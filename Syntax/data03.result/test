@@ -45,7 +45,7 @@ C     the current implementation (June 2002).
 C  P() {M==-1}
 
 
-      PRINT *, X(2,4), K, L, M                                          0001
+      PRINT *, X(2,4), K, L, M                                          0011
 
       END
 Deletion of obsolete resources:

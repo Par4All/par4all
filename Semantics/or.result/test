@@ -8,63 +8,63 @@ C     to test or conditions
 C  P() {}
 
 
-      L = 3                                                             0001
+      L = 3                                                             0005
 
 C  P(L) {L==3}
 
-      IF (K.EQ.1.OR.K.EQ.2) L = K                                       0002
+      IF (K.EQ.1.OR.K.EQ.2) L = K                                       0006
 
 C  P(L) {1<=L, L<=3}
 
-      K = M                                                             0004
+      K = M                                                             0009
 
 C  P(K,L) {K==M, 1<=L, L<=3}
 
-      PRINT *, L                                                        0005
+      PRINT *, L                                                        0010
 
 C  P(K,L) {K==M, 1<=L, L<=3}
 
 
-      L = 3                                                             0006
+      L = 3                                                             0012
 
 C  P(K,L) {K==M, L==3}
 
-      IF (K.GE.1) THEN                                                  0007
+      IF (K.GE.1) THEN                                                  0013
 
 C  P(K,L) {K==M, L==3, 1<=K}
 
-         IF (K.EQ.1.OR.K.EQ.2) THEN                                     0008
+         IF (K.EQ.1.OR.K.EQ.2) THEN                                     0014
 
 C  P(K,L) {K==M, L==3, 1<=K, K<=2}
 
-            L = K                                                       0009
+            L = K                                                       0015
 
 C  P(K,L) {K==L, K==M, 1<=K, K<=2}
 
-            K = 0                                                       0010
+            K = 0                                                       0016
 
 C  P(K,L) {K==0, L==M, 1<=L, L<=2}
 
-            PRINT *, L                                                  0011
+            PRINT *, L                                                  0017
          ELSE
 
 C  P(K,L) {K==M, L==3, 3<=K}
 
-            L = K                                                       0012
+            L = K                                                       0019
 
 C  P(K,L) {K==L, K==M, 3<=K}
 
-            K = 0                                                       0013
+            K = 0                                                       0020
 
 C  P(K,L) {K==0, L==M, 3<=L}
 
-            PRINT *, L                                                  0014
+            PRINT *, L                                                  0021
          ENDIF
       ENDIF
 
 C  P(K,L) {K<=0, M<=K+L, K+L<=M+3, 2K+3<=L+2M}
 
 
-      PRINT *, K, L, M                                                  0015
+      PRINT *, K, L, M                                                  0025
 
       END

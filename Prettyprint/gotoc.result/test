@@ -3,28 +3,28 @@ Userview
 
       SUBROUTINE GOTOC(I)
 
-      IF (I.EQ.1) THEN                                                  0001
+      IF (I.EQ.1) THEN                                                  0003
          GOTO 100
       ENDIF
-      IF (I.EQ.2) THEN                                                  0001
+      IF (I.EQ.2) THEN                                                  0003
          GOTO 200
       ENDIF
-      IF (I.EQ.3) THEN                                                  0001
+      IF (I.EQ.3) THEN                                                  0003
          GOTO 300
       ENDIF
 
-      PRINT *, I                                                        0002
+      PRINT *, I                                                        0005
 
-100   CONTINUE                                                          0003
-      PRINT *, I                                                        0004
-
-200   CONTINUE                                                          0005
-      PRINT *, I                                                        0006
-
-300   CONTINUE                                                          0007
+100   CONTINUE                                                          0007
       PRINT *, I                                                        0008
 
-400   CONTINUE                                                          0009
+200   CONTINUE                                                          0010
+      PRINT *, I                                                        0011
+
+300   CONTINUE                                                          0013
+      PRINT *, I                                                        0014
+
+400   CONTINUE                                                          0016
 
       END
 
@@ -32,36 +32,36 @@ Userview with proper effects
 
       SUBROUTINE GOTOC(I)
 
-      IF (I.EQ.1) THEN                                                  0001
+      IF (I.EQ.1) THEN                                                  0003
          GOTO 100
       ENDIF
-      IF (I.EQ.2) THEN                                                  0001
+      IF (I.EQ.2) THEN                                                  0003
          GOTO 200
       ENDIF
-      IF (I.EQ.3) THEN                                                  0001
+      IF (I.EQ.3) THEN                                                  0003
          GOTO 300
       ENDIF
 C               <must be read   >: I __IO_EFFECTS:LUNS(6)
 C               <must be written>: __IO_EFFECTS:LUNS(6)
 
-      PRINT *, I                                                        0002
+      PRINT *, I                                                        0005
 
-100   CONTINUE                                                          0003
-C               <must be read   >: I __IO_EFFECTS:LUNS(6)
-C               <must be written>: __IO_EFFECTS:LUNS(6)
-      PRINT *, I                                                        0004
-
-200   CONTINUE                                                          0005
-C               <must be read   >: I __IO_EFFECTS:LUNS(6)
-C               <must be written>: __IO_EFFECTS:LUNS(6)
-      PRINT *, I                                                        0006
-
-300   CONTINUE                                                          0007
+100   CONTINUE                                                          0007
 C               <must be read   >: I __IO_EFFECTS:LUNS(6)
 C               <must be written>: __IO_EFFECTS:LUNS(6)
       PRINT *, I                                                        0008
 
-400   CONTINUE                                                          0009
+200   CONTINUE                                                          0010
+C               <must be read   >: I __IO_EFFECTS:LUNS(6)
+C               <must be written>: __IO_EFFECTS:LUNS(6)
+      PRINT *, I                                                        0011
+
+300   CONTINUE                                                          0013
+C               <must be read   >: I __IO_EFFECTS:LUNS(6)
+C               <must be written>: __IO_EFFECTS:LUNS(6)
+      PRINT *, I                                                        0014
+
+400   CONTINUE                                                          0016
 
       END
 
@@ -71,36 +71,36 @@ C               <must be read   >: I __IO_EFFECTS:LUNS(6)
 C               <must be written>: __IO_EFFECTS:LUNS(6)
       SUBROUTINE GOTOC(I)
 
-      IF (I.EQ.1) THEN                                                  0001
+      IF (I.EQ.1) THEN                                                  0003
          GOTO 100
       ENDIF
-      IF (I.EQ.2) THEN                                                  0001
+      IF (I.EQ.2) THEN                                                  0003
          GOTO 200
       ENDIF
-      IF (I.EQ.3) THEN                                                  0001
+      IF (I.EQ.3) THEN                                                  0003
          GOTO 300
       ENDIF
 C               <must be read   >: I __IO_EFFECTS:LUNS(6)
 C               <must be written>: __IO_EFFECTS:LUNS(6)
 
-      PRINT *, I                                                        0002
+      PRINT *, I                                                        0005
 
-100   CONTINUE                                                          0003
-C               <must be read   >: I __IO_EFFECTS:LUNS(6)
-C               <must be written>: __IO_EFFECTS:LUNS(6)
-      PRINT *, I                                                        0004
-
-200   CONTINUE                                                          0005
-C               <must be read   >: I __IO_EFFECTS:LUNS(6)
-C               <must be written>: __IO_EFFECTS:LUNS(6)
-      PRINT *, I                                                        0006
-
-300   CONTINUE                                                          0007
+100   CONTINUE                                                          0007
 C               <must be read   >: I __IO_EFFECTS:LUNS(6)
 C               <must be written>: __IO_EFFECTS:LUNS(6)
       PRINT *, I                                                        0008
 
-400   CONTINUE                                                          0009
+200   CONTINUE                                                          0010
+C               <must be read   >: I __IO_EFFECTS:LUNS(6)
+C               <must be written>: __IO_EFFECTS:LUNS(6)
+      PRINT *, I                                                        0011
+
+300   CONTINUE                                                          0013
+C               <must be read   >: I __IO_EFFECTS:LUNS(6)
+C               <must be written>: __IO_EFFECTS:LUNS(6)
+      PRINT *, I                                                        0014
+
+400   CONTINUE                                                          0016
 
       END
 
@@ -113,21 +113,21 @@ C  T() {}
 
 
 
-      IF (I.EQ.1) THEN                                                  0001
+      IF (I.EQ.1) THEN                                                  0003
 
 
          GOTO 100
       ENDIF
 
 
-      IF (I.EQ.2) THEN                                                  0001
+      IF (I.EQ.2) THEN                                                  0003
 
 
          GOTO 200
       ENDIF
 
 
-      IF (I.EQ.3) THEN                                                  0001
+      IF (I.EQ.3) THEN                                                  0003
 
 
          GOTO 300
@@ -136,30 +136,12 @@ C  T() {}
 C  T() {}
 
 
-      PRINT *, I                                                        0002
+      PRINT *, I                                                        0005
 
 C  T() {}
 
 
-100   CONTINUE                                                          0003
-
-C  T() {}
-
-      PRINT *, I                                                        0004
-
-C  T() {}
-
-
-200   CONTINUE                                                          0005
-
-C  T() {}
-
-      PRINT *, I                                                        0006
-
-C  T() {}
-
-
-300   CONTINUE                                                          0007
+100   CONTINUE                                                          0007
 
 C  T() {}
 
@@ -168,7 +150,25 @@ C  T() {}
 C  T() {}
 
 
-400   CONTINUE                                                          0009
+200   CONTINUE                                                          0010
+
+C  T() {}
+
+      PRINT *, I                                                        0011
+
+C  T() {}
+
+
+300   CONTINUE                                                          0013
+
+C  T() {}
+
+      PRINT *, I                                                        0014
+
+C  T() {}
+
+
+400   CONTINUE                                                          0016
 
       END
 
@@ -181,21 +181,21 @@ C  P() {}
 
 
 
-      IF (I.EQ.1) THEN                                                  0001
+      IF (I.EQ.1) THEN                                                  0003
 
 
          GOTO 100
       ENDIF
 
 
-      IF (I.EQ.2) THEN                                                  0001
+      IF (I.EQ.2) THEN                                                  0003
 
 
          GOTO 200
       ENDIF
 
 
-      IF (I.EQ.3) THEN                                                  0001
+      IF (I.EQ.3) THEN                                                  0003
 
 
          GOTO 300
@@ -204,30 +204,12 @@ C  P() {}
 C  P() {}
 
 
-      PRINT *, I                                                        0002
+      PRINT *, I                                                        0005
 
 C  P() {}
 
 
-100   CONTINUE                                                          0003
-
-C  P() {}
-
-      PRINT *, I                                                        0004
-
-C  P() {}
-
-
-200   CONTINUE                                                          0005
-
-C  P() {}
-
-      PRINT *, I                                                        0006
-
-C  P() {}
-
-
-300   CONTINUE                                                          0007
+100   CONTINUE                                                          0007
 
 C  P() {}
 
@@ -236,7 +218,25 @@ C  P() {}
 C  P() {}
 
 
-400   CONTINUE                                                          0009
+200   CONTINUE                                                          0010
+
+C  P() {}
+
+      PRINT *, I                                                        0011
+
+C  P() {}
+
+
+300   CONTINUE                                                          0013
+
+C  P() {}
+
+      PRINT *, I                                                        0014
+
+C  P() {}
+
+
+400   CONTINUE                                                          0016
 
       END
 
@@ -248,13 +248,13 @@ C  <__IO_EFFECTS:LUNS(PHI1)-W-MAY-{PHI1==6}>
 
       SUBROUTINE GOTOC(I)
 
-      IF (I.EQ.1) THEN                                                  0001
+      IF (I.EQ.1) THEN                                                  0003
          GOTO 100
       ENDIF
-      IF (I.EQ.2) THEN                                                  0001
+      IF (I.EQ.2) THEN                                                  0003
          GOTO 200
       ENDIF
-      IF (I.EQ.3) THEN                                                  0001
+      IF (I.EQ.3) THEN                                                  0003
          GOTO 300
       ENDIF
 
@@ -262,30 +262,30 @@ C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6}>
 C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6}>
 
 
-      PRINT *, I                                                        0002
+      PRINT *, I                                                        0005
 
-100   CONTINUE                                                          0003
-
-C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6}>
-C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6}>
-
-      PRINT *, I                                                        0004
-
-200   CONTINUE                                                          0005
-
-C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6}>
-C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6}>
-
-      PRINT *, I                                                        0006
-
-300   CONTINUE                                                          0007
+100   CONTINUE                                                          0007
 
 C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6}>
 C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6}>
 
       PRINT *, I                                                        0008
 
-400   CONTINUE                                                          0009
+200   CONTINUE                                                          0010
+
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6}>
+
+      PRINT *, I                                                        0011
+
+300   CONTINUE                                                          0013
+
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6}>
+
+      PRINT *, I                                                        0014
+
+400   CONTINUE                                                          0016
 
       END
 
@@ -294,35 +294,35 @@ Userview with complexities
 C                                                                 4.38 (SUMMARY)
       SUBROUTINE GOTOC(I)
 
-      IF (I.EQ.1) THEN                                                  0001
+      IF (I.EQ.1) THEN                                                  0003
          GOTO 100
       ENDIF
-      IF (I.EQ.2) THEN                                                  0001
+      IF (I.EQ.2) THEN                                                  0003
          GOTO 200
       ENDIF
-      IF (I.EQ.3) THEN                                                  0001
+      IF (I.EQ.3) THEN                                                  0003
          GOTO 300
       ENDIF
 C                                                                  1/8 (STMT)
 
-      PRINT *, I                                                        0002
+      PRINT *, I                                                        0005
 C                                                                    0 (STMT)
 
-100   CONTINUE                                                          0003
-C                                                                    1 (STMT)
-      PRINT *, I                                                        0004
-C                                                                    0 (STMT)
-
-200   CONTINUE                                                          0005
-C                                                                    1 (STMT)
-      PRINT *, I                                                        0006
-C                                                                    0 (STMT)
-
-300   CONTINUE                                                          0007
+100   CONTINUE                                                          0007
 C                                                                    1 (STMT)
       PRINT *, I                                                        0008
 C                                                                    0 (STMT)
 
-400   CONTINUE                                                          0009
+200   CONTINUE                                                          0010
+C                                                                    1 (STMT)
+      PRINT *, I                                                        0011
+C                                                                    0 (STMT)
+
+300   CONTINUE                                                          0013
+C                                                                    1 (STMT)
+      PRINT *, I                                                        0014
+C                                                                    0 (STMT)
+
+400   CONTINUE                                                          0016
 
       END

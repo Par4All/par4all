@@ -7,7 +7,7 @@ Module ENTRY01
       COMPLEX*8 X(1:N)
       COMMON /ENTRY_ENTRY08/ L
 
-      PRINT *, X(1), W                                                  0001
+      PRINT *, X(1), W                                                  0010
 
 
       END
@@ -20,10 +20,10 @@ Entry INCREMENT
       CHARACTER Y(1:M)
       COMMON /ENTRY_ENTRY08/ L
 
-99999 CONTINUE                                                          0001
+99999 CONTINUE                                                          0007
 
-      PRINT *, Y(2), U                                                  0002
+      PRINT *, Y(2), U                                                  0009
 
-      M = M+1                                                           0003
+      M = M+1                                                           0011
 
       END

@@ -11,73 +11,73 @@ C
       INTEGER L(10)
 C
 C
-      I = 0                                                             0001
-      J = 1                                                             0002
-      K = 5                                                             0003
+      I = 0                                                             0011
+      J = 1                                                             0012
+      K = 5                                                             0013
 C
 C     do not replace array references, but array indices
-      L(2) = L(1)+L(1)                                                  0004
+      L(2) = L(1)+L(1)                                                  0016
 C
-      DO I = 1, 5                                                       0005
-         P = P+I                                                        0006
+      DO I = 1, 5                                                       0018
+         P = P+I                                                        0019
       ENDDO
 C
-      IF (2*N.GT.0) P = 0                                               0007
+      IF (2*N.GT.0) P = 0                                               0022
 C
 C     test de PLUS et MINUS
-      K = 2*(M+N)                                                       0009
-      K = 2*(M-N)                                                       0010
-      K = 2*(M-N)                                                       0011
-      K = 2*(N-M)                                                       0012
-      K = -2*(M+N)                                                      0013
-      K = -2*(M+N)                                                      0014
+      K = 2*(M+N)                                                       0027
+      K = 2*(M-N)                                                       0028
+      K = 2*(M-N)                                                       0029
+      K = 2*(N-M)                                                       0030
+      K = -2*(M+N)                                                      0031
+      K = -2*(M+N)                                                      0032
 C
-      K = M+2*N                                                         0015
-      K = M-2*N                                                         0016
-      K = M-2*N                                                         0017
-      K = -M-2*N                                                        0018
-      K = -(M+2*N)                                                      0019
-      K = 2*N-M                                                         0020
+      K = M+2*N                                                         0034
+      K = M-2*N                                                         0035
+      K = M-2*N                                                         0036
+      K = -M-2*N                                                        0037
+      K = -(M+2*N)                                                      0038
+      K = 2*N-M                                                         0039
 C
-      K = 1+N                                                           0021
-      K = -N-1                                                          0022
-      K = -N-1                                                          0023
-      K = -N-1                                                          0024
-      K = N+1                                                           0025
-      K = N                                                             0026
+      K = 1+N                                                           0041
+      K = -N-1                                                          0042
+      K = -N-1                                                          0043
+      K = -N-1                                                          0044
+      K = N+1                                                           0045
+      K = N                                                             0046
 C
 C     test pour MULT
-      K = -6*M                                                          0027
-      K = N                                                             0028
-      K = 0                                                             0029
-      K = 3*N*M                                                         0030
-      K = 3*N*(M-1)+7                                                   0031
-      K = (N+1)*M                                                       0032
+      K = -6*M                                                          0049
+      K = N                                                             0050
+      K = 0                                                             0051
+      K = 3*N*M                                                         0052
+      K = 3*N*(M-1)+7                                                   0053
+      K = (N+1)*M                                                       0054
 C
 C     test pour DIV et MOD.
 C     {A=3/2} est equivalent a {A=1}, mais different de {A=3./2}
-      A = 1                                                             0033
-      A = 3./2                                                          0034
-      K = 1                                                             0035
-      K = 2                                                             0036
-      K = 2                                                             0037
+      A = 1                                                             0058
+      A = 3./2                                                          0059
+      K = 1                                                             0060
+      K = 2                                                             0061
+      K = 2                                                             0062
 c     (-5)/2 = 5/(-2) = -2
-      K = -2                                                            0038
-      K = -2                                                            0039
-      K = (4*M+5)/2                                                     0040
-      K = 4*M+5                                                         0041
-      K = 2*M+3                                                         0042
-      K = 1                                                             0043
-      K = 1                                                             0044
+      K = -2                                                            0064
+      K = -2                                                            0065
+      K = (4*M+5)/2                                                     0066
+      K = 4*M+5                                                         0067
+      K = 2*M+3                                                         0068
+      K = 1                                                             0069
+      K = 1                                                             0070
 c     MOD(-3,2) = MOD(3,-2) = -1
-      K = -1                                                            0045
-      K = -1                                                            0046
+      K = -1                                                            0072
+      K = -1                                                            0073
 C
 C     do not replace written parameters of assign, fonctions 
 C     or subroutines!
-      I = 10                                                            0047
-      I = I                                                             0048
-      J = 0                                                             0049
-      CALL FX(10, J)                                                    0050
+      I = 10                                                            0077
+      I = I                                                             0078
+      J = 0                                                             0079
+      CALL FX(10, J)                                                    0080
 C
       END

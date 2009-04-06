@@ -16,24 +16,24 @@ C  T(N) {}
 
 C (0,2)
 
-      READ *, N                                                         0001
+      READ *, N                                                         0007
 
 C  T(I) {2<=I}
 
 C (0,3)
-      DO I = N*N+2, M                                                   0002
+      DO I = N*N+2, M                                                   0008
 
 C  T() {1<=I, I<=M}
 
 C (0,4)
-         T(I) = 0.                                                      0003
+         T(I) = 0.                                                      0009
       ENDDO
 
 C  T() {}
 
 C (0,5)
 
-      PRINT *, I                                                        0004
+      PRINT *, I                                                        0012
 
 C     END BLOCK
       END
@@ -55,24 +55,24 @@ C  P() {1<=M}
 
 C (0,2)
 
-      READ *, N                                                         0001
+      READ *, N                                                         0007
 
 C  P(N) {1<=M}
 
 C (0,3)
-      DO I = N*N+2, M                                                   0002
+      DO I = N*N+2, M                                                   0008
 
 C  P(I,N) {2<=I, I<=M, 1<=M}
 
 C (0,4)
-         T(I) = 0.                                                      0003
+         T(I) = 0.                                                      0009
       ENDDO
 
 C  P(I,N) {2<=I, 1<=M}
 
 C (0,5)
 
-      PRINT *, I                                                        0004
+      PRINT *, I                                                        0012
 
 C     END BLOCK
       END

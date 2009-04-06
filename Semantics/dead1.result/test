@@ -10,7 +10,7 @@ C  P() {I==1}
 C  P() {I==1}
 
 
-      PRINT *, I                                                        0001
+      PRINT *, I                                                        0004
 
       END
 
@@ -25,6 +25,6 @@ C  P() {I==1}
 C  P() {I==1}
 
 
-      PRINT *, I                                                        0001
+      PRINT *, I                                                        0004
 
       END

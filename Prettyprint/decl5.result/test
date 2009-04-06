@@ -10,7 +10,7 @@
       EQUIVALENCE (A1, B1)
       EQUIVALENCE (D, A)
 ! use
-      PRINT *, B, B3, C2(2), C3(2)                                      0001
+      PRINT *, B, B3, C2(2), C3(2)                                      0018
       END
 # after cleaning declarations...
       PROGRAM DECL5
@@ -20,5 +20,5 @@
       EQUIVALENCE (C3(2), C2)
       EQUIVALENCE (A3, B3)
 ! use
-      PRINT *, B, B3, C2(2), C3(2)                                      0001
+      PRINT *, B, B3, C2(2), C3(2)                                      0018
       END

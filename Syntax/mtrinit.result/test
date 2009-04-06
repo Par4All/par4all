@@ -5,7 +5,7 @@ EXTERNAL declaration parsed first
       EXTERNAL TRINIT
       COMMON /CTRINIT/ I
 
-      PRINT *, I                                                        0001
+      PRINT *, I                                                        0005
 
       END
 
@@ -23,7 +23,7 @@ C  P() {I==3}
 C  P() {I==3}
 
 
-      PRINT *, I                                                        0001
+      PRINT *, I                                                        0005
 
       END
 
@@ -38,7 +38,7 @@ EXTERNAL declaration parsed second
       EXTERNAL TRINIT
       COMMON /CTRINIT/ I
 
-      PRINT *, I                                                        0001
+      PRINT *, I                                                        0005
 
       END
 
@@ -51,6 +51,6 @@ C  P() {I==3}
 C  P() {I==3}
 
 
-      PRINT *, I                                                        0001
+      PRINT *, I                                                        0005
 
       END

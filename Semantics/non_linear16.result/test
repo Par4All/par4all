@@ -14,7 +14,7 @@ C  T(J) {I==2, J==2K}
 
 C (0,2)
 
-      J = K*I                                                           0001
+      J = K*I                                                           0005
 c      if(k.eq.3) then
 c         read *, i
 c         l = j*m

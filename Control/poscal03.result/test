@@ -25,7 +25,7 @@ C (unreachable)
 
 c     5             if the next line is commented out, the controlizer bug disappears...
 C     Same thing if the other READ is commented out
-      READ (UNIT=NFICAL,FMT='(A)',END=9999) TXLIGN(NFICAL)              0001
+      READ (UNIT=NFICAL,FMT='(A)',END=9999) TXLIGN(NFICAL)              0020
 C (unreachable)
       IF (END_LUNS(NFICAL)) THEN
 C (unreachable)
@@ -37,14 +37,14 @@ C        END BLOCK
       ENDIF
 C     END BLOCK
 C (unreachable)
-      DO WHILE (TXLIGN(NFICAL)(1:1).EQ.'('.OR.TXLIGN(NFICAL)(1:1).EQ.   0002
-     &'*')                                                              0002
+      DO WHILE (TXLIGN(NFICAL)(1:1).EQ.'('.OR.TXLIGN(NFICAL)(1:1).EQ.   0021
+     &'*')                                                              0021
 C (unreachable)
 C        BEGIN BLOCK
 C (unreachable)
 C        BEGIN BLOCK
 C (unreachable)
-         READ (UNIT=NFICAL,FMT='(A)',END=9999) TXLIGN(NFICAL)           0003
+         READ (UNIT=NFICAL,FMT='(A)',END=9999) TXLIGN(NFICAL)           0023
 C (unreachable)
          IF (END_LUNS(NFICAL)) THEN
 C (unreachable)
@@ -56,11 +56,11 @@ C           END BLOCK
          ENDIF
 C        END BLOCK
 C (unreachable)
-         CONTINUE                                                       0004
+         CONTINUE                                                       0024
 C        END BLOCK
       ENDDO
 C (unreachable)
-9999  IRETOU = 1                                                        0004
+9999  IRETOU = 1                                                        0025
 C (unreachable)
       RETURN
 C     END BLOCK
@@ -89,7 +89,7 @@ C (1,1)
 
 c     5             if the next line is commented out, the controlizer bug disappears...
 C     Same thing if the other READ is commented out
-      READ (UNIT=NFICAL,FMT='(A)',END=9999) TXLIGN(NFICAL)              0001
+      READ (UNIT=NFICAL,FMT='(A)',END=9999) TXLIGN(NFICAL)              0020
 C (2,1)
       IF (END_LUNS(NFICAL)) GOTO 99999
 C (16,1)
@@ -102,10 +102,10 @@ C (14,1)
 99997 CONTINUE
 C (6,1)
 C     DO WHILE loop with GO TO exit had to be desugared
-      IF (.NOT.(TXLIGN(NFICAL)(1:1).EQ.'('.OR.TXLIGN(NFICAL)(1:1).EQ.   0002
-     &'*')) GOTO 9999                                                   0002
+      IF (.NOT.(TXLIGN(NFICAL)(1:1).EQ.'('.OR.TXLIGN(NFICAL)(1:1).EQ.   0021
+     &'*')) GOTO 9999                                                   0021
 C (7,1)
-      READ (UNIT=NFICAL,FMT='(A)',END=9999) TXLIGN(NFICAL)              0003
+      READ (UNIT=NFICAL,FMT='(A)',END=9999) TXLIGN(NFICAL)              0023
 C (8,1)
       IF (END_LUNS(NFICAL)) GOTO 99998
 C (10,1)
@@ -126,7 +126,7 @@ C     BEGIN BLOCK
 C (4,2)
       CONTINUE
 C (4,3)
-9999  IRETOU = 1                                                        0004
+9999  IRETOU = 1                                                        0025
 C (4,4)
       RETURN
 C     END BLOCK
@@ -162,26 +162,26 @@ C (0,2)
 
 c     5             if the next line is commented out, the controlizer bug disappears...
 C     Same thing if the other READ is commented out
-      READ (UNIT=NFICAL,FMT='(A)',END=9999) TXLIGN(NFICAL)              0001
+      READ (UNIT=NFICAL,FMT='(A)',END=9999) TXLIGN(NFICAL)              0020
 C (0,3)
 C (1,1)
       IF (END_LUNS(NFICAL)) GOTO 9999
 99999 CONTINUE
 C (3,1)
 C     DO WHILE loop with GO TO exit had to be desugared
-      IF (.NOT.(TXLIGN(NFICAL)(1:1).EQ.'('.OR.TXLIGN(NFICAL)(1:1).EQ.   0002
-     &'*')) GOTO 9999                                                   0002
+      IF (.NOT.(TXLIGN(NFICAL)(1:1).EQ.'('.OR.TXLIGN(NFICAL)(1:1).EQ.   0021
+     &'*')) GOTO 9999                                                   0021
 C (4,1)
-      READ (UNIT=NFICAL,FMT='(A)',END=9999) TXLIGN(NFICAL)              0003
+      READ (UNIT=NFICAL,FMT='(A)',END=9999) TXLIGN(NFICAL)              0023
 C (5,1)
       IF (END_LUNS(NFICAL)) THEN
       ELSE
          GOTO 99999
       ENDIF
 C (2,1)
-9999  CONTINUE                                                          0004
+9999  CONTINUE                                                          0025
 C (0,4)
-      IRETOU = 1                                                        0004
+      IRETOU = 1                                                        0025
 C (0,5)
       RETURN
 C     END BLOCK

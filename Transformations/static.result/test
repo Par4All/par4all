@@ -1,21 +1,21 @@
       SUBROUTINE STATIC(A,B,N)
       REAL A(100,200), B(100,200)
       INTEGER M, N, I, J, K
-      DO NLC1 = 1, (-1+N)/2                                             0001
-         M = -1+2*N                                                     0002
-         DO NLC2 = 1, -2-4*NLC1+N                                       0003
-            IF (4+8*NLC1.GT.-3+2*NLC2.AND.-M+2*NLC1+1.LT.N) THEN        0004
-               DO NLC3 = 1, -1-2*NLC1+N                                 0005
-                  A(-NLC2+N,-M+2*NLC1+NLC2+1) = SQRT(B(1+4*NLC1,1+3*    0006
-     &            NLC2)+1.)/2.                                          0006
-3                 CONTINUE                                              0007
+      DO NLC1 = 1, (-1+N)/2                                             0004
+         M = -1+2*N                                                     0005
+         DO NLC2 = 1, -2-4*NLC1+N                                       0006
+            IF (4+8*NLC1.GT.-3+2*NLC2.AND.-M+2*NLC1+1.LT.N) THEN        0007
+               DO NLC3 = 1, -1-2*NLC1+N                                 0008
+                  A(-NLC2+N,-M+2*NLC1+NLC2+1) = SQRT(B(1+4*NLC1,1+3*    0009
+     &            NLC2)+1.)/2.                                          0009
+3                 CONTINUE                                              0010
                ENDDO
                K = MAX(-1-2*NLC1+N, 0)+2*NLC1+2
             ENDIF
-2           CONTINUE                                                    0008
+2           CONTINUE                                                    0012
          ENDDO
          J = MAX(-2-4*NLC1+N, 0)+1
-1        CONTINUE                                                       0009
+1        CONTINUE                                                       0013
       ENDDO
       I = 2*MAX((-1+N)/2, 0)+3
       RETURN

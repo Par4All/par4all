@@ -12,11 +12,11 @@ c     current procedure.
 C  P() {}
 
 
-      CALL BAR                                                          0001
+      CALL BAR                                                          0009
 
 C  P(K,L,M) {K==3, L==5, M==4}
 
 
-      PRINT *, K, L, M, N                                               0002
+      PRINT *, K, L, M, N                                               0011
 
       END

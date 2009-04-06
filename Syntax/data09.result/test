@@ -21,10 +21,10 @@ C     Detect data bug (or ANSI extension...)
 
       COMMON M
 
-      CALL INIT1                                                        0001
-      CALL INIT2                                                        0002
+      CALL INIT1                                                        0007
+      CALL INIT2                                                        0008
 
-      PRINT *, M                                                        0003
+      PRINT *, M                                                        0010
 
       END
 Selecting rule: TRANSFORMERS_INTER_FULL
@@ -88,16 +88,16 @@ C     Detect data bug (or ANSI extension...)
 C  P() {0==-1}
 
 
-      CALL INIT1                                                        0001
+      CALL INIT1                                                        0007
 
 C  P() {0==-1}
 
-      CALL INIT2                                                        0002
+      CALL INIT2                                                        0008
 
 C  P() {0==-1}
 
 
-      PRINT *, M                                                        0003
+      PRINT *, M                                                        0010
 
       END
 Deletion of obsolete resources:

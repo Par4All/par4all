@@ -15,12 +15,12 @@ C  <A(PHI1)-W-EXACT-{1<=PHI1, PHI1<=5}>
 C  <B(PHI1)-R-EXACT-{1<=PHI1, PHI1<=5}>
 
 C
-      DO I = 1, 5                                                       0001
+      DO I = 1, 5                                                       0009
 
 C  <A(PHI1)-W-EXACT-{PHI1==I, 1<=I, I<=5}>
 C  <B(PHI1)-R-EXACT-{PHI1==I, 1<=I, I<=5}>
 
-         A(I) = SIN(B(I))                                               0002
+         A(I) = SIN(B(I))                                               0010
       ENDDO
 C
       END

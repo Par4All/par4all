@@ -14,13 +14,13 @@ C (0,2)
 
 C     Check
 
-      IF (I.NE.1) STOP                                                  0001
+      IF (I.NE.1) STOP                                                  0005
 
 C  T(K) {0<=K}
 
 C (0,5)
 
-      K = I*I                                                           0003
+      K = I*I                                                           0007
 
 C     END BLOCK
       END

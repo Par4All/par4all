@@ -6,8 +6,8 @@ C     Bug trouve dans Scilab, matops.f
       PARAMETER (BUFSIZE=4096)
       CHARACTER BUFFER*(BUFSIZE)
 
-      BUFFER = 'Hello world!'                                           0001
+      BUFFER = 'Hello world!'                                           0009
 
-      PRINT *, BUFFER                                                   0002
+      PRINT *, BUFFER                                                   0011
 
       END

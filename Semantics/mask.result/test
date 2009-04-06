@@ -9,17 +9,17 @@ C  P() {}
 C  P() {}
 
 
-      CALL MASKED_INIT                                                  0001
+      CALL MASKED_INIT                                                  0003
 
 C  P(INCR:I) {}
 
 
-      CALL MASKED_INCR                                                  0002
+      CALL MASKED_INCR                                                  0005
 
 C  P(INCR:I) {}
 
 
-      PRINT *, 'hello'                                                  0003
+      PRINT *, 'hello'                                                  0007
 
       END
 
@@ -33,16 +33,16 @@ C  P() {}
 C  P() {}
 
 
-      CALL MASKED_INIT                                                  0001
+      CALL MASKED_INIT                                                  0003
 
 C  P(INCR:I) {INCR:I==0}
 
 
-      CALL MASKED_INCR                                                  0002
+      CALL MASKED_INCR                                                  0005
 
 C  P(INCR:I) {INCR:I==1}
 
 
-      PRINT *, 'hello'                                                  0003
+      PRINT *, 'hello'                                                  0007
 
       END

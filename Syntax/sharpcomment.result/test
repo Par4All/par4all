@@ -4,8 +4,8 @@
 
 # here is some output 
 ! and a more usual comment
-      PRINT *, 'a sharp can start a comment '                           0001
-      PRINT *, 'for most Fortran compilers'                             0002
+      PRINT *, 'a sharp can start a comment '                           0007
+      PRINT *, 'for most Fortran compilers'                             0008
 
 # last comment.
       END

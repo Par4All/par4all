@@ -22,29 +22,29 @@ C
      XJ(11),K(11),L(11),M(11),N(11)/'H2O ','TR. ','TEMP','  ( ',' K )'/
      XJ(12),K(12),L(12),M(12),N(12)/'H2O ','ROT ','TEMP','  ( ',' K )'/
      XJ(13),K(13),L(13),M(13),N(13)/'ION ','TR. ','TEMP','  ( ',' K )'/
-      FNAVS = DBLE(NAVRS)                                               0001
-      DO 100 I = 1, 13                                                  0002
-         AV(I) = V(I)/FNAVS                                             0003
-         AVV(I) = SQRT(ABS(VV(I)/FNAVS-AV(I)*AV(I)))                    0004
-100      CONTINUE                                                       0005
-      WRITE (66, 150) NAVRS                                             0006
-150   FORMAT(//1X,'*** AVERAGE VALUES AFTER ',I8,' STEPS:'//)           0007
-      DO 200 I = 1, 10                                                  0008
-200      WRITE (66, 250) J(I), K(I), L(I), M(I), N(I), AV(I), AVV(I)    0009
-250   FORMAT(/1X,5A4,4X,-3PF12.4,' +/-  ',-3PF12.4)                     0010
-      WRITE (1, 2)                                                      0011
-      WRITE (1, 5) AV(10)                                               0012
-      IF (AV(10).LT.-7495.5.AND.AV(10).LT.-7495.3) THEN                 0013
-         WRITE (1, 3)                                                   0014
+      FNAVS = DBLE(NAVRS)                                               0025
+      DO 100 I = 1, 13                                                  0026
+         AV(I) = V(I)/FNAVS                                             0027
+         AVV(I) = SQRT(ABS(VV(I)/FNAVS-AV(I)*AV(I)))                    0028
+100      CONTINUE                                                       0029
+      WRITE (66, 150) NAVRS                                             0030
+150   FORMAT(//1X,'*** AVERAGE VALUES AFTER ',I8,' STEPS:'//)           0031
+      DO 200 I = 1, 10                                                  0032
+200      WRITE (66, 250) J(I), K(I), L(I), M(I), N(I), AV(I), AVV(I)    0033
+250   FORMAT(/1X,5A4,4X,-3PF12.4,' +/-  ',-3PF12.4)                     0034
+      WRITE (1, 2)                                                      0035
+      WRITE (1, 5) AV(10)                                               0036
+      IF (AV(10).LT.-7495.5.AND.AV(10).LT.-7495.3) THEN                 0037
+         WRITE (1, 3)                                                   0038
       ELSE
-         WRITE (1, 4)                                                   0015
+         WRITE (1, 4)                                                   0040
       ENDIF
 C
-      DO 300 I = 11, 13                                                 0016
-300      WRITE (66, 350) J(I), K(I), L(I), M(I), N(I), AV(I), AVV(I)    0017
-350   FORMAT(/1X,5A4,4X,0PF12.2,' +/-  ',0PF12.2)                       0018
-2     FORMAT(1X,'VALIDATION PARAMETERS:'/)                              0019
-3     FORMAT(//1X,'RESULTS FOR THIS RUN ARE:   VALID')                  0020
-4     FORMAT(//1X,'RESULTS FOR THIS RUN ARE: INVALID')                  0021
-5     FORMAT(1X,-3PF12.4)                                               0022
+      DO 300 I = 11, 13                                                 0043
+300      WRITE (66, 350) J(I), K(I), L(I), M(I), N(I), AV(I), AVV(I)    0044
+350   FORMAT(/1X,5A4,4X,0PF12.2,' +/-  ',0PF12.2)                       0045
+2     FORMAT(1X,'VALIDATION PARAMETERS:'/)                              0046
+3     FORMAT(//1X,'RESULTS FOR THIS RUN ARE:   VALID')                  0047
+4     FORMAT(//1X,'RESULTS FOR THIS RUN ARE: INVALID')                  0048
+5     FORMAT(1X,-3PF12.4)                                               0049
       END

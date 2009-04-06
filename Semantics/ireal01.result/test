@@ -13,41 +13,41 @@ C     but I <= k2
 C  T(I) {}
 
 
-      I = 1.2                                                           0001
+      I = 1.2                                                           0010
 
 C  T(I) {}
 
-      I = MIN(1.2, K)                                                   0002
+      I = MIN(1.2, K)                                                   0011
 
 C  T(LWIDTH) {LWIDTH<=132}
 
-      LWIDTH = MIN(MAX(IFIELD, 72), 132)                                0003
+      LWIDTH = MIN(MAX(IFIELD, 72), 132)                                0012
 
 C  T(LWIDTH) {}
 
-      LWIDTH = MIN(MAX(IFIELD, 72.0D0), 132)                            0004
-
-C  T(LWIDTH) {}
-
-
-      LWIDTH = MIN(MAX(IFIELD, 72), 132.0D0)                            0005
+      LWIDTH = MIN(MAX(IFIELD, 72.0D0), 132)                            0013
 
 C  T(LWIDTH) {}
 
 
-      LWIDTH = MIN(MAX(IFIELD, 72.0D0), 132.0D0)                        0006
+      LWIDTH = MIN(MAX(IFIELD, 72), 132.0D0)                            0015
 
 C  T(LWIDTH) {}
 
-      LWIDTH = MIN(MAX(IFIELD+IFLD, 72.0D0), 132.0D0)                   0007
+
+      LWIDTH = MIN(MAX(IFIELD, 72.0D0), 132.0D0)                        0017
 
 C  T(LWIDTH) {}
 
-      LWIDTH = MIN(MAX(VALUE(IFIELD+IFLD), 72.0D0), 132.0D0)            0008
+      LWIDTH = MIN(MAX(IFIELD+IFLD, 72.0D0), 132.0D0)                   0018
+
+C  T(LWIDTH) {}
+
+      LWIDTH = MIN(MAX(VALUE(IFIELD+IFLD), 72.0D0), 132.0D0)            0019
 
 C  T() {}
 
 
-      PRINT *, I                                                        0009
+      PRINT *, I                                                        0021
 
       END

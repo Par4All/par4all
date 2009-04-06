@@ -1,25 +1,25 @@
 
  **************** Effective Dependence Graph ****************
 
-	55 --> 55 with conflicts
+	86 --> 86 with conflicts
 		from <QSUM-R-MUST> to <QSUM-W-MUST> at levels  1 2
-	55 --> 55 with conflicts
+	86 --> 86 with conflicts
 		from <QSUM-W-MUST> to <QSUM-R-MUST> at levels  1 2
-	55 --> 55 with conflicts
+	86 --> 86 with conflicts
 		from <QSUM-W-MUST> to <QSUM-W-MUST> at levels  1 2
-	53 --> 54 with conflicts
+	84 --> 85 with conflicts
 		from <J-W-MUST> to <J-W-MUST> at levels  2
-	53 --> 53 with conflicts
+	84 --> 84 with conflicts
 		from <__IO_EFFECTS:LUNS(PHI1)-R-MUST> to <__IO_EFFECTS:LUNS(PHI1)-W-MUST> at levels  1
-	53 --> 53 with conflicts
+	84 --> 84 with conflicts
 		from <__IO_EFFECTS:LUNS(PHI1)-W-MUST> to <__IO_EFFECTS:LUNS(PHI1)-W-MUST> at levels  1
-	53 --> 53 with conflicts
+	84 --> 84 with conflicts
 		from <__IO_EFFECTS:LUNS(PHI1)-W-MUST> to <__IO_EFFECTS:LUNS(PHI1)-R-MUST> at levels  1
-	45 --> 45 with conflicts
+	76 --> 76 with conflicts
 		from <__IO_EFFECTS:LUNS(PHI1)-R-MUST> to <__IO_EFFECTS:LUNS(PHI1)-W-MUST> at levels  1
-	45 --> 45 with conflicts
+	76 --> 76 with conflicts
 		from <__IO_EFFECTS:LUNS(PHI1)-W-MUST> to <__IO_EFFECTS:LUNS(PHI1)-W-MUST> at levels  1
-	45 --> 45 with conflicts
+	76 --> 76 with conflicts
 		from <__IO_EFFECTS:LUNS(PHI1)-W-MUST> to <__IO_EFFECTS:LUNS(PHI1)-R-MUST> at levels  1
 
 ****************** End of Dependence Graph ******************
@@ -54,82 +54,82 @@ C
       DATA TYPE /' H2O','+ION','-ION'/                                  
       DATA ESORT /'KCAL','MHAR','HART'/                                 
       DATA LSORT /'ANGS','A.U.'/                                        
-      A(1) = 1088213.2D0                                                0001
-      A(2) = 1455.427D0                                                 0002
-      A(3) = -273.5954D0                                                0003
-      A(4) = 666.3373D0                                                 0004
-      A(5) = 0.D0                                                       0005
-      B(1) = 5.152712D0                                                 0006
-      B(2) = 2.961895D0                                                 0007
-      B(3) = 2.233264D0                                                 0008
-      B(4) = 2.760844D0                                                 0009
-      B(5) = 0.D0                                                       0010
-      NT1 = TYPE(1)                                                     0011
-      NT2 = TYPE(1)                                                     0012
-      NPBF = 3                                                          0013
-      NCPBF(1) = 1                                                      0014
-      NCPBF(2) = 2                                                      0015
-      NCPBF(3) = 1                                                      0016
-      NEU = ESORT(1)                                                    0017
-      NLU = LSORT(1)                                                    0018
-      CHRG(1) = 0.D0                                                    0019
-      CHRG(2) = 0.7175D0                                                0020
-      CHRG(3) = 0.7175D0                                                0021
-      CHRG(4) = -1.435D0                                                0022
-      DOALL I = 1, 11                                                   0023
+      A(1) = 1088213.2D0                                                0032
+      A(2) = 1455.427D0                                                 0033
+      A(3) = -273.5954D0                                                0034
+      A(4) = 666.3373D0                                                 0035
+      A(5) = 0.D0                                                       0036
+      B(1) = 5.152712D0                                                 0037
+      B(2) = 2.961895D0                                                 0038
+      B(3) = 2.233264D0                                                 0039
+      B(4) = 2.760844D0                                                 0040
+      B(5) = 0.D0                                                       0041
+      NT1 = TYPE(1)                                                     0042
+      NT2 = TYPE(1)                                                     0043
+      NPBF = 3                                                          0044
+      NCPBF(1) = 1                                                      0045
+      NCPBF(2) = 2                                                      0046
+      NCPBF(3) = 1                                                      0047
+      NEU = ESORT(1)                                                    0048
+      NLU = LSORT(1)                                                    0049
+      CHRG(1) = 0.D0                                                    0050
+      CHRG(2) = 0.7175D0                                                0051
+      CHRG(3) = 0.7175D0                                                0052
+      CHRG(4) = -1.435D0                                                0053
+      DOALL I = 1, 11                                                   0054
          PRIVATE J
-         DOALL J = 1, 11                                                0024
-100         INDEX(I,J) = 4                                              0025
+         DOALL J = 1, 11                                                0055
+100         INDEX(I,J) = 4                                              0056
          ENDDO
       ENDDO
-      INDEX(1,3) = 2                                                    0026
-      INDEX(2,2) = 3                                                    0027
-      INDEX(2,3) = 3                                                    0028
-      INDEX(3,3) = 3                                                    0029
-      DOALL I = 1, 3                                                    0030
+      INDEX(1,3) = 2                                                    0057
+      INDEX(2,2) = 3                                                    0058
+      INDEX(2,3) = 3                                                    0059
+      INDEX(3,3) = 3                                                    0060
+      DOALL I = 1, 3                                                    0061
          PRIVATE J
-         DOALL J = I, 3                                                 0031
-110         INDEX(J,I) = INDEX(I,J)                                     0032
+         DOALL J = I, 3                                                 0062
+110         INDEX(J,I) = INDEX(I,J)                                     0063
          ENDDO
       ENDDO
-      DOALL I = 1, 4                                                    0033
+      DOALL I = 1, 4                                                    0064
          PRIVATE J
-         DOALL J = 1, 4                                                 0034
-            QQ(I,J) = CHRG(I)*CHRG(J)                                   0035
+         DOALL J = 1, 4                                                 0065
+            QQ(I,J) = CHRG(I)*CHRG(J)                                   0066
          ENDDO
       ENDDO
-      M = 4                                                             0037
-      WRITE (66, 1505)                                                  0038
-      WRITE (66, 1510)                                                  0039
-1505  FORMAT(////20X,' P O T E N T I A L   M O D E L       : '//)       0040
-1510  FORMAT(/20X,' NON-COULOMB INTERACTION INDEX TABLE: '//)           0041
-      WRITE (66, 1520) (I, I = 1, M)                                    0042
-1520  FORMAT(/20X,3X,10I5//)                                            0043
-      DO I = 1, M                                                       0044
-1530     WRITE (66, 1540) I, (INDEX(I,J), J = 1, M)                     0045
+      M = 4                                                             0068
+      WRITE (66, 1505)                                                  0069
+      WRITE (66, 1510)                                                  0070
+1505  FORMAT(////20X,' P O T E N T I A L   M O D E L       : '//)       0071
+1510  FORMAT(/20X,' NON-COULOMB INTERACTION INDEX TABLE: '//)           0072
+      WRITE (66, 1520) (I, I = 1, M)                                    0073
+1520  FORMAT(/20X,3X,10I5//)                                            0074
+      DO I = 1, M                                                       0075
+1530     WRITE (66, 1540) I, (INDEX(I,J), J = 1, M)                     0076
       ENDDO
-1540  FORMAT(20X,I2,1X,10I5)                                            0046
-      WRITE (66, 1550)                                                  0047
-1550  FORMAT(//20X,' CHARGES ON COULOMB TERMS:'//)                      0048
-      WRITE (66, 1560) (ZITES(I), I = 1, M)                             0049
-1560  FORMAT(20X,10(5X,A4)//)                                           0050
-      QSUM = 0.D0                                                       0051
-      DO I = 1, M                                                       0052
-         DO J = 1, M                                                    0054
-            QSUM = QSUM+QQ(I,J)                                         0055
+1540  FORMAT(20X,I2,1X,10I5)                                            0077
+      WRITE (66, 1550)                                                  0078
+1550  FORMAT(//20X,' CHARGES ON COULOMB TERMS:'//)                      0079
+      WRITE (66, 1560) (ZITES(I), I = 1, M)                             0080
+1560  FORMAT(20X,10(5X,A4)//)                                           0081
+      QSUM = 0.D0                                                       0082
+      DO I = 1, M                                                       0083
+         DO J = 1, M                                                    0085
+            QSUM = QSUM+QQ(I,J)                                         0086
          ENDDO
       ENDDO
-      DO I = 1, M                                                       0052
-         WRITE (66, 1580) ZITES(I), (QQ(I,J), J = 1, M)                 0053
+      DO I = 1, M                                                       0083
+         WRITE (66, 1580) ZITES(I), (QQ(I,J), J = 1, M)                 0084
       ENDDO
-1580  FORMAT(20X,A4,10(1X,F8.5))                                        0057
-      WRITE (66, 1585) QSUM                                             0058
-1585  FORMAT                                                            0059
-     &(/20X,'..SUM OVER POINT CHARGES =',F5.2,' (SHOULD BE ZERO)')      0059
-      DOALL I = 1, 4                                                    0060
+1580  FORMAT(20X,A4,10(1X,F8.5))                                        0088
+      WRITE (66, 1585) QSUM                                             0089
+1585  FORMAT                                                            0090
+     &(/20X,'..SUM OVER POINT CHARGES =',F5.2,' (SHOULD BE ZERO)')      0090
+      DOALL I = 1, 4                                                    0091
          PRIVATE J
-         DOALL J = 1, 4                                                 0061
-            QQ(I,J) = QQ(I,J)*COULF                                     0062
+         DOALL J = 1, 4                                                 0092
+            QQ(I,J) = QQ(I,J)*COULF                                     0093
          ENDDO
       ENDDO
       END

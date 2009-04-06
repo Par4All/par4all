@@ -4,7 +4,7 @@
 C               <must be read   >: JPOINT
 C               <must be written>: EFF(JPOINT)
 
-      EFF(JPOINT) = 0.0                                                 0001
+      EFF(JPOINT) = 0.0                                                 0005
 
       END
 C               <may be written >: EFF(*)
@@ -15,7 +15,7 @@ C               <must be read   >: JPOINT
 C               <may be written >: EFF(*)
 C               <must be read   >: JPOINT
 
-      EFF(JPOINT) = 0.0                                                 0001
+      EFF(JPOINT) = 0.0                                                 0005
 
       END
       PROGRAM CPREC
@@ -30,13 +30,13 @@ C     check that regions are passed upwards correctly
 C               <must be read   >: N
 C               <must be written>: J
 
-      DO J = 1, N                                                       0001
+      DO J = 1, N                                                       0011
 C               <must be read   >: J N
 C               <must be written>: JPOINT
-         JPOINT = J                                                     0002
+         JPOINT = J                                                     0012
 C               <may be written >: EFF(*)
 C               <must be read   >: JPOINT N
-         CALL VS                                                        0003
+         CALL VS                                                        0013
       ENDDO
 
       END

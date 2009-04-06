@@ -7,8 +7,8 @@ c     Do we lose comments in front of an ENDDO?
 
 c     No, as long as you do not parallelize the loop...
 
-      DO I = 1, N                                                       0001
-         T(I) = 0.                                                      0002
+      DO I = 1, N                                                       0008
+         T(I) = 0.                                                      0009
 c     this comment might be lost!
       ENDDO
 
@@ -22,8 +22,8 @@ c     Do we lose comments in front of an ENDDO?
 
 c     No, as long as you do not parallelize the loop...
 
-      DOALL I = 1, N                                                    0001
-         T(I) = 0.                                                      0002
+      DOALL I = 1, N                                                    0008
+         T(I) = 0.                                                      0009
       ENDDO
 
       END

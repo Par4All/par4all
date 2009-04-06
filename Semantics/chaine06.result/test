@@ -25,114 +25,114 @@ C     declared length
 C  T(S) {"hello"==S}
 
 
-      S = "hello"                                                       0001
+      S = "hello"                                                       0013
 
 C  T(T) {"hello "==T}
 
-      T = "hello "                                                      0002
+      T = "hello "                                                      0014
 
 C  T() {}
 
 
-      IF (S.EQ.T) THEN                                                  0003
+      IF (S.EQ.T) THEN                                                  0016
 
 C  T() {}
 
 !        FALSE
-         PRINT *, "Trailing blanks are ignored"                         0004
+         PRINT *, "Trailing blanks are ignored"                         0018
       ELSE
 
 C  T() {}
 
 !        TRUE 
-         PRINT *, "Trailing blanks are not ignored"                     0005
+         PRINT *, "Trailing blanks are not ignored"                     0021
       ENDIF
 
 C  T(S) {"hello"==S}
 
 
-      S = "hello"                                                       0006
+      S = "hello"                                                       0024
 
 C  T(T) {" hello"==T}
 
-      T = " hello"                                                      0007
+      T = " hello"                                                      0025
 
 C  T() {}
 
 
-      IF (S.EQ.T) THEN                                                  0008
+      IF (S.EQ.T) THEN                                                  0027
 
 C  T() {}
 
 !        FALSE
-         PRINT *, "Leading blanks are ignored"                          0009
+         PRINT *, "Leading blanks are ignored"                          0029
       ELSE
 
 C  T() {}
 
 !        TRUE 
-         PRINT *, "Leading blanks are not ignored"                      0010
+         PRINT *, "Leading blanks are not ignored"                      0032
       ENDIF
 
 C  T(S) {"hello"==S}
 
 
-      S = "hello"                                                       0011
+      S = "hello"                                                       0035
 
 C  T(T) {"hello "==T}
 
-      T = "hello "                                                      0012
+      T = "hello "                                                      0036
 
 C  T(U) {"world"==U}
 
-      U = "world"                                                       0013
+      U = "world"                                                       0037
 
 C  T(V) {}
 
-      V = S//U                                                          0014
+      V = S//U                                                          0038
 
 C  T(W) {}
 
-      W = T//U                                                          0015
+      W = T//U                                                          0039
 
 C  T() {}
 
 
-      IF (V.EQ.W) THEN                                                  0016
+      IF (V.EQ.W) THEN                                                  0041
 
 C  T() {}
 
 !        FALSE
-         PRINT *, "Trailing blanks are ignored when concatenating"      0017
+         PRINT *, "Trailing blanks are ignored when concatenating"      0043
       ELSE
 
 C  T() {}
 
 !        TRUE 
-         PRINT *,                                                       0018
-     &   "Trailing blanks are not ignored when concatenating"           0018
+         PRINT *,                                                       0046
+     &   "Trailing blanks are not ignored when concatenating"           0046
       ENDIF
 
 C  T() {}
 
 
-      PRINT *, S                                                        0019
+      PRINT *, S                                                        0049
 
 C  T() {}
 
-      PRINT *, T                                                        0020
+      PRINT *, T                                                        0050
 
 C  T() {}
 
-      PRINT *, U                                                        0021
+      PRINT *, U                                                        0051
 
 C  T() {}
 
-      PRINT *, V                                                        0022
+      PRINT *, V                                                        0052
 
 C  T() {}
 
-      PRINT *, W                                                        0023
+      PRINT *, W                                                        0053
 
       END
 
@@ -153,115 +153,115 @@ C     declared length
 C  P() {}
 
 
-      S = "hello"                                                       0001
+      S = "hello"                                                       0013
 
 C  P(S) {"hello"==S}
 
-      T = "hello "                                                      0002
+      T = "hello "                                                      0014
 
 C  P(S,T) {"hello "==T, "hello"==S}
 
 
-      IF (S.EQ.T) THEN                                                  0003
+      IF (S.EQ.T) THEN                                                  0016
 
 C  P(S,T) {"hello "==S, "hello"==S, S==T}
 
 !        FALSE
-         PRINT *, "Trailing blanks are ignored"                         0004
+         PRINT *, "Trailing blanks are ignored"                         0018
       ELSE
 
 C  P(S,T) {"hello "==T, "hello"==S}
 
 !        TRUE 
-         PRINT *, "Trailing blanks are not ignored"                     0005
+         PRINT *, "Trailing blanks are not ignored"                     0021
       ENDIF
 
 C  P(S,T) {"hello "==T, "hello"==S}
 
 
-      S = "hello"                                                       0006
+      S = "hello"                                                       0024
 
 C  P(S,T) {"hello "==T, "hello"==S}
 
-      T = " hello"                                                      0007
+      T = " hello"                                                      0025
 
 C  P(S,T) {" hello"==T, "hello"==S}
 
 
-      IF (S.EQ.T) THEN                                                  0008
+      IF (S.EQ.T) THEN                                                  0027
 
 C  P() {0==-1}
 
 !        FALSE
-         PRINT *, "Leading blanks are ignored"                          0009
+         PRINT *, "Leading blanks are ignored"                          0029
       ELSE
 
 C  P(S,T) {" hello"==T, "hello"==S, T<=S}
 
 !        TRUE 
-         PRINT *, "Leading blanks are not ignored"                      0010
+         PRINT *, "Leading blanks are not ignored"                      0032
       ENDIF
 
 C  P(S,T) {" hello"==T, "hello"==S, T<=S}
 
 
-      S = "hello"                                                       0011
+      S = "hello"                                                       0035
 
 C  P(S,T) {" hello"==T, "hello"==S, T<=S}
 
-      T = "hello "                                                      0012
+      T = "hello "                                                      0036
 
 C  P(S,T) {"hello "==T, "hello"==S, " hello"<=S}
 
-      U = "world"                                                       0013
+      U = "world"                                                       0037
 
 C  P(S,T,U) {"hello "==T, "hello"==S, "world"==U, " hello"<=S}
 
-      V = S//U                                                          0014
+      V = S//U                                                          0038
 
 C  P(S,T,U,V) {"hello "==T, "hello"==S, "world"==U, " hello"<=S}
 
-      W = T//U                                                          0015
+      W = T//U                                                          0039
 
 C  P(S,T,U,V,W) {"hello "==T, "hello"==S, "world"==U, " hello"<=S}
 
 
-      IF (V.EQ.W) THEN                                                  0016
+      IF (V.EQ.W) THEN                                                  0041
 
 C  P(S,T,U,V,W) {"hello "==T, "hello"==S, "world"==U, V==W,
 C    " hello"<=S}
 
 !        FALSE
-         PRINT *, "Trailing blanks are ignored when concatenating"      0017
+         PRINT *, "Trailing blanks are ignored when concatenating"      0043
       ELSE
 
 C  P(S,T,U,V,W) {"hello "==T, "hello"==S, "world"==U, " hello"<=S}
 
 !        TRUE 
-         PRINT *,                                                       0018
-     &   "Trailing blanks are not ignored when concatenating"           0018
+         PRINT *,                                                       0046
+     &   "Trailing blanks are not ignored when concatenating"           0046
       ENDIF
 
 C  P(S,T,U,V,W) {"hello "==T, "hello"==S, "world"==U, " hello"<=S}
 
 
-      PRINT *, S                                                        0019
+      PRINT *, S                                                        0049
 
 C  P(S,T,U,V,W) {"hello "==T, "hello"==S, "world"==U, " hello"<=S}
 
-      PRINT *, T                                                        0020
+      PRINT *, T                                                        0050
 
 C  P(S,T,U,V,W) {"hello "==T, "hello"==S, "world"==U, " hello"<=S}
 
-      PRINT *, U                                                        0021
+      PRINT *, U                                                        0051
 
 C  P(S,T,U,V,W) {"hello "==T, "hello"==S, "world"==U, " hello"<=S}
 
-      PRINT *, V                                                        0022
+      PRINT *, V                                                        0052
 
 C  P(S,T,U,V,W) {"hello "==T, "hello"==S, "world"==U, " hello"<=S}
 
-      PRINT *, W                                                        0023
+      PRINT *, W                                                        0053
 
       END
       PROGRAM CHAINE06
@@ -276,43 +276,43 @@ C     declared length
       CHARACTER*21 V
       CHARACTER*22 W
 
-      S = "hello"                                                       0001
-      T = "hello "                                                      0002
+      S = "hello"                                                       0013
+      T = "hello "                                                      0014
 
-      IF (S.EQ.T) THEN                                                  0003
+      IF (S.EQ.T) THEN                                                  0016
 !        FALSE
-         PRINT *, "Trailing blanks are ignored"                         0004
+         PRINT *, "Trailing blanks are ignored"                         0018
       ELSE
 !        TRUE 
-         PRINT *, "Trailing blanks are not ignored"                     0005
+         PRINT *, "Trailing blanks are not ignored"                     0021
       ENDIF
 
-      S = "hello"                                                       0006
-      T = " hello"                                                      0007
+      S = "hello"                                                       0024
+      T = " hello"                                                      0025
 
 !        TRUE 
-      PRINT *, "Leading blanks are not ignored"                         0010
+      PRINT *, "Leading blanks are not ignored"                         0032
 
-      S = "hello"                                                       0011
-      T = "hello "                                                      0012
-      U = "world"                                                       0013
-      V = S//U                                                          0014
-      W = T//U                                                          0015
+      S = "hello"                                                       0035
+      T = "hello "                                                      0036
+      U = "world"                                                       0037
+      V = S//U                                                          0038
+      W = T//U                                                          0039
 
-      IF (V.EQ.W) THEN                                                  0016
+      IF (V.EQ.W) THEN                                                  0041
 !        FALSE
-         PRINT *, "Trailing blanks are ignored when concatenating"      0017
+         PRINT *, "Trailing blanks are ignored when concatenating"      0043
       ELSE
 !        TRUE 
-         PRINT *,                                                       0018
-     &   "Trailing blanks are not ignored when concatenating"           0018
+         PRINT *,                                                       0046
+     &   "Trailing blanks are not ignored when concatenating"           0046
       ENDIF
 
-      PRINT *, S                                                        0019
-      PRINT *, T                                                        0020
-      PRINT *, U                                                        0021
-      PRINT *, V                                                        0022
-      PRINT *, W                                                        0023
+      PRINT *, S                                                        0049
+      PRINT *, T                                                        0050
+      PRINT *, U                                                        0051
+      PRINT *, V                                                        0052
+      PRINT *, W                                                        0053
 
       END
 'optimized exec'

@@ -5,21 +5,21 @@
       PARAMETER (N=10)
       REAL A(N)
 
-      I = 1                                                             0001
+      I = 1                                                             0007
 
-      DO WHILE (I.LE.10)                                                0002
-         A(I) = I*1.23                                                  0003
-         I = I+1                                                        0004
+      DO WHILE (I.LE.10)                                                0009
+         A(I) = I*1.23                                                  0010
+         I = I+1                                                        0011
       ENDDO
 
-      I = 2                                                             0005
+      I = 2                                                             0014
 
-      DO WHILE (I.LT.N)                                                 0006
-         PRINT *, A(I-1)                                                0007
-         I = I+1                                                        0008
+      DO WHILE (I.LT.N)                                                 0016
+         PRINT *, A(I-1)                                                0017
+         I = I+1                                                        0018
       ENDDO
 
-      PRINT *, 'bye'                                                    0009
+      PRINT *, 'bye'                                                    0021
 
       END
 # proper effects
@@ -30,34 +30,34 @@
       REAL A(N)
 C               <must be written>: I
 
-      I = 1                                                             0001
+      I = 1                                                             0007
 C               <must be read   >: I
 
-      DO WHILE (I.LE.10)                                                0002
+      DO WHILE (I.LE.10)                                                0009
 C               <must be read   >: I
 C               <must be written>: A(I)
-         A(I) = I*1.23                                                  0003
+         A(I) = I*1.23                                                  0010
 C               <must be read   >: I
 C               <must be written>: I
-         I = I+1                                                        0004
+         I = I+1                                                        0011
       ENDDO
 C               <must be written>: I
 
-      I = 2                                                             0005
+      I = 2                                                             0014
 C               <must be read   >: I
 
-      DO WHILE (I.LT.N)                                                 0006
+      DO WHILE (I.LT.N)                                                 0016
 C               <must be read   >: A(I-1) I __IO_EFFECTS:LUNS(6)
 C               <must be written>: __IO_EFFECTS:LUNS(6)
-         PRINT *, A(I-1)                                                0007
+         PRINT *, A(I-1)                                                0017
 C               <must be read   >: I
 C               <must be written>: I
-         I = I+1                                                        0008
+         I = I+1                                                        0018
       ENDDO
 C               <must be read   >: __IO_EFFECTS:LUNS(6)
 C               <must be written>: __IO_EFFECTS:LUNS(6)
 
-      PRINT *, 'bye'                                                    0009
+      PRINT *, 'bye'                                                    0021
 
       END
 # cumulated effects
@@ -70,39 +70,39 @@ C               <must be written>: __IO_EFFECTS:LUNS(6)
       REAL A(N)
 C               <must be written>: I
 
-      I = 1                                                             0001
+      I = 1                                                             0007
 C               <may be written >: A(*)
 C               <must be read   >: I
 C               <must be written>: I
 
-      DO WHILE (I.LE.10)                                                0002
+      DO WHILE (I.LE.10)                                                0009
 C               <may be written >: A(*)
 C               <must be read   >: I
-         A(I) = I*1.23                                                  0003
+         A(I) = I*1.23                                                  0010
 C               <must be read   >: I
 C               <must be written>: I
-         I = I+1                                                        0004
+         I = I+1                                                        0011
       ENDDO
 C               <must be written>: I
 
-      I = 2                                                             0005
+      I = 2                                                             0014
 C               <may be read    >: A(*)
 C               <must be read   >: I __IO_EFFECTS:LUNS(6)
 C               <must be written>: I __IO_EFFECTS:LUNS(6)
 
-      DO WHILE (I.LT.N)                                                 0006
+      DO WHILE (I.LT.N)                                                 0016
 C               <may be read    >: A(*)
 C               <must be read   >: I __IO_EFFECTS:LUNS(6)
 C               <must be written>: __IO_EFFECTS:LUNS(6)
-         PRINT *, A(I-1)                                                0007
+         PRINT *, A(I-1)                                                0017
 C               <must be read   >: I
 C               <must be written>: I
-         I = I+1                                                        0008
+         I = I+1                                                        0018
       ENDDO
 C               <must be read   >: __IO_EFFECTS:LUNS(6)
 C               <must be written>: __IO_EFFECTS:LUNS(6)
 
-      PRINT *, 'bye'                                                    0009
+      PRINT *, 'bye'                                                    0021
 
       END
 # transformers
@@ -118,45 +118,45 @@ C  T() {}
 C  T(I) {I==1}
 
 
-      I = 1                                                             0001
+      I = 1                                                             0007
 
 C  T(I) {I#init<=I}
 
 
-      DO WHILE (I.LE.10)                                                0002
+      DO WHILE (I.LE.10)                                                0009
 
 C  T() {}
 
-         A(I) = I*1.23                                                  0003
+         A(I) = I*1.23                                                  0010
 
 C  T(I) {I==I#init+1}
 
-         I = I+1                                                        0004
+         I = I+1                                                        0011
       ENDDO
 
 C  T(I) {I==2}
 
 
-      I = 2                                                             0005
+      I = 2                                                             0014
 
 C  T(I) {I#init<=I}
 
 
-      DO WHILE (I.LT.N)                                                 0006
+      DO WHILE (I.LT.N)                                                 0016
 
 C  T() {}
 
-         PRINT *, A(I-1)                                                0007
+         PRINT *, A(I-1)                                                0017
 
 C  T(I) {I==I#init+1}
 
-         I = I+1                                                        0008
+         I = I+1                                                        0018
       ENDDO
 
 C  T() {}
 
 
-      PRINT *, 'bye'                                                    0009
+      PRINT *, 'bye'                                                    0021
 
       END
 # preconditions
@@ -172,45 +172,45 @@ C  P() {}
 C  P() {}
 
 
-      I = 1                                                             0001
+      I = 1                                                             0007
 
 C  P(I) {I==1}
 
 
-      DO WHILE (I.LE.10)                                                0002
+      DO WHILE (I.LE.10)                                                0009
 
 C  P(I) {1<=I, I<=10}
 
-         A(I) = I*1.23                                                  0003
+         A(I) = I*1.23                                                  0010
 
 C  P(I) {1<=I, I<=10}
 
-         I = I+1                                                        0004
+         I = I+1                                                        0011
       ENDDO
 
 C  P(I) {I==11}
 
 
-      I = 2                                                             0005
+      I = 2                                                             0014
 
 C  P(I) {I==2}
 
 
-      DO WHILE (I.LT.N)                                                 0006
+      DO WHILE (I.LT.N)                                                 0016
 
 C  P(I) {2<=I, I<=9}
 
-         PRINT *, A(I-1)                                                0007
+         PRINT *, A(I-1)                                                0017
 
 C  P(I) {2<=I, I<=9}
 
-         I = I+1                                                        0008
+         I = I+1                                                        0018
       ENDDO
 
 C  P(I) {I==10}
 
 
-      PRINT *, 'bye'                                                    0009
+      PRINT *, 'bye'                                                    0021
 
       END
 # must regions
@@ -224,41 +224,41 @@ C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6}>
       PARAMETER (N=10)
       REAL A(N)
 
-      I = 1                                                             0001
+      I = 1                                                             0007
 
 C  <A(PHI1)-W-MAY-{I<=PHI1, 1<=PHI1, PHI1<=10}>
 
 
-      DO WHILE (I.LE.10)                                                0002
+      DO WHILE (I.LE.10)                                                0009
 
 C  <A(PHI1)-W-EXACT-{PHI1==I, 1<=I, I<=10}>
 
-         A(I) = I*1.23                                                  0003
-         I = I+1                                                        0004
+         A(I) = I*1.23                                                  0010
+         I = I+1                                                        0011
       ENDDO
 
-      I = 2                                                             0005
+      I = 2                                                             0014
 
 C  <A(PHI1)-R-MAY-{I<=PHI1+1, 1<=PHI1, PHI1<=8}>
 C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6, I<=9}>
 C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6, I<=9}>
 
 
-      DO WHILE (I.LT.N)                                                 0006
+      DO WHILE (I.LT.N)                                                 0016
 
 C  <A(PHI1)-R-EXACT-{PHI1==I-1, 2<=I, I<=9}>
 C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6, 2<=I, I<=9}>
 C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6, 2<=I, I<=9}>
 
-         PRINT *, A(I-1)                                                0007
-         I = I+1                                                        0008
+         PRINT *, A(I-1)                                                0017
+         I = I+1                                                        0018
       ENDDO
 
 C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6, I==10}>
 C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6, I==10}>
 
 
-      PRINT *, 'bye'                                                    0009
+      PRINT *, 'bye'                                                    0021
 
       END
 # in regions
@@ -271,32 +271,32 @@ C  <__IO_EFFECTS:LUNS(PHI1)-IN-MAY-{PHI1==6}>
       PARAMETER (N=10)
       REAL A(N)
 
-      I = 1                                                             0001
+      I = 1                                                             0007
 
-      DO WHILE (I.LE.10)                                                0002
-         A(I) = I*1.23                                                  0003
-         I = I+1                                                        0004
+      DO WHILE (I.LE.10)                                                0009
+         A(I) = I*1.23                                                  0010
+         I = I+1                                                        0011
       ENDDO
 
-      I = 2                                                             0005
+      I = 2                                                             0014
 
 C  <A(PHI1)-IN-MAY-{I<=PHI1+1, 1<=PHI1, PHI1<=8}>
 C  <__IO_EFFECTS:LUNS(PHI1)-IN-MAY-{PHI1==6, I<=9}>
 
 
-      DO WHILE (I.LT.N)                                                 0006
+      DO WHILE (I.LT.N)                                                 0016
 
 C  <A(PHI1)-IN-EXACT-{PHI1==I-1, 2<=I, I<=9}>
 C  <__IO_EFFECTS:LUNS(PHI1)-IN-EXACT-{PHI1==6, 2<=I, I<=9}>
 
-         PRINT *, A(I-1)                                                0007
-         I = I+1                                                        0008
+         PRINT *, A(I-1)                                                0017
+         I = I+1                                                        0018
       ENDDO
 
 C  <__IO_EFFECTS:LUNS(PHI1)-IN-EXACT-{PHI1==6, I==10}>
 
 
-      PRINT *, 'bye'                                                    0009
+      PRINT *, 'bye'                                                    0021
 
       END
 # out regions
@@ -306,33 +306,33 @@ C  <__IO_EFFECTS:LUNS(PHI1)-IN-EXACT-{PHI1==6, I==10}>
       PARAMETER (N=10)
       REAL A(N)
 
-      I = 1                                                             0001
+      I = 1                                                             0007
 
 C  <A(PHI1)-OUT-MAY-{I<=PHI1, 1<=PHI1, PHI1<=8}>
 
 
-      DO WHILE (I.LE.10)                                                0002
+      DO WHILE (I.LE.10)                                                0009
 
 C  <A(PHI1)-OUT-MAY-{PHI1==I, 1<=I, I<=10}>
 
-         A(I) = I*1.23                                                  0003
-         I = I+1                                                        0004
+         A(I) = I*1.23                                                  0010
+         I = I+1                                                        0011
       ENDDO
 
-      I = 2                                                             0005
+      I = 2                                                             0014
 
 C  <__IO_EFFECTS:LUNS(PHI1)-OUT-EXACT-{PHI1==6, I<=9}>
 
 
-      DO WHILE (I.LT.N)                                                 0006
+      DO WHILE (I.LT.N)                                                 0016
 
 C  <__IO_EFFECTS:LUNS(PHI1)-OUT-MAY-{PHI1==6, 2<=I, I<=9}>
 
-         PRINT *, A(I-1)                                                0007
-         I = I+1                                                        0008
+         PRINT *, A(I-1)                                                0017
+         I = I+1                                                        0018
       ENDDO
 
-      PRINT *, 'bye'                                                    0009
+      PRINT *, 'bye'                                                    0021
 
       END
 

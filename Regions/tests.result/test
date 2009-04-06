@@ -11,11 +11,11 @@ C  <A(PHI1)-W-MAY-{PHI1==N, 4<=N}>
 
 
 C     ONLY ONE BRANCH
-      IF (N.GT.3) THEN                                                  0001
+      IF (N.GT.3) THEN                                                  0010
 
 C  <A(PHI1)-W-EXACT-{PHI1==N, 4<=N}>
 
-         A(N) = N-1                                                     0002
+         A(N) = N-1                                                     0011
       ENDIF
 
 C  <A(PHI1)-R-MAY-{PHI1==N}>
@@ -23,18 +23,18 @@ C  <A(PHI1)-W-MAY-{PHI1==N}>
 
 
 C     TWO BRANCHES WITH THE SAME ARRAY ELEMENTS ACCESSED
-      IF (N.EQ.3) THEN                                                  0003
+      IF (N.EQ.3) THEN                                                  0015
 
 C  <A(PHI1)-R-EXACT-{PHI1==N, N==3}>
 C  <A(PHI1)-W-EXACT-{PHI1==N, N==3}>
 
-         A(N) = A(N)+N                                                  0004
+         A(N) = A(N)+N                                                  0016
       ELSE
 
 C  <A(PHI1)-R-EXACT-{PHI1==N}>
 C  <A(PHI1)-W-EXACT-{PHI1==N}>
 
-         A(N) = A(N)-N                                                  0005
+         A(N) = A(N)-N                                                  0018
       ENDIF
 
 C  <A(PHI1)-R-EXACT-{PHI1==N}>
@@ -42,50 +42,50 @@ C  <B(PHI1)-W-EXACT-{PHI1==N}>
 
 
 C     A REAL IN THE CONDITION AND THE SAME ELTS ACCESSED
-      IF (R.GT.0) THEN                                                  0006
+      IF (R.GT.0) THEN                                                  0022
 
 C  <A(PHI1)-R-EXACT-{PHI1==N}>
 C  <B(PHI1)-W-EXACT-{PHI1==N}>
 
-         B(N) = A(N)/R                                                  0007
+         B(N) = A(N)/R                                                  0023
       ELSE
 
 C  <A(PHI1)-R-EXACT-{PHI1==N}>
 C  <B(PHI1)-W-EXACT-{PHI1==N}>
 
-         B(N) = A(N)*R                                                  0008
+         B(N) = A(N)*R                                                  0025
       ENDIF
 
 C  <A(PHI1)-W-MAY-{N<=PHI1, PHI1<=1+N}>
 
 
 C     TWO DIFFERENT ARRAY ELEMENTS ACCESSED IN THE BRANCHES
-      IF (N.GT.3) THEN                                                  0009
+      IF (N.GT.3) THEN                                                  0029
 
 C  <A(PHI1)-W-EXACT-{PHI1==N, 4<=N}>
 
-         A(N) = N-1                                                     0010
+         A(N) = N-1                                                     0030
       ELSE
 
 C  <A(PHI1)-W-EXACT-{PHI1==N+1, N<=3}>
 
-         A(N+1) = N+1                                                   0011
+         A(N+1) = N+1                                                   0032
       ENDIF
 
 C  <A(PHI1)-W-MAY-{PHI1==M}>
 
 
 C     THE ARRAY INDICES DON'T DEPEND ON THE TEST VARIABLE
-      IF (N.GT.3) THEN                                                  0012
+      IF (N.GT.3) THEN                                                  0036
 
 C  <A(PHI1)-W-EXACT-{PHI1==M, 4<=N}>
 
-         A(M) = N-1                                                     0013
+         A(M) = N-1                                                     0037
       ELSE
 
 C  <A(PHI1)-W-EXACT-{PHI1==M, N<=3}>
 
-         A(M) = N+1                                                     0014
+         A(M) = N+1                                                     0039
       ENDIF
 
 C  <A(PHI1)-R-MAY-{PHI1==N}>
@@ -95,12 +95,12 @@ C  <B(PHI1)-R-EXACT-{PHI1==N}>
 
 C     THE TEST VARIABLE IS AN ARRAY ELEMENT, BUT IS NOT 
 C     ACCESSED IN THE BRANCHES
-      IF (B(N).EQ.N) THEN                                               0015
+      IF (B(N).EQ.N) THEN                                               0044
 
 C  <A(PHI1)-R-EXACT-{PHI1==N}>
 C  <A(PHI1)-W-EXACT-{PHI1==N}>
 
-         A(N) = A(N)+1                                                  0016
+         A(N) = A(N)+1                                                  0045
       ENDIF
 
 C  <A(PHI1)-W-EXACT-{PHI1==N}>
@@ -109,18 +109,18 @@ C  <B(PHI1)-R-EXACT-{PHI1==N}>
 
 C     THE TEST VARIABLE IS AN ARRAY ELEMENT, AND IS 
 C     ACCESSED IN THE TWO BRANCHES
-      IF (B(N).EQ.N) THEN                                               0017
+      IF (B(N).EQ.N) THEN                                               0050
 
 C  <A(PHI1)-W-EXACT-{PHI1==N}>
 C  <B(PHI1)-R-EXACT-{PHI1==N}>
 
-         A(N) = B(N)+1                                                  0018
+         A(N) = B(N)+1                                                  0051
       ELSE
 
 C  <A(PHI1)-W-EXACT-{PHI1==N}>
 C  <B(PHI1)-R-EXACT-{PHI1==N}>
 
-         A(N) = B(N)-1                                                  0019
+         A(N) = B(N)-1                                                  0053
       ENDIF
 
 C  <A(PHI1)-R-MAY-{PHI1==N}>
@@ -130,18 +130,18 @@ C  <B(PHI1)-R-EXACT-{PHI1==N}>
 
 C     THE TEST VARIABLE IS AN ARRAY ELEMENT, AND IS 
 C     ACCESSED IN ONLY ONE BRANCH
-      IF (B(N).EQ.N) THEN                                               0020
+      IF (B(N).EQ.N) THEN                                               0058
 
 C  <A(PHI1)-W-EXACT-{PHI1==N}>
 C  <B(PHI1)-R-EXACT-{PHI1==N}>
 
-         A(N) = B(N)+1                                                  0021
+         A(N) = B(N)+1                                                  0059
       ELSE
 
 C  <A(PHI1)-R-EXACT-{PHI1==N}>
 C  <A(PHI1)-W-EXACT-{PHI1==N}>
 
-         A(N) = A(N)-1                                                  0022
+         A(N) = A(N)-1                                                  0061
       ENDIF
 
       END

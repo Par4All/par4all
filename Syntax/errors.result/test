@@ -5,7 +5,7 @@
 C**********************************************************************
 C ERROR HANDLING ROUTINE.  PRINT MESSAGE, ABORT JOB.
 C**********************************************************************
-      WRITE (6, 10) MESAGE                                              0001
-10    FORMAT(1X,A)                                                      0002
-      STOP ' ERRORS'                                                    0003
+      WRITE (6, 10) MESAGE                                              0008
+10    FORMAT(1X,A)                                                      0009
+      STOP ' ERRORS'                                                    0010
       END

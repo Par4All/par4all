@@ -2,8 +2,8 @@
 
       EXTERNAL F
 
-      CALL G(F)                                                         0001
+      CALL G(F)                                                         0005
 
-      CALL F                                                            0002
+      CALL F                                                            0007
 
       END

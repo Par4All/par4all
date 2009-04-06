@@ -20,31 +20,31 @@ c     lower loop bound.
 C  P() {}
 
 
-      J = 2                                                             0001
+      J = 2                                                             0016
 
 C  P(J) {J==2}
 
 
-      N = 0                                                             0002
+      N = 0                                                             0018
 
 C  P(J,N) {J==2, N==0}
 
 
-      DO I = INC(J), N                                                  0003
+      DO I = INC(J), N                                                  0020
 
 C  P(I,J,N) {N==0, I<=0}
 
-         T(I) = 0.                                                      0004
+         T(I) = 0.                                                      0021
 
 C  P(I,J,N) {N==0, I<=0}
 
-         J = J+2                                                        0005
+         J = J+2                                                        0022
       ENDDO
 
 C  P(I,J,N) {N==0, 1<=I, I<=4}
 
 
 c     The precondition should be: i==3, j==3
-      PRINT *, I, J                                                     0006
+      PRINT *, I, J                                                     0026
 
       END

@@ -10,38 +10,38 @@ C     Check that desugared loop might be handled
 C  P() {}
 
 
-      READ *, N                                                         0001
+      READ *, N                                                         0007
 
 C  P(N) {}
 
 
-      I = 1                                                             0002
+      I = 1                                                             0009
 
 C  P(I,N) {1<=I}
 
-100   CONTINUE                                                          0003
+100   CONTINUE                                                          0010
 
 C  P(I,N) {1<=I}
 
-      IF (I.GT.N) GOTO 200                                              0004
+      IF (I.GT.N) GOTO 200                                              0011
 
 C  P(I,N) {1<=I, I<=N}
 
-      A(I) = 0                                                          0006
+      A(I) = 0                                                          0012
 
 C  P(I,N) {1<=I, I<=N}
 
-      I = I+1                                                           0007
+      I = I+1                                                           0013
       GOTO 100
 
 C  P(I,N) {1<=I, N+1<=I}
 
 
-200   CONTINUE                                                          0008
+200   CONTINUE                                                          0016
 
 C  P(I,N) {1<=I, N+1<=I}
 
-      PRINT *, I, N                                                     0009
+      PRINT *, I, N                                                     0017
 
       END
 

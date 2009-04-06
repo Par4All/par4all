@@ -10,18 +10,18 @@ c     of the bug in flip-flop
 
       REAL D(LX, MX, NX)
 
-      READ *, A                                                         0001
+      READ *, A                                                         0013
 
-      CALL MATMUL(B, A, A, N, N, N)                                     0002
+      CALL MATMUL(B, A, A, N, N, N)                                     0015
 
-      CALL SMATMUL(B, A, A, N, N, N)                                    0003
+      CALL SMATMUL(B, A, A, N, N, N)                                    0017
 
-      CALL TRANSPOSE(B, N)                                              0004
+      CALL TRANSPOSE(B, N)                                              0019
 
-      CALL FLIPFLOP(C, N, 0.25)                                         0005
+      CALL FLIPFLOP(C, N, 0.25)                                         0021
 
-      CALL INIT                                                         0006
-      CALL TESTINIT                                                     0007
-      CALL DIGITALIZE(D, LX, MX, NX)                                    0008
+      CALL INIT                                                         0023
+      CALL TESTINIT                                                     0024
+      CALL DIGITALIZE(D, LX, MX, NX)                                    0025
 
       END

@@ -153,7 +153,7 @@ C             CALLS OF RFFTB OR RFFTF.
       DIMENSION       WSAVE(*)                                          
 CX30127 CALL SBINX (127)                                                
 CY30127 CALL SBINY (127)                                                
-      IF (N.EQ.1) GOTO 99999                                            0001
+      IF (N.EQ.1) GOTO 99999                                            0156
 c      CALL RFFTI1 (N,WSAVE(N+1),WSAVE(2*N+1))                           
 CX40128 CALL SBOUTX (128)                                               
 CY40128 CALL SBOUTY (128)                                               

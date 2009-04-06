@@ -6,5 +6,5 @@ C     Non-ANSI extension only recognized by xlf, which produces
 C     code with same behavior as SUN f77
 
 c      print *, 'Hello!'
-      PRINT *, '---\'\a\\\n''---'                                       0001
+      PRINT *, '---\'\a\\\n''---'                                       0009
       END

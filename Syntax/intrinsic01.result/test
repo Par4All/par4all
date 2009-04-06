@@ -54,9 +54,9 @@ PRINTED_FILE made for INTRINSIC01.
 
       INTRINSIC ABS,EXP,SQRT
 
-      READ *, X                                                         0001
+      READ *, X                                                         0005
 
-      PRINT *, ABS(SQRT(X))                                             0002
+      PRINT *, ABS(SQRT(X))                                             0007
 
       END
 Deletion of obsolete resources:

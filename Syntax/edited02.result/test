@@ -6,7 +6,7 @@ C     after user edition steps
 !!      integer x(3)
 !%      real x(10)
 
-      PRINT *, X                                                        0001
+      PRINT *, X                                                        0009
 
       END
       PROGRAM EDITED02
@@ -17,7 +17,7 @@ C     after user edition steps
 !!      integer x(3)
       REAL X(10)
 
-      PRINT *, X                                                        0001
+      PRINT *, X                                                        0009
 
       END
       PROGRAM EDITED02
@@ -28,6 +28,6 @@ C     after user edition steps
 !!      integer x(3)
       INTEGER X(3)
 
-      PRINT *, X                                                        0001
+      PRINT *, X                                                        0009
 
       END

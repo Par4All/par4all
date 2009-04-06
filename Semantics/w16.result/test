@@ -21,13 +21,13 @@ C  T(I) {I==0}
 
 C (0,2)
 
-      I = 0                                                             0001
+      I = 0                                                             0009
 
 C  T(I) {}
 
 C (0,3)
 
-      DO WHILE (X.GT.0.)                                                0002
+      DO WHILE (X.GT.0.)                                                0011
 
 C  T(I) {}
 
@@ -37,17 +37,17 @@ C        BEGIN BLOCK
 C  T() {}
 
 C (0,5)
-         READ *, Y                                                      0003
+         READ *, Y                                                      0012
 
 C  T(I) {}
 
 C (0,6)
-         IF (Y.GT.0.) THEN                                              0004
+         IF (Y.GT.0.) THEN                                              0013
 
 C  T(I) {I==1}
 
 C (0,7)
-            I = 1                                                       0005
+            I = 1                                                       0014
          ELSE
 
 C  T() {}
@@ -60,7 +60,7 @@ C           END BLOCK
 C  T() {}
 
 C (0,9)
-         READ *, X                                                      0006
+         READ *, X                                                      0016
 C        END BLOCK
       ENDDO
 
@@ -68,7 +68,7 @@ C  T() {}
 
 C (0,10)
 
-      PRINT *, I                                                        0007
+      PRINT *, I                                                        0019
 
 C     END BLOCK
       END
@@ -95,13 +95,13 @@ C  P() {}
 
 C (0,2)
 
-      I = 0                                                             0001
+      I = 0                                                             0009
 
 C  P(I) {I==0}
 
 C (0,3)
 
-      DO WHILE (X.GT.0.)                                                0002
+      DO WHILE (X.GT.0.)                                                0011
 
 C  P(I) {}
 
@@ -111,17 +111,17 @@ C        BEGIN BLOCK
 C  P(I) {}
 
 C (0,5)
-         READ *, Y                                                      0003
+         READ *, Y                                                      0012
 
 C  P(I) {}
 
 C (0,6)
-         IF (Y.GT.0.) THEN                                              0004
+         IF (Y.GT.0.) THEN                                              0013
 
 C  P(I) {}
 
 C (0,7)
-            I = 1                                                       0005
+            I = 1                                                       0014
          ELSE
 
 C  P(I) {}
@@ -134,7 +134,7 @@ C           END BLOCK
 C  P(I) {}
 
 C (0,9)
-         READ *, X                                                      0006
+         READ *, X                                                      0016
 C        END BLOCK
       ENDDO
 
@@ -142,7 +142,7 @@ C  P(I) {}
 
 C (0,10)
 
-      PRINT *, I                                                        0007
+      PRINT *, I                                                        0019
 
 C     END BLOCK
       END
@@ -169,13 +169,13 @@ C  T(I) {I==0}
 
 C (0,2)
 
-      I = 0                                                             0001
+      I = 0                                                             0009
 
 C  T(I) {}
 
 C (0,3)
 
-      DO WHILE (X.GT.0.)                                                0002
+      DO WHILE (X.GT.0.)                                                0011
 
 C  T(I) {}
 
@@ -185,17 +185,17 @@ C        BEGIN BLOCK
 C  T() {}
 
 C (0,5)
-         READ *, Y                                                      0003
+         READ *, Y                                                      0012
 
 C  T(I) {}
 
 C (0,6)
-         IF (Y.GT.0.) THEN                                              0004
+         IF (Y.GT.0.) THEN                                              0013
 
 C  T(I) {I==1}
 
 C (0,7)
-            I = 1                                                       0005
+            I = 1                                                       0014
          ELSE
 
 C  T() {}
@@ -208,7 +208,7 @@ C           END BLOCK
 C  T() {}
 
 C (0,9)
-         READ *, X                                                      0006
+         READ *, X                                                      0016
 C        END BLOCK
       ENDDO
 
@@ -216,7 +216,7 @@ C  T() {}
 
 C (0,10)
 
-      PRINT *, I                                                        0007
+      PRINT *, I                                                        0019
 
 C     END BLOCK
       END
@@ -243,13 +243,13 @@ C  P() {}
 
 C (0,2)
 
-      I = 0                                                             0001
+      I = 0                                                             0009
 
 C  P(I) {I==0}
 
 C (0,3)
 
-      DO WHILE (X.GT.0.)                                                0002
+      DO WHILE (X.GT.0.)                                                0011
 
 C  P(I) {}
 
@@ -259,17 +259,17 @@ C        BEGIN BLOCK
 C  P(I) {}
 
 C (0,5)
-         READ *, Y                                                      0003
+         READ *, Y                                                      0012
 
 C  P(I) {}
 
 C (0,6)
-         IF (Y.GT.0.) THEN                                              0004
+         IF (Y.GT.0.) THEN                                              0013
 
 C  P(I) {}
 
 C (0,7)
-            I = 1                                                       0005
+            I = 1                                                       0014
          ELSE
 
 C  P(I) {}
@@ -282,7 +282,7 @@ C           END BLOCK
 C  P(I) {}
 
 C (0,9)
-         READ *, X                                                      0006
+         READ *, X                                                      0016
 C        END BLOCK
       ENDDO
 
@@ -290,7 +290,7 @@ C  P(I) {}
 
 C (0,10)
 
-      PRINT *, I                                                        0007
+      PRINT *, I                                                        0019
 
 C     END BLOCK
       END

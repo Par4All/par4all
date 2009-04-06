@@ -8,16 +8,16 @@ C  T(NABS) {0<=N+NABS, N<=NABS}
 
 C  T(NABS) {0<=N+NABS, N<=NABS}
 
-      IF (N.LT.0) THEN                                                  0001
+      IF (N.LT.0) THEN                                                  0002
 
 C  T(NABS) {N+NABS==0}
 
-         NABS = -N                                                      0002
+         NABS = -N                                                      0003
       ELSE
 
 C  T(NABS) {N==NABS}
 
-         NABS = N                                                       0003
+         NABS = N                                                       0005
       ENDIF
       END
 
@@ -38,21 +38,21 @@ c     note also that preconditions in the test branches are not symmetrical
 c     because 0 belongs to the [-1..1] interval and because the condition
 c     .lt. is more precise when n is negative
 
-      I = 1                                                             0001
+      I = 1                                                             0010
 
 C  P(I) {I==1}
 
-      CALL ABSVAL(I, IABS)                                              0002
+      CALL ABSVAL(I, IABS)                                              0011
 
 C  P(I,IABS) {I==1, 1<=IABS}
 
-      I = -1                                                            0003
+      I = -1                                                            0012
 
 C  P(I,IABS) {I==-1, 1<=IABS}
 
-      CALL ABSVAL(I, IABS)                                              0004
+      CALL ABSVAL(I, IABS)                                              0013
 
 C  P(I,IABS) {I==-1, 1<=IABS}
 
-      PRINT *, I, IABS                                                  0005
+      PRINT *, I, IABS                                                  0014
       END

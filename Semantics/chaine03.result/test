@@ -7,32 +7,32 @@ C  T() {}
 C  T(S1) {'hi'==S1}
 
 !
-      S1 = 'hi'                                                         0001
+      S1 = 'hi'                                                         0004
 
 C  T(S2) {'hi '==S2}
 
-      S2 = 'hi '                                                        0002
+      S2 = 'hi '                                                        0005
 
 C  T() {}
 
-      PRINT *, '-', S1, '-', S2, '-'                                    0003
+      PRINT *, '-', S1, '-', S2, '-'                                    0006
 
 C  T() {}
 
-      IF (S1.EQ.S2) THEN                                                0004
+      IF (S1.EQ.S2) THEN                                                0007
 
 C  T() {}
 
-         PRINT *, 's1 == s2'                                            0005
+         PRINT *, 's1 == s2'                                            0008
       ENDIF
 
 C  T() {}
 
-      IF (S1.NE.S2) THEN                                                0006
+      IF (S1.NE.S2) THEN                                                0010
 
 C  T() {}
 
-         PRINT *, 's1 != s2'                                            0007
+         PRINT *, 's1 != s2'                                            0011
       ENDIF
       END
 
@@ -44,45 +44,45 @@ C  P() {}
 C  P() {}
 
 !
-      S1 = 'hi'                                                         0001
+      S1 = 'hi'                                                         0004
 
 C  P(S1) {'hi'==S1}
 
-      S2 = 'hi '                                                        0002
+      S2 = 'hi '                                                        0005
 
 C  P(S1,S2) {'hi '==S2, 'hi'==S1}
 
-      PRINT *, '-', S1, '-', S2, '-'                                    0003
+      PRINT *, '-', S1, '-', S2, '-'                                    0006
 
 C  P(S1,S2) {'hi '==S2, 'hi'==S1}
 
-      IF (S1.EQ.S2) THEN                                                0004
+      IF (S1.EQ.S2) THEN                                                0007
 
 C  P(S1,S2) {'hi '==S1, 'hi'==S1, S1==S2}
 
-         PRINT *, 's1 == s2'                                            0005
+         PRINT *, 's1 == s2'                                            0008
       ENDIF
 
 C  P(S1,S2) {'hi '==S2, 'hi'==S1}
 
-      IF (S1.NE.S2) THEN                                                0006
+      IF (S1.NE.S2) THEN                                                0010
 
 C  P(S1,S2) {'hi '==S2, 'hi'==S1}
 
-         PRINT *, 's1 != s2'                                            0007
+         PRINT *, 's1 != s2'                                            0011
       ENDIF
       END
       PROGRAM CHAINE03
       CHARACTER*3 S1, S2
 !
-      S1 = 'hi'                                                         0001
-      S2 = 'hi '                                                        0002
-      PRINT *, '-', S1, '-', S2, '-'                                    0003
-      IF (S1.EQ.S2) THEN                                                0004
-         PRINT *, 's1 == s2'                                            0005
+      S1 = 'hi'                                                         0004
+      S2 = 'hi '                                                        0005
+      PRINT *, '-', S1, '-', S2, '-'                                    0006
+      IF (S1.EQ.S2) THEN                                                0007
+         PRINT *, 's1 == s2'                                            0008
       ENDIF
-      IF (S1.NE.S2) THEN                                                0006
-         PRINT *, 's1 != s2'                                            0007
+      IF (S1.NE.S2) THEN                                                0010
+         PRINT *, 's1 != s2'                                            0011
       ENDIF
       END
 

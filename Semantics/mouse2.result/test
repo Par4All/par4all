@@ -5,17 +5,17 @@ C  P() {TRAP:ENTRY==0}
 
 C  P() {TRAP:ENTRY==0}
 
-      MODE = 0                                                          0001
+      MODE = 0                                                          0002
 
 C  P(MODE) {MODE==0, TRAP:ENTRY==0}
 
-      CALL TRAP(MODE)                                                   0002
+      CALL TRAP(MODE)                                                   0003
 
 C  P(MODE,TRAP:ENTRY) {MODE==0, TRAP:ENTRY#init==0, 1<=TRAP:ENTRY}
 
-      MODE = 1                                                          0003
+      MODE = 1                                                          0004
 
 C  P(MODE,TRAP:ENTRY) {MODE==1, TRAP:ENTRY#init==0, 1<=TRAP:ENTRY}
 
-      CALL TRAP(MODE)                                                   0004
+      CALL TRAP(MODE)                                                   0005
       END

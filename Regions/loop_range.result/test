@@ -8,16 +8,16 @@ C     we have an exact region which is not correct.
 
 C  <A(PHI1)-R-EXACT-{1<=PHI1}>
 
-      DO I = 1, N                                                       0001
+      DO I = 1, N                                                       0008
 
 C  <A(PHI1)-R-EXACT-{PHI1==I, 1<=I}>
 
-         X = A(I)                                                       0002
-         CALL SUB                                                       0003
+         X = A(I)                                                       0009
+         CALL SUB                                                       0010
       ENDDO
       END
 
       SUBROUTINE SUB
       COMMON N
-      N = NGV                                                           0001
+      N = NGV                                                           0004
       END

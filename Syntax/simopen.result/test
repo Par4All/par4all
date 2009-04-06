@@ -2,7 +2,7 @@
 
 C     Bug dans simula (sidolo package)
 
-      OPEN (UNIT=ISCA,FILE=FICHS,RECL=LONREC*(NSCAL+MAXVOBS+NSCAL2),    0001
-     &ACCESS='direct')                                                  0001
+      OPEN (UNIT=ISCA,FILE=FICHS,RECL=LONREC*(NSCAL+MAXVOBS+NSCAL2),    0005
+     &ACCESS='direct')                                                  0005
 
       END

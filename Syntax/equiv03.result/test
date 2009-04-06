@@ -66,8 +66,8 @@ C     when a debugging option is used to print out common layouts
       COMMON /C_U/U
       EQUIVALENCE (T(1),U(1))
 
-      DO I = 2, 10                                                      0001
-         T(I) = U(I-1)                                                  0002
+      DO I = 2, 10                                                      0010
+         T(I) = U(I-1)                                                  0011
       ENDDO
 
       END

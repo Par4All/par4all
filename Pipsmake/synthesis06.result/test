@@ -33,7 +33,7 @@ C     Check for non-trivial symbolic constants
       PARAMETER (NBR = 2)
       PARAMETER  (LLOAD  = 3*NBR )
 
-      CALL HIDENH(LHIDEN, LLOAD, 9999)                                  0001
+      CALL HIDENH(LHIDEN, LLOAD, 9999)                                  0010
 
       END
 echo

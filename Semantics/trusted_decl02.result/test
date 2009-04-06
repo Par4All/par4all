@@ -9,17 +9,17 @@ C  T(N) {N==0, 1<=N#init}
 C  T(I) {1<=N}
 
 
-      DO I = 1, N                                                       0001
+      DO I = 1, N                                                       0006
 
 C  T() {1<=I, I<=N, 1<=N}
 
-         A(I) = 0.                                                      0002
+         A(I) = 0.                                                      0007
       ENDDO
 
 C  T(N) {I==N#init+1, N==0, 2<=I}
 
 
-      N = 0                                                             0003
+      N = 0                                                             0010
 
       END
 
@@ -32,17 +32,17 @@ C  P() {}
 C  P() {}
 
 
-      READ *, N                                                         0001
+      READ *, N                                                         0005
 
 C  P(N) {}
 
 
-      CALL INIT(A, N)                                                   0002
+      CALL INIT(A, N)                                                   0007
 
 C  P(N) {N==0}
 
 
-      PRINT *, N                                                        0003
+      PRINT *, N                                                        0009
 
       END
 

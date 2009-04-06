@@ -14,17 +14,17 @@ C (0,2)
 
 C     Check rules for multiplication
 
-      READ *, N                                                         0001
+      READ *, N                                                         0005
 
 C  T(I) {2<=I}
 
 C (0,3)
-      I = N*N+2                                                         0002
+      I = N*N+2                                                         0006
 
 C  T() {}
 
 C (0,4)
-      PRINT *, I                                                        0003
+      PRINT *, I                                                        0007
 
 C     END BLOCK
       END
@@ -44,17 +44,17 @@ C (0,2)
 
 C     Check rules for multiplication
 
-      READ *, N                                                         0001
+      READ *, N                                                         0005
 
 C  P(N) {}
 
 C (0,3)
-      I = N*N+2                                                         0002
+      I = N*N+2                                                         0006
 
 C  P(I,N) {2<=I}
 
 C (0,4)
-      PRINT *, I                                                        0003
+      PRINT *, I                                                        0007
 
 C     END BLOCK
       END

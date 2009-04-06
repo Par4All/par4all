@@ -16,7 +16,7 @@ Request: build resource PARALLELPRINTED_FILE for module EQUIV02.
   ATOMIC_CHAINS                  building   CHAINS(EQUIV02)
   CUMULATED_EFFECTS              building   CUMULATED_EFFECTS(EQUIV02)
   RICE_FAST_DEPENDENCE_GRAPH     building   DG(EQUIV02)
-dep 02 (<U(I-1)-R-MUST>) --> 02 (<T(I)-W-MUST>) 
+dep 11 (<U(I-1)-R-MUST>) --> 11 (<T(I)-W-MUST>) 
 user warning in TestCoupleOfReferences: Dependence between differents variables: U and T
 Dependence assumed
   RICE_ALL_DEPENDENCE            building   PARALLELIZED_CODE(EQUIV02)
@@ -31,8 +31,8 @@ C     between T and U
       COMMON /C_U/U
       EQUIVALENCE (T(1),U(1))
 
-      DO I = 2, 10                                                      0001
-         T(I) = U(I-1)                                                  0002
+      DO I = 2, 10                                                      0010
+         T(I) = U(I-1)                                                  0011
       ENDDO
 
       END

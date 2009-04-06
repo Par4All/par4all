@@ -7,8 +7,8 @@ C     declaration
       CHARACTER*2 FORMAI
       DATA FORMAI /'i4'/
 
-      JTYPE = 1                                                         0001
+      JTYPE = 1                                                         0010
 
-      WRITE (TEXTE(IPOS+1:), FORMAI) JTYPE                              0002
+      WRITE (TEXTE(IPOS+1:), FORMAI) JTYPE                              0012
 
       END

@@ -6,8 +6,8 @@ C     is not taken into account.
 
       REAL U(10,10)
 
-      DO I = 1, 10                                                      0001
-         U(I,1:10) = 0.                                                 0003
+      DO I = 1, 10                                                      0009
+         U(I,1:10) = 0.                                                 0011
       ENDDO
 
       END

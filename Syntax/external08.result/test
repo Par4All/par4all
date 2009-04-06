@@ -65,9 +65,9 @@ C     signature should be OK. Variation of external06.f
 
       EXTERNAL F
 
-      CALL F(I, J)                                                      0001
+      CALL F(I, J)                                                      0008
 
-      CALL G(F)                                                         0002
+      CALL G(F)                                                         0010
 
       END
 Deletion of obsolete resources:

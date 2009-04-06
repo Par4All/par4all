@@ -2,10 +2,10 @@
 
       REAL X(100)
 
-      I = 100                                                           0001
-      DO 100 WHILE (I.GT.1)                                             0002
-         X(I) = 0.                                                      0003
-         I = I-1                                                        0004
-100      CONTINUE                                                       0005
+      I = 100                                                           0005
+      DO 100 WHILE (I.GT.1)                                             0006
+         X(I) = 0.                                                      0007
+         I = I-1                                                        0008
+100      CONTINUE                                                       0009
 
       END

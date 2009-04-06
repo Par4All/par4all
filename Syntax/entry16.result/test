@@ -7,7 +7,7 @@ Module ENTRY16
 
       DATA K /3/
 
-      PRINT *, N                                                        0001
+      PRINT *, N                                                        0006
 
 
       END
@@ -18,8 +18,8 @@ Entry INCREMENT
       INTEGER N, K, M
       COMMON /ENTRY_ENTRY16/ M, K
 
-99999 CONTINUE                                                          0001
+99999 CONTINUE                                                          0005
 
-      M = K+1                                                           0002
+      M = K+1                                                           0007
 
       END

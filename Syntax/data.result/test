@@ -11,7 +11,7 @@
       PROGRAM MAIN000
       INTEGER I, J
       COMMON /FOO/ I, J
-      PRINT *, I, J                                                     0001
+      PRINT *, I, J                                                     0004
       END
 
 C  P() {0==-1}
@@ -38,5 +38,5 @@ C  P() {I==4, J==5}
 
 C  P() {I==4, J==5}
 
-      PRINT *, I, J                                                     0001
+      PRINT *, I, J                                                     0004
       END

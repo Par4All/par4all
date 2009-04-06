@@ -8,30 +8,30 @@ C     to test negation of and conditions
 C  P() {}
 
 
-      I = 1                                                             0001
+      I = 1                                                             0005
 
 C  P(I) {I==1}
 
-      IF (I.EQ.2.AND.J.EQ.3) THEN                                       0002
+      IF (I.EQ.2.AND.J.EQ.3) THEN                                       0006
 
 C  P() {0==-1}
 
-         J = 4                                                          0003
+         J = 4                                                          0007
       ELSE
 
 C  P(I) {I==1}
 
-         J = 5                                                          0004
+         J = 5                                                          0009
       ENDIF
 
 C  P(I,J) {I==1, J==5}
 
 
-      K = J                                                             0005
+      K = J                                                             0012
 
 C  P(I,J,K) {I==1, J==5, K==5}
 
 
-      PRINT *, I, J, K                                                  0006
+      PRINT *, I, J, K                                                  0014
 
       END

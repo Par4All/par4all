@@ -37,9 +37,9 @@ C     Check for overloading: two incompatible calls to hidenh
       REAL LHIDEN
       PARAMETER (LHIDEN = NBR*PI)
 
-      CALL HIDENH(LHIDEN, LLOAD, 9999)                                  0001
+      CALL HIDENH(LHIDEN, LLOAD, 9999)                                  0013
 
-      CALL HIDENH(LLOAD, LLOAD, 9999)                                   0002
+      CALL HIDENH(LLOAD, LLOAD, 9999)                                   0015
 
       END
 echo

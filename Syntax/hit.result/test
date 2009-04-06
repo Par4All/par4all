@@ -33,23 +33,23 @@ C
 C      CALL CPYMAT(PTEMP,PSTR(1,DIR+1),24) LPOINTER 4-3-89
 C      CALL ICPYMT(PTEMP,PSTR(1,DIR+1),24)
 C
-      IF (COORD(DIR+1).EQ.LATT1(DIR+1)) THEN                            0001
-         OTHEND = 0                                                     0002
+      IF (COORD(DIR+1).EQ.LATT1(DIR+1)) THEN                            0036
+         OTHEND = 0                                                     0037
       ELSE
-         OTHEND = COORD(DIR+1)+1                                        0003
+         OTHEND = COORD(DIR+1)+1                                        0039
       ENDIF
 C
-      COORD(DIR+1) = OTHEND                                             0004
-      SITE = COORD(1)*MOV(1)+COORD(2)*MOV(2)+COORD(3)*MOV(3)+COORD(4)   0005
-     &*MOV(4)                                                           0005
-      CNT = 1                                                           0006
-      DO 1 J = 1, 6                                                     0007
-         COORD(DIR+1) = OTHEND                                          0008
+      COORD(DIR+1) = OTHEND                                             0042
+      SITE = COORD(1)*MOV(1)+COORD(2)*MOV(2)+COORD(3)*MOV(3)+COORD(4)   0043
+     &*MOV(4)                                                           0043
+      CNT = 1                                                           0045
+      DO 1 J = 1, 6                                                     0046
+         COORD(DIR+1) = OTHEND                                          0047
 C        CALL SYSLOP(COORD,SITE,PTEMP(CNT),ST(1,J),NCHAR)
-         CNT = NCHAR+CNT                                                0009
-1        CONTINUE                                                       0010
+         CNT = NCHAR+CNT                                                0049
+1        CONTINUE                                                       0050
 C
-      PU = ORIGIN+ROT(DIR+1)                                            0011
+      PU = ORIGIN+ROT(DIR+1)                                            0052
 C      CALL CHOOS(ST(1,1),U1(PU+1))
 C
       END

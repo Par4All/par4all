@@ -8,9 +8,9 @@ c     Do we lose comments in front of an ENDIF?
 C     No, but there is a bug when the user view is displayed: 
 C     a useless ELSE appears
 
-      DO I = 1, N                                                       0001
-         IF (T(I).LT.0.) THEN                                           0002
-            T(I) = 0.                                                   0003
+      DO I = 1, N                                                       0009
+         IF (T(I).LT.0.) THEN                                           0010
+            T(I) = 0.                                                   0011
 c     this comment might be lost!
          ENDIF
 c     And how about this one?
@@ -27,9 +27,9 @@ c     Do we lose comments in front of an ENDIF?
 C     No, but there is a bug when the user view is displayed: 
 C     a useless ELSE appears
 
-      DOALL I = 1, N                                                    0001
-         IF (T(I).LT.0.) THEN                                           0002
-            T(I) = 0.                                                   0003
+      DOALL I = 1, N                                                    0009
+         IF (T(I).LT.0.) THEN                                           0010
+            T(I) = 0.                                                   0011
 c     this comment might be lost!
          ENDIF
 c     And how about this one?

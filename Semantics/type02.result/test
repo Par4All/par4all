@@ -11,34 +11,34 @@ C     scalar variables
 C  T(L1) {L1==1}
 
 
-      L1 = .TRUE.                                                       0001
+      L1 = .TRUE.                                                       0008
 
 C  T(L2) {L2==0}
 
-      L2 = .FALSE.                                                      0002
+      L2 = .FALSE.                                                      0009
 
 C  T(L1) {L1+L2==1, 0<=L1, L1<=1}
 
-      L1 = .NOT.L2                                                      0003
+      L1 = .NOT.L2                                                      0010
 
 C  T(L1) {L1+L1#init==1, 0<=L1, L1<=1}
 
-      L1 = .NOT.L1                                                      0004
+      L1 = .NOT.L1                                                      0011
 
 C  T(L3) {0<=L1, L1<=1, L3<=L1+L2, L1<=L3, 0<=L2, L2<=1, L2<=L3,
 C    0<=L3, L3<=1}
 
-      L3 = L1.OR.L2                                                     0005
+      L3 = L1.OR.L2                                                     0012
 
 C  T(L4) {0<=L1, L1<=1, L1+L2<=L4+1, L4<=L1, 0<=L2, L2<=1, L4<=L2,
 C    0<=L4, L4<=1}
 
-      L4 = L1.AND.L2                                                    0006
+      L4 = L1.AND.L2                                                    0013
 
 C  T() {}
 
 
-      PRINT *, L1, L2, L3, L4                                           0007
+      PRINT *, L1, L2, L3, L4                                           0015
 
       END
 
@@ -54,32 +54,32 @@ C     scalar variables
 C  P() {}
 
 
-      L1 = .TRUE.                                                       0001
+      L1 = .TRUE.                                                       0008
 
 C  P(L1) {L1==1}
 
-      L2 = .FALSE.                                                      0002
+      L2 = .FALSE.                                                      0009
 
 C  P(L1,L2) {L1==1, L2==0}
 
-      L1 = .NOT.L2                                                      0003
+      L1 = .NOT.L2                                                      0010
 
 C  P(L1,L2) {L1==1, L2==0}
 
-      L1 = .NOT.L1                                                      0004
+      L1 = .NOT.L1                                                      0011
 
 C  P(L1,L2) {L1==0, L2==0}
 
-      L3 = L1.OR.L2                                                     0005
+      L3 = L1.OR.L2                                                     0012
 
 C  P(L1,L2,L3) {L1==0, L2==0, L3==0}
 
-      L4 = L1.AND.L2                                                    0006
+      L4 = L1.AND.L2                                                    0013
 
 C  P(L1,L2,L3,L4) {L1==0, L2==0, L3==0, L4==0}
 
 
-      PRINT *, L1, L2, L3, L4                                           0007
+      PRINT *, L1, L2, L3, L4                                           0015
 
       END
 

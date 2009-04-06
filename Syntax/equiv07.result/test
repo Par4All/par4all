@@ -68,8 +68,8 @@ C     Check that aliased variable T has proper offset
       EQUIVALENCE (T(1),U(1))
       DOUBLE PRECISION A(10)
 
-      DO I = 2, 10                                                      0001
-         T(I) = U(I-1)                                                  0002
+      DO I = 2, 10                                                      0010
+         T(I) = U(I-1)                                                  0011
       ENDDO
 
       END

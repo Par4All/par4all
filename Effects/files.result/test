@@ -5,12 +5,12 @@ C     because of the write instruction ...
       INTEGER J
 C               <must be written>: J
 
-      DO 10 J = 1, 20                                                   0001
+      DO 10 J = 1, 20                                                   0007
 C               <must be read   >: I(J) J __IO_EFFECTS:LUNS(5)
 C               <must be written>: __IO_EFFECTS:LUNS(5)
 c         WRITE (UNIT=5,*) I(J)
-         WRITE (5, *) I(J)                                              0002
-10       CONTINUE                                                       0003
+         WRITE (5, *) I(J)                                              0009
+10       CONTINUE                                                       0010
 
       END
 C     There should no parallelization possible
@@ -19,9 +19,9 @@ C     because of the write instruction ...
       INTEGER I(10)
       INTEGER J
 
-      DO J = 1, 20                                                      0001
+      DO J = 1, 20                                                      0007
 c         WRITE (UNIT=5,*) I(J)
-         WRITE (5, *) I(J)                                              0002
+         WRITE (5, *) I(J)                                              0009
       ENDDO
 
       END

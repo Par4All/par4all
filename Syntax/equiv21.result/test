@@ -11,6 +11,6 @@ C     declaree dans un common
       DATA NP/4/
       EQUIVALENCE (NP,MP)
 
-      PRINT *, M, MP                                                    0001
+      PRINT *, M, MP                                                    0014
 
       END

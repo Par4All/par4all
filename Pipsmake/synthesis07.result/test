@@ -36,7 +36,7 @@ C     Check for non-trivial symbolic constants
       REAL LHIDEN
       PARAMETER (LHIDEN = NBR*PI)
 
-      CALL HIDENH(LHIDEN, LLOAD, 9999)                                  0001
+      CALL HIDENH(LHIDEN, LLOAD, 9999)                                  0013
 
       END
 echo

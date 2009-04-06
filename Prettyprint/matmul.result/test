@@ -6,54 +6,54 @@ c square matrix multiplication
       INTEGER I, J, K
 
 !HPF$ INDEPENDENT, NEW(I)
-      DO J = 1, N                                                       0001
+      DO J = 1, N                                                       0007
 
 !HPF$    INDEPENDENT
-         DO I = 1, N                                                    0002
-            A(I,J) = REAL(I-N/2)/REAL(J)                                0003
+         DO I = 1, N                                                    0008
+            A(I,J) = REAL(I-N/2)/REAL(J)                                0009
          ENDDO
       ENDDO
 
 !HPF$ INDEPENDENT, NEW(I)
-      DO J = 1, N                                                       0001
+      DO J = 1, N                                                       0007
 
 !HPF$    INDEPENDENT
-         DO I = 1, N                                                    0002
-            B(I,J) = REAL(J-3)/REAL(I)                                  0004
+         DO I = 1, N                                                    0008
+            B(I,J) = REAL(J-3)/REAL(I)                                  0010
          ENDDO
       ENDDO
 
 !HPF$ INDEPENDENT, NEW(I)
-      DO J = 1, N                                                       0005
+      DO J = 1, N                                                       0013
 
 !HPF$    INDEPENDENT
-         DO I = 1, N                                                    0006
-            C(I,J) = 0.                                                 0007
+         DO I = 1, N                                                    0014
+            C(I,J) = 0.                                                 0015
          ENDDO
       ENDDO
 
 !HPF$ INDEPENDENT, NEW(I)
-      DO J = 1, N                                                       0005
+      DO J = 1, N                                                       0013
 
 !HPF$    INDEPENDENT, NEW(K)
-         DO I = 1, N                                                    0006
-            DO K = 1, N                                                 0008
-               C(I,J) = C(I,J)+A(I,K)*B(K,J)                            0009
+         DO I = 1, N                                                    0014
+            DO K = 1, N                                                 0016
+               C(I,J) = C(I,J)+A(I,K)*B(K,J)                            0017
             ENDDO
          ENDDO
       ENDDO
 
 !HPF$ INDEPENDENT, NEW(I)
-      DO J = 1, N                                                       0010
+      DO J = 1, N                                                       0021
 
 !HPF$    INDEPENDENT, NEW(X,K)
-         DO I = 1, N                                                    0011
-            X = 0.                                                      0012
-            DO K = 1, N                                                 0013
-               X = X+A(I,K)*B(K,J)                                      0014
+         DO I = 1, N                                                    0022
+            X = 0.                                                      0023
+            DO K = 1, N                                                 0024
+               X = X+A(I,K)*B(K,J)                                      0025
             ENDDO
-            C(I,J) = X                                                  0015
+            C(I,J) = X                                                  0027
          ENDDO
       ENDDO
-      PRINT *, ((C(I,J), I = 1, N), J = 1, N)                           0016
+      PRINT *, ((C(I,J), I = 1, N), J = 1, N)                           0030
       END

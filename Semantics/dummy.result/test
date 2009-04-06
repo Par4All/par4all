@@ -9,43 +9,43 @@ C    M==N, J<=I}
 C  T(I,J,K,L) {I==I#init+1, J==J#init+2, K==K#init+3, L==L#init+4,
 C    J<=I}
 
-      IF (I.GT.J) THEN                                                  0001
+      IF (I.GT.J) THEN                                                  0004
 
 C  T(I) {I==I#init+1}
 
-         I = I+1                                                        0002
+         I = I+1                                                        0005
 
 C  T(J) {J==J#init+2}
 
-         J = J+2                                                        0003
+         J = J+2                                                        0006
 
 C  T(K) {K==K#init+3}
 
-         K = K+3                                                        0004
+         K = K+3                                                        0007
 
 C  T(L) {L==L#init+4}
 
-         L = L+4                                                        0005
+         L = L+4                                                        0008
       ELSE
 
 C  T() {0==-1}
 
-         STOP                                                           0006
+         STOP                                                           0010
       ENDIF
 
 C  T() {M==N}
 
 
-      IF (M.EQ.N) THEN                                                  0007
+      IF (M.EQ.N) THEN                                                  0013
 
 C  T() {}
 
-         PRINT *, M-N                                                   0008
+         PRINT *, M-N                                                   0014
       ELSE
 
 C  T() {0==-1}
 
-         STOP                                                           0009
+         STOP                                                           0016
       ENDIF
 
       END
@@ -65,11 +65,11 @@ c     linked to old or new values
 C  P() {}
 
 
-      CALL BAR                                                          0001
+      CALL BAR                                                          0011
 
 C  P(I,J) {I==I#init+1, J==J#init+2, M==N, J<=I}
 
 
-      PRINT *, I, J, M, M                                               0002
+      PRINT *, I, J, M, M                                               0013
 
       END

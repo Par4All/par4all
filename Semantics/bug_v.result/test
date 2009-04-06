@@ -14,22 +14,22 @@ C     Bug found in CEA's benchv
 C     Double occurence of the same variable in a 
 C     precondition argument list
 
-      IF (X.GT.0.) THEN                                                 0001
+      IF (X.GT.0.) THEN                                                 0008
 
 C  T(GAMA:N) {}
 
-         Y = GAMA(XX, IER)                                              0002
+         Y = GAMA(XX, IER)                                              0009
       ELSE
 
 C  T(N) {N==3}
 
-         N = 3                                                          0003
+         N = 3                                                          0011
       ENDIF
 
 C  T() {}
 
 
-      PRINT *, Y, N                                                     0004
+      PRINT *, Y, N                                                     0014
 
       END
 
@@ -49,21 +49,21 @@ C     Bug found in CEA's benchv
 C     Double occurence of the same variable in a 
 C     precondition argument list
 
-      IF (X.GT.0.) THEN                                                 0001
+      IF (X.GT.0.) THEN                                                 0008
 
 C  P() {}
 
-         Y = GAMA(XX, IER)                                              0002
+         Y = GAMA(XX, IER)                                              0009
       ELSE
 
 C  P() {}
 
-         N = 3                                                          0003
+         N = 3                                                          0011
       ENDIF
 
 C  P(GAMA:N,N) {}
 
 
-      PRINT *, Y, N                                                     0004
+      PRINT *, Y, N                                                     0014
 
       END

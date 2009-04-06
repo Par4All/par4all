@@ -5,11 +5,11 @@ Output of the parser
       INTEGER NFILEC
       CHARACTER*80 LIGNE
 
-      IF (IOPERA.LE.0) THEN                                             0001
-         DO WHILE (IPOYNT.LE.LONGSF)                                    0002
-            IF (IPOYNT.GT.LONGSF) THEN                                  0003
-               READ (UNIT=NFILEC,FMT='(A)',END=1999,ERR=1999) LIGNE(1   0004
-     &         :LONGSF)                                                 0004
+      IF (IOPERA.LE.0) THEN                                             0005
+         DO WHILE (IPOYNT.LE.LONGSF)                                    0006
+            IF (IPOYNT.GT.LONGSF) THEN                                  0007
+               READ (UNIT=NFILEC,FMT='(A)',END=1999,ERR=1999) LIGNE(1   0008
+     &         :LONGSF)                                                 0008
                GOTO 99999
                
                GOTO 1999
@@ -23,7 +23,7 @@ Output of the parser
          ENDDO
       ELSE
       ENDIF
-1999  RETURN                                                            0005
+1999  RETURN                                                            0012
       END
 
 Output of the controlizer
@@ -32,19 +32,19 @@ Output of the controlizer
       INTEGER NFILEC
       CHARACTER*80 LIGNE
 
-      IF (IOPERA.LE.0) THEN                                             0001
+      IF (IOPERA.LE.0) THEN                                             0005
       ELSE
          GOTO 1999
       ENDIF
 99999 CONTINUE
 C     DO WHILE loop with GO TO exit had to be desugared
-      IF (.NOT.IPOYNT.LE.LONGSF) GOTO 1999                              0002
-      IF (IPOYNT.GT.LONGSF) THEN                                        0003
+      IF (.NOT.IPOYNT.LE.LONGSF) GOTO 1999                              0006
+      IF (IPOYNT.GT.LONGSF) THEN                                        0007
       ELSE
          GOTO 99999
       ENDIF
-      READ (UNIT=NFILEC,FMT='(A)',END=1999,ERR=1999) LIGNE(1:LONGSF)    0004
+      READ (UNIT=NFILEC,FMT='(A)',END=1999,ERR=1999) LIGNE(1:LONGSF)    0008
       GOTO 99999
-1999  CONTINUE                                                          0005
+1999  CONTINUE                                                          0012
       END
 

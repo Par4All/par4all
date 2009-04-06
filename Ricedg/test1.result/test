@@ -1,7 +1,7 @@
       PROGRAM TEST1
       REAL T(10)
 
-      DOALL I = 1, 10                                                   0001
-         T(I) = 0.0                                                     0002
+      DOALL I = 1, 10                                                   0004
+         T(I) = 0.0                                                     0005
       ENDDO
       END

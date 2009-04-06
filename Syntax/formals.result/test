@@ -65,14 +65,14 @@ PRINTED_FILE made for EXTEND.
       INTEGER ISTAT, NEQUIV
       REAL*4 GATEF, GATVEL, ALVERT
 
-      ISTAT = 0                                                         0001
+      ISTAT = 0                                                         0004
 
 99999 CONTINUE
-      GATEF = GATE1                                                     0002
-      GATVEL = GATE2                                                    0003
-      NEQUIV = NEQQ                                                     0004
-      ALVERT = ALVNEW                                                   0005
-      IF (IPRT.LT.1) THEN                                               0006
+      GATEF = GATE1                                                     0007
+      GATVEL = GATE2                                                    0008
+      NEQUIV = NEQQ                                                     0009
+      ALVERT = ALVNEW                                                   0010
+      IF (IPRT.LT.1) THEN                                               0011
       ENDIF
 
       END
@@ -130,7 +130,7 @@ C     Bug with formal parameter lists with ENTRY (CA)
 
       SUBROUTINE FPTRAK(NNEW,ISTAT)                                     
 
-      CALL EXTEND(JSTAT)                                                0001
+      CALL EXTEND(JSTAT)                                                0005
 
       END
 Module EXTINT selected
@@ -197,12 +197,12 @@ PRINTED_FILE made for EXTINT.
       INTEGER NEQQ, IPRT, NEQUIV
       REAL*4 GATE1, GATE2, ALVNEW, GATEF, GATVEL, ALVERT
 
-99999 CONTINUE                                                          0001
-      GATEF = GATE1                                                     0002
-      GATVEL = GATE2                                                    0003
-      NEQUIV = NEQQ                                                     0004
-      ALVERT = ALVNEW                                                   0005
-      IF (IPRT.LT.1) THEN                                               0006
+99999 CONTINUE                                                          0005
+      GATEF = GATE1                                                     0006
+      GATVEL = GATE2                                                    0007
+      NEQUIV = NEQQ                                                     0008
+      ALVERT = ALVNEW                                                   0009
+      IF (IPRT.LT.1) THEN                                               0010
       ENDIF
 
       END
@@ -217,23 +217,23 @@ PRINTED_FILE made for EXTEND.
       REAL*4 GATEF, GATVEL, ALVERT
 C               <must be written>: ISTAT
 
-      ISTAT = 0                                                         0001
+      ISTAT = 0                                                         0004
 
 99999 CONTINUE
 C               <must be read   >: GATE1
 C               <must be written>: GATEF
-      GATEF = GATE1                                                     0002
+      GATEF = GATE1                                                     0007
 C               <must be read   >: GATE2
 C               <must be written>: GATVEL
-      GATVEL = GATE2                                                    0003
+      GATVEL = GATE2                                                    0008
 C               <must be read   >: NEQQ
 C               <must be written>: NEQUIV
-      NEQUIV = NEQQ                                                     0004
+      NEQUIV = NEQQ                                                     0009
 C               <must be read   >: ALVNEW
 C               <must be written>: ALVERT
-      ALVERT = ALVNEW                                                   0005
+      ALVERT = ALVNEW                                                   0010
 C               <must be read   >: IPRT
-      IF (IPRT.LT.1) THEN                                               0006
+      IF (IPRT.LT.1) THEN                                               0011
       ENDIF
 
       END
@@ -249,7 +249,7 @@ C     Bug with formal parameter lists with ENTRY (CA)
       SUBROUTINE FPTRAK(NNEW,ISTAT)                                     
 C               <must be written>: JSTAT
 
-      CALL EXTEND(JSTAT)                                                0001
+      CALL EXTEND(JSTAT)                                                0005
 
       END
 Deletion of obsolete resources:

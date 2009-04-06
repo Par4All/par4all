@@ -7,31 +7,31 @@ C  T() {}
 C  T(A) {}
 
 
-      READ *, A                                                         0001
+      READ *, A                                                         0004
 
 C  T(A) {1.+A#init<=A, 4.<=A, 5.<=A}
 
 
-      A = AMAX1(A+1., 4., 5.)                                           0002
+      A = AMAX1(A+1., 4., 5.)                                           0006
 
 C  T(B) {3.==B}
 
 
-      B = 3.                                                            0003
+      B = 3.                                                            0008
 
 C  T() {}
 
 
-      IF (A.LT.B-0.5) THEN                                              0004
+      IF (A.LT.B-0.5) THEN                                              0010
 
 C  T() {}
 
-         PRINT *, 'a is small'                                          0005
+         PRINT *, 'a is small'                                          0011
       ELSE
 
 C  T() {}
 
-         PRINT *, 'a is big'                                            0006
+         PRINT *, 'a is big'                                            0013
       ENDIF
 
       END
@@ -44,44 +44,44 @@ C  P() {}
 C  P() {}
 
 
-      READ *, A                                                         0001
+      READ *, A                                                         0004
 
 C  P(A) {}
 
 
-      A = AMAX1(A+1., 4., 5.)                                           0002
+      A = AMAX1(A+1., 4., 5.)                                           0006
 
 C  P(A) {4.<=A, 5.<=A}
 
 
-      B = 3.                                                            0003
+      B = 3.                                                            0008
 
 C  P(A,B) {3.==B, 4.<=A, 5.<=A}
 
 
-      IF (A.LT.B-0.5) THEN                                              0004
+      IF (A.LT.B-0.5) THEN                                              0010
 
 C  P() {0==-1}
 
-         PRINT *, 'a is small'                                          0005
+         PRINT *, 'a is small'                                          0011
       ELSE
 
 C  P(A,B) {3.==B, B<=0.5+A, 4.<=A, 5.<=A}
 
-         PRINT *, 'a is big'                                            0006
+         PRINT *, 'a is big'                                            0013
       ENDIF
 
       END
       PROGRAM TYPE16
       REAL A, B
 
-      READ *, A                                                         0001
+      READ *, A                                                         0004
 
-      A = AMAX1(A+1., 4., 5.)                                           0002
+      A = AMAX1(A+1., 4., 5.)                                           0006
 
-      B = 3.                                                            0003
+      B = 3.                                                            0008
 
-      PRINT *, 'a is big'                                               0006
+      PRINT *, 'a is big'                                               0013
 
       END
 

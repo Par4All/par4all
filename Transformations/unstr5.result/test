@@ -10,30 +10,30 @@ C  P() {}
 C  P() {}
 
 
-      I = 4                                                             0001
+      I = 4                                                             0004
 
 C  P(I) {I==4}
 
 
-      IF (I.GE.3) GOTO 99999                                            0002
+      IF (I.GE.3) GOTO 99999                                            0006
 
 C  P() {0==-1}
 
-      I = 1                                                             0004
+      I = 1                                                             0010
       GOTO 100
 99999 CONTINUE
 
 C  P(I) {I==4}
 
-      I = 3                                                             0003
+      I = 3                                                             0007
 
 C  P(I) {I==3}
 
-100   CONTINUE                                                          0005
+100   CONTINUE                                                          0013
 
 C  P(I) {I==3}
 
-      PRINT *, J                                                        0005
+      PRINT *, J                                                        0013
 
 C  P(I) {I==3}
 
@@ -52,30 +52,30 @@ C  P() {}
 C  P() {}
 
 
-      I = 4                                                             0001
+      I = 4                                                             0004
 
 C  P(I) {I==4}
 
 
-      IF (I.GE.3) GOTO 99999                                            0002
+      IF (I.GE.3) GOTO 99999                                            0006
 
 C  P() {0==-1}
 
-      I = 1                                                             0004
+      I = 1                                                             0010
       GOTO 100
 99999 CONTINUE
 
 C  P(I) {I==4}
 
-      I = 3                                                             0003
+      I = 3                                                             0007
 
 C  P(I) {I==3}
 
-100   CONTINUE                                                          0005
+100   CONTINUE                                                          0013
 
 C  P(I) {I==3}
 
-      PRINT *, J                                                        0005
+      PRINT *, J                                                        0013
 
 C  P(I) {I==3}
 
@@ -94,20 +94,20 @@ C  P() {}
 C  P() {}
 
 
-      I = 4                                                             0001
+      I = 4                                                             0004
 
 C  P(I) {I==4}
 
 
-      I = 3                                                             0003
+      I = 3                                                             0007
 
 C  P(I) {I==3}
 
-100   CONTINUE                                                          0005
+100   CONTINUE                                                          0013
 
 C  P(I) {I==3}
 
-      PRINT *, J                                                        0005
+      PRINT *, J                                                        0013
 
 C  P(I) {I==3}
 

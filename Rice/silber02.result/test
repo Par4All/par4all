@@ -5,9 +5,9 @@ C     presented at CPC'98
 
       REAL A(N), B(N)
 
-      DO I = 1, N                                                       0001
-         IF (A(I-1).GE.0.) B(I) = 0.                                    0002
-         A(I) = 1.                                                      0004
+      DO I = 1, N                                                       0008
+         IF (A(I-1).GE.0.) B(I) = 0.                                    0009
+         A(I) = 1.                                                      0012
       ENDDO
 
       END

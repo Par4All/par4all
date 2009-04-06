@@ -1,6 +1,6 @@
 
       FUNCTION ETIME(TMP)
-      ETIME = 0.3                                                       0001
+      ETIME = 0.3                                                       0003
       END
 c     Bug with cr2cnf.f, modified version
 
@@ -8,5 +8,5 @@ c     Bug with cr2cnf.f, modified version
       REAL*4 T1,T2,TMP(2),ETIME
       IMPLICIT REAL*8(A-H,O-Z)
       DIMENSION A(N,N,3),B(N,N),AF(N,N,NC),X(N),Y(N),C(N,N),Z(N)
-      T1 = ETIME(TMP)                                                   0001
+      T1 = ETIME(TMP)                                                   0007
       END

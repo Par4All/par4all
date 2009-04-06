@@ -8,17 +8,17 @@ C
 C
       INTEGER A(25)
 C
-      K = 0                                                             0001
+      K = 0                                                             0007
 
 C  <A(PHI1)-W-MAY-{}>
 
 
-      DO I = 1, 5                                                       0002
+      DO I = 1, 5                                                       0009
 
 C  <A(PHI1)-W-EXACT-{PHI1==K, 1<=I, I<=5}>
 
-         A(K) = 0                                                       0003
-         K = K*K                                                        0004
+         A(K) = 0                                                       0010
+         K = K*K                                                        0011
       ENDDO
 C
       END

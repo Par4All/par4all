@@ -15,31 +15,31 @@ C  P() {}
 C  P() {}
 
 
-      DO I = 1, 10                                                      0001
+      DO I = 1, 10                                                      0012
 
 C  P(I) {1<=I, I<=10}
 
-         A(I) = I                                                       0002
+         A(I) = I                                                       0013
       ENDDO
 
 C  P(I) {I==11}
 
 
-      READ *, N, P, I, J                                                0003
+      READ *, N, P, I, J                                                0016
 
 C  P(I,J,N,P) {}
 
 
 !ABC if (1.le.p.and.(n.lt.0.or.n.gt.7)) stop
-      IF (1.LE.P) THEN                                                  0004
+      IF (1.LE.P) THEN                                                  0019
 
 C  P(I,J,N,P) {1<=P}
 
-         DO I = N, N+3                                                  0005
+         DO I = N, N+3                                                  0020
 
 C  P(I,J,N,P) {N<=I, I<=N+3, 1<=P}
 
-            A(I) = 10                                                   0006
+            A(I) = 10                                                   0021
          ENDDO
       ENDIF
 
@@ -47,15 +47,15 @@ C  P(I,J,N,P) {}
 
 
 !ABC if (1.le.p.and.(n.lt.0.or.n.gt.7)) stop
-      DO J = 1, P                                                       0007
+      DO J = 1, P                                                       0026
 
 C  P(I,J,N,P) {1<=J, J<=P}
 
-         DO I = N, N+3                                                  0008
+         DO I = N, N+3                                                  0027
 
 C  P(I,J,N,P) {N<=I, I<=N+3, 1<=J, J<=P}
 
-            A(I) = 10                                                   0009
+            A(I) = 10                                                   0028
          ENDDO
       ENDDO
 
@@ -78,32 +78,32 @@ C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==5}>
 C  <A(PHI1)-W-EXACT-{1<=PHI1, PHI1<=10}>
 
 
-      DO I = 1, 10                                                      0001
+      DO I = 1, 10                                                      0012
 
 C  <A(PHI1)-W-EXACT-{PHI1==I, 1<=I, I<=10}>
 
-         A(I) = I                                                       0002
+         A(I) = I                                                       0013
       ENDDO
 
 C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==5}>
 C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==5}>
 
 
-      READ *, N, P, I, J                                                0003
+      READ *, N, P, I, J                                                0016
 
 C  <A(PHI1)-W-MAY-{N<=PHI1, PHI1<=3+N, 1<=P}>
 
 
 !ABC if (1.le.p.and.(n.lt.0.or.n.gt.7)) stop
-      IF (1.LE.P) THEN                                                  0004
+      IF (1.LE.P) THEN                                                  0019
 
 C  <A(PHI1)-W-EXACT-{N<=PHI1, PHI1<=3+N, 1<=P}>
 
-         DO I = N, N+3                                                  0005
+         DO I = N, N+3                                                  0020
 
 C  <A(PHI1)-W-EXACT-{PHI1==I, N<=I, I<=3+N, 1<=P}>
 
-            A(I) = 10                                                   0006
+            A(I) = 10                                                   0021
          ENDDO
       ENDIF
 
@@ -111,15 +111,15 @@ C  <A(PHI1)-W-EXACT-{N<=PHI1, PHI1<=3+N, 1<=P}>
 
 
 !ABC if (1.le.p.and.(n.lt.0.or.n.gt.7)) stop
-      DO J = 1, P                                                       0007
+      DO J = 1, P                                                       0026
 
 C  <A(PHI1)-W-EXACT-{N<=PHI1, PHI1<=3+N, 1<=J, J<=P}>
 
-         DO I = N, N+3                                                  0008
+         DO I = N, N+3                                                  0027
 
 C  <A(PHI1)-W-EXACT-{PHI1==I, N<=I, I<=3+N, 1<=J, J<=P}>
 
-            A(I) = 10                                                   0009
+            A(I) = 10                                                   0028
          ENDDO
       ENDDO
 

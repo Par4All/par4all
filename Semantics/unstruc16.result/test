@@ -13,31 +13,31 @@ C     Modification: J is now read with N
 C     Remark: the intended behavior probably was to start the loop with J
 C     equals 1 or 2. The go to targets in the first test are probably wrong.
 
-      READ *, N, J                                                      0001
+      READ *, N, J                                                      0013
 C (0,3)
-      I = 1                                                             0002
+      I = 1                                                             0014
 C (0,4)
 C     BEGIN UNSTRUCTURED
 C (1,1)
-      IF (N.GT.0) GOTO 99999                                            0003
+      IF (N.GT.0) GOTO 99999                                            0015
 C        J is not (re-)initialized
 C (4,1)
-200   CONTINUE                                                          0007
+200   CONTINUE                                                          0025
 C (5,1)
 C     BEGIN BLOCK
 C (5,2)
-300   CONTINUE                                                          0008
+300   CONTINUE                                                          0026
 C (5,3)
-      J = J+1                                                           0009
+      J = J+1                                                           0027
 C     END BLOCK
 C (6,1)
-      IF (J.LT.10) GOTO 300                                             0010
+      IF (J.LT.10) GOTO 300                                             0028
 C (7,1)
-      IF (I+J.GT.105) GOTO 400                                          0012
+      IF (I+J.GT.105) GOTO 400                                          0029
 C (10,1)
-      I = I+1                                                           0014
+      I = I+1                                                           0030
 C (9,1)
-      IF (I.LT.100) THEN                                                0015
+      IF (I.LT.100) THEN                                                0031
       ELSE
          GOTO 400
       ENDIF
@@ -45,18 +45,18 @@ C (3,1)
 C     BEGIN BLOCK
 C (3,2)
 
-100   CONTINUE                                                          0005
+100   CONTINUE                                                          0023
 C (3,3)
-      J = 1                                                             0006
+      J = 1                                                             0024
 C     END BLOCK
       GOTO 200
 99999 CONTINUE
 C (2,1)
-      J = 2                                                             0004
+      J = 2                                                             0016
       GOTO 100
 C (8,1)
 
-400   CONTINUE                                                          0017
+400   CONTINUE                                                          0033
 C     END UNSTRUCTURED
 C (0,5)
 C     If N is negative: If the initial value of J is greater than or
@@ -67,7 +67,7 @@ C     I=96 and J=10. Else, J is reinitialized and we end up with I=96 and J=10.
 C     If N is strictly positive, we end up with J=10 and I=96 since J is always
 C     initialized to 1.
 
-      PRINT *, I, J                                                     0018
+      PRINT *, I, J                                                     0042
 
 C     END BLOCK
       END
@@ -95,12 +95,12 @@ C     Modification: J is now read with N
 C     Remark: the intended behavior probably was to start the loop with J
 C     equals 1 or 2. The go to targets in the first test are probably wrong.
 
-      READ *, N, J                                                      0001
+      READ *, N, J                                                      0013
 
 C  T(I) {I==1}
 
 C (0,3)
-      I = 1                                                             0002
+      I = 1                                                             0014
 
 C  T(I,J) {I#init<=I, 106<=I+J, 10<=J}
 
@@ -110,13 +110,13 @@ C     BEGIN UNSTRUCTURED
 C  T() {}
 
 C (1,1)
-      IF (N.GT.0) GOTO 99999                                            0003
+      IF (N.GT.0) GOTO 99999                                            0015
 C        J is not (re-)initialized
 
 C  T() {}
 
 C (4,1)
-200   CONTINUE                                                          0007
+200   CONTINUE                                                          0025
 
 C  T(J) {J==J#init+1}
 
@@ -126,33 +126,33 @@ C     BEGIN BLOCK
 C  T() {}
 
 C (5,2)
-300   CONTINUE                                                          0008
+300   CONTINUE                                                          0026
 
 C  T(J) {J==J#init+1}
 
 C (5,3)
-      J = J+1                                                           0009
+      J = J+1                                                           0027
 C     END BLOCK
 
 C  T() {}
 
 C (6,1)
-      IF (J.LT.10) GOTO 300                                             0010
+      IF (J.LT.10) GOTO 300                                             0028
 
 C  T() {}
 
 C (7,1)
-      IF (I+J.GT.105) GOTO 400                                          0012
+      IF (I+J.GT.105) GOTO 400                                          0029
 
 C  T(I) {I==I#init+1}
 
 C (10,1)
-      I = I+1                                                           0014
+      I = I+1                                                           0030
 
 C  T() {}
 
 C (9,1)
-      IF (I.LT.100) THEN                                                0015
+      IF (I.LT.100) THEN                                                0031
       ELSE
          GOTO 400
       ENDIF
@@ -166,12 +166,12 @@ C  T() {}
 
 C (3,2)
 
-100   CONTINUE                                                          0005
+100   CONTINUE                                                          0023
 
 C  T(J) {J==1}
 
 C (3,3)
-      J = 1                                                             0006
+      J = 1                                                             0024
 C     END BLOCK
       GOTO 200
 99999 CONTINUE
@@ -179,14 +179,14 @@ C     END BLOCK
 C  T(J) {J==2}
 
 C (2,1)
-      J = 2                                                             0004
+      J = 2                                                             0016
       GOTO 100
 
 C  T() {}
 
 C (8,1)
 
-400   CONTINUE                                                          0017
+400   CONTINUE                                                          0033
 C     END UNSTRUCTURED
 
 C  T() {}
@@ -200,7 +200,7 @@ C     I=96 and J=10. Else, J is reinitialized and we end up with I=96 and J=10.
 C     If N is strictly positive, we end up with J=10 and I=96 since J is always
 C     initialized to 1.
 
-      PRINT *, I, J                                                     0018
+      PRINT *, I, J                                                     0042
 
 C     END BLOCK
       END
@@ -228,12 +228,12 @@ C     Modification: J is now read with N
 C     Remark: the intended behavior probably was to start the loop with J
 C     equals 1 or 2. The go to targets in the first test are probably wrong.
 
-      READ *, N, J                                                      0001
+      READ *, N, J                                                      0013
 
 C  P(J,N) {}
 
 C (0,3)
-      I = 1                                                             0002
+      I = 1                                                             0014
 
 C  P(I,J,N) {I==1}
 
@@ -243,13 +243,13 @@ C     BEGIN UNSTRUCTURED
 C  P(I,J,N) {I==1}
 
 C (1,1)
-      IF (N.GT.0) GOTO 99999                                            0003
+      IF (N.GT.0) GOTO 99999                                            0015
 C        J is not (re-)initialized
 
 C  P(I,J,N) {1<=I, I<=96}
 
 C (4,1)
-200   CONTINUE                                                          0007
+200   CONTINUE                                                          0025
 
 C  P(I,J,N) {1<=I, I<=96}
 
@@ -259,33 +259,33 @@ C     BEGIN BLOCK
 C  P(I,J,N) {1<=I, I<=96}
 
 C (5,2)
-300   CONTINUE                                                          0008
+300   CONTINUE                                                          0026
 
 C  P(I,J,N) {1<=I, I<=96}
 
 C (5,3)
-      J = J+1                                                           0009
+      J = J+1                                                           0027
 C     END BLOCK
 
 C  P(I,J,N) {1<=I, I<=96}
 
 C (6,1)
-      IF (J.LT.10) GOTO 300                                             0010
+      IF (J.LT.10) GOTO 300                                             0028
 
 C  P(I,J,N) {1<=I, I<=96, 10<=J}
 
 C (7,1)
-      IF (I+J.GT.105) GOTO 400                                          0012
+      IF (I+J.GT.105) GOTO 400                                          0029
 
 C  P(I,J,N) {1<=I, I+J<=105, 10<=J}
 
 C (10,1)
-      I = I+1                                                           0014
+      I = I+1                                                           0030
 
 C  P(I,J,N) {2<=I, I+J<=106, 10<=J}
 
 C (9,1)
-      IF (I.LT.100) THEN                                                0015
+      IF (I.LT.100) THEN                                                0031
       ELSE
          GOTO 400
       ENDIF
@@ -299,12 +299,12 @@ C  P(I,J,N) {J+100<=102I, I+J<=106, 8I+182<=95J}
 
 C (3,2)
 
-100   CONTINUE                                                          0005
+100   CONTINUE                                                          0023
 
 C  P(I,J,N) {J+100<=102I, I+J<=106, 8I+182<=95J}
 
 C (3,3)
-      J = 1                                                             0006
+      J = 1                                                             0024
 C     END BLOCK
       GOTO 200
 99999 CONTINUE
@@ -312,14 +312,14 @@ C     END BLOCK
 C  P(I,J,N) {I==1, 1<=N}
 
 C (2,1)
-      J = 2                                                             0004
+      J = 2                                                             0016
       GOTO 100
 
 C  P(I,J,N) {1<=I, I<=96, 106<=I+J}
 
 C (8,1)
 
-400   CONTINUE                                                          0017
+400   CONTINUE                                                          0033
 C     END UNSTRUCTURED
 
 C  P(I,J,N) {1<=I, I<=96, 106<=I+J}
@@ -333,7 +333,7 @@ C     I=96 and J=10. Else, J is reinitialized and we end up with I=96 and J=10.
 C     If N is strictly positive, we end up with J=10 and I=96 since J is always
 C     initialized to 1.
 
-      PRINT *, I, J                                                     0018
+      PRINT *, I, J                                                     0042
 
 C     END BLOCK
       END

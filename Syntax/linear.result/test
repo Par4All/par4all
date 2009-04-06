@@ -32,13 +32,13 @@ c
       REAL*8 F
       INTEGER D1, D2
 c
-      IF (N.LE.0) STOP 'nombre d iterations incorrect'                  0001
+      IF (N.LE.0) STOP 'nombre d iterations incorrect'                  0009
 c
-      DO ITER = 1, N                                                    0003
-         DO I = 2, D1-1                                                 0004
-            DO J = 2, D2-1                                              0005
-               Q = (MAT(I-1,J)+MAT(I+1,J)+MAT(I,J-1)+MAT(I,J+1))/4.0    0006
-               MAT(I,J) = F(MAT(I,J), Q)                                0007
+      DO ITER = 1, N                                                    0011
+         DO I = 2, D1-1                                                 0012
+            DO J = 2, D2-1                                              0013
+               Q = (MAT(I-1,J)+MAT(I+1,J)+MAT(I,J-1)+MAT(I,J+1))/4.0    0014
+               MAT(I,J) = F(MAT(I,J), Q)                                0015
             ENDDO
          ENDDO
       ENDDO

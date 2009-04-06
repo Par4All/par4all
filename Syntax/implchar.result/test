@@ -59,7 +59,7 @@ End of declarations for module DUMMY
 PRINTED_FILE made for DUMMY.
 
       SUBROUTINE DUMMY(I, J)
-      PRINT *, I+J                                                      0001
+      PRINT *, I+J                                                      0003
       END
 Module DANCE selected
 Module DANCE already active.
@@ -118,7 +118,7 @@ End of declarations for module DANCE
 PRINTED_FILE made for DANCE.
 
       CHARACTER*8 FUNCTION DANCE(I, J, K)
-      DANCE = 'Bye!'                                                    0001
+      DANCE = 'Bye!'                                                    0003
       END
 Module IMPLCHAR selected
 Module IMPLCHAR already active.
@@ -195,18 +195,18 @@ c      save
       REAL T(M)
 c      common /foo/do, de, t
 c
-      DO = 'Hello'                                                      0001
+      DO = 'Hello'                                                      0019
 
-      DE = 'world!'                                                     0002
+      DE = 'world!'                                                     0021
 
 c     Type clash, detected by g77, not by f77
 c      erreur = 'rate!'
 
-      T(1) = 1.                                                         0003
+      T(1) = 1.                                                         0026
 
-      CALL DUMMY(I, J)                                                  0004
+      CALL DUMMY(I, J)                                                  0028
 
-      PRINT *, DO, DE, ERREUR, T(1), DANCE(I, J, K)                     0005
+      PRINT *, DO, DE, ERREUR, T(1), DANCE(I, J, K)                     0030
 
       END
 Deletion of obsolete resources:

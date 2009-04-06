@@ -1,7 +1,7 @@
 
       SUBROUTINE BLA()
       INTEGER FOO
-      I = FOO()                                                         0001
+      I = FOO()                                                         0004
       END
 
 ! fonctionne avec
@@ -11,7 +11,7 @@
 !
       FUNCTION FOO()
       INTEGER FOO
-      FOO = 0                                                           0001
+      FOO = 0                                                           0009
       END
 
 C  T(FOO) {FOO==0}
@@ -27,7 +27,7 @@ C  T(FOO) {FOO==0}
 
 C  T(FOO) {FOO==0}
 
-      FOO = 0                                                           0001
+      FOO = 0                                                           0009
       END
 
 C  T() {}
@@ -38,5 +38,5 @@ C  T() {}
 
 C  T(I) {I==0}
 
-      I = FOO()                                                         0001
+      I = FOO()                                                         0004
       END

@@ -4,53 +4,53 @@
      &, J, I
       REAL*4 R
 
-      B = 5                                                             0001
-      A = 2                                                             0002
-      C = 3                                                             0003
-      DO5_BEGIN = 1                                                     0004
-      DO5_END = 10                                                      0004
-      DO5_INCREMENT = 1                                                 0004
-      DO5_INDEX = DO5_BEGIN                                             0004
+      B = 5                                                             0013
+      A = 2                                                             0014
+      C = 3                                                             0015
+      DO5_BEGIN = 1                                                     0017
+      DO5_END = 10                                                      0017
+      DO5_INCREMENT = 1                                                 0017
+      DO5_INDEX = DO5_BEGIN                                             0017
 99994 CONTINUE
-      IF (DO5_INDEX.LE.DO5_END) GOTO 99999                              0004
-      IF (A.LT.B) GOTO 99998                                            0012
-      B = 7                                                             0015
-      A = 89                                                            0016
+      IF (DO5_INDEX.LE.DO5_END) GOTO 99999                              0017
+      IF (A.LT.B) GOTO 99998                                            0028
+      B = 7                                                             0032
+      A = 89                                                            0033
 99996 CONTINUE
-      IF (A.LT.B) THEN                                                  0017
+      IF (A.LT.B) THEN                                                  0036
       ELSE
          GOTO 99997
       ENDIF
-      R = A*R                                                           0018
-      A = A+9                                                           0019
+      R = A*R                                                           0037
+      A = A+9                                                           0038
       GOTO 99996
 99998 CONTINUE
-      B = 5                                                             0013
-      A = 17                                                            0014
+      B = 5                                                             0029
+      A = 17                                                            0030
       GOTO 99996
 99999 CONTINUE
-      J = DO5_INDEX                                                     0004
-      B = 5                                                             0005
-      A = 8                                                             0006
-      DO9_BEGIN = 1                                                     0007
-      DO9_END = 10                                                      0007
-      DO9_INCREMENT = 1                                                 0007
-      DO9_INDEX = DO9_BEGIN                                             0007
+      J = DO5_INDEX                                                     0017
+      B = 5                                                             0018
+      A = 8                                                             0019
+      DO9_BEGIN = 1                                                     0020
+      DO9_END = 10                                                      0020
+      DO9_INCREMENT = 1                                                 0020
+      DO9_INDEX = DO9_BEGIN                                             0020
 99993 CONTINUE
-      IF (DO9_INDEX.LE.DO9_END) GOTO 99995                              0007
-      A = B+K                                                           0011
-      DO5_INDEX = DO5_INDEX+DO5_INCREMENT                               0004
+      IF (DO9_INDEX.LE.DO9_END) GOTO 99995                              0020
+      A = B+K                                                           0025
+      DO5_INDEX = DO5_INDEX+DO5_INCREMENT                               0017
       GOTO 99994
 99995 CONTINUE
-      I = DO9_INDEX                                                     0007
-      N = A*I+B                                                         0008
-      M = B*I+J                                                         0009
-      K = K+N*M                                                         0010
-      DO9_INDEX = DO9_INDEX+DO9_INCREMENT                               0007
+      I = DO9_INDEX                                                     0020
+      N = A*I+B                                                         0021
+      M = B*I+J                                                         0022
+      K = K+N*M                                                         0023
+      DO9_INDEX = DO9_INDEX+DO9_INCREMENT                               0020
       GOTO 99993
 99997 CONTINUE
 
-      STOP                                                              0020
+      STOP                                                              0041
       END
       PROGRAM TEST12
       INTEGER FSM9_STATE, DO9_INCREMENT, DO9_END, DO9_BEGIN, 
@@ -58,75 +58,75 @@
      &C, N, M, K, J, I
       REAL*4 R
 
-      B = 5                                                             0001
-      A = 2                                                             0002
-      C = 3                                                             0003
-      DO5_BEGIN = 1                                                     0004
-      DO5_END = 10                                                      0004
-      DO5_INCREMENT = 1                                                 0004
-      DO5_INDEX = DO5_BEGIN                                             0004
+      B = 5                                                             0013
+      A = 2                                                             0014
+      C = 3                                                             0015
+      DO5_BEGIN = 1                                                     0017
+      DO5_END = 10                                                      0017
+      DO5_INCREMENT = 1                                                 0017
+      DO5_INDEX = DO5_BEGIN                                             0017
       FSM9_STATE = 1
       DO WHILE (FSM9_STATE.NE.0)
          IF (FSM9_STATE.EQ.1) THEN
-            IF (DO5_INDEX.LE.DO5_END) THEN                              0004
-               FSM9_STATE = 2                                           0004
+            IF (DO5_INDEX.LE.DO5_END) THEN                              0017
+               FSM9_STATE = 2                                           0017
             ELSE
-               FSM9_STATE = 6                                           0004
+               FSM9_STATE = 6                                           0017
             ENDIF
          ELSEIF (FSM9_STATE.EQ.2) THEN
-            J = DO5_INDEX                                               0004
-            B = 5                                                       0005
-            A = 8                                                       0006
-            DO9_BEGIN = 1                                               0007
-            DO9_END = 10                                                0007
-            DO9_INCREMENT = 1                                           0007
-            DO9_INDEX = DO9_BEGIN                                       0007
+            J = DO5_INDEX                                               0017
+            B = 5                                                       0018
+            A = 8                                                       0019
+            DO9_BEGIN = 1                                               0020
+            DO9_END = 10                                                0020
+            DO9_INCREMENT = 1                                           0020
+            DO9_INDEX = DO9_BEGIN                                       0020
             FSM9_STATE = 3
          ELSEIF (FSM9_STATE.EQ.3) THEN
-            IF (DO9_INDEX.LE.DO9_END) THEN                              0007
-               FSM9_STATE = 4                                           0007
+            IF (DO9_INDEX.LE.DO9_END) THEN                              0020
+               FSM9_STATE = 4                                           0020
             ELSE
-               FSM9_STATE = 5                                           0007
+               FSM9_STATE = 5                                           0020
             ENDIF
          ELSEIF (FSM9_STATE.EQ.4) THEN
-            I = DO9_INDEX                                               0007
-            N = A*I+B                                                   0008
-            M = B*I+J                                                   0009
-            K = K+N*M                                                   0010
-            DO9_INDEX = DO9_INDEX+DO9_INCREMENT                         0007
+            I = DO9_INDEX                                               0020
+            N = A*I+B                                                   0021
+            M = B*I+J                                                   0022
+            K = K+N*M                                                   0023
+            DO9_INDEX = DO9_INDEX+DO9_INCREMENT                         0020
             FSM9_STATE = 3
          ELSEIF (FSM9_STATE.EQ.5) THEN
-            A = B+K                                                     0011
-            DO5_INDEX = DO5_INDEX+DO5_INCREMENT                         0004
+            A = B+K                                                     0025
+            DO5_INDEX = DO5_INDEX+DO5_INCREMENT                         0017
             FSM9_STATE = 1
          ELSEIF (FSM9_STATE.EQ.6) THEN
-            IF (A.LT.B) THEN                                            0012
-               FSM9_STATE = 7                                           0012
+            IF (A.LT.B) THEN                                            0028
+               FSM9_STATE = 7                                           0028
             ELSE
-               FSM9_STATE = 11                                          0012
+               FSM9_STATE = 11                                          0028
             ENDIF
          ELSEIF (FSM9_STATE.EQ.7) THEN
-            B = 5                                                       0013
-            A = 17                                                      0014
+            B = 5                                                       0029
+            A = 17                                                      0030
             FSM9_STATE = 8
          ELSEIF (FSM9_STATE.EQ.8) THEN
-            IF (A.LT.B) THEN                                            0017
-               FSM9_STATE = 9                                           0017
+            IF (A.LT.B) THEN                                            0036
+               FSM9_STATE = 9                                           0036
             ELSE
-               FSM9_STATE = 10                                          0017
+               FSM9_STATE = 10                                          0036
             ENDIF
          ELSEIF (FSM9_STATE.EQ.9) THEN
-            R = A*R                                                     0018
-            A = A+9                                                     0019
+            R = A*R                                                     0037
+            A = A+9                                                     0038
             FSM9_STATE = 8
          ELSEIF (FSM9_STATE.EQ.10) THEN
 
-            FSM9_STATE = 0                                              0020
+            FSM9_STATE = 0                                              0041
          ELSEIF (FSM9_STATE.EQ.11) THEN
-            B = 7                                                       0015
-            A = 89                                                      0016
+            B = 7                                                       0032
+            A = 89                                                      0033
             FSM9_STATE = 8
          ENDIF
       ENDDO
-      STOP                                                              0020
+      STOP                                                              0041
       END

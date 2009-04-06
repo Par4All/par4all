@@ -3,11 +3,11 @@ c     To check that max0
       PARAMETER (I=1, J=2*I, K = MAX0(I,J))
       REAL A(I), B(J), C(K)
 
-      PRINT *, A(I)                                                     0001
+      PRINT *, A(I)                                                     0006
 
-      L = K                                                             0002
+      L = K                                                             0008
 
-      PRINT *, L                                                        0003
+      PRINT *, L                                                        0010
 
       END
 
@@ -21,16 +21,16 @@ c     To check that max0
 C  P() {}
 
 
-      PRINT *, A(I)                                                     0001
+      PRINT *, A(I)                                                     0006
 
 C  P() {}
 
 
-      L = K                                                             0002
+      L = K                                                             0008
 
 C  P(L) {L==2}
 
 
-      PRINT *, L                                                        0003
+      PRINT *, L                                                        0010
 
       END

@@ -62,7 +62,7 @@ PRINTED_FILE made for BAR.
 
       COMMON /FOOFOO/ Z
 
-      Z = 3.                                                            0001
+      Z = 3.                                                            0006
 
       END
 Module COMMON04 selected
@@ -117,9 +117,9 @@ PRINTED_FILE made for COMMON04.
 
       COMMON /FOOFOO/ X
 
-      CALL FOO                                                          0001
+      CALL FOO                                                          0005
 
-      PRINT *, X                                                        0002
+      PRINT *, X                                                        0007
 
       END
 Module FOO selected
@@ -175,9 +175,9 @@ PRINTED_FILE made for FOO.
 
       COMMON /FOOFOO/ Y
 
-      CALL BAR                                                          0001
+      CALL BAR                                                          0006
 
-      Y = Y+1.                                                          0002
+      Y = Y+1.                                                          0008
 
       END
 Deletion of obsolete resources:

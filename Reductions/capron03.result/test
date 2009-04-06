@@ -6,15 +6,15 @@ Print code with proper reductions
       LOGICAL A(10)
       INTEGER C
 
-      READ *, A                                                         0001
+      READ *, A                                                         0006
 
-      C = 0                                                             0002
-      DO I = 1, N                                                       0003
+      C = 0                                                             0008
+      DO I = 1, N                                                       0009
 !  call sum[C],
-         C = C+A(I)                                                     0004
+         C = C+A(I)                                                     0010
       ENDDO
 
-      PRINT *, C                                                        0005
+      PRINT *, C                                                        0013
       END
 
 Print code with cumulated reductions
@@ -24,28 +24,28 @@ Print code with cumulated reductions
       LOGICAL A(10)
       INTEGER C
 
-      READ *, A                                                         0001
+      READ *, A                                                         0006
 
-      C = 0                                                             0002
+      C = 0                                                             0008
 !  loop sum[C],
-      DO I = 1, N                                                       0003
+      DO I = 1, N                                                       0009
 !  call sum[C],
-         C = C+A(I)                                                     0004
+         C = C+A(I)                                                     0010
       ENDDO
 
-      PRINT *, C                                                        0005
+      PRINT *, C                                                        0013
       END
       PROGRAM CAPRON03
 
       LOGICAL A(10)
       INTEGER C
 
-      READ *, A                                                         0001
+      READ *, A                                                         0006
 
-      C = 0                                                             0002
-      DO I = 1, N                                                       0003
-         C = C+A(I)                                                     0004
+      C = 0                                                             0008
+      DO I = 1, N                                                       0009
+         C = C+A(I)                                                     0010
       ENDDO
 
-      PRINT *, C                                                        0005
+      PRINT *, C                                                        0013
       END

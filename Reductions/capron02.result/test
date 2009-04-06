@@ -8,14 +8,14 @@ C Check optimization for code generated in Guuillaume Capron's PhD dissertation
       LOGICAL A(10)
       INTEGER C
 
-      READ *, A                                                         0001
+      READ *, A                                                         0008
 
-      C = 0                                                             0002
-      DO I = 1, N                                                       0003
-         IF (A(I)) C = C+1                                              0004
+      C = 0                                                             0010
+      DO I = 1, N                                                       0011
+         IF (A(I)) C = C+1                                              0012
       ENDDO
 
-      PRINT *, C                                                        0006
+      PRINT *, C                                                        0017
       END
 
 Print code with cumulated reductions
@@ -27,16 +27,16 @@ C Check optimization for code generated in Guuillaume Capron's PhD dissertation
       LOGICAL A(10)
       INTEGER C
 
-      READ *, A                                                         0001
+      READ *, A                                                         0008
 
-      C = 0                                                             0002
+      C = 0                                                             0010
 !  loop sum[C],
-      DO I = 1, N                                                       0003
+      DO I = 1, N                                                       0011
 !  test sum[C],
-         IF (A(I)) C = C+1                                              0004
+         IF (A(I)) C = C+1                                              0012
       ENDDO
 
-      PRINT *, C                                                        0006
+      PRINT *, C                                                        0017
       END
 C Check optimization for code generated in Guuillaume Capron's PhD dissertation
 
@@ -45,12 +45,12 @@ C Check optimization for code generated in Guuillaume Capron's PhD dissertation
       LOGICAL A(10)
       INTEGER C
 
-      READ *, A                                                         0001
+      READ *, A                                                         0008
 
-      C = 0                                                             0002
-      DO I = 1, N                                                       0003
-         IF (A(I)) C = C+1                                              0004
+      C = 0                                                             0010
+      DO I = 1, N                                                       0011
+         IF (A(I)) C = C+1                                              0012
       ENDDO
 
-      PRINT *, C                                                        0006
+      PRINT *, C                                                        0017
       END

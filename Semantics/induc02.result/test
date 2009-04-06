@@ -12,27 +12,27 @@ C     to recompute the loop fixpoints with precondition information.
 C  T(IJ,IX,IY) {1<=IX}
 
 
-      DO IX = 1, NX2                                                    0001
+      DO IX = 1, NX2                                                    0009
 
 C  T(IJ) {IJ==IX}
 
-         IJ = IX                                                        0002
+         IJ = IX                                                        0010
 
 C  T(IJ,IY) {IJ#init<=IJ, 1<=IY}
 
-         DO IY = 1, NY2                                                 0003
+         DO IY = 1, NY2                                                 0011
 
 C  T(IJ) {IJ#init<=IJ, IJ#init+NX2<=IJ}
 
-            IF (NX2.GT.0) THEN                                          0004
+            IF (NX2.GT.0) THEN                                          0012
 
 C  T() {}
 
-               A(IJ) = 0.                                               0005
+               A(IJ) = 0.                                               0013
 
 C  T(IJ) {IJ#init+NX2==IJ}
 
-               IJ = IJ+NX2                                              0006
+               IJ = IJ+NX2                                              0014
             ENDIF
          ENDDO
       ENDDO
@@ -40,23 +40,23 @@ C  T(IJ) {IJ#init+NX2==IJ}
 C  T(IJ,IX,IY) {1<=IX}
 
 
-      DO IX = 1, NX2                                                    0007
+      DO IX = 1, NX2                                                    0019
 
 C  T(IJ) {IJ==IX}
 
-         IJ = IX                                                        0008
+         IJ = IX                                                        0020
 
 C  T(IJ,IY) {1<=IY}
 
-         DO IY = 1, NY2                                                 0009
+         DO IY = 1, NY2                                                 0021
 
 C  T() {}
 
-            A(IJ) = 0.                                                  0010
+            A(IJ) = 0.                                                  0022
 
 C  T(IJ) {IJ#init+NX2==IJ}
 
-            IJ = IJ+NX2                                                 0011
+            IJ = IJ+NX2                                                 0023
          ENDDO
       ENDDO
 
@@ -75,27 +75,27 @@ C     to recompute the loop fixpoints with precondition information.
 C  P() {}
 
 
-      DO IX = 1, NX2                                                    0001
+      DO IX = 1, NX2                                                    0009
 
 C  P(IJ,IX,IY) {1<=IX, IX<=NX2}
 
-         IJ = IX                                                        0002
+         IJ = IX                                                        0010
 
 C  P(IJ,IX,IY) {IJ==IX, 1<=IJ, IJ<=NX2}
 
-         DO IY = 1, NY2                                                 0003
+         DO IY = 1, NY2                                                 0011
 
 C  P(IJ,IX,IY) {IX+IY<=IJ+1, 1<=IX, IX<=NX2, 1<=IY, IY<=NY2}
 
-            IF (NX2.GT.0) THEN                                          0004
+            IF (NX2.GT.0) THEN                                          0012
 
 C  P(IJ,IX,IY) {IX+IY<=IJ+1, 1<=IX, IX<=NX2, 1<=IY, IY<=NY2, 1<=NX2}
 
-               A(IJ) = 0.                                               0005
+               A(IJ) = 0.                                               0013
 
 C  P(IJ,IX,IY) {IX+IY<=IJ+1, 1<=IX, IX<=NX2, 1<=IY, IY<=NY2, 1<=NX2}
 
-               IJ = IJ+NX2                                              0006
+               IJ = IJ+NX2                                              0014
             ENDIF
          ENDDO
       ENDDO
@@ -103,23 +103,23 @@ C  P(IJ,IX,IY) {IX+IY<=IJ+1, 1<=IX, IX<=NX2, 1<=IY, IY<=NY2, 1<=NX2}
 C  P(IJ,IX,IY) {1<=IX, NX2+1<=IX}
 
 
-      DO IX = 1, NX2                                                    0007
+      DO IX = 1, NX2                                                    0019
 
 C  P(IJ,IX,IY) {1<=IX, IX<=NX2}
 
-         IJ = IX                                                        0008
+         IJ = IX                                                        0020
 
 C  P(IJ,IX,IY) {IJ==IX, 1<=IJ, IJ<=NX2}
 
-         DO IY = 1, NY2                                                 0009
+         DO IY = 1, NY2                                                 0021
 
 C  P(IJ,IX,IY) {IX+IY<=IJ+1, 1<=IX, IX<=NX2, 1<=IY, IY<=NY2}
 
-            A(IJ) = 0.                                                  0010
+            A(IJ) = 0.                                                  0022
 
 C  P(IJ,IX,IY) {IX+IY<=IJ+1, 1<=IX, IX<=NX2, 1<=IY, IY<=NY2}
 
-            IJ = IJ+NX2                                                 0011
+            IJ = IJ+NX2                                                 0023
          ENDDO
       ENDDO
 

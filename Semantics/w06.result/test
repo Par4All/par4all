@@ -18,23 +18,23 @@ C  T(I) {I==1}
 C (0,2)
 
 c      I = 100
-      I = 1                                                             0001
+      I = 1                                                             0009
 
 C  T(N) {N==10}
 
 C (0,3)
-      N = 10                                                            0002
+      N = 10                                                            0010
 
 C  T(J) {J==3}
 
 C (0,4)
-      J = 3                                                             0003
+      J = 3                                                             0011
 
 C  T(I,J) {2I#init+J#init<=2I+J, J<=J#init}
 
 C (0,5)
 
-      DO WHILE (I.LT.N)                                                 0004
+      DO WHILE (I.LT.N)                                                 0013
 
 C  T(I,J) {I==I#init+1, J#init<=J+2, J<=J#init}
 
@@ -44,17 +44,17 @@ C        BEGIN BLOCK
 C  T() {}
 
 C (0,7)
-         PRINT *, I                                                     0005
+         PRINT *, I                                                     0014
 
 C  T(J) {J#init<=J+2, J<=J#init}
 
 C (0,8)
-         IF (T(I).GT.0.) THEN                                           0006
+         IF (T(I).GT.0.) THEN                                           0015
 
 C  T(J) {J==J#init-2}
 
 C (0,9)
-            J = J-2                                                     0007
+            J = J-2                                                     0016
          ELSE
 
 C  T() {}
@@ -67,7 +67,7 @@ C           END BLOCK
 C  T(I) {I==I#init+1}
 
 C (0,11)
-         I = I+1                                                        0008
+         I = I+1                                                        0018
 C        END BLOCK
       ENDDO
 
@@ -75,7 +75,7 @@ C  T() {}
 
 C (0,12)
 
-      PRINT *, I, J                                                     0009
+      PRINT *, I, J                                                     0021
 
 C     END BLOCK
       END
@@ -99,23 +99,23 @@ C  P() {}
 C (0,2)
 
 c      I = 100
-      I = 1                                                             0001
+      I = 1                                                             0009
 
 C  P(I) {I==1}
 
 C (0,3)
-      N = 10                                                            0002
+      N = 10                                                            0010
 
 C  P(I,N) {I==1, N==10}
 
 C (0,4)
-      J = 3                                                             0003
+      J = 3                                                             0011
 
 C  P(I,J,N) {I==1, J==3, N==10}
 
 C (0,5)
 
-      DO WHILE (I.LT.N)                                                 0004
+      DO WHILE (I.LT.N)                                                 0013
 
 C  P(I,J,N) {N==10, I<=9, 5<=2I+J, J<=3}
 
@@ -125,17 +125,17 @@ C        BEGIN BLOCK
 C  P(I,J,N) {N==10, I<=9, 5<=2I+J, J<=3}
 
 C (0,7)
-         PRINT *, I                                                     0005
+         PRINT *, I                                                     0014
 
 C  P(I,J,N) {N==10, I<=9, 5<=2I+J, J<=3}
 
 C (0,8)
-         IF (T(I).GT.0.) THEN                                           0006
+         IF (T(I).GT.0.) THEN                                           0015
 
 C  P(I,J,N) {N==10, I<=9, 5<=2I+J, J<=3}
 
 C (0,9)
-            J = J-2                                                     0007
+            J = J-2                                                     0016
          ELSE
 
 C  P(I,J,N) {N==10, I<=9, 5<=2I+J, J<=3}
@@ -148,7 +148,7 @@ C           END BLOCK
 C  P(I,J,N) {N==10, 1<=I, I<=9, 3<=2I+J, J<=3}
 
 C (0,11)
-         I = I+1                                                        0008
+         I = I+1                                                        0018
 C        END BLOCK
       ENDDO
 
@@ -156,7 +156,7 @@ C  P(I,J,N) {I==10, N==10, 0<=J+15, J<=3}
 
 C (0,12)
 
-      PRINT *, I, J                                                     0009
+      PRINT *, I, J                                                     0021
 
 C     END BLOCK
       END

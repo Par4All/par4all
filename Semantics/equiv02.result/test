@@ -10,17 +10,17 @@ C     Check alias detection
 C  T(I) {I==0}
 
 
-      I = 0                                                             0001
+      I = 0                                                             0007
 
 C  T(I) {}
 
 
-      CALL FOO                                                          0002
+      CALL FOO                                                          0009
 
 C  T() {}
 
 
-      PRINT *, I                                                        0003
+      PRINT *, I                                                        0011
 
       END
 
@@ -35,17 +35,17 @@ C     Check alias detection
 C  P() {}
 
 
-      I = 0                                                             0001
+      I = 0                                                             0007
 
 C  P(I) {I==0}
 
 
-      CALL FOO                                                          0002
+      CALL FOO                                                          0009
 
 C  P(I) {}
 
 
-      PRINT *, I                                                        0003
+      PRINT *, I                                                        0011
 
       END
 

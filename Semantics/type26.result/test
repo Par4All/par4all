@@ -13,20 +13,20 @@ C     Check multi-type initialization routine
 C  T(S) {"Hello World!"==S}
 
 
-      S = "Hello World!"                                                0001
+      S = "Hello World!"                                                0007
 
 C  T(X) {2.0==X}
 
-      X = 2.0                                                           0002
+      X = 2.0                                                           0008
 
 C  T(I) {I==1}
 
-      I = 1                                                             0003
+      I = 1                                                             0009
 
 C  T() {}
 
 
-      CALL INIPRINT(S, X, I)                                            0004
+      CALL INIPRINT(S, X, I)                                            0011
 
       END
 
@@ -44,20 +44,20 @@ C     Check multi-type initialization routine
 C  P() {}
 
 
-      S = "Hello World!"                                                0001
+      S = "Hello World!"                                                0007
 
 C  P(S) {"Hello World!"==S}
 
-      X = 2.0                                                           0002
+      X = 2.0                                                           0008
 
 C  P(S,X) {"Hello World!"==S, 2.0==X}
 
-      I = 1                                                             0003
+      I = 1                                                             0009
 
 C  P(I,S,X) {"Hello World!"==S, 2.0==X, I==1}
 
 
-      CALL INIPRINT(S, X, I)                                            0004
+      CALL INIPRINT(S, X, I)                                            0011
 
       END
 
@@ -72,7 +72,7 @@ C  P() {"Hello World!"==FS, 2.0==FX, FI==1}
 C  P() {"Hello World!"==FS, 2.0==FX, FI==1}
 
 
-      PRINT *, FS, FX, FI                                               0001
+      PRINT *, FS, FX, FI                                               0007
 
       END
 
@@ -84,6 +84,6 @@ Partial evaluation for "INIPRINT": only integer scalar variables are substituted
       CHARACTER*(*) FS
       INTEGER FI
 
-      PRINT *, FS, FX, 1                                                0001
+      PRINT *, FS, FX, 1                                                0007
 
       END

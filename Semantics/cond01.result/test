@@ -8,31 +8,31 @@ C  P() {}
 C  P() {}
 
 
-      IF (I.GT.N.AND.X(I).GT.Z) THEN                                    0001
+      IF (I.GT.N.AND.X(I).GT.Z) THEN                                    0005
 
 C  P() {N+1<=I}
 
-         PRINT *, I                                                     0002
+         PRINT *, I                                                     0006
       ELSE
 
 C  P() {}
 
-         PRINT *, I                                                     0003
+         PRINT *, I                                                     0008
       ENDIF
 
 C  P() {}
 
 
-      IF (I.GT.N.OR.X(I).GT.Z) THEN                                     0004
+      IF (I.GT.N.OR.X(I).GT.Z) THEN                                     0011
 
 C  P() {}
 
-         PRINT *, I                                                     0005
+         PRINT *, I                                                     0012
       ELSE
 
 C  P() {I<=N}
 
-         PRINT *, I                                                     0006
+         PRINT *, I                                                     0014
       ENDIF
 
       END

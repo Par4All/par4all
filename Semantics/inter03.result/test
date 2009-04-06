@@ -6,7 +6,7 @@ C  T(I) {I==I#init+1}
 
 C  T(I) {I==I#init+1}
 
-      I = I+1                                                           0001
+      I = I+1                                                           0003
       END
 
 C  T() {}
@@ -20,12 +20,12 @@ C     Check that equivalences are taken into account properly
 C  T() {}
 
 
-      CALL INCR(J)                                                      0001
+      CALL INCR(J)                                                      0007
 
 C  T() {}
 
 
-      PRINT *, J                                                        0002
+      PRINT *, J                                                        0009
 
       END
 
@@ -36,7 +36,7 @@ C  P() {}
 
 C  P() {}
 
-      I = I+1                                                           0001
+      I = I+1                                                           0003
       END
 
 C  P() {}
@@ -50,12 +50,12 @@ C     Check that equivalences are taken into account properly
 C  P() {}
 
 
-      CALL INCR(J)                                                      0001
+      CALL INCR(J)                                                      0007
 
 C  P() {}
 
 
-      PRINT *, J                                                        0002
+      PRINT *, J                                                        0009
 
       END
 

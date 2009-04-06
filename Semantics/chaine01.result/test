@@ -29,187 +29,187 @@ C  T() {}
 C  T(S) {'hello'==S}
 
 
-      S = 'hello'                                                       0001
+      S = 'hello'                                                       0010
 
 C  T() {}
 
-      PRINT *, '-', S, '-'                                              0002
+      PRINT *, '-', S, '-'                                              0011
 
 C  T() {}
 
-      IF (S.EQ.'hell') THEN                                             0003
+      IF (S.EQ.'hell') THEN                                             0012
 
 C  T() {}
 
 ! FALSE         
-         PRINT *, 's == "hello"'                                        0004
+         PRINT *, 's == "hello"'                                        0014
       ENDIF
 
 C  T() {}
 
-      IF (S.EQ.'hello') THEN                                            0005
+      IF (S.EQ.'hello') THEN                                            0016
 
 C  T() {}
 
 ! TRUE
-         PRINT *, 's == "hello"'                                        0006
+         PRINT *, 's == "hello"'                                        0018
       ENDIF
 
 C  T() {}
 
-      IF (S.EQ.'hello   ') THEN                                         0007
+      IF (S.EQ.'hello   ') THEN                                         0020
 
 C  T() {}
 
 ! TRUE...
-         PRINT *, 's == "hello   "'                                     0008
+         PRINT *, 's == "hello   "'                                     0022
       ENDIF
 
 C  T() {}
 
-      IF (S.EQ.'hello     ') THEN                                       0009
+      IF (S.EQ.'hello     ') THEN                                       0024
 
 C  T() {}
 
 ! TRUE...
-         PRINT *, 's == "hello     "'                                   0010
+         PRINT *, 's == "hello     "'                                   0026
       ENDIF
 
 C  T() {}
 
-      IF (S.EQ.'hello          ') THEN                                  0011
+      IF (S.EQ.'hello          ') THEN                                  0028
 
 C  T() {}
 
 ! TRUE...
-         PRINT *, 's == "hello          "'                              0012
+         PRINT *, 's == "hello          "'                              0030
       ENDIF
 
 C  T() {}
 
-      IF (S.EQ.'hello          toto') THEN                              0013
+      IF (S.EQ.'hello          toto') THEN                              0032
 
 C  T() {}
 
 ! FALSE
-         PRINT *, 's == "hello          toto"'                          0014
+         PRINT *, 's == "hello          toto"'                          0034
       ENDIF
 
 C  T(S) {'hello worl'==S}
 
 
 ! ending d is dropped
-      S = 'hello world'                                                 0015
+      S = 'hello world'                                                 0038
 
 C  T() {}
 
-      PRINT *, '-', S, '-'                                              0016
+      PRINT *, '-', S, '-'                                              0039
 
 C  T(S) {'hi'==S}
 
 
-      S = 'hi'                                                          0017
+      S = 'hi'                                                          0041
 
 C  T(T) {'hi'==T}
 
-      T = 'hi'                                                          0018
+      T = 'hi'                                                          0042
 
 C  T() {}
 
-      PRINT *, '-', S, '-', T, '-'                                      0019
+      PRINT *, '-', S, '-', T, '-'                                      0043
 
 C  T() {}
 
-      IF (S.EQ.T) THEN                                                  0020
+      IF (S.EQ.T) THEN                                                  0044
 
 C  T() {}
 
 ! TRUE
-         PRINT *, 's == t == "hi"'                                      0021
+         PRINT *, 's == t == "hi"'                                      0046
       ENDIF
 
 C  T(T) {'hi '==T}
 
 
-      T = 'hi '                                                         0022
+      T = 'hi '                                                         0049
 
 C  T() {}
 
-      PRINT *, '-', S, '-', T, '-'                                      0023
+      PRINT *, '-', S, '-', T, '-'                                      0050
 
 C  T() {}
 
-      IF (S.EQ.T) THEN                                                  0024
+      IF (S.EQ.T) THEN                                                  0051
 
 C  T() {}
 
 ! TRUE...
-         PRINT *, 's == t == "hi "'                                     0025
+         PRINT *, 's == t == "hi "'                                     0053
       ENDIF
 
 C  T(T) {'hi '==T}
 
 
-      T = 'hi world'                                                    0026
+      T = 'hi world'                                                    0056
 
 C  T() {}
 
-      PRINT *, '-', S, '-', T, '-'                                      0027
+      PRINT *, '-', S, '-', T, '-'                                      0057
 
 C  T() {}
 
-      IF (S.EQ.T) THEN                                                  0028
+      IF (S.EQ.T) THEN                                                  0058
 
 C  T() {}
 
 ! TRUE...
-         PRINT *, 's == t == "hi " (2)'                                 0029
+         PRINT *, 's == t == "hi " (2)'                                 0060
       ENDIF
 
 C  T(S) {'hi world'==S}
 
 
-      S = 'hi world'                                                    0030
+      S = 'hi world'                                                    0063
 
 C  T(T) {'hi '==T}
 
-      T = 'hi '                                                         0031
+      T = 'hi '                                                         0064
 
 C  T() {}
 
-      PRINT *, '-', S, '-', T, '-'                                      0032
+      PRINT *, '-', S, '-', T, '-'                                      0065
 
 C  T() {}
 
-      IF (S.EQ.T) THEN                                                  0033
+      IF (S.EQ.T) THEN                                                  0066
 
 C  T() {}
 
 ! FALSE
-         PRINT *, 's == t == "hi " (3)'                                 0034
+         PRINT *, 's == t == "hi " (3)'                                 0068
       ENDIF
 
 C  T(S) {'hi        '==S}
 
 
-      S = 'hi        '                                                  0035
+      S = 'hi        '                                                  0071
 
 C  T(T) {'hi '==T}
 
-      T = 'hi '                                                         0036
+      T = 'hi '                                                         0072
 
 C  T() {}
 
-      PRINT *, '-', S, '-', T, '-'                                      0037
+      PRINT *, '-', S, '-', T, '-'                                      0073
 
 C  T() {}
 
-      IF (S.EQ.T) THEN                                                  0038
+      IF (S.EQ.T) THEN                                                  0074
 
 C  T() {}
 
 ! TRUE...
-         PRINT *, 's == t == "hi " (4)'                                 0039
+         PRINT *, 's == t == "hi " (4)'                                 0076
       ENDIF
       END
 
@@ -227,209 +227,209 @@ C  P() {}
 C  P() {}
 
 
-      S = 'hello'                                                       0001
+      S = 'hello'                                                       0010
 
 C  P(S) {'hello'==S}
 
-      PRINT *, '-', S, '-'                                              0002
+      PRINT *, '-', S, '-'                                              0011
 
 C  P(S) {'hello'==S}
 
-      IF (S.EQ.'hell') THEN                                             0003
+      IF (S.EQ.'hell') THEN                                             0012
 
 C  P() {0==-1}
 
 ! FALSE         
-         PRINT *, 's == "hello"'                                        0004
+         PRINT *, 's == "hello"'                                        0014
       ENDIF
 
 C  P(S) {'hello'==S, 'hell'<=S}
 
-      IF (S.EQ.'hello') THEN                                            0005
+      IF (S.EQ.'hello') THEN                                            0016
 
 C  P(S) {'hello'==S, 'hell'<=S}
 
 ! TRUE
-         PRINT *, 's == "hello"'                                        0006
+         PRINT *, 's == "hello"'                                        0018
       ENDIF
 
 C  P(S) {'hello'==S, 'hell'<=S}
 
-      IF (S.EQ.'hello   ') THEN                                         0007
+      IF (S.EQ.'hello   ') THEN                                         0020
 
 C  P(S) {'hello   '==S, 'hello'==S, 'hell'<=S}
 
 ! TRUE...
-         PRINT *, 's == "hello   "'                                     0008
+         PRINT *, 's == "hello   "'                                     0022
       ENDIF
 
 C  P(S) {'hello'==S, 'hell'<=S}
 
-      IF (S.EQ.'hello     ') THEN                                       0009
+      IF (S.EQ.'hello     ') THEN                                       0024
 
 C  P(S) {'hello     '==S, 'hello'==S, 'hell'<=S}
 
 ! TRUE...
-         PRINT *, 's == "hello     "'                                   0010
+         PRINT *, 's == "hello     "'                                   0026
       ENDIF
 
 C  P(S) {'hello'==S, 'hell'<=S}
 
-      IF (S.EQ.'hello          ') THEN                                  0011
+      IF (S.EQ.'hello          ') THEN                                  0028
 
 C  P(S) {'hello          '==S, 'hello'==S, 'hell'<=S}
 
 ! TRUE...
-         PRINT *, 's == "hello          "'                              0012
+         PRINT *, 's == "hello          "'                              0030
       ENDIF
 
 C  P(S) {'hello'==S, 'hell'<=S}
 
-      IF (S.EQ.'hello          toto') THEN                              0013
+      IF (S.EQ.'hello          toto') THEN                              0032
 
 C  P() {0==-1}
 
 ! FALSE
-         PRINT *, 's == "hello          toto"'                          0014
+         PRINT *, 's == "hello          toto"'                          0034
       ENDIF
 
 C  P(S) {'hello'==S, 'hell'<=S, S<='hello          toto'}
 
 
 ! ending d is dropped
-      S = 'hello world'                                                 0015
+      S = 'hello world'                                                 0038
 
 C  P(S) {'hello worl'==S, 'hell'<='hello',
 C    'hello'<='hello          toto'}
 
-      PRINT *, '-', S, '-'                                              0016
+      PRINT *, '-', S, '-'                                              0039
 
 C  P(S) {'hello worl'==S, 'hell'<='hello',
 C    'hello'<='hello          toto'}
 
 
-      S = 'hi'                                                          0017
+      S = 'hi'                                                          0041
 
 C  P(S) {'hi'==S, 'hell'<='hello', 'hello'<='hello          toto'}
 
-      T = 'hi'                                                          0018
+      T = 'hi'                                                          0042
 
 C  P(S,T) {'hi'==S, S==T, 'hell'<='hello',
 C    'hello'<='hello          toto'}
 
-      PRINT *, '-', S, '-', T, '-'                                      0019
+      PRINT *, '-', S, '-', T, '-'                                      0043
 
 C  P(S,T) {'hi'==S, S==T, 'hell'<='hello',
 C    'hello'<='hello          toto'}
 
-      IF (S.EQ.T) THEN                                                  0020
+      IF (S.EQ.T) THEN                                                  0044
 
 C  P(S,T) {'hi'==S, S==T, 'hell'<='hello',
 C    'hello'<='hello          toto'}
 
 ! TRUE
-         PRINT *, 's == t == "hi"'                                      0021
+         PRINT *, 's == t == "hi"'                                      0046
       ENDIF
 
 C  P(S,T) {'hi'==S, S==T, 'hell'<='hello',
 C    'hello'<='hello          toto'}
 
 
-      T = 'hi '                                                         0022
+      T = 'hi '                                                         0049
 
 C  P(S,T) {'hi '==T, 'hi'==S, 'hell'<='hello',
 C    'hello'<='hello          toto'}
 
-      PRINT *, '-', S, '-', T, '-'                                      0023
+      PRINT *, '-', S, '-', T, '-'                                      0050
 
 C  P(S,T) {'hi '==T, 'hi'==S, 'hell'<='hello',
 C    'hello'<='hello          toto'}
 
-      IF (S.EQ.T) THEN                                                  0024
+      IF (S.EQ.T) THEN                                                  0051
 
 C  P(S,T) {'hi '==S, 'hi'==S, S==T, 'hell'<='hello',
 C    'hello'<='hello          toto'}
 
 ! TRUE...
-         PRINT *, 's == t == "hi "'                                     0025
+         PRINT *, 's == t == "hi "'                                     0053
       ENDIF
 
 C  P(S,T) {'hi '==T, 'hi'==S, 'hell'<='hello',
 C    'hello'<='hello          toto'}
 
 
-      T = 'hi world'                                                    0026
+      T = 'hi world'                                                    0056
 
 C  P(S,T) {'hi '==T, 'hi'==S, 'hell'<='hello',
 C    'hello'<='hello          toto'}
 
-      PRINT *, '-', S, '-', T, '-'                                      0027
+      PRINT *, '-', S, '-', T, '-'                                      0057
 
 C  P(S,T) {'hi '==T, 'hi'==S, 'hell'<='hello',
 C    'hello'<='hello          toto'}
 
-      IF (S.EQ.T) THEN                                                  0028
+      IF (S.EQ.T) THEN                                                  0058
 
 C  P(S,T) {'hi '==S, 'hi'==S, S==T, 'hell'<='hello',
 C    'hello'<='hello          toto'}
 
 ! TRUE...
-         PRINT *, 's == t == "hi " (2)'                                 0029
+         PRINT *, 's == t == "hi " (2)'                                 0060
       ENDIF
 
 C  P(S,T) {'hi '==T, 'hi'==S, 'hell'<='hello',
 C    'hello'<='hello          toto'}
 
 
-      S = 'hi world'                                                    0030
+      S = 'hi world'                                                    0063
 
 C  P(S,T) {'hi '==T, 'hi world'==S, 'hell'<='hello',
 C    'hello'<='hello          toto'}
 
-      T = 'hi '                                                         0031
+      T = 'hi '                                                         0064
 
 C  P(S,T) {'hi '==T, 'hi world'==S, 'hell'<='hello',
 C    'hello'<='hello          toto'}
 
-      PRINT *, '-', S, '-', T, '-'                                      0032
+      PRINT *, '-', S, '-', T, '-'                                      0065
 
 C  P(S,T) {'hi '==T, 'hi world'==S, 'hell'<='hello',
 C    'hello'<='hello          toto'}
 
-      IF (S.EQ.T) THEN                                                  0033
+      IF (S.EQ.T) THEN                                                  0066
 
 C  P() {0==-1}
 
 ! FALSE
-         PRINT *, 's == t == "hi " (3)'                                 0034
+         PRINT *, 's == t == "hi " (3)'                                 0068
       ENDIF
 
 C  P(S,T) {'hi '==T, 'hi world'==S, 'hell'<='hello',
 C    'hello'<='hello          toto', T<=S}
 
 
-      S = 'hi        '                                                  0035
+      S = 'hi        '                                                  0071
 
 C  P(S,T) {'hi        '==S, 'hi '==T, 'hell'<='hello',
 C    'hello'<='hello          toto', T<='hi world'}
 
-      T = 'hi '                                                         0036
+      T = 'hi '                                                         0072
 
 C  P(S,T) {'hi        '==S, 'hi '==T, 'hell'<='hello',
 C    'hello'<='hello          toto', T<='hi world'}
 
-      PRINT *, '-', S, '-', T, '-'                                      0037
+      PRINT *, '-', S, '-', T, '-'                                      0073
 
 C  P(S,T) {'hi        '==S, 'hi '==T, 'hell'<='hello',
 C    'hello'<='hello          toto', T<='hi world'}
 
-      IF (S.EQ.T) THEN                                                  0038
+      IF (S.EQ.T) THEN                                                  0074
 
 C  P(S,T) {'hi        '==S, 'hi '==S, S==T, 'hell'<='hello',
 C    'hello'<='hello          toto', S<='hi world'}
 
 ! TRUE...
-         PRINT *, 's == t == "hi " (4)'                                 0039
+         PRINT *, 's == t == "hi " (4)'                                 0076
       ENDIF
       END
 !
@@ -441,61 +441,61 @@ C    'hello'<='hello          toto', S<='hi world'}
       CHARACTER*10 S
       CHARACTER*3 T
 
-      S = 'hello'                                                       0001
-      PRINT *, '-', S, '-'                                              0002
-      IF (S.EQ.'hello') THEN                                            0005
+      S = 'hello'                                                       0010
+      PRINT *, '-', S, '-'                                              0011
+      IF (S.EQ.'hello') THEN                                            0016
 ! TRUE
-         PRINT *, 's == "hello"'                                        0006
+         PRINT *, 's == "hello"'                                        0018
       ENDIF
-      IF (S.EQ.'hello   ') THEN                                         0007
+      IF (S.EQ.'hello   ') THEN                                         0020
 ! TRUE...
-         PRINT *, 's == "hello   "'                                     0008
+         PRINT *, 's == "hello   "'                                     0022
       ENDIF
-      IF (S.EQ.'hello     ') THEN                                       0009
+      IF (S.EQ.'hello     ') THEN                                       0024
 ! TRUE...
-         PRINT *, 's == "hello     "'                                   0010
+         PRINT *, 's == "hello     "'                                   0026
       ENDIF
-      IF (S.EQ.'hello          ') THEN                                  0011
+      IF (S.EQ.'hello          ') THEN                                  0028
 ! TRUE...
-         PRINT *, 's == "hello          "'                              0012
+         PRINT *, 's == "hello          "'                              0030
       ENDIF
 
 ! ending d is dropped
-      S = 'hello world'                                                 0015
-      PRINT *, '-', S, '-'                                              0016
+      S = 'hello world'                                                 0038
+      PRINT *, '-', S, '-'                                              0039
 
-      S = 'hi'                                                          0017
-      T = 'hi'                                                          0018
-      PRINT *, '-', S, '-', T, '-'                                      0019
-      IF (S.EQ.T) THEN                                                  0020
+      S = 'hi'                                                          0041
+      T = 'hi'                                                          0042
+      PRINT *, '-', S, '-', T, '-'                                      0043
+      IF (S.EQ.T) THEN                                                  0044
 ! TRUE
-         PRINT *, 's == t == "hi"'                                      0021
+         PRINT *, 's == t == "hi"'                                      0046
       ENDIF
 
-      T = 'hi '                                                         0022
-      PRINT *, '-', S, '-', T, '-'                                      0023
-      IF (S.EQ.T) THEN                                                  0024
+      T = 'hi '                                                         0049
+      PRINT *, '-', S, '-', T, '-'                                      0050
+      IF (S.EQ.T) THEN                                                  0051
 ! TRUE...
-         PRINT *, 's == t == "hi "'                                     0025
+         PRINT *, 's == t == "hi "'                                     0053
       ENDIF
 
-      T = 'hi world'                                                    0026
-      PRINT *, '-', S, '-', T, '-'                                      0027
-      IF (S.EQ.T) THEN                                                  0028
+      T = 'hi world'                                                    0056
+      PRINT *, '-', S, '-', T, '-'                                      0057
+      IF (S.EQ.T) THEN                                                  0058
 ! TRUE...
-         PRINT *, 's == t == "hi " (2)'                                 0029
+         PRINT *, 's == t == "hi " (2)'                                 0060
       ENDIF
 
-      S = 'hi world'                                                    0030
-      T = 'hi '                                                         0031
-      PRINT *, '-', S, '-', T, '-'                                      0032
+      S = 'hi world'                                                    0063
+      T = 'hi '                                                         0064
+      PRINT *, '-', S, '-', T, '-'                                      0065
 
-      S = 'hi        '                                                  0035
-      T = 'hi '                                                         0036
-      PRINT *, '-', S, '-', T, '-'                                      0037
-      IF (S.EQ.T) THEN                                                  0038
+      S = 'hi        '                                                  0071
+      T = 'hi '                                                         0072
+      PRINT *, '-', S, '-', T, '-'                                      0073
+      IF (S.EQ.T) THEN                                                  0074
 ! TRUE...
-         PRINT *, 's == t == "hi " (4)'                                 0039
+         PRINT *, 's == t == "hi " (4)'                                 0076
       ENDIF
       END
 'optimized exec'

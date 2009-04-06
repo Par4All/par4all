@@ -77,11 +77,11 @@ C     Check that commons have right sizes
       COMMON /BAR/A, B
       DOUBLE PRECISION A, B
 
-      DO I = 2, 10                                                      0001
-         Y(I) = 0.                                                      0002
+      DO I = 2, 10                                                      0012
+         Y(I) = 0.                                                      0013
       ENDDO
 
-      CALL SUBEQUIV08                                                   0003
+      CALL SUBEQUIV08                                                   0016
 
       END
 user warning in open_module: Module SUBEQUIV08 selected instead of subequiv08 which was not found

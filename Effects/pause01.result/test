@@ -4,13 +4,13 @@ C               <must be written>: __IO_EFFECTS:LUNS(6)
 
 C     Check effects for PAUSE so that it is not removed as dead code!
 
-      PRINT *, "I'm going to pause!"                                    0001
+      PRINT *, "I'm going to pause!"                                    0005
 C               <must be read   >: __IO_EFFECTS:LUNS(0)
 C               <must be written>: __IO_EFFECTS:LUNS(0)
-      PAUSE                                                             0002
+      PAUSE                                                             0006
 C               <must be read   >: __IO_EFFECTS:LUNS(6)
 C               <must be written>: __IO_EFFECTS:LUNS(6)
-      PRINT *, "I'm done!"                                              0003
+      PRINT *, "I'm done!"                                              0007
 
       END
 
@@ -20,9 +20,9 @@ PAUSE must not be use-def eliminated
 
 C     Check effects for PAUSE so that it is not removed as dead code!
 
-      PRINT *, "I'm going to pause!"                                    0001
-      PAUSE                                                             0002
-      PRINT *, "I'm done!"                                              0003
+      PRINT *, "I'm going to pause!"                                    0005
+      PAUSE                                                             0006
+      PRINT *, "I'm done!"                                              0007
 
       END
 

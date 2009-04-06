@@ -11,7 +11,7 @@ C  P() {}
 
 C  P() {}
 
-200   CONTINUE                                                          0001
+200   CONTINUE                                                          0005
       GOTO 100
       END
 
@@ -27,7 +27,7 @@ C  P() {}
 
 C  P() {}
 
-200   CONTINUE                                                          0001
+200   CONTINUE                                                          0005
       GOTO 100
 
 C  P() {0==-1}
@@ -43,7 +43,7 @@ C  P() {}
 C  P() {}
 
 
-100   CONTINUE                                                          0001
+100   CONTINUE                                                          0004
       GOTO 100
       END
 
@@ -55,7 +55,7 @@ C  P() {}
 C  P() {}
 
 
-100   CONTINUE                                                          0001
+100   CONTINUE                                                          0004
       GOTO 100
 
 C  P() {0==-1}
@@ -75,7 +75,7 @@ C  P() {}
 
 C  P() {}
 
-300   CONTINUE                                                          0001
+300   CONTINUE                                                          0006
 
 C  P() {}
 
@@ -95,7 +95,7 @@ C  P() {}
 
 C  P() {}
 
-300   CONTINUE                                                          0001
+300   CONTINUE                                                          0006
 
 C  P() {}
 
@@ -115,7 +115,7 @@ C  P() {}
 
 C  P() {}
 
-100   IF (A.EQ.0) THEN                                                  0001
+100   IF (A.EQ.0) THEN                                                  0004
          GOTO 100
       ELSE
          GOTO 100
@@ -130,7 +130,7 @@ C  P() {}
 
 C  P() {}
 
-100   IF (A.EQ.0) THEN                                                  0001
+100   IF (A.EQ.0) THEN                                                  0004
       ENDIF
       GOTO 100
       END
@@ -143,7 +143,7 @@ C  P() {}
 
 C  P() {}
 
-100   CONTINUE                                                          0001
+100   CONTINUE                                                          0004
       GOTO 100
 
 C  P() {0==-1}
@@ -159,7 +159,7 @@ C  P() {}
 
 C  P() {}
 
-      B = -TROYE                                                        0001
+      B = -TROYE                                                        0004
 
 C  P(B) {B+TROYE==0}
 
@@ -167,7 +167,7 @@ C  P(B) {B+TROYE==0}
 
 C  P(B) {B+TROYE==0}
 
-300   CONTINUE                                                          0002
+300   CONTINUE                                                          0007
 
 C  P(B) {B+TROYE==0}
 
@@ -183,7 +183,7 @@ C  P() {}
 
 C  P() {}
 
-      B = -TROYE                                                        0001
+      B = -TROYE                                                        0004
 
 C  P(B) {B+TROYE==0}
 
@@ -191,7 +191,7 @@ C  P(B) {B+TROYE==0}
 
 C  P(B) {B+TROYE==0}
 
-300   CONTINUE                                                          0002
+300   CONTINUE                                                          0007
 
 C  P(B) {B+TROYE==0}
 
@@ -211,7 +211,7 @@ C  P() {}
 
 C  P() {}
 
-      B = -TROYE                                                        0001
+      B = -TROYE                                                        0004
 
 C  P(B) {B+TROYE==0}
 
@@ -219,7 +219,7 @@ C  P(B) {B+TROYE==0}
 
 C  P(B) {B+TROYE==0}
 
-300   CONTINUE                                                          0002
+300   CONTINUE                                                          0007
 
 C  P(B) {B+TROYE==0}
 
@@ -239,11 +239,11 @@ C  P() {}
 
 C  P() {}
 
-      B = -2                                                            0001
+      B = -2                                                            0004
 
 C  P(B) {B==-2}
 
-100   CONTINUE                                                          0002
+100   CONTINUE                                                          0005
       GOTO 100
       END
 
@@ -255,11 +255,11 @@ C  P() {}
 
 C  P() {}
 
-      B = -2                                                            0001
+      B = -2                                                            0004
 
 C  P(B) {B==-2}
 
-100   CONTINUE                                                          0002
+100   CONTINUE                                                          0005
       GOTO 100
       END
 
@@ -271,11 +271,11 @@ C  P() {}
 
 C  P() {}
 
-      B = -2                                                            0001
+      B = -2                                                            0004
 
 C  P(B) {B==-2}
 
-100   CONTINUE                                                          0002
+100   CONTINUE                                                          0005
       GOTO 100
 
 C  P() {0==-1}
@@ -292,11 +292,11 @@ C  P() {}
 C  P() {}
 
 
-      SANSIF = TROPFACILE                                               0001
+      SANSIF = TROPFACILE                                               0005
 
 C  P(SANSIF) {SANSIF==TROPFACILE}
 
-100   IF (A.EQ.0) THEN                                                  0002
+100   IF (A.EQ.0) THEN                                                  0006
          GOTO 100
       ELSE
          GOTO 100
@@ -312,11 +312,11 @@ C  P() {}
 C  P() {}
 
 
-      SANSIF = TROPFACILE                                               0001
+      SANSIF = TROPFACILE                                               0005
 
 C  P(SANSIF) {SANSIF==TROPFACILE}
 
-100   IF (A.EQ.0) THEN                                                  0002
+100   IF (A.EQ.0) THEN                                                  0006
       ENDIF
       GOTO 100
       END
@@ -330,11 +330,11 @@ C  P() {}
 C  P() {}
 
 
-      SANSIF = TROPFACILE                                               0001
+      SANSIF = TROPFACILE                                               0005
 
 C  P(SANSIF) {SANSIF==TROPFACILE}
 
-100   CONTINUE                                                          0002
+100   CONTINUE                                                          0006
       GOTO 100
 
 C  P() {0==-1}
@@ -351,7 +351,7 @@ C  P() {}
 C  P() {}
 
 
-      B = -1                                                            0001
+      B = -1                                                            0005
 
 C  P(B) {B==-1}
 
@@ -360,7 +360,7 @@ C  P(B) {B==-1}
 
 C  P(B) {B==-1}
 
-200   CONTINUE                                                          0002
+200   CONTINUE                                                          0008
       GOTO 100
       END
 
@@ -373,7 +373,7 @@ C  P() {}
 C  P() {}
 
 
-      B = -1                                                            0001
+      B = -1                                                            0005
 
 C  P(B) {B==-1}
 
@@ -382,7 +382,7 @@ C  P(B) {B==-1}
 
 C  P(B) {B==-1}
 
-200   CONTINUE                                                          0002
+200   CONTINUE                                                          0008
       GOTO 100
 
 C  P() {0==-1}

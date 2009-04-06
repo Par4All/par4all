@@ -56,10 +56,10 @@
       PARAMETER (I6 = I5)
       INTEGER I
       INTEGER T(1:M)
-      DO I = 1, 5                                                       0001
-         T(I) = B+C+D+E+Z+I6                                            0002
+      DO I = 1, 5                                                       0011
+         T(I) = B+C+D+E+Z+I6                                            0012
       ENDDO
-      PRINT *, A5, A7                                                   0003
+      PRINT *, A5, A7                                                   0014
       END
 # after cleaning declarations (u and a6 dropped)
       PROGRAM DECL6
@@ -115,9 +115,9 @@
       PARAMETER (I6 = I5)
       INTEGER I
       INTEGER T(1:M)
-      DO I = 1, 5                                                       0001
-         T(I) = B+C+D+E+Z+I6                                            0002
+      DO I = 1, 5                                                       0011
+         T(I) = B+C+D+E+Z+I6                                            0012
       ENDDO
-      PRINT *, A5, A7                                                   0003
+      PRINT *, A5, A7                                                   0014
       END
 

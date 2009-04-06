@@ -17,8 +17,8 @@ Request: build resource PRINTED_FILE for module CAPTURE01.
 PRINTED_FILE made for CAPTURE01.
 C     test de la (non) capture des intrinsics, e.g. DIM
       PROGRAM CAPTURE01
-      DIM = 1                                                           0001
-      IF (DIM.LT.0.) PRINT *, DIM                                       0002
+      DIM = 1                                                           0003
+      IF (DIM.LT.0.) PRINT *, DIM                                       0004
       END
 Deletion of obsolete resources:
 none destroyed.

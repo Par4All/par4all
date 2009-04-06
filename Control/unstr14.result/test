@@ -3,15 +3,15 @@ Printed file
 
       PROGRAM UNSTR
       INTEGER I,J,K
-      READ *, J, K                                                      0001
-      I = 4                                                             0002
+      READ *, J, K                                                      0003
+      I = 4                                                             0004
 
 c     500      
-500   IF (J.GE.11) GOTO 99999                                           0003
+500   IF (J.GE.11) GOTO 99999                                           0007
 c     goto 502
-502   PRINT *, '502'                                                    0005
+502   PRINT *, '502'                                                    0018
 c     501
-501   PRINT *, '501'                                                    0004
+501   PRINT *, '501'                                                    0015
 c     goto 502      
       GOTO 502
 99999 CONTINUE
@@ -23,15 +23,15 @@ Printed file after RESTUCTURE_CONTROL
 
       PROGRAM UNSTR
       INTEGER I,J,K
-      READ *, J, K                                                      0001
-      I = 4                                                             0002
+      READ *, J, K                                                      0003
+      I = 4                                                             0004
 
 c     500      
-500   IF (J.GE.11) GOTO 99999                                           0003
+500   IF (J.GE.11) GOTO 99999                                           0007
 c     goto 502
-502   PRINT *, '502'                                                    0005
+502   PRINT *, '502'                                                    0018
 c     501
-501   PRINT *, '501'                                                    0004
+501   PRINT *, '501'                                                    0015
 c     goto 502      
       GOTO 502
 99999 CONTINUE

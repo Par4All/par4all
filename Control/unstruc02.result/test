@@ -5,21 +5,21 @@ C     Check bug in controlizer when controlize_test() is called from controlize_
       REAL P(10,10,10), A0(10,10,10)
 C     BEGIN BLOCK
 
-      DO 31 I = 1, NIM1                                                 0001
-         DO 31 J = 1, NJM1                                              0002
-            IF (P(I,J,KM).EQ.0.) THEN                                   0003
+      DO 31 I = 1, NIM1                                                 0007
+         DO 31 J = 1, NJM1                                              0008
+            IF (P(I,J,KM).EQ.0.) THEN                                   0009
 C$PIPS STATEMENT FUNCTION AO SUBSTITUTED
             ELSE
 C              BEGIN BLOCK
 C              END BLOCK
             ENDIF
-            IF (P(I,J,KM).EQ.0.) GOTO 99999                             0005
+            IF (P(I,J,KM).EQ.0.) GOTO 99999                             0010
 C           BEGIN BLOCK
 C           END BLOCK
 C           BEGIN BLOCK
-            ENBAS = 0.                                                  0007
+            ENBAS = 0.                                                  0011
 C           END BLOCK
-31          CONTINUE                                                    0008
+31          CONTINUE                                                    0012
             GOTO 99998
 99999       CONTINUE
             GOTO 31
@@ -46,15 +46,15 @@ C     BEGIN BLOCK
 C  T(I,J) {}
 
 
-      DO 31 I = 1, NIM1                                                 0001
+      DO 31 I = 1, NIM1                                                 0007
 
 C  T(J) {}
 
-         DO 31 J = 1, NJM1                                              0002
+         DO 31 J = 1, NJM1                                              0008
 
 C  T() {}
 
-            IF (P(I,J,KM).EQ.0.) THEN                                   0003
+            IF (P(I,J,KM).EQ.0.) THEN                                   0009
 C$PIPS STATEMENT FUNCTION AO SUBSTITUTED
             ELSE
 
@@ -66,7 +66,7 @@ C              END BLOCK
 
 C  T() {}
 
-            IF (P(I,J,KM).EQ.0.) GOTO 99999                             0005
+            IF (P(I,J,KM).EQ.0.) GOTO 99999                             0010
 
 C  T() {}
 
@@ -79,12 +79,12 @@ C           BEGIN BLOCK
 
 C  T() {}
 
-            ENBAS = 0.                                                  0007
+            ENBAS = 0.                                                  0011
 C           END BLOCK
 
 C  T() {}
 
-31          CONTINUE                                                    0008
+31          CONTINUE                                                    0012
             GOTO 99998
 99999       CONTINUE
             GOTO 31

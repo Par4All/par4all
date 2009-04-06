@@ -116,46 +116,46 @@ C ##### end include #####
 c=========================================================
       DATA ZE/0.0D0/ UN/1.0D0/ DE/2.0D0/ TR/3.0D0/ QU/4.0D0/
       DATA PI4/0.785398163D0/ CT/1.0D0/
-      DE2 = DIAMEXT*DIAMEXT                                             0001
-      DI2 = DIAMINT*DIAMINT                                             0002
-      AIR = PI4*(DE2-DI2)                                               0003
-      BIR = PI4*(DE2*DIAMEXT-DI2*DIAMINT)/TR                            0004
-      FORCE = AIR*SIG11                                                 0005
-      IF (TEMPS.LT.1200.0) THEN                                         0006
-         COUPLE = BIR*SIG12                                             0007
+      DE2 = DIAMEXT*DIAMEXT                                             0119
+      DI2 = DIAMINT*DIAMINT                                             0120
+      AIR = PI4*(DE2-DI2)                                               0121
+      BIR = PI4*(DE2*DIAMEXT-DI2*DIAMINT)/TR                            0122
+      FORCE = AIR*SIG11                                                 0123
+      IF (TEMPS.LT.1200.0) THEN                                         0124
+         COUPLE = BIR*SIG12                                             0125
       ELSE
-         COUPLE = ZE                                                    0008
+         COUPLE = ZE                                                    0127
       ENDIF
-      ETO11 = (SIG11/YOUNG+EVI11)*CT                                    0009
-      DMOY = (DIAMINT+DIAMEXT)/DE                                       0010
-      ETO12 = (SIG12*(UN+POISS)/YOUNG+EVI12)*CT*DIAMEXT/DMOY            0011
+      ETO11 = (SIG11/YOUNG+EVI11)*CT                                    0129
+      DMOY = (DIAMINT+DIAMEXT)/DE                                       0130
+      ETO12 = (SIG12*(UN+POISS)/YOUNG+EVI12)*CT*DIAMEXT/DMOY            0131
 €Unstructured c_1_1 end: c_2_1
 ‚Unstructured Item c_1_1
-      IF (IFSIM.NE.1) THEN                                              0012
+      IF (IFSIM.NE.1) THEN                                              0132
       ENDIF
 ƒUnstructured Successor -> c_2_1 c_3_1
 ‚Unstructured Item c_2_1
 ƒUnstructured Successor ->
 ‚Unstructured Item c_3_1
-      SIGMI = DSQRT(SIG11*SIG11+TR*SIG12*SIG12)                         0014
-      SIGTR = DSQRT(SIG11*SIG11+QU*SIG12*SIG12)                         0015
-      EVIMI = DSQRT(EVI11*EVI11+QU*EVI12*EVI12/TR)                      0016
-      EVITR = DSQRT(EVI11*EVI11+QU*QU*EVI12*EVI12/TR/TR)                0017
-      WRITE (6, '(5(2x,e13.5))') TEMPS, SIG11, SIG12, ETO11, ETO12      0018
-      IF (NPT.GE.MAXPSIM-1) THEN                                        0019
-         LONFICH = INDEX(FICHTEST(ITEST), ' ')-1                        0020
+      SIGMI = DSQRT(SIG11*SIG11+TR*SIG12*SIG12)                         0133
+      SIGTR = DSQRT(SIG11*SIG11+QU*SIG12*SIG12)                         0134
+      EVIMI = DSQRT(EVI11*EVI11+QU*EVI12*EVI12/TR)                      0135
+      EVITR = DSQRT(EVI11*EVI11+QU*QU*EVI12*EVI12/TR/TR)                0136
+      WRITE (6, '(5(2x,e13.5))') TEMPS, SIG11, SIG12, ETO11, ETO12      0137
+      IF (NPT.GE.MAXPSIM-1) THEN                                        0138
+         LONFICH = INDEX(FICHTEST(ITEST), ' ')-1                        0139
 C*        filsys=fichtest(itest)(1:lonfich)//'.sys'
 C*        filsys=fichtest(itest)(1:lonfich)
-         OPEN (UNIT=56,FILE=FILSYS)                                     0021
-         DO 910 IGRAIN = 1, NGRAIN                                      0022
-            ISYS = 12*(IGRAIN-1)                                        0023
-            WRITE (56, *) 'grain ', IGRAIN                              0024
-            WRITE (56, '(6(2x,f9.5))') (GVCUM(ID), ID = ISYS+1, ISYS+   0025
-     &      6)                                                          0025
-            WRITE (56, '(6(2x,f9.5))') (GVCUM(ID), ID = ISYS+7, ISYS+   0026
-     &      12)                                                         0026
-910         CONTINUE                                                    0027
-         CLOSE (56)                                                     0028
+         OPEN (UNIT=56,FILE=FILSYS)                                     0142
+         DO 910 IGRAIN = 1, NGRAIN                                      0143
+            ISYS = 12*(IGRAIN-1)                                        0144
+            WRITE (56, *) 'grain ', IGRAIN                              0145
+            WRITE (56, '(6(2x,f9.5))') (GVCUM(ID), ID = ISYS+1, ISYS+   0146
+     &      6)                                                          0146
+            WRITE (56, '(6(2x,f9.5))') (GVCUM(ID), ID = ISYS+7, ISYS+   0147
+     &      12)                                                         0147
+910         CONTINUE                                                    0148
+         CLOSE (56)                                                     0149
       ENDIF
 ƒUnstructured Successor -> c_2_1
 Unstructured End c_1_1 end: c_2_1

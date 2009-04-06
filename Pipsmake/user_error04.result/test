@@ -5,6 +5,6 @@ C               <must be written>: __IO_EFFECTS:LUNS(6)
 C               <must be read   >: X Y __IO_EFFECTS:LUNS(6)
 C               <must be written>: __IO_EFFECTS:LUNS(6)
 
-      PRINT *, X+Y                                                      0001
+      PRINT *, X+Y                                                      0004
 
       END

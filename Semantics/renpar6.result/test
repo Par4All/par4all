@@ -2,17 +2,17 @@
       SUBROUTINE RENPAR6(A,N,K,M)
       INTEGER N,K,M,A(N)
       DIMENSION WORK(100,100)
-      K = M*M                                                           0001
-      DO I = 1, N                                                       0002
-         DO J = 1, N                                                    0003
-            WORK(J,K) = J+K                                             0004
+      K = M*M                                                           0005
+      DO I = 1, N                                                       0006
+         DO J = 1, N                                                    0007
+            WORK(J,K) = J+K                                             0008
          ENDDO
 
-         CALL INC1(K)                                                   0005
+         CALL INC1(K)                                                   0011
 
-         DO J = 1, N                                                    0006
-            WORK(J,K) = J*J-K*K                                         0007
-            A(I) = A(I)+WORK(J,K)+WORK(J,K-1)                           0008
+         DO J = 1, N                                                    0013
+            WORK(J,K) = J*J-K*K                                         0014
+            A(I) = A(I)+WORK(J,K)+WORK(J,K-1)                           0015
          ENDDO
       ENDDO
       END
@@ -26,38 +26,38 @@ C  T(K) {0<=K, N<=K}
 
 C  T(K) {0<=K}
 
-      K = M*M                                                           0001
+      K = M*M                                                           0005
 
 C  T(I,J,K) {I+K#init==K+1, K#init<=K}
 
-      DO I = 1, N                                                       0002
+      DO I = 1, N                                                       0006
 
 C  T(J) {1<=J}
 
-         DO J = 1, N                                                    0003
+         DO J = 1, N                                                    0007
 
 C  T() {}
 
-            WORK(J,K) = J+K                                             0004
+            WORK(J,K) = J+K                                             0008
          ENDDO
 
 C  T(K) {K==K#init+1}
 
 
-         CALL INC1(K)                                                   0005
+         CALL INC1(K)                                                   0011
 
 C  T(J) {1<=J}
 
 
-         DO J = 1, N                                                    0006
+         DO J = 1, N                                                    0013
 
 C  T() {}
 
-            WORK(J,K) = J*J-K*K                                         0007
+            WORK(J,K) = J*J-K*K                                         0014
 
 C  T() {}
 
-            A(I) = A(I)+WORK(J,K)+WORK(J,K-1)                           0008
+            A(I) = A(I)+WORK(J,K)+WORK(J,K-1)                           0015
          ENDDO
       ENDDO
       END
@@ -69,7 +69,7 @@ C  <A(PHI1)-W-EXACT-{1<=PHI1, PHI1<=N}>
       SUBROUTINE RENPAR6(A,N,K,M)
       INTEGER N,K,M,A(N)
       DIMENSION WORK(100,100)
-      K = M*M                                                           0001
+      K = M*M                                                           0005
 
 C  <A(PHI1)-R-EXACT-{1<=PHI1, PHI1<=N, 0<=K}>
 C  <A(PHI1)-W-EXACT-{1<=PHI1, PHI1<=N, 0<=K}>
@@ -78,20 +78,20 @@ C    0<=K}>
 C  <WORK(PHI1,PHI2)-W-EXACT-{1<=PHI1, PHI1<=N, K<=PHI2, PHI2<=K+N,
 C    0<=K}>
 
-      DO I = 1, N                                                       0002
+      DO I = 1, N                                                       0006
 
 C  <WORK(PHI1,PHI2)-W-EXACT-{PHI2==K, 1<=PHI1, PHI1<=N, 1<=I, I<=1+K,
 C    I<=N}>
 
-         DO J = 1, N                                                    0003
+         DO J = 1, N                                                    0007
 
 C  <WORK(PHI1,PHI2)-W-EXACT-{PHI1==J, PHI2==K, 1<=I, I<=1+K, I<=N,
 C    1<=J, J<=N}>
 
-            WORK(J,K) = J+K                                             0004
+            WORK(J,K) = J+K                                             0008
          ENDDO
 
-         CALL INC1(K)                                                   0005
+         CALL INC1(K)                                                   0011
 
 C  <A(PHI1)-R-EXACT-{PHI1==I, 1<=I, I<=K, I<=N}>
 C  <A(PHI1)-W-EXACT-{PHI1==I, 1<=I, I<=K, I<=N}>
@@ -101,19 +101,19 @@ C  <WORK(PHI1,PHI2)-W-EXACT-{PHI2==K, 1<=PHI1, PHI1<=N, 1<=I, I<=K,
 C    I<=N}>
 
 
-         DO J = 1, N                                                    0006
+         DO J = 1, N                                                    0013
 
 C  <WORK(PHI1,PHI2)-W-EXACT-{PHI1==J, PHI2==K, 1<=I, I<=K, I<=N, 1<=J,
 C    J<=N}>
 
-            WORK(J,K) = J*J-K*K                                         0007
+            WORK(J,K) = J*J-K*K                                         0014
 
 C  <A(PHI1)-R-EXACT-{PHI1==I, 1<=I, I<=K, I<=N, 1<=J, J<=N}>
 C  <A(PHI1)-W-EXACT-{PHI1==I, 1<=I, I<=K, I<=N, 1<=J, J<=N}>
 C  <WORK(PHI1,PHI2)-R-EXACT-{PHI1==J, 1<=PHI1, PHI1<=N, K<=PHI2+1,
 C    PHI2<=K, 1<=I, I<=K, I<=N}>
 
-            A(I) = A(I)+WORK(J,K)+WORK(J,K-1)                           0008
+            A(I) = A(I)+WORK(J,K)+WORK(J,K-1)                           0015
          ENDDO
       ENDDO
       END
@@ -124,30 +124,30 @@ C  <A(PHI1)-IN-EXACT-{1<=PHI1, PHI1<=N}>
       SUBROUTINE RENPAR6(A,N,K,M)
       INTEGER N,K,M,A(N)
       DIMENSION WORK(100,100)
-      K = M*M                                                           0001
+      K = M*M                                                           0005
 
 C  <A(PHI1)-IN-EXACT-{1<=PHI1, PHI1<=N, 0<=K}>
 
-      DO I = 1, N                                                       0002
-         DO J = 1, N                                                    0003
-            WORK(J,K) = J+K                                             0004
+      DO I = 1, N                                                       0006
+         DO J = 1, N                                                    0007
+            WORK(J,K) = J+K                                             0008
          ENDDO
 
-         CALL INC1(K)                                                   0005
+         CALL INC1(K)                                                   0011
 
 C  <A(PHI1)-IN-EXACT-{I==PHI1, 1<=I, I<=K, I<=N, 1<=N}>
 C  <WORK(PHI1,PHI2)-IN-EXACT-{K==PHI2+1, 1<=PHI1, PHI1<=N, 1<=I, I<=K,
 C    I<=N}>
 
 
-         DO J = 1, N                                                    0006
-            WORK(J,K) = J*J-K*K                                         0007
+         DO J = 1, N                                                    0013
+            WORK(J,K) = J*J-K*K                                         0014
 
 C  <A(PHI1)-IN-EXACT-{PHI1==I, 1<=I, I<=K, I<=N, 1<=J, J<=N}>
 C  <WORK(PHI1,PHI2)-IN-EXACT-{PHI1==J, 1<=PHI1, PHI1<=N, K<=PHI2+1,
 C    PHI2<=K, 1<=I, I<=K, I<=N}>
 
-            A(I) = A(I)+WORK(J,K)+WORK(J,K-1)                           0008
+            A(I) = A(I)+WORK(J,K)+WORK(J,K-1)                           0015
          ENDDO
       ENDDO
       END
@@ -155,32 +155,32 @@ C    PHI2<=K, 1<=I, I<=K, I<=N}>
       SUBROUTINE RENPAR6(A,N,K,M)
       INTEGER N,K,M,A(N)
       DIMENSION WORK(100,100)
-      K = M*M                                                           0001
-      DO I = 1, N                                                       0002
+      K = M*M                                                           0005
+      DO I = 1, N                                                       0006
 
 C  <WORK(PHI1,PHI2)-OUT-EXACT-{K==PHI2, 1<=PHI1, PHI1<=N, 1<=I,
 C    I<=1+K, I<=N}>
 
-         DO J = 1, N                                                    0003
+         DO J = 1, N                                                    0007
 
 C  <WORK(PHI1,PHI2)-OUT-EXACT-{J==PHI1, PHI2==K, 1<=I, I<=1+K, I<=N,
 C    1<=J, J<=N}>
 
-            WORK(J,K) = J+K                                             0004
+            WORK(J,K) = J+K                                             0008
          ENDDO
 
-         CALL INC1(K)                                                   0005
+         CALL INC1(K)                                                   0011
 
-         DO J = 1, N                                                    0006
+         DO J = 1, N                                                    0013
 
 C  <WORK(PHI1,PHI2)-OUT-EXACT-{PHI1==J, PHI2==K, 1<=I, I<=K, I<=N,
 C    1<=J, J<=N}>
 
-            WORK(J,K) = J*J-K*K                                         0007
+            WORK(J,K) = J*J-K*K                                         0014
 
 C  <A(PHI1)-OUT-EXACT-{I==PHI1, 1<=I, I<=K, I<=N, 1<=J, 1+J<=N}>
 
-            A(I) = A(I)+WORK(J,K)+WORK(J,K-1)                           0008
+            A(I) = A(I)+WORK(J,K)+WORK(J,K-1)                           0015
          ENDDO
       ENDDO
       END
@@ -188,60 +188,60 @@ C  <A(PHI1)-OUT-EXACT-{I==PHI1, 1<=I, I<=K, I<=N, 1<=J, 1+J<=N}>
       SUBROUTINE RENPAR6(A,N,K,M)
       INTEGER N,K,M,A(N)
       DIMENSION WORK(100,100)
-      K = M*M                                                           0001
-      DO I = 1, N                                                       0002
-         DOALL J = 1, N                                                 0003
-            WORK(J,K) = J+K                                             0004
-         ENDDO
-
-         CALL INC1(K)                                                   0005
-         DOALL J = 1, N                                                 0006
-            WORK(J,K) = J*J-K*K                                         0007
-         ENDDO
-         DO J = 1, N                                                    0006
-            A(I) = A(I)+WORK(J,K)+WORK(J,K-1)                           0008
-         ENDDO
-      ENDDO
-      END
-
-
-      SUBROUTINE RENPAR6_2(A,N,K,M)
-      INTEGER N,K,M,A(N)
-      DIMENSION WORK(100,100)
-      K0 = M*M                                                          0001
-      DO I = 1, N                                                       0002
-         K = K0+I-1                                                     0003
-         DO J = 1, N                                                    0004
-            WORK(J,K) = J+K                                             0005
-         ENDDO
-
-         CALL INC1(K)                                                   0006
-
-         DO J = 1, N                                                    0007
-            WORK(J,K) = J*J-K*K                                         0008
-            A(I) = A(I)+WORK(J,K)+WORK(J,K-1)                           0009
-         ENDDO
-      ENDDO
-      END
-
-
-      SUBROUTINE RENPAR6_2(A,N,K,M)
-      INTEGER N,K,M,A(N)
-      DIMENSION WORK(100,100)
-      K0 = M*M                                                          0001
-      DOALL I = 1, N                                                    0002
-         PRIVATE WORK(1:100, 1:100),K,J
-         K = K0+I-1                                                     0003
-         DOALL J = 1, N                                                 0004
-            WORK(J,K) = J+K                                             0005
-         ENDDO
-
-         CALL INC1(K)                                                   0006
+      K = M*M                                                           0005
+      DO I = 1, N                                                       0006
          DOALL J = 1, N                                                 0007
-            WORK(J,K) = J*J-K*K                                         0008
+            WORK(J,K) = J+K                                             0008
          ENDDO
-         DO J = 1, N                                                    0007
-            A(I) = A(I)+WORK(J,K)+WORK(J,K-1)                           0009
+
+         CALL INC1(K)                                                   0011
+         DOALL J = 1, N                                                 0013
+            WORK(J,K) = J*J-K*K                                         0014
+         ENDDO
+         DO J = 1, N                                                    0013
+            A(I) = A(I)+WORK(J,K)+WORK(J,K-1)                           0015
+         ENDDO
+      ENDDO
+      END
+
+
+      SUBROUTINE RENPAR6_2(A,N,K,M)
+      INTEGER N,K,M,A(N)
+      DIMENSION WORK(100,100)
+      K0 = M*M                                                          0006
+      DO I = 1, N                                                       0007
+         K = K0+I-1                                                     0008
+         DO J = 1, N                                                    0009
+            WORK(J,K) = J+K                                             0010
+         ENDDO
+
+         CALL INC1(K)                                                   0013
+
+         DO J = 1, N                                                    0015
+            WORK(J,K) = J*J-K*K                                         0016
+            A(I) = A(I)+WORK(J,K)+WORK(J,K-1)                           0017
+         ENDDO
+      ENDDO
+      END
+
+
+      SUBROUTINE RENPAR6_2(A,N,K,M)
+      INTEGER N,K,M,A(N)
+      DIMENSION WORK(100,100)
+      K0 = M*M                                                          0006
+      DOALL I = 1, N                                                    0007
+         PRIVATE WORK(1:100, 1:100),K,J
+         K = K0+I-1                                                     0008
+         DOALL J = 1, N                                                 0009
+            WORK(J,K) = J+K                                             0010
+         ENDDO
+
+         CALL INC1(K)                                                   0013
+         DOALL J = 1, N                                                 0015
+            WORK(J,K) = J*J-K*K                                         0016
+         ENDDO
+         DO J = 1, N                                                    0015
+            A(I) = A(I)+WORK(J,K)+WORK(J,K-1)                           0017
          ENDDO
       ENDDO
       END

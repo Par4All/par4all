@@ -5,12 +5,12 @@
 c     check that formats in declarations are OK if PRETTYPRINT_ALL_DECLARATIONS
 C     is set
 
-1000  FORMAT('Hello world')                                             0001
+1000  FORMAT('Hello world')                                             0006
 
-      WRITE (6, 1000)                                                   0002
+      WRITE (6, 1000)                                                   0010
 
-      DO I = 1, 10                                                      0003
-         T(I) = 0.                                                      0004
+      DO I = 1, 10                                                      0012
+         T(I) = 0.                                                      0013
       ENDDO
 
       END

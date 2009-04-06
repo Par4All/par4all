@@ -11,8 +11,8 @@ Call graph file ENTRY03 (with too many callees?)
       INTEGER N
       COMPLEX*8 X(1:N)
 
-      CALL FOO                                                          0001
-      PRINT *, X                                                        0002
+      CALL FOO                                                          0008
+      PRINT *, X                                                        0009
 
 
       END

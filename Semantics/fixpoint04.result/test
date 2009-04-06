@@ -16,17 +16,17 @@ C     fixpoint operator and legaly so since the loop may not be entered
 C     The loop may not be entered: no information about j is available
 C     when it is printed
 
-      DO I = 1, N                                                       0001
+      DO I = 1, N                                                       0013
 
 C  T(J) {J<=5, J<=J#init}
 
-         IF (J.GE.5) J = 5                                              0002
+         IF (J.GE.5) J = 5                                              0014
       ENDDO
 
 C  T() {}
 
 
-      PRINT *, J                                                        0004
+      PRINT *, J                                                        0019
 
 C  T(I,J) {}
 
@@ -35,17 +35,17 @@ C     The loop is entered: the fix point is not improved (alas) but the
 C     loop body is applied at least once which produces a condition on
 C     J, namely J <= 5
 
-      DO I = 1, 5                                                       0005
+      DO I = 1, 5                                                       0025
 
 C  T(J) {J<=5, J<=J#init}
 
-         IF (J.GE.5) J = 5                                              0006
+         IF (J.GE.5) J = 5                                              0026
       ENDDO
 
 C  T() {}
 
 
-      PRINT *, J                                                        0008
+      PRINT *, J                                                        0031
 
 C  T(I,J) {J<=5, J<=J#init}
 
@@ -54,22 +54,22 @@ C     Suppose J is known to be greater than 5 (in fact, equal to 5
 C     because of the previous loop) and the loop certainly entered: the
 C     information is lost!
 
-      IF (J.GE.5) THEN                                                  0009
+      IF (J.GE.5) THEN                                                  0037
 
 C  T(I,J) {}
 
 
-         DO I = 1, 5                                                    0010
+         DO I = 1, 5                                                    0039
 
 C  T(J) {J<=5, J<=J#init}
 
-            IF (J.GE.5) J = 5                                           0011
+            IF (J.GE.5) J = 5                                           0040
          ENDDO
 
 C  T() {}
 
 
-         PRINT *, J                                                     0013
+         PRINT *, J                                                     0045
 
       ENDIF
 
@@ -92,17 +92,17 @@ C     fixpoint operator and legaly so since the loop may not be entered
 C     The loop may not be entered: no information about j is available
 C     when it is printed
 
-      DO I = 1, N                                                       0001
+      DO I = 1, N                                                       0013
 
 C  P(I,J) {1<=I, I<=N}
 
-         IF (J.GE.5) J = 5                                              0002
+         IF (J.GE.5) J = 5                                              0014
       ENDDO
 
 C  P(I,J) {1<=I, N+1<=I}
 
 
-      PRINT *, J                                                        0004
+      PRINT *, J                                                        0019
 
 C  P(I,J) {1<=I, N+1<=I}
 
@@ -111,17 +111,17 @@ C     The loop is entered: the fix point is not improved (alas) but the
 C     loop body is applied at least once which produces a condition on
 C     J, namely J <= 5
 
-      DO I = 1, 5                                                       0005
+      DO I = 1, 5                                                       0025
 
 C  P(I,J) {1<=I, I<=5}
 
-         IF (J.GE.5) J = 5                                              0006
+         IF (J.GE.5) J = 5                                              0026
       ENDDO
 
 C  P(I,J) {I==6, J<=5}
 
 
-      PRINT *, J                                                        0008
+      PRINT *, J                                                        0031
 
 C  P(I,J) {I==6, J<=5}
 
@@ -130,22 +130,22 @@ C     Suppose J is known to be greater than 5 (in fact, equal to 5
 C     because of the previous loop) and the loop certainly entered: the
 C     information is lost!
 
-      IF (J.GE.5) THEN                                                  0009
+      IF (J.GE.5) THEN                                                  0037
 
 C  P(I,J) {I==6, J==5}
 
 
-         DO I = 1, 5                                                    0010
+         DO I = 1, 5                                                    0039
 
 C  P(I,J) {1<=I, I<=5}
 
-            IF (J.GE.5) J = 5                                           0011
+            IF (J.GE.5) J = 5                                           0040
          ENDDO
 
 C  P(I,J) {I==6, J<=5}
 
 
-         PRINT *, J                                                     0013
+         PRINT *, J                                                     0045
 
       ENDIF
 

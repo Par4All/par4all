@@ -11,26 +11,26 @@ C     scalar variables in tests
 C  T(L1) {}
 
 
-      READ *, L1                                                        0001
+      READ *, L1                                                        0008
 
 C  T(L2) {0<=L1, L1+L2<=1, 0<=L2}
 
 
-      IF (L1) THEN                                                      0002
+      IF (L1) THEN                                                      0010
 
 C  T(L2) {L2==0}
 
-         L2 = .FALSE.                                                   0003
+         L2 = .FALSE.                                                   0011
 
 C  T() {}
 
-         PRINT *, L1, L2                                                0004
+         PRINT *, L1, L2                                                0012
       ENDIF
 
 C  T() {}
 
 
-      PRINT *, L1, L2                                                   0005
+      PRINT *, L1, L2                                                   0015
 
       END
 
@@ -46,26 +46,26 @@ C     scalar variables in tests
 C  P() {}
 
 
-      READ *, L1                                                        0001
+      READ *, L1                                                        0008
 
 C  P(L1) {}
 
 
-      IF (L1) THEN                                                      0002
+      IF (L1) THEN                                                      0010
 
 C  P(L1) {L1==1}
 
-         L2 = .FALSE.                                                   0003
+         L2 = .FALSE.                                                   0011
 
 C  P(L1,L2) {L1==1, L2==0}
 
-         PRINT *, L1, L2                                                0004
+         PRINT *, L1, L2                                                0012
       ENDIF
 
 C  P(L1,L2) {0<=L1, L1+L2<=1, 0<=L2}
 
 
-      PRINT *, L1, L2                                                   0005
+      PRINT *, L1, L2                                                   0015
 
       END
 

@@ -5,9 +5,9 @@ C     Goal: find out that C is a function after the call to foo
       INTEGER UN
       PARAMETER (UN=1)
 
-      J = UN                                                            0001
-      CALL FOO(C)                                                       0002
-      I = C(UN)                                                         0003
+      J = UN                                                            0008
+      CALL FOO(C)                                                       0009
+      I = C(UN)                                                         0010
 
       END
       PROGRAM FORMEL06
@@ -17,9 +17,9 @@ C     Goal: find out that C is a function after the call to foo
       INTEGER UN
       PARAMETER (UN=1)
 
-      J = UN                                                            0001
-      CALL FOO(C)                                                       0002
-      I = C(UN)                                                         0003
+      J = UN                                                            0008
+      CALL FOO(C)                                                       0009
+      I = C(UN)                                                         0010
 
       END
       PROGRAM FORMEL06
@@ -29,9 +29,9 @@ C     Goal: find out that C is a function after the call to foo
       INTEGER UN
       PARAMETER (UN=1)
 
-      J = UN                                                            0001
-      CALL FOO(C)                                                       0002
-      I = C(UN)                                                         0003
+      J = UN                                                            0008
+      CALL FOO(C)                                                       0009
+      I = C(UN)                                                         0010
 
       END
 

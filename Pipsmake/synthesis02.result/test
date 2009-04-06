@@ -13,10 +13,10 @@ C     by automatically generating source code for FOO and BAR
 c      parameter (lng=10)
 C      character*lng s2
 
-      CALL FOO(X, I, C, S)                                              0001
+      CALL FOO(X, I, C, S)                                              0013
 
 c      c = bar(i, s2)
-      C = BAR(I, J, K)                                                  0002
+      C = BAR(I, J, K)                                                  0016
 
       END
 Call graph for synthesis02

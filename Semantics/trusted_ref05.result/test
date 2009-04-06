@@ -14,11 +14,11 @@ C     BEGIN BLOCK
 C  T(I) {1<=I, 1<=N}
 
 
-      DO I = 1, M                                                       0001
+      DO I = 1, M                                                       0007
 
 C  T() {1<=I, I<=M, I<=N, 1<=N}
 
-         A(I) = 0.                                                      0002
+         A(I) = 0.                                                      0008
       ENDDO
 
 C     END BLOCK
@@ -39,11 +39,11 @@ C     BEGIN BLOCK
 C  P() {1<=N}
 
 
-      DO I = 1, M                                                       0001
+      DO I = 1, M                                                       0007
 
 C  P(I) {1<=I, I<=M, I<=N, 1<=N}
 
-         A(I) = 0.                                                      0002
+         A(I) = 0.                                                      0008
       ENDDO
 
 C     END BLOCK

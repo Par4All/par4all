@@ -3,6 +3,6 @@
       DATA I /1/
 ! moved up...
       DATA J/2/
-      PRINT *, I                                                        0001
-      PRINT *, J                                                        0002
+      PRINT *, I                                                        0004
+      PRINT *, J                                                        0007
       END

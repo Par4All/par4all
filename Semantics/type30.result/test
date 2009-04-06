@@ -11,16 +11,16 @@ C     Check proper subtring operation in string assignment
 C  T(S1) {"Hell"==S1}
 
 
-      S1 = "Hello!"                                                     0001
+      S1 = "Hello!"                                                     0008
 
 C  T(S2) {'He'==S2}
 
-      S2 = 'Hello!'                                                     0002
+      S2 = 'Hello!'                                                     0009
 
 C  T() {}
 
 
-      PRINT *, S1, S2                                                   0003
+      PRINT *, S1, S2                                                   0011
 
       END
 
@@ -36,16 +36,16 @@ C     Check proper subtring operation in string assignment
 C  P() {}
 
 
-      S1 = "Hello!"                                                     0001
+      S1 = "Hello!"                                                     0008
 
 C  P(S1) {"Hell"==S1}
 
-      S2 = 'Hello!'                                                     0002
+      S2 = 'Hello!'                                                     0009
 
 C  P(S1,S2) {"Hell"==S1, 'He'==S2}
 
 
-      PRINT *, S1, S2                                                   0003
+      PRINT *, S1, S2                                                   0011
 
       END
 

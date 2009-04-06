@@ -10,6 +10,6 @@ C     Aliasing between a global variable and a formal parameter
 C  T(MAXMEM) {}
 
 
-      CALL SETMEM(MAXMEM)                                               0001
+      CALL SETMEM(MAXMEM)                                               0007
 
       END

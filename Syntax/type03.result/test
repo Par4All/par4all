@@ -5,7 +5,7 @@
       REAL GRAD(1),ZZ(1)
       EXTERNAL SDOT
 
-      XMUN = SDOT(NMOT, GRAD, 1, ZZ, 1)                                 0001
+      XMUN = SDOT(NMOT, GRAD, 1, ZZ, 1)                                 0008
 
       END
 !

@@ -3,7 +3,7 @@ Printed file
 
       PROGRAM UNSTR
 
-10    CONTINUE                                                          0001
+10    CONTINUE                                                          0003
       GOTO 10
       END
 
@@ -11,6 +11,6 @@ Printed file after RESTUCTURE_CONTROL
 
       PROGRAM UNSTR
 
-10    CONTINUE                                                          0001
+10    CONTINUE                                                          0003
       GOTO 10
       END

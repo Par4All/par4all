@@ -2,5 +2,5 @@
       INTEGER I
       SAVE I
       DATA I /4/
-      PRINT *, I                                                        0001
+      PRINT *, I                                                        0003
       END

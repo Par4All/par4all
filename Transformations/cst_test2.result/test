@@ -11,56 +11,56 @@ C  P() {}
 
 c     Example taken from ocean (Perfect Club)
 
-      LEIG = 132097                                                     0001
+      LEIG = 132097                                                     0005
 
 C  P(LEIG) {LEIG==132097}
 
-      IF (.FALSE.) THEN                                                 0002
+      IF (.FALSE.) THEN                                                 0006
 
 C  P() {0==-1}
 
-         LEIG = LPRESS-NWEIG                                            0003
+         LEIG = LPRESS-NWEIG                                            0007
       ENDIF
 
 C  P(LEIG) {LEIG==132097}
 
-      LE = 1                                                            0004
+      LE = 1                                                            0009
 
 C  P(LE,LEIG) {LE==1, LEIG==132097}
 
 
-      PRINT *, LEIG                                                     0005
+      PRINT *, LEIG                                                     0011
 
 C  P(LE,LEIG) {LE==1, LEIG==132097}
 
 
 c     First synthetic example
 
-      IF (.TRUE.) THEN                                                  0006
+      IF (.TRUE.) THEN                                                  0015
 
 C  P(LE,LEIG) {LE==1, LEIG==132097}
 
-         I = 1                                                          0007
+         I = 1                                                          0016
       ELSE
 
 C  P() {0==-1}
 
-         I = 2                                                          0008
+         I = 2                                                          0018
       ENDIF
 
 C  P(I,LE,LEIG) {I==1, LE==1, LEIG==132097}
 
 
-      IF (.FALSE.) THEN                                                 0009
+      IF (.FALSE.) THEN                                                 0021
 
 C  P() {0==-1}
 
-         I = I+2                                                        0010
+         I = I+2                                                        0022
       ELSE
 
 C  P(I,LE,LEIG) {I==1, LE==1, LEIG==132097}
 
-         I = I+1                                                        0011
+         I = I+1                                                        0024
       ENDIF
 
 C  P(I,LE,LEIG) {I==2, LE==1, LEIG==132097}
@@ -68,38 +68,38 @@ C  P(I,LE,LEIG) {I==2, LE==1, LEIG==132097}
 
 c     Should be I == 2
 
-      PRINT *, I                                                        0012
+      PRINT *, I                                                        0029
 
 C  P(I,LE,LEIG) {I==2, LE==1, LEIG==132097}
 
 
 c     Second synthetic example
 
-      IF (.TRUE..AND.I.EQ.1) THEN                                       0013
+      IF (.TRUE..AND.I.EQ.1) THEN                                       0033
 
 C  P() {0==-1}
 
-         I = 1                                                          0014
+         I = 1                                                          0034
       ELSE
 
 C  P(I,LE,LEIG) {I==2, LE==1, LEIG==132097}
 
-         I = 2                                                          0015
+         I = 2                                                          0036
       ENDIF
 
 C  P(I,LE,LEIG) {I==2, LE==1, LEIG==132097}
 
 
-      IF (.FALSE..OR.I.EQ.2) THEN                                       0016
+      IF (.FALSE..OR.I.EQ.2) THEN                                       0039
 
 C  P(I,LE,LEIG) {I==2, LE==1, LEIG==132097}
 
-         I = I+2                                                        0017
+         I = I+2                                                        0040
       ELSE
 
 C  P() {0==-1}
 
-         I = I+1                                                        0018
+         I = I+1                                                        0042
       ENDIF
 
 C  P(I,LE,LEIG) {I==4, LE==1, LEIG==132097}
@@ -107,7 +107,7 @@ C  P(I,LE,LEIG) {I==4, LE==1, LEIG==132097}
 
 c     Should be I == 4
 
-      PRINT *, I                                                        0019
+      PRINT *, I                                                        0047
 
       END
 
@@ -123,54 +123,54 @@ C  P() {}
 
 c     Example taken from ocean (Perfect Club)
 
-      LEIG = 132097                                                     0001
+      LEIG = 132097                                                     0005
 
 C  P(LEIG) {LEIG==132097}
 
-      LE = 1                                                            0004
+      LE = 1                                                            0009
 
 C  P(LE,LEIG) {LE==1, LEIG==132097}
 
 
-      PRINT *, LEIG                                                     0005
+      PRINT *, LEIG                                                     0011
 
 C  P(LE,LEIG) {LE==1, LEIG==132097}
 
 
 c     First synthetic example
 
-      I = 1                                                             0007
+      I = 1                                                             0016
 
 C  P(I,LE,LEIG) {I==1, LE==1, LEIG==132097}
 
 
-      I = I+1                                                           0011
+      I = I+1                                                           0024
 
 C  P(I,LE,LEIG) {I==2, LE==1, LEIG==132097}
 
 
 c     Should be I == 2
 
-      PRINT *, I                                                        0012
+      PRINT *, I                                                        0029
 
 C  P(I,LE,LEIG) {I==2, LE==1, LEIG==132097}
 
 
 c     Second synthetic example
 
-      I = 2                                                             0015
+      I = 2                                                             0036
 
 C  P(I,LE,LEIG) {I==2, LE==1, LEIG==132097}
 
 
-      I = I+2                                                           0017
+      I = I+2                                                           0040
 
 C  P(I,LE,LEIG) {I==4, LE==1, LEIG==132097}
 
 
 c     Should be I == 4
 
-      PRINT *, I                                                        0019
+      PRINT *, I                                                        0047
 
       END
 
@@ -186,54 +186,54 @@ C  P() {}
 
 c     Example taken from ocean (Perfect Club)
 
-      LEIG = 132097                                                     0001
+      LEIG = 132097                                                     0005
 
 C  P(LEIG) {LEIG==132097}
 
-      LE = 1                                                            0004
+      LE = 1                                                            0009
 
 C  P(LE,LEIG) {LE==1, LEIG==132097}
 
 
-      PRINT *, 132097                                                   0005
+      PRINT *, 132097                                                   0011
 
 C  P(LE,LEIG) {LE==1, LEIG==132097}
 
 
 c     First synthetic example
 
-      I = 1                                                             0007
+      I = 1                                                             0016
 
 C  P(I,LE,LEIG) {I==1, LE==1, LEIG==132097}
 
 
-      I = I+1                                                           0011
+      I = I+1                                                           0024
 
 C  P(I,LE,LEIG) {I==2, LE==1, LEIG==132097}
 
 
 c     Should be I == 2
 
-      PRINT *, 2                                                        0012
+      PRINT *, 2                                                        0029
 
 C  P(I,LE,LEIG) {I==2, LE==1, LEIG==132097}
 
 
 c     Second synthetic example
 
-      I = 2                                                             0015
+      I = 2                                                             0036
 
 C  P(I,LE,LEIG) {I==2, LE==1, LEIG==132097}
 
 
-      I = I+2                                                           0017
+      I = I+2                                                           0040
 
 C  P(I,LE,LEIG) {I==4, LE==1, LEIG==132097}
 
 
 c     Should be I == 4
 
-      PRINT *, 4                                                        0019
+      PRINT *, 4                                                        0047
 
       END
 
@@ -243,29 +243,29 @@ Code after dead code elimination
 
 c     Example taken from ocean (Perfect Club)
 
-      LEIG = 132097                                                     0001
-      LE = 1                                                            0004
+      LEIG = 132097                                                     0005
+      LE = 1                                                            0009
 
-      PRINT *, 132097                                                   0005
+      PRINT *, 132097                                                   0011
 
 c     First synthetic example
 
-      I = 1                                                             0007
+      I = 1                                                             0016
 
-      I = I+1                                                           0011
+      I = I+1                                                           0024
 
 c     Should be I == 2
 
-      PRINT *, 2                                                        0012
+      PRINT *, 2                                                        0029
 
 c     Second synthetic example
 
-      I = 2                                                             0015
+      I = 2                                                             0036
 
-      I = I+2                                                           0017
+      I = I+2                                                           0040
 
 c     Should be I == 4
 
-      PRINT *, 4                                                        0019
+      PRINT *, 4                                                        0047
 
       END

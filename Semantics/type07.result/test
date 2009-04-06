@@ -11,29 +11,29 @@ C     scalar variables in tests
 C  T(X) {0.57==X}
 
 
-      X = 0.57                                                          0001
+      X = 0.57                                                          0008
 
 C  T(X) {}
 
 
-      IF (X.GE.0.58) THEN                                               0002
+      IF (X.GE.0.58) THEN                                               0010
 
 C  T(X) {}
 
-         READ *, X                                                      0003
+         READ *, X                                                      0011
 
 C  T() {}
 
-         PRINT *, X                                                     0004
+         PRINT *, X                                                     0012
       ELSE
 
 C  T(X) {}
 
-         READ *, X                                                      0005
+         READ *, X                                                      0014
 
 C  T() {}
 
-         PRINT *, X                                                     0006
+         PRINT *, X                                                     0015
       ENDIF
 
       END
@@ -50,29 +50,29 @@ C     scalar variables in tests
 C  P() {}
 
 
-      X = 0.57                                                          0001
+      X = 0.57                                                          0008
 
 C  P(X) {0.57==X}
 
 
-      IF (X.GE.0.58) THEN                                               0002
+      IF (X.GE.0.58) THEN                                               0010
 
 C  P() {0==-1}
 
-         READ *, X                                                      0003
+         READ *, X                                                      0011
 
 C  P() {0==-1}
 
-         PRINT *, X                                                     0004
+         PRINT *, X                                                     0012
       ELSE
 
 C  P(X) {0.57==X, 0.57<=0.58}
 
-         READ *, X                                                      0005
+         READ *, X                                                      0014
 
 C  P(X) {0.57<=0.58}
 
-         PRINT *, X                                                     0006
+         PRINT *, X                                                     0015
       ENDIF
 
       END

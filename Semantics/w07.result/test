@@ -18,17 +18,17 @@ C  T(I) {I==1}
 
 C (0,2)
 
-      I = 1                                                             0001
+      I = 1                                                             0006
 
 C  T(J) {J==10}
 
 C (0,3)
-      J = N                                                             0002
+      J = N                                                             0007
 
 C  T(I,J) {I+J==I#init+J#init}
 
 C (0,4)
-      DO WHILE (I.LT.N)                                                 0003
+      DO WHILE (I.LT.N)                                                 0008
 
 C  T(I,J) {I==I#init+1, J==J#init-1}
 
@@ -38,24 +38,24 @@ C        BEGIN BLOCK
 C  T() {}
 
 C (0,6)
-         A(I) = A(J)                                                    0004
+         A(I) = A(J)                                                    0009
 
 C  T(J) {J==J#init-1}
 
 C (0,7)
-         J = J-1                                                        0005
+         J = J-1                                                        0010
 
 C  T(I) {I==I#init+1}
 
 C (0,8)
-         I = I+1                                                        0006
+         I = I+1                                                        0011
 C        END BLOCK
       ENDDO
 
 C  T() {}
 
 C (0,9)
-      PRINT *, 'that is all'                                            0007
+      PRINT *, 'that is all'                                            0013
 C     END BLOCK
       END
 
@@ -78,17 +78,17 @@ C  P() {}
 
 C (0,2)
 
-      I = 1                                                             0001
+      I = 1                                                             0006
 
 C  P(I) {I==1}
 
 C (0,3)
-      J = N                                                             0002
+      J = N                                                             0007
 
 C  P(I,J) {I==1, J==10}
 
 C (0,4)
-      DO WHILE (I.LT.N)                                                 0003
+      DO WHILE (I.LT.N)                                                 0008
 
 C  P(I,J) {I+J==11, I<=9}
 
@@ -98,23 +98,23 @@ C        BEGIN BLOCK
 C  P(I,J) {I+J==11, I<=9}
 
 C (0,6)
-         A(I) = A(J)                                                    0004
+         A(I) = A(J)                                                    0009
 
 C  P(I,J) {I+J==11, I<=9}
 
 C (0,7)
-         J = J-1                                                        0005
+         J = J-1                                                        0010
 
 C  P(I,J) {I+J==10, I<=9}
 
 C (0,8)
-         I = I+1                                                        0006
+         I = I+1                                                        0011
 C        END BLOCK
       ENDDO
 
 C  P(I,J) {I==10, J==1}
 
 C (0,9)
-      PRINT *, 'that is all'                                            0007
+      PRINT *, 'that is all'                                            0013
 C     END BLOCK
       END

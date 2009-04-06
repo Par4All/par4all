@@ -4,7 +4,7 @@
 
 C  <A(PHI1)-W-EXACT-{1<=PHI1, PHI1<=10}>
 
-      CALL S1(A)                                                        0001
+      CALL S1(A)                                                        0004
       END
 
 C  <X(PHI1)-W-EXACT-{1<=PHI1, PHI1<=10}>
@@ -16,7 +16,7 @@ C  <X(PHI1)-W-EXACT-{1<=PHI1, PHI1<=10}>
 
 C  <X(PHI1)-W-EXACT-{1<=PHI1, PHI1<=10}>
 
-      CALL S2(X)                                                        0001
+      CALL S2(X)                                                        0005
       END
 
 C  <Y(PHI1)-W-EXACT-{1<=PHI1, PHI1<=10}>
@@ -28,11 +28,11 @@ C  <Y(PHI1)-W-EXACT-{1<=PHI1, PHI1<=10}>
 
 C  <Y(PHI1)-W-EXACT-{1<=PHI1, PHI1<=10}>
 
-      DO I = 1, 10                                                      0001
+      DO I = 1, 10                                                      0005
 
 C  <Y(PHI1)-W-EXACT-{PHI1==I, 1<=I, I<=10}>
 
-         Y(I) = 1.0                                                     0002
+         Y(I) = 1.0                                                     0006
       ENDDO
       END
 

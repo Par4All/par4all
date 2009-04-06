@@ -1,14 +1,14 @@
       PROGRAM IFTHENELSE01
 
-      READ *, I                                                         0001
+      READ *, I                                                         0003
 
-      IF (I.EQ.0) THEN                                                  0002
-         PRINT *, I                                                     0003
+      IF (I.EQ.0) THEN                                                  0005
+         PRINT *, I                                                     0006
       ELSE
-1        IF (I.EQ.1) THEN                                               0004
-            PRINT *, I+1                                                0005
+1        IF (I.EQ.1) THEN                                               0007
+            PRINT *, I+1                                                0008
          ELSE
-            PRINT *, I-1                                                0006
+            PRINT *, I-1                                                0010
          ENDIF
       ENDIF
 

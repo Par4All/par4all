@@ -16,19 +16,19 @@ C  T(I) {I==1}
 
 C (0,2)
 
-      DO I = 1, N                                                       0001
+      DO I = 1, N                                                       0007
 
 C  T() {0==-1}
 
 C (0,3)
-         U(I+1) = 0.                                                    0002
+         U(I+1) = 0.                                                    0008
       ENDDO
 
 C  T() {I==1, N<=0}
 
 C (0,4)
 
-      PRINT *, N                                                        0003
+      PRINT *, N                                                        0011
 
 C     END BLOCK
       END
@@ -50,19 +50,19 @@ C  P() {}
 
 C (0,2)
 
-      DO I = 1, N                                                       0001
+      DO I = 1, N                                                       0007
 
 C  P() {0==-1}
 
 C (0,3)
-         U(I+1) = 0.                                                    0002
+         U(I+1) = 0.                                                    0008
       ENDDO
 
 C  P(I) {I==1, N<=0}
 
 C (0,4)
 
-      PRINT *, N                                                        0003
+      PRINT *, N                                                        0011
 
 C     END BLOCK
       END

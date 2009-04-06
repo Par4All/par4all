@@ -3,22 +3,22 @@ Initial code
 
       PROGRAM ONETRIPLOOP02
 
-      READ *, N                                                         0001
+      READ *, N                                                         0003
 
 
-      M = N                                                             0002
+      M = N                                                             0006
 
-      M = N+2                                                           0003
+      M = N+2                                                           0008
 
-      IF (N.GT.0) THEN                                                  0004
-         DO I = N, 2*N-1, N                                             0005
-            PRINT *, 'i = ', I                                          0006
+      IF (N.GT.0) THEN                                                  0010
+         DO I = N, 2*N-1, N                                             0011
+            PRINT *, 'i = ', I                                          0012
          ENDDO
       ENDIF
 
-      IF (N.LT.0) THEN                                                  0007
-         DO I = N, 2*N+1, N                                             0008
-            PRINT *, 'i = ', I                                          0009
+      IF (N.LT.0) THEN                                                  0016
+         DO I = N, 2*N+1, N                                             0017
+            PRINT *, 'i = ', I                                          0018
          ENDDO
       ENDIF
 
@@ -34,46 +34,46 @@ C  P() {}
 C  P() {}
 
 
-      READ *, N                                                         0001
+      READ *, N                                                         0003
 
 C  P(N) {}
 
 
 
-      M = N                                                             0002
+      M = N                                                             0006
 
 C  P(M,N) {M==N}
 
 
-      M = N+2                                                           0003
+      M = N+2                                                           0008
 
 C  P(M,N) {M==N+2}
 
 
-      IF (N.GT.0) THEN                                                  0004
+      IF (N.GT.0) THEN                                                  0010
 
 C  P(M,N) {M==N+2, 3<=M}
 
-         DO I = N, 2*N-1, N                                             0005
+         DO I = N, 2*N-1, N                                             0011
 
 C  P(I,M,N) {M==N+2, M<=I+2, I+5<=2M, 3<=M}
 
-            PRINT *, 'i = ', I                                          0006
+            PRINT *, 'i = ', I                                          0012
          ENDDO
       ENDIF
 
 C  P(I,M,N) {M==N+2}
 
 
-      IF (N.LT.0) THEN                                                  0007
+      IF (N.LT.0) THEN                                                  0016
 
 C  P(I,M,N) {M==N+2, M<=1}
 
-         DO I = N, 2*N+1, N                                             0008
+         DO I = N, 2*N+1, N                                             0017
 
 C  P(I,M,N) {M==N+2, 2M<=I+3, I+2<=M, M<=1}
 
-            PRINT *, 'i = ', I                                          0009
+            PRINT *, 'i = ', I                                          0018
          ENDDO
       ENDIF
 
@@ -83,21 +83,21 @@ Code after one trip loop detection and simplification
 
       PROGRAM ONETRIPLOOP02
 
-      READ *, N                                                         0001
+      READ *, N                                                         0003
 
 
-      M = N                                                             0002
+      M = N                                                             0006
 
-      M = N+2                                                           0003
+      M = N+2                                                           0008
 
-      IF (N.GT.0) THEN                                                  0004
+      IF (N.GT.0) THEN                                                  0010
          I = N
-         PRINT *, 'i = ', I                                             0006
+         PRINT *, 'i = ', I                                             0012
       ENDIF
 
-      IF (N.LT.0) THEN                                                  0007
+      IF (N.LT.0) THEN                                                  0016
          I = N
-         PRINT *, 'i = ', I                                             0009
+         PRINT *, 'i = ', I                                             0018
       ENDIF
 
       END

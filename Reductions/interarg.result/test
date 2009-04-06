@@ -4,16 +4,16 @@ Print code with proper reductions
       SUBROUTINE ADDTO(X, J)
       INTEGER X, J
 !  call sum[X],
-      X = X+J                                                           0001
+      X = X+J                                                           0003
       END
       PROGRAM INTERARG
       INTEGER S, I
-      S = 0                                                             0001
-      DO I = 1, 10                                                      0002
+      S = 0                                                             0003
+      DO I = 1, 10                                                      0004
 !  call sum[S],
-         CALL ADDTO(S, I)                                               0003
+         CALL ADDTO(S, I)                                               0005
       ENDDO
-      PRINT *, S                                                        0004
+      PRINT *, S                                                        0007
       END
 
 Print code with cumulated reductions
@@ -22,15 +22,15 @@ Print code with cumulated reductions
       SUBROUTINE ADDTO(X, J)
       INTEGER X, J
 !  call sum[X],
-      X = X+J                                                           0001
+      X = X+J                                                           0003
       END
       PROGRAM INTERARG
       INTEGER S, I
-      S = 0                                                             0001
+      S = 0                                                             0003
 !  loop sum[S],
-      DO I = 1, 10                                                      0002
+      DO I = 1, 10                                                      0004
 !  call sum[S],
-         CALL ADDTO(S, I)                                               0003
+         CALL ADDTO(S, I)                                               0005
       ENDDO
-      PRINT *, S                                                        0004
+      PRINT *, S                                                        0007
       END

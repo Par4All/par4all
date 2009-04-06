@@ -9,16 +9,16 @@ C  T(K) {K==1}
 C     Check integer behavior after extensions to other types
 
 c      common /foo/ k
-      K = 1                                                             0001
+      K = 1                                                             0006
 
 C  T(K) {K==K#init+1}
 
 c      call incr
-      CALL INCR(K)                                                      0002
+      CALL INCR(K)                                                      0008
 
 C  T() {}
 
-      PRINT *, K                                                        0003
+      PRINT *, K                                                        0009
       END
 
 C  T(K) {K==K#init+1}
@@ -29,7 +29,7 @@ C  T(K) {K==K#init+1}
 
 c      subroutine incr
 c      common /foo/ k
-      K = K+1                                                           0001
+      K = K+1                                                           0004
       END
 
 C  P() {}
@@ -42,15 +42,15 @@ C  P() {}
 C     Check integer behavior after extensions to other types
 
 c      common /foo/ k
-      K = 1                                                             0001
+      K = 1                                                             0006
 
 C  P(K) {K==1}
 
 c      call incr
-      CALL INCR(K)                                                      0002
+      CALL INCR(K)                                                      0008
 
 C  P(K) {K==2}
 
-      PRINT *, K                                                        0003
+      PRINT *, K                                                        0009
       END
 

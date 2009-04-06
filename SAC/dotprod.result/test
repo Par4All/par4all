@@ -9,10 +9,10 @@
       INTEGER I
       INTEGER*2 A(1:1), B(1:SIZE), C(1:SIZE)
 
-      A(1) = 0                                                          0001
-      DO 10 I = 1, SIZE                                                 0002
-         A(1) = A(1)+B(I)*C(I)                                          0003
-10       CONTINUE                                                       0004
+      A(1) = 0                                                          0012
+      DO 10 I = 1, SIZE                                                 0013
+         A(1) = A(1)+B(I)*C(I)                                          0014
+10       CONTINUE                                                       0015
 
       END
       SUBROUTINE DOTPROD(A, B, C)
@@ -21,10 +21,10 @@
       INTEGER I
       INTEGER*2 A(1:1), B(1:SIZE), C(1:SIZE)
 
-      A(1) = 0                                                          0001
-      DO 10 I = 1, SIZE                                                 0002
-         A(1) = A(1)+B(I)*C(I)                                          0003
-10       CONTINUE                                                       0004
+      A(1) = 0                                                          0012
+      DO 10 I = 1, SIZE                                                 0013
+         A(1) = A(1)+B(I)*C(I)                                          0014
+10       CONTINUE                                                       0015
 
       END
       SUBROUTINE DOTPROD(A, B, C)
@@ -33,10 +33,10 @@
       INTEGER I
       INTEGER*2 A(1:1), B(1:SIZE), C(1:SIZE)
 
-      A(1) = 0                                                          0001
-      DO 10 I = 1, SIZE                                                 0002
-         A(1) = A(1)+B(I)*C(I)                                          0003
-10       CONTINUE                                                       0004
+      A(1) = 0                                                          0012
+      DO 10 I = 1, SIZE                                                 0013
+         A(1) = A(1)+B(I)*C(I)                                          0014
+10       CONTINUE                                                       0015
 
       END
       SUBROUTINE DOTPROD(A, B, C)
@@ -45,10 +45,10 @@
       INTEGER I
       INTEGER*2 A(1:1), B(1:SIZE), C(1:SIZE)
 
-      A(1) = 0                                                          0001
-      DO 10 I = 1, SIZE                                                 0002
-         A(1) = A(1)+B(I)*C(I)                                          0003
-10       CONTINUE                                                       0004
+      A(1) = 0                                                          0012
+      DO 10 I = 1, SIZE                                                 0013
+         A(1) = A(1)+B(I)*C(I)                                          0014
+10       CONTINUE                                                       0015
 
       END
       SUBROUTINE DOTPROD(A, B, C)
@@ -58,11 +58,11 @@
       INTEGER I
       INTEGER*2 A(1:1), B(1:SIZE), C(1:SIZE)
 
-      A(1) = 0                                                          0001
-      DO 10 I = 1, 10000                                                0002
+      A(1) = 0                                                          0012
+      DO 10 I = 1, 10000                                                0013
          I_0 = B(I)*C(I)
-         A(1) = A(1)+I_0                                                0003
-10       CONTINUE                                                       0004
+         A(1) = A(1)+I_0                                                0014
+10       CONTINUE                                                       0015
 
       END
       SUBROUTINE DOTPROD(A, B, C)
@@ -72,7 +72,7 @@
       INTEGER LU_IND0, LU_IB0, LU_NUB0, I
       INTEGER*2 A(1:1), B(1:SIZE), C(1:SIZE)
 
-      A(1) = 0                                                          0001
+      A(1) = 0                                                          0012
       LU_NUB0 = 10000
       LU_IB0 = 0
       LU_IND0 = 0
@@ -81,22 +81,22 @@
 c SIMD_COMMENT_0
          I_0 = B(LU_IND0+1)*C(LU_IND0+1)
 c SIMD_COMMENT_1
-         A(1) = A(1)+I_0                                                0003
+         A(1) = A(1)+I_0                                                0014
 c SIMD_COMMENT_2
 c SIMD_COMMENT_0
          I_0 = B(LU_IND0+2)*C(LU_IND0+2)
 c SIMD_COMMENT_1
-         A(1) = A(1)+I_0                                                0003
+         A(1) = A(1)+I_0                                                0014
 c SIMD_COMMENT_2
 c SIMD_COMMENT_0
          I_0 = B(LU_IND0+3)*C(LU_IND0+3)
 c SIMD_COMMENT_1
-         A(1) = A(1)+I_0                                                0003
+         A(1) = A(1)+I_0                                                0014
 c SIMD_COMMENT_2
 c SIMD_COMMENT_0
          I_0 = B(LU_IND0+4)*C(LU_IND0+4)
 c SIMD_COMMENT_1
-         A(1) = A(1)+I_0                                                0003
+         A(1) = A(1)+I_0                                                0014
 c SIMD_COMMENT_2
 99998    CONTINUE
       I = 10001
@@ -109,7 +109,7 @@ c SIMD_COMMENT_2
       INTEGER LU_IND0, LU_IB0, LU_NUB0, I
       INTEGER*2 RED0(0:3), A(1:1), B(1:SIZE), C(1:SIZE)
 
-      A(1) = 0                                                          0001
+      A(1) = 0                                                          0012
       LU_NUB0 = 10000
       LU_IB0 = 0
       LU_IND0 = 0
@@ -122,22 +122,22 @@ c SIMD_COMMENT_2
 c SIMD_COMMENT_0
          I_0 = B(LU_IND0+1)*C(LU_IND0+1)
 c SIMD_COMMENT_1
-         RED0(0) = RED0(0)+I_0                                          0003
+         RED0(0) = RED0(0)+I_0                                          0014
 c SIMD_COMMENT_2
 c SIMD_COMMENT_0
          I_0 = B(LU_IND0+2)*C(LU_IND0+2)
 c SIMD_COMMENT_1
-         RED0(1) = RED0(1)+I_0                                          0003
+         RED0(1) = RED0(1)+I_0                                          0014
 c SIMD_COMMENT_2
 c SIMD_COMMENT_0
          I_0 = B(LU_IND0+3)*C(LU_IND0+3)
 c SIMD_COMMENT_1
-         RED0(2) = RED0(2)+I_0                                          0003
+         RED0(2) = RED0(2)+I_0                                          0014
 c SIMD_COMMENT_2
 c SIMD_COMMENT_0
          I_0 = B(LU_IND0+4)*C(LU_IND0+4)
 c SIMD_COMMENT_1
-         RED0(3) = RED0(3)+I_0                                          0003
+         RED0(3) = RED0(3)+I_0                                          0014
 c SIMD_COMMENT_2
 99998    CONTINUE
       A(1) = RED0(3)+RED0(2)+RED0(1)+RED0(0)+A(1)
@@ -151,7 +151,7 @@ c SIMD_COMMENT_2
       INTEGER LU_IND0, LU_IB0, LU_NUB0, I
       INTEGER*2 RED0(0:3), A(1:1), B(1:SIZE), C(1:SIZE)
 
-      A(1) = 0                                                          0001
+      A(1) = 0                                                          0012
 99999 CONTINUE
       RED0(0) = 0
       RED0(1) = 0
@@ -161,22 +161,22 @@ c SIMD_COMMENT_2
 c SIMD_COMMENT_0
          I_0 = B(LU_IND0+1)*C(LU_IND0+1)
 c SIMD_COMMENT_1
-         RED0(0) = RED0(0)+I_0                                          0003
+         RED0(0) = RED0(0)+I_0                                          0014
 c SIMD_COMMENT_2
 c SIMD_COMMENT_0
          I_0 = B(LU_IND0+2)*C(LU_IND0+2)
 c SIMD_COMMENT_1
-         RED0(1) = RED0(1)+I_0                                          0003
+         RED0(1) = RED0(1)+I_0                                          0014
 c SIMD_COMMENT_2
 c SIMD_COMMENT_0
          I_0 = B(LU_IND0+3)*C(LU_IND0+3)
 c SIMD_COMMENT_1
-         RED0(2) = RED0(2)+I_0                                          0003
+         RED0(2) = RED0(2)+I_0                                          0014
 c SIMD_COMMENT_2
 c SIMD_COMMENT_0
          I_0 = B(LU_IND0+4)*C(LU_IND0+4)
 c SIMD_COMMENT_1
-         RED0(3) = RED0(3)+I_0                                          0003
+         RED0(3) = RED0(3)+I_0                                          0014
 c SIMD_COMMENT_2
 99998    CONTINUE
       A(1) = RED0(3)+RED0(2)+RED0(1)+RED0(0)+A(1)
@@ -189,7 +189,7 @@ c SIMD_COMMENT_2
       INTEGER LU_IND0, LU_IB0, LU_NUB0, I
       INTEGER*2 RED0(0:3), A(1:1), B(1:SIZE), C(1:SIZE)
 
-      A(1) = 0                                                          0001
+      A(1) = 0                                                          0012
 99999 CONTINUE
       RED0(0) = 0
       RED0(1) = 0
@@ -199,22 +199,22 @@ c SIMD_COMMENT_2
 c SIMD_COMMENT_0
          I_03 = B(LU_IND0+1)*C(LU_IND0+1)
 c SIMD_COMMENT_1
-         RED0(0) = RED0(0)+I_03                                         0003
+         RED0(0) = RED0(0)+I_03                                         0014
 c SIMD_COMMENT_2
 c SIMD_COMMENT_0
          I_02 = B(LU_IND0+2)*C(LU_IND0+2)
 c SIMD_COMMENT_1
-         RED0(1) = RED0(1)+I_02                                         0003
+         RED0(1) = RED0(1)+I_02                                         0014
 c SIMD_COMMENT_2
 c SIMD_COMMENT_0
          I_01 = B(LU_IND0+3)*C(LU_IND0+3)
 c SIMD_COMMENT_1
-         RED0(2) = RED0(2)+I_01                                         0003
+         RED0(2) = RED0(2)+I_01                                         0014
 c SIMD_COMMENT_2
 c SIMD_COMMENT_0
          I_00 = B(LU_IND0+4)*C(LU_IND0+4)
 c SIMD_COMMENT_1
-         RED0(3) = RED0(3)+I_00                                         0003
+         RED0(3) = RED0(3)+I_00                                         0014
 c SIMD_COMMENT_2
 99998    CONTINUE
       A(1) = RED0(3)+RED0(2)+RED0(1)+RED0(0)+A(1)
@@ -230,7 +230,7 @@ c SIMD_COMMENT_2
      &, v4hi_vec4(0:3), v4hi_vec3(0:3), v4hi_vec2(0:3), v4hi_vec1(0:3
      &), v4hi_vec0(0:3), RED0(0:3), A(1:1), B(1:SIZE), C(1:SIZE)
 
-      A(1) = 0                                                          0001
+      A(1) = 0                                                          0012
 99999 CONTINUE
       RED0(0) = 0
       RED0(1) = 0
@@ -260,7 +260,7 @@ c SIMD_COMMENT_2
      &, v4hi_vec4(0:3), v4hi_vec3(0:3), v4hi_vec2(0:3), v4hi_vec1(0:3
      &), v4hi_vec0(0:3), RED0(0:3), A(1:1), B(1:SIZE), C(1:SIZE)
 
-      A(1) = 0                                                          0001
+      A(1) = 0                                                          0012
 99999 CONTINUE
       RED0(0) = 0
       RED0(1) = 0
@@ -288,7 +288,7 @@ c SIMD_COMMENT_2
      &, v4hi_vec4(0:3), v4hi_vec3(0:3), v4hi_vec2(0:3), v4hi_vec1(0:3
      &), v4hi_vec0(0:3), RED0(0:3), A(1:1), B(1:SIZE), C(1:SIZE)
 
-      A(1) = 0                                                          0001
+      A(1) = 0                                                          0012
 99999 CONTINUE
       RED0(0) = 0
       RED0(1) = 0
@@ -314,7 +314,7 @@ c SIMD_COMMENT_2
      &v4hi_vec1(0:3), v4hi_vec0(0:3), RED0(0:3), A(1:1), B(1:SIZE), C
      &(1:SIZE)
 
-      A(1) = 0                                                          0001
+      A(1) = 0                                                          0012
 99999 CONTINUE
       RED0(0) = 0
       RED0(1) = 0

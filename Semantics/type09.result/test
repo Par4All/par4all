@@ -8,20 +8,20 @@ C  T(R) {}
 
 C     Check float behavior after extensions to non-integer types
 
-      READ *, R                                                         0001
+      READ *, R                                                         0005
 
 C  T() {}
 
 
-      IF (R.GT.0.0.AND.R.LT.1.0) THEN                                   0002
+      IF (R.GT.0.0.AND.R.LT.1.0) THEN                                   0007
 
 C  T() {}
 
-         PRINT *, R                                                     0003
+         PRINT *, R                                                     0008
 
 C  T() {}
 
-         PRINT *, R                                                     0004
+         PRINT *, R                                                     0009
 c      else
 c         print *, r
 c         print *, r
@@ -46,20 +46,20 @@ C  P() {}
 
 C     Check float behavior after extensions to non-integer types
 
-      READ *, R                                                         0001
+      READ *, R                                                         0005
 
 C  P(R) {}
 
 
-      IF (R.GT.0.0.AND.R.LT.1.0) THEN                                   0002
+      IF (R.GT.0.0.AND.R.LT.1.0) THEN                                   0007
 
 C  P(R) {0.0<=R, R<=1.0}
 
-         PRINT *, R                                                     0003
+         PRINT *, R                                                     0008
 
 C  P(R) {0.0<=R, R<=1.0}
 
-         PRINT *, R                                                     0004
+         PRINT *, R                                                     0009
 c      else
 c         print *, r
 c         print *, r

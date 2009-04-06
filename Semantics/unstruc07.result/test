@@ -10,40 +10,40 @@ C     Check that desugared loop might be handled
 C  P() {}
 
 
-      READ *, N                                                         0001
+      READ *, N                                                         0007
 
 C  P(N) {}
 
-      I = 1                                                             0002
+      I = 1                                                             0009
 99999 CONTINUE
 
 C  P(I,N) {1<=I}
 
 
 C     DO loop  with exit had to be desugared
-      IF (I.GT.N) GOTO 200                                              0002
+      IF (I.GT.N) GOTO 200                                              0009
 
 C  P(I,N) {1<=I, I<=N}
 
-      A(I) = 0.                                                         0003
+      A(I) = 0.                                                         0010
 
 C  P(I,N) {1<=I, I<=N}
 
-      IF (A(I).LT.A(I-1)) GOTO 200                                      0004
+      IF (A(I).LT.A(I-1)) GOTO 200                                      0011
 
 C  P(I,N) {1<=I, I<=N}
 
-      I = I+1                                                           0002
+      I = I+1                                                           0009
       GOTO 99999
 
 C  P(I,N) {1<=I}
 
 
-200   CONTINUE                                                          0006
+200   CONTINUE                                                          0014
 
 C  P(I,N) {1<=I}
 
-      PRINT *, I, N                                                     0007
+      PRINT *, I, N                                                     0015
 
       END
 

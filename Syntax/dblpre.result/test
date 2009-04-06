@@ -5,5 +5,5 @@ C
 C     Francois Irigoin
       PROGRAM DBLPRE
       DOUBLE PRECISION X
-      X = 0.                                                            0001
+      X = 0.                                                            0008
       END

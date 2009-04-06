@@ -42,15 +42,15 @@ c     This is Fortran compatible. But a user error should be raised.
 C  T(K) {K==0}
 
 
-      K = 0                                                             0001
+      K = 0                                                             0007
 
 C  T(I) {}
 
-      DO I = 1, 10, K                                                   0002
+      DO I = 1, 10, K                                                   0008
 
 C  T() {}
 
-         T(I) = 0.                                                      0003
+         T(I) = 0.                                                      0009
       ENDDO
 
       END

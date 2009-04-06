@@ -8,37 +8,37 @@ C  T(I) {}
 
 C     Check integer behavior after extensions to non-integer types
 
-      READ *, I                                                         0001
+      READ *, I                                                         0005
 
 C  T(I) {I==0}
 
 
 ! known-in
 
-      I = 0                                                             0002
+      I = 0                                                             0009
 
 C  T(R) {0.5==R}
 
-      R = 0.5                                                           0003
+      R = 0.5                                                           0010
 
 C  T(D) {0.5D0==D}
 
-      D = 0.5D0                                                         0004
+      D = 0.5D0                                                         0011
 
 C  T() {}
 
 
 ! int gt lt
 
-      IF (I.GT.0) THEN                                                  0005
+      IF (I.GT.0) THEN                                                  0015
 
 C  T() {}
 
-         PRINT *, 'int gt int'                                          0006
+         PRINT *, 'int gt int'                                          0016
 
 C  T() {}
 
-         PRINT *, I                                                     0007
+         PRINT *, I                                                     0017
       ENDIF
 
       END
@@ -52,37 +52,37 @@ C  P() {}
 
 C     Check integer behavior after extensions to non-integer types
 
-      READ *, I                                                         0001
+      READ *, I                                                         0005
 
 C  P(I) {}
 
 
 ! known-in
 
-      I = 0                                                             0002
+      I = 0                                                             0009
 
 C  P(I) {I==0}
 
-      R = 0.5                                                           0003
+      R = 0.5                                                           0010
 
 C  P(I,R) {0.5==R, I==0}
 
-      D = 0.5D0                                                         0004
+      D = 0.5D0                                                         0011
 
 C  P(D,I,R) {0.5==R, 0.5D0==D, I==0}
 
 
 ! int gt lt
 
-      IF (I.GT.0) THEN                                                  0005
+      IF (I.GT.0) THEN                                                  0015
 
 C  P() {0==-1}
 
-         PRINT *, 'int gt int'                                          0006
+         PRINT *, 'int gt int'                                          0016
 
 C  P() {0==-1}
 
-         PRINT *, I                                                     0007
+         PRINT *, I                                                     0017
       ENDIF
 
       END

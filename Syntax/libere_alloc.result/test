@@ -82,7 +82,7 @@ c.. External Calls ..
 c 
 c ... Executable Statements ...
 c 
-      TROUVE = .FALSE.                                                  0001
+      TROUVE = .FALSE.                                                  0085
 c---
 c 1. Liberation de l'archivage 
 c---
@@ -94,41 +94,41 @@ c
 c
 c --> Si le pointeur est nul
 c
-      IF (T_PTR.EQ.0) THEN                                              0002
-         WRITE (6, 1010)                                                0003
-         CALL FINALLOC                                                  0004
-         CALL ARRET(198)                                                0005
-         STOP                                                           0006
+      IF (T_PTR.EQ.0) THEN                                              0097
+         WRITE (6, 1010)                                                0098
+         CALL FINALLOC                                                  0099
+         CALL ARRET(198)                                                0100
+         STOP                                                           0101
       ENDIF
-      IF (IT_ALLOC.GE.1.AND.IT_ALLOC.LE.3) THEN                         0007
-         NB = NB_ALLOC(IT_ALLOC)                                        0008
-         DO 10 I = 1, NB                                                0009
+      IF (IT_ALLOC.GE.1.AND.IT_ALLOC.LE.3) THEN                         0103
+         NB = NB_ALLOC(IT_ALLOC)                                        0104
+         DO 10 I = 1, NB                                                0105
 c
 c --------> Le pointeur est retrouve dans la table
 c
-            IF (T_PTR.EQ.TAB_ALLOC(I,IT_ALLOC)) THEN                    0010
-               TROUVE = .TRUE.                                          0011
-               ITO_ALLOC(IT_ALLOC) = ITO_ALLOC(IT_ALLOC)-SIZ_ALLOC(I,   0012
-     &         IT_ALLOC)                                                0012
-               DO 20 J = I, NB-1                                        0013
-                  TAB_ALLOC(J,IT_ALLOC) = TAB_ALLOC(J+1,IT_ALLOC)       0014
-                  SIZ_ALLOC(J,IT_ALLOC) = SIZ_ALLOC(J+1,IT_ALLOC)       0015
-                  NOM_ALLOC(J,IT_ALLOC) = NOM_ALLOC(J+1,IT_ALLOC)       0016
-20                CONTINUE                                              0017
+            IF (T_PTR.EQ.TAB_ALLOC(I,IT_ALLOC)) THEN                    0109
+               TROUVE = .TRUE.                                          0110
+               ITO_ALLOC(IT_ALLOC) = ITO_ALLOC(IT_ALLOC)-SIZ_ALLOC(I,   0111
+     &         IT_ALLOC)                                                0111
+               DO 20 J = I, NB-1                                        0113
+                  TAB_ALLOC(J,IT_ALLOC) = TAB_ALLOC(J+1,IT_ALLOC)       0114
+                  SIZ_ALLOC(J,IT_ALLOC) = SIZ_ALLOC(J+1,IT_ALLOC)       0115
+                  NOM_ALLOC(J,IT_ALLOC) = NOM_ALLOC(J+1,IT_ALLOC)       0116
+20                CONTINUE                                              0117
 c               TAB_ALLOC(NB,IT_ALLOC) = 0
 c               SIZ_ALLOC(NB,IT_ALLOC) = 0
 c               NOM_ALLOC(NB,IT_ALLOC) = ''
-               NB_ALLOC(IT_ALLOC) = NB_ALLOC(IT_ALLOC)-1                0018
+               NB_ALLOC(IT_ALLOC) = NB_ALLOC(IT_ALLOC)-1                0121
             ENDIF
-10          CONTINUE                                                    0019
+10          CONTINUE                                                    0123
       ENDIF
 c
 c --> Le pointeur n'a pas ete retrouve dans la table
 c
-      IF (.NOT.TROUVE) THEN                                             0020
-         WRITE (6, 1020) T_PTR                                          0021
-         CALL FINALLOC                                                  0022
-         STOP                                                           0023
+      IF (.NOT.TROUVE) THEN                                             0128
+         WRITE (6, 1020) T_PTR                                          0129
+         CALL FINALLOC                                                  0130
+         STOP                                                           0131
       ENDIF
       END
 

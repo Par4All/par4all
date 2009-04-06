@@ -8,16 +8,16 @@ C  P() {}
 
 C  P() {}
 
-      I = 2                                                             0001
+      I = 2                                                             0005
 
 C  P(I) {I==2}
 
-      PRINT *, I, J                                                     0002
+      PRINT *, I, J                                                     0006
 
 C  P(I) {I==2}
 
 
-      CALL BLA2(I)                                                      0003
+      CALL BLA2(I)                                                      0008
       END
 
 C  P() {I==2}
@@ -28,6 +28,6 @@ C  P() {I==2}
 
 C  P() {I==2}
 
-      PRINT *, I                                                        0001
+      PRINT *, I                                                        0004
       END
 

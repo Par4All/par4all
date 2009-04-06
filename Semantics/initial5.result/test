@@ -13,7 +13,7 @@ C     but it *does* work. Why?
 
       COMMON /FOO/I
 
-      PRINT *, I                                                        0001
+      PRINT *, I                                                        0008
 
       END
 
@@ -41,6 +41,6 @@ C     but it *does* work. Why?
 C  P() {I==1}
 
 
-      PRINT *, I                                                        0001
+      PRINT *, I                                                        0008
 
       END

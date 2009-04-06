@@ -62,7 +62,7 @@ PRINTED_FILE made for ENTRY19.
       SUBROUTINE ENTRY19(N)
       INTEGER N
 
-      PRINT *, N                                                        0001
+      PRINT *, N                                                        0005
 
 
       END

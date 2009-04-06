@@ -4,16 +4,16 @@
 C               <must be read   >: I J
 C               <must be written>: F
 
-      F(I:J) = 'arthur'                                                 0001
+      F(I:J) = 'arthur'                                                 0005
 C               <must be read   >: F I J
 C               <must be written>: G
-      G = F(I:J)                                                        0002
+      G = F(I:J)                                                        0006
 C               <must be read   >: I J __IO_EFFECTS:LUNS(5)
 C               <must be written>: F __IO_EFFECTS:LUNS(5)
 
-      READ *, F(I:J)                                                    0003
+      READ *, F(I:J)                                                    0008
 C               <must be read   >: F I J __IO_EFFECTS:LUNS(6)
 C               <must be written>: __IO_EFFECTS:LUNS(6)
-      PRINT *, F(I:J)                                                   0004
+      PRINT *, F(I:J)                                                   0009
 
       END

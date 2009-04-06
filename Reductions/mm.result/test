@@ -7,44 +7,44 @@ c square matrix multiplication
       PARAMETER (N=10)
       REAL*8 A(N,N), B(N,N), C(N,N)
       INTEGER I, J, K
-      DO J = 1, N                                                       0001
-         DO I = 1, N                                                    0002
-            A(I,J) = REAL(I-N/2)/REAL(J)                                0003
-            B(I,J) = REAL(J-3)/REAL(I)                                  0004
+      DO J = 1, N                                                       0007
+         DO I = 1, N                                                    0008
+            A(I,J) = REAL(I-N/2)/REAL(J)                                0009
+            B(I,J) = REAL(J-3)/REAL(I)                                  0010
          ENDDO
       ENDDO
 c
 c matrix multiply: C=A*B
 c
-      DO J = 1, N                                                       0005
-         DO I = 1, N                                                    0006
-            C(I,J) = 0.                                                 0007
-            DO K = 1, N                                                 0008
+      DO J = 1, N                                                       0016
+         DO I = 1, N                                                    0017
+            C(I,J) = 0.                                                 0018
+            DO K = 1, N                                                 0019
 !  call sum[C(I,J)],
-               C(I,J) = C(I,J)+A(I,K)*B(K,J)                            0009
+               C(I,J) = C(I,J)+A(I,K)*B(K,J)                            0020
             ENDDO
          ENDDO
       ENDDO
 c
 c again..
 c
-      DO J = 1, N                                                       0010
-         DO I = 1, N                                                    0011
-            C(I,J) = 0.                                                 0012
+      DO J = 1, N                                                       0027
+         DO I = 1, N                                                    0028
+            C(I,J) = 0.                                                 0029
          ENDDO
       ENDDO
-      DO K = 1, N                                                       0013
-         DO J = 1, N                                                    0014
-            DO I = 1, N                                                 0015
+      DO K = 1, N                                                       0032
+         DO J = 1, N                                                    0033
+            DO I = 1, N                                                 0034
 !  call sum[C(I,J)],
-               C(I,J) = C(I,J)+A(I,K)*B(K,J)                            0016
+               C(I,J) = C(I,J)+A(I,K)*B(K,J)                            0035
             ENDDO
          ENDDO
       ENDDO
 c
 c output of the result
 c
-      PRINT *, ((C(I,J), I = 1, N), J = 1, N)                           0017
+      PRINT *, ((C(I,J), I = 1, N), J = 1, N)                           0042
       END
 
 Print code with cumulated reductions
@@ -55,46 +55,46 @@ c square matrix multiplication
       PARAMETER (N=10)
       REAL*8 A(N,N), B(N,N), C(N,N)
       INTEGER I, J, K
-      DO J = 1, N                                                       0001
-         DO I = 1, N                                                    0002
-            A(I,J) = REAL(I-N/2)/REAL(J)                                0003
-            B(I,J) = REAL(J-3)/REAL(I)                                  0004
+      DO J = 1, N                                                       0007
+         DO I = 1, N                                                    0008
+            A(I,J) = REAL(I-N/2)/REAL(J)                                0009
+            B(I,J) = REAL(J-3)/REAL(I)                                  0010
          ENDDO
       ENDDO
 c
 c matrix multiply: C=A*B
 c
-      DO J = 1, N                                                       0005
-         DO I = 1, N                                                    0006
-            C(I,J) = 0.                                                 0007
+      DO J = 1, N                                                       0016
+         DO I = 1, N                                                    0017
+            C(I,J) = 0.                                                 0018
 !  loop sum[C(I,J)],
-            DO K = 1, N                                                 0008
+            DO K = 1, N                                                 0019
 !  call sum[C(I,J)],
-               C(I,J) = C(I,J)+A(I,K)*B(K,J)                            0009
+               C(I,J) = C(I,J)+A(I,K)*B(K,J)                            0020
             ENDDO
          ENDDO
       ENDDO
 c
 c again..
 c
-      DO J = 1, N                                                       0010
-         DO I = 1, N                                                    0011
-            C(I,J) = 0.                                                 0012
+      DO J = 1, N                                                       0027
+         DO I = 1, N                                                    0028
+            C(I,J) = 0.                                                 0029
          ENDDO
       ENDDO
 !  loop sum[C(*,*)],
-      DO K = 1, N                                                       0013
+      DO K = 1, N                                                       0032
 !  loop sum[C(*,*)],
-         DO J = 1, N                                                    0014
+         DO J = 1, N                                                    0033
 !  loop sum[C(*,J)],
-            DO I = 1, N                                                 0015
+            DO I = 1, N                                                 0034
 !  call sum[C(I,J)],
-               C(I,J) = C(I,J)+A(I,K)*B(K,J)                            0016
+               C(I,J) = C(I,J)+A(I,K)*B(K,J)                            0035
             ENDDO
          ENDDO
       ENDDO
 c
 c output of the result
 c
-      PRINT *, ((C(I,J), I = 1, N), J = 1, N)                           0017
+      PRINT *, ((C(I,J), I = 1, N), J = 1, N)                           0042
       END

@@ -8,21 +8,21 @@ C     I is indirectly modified by many procedures via a hidden common
 C  T(PRINTI:I) {PRINTI:I==0}
 
 
-      CALL INIT                                                         0001
+      CALL INIT                                                         0005
 
 C  T(PRINTI:I) {PRINTI:I==PRINTI:I#init+1}
 
 
-      CALL INCR(1)                                                      0002
+      CALL INCR(1)                                                      0007
 
 C  T(PRINTI:I) {PRINTI:I==2PRINTI:I#init}
 
 
-      CALL DOUBLE                                                       0003
+      CALL DOUBLE                                                       0009
 
 C  T() {}
 
 
-      CALL PRINTI                                                       0004
+      CALL PRINTI                                                       0011
 
       END

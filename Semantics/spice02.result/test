@@ -9,6 +9,6 @@ C  T(KSIZE) {KSIZE==MAXSIZE}
 
 C     This is not smart but could be programmed
 
-      KSIZE = MAXSIZE                                                   0001
+      KSIZE = MAXSIZE                                                   0006
 
       END

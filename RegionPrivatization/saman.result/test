@@ -2,18 +2,18 @@ saman code
       PROGRAM SAMAN
       INTEGER I,J, N, WORK(100), A(200)
 
-      N = 50                                                            0001
+      N = 50                                                            0004
 
-      DO J = 1, 100                                                     0002
-         WORK(J) = 0                                                    0003
+      DO J = 1, 100                                                     0006
+         WORK(J) = 0                                                    0007
       ENDDO
 
-      DO J = 1, 200                                                     0004
-         DO I = 1, N                                                    0005
-            WORK(I) = I+J                                               0006
+      DO J = 1, 200                                                     0010
+         DO I = 1, N                                                    0011
+            WORK(I) = I+J                                               0012
          ENDDO
-         DO I = 1, 2*N                                                  0007
-            A(J) = WORK(I)                                              0008
+         DO I = 1, 2*N                                                  0014
+            A(J) = WORK(I)                                              0015
          ENDDO
       ENDDO
       END
@@ -21,16 +21,16 @@ saman RW must regions
       PROGRAM SAMAN
       INTEGER I,J, N, WORK(100), A(200)
 
-      N = 50                                                            0001
+      N = 50                                                            0004
 
 C  <WORK(PHI1)-W-EXACT-{1<=PHI1, PHI1<=100, N==50}>
 
 
-      DO J = 1, 100                                                     0002
+      DO J = 1, 100                                                     0006
 
 C  <WORK(PHI1)-W-EXACT-{PHI1==J, N==50, 1<=J, J<=100}>
 
-         WORK(J) = 0                                                    0003
+         WORK(J) = 0                                                    0007
       ENDDO
 
 C  <A(PHI1)-W-EXACT-{1<=PHI1, PHI1<=200, N==50}>
@@ -38,26 +38,26 @@ C  <WORK(PHI1)-R-EXACT-{1<=PHI1, PHI1<=100, N==50}>
 C  <WORK(PHI1)-W-EXACT-{1<=PHI1, PHI1<=50, N==50}>
 
 
-      DO J = 1, 200                                                     0004
+      DO J = 1, 200                                                     0010
 
 C  <WORK(PHI1)-W-EXACT-{1<=PHI1, PHI1<=50, N==50, 1<=J, J<=200}>
 
-         DO I = 1, N                                                    0005
+         DO I = 1, N                                                    0011
 
 C  <WORK(PHI1)-W-EXACT-{PHI1==I, N==50, 1<=I, I<=50, 1<=J, J<=200}>
 
-            WORK(I) = I+J                                               0006
+            WORK(I) = I+J                                               0012
          ENDDO
 
 C  <A(PHI1)-W-EXACT-{PHI1==J, N==50, 1<=J, J<=200}>
 C  <WORK(PHI1)-R-EXACT-{1<=PHI1, PHI1<=100, N==50, 1<=J, J<=200}>
 
-         DO I = 1, 2*N                                                  0007
+         DO I = 1, 2*N                                                  0014
 
 C  <A(PHI1)-W-EXACT-{PHI1==J, N==50, 1<=I, I<=100, 1<=J, J<=200}>
 C  <WORK(PHI1)-R-EXACT-{PHI1==I, N==50, 1<=I, I<=100, 1<=J, J<=200}>
 
-            A(J) = WORK(I)                                              0008
+            A(J) = WORK(I)                                              0015
          ENDDO
       ENDDO
       END
@@ -65,27 +65,27 @@ saman in regions
       PROGRAM SAMAN
       INTEGER I,J, N, WORK(100), A(200)
 
-      N = 50                                                            0001
+      N = 50                                                            0004
 
-      DO J = 1, 100                                                     0002
-         WORK(J) = 0                                                    0003
+      DO J = 1, 100                                                     0006
+         WORK(J) = 0                                                    0007
       ENDDO
 
 C  <WORK(PHI1)-IN-EXACT-{51<=PHI1, PHI1<=100, N==50}>
 
 
-      DO J = 1, 200                                                     0004
-         DO I = 1, N                                                    0005
-            WORK(I) = I+J                                               0006
+      DO J = 1, 200                                                     0010
+         DO I = 1, N                                                    0011
+            WORK(I) = I+J                                               0012
          ENDDO
 
 C  <WORK(PHI1)-IN-EXACT-{1<=PHI1, PHI1<=100, N==50, 1<=J, J<=200}>
 
-         DO I = 1, 2*N                                                  0007
+         DO I = 1, 2*N                                                  0014
 
 C  <WORK(PHI1)-IN-EXACT-{PHI1==I, N==50, 1<=I, I<=100, 1<=J, J<=200}>
 
-            A(J) = WORK(I)                                              0008
+            A(J) = WORK(I)                                              0015
          ENDDO
       ENDDO
       END
@@ -93,30 +93,30 @@ saman out regions
       PROGRAM SAMAN
       INTEGER I,J, N, WORK(100), A(200)
 
-      N = 50                                                            0001
+      N = 50                                                            0004
 
 C  <WORK(PHI1)-OUT-EXACT-{51<=PHI1, PHI1<=100, N==50}>
 
 
-      DO J = 1, 100                                                     0002
+      DO J = 1, 100                                                     0006
 
 C  <WORK(PHI1)-OUT-EXACT-{J==PHI1, 51<=PHI1, N==50, J<=100}>
 
-         WORK(J) = 0                                                    0003
+         WORK(J) = 0                                                    0007
       ENDDO
 
-      DO J = 1, 200                                                     0004
+      DO J = 1, 200                                                     0010
 
 C  <WORK(PHI1)-OUT-EXACT-{1<=PHI1, PHI1<=50, N==50, 1<=J, J<=200}>
 
-         DO I = 1, N                                                    0005
+         DO I = 1, N                                                    0011
 
 C  <WORK(PHI1)-OUT-EXACT-{I==PHI1, N==50, 1<=I, I<=50, 1<=J, J<=200}>
 
-            WORK(I) = I+J                                               0006
+            WORK(I) = I+J                                               0012
          ENDDO
-         DO I = 1, 2*N                                                  0007
-            A(J) = WORK(I)                                              0008
+         DO I = 1, 2*N                                                  0014
+            A(J) = WORK(I)                                              0015
          ENDDO
       ENDDO
       END
@@ -132,31 +132,31 @@ C  <WORK(PHI1)-PRIVATE-EXACT-{1<=PHI1, PHI1<=100}>
 
 C     BEGIN BLOCK
 
-      N = 50                                                            0001
+      N = 50                                                            0004
 
-      DO J = 1, 100                                                     0002
+      DO J = 1, 100                                                     0006
          PRIVATE J
-         WORK(J) = 0                                                    0003
+         WORK(J) = 0                                                    0007
       ENDDO
 
-      DO J = 1, 200                                                     0004
+      DO J = 1, 200                                                     0010
          PRIVATE I,J,WORK(1:100)
 
 C  <I-PRIVATE-EXACT-{}>
 C  <WORK(PHI1)-PRIVATE-EXACT-{1<=PHI1, PHI1<=50, N==50, 1<=J, J<=200}>
 
 C        BEGIN BLOCK
-         DO I = 1, N                                                    0005
+         DO I = 1, N                                                    0011
             PRIVATE I
-            WORK(I) = I+J                                               0006
+            WORK(I) = I+J                                               0012
          ENDDO
-         DO I = 1, 2*N                                                  0007
+         DO I = 1, 2*N                                                  0014
             PRIVATE A(1:200),I
 
 C  <A(PHI1)-PRIVATE-EXACT-{PHI1==J, N==50, 1<=I, I<=100, 1<=J,
 C    J<=200}>
 
-            A(J) = WORK(I)                                              0008
+            A(J) = WORK(I)                                              0015
          ENDDO
 C        END BLOCK
       ENDDO

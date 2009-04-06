@@ -5,7 +5,7 @@ Module ENTRY01
       INTEGER N
       COMPLEX*8 X(1:N)
 
-      PRINT *, X(1)                                                     0001
+      PRINT *, X(1)                                                     0009
 
 
       END
@@ -16,17 +16,17 @@ Entry INCREMENT
       INTEGER M
       CHARACTER Y(1:M)
 
-99999 CONTINUE                                                          0001
+99999 CONTINUE                                                          0005
 
-      PRINT *, Y(2)                                                     0002
+      PRINT *, Y(2)                                                     0007
 
-      M = M+1                                                           0003
+      M = M+1                                                           0009
 
-99998 CONTINUE                                                          0004
+99998 CONTINUE                                                          0011
 
-      PRINT *, Y(3)                                                     0005
+      PRINT *, Y(3)                                                     0013
 
-      M = M-1                                                           0006
+      M = M-1                                                           0015
 
       END
 
@@ -36,10 +36,10 @@ Entry INCREMENT
       INTEGER M
       CHARACTER Y(1:M)
 
-99998 CONTINUE                                                          0001
+99998 CONTINUE                                                          0005
 
-      PRINT *, Y(3)                                                     0002
+      PRINT *, Y(3)                                                     0007
 
-      M = M-1                                                           0003
+      M = M-1                                                           0009
 
       END

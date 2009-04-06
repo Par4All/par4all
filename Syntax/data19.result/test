@@ -23,7 +23,7 @@ C ---- CAVITE GV3 -----
 C ---- BARILLET -----
      7            15,30,45, 0 /
 
-      PRINT *, IELEXT                                                   0001
+      PRINT *, IELEXT                                                   0023
 
       END
 
@@ -47,6 +47,6 @@ C ---- BARILLET -----
      &48, 48, 42, 41, 43, 42, 44, 43, 45, 44, 49, 1, 10, 11, 16, 25, 
      &26, 31, 40, 41, 15, 30, 45, 0/
 
-      PRINT *, IELEXT                                                   0001
+      PRINT *, IELEXT                                                   0023
 
       END

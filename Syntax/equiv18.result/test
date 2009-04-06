@@ -76,9 +76,9 @@ C     w=4
 
       COMMON /FOO/ X, U
 
-      X(1) = Y+W(10)                                                    0001
+      X(1) = Y+W(10)                                                    0017
 
-      PRINT *, U, Y                                                     0002
+      PRINT *, U, Y                                                     0019
 
       END
 Deletion of obsolete resources:

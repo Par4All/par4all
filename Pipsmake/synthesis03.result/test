@@ -14,9 +14,9 @@ c     whose type should be derived
 
       CHARACTER*80 S
 
-      CALL FOO(X, I, C, S)                                              0001
+      CALL FOO(X, I, C, S)                                              0014
 
-      C = BAR(I+1)                                                      0002
+      C = BAR(I+1)                                                      0016
 
       END
 

@@ -13,14 +13,14 @@ C  T(S1) {}
 
 C     Cannot be expressed as a transformer because a subtring operator
 C     is implictly applied
-      S1 = S2                                                           0001
+      S1 = S2                                                           0010
 
 C  T(S2) {S1==S2}
 
 
 C     Can be expressed as a transformer because a padding SPACEs
 C     are implictly added and are not considered in string comparisons
-      S2 = S1                                                           0002
+      S2 = S1                                                           0014
 
       END
 

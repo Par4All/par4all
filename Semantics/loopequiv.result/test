@@ -15,43 +15,43 @@ C     directly or indirectly the value of the upper bound expression
 C  P() {K==L}
 
 
-      DO I = I+1, M                                                     0001
+      DO I = I+1, M                                                     0012
 
 C  P(I) {K==L}
 
-         T(I) = 0.                                                      0002
+         T(I) = 0.                                                      0013
       ENDDO
 
 C  P(I) {K==L}
 
 
-      DO I = I+1, N+L                                                   0003
+      DO I = I+1, N+L                                                   0016
 
 C  P(I,K) {K==L}
 
-         K = 2                                                          0004
+         K = 2                                                          0017
 
 C  P(I,K) {K==2, L==2}
 
-         T(I) = 0.                                                      0005
+         T(I) = 0.                                                      0018
       ENDDO
 
 C  P(I,K) {K==L}
 
 
-      DO I = I+1, N                                                     0006
+      DO I = I+1, N                                                     0021
 
 C  P(I,K,N) {K==L}
 
-         N = 0                                                          0007
+         N = 0                                                          0022
 
 C  P(I,K,N) {K==L, N==0}
 
-         T(I) = 0.                                                      0008
+         T(I) = 0.                                                      0023
       ENDDO
 
 C  P(I,K,N) {K==L}
 
 
-      PRINT *, I, N, M, K, L                                            0009
+      PRINT *, I, N, M, K, L                                            0026
       END

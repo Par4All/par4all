@@ -1,7 +1,7 @@
 --- Regions for UNREACH
 c       regions of unreachable statements
 	PROGRAM UNREACH
-      I = 2                                                             0001
-10    CONTINUE                                                          0002
+      I = 2                                                             0003
+10    CONTINUE                                                          0004
       GOTO 10
       END

@@ -64,9 +64,9 @@ PRINTED_FILE made for ENTRY20.
       SUBROUTINE ENTRY20(N)
       INTEGER N
 
-      M = 0                                                             0001
+      M = 0                                                             0013
 
-      PRINT *, N                                                        0002
+      PRINT *, N                                                        0015
 
 
       END

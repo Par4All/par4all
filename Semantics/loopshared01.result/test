@@ -9,62 +9,62 @@ C  T(N) {N==0}
 C     Check conformance with Fortran standard, section 11.10, pp. 11-5,
 C     11-9
 
-      N = 0                                                             0001
+      N = 0                                                             0006
 
 C  T(I,J,K,L,N) {5I+N#init==N+5, N#init<=N}
 
-      DO 100 I = 1, 10                                                  0002
+      DO 100 I = 1, 10                                                  0007
 
 C  T(J) {I==J}
 
-         J = I                                                          0003
+         J = I                                                          0008
 
 C  T(K,L,N) {K+N#init==N+1, N#init<=N}
 
-         DO 100 K = 1, 5                                                0004
+         DO 100 K = 1, 5                                                0009
 
 C  T(L) {K==L}
 
-            L = K                                                       0005
+            L = K                                                       0010
 
 C  T(N) {N==N#init+1}
 
-100         N = N+1                                                     0006
+100         N = N+1                                                     0011
 
 C  T() {}
 
 
-      PRINT *, I, J, K, L, N                                            0007
+      PRINT *, I, J, K, L, N                                            0013
 
 C  T(N) {N==0}
 
 
-      N = 0                                                             0008
+      N = 0                                                             0015
 
 C  T(I,J,K) {1<=I}
 
-      DO 200 I = 1, 10                                                  0009
+      DO 200 I = 1, 10                                                  0016
 
 C  T(J) {I==J}
 
-         J = I                                                          0010
+         J = I                                                          0017
 
 C  T(K,L,N) {K+N#init==N+5, N#init<=N}
 
-         DO 200 K = 5, 1                                                0011
+         DO 200 K = 5, 1                                                0018
 
 C  T(L) {K==L}
 
-            L = K                                                       0012
+            L = K                                                       0019
 
 C  T(N) {N==N#init+1}
 
-200         N = N+1                                                     0013
+200         N = N+1                                                     0020
 
 C  T() {}
 
 
-      PRINT *, I, J, K, L, N                                            0014
+      PRINT *, I, J, K, L, N                                            0022
 
       END
 
@@ -78,63 +78,63 @@ C  P() {}
 C     Check conformance with Fortran standard, section 11.10, pp. 11-5,
 C     11-9
 
-      N = 0                                                             0001
+      N = 0                                                             0006
 
 C  P(N) {N==0}
 
-      DO 100 I = 1, 10                                                  0002
+      DO 100 I = 1, 10                                                  0007
 
 C  P(I,J,K,L,N) {5I==N+5, 1<=I, I<=10}
 
-         J = I                                                          0003
+         J = I                                                          0008
 
 C  P(I,J,K,L,N) {I==J, 5I==N+5, 1<=I, I<=10}
 
-         DO 100 K = 1, 5                                                0004
+         DO 100 K = 1, 5                                                0009
 
 C  P(I,J,K,L,N) {I==J, 5I+K==N+6, 1<=I, I<=10, 5I<=N+5, 1<=K, K<=5}
 
-            L = K                                                       0005
+            L = K                                                       0010
 
 C  P(I,J,K,L,N) {I==J, 5I+K==N+6, K==L, 1<=I, I<=10, 5I<=N+5, 1<=K,
 C    K<=5}
 
-100         N = N+1                                                     0006
+100         N = N+1                                                     0011
 
 C  P(I,J,K,L,N) {I==11, J==10, K==6, L==5, N==50}
 
 
-      PRINT *, I, J, K, L, N                                            0007
+      PRINT *, I, J, K, L, N                                            0013
 
 C  P(I,J,K,L,N) {I==11, J==10, K==6, L==5, N==50}
 
 
-      N = 0                                                             0008
+      N = 0                                                             0015
 
 C  P(I,J,K,L,N) {I==11, J==10, K==6, L==5, N==0}
 
-      DO 200 I = 1, 10                                                  0009
+      DO 200 I = 1, 10                                                  0016
 
 C  P(I,J,K,L,N) {L==5, N==0, 1<=I, I<=10}
 
-         J = I                                                          0010
+         J = I                                                          0017
 
 C  P(I,J,K,L,N) {I==J, L==5, N==0, 1<=I, I<=10}
 
-         DO 200 K = 5, 1                                                0011
+         DO 200 K = 5, 1                                                0018
 
 C  P() {0==-1}
 
-            L = K                                                       0012
+            L = K                                                       0019
 
 C  P() {0==-1}
 
-200         N = N+1                                                     0013
+200         N = N+1                                                     0020
 
 C  P(I,J,K,L,N) {I==11, J==10, K==5, L==5, N==0}
 
 
-      PRINT *, I, J, K, L, N                                            0014
+      PRINT *, I, J, K, L, N                                            0022
 
       END
 

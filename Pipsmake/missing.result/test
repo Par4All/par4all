@@ -28,7 +28,7 @@ Request: build resource PRINTED_FILE for module CALLMISSING.
 PRINTED_FILE made for CALLMISSING.
       PROGRAM CALLMISSING
 
-      CALL MISSING(3)                                                   0001
+      CALL MISSING(3)                                                   0003
 
       END
 Deletion of obsolete resources:

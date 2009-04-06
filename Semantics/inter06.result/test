@@ -51,7 +51,7 @@ C  T(I) {I==I#init+1}
 
 C  T(I) {I==I#init+1}
 
-      I = I+1                                                           0001
+      I = I+1                                                           0003
       END
 
 C  T() {}
@@ -66,12 +66,12 @@ C     dumps: the type mismatch is detected and a warning is issued.
 C     Floating point scalar variables are not analyzed, this is the
 C     difference with inter02
 
-      CALL INCR(X)                                                      0001
+      CALL INCR(X)                                                      0008
 
 C  T() {}
 
 
-      PRINT *, X                                                        0002
+      PRINT *, X                                                        0010
 
       END
 Selecting rule: PRINT_CODE_PRECONDITIONS
@@ -105,7 +105,7 @@ C  P() {}
 
 C  P() {}
 
-      I = I+1                                                           0001
+      I = I+1                                                           0003
       END
 
 C  P() {}
@@ -120,12 +120,12 @@ C     dumps: the type mismatch is detected and a warning is issued.
 C     Floating point scalar variables are not analyzed, this is the
 C     difference with inter02
 
-      CALL INCR(X)                                                      0001
+      CALL INCR(X)                                                      0008
 
 C  P() {}
 
 
-      PRINT *, X                                                        0002
+      PRINT *, X                                                        0010
 
       END
 Deletion of obsolete resources:

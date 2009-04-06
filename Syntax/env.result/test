@@ -31,9 +31,9 @@ c      subroutine env
 
 C     Name conflicts between subroutines, functions, main and commons
 
-      CALL FOO                                                          0001
+      CALL FOO                                                          0006
 
-      CALL BAR                                                          0002
+      CALL BAR                                                          0008
 
       END
 Deletion of obsolete resources:
@@ -78,9 +78,9 @@ c      program env
 
 C     Name onflicts between subroutines, functions, main and commons
 
-      CALL FOO                                                          0001
+      CALL FOO                                                          0006
 
-      CALL BAR                                                          0002
+      CALL BAR                                                          0008
 
       END
 Deletion of obsolete resources:
@@ -151,8 +151,8 @@ PRINTED_FILE made for FOO.
       COMMON /ENV/ A(10), B(10)
       COMMON /BAR/ X, Y
 
-      DO I = 1, 10                                                      0001
-         A(I) = 0.                                                      0002
+      DO I = 1, 10                                                      0006
+         A(I) = 0.                                                      0007
       ENDDO
 
       END
@@ -211,13 +211,13 @@ c      subroutine env
 
 C     Name conflicts between subroutines, functions, main and commons
 
-      CALL FOO                                                          0001
+      CALL FOO                                                          0006
 
 C  <BAR:A(PHI1)-R-EXACT-{1<=PHI1, PHI1<=10}>
 C  <BAR:B(PHI1)-W-EXACT-{1<=PHI1, PHI1<=10}>
 
 
-      CALL BAR                                                          0002
+      CALL BAR                                                          0008
 
       END
 Deletion of obsolete resources:
@@ -261,8 +261,8 @@ PRINTED_FILE made for BAR.
       SUBROUTINE BAR
       COMMON /ENV/A(10), B(10)
 
-      DO I = 1, 10                                                      0001
-         B(I) = A(I)                                                    0002
+      DO I = 1, 10                                                      0005
+         B(I) = A(I)                                                    0006
       ENDDO
 
       END
@@ -281,8 +281,8 @@ PRINTED_FILE made for FOO.
       COMMON /ENV/ A(10), B(10)
       COMMON /BAR/ X, Y
 
-      DO I = 1, 10                                                      0001
-         A(I) = 0.                                                      0002
+      DO I = 1, 10                                                      0006
+         A(I) = 0.                                                      0007
       ENDDO
 
       END
@@ -328,8 +328,8 @@ PRINTED_FILE made for FOO.
       COMMON /ENV/ A(10), B(10)
       COMMON /BAR/ X, Y
 
-      DO I = 1, 10                                                      0001
-         A(I) = 0.                                                      0002
+      DO I = 1, 10                                                      0006
+         A(I) = 0.                                                      0007
       ENDDO
 
       END
@@ -347,8 +347,8 @@ PRINTED_FILE made for BAR.
       SUBROUTINE BAR
       COMMON /ENV/A(10), B(10)
 
-      DO I = 1, 10                                                      0001
-         B(I) = A(I)                                                    0002
+      DO I = 1, 10                                                      0005
+         B(I) = A(I)                                                    0006
       ENDDO
 
       END

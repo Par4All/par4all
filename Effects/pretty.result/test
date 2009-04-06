@@ -7,10 +7,10 @@ C                                  FOO:GAMMA
 
 c     Check prettyprinting of effects
 
-      CALL FOO                                                          0001
+      CALL FOO                                                          0005
 C               <must be written>: BAR:ALPHA BAR:BETA BAR:DELTA 
 C                                  BAR:GAMMA
 
-      CALL BAR                                                          0002
+      CALL BAR                                                          0007
 
       END

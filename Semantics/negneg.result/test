@@ -8,21 +8,21 @@ C     Test of .NE. handling in the false branch
 C  P() {}
 
 
-      IF (I.NE.J) THEN                                                  0001
+      IF (I.NE.J) THEN                                                  0005
 
 C  P() {}
 
-         I = J                                                          0002
+         I = J                                                          0006
       ELSE
 
 C  P() {I==J}
 
-         K = 3                                                          0003
+         K = 3                                                          0008
       ENDIF
 
 C  P(I,K) {I==J}
 
 
-      PRINT *, I, J, K                                                  0004
+      PRINT *, I, J, K                                                  0011
 
       END

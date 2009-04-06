@@ -10,17 +10,17 @@ C     When F is called first, MakeAtom understands "call g(f)" as call "g(f())"
 
       EXTERNAL F
 
-      CALL G(F)                                                         0001
+      CALL G(F)                                                         0010
 
-      CALL F(I, J)                                                      0002
+      CALL F(I, J)                                                      0012
 
-      CALL H                                                            0003
+      CALL H                                                            0014
 
       END
 
       SUBROUTINE F(I)
 
-      PRINT *, I                                                        0001
+      PRINT *, I                                                        0004
 
       END
 
@@ -28,12 +28,12 @@ Main parsed last
 
 
       SUBROUTINE H
-      STOP                                                              0001
+      STOP                                                              0003
       END
 
       SUBROUTINE F(I)
 
-      PRINT *, I                                                        0001
+      PRINT *, I                                                        0004
 
       END
       PROGRAM EXTERNAL07
@@ -45,10 +45,10 @@ C     When F is called first, MakeAtom understands "call g(f)" as call "g(f())"
 
       EXTERNAL F
 
-      CALL G(F)                                                         0001
+      CALL G(F)                                                         0010
 
-      CALL F(I, J)                                                      0002
+      CALL F(I, J)                                                      0012
 
-      CALL H                                                            0003
+      CALL H                                                            0014
 
       END

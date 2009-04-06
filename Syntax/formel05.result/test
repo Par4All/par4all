@@ -3,10 +3,10 @@
       INTEGER UN
       PARAMETER (UN=1)
 
-      J = UN                                                            0001
-      I = C(UN)                                                         0002
+      J = UN                                                            0006
+      I = C(UN)                                                         0007
 c      I = C(1)
-      CALL FOO(C)                                                       0003
+      CALL FOO(C)                                                       0009
 
       END
 

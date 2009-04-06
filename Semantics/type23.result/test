@@ -13,7 +13,7 @@ C  T(S) {"Hello World!"==S}
 
 
 C     Should not be truncated since the actual lenght of s is unknown
-      S = "Hello World!"                                                0001
+      S = "Hello World!"                                                0010
 
       END
 

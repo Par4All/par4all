@@ -9,7 +9,7 @@ Ignore alternate returns and substitute STOP
 
 C     Check that the implicit return is properly processed
 
-      PRINT *, "altret03 was called"                                    0001
+      PRINT *, "altret03 was called"                                    0005
 
       END
 
@@ -21,7 +21,7 @@ Replace alternate returns
 
 C     Check that the implicit return is properly processed
 
-      PRINT *, "altret03 was called"                                    0001
+      PRINT *, "altret03 was called"                                    0005
 
-      I_PIPS_RETURN_CODE_ = 0                                           0002
+      I_PIPS_RETURN_CODE_ = 0                                           0007
       END

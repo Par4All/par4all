@@ -10,17 +10,17 @@ C     Check static alias use for non-type compatible variables
 C  T() {}
 
 
-      X = 4.                                                            0001
+      X = 4.                                                            0007
 
 C  T() {}
 
 
-      I = 5                                                             0002
+      I = 5                                                             0009
 
 C  T() {}
 
 
-      PRINT *, 'x=', X, 'i=', I                                         0003
+      PRINT *, 'x=', X, 'i=', I                                         0011
 
       END
 
@@ -35,17 +35,17 @@ C     Check static alias use for non-type compatible variables
 C  P() {}
 
 
-      X = 4.                                                            0001
+      X = 4.                                                            0007
 
 C  P() {}
 
 
-      I = 5                                                             0002
+      I = 5                                                             0009
 
 C  P() {}
 
 
-      PRINT *, 'x=', X, 'i=', I                                         0003
+      PRINT *, 'x=', X, 'i=', I                                         0011
 
       END
 

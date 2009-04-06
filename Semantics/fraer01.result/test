@@ -19,74 +19,74 @@ C     To get a stronger postcondition by bounding x, y and z: see fraer03
 C  P() {}
 
 
-      READ *, X, Y, Z                                                   0001
+      READ *, X, Y, Z                                                   0013
 
 C  P(X,Y,Z) {}
 
 
-      IF (X.LT.Y) THEN                                                  0002
+      IF (X.LT.Y) THEN                                                  0015
 
 C  P(X,Y,Z) {X+1<=Y}
 
-         MAX2 = Y                                                       0003
+         MAX2 = Y                                                       0016
 
 C  P(MAX2,X,Y,Z) {MAX2==Y, X+1<=MAX2}
 
-         MIN2 = X                                                       0004
+         MIN2 = X                                                       0017
       ELSE
 
 C  P(X,Y,Z) {Y<=X}
 
-         MAX2 = X                                                       0005
+         MAX2 = X                                                       0019
 
 C  P(MAX2,X,Y,Z) {MAX2==X, Y<=MAX2}
 
-         MIN2 = Y                                                       0006
+         MIN2 = Y                                                       0020
       ENDIF
 
 C  P(MAX2,MIN2,X,Y,Z) {MAX2+MIN2==X+Y, Y<=MAX2, MIN2<=Y}
 
 
-      CALL PRINTMIN2(MIN2, X, Y)                                        0007
+      CALL PRINTMIN2(MIN2, X, Y)                                        0023
 
 C  P(MAX2,MIN2,X,Y,Z) {MAX2+MIN2==X+Y, Y<=MAX2, MIN2<=Y}
 
-      CALL PRINTMAX2(MAX2, X, Y)                                        0008
+      CALL PRINTMAX2(MAX2, X, Y)                                        0024
 
 C  P(MAX2,MIN2,X,Y,Z) {MAX2+MIN2==X+Y, Y<=MAX2, MIN2<=Y}
 
 
-      IF (MAX2.LT.Z) THEN                                               0009
+      IF (MAX2.LT.Z) THEN                                               0026
 
 C  P(MAX2,MIN2,X,Y,Z) {MAX2+MIN2==X+Y, Y<=MAX2, MAX2+1<=Z, MIN2<=Y}
 
-         MAX3 = Z                                                       0010
+         MAX3 = Z                                                       0027
 
 C  P(MAX2,MAX3,MIN2,X,Y,Z) {MAX2+MIN2==X+Y, MAX3==Z, MAX2+1<=MAX3,
 C    Y<=MAX2, MIN2<=Y}
 
-         MIN3 = MIN2                                                    0011
+         MIN3 = MIN2                                                    0028
       ELSE
 
 C  P(MAX2,MIN2,X,Y,Z) {MAX2+MIN2==X+Y, Y<=MAX2, Z<=MAX2, MIN2<=Y}
 
-         MAX3 = MAX2                                                    0012
+         MAX3 = MAX2                                                    0030
 
 C  P(MAX2,MAX3,MIN2,X,Y,Z) {MAX2==MAX3, MAX2+MIN2==X+Y, Y<=MAX2,
 C    Z<=MAX2, MIN2<=Y}
 
-         IF (MIN2.GT.Z) THEN                                            0013
+         IF (MIN2.GT.Z) THEN                                            0031
 
 C  P(MAX2,MAX3,MIN2,X,Y,Z) {MAX2==MAX3, MAX2+MIN2==X+Y, Y<=MAX2,
 C    Z<=MAX2, MIN2<=Y, Z+1<=MIN2}
 
-            MIN3 = Z                                                    0014
+            MIN3 = Z                                                    0032
          ELSE
 
 C  P(MAX2,MAX3,MIN2,X,Y,Z) {MAX2==MAX3, MAX2+MIN2==X+Y, Y<=MAX2,
 C    Z<=MAX2, MIN2<=Y, MIN2<=Z}
 
-            MIN3 = MIN2                                                 0015
+            MIN3 = MIN2                                                 0034
          ENDIF
       ENDIF
 
@@ -95,20 +95,20 @@ C    MAX3+MIN2+MIN3<=X+Y+Z, MIN2+Z<=MAX3+MIN3, X+Y<=MAX3+MIN2,
 C    MIN3<=MIN2, MIN2<=X, MIN2<=Y}
 
 
-      CALL PRINTMIN3(MIN3, X, Y, Z)                                     0016
+      CALL PRINTMIN3(MIN3, X, Y, Z)                                     0038
 
 C  P(MAX2,MAX3,MIN2,MIN3,X,Y,Z) {MAX2+MIN2==X+Y,
 C    MAX3+MIN2+MIN3<=X+Y+Z, MIN2+Z<=MAX3+MIN3, X+Y<=MAX3+MIN2,
 C    MIN3<=MIN2, MIN2<=X, MIN2<=Y}
 
-      CALL PRINTMAX3(MAX3, X, Y, Z)                                     0017
+      CALL PRINTMAX3(MAX3, X, Y, Z)                                     0039
 
 C  P(MAX2,MAX3,MIN2,MIN3,X,Y,Z) {MAX2+MIN2==X+Y,
 C    MAX3+MIN2+MIN3<=X+Y+Z, MIN2+Z<=MAX3+MIN3, X+Y<=MAX3+MIN2,
 C    MIN3<=MIN2, MIN2<=X, MIN2<=Y}
 
 
-      PRINT *, MIN2, MAX2, MIN3, MAX3                                   0018
+      PRINT *, MIN2, MAX2, MIN3, MAX3                                   0041
 
       END
 
@@ -125,7 +125,7 @@ C  P() {MIN2<=X, MIN2<=Y}
 C  P() {MIN2<=X, MIN2<=Y}
 
 
-      PRINT *, MIN2, X, Y                                               0001
+      PRINT *, MIN2, X, Y                                               0006
 
       END
 
@@ -142,7 +142,7 @@ C  P() {X<=MAX2, Y<=MAX2}
 C  P() {X<=MAX2, Y<=MAX2}
 
 
-      PRINT *, MAX2, X, Y                                               0001
+      PRINT *, MAX2, X, Y                                               0006
 
       END
 
@@ -159,7 +159,7 @@ C  P() {MIN3<=X, 2MIN3<=X+Y, MIN3<=Y, MIN3<=Z}
 C  P() {MIN3<=X, 2MIN3<=X+Y, MIN3<=Y, MIN3<=Z}
 
 
-      PRINT *, MIN3, X, Y, Z                                            0001
+      PRINT *, MIN3, X, Y, Z                                            0006
 
       END
 
@@ -178,7 +178,7 @@ C  P() {X<=MAX3, X+Y<=2MAX3, X+Y+Z<=3MAX3, X+Z<=2MAX3, Y<=MAX3,
 C    Y+Z<=2MAX3, Z<=MAX3}
 
 
-      PRINT *, MAX3, X, Y, Z                                            0001
+      PRINT *, MAX3, X, Y, Z                                            0006
 
       END
 

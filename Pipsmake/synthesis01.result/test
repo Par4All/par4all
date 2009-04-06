@@ -6,7 +6,7 @@ User source code for SYNTHESIS01
 C     Goal: debug the code synthesis in initializer()
 C     Check that a call graph of this routine can be obtained
 
-      CALL FOO(X)                                                       0001
+      CALL FOO(X)                                                       0006
 
       END
 

@@ -27,12 +27,12 @@ C
 C     THIS FUNCTION RETURNS THE MGP EQUIVALENT OF THE GP PARAMETERS
 C     (THOSE WHICH APPLY)
 C     
-      IKNT = 0                                                          0001
-      ALIAS = ANAM                                                      0002
-10    IKNT = IKNT+1                                                     0003
-      IF (IKNT.GT.14) RETURN                                            0004
-      IF (ANAM1(IKNT).NE.ANAM) GOTO 10                                  0006
-      ALIAS = ANAM2(IKNT)                                               0008
+      IKNT = 0                                                          0015
+      ALIAS = ANAM                                                      0016
+10    IKNT = IKNT+1                                                     0017
+      IF (IKNT.GT.14) RETURN                                            0018
+      IF (ANAM1(IKNT).NE.ANAM) GOTO 10                                  0019
+      ALIAS = ANAM2(IKNT)                                               0020
       END
 Deletion of obsolete resources:
 none destroyed.

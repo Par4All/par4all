@@ -2,7 +2,7 @@
 ! fichier non vide.
 !
       PROGRAM NONVIDE
-      PRINT *, 'pas vide'                                               0001
+      PRINT *, 'pas vide'                                               0005
       END
 v.database/Src/nonvide.f
 !!
@@ -12,6 +12,6 @@ v.database/Src/nonvide.f
 ! fichier non vide.
 !
       PROGRAM NONVIDE
-      PRINT *, 'pas vide'                                               0001
+      PRINT *, 'pas vide'                                               0005
       END
 

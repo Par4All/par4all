@@ -53,7 +53,7 @@ C  T(I) {I==I#init+1}
 
 C  T(I) {I==I#init+1}
 
-      I = I+1                                                           0001
+      I = I+1                                                           0003
       END
 
 C  T() {}
@@ -65,17 +65,17 @@ C  T(X) {0.==X}
 
 C     Check that type mismatches are detected and do not cause core dumps
 
-      X = 0.                                                            0001
+      X = 0.                                                            0005
 
 C  T(X) {}
 
 
-      CALL INCR(X)                                                      0002
+      CALL INCR(X)                                                      0007
 
 C  T() {}
 
 
-      PRINT *, X                                                        0003
+      PRINT *, X                                                        0009
 
       END
 Selecting rule: PRINT_CODE_PRECONDITIONS
@@ -109,7 +109,7 @@ C  P() {}
 
 C  P() {}
 
-      I = I+1                                                           0001
+      I = I+1                                                           0003
       END
 
 C  P() {}
@@ -121,17 +121,17 @@ C  P() {}
 
 C     Check that type mismatches are detected and do not cause core dumps
 
-      X = 0.                                                            0001
+      X = 0.                                                            0005
 
 C  P(X) {0.==X}
 
 
-      CALL INCR(X)                                                      0002
+      CALL INCR(X)                                                      0007
 
 C  P(X) {}
 
 
-      PRINT *, X                                                        0003
+      PRINT *, X                                                        0009
 
       END
 Deletion of obsolete resources:

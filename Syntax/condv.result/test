@@ -349,60 +349,60 @@ C
 C
 C  ALLOCATION DYNAMIQUE
 C
-      T2T1I_PTR = ALLOUER(NCACV2*NMZRAC, 0, IER, "CONDV")               0001
+      T2T1I_PTR = ALLOUER(NCACV2*NMZRAC, 0, IER, "CONDV")               0352
 C
 C  SEQUENCE 1
 C  CALCUL DE COND EN FONCTION DU COMBUSTIBLE OU DE LA CORRELATION
 C***********************************************************************
 C
-      IF (ICOND.EQ.2) THEN                                              0002
+      IF (ICOND.EQ.2) THEN                                              0358
 C
 C        CHOIX DE LA CORRELATION UO2 N0 2 : FORMULATION WESTINGHOUSE
 C
 C
-         DO 14 I = 1, DIM                                               0003
-            DO 13 IC = 1, NCACV2                                        0004
-               IF (CDVECV(IC)) THEN                                     0005
-                  T2T1 = TR(IC,I+1)-TR(IC,I)                            0006
+         DO 14 I = 1, DIM                                               0363
+            DO 13 IC = 1, NCACV2                                        0364
+               IF (CDVECV(IC)) THEN                                     0365
+                  T2T1 = TR(IC,I+1)-TR(IC,I)                            0366
 C
-                  IF (ABS(T2T1).GE.DTMIN) THEN                          0007
+                  IF (ABS(T2T1).GE.DTMIN) THEN                          0368
 C
 C                    CALCUL AVEC INTEGRALE
 C
-                     IF (TENPUV(IC).EQ.0..OR.IPLUT.EQ.0) THEN           0008
+                     IF (TENPUV(IC).EQ.0..OR.IPLUT.EQ.0) THEN           0372
 C
 C                       PAS DE PLUTONIUM : FORMULATION UO2
 C
-                        IUO2(IC,I) = (WEST3*ALOG((1.+TR(IC,I+1)*WEST2   0009
-     &                  )/(1.+TR(IC,I)*WEST2))+WEST4*(TR(IC,I+1)**4-    0009
-     &                  TR(IC,I)**4))*TPOROS/T2T1                       0009
+                        IUO2(IC,I) = (WEST3*ALOG((1.+TR(IC,I+1)*WEST2   0376
+     &                  )/(1.+TR(IC,I)*WEST2))+WEST4*(TR(IC,I+1)**4-    0376
+     &                  TR(IC,I)**4))*TPOROS/T2T1                       0376
                      ELSE
 C
 C                       PLUTONIUM : FORMULATION MOX COMETHE
 C
-                        ICONPU = 1                                      0010
-                        FPI(IC) = 0.124*XRV(IC,IZ-1)*1.E-02             0011
-                        DT = T2T1*INVN                                  0012
-                        TT = TR(IC,I)-DT*0.5                            0013
-                        CINT = 0.                                       0014
-                        DO 12 J = 1, NPAS                               0015
-                           TT = TT+DT                                   0016
-                           IF (TT.GT.1000.) THEN                        0017
-                              A = 2.                                    0018
+                        ICONPU = 1                                      0384
+                        FPI(IC) = 0.124*XRV(IC,IZ-1)*1.E-02             0385
+                        DT = T2T1*INVN                                  0386
+                        TT = TR(IC,I)-DT*0.5                            0387
+                        CINT = 0.                                       0388
+                        DO 12 J = 1, NPAS                               0389
+                           TT = TT+DT                                   0390
+                           IF (TT.GT.1000.) THEN                        0391
+                              A = 2.                                    0392
                            ELSE
-                              A = 2.58-0.58E-03*TT                      0019
+                              A = 2.58-0.58E-03*TT                      0394
                            ENDIF
-                           FP = (1.-A*POROS)/(1.-A*0.05)                0020
-                           TTK = TT+ZKELV                               0021
-                           TEMP = HK2+(1+HK4*TENPUV(IC)*1.E-02)*TTK     0022
-                           FTP = FP*ZMCM*(HK1/TEMP+HK5*TTK*TTK*TTK)     0023
-                           IF (TT.EQ.0.) THEN                           0024
-                              CINT = CINT+FTP                           0025
+                           FP = (1.-A*POROS)/(1.-A*0.05)                0396
+                           TTK = TT+ZKELV                               0397
+                           TEMP = HK2+(1+HK4*TENPUV(IC)*1.E-02)*TTK     0398
+                           FTP = FP*ZMCM*(HK1/TEMP+HK5*TTK*TTK*TTK)     0399
+                           IF (TT.EQ.0.) THEN                           0400
+                              CINT = CINT+FTP                           0401
                            ELSE
-                              CINT = CINT+1./(1./FTP+FPI(IC)/TT)        0026
+                              CINT = CINT+1./(1./FTP+FPI(IC)/TT)        0403
                            ENDIF
-12                         CONTINUE                                     0027
-                        IUO2(IC,I) = CINT*INVN                          0028
+12                         CONTINUE                                     0405
+                        IUO2(IC,I) = CINT*INVN                          0406
 C
                      ENDIF
 C
@@ -410,33 +410,33 @@ C
 C
 C                    CALCUL AVEC LA VALEUR MOYENNE
 C
-                     TM = .5*(TR(IC,I+1)+TR(IC,I))                      0029
-                     IF (TENPUV(IC).EQ.0..OR.IPLUT.EQ.0) THEN           0030
+                     TM = .5*(TR(IC,I+1)+TR(IC,I))                      0414
+                     IF (TENPUV(IC).EQ.0..OR.IPLUT.EQ.0) THEN           0415
 C
 C                       PAS DE PLUTONIUM : FORMULATION UO2
 C
-                        IUO2(IC,I) = (1./(11.8+0.0238*TM)+8.775E-13*    0031
-     &                  TM**3)*WEST1*TPOROS                             0031
+                        IUO2(IC,I) = (1./(11.8+0.0238*TM)+8.775E-13*    0419
+     &                  TM**3)*WEST1*TPOROS                             0419
 C
                      ELSE
 C
 C                       PLUTONIUM : FORMULATION MOX COMETHE
 C
-                        ICONPU = 1                                      0032
-                        FPI(IC) = 0.124*XRV(IC,IZ-1)*1.E-02             0033
-                        IF (TM.GT.1000.) THEN                           0034
-                           A = 2.                                       0035
+                        ICONPU = 1                                      0426
+                        FPI(IC) = 0.124*XRV(IC,IZ-1)*1.E-02             0427
+                        IF (TM.GT.1000.) THEN                           0428
+                           A = 2.                                       0429
                         ELSE
-                           A = 2.58-0.58E-03*TM                         0036
+                           A = 2.58-0.58E-03*TM                         0431
                         ENDIF
-                        FP = (1.-A*POROS)/(1.-A*0.05)                   0037
-                        TMK = TM+ZKELV                                  0038
-                        TEMP = HK2+(1+HK4*TENPUV(IC)*1.E-02)*TMK        0039
-                        FTP = FP*ZMCM*(HK1/TEMP+HK5*TMK*TMK*TMK)        0040
-                        IF (TM.EQ.0.) THEN                              0041
-                           IUO2(IC,I) = FTP                             0042
+                        FP = (1.-A*POROS)/(1.-A*0.05)                   0433
+                        TMK = TM+ZKELV                                  0434
+                        TEMP = HK2+(1+HK4*TENPUV(IC)*1.E-02)*TMK        0435
+                        FTP = FP*ZMCM*(HK1/TEMP+HK5*TMK*TMK*TMK)        0436
+                        IF (TM.EQ.0.) THEN                              0437
+                           IUO2(IC,I) = FTP                             0438
                         ELSE
-                           IUO2(IC,I) = 1./(1./FTP+FPI(IC)/TM)          0043
+                           IUO2(IC,I) = 1./(1./FTP+FPI(IC)/TM)          0440
                         ENDIF
 C
                      ENDIF
@@ -444,104 +444,104 @@ C
                   ENDIF
 C
                ENDIF
-13             CONTINUE                                                 0044
-14          CONTINUE                                                    0045
+13             CONTINUE                                                 0448
+14          CONTINUE                                                    0449
 C
-      ELSEIF (ICOND.EQ.1) THEN                                          0002
+      ELSEIF (ICOND.EQ.1) THEN                                          0358
 C
 C           CHOIX DE LA CORRELATION UO2 N0 1 : FORMULATION STORA
 C
-         DO 24 I = 1, DIM                                               0047
-            DO 23 IC = 1, NCACV2                                        0048
-               IF (CDVECV(IC)) THEN                                     0049
-                  T2T1 = TR(IC,I+1)-TR(IC,I)                            0050
-                  IF (ABS(T2T1).GE.DTMIN) THEN                          0051
+         DO 24 I = 1, DIM                                               0455
+            DO 23 IC = 1, NCACV2                                        0456
+               IF (CDVECV(IC)) THEN                                     0457
+                  T2T1 = TR(IC,I+1)-TR(IC,I)                            0458
+                  IF (ABS(T2T1).GE.DTMIN) THEN                          0459
 C
 C                       CALCUL AVEC INTEGRALE
 C
-                     IF (TENPUV(IC).EQ.0..OR.IPLUT.EQ.0) THEN           0052
+                     IF (TENPUV(IC).EQ.0..OR.IPLUT.EQ.0) THEN           0463
 C
 C                          PAS DE PLUTONIUM : FORMULATION UO2
 C
-                        C1 = (STORA1-(STORA2-STORA3*TR(IC,I))*TR(IC,I   0053
-     &                  ))*TR(IC,I)                                     0053
-                        C2 = (STORA1-(STORA2-STORA3*TR(IC,I+1))*TR(IC   0054
-     &                  ,I+1))*TR(IC,I+1)                               0054
-                        IF (TR(IC,I).GT.1000.) THEN                     0055
-                           A1 = 2.                                      0056
+                        C1 = (STORA1-(STORA2-STORA3*TR(IC,I))*TR(IC,I   0467
+     &                  ))*TR(IC,I)                                     0467
+                        C2 = (STORA1-(STORA2-STORA3*TR(IC,I+1))*TR(IC   0469
+     &                  ,I+1))*TR(IC,I+1)                               0469
+                        IF (TR(IC,I).GT.1000.) THEN                     0471
+                           A1 = 2.                                      0472
                         ELSE
-                           A1 = 2.58-0.58E-03*TR(IC,I)                  0057
+                           A1 = 2.58-0.58E-03*TR(IC,I)                  0474
                         ENDIF
-                        IF (TR(IC,I+1).GT.1000.) THEN                   0058
-                           A2 = 2.                                      0059
+                        IF (TR(IC,I+1).GT.1000.) THEN                   0476
+                           A2 = 2.                                      0477
                         ELSE
-                           A2 = 2.58-0.58E-03*TR(IC,I+1)                0060
+                           A2 = 2.58-0.58E-03*TR(IC,I+1)                0479
                         ENDIF
-                        IUO2(IC,I) = ((1.-A2*POROS)/(1.-A2*0.036)*C2-   0061
-     &                  (1.-A1*POROS)/(1.-A1*0.036)*C1)*ZMCM/T2T1       0061
+                        IUO2(IC,I) = ((1.-A2*POROS)/(1.-A2*0.036)*C2-   0481
+     &                  (1.-A1*POROS)/(1.-A1*0.036)*C1)*ZMCM/T2T1       0481
                      ELSE
 C
 C                          PLUTONIUM : FORMULATION MOX COMETHE
 C
-                        ICONPU = 1                                      0062
-                        FPI(IC) = 0.124*XRV(IC,IZ-1)*1.E-02             0063
-                        TT = TR(IC,I)-DT*0.5                            0064
-                        CINT = 0.                                       0065
-                        DO 22 J = 1, NPAS                               0066
-                           TT = TT+DT                                   0067
-                           IF (TT.GT.1000.) THEN                        0068
-                              A = 2.                                    0069
+                        ICONPU = 1                                      0488
+                        FPI(IC) = 0.124*XRV(IC,IZ-1)*1.E-02             0489
+                        TT = TR(IC,I)-DT*0.5                            0490
+                        CINT = 0.                                       0491
+                        DO 22 J = 1, NPAS                               0492
+                           TT = TT+DT                                   0493
+                           IF (TT.GT.1000.) THEN                        0494
+                              A = 2.                                    0495
                            ELSE
-                              A = 2.58-0.58E-03*TT                      0070
+                              A = 2.58-0.58E-03*TT                      0497
                            ENDIF
-                           FP = (1.-A*POROS)/(1.-A*0.05)                0071
-                           TTK = TT+ZKELV                               0072
-                           TEMP = HK2+(1+HK4*TENPUV(IC)*1.E-02)*TTK     0073
-                           FTP = FP*ZMCM*(HK1/TEMP+HK5*TTK*TTK*TTK)     0074
-                           IF (TT.EQ.0.) THEN                           0075
-                              CINT = CINT+FTP                           0076
+                           FP = (1.-A*POROS)/(1.-A*0.05)                0499
+                           TTK = TT+ZKELV                               0500
+                           TEMP = HK2+(1+HK4*TENPUV(IC)*1.E-02)*TTK     0501
+                           FTP = FP*ZMCM*(HK1/TEMP+HK5*TTK*TTK*TTK)     0503
+                           IF (TT.EQ.0.) THEN                           0504
+                              CINT = CINT+FTP                           0505
                            ELSE
-                              CINT = CINT+1./(1./FTP+FPI(IC)/TT)        0077
+                              CINT = CINT+1./(1./FTP+FPI(IC)/TT)        0507
                            ENDIF
-22                         CONTINUE                                     0078
-                        IUO2(IC,I) = CINT*INVN                          0079
+22                         CONTINUE                                     0509
+                        IUO2(IC,I) = CINT*INVN                          0510
                      ENDIF
 C
                   ELSE
 C
 C                       CALCUL AVEC LA VALEUR MOYENNE
 C
-                     TM = .5*(TR(IC,I+1)+TR(IC,I))                      0080
-                     IF (TENPUV(IC).EQ.0..OR.IPLUT.EQ.0) THEN           0081
+                     TM = .5*(TR(IC,I+1)+TR(IC,I))                      0517
+                     IF (TENPUV(IC).EQ.0..OR.IPLUT.EQ.0) THEN           0518
 C
 C                          PAS DE PLUTONIUM : FORMULATION UO2
 C
-                        IF (TM.GT.1000.) THEN                           0082
-                           A = 2.                                       0083
+                        IF (TM.GT.1000.) THEN                           0522
+                           A = 2.                                       0523
                         ELSE
-                           A = 2.58-0.58E-03*TM                         0084
+                           A = 2.58-0.58E-03*TM                         0525
                         ENDIF
-                        IUO2(IC,I) = (0.057-(0.4E-4-0.12E-7*TM)*TM)*(   0085
-     &                  1.-A*POROS)/(1.-A*0.036)*ZMCM                   0085
+                        IUO2(IC,I) = (0.057-(0.4E-4-0.12E-7*TM)*TM)*(   0527
+     &                  1.-A*POROS)/(1.-A*0.036)*ZMCM                   0527
                      ELSE
 C
 C                          PLUTONIUM : FORMULATION MOX COMETHE
 C
-                        ICONPU = 1                                      0086
-                        FPI(IC) = 0.124*XRV(IC,IZ-1)*1.E-02             0087
-                        TMK = TM+ZKELV                                  0088
-                        TEMP = HK2+(1+HK4*TENPUV(IC)*1.E-02)*TMK        0089
-                        IF (TM.GT.1000.) THEN                           0090
-                           A = 2.                                       0091
+                        ICONPU = 1                                      0533
+                        FPI(IC) = 0.124*XRV(IC,IZ-1)*1.E-02             0534
+                        TMK = TM+ZKELV                                  0535
+                        TEMP = HK2+(1+HK4*TENPUV(IC)*1.E-02)*TMK        0536
+                        IF (TM.GT.1000.) THEN                           0537
+                           A = 2.                                       0538
                         ELSE
-                           A = 2.58-0.58E-03*TM                         0092
+                           A = 2.58-0.58E-03*TM                         0540
                         ENDIF
-                        FP = (1.-A*POROS)/(1.-A*0.05)                   0093
-                        FTP = FP*ZMCM*(HK1/TEMP+HK5*TMK*TMK*TMK)        0094
-                        IF (TM.EQ.0.) THEN                              0095
-                           IUO2(IC,I) = FTP                             0096
+                        FP = (1.-A*POROS)/(1.-A*0.05)                   0542
+                        FTP = FP*ZMCM*(HK1/TEMP+HK5*TMK*TMK*TMK)        0543
+                        IF (TM.EQ.0.) THEN                              0544
+                           IUO2(IC,I) = FTP                             0545
                         ELSE
-                           IUO2(IC,I) = 1./(1./FTP+FPI(IC)/TM)          0097
+                           IUO2(IC,I) = 1./(1./FTP+FPI(IC)/TM)          0547
                         ENDIF
                      ENDIF
 C
@@ -549,123 +549,123 @@ C
 C
                ENDIF
 C
-23             CONTINUE                                                 0098
-24          CONTINUE                                                    0099
+23             CONTINUE                                                 0555
+24          CONTINUE                                                    0556
 C
       ELSE
 C
 C           CHOIX DE LA CORRELATION UO2 N0 3 : FORMULATION "HGAP VARIABLE
 C
-         DO 55 IC = 1, NCACV2                                           0100
-            IF (CDVECV(IC)) FPI(IC) = 0.124*XRV(IC,IZ-1)                0101
-55          CONTINUE                                                    0103
-         DO 57 I = 1, DIM                                               0104
-            DO 56 IC = 1, NCACV2                                        0105
-               IF (CDVECV(IC)) T2T1I(IC,I) = TR(IC,I+1)-TR(IC,I)        0106
-56             CONTINUE                                                 0108
-57          CONTINUE                                                    0109
-         DO 65 I = 1, DIM                                               0110
-            DO 64 IC = 1, NCACV2                                        0111
-               IF (CDVECV(IC)) THEN                                     0112
-                  IF (ABS(T2T1I(IC,I)).GE.DTMIN) THEN                   0113
+         DO 55 IC = 1, NCACV2                                           0562
+            IF (CDVECV(IC)) FPI(IC) = 0.124*XRV(IC,IZ-1)                0563
+55          CONTINUE                                                    0566
+         DO 57 I = 1, DIM                                               0567
+            DO 56 IC = 1, NCACV2                                        0568
+               IF (CDVECV(IC)) T2T1I(IC,I) = TR(IC,I+1)-TR(IC,I)        0569
+56             CONTINUE                                                 0572
+57          CONTINUE                                                    0573
+         DO 65 I = 1, DIM                                               0574
+            DO 64 IC = 1, NCACV2                                        0575
+               IF (CDVECV(IC)) THEN                                     0576
+                  IF (ABS(T2T1I(IC,I)).GE.DTMIN) THEN                   0577
 C
 C                       CALCUL AVEC INTEGRALE
 C
-                     DT = T2T1I(IC,I)*INVN                              0114
-                     TT = TR(IC,I)-DT*.5                                0115
-                     IF (TENPUV(IC).EQ.0..OR.IPLUT.EQ.0) THEN           0116
+                     DT = T2T1I(IC,I)*INVN                              0581
+                     TT = TR(IC,I)-DT*.5                                0582
+                     IF (TENPUV(IC).EQ.0..OR.IPLUT.EQ.0) THEN           0583
 C
 C                          PAS DE PLUTONIUM : FORMULATION UO2
 C
-                        CINT = 0.                                       0117
-                        DO 62 J = 1, NPAS                               0118
-                           TT = TT+DT                                   0119
-                           IF (TT.GT.1000.) THEN                        0120
-                              A = 2.                                    0121
+                        CINT = 0.                                       0587
+                        DO 62 J = 1, NPAS                               0588
+                           TT = TT+DT                                   0589
+                           IF (TT.GT.1000.) THEN                        0590
+                              A = 2.                                    0591
                            ELSE
-                              A = 2.58-0.58E-03*TT                      0122
+                              A = 2.58-0.58E-03*TT                      0593
                            ENDIF
-                           FP = (1.-A*POROS)/(1.-A*0.034)               0123
-                           TTK = TT+ZKELV                               0124
-                           IF (TT.EQ.0.) THEN                           0125
-                              CINT = CINT+ZMCM*FP*HV3                   0126
+                           FP = (1.-A*POROS)/(1.-A*0.034)               0595
+                           TTK = TT+ZKELV                               0596
+                           IF (TT.EQ.0.) THEN                           0597
+                              CINT = CINT+ZMCM*FP*HV3                   0598
                            ELSE
-                              CINT = CINT+ZMCM/(1./(FP*(HV3+(HV2+HV1*   0127
-     &                        TT)*TT))+FPI(IC)/TT)                      0127
+                              CINT = CINT+ZMCM/(1./(FP*(HV3+(HV2+HV1*   0600
+     &                        TT)*TT))+FPI(IC)/TT)                      0600
                            ENDIF
-62                         CONTINUE                                     0128
-                        IUO2(IC,I) = CINT*INVN                          0129
+62                         CONTINUE                                     0606
+                        IUO2(IC,I) = CINT*INVN                          0607
 C
                      ELSE
 C
 C                          PLUTONIUM : FORMULATION MOX COMETHE
 C
-                        ICONPU = 1                                      0130
-                        CINT = 0.                                       0131
-                        DO 63 J = 1, NPAS                               0132
-                           TT = TT+DT                                   0133
-                           IF (TT.GT.1000.) THEN                        0134
-                              A = 2.                                    0135
+                        ICONPU = 1                                      0613
+                        CINT = 0.                                       0614
+                        DO 63 J = 1, NPAS                               0615
+                           TT = TT+DT                                   0616
+                           IF (TT.GT.1000.) THEN                        0617
+                              A = 2.                                    0618
                            ELSE
-                              A = 2.58-0.58E-03*TT                      0136
+                              A = 2.58-0.58E-03*TT                      0620
                            ENDIF
-                           FP = (1.-A*POROS)/(1.-A*0.05)                0137
-                           TTK = TT+ZKELV                               0138
-                           TEMP = HK2+(1+HK4*TENPUV(IC)*1.E-02)*TTK     0139
-                           FTP = FP*ZMCM*(HK1/TEMP+HK5*TTK*TTK*TTK)     0140
-                           IF (TT.EQ.0.) THEN                           0141
-                              CINT = CINT+FTP                           0142
+                           FP = (1.-A*POROS)/(1.-A*0.05)                0622
+                           TTK = TT+ZKELV                               0623
+                           TEMP = HK2+(1+HK4*TENPUV(IC)*1.E-02)*TTK     0624
+                           FTP = FP*ZMCM*(HK1/TEMP+HK5*TTK*TTK*TTK)     0626
+                           IF (TT.EQ.0.) THEN                           0627
+                              CINT = CINT+FTP                           0628
                            ELSE
-                              CINT = CINT+1./(1./FTP+0.01*FPI(IC)/TT)   0143
+                              CINT = CINT+1./(1./FTP+0.01*FPI(IC)/TT)   0630
                            ENDIF
-63                         CONTINUE                                     0144
-                        IUO2(IC,I) = CINT*INVN                          0145
+63                         CONTINUE                                     0632
+                        IUO2(IC,I) = CINT*INVN                          0633
                      ENDIF
 C
                   ELSE
 C
 C                       CALCUL AVEC LA VALEUR MOYENNE
 C
-                     TM = .5*(TR(IC,I+1)+TR(IC,I))                      0146
-                     IF (TM.GT.1000.) THEN                              0147
-                        A = 2.                                          0148
+                     TM = .5*(TR(IC,I+1)+TR(IC,I))                      0640
+                     IF (TM.GT.1000.) THEN                              0641
+                        A = 2.                                          0642
                      ELSE
-                        A = 2.58-0.58E-03*TM                            0149
+                        A = 2.58-0.58E-03*TM                            0644
                      ENDIF
-                     IF (TENPUV(IC).EQ.0..OR.IPLUT.EQ.0) THEN           0150
+                     IF (TENPUV(IC).EQ.0..OR.IPLUT.EQ.0) THEN           0646
 C
 C                             PAS DE PLUTONIUM : FORMULATION UO2
 C
-                        TMK = TM+ZKELV                                  0151
-                        FP = (1.-A*POROS)/(1.-A*0.034)                  0152
-                        IF (TM.EQ.0.) THEN                              0153
-                           IUO2(IC,I) = ZMCM*FP*HV3                     0154
+                        TMK = TM+ZKELV                                  0650
+                        FP = (1.-A*POROS)/(1.-A*0.034)                  0651
+                        IF (TM.EQ.0.) THEN                              0652
+                           IUO2(IC,I) = ZMCM*FP*HV3                     0653
                         ELSE
-                           IUO2(IC,I) = ZMCM/(1./(FP*(HV3+(HV2+HV1*TM   0155
-     &                     )*TM))+FPI(IC)/TM)                           0155
+                           IUO2(IC,I) = ZMCM/(1./(FP*(HV3+(HV2+HV1*TM   0655
+     &                     )*TM))+FPI(IC)/TM)                           0655
                         ENDIF
                      ELSE
 C
 C                          PLUTONIUM : FORMULATION MOX COMETHE
 C
-                        ICONPU = 1                                      0156
-                        FPI(IC) = FPI(IC)*1.E-02                        0157
-                        TMK = TM+ZKELV                                  0158
-                        TEMP = HK2+(1+HK4*TENPUV(IC)*1.E-02)*TMK        0159
-                        FP = (1.-A*POROS)/(1.-A*0.05)                   0160
-                        FTP = FP*ZMCM*(HK1/TEMP+HK5*TMK*TMK*TMK)        0161
-                        IF (TM.EQ.0.) THEN                              0162
-                           IUO2(IC,I) = FTP                             0163
+                        ICONPU = 1                                      0664
+                        FPI(IC) = FPI(IC)*1.E-02                        0665
+                        TMK = TM+ZKELV                                  0666
+                        TEMP = HK2+(1+HK4*TENPUV(IC)*1.E-02)*TMK        0667
+                        FP = (1.-A*POROS)/(1.-A*0.05)                   0668
+                        FTP = FP*ZMCM*(HK1/TEMP+HK5*TMK*TMK*TMK)        0669
+                        IF (TM.EQ.0.) THEN                              0670
+                           IUO2(IC,I) = FTP                             0671
                         ELSE
-                           IUO2(IC,I) = 1./(1./FTP+FPI(IC)/TM)          0164
+                           IUO2(IC,I) = 1./(1./FTP+FPI(IC)/TM)          0673
                         ENDIF
                      ENDIF
 C
                   ENDIF
 C
                ENDIF
-64             CONTINUE                                                 0165
-65          CONTINUE                                                    0166
+64             CONTINUE                                                 0680
+65          CONTINUE                                                    0681
 C
       ENDIF
 C
@@ -673,7 +673,7 @@ C***********************************************************************
 C
 C  LIBERATION
 C
-      CALL LIBERE(T2T1I_PTR)                                            0167
+      CALL LIBERE(T2T1I_PTR)                                            0689
 C
       END
 

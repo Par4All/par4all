@@ -2,7 +2,7 @@
       SUBROUTINE FOO(X,Y,Z,ZZ)
       COMMON /COM/ T
       INTEGER X, Y, Z(5), ZZ, I
-      X = X+1                                                           0001
+      X = X+1                                                           0005
 C	Attention: impact alias MUST at (IMPACT:(0,7))  between X and T
 C	New output-dependence with statement
 C	X = X+1
@@ -12,7 +12,7 @@ C	X = X+1
 C	Attention: impact alias MUST at (IMPACT:(0,5))  between Y and X
 C	New flow-dependence with statement
 C	X = X+1
-      T = Y                                                             0002
+      T = Y                                                             0006
 C	Attention: impact alias MUST at (IMPACT:(0,7))  between X and T
 C	New flow-dependence with statement
 C	C	Attention: impact alias MUST at (IMPACT:(0,7))  between X and T
@@ -25,23 +25,23 @@ C	Attention: impact alias MUST at (IMPACT:(0,5))  between Y and X
 C	New flow-dependence with statement
 C	X = X+1
 T = Y
-      Y = X                                                             0003
+      Y = X                                                             0007
 C	Attention: impact alias MUST at (IMPACT:(0,7))  between X and T
 C	New flow-dependence with statement
 C	X = X+1
 C	Attention: impact alias MUST at (IMPACT:(0,5))  between Y and X
 C	New output-dependence with statement
 C	Y = X
-      X = T                                                             0004
-      I = 1                                                             0005
-      DO WHILE (I.LT.5)                                                 0006
+      X = T                                                             0008
+      I = 1                                                             0009
+      DO WHILE (I.LT.5)                                                 0010
 C	Attention: impact alias MUST at (IMPACT:(0,6))  between ZZ and X
 C	New flow-dependence with statement
 C	C	Attention: impact alias MUST at (IMPACT:(0,5))  between Y and X
 C	New output-dependence with statement
 C	Y = X
 X = T
-         Z(I) = ZZ*Z(I)                                                 0007
+         Z(I) = ZZ*Z(I)                                                 0011
       ENDDO
 C	Attention: impact alias MUST at (IMPACT:(0,5))  between Y and X
 C	New flow-dependence with statement
@@ -49,7 +49,7 @@ C	C	Attention: impact alias MUST at (IMPACT:(0,5))  between Y and X
 C	New output-dependence with statement
 C	Y = X
 X = T
-      DO I = 1, Y                                                       0008
+      DO I = 1, Y                                                       0013
 C	Attention: impact alias MUST at (IMPACT:(0,6))  between ZZ and X
 C	New anti-dependence with statement
 C	C	Attention: impact alias MUST at (IMPACT:(0,6))  between ZZ and X
@@ -71,45 +71,45 @@ C	New output-dependence with statement
 C	Y = X
 X = T
 DO I = 1, YX = X+1ENDDO
-         X = X+1                                                        0009
+         X = X+1                                                        0014
       ENDDO
       END
 
       SUBROUTINE FOO1(X,Y)
       INTEGER X(5), Y(4)
-      CALL FOO2(X(2), Y(2))                                             0001
+      CALL FOO2(X(2), Y(2))                                             0004
       END
 
       SUBROUTINE FOO2(X, Y)
       INTEGER X(4), Y(3)
-      CALL FOO3(X(2), Y(1))                                             0001
+      CALL FOO3(X(2), Y(1))                                             0004
       END
 
       SUBROUTINE FOO3(X,Y)
       INTEGER X, Y
-      X = 4                                                             0001
-      T = T+X                                                           0002
+      X = 4                                                             0004
+      T = T+X                                                           0005
 C	Attention: impact alias MUST at (FOO2:(0,2)) (FOO1:(0,2)) (IMPACT:(0,10))  between X and Y
 C	New anti-dependence with statement
 C	T = T+X
-      Y = X                                                             0003
+      Y = X                                                             0006
       END
       PROGRAM IMPACT
       COMMON /COM/ T
       INTEGER A, B, C(5), D
-      A = 0                                                             0001
-      B = 1                                                             0002
+      A = 0                                                             0004
+      B = 1                                                             0005
 C     no alias
-      CALL FOO(A, B, C, D)                                              0003
+      CALL FOO(A, B, C, D)                                              0007
 C     alias between two scalars
-      CALL FOO(A, A, C, D)                                              0004
-      CALL FOO(A, B, C, A)                                              0005
+      CALL FOO(A, A, C, D)                                              0009
+      CALL FOO(A, B, C, A)                                              0010
 C     alias between one formal variable with one common variable
-      CALL FOO(T, B, C, D)                                              0006
+      CALL FOO(T, B, C, D)                                              0012
 C     alias between one scalars and one array
-      CALL FOO(A, B, C, C(1))                                           0007
+      CALL FOO(A, B, C, C(1))                                           0014
 C     no alias
-      CALL FOO3(A, B)                                                   0008
+      CALL FOO3(A, B)                                                   0016
 C     alias between two arrays
-      CALL FOO1(C(1), C(2))                                             0009
+      CALL FOO1(C(1), C(2))                                             0018
       END

@@ -4,19 +4,19 @@
 # initial codes
 ! trying clone transformations...
       PROGRAM C2
-      CALL CLONEE(1, 1)                                                 0001
-      CALL CLONEE(2, 3)                                                 0002
-      CALL CLONEE(2, 2)                                                 0003
+      CALL CLONEE(1, 1)                                                 0003
+      CALL CLONEE(2, 3)                                                 0004
+      CALL CLONEE(2, 2)                                                 0005
       END
 
       SUBROUTINE CLONEE(I, J)
       INTEGER I, J
-      IF (I.EQ.J) THEN                                                  0001
-         PRINT *, 'both arguments are equal'                            0002
+      IF (I.EQ.J) THEN                                                  0004
+         PRINT *, 'both arguments are equal'                            0005
       ELSE
-         PRINT *, 'the arguments are different'                         0003
+         PRINT *, 'the arguments are different'                         0007
       ENDIF
-      PRINT *, I, J                                                     0004
+      PRINT *, I, J                                                     0009
       END
 # applying clone...
 # new callgraph
@@ -26,19 +26,19 @@
 # new codes.
 ! trying clone transformations...
       PROGRAM C2
-      CALL CLONEE_0(1, 1)                                               0001
-      CALL CLONEE(2, 3)                                                 0002
-      CALL CLONEE_0(2, 2)                                               0003
+      CALL CLONEE_0(1, 1)                                               0003
+      CALL CLONEE(2, 3)                                                 0004
+      CALL CLONEE_0(2, 2)                                               0005
       END
 
       SUBROUTINE CLONEE(I, J)
       INTEGER I, J
-      IF (I.EQ.J) THEN                                                  0001
-         PRINT *, 'both arguments are equal'                            0002
+      IF (I.EQ.J) THEN                                                  0004
+         PRINT *, 'both arguments are equal'                            0005
       ELSE
-         PRINT *, 'the arguments are different'                         0003
+         PRINT *, 'the arguments are different'                         0007
       ENDIF
-      PRINT *, I, J                                                     0004
+      PRINT *, I, J                                                     0009
       END
 !!
 !! PIPS: please caution!
@@ -51,25 +51,25 @@
 !!
       SUBROUTINE CLONEE_0(I, J)
       INTEGER I, J
-      IF (I.EQ.J) THEN                                                  0001
-         PRINT *, 'both arguments are equal'                            0002
+      IF (I.EQ.J) THEN                                                  0012
+         PRINT *, 'both arguments are equal'                            0013
       ELSE
-         PRINT *, 'the arguments are different'                         0003
+         PRINT *, 'the arguments are different'                         0015
       ENDIF
-      PRINT *, I, J                                                     0004
+      PRINT *, I, J                                                     0017
       END
 # applying dead code elimination...
 ! trying clone transformations...
       PROGRAM C2
-      CALL CLONEE_0(1, 1)                                               0001
-      CALL CLONEE(2, 3)                                                 0002
-      CALL CLONEE_0(2, 2)                                               0003
+      CALL CLONEE_0(1, 1)                                               0003
+      CALL CLONEE(2, 3)                                                 0004
+      CALL CLONEE_0(2, 2)                                               0005
       END
 
       SUBROUTINE CLONEE(I, J)
       INTEGER I, J
-      PRINT *, 'the arguments are different'                            0003
-      PRINT *, I, J                                                     0004
+      PRINT *, 'the arguments are different'                            0007
+      PRINT *, I, J                                                     0009
       END
 !!
 !! PIPS: please caution!
@@ -82,8 +82,8 @@
 !!
       SUBROUTINE CLONEE_0(I, J)
       INTEGER I, J
-      PRINT *, 'both arguments are equal'                               0002
-      PRINT *, I, J                                                     0004
+      PRINT *, 'both arguments are equal'                               0013
+      PRINT *, I, J                                                     0017
       END
 # done
 

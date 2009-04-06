@@ -6,47 +6,47 @@ C  P() {}
 C  P() {}
 
 
-      READ *, N                                                         0001
+      READ *, N                                                         0003
 
 C  P(N) {}
 
 
-      I = IABS(N)                                                       0002
+      I = IABS(N)                                                       0005
 
 C  P(I,N) {0<=I+N, N<=I}
 
 
-      PRINT *, I                                                        0003
+      PRINT *, I                                                        0007
 
 C  P(I,N) {0<=I+N, N<=I}
 
 
-      READ *, J                                                         0004
+      READ *, J                                                         0009
 
 C  P(I,J,N) {0<=I+N, N<=I}
 
 
-      J = IABS(J)                                                       0005
+      J = IABS(J)                                                       0011
 
 C  P(I,J,N) {0<=I+N, N<=I, 0<=J}
 
 
-      PRINT *, J                                                        0006
+      PRINT *, J                                                        0013
 
 C  P(I,J,N) {0<=I+N, N<=I, 0<=J}
 
 
-      READ *, X                                                         0007
+      READ *, X                                                         0015
 
 C  P(I,J,N) {0<=I+N, N<=I, 0<=J}
 
 
-      K = IABS(X)                                                       0008
+      K = IABS(X)                                                       0017
 
 C  P(I,J,K,N) {0<=I+N, N<=I, 0<=J, 0<=K}
 
 
-      PRINT *, K                                                        0009
+      PRINT *, K                                                        0019
 
       END
 

@@ -6,20 +6,20 @@ C  P() {}
 C  P() {}
 
 
-      J = 0                                                             0001
+      J = 0                                                             0003
 
 C  P(J) {J==0}
 
 
-      DO 100 I = 1, N                                                   0002
+      DO 100 I = 1, N                                                   0005
 
 C  P(I,J) {2I==J+2, 1<=I, I<=N}
 
-         J = J+2                                                        0003
+         J = J+2                                                        0006
 
 C  P(I,J) {2I==J, 1<=I, I<=N}
 
-100      CONTINUE                                                       0004
+100      CONTINUE                                                       0007
 
 C  P(I,J) {2I==J+2, 1<=I, N+1<=I}
 
@@ -42,6 +42,6 @@ c     must end up greater than N+1.
 c     Expected precondition:
 C     P(I,J) {J==2I-2, N+1<=I}
 
-      PRINT *, I, J                                                     0005
+      PRINT *, I, J                                                     0027
 
       END

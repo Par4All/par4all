@@ -4,8 +4,8 @@ Parsed printed file for "ARRAY01"
       SUBROUTINE ARRAY01
       REAL X(10)
 
-      DO I = 1, 10                                                      0001
-         X(I) = 0.                                                      0002
+      DO I = 1, 10                                                      0004
+         X(I) = 0.                                                      0005
       ENDDO
 
       END
@@ -16,10 +16,10 @@ Proper effetcs for "ARRAY01"
       REAL X(10)
 C               <must be written>: I
 
-      DO I = 1, 10                                                      0001
+      DO I = 1, 10                                                      0004
 C               <must be read   >: I
 C               <must be written>: X(I)
-         X(I) = 0.                                                      0002
+         X(I) = 0.                                                      0005
       ENDDO
 
       END
@@ -32,10 +32,10 @@ C               <may be read    >: I
 C               <may be written >: X(*)
 C               <must be written>: I
 
-      DO I = 1, 10                                                      0001
+      DO I = 1, 10                                                      0004
 C               <may be written >: X(*)
 C               <must be read   >: I
-         X(I) = 0.                                                      0002
+         X(I) = 0.                                                      0005
       ENDDO
 
       END
@@ -51,11 +51,11 @@ C  T() {}
 C  T(I) {1<=I}
 
 
-      DO I = 1, 10                                                      0001
+      DO I = 1, 10                                                      0004
 
 C  T() {1<=I, I<=10}
 
-         X(I) = 0.                                                      0002
+         X(I) = 0.                                                      0005
       ENDDO
 
       END
@@ -71,11 +71,11 @@ C  P() {}
 C  P() {}
 
 
-      DO I = 1, 10                                                      0001
+      DO I = 1, 10                                                      0004
 
 C  P(I) {1<=I, I<=10}
 
-         X(I) = 0.                                                      0002
+         X(I) = 0.                                                      0005
       ENDDO
 
       END
@@ -88,11 +88,11 @@ Printed files with regions
 C  <X(PHI1)-W-EXACT-{1<=PHI1, PHI1<=10}>
 
 
-      DO I = 1, 10                                                      0001
+      DO I = 1, 10                                                      0004
 
 C  <X(PHI1)-W-EXACT-{PHI1==I, 1<=I, I<=10}>
 
-         X(I) = 0.                                                      0002
+         X(I) = 0.                                                      0005
       ENDDO
 
       END
@@ -104,8 +104,8 @@ Printed files after parallelization
 
 
 !$OMP PARALLEL DO 
-      DO I = 1, 10                                                      0001
-         X(I) = 0.                                                      0002
+      DO I = 1, 10                                                      0004
+         X(I) = 0.                                                      0005
       ENDDO
 
       END

@@ -4,11 +4,11 @@ C
       PARAMETER (N=10)
       REAL A(N,N)
 c
-      DOALL I = 1, N                                                    0001
+      DOALL I = 1, N                                                    0007
          PRIVATE M,J
-         M = I                                                          0002
-         DOALL J = 1, M                                                 0003
-            A(I,J) = 0.                                                 0004
+         M = I                                                          0008
+         DOALL J = 1, M                                                 0009
+            A(I,J) = 0.                                                 0010
          ENDDO
       ENDDO
       END

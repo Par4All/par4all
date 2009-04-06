@@ -21,7 +21,7 @@ C     statement function.
 
       PROGRAM CAPTURE02
 C$PIPS STATEMENT FUNCTION REAL SUBSTITUTED
-      IF (1.**2.LT.0.) PRINT *, 2**2                                    0001
+      IF (1.**2.LT.0.) PRINT *, 2**2                                    0006
       END
 Deletion of obsolete resources:
 none destroyed.

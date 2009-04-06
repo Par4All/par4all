@@ -78,7 +78,7 @@ C     declaration order
 
       REAL Z(3), Y(6)
 
-      X = Y+W                                                           0001
+      X = Y+W                                                           0017
 
       END
 Deletion of obsolete resources:

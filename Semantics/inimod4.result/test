@@ -15,10 +15,10 @@ C     Simplified version of inimod4
 C  P() {}
 
 
-      MPCON = NINT(MP*XCZ/XLZ)                                          0001
+      MPCON = NINT(MP*XCZ/XLZ)                                          0012
 
 C  P(MPCON) {}
 
-      PRINT *, MPCON                                                    0002
+      PRINT *, MPCON                                                    0013
       END
 

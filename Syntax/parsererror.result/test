@@ -29,7 +29,7 @@ Request: build resource PRINTED_FILE for module PARSERERROR2.
 PRINTED_FILE made for PARSERERROR2.
       SUBROUTINE PARSERERROR2
 
-      IF (I.GT.1) J = 2                                                 0001
+      IF (I.GT.1) J = 2                                                 0003
 
       END
 Deletion of obsolete resources:

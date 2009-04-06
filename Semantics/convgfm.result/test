@@ -16,34 +16,34 @@ C     MODIFIED VERSION CONVGF: THE TWO INTERNAL LOOPS ARE FUSIONED
 C  T(IKEND) {IKEND==LST}
 
 
-      IKEND = LST                                                       0001
+      IKEND = LST                                                       0013
 
 C  T(OFFTAB) {NX==OFFTAB}
 
-      OFFTAB = 2*NX/2                                                   0002
+      OFFTAB = 2*NX/2                                                   0014
 
 C  T(COEFDEB) {COEFDEB==3IKEND}
 
-      COEFDEB = 3*IKEND                                                 0003
+      COEFDEB = 3*IKEND                                                 0015
 
 C  T(IWKE) {IWKE==0}
 
-      IWKE = 0                                                          0004
+      IWKE = 0                                                          0016
 
 C  T(IWKS) {IWKS==0}
 
-      IWKS = 0                                                          0005
+      IWKS = 0                                                          0017
 
 C  T(I,IWKE,IWKS) {I+IWKS#init==IWKS, IWKE+IWKS#init==IWKE#init+IWKS}
 
-      DO I = 0, NX-1                                                    0006
+      DO I = 0, NX-1                                                    0018
 
 C  T(IWKE) {IWKE==IWKE#init+1}
 
-         IWKE = IWKE+1                                                  0007
+         IWKE = IWKE+1                                                  0019
 
 C  T(IWKS) {IWKS==IWKS#init+1}
 
-         IWKS = IWKS+1                                                  0008
+         IWKS = IWKS+1                                                  0020
       ENDDO
       END

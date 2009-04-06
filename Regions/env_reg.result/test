@@ -12,13 +12,13 @@ C  <BAR:A(PHI1)-W-EXACT-{1<=PHI1, PHI1<=10}>
 
 C     regions and environment
 
-      CALL FOO                                                          0001
+      CALL FOO                                                          0007
 
 C  <BAR:A(PHI1)-R-EXACT-{1<=PHI1, PHI1<=10}>
 C  <BAR:B(PHI1)-W-EXACT-{1<=PHI1, PHI1<=10}>
 
 
-      CALL BAR                                                          0002
+      CALL BAR                                                          0009
 
       END
 

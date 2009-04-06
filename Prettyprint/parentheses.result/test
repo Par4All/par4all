@@ -8,7 +8,7 @@ C     Check unary operator - and PRETTYPRINT_ALL_PARENTHESES property
       INTEGER A,B,C,D,E
 
 c     expression avec parentheses pour forcer les multiply-add
-      A = 60*B+(-16)*(C+D)+E                                            0001
+      A = 60*B+(-16)*(C+D)+E                                            0008
 
 c     sortie du prettyprinter : A = 60*B+-16*(C+D)+E 
 
@@ -23,7 +23,7 @@ C     Check unary operator - and PRETTYPRINT_ALL_PARENTHESES property
       INTEGER A,B,C,D,E
 
 c     expression avec parentheses pour forcer les multiply-add
-      A = ((60*B)+(((-16)*(C+D))+E))                                    0001
+      A = ((60*B)+(((-16)*(C+D))+E))                                    0008
 
 c     sortie du prettyprinter : A = 60*B+-16*(C+D)+E 
 

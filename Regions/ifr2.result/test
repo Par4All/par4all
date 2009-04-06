@@ -19,25 +19,25 @@ C  <B(PHI1)-R-MAY-{1<=PHI1, PHI1<=5}>
 C  <B(PHI1)-W-MAY-{1<=PHI1, PHI1<=5}>
 
 C
-      DO I = 1, 5                                                       0001
+      DO I = 1, 5                                                       0009
 
 C  <A(PHI1)-R-EXACT-{PHI1==I, 1<=I, I<=5}>
 C  <A(PHI1)-W-MAY-{PHI1==I, 1<=I, I<=5}>
 C  <B(PHI1)-R-MAY-{PHI1==I, 1<=I, I<=5}>
 C  <B(PHI1)-W-MAY-{PHI1==I, 1<=I, I<=5}>
 
-         IF (A(I).GT.2) THEN                                            0002
+         IF (A(I).GT.2) THEN                                            0010
 
 C  <A(PHI1)-R-EXACT-{PHI1==I, 1<=I, I<=5}>
 C  <B(PHI1)-W-EXACT-{PHI1==I, 1<=I, I<=5}>
 
-            B(I) = A(I)-1                                               0003
+            B(I) = A(I)-1                                               0011
          ELSE
 
 C  <A(PHI1)-W-EXACT-{PHI1==I, 1<=I, I<=5}>
 C  <B(PHI1)-R-EXACT-{PHI1==I, 1<=I, I<=5}>
 
-            A(I) = B(I)+1                                               0004
+            A(I) = B(I)+1                                               0013
          ENDIF
       ENDDO
 C

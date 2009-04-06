@@ -2,15 +2,15 @@
       INTEGER L,N,M
       REAL A(L,M), B(M,N), C(L,M)
 
-      DOALL I = 1, L                                                    0001
-         DOALL J = 1, N                                                 0002
-            C(I,J) = 0.0                                                0003
+      DOALL I = 1, L                                                    0005
+         DOALL J = 1, N                                                 0006
+            C(I,J) = 0.0                                                0007
          ENDDO
       ENDDO
-      DOALL I = 1, L                                                    0001
-         DOALL J = 1, N                                                 0002
-            DO K = 1, M                                                 0004
-               C(I,J) = C(I,J)+A(I,K)*B(K,J)                            0005
+      DOALL I = 1, L                                                    0005
+         DOALL J = 1, N                                                 0006
+            DO K = 1, M                                                 0008
+               C(I,J) = C(I,J)+A(I,K)*B(K,J)                            0009
             ENDDO
          ENDDO
       ENDDO

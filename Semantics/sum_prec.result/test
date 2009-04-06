@@ -15,17 +15,17 @@ c     Goal: show different dependence tests and privatization
 C  P() {}
 
 
-      CALL INIT                                                         0001
+      CALL INIT                                                         0012
 
 C  P() {}
 
-      CALL TESTINIT                                                     0002
+      CALL TESTINIT                                                     0013
 
 C  P(DIGITALIZE:M,DIGITALIZE:MM1,DIGITALIZE:MP1)
 C    {DIGITALIZE:M==DIGITALIZE:MM1+1, DIGITALIZE:M==DIGITALIZE:MP1-1,
 C    2<=DIGITALIZE:M, DIGITALIZE:M<=92}
 
-      CALL DIGITALIZE(D, LX, MX, NX)                                    0003
+      CALL DIGITALIZE(D, LX, MX, NX)                                    0014
 
       END
 
@@ -42,41 +42,41 @@ C  P() {LX==32, MM1==MP1-2, MX==92, NX==42, 1<=MM1, MM1<=91}
 
 !!     i = m
 
-      MS = MM1/2                                                        0001
+      MS = MM1/2                                                        0009
 
 C  P(MS) {LX==32, MM1==MP1-2, MX==92, NX==42, 1<=MM1, MM1<=91,
 C    2MS<=MM1, MM1<=2MS+1}
 
-      MM = MP1/2                                                        0002
+      MM = MP1/2                                                        0010
 
 C  P(MM,MS) {LX==32, MM1==MP1-2, MX==92, NX==42, MM1+1<=2MM,
 C    2MM<=MM1+2, 1<=MM1, MM1<=91, 2MS<=MM1, MM1<=2MS+1}
 
 
-      DO K = 2, N-1                                                     0003
+      DO K = 2, N-1                                                     0012
 
 C  P(J,JJ,K,MM,MS) {LX==32, MM1==MP1-2, MX==92, NX==42, 2<=K, K+1<=N,
 C    MM1+1<=2MM, 2MM<=MM1+2, 1<=MM1, MM1<=91, 2MS<=MM1, MM1<=2MS+1}
 
-         DO J = 2, MM                                                   0004
+         DO J = 2, MM                                                   0013
 
 C  P(J,JJ,K,MM,MS) {LX==32, MM1==MP1-2, MX==92, NX==42, 2<=J, J<=MM,
 C    2<=K, K+1<=N, MM1+1<=2MM, 2MM<=MM1+2, 1<=MM1, MM1<=91, 2MS<=MM1,
 C    MM1<=2MS+1}
 
-            JJ = J+MS                                                   0005
+            JJ = J+MS                                                   0014
 
 C  P(J,JJ,K,MM,MS) {J+MS==JJ, LX==32, MM1==MP1-2, MX==92, NX==42,
 C    2<=J, J<=MM, 2<=K, K+1<=N, MM1+1<=2MM, 2MM<=MM1+2, 1<=MM1,
 C    MM1<=91, 2MS<=MM1, MM1<=2MS+1}
 
-            X(J,K,1) = X(JJ,K,2)                                        0006
+            X(J,K,1) = X(JJ,K,2)                                        0015
 
 C  P(J,JJ,K,MM,MS) {J+MS==JJ, LX==32, MM1==MP1-2, MX==92, NX==42,
 C    2<=J, J<=MM, 2<=K, K+1<=N, MM1+1<=2MM, 2MM<=MM1+2, 1<=MM1,
 C    MM1<=91, 2MS<=MM1, MM1<=2MS+1}
 
-            X(JJ,K,1) = X(J,K,2)                                        0007
+            X(JJ,K,1) = X(J,K,2)                                        0016
          ENDDO
       ENDDO
 
@@ -93,48 +93,48 @@ C  P() {LX==32, M==MM1+1, M==MP1-1, MX==92, NX==42, 2<=M, M<=92}
 C  P() {LX==32, M==MM1+1, M==MP1-1, MX==92, NX==42, 2<=M, M<=92}
 
 
-      I = M                                                             0001
+      I = M                                                             0007
 
 C  P(I) {I==M, I==MM1+1, I==MP1-1, LX==32, MX==92, NX==42, 2<=I,
 C    I<=92}
 
 
-      MS = MM1/2                                                        0002
+      MS = MM1/2                                                        0009
 
 C  P(I,MS) {I==M, I==MM1+1, I==MP1-1, LX==32, MX==92, NX==42, 2<=I,
 C    I<=92, 2MS+1<=I, I<=2MS+2}
 
-      MM = MP1/2                                                        0003
+      MM = MP1/2                                                        0010
 
 C  P(I,MM,MS) {I==M, I==MM1+1, I==MP1-1, LX==32, MX==92, NX==42, 2<=I,
 C    I<=92, 2MM<=I+1, I<=2MM, 2MS+1<=I, I<=2MS+2}
 
 
-      DO K = 2, N-1                                                     0004
+      DO K = 2, N-1                                                     0012
 
 C  P(I,J,JJ,K,MM,MS) {I==M, I==MM1+1, I==MP1-1, LX==32, MX==92,
 C    NX==42, 2<=I, I<=92, 2MM<=I+1, I<=2MM, 2MS+1<=I, I<=2MS+2, 2<=K,
 C    K+1<=N}
 
-         DO J = 2, MM                                                   0005
+         DO J = 2, MM                                                   0013
 
 C  P(I,J,JJ,K,MM,MS) {I==M, I==MM1+1, I==MP1-1, LX==32, MX==92,
 C    NX==42, 2<=I, I<=92, 2MM<=I+1, I<=2MM, 2MS+1<=I, I<=2MS+2, 2<=J,
 C    J<=MM, 2<=K, K+1<=N}
 
-            JJ = J+MS                                                   0006
+            JJ = J+MS                                                   0014
 
 C  P(I,J,JJ,K,MM,MS) {I==M, I==MM1+1, I==MP1-1, J+MS==JJ, LX==32,
 C    MX==92, NX==42, 2<=I, I<=92, 2MM<=I+1, I<=2MM, 2MS+1<=I,
 C    I<=2MS+2, 2<=J, J<=MM, 2<=K, K+1<=N}
 
-            X(J,K,1) = X(JJ,K,2)                                        0007
+            X(J,K,1) = X(JJ,K,2)                                        0015
 
 C  P(I,J,JJ,K,MM,MS) {I==M, I==MM1+1, I==MP1-1, J+MS==JJ, LX==32,
 C    MX==92, NX==42, 2<=I, I<=92, 2MM<=I+1, I<=2MM, 2MS+1<=I,
 C    I<=2MS+2, 2<=J, J<=MM, 2<=K, K+1<=N}
 
-            X(JJ,K,1) = X(J,K,2)                                        0008
+            X(JJ,K,1) = X(J,K,2)                                        0016
          ENDDO
       ENDDO
 

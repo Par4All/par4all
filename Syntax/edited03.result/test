@@ -3,9 +3,9 @@
 C     The parser must be able to process the same routine several times
 C     after user edition steps
 
-      CALL BAR(Y)                                                       0001
+      CALL BAR(Y)                                                       0006
 
-      PRINT *, IBAR(Z)                                                  0002
+      PRINT *, IBAR(Z)                                                  0008
 
       END
 
@@ -14,7 +14,7 @@ C     after user edition steps
 !!      integer x(3)
 !%      real x(10)
 
-      PRINT *, X                                                        0001
+      PRINT *, X                                                        0007
 
       END
 
@@ -23,9 +23,9 @@ C     after user edition steps
 !!      integer x(3)
 !%      real x(10)
 
-      PRINT *, X                                                        0001
+      PRINT *, X                                                        0007
 
-      IBAR = 1                                                          0002
+      IBAR = 1                                                          0009
 
       END
 
@@ -34,7 +34,7 @@ C     after user edition steps
 !!      integer x(3)
       REAL X(10)
 
-      PRINT *, X                                                        0001
+      PRINT *, X                                                        0007
 
       END
 
@@ -43,7 +43,7 @@ C     after user edition steps
 !!      integer x(3)
       INTEGER X(3)
 
-      PRINT *, X                                                        0001
+      PRINT *, X                                                        0007
 
       END
 
@@ -52,9 +52,9 @@ C     after user edition steps
 !!      integer x(3)
       REAL X(10)
 
-      PRINT *, X                                                        0001
+      PRINT *, X                                                        0007
 
-      IBAR = 1                                                          0002
+      IBAR = 1                                                          0009
 
       END
 
@@ -63,8 +63,8 @@ C     after user edition steps
 !!      integer x(3)
       INTEGER X(3)
 
-      PRINT *, X                                                        0001
+      PRINT *, X                                                        0007
 
-      IBAR = 1                                                          0002
+      IBAR = 1                                                          0009
 
       END

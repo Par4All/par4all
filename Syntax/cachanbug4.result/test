@@ -1,4 +1,6 @@
 user warning in tp_parse: cachanbug4: No such workspace
+Registering file cachanbug4.f
+Splitting file    $VDIR/cachanbug4.f
   Module         CACHANBUG4C
   Module         CACHANBUG4B
   Module         CACHANBUG4
@@ -35,7 +37,7 @@ Request: build resource PRINTED_FILE for module CACHANBUG4B.
   FILTER_FILE                    building   SOURCE_FILE(CACHANBUG4B)
   PARSER                         building   PARSED_CODE(CACHANBUG4B)
                                  building   CALLEES(CACHANBUG4B)
-user warning in syn_error: Syntax error - syntax error, unexpected TK_SCON, expecting TK_SLASH or TK_COMMA line 4 near "'7F7F'"
+user warning in syn_error: Syntax error - syntax error, unexpected TK_SCON, expecting TK_SLASH or TK_COMMA line 3 near "'7F7F'"
 user warning in syn_error: Non analyzed source text stored in logfile
 
       end
@@ -74,9 +76,9 @@ C     Check that PIPS is OK for the normal case: compute preconditions
 
       DATA TAB,I/M*M,M/
 
-      J = M                                                             0001
+      J = M                                                             0015
 
-      PRINT *, I, J                                                     0002
+      PRINT *, I, J                                                     0017
 
       END
 Deletion of obsolete resources:

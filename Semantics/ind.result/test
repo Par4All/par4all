@@ -8,11 +8,11 @@ C  P() {OUT:COUNT==0}
 C  P() {OUT:COUNT==0}
 
 
-      CALL OUT                                                          0001
+      CALL OUT                                                          0004
 
 C  P(OUT:COUNT) {OUT:COUNT==1, OUT:COUNT#init==0}
 
-      J = 2                                                             0002
+      J = 2                                                             0005
 
       END
 --- Preconditions for module IND
@@ -37,10 +37,10 @@ C     dans deux COMMONs differents, portant le meme nom.
 C  P() {COUNT==0}
 
 
-      CALL DATAST                                                       0001
+      CALL DATAST                                                       0016
 
 C  P(COUNT) {COUNT==1, COUNT#init==0}
 
-      I = 1                                                             0002
+      I = 1                                                             0017
 
       END

@@ -30,69 +30,69 @@ csecond      l5=n/m
 
 c     Check that parameters are properly evaluated (eval.c)
 
-      J1 = L1                                                           0001
+      J1 = L1                                                           0021
 
 C  P(J1) {J1==24}
 
-      J2 = L2                                                           0002
+      J2 = L2                                                           0022
 
 C  P(J1,J2) {J1==24, J2==101}
 
-      J3 = L3                                                           0003
+      J3 = L3                                                           0023
 
 C  P(J1,J2,J3) {J1==24, J2==101, J3==576}
 
-      J4 = L4                                                           0004
+      J4 = L4                                                           0024
 
 C  P(J1,J2,J3,J4) {J1==24, J2==101, J3==576, J4==5}
 
-      J5 = L5                                                           0005
+      J5 = L5                                                           0025
 
 C  P(J1,J2,J3,J4,J5) {J1==24, J2==101, J3==576, J4==5, J5==4}
 
-      PRINT *, J1, J2, J3, J4, J5                                       0006
+      PRINT *, J1, J2, J3, J4, J5                                       0026
 
 C  P(J1,J2,J3,J4,J5) {J1==24, J2==101, J3==576, J4==5, J5==4}
 
 
 c     Check expression normalization or partial evaluation
 
-      I1 = MIN(N, M)                                                    0007
+      I1 = MIN(N, M)                                                    0030
 
 C  P(I1,J1,J2,J3,J4,J5) {I1==24, J1==24, J2==101, J3==576, J4==5,
 C    J5==4}
 
-      I1 = MIN0(N, M)                                                   0008
+      I1 = MIN0(N, M)                                                   0031
 
 C  P(I1,J1,J2,J3,J4,J5) {I1==24, J1==24, J2==101, J3==576, J4==5,
 C    J5==4}
 
-      I2 = MAX(N, M)                                                    0009
+      I2 = MAX(N, M)                                                    0032
 
 C  P(I1,I2,J1,J2,J3,J4,J5) {I1==24, I2==101, J1==24, J2==101, J3==576,
 C    J4==5, J5==4}
 
-      I2 = MAX0(N, M)                                                   0010
+      I2 = MAX0(N, M)                                                   0033
 
 C  P(I1,I2,J1,J2,J3,J4,J5) {I1==24, I2==101, J1==24, J2==101, J3==576,
 C    J4==5, J5==4}
 
-      I3 = M**2                                                         0011
+      I3 = M**2                                                         0034
 
 C  P(I1,I2,I3,J1,J2,J3,J4,J5) {I1==24, I2==101, I3==576, J1==24,
 C    J2==101, J3==576, J4==5, J5==4}
 
-      I4 = MOD(N, M)                                                    0012
+      I4 = MOD(N, M)                                                    0035
 
 C  P(I1,I2,I3,I4,J1,J2,J3,J4,J5) {I1==24, I2==101, I3==576, I4==5,
 C    J1==24, J2==101, J3==576, J4==5, J5==4}
 
-      I5 = N/M                                                          0013
+      I5 = N/M                                                          0036
 
 C  P(I1,I2,I3,I4,I5,J1,J2,J3,J4,J5) {I1==24, I2==101, I3==576, I4==5,
 C    I5==4, J1==24, J2==101, J3==576, J4==5, J5==4}
 
-      PRINT *, I1, I2, I3, I4, I5                                       0014
+      PRINT *, I1, I2, I3, I4, I5                                       0037
 
       END
 
@@ -118,23 +118,23 @@ csecond      l5=n/m
 
 c     Check that parameters are properly evaluated (eval.c)
 
-      J1 = 24                                                           0001
-      J2 = 101                                                          0002
-      J3 = 576                                                          0003
-      J4 = 5                                                            0004
-      J5 = 4                                                            0005
-      PRINT *, 24, 101, 576, 5, 4                                       0006
+      J1 = 24                                                           0021
+      J2 = 101                                                          0022
+      J3 = 576                                                          0023
+      J4 = 5                                                            0024
+      J5 = 4                                                            0025
+      PRINT *, 24, 101, 576, 5, 4                                       0026
 
 c     Check expression normalization or partial evaluation
 
-      I1 = 24                                                           0007
-      I1 = 24                                                           0008
-      I2 = 101                                                          0009
-      I2 = 101                                                          0010
-      I3 = 576                                                          0011
-      I4 = 5                                                            0012
-      I5 = 4                                                            0013
-      PRINT *, 24, 101, 576, 5, 4                                       0014
+      I1 = 24                                                           0030
+      I1 = 24                                                           0031
+      I2 = 101                                                          0032
+      I2 = 101                                                          0033
+      I3 = 576                                                          0034
+      I4 = 5                                                            0035
+      I5 = 4                                                            0036
+      PRINT *, 24, 101, 576, 5, 4                                       0037
 
       END
 
@@ -159,63 +159,63 @@ cfirst      parameter(n=101, m=24, l1=min(n,m), l2=max(n,m), l3=m**2,
 cfirst     &     l4=mod(n,m), l5=n/m)
 
 c     Alternative to PARAMETER (partial evaluation)
-      N = 101                                                           0001
+      N = 101                                                           0011
 
 C  P(N) {N==101}
 
-      M = 24                                                            0002
+      M = 24                                                            0012
 
 C  P(M,N) {M==24, N==101}
 
-      L1 = MIN(N, M)                                                    0003
+      L1 = MIN(N, M)                                                    0013
 
 C  P(L1,M,N) {M==24, N==101, L1<=24}
 
-      L2 = MAX(N, M)                                                    0004
+      L2 = MAX(N, M)                                                    0014
 
 C  P(L1,L2,M,N) {M==24, N==101, L1<=24, 101<=L2}
 
-      L3 = M**2                                                         0005
+      L3 = M**2                                                         0015
 
 C  P(L1,L2,L3,M,N) {M==24, N==101, L1<=24, 101<=L2, 24<=L3}
 
-      L4 = MOD(N, M)                                                    0006
+      L4 = MOD(N, M)                                                    0016
 
 C  P(L1,L2,L3,L4,M,N) {M==24, N==101, L1<=24, 101<=L2, 24<=L3}
 
-      L5 = N/M                                                          0007
+      L5 = N/M                                                          0017
 
 C  P(L1,L2,L3,L4,L5,M,N) {M==24, N==101, L1<=24, 101<=L2, 24<=L3}
 
 
 c     Check that parameters are properly evaluated (eval.c)
 
-      J1 = L1                                                           0008
+      J1 = L1                                                           0021
 
 C  P(J1,L1,L2,L3,L4,L5,M,N) {J1==L1, M==24, N==101, J1<=24, 101<=L2,
 C    24<=L3}
 
-      J2 = L2                                                           0009
+      J2 = L2                                                           0022
 
 C  P(J1,J2,L1,L2,L3,L4,L5,M,N) {J1==L1, J2==L2, M==24, N==101, J1<=24,
 C    101<=J2, 24<=L3}
 
-      J3 = L3                                                           0010
+      J3 = L3                                                           0023
 
 C  P(J1,J2,J3,L1,L2,L3,L4,L5,M,N) {J1==L1, J2==L2, J3==L3, M==24,
 C    N==101, J1<=24, 101<=J2, 24<=J3}
 
-      J4 = L4                                                           0011
+      J4 = L4                                                           0024
 
 C  P(J1,J2,J3,J4,L1,L2,L3,L4,L5,M,N) {J1==L1, J2==L2, J3==L3, J4==L4,
 C    M==24, N==101, J1<=24, 101<=J2, 24<=J3}
 
-      J5 = L5                                                           0012
+      J5 = L5                                                           0025
 
 C  P(J1,J2,J3,J4,J5,L1,L2,L3,L4,L5,M,N) {J1==L1, J2==L2, J3==L3,
 C    J4==L4, J5==L5, M==24, N==101, J1<=24, 101<=J2, 24<=J3}
 
-      PRINT *, J1, J2, J3, J4, J5                                       0013
+      PRINT *, J1, J2, J3, J4, J5                                       0026
 
 C  P(J1,J2,J3,J4,J5,L1,L2,L3,L4,L5,M,N) {J1==L1, J2==L2, J3==L3,
 C    J4==L4, J5==L5, M==24, N==101, J1<=24, 101<=J2, 24<=J3}
@@ -223,47 +223,47 @@ C    J4==L4, J5==L5, M==24, N==101, J1<=24, 101<=J2, 24<=J3}
 
 c     Check expression normalization or partial evaluation
 
-      I1 = MIN(N, M)                                                    0014
+      I1 = MIN(N, M)                                                    0030
 
 C  P(I1,J1,J2,J3,J4,J5,L1,L2,L3,L4,L5,M,N) {J1==L1, J2==L2, J3==L3,
 C    J4==L4, J5==L5, M==24, N==101, I1<=24, J1<=24, 101<=J2, 24<=J3}
 
-      I1 = MIN0(N, M)                                                   0015
+      I1 = MIN0(N, M)                                                   0031
 
 C  P(I1,J1,J2,J3,J4,J5,L1,L2,L3,L4,L5,M,N) {J1==L1, J2==L2, J3==L3,
 C    J4==L4, J5==L5, M==24, N==101, I1<=24, J1<=24, 101<=J2, 24<=J3}
 
-      I2 = MAX(N, M)                                                    0016
+      I2 = MAX(N, M)                                                    0032
 
 C  P(I1,I2,J1,J2,J3,J4,J5,L1,L2,L3,L4,L5,M,N) {J1==L1, J2==L2, J3==L3,
 C    J4==L4, J5==L5, M==24, N==101, I1<=24, 101<=I2, J1<=24, 101<=J2,
 C    24<=J3}
 
-      I2 = MAX0(N, M)                                                   0017
+      I2 = MAX0(N, M)                                                   0033
 
 C  P(I1,I2,J1,J2,J3,J4,J5,L1,L2,L3,L4,L5,M,N) {J1==L1, J2==L2, J3==L3,
 C    J4==L4, J5==L5, M==24, N==101, I1<=24, 101<=I2, J1<=24, 101<=J2,
 C    24<=J3}
 
-      I3 = M**2                                                         0018
+      I3 = M**2                                                         0034
 
 C  P(I1,I2,I3,J1,J2,J3,J4,J5,L1,L2,L3,L4,L5,M,N) {J1==L1, J2==L2,
 C    J3==L3, J4==L4, J5==L5, M==24, N==101, I1<=24, 101<=I2, 24<=I3,
 C    J1<=24, 101<=J2, 24<=J3}
 
-      I4 = MOD(N, M)                                                    0019
+      I4 = MOD(N, M)                                                    0035
 
 C  P(I1,I2,I3,I4,J1,J2,J3,J4,J5,L1,L2,L3,L4,L5,M,N) {J1==L1, J2==L2,
 C    J3==L3, J4==L4, J5==L5, M==24, N==101, I1<=24, 101<=I2, 24<=I3,
 C    J1<=24, 101<=J2, 24<=J3}
 
-      I5 = N/M                                                          0020
+      I5 = N/M                                                          0036
 
 C  P(I1,I2,I3,I4,I5,J1,J2,J3,J4,J5,L1,L2,L3,L4,L5,M,N) {J1==L1,
 C    J2==L2, J3==L3, J4==L4, J5==L5, M==24, N==101, I1<=24, 101<=I2,
 C    24<=I3, J1<=24, 101<=J2, 24<=J3}
 
-      PRINT *, I1, I2, I3, I4, I5                                       0021
+      PRINT *, I1, I2, I3, I4, I5                                       0037
 
       END
 
@@ -279,32 +279,32 @@ cfirst      parameter(n=101, m=24, l1=min(n,m), l2=max(n,m), l3=m**2,
 cfirst     &     l4=mod(n,m), l5=n/m)
 
 c     Alternative to PARAMETER (partial evaluation)
-      N = 101                                                           0001
-      M = 24                                                            0002
-      L1 = 24                                                           0003
-      L2 = 101                                                          0004
-      L3 = 576                                                          0005
-      L4 = 5                                                            0006
-      L5 = 4                                                            0007
+      N = 101                                                           0011
+      M = 24                                                            0012
+      L1 = 24                                                           0013
+      L2 = 101                                                          0014
+      L3 = 576                                                          0015
+      L4 = 5                                                            0016
+      L5 = 4                                                            0017
 
 c     Check that parameters are properly evaluated (eval.c)
 
-      J1 = 24                                                           0008
-      J2 = 101                                                          0009
-      J3 = 576                                                          0010
-      J4 = 5                                                            0011
-      J5 = 4                                                            0012
-      PRINT *, 24, 101, 576, 5, 4                                       0013
+      J1 = 24                                                           0021
+      J2 = 101                                                          0022
+      J3 = 576                                                          0023
+      J4 = 5                                                            0024
+      J5 = 4                                                            0025
+      PRINT *, 24, 101, 576, 5, 4                                       0026
 
 c     Check expression normalization or partial evaluation
 
-      I1 = 24                                                           0014
-      I1 = 24                                                           0015
-      I2 = 101                                                          0016
-      I2 = 101                                                          0017
-      I3 = 576                                                          0018
-      I4 = 5                                                            0019
-      I5 = 4                                                            0020
-      PRINT *, 24, 101, 576, 5, 4                                       0021
+      I1 = 24                                                           0030
+      I1 = 24                                                           0031
+      I2 = 101                                                          0032
+      I2 = 101                                                          0033
+      I3 = 576                                                          0034
+      I4 = 5                                                            0035
+      I5 = 4                                                            0036
+      PRINT *, 24, 101, 576, 5, 4                                       0037
 
       END

@@ -64,7 +64,7 @@ PRINTED_FILE made for OVL.
 C
       FUNCTION OVL(BETA,Z0)
       IMPLICIT DOUBLE PRECISION (A-H, O-Z)
-      OVL = MIN(XL, -0.003D0)                                           0001
+      OVL = MIN(XL, -0.003D0)                                           0004
       END
 Module BLM selected
 Request: build resource PRINTED_FILE for module BLM.
@@ -143,7 +143,7 @@ C     Extract from apsi (Spec CFP95)
       SUBROUTINE BLM(U,POTT,ZET,NZ,Z0,USTAR,DL,DZ,DKZ,KLAS,ZMH,F)
       IMPLICIT DOUBLE PRECISION (A-H, O-Z)
       REAL*8 POTT(*),ZET(*),DKZ(*)
-      DL = 1.D0/OVL(BETA, Z0)                                           0001
+      DL = 1.D0/OVL(BETA, Z0)                                           0009
       END
 Deletion of obsolete resources:
 none destroyed.
@@ -239,7 +239,7 @@ C     Extract from apsi (Spec CFP95)
       SUBROUTINE BLM(U,POTT,ZET,NZ,Z0,USTAR,DL,DZ,DKZ,KLAS,ZMH,F)
       IMPLICIT DOUBLE PRECISION (A-H, O-Z)
       REAL*8 POTT(*),ZET(*),DKZ(*)
-      DL = 1.D0/OVL(BETA, Z0)                                           0001
+      DL = 1.D0/OVL(BETA, Z0)                                           0009
       END
 Module OVL selected
 Request: build resource PRINTED_FILE for module OVL.
@@ -298,7 +298,7 @@ PRINTED_FILE made for OVL.
 C
       FUNCTION OVL(BETA,Z0)
       IMPLICIT DOUBLE PRECISION (A-H, O-Z)
-      OVL = MIN(XL, -0.003D0)                                           0001
+      OVL = MIN(XL, -0.003D0)                                           0004
       END
 Deletion of obsolete resources:
 none destroyed.

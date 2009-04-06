@@ -6,13 +6,13 @@
 
 
 
-      PRINT *, '__PIPS__ est defini'                                    0001
+      PRINT *, '__PIPS__ est defini'                                    0009
 
 
 
 
 
-      PRINT *, '__HPFC__ est defini'                                    0002
+      PRINT *, '__HPFC__ est defini'                                    0015
 
 
 

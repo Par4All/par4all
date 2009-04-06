@@ -14,23 +14,23 @@ C  <A(PHI1)-R-EXACT-{1<=PHI1, PHI1<=5}>
 C  <A(PHI1)-W-EXACT-{1<=PHI1, PHI1<=5}>
 
 C
-      DO I = 1, 5                                                       0001
+      DO I = 1, 5                                                       0008
 
 C  <A(PHI1)-R-EXACT-{PHI1==I, 1<=I, I<=5}>
 C  <A(PHI1)-W-EXACT-{PHI1==I, 1<=I, I<=5}>
 
-         IF (A(I).GT.2) THEN                                            0002
+         IF (A(I).GT.2) THEN                                            0009
 
 C  <A(PHI1)-R-EXACT-{PHI1==I, 1<=I, I<=5}>
 C  <A(PHI1)-W-EXACT-{PHI1==I, 1<=I, I<=5}>
 
-            A(I) = A(I)-1                                               0003
+            A(I) = A(I)-1                                               0010
          ELSE
 
 C  <A(PHI1)-R-EXACT-{PHI1==I, 1<=I, I<=5}>
 C  <A(PHI1)-W-EXACT-{PHI1==I, 1<=I, I<=5}>
 
-            A(I) = A(I)+1                                               0004
+            A(I) = A(I)+1                                               0012
          ENDIF
       ENDDO
 C

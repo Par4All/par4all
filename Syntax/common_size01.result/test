@@ -26,7 +26,7 @@ c      common /size_ok/mot, x, i
 C     Varying size common
       COMMON /SIZE_NOT_OK/ T(20)
 
-      PRINT *, I                                                        0001
+      PRINT *, I                                                        0013
 
       END
 Module COMMON_SIZE01 already active.
@@ -54,7 +54,7 @@ c      common /size_ok/mot, x, i
 C     Varying size common
       COMMON /SIZE_NOT_OK/ T(10)
 
-      CALL REORDER                                                      0001
+      CALL REORDER                                                      0016
 
       END
 Deletion of obsolete resources:

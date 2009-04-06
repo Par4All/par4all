@@ -168,7 +168,7 @@ C -----------------------------------------------------------
 C                       Debut de CAMAT                  
 C -----------------------------------------------------------
 
-      KER = 0                                                           0001
+      KER = 0                                                           0168
 C      CALL MOVEK (SPGM, '*CAMAT *', 1, 1, 8)
 
 C -----------------------------------------------------------
@@ -177,42 +177,42 @@ C -----------------------------------------------------------
 
 C      IF (BS) WRITE(KS,1000) TZEREA(IBT)
 
-      IF (IBT.EQ.1) THEN                                                0002
-         LON = 2*NXL+NG+NC+NBY                                          0003
+      IF (IBT.EQ.1) THEN                                                0177
+         LON = 2*NXL+NG+NC+NBY                                          0178
       ELSE
-         LON = 2*NXL+NG+NC+NT                                           0004
+         LON = 2*NXL+NG+NC+NT                                           0180
       ENDIF
 
-      CALL NLIRE(NX4, ITVATM(IBT), LON, KER)                            0005
-      IF (KER.NE.0) GOTO 1                                              0006
+      CALL NLIRE(NX4, ITVATM(IBT), LON, KER)                            0183
+      IF (KER.NE.0) GOTO 1                                              0184
 
-      CALL NLIRE(NX6, ITMTMA(IBT), LON, KER)                            0008
-      IF (KER.NE.0) GOTO 1                                              0009
+      CALL NLIRE(NX6, ITMTMA(IBT), LON, KER)                            0186
+      IF (KER.NE.0) GOTO 1                                              0187
 
 C -----------------------------------------------------------
 C               REJET DES TM FAUSSES DE FTMERR          
 C -----------------------------------------------------------
 
-      CALL CATMFA(ITMF_P, NX4, NX4(I_IVEL), NX4(I_IVGR), NX4(I_IVCO)    0011
-     &, NX4(I_IVTM), NDTM)                                              0011
-      IF (KER.NE.0) GOTO 1                                              0012
+      CALL CATMFA(ITMF_P, NX4, NX4(I_IVEL), NX4(I_IVGR), NX4(I_IVCO)    0193
+     &, NX4(I_IVTM), NDTM)                                              0193
+      IF (KER.NE.0) GOTO 1                                              0195
 
-      IF (IBT.EQ.1) THEN                                                0014
-         MAXNTM = IRDO*NMS/10                                           0015
-         IRDIN(1,3) = MAXNTM                                            0016
-         MAXMVA = IRIN*NMS/10                                           0017
-         IRDIN(2,3) = MAXMVA                                            0018
-         MAXNH = IRDH*NMS/10                                            0019
-         IRDIN(3,3) = MAXNH                                             0020
+      IF (IBT.EQ.1) THEN                                                0197
+         MAXNTM = IRDO*NMS/10                                           0198
+         IRDIN(1,3) = MAXNTM                                            0199
+         MAXMVA = IRIN*NMS/10                                           0200
+         IRDIN(2,3) = MAXMVA                                            0201
+         MAXNH = IRDH*NMS/10                                            0202
+         IRDIN(3,3) = MAXNH                                             0203
 
-         CALL CAISAX(NX6(I_IVTM), NX4(I_IVTM), NXUT_P, NA7, NA7(        0021
-     &   I_NZBY), NA1(I_NRLO), NA1(I_NRLE), INTM)                       0021
+         CALL CAISAX(NX6(I_IVTM), NX4(I_IVTM), NXUT_P, NA7, NA7(        0205
+     &   I_NZBY), NA1(I_NRLO), NA1(I_NRLE), INTM)                       0205
       ENDIF
 
-      CALL CACONT(NTM, MVA, NH, NA1, NA1(I_NRLO), NA1(I_NRLE), NA1(     0022
-     &I_NRGR), NA1(I_NRTJ), NX4, NX4(I_IVEL), NX4(I_IVGR), NX4(I_IVTM   0022
-     &), NX6, NX6(I_IVEL), NX6(I_IVGR), NX6(I_IVTM), NX2(I_IPTAI),      0022
-     &NDTM, INTM)                                                       0022
+      CALL CACONT(NTM, MVA, NH, NA1, NA1(I_NRLO), NA1(I_NRLE), NA1(     0209
+     &I_NRGR), NA1(I_NRTJ), NX4, NX4(I_IVEL), NX4(I_IVGR), NX4(I_IVTM   0209
+     &), NX6, NX6(I_IVEL), NX6(I_IVGR), NX6(I_IVTM), NX2(I_IPTAI),      0209
+     &NDTM, INTM)                                                       0209
 
 C      if (BS) then
 C         WRITE(KS,1001) NTM, MAXNTM
@@ -220,50 +220,50 @@ C         WRITE(KS,1002) MVA, MAXMVA
 C         WRITE(KS,1003) NH, MAXNH
 C      end if
 
-10    IF (NTM.GT.MAXNTM) GOTO 900                                       0023
-      IF (MVA.GT.MAXMVA) GOTO 901                                       0025
-      IF (NH.GT.MAXNH) GOTO 902                                         0027
+10    IF (NTM.GT.MAXNTM) GOTO 900                                       0222
+      IF (MVA.GT.MAXMVA) GOTO 901                                       0223
+      IF (NH.GT.MAXNH) GOTO 902                                         0224
 
-      LON = 8                                                           0029
-      CALL MOVEK(NX2, I_IPTAI, 1, 1, LON)                               0030
+      LON = 8                                                           0226
+      CALL MOVEK(NX2, I_IPTAI, 1, 1, LON)                               0227
 
-      I_LHAC = 7                                                        0031
-      I_NCHA = I_LHAC+NTM+1                                             0032
-      I_EHA = I_NCHA+NH                                                 0033
-      LON = 12                                                          0034
-      CALL MOVEK(NX3, I_LHAC, 1, 1, LON)                                0035
+      I_LHAC = 7                                                        0229
+      I_NCHA = I_LHAC+NTM+1                                             0230
+      I_EHA = I_NCHA+NH                                                 0231
+      LON = 12                                                          0232
+      CALL MOVEK(NX3, I_LHAC, 1, 1, LON)                                0233
 
-      IF (IBT.EQ.1) THEN                                                0036
-         LGR = NFA+NBFA                                                 0037
+      IF (IBT.EQ.1) THEN                                                0235
+         LGR = NFA+NBFA                                                 0236
       ELSE
-         LGR = NFR+NBFR                                                 0038
+         LGR = NFR+NBFR                                                 0238
       ENDIF
 
-      I_IVAC = 9                                                        0039
-      I_LITA = I_IVAC+NTM                                               0040
-      I_ITMF = I_LITA+NTM                                               0041
-      I_NXUT = I_ITMF+LGR                                               0042
+      I_IVAC = 9                                                        0241
+      I_LITA = I_IVAC+NTM                                               0242
+      I_ITMF = I_LITA+NTM                                               0243
+      I_NXUT = I_ITMF+LGR                                               0244
 
-      LON = 16                                                          0043
-      CALL MOVEK(NX5, I_IVAC, 1, 1, LON)                                0044
+      LON = 16                                                          0246
+      CALL MOVEK(NX5, I_IVAC, 1, 1, LON)                                0247
 
 C Compactage de ITMF ---
 C ------------------ ---
 
-      IF (LGR.GT.0) THEN                                                0045
-         DO I = 1, LGR                                                  0046
+      IF (LGR.GT.0) THEN                                                0252
+         DO I = 1, LGR                                                  0253
 C            Nx5(I_ITMF - 1 + I) = Nx5(I_ITMF_P -1 + I)
-            NX5(I_ITMF-1+I) = ITMF_P(I)                                 0047
+            NX5(I_ITMF-1+I) = ITMF_P(I)                                 0255
          ENDDO
       ENDIF
 
 C Comptage de NXUT ---
 C ---------------- ---
 
-      IF (NXU.GT.0) THEN                                                0048
-         DO I = 1, NBY                                                  0049
+      IF (NXU.GT.0) THEN                                                0262
+         DO I = 1, NBY                                                  0263
 C            Nx5(I_NXUT - 1 + I) = Nx5(I_NXUT_P -1 + I)
-            NX5(I_NXUT-1+I) = NXUT_P(I)                                 0050
+            NX5(I_NXUT-1+I) = NXUT_P(I)                                 0265
          ENDDO
       ENDIF
 
@@ -271,24 +271,24 @@ C     CALL CADSTM (NTM, MVA, NRLO, NRLE, NRGC, NRTJ,
 C                  IVOL, IVEL, IVGC, IVTM
 C                  NXUT, IVAC, LITA,
 C                  IPTAI, NTAI, ZIMP, ADTR)
-      CALL CADSTM(NTM, MVA, NA1(I_NRLO), NA1(I_NRLE), NA1(I_NRGR),      0051
-     &NA1(I_NRTJ), NX4, NX4(I_IVEL), NX4(I_IVGR), NX4(I_IVTM), NX5(     0051
-     &I_NXUT), NX5(I_IVAC), NX5(I_LITA), NX2(I_IPTAI), NX2(I_NTAI),     0051
-     &ZIMP, ADTR)                                                       0051
-      IF (KER.NE.0) GOTO 1                                              0052
+      CALL CADSTM(NTM, MVA, NA1(I_NRLO), NA1(I_NRLE), NA1(I_NRGR),      0273
+     &NA1(I_NRTJ), NX4, NX4(I_IVEL), NX4(I_IVGR), NX4(I_IVTM), NX5(     0273
+     &I_NXUT), NX5(I_IVAC), NX5(I_LITA), NX2(I_IPTAI), NX2(I_NTAI),     0273
+     &ZIMP, ADTR)                                                       0273
+      IF (KER.NE.0) GOTO 1                                              0278
 
 C -----------------------------------------------------------
 C       ECRITURE SUR DISQUE DES TABLEAUX D'ECRIVANT LES T.M.
 C -----------------------------------------------------------
 
-      LON = I_NTAI+MVA-1                                                0054
-      LBLC(2,IBT) = LON                                                 0055
+      LON = I_NTAI+MVA-1                                                0284
+      LBLC(2,IBT) = LON                                                 0285
 cc      CALL NECRIR (Nx2, ITIATE(IBT), LON, KER)        
 cc      IF (KER.NE.0) GOTO 1
 
-      LON = I_NXUT-1                                                    0056
-      IF (NXU.GE.0) LON = LON+NBY                                       0057
-      LBLC(5,IBT) = LON                                                 0059
+      LON = I_NXUT-1                                                    0289
+      IF (NXU.GE.0) LON = LON+NBY                                       0290
+      LBLC(5,IBT) = LON                                                 0291
 cc     CALL NECRIR (Nx5, ITLITA(IBT), LON, KER) 
 cc      IF (KER.NE.0) GOTO 1
 
@@ -313,17 +313,17 @@ C                 NRTJ, ZIMP,
 C                 NXUT, IVAC, LITA
 C                 LHAC, NCHA, EHA)
 
-      CALL CAJAC(NTM, NH, VCAL, NA1(I_IPCO), NA1(I_IPCE), NA1(I_ICCO)   0060
-     &, NA1(I_ICCE), NA1(I_NRLO), NA1(I_NRLE), NA1(I_NRGR), NA1(        0060
-     &I_NRCO), NA1(I_NRTJ), ZIMP, NX5(I_NXUT), NX5(I_IVAC), NX5(        0060
-     &I_LITA), NX3(I_LHAC), NX3(I_NCHA), NX3(I_EHA))                    0060
+      CALL CAJAC(NTM, NH, VCAL, NA1(I_IPCO), NA1(I_IPCE), NA1(I_ICCO)   0316
+     &, NA1(I_ICCE), NA1(I_NRLO), NA1(I_NRLE), NA1(I_NRGR), NA1(        0316
+     &I_NRCO), NA1(I_NRTJ), ZIMP, NX5(I_NXUT), NX5(I_IVAC), NX5(        0316
+     &I_LITA), NX3(I_LHAC), NX3(I_NCHA), NX3(I_EHA))                    0316
 
 C -----------------------------------------------------------
 C               ECRITURE DE LA MATRICE JACOBIEN         
 C -----------------------------------------------------------
 
-      LON = I_EHA+2*NH-1                                                0061
-      LBLC(3,IBT) = LON                                                 0062
+      LON = I_EHA+2*NH-1                                                0327
+      LBLC(3,IBT) = LON                                                 0328
 cc      CALL NECRIR (Nx3, ITIJAE(IBT), LON, KER)
 cc      IF (KER.NE.0) GOTO 1
 
@@ -334,23 +334,23 @@ C -----------------------------------------------------------
 C     CALL CAGAIN (NTM, INTM, LHAC, NCHA, EHA,
 C                  IVAC, M_GAIN)
 
-      CALL CAGAIN(NTM, INTM, NX3(I_LHAC), NX3(I_NCHA), NX3(I_EHA),      0063
-     &NX5(I_IVAC), M_GAIN)                                              0063
-      IF (KER.NE.0) GOTO 1                                              0064
+      CALL CAGAIN(NTM, INTM, NX3(I_LHAC), NX3(I_NCHA), NX3(I_EHA),      0339
+     &NX5(I_IVAC), M_GAIN)                                              0339
+      IF (KER.NE.0) GOTO 1                                              0341
 
 C -----------------------------------------------------------
 C               ECRITURE DE LA MATRICE DE GAIN SUR DISQUE
 C -----------------------------------------------------------
 
-      LON = LBLC(6,IBT)                                                 0066
+      LON = LBLC(6,IBT)                                                 0347
       GOTO 1
 
 C  902 IF(B9.AND..NOT.BS) WRITE(KS,1003) NH, MAXNH
-902   KER = 13                                                          0070
+902   KER = 13                                                          0365
       GOTO 1
 
 C  901 IF (B9.AND..NOT.BS) WRITE(KS,1002) MVA, MAXMVA
-901   KER = 12                                                          0069
+901   KER = 12                                                          0361
       GOTO 1
 
 C -----------------------------------------------------------
@@ -358,10 +358,10 @@ C                       ERREURS DE DEBORDEMENT
 C -----------------------------------------------------------
 
 C  900 IF (B9.AND..NOT.BS) WRITE(KS,1001) NTM, MAXNTM
-900   KER = 11                                                          0068
+900   KER = 11                                                          0357
 
 C    1 IF (BS) WRITE(KS,1004) TZEREA(IBT), KER
-1     CONTINUE                                                          0067
+1     CONTINUE                                                          0350
 
 C 1000 FORMAT (///,1X,'* ENTREE DANS CAMAT , DEBUT DU TRAITEMENT ',
 C     +        'DES DONNEES EN ',A4)
@@ -541,7 +541,7 @@ C -----------------------------------------------------------
 C                       Debut de CAMAT                  
 C -----------------------------------------------------------
 
-      KER = 0                                                           0001
+      KER = 0                                                           0168
 C      CALL MOVEK (SPGM, '*CAMAT *', 1, 1, 8)
 
 C -----------------------------------------------------------
@@ -550,45 +550,45 @@ C -----------------------------------------------------------
 
 C      IF (BS) WRITE(KS,1000) TZEREA(IBT)
 
-      IF (IBT.EQ.1) THEN                                                0002
-         LON = 2*NXL+NG+NC+NBY                                          0003
+      IF (IBT.EQ.1) THEN                                                0177
+         LON = 2*NXL+NG+NC+NBY                                          0178
       ELSE
-         LON = 2*NXL+NG+NC+NT                                           0004
+         LON = 2*NXL+NG+NC+NT                                           0180
       ENDIF
 
-      CALL NLIRE(NX4, ITVATM(IBT), LON, KER)                            0005
-      IF (KER.NE.0) THEN                                                0006
+      CALL NLIRE(NX4, ITVATM(IBT), LON, KER)                            0183
+      IF (KER.NE.0) THEN                                                0184
       ELSE
 
-         CALL NLIRE(NX6, ITMTMA(IBT), LON, KER)                         0008
-         IF (KER.NE.0) THEN                                             0009
+         CALL NLIRE(NX6, ITMTMA(IBT), LON, KER)                         0186
+         IF (KER.NE.0) THEN                                             0187
          ELSE
 
 C -----------------------------------------------------------
 C               REJET DES TM FAUSSES DE FTMERR          
 C -----------------------------------------------------------
 
-            CALL CATMFA(ITMF_P, NX4, NX4(I_IVEL), NX4(I_IVGR), NX4(     0011
-     &      I_IVCO), NX4(I_IVTM), NDTM)                                 0011
-            IF (KER.NE.0) THEN                                          0012
+            CALL CATMFA(ITMF_P, NX4, NX4(I_IVEL), NX4(I_IVGR), NX4(     0193
+     &      I_IVCO), NX4(I_IVTM), NDTM)                                 0193
+            IF (KER.NE.0) THEN                                          0195
             ELSE
 
-               IF (IBT.EQ.1) THEN                                       0014
-                  MAXNTM = IRDO*NMS/10                                  0015
-                  IRDIN(1,3) = MAXNTM                                   0016
-                  MAXMVA = IRIN*NMS/10                                  0017
-                  IRDIN(2,3) = MAXMVA                                   0018
-                  MAXNH = IRDH*NMS/10                                   0019
-                  IRDIN(3,3) = MAXNH                                    0020
+               IF (IBT.EQ.1) THEN                                       0197
+                  MAXNTM = IRDO*NMS/10                                  0198
+                  IRDIN(1,3) = MAXNTM                                   0199
+                  MAXMVA = IRIN*NMS/10                                  0200
+                  IRDIN(2,3) = MAXMVA                                   0201
+                  MAXNH = IRDH*NMS/10                                   0202
+                  IRDIN(3,3) = MAXNH                                    0203
 
-                  CALL CAISAX(NX6(I_IVTM), NX4(I_IVTM), NXUT_P, NA7,    0021
-     &            NA7(I_NZBY), NA1(I_NRLO), NA1(I_NRLE), INTM)          0021
+                  CALL CAISAX(NX6(I_IVTM), NX4(I_IVTM), NXUT_P, NA7,    0205
+     &            NA7(I_NZBY), NA1(I_NRLO), NA1(I_NRLE), INTM)          0205
                ENDIF
 
-               CALL CACONT(NTM, MVA, NH, NA1, NA1(I_NRLO), NA1(I_NRLE   0022
-     &         ), NA1(I_NRGR), NA1(I_NRTJ), NX4, NX4(I_IVEL), NX4(      0022
-     &         I_IVGR), NX4(I_IVTM), NX6, NX6(I_IVEL), NX6(I_IVGR),     0022
-     &         NX6(I_IVTM), NX2(I_IPTAI), NDTM, INTM)                   0022
+               CALL CACONT(NTM, MVA, NH, NA1, NA1(I_NRLO), NA1(I_NRLE   0209
+     &         ), NA1(I_NRGR), NA1(I_NRTJ), NX4, NX4(I_IVEL), NX4(      0209
+     &         I_IVGR), NX4(I_IVTM), NX6, NX6(I_IVEL), NX6(I_IVGR),     0209
+     &         NX6(I_IVTM), NX2(I_IPTAI), NDTM, INTM)                   0209
 
 C      if (BS) then
 C         WRITE(KS,1001) NTM, MAXNTM
@@ -596,64 +596,64 @@ C         WRITE(KS,1002) MVA, MAXMVA
 C         WRITE(KS,1003) NH, MAXNH
 C      end if
 
-10             IF (NTM.GT.MAXNTM) THEN                                  0023
+10             IF (NTM.GT.MAXNTM) THEN                                  0222
 
 C -----------------------------------------------------------
 C                       ERREURS DE DEBORDEMENT          
 C -----------------------------------------------------------
 
 C  900 IF (B9.AND..NOT.BS) WRITE(KS,1001) NTM, MAXNTM
-900               KER = 11                                              0068
-               ELSEIF (MVA.GT.MAXMVA) THEN                              0023
+900               KER = 11                                              0357
+               ELSEIF (MVA.GT.MAXMVA) THEN                              0222
 
 C  901 IF (B9.AND..NOT.BS) WRITE(KS,1002) MVA, MAXMVA
-901               KER = 12                                              0069
-               ELSEIF (NH.GT.MAXNH) THEN                                0023
+901               KER = 12                                              0361
+               ELSEIF (NH.GT.MAXNH) THEN                                0222
 
 C  902 IF(B9.AND..NOT.BS) WRITE(KS,1003) NH, MAXNH
-902               KER = 13                                              0070
+902               KER = 13                                              0365
                ELSE
 
-                  LON = 8                                               0029
-                  CALL MOVEK(NX2, I_IPTAI, 1, 1, LON)                   0030
+                  LON = 8                                               0226
+                  CALL MOVEK(NX2, I_IPTAI, 1, 1, LON)                   0227
 
-                  I_LHAC = 7                                            0031
-                  I_NCHA = I_LHAC+NTM+1                                 0032
-                  I_EHA = I_NCHA+NH                                     0033
-                  LON = 12                                              0034
-                  CALL MOVEK(NX3, I_LHAC, 1, 1, LON)                    0035
+                  I_LHAC = 7                                            0229
+                  I_NCHA = I_LHAC+NTM+1                                 0230
+                  I_EHA = I_NCHA+NH                                     0231
+                  LON = 12                                              0232
+                  CALL MOVEK(NX3, I_LHAC, 1, 1, LON)                    0233
 
-                  IF (IBT.EQ.1) THEN                                    0036
-                     LGR = NFA+NBFA                                     0037
+                  IF (IBT.EQ.1) THEN                                    0235
+                     LGR = NFA+NBFA                                     0236
                   ELSE
-                     LGR = NFR+NBFR                                     0038
+                     LGR = NFR+NBFR                                     0238
                   ENDIF
 
-                  I_IVAC = 9                                            0039
-                  I_LITA = I_IVAC+NTM                                   0040
-                  I_ITMF = I_LITA+NTM                                   0041
-                  I_NXUT = I_ITMF+LGR                                   0042
+                  I_IVAC = 9                                            0241
+                  I_LITA = I_IVAC+NTM                                   0242
+                  I_ITMF = I_LITA+NTM                                   0243
+                  I_NXUT = I_ITMF+LGR                                   0244
 
-                  LON = 16                                              0043
-                  CALL MOVEK(NX5, I_IVAC, 1, 1, LON)                    0044
+                  LON = 16                                              0246
+                  CALL MOVEK(NX5, I_IVAC, 1, 1, LON)                    0247
 
 C Compactage de ITMF ---
 C ------------------ ---
 
-                  IF (LGR.GT.0) THEN                                    0045
-                     DO I = 1, LGR                                      0046
+                  IF (LGR.GT.0) THEN                                    0252
+                     DO I = 1, LGR                                      0253
 C            Nx5(I_ITMF - 1 + I) = Nx5(I_ITMF_P -1 + I)
-                        NX5(I_ITMF-1+I) = ITMF_P(I)                     0047
+                        NX5(I_ITMF-1+I) = ITMF_P(I)                     0255
                      ENDDO
                   ENDIF
 
 C Comptage de NXUT ---
 C ---------------- ---
 
-                  IF (NXU.GT.0) THEN                                    0048
-                     DO I = 1, NBY                                      0049
+                  IF (NXU.GT.0) THEN                                    0262
+                     DO I = 1, NBY                                      0263
 C            Nx5(I_NXUT - 1 + I) = Nx5(I_NXUT_P -1 + I)
-                        NX5(I_NXUT-1+I) = NXUT_P(I)                     0050
+                        NX5(I_NXUT-1+I) = NXUT_P(I)                     0265
                      ENDDO
                   ENDIF
 
@@ -661,25 +661,25 @@ C     CALL CADSTM (NTM, MVA, NRLO, NRLE, NRGC, NRTJ,
 C                  IVOL, IVEL, IVGC, IVTM
 C                  NXUT, IVAC, LITA,
 C                  IPTAI, NTAI, ZIMP, ADTR)
-                  CALL CADSTM(NTM, MVA, NA1(I_NRLO), NA1(I_NRLE), NA1   0051
-     &            (I_NRGR), NA1(I_NRTJ), NX4, NX4(I_IVEL), NX4(I_IVGR   0051
-     &            ), NX4(I_IVTM), NX5(I_NXUT), NX5(I_IVAC), NX5(        0051
-     &            I_LITA), NX2(I_IPTAI), NX2(I_NTAI), ZIMP, ADTR)       0051
-                  IF (KER.NE.0) THEN                                    0052
+                  CALL CADSTM(NTM, MVA, NA1(I_NRLO), NA1(I_NRLE), NA1   0273
+     &            (I_NRGR), NA1(I_NRTJ), NX4, NX4(I_IVEL), NX4(I_IVGR   0273
+     &            ), NX4(I_IVTM), NX5(I_NXUT), NX5(I_IVAC), NX5(        0273
+     &            I_LITA), NX2(I_IPTAI), NX2(I_NTAI), ZIMP, ADTR)       0273
+                  IF (KER.NE.0) THEN                                    0278
                   ELSE
 
 C -----------------------------------------------------------
 C       ECRITURE SUR DISQUE DES TABLEAUX D'ECRIVANT LES T.M.
 C -----------------------------------------------------------
 
-                     LON = I_NTAI+MVA-1                                 0054
-                     LBLC(2,IBT) = LON                                  0055
+                     LON = I_NTAI+MVA-1                                 0284
+                     LBLC(2,IBT) = LON                                  0285
 cc      CALL NECRIR (Nx2, ITIATE(IBT), LON, KER)        
 cc      IF (KER.NE.0) GOTO 1
 
-                     LON = I_NXUT-1                                     0056
-                     IF (NXU.GE.0) LON = LON+NBY                        0057
-                     LBLC(5,IBT) = LON                                  0059
+                     LON = I_NXUT-1                                     0289
+                     IF (NXU.GE.0) LON = LON+NBY                        0290
+                     LBLC(5,IBT) = LON                                  0291
 cc     CALL NECRIR (Nx5, ITLITA(IBT), LON, KER) 
 cc      IF (KER.NE.0) GOTO 1
 
@@ -704,18 +704,18 @@ C                 NRTJ, ZIMP,
 C                 NXUT, IVAC, LITA
 C                 LHAC, NCHA, EHA)
 
-                     CALL CAJAC(NTM, NH, VCAL, NA1(I_IPCO), NA1(        0060
-     &               I_IPCE), NA1(I_ICCO), NA1(I_ICCE), NA1(I_NRLO),    0060
-     &               NA1(I_NRLE), NA1(I_NRGR), NA1(I_NRCO), NA1(        0060
-     &               I_NRTJ), ZIMP, NX5(I_NXUT), NX5(I_IVAC), NX5(      0060
-     &               I_LITA), NX3(I_LHAC), NX3(I_NCHA), NX3(I_EHA))     0060
+                     CALL CAJAC(NTM, NH, VCAL, NA1(I_IPCO), NA1(        0316
+     &               I_IPCE), NA1(I_ICCO), NA1(I_ICCE), NA1(I_NRLO),    0316
+     &               NA1(I_NRLE), NA1(I_NRGR), NA1(I_NRCO), NA1(        0316
+     &               I_NRTJ), ZIMP, NX5(I_NXUT), NX5(I_IVAC), NX5(      0316
+     &               I_LITA), NX3(I_LHAC), NX3(I_NCHA), NX3(I_EHA))     0316
 
 C -----------------------------------------------------------
 C               ECRITURE DE LA MATRICE JACOBIEN         
 C -----------------------------------------------------------
 
-                     LON = I_EHA+2*NH-1                                 0061
-                     LBLC(3,IBT) = LON                                  0062
+                     LON = I_EHA+2*NH-1                                 0327
+                     LBLC(3,IBT) = LON                                  0328
 cc      CALL NECRIR (Nx3, ITIJAE(IBT), LON, KER)
 cc      IF (KER.NE.0) GOTO 1
 
@@ -726,16 +726,16 @@ C -----------------------------------------------------------
 C     CALL CAGAIN (NTM, INTM, LHAC, NCHA, EHA,
 C                  IVAC, M_GAIN)
 
-                     CALL CAGAIN(NTM, INTM, NX3(I_LHAC), NX3(I_NCHA)    0063
-     &               , NX3(I_EHA), NX5(I_IVAC), M_GAIN)                 0063
-                     IF (KER.NE.0) THEN                                 0064
+                     CALL CAGAIN(NTM, INTM, NX3(I_LHAC), NX3(I_NCHA)    0339
+     &               , NX3(I_EHA), NX5(I_IVAC), M_GAIN)                 0339
+                     IF (KER.NE.0) THEN                                 0341
                      ELSE
 
 C -----------------------------------------------------------
 C               ECRITURE DE LA MATRICE DE GAIN SUR DISQUE
 C -----------------------------------------------------------
 
-                        LON = LBLC(6,IBT)                               0066
+                        LON = LBLC(6,IBT)                               0347
                      ENDIF
                   ENDIF
                ENDIF
@@ -744,7 +744,7 @@ C -----------------------------------------------------------
       ENDIF
 
 C    1 IF (BS) WRITE(KS,1004) TZEREA(IBT), KER
-1     CONTINUE                                                          0067
+1     CONTINUE                                                          0350
 
 C 1000 FORMAT (///,1X,'* ENTREE DANS CAMAT , DEBUT DU TRAITEMENT ',
 C     +        'DES DONNEES EN ',A4)

@@ -3,13 +3,13 @@ C                                                                   15 (SUMMARY)
       REAL T(100)
 C                                                                    1 (STMT)
 
-      I = 1                                                             0001
+      I = 1                                                             0004
 C                                                                    0 (STMT)
-100   CONTINUE                                                          0002
+100   CONTINUE                                                          0005
 C                                                                    2 (STMT)
-      T(I) = 0.                                                         0003
+      T(I) = 0.                                                         0006
 C                                                                    3 (STMT)
-      I = I+1                                                           0004
+      I = I+1                                                           0007
 C                                                                    4 (TEST)
-      IF (I.LE.N) GOTO 100                                              0005
+      IF (I.LE.N) GOTO 100                                              0008
       END

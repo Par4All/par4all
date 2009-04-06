@@ -5,52 +5,52 @@ Output of the parser
 
 C     Check desugaring of assigned go to's and elimination of carriage returns
 
-      I = 100                                                           0001
+      I = 100                                                           0005
 
-      I = 200                                                           0002
+      I = 200                                                           0007
 
       GOTO 600
 
-      IF (I.EQ.100) THEN                                                0003
+      IF (I.EQ.100) THEN                                                0011
          GOTO 100
       ENDIF
-      IF (I.EQ.300) THEN                                                0003
+      IF (I.EQ.300) THEN                                                0011
          GOTO 300
       ELSE
-         STOP                                                           0003
+         STOP                                                           0011
       ENDIF
 
-600   IF (I.EQ.400) THEN                                                0004
+600   IF (I.EQ.400) THEN                                                0013
          GOTO 400
       ELSE
-         STOP                                                           0004
+         STOP                                                           0013
       ENDIF
 
-500   IF (I.EQ.100) THEN                                                0005
+500   IF (I.EQ.100) THEN                                                0015
          GOTO 100
       ENDIF
-      IF (I.EQ.300) THEN                                                0005
+      IF (I.EQ.300) THEN                                                0015
          GOTO 300
       ENDIF
-      IF (I.EQ.400) THEN                                                0005
+      IF (I.EQ.400) THEN                                                0015
          GOTO 400
       ELSE
-         STOP                                                           0005
+         STOP                                                           0015
       ENDIF
 
-100   CONTINUE                                                          0006
-      PRINT *, 'I reach 100'                                            0007
-      PRINT *, I                                                        0008
+100   CONTINUE                                                          0017
+      PRINT *, 'I reach 100'                                            0018
+      PRINT *, I                                                        0019
 
-      STOP                                                              0009
-300   CONTINUE                                                          0010
-      PRINT *, 'I reach 300'                                            0011
-      STOP                                                              0012
-200   CONTINUE                                                          0013
-      PRINT *, 'I reach 200'                                            0014
-      STOP                                                              0015
-400   CONTINUE                                                          0016
-      PRINT *, 'I reach 400'                                            0017
+      STOP                                                              0021
+300   CONTINUE                                                          0022
+      PRINT *, 'I reach 300'                                            0023
+      STOP                                                              0024
+200   CONTINUE                                                          0025
+      PRINT *, 'I reach 200'                                            0026
+      STOP                                                              0027
+400   CONTINUE                                                          0028
+      PRINT *, 'I reach 400'                                            0029
       GOTO 500
       END
 
@@ -60,32 +60,32 @@ Output of the controlizer
 
 C     Check desugaring of assigned go to's and elimination of carriage returns
 
-      I = 100                                                           0001
+      I = 100                                                           0005
 
-      I = 200                                                           0002
+      I = 200                                                           0007
 
 
-600   IF (I.EQ.400) GOTO 400                                            0004
-      STOP                                                              0004
+600   IF (I.EQ.400) GOTO 400                                            0013
+      STOP                                                              0013
 
-500   IF (I.EQ.100) GOTO 100                                            0005
-      IF (I.EQ.300) GOTO 300                                            0005
-      IF (I.EQ.400) GOTO 400                                            0005
-      STOP                                                              0005
-
-100   CONTINUE                                                          0006
-      PRINT *, 'I reach 100'                                            0007
-      PRINT *, I                                                        0008
-
-      STOP                                                              0009
-300   CONTINUE                                                          0010
-      PRINT *, 'I reach 300'                                            0011
-      STOP                                                              0012
-200   CONTINUE                                                          0013
-      PRINT *, 'I reach 200'                                            0014
+500   IF (I.EQ.100) GOTO 100                                            0015
+      IF (I.EQ.300) GOTO 300                                            0015
+      IF (I.EQ.400) GOTO 400                                            0015
       STOP                                                              0015
-400   CONTINUE                                                          0016
-      PRINT *, 'I reach 400'                                            0017
+
+100   CONTINUE                                                          0017
+      PRINT *, 'I reach 100'                                            0018
+      PRINT *, I                                                        0019
+
+      STOP                                                              0021
+300   CONTINUE                                                          0022
+      PRINT *, 'I reach 300'                                            0023
+      STOP                                                              0024
+200   CONTINUE                                                          0025
+      PRINT *, 'I reach 200'                                            0026
+      STOP                                                              0027
+400   CONTINUE                                                          0028
+      PRINT *, 'I reach 400'                                            0029
       GOTO 500
       END
 

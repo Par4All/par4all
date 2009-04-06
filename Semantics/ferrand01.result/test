@@ -12,22 +12,22 @@ C  T() {}
 C  T(BI,CI,I) {}
 
 
-      DO 20 I = 0, 199                                                  0001
+      DO 20 I = 0, 199                                                  0009
 
 C  T(BI) {}
 
-         BI = B(I)                                                      0002
+         BI = B(I)                                                      0010
 
 C  T(CI) {}
 
-         CI = C(I)                                                      0003
+         CI = C(I)                                                      0011
 
 C  T() {}
 
-         A(I) = BI+CI                                                   0004
+         A(I) = BI+CI                                                   0012
 
 C  T() {}
 
-20       CONTINUE                                                       0005
+20       CONTINUE                                                       0013
 
       END

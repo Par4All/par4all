@@ -18,18 +18,18 @@ C  T(M) {1<=N}
 
 C (0,2)
 
-      READ *, M                                                         0001
+      READ *, M                                                         0009
 
 C  T(I) {1<=I, 1<=N}
 
 C (0,3)
 
-      DO I = 1, M                                                       0002
+      DO I = 1, M                                                       0011
 
 C  T() {1<=I, I<=M, I<=N, 1<=N}
 
 C (0,4)
-         A(I) = 0.                                                      0003
+         A(I) = 0.                                                      0012
       ENDDO
 
 C     END BLOCK
@@ -54,18 +54,18 @@ C TP() {1<=N}
 
 C (0,2)
 
-      READ *, M                                                         0001
+      READ *, M                                                         0009
 
 C TP() {M<=N, 1<=N}
 
 C (0,3)
 
-      DO I = 1, M                                                       0002
+      DO I = 1, M                                                       0011
 
 C TP() {1<=I, I<=M, I<=N, 0<=M, M<=N, 1<=N}
 
 C (0,4)
-         A(I) = 0.                                                      0003
+         A(I) = 0.                                                      0012
       ENDDO
 
 C     END BLOCK

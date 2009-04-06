@@ -5,9 +5,9 @@ Parsed printed file for "PRINT01"
 
       REAL X(10)
 
-      READ *, X                                                         0001
+      READ *, X                                                         0005
 
-      PRINT *, X                                                        0002
+      PRINT *, X                                                        0007
 
       END
 
@@ -19,11 +19,11 @@ Proper effetcs for "PRINT01"
 C               <must be read   >: __IO_EFFECTS:LUNS(5)
 C               <must be written>: X __IO_EFFECTS:LUNS(5)
 
-      READ *, X                                                         0001
+      READ *, X                                                         0005
 C               <must be read   >: X __IO_EFFECTS:LUNS(6)
 C               <must be written>: __IO_EFFECTS:LUNS(6)
 
-      PRINT *, X                                                        0002
+      PRINT *, X                                                        0007
 
       END
 
@@ -39,11 +39,11 @@ C                                  __IO_EFFECTS:LUNS(6)
 C               <must be read   >: __IO_EFFECTS:LUNS(5)
 C               <must be written>: X __IO_EFFECTS:LUNS(5)
 
-      READ *, X                                                         0001
+      READ *, X                                                         0005
 C               <must be read   >: X __IO_EFFECTS:LUNS(6)
 C               <must be written>: __IO_EFFECTS:LUNS(6)
 
-      PRINT *, X                                                        0002
+      PRINT *, X                                                        0007
 
       END
 
@@ -62,13 +62,13 @@ C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==5}>
 C  <X(PHI1)-W-EXACT-{1<=PHI1, PHI1<=10}>
 
 
-      READ *, X                                                         0001
+      READ *, X                                                         0005
 
 C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6}>
 C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6}>
 C  <X(PHI1)-R-EXACT-{1<=PHI1, PHI1<=10}>
 
 
-      PRINT *, X                                                        0002
+      PRINT *, X                                                        0007
 
       END

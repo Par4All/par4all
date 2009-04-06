@@ -9,15 +9,15 @@ Proper effects for "FFT1"
       REAL S(N), F(N)
 C               <must be written>: J
 
-      J = 1                                                             0001
+      J = 1                                                             0008
 C               <must be written>: I
-      DO I = 1, N                                                       0002
+      DO I = 1, N                                                       0009
 C               <must be read   >: I J S(I)
 C               <must be written>: F(J)
-         F(J) = S(I)                                                    0003
+         F(J) = S(I)                                                    0010
 C               <must be read   >: J
 C               <must be written>: J
-         J = J+1                                                        0004
+         J = J+1                                                        0011
       ENDDO
 
       END
@@ -34,18 +34,18 @@ C               <may be written >: F(*)
       REAL S(N), F(N)
 C               <must be written>: J
 
-      J = 1                                                             0001
+      J = 1                                                             0008
 C               <may be read    >: I J S(*)
 C               <may be written >: F(*) J
 C               <must be written>: I
-      DO I = 1, N                                                       0002
+      DO I = 1, N                                                       0009
 C               <may be read    >: S(*)
 C               <may be written >: F(*)
 C               <must be read   >: I J
-         F(J) = S(I)                                                    0003
+         F(J) = S(I)                                                    0010
 C               <must be read   >: J
 C               <must be written>: J
-         J = J+1                                                        0004
+         J = J+1                                                        0011
       ENDDO
 
       END

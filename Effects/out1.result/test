@@ -2,10 +2,10 @@
       PROGRAM OUT1
       INTEGER I, K
 C               <must be exported>: I __IO_EFFECTS:LUNS(5)
-      READ *, I, K                                                      0001
+      READ *, I, K                                                      0004
 C               <must be exported>: __IO_EFFECTS:LUNS(6)
-      PRINT *, I                                                        0002
+      PRINT *, I                                                        0005
 C               <must be exported>: K
-      K = 3                                                             0003
-      PRINT *, K                                                        0004
+      K = 3                                                             0006
+      PRINT *, K                                                        0007
       END

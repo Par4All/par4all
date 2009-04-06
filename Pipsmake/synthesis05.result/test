@@ -31,7 +31,7 @@ C     Bug: wrong typing for a parameter. PIPS sees lload as an OVERLOADED...
       INTEGER LLOAD
       PARAMETER  (LLOAD  = 1 )
 
-      CALL HIDENH(LHIDEN, LLOAD, 9999)                                  0001
+      CALL HIDENH(LHIDEN, LLOAD, 9999)                                  0008
 
       END
 echo

@@ -6,33 +6,33 @@ C  P() {INCX==1, INCY==1, N==49}
 
 C  P() {INCX==1, INCY==1, N==49}
 
-      SDOT = 0.0                                                        0001
+      SDOT = 0.0                                                        0003
 
 C  P() {INCX==1, INCY==1, N==49}
 
-      IX = 1                                                            0002
+      IX = 1                                                            0004
 
 C  P(IX) {INCX==1, INCY==1, IX==1, N==49}
 
-      IY = 1                                                            0003
+      IY = 1                                                            0005
 
 C  P(IX,IY) {INCX==1, INCY==1, IX==1, IY==1, N==49}
 
-      DO 10 I = 1, N                                                    0004
+      DO 10 I = 1, N                                                    0006
 
 C  P(I,IX,IY) {INCX==1, INCY==1, N==49, 1<=I, I<=49}
 
-         SDOT = SDOT+X(IX)*Y(IY)                                        0005
+         SDOT = SDOT+X(IX)*Y(IY)                                        0007
 
 C  P(I,IX,IY) {INCX==1, INCY==1, N==49, 1<=I, I<=49}
 
-         IX = IX+INCX                                                   0006
+         IX = IX+INCX                                                   0008
 
 C  P(I,IX,IY) {INCX==1, INCY==1, N==49, 1<=I, I<=49}
 
-         IY = IY+INCY                                                   0007
+         IY = IY+INCY                                                   0009
 
 C  P(I,IX,IY) {INCX==1, INCY==1, N==49, 1<=I, I<=49}
 
-10       CONTINUE                                                       0008
+10       CONTINUE                                                       0010
       END

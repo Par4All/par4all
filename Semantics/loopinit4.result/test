@@ -22,32 +22,32 @@ c     lower loop bound.
 C  T(J) {J==2}
 
 
-      J = 2                                                             0001
+      J = 2                                                             0018
 
 C  T(N) {J==2, N==0}
 
 
-      N = 0                                                             0002
+      N = 0                                                             0020
 
 C  T(I,J) {J#init==1, N==0}
 
 
-      DO I = INC(J), N                                                  0003
+      DO I = INC(J), N                                                  0022
 
 C  T(J) {N==0, I<=0}
 
-         T(I) = 0.                                                      0004
+         T(I) = 0.                                                      0023
 
 C  T(J) {J==J#init+2, N==0, I<=0}
 
-         J = J+2                                                        0005
+         J = J+2                                                        0024
       ENDDO
 
 C  T() {I==3, N==0}
 
 
 c     The precondition should be: i==3, j==3
-      PRINT *, I, J                                                     0006
+      PRINT *, I, J                                                     0028
 
       END
 # preconditions
@@ -74,32 +74,32 @@ c     lower loop bound.
 C  P() {}
 
 
-      J = 2                                                             0001
+      J = 2                                                             0018
 
 C  P(J) {J==2}
 
 
-      N = 0                                                             0002
+      N = 0                                                             0020
 
 C  P(J,N) {J==2, N==0}
 
 
-      DO I = INC(J), N                                                  0003
+      DO I = INC(J), N                                                  0022
 
 C  P() {0==-1}
 
-         T(I) = 0.                                                      0004
+         T(I) = 0.                                                      0023
 
 C  P() {0==-1}
 
-         J = J+2                                                        0005
+         J = J+2                                                        0024
       ENDDO
 
 C  P(I,J,N) {I==4, J==4, N==0}
 
 
 c     The precondition should be: i==3, j==3
-      PRINT *, I, J                                                     0006
+      PRINT *, I, J                                                     0028
 
       END
 

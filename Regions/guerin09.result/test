@@ -19,7 +19,7 @@ C  <K(PHI1)-W-EXACT-{PHI1==1}>
 
 C (0,2)
 
-      K(1) = 0                                                          0001
+      K(1) = 0                                                          0010
 
 C  <I-R-EXACT-{}>
 C  <I-W-EXACT-{}>
@@ -27,14 +27,14 @@ C  <K(PHI1)-R-EXACT-{1<=PHI1, PHI1<=9}>
 C  <K(PHI1)-W-EXACT-{2<=PHI1, PHI1<=10}>
 
 C (0,3)
-      DO I = 2, 10                                                      0002
+      DO I = 2, 10                                                      0011
 
 C  <I-R-EXACT-{}>
 C  <K(PHI1)-R-EXACT-{PHI1==I-1, 2<=I, I<=10}>
 C  <K(PHI1)-W-EXACT-{PHI1==I, 2<=I, I<=10}>
 
 C (0,4)
-         K(I) = K(I-1)+1                                                0003
+         K(I) = K(I-1)+1                                                0012
       ENDDO
 
 C     END BLOCK
@@ -51,18 +51,18 @@ C (0,1)
 C     BEGIN BLOCK
 C (0,2)
 
-      K(1) = 0                                                          0001
+      K(1) = 0                                                          0010
 
 C  <K(PHI1)-IN-EXACT-{1<=PHI1, PHI1<=1}>
 
 C (0,3)
-      DO I = 2, 10                                                      0002
+      DO I = 2, 10                                                      0011
 
 C  <I-IN-EXACT-{}>
 C  <K(PHI1)-IN-EXACT-{PHI1==I-1, 2<=I, I<=10}>
 
 C (0,4)
-         K(I) = K(I-1)+1                                                0003
+         K(I) = K(I-1)+1                                                0012
       ENDDO
 
 C     END BLOCK

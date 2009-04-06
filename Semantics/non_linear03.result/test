@@ -14,13 +14,13 @@ C (0,2)
 
 C     Check non-linear expression handling
 
-      IF (I.LT.2.OR.J.LT.3) STOP                                        0001
+      IF (I.LT.2.OR.J.LT.3) STOP                                        0005
 
 C  T(K) {}
 
 C (0,5)
 
-      K = I*(J-1)                                                       0003
+      K = I*(J-1)                                                       0007
 
 C     END BLOCK
       END

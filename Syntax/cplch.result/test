@@ -22,18 +22,18 @@ c
 c
 c Traitement
 c
-      WRITE (6, 1020) NOM_VAR                                           0001
-      READ (UNIT=10,FMT=*,ERR=9000,END=9001,IOSTAT=IOS) LIGNE           0002
-      READ (UNIT=10,FMT=*,ERR=9000,END=9001,IOSTAT=IOS) VAR_CHAINE      0003
-      N = LEN                                                           0004
-      INFOCA = CPOK                                                     0005
+      WRITE (6, 1020) NOM_VAR                                           0025
+      READ (UNIT=10,FMT=*,ERR=9000,END=9001,IOSTAT=IOS) LIGNE           0026
+      READ (UNIT=10,FMT=*,ERR=9000,END=9001,IOSTAT=IOS) VAR_CHAINE      0027
+      N = LEN                                                           0028
+      INFOCA = CPOK                                                     0029
       RETURN
 c
-9000  WRITE (6, 1000) LIGNE                                             0006
-      WRITE (6, *) VAR_CHAINE                                           0007
-      INFOCA = CPSTOP                                                   0008
+9000  WRITE (6, 1000) LIGNE                                             0032
+      WRITE (6, *) VAR_CHAINE                                           0033
+      INFOCA = CPSTOP                                                   0034
       RETURN
-9001  WRITE (6, 1010) LIGNE                                             0009
-      INFOCA = CPSTOP                                                   0010
+9001  WRITE (6, 1010) LIGNE                                             0036
+      INFOCA = CPSTOP                                                   0037
       END
 

@@ -86,16 +86,16 @@ C     When F is called first, MakeAtom understands "call g(f)" as call "g(f())"
       INTEGER F
       INTEGER H
 
-      CALL G(F)                                                         0001
+      CALL G(F)                                                         0014
 
-      I = 2                                                             0002
-      J = 3                                                             0003
+      I = 2                                                             0016
+      J = 3                                                             0017
 
-      K = F(I, J)                                                       0004
+      K = F(I, J)                                                       0019
 
-      L = F(F(I, J), H())                                               0005
+      L = F(F(I, J), H())                                               0021
 
-      PRINT *, K, L                                                     0006
+      PRINT *, K, L                                                     0023
 
       END
 Module F selected
@@ -153,9 +153,9 @@ PRINTED_FILE made for F.
 
       INTEGER FUNCTION F(I, J)
 
-      PRINT *, "f called for ", I, J                                    0001
+      PRINT *, "f called for ", I, J                                    0004
 
-      F = I+J                                                           0002
+      F = I+J                                                           0006
 
       END
 Module G selected
@@ -211,7 +211,7 @@ PRINTED_FILE made for G.
       SUBROUTINE G(F)
       INTEGER F
       EXTERNAL F
-      PRINT *, F(10, 1)                                                 0001
+      PRINT *, F(10, 1)                                                 0005
       END
 Module H selected
 Request: build resource PRINTED_FILE for module H.
@@ -260,7 +260,7 @@ End of declarations for module H
 PRINTED_FILE made for H.
 
       INTEGER FUNCTION H()
-      H = 1                                                             0001
+      H = 1                                                             0003
       END
 Deletion of obsolete resources:
 none destroyed.

@@ -9,7 +9,7 @@ C  P() {}
 
 c     PLDI'95, Constant propagation
 
-      CALL SUB1(0)                                                      0001
+      CALL SUB1(0)                                                      0005
 
       END
 --- Preconditions for module SUB1
@@ -24,27 +24,27 @@ C  P() {F1==0}
 C  P() {F1==0}
 
 
-      X = 9                                                             0001
+      X = 9                                                             0006
 
 C  P(X) {F1==0, X==9}
 
 
-      IF (F1.EQ.0) THEN                                                 0002
+      IF (F1.EQ.0) THEN                                                 0008
 
 C  P(X) {F1==0, X==9}
 
-         Y = 1                                                          0003
+         Y = 1                                                          0009
       ELSE
 
 C  P() {0==-1}
 
-         Y = 0                                                          0004
+         Y = 0                                                          0011
       ENDIF
 
 C  P(X,Y) {F1==0, X==9, Y==1}
 
 
-      CALL SUB2(Y, 4, F1, X)                                            0005
+      CALL SUB2(Y, 4, F1, X)                                            0014
 
       END
 --- Preconditions for module SUB2
@@ -58,6 +58,6 @@ C  P() {F2==1, F3==4, F4==0, F5==9}
 C  P() {F2==1, F3==4, F4==0, F5==9}
 
 
-      PRINT *, F2+F3+F4+F5                                              0001
+      PRINT *, F2+F3+F4+F5                                              0005
 
       END

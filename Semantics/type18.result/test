@@ -6,12 +6,12 @@ C  T() {}
 C  T(KK) {ICAR==KK}
 
 
-      KK = ICAR                                                         0001
+      KK = ICAR                                                         0003
 
 C  T(ICAR) {ICAR==KK}
 
 
-      ICAR = KK                                                         0002
+      ICAR = KK                                                         0005
 
       END
 

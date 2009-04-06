@@ -17,39 +17,39 @@ C     body.
 C  T(R,T) {RMIN<=R}
 
 
-      DO 4 R = RMIN, RMAX                                               0001
+      DO 4 R = RMIN, RMAX                                               0014
 
 C  T(T) {}
 
-         DO 4 T = TMIN(R+1), TMAX(R+1)                                  0002
+         DO 4 T = TMIN(R+1), TMAX(R+1)                                  0015
 
 C  T() {}
 
-            FC(2) = WLOOP(R+1,T+1)                                      0003
+            FC(2) = WLOOP(R+1,T+1)                                      0016
 
 C  T() {}
 
 
-4           CONTINUE                                                    0004
+4           CONTINUE                                                    0018
 
 C  T(T) {1<=T}
 
 
-      DO T = 1, N                                                       0005
+      DO T = 1, N                                                       0020
 
 C  T() {}
 
-         FC(I) = WLOOP(I,I)                                             0006
+         FC(I) = WLOOP(I,I)                                             0021
       ENDDO
 
 C  T(T) {1<=T}
 
 
-      DO T = 1, 2                                                       0007
+      DO T = 1, 2                                                       0024
 
 C  T() {}
 
-         FC(I) = WLOOP(I,I)                                             0008
+         FC(I) = WLOOP(I,I)                                             0025
       ENDDO
 C     
       END

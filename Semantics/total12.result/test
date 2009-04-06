@@ -12,53 +12,53 @@ C     Club)
 
 C TP() {}
 
-      READ (5, *) M, N                                                  0001
+      READ (5, *) M, N                                                  0009
 
 C TP() {0<=M, M<=512, 0<=N, N<=512}
 
 
-      DO 20 I = 1, M                                                    0002
+      DO 20 I = 1, M                                                    0011
 
 C TP() {0<=M, M<=512, 0<=N, N<=512}
 
-         DO 20 J = 1, N                                                 0003
+         DO 20 J = 1, N                                                 0012
 
 C TP() {0<=I, I<=512, 1<=J, J<=513, 0<=M, M<=512, 0<=N, N<=512}
 
-            UNEW(I+1,J) = (I+1)*J                                       0004
+            UNEW(I+1,J) = (I+1)*J                                       0013
 
 C TP() {0<=M, M<=512, 0<=N, N<=512}
 
-20          CONTINUE                                                    0005
+20          CONTINUE                                                    0014
 
 C TP() {0<=M, M<=512, 0<=N, N<=512}
 
 
-      DO 30 J = 1, N                                                    0006
+      DO 30 J = 1, N                                                    0016
 
 C TP() {1<=J, J<=513, 0<=M, M<=512, 0<=N, N<=512}
 
-         UNEW(1,J) = UNEW(M+1,J)                                        0007
+         UNEW(1,J) = UNEW(M+1,J)                                        0017
 
 C TP() {0<=M, M<=512, 0<=N, N<=512}
 
-30       CONTINUE                                                       0008
+30       CONTINUE                                                       0018
 
 C TP() {0<=M, M<=512, 0<=N, N<=512}
 
 
-      DO 40 I = 1, M                                                    0009
+      DO 40 I = 1, M                                                    0020
 
 C TP() {0<=I, I<=512, 0<=M, M<=512, 0<=N, N<=512}
 
-         UNEW(I+1,N+1) = UNEW(I+1,1)                                    0010
+         UNEW(I+1,N+1) = UNEW(I+1,1)                                    0021
 
 C TP() {0<=M, M<=512, 0<=N, N<=512}
 
-40       CONTINUE                                                       0011
+40       CONTINUE                                                       0022
 
 C TP() {0<=M, M<=512, 0<=N, N<=512}
 
 
-      UNEW(1,N+1) = UNEW(M+1,1)                                         0012
+      UNEW(1,N+1) = UNEW(M+1,1)                                         0024
       END

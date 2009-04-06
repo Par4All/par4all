@@ -3,7 +3,7 @@
      &                                                             TETA)
       INTEGER NMOT
       REAL GRAD(1),ZZ(1)
-      XMUN = SDOT(NMOT, GRAD, 1, ZZ, 1)                                 0001
+      XMUN = SDOT(NMOT, GRAD, 1, ZZ, 1)                                 0006
 
       END
 !

@@ -7,13 +7,13 @@ C     Check tiling: use integer loop bounds, mutiple of the tile size
 
       REAL X(0:15, 0:10)
 
-      DO 100 I = 1, 15                                                  0001
-         DO 200 J = 1, 10                                               0002
-            X(I,J) = FLOAT(I+J)                                         0003
-200         CONTINUE                                                    0004
-100      CONTINUE                                                       0005
+      DO 100 I = 1, 15                                                  0007
+         DO 200 J = 1, 10                                               0008
+            X(I,J) = FLOAT(I+J)                                         0009
+200         CONTINUE                                                    0010
+100      CONTINUE                                                       0011
 
-      PRINT *, X                                                        0006
+      PRINT *, X                                                        0013
 
       END
 
@@ -25,18 +25,18 @@ C     Check tiling: use integer loop bounds, mutiple of the tile size
 
       REAL X(0:15, 0:10)
 
-      DO I_t = 0, 2                                                     0001
+      DO I_t = 0, 2                                                     0007
          DO J_t = 0, 1
 
-            DO I = 1+5*I_t, 5+5*I_t                                     0001
-               DO J = 1+5*J_t, 5+5*J_t                                  0002
-                  X(I,J) = FLOAT(I+J)                                   0003
-200               CONTINUE                                              0004
+            DO I = 1+5*I_t, 5+5*I_t                                     0007
+               DO J = 1+5*J_t, 5+5*J_t                                  0008
+                  X(I,J) = FLOAT(I+J)                                   0009
+200               CONTINUE                                              0010
                ENDDO
             ENDDO
          ENDDO
       ENDDO
 
-      PRINT *, X                                                        0006
+      PRINT *, X                                                        0013
 
       END

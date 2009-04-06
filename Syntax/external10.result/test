@@ -59,7 +59,7 @@ PRINTED_FILE made for F.
 
       SUBROUTINE F
 
-      PRINT *, "Hello world!"                                           0001
+      PRINT *, "Hello world!"                                           0004
 
       END
 Module EXTERNAL10 selected
@@ -121,7 +121,7 @@ C     When f is parsed, you cannot decide yet
 
       EXTERNAL F
 
-      CALL G(F)                                                         0001
+      CALL G(F)                                                         0007
 
       END
 Deletion of obsolete resources:

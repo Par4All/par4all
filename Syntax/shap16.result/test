@@ -13,7 +13,7 @@ C$PIPS STATEMENT FUNCTION DF3 SUBSTITUTED
 !
 ! code
 !
-      DFXI(3) = -1.                                                     0001
+      DFXI(3) = -1.                                                     0015
 
       END
 !
@@ -31,7 +31,7 @@ C$PIPS STATEMENT FUNCTION DF3 SUBSTITUTED
 !
 ! code
 !
-      DFXI(3) = -1.                                                     0001
+      DFXI(3) = -1.                                                     0015
 
       END
 

@@ -2,6 +2,6 @@
 
 C     Check that new grammar rules are ok
 
-      OPEN (UNIT=5,FILE="foo")                                          0001
+      OPEN (UNIT=5,FILE="foo")                                          0005
 
       END

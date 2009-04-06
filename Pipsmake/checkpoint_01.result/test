@@ -4,21 +4,21 @@
 
       SUBROUTINE BLA
       INTEGER K
-      K = 3                                                             0001
-      PRINT *, 'bla', K                                                 0002
+      K = 3                                                             0004
+      PRINT *, 'bla', K                                                 0005
       END
       PROGRAM CHECKPOINT
       INTEGER I
-      I = 1                                                             0001
-      PRINT *, 'checkpoint', I                                          0002
-      CALL FOO                                                          0003
+      I = 1                                                             0003
+      PRINT *, 'checkpoint', I                                          0004
+      CALL FOO                                                          0005
       END
 
       SUBROUTINE FOO
       INTEGER J
-      J = 2                                                             0001
-      PRINT *, 'foo', J                                                 0002
-      CALL BLA                                                          0003
+      J = 2                                                             0004
+      PRINT *, 'foo', J                                                 0005
+      CALL BLA                                                          0006
       END
 # third run, preconditions
 
@@ -30,11 +30,11 @@ C  P() {}
 
 C  P() {}
 
-      K = 3                                                             0001
+      K = 3                                                             0004
 
 C  P(K) {K==3}
 
-      PRINT *, 'bla', K                                                 0002
+      PRINT *, 'bla', K                                                 0005
       END
 
 C  P() {}
@@ -44,15 +44,15 @@ C  P() {}
 
 C  P() {}
 
-      I = 1                                                             0001
+      I = 1                                                             0003
 
 C  P(I) {I==1}
 
-      PRINT *, 'checkpoint', I                                          0002
+      PRINT *, 'checkpoint', I                                          0004
 
 C  P(I) {I==1}
 
-      CALL FOO                                                          0003
+      CALL FOO                                                          0005
       END
 
 C  P() {}
@@ -63,35 +63,35 @@ C  P() {}
 
 C  P() {}
 
-      J = 2                                                             0001
+      J = 2                                                             0004
 
 C  P(J) {J==2}
 
-      PRINT *, 'foo', J                                                 0002
+      PRINT *, 'foo', J                                                 0005
 
 C  P(J) {J==2}
 
-      CALL BLA                                                          0003
+      CALL BLA                                                          0006
       END
 # fourth run, partial eval
 # last run, display, close and delete.
 
       SUBROUTINE BLA
       INTEGER K
-      K = 3                                                             0001
-      PRINT *, 'bla', 3                                                 0002
+      K = 3                                                             0004
+      PRINT *, 'bla', 3                                                 0005
       END
       PROGRAM CHECKPOINT
       INTEGER I
-      I = 1                                                             0001
-      PRINT *, 'checkpoint', 1                                          0002
-      CALL FOO                                                          0003
+      I = 1                                                             0003
+      PRINT *, 'checkpoint', 1                                          0004
+      CALL FOO                                                          0005
       END
 
       SUBROUTINE FOO
       INTEGER J
-      J = 2                                                             0001
-      PRINT *, 'foo', 2                                                 0002
-      CALL BLA                                                          0003
+      J = 2                                                             0004
+      PRINT *, 'foo', 2                                                 0005
+      CALL BLA                                                          0006
       END
 # done

@@ -6,27 +6,27 @@
       PROGRAM C1
       INTEGER I
 ! clone on a constant
-      CALL CLONEE(1)                                                    0001
+      CALL CLONEE(1)                                                    0005
 ! comments
 ! again
 ! and more
-      CALL CLONEE(2)                                                    0002
+      CALL CLONEE(2)                                                    0009
 ! cannot clone there
-      DO I = 1, 5                                                       0003
-         CALL CLONEE(I)                                                 0004
+      DO I = 1, 5                                                       0011
+         CALL CLONEE(I)                                                 0012
       ENDDO
 ! check reuse of corresponding clonee
-      CALL CLONEE(2)                                                    0005
+      CALL CLONEE(2)                                                    0015
 ! clone with preconditions
-      I = 1                                                             0006
-      CALL CLONEE(I)                                                    0007
-      I = 3                                                             0008
-      CALL CLONEE(I)                                                    0009
+      I = 1                                                             0017
+      CALL CLONEE(I)                                                    0018
+      I = 3                                                             0019
+      CALL CLONEE(I)                                                    0020
       END
 
       SUBROUTINE CLONEE(I)
       INTEGER I
-      PRINT *, I                                                        0001
+      PRINT *, I                                                        0004
       END
 # applying clone_on_argument...
 # new callgraph
@@ -40,27 +40,27 @@
       PROGRAM C1
       INTEGER I
 ! clone on a constant
-      CALL CLONEE_0(1)                                                  0001
+      CALL CLONEE_0(1)                                                  0005
 ! comments
 ! again
 ! and more
-      CALL CLONEE_1(2)                                                  0002
+      CALL CLONEE_1(2)                                                  0009
 ! cannot clone there
-      DO I = 1, 5                                                       0003
-         CALL CLONEE(I)                                                 0004
+      DO I = 1, 5                                                       0011
+         CALL CLONEE(I)                                                 0012
       ENDDO
 ! check reuse of corresponding clonee
-      CALL CLONEE_1(2)                                                  0005
+      CALL CLONEE_1(2)                                                  0015
 ! clone with preconditions
-      I = 1                                                             0006
-      CALL CLONEE_0(I)                                                  0007
-      I = 3                                                             0008
-      CALL CLONEE_2(I)                                                  0009
+      I = 1                                                             0017
+      CALL CLONEE_0(I)                                                  0018
+      I = 3                                                             0019
+      CALL CLONEE_2(I)                                                  0020
       END
 
       SUBROUTINE CLONEE(I)
       INTEGER I
-      PRINT *, I                                                        0001
+      PRINT *, I                                                        0004
       END
 !!
 !! PIPS: please caution!
@@ -74,8 +74,8 @@
       SUBROUTINE CLONEE_0(I)
       INTEGER I
 !! PIPS: I is assumed a constant reaching value
-      IF (I.NE.1) STOP                                                  0001
-      PRINT *, I                                                        0003
+      IF (I.NE.1) STOP                                                  0013
+      PRINT *, I                                                        0016
       END
 !!
 !! PIPS: please caution!
@@ -89,8 +89,8 @@
       SUBROUTINE CLONEE_1(I)
       INTEGER I
 !! PIPS: I is assumed a constant reaching value
-      IF (I.NE.2) STOP                                                  0001
-      PRINT *, I                                                        0003
+      IF (I.NE.2) STOP                                                  0013
+      PRINT *, I                                                        0016
       END
 !!
 !! PIPS: please caution!
@@ -104,8 +104,8 @@
       SUBROUTINE CLONEE_2(I)
       INTEGER I
 !! PIPS: I is assumed a constant reaching value
-      IF (I.NE.3) STOP                                                  0001
-      PRINT *, I                                                        0003
+      IF (I.NE.3) STOP                                                  0013
+      PRINT *, I                                                        0016
       END
 # applying partial evaluation...
 # applying dead code elimination...
@@ -113,27 +113,27 @@
       PROGRAM C1
       INTEGER I
 ! clone on a constant
-      CALL CLONEE_0(1)                                                  0001
+      CALL CLONEE_0(1)                                                  0005
 ! comments
 ! again
 ! and more
-      CALL CLONEE_1(2)                                                  0002
+      CALL CLONEE_1(2)                                                  0009
 ! cannot clone there
-      DO I = 1, 5                                                       0003
-         CALL CLONEE(I)                                                 0004
+      DO I = 1, 5                                                       0011
+         CALL CLONEE(I)                                                 0012
       ENDDO
 ! check reuse of corresponding clonee
-      CALL CLONEE_1(2)                                                  0005
+      CALL CLONEE_1(2)                                                  0015
 ! clone with preconditions
-      I = 1                                                             0006
-      CALL CLONEE_0(1)                                                  0007
-      I = 3                                                             0008
-      CALL CLONEE_2(3)                                                  0009
+      I = 1                                                             0017
+      CALL CLONEE_0(1)                                                  0018
+      I = 3                                                             0019
+      CALL CLONEE_2(3)                                                  0020
       END
 
       SUBROUTINE CLONEE(I)
       INTEGER I
-      PRINT *, I                                                        0001
+      PRINT *, I                                                        0004
       END
 !!
 !! PIPS: please caution!
@@ -147,7 +147,7 @@
       SUBROUTINE CLONEE_0(I)
       INTEGER I
 !! PIPS: I is assumed a constant reaching value
-      PRINT *, 1                                                        0003
+      PRINT *, 1                                                        0016
       END
 !!
 !! PIPS: please caution!
@@ -161,7 +161,7 @@
       SUBROUTINE CLONEE_1(I)
       INTEGER I
 !! PIPS: I is assumed a constant reaching value
-      PRINT *, 2                                                        0003
+      PRINT *, 2                                                        0016
       END
 !!
 !! PIPS: please caution!
@@ -175,7 +175,7 @@
       SUBROUTINE CLONEE_2(I)
       INTEGER I
 !! PIPS: I is assumed a constant reaching value
-      PRINT *, 3                                                        0003
+      PRINT *, 3                                                        0016
       END
 # done
 

@@ -2,9 +2,9 @@
 C     BUG: IMPLICIT DO IN IO LIST ARE NO LONGER ACCEPTED BY THE PARSER
       DIMENSION TIT(2,7)
 
-      PRINT *, K, (TIT(L,N), L = 1, 2)                                  0001
-      WRITE (IMP, 2000) K, (TIT(L,N), L = 1, 2)                         0002
+      PRINT *, K, (TIT(L,N), L = 1, 2)                                  0005
+      WRITE (IMP, 2000) K, (TIT(L,N), L = 1, 2)                         0006
 2000  FORMAT('1',44X,'   K=',I2,2A10,/,45X,'----------------------------
-     &--',/)                                                            0003
+     &--',/)                                                            0007
 
       END

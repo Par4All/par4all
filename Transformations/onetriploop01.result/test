@@ -3,12 +3,12 @@ Initial code
 
       PROGRAM ONETRIPLOOP01
 
-      READ *, N                                                         0001
+      READ *, N                                                         0003
 
-      M = N                                                             0002
+      M = N                                                             0005
 
-      DO I = N, M                                                       0003
-         PRINT *, 'i = ', I                                             0004
+      DO I = N, M                                                       0007
+         PRINT *, 'i = ', I                                             0008
       ENDDO
 
       END
@@ -23,21 +23,21 @@ C  P() {}
 C  P() {}
 
 
-      READ *, N                                                         0001
+      READ *, N                                                         0003
 
 C  P(N) {}
 
 
-      M = N                                                             0002
+      M = N                                                             0005
 
 C  P(M,N) {M==N}
 
 
-      DO I = N, M                                                       0003
+      DO I = N, M                                                       0007
 
 C  P(I,M,N) {I==M, I==N}
 
-         PRINT *, 'i = ', I                                             0004
+         PRINT *, 'i = ', I                                             0008
       ENDDO
 
       END
@@ -46,12 +46,12 @@ Code after one trip loop detection and simplification
 
       PROGRAM ONETRIPLOOP01
 
-      READ *, N                                                         0001
+      READ *, N                                                         0003
 
-      M = N                                                             0002
+      M = N                                                             0005
 
       I = N
-      PRINT *, 'i = ', I                                                0004
+      PRINT *, 'i = ', I                                                0008
 
       END
 

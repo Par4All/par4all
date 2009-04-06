@@ -12,13 +12,13 @@ C  T(S1) {"Hel"==S1}
 
 
 C     Should be truncated
-      S1 = "Hello World!"                                               0001
+      S1 = "Hello World!"                                               0009
 
 C  T(S2) {"Z"==S2}
 
 
 C     Should be (implictly) SPACE padded
-      S2 = "Z"                                                          0002
+      S2 = "Z"                                                          0012
 
       END
 

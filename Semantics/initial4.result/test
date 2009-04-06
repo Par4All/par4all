@@ -17,7 +17,7 @@ C     See what happens with conflicting initial values
 
       COMMON /FOO/I
 
-      PRINT *, I                                                        0001
+      PRINT *, I                                                        0007
 
       END
 
@@ -47,6 +47,6 @@ C     See what happens with conflicting initial values
 C  P() {0==-1}
 
 
-      PRINT *, I                                                        0001
+      PRINT *, I                                                        0007
 
       END

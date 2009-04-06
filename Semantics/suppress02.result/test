@@ -8,16 +8,16 @@ C  T() {'a'<='b'}
 
 C     Check suppress_dead_code for string variables
 
-      IF ('a'.GT.'b') THEN                                              0001
+      IF ('a'.GT.'b') THEN                                              0005
 
 C  T() {}
 
-         PRINT *, 'a is greater than b'                                 0002
+         PRINT *, 'a is greater than b'                                 0006
       ELSE
 
 C  T() {}
 
-         PRINT *, 'b is greater than a'                                 0003
+         PRINT *, 'b is greater than a'                                 0008
       ENDIF
 
       END
@@ -31,16 +31,16 @@ C  P() {}
 
 C     Check suppress_dead_code for string variables
 
-      IF ('a'.GT.'b') THEN                                              0001
+      IF ('a'.GT.'b') THEN                                              0005
 
 C  P() {0==-1}
 
-         PRINT *, 'a is greater than b'                                 0002
+         PRINT *, 'a is greater than b'                                 0006
       ELSE
 
 C  P() {'a'<='b'}
 
-         PRINT *, 'b is greater than a'                                 0003
+         PRINT *, 'b is greater than a'                                 0008
       ENDIF
 
       END
@@ -48,7 +48,7 @@ C  P() {'a'<='b'}
 
 C     Check suppress_dead_code for string variables
 
-      PRINT *, 'b is greater than a'                                    0003
+      PRINT *, 'b is greater than a'                                    0008
 
       END
 

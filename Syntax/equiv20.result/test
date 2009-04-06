@@ -69,9 +69,9 @@ C     Check that equivalenced variables declared in common are properly allocate
       COMMON /FOO/ X, Y2
       EQUIVALENCE (X1,X(1)), (Y(2),Y2)
 
-      X(2) = 3                                                          0001
+      X(2) = 3                                                          0010
 
-      PRINT *, Y(1)                                                     0002
+      PRINT *, Y(1)                                                     0012
 
       END
 Deletion of obsolete resources:

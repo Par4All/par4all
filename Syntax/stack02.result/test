@@ -61,7 +61,7 @@ PRINTED_FILE made for STACK02.
       REAL A(N), B(N), C(10)
       DATA M /1/
 
-      PRINT *, A                                                        0001
+      PRINT *, A                                                        0005
 
       END
 Deletion of obsolete resources:

@@ -5,6 +5,6 @@
       END
       PROGRAM EDITED
 
-      PRINT *, "ajout!"                                                 0001
+      PRINT *, "ajout!"                                                 0003
 
       END

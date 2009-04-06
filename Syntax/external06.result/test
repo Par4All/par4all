@@ -66,9 +66,9 @@ C     the symbole table for types.
 
       EXTERNAL F
 
-      CALL G(F)                                                         0001
+      CALL G(F)                                                         0009
 
-      CALL F(I, J)                                                      0002
+      CALL F(I, J)                                                      0011
 
       END
 Deletion of obsolete resources:

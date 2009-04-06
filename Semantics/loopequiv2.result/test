@@ -17,24 +17,24 @@ C     in preconditions (only its sign at loop entry matters).
 C  P() {K==L}
 
 
-      M = 1                                                             0001
+      M = 1                                                             0014
 
 C  P() {K==L}
 
 
 C     The increment sign is unknown because M is not analyzed
 
-      DO I = I+1, N, M                                                  0002
+      DO I = I+1, N, M                                                  0018
 
 C  P(I) {K==L}
 
-         T(I) = 0.                                                      0003
+         T(I) = 0.                                                      0019
       ENDDO
 
 C  P(I) {K==L}
 
 
-      L = 1                                                             0004
+      L = 1                                                             0022
 
 C  P(I,K) {K==1, L==1}
 
@@ -42,21 +42,21 @@ C  P(I,K) {K==1, L==1}
 C     Although L is implictly modified in the loop body, the increment sign
 C     and value are known at loop entry.
 
-      DO I = I+1, N, L                                                  0005
+      DO I = I+1, N, L                                                  0027
 
 C  P(I,K) {K==L}
 
-         K = 2                                                          0006
+         K = 2                                                          0028
 
 C  P(I,K) {K==2, L==2}
 
-         T(I) = 0.                                                      0007
+         T(I) = 0.                                                      0029
       ENDDO
 
 C  P(I,K) {K==L, N+1<=I, 1<=K, K<=2}
 
 
-      N = 1                                                             0008
+      N = 1                                                             0032
 
 C  P(I,K,N) {K==L, N==1, N#init+1<=I, 1<=K, K<=2}
 
@@ -64,20 +64,20 @@ C  P(I,K,N) {K==L, N==1, N#init+1<=I, 1<=K, K<=2}
 C     Although N is modified in the loop body, the increment sign
 C     and value are known at loop entry.
 
-      DO I = I+1, L, N                                                  0009
+      DO I = I+1, L, N                                                  0037
 
 C  P(I,K,N) {K==L, 1<=K, K<=2}
 
-         N = 0                                                          0010
+         N = 0                                                          0038
 
 C  P(I,K,N) {K==L, N==0, 1<=K, K<=2}
 
-         T(I) = 0.                                                      0011
+         T(I) = 0.                                                      0039
       ENDDO
 
 C  P(I,K,N) {K==L, 1<=K, K<=2, 0<=N, N<=1}
 
 
-      PRINT *, I, N, M, K, L                                            0012
+      PRINT *, I, N, M, K, L                                            0042
 
       END

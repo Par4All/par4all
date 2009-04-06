@@ -5,10 +5,10 @@ C               <may be written >: BAR:A(*)
 
 C     regions and environment
 
-      CALL FOO                                                          0001
+      CALL FOO                                                          0007
 C               <may be read    >: BAR:A(*)
 C               <may be written >: BAR:B(*)
 
-      CALL BAR                                                          0002
+      CALL BAR                                                          0009
 
       END

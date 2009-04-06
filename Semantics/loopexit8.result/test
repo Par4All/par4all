@@ -12,19 +12,19 @@ C     the loop is entered and increment is 1
 C  P() {}
 
 
-      IF (N.GE.1) THEN                                                  0001
+      IF (N.GE.1) THEN                                                  0008
 
 C  P() {1<=N}
 
-         DO I = 1, N                                                    0002
+         DO I = 1, N                                                    0009
 
 C  P(I,J) {1<=I, I<=N, 1<=N}
 
-            J = I+MMAX                                                  0003
+            J = I+MMAX                                                  0010
 
 C  P(I,J) {I+MMAX==J, 1<=I, I<=N, 1<=N}
 
-            T(I) = 0.                                                   0004
+            T(I) = 0.                                                   0011
          ENDDO
 
 C  P(I,J) {I+MMAX==J+1, I==N+1, 2<=I}
@@ -32,7 +32,7 @@ C  P(I,J) {I+MMAX==J+1, I==N+1, 2<=I}
 
 C        Expected precondition:
 C        P(I) {I+MMAX==J+1, N+1<=I, I<=N+1, 1<=N} 
-         PRINT *, I, J, MMAX                                            0005
+         PRINT *, I, J, MMAX                                            0016
 
       ENDIF
 

@@ -75,7 +75,7 @@ C     Check equivalences and substrings
 
       EQUIVALENCE (X(13:16), Y(2:3))
 
-      PRINT *, X, Y                                                     0001
+      PRINT *, X, Y                                                     0010
 
       END
 Deletion of obsolete resources:

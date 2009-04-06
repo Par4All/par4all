@@ -19,17 +19,17 @@ c     sub2 is exact.
 C  P() {}
 
 
-      R1 = SUB1(0)                                                      0001
+      R1 = SUB1(0)                                                      0013
 
 C  P(R1) {0<=R1, R1<=1}
 
 
-      IF (R1.EQ.0) THEN                                                 0002
+      IF (R1.EQ.0) THEN                                                 0015
 
 C  P(R1) {R1==0}
 
 C     See if this is reachable
-         CALL SUB4                                                      0003
+         CALL SUB4                                                      0017
       ENDIF
 
       END
@@ -48,46 +48,46 @@ C  P() {F1==0}
 C  P() {F1==0}
 
 
-      X = 9                                                             0001
+      X = 9                                                             0007
 
 C  P(X) {F1==0, X==9}
 
 
-      IF (F1.EQ.0) THEN                                                 0002
+      IF (F1.EQ.0) THEN                                                 0009
 
 C  P(X) {F1==0, X==9}
 
-         Y = 1                                                          0003
+         Y = 1                                                          0010
       ELSE
 
 C  P() {0==-1}
 
-         Y = 0                                                          0004
+         Y = 0                                                          0012
       ENDIF
 
 C  P(X,Y) {F1==0, X==9, Y==1}
 
 
-      R2 = SUB2(Y, 4, F1, X)                                            0005
+      R2 = SUB2(Y, 4, F1, X)                                            0015
 
 C  P(R2,X,Y) {F1==0, R2==14, X==9, Y==1}
 
 
-      CALL SUB3(R2)                                                     0006
+      CALL SUB3(R2)                                                     0017
 
 C  P(R2,X,Y) {F1==0, R2==14, X==9, Y==1}
 
 
-      IF (R2.GT.0) THEN                                                 0007
+      IF (R2.GT.0) THEN                                                 0019
 
 C  P(R2,X,Y) {F1==0, R2==14, X==9, Y==1}
 
-         SUB1 = 1                                                       0008
+         SUB1 = 1                                                       0020
       ELSE
 
 C  P() {0==-1}
 
-         SUB1 = 0                                                       0009
+         SUB1 = 0                                                       0022
       ENDIF
 
       END
@@ -104,7 +104,7 @@ C  P() {F2==1, F3==4, F4==0, F5==9}
 C  P() {F2==1, F3==4, F4==0, F5==9}
 
 
-      SUB2 = F2+F3+F4+F5                                                0001
+      SUB2 = F2+F3+F4+F5                                                0005
 
       END
 
@@ -119,7 +119,7 @@ C  P() {F6==14}
 
 C  P() {F6==14}
 
-      PRINT *, F6                                                       0001
+      PRINT *, F6                                                       0004
       END
 
 Preconditions for SUB4
@@ -132,6 +132,6 @@ C  P() {}
 
 C  P() {}
 
-      PRINT *, 'sub4 is called'                                         0001
+      PRINT *, 'sub4 is called'                                         0003
       END
 

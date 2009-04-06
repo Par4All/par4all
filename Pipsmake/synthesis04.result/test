@@ -35,11 +35,11 @@ C     Check that a call graph of this routine can be obtained
 
 C     A warning should be generated because foo cannot be properly typed
 
-      CALL FOO(X)                                                       0001
+      CALL FOO(X)                                                       0008
 
-      CALL FOO(I)                                                       0002
+      CALL FOO(I)                                                       0010
 
-      CALL FOO(X, J)                                                    0003
+      CALL FOO(X, J)                                                    0012
 
       END
 echo

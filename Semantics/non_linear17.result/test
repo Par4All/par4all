@@ -12,12 +12,12 @@ C     BEGIN BLOCK
 C  T(KMAX) {KMAX#init<=KMAX+1, KMAX<=KMAX#init}
 
 C (0,2)
-      IF (KMAX.NE.1) THEN                                               0001
+      IF (KMAX.NE.1) THEN                                               0003
 
 C  T(KMAX) {KMAX==KMAX#init-1}
 
 C (0,3)
-         KMAX = KMAX-1                                                  0002
+         KMAX = KMAX-1                                                  0004
       ENDIF
 
 C     END BLOCK
@@ -36,12 +36,12 @@ C     BEGIN BLOCK
 C  P() {KMAX==1}
 
 C (0,2)
-      IF (KMAX.NE.1) THEN                                               0001
+      IF (KMAX.NE.1) THEN                                               0003
 
 C  P() {0==-1}
 
 C (0,3)
-         KMAX = KMAX-1                                                  0002
+         KMAX = KMAX-1                                                  0004
       ENDIF
 
 C     END BLOCK
@@ -62,17 +62,17 @@ C (0,2)
 
 C     For EDF KMAX, refine transformers
 
-      KMAX = 1                                                          0001
+      KMAX = 1                                                          0005
 
 C  P(KMAX) {KMAX==1}
 
 C (0,3)
-      CALL FOO(KMAX)                                                    0002
+      CALL FOO(KMAX)                                                    0006
 
 C  P(KMAX) {0<=KMAX, KMAX<=1}
 
 C (0,4)
-      PRINT *, KMAX                                                     0003
+      PRINT *, KMAX                                                     0007
 
 C     END BLOCK
       END
@@ -92,17 +92,17 @@ C (0,2)
 
 C     For EDF KMAX, refine transformers
 
-      KMAX = 1                                                          0001
+      KMAX = 1                                                          0005
 
 C  P(KMAX) {KMAX==1}
 
 C (0,3)
-      CALL FOO(KMAX)                                                    0002
+      CALL FOO(KMAX)                                                    0006
 
 C  P(KMAX) {KMAX==1}
 
 C (0,4)
-      PRINT *, KMAX                                                     0003
+      PRINT *, KMAX                                                     0007
 
 C     END BLOCK
       END

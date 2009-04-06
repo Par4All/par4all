@@ -13,11 +13,11 @@ Proper effects for "TRAP"
 C               <must be read   >: C
 C               <must be written>: C
 
-      C = C+1                                                           0001
+      C = C+1                                                           0011
 C               <must be read   >: C
 C               <must be written>: B(C)
 
-      B(C) = C                                                          0002
+      B(C) = C                                                          0013
 
       END
 
@@ -38,11 +38,11 @@ C               <must be written>: C
 C               <must be read   >: C
 C               <must be written>: C
 
-      C = C+1                                                           0001
+      C = C+1                                                           0011
 C               <may be written >: B(*)
 C               <must be read   >: C
 
-      B(C) = C                                                          0002
+      B(C) = C                                                          0013
 
       END
 
@@ -55,10 +55,10 @@ C               <may be written >: A(*)
 C               <must be read   >: TRAP:C
 C               <must be written>: TRAP:C
 
-      CALL TRAP(A, 10)                                                  0001
+      CALL TRAP(A, 10)                                                  0005
 C               <may be written >: A(*)
 C               <must be read   >: TRAP:C
 C               <must be written>: TRAP:C
-      CALL TRAP(A, 10)                                                  0002
+      CALL TRAP(A, 10)                                                  0006
 
       END

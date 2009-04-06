@@ -14,11 +14,11 @@ C     Use parameters in DATA statements
 C  P() {}
 
 
-      J = M                                                             0001
+      J = M                                                             0011
 
 C  P(J) {J==10}
 
 
-      PRINT *, I, J                                                     0002
+      PRINT *, I, J                                                     0013
 
       END

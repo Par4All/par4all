@@ -6,7 +6,7 @@
       REAL Z(N*1.5)
       REAL W(N*M)
       INTEGER I
-      DO 10 I = 1, N+1                                                  0001
-         X(I) = 1                                                       0002
-10       CONTINUE                                                       0003
+      DO 10 I = 1, N+1                                                  0009
+         X(I) = 1                                                       0010
+10       CONTINUE                                                       0011
       END

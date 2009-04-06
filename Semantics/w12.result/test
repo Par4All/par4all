@@ -28,23 +28,23 @@ C  T(I) {I==0}
 
 C (0,2)
 
-      I = 0                                                             0001
+      I = 0                                                             0016
 
 C  T(I) {}
 
 C (0,3)
 
-      DO WHILE (X.GT.0.)                                                0002
+      DO WHILE (X.GT.0.)                                                0018
 
 C  T(I) {0<=I, I<=1}
 
 C (0,4)
-         IF (I.EQ.1) THEN                                               0003
+         IF (I.EQ.1) THEN                                               0019
 
 C  T(I) {I==0, I#init==1}
 
 C (0,5)
-            I = 0                                                       0004
+            I = 0                                                       0020
          ELSE
 
 C  T(I) {I==1}
@@ -52,7 +52,7 @@ C  T(I) {I==1}
 C (0,6)
 C           let's hope that i==0 here... but it's not possible,
 C           unless transformers are recomputed using preconditions.
-            I = 1                                                       0005
+            I = 1                                                       0024
          ENDIF
       ENDDO
 
@@ -60,7 +60,7 @@ C  T() {0<=I, I<=1}
 
 C (0,7)
 
-      PRINT *, I                                                        0006
+      PRINT *, I                                                        0028
 
 C     END BLOCK
       END
@@ -94,23 +94,23 @@ C  P() {}
 
 C (0,2)
 
-      I = 0                                                             0001
+      I = 0                                                             0016
 
 C  P(I) {I==0}
 
 C (0,3)
 
-      DO WHILE (X.GT.0.)                                                0002
+      DO WHILE (X.GT.0.)                                                0018
 
 C  P(I) {0<=I, I<=1}
 
 C (0,4)
-         IF (I.EQ.1) THEN                                               0003
+         IF (I.EQ.1) THEN                                               0019
 
 C  P(I) {I==1}
 
 C (0,5)
-            I = 0                                                       0004
+            I = 0                                                       0020
          ELSE
 
 C  P(I) {I==0}
@@ -118,7 +118,7 @@ C  P(I) {I==0}
 C (0,6)
 C           let's hope that i==0 here... but it's not possible,
 C           unless transformers are recomputed using preconditions.
-            I = 1                                                       0005
+            I = 1                                                       0024
          ENDIF
       ENDDO
 
@@ -126,7 +126,7 @@ C  P(I) {0<=I, I<=1}
 
 C (0,7)
 
-      PRINT *, I                                                        0006
+      PRINT *, I                                                        0028
 
 C     END BLOCK
       END
@@ -160,23 +160,23 @@ C  T(I) {I==0}
 
 C (0,2)
 
-      I = 0                                                             0001
+      I = 0                                                             0016
 
 C  T(I) {}
 
 C (0,3)
 
-      DO WHILE (X.GT.0.)                                                0002
+      DO WHILE (X.GT.0.)                                                0018
 
 C  T(I) {I+I#init==1, 0<=I, I<=1}
 
 C (0,4)
-         IF (I.EQ.1) THEN                                               0003
+         IF (I.EQ.1) THEN                                               0019
 
 C  T(I) {I==0, I#init==1}
 
 C (0,5)
-            I = 0                                                       0004
+            I = 0                                                       0020
          ELSE
 
 C  T(I) {I==1, I#init==0}
@@ -184,7 +184,7 @@ C  T(I) {I==1, I#init==0}
 C (0,6)
 C           let's hope that i==0 here... but it's not possible,
 C           unless transformers are recomputed using preconditions.
-            I = 1                                                       0005
+            I = 1                                                       0024
          ENDIF
       ENDDO
 
@@ -192,7 +192,7 @@ C  T() {0<=I, I<=1}
 
 C (0,7)
 
-      PRINT *, I                                                        0006
+      PRINT *, I                                                        0028
 
 C     END BLOCK
       END
@@ -226,23 +226,23 @@ C  P() {}
 
 C (0,2)
 
-      I = 0                                                             0001
+      I = 0                                                             0016
 
 C  P(I) {I==0}
 
 C (0,3)
 
-      DO WHILE (X.GT.0.)                                                0002
+      DO WHILE (X.GT.0.)                                                0018
 
 C  P(I) {0<=I, I<=1}
 
 C (0,4)
-         IF (I.EQ.1) THEN                                               0003
+         IF (I.EQ.1) THEN                                               0019
 
 C  P(I) {I==1}
 
 C (0,5)
-            I = 0                                                       0004
+            I = 0                                                       0020
          ELSE
 
 C  P(I) {I==0}
@@ -250,7 +250,7 @@ C  P(I) {I==0}
 C (0,6)
 C           let's hope that i==0 here... but it's not possible,
 C           unless transformers are recomputed using preconditions.
-            I = 1                                                       0005
+            I = 1                                                       0024
          ENDIF
       ENDDO
 
@@ -258,7 +258,7 @@ C  P(I) {0<=I, I<=1}
 
 C (0,7)
 
-      PRINT *, I                                                        0006
+      PRINT *, I                                                        0028
 
 C     END BLOCK
       END

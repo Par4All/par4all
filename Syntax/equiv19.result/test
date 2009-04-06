@@ -63,7 +63,7 @@ C     is properly handled.
       SAVE M
       EQUIVALENCE (M,K)
 
-      PRINT *, N                                                        0001
+      PRINT *, N                                                        0010
 
       END
 Deletion of obsolete resources:

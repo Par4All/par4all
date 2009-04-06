@@ -72,9 +72,9 @@ C     equivalences
       EQUIVALENCE (X,Y)
       EQUIVALENCE (W1, W2)
 
-      X = Y+W                                                           0001
+      X = Y+W                                                           0015
 
-      PRINT *, U, W1, W2                                                0002
+      PRINT *, U, W1, W2                                                0017
 
       END
 Deletion of obsolete resources:

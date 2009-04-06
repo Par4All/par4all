@@ -5,21 +5,21 @@
 C      parameter (NC=100)
       REAL  ZG,V(100),W(100),G(100,100),GAMAI(100)
 
-      NC = 50                                                           0001
-      JC = 30                                                           0002
-      DO 320 I = 1, NC                                                  0003
-         V(I) = 0.                                                      0004
-         W(I) = 0.                                                      0005
-         IF (I.GT.10) GOTO 99999                                        0006
-         DO J = 1, JC                                                   0009
-            W(I) = W(I)/V(I)                                            0010
-            GAMAI(I) = W(I)+G(I,J)                                      0011
+      NC = 50                                                           0007
+      JC = 30                                                           0008
+      DO 320 I = 1, NC                                                  0009
+         V(I) = 0.                                                      0010
+         W(I) = 0.                                                      0011
+         IF (I.GT.10) GOTO 99999                                        0012
+         DO J = 1, JC                                                   0015
+            W(I) = W(I)/V(I)                                            0016
+            GAMAI(I) = W(I)+G(I,J)                                      0017
          ENDDO
 99996    CONTINUE
-320      CONTINUE                                                       0012
+320      CONTINUE                                                       0020
          GOTO 99998
 99999    CONTINUE
-         IF (NC.LT.JC.AND.NC.GT.10) GOTO 99997                          0007
+         IF (NC.LT.JC.AND.NC.GT.10) GOTO 99997                          0013
          GOTO 99996
 99997    CONTINUE
          GOTO 320
@@ -33,21 +33,21 @@ C      parameter (NC=100)
 C      parameter (NC=100)
       REAL  ZG,V(100),W(100),G(100,100),GAMAI(100)
 
-      NC = 50                                                           0001
-      JC = 30                                                           0002
-      DO 320 I = 1, NC                                                  0003
-         V(I) = 0.                                                      0004
-         W(I) = 0.                                                      0005
-         IF (I.GT.10) THEN                                              0006
-            IF (NC.LT.JC.AND.NC.GT.10) THEN                             0007
+      NC = 50                                                           0007
+      JC = 30                                                           0008
+      DO 320 I = 1, NC                                                  0009
+         V(I) = 0.                                                      0010
+         W(I) = 0.                                                      0011
+         IF (I.GT.10) THEN                                              0012
+            IF (NC.LT.JC.AND.NC.GT.10) THEN                             0013
             ENDIF
          ELSE
-            DO J = 1, JC                                                0009
-               W(I) = W(I)/V(I)                                         0010
-               GAMAI(I) = W(I)+G(I,J)                                   0011
+            DO J = 1, JC                                                0015
+               W(I) = W(I)/V(I)                                         0016
+               GAMAI(I) = W(I)+G(I,J)                                   0017
             ENDDO
          ENDIF
-320      CONTINUE                                                       0012
+320      CONTINUE                                                       0020
 
       END
 ## apres unspaghettify
@@ -57,21 +57,21 @@ C      parameter (NC=100)
 C      parameter (NC=100)
       REAL  ZG,V(100),W(100),G(100,100),GAMAI(100)
 
-      NC = 50                                                           0001
-      JC = 30                                                           0002
-      DO 320 I = 1, NC                                                  0003
-         V(I) = 0.                                                      0004
-         W(I) = 0.                                                      0005
-         IF (I.GT.10) THEN                                              0006
-            IF (NC.LT.JC.AND.NC.GT.10) THEN                             0007
+      NC = 50                                                           0007
+      JC = 30                                                           0008
+      DO 320 I = 1, NC                                                  0009
+         V(I) = 0.                                                      0010
+         W(I) = 0.                                                      0011
+         IF (I.GT.10) THEN                                              0012
+            IF (NC.LT.JC.AND.NC.GT.10) THEN                             0013
             ENDIF
          ELSE
-            DO J = 1, JC                                                0009
-               W(I) = W(I)/V(I)                                         0010
-               GAMAI(I) = W(I)+G(I,J)                                   0011
+            DO J = 1, JC                                                0015
+               W(I) = W(I)/V(I)                                         0016
+               GAMAI(I) = W(I)+G(I,J)                                   0017
             ENDDO
          ENDIF
-320      CONTINUE                                                       0012
+320      CONTINUE                                                       0020
 
       END
 ## apres DeadCode
@@ -81,19 +81,19 @@ C      parameter (NC=100)
 C      parameter (NC=100)
       REAL  ZG,V(100),W(100),G(100,100),GAMAI(100)
 
-      NC = 50                                                           0001
-      JC = 30                                                           0002
-      DO 320 I = 1, NC                                                  0003
-         V(I) = 0.                                                      0004
-         W(I) = 0.                                                      0005
-         IF (I.GT.10) THEN                                              0006
+      NC = 50                                                           0007
+      JC = 30                                                           0008
+      DO 320 I = 1, NC                                                  0009
+         V(I) = 0.                                                      0010
+         W(I) = 0.                                                      0011
+         IF (I.GT.10) THEN                                              0012
          ELSE
-            DO J = 1, JC                                                0009
-               W(I) = W(I)/V(I)                                         0010
-               GAMAI(I) = W(I)+G(I,J)                                   0011
+            DO J = 1, JC                                                0015
+               W(I) = W(I)/V(I)                                         0016
+               GAMAI(I) = W(I)+G(I,J)                                   0017
             ENDDO
          ENDIF
-320      CONTINUE                                                       0012
+320      CONTINUE                                                       0020
 
       END
 ## apres DeadTestElim
@@ -103,17 +103,17 @@ C      parameter (NC=100)
 C      parameter (NC=100)
       REAL  ZG,V(100),W(100),G(100,100),GAMAI(100)
 
-      NC = 50                                                           0001
-      JC = 30                                                           0002
-      DO 320 I = 1, NC                                                  0003
-         V(I) = 0.                                                      0004
-         W(I) = 0.                                                      0005
-         IF (I.LE.10) THEN                                              0006
-            DO J = 1, JC                                                0009
-               W(I) = W(I)/V(I)                                         0010
-               GAMAI(I) = W(I)+G(I,J)                                   0011
+      NC = 50                                                           0007
+      JC = 30                                                           0008
+      DO 320 I = 1, NC                                                  0009
+         V(I) = 0.                                                      0010
+         W(I) = 0.                                                      0011
+         IF (I.LE.10) THEN                                              0012
+            DO J = 1, JC                                                0015
+               W(I) = W(I)/V(I)                                         0016
+               GAMAI(I) = W(I)+G(I,J)                                   0017
             ENDDO
          ENDIF
-320      CONTINUE                                                       0012
+320      CONTINUE                                                       0020
 
       END

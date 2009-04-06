@@ -10,16 +10,16 @@
       REAL A(N,N), B(N)
       REAL X1, X2, X3
 
-      DO I = 1, N                                                       0001
-         X1 = B(I)                                                      0002
-         X2 = X1*X1+X1                                                  0003
-         DO J = 1, N                                                    0004
-            X3 = X1+X2                                                  0005
-            A(I,J) = A(I,J)*X3+X2-1                                     0006
+      DO I = 1, N                                                       0012
+         X1 = B(I)                                                      0013
+         X2 = X1*X1+X1                                                  0014
+         DO J = 1, N                                                    0015
+            X3 = X1+X2                                                  0016
+            A(I,J) = A(I,J)*X3+X2-1                                     0017
          ENDDO
       ENDDO
 
-      PRINT *, A(5,20)                                                  0007
+      PRINT *, A(5,20)                                                  0021
 
       END
 !! After forward substitution
@@ -34,16 +34,16 @@
       REAL A(N,N), B(N)
       REAL X1, X2, X3
 
-      DO I = 1, N                                                       0001
-         X1 = B(I)                                                      0002
-         X2 = B(I)*B(I)+B(I)                                            0003
-         DO J = 1, N                                                    0004
-            X3 = B(I)+B(I)*B(I)+B(I)                                    0005
-            A(I,J) = A(I,J)*(B(I)+B(I)*B(I)+B(I))+B(I)*B(I)+B(I)-1      0006
+      DO I = 1, N                                                       0012
+         X1 = B(I)                                                      0013
+         X2 = B(I)*B(I)+B(I)                                            0014
+         DO J = 1, N                                                    0015
+            X3 = B(I)+B(I)*B(I)+B(I)                                    0016
+            A(I,J) = A(I,J)*(B(I)+B(I)*B(I)+B(I))+B(I)*B(I)+B(I)-1      0017
          ENDDO
       ENDDO
 
-      PRINT *, A(5,20)                                                  0007
+      PRINT *, A(5,20)                                                  0021
 
       END
 !! After use-def elimination
@@ -58,13 +58,13 @@
       REAL A(N,N), B(N)
       REAL X1, X2, X3
 
-      DO I = 1, N                                                       0001
-         DO J = 1, N                                                    0004
-            A(I,J) = A(I,J)*(B(I)+B(I)*B(I)+B(I))+B(I)*B(I)+B(I)-1      0006
+      DO I = 1, N                                                       0012
+         DO J = 1, N                                                    0015
+            A(I,J) = A(I,J)*(B(I)+B(I)*B(I)+B(I))+B(I)*B(I)+B(I)-1      0017
          ENDDO
       ENDDO
 
-      PRINT *, A(5,20)                                                  0007
+      PRINT *, A(5,20)                                                  0021
 
       END
 !! After cleaning declarations
@@ -74,12 +74,12 @@
       INTEGER I, J
       REAL*4 A(1:N, 1:N), B(1:N)
 
-      DO I = 1, N                                                       0001
-         DO J = 1, N                                                    0004
-            A(I,J) = A(I,J)*(B(I)+B(I)*B(I)+B(I))+B(I)*B(I)+B(I)-1      0006
+      DO I = 1, N                                                       0012
+         DO J = 1, N                                                    0015
+            A(I,J) = A(I,J)*(B(I)+B(I)*B(I)+B(I))+B(I)*B(I)+B(I)-1      0017
          ENDDO
       ENDDO
 
-      PRINT *, A(5,20)                                                  0007
+      PRINT *, A(5,20)                                                  0021
 
       END

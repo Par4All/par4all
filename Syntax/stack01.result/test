@@ -56,7 +56,7 @@ PRINTED_FILE made for STACK01.
       SUBROUTINE STACK01(N)
       REAL A(N)
 
-      PRINT *, A                                                        0001
+      PRINT *, A                                                        0004
 
       END
 Deletion of obsolete resources:

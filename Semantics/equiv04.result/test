@@ -10,17 +10,17 @@ C     Check static alias use for non integer
 C  T() {}
 
 
-      X = 4.                                                            0001
+      X = 4.                                                            0007
 
 C  T() {}
 
 
-      Y = 5.                                                            0002
+      Y = 5.                                                            0009
 
 C  T() {}
 
 
-      PRINT *, 'x=', X, 'y=', Y                                         0003
+      PRINT *, 'x=', X, 'y=', Y                                         0011
 
       END
 
@@ -35,17 +35,17 @@ C     Check static alias use for non integer
 C  P() {}
 
 
-      X = 4.                                                            0001
+      X = 4.                                                            0007
 
 C  P() {}
 
 
-      Y = 5.                                                            0002
+      Y = 5.                                                            0009
 
 C  P() {}
 
 
-      PRINT *, 'x=', X, 'y=', Y                                         0003
+      PRINT *, 'x=', X, 'y=', Y                                         0011
 
       END
 

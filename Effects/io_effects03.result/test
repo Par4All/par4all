@@ -1,6 +1,6 @@
       PROGRAM IO_EFFECTS03
       REAL T(10)
 
-      PRINT *, (T(N), N, N = 1, 10)                                     0001
+      PRINT *, (T(N), N, N = 1, 10)                                     0004
 
       END

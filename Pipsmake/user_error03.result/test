@@ -42,11 +42,11 @@ PARALLELPRINTED_FILE made for B.
       SUBROUTINE B(X, Y)
       REAL U(10)
 
-      DOALL I = 1, 10                                                   0001
-         U(I) = 0.                                                      0002
+      DOALL I = 1, 10                                                   0005
+         U(I) = 0.                                                      0006
       ENDDO
 
-      PRINT *, X+Y                                                      0003
+      PRINT *, X+Y                                                      0009
 
       END
 Deletion of obsolete resources:

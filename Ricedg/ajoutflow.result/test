@@ -1,14 +1,14 @@
       PROGRAM AJOUTFLOW
       INTEGER A, C
-      READ *, A, C                                                      0001
-      CALL AJOUTFLOWFOO(A, A, C)                                        0002
-      PRINT *, A, C                                                     0003
+      READ *, A, C                                                      0003
+      CALL AJOUTFLOWFOO(A, A, C)                                        0004
+      PRINT *, A, C                                                     0005
       END
       SUBROUTINE AJOUTFLOWFOO(A, B, C)
       INTEGER A, B, C
-      A = 2*C                                                           0001
+      A = 2*C                                                           0003
 C	Attention: impact alias MUST at (AJOUTFLOW:(0,3))  between B and A
 C	New flow-dependence with statement
 C	A = 2*C
-      C = 2+B                                                           0002
+      C = 2+B                                                           0004
       END

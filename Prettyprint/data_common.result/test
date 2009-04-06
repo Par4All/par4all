@@ -4,12 +4,12 @@
 ! it must be kept because of the data...
       include 'FOO.h'
       DATA I, J /1, 2/
-      PRINT *, "hello world"                                            0001
+      PRINT *, "hello world"                                            0008
       END
       PROGRAM DC
 ! here is common foo
       include 'FOO.h'
-      PRINT *, I, J                                                     0001
-      CALL BLA                                                          0002
+      PRINT *, I, J                                                     0005
+      CALL BLA                                                          0006
       END
 

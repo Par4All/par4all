@@ -24,26 +24,26 @@ C  <Y(PHI1)-R-EXACT-{1<=PHI1, PHI1<=N}>
 C  <Y(PHI1)-W-EXACT-{1<=PHI1, PHI1<=N}>
 
 C
-      DO I = 1, N                                                       0001
+      DO I = 1, N                                                       0011
 
 C  <B(PHI1)-R-EXACT-{PHI1==I, 1<=I, I<=N}>
 C  <Y(PHI1)-W-EXACT-{PHI1==I, 1<=I, I<=N}>
 
-         Y(I) = B(I)                                                    0002
+         Y(I) = B(I)                                                    0012
 
 C  <A(PHI1,PHI2)-R-EXACT-{PHI1==I, 1<=PHI2, PHI2<=N, 1<=I, I<=N}>
 C  <X(PHI1)-R-EXACT-{1<=PHI1, PHI1<=N, 1<=I, I<=N}>
 C  <Y(PHI1)-R-EXACT-{PHI1==I, 1<=I, I<=N}>
 C  <Y(PHI1)-W-EXACT-{PHI1==I, 1<=I, I<=N}>
 
-         DO J = 1, N                                                    0003
+         DO J = 1, N                                                    0013
 
 C  <A(PHI1,PHI2)-R-EXACT-{PHI1==I, PHI2==J, 1<=I, I<=N, 1<=J, J<=N}>
 C  <X(PHI1)-R-EXACT-{PHI1==J, 1<=I, I<=N, 1<=J, J<=N}>
 C  <Y(PHI1)-R-EXACT-{PHI1==I, 1<=I, I<=N, 1<=J, J<=N}>
 C  <Y(PHI1)-W-EXACT-{PHI1==I, 1<=I, I<=N, 1<=J, J<=N}>
 
-            Y(I) = Y(I)-X(J)*A(I,J)                                     0004
+            Y(I) = Y(I)-X(J)*A(I,J)                                     0014
          ENDDO
       ENDDO
 
@@ -53,14 +53,14 @@ C  <X(PHI1)-W-EXACT-{1<=PHI1, PHI1<=N}>
 C  <Y(PHI1)-R-EXACT-{1<=PHI1, PHI1<=N}>
 
 C
-      DO I = 1, N                                                       0005
+      DO I = 1, N                                                       0018
 
 C  <A(PHI1,PHI2)-R-EXACT-{PHI1==I, PHI2==I, 1<=I, I<=N}>
 C  <X(PHI1)-R-EXACT-{PHI1==I, 1<=I, I<=N}>
 C  <X(PHI1)-W-EXACT-{PHI1==I, 1<=I, I<=N}>
 C  <Y(PHI1)-R-EXACT-{PHI1==I, 1<=I, I<=N}>
 
-         X(I) = X(I)+Y(I)/A(I,I)                                        0006
+         X(I) = X(I)+Y(I)/A(I,I)                                        0019
       ENDDO
 C
       END

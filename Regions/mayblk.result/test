@@ -6,11 +6,11 @@ C  <A(PHI1)-W-EXACT-{PHI1==J}>
       SUBROUTINE MAYBLK(A,J)
       INTEGER A(5), J, I
 C
-      I = J                                                             0001
+      I = J                                                             0004
 
 C  <A(PHI1)-R-MAY-{I<=PHI1+1, PHI1<=1+I, I==J}>
 C  <A(PHI1)-W-EXACT-{PHI1==I, I==J}>
 
-      A(I) = A(I-1)+A(I+1)                                              0002
+      A(I) = A(I-1)+A(I+1)                                              0005
 C
       END

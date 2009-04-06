@@ -12,12 +12,12 @@ C  T() {N<=0}
 
 C (0,2)
 
-      IF (N.GT.0) THEN                                                  0001
+      IF (N.GT.0) THEN                                                  0003
 
 C  T() {0==-1}
 
 C (0,3)
-         STOP                                                           0002
+         STOP                                                           0004
       ENDIF
 
 C     END BLOCK
@@ -36,12 +36,12 @@ C TP() {N<=0}
 
 C (0,2)
 
-      IF (N.GT.0) THEN                                                  0001
+      IF (N.GT.0) THEN                                                  0003
 
 C TP() {0==-1}
 
 C (0,3)
-         STOP                                                           0002
+         STOP                                                           0004
       ENDIF
 
 C     END BLOCK

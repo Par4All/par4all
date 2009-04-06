@@ -1,36 +1,36 @@
       INTEGER FUNCTION FUN1(I)
       INTEGER I
-      FUN1 = 3                                                          0001
+      FUN1 = 3                                                          0003
       END
       PROGRAM MAIN
       INTEGER I, FUN1
       EXTERNAL FUN1
-      I = 1                                                             0001
-      IF (I.EQ.1) THEN                                                  0002
-         I = 2                                                          0003
+      I = 1                                                             0004
+      IF (I.EQ.1) THEN                                                  0005
+         I = 2                                                          0006
       ELSE
-         I = 3                                                          0004
+         I = 3                                                          0008
       ENDIF
-      CALL SUB(I, 10)                                                   0005
-      CALL SUB2(10, 20)                                                 0006
-      CALL SUB3                                                         0007
-      I = FUN1(2)                                                       0008
+      CALL SUB(I, 10)                                                   0010
+      CALL SUB2(10, 20)                                                 0011
+      CALL SUB3                                                         0012
+      I = FUN1(2)                                                       0013
       END
       SUBROUTINE SUB(J, K)
       INTEGER I
       PARAMETER (N=10)
       REAL*8 A(0:N)
-      DO I = 0, K                                                       0001
-         A(I) = 0                                                       0002
+      DO I = 0, K                                                       0005
+         A(I) = 0                                                       0006
       ENDDO
-      CALL SUB4(A)                                                      0003
+      CALL SUB4(A)                                                      0008
       END
       SUBROUTINE SUB2(N, M)
       REAL*4 B(0:10,0:20)
       INTEGER I,J
-      DO I = 0, M                                                       0001
-         DO J = 0, N                                                    0002
-            B(J,I) = I+J                                                0003
+      DO I = 0, M                                                       0004
+         DO J = 0, N                                                    0005
+            B(J,I) = I+J                                                0006
          ENDDO
       ENDDO
       END
@@ -38,10 +38,10 @@
       PARAMETER (N=2, M=3)
       INTEGER I, FUN1
       EXTERNAL FUN1
-      I = N+M                                                           0001
-      DO WHILE (I.GT.0)                                                 0002
-         I = I-1                                                        0003
-         I = I-FUN1(0)                                                  0004
+      I = N+M                                                           0005
+      DO WHILE (I.GT.0)                                                 0006
+         I = I-1                                                        0007
+         I = I-FUN1(0)                                                  0008
       ENDDO
       END
       SUBROUTINE SUB4(A)
@@ -49,11 +49,11 @@
       INTEGER I
       REAL*8 A(0:N)
       REAL*8 B(0:N)
-      DO I = 0, N                                                       0001
-         B(I) = A(I)                                                    0002
+      DO I = 0, N                                                       0006
+         B(I) = A(I)                                                    0007
       ENDDO
-      DO I = 1, N-1                                                     0003
-         A(I) = 0.25*(B(I-1)+2*B(I)+B(I+1))                             0004
+      DO I = 1, N-1                                                     0009
+         A(I) = 0.25*(B(I-1)+2*B(I)+B(I+1))                             0010
       ENDDO
       END
 /* C pretty print for module FUN1. */

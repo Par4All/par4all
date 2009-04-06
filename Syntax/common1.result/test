@@ -2,7 +2,7 @@
 C     test du parsing de deux apparitions du meme common
 C     il faudrait verifier qu'ils ont bien la meme taille
       COMMON /TOTO/ X, Y
-      CALL FOO                                                          0001
+      CALL FOO                                                          0005
       END
       SUBROUTINE FOO
       COMMON /TOTO/ X, Y

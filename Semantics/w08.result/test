@@ -23,29 +23,29 @@ C  T(MS) {MS==0}
 
 C (0,2)
 
-      MS = 0                                                            0001
+      MS = 0                                                            0011
 
 C  T(MS) {}
 
 C (0,3)
 
-      DO WHILE (MS.LE.2)                                                0002
+      DO WHILE (MS.LE.2)                                                0013
 
 C  T(MS) {MS<=3, MS#init<=MS+2, MS#init<=2}
 
 C (0,4)
-         IF (X.GT.0.) THEN                                              0003
+         IF (X.GT.0.) THEN                                              0014
 
 C  T(MS) {MS==0, MS#init<=2}
 
 C (0,5)
-            MS = 0                                                      0004
+            MS = 0                                                      0015
          ELSE
 
 C  T(MS) {MS==MS#init+1, MS<=3}
 
 C (0,6)
-            MS = MS+1                                                   0005
+            MS = MS+1                                                   0017
          ENDIF
       ENDDO
 
@@ -53,7 +53,7 @@ C  T() {MS==3}
 
 C (0,7)
 
-      PRINT *, MS                                                       0006
+      PRINT *, MS                                                       0021
 
 C     END BLOCK
       END
@@ -82,29 +82,29 @@ C  P() {}
 
 C (0,2)
 
-      MS = 0                                                            0001
+      MS = 0                                                            0011
 
 C  P(MS) {MS==0}
 
 C (0,3)
 
-      DO WHILE (MS.LE.2)                                                0002
+      DO WHILE (MS.LE.2)                                                0013
 
 C  P(MS) {MS<=2}
 
 C (0,4)
-         IF (X.GT.0.) THEN                                              0003
+         IF (X.GT.0.) THEN                                              0014
 
 C  P(MS) {MS<=2}
 
 C (0,5)
-            MS = 0                                                      0004
+            MS = 0                                                      0015
          ELSE
 
 C  P(MS) {MS<=2}
 
 C (0,6)
-            MS = MS+1                                                   0005
+            MS = MS+1                                                   0017
          ENDIF
       ENDDO
 
@@ -112,7 +112,7 @@ C  P(MS) {MS==3}
 
 C (0,7)
 
-      PRINT *, MS                                                       0006
+      PRINT *, MS                                                       0021
 
 C     END BLOCK
       END

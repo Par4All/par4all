@@ -4,11 +4,11 @@ Printed file
       PROGRAM EMPTY
       INTEGER A, B
 
-      J = 3                                                             0001
+      J = 3                                                             0004
 
 c     commentaire sur un goto :
-10    CONTINUE                                                          0003
-      PRINT *, J                                                        0004
+10    CONTINUE                                                          0010
+      PRINT *, J                                                        0011
 
       END
 
@@ -17,10 +17,10 @@ Printed file after RESTUCTURE_CONTROL
       PROGRAM EMPTY
       INTEGER A, B
 
-      J = 3                                                             0001
+      J = 3                                                             0004
 
 c     commentaire sur un goto :
-10    CONTINUE                                                          0003
-      PRINT *, J                                                        0004
+10    CONTINUE                                                          0010
+      PRINT *, J                                                        0011
 
       END

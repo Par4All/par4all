@@ -4,38 +4,38 @@
 C  <I-W-EXACT-{}>
 
 
-      DO I = 11, 20                                                     0001
+      DO I = 11, 20                                                     0004
 
 C  <A(PHI1)-R-EXACT-{PHI1==I+10, 11<=I, I<=20}>
 C  <A(PHI1)-R-EXACT-{PHI1==I-10, 11<=I, I<=20}>
 C  <A(PHI1)-W-EXACT-{PHI1==I, 11<=I, I<=20}>
 C  <I-R-EXACT-{}>
 
-         A(I) = A(I-10)+A(I+10)                                         0002
+         A(I) = A(I-10)+A(I+10)                                         0005
       ENDDO
 
 C  <I-W-EXACT-{}>
 
-      DO I = 11, 20                                                     0003
+      DO I = 11, 20                                                     0007
 
 C  <A(PHI1)-R-EXACT-{PHI1==I-10, 1<=PHI1, I<=20}>
 C  <A(PHI1)-R-EXACT-{PHI1==I+10, PHI1<=30, 11<=I}>
 C  <A(PHI1)-W-EXACT-{PHI1==I, 11<=I, I<=20}>
 C  <I-R-EXACT-{}>
 
-         CALL DUM1(A(I), A(I-10), A(I+10))                              0004
+         CALL DUM1(A(I), A(I-10), A(I+10))                              0008
       ENDDO
 
 C  <I-W-EXACT-{}>
 
-      DO I = 11, 20                                                     0005
+      DO I = 11, 20                                                     0010
 
 C  <A(PHI1)-R-EXACT-{PHI1==I+10, 11<=I, I<=20}>
 C  <A(PHI1)-R-EXACT-{PHI1==I-10, 11<=I, I<=20}>
 C  <A(PHI1)-W-EXACT-{PHI1==I, 11<=I, I<=20}>
 C  <I-R-EXACT-{}>
 
-         CALL DUM2(A(I), A(I-10)+A(I+10))                               0006
+         CALL DUM2(A(I), A(I-10)+A(I+10))                               0011
       ENDDO
       END
       PROGRAM PROPER
@@ -47,13 +47,13 @@ C  <I-R-EXACT-{}>
 C  <I-W-EXACT-{}>
 
 
-      DO I = 11, 20                                                     0001
+      DO I = 11, 20                                                     0004
 
 C  <A(PHI1)-R-MAY-{I<=PHI1+10, PHI1<=10+I, 11<=I, I<=20}>
 C  <A(PHI1)-W-EXACT-{PHI1==I, 11<=I, I<=20}>
 C  <I-R-EXACT-{}>
 
-         A(I) = A(I-10)+A(I+10)                                         0002
+         A(I) = A(I-10)+A(I+10)                                         0005
       ENDDO
 
 C  <A(PHI1)-R-MAY-{1<=PHI1, PHI1<=30}>
@@ -61,13 +61,13 @@ C  <A(PHI1)-W-EXACT-{11<=PHI1, PHI1<=20}>
 C  <I-R-EXACT-{}>
 C  <I-W-EXACT-{}>
 
-      DO I = 11, 20                                                     0003
+      DO I = 11, 20                                                     0007
 
 C  <A(PHI1)-R-MAY-{I<=PHI1+10, PHI1<=10+I, 11<=I, I<=20}>
 C  <A(PHI1)-W-EXACT-{PHI1==I, 11<=I, I<=20}>
 C  <I-R-EXACT-{}>
 
-         CALL DUM1(A(I), A(I-10), A(I+10))                              0004
+         CALL DUM1(A(I), A(I-10), A(I+10))                              0008
       ENDDO
 
 C  <A(PHI1)-R-MAY-{1<=PHI1, PHI1<=30}>
@@ -75,26 +75,26 @@ C  <A(PHI1)-W-EXACT-{11<=PHI1, PHI1<=20}>
 C  <I-R-EXACT-{}>
 C  <I-W-EXACT-{}>
 
-      DO I = 11, 20                                                     0005
+      DO I = 11, 20                                                     0010
 
 C  <A(PHI1)-R-MAY-{I<=PHI1+10, PHI1<=10+I, 11<=I, I<=20}>
 C  <A(PHI1)-W-EXACT-{PHI1==I, 11<=I, I<=20}>
 C  <I-R-EXACT-{}>
 
-         CALL DUM2(A(I), A(I-10)+A(I+10))                               0006
+         CALL DUM2(A(I), A(I-10)+A(I+10))                               0011
       ENDDO
       END
       PROGRAM PROPER
       INTEGER I,A(30)
 
-      DOALL I = 11, 20                                                  0001
-         A(I) = A(I-10)+A(I+10)                                         0002
+      DOALL I = 11, 20                                                  0004
+         A(I) = A(I-10)+A(I+10)                                         0005
       ENDDO
-      DOALL I = 11, 20                                                  0003
-         CALL DUM1(A(I), A(I-10), A(I+10))                              0004
+      DOALL I = 11, 20                                                  0007
+         CALL DUM1(A(I), A(I-10), A(I+10))                              0008
       ENDDO
-      DOALL I = 11, 20                                                  0005
-         CALL DUM2(A(I), A(I-10)+A(I+10))                               0006
+      DOALL I = 11, 20                                                  0010
+         CALL DUM2(A(I), A(I-10)+A(I+10))                               0011
       ENDDO
       END
 

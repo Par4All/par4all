@@ -7,19 +7,19 @@ C
       SUBROUTINE CHOLES(A, P, N)
       REAL X, A(N,N), P(N)
 C
-      DO I = 1, N                                                       0001
-         X = A(I,I)                                                     0002
-         DO K = 1, I-1                                                  0003
-            X = X-A(I,K)*A(I,K)                                         0004
+      DO I = 1, N                                                       0010
+         X = A(I,I)                                                     0011
+         DO K = 1, I-1                                                  0012
+            X = X-A(I,K)*A(I,K)                                         0013
          ENDDO
-         P(I) = 1.0/SQRT(X)                                             0005
-         DOALL J = I+1, N                                               0006
+         P(I) = 1.0/SQRT(X)                                             0015
+         DOALL J = I+1, N                                               0016
             PRIVATE X,KK
-            X = A(I,J)                                                  0007
-            DO KK = 1, I-1                                              0008
-               X = X-A(I,J)*A(I,KK)                                     0009
+            X = A(I,J)                                                  0017
+            DO KK = 1, I-1                                              0018
+               X = X-A(I,J)*A(I,KK)                                     0019
             ENDDO
-            A(J,I) = X*P(I)                                             0010
+            A(J,I) = X*P(I)                                             0021
          ENDDO
       ENDDO
 C

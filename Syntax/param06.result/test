@@ -3,6 +3,6 @@
       PARAMETER (CBLANC = '                              '
      1                  //'                              ')
 
-      PRINT *, CBLANC                                                   0001
+      PRINT *, CBLANC                                                   0006
 
       END

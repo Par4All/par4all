@@ -3,15 +3,15 @@
 C (unreachable)
 C     BEGIN BLOCK
 C (unreachable)
-      REWIND (NIRR)                                                     0001
+      REWIND (NIRR)                                                     0003
 C (unreachable)
-      IF (INIRR.NE.1) THEN                                              0002
-C (unreachable)
-C        BEGIN BLOCK
+      IF (INIRR.NE.1) THEN                                              0004
 C (unreachable)
 C        BEGIN BLOCK
 C (unreachable)
-1        READ (UNIT=NIRR,FMT=1000,END=2)                                0003
+C        BEGIN BLOCK
+C (unreachable)
+1        READ (UNIT=NIRR,FMT=1000,END=2)                                0005
 C (unreachable)
          GOTO 99999
          
@@ -28,9 +28,9 @@ C        BEGIN BLOCK
 C        END BLOCK
       ENDIF
 C (unreachable)
-      INIRR = 0                                                         0004
+      INIRR = 0                                                         0008
 C (unreachable)
-2     CONTINUE                                                          0005
+2     CONTINUE                                                          0009
 C     END BLOCK
       END
       PROGRAM MINI1
@@ -38,19 +38,19 @@ C     END BLOCK
 C (0,1)
 C     BEGIN BLOCK
 C (0,2)
-      REWIND (NIRR)                                                     0001
+      REWIND (NIRR)                                                     0003
 C (0,3)
 C     BEGIN UNSTRUCTURED
 C (1,1)
-      IF (INIRR.NE.1) GOTO 1                                            0002
+      IF (INIRR.NE.1) GOTO 1                                            0004
 C (5,1)
-      INIRR = 0                                                         0004
+      INIRR = 0                                                         0008
       GOTO 2
 C (2,1)
-1     READ (UNIT=NIRR,FMT=1000,END=2)                                   0003
+1     READ (UNIT=NIRR,FMT=1000,END=2)                                   0005
       GOTO 1
 C (4,1)
-2     CONTINUE                                                          0005
+2     CONTINUE                                                          0009
 C     END UNSTRUCTURED
 C     END BLOCK
       END

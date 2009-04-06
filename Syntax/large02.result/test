@@ -10,7 +10,7 @@ C     Check the behavior of large integer constants stored on 32 or 64 bits
 C     in declarations.
 
       REAL X(1234567890)
-      PRINT *, X(1)                                                     0001
+      PRINT *, X(1)                                                     0007
 
       END
 
@@ -28,7 +28,7 @@ C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6}>
 C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6}>
 C  <X(PHI1)-R-EXACT-{PHI1==1}>
 
-      PRINT *, X(1)                                                     0001
+      PRINT *, X(1)                                                     0007
 
       END
 

@@ -17,17 +17,17 @@ Request: build resource PRINTED_FILE for module IOERREND.
 PRINTED_FILE made for IOERREND.
       PROGRAM IOERREND
 
-      READ (UNIT=*,FMT=100,ERR=1000,END=2000) I                         0001
-100   FORMAT(I5)                                                        0002
+      READ (UNIT=*,FMT=100,ERR=1000,END=2000) I                         0003
+100   FORMAT(I5)                                                        0004
 
-      STOP                                                              0003
-
-1000  CONTINUE                                                          0004
-      PRINT *, 'end of file'                                            0005
       STOP                                                              0006
 
-2000  CONTINUE                                                          0007
-      PRINT *, 'read error'                                             0008
+1000  CONTINUE                                                          0008
+      PRINT *, 'end of file'                                            0009
+      STOP                                                              0010
+
+2000  CONTINUE                                                          0012
+      PRINT *, 'read error'                                             0013
 
       END
 Deletion of obsolete resources:

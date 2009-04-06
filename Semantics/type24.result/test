@@ -14,7 +14,7 @@ C  T(S) {"Hello World!"==S}
 
 
 C     Should not be truncated since the actual lenght of s is unknown
-      S = "Hello World!"                                                0001
+      S = "Hello World!"                                                0011
 
       END
 
@@ -31,16 +31,16 @@ C     s2 should receive different values
 C  T(S1) {"Hello World!"==S1}
 
 
-      CALL FOO(S1)                                                      0001
+      CALL FOO(S1)                                                      0009
 
 C  T(S2) {"Hello World!"==S2}
 
-      CALL FOO(S2)                                                      0002
+      CALL FOO(S2)                                                      0010
 
 C  T() {}
 
 
-      PRINT *, S1, S2                                                   0003
+      PRINT *, S1, S2                                                   0012
 
       END
 

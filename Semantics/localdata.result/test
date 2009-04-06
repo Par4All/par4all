@@ -8,7 +8,7 @@ C  T() {}
 
 C  T(N) {N==10}
 
-      N = 10                                                            0001
+      N = 10                                                            0004
       END
 
 C  T(M) {M==M#init+1}
@@ -22,11 +22,11 @@ C  T(M) {M==M#init+1}
 
 C  T() {}
 
-      PRINT *, M                                                        0001
+      PRINT *, M                                                        0007
 
 C  T(M) {M==M#init+1}
 
-      M = M+1                                                           0002
+      M = M+1                                                           0008
       END
 
 C  T(FOO:M) {}
@@ -35,15 +35,15 @@ C  T(FOO:M) {}
 
 C  T(FOO:M) {}
 
-      CALL FOO                                                          0001
+      CALL FOO                                                          0002
 
 C  T() {}
 
-      CALL BLA                                                          0002
+      CALL BLA                                                          0003
 
 C  T(FOO:M) {}
 
-      CALL FOO                                                          0003
+      CALL FOO                                                          0004
       END
 -- intraprocedural preconditions
 
@@ -55,7 +55,7 @@ C  P() {}
 
 C  P() {}
 
-      N = 10                                                            0001
+      N = 10                                                            0004
       END
 
 C  P() {}
@@ -69,11 +69,11 @@ C  P() {}
 
 C  P() {}
 
-      PRINT *, M                                                        0001
+      PRINT *, M                                                        0007
 
 C  P() {}
 
-      M = M+1                                                           0002
+      M = M+1                                                           0008
       END
 
 C  P() {}
@@ -82,15 +82,15 @@ C  P() {}
 
 C  P() {}
 
-      CALL FOO                                                          0001
+      CALL FOO                                                          0002
 
 C  P(FOO:M) {}
 
-      CALL BLA                                                          0002
+      CALL BLA                                                          0003
 
 C  P(FOO:M) {}
 
-      CALL FOO                                                          0003
+      CALL FOO                                                          0004
       END
 -- interprocedural transformers
 
@@ -102,7 +102,7 @@ C  T() {}
 
 C  T(N) {N==10}
 
-      N = 10                                                            0001
+      N = 10                                                            0004
       END
 
 C  T(M) {M==M#init+1}
@@ -116,11 +116,11 @@ C  T(M) {M==M#init+1}
 
 C  T() {}
 
-      PRINT *, M                                                        0001
+      PRINT *, M                                                        0007
 
 C  T(M) {M==M#init+1}
 
-      M = M+1                                                           0002
+      M = M+1                                                           0008
       END
 
 C  T(FOO:M) {FOO:M==FOO:M#init+2}
@@ -129,15 +129,15 @@ C  T(FOO:M) {FOO:M==FOO:M#init+2}
 
 C  T(FOO:M) {FOO:M==FOO:M#init+1}
 
-      CALL FOO                                                          0001
+      CALL FOO                                                          0002
 
 C  T() {}
 
-      CALL BLA                                                          0002
+      CALL BLA                                                          0003
 
 C  T(FOO:M) {FOO:M==FOO:M#init+1}
 
-      CALL FOO                                                          0003
+      CALL FOO                                                          0004
       END
 -- interprocedural preconditions
 
@@ -149,7 +149,7 @@ C  P() {}
 
 C  P() {}
 
-      N = 10                                                            0001
+      N = 10                                                            0004
       END
 
 C  P() {5<=M, M<=6}
@@ -163,11 +163,11 @@ C  P() {5<=M, M<=6}
 
 C  P() {5<=M, M<=6}
 
-      PRINT *, M                                                        0001
+      PRINT *, M                                                        0007
 
 C  P() {5<=M, M<=6}
 
-      M = M+1                                                           0002
+      M = M+1                                                           0008
       END
 
 C  P() {FOO:M==5}
@@ -176,13 +176,13 @@ C  P() {FOO:M==5}
 
 C  P() {FOO:M==5}
 
-      CALL FOO                                                          0001
+      CALL FOO                                                          0002
 
 C  P(FOO:M) {FOO:M==6, FOO:M#init==5}
 
-      CALL BLA                                                          0002
+      CALL BLA                                                          0003
 
 C  P(FOO:M) {FOO:M==6, FOO:M#init==5}
 
-      CALL FOO                                                          0003
+      CALL FOO                                                          0004
       END

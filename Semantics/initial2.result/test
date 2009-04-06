@@ -8,7 +8,7 @@
       INTEGER I
       COMMON /INIT/ I1, I2, I3, I4, I5
       DATA I5 /5/
-      BOO = I+I5                                                        0001
+      BOO = I+I5                                                        0006
       END
 
 ! next line modified by fsplit() in pips
@@ -20,18 +20,18 @@
       SUBROUTINE FOO
       COMMON /INIT/ I1, I2, I3, I4, I5
       DATA I2 /2/
-      PRINT *, 'foo'                                                    0001
+      PRINT *, 'foo'                                                    0005
       END
       PROGRAM INITIAL2
-      PRINT *, 'initial'                                                0001
-      CALL PC                                                           0002
+      PRINT *, 'initial'                                                0002
+      CALL PC                                                           0003
       END
 
       SUBROUTINE PC
       COMMON /INIT/ I1, I2, I3, I4, I5
       DATA I1 /1/
-      PRINT *, 'pc'                                                     0001
-      PRINT *, I1, I2, I3, I4, I5                                       0002
+      PRINT *, 'pc'                                                     0005
+      PRINT *, I1, I2, I3, I4, I5                                       0006
       END
 
 C  P() {I4==4}
@@ -61,9 +61,9 @@ C  P() {BLA:I1==1, BLA:I2==2, BLA:I3==3, BLA:I4==4, BLA:I5==5}
 
 C  P() {BLA:I1==1, BLA:I2==2, BLA:I3==3, BLA:I4==4, BLA:I5==5}
 
-      PRINT *, 'initial'                                                0001
+      PRINT *, 'initial'                                                0002
 
 C  P() {BLA:I1==1, BLA:I2==2, BLA:I3==3, BLA:I4==4, BLA:I5==5}
 
-      CALL PC                                                           0002
+      CALL PC                                                           0003
       END

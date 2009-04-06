@@ -29,9 +29,9 @@ PRINTED_FILE made for FOO.
       EXTERNAL X
       REAL Y(100)
 
-      DO 100 J = 1, 100                                                 0001
-         Y(I) = X(I)                                                    0002
-100      CONTINUE                                                       0003
+      DO 100 J = 1, 100                                                 0005
+         Y(I) = X(I)                                                    0006
+100      CONTINUE                                                       0007
       END
 echo
 
@@ -55,7 +55,7 @@ C     abort "no source file for x"
 C     Forbidden in Fortran 77:
 c      p = q
 
-      CALL FOO(Q)                                                       0001
+      CALL FOO(Q)                                                       0009
       END
 echo
 
@@ -72,7 +72,7 @@ Request: build resource PRINTED_FILE for module Q.
   PRINT_CODE                     building   PRINTED_FILE(Q)
 PRINTED_FILE made for Q.
       FUNCTION Q(I)
-      Q = FLOAT(I)                                                      0001
+      Q = FLOAT(I)                                                      0002
       END
 Deletion of obsolete resources:
 none destroyed.

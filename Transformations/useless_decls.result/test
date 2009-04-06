@@ -16,11 +16,11 @@
       COMMON /FOO/ V, W
       COMMON /BLA/ X, Y, Z
 ! some code
-      C = 3.0                                                           0001
-      DO J = 1, 3                                                       0002
-         D(J) = 8                                                       0003
+      C = 3.0                                                           0021
+      DO J = 1, 3                                                       0022
+         D(J) = 8                                                       0023
       ENDDO
-      V = CALLED(2)                                                     0004
+      V = CALLED(2)                                                     0025
       END
 !! after cleaning declarations
 ! testing removal of useless declarations
@@ -35,10 +35,10 @@
       REAL*4 X1, C, D(1:M), V, W
       COMMON /FOO/ V, W
 ! some code
-      C = 3.0                                                           0001
-      DO J = 1, 3                                                       0002
-         D(J) = 8                                                       0003
+      C = 3.0                                                           0021
+      DO J = 1, 3                                                       0022
+         D(J) = 8                                                       0023
       ENDDO
-      V = CALLED(2)                                                     0004
+      V = CALLED(2)                                                     0025
       END
 

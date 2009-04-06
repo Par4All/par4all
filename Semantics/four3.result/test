@@ -18,17 +18,17 @@ C  T(J) {J==1}
 
 C (0,2)
 
-      J = 1                                                             0001
+      J = 1                                                             0009
 
 C  T(NN) {2N==NN}
 
 C (0,3)
-      NN = 2*N                                                          0002
+      NN = 2*N                                                          0010
 
 C  T(M) {NN<=2M+1, 2M<=NN}
 
 C (0,4)
-      M = NN/2                                                          0003
+      M = NN/2                                                          0011
 
 C  T(J,M) {J#init+2M<=J+2M#init, 3J+4M#init<=3J#init+4M}
 
@@ -38,7 +38,7 @@ C     BEGIN UNSTRUCTURED
 C  T() {}
 
 C (1,1)
-1     IF (M.GE.2.AND.J.GT.M) THEN                                       0004
+1     IF (M.GE.2.AND.J.GT.M) THEN                                       0012
       ELSE
          GOTO 99999
       ENDIF
@@ -51,12 +51,12 @@ C     BEGIN BLOCK
 C  T(J) {J+M==J#init}
 
 C (2,2)
-      J = J-M                                                           0005
+      J = J-M                                                           0013
 
 C  T(M) {M#init<=2M+1, 2M<=M#init}
 
 C (2,3)
-      M = M/2                                                           0006
+      M = M/2                                                           0014
 C     END BLOCK
       GOTO 1
 99999 CONTINUE
@@ -66,7 +66,7 @@ C     END UNSTRUCTURED
 C  T() {}
 
 C (0,6)
-      PRINT *, N, NN, M, J                                              0007
+      PRINT *, N, NN, M, J                                              0018
 
 C  T() {}
 
@@ -95,17 +95,17 @@ C  P() {}
 
 C (0,2)
 
-      J = 1                                                             0001
+      J = 1                                                             0009
 
 C  P(J) {J==1}
 
 C (0,3)
-      NN = 2*N                                                          0002
+      NN = 2*N                                                          0010
 
 C  P(J,NN) {J==1, 2N==NN}
 
 C (0,4)
-      M = NN/2                                                          0003
+      M = NN/2                                                          0011
 
 C  P(J,M,NN) {J==1, M==N, 2M==NN}
 
@@ -115,7 +115,7 @@ C     BEGIN UNSTRUCTURED
 C  P(J,M,NN) {J==1, M==N, 2M==NN}
 
 C (1,1)
-1     IF (M.GE.2.AND.J.GT.M) THEN                                       0004
+1     IF (M.GE.2.AND.J.GT.M) THEN                                       0012
       ELSE
          GOTO 99999
       ENDIF
@@ -128,12 +128,12 @@ C     BEGIN BLOCK
 C  P() {0==-1}
 
 C (2,2)
-      J = J-M                                                           0005
+      J = J-M                                                           0013
 
 C  P() {0==-1}
 
 C (2,3)
-      M = M/2                                                           0006
+      M = M/2                                                           0014
 C     END BLOCK
       GOTO 1
 99999 CONTINUE
@@ -143,7 +143,7 @@ C     END UNSTRUCTURED
 C  P(J,M,NN) {J==1, M==N, 2M==NN}
 
 C (0,6)
-      PRINT *, N, NN, M, J                                              0007
+      PRINT *, N, NN, M, J                                              0018
 
 C  P(J,M,NN) {J==1, M==N, 2M==NN}
 

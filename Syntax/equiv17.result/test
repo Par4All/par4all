@@ -70,9 +70,9 @@ C     to check their allocation offsets.
       EQUIVALENCE (X(25),Y)
       EQUIVALENCE (U, W(50))
 
-      X(1) = Y+W(10)+Z1+Z2                                              0001
+      X(1) = Y+W(10)+Z1+Z2                                              0012
 
-      PRINT *, U, Y                                                     0002
+      PRINT *, U, Y                                                     0014
 
       END
 Deletion of obsolete resources:

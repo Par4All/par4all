@@ -22,9 +22,9 @@ PRINTED_FILE made for ALTRET11.
       SUBROUTINE ALTRET11(*, N)
       INTEGER N
       LOGICAL B
-90000 FORMAT(' @(#) altret11.f #_cp1s_# 4.1 01/18/99 ')                 0001
+90000 FORMAT(' @(#) altret11.f #_cp1s_# 4.1 01/18/99 ')                 0004
 
-      PRINT *, B                                                        0002
+      PRINT *, B                                                        0007
 
       END
 Request: build phase/rule UNSPLIT for module ALTRET11.

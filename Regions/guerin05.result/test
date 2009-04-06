@@ -21,20 +21,20 @@ C  <K-W-EXACT-{}>
 
 C (0,2)
 
-      K = 0                                                             0001
+      K = 0                                                             0013
 
 C  <I-W-EXACT-{}>
 C  <K-R-EXACT-{}>
 C  <K-W-EXACT-{}>
 
 C (0,3)
-      DO I = 1, 1                                                       0002
+      DO I = 1, 1                                                       0014
 
 C  <K-R-EXACT-{}>
 C  <K-W-EXACT-{}>
 
 C (0,4)
-         K = K+1                                                        0003
+         K = K+1                                                        0015
       ENDDO
 
 C     END BLOCK
@@ -54,14 +54,14 @@ C (0,1)
 C     BEGIN BLOCK
 C (0,2)
 
-      K = 0                                                             0001
+      K = 0                                                             0013
 C (0,3)
-      DO I = 1, 1                                                       0002
+      DO I = 1, 1                                                       0014
 
 C  <K-IN-EXACT-{}>
 
 C (0,4)
-         K = K+1                                                        0003
+         K = K+1                                                        0015
       ENDDO
 
 C     END BLOCK

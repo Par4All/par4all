@@ -1,9 +1,9 @@
       FUNCTION D(X)
-      D = X                                                             0001
+      D = X                                                             0002
       END
       FUNCTION E(X)
-      D = X                                                             0001
-      E = D                                                             0002
+      D = X                                                             0002
+      E = D                                                             0003
       END
 C     Declaration bug observed in aile.f: a conflict MAY occur if a local
 C     variable has the same name as a function (may be also true for
@@ -17,6 +17,6 @@ C     to be identified with top-level:d
 C
 C     Francois Irigoin, April 91
       PROGRAM FUNVAR
-      X = D(5)                                                          0001
-      Y = E(6)                                                          0002
+      X = D(5)                                                          0013
+      Y = E(6)                                                          0014
       END

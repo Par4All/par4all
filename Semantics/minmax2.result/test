@@ -7,35 +7,35 @@ C    M<=L, N<=L}
 C  T(I) {I<=M, I<=N}
 
 
-      I = MIN(M, N)                                                     0001
+      I = MIN(M, N)                                                     0003
 
 C  T(J) {J<=M, J<=N}
 
-      J = MIN0(M, N)                                                    0002
+      J = MIN0(M, N)                                                    0004
 
 C  T(K) {M<=K, N<=K}
 
 
-      K = MAX(M, N)                                                     0003
+      K = MAX(M, N)                                                     0006
 
 C  T(L) {M<=L, N<=L}
 
-      L = MAX0(M, N)                                                    0004
+      L = MAX0(M, N)                                                    0007
 
 C  T() {}
 
 
-      PRINT *, I, J, K, L                                               0005
+      PRINT *, I, J, K, L                                               0009
 
 C  T(I) {I<=I#init, I<=J, I<=K, I<=L, I<=M, I<=N}
 
 
-      I = MIN(I, J, K, L, M, N)                                         0006
+      I = MIN(I, J, K, L, M, N)                                         0011
 
 C  T() {}
 
 
-      PRINT *, I                                                        0007
+      PRINT *, I                                                        0013
 
       END
 
@@ -46,35 +46,35 @@ C  P() {}
 C  P() {}
 
 
-      I = MIN(M, N)                                                     0001
+      I = MIN(M, N)                                                     0003
 
 C  P(I) {I<=M, I<=N}
 
-      J = MIN0(M, N)                                                    0002
+      J = MIN0(M, N)                                                    0004
 
 C  P(I,J) {I<=M, I<=N, J<=M, J<=N}
 
 
-      K = MAX(M, N)                                                     0003
+      K = MAX(M, N)                                                     0006
 
 C  P(I,J,K) {I<=M, I<=N, J<=M, J<=N, M<=K, N<=K}
 
-      L = MAX0(M, N)                                                    0004
+      L = MAX0(M, N)                                                    0007
 
 C  P(I,J,K,L) {I<=M, I<=N, J<=M, J<=N, M<=K, N<=K, M<=L, N<=L}
 
 
-      PRINT *, I, J, K, L                                               0005
+      PRINT *, I, J, K, L                                               0009
 
 C  P(I,J,K,L) {I<=M, I<=N, J<=M, J<=N, M<=K, N<=K, M<=L, N<=L}
 
 
-      I = MIN(I, J, K, L, M, N)                                         0006
+      I = MIN(I, J, K, L, M, N)                                         0011
 
 C  P(I,J,K,L) {I<=J, I<=K, I<=L, I<=M, I<=N, J<=M, J<=N, M<=K, N<=K,
 C    M<=L, N<=L}
 
 
-      PRINT *, I                                                        0007
+      PRINT *, I                                                        0013
 
       END

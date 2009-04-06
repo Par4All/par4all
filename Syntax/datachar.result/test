@@ -2,6 +2,6 @@
 
       DATA I/'Hell'/
 
-      PRINT *, I                                                        0001
+      PRINT *, I                                                        0005
 
       END

@@ -11,43 +11,43 @@ c     used in the precondition
 C  P() {}
 
 
-      DO I = 1, N, K                                                    0001
+      DO I = 1, N, K                                                    0008
 
 C  P(I,N) {1<=I, I<=10}
 
-         T(I) = 0.                                                      0002
+         T(I) = 0.                                                      0009
 
 C  P(I,N) {1<=I, I<=10}
 
-         N = N+1                                                        0003
+         N = N+1                                                        0010
       ENDDO
 
 C  P(I,N) {}
 
 
-      DO I = 1, N                                                       0004
+      DO I = 1, N                                                       0013
 
 C  P(I,N) {1<=I, I<=10}
 
-         T(I) = 0.                                                      0005
+         T(I) = 0.                                                      0014
 
 C  P(I,N) {1<=I, I<=10}
 
-         N = N+1                                                        0006
+         N = N+1                                                        0015
       ENDDO
 
 C  P(I,N) {1<=I, I<=11}
 
 
-      DO I = 1, N, -1                                                   0007
+      DO I = 1, N, -1                                                   0018
 
 C  P(I,N) {I==1}
 
-         T(I) = 0.                                                      0008
+         T(I) = 0.                                                      0019
 
 C  P(I,N) {I==1}
 
-         N = N+1                                                        0009
+         N = N+1                                                        0020
       ENDDO
 
       END

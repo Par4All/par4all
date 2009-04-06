@@ -13,6 +13,6 @@ C     Use non-integer variables in DATA
 C  P() {"3"==S, 2.==X, B==1, I==1}
 
 
-      PRINT *, I, X, S, B                                               0001
+      PRINT *, I, X, S, B                                               0010
 
       END

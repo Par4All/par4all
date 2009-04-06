@@ -8,14 +8,14 @@ C  P() {M<=N}
 C  P() {M<=N}
 
 
-      DO 10 I = 1, M                                                    0001
+      DO 10 I = 1, M                                                    0005
 
 C  P(I) {1<=I, I<=M, M<=N}
 
-         A(I) = 1.                                                      0002
+         A(I) = 1.                                                      0006
 
 C  P(I) {1<=I, I<=M, M<=N}
 
-10       CONTINUE                                                       0003
+10       CONTINUE                                                       0007
 
       END

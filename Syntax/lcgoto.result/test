@@ -2,11 +2,11 @@
 c     check labelled computed go to's
 
 
-10    IF (I.EQ.1) GOTO 100                                              0001
-      IF (I.EQ.2) GOTO 200                                              0001
+10    IF (I.EQ.1) GOTO 100                                              0006
+      IF (I.EQ.2) GOTO 200                                              0006
 
-100   PRINT *, 100                                                      0002
-200   CONTINUE                                                          0003
-      PRINT *, 200                                                      0003
+100   PRINT *, 100                                                      0008
+200   CONTINUE                                                          0009
+      PRINT *, 200                                                      0009
 
       END

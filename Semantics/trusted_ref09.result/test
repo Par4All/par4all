@@ -12,20 +12,20 @@ C     BEGIN BLOCK
 C  T(M) {1<=N}
 
 
-      READ *, M                                                         0001
+      READ *, M                                                         0005
 
 C  T(I) {1<=I, M+1<=I, I<=N+1, 1<=N}
 
 
-      IF (.TRUE.) THEN                                                  0002
+      IF (.TRUE.) THEN                                                  0007
 
 C  T(I) {1<=I, 1<=N}
 
-         DO I = 1, M                                                    0003
+         DO I = 1, M                                                    0008
 
 C  T() {1<=I, I<=M, I<=N, 1<=N}
 
-            A(I) = 0                                                    0004
+            A(I) = 0                                                    0009
          ENDDO
       ENDIF
 

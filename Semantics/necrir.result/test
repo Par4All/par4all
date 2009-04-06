@@ -27,56 +27,56 @@ c       itab : table remplie
 c       ker : indicatif d'erreur =0 si tout va bien
 c---------------------------------------------------------------
 c
-      KER = 0                                                           0001
+      KER = 0                                                           0024
 
 C  P(KER) {KER==0}
 
-      LON2 = 2*LON                                                      0002
+      LON2 = 2*LON                                                      0025
 
 C  P(KER,LON2) {KER==0, 2LON==LON2}
 
-      LREC = 8000                                                       0003
+      LREC = 8000                                                       0026
 
 C  P(KER,LON2,LREC) {KER==0, 2LON==LON2, LREC==8000}
 
 C       ifin=long(cnombase)***pas de source LONG
-      CNOML = CNOMF                                                     0004
+      CNOML = CNOMF                                                     0028
 
 C  P(KER,LON2,LREC) {KER==0, 2LON==LON2, LREC==8000}
 
-      OPEN (UNIT=8,FILE=CNOML,ERR=99,FORM='unformatted')                0005
+      OPEN (UNIT=8,FILE=CNOML,ERR=99,FORM='unformatted')                0029
 
 C  P(KER,LON2,LREC) {KER==0, 2LON==LON2, LREC==8000}
 
-      REWIND (8)                                                        0006
+      REWIND (8)                                                        0030
 
 C  P(KER,LON2,LREC) {KER==0, 2LON==LON2, LREC==8000}
 
-      IBUF = LON+1                                                      0007
+      IBUF = LON+1                                                      0031
 
 C  P(KER,LON2,LREC) {KER==0, 2LON==LON2, LREC==8000}
 
 C       istat=fputc(8,cbuf(1))***pas de source FPUTC
 C       istat=fputc(8,cbuf(2))***pas de source FPUTC
-      DO I = 1, LON*2                                                   0008
+      DO I = 1, LON*2                                                   0034
 
 C  P(I,KER,LON2,LREC) {KER==0, 2LON==LON2, LREC==8000, 1<=I, I<=2LON}
 
 C       ***istrat=fputc(8,ctab(i))***pas de source FPUTC
-         X = CTAB(I)                                                    0009
+         X = CTAB(I)                                                    0036
       ENDDO
 
 C  P(I,KER,LON2,LREC) {KER==0, 2LON==LON2, LREC==8000, 1<=I,
 C    2LON+1<=I}
 
-      CLOSE (8)                                                         0010
+      CLOSE (8)                                                         0038
       RETURN
 
 C  P(KER,LON2,LREC) {KER==0, 2LON==LON2, LREC==8000}
 
-99    CLOSE (8)                                                         0011
+99    CLOSE (8)                                                         0040
 
 C  P(KER,LON2,LREC) {KER==0, 2LON==LON2, LREC==8000}
 
-      KER = 1                                                           0012
+      KER = 1                                                           0041
       END

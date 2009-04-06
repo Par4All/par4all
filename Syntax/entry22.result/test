@@ -9,11 +9,11 @@ Module ENTRY22
       REAL*4 X(1:NCL)
       COMMON /FOO/ X
 
-      PRINT *, X                                                        0001
+      PRINT *, X                                                        0022
 
 99999 CONTINUE
 
-      X(1) = 0.                                                         0002
+      X(1) = 0.                                                         0026
 
       END
 
@@ -27,8 +27,8 @@ Entry INIBND
       REAL*4 X(1:NCL)
       COMMON /FOO/ X
 
-99999 CONTINUE                                                          0001
+99999 CONTINUE                                                          0009
 
-      X(1) = 0.                                                         0002
+      X(1) = 0.                                                         0011
 
       END

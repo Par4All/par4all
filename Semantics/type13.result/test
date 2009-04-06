@@ -7,20 +7,20 @@ C  T() {}
 C  T(A,B) {}
 
 
-      READ *, A, B                                                      0001
+      READ *, A, B                                                      0004
 
 C  T() {}
 
 
-      IF (A.EQ.-B) THEN                                                 0002
+      IF (A.EQ.-B) THEN                                                 0006
 
 C  T() {}
 
-         PRINT *, 'a+b = 0'                                             0003
+         PRINT *, 'a+b = 0'                                             0007
 
 C  T() {}
 
-         PRINT *, A+B                                                   0004
+         PRINT *, A+B                                                   0008
       ENDIF
 
       END
@@ -33,20 +33,20 @@ C  P() {}
 C  P() {}
 
 
-      READ *, A, B                                                      0001
+      READ *, A, B                                                      0004
 
 C  P(A,B) {}
 
 
-      IF (A.EQ.-B) THEN                                                 0002
+      IF (A.EQ.-B) THEN                                                 0006
 
 C  P(A,B) {A+B==0}
 
-         PRINT *, 'a+b = 0'                                             0003
+         PRINT *, 'a+b = 0'                                             0007
 
 C  P(A,B) {A+B==0}
 
-         PRINT *, A+B                                                   0004
+         PRINT *, A+B                                                   0008
       ENDIF
 
       END

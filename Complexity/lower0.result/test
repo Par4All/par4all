@@ -1,90 +1,90 @@
 --- Before partial eval
 C                                                            20*N + 32 (SUMMARY)
       SUBROUTINE LOWER0(N)
-C                                                             4*N + 15 (DO)   
+C                                                             4*N + 15 (DO)
 
 C     Check integration for negative lower bounds
 
 C     Note: "-2" represents the unary operator "-"
 C     applied to the positive integer constant "2"
 
-      DO 30 I = -2, N                                                   0001
-C                                                                    3 (STMT) 
-         T = T+1.                                                       0002
-C                                                                    0 (STMT) 
-30       CONTINUE                                                       0003
-C                                                             4*N + 11 (DO)   
+      DO 30 I = -2, N                                                   0008
+C                                                                    3 (STMT)
+         T = T+1.                                                       0009
+C                                                                    0 (STMT)
+30       CONTINUE                                                       0010
+C                                                             4*N + 11 (DO)
 
-      DO 50 I = -1, N                                                   0004
-C                                                                    3 (STMT) 
-         T = T+1.                                                       0005
-C                                                                    0 (STMT) 
-50       CONTINUE                                                       0006
-C                                                              4*N + 6 (DO)   
+      DO 50 I = -1, N                                                   0012
+C                                                                    3 (STMT)
+         T = T+1.                                                       0013
+C                                                                    0 (STMT)
+50       CONTINUE                                                       0014
+C                                                              4*N + 6 (DO)
 
-      DO 10 I = 0, N                                                    0007
-C                                                                    3 (STMT) 
-         T = T+1.                                                       0008
-C                                                                    0 (STMT) 
-10       CONTINUE                                                       0009
-C                                                              4*N + 2 (DO)   
+      DO 10 I = 0, N                                                    0016
+C                                                                    3 (STMT)
+         T = T+1.                                                       0017
+C                                                                    0 (STMT)
+10       CONTINUE                                                       0018
+C                                                              4*N + 2 (DO)
 
-      DO 20 I = 1, N                                                    0010
-C                                                                    3 (STMT) 
-         T = T+1.                                                       0011
-C                                                                    0 (STMT) 
-20       CONTINUE                                                       0012
-C                                                              4*N - 2 (DO)   
+      DO 20 I = 1, N                                                    0020
+C                                                                    3 (STMT)
+         T = T+1.                                                       0021
+C                                                                    0 (STMT)
+20       CONTINUE                                                       0022
+C                                                              4*N - 2 (DO)
 
-      DO 40 I = 2, N                                                    0013
-C                                                                    3 (STMT) 
-         T = T+1.                                                       0014
-C                                                                    0 (STMT) 
-40       CONTINUE                                                       0015
+      DO 40 I = 2, N                                                    0024
+C                                                                    3 (STMT)
+         T = T+1.                                                       0025
+C                                                                    0 (STMT)
+40       CONTINUE                                                       0026
 
       END
 --- After partial eval
 C                                                            20*N + 30 (SUMMARY)
       SUBROUTINE LOWER0(N)
-C                                                             4*N + 14 (DO)   
+C                                                             4*N + 14 (DO)
 
 C     Check integration for negative lower bounds
 
 C     Note: "-2" represents the unary operator "-"
 C     applied to the positive integer constant "2"
 
-      DO 30 I = -2, N                                                   0001
-C                                                                    3 (STMT) 
-         T = T+1.                                                       0002
-C                                                                    0 (STMT) 
-30       CONTINUE                                                       0003
-C                                                             4*N + 10 (DO)   
+      DO 30 I = -2, N                                                   0008
+C                                                                    3 (STMT)
+         T = T+1.                                                       0009
+C                                                                    0 (STMT)
+30       CONTINUE                                                       0010
+C                                                             4*N + 10 (DO)
 
-      DO 50 I = -1, N                                                   0004
-C                                                                    3 (STMT) 
-         T = T+1.                                                       0005
-C                                                                    0 (STMT) 
-50       CONTINUE                                                       0006
-C                                                              4*N + 6 (DO)   
+      DO 50 I = -1, N                                                   0012
+C                                                                    3 (STMT)
+         T = T+1.                                                       0013
+C                                                                    0 (STMT)
+50       CONTINUE                                                       0014
+C                                                              4*N + 6 (DO)
 
-      DO 10 I = 0, N                                                    0007
-C                                                                    3 (STMT) 
-         T = T+1.                                                       0008
-C                                                                    0 (STMT) 
-10       CONTINUE                                                       0009
-C                                                              4*N + 2 (DO)   
+      DO 10 I = 0, N                                                    0016
+C                                                                    3 (STMT)
+         T = T+1.                                                       0017
+C                                                                    0 (STMT)
+10       CONTINUE                                                       0018
+C                                                              4*N + 2 (DO)
 
-      DO 20 I = 1, N                                                    0010
-C                                                                    3 (STMT) 
-         T = T+1.                                                       0011
-C                                                                    0 (STMT) 
-20       CONTINUE                                                       0012
-C                                                              4*N - 2 (DO)   
+      DO 20 I = 1, N                                                    0020
+C                                                                    3 (STMT)
+         T = T+1.                                                       0021
+C                                                                    0 (STMT)
+20       CONTINUE                                                       0022
+C                                                              4*N - 2 (DO)
 
-      DO 40 I = 2, N                                                    0013
-C                                                                    3 (STMT) 
-         T = T+1.                                                       0014
-C                                                                    0 (STMT) 
-40       CONTINUE                                                       0015
+      DO 40 I = 2, N                                                    0024
+C                                                                    3 (STMT)
+         T = T+1.                                                       0025
+C                                                                    0 (STMT)
+40       CONTINUE                                                       0026
 
       END

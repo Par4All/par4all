@@ -14,15 +14,15 @@ C     the loop non entered cases
 C  P() {}
 
 
-      I = 0                                                             0001
+      I = 0                                                             0010
 
 C  P(I) {I==0}
 
-      DO I = N, 1, -1                                                   0002
+      DO I = N, 1, -1                                                   0011
 
 C  P(I) {1<=I, I<=N}
 
-         T(I) = 0.                                                      0003
+         T(I) = 0.                                                      0012
       ENDDO
 
 C  P(I) {I<=0, I<=N}
@@ -34,6 +34,6 @@ C     Effective precondition because initialization of i is useless
 C     and because n's value is unknown:
 C     P(I) {I<=0}
 
-      PRINT *, I                                                        0004
+      PRINT *, I                                                        0021
 
       END

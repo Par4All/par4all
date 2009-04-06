@@ -10,13 +10,13 @@ c     ordering_to_statement tables.
 
       REAL D(LX, MX, NX)
 
-      READ *, A                                                         0001
+      READ *, A                                                         0013
 
 
 
 
 
-      CALL INIT                                                         0006
-      CALL TESTINIT                                                     0007
+      CALL INIT                                                         0023
+      CALL TESTINIT                                                     0024
 
       END

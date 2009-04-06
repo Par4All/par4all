@@ -8,17 +8,17 @@ C  P() {}
 C  P() {}
 
 
-      READ *, N                                                         0001
+      READ *, N                                                         0005
 
 C  P(N) {}
 
 
-      CALL INIT(A, N)                                                   0002
+      CALL INIT(A, N)                                                   0007
 
 C  P(N) {1<=N}
 
 
-      PRINT *, N                                                        0003
+      PRINT *, N                                                        0009
 
       END
 

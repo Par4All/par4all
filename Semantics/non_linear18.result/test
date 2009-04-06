@@ -10,22 +10,22 @@ C     Check polynomial analysis: power is more precisely analyzed than
 C     multiply!
 
 
-      K = N**2+N                                                        0002
+      K = N**2+N                                                        0008
 
 C  T(K) {0<=K, 0<=K+2N}
 
 
-      K = N**2-N                                                        0003
+      K = N**2-N                                                        0010
 
 C  T(K) {N<=K}
 
 
-      K = N*N+N                                                         0004
+      K = N*N+N                                                         0012
 
 C  T(K) {0<=K+N}
 
 
-      K = N*N-N                                                         0005
+      K = N*N-N                                                         0014
 
       END
 

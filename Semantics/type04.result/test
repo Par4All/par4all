@@ -11,22 +11,22 @@ C     scalar variables
 C  T(L1) {}
 
 
-      READ *, L1                                                        0001
+      READ *, L1                                                        0008
 
 C  T(L2) {0<=L1, L1<=1, L2<=L1, L1+L2<=1, 0<=L2, L2<=1}
 
 
-      L2 = L1.AND..NOT.L1                                               0002
+      L2 = L1.AND..NOT.L1                                               0010
 
 C  T(L1) {}
 
 
-      READ *, L1                                                        0003
+      READ *, L1                                                        0012
 
 C  T() {}
 
 
-      PRINT *, L1, L2                                                   0004
+      PRINT *, L1, L2                                                   0014
 
       END
 
@@ -42,22 +42,22 @@ C     scalar variables
 C  P() {}
 
 
-      READ *, L1                                                        0001
+      READ *, L1                                                        0008
 
 C  P(L1) {}
 
 
-      L2 = L1.AND..NOT.L1                                               0002
+      L2 = L1.AND..NOT.L1                                               0010
 
 C  P(L1,L2) {0<=L1, L1<=1, L2<=L1, L1+L2<=1, 0<=L2, L2<=1}
 
 
-      READ *, L1                                                        0003
+      READ *, L1                                                        0012
 
 C  P(L1,L2) {L2==0}
 
 
-      PRINT *, L1, L2                                                   0004
+      PRINT *, L1, L2                                                   0014
 
       END
 

@@ -6,7 +6,7 @@ C  T(X) {1.+X#init==X}
 
 C  T(X) {1.+X#init==X}
 
-      X = X+1.                                                          0001
+      X = X+1.                                                          0003
       END
 
 C  T() {}
@@ -20,17 +20,17 @@ C     Check that type mismatches are detected and do not cause core dumps:
 C     this case is not detected but the value of i is lost as it should be.
 C     Floating point scalar variables are not analyzed
 
-      I = 0                                                             0001
+      I = 0                                                             0007
 
 C  T(I) {}
 
 
-      CALL INCR(I)                                                      0002
+      CALL INCR(I)                                                      0009
 
 C  T() {}
 
 
-      PRINT *, I                                                        0003
+      PRINT *, I                                                        0011
 
       END
 
@@ -41,7 +41,7 @@ C  P() {}
 
 C  P() {}
 
-      X = X+1.                                                          0001
+      X = X+1.                                                          0003
       END
 
 C  P() {}
@@ -55,17 +55,17 @@ C     Check that type mismatches are detected and do not cause core dumps:
 C     this case is not detected but the value of i is lost as it should be.
 C     Floating point scalar variables are not analyzed
 
-      I = 0                                                             0001
+      I = 0                                                             0007
 
 C  P(I) {I==0}
 
 
-      CALL INCR(I)                                                      0002
+      CALL INCR(I)                                                      0009
 
 C  P(I) {}
 
 
-      PRINT *, I                                                        0003
+      PRINT *, I                                                        0011
 
       END
 
@@ -76,7 +76,7 @@ INTERPROCEDURAL_SUMMARY_PRECONDITION[INCR] (add_formal_to_actual_bindings) Type 
 
 
       SUBROUTINE INCR(X)
-      X = X+1.                                                          0001
+      X = X+1.                                                          0003
       END
       PROGRAM SUPPRESS01
 
@@ -84,11 +84,11 @@ C     Check that type mismatches are detected and do not cause core dumps:
 C     this case is not detected but the value of i is lost as it should be.
 C     Floating point scalar variables are not analyzed
 
-      I = 0                                                             0001
+      I = 0                                                             0007
 
-      CALL INCR(I)                                                      0002
+      CALL INCR(I)                                                      0009
 
-      PRINT *, I                                                        0003
+      PRINT *, I                                                        0011
 
       END
 

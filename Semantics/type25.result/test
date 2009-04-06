@@ -10,15 +10,15 @@ C  T(FI,FS,FX) {"Hello World!"==FS, 2.0==FX, FI==1}
 C  T(FS) {"Hello World!"==FS}
 
 
-      FS = "Hello World!"                                               0001
+      FS = "Hello World!"                                               0007
 
 C  T(FX) {2.0==FX}
 
-      FX = 2.0                                                          0002
+      FX = 2.0                                                          0008
 
 C  T(FI) {FI==1}
 
-      FI = 1                                                            0003
+      FI = 1                                                            0009
 
       END
 
@@ -33,12 +33,12 @@ C     Check multi-type initialization routine
 C  T(I,S,X) {"Hello World!"==S, 2.0==X, I==1}
 
 
-      CALL INIT(S, X, I)                                                0001
+      CALL INIT(S, X, I)                                                0007
 
 C  T() {}
 
 
-      PRINT *, S, X, I                                                  0002
+      PRINT *, S, X, I                                                  0009
 
       END
 
@@ -53,15 +53,15 @@ C  P() {}
 C  P() {}
 
 
-      FS = "Hello World!"                                               0001
+      FS = "Hello World!"                                               0007
 
 C  P(FS) {"Hello World!"==FS}
 
-      FX = 2.0                                                          0002
+      FX = 2.0                                                          0008
 
 C  P(FS,FX) {"Hello World!"==FS, 2.0==FX}
 
-      FI = 1                                                            0003
+      FI = 1                                                            0009
 
       END
 
@@ -76,12 +76,12 @@ C     Check multi-type initialization routine
 C  P() {}
 
 
-      CALL INIT(S, X, I)                                                0001
+      CALL INIT(S, X, I)                                                0007
 
 C  P(I,S,X) {"Hello World!"==S, 2.0==X, I==1}
 
 
-      PRINT *, S, X, I                                                  0002
+      PRINT *, S, X, I                                                  0009
 
       END
 

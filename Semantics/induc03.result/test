@@ -18,7 +18,7 @@ C  T(IJ,IX,IY) {1<=IX, 1<=N}
 
 C (0,2)
 
-      DO IX = 1, NX2                                                    0001
+      DO IX = 1, NX2                                                    0009
 
 C  T(IJ,IY) {IX+IY<=IJ+1, IJ+2<=IY+N+NX2, IJ<=N+NX2, 1<=IX, IX<=NX2,
 C    1<=IY, IY<=N+1, NY2+1<=IY, 1<=N}
@@ -29,13 +29,13 @@ C        BEGIN BLOCK
 C  T(IJ) {IJ==IX, 1<=IJ, IJ<=NX2, 1<=N}
 
 C (0,4)
-         IJ = IX                                                        0002
+         IJ = IX                                                        0010
 
 C  T(IJ,IY) {IJ#init==IX, IJ#init+IY<=IJ+1, 1<=IJ#init, IJ#init<=NX2,
 C    1<=IY, 1<=N}
 
 C (0,5)
-         DO IY = 1, NY2                                                 0003
+         DO IY = 1, NY2                                                 0011
 
 C  T(IJ) {IJ#init+NX2==IJ, 1<=IJ#init, IJ#init<=N, 1<=IX, IX<=NX2,
 C    1<=IY, IY<=NY2, 1<=N}
@@ -46,13 +46,13 @@ C           BEGIN BLOCK
 C  T() {1<=IJ, IJ<=N, 1<=IX, IX<=NX2, 1<=IY, IY<=NY2, 1<=N}
 
 C (0,7)
-            A(IJ) = 0.                                                  0004
+            A(IJ) = 0.                                                  0012
 
 C  T(IJ) {IJ#init+NX2==IJ, 1<=IJ#init, IJ#init<=N, 1<=IX, IX<=NX2,
 C    1<=IY, IY<=NY2, 1<=N}
 
 C (0,8)
-            IJ = IJ+NX2                                                 0005
+            IJ = IJ+NX2                                                 0013
 C           END BLOCK
          ENDDO
 C        END BLOCK
@@ -61,7 +61,7 @@ C        END BLOCK
 C  T() {1<=IX, NX2+1<=IX, 1<=N}
 
 C (0,9)
-      PRINT *, IX                                                       0006
+      PRINT *, IX                                                       0016
 
 C     END BLOCK
       END

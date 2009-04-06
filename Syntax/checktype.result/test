@@ -24,10 +24,10 @@ C     Goal: see if we know how to type check MAX, MAX0, AMAX1, DMAX1, AMAX0 and 
 
       DOUBLE PRECISION X, Y, Z
 
-      I = MAX0(I, J)                                                    0001
+      I = MAX0(I, J)                                                    0007
 
 C     This one is wrong
-      I = MAX0(I, J, 1.)                                                0002
+      I = MAX0(I, J, 1.)                                                0010
 
       END
 Deletion of obsolete resources:

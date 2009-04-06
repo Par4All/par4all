@@ -80,9 +80,9 @@ C     offsets for y=0
       EQUIVALENCE (X(25),Y(50))
       EQUIVALENCE (U(100), W(50))
 
-      X(1) = Y+W(10)                                                    0001
+      X(1) = Y+W(10)                                                    0024
 
-      PRINT *, U, Y                                                     0002
+      PRINT *, U, Y                                                     0026
 
       END
 Deletion of obsolete resources:

@@ -7,11 +7,11 @@ C  T(I,J) {I<=K, I<=L+2, 4<=J, K<=J}
 C  T(I) {I<=K, I<=L+2}
 
 
-      I = MIN0(K, L+2)                                                  0001
+      I = MIN0(K, L+2)                                                  0004
 
 C  T(J) {4<=J, K<=J}
 
 
-      J = MAX0(K, L*L, 4)                                               0002
+      J = MAX0(K, L*L, 4)                                               0006
 
       END

@@ -15,11 +15,11 @@ C     l==1 in OUTPUT
 
 C  P() {K==3}
 
-      CALL FOO1(I)                                                      0001
+      CALL FOO1(I)                                                      0009
 
 C  P(I) {I==1, K==3}
 
-      PRINT *, I, K                                                     0002
+      PRINT *, I, K                                                     0010
       END
 
 Initial code with preconditions for FOO1 after cleanup
@@ -32,11 +32,11 @@ C  P() {ALL04:K==3}
 
 C  P() {ALL04:K==3}
 
-      J = 1                                                             0001
+      J = 1                                                             0003
 
 C  P(J) {ALL04:K==3, J==1}
 
-      CALL OUTPUT(J)                                                    0002
+      CALL OUTPUT(J)                                                    0004
       END
 
 Initial code with preconditions for FOO2 after cleanup
@@ -51,11 +51,11 @@ C  P() {0==-1}
 
 C  P() {0==-1}
 
-      J = 2                                                             0001
+      J = 2                                                             0005
 
 C  P() {0==-1}
 
-      CALL FOO3(J)                                                      0002
+      CALL FOO3(J)                                                      0006
       END
 
 Initial code with preconditions for FOO3 after cleanup
@@ -68,7 +68,7 @@ C  P() {0==-1}
 
 C  P() {0==-1}
 
-      CALL OUTPUT(J)                                                    0001
+      CALL OUTPUT(J)                                                    0003
       END
 
 Initial code with preconditions for OUTPUT after cleanup
@@ -82,7 +82,7 @@ C  P() {K==3, L==1}
 
 C  P() {K==3, L==1}
 
-      PRINT *, L, K                                                     0001
+      PRINT *, L, K                                                     0004
       END
 
 Code for ALL04 after cleanup
@@ -95,16 +95,16 @@ C     l==1 in OUTPUT
 
       PROGRAM ALL04
       COMMON /BAR/ K
-      CALL FOO1(I)                                                      0001
-      PRINT *, 1, 3                                                     0002
+      CALL FOO1(I)                                                      0009
+      PRINT *, 1, 3                                                     0010
       END
 
 Code for FOO1 after cleanup
 
 
       SUBROUTINE FOO1(J)
-      J = 1                                                             0001
-      CALL OUTPUT(1)                                                    0002
+      J = 1                                                             0003
+      CALL OUTPUT(1)                                                    0004
       END
 
 Code for FOO2 after cleanup
@@ -126,5 +126,5 @@ Code for OUTPUT after cleanup
 
       SUBROUTINE OUTPUT(L)
       COMMON /BAR/ K
-      PRINT *, 1, 3                                                     0001
+      PRINT *, 1, 3                                                     0004
       END

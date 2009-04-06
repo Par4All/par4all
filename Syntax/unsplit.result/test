@@ -9,15 +9,15 @@ OTHER: ./unsplit.database/Src/unsplit.f
 ! testing unsplit with one file
 !
       PROGRAM UNSPLIT
-      CALL CALLEE                                                       0001
-      CALL OTHER                                                        0002
+      CALL CALLEE                                                       0005
+      CALL OTHER                                                        0006
       END
 
       SUBROUTINE CALLEE
-      PRINT *, 'callee'                                                 0001
+      PRINT *, 'callee'                                                 0003
       END
 
       SUBROUTINE OTHER
-      PRINT *, 'other'                                                  0001
+      PRINT *, 'other'                                                  0003
       END
 

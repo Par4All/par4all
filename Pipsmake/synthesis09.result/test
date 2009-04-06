@@ -36,7 +36,7 @@ C     Check for overloaded operator
       REAL LHIDEN
       PARAMETER (LHIDEN = NBR*PI)
 
-      CALL HIDENH(MAX(LHIDEN, LLOAD), MAX(LLOAD, N), 9999)              0001
+      CALL HIDENH(MAX(LHIDEN, LLOAD), MAX(LLOAD, N), 9999)              0013
 
       END
 echo

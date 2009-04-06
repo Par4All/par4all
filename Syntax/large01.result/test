@@ -8,8 +8,8 @@ First case
 
 C     Check the behavior of large integer constants stored on 32 or 64 bits
 
-      I = 1234567890                                                    0001
-      PRINT *, I                                                        0002
+      I = 1234567890                                                    0005
+      PRINT *, I                                                        0006
 
       END
 
@@ -22,11 +22,11 @@ C  P() {}
 
 C     Check the behavior of large integer constants stored on 32 or 64 bits
 
-      I = 1234567890                                                    0001
+      I = 1234567890                                                    0005
 
 C  P(I) {I==1234567890}
 
-      PRINT *, I                                                        0002
+      PRINT *, I                                                        0006
 
       END
 

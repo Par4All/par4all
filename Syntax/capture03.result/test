@@ -22,10 +22,10 @@ C     with the same name
 
       PROGRAM CAPTURE03
 C     Here "min" is the Fortran intrinsics
-      I = MIN(2, 3)                                                     0001
-      PRINT *, I                                                        0002
-      CALL FOO(I)                                                       0003
-      PRINT *, I                                                        0004
+      I = MIN(2, 3)                                                     0007
+      PRINT *, I                                                        0008
+      CALL FOO(I)                                                       0009
+      PRINT *, I                                                        0010
       END
 Module FOO selected
 Request: build resource PRINTED_FILE for module FOO.

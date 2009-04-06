@@ -2,9 +2,9 @@
       INTEGER N
       REAL*8 Y(2:2*N)
 
-      DO I = 1, N                                                       0001
-         DO J = 1, N                                                    0002
-            Y(I+J) = Y(I)+Y(I+J)                                        0003
+      DO I = 1, N                                                       0005
+         DO J = 1, N                                                    0006
+            Y(I+J) = Y(I)+Y(I+J)                                        0007
          ENDDO
       ENDDO
       END

@@ -4,7 +4,7 @@ Module ENTRY01
       SUBROUTINE ENTRY01(N)
       INTEGER N, M, K
 
-      PRINT *, N                                                        0001
+      PRINT *, N                                                        0003
 
 
       END
@@ -14,8 +14,8 @@ Entry INCREMENT
       SUBROUTINE INCREMENT(N)
       INTEGER N, M, K
 
-99999 CONTINUE                                                          0001
+99999 CONTINUE                                                          0004
 
-      M = K+1                                                           0002
+      M = K+1                                                           0006
 
       END

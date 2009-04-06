@@ -19,7 +19,7 @@ C     REAL A(N) implies N>=1 although it is not in the FOrtran standard
 C  P() {}
 
 
-      READ *, N, M                                                      0001
+      READ *, N, M                                                      0016
 
 C  P(M,N) {}
 
@@ -27,35 +27,35 @@ C  P(M,N) {}
 c      if(n.lt.5) stop
 c      if(m.lt.5) stop
 
-      DO I = 1, N                                                       0002
+      DO I = 1, N                                                       0021
 
 C  P(I,J,M,N) {1<=I, I<=N}
 
-         DO J = 1, M                                                    0003
+         DO J = 1, M                                                    0022
 
 C  P(I,J,M,N) {1<=I, I<=N, 1<=J, J<=M}
 
-            IF (I.GT.33) STOP                                           0004
+            IF (I.GT.33) STOP                                           0023
 
 C  P(I,J,M,N) {1<=I, I<=33, I<=N, 1<=J, J<=M}
 
-            IF (J.GT.33) STOP                                           0006
+            IF (J.GT.33) STOP                                           0024
 
 C  P(I,J,M,N) {1<=I, I<=33, I<=N, 1<=J, J<=33, J<=M}
 
-            A(I,J) = 0.                                                 0008
+            A(I,J) = 0.                                                 0025
          ENDDO
 
 C  P(I,J,M,N) {1<=I, I<=N, 1<=J, J<=34, M+1<=J}
 
 
-         PRINT *, A, N, M                                               0009
+         PRINT *, A, N, M                                               0028
 
       ENDDO
 
 C  P(I,J,M,N) {1<=I, N+1<=I}
 
 
-      PRINT *, A, N, M                                                  0010
+      PRINT *, A, N, M                                                  0032
 
       END

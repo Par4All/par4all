@@ -72,11 +72,11 @@ C     Check offsets
       EQUIVALENCE (X(2), Y), (Y(50), Z)
       COMMON /FOO/U
 
-      DO I = 2, 10                                                      0001
-         Y(I) = 0.                                                      0002
+      DO I = 2, 10                                                      0010
+         Y(I) = 0.                                                      0011
       ENDDO
 
-      PRINT *, I, J                                                     0003
+      PRINT *, I, J                                                     0014
 
       END
 Deletion of obsolete resources:

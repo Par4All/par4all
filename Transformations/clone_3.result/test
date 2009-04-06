@@ -2,18 +2,18 @@
       PROGRAM C3
       INTEGER I, N, M
       PARAMETER (N=5, M = N + 1 - 2 + 1)
-      I = 4                                                             0001
-      I = I+1                                                           0002
-      CALL CLONEE_0(I)                                                  0003
-      CALL CLONEE_0(N)                                                  0004
-      CALL CLONEE_0(M)                                                  0005
-      CALL CLONEE_0(5)                                                  0006
-      CALL CLONEE(5+N-M)                                                0007
+      I = 4                                                             0005
+      I = I+1                                                           0006
+      CALL CLONEE_0(I)                                                  0007
+      CALL CLONEE_0(N)                                                  0008
+      CALL CLONEE_0(M)                                                  0009
+      CALL CLONEE_0(5)                                                  0010
+      CALL CLONEE(5+N-M)                                                0011
       END
 
       SUBROUTINE CLONEE(I)
       INTEGER I
-      IF (I.EQ.5) PRINT *, 'ok'                                         0001
+      IF (I.EQ.5) PRINT *, 'ok'                                         0004
       END
 !!
 !! PIPS: please caution!
@@ -27,6 +27,6 @@
       SUBROUTINE CLONEE_0(I)
       INTEGER I
 !! PIPS: I is assumed a constant reaching value
-      IF (I.NE.5) STOP                                                  0001
-      PRINT *, 'ok'                                                     0004
+      IF (I.NE.5) STOP                                                  0013
+      PRINT *, 'ok'                                                     0016
       END

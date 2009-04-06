@@ -9,16 +9,16 @@
 
       REAL A(N), X
 
-      DO I = 1, N                                                       0001
-         X = A(I)*A(I)                                                  0002
-         A(I) = X+X                                                     0003
+      DO I = 1, N                                                       0011
+         X = A(I)*A(I)                                                  0012
+         A(I) = X+X                                                     0013
       ENDDO
 
-      X = A(4)                                                          0004
-      A(I-3) = X+X                                                      0005
-      A(I-2) = X-X                                                      0006
+      X = A(4)                                                          0016
+      A(I-3) = X+X                                                      0017
+      A(I-2) = X-X                                                      0018
 
-      PRINT *, A(5)                                                     0007
+      PRINT *, A(5)                                                     0020
 
       END
 !! After forward substitution
@@ -32,16 +32,16 @@
 
       REAL A(N), X
 
-      DO I = 1, N                                                       0001
-         X = A(I)*A(I)                                                  0002
-         A(I) = A(I)*A(I)+A(I)*A(I)                                     0003
+      DO I = 1, N                                                       0011
+         X = A(I)*A(I)                                                  0012
+         A(I) = A(I)*A(I)+A(I)*A(I)                                     0013
       ENDDO
 
-      X = A(4)                                                          0004
-      A(I-3) = A(4)+A(4)                                                0005
-      A(I-2) = X-X                                                      0006
+      X = A(4)                                                          0016
+      A(I-3) = A(4)+A(4)                                                0017
+      A(I-2) = X-X                                                      0018
 
-      PRINT *, A(5)                                                     0007
+      PRINT *, A(5)                                                     0020
 
       END
 !! After use-def elimination
@@ -55,15 +55,15 @@
 
       REAL A(N), X
 
-      DO I = 1, N                                                       0001
-         A(I) = A(I)*A(I)+A(I)*A(I)                                     0003
+      DO I = 1, N                                                       0011
+         A(I) = A(I)*A(I)+A(I)*A(I)                                     0013
       ENDDO
 
-      X = A(4)                                                          0004
-      A(I-3) = A(4)+A(4)                                                0005
-      A(I-2) = X-X                                                      0006
+      X = A(4)                                                          0016
+      A(I-3) = A(4)+A(4)                                                0017
+      A(I-2) = X-X                                                      0018
 
-      PRINT *, A(5)                                                     0007
+      PRINT *, A(5)                                                     0020
 
       END
 !! After cleaning declarations
@@ -73,14 +73,14 @@
       INTEGER I
       REAL*4 A(1:N), X
 
-      DO I = 1, N                                                       0001
-         A(I) = A(I)*A(I)+A(I)*A(I)                                     0003
+      DO I = 1, N                                                       0011
+         A(I) = A(I)*A(I)+A(I)*A(I)                                     0013
       ENDDO
 
-      X = A(4)                                                          0004
-      A(I-3) = A(4)+A(4)                                                0005
-      A(I-2) = X-X                                                      0006
+      X = A(4)                                                          0016
+      A(I-3) = A(4)+A(4)                                                0017
+      A(I-2) = X-X                                                      0018
 
-      PRINT *, A(5)                                                     0007
+      PRINT *, A(5)                                                     0020
 
       END

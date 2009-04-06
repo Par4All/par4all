@@ -16,7 +16,7 @@ C  <B(PHI1,PHI2)-R-EXACT-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=N}>
 C  <C(PHI1,PHI2)-R-MAY-{1<=PHI1, PHI1<=N, 1<=PHI2}>
 
 C
-      DO I = 1, N                                                       0001
+      DO I = 1, N                                                       0006
 
 C  <A(PHI1,PHI2)-R-MAY-{1<=PHI1, PHI1<=N, 1<=PHI2, 1<=I, I<=N}>
 C  <A(PHI1,PHI2)-W-MAY-{1<=PHI1, PHI1<=N, 1<=PHI2, 1<=I, I<=N}>
@@ -24,7 +24,7 @@ C  <B(PHI1,PHI2)-R-EXACT-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=N, 1<=I,
 C    I<=N}>
 C  <C(PHI1,PHI2)-R-MAY-{1<=PHI1, PHI1<=N, 1<=PHI2, 1<=I, I<=N}>
 
-         CALL SMXPY(N, A(1,I), C(1,I), B)                               0002
+         CALL SMXPY(N, A(1,I), C(1,I), B)                               0007
       ENDDO
 C
       END

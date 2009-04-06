@@ -8,10 +8,10 @@ C               <must be written>: BAR:I
 C     Purpose: to show that effects on I are not translated in a unique way.
 C     Its name depends on the parsing order.
 
-      CALL FOO                                                          0001
+      CALL FOO                                                          0006
 C               <must be written>: BAR:I
 
-      CALL BAR                                                          0002
+      CALL BAR                                                          0008
 
       END
 
@@ -24,9 +24,9 @@ C               <must be written>: FOO:I
 C     Purpose: to show that effects on I are not translated in a unique way.
 C     Its name depends on the parsing order.
 
-      CALL FOO                                                          0001
+      CALL FOO                                                          0006
 C               <must be written>: FOO:I
 
-      CALL BAR                                                          0002
+      CALL BAR                                                          0008
 
       END

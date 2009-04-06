@@ -64,7 +64,7 @@ user warning in control_graph: Some statements are unreachable
 PRINTED_FILE made for ENTRY21.
       SUBROUTINE ENTRY21(K, M)
       INTEGER K, M, N
-      PRINT *, N                                                        0001
+      PRINT *, N                                                        0005
 
 
       END
@@ -124,9 +124,9 @@ PRINTED_FILE made for INCREMENT.
       SUBROUTINE INCREMENT(M, K)
       INTEGER M, K, N
 
-99999 CONTINUE                                                          0001
+99999 CONTINUE                                                          0004
 
-      M = K+1                                                           0002
+      M = K+1                                                           0006
 
       END
 Deletion of obsolete resources:

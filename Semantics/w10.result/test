@@ -19,25 +19,25 @@ C  T(MS) {MS==0}
 
 C (0,2)
 
-      MS = 0                                                            0001
+      MS = 0                                                            0007
 
 C  T() {}
 
 C (0,3)
 
-      DO WHILE (INC(MS).LE.2)                                           0002
+      DO WHILE (INC(MS).LE.2)                                           0009
 
 C  T() {MS<=2}
 
 C (0,4)
-         PRINT *, MS                                                    0003
+         PRINT *, MS                                                    0010
       ENDDO
 
 C  T() {0==-1}
 
 C (0,5)
 
-      PRINT *, MS                                                       0004
+      PRINT *, MS                                                       0013
 
 C     END BLOCK
       END

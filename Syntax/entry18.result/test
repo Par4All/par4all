@@ -80,7 +80,7 @@ C     for multiple static variables (and a unique DATA, see also entry16.f)
 
       DATA K /3/
 
-      PRINT *, M(1)+N, K+L                                              0001
+      PRINT *, M(1)+N, K+L                                              0010
 
 
       END
@@ -149,21 +149,21 @@ PRINTED_FILE made for INCREMENT1.
       INTEGER M(1:10)
       COMMON /ENTRY_ENTRY18/ L, M, K
 
-99999 CONTINUE                                                          0001
+99999 CONTINUE                                                          0006
 
-      M(1) = N+1                                                        0002
+      M(1) = N+1                                                        0008
 
-99998 CONTINUE                                                          0003
+99998 CONTINUE                                                          0010
 
-      M(2) = N+1                                                        0004
+      M(2) = N+1                                                        0012
 
-99997 CONTINUE                                                          0005
+99997 CONTINUE                                                          0014
 
-      M(3) = N+1                                                        0006
+      M(3) = N+1                                                        0016
 
-99996 CONTINUE                                                          0007
+99996 CONTINUE                                                          0018
 
-      M(4) = N+1                                                        0008
+      M(4) = N+1                                                        0020
 
       END
 echo
@@ -231,17 +231,17 @@ PRINTED_FILE made for INCREMENT2.
       INTEGER M(1:10)
       COMMON /ENTRY_ENTRY18/ L, M, K
 
-99998 CONTINUE                                                          0001
+99998 CONTINUE                                                          0006
 
-      M(2) = N+1                                                        0002
+      M(2) = N+1                                                        0008
 
-99997 CONTINUE                                                          0003
+99997 CONTINUE                                                          0010
 
-      M(3) = N+1                                                        0004
+      M(3) = N+1                                                        0012
 
-99996 CONTINUE                                                          0005
+99996 CONTINUE                                                          0014
 
-      M(4) = N+1                                                        0006
+      M(4) = N+1                                                        0016
 
       END
 echo
@@ -309,13 +309,13 @@ PRINTED_FILE made for INCREMENT3.
       INTEGER M(1:10)
       COMMON /ENTRY_ENTRY18/ L, M, K
 
-99997 CONTINUE                                                          0001
+99997 CONTINUE                                                          0006
 
-      M(3) = N+1                                                        0002
+      M(3) = N+1                                                        0008
 
-99996 CONTINUE                                                          0003
+99996 CONTINUE                                                          0010
 
-      M(4) = N+1                                                        0004
+      M(4) = N+1                                                        0012
 
       END
 echo
@@ -383,9 +383,9 @@ PRINTED_FILE made for INCREMENT4.
       INTEGER M(1:10)
       COMMON /ENTRY_ENTRY18/ L, M, K
 
-99996 CONTINUE                                                          0001
+99996 CONTINUE                                                          0006
 
-      M(4) = N+1                                                        0002
+      M(4) = N+1                                                        0008
 
       END
 Deletion of obsolete resources:
