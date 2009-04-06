@@ -119,7 +119,7 @@
 /* Comm contains the comments for the current statement in ReadStmt().
  * PrevComm contains the comments for the previous statement in ReadStmt(),
  * which is currently being parsed.
- * CurrComm contains the comments attached to the current line in Realine()
+ * CurrComm contains the comments attached to the current line in ReadLine()
  */
 
 #define INITIAL_BUFFER_SIZE (128)
@@ -338,6 +338,13 @@ static int EtatQuotes;
 LOCAL int LineNumber, Column;
 
 /*
+ * Line number of the statement in ReadStmt(),
+ * which is currently being parsed.
+ */
+LOCAL int StmtLineNumber;
+
+
+/*
  * Y a t il un '=' ou un ',' non parenthese ?
  */
 LOCAL int ProfZeroVirg, ProfZeroEgal;
@@ -467,6 +474,7 @@ ScanNewFile(void)
     /* on initialise les variables externes locales et non locales */
     LineNumber = 1;
     Column = 1;
+    StmtLineNumber = 1;
     EtatQuotes = NONINQUOTES;
     iStmt = lStmt = UNDEF;
     iLine = lLine = UNDEF;
@@ -952,6 +960,8 @@ ReadStmt(FILE * fp)
 	strcpy(lab_I, tmp_lab_I);
 		
 	lStmt = 0;
+	/* Memorize the line number before to find next Statement*/
+	StmtLineNumber = LineNumber;
 	do {
 	    iLine = 0;
 	    while (iLine < lLine) {
@@ -1350,3 +1360,9 @@ void dump_current_statement()
 
   safe_fclose(syn_in, CurrentFN);
 }
+
+/*return the line number of the statement being parsed*/
+int get_statement_number () {
+  return StmtLineNumber - 1;
+}
+

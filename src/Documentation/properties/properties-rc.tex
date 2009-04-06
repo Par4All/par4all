@@ -2230,7 +2230,7 @@ regions), add a line before and after each piece of information if set to
 PRETTYPRINT_LOOSE TRUE 
 \end{verbatim}
 
-By default, each prettyprinted line of Fortran code is terminated by its
+By default, each prettyprinted line of Fortran or C code is terminated by its
 statement number in columns 73-80, unless no significative statement
 number is available. This feature is used to trace the origin of
 statements after program transformations and parallelization steps.
@@ -2238,9 +2238,11 @@ statements after program transformations and parallelization steps.
 This feature may be inconvenient for some compilers or because it
 generates large source files. It may be turned off.
 
-Note that the statement number is {\em not} related to the line
-number. Two statements on the same line have different statement
-numbers. A multi-line statement only has one number. See \Pri{}.
+Note that the statement number is equal to the line number in the original 
+function. Note also that some phases in {\texttt{pips}
+may add new statement that are not present in the original file. In this 
+case the number of the statement that requires such a transformation,
+is used for the added statement.
 
 \begin{verbatim}
 PRETTYPRINT_STATEMENT_NUMBER TRUE 

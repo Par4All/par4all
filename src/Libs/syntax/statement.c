@@ -64,49 +64,6 @@ parser_reset_StmtHeap_buffer(void)
     CurrentStmt = 0;
 }
 
-/* to produce statement numbers */
-static int stat_num = 1;
-static bool skip_num = FALSE ;
-
-void 
-reset_statement_number()
-{
-    stat_num = 1;
-    skip_num = FALSE;
-}
-
-int
-get_next_statement_number()
-{
-  int next = stat_num;
-
-  stat_num = skip_num? stat_num+2 : stat_num+1;
-  skip_num = FALSE;
-
-  return next;
-}
-
-int
-look_at_next_statement_number()
-{
-  return stat_num;
-}
-
-int
-get_future_statement_number()
-{
-  int next = stat_num+1;
-  pips_assert("skip_num must be false",!skip_num);
-  skip_num = TRUE;
-  return next;
-}
-
-void
-decrement_statement_number()
-{
-  stat_num--;
-}
-
 /* this functions looks up in table StmtHeap for the statement s whose
 label is l. */
 
@@ -319,7 +276,7 @@ instruction i;
 	statement c = make_continue_statement(l);
 	statement ls = instruction_to_statement(i);
 
-	statement_number(ls) = get_next_statement_number();
+	statement_number(ls) = get_statement_number();//get_next_statement_number();
 	NewStmt(l, c);
 	s = make_block_statement(CONS(STATEMENT,c,
 				      CONS(STATEMENT, ls, NIL)));
@@ -341,7 +298,7 @@ instruction i;
     else {
 	s = make_statement(l,
 			   (instruction_goto_p(i))?
-			   STATEMENT_NUMBER_UNDEFINED : get_next_statement_number(),
+			   STATEMENT_NUMBER_UNDEFINED : get_statement_number(),//get_next_statement_number(),
 			   STATEMENT_ORDERING_UNDEFINED,
 			   empty_comments,
 			   i,NIL,NULL);
@@ -374,7 +331,7 @@ instruction i;
 	instruction c = make_continue_instruction();
 	statement ls = instruction_to_statement(i);
 
-	statement_number(ls) = get_next_statement_number();
+	statement_number(ls) = get_statement_number();//get_next_statement_number();
 	statement_instruction(s) = c;
 
 	new_s = instruction_to_statement(
@@ -427,7 +384,7 @@ instruction i;
 	   STATEMENT_NUMBER_UNDEFINED : get_next_statement_number();
 	*/
 	/* Let's number labelled GOTO because a CONTINUE is derived later from them */
-	statement_number(s) = get_next_statement_number();
+	statement_number(s) = get_statement_number(); //get_next_statement_number();
 	new_s = s;
     }
 
@@ -529,7 +486,7 @@ instruction i;
 	/* No actual label, no problem */
 	s = make_statement(l, 
 			   (instruction_goto_p(i)||instruction_block_p(i))?
-			   STATEMENT_NUMBER_UNDEFINED : get_next_statement_number(),
+			   STATEMENT_NUMBER_UNDEFINED : get_statement_number(), //get_next_statement_number(),
 			   STATEMENT_ORDERING_UNDEFINED,
 			   empty_comments, 
 			   i,NIL,NULL);
@@ -590,9 +547,6 @@ bool number_it;
     }
     else {
       s = MakeStatement(l, i);
-      if(!number_it) {
-	decrement_statement_number();
-      }
     }
 
     if (iPrevComm != 0) {
@@ -837,9 +791,9 @@ MakeAssignedOrComputedGotoInst(list ll, expression ce, bool assigned)
     s = instruction_to_statement(iif);
 
     /* Update the statement numbers of all possibly allocated statements */
-    statement_number(s) = look_at_next_statement_number();
+    statement_number(s) = get_statement_number();
     if(stop_statement_p(may_stop))
-      statement_number(may_stop) = look_at_next_statement_number();
+      statement_number(may_stop) = get_statement_number();
 
     cs = CONS(STATEMENT, s, cs);
   }
@@ -850,7 +804,7 @@ MakeAssignedOrComputedGotoInst(list ll, expression ce, bool assigned)
   /* MakeStatement won't increment the current statement number
    * because this is a block... so it has to be done here
    */
-  (void) get_next_statement_number();
+  //  (void) get_next_statement_number();
   ins = make_instruction_block(cs);
 
   (void) instruction_consistent_p(ins);
@@ -1136,7 +1090,7 @@ MakeCallInst(
 	statement s = instruction_to_statement
 	    (make_instruction(is_instruction_call, make_call(fe, ap)));
 
-	statement_number(s) = look_at_next_statement_number();
+	statement_number(s) = get_statement_number();
 	pips_assert("Alternate return substitution required\n", SubstituteAlternateReturnsP());
 	i = generate_return_code_checks(ar);
 	pips_assert("Must be a sequence", instruction_block_p(i));
@@ -1351,7 +1305,6 @@ instruction i;
     if(instruction_block_p(i)) {
 	list l = instruction_block(i);
 	/* statement first = STATEMENT(CAR(l)); */
-	int sn = get_future_statement_number();
 	/* Only the alternate return case assert:
 	pips_assert("Block of two instructions or call with return code checks",
 		    (gen_length(l)==2 && assignment_statement_p(first))
@@ -1360,11 +1313,11 @@ instruction i;
 	    );
 	    */
 	MAP(STATEMENT, s, {
-	    statement_number(s) = sn;
+	    statement_number(s) = get_statement_number ();
 	}, l);
     }
     else {
-	statement_number(bt) = get_future_statement_number();
+	statement_number(bt) = get_statement_number();
     }
 
     return ti;
@@ -1473,7 +1426,7 @@ string l1, l2, l3;
 
 	s = instruction_to_statement(make_instruction(is_instruction_test, 
 						      make_test(e2,s2,s3)));
-	statement_number(s) = look_at_next_statement_number();
+	statement_number(s) = get_statement_number();
 
 	ifarith = make_instruction(is_instruction_test, make_test(e1,s1,s));
     }
@@ -1961,7 +1914,6 @@ set_first_format_statement()
 {
     if(!format_seen && !seen) {
 	format_seen = TRUE;
-	reset_statement_number();
 	/* declaration_lines = line_b_I-1; */
 	    debug(8, "set_first_format_statement", "line_b_C=%d, line_b_I=%d\n",
 		  line_b_C, line_b_I);
@@ -2150,8 +2102,5 @@ check_first_statement()
 	 *
 	 * SaveChains();
 	 */
-
-	if(!format_seen)
-	    reset_statement_number();
     }
 }

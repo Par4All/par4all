@@ -1,0 +1,42 @@
+#! /bin/bash
+
+failed=0
+success=0
+list_lgt=$#
+
+echo "starting $0 script with folowing argument(s):"> /tmp/pips_force_accept.log
+echo "$@" >> /tmp/pips_force_accept.log
+
+if [[ "$1" == "-h" || "$1" == "--help" || $# == 0 ]]
+then
+   echo "usage: $0 directory_list"
+   echo "  the directory_list is a list of .result directory where you want"
+   echo "  the previous validation output to be considered as the new"
+   echo "  reference for future validation tests"
+   exit
+else
+    for dir in $@
+    do
+	if [ -f $dir/out ]
+	then
+	    cp $dir/out $dir/test
+	    if [ -f $dir/test ]
+	    then
+		let success++
+	    else
+		let failed++
+		echo "ERROR:can not create test in $dir" >> /tmp/pips_force_accept.log
+	    fi
+	else
+	    echo "ERROR:No output defined in directory $dir
+	    Consider runing the validation first" >> /tmp/pips_force_accept.log
+	    let failed++
+	fi
+    done
+fi
+
+echo "$0 completes with following statistics :"
+echo "$list_lgt directories processed"
+echo "$success succeed"
+echo "$failed failed"
+echo "logs are in /tmp/pips_force_accept.log"

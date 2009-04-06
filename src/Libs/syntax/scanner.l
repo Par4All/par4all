@@ -279,7 +279,7 @@ void yyerror(char * msg)
 
 void yyreset_lex(void)
 {
-    line = 1;
+    line = 0;
 #ifdef FLEX_SCANNER
     yyrestart(yyin);
 #else

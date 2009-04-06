@@ -304,7 +304,7 @@ static statement make_get_rc_statement(expression rc_ref)
   i_get = make_instruction(is_instruction_call,
 			   make_call(get_rc, CONS(EXPRESSION, rc_ref, NIL)));
   s_get = instruction_to_statement(i_get);
-  statement_number(s_get) = look_at_next_statement_number();
+  statement_number(s_get) = get_statement_number();
 
   return s_get;
 }
@@ -443,9 +443,9 @@ instruction MakeReturn(expression e)
     statement src = make_set_rc_statement(e);
     statement jmp = instruction_to_statement(MakeGotoInst(end_label_local_name));
 	
-    statement_number(src) = look_at_next_statement_number();
-    statement_number(jmp) = look_at_next_statement_number();
-    (void) get_next_statement_number();
+    statement_number(src) = get_statement_number();
+    statement_number(jmp) = get_statement_number();
+    //    (void) get_next_statement_number();
     inst = make_instruction_block(CONS(STATEMENT, src, CONS(STATEMENT, jmp, NIL)));
     instruction_consistent_p(inst);
   }
@@ -486,10 +486,10 @@ GenerateReturn()
 	statement jmp = statement_undefined;
 	    (MakeZeroOrOneArgCallInst("RETURN", expression_undefined));
 
-	statement_number(src) = look_at_next_statement_number();
+	statement_number(src) = get_statement_number();
 	jmp = MakeStatement(l, MakeZeroOrOneArgCallInst("RETURN", expression_undefined));
 	/*
-	statement_number(jmp) = look_at_next_statement_number();
+	statement_number(jmp) = get_statement_number();
 	(void) get_next_statement_number();
 	*/
 	inst = make_instruction_block(CONS(STATEMENT, src, CONS(STATEMENT, jmp, NIL)));

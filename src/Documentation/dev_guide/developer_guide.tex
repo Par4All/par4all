@@ -1038,7 +1038,7 @@ default options for the validation.
 \label{sec:validation-scripts}
 
 
-Two validation scripts are available:
+Three validation scripts are available:
 \begin{description}
 \item[pips\_validate]: \index{Validate} Non-regression tests;
 
@@ -1122,6 +1122,16 @@ Two validation scripts are available:
 \begin{verbatim}
 PIPS_GRAPHICAL_DIFF=pips_emacs_diff manual_accept LoopRecovering
 \end{verbatim}
+
+\item[pips\_force\_accept]
+  The script takes a list of .result directories as an argument. For each of
+  the given directory the result of the previous validation will be made the
+  reference for future validation tests. Note that you need to run the validation
+  first.
+  Once you have run the \texttt{pips\_force\_accept}
+  script, you need to commit these changes to the validation repository, if
+  and only if the corresponding pips sources are already in the subversion
+  repository of course!
 \end{description}
 
 %%\begin{itemize}
