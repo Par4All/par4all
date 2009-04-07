@@ -15,15 +15,15 @@ Ask for the parallelization of all the modules of the program with OpenMP output
 
 
 !$OMP PARALLEL DO PRIVATE(I)
-      DO J = 2, NY-1                                                    0001
+      DO J = 2, NY-1                                                    0008
 
 !$OMP    PARALLEL DO PRIVATE(XCO,PY,PX)
-         DO I = 2, NX-1                                                 0002
-            XCO = XCOEF(I,J)                                            0003
-            PX = (PHI1(3,I+1,J)-PHI1(3,I-1,J))*H1P2                     0004
-            PHI1(1,I,J) = PHI1(1,I,J)-DT*PX*XCO                         0006
-            PY = (PHI1(3,I,J+1)-PHI1(3,I,J-1))*H2P2                     0005
-            PHI1(2,I,J) = PHI1(2,I,J)-DT*PY*XCO                         0007
+         DO I = 2, NX-1                                                 0009
+            XCO = XCOEF(I,J)                                            0010
+            PX = (PHI1(3,I+1,J)-PHI1(3,I-1,J))*H1P2                     0011
+            PHI1(1,I,J) = PHI1(1,I,J)-DT*PX*XCO                         0013
+            PY = (PHI1(3,I,J+1)-PHI1(3,I,J-1))*H2P2                     0012
+            PHI1(2,I,J) = PHI1(2,I,J)-DT*PY*XCO                         0014
          ENDDO
       ENDDO
       END
