@@ -2872,6 +2872,13 @@ account data flow dependences, a.k.a true dependences. It is of limited
 interest because transitive dependences are computed. It is not
 equivalent at all to performing array and scalar expansion based on direct
 dependence computation (\textsc{Brandes}, \textsc{Feautrier}, \textsc{Pugh}).
+It is not safe when privatization is performed before parallelization.
+
+This phase is named after the historical classification of data
+dependencies in output dependence, anti-dependence and true or data
+dependence. It should not be used for standard parallelization, but
+only for experimental parallelization by knowledgeable users, aware
+that the output code may be illegal.
 %%!UserManualDocumentation
 
 \begin{verbatim}
