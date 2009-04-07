@@ -8,7 +8,7 @@ int main () {
 
   for (i = 0; i < 10; i++) {
     for (j = 2; j < 7; j++) {
-      for (k = 4; k < 3; k++) {
+      for (k = 4; k < 10; k++) {
 	for (l = 2; l < 10; l++) {
 	  for (m = 0; m < 10; m++) {
 	    y = 3.5 + x;	    
