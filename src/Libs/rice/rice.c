@@ -350,6 +350,7 @@ bool rice_data_dependence(string mod_name)
 {
     set_bool_property( "GENERATE_NESTED_PARALLEL_LOOPS", TRUE ) ;
     set_bool_property( "RICE_DATAFLOW_DEPENDENCE_ONLY", TRUE ) ;
+    pips_user_warning("This phase is designed for experimental purposes only. The generated code is most likely to be illegal, especially if a privatization phase was performed before.\n");
     return rice( mod_name ) ;
 }
 
