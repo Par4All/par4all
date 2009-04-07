@@ -23,7 +23,7 @@ apply PRIVATIZE_MODULE[NS]
 echo Ask for some statistics about the job to be done:
 setproperty PARALLELIZATION_STATISTICS=TRUE
 echo Ask for the parallelization of all the modules of the program with OpenMP output:
-activate RICE_DATA_DEPENDENCE
+#activate RICE_DATA_DEPENDENCE
 activate PRINT_PARALLELIZEDOMP_CODE
 display PARALLELPRINTED_FILE[NS]
 echo Consider the generated parallel as the sequential code now:
