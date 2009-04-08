@@ -40,6 +40,7 @@ ln: local-clean
 	#
 	# links
 	#
-	ln $(ARCH)/fpips $(ARCH)/pips 
-	ln $(ARCH)/fpips $(ARCH)/tpips 
-	ln $(ARCH)/fpips $(ARCH)/wpips 
+	ln $(ARCH)/fpips $(ARCH)/gpips
+	ln $(ARCH)/fpips $(ARCH)/pips
+	ln $(ARCH)/fpips $(ARCH)/tpips
+	ln $(ARCH)/fpips $(ARCH)/wpips

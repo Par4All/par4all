@@ -8,7 +8,7 @@
  * be exported, reducing the size of binary distributions.
  * The execution depends on the name of the executable, or the first option.
  *
- * C macros of interest: FPIPS_WITHOUT_{,T,W}PIPS to disable some versions.
+ * C macros of interest: FPIPS_WITHOUT_{,G,T,W}PIPS to disable some versions.
  *
  * FC, Mon Aug 18 09:09:32 GMT 1997
  */
@@ -44,10 +44,18 @@ extern int wpips_main(int, char**);
 #define WPIPS(c, v) wpips_main(c, v)
 #endif
 
+#if defined(FPIPS_WITHOUT_GPIPS)
+#define GPIPS(c, v) fpips_error("gpips", c, v)
+#else
+extern int gpips_main(int, char**);
+#define GPIPS(c, v) gpips_main(c, v)
+#endif
+
 #define USAGE							\
-    "Usage: fpips [-hvPTW] (other options and arguments...)\n"	\
+    "Usage: fpips [-hvGPTW] (other options and arguments...)\n"	\
     "\t-h: this help...\n"					\
     "\t-v: version\n"						\
+    "\t-G: gpips\n"						\
     "\t-P: pips\n"						\
     "\t-T: tpips\n"						\
     "\t-W: wpips\n"						\
@@ -81,14 +89,14 @@ int fpips_error(char * what,
     return fpips_usage(1);
 }
 
-/* returns whether name ends with ref 
+/* returns whether name ends with ref
  */
 static int name_end_p(char * name, char * ref)
 {
     int nlen = strlen(name), rlen = strlen(ref);
     if (nlen<rlen) return FALSE;
-    while (rlen>0) 
-	if (ref[--rlen]!=name[--nlen]) 
+    while (rlen>0)
+	if (ref[--rlen]!=name[--nlen])
 	    return FALSE;
     return TRUE;
 }
@@ -107,21 +115,24 @@ int fpips_main(int argc, char **  argv)
 
     /* According to the shell or the debugger, the path may be
        complete or not... RK. */
-    if (name_end_p(argv[0], "tpips")) 
+    if (name_end_p(argv[0], "gpips"))
+	return GPIPS(argc, argv);
+    if (name_end_p(argv[0], "tpips"))
 	return TPIPS(argc, argv);
-    if (name_end_p(argv[0], "wpips")) 
+    if (name_end_p(argv[0], "wpips"))
 	return WPIPS(argc, argv);
     if (name_end_p(argv[0], "/pips") || same_string_p(argv[0], "pips"))
 	return  PIPS(argc, argv);
 
     /* parsing of options may be continuate by called version.
      */
-    while ((opt = getopt(argc, argv, "hvPTW"))!=-1)
+    while ((opt = getopt(argc, argv, "hvGPTW"))!=-1)
     {
 	switch (opt)
 	{
 	case 'h': fpips_usage(0); break;
 	case 'v': fpips_version(0); break;
+	case 'G': return GPIPS(argc, argv);
 	case 'P': return PIPS(argc, argv);
 	case 'T': return TPIPS(argc, argv);
 	case 'W': return WPIPS(argc, argv);

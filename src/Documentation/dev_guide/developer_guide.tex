@@ -432,6 +432,12 @@ svn revert -R .
 \end{verbatim}
   }
 
+  Well, it does not remove the new files that may be created previously in
+  your local copy by the merge procedure, it only delete their meta-data
+  from the subversion point of view. So the cleaner way is to merge into a
+  new working copy of the trunk so that if things go wrong you can simply
+  delete the working copy.
+
   To know about where you are compared to the trunk, you can try a:
   {\small
 \begin{verbatim}
@@ -450,7 +456,7 @@ svn diff http://svn.cri.ensmp.fr/svn/pips/branches/calvin/graph \
   You must have write access to the \texttt{trunk} in order to do the commit.
   {\small
 \begin{verbatim}
-sh> cd prod/pips  # cd in your pips trunk copy
+sh> cd prod/pips  # cd in your pips trunk copy, or better a fresh copy
 sh> svn mergeinfo \
   http://svn.cri.ensmp.fr/svn/pips/branches/calvin/my-branch-name \
   --show-revs eligible

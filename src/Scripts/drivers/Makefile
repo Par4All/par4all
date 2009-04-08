@@ -25,15 +25,15 @@ endif
 include $(ROOT)/makes/main.mk
 
 # local stuff:
-LINKS =	pips tpips wpips fpips
+LINKS =	pips tpips wpips fpips gpips
 
 .build_exe: .build_links
 
-.build_links: 
+.build_links:
 	$(MAKE) links
 	touch $@
 
-links: 
+links:
 	# no direct dependency, as usual
 	$(MAKE) $(EXE.d)
 	for l in $(LINKS) ; do $(RM) $(EXE.d)/$$l ; done
