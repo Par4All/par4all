@@ -2238,11 +2238,20 @@ statements after program transformations and parallelization steps.
 This feature may be inconvenient for some compilers or because it
 generates large source files. It may be turned off.
 
-Note that the statement number is equal to the line number in the original 
-function. Note also that some phases in {\texttt{pips}
-may add new statement that are not present in the original file. In this 
-case the number of the statement that requires such a transformation,
-is used for the added statement.
+Note that the statement number is equal to the line number in the
+function file, that is the source file obtained after PIPS
+preprocessing\footnote{PIPS preprocessing usually includes the
+standard C or Fortran preprocessing phase but also breaks down user
+files into compilation units and function files, a.k.a. initial files
+in Fortran and source files in C.} and filtering\footnote{Filtering is
+applied on Fortran files only to perform file includes. It is
+implemented in Perl.}, and not the user file, which is the file
+submitted by the user and which may contain several functions.
+
+Note also that some phases in {\texttt{pips} may add new statement
+that are not present in the original file. In this case the number of
+the statement that requires such a transformation, is used for the
+added statement.
 
 \begin{verbatim}
 PRETTYPRINT_STATEMENT_NUMBER TRUE 
