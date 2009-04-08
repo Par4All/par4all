@@ -6,7 +6,7 @@
 
 #debug_output := $(shell echo no_wpips.mk  > /dev/tty)
 
-CPPFLAGS 	+=	-DFPIPS_WITHOUT_WPIPS 
+CPPFLAGS 	+=	-DFPIPS_WITHOUT_WPIPS
 
 # Skip compiling WPips:
 PIPS_NO_WPIPS = 1
