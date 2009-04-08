@@ -134,6 +134,9 @@ while [ "$1" ] ; do
   esac
 done
 
+# use a full path name
+[[ $vdir == .* ]] && vdir=$PWD/$vdir
+
 # option checks
 [[ -d $vdir ]] || usage 3 "no validation directory: $vdir"
 [[ -d $rdir ]] || usage 4 "no run directory: $rdir"
@@ -300,10 +303,15 @@ function validate_file()
 
   verb 4 "Status = $status"
 
-  # filter out validation directory path for all output...
-  # the if/fi output above cannot be piped directly because
+  # not very beautiful, but necessary as some output contains
+  # the full path of some files... so filter out validation directory path
+  # for all output... the if/fi output above cannot be piped directly because
   # it would hide the "status" variable setting in a subshell.
-  sed -e "s/${VDIR//\//\\/}/\$VDIR/g" $out.tmp > $out.out && rm -f $out.tmp
+  # escape VDIR for sed
+  local vdirec=$VDIR
+  vdiresc=${vdiresc//\//\\/}
+  vdiresc=${vdiresc//./\\.}
+  sed -e "s/$vdiresc/\$VDIR/g" $out.tmp > $out.out && rm -f $out.tmp
 
   [[ -f core ]] && rm -f core # cleanup
 
@@ -364,7 +372,7 @@ function validate_file()
       verb 3 "$rel_file: SUCCEEDED" # ok!
       rm -f $out.* $file_resdir/*.filtered
     fi
-    
+
   else
       verb 2 "$rel_file: FAILED"
       echo "failed: $rel_file" >> $summary
