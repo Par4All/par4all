@@ -24,6 +24,10 @@ ifndef PIPS_NO_WPIPS
 	FWD_DIRS	+= wpips
 endif
 
+ifndef PIPS_NO_GPIPS
+	FWD_DIRS	+= gpips
+endif
+
 # compile pypips only if required
 ifdef PIPS_PYPIPS
 	FWD_DIRS	+= pypips

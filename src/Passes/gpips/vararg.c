@@ -1,0 +1,44 @@
+#include <stdio.h>
+#include <stdarg.h>
+#include <string.h>
+
+#define SMALL_BUFFER_LENGTH 2560
+
+/*VARARGS0*/
+void
+gpips_user_error(char * calling_function_name,
+                 char * a_message_format,
+                 va_list * some_arguments)
+{
+   char error_buffer[SMALL_BUFFER_LENGTH];
+
+   /* print name of function causing error */
+   (void) sprintf(error_buffer, "user error in %s: ", 
+                  calling_function_name);
+
+   /* print out remainder of message */
+   (void) vsprintf(error_buffer + strlen(error_buffer),
+                   a_message_format, *some_arguments);
+
+   gpips_user_error_message(error_buffer);
+}
+
+
+/*VARARGS0*/
+void
+gpips_user_warning(char * calling_function_name,
+                   char * a_message_format,
+                   va_list * some_arguments)
+{
+   char warning_buffer[SMALL_BUFFER_LENGTH];
+
+   /* print name of function causing warning */
+   (void) sprintf(warning_buffer, "user warning in %s: ", 
+                  calling_function_name);
+
+   /* print out remainder of message */
+   (void) vsprintf(warning_buffer+strlen(warning_buffer),
+                   a_message_format, *some_arguments);
+
+   gpips_user_warning_message(warning_buffer);
+}
