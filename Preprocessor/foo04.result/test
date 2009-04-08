@@ -5,6 +5,6 @@ Printed file
 
 C Check that preprocessed files are removed from Tmp
 
-      PRINT *, "foo4"                                                   0007
+      PRINT *, "foo4"                                                   0005
 
       END
