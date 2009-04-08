@@ -32,7 +32,7 @@ setproperty LOOP_PEELING_PEEL_BEFORE_BOUND FALSE
 apply LOOP_PEELING
 
 display PRINTED_FILE
-
+quit
 echo
 echo Code after dead code elimination
 echo
