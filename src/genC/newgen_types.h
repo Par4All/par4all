@@ -30,8 +30,12 @@
 #ifndef BOOLEAN_INCLUDED
 #define BOOLEAN_INCLUDED
 typedef enum { false, true } boolean;
+#ifndef TRUE /* defined by glib2.0 AS (!FALSE) */
 #define	TRUE     true
+#endif /* TRUE */
+#ifndef FALSE /* idem AS (0) */
 #define	FALSE    false
+#endif /* FALSE */
 #endif /* BOOLEAN_INCLUDED */
 
 /* newgen compatibility */
