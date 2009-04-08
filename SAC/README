@@ -6,4 +6,15 @@ or
 from the MSc internship of Matthieu Godet.
 https://comap.enstb.org/publications/msc-of-matthieu-godet
 
+It is going on with the PhD thesis of Serge Guelton on the FREIA ANR
+project.
+
+
+
 When it works, one should try to compile the output with compileC.sh
+
+For a demo, try for example:
+tpips dotprod_c.tpips
+./compileC.sh DOTPROD_C dotprod out.c
+gcc -march=native -O3 -c out.c
+objdump -d out.o
