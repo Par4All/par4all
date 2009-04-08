@@ -1,8 +1,8 @@
 #
 # $Id$
 #
-# updates if no wpips on a pips architecture
-# wpips was never compiled with aix for instance, hence
+# updates if no gpips on a pips architecture, for example if the GTK
+# development infrastructure is not installed.
 
 #debug_output := $(shell echo no_gpips.mk  > /dev/tty)
 
