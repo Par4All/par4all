@@ -4,6 +4,8 @@
 
 #define SMALL_BUFFER_LENGTH 2560
 
+/* two nice examples of static buffer overflow... */
+
 /*VARARGS0*/
 void
 wpips_user_error(char * calling_function_name,
