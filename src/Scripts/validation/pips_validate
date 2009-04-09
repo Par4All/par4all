@@ -308,7 +308,7 @@ function validate_file()
   # for all output... the if/fi output above cannot be piped directly because
   # it would hide the "status" variable setting in a subshell.
   # escape VDIR for sed
-  local vdirec=$VDIR
+  local vdiresc=$VDIR
   vdiresc=${vdiresc//\//\\/}
   vdiresc=${vdiresc//./\\.}
   sed -e "s/$vdiresc/\$VDIR/g" $out.tmp > $out.out && rm -f $out.tmp
