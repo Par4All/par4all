@@ -1,6 +1,6 @@
 /* Check the use of a variable in its own declaration statement */
 
-void decl29(void)
+void decl34(void)
 {
 int i = 0, j = i;
 }

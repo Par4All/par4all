@@ -1,5 +1,5 @@
-delete decl29
-create decl29 decl29.c
+delete decl34
+create decl34 decl34.c
 
 #setenv C_SYNTAX_DEBUG_LEVEL 1
 
@@ -13,12 +13,12 @@ setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
 #setenv PRETTYPRINT_DEBUG_LEVEL 5
 
 echo
-echo Parsed printed file for "decl29"
+echo Parsed printed file for "decl34"
 echo
 
-display PARSED_PRINTED_FILE[decl29]
+display PARSED_PRINTED_FILE[decl34]
 
 close
-delete decl29
+delete decl34
 
 quit
