@@ -1,8 +1,8 @@
 
-Parsed printed file for "decl29"
+Parsed printed file for "decl34"
 
-void decl29(void)
+void decl34(void)
 {
-   int i = 0;
-   int j = i;
+   int i = 0;                                                          /*0005*/
+   int j = i;                                                          /*0005*/
 }
