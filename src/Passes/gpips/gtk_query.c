@@ -73,16 +73,6 @@ void start_query(char * window_title, char * query_title, char * help_topic,
 //	}
 //}
 
-
-/* only debug : */
-//void end_query_pad_notify(Panel_item item, Event *event) {
-//	debug_on("GPIPS_EVENT_DEBUG_LEVEL");
-//	debug(2, "find_dead_code",
-//			"end_query_pad_notify: Event_id %d, event_action %d\n", event_id(
-//					event), event_action(event));
-//	debug_off();
-//}
-
 void end_query_notify(GtkWidget * widget, gpointer data) {
 	char * s = gtk_entry_get_text(GTK_ENTRY(query_entry));
 	if (s == NULL)
@@ -144,7 +134,8 @@ string gpips_user_request(char * a_printf_format, va_list args) {
 
 void create_query_window() {
 	GtkWidget *help_button, *ok_button;
-	GtkWidget *action_area, *content_area;
+	GtkWidget *action_area;
+	GtkWidget *content_area;
 
 	/* seems it has no use. RK, 9/11/93. */
 	//	xv_set(canvas_paint_window(query_panel), WIN_CONSUME_EVENT, LOC_WINENTER,
@@ -152,8 +143,8 @@ void create_query_window() {
 	//			/*	   WIN_IGNORE_X_EVENT_MASK, KeyReleaseMask, */
 	//			WIN_EVENT_PROC, query_canvas_event_proc, NULL);
 
-	action_area = gtk_dialog_get_action_area(query_dialog);
-	content_area = gtk_dialog_get_content_area(query_dialog);
+	//action_area = gtk_dialog_get_action_area(query_dialog);
+	content_area = gpips_gtk_dialog_get_content_area(GTK_DIALOG(query_dialog));
 
 	GtkWidget * hbox = gtk_hbox_new(FALSE,0);
 	query_entry_label = gtk_label_new(NULL);
@@ -164,18 +155,21 @@ void create_query_window() {
 	gtk_widget_show_all(hbox);
 
 	ok_button = gtk_button_new_with_label("OK");
+	gtk_dialog_add_action_widget(GTK_DIALOG(query_dialog), ok_button, GTK_RESPONSE_OK);
 	gtk_signal_connect(GTK_OBJECT(ok_button), "clicked", GTK_SIGNAL_FUNC(
 			end_query_notify), NULL);
 	gtk_window_set_default(GTK_WINDOW(query_dialog), ok_button);
-	gtk_container_add(GTK_CONTAINER(action_area), ok_button);
+	//gtk_container_add(GTK_CONTAINER(action_area), ok_button);
 
 	help_button = gtk_button_new_with_label("Help");
+	gtk_dialog_add_action_widget(GTK_DIALOG(query_dialog), help_button, GTK_RESPONSE_HELP);
 	gtk_signal_connect(GTK_OBJECT(help_button), "clicked", GTK_SIGNAL_FUNC(
 			help_query_notify), NULL);
-	gtk_container_add(GTK_CONTAINER(action_area), help_button);
+	//gtk_container_add(GTK_CONTAINER(action_area), help_button);
 
 	query_cancel_button = gtk_button_new_with_label("Cancel");
-	gtk_container_add(GTK_CONTAINER(action_area), query_cancel_button);
+	gtk_dialog_add_action_widget(GTK_DIALOG(query_dialog), query_cancel_button, GTK_RESPONSE_CANCEL);
+	//gtk_container_add(GTK_CONTAINER(action_area), query_cancel_button);
 
 	gtk_widget_show_all(query_dialog);
 	gtk_widget_hide(query_dialog);

@@ -71,8 +71,8 @@ static void insert_something_in_the_gpips_log_window(char * a_message) {
 	gtk_text_view_scroll_to_iter(GTK_TEXT_VIEW(log_text_view), &iter, 0.0,
 			FALSE, 0.0, 0.0);
 	gtk_adjustment_set_value(GTK_ADJUSTMENT(scrolled_window_vadjustment),
-			gtk_adjustment_get_upper(
-					GTK_ADJUSTMENT(scrolled_window_vadjustment)));
+			gpips_gtk_adjustment_get_upper(GTK_ADJUSTMENT(
+					scrolled_window_vadjustment)));
 
 	gtk_widget_set_sensitive(clear_menu_item, TRUE);
 }

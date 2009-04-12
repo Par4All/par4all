@@ -49,6 +49,16 @@ void gpips_gtk_menu_item_set_label(GtkWidget * w, gchar * text) {
 	g_list_free(children);
 }
 
+GtkWidget * gpips_gtk_dialog_get_content_area(GtkDialog *dialog) {
+	g_return_val_if_fail(GTK_IS_DIALOG(dialog), NULL);
+	return dialog->vbox;
+}
+
+gdouble gpips_gtk_adjustment_get_upper(GtkAdjustment *adjustment) {
+	g_return_val_if_fail(GTK_IS_ADJUSTMENT(adjustment), 0.0);
+	return adjustment->upper;
+}
+
 gint hide_window(GtkWidget *window, GdkEvent *ev __attribute__((unused)), gpointer data __attribute__((unused))) {
 	gtk_widget_hide(GTK_WIDGET(window));
 	return TRUE;
