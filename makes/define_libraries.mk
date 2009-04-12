@@ -69,30 +69,50 @@ WPIPS_MAIN 	= main_wpips.o
 ######################################################################### GPIPS
 
 # The following locations should be parameterized somewhere else
-# or à la autocon
-GPIPS_CPPFLAGS 	= $(shell pkg-config --cflags gtk+-2.0)
-GPIPS_LDFLAGS 	= $(shell pkg-config --libs gtk+-2.0)
+# or à la autoconf
+
+# first check that pkg-config is available? (comes with gnome?)
+has_pkgcfg := $(shell type pkg-config > /dev/null 2>&1 && echo ok)
+
+ifeq ($(has_pkgcfg),ok)
+
+has_gtk2   = $(shell pkg-config --exists gtk+-2.0 && echo ok)
+
+ifeq ($(has_gtk2),ok)
+
+GPIPS_CPPFLAGS 	:= $(shell pkg-config --cflags gtk+-2.0)
+GPIPS_LDFLAGS 	:= $(shell pkg-config --libs gtk+-2.0)
 
 gpips_add.libs	=
 gpips.libs	= $(pips.libs) $(gpips_add.libs)
 GPIPS_MAIN 	= main_gpips.o
 
+else # no gtk2 => no gpips
+
+$(warning "skipping gpips compilation, gtk2 is not available")
+PIPS_NO_GPIPS	= 1
+
+endif # gtk2 availibility through pkg-config
+
+else # no pkg-config => no gpips
+
+$(warning "skipping gpips compilation, pkg-config not found")
+PIPS_NO_GPIPS	= 1
+
+endif # pkg-config check
+
 ######################################################################### FPIPS
 
 ifndef PIPS_NO_WPIPS
-	FPIPS_LDFLAGS	= $(WPIPS_LDFLAGS)
+	FPIPS_LDFLAGS	+= $(WPIPS_LDFLAGS)
 	# By default, compile with wpips:
-	fpips_add.libs	= wpips $(wpips_add.libs)
-else
-	fpips_add.libs	=
+	fpips_add.libs	+= wpips $(wpips_add.libs)
 endif
 
 ifndef PIPS_NO_GPIPS
 	FPIPS_LDFLAGS	+= $(GPIPS_LDFLAGS)
 	# By default, compile with gpips:
 	fpips_add.libs	+= gpips $(gpips_add.libs)
-else
-	fpips_add.libs	=
 endif
 
 fpips.libs	= pips tpips $(pips.libs) $(fpips_add.libs) $(tpips_add.libs)
