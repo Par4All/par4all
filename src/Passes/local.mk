@@ -16,7 +16,7 @@ MAKE.d	= $(ROOT)/makes
 include $(MAKE.d)/arch.mk
 include $(MAKE.d)/$(ARCH).mk
 
-FWD_DIRS	= pips tpips fpips
+FWD_DIRS	= pips tpips
 
 # Skip compiling WPips if not required:
 
@@ -32,3 +32,6 @@ endif
 ifdef PIPS_PYPIPS
 	FWD_DIRS	+= pypips
 endif
+
+# after its dependencies
+FWD_DIRS	+= fpips
