@@ -1,4 +1,4 @@
-# $Id: LINUXI86LL.mk 732 2005-03-14 11:00:18Z coelho $
+# $Id$
 
 include $(ROOT)/makes/GNULL.mk
 include $(ROOT)/makes/linux.mk
