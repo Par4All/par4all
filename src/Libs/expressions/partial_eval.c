@@ -1321,10 +1321,10 @@ void recursiv_partial_eval(statement stmt)
 	  /* Also, two kinds of while mudt be handled */
 	  /* Short term fix... we might as well not try anything for
 	     the while condition */
-	  partial_eval_expression_and_regenerate(&whileloop_condition(l), 
+	  /* partial_eval_expression_and_regenerate(&whileloop_condition(l), 
 						 SC_UNDEFINED, 
 						 stmt_to_fx(stmt,fx_map));
-	
+	  */
 	 recursiv_partial_eval(whileloop_body(l));
 	 
 	  if(get_debug_level()>=9) {
