@@ -1,0 +1,86 @@
+
+Transformers for "while01"
+
+
+C  T(while01) {16<=while01}
+
+int while01()
+{
+   int i;
+   int j;
+   int n;
+
+//  T(i) {i==0}
+
+
+   i = 0;
+
+//  T(j) {j==1}
+
+   j = 1;
+
+//  T(n) {n==10}
+
+   n = 10;
+
+//  T(i,j) {2i+j#init==2i#init+j}
+
+
+   while (j<n) {
+
+//  T(i) {i==i#init+1}
+
+      i++;
+
+//  T(j) {j==j#init+2}
+
+      j += 2;
+   }
+
+//  T(while01) {i+j==while01}
+
+   return i+j;
+}
+
+Preconditions for "while01"
+
+
+//  P() {}
+
+int while01()
+{
+   int i;
+   int j;
+   int n;
+
+//  P() {}
+
+
+   i = 0;
+
+//  P(i) {i==0}
+
+   j = 1;
+
+//  P(i,j) {i==0, j==1}
+
+   n = 10;
+
+//  P(i,j,n) {i==0, j==1, n==10}
+
+
+   while (j<n) {
+
+//  P(i,j,n) {2i==j-1, n==10, i<=4}
+
+      i++;
+
+//  P(i,j,n) {2i==j+1, n==10, i<=5}
+
+      j += 2;
+   }
+
+//  P(i,j,n) {i==5, j==11, n==10}
+
+   return i+j;
+}

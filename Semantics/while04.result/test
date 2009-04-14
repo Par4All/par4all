@@ -1,0 +1,118 @@
+
+Transformers for "while04"
+
+
+C  T(while04) {}
+
+int while04()
+{
+   int i;
+   int j;
+   int n;
+
+//  T(i) {i==0}
+
+
+   i = 0;
+
+//  T(j) {j==1}
+
+   j = 1;
+
+//  T() {2<=n}
+
+
+   if (n<=1) 
+
+//  T() {0==-1}
+
+      exit(1);
+
+//  T(i,j) {i+j#init==i#init+j}
+
+
+   while (i<n-1&&j<n) {
+
+//  T(i) {i==i#init+1}
+
+      i++;
+
+//  T(j) {j==j#init+1}
+
+      j++;
+   }
+
+//  T(while04) {i+j==while04}
+
+   return i+j;
+}
+
+Preconditions for "while04"
+
+
+//  P() {}
+
+int while04()
+{
+   int i;
+   int j;
+   int n;
+
+//  P() {}
+
+
+   i = 0;
+
+//  P(i) {i==0}
+
+   j = 1;
+
+//  P(i,j) {i==0, j==1}
+
+
+   if (n<=1) 
+
+//  P(i,j) {i==0, j==1, n<=1}
+
+      exit(1);
+
+//  P(i,j) {i==0, j==1, 2<=n}
+
+
+   while (i<n-1&&j<n) {
+
+//  P(i,j) {i==j-1, i+2<=n, 2<=n}
+
+      i++;
+
+//  P(i,j) {i==j, i+1<=n, 2<=n}
+
+      j++;
+   }
+
+//  P(i,j) {i==j-1, i==n-1, 1<=i}
+
+   return i+j;
+}
+
+Partial evaluation: bug because the while loop precondition
+only is used to evaluate the loop condition
+
+int while04()
+{
+   int i;
+   int j;
+   int n;
+
+   i = 0;
+   j = 1;
+
+   if (n<=1) 
+      exit(1);
+
+   while (i<n-1&&j<n) {
+      i++;
+      j++;
+   }
+   return i+j;
+}

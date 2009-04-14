@@ -1,0 +1,43 @@
+delete while04
+
+setenv PIPS_CPP="cpp -C"
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create while04 while04.c
+
+activate C_PARSER
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate TRANSFORMERS_INTER_FULL
+activate PRECONDITIONS_INTER_FULL
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
+
+echo
+echo Transformers for "while04"
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[while04]
+
+echo
+echo Preconditions for "while04"
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[while04]
+
+echo
+echo Partial evaluation: bug because the while loop precondition
+echo only is used to evaluate the loop condition
+ echo
+
+apply PARTIAL_EVAL[while04]
+activate PRINT_CODE
+display PRINTED_FILE[while04]
+
+close
+delete while04
+quit
