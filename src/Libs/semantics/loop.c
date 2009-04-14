@@ -1215,7 +1215,7 @@ static transformer loop_body_transformer_add_entry_and_iteration_information(tra
  */
 
 transformer 
-whileloop_to_transformer(whileloop l, transformer pre, list e) /* effects of whileloop l */
+standard_whileloop_to_transformer(whileloop l, transformer pre, list e) /* effects of whileloop l */
 {
   /* loop transformer tf = tfb* or tf = tfb+ or ... */
   transformer tf;
@@ -1334,6 +1334,19 @@ whileloop_to_transformer(whileloop l, transformer pre, list e) /* effects of whi
   }
   pips_debug(8,"end\n");
   return tf;
+}
+
+transformer 
+whileloop_to_transformer(whileloop l, transformer pre, list e) /* effects of whileloop l */
+{
+  transformer t = transformer_undefined;
+  evaluation lt = whileloop_evaluation(l);
+
+  if(evaluation_before_p(lt))
+    t = standard_whileloop_to_transformer(l, pre, e);
+  else
+    pips_user_error("transformer for repeat until loop not implemented\n");
+  return t;
 }
 
 transformer loop_to_postcondition(
