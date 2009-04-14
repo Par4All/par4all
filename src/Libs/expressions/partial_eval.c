@@ -1312,8 +1312,17 @@ void recursiv_partial_eval(statement stmt)
       }      
     case is_instruction_whileloop : {
 	  whileloop l = instruction_whileloop(inst);
+	  /* The whileloop precondition cannot be used to evaluate the
+	     while condition. It must be unioned with the body postcondition.
 	  partial_eval_expression_and_regenerate(&whileloop_condition(l), 
 						 stmt_prec(stmt), 
+						 stmt_to_fx(stmt,fx_map));
+	  */
+	  /* Also, two kinds of while mudt be handled */
+	  /* Short term fix... we might as well not try anything for
+	     the while condition */
+	  partial_eval_expression_and_regenerate(&whileloop_condition(l), 
+						 SC_UNDEFINED, 
 						 stmt_to_fx(stmt,fx_map));
 	
 	 recursiv_partial_eval(whileloop_body(l));
