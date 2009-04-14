@@ -1,6 +1,7 @@
 \documentclass[a4paper]{report}
 \usepackage{verbatim,newgen_domain}
 \usepackage{listings}
+\usepackage{array}
 \lstset{extendedchars=true, language=C}
 
 % Ou est le fichier de biblio ?
@@ -1629,7 +1630,7 @@ preference = persistant reference ;
 \end{verbatim}
 
 In this framework, the effect of a statement like \verb/*p=1;/ can
- only be expressed in this framework as a reference to a large memory
+ only be expressed as a reference to a large memory
  entity, an area or a set of areas, as no information is locally
  available about \verb/p/.
 
@@ -1667,7 +1668,7 @@ We do not know if we need to keep track of pointer arrays, as in
  accesses to structure fields into indexing (Section
  \ref{section:data-structures}), we might be interested in the post
  index form to keep or to retrieve information about data structures
- containing pointers ot functions.
+ containing pointers on functions.
 
 What is the new information we want to add? How can we add this new
 information in the current PIPS data structure? Many solutions are
@@ -1688,13 +1689,13 @@ level, \verb/g_effects = direct:effects + indirect:effects + .../
 \item re-use the \verb/descriptor/ field; this does seem to make less
  sense than the previous solution;
 
-\item \label{new-effect-field} add a new effect field, \verb/addressing/,
- in \verb/effect/
-
 \item \label{new-effect}define a brand new pointer effect data structure, extending
  solution~\ref{new-level};
 
-\item ...
+\item \label{new-effect-field} add a new effect field, \verb/addressing/,
+ in \verb/effect/;
+
+\item \label{new-effect-reference-dimension} represent pointer accesses using additional effect reference dimensions ; for instance an effect on \verb/*p/ could be represented as \verb/p[0]/;
 
 \end{enumerate}
 
@@ -1720,6 +1721,14 @@ Adding new actions, Solution~\ref{new-action}, does not respect the
  switch and default when there are only two actions. They assume that
  if it is not the first one, it has to be the second one.
 
+Solution~\ref{new-effect} would require a proper
+ survey of most published pointer analyses. It would be nice if the
+ old effect data structure could be mapped onto it to minimize source
+ code modifications via macros. This could also be done later and
+ independently, using simple pointer information gathered with the
+ effect data structure as a starting point for more advanced analyses.
+
+
 Adding a new field to effect, for instance \verb/addressing/ or
  \verb/addressing_mode/, Solution~\ref{new-effect-field}, is nicely
  orthogonal, let us structure it as we want, and avoid a combination
@@ -1737,14 +1746,7 @@ However indirect accesses would have to be reduced to standard
  the pipsmake and database level to avoid confusion and to force the
  conversion of resources.
 
-The last solution, Solution~\ref{new-effect}, would require a proper
- survey of most published pointer analyses. It would be nice if the
- old effect data structure could be mapped onto it to minimize source
- code modifications via macros. This could also be done later and
- independently, using simple pointer information gathered with the
- effect data structure as a starting point for more advanced analyses.
-
-In the short term, the best solution is to add a new field
+This is the solution which was first chosen. It consisted in adding a new field
  \verb/addressing_mode/ (or \verb/addressing/ to avoid underscore in
  field names?) with three values for pre- and post-indexation:
 
@@ -1753,15 +1755,65 @@ effect = cell x action x approximation x descriptor x addressing;
 addressing = index:unit + pre:unit + post:unit
 \end{verbatim}
 
-All accesses are indexed by default in PIPS internal representation,
- so \verb/post/ and \verb/pre/ are equivalent for scalar accesses.
+All accesses were indexed by default in PIPS internal representation,
+ so \verb/post/ and \verb/pre/ were equivalent for scalar accesses.
 
-Mode \verb/index/ could be called \verb/direct_indexing/ to be more
- homogeneous, but indexing always occurs. So \verb/index/ could be
+Mode \verb/index/ could have been called \verb/direct_indexing/ to be more
+ homogeneous, but indexing always occured. So \verb/index/ could have been
  called \verb/direct/.
 
-The mode \verb/preindexing/ does not seem to be very useful in the
+The mode \verb/preindexing/ did not seem to be very useful in the
  short term.
+
+
+But it proved to lack accuracy to handle real applications which use indirect accesses at several levels of data structures, and not only at the uppermost level. So, lastly, solution \ref{new-effect-reference-dimension} was retained. Table~\ref{tab:effects}, which is not limitative, shows that many cases of indirect accesses can be handled this way. Moreover, an obvious advantage of this approach is to unify all effects into effects on arrays which can be handled by following phases. 
+
+\begin{table}[htbp]
+\begin{center}
+\begin{tabular}{| >{\tt}l | >{\tt}l | >{\tt}l |}
+
+\hline
+declarations & reference & effects \\ \hline
+
+int a, *p; &   & \\
+      & a & a\\
+      &*p & p[0] \\\hline
+
+int t[N], *p, (*q)[N], * u[N], **v; & & \\ 
+        & t[I] & t[I] \\
+        & (*p)[I]& p[0][I]\\ 
+        & (*q)[I] & q[0][I] \\
+        & *(u[I])& u[I][0]\\
+        & *((*v)[I])& v[0][I][0]\\\hline
+
+typedef struct \{ & & \\
+int num; && \\
+int tab1[N] ; && \\
+int *tab2; \} mys;&& \\
+&& \\
+
+mys a, b[N], *c, **d; & & \\
+                  & a.num  & a[1] \\
+                  & a.tab1[J] & a[2][J] \\
+                  & a.tab2[K] & a[3][K] \\
+&& \\
+                  & b[I].num & b[I][1] \\
+                  & b[I].tab1[J] & b[I][2][J]\\
+                  & b[I].tab2[K]& b[I][3][K]\\
+&& \\
+                  & c->num & c[0][1]\\
+                  & c->tab1[J] & c[0][2][J] \\
+                  & c->tab2[K] & c[0][3][K] \\
+&& \\
+                  & d[I]->num & d[I][0][1]\\
+                  & d[I]->tab1[J] & d[I][0][2][J]\\
+                  & d[I]->tab2[K] & d[I][0][3][K]\\ \hline
+                  
+\end{tabular}
+\end{center}
+\caption{Representinf effects with additional dimensions}\label{tab:effects}
+\end{table}
+
 
 \section{Data structures}
 \label{section:data-structures}
