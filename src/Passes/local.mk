@@ -16,6 +16,9 @@ MAKE.d	= $(ROOT)/makes
 include $(MAKE.d)/arch.mk
 include $(MAKE.d)/$(ARCH).mk
 
+# check for gtk2 here, to know whether to forward to gpips or not
+include $(MAKE.d)/has_gtk2.mk
+
 FWD_DIRS	= pips tpips
 
 # Skip compiling WPips if not required:
