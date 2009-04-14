@@ -71,12 +71,7 @@ WPIPS_MAIN 	= main_wpips.o
 # The following locations should be parameterized somewhere else
 # or à la autoconf
 
-# first check that pkg-config is available? (comes with gnome?)
-has_pkgcfg := $(shell type pkg-config > /dev/null 2>&1 && echo ok)
-
-ifeq ($(has_pkgcfg),ok)
-
-has_gtk2   = $(shell pkg-config --exists gtk+-2.0 && echo ok)
+include $(MAKE.d)/has_gtk2.mk
 
 ifeq ($(has_gtk2),ok)
 
@@ -87,19 +82,7 @@ gpips_add.libs	=
 gpips.libs	= $(pips.libs) $(gpips_add.libs)
 GPIPS_MAIN 	= main_gpips.o
 
-else # no gtk2 => no gpips
-
-$(warning "skipping gpips compilation, gtk2 is not available")
-PIPS_NO_GPIPS	= 1
-
 endif # gtk2 availibility through pkg-config
-
-else # no pkg-config => no gpips
-
-$(warning "skipping gpips compilation, pkg-config not found")
-PIPS_NO_GPIPS	= 1
-
-endif # pkg-config check
 
 ######################################################################### FPIPS
 
