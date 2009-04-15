@@ -1,0 +1,8 @@
+delete muller05
+
+create muller05 muller05.f
+
+display PRINTED_FILE [MULLER05]
+
+close
+quit
