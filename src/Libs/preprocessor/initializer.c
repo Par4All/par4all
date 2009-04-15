@@ -81,6 +81,12 @@ stub_var_decl(parameter p, int n, bool is_fortran)
 					      gen_make_list(string_domain,
 							    strdup("void"), NULL)));
   }
+  else if(type_varargs_p(t)) {
+      result = make_sentence(is_sentence_unformatted,
+			     make_unformatted(string_undefined, 0, 0,
+					      gen_make_list(string_domain,
+							    strdup("..."), NULL)));
+  }
   else {
     pips_internal_error("Unexpected type tag %d.\n", type_tag(t));
   }
