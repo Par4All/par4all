@@ -144,6 +144,9 @@ void init_keyword_typedef_table()
   hash_put(keyword_typedef_table,"volatile", (char *) TK_VOLATILE);
   hash_put(keyword_typedef_table,"while", (char *) TK_WHILE);
   hash_put(keyword_typedef_table,"__builtin_va_arg", (char *) TK_BUILTIN_VA_ARG);
+  hash_put(keyword_typedef_table,"asm", (char *) TK_ASM);
+  hash_put(keyword_typedef_table,"__asm__", (char *) TK_ASM);
+  hash_put(keyword_typedef_table,"__volatile__", (char *) TK_VOLATILE);
 
   /* GNU predefined type(s), expecting no conflict with user named type */
 
