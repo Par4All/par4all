@@ -734,17 +734,32 @@ transformer_add_condition_information_updown(
     }
   case is_syntax_reference:
     {
-      /* A logical variable must be referenced */
+      /* A logical variable must be referenced in Fortran. Any
+	 variable can be referenced in C. */
       entity l = reference_variable(syntax_reference(s));
       if(entity_has_values_p(l)) {
 	entity l_new = entity_to_new_value(l);
-	Pvecteur eq = vect_new((Variable) l_new, VALUE_ONE);
+	type lt = ultimate_type(entity_type(l));
+	basic lb = variable_basic(type_variable(lt));
 
-	if(veracity) {
-	  vect_add_elem(&eq, TCST, VALUE_MONE);
+	if(basic_logical_p(lb)) {
+	  Pvecteur eq = vect_new((Variable) l_new, VALUE_ONE);
+
+	  if(veracity) {
+	    vect_add_elem(&eq, TCST, VALUE_MONE);
+	  }
+
+	  newpre = transformer_equality_add(pre, eq);
 	}
+	else {
+	  Pvecteur eq = vect_new((Variable) l_new, VALUE_ONE);
 
-	newpre = transformer_equality_add(pre, eq);
+	  if(veracity) {
+	    eq = vect_multiply(eq, VALUE_MONE);
+	    vect_add_elem(&eq, TCST, VALUE_ONE);
+	  }
+	  newpre = transformer_inequality_add(pre, eq);
+	}
       }
       break;
     }
