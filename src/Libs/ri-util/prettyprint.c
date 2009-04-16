@@ -323,7 +323,26 @@ char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data
 
 /*===================== Variables and Function prototypes for C ===========*/
 
+/* This variable should be made static and accessed from other files
+   or at least from other libraries via its functions only */
 bool prettyprint_is_fortran = TRUE;
+
+/* To track accesses from other libraries */
+bool get_prettyprint_is_fortran()
+{
+  return prettyprint_is_fortran;
+}
+
+bool set_prettyprint_is_fortran()
+{
+  prettyprint_is_fortran = TRUE;
+}
+
+bool reset_prettyprint_is_fortran()
+{
+  prettyprint_is_fortran = FALSE;
+}
+
 static list words_cast(cast obj);
 static list words_sizeofexpression(sizeofexpression obj);
 static list words_subscript(subscript s);

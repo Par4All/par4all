@@ -223,7 +223,7 @@ compilation_unit_text(entity cu, entity module)
     text cut = make_text(NIL);
     //entity e = entity_undefined;
     
-    pips_assert("We must be in a C prettyprinter environement", !prettyprint_is_fortran);
+    pips_assert("We must be in a C prettyprinter environment", !get_prettyprint_is_fortran());
 
     if (type_undefined_p(t))
 	pips_user_error("undefined type for %s\n", entity_name(module));
@@ -431,6 +431,7 @@ add_new_module(string module_name,
 static bool 
 missing_file_initializer(string module_name, bool is_fortran) {
   entity m = local_name_to_top_level_entity(module_name);
+  text stub = text_undefined;
 
   pips_user_warning("no source file for %s: synthetic code is generated\n",
 		    module_name);
@@ -441,7 +442,9 @@ missing_file_initializer(string module_name, bool is_fortran) {
   }
 
   /* Builds a stub code text for the missing module */
-  text stub = stub_text(m, is_fortran);
+  if(!is_fortran)
+     reset_prettyprint_is_fortran();
+  stub = stub_text(m, is_fortran);
   return add_new_module_from_text(module_name,
 				  stub,
 				  is_fortran);
