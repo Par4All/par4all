@@ -111,6 +111,20 @@ type javac && echo '_HAS_JDK_ = 1' >> $config
 type latex && echo '_HAS_LATEX_ = 1' >> $config
 type htlatex && echo '_HAS_HTLATEX_ = 1' >> $config
 type emacs && echo '_HAS_EMACS_ = 1' >> $config
+type pkg-config && has_pkgconfig=1
+
+if [ "$has_pkgconfig" ]
+then
+  echo '_HAS_PKGCONFIG_ = 1' >> $config
+  if pkg-config --exists gtk+-2.0
+  then
+    echo '_HAS_GTK2_ = 1' >> $config
+ else
+    echo 'PIPS_NO_GPIPS = 1' >> $config
+  fi
+else
+  echo 'PIPS_NO_GPIPS = 1' >> $config
+fi
 
 # others? copy config to newgen and linear?
 ln -s $config $prod/newgen/makes/config.mk
