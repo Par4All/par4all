@@ -8,6 +8,3 @@
 
 # Skip compiling GPips:
 PIPS_NO_GPIPS = 1
-
-# Do not link gpips into fpips:
-CPPFLAGS 	+=	-DFPIPS_WITHOUT_GPIPS
