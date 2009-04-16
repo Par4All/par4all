@@ -2,5 +2,5 @@
 
 clean:	NO_INCLUDES=1
 
-FWD_DIRS = newgen pipsmake properties constants help dev_guide \
+FWD_DIRS = newgen pipsmake constants help dev_guide \
 	   tpips-user-manual web doxygen

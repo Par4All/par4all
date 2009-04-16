@@ -11,6 +11,7 @@ SOURCES=	pipsmake-rc.tex \
 INSTALL_ETC=	epips_view_menu_layout.el \
 		epips_transform_menu_layout.el \
 		pipsmake.rc \
+		properties.rc \
 		wpips.rc
 
 DERIVED_INC=	resources.h \
@@ -35,19 +36,29 @@ all: $(DERIVED_FILES)
 # the documentation must generate its derived headers as soon as possible
 # beacause it is expected to compute the dependencies of some librairies
 # especially Passes/tpips
-phase0: .build_inc
+phase0: .build_inc .build_etc
 
 # skip latex 2 html if needed:
 simple: $(DERIVED_INC) $(INSTALL_ETC) $(INSTALL_DOC)
 simpleinstall: simple; $(MAKE) INSTALL_HTM= install
 
 pipsmake.flt	= sed -f pipsmake.sed
+pipsprop.flt	= sed -f pipsprop.sed
+
+pipsprop.sed:	pipsmake.sed
+	sed 's/PipsMake/PipsProp/g' $< > $@
 
 pipsmake.rc: pipsmake-rc.tex
 	#
 	# building pipsmake.rc
 	#
 	$(pipsmake.flt) $< | sed '/^alias /d' > $@
+
+properties.rc: pipsmake-rc.tex pipsprop.sed
+	#
+	# building properties.rc
+	#
+	$(pipsprop.flt) $< > $@
 
 wpips.rc: pipsmake-rc.tex
 	#
@@ -93,7 +104,7 @@ headers: $(DERIVED_INC)
 clean: local-clean
 
 local-clean:
-	$(RM) -r $(DERIVED_FILES) pipsmake-rc.htdoc \
+	$(RM) -r $(DERIVED_FILES) pipsmake-rc.htdoc pipsprop.sed \
 		*.aux *.log *.ind *.idx *.toc *.ilg *.dvi *.ps *.out *.brf
 
 # common stuff
