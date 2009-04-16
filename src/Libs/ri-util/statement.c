@@ -1739,7 +1739,7 @@ fix_sequence_statement_attributes(statement s)
 	
 	statement_label(s) = entity_empty_label();
 	statement_comments(continue_s) = statement_comments(s);
-	statement_comments(s) = string_undefined;
+	statement_comments(s) = empty_comments;
 	statement_number(continue_s) = statement_number(s);
 	statement_number(s) = STATEMENT_NUMBER_UNDEFINED;
 
@@ -1971,7 +1971,7 @@ insert_a_statement_list_in_a_statement(statement target,
 	statement_number(target) = STATEMENT_NUMBER_UNDEFINED;
 	statement_ordering(target) = STATEMENT_ORDERING_UNDEFINED;
 	statement_comments(new_statement) = statement_comments(target);
-	statement_comments(target) = string_undefined;
+	statement_comments(target) = empty_comments;
     }
 }
 
@@ -1998,7 +1998,7 @@ append_a_statement_list_to_a_statement(statement target,
 	statement_number(target) = STATEMENT_NUMBER_UNDEFINED;
 	statement_ordering(target) = STATEMENT_ORDERING_UNDEFINED;
 	statement_comments(new_statement) = statement_comments(target);
-	statement_comments(target) = string_undefined;
+	statement_comments(target) = empty_comments;
     }
 }
 
