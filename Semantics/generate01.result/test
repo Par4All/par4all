@@ -1,0 +1,30 @@
+
+Transformers for "generate01"
+
+
+//  T(generate01) {}
+
+int generate01()
+{
+   int i;
+
+//  T(generate01) {}
+
+
+   return foo(i);
+}
+
+Preconditions for "generate01"
+
+
+//  P() {}
+
+int generate01()
+{
+   int i;
+
+//  P() {}
+
+
+   return foo(i);
+}
