@@ -22,7 +22,7 @@ DERIVED_INC=	resources.h \
 
 INSTALL_INC=	$(DERIVED_INC)
 INSTALL_DOC=	pipsmake-rc.pdf
-INSTALL_HTM=	pipsmake-rc.htdoc 
+INSTALL_HTM=	pipsmake-rc.htdoc
 # Hide the PDF into the HTML documentation directory
 DOC.subd = $(INSTALL_HTM)
 
@@ -41,22 +41,24 @@ phase0: .build_inc
 simple: $(DERIVED_INC) $(INSTALL_ETC) $(INSTALL_DOC)
 simpleinstall: simple; $(MAKE) INSTALL_HTM= install
 
+pipsmake.flt	= sed -f pipsmake.sed
+
 pipsmake.rc: pipsmake-rc.tex
 	#
 	# building pipsmake.rc
 	#
-	sed 's,	,    ,g;s/ *$$//;/^alias /d' $< | $(FLTVERB) > $@
+	$(pipsmake.flt) $< | sed '/^alias /d' > $@
 
 wpips.rc: pipsmake-rc.tex
 	#
 	# buidling $@
 	#
-	$(FLTVERB) $< | sed 's,	,    ,g;s/ *$$//;/^alias /!d' > $@
+	$(pipsmake.flt) $< | sed '/^alias /!d' > $@
 
 resources.h: pipsmake.rc
 	#
 	# building $@
-	# 
+	#
 	sed -f resources.sed $< | \
 	$(UPPER) | sort -u | sed 's/.*/#define DBR_& "&"/' > $@
 

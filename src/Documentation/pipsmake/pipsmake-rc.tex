@@ -81,6 +81,12 @@
 \newenvironment{PipsExample}{\VerbatimEnvironment
 \begin{Verbatim}}{\end{Verbatim}}
 
+\newenvironment{PipsProp}{\VerbatimEnvironment
+\begin{Verbatim}}{\end{Verbatim}}
+
+\newenvironment{PipsMake}{\VerbatimEnvironment
+\begin{Verbatim}}{\end{Verbatim}}
+
 \newcommand{\PipsPIPSmakePDF}{\url{http://www.cri.ensmp.fr/pips/pipsmake-rc.htdoc/pipsmake-rc.pdf}\xspace}
 \newcommand{\PipsPIPSmakeHTDOC}{\url{http://www.cri.ensmp.fr/pips/pipsmake-rc.htdoc}\xspace}
 
@@ -533,10 +539,10 @@ is missing. This decision was made for two reasons:
 \end{enumerate}
 
 
-\begin{verbatim}
+\begin{PipsMake}
 initializer                     > MODULE.user_file
                                 > MODULE.initial_file
-\end{verbatim}
+\end{PipsMake}
 
 
 Note: the generation of the resource \verb|user_file| here above is mainly 
@@ -545,20 +551,20 @@ have the concept of user files managed by \PIPSMAKE.
 
 MUST appear after initializer:
 
-\begin{verbatim}
+\begin{PipsMake}
 filter_file                     > MODULE.source_file
                 < MODULE.initial_file
                 < MODULE.user_file
-\end{verbatim}
+\end{PipsMake}
 
 
 In C, the initializer can generate directly a \verb|c_source_file| and
 its compilation unit.
 
-\begin{verbatim}
+\begin{PipsMake}
 c_initializer                     > MODULE.c_source_file
                                   > COMPILATION_UNIT.c_source_file
-\end{verbatim}
+\end{PipsMake}
 
 \section{Regeneration of user source files}
 \label{sec:regen-user-source}
@@ -575,14 +581,14 @@ Also the \texttt{include} file preprocessing is not reversed.
 Regeneration of user files. The various modules that where initialy stored in
 single file are appended together in a file with the same name.
 %%!UserManualDocumentation
-\begin{verbatim}
+\begin{PipsMake}
 
 alias unsplit 'User files Regeneration'
 
 unsplit                         > PROGRAM.user_file
                 < ALL.user_file
                 < ALL.printed_file
-\end{verbatim}
+\end{PipsMake}
 
 \chapter{Abstract Syntax Tree}
 \label{section-abstract-syntax-tree}
@@ -610,9 +616,9 @@ program initialization. The symbol table is updated with user local and
 global variables when modules are parsed or linked together. This side
 effect is not disclosed to \PIPSMAKE.
 
-\begin{verbatim}
+\begin{PipsMake}
 bootstrap                       > PROGRAM.entities
-\end{verbatim}
+\end{PipsMake}
 
 The entity data structure is described in \Pri{}.
 
@@ -754,19 +760,19 @@ generated for lines ending after column 72.
 
 \subsubsection{Declaration of the standard parser}
 
-\begin{verbatim}
+\begin{PipsMake}
 parser                          > MODULE.parsed_code
                                 > MODULE.callees
         < PROGRAM.entities
         < MODULE.source_file
-\end{verbatim}
+\end{PipsMake}
 
 A prettyprint of the symbol table for a Fortran module is generated with:
-\begin{verbatim}
+\begin{PipsMake}
 fortran_symbol_table        > MODULE.symbol_table_file
     < PROGRAM.entities
     < MODULE.parsed_code
-\end{verbatim}
+\end{PipsMake}
 
 
 \subsection{Declaration of HPFC parser}
@@ -781,12 +787,12 @@ directives. Their call sites are removed from the code before requesting full an
 to PIPS. This parser is triggered automatically by the \verb|hpfc_close|
 phase when requested. It should never be selected or activated by hand.
 
-\begin{verbatim}
+\begin{PipsMake}
 hpfc_parser                     > MODULE.parsed_code
                                 > MODULE.callees
         < PROGRAM.entities
         < MODULE.hpfc_filtered_file
-\end{verbatim}
+\end{PipsMake}
 
 
 \subsection{Declaration of the C parsers}
@@ -862,10 +868,10 @@ Note that it is possible to have an empty compilation unit and no module
 file if the original file does not contain sensible C informations (such
 as an empty file containing only blank characters and so on).
 
-\begin{verbatim}
+\begin{PipsMake}
 compilation_unit_parser         > COMPILATION_UNIT.declarations
         < COMPILATION_UNIT.c_source_file
-\end{verbatim}
+\end{PipsMake}
 
 The resource \verb/COMPILATION_UNIT.declarations/ produced by
 \verb/compilation_unit_parser/ is a special resource used to force the
@@ -880,13 +886,13 @@ In fact phase compilation\_unit\_parser also produces parsed\_code and callees r
 % because the compilation unit declarations were not satisfactory (to be
 % investigated: they might be satisfactory now).
 
-\begin{verbatim}
+\begin{PipsMake}
 c_parser                        > MODULE.parsed_code
                                 > MODULE.callees
         < PROGRAM.entities
         < MODULE.c_source_file
         < COMPILATION_UNIT.declarations
-\end{verbatim}
+\end{PipsMake}
 
 If you want to parse some C code using \texttt{tpips}, it is necessary to
 select the C parser with
@@ -903,11 +909,11 @@ PRETTYPRINT_BLOCK_IF_ONLY TRUE
 
 
 A prettyprint of the symbol table for a C module can be generated with
-\begin{verbatim}
+\begin{PipsMake}
 c_symbol_table      > MODULE.symbol_table_file
         < PROGRAM.entities
         < MODULE.parsed_code
-\end{verbatim}
+\end{PipsMake}
 
 
 \section{Controlized Code (hierarchical control flow graph)}
@@ -960,11 +966,11 @@ transformations may well return any kind of top statement, most likely a
 contain any kind of instruction.
 
 %Controlizer                     > MODULE.Controlizer_code
-\begin{verbatim}
+\begin{PipsMake}
 controlizer                     > MODULE.code
         < PROGRAM.entities
         < MODULE.parsed_code
-\end{verbatim}
+\end{PipsMake}
 
 
 
@@ -1000,18 +1006,18 @@ The depth of a module can be used to schedule top-down analyses. It is
 zero if the module has no callers. Else, it it the mazimal depth of the
 callers plus one.
 
-\begin{verbatim}
+\begin{PipsMake}
 callgraph                       > ALL.callers
                                 > ALL.height
                                 > ALL.depth
         < ALL.callees
-\end{verbatim}
+\end{PipsMake}
 
 The following pass generates a \PuDrawGraph version of the callgraph.  Its
 quite partial since it should rely on an hypothetical \emph{all callees},
 direct and indirect, resource.
 
-\begin{verbatim}
+\begin{PipsMake}
 alias dvcg_file 'Graphical Call Graph'
 alias graph_of_calls 'For current module'
 alias full_graph_of_calls 'For all modules'
@@ -1021,7 +1027,7 @@ graph_of_calls               > MODULE.dvcg_file
 
 full_graph_of_calls          > PROGRAM.dvcg_file
         < ALL.callees
-\end{verbatim}
+\end{PipsMake}
 
 \section{Memory Effects}
 \label{subsection-effects}
@@ -1056,12 +1062,12 @@ Variables private to loop are handled like regular variable.
 Proper references try to keep the local references as much as possible. WE
 have to think a little more about this concept.
 
-\begin{verbatim}
+\begin{PipsMake}
 proper_effects                  > MODULE.proper_effects
         < PROGRAM.entities
         < MODULE.code
         < CALLEES.summary_effects
-\end{verbatim}
+\end{PipsMake}
 
 
 \subsection{Filtered Proper Effects}
@@ -1072,13 +1078,13 @@ actually modified in the program.
 
 \marginpar{To be continued...by whom?}
 
-\begin{verbatim}
+\begin{PipsMake}
 filter_proper_effects         > MODULE.filtered_proper_effects
         < PROGRAM.entities
         < MODULE.code
         < MODULE.proper_effects
         < CALLEES.summary_effects
-\end{verbatim}
+\end{PipsMake}
 
 
 \subsection{Cumulated Effects}
@@ -1091,12 +1097,12 @@ variables. Cumulated means that the effects of a compound statement, do
 loop, test or unstructured, include the effects of the lower level
 statements such as a loop body or a test branch.
 
-\begin{verbatim}
+\begin{PipsMake}
 cumulated_effects               > MODULE.cumulated_effects
         < PROGRAM.entities
         < MODULE.code
         < MODULE.proper_effects
-\end{verbatim}
+\end{PipsMake}
 
 Cumulated memory effects do not take into account local effects on
 private variables, such as variables declared in C blocks or in
@@ -1111,7 +1117,7 @@ Cumulated references integrate proper references over the program code.
 
 \emph{FC: I should implement real summary references?}
 
-\begin{verbatim}
+\begin{PipsMake}
 proper_references       > MODULE.proper_references
         < PROGRAM.entities
         < MODULE.code
@@ -1121,7 +1127,7 @@ cumulated_references    > MODULE.cumulated_references
         < PROGRAM.entities
         < MODULE.code
         < MODULE.proper_references
-\end{verbatim}
+\end{PipsMake}
 
 Cumulated effects of a all module are used to compute the proper
 effects of the corresponding call sites. They are translated from the
@@ -1150,11 +1156,11 @@ subscript expressions of remaining effects are eliminated.
 The proper effects of a call site are computed by translating the
 summary effects of the callee.
 
-\begin{verbatim}
+\begin{PipsMake}
 summary_effects                 > MODULE.summary_effects
         < PROGRAM.entities 
         < MODULE.code MODULE.cumulated_effects
-\end{verbatim}
+\end{PipsMake}
 
 
 \subsection{IN and OUT Effects}
@@ -1173,7 +1179,7 @@ require an interprocedural analysis\footnote{They are not validated as
 of June 21, 2008 (FI).}
 \marginpar{RK: What are they? (FI: To be deleted)}
 
-\begin{verbatim}
+\begin{PipsMake}
 in_effects > MODULE.in_effects
            > MODULE.cumulated_in_effects
          < PROGRAM.entities 
@@ -1196,56 +1202,56 @@ out_effects > MODULE.out_effects
         < MODULE.code 
         < MODULE.out_summary_effects   
         < MODULE.cumulated_in_effects   
-\end{verbatim}
+\end{PipsMake}
 
 \section{Reductions}
 \label{sec:reductions}
 
 The proper reductions are computed from a code.
 
-\begin{verbatim}
+\begin{PipsMake}
 proper_reductions > MODULE.proper_reductions
   < PROGRAM.entities
   < MODULE.code
   < MODULE.proper_references
   < CALLEES.summary_effects
   < CALLEES.summary_reductions
-\end{verbatim}
+\end{PipsMake}
 
 The cumulated reductions propagate the reductions in the code, upwards. 
 
-\begin{verbatim}
+\begin{PipsMake}
 cumulated_reductions > MODULE.cumulated_reductions
   < PROGRAM.entities
   < MODULE.code
   < MODULE.proper_references
   < MODULE.cumulated_effects
   < MODULE.proper_reductions
-\end{verbatim}
+\end{PipsMake}
 
 This pass summarizes the reductions candidates found in a module for
 export to its callers. The summary effects should be used to restrict
 attention to variable of interest in the translation?
 
-\begin{verbatim}
+\begin{PipsMake}
 summary_reductions > MODULE.summary_reductions
   < PROGRAM.entities
   < MODULE.code
   < MODULE.cumulated_reductions
   < MODULE.summary_effects
-\end{verbatim}
+\end{PipsMake}
 
 Some possible (simple) transformations could be added to the code to mark
 reductions in loops, for latter use in the parallelization.
 
 The following is NOT implemented. Anyway, should the cumulated\_reductions
 be simply used by the prettyprinter instead?
-\begin{verbatim}
+\begin{PipsMake}
 loop_reductions > MODULE.code
   < PROGRAM.entities
   < MODULE.code
   < MODULE.cumulated_reductions
-\end{verbatim}
+\end{PipsMake}
 
 
 \section{Chains (Use-Def Chains)}
@@ -1270,13 +1276,13 @@ included in the region predicate.
 
 \subsection{Menu for Use-Def Chains}
 
-\begin{verbatim}
+\begin{PipsMake}
 alias chains 'Use-Def Chains'
 
 alias atomic_chains 'Standard'
 alias region_chains 'Regions'
 alias in_out_regions_chains 'In-Out Regions'
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Standard Use-Def Chains (a.k.a. Atomic Chains)}
 \label{subsubsection-atomic-chains}
@@ -1309,12 +1315,12 @@ due to the loop incrementation.
 Artificial arcs are added to... (Pierre Jouvelot, help!).
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 atomic_chains                   > MODULE.chains
         < PROGRAM.entities 
         < MODULE.code
         < MODULE.proper_effects
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{READ/WRITE Region-Based Chains}
 
@@ -1335,12 +1341,12 @@ not improve the simplest test based on regions. Note that it is not fast
 anymore when coping with regions.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 region_chains                   > MODULE.chains
         < PROGRAM.entities 
         < MODULE.code
         < MODULE.proper_regions
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{IN/OUT Region-Based Chains}
 
@@ -1370,14 +1376,14 @@ Section~\ref{subsubsection-read-write-region-based-chains}), the
 simplest dependence test should be selected for best results.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 in_out_regions_chains           > MODULE.chains
         < PROGRAM.entities 
         < MODULE.code
         < MODULE.proper_regions
         < MODULE.in_regions
         < MODULE.out_regions
-\end{verbatim}
+\end{PipsMake}
 
 The following loop in Subroutine \verb+inout+ cannot be parallelized legally
 because Subroutine \verb+foo+ uses a static variable, \verb+y+. However,
@@ -1472,14 +1478,14 @@ analysis are Rémi \textsc{Triolet}, François \textsc{Irigoin} and Yi-qing
 \subsection{Menu for Dependence Tests}
 \label{subsubsection-menu-for-dependence-tests}
 
-\begin{verbatim}
+\begin{PipsMake}
 alias dg 'Dependence Test'
 
 alias rice_fast_dependence_graph 'Preconditions Ignored'
 alias rice_full_dependence_graph 'Loop Bounds Used'
 alias rice_semantics_dependence_graph 'Preconditions Used'
 alias rice_regions_dependence_graph 'Regions Used'
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Fast Dependence Test}
 \label{subsubsection-fast-dependence-test}
@@ -1492,13 +1498,13 @@ use-def chains, in which case regions are used instead). {\tt
 warning if {\tt region\_chains} is not selected. 
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 rice_fast_dependence_graph      > MODULE.dg
         < PROGRAM.entities 
         < MODULE.code
         < MODULE.chains
         < MODULE.cumulated_effects
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Full Dependence Test}
 \label{subsubsection-full-dependence-test}
@@ -1508,13 +1514,13 @@ rice_fast_dependence_graph      > MODULE.dg
 Use subscript expressions and loop bounds.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 rice_full_dependence_graph      > MODULE.dg
         < PROGRAM.entities 
         < MODULE.code
         < MODULE.chains
         < MODULE.cumulated_effects
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Semantics Dependence Test}
 \label{subsubsection-semantics-dependence-test}
@@ -1525,14 +1531,14 @@ Uses subscript expressions and preconditions
 (see~\ref{subsection-semantics-analysis}).
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 rice_semantics_dependence_graph > MODULE.dg
         < PROGRAM.entities 
         < MODULE.code
         < MODULE.chains
         < MODULE.preconditions
         < MODULE.cumulated_effects
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Dependence Test with Array Regions}
 \label{subsubsection-regions-dependence-test}
@@ -1543,13 +1549,13 @@ Synonym for {\tt rice\_fast\_dependence\_graph}, except that it emits a
 warning when {\tt region\_chains} is not selected.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 rice_regions_dependence_graph      > MODULE.dg
         < PROGRAM.entities 
         < MODULE.code
         < MODULE.chains
         < MODULE.cumulated_effects
-\end{verbatim}
+\end{PipsMake}
 
 \section{Flinter}
 \label{subsection-flinter}
@@ -1560,7 +1566,7 @@ about formal/actual argument pairs, use of COMMONs,... It was developed by
 Laurent \textsc{Aniort} and Fabien \textsc{Coelho}. Ronan \textsc{Keryell}
 added the uninitialized variable checking.
 
-\begin{verbatim}
+\begin{PipsMake}
 alias flinted_file 'Flint View'
 flinter                         > MODULE.flinted_file
         < PROGRAM.entities
@@ -1568,7 +1574,7 @@ flinter                         > MODULE.flinted_file
         < CALLEES.code
         < MODULE.proper_effects
         < MODULE.chains
-\end{verbatim}
+\end{PipsMake}
 
 In the past, \texttt{flinter} used to require \texttt{MODULE.summary\_effects}
 to check the parameter passing modes and to make sure that no module would
@@ -1584,11 +1590,11 @@ Computes statistics about loops in module. It computes the number of
 perfectly and imperfectly  nested loops and gives their depths. And it gives
 the number of nested loops which we can treat with our algorithm.    
 
-\begin{verbatim}
+\begin{PipsMake}
 loop_statistics > MODULE.stats_file
         < PROGRAM.entities
         < MODULE.code
-\end{verbatim}
+\end{PipsMake}
 
 \section{Semantics Analysis}
 \label{subsection-semantics-analysis}
@@ -1719,14 +1725,14 @@ are stored on and retrieved from disk by {\em pipsdbm}.
 
 \subsubsection{Menu for Transformers}
 
-\begin{verbatim}
+\begin{PipsMake}
 alias transformers 'Transformers'
 alias transformers_intra_fast 'Quick Intra-Procedural Computation'
 alias transformers_inter_fast 'Quick Inter-Procedural Computation'
 alias transformers_intra_full 'Full Intra-Procedural Computation'
 alias transformers_inter_full 'Full Inter-Procedural Computation'
 alias refine_transformers 'Refine Transformers'
-\end{verbatim}
+\end{PipsMake}
 
 \subsubsection{Fast Intraprocedural Transformers}
 
@@ -1734,14 +1740,14 @@ alias refine_transformers 'Refine Transformers'
 Build the fast intraprocedural transformers.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 transformers_intra_fast         > MODULE.transformers
         < PROGRAM.entities 
         < MODULE.code
         < MODULE.cumulated_effects
         < MODULE.summary_effects
         < MODULE.proper_effects
-\end{verbatim}
+\end{PipsMake}
 
 \subsubsection{Full Intraprocedural Transformers}
                 
@@ -1749,14 +1755,14 @@ transformers_intra_fast         > MODULE.transformers
 Build the improved intraprocedural transformers.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 transformers_intra_full         > MODULE.transformers
         < PROGRAM.entities 
         < MODULE.code
         < MODULE.cumulated_effects
         < MODULE.summary_effects
         < MODULE.proper_effects
-\end{verbatim}
+\end{PipsMake}
 
 \subsubsection{Fast Interprocedural Transformers}
 
@@ -1764,7 +1770,7 @@ transformers_intra_full         > MODULE.transformers
 Build the fast interprocedural transformers.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 transformers_inter_fast         > MODULE.transformers
         < PROGRAM.entities 
         < MODULE.code
@@ -1773,7 +1779,7 @@ transformers_inter_fast         > MODULE.transformers
         < CALLEES.summary_transformer
         < MODULE.proper_effects
         < PROGRAM.program_precondition
-\end{verbatim}
+\end{PipsMake}
 
 \subsubsection{Full Interprocedural Transformers}
 
@@ -1782,7 +1788,7 @@ Build the improved interprocedural transformers (This should be used
 as default option.).
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 transformers_inter_full         > MODULE.transformers
         < PROGRAM.entities 
         < MODULE.code
@@ -1791,7 +1797,7 @@ transformers_inter_full         > MODULE.transformers
         < CALLEES.summary_transformer
         < MODULE.proper_effects
         < PROGRAM.program_precondition
-\end{verbatim}
+\end{PipsMake}
 
 \subsubsection{Full Interprocedural Transformers}
 
@@ -1801,7 +1807,7 @@ preconditions. Intraprocedural preconditions are also used to refine all
 transformers.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 refine_transformers         > MODULE.transformers
         < PROGRAM.entities 
         < MODULE.code
@@ -1813,7 +1819,7 @@ refine_transformers         > MODULE.transformers
         < MODULE.preconditions
         < MODULE.summary_precondition
         < PROGRAM.program_precondition
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Summary Transformer}
 \label{subsubsection-summary-transformer}
@@ -1828,12 +1834,12 @@ statement.
 
 A \verb+summary_transformer+ is of Newgen type \texttt{transformer}.
 
-\begin{verbatim}
+\begin{PipsMake}
 summary_transformer             > MODULE.summary_transformer
         < PROGRAM.entities
         < MODULE.transformers
         < MODULE.summary_effects
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Initial Precondition}
 \label{subsubsection-initial-precs}
@@ -1850,23 +1856,23 @@ scalar variables only.
 Note: To be extended to handle C code. To be extended to handle properly
 unknown modules.
 
-\begin{verbatim}
+\begin{PipsMake}
 initial_precondition     > MODULE.initial_precondition
         < PROGRAM.entities
         < MODULE.code
         < MODULE.cumulated_effects
         < MODULE.summary_effects
-\end{verbatim}
+\end{PipsMake}
 
 All initial preconditions, including the initial precondition for the
 main, are combined to define the program precondition which is an
 abstraction of the program initial state.
 
-\begin{verbatim}
+\begin{PipsMake}
 program_precondition     > PROGRAM.program_precondition
         < PROGRAM.entities
         < ALL.initial_precondition
-\end{verbatim}
+\end{PipsMake}
 
 The program precondition can only be used for the initial state of the
 main procedure. Although it appears below for all interprocedural analyses
@@ -1884,11 +1890,11 @@ it is a state predicate.
 The intraprocedural summary precondition uses DATA statement for the main
 module and is the TRUE constant for all other modules.
 
-\begin{verbatim}
+\begin{PipsMake}
 intraprocedural_summary_precondition            > MODULE.summary_precondition
         < PROGRAM.entities
         < MODULE.initial_precondition
-\end{verbatim}
+\end{PipsMake}
 
 Interprocedural summary preconditions can be requested instead. They are
 not described in the same section in order to introduce the summary
@@ -1936,14 +1942,14 @@ to obtain the best possible results. These two options are recommended.
 
 \subsubsection{Menu for Preconditions}
 
-\begin{verbatim}
+\begin{PipsMake}
 alias preconditions 'Preconditions'
 
 alias preconditions_intra 'Intra-Procedural Analysis'
 alias preconditions_inter_fast 'Quick Inter-Procedural Analysis'
 alias preconditions_inter_full 'Full Inter-Procedural Analysis'
 alias preconditions_intra_fast 'Fast intra-Procedural Analysis'
-\end{verbatim}
+\end{PipsMake}
 
 \subsubsection{Intra-Procedural Preconditions}
 
@@ -1953,7 +1959,7 @@ propagation. The fast version uses a fast but crude approximation of
 preconditions for unstructured code.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 preconditions_intra            > MODULE.preconditions
         < PROGRAM.entities
         < MODULE.cumulated_effects
@@ -1962,9 +1968,9 @@ preconditions_intra            > MODULE.preconditions
         < MODULE.summary_transformer
         < MODULE.summary_precondition
         < MODULE.code
-\end{verbatim}
+\end{PipsMake}
 
-\begin{verbatim}
+\begin{PipsMake}
 preconditions_intra_fast            > MODULE.preconditions
         < PROGRAM.entities
         < MODULE.cumulated_effects
@@ -1973,7 +1979,7 @@ preconditions_intra_fast            > MODULE.preconditions
         < MODULE.summary_transformer
         < MODULE.summary_precondition
         < MODULE.code
-\end{verbatim}
+\end{PipsMake}
 
 \subsubsection{Fast Inter-Procedural Preconditions}
 
@@ -1986,7 +1992,7 @@ The {\em fast} versions use no fix-point operations for loops.
 %%!UserManualDocumentation
 
 
-\begin{verbatim}
+\begin{PipsMake}
 
 preconditions_inter_fast        > MODULE.preconditions
         < PROGRAM.entities
@@ -1998,7 +2004,7 @@ preconditions_inter_fast        > MODULE.preconditions
         < MODULE.summary_effects
         < CALLEES.summary_effects
         < MODULE.summary_transformer
-\end{verbatim}
+\end{PipsMake}
 
 \subsubsection{Full Inter-Procedural Preconditions}
 
@@ -2010,7 +2016,7 @@ downwards in the module statement.
 The {\em full} versions use fix-point operations for loops.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 preconditions_inter_full        > MODULE.preconditions
         < PROGRAM.entities
         < PROGRAM.program_precondition
@@ -2022,7 +2028,7 @@ preconditions_inter_full        > MODULE.preconditions
         < CALLEES.summary_effects
         < MODULE.summary_transformer
 
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Interprocedural Summary Precondition}
 \index{Summary Precondition}
@@ -2060,23 +2066,23 @@ construct for such initializations. In other words, a module which is
 never called has an impact on the program execution and its declarations
 should not be destroyed.
 
-\begin{verbatim}
+\begin{PipsMake}
 interprocedural_summary_precondition            > MODULE.summary_precondition
         < PROGRAM.entities
         < PROGRAM.program_precondition
         < CALLERS.preconditions
         < MODULE.callers
-\end{verbatim}
+\end{PipsMake}
 
 The following rule is obsolete. It is context sensitive and its results
 depends on the history of commands performed on the workspace.
 
-\begin{verbatim}
+\begin{PipsMake}
 summary_precondition            > MODULE.summary_precondition
         < PROGRAM.entities
         < CALLERS.preconditions
         < MODULE.callers
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Total Preconditions}
 \label{subsubsection-ototal-preconditions}
@@ -2113,12 +2119,12 @@ to obtain the best possible results.
 
 \subsubsection{Menu for Total Preconditions}
 
-\begin{verbatim}
+\begin{PipsMake}
 alias total_preconditions 'Total Preconditions'
 
 alias total_preconditions_intra 'Total Intra-Procedural Analysis'
 alias total_preconditions_inter 'Total Inter-Procedural Analysis'
-\end{verbatim}
+\end{PipsMake}
 
 \subsubsection{Intra-Procedural Total Preconditions}
 
@@ -2127,7 +2133,7 @@ Only build the total preconditions in a module without any interprocedural
 propagation. No specific condition must be met when reaching a RETURN statement.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 total_preconditions_intra            > MODULE.total_preconditions
         < PROGRAM.entities
         < MODULE.cumulated_effects
@@ -2135,7 +2141,7 @@ total_preconditions_intra            > MODULE.total_preconditions
         < MODULE.summary_effects
         < MODULE.summary_transformer
         < MODULE.code
-\end{verbatim}
+\end{PipsMake}
 
 \subsubsection{Inter-Procedural Total Preconditions}
 
@@ -2147,7 +2153,7 @@ true when the RETURN statement is reached.
 %%!UserManualDocumentation
 
 
-\begin{verbatim}
+\begin{PipsMake}
 
 total_preconditions_inter        > MODULE.total_preconditions
         < PROGRAM.entities
@@ -2159,7 +2165,7 @@ total_preconditions_inter        > MODULE.total_preconditions
         < MODULE.summary_effects
         < CALLEES.summary_effects
         < MODULE.summary_transformer
-\end{verbatim}
+\end{PipsMake}
 
 The program postcondition is only used for the main module.
 
@@ -2173,11 +2179,11 @@ summary transformer (see Section~\ref{subsubsection-summary-transformer}).
 
 A summary total precondition is of type "transformer".
 
-\begin{verbatim}
+\begin{PipsMake}
 summary_total_precondition            > MODULE.summary_total_precondition
         < PROGRAM.entities
         < CALLERS.total_preconditions
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Summary Total Postcondition}
 \index{Summary Total Postcondition}
@@ -2197,12 +2203,12 @@ resource manager ({\em pipsdbm}) before using it.
 
 A summary total postcondition is of type "transformer".
 
-\begin{verbatim}
+\begin{PipsMake}
 summary_total_postcondition            > MODULE.summary_total_postcondition
         < PROGRAM.entities
         < CALLERS.total_preconditions
         < MODULE.callers
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Final Postcondition}
 \label{subsubsection-final-postcondition}
@@ -2215,9 +2221,9 @@ always true. But you might want some variables to have specific values,
 e.g. \verb+KMAX==1+, or signs,\verb+KMAX>1+ or relationships
 \verb+KMAX>JMAX+.
 
-\begin{verbatim}
+\begin{PipsMake}
 program_postcondition     > PROGRAM.program_postcondition
-\end{verbatim}
+\end{PipsMake}
 
 \section{Continuation conditions}
 \label{subsection-continuation-conditions}
@@ -2226,7 +2232,7 @@ Continuation conditions are attached to each statement. They represent the
 conditions under which the program will not stop in this statement. Under-
 and over-approximations of these conditions are computed.
 
-\begin{verbatim}
+\begin{PipsMake}
 continuation_conditions > MODULE.must_continuation
                         > MODULE.may_continuation
                         > MODULE.must_summary_continuation
@@ -2237,7 +2243,7 @@ continuation_conditions > MODULE.must_continuation
         < MODULE.transformers
         < CALLEES.must_summary_continuation
         < CALLEES.may_summary_continuation
-\end{verbatim}
+\end{PipsMake}
 
 \section{Complexities}
 \label{subsection-complexities}
@@ -2280,12 +2286,12 @@ fixed probably of 0.5 is systematically assumed.
 
 \subsection{Menu for Complexities}
 
-\begin{verbatim}
+\begin{PipsMake}
 alias complexities      'Complexities'
 alias uniform_complexities      'Uniform'
 alias fp_complexities   'FLOPs'
 alias any_complexities  'Any'
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Uniform Complexities}
 \label{subsubsection-uniform-complexities}
@@ -2305,12 +2311,12 @@ operations. They nevertheless give interesting estimations for SPARC
 SS-10, especially for -O2/-O3 optimized code.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 uniform_complexities                    > MODULE.complexities
         < PROGRAM.entities 
         < MODULE.code MODULE.preconditions
         < CALLEES.summary_complexity
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Summary Complexity}
 \label{subsubsection-summary-complexity}
@@ -2322,11 +2328,11 @@ Local variables are eliminated from the complexity associated to the top
 statement of a module in order to obtain the modules's summary complexity.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 summary_complexity              > MODULE.summary_complexity
         < PROGRAM.entities 
         < MODULE.code MODULE.complexities 
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Floating Point Complexities}
 \label{subsubsection-floating-point-complexities}
@@ -2339,24 +2345,24 @@ non-floating point operations, and to 1 for all floating point
 operations, including intrinsics like \texttt{SIN}.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 fp_complexities                    > MODULE.complexities
         < PROGRAM.entities 
         < MODULE.code MODULE.preconditions
         < CALLEES.summary_complexity
-\end{verbatim}
+\end{PipsMake}
 
 %%@UserManualDocumentation: any_complexities
 This enables the default specification within the properties to
 be considered. 
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 any_complexities                    > MODULE.complexities
         < PROGRAM.entities 
         < MODULE.code MODULE.preconditions
         < CALLEES.summary_complexity
-\end{verbatim}
+\end{PipsMake}
 
 \section{Array Regions}
 \label{subsection-array-regions}
@@ -2441,12 +2447,12 @@ which are merely appended the regions of the expressions passed as argument
 
 \subsection{Menu for Array Regions}
 
-\begin{verbatim}
+\begin{PipsMake}
 alias regions 'Array regions'
 
 alias may_regions 'MAY regions'
 alias must_regions 'EXACT or MAY regions'
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{MAY READ/WRITE Regions}
 \label{subsubsection-may-regions}
@@ -2455,7 +2461,7 @@ alias must_regions 'EXACT or MAY regions'
 %%@UserManualDocumentation: may_regions
 This function computes the \verb|MAY| regions in a module.
 %%!UserManualDocumentation
-\begin{verbatim}
+\begin{PipsMake}
 may_regions                     > MODULE.regions
                                 > MODULE.proper_regions
                                 > MODULE.inv_regions
@@ -2465,7 +2471,7 @@ may_regions                     > MODULE.regions
         < MODULE.transformers
         < MODULE.preconditions      
         < CALLEES.summary_regions 
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{MUST READ/WRITE Regions}
 \label{subsubsection-must-regions}
@@ -2474,7 +2480,7 @@ may_regions                     > MODULE.regions
 %%@UserManualDocumentation: must_regions
 This function computes the \verb|MUST| regions in a module.
 %%!UserManualDocumentation
-\begin{verbatim}
+\begin{PipsMake}
 must_regions                    > MODULE.regions
                                 > MODULE.proper_regions
                                 > MODULE.inv_regions
@@ -2484,7 +2490,7 @@ must_regions                    > MODULE.regions
         < MODULE.transformers
         < MODULE.preconditions      
         < CALLEES.summary_regions 
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Summary READ/WRITE Regions}
 \label{subsubsection-summary-regions}
@@ -2496,12 +2502,12 @@ approximation of the effects observable by a caller that a module has on
 its variables and, indirectly, on the global and static variables of its
 callees.
 
-\begin{verbatim}
+\begin{PipsMake}
 summary_regions                 > MODULE.summary_regions
         < PROGRAM.entities 
         < MODULE.code 
         < MODULE.regions   
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{IN Regions}
 \label{subsubsection-in-regions}
@@ -2516,7 +2522,7 @@ regions must be calculated using \verb+must_regions+ (a new kind of
 resources, \verb+must_region+, should be added). The user must be
 knowledgeable enough to select \verb+must_regions+ first.
 
-\begin{verbatim}
+\begin{PipsMake}
 in_regions                      > MODULE.in_regions
                                 > MODULE.cumulated_in_regions
                                 > MODULE.inv_in_regions
@@ -2529,21 +2535,21 @@ in_regions                      > MODULE.in_regions
         < MODULE.regions
         < MODULE.inv_regions
         < CALLEES.in_summary_regions
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{IN Summary Regions}
 \label{subsubsection-in-summary-regions}
 \index{IN Summary Regions}
 \index{Summary Regions (IN)}
 
-\begin{verbatim}
+\begin{PipsMake}
 in_summary_regions              > MODULE.in_summary_regions
         < PROGRAM.entities 
         < MODULE.code 
         < MODULE.transformers
         < MODULE.preconditions  
         < MODULE.in_regions   
-\end{verbatim}
+\end{PipsMake}
 
 
 \subsection{OUT Summary Regions}
@@ -2553,11 +2559,11 @@ in_summary_regions              > MODULE.in_summary_regions
 
 See Section~\ref{subsubsection-out-regions}.
 
-\begin{verbatim}
+\begin{PipsMake}
 out_summary_regions             > MODULE.out_summary_regions
         < PROGRAM.entities 
         < CALLERS.out_regions   
-\end{verbatim}
+\end{PipsMake}
 
 
 \subsection{OUT Regions}
@@ -2572,7 +2578,7 @@ Unlike \verb+READ+, \verb+WRITE+ and \verb+IN+ regions, they are propagated
 downward in the call graph and in the hierarchical control flow graphs of
 the subroutines.
 
-\begin{verbatim}
+\begin{PipsMake}
 out_regions                     > MODULE.out_regions
         < PROGRAM.entities 
         < MODULE.code  
@@ -2585,7 +2591,7 @@ out_regions                     > MODULE.out_regions
         < MODULE.cumulated_in_regions
         < MODULE.inv_in_regions
         < MODULE.out_summary_regions
-\end{verbatim}
+\end{PipsMake}
 
 \section{Alias Analysis}
 \label{subsection-alias-analysis}
@@ -2615,7 +2621,7 @@ lists'' are created for each module. An alias list for a module is the
 transitive closure of the alias pairs (IN or OUT) for a particular path
 through the callgraph subtree rooted in this module.
 
-\begin{verbatim}
+\begin{PipsMake}
 in_alias_pairs > MODULE.in_alias_pairs
         < PROGRAM.entities
         < MODULE.callers
@@ -2641,62 +2647,62 @@ alias_lists > MODULE.alias_lists
 alias_classes > MODULE.alias_classes
         < PROGRAM.entities
         < MODULE.alias_lists
-\end{verbatim}
+\end{PipsMake}
 
 
 \subsection{Menu for Alias Views}
 
-\begin{verbatim}
+\begin{PipsMake}
 alias alias_file 'Alias View'
 
 alias print_in_alias_pairs 'In Alias Pairs'
 alias print_out_alias_pairs 'Out Alias Pairs'
 alias print_alias_lists 'Alias Lists'
 alias print_alias_classes 'Alias Classes'
-\end{verbatim}
+\end{PipsMake}
 
 %%@UserManualDocumentation: print_in_alias_pairs
 Display the dynamic alias pairs (formal region, actual region) for the IN
 regions of the module.
 %%!UserManualDocumentation
-\begin{verbatim}
+\begin{PipsMake}
 print_in_alias_pairs > MODULE.alias_file
         < PROGRAM.entities
         < MODULE.cumulated_effects
         < MODULE.in_alias_pairs
-\end{verbatim}
+\end{PipsMake}
 
 %%@UserManualDocumentation: print_out_alias_pairs
 Display the dynamic alias pairs (formal region, actual region) for the OUT
 regions of the module.
 %%!UserManualDocumentation
-\begin{verbatim}
+\begin{PipsMake}
 print_out_alias_pairs > MODULE.alias_file
         < PROGRAM.entities
         < MODULE.cumulated_effects
         < MODULE.out_alias_pairs
-\end{verbatim}
+\end{PipsMake}
 
 %%@UserManualDocumentation: print_alias_lists
 Display the transitive closure of the dynamic aliases for the module.
 %%!UserManualDocumentation
-\begin{verbatim}
+\begin{PipsMake}
 print_alias_lists > MODULE.alias_file
         < PROGRAM.entities
         < MODULE.cumulated_effects
         < MODULE.alias_lists
-\end{verbatim}
+\end{PipsMake}
 
 %%@UserManualDocumentation: print_alias_classes
 Display the dynamic alias equivalence classes for this module and those
 below it in the callgraph.
 %%!UserManualDocumentation
-\begin{verbatim}
+\begin{PipsMake}
 print_alias_classes > MODULE.alias_file
         < PROGRAM.entities
         < MODULE.cumulated_effects
         < MODULE.alias_classes
-\end{verbatim}
+\end{PipsMake}
 
 
 \section{Complementary Sections}
@@ -2704,9 +2710,9 @@ print_alias_classes > MODULE.alias_file
 \index{Complementary Sections}
 \index{Array Region}
 
-\begin{verbatim}
+\begin{PipsMake}
 alias compsec 'Complementary Sections'
-\end{verbatim}
+\end{PipsMake}
 
 A new type of array regions, from Manjunathaiah \textsc{Muniyappa}.
 \marginpar{RK: Sounds great ! :-) FI: Validation? Experimental?}
@@ -2717,7 +2723,7 @@ A new type of array regions, from Manjunathaiah \textsc{Muniyappa}.
 %%@UserManualDocumentation complementary_sections
 This function computes the complementary sections in a module.
 %%!UserManualDocumentation
-\begin{verbatim}
+\begin{PipsMake}
 complementary_sections > MODULE.compsec
         < PROGRAM.entities 
         < MODULE.code 
@@ -2725,7 +2731,7 @@ complementary_sections > MODULE.compsec
         < MODULE.transformers
         < MODULE.preconditions      
         < CALLEES.summary_compsec 
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Summary READ/WRITE Complementary Sections}
 \label{subsubsection-summary-complementary-sections}
@@ -2733,12 +2739,12 @@ complementary_sections > MODULE.compsec
 \index{Complementary Sections (Summary)}
 
 
-\begin{verbatim}
+\begin{PipsMake}
 summary_complementary_sections > MODULE.summary_compsec
         < PROGRAM.entities 
         < MODULE.code 
         < MODULE.compsec   
-\end{verbatim}
+\end{PipsMake}
 
 
 
@@ -2799,7 +2805,7 @@ Entries in menu for the resource \verb/parallelized_code/ and for the
 different parallelization algorithms with may be activated or
 selected. Note that the nest parallelization algorithm is not debugged.
 
-\begin{verbatim}
+\begin{PipsMake}
 alias parallelized_code 'Parallelization'
 
 alias rice_all_dependence 'All Dependences'
@@ -2808,7 +2814,7 @@ alias rice_cray 'CRAY Microtasking'
 alias nest_parallelization 'Loop Nest Parallelization'
 alias coarse_grain_parallelization 'Coarse Grain Parallelization'
 alias internalize_parallel_code 'Consider a parallel code as a sequential one'
-\end{verbatim}
+\end{PipsMake}
 
 
 \subsection{Mark Parallel Loops in Sequential Code}
@@ -2841,10 +2847,10 @@ parallelizations in PIPS such as WP65 or HPFC that generate other resource
 types that may be quite different.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 internalize_parallel_code             > MODULE.code
         < MODULE.parallelized_code
-\end{verbatim}
+\end{PipsMake}
 
 
 \subsection{Allen \& Kennedy's Parallelization Algorithm}
@@ -2857,11 +2863,11 @@ Use A{\sc llen} \& K{\sc ennedy}'s algorithm and consider all
 dependences.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 rice_all_dependence             > MODULE.parallelized_code
         < PROGRAM.entities
         < MODULE.code MODULE.dg
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Def-Use Based Parallelization Algorithm}
 
@@ -2881,11 +2887,11 @@ only for experimental parallelization by knowledgeable users, aware
 that the output code may be illegal.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 rice_data_dependence            > MODULE.parallelized_code
         < PROGRAM.entities
         < MODULE.code MODULE.dg
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Parallelization and Vectorization for Cray Multiprocessors}
 \index{Cray}
@@ -2898,11 +2904,11 @@ directives. Note that a prettyprinter option must also be selected independently
 Section~\ref{subsection-parallel-printed-files}).
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 rice_cray                   > MODULE.parallelized_code
         < PROGRAM.entities
         < MODULE.code MODULE.dg
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Global Loop Nest Parallelization}
 
@@ -2924,11 +2930,11 @@ it!\marginpar{RK: Who is working on ? :-/ FI! Could be redesigned by IEF.}
 
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 nest_parallelization                    > MODULE.parallelized_code
         < PROGRAM.entities 
         < MODULE.code MODULE.dg
-\end{verbatim}
+\end{PipsMake}
 
 
 \subsection{SIMDizer for SIMD multimedia instruction set}
@@ -2946,13 +2952,13 @@ generate code that would potentially be efficient, whereas the
 original atomizer would most of the time generate unusable code.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 alias simd_atomizer 'SIMD Atomizer'
 
 simd_atomizer                      > MODULE.code
         < PROGRAM.entities
         < MODULE.code
-\end{verbatim}
+\end{PipsMake}
 
 %%@UserManualDocumentation: simdizer_auto_unroll
 Function \verb+simdizer_auto_unroll+ tries to unroll the code for
@@ -2960,13 +2966,13 @@ making the simdizing process more efficient. It thus tries to compute
 the optimal unroll factor, allowing to pack the most instructions together.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 alias simdizer_auto_unroll 'SIMD-Auto Unroll'
 
 simdizer_auto_unroll        > MODULE.code
         < PROGRAM.entities
         < MODULE.code
-\end{verbatim}
+\end{PipsMake}
 
 %%@UserManualDocumentation: simd_remove_reductions
 This phase tries to pre-process reductions, so that they can be
@@ -2977,7 +2983,7 @@ reduction is renamed, and some code is added before and after the loop
 to initialize the new variables and compute the final result.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 alias simd_remove_reductions 'SIMD Remove Reductions'
 
 simd_remove_reductions      > MODULE.code
@@ -2985,13 +2991,13 @@ simd_remove_reductions      > MODULE.code
         < MODULE.cumulated_reductions
         < MODULE.code
         < MODULE.dg
-\end{verbatim}
+\end{PipsMake}
 
 %%@UserManualDocumentation: deatomizer
 ...
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 alias deatomizer 'Deatomizer'
 
 deatomizer                  > MODULE.code
@@ -2999,7 +3005,7 @@ deatomizer                  > MODULE.code
         < MODULE.code
         < MODULE.proper_effects
         < MODULE.dg
-\end{verbatim}
+\end{PipsMake}
 
 %%@UserManualDocumentation: if_conversion init
 This phase is the first phase of the if-conversion algorithm. The complete
@@ -3008,7 +3014,7 @@ phase: \verb|if_conversion_init|, \verb|if_conversion| and
 \verb|if_conversion_compact|.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 alias if_conversion_init 'If-conversion init'
 
 if_conversion_init                  > MODULE.code
@@ -3017,7 +3023,7 @@ if_conversion_init                  > MODULE.code
         < MODULE.proper_effects
         < MODULE.dg
         < MODULE.summary_complexity
-\end{verbatim}
+\end{PipsMake}
 % +if_conversion_init > MODULE.code
 % +        > MODULE.calles
 % +        < PROGRAM.entities
@@ -3031,7 +3037,7 @@ following phase: \verb|if_conversion_init|, \verb|if_conversion| and
 \verb|if_conversion_compact|.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 alias if_conversion 'If-conversion'
 
 if_conversion                  > MODULE.code
@@ -3039,7 +3045,7 @@ if_conversion                  > MODULE.code
         < MODULE.code
         < MODULE.proper_effects
         < MODULE.dg
-\end{verbatim}
+\end{PipsMake}
 % +if_conversion > MODULE.code
 % +        > MODULE.calles
 % +        < PROGRAM.entities
@@ -3053,7 +3059,7 @@ following phase: \verb|if_conversion_init|, \verb|if_conversion| and
 \verb|if_conversion_compact|.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 alias if_conversion_compact 'If-conversion compact'
 
 if_conversion_compact                  > MODULE.code
@@ -3061,7 +3067,7 @@ if_conversion_compact                  > MODULE.code
         < MODULE.code
         < MODULE.proper_effects
         < MODULE.dg
-\end{verbatim}
+\end{PipsMake}
 % +if_conversion_compact > MODULE.code
 % +        > MODULE.calles
 % +        < PROGRAM.entities
@@ -3075,14 +3081,14 @@ This phase tries to minimize dependencies in the code by transforming
 it into single-assignment form.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 alias single_assignment 'Single Assignment Form'
 
 single_assignment           > MODULE.code
         < PROGRAM.entities
         < MODULE.code
         < MODULE.dg
-\end{verbatim}%$
+\end{PipsMake}%$
 
 %%@UserManualDocumentation: simdizer
 Function \verb+simdizer+ is an attempt at generating SIMD code for SIMD
@@ -3091,7 +3097,7 @@ transformation performs the core vectorization, transforming sequences
 of similar statements into vector operations.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 alias simdizer 'Generate SIMD code'
 
 simdizer                    > MODULE.code
@@ -3099,7 +3105,7 @@ simdizer                    > MODULE.code
         < PROGRAM.entities
         < MODULE.code
         < MODULE.dg
-\end{verbatim}
+\end{PipsMake}
 
 
 %%@UserManualDocumentation: simd_loop_const_elim
@@ -3107,7 +3113,7 @@ This phase tries to optimize the SIMD code by removing from the loop body
 the SIMD statement that does not depends on the loop iteration.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 alias simd_loop_const_elim 'SIMD loop constant elimination'
 
 simd_loop_const_elim                    > MODULE.code
@@ -3116,7 +3122,7 @@ simd_loop_const_elim                    > MODULE.code
         < MODULE.proper_effects
         < MODULE.cumulated_effects
         < MODULE.dg
-\end{verbatim}
+\end{PipsMake}
 
 %%@UserManualDocumentation: simd_memory_packing
 This phase si to be called after simdizarion of affectation operator.
@@ -3126,13 +3132,13 @@ For example, four consecutive load from a char array could be a single load from
 This prove to be useful for \textit{c to vhdl} compilers such as \texttt{c2h}.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 alias simd_memory_packing 'Generate Optimized Load Store'
 
 simd_memory_packing  > MODULE.code
         < PROGRAM.entities
         < MODULE.code
-\end{verbatim}
+\end{PipsMake}
 
 
 
@@ -3147,12 +3153,12 @@ distribution is performed, but any kind of loop body is acceptable
 whereas \textsc{Allen} \& \textsc{Kennedy} algorithm only copes with very simple loop bodies.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 coarse_grain_parallelization > MODULE.parallelized_code
         < PROGRAM.entities
         < MODULE.code
         < MODULE.inv_regions
-\end{verbatim}
+\end{PipsMake}
 
 
 \section{Code Distribution}
@@ -3191,7 +3197,7 @@ This compilation scheme was designed by Corinne \textsc{Ancourt} and François
 small subset of Fortran program (e.g. procedure calls are not supported).
 It was implemented by the designers, with help from Lei \textsc{Zhou}.
 
-\begin{verbatim}
+\begin{PipsMake}
 alias wp65_compute_file 'Distributed View'
 alias wp65_bank_file 'Bank Distributed View'
 wp65                            > MODULE.wp65_compute_file
@@ -3204,7 +3210,7 @@ wp65                            > MODULE.wp65_compute_file
         < MODULE.chains
         < MODULE.proper_effects
 
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{HPF Compiler}
 \label{subsubsection-hpf-compiler}
@@ -3225,10 +3231,10 @@ Some shell script based on sed is used. The \verb+hpfc_parser+ must be
 called to analyze the right file. This is trigerred automatically by the
 bang selection in the \verb|hpfc_close| phase.
 
-\begin{verbatim}
+\begin{PipsMake}
 hpfc_filter             > MODULE.hpfc_filtered_file
     < MODULE.source_file
-\end{verbatim}
+\end{PipsMake}
 
 \subsubsection{HPFC Initialization}
 
@@ -3238,11 +3244,11 @@ status is bootstrapped. The compiler status stores (or should store) all relevan
 information about the HPF part of the program (data distribution, IO
 functions and so on).
 
-\begin{verbatim}
+\begin{PipsMake}
 hpfc_init              > PROGRAM.entities
                        > PROGRAM.hpfc_status
     < PROGRAM.entities
-\end{verbatim}
+\end{PipsMake}
 
 \subsubsection{HPF Directive removal}
 
@@ -3266,7 +3272,7 @@ the \verb|hpfc_filter| artifacts after this phase, and all the proper
 information about the HPF stuff included in the routines is stored in
 \verb|hpfc_status|. 
 
-\begin{verbatim}
+\begin{PipsMake}
 hpfc_static_directives         > MODULE.code
                         > PROGRAM.hpfc_status
     < PROGRAM.entities
@@ -3279,7 +3285,7 @@ hpfc_dynamic_directives         > MODULE.code
     < PROGRAM.hpfc_status
     < MODULE.code
     < MODULE.proper_effects
-\end{verbatim}
+\end{PipsMake}
 
 \subsubsection{HPFC actual compilation}
 
@@ -3296,7 +3302,7 @@ one, many PIPS standard analyses are performed, especially the regions and
 preconditions.  Then this phase will perform the actual translation of the
 program into a host and SPMD node code.
 
-\begin{verbatim}
+\begin{PipsMake}
 hpfc_compile           > MODULE.hpfc_host
                        > MODULE.hpfc_node
                        > MODULE.hpfc_parameters
@@ -3310,7 +3316,7 @@ hpfc_compile           > MODULE.hpfc_host
     < MODULE.code
     < MODULE.cumulated_references
     < CALLEES.hpfc_host
-\end{verbatim}
+\end{PipsMake}
 
 \subsubsection{HPFC completion}
 
@@ -3320,7 +3326,7 @@ The hpfc parser selection is put here.
 %% I guess nobody should have to require intermediate targets such as ???. Ya!
 %% \marginpar{RK: hmmm; FC?}
 
-\begin{verbatim}
+\begin{PipsMake}
 hpfc_close             > PROGRAM.hpfc_commons
     ! SELECT.hpfc_parser
     ! SELECT.must_regions
@@ -3329,7 +3335,7 @@ hpfc_close             > PROGRAM.hpfc_commons
     < PROGRAM.entities
     < PROGRAM.hpfc_status
     < MAIN.hpfc_host
-\end{verbatim}
+\end{PipsMake}
 
 \subsubsection{HPFC install}
 
@@ -3338,7 +3344,7 @@ directory. This rule is added to make hpfc usable from wpips and epips. I
 got problems with the make and run rules, because it was trying to
 recompute everything from scratch. To be investigated later on.
 
-\begin{verbatim}
+\begin{PipsMake}
 hpfc_install            > PROGRAM.hpfc_installation
     < PROGRAM.hpfc_commons
 
@@ -3346,7 +3352,7 @@ hpfc_make
 
 hpfc_run
 
-\end{verbatim}
+\end{PipsMake}
 
 
 \subsection{STEP: MPI code generation from OpenMP programs}
@@ -3383,13 +3389,13 @@ This phase is a preparation phase for the Phrase Distributor
 identified and isolated here. Comments are modified by this phase.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 alias phrase_distributor_init 'PHRASE Distributor initialization'
 
 phrase_distributor_init                  > MODULE.code
         < PROGRAM.entities
         < MODULE.code
-\end{verbatim}
+\end{PipsMake}
 
 This phase is automatically called by the following
 \verb|phrase_distributor|.
@@ -3405,7 +3411,7 @@ the initialization (Phrase Distributor Initialisation
 first.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 alias phrase_distributor 'PHRASE Distributor'
 
 phrase_distributor                       > MODULE.code
@@ -3416,7 +3422,7 @@ phrase_distributor                       > MODULE.code
         < MODULE.in_regions
         < MODULE.out_regions
         < MODULE.dg
-\end{verbatim}
+\end{PipsMake}
 
 
 \subsubsection{Phrase Distributor Control Code}
@@ -3428,7 +3434,7 @@ externalized code portions are transformed into START and WAIT calls.
 Parameters communication (send and receive) are also handled here
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 alias phrase_distributor_control_code 'PHRASE Distributor Control Code'
 
 phrase_distributor_control_code          > MODULE.code
@@ -3437,7 +3443,7 @@ phrase_distributor_control_code          > MODULE.code
         < MODULE.in_regions
         < MODULE.out_regions
         < MODULE.dg
-\end{verbatim}
+\end{PipsMake}
 
 
 \subsection{Safescale}
@@ -3456,13 +3462,13 @@ This phase is intended for the analysis of a module given with the aim of findin
 blocks of code delimited by specific pragmas from it.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 alias safescale_distributor_init 'Safescale distributor init'
 
 safescale_distributor_init                  > MODULE.code
         < PROGRAM.entities
         < MODULE.code
-\end{verbatim}
+\end{PipsMake}
 
 \subsubsection{Statement externalization}
 \index{Statement externalization}
@@ -3471,7 +3477,7 @@ safescale_distributor_init                  > MODULE.code
 This phase is intended for the externalization of a block of code.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 alias safescale_distributor 'Safescale distributor'
 
 safescale_distributor                  > MODULE.code
@@ -3482,7 +3488,7 @@ safescale_distributor                  > MODULE.code
         < MODULE.regions
         < MODULE.in_regions
         < MODULE.out_regions
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{CoMap: code generation for accelerators with DMA}
 \label{sec:comap:-code}
@@ -3490,7 +3496,7 @@ safescale_distributor                  > MODULE.code
 \paragraph{Phrase Remove Dependences}
 \index{Phrase Remove Dependences}
 
-\begin{verbatim}
+\begin{PipsMake}
 alias phrase_remove_dependences 'Phrase Remove Dependences'
 
 phrase_remove_dependences                      > MODULE.code
@@ -3501,7 +3507,7 @@ phrase_remove_dependences                      > MODULE.code
         < MODULE.in_regions
         < MODULE.out_regions
         < MODULE.dg
-\end{verbatim}
+\end{PipsMake}
 
 
 \paragraph{Phrase comEngine Distributor}
@@ -3513,7 +3519,7 @@ Initialisation or \verb|PHRASE_DISTRIBUTOR_INIT|). The job of comEngine
 distribution is done here.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 alias phrase_comEngine_distributor 'PHRASE comEngine Distributor'
 
 phrase_comEngine_distributor                       > MODULE.code
@@ -3525,7 +3531,7 @@ phrase_comEngine_distributor                       > MODULE.code
         < MODULE.out_regions
         < MODULE.dg
         < MODULE.summary_complexity
-\end{verbatim}
+\end{PipsMake}
 
 
 \chapter{Program Transformations}
@@ -3593,13 +3599,13 @@ difference is that \verb+distributer+ does not produce DOALL loops,
 but just distributes loops as much as possible.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 alias distributer 'Distribute Loops'
 distributer                    > MODULE.code
         < PROGRAM.entities 
         < MODULE.code
         < MODULE.dg
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Loop peeling}
 \label{subsection-loop-peeling}
@@ -3610,13 +3616,13 @@ The first loop ends at a point designated by \lstinline|LOOP_PEELING_BOUND| and 
 It currently only works for do loops.
 This transformation is always legal.
 %%!UserManualDocumentation
-\begin{verbatim}
+\begin{PipsMake}
 alias loop_peeling 'Loop peeling'
 loop_peeling      > MODULE.code
         > PROGRAM.entities
         < PROGRAM.entities
         < MODULE.code
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Loop Unrolling}
 \label{subsection-loop-unrolling}
@@ -3637,12 +3643,12 @@ innermost loop.
 This transformation is always legal.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 alias unroll 'Loop Unroll'
 unroll                          > MODULE.code
         < PROGRAM.entities
         < MODULE.code
-\end{verbatim}
+\end{PipsMake}
 
 \subsubsection{Full Loop Unroll}
 
@@ -3656,19 +3662,19 @@ Unrolling can be interactively applied and the user is requested a loop
 label:
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 alias full_unroll 'Full Loop Unroll (Interactive)'
 full_unroll                          > MODULE.code
         < PROGRAM.entities
         < MODULE.code
-\end{verbatim}
+\end{PipsMake}
 Or directives can be inserted as comments for loops to be unrolled with:
-\begin{verbatim}
+\begin{PipsMake}
 alias full_unroll_pragma 'Full Loop Unroll (Pragma)'
 full_unroll_pragma                   > MODULE.code
         < PROGRAM.entities
         < MODULE.code
-\end{verbatim}
+\end{PipsMake}
 The directive is a comment containing the string \texttt{Cxxx} just before
 a loop to fully unroll (it is reserved to Fortran right now and should be
 generalized).
@@ -3683,12 +3689,12 @@ Then it strip-mines the specified loop, if it is found. Note that the
 DO/ENDDO construct is not compatible with such local program transformations.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 alias strip_mine 'Strip Mining'
 strip_mine                          > MODULE.code
         < PROGRAM.entities
         < MODULE.code
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Loop Interchange}
 \label{subsection-loop-interchange}
@@ -3703,12 +3709,12 @@ loop nest exists.
 Presently, legality is not checked.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 alias loop_interchange 'Loop Interchange'
 loop_interchange                            > MODULE.code
         < PROGRAM.entities
         < MODULE.code
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Hyperplane Method}
 \label{subsection-hyperplane-method}
@@ -3722,12 +3728,12 @@ loop label, if such a loop nest exists.
 Presently, legality is not checked.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 alias loop_hyperplane 'Hyperplane Method'
 loop_hyperplane                            > MODULE.code
         < PROGRAM.entities
         < MODULE.code
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Loop Nest Tiling}
 \label{subsection-loop-nest-tiling}
@@ -3757,12 +3763,12 @@ tiling in Parallel Processing Letters
 (\url{http://cs.une.edu.au/~xue/pub.html}).
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 alias loop_tiling 'Tiling'
 loop_tiling                            > MODULE.code
         < PROGRAM.entities
         < MODULE.code
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Loop Normalize}
 \label{subsection-loop-normalize}
@@ -3797,15 +3803,15 @@ assigns it to its value function of the new index and the second one
 (after the end of the loop) assigns it to its final value.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 alias loop_normalize 'Loop Normalize'
-\end{verbatim}
+\end{PipsMake}
 
-\begin{verbatim}
+\begin{PipsMake}
 loop_normalize          > MODULE.code
         < PROGRAM.entities
         < MODULE.code
-\end{verbatim}
+\end{PipsMake}
 
 
 \subsection{Guard Elimination and Loop Transformations}
@@ -3814,11 +3820,11 @@ loop_normalize          > MODULE.code
 Youcef \textsc{Bouchebaba}'s implementation of unimodular loop
 transformations\ldots
 
-\begin{verbatim}
+\begin{PipsMake}
 guard_elimination       > MODULE.code
         < PROGRAM.entities
         < MODULE.code
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Tiling for sequences of loop nests }
 \label{subsection-tiling-for-sequences-loop-ness}
@@ -3830,15 +3836,15 @@ Tiling for sequences of loop nests
 Youcef \textsc{Bouchebaba}'s implementation of tiling for sequences of
 loop nests \ldots
   
-\begin{verbatim}
+\begin{PipsMake}
 alias tiling_sequence 'Tiling sequence of loop nests'
-\end{verbatim}
+\end{PipsMake}
 
-\begin{verbatim}
+\begin{PipsMake}
 tiling_sequence      > MODULE.code
         < PROGRAM.entities
         < MODULE.code
-\end{verbatim}
+\end{PipsMake}
 
 
 
@@ -3854,12 +3860,12 @@ tiling_sequence      > MODULE.code
 This is a test to implement a invariant code motion. It doesn't work currently.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 invariant_code_motion             > MODULE.code
         < PROGRAM.entities 
         < MODULE.proper_effects
         < MODULE.code MODULE.dg
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Partial Redundancy Elimination}
 \label{subsection-partial_redundancy_elimination}
@@ -3876,7 +3882,7 @@ precondition analyses.
 This transformation is implemented by Thi Viet Nga \textsc{Nguyen}.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 
 alias partial_redundancy_elimination 'Partial Redundancy Elimination'
 
@@ -3884,7 +3890,7 @@ partial_redundancy_elimination             > MODULE.code
         < PROGRAM.entities 
         < MODULE.code
         < MODULE.preconditions
-\end{verbatim}
+\end{PipsMake}
 
 %-----------End of Redundancy Elimination -------------------------
 
@@ -3939,7 +3945,7 @@ This function was designed and implemented by Ronan K{\sc eryell}.
 
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 alias suppress_dead_code 'Dead Code Elimination'
 suppress_dead_code          > MODULE.code
                             > MODULE.callees      
@@ -3948,7 +3954,7 @@ suppress_dead_code          > MODULE.code
         < MODULE.proper_effects
         < MODULE.cumulated_effects
         < MODULE.preconditions
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Use-Def Elimination}
 \label{sec:use-def-elimination}
@@ -3987,14 +3993,14 @@ elimination !
 
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 alias use_def_elimination 'Use-Def elimination'
 use_def_elimination          > MODULE.code
         < PROGRAM.entities
         < MODULE.code
         < MODULE.proper_effects
         < MODULE.chains
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Control Restructurers}
 \index{Restructurer}
@@ -4036,15 +4042,15 @@ restructuring from \verb|restructure_control| to be added in the
 This function was designed and implemented by Ronan \textsc{Keryell}.
 %%!UserManualDocumentation
 %% Control Graph Restructuring
-\begin{verbatim}
+\begin{PipsMake}
 alias unspaghettify 'Unspaghettify the Control Graph'
-\end{verbatim}
+\end{PipsMake}
 
-\begin{verbatim}
+\begin{PipsMake}
 unspaghettify          > MODULE.code
         < PROGRAM.entities
         < MODULE.code
-\end{verbatim}
+\end{PipsMake}
 
 
 \subsubsection{Restructure Control}
@@ -4065,13 +4071,13 @@ restructurer (see
 Section~\ref{subsection-control-structure-normalization-stf}).
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 alias restructure_control 'Restructure the Control Graph'
 
 restructure_control          > MODULE.code
         < PROGRAM.entities
         < MODULE.code
-\end{verbatim}
+\end{PipsMake}
 
 
 \subsubsection{Spaghettify}
@@ -4101,15 +4107,15 @@ to allow more or less destruction power.
 
 %%!UserManualDocumentation
 %% Control Graph Restructuring
-\begin{verbatim}
+\begin{PipsMake}
 alias spaghettify 'Spaghettify the Control Graph'
-\end{verbatim}
+\end{PipsMake}
 
-\begin{verbatim}
+\begin{PipsMake}
 spaghettify          > MODULE.code
         < PROGRAM.entities
         < MODULE.code
-\end{verbatim}
+\end{PipsMake}
 
 \subsubsection{Full Spaghettify}
 \label{paragraph-full-spaghettify}
@@ -4131,15 +4137,15 @@ final statement.
 
 %%!UserManualDocumentation
 %% Control Graph Restructuring
-\begin{verbatim}
+\begin{PipsMake}
 alias full_spaghettify 'Spaghettify the Control Graph for the entire module'
-\end{verbatim}
+\end{PipsMake}
 
-\begin{verbatim}
+\begin{PipsMake}
 full_spaghettify          > MODULE.code
         < PROGRAM.entities
         < MODULE.code
-\end{verbatim}
+\end{PipsMake}
 
 
 \subsection{Control Structure Normalisation (STF)}
@@ -4164,11 +4170,11 @@ This transformation is now assumed redundant with respect to the native
 PIPS control restructurers that deal with other languages too.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 alias stf 'Restructure with STF'
 stf                      > MODULE.source_file
         < MODULE.source_file
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Trivial Test Elimination}
 \label{subsection-trivial-test-elimination}
@@ -4183,12 +4189,12 @@ the test initial.
 This function was designed and implemented by Trinh Quoc \textsc{Anh}.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 alias suppress_trivial_test 'Trivial Test Elimination'
 suppress_trivial_test          > MODULE.code
         < PROGRAM.entities
         < MODULE.code
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Finite State Machine Generation}
 \label{subsection-fsm-generation}
@@ -4226,14 +4232,14 @@ which controls the fact that the same global variable (global to the
 current module) must be used for each FSMized statements.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 alias fsm_generation 'FSM Generation'
 
 fsm_generation        > MODULE.code
                       > PROGRAM.entities
         < PROGRAM.entities
         < MODULE.code
-\end{verbatim}
+\end{PipsMake}
 
 To generate a hierarchical finite state machine, apply first
 \texttt{spaghettify} (\S~\ref{paragraph-spaghettify}) and then
@@ -4263,7 +4269,7 @@ succession of the 2 phases \texttt{FULL\_SPAGHETTIFY}
 (\S~\ref{paragraph-fsm-generation})
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 alias full_fsm_generation 'Full FSM Generation'
 
 full_fsm_generation   > MODULE.code
@@ -4272,7 +4278,7 @@ full_fsm_generation   > MODULE.code
         ! MODULE.fsm_generation
         < PROGRAM.entities
         < MODULE.code
-\end{verbatim}
+\end{PipsMake}
 
 \subsubsection{FSM Split State}
 \label{paragraph-fsm-split-state}
@@ -4287,13 +4293,13 @@ NB: Phase \texttt{FULL\_SPAGHETTIFY} (\S~\ref{paragraph-full-spaghettify})
 must have been applied first !
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 alias fsm_split_state 'FSM split state
 
 fsm_split_state    > MODULE.code
         < PROGRAM.entities
         < MODULE.code
-\end{verbatim}
+\end{PipsMake}
 
 \subsubsection{FSM Merge States}
 \label{paragraph-fsm-merge-states}
@@ -4308,13 +4314,13 @@ NB: Phase \texttt{FULL\_SPAGHETTIFY} (\S~\ref{paragraph-full-spaghettify})
 must have been applied first !
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 alias fsm_merge_states 'FSM merge states
 
 fsm_merge_states    > MODULE.code
         < PROGRAM.entities
         < MODULE.code
-\end{verbatim}
+\end{PipsMake}
 
 
 %\subsection{Declaration Common Addition}
@@ -4330,12 +4336,12 @@ fsm_merge_states    > MODULE.code
 %This function was designed and implemented by Trinh Quoc Anh.
 
 
-%\begin{verbatim}
+%\begin{PipsMake}
 %alias add_declaration_common 'Declaration Common Addition'
 %add_declaration_common          > MODULE.code
 %        < PROGRAM.entities
 %        < MODULE.code
-%\end{verbatim}
+%\end{PipsMake}
 
 %-----------End of Control-flow Optimizations -------------------------
 
@@ -4361,14 +4367,14 @@ distribution phases. For instance, indirect addressing like
 
 \subsubsection{General Atomizer}
 
-\begin{verbatim}
+\begin{PipsMake}
 alias atomizer 'Atomizer'
 atomizer                      > MODULE.code
         < PROGRAM.entities
         < MODULE.code
         < MODULE.cumulated_effects
         < MODULE.dg
-\end{verbatim}
+\end{PipsMake}
 
 \subsubsection{Limited Atomizer}
 
@@ -4376,12 +4382,12 @@ atomizer                      > MODULE.code
 Here is a new version of the atomizer using a small atomizer from
 the HPF compiler (see Section~\ref{subsubsection-hpf-compiler}).
 %%!UserManualDocumentation
-\begin{verbatim}
+\begin{PipsMake}
 alias new_atomizer 'New Atomizer'
 new_atomizer                      > MODULE.code
         < PROGRAM.entities
         < MODULE.code
-\end{verbatim}
+\end{PipsMake}
 
 An atomizer is also used by WP65 (see
 Section~\ref{subsubsection-shared-memory-emulation})
@@ -4419,7 +4425,7 @@ error message at compile time indicating potential error such as division
 by zero.  
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 alias partial_eval 'Partial Eval'
 partial_eval                    > MODULE.code
         < PROGRAM.entities
@@ -4427,7 +4433,7 @@ partial_eval                    > MODULE.code
         < MODULE.proper_effects
         < MODULE.cumulated_effects
         < MODULE.preconditions
-\end{verbatim}
+\end{PipsMake}
 
 This function was implemented initially by Bruno \textsc{Baron}.
 
@@ -4446,12 +4452,12 @@ code restructuring and optimization... A new reduction detection phase was
 implemented by Fabien \textsc{Coelho}. It does not include a code transformation.
 Its result could be prettyprinted in an HPF style (FC: implementation?).
 
-\begin{verbatim}
+\begin{PipsMake}
 old_reductions                      > MODULE.code
         < PROGRAM.entities
         < MODULE.code
         < MODULE.cumulated_effects
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Forward Substitution}
 
@@ -4459,7 +4465,7 @@ Scalars can be forward substitute. The effect is to undo already performed
 optimizations such as invariant code motion and common subexpressions, or
 manual atomization. However we hope to do a better job automatically!
 
-\begin{verbatim}
+\begin{PipsMake}
 alias forward_substitute 'Forward Substitution'
 
 forward_substitute      > MODULE.code
@@ -4467,7 +4473,7 @@ forward_substitute      > MODULE.code
         < MODULE.code
         < MODULE.proper_effects
         < MODULE.cumulated_effects
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Expression Substitution}
 
@@ -4478,14 +4484,14 @@ It is  a kind of simple outlining transformations, it proves to be usefull durin
 This phase was developped by Serge \textsc{Guelton} during his PhD.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 alias expression_substitution 'Expression Substitution'
 
 expression_substitution > MODULE.code
         > MODULE.callee
         < PROGRAM.entities
         < ALL.code
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Expression Optimizations}
 \label{subsection-expression-optimizations}
@@ -4520,7 +4526,7 @@ expressions of mixed types such as \verb|X+1| where \verb|1| is implictly
 promoted from integer to real.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 alias optimize_expressions 'Optimize Expressions'
 
 optimize_expressions    > MODULE.code
@@ -4532,7 +4538,7 @@ alias instruction_selection 'Select Instructions'
 instruction_selection > MODULE.code
         < PROGRAM.entities
         < MODULE.code
-\end{verbatim}
+\end{PipsMake}
 
 %%%%%%%%%%
 
@@ -4551,7 +4557,7 @@ It should be followed by a call to \verb+UNSPAGHETTIFY+ and \verb+SUPPRESS_DEAD_
 
 
 %%!UserManualDocumentation
-\begin{verbatim}
+\begin{PipsMake}
 
 inlining      > CALLERS.parsed_code
         < PROGRAM.entities
@@ -4560,7 +4566,7 @@ inlining      > CALLERS.parsed_code
 		< MODULE.code
         < MODULE.cumulated_effects
         < MODULE.callers
-\end{verbatim}
+\end{PipsMake}
 %%%%%%%%%%
 
 \subsection{Unfolding}
@@ -4576,7 +4582,7 @@ Thus unfolding the content of the module.
 
 
 %%!UserManualDocumentation
-\begin{verbatim}
+\begin{PipsMake}
 
 unfolding      > MODULE.parsed_code
         < PROGRAM.entities
@@ -4584,7 +4590,7 @@ unfolding      > MODULE.parsed_code
         < MODULE.printed_file
         < MODULE.cumulated_effects
         < CALLERS.code
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Outlining}
 \label{subsection-outlining}
@@ -4606,13 +4612,13 @@ The user will be prompted for various question in order to perform the outlining
 
 
 %%!UserManualDocumentation
-\begin{verbatim}
+\begin{PipsMake}
 
 outline      > MODULE.code
         > PROGRAM.entities
         < PROGRAM.entities
         < MODULE.code
-\end{verbatim}
+\end{PipsMake}
 
 
 %-----------End of Expression Transformations -------------------------
@@ -4629,14 +4635,14 @@ prettyprint.
 %%@UserManualDocumentation: clean_declarations
 Clean the declarations of unused variables and commons and so.
 %%!UserManualDocumentation
-\begin{verbatim}
+\begin{PipsMake}
 
 alias clean_declarations 'Clean Declarations'
 
 clean_declarations      > MODULE.code
         < PROGRAM.entities
         < MODULE.code
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Array Resizing}
 \label{subsubsection-array-resizing}
@@ -4675,7 +4681,7 @@ It is  faster than the first one because array regions are not needed.
 This phase is implemented by Thi Viet Nga \textsc{Nguyen}.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 alias array_resizing_top_down 'Top Down Array Resizing'
 array_resizing_top_down         > MODULE.new_declarations
                                 > PROGRAM.entities
@@ -4683,7 +4689,7 @@ array_resizing_top_down         > MODULE.new_declarations
         < CALLERS.code
         < CALLERS.new_declarations
         < CALLERS.preconditions
-\end{verbatim}
+\end{PipsMake}
 
 \subsubsection{Bottom Up Array Resizing}
 
@@ -4699,26 +4705,26 @@ This function is firstly implemented by Trinh Quoc \textsc{Anh}, and
 ameliorated by Corinne \textsc{Ancourt}, Thi Viet Nga \textsc{Nguyen}.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 alias array_resizing_bottom_up 'Bottom Up Array Resizing'
 array_resizing_bottom_up         > MODULE.code
         < PROGRAM.entities
         < MODULE.code
         < MODULE.preconditions
         < MODULE.regions
-\end{verbatim}
+\end{PipsMake}
 
 \subsubsection{Array Resizing Statistic}
 
 We provide here a tool to calculate the number of pointer-type A(,1) and
 assumed-size A(,*) array declarators as well as other information.
 
-\begin{verbatim}
+\begin{PipsMake}
 alias array_resizing_statistic 'Array Resizing Statistic'
 array_resizing_statistic   > MODULE.code
         < PROGRAM.entities
         < MODULE.code
-\end{verbatim}
+\end{PipsMake}
 
 %-----------End of Declaration Transformations -------------------------
 
@@ -4753,12 +4759,12 @@ This phase is always followed by the \verb/partial_redundancy_elimination/ for l
 expression in order to reduce the number of bound checks.  
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 alias array_bound_check_bottom_up 'Elimination of Redundant Tests'
 array_bound_check_bottom_up            > MODULE.code
         < PROGRAM.entities 
         < MODULE.code
-\end{verbatim}
+\end{PipsMake}
 
 
 \subsection{Insertion of Unavoidable Tests}
@@ -4795,13 +4801,13 @@ possible, thanks to the context given by preconditions and the top-down
 analyses. 
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 alias array_bound_check_top_down 'Insertion of Unavoidable Tests'
 array_bound_check_top_down   > MODULE.code
         < PROGRAM.entities 
         < MODULE.code
         < MODULE.regions
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Interprocedural Array Bound Checking}
 \label{subsection-array-bound-check_interprocedural}
@@ -4813,13 +4819,13 @@ violation in every array access in the callee procedure, with respect to
 the array declarations in the caller procedure.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 alias array_bound_check_interprocedural 'Interprocedural Array Bound Checking'
 array_bound_check_interprocedural             > MODULE.code
         < PROGRAM.entities
         < MODULE.code
         < MODULE.preconditions
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Array Bound Checking Instrumentation}
 \label{subsection-array-bound-check_instrumentation}
@@ -4832,12 +4838,12 @@ from both initial and PIPS generated code.
 These transformations are implemented by Thi Viet Nga \textsc{Nguyen}.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 alias array_bound_check_instrumentation 'Array Bound Checking Instrumentation'
 array_bound_check_instrumentation > MODULE.code
         < PROGRAM.entities
         < MODULE.code
-\end{verbatim}
+\end{PipsMake}
 
 \section{Alias Verification}
 \label{subsection-alias-verification}
@@ -4886,7 +4892,7 @@ variables. The analysis is called alias propagation.
 This analysis is implemented by Thi Viet Nga \textsc{Nguyen}.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 
 alias_propagation           > MODULE.alias_associations
         < PROGRAM.entities 
@@ -4894,7 +4900,7 @@ alias_propagation           > MODULE.alias_associations
         < CALLERS.alias_associations
         < CALLERS.code
 
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Alias Checing}
 \label{subsubsection-alias-check}
@@ -4928,14 +4934,14 @@ This verification is implemented by Thi Viet Nga \textsc{Nguyen}.
 % Attention : will we use the preconditions, regions, effects ? 
 % They are may be wrong 
 
-\begin{verbatim}
+\begin{PipsMake}
 alias alias_check 'Alias Check'
 alias_check   > MODULE.code
         < PROGRAM.entities 
         < MODULE.alias_associations
         < MODULE.cumulated_effects
         < ALL.code
-\end{verbatim}
+\end{PipsMake}
 
 \section{Used Before Set}
 \label{subsection-used-before_set}
@@ -4963,14 +4969,14 @@ parameters of the called procedures have to be checked or not.
 This verification is implemented by Thi Viet Nga \textsc{Nguyen}.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 alias used_before_set 'Used Before Set'
 used_before_set   > MODULE.ubs
         < PROGRAM.entities 
         < MODULE.code
         < MODULE.in_regions
         < CALLERS.ubs
-\end{verbatim}
+\end{PipsMake}
 
 
 \section{Miscellanous Transformations}
@@ -4987,12 +4993,12 @@ Precompute constant conversions if appropriate (e.g. 16 to 16.0E0).
 Add comments about type errors detected in the code.
 Report back how much was done.
 
-\begin{verbatim}
+\begin{PipsMake}
 type_checker            > MODULE.code
         < PROGRAM.entities
         < MODULE.code
         < CALLEES.code
-\end{verbatim}
+\end{PipsMake}
 
 
 \subsection{Scalar and Array Privatization}
@@ -5020,7 +5026,7 @@ values assigned to this variable inside the loop cannot reach a
 statement outside the loop body.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 alias privatize_module 'Privatize Scalars'
 privatize_module                    > MODULE.code
         < PROGRAM.entities 
@@ -5028,7 +5034,7 @@ privatize_module                    > MODULE.code
         < MODULE.proper_effects
         < MODULE.cumulated_effects
         < MODULE.chains
-\end{verbatim}
+\end{PipsMake}
 
 \subsubsection{Array Privatization}
 \index{Array Privatization}
@@ -5067,13 +5073,13 @@ transformation is called \verb|declarations_privatizer|.
 
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 alias array_privatizer 'Privatize Scalars & Arrays'
 alias array_section_privatizer 'Scalar and Array Section Privatization'
 alias declarations_privatizer 'Declaration Privatization'
-\end{verbatim}
+\end{PipsMake}
 
-\begin{verbatim}
+\begin{PipsMake}
 array_privatizer             > MODULE.code
         < PROGRAM.entities
         < MODULE.code
@@ -5107,7 +5113,7 @@ declarations_privatizer              > MODULE.code
         < MODULE.in_regions
         < MODULE.out_regions
 
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Scalar and Array Expansion}
 \label{subsection-scalar-and-array-expansion}
@@ -5132,12 +5138,12 @@ Loop private scalar variables are expanded when all enclosing loops have
 numerical bounds and increment one.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 alias variable_expansion 'Expand Scalar'
 variable_expansion                    > MODULE.code
         < PROGRAM.entities 
         < MODULE.code 
-\end{verbatim}
+\end{PipsMake}
 
 \subsubsection{Array Expansion}
 \index{Array Expansion}
@@ -5158,14 +5164,14 @@ changes within the code. \marginpar{CA? More information? The variable
 names are requested from the PIPS user?}
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 alias freeze_variables 'Freeze Variables'
 freeze_variables                   > MODULE.code
         < PROGRAM.entities
         < MODULE.code
         < MODULE.proper_effects
         < MODULE.cumulated_effects
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Manual Editing}
 
@@ -5188,7 +5194,7 @@ call sites must be updated to refer to the desired version.
 User assisted cloning.See examples in clone vslidation
 suite. \marginpar{RK: terse; to be improved by FC}
 %%!UserManualDocumentation
-\begin{verbatim}
+\begin{PipsMake}
 
 alias clone 'Manual Clone'
 
@@ -5199,12 +5205,12 @@ clone                   > CALLERS.code
         < MODULE.user_file
         < CALLERS.callees
         < CALLERS.code
-\end{verbatim}
+\end{PipsMake}
 
 %%@UserManualDocumentation: clone_substitute
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 alias clone_substitute 'Manual Clone Substitution'
 
 clone_substitute        > CALLERS.code
@@ -5214,7 +5220,7 @@ clone_substitute        > CALLERS.code
         < MODULE.user_file
         < CALLERS.callees
         < CALLERS.code
-\end{verbatim}
+\end{PipsMake}
 
 %%@UserManualDocumentation: clone_on_argument
 
@@ -5224,7 +5230,7 @@ The argument is specified thru integer property
 performed.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 alias clone_on_argument 'Clone On Argument'
 
 clone_on_argument       > CALLERS.code
@@ -5236,7 +5242,7 @@ clone_on_argument       > CALLERS.code
         < CALLERS.callees
         < CALLERS.preconditions
         < CALLERS.code
-\end{verbatim}
+\end{PipsMake}
 
 %%@UserManualDocumentation: clone_only
 Not use assisted version of cloning
@@ -5244,14 +5250,14 @@ it just perform the cloning without any substitution
 Use the \lstinline|CLONE_NAME| property if you want a particular clone name.
 It's up to another phase to perform the substitution.
 %%!UserManualDocumentation
-\begin{verbatim}
+\begin{PipsMake}
 
 alias clone_only 'Simple Clone'
 
 clone_only
         < MODULE.code
         < MODULE.user_file
-\end{verbatim}
+\end{PipsMake}
 \subsection{Transformation Test}
 \label{subsection-transformation_test}
 
@@ -5260,13 +5266,13 @@ This is plug to implement quickly a program transformation requested by a
 user. Currently, it is a full loop distribution suggested by Alain \textsc{Darte}
 to compare different implementations, namely Nestor and PIPS.
 %%!UserManualDocumentation
-\begin{verbatim}
+\begin{PipsMake}
 alias transformation_test 'Transformation Test'
 
 transformation_test    > MODULE.code
         < PROGRAM.entities
         < MODULE.code
-\end{verbatim}
+\end{PipsMake}
 
 
 \chapter{Output Files (Prettyprinted Files)}
@@ -5312,7 +5318,7 @@ module value basis.
 
 \subsection{Menu for User Views}
 
-\begin{verbatim}
+\begin{PipsMake}
 alias parsed_printed_file 'User View'
 
 alias print_source 'Basic'
@@ -5328,7 +5334,7 @@ alias print_source_cumulated_effects 'With Cumulated Effects'
 alias print_source_in_effects 'With IN Effects'
 alias print_source_out_effects 'With OUT Effects'
 alias print_source_continuation_conditions 'With Continuation Conditions'
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Standard User View}
 
@@ -5336,11 +5342,11 @@ alias print_source_continuation_conditions 'With Continuation Conditions'
 Display the code without any decoration.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 print_source         > MODULE.parsed_printed_file
         < PROGRAM.entities
         < MODULE.parsed_code
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{User View with Transformers}
 
@@ -5348,7 +5354,7 @@ print_source         > MODULE.parsed_printed_file
 Display the code decorated with the transformers.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 print_source_transformers         > MODULE.parsed_printed_file
         < PROGRAM.entities
         < MODULE.parsed_code
@@ -5356,7 +5362,7 @@ print_source_transformers         > MODULE.parsed_printed_file
         < MODULE.summary_transformer
         < MODULE.cumulated_effects
         < MODULE.summary_effects
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{User View with Preconditions}
 
@@ -5364,7 +5370,7 @@ print_source_transformers         > MODULE.parsed_printed_file
 Display the code decorated with the preconditions.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 print_source_preconditions        > MODULE.parsed_printed_file
         < PROGRAM.entities
         < MODULE.parsed_code
@@ -5372,7 +5378,7 @@ print_source_preconditions        > MODULE.parsed_printed_file
         < MODULE.summary_precondition
         < MODULE.summary_effects
         < MODULE.cumulated_effects
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{User View with Total Preconditions}
 
@@ -5380,7 +5386,7 @@ print_source_preconditions        > MODULE.parsed_printed_file
 Display the code decorated with the total preconditions.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 print_source_total_preconditions        > MODULE.parsed_printed_file
         < PROGRAM.entities
         < MODULE.parsed_code
@@ -5388,7 +5394,7 @@ print_source_total_preconditions        > MODULE.parsed_printed_file
         < MODULE.summary_precondition
         < MODULE.summary_effects
         < MODULE.cumulated_effects
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{User View with Continuation Conditions}
 
@@ -5396,7 +5402,7 @@ print_source_total_preconditions        > MODULE.parsed_printed_file
 Display the code decorated with the continuation conditions.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 print_source_continuation_conditions   > MODULE.parsed_printed_file
         < PROGRAM.entities
         < MODULE.parsed_code
@@ -5405,7 +5411,7 @@ print_source_continuation_conditions   > MODULE.parsed_printed_file
         < MODULE.must_summary_continuation
         < MODULE.may_summary_continuation        
         < MODULE.cumulated_effects
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{User View with Regions}
 
@@ -5413,7 +5419,7 @@ print_source_continuation_conditions   > MODULE.parsed_printed_file
 Display the code decorated with the regions.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 print_source_regions              > MODULE.parsed_printed_file
         < PROGRAM.entities
         < MODULE.parsed_code 
@@ -5422,7 +5428,7 @@ print_source_regions              > MODULE.parsed_printed_file
         < MODULE.preconditions
         < MODULE.transformers
         < MODULE.cumulated_effects
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{User View with IN Regions}
 
@@ -5430,7 +5436,7 @@ print_source_regions              > MODULE.parsed_printed_file
 Display the code decorated with the IN regions.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 print_source_in_regions              > MODULE.parsed_printed_file
         < PROGRAM.entities
         < MODULE.parsed_code
@@ -5439,7 +5445,7 @@ print_source_in_regions              > MODULE.parsed_printed_file
         < MODULE.preconditions
         < MODULE.transformers
         < MODULE.cumulated_effects
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{User View with OUT Regions}
 
@@ -5447,7 +5453,7 @@ print_source_in_regions              > MODULE.parsed_printed_file
 Display the code decorated with the OUT regions.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 print_source_out_regions              > MODULE.parsed_printed_file
         < PROGRAM.entities
         < MODULE.parsed_code
@@ -5456,7 +5462,7 @@ print_source_out_regions              > MODULE.parsed_printed_file
         < MODULE.preconditions
         < MODULE.transformers
         < MODULE.cumulated_effects
-\end{verbatim}
+\end{PipsMake}
 
 
 \subsection{User View with Complexities}
@@ -5466,13 +5472,13 @@ print_source_out_regions              > MODULE.parsed_printed_file
 Display the code decorated with the complexities.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 print_source_complexities         > MODULE.parsed_printed_file
         < PROGRAM.entities
         < MODULE.parsed_code
         < MODULE.complexities
         < MODULE.summary_complexity
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{User View with Proper Effects}
 
@@ -5480,12 +5486,12 @@ print_source_complexities         > MODULE.parsed_printed_file
 Display the code decorated with the proper effects.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 print_source_proper_effects       > MODULE.parsed_printed_file
         < PROGRAM.entities
         < MODULE.parsed_code
         <  MODULE.proper_effects
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{User View with Cumulated Effects}
 
@@ -5493,39 +5499,39 @@ print_source_proper_effects       > MODULE.parsed_printed_file
 Display the code decorated with the cumulated effects.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 print_source_cumulated_effects    > MODULE.parsed_printed_file
         < PROGRAM.entities
         < MODULE.parsed_code
         < MODULE.cumulated_effects
         < MODULE.summary_effects
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{User View with IN Effects}
 %%@UserManualDocumentation: print_source_in_effects
 Display the code decorated with its IN effects.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 print_source_in_effects       > MODULE.parsed_printed_file
         < PROGRAM.entities
         < MODULE.code
         < MODULE.in_effects
         < MODULE.in_summary_effects
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{User View with OUT Effects}
 %%@UserManualDocumentation: print_source_out_effects
 Display the code decorated with its OUT effects.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 print_source_out_effects       > MODULE.parsed_printed_file
         < PROGRAM.entities
         < MODULE.code
         < MODULE.out_effects
         < MODULE.out_summary_effects
-\end{verbatim}
+\end{PipsMake}
 
 
 
@@ -5551,7 +5557,7 @@ to build the module value basis.
 
 \subsection{Menu for Sequential Views}
 
-\begin{verbatim}
+\begin{PipsMake}
 alias printed_file 'Sequential View'
 
 alias print_code 'Statements Only'
@@ -5576,7 +5582,7 @@ alias print_code_proper_regions 'Statements & Proper Regions'
 alias print_code_proper_references 'Statements & Proper References'
 alias print_code_cumulated_references 'Statements & Cumulated References'
 alias print_initial_precondition 'Initial Preconditions'
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Standard Sequential View}
 \label{subsubsection-standard-sequential-view}
@@ -5586,11 +5592,11 @@ alias print_initial_precondition 'Initial Preconditions'
 Display the code without any decoration.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 print_code                      > MODULE.printed_file
         < PROGRAM.entities
         < MODULE.code
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Sequential View with Transformers}
 
@@ -5598,7 +5604,7 @@ print_code                      > MODULE.printed_file
 Display the code decorated with the transformers.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 print_code_transformers         > MODULE.printed_file
         < PROGRAM.entities
         < MODULE.code
@@ -5606,11 +5612,11 @@ print_code_transformers         > MODULE.printed_file
         < MODULE.summary_transformer
         < MODULE.cumulated_effects
         < MODULE.summary_effects
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Initial Preconditions}
 
-\begin{verbatim}
+\begin{PipsMake}
 print_initial_precondition  > MODULE.printed_file
         < MODULE.initial_precondition
         < PROGRAM.entities
@@ -5618,7 +5624,7 @@ print_initial_precondition  > MODULE.printed_file
 print_program_precondition  > PROGRAM.printed_file
         < PROGRAM.program_precondition
         < PROGRAM.entities
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Sequential View with Complexities}
 
@@ -5626,13 +5632,13 @@ print_program_precondition  > PROGRAM.printed_file
 Display the code decorated with the complexities.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 print_code_complexities         > MODULE.printed_file
         < PROGRAM.entities
         < MODULE.code
         < MODULE.complexities
         < MODULE.summary_complexity
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Sequential View with Preconditions}
 
@@ -5640,7 +5646,7 @@ print_code_complexities         > MODULE.printed_file
 Display the code decorated with the preconditions.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 print_code_preconditions        > MODULE.printed_file
         < PROGRAM.entities
         < MODULE.code
@@ -5648,7 +5654,7 @@ print_code_preconditions        > MODULE.printed_file
         < MODULE.summary_precondition
         < MODULE.cumulated_effects
         < MODULE.summary_effects
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Sequential View with Total Preconditions}
 
@@ -5656,7 +5662,7 @@ print_code_preconditions        > MODULE.printed_file
 Display the code decorated with the total preconditions.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 print_code_total_preconditions        > MODULE.printed_file
         < PROGRAM.entities
         < MODULE.code
@@ -5664,7 +5670,7 @@ print_code_total_preconditions        > MODULE.printed_file
         < MODULE.summary_total_precondition
         < MODULE.cumulated_effects
         < MODULE.summary_effects
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Sequential View with Continuation Conditions}
 
@@ -5672,7 +5678,7 @@ print_code_total_preconditions        > MODULE.printed_file
 Display the code decorated with the continuation preconditions.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 print_code_continuation_conditions   > MODULE.printed_file
         < PROGRAM.entities
         < MODULE.parsed_code
@@ -5681,7 +5687,7 @@ print_code_continuation_conditions   > MODULE.printed_file
         < MODULE.must_summary_continuation
         < MODULE.may_summary_continuation
         < MODULE.cumulated_effects
-\end{verbatim}
+\end{PipsMake}
 
 
 \subsection{Sequential View with Regions}
@@ -5690,7 +5696,7 @@ print_code_continuation_conditions   > MODULE.printed_file
 Display the code decorated with the regions.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 print_code_regions              > MODULE.printed_file
         < PROGRAM.entities
         < MODULE.code
@@ -5699,7 +5705,7 @@ print_code_regions              > MODULE.printed_file
         < MODULE.preconditions
         < MODULE.transformers
         < MODULE.cumulated_effects
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Sequential View with Proper Regions}
 
@@ -5707,7 +5713,7 @@ print_code_regions              > MODULE.printed_file
 Display the code decorated with the proper regions.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 print_code_proper_regions              > MODULE.printed_file
         < PROGRAM.entities
         < MODULE.code
@@ -5716,7 +5722,7 @@ print_code_proper_regions              > MODULE.printed_file
         < MODULE.preconditions
         < MODULE.transformers
         < MODULE.cumulated_effects
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Sequential View with IN Regions}
 
@@ -5724,7 +5730,7 @@ print_code_proper_regions              > MODULE.printed_file
 Display the code decorated with the IN regions.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 print_code_in_regions              > MODULE.printed_file
         < PROGRAM.entities
         < MODULE.code
@@ -5733,7 +5739,7 @@ print_code_in_regions              > MODULE.printed_file
         < MODULE.preconditions
         < MODULE.transformers
         < MODULE.cumulated_effects
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Sequential View with OUT Regions}
 
@@ -5741,7 +5747,7 @@ print_code_in_regions              > MODULE.printed_file
 Display the code decorated with the OUT regions.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 print_code_out_regions              > MODULE.printed_file
         < PROGRAM.entities
         < MODULE.code
@@ -5750,7 +5756,7 @@ print_code_out_regions              > MODULE.printed_file
         < MODULE.preconditions
         < MODULE.transformers
         < MODULE.cumulated_effects
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Sequential View with Privatized Regions}
 
@@ -5758,7 +5764,7 @@ print_code_out_regions              > MODULE.printed_file
 Display the code decorated with the privatized regions.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 print_code_privatized_regions       > MODULE.printed_file
         < PROGRAM.entities
         < MODULE.code
@@ -5766,7 +5772,7 @@ print_code_privatized_regions       > MODULE.printed_file
         < MODULE.summary_effects
         < MODULE.privatized_regions
         < MODULE.copy_out_regions
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Sequential View with Complementary Sections}
 
@@ -5774,7 +5780,7 @@ print_code_privatized_regions       > MODULE.printed_file
 Display the code decorated with complementary sections.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 print_code_complementary_sections > MODULE.printed_file
         < PROGRAM.entities
         < MODULE.code
@@ -5783,7 +5789,7 @@ print_code_complementary_sections > MODULE.printed_file
         < MODULE.preconditions
         < MODULE.transformers
         < MODULE.cumulated_effects
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Sequential View with Proper Effects}
 
@@ -5791,23 +5797,23 @@ print_code_complementary_sections > MODULE.printed_file
 Display the code decorated with the proper effects.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 print_code_proper_effects       > MODULE.printed_file
         < PROGRAM.entities
         < MODULE.code
         < MODULE.proper_effects
-\end{verbatim}
+\end{PipsMake}
 
 %%@UserManualDocumentation: print_code_proper_references
 Display the code decorated with the proper references.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 print_code_proper_references       > MODULE.printed_file
         < PROGRAM.entities
         < MODULE.code
         < MODULE.proper_references
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Sequential View with Cumulated Effects}
 
@@ -5815,24 +5821,24 @@ print_code_proper_references       > MODULE.printed_file
 Display the code decorated with the cumulated effects.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 print_code_cumulated_effects    > MODULE.printed_file
         < PROGRAM.entities
         < MODULE.code
         < MODULE.cumulated_effects
         < MODULE.summary_effects
-\end{verbatim}
+\end{PipsMake}
 
 %%@UserManualDocumentation: print_code_cumulated_references
 Display the code decorated with the cumulated references.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 print_code_cumulated_references    > MODULE.printed_file
         < PROGRAM.entities
         < MODULE.code
         < MODULE.cumulated_references
-\end{verbatim}
+\end{PipsMake}
 
 
 \subsection{Sequential View with IN Effects}
@@ -5840,26 +5846,26 @@ print_code_cumulated_references    > MODULE.printed_file
 Display the code decorated with its IN effects.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 print_code_in_effects       > MODULE.printed_file
         < PROGRAM.entities
         < MODULE.code
         < MODULE.in_effects
         < MODULE.in_summary_effects
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Sequential View with OUT Effects}
 %%@UserManualDocumentation: print_code_out_effects
 Display the code decorated with its OUT effects.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 print_code_out_effects       > MODULE.printed_file
         < PROGRAM.entities
         < MODULE.code
         < MODULE.out_effects
         < MODULE.out_summary_effects
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Sequential View with Proper Reductions}
 
@@ -5867,12 +5873,12 @@ print_code_out_effects       > MODULE.printed_file
 Display the code decorated with the proper reductions.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 print_code_proper_reductions > MODULE.printed_file
   < PROGRAM.entities
   < MODULE.code
   < MODULE.proper_reductions
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Sequential View with Cumulated Reductions}
 
@@ -5880,13 +5886,13 @@ print_code_proper_reductions > MODULE.printed_file
 Display the code decorated with the cumulated reductions.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 print_code_cumulated_reductions > MODULE.printed_file
   < PROGRAM.entities
   < MODULE.code
   < MODULE.cumulated_reductions
   < MODULE.summary_reductions
-\end{verbatim}
+\end{PipsMake}
 
 
 \subsection{Sequential View with Static Control Information}
@@ -5895,12 +5901,12 @@ print_code_cumulated_reductions > MODULE.printed_file
 Display the code decorated with the static control.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 print_code_static_control       > MODULE.printed_file
         < PROGRAM.entities
         < MODULE.code
         < MODULE.static_control
-\end{verbatim}
+\end{PipsMake}
 
 \section{Printed Files with the Intraprocedural Control Graph}
 
@@ -5919,7 +5925,7 @@ used to produce this file.
 
 \subsection{Menu for Graph Views}
 
-\begin{verbatim}
+\begin{PipsMake}
 alias graph_printed_file 'Control Graph Sequential View'
 
 alias print_code_as_a_graph 'Graph with Statements Only'
@@ -5932,7 +5938,7 @@ alias print_code_as_a_graph_in_regions 'Graph with Statements & IN Regions'
 alias print_code_as_a_graph_out_regions 'Graph with Statements & OUT Regions'
 alias print_code_as_a_graph_proper_effects 'Graph with Statements & Proper Effects'
 alias print_code_as_a_graph_cumulated_effects 'Graph with Statements & Cumulated Effects'
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Standard Graph View}
 
@@ -5940,11 +5946,11 @@ alias print_code_as_a_graph_cumulated_effects 'Graph with Statements & Cumulated
 Display the code without any decoration.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 print_code_as_a_graph                      > MODULE.graph_printed_file
         < PROGRAM.entities
         < MODULE.code
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Graph View with Transformers}
 
@@ -5952,7 +5958,7 @@ print_code_as_a_graph                      > MODULE.graph_printed_file
 Display the code decorated with the transformers.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 print_code_as_a_graph_transformers         > MODULE.graph_printed_file
         < PROGRAM.entities
         < MODULE.code
@@ -5960,7 +5966,7 @@ print_code_as_a_graph_transformers         > MODULE.graph_printed_file
         < MODULE.summary_transformer
         < MODULE.cumulated_effects
         < MODULE.summary_effects
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Graph View with Complexities}
 
@@ -5968,13 +5974,13 @@ print_code_as_a_graph_transformers         > MODULE.graph_printed_file
 Display the code decorated with the complexities.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 print_code_as_a_graph_complexities         > MODULE.graph_printed_file
         < PROGRAM.entities
         < MODULE.code
         < MODULE.complexities
         < MODULE.summary_complexity
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Graph View with Preconditions}
 
@@ -5982,7 +5988,7 @@ print_code_as_a_graph_complexities         > MODULE.graph_printed_file
 Display the code decorated with the preconditions.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 print_code_as_a_graph_preconditions        > MODULE.graph_printed_file
         < PROGRAM.entities
         < MODULE.code
@@ -5990,7 +5996,7 @@ print_code_as_a_graph_preconditions        > MODULE.graph_printed_file
         < MODULE.summary_precondition
         < MODULE.cumulated_effects
         < MODULE.summary_effects
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Graph View with Preconditions}
 
@@ -5998,7 +6004,7 @@ print_code_as_a_graph_preconditions        > MODULE.graph_printed_file
 Display the code decorated with the preconditions.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 print_code_as_a_graph_total_preconditions        > MODULE.graph_printed_file
         < PROGRAM.entities
         < MODULE.code
@@ -6006,7 +6012,7 @@ print_code_as_a_graph_total_preconditions        > MODULE.graph_printed_file
         < MODULE.summary_total_postcondition
         < MODULE.cumulated_effects
         < MODULE.summary_effects
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Graph View with Regions}
 
@@ -6014,7 +6020,7 @@ print_code_as_a_graph_total_preconditions        > MODULE.graph_printed_file
 Display the code decorated with the regions.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 print_code_as_a_graph_regions              > MODULE.graph_printed_file
         < PROGRAM.entities
         < MODULE.code
@@ -6023,7 +6029,7 @@ print_code_as_a_graph_regions              > MODULE.graph_printed_file
         < MODULE.preconditions
         < MODULE.transformers
         < MODULE.cumulated_effects
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Graph View with IN Regions}
 
@@ -6031,7 +6037,7 @@ print_code_as_a_graph_regions              > MODULE.graph_printed_file
 Display the code decorated with the IN regions.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 print_code_as_a_graph_in_regions              > MODULE.graph_printed_file
         < PROGRAM.entities
         < MODULE.code
@@ -6040,7 +6046,7 @@ print_code_as_a_graph_in_regions              > MODULE.graph_printed_file
         < MODULE.preconditions
         < MODULE.transformers
         < MODULE.cumulated_effects
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Graph View with OUT Regions}
 
@@ -6048,7 +6054,7 @@ print_code_as_a_graph_in_regions              > MODULE.graph_printed_file
 Display the code decorated with the OUT regions.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 print_code_as_a_graph_out_regions              > MODULE.graph_printed_file
         < PROGRAM.entities
         < MODULE.code
@@ -6057,7 +6063,7 @@ print_code_as_a_graph_out_regions              > MODULE.graph_printed_file
         < MODULE.preconditions
         < MODULE.transformers
         < MODULE.cumulated_effects
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Graph View with Proper Effects}
 
@@ -6065,12 +6071,12 @@ print_code_as_a_graph_out_regions              > MODULE.graph_printed_file
 Display the code decorated with the proper effects.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 print_code_as_a_graph_proper_effects       > MODULE.graph_printed_file
         < PROGRAM.entities
         < MODULE.code
         < MODULE.proper_effects
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Graph View with Cumulated Effects}
 
@@ -6078,13 +6084,13 @@ print_code_as_a_graph_proper_effects       > MODULE.graph_printed_file
 Display the code decorated with the cumulated effects.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 print_code_as_a_graph_cumulated_effects    > MODULE.graph_printed_file
         < PROGRAM.entities
         < MODULE.code
         < MODULE.cumulated_effects
         < MODULE.summary_effects
-\end{verbatim}
+\end{PipsMake}
 
 
 \section{Parallel Printed Files}
@@ -6107,7 +6113,7 @@ date). The result is stored in a file suffixed by \verb+.parf+.
 
 \subsection{Menu for Parallel View}
 
-\begin{verbatim}
+\begin{PipsMake}
 alias parallelprinted_file 'Parallel View'
 
 alias print_parallelized77_code 'Fortran 77'
@@ -6115,7 +6121,7 @@ alias print_parallelizedHPF_code 'HPF directives'
 alias print_parallelizedOMP_code 'OMP directives'
 alias print_parallelized90_code 'Fortran 90'
 alias print_parallelizedcray_code 'Fortran Cray'
-\end{verbatim}
+\end{PipsMake}
 
 
 \subsection{Fortran 77 Parallel View}
@@ -6124,11 +6130,11 @@ alias print_parallelizedcray_code 'Fortran Cray'
 Output a Fortran-77 code extended with {\tt DOALL} parallel constructs.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 print_parallelized77_code       > MODULE.parallelprinted_file
         < PROGRAM.entities
         < MODULE.parallelized_code
-\end{verbatim}
+\end{PipsMake}
 
 %% print_parallelized_code       > MODULE.parallelprinted_file
 %%        < PROGRAM.entities
@@ -6141,11 +6147,11 @@ print_parallelized77_code       > MODULE.parallelprinted_file
 Output the code decorated with HPF directives.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 print_parallelizedHPF_code     > MODULE.parallelprinted_file
         < PROGRAM.entities
         < MODULE.parallelized_code
-\end{verbatim}
+\end{PipsMake}
 
 
 \subsection{OpenMP Directives Parallel View}
@@ -6154,11 +6160,11 @@ print_parallelizedHPF_code     > MODULE.parallelprinted_file
 Output the code decorated with OpenMP (OMP) directives.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 print_parallelizedOMP_code     > MODULE.parallelprinted_file
         < PROGRAM.entities
         < MODULE.parallelized_code
-\end{verbatim}
+\end{PipsMake}
 
 
 \subsection{Fortran 90 Parallel View}
@@ -6167,11 +6173,11 @@ print_parallelizedOMP_code     > MODULE.parallelprinted_file
 Output the code with some Fortran-90 array construct style.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 print_parallelized90_code       > MODULE.parallelprinted_file
         < PROGRAM.entities
         < MODULE.parallelized_code
-\end{verbatim}
+\end{PipsMake}
 
 
 \subsection{Cray Fortran Parallel View}
@@ -6182,12 +6188,12 @@ Cray parallelization algorithm should have been used in order to match
 Cray directives for parallel vector processors.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 print_parallelizedcray_code     > MODULE.parallelprinted_file
         < PROGRAM.entities
         < MODULE.parallelized_code
         < MODULE.cumulated_effects
-\end{verbatim}
+\end{PipsMake}
 
 
 \section{Call Graph Files}
@@ -6228,7 +6234,7 @@ Aliases for call graphs must de different from aliases for
 interprocedural control flow graphs (ICFG). A simple trick, a trailing
 SPACE character, is used.
 
-\begin{verbatim}
+\begin{PipsMake}
 alias callgraph_file 'Callgraph View'
 
 alias print_call_graph 'Calls'
@@ -6241,40 +6247,40 @@ alias print_call_graph_with_cumulated_effects 'Calls & Cumulated effects'
 alias print_call_graph_with_regions 'Calls & Regions'
 alias print_call_graph_with_in_regions 'Calls & In Regions'
 alias print_call_graph_with_out_regions 'Calls & Out regions'
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Standard Call Graphs}
 
 %%@UserManualDocumentation: print_call_graph
 To have the call graph without any decoration.
 %%!UserManualDocumentation
-\begin{verbatim}
+\begin{PipsMake}
 print_call_graph                         > MODULE.callgraph_file
         < PROGRAM.entities
         < MODULE.code
         < CALLEES.callgraph_file
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Call Graphs with Complexities}
 
 %%@UserManualDocumentation: print_call_graph_with_complexities
 To have the call graph decorated with the complexities.
 %%!UserManualDocumentation
-\begin{verbatim}
+\begin{PipsMake}
 print_call_graph_with_complexities     > MODULE.callgraph_file
         < PROGRAM.entities
         < MODULE.code
         < CALLEES.callgraph_file
         < MODULE.summary_complexity
         < MODULE.complexities
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Call Graphs with Preconditions}
 
 %%@UserManualDocumentation: print_call_graph_with_preconditions
 To have the call graph decorated with the preconditions.
 %%!UserManualDocumentation
-\begin{verbatim}
+\begin{PipsMake}
 print_call_graph_with_preconditions      > MODULE.callgraph_file
         < PROGRAM.entities
         < MODULE.code
@@ -6283,14 +6289,14 @@ print_call_graph_with_preconditions      > MODULE.callgraph_file
         < MODULE.summary_effects
         < MODULE.preconditions
         < MODULE.cumulated_effects
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Call Graphs with Total Preconditions}
 
 %%@UserManualDocumentation: print_call_graph_with_total_preconditions
 To have the call graph decorated with the total preconditions.
 %%!UserManualDocumentation
-\begin{verbatim}
+\begin{PipsMake}
 print_call_graph_with_total_preconditions      > MODULE.callgraph_file
         < PROGRAM.entities
         < MODULE.code
@@ -6299,14 +6305,14 @@ print_call_graph_with_total_preconditions      > MODULE.callgraph_file
         < MODULE.summary_effects
         < MODULE.total_preconditions
         < MODULE.cumulated_effects
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Call Graphs with Transformers}
 
 %%@UserManualDocumentation: print_call_graph_with_transformers
 To have the call graph decorated with the transformers.
 %%!UserManualDocumentation
-\begin{verbatim}
+\begin{PipsMake}
 print_call_graph_with_transformers       > MODULE.callgraph_file
         < PROGRAM.entities
         < MODULE.code
@@ -6315,41 +6321,41 @@ print_call_graph_with_transformers       > MODULE.callgraph_file
         < MODULE.summary_effects
         < MODULE.transformers
         < MODULE.cumulated_effects
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Call Graphs with Proper Effects}
 
 %%@UserManualDocumentation: print_call_graph_with_proper_effects
 To have the call graph decorated with the proper effects.
 %%!UserManualDocumentation
-\begin{verbatim}
+\begin{PipsMake}
 print_call_graph_with_proper_effects     > MODULE.callgraph_file
         < PROGRAM.entities
         < MODULE.code
         < CALLEES.callgraph_file
         < MODULE.proper_effects
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Call Graphs with Cumulated Effects}
 
 %%@UserManualDocumentation: print_call_graph_with_cumulated_effects
 To have the call graph decorated with the cumulated effects.
 %%!UserManualDocumentation
-\begin{verbatim}
+\begin{PipsMake}
 print_call_graph_with_cumulated_effects  > MODULE.callgraph_file
         < PROGRAM.entities
         < MODULE.code
         < CALLEES.callgraph_file
         < MODULE.cumulated_effects
         < MODULE.summary_effects
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Call Graphs with Regions}
 
 %%@UserManualDocumentation: print_call_graph_with_regions
 To have the call graph decorated with the regions.
 %%!UserManualDocumentation
-\begin{verbatim}
+\begin{PipsMake}
 print_call_graph_with_regions            > MODULE.callgraph_file
         < PROGRAM.entities
         < MODULE.code
@@ -6359,14 +6365,14 @@ print_call_graph_with_regions            > MODULE.callgraph_file
         < MODULE.preconditions
         < MODULE.transformers
         < MODULE.cumulated_effects
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Call Graphs with IN Regions}
 
 %%@UserManualDocumentation: print_call_graph_with_in_regions
 To have the call graph decorated with the IN regions.
 %%!UserManualDocumentation
-\begin{verbatim}
+\begin{PipsMake}
 print_call_graph_with_in_regions         > MODULE.callgraph_file
         < PROGRAM.entities
         < MODULE.code
@@ -6376,14 +6382,14 @@ print_call_graph_with_in_regions         > MODULE.callgraph_file
         < MODULE.preconditions
         < MODULE.transformers
         < MODULE.cumulated_effects
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Call Graphs with OUT Regions}
 
 %%@UserManualDocumentation: print_call_graph_with_out_regions
 To have the call graph decorated with the OUT regions.
 %%!UserManualDocumentation
-\begin{verbatim}
+\begin{PipsMake}
 print_call_graph_with_out_regions        > MODULE.callgraph_file
         < PROGRAM.entities
         < MODULE.code
@@ -6393,7 +6399,7 @@ print_call_graph_with_out_regions        > MODULE.callgraph_file
         < MODULE.preconditions
         < MODULE.transformers
         < MODULE.cumulated_effects
-\end{verbatim}
+\end{PipsMake}
 
 \section{DrawGraph Interprocedural Control Flow Graph Files (DVICFG)}
 
@@ -6404,24 +6410,24 @@ daVinci). This should be generalized to be less tool-dependent.
 %%!UserManualDocumentation
 
 \subsection{Menu for DVICFG's}
-\begin{verbatim}
+\begin{PipsMake}
 alias dvicfg_file 'DVICFG View'
 
 alias print_dvicfg_with_filtered_proper_effects 'Graphical Calls & Filtered proper effects'
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Minimal ICFG with graphical filtered Proper Effects}
 %%@UserManualDocumentation: print_dvicfg_with_filtered_proper_effects
 Display the ICFG graphically decorated with the write proper effects filtered for a variable.
 %%!UserManualDocumentation
-\begin{verbatim}
+\begin{PipsMake}
 print_dvicfg_with_filtered_proper_effects           > MODULE.dvicfg_file
         < PROGRAM.entities
         < MODULE.code
         < CALLEES.dvicfg_file
         < MODULE.proper_effects
         < CALLEES.summary_effects
-\end{verbatim}
+\end{PipsMake}
 
 \section{Interprocedural Control Flow Graph Files (ICFG)}
 
@@ -6446,7 +6452,7 @@ Note: In order to avoid conflicts with callgraph aliases, a space
 character is appended at each alias shared with call graph related
 functions (Guillaume \textsc{Oget}).
 
-\begin{verbatim}
+\begin{PipsMake}
 alias icfg_file 'ICFG View'
 
 alias print_icfg 'Calls '
@@ -6482,33 +6488,33 @@ alias print_icfg_with_control_cumulated_effects 'Calls & Control & Cumulated eff
 alias print_icfg_with_control_regions 'Calls & Control & Regions'
 alias print_icfg_with_control_in_regions 'Calls & Control & In Regions'
 alias print_icfg_with_control_out_regions 'Calls & Control & Out regions'
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Minimal ICFG}
 
 %%@UserManualDocumentation: print_icfg
 Display the plain ICFG, without any decoration.
 %%!UserManualDocumentation
-\begin{verbatim}
+\begin{PipsMake}
 print_icfg                      > MODULE.icfg_file
         < PROGRAM.entities
         < MODULE.code
         < CALLEES.icfg_file
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Minimal ICFG with Complexities}
 
 %%@UserManualDocumentation: print_icfg_with_complexities
 Display the ICFG decorated with complexities.
 %%!UserManualDocumentation
-\begin{verbatim}
+\begin{PipsMake}
 print_icfg_with_complexities            > MODULE.icfg_file
         < PROGRAM.entities
         < MODULE.code
         < CALLEES.icfg_file
         < MODULE.summary_complexity
         < MODULE.complexities
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Minimal ICFG with Preconditions}
 
@@ -6517,7 +6523,7 @@ Display the ICFG decorated with preconditions. They are expressed in the
 \emph{callee} name space to evaluate the interest of cloning, depending on
 the information available to the callee at a given call site.
 %%!UserManualDocumentation
-\begin{verbatim}
+\begin{PipsMake}
 print_icfg_with_preconditions            > MODULE.icfg_file
         < PROGRAM.entities
         < MODULE.code
@@ -6526,7 +6532,7 @@ print_icfg_with_preconditions            > MODULE.icfg_file
         < MODULE.summary_effects
         < MODULE.preconditions
         < MODULE.cumulated_effects
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Minimal ICFG with Preconditions}
 
@@ -6535,7 +6541,7 @@ Display the ICFG decorated with total preconditions. They are expressed in the
 \emph{callee} name space to evaluate the interest of cloning, depending on
 the information available to the callee at a given call site.
 %%!UserManualDocumentation
-\begin{verbatim}
+\begin{PipsMake}
 print_icfg_with_total_preconditions            > MODULE.icfg_file
         < PROGRAM.entities
         < MODULE.code
@@ -6544,14 +6550,14 @@ print_icfg_with_total_preconditions            > MODULE.icfg_file
         < MODULE.summary_effects
         < MODULE.total_preconditions
         < MODULE.cumulated_effects
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Minimal ICFG with Transformers}
 
 %%@UserManualDocumentation: print_icfg_with_transformers
 Display the ICFG decorated with transformers.
 %%!UserManualDocumentation
-\begin{verbatim}
+\begin{PipsMake}
 print_icfg_with_transformers             > MODULE.icfg_file
         < PROGRAM.entities
         < MODULE.code
@@ -6559,54 +6565,54 @@ print_icfg_with_transformers             > MODULE.icfg_file
         < MODULE.transformers
         < MODULE.summary_transformer
         < MODULE.cumulated_effects
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Minimal ICFG with Proper Effects}
 
 %%@UserManualDocumentation: print_icfg_with_proper_effects
 Display the ICFG decorated with the proper effects.
 %%!UserManualDocumentation
-\begin{verbatim}
+\begin{PipsMake}
 print_icfg_with_proper_effects           > MODULE.icfg_file
         < PROGRAM.entities
         < MODULE.code
         < CALLEES.icfg_file
         < MODULE.proper_effects
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Minimal ICFG with filtered Proper Effects}
 %%@UserManualDocumentation: print_icfg_with_filtered_proper_effects
 Display the ICFG decorated with the write proper effects filtered for a variable.
 %%!UserManualDocumentation
-\begin{verbatim}
+\begin{PipsMake}
 print_icfg_with_filtered_proper_effects           > MODULE.icfg_file
         < PROGRAM.entities
         < MODULE.code
         < CALLEES.icfg_file
         < MODULE.proper_effects
         < CALLEES.summary_effects
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Minimal ICFG with Cumulated Effects}
 
 %%@UserManualDocumentation: print_icfg_with_cumulated_effects
 Display the ICFG decorated with cumulated effects.
 %%!UserManualDocumentation
-\begin{verbatim}
+\begin{PipsMake}
 print_icfg_with_cumulated_effects        > MODULE.icfg_file
         < PROGRAM.entities
         < MODULE.code
         < CALLEES.icfg_file
         < MODULE.cumulated_effects
         < MODULE.summary_effects
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Minimal ICFG with Regions}
 
 %%@UserManualDocumentation: print_icfg_with_regions
 Display the ICFG decorated with regions.
 %%!UserManualDocumentation
-\begin{verbatim}
+\begin{PipsMake}
 print_icfg_with_regions                  > MODULE.icfg_file
         < PROGRAM.entities
         < MODULE.code
@@ -6616,14 +6622,14 @@ print_icfg_with_regions                  > MODULE.icfg_file
         < MODULE.preconditions
         < MODULE.transformers
         < MODULE.cumulated_effects
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Minimal ICFG with IN Regions}
 
 %%@UserManualDocumentation: print_icfg_with_in_regions
 Display the ICFG decorated with IN regions.
 %%!UserManualDocumentation
-\begin{verbatim}
+\begin{PipsMake}
 print_icfg_with_in_regions               > MODULE.icfg_file
         < PROGRAM.entities
         < MODULE.code
@@ -6633,14 +6639,14 @@ print_icfg_with_in_regions               > MODULE.icfg_file
         < MODULE.preconditions
         < MODULE.transformers
         < MODULE.cumulated_effects
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Minimal ICFG with OUT Regions}
 
 %%@UserManualDocumentation: print_icfg_with_out_regions
 Display the ICFG decorated with OUT regions.
 %%!UserManualDocumentation
-\begin{verbatim}
+\begin{PipsMake}
 print_icfg_with_out_regions              > MODULE.icfg_file
         < PROGRAM.entities
         < MODULE.code
@@ -6650,40 +6656,40 @@ print_icfg_with_out_regions              > MODULE.icfg_file
         < MODULE.preconditions
         < MODULE.transformers
         < MODULE.cumulated_effects
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{ICFG with Loops}
 
 %%@UserManualDocumentation: print_icfg_with_loops 
 Display the plain ICFG with loops, without any decoration.
 %%!UserManualDocumentation
-\begin{verbatim}
+\begin{PipsMake}
 print_icfg_with_loops                    > MODULE.icfg_file
         < PROGRAM.entities
         < MODULE.code
         < CALLEES.icfg_file
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{ICFG with Loops and Complexities}
 
 %%@UserManualDocumentation: print_icfg_with_loops_complexities
 Display the ICFG decorated with loops and complexities.
 %%!UserManualDocumentation
-\begin{verbatim}
+\begin{PipsMake}
 print_icfg_with_loops_complexities       > MODULE.icfg_file
         < PROGRAM.entities
         < MODULE.code
         < CALLEES.icfg_file
         < MODULE.summary_complexity
         < MODULE.complexities
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{ICFG with Loops and Preconditions}
 
 %%@UserManualDocumentation: print_icfg_with_loops_preconditions
 Display the ICFG decorated with preconditions.
 %%!UserManualDocumentation
-\begin{verbatim}
+\begin{PipsMake}
 print_icfg_with_loops_preconditions      > MODULE.icfg_file
         < PROGRAM.entities
         < MODULE.code
@@ -6691,14 +6697,14 @@ print_icfg_with_loops_preconditions      > MODULE.icfg_file
         < MODULE.summary_precondition
         < MODULE.preconditions
         < MODULE.cumulated_effects
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{ICFG with Loops and Total Preconditions}
 
 %%@UserManualDocumentation: print_icfg_with_loops_total_preconditions
 Display the ICFG decorated with total preconditions.
 %%!UserManualDocumentation
-\begin{verbatim}
+\begin{PipsMake}
 print_icfg_with_loops_total_preconditions      > MODULE.icfg_file
         < PROGRAM.entities
         < MODULE.code
@@ -6706,14 +6712,14 @@ print_icfg_with_loops_total_preconditions      > MODULE.icfg_file
         < MODULE.summary_total_postcondition
         < MODULE.total_preconditions
         < MODULE.cumulated_effects
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{ICFG with Loops and Transformers}
 
 %%@UserManualDocumentation: print_icfg_with_loops_transformers
 Display the ICFG decorated with transformers.
 %%!UserManualDocumentation
-\begin{verbatim}
+\begin{PipsMake}
 print_icfg_with_loops_transformers       > MODULE.icfg_file
         < PROGRAM.entities
         < MODULE.code
@@ -6721,41 +6727,41 @@ print_icfg_with_loops_transformers       > MODULE.icfg_file
         < MODULE.transformers
         < MODULE.summary_transformer
         < MODULE.cumulated_effects
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{ICFG with Loops and Proper Effects}
 
 %%@UserManualDocumentation: print_icfg_with_loops_proper_effects
 Display the ICFG decorated with proper effects.
 %%!UserManualDocumentation
-\begin{verbatim}
+\begin{PipsMake}
 print_icfg_with_loops_proper_effects     > MODULE.icfg_file
         < PROGRAM.entities
         < MODULE.code
         < CALLEES.icfg_file
         < MODULE.proper_effects
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{ICFG with Loops and Cumulated Effects}
 
 %%@UserManualDocumentation: print_icfg_with_loops_cumulated_effects
 Display the ICFG decorated with cumulated effects.
 %%!UserManualDocumentation
-\begin{verbatim}
+\begin{PipsMake}
 print_icfg_with_loops_cumulated_effects        > MODULE.icfg_file
         < PROGRAM.entities
         < MODULE.code
         < CALLEES.icfg_file
         < MODULE.cumulated_effects
         < MODULE.summary_effects
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{ICFG with Loops and Regions}
 
 %%@UserManualDocumentation: print_icfg_with_loops_regions
 Display the ICFG decorated with regions.
 %%!UserManualDocumentation
-\begin{verbatim}
+\begin{PipsMake}
 print_icfg_with_loops_regions            > MODULE.icfg_file
         < PROGRAM.entities
         < MODULE.code
@@ -6765,14 +6771,14 @@ print_icfg_with_loops_regions            > MODULE.icfg_file
         < MODULE.preconditions
         < MODULE.transformers
         < MODULE.cumulated_effects
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{ICFG with Loops and IN Regions}
 
 %%@UserManualDocumentation: print_icfg_with_loops_in_regions
 Display the ICFG decorated with IN regions.
 %%!UserManualDocumentation
-\begin{verbatim}
+\begin{PipsMake}
 print_icfg_with_loops_in_regions         > MODULE.icfg_file
         < PROGRAM.entities
         < MODULE.code
@@ -6782,14 +6788,14 @@ print_icfg_with_loops_in_regions         > MODULE.icfg_file
         < MODULE.preconditions
         < MODULE.transformers
         < MODULE.cumulated_effects
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{ICFG with Loops and OUT Regions}
 
 %%@UserManualDocumentation: print_icfg_with_loops_out_regions
 Display the ICFG decorated with the OUT regions.
 %%!UserManualDocumentation
-\begin{verbatim}
+\begin{PipsMake}
 print_icfg_with_loops_out_regions        > MODULE.icfg_file
         < PROGRAM.entities
         < MODULE.code
@@ -6799,40 +6805,40 @@ print_icfg_with_loops_out_regions        > MODULE.icfg_file
         < MODULE.preconditions
         < MODULE.transformers
         < MODULE.cumulated_effects
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{ICFG with Control}
 
 %%@UserManualDocumentation: print_icfg_with_control
 Display the plain ICFG with loops, without any decoration.
 %%!UserManualDocumentation
-\begin{verbatim}
+\begin{PipsMake}
 print_icfg_with_control         > MODULE.icfg_file
         < PROGRAM.entities
         < MODULE.code
         < CALLEES.icfg_file
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{ICFG with Control and Complexities}
 
 %%@UserManualDocumentation: print_icfg_with_control_complexities
 Display the ICFG decorated with the complexities.
 %%!UserManualDocumentation
-\begin{verbatim}
+\begin{PipsMake}
 print_icfg_with_control_complexities    > MODULE.icfg_file
         < PROGRAM.entities
         < MODULE.code
         < CALLEES.icfg_file
         < MODULE.summary_complexity
         < MODULE.complexities
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{ICFG with Control and Preconditions}
 
 %%@UserManualDocumentation: print_icfg_with_control_preconditions
 Display the ICFG decorated with the preconditions.
 %%!UserManualDocumentation
-\begin{verbatim}
+\begin{PipsMake}
 print_icfg_with_control_preconditions   > MODULE.icfg_file
         < PROGRAM.entities
         < MODULE.code
@@ -6840,14 +6846,14 @@ print_icfg_with_control_preconditions   > MODULE.icfg_file
         < MODULE.summary_precondition
         < MODULE.preconditions
         < MODULE.cumulated_effects
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{ICFG with Control and Total Preconditions}
 
 %%@UserManualDocumentation: print_icfg_with_control_total_preconditions
 Display the ICFG decorated with the preconditions.
 %%!UserManualDocumentation
-\begin{verbatim}
+\begin{PipsMake}
 print_icfg_with_control_total_preconditions   > MODULE.icfg_file
         < PROGRAM.entities
         < MODULE.code
@@ -6855,14 +6861,14 @@ print_icfg_with_control_total_preconditions   > MODULE.icfg_file
         < MODULE.summary_total_postcondition
         < MODULE.total_preconditions
         < MODULE.cumulated_effects
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{ICFG with Control and Transformers}
 
 %%@UserManualDocumentation: print_icfg_with_control_transformers
 Display the ICFG decorated with the transformers.
 %%!UserManualDocumentation
-\begin{verbatim}
+\begin{PipsMake}
 print_icfg_with_control_transformers    > MODULE.icfg_file
         < PROGRAM.entities
         < MODULE.code
@@ -6870,41 +6876,41 @@ print_icfg_with_control_transformers    > MODULE.icfg_file
         < MODULE.transformers
         < MODULE.summary_transformer
         < MODULE.cumulated_effects
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{ICFG with Control and Proper Effects}
 
 %%@UserManualDocumentation: print_icfg_with_control_proper_effects
 Display the ICFG decorated with the proper effects.
 %%!UserManualDocumentation
-\begin{verbatim}
+\begin{PipsMake}
 print_icfg_with_control_proper_effects  > MODULE.icfg_file
         < PROGRAM.entities
         < MODULE.code
         < CALLEES.icfg_file
         < MODULE.proper_effects
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{ICFG with Control and Cumulated Effects}
 
 %%@UserManualDocumentation: print_icfg_with_control_cumulated_effects
 Display the ICFG decorated with the cumulated effects.
 %%!UserManualDocumentation
-\begin{verbatim}
+\begin{PipsMake}
 print_icfg_with_control_cumulated_effects   > MODULE.icfg_file
         < PROGRAM.entities
         < MODULE.code
         < CALLEES.icfg_file
         < MODULE.cumulated_effects
         < MODULE.summary_effects
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{ICFG with Control and Regions}
 
 %%@UserManualDocumentation: print_icfg_with_control_regions
 Display the ICFG decorated with the regions.
 %%!UserManualDocumentation
-\begin{verbatim}
+\begin{PipsMake}
 print_icfg_with_control_regions         > MODULE.icfg_file
         < PROGRAM.entities
         < MODULE.code
@@ -6914,14 +6920,14 @@ print_icfg_with_control_regions         > MODULE.icfg_file
         < MODULE.preconditions
         < MODULE.transformers
         < MODULE.cumulated_effects
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{ICFG with Control and IN Regions}
 
 %%@UserManualDocumentation: print_icfg_with_control_in_regions
 Display the ICFG decorated with the IN regions.
 %%!UserManualDocumentation
-\begin{verbatim}
+\begin{PipsMake}
 print_icfg_with_control_in_regions      > MODULE.icfg_file
         < PROGRAM.entities
         < MODULE.code
@@ -6931,14 +6937,14 @@ print_icfg_with_control_in_regions      > MODULE.icfg_file
         < MODULE.preconditions
         < MODULE.transformers
         < MODULE.cumulated_effects
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{ICFG with Control and OUT Regions}
 
 %%@UserManualDocumentation: print_icfg_with_control_out_regions
 Display the ICFG decorated with the OUT regions.
 %%!UserManualDocumentation
-\begin{verbatim}
+\begin{PipsMake}
 print_icfg_with_control_out_regions     > MODULE.icfg_file
         < PROGRAM.entities
         < MODULE.code
@@ -6948,7 +6954,7 @@ print_icfg_with_control_out_regions     > MODULE.icfg_file
         < MODULE.preconditions
         < MODULE.transformers
         < MODULE.cumulated_effects
-\end{verbatim}
+\end{PipsMake}
 
 \section{Dependence Graph File}
 \label{subsection-dependence-graph-file}
@@ -6976,7 +6982,7 @@ is set to FALSE by default.
 
 \subsection{Menu For Dependence Graph Views}
 
-\begin{verbatim}
+\begin{PipsMake}
 alias dg_file 'Dependence Graph View'
 
 alias   print_effective_dependence_graph    'Default'
@@ -6986,7 +6992,7 @@ alias   print_chains_graph                  'Chains'
 alias   print_filtered_dependence_graph     'Filtered Arcs'
 alias   print_filtered_dependence_daVinci_graph   'Filtered Arcs Output to uDrawGraph'
 alias   impact_check                        'Check alias impact'
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Effective Dependence Graph View}
 
@@ -6995,12 +7001,12 @@ Display dependence levels for loop-carried and non-loop-carried dependence
 arcs due to non-privatized variables. Do not display dependence cones.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 print_effective_dependence_graph          > MODULE.dg_file
         < PROGRAM.entities
         < MODULE.code
         < MODULE.dg
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Loop-Carried Dependence Graph View}
 
@@ -7009,12 +7015,12 @@ Display dependence levels for loop-carried dependence arcs only. Ignore
 arcs labeled by private variables and do not print dependence cones.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 print_loop_carried_dependence_graph          > MODULE.dg_file
         < PROGRAM.entities
         < MODULE.code
         < MODULE.dg
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Whole Dependence Graph View}
 
@@ -7025,12 +7031,12 @@ due to a private variable (and ignored by parallelization algorithms) or
 not. Dependence cones labeling arcs are printed too.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 print_whole_dependence_graph          > MODULE.dg_file
         < PROGRAM.entities
         < MODULE.code
         < MODULE.dg
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Filtered Dependence Graph View}
 
@@ -7040,12 +7046,12 @@ some variables.\marginpar{RK: which one? FI: user\_request? Not found
 in validation suite.}
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 print_filtered_dependence_graph          > MODULE.dg_file
         < PROGRAM.entities
         < MODULE.code
         < MODULE.dg
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Filtered Dependence daVinci Graph View}
 
@@ -7054,12 +7060,12 @@ Same as \texttt{print\_filtered\_dependence\_graph} but its output is
 \PuDrawGraph format.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 print_filtered_dependence_daVinci_graph          > MODULE.dvdg_file
         < PROGRAM.entities
         < MODULE.code
         < MODULE.dg
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Filtered Dependence Graph View}
 
@@ -7068,7 +7074,7 @@ Check impact of alias on the dependance graph.\marginpar{RK: What is
 that? FI: Maybe, we should sign how contributions? See validation?}
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 impact_check    > MODULE.code
         < PROGRAM.entities
         < MODULE.alias_associations
@@ -7079,16 +7085,16 @@ impact_check    > MODULE.code
         < MODULE.summary_precondition
         < MODULE.dg
         < ALL.code
-\end{verbatim}
+\end{PipsMake}
 
 \subsection{Chains Graph View}
 
-\begin{verbatim}
+\begin{PipsMake}
 print_chains_graph      > MODULE.dg_file
         < PROGRAM.entities
         < MODULE.code
         < MODULE.chains
-\end{verbatim}
+\end{PipsMake}
 
 
 \section{Prettyprinters for C}
@@ -7097,14 +7103,14 @@ A very basic and experimental C dumper to output a Fortran program in C
 code. It is not the same as the default pretty printer that is used the
 normal way to pretty print C code in C.
 
-\begin{verbatim}
+\begin{PipsMake}
 print_crough  > MODULE.crough
               < PROGRAM.entities
               < MODULE.code
 
 print_c_code  > MODULE.c_printed_file
               < MODULE.crough
-\end{verbatim}
+\end{PipsMake}
 
 
 \section{Prettyprinters Smalltalk}
@@ -7128,13 +7134,13 @@ written in SmallTalk and take circuit behaviour in SmallTalk.
 
 It is an interesting language fusion...
 
-\begin{verbatim}
+\begin{PipsMake}
 alias print_code_smalltalk 'Smalltalk Pretty-Printer'
 
 print_code_smalltalk        > MODULE.smalltalk_code_file
         < PROGRAM.entities
         < MODULE.code
-\end{verbatim}
+\end{PipsMake}
 
 
 \section{Prettyprinter for CLAIRE}
@@ -7160,7 +7166,7 @@ If the input code does not meet these conditions, a user error is generated.
 This pass is used for the specification input and transformation in the XML format which can further be used by number of application as input. This function can be viewed as a XML pretty-printer of a subset of C and Fortran programs.
 %%@!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 alias print_xml_code 'Xml Pretty-Printer'
 
 print_xml_code      > MODULE.xml_printed_file
@@ -7169,7 +7175,7 @@ print_xml_code      > MODULE.xml_printed_file
     < MODULE.complexities
     < MODULE.preconditions
     < MODULE.regions
-\end{verbatim}
+\end{PipsMake}
 
 %%@UserManualDocumentation: print_xml_code_with_explicit_motif
 This phase was developped for the DREAM-UP/Ter@ops project to generate models
@@ -7179,13 +7185,13 @@ input contains explicitly loops to scan motifs. It is useless for
 other purposes. \marginpar{RK: gnih? FI: to be deleted? CA: more to say?}
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 alias print_xml_code_with_explicit_motif 'Xml Pretty-Printer with explicit motif'
 
 print_xml_code_with_explicit_motif       > MODULE.xml_printed_file
         < PROGRAM.entities
     < MODULE.code
-\end{verbatim}
+\end{PipsMake}
 
 %%@UserManualDocumentation: print_claire_code
 This pass is used in the DREAM-UP project for module specification
@@ -7193,7 +7199,7 @@ input and transformation (?)~\cite{}. This function can be viewed as a
 CLAIRE pretty-printer of a subset of Fortran.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 alias print_claire_code 'Claire Pretty-Printer'
 
 print_claire_code        > MODULE.claire_printed_file
@@ -7201,7 +7207,7 @@ print_claire_code        > MODULE.claire_printed_file
         < MODULE.code
         < MODULE.preconditions
         < MODULE.regions
-\end{verbatim}
+\end{PipsMake}
 
 
 %%@UserManualDocumentation: print_claire_code_with_explicit_motif
@@ -7209,13 +7215,13 @@ This pass generates CLAIRE code like the \textsc{print\_claire\_code}
 pass, but the input contains explicitly loops to scan motifs.
 %%!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 alias print_claire_code_with_explicit_motif 'Claire Pretty-Printer with explicit motif'
 
 print_claire_code_with_explicit_motif       > MODULE.claire_printed_file
         < PROGRAM.entities
         < MODULE.code
-\end{verbatim}
+\end{PipsMake}
 
 
 %%@UserManualDocumentation: print_xml_application
@@ -7224,7 +7230,7 @@ of functions and application used for automatic mapping by SPEAR.
 It generates XML code.
 %%@!UserManualDocumentation
 
-\begin{verbatim}
+\begin{PipsMake}
 alias print_xml_application 'Teraops Xml Pretty-Printer'
 
 print_xml_application      > MODULE.xml_printed_file
@@ -7235,7 +7241,7 @@ print_xml_application      > MODULE.xml_printed_file
     < MODULE.summary_effects
     < MODULE.regions       
     < CALLEES.summary_effects
-\end{verbatim}
+\end{PipsMake}
 
 \chapter{Feautrier Methods (a.k.a. Polyhedral Method)}
 \label{section-feautrier-methods}
@@ -7269,12 +7275,12 @@ is not specified here for implementation bug purpose.
 The definition of a static control program is given in~\cite{Fea91}.
 %%!UserManualDocumentation
 
-% \begin{verbatim}
+% \begin{PipsMake}
 % alias static_controlize 'Static Controlize'
 % static_controlize               > MODULE.static_control
 %         < PROGRAM.entities
 %         < MODULE.code
-% \end{verbatim}
+% \end{PipsMake}
 
 See the alias \verb|print_code_static_control| and function
 \verb|print_code_static_control| in
@@ -7314,7 +7320,7 @@ The following describes the output of an Array DFG analysis:
 \end{description}
 Known bug: what happens if the input is not a static control program?
 
-% \begin{verbatim}
+% \begin{PipsMake}
 
 % array_dfg                       > MODULE.adfg
 %         < PROGRAM.entities
@@ -7322,10 +7328,10 @@ Known bug: what happens if the input is not a static control program?
 %         < MODULE.static_control
 %         < MODULE.dg
 %         < MODULE.preconditions
-% \end{verbatim}
+% \end{PipsMake}
 
 
-% \begin{verbatim}
+% \begin{PipsMake}
 
 % alias adfg_file 'Array Data Flow Graph'
 
@@ -7333,7 +7339,7 @@ Known bug: what happens if the input is not a static control program?
 %         < PROGRAM.entities
 %         < MODULE.code
 %         < MODULE.adfg
-% \end{verbatim}
+% \end{PipsMake}
 
 \section{Scheduling}
 \label{subsection-scheduling}
@@ -7354,16 +7360,16 @@ The output of the scheduling is of the following form:
   the loop counters of the surrounding loops.
 \end{description}
 
-% \begin{verbatim}
+% \begin{PipsMake}
 
 % scheduling              > MODULE.bdt
 %         < PROGRAM.entities
 %         < MODULE.code
 %         < MODULE.static_control
 %         < MODULE.adfg
-% \end{verbatim}
+% \end{PipsMake}
 
-% \begin{verbatim}
+% \begin{PipsMake}
 
 % alias bdt_file 'Time stamps'
 
@@ -7371,7 +7377,7 @@ The output of the scheduling is of the following form:
 %         < PROGRAM.entities
 %         < MODULE.code
 %         < MODULE.bdt
-% \end{verbatim}
+% \end{PipsMake}
 
 \section{Mapping (a.k.a. Placement)}
 
@@ -7394,16 +7400,16 @@ The output of the placement is:
   loops.
 \end{description}
 
-% \begin{verbatim}
+% \begin{PipsMake}
 % prgm_mapping            > MODULE.plc
 %         < PROGRAM.entities
 %         < MODULE.code
 %         < MODULE.static_control
 %         < MODULE.adfg
 %         < MODULE.bdt
-% \end{verbatim}
+% \end{PipsMake}
 
-% \begin{verbatim}
+% \begin{PipsMake}
 
 % alias plc_file 'Placement'
 
@@ -7411,7 +7417,7 @@ The output of the placement is:
 %         < PROGRAM.entities
 %         < MODULE.code
 %         < MODULE.plc
-% \end{verbatim}
+% \end{PipsMake}
 
 \section{Code Generation}
 
@@ -7419,7 +7425,7 @@ Function \texttt{reindexing} transforms the code using the schedule
 (\texttt{bdt}) and the mapping (\texttt{plc}) (see~\cite{Col93,Pla95a}). The
 result is a new resource named \verb/reindexed_code/.
 
-% \begin{verbatim}
+% \begin{PipsMake}
 % reindexing            > MODULE.reindexed_code
 %         < PROGRAM.entities
 %         < MODULE.code
@@ -7427,7 +7433,7 @@ result is a new resource named \verb/reindexed_code/.
 %         < MODULE.adfg
 %         < MODULE.bdt
 %         < MODULE.plc
-% \end{verbatim}
+% \end{PipsMake}
 
 \section{Prettyprinters for CM Fortran}
 
@@ -7437,10 +7443,10 @@ result is stored in a file suffixed by \verb+.fcm+. The second one
 produces CRAFT Fortran and the result is stored in a file suffixed by
 \verb+.craft+.
 
-% \begin{verbatim}
+% \begin{PipsMake}
 % alias print_parallelizedCMF_code 'CM Fortran'
 % alias print_parallelizedCRAFT_code 'CRAFT Fortran'
-% \end{verbatim}
+% \end{PipsMake}
 
 %%@UserManualDocumentation: print_parallelizedCMF_code
 Use the polyhedric method to parallelize the code and display the
@@ -7448,14 +7454,14 @@ reindexed code in a CMF (parallel Fortran extension from TMC, Thinking
 Machine Corporation) style.
 %%!UserManualDocumentation
 
-% \begin{verbatim}
+% \begin{PipsMake}
 % print_parallelizedCMF_code       > MODULE.parallelprinted_file
 %         < PROGRAM.entities
 %         < MODULE.adfg
 %         < MODULE.bdt
 %         < MODULE.plc
 %         < MODULE.reindexed_code
-% \end{verbatim}
+% \end{PipsMake}
 
 %%@UserManualDocumentation: print_parallelizedCRAFT_code
 Use the polyhedric method to parallelize the code and display the
@@ -7463,14 +7469,14 @@ reindexed code in a CRAFT (parallel Fortran used on the Cray T3 serie)
 style.
 %%!UserManualDocumentation
 
-% \begin{verbatim}
+% \begin{PipsMake}
 % print_parallelizedCRAFT_code     > MODULE.parallelprinted_file
 %         < PROGRAM.entities
 %         < MODULE.adfg
 %         < MODULE.bdt
 %         < MODULE.plc
 %         < MODULE.reindexed_code
-% \end{verbatim}
+% \end{PipsMake}
 
 
 \chapter{User Interface Menu Layouts}
