@@ -3607,14 +3607,19 @@ distributer                    > MODULE.code
         < MODULE.dg
 \end{PipsMake}
 
-\subsection{Loop peeling}
+\subsection{Index Set Splitting (a.k.a. Loop Peeling for the time being}
 \label{subsection-loop-peeling}
 \index{Loop Peeling}
+\index{Index Set Splitting}
 %%@UserManualDocumentation: loop_peeling
-Loop peeling split the loop referenced by \lstinline|LOOP_PEELING_LOOP_LABEL| into two loops.
-The first loop ends at a point designated by \lstinline|LOOP_PEELING_BOUND| and the second start therafter.
-It currently only works for do loops.
-This transformation is always legal.
+Index Set Splitting (Loop peeling) splits the loop referenced by
+property \lstinline|LOOP_PEELING_LOOP_LABEL| into two loops.  The
+first loop ends at an iteration designated by property
+\lstinline|LOOP_PEELING_BOUND| and the second start therafter.  It
+currently only works for do loops.  This transformation is always
+legal. It is currently called loop peeling by mistake. But loop
+splitting in combination with loop unrolling could be used to perform
+loop peeling.
 %%!UserManualDocumentation
 \begin{PipsMake}
 alias loop_peeling 'Loop peeling'
@@ -4549,13 +4554,18 @@ instruction_selection > MODULE.code
 This documentation is a work in progress, as well as the documented topic.
 
 
-Inlining is a well known technique.
-Basically it replaces a function call by the function body.
-Current implementation does not work if the function has static declarations, access global variables \dots.
-Actually it (seems to) work(s) for pure, non-recursive functions \dots and not for any kind of call.
-It should be followed by a call to \verb+UNSPAGHETTIFY+ and \verb+SUPPRESS_DEAD_CODE+.
+Inlining is a well known technique.  Basically it replaces a function
+call by the function body.  Current implementation does not work if
+the function has static declarations, access global variables \dots.
+Actually it (seems to) work(s) for pure, non-recursive functions \dots
+and not for any kind of call.  
 
+It should be followed by a call to \verb+UNSPAGHETTIFY+ and
+\verb+SUPPRESS_DEAD_CODE+.
 
+Property \verb/INLINING_CALLERS/ can be set to define the list of
+functions where the call sites have to be inlined. By default, all
+call sites of the inlined function are inlined.
 %%!UserManualDocumentation
 \begin{PipsMake}
 

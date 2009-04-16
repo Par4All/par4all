@@ -47,18 +47,11 @@ void inline_return_remover(instruction ins,instruction tail_ins)
     }
 }
 
-/* replace instruction ins by a sequence made of an assignment and a
- * goto when ins is a return instruction. Do nothing otherwise.  The
- * new sequence is stored in ins. The statement containing ins cannot
- * carry comments any lonoger (OK, it does not make much sense, but
- * history weighs in.).
+/* replace return instruction by an assignment and a goto
  */
 static
-//void inline_return_switcher(instruction ins,instruction tail_ins)
-void inline_return_switcher(statement ins_stmt, instruction tail_ins)
+void inline_return_switcher(instruction ins,instruction tail_ins)
 {
-  instruction ins = statement_instruction(ins_stmt);
-
     if( return_instruction_p( ins ) )
     {
         // create the goto
@@ -81,11 +74,6 @@ void inline_return_switcher(statement ins_stmt, instruction tail_ins)
         free_call( instruction_call(ins));
         instruction_tag(ins) = is_instruction_sequence;
         instruction_sequence(ins)=make_sequence( l );
-
-	if(!empty_comments_p(statement_comments(ins_stmt))) {
-	  free(statement_comments(ins_stmt));
-	  statement_comments(ins_stmt) = empty_comments;
-	}
     }
 }
 
@@ -318,8 +306,7 @@ instruction inline_expression_call(expression modified_expression, call callee)
             AddLocalEntityToDeclarations(returned_entity, get_current_module_entity(),
                     c_module_p(get_current_module_entity())?get_current_module_statement():statement_undefined);
 
-            //gen_context_recurse(expanded, tail_ins, instruction_domain, gen_true, &inline_return_switcher);
-            gen_context_recurse(expanded, tail_ins, statement_domain, gen_true, &inline_return_switcher);
+            gen_context_recurse(expanded, tail_ins, instruction_domain, gen_true, &inline_return_switcher);
         }
         if( !type_void_p(treturn) )
         {
@@ -466,10 +453,6 @@ instruction inline_expression_call(expression modified_expression, call callee)
      */
     gen_recurse(expanded,statement_domain,gen_true,fix_sequence_statement_attributes_if_sequence);
     gen_recurse(expanded,expression_domain,gen_true,reset_expression_normalized);
-    ifdebug(1) {
-      fprintf(stderr, "expanded statement:\n");
-      print_statement(expanded);
-    }
     unstructured u = control_graph(expanded);
     instruction ins = make_instruction_unstructured(u);
 
@@ -478,7 +461,7 @@ instruction inline_expression_call(expression modified_expression, call callee)
 }
 
 
-/* recursively inline an expression if needed
+/* recursievly inline an expression if needed
  */
 static
 void inline_expression(expression expr, list * new_instructions)
@@ -601,10 +584,6 @@ inline_calls(char * module)
      * SG: this may not be needed ...
      */
     DB_PUT_MEMORY_RESOURCE(DBR_CODE, module, modified_module_statement);
-    ifdebug(1) {
-      fprintf(stderr, "Modified statement for module %s\n", module);
-      print_statement(modified_module_statement);
-    }
     DB_PUT_MEMORY_RESOURCE(DBR_CALLEES, module, compute_callees(modified_module_statement));
     reset_current_module_entity();
     reset_current_module_statement();

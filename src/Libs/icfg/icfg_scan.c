@@ -31,18 +31,12 @@
 static int current_margin;
 
 #define st_DO	 	"do"
-#define st_ENDDO 	"enddo"
-#define st_FOR	 	"for"
-#define st_ENDFOR 	"endfor"
 #define st_DOWHILE	"do while"
-#define st_ENDDOWHILE	"enddo"
-#define st_REPEAT	"repeat"
-#define st_UNTIL	"until"
+#define st_ENDDO 	"enddo"
 #define st_IF	 	"if"
 #define st_THEN	 	"then"
 #define st_ELSE	 	"else"
 #define st_ENDIF 	"endif"
-/* These last two strings are used for unstructured */
 #define st_WHILE 	"while"
 #define st_ENDWHILE 	"endwhile"
 
@@ -267,7 +261,7 @@ static void call_flt(call c)
 
 /* LOOP
  */
-static bool loop_flt (loop __attribute__ ((unused)) l)
+static bool loop_flt (loop l)
 {
     pips_debug (5, "Loop begin\n");
     if (print_do_loops) current_margin += ICFG_SCAN_INDENT;
@@ -276,7 +270,6 @@ static bool loop_flt (loop __attribute__ ((unused)) l)
 
 static void anyloop_rwt(
     string st_what, 
-    string st_end_what, 
     string st_index, 
     statement body)
 {
@@ -322,7 +315,7 @@ static void anyloop_rwt(
      */
     if ((text_in_loop_p || text_in_do_p) && print_do_loops) 
     {
-	append_marged_text(t, current_margin, st_end_what, "");
+	append_marged_text(t, current_margin, st_ENDDO, "");
     }
 
     /* store it to the statement mapping */
@@ -333,22 +326,12 @@ static void anyloop_rwt(
 
 static void loop_rwt(loop l)
 {
-    anyloop_rwt(st_DO " ", st_ENDDO, entity_user_name(loop_index(l)), loop_body(l));
-}
-
-static void forloop_rwt(forloop l)
-{
-    anyloop_rwt(st_FOR " ", st_ENDFOR, "", forloop_body(l));
+    anyloop_rwt(st_DO " ", entity_local_name(loop_index(l)), loop_body(l));
 }
 
 static void while_rwt(whileloop w)
 {
-  evaluation e = whileloop_evaluation(w);
-
-  if(evaluation_before_p(e))
-    anyloop_rwt(st_DOWHILE " ", st_ENDDOWHILE, "", whileloop_body(w));
-  else
-    anyloop_rwt(st_REPEAT " ", st_UNTIL, "", whileloop_body(w));
+    anyloop_rwt(st_DOWHILE " ", "", whileloop_body(w));
 }
 
 /* INSTRUCTION
@@ -436,8 +419,6 @@ static void instruction_rwt (instruction i)
 	update_statement_icfg (current_stmt_head (), t);
 	break;
     }
-    default:
-      break;
     }
 
 }
@@ -445,7 +426,7 @@ static void instruction_rwt (instruction i)
 /* RANGE
  * functions to avoid the indentation when dealing with DO expressions.
  */
-static bool range_flt(range __attribute__ ((unused)) r)
+static bool range_flt(range r)
 {
     statement s = current_stmt_head();
 
@@ -454,7 +435,7 @@ static bool range_flt(range __attribute__ ((unused)) r)
     return TRUE;
 }
 
-static void range_rwt(range __attribute__ ((unused)) r)
+static void range_rwt(range r)
 {
     statement s = current_stmt_head();
 
@@ -464,7 +445,7 @@ static void range_rwt(range __attribute__ ((unused)) r)
 
 /* TEST
  */
-static bool test_flt (test __attribute__ ((unused)) t)
+static bool test_flt (test l)
 {
     pips_debug (5, "Test begin\n");
     if (print_ifs) current_margin += ICFG_SCAN_INDENT;
@@ -557,7 +538,6 @@ void print_module_icfg(entity module)
 	 instruction_domain    , instruction_flt  , instruction_rwt,
 	 test_domain     , test_flt     , test_rwt,
          whileloop_domain, loop_flt       , while_rwt,
-         forloop_domain, loop_flt       , forloop_rwt,
          range_domain    , range_flt    , range_rwt,
 	 NULL);
 

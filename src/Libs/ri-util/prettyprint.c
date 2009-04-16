@@ -3174,11 +3174,7 @@ text text_statement_enclosed(
   bool braces_added = FALSE;
   int nmargin = imargin;
 
-  // To ease breakpoint setting
-  //pips_assert("Blocks have no comments", !instruction_block_p(i)||empty_comments_p(comments));
-  if(instruction_block_p(i) && !empty_comments_p(comments)) {
-    pips_internal_error("Blocks should have no comments\n");
-  }
+  pips_assert("Blocks have no comments", !instruction_block_p(i)||empty_comments_p(comments));
 
   /* 31/07/2003 Nga Nguyen : This code is added for C, because a
      statement can have its own declarations */
