@@ -28,6 +28,15 @@ endif
 PROJECT = pips
 include $(ROOT)/makes/main.mk
 
+# fix fpips inclusions
+ifdef PIPS_NO_GPIPS
+CPPFLAGS        +=      -DFPIPS_WITHOUT_GPIPS
+endif PIPS_NO_GPIPS
+
+ifdef PIPS_NO_WPIPS
+CPPFLAGS 	+=	-DFPIPS_WITHOUT_WPIPS
+endif PIPS_NO_WPIPS
+
 # local stuff
 $(ARCH)/fpips: $(ARCH)/$(FPIPS_MAIN)
 
