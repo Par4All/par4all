@@ -166,6 +166,11 @@ bool transformers_intra_fast(char * module_name)
     select_fix_point_operator();
     set_bool_property(SEMANTICS_STDOUT, FALSE);
     /* set_int_property(SEMANTICS_DEBUG_LEVEL, 0); */
+    if(get_bool_property("SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT")) {
+      pips_user_warning("If you really want to set property "
+			"SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT, "
+			"you should activate TRANSFORMERS_INTER_FULL\n");
+    }
     return module_name_to_transformers(module_name);
 }
 

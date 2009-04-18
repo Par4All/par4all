@@ -1323,12 +1323,15 @@ standard_whileloop_to_transformer(whileloop l, transformer pre, list e) /* effec
        avoid fix-points; local variables do not have to be filtered out
        because this was already done while computing effects */
 
-    (void) statement_to_transformer(s, pre);
+    /* The loop body transformers could benefit from pre_n instead of
+       transformer_undefined, but who would think of combining these
+       two options? */
+    (void) statement_to_transformer(s, transformer_undefined);
     tf = effects_to_transformer(e);
   }
 
   ifdebug(8) {
-    (void) fprintf(stderr,"%s: %s\n","whileloop_to_transformer",
+    (void) fprintf(stderr,"%s: %s\n","standard_whileloop_to_transformer",
 		   "resultat tf =");
     (void) print_transformer(tf);
   }
