@@ -401,7 +401,9 @@ sh> svn commit my-branch-name
   This requires that your \verb.PIPS_ROOT. environment variable
   points to your development branch instead of the trunk, otherwise
   the compilation of the branch install files into the other location
-  pointed to by this variable. Also check for your \verb.PATH. to
+  pointed to by this variable. You may also check for the right
+  settings for \verb.EXTERN_ROOT. \verb.NEWGEN_ROOT. and
+  \verb.LINEAR_ROOT. variables, as well as your \verb.PATH. to
   ensure that the right executable is used.
 
 \item To merge into your branch on-going developments by other people from
@@ -1533,7 +1535,7 @@ possible to define several phases in one C file, but a new user should
 avoid it.} in an existing library or in a new library named
 \texttt{myphase}. The latter is not compulsory, but it is advised for
 new contributors. If the new phase requires global variables to tune
-its behavior, the \texttt{properties} mechanism must be used. The new
+its behavior, the \emph{properties} mechanism must be used. The new
 phase must acquire the necessary resources by invoking
 \texttt{pipsdbm}. Recursively invoking \texttt{pipsmake} is forbidden at
 this level.
@@ -1661,21 +1663,15 @@ myphase > MODULE.res2
 \end{itemize}
 
 
-\subsubsection{In directory \texttt{src/Documentation/properties}}
-\label{sec:srcd}
-
-New \emph{properties} (that are global variables with a user interface in
-PIPS) may be necessary for the fine control of the new phase.  They must
-be declared in the \texttt{properties-rc.tex} file.
-
-If any, use \texttt{make} to push them into PIPS.
-
-
 \subsubsection{In directory \texttt{src/Libs/pipsmake}}
 \label{sec:direct-lib-pipsmake}
 
 Execute the command \texttt{make recompile} to recompile the
 \texttt{pipsmake} library.
+
+New \emph{properties} (that are global variables with a user interface in
+PIPS) may be necessary for the fine control of the new phase.  They must
+be declared in the \texttt{pipsmake-rc.tex} file.
 
 
 \subsubsection{In directory \texttt{src/Passes}}
