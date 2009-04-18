@@ -2,6 +2,8 @@
 # $Id$
 #
 
+use_pdflatex	= 1
+
 SOURCES=	pipsmake-rc.tex \
 		make-pips-menu \
 		make-builder-map \
@@ -89,22 +91,25 @@ phases.h: pipsmake.rc
 builder_map.h: pipsmake.rc
 	#
 	# building builder_map.h
-	# 
+	#
 	./make-builder-map < $< > $@
 
 
 epips_transform_menu_layout.el wpips_transform_menu_layout.h epips_view_menu_layout.el wpips_view_menu_layout.h:  pipsmake-rc.tex
-	# 
+	#
 	# building menu layout files:
 	#
 	./generate_all_menu_documentation -layout < $<
 
 headers: $(DERIVED_INC)
 
+pipsmake-rc.pdf: user-and-source-files.pdf
+
 clean: local-clean
 
 local-clean:
 	$(RM) -r $(DERIVED_FILES) pipsmake-rc.htdoc pipsprop.sed \
+		user-and-source-files.pdf \
 		*.aux *.log *.ind *.idx *.toc *.ilg *.dvi *.ps *.out *.brf
 
 # common stuff

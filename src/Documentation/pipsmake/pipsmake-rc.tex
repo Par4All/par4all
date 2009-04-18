@@ -61,9 +61,10 @@
 \documentclass[a4paper]{report}
 \usepackage[latin9]{inputenc}
 %\usepackage{alltt,html,fancybox,amstext,xspace,psfig}
-\usepackage{epsfig,amstext,alltt}
+\usepackage{amstext,alltt}
 \usepackage[backref,pagebackref]{hyperref}
 \usepackage{xspace}
+\usepackage{graphicx}
 \makeatletter
 % Test for a TeX4ht command:
 %%\@ifundefined{HCode}{%
@@ -732,7 +733,7 @@ Figure~\ref{figure-user-and-source-files}.
 
 \begin{figure}
 \begin{center}
-\mbox{\psfig{file=user-and-source-files.idraw,width=\hsize}}
+\mbox{\includegraphics[width=\hsize]{user-and-source-files}}
 \end{center}
 \caption{Preprocessing phases: from a user file to a source file}
 \label{figure-user-and-source-files}
