@@ -1,5 +1,7 @@
 # $Id: Makefile 12428 2005-12-30 14:22:06Z coelho $
 
+use_pdflatex	= 1
+
 INSTALL_DOC =	tpips-user-manual.pdf
 INSTALL_HTM = tpips-user-manual.htdoc
 # Hide the PDF into the HTML documentation directory
