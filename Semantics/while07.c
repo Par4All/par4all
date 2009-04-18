@@ -13,6 +13,7 @@ int main()
      i = i+1;
    }
    // We should have the precondition i == 500, j == 501
+   // if we would use the proper fix point operator (derivative)
    k = 2;
    return k;
 }

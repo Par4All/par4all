@@ -31,6 +31,13 @@ echo
 activate PRINT_CODE_PRECONDITIONS
 display PRINTED_FILE[generate01]
 
+echo
+echo Preconditions for "foo"
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[foo]
+
 close
 delete generate01
 quit
