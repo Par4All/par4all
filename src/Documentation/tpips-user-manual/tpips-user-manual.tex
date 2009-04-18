@@ -1,8 +1,13 @@
-\documentclass[a4paper,12pt]{article}
+%% $Id$
+
+\documentclass[a4paper]{article}
+
 \usepackage[latin9]{inputenc}
 \usepackage[backref,pagebackref]{hyperref}
 \usepackage{xspace}
 \usepackage{url}
+\usepackage[nofancy]{svninfo}
+
 \newcommand{\PipsTpipsPDF}{\url{http://www.cri.ensmp.fr/pips/tpips-user-manual.htdoc/tpips-user-manual.pdf}\xspace}
 \newcommand{\PipsTpipsHTDOC}{\url{http://www.cri.ensmp.fr/pips/tpips-user-manual.htdoc}\xspace}
 \newcommand{\PipsPIPSmakePDF}{\url{http://www.cri.ensmp.fr/pips/pipsmake-rc.htdoc/pipsmake-rc.pdf}\xspace}
@@ -20,18 +25,18 @@
 
 \author{Corinne Ancourt \and Fabien Coelho \and Guillaume Oget}
 
-\date{\today}
+\date{\svnInfoLongDate, revision \svnInfoRevision}
 
 
 \begin{document}
+\svnInfo $Id$
+
 \setlength{\parindent}{0in}
 
 \maketitle
 
 You can get a printable version of this document on\\
 \PipsTpipsPDF and a HTML version on \PipsTpipsHTDOC.
-
-\verb|$Id$|
 
 \tableofcontents
 
