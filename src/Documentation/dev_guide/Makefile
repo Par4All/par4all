@@ -1,5 +1,6 @@
 # $Id$
 
+use_pdflatex = 1
 INSTALL_DOC = developer_guide.pdf
 INSTALL_HTM = developer_guide.htdoc
 # Hide the PDF into the HTML documentation directory
@@ -23,4 +24,5 @@ include $(ROOT)/makes/main.mk
 clean: local-clean
 
 local-clean:
-	$(RM) -rf $(INSTALL_DOC) $(INSTALL_HTM) *.aux *.toc *.idx *.ilg *.ind *.log *.dvi *.ps *.out
+	$(RM) -rf $(INSTALL_DOC) $(INSTALL_HTM) \
+		*.aux *.toc *.idx *.ilg *.ind *.log *.dvi *.ps *.out
