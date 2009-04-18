@@ -1,7 +1,12 @@
+%% $Id$
+
 \documentclass[a4paper]{report}
+\usepackage[nofancy]{svninfo}
 \usepackage{verbatim,newgen_domain}
 \usepackage{listings}
 \usepackage{array}
+\usepackage[backref,pagebackref]{hyperref}
+
 \lstset{extendedchars=true, language=C}
 
 % Ou est le fichier de biblio ?
@@ -12,9 +17,12 @@
   Fran\c{c}ois Irigoin \\
   Pierre Jouvelot \\
   Thi Viet Nga Nguyen \\
-  CRI, Ecole des Mines de Paris}
+  CRI, MINES ParisTech}
+\date{\svnInfoLongDate{}, revision \svnInfoRevision}
 
 \begin{document}
+\svnInfo $Id$
+
 \noindent
 \maketitle
 \tableofcontents

@@ -1,8 +1,10 @@
 #
 # $Id$
-# 
+#
 
-# unused: dcdg.tex 
+# unused: dcdg.tex
+
+use_pdflatex	= 1
 
 F.tex =	ri.tex \
 	dg.tex \
@@ -62,6 +64,8 @@ allhs: $(ALLHS)
 	./remove-latex-comments $<
 	chmod a-w $@
 
+ri.pdf: unstructured.pdf
+
 all_newgen_headers.h: specs.h
 	#
 	# building $@ (ordered as specs.h!)
@@ -87,7 +91,7 @@ clean: local-clean
 
 local-clean:
 	$(RM) $(INSTALL_INC) $(F.newgen) 
-	$(RM) *.dvi *.ind *.log *.ps *.pdf *.aux *.idx *.ilg *.toc
+	$(RM) *.dvi *.ind *.log *.ps *.pdf *.aux *.idx *.ilg *.toc *.out *.brf
 	$(RM) -r $(INSTALL_HTM) ri.html dg.html
 
 

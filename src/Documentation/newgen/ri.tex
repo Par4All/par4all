@@ -1,11 +1,13 @@
 %%
 %% $Id$
-%%
 
 \documentclass[a4paper]{article}
 
 \usepackage[latin1]{inputenc}
-\usepackage{epsfig,verbatim,comment,newgen_domain}
+\usepackage{verbatim,comment,newgen_domain}
+\usepackage{graphicx}
+\usepackage[backref,pagebackref]{hyperref}
+\usepackage[nofancy]{svninfo}
 
 %% To generate an index:
 \usepackage{makeidx}
@@ -19,15 +21,11 @@
   Ronan Keryell \\
   Rémi Triolet\\
   \\
-  CRI, Ecole des Mines de Paris}
-
-
-% Correction de quelques erreurs. RK, 07/02/1994.
-
-%\renewcommand{\indexname}{Index}
-
+  CRI, M\&S, MINES ParisTech}
+\date{\svnInfoLongDate{}, revision r\svnInfoRevision}
 
 \begin{document}
+\svnInfo $Id$
 \maketitle
 \sloppy
 \newpage
@@ -1539,7 +1537,7 @@ recursion between \verb/control/ and \verb/statement/ (via
 
 \begin{figure}
 \begin{center}
-\mbox{\psfig{file=unstructured.idraw,width=\hsize}}
+\mbox{\includegraphics[width=\hsize]{unstructured}}
 \end{center}
 \caption{Control Flow Graph}
 \label{figure-unstructured}

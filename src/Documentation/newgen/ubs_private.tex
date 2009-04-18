@@ -1,7 +1,8 @@
 
-\documentclass{article}
+\documentclass[a4paper]{article}
 
 \usepackage{newgen_domain}
+\usepackage[backref,pagebackref]{hyperref}
 
 \title{Used Before Set Analysis}
 \author{Nga Nguyen}
@@ -10,11 +11,13 @@
 
 \section{Introduction}
 
+These newgen data structures are used to tell whether a variable
+(formal parameter or common variable) in a called procedure must be
+checked for used-before-set error or not.
+
 \domain{import entity from "ri.newgen"}
 {}
-% These newgen data structures are used to tell whether a variable (formal parameter
-% or common variable) in a called procedure must be checked for used-before-set error or not.  
- 
+
 \domain{ubs\_check = module:entity x variable:entity}
 {}
 \domain{ubs = list:ubs\_check*}
