@@ -14,6 +14,7 @@ RMAN	= rman
 MAKEIDX	= makeindex
 DVIPS	= dvips
 PS2PDF	= ps2pdf
+EPS2PDF	= epstopdf --compress
 # To publish on a WWW server:
 RSYNC = rsync --archive --hard-links --delete --force --partial --compress --verbose
 
@@ -39,6 +40,8 @@ endif # use_pdflatex
 
 # ps (post script)
 %.ps: %.dvi;	$(DVIPS) $< -o
+
+%.pdf: %.idraw;	$(EPS2PDF) $< > $@
 
 # latex
 %.dvi: %.tex
