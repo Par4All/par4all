@@ -8,6 +8,7 @@
 LX2HTM	= htlatex
 #L2HFLAGS= -link 8 -split 5 -local_icons
 LATEX	= latex
+PDFLTX	= pdflatex
 BIBTEX	= bibtex
 RMAN	= rman
 MAKEIDX	= makeindex
@@ -16,9 +17,25 @@ PS2PDF	= ps2pdf
 # To publish on a WWW server:
 RSYNC = rsync --archive --hard-links --delete --force --partial --compress --verbose
 
+# whether to generate pdf directly from tex
+ifdef use_pdflatex
+
+%.pdf: %.tex
+	-grep '\\makeindex' $*.tex && touch $*.ind
+	$(PDFLTX) $<
+	-grep '\\bibdata{' \*.aux && { $(BIBTEX) $* ; $(PDFLTX) $< ;}
+	test ! -f $*.idx || { $(MAKEIDX) $*.idx ; $(PDFLTX) $< ;}
+	$(PDFLTX) $<
+	# Twice for the backref bibliography with hyperref:
+	$(PDFLTX) $<
+	touch $@
+
+else # tex -> dvi -> ps -> pdf
 
 # pdf (portable document format)
 %.pdf: %.ps;	$(PS2PDF) $<
+
+endif # use_pdflatex
 
 # ps (post script)
 %.ps: %.dvi;	$(DVIPS) $< -o
