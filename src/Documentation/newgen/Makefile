@@ -74,7 +74,7 @@ all_newgen_headers.h: specs.h
 	sed -n 's,^\(.*\)_spec.*,#include "\1.h",p' $< > $@
 	chmod a+r-w $@
 
-specs.h: $(F.newgen)
+specs.h $(F.spec): $(F.newgen)
 	#
 	# building specs.h
 	#
@@ -90,7 +90,7 @@ lisp_internal_representation: $(F.newgen)
 clean: local-clean
 
 local-clean:
-	$(RM) $(INSTALL_INC) $(F.newgen) 
+	$(RM) $(INSTALL_INC) $(F.newgen)
 	$(RM) *.dvi *.ind *.log *.ps *.pdf *.aux *.idx *.ilg *.toc *.out *.brf
 	$(RM) -r $(INSTALL_HTM) ri.html dg.html
 
