@@ -103,13 +103,13 @@ then
   make $clean
 
   cd newgen
-  make -j1 $compile
+  make $compile
 
   cd ../linear
-  make -j1 $compile
+  make $compile
 
   cd ../pips
-  make -j1 $compile
+  make $compile
 
   if [ -f bin/$PIPS_ARCH/tpips ]
   then
