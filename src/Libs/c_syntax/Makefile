@@ -37,11 +37,13 @@ local-clean:
 
 YY2C	= sed '/^FILE \*yyin/s/=[^,;]*//g;s/YY/C_/g;s/yy/c_/g'
 
-cyacc.c cyacc.h: cyacc.y
+cyacc.c: cyacc.y
 	$(PARSE) `pwd`/cyacc.y
 	$(YY2C) y.tab.c > cyacc.c
 	$(YY2C) y.tab.h > cyacc.h
 	$(RM) y.tab.c y.tab.h
+
+cyacc.h: cyacc.c
 
 clexer.c: clex.l cyacc.h
 	$(SCAN) `pwd`/clex.l | $(YY2C) > $@
