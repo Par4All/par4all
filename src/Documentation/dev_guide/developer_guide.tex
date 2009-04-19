@@ -166,7 +166,7 @@ from the C files. After a while, C files should be compiled without
 errors.
 
 In order to rebuild only the PIPS infrastructure, just type
-\texttt{make -j1} into the \verb|$PIPS_ROOT| directory. If something
+\texttt{make} into the \verb|$PIPS_ROOT| directory. If something
 has gone wrong, for instance because a software component is missing
 or outdated, it is advised to restart from scratch by runing
 \texttt{make unbuild} before trying again.
@@ -1681,8 +1681,8 @@ Execute the command \texttt{make recompile} to recompile and install
 updated versions of \texttt{pips}, \texttt{tpips} and \texttt{wpips}.
 
 With fast computers, it may be easier to skip the previous steps and
-to rebuild PIPS from directory \texttt{PIPS\_ROOT} using \texttt{make
--j1 build}.
+to rebuild PIPS from directory \texttt{PIPS\_ROOT} using
+\texttt{make build}.
 
 
 \subsubsection{The final touch}
