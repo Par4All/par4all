@@ -42,6 +42,10 @@ rebuild:
 	$(MAKE) unbuild
 	$(MAKE) build
 
+recompile:
+	$(MAKE) clean
+	$(MAKE) compile
+
 install:
 	@echo "try 'build' target"
 
