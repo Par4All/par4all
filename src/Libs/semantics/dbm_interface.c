@@ -160,18 +160,47 @@ static void precondition_add_declaration_information(transformer pre, entity m)
 
 bool transformers_intra_fast(char * module_name)
 {
+  bool si = get_bool_property(SEMANTICS_INTERPROCEDURAL);
+  bool sfs = get_bool_property(SEMANTICS_FLOW_SENSITIVE);
+  bool sfp = get_bool_property(SEMANTICS_FIX_POINT);
+  bool result = TRUE;
+
+  /* Set properties as required for a very fast semantics analysis */
+  if(si) {
+    pips_user_warning("Property SEMANTICS_INTERPROCEDURAL is ignored\n");
     set_bool_property(SEMANTICS_INTERPROCEDURAL, FALSE);
+  }
+  if(!sfs) {
+    pips_user_warning("Property SEMANTICS_FLOW_SENSITIVE is ignored\n");
     set_bool_property(SEMANTICS_FLOW_SENSITIVE, TRUE);
+  }
+  if(sfp) {
+    pips_user_warning("Property SEMANTICS_FIX_POINT is ignored\n");
     set_bool_property(SEMANTICS_FIX_POINT, FALSE);
-    select_fix_point_operator();
-    set_bool_property(SEMANTICS_STDOUT, FALSE);
-    /* set_int_property(SEMANTICS_DEBUG_LEVEL, 0); */
-    if(get_bool_property("SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT")) {
-      pips_user_warning("If you really want to set property "
-			"SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT, "
-			"you should activate TRANSFORMERS_INTER_FULL\n");
-    }
-    return module_name_to_transformers(module_name);
+  }
+  /* No need to select a fix point operator given the above property, but just in case... */
+  select_fix_point_operator();
+
+  set_bool_property(SEMANTICS_STDOUT, FALSE);
+  /* set_int_property(SEMANTICS_DEBUG_LEVEL, 0); */
+
+  if(get_bool_property("SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT")) {
+    pips_user_warning("If you really want to set property "
+		      "SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT, "
+		      "you should activate TRANSFORMERS_INTER_FULL\n");
+  }
+
+  result =  module_name_to_transformers(module_name);
+
+  /* Restaure initial values of modified properties */
+  if(si)
+    set_bool_property(SEMANTICS_INTERPROCEDURAL, TRUE);
+  if(!sfs)
+    set_bool_property(SEMANTICS_FLOW_SENSITIVE, FALSE);
+  if(sfp)
+    set_bool_property(SEMANTICS_FIX_POINT, TRUE);
+
+  return result;
 }
 
 bool transformers_intra_full(char * module_name)
