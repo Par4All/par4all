@@ -17,6 +17,7 @@ include $(MAKE.d)/arch.mk
 include $(MAKE.d)/$(ARCH).mk
 
 # check for gtk2 here, to know whether to forward to gpips or not
+-include $(MAKE.d)/config.mk
 include $(MAKE.d)/has_gtk2.mk
 
 FWD_DIRS	= pips tpips
