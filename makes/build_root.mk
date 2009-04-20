@@ -38,6 +38,10 @@ unbuild: clean tags-clean
 		./bin ./include ./lib ./share ./utils \
 		./doc ./runtime ./etc ./html
 
+rebuild:
+	$(MAKE) unbuild
+	$(MAKE) build
+
 install:
 	@echo "try 'build' target"
 

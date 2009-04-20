@@ -27,7 +27,10 @@ endif
 
 # the default target is to "recompile" the current directory
 all: recompile
-recompile: compile
+
+recompile:
+	$(MAKE) clean
+	$(MAKE) compile
 
 ########################################################################## ROOT
 

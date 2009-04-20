@@ -1,4 +1,0 @@
-* building pips
-- fix "header" dependency so that "make -j2" runs correctly?
-- make ttest => cd root + make recompile ?
-- if so, add link for local tpips to help running the debugger?
