@@ -918,30 +918,46 @@ static list any_affect_effects(entity e __attribute__ ((__unused__)),
 
   pips_debug(5, "begin\n");
 
-  if (syntax_reference_p(s)) {
-    if(update_p) {
-      le = generic_proper_effects_of_expression(lhs);
-      /* To avoid sharing between references as we move away from preference with C */
-      le = gen_nconc(le, generic_proper_effects_of_lhs(copy_reference(syntax_reference(s))));
-  }
-    le = gen_nconc(le, generic_proper_effects_of_lhs(syntax_reference(s)));
-  }
-  else {
-    if(update_p) {
-      le = generic_proper_effects_of_expression(lhs);
-      /* To avoid sharing in effects which help when combining and
-	 freeing effects, too bad for the memory leak at the
-	 expression level. No time to think about something better for
-	 the time being, although preference is around to help. FI */
-      le = gen_nconc(le, generic_proper_effects_of_any_lhs(copy_expression(lhs)));
-    }
-    le = gen_nconc(le, generic_proper_effects_of_any_lhs(lhs));
-  }
+  if (syntax_reference_p(s)) 
+    {
+      pips_debug(5, "this is a reference\n");
 
-  if(!unique_p) {
-    expression rhs = EXPRESSION(CAR(CDR(args)));
-    le = gen_nconc(le, generic_proper_effects_of_expression(rhs));
-  }
+      if(update_p) 
+	{
+	  pips_debug(5, "update_p is true\n");
+	  le = generic_proper_effects_of_expression(lhs);
+	  /* To avoid sharing between references as we move away from 
+	     preference with C */
+	  le = gen_nconc(le, generic_proper_effects_of_lhs
+			 (copy_reference(syntax_reference(s))));
+	}
+      le = gen_nconc(le, generic_proper_effects_of_lhs(syntax_reference(s)));
+    }
+  else 
+    {
+       pips_debug(5, "this is not a reference\n");
+     
+      if(update_p) 
+	{
+	  pips_debug(5, "update_p is fase\n");
+	 
+	  le = generic_proper_effects_of_expression(lhs);
+	  /* To avoid sharing in effects which help when combining and
+	     freeing effects, too bad for the memory leak at the
+	     expression level. No time to think about something better for
+	     the time being, although preference is around to help. FI */
+	  le = gen_nconc(le, generic_proper_effects_of_any_lhs(copy_expression(lhs)));
+	}
+      le = gen_nconc(le, generic_proper_effects_of_any_lhs(lhs));
+    }
+  
+  if(!unique_p)
+    {
+      pips_debug(5, "unique_p is fase\n");
+	 
+      expression rhs = EXPRESSION(CAR(CDR(args)));
+      le = gen_nconc(le, generic_proper_effects_of_expression(rhs));
+    }
 
   pips_debug(5, "end\n");
 

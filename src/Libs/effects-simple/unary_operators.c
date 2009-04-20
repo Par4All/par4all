@@ -163,6 +163,8 @@ effect reference_to_simple_effect(reference ref, action ac)
     pips_internal_error("Unexpected type\n");
   }
 
+  pips_debug(8, "end\n");
+
   return eff;
 }
 
