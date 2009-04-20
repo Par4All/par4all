@@ -4,20 +4,27 @@
 #include <stdlib.h>
 #include "genC.h"
 
+/* internally defined structure.
+ */
 typedef struct __string_buffer_head
 {
   stack ins;
 }
   _string_buffer_head;
 
+/* allocate a new string buffer
+ */
 string_buffer string_buffer_make(void)
 {
   string_buffer n = (string_buffer) malloc(sizeof(_string_buffer_head));
-  message_assert("n allocated", n!=NULL);
+  message_assert("allocated", n!=NULL);
   n->ins = stack_make(0, 0, 0);
   return n;
 }
 
+/* free string buffer structure
+ * @arg free_strings also free string contents
+ */
 void string_buffer_free(string_buffer *psb, bool free_strings)
 {
   if (free_strings)
@@ -27,6 +34,8 @@ void string_buffer_free(string_buffer *psb, bool free_strings)
   *psb = NULL;
 }
 
+/* return malloc'ed string from string buffer sb
+ */
 string string_buffer_to_string(string_buffer sb)
 {
   int bufsize = 0, current = 0;
@@ -49,11 +58,15 @@ string string_buffer_to_string(string_buffer sb)
   return buf;
 }
 
+/* append string s to string buffer sb, without duplication
+ */
 void string_buffer_append(string_buffer sb, string s)
 {
   stack_push(s, sb->ins);
 }
 
+/* append string s to string buffer sb, with duplication
+ */
 void string_buffer_append_dup(string_buffer sb, string s)
 {
   string_buffer_append_dup(sb, strdup(s));
