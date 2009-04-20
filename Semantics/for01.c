@@ -11,7 +11,9 @@ int main()
      // Cumulated effects should be a[i] here and not a[*]
      a[i] = i;
    }
-   // We should have j==501 in the preconditions here...
+   /* We would have j==501 in the preconditions here... if we'd use
+   // the proper activate and properties: the fast analysis exclude
+   // fix points (see for01.tpips) */
    k = 2;
    return k;
 }

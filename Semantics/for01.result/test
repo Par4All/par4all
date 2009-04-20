@@ -1,0 +1,197 @@
+
+Source code with proper effects
+
+int main()
+{
+   int i;
+   int j;
+   int k;
+   int a[500];
+//               <must be written>: i
+
+   i = 0;                                                               /*0007*/
+//               <must be written>: j
+   j = 1;                                                               /*0008*/
+//               <must be written>: i
+
+   for(i = 0; i <= 499; i += 1) {                                       /*0010*/
+//               <must be read   >: j
+//               <must be written>: j
+      j++;                                                              /*0011*/
+//               <must be read   >: i
+//               <must be written>: a[i]
+      // Cumulated effects should be a[i] here and not a[*]
+      a[i] = i;                                                         /*0013*/
+   }
+//               <must be written>: k
+   /* We would have j==501 in the preconditions here... if we'd use
+      // the proper activate and properties: the fast analysis exclude
+      // fix points (see for01.tpips) */
+   k = 2;                                                               /*0018*/
+//               <must be read   >: k
+   return k;                                                            /*0019*/
+}
+
+Source code with cumulated effects
+
+int main()
+{
+   int i;
+   int j;
+   int k;
+   int a[500];
+//               <must be written>: i
+
+   i = 0;                                                               /*0007*/
+//               <must be written>: j
+   j = 1;                                                               /*0008*/
+//               <may be read    >: i j
+//               <may be written >: a[*] j
+//               <must be written>: i
+
+   for(i = 0; i <= 499; i += 1) {                                       /*0010*/
+//               <must be read   >: j
+//               <must be written>: j
+      j++;                                                              /*0011*/
+//               <may be written >: a[*]
+//               <must be read   >: i
+      // Cumulated effects should be a[i] here and not a[*]
+      a[i] = i;                                                         /*0013*/
+   }
+//               <must be written>: k
+   /* We would have j==501 in the preconditions here... if we'd use
+      // the proper activate and properties: the fast analysis exclude
+      // fix points (see for01.tpips) */
+   k = 2;                                                               /*0018*/
+//               <must be read   >: k
+   return k;                                                            /*0019*/
+}
+
+Dependence graph
+
+
+ ******** Whole Dependence Graph with Dependence Cones ******
+
+	18 --> 19 with conflicts
+		from <k-W-MUST> to <k-R-MUST>
+	11 --> 11 with conflicts
+		from <j-R-MUST> to <j-W-MUST> at levels  1
+
+	11 --> 11 with conflicts
+		from <j-W-MUST> to <j-W-MUST> at levels  1
+
+		from <j-W-MUST> to <j-R-MUST> at levels  1
+
+	08 --> 11 with conflicts
+		from <j-W-MUST> to <j-W-MUST>
+		from <j-W-MUST> to <j-R-MUST>
+	07 --> 10 with conflicts
+		from <i-W-MUST> to <i-W-MUST>
+
+****************** End of Dependence Graph ******************
+
+Source code with transformers
+
+
+//  T(main) {main==2}
+
+int main()
+{
+   int i;
+   int j;
+   int k;
+   int a[500];
+
+//  T(i) {i==0}
+
+
+   i = 0;                                                               /*0007*/
+
+//  T(j) {j==1}
+
+   j = 1;                                                               /*0008*/
+
+//  T(i,j) {}
+
+
+   for(i = 0; i <= 499; i += 1) {                                       /*0010*/
+
+//  T(j) {j==j#init+1}
+
+      j++;                                                              /*0011*/
+
+//  T() {}
+
+      // Cumulated effects should be a[i] here and not a[*]
+      a[i] = i;                                                         /*0013*/
+   }
+
+//  T(k) {k==2}
+
+   /* We would have j==501 in the preconditions here... if we'd use
+      // the proper activate and properties: the fast analysis exclude
+      // fix points (see for01.tpips) */
+   k = 2;                                                               /*0018*/
+
+//  T(main) {k==main}
+
+   return k;                                                            /*0019*/
+}
+
+Source code with preconditions
+
+
+//  P() {}
+
+int main()
+{
+   int i;
+   int j;
+   int k;
+   int a[500];
+
+//  P() {}
+
+
+   i = 0;                                                               /*0007*/
+
+//  P(i) {i==0}
+
+   j = 1;                                                               /*0008*/
+
+//  P(i,j) {i==0, j==1}
+
+
+   for(i = 0; i <= 499; i += 1) {                                       /*0010*/
+
+//  P(i,j) {0<=i, i<=499}
+
+      j++;                                                              /*0011*/
+
+//  P(i,j) {0<=i, i<=499}
+
+      // Cumulated effects should be a[i] here and not a[*]
+      a[i] = i;                                                         /*0013*/
+   }
+
+//  P(i,j) {i==500}
+
+   /* We would have j==501 in the preconditions here... if we'd use
+      // the proper activate and properties: the fast analysis exclude
+      // fix points (see for01.tpips) */
+   k = 2;                                                               /*0018*/
+
+//  P(i,j,k) {i==500, k==2}
+
+   return k;                                                            /*0019*/
+}
+
+Warnings
+
+TRANSFORMERS_INTRA_FAST[main] (transformers_intra_fast) Property SEMANTICS_FIX_POINT is ignored
+TRANSFORMERS_INTRA_FAST[main] (add_or_kill_equivalenced_variables) storage return
+PRINT_CODE_TRANSFORMERS[main] (add_or_kill_equivalenced_variables) storage return
+INITIAL_PRECONDITION[main] (add_or_kill_equivalenced_variables) storage return
+PRECONDITIONS_INTRA[main] (add_or_kill_equivalenced_variables) storage return
+PRINT_CODE_PRECONDITIONS[main] (add_or_kill_equivalenced_variables) storage return
+TRANSFORMERS_INTRA_FAST[for01!] (transformers_intra_fast) Property SEMANTICS_FIX_POINT is ignored
