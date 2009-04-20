@@ -181,10 +181,10 @@ phase0: $(DEPEND)
 
 ifndef NO_INCLUDES
 -include $(DEPEND)
-endif
+endif # NO_INCLUDES
 
 # generation by make recursion
-$(DEPEND): $(LIB_CFILES) $(OTHER_CFILES) $(DERIVED_CFILES)
+$(DEPEND): $(DERIVED_CFILES)
 	touch $@
 	test -s $(DEPEND) || $(MAKE) depend
 
