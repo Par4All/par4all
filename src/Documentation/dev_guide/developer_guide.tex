@@ -857,7 +857,7 @@ meaning such as building a global binary file from the sources.
 Useful targets defined:
 \begin{description}
 \item[build:] generate a running version with the documentation;
-\item[compile \& recompile:] generate a running (hope so...) version. It is the default
+\item[compile:] generate a running (hope so...) version. It is the default
   target to \texttt{make} if you don't precise one;
 \item[doc:] build the documentation (such as the one you are reading right
   now);
@@ -867,6 +867,7 @@ Useful targets defined:
   subdirectories (see~\ref{subsec:tags} for more precision and other
   specific targets);
 \item[unbuild:] clean up things: generated directories are removed;
+\item[rebuild:] unbuild then build;
 \item[htdoc:] generate an HTML version of the documentation
 \item[full-build:] like \texttt{build} but with \texttt{htdoc} too.
 \end{description}
