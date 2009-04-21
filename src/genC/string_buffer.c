@@ -58,6 +58,13 @@ string string_buffer_to_string(string_buffer sb)
   return buf;
 }
 
+/* put string buffer into file.
+ */
+void string_buffer_to_file(string_buffer sb, FILE * out)
+{
+  STACK_MAP_X(s, string, fputs(s, out), sb->ins, 0);
+}
+
 /* append string s to string buffer sb, without duplication
  */
 void string_buffer_append(string_buffer sb, string s)
