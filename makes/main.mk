@@ -25,8 +25,8 @@ endif
 # INSTALL_RTM: runtime-related stuff
 # INSTALL_MAN DOC HTM: various documentations
 
-# the default target is to "recompile" the current directory
-all: recompile
+# the default target is to simply "compile" the current directory
+all: compile
 
 recompile:
 	$(MAKE) clean
