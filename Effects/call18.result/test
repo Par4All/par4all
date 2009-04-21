@@ -1,0 +1,37 @@
+void call18(int i, ...)
+{
+   extern  fmt();
+   i++;
+   if (i) {
+      va_list pa;
+      int r;
+
+      va_start(pa,fmt);
+
+      va_end(pa);
+   }
+}
+
+Proper effects for "main"
+
+main()
+{
+   int i = 1;
+   int j = 2;
+   int k = 3;
+//               <must be read   >: i j k
+
+   call18(i, i, j, k, 0);
+}
+
+Cumulated effects for "main"
+
+main()
+{
+   int i = 1;
+   int j = 2;
+   int k = 3;
+//               <must be read   >: i j k
+
+   call18(i, i, j, k, 0);
+}

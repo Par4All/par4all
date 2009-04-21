@@ -1,0 +1,23 @@
+delete varargs03
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create varargs03 varargs03.c
+
+activate C_PARSER
+
+setproperty PRETTYPRINT_C_CODE TRUE
+
+echo
+echo Proper effects for "main"
+echo
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[main]
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[main]
+
+close
+delete varargs03
+quit
