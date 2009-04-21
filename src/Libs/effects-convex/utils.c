@@ -1196,6 +1196,27 @@ region entity_whole_region(entity e, tag tac)
     return(new_eff);
 }  
 
+
+/* list region_to_store_independent_region_list(effect reg, bool force_may_p)
+ * input    : a region and a boolean;
+ * output   : a list with a unique region representing the entire memory space 
+ *            allocated to the variable reference : the systeme of constraints 
+ *            is a sc_rn(phi_1, ..., phi_n) except if REGIONS_WITH_ARRAY_BOUNDS
+ *            is true. The region is a MAY region.
+ *            The boolean force_may_p is here for consistency with 
+ *            effect_to_store_independent_sdfi_list. 
+ *            We could refine this function in order to keep constraints
+ *            which are independent from the store. 
+ * modifies : nothing.
+ */
+list region_to_store_independent_region_list(effect reg, bool force_may_p)
+{
+    reference ref =  effect_any_reference(reg);
+    effect eff = reference_whole_region(ref, region_action_tag(eff));
+    return(CONS(EFFECT,eff,NIL));
+}
+
+
 /************************************************************ PHI ENTITIES */
 
 /* entity make_phi_entity(int n) 

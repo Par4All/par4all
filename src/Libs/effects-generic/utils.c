@@ -37,6 +37,7 @@ void (*effect_free_func)(effect eff);
 
 /* make functions for effects */
 effect (*reference_to_effect_func)(reference, action);
+list (*effect_to_store_independent_effect_list_func)(effect, bool);
 
 /* union */
 effect (*effect_union_op)(effect, effect);

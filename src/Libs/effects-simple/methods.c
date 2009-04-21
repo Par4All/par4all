@@ -52,6 +52,8 @@ set_methods_for_proper_references()
     effect_free_func = reference_effect_free;
 
     reference_to_effect_func = reference_to_reference_effect;
+    effect_to_store_independent_effect_list_func = 
+      effect_to_store_independent_sdfi_list;
 
     /* FI: no longer good with conditional expressions? Should we use
        EffectsMustUnion or ReferenceMustUnion? Does not seem to have
@@ -111,6 +113,8 @@ set_methods_for_cumulated_references()
     effect_free_func = reference_effect_free;
 
     reference_to_effect_func = reference_to_reference_effect;
+    effect_to_store_independent_effect_list_func = 
+      effect_to_store_independent_sdfi_list;
 
     /* effect_union_op = ; *//* ??? */
     effects_union_op = ReferenceUnion;
@@ -176,6 +180,8 @@ set_methods_for_proper_simple_effects()
     effect_free_func = simple_effect_free;
 
     reference_to_effect_func = reference_to_simple_effect;
+    effect_to_store_independent_effect_list_func = 
+      effect_to_store_independent_sdfi_list;
 
     effect_union_op = effect_must_union;
 
@@ -232,6 +238,8 @@ set_methods_for_simple_effects()
     effect_free_func = simple_effect_free;
 
     reference_to_effect_func = reference_to_simple_effect;
+    effect_to_store_independent_effect_list_func = 
+      effect_to_store_independent_sdfi_list;
 
     effect_union_op = effect_must_union;
     effects_union_op = EffectsMustUnion;

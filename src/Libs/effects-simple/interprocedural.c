@@ -1311,6 +1311,7 @@ effect c_summary_effect_to_proper_effect(effect eff,
 /* FI: I do not know how deep the copying should be and the
    preferences do not help for C because some references are not found
    in the program expression but built according to an abstraction. */
+
 list c_summary_to_proper_effects(
 				 entity func,
 				 list /* of expression */ args,
@@ -1318,54 +1319,295 @@ list c_summary_to_proper_effects(
 {
   list pel = NIL; /* proper effect list */
   list ce = list_undefined; /* current effect */
+  bool param_varargs_p = false;
+  type u_func_t = ultimate_type(entity_type(func));
+  list params = functional_parameters(type_functional(u_func_t));
+ 
+  pips_debug(2, "begin for %s\n", entity_local_name(func));
 
-  check_user_call_site(func, args);
+  /* first the case of va_args.
+   * the approach is conservative : we generate may r/w effects
+   * on all actual arguments. This could and should be refined...
+   */
 
-  for(ce = func_sdfi; !ENDP(ce); POP(ce)) {
-    effect eff = EFFECT(CAR(ce));
-    reference r = effect_any_reference(eff);
-    entity v = reference_variable(r);
+  MAP(PARAMETER, e_param, 
+      {
+	type te = parameter_type(e_param);
+	pips_debug(8, "parameter type : %s\n", type_to_string(te));
+	if(type_varargs_p(te)) 
+	  {
+	    param_varargs_p = true;
+	  }  
+      },
+      params);
+  
+  if (param_varargs_p)
+    {
+      pips_debug(5, "varargs parameters.\n");
+      
+      /* First, we keep those effects in the summary list that are not 
+       * effects on formal parameters, that is to say effects on global 
+       * variables.
+       */
+ 
+      MAP(EFFECT, eff,
+	  {
+	    reference r = effect_any_reference(eff);
+	    entity v = reference_variable(r);
+	     
+	    if(formal_parameter_p(v)) 
+	      {
+		pips_debug(8, "effect on formal parameter skipped : %s\n", 
+			   entity_name(v));
+	      }
+	    else 
+	      {
+		bool force_may_p = true;
+		
+		pips_debug(8, "effect on global entity keeped : %s\n",
+			   entity_name(v));
+		
+		/* We keep a may effect on the global entity.
+		 * We do not try to translate the predicate if it's a region
+		 * because it may reference the formal parameters. */
+		
+		pel = gen_nconc
+		  (pel, 
+		   (*effect_to_store_independent_effect_list_func)
+		   (effect_dup(eff), force_may_p));
+	      }
+	  },
+	  func_sdfi);
+       
+      ifdebug(8)
+	{
+	  pips_debug(8, "effects on global variables :\n");
+	  (* effects_prettyprint_func)(pel);
+	}
+      
 
-    if(formal_parameter_p(v)) {
-      storage s = entity_storage(v);
-      formal fs = storage_formal(s);
-      int rank = formal_offset(fs);
-      expression ep = EXPRESSION(gen_nth(rank-1, args));
-      effect n_eff = effect_undefined;
+      /* Then, we add the read effects on actual parameters.
+       * (I have to check if it is not done by in the callers of this function)
+       */
+      
+      pel = gen_nconc(pel, generic_proper_effects_of_expressions(args));
+      ifdebug(8)
+	{
+	  pips_debug(8, "effects on actual parameters added :\n");
+	  (* effects_prettyprint_func)(pel);
+	}
+      
+      
+      /* Lastly, we add the read and write effects on the variables 
+       * pointed by the actual parameters if it makes sense.
+       */
+      
+      pips_debug(5, "Generating r/w effects on variables pointed by actual parameters\n");
+      
+      MAP(EXPRESSION, arg,
+	  {
+	    /*first, we compute the effects on the expression as if it were 
+	     * a lhs. */
+	    list arg_eff_tmp = NIL;
+	    list arg_eff = NIL;
 
-      ifdebug(8){
-	pips_debug(8, "Summary effect eff=%p: \"%s\"\n", eff,
-		   list_to_string(effect_words_reference_with_addressing_as_it_is
-				  (effect_any_reference(eff),
-				   addressing_tag(effect_addressing(eff)))));
-      }
+	    if (! expression_constant_p(arg))
+	      {
+		arg_eff_tmp =  generic_proper_effects_of_any_lhs(arg);
+		
+		ifdebug(8)
+		  {
+		    pips_debug
+		      (8, 
+		       "begin considering expression %s , effects are :\n",
+		       words_to_string(words_expression(arg)));
+		    (* effects_prettyprint_func)(arg_eff_tmp);
+		  }
+		
+		/* Then, we replace write effects on references with write effects
+		 * on the pointed variable if it makes sense.
+		 * we skip read effects since they have already been computed 
+		 * before. */
+		MAP(EFFECT, eff,
+		    {
+		      if (effect_write_p(eff))
+			{
+			  reference ref = effect_any_reference(eff);
+			  entity ent = reference_variable(ref);
+			  type t = entity_type(ent);
+			  
+			  switch (type_tag(t))
+			    {
+			    case is_type_variable :
+			      {
+				variable var = type_variable(t);
+				int nb_inds = gen_length(variable_dimensions(var)); 
+				pips_debug(8, "It's a variable\n");
+				
+				if ( nb_inds > 0)
+				  {
+				    /* it's an array  : let us generate write and "
+				       read effects on the whole array 
+				    This really is not GENERIC at all 
+				    */
+				    effect eff_read; 
+				    effect eff_write =effect_dup(eff);
+				    reference eff_ref = copy_reference(ref);
+				    int i;
+				    list ind = NIL;
+				    pips_debug(8, "It's an array \n");
 
-      /* copy_effect cannot be used in case a "preference" is used in the cell */
-      n_eff = c_summary_effect_to_proper_effect(effect_dup(eff), ep);
-
-      ifdebug(8){
-	pips_debug(8, "Resulting proper effect: \"%s\"\n",
-		   list_to_string(effect_words_reference_with_addressing_as_it_is
-				  (effect_any_reference(eff),
-				   addressing_tag(effect_addressing(eff)))));
-      }
-
-      if(!effect_undefined_p(n_eff))
-	pel = gen_nconc(pel, CONS(EFFECT, n_eff, NIL));
-      /* FI: I'm not too sure about this... */
-      pel = gen_nconc(pel, generic_proper_effects_of_expression(ep));
-
-      ifdebug(8) {
-	pips_debug(8, "With expression effects:\n");
-	print_effects(pel);
+				    /* add the indices */
+				    for (i=0; i<nb_inds; i++)
+				      {
+					ind = gen_nconc
+					  (ind, 
+					   CONS(EXPRESSION,
+						make_unbounded_expression(),
+						NIL));
+				      }
+				    eff_ref = effect_any_reference(eff_write);
+				    reference_indices(eff_ref) = ind;
+				    
+				    eff_read = effect_dup(eff_write);
+				    action_tag(effect_action(eff_read)) =
+				      is_action_read;
+				    arg_eff = gen_nconc
+				      (arg_eff, CONS(EFFECT, eff_write,
+						     CONS(EFFECT,eff_read,NIL)));
+				    ifdebug(8)
+				      {
+					pips_debug(8, "generated effects are :\n");
+					(* effects_prettyprint_func)(arg_eff);
+				      }
+				  }
+				else if (basic_pointer_p(variable_basic(var))) 
+				  {
+				    effect eff_write;
+				    effect eff_read;
+				    
+				    pips_debug(8, "Its a pointer\n");
+				    /* it's a pointer : let us generate write and
+				       read effects on the pointed structure
+				       I think it can be simplified with the next
+				       representation of effects
+				       THIS IS NOT GENERIC, but it should be
+				       easily made so with the future
+				       representation of effects
+				    */
+				    eff_write = effect_dup(eff);
+				    addressing_tag(effect_addressing(eff_write)) =
+				      is_addressing_pre;
+				    approximation_tag
+				      (effect_approximation(eff_write)) =
+				      is_approximation_may;
+				    eff_read = effect_dup(eff_write);
+				    action_tag(effect_action(eff_read)) =
+				      is_action_read;
+				    arg_eff = gen_nconc
+				      (arg_eff, CONS(EFFECT, eff_write,
+						     CONS(EFFECT,eff_read,NIL)));
+				    ifdebug(8)
+				      {
+					pips_debug(8, "generated effects are :\n");
+					(* effects_prettyprint_func)(arg_eff);
+				      }
+				    
+				  }
+				else
+				  {
+				    pips_debug(8,"No write effect on passed by value actual parameter %s\n", entity_name(ent));
+				  }
+				break;
+			      } /* case is_type_variable */
+			    case is_type_struct:
+			    case is_type_union:
+			    case is_type_enum:
+			      {
+				pips_user_warning("Effect on struct, union or enum not handled yet\n");
+				break;
+			      }
+			    default: 
+			      {
+				pips_internal_error
+				  ("effect entity is a statement, an area, a functional, a vararg, unknown or void \n");
+			      }
+			    } /* end of switch */
+			} /* end of if (effect_write_p)*/
+		    }, arg_eff_tmp);
+		
+		/* The next statement was here to avoid memory leaks. 
+		   But it aborts ! I don't know why, maybe due to preferences 
+		   As it should maybe disappear with the change of effects, 
+		   I leave it as it is.*/ 
+		/* effects_free(arg_eff_tmp);*/ 
+		pel = gen_nconc(pel, arg_eff);
+	      } /* if (! expression_constant_p)*/
+	    
+	  }, args);
+      
+    } /* if (param_varargs_p) */
+  
+  else
+    {
+      check_user_call_site(func, args);
+      
+      for(ce = func_sdfi; !ENDP(ce); POP(ce)) {
+	effect eff = EFFECT(CAR(ce));
+	reference r = effect_any_reference(eff);
+	entity v = reference_variable(r);
+	
+	if(formal_parameter_p(v)) 
+	  {
+	    storage s = entity_storage(v);
+	    formal fs = storage_formal(s);
+	    int rank = formal_offset(fs);
+	    expression ep = EXPRESSION(gen_nth(rank-1, args));
+	    effect n_eff = effect_undefined;
+	    
+	    ifdebug(8){
+	      pips_debug(8, "Summary effect eff=%p: \"%s\"\n", eff,
+			 list_to_string
+			 (effect_words_reference_with_addressing_as_it_is
+			  (effect_any_reference(eff),
+			   addressing_tag(effect_addressing(eff)))));
+	    }
+	    
+	    /* copy_effect cannot be used in case a "preference" is used in the cell */
+	    n_eff = c_summary_effect_to_proper_effect(effect_dup(eff), ep);
+	    
+	    ifdebug(8){
+	      pips_debug(8, "Resulting proper effect: \"%s\"\n",
+			 list_to_string
+			 (effect_words_reference_with_addressing_as_it_is
+			  (effect_any_reference(eff),
+			   addressing_tag(effect_addressing(eff)))));
+	    }
+	    
+	    if(!effect_undefined_p(n_eff))
+	       pel = gen_nconc(pel, CONS(EFFECT, n_eff, NIL));
+	    /* FI: I'm not too sure about this... */
+	    pel = gen_nconc(pel, generic_proper_effects_of_expression(ep));
+	    
+	    ifdebug(8) 
+	      {
+		pips_debug(8, "With expression effects:\n");
+		print_effects(pel);
+	      }
+	  }
+	else {
+	  /* This effect must be a global effect. It does not require
+	     translation in C. However, it may not be in the scope of the caller. */
+	  pel = gen_nconc(pel, CONS(EFFECT, copy_effect(eff), NIL));
+	}
       }
     }
-    else {
-      /* This effect must be a global effect. It does not require
-	 translation in C. However, it may not be in the scope of the caller. */
-      pel = gen_nconc(pel, CONS(EFFECT, copy_effect(eff), NIL));
+
+  ifdebug(5)
+    {
+      pips_debug(5, "resulting effects :\n");
+       (*effects_prettyprint_func)(pel);
     }
-  }
   return pel;
 }
 
