@@ -173,10 +173,12 @@ Request: build resource PRINTED_FILE for module ENV.
   CUMULATED_EFFECTS              building   CUMULATED_EFFECTS(ENV)
   SUMMARY_EFFECTS                building   SUMMARY_EFFECTS(ENV)
   TRANSFORMERS_INTRA_FAST        building   TRANSFORMERS(ENV)
+user warning in transformers_intra_fast: Property SEMANTICS_FLOW_SENSITIVE is ignored
   INITIAL_PRECONDITION           building   INITIAL_PRECONDITION(ENV)
   INTRAPROCEDURAL_SUMMARY_PRECONDITION building   SUMMARY_PRECONDITION(ENV)
   PRECONDITIONS_INTRA            building   PRECONDITIONS(ENV)
   TRANSFORMERS_INTRA_FAST        building   TRANSFORMERS(BAR)
+user warning in transformers_intra_fast: Property SEMANTICS_FIX_POINT is ignored
   INITIAL_PRECONDITION           building   INITIAL_PRECONDITION(BAR)
   INTRAPROCEDURAL_SUMMARY_PRECONDITION building   SUMMARY_PRECONDITION(BAR)
   PRECONDITIONS_INTRA            building   PRECONDITIONS(BAR)
@@ -185,6 +187,7 @@ Request: build resource PRINTED_FILE for module ENV.
                                  building   INV_REGIONS(BAR)
   SUMMARY_REGIONS                building   SUMMARY_REGIONS(BAR)
   TRANSFORMERS_INTRA_FAST        building   TRANSFORMERS(FOO)
+user warning in transformers_intra_fast: Property SEMANTICS_FIX_POINT is ignored
   INITIAL_PRECONDITION           building   INITIAL_PRECONDITION(FOO)
   INTRAPROCEDURAL_SUMMARY_PRECONDITION building   SUMMARY_PRECONDITION(FOO)
   PRECONDITIONS_INTRA            building   PRECONDITIONS(FOO)
