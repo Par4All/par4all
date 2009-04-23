@@ -41,7 +41,11 @@ endif # use_pdflatex
 # ps (post script)
 %.ps: %.dvi;	$(DVIPS) $< -o
 
-%.pdf: %.idraw;	$(EPS2PDF) $< > $@
+%.eps: %.idraw
+	cp $< $@
+
+%.pdf: %.idraw
+	$(EPS2PDF) --outfile=$@ $<
 
 # latex
 %.dvi: %.tex
