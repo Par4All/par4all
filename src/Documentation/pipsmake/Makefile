@@ -104,12 +104,13 @@ epips_transform_menu_layout.el wpips_transform_menu_layout.h epips_view_menu_lay
 headers: $(DERIVED_INC)
 
 pipsmake-rc.pdf: user-and-source-files.pdf
+pipsmake-rc.dvi: user-and-source-files.eps
 
 clean: local-clean
 
 local-clean:
 	$(RM) -r $(DERIVED_FILES) pipsmake-rc.htdoc pipsprop.sed \
-		user-and-source-files.pdf \
+		user-and-source-files.pdf user-and-source-files.eps \
 		*.aux *.log *.ind *.idx *.toc *.ilg *.dvi *.ps *.out *.brf
 
 # common stuff
