@@ -28,6 +28,7 @@
 
 #include "genC.h"
 #include "newgen_include.h"
+#include "newgen_hash.h"
 #include "genread.h"
 
 /* starting the scanner.
@@ -353,6 +354,16 @@ struct driver {
   void (*obj_out)() ;
 } ;
 
+/* Store the last object visited, that is the parent of the current
+   object: */
+static gen_chunk gen_previous_object = { .p = NULL };
+/* If we record the parent object relation during the current recursion: */
+bool gen_record_tracking_p = FALSE;
+/* The hash map that stores the parent associated to an object visited
+   during the recursion: */
+hash_table ancestor_tracking = NULL;
+
+
 /* To be called on any object pointer.
  */
 
@@ -581,6 +592,20 @@ gen_trav_obj(
 	    print_domain( stderr, dp ) ;
 	    (void) fprintf( stderr, "\n" ) ;
 	}
+
+	/* Keep track of the current object before jumpin in: */
+	if (gen_record_tracking_p) {
+	  // fprintf(stderr, "[gen_trav_obj] set heritage %p -> %p\n",
+	  //         gen_previous_object.p, obj);
+	  /* Since an object can have multiple ancestors (for example
+	     think in PIPS unstructured where we can have multible goto
+	     towards the same node), just pick the first ancestor found to
+	     avoid heritage flapping. So do not store again an ancestor if
+	     already one: */
+	  if (! hash_defined_p(ancestor_tracking, obj))
+	    hash_put(ancestor_tracking, obj, gen_previous_object.p);
+	}
+	gen_previous_object.p = obj;
 
 	switch( dp->ba.type ) 
 	{
@@ -2705,7 +2730,7 @@ gen_allocated_memory(
 }
 
 /*********************************************************** MULTI RECURSION */
-/*
+/* @defgroup Gen_Multi_Recurse
  *    quick and Intelligent Recursion Thru Gen_Multi_Recurse
  *
  *    Fabien COELHO, Jun-Sep-Dec 94
@@ -3249,7 +3274,7 @@ void gen_recurse(
     gen_multi_recurse(obj, domain, filter, rewrite, NULL);
 }
 
-#ifdef gen_context_recurse 
+#ifdef gen_context_recurse
 #undef gen_context_recurse
 #endif
 
@@ -3261,6 +3286,69 @@ void gen_context_recurse(
     void (*rewrite)())
 {
     gen_context_multi_recurse(obj, context, domain, filter, rewrite, NULL);
+}
+
+/* @defgroup gen_recurse_heritage
+
+   Methods to get parent information during recursion. */
+
+/* Get the previous visited object during the recursion.  If we are in a
+   filter called from a gen_recurse, it interestingly the parent object.
+
+   @return the parent object. If it fails to do it, it returns:
+
+     - NULL if the current object is the root of the recursion (since it
+       does not have any parent inside the reduction scope)
+*/
+gen_chunk
+gen_get_recurse_previous_visited_object() {
+  return gen_previous_object;
+}
+
+
+/* Get the first ancestor object encountered during the recursion for the
+   given object.
+
+   The heritage relation is built during the top-down phase (the
+   filter-down phase), so if the objects are rewiten durin the top-down
+   rewriting phase, the heritage relation are not up-to-date for these
+   objects.
+
+   @p is the object we want the ancestor
+   @return the object parent. If it fails, it returns:
+     - NULL if the current object is the root of the recursion (so no parent)
+     - HASH_UNDEFINED_VALUE if the current object
+*/
+gen_chunk
+gen_get_recurse_ancestor(void * object) {
+  return (gen_chunk) hash_get(ancestor_tracking, object);
+}
+
+
+/* Start gen_recurse function heritage tracking.
+
+   It reset the previous computed ancestor relations.
+ */
+void
+gen_start_recurse_ancestor_tracking() {
+  // Deallocate the hash-map if already set:
+  if (ancestor_tracking != NULL)
+    hash_table_free(ancestor_tracking);
+  ancestor_tracking = hash_table_make(hash_pointer, 0);
+  // There is no previous node visited:
+  gen_previous_object.p = NULL;
+  gen_record_tracking_p = TRUE;
+}
+
+
+/* Stop gen_recurse function tracking heritage.
+
+   Do not remove the hash-map so that we can continue to have this
+   information afterwards.
+*/
+void
+gen_stop_recurse_ancestor_tracking() {
+  gen_record_tracking_p = FALSE;
 }
 
 /*    That is all

@@ -27,6 +27,7 @@
 
 */
 
+#include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <ctype.h>
@@ -44,6 +45,9 @@ string gen_strndup(
 {
  	register string r;
 	register size_t i;
+
+	/* The length must be positive: */
+	assert((intptr_t) n >= 0);
 
 	/* allocation */
 	if ((r = (string) malloc(n)) == NULL) {
@@ -72,6 +76,9 @@ string gen_strndup0(
 {
  	register string r;
 	register size_t i;
+
+	/* The length must be positive: */
+	assert((intptr_t) n >= 0);
 
 	/* allocation */
 	if ((r = (string) malloc(n+1)) == NULL) {

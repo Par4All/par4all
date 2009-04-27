@@ -13,6 +13,7 @@
   "Assertion failed (%s:%d)\n", __FILE__, __LINE__
 #endif
 
+#undef assert
 #ifdef NDEBUG
 #define assert(ex)
 #define message_assert(msg, ex)
