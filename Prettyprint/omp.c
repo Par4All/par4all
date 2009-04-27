@@ -4,16 +4,18 @@ int main () {
   float x = 2.12;
 
   for (i = 0; i < 10; i++) {
-    for (j = 2; j < 7; j++) {
-      for (k = 4; k < 3; k++) {
-	for (l = 2; l < 10; l++) {
+    for (j = 0; j < 10; j++) {
+      // comments 2
+      float z = 0.0;
+      for (k = 0; k < 10; k++) {
+	z = k * 2.0;
+	for (l = 0; l < 10; l++) {
 	  for (m = 0; m < 10; m++) {
-	    float y;
-	    float w = 1.0;
-	    float z=2.32 + y;
-	    y = 3.5 + x;	    
-	    w=1.2 + z;
-	    a[i][j][k][l][m] = x*y+x+z;
+	    //comments 3
+	    float y = 2.0;
+	    // comments 4
+	    y = 3.5 + x + z;	   
+	    a[i][j][k][l][m] = x*y;
 	  }
 	}
       }

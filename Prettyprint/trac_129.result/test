@@ -1,0 +1,16 @@
+int main()
+{
+   float a[10];
+   int i;
+   int j;
+   float x = 2.12;
+   {
+      float z = 3.0;
+      x += z;                                                           /*0010*/
+   }
+#pragma omp parallel for 
+   for(i = 0; i <= 9; i += 1) {                                         /*0012*/
+      float y = 2.0;
+      a[i] = x*y;                                                       /*0014*/
+   }
+}
