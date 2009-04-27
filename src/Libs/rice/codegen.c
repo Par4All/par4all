@@ -485,42 +485,50 @@ tag seq_or_par;
 statement body;
 {
   loop old_loop = statement_loop(old_loop_statement);
-    loop new_loop;
-    statement new_loop_s;
-    list new_locals = NewLoopLocals(body, loop_locals(old_loop));
-    instruction ibody = statement_instruction(body);  
+  loop new_loop;
+  statement new_loop_s;
+  statement old_body = loop_body (old_loop);
+  list new_locals = NewLoopLocals(body, loop_locals(old_loop));
+  instruction ibody = statement_instruction(body); 
 
-
-    if (instruction_loop_p(ibody))
-	body = make_block_statement(CONS(STATEMENT,body,NIL));
-    ibody = statement_instruction(body);
+  if (instruction_loop_p(ibody))
+    body = make_block_statement(CONS(STATEMENT,body,NIL));
+  ibody = statement_instruction(body);
   
-    if (rice_distribute_only)
-	seq_or_par = is_execution_sequential;
+  if (rice_distribute_only)
+    seq_or_par = is_execution_sequential;
+  
+  // copy declaration from old body to new body
+  if ((statement_decls_text (old_body) != string_undefined) &&
+      (statement_decls_text (old_body) != NULL))
+    statement_decls_text (body) = copy_string (statement_decls_text (old_body));
+  if ((statement_declarations (old_body) != list_undefined) &&
+      (statement_declarations (old_body) != NULL))
+    //statement_declarations (body) = statement_declarations (old_body);
+    statement_declarations (body) = gen_copy_seq (statement_declarations (old_body));
+  
+  new_loop = make_loop(loop_index(old_loop), 
+		       loop_range(old_loop), 
+		       body,
+		       entity_empty_label(),
+		       make_execution(seq_or_par, UU), 
+		       new_locals);
     
+  new_loop_s = make_statement(entity_empty_label(), 
+			      statement_number(old_loop_statement),
+			      STATEMENT_ORDERING_UNDEFINED,
+			      string_undefined,
+			      make_instruction(is_instruction_loop, new_loop),NIL,NULL);
     
-    new_loop = make_loop(loop_index(old_loop), 
-			 loop_range(old_loop), 
-			 body,
-			 entity_empty_label(),
-			 make_execution(seq_or_par, UU), 
-			 new_locals);
+  ifdebug(8) {
+    pips_assert("Execution is either parallel or sequential",
+		seq_or_par==is_execution_sequential || seq_or_par==is_execution_parallel);
+    debug(8, "MakeLoopAs", "New %s loop\n",
+	  seq_or_par==is_execution_sequential? "sequential" : "parallel");
+    print_parallel_statement(new_loop_s);
+  }
     
-    new_loop_s = make_statement(entity_empty_label(), 
-				statement_number(old_loop_statement),
-				STATEMENT_ORDERING_UNDEFINED,
-				string_undefined,
-				make_instruction(is_instruction_loop, new_loop),NIL,NULL);
-    
-    ifdebug(8) {
-      pips_assert("Execution is either parallel or sequential",
-		  seq_or_par==is_execution_sequential || seq_or_par==is_execution_parallel);
-      debug(8, "MakeLoopAs", "New %s loop\n",
-	    seq_or_par==is_execution_sequential? "sequential" : "parallel");
-      print_parallel_statement(new_loop_s);
-    }
-    
-    return(new_loop_s);
+  return(new_loop_s);
 }
 
 /*

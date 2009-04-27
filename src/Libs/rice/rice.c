@@ -303,7 +303,6 @@ do_it(
 
     dg = graph_undefined;
     reset_current_module_statement();
-
     return TRUE;
 }
 

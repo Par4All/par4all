@@ -348,6 +348,7 @@ static list words_sizeofexpression(sizeofexpression obj);
 static list words_subscript(subscript s);
 static list words_application(application a);
 static text text_forloop(entity module,string label,int margin,forloop obj,int n);
+static text text_forloop(entity module,string label,int margin,forloop obj,int n);
 
 /* This variable is used to disable the precedence system and hence to
    prettyprint all parentheses, which let the prettyprint reflect the
@@ -2305,15 +2306,19 @@ text_loop_default(
     pc = CHAIN_SWORD(pc, entity_user_name(loop_index(obj)));
     pc = CHAIN_SWORD(pc, " = ");
 
+
     if(prettyprint_is_fortran) {
       pc = gen_nconc(pc, words_loop_range(loop_range(obj)));
+      // PIER trac 127, add begin block here
     }
     else {
       /* Assumed to be C */
       pc = gen_nconc(pc, C_loop_range(loop_range(obj), loop_index(obj)));
+      // PIER trac 127, add begin block here
       if(!one_liner_p(body))
 	 pc = CHAIN_SWORD(pc," {");
     }
+
     u = make_unformatted(strdup(label), n, margin, pc) ;
     ADD_SENTENCE_TO_TEXT(r, first_sentence = 
 			 make_sentence(is_sentence_unformatted, u));
@@ -2349,7 +2354,7 @@ text_loop_default(
     {
 	ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"ENDDO"));
     } 
-
+    // PIER trac 127, add end block here
     attach_loop_to_sentence_up_to_end_of_text(first_sentence, r, obj);
 
     return r;
@@ -3204,12 +3209,6 @@ text text_statement_enclosed(
   list l = statement_declarations(stmt);
 
   if (!ENDP(l) && !prettyprint_is_fortran) {
-    if(!statement_block_p(stmt)
-       && !instruction_unstructured_p(statement_instruction(stmt))) {
-      /* Maybe it should be a warning as the controlizer might need to
-	 generate such statements... */
-      pips_internal_error("Declarations added to a standard statement\n");
-    }
     if(!braces_p) {
       braces_added = TRUE;
       ADD_SENTENCE_TO_TEXT(r,
