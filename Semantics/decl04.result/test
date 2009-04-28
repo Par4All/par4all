@@ -3,38 +3,38 @@ Parsed code for "decl04"
 
 void decl04()
 {
+   // BEGIN BLOCK
    int i = 1;
-//:   BEGIN BLOCK
    {
+      // BEGIN BLOCK
       int j = i;
-//:      BEGIN BLOCK
 
       i = i+1;
 
       foo(j);
-//:      END BLOCK
+      // END BLOCK
    }
 
    foo(i);
-//:   END BLOCK
+   // END BLOCK
 }
 
 Controlized code for "decl04"
 
 void decl04()
 {
+   // BEGIN BLOCK
    int i = 1;
-//:   BEGIN BLOCK
    {
+      // BEGIN BLOCK
       int j = i;
-//:      BEGIN BLOCK
 
       i = i+1;
 
       foo(j);
-//:      END BLOCK
+      // END BLOCK
    }
 
    foo(i);
-//:   END BLOCK
+   // END BLOCK
 }
