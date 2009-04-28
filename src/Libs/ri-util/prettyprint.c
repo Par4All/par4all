@@ -333,12 +333,12 @@ bool get_prettyprint_is_fortran()
   return prettyprint_is_fortran;
 }
 
-bool set_prettyprint_is_fortran()
+void set_prettyprint_is_fortran()
 {
   prettyprint_is_fortran = TRUE;
 }
 
-bool reset_prettyprint_is_fortran()
+void reset_prettyprint_is_fortran()
 {
   prettyprint_is_fortran = FALSE;
 }
@@ -419,6 +419,55 @@ bool one_liner_p(statement s)
   }
 
   return yes;
+}
+
+/***************************************************local varibles handling */
+
+static text local_var;
+static bool local_flg = false;
+
+// This function either append the declaration to the text given as a parameter
+// or return a new text with  the declaration
+static text insert_locals (text r) {
+  if (local_flg == true) {
+    if ((r != text_undefined) && (r != NULL)){
+      MERGE_TEXTS (r, local_var);
+    }
+    else {
+      r = local_var;
+    }
+    local_flg = false;
+  }
+  return r;
+}
+
+// This function return true if BLOCK boundary markers are required.
+// The function also create the maker when needed.
+static bool mark_block (unformatted* t_beg, unformatted* t_end, int n, int margin) {
+  bool result = false;
+  if (!get_bool_property("PRETTYPRINT_FOR_FORESYS") &&
+      (get_bool_property("PRETTYPRINT_ALL_EFFECTS") ||
+       get_bool_property("PRETTYPRINT_BLOCKS")))
+    result = true;
+  if (result == true) {
+    // here we need to generat block marker for later use
+    if (prettyprint_is_fortran == true) {
+      // fortran case: comments at the begin of the line
+      list pbeg = CHAIN_SWORD (NIL, "BEGIN BLOCK");
+      list pend = CHAIN_SWORD (NIL, "END BLOCK");
+      *t_beg = make_unformatted (strdup (PIPS_COMMENT_SENTINEL), n, margin, pbeg);
+      *t_end = make_unformatted (strdup (PIPS_COMMENT_SENTINEL), n, margin, pend);
+    } else {
+      // C case: comments alligned with blocks
+      list pbeg = CHAIN_SWORD (NIL, strdup (PIPS_COMMENT_SENTINEL));
+      list pend = CHAIN_SWORD (NIL, strdup (PIPS_COMMENT_SENTINEL));
+      pbeg = CHAIN_SWORD (pbeg, " BEGIN BLOCK");
+      pend = CHAIN_SWORD (pend, " END BLOCK");
+      *t_beg = make_unformatted (NULL, n, margin, pbeg);
+      *t_end = make_unformatted (NULL, n, margin, pend);
+    }
+  }
+  return result;
 }
 
 /********************************************************************* WORDS */
@@ -2034,71 +2083,58 @@ sentence_goto(
 }
 
 /********************************************************************* TEXT */
-
-static text 
-
-text_block(
-    entity module,
-    string label,
-    int margin,
-    list objs,
-    int n)
+static text text_block (entity module, string label, int margin, list objs,
+			int n)
 {
-    text r = make_text(NIL);
-    list pbeg, pend;
+  text r = make_text(NIL);
+  
+  if (ENDP(objs) && !get_bool_property("PRETTYPRINT_EMPTY_BLOCKS")) {
+    return(r) ;
+  }
 
-    pend = NIL;
+  if(!empty_string_p(label)) {
+    pips_internal_error("Illegal label \"%s\". "
+			"Blocks cannot carry a label\n",
+			label);
+  }
 
-    if (ENDP(objs) && !get_bool_property("PRETTYPRINT_EMPTY_BLOCKS")) {
-	return(r) ;
-    }
+  unformatted bm_beg = NULL;
+  unformatted bm_end = NULL;
+  // test if block markers are required
+  bool flg_marker = mark_block (&bm_beg, &bm_end, n, margin);
 
+  // print the begin block marker if needed
+  if (flg_marker == true) {
+    ADD_SENTENCE_TO_TEXT(r, 
+			 make_sentence(is_sentence_unformatted, bm_beg));
+  }
+  else if ((get_bool_property("PRETTYPRINT_ALL_EFFECTS") ||
+	    get_bool_property("PRETTYPRINT_BLOCKS"))
+	   &&
+	   get_bool_property("PRETTYPRINT_FOR_FORESYS"))
+    ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted, 
+					  strdup("C$BB\n")));
 
-    if(!empty_string_p(label)) {
-	pips_internal_error("Illegal label \"%s\". "
-			    "Blocks cannot carry a label\n",
-			    label);
-    }
+  // append local variables if there is some
+  r = insert_locals (r);
     
-    if (get_bool_property("PRETTYPRINT_ALL_EFFECTS") ||
-	get_bool_property("PRETTYPRINT_BLOCKS")) {
-	unformatted u;
-	
-	if (get_bool_property("PRETTYPRINT_FOR_FORESYS")){
-	    ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted, 
-						  strdup("C$BB\n")));
-	}
-	else {
-	    pbeg = CHAIN_SWORD(NIL, "BEGIN BLOCK");
-	    pend = CHAIN_SWORD(NIL, "END BLOCK");
-	    
-	    /* Should be guarded by prettyprint_is_fortran as "C" is not OK in C,
-	       however, this option is useless in C since { and } are
-	       visible. Also, the comment prefix should be uniquely declared.*/
-	    u = make_unformatted(strdup(PIPS_COMMENT_SENTINEL), n, margin, pbeg);
-	    ADD_SENTENCE_TO_TEXT(r, 
-				 make_sentence(is_sentence_unformatted, u));
-	}
-    }
+  // begin  block marker and declarations have already been printed
+  // print the block instructions
+  for (; objs != NIL; objs = CDR(objs)) {
+    statement s = STATEMENT(CAR(objs));
 
-    for (; objs != NIL; objs = CDR(objs)) {
-	statement s = STATEMENT(CAR(objs));
-
-	text t = text_statement_enclosed(module, margin, s, FALSE);
-	text_sentences(r) = gen_nconc(text_sentences(r), text_sentences(t));
-	text_sentences(t) = NIL;
-	free_text(t);
-    }
-
-    if (!get_bool_property("PRETTYPRINT_FOR_FORESYS") &&
-	(get_bool_property("PRETTYPRINT_ALL_EFFECTS") ||
-	 get_bool_property("PRETTYPRINT_BLOCKS"))) 
-    {
-	unformatted u = make_unformatted(strdup(PIPS_COMMENT_SENTINEL), n, margin, pend);
-	ADD_SENTENCE_TO_TEXT(r, 
-			     make_sentence(is_sentence_unformatted, u));
-    }
-    return r;
+    text t = text_statement_enclosed(module, margin, s, FALSE);
+    text_sentences(r) = gen_nconc(text_sentences(r), text_sentences(t));
+    text_sentences(t) = NIL;
+    free_text(t);
+  }
+    
+  // print the end block marker if needed
+  if (flg_marker == true) {
+    ADD_SENTENCE_TO_TEXT(r, 
+			 make_sentence(is_sentence_unformatted, bm_end));
+  }
+  return r;
 }
 
 /* private variables.
@@ -2125,9 +2161,12 @@ loop_private_variables(loop obj)
 	    if (some_before) 
 		l = CHAIN_SWORD(l, ",");
 	    else
-		some_before = TRUE; /* from now on commas, triggered... */
-
+	      some_before = TRUE; /* from now on commas, triggered... */
+	    // PIER In C local variables are already private, so we might need
+	    // to skip
+	    //if ((prettyprint_is_fortran == true) || ()) {
 	    l = gen_nconc(l, words_declaration(p,TRUE));
+	    //}
 	}
     }, 
 	loop_locals(obj)) ; /* end of MAP */
@@ -2309,14 +2348,12 @@ text_loop_default(
 
     if(prettyprint_is_fortran) {
       pc = gen_nconc(pc, words_loop_range(loop_range(obj)));
-      // PIER trac 127, add begin block here
     }
     else {
       /* Assumed to be C */
       pc = gen_nconc(pc, C_loop_range(loop_range(obj), loop_index(obj)));
-      // PIER trac 127, add begin block here
       if(!one_liner_p(body))
-	 pc = CHAIN_SWORD(pc," {");
+	pc = CHAIN_SWORD(pc," {");
     }
 
     u = make_unformatted(strdup(label), n, margin, pc) ;
@@ -2330,8 +2367,14 @@ text_loop_default(
     {
 	list /* of string */ lp = loop_private_variables(obj);
 
+	// initialize the local variable text if needed 
+	if ((local_flg == false) && (lp)) {
+	  local_flg = true;
+	  local_var =  make_text(NIL);
+	}
+
 	if (lp) 
-	    ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_unformatted,
+	  ADD_SENTENCE_TO_TEXT( local_var, make_sentence(is_sentence_unformatted,
 	        make_unformatted(NULL, 0, margin+INDENTATION, lp)));
     }
 
@@ -2342,9 +2385,6 @@ text_loop_default(
     /* LOOP postlogue
      */
 
-
-
-
     if(!prettyprint_is_fortran) { /* i.e. is_C for the time being */
       if(!one_liner_p(body))
 	 ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"}"));
@@ -2354,7 +2394,7 @@ text_loop_default(
     {
 	ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"ENDDO"));
     } 
-    // PIER trac 127, add end block here
+
     attach_loop_to_sentence_up_to_end_of_text(first_sentence, r, obj);
 
     return r;
@@ -2991,8 +3031,23 @@ text_instruction(
     }
   case is_instruction_unstructured:
     {
-      r = text_unstructured(module, label, margin, 
-			    instruction_unstructured(obj), n);
+      // append local variables if there is some.
+      // local variable need to be inserted before diging the
+      // unstructured graph.
+      r = insert_locals (r);
+      
+      text tmp = text_undefined;
+      tmp = text_unstructured(module, label, margin, 
+			      instruction_unstructured(obj), n);
+      
+      // append the unstructured to the current text if it exists
+      if ((r != text_undefined) && (r != NULL)) {
+	MERGE_TEXTS (r, tmp);
+      }
+      else {
+	r = tmp;
+      }
+
       break;
     }
   case is_instruction_forloop:
@@ -3215,7 +3270,12 @@ text text_statement_enclosed(
 			   MAKE_ONE_WORD_SENTENCE(imargin, "{"));
       nmargin += INDENTATION;
     }
-    MERGE_TEXTS(r,c_text_entities(module,l,nmargin));
+    // initialize the local variable text if needed 
+    if (local_flg == false) {
+      local_flg = true;
+      local_var =  make_text(NIL);
+    }
+    MERGE_TEXTS(local_var, c_text_entities(module,l,nmargin));
   }
 
   pips_debug(2, "Begin for statement %s with braces_p=%d\n",
@@ -3257,6 +3317,10 @@ text text_statement_enclosed(
       else
  	temp = make_text(NIL);
    }
+
+  // append local variables  that might
+  // have not been inserted previously 
+  r = insert_locals (r);
 
   /* note about comments: they are duplicated here, but I'm pretty
    * sure that the free is NEVER performed as it should. FC.
