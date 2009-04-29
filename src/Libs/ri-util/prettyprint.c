@@ -2137,40 +2137,47 @@ static text text_block (entity module, string label, int margin, list objs,
   return r;
 }
 
-/* private variables.
- * modified 2-8-94 by BA.
- * extracted as a function and cleaned a *lot*, FC.
+/* return a string with the variable that need to be private in the current
+ * context
  */
 static list /* of string */
 loop_private_variables(loop obj)
 {
     bool
-	all_private = get_bool_property("PRETTYPRINT_ALL_PRIVATE_VARIABLES"),
+        all_private = get_bool_property("PRETTYPRINT_ALL_PRIVATE_VARIABLES"),
 	hpf_private = pp_hpf_style_p(),
 	omp_private = pp_omp_style_p(),
 	some_before = FALSE;
     list l = NIL;
+    
+    list locals = gen_copy_seq (loop_locals(obj));
+    list decl_var = statement_declarations (loop_body (obj));
+    
+    if (omp_private == TRUE) {
+      // In case of openmp the variable declared in the loop body should
+      // not be made private, so remove them from the list of locals.
+      gen_list_and_not (&locals, decl_var);
+    }
 
     /* comma-separated list of private variables. 
      * built in reverse order to avoid adding at the end...
      */
     MAP(ENTITY, p,
-    {
-	if((p!=loop_index(obj)) || all_private) 
 	{
-	    if (some_before) 
+	  if((p!=loop_index(obj)) || all_private) 
+	    {
+	      if (some_before) 
 		l = CHAIN_SWORD(l, ",");
-	    else
-	      some_before = TRUE; /* from now on commas, triggered... */
-	    // PIER In C local variables are already private, so we might need
-	    // to skip
-	    //if ((prettyprint_is_fortran == true) || ()) {
-	    l = gen_nconc(l, words_declaration(p,TRUE));
-	    //}
-	}
-    }, 
-	loop_locals(obj)) ; /* end of MAP */
-    
+	      else
+		some_before = TRUE; /* from now on commas, triggered... */
+	      l = gen_nconc(l, words_declaration(p,TRUE));
+	    }
+	}, 
+	locals
+	); /* end of MAP */
+
+    gen_free_list (locals);
+
     pips_debug(5, "#printed %zd/%zd\n", gen_length(l), 
 	       gen_length(loop_locals(obj)));
 
@@ -2185,7 +2192,7 @@ loop_private_variables(loop obj)
 	l = CONS(STRING, MAKE_SWORD(private), l);
 	if (hpf_private || omp_private) CHAIN_SWORD(l, ")");
     }
-
+    
     return l;
 }
 
