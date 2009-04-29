@@ -20,14 +20,10 @@ setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
 #echo Desugaring other for-loops into plain while-loops fot the time we improve semantics ameliorations in PIPS:
 setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
 
-apply PRIVATIZE_MODULE(%ALL)
-echo ## OMP style
+apply PRIVATIZE_MODULE(main)
+echo // OMP style
 activate PRINT_PARALLELIZEDOMP_CODE
-display PARALLELPRINTED_FILE(%ALL)
-echo ## done
-
-#display PRINTED_FILE(%ALL)
-
+display PARALLELPRINTED_FILE(main)
 
 close
 delete omp_c

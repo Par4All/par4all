@@ -1,3 +1,4 @@
+// OMP style
 int main()
 {
    float a[10][10][10][10][10];
