@@ -6,7 +6,7 @@
  * Modifications:
  *  - les fonctions d'interface avec GenPgm dont les noms commencent par
  *    "_gC_" ont ete deplacees dans _gC_lib
- *  - passage a "char *" pour le type Variable au lieu de "int" (Linear-C3) 
+ *  - passage a "char *" pour le type Variable au lieu de "int" (Linear-C3)
  *    et de "entity *" (PIPS); le package n'est pas independant de la
  *    definition du type "Variable"; il faudrait ameliorer ca avec un
  *    package "Variable"
@@ -30,22 +30,22 @@
 /* arithmetique is a requirement for vecteur, but I do not want
  * to inforce it in all pips files... thus here it is
  */
-#include "arithmetique.h" 
+#include "arithmetique.h"
 
 /* le type des variables (ou coordonnees) dans les vecteurs */
 typedef void * Variable;
-// The method type that return the name of a varible:
+// The method type that return the name of a variable:
 typedef char * (*get_variable_name_t)(Variable);
 
 #define VARIABLE_UNDEFINED ((Variable) 0)
 #define VARIABLE_UNDEFINED_P(v) ((v)==VARIABLE_UNDEFINED)
 #define VARIABLE_DEFINED_P(v) ((v)!=VARIABLE_UNDEFINED)
 
-/* le type des coefficients dans les vecteurs: 
+/* le type des coefficients dans les vecteurs:
  * Value est defini dans le package arithmetique
  */
 
-/* STRUCTURE D'UN VECTEUR 
+/* STRUCTURE D'UN VECTEUR
  *
  * Un vecteur est defini par une suite de couples Variable (i.e. element
  * de la base) et Valeur (valeur du coefficient correspondant). Les
@@ -62,17 +62,17 @@ typedef char * (*get_variable_name_t)(Variable);
  * Il n'existe pas non plus de VECTEUR_UNDEFINED, puisque sa valeur devrait
  * logiquement etre NULL.
  */
-typedef struct Svecteur { 
+typedef struct Svecteur {
     Variable var;
     Value val;
-    struct Svecteur *succ; 
+    struct Svecteur *succ;
 } Svecteur, *Pvecteur;
 
-/* STRUCTURE D'UNE BASE 
+/* STRUCTURE D'UNE BASE
  *
  * Une base est definie par son vecteur diagonal
  *
- * Les tests d'appartenance sont effectues par comparaison des pointeurs 
+ * Les tests d'appartenance sont effectues par comparaison des pointeurs
  * et non par des strcmp.
  *
  * Rien ne contraint les coefficients a valoir 1 et le package plint
@@ -120,24 +120,24 @@ typedef struct Svecteur Sbase, * Pbase;
  * It should be all or not, as provided by any os that would raise
  * integer overflows. Thus we should have thought of a sofware
  * mecanism compatible with such a hardware and os approach.
- * maybe by defining a mult_Value macro to check explicitely for 
- * overflows if needed, and defined to a simple product if not. 
- * functions would have an additional argument for returning a 
+ * maybe by defining a mult_Value macro to check explicitely for
+ * overflows if needed, and defined to a simple product if not.
+ * functions would have an additional argument for returning a
  * conservative answer in case of overflow. Maybe some global
  * variable could count the number of overflow that occured so that
- * some caller could check whether sg got wrong and thus could 
+ * some caller could check whether sg got wrong and thus could
  * warn about the result and this fact.
  * then we would have either the library compiled for these soft checks
- * or for none, but without any difference or explicite requirements 
+ * or for none, but without any difference or explicite requirements
  * from the user of these functions.
  *
- * instead of that, we have the two versions at the same time with explicite 
- * control required from the user. I heard that for some functions 
+ * instead of that, we have the two versions at the same time with explicite
+ * control required from the user. I heard that for some functions
  * this is not used... thus allowing good performance (each time some
  * result is false someone tracks down the not checked function and
  * checks overflow explicitely, thus it is not a very good approach).
  * moreover the most costly functions (simplexe, chernikova) are also
- * those in which the exceptions occurs thus they are all checked. 
+ * those in which the exceptions occurs thus they are all checked.
  * the the impact on performances is definitely low.
  * as far as software engineering is concerned, the current solution
  * adds low level switch for calling different versions (controled or not)
