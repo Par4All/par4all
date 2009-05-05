@@ -20,8 +20,7 @@
 #include "constants.h"
 #include "preprocessor.h"
 
-void print_arguments(args)
-cons * args;
+void print_homogeneous_arguments(list args, string variable_name(entity))
 {
     if(ENDP(args))
 	(void) fprintf(stderr, "(nil)\n");
@@ -29,12 +28,18 @@ cons * args;
 	MAPL(c, {entity e = ENTITY(CAR(c));
 		 (void) fprintf(stderr,
 			 c==args ? "%s" : ", %s",
-			 e==entity_undefined? "entity_undefined" : entity_minimal_name(e));},
+			 e==entity_undefined? "entity_undefined" : variable_name(e));},
 	     args);
 	(void) putc('\n',stderr);
     }
 }
 
+void print_arguments(list args)
+{
+  print_homogeneous_arguments(args, entity_minimal_name);
+}
+
+/* entity_name is a macro, hence the code replication */
 void dump_arguments(args)
 cons * args;
 {
