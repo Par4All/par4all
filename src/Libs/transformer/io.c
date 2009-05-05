@@ -43,7 +43,7 @@ fprint_transformer(FILE * fd,
 
 	/* print argument list */
 	(void) fprintf(fd,"arguments:");
-	print_arguments(args);
+	print_homogeneous_arguments(args, value_name);
 
 	/* print relation */
 	if(SC_UNDEFINED_P(sc))

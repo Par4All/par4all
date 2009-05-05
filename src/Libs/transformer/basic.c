@@ -118,6 +118,46 @@ transformer t;
  * to loops!!!
  */
 
+/* Add in tf the information that v is striclty positive, strictly negative or zero. 
+ *
+ * Assume that v is a value.and tf is defined.
+ */
+transformer transformer_add_sign_information(transformer tf,
+					     entity v,
+					     int v_sign)
+{
+  Psysteme psyst = predicate_system(transformer_relation(tf));
+
+  pips_assert("v is a value", value_entity_p(v) || local_temporary_value_entity_p(v));
+
+  psyst->base = base_add_variable(psyst->base, (Variable) v);
+
+  if(v_sign!=0) {
+    Pvecteur cv;
+    Pcontrainte ineq;
+    if(v_sign>0) {
+      cv = vect_new((Variable) v, VALUE_MONE);
+      vect_add_elem(&cv, TCST, VALUE_ONE);
+    }
+    else {
+      /* v_sign<0 */
+      cv = vect_new((Variable) v, VALUE_ONE);
+      vect_add_elem(&cv, TCST, VALUE_ONE);
+    }
+    ineq = contrainte_make(cv);
+    sc_add_inegalite(psyst, ineq);
+  }
+  else {
+    /* v_sign==0*/
+    Pvecteur cv = vect_new((Variable) v, VALUE_ONE);
+    Pcontrainte eq = contrainte_make(cv);
+
+    sc_add_egalite(psyst, eq);
+  }
+
+  return tf;
+}
+
 /* transformer transformer_add_loop_index(transformer t, entity i,
  *                                        Pvecteur incr):
  * add the index incrementation expression incr for loop index i to

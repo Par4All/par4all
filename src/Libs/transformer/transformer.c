@@ -879,7 +879,7 @@ transformer transformer_temporary_value_projection(transformer tf)
     /* tf = transformer_projection_with_redundancy_elimination(tf, tv, sc_identity); */
     tf = transformer_projection_with_redundancy_elimination(tf, tv, sc_safe_normalize);
   }
-  else ifdebug(9) {
+  else ifdebug(1) {
     Psysteme r = (Psysteme) predicate_system(transformer_relation(tf));
     Pbase b = BASE_NULLE;
 
