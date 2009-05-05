@@ -1,0 +1,97 @@
+
+Parsed printed file for "update04"
+
+void update04()
+{
+   int i = 1;
+   int j;
+   int k;
+
+   j = ++i;
+   k = i++;
+   foo(i);
+}
+
+Proper effects for "update04"
+
+void update04()
+{
+   int i = 1;
+   int j;
+   int k;
+//               <must be read   >: i
+//               <must be written>: i j
+
+   j = ++i;
+//               <must be read   >: i
+//               <must be written>: i k
+   k = i++;
+   foo(i);
+}
+
+Cumulated effects for "update04"
+
+void update04()
+{
+   int i = 1;
+   int j;
+   int k;
+//               <must be read   >: i
+//               <must be written>: i j
+
+   j = ++i;
+//               <must be read   >: i
+//               <must be written>: i k
+   k = i++;
+   foo(i);
+}
+
+Transformers for "update04"
+
+
+//  T() {}
+
+void update04()
+{
+   int i = 1;
+   int j;
+   int k;
+
+//  T(i,j) {i==i#init+1, i==j}
+
+
+   j = ++i;
+
+//  T(i,k) {i==i#init+1, i==k+1}
+
+   k = i++;
+
+//  T() {}
+
+   foo(i);
+}
+
+Preconditions for "update04"
+
+
+//  P() {}
+
+void update04()
+{
+   int i = 1;
+   int j;
+   int k;
+
+//  P() {i==1}
+
+
+   j = ++i;
+
+//  P(i,j) {i==2, j==2}
+
+   k = i++;
+
+//  P(i,j,k) {i==3, j==2, k==2}
+
+   foo(i);
+}

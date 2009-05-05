@@ -1,0 +1,138 @@
+
+Source code with proper effects
+
+void assign02()
+{
+   int i = 1;
+   int j;
+   int k;
+   int n;
+//               <must be read   >: n
+//               <must be written>: n
+
+   n++;                                                                 /*0009*/
+//               <must be written>: j k
+   j = k = 2;                                                           /*0010*/
+//               <must be read   >: i j
+//               <must be written>: i k
+   (i = j, k = i);
+//               <must be read   >: i j
+//               <must be written>: i j
+   (j = 2*i, i = j+1);
+   /* i is assigned before k, left-to-right evaluation */
+   
+   
+   
+
+   foo(i);                                                              /*0016*/
+}
+
+Source code with cumulated effects
+
+void assign02()
+{
+   int i = 1;
+   int j;
+   int k;
+   int n;
+//               <must be read   >: n
+//               <must be written>: n
+
+   n++;                                                                 /*0009*/
+//               <must be written>: j k
+   j = k = 2;                                                           /*0010*/
+//               <must be read   >: i j
+//               <must be written>: i k
+   (i = j, k = i);
+//               <must be read   >: i j
+//               <must be written>: i j
+   (j = 2*i, i = j+1);
+   /* i is assigned before k, left-to-right evaluation */
+   
+   
+   
+
+   foo(i);                                                              /*0016*/
+}
+
+Source code with transformers
+
+
+//  T() {}
+
+void assign02()
+{
+   int i = 1;
+   int j;
+   int k;
+   int n;
+
+//  T(n) {n==n#init+1}
+
+
+   n++;                                                                 /*0009*/
+
+//  T(j,k) {j==2, k==2}
+
+   j = k = 2;                                                           /*0010*/
+
+//  T(i,k) {i==j, i==k}
+
+   (i = j, k = i);
+
+//  T(i,j) {i==2i#init+1, 2i#init==j}
+
+   (j = 2*i, i = j+1);
+
+//  T() {}
+
+   /* i is assigned before k, left-to-right evaluation */
+   
+   
+   
+
+   foo(i);                                                              /*0016*/
+}
+
+Source code with preconditions
+
+
+//  P() {}
+
+void assign02()
+{
+   int i = 1;
+   int j;
+   int k;
+   int n;
+
+//  P() {i==1}
+
+
+   n++;                                                                 /*0009*/
+
+//  P(n) {i==1}
+
+   j = k = 2;                                                           /*0010*/
+
+//  P(j,k,n) {i==1, j==2, k==2}
+
+   (i = j, k = i);
+
+//  P(i,j,k,n) {i==2, j==2, k==2}
+
+   (j = 2*i, i = j+1);
+
+//  P(i,j,k,n) {i==5, j==4, k==2}
+
+   /* i is assigned before k, left-to-right evaluation */
+   
+   
+   
+
+   foo(i);                                                              /*0016*/
+}
+
+Warnings
+
+PROGRAM_PRECONDITION[] (get_main_entity) no main found, returning assign02 instead

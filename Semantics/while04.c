@@ -11,18 +11,21 @@
    i<n-1.
  */
 
-int while04()
+int while04(int n)
 {
-  int i, j, n;
+  int i, j;
 
   i = 0;
   j = 1;
 
   if(n<=1) exit(1);
 
+  {int k;
+
   while(i<n-1 && j<n) {
     i++;
     j++;
+  }
   }
   return i+j;
 }

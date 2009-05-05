@@ -1,37 +1,36 @@
-delete while01
+delete if02
 
 setenv PIPS_CPP="cpp -C"
 setproperty ABORT_ON_USER_ERROR TRUE
 
-create while01 while01.c
+create if02 if02.c
 
 activate C_PARSER
 activate INTERPROCEDURAL_SUMMARY_PRECONDITION
 activate TRANSFORMERS_INTER_FULL
 activate PRECONDITIONS_INTER_FULL
-setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
-setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
 
 setproperty PRETTYPRINT_C_CODE TRUE
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
-setproperty PRETTYPRINT_BLOCKS TRUE
 setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
 setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
 
+setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
+
 echo
-echo Transformers for "while01"
+echo Transformers for "if02"
 echo
 
 activate PRINT_CODE_TRANSFORMERS
-display PRINTED_FILE[while01]
+display PRINTED_FILE[if02]
 
 echo
-echo Preconditions for "while01"
+echo Preconditions for "if02"
 echo
 
 activate PRINT_CODE_PRECONDITIONS
-display PRINTED_FILE[while01]
+display PRINTED_FILE[if02]
 
 close
-delete while01
+delete if02
 quit

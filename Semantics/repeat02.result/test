@@ -1,0 +1,112 @@
+
+Transformers for "repeat02"
+
+
+C  T(repeat02) {repeat02==4}
+
+int repeat02()
+{
+   int i;
+   int j;
+
+//  T(repeat02) {repeat02==4}
+
+//:   BEGIN BLOCK
+
+//  T(i) {i==0}
+
+
+   i = 0;
+
+//  T(j) {i==0, j==1}
+
+   j = 1;
+   {
+      int n = 10;
+
+//  T(i,j) {i==1, i#init==0, j==3, j#init==1}
+
+//:      BEGIN BLOCK
+
+//  T(i,j) {2i+j#init==2i#init+j, i#init<=i}
+
+      do {
+
+//  T(i,j) {i==i#init+1, j==j#init+2, n==10}
+
+//:         BEGIN BLOCK
+
+//  T(i) {i==i#init+1, n==10}
+
+         i++;
+
+//  T(j) {j==j#init+2, n==10}
+
+         j += 2;
+//:         END BLOCK
+      }
+      while (j>n);
+//:      END BLOCK
+   }
+
+//  T(repeat02) {i==1, j==3, repeat02==4}
+
+   return i+j;
+//:   END BLOCK
+}
+
+Preconditions for "repeat02"
+
+
+//  P() {}
+
+int repeat02()
+{
+   int i;
+   int j;
+
+//  P() {}
+
+//:   BEGIN BLOCK
+
+//  P() {}
+
+
+   i = 0;
+
+//  P(i) {i==0}
+
+   j = 1;
+   {
+      int n = 10;
+
+//  P(i,j) {i==0, j==1}
+
+//:      BEGIN BLOCK
+
+//  P(i,j) {i==0, j==1, n==10}
+
+      do {
+
+//  P(i,j) {2i==j-1, n==10, 0<=i}
+
+//:         BEGIN BLOCK
+
+//  P(i,j) {2i==j-1, n==10, 0<=i}
+
+         i++;
+
+//  P(i,j) {2i==j+1, n==10, 1<=i}
+
+         j += 2;
+//:         END BLOCK
+      }
+      while (j>n);
+//:      END BLOCK
+   }
+
+//  P(i,j) {i==1, j==3}
+
+   return i+j;
+//:   END BLOCK
+}

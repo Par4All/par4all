@@ -1,0 +1,60 @@
+delete complete01
+create complete01 complete01.c
+
+#setenv C_SYNTAX_DEBUG_LEVEL 9
+#setproperty GENERATE_MISSING_SOURCE_FILES TRUE
+activate C_PARSER
+
+setproperty PRETTYPRINT_C_CODE TRUE
+#setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+# We want here to analyze for loops directly
+# setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
+setproperty PRETTYPRINT_BLOCKS TRUE
+#setproperty PPRETTYPRINT_EMPTY_BLOCKS TRUE
+
+# We do want to use the winning combination for the loop postcondition
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate TRANSFORMERS_INTER_FULL
+activate PRECONDITIONS_INTER_FULL
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+
+echo
+echo Source code with proper effects
+echo
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[complete01]
+
+echo
+echo Source code with cumulated effects
+echo
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[complete01]
+
+echo
+echo Source code with transformers
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[complete01]
+
+echo
+echo Source code with preconditions
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[complete01]
+
+apply UNSPLIT[%PROGRAM]
+
+close
+
+echo
+echo Warnings
+echo
+
+shell cat complete01.database/Warnings
+
+quit
