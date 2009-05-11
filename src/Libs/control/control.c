@@ -842,6 +842,12 @@ statement forloop_inc(statement sl)
   return is;
 }
 
+
+/* Test if the for-loop initialization is static.
+
+   @return TRUE if yes and a new plb expression of this initialization
+   value and the related index variable pli.
+*/
 static bool init_expression_to_index_and_initial_bound(expression init,
 						       entity * pli,
 						       expression * plb)
@@ -870,6 +876,7 @@ static bool init_expression_to_index_and_initial_bound(expression init,
 	  /* To avoid sharing and intricate free operations */
 	  *plb = copy_expression(EXPRESSION(CAR(CDR(call_arguments(c)))));
 	  success = TRUE;
+	  pips_debug(5, "Static initialization found.\n");
 	}
       }
     }
@@ -888,8 +895,23 @@ static bool init_expression_to_index_and_initial_bound(expression init,
   return success;
 }
 
-/* Depending on cond, the so-called upper bound may end up being a lower
-   bound with a decreasing steop loop. */
+
+/* Test if the final value @param li of a for-loop is static.
+
+   @return:
+   - TRUE if the final value of a for-loop is static
+
+   - pub is the new expression of the final value
+
+   - p_is_upper_p is set to TRUE if the final value is upper-bound (index
+     is increasing)
+
+   - p_is_lower_p is set to TRUE if the final value is loweer-bound (index
+     is decreasing)
+
+   Depending on cond, the so-called upper bound may end up being a lower
+   bound with a decreasing step loop.
+ */
 static bool condition_expression_to_final_bound(expression cond,
 						entity li,
 						bool* p_is_upper_p,
@@ -934,19 +956,37 @@ static bool condition_expression_to_final_bound(expression cond,
 
   ifdebug(5) {
     if(success) {
-      pips_debug(5, "End with expression\n");
+	pips_debug(5, "Static final value found!\n"
+		   "\tEnd with expression\n");
       print_expression(cond);
       pips_debug(5, "Loop counter is increasing: %s\n", bool_to_string(*p_is_upper_p));
-      pips_debug(5, "Loop condition is strict: %s\n", bool_to_string(*p_is_lower_p));
+      pips_debug(5, "Loop counter is decreasing: %s\n", bool_to_string(*p_is_lower_p));
+      pips_debug(5, "Loop condition is strict (< or > instead of <= or >=) : %s\n", bool_to_string(strict_p));
     }
-    else {
+    else
       pips_debug(5, "End: no final bound available\n");
-    }
   }
 
   return success;
 }
 
+
+/**
+   Test if a for-loop incrementation expression is do-loop compatible and,
+   if yes, compute the increment expression.
+
+   Most of this could be trivial by using the transformers but this
+   function is to be used from the controlizer where the semantics
+   informations are far from being available yet.
+
+   @param incr for-loop incrementation expression
+   @param li is the index variable
+
+   @return TRUE if the incrementation is do-loop compatible \`a la Fortran
+   - @param is_increasing_p is set to TRUE is the loop index is increasing
+   - @param is_decreasing_p is set to TRUE is the loop index is decreasing
+   - @param pincrement is genereted with the detected increment value expression
+ */
 static bool incrementation_expression_to_increment(expression incr,
 						   entity li,
 						   bool * is_increasing_p,
@@ -959,62 +999,99 @@ static bool incrementation_expression_to_increment(expression incr,
   if(syntax_call_p(incr_s)) {
     call incr_c = syntax_call(incr_s);
     entity op = call_function(incr_c);
-    if( ! ENDP(call_arguments(incr_c)) )
-    {
-        expression e = EXPRESSION(CAR(call_arguments(incr_c)));
+    if (! ENDP(call_arguments(incr_c))) {
+      expression e = EXPRESSION(CAR(call_arguments(incr_c)));
 
-        if((ENTITY_POST_INCREMENT_P(op) || ENTITY_PRE_INCREMENT_P(op))
-                && is_expression_reference_to_entity_p(e,li)) {
-            * is_increasing_p = TRUE;
-            * pincrement = int_to_expression(1);
-            success = TRUE;
-        }
-        else if((ENTITY_POST_DECREMENT_P(op) || ENTITY_PRE_DECREMENT_P(op))
-                && is_expression_reference_to_entity_p(e, li)) {
-            * is_decreasing_p = TRUE;
-            * pincrement = int_to_expression(-1);
-            success = TRUE;
-        }
-        else if( ! ENDP(CDR(call_arguments(incr_c))) )
-        {
-            e =  EXPRESSION(CAR(CDR(call_arguments(incr_c))));
-            if(ENTITY_PLUS_UPDATE_P(op)
-                    && extended_integer_constant_expression_p(e)) {
-                int v = expression_to_int(e);
-                if( v != 0)
-                {
-                    * pincrement = e;
-                    success = TRUE;
-                    if( v > 0 )
-                        * is_increasing_p = TRUE;
-                    else
-                        * is_decreasing_p = TRUE;
-                }
-            }
-            else if(ENTITY_MINUS_UPDATE_P(op)
-                    && extended_integer_constant_expression_p(e)) {
-                int v = expression_to_int(e);
-                if( v != 0)
-                {
-                    * pincrement = int_to_expression(-v);
-                    success = TRUE;
-                    if( v < 0 )
-                        * is_increasing_p = TRUE;
-                    else
-                        * is_decreasing_p = TRUE;
-                }
-            }
-        }
+      /* Look for i++ or ++i: */
+      if ((ENTITY_POST_INCREMENT_P(op) || ENTITY_PRE_INCREMENT_P(op))
+	  && is_expression_reference_to_entity_p(e,li)) {
+	* is_increasing_p = TRUE;
+	* pincrement = int_to_expression(1);
+	success = TRUE;
+	pips_debug(5, "Increment operator found!\n");
+      }
+      /* Look for i-- or --i: */
+      else if ((ENTITY_POST_DECREMENT_P(op) || ENTITY_PRE_DECREMENT_P(op))
+	       && is_expression_reference_to_entity_p(e, li)) {
+	* is_decreasing_p = TRUE;
+	* pincrement = int_to_expression(-1);
+	success = TRUE;
+	pips_debug(5, "Decrement operator found!\n");
+      }
+      else if (! ENDP(CDR(call_arguments(incr_c)))) {
+	e =  EXPRESSION(CAR(CDR(call_arguments(incr_c))));
+	/* Look for "i += integer": */
+	if (ENTITY_PLUS_UPDATE_P(op)
+	    && extended_integer_constant_expression_p(e)) {
+	  int v = expression_to_int(e);
+	  if (v != 0) {
+	    * pincrement = e;
+	    success = TRUE;
+	    if (v > 0 ) {
+	      * is_increasing_p = TRUE;
+	      pips_debug(5, "Found += with positive increment!\n");
+	    }
+	    else {
+	      * is_decreasing_p = TRUE;
+	      pips_debug(5, "Found += with negative increment!\n");
+	    }
+	  }
+	}
+	/* Look for "i -= integer": */
+	else if(ENTITY_MINUS_UPDATE_P(op)
+		&& extended_integer_constant_expression_p(e)) {
+	  int v = expression_to_int(e);
+	  if (v != 0) {
+	    * pincrement = int_to_expression(-v);
+	    success = TRUE;
+	    if (v < 0 ) {
+	      * is_increasing_p = TRUE;
+	      pips_debug(5, "Found -= with negative increment!\n");
+	    }
+	    else {
+	      * is_decreasing_p = TRUE;
+	      pips_debug(5, "Found -= with positive increment!\n");
+	    }
+	  }
+	}
+	else {
+	  /* Look for "i = i + v" or "i = v + i": */
+	  expression inc_v =
+	    expression_verbose_incrementation_p_and_return_increment(incr);
+	  if (inc_v != expression_undefined
+	      && extended_integer_constant_expression_p(inc_v)) {
+	    int v = expression_to_int(e);
+	    if (v != 0) {
+	      * pincrement = inc_v;
+	      success = TRUE;
+	      if (v > 0 ) {
+		* is_increasing_p = TRUE;
+		pips_debug(5, "Found \"i = i + v\" or \"i = v + i\" with positive increment!\n");
+	      }
+	      else {
+		* is_decreasing_p = TRUE;
+		pips_debug(5, "Found \"i = i + v\" or \"i = v + i\" with negative increment!\n");
+		    
+	      }
+	    }
+	  }
+	}
+      }
     }
   }
-
   return success;
 }
 
-static loop for_to_do_loop_conversion(expression init,
-				      expression cond,
-				      expression incr,
-				      statement body)
+
+/* Try to convert a C-like for-loop into a Fortran-like do-loop.
+
+   @return the do-loop if the transformation worked or loop_undefined if
+   it failed.
+ */
+loop for_to_do_loop_conversion(expression init,
+			       expression cond,
+			       expression incr,
+			       statement body)
 {
   loop l = loop_undefined;
   entity li = entity_undefined; /* loop index */
@@ -1027,7 +1104,7 @@ static loop for_to_do_loop_conversion(expression init,
 
    * The init expression is an assignment to an integer scalar (not fully necessary)
      It failed on the first submitted for loop which had two assignments as
-     initialization steap. One of the them was the loop index assignment.
+     initialization step. One of the them was the loop index assignment.
      More work is needed to retrieve all DO loops programmed as for loops.
 
    * The condition is a relational operation with the index
@@ -1037,16 +1114,18 @@ static loop for_to_do_loop_conversion(expression init,
 
    */
 
-  if(init_expression_to_index_and_initial_bound(init, &li, &lb)) {
+  if (init_expression_to_index_and_initial_bound(init, &li, &lb)) {
       bool is_lower_p = FALSE;
       bool is_upper_p = FALSE;
 
-    if(condition_expression_to_final_bound(cond, li, &is_upper_p, &is_lower_p, &ub)) {
+    if (condition_expression_to_final_bound(cond, li, &is_upper_p,
+					    &is_lower_p, &ub)) {
       bool is_increasing_p = FALSE;
       bool is_decreasing_p = FALSE;
 
-      if(incrementation_expression_to_increment(incr, li, &is_increasing_p,
-						&is_decreasing_p, &increment)) {
+      if (incrementation_expression_to_increment(incr, li, &is_increasing_p,
+						 &is_decreasing_p,
+						 &increment)) {
 	if(is_lower_p && is_increasing_p)
 	  pips_user_warning("Loop with lower bound and increasing index %s\n",
 			    entity_local_name(li));
@@ -1057,7 +1136,13 @@ static loop for_to_do_loop_conversion(expression init,
 	l = make_loop(li, lr, body, entity_empty_label(),
 		      make_execution(is_execution_sequential, UU), NIL);
       }
+      else
+	/* Remove the lower bound expression that won't be used: */
+	free_expression(ub);
     }
+    else
+      /* Remove the lower bound expression that won't be used: */
+      free_expression(lb);
   }
 
   return l;
@@ -1186,9 +1271,9 @@ hash_table used_labels;
        not yet available when the controlizer is run. */
     if(get_bool_property("FOR_TO_DO_LOOP_IN_CONTROLIZER")) {
 	loop new_l = for_to_do_loop_conversion(forloop_initialization(l),
-						  forloop_condition(l),
-						  forloop_increment(l),
-						  control_statement(c_body));
+					       forloop_condition(l),
+					       forloop_increment(l),
+					       control_statement(c_body));
 
 	if(!loop_undefined_p(new_l))
 	  ni = make_instruction(is_instruction_loop, new_l);

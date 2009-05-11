@@ -404,9 +404,12 @@ entity make_local_temporary_integer_value_entity()
   return tmp;
 }
 
+/* Return true if an entity is a local old value (such as "o#0" for a
+   global value "i#init"...).
+*/
 bool local_old_value_entity_p(entity e)
 {
-  /* this is not a general test; it will only work for LOCAL values */
+  /* This is not a general test; it will only work for LOCAL values */
   return strncmp(entity_local_name(e), OLD_VALUE_PREFIX, 2) == 0;
 }
 
@@ -445,6 +448,8 @@ bool global_new_value_p(entity e)
   return new;
 }
 
+/* Return true if an entity is a global old value (such as
+   "i#init"...). */
 bool global_old_value_p(entity e)
 {
   /* this is not a general test; it will only work for GLOBAL values */
@@ -1056,12 +1061,17 @@ void add_synonym_values(entity e, entity eq, bool readonly)
 
   pips_debug(8, "End\n");
 }
-
-/* This function used to be restricted to values seen by the
- * current module. It was extended to values in general to
- * cope with translation issues.
- */
 
+
+/* Get the primitive variable associated to any value involved in a
+   transformer.
+
+   For example can associate values such as "o#0" to "i" (via "i#init").
+
+   This function used to be restricted to values seen by the current
+   module. It was extended to values in general to cope with translation
+   issues.
+*/
 entity value_to_variable(entity val)
 {
   entity var = entity_undefined;
@@ -1079,9 +1089,9 @@ entity value_to_variable(entity val)
     /* this may be a value, but it is unknown in the current module */
     string val_name = entity_name(val);
 
-    if(strstr(val_name, NEW_VALUE_SUFFIX) != NULL) 
+    if(strstr(val_name, NEW_VALUE_SUFFIX) != NULL)
       l_suffix = strlen(NEW_VALUE_SUFFIX);
-    else if(strstr(val_name, OLD_VALUE_SUFFIX) != NULL) 
+    else if(strstr(val_name, OLD_VALUE_SUFFIX) != NULL)
       l_suffix = strlen(OLD_VALUE_SUFFIX);
     else if(strstr(val_name, INTERMEDIATE_VALUE_SUFFIX) != NULL)
       l_suffix = strlen(INTERMEDIATE_VALUE_SUFFIX);

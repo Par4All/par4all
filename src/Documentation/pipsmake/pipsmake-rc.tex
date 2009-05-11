@@ -64,7 +64,14 @@
 \usepackage{amstext,alltt}
 \usepackage[backref,pagebackref]{hyperref}
 \usepackage{xspace}
-\usepackage{graphicx}
+\usepackage{graphicx,ifpdf}
+% Use classical figure extension if we are in classical LaTeX (instead of
+% pdflatex), necessary for TeX4ht (htlatex):
+\ifpdf
+\else
+  \DeclareGraphicsExtensions{.idraw,.eps}
+\fi
+
 \makeatletter
 % Test for a TeX4ht command:
 %%\@ifundefined{HCode}{%
@@ -95,11 +102,15 @@
 \newcommand{\PdaVinci}{\LINK{\emph{daVinci}}{http://www.informatik.uni-bremen.de/~davinci}}
 
 % Some day it should point to the right place for the given property...
-\newcommand{\PipsProperty}[1]{\href{http://www.cri.ensmp.fr/pips/properties-rc.htdoc}{\texttt{#1}}\xspace}
+\def\PipsProperty{% To avoid escaping the "_" in the property
+                           % names...
+  \begingroup\catcode`\_=\active\@PipsProperty}
+{%\catcode`\_=12
+  \gdef\@PipsProperty#1{\href{http://www.cri.ensmp.fr/pips/properties-rc.htdoc}{\texttt{#1}}\endgroup\xspace}}
 
 
 \title{PIPS High-Level Software Interface \\
-    Pipsmake}
+    Pipsmake configuration}
 \author{Remi Triolet and Fran\c{c}ois Irigoin\\
   with many other contributors\\
         Ecole des Mines de Paris \\
@@ -1539,6 +1550,10 @@ property is set to false by default and should disappear soon.
 FOR_TO_DO_LOOP_IN_CONTROLIZER   FALSE
 \end{PipsProp}
 
+This can also explicitly applied by calling the phase described in
+\S~\ref{sec:loop-do-loop}.
+
+
 \subsubsection*{FORMAT Restructuring}
 \index{Format (Fortran)}
 \index{GATHER\_FORMATS\_AT\_BEGINNING}
@@ -1954,7 +1969,7 @@ option (see Section~\ref{subsubsection-menu-for-dependence-tests}).  Other
 dependence tests are likely to lack accuracy because a transitive check has
 been added by Béatrice \textsc{Creusillet} to improve speed. The other tests could
 not improve the simplest test based on regions. Note that it is not fast
-anymore when coping with regions.
+anymore when coping with regions.\marginpar{RK->BS: could you precise?}
 %%!UserManualDocumentation
 
 \begin{PipsMake}
@@ -1979,13 +1994,13 @@ exposed to callers because they are statically allocated or formal
 parameters, are ignored. The resulting parallel loops require some
 reallocation work in the callees. Ideally, the logically local
 variables should be made {\em physically} local automatically,
-e.g. stack allocated or dynsmically allocated, but this memory
+e.g. stack allocated or dynamically allocated, but this memory
 allocation transformation is not (yet) implemented in
 \PIPS{}. \marginpar{RK: Not clear (FI: To be deleted?)}
 
 Thus \verb+in_out_regions_chains+ are not safe: the resulting code is
 not equivalent to the input code. It is only useful for manual
-experimentss.
+experiments.
 
 As for region-based chains (see
 Section~\ref{subsubsection-read-write-region-based-chains}), the
@@ -2099,7 +2114,7 @@ CHAINS_DISAMBIGUATE_CONSTANT_SUBSCRIPTS FALSE
 %%@UserManualDocumentation: dg
 The dependence graph is used primarily by the parallelization
 algorithms. A dependence graph is a refinement of use-def chains
-(Section~\ref{subsection-chains}). If is {\em location}-based and not
+(Section~\ref{subsection-chains}). It is {\em location}-based and not
 {\em value}-based. See Section~\ref{subsection-array-data-flow-graph}
 for information about \PIPS{} value-based dependence graph, \textsc{Feautrier}'s
 DFG.
@@ -2170,7 +2185,7 @@ alias rice_regions_dependence_graph 'Regions Used'
 
 \subsection{Fast Dependence Test}
 \label{subsubsection-fast-dependence-test}
-\index{Fast Dependence Test}
+\index{dependence test!fast}
 
 %%@UserManualDocumentation: rice_fast_dependence_graph
 Use subscript expressions only (unless regions were used to compute
@@ -2189,7 +2204,7 @@ rice_fast_dependence_graph      > MODULE.dg
 
 \subsection{Full Dependence Test}
 \label{subsubsection-full-dependence-test}
-\index{Full Dependence Test}
+\index{dependence test!full}
 
 %%@UserManualDocumentation: rice_full_dependence_graph
 Use subscript expressions and loop bounds.
@@ -2203,9 +2218,10 @@ rice_full_dependence_graph      > MODULE.dg
         < MODULE.cumulated_effects
 \end{PipsMake}
 
+
 \subsection{Semantics Dependence Test}
 \label{subsubsection-semantics-dependence-test}
-\index{Fast Dependence Test}
+\index{dependence test!semantics}
 
 %%@UserManualDocumentation: rice_semantics_dependence_graph
 Uses subscript expressions and preconditions
@@ -2214,16 +2230,17 @@ Uses subscript expressions and preconditions
 
 \begin{PipsMake}
 rice_semantics_dependence_graph > MODULE.dg
-        < PROGRAM.entities 
+        < PROGRAM.entities
         < MODULE.code
         < MODULE.chains
         < MODULE.preconditions
         < MODULE.cumulated_effects
 \end{PipsMake}
 
+
 \subsection{Dependence Test with Array Regions}
 \label{subsubsection-regions-dependence-test}
-\index{Fast Dependence Test}
+\index{dependence test!regions}
 
 %%@UserManualDocumentation: rice_regions_dependence_graph
 Synonym for {\tt rice\_fast\_dependence\_graph}, except that it emits a
@@ -2232,7 +2249,7 @@ warning when {\tt region\_chains} is not selected.
 
 \begin{PipsMake}
 rice_regions_dependence_graph      > MODULE.dg
-        < PROGRAM.entities 
+        < PROGRAM.entities
         < MODULE.code
         < MODULE.chains
         < MODULE.cumulated_effects
@@ -5786,6 +5803,9 @@ when applying unspaghettify:
 UNSPAGHETTIFY_TEST_RESTRUCTURING FALSE
 \end{PipsProp}
 It is assumed as true for \verb/restructure_control/.
+It recursively implement TEST restructuring (replacing IF/THEN/ELSE
+with GOTOs with structured IF/THEN/ELSE without any GOTOs when
+possible) by applying pattern matching methods.
 
 The following option enables the use of control graph hierarchisation
 when applying unspaghettify:
@@ -5793,6 +5813,8 @@ when applying unspaghettify:
 UNSPAGHETTIFY_RECURSIVE_DECOMPOSITION FALSE
 \end{PipsProp}
 It is assumed as true for \verb/restructure_control/.
+It implements a recursive decomposition of the control flow graph
+by an interval graph partitioning method.
 
 The restructurer can recover some while loops if this property is set:
 \begin{PipsProp}
@@ -5806,12 +5828,10 @@ UNSPAGHETTIFY_WHILE_RECOVER FALSE
 \verb|restructure_control| is a more complete restructuring phase that
 is useful to improve the accuracy of various \PIPS{} phases.
 
-It recursively implement TEST restructuring (replacing IF/THEN/ELSE
-with GOTOs with structured IF/THEN/ELSE without any GOTOs when
-possible) by applying pattern matching methods.
-
-It also implement a recursive decomposition of the control flow graph
-by an interval graph partitioning method.
+It is implemented by calling \texttt{unspaghettify}
+(\S~\ref{sec:unspaghettify}) with the properties
+\PipsProperty{UNSPAGHETTIFY_TEST_RESTRUCTURING} and
+\PipsProperty{UNSPAGHETTIFY_RECURSIVE_DECOMPOSITION} set to \texttt{TRUE}.
 
 Other restructuring methods are available in \PIPS{} with the TOOLPACK's
 restructurer (see
@@ -5825,6 +5845,46 @@ restructure_control          > MODULE.code
         < PROGRAM.entities
         < MODULE.code
 \end{PipsMake}
+
+
+\subsubsection{For-loop recovering}
+\label{sec:loop-recovering}
+
+%%@UserManualDocumentation: recover_for_loop
+This control-flow transformation try to recover for-loops from
+while-loops. Useful to be run after transformations 
+%%!UserManualDocumentation
+
+\begin{PipsMake}
+alias recover_for_loop 'Recover for-loops from while-loops'
+
+recover_for_loop          > MODULE.code
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.transformers
+        < MODULE.summary_transformer
+        < MODULE.proper_effects
+        < MODULE.cumulated_effects
+        < MODULE.summary_effects
+\end{PipsMake}
+
+
+\subsubsection{For-loop to do-loop transformation}
+\label{sec:loop-do-loop}
+
+Since in PIPS some transformations and analysis are more precise for
+Fortran code, this is a transformation than try to transform the C-like
+for-loops into Fortran-like do-loops. Don't worry about the C-code output:
+the prettyprinter output do-loop as for-loop if the C-output is selected.
+
+\begin{PipsMake}
+alias for_loop_to_do_loop 'For-loop to do-loop transformation'
+
+for_loop_to_do_loop          > MODULE.code
+        < PROGRAM.entities
+        < MODULE.code
+\end{PipsMake}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SPAGHETTIFY
 
@@ -7653,7 +7713,7 @@ print_code_transformers         > MODULE.printed_file
         < MODULE.summary_effects
 \end{PipsMake}
 
-\subsection{Initial Preconditions}
+\subsection{Sequential View with Initial Preconditions}
 
 \begin{PipsMake}
 print_initial_precondition  > MODULE.printed_file
@@ -8001,7 +8061,7 @@ applied on Fortran files only to perform file includes. It is
 implemented in Perl.}, and not the user file, which is the file
 submitted by the user and which may contain several functions.
 
-Note also that some phases in {\texttt{pips} may add new statement
+Note also that some phases in \texttt{pips} may add new statement
 that are not present in the original file. In this case the number of
 the statement that requires such a transformation, is used for the
 added statement.
@@ -8273,14 +8333,15 @@ PRETTYPRINT_ALL_PARENTHESES FALSE
 \index{PRETTYPRINT\_COMMONS}
 \index{PRETTYPRINT\_VARIABLE\_DIMENSIONS}
 
-By default, module declarations are preserved as huge strings to produce
-an output as close as possible to the input (see field \verb/decls_text/
-in type \verb/code/). However, large program transformations and code
-generation phases, e.g. hpfc,a require updated declarations.
+By default in Fortran (and not in C), module declarations are preserved as
+huge strings to produce an output as close as possible to the input (see
+field \verb/decls_text/ in type \verb/code/). However, large program
+transformations and code generation phases, e.g. hpfc, require updated
+declarations.
 
 Regenerate all variable declarations, including those variables not
-declared in the user program. By default, when possible, the user
-declaration {\em text} is used to preserve comments.
+declared in the user program. By default in Fortran, when possible, the
+user declaration {\em text} is used to preserve comments.
 
 \begin{PipsProp}
 PRETTYPRINT_ALL_DECLARATIONS FALSE

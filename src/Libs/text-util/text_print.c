@@ -12,7 +12,7 @@
 #include "misc.h"
 #include "properties.h"
 
-/* ??? stupid cyclic rext-util <-> ri-util dependency */
+/* ??? stupid cyclic text-util <-> ri-util dependency */
 extern void deal_with_attachments_at_this_character();
 extern void deal_with_attachments_in_this_string();
 extern void deal_with_attachments_in_this_string_length();

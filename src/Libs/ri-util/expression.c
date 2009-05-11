@@ -1,4 +1,4 @@
- /* 
+ /*
   * $Id$
   *
   * Functions for the expressions
@@ -28,7 +28,7 @@
 
 /**************************************************** FORTRAN STRING COMPARE */
 
-/* quite lazy... 
+/* quite lazy...
  */
 static string actual_fortran_string_to_compare(string fs, int * plength)
 {
@@ -49,12 +49,12 @@ static string actual_fortran_string_to_compare(string fs, int * plength)
   if (len>=2 &&
       ((s[0]=='\'' && s[len-1]=='\'') || (s[0]=='"' && s[len-1]=='"')))
   {
-    s++; 
+    s++;
     len -= 2;
   }
 
   /* skip trailing *spaces* (are these blanks?) if any. */
-  while (len>0 && s[len-1]==' ') 
+  while (len>0 && s[len-1]==' ')
     len--;
 
   *plength = len;
@@ -234,6 +234,26 @@ expression e1,e2,e3;
 		    NULL)))));
 }
 
+
+/* Make an assign expression, since in C the assignment is a side effect
+   operator.
+
+   Useful in for-loops.
+
+   @param lhs must be a reference
+   @param rhs is the expression to assign
+
+   @return the expression "lhs = rhs"
+*/
+expression
+make_assign_expression(expression lhs,
+		       expression rhs) {
+  /* RK: this assert should be relax to deal with *p and so on.
+     pips_assert("Need a reference as lhs", expression_reference_p(lhs)); */
+  return MakeBinaryCall(CreateIntrinsic(ASSIGN_OPERATOR_NAME), lhs, rhs);
+}
+
+
 /* predicates on expressions */
 
 bool expression_call_p(e)
@@ -247,14 +267,17 @@ call expression_call(expression e)
     return(syntax_call(expression_syntax(e)));
 }
 
-bool expression_reference_p(e)
-expression e;
-{
-    return(syntax_reference_p(expression_syntax(e)));
+
+/* Test if an expression is a reference.
+ */
+bool expression_reference_p(expression e) {
+  return(syntax_reference_p(expression_syntax(e)));
 }
 
-bool is_expression_reference_to_entity_p(expression e, entity v)
-{
+
+/* Test if an expression is a reference to a given variable entity.
+ */
+bool is_expression_reference_to_entity_p(expression e, entity v) {
   bool is_e_reference_to_v = FALSE;
 
   if(expression_reference_p(e)) {
@@ -265,15 +288,16 @@ bool is_expression_reference_to_entity_p(expression e, entity v)
   return is_e_reference_to_v;
 }
 
-/* This function returns TRUE, if there exists an equal expression in the list
- *                       FALSE, otherwise 
-*/
 
+/* This function returns TRUE, if there exists an equal expression in the list
+ *                       FALSE, otherwise
+*/
 bool same_expression_in_list_p(expression e, list le)
 {
   MAP(EXPRESSION, f, if (same_expression_p(e,f)) return TRUE, le);
   return FALSE;
 }
+
 
 bool logical_operator_expression_p(expression e)
 {
@@ -460,6 +484,52 @@ int trivial_expression_p(expression e)
 }
 
 
+/* Test if an expression is a verbose incrementation of the form "i = i +
+  v"
+
+  Do not if v is positive or negative (it may not make any sense...).
+
+  @param e is the expression to analyse
+
+  @return the v expression if e is of the requested form or
+  expression_undefined if not
+ */
+expression
+expression_verbose_incrementation_p_and_return_increment(expression incr) {
+  if (assignment_expression_p(incr)) {
+    /* The expression is an assignment, it is a good start. */
+    list assign_params = call_arguments(syntax_call(expression_syntax(incr)));
+    expression lhs = EXPRESSION(CAR(assign_params));
+
+    /* Only deal with simple references right now: */
+    if (expression_reference_p(lhs)) {
+      expression rhs = EXPRESSION(CAR(CDR(assign_params)));
+      if (add_expression_p(rhs)) {
+	/* Operation found. */
+	list op_params = call_arguments(syntax_call(expression_syntax(incr)));
+	/* Only deal with binary operators */
+	if (gen_length(op_params) == 2) {
+	  expression arg1 = EXPRESSION(CAR(op_params));
+	  expression arg2 = EXPRESSION(CAR(CDR(op_params)));
+	  if (expression_reference_p(arg1)
+	      && reference_equal_p(expression_reference(lhs),
+				   expression_reference(arg1)))
+	    /* If arg1 is the same reference as lhs,
+	       we are in the "i = i op v" case: */
+	    return arg2;
+	  else if (expression_reference_p(arg2)
+		   && reference_equal_p(expression_reference(lhs),
+					expression_reference(arg2)))
+	    /* If arg2 is the same reference as lhs,
+	       we are in the "i = v op i" case: */
+	    return arg1;
+	}
+      }
+    }
+  }
+  return expression_undefined;
+}
+
 
 bool expression_implied_do_p(e)
 expression e ;
@@ -571,7 +641,7 @@ expression e;
 }
 
 /* The expression may be complicated but all its leaves are constants or
-   para,eters. It evaluates to a signed integer constant. I am too lazy to
+   parameters. It evaluates to a signed integer constant. I am too lazy to
    fully implement it as I should and I only take care of affine
    expressions (Francois). */
 bool expression_with_constant_signed_integer_value_p(e)
@@ -589,6 +659,28 @@ expression e;
 
   return constant_p;
 }
+
+
+/* Test if an expression is an assignment operation.
+ */
+bool assignment_expression_p(expression e) {
+  return operator_expression_p(e, ASSIGN_OPERATOR_NAME);
+}
+
+
+/* Test if an expression is an addition.
+ */
+bool add_expression_p(expression e) {
+  return operator_expression_p(e, PLUS_OPERATOR_NAME);
+}
+
+
+/* Test if an expression is an substraction.
+ */
+bool substraction_expression_p(expression e) {
+  return operator_expression_p(e, MINUS_OPERATOR_NAME);
+}
+
 
 bool modulo_expression_p(e)
 expression e;
@@ -1119,6 +1211,11 @@ signed_integer_constant_expression_value(expression e)
     return val;
 }
 
+
+/* Some functions to generate expressions from vectors and constraint
+   systems. */
+
+
 /* expression make_factor_expression(int coeff, entity vari)
  * make the expression "coeff*vari"  where vari is an entity.
  */
@@ -1204,9 +1301,12 @@ make_vecteur_expression(Pvecteur pv)
     return factor1;
 }
 
-/* generates var = linear expression 
- * from the Pvecteur. var is removed if necessary.
- * ??? should manage an (positive remainder) integer divide ?
+/* generates var = linear expression from the Pvecteur.
+
+   var is removed if necessary.
+
+   ??? should manage an (positive remainder) integer divide ?  Have a look
+   to make_constraint_expression instead?
  */
 statement
 Pvecteur_to_assign_statement(
@@ -1231,6 +1331,185 @@ Pvecteur_to_assign_statement(
 
     return result;
 }
+
+
+/* Make an expression from a constraint v for a given index.
+
+  For example: for a constraint of index I : aI + linear_expr(J,K,TCST) <=0
+  @return the new expression for I that is -expr_linear(J,K,TCST)/a
+ */
+expression make_constraint_expression(Pvecteur v, Variable index) {
+    Pvecteur pv;
+    expression ex1, ex2, ex;
+    entity div;
+    Value coeff;
+
+    /*search the couple (var,val) where var is equal to index and extract it */
+    pv = vect_dup(v);
+    coeff = vect_coeff(index, pv);
+    vect_erase_var(&pv, index);
+
+    if (VECTEUR_NUL_P(pv))
+      /* If the vector wihout the index is the vector null, we have simply
+	 index = 0: */
+      return make_integer_constant_expression(0);
+
+    /* If the coefficient for the index is positive, inverse all the
+       vector since the index goes at the other side of "=": */
+    if (value_pos_p(coeff))
+      vect_chg_sgn(pv);
+    else {
+      /* If coeff is negative, correct the future division rounding (by
+	 -coeff) by adding (coeff - 1) to the vector first: */
+      value_absolute(coeff);
+      vect_add_elem(&pv, TCST, value_minus(coeff, VALUE_ONE));
+    }
+
+    if(vect_size(pv) == 1 && vecteur_var(pv) == TCST) {
+      /* If the vector is simply coeff.index=c, directly generate and
+	 return c/coeff: */
+      vecteur_val(pv) = value_pdiv(vecteur_val(pv), coeff);
+      return make_vecteur_expression(pv);
+    }
+
+    /* Generate an expression from the linear vector: */
+    ex1 = make_vecteur_expression(pv);
+
+    if (value_gt(coeff, VALUE_ONE)) {
+      /* If coeff > 1, divide all the expression by coeff: */
+      /* FI->YY: before generating a division, you should test if it could
+	   not be performed statically; you have to check if ex1 is not a
+	   constant expression, which is fairly easy since you still have
+	   its linear form, pv */
+      div = gen_find_tabulated("TOP-LEVEL:/",entity_domain);
+      pips_assert("Division operator not found", div != entity_undefined);
+
+      ex2 = make_integer_constant_expression(VALUE_TO_INT(coeff));
+      ex = make_expression(make_syntax(is_syntax_call,
+				       make_call(div,
+						 CONS(EXPRESSION,ex1,
+						      CONS(EXPRESSION,
+							   ex2,NIL)))),
+			   normalized_undefined);
+      return(ex);
+    }
+    else
+      return(ex1);
+}
+
+
+/*  A wrapper around make_contrainte_expression() for compatibility.
+ */
+expression make_contrainte_expression(Pcontrainte pc, Variable index) {
+  /* Simply call the function on the vector in the constrain system: */
+  return make_constraint_expression(pc->vecteur, index);
+}
+
+
+/* AP, sep 25th 95 : some usefull functions moved from
+   static_controlize/utils.c */
+
+/*=================================================================*/
+/* expression Pvecteur_to_expression(Pvecteur vect): returns an
+ * expression equivalent to "vect".
+ *
+ * A Pvecteur is a list of variables, each with an associated value.
+ * Only one term of the list may have an undefined variables, it is the
+ * constant term of the vector :
+ *     (var1,val1) , (var2,val2) , (var3,val3) , ...
+ *
+ * An equivalent expression is the addition of all the variables, each
+ * multiplied by its associated value :
+ *     (...((val1*var1 + val2*var2) + val3*var3) +...)
+ *
+ * Two special cases are treated in order to get a more simple expression :
+ *       _ if the sign of the value associated to the variable is
+ *         negative, the addition is replaced by a substraction and we
+ *         change the sign of the value (e.g. 2*Y + (-3)*X == 2*Y - 3*X).
+ *         This optimization is of course not done for the first variable.
+ *       _ the values equal to one are eliminated (e.g. 1*X == X).
+ *
+ * Note (IMPORTANT): if the vector is equal to zero, then it returns an
+ * "expression_undefined", not an expression equal to zero.
+ *
+ */
+/* rather use make_vecteur_expression which was already there */
+expression 
+Pvecteur_to_expression(Pvecteur vect)
+{
+    Pvecteur Vs;
+    expression aux_exp, new_exp;
+    entity plus_ent, mult_ent, minus_ent, unary_minus_ent, op_ent;
+    
+    new_exp = expression_undefined;
+    Vs = vect;
+    
+    debug( 7, "Pvecteur_to_expression", "doing\n");
+    if(!VECTEUR_NUL_P(Vs))
+    {
+	entity var = (entity) Vs->var;
+	int val = VALUE_TO_INT(Vs->val);
+	
+  /* We get the entities corresponding to the three operations +, - and *. */
+  plus_ent = gen_find_tabulated(make_entity_fullname(TOP_LEVEL_MODULE_NAME,
+                                                     PLUS_OPERATOR_NAME),
+                                entity_domain);
+  minus_ent = gen_find_tabulated(make_entity_fullname(TOP_LEVEL_MODULE_NAME,
+                                                      MINUS_OPERATOR_NAME),
+                                 entity_domain);
+  mult_ent = gen_find_tabulated(make_entity_fullname(TOP_LEVEL_MODULE_NAME,
+                                                     MULTIPLY_OPERATOR_NAME),
+                                entity_domain);
+  unary_minus_ent =
+         gen_find_tabulated(make_entity_fullname(TOP_LEVEL_MODULE_NAME,
+                                                 UNARY_MINUS_OPERATOR_NAME),
+		 	    entity_domain);
+
+  /* Computation of the first variable of the vector. */
+  if(term_cst(Vs))
+    /* Special case of the constant term. */
+    new_exp = make_integer_constant_expression(val);
+  else if( (val != 1) && (val != -1) )
+    new_exp = MakeBinaryCall(mult_ent,
+                             make_integer_constant_expression(val),
+                             make_entity_expression(var, NIL));
+  else if (val == 1)
+    /* We eliminate this value equal to one. */
+    new_exp = make_entity_expression(var, NIL);
+  else /* val == -1 */
+    new_exp = MakeUnaryCall(unary_minus_ent, make_entity_expression(var, NIL));
+
+  /* Computation of the rest of the vector. */
+  for(Vs = vect->succ; !VECTEUR_NUL_P(Vs); Vs = Vs->succ)
+    {
+    var = (entity) Vs->var;
+    val = VALUE_TO_INT(Vs->val);
+
+    if (val < 0)
+      {
+      op_ent = minus_ent;
+      val = -val;
+      }
+    else
+      op_ent = plus_ent;
+
+    if(term_cst(Vs))
+      /* Special case of the constant term. */
+      aux_exp = make_integer_constant_expression(val);
+    else if(val != 1)
+      aux_exp = MakeBinaryCall(mult_ent,
+                               make_integer_constant_expression(val),
+                               make_entity_expression(var, NIL));
+    else
+      /* We eliminate this value equal to one. */
+      aux_exp = make_entity_expression(var, NIL);
+
+    new_exp = MakeBinaryCall(op_ent, new_exp, aux_exp);
+    }
+    }
+    return(new_exp);
+}
+
 
 reference expression_reference(e)
 expression e;
@@ -1360,110 +1639,6 @@ call_constant_p(call c)
 	   (value_tag(cv) == is_value_symbolic)   );
 }
 
-
-/* AP, sep 25th 95 : some usefull functions moved from
-   static_controlize/utils.c */
-
-/*=================================================================*/
-/* expression Pvecteur_to_expression(Pvecteur vect): returns an
- * expression equivalent to "vect".
- *
- * A Pvecteur is a list of variables, each with an associated value.
- * Only one term of the list may have an undefined variables, it is the
- * constant term of the vector :
- *     (var1,val1) , (var2,val2) , (var3,val3) , ...
- *
- * An equivalent expression is the addition of all the variables, each
- * multiplied by its associated value :
- *     (...((val1*var1 + val2*var2) + val3*var3) +...)
- *
- * Two special cases are treated in order to get a more simple expression :
- *       _ if the sign of the value associated to the variable is
- *         negative, the addition is replaced by a substraction and we
- *         change the sign of the value (e.g. 2*Y + (-3)*X == 2*Y - 3*X).
- *         This optimization is of course not done for the first variable.
- *       _ the values equal to one are eliminated (e.g. 1*X == X).
- *
- * Note (IMPORTANT): if the vector is equal to zero, then it returns an
- * "expression_undefined", not an expression equal to zero.
- *
- */
-/* rather use make_vecteur_expression which was already there */
-expression 
-Pvecteur_to_expression(Pvecteur vect)
-{
-    Pvecteur Vs;
-    expression aux_exp, new_exp;
-    entity plus_ent, mult_ent, minus_ent, unary_minus_ent, op_ent;
-    
-    new_exp = expression_undefined;
-    Vs = vect;
-    
-    debug( 7, "Pvecteur_to_expression", "doing\n");
-    if(!VECTEUR_NUL_P(Vs))
-    {
-	entity var = (entity) Vs->var;
-	int val = VALUE_TO_INT(Vs->val);
-	
-  /* We get the entities corresponding to the three operations +, - and *. */
-  plus_ent = gen_find_tabulated(make_entity_fullname(TOP_LEVEL_MODULE_NAME,
-                                                     PLUS_OPERATOR_NAME),
-                                entity_domain);
-  minus_ent = gen_find_tabulated(make_entity_fullname(TOP_LEVEL_MODULE_NAME,
-                                                      MINUS_OPERATOR_NAME),
-                                 entity_domain);
-  mult_ent = gen_find_tabulated(make_entity_fullname(TOP_LEVEL_MODULE_NAME,
-                                                     MULTIPLY_OPERATOR_NAME),
-                                entity_domain);
-  unary_minus_ent =
-         gen_find_tabulated(make_entity_fullname(TOP_LEVEL_MODULE_NAME,
-                                                 UNARY_MINUS_OPERATOR_NAME),
-		 	    entity_domain);
-
-  /* Computation of the first variable of the vector. */
-  if(term_cst(Vs))
-    /* Special case of the constant term. */
-    new_exp = make_integer_constant_expression(val);
-  else if( (val != 1) && (val != -1) )
-    new_exp = MakeBinaryCall(mult_ent,
-                             make_integer_constant_expression(val),
-                             make_entity_expression(var, NIL));
-  else if (val == 1)
-    /* We eliminate this value equal to one. */
-    new_exp = make_entity_expression(var, NIL);
-  else /* val == -1 */
-    new_exp = MakeUnaryCall(unary_minus_ent, make_entity_expression(var, NIL));
-
-  /* Computation of the rest of the vector. */
-  for(Vs = vect->succ; !VECTEUR_NUL_P(Vs); Vs = Vs->succ)
-    {
-    var = (entity) Vs->var;
-    val = VALUE_TO_INT(Vs->val);
-
-    if (val < 0)
-      {
-      op_ent = minus_ent;
-      val = -val;
-      }
-    else
-      op_ent = plus_ent;
-
-    if(term_cst(Vs))
-      /* Special case of the constant term. */
-      aux_exp = make_integer_constant_expression(val);
-    else if(val != 1)
-      aux_exp = MakeBinaryCall(mult_ent,
-                               make_integer_constant_expression(val),
-                               make_entity_expression(var, NIL));
-    else
-      /* We eliminate this value equal to one. */
-      aux_exp = make_entity_expression(var, NIL);
-
-    new_exp = MakeBinaryCall(op_ent, new_exp, aux_exp);
-    }
-    }
-    return(new_exp);
-}
 
 /*=================================================================*/
 /* bool expression_equal_integer_p(expression exp, int i): returns TRUE if
@@ -2154,7 +2329,8 @@ bool simplify_C_expression(expression e)
 }
 
 /* Replace a C expression used as FOR bound by a Fortran DO bound
-expression, taking into account the C comparison operator used. */
+   expression, taking into account the C comparison operator used.
+*/
 expression convert_bound_expression(expression e, bool upper_p, bool non_strict_p)
 {
   expression b = expression_undefined;
@@ -2320,7 +2496,7 @@ expression e;
 
 /** 
  * @brief perform the real similarity comparaison between two expressions
- * target is matcehd against pattern, and expression <> argument is strored in symbols
+ * target is matched against pattern, and expression <> argument is strored in symbols
  * 
  * @param target cheked expression
  * @param pattern pattern expression

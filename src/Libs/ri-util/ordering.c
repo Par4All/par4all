@@ -67,7 +67,12 @@ apply_ordering_to_statement(hash_table ots, _int o)
     return s;
 }
 
-statement 
+
+/* Get the statement associated to a given ordering.
+
+   It is useful for retrieve the statements associated with the arcs in
+   the dependence graphs for example. */
+statement
 ordering_to_statement(int o)
 {
     statement s;
@@ -75,59 +80,34 @@ ordering_to_statement(int o)
     return s;
 }
 
-static void 
-rinitialize_ordering_to_statement(hash_table ots, statement s)
-{
-    instruction i = statement_instruction(s);
 
-    if (statement_ordering(s) != STATEMENT_ORDERING_UNDEFINED)
-	hash_put(ots,  
-		 (char *) statement_ordering(s), (char *) s);
+/* Add the statement for its ordering, if any, in the hash-map. */
+static bool
+add_ordering_of_the_statement(statement s,
+			      void * a_context) {
+  hash_table ots = (hash_table) a_context;
+  if (statement_ordering(s) != STATEMENT_ORDERING_UNDEFINED)
+    hash_put(ots, (char *) statement_ordering(s), (char *) s);
 
-    switch (instruction_tag(i)) {
-
-      case is_instruction_block:
-	MAPL(ps, {
-	    rinitialize_ordering_to_statement(ots, STATEMENT(CAR(ps)));
-	}, instruction_block(i));
-	break;
-
-      case is_instruction_loop:
-	rinitialize_ordering_to_statement(ots, loop_body(instruction_loop(i)));
-	break;
-
-      case is_instruction_whileloop:
-	rinitialize_ordering_to_statement(ots, whileloop_body(instruction_whileloop(i)));
-	break;
-
-      case is_instruction_test:
- 	rinitialize_ordering_to_statement(ots, test_true(instruction_test(i)));
-	rinitialize_ordering_to_statement(ots, test_false(instruction_test(i)));
-	break;
-
-      case is_instruction_call:
-      case is_instruction_goto:
-      case is_instruction_forloop:
-      case is_instruction_expression:
-	break;
-
-      case is_instruction_unstructured: {
-	  cons *blocs = NIL ;
-
-	  CONTROL_MAP(c, {
-	      rinitialize_ordering_to_statement(ots, control_statement(c));
-	  }, unstructured_control(instruction_unstructured(i)), blocs);
-	  gen_free_list( blocs );
-
-	  break;
-      }
-	    
-      default:
-	pips_error("rinitialize_ordering_to_statement", "bad tag\n");
-    }
+  // Go on walking down the RI:
+  return TRUE;
 }
 
-static hash_table 
+
+static void
+rinitialize_ordering_to_statement(hash_table ots, statement s) {
+  /* Simplify this with a gen_recurse to avoid dealing with all the new
+     cases by hand (for-loops...).
+
+     Apply a prefix hash-map add to be compatible with previous
+     implementation and avoid different hash-map iteration later. */
+  gen_context_recurse(s, ots, statement_domain,
+		      add_ordering_of_the_statement,
+		      gen_identity);
+}
+
+
+static hash_table
 set_ordering_to_statement(statement s)
 {
     hash_table ots =  hash_table_make(hash_int, 0);

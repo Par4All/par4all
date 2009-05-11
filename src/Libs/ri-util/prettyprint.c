@@ -287,6 +287,9 @@ char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data
   * - Also, EQUIVALENCE statements are not generated for the moment. BC.
   *     Thay are now??? FC?
   */
+
+// To have asprintf:
+#define _GNU_SOURCE
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -3498,14 +3501,14 @@ last_statement_p(statement s) {
     return s == last_statement;
 }
 
-/* function text text_module(module, stat)
- *
- * carefull! the original text of the declarations is used
- * if possible. Otherwise, the function text_declaration is called.
+/* Build the text of a module.
+
+   The original text of the declarations is used if possible in
+   Fortran. Otherwise, the function text_declaration is called.
  */
 text
 text_named_module(
-    entity name, /* the name of the module */
+    entity name, /**< the name of the module */
     entity module,
     statement stat)
 {

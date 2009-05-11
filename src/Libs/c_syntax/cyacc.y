@@ -1018,12 +1018,12 @@ expression:
 			    }
 			  }
 			  (void) simplify_C_expression(rhs);
-			  $$ = MakeBinaryCall(CreateIntrinsic(ASSIGN_OPERATOR_NAME), lhs, rhs); 
+			  $$ = make_assign_expression(lhs, rhs);
 			}
 |   expression TK_PLUS_EQ expression
 			{
 			  (void) simplify_C_expression($3);
-			  $$ = MakeBinaryCall(CreateIntrinsic(PLUS_UPDATE_OPERATOR_NAME), $1, $3); 
+			  $$ = MakeBinaryCall(CreateIntrinsic(PLUS_UPDATE_OPERATOR_NAME), $1, $3);
 			}
 |   expression TK_MINUS_EQ expression
 			{

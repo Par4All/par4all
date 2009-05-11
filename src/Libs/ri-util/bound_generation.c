@@ -7,82 +7,11 @@
 #include "linear.h"
 
 #include "genC.h"
-#include "misc.h" 
+#include "misc.h"
 #include "ri.h"
-
+#include "transformer.h"
 #include "ri-util.h"
 
-/* hum... */
-string 
-nom_de_variable(string e)
-{
-    if (e!=NULL) return entity_name((entity) e);
-    else return "TCST";
-}
-
-/* expression make_contrainte_expression(Pcontrainte pc, variable index)
- * make an expression for constraint of index I 
- * for example: for a constraint of index I : aI + expr_linear(J,K,TCST) <=0
- *              the new expression for I will be : -expr_linear(J,K,TCST)/a 
- */
-expression make_contrainte_expression(pc, index)
-Pcontrainte pc;
-Variable index;
-{    
-    Pvecteur pv;
-    expression ex1,ex2,ex;
-    entity div;
-    Value coeff;
-
-    /*search the couple (var,val) where var is equal to index and extract it */
-    pv = vect_dup(pc->vecteur);
-    coeff = vect_coeff(index,pv);
-    vect_erase_var(&pv,index);
-
-    if (value_pos_p(coeff)) 
-	vect_chg_sgn(pv);
-    else
-    {
-	value_absolute(coeff);
-	vect_add_elem(&pv,TCST,value_minus(coeff,VALUE_ONE));
-    }
-
-    if(vect_size(pv)==1 && vecteur_var(pv)==TCST)
-    {
-	vecteur_val(pv) = value_pdiv(vecteur_val(pv), coeff);
-	return make_vecteur_expression(pv);
-    }
-
-    if(VECTEUR_NUL_P(pv))
-	return make_integer_constant_expression(0);
-
-    ex1 = make_vecteur_expression(pv); 
-    
-    if (value_gt(coeff,VALUE_ONE))
-    {
-	/* FI->YY: before generating a division, you should test if it could
-	   not be performed statically; you have to check if ex1 is not
-	   a constant expression, which is fairly easy since you still
-	   have its linear form, pv */
-	div = gen_find_tabulated("TOP-LEVEL:/",entity_domain);
-	
-	pips_assert("make_contraitne_expression",div != entity_undefined);
-	ex2 = make_integer_constant_expression(VALUE_TO_INT(coeff));
-	
-	ex = make_expression(make_syntax(is_syntax_call,
-					 make_call(div,
-						   CONS(EXPRESSION,ex1,
-							CONS(EXPRESSION,
-							     ex2,NIL)))
-	    ),normalized_undefined);	
-	return(ex);
-    }
-    else
-	return(ex1);
-
-}
-
-typedef char * (*variable_name_type)(Variable);
 
 /* void make_bound_expression(variable index, Pbase base, Psysteme sc,
  * expression *lower, expression *upper)
@@ -107,8 +36,8 @@ expression *upper;
     int rank_index ;
 
     /* compute the rank d of the  index in the basis */
-    rank_index = base_find_variable_rank(base, index, (get_variable_name_t) nom_de_variable);
-    debug(7, "make_bound_expression", "index :%s\n", nom_de_variable(index));
+    rank_index = base_find_variable_rank(base, index, (get_variable_name_t) entity_name_or_TCST);
+    debug(7, "make_bound_expression", "index :%s\n", entity_name_or_TCST(index));
     debug(8, "make_bound_expression", "rank_index = %d\n", rank_index);
 
     /*search constraints referencing "index" and create the list of
@@ -120,9 +49,9 @@ expression *upper;
 	    ifdebug(7) {
 		(void) fprintf(stderr, "\n constraint before :");
 		contrainte_fprint(stderr, pc, TRUE,
-				  (variable_name_type) entity_local_name);
+				  (get_variable_name_t) entity_name_or_TCST);
 	    }
-	    ex = make_contrainte_expression(pc, (Variable) index);
+	    ex = make_constraint_expression(pc->vecteur, (Variable) index);
 	    ifdebug(7) {
 		fprintf(stderr, "\n expression after :");
 		print_expression(ex);
@@ -173,6 +102,3 @@ expression *upper;
 	print_expression(*upper);
     }
 }
-
-
- 

@@ -4,6 +4,8 @@
  * $Id$
  */
 
+// To have asprintf:
+#define _GNU_SOURCE
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -19,11 +21,11 @@
 #include "properties.h"
 #include "preprocessor.h"
 
-bool 
+bool
 variable_entity_p(entity e)
 {
-  bool variable = 
-    (entity_storage(e)!=storage_undefined) && 
+  bool variable =
+    (entity_storage(e)!=storage_undefined) &&
     storage_ram_p(entity_storage(e));
 
   return variable;
@@ -32,11 +34,10 @@ variable_entity_p(entity e)
 /* BEGIN_EOLE */ /* - please do not remove this line */
 /* Lines between BEGIN_EOLE and END_EOLE tags are automatically included
    in the EOLE project (JZ - 11/98) */
-
-bool 
+bool
 symbolic_constant_entity_p(entity e)
 {
-  bool symbolic_constant = entity_storage(e)!= storage_undefined 
+  bool symbolic_constant = entity_storage(e)!= storage_undefined
     && storage_rom_p(entity_storage(e))
     && entity_initial(e) != value_undefined
     && value_symbolic_p(entity_initial(e));
@@ -47,53 +48,71 @@ symbolic_constant_entity_p(entity e)
 /* END_EOLE */
 
 
-/* this function adds an entity to the list of variables of the
-CurrentFunction. it does nothing if e is already in the list. */
+/* Add a global variable e to the variable declarations of a module.
 
-void 
-AddEntityToDeclarations(e, f)
-entity e;
-entity f;
-{
-  list l = code_declarations(EntityCode(f));
-  if( gen_chunk_undefined_p( gen_find_eq(e,l) ) )
-      code_declarations(EntityCode(f)) = CONS(ENTITY, e, l);
+   It does nothing if e is already in the list.
+
+   In the general case you should use AddLocalEntityToDeclarations() or
+   AddEntityToCurrentModule() instead.
+
+   Since in C, variables should be added to the statement declarations
+   too, only use this function for special stuff like compilation unit and
+   special area delarations in the module bootstrapping.
+*/
+void
+AddEntityToDeclarations(entity e, entity module) {
+  /* Add the variable to the module declarations: */
+  list l = code_declarations(EntityCode(module));
+  /* Add the declaration only if not already here: */
+  if (gen_chunk_undefined_p(gen_find_eq(e,l)))
+    code_declarations(EntityCode(module)) = CONS(ENTITY, e, l);
 }
 
-/** 
- * adds the entity e to the list of variables of the function f
- * as AddEntityToDeclarations does if f is a fortran function
- * adds the entity to statenent s declaration if called from a C module
- * 
- * @param e entity to add
- * @param f module entity
- * @param s statement where entity must be added. can be statement_undefined from Fortran module
+
+/**
+ Add the variable entity e to the list of variables of the function
+ module.
+
+ For a C module, the variable is also added as local to the given
+ statement s. A global variable to a module should be added to the global
+ statement module (given by get_current_module_statement() for example.
+
+ @param e variable entity to add
+ @param module entity
+ @param s statement where entity must be added. It can be
+ statement_undefined in the case of a Fortran module
  */
 void
-AddLocalEntityToDeclarations(entity e, entity f, statement s)
-{
-    if(c_module_p(f))
-    {
-        pips_assert("Calling AddLocalEntityToDeclarations from c_module with valid statement",
-                !statement_undefined_p(s) );
-        list l = statement_declarations(s);
-        if( gen_chunk_undefined_p( gen_find_eq(e,l) ) )
-            statement_declarations(s) = CONS(ENTITY,e,l);
-    }
-    {
-        AddEntityToDeclarations(e,f);
-    }
+AddLocalEntityToDeclarations(entity e, entity module, statement s) {
+  AddEntityToDeclarations(e, module);
+
+  if (c_module_p(module)
+      /* A compilation does not have statements */
+      && !compilation_unit_entity_p(module)) {
+    /* In C the variable are local to a statement, so add : */
+    pips_assert("Calling AddLocalEntityToDeclarations from c_module with valid statement", !statement_undefined_p(s) );
+    list l = statement_declarations(s);
+    if (gen_chunk_undefined_p(gen_find_eq(e,l)))
+      statement_declarations(s) = CONS(ENTITY,e,l);
+  }
 }
 
+
+/* Add a variable entity to the current module declarations. */
 void
-AddEntityToCurrentModule(entity e)
-{
-    AddLocalEntityToDeclarations(e,get_current_module_entity(),get_current_module_statement());
+AddEntityToCurrentModule(entity e) {
+  entity module_e = get_current_module_entity();
+  /* There is no declaration local to a statement in Fortran: */
+  statement module_s = c_module_p(module_e) ? get_current_module_statement()
+    : statement_undefined;
+
+  AddLocalEntityToDeclarations(e, module_e, module_s);
 }
+
 
 /* entity make_scalar_entity(name, module_name, base)
  */
-entity 
+entity
 make_scalar_entity(name, module_name, base)
 string name;
 string module_name;
@@ -139,14 +158,14 @@ basic base;
  *
  */
 
-static int 
+static int
     unique_integer_number = 0,
     unique_float_number = 0,
     unique_logical_number = 0,
     unique_complex_number = 0,
     unique_string_number = 0;
 
-void 
+void
 reset_unique_variable_numbers()
 {
   unique_integer_number=0;
@@ -162,67 +181,81 @@ reset_unique_variable_numbers()
 #define DEFAULT_COMPLEX_PREFIX	"C_"
 #define DEFAULT_STRING_PREFIX	"S_"
 
+/* Create a new scalar variable of type b in the given module.
+
+   The variable name is constructed with "<prefix><number>" If the given
+   prefix is the empty string, some standard prefixes are used, based on
+   the type.
+
+   In C this function is added to current module only.
+
+   @return the variable entity.
+*/
 entity
 make_new_scalar_variable_with_prefix(string prefix,
 				     entity module,
 				     basic b)
 {
   string module_name = module_local_name(module);
-  char buffer[22];
   entity e;
+  char * variable_name = NULL;
   int number = 0;
   bool empty_prefix = (strlen(prefix) == 0);
   const string format = fortran_module_p(module)?"%s%d":"0" BLOCK_SEP_STRING "%s%d";
 
-  /* let's assume positive int stored on 4 bytes */
-  pips_assert("make_new_scalar_variable_with_prefix", strlen(prefix)<=10);
-
+  /* Find the first matching non-already existent variable name: */
   do {
+    if (variable_name != NULL)
+      /* Free the already allocated name in the previous iteration that
+	 was conflicting: */
+      free(variable_name);
+
     if (empty_prefix) {
+      /* Use a default type-dependent variable name since the programmer
+	 gave none: */
       switch(basic_tag(b)) {
       case is_basic_int:
-	sprintf(buffer,format, DEFAULT_INT_PREFIX,
+	asprintf(&variable_name,  format, DEFAULT_INT_PREFIX,
 		unique_integer_number++);
 	break;
       case is_basic_float:
-	sprintf(buffer,format, DEFAULT_FLOAT_PREFIX, 
+	asprintf(&variable_name, format, DEFAULT_FLOAT_PREFIX,
 		unique_float_number++);
 	break;
       case is_basic_logical:
-	sprintf(buffer,format, DEFAULT_LOGICAL_PREFIX,
+	asprintf(&variable_name, format, DEFAULT_LOGICAL_PREFIX,
 		unique_logical_number++);
 	break;
       case is_basic_complex:
-	sprintf(buffer,format, DEFAULT_COMPLEX_PREFIX,
+	asprintf(&variable_name, format, DEFAULT_COMPLEX_PREFIX,
 		unique_complex_number++);
 	break;
       case is_basic_string:
-	sprintf(buffer, format, DEFAULT_STRING_PREFIX,
+	asprintf(&variable_name, format, DEFAULT_STRING_PREFIX,
 		unique_string_number++);
 	break;
       default:
-	pips_error("make_new_scalar_variable_with_prefix", 
+	pips_error("make_new_scalar_variable_with_prefix",
 		   "unknown basic tag: %d\n",
 		   basic_tag(b));
 	break;
       }
     }
-    else {
-      sprintf(buffer,"%s%d", prefix, number++);
-      pips_assert ("make_new_scalar_variable_with_prefix",
-		   strlen (buffer) < 19);
-    }
+    else
+      asprintf(&variable_name, "%s%d", prefix, number++);
   }
   while(gen_find_tabulated(concatenate(module_name,
 				       MODULE_SEP_STRING,
-				       buffer,
+				       variable_name,
 				       NULL),
 			   entity_domain) != entity_undefined);
 
-  pips_debug(9, "var %s, tag %d\n", buffer, basic_tag(b));
+  pips_debug(9, "var %s, tag %d\n", variable_name, basic_tag(b));
 
-  e = make_scalar_entity(buffer, module_name, b);
-  AddEntityToDeclarations(e, module);
+  e = make_scalar_entity(variable_name, module_name, b);
+  // Add a global variable:
+  AddEntityToCurrentModule(e);
+  free(variable_name);
 
   return e;
 }
@@ -235,10 +268,214 @@ make_new_scalar_variable(entity module,
 }
 
 
-/* looks for an entity which should be a scalar of the specified
- * basic. If found, returns it, else one is created.
+/* Make a new module integer variable of name X<d>.
  */
-entity 
+entity
+make_new_module_variable(entity module,int d)
+{
+
+  static char name[ 64 ];
+  string name1;
+  entity ent1=entity_undefined;
+  string full_name;
+  static int num = 1;
+  name[0] = 'X';
+  if (d != 0) {
+    (void) sprintf(&name[1],"%d",d);
+    num = d;
+  }
+  else { (void) sprintf(&name[1],"%d",num);
+  num++;}
+
+  name1 = strdup(name);
+  full_name=strdup(concatenate(module_local_name(module),
+			       MODULE_SEP_STRING,
+			       name1,
+			       NULL));
+  while ((ent1 = gen_find_tabulated(full_name,entity_domain))
+	 != entity_undefined) {
+    free(name1);
+    free(full_name);
+    name[0] = 'X';
+    (void) sprintf(&name[1],"%d",num);
+    num++;
+    name1 = strdup(name);
+    full_name=strdup(concatenate(module_local_name(module),
+				 MODULE_SEP_STRING,
+				 name1,
+				 NULL));
+  }
+  ent1 = make_scalar_integer_entity(name1,
+				    module_local_name(module));
+  free(full_name);
+  return ent1;
+}
+
+
+/* These globals variables count the number of temporary and auxiliary
+ * entities. Each time such a variable is created, the corresponding
+ * counter is incremented.
+ *
+ * FI: this must be wrong. A function to reset count_tmp and count_aux 
+ * is needed if tpips or wpips are to work in a consistent way!
+ */
+/* gcc complains that they are not used... but they are defined! */
+static int count_tmp = 0;
+static int count_aux = 0;
+
+
+/* Make a new variable entity which name is one letter prefix + one
+   incrementing number.
+
+   The function name should be changed. Useless function according to
+   previous ones ?
+
+ * This entity is either a new temporary or a new auxiliary variable.
+ * The parameter "kind" gives the kind of entity to produce.
+ * "ba" gives the basic (ie the type) of the entity to create.
+ *
+ * The number of the temporaries is given by a global variable named
+ * "count_tmp".
+ * The number of the auxiliary variables is given by a global variable named
+ * "count_aux".
+ */
+entity
+make_new_entity(ba, kind)
+basic ba;
+int kind;
+{
+  extern list integer_entities,
+    real_entities, logical_entities, complex_entities,
+    double_entities, char_entities;
+
+  entity new_ent, mod_ent;
+  char prefix[4], *name, *num;
+  int number = 0;
+  entity dynamic_area;
+
+  /* The first letter of the local name depends on the basic:
+   *       int --> I
+   *     real  --> F (float single precision)
+   *    others --> O
+   */
+  switch(basic_tag(ba))
+    {
+    case is_basic_int: { (void) sprintf(prefix, "I"); break;}
+    case is_basic_float:
+      {
+	if(basic_float(ba) == DOUBLE_PRECISION_SIZE)
+	  (void) sprintf(prefix, "O");
+	else
+	  (void) sprintf(prefix, "F");
+	break;
+      }
+    default: (void) sprintf(prefix, "O");
+    }
+
+  /* The three following letters are whether "TMP", for temporaries
+   * or "AUX" for auxiliary variables.
+   */
+  switch(kind)
+    {
+    case TMP_ENT:
+      {
+	number = (++count_tmp);
+	(void) sprintf(prefix+1, "TMP");
+	break;
+      }
+    case AUX_ENT:
+      {
+	number = (++count_aux);
+	(void) sprintf(prefix+1, "AUX");
+	break;
+      }
+    default: user_error("make_new_entity", "Bad kind of entity: %d", kind);
+    }
+
+  mod_ent = get_current_module_entity();
+  num = (char*) malloc(32);
+  (void) sprintf(num, "%d", number);
+
+  /* The first part of the full name is the concatenation of the define
+   * constant ATOMIZER_MODULE_NAME and the local name of the module
+   * entity.
+   */
+  /* ATOMIZER_MODULE_NAME discarded : it is a bug ! RK, 31/05/1994.
+     name = strdup(concatenate(ATOMIZER_MODULE_NAME, entity_local_name(mod_ent),
+     MODULE_SEP_STRING, prefix, num, (char *) NULL));
+  */
+  name = strdup(concatenate(entity_local_name(mod_ent),
+			    MODULE_SEP_STRING, prefix, num, (char *) NULL));
+  /*
+    new_ent = make_entity(name,
+    make_type(is_type_variable,
+    make_variable(ba,
+    NIL,NIL)),
+    make_storage(is_storage_rom, UU),
+    make_value(is_value_unknown, UU));
+  */
+  /* Create a true dynamic variable. RK, 31/05/1994 : */
+  new_ent = make_entity(name,
+			make_type(is_type_variable,
+				  make_variable(ba,
+						NIL,NIL)),
+			storage_undefined,
+			make_value(is_value_unknown, UU));
+  dynamic_area = global_name_to_entity(module_local_name(mod_ent),
+				       DYNAMIC_AREA_LOCAL_NAME);
+  entity_storage(new_ent) = make_storage(is_storage_ram,
+					 make_ram(mod_ent,
+						  dynamic_area,
+						  add_variable_to_area(dynamic_area, new_ent),
+						  NIL));
+  AddEntityToCurrentModule(new_ent);
+
+  /* Is the following useless : */
+
+  /* The new entity is stored in the list of entities of the same type. */
+  switch(basic_tag(ba))
+    {
+    case is_basic_int:
+      {
+	integer_entities = CONS(ENTITY, new_ent, integer_entities);
+	break;
+      }
+    case is_basic_float:
+      {
+	if(basic_float(ba) == DOUBLE_PRECISION_SIZE)
+	  double_entities = CONS(ENTITY, new_ent, double_entities);
+	else
+	  real_entities = CONS(ENTITY, new_ent, real_entities);
+	break;
+      }
+    case is_basic_logical:
+      {
+	logical_entities = CONS(ENTITY, new_ent, logical_entities);
+	break;
+      }
+    case is_basic_complex:
+      {
+	complex_entities = CONS(ENTITY, new_ent, complex_entities);
+	break;
+      }
+    case is_basic_string:
+      {
+	char_entities = CONS(ENTITY, new_ent, char_entities);
+	break;
+      }
+    default:break;
+    }
+
+  return new_ent;
+}
+
+
+/* Looks for an entity which should be a scalar of the specified
+   basic. If found, returns it, else one is created.
+
+   If the entity is not a scalar, it aborts.
+ */
+entity
 find_or_create_scalar_entity(name, module_name, base)
 string name;
 string module_name;
@@ -247,7 +484,7 @@ tag base;
   entity e = entity_undefined;
   string nom = concatenate(module_name, MODULE_SEP_STRING, name, NULL);
 
-  if ((e = gen_find_tabulated(nom, entity_domain)) != entity_undefined) 
+  if ((e = gen_find_tabulated(nom, entity_domain)) != entity_undefined)
     {
       pips_assert("find_or_create_scalar_entity",
 		  (entity_scalar_p(e) && entity_basic_p(e, base)));
@@ -258,7 +495,11 @@ tag base;
   return(make_scalar_entity(name, module_name, MakeBasic(base)));
 }
 
-entity 
+
+/* Looks for an entity of the specified
+   basic. If found, returns it, else one is created.
+ */
+entity
 find_or_create_typed_entity(
    string name,
    string module_name,
@@ -267,7 +508,7 @@ find_or_create_typed_entity(
   entity e = entity_undefined;
   string nom = concatenate(module_name, MODULE_SEP_STRING, name, NULL);
 
-  if ((e = gen_find_tabulated(nom, entity_domain)) != entity_undefined) 
+  if ((e = gen_find_tabulated(nom, entity_domain)) != entity_undefined)
     {
       pips_assert("type is okay", entity_basic_p(e, base));
 
@@ -277,7 +518,10 @@ find_or_create_typed_entity(
   return(make_scalar_entity(name, module_name, MakeBasic(base)));
 }
 
-entity 
+
+/* Create an integer variable of name "name" in module of name
+   "module_name" */
+entity
 make_scalar_integer_entity(name, module_name)
 char *name;
 char *module_name;
@@ -292,11 +536,11 @@ char *module_name;
   full_name = concatenate(module_name, MODULE_SEP_STRING, name, NULL);
   hash_warn_on_redefinition();
   e = make_entity(strdup(full_name),
-		  type_undefined, 
-		  storage_undefined, 
+		  type_undefined,
+		  storage_undefined,
 		  value_undefined);
 
-  b = make_basic(is_basic_int, (void*) 4); 
+  b = make_basic(is_basic_int, (void*) 4);
 
   entity_type(e) = (type) MakeTypeVariable(b, NIL);
 
@@ -317,8 +561,9 @@ char *module_name;
   return(e);
 }
 
-
-/* The concrete type of e is a scalar type. The programmer cannot index this variable. 
+
+/* The concrete type of e is a scalar type. The programmer cannot index
+   this variable.
 
    Note: variable e may appear indexed somewhere in the PIPS internal
    representation if this is linked to some semantics.
@@ -730,206 +975,6 @@ int i;
 }
 
 
-entity 
-make_new_module_variable(entity module,int d)	       
-{ 
-
-  static char name[ 64 ];
-  string name1;
-  entity ent1=entity_undefined;
-  string full_name;
-  static int num = 1;
-  name[0] = 'X';
-  if (d != 0) {
-    (void) sprintf(&name[1],"%d",d);
-    num = d;
-  }
-  else { (void) sprintf(&name[1],"%d",num);
-  num++;}
-	
-  name1 = strdup(name);
-  full_name=strdup(concatenate(module_local_name(module), 
-			       MODULE_SEP_STRING,
-			       name1,
-			       NULL));
-  while ((ent1 = gen_find_tabulated(full_name,entity_domain)) 
-	 != entity_undefined) {
-    free(name1);
-    free(full_name);
-    name[0] = 'X';
-    (void) sprintf(&name[1],"%d",num);
-    num++;
-    name1 = strdup(name);
-    full_name=strdup(concatenate(module_local_name(module), 
-				 MODULE_SEP_STRING,
-				 name1,
-				 NULL));
-  }
-  ent1 = make_scalar_integer_entity(name1,
-				    module_local_name(module));
-  free(full_name);
-  return ent1;
-}
-
-
-/* These globals variables count the number of temporary and auxiliary
- * entities. Each time such a variable is created, the corresponding
- * counter is incremented.
- *
- * FI: this must be wrong. A function to reset count_tmp and count_aux 
- * is needed if tpips or wpips are to work in a consistent way!
- */
-/* gcc complains that they are not used... but they are defined! */
-static int count_tmp = 0;
-static int count_aux = 0;
-
-
-/*============================================================================*/
-/* entity make_new_entity(basic ba, int kind): Returns a new entity.
- * This entity is either a new temporary or a new auxiliary variable.
- * The parameter "kind" gives the kind of entity to produce.
- * "ba" gives the basic (ie the type) of the entity to create.
- *
- * The number of the temporaries is given by a global variable named
- * "count_tmp".
- * The number of the auxiliary variables is given by a global variable named
- * "count_aux".
- *
- * Called functions:
- *       _ current_module() : loop_normalize/utils.c
- *       _ FindOrCreateEntity() : syntax/declaration.c
- *       _ CurrentOffsetOfArea() : syntax/declaration.c
- */
-entity 
-make_new_entity(ba, kind)
-basic ba;
-int kind;
-{
-  extern list integer_entities, 
-    real_entities, logical_entities, complex_entities,
-    double_entities, char_entities;
-
-  entity new_ent, mod_ent;
-  char prefix[4], *name, *num;
-  int number = 0;
-  entity dynamic_area;
-  
-  /* The first letter of the local name depends on the basic:
-   *       int --> I
-   *     real  --> F (float single precision)
-   *    others --> O
-   */
-  switch(basic_tag(ba))
-    {
-    case is_basic_int: { (void) sprintf(prefix, "I"); break;}
-    case is_basic_float:
-      {
-	if(basic_float(ba) == DOUBLE_PRECISION_SIZE)
-	  (void) sprintf(prefix, "O");
-	else
-	  (void) sprintf(prefix, "F");
-	break;
-      }
-    default: (void) sprintf(prefix, "O");
-    }
-
-  /* The three following letters are whether "TMP", for temporaries
-   * or "AUX" for auxiliary variables.
-   */
-  switch(kind)
-    {
-    case TMP_ENT:
-      {
-	number = (++count_tmp);
-	(void) sprintf(prefix+1, "TMP");
-	break;
-      }
-    case AUX_ENT:
-      {
-	number = (++count_aux);
-	(void) sprintf(prefix+1, "AUX");
-	break;
-      }
-    default: user_error("make_new_entity", "Bad kind of entity: %d", kind);
-    }
-
-  mod_ent = get_current_module_entity();
-  num = (char*) malloc(32);
-  (void) sprintf(num, "%d", number);
-
-  /* The first part of the full name is the concatenation of the define
-   * constant ATOMIZER_MODULE_NAME and the local name of the module
-   * entity.
-   */
-  /* ATOMIZER_MODULE_NAME discarded : it is a bug ! RK, 31/05/1994.
-     name = strdup(concatenate(ATOMIZER_MODULE_NAME, entity_local_name(mod_ent),
-     MODULE_SEP_STRING, prefix, num, (char *) NULL));
-  */
-  name = strdup(concatenate(entity_local_name(mod_ent),
-			    MODULE_SEP_STRING, prefix, num, (char *) NULL));
-  /*
-    new_ent = make_entity(name,
-    make_type(is_type_variable,
-    make_variable(ba,
-    NIL,NIL)),
-    make_storage(is_storage_rom, UU),
-    make_value(is_value_unknown, UU));
-  */
-  /* Create a true dynamic variable. RK, 31/05/1994 : */
-  new_ent = make_entity(name,
-			make_type(is_type_variable,
-				  make_variable(ba,
-						NIL,NIL)),
-			storage_undefined,
-			make_value(is_value_unknown, UU));
-  dynamic_area = global_name_to_entity(module_local_name(mod_ent),
-				       DYNAMIC_AREA_LOCAL_NAME);
-  entity_storage(new_ent) = make_storage(is_storage_ram,
-					 make_ram(mod_ent,
-						  dynamic_area,
-						  add_variable_to_area(dynamic_area, new_ent),
-						  NIL));
-  AddEntityToDeclarations( new_ent,mod_ent);
-
-  /* Is the following useless : */
-  
-  /* The new entity is stored in the list of entities of the same type. */
-  switch(basic_tag(ba))
-    {
-    case is_basic_int:
-      {
-	integer_entities = CONS(ENTITY, new_ent, integer_entities);
-	break;
-      }
-    case is_basic_float:
-      {
-	if(basic_float(ba) == DOUBLE_PRECISION_SIZE)
-	  double_entities = CONS(ENTITY, new_ent, double_entities);
-	else
-	  real_entities = CONS(ENTITY, new_ent, real_entities);
-	break;
-      }
-    case is_basic_logical:
-      {
-	logical_entities = CONS(ENTITY, new_ent, logical_entities);
-	break;
-      }
-    case is_basic_complex:
-      {
-	complex_entities = CONS(ENTITY, new_ent, complex_entities);
-	break;
-      }
-    case is_basic_string:
-      {
-	char_entities = CONS(ENTITY, new_ent, char_entities);
-	break;
-      }
-    default:break;
-    }
-
-  return new_ent;
-}
-
 expression generate_string_for_alternate_return_argument(string i)
 {
   expression e = expression_undefined;

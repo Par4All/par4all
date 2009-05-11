@@ -20,7 +20,52 @@
 static bool module_coherent_p=TRUE;
 static entity checked_module = entity_undefined;
 
-bool 
+
+/* Check if the given name is a plain module (and not a compilation unit)
+   internal name
+ */
+bool module_name_p(string name) {
+  return (!compilation_unit_p(name) && strstr(name, MODULE_SEP_STRING) == NULL);
+}
+
+
+/* Check if the given name is a static module name.
+ */
+bool static_module_name_p(string name)
+{
+  /* An entity is a static module if its name contains the FILE_SEP_STRING
+     but the last one is not the last character of the name string */
+  /* FI: I doubt this is true. Maybe if you're sure name is the name of a module? */
+  return (!compilation_unit_p(name) && strstr(name, FILE_SEP_STRING) != NULL);
+}
+
+
+/* Check if the given module entity is a static module.
+ */
+bool static_module_p(entity e) {
+  return static_module_name_p(entity_name(e));
+}
+
+
+/* Check if the given name is a compilation unit internal name.
+ */
+bool compilation_unit_p(string module_name) {
+  /* A module name is a compilation unit if and only if its last character is
+     FILE_SEP */
+  if (module_name[strlen(module_name)-1]==FILE_SEP)
+    return TRUE;
+  return FALSE;
+}
+
+
+/* Check if the given module entity is a compilation unit.
+ */
+bool compilation_unit_entity_p(entity e) {
+  return compilation_unit_p(entity_name(e));
+}
+
+
+bool
 variable_in_module_p2(v,m)
 entity v;
 entity m;

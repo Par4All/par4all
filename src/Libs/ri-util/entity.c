@@ -278,7 +278,7 @@ string entity_global_name(entity e)
 
   string name = local_name(entity_name(e));
 
-  return (name 
+  return (name
     + strspn(name, MAIN_PREFIX)
     + strspn(name, BLOCKDATA_PREFIX)
     + strspn(name, COMMON_PREFIX));
@@ -299,12 +299,27 @@ string module_resource_name(entity e)
 
 /* END_EOLE */
 
-string 
+string
 label_local_name(entity e)
 {
     string name = local_name(entity_name(e));
     return name+strlen(LABEL_PREFIX);
 }
+
+/* Return a name valid for sorting variables in vectors and constraint
+   systems.
+
+   @return the name or "TCST" if the entity is null.
+*/
+string
+entity_name_or_TCST(entity e)
+{
+    if (e != NULL)
+      return entity_name(e);
+    else
+ return "TCST";
+}
+
 
 /* See next function! */
 /*
@@ -1241,40 +1256,6 @@ string local_name_to_scope(string ln)
 	     ln, s);
 
   return s;
-}
-
-
-bool module_name_p(string name)
-{
-  return (!compilation_unit_p(name) && strstr(name, MODULE_SEP_STRING) == NULL);
-}
-
-
-bool static_module_name_p(string name)
-{
-  /* An entity is a static module if its name contains the FILE_SEP_STRING
-     but the last one is not the last character of the name string */
-  /* FI: I doubt this is true. Maybe if you're sure name is the name of a module? */
-  return (!compilation_unit_p(name) && strstr(name, FILE_SEP_STRING) != NULL);
-}
-
-bool static_module_p(entity e)
-{
-  return static_module_name_p(entity_name(e));
-}
-
-bool compilation_unit_p(string module_name)
-{
-  /* A module name is a compilation unit if and only if its last character is
-     FILE_SEP */
-  if (module_name[strlen(module_name)-1]==FILE_SEP)
-    return TRUE;
-  return FALSE;
-}
-
-bool compilation_unit_entity_p(entity e)
-{
-  return compilation_unit_p(entity_name(e));
 }
 
 bool typedef_entity_p(entity e)

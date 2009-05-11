@@ -1,6 +1,9 @@
 /*
  * $Id$
  */
+
+// To have asprintf:
+#define _GNU_SOURCE
 #include <stdio.h>
 
 #include "linear.h"
