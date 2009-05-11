@@ -1,7 +1,7 @@
+\documentclass[a4paper]{article}
+
 %%
 %% $Id$
-
-\documentclass[a4paper]{article}
 
 \usepackage[latin1]{inputenc}
 \usepackage{verbatim,comment,newgen_domain}
@@ -1779,7 +1779,7 @@ useful to be able to encode pseudo-affine operators such as \verb+/+,
 \section{Memory Effects of Statements}
 \label{effects}
 
-Each statement reads and writes several memory locations to retrieve 
+Each statement reads and writes several memory locations to retrieve
 stored values and to store new values. Understanding the relationship between
 statements and memory is one of the many keys to restructure and
 parallelize programs. Several analyses provide different approximations
@@ -1816,16 +1816,17 @@ is used later by another statement execution. In the later case, it is
 called an \texttt{OUT} effect.
 
 Note that spurious effects are added in loop bodies to avoid... and/or
-simulate later a control dependence by a data dependence (see
-PJ).  These effects are \verb/read/ effects on the loop bounds
-(variables used in loop bound expressions?). 
+simulate later a control dependence by a data dependence \marginpar{see
+PJ}.  These effects are \verb/read/ effects on the loop bounds
+(variables used in loop bound expressions?).
 
-Note also that \verb/read/ effects of loop indices due to the
-incrementations are ignored because they are never upward exposed. This is
-due to the \emph{compound} nature of the PIPS \verb/DO/ construct. It if
-were decomposed into elementary parts, there would be no such surprising
-approximations. Note that read effects which might be due to bound or
-increment expressions as in \verb/DO I = I, 10*I, I/ must be preserved.
+Note also that \verb/read/ effects of Fortran \verb/DO/ loop indices due
+to the incrementations are ignored because they are never upward
+exposed. This is due to the \emph{compound} nature of the PIPS \verb/DO/
+construct. If it was decomposed into elementary parts, there would be no
+such surprising approximations. Note that read effects which might be due
+to bound or increment expressions as in \verb/DO I = I, 10*I, I/ must be
+preserved.
 
 \subsection{Effects}
 \label{subsection-effects}
@@ -1888,7 +1889,7 @@ Type \verb/effect/ is used to represent a read or write access to a
 variable or through a pointer, i.e. to abstract a reference in a
 statement. Statement effects are used to compute array regions,
 transformers and preconditions, to build use-def chains, dependence
-%% http://www.cri.ensmp.fr/pips/pipsmake-rc.html} 
+%% http://www.cri.ensmp.fr/pips/pipsmake-rc.html}
 graphs, Summary Data Flow Information (SDFI), known as summary effects
 at the module level, and as cumulated effects at the statement level,
 and array regions. Proper effects, cumulated effects, summary effects
@@ -1901,10 +1902,10 @@ Field \verb/cell/ specifies which memory locations are accessed. In
 Fortran, variables, scalar or array, are accessed directly. In C, it
 may be a pointer specifying an indirect adressing. A \verb/cell/ is
 either a \verb/reference/ or a persistant\footnote{Persitant is a
-  Newgen attribute carried by a typ or by a field. It means that
+  Newgen attribute carried by a type or by a field. It means that
   recursive Newgen procedures must stop there. This impacts especially
   the free and copy functions.} \verb/preference/. Attribute
-\verb/persistant/ is used because reference objects point to may be
+\verb/persistant/ is used because the reference objects pointed to may be
 part of program statements. At least for simple effects such as
 effects associated to \verb/x[i]/: if effect references are copied, a
 reference to \verb/i/ is copied twice, once to specify that \verb/i/
@@ -1927,7 +1928,7 @@ the statement is later read for a \verb/out/ effect or region. So,
 
 Field \verb/addressing/ specifies the addressing mode. The addressing
 can be direct and indexed, as in \verb/x[i]/, indirect and
-post-indexed, as in \verb/(*p)[i]/, indirect and pre-indexed, as sin
+post-indexed, as in \verb/(*p)[i]/, indirect and pre-indexed, as in
 \verb/*(p[i])/. For Fortran code, indirect addressing modes are not
 used.
 
