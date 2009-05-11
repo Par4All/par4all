@@ -1,4 +1,9 @@
-#! /bin/bash
+#! /bin/bash -vx
+
+# 	$Id$
+
+# Accept entries in the PIPS validation
+
 
 failed=0
 success=0
@@ -46,32 +51,24 @@ then
     echo "                  as the new reference"
    exit
 else
-    # in this case we want to process a SUMMARY file    
+    # in this case we want to process a SUMMARY file
     if [[ $# == 1 && -f $1 ]]; then
 	# generate a file with one .result directory per line
 	awk_file=/tmp/pips_force_accept_gen_list_awk
 	sed_file=/tmp/pips_force_accept_gen_list_sed
 	# firstly select change result in summary file
 	mawk '$1 ~ /^changed:.*/ {print $2}' $1 > $awk_file
+	# Select also the '> changed:' from a diff output:
+	mawk '/^(> )changed:.*/ {print $3}' $1 >> $awk_file
 	# secondly change extension to .result
 	sed 's/\.f$\|\.F$\|\.tpips2$\|\.tpips$\|\.c$/.result/' $awk_file > $sed_file
 
-	# check the PIPS_VALIDATE folder 
-	if [ ! -d $PIPS_VALIDATE ]; then
-	    echo "ERROR pips validation folder :$PIPS_VALIDATE does not exist" 
-	    exit
-	fi
-	
-        # go to PIPS_VALIDATE folder because it is use as the root in the
-	# SUMMARY file
-	cd $PIPS_VALIDATE 
+	# Assume the validation in the current directory
 	while read line
 	do
 	    let list_lgt++
 	    accept_one_file $line /tmp/pips_force_accept.log
 	done < $sed_file
-	#go back to original folder
-	cd -
     else
 	list_lgt=$#
 	for dir in $@

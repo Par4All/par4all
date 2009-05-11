@@ -1132,17 +1132,24 @@ Three validation scripts are available:
 PIPS_GRAPHICAL_DIFF=pips_emacs_diff manual_accept LoopRecovering
 \end{verbatim}
 
-\item[pips\_force\_accept]
+\item[pips\_force\_accept] to massively accept some changes in a
+  validation directory. The script is to be run in a validation directory.
+
   The script accepts two types of argument:
   \begin{enumerate}
-  \item A list of .result directories as an argument. For each of
+  \item A list of \texttt{.result} directories as an argument. For each of
     the given directory the result of the previous validation will be made the
     reference for future validation tests. Note that you need to run the validation
     first.
-  \item A validation \texttt{SUMMARY} in wihch all changed entry will be selected.
-    As described previously, for all those entries the previous validation will be made the
-    reference for future validation tests. Note that you need to run the validation
-    first.
+
+  \item A file with some excerpts of validation \texttt{SUMMARY} or a
+    nightly validation mail in which all changed entry will be selected.
+    Basically, each line in the file that is marked as \verb*|changed:| or
+    \verb*|> changed:| will result in the matching acceptance.
+
+    As described previously, for all those entries the previous validation
+    will be made the reference for future validation tests. Note that you
+    need to run the validation first.
   \end{enumerate}
   Once you have run the \texttt{pips\_force\_accept}
   script, you need to commit these changes to the validation repository, if
