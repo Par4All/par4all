@@ -61,7 +61,7 @@
       include "REDUCTION_parameters.h"
       INTEGER*4 N
       PARAMETER (N = 10)
-      INTEGER I_7, I_6, I_5, I_4, I_3, I_2, I_1, I_0, I
+      INTEGER I_0, I_1, I_2, I_3, I_4, I_5, I_6, I_7, I
       REAL*4 A(1:3), S
       CALL HPFC INIT NODE
       CALL HPFC LOOP BOUNDS(I_5, I_6, I_7, 2, N-1, 1, 1)

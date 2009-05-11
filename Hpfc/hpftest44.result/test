@@ -116,8 +116,8 @@
       include "HPFTEST44_parameters.h"
       INTEGER*4 N
       PARAMETER (N = 20)
-      INTEGER ALPHA1, LALPHA1, PSI1, I_9, I_8, I_7, I_6, I_5, I_4, 
-     &I_3, I_2, I
+      INTEGER ALPHA1, LALPHA1, PSI1, I_2, I_3, I_4, I_5, I_6, I_7, 
+     &I_8, I_9, I
       REAL*4 A(1:6), B(1:7), H
       CALL HPFC INIT NODE
       CALL HPFC LOOP BOUNDS(I_7, I_8, I_9, 3, N-2, 2, 1)

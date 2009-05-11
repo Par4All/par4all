@@ -88,7 +88,7 @@
       include "hpfc_commons.h"
       include "hpfc_includes.h"
       include "HPFTEST21_parameters.h"
-      INTEGER ALPHA1, LALPHA1, PSI1, I_3, I_2, I_1, I_0, I
+      INTEGER ALPHA1, LALPHA1, PSI1, I_0, I_1, I_2, I_3, I
       INTEGER J(1:5)
       REAL*4 A
       CALL HPFC INIT NODE

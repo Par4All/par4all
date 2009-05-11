@@ -122,8 +122,8 @@
       PARAMETER (N = 70)
       INTEGER*4 M
       PARAMETER (M = 40)
-      INTEGER ALPHA1, LALPHA1, PSI1, I_17, I_16, I_15, I_14, I_13, 
-     &I_12, I_11, I_10, I_9, I_8, I_7, I_6, I_5, I_4, I_3, I_2, J, 
+      INTEGER ALPHA1, LALPHA1, PSI1, I_10, I_11, I_12, I_13, I_14, 
+     &I_15, I_16, I_17, I_2, I_3, I_4, I_5, I_6, I_7, I_8, I_9, J, 
      &I_LOCAL
       LOGICAL FIELD(0:37, 1:3), L_0
       CHARACTER S(1:36)

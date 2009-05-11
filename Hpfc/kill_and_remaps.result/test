@@ -153,7 +153,7 @@
       include "hpfc_commons.h"
       include "hpfc_includes.h"
       include "KILLANDREMAP_parameters.h"
-      INTEGER LALPHA1, LALPHAp1, PSI1, PSIp1, T LID, I_3, I_2, I_1
+      INTEGER LALPHA1, LALPHAp1, PSI1, PSIp1, T LID, I_1, I_2, I_3
       INTEGER A(1:5), A_1(1:8)
       CALL HPFC INIT NODE
 ! all livenesss for A

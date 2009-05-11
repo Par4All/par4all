@@ -74,9 +74,9 @@
       include "hpfc_commons.h"
       include "hpfc_includes.h"
       include "HPFTEST07_parameters.h"
-      INTEGER I_21, I_20, I_19, I_18, I_17, I_16, I_15, I_14, I_13, 
-     &I_12, I_11, I_10, I_9, I_8, I_7, I_6, I_5, J, I, I_0, I_1, I_2
-     &, I_3, I_4
+      INTEGER I_10, I_12, I_14, I_16, I_18, I_20, I_21, I_5, I_7, I_8
+     &, I_19, I_17, I_15, I_13, I_11, I_9, I_6, J, I, I_0, I_1, I_2, 
+     &I_3, I_4
       INTEGER G(1:5)
       LOGICAL L_0
       CALL HPFC INIT NODE

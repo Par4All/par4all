@@ -128,7 +128,7 @@
       include "hpfc_commons.h"
       include "hpfc_includes.h"
       include "HPFTEST16_parameters.h"
-      INTEGER I_7, I_6, I_5, I_4, I_3, I_2, I_1, I_0
+      INTEGER I_0, I_1, I_2, I_3, I_4, I_5, I_6, I_7
       REAL*4 A(1:25, 1:25), B(1:25, 1:25), C(1:25, 1:25), TEMP
       CALL HPFC INIT NODE
       CALL HPFC LOOP BOUNDS(I_5, I_6, I_7, 1, 100, 3, 2)

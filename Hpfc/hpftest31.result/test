@@ -122,8 +122,8 @@
       include "hpfc_commons.h"
       include "hpfc_includes.h"
       include "HPFTEST31_parameters.h"
-      INTEGER ALPHA1, ALPHA2, LALPHA1, LALPHA2, PSI1, I_8, I_7, I_6, 
-     &I_5, I_4, I_3, I_2, I_1, I, J
+      INTEGER ALPHA1, ALPHA2, LALPHA1, LALPHA2, PSI1, I_1, I_2, I_3, 
+     &I_4, I_5, I_6, I_7, I_8, I, J
       REAL*4 A(0:5, 1:10), B(1:5, 1:10)
       CALL HPFC INIT NODE
       CALL HPFC LOOP BOUNDS(I_6, I_7, I_8, 2, 10, 1, 1)

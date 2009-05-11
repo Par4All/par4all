@@ -98,7 +98,7 @@
       include "HPFTEST49_parameters.h"
       INTEGER*4 SIZE
       PARAMETER (SIZE = 500)
-      INTEGER ALPHA1, LALPHA1, PSI1, I_4, I_3, I_2, I_1, I_0, I, N
+      INTEGER ALPHA1, LALPHA1, PSI1, I_0, I_1, I_2, I_3, I_4, I, N
       INTEGER A(1:128)
       CALL HPFC INIT NODE
       CALL HPFC LOOP BOUNDS(I_2, I_3, I_4, 2, SIZE, 1, 1)

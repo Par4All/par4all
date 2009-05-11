@@ -153,7 +153,7 @@
       include "hpfc_commons.h"
       include "hpfc_includes.h"
       include "HPFTEST22_parameters.h"
-      INTEGER ALPHA1, LALPHA1, PSI1, I_6, I_5, I_4, I_3, I
+      INTEGER ALPHA1, LALPHA1, PSI1, I_3, I_4, I_5, I_6, I
       INTEGER J(1:2), K(1:2)
       CALL HPFC INIT NODE
       CALL HPFC LOOP BOUNDS(I_4, I_5, I_6, 1, 10, 1, 1)

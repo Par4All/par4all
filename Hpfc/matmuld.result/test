@@ -409,8 +409,8 @@ c
       INTEGER*4 N
       PARAMETER (N = 10)
       INTEGER ALPHA1, ALPHA2, LALPHA1, LALPHA2, LALPHAp1, LALPHAp2, 
-     &PSI1, PSI2, PSIp1, PSIp2, T LID, I_19, I_18, I_17, I_16, I_15, 
-     &I_14, I_13, I_12, I_11, I_10, I_9, I_8, I_7, I_6, I_5, I_4, I, 
+     &PSI1, PSI2, PSIp1, PSIp2, T LID, I_10, I_11, I_12, I_13, I_14, 
+     &I_15, I_16, I_17, I_18, I_19, I_4, I_5, I_6, I_7, I_8, I_9, I, 
      &J, K
       REAL*8 A(1:5, 1:5), B(1:5, 1:5), C(1:5, 1:5), A_1(1:5, 1:N), 
      &B_1(1:N, 1:5)

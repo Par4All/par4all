@@ -191,7 +191,7 @@
       include "INIT_parameters.h"
       INTEGER*4 N
       PARAMETER (N = 20)
-      INTEGER I_3, I_2, I_1, I_0, INIT A UP1, INIT A LO1, I
+      INTEGER I_0, I_1, I_2, I_3, INIT A UP1, INIT A LO1, I
       INTEGER A(INIT A LO1:INIT A UP1, 1:2)
       CALL HPFC LOOP BOUNDS(I_1, I_2, I_3, 1, N, 3, 1)
       I = I_3
@@ -282,7 +282,7 @@
       include "ITER_parameters.h"
       INTEGER*4 N
       PARAMETER (N = 20)
-      INTEGER I_5, I_4, I_3, I_2, ITER A UP1, ITER A LO1
+      INTEGER I_2, I_3, I_4, I_5, ITER A UP1, ITER A LO1
       INTEGER A(ITER A LO1:ITER A UP1, 1:2)
       CALL HPFC LOOP BOUNDS(I_3, I_4, I_5, 2, N-1, 2, 1)
 ! P(2:4) send A(1, 1) to (-1)

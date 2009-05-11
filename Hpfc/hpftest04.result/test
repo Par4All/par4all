@@ -79,7 +79,7 @@ Commencement du code
       include "hpfc_commons.h"
       include "hpfc_includes.h"
       include "HPFTEST04_parameters.h"
-      INTEGER I_10, I_9, I_8, I_7, I_6, I_5, I_4, I_3, I_2, I_1, I, 
+      INTEGER I_1, I_10, I_2, I_3, I_4, I_5, I_6, I_7, I_8, I_9, I, 
      &I_0
       REAL*4 F_1, F_0, A(1:5), B(1:5)
       CALL HPFC INIT NODE

@@ -77,8 +77,8 @@ cfcd$ pure
       include "PURE_1_parameters.h"
       REAL*4 CUBE
       EXTERNAL CUBE
-      INTEGER ALPHA1, LALPHA1, PSI1, I_7, I_6, I_5, I_4, I_3, I_2, 
-     &I_1, I_0, I
+      INTEGER ALPHA1, LALPHA1, PSI1, I_0, I_1, I_2, I_3, I_4, I_5, 
+     &I_6, I_7, I
       REAL*4 A(1:25)
       CALL HPFC INIT NODE
       CALL HPFC LOOP BOUNDS(I_5, I_6, I_7, 1, 100, 1, 1)

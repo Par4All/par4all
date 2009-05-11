@@ -89,7 +89,7 @@
       include "SHIFTM1_parameters.h"
       INTEGER*4 N
       PARAMETER (N = 10)
-      INTEGER ALPHA1, LALPHA1, PSI1, I_4, I_3, I_2, I_1, I
+      INTEGER ALPHA1, LALPHA1, PSI1, I_1, I_2, I_3, I_4, I
       REAL*4 A(1:5)
       CALL HPFC INIT NODE
       CALL HPFC LOOP BOUNDS(I_2, I_3, I_4, 1, N, 1, 1)

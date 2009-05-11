@@ -103,7 +103,7 @@
       include "SAMEDIST_parameters.h"
       INTEGER*4 N
       PARAMETER (N = 100)
-      INTEGER I_3, I_2
+      INTEGER I_2, I_3
       REAL*4 A(1:N, 1:50)
       CALL HPFC INIT NODE
 ! all livenesss for A

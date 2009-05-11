@@ -178,9 +178,9 @@ c
       INTEGER*4 TIMES
       PARAMETER (TIMES = 100)
       INTEGER ALPHA1, ALPHA2, ALPHA3, LALPHA1, LALPHA2, LALPHA3, PSI1
-     &, PSI2, I_31, I_30, I_29, I_28, I_27, I_26, I_25, I_24, I_23, 
-     &I_22, I_21, I_20, I_19, I_18, I_17, I_16, I_15, I_14, I_13, 
-     &I_12, I_11, I_10, I_9, I_8, I_7, I_6, I_5, I_4, OLD, NEW, T1, 
+     &, PSI2, I_10, I_11, I_12, I_13, I_14, I_15, I_16, I_17, I_18, 
+     &I_19, I_20, I_21, I_22, I_23, I_24, I_25, I_26, I_27, I_28, 
+     &I_29, I_30, I_31, I_4, I_5, I_6, I_7, I_8, I_9, OLD, NEW, T1, 
      &T2, T3, T4, T5, I, K
       REAL*8 TEMP(0:251, 0:251, 1:2), NORTH(1:250), X
       CALL HPFC INIT NODE

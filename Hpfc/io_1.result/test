@@ -84,7 +84,7 @@
       include "hpfc_commons.h"
       include "hpfc_includes.h"
       include "IO_1_parameters.h"
-      INTEGER ALPHA1, LALPHA1, PSI1, I_3, I_2, I_1, I_0, I, N
+      INTEGER ALPHA1, LALPHA1, PSI1, I_0, I_1, I_2, I_3, I, N
       REAL*4 A(1:25)
       CALL HPFC INIT NODE
       CALL HPFC LOOP BOUNDS(I_1, I_2, I_3, 1, 100, 1, 1)

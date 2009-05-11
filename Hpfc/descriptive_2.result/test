@@ -101,8 +101,8 @@
       include "DESCRIPTIVE_2_parameters.h"
       INTEGER*4 N
       PARAMETER (N = 20)
-      INTEGER ALPHA1, ALPHA2, LALPHA1, LALPHA2, PSI1, I_3, I_2, I_1, 
-     &I_0, I
+      INTEGER ALPHA1, ALPHA2, LALPHA1, LALPHA2, PSI1, I_0, I_1, I_2, 
+     &I_3, I
       INTEGER A(0:6, 1:2)
       CALL HPFC INIT NODE
       CALL HPFC LOOP BOUNDS(I_1, I_2, I_3, 1, N, 2, 1)
@@ -238,7 +238,7 @@
       include "ITER_parameters.h"
       INTEGER*4 N
       PARAMETER (N = 20)
-      INTEGER I_5, I_4, I_3, I_2, ITER A UP1, ITER A LO1
+      INTEGER I_2, I_3, I_4, I_5, ITER A UP1, ITER A LO1
       INTEGER A(ITER A LO1:ITER A UP1, 1:2)
       CALL HPFC LOOP BOUNDS(I_3, I_4, I_5, 2, N-1, 1, 1)
 ! P(2:4) send A(1, 1) to (-1)

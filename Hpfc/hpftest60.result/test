@@ -114,7 +114,7 @@
       INTEGER*4 N
       PARAMETER (N = 10)
       INTEGER ALPHA1, ALPHA2, ALPHA3, LALPHA1, LALPHA2, LALPHA3, PSI1
-     &, PSI2, I_7, I_6, I_5, I_4, I_3, I_2, I_1, I_0, I, J, K
+     &, PSI2, I_0, I_1, I_2, I_3, I_4, I_5, I_6, I_7, I, J, K
       INTEGER A(1:N, 1:5, 1:5)
       CALL HPFC INIT NODE
       CALL HPFC LOOP BOUNDS(I_5, I_6, I_7, 1, N, 1, 1)

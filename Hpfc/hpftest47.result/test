@@ -60,7 +60,7 @@
       include "HPFTEST47_parameters.h"
       INTEGER*4 N
       PARAMETER (N = 100)
-      INTEGER I_3, I_2, I_1, I_0, I
+      INTEGER I_0, I_1, I_2, I_3, I
       REAL*4 A(1:50), AMIN
       CALL HPFC INIT NODE
       CALL HPFC LOOP BOUNDS(I_1, I_2, I_3, 1, N, 1, 1)

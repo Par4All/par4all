@@ -66,7 +66,7 @@
       include "PI_parameters.h"
       INTEGER*4 N
       PARAMETER (N = 1000)
-      INTEGER I_3, I_2, I_1, I_0, I
+      INTEGER I_0, I_1, I_2, I_3, I
       REAL*8 V(1:125), X, GSUM, W
       CALL HPFC INIT NODE
       CALL HPFC LOOP BOUNDS(I_1, I_2, I_3, 1, N, 1, 1)

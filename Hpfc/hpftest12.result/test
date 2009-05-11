@@ -67,7 +67,7 @@
       include "hpfc_commons.h"
       include "hpfc_includes.h"
       include "HPFTEST12_parameters.h"
-      INTEGER I_1, I_0, I, J, K
+      INTEGER I_0, I_1, I, J, K
       REAL*4 A(1:25, 1:100, 1:100)
       CALL HPFC INIT NODE
       DO I = 1, 100

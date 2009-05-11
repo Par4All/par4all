@@ -65,7 +65,7 @@
       PARAMETER (N = 20)
       INTEGER*4 N
       PARAMETER (N = 20)
-      INTEGER I_3, I_2, I_1, I_0, INIT AX UP2, INIT AX LO2, I, J
+      INTEGER I_0, I_1, I_2, I_3, INIT AX UP2, INIT AX LO2, I, J
       INTEGER AX(1:N, INIT AX LO2:INIT AX UP2)
       CALL HPFC LOOP BOUNDS(I_1, I_2, I_3, 1, N, 3, 1)
       J = I_3

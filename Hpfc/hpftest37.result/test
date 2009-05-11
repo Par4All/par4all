@@ -153,8 +153,8 @@ c print results
       include "hpfc_commons.h"
       include "hpfc_includes.h"
       include "HPFTEST37_parameters.h"
-      INTEGER ALPHA1, ALPHA2, LALPHA1, LALPHA2, PSI1, I_15, I_14, 
-     &I_13, I_12, I_11, I_10, I_9, I_8, I_7, I_6, I_5, I_4, I, J, K, 
+      INTEGER ALPHA1, ALPHA2, LALPHA1, LALPHA2, PSI1, I_10, I_11, 
+     &I_12, I_13, I_14, I_15, I_4, I_5, I_6, I_7, I_8, I_9, I, J, K, 
      &I_2, I_3
       REAL*4 TC(0:64, 1:250), TS(1:63, 1:250), NORTH(1:250)
       CALL HPFC INIT NODE

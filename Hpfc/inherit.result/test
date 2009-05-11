@@ -272,7 +272,7 @@
       include "hpfc_commons.h"
       include "hpfc_includes.h"
       include "INIT_parameters.h"
-      INTEGER I_3, I_2, I_1, I_0, INIT A UP1, INIT A LO1, I
+      INTEGER I_0, I_1, I_2, I_3, INIT A UP1, INIT A LO1, I
       REAL*4 A(INIT A LO1:INIT A UP1)
       CALL HPFC LOOP BOUNDS(I_1, I_2, I_3, 1, 10, 1, 1)
       IF (MY POS(1,1).LE.5) THEN

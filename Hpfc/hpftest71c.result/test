@@ -351,7 +351,7 @@ c
       INTEGER*4 N
       PARAMETER (N = 100)
       INTEGER LALPHA1, LALPHA2, LALPHAp1, LALPHAp2, PSI1, PSI2, PSIp1
-     &, PSIp2, T LID, I_11, I_10, I_9, I_8, I_7, I_6, I_5, I_4, I, J
+     &, PSIp2, T LID, I_10, I_11, I_4, I_5, I_6, I_7, I_8, I_9, I, J
       REAL*4 A(1:50, 1:50), B(1:50, 1:50), B_1(1:50, 1:50), A_1(1:50
      &, 1:50)
       CALL HPFC INIT NODE

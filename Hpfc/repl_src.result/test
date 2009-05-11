@@ -175,7 +175,7 @@
       include "hpfc_includes.h"
       include "REPLICATED_SOURCE_parameters.h"
       INTEGER GAMMAp1, LALPHA1, LALPHAp1, PSI1, PSI2, PSI3, PSIp1, 
-     &PSIp2, T LID, TMP3, I_6, I_5, I_4, I_3, I_2, I_1
+     &PSIp2, T LID, TMP3, I_1, I_2, I_3, I_4, I_5, I_6
       REAL*4 F_0, A(1:10), A_1(1:6)
       CALL HPFC INIT NODE
 ! all livenesss for A

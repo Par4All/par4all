@@ -213,7 +213,7 @@
       include "CGC_parameters.h"
       INTEGER*4 N
       PARAMETER (N = 4500)
-      INTEGER LALPHA1, LALPHAp1, PSI1, PSIp1, T LID, I_4, I_3, I_2, 
+      INTEGER I_2, I_3, I_4, LALPHA1, LALPHAp1, PSI1, PSIp1, T LID, 
      &CGC SOL UP1, CGC SOL LO1
       REAL*4 F_0, SOL(CGC SOL LO1:CGC SOL UP1), SOL_1(1:N)
 ! all livenesss for SOL
@@ -357,7 +357,7 @@
       include "MAIN_parameters.h"
       INTEGER*4 N
       PARAMETER (N = 4500)
-      INTEGER ALPHA1, LALPHA1, PSI1, I_3, I_2, I_1, I_0
+      INTEGER ALPHA1, LALPHA1, PSI1, I_0, I_1, I_2, I_3
       REAL*4 SOL(1:563)
       CALL HPFC INIT NODE
       CALL HPFC LOOP BOUNDS(I_1, I_2, I_3, 1, N, 3, 1)
