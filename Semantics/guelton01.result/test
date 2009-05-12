@@ -1,0 +1,69 @@
+
+Transformers for "FIR"
+
+
+C  T(FIR) {FIR==0}
+
+int FIR()
+{
+   int ifr;
+
+//  T(ifr) {0<=ifr}
+
+   for(ifr = 0; ifr <= 0; ifr += 1)
+
+//  T() {ifr==0}
+
+      if (ifr==0)
+         ;
+
+//  T(FIR) {FIR==0, ifr==1}
+
+   return 0;
+}
+
+Preconditions for "FIR"
+
+
+//  P() {}
+
+int FIR()
+{
+   int ifr;
+
+//  P() {}
+
+   for(ifr = 0; ifr <= 0; ifr += 1)
+
+//  P(ifr) {ifr==0}
+
+      if (ifr==0)
+         ;
+
+//  P(ifr) {ifr==1}
+
+   return 0;
+}
+
+Preconditions for "FIR" after partial evaluation
+
+
+//  P() {}
+
+int FIR()
+{
+   int ifr;
+
+//  P() {}
+
+   for(ifr = 0; ifr <= 0; ifr += 1)
+
+//  P(ifr) {ifr==0}
+
+      if (ifr==0)
+         ;
+
+//  P(ifr) {ifr==1}
+
+   return 0;
+}
