@@ -9,7 +9,7 @@ ARFLAGS	= rv
 
 CC	= gcc
 CANSI	= -ansi -pedantic-errors
-CFLAGS	= -g -O2 -Wall -W -pipe
+CFLAGS	= -g -O2 -Wall -W -pipe -std=c99
 # ??? -MG
 CMKDEP	= -MM
 
