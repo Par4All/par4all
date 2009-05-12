@@ -84,7 +84,7 @@ C (0,12)
       IF (IS.NE.1.AND.IS.NE.-1.OR.M.LT.1.OR.M.GT.MX) THEN               0028
 
 C  T() {0<=IS+1, IS<=1, MX<=59IS+M+58, 59IS+MX<=M+58, MX<=58IS+63,
-C    58IS+MX<=63, 5<=M, M<=6, 0<=MX, 1<=NQ, NQ<=64}
+C    58IS+MX<=63, 5<=M, M<=6, 0<=MX, MX<=63, 1<=NQ, NQ<=64}
 
 C (0,13)
          PRINT *, IS, M, MX                                             0030
@@ -190,7 +190,8 @@ C (0,12)
       IF (IS.NE.1.AND.IS.NE.-1.OR.M.LT.1.OR.M.GT.MX) THEN               0028
 
 C  P(IS,M,MX,NQ) {0<=IS+1, IS<=1, MX<=59IS+M+58, 59IS+MX<=M+58,
-C    MX<=58IS+63, 58IS+MX<=63, 5<=M, M<=6, 0<=MX, 1<=NQ, NQ<=64}
+C    MX<=58IS+63, 58IS+MX<=63, 5<=M, M<=6, 0<=MX, MX<=63, 1<=NQ,
+C    NQ<=64}
 
 C (0,13)
          PRINT *, IS, M, MX                                             0030

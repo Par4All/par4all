@@ -55,11 +55,11 @@ main()
    int j;
    int a[5];
 
-//  T(i,j) {}
+//  T(i,j) {i==1, j==2}
 
    (i = 1, j = 2);
 
-//  T(i,j) {}
+//  T(i,j) {i<=4, i#init<=4}
 
    while (i<5) {
 
@@ -67,7 +67,7 @@ main()
 
       a[i] = i;
 
-//  T(i,j) {}
+//  T(i,j) {i==i#init+2, j==j#init+2}
 
       (i++, j += 2);
    }

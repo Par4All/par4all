@@ -25,7 +25,7 @@ C  T(J) {J==10}
 C (0,3)
       J = N                                                             0007
 
-C  T(I,J) {I+J==I#init+J#init}
+C  T(I,J) {I+J==I#init+J#init, I<=9, I#init<=9}
 
 C (0,4)
       DO WHILE (I.LT.N)                                                 0008

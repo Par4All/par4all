@@ -1,0 +1,76 @@
+
+Transformers for "while06"
+
+
+C  T(while06) {while06==10}
+
+int while06()
+{
+   int i;
+   int n;
+
+//  T(i) {i==0}
+
+
+   i = 0;
+
+//  T(n) {n==10}
+
+   n = 10;
+
+//  T(i,n) {i+n==i#init+n#init}
+
+
+   while (n) {
+
+//  T(i) {i==i#init+1}
+
+      i++;
+
+//  T(n) {n==n#init-1}
+
+      n--;
+   }
+
+//  T(while06) {i==while06}
+
+   return i;
+}
+
+Preconditions for "while06"
+
+
+//  P() {}
+
+int while06()
+{
+   int i;
+   int n;
+
+//  P() {}
+
+
+   i = 0;
+
+//  P(i) {i==0}
+
+   n = 10;
+
+//  P(i,n) {i==0, n==10}
+
+
+   while (n) {
+
+//  P(i,n) {i+n==10, i<=9}
+
+      i++;
+
+//  P(i,n) {i+n==11, i<=10}
+
+      n--;
+   }
+
+//  P(i,n) {i==10, n==0}
+
+   return i;
+}

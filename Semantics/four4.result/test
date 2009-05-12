@@ -1,11 +1,14 @@
 
+Transformers for "FOUR4"
+
+
 C  T() {}
 
 C     Structured version of four3.f
 
       SUBROUTINE FOUR4(N)
 
-C  T(J,M,NN) {2N==NN, 2M+1<=J+2N, 3J+5N<=5M+3}
+C  T(J,M,NN) {2N==NN, 2M+1<=J+2N, 2J+3N<=3M+2, 3J+5N<=5M+4}
 
 C (0,1)
 C     BEGIN BLOCK
@@ -14,22 +17,23 @@ C  T(J) {J==1}
 
 C (0,2)
 
-      J = 1                                                             0001
+      J = 1                                                             0005
 
 C  T(NN) {2N==NN}
 
 C (0,3)
-      NN = 2*N                                                          0002
+      NN = 2*N                                                          0006
 
 C  T(M) {NN<=2M+1, 2M<=NN}
 
 C (0,4)
-      M = NN/2                                                          0003
+      M = NN/2                                                          0007
 
-C  T(J,M) {J#init+2M<=J+2M#init, 3J+5M#init<=3J#init+5M}
+C  T(J,M) {J#init+2M<=J+2M#init, 3J+5M#init<=3J#init+5M, M+1<=J,
+C    M#init+1<=J#init, 2<=M, 2<=M#init}
 
 C (0,5)
-      DO WHILE (M.GE.2.AND.J.GT.M)                                      0004
+      DO WHILE (M.GE.2.AND.J.GT.M)                                      0008
 
 C  T(J,M) {J+M#init==J#init, M#init<=2M+1, 2M<=M#init}
 
@@ -39,12 +43,12 @@ C        BEGIN BLOCK
 C  T(J) {J+M==J#init}
 
 C (0,7)
-         J = J-M                                                        0005
+         J = J-M                                                        0009
 
 C  T(M) {M#init<=2M+1, 2M<=M#init}
 
 C (0,8)
-         M = M/2                                                        0006
+         M = M/2                                                        0010
 C        END BLOCK
       ENDDO
 
@@ -52,7 +56,7 @@ C  T() {}
 
 C (0,9)
 
-      PRINT *, N, NN, M, J                                              0007
+      PRINT *, N, NN, M, J                                              0013
 
 C  T() {}
 
@@ -61,6 +65,9 @@ C (0,10)
       RETURN
 C     END BLOCK
       END
+
+Preconditions for "FOUR4"
+
 
 C  P() {}
 
@@ -77,37 +84,37 @@ C  P() {}
 
 C (0,2)
 
-      J = 1                                                             0001
+      J = 1                                                             0005
 
 C  P(J) {J==1}
 
 C (0,3)
-      NN = 2*N                                                          0002
+      NN = 2*N                                                          0006
 
 C  P(J,NN) {J==1, 2N==NN}
 
 C (0,4)
-      M = NN/2                                                          0003
+      M = NN/2                                                          0007
 
 C  P(J,M,NN) {J==1, M==N, 2M==NN}
 
 C (0,5)
-      DO WHILE (M.GE.2.AND.J.GT.M)                                      0004
+      DO WHILE (M.GE.2.AND.J.GT.M)                                      0008
 
-C  P(J,M,NN) {2N==NN, M+1<=J, 2M+1<=J+2N, 3J+5N<=5M+3, 2<=M}
+C  P() {0==-1}
 
 C (0,6)
 C        BEGIN BLOCK
 
-C  P(J,M,NN) {2N==NN, M+1<=J, 2M+1<=J+2N, 3J+5N<=5M+3, 2<=M}
+C  P() {0==-1}
 
 C (0,7)
-         J = J-M                                                        0005
+         J = J-M                                                        0009
 
-C  P(J,M,NN) {2N==NN, 1<=J, M+1<=J+2N, 3J+5N<=2M+3, 2<=M}
+C  P() {0==-1}
 
 C (0,8)
-         M = M/2                                                        0006
+         M = M/2                                                        0010
 C        END BLOCK
       ENDDO
 
@@ -115,7 +122,7 @@ C  P(J,M,NN) {J==1, M==N, 2M==NN}
 
 C (0,9)
 
-      PRINT *, N, NN, M, J                                              0007
+      PRINT *, N, NN, M, J                                              0013
 
 C  P(J,M,NN) {J==1, M==N, 2M==NN}
 

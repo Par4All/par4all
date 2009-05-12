@@ -1,0 +1,36 @@
+
+Transformers for "if06"
+
+
+C  T(if06) {0<=if06+1, if06<=1}
+
+int if06()
+{
+   int i;
+   int n;
+
+//  T(i) {i==0}
+
+
+   i = 0;
+
+//  T(i,n) {i#init==0, n==n#init+1, 0<=i+1, i<=1}
+
+   //n = 10;
+
+   if (n++>0)
+
+//  T(i) {i==1, i#init==0, 2<=n}
+
+      i++;
+   else
+
+//  T(i) {i==-1, i#init==0, n<=1}
+
+      i--;
+
+//  T(if06) {i==if06, 0<=i+1, i<=1}
+
+
+   return i;
+}

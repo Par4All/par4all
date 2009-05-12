@@ -101,7 +101,7 @@ int main()
 
    j = 1;                                                               /*0008*/
 
-//  T(i,j) {i+j#init==i#init+j, j#init<=j}
+//  T(i,j) {i+j#init==i#init+j, i<=499, i#init<=499, j#init<=j}
 
    while (i<=499) {                                                     /*0009*/
 

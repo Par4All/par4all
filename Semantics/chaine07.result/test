@@ -56,7 +56,7 @@ C  P() {0==-1}
          PRINT *, "Leading blanks are ignored"                          0026
       ELSE
 
-C  P(S,T) {" hello"==T, "hello"==S, T<=S}
+C  P(S,T) {" hello"==T, "hello"==S}
 
 !        TRUE 
          PRINT *, "Leading blanks are not ignored"                      0029

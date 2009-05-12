@@ -6,12 +6,13 @@ Transformers for "generate01"
 
 int generate01()
 {
-   int i;
+   int i = 1;
+   float x = 0.5;
 
 //  T(generate01) {}
 
 
-   return foo(i);
+   return foo(i, x);
 }
 
 Preconditions for "generate01"
@@ -21,10 +22,20 @@ Preconditions for "generate01"
 
 int generate01()
 {
-   int i;
+   int i = 1;
+   float x = 0.5;
+
+//  P() {i==1}
+
+
+   return foo(i, x);
+}
+
+Preconditions for "foo"
+
 
 //  P() {}
 
-
-   return foo(i);
+int foo(int f1, float f2)
+{
 }

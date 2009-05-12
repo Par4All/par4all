@@ -1,0 +1,66 @@
+
+Transformers for "while05"
+
+
+C  T(while05) {while05==9}
+
+int while05()
+{
+   int i;
+   int n;
+
+//  T(i) {i==0}
+
+
+   i = 0;
+
+//  T(n) {n==10}
+
+   n = 10;
+
+//  T(i,n) {i+n==i#init+n#init-1}
+
+
+   while (--n) 
+
+//  T(i) {i==i#init+1}
+
+      i++;
+
+//  T(while05) {i==while05}
+
+   return i;
+}
+
+Preconditions for "while05"
+
+
+//  P() {}
+
+int while05()
+{
+   int i;
+   int n;
+
+//  P() {}
+
+
+   i = 0;
+
+//  P(i) {i==0}
+
+   n = 10;
+
+//  P(i,n) {i==0, n==10}
+
+
+   while (--n) 
+
+//  P(i,n) {i+n==10}
+
+      i++;
+
+//  P(i,n) {10<=i+n, i+n<=11}
+
+   return i;
+}

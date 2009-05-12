@@ -23,7 +23,7 @@
  s1 == s2
  s1 <= s2
  s1 >= s2
-          18
+ 18
 
 C  T() {}
 
@@ -805,20 +805,20 @@ C  P() {0==-1}
          PRINT *, 's1 == s2'                                            0067
       ENDIF
 
-C  P(I,S1,S2) {'bye'==S1, 'hi'==S2, 0<=I, I<=12, S1<=S2}
+C  P(I,S1,S2) {'bye'==S1, 'hi'==S2, 0<=I, I<=12}
 
       IF (S1.NE.S2) THEN                                                0069
 
-C  P(I,S1,S2) {'bye'==S1, 'hi'==S2, 0<=I, I<=12, S1<=S2}
+C  P(I,S1,S2) {'bye'==S1, 'hi'==S2, 0<=I, I<=12}
 
          I = I+1                                                        0070
 
-C  P(I,S1,S2) {'bye'==S1, 'hi'==S2, 1<=I, I<=13, S1<=S2}
+C  P(I,S1,S2) {'bye'==S1, 'hi'==S2, 1<=I, I<=13}
 
          PRINT *, 's1 != s2'                                            0071
       ENDIF
 
-C  P(I,S1,S2) {'bye'==S1, 'hi'==S2, 1<=I, I<=13, S1<=S2}
+C  P(I,S1,S2) {'bye'==S1, 'hi'==S2, 1<=I, I<=13}
 
       IF (S1.LT.S2) THEN                                                0073
 
@@ -1312,5 +1312,5 @@ C  P(I,S1,S2) {'   '==S1, ' '==S2, 'bye'<='hi', 6<=I, I<=30}
  s1 == s2
  s1 <= s2
  s1 >= s2
-          18
+ 18
 

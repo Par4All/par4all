@@ -28,7 +28,7 @@ C (0,3)
 
       READ *, X                                                         0010
 
-C  T(I) {}
+C  T(I) {I#init==0}
 
 C (0,4)
       DO WHILE (X.GT.0.)                                                0011

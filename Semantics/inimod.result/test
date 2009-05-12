@@ -212,13 +212,13 @@ C (8,1)
       GOTO 99996
 99999 CONTINUE
 
-C  T(I,J,NPJET) {3<=I, 803<=I+400J, 2I+5J<=811, NPJET+1<=J,
-C    MPCON<=401}
+C  T(I,J,NPJET) {J#init==161, 3<=I, 803<=I+400J, 2I+5J<=811,
+C    NPJET+1<=J, MPCON<=401}
 
 C (2,1)
 C     BEGIN BLOCK
 
-C  T(I,J) {1<=J}
+C  T(I,J) {J#init==161, 1<=J}
 
 C (2,2)
       DO 10 J = 1, NP                                                   0072
@@ -255,7 +255,7 @@ C (2,8)
 10          CONTINUE                                                    0078
 C           END BLOCK
 
-C  T(I,J) {2<=I#init, I#init<=403, MPCON+1<=I#init, 1<=J}
+C  T(I,J) {J#init==161, 2<=I#init, I#init<=403, MPCON+1<=I#init, 1<=J}
 
 C (2,9)
 *
@@ -312,7 +312,7 @@ C (2,18)
 *
       NPJET = NINT(NP*XLJET/XLR)                                        0093
 
-C  T(I,J) {I#init==403, 1<=J, MPCON<=401}
+C  T(I,J) {I#init==403, J#init==161, 1<=J, MPCON<=401}
 
 C (2,19)
 *

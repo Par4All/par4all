@@ -27,7 +27,7 @@ C (0,3)
 
       IF (.TRUE.) THEN                                                  0009
 
-C  T(I) {}
+C  T(I) {I#init==0, 0<=I+4, I<=4}
 
 C (0,4)
          DO WHILE (I.GT.-5.AND.I.LT.5)                                  0010

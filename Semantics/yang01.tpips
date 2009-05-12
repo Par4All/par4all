@@ -44,18 +44,30 @@ echo
 display PRINTED_FILE[foo]
 
 echo
-echo
+echo After inlining/unfolding of "bar"
 echo
 
 apply UNFOLDING[bar]
 activate PRINT_CODE
 display PRINTED_FILE[bar]
 
+echo
+echo After unspahettify of "bar"
+echo
+
 apply UNSPAGHETTIFY[bar]
 display PRINTED_FILE[bar]
 
+echo
+echo Preconditions for "bar"
+echo
+
 activate PRINT_CODE_PRECONDITIONS
 display PRINTED_FILE[bar]
+
+echo
+echo After dead code elimination of "bar"
+echo
 
 apply SUPPRESS_DEAD_CODE[bar]
 display PRINTED_FILE[bar]

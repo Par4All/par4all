@@ -32,7 +32,7 @@ C  T() {}
 
             CALL REDLEV('IC')                                           0015
 
-C  T() {}
+C  T() {ITYPLU==1}
 
             DO WHILE (ITYPLU.EQ.1)                                      0016
 

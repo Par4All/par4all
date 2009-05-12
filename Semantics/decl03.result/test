@@ -18,7 +18,7 @@ C  T() {1<=I, I<=M, I<=N, 1<=M, 1<=N}
          X(I,I) = 0.                                                    0009
       ENDDO
 
-C  T(I,J) {1<=M, N<=M, 1<=N}
+C  T(I,J) {I#init==N+1, 2<=I#init, I#init<=M+1, 1<=M}
 
 
       DO I = 1, N                                                       0012

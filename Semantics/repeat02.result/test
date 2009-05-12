@@ -6,53 +6,47 @@ C  T(repeat02) {repeat02==4}
 
 int repeat02()
 {
-   int i;
-   int j;
 
 //  T(repeat02) {repeat02==4}
 
-//:   BEGIN BLOCK
+   // BEGIN BLOCK
+   int i;
+   int j;
+   int n = 10;
 
-//  T(i) {i==0}
+//  T(i) {i==0, n==10}
 
 
    i = 0;
 
-//  T(j) {i==0, j==1}
+//  T(j) {i==0, j==1, n==10}
 
    j = 1;
-   {
-      int n = 10;
 
-//  T(i,j) {i==1, i#init==0, j==3, j#init==1}
+//  T(i,j) {2i==j-1, 2i#init==j#init-1, n==10, 0<=i, i#init<=i}
 
-//:      BEGIN BLOCK
+   do {
 
-//  T(i,j) {2i+j#init==2i#init+j, i#init<=i}
+//  T(i,j) {i==i#init+1, j==j#init+2, n==10, 3<=j}
 
-      do {
+      // BEGIN BLOCK
 
-//  T(i,j) {i==i#init+1, j==j#init+2, n==10}
+//  T(i) {i==i#init+1, n==10, 1<=j}
 
-//:         BEGIN BLOCK
+      i++;
 
-//  T(i) {i==i#init+1, n==10}
+//  T(j) {j==j#init+2, n==10, 3<=j}
 
-         i++;
-
-//  T(j) {j==j#init+2, n==10}
-
-         j += 2;
-//:         END BLOCK
-      }
-      while (j>n);
-//:      END BLOCK
+      j += 2;
+      // END BLOCK
    }
+   while (j>n);
 
-//  T(repeat02) {i==1, j==3, repeat02==4}
+//  T(repeat02) {i==1, j==3, n==10, repeat02==4}
 
+   //}
    return i+j;
-//:   END BLOCK
+   // END BLOCK
 }
 
 Preconditions for "repeat02"
@@ -62,51 +56,45 @@ Preconditions for "repeat02"
 
 int repeat02()
 {
+
+//  P() {}
+
+   // BEGIN BLOCK
    int i;
    int j;
+   int n = 10;
 
-//  P() {}
-
-//:   BEGIN BLOCK
-
-//  P() {}
+//  P() {n==10}
 
 
    i = 0;
 
-//  P(i) {i==0}
+//  P(i) {i==0, n==10}
 
    j = 1;
-   {
-      int n = 10;
-
-//  P(i,j) {i==0, j==1}
-
-//:      BEGIN BLOCK
 
 //  P(i,j) {i==0, j==1, n==10}
 
-      do {
+   do {
 
 //  P(i,j) {2i==j-1, n==10, 0<=i}
 
-//:         BEGIN BLOCK
+      // BEGIN BLOCK
 
 //  P(i,j) {2i==j-1, n==10, 0<=i}
 
-         i++;
+      i++;
 
 //  P(i,j) {2i==j+1, n==10, 1<=i}
 
-         j += 2;
-//:         END BLOCK
-      }
-      while (j>n);
-//:      END BLOCK
+      j += 2;
+      // END BLOCK
    }
+   while (j>n);
 
-//  P(i,j) {i==1, j==3}
+//  P(i,j) {i==1, j==3, n==10}
 
+   //}
    return i+j;
-//:   END BLOCK
+   // END BLOCK
 }

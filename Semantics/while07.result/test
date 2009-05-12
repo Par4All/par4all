@@ -1,10 +1,10 @@
 int main()
 {
+   // BEGIN BLOCK
    int i;
    int j;
    int k;
    int a[500];
-//:   BEGIN BLOCK
 //               <must be written>: i
 
    i = 0;                                                               /*0007*/
@@ -12,7 +12,7 @@ int main()
    j = 1;                                                               /*0008*/
 //               <must be read   >: i
    while (i<=499) {                                                     /*0009*/
-//:      BEGIN BLOCK
+      // BEGIN BLOCK
 //               <must be read   >: j
 //               <must be written>: j
       // The lower bound on i and j should not be lost...
@@ -24,26 +24,26 @@ int main()
 //               <must be read   >: i
 //               <must be written>: i
       i = i+1;                                                          /*0014*/
-//:      END BLOCK
+      // END BLOCK
    }
 //               <must be written>: k
    // We should have the precondition i == 500, j == 501
-   // if we would use the proper fix point
+   // if we would use the proper fix point operator (derivative)
    k = 2;                                                               /*0018*/
 //               <must be read   >: k
    return k;                                                            /*0019*/
-//:   END BLOCK
+   // END BLOCK
 }
 int main()
 {
+//               <may be written >: a[*]
+//               <must be read   >: i j k
+//               <must be written>: i j k
+   // BEGIN BLOCK
    int i;
    int j;
    int k;
    int a[500];
-//               <may be written >: a[*]
-//               <must be read   >: i j k
-//               <must be written>: i j k
-//:   BEGIN BLOCK
 //               <must be written>: i
 
    i = 0;                                                               /*0007*/
@@ -56,7 +56,7 @@ int main()
 //               <may be written >: a[*]
 //               <must be read   >: i j
 //               <must be written>: i j
-//:      BEGIN BLOCK
+      // BEGIN BLOCK
 //               <must be read   >: j
 //               <must be written>: j
       // The lower bound on i and j should not be lost...
@@ -68,29 +68,29 @@ int main()
 //               <must be read   >: i
 //               <must be written>: i
       i = i+1;                                                          /*0014*/
-//:      END BLOCK
+      // END BLOCK
    }
 //               <must be written>: k
    // We should have the precondition i == 500, j == 501
-   // if we would use the proper fix point
+   // if we would use the proper fix point operator (derivative)
    k = 2;                                                               /*0018*/
 //               <must be read   >: k
    return k;                                                            /*0019*/
-//:   END BLOCK
+   // END BLOCK
 }
 
 //  T(main) {main==2}
 
 int main()
 {
+
+//  T(main) {main==2}
+
+   // BEGIN BLOCK
    int i;
    int j;
    int k;
    int a[500];
-
-//  T(main) {main==2}
-
-//:   BEGIN BLOCK
 
 //  T(i) {i==0}
 
@@ -101,54 +101,54 @@ int main()
 
    j = 1;                                                               /*0008*/
 
-//  T(i,j) {}
+//  T(i,j) {i#init==0, j#init==1, i<=499}
 
    while (i<=499) {                                                     /*0009*/
 
-//  T(i,j) {i==i#init+1, j==j#init+1}
+//  T(i,j) {i==i#init+1, j==j#init+1, i<=500}
 
-//:      BEGIN BLOCK
+      // BEGIN BLOCK
 
-//  T(j) {j==j#init+1}
+//  T(j) {j==j#init+1, i<=499}
 
       // The lower bound on i and j should not be lost...
       j++;                                                              /*0011*/
 
-//  T() {}
+//  T() {i<=499}
 
       // Cumulated effects should be a[i] here and not a[*]
       a[i] = i;                                                         /*0013*/
 
-//  T(i) {i==i#init+1}
+//  T(i) {i==i#init+1, i<=500}
 
       i = i+1;                                                          /*0014*/
-//:      END BLOCK
+      // END BLOCK
    }
 
-//  T(k) {k==2, 500<=i}
+//  T(k) {i==500, k==2}
 
    // We should have the precondition i == 500, j == 501
-   // if we would use the proper fix point
+   // if we would use the proper fix point operator (derivative)
    k = 2;                                                               /*0018*/
 
-//  T(main) {k==2, main==2, 500<=i}
+//  T(main) {i==500, k==2, main==2}
 
    return k;                                                            /*0019*/
-//:   END BLOCK
+   // END BLOCK
 }
 
 //  P() {}
 
 int main()
 {
+
+//  P() {}
+
+   // BEGIN BLOCK
    int i;
    int j;
    int k;
    int a[500];
-
-//  P() {}
-
-//:   BEGIN BLOCK
 
 //  P() {}
 
@@ -165,7 +165,7 @@ int main()
 
 //  P(i,j) {i<=499}
 
-//:      BEGIN BLOCK
+      // BEGIN BLOCK
 
 //  P(i,j) {i<=499}
 
@@ -180,17 +180,17 @@ int main()
 //  P(i,j) {i<=499}
 
       i = i+1;                                                          /*0014*/
-//:      END BLOCK
+      // END BLOCK
    }
 
 //  P(i,j) {i==500}
 
    // We should have the precondition i == 500, j == 501
-   // if we would use the proper fix point
+   // if we would use the proper fix point operator (derivative)
    k = 2;                                                               /*0018*/
 
 //  P(i,j,k) {i==500, k==2}
 
    return k;                                                            /*0019*/
-//:   END BLOCK
+   // END BLOCK
 }

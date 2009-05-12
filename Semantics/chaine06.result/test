@@ -196,70 +196,69 @@ C  P() {0==-1}
          PRINT *, "Leading blanks are ignored"                          0029
       ELSE
 
-C  P(S,T) {" hello"==T, "hello"==S, T<=S}
+C  P(S,T) {" hello"==T, "hello"==S}
 
 !        TRUE 
          PRINT *, "Leading blanks are not ignored"                      0032
       ENDIF
 
-C  P(S,T) {" hello"==T, "hello"==S, T<=S}
+C  P(S,T) {" hello"==T, "hello"==S}
 
 
       S = "hello"                                                       0035
 
-C  P(S,T) {" hello"==T, "hello"==S, T<=S}
+C  P(S,T) {" hello"==T, "hello"==S}
 
       T = "hello "                                                      0036
 
-C  P(S,T) {"hello "==T, "hello"==S, " hello"<=S}
+C  P(S,T) {"hello "==T, "hello"==S}
 
       U = "world"                                                       0037
 
-C  P(S,T,U) {"hello "==T, "hello"==S, "world"==U, " hello"<=S}
+C  P(S,T,U) {"hello "==T, "hello"==S, "world"==U}
 
       V = S//U                                                          0038
 
-C  P(S,T,U,V) {"hello "==T, "hello"==S, "world"==U, " hello"<=S}
+C  P(S,T,U,V) {"hello "==T, "hello"==S, "world"==U}
 
       W = T//U                                                          0039
 
-C  P(S,T,U,V,W) {"hello "==T, "hello"==S, "world"==U, " hello"<=S}
+C  P(S,T,U,V,W) {"hello "==T, "hello"==S, "world"==U}
 
 
       IF (V.EQ.W) THEN                                                  0041
 
-C  P(S,T,U,V,W) {"hello "==T, "hello"==S, "world"==U, V==W,
-C    " hello"<=S}
+C  P(S,T,U,V,W) {"hello "==T, "hello"==S, "world"==U, V==W}
 
 !        FALSE
          PRINT *, "Trailing blanks are ignored when concatenating"      0043
       ELSE
 
-C  P(S,T,U,V,W) {"hello "==T, "hello"==S, "world"==U, " hello"<=S}
+C  P(S,T,U,V,W) {"hello "==T, "hello"==S, "world"==U}
 
 !        TRUE 
          PRINT *,                                                       0046
      &   "Trailing blanks are not ignored when concatenating"           0046
       ENDIF
 
-C  P(S,T,U,V,W) {"hello "==T, "hello"==S, "world"==U, " hello"<=S}
+C  P(S,T,U,V,W) {"hello "==T, "hello"==S, "world"==U}
 
 
       PRINT *, S                                                        0049
 
-C  P(S,T,U,V,W) {"hello "==T, "hello"==S, "world"==U, " hello"<=S}
+C  P(S,T,U,V,W) {"hello "==T, "hello"==S, "world"==U}
 
       PRINT *, T                                                        0050
 
-C  P(S,T,U,V,W) {"hello "==T, "hello"==S, "world"==U, " hello"<=S}
+C  P(S,T,U,V,W) {"hello "==T, "hello"==S, "world"==U}
 
       PRINT *, U                                                        0051
 
-C  P(S,T,U,V,W) {"hello "==T, "hello"==S, "world"==U, " hello"<=S}
+C  P(S,T,U,V,W) {"hello "==T, "hello"==S, "world"==U}
 
       PRINT *, V                                                        0052
 
-C  P(S,T,U,V,W) {"hello "==T, "hello"==S, "world"==U, " hello"<=S}
+C  P(S,T,U,V,W) {"hello "==T, "hello"==S, "world"==U}
 
       PRINT *, W                                                        0053
 

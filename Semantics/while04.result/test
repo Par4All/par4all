@@ -2,24 +2,27 @@
 Transformers for "while04"
 
 
-C  T(while04) {}
+C  T(while04) {2n==while04+1, 2<=n}
 
-int while04()
+int while04(int n)
 {
+
+//  T(while04) {2n==while04+1, 2<=n}
+
+   // BEGIN BLOCK
    int i;
    int j;
-   int n;
 
 //  T(i) {i==0}
 
 
    i = 0;
 
-//  T(j) {j==1}
+//  T(j) {i==0, j==1}
 
    j = 1;
 
-//  T() {2<=n}
+//  T() {i==0, j==1, 2<=n}
 
 
    if (n<=1) 
@@ -27,24 +30,38 @@ int while04()
 //  T() {0==-1}
 
       exit(1);
+   {
 
-//  T(i,j) {i+j#init==i#init+j}
+//  T(i,j) {i==j-1, i==n-1, i#init==0, j#init==1, 1<=i}
+
+      // BEGIN BLOCK
+      int k;
+
+//  T(i,j) {i==j-1, i#init==0, j#init==1, 0<=i, i+2<=n, 2<=n}
 
 
-   while (i<n-1&&j<n) {
+      while (i<n-1&&j<n) {
 
-//  T(i) {i==i#init+1}
+//  T(i,j) {i==i#init+1, j==j#init+1, i+1<=n, j<=n, 2<=n}
 
-      i++;
+         // BEGIN BLOCK
 
-//  T(j) {j==j#init+1}
+//  T(i) {i==i#init+1, i+1<=n, j+1<=n, 2<=n}
 
-      j++;
+         i++;
+
+//  T(j) {j==j#init+1, i+1<=n, j<=n, 2<=n}
+
+         j++;
+         // END BLOCK
+      }
+      // END BLOCK
    }
 
-//  T(while04) {i+j==while04}
+//  T(while04) {i==j-1, i==n-1, 2i==while04-1, 1<=i}
 
    return i+j;
+   // END BLOCK
 }
 
 Preconditions for "while04"
@@ -52,11 +69,14 @@ Preconditions for "while04"
 
 //  P() {}
 
-int while04()
+int while04(int n)
 {
+
+//  P() {}
+
+   // BEGIN BLOCK
    int i;
    int j;
-   int n;
 
 //  P() {}
 
@@ -75,44 +95,66 @@ int while04()
 //  P(i,j) {i==0, j==1, n<=1}
 
       exit(1);
+   {
+
+//  P(i,j) {i==0, j==1, 2<=n}
+
+      // BEGIN BLOCK
+      int k;
 
 //  P(i,j) {i==0, j==1, 2<=n}
 
 
-   while (i<n-1&&j<n) {
+      while (i<n-1&&j<n) {
 
-//  P(i,j) {i==j-1, i+2<=n, 2<=n}
+//  P(i,j) {i==j-1, 0<=i, i+2<=n}
 
-      i++;
+         // BEGIN BLOCK
 
-//  P(i,j) {i==j, i+1<=n, 2<=n}
+//  P(i,j) {i==j-1, 0<=i, i+2<=n}
 
-      j++;
+         i++;
+
+//  P(i,j) {i==j, 1<=i, i+1<=n, 2<=n}
+
+         j++;
+         // END BLOCK
+      }
+      // END BLOCK
    }
 
 //  P(i,j) {i==j-1, i==n-1, 1<=i}
 
    return i+j;
+   // END BLOCK
 }
 
 Partial evaluation: bug because the while loop precondition
 only is used to evaluate the loop condition
 
-int while04()
+int while04(int n)
 {
+   // BEGIN BLOCK
    int i;
    int j;
-   int n;
 
    i = 0;
    j = 1;
 
    if (n<=1) 
       exit(1);
+   {
+      // BEGIN BLOCK
+      int k;
 
-   while (i<n-1&&j<n) {
-      i++;
-      j++;
+      while (i<n-1&&j<n) {
+         // BEGIN BLOCK
+         i++;
+         j++;
+         // END BLOCK
+      }
+      // END BLOCK
    }
    return i+j;
+   // END BLOCK
 }

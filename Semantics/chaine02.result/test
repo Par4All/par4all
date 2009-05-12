@@ -270,11 +270,11 @@ C  P(S1,S2) {'bye'==S1, 'hi'==S2}
 
       IF (S1.EQ.S2) PRINT *, 's1 == s2'                                 0029
 
-C  P(S1,S2) {'bye'==S1, 'hi'==S2, S1<=S2}
+C  P(S1,S2) {'bye'==S1, 'hi'==S2}
 
       IF (S1.NE.S2) PRINT *, 's1 != s2'                                 0032
 
-C  P(S1,S2) {'bye'==S1, 'hi'==S2, S1<=S2}
+C  P(S1,S2) {'bye'==S1, 'hi'==S2}
 
       IF (S1.LT.S2) PRINT *, 's1 <  s2'                                 0035
 

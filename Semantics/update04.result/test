@@ -6,7 +6,8 @@ void update04()
    int i = 1;
    int j;
    int k;
-
+   
+   //i = 2;
    j = ++i;
    k = i++;
    foo(i);
@@ -21,7 +22,8 @@ void update04()
    int k;
 //               <must be read   >: i
 //               <must be written>: i j
-
+   
+   //i = 2;
    j = ++i;
 //               <must be read   >: i
 //               <must be written>: i k
@@ -38,7 +40,8 @@ void update04()
    int k;
 //               <must be read   >: i
 //               <must be written>: i j
-
+   
+   //i = 2;
    j = ++i;
 //               <must be read   >: i
 //               <must be written>: i k
@@ -57,16 +60,17 @@ void update04()
    int j;
    int k;
 
-//  T(i,j) {i==i#init+1, i==j}
+//  T(i,j) {i==2, i#init==1, j==2}
 
-
+   
+   //i = 2;
    j = ++i;
 
-//  T(i,k) {i==i#init+1, i==k+1}
+//  T(i,k) {i==3, i#init==2, j==2, k==2}
 
    k = i++;
 
-//  T() {}
+//  T() {i==3, j==2, k==2}
 
    foo(i);
 }
@@ -84,7 +88,8 @@ void update04()
 
 //  P() {i==1}
 
-
+   
+   //i = 2;
    j = ++i;
 
 //  P(i,j) {i==2, j==2}

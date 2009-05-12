@@ -28,7 +28,7 @@ int while03()
 
       exit(1);
 
-//  T(i,j) {2i+j#init==2i#init+j}
+//  T(i,j) {2i+j#init==2i#init+j, j+1<=n, j#init+1<=n}
 
 
    while (j<n) {

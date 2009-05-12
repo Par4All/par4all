@@ -2,7 +2,7 @@
 Transformers for "while02"
 
 
-C  T(while02) {}
+C  T(while02) {1<=while02}
 
 int while02()
 {
@@ -19,7 +19,7 @@ int while02()
 
    j = 1;
 
-//  T(i,j) {2i+j#init==2i#init+j}
+//  T(i,j) {2i+j#init==2i#init+j, j+1<=n, j#init+1<=n}
 
 
    while (j<n) {
@@ -63,16 +63,16 @@ int while02()
 
    while (j<n) {
 
-//  P(i,j) {2i==j-1, 2i+2<=n}
+//  P(i,j) {2i==j-1, 2i+2<=n, 2<=n}
 
       i++;
 
-//  P(i,j) {2i==j+1, 2i<=n}
+//  P(i,j) {2i==j+1, 2i<=n, 2<=n}
 
       j += 2;
    }
 
-//  P(i,j) {2i==j-1, n<=2i+1}
+//  P(i,j) {2i==j-1, 0<=i, n<=2i+1}
 
    return i+j;
 }

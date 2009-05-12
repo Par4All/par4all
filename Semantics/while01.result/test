@@ -2,10 +2,14 @@
 Transformers for "while01"
 
 
-C  T(while01) {16<=while01}
+C  T(while01) {while01==16}
 
 int while01()
 {
+
+//  T(while01) {while01==16}
+
+   // BEGIN BLOCK
    int i;
    int j;
    int n;
@@ -15,31 +19,47 @@ int while01()
 
    i = 0;
 
-//  T(j) {j==1}
+//  T(j) {i==0, j==1}
 
    j = 1;
 
-//  T(n) {n==10}
+//  T(0`n) {0`n==0, i==0, j==1}
 
-   n = 10;
+   n = 0;
+   {
 
-//  T(i,j) {2i+j#init==2i#init+j}
+//  T(i,j) {0`n==0, i==5, i#init==0, j==11, j#init==1}
+
+      // BEGIN BLOCK
+      int n = 10;
+
+//  T(i,j) {0`1`n==10, 0`n==0, 2i==j-1, i#init==0, j#init==1, 0<=i,
+//    i<=4}
 
 
-   while (j<n) {
+      while (j<n) {
 
-//  T(i) {i==i#init+1}
+//  T(i,j) {0`1`n==10, 0`n==0, i==i#init+1, j==j#init+2, j<=11}
 
-      i++;
+         // BEGIN BLOCK
 
-//  T(j) {j==j#init+2}
+//  T(i) {0`1`n==10, 0`n==0, i==i#init+1, j<=9}
 
-      j += 2;
+         i++;
+
+//  T(j) {0`1`n==10, 0`n==0, j==j#init+2, j<=11}
+
+         j += 2;
+         // END BLOCK
+      }
+      // END BLOCK
    }
 
-//  T(while01) {i+j==while01}
+//  T(while01) {0`n==0, i==5, j==11, while01==16}
+
 
    return i+j;
+   // END BLOCK
 }
 
 Preconditions for "while01"
@@ -49,6 +69,10 @@ Preconditions for "while01"
 
 int while01()
 {
+
+//  P() {}
+
+   // BEGIN BLOCK
    int i;
    int j;
    int n;
@@ -64,23 +88,38 @@ int while01()
 
 //  P(i,j) {i==0, j==1}
 
-   n = 10;
+   n = 0;
+   {
 
-//  P(i,j,n) {i==0, j==1, n==10}
+//  P(0`n,i,j) {0`n==0, i==0, j==1}
+
+      // BEGIN BLOCK
+      int n = 10;
+
+//  P(0`n,i,j) {0`1`n==10, 0`n==0, i==0, j==1}
 
 
-   while (j<n) {
+      while (j<n) {
 
-//  P(i,j,n) {2i==j-1, n==10, i<=4}
+//  P(0`n,i,j) {0`1`n==10, 0`n==0, 2i==j-1, 0<=i, i<=4}
 
-      i++;
+         // BEGIN BLOCK
 
-//  P(i,j,n) {2i==j+1, n==10, i<=5}
+//  P(0`n,i,j) {0`1`n==10, 0`n==0, 2i==j-1, 0<=i, i<=4}
 
-      j += 2;
+         i++;
+
+//  P(0`n,i,j) {0`1`n==10, 0`n==0, 2i==j+1, 1<=i, i<=5}
+
+         j += 2;
+         // END BLOCK
+      }
+      // END BLOCK
    }
 
-//  P(i,j,n) {i==5, j==11, n==10}
+//  P(0`n,i,j) {0`n==0, i==5, j==11}
+
 
    return i+j;
+   // END BLOCK
 }

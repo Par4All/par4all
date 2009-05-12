@@ -106,12 +106,12 @@ C  P() {0==-1}
          PRINT *, 's1 equals s2'                                        0008
       ELSE
 
-C  P(S1,S2) {"titi"==S2, "toto"==S1, S2<=S1}
+C  P(S1,S2) {"titi"==S2, "toto"==S1}
 
          PRINT *, 's1 does not equal s2'                                0010
       ENDIF
 
-C  P(S1,S2) {"titi"==S2, "toto"==S1, S2<=S1}
+C  P(S1,S2) {"titi"==S2, "toto"==S1}
 
 
       IF (S1.LT.S2) THEN                                                0013

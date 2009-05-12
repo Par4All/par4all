@@ -29,7 +29,7 @@ C  T(J) {J==3}
 C (0,4)
       J = 3                                                             0007
 
-C  T(I,J) {2I+J==2I#init+J#init, I#init<=I}
+C  T(I,J) {2I+J==2I#init+J#init, I#init<=I, I+1<=N, I#init+1<=N}
 
 C (0,5)
 

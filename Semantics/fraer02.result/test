@@ -2,7 +2,7 @@
 Transformers for FRAER02 (integer division)
 
 
-C  T(Q,R) {1<=Q, Q+R+Y<=X+1, 0<=R, R+1<=Y, 0<=X, 1<=Y}
+C  T(Q,R) {0<=Q, Q+R<=X, 0<=R, R+1<=Y, 0<=X, 1<=Y}
 
       SUBROUTINE FRAER02(X, Y, Q, R)
 
@@ -18,42 +18,43 @@ c     loops)
 
       INTEGER X, Y, Q, R
 
-C  T(Q,R) {1<=Q, Q+R+Y<=X+1, 0<=R, R+1<=Y, 0<=X, 1<=Y}
+C  T(Q,R) {0<=Q, Q+R<=X, 0<=R, R+1<=Y, 0<=X, 1<=Y}
 
 
-      IF (X.LT.0.OR.Y.LE.0) THEN                                        0001
+      IF (X.LT.0.OR.Y.LE.0) THEN                                        0015
 
 C  T() {0==-1}
 
-         STOP                                                           0002
+         STOP                                                           0016
       ELSE
 
 C  T(Q) {Q==0, 0<=X, 1<=Y}
 
-         Q = 0                                                          0003
+         Q = 0                                                          0018
 
 C  T(R) {Q==0, R==X, 0<=R, 1<=Y}
 
-         R = X                                                          0004
+         R = X                                                          0019
 
-C  T(Q,R) {Q#init<=Q, Q+R<=Q#init+R#init}
+C  T(Q,R) {Q#init==0, R#init==X, 0<=Q, Q+R<=R#init, Y<=R, 0<=R#init,
+C    Y<=R#init, 1<=Y}
 
-         DO WHILE (R.GE.Y)                                              0005
+         DO WHILE (R.GE.Y)                                              0020
 
-C  T(Q) {Q==Q#init+1, Y<=R, 0<=X, 1<=Y}
+C  T(Q) {Q==Q#init+1, Y<=R, Y<=X, 1<=Y}
 
-            Q = Q+1                                                     0006
+            Q = Q+1                                                     0021
 
-C  T(R) {R+Y==R#init, Y<=R#init, 0<=X, 1<=Y}
+C  T(R) {R+Y==R#init, Y<=R#init, Y<=X, 1<=Y}
 
-            R = R-Y                                                     0007
+            R = R-Y                                                     0022
          ENDDO
       ENDIF
 
-C  T() {1<=Q, Q+R+Y<=X+1, 0<=R, R+1<=Y, 0<=X, 1<=Y}
+C  T() {0<=Q, Q+R<=X, 0<=R, R+1<=Y, 0<=X, 1<=Y}
 
 
-      PRINT *, X, Y, Q, R                                               0008
+      PRINT *, X, Y, Q, R                                               0026
 
       END
 
@@ -79,38 +80,38 @@ c     loops)
 C  P() {}
 
 
-      IF (X.LT.0.OR.Y.LE.0) THEN                                        0001
+      IF (X.LT.0.OR.Y.LE.0) THEN                                        0015
 
 C  P() {}
 
-         STOP                                                           0002
+         STOP                                                           0016
       ELSE
 
 C  P() {0<=X, 1<=Y}
 
-         Q = 0                                                          0003
+         Q = 0                                                          0018
 
 C  P(Q) {Q==0, 0<=X, 1<=Y}
 
-         R = X                                                          0004
+         R = X                                                          0019
 
 C  P(Q,R) {Q==0, R==X, 0<=R, 1<=Y}
 
-         DO WHILE (R.GE.Y)                                              0005
+         DO WHILE (R.GE.Y)                                              0020
 
 C  P(Q,R) {0<=Q, Q+R<=X, Y<=R, 1<=Y}
 
-            Q = Q+1                                                     0006
+            Q = Q+1                                                     0021
 
-C  P(Q,R) {1<=Q, Q+R<=X+1, Y<=R, 0<=X, 1<=Y}
+C  P(Q,R) {1<=Q, Q+R<=X+1, Y<=R, Y<=X, 1<=Y}
 
-            R = R-Y                                                     0007
+            R = R-Y                                                     0022
          ENDDO
       ENDIF
 
 C  P(Q,R) {0<=Q, Q+R<=X, 0<=R, R+1<=Y}
 
 
-      PRINT *, X, Y, Q, R                                               0008
+      PRINT *, X, Y, Q, R                                               0026
 
       END

@@ -1,0 +1,20 @@
+delete inegfloat03
+create inegfloat03 inegfloat03.f
+
+setproperty SEMANTICS_ANALYZE_SCALAR_FLOAT_VARIABLES TRUE
+setproperty SEMANTICS_ANALYZE_SCALAR_INTEGER_VARIABLES TRUE
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[%ALL]
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[%ALL]
+
+# activate PRINT_CODE
+# apply PARTIAL_EVAL[%ALL]
+
+# display PRINTED_FILE[%ALL]
+
+close
+# delete inegfloat03
+delete inegfloat03
