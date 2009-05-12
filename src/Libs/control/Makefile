@@ -12,7 +12,8 @@ LIB_CFILES = \
 	unspaghettify.c \
 	cfg.c \
 	unreachable.c \
-	bourdoncle.c
+	bourdoncle.c \
+	for_to_do_or_while_loops.c
 
 INC_TARGET =    $(TARGET).h
 
