@@ -37,6 +37,15 @@ apply PARTIAL_EVAL
 
 display PRINTED_FILE
 
+echo
+echo Preconditions for "FIR" after dead code elimination
+echo
+
+apply SUPPRESS_DEAD_CODE
+
+activate PRINT_CODE
+display PRINTED_FILE
+
 close
 delete GUELTON01
 quit

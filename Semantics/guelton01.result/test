@@ -67,3 +67,12 @@ int FIR()
 
    return 0;
 }
+
+Preconditions for "FIR" after dead code elimination
+
+int FIR()
+{
+   int ifr;
+   ifr = 0;
+   return 0;
+}
