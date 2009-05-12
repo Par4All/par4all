@@ -495,8 +495,8 @@ bool transformer_general_consistency_p(transformer t, bool is_weak)
 		if(!consistent)
 		    debug(TRANSFORMER_CONSISTENCY_P_DEBUG_LEVEL,
 			  "transformer_consistency_p",
-			  "Old value of % s in sc but not in arguments\n",
-			  entity_name(var));
+			  "Old value of % s in sc but not in arguments of transformer %p\n",
+			  entity_name(var), t);
 	    }
 	    /* The constant term should not appear in the basis */
 	    if(consistent) {

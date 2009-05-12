@@ -136,9 +136,9 @@ transformer declaration_to_transformer(entity v, transformer pre)
       pips_internal_error("Unexpected value tag: symbolic\n");
     }
     else if (value_constant_p(vv)) {
-    tf = transformer_identity();
-    //  SG: quickly fix this, unsure about the meaning
-    //pips_internal_error("Unexpected value tag: constant\n");
+      tf = transformer_identity();
+      //  SG: quickly fix this, unsure about the meaning
+      //pips_internal_error("Unexpected value tag: constant\n");
     }
     else if (value_expression_p(vv)) {
       expression e = value_expression(vv);
@@ -297,13 +297,19 @@ test_to_transformer(test t, transformer pre, list ef) /* effects of t */
     transformer post_tffwc = transformer_undefined;
     list ta = NIL;
     list fa = NIL;
+    /* True condition transformer */
+    transformer tct = condition_to_transformer(e, context, TRUE);
+    /* False condition transformer */
+    transformer fct = condition_to_transformer(e, context, FALSE);
 
     /*
     tftwc = transformer_dup(statement_to_transformer(st));
     tffwc = transformer_dup(statement_to_transformer(sf));
     */
 
-    tftwc = precondition_add_condition_information(tftwc, e, context, TRUE);
+    
+    /* tftwc = precondition_add_condition_information(tftwc, e, context, TRUE); */
+    tftwc = transformer_apply(tct, context);
     ifdebug(8) {
       pips_debug(8, "tftwc before transformer_temporary_value_projection %p:\n", tftwc);
       (void) print_transformer(tftwc);
@@ -322,7 +328,8 @@ test_to_transformer(test t, transformer pre, list ef) /* effects of t */
       (void) print_transformer(post_tftwc);
     }
 
-    tffwc = precondition_add_condition_information(tffwc, e, context, FALSE);
+    /* tffwc = precondition_add_condition_information(tffwc, e, context, FALSE); */
+    tffwc = transformer_apply(fct, context);
     tffwc = transformer_temporary_value_projection(tffwc);
     reset_temporary_value_counter();
     post_tffwc = transformer_apply(statement_to_transformer(sf, tffwc), tffwc);
@@ -382,6 +389,9 @@ intrinsic_to_transformer(
   }
   else if(ENTITY_STOP_P(e)||ENTITY_ABORT_SYSTEM_P(e)||ENTITY_EXIT_SYSTEM_P(e))
     tf = transformer_empty();
+  else if(ENTITY_COMMA_P(e)) {
+    tf = expressions_to_transformer(pc, pre);
+  }
   else
     tf = effects_to_transformer(ef);
 
@@ -408,8 +418,21 @@ call_to_transformer(call c, transformer pre, list ef) /* effects of call c */
        rely on effects */
     pips_debug(5, "external function %s\n", entity_name(e));
     if(get_bool_property(SEMANTICS_INTERPROCEDURAL)) {
+      type et = ultimate_type(entity_type(e));
+      type rt = ultimate_type(functional_result(type_functional(et)));
+
+      if(type_void_p(rt)) {
       tf = user_call_to_transformer(e, pc, ef);
       reset_temporary_value_counter();
+      }
+      else {
+	/* A temporary variable should be allocated and
+	   user_function_call_to_transformer() be used. The variable
+	   should then be projected to keep only the side effects of
+	   the call. */
+	pips_user_error("Result of function %s ignored. Not supported yet.\n",
+			entity_user_name(e));
+      }
     }
     else
       tf = effects_to_transformer(ef);
@@ -428,7 +451,7 @@ call_to_transformer(call c, transformer pre, list ef) /* effects of call c */
   default:
     pips_internal_error("unknown tag %d\n", tt);
   }
-  pips_assert("transformer tt is consistent", 
+  pips_assert("transformer tf is consistent", 
 	      transformer_consistency_p(tf)); 
 
   pips_debug(8,"Transformer before intersection with precondition, tf=%p\n", tf);
@@ -874,22 +897,22 @@ user_call_to_transformer(
   }
 
   if(!transformer_empty_p(t_caller)) {
-  /* Callee f may have read/write effects on caller's scalar
-   * integer variables thru an array and/or non-integer variables.
-   */
-  t_effects = effects_to_transformer(ef);
-  all_args = arguments_union(transformer_arguments(t_caller),
-			     transformer_arguments(t_effects));
-  /*
-    free_transformer(t_effects);
-    gen_free_list(transformer_arguments(t_caller));
-  */
-  transformer_arguments(t_caller) = all_args;
-  /* The relation basis must be updated too */
-  MAP(ENTITY, v, {
-    Psysteme sc = (Psysteme) predicate_system(transformer_relation(t_caller));
-    sc_base_add_variable(sc, (Variable) v);
-  }, transformer_arguments(t_effects));
+    /* Callee f may have read/write effects on caller's scalar
+     * integer variables thru an array and/or non-integer variables.
+     */
+    t_effects = effects_to_transformer(ef);
+    all_args = arguments_union(transformer_arguments(t_caller),
+			       transformer_arguments(t_effects));
+    /*
+      free_transformer(t_effects);
+      gen_free_list(transformer_arguments(t_caller));
+    */
+    transformer_arguments(t_caller) = all_args;
+    /* The relation basis must be updated too */
+    MAP(ENTITY, v, {
+	Psysteme sc = (Psysteme) predicate_system(transformer_relation(t_caller));
+	sc_base_add_variable(sc, (Variable) v);
+      }, transformer_arguments(t_effects));
   }
   else {
     pips_user_warning("Call to %s seems never to return."
@@ -984,15 +1007,18 @@ assigned_expression_to_transformer(
     entity v_new = entity_to_new_value(v);
     entity v_old = entity_to_old_value(v);
     entity tmp = make_local_temporary_value_entity(entity_type(v));
-    list tf_args = CONS(ENTITY, v, NIL);
+    //list tf_args = CONS(ENTITY, v, NIL);
 
     tf = any_expression_to_transformer(tmp, expr, pre, TRUE);
-    reset_temporary_value_counter();
+    // The assignment may be part of a more complex expression
+    // This should be guarded by "is_internal==FALSE" if is_internal were an argument
+    //reset_temporary_value_counter();
     if(!transformer_undefined_p(tf)) {
       tf = transformer_value_substitute(tf, v_new, v_old);
       tf = transformer_value_substitute(tf, tmp, v_new);
+      // v cannot be a temporary variable
+      transformer_arguments(tf) = arguments_add_entity(transformer_arguments(tf), v);
       tf = transformer_temporary_value_projection(tf);
-      transformer_arguments(tf) = tf_args;
     }
   }
   else {
@@ -1005,6 +1031,8 @@ assigned_expression_to_transformer(
   return tf;
 }
 
+/* This function never returns an undefined transformer. It is used
+   for an assignment statement, not for an assignment operation. */
 transformer integer_assign_to_transformer(expression lhs,
 					  expression rhs,
 					  transformer pre,
@@ -1249,6 +1277,7 @@ instruction_to_transformer(
   loop l;
   call c;
   whileloop wl;
+  forloop fl;
 
   debug(8,"instruction_to_transformer","begin\n");
 
@@ -1264,13 +1293,14 @@ instruction_to_transformer(
     l = instruction_loop(i);
     tf = loop_to_transformer(l, pre, e);
     break;
-  case is_instruction_whileloop:
+  case is_instruction_whileloop: {
     wl = instruction_whileloop(i);
     tf = whileloop_to_transformer(wl, pre, e);
     break;
+  }
   case is_instruction_forloop:
-    pips_user_error("Use property FOR_TO_WHILE_LOOP_IN_CONTROLIZER or "
-		    "FOR_TO_DO_LOOP_IN_CONTROLIZER to convert for loops into while loops");
+    fl = instruction_forloop(i);
+    tf = forloop_to_transformer(fl, pre, e);
     break;
   case is_instruction_goto:
     pips_error("instruction_to_transformer",
@@ -1296,8 +1326,66 @@ instruction_to_transformer(
   pips_debug(8, "end\n");
   return tf;
 }
+
+/* Returns the effective transformer ct for a given statement s. t is
+ * the stored transformer. For loops, t is useful to compute the body
+ * preconditions but not to compute the loop postcondition. ct can be
+ * used to compute the statement s postcondition, no matter what kind
+ * of statement s is, and to compute the transformer of a higher-level
+ * statement enclosing s.
+ *
+ * In other words, load_statement_transformer(s) does not always
+ * return a transformer which can be composed with another transformer
+ * or applied to a precondition. But statement_to_transformer() always
+ * returns such a transformer.
+ *
+ * Always allocates a new transformer. This probably creates a memory
+ * leak when going up the internal representation because it was
+ * originally assumed that the transformer returned recursively was
+ * also the transformer stored at a lower level. This is changed
+ * because this function calls itself recursively. So now
+ * statement_to_transformer() returns a transformer which is not the
+ * transformer stored for the statement.
+ */
+transformer complete_statement_transformer(transformer t, transformer pre, statement s)
+{
+  /* If i is a loop, the expected transformer can be more complex (see
+     nga06) because the stores transformer is later used to compute the
+     loop body precondition. It cannot take into account the exit
+     condition. */
+  transformer ct = transformer_undefined;
+  instruction i = statement_instruction(s);
 
+  if(instruction_loop_p(i)) {
+    /* likely memory leak:-(. ct should be allocated in both test
+       branches and freed at call site but I program everything under
+       the opposite assumption */
+    /* The refined transformer may be lost or stored as a block
+       transformer is the loop is directly surrounded by a bloc or used to
+       compute the transformer of the surroundings blokcs */
+    ct = complete_loop_transformer(t, pre, instruction_loop(i));
+  }
+  else if(instruction_whileloop_p(i)) {
+    whileloop w = instruction_whileloop(i);
+    evaluation e = whileloop_evaluation(w);
 
+    if(evaluation_before_p(e)) {
+      ct = new_complete_whileloop_transformer(t, pre, w);
+    }
+    else {
+      ct = complete_repeatloop_transformer(t, pre, w);
+    }
+  }
+  else if(instruction_forloop_p(i)) {
+    ct = complete_forloop_transformer(t, pre, instruction_forloop(i));
+  }
+  else {
+    /* No need to ccomplete it */
+    ct = copy_transformer(t);
+  }
+  return ct;
+}
+
 transformer statement_to_transformer(
 				     statement s,
 				     transformer spre) /* stmt precondition */
@@ -1335,8 +1423,11 @@ transformer statement_to_transformer(
       free_transformer(srpre_r);
     }
   }
-  else
-    pre = transformer_undefined;
+  else {
+    // Avoid lots of test in the callees
+    // pre = transformer_undefined;
+    pre = transformer_identity();
+  }
 
   pips_assert("pre is a consistent precondition",
 	      transformer_consistent_p(pre));
@@ -1362,7 +1453,9 @@ transformer statement_to_transformer(
 
     if(!ENDP(dl)) {
       transformer dt = declarations_to_transformer(dl, pre);
-      transformer ipre = transformer_range(dt);
+      /* not very smart because declarations_to_transformer() computes post and free it...*/
+      transformer post = transformer_apply(dt, pre);
+      transformer ipre = transformer_range(post);
       transformer it = transformer_undefined;
 
       ifdebug(8) {
@@ -1373,6 +1466,7 @@ transformer statement_to_transformer(
       it = instruction_to_transformer(i, ipre, e);
       nt = transformer_combine(dt, it);
       free_transformer(it);
+      free_transformer(post);
       // free_transformer(ipre);
     }
     else {
@@ -1467,27 +1561,9 @@ transformer statement_to_transformer(
   /* The transformer returned for the statement is not always the
      transformer stored for the statement. This happens for loops and for
      context sensitive transformers for replicated statements in
-     CFG/unstructured. */
+     CFG/unstructured. See comments in loop.c */
 
-  /* If i is a loop, the expected transformer can be more complex (see
-     nga06) because the stores transformer is later used to compute the
-     loop body precondition. It cannot take into account the exit
-     condition. */
-  if(instruction_loop_p(i)) {
-    /* likely memory leak:-(. te should be allocated in both test
-       branches and freed at call site but I program everything under
-       the opposite assumption */
-    /* The refined transformer may be lost or stored as a block
-       transformer is the loop is directly surrounded by a bloc or used to
-       compute the transformer of the surroundings blokcs */
-    te = refine_loop_transformer(nt, pre, instruction_loop(i));
-  }
-  else if(instruction_whileloop_p(i)) {
-    te = refine_whileloop_transformer(nt, pre, instruction_whileloop(i));
-  }
-  else {
-    te = nt;
-  }
+  te = complete_statement_transformer(nt, pre, s);
 
   free_transformer(pre);
 

@@ -700,10 +700,16 @@ static int varval_value_name_is_inferior_p(Pvecteur * pvarval1, Pvecteur * pvarv
     return is_inferior; 
 }
 
-/* Eliminate (some) rational or integer redundancy. Remember that integer
+/* Eliminate (some) rational or integer redundancy. 
+
+   Remember that integer
    redundancy elimination may degrade results because some transformer
    operator such as convex hull use a rational interpretation of the
-   constraints. */
+   constraints.
+
+   Does not take into account value types. So s=="hello" and
+   s=="world" do not result into an empty transformer.
+ */
 transformer
 transformer_normalize(transformer t, int level)
 {

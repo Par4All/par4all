@@ -1,5 +1,38 @@
  /* semantic analysis: processing of expressions, with or without
-  * preconditions
+  * preconditions.
+  *
+  * Expressions in Fortran were assumed to be side effect free most of
+  * the time and transformers were assumed to be linked to statements
+  * only. This is not true in C, where many constructs have side
+  * effects: Consider for instance the following three statements
+  *
+  * n++; j = k = 2; i = j, k = i;
+  *
+  * which may also appear as conditions, initializations or
+  * incrementations in compound statements (while, for, if).
+  *
+  * Most functions here may return transformer_undefined when no
+  * interesting polyhedral approximation exists because the problem
+  * was fixed later at the statement level by using effects. For C, we
+  * need new functions which always succeed. So we need effects at the
+  * expression level although they are not stored in the PIPS
+  * database.
+  *
+  * Moreover, temporary values are used to combine
+  * subexpressions. These temporary values must be projected when a
+  * significant transformer has been obtained, but not earlier. The
+  * temporary value counter cannot be reset before all temporary
+  * variables have been projected (eliminated). So functions which are
+  * called recursively cannot project temporary values and reset the
+  * temporary value counter. We can use wrapping functions and/or an
+  * additional argument, is_internal, to know whether temporary
+  * variables should be eliminated or not when returning the transformer.
+  *
+  * Note that since expressions have side effects, preconditions must
+  * be updated along the left-to-right expression abstraction
+  * process. For example:
+  *
+  * j = 2; i = j + (j = 0) + j;
   *
   * $Id$
   */
@@ -215,8 +248,17 @@ generic_unary_operation_to_transformer(
     syntax s1 = expression_syntax(e1);
     entity v1 = reference_variable(syntax_reference(s1));
 
-    if(entity_has_values_p(v1))
-       tf = any_basic_update_operation_to_transformer(e, v1, op);
+    if(entity_has_values_p(v1)) {
+      transformer tfu = any_basic_update_operation_to_transformer(e, v1, op);
+      if(transformer_undefined_p(pre)) {
+	tf = tfu;
+      }
+      else {
+	/* FI: Oops, the precondition is lost here! See any_basic_update_to_transformer() */
+	tf = transformer_combine(transformer_range(pre), tfu);
+	free_transformer(tfu);
+      }
+    }
   }
 
   return tf;
@@ -236,10 +278,16 @@ static transformer addition_operation_to_transformer(entity v,
   entity tmp2 = make_local_temporary_value_entity(entity_type(v));
   /* sub-expressions are not necessarily integer? Then the expression
      should not be integer? */
-  transformer tf1 = any_expression_to_transformer(tmp1, e1, pre, is_internal);
-  transformer tf2 = any_expression_to_transformer(tmp2, e2, pre, is_internal);
+  transformer tf1 = safe_any_expression_to_transformer(tmp1, e1, pre, is_internal);
+  transformer post = transformer_undefined_p(pre)? transformer_identity()
+    : transformer_apply(tf1, pre);
+  transformer npre = transformer_range(post);
+  transformer tf2 = safe_any_expression_to_transformer(tmp2, e2, npre, is_internal);
   transformer tf12 = transformer_undefined;
   transformer tf_op = simple_addition_to_transformer(v, tmp1, tmp2, addition_p);
+
+  free_transformer(post);
+  free_transformer(npre);
 
   pips_debug(9, "Begin officialy... but a lot has been done already!\n");
 
@@ -517,7 +565,7 @@ transformer_add_anded_conditions_updown(
       dump_transformer(newpre);
     }
   }
-  else if(!upwards) {
+  else if(!upwards  || upwards) { /* This is useful when computing transformers in context */
     /* use precondition pre and hope than the convex hull won't destroy
        all information */
     /* compute !(c1&&c2) as !c1 || !c2 */
@@ -1427,6 +1475,32 @@ max0_to_transformer(entity e, list args, transformer pre, bool is_internal)
   return integer_minmax_to_transformer(e, args, pre, FALSE, is_internal);
 }
 
+/* Returns an undefined transformer in case of failure */
+transformer assign_operation_to_transformer(entity val, // assumed to be a value
+					    expression lhs,
+					    expression rhs,
+					    transformer pre)
+{
+  transformer tf = transformer_undefined;
+
+  pips_debug(8,"begin\n");
+
+  if(expression_reference_p(lhs)) {
+    entity e = reference_variable(syntax_reference(expression_syntax(lhs)));
+
+    if(entity_has_values_p(e) /* && integer_scalar_entity_p(e) */) {
+      entity ev = entity_to_new_value(e);
+      tf = assigned_expression_to_transformer(ev, rhs, pre);
+      tf = transformer_add_equality(tf, val, ev);
+    }
+  }
+
+  pips_debug(6,"return tf=%lx\n", (unsigned long)tf);
+  ifdebug(6) (void) dump_transformer(tf);
+  pips_debug(8,"end\n");
+  return tf;
+}
+
 /* */
 
 static transformer 
@@ -1514,6 +1588,9 @@ integer_binary_operation_to_transformer(
   else if(ENTITY_POWER_P(op)) {
     tf = integer_power_to_transformer(e, e1, e2, pre, is_internal);
   }
+  else if(ENTITY_ASSIGN_P(op)) {
+    tf = assign_operation_to_transformer(e, e1, e2, pre);
+  }
 
   pips_debug(8, "End with tf=%p\n", tf);
 
@@ -1575,13 +1652,22 @@ integer_call_expression_to_transformer(
   return tf;
 }
 
+transformer expression_effects_to_transformer(expression expr)
+{
+  list el = expression_to_proper_effects(expr);
+  transformer tf = effects_to_transformer(el);
+
+  gen_full_free_list(el);
+  return tf;
+}
+
 transformer 
 integer_expression_to_transformer(
     entity v,
     expression expr,
     transformer pre,
     bool is_internal) /* Do check wrt to value mappings... if you are
-                           not dealing with interprocedural issues */
+			 not dealing with interprocedural issues */
 {
   transformer tf = transformer_undefined;
   normalized n = NORMALIZE_EXPRESSION(expr);
@@ -1593,7 +1679,20 @@ integer_expression_to_transformer(
   /* Assume: e is a value */
 
   if(normalized_linear_p(n)) {
-    tf = simple_affine_to_transformer(v, (Pvecteur) normalized_linear(n), is_internal);
+    /* Is it really useful to keep using this function which does not
+       take the precondition into acount? */
+    if(transformer_undefined_p(pre)) {
+      tf = simple_affine_to_transformer(v, (Pvecteur) normalized_linear(n), is_internal);
+    }
+    else {
+      transformer tfl = simple_affine_to_transformer(v, (Pvecteur) normalized_linear(n), is_internal);
+      if(transformer_undefined_p(tfl)) {
+	tfl = expression_effects_to_transformer(expr);
+      }
+
+      tf = transformer_combine(copy_transformer(pre), tfl);
+      free_transformer(tfl);
+    }
   }
   else if(syntax_call_p(sexpr)) {
     tf = integer_call_expression_to_transformer(v, expr, pre, is_internal);
@@ -2110,11 +2209,18 @@ transformer transformer_add_any_relation_information(
            rel in pre! */
 	entity tmp1 = make_local_temporary_value_entity_with_basic(b1);
 	entity tmp2 = make_local_temporary_value_entity_with_basic(b2);
-	transformer tf1 = any_expression_to_transformer(tmp1, e1, context, TRUE);
-	transformer tf2 = any_expression_to_transformer(tmp2, e2, context, TRUE);
+	transformer tf1 = safe_any_expression_to_transformer(tmp1, e1, context, TRUE);
+	/* tf1 may modify the initial context. See w10.f */
+	transformer pcontext = transformer_undefined_p(context)? transformer_identity()
+	  : transformer_apply(tf1, context);
+	transformer ncontext = transformer_range(pcontext);
+	transformer tf2 = safe_any_expression_to_transformer(tmp2, e2, ncontext, TRUE);
 	transformer rel = relation_to_transformer(op, tmp1, tmp2, veracity);
 	transformer cond = transformer_undefined;
 	transformer newpre = transformer_undefined;
+
+	free_transformer(pcontext);
+	free_transformer(ncontext);
 
 	/* tf1 disappears into cond */
 	cond = transformer_safe_combine_with_warnings(tf1, tf2);
@@ -2200,9 +2306,11 @@ transformer transformer_add_any_relation_information(
 }
 
 
+/* This function may return an undefined transformers if it fails to
+   capture the semantics of expr in the polyhedral framework. */
 transformer 
 any_expression_to_transformer(
-			      entity v,
+			      entity v, // value of the expression
 			      expression expr,
 			      transformer pre,
 			      bool is_internal)
@@ -2278,6 +2386,24 @@ any_expression_to_transformer(
   return tf;
 }
 
+transformer safe_any_expression_to_transformer(
+					       entity v, // value of the expression
+					       expression expr,
+					       transformer pre,
+					       bool is_internal)
+{
+  transformer npre = transformer_undefined_p(pre)? transformer_identity() : copy_transformer(pre);
+  transformer tf = any_expression_to_transformer(v, expr, npre, is_internal);
+  list el = expression_to_proper_effects(expr);
+
+  if(transformer_undefined_p(tf))
+    tf = effects_to_transformer(el);
+
+  gen_full_free_list(el);
+  free_transformer(npre);
+
+  return tf;
+}
 
 /* Just to capture side effects as the returned value is
    ignored. Example: "(void) inc(&i);' */
@@ -2295,6 +2421,135 @@ transformer expression_to_transformer(
     tf = effects_to_transformer(el);
   else
     tf = transformer_temporary_value_projection(tf);
+  return tf;
+}
+
+transformer safe_expression_to_transformer(expression exp, transformer pre)
+{
+  list el = expression_to_proper_effects(exp);
+  transformer tf = expression_to_transformer(exp, pre, el);
+
+  gen_full_free_list(el);
+
+  return tf;
+}
+
+/* To capture side effects and to add C twist for numerical
+   conditions. Argument pre may be undefined. */
+transformer condition_to_transformer(
+				     expression cond,
+				     transformer pre,
+				     bool veracity)
+{
+  list el = expression_to_proper_effects(cond);
+  transformer safe_pre = transformer_undefined_p(pre)?
+    transformer_identity():
+    transformer_range(pre);
+  basic eb = basic_of_expression(cond);
+  transformer tf = transformer_undefined;
+  bool relation_p = FALSE;
+  /* upwards should be set to FALSE when computing preconditions (but
+     we have no way to know) or when computing tramsformers in
+     context. And set to TRUE in other cases. upwards is a way to gain
+     execution time at the expense of precision. This speed/accuracy
+     tradeoff has evolved with CPU technology. */
+  bool upwards = FALSE;
+
+  /* C comparison operators return an integer value */
+  if(!basic_logical_p(eb) && expression_call_p(cond)) {
+    entity op = call_function(syntax_call(expression_syntax(cond)));
+
+    relation_p = ENTITY_LOGICAL_OPERATOR_P(op);
+    //relation_p = ENTITY_RELATIONAL_OPERATOR_P(op);
+  }
+
+  if(basic_logical_p(eb)) {
+    // entity tmpv = make_local_temporary_value_entity_with_basic(eb);
+    //tf = logical_expression_to_transformer(tmpv, cond, safe_pre, TRUE);
+    //tf = transformer_add_condition_information_updown
+    //  (transformer_identity(), cond, safe_pre, veracity, upwards);
+    /* FI: not good when side effects in cond */
+    //tf = transformer_add_condition_information_updown
+    //  (copy_transformer(safe_pre), cond, safe_pre, veracity, upwards);
+    transformer ctf = transformer_add_condition_information_updown
+      (transformer_identity(), cond, safe_pre, veracity, upwards);
+    tf = transformer_apply(ctf, safe_pre);
+    free_transformer(ctf);
+  }
+  else if(relation_p) {
+    //tf = transformer_add_condition_information_updown
+    //  (transformer_identity(), cond, safe_pre, veracity, upwards);
+    //tf = transformer_add_condition_information_updown
+    //  (copy_transformer(safe_pre), cond, safe_pre, veracity, upwards);
+    transformer ctf = transformer_add_condition_information_updown
+      (transformer_identity(), cond, safe_pre, veracity, upwards);
+    tf = transformer_apply(ctf, safe_pre);
+    free_transformer(ctf);
+  }
+  else {
+    entity tmpv = make_local_temporary_value_entity_with_basic(eb);
+    tf = any_expression_to_transformer(tmpv, cond, safe_pre, TRUE);
+    if(veracity) {
+      /* tmpv != 0 */
+      transformer tf_plus = transformer_add_sign_information(copy_transformer(tf), tmpv, 1);
+      transformer tf_minus = transformer_add_sign_information(copy_transformer(tf), tmpv, -1);
+
+      ifdebug(8) {
+	fprintf(stderr, "tf_plus:\n");
+	dump_transformer(tf_plus);
+	fprintf(stderr, "tf_minus:\n");
+	dump_transformer(tf_minus);
+      }
+
+      free_transformer(tf);
+      tf = transformer_convex_hull(tf_plus, tf_minus);
+      free_transformer(tf_plus);
+      free_transformer(tf_minus);
+    }
+    else {
+      /* tmpv==0 */
+      tf = transformer_add_sign_information(tf, tmpv, 0);
+    }
+  }
+
+  if(transformer_undefined_p(tf))
+    tf = effects_to_transformer(el);
+  else {
+    /* Not yet? We may be in a = c? x : y; or in e1, e2,...; Does it matter? */
+    tf = transformer_temporary_value_projection(tf);
+    //reset_temporary_value_counter();
+  }
+  /* May be dangerous if this routine is called internally to another
+     routine using temporary variables... */
+  /* reset_temporary_value_counter(); */
+
+  gen_full_free_list(el);
+  free_basic(eb);
+  free_transformer(safe_pre);
+
+  return tf;
+}
+
+/* Compute the transformer associated to a list of expressions such as "i=0, j = 1;" */
+transformer expressions_to_transformer(list expl,
+				       transformer pre)
+{
+  transformer tf = transformer_identity();
+  transformer cpre = copy_transformer(pre);
+
+  FOREACH(EXPRESSION, exp, expl) {
+    /* el is an over-appoximation; should be replaced by a
+       safe_expression_to_transformer() taking care of computing the
+       precise effects of exp instead of using the effects of expl. */
+    transformer ctf = safe_expression_to_transformer(exp, cpre);
+    transformer npre = transformer_undefined;
+
+    tf = transformer_combine(tf, ctf);
+    npre = transformer_apply(ctf, cpre);
+    free_transformer(cpre);
+    cpre = npre;
+  }
+  free_transformer(cpre);
   return tf;
 }
 

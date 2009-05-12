@@ -659,6 +659,7 @@
 #define ENTITY_BITWISE_AND_UPDATE_P(e) entity_an_operator_p(e, BITWISE_AND_UPDATE)
 #define ENTITY_BITWISE_XOR_UPDATE_P(e) entity_an_operator_p(e, BITWISE_XOR_UPDATE)
 #define ENTITY_BITWISE_OR_UPDATE_P(e) entity_an_operator_p(e, BITWISE_OR_UPDATE)
+#define ENTITY_COMMA_P(e) entity_an_operator_p(e, COMMA)
 #define ENTITY_ADDRESS_OF_P(e) entity_an_operator_p(e, ADDRESS_OF)
 #define ENTITY_CONDITIONAL_P(e) entity_an_operator_p(e, CONDITIONAL)
 

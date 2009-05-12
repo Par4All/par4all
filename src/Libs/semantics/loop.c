@@ -37,7 +37,293 @@
 #include "transformer.h"
 
 #include "semantics.h"
+
+/* General handling of structured loops: while, repeat, for, do.
+ *
+ * Because the functions for "do" and "while" loops pre-existed this
+ * framework, they have not (yet) been reimplemented with it. Their
+ * implementations are likely to be more CPU efficient because only
+ * useful objects are computed whereas the general case requires the
+ * computation and use of neutral and absorbent elements such as
+ * tranformer_identity() and transformer_empty().
+ *
+ * Slightly different equations are used for the repeat loop, which
+ * executes once or at least twice instead of zero or at least
+ * once. These equations are given in the corresponding module,
+ * complete_repeatloop_transformer() and
+ * repeatloop_to_postcondition().
+ *
+ * The transformer associated to any kind of loop, but the
+ * repeat_loop, is defined by equation:
+ *
+ * t_loop = t_init ; t_skip +
+ *          t_init ; t_enter ; (t_body ; t_next)* ; t_body ; t_inc; t_exit
+ *
+ * where ";" is the combine operator and "+" the union. Note already
+ * that t_init is not factored out because the union usually loses
+ * information and its use must be postponed as much as possible.
+ *
+ * Transformers t_init, t_skip, t_inc, t_next and t_exit are dependent
+ * on the kind of loops. For instance, t_skip is transformer_empty for
+ * a repeat loop and t_next may include the incrementation (t_inc) and
+ * the looping condition (for loop) or just the looping condition
+ * (while loop). When no incrementation occurs, t_inc is t_identity
+ * and 
+ *
+ * t_next = t_continue. Elsewhere:
+ *
+ * t_next = t_inc ; t_continue
+ *
+ * Because transformers are used to compute preconditions, we need to
+ * preserve:
+ *
+ * t_body_star =  t_init ; t_enter ;(t_body ; t_next)*
+ *
+ * to compute the body preconditions as t_body_star(pre). But it might
+ * be better to use equation
+ *
+ * .t_init ; t_enter(pre) + (t_init ; t_enter ;(t_body ; t_next)* ; t_body ; t_next)(pre)
+ *
+ * to reduce the approximation in the * operator (see below).
+ *
+ * Since we store only one transformer per statement (no such thing as
+ * proper and cumulated effects), we store t_bodystar instead of
+ * t_loop. Note that the range of t_body_star can be restricted by the
+ * union of the ranges of t_enter and t_continue (or t_next) which are
+ * the last transitions to occur in t_body_star.
+ *
+ * But to obtain a correct transformer for the bottom-up composition,
+ * we fix the resulting transformer in statement_to_transformer with
+ * the equation:
+ *
+ * t_loop = t_init ; t_skip + t_body_star ; t_body ; t_inc; t_exit
+ *
+ * When computing the loop postcondition, we do not use t_loop either
+ * because we want to postpone the use of "+":
+ *
+ * post = (t_init ; t_skip)(pre) + (t_body_star ; t_body ; t_inc ; t_exit) (pre)
+ *
+ * When computing the body precondition, we use the following equation
+ *
+ * p_body = (t_init ; t_enter)(pre) + (t_body_star ; t_body ; t_next) (pre)
+ *
+ * in order to avoid t_body_star imprecision due to a union with
+ * t_identity and to delay it in the precondition domain whose
+ * dimension is half of the transformer domain dimension.
+ *
+ * Note also that the different transformers are computed relatively
+ * to a current precondition. So t_init, t_skip etc... may have
+ * different values at differente stages. This happens more when
+ * transformers are computed in context (setproprety
+ * SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE) and even more when
+ * they are recomputed (apply REFINE_TRANSFORMERS). For this reason, a
+ * first crude precondition is computed with effects information to be
+ * used to compute the body transformer. And since t_enter cannot be
+ * computed without its precondition, the later is passed as post_init
+ * instead of the loop precondition pre:
+ *
+ * post_init = t_init(pre)
+ *
+ * A new transformer is allocated. None of the arguments are modified.
+ */
+transformer any_loop_to_transformer(transformer t_init,
+				    transformer t_enter,
+				    transformer t_next,
+				    statement body,
+				    list __attribute__ ((unused)) lel, // loop effect list
+				    transformer post_init)
+{
+  transformer t_body = transformer_undefined; // Body transformer
+  transformer t_fbody = transformer_undefined; // t_body; t_next
+  transformer t_fbody_star = transformer_undefined; // t_fbody*
+  transformer t_body_star = transformer_undefined; // t_init ; t_enter ; tfbodystar
+  transformer pre_body = transformer_undefined;
+  transformer post_body = transformer_undefined;
+  list bel = load_cumulated_rw_effects_list(body);
+  transformer post_enter = transformer_apply(t_enter, post_init);
+  transformer t_effects = effects_to_transformer(bel);
+  //transformer enter_condition = transformer_range(t_enter);
+  transformer enter_condition = transformer_range(post_enter);
+  transformer next_condition = transformer_range(t_next);
+  transformer post_next = transformer_undefined;
+  transformer pre_iteration = transformer_convex_hull(enter_condition, next_condition);
+  transformer npre_iteration = transformer_undefined;
+  transformer post_loop_star = transformer_undefined;
+  transformer post_loop_plus = transformer_undefined;
+  transformer post_loop = transformer_undefined;
 
+  ifdebug(8) {
+    fprintf(stderr, "t_init:\n");
+    print_transformer(t_init);
+    fprintf(stderr, "t_enter:\n");
+    print_transformer(t_enter);
+    fprintf(stderr, "t_next:\n");
+    print_transformer(t_next);
+    fprintf(stderr, "post_init:\n");
+    print_transformer(post_init);
+  }
+
+  /* Compute a first rough body precondition pre_body using a very approximate
+     fix-point and the conditions met for the body to execute, pre_iteration. */
+  //
+  // First heuristics:
+  //pre_body = invariant_wrt_transformer(post_enter, t_effects);
+  // memory leak for pre_body? for transformer_range(pre_iteration)?
+  //pre_body = invariant_wrt_transformer(pre_body, t_next);
+  /* Add the loop body execution condition */
+  //pre_body = transformer_combine(pre_body, pre_iteration);
+  //
+  // Second heuristics: either we enter directly or we loop
+  post_body = transformer_apply(t_effects, post_enter);
+  // temporary memory leak
+  post_next = transformer_range(transformer_apply(t_next, post_body));
+  pre_body = transformer_convex_hull(post_next, post_enter);
+
+  /* Compute the body transformer */
+  // statement_to_transformer() allocated a new transformer which is not the stored transformer
+  //t_body = transformer_dup(statement_to_transformer(body, pre_body));
+  t_body = statement_to_transformer(body, pre_body);
+  
+  /* Complete the body transformer with t_next (t_body is modified by side effects into t_fbody) */
+  t_fbody = transformer_combine(t_body, t_next);
+
+  /* Compute the fix point */
+  t_fbody_star = (* transformer_fix_point_operator)(t_fbody);
+
+  /* Compute t_body_star = t_init ; t_enter */
+  t_body_star = transformer_combine(transformer_dup(t_init), t_enter);
+  t_body_star = transformer_combine(t_body_star, t_fbody_star);
+
+  /* and add the continuation condition, pre_iteration improved with
+     knowledge about the body, npre_iteration. Note that pre_iteration
+     would also provide correct results, although less accurate. */
+  post_loop_star = transformer_apply(t_fbody_star, post_enter);
+  post_loop_plus = transformer_apply(t_fbody, post_loop_star);
+  post_loop = transformer_range(post_loop_plus);
+  npre_iteration = transformer_convex_hull(post_enter, post_loop);
+  t_body_star = transformer_combine(t_body_star, npre_iteration);
+
+  /* Any transformer or other data structure to free? */
+  //free_transformer(t_body); transformed into t_fbody
+  free_transformer(t_fbody);
+  free_transformer(t_fbody_star);
+  free_transformer(pre_body);
+  free_transformer(post_body);
+  free_transformer(post_next);
+  free_transformer(t_effects);
+  free_transformer(post_enter);
+  free_transformer(enter_condition);
+  free_transformer(next_condition);
+  free_transformer(pre_iteration);
+  free_transformer(npre_iteration);
+  free_transformer(post_loop_star);
+  free_transformer(post_loop_plus);
+  free_transformer(post_loop);
+
+  ifdebug(8) {
+    fprintf(stderr, "t_body_star:\n");
+    print_transformer(t_body_star);
+  }
+
+  return t_body_star;
+}
+
+transformer forloop_to_transformer(forloop fl,
+				   transformer pre,
+				   list flel) /* effects of forloop fl */
+{
+  /* t_body_star =  t_init ; t_enter ;(t_body ; t_next)* */
+  transformer t_body_star = transformer_undefined;
+  statement body_s = forloop_body(fl);
+
+  /* Deal with initialization expression */
+  expression init_e = forloop_initialization(fl);
+  transformer t_init = safe_expression_to_transformer(init_e, pre);
+  transformer post_init = transformer_apply(t_init, pre);
+
+  /* Deal with condition expression */
+  expression cond_e = forloop_condition(fl);
+  transformer t_enter = condition_to_transformer(cond_e, post_init, TRUE);
+  /* An effort could be made to compute the precondition for t_continue,
+     especially if the precondition to t_inc is available. */
+  transformer p_continue = transformer_identity();
+  transformer t_continue = condition_to_transformer(cond_e, p_continue, TRUE);
+
+  /* Deal with increment expression */
+  expression inc_e = forloop_increment(fl);
+  /* An effort could be made to compute the precondition for t_inc */
+  transformer t_inc = safe_expression_to_transformer(inc_e, transformer_undefined);
+  transformer t_next = transformer_combine(t_inc, t_continue);
+
+  t_body_star = any_loop_to_transformer(t_init, t_enter, t_next, body_s, flel, post_init);
+
+  /* Let's clean up the memory */
+
+  free_transformer(p_continue);
+
+  free_transformer(t_init);
+  free_transformer(post_init);
+
+  free_transformer(t_enter);
+  free_transformer(t_continue);
+
+  // free_transformer(t_inc); it is absorbed by t_next
+  free_transformer(t_next);
+
+  return t_body_star;
+}
+
+transformer new_whileloop_to_transformer(whileloop wl,
+					 transformer pre,
+					 list wlel) /* effects of whileloop wl */
+{
+  /* t_body_star =  t_init ; t_enter ;(t_body ; t_next)* */
+  transformer t_body_star = transformer_undefined;
+  statement body_s = whileloop_body(wl);
+
+  /* Deal with initialization expression */
+  transformer t_init = transformer_identity();
+
+  /* Deal with condition expression */
+  expression cond_e = whileloop_condition(wl);
+  transformer t_enter = condition_to_transformer(cond_e, pre, TRUE);
+  /* An effort could be made to compute the precondition for t_continue. */
+  transformer p_continue = transformer_identity();
+  transformer t_continue = condition_to_transformer(cond_e, p_continue, TRUE);
+
+  t_body_star = any_loop_to_transformer(t_init, t_enter, t_continue, body_s, wlel, pre);
+
+  /* Let's clean up the memory */
+
+  free_transformer(p_continue);
+
+  free_transformer(t_enter);
+  free_transformer(t_continue);
+
+  return t_body_star;
+}
+
+transformer repeatloop_to_transformer(whileloop wl,
+				      transformer pre,
+				      list wlel) /* effects of whileloop wl */
+{
+  /* t_body_star =  t_init ; t_enter ;(t_body ; t_next)* */
+  transformer t_body_star = transformer_undefined;
+  statement body_s = whileloop_body(wl);
+  transformer t_init = transformer_identity();
+  expression cond_e = whileloop_condition(wl);
+  transformer t_enter = transformer_identity();
+  /* An effort could be made to compute the precondition for t_continue,
+     especially if the precondition to t_inc is available. */
+  transformer t_continue = condition_to_transformer(cond_e, transformer_undefined, TRUE);
+  //transformer t_inc = transformer_identity();
+  transformer t_next = t_continue;
+
+  t_body_star = any_loop_to_transformer(t_init, t_enter, t_next, body_s, wlel, pre);
+
+  return t_body_star;
+}
+
 #define IS_LOWER_BOUND 0
 #define IS_UPPER_BOUND 1
 
@@ -874,6 +1160,245 @@ loop_to_transformer(loop l, transformer pre, list e)
   return tf;
 }
 
+transformer complete_any_loop_transformer(transformer t_init,
+					  transformer __attribute__ ((unused)) t_enter,
+					  transformer t_skip,
+					  transformer t_body_star,
+					  transformer t_body,
+					  transformer __attribute__ ((unused)) t_continue,
+					  transformer t_inc,
+					  transformer t_exit)
+{
+  /* t_loop = t_init ; t_skip + t_bodystar ; t_body ; t_inc; t_exit 
+   *
+   * Before entering t_body, t_enter or t_next have been applied which
+   * let us restrict the set of state modified by t_body. But this
+   * information should already been included in t_body_star.
+   */
+
+  /* Several cases must be tested:
+   *
+   * 1. The loop is always entered and exited (usual case for
+   * scientific code: t_skip = transformer_empty).
+   *
+   * 2. The loop is always entered and never exited (real-time code
+   * situation, t_exit = transformer_empty)
+   *
+   * 3. The loop is never entered (in its current context, t_bodystar
+   * = transformer_empty because t_enter = transformer_empty).
+   *
+   * 4. The loop may be entered and exited (usual case for general
+   * purpose computing, think of list handling).
+   *
+   * 5. The loop may be entered but is then never exited (real-time
+   * code again).
+   *
+   * These cases are checked with complete01.c,
+   * complete02.c,... complete05.c
+   */
+  transformer ct = transformer_undefined;
+  /* loop skipped transformer */
+  transformer lst = transformer_combine(copy_transformer(t_init), t_skip);
+  /* add loop entered transformer/condition: should already be in t_body_star */
+  //transformer post_enter = transformer_range(t_enter);
+  //transformer post_continue = transformer_range(t_continue);
+  //transformer pre_body = transformer_convex_hull(post_enter, post_continue);
+  //transformer let = transformer_combine(copy_transformer(t_body_star), pre_body);
+  transformer let = copy_transformer(t_body_star);
+
+  ifdebug(8) {
+    fprintf(stderr, "t_init:\n");
+    print_transformer(t_init);
+    fprintf(stderr, "t_enter:\n");
+    print_transformer(t_enter);
+    fprintf(stderr, "t_skip:\n");
+    print_transformer(t_skip);
+    fprintf(stderr, "t_body_star:\n");
+    print_transformer(t_body_star);
+    fprintf(stderr, "t_body:inc\n");
+    print_transformer(t_body);
+    fprintf(stderr, "t_continue:\n");
+    print_transformer(t_continue);
+    fprintf(stderr, "t_inc:\n");
+    print_transformer(t_inc);
+    fprintf(stderr, "t_exit:\n");
+    print_transformer(t_exit);
+  }
+
+  let = transformer_combine(let, t_body);
+  let = transformer_combine(let, t_inc);
+  let = transformer_combine(let, t_exit);
+
+  /* combine both cases */
+  ct = transformer_convex_hull(lst, let);
+
+  //free_transformer(post_enter);
+  //free_transformer(post_continue);
+  //free_transformer(pre_body);
+
+  ifdebug(8) {
+    fprintf(stderr, "ct:\n");
+    print_transformer(ct);
+  }
+
+  return ct;
+}
+
+transformer complete_forloop_transformer(transformer t_body_star,
+					 transformer pre,
+					 forloop fl)
+{
+  transformer ct = transformer_undefined;
+  statement body_s = forloop_body(fl);
+  transformer t_body = load_statement_transformer(body_s);
+  transformer ct_body = transformer_undefined;
+  transformer pre_body = transformer_undefined;
+  expression init_e = forloop_initialization(fl);
+  /* This function does not seem to exist because we only used
+     statement effects in the past and because those are stored in the
+     database. */
+  transformer t_init = safe_expression_to_transformer(init_e, pre);
+  transformer post_init = transformer_apply(t_init, pre);
+  expression cond_e = forloop_condition(fl);
+  expression inc_e = forloop_increment(fl);
+  transformer t_skip = condition_to_transformer(cond_e, post_init, FALSE);
+  transformer t_enter = condition_to_transformer(cond_e, post_init, TRUE);
+/* An effort could be made to compute the precondition for t_exit,
+     especially if the precondition to t_inc is available. */
+  transformer t_continue = condition_to_transformer(cond_e, transformer_undefined, TRUE);
+  transformer t_exit = condition_to_transformer(cond_e, transformer_undefined, FALSE);
+  /* An effort could be made to compute the precondition for t_inc */
+  transformer t_inc = safe_expression_to_transformer(inc_e, transformer_undefined);
+
+  /* Make sure you have the effective statement transformer: it is not
+     stored for loops and this is key for nested loops. */
+  pre_body = transformer_apply(t_body_star, pre);
+  ct_body = complete_statement_transformer(t_body, pre_body, body_s);
+
+  ct = complete_any_loop_transformer(t_init, t_enter, t_skip, t_body_star, ct_body, t_continue, t_inc, t_exit);
+
+  free_transformer(ct_body);
+  free_transformer(pre_body);
+  free_transformer(t_init);
+  free_transformer(post_init);
+  free_transformer(t_skip);
+  free_transformer(t_enter);
+  free_transformer(t_continue);
+  free_transformer(t_exit);
+  free_transformer(t_inc);
+
+  return ct;
+}
+
+transformer new_complete_whileloop_transformer(transformer t_body_star,
+					       transformer pre,
+					       whileloop wl)
+{
+  transformer ct = transformer_undefined;
+  statement body_s = whileloop_body(wl);
+  transformer t_body = load_statement_transformer(body_s);
+  transformer ct_body = transformer_undefined;
+  transformer pre_body = transformer_undefined;
+  transformer post_body = transformer_undefined;
+  transformer t_init = transformer_identity();
+  expression cond_e = whileloop_condition(wl);
+  transformer t_skip = condition_to_transformer(cond_e, pre, FALSE);
+  transformer t_enter = condition_to_transformer(cond_e, pre, TRUE);
+  /* An effort could be made to compute the preconditions for t_continue and t_exit: see while04.c. */
+  //transformer t_continue = condition_to_transformer(cond_e, transformer_undefined, TRUE);
+  //transformer t_exit = condition_to_transformer(cond_e, transformer_undefined, FALSE);
+  transformer t_continue = transformer_undefined;
+  transformer t_exit = transformer_undefined;
+  transformer t_inc = transformer_identity();
+
+  /* Make sure you have the effective statement transformer: it is not
+     stored for loops and this is key for nested loops. */
+  pre_body = transformer_apply(t_body_star, pre);
+  ct_body = complete_statement_transformer(t_body, pre_body, body_s);
+
+  post_body = transformer_apply(ct_body, pre_body);
+  t_continue = condition_to_transformer(cond_e, post_body, TRUE);
+  t_exit = condition_to_transformer(cond_e, post_body, FALSE);
+
+  ct = complete_any_loop_transformer(t_init, t_enter, t_skip, t_body_star, ct_body, t_continue, t_inc, t_exit);
+
+  free_transformer(ct_body);
+  free_transformer(pre_body);
+  free_transformer(post_body);
+  free_transformer(t_init);
+  free_transformer(t_skip);
+  free_transformer(t_enter);
+  free_transformer(t_continue);
+  free_transformer(t_exit);
+  free_transformer(t_inc);
+
+  return ct;
+}
+
+transformer complete_repeatloop_transformer(transformer t_body_star,
+					    transformer __attribute__ ((unused)) pre, 
+					    whileloop wl)
+{
+  transformer ct = transformer_undefined;
+  statement body_s = whileloop_body(wl);
+  transformer pt_body = load_statement_transformer(body_s);
+  transformer t_body = transformer_undefined;
+  transformer pre_body = transformer_undefined;
+  transformer t_init = transformer_identity();
+  expression cond_e = whileloop_condition(wl);
+  transformer t_continue = condition_to_transformer(cond_e, transformer_undefined, TRUE);
+  transformer t_enter = transformer_identity();
+  transformer t_skip = transformer_empty();
+  transformer t_exit = condition_to_transformer(cond_e, transformer_undefined, FALSE);
+  /* An effort could be made to compute the precondition for t_exit */
+  transformer t_inc = transformer_identity();
+  transformer t_loop_1 = transformer_undefined;
+  transformer t_loop_2 = transformer_undefined;;
+
+  /* Make sure you have the effective statement transformer: it is not
+     stored for loops and this is key for nested loops. */
+  pre_body = transformer_apply(t_body_star, pre);
+  t_body = complete_statement_transformer(pt_body, pre_body, body_s);
+
+  t_loop_1 = copy_transformer(t_body);
+  t_loop_2 = copy_transformer(t_body);
+
+  /* The generic equation is not adpated to repeat loops, which may
+   * execute once or at least twice instead of zero or twice
+   *
+   * The equation is:
+   *.
+   * t_loop = (t_body ; t_exit) +
+   *          (t_body ; t_continue ; t_body_star ; t_body ; t_exit)
+   *
+   * where we assume that t_body_star includes the continuation condition. 
+   */
+
+  //  ct = complete_any_loop_transformer(t_init, t_enter, t_skip, t_body_star, t_body, t_continue, t_inc, t_exit);
+
+  t_loop_1 = transformer_combine(t_loop_1, t_exit);
+
+  t_loop_2 = transformer_combine(t_loop_2, t_continue);
+  t_loop_2 = transformer_combine(t_loop_2, t_body_star);
+  t_loop_2 = transformer_combine(t_loop_2, t_body);
+  t_loop_2 = transformer_combine(t_loop_2, t_exit);
+
+  ct = transformer_convex_hull(t_loop_1, t_loop_2);
+
+  free_transformer(t_body);
+  free_transformer(pre_body);
+  free_transformer(t_init);
+  free_transformer(t_enter);
+  free_transformer(t_skip);
+  free_transformer(t_exit);
+  free_transformer(t_inc);
+
+  free_transformer(t_loop_1);
+  free_transformer(t_loop_2);
+
+  return ct;
+}
+
 /* The transformer computed and stored for a loop is useful to compute the
    loop body precondition, but it is not useful to analyze a higher level
    construct, which need the loop transformer with the exit
@@ -883,7 +1408,7 @@ loop_to_transformer(loop l, transformer pre, list e)
 /* The index variable is always initialized and then the loop is either
    entered and exited or not entered */
 transformer 
-refine_loop_transformer(transformer ltf, transformer pre, loop l)
+complete_loop_transformer(transformer ltf, transformer pre, loop l)
 {
   transformer tf = transformer_undefined;
   transformer t_enter = transformer_undefined;
@@ -907,7 +1432,7 @@ refine_loop_transformer(transformer ltf, transformer pre, loop l)
        bodies... Let's hope that perfectly nested loops are neither
        frequent nor deep! */
     loop il = instruction_loop(statement_instruction(s));
-    btf = refine_loop_transformer(load_statement_transformer(s), pre, il);
+    btf = complete_loop_transformer(load_statement_transformer(s), pre, il);
   }
   else {
     btf = transformer_dup(load_statement_transformer(s));
@@ -977,7 +1502,7 @@ refine_loop_transformer(transformer ltf, transformer pre, loop l)
 }
 
 transformer 
-refine_whileloop_transformer(transformer ltf, transformer pre, whileloop l)
+complete_whileloop_transformer(transformer ltf, transformer pre, whileloop l)
 {
   transformer tf = transformer_undefined;
   transformer t_enter = transformer_undefined;
@@ -995,20 +1520,20 @@ refine_whileloop_transformer(transformer ltf, transformer pre, whileloop l)
     (void) print_transformer(ltf);
   }
 
-  /* compute the loop body transformer */
+  /* Recompute the exact loop body transformer. This is weird: it should have already been done by statement_to_transformer and propagated bask. However, we need to recompute it because it has not been stored and cannot be retrieved. It might be better to use complete_statement_transformer(retrieved t, preb, s). */
   if(statement_loop_p(s)) {
     /* Since it is not stored, we need to go down recursively. A way to
        avoid this would be to always have sequences as loop
        bodies... Let's hope that perfectly nested loops are neither
        frequent nor deep! */
     loop il = instruction_loop(statement_instruction(s));
-    btf = refine_loop_transformer(load_statement_transformer(s), pre, il);
+    btf = complete_loop_transformer(load_statement_transformer(s), pre, il);
   }
   else if(statement_whileloop_p(s)) {
     whileloop il = instruction_whileloop(statement_instruction(s));
-    btf = refine_whileloop_transformer(load_statement_transformer(s), pre, il);
+    btf = complete_whileloop_transformer(load_statement_transformer(s), pre, il);
   }
-  else {
+  else { /* The proper transformer has been stored. */
     btf = transformer_dup(load_statement_transformer(s));
   }
 
@@ -1346,10 +1871,213 @@ whileloop_to_transformer(whileloop l, transformer pre, list e) /* effects of whi
   evaluation lt = whileloop_evaluation(l);
 
   if(evaluation_before_p(lt))
-    t = standard_whileloop_to_transformer(l, pre, e);
+    t = new_whileloop_to_transformer(l, pre, e);
   else
-    pips_user_error("transformer for repeat until loop not implemented\n");
+    t = repeatloop_to_transformer(l, pre, e);
   return t;
+}
+
+transformer any_loop_to_postcondition(statement body,
+				      transformer t_init,
+				      transformer t_enter,
+				      transformer t_skip,
+				      transformer t_body_star,
+				      transformer t_body,
+				      transformer t_next,
+				      transformer t_inc,
+				      transformer t_exit,
+				      transformer pre)
+{
+  /* The precondition to propagate in the body is: 
+   *
+   * p_body = (t_init ; t_enter)(pre) + (t_body_star ; t_body ; t_next) (pre)
+   *
+   * The loop postcondition to return is:
+   *
+   * post = (t_init ; t_skip)(pre) + (t_body_star ; t_body ; t_inc ; t_exit) (pre)
+   */
+  transformer p_body = transformer_undefined;
+  transformer post = transformer_undefined;
+  /* To restrict the state at the beginning of the last iteration:
+     should be part of t_body_star */
+  //transformer post_enter = transformer_range(t_enter);
+  //transformer post_continue = transformer_range(t_next);
+  //transformer pre_iteration = transformer_convex_hull(post_enter, post_continue);
+  /* Decompose the computation of p_body */
+  transformer p_body_1 = transformer_apply(t_enter, transformer_apply(t_init, pre));
+  transformer p_body_2 = transformer_apply(t_body_star, pre);
+  //transformer p_body_3 = transformer_apply(pre_iteration, p_body_2);
+  transformer p_body_4 = transformer_apply(t_body, p_body_2);
+  transformer p_body_5 = transformer_apply(t_next, p_body_4);
+  transformer a_post = transformer_undefined;
+  /* Decompose the computation of post */
+  transformer post_1 = transformer_apply(t_skip, transformer_apply(t_init, pre));
+  transformer post_2 = transformer_apply(t_body_star, pre);
+  //transformer post_3 = transformer_apply(pre_iteration, post_2);
+  transformer post_4 = transformer_apply(t_body, post_2);
+  transformer post_5 = transformer_apply(t_inc, post_4);
+  transformer post_6 = transformer_apply(t_exit, post_5);
+
+  p_body = transformer_convex_hull(p_body_1, p_body_5);
+  a_post = statement_to_postcondition(p_body, body);
+
+  /* a_post could be used, but we chose to recompute post entorely */
+  post = transformer_convex_hull(post_1, post_6);
+
+  /* Get rid of now useless transformers */
+
+  free_transformer(a_post);
+
+  //free_transformer(post_enter);
+  //free_transformer(post_continue);
+  //free_transformer(pre_iteration);
+
+  free_transformer(p_body_1);
+  free_transformer(p_body_2);
+  //free_transformer(p_body_3);
+  free_transformer(p_body_4);
+  free_transformer(p_body_5);
+
+  free_transformer(post_1);
+  free_transformer(post_2);
+  //free_transformer(post_3);
+  free_transformer(post_4);
+  free_transformer(post_5);
+  free_transformer(post_6);
+
+  return post;
+}
+
+transformer forloop_to_postcondition(transformer pre, forloop fl, transformer t_body_star)
+{
+  transformer post = transformer_undefined;
+
+  statement body_s = forloop_body(fl);
+  transformer t_body = load_statement_transformer(body_s);
+
+  expression init_e = forloop_initialization(fl);
+  /* This function does not seem to exist because we only used
+     statement effects in the past and because those are stored in the
+     database. */
+  transformer t_init = safe_expression_to_transformer(init_e, pre);
+  transformer post_init = transformer_apply(t_init, pre);
+
+  expression cond_e = forloop_condition(fl);
+  transformer t_skip = condition_to_transformer(cond_e, post_init, FALSE);
+  transformer t_enter = condition_to_transformer(cond_e, post_init, TRUE);
+/* An effort could be made to compute the precondition for t_exit,
+     especially if the precondition to t_inc is available. */
+  transformer t_continue = condition_to_transformer(cond_e, transformer_undefined, TRUE);
+  transformer t_exit = condition_to_transformer(cond_e, transformer_undefined, FALSE);
+
+  expression inc_e = forloop_increment(fl);
+  /* An effort could be made to compute the precondition for t_inc */
+  transformer t_inc = safe_expression_to_transformer(inc_e, transformer_undefined);
+
+  transformer t_next = transformer_combine(transformer_dup(t_inc), t_continue);
+
+  post = any_loop_to_postcondition(body_s,
+				   t_init,
+				   t_enter,
+				   t_skip,
+				   t_body_star,
+				   t_body,
+				   t_next,
+				   t_inc,
+				   t_exit,
+				   pre);
+
+  /* Clean up memory */
+
+  free_transformer(t_init);
+  free_transformer(post_init);
+  free_transformer(t_skip);
+  free_transformer(t_enter);
+  free_transformer(t_continue);
+  free_transformer(t_exit);
+  free_transformer(t_inc);
+  free_transformer(t_next);
+
+    return post;
+}
+
+transformer repeatloop_to_postcondition(transformer pre, whileloop wl, transformer t_body_star)
+{
+  transformer post = transformer_undefined;
+
+  statement body_s = whileloop_body(wl);
+  transformer t_body = load_statement_transformer(body_s);
+  transformer t_init = transformer_identity();
+  transformer post_init = copy_transformer(pre);
+  expression cond_e = whileloop_condition(wl);
+  transformer t_continue = condition_to_transformer(cond_e, transformer_undefined, TRUE);
+  transformer t_exit = condition_to_transformer(cond_e, transformer_undefined, FALSE);
+  transformer t_skip = transformer_empty();
+  //transformer t_skip = transformer_combine(copy_transformer(t_body), t_exit);
+  transformer t_enter = transformer_identity();
+  //transformer t_enter = transformer_combine(copy_transformer(t_body), t_continue);
+  /* An effort could be made to compute the precondition for t_exit,
+     especially if the precondition to t_inc is available. */
+  transformer t_inc = transformer_identity();
+  transformer post_1 = transformer_undefined;
+  transformer post_2 = transformer_undefined;
+  transformer post_3 = transformer_undefined;
+  transformer post_4 = transformer_undefined;
+  transformer post_5 = transformer_undefined;
+  transformer post_6 = transformer_undefined;
+
+  post = any_loop_to_postcondition(body_s,
+				   t_init,
+				   t_enter,
+				   t_skip,
+				   t_body_star,
+				   t_body,
+				   t_continue, //since t_inc is ineffective
+				   t_inc,
+				   t_exit,
+				   pre);
+
+  /* The repeat loop does not fit well in the current generic
+   * approach. Most of the basic transformers such as t_init, t_skip,
+   * t_enter,... are meaningless. Instead of dealing with zero or at
+   * least one iteration, we have to deal with one or at least two.
+   *
+   * post = (t_body ; t_exit)(pre) +
+   *        (t_body ; t_continue ; t_body_star ; t_body ; t_exit)(pre)
+   *
+   * where we assume that t_body_star includes the continuation condition. 
+   */
+
+  free_transformer(post);
+
+  post_1 = transformer_apply(t_body, pre);
+  post_2 = transformer_apply(t_exit, post_1);
+
+  post_3 = transformer_apply(t_continue, post_1);
+  post_4 = transformer_apply(t_body_star, post_3);
+  post_5 = transformer_apply(t_body, post_4);
+  post_6 = transformer_apply(t_exit, post_5);
+
+  post = transformer_convex_hull(post_2, post_6);
+
+  /* Clean up memory */
+
+  free_transformer(t_init);
+  free_transformer(post_init);
+  free_transformer(t_skip);
+  free_transformer(t_enter);
+  free_transformer(t_continue);
+  free_transformer(t_exit);
+  free_transformer(t_inc);
+
+  free_transformer(post_1);
+  free_transformer(post_2);
+  free_transformer(post_3);
+  free_transformer(post_4);
+  free_transformer(post_5);
+  free_transformer(post_6);
+
+    return post;
 }
 
 transformer loop_to_postcondition(
