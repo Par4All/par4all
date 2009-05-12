@@ -5,7 +5,13 @@
 
 \usepackage[latin1]{inputenc}
 \usepackage{verbatim,comment,newgen_domain}
-\usepackage{graphicx}
+\usepackage{graphicx,ifpdf}
+% Use classical figure extension if we are in classical LaTeX (instead of
+% pdflatex), necessary for TeX4ht (htlatex):
+\ifpdf
+\else
+  \DeclareGraphicsExtensions{.idraw,.eps}
+\fi
 \usepackage[backref,pagebackref]{hyperref}
 \usepackage[nofancy]{svninfo}
 

@@ -160,8 +160,7 @@ static bool incrementation_expression_to_increment(expression incr,
 						   entity li,
 						   bool * is_increasing_p,
 						   bool * is_decreasing_p,
-						   expression * pincrement)
-{
+						   expression * pincrement) {
   bool success = FALSE;
   syntax incr_s = expression_syntax(incr);
 
@@ -240,7 +239,6 @@ static bool incrementation_expression_to_increment(expression incr,
 	      else {
 		* is_decreasing_p = TRUE;
 		pips_debug(5, "Found \"i = i + v\" or \"i = v + i\" with negative increment!\n");
-		    
 	      }
 	    }
 	  }
@@ -436,9 +434,10 @@ try_to_transform_a_for_loop_into_a_do_loop(forloop f) {
        phase of the recursion. */
     instruction_tag(i) = is_instruction_loop;
     instruction_loop(i) = new_l;
-    /* Detach informations of the while-loop before freeing it
-    whileloop_body(wl) = statement_undefined;
-    whileloop_condition(wl) = expression_undefined;: */
+    /* Detach informations of the for-loop before freeing it: */
+    forloop_increment(f) = expression_undefined;
+    forloop_body(f) = statement_undefined;
+    forloop_condition(f) = expression_undefined;
     free_forloop(f);
   }
 }
