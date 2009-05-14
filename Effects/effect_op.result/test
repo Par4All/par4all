@@ -5,49 +5,49 @@ int main()
 //               <must be read   >: b i
 //               <must be written>: b
 
-   b = b+i;                                                             /*0006*/
+   b = b+i;
 //               <must be read   >: b i
 //               <must be written>: b
-   b = b*i;                                                             /*0007*/
+   b = b*i;
 //               <must be read   >: b i
 //               <must be written>: b
-   b = b/i;                                                             /*0008*/
+   b = b/i;
 //               <must be read   >: b i
 //               <must be written>: b
-   b = b&i;                                                             /*0009*/
+   b = b&i;
 //               <must be read   >: b i
 //               <must be written>: b
-   b = b^i;                                                             /*0010*/
+   b = b^i;
 //               <must be read   >: b i
 //               <must be written>: b
-   b = b|i;                                                             /*0011*/
+   b = b|i;
 //               <must be read   >: b i
 //               <must be written>: b
-   b += i;                                                              /*0012*/
+   b += i;
 //               <must be read   >: b i
 //               <must be written>: b
-   b *= i;                                                              /*0013*/
+   b *= i;
 //               <must be read   >: b i
 //               <must be written>: b
-   b /= i;                                                              /*0014*/
+   b /= i;
 //               <must be read   >: b i
 //               <must be written>: b
-   b -= i;                                                              /*0015*/
+   b -= i;
 //               <must be read   >: b i
 //               <must be written>: b
-   b &= i;                                                              /*0016*/
+   b &= i;
 //               <must be read   >: b i
 //               <must be written>: b
-   b |= i;                                                              /*0017*/
+   b |= i;
 //               <must be read   >: b i
 //               <must be written>: b
-   b ^= i;                                                              /*0018*/
+   b ^= i;
 //               <must be read   >: b
 //               <must be written>: b
-   b++;                                                                 /*0019*/
+   b++;
 //               <must be read   >: b
 //               <must be written>: b
-   b--;                                                                 /*0020*/
+   b--;
 
-   return 0;                                                            /*0022*/
+   return 0;
 }
