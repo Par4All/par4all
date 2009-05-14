@@ -2140,8 +2140,11 @@ static text text_block (entity module, string label, int margin, list objs,
   return r;
 }
 
-/* return a string with the variable that need to be private in the current
- * context
+/* @return a string with the variable that need to be private in the current
+ * context. The context takes care of the kind of output. For example in the
+ * case of open mp the variables would be encapsulated into
+ * the private() clause like this: private (a,b).
+ * @param obj the loop to look at.
  */
 static list /* of string */
 loop_private_variables(loop obj)
@@ -2158,7 +2161,7 @@ loop_private_variables(loop obj)
     
     if (omp_private == TRUE) {
       // In case of openmp the variable declared in the loop body should
-      // not be made private, so remove them from the list of locals.
+      // not be made private, so let's remove them from the list of locals.
       gen_list_and_not (&locals, decl_var);
     }
 
@@ -2262,6 +2265,7 @@ text_directive(
 
     /* what about reductions? should be associated to the ri somewhere.
      */
+
     close_current_line(buffer, t,cont);
     free(dir);
     free(cont);
@@ -2297,8 +2301,11 @@ text_omp_directive(loop l, int m)
   if(prettyprint_is_fortran)
     t = text_directive(l, m, "\n" OMP_DIRECTIVE, OMP_CONTINUATION,
 		       OMP_PARALLELDO);
-  else { // assume C
-    // More should be done to take care of shared and private variables
+  else {
+    // assume C
+    // text_directive function takes care of private variables 
+    // More should be done to take care of shared variables, reductions
+    // and other specific omp clause like lastprivate, copyin ...
     t = text_directive(l, m, OMP_C_DIRECTIVE, OMP_C_CONTINUATION,
 		       OMP_C_PARALLELDO);
 

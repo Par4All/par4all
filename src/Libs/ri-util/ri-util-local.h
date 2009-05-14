@@ -689,6 +689,9 @@
 
 #define ENTITY_AND_P(e) (entity_an_operator_p(e, AND) || entity_an_operator_p(e, C_AND))
 #define ENTITY_OR_P(e) (entity_an_operator_p(e, OR) || entity_an_operator_p(e, C_OR))
+#define ENTITY_BITWISE_AND_P(e) (entity_an_operator_p(e, BITWISE_AND))
+#define ENTITY_BITWISE_OR_P(e) (entity_an_operator_p(e, BITWISE_OR))
+#define ENTITY_BITWISE_XOR_P(e) (entity_an_operator_p(e, BITWISE_XOR))
 #define ENTITY_NOT_P(e) (entity_an_operator_p(e, NOT) || entity_an_operator_p(e, C_NOT))
 #define ENTITY_NON_EQUAL_P(e) (entity_an_operator_p(e, NON_EQUAL) || entity_an_operator_p(e, C_NON_EQUAL))
 #define ENTITY_EQUIV_P(e) entity_an_operator_p(e, EQUIV)

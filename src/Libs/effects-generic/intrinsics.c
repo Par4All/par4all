@@ -796,8 +796,9 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
 
 
 /* list generic_proper_effects_of_intrinsic(entity e, list args)
- * input    : a intrinsic function name, and the list or arguments.
- * output   : the corresponding list of effects.
+ * @return the corresponding list of effects.
+ * @param e, an intrinsic function name,
+ * @param args, the list or arguments.
  * modifies : nothing.
  * comment  :
  */
@@ -819,7 +820,7 @@ generic_proper_effects_of_intrinsic(entity e, list args)
 
         pid += 1;
     }
-
+   
     pips_error("generic_proper_effects_of_intrinsic", "unknown intrinsic %s\n", s);
 
     return(NIL);
@@ -901,8 +902,11 @@ address_of_effects(entity f __attribute__ ((__unused__)),list args)
     return(lr);
 }
 
-
-/* Three different cases are handled:
+/* @return the corresponding list of effects.
+ * @param args, the list or arguments.
+ * @param update_p, set to true if the operator is an update operator (i.e +=)
+ * @param unique_p, set to true if the operator is an unique operator (i.e ++)
+ * Three different cases are handled:
  * the standard assignement: x = y;
  * the assignement with update, x+=y, which implies first a read of the lhs
  * the update, x++, which has no rhs
@@ -918,48 +922,27 @@ static list any_affect_effects(entity e __attribute__ ((__unused__)),
 
   pips_debug(5, "begin\n");
 
-  if (syntax_reference_p(s)) 
+  if (update_p)
     {
-      pips_debug(5, "this is a reference\n");
+      pips_debug(5, "update_p is true\n");
+      le = generic_proper_effects_of_expression(lhs);      
+    }
 
-      if(update_p) 
-	{
-	  pips_debug(5, "update_p is true\n");
-	  le = generic_proper_effects_of_expression(lhs);
-	  /* To avoid sharing between references as we move away from 
-	     preference with C */
-	  le = gen_nconc(le, generic_proper_effects_of_lhs
-			 (copy_reference(syntax_reference(s))));
-	}
-      le = gen_nconc(le, generic_proper_effects_of_lhs(syntax_reference(s)));
-    }
-  else 
-    {
-       pips_debug(5, "this is not a reference\n");
-     
-      if(update_p) 
-	{
-	  pips_debug(5, "update_p is fase\n");
-	 
-	  le = generic_proper_effects_of_expression(lhs);
-	  /* To avoid sharing in effects which help when combining and
-	     freeing effects, too bad for the memory leak at the
-	     expression level. No time to think about something better for
-	     the time being, although preference is around to help. FI */
-	  le = gen_nconc(le, generic_proper_effects_of_any_lhs(copy_expression(lhs)));
-	}
-      le = gen_nconc(le, generic_proper_effects_of_any_lhs(lhs));
-    }
-  
+  le = gen_nconc(le, generic_proper_effects_of_any_lhs(lhs));
+       
   if(!unique_p)
     {
-      pips_debug(5, "unique_p is fase\n");
+      pips_debug(5, "unique_p is false\n");
 	 
       expression rhs = EXPRESSION(CAR(CDR(args)));
       le = gen_nconc(le, generic_proper_effects_of_expression(rhs));
     }
 
-  pips_debug(5, "end\n");
+  ifdebug(5)
+    {
+      pips_debug(5, "end with effects :\n");
+      (*effects_prettyprint_func)(le);
+    }
 
   return le;
 }

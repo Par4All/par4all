@@ -364,10 +364,14 @@ functional_object_p(gen_chunk* obj)
 
 /****************************************************** REDUCTION OPERATOR */
 
+#define OKAY(op,com) do { *op_tag=op; *commutative=com; return TRUE;} while(FALSE)
 /* tells whether entity f is a reduction operator function
  * also returns the corresponding tag, and if commutative
+ * @return TRUE if the entity f is a reduction operator function
+ * @param f, the entity to look at
+ * @param op_tag, use to return the reduction operator (+, * ...)
+ * @param commutative, use to return the operator commutativity
  */
-#define OKAY(op,com) { *op_tag=op; *commutative=com; return TRUE;}
 static bool 
 function_reduction_operator_p(
     entity f,
@@ -375,21 +379,27 @@ function_reduction_operator_p(
     bool *commutative)
 {
     if (ENTITY_PLUS_P(f)) 
-	OKAY(is_reduction_operator_sum, TRUE)
+      OKAY(is_reduction_operator_sum, TRUE);
     else if (ENTITY_MINUS_P(f))
-	OKAY(is_reduction_operator_sum, FALSE)
+      OKAY(is_reduction_operator_sum, FALSE);
     else if (ENTITY_MULTIPLY_P(f))
-	OKAY(is_reduction_operator_prod, TRUE)
+      OKAY(is_reduction_operator_prod, TRUE);
     else if (ENTITY_DIVIDE_P(f))
-	OKAY(is_reduction_operator_prod, FALSE)
+      OKAY(is_reduction_operator_prod, FALSE);
     else if (ENTITY_MIN_P(f) || ENTITY_MIN0_P(f))
-	OKAY(is_reduction_operator_min, TRUE)
+      OKAY(is_reduction_operator_min, TRUE);
     else if (ENTITY_MAX_P(f) || ENTITY_MAX0_P(f))
-	OKAY(is_reduction_operator_max, TRUE)
+      OKAY(is_reduction_operator_max, TRUE);
     else if (ENTITY_AND_P(f))
-	OKAY(is_reduction_operator_and, TRUE)
+      OKAY(is_reduction_operator_and, TRUE);
     else if (ENTITY_OR_P(f))
-	OKAY(is_reduction_operator_or, TRUE)
+      OKAY(is_reduction_operator_or, TRUE);
+    else if (ENTITY_BITWISE_AND_P(f))
+      OKAY(is_reduction_operator_bitwise_and, TRUE);
+    else if (ENTITY_BITWISE_OR_P(f))
+      OKAY(is_reduction_operator_bitwise_or, TRUE);
+    else if (ENTITY_BITWISE_XOR_P(f))
+      OKAY(is_reduction_operator_bitwise_xor, TRUE);
     else
 	return FALSE;
 }
@@ -413,8 +423,37 @@ extract_reduction_operator(
     return function_reduction_operator_p(f, op_tag, commutative);
 }
 
-/* tells whether call to f is compatible with tag op.
- * if so, also returns whether f is commutative
+/* Test if the operator is an update operator compatible with reduction
+ * This also returns the corresponding tag, and if commutative
+ * @return TRUE if the operator is an update operator compatible with reduction
+ * @param operator, the operator (as an entity) to look at
+ * @param op_tag, used to return the reduction operator (+, * ...)
+ * @param commutative, used to return the operator commutativity
+ */
+static bool extract_reduction_update_operator (entity operator,
+					       tag*   op_tag,
+					       bool*  commutative)
+{
+  if (ENTITY_PLUS_UPDATE_P (operator)) 
+    OKAY(is_reduction_operator_sum, TRUE);
+  else if (ENTITY_MINUS_UPDATE_P (operator))
+    OKAY(is_reduction_operator_sum, TRUE);
+  else if (ENTITY_MULTIPLY_UPDATE_P (operator))
+    OKAY(is_reduction_operator_prod, TRUE);
+  else if (ENTITY_BITWISE_OR_UPDATE_P (operator))
+    OKAY (is_reduction_operator_bitwise_or, TRUE);
+  else if (ENTITY_BITWISE_AND_UPDATE_P (operator))
+    OKAY(is_reduction_operator_bitwise_and, TRUE);
+  else if (ENTITY_BITWISE_XOR_UPDATE_P (operator))
+    OKAY(is_reduction_operator_bitwise_xor, TRUE);
+  
+  return FALSE;
+}
+
+/* @return TRUE if f is compatible with tag op.
+ * @param f the entity to check.
+ * @param op the tag to check against.
+ * @param pcomm the commutative return value.
  */
 static bool
 reduction_function_compatible_p(
@@ -441,12 +480,17 @@ reduction_function_compatible_p(
  * - returned reference fsr_found,
  * - boolean fsr_okay.
  */
-static reference fsr_ref, fsr_found;
+static reference fsr_ref;
+static reference fsr_found;
 static tag fsr_op;
 static bool fsr_okay;
+
 static bool fsr_reference_flt(reference r)
 {
-    if (reference_equal_p(r, fsr_ref))
+  pips_debug(7,"r: %s, fsr_ref: %s\n",
+	     entity_name(reference_variable(r)),
+	     entity_name(reference_variable(fsr_ref)));
+   if (reference_equal_p(r, fsr_ref))
     {
 	fsr_found = r;
 	/* stop the recursion if does not need to check int div
@@ -458,22 +502,26 @@ static bool fsr_reference_flt(reference r)
 
     return FALSE; /* no candidate refs within a ref! */
 }
+
+/* @return TRUE if the all operators are compatible with the detected reduction operator
+ * @param c, the call to search for operators
+ */
 static bool fsr_call_flt(call c)
 {
     bool comm;
     if (!reduction_function_compatible_p(call_function(c), fsr_op, &comm))
-	return FALSE;
+      return FALSE;
     /* else */
     if (!comm)
     {
-	list /* of expression */ le = call_arguments(c);
-	pips_assert("length is two", gen_length(le)==2);
-	gen_recurse_stop(EXPRESSION(CAR(CDR(le))));
+      list /* of expression */ le = call_arguments(c);
+      pips_assert("length is two", gen_length(le)==2);
+      gen_recurse_stop(EXPRESSION(CAR(CDR(le))));
 
-	/* int div */
-	if (basic_int_p(entity_basic(reference_variable(fsr_ref))) &&
-	    (fsr_op==is_reduction_operator_prod))
-	    fsr_okay = FALSE;
+      // check for integer division which is considered as non reductable
+      if (basic_int_p(entity_basic(reference_variable(fsr_ref))) &&
+	  (fsr_op==is_reduction_operator_prod))
+	fsr_okay = FALSE;
     }
 
     return TRUE;
@@ -484,6 +532,7 @@ equal_reference_in_expression_p(
     reference r,       /* looked for */
     expression e,      /* visited object */
     tag rop,           /* assumed reduction */
+    bool red_up_op,
     reference *pfound) /* returned */
 {
     fsr_ref = r;
@@ -495,9 +544,9 @@ equal_reference_in_expression_p(
 		      call_domain, fsr_call_flt, gen_null,
 		      reference_domain, fsr_reference_flt, gen_null,
 		      NULL);
-
+    
     *pfound = fsr_found;
-    return (fsr_found != NULL) && fsr_okay;
+    return ((red_up_op || (fsr_found != NULL)) && fsr_okay);
 }
 
 /******************************************************** NO OTHER EFFECTS */
@@ -506,7 +555,7 @@ equal_reference_in_expression_p(
  * I trust the proper effects to store all references...
  */
 bool
-no_other_effects_on_references(
+no_other_effects_on_references (
     statement s,
     list /* of reference on the same variable */ lr)
 {
@@ -517,12 +566,15 @@ no_other_effects_on_references(
     le = effects_effects(load_proper_references(s));
     var = reference_variable(REFERENCE(CAR(lr)));
 
+    pips_debug(7,"entity name: %s\n", entity_name(var));
+
     MAP(EFFECT, e,
     {
-	reference r = effect_reference(e);
-	if (!gen_in_list_p(r, lr) && 
-	    entity_conflict_p(reference_variable(r), var))
-	    return FALSE;
+      reference r = effect_reference(e);
+      if (!gen_in_list_p(r, lr) && 
+	  entity_conflict_p(reference_variable(r), var))
+	return FALSE;
+      pips_debug(7,"refrence r: %p of entity: %s\n", r, entity_name (reference_variable(r))); 
     },
 	le);
 
@@ -530,66 +582,84 @@ no_other_effects_on_references(
 }
 
 /************************************************ EXTRACT PROPER REDUCTION */
-/* is the call in s a reduction? returns the reduction if so.
+/* This function look for a reduction and return it if found 
  * mallocs are avoided if nothing is found...
- * looks for v = v OP y, where y is independent of v.
+ * looks for v = v OP y or v OP= y, where y is independent of v.
+ * @return TRUE if the call in s a reduction
+ * @param s,
+ * @param c, the call to test for reduction
+ * @param red, the reduction to return
  */
 bool 
-call_proper_reduction_p(
+call_proper_reduction_p (
     statement s,    /* needed to query about proper effects */
     call c,         /* the call of interest */
     reduction *red) /* the returned reduction (if any) */
 {
-    list /* of expression */ le, 
-         /* of reference */ lr, 
-         /* of Preference */ lp;
-    expression elhs, erhs;
-    reference lhs, other;
-    tag op;
-    bool comm;
+  list /* of expression */ le, 
+    /* of reference */ lr, 
+    /* of Preference */ lp;
+  expression elhs, erhs;
+  reference lhs, other;
+  tag op;
+  bool comm;
+  
+  // initialize the reduction update operator flag;
+  bool red_up_op = FALSE;
 
-    pips_debug(7, "call to %s (%p)\n", entity_name(call_function(c)), s);
+  pips_debug(7, "call to %s (%p)\n", entity_name(call_function(c)), s);
+    
+  entity fct = call_function(c);
+  
+  // check if there is a reduction_update_operator
+  red_up_op = extract_reduction_update_operator (fct, &op, &comm);
 
-    if (!ENTITY_ASSIGN_P(call_function(c))) 
-	return FALSE;
+  if ((red_up_op == TRUE) || (ENTITY_ASSIGN_P (fct))) {
 
     le = call_arguments(c);
     pips_assert("two arguments", gen_length(le)==2);
     elhs = EXPRESSION(CAR(le));
     erhs = EXPRESSION(CAR(CDR(le)));
-
+    
     pips_assert("lhs reference", syntax_reference_p(expression_syntax(elhs)));
     lhs = syntax_reference(expression_syntax(elhs));
-
+    
     /* the lhs and rhs must be functionnal
      * (same location on different evaluations)
      */
     if (!functional_object_p((gen_chunk *) lhs)
 	|| !functional_object_p((gen_chunk *) erhs))
-	return FALSE;
-    pips_debug(8, "lsh and rhs are functional\n");
+      return FALSE;
+    pips_debug(8, "lhs and rhs are functional\n");
 
-    /* the operation performed must be valid for a reduction
-     */
-    if (!extract_reduction_operator(erhs, &op, &comm))
-	return FALSE;
+    // Check that the operation performed is valid for a reduction,
+    // The check is useless for reduction update operator because
+    // already done previously by "extract_reduction_update_operator"
+    if ((red_up_op == FALSE) && (!extract_reduction_operator(erhs, &op, &comm)))
+      return FALSE;
     pips_debug(8, "reduction operator %s\n", reduction_operator_tag_name(op));
 
     /* there should be another direct reference as lhs
      * !!! syntax is a call if extract_reduction_operator returned TRUE
      */
-    if (!equal_reference_in_expression_p(lhs, erhs, op, &other))
-	return FALSE;
+    if (!equal_reference_in_expression_p(lhs, erhs, op, red_up_op, &other))
+      return FALSE;
     pips_debug(8, "matching reference found (%p)\n", other);
     
     /* there should be no extract effects on the reduced variable
      */
-    lr = CONS(REFERENCE, lhs, CONS(REFERENCE, other, NIL));
+    if (red_up_op == TRUE)
+      lr = CONS(REFERENCE, lhs, NIL);
+    else 
+      lr = CONS(REFERENCE, lhs, CONS(REFERENCE, other, NIL));
+    
+    pips_debug(7,"list lr is: %p and %p\n", other, lhs); 
+
     if (!no_other_effects_on_references(s, lr))
-    {
+      {
 	gen_free_list(lr);
 	return FALSE;
-    }
+      }
     /* lr is used latter on */
     pips_debug(8, "no other effects\n");
 
@@ -606,7 +676,6 @@ call_proper_reduction_p(
 
     DEBUG_REDUCTION(7, "returning\n", *red);
     return TRUE;
+  }
+  return FALSE;    
 }
-
-/* end of $RCSfile: utils.c,v $
- */

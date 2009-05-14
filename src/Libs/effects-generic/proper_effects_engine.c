@@ -1418,11 +1418,11 @@ generic_proper_effects_of_external(entity func, list args)
 }
 
 /* list proper_effects_of_call(call c, transformer context, list *plpropreg)
- * input    : a call, which can be a call to a subroutine, but also
- *            to an function, or to an intrinsic, or even an assignement.
- *            And a pointer that will be the proper effects of the call; NIL,
- *            except for an intrinsic (assignment or real FORTRAN intrinsic).
- * output   : the corresponding list of effects.
+ * @return the list of effects found.
+ * @param c, a call, which can be a call to a subroutine, but also
+ * to an function, or to an intrinsic, or even an assignement.
+ * And a pointer that will be the proper effects of the call; NIL,
+ * except for an intrinsic (assignment or real FORTRAN intrinsic).
  * modifies : nothing.
  * comment  :	
  */
@@ -1468,6 +1468,7 @@ generic_r_proper_effects_of_call(call c)
 
     default:
       pips_internal_error("unknown tag %d\n", t);
+      break;
     }
   }
   else if(type_variable_p(uet)) {
@@ -1507,13 +1508,16 @@ proper_effects_of_call(call c)
     /* Is the call an instruction, or a sub-expression? */
     if (instruction_call_p(inst) && (instruction_call(inst) == c))
     {
-	pips_debug(2, "Effects for statement %03zd:\n",
+      pips_debug(2, "Effects for statement %03zd:\n",
 		   statement_ordering(current_stat)); 
+
 	l_proper = generic_r_proper_effects_of_call(c);
+
 	l_proper = gen_nconc(l_proper, effects_dup(l_cumu_range));
 		
 	if (contract_p)
 	    l_proper = proper_effects_contract(l_proper);
+
 	ifdebug(2) {
 	  pips_debug(2, "Proper effects for statement %03zd:\n",
 		     statement_ordering(current_stat));  

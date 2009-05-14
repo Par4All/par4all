@@ -12,8 +12,6 @@
 #include "semantics.h"
 #include "prettyprint.h"
 
-#define REDUCTION_PREFIX "!"
-
 #define PROP_SUFFIX ".proper_reductions"
 #define CUMU_SUFFIX ".cumulated_reductions"
 
@@ -51,13 +49,16 @@ string reduction_operator_tag_name(tag t)
 {
     switch(t)
     {
-    case is_reduction_operator_none: return "none"; 
-    case is_reduction_operator_sum:  return "sum";  
-    case is_reduction_operator_prod: return "prod"; 
-    case is_reduction_operator_min:  return "min";  
-    case is_reduction_operator_max:  return "max";  
-    case is_reduction_operator_and:  return "and";  
-    case is_reduction_operator_or:   return "or";   
+    case is_reduction_operator_none:        return "none"; 
+    case is_reduction_operator_sum:         return "sum";   
+    case is_reduction_operator_csum:        return "csum";
+    case is_reduction_operator_prod:        return "prod"; 
+    case is_reduction_operator_min:         return "min";  
+    case is_reduction_operator_max:         return "max";  
+    case is_reduction_operator_and:         return "and";  
+    case is_reduction_operator_bitwise_or:  return "bitwise_or";   
+    case is_reduction_operator_bitwise_xor: return "bitwise_xor";   
+    case is_reduction_operator_bitwise_and: return "bitwise_and";   
     default: pips_internal_error("unexpected reduction operator tag!");
     }
 
@@ -129,7 +130,7 @@ static text text_reductions(entity module, int margin, statement s)
 	words_predicate_to_commentary
 	    (words_reductions(note_for_statement(s),
 			      load_printed_reductions(s)), 
-	     REDUCTION_PREFIX):
+	     PIPS_COMMENT_SENTINEL):
 		make_text(NIL);
 
     debug_off();
@@ -152,6 +153,12 @@ static text text_code_reductions(statement s)
 /* handles the required prettyprint
  * ??? what about summary reductions? 
  * should be pprinted with cumulated regions. 
+ * @ return TRUE if succeed
+ * @param module_name the module name to process
+ * @param resource_name the resource to use
+ * @param decoration_name
+ * @param summary_name
+ * @param file_suffix
  */
 static bool
 print_any_reductions(
@@ -182,8 +189,9 @@ print_any_reductions(
 	    db_get_memory_resource(summary_name, module_name, TRUE);
 	text p = 
 	    words_predicate_to_commentary(words_reductions("summary ", rs), 
-					  REDUCTION_PREFIX);
-	MERGE_TEXTS(p, t); t=p;
+					  PIPS_COMMENT_SENTINEL);
+	MERGE_TEXTS(p, t);
+	t=p;
     }
 
     make_text_resource_and_free(module_name, DBR_PRINTED_FILE, file_suffix, t);
