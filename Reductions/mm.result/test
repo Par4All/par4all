@@ -20,7 +20,7 @@ c
          DO I = 1, N                                                    0017
             C(I,J) = 0.                                                 0018
             DO K = 1, N                                                 0019
-!  call sum[C(I,J)],
+C  call sum[C(I,J)],
                C(I,J) = C(I,J)+A(I,K)*B(K,J)                            0020
             ENDDO
          ENDDO
@@ -36,7 +36,7 @@ c
       DO K = 1, N                                                       0032
          DO J = 1, N                                                    0033
             DO I = 1, N                                                 0034
-!  call sum[C(I,J)],
+C  call sum[C(I,J)],
                C(I,J) = C(I,J)+A(I,K)*B(K,J)                            0035
             ENDDO
          ENDDO
@@ -67,9 +67,9 @@ c
       DO J = 1, N                                                       0016
          DO I = 1, N                                                    0017
             C(I,J) = 0.                                                 0018
-!  loop sum[C(I,J)],
+C  loop sum[C(I,J)],
             DO K = 1, N                                                 0019
-!  call sum[C(I,J)],
+C  call sum[C(I,J)],
                C(I,J) = C(I,J)+A(I,K)*B(K,J)                            0020
             ENDDO
          ENDDO
@@ -82,13 +82,13 @@ c
             C(I,J) = 0.                                                 0029
          ENDDO
       ENDDO
-!  loop sum[C(*,*)],
+C  loop sum[C(*,*)],
       DO K = 1, N                                                       0032
-!  loop sum[C(*,*)],
+C  loop sum[C(*,*)],
          DO J = 1, N                                                    0033
-!  loop sum[C(*,J)],
+C  loop sum[C(*,J)],
             DO I = 1, N                                                 0034
-!  call sum[C(I,J)],
+C  call sum[C(I,J)],
                C(I,J) = C(I,J)+A(I,K)*B(K,J)                            0035
             ENDDO
          ENDDO

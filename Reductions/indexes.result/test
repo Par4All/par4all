@@ -6,18 +6,18 @@ Print code with proper reductions
       INTEGER S(10)
       DO I = 1, 10                                                      0004
          DO J = 1, 10                                                   0005
-!  call sum[S(J)],
+C  call sum[S(J)],
             S(J) = S(J)+I                                               0006
          ENDDO
-!  call sum[S(I)],
+C  call sum[S(I)],
          S(I) = S(I)+2                                                  0008
       ENDDO
       DO I = 1, 10                                                      0010
-!  call sum[S(3)],
+C  call sum[S(3)],
          S(3) = S(3)+I+J                                                0011
-!  call sum[S(5)],
+C  call sum[S(5)],
          S(5) = I+S(5)+J                                                0012
-!  call sum[S(7)],
+C  call sum[S(7)],
          S(7) = I+J+S(7)                                                0013
       ENDDO
       END
@@ -27,23 +27,23 @@ Print code with cumulated reductions
       PROGRAM INDEXES
       INTEGER I,J
       INTEGER S(10)
-!  loop sum[S],
+C  loop sum[S],
       DO I = 1, 10                                                      0004
-!  loop sum[S(*)],
+C  loop sum[S(*)],
          DO J = 1, 10                                                   0005
-!  call sum[S(J)],
+C  call sum[S(J)],
             S(J) = S(J)+I                                               0006
          ENDDO
-!  call sum[S(I)],
+C  call sum[S(I)],
          S(I) = S(I)+2                                                  0008
       ENDDO
-!  loop sum[S],
+C  loop sum[S],
       DO I = 1, 10                                                      0010
-!  call sum[S(3)],
+C  call sum[S(3)],
          S(3) = S(3)+I+J                                                0011
-!  call sum[S(5)],
+C  call sum[S(5)],
          S(5) = I+S(5)+J                                                0012
-!  call sum[S(7)],
+C  call sum[S(7)],
          S(7) = I+J+S(7)                                                0013
       ENDDO
       END

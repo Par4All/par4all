@@ -1,0 +1,99 @@
+int main()
+{
+   int b = 0;
+   int i = 0;
+   float y = 10.0;
+   float x = 1.0;
+//  loop sum[b],
+   
+   // b should be reduced here
+   for(i = 0; i <= 99; i += 1)                                          /*0009*/
+//  call sum[b],
+      b = b+i;                                                          /*0010*/
+//  loop prod[b],
+   
+   // b should be reduced here
+   for(i = 0; i <= 99; i += 1)                                          /*0014*/
+//  call prod[b],
+      b = b*i;                                                          /*0015*/
+   
+   // b should not be reduced here
+   // because "/" on int is not accepted
+   for(i = 0; i <= 99; i += 1)                                          /*0020*/
+      b = b/i;                                                          /*0021*/
+//  loop bitwise_and[b],
+   
+   // b should be reduced here
+   for(i = 0; i <= 99; i += 1)                                          /*0025*/
+//  call bitwise_and[b],
+      b = b&i;                                                          /*0026*/
+//  loop bitwise_xor[b],
+   
+   // b should be reduced here
+   for(i = 0; i <= 99; i += 1)                                          /*0030*/
+//  call bitwise_xor[b],
+      b = b^i;                                                          /*0031*/
+//  loop bitwise_or[b],
+   
+   // b should be reduced here
+   for(i = 0; i <= 99; i += 1)                                          /*0035*/
+//  call bitwise_or[b],
+      b = b|i;                                                          /*0036*/
+//  loop sum[b],
+   
+   // b should be reduced here
+   for(i = 0; i <= 99; i += 1)                                          /*0040*/
+//  call sum[b],
+      b += i;                                                           /*0041*/
+//  loop prod[b],
+   
+   // b should be reduced here
+   for(i = 0; i <= 99; i += 1)                                          /*0045*/
+//  call prod[b],
+      b *= i;                                                           /*0046*/
+   
+   // b should not be reduced here
+   // because "/" on int is not accepted
+   for(i = 0; i <= 99; i += 1)                                          /*0051*/
+      b /= i;                                                           /*0052*/
+//  loop sum[b],
+   
+   // b should be reduced here
+   for(i = 0; i <= 99; i += 1)                                          /*0056*/
+//  call sum[b],
+      b -= i;                                                           /*0057*/
+//  loop bitwise_and[b],
+   
+   // b should be reduced here
+   for(i = 0; i <= 99; i += 1)                                          /*0061*/
+//  call bitwise_and[b],
+      b &= i;                                                           /*0062*/
+//  loop bitwise_or[b],
+   
+   // b should be reduced here
+   for(i = 0; i <= 99; i += 1)                                          /*0066*/
+//  call bitwise_or[b],
+      b |= i;                                                           /*0067*/
+//  loop bitwise_xor[b],
+   
+   // b should be reduced here
+   for(i = 0; i <= 99; i += 1)                                          /*0071*/
+//  call bitwise_xor[b],
+      b ^= i;                                                           /*0072*/
+//  loop prod[y],
+   
+   // b should be reduced here
+   // because "/" on float is accepted
+   for(i = 0; i <= 99; i += 1)                                          /*0077*/
+//  call prod[y],
+      y = y/x;                                                          /*0078*/
+//  loop prod[y],
+   
+   // b should be reduced here
+   // because "/" on float is accepted
+   for(i = 0; i <= 99; i += 1)                                          /*0083*/
+//  call prod[y],
+      y = y/x;                                                          /*0084*/
+
+   return 0;                                                            /*0087*/
+}

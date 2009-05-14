@@ -6,19 +6,19 @@ Print code with proper reductions
       PARAMETER (N=10)
       REAL S, A(N), P
       S = 1.0                                                           0005
-!  call sum[S],
+C  call sum[S],
       S = S-2.0                                                         0006
       S = S+S                                                           0007
-!  call sum[S],
+C  call sum[S],
       S = 3.0+S                                                         0008
       DO I = 1, N                                                       0009
          A(I) = REAL(I)                                                 0010
       ENDDO
 
       DO I = 1, N                                                       0013
-!  call sum[S],
+C  call sum[S],
          S = S+A(I)                                                     0014
-!  call sum[S],
+C  call sum[S],
          S = S-A(I)                                                     0015
       ENDDO
       PRINT *, 'sum is ', S                                             0017
@@ -26,10 +26,10 @@ Print code with proper reductions
       P = 1.0                                                           0019
       DO I = 1, N                                                       0020
          IF (MOD(I, 2).EQ.0) THEN                                       0021
-!  call prod[P],
+C  call prod[P],
             P = A(I)*P                                                  0022
          ELSE
-!  call prod[P],
+C  call prod[P],
             P = P/A(I)                                                  0024
          ENDIF
       ENDDO
@@ -44,33 +44,33 @@ Print code with cumulated reductions
       PARAMETER (N=10)
       REAL S, A(N), P
       S = 1.0                                                           0005
-!  call sum[S],
+C  call sum[S],
       S = S-2.0                                                         0006
       S = S+S                                                           0007
-!  call sum[S],
+C  call sum[S],
       S = 3.0+S                                                         0008
       DO I = 1, N                                                       0009
          A(I) = REAL(I)                                                 0010
       ENDDO
-!  loop sum[S],
+C  loop sum[S],
 
       DO I = 1, N                                                       0013
-!  call sum[S],
+C  call sum[S],
          S = S+A(I)                                                     0014
-!  call sum[S],
+C  call sum[S],
          S = S-A(I)                                                     0015
       ENDDO
       PRINT *, 'sum is ', S                                             0017
 
       P = 1.0                                                           0019
-!  loop prod[P],
+C  loop prod[P],
       DO I = 1, N                                                       0020
-!  test prod[P],
+C  test prod[P],
          IF (MOD(I, 2).EQ.0) THEN                                       0021
-!  call prod[P],
+C  call prod[P],
             P = A(I)*P                                                  0022
          ELSE
-!  call prod[P],
+C  call prod[P],
             P = P/A(I)                                                  0024
          ENDIF
       ENDDO

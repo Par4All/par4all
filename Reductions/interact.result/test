@@ -2,80 +2,80 @@
 Print code with proper reductions
 
       REAL FUNCTION FSUMPROD(X, Y, Z)
-!  call sum[X],
+C  call sum[X],
       X = X+Z                                                           0002
-!  call prod[Y],
+C  call prod[Y],
       Y = Y*Z                                                           0003
       FSUMPROD = Z                                                      0004
       END
       PROGRAM INTERACT
       S = 0.                                                            0002
       P = 1.                                                            0003
-!  call prod[P],sum[S],
+C  call prod[P],sum[S],
       CALL SUMPROD(S, P, 2.1)                                           0004
-!  call prod[P],sum[S],
+C  call prod[P],sum[S],
       CALL SUMPROD(S, P, 2.+I)                                          0005
       DO I = 1, N                                                       0006
-!  call prod[P],sum[S],
+C  call prod[P],sum[S],
          CALL SUMPROD(S, P, 2.+I)                                       0007
-!  call prod[P],sum[S],
+C  call prod[P],sum[S],
          CALL SUMPROD(S, P, FSUMPROD(S, P, 3.))                         0008
       ENDDO
       DO I = 1, N                                                       0010
          CALL SUMPROD(P, S, FSUMPROD(S, P, 3.))                         0011
       ENDDO
       DO I = 1, N                                                       0013
-!  call prod[P],sum[S],
+C  call prod[P],sum[S],
          CALL SUMPROD(S, P, 2.+I)                                       0014
-!  call prod[S],sum[P],
+C  call prod[S],sum[P],
          CALL SUMPROD(P, S, 1.-I)                                       0015
       ENDDO
       END
       SUBROUTINE SUMPROD(X, Y, Z)
-!  call sum[X],
+C  call sum[X],
       X = X+Z                                                           0002
-!  call prod[Y],
+C  call prod[Y],
       Y = Y*Z                                                           0003
       END
 
 Print code with cumulated reductions
 
-!  summary sum[X],prod[Y],
+C  summary sum[X],prod[Y],
       REAL FUNCTION FSUMPROD(X, Y, Z)
-!  call sum[X],
+C  call sum[X],
       X = X+Z                                                           0002
-!  call prod[Y],
+C  call prod[Y],
       Y = Y*Z                                                           0003
       FSUMPROD = Z                                                      0004
       END
       PROGRAM INTERACT
       S = 0.                                                            0002
       P = 1.                                                            0003
-!  call prod[P],sum[S],
+C  call prod[P],sum[S],
       CALL SUMPROD(S, P, 2.1)                                           0004
-!  call prod[P],sum[S],
+C  call prod[P],sum[S],
       CALL SUMPROD(S, P, 2.+I)                                          0005
-!  loop prod[P],sum[S],
+C  loop prod[P],sum[S],
       DO I = 1, N                                                       0006
-!  call prod[P],sum[S],
+C  call prod[P],sum[S],
          CALL SUMPROD(S, P, 2.+I)                                       0007
-!  call prod[P],sum[S],
+C  call prod[P],sum[S],
          CALL SUMPROD(S, P, FSUMPROD(S, P, 3.))                         0008
       ENDDO
       DO I = 1, N                                                       0010
          CALL SUMPROD(P, S, FSUMPROD(S, P, 3.))                         0011
       ENDDO
       DO I = 1, N                                                       0013
-!  call prod[P],sum[S],
+C  call prod[P],sum[S],
          CALL SUMPROD(S, P, 2.+I)                                       0014
-!  call prod[S],sum[P],
+C  call prod[S],sum[P],
          CALL SUMPROD(P, S, 1.-I)                                       0015
       ENDDO
       END
-!  summary sum[X],prod[Y],
+C  summary sum[X],prod[Y],
       SUBROUTINE SUMPROD(X, Y, Z)
-!  call sum[X],
+C  call sum[X],
       X = X+Z                                                           0002
-!  call prod[Y],
+C  call prod[Y],
       Y = Y*Z                                                           0003
       END

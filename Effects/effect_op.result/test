@@ -1,0 +1,53 @@
+int main()
+{
+   int b = 1;
+   int i = 10;
+//               <must be read   >: b i
+//               <must be written>: b
+
+   b = b+i;                                                             /*0006*/
+//               <must be read   >: b i
+//               <must be written>: b
+   b = b*i;                                                             /*0007*/
+//               <must be read   >: b i
+//               <must be written>: b
+   b = b/i;                                                             /*0008*/
+//               <must be read   >: b i
+//               <must be written>: b
+   b = b&i;                                                             /*0009*/
+//               <must be read   >: b i
+//               <must be written>: b
+   b = b^i;                                                             /*0010*/
+//               <must be read   >: b i
+//               <must be written>: b
+   b = b|i;                                                             /*0011*/
+//               <must be read   >: b i
+//               <must be written>: b
+   b += i;                                                              /*0012*/
+//               <must be read   >: b i
+//               <must be written>: b
+   b *= i;                                                              /*0013*/
+//               <must be read   >: b i
+//               <must be written>: b
+   b /= i;                                                              /*0014*/
+//               <must be read   >: b i
+//               <must be written>: b
+   b -= i;                                                              /*0015*/
+//               <must be read   >: b i
+//               <must be written>: b
+   b &= i;                                                              /*0016*/
+//               <must be read   >: b i
+//               <must be written>: b
+   b |= i;                                                              /*0017*/
+//               <must be read   >: b i
+//               <must be written>: b
+   b ^= i;                                                              /*0018*/
+//               <must be read   >: b
+//               <must be written>: b
+   b++;                                                                 /*0019*/
+//               <must be read   >: b
+//               <must be written>: b
+   b--;                                                                 /*0020*/
+
+   return 0;                                                            /*0022*/
+}

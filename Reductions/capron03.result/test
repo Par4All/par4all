@@ -10,7 +10,7 @@ Print code with proper reductions
 
       C = 0                                                             0008
       DO I = 1, N                                                       0009
-!  call sum[C],
+C  call sum[C],
          C = C+A(I)                                                     0010
       ENDDO
 
@@ -27,9 +27,9 @@ Print code with cumulated reductions
       READ *, A                                                         0006
 
       C = 0                                                             0008
-!  loop sum[C],
+C  loop sum[C],
       DO I = 1, N                                                       0009
-!  call sum[C],
+C  call sum[C],
          C = C+A(I)                                                     0010
       ENDDO
 

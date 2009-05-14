@@ -3,14 +3,14 @@ Print code with proper reductions
 
       SUBROUTINE ADDTO(X, J)
       INTEGER X, J
-!  call sum[X],
+C  call sum[X],
       X = X+J                                                           0003
       END
       PROGRAM INTERARG
       INTEGER S, I
       S = 0                                                             0003
       DO I = 1, 10                                                      0004
-!  call sum[S],
+C  call sum[S],
          CALL ADDTO(S, I)                                               0005
       ENDDO
       PRINT *, S                                                        0007
@@ -18,18 +18,18 @@ Print code with proper reductions
 
 Print code with cumulated reductions
 
-!  summary sum[X],
+C  summary sum[X],
       SUBROUTINE ADDTO(X, J)
       INTEGER X, J
-!  call sum[X],
+C  call sum[X],
       X = X+J                                                           0003
       END
       PROGRAM INTERARG
       INTEGER S, I
       S = 0                                                             0003
-!  loop sum[S],
+C  loop sum[S],
       DO I = 1, 10                                                      0004
-!  call sum[S],
+C  call sum[S],
          CALL ADDTO(S, I)                                               0005
       ENDDO
       PRINT *, S                                                        0007

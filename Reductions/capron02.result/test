@@ -30,9 +30,9 @@ C Check optimization for code generated in Guuillaume Capron's PhD dissertation
       READ *, A                                                         0008
 
       C = 0                                                             0010
-!  loop sum[C],
+C  loop sum[C],
       DO I = 1, N                                                       0011
-!  test sum[C],
+C  test sum[C],
          IF (A(I)) C = C+1                                              0012
       ENDDO
 
