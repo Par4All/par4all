@@ -213,12 +213,14 @@ transformer transformer_add_variable_update(transformer t, entity v)
 /* Add an update of value v to t */
 transformer transformer_add_value_update(transformer t, entity v)
 {
-  Psysteme psyst = predicate_system(transformer_relation(t));
+  if(!transformer_empty_p(t)) {
+    Psysteme psyst = predicate_system(transformer_relation(t));
 
-  transformer_arguments(t) = arguments_add_entity(transformer_arguments(t), v);
-  if(!base_contains_variable_p(psyst->base, (Variable) v)) {
-    psyst->base = base_add_variable(psyst->base, (Variable) v);
-    psyst->dimension = vect_size(psyst->base);
+    transformer_arguments(t) = arguments_add_entity(transformer_arguments(t), v);
+    if(!base_contains_variable_p(psyst->base, (Variable) v)) {
+      psyst->base = base_add_variable(psyst->base, (Variable) v);
+      psyst->dimension = vect_size(psyst->base);
+    }
   }
 
   return t;

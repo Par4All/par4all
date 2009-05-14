@@ -151,6 +151,7 @@ transformer any_loop_to_transformer(transformer t_init,
   transformer post_loop_star = transformer_undefined;
   transformer post_loop_plus = transformer_undefined;
   transformer post_loop = transformer_undefined;
+  transformer t_next_star = transformer_undefined;
 
   ifdebug(8) {
     fprintf(stderr, "t_init:\n");
@@ -175,8 +176,9 @@ transformer any_loop_to_transformer(transformer t_init,
   //
   // Second heuristics: either we enter directly or we loop
   post_body = transformer_apply(t_effects, post_enter);
-  // temporary memory leak
-  post_next = transformer_range(transformer_apply(t_next, post_body));
+  // temporary memory leaks
+  t_next_star = (* transformer_fix_point_operator)(t_next);
+  post_next = transformer_range(transformer_apply(transformer_combine(t_next_star, t_next), post_body));
   pre_body = transformer_convex_hull(post_next, post_enter);
 
   /* Compute the body transformer */
@@ -219,6 +221,7 @@ transformer any_loop_to_transformer(transformer t_init,
   free_transformer(post_loop_star);
   free_transformer(post_loop_plus);
   free_transformer(post_loop);
+  free_transformer(t_next_star);
 
   ifdebug(8) {
     fprintf(stderr, "t_body_star:\n");
