@@ -365,6 +365,7 @@ functional_object_p(gen_chunk* obj)
 /****************************************************** REDUCTION OPERATOR */
 
 #define OKAY(op,com) do { *op_tag=op; *commutative=com; return TRUE;} while(FALSE)
+#define OKAY_WO_COMM(op) do { *op_tag=op; return TRUE;} while(FALSE)
 /* tells whether entity f is a reduction operator function
  * also returns the corresponding tag, and if commutative
  * @return TRUE if the entity f is a reduction operator function
@@ -446,6 +447,24 @@ static bool extract_reduction_update_operator (entity operator,
     OKAY(is_reduction_operator_bitwise_and, TRUE);
   else if (ENTITY_BITWISE_XOR_UPDATE_P (operator))
     OKAY(is_reduction_operator_bitwise_xor, TRUE);
+  
+  return FALSE;
+}
+
+/* Test if the operator is an unary update operator compatible with reduction
+ * This also returns the corresponding tag
+ * @return TRUE if the operator is an update operator compatible with reduction
+ * @param operator, the operator (as an entity) to look at
+ * @param op_tag, used to return the reduction operator (+, ...)
+ */
+static bool extract_reduction_unary_update_operator (entity operator,
+						     tag*   op_tag)
+{
+  if (ENTITY_POST_INCREMENT_P(operator) ||
+      ENTITY_POST_DECREMENT_P(operator) ||
+      ENTITY_PRE_INCREMENT_P(operator) ||
+      ENTITY_PRE_DECREMENT_P(operator))
+    OKAY_WO_COMM (is_reduction_operator_sum);
   
   return FALSE;
 }
@@ -596,86 +615,86 @@ call_proper_reduction_p (
     call c,         /* the call of interest */
     reduction *red) /* the returned reduction (if any) */
 {
-  list /* of expression */ le, 
-    /* of reference */ lr, 
-    /* of Preference */ lp;
-  expression elhs, erhs;
-  reference lhs, other;
-  tag op;
-  bool comm;
-  
-  // initialize the reduction update operator flag;
-  bool red_up_op = FALSE;
+  tag op; // The operator tag (sum, mul ...)
+  list le = NIL; // list of expression 
+  list lr = NIL; // list of reference
+  list lp = NIL; // list of Preference 
+  bool comm      = FALSE; // The commutatity operator flag
+  bool assign_op = FALSE; // The assign operator flag
+  bool update_op = FALSE; // The reduction update operator flag;
+  bool unary_op  = FALSE; // The reduction unary update operator flag;
+  entity fct = call_function(c); // the call function to test for reduction
+  reference  lhs   = reference_undefined;
+  reference  other = reference_undefined;
+  expression elhs  = expression_undefined;
+  expression erhs  = expression_undefined;
 
   pips_debug(7, "call to %s (%p)\n", entity_name(call_function(c)), s);
+
+  // First init the operation flags
+  // only check the operator type if the previous test failed
+  if ((assign_op = ENTITY_ASSIGN_P (fct)) == FALSE)
+    if ((update_op=extract_reduction_update_operator(fct, &op, &comm))==FALSE)
+      unary_op = extract_reduction_unary_update_operator (fct, &op);
+
+  // if no suitable operator have been found : return false
+  if ((unary_op == FALSE) && (update_op == FALSE) && (assign_op == FALSE))
+    return FALSE;
+
+  // get the left and rigth operand
+  le = call_arguments(c);
+  elhs = EXPRESSION(CAR(le));
+  //no right operand for unary operator
+  if (unary_op == FALSE) erhs = EXPRESSION(CAR(CDR(le)));    
+  pips_assert("lhs reference", syntax_reference_p(expression_syntax(elhs)));
+  lhs = syntax_reference(expression_syntax(elhs));
     
-  entity fct = call_function(c);
-  
-  // check if there is a reduction_update_operator
-  red_up_op = extract_reduction_update_operator (fct, &op, &comm);
+  // the lhs and rhs (if exits) must be functionnal
+  // (same location on different evaluations)
+  if (!functional_object_p((gen_chunk *) lhs)	||
+      ((unary_op == FALSE) && !functional_object_p((gen_chunk *) erhs)))
+    return FALSE;
+  pips_debug(8, "lhs and rhs are functional\n");
+ 
+  // Check that the operation performed is valid for a reduction,
+  // The check is useless for reduction update and unary operator because
+  // already done previously by "extract_reduction_update_operator" and
+  // "extract_reduction_unary_update_operator"
+  if ((unary_op == FALSE) && (update_op == FALSE) &&
+      (extract_reduction_operator(erhs, &op, &comm) == FALSE))
+    return FALSE;
+  pips_debug(8, "reduction operator %s\n", reduction_operator_tag_name(op));
 
-  if ((red_up_op == TRUE) || (ENTITY_ASSIGN_P (fct))) {
-
-    le = call_arguments(c);
-    pips_assert("two arguments", gen_length(le)==2);
-    elhs = EXPRESSION(CAR(le));
-    erhs = EXPRESSION(CAR(CDR(le)));
-    
-    pips_assert("lhs reference", syntax_reference_p(expression_syntax(elhs)));
-    lhs = syntax_reference(expression_syntax(elhs));
-    
-    /* the lhs and rhs must be functionnal
-     * (same location on different evaluations)
-     */
-    if (!functional_object_p((gen_chunk *) lhs)
-	|| !functional_object_p((gen_chunk *) erhs))
-      return FALSE;
-    pips_debug(8, "lhs and rhs are functional\n");
-
-    // Check that the operation performed is valid for a reduction,
-    // The check is useless for reduction update operator because
-    // already done previously by "extract_reduction_update_operator"
-    if ((red_up_op == FALSE) && (!extract_reduction_operator(erhs, &op, &comm)))
-      return FALSE;
-    pips_debug(8, "reduction operator %s\n", reduction_operator_tag_name(op));
-
-    /* there should be another direct reference as lhs
-     * !!! syntax is a call if extract_reduction_operator returned TRUE
-     */
-    if (!equal_reference_in_expression_p(lhs, erhs, op, red_up_op, &other))
+  // there should be another direct reference to lhs if not unary
+  // !!! syntax is a call if extract_reduction_operator returned TRUE
+  if (unary_op == FALSE) {
+    if (!equal_reference_in_expression_p(lhs, erhs, op, update_op, &other))
       return FALSE;
     pips_debug(8, "matching reference found (%p)\n", other);
-    
-    /* there should be no extract effects on the reduced variable
-     */
-    if (red_up_op == TRUE)
-      lr = CONS(REFERENCE, lhs, NIL);
-    else 
-      lr = CONS(REFERENCE, lhs, CONS(REFERENCE, other, NIL));
-    
-    pips_debug(7,"list lr is: %p and %p\n", other, lhs); 
-
-    if (!no_other_effects_on_references(s, lr))
-      {
-	gen_free_list(lr);
-	return FALSE;
-      }
-    /* lr is used latter on */
-    pips_debug(8, "no other effects\n");
-
-    lp = NIL;
-    MAP(REFERENCE, r, lp = CONS(PREFERENCE, make_preference(r), lp), lr);
-    gen_free_list(lr), lr = NIL;
-
-    /* well, it is ok for a reduction now! 
-     */
-    *red = make_reduction(copy_reference(lhs),
-			  make_reduction_operator(op, UU), 
-			  referenced_variables(lhs),
-			  lp);
-
-    DEBUG_REDUCTION(7, "returning\n", *red);
-    return TRUE;
   }
-  return FALSE;    
+
+  // build the list of found reference to the reduced variable
+  if ((update_op == TRUE) || (unary_op == TRUE))
+    lr = CONS(REFERENCE, lhs, NIL);
+  else 
+    lr = CONS(REFERENCE, lhs, CONS(REFERENCE, other, NIL));  
+  pips_debug(7,"list lr is: %p and %p\n", other, lhs); 
+  // there should be no extra effects on the reduced variable
+  if (!no_other_effects_on_references (s, lr)) {
+    gen_free_list(lr);
+    return FALSE;
+  }
+  pips_debug(8, "no other effects\n");
+  
+  MAP(REFERENCE, r, lp = CONS(PREFERENCE, make_preference(r), lp), lr);
+  gen_free_list(lr), lr = NIL;
+  
+  // well, it is ok for a reduction now! 
+  *red = make_reduction(copy_reference(lhs),
+			make_reduction_operator(op, UU), 
+			referenced_variables(lhs),
+			lp);
+  
+  DEBUG_REDUCTION(7, "returning\n", *red);
+  return TRUE;
 }
