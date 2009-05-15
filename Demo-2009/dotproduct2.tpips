@@ -1,0 +1,80 @@
+
+delete dotproduct
+create dotproduct dotproduct.f
+
+setproperty	PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+module DOTPRODUCT
+display PRINTED_FILE
+shell cp dotproduct.database/DOTPRODUCT/DOTPRODUCT.pref DOTPRODUCT01.f
+#
+
+#apply SIMD_REMOVE_REDUCTIONS
+#display PRINTED_FILE
+
+#activate   PRINT_CODE_CUMULATED_REDUCTIONS
+#display PRINTED_FILE
+
+
+apply UNROLL
+100
+3
+
+display PRINTED_FILE
+shell cp dotproduct.database/DOTPRODUCT/DOTPRODUCT.pref DOTPRODUCT02.f
+
+# permet d'eliminer les multiplications par 1 et les additions de 0
+apply PARTIAL_EVAL 
+display PRINTED_FILE
+shell cp dotproduct.database/DOTPRODUCT/DOTPRODUCT.pref DOTPRODUCT03.f
+
+# node splitting
+apply NEW_ATOMIZER
+display PRINTED_FILE
+shell cp dotproduct.database/DOTPRODUCT/DOTPRODUCT.pref DOTPRODUCT04.f
+
+apply USE_DEF_ELIMINATION
+display PRINTED_FILE
+shell cp dotproduct.database/DOTPRODUCT/DOTPRODUCT.pref DOTPRODUCT05.f
+
+module DEMO1
+display PRINTED_FILE
+#
+
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate PRECONDITIONS_INTER_FULL 
+activate TRANSFORMERS_INTER_FULL  
+
+
+
+module DOTPRODUCT
+apply PARTIAL_EVAL 
+# l'operateur modulo n'est pas pris en compte precisement par les preconditions
+apply PARTIAL_EVAL 
+
+display PRINTED_FILE
+shell cp dotproduct.database/DOTPRODUCT/DOTPRODUCT.pref DOTPRODUCT06.f
+
+# suppression de la boucle vide du prologue
+apply SUPPRESS_DEAD_CODE
+display PRINTED_FILE
+shell cp dotproduct.database/DOTPRODUCT/DOTPRODUCT.pref DOTPRODUCT07.f
+
+# suppression des calculs de la borne de boucle
+apply USE_DEF_ELIMINATION
+display PRINTED_FILE
+shell cp dotproduct.database/DOTPRODUCT/DOTPRODUCT.pref DOTPRODUCT08.f
+
+
+setproperty PRETTYPRINT_ALL_DECLARATIONS TRUE
+apply USE_DEF_ELIMINATION
+display PRINTED_FILE
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE
+
+# Ne pas appliquer - retour en arriere
+#apply FORWARD_SUBSTITUTE
+#display PRINTED_FILE
+close
+quit
