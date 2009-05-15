@@ -94,6 +94,30 @@ int main()
    for(i = 0; i <= 99; i += 1)
 //  call prod[y],
       y = y/x;
+//  loop sum[b],
+   
+   // b should be reduced here
+   for(i = 0; i <= 99; i += 1)
+//  call sum[b],
+      b++;
+//  loop sum[b],
+   
+   // b should be reduced here
+   for(i = 0; i <= 99; i += 1)
+//  call sum[b],
+      b--;
+//  loop sum[b],
+   
+   // b should be reduced here
+   for(i = 0; i <= 99; i += 1)
+//  call sum[b],
+      ++b;
+//  loop sum[b],
+   
+   // b should be reduced here
+   for(i = 0; i <= 99; i += 1)
+//  call sum[b],
+      --b;
 
    return 0;
 }
