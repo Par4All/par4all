@@ -1,0 +1,132 @@
+int main()
+{
+   int a[100];
+   int i;
+   int j;
+   
+   // A do loop ! Should be parallel.
+   for (j = 10;j>0;j = -4+j)                                            /*0007*/
+      a[j] = 2;                                                         /*0008*/
+
+   return 0;                                                            /*0010*/
+}
+
+After for to do loop conversion
+
+int main()
+{
+   int a[100];
+   int i;
+   int j;
+   
+   // A do loop ! Should be parallel.
+   for(j = 10; j >= 1; j += -4)                                         /*0007*/
+      a[j] = 2;                                                         /*0008*/
+
+   return 0;                                                            /*0010*/
+}
+
+Proper effects for "main"
+
+int main()
+{
+   int a[100];
+   int i;
+   int j;
+//               <must be written>: j
+   
+   // A do loop ! Should be parallel.
+   for(j = 10; j >= 1; j += -4)                                         /*0007*/
+//               <must be read   >: j
+//               <must be written>: a[j]
+      a[j] = 2;                                                         /*0008*/
+
+   return 0;                                                            /*0010*/
+}
+
+Cumulated effects for "main"
+
+int main()
+{
+   int a[100];
+   int i;
+   int j;
+//               <may be read    >: j
+//               <may be written >: a[*]
+//               <must be written>: j
+   
+   // A do loop ! Should be parallel.
+   for(j = 10; j >= 1; j += -4)                                         /*0007*/
+//               <may be written >: a[*]
+//               <must be read   >: j
+      a[j] = 2;                                                         /*0008*/
+
+   return 0;                                                            /*0010*/
+}
+
+Transformers for "main"
+
+
+//  T(main) {main==0}
+
+int main()
+{
+   int a[100];
+   int i;
+   int j;
+
+//  T(j) {j<=10}
+
+   
+   // A do loop ! Should be parallel.
+   for(j = 10; j >= 1; j += -4)                                         /*0007*/
+
+//  T() {1<=j, j<=10}
+
+      a[j] = 2;                                                         /*0008*/
+
+//  T(main) {main==0, 0<=j+3, j<=0}
+
+
+   return 0;                                                            /*0010*/
+}
+
+Preconditions for "main"
+
+
+//  P() {}
+
+int main()
+{
+   int a[100];
+   int i;
+   int j;
+
+//  P() {}
+
+   
+   // A do loop ! Should be parallel.
+   for(j = 10; j >= 1; j += -4)                                         /*0007*/
+
+//  P(j) {1<=j, j<=10}
+
+      a[j] = 2;                                                         /*0008*/
+
+//  P(j) {0<=j+3, j<=0}
+
+
+   return 0;                                                            /*0010*/
+}
+int main()
+{
+   int a[100];
+   int i;
+   int j;
+   
+   // A do loop ! Should be parallel.
+#pragma omp parallel for 
+   for(j = 10; j >= 1; j += -4)                                         /*0007*/
+      a[j] = 2;                                                         /*0008*/
+
+   return 0;                                                            /*0010*/
+}
