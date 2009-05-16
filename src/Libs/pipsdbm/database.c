@@ -53,7 +53,8 @@ static bool simple_name_p(const string name)
 static db_symbol find_or_create_db_symbol(const string name)
 {
     db_symbol s = gen_find_tabulated(name, db_symbol_domain);
-    if (!simple_name_p(name)) pips_user_warning("strange name \"%s\"\n", name);
+    if (!simple_name_p(name)) 
+      pips_user_warning("strange name \"%s\"\n", name);
     return db_symbol_undefined_p(s)? make_db_symbol(strdup(name)): s;
 }
 
