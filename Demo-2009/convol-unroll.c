@@ -1,17 +1,18 @@
-int main() //      program image_processing
-{
-  //     goal: show effect of cloning, partial evaluation and loop unrolling
-  //     and reduction parallelization for a Power architecture
+//     goal: show effect of cloning, partial evaluation and loop unrolling
+//     and reduction parallelization for a Power architecture
 
-  //     kernel_size must be even? odd?
+//     kernel_size must be odd
 #define image_size 512
 #define kernel_size 3
 #define nsteps 20
+
+void convol();
+
+int main() //      program image_processing
+{
   float image[image_size][image_size];
   float new_image[image_size][image_size];
   float kernel[kernel_size][kernel_size];
-
-  void convol();
 
   int i, j, n;
 
@@ -29,8 +30,8 @@ int main() //      program image_processing
 
 
   for( n = 0; n< nsteps; n++) {
-    convol(new_image, image, image_size, image_size, 
-	   kernel, kernel_size, kernel_size);
+    convol(image_size, image_size, new_image, image,
+	   kernel_size, kernel_size, kernel);
       }
 
   //     print *, new_image
