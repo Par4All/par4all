@@ -89,7 +89,7 @@ bool (*loop_predicate)();
 	look_for_nested_loop_statements(ss, loop_transformation, loop_predicate);
 	for(b1 = CDR(b); !ENDP(b1); b1 = CDR(b1)) {
 	    ss = STATEMENT(CAR(b1));
-	    look_for_nested_loop_statements(ss,loop_transformation, loop_predicate);
+	    look_for_nested_loop_statements(ss, loop_transformation, loop_predicate);
 	}
 	break;
 
@@ -101,9 +101,27 @@ bool (*loop_predicate)();
 	tt = instruction_test(i);
 	true_s = test_true(tt);
 	false_s= test_false(tt);
-	look_for_nested_loop_statements(true_s,loop_transformation, loop_predicate);
-	look_for_nested_loop_statements(false_s,loop_transformation, loop_predicate);
+	look_for_nested_loop_statements(true_s, loop_transformation, loop_predicate);
+	look_for_nested_loop_statements(false_s, loop_transformation, loop_predicate);
 	break;
+
+    case is_instruction_whileloop: {
+
+	whileloop wl = instruction_whileloop(i);
+	statement body = whileloop_body(wl);
+
+	look_for_nested_loop_statements(body, loop_transformation, loop_predicate);
+	break;
+    }
+
+    case is_instruction_forloop: {
+
+	forloop fl = instruction_forloop(i);
+	statement body = forloop_body(fl);
+
+	look_for_nested_loop_statements(body, loop_transformation, loop_predicate);
+	break;
+    }
 
     case is_instruction_unstructured:
 	look_for_nested_loops_unstructured(instruction_unstructured(i),loop_transformation, loop_predicate);
