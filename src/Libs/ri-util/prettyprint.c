@@ -498,6 +498,12 @@ words_loop_range(range obj)
     return(pc);
 }
 
+
+/* Output a Fortan-like do-loop range as a C-like for-loop index part.
+   Assume that the increment is an integer so we can generate the good
+   condition. Since the do-loops are recognized in C program part only
+   with this assumptions, it is a good assumption.
+*/
 list C_loop_range(range obj, entity i)
 {
     list pc;
@@ -509,21 +515,31 @@ list C_loop_range(range obj, entity i)
 
     /* Check the final bound */
     pc = CHAIN_SWORD(pc, entity_user_name(i));
-    /* increasing or decreasing index? To be done later */
-    pc = CHAIN_SWORD(pc," <= ");
+
+    /* Increasing or decreasing index? */
+    expression inc = range_increment(obj);
+    // Assume the increment has an integer value with a known sign
+    if (expression_negative_integer_value_p(inc))
+      /* The increment is negative, that means the index is tested against
+	 a lower bound: */
+      pc = CHAIN_SWORD(pc," >= ");
+    else
+      /* Else we assume to test against an upper bound: */
+      pc = CHAIN_SWORD(pc," <= ");
+
     pc = gen_nconc(pc, words_subexpression(range_upper(obj), 0, TRUE));
     pc = CHAIN_SWORD(pc,"; ");
 
     /* Increment the loop index */
     pc = CHAIN_SWORD(pc, entity_user_name(i));
     pc = CHAIN_SWORD(pc," += ");
-    pc = gen_nconc(pc, words_expression(range_increment(obj)));
+    pc = gen_nconc(pc, words_expression(inc));
     pc = CHAIN_SWORD(pc,")");
 
     return(pc);
 }
 
-list /* of string */ 
+list /* of string */
 words_range(range obj)
 {
     list pc = NIL ;

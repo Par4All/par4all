@@ -484,18 +484,23 @@ int trivial_expression_p(expression e)
 }
 
 
-/* Test if an expression is a verbose incrementation of the form "i = i +
-  v"
-
-  Do not if v is positive or negative (it may not make any sense...).
+/* Test if an expression is a verbose reduction of the form :
+   "i = i op v" or "i = v op i"
 
   @param e is the expression to analyse
+
+  @param filter is a function that take an expression and return TRUE iff
+  expression is of the form "op(a,b,c...)". The filter may not be specific
+  to binary operators, even if this function only deal with binary
+  patterns. Use for example add_expression_p() to detect "i = i + v" or "i
+  = v + i".
 
   @return the v expression if e is of the requested form or
   expression_undefined if not
  */
 expression
-expression_verbose_incrementation_p_and_return_increment(expression incr) {
+expression_verbose_reduction_p_and_return_increment(expression incr,
+						    bool filter(expression)) {
   if (assignment_expression_p(incr)) {
     /* The expression is an assignment, it is a good start. */
     list assign_params = call_arguments(syntax_call(expression_syntax(incr)));
@@ -504,9 +509,9 @@ expression_verbose_incrementation_p_and_return_increment(expression incr) {
     /* Only deal with simple references right now: */
     if (expression_reference_p(lhs)) {
       expression rhs = EXPRESSION(CAR(CDR(assign_params)));
-      if (add_expression_p(rhs)) {
+      if (filter(rhs)) {
 	/* Operation found. */
-	list op_params = call_arguments(syntax_call(expression_syntax(incr)));
+	list op_params = call_arguments(syntax_call(expression_syntax(rhs)));
 	/* Only deal with binary operators */
 	if (gen_length(op_params) == 2) {
 	  expression arg1 = EXPRESSION(CAR(op_params));
@@ -671,14 +676,16 @@ bool assignment_expression_p(expression e) {
 /* Test if an expression is an addition.
  */
 bool add_expression_p(expression e) {
-  return operator_expression_p(e, PLUS_OPERATOR_NAME);
+  return operator_expression_p(e, PLUS_OPERATOR_NAME)
+    || operator_expression_p(e, PLUS_C_OPERATOR_NAME);
 }
 
 
 /* Test if an expression is an substraction.
  */
 bool substraction_expression_p(expression e) {
-  return operator_expression_p(e, MINUS_OPERATOR_NAME);
+  return operator_expression_p(e, MINUS_OPERATOR_NAME)
+    || operator_expression_p(e, MINUS_C_OPERATOR_NAME);
 }
 
 
@@ -774,11 +781,11 @@ string op_name;
 }
 
 expression  make_true_expression()
-{ 
+{
   return make_call_expression(MakeConstant(TRUE_OPERATOR_NAME,is_basic_logical),NIL);
 }
 
-expression make_false_expression() 
+expression make_false_expression()
 {
   return make_call_expression(MakeConstant(FALSE_OPERATOR_NAME,is_basic_logical),NIL);
 }

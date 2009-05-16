@@ -524,13 +524,14 @@ ipow(int vg, int vd)
 
 	return(i);
 }
-
-/* 
+
+
+/*
   computes the value of an integer expression.
   returns TRUE if an integer value has been found and placed in pval.
   returns FALSE otherwise.
 */
-bool 
+bool
 expression_integer_value(expression e, int * pval)
 {
     bool is_int = FALSE;
@@ -545,11 +546,21 @@ expression_integer_value(expression e, int * pval)
     return is_int;
 }
 
+
+/* Return TRUE iff the expression has an integer value and this value is
+   negative.
+*/
+bool
+expression_negative_integer_value_p(expression e) {
+  int v;
+  return expression_integer_value(e, &v) && (v < 0);
+}
+
+
 /* The range count only can be evaluated if the three range expressions
  * are constant and if the increment is non zero. On failure, a zero
  * count is returned. See also SizeOfRange().
  */
-
 bool
 range_count(range r, int * pcount)
 {
@@ -568,7 +579,7 @@ range_count(range r, int * pcount)
 	    * pcount = ((u-l)/inc)+1;
 	}
 
-	if(* pcount < 0) 
+	if(* pcount < 0)
 	    *pcount = 0;
 
 	success = TRUE;
@@ -581,13 +592,14 @@ range_count(range r, int * pcount)
     return success;
 }
 
+
 /* returns TRUE if v is not NULL and is constant */
 /* I make it "static" because it conflicts with a Linear library function.
  * Both functions have the same name but a slightly different behavior.
  * The Linear version returns 0 when a null vector is passed as argument.
  * Francois Irigoin, 16 April 1990
  */
-static bool 
+static bool
 vect_const_p(Pvecteur v)
 {
     pips_assert("vect_const_p", v != NULL);

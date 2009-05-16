@@ -1363,11 +1363,14 @@ unspaghettify_or_restructure_statement(statement mod_stmt)
 
     /* If something changed, retry further restructuring: */
     nr = total_number_of_restructurations();
+    ifdebug(2)
+      display_unspaghettify_statistics();
   } while (nr != old_nr);
+
+  pips_debug(2, "done\n");
 
   display_unspaghettify_statistics();
 
-  pips_debug(2, "done\n");
   debug_off();
   // Note that this debug is not controlled by "UNSPAGHETTIFY_DEBUG_LEVEL":
   ifdebug(5) {
