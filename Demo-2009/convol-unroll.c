@@ -28,7 +28,7 @@ int main() //      program image_processing
   }
 
 
-  for( n = 0; i< nsteps; n++) {
+  for( n = 0; n< nsteps; n++) {
     convol(new_image, image, image_size, image_size, 
 	   kernel, kernel_size, kernel_size);
       }
@@ -47,15 +47,15 @@ void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj],
 
   int i, j, ki, kj;
  
-  for(i = 0; i< isi; isi++) {
-    for(j = 0; i< isj; isj++) {
+  for(i = 0; i< isi; i++) {
+    for(j = 0; j< isj; j++) {
       new_image[i][j] = image[i][j];
     }
   }
       
 
  l400: for(i =  ksi/2; i<isi - ksi/2; i++) {
- l300: for(j =  ksj/2; i<isj - ksj/2; j++) {
+ l300: for(j =  ksj/2; j<isj - ksj/2; j++) {
    new_image[i][j] = 0.;
  l200: for(ki = 0; ki<ksi; ki++) {
  l100: for(kj = 0; kj<ksj; kj++) {
