@@ -12,10 +12,10 @@ foo=modules["foo"]
 bar=modules["bar"]
 
 # and apply transformation to modules
-bar.apply("inlining")
+foo.apply("inlining")
 
 # code gives us a list of line view of modue's code
-bar.code()
+foo.code()
 
 #the good old display, default to PRINTED_FILE, but you can give args
 foo.display()
@@ -45,7 +45,7 @@ if labels:
 foo.save()
 
 #funny way to save the whole file
-module("test").save("test2.c")
+module("test","test.c").save("test2.c")
 
 # close *and* delete the workspace
 close()

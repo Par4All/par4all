@@ -27,19 +27,17 @@ entity selected_label;
 
 bool selected_loop_p(loop l)
 {
-    return loop_label(l) == selected_label;
+    return loop_label(l) == selected_label ;
 }
 
 bool interactive_loop_transformation(string module_name,
 				     statement (*loop_transformation)(list))
 {
-    char lp_label[6];
+    char *lp_label=NULL;
     entity module = module_name_to_entity(module_name);
     statement s = statement_undefined;
     string resp = string_undefined;
     bool return_status = FALSE;
-
-    set_current_module_entity(module);
 
     pips_assert("interactive_loop_transformation", entity_module_p(module));
 
@@ -48,37 +46,59 @@ bool interactive_loop_transformation(string module_name,
        a new version will be put back in the data base after transforming
        the loops */
     s = (statement) db_get_memory_resource(DBR_CODE, module_name, TRUE);
+    set_current_module_entity(module);
+    set_current_module_statement(s);
 
     /* Get the loop label from the user */
-    resp = user_request("Which loop do you want to transform?\n"
-			"(give its label): ");
-    if (resp[0] == '\0') {
-	user_log("Interactive loop transformation has been cancelled.\n");
-	return_status = FALSE;
+    if( empty_string_p(get_string_property("LOOP_LABEL")) )
+    {
+        resp = user_request("Which loop do you want to transform?\n"
+                "(give its label): ");
+        if (resp[0] == '\0') {
+            user_log("Interactive loop transformation has been cancelled.\n");
+            return_status = FALSE;
+        }
+        else {
+            if( (lp_label=malloc(strlen(resp)+1)) == NULL)
+                pips_internal_error("not enough memory");
+            sscanf(resp, "%s", lp_label);
+        }
     }
-    else {    
-	sscanf(resp, "%s", lp_label);
-	selected_label = find_label_entity(module_name, lp_label);
-	if (selected_label==entity_undefined) {
-	    pips_user_error("loop label `%s' does not exist\n", lp_label);
-	}
-
-	debug_on("INTERACTIVE_LOOP_TRANSFORMATION_DEBUG_LEVEL");
-
-	look_for_nested_loop_statements(s, loop_transformation, selected_loop_p);
-
-	debug_off();
-
-	/* Reorder the module, because new statements have been generated. */
-	module_reorder(s);
-
-	DB_PUT_MEMORY_RESOURCE(DBR_CODE, 
-			       strdup(module_name), 
-			       (char*) s);
-	return_status = TRUE;
+    else
+    {
+        lp_label = get_string_property("LOOP_LABEL");
+        if( string_undefined_p( lp_label ) )
+        {
+             pips_user_error("please set %s  property to a valid label\n");
+        }
+        else
+            lp_label=strdup(lp_label); // to keep allocation consistency betwwen interactive / non interactive
     }
 
+    if(lp_label)
+    {
+        selected_label = find_label_entity(module_name, lp_label);
+        if (selected_label==entity_undefined) {
+            pips_user_error("loop label `%s' does not exist\n", lp_label);
+        }
+        free(lp_label);
+
+        debug_on("INTERACTIVE_LOOP_TRANSFORMATION_DEBUG_LEVEL");
+
+        look_for_nested_loop_statements(s, loop_transformation, selected_loop_p);
+
+        debug_off();
+
+        /* Reorder the module, because new statements have been generated. */
+        module_reorder(s);
+
+        DB_PUT_MEMORY_RESOURCE(DBR_CODE, 
+                strdup(module_name), 
+                (char*) s);
+        return_status = TRUE;
+    }
     reset_current_module_entity();
+    reset_current_module_statement();
     
     return return_status;
 }

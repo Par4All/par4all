@@ -51,32 +51,28 @@ Pbase *base_newindex;
 entity make_index_prime_entity(old_index)
 entity old_index;
 {
-    entity new_index;
-    string old_name;
-    // FI: 16 was way too little...
-    char *new_name = (char*) malloc(160);
+	entity new_index;
+	string old_name;
+	// FI: 16 was way too little...
+	char *new_name=NULL;
 
-    old_name = entity_name(old_index);
+	old_name = entity_name(old_index);
 
-    /* add a terminal p till a new name is found. */
-    for (sprintf(new_name, "%s%s", old_name, "p");
-         gen_find_tabulated(new_name, entity_domain)!=entity_undefined; 
+	/* add a terminal p till a new name is found. */
+	for (asprintf(&new_name, "%s%s", old_name, "p");
+			gen_find_tabulated(new_name, entity_domain)!=entity_undefined; 
 
-         old_name = new_name) {
-        sprintf(new_name, "%s%s", old_name, "p");
-    }
- 
-    new_index = make_entity(strdup(new_name),
-			   copy_type(entity_type(old_index)),
-			   /* Should be AddVariableToCommon(DynamicArea) or
-			      something similar! */
-			   copy_storage(entity_storage(old_index)),
-			   copy_value(entity_initial(old_index)));
-    if(strlen(new_name)>159)
-      pips_internal_error("Allocated buffer is too small");
-    free(new_name);
+			old_name = new_name) {
+		free(new_name);
+		asprintf(&new_name, "%s%s", old_name, "p");
+	}
 
-    return(new_index);
+	new_index = make_entity(new_name,
+			copy_type(entity_type(old_index)),
+			copy_storage(entity_storage(old_index)),
+			copy_value(entity_initial(old_index)));
+	AddEntityToCurrentModule(new_index);
+	return(new_index);
 }
 
 entity make_index_entity(old_index)

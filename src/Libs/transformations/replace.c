@@ -17,6 +17,7 @@
 
 #include "pipsdbm.h"
 #include "resources.h"
+#include "preprocessor.h"
 /* #include "loop_normalize.h" */
 
 #include "transformations.h"

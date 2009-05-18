@@ -5249,6 +5249,15 @@ more flexible and to allow dialogues between a transformation and the user.
 
 \section{Loop Transformations}
 
+\subsection{Introduction}
+\index{LOOP\_LABEL}
+
+Most loop transformations require the user to give a valid loop label to locate the loop to be transformed.
+This is done interactively or by setting the following property to the valid label:
+\begin{PipsProp}
+LOOP_LABEL ""
+\end{PipsProp}
+
 \subsection{Loop Distribution}
 \label{subsection-loop-distribution}
 \index{Loop Distribution}
@@ -5291,7 +5300,7 @@ PARTIAL_DISTRIBUTION FALSE
 \index{Index Set Splitting}
 %%@UserManualDocumentation: loop_peeling
 Index Set Splitting (Loop peeling) splits the loop referenced by
-property \lstinline|LOOP_PEELING_LOOP_LABEL| into two loops.  The
+property \lstinline|LOOP_LABEL| into two loops.  The
 first loop ends at an iteration designated by property
 \lstinline|LOOP_PEELING_BOUND| and the second start therafter.  It
 currently only works for do loops.  This transformation is always
@@ -5308,12 +5317,9 @@ loop_peeling      > MODULE.code
 \end{PipsMake}
 
 
-Loop peeling \emph{requires} the two following globals to be set :
+Loop peeling \emph{requires} the following globals to be set :
 \begin{itemize}
-    \item \lstinline|LOOP_PEELING_LOOP_LABEL| is the loop label
-\begin{PipsProp}
-LOOP_PEELING_LOOP_LABEL ""
-\end{PipsProp}
+    \item \lstinline|LOOP_LABEL| is the loop label
     \item \lstinline|LOOP_PEELING_BOUND| is the splitting bound
 \begin{PipsProp}
 LOOP_PEELING_BOUND ""
@@ -5354,6 +5360,12 @@ unroll                          > MODULE.code
         < MODULE.code
 \end{PipsMake}
 
+Use \lstinline|LOOP_LABEL| and \lstinline|UNROLL_RATE| if you don't want to unroll interactively
+\begin{PipsProp}
+UNROLL_RATE 0
+\end{PipsProp}
+
+
 \subsubsection{Full Loop Unroll}
 
 %%@UserManualDocumentation: full_unroll
@@ -5388,6 +5400,9 @@ Full loop unrolling is applied one loop at a time by default. The user
 must specify the loop label. This default feature can be turned off
 and all loops with constant loop bounds and constant increment are
 fully unrolled. 
+
+Use \lstinline|LOOP_LABEL| to pass the desired label if you don't want to give it interactively
+
 \begin{PipsProp}
 FULL_UNROLL_INTERACTIVELY TRUE
 \end{PipsProp}
@@ -5431,6 +5446,8 @@ loop_interchange                            > MODULE.code
         < PROGRAM.entities
         < MODULE.code
 \end{PipsMake}
+
+Property \lstinline|LOOP_LABEL| can be set to a loop label instead of using the default interactive method.
 
 \subsection{Hyperplane Method}
 \label{subsection-hyperplane-method}
@@ -6474,6 +6491,7 @@ The default behavior of inlining is to inline the given module in \textbf{all} c
 Use this property to filter the call sites: only given module names will be considered
 \begin{PipsProp}
 INLINING_CALLERS ""
+INLINING_PURGE_LABELS TRUE
 \end{PipsProp}
 
 %%%%%%%%%%

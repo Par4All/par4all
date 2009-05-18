@@ -23,6 +23,7 @@
 
 #include "arithmetique.h"
 #include "properties.h"
+#include "preprocessor.h"
 
 #include "transformations.h"
 
@@ -139,12 +140,13 @@ bool loop_peeling(char* module_name)
     set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, module_name, TRUE) );
 
     /* get the loop */
-    string loop_label = get_string_property("LOOP_PEELING_LOOP_LABEL");
+    string loop_label = get_string_property("LOOP_LABEL");
     entity loop_label_entity = entity_undefined;
     if( string_undefined_p( loop_label ) || 
             entity_undefined_p((loop_label_entity=find_label_entity(module_name, loop_label))) )
-        pips_user_error("please set LOOP_PEELING_LOOP_LABEL property to a valid label\n");
+        pips_user_error("please set LOOP_LABEL property to a valid label\n");
 
+    loop_statement=statement_undefined;
     gen_context_recurse(get_current_module_statement(), loop_label_entity, statement_domain, find_loop_from_label, gen_null);
     if(statement_undefined_p(loop_statement))
         pips_user_error("no statement with label %s found\n",loop_label);

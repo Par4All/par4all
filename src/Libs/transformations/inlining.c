@@ -399,8 +399,14 @@ instruction inline_expression_call(expression modified_expression, call callee)
             switch(syntax_tag(expression_syntax(from)))
             {
                 case is_syntax_reference:
-                    new = reference_variable(syntax_reference(expression_syntax(from)));
-                    break;
+                    {
+                        reference r = syntax_reference(expression_syntax(from));
+                        if( ENDP(reference_indices(r)))
+                            new = reference_variable(r);
+                        else {
+                            pips_user_error("unhandled case: passing array reference");
+                        }
+                    } break;
                     /* this one is more complicated than I thought,
                      * what of the side effect of the call ?
                      * we must create a new variable holding the call result before
@@ -593,8 +599,9 @@ inline_calls(char * module)
         pips_user_warning("failed to restructure after inlining");
 
     /* we can try to remove some labels now*/
-    if(!remove_useless_label(module))
-        pips_user_warning("failed to remove useless labels after restructure_control in inlining");
+    if( get_bool_property("INLINING_PURGE_LABELS"))
+    	if(!remove_useless_label(module))
+        	pips_user_warning("failed to remove useless labels after restructure_control in inlining");
 }
 
 /* build a textual representation of the modified module and update db

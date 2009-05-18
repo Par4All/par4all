@@ -50,13 +50,11 @@ distclean:clean
 
 check:sample.py all
 	python -c "import pypips"
-	./$<
+	python -c "import pyps"
+	PAGER=cat ./$<
 
 DOCSTRING=%%@UserManualDocumentation:
-pyps.py: ../../Documentation/pipsmake/pipsmake-rc.tex _pyps.py
+pyps.py: ../../Documentation/pipsmake/pipsmake-rc.tex _pyps.py pipsmakerc2python.pl
 	sed -n -e '1,/### helpers/ p' _pyps.py > $@
-	sed -n -e '/$(DOCSTRING)/ p' $< |\
-		sed -e 's/$(DOCSTRING) *//g' |\
-		sed -e 's/ /_/g' |\
-		sed -r -e 's/(.*)/\tdef \1(self):\n\t\tself.apply("\1")\n/g' >> $@
+	./pipsmakerc2python.pl $< >> $@
 	sed -n -e '/### helpers/,$$ p' _pyps.py >> $@

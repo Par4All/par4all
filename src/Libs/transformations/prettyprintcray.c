@@ -16,6 +16,8 @@
 #include "effects-simple.h"
 #include "pipsdbm.h"
 #include "prettyprint.h"
+#include "preprocessor.h"
+#include "expressions.h"
 
 #include "top-level.h"
 #include "resources.h"
