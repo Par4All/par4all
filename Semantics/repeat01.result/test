@@ -1,0 +1,88 @@
+
+Transformers for "repeat01"
+
+
+C  T(repeat01) {16<=repeat01}
+
+int repeat01()
+{
+   int i;
+   int j;
+   int n;
+
+//  T(i) {i==0}
+
+
+   i = 0;
+
+//  T(j) {j==1}
+
+   j = 1;
+
+//  T(n) {n==10}
+
+   n = 10;
+
+//  T(i,j) {2i+j#init==2i#init+j}
+
+   do {
+
+//  T(i) {i==i#init+1}
+
+      i++;
+
+//  T(j) {j==j#init+2}
+
+      j += 2;
+   }
+   while (j<n);
+
+//  T(repeat01) {i+j==repeat01}
+
+
+   return i+j;
+}
+
+Preconditions for "repeat01"
+
+
+//  P() {}
+
+int repeat01()
+{
+   int i;
+   int j;
+   int n;
+
+//  P() {}
+
+
+   i = 0;
+
+//  P(i) {i==0}
+
+   j = 1;
+
+//  P(i,j) {i==0, j==1}
+
+   n = 10;
+
+//  P(i,j,n) {i==0, j==1, n==10}
+
+   do {
+
+//  P(i,j,n) {2i==j-1, n==10, i<=4}
+
+      i++;
+
+//  P(i,j,n) {2i==j+1, n==10, i<=5}
+
+      j += 2;
+   }
+   while (j<n);
+
+//  P(i,j,n) {2i==j-1, n==10, 5<=i}
+
+
+   return i+j;
+}

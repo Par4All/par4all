@@ -1,0 +1,63 @@
+
+Transformers for "eval04"
+
+
+C  T() {}
+
+void eval04()
+{
+   int i;
+   int j;
+
+//  T(i) {i==7}
+
+
+   i = 3+4+0;
+
+//  T(i,j) {i<=509}
+
+
+   for (i = 1+2+0;i<511-1+0;i+++0)
+
+//  T(j) {j==2}
+
+      j = 2;
+}
+
+Preconditions for "eval04" (useless)
+
+
+//  P() {}
+
+void eval04()
+{
+   int i;
+   int j;
+
+//  P() {}
+
+
+   i = 3+4+0;
+
+//  P(i) {i==7}
+
+
+   for (i = 1+2+0;i<511-1+0;i+++0)
+
+//  P(i,j) {i<=509}
+
+      j = 2;
+}
+
+Code for "eval04" after partial evaluation
+
+void eval04()
+{
+   int i;
+   int j;
+
+   i = 7;
+
+   for (i = 3;i<510;i++)
+      j = 2;
+}

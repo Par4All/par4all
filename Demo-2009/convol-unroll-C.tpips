@@ -2,8 +2,11 @@
 # and by repetitive partial evaluation
 
 delete convol-unroll-C
+
 # create convol-unroll-C ${PIPS_ROOT}/Validation/Transformations/convol-unroll.c
 create convol-unroll-C convol-unroll.c
+
+setproperty ABORT_ON_USER_ERROR TRUE
 
 setproperty PRETTYPRINT_C_CODE TRUE
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
@@ -61,15 +64,15 @@ display PRINTED_FILE
 #
 apply USE_DEF_ELIMINATION
 display PRINTED_FILE
-# shell cp convol-unroll-C.database/convol/convol.pref convol04.c
+#shell cp convol-unroll-C.database/convol/convol.pref convol04.c
 
 # Simplify subscript expressions
 #
 apply PARTIAL_EVAL
 display PRINTED_FILE 
-# shell cp convol-unroll-C.database/convol/convol.pref convol05.c
+#shell cp convol-unroll-C.database/convol/convol.pref convol05.c
 
-# Increase locality
+# Increase locality: not a god idea in C but this shows PIPS works
 #
 apply LOOP_INTERCHANGE
 l400

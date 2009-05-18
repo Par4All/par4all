@@ -1,0 +1,58 @@
+
+Source code with proper effects
+
+void assign04()
+{
+   int i;
+//               <must be written>: i
+   
+   // This assignment works fine with transformers
+   //i = (i = 2) + 1;
+   
+   // Go around the problem with user_call_to_transformer()
+   //foo( i = (i = 2) + 1);
+   i = (i = 2)+1;                                                       /*0011*/
+//               <must be read   >: i
+   foo(i);                                                              /*0012*/
+}
+
+Source code with cumulated effects
+
+void assign04()
+{
+   int i;
+//               <must be written>: i
+   
+   // This assignment works fine with transformers
+   //i = (i = 2) + 1;
+   
+   // Go around the problem with user_call_to_transformer()
+   //foo( i = (i = 2) + 1);
+   i = (i = 2)+1;                                                       /*0011*/
+//               <must be read   >: i
+   foo(i);                                                              /*0012*/
+}
+
+Source code with transformers
+
+
+//  T() {}
+
+void assign04()
+{
+   int i;
+
+//  T(i) {i==3}
+
+   
+   // This assignment works fine with transformers
+   //i = (i = 2) + 1;
+   
+   // Go around the problem with user_call_to_transformer()
+   //foo( i = (i = 2) + 1);
+   i = (i = 2)+1;                                                       /*0011*/
+
+//  T(i) {i==i#init+1}
+
+   foo(i);                                                              /*0012*/
+}

@@ -1,0 +1,34 @@
+
+User FILE for "decl35"
+
+# 18
+void decl35(int i)
+{
+  i++;
+}
+
+PARSED PRINTED FILE for "decl35"
+
+void decl35(int i)
+{
+   i++;
+}
+
+PRINTED FILE for "decl35"
+
+void decl35(int i)
+{
+   i++;
+}
+
+Effects for "decl35"
+
+void decl35(int i)
+{
+//               <must be read   >: i
+//               <must be written>: i
+   i++;
+}
+
+Effects for "main"
+

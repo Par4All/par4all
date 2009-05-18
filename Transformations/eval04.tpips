@@ -1,0 +1,39 @@
+delete eval04
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create eval04 eval04.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+# We want to see what happens with C "for" loops
+# setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
+
+echo
+echo Transformers for "eval04"
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[eval04]
+
+echo
+echo Preconditions for "eval04" (useless)
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[eval04]
+
+echo
+echo Code for "eval04" after partial evaluation
+echo
+
+apply PARTIAL_EVAL
+activate PRINT_CODE
+display PRINTED_FILE[eval04]
+
+close eval04
+#delete eval04
+quit
+
