@@ -7,13 +7,17 @@ void assign04()
 //               <must be written>: i
    
    // This assignment works fine with transformers
-   //i = (i = 2) + 1;
+   i = (i = 2)+1;                                                       /*0007*/
+//               <must be written>: i
    
    // Go around the problem with user_call_to_transformer()
-   //foo( i = (i = 2) + 1);
-   i = (i = 2)+1;                                                       /*0011*/
+   foo(i = (i = 2)+1);                                                  /*0010*/
+//               <must be written>: i
+   
+   // As in:
+   i = (i = 2)+1;                                                       /*0013*/
 //               <must be read   >: i
-   foo(i);                                                              /*0012*/
+   foo(i);                                                              /*0014*/
 }
 
 Source code with cumulated effects
@@ -24,13 +28,17 @@ void assign04()
 //               <must be written>: i
    
    // This assignment works fine with transformers
-   //i = (i = 2) + 1;
+   i = (i = 2)+1;                                                       /*0007*/
+//               <must be written>: i
    
    // Go around the problem with user_call_to_transformer()
-   //foo( i = (i = 2) + 1);
-   i = (i = 2)+1;                                                       /*0011*/
+   foo(i = (i = 2)+1);                                                  /*0010*/
+//               <must be written>: i
+   
+   // As in:
+   i = (i = 2)+1;                                                       /*0013*/
 //               <must be read   >: i
-   foo(i);                                                              /*0012*/
+   foo(i);                                                              /*0014*/
 }
 
 Source code with transformers
@@ -46,13 +54,21 @@ void assign04()
 
    
    // This assignment works fine with transformers
-   //i = (i = 2) + 1;
+   i = (i = 2)+1;                                                       /*0007*/
+
+//  T(i) {i==3}
+
    
    // Go around the problem with user_call_to_transformer()
-   //foo( i = (i = 2) + 1);
-   i = (i = 2)+1;                                                       /*0011*/
+   foo(i = (i = 2)+1);                                                  /*0010*/
 
-//  T(i) {i==i#init+1}
+//  T(i) {i==3}
 
-   foo(i);                                                              /*0012*/
+   
+   // As in:
+   i = (i = 2)+1;                                                       /*0013*/
+
+//  T() {}
+
+   foo(i);                                                              /*0014*/
 }
