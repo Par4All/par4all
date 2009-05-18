@@ -16,6 +16,8 @@ Source code after loop interchange
 
 void loop_interchange01(int ni, int nj)
 {
+   int jp;
+   int ip;
    float x[n][n];
    int i;
    int j;

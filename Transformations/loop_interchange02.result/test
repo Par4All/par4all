@@ -18,6 +18,8 @@ Source code after loop interchange
 
 void loop_interchange02(int n, int ni, int nj, int nk)
 {
+   int kp;
+   int jp;
    float x[n][n][n];
    int i;
    int j;
