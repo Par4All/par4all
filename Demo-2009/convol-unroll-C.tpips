@@ -88,4 +88,20 @@ l400
 display PRINTED_FILE
 # shell cp convol-unroll-C.database/convol/convol.pref convol07.c
 
+# The code should be scalarized first...
+#
+shell echo missing scalarization
+
+# atomize
+#
+apply NEW_ATOMIZER
+display PRINTED_FILE
+# shell cp convol-unroll-C.database/convol/convol.pref convol08.c
+
+# Loop invariant code motion
+#
+apply INVARIANT_CODE_MOTION
+display PRINTED_FILE
+# shell cp convol-unroll-C.database/convol/convol.pref convol09.c
+
 quit
