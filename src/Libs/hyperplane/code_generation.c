@@ -80,7 +80,7 @@ Psysteme sc_newbase;
 			  make_execution(is_execution_sequential,UU),
 			  NIL);
 
-	bl = makeloopbody(l_hyp, s_loop);
+	bl = makeloopbody(l_hyp, s_loop, TRUE);
     }
     
     instr_lhyp = make_instruction(is_instruction_loop,l_hyp);
