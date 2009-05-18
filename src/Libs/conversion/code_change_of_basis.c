@@ -225,6 +225,42 @@ Pbase base_oldindex;
 	}
 	statement_newbase(loop_body(l),pvg,base_oldindex);
 	break;
+    case is_instruction_forloop: {
+	forloop fl = instruction_forloop(i);
+
+	e = forloop_initialization(fl);
+	e1 = expression_to_expression_newbase(e,pvg,base_oldindex);
+	if (e != e1) {
+	  forloop_initialization(fl) = e1;
+	  free_expression(e);
+	}
+	e = forloop_condition(fl);
+	e1 = expression_to_expression_newbase(e,pvg,base_oldindex);
+	if (e != e1) {
+	    forloop_condition(fl) = e1;
+	    free_expression(e);
+	}
+	e = forloop_increment(fl);
+	e1 = expression_to_expression_newbase(e,pvg,base_oldindex);
+	if (e != e1) {
+	    forloop_increment(fl) = e1;
+	    free_expression(e);
+	}
+	statement_newbase(forloop_body(fl),pvg,base_oldindex);
+	break;
+    }
+    case is_instruction_whileloop: {
+	whileloop wl = instruction_whileloop(i);
+
+	e = whileloop_condition(wl);
+	e1 = expression_to_expression_newbase(e,pvg,base_oldindex);
+	if (e != e1) {
+	  whileloop_condition(wl) = e1;
+	    free_expression(e);
+	}
+	statement_newbase(whileloop_body(wl),pvg,base_oldindex);
+	break;
+    }
     case is_instruction_goto:
 	statement_newbase(instruction_goto(i),pvg,base_oldindex);
     case is_instruction_call:

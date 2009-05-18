@@ -29,11 +29,9 @@
  * search  the  nested  loops  in the statement s
  *  
 */
-void 
-look_for_nested_loop_statements(s,loop_transformation, loop_predicate)
-statement s;
-statement (*loop_transformation)();
-bool (*loop_predicate)();
+void look_for_nested_loop_statements(statement s,
+				     statement (*loop_transformation)(list, bool (*)(bool)),
+				     bool (*loop_predicate)(loop))
 {
     instruction i;
     cons *b, *b1;
@@ -60,7 +58,8 @@ bool (*loop_predicate)();
 		debug_off();
 	    }
 
-	    new_s = look_for_inner_loops(l,list_loop_statement,
+	    new_s = look_for_inner_loops(l,
+					 list_loop_statement,
 					 loop_transformation, 
 					 loop_predicate);
 	    
@@ -124,7 +123,9 @@ bool (*loop_predicate)();
     }
 
     case is_instruction_unstructured:
-	look_for_nested_loops_unstructured(instruction_unstructured(i),loop_transformation, loop_predicate);
+	look_for_nested_loops_unstructured(instruction_unstructured(i),
+					   loop_transformation,
+					   loop_predicate);
 	break;
 
     case is_instruction_goto:
@@ -136,11 +137,11 @@ bool (*loop_predicate)();
     }
 }
 
-statement look_for_inner_loops(l,sl,loop_transformation, loop_predicate)
-loop l;
-cons *sl;
-statement (*loop_transformation)();
-bool (*loop_predicate)();
+/* FI: I do not understand how debug levels are managed... They should be factored out. */
+statement look_for_inner_loops(loop l,
+			       list sl,
+			       statement (*loop_transformation)(list, bool (*)(loop)),
+			       bool (*loop_predicate)(loop))
 
 {
     statement lb = loop_body(l);
@@ -161,7 +162,6 @@ bool (*loop_predicate)();
 	li = instruction_loop(i);
 	sl = CONS(STATEMENT,lb,sl);
 	new_s = look_for_inner_loops(li,sl,loop_transformation, loop_predicate);
-	return(new_s);
 	break;
 
     case is_instruction_block:
@@ -173,7 +173,7 @@ bool (*loop_predicate)();
 	    /* i is an inner loop, append it to the list of loops */
 	    li = instruction_loop(i);
 	    sl = CONS(STATEMENT,ss,sl);
-    	    new_s = look_for_inner_loops(li,sl,loop_transformation, loop_predicate);
+    	    new_s = look_for_inner_loops(li, sl, loop_transformation, loop_predicate);
 	}
 	else {				
 	    /*there are no more nested loops */
@@ -188,7 +188,6 @@ bool (*loop_predicate)();
 	    ss = STATEMENT(CAR(b1));
 	    look_for_nested_loop_statements(ss,loop_transformation, loop_predicate);
 	}
-	return(new_s);
 	break;
 
 
@@ -203,23 +202,38 @@ bool (*loop_predicate)();
 	debug_on("ZERO_DEBUG_LEVEL");
 	new_s = (*loop_transformation)(sl,loop_predicate);
 	debug_off();
-	return(new_s);
 	break;
 
+    case is_instruction_whileloop: {
+      statement body = whileloop_body(instruction_whileloop(i));
+
+      look_for_nested_loop_statements(body, loop_transformation, loop_predicate);
+      new_s = (*loop_transformation)(sl,loop_predicate);
+      break;
+    }
+
+    case is_instruction_forloop: {
+      statement body = forloop_body(instruction_forloop(i));
+
+      look_for_nested_loop_statements(body, loop_transformation, loop_predicate);
+      new_s = (*loop_transformation)(sl,loop_predicate);
+      break;
+    }
     case is_instruction_goto:
 
-	pips_error("look_for_inner_loop","unexpected goto");
+	pips_internal_error("unexpected goto");
 
     case is_instruction_call:
 	debug_on("ZERO_DEBUG_LEVEL");
 	new_s = (*loop_transformation)(sl,loop_predicate);
 	debug_off();
 
-	return(new_s);
 	break;
 
     case is_instruction_unstructured:
 
+      /* FI: I do not understand this piece of code. I expect a
+	 look_for_nested_loop_statements(). */
 	unst =instruction_unstructured(i);
 	ss=control_statement(unstructured_control(unst));
 	i = statement_instruction(ss);
@@ -234,15 +248,13 @@ bool (*loop_predicate)();
 	    debug_off();
 	    break;
 	}
-	return(new_s);
 	break;
 
     default:
-	pips_error("look_for_inner_loop",
-		   "unexpected tag %d\n",instruction_tag(i));
+	pips_internal_error("unexpected tag %d\n",instruction_tag(i));
     }
 
-    return(statement_undefined); /* just to avoid a gcc warning */
+    return new_s;
 }
 
 
@@ -261,10 +273,9 @@ cons *sl;
  *  search the nested loops contained in the 
  * unstructured u
  */
-void look_for_nested_loops_unstructured(u,loop_transformation, loop_predicate)
-unstructured u;
-statement (*loop_transformation) ();
-bool (*loop_predicate)();
+void look_for_nested_loops_unstructured(unstructured u,
+					statement (*loop_transformation) (list),
+					bool (*loop_predicate)(loop))
 {
     cons *blocs = NIL;
     control ct = unstructured_control(u);

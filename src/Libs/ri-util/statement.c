@@ -1332,26 +1332,23 @@ list ltrue,lfalse;
 }
 
 
-/* statement makeloopbody(l) 
- * make statement of a  loop body
+/* statement makeloopbody(l, s_old) 
+ * make a statement for a loop body, using the fields of a previously existing statement
  *
- * FI: the name of this function is not very good; the function should be put
- * in ri-util/statement.c, if it is really useful. The include list is
- * a joke!
+ * Preserving the labels may be sometimes a good thing (hyperplane or
+ * tiling transformation, outermostloop) or a bad thing for innermost
+ * loops, sometimes replicated loops
  *
- * move here from generation... FC 16/05/94
+ * FI: the name of this function is not well chosen.
  */
-statement 
-makeloopbody(l,s_old)
-loop l;
-statement s_old;
+statement makeloopbody(loop l, statement s_old, bool inner_p)
 {
     statement state_l;
     instruction instr_l;
     statement l_body;
 
     instr_l = make_instruction(is_instruction_loop,l);
-    state_l = make_statement(statement_label(s_old),
+    state_l = make_statement(inner_p? entity_empty_label() : statement_label(s_old),
 			     statement_number(s_old),
 			     statement_ordering(s_old),
 			     statement_comments(s_old),
@@ -1360,7 +1357,7 @@ statement s_old;
 			    STATEMENT_NUMBER_UNDEFINED,
 			    STATEMENT_ORDERING_UNDEFINED,
 			    empty_comments,
-			make_instruction_block(CONS(STATEMENT,state_l,NIL)),NIL,NULL);
+			    make_instruction_block(CONS(STATEMENT,state_l,NIL)),NIL,NULL);
 
     return(l_body);
 }

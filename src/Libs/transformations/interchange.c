@@ -81,12 +81,12 @@ gener_DOSEQ(
 			      loop_label(l_old),
 			      make_execution(is_execution_sequential,UU),
 			      loop_locals(l_old));
-	    bl = makeloopbody(l_hyp,s_loop);
+	    bl = makeloopbody(l_hyp,s_loop, TRUE);
 	    pb=pb->succ;
 	}
     }
 
-    /*make the last loop which is sequential*/
+    /* Make the last outer loop which is sequential and can be labelled */
    
     l_hyp = make_loop(pb->var,rl,bl,loop_label(l_old),
 		      make_execution(is_execution_sequential,UU),

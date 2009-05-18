@@ -16,6 +16,9 @@
 #include "sc.h"
 #include "matrice.h"
 #include "conversion.h"
+
+#include "misc.h"
+
 void derive_new_basis(Pbase base_oldindex, Pbase * base_newindex, entity (*new_entity)(entity))
 {
     Pbase pb;
@@ -50,9 +53,12 @@ entity old_index;
 {
     entity new_index;
     string old_name;
-    char *new_name = (char*) malloc(16);
+    // FI: 16 was way too little...
+    char *new_name = (char*) malloc(160);
 
     old_name = entity_name(old_index);
+
+    /* add a terminal p till a new name is found. */
     for (sprintf(new_name, "%s%s", old_name, "p");
          gen_find_tabulated(new_name, entity_domain)!=entity_undefined; 
 
@@ -60,12 +66,15 @@ entity old_index;
         sprintf(new_name, "%s%s", old_name, "p");
     }
  
-   new_index = make_entity(new_name,
+    new_index = make_entity(strdup(new_name),
 			   copy_type(entity_type(old_index)),
 			   /* Should be AddVariableToCommon(DynamicArea) or
 			      something similar! */
 			   copy_storage(entity_storage(old_index)),
 			   copy_value(entity_initial(old_index)));
+    if(strlen(new_name)>159)
+      pips_internal_error("Allocated buffer is too small");
+    free(new_name);
 
     return(new_index);
 }

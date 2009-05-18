@@ -30,14 +30,16 @@ bool selected_loop_p(loop l)
     return loop_label(l) == selected_label;
 }
 
-bool
-interactive_loop_transformation(string module_name, statement (*loop_transformation)())
+bool interactive_loop_transformation(string module_name,
+				     statement (*loop_transformation)(list))
 {
     char lp_label[6];
     entity module = module_name_to_entity(module_name);
-    statement s;
-    string resp;
+    statement s = statement_undefined;
+    string resp = string_undefined;
     bool return_status = FALSE;
+
+    set_current_module_entity(module);
 
     pips_assert("interactive_loop_transformation", entity_module_p(module));
 
@@ -47,7 +49,7 @@ interactive_loop_transformation(string module_name, statement (*loop_transformat
        the loops */
     s = (statement) db_get_memory_resource(DBR_CODE, module_name, TRUE);
 
-    /* Get the loop label form the user */
+    /* Get the loop label from the user */
     resp = user_request("Which loop do you want to transform?\n"
 			"(give its label): ");
     if (resp[0] == '\0') {
@@ -75,6 +77,8 @@ interactive_loop_transformation(string module_name, statement (*loop_transformat
 			       (char*) s);
 	return_status = TRUE;
     }
+
+    reset_current_module_entity();
     
     return return_status;
 }
