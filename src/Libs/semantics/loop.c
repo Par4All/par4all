@@ -1924,7 +1924,9 @@ transformer any_loop_to_postcondition(statement body,
   p_body = transformer_convex_hull(p_body_1, p_body_5);
   a_post = statement_to_postcondition(p_body, body);
 
-  /* a_post could be used, but we chose to recompute post entorely */
+  /* a_post should be used because it is more accurate than direct
+     recomputation, but we chose for the time being to recompute post
+     entirely */
   post = transformer_convex_hull(post_1, post_6);
 
   /* Get rid of now useless transformers */

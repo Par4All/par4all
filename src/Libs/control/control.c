@@ -876,8 +876,12 @@ hash_table used_labels;
 					       forloop_increment(l),
 					       control_statement(c_body));
 
-	if(!loop_undefined_p(new_l))
+	if(!loop_undefined_p(new_l)) {
 	  ni = make_instruction(is_instruction_loop, new_l);
+	  /* The loop label field is unused in C, but it is used
+	     internally to locate loops for applying PIPS transformations. */
+	  loop_label(new_l) = statement_label(st);
+	}
     }
 
     /* If the DO conversion has failed, the WHILE conversion may be requested */

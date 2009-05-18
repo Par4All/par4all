@@ -244,14 +244,18 @@ void partial_eval_expression_and_regenerate(expression *ep, Psysteme ps, effects
 
     ef = partial_eval_expression(*ep, ps, fx);
 
-    if (get_debug_level()>=5)
+    ifdebug(5)
 	print_eformat(ef, "before regenerate");
 
     regenerate_expression(&ef, ep);
 
-    if(get_debug_level()>=5 && !expression_consistent_p(*ep)) {
+    ifdebug(5)
+      if(!expression_consistent_p(*ep)) {
 	pips_internal_error("bad evaluation");
-    }
+      }
+      else {
+	print_eformat(ef, "after regenerate");
+      }
 }
 
 struct eformat partial_eval_expression_and_copy(expression expr, Psysteme ps, effects fx)
@@ -510,9 +514,14 @@ struct eformat partial_eval_call(expression exp, Psysteme ps, effects fx)
 	      ef = partial_eval_binary_operator(func, la, ps, fx);
 	  else {
 	      MAPL(le, {
+		  /*
 		  expression expr = EXPRESSION(CAR(le));
 
 		  partial_eval_expression_and_regenerate(&expr, ps, fx);
+		  */
+		  //expression expr = EXPRESSION(CAR(le));
+
+		  partial_eval_expression_and_regenerate(&EXPRESSION_(CAR(le)), ps, fx);
 	      }, call_arguments(ec) );
 	      ef = eformat_undefined;
 	  }
@@ -1310,15 +1319,40 @@ void recursiv_partial_eval(statement stmt)
 	  }
 	  break;
       }      
+      case is_instruction_forloop : {
+	  forloop fl = instruction_forloop(inst);
+
+	  partial_eval_expression_and_regenerate(&forloop_initialization(fl), 
+						 stmt_prec(stmt), 
+						 stmt_to_fx(stmt,fx_map));
+	  // FI: wrong precondition!
+	  partial_eval_expression_and_regenerate(&forloop_condition(fl), 
+						 stmt_prec(stmt), 
+						 stmt_to_fx(stmt,fx_map));
+	  // FI: wrong precondition!
+	  partial_eval_expression_and_regenerate(&forloop_increment(fl), 
+						 stmt_prec(stmt), 
+						 stmt_to_fx(stmt,fx_map));
+	  //add_live_loop_index(loop_index(l));
+	  recursiv_partial_eval(forloop_body(fl));
+	  //rm_live_loop_index(loop_index(l));
+
+	  if(get_debug_level()>=9) {
+	      print_text(stderr, text_statement(entity_undefined, 0, stmt));
+	      pips_assert("recursiv_partial_eval", statement_consistent_p(stmt));
+	  }
+	  break;
+      }      
     case is_instruction_whileloop : {
 	  whileloop l = instruction_whileloop(inst);
+
 	  /* The whileloop precondition cannot be used to evaluate the
 	     while condition. It must be unioned with the body postcondition.
 	  partial_eval_expression_and_regenerate(&whileloop_condition(l), 
 						 stmt_prec(stmt), 
 						 stmt_to_fx(stmt,fx_map));
 	  */
-	  /* Also, two kinds of while mudt be handled */
+	  /* Also, two kinds of while must be handled */
 	  /* Short term fix... we might as well not try anything for
 	     the while condition */
 	  /* partial_eval_expression_and_regenerate(&whileloop_condition(l), 

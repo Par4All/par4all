@@ -1476,7 +1476,7 @@ max0_to_transformer(entity e, list args, transformer pre, bool is_internal)
 }
 
 /* Returns an undefined transformer in case of failure */
-transformer assign_operation_to_transformer(entity val, // assumed to be a value
+transformer assign_operation_to_transformer(entity val, // assumed to be a value, not to have values
 					    expression lhs,
 					    expression rhs,
 					    transformer pre)
@@ -1490,8 +1490,11 @@ transformer assign_operation_to_transformer(entity val, // assumed to be a value
 
     if(entity_has_values_p(e) /* && integer_scalar_entity_p(e) */) {
       entity ev = entity_to_new_value(e);
+      //transformer teq = simple_equality_to_transformer(val, ev, TRUE);
       tf = assigned_expression_to_transformer(ev, rhs, pre);
       tf = transformer_add_equality(tf, val, ev);
+      //tf = transformer_combine(tf, teq);
+      //free_transformer(teq);
     }
   }
 
@@ -2360,11 +2363,15 @@ any_expression_to_transformer(
       if(string_analyzed_p())
 	tf = string_expression_to_transformer(v, expr);
       break;
-    case is_basic_overloaded:
+    case is_basic_overloaded: {
       /* The overloading is supposed to have been lifted by
 	 basic_of_expression() */
-      pips_internal_error("illegal overloaded type for an expression\n");
+      if(expression_call_p(expr) && ENTITY_CONTINUE_P(call_function(expression_call(expr))))
+	tf = transformer_identity();
+      else
+	pips_internal_error("illegal overloaded type for an expression\n");
       break;
+    }
     default:
       pips_internal_error("unknown basic b=%d\n", basic_tag(be));
     }

@@ -2268,9 +2268,10 @@ bool simplify_C_expression(expression e)
       else if(gen_length(call_arguments(c))==2) {
 	/* Check "+C" and "-C" */
 	expression e1 = EXPRESSION(CAR(call_arguments(c)));
-	expression e2 = EXPRESSION(CAR(call_arguments(c)));
-	can_be_substituted_p = simplify_C_expression(e1)
-	  && simplify_C_expression(e2);
+	expression e2 = EXPRESSION(CAR(CDR(call_arguments(c))));
+	bool can_be_substituted_p1 = simplify_C_expression(e1);
+	bool can_be_substituted_p2 = simplify_C_expression(e2);
+	can_be_substituted_p = can_be_substituted_p1 && can_be_substituted_p2;
 	if(can_be_substituted_p) {
 	  entity op = call_function(c);
 	  if(ENTITY_PLUS_C_P(op)) {

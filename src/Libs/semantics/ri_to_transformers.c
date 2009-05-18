@@ -708,6 +708,9 @@ user_call_to_transformer(
   pips_debug(8, "begin\n");
   pips_assert("f is a module", entity_module_p(f));
 
+  pips_user_warning("Side effects in actual arguments are not yet taken into account\n."
+		    "Meanwhile, atomize the call site to avoid the problem.\n");
+
   if(!get_bool_property(SEMANTICS_INTERPROCEDURAL)) {
     /*
       pips_user_warning(
@@ -1014,10 +1017,22 @@ assigned_expression_to_transformer(
     // This should be guarded by "is_internal==FALSE" if is_internal were an argument
     //reset_temporary_value_counter();
     if(!transformer_undefined_p(tf)) {
-      tf = transformer_value_substitute(tf, v_new, v_old);
-      tf = transformer_value_substitute(tf, tmp, v_new);
-      // v cannot be a temporary variable
-      transformer_arguments(tf) = arguments_add_entity(transformer_arguments(tf), v);
+      /* if the assigned variable is also assigned by the expression
+       as in i = (i = 2) + 1, transformer_value_substitute() cannot be
+       used right away. The previous store must be projected out. */
+      if(entity_is_argument_p(v, transformer_arguments(tf))) {
+	/* v must be assigneded */
+	transformer teq = simple_equality_to_transformer(v, tmp, TRUE);
+	tf = transformer_combine(tf, teq);
+	free_transformer(teq);
+
+      }
+      else { /* subcase of previous aternative */
+	tf = transformer_value_substitute(tf, v_new, v_old);
+	tf = transformer_value_substitute(tf, tmp, v_new);
+	// v cannot be a temporary variable
+	transformer_arguments(tf) = arguments_add_entity(transformer_arguments(tf), v);
+      }
       tf = transformer_temporary_value_projection(tf);
     }
   }

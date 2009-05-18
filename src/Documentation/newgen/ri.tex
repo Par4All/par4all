@@ -1279,19 +1279,24 @@ et de \verb/goto/s.
 \domain{Loop = index:entity x range x body:statement x label:entity x execution x locals:entity*}
 
 Type \texttt{loop} is used to represent Fortran DO loops or Pascal FOR
-loops. Field \texttt{index} points to the loop index, an entity. Field
-\texttt{range} contains the lower and upper bounds, as well as the step. Field
-\texttt{body} points to the loop body, a unique statement which usually is
-a sequence. Field \texttt{label} is used for Fortran labelled DO loops. It
-is the label of the last statement in the loop body. Field \texttt{execution}
-specifies if the loop should be executed sequentially or
-concurrently. Entities in the \texttt{local}\index{Private} field
-are loop-private
-variables. They can be stack-allocated on body entrance and deallocated
-on exit. The read and write effects on these variables are not visible
-from outside the loop body. They can be privatized and their effects can
-be ignored when running the loop in parallel if each processor gets a
-private copy of it.
+loops. It is also used to represent C for loops, when their semantics
+is compatible with Fortran DO loops. Field \texttt{index} points to
+the loop index, an entity. Field \texttt{range} contains the lower and
+upper bounds, as well as the step. Field \texttt{body} points to the
+loop body, a unique statement which usually is a sequence. Field
+\texttt{label} is used for Fortran labelled DO loops. It is the label
+of the last statement in the loop body. In C, this field contains a
+redundant pointer to the label of the statement containing the
+loop. It has no semantics, but makes C loops easy to designate in a
+Fortran-compatible mode to apply loop transformations. Field
+\texttt{execution} specifies if the loop should be executed
+sequentially or concurrently. Entities in the
+\texttt{local}\index{Private} field are loop-private variables. They
+can be stack-allocated on body entrance and deallocated on exit. The
+read and write effects on these variables are not visible from outside
+the loop body. They can be privatized and their effects can be ignored
+when running the loop in parallel if each processor gets a private
+copy of each of them.
 
 This field should be factored out in the \verb/statement/ type in order
 to declare variables local to a block, as in C. However, the two levels,

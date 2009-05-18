@@ -743,26 +743,35 @@ static entity searched_loop_label = entity_undefined;
 
 bool find_loop_and_fully_unroll(statement s)
 {
-    instruction inst = statement_instruction (s);
-    bool go_on = TRUE;
+  instruction inst = statement_instruction (s);
+  bool go_on = TRUE;
 
-    if(instruction_loop_p(inst)) {
-	  entity do_lab_ent = loop_label(instruction_loop(inst));
-	  /* is it the right label? */
-	  if (do_lab_ent == entity_undefined) {
-	      pips_error("recursive_loop_unroll", "DO label undefined\n");
-	      go_on = FALSE;
-	  }
-	  else if (gen_eq(searched_loop_label, do_lab_ent)) {
-	      full_loop_unroll(s);
-	      go_on = FALSE;
-	  }
-	  else {
-	      go_on = TRUE;
-	  }
-      }
 
-    return go_on;
+  if(instruction_loop_p(inst)) {
+    entity do_lab_ent = entity_undefined;
+
+    if(c_module_p(get_current_module_entity())) {
+      do_lab_ent = statement_label(s);
+    }
+    else { // Fortran assumed
+      do_lab_ent = loop_label(instruction_loop(inst));
+    }
+
+    /* is it the right label? */
+    if (do_lab_ent == entity_undefined) {
+      pips_error("recursive_loop_unroll", "DO label undefined\n");
+      go_on = FALSE;
+    }
+    else if (gen_eq(searched_loop_label, do_lab_ent)) {
+      full_loop_unroll(s);
+      go_on = FALSE;
+    }
+    else {
+      go_on = TRUE;
+    }
+  }
+
+  return go_on;
 }
 
 bool apply_full_loop_unroll(statement s)

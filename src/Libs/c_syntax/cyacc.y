@@ -1452,6 +1452,9 @@ statement:
 			  if(expression_undefined_p(init))
 			    init = make_call_expression(entity_intrinsic(CONTINUE_FUNCTION_NAME),
 							NIL);
+			  else
+			    simplify_C_expression(init);
+
 			  if(expression_undefined_p(cond)) {
 			    /* A bool C constant cannot be used
 			       because stdbool.h may not be
@@ -1461,9 +1464,15 @@ statement:
 			    /* NIL); */
 			    cond = int_to_expression(1);
 			  }
+			  else
+			    simplify_C_expression(cond);
+
 			  if(expression_undefined_p(inc))
 			    inc = make_call_expression(entity_intrinsic(CONTINUE_FUNCTION_NAME),
 							NIL);
+			  else
+			    simplify_C_expression(inc);
+
 			  /*  The for clause may contain declarations*/
 			  $$ = MakeForloop(init, cond, inc,$9);
 			  $$ = add_comment_and_line_number($$, sc, sn);

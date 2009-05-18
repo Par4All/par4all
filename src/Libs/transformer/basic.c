@@ -532,7 +532,7 @@ bool transformer_general_consistency_p(transformer t, bool is_weak)
      * This is not redundant with the printout procedure which uses
      * entity_minimal_name() and not the value mappings.
      */
-    MAP(ENTITY, e, {
+    FOREACH(ENTITY, e, args) {
 	/*
 	pips_assert("Argument entity appears in the value mappings",
 		    entity_has_values_p(e));
@@ -542,8 +542,9 @@ bool transformer_general_consistency_p(transformer t, bool is_weak)
 			      entity_name(e));
 	    if(!is_weak)
 	      consistent = FALSE;
+	
 	}
-    }, args);
+    }
 
     if(consistent && !is_weak)
       consistent = transformer_argument_consistency_p(t);
