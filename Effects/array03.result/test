@@ -1,0 +1,166 @@
+
+Proper effects for "foo"
+
+int foo(float (*b)[3])
+{
+   float c;
+//               <must be read   >: b
+//               <must be written>: b[0][3]
+   (*b)[3] = 2.0;                                                       /*0005*/
+//               <must be read   >: b b[0][3]
+//               <must be written>: c
+   c = (*b)[3];                                                         /*0006*/
+//               <must be written>: b[1][3]
+   b[1][3] = 2.0;                                                       /*0007*/
+//               <must be read   >: b[1][3]
+//               <must be written>: c
+   c = b[1][3];                                                         /*0008*/
+//               <must be read   >: b b[0][3]
+//               <must be written>: b[0][3]
+   (*b)[3]++;                                                           /*0010*/
+//               <must be read   >: b b[0][3]
+//               <must be written>: b[0][3]
+   (*b)[3] += 5.0;                                                      /*0011*/
+//               <must be read   >: b[1][3]
+//               <must be written>: b[1][3]
+   b[1][3]++;                                                           /*0012*/
+//               <must be read   >: b[1][3]
+//               <must be written>: b[1][3]
+   b[1][3] += 5.0;                                                      /*0013*/
+   return 1;                                                            /*0015*/
+}
+
+Proper effects for "foo2"
+
+int foo2(float b[5][3])
+{
+   float c;
+//               <must be read   >: b
+//               <must be written>: b[0][3]
+   (*b)[3] = 2.0;                                                       /*0027*/
+//               <must be read   >: b b[0][3]
+//               <must be written>: c
+   c = (*b)[3];                                                         /*0028*/
+//               <must be written>: b[1][3]
+   b[1][3] = 2.0;                                                       /*0029*/
+//               <must be read   >: b[1][3]
+//               <must be written>: c
+   c = b[1][3];                                                         /*0030*/
+//               <must be read   >: b b b[0][3]
+//               <must be written>: b[0][3]
+   (*b)[3]++;                                                           /*0032*/
+//               <must be read   >: b b b[0][3]
+//               <must be written>: b[0][3]
+   (*b)[3] += 5.0;                                                      /*0033*/
+//               <must be read   >: b[1][3]
+//               <must be written>: b[1][3]
+   b[1][3]++;                                                           /*0034*/
+//               <must be read   >: b[1][3]
+//               <must be written>: b[1][3]
+   b[1][3] += 5.0;                                                      /*0035*/
+
+   return 1;                                                            /*0037*/
+}
+
+Proper regions for "foo"
+
+int foo(float (*b)[3])
+{
+   float c;
+
+//  <b-R-EXACT-{}>
+//  <b[PHI1][PHI2]-W-EXACT-{PHI1==0, PHI2==3}>
+
+   (*b)[3] = 2.0;                                                       /*0005*/
+
+//  <b[PHI1][PHI2]-R-EXACT-{PHI1==0, PHI2==3}>
+//  <b-R-EXACT-{}>
+//  <c-W-EXACT-{}>
+
+   c = (*b)[3];                                                         /*0006*/
+
+//  <b[PHI1][PHI2]-W-EXACT-{PHI1==1, PHI2==3}>
+
+   b[1][3] = 2.0;                                                       /*0007*/
+
+//  <b[PHI1][PHI2]-R-EXACT-{PHI1==1, PHI2==3}>
+//  <c-W-EXACT-{}>
+
+   c = b[1][3];                                                         /*0008*/
+
+//  <b[PHI1][PHI2]-R-EXACT-{PHI1==0, PHI2==3}>
+//  <b-R-EXACT-{}>
+//  <b[PHI1][PHI2]-W-EXACT-{PHI1==0, PHI2==3}>
+
+   (*b)[3]++;                                                           /*0010*/
+
+//  <b[PHI1][PHI2]-R-EXACT-{PHI1==0, PHI2==3}>
+//  <b-R-EXACT-{}>
+//  <b[PHI1][PHI2]-W-EXACT-{PHI1==0, PHI2==3}>
+
+   (*b)[3] += 5.0;                                                      /*0011*/
+
+//  <b[PHI1][PHI2]-R-EXACT-{PHI1==1, PHI2==3}>
+//  <b[PHI1][PHI2]-W-EXACT-{PHI1==1, PHI2==3}>
+
+   b[1][3]++;                                                           /*0012*/
+
+//  <b[PHI1][PHI2]-R-EXACT-{PHI1==1, PHI2==3}>
+//  <b[PHI1][PHI2]-W-EXACT-{PHI1==1, PHI2==3}>
+
+   b[1][3] += 5.0;                                                      /*0013*/
+   return 1;                                                            /*0015*/
+}
+
+Proper regions for "foo2"
+
+int foo2(float b[5][3])
+{
+   float c;
+
+//  <b-R-EXACT-{}>
+//  <b[PHI1][PHI2]-W-EXACT-{PHI1==0, PHI2==3}>
+
+   (*b)[3] = 2.0;                                                       /*0027*/
+
+//  <b[PHI1][PHI2]-R-EXACT-{PHI1==0, PHI2==3}>
+//  <b-R-EXACT-{}>
+//  <c-W-EXACT-{}>
+
+   c = (*b)[3];                                                         /*0028*/
+
+//  <b[PHI1][PHI2]-W-EXACT-{PHI1==1, PHI2==3}>
+
+   b[1][3] = 2.0;                                                       /*0029*/
+
+//  <b[PHI1][PHI2]-R-EXACT-{PHI1==1, PHI2==3}>
+//  <c-W-EXACT-{}>
+
+   c = b[1][3];                                                         /*0030*/
+
+//  <b[PHI1][PHI2]-R-EXACT-{PHI1==0, PHI2==3}>
+//  <b-R-EXACT-{}>
+//  <b-R-EXACT-{}>
+//  <b[PHI1][PHI2]-W-EXACT-{PHI1==0, PHI2==3}>
+
+   (*b)[3]++;                                                           /*0032*/
+
+//  <b[PHI1][PHI2]-R-EXACT-{PHI1==0, PHI2==3}>
+//  <b-R-EXACT-{}>
+//  <b-R-EXACT-{}>
+//  <b[PHI1][PHI2]-W-EXACT-{PHI1==0, PHI2==3}>
+
+   (*b)[3] += 5.0;                                                      /*0033*/
+
+//  <b[PHI1][PHI2]-R-EXACT-{PHI1==1, PHI2==3}>
+//  <b[PHI1][PHI2]-W-EXACT-{PHI1==1, PHI2==3}>
+
+   b[1][3]++;                                                           /*0034*/
+
+//  <b[PHI1][PHI2]-R-EXACT-{PHI1==1, PHI2==3}>
+//  <b[PHI1][PHI2]-W-EXACT-{PHI1==1, PHI2==3}>
+
+   b[1][3] += 5.0;                                                      /*0035*/
+
+   return 1;                                                            /*0037*/
+}

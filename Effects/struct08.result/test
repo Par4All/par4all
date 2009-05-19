@@ -1,0 +1,382 @@
+
+Proper effects for "init"
+
+void init(mys *m)
+{
+   int i;
+//               <must be read   >: m
+//               <must be written>: m[0][1]
+   m->num = 5;                                                          /*0015*/
+//               <must be read   >: m
+//               <must be written>: m[0][3]
+   m->tab2 = malloc(5*sizeof(int));                                     /*0016*/
+//               <must be read   >: m
+//               <must be written>: m[0][2][0]
+   (m->tab1)[0] = 10;                                                   /*0017*/
+//               <must be read   >: m
+//               <must be written>: m[0][3][0]
+   (m->tab2)[0] = 20;                                                   /*0018*/
+//               <must be written>: i
+   for(i = 0; i <= 4; i += 1) {                                         /*0019*/
+//               <must be read   >: i m
+//               <must be written>: m[0][2][i]
+      (m->tab1)[i] = 1;                                                 /*0021*/
+//               <must be read   >: i m m[0][2][i]
+//               <must be written>: m[0][3][i]
+      (m->tab2)[i] = (m->tab1)[i];                                      /*0022*/
+   }
+}
+
+Proper effects for "init2"
+
+void init2(mys *n)
+{
+   int i;
+   mys m;
+//               <must be read   >: n n[0]
+//               <must be written>: m
+
+   m = *n;                                                              /*0032*/
+//               <must be written>: m[1]
+   m.num = 5;                                                           /*0033*/
+//               <must be written>: m[3]
+   m.tab2 = malloc(5*sizeof(int));                                      /*0034*/
+//               <must be written>: m[2][0]
+   (m.tab1)[0] = 10;                                                    /*0035*/
+//               <must be written>: m[3][0]
+   (m.tab2)[0] = 20;                                                    /*0036*/
+//               <must be written>: i
+   for(i = 0; i <= 4; i += 1) {                                         /*0037*/
+//               <must be read   >: i
+//               <must be written>: m[2][i]
+      (m.tab1)[i] = 1;                                                  /*0039*/
+//               <must be read   >: i m[2][i]
+//               <must be written>: m[3][i]
+      (m.tab2)[i] = (m.tab1)[i];                                        /*0040*/
+   }
+}
+
+Proper effects for "init3"
+
+void init3(mys **p)
+{
+   int i;
+//               <must be written>: p
+   p = malloc(5*sizeof(mys *));                                         /*0048*/
+//               <must be written>: i
+   for(i = 0; i <= 4; i += 1) {                                         /*0049*/
+//               <must be read   >: i
+//               <must be written>: p[i]
+      p[i] = malloc(sizeof(mys));                                       /*0051*/
+//               <must be read   >: i p[i]
+//               <must be written>: p[i][0][3]
+      p[i]->tab2 = malloc(5*sizeof(int));                               /*0052*/
+   }
+//               <must be read   >: p[0]
+//               <must be written>: p[0][0][1]
+
+   p[0]->num = 11;                                                      /*0055*/
+//               <must be read   >: p[0]
+//               <must be written>: p[0][0][2][0]
+   (p[0]->tab1)[0] = 20;                                                /*0056*/
+//               <must be read   >: p[0]
+//               <must be written>: p[0][0][3][0]
+   (p[0]->tab2)[0] = 30;                                                /*0057*/
+//               <must be written>: i
+
+   for(i = 1; i <= 4; i += 1) {                                         /*0059*/
+//               <must be read   >: i p[i]
+//               <must be written>: p[i][0][1]
+      p[i]->num = 10;                                                   /*0061*/
+//               <must be read   >: i p[i]
+//               <must be written>: p[i][0][2][0]
+      (p[i]->tab1)[0] = 21;                                             /*0062*/
+//               <must be read   >: i p[i] p[i][0][2][0] p[i]
+//               <must be written>: p[i][0][3][0]
+      (p[i]->tab2)[0] = (p[i]->tab1)[0];                                /*0063*/
+   }
+}
+
+Proper effects for "init4"
+
+void init4(mys *p[5])
+{
+   int i;
+//               <must be written>: i
+   for(i = 0; i <= 4; i += 1) {                                         /*0070*/
+//               <must be read   >: i
+//               <must be written>: p[i]
+      p[i] = malloc(sizeof(mys));                                       /*0072*/
+//               <must be read   >: i p[i]
+//               <must be written>: p[i][0][3]
+      p[i]->tab2 = malloc(5*sizeof(int));                               /*0073*/
+   }
+//               <must be read   >: p[0]
+//               <must be written>: p[0][0][1]
+
+   p[0]->num = 11;                                                      /*0076*/
+//               <must be read   >: p[0]
+//               <must be written>: p[0][0][2][0]
+   (p[0]->tab1)[0] = 20;                                                /*0077*/
+//               <must be read   >: p[0]
+//               <must be written>: p[0][0][3][0]
+   (p[0]->tab2)[0] = 30;                                                /*0078*/
+//               <must be written>: i
+   
+
+   for(i = 1; i <= 4; i += 1) {                                         /*0081*/
+//               <must be read   >: i p[i]
+//               <must be written>: p[i][0][1]
+      p[i]->num = 10;                                                   /*0083*/
+//               <must be read   >: i p[i]
+//               <must be written>: p[i][0][2][0]
+      (p[i]->tab1)[0] = 21;                                             /*0084*/
+//               <must be read   >: i p[i] p[i][0][2][0] p[i]
+//               <must be written>: p[i][0][3][0]
+      (p[i]->tab2)[0] = (p[i]->tab1)[0];                                /*0085*/
+   }
+}
+
+Proper regions for "init"
+
+void init(mys *m)
+{
+   int i;
+
+//  <m-R-EXACT-{}>
+//  <m[PHI1][PHI2]-W-EXACT-{PHI1==0, PHI2==1}>
+
+   m->num = 5;                                                          /*0015*/
+
+//  <m-R-EXACT-{}>
+//  <m[PHI1][PHI2]-W-EXACT-{PHI1==0, PHI2==3}>
+
+   m->tab2 = malloc(5*sizeof(int));                                     /*0016*/
+
+//  <m-R-EXACT-{}>
+//  <m[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==0, PHI2==2, PHI3==0}>
+
+   (m->tab1)[0] = 10;                                                   /*0017*/
+
+//  <m-R-EXACT-{}>
+//  <m[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==0, PHI2==3, PHI3==0}>
+
+   (m->tab2)[0] = 20;                                                   /*0018*/
+
+//  <i-W-EXACT-{}>
+
+   for(i = 0; i <= 4; i += 1) {                                         /*0019*/
+
+//  <i-R-EXACT-{}>
+//  <m-R-EXACT-{}>
+//  <m[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==0, PHI2==2, PHI3==i, 0<=i,
+//    i<=4}>
+
+      (m->tab1)[i] = 1;                                                 /*0021*/
+
+//  <i-R-EXACT-{}>
+//  <m-R-EXACT-{}>
+//  <m[PHI1][PHI2][PHI3]-R-EXACT-{PHI1==0, PHI2==2, PHI3==i, 0<=i,
+//    i<=4}>
+//  <m[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==0, PHI2==3, PHI3==i, 0<=i,
+//    i<=4}>
+
+      (m->tab2)[i] = (m->tab1)[i];                                      /*0022*/
+   }
+}
+
+Proper regions for "init2"
+
+void init2(mys *n)
+{
+   int i;
+   mys m;
+
+//  <m-W-EXACT-{}>
+//  <n[PHI1]-R-EXACT-{PHI1==0}>
+//  <n-R-EXACT-{}>
+
+
+   m = *n;                                                              /*0032*/
+
+//  <m[PHI1]-W-EXACT-{PHI1==1}>
+
+   m.num = 5;                                                           /*0033*/
+
+//  <m[PHI1]-W-EXACT-{PHI1==3}>
+
+   m.tab2 = malloc(5*sizeof(int));                                      /*0034*/
+
+//  <m[PHI1][PHI2]-W-EXACT-{PHI1==2, PHI2==0}>
+
+   (m.tab1)[0] = 10;                                                    /*0035*/
+
+//  <m[PHI1][PHI2]-W-EXACT-{PHI1==3, PHI2==0}>
+
+   (m.tab2)[0] = 20;                                                    /*0036*/
+
+//  <i-W-EXACT-{}>
+
+   for(i = 0; i <= 4; i += 1) {                                         /*0037*/
+
+//  <i-R-EXACT-{}>
+//  <m[PHI1][PHI2]-W-EXACT-{PHI1==2, PHI2==i, 0<=i, i<=4}>
+
+      (m.tab1)[i] = 1;                                                  /*0039*/
+
+//  <i-R-EXACT-{}>
+//  <m[PHI1][PHI2]-R-EXACT-{PHI1==2, PHI2==i, 0<=i, i<=4}>
+//  <m[PHI1][PHI2]-W-EXACT-{PHI1==3, PHI2==i, 0<=i, i<=4}>
+
+      (m.tab2)[i] = (m.tab1)[i];                                        /*0040*/
+   }
+}
+
+Proper regions for "init3"
+
+void init3(mys **p)
+{
+   int i;
+
+//  <p-W-EXACT-{}>
+
+   p = malloc(5*sizeof(mys *));                                         /*0048*/
+
+//  <i-W-EXACT-{}>
+
+   for(i = 0; i <= 4; i += 1) {                                         /*0049*/
+
+//  <i-R-EXACT-{}>
+//  <p[PHI1]-W-EXACT-{PHI1==i, 0<=i, i<=4}>
+
+      p[i] = malloc(sizeof(mys));                                       /*0051*/
+
+//  <i-R-EXACT-{}>
+//  <p[PHI1]-R-EXACT-{PHI1==i, 0<=i, i<=4}>
+//  <p[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==i, PHI2==0, PHI3==3, 0<=i,
+//    i<=4}>
+
+      p[i]->tab2 = malloc(5*sizeof(int));                               /*0052*/
+   }
+
+//  <p[PHI1]-R-EXACT-{PHI1==0, i==5}>
+//  <p[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==0, PHI2==0, PHI3==1, i==5}>
+
+
+   p[0]->num = 11;                                                      /*0055*/
+
+//  <p[PHI1]-R-EXACT-{PHI1==0, i==5}>
+//  <p[PHI1][PHI2][PHI3][PHI4]-W-EXACT-{PHI1==0, PHI2==0, PHI3==2,
+//    PHI4==0, i==5}>
+
+   (p[0]->tab1)[0] = 20;                                                /*0056*/
+
+//  <p[PHI1]-R-EXACT-{PHI1==0, i==5}>
+//  <p[PHI1][PHI2][PHI3][PHI4]-W-EXACT-{PHI1==0, PHI2==0, PHI3==3,
+//    PHI4==0, i==5}>
+
+   (p[0]->tab2)[0] = 30;                                                /*0057*/
+
+//  <i-W-EXACT-{}>
+
+
+   for(i = 1; i <= 4; i += 1) {                                         /*0059*/
+
+//  <i-R-EXACT-{}>
+//  <p[PHI1]-R-EXACT-{PHI1==i, 1<=i, i<=4}>
+//  <p[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==i, PHI2==0, PHI3==1, 1<=i,
+//    i<=4}>
+
+      p[i]->num = 10;                                                   /*0061*/
+
+//  <i-R-EXACT-{}>
+//  <p[PHI1]-R-EXACT-{PHI1==i, 1<=i, i<=4}>
+//  <p[PHI1][PHI2][PHI3][PHI4]-W-EXACT-{PHI1==i, PHI2==0, PHI3==2,
+//    PHI4==0, 1<=i, i<=4}>
+
+      (p[i]->tab1)[0] = 21;                                             /*0062*/
+
+//  <i-R-EXACT-{}>
+//  <p[PHI1]-R-EXACT-{PHI1==i, 1<=i, i<=4}>
+//  <p[PHI1][PHI2][PHI3][PHI4]-R-EXACT-{PHI1==i, PHI2==0, PHI3==2,
+//    PHI4==0, 1<=i, i<=4}>
+//  <p[PHI1]-R-EXACT-{PHI1==i, 1<=i, i<=4}>
+//  <p[PHI1][PHI2][PHI3][PHI4]-W-EXACT-{PHI1==i, PHI2==0, PHI3==3,
+//    PHI4==0, 1<=i, i<=4}>
+
+      (p[i]->tab2)[0] = (p[i]->tab1)[0];                                /*0063*/
+   }
+}
+
+Proper regions for "init4"
+
+void init4(mys *p[5])
+{
+   int i;
+
+//  <i-W-EXACT-{}>
+
+   for(i = 0; i <= 4; i += 1) {                                         /*0070*/
+
+//  <i-R-EXACT-{}>
+//  <p[PHI1]-W-EXACT-{PHI1==i, 0<=i, i<=4}>
+
+      p[i] = malloc(sizeof(mys));                                       /*0072*/
+
+//  <i-R-EXACT-{}>
+//  <p[PHI1]-R-EXACT-{PHI1==i, 0<=i, i<=4}>
+//  <p[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==i, PHI2==0, PHI3==3, 0<=i,
+//    i<=4}>
+
+      p[i]->tab2 = malloc(5*sizeof(int));                               /*0073*/
+   }
+
+//  <p[PHI1]-R-EXACT-{PHI1==0, i==5}>
+//  <p[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==0, PHI2==0, PHI3==1, i==5}>
+
+
+   p[0]->num = 11;                                                      /*0076*/
+
+//  <p[PHI1]-R-EXACT-{PHI1==0, i==5}>
+//  <p[PHI1][PHI2][PHI3][PHI4]-W-EXACT-{PHI1==0, PHI2==0, PHI3==2,
+//    PHI4==0, i==5}>
+
+   (p[0]->tab1)[0] = 20;                                                /*0077*/
+
+//  <p[PHI1]-R-EXACT-{PHI1==0, i==5}>
+//  <p[PHI1][PHI2][PHI3][PHI4]-W-EXACT-{PHI1==0, PHI2==0, PHI3==3,
+//    PHI4==0, i==5}>
+
+   (p[0]->tab2)[0] = 30;                                                /*0078*/
+
+//  <i-W-EXACT-{}>
+
+   
+
+   for(i = 1; i <= 4; i += 1) {                                         /*0081*/
+
+//  <i-R-EXACT-{}>
+//  <p[PHI1]-R-EXACT-{PHI1==i, 1<=i, i<=4}>
+//  <p[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==i, PHI2==0, PHI3==1, 1<=i,
+//    i<=4}>
+
+      p[i]->num = 10;                                                   /*0083*/
+
+//  <i-R-EXACT-{}>
+//  <p[PHI1]-R-EXACT-{PHI1==i, 1<=i, i<=4}>
+//  <p[PHI1][PHI2][PHI3][PHI4]-W-EXACT-{PHI1==i, PHI2==0, PHI3==2,
+//    PHI4==0, 1<=i, i<=4}>
+
+      (p[i]->tab1)[0] = 21;                                             /*0084*/
+
+//  <i-R-EXACT-{}>
+//  <p[PHI1]-R-EXACT-{PHI1==i, 1<=i, i<=4}>
+//  <p[PHI1][PHI2][PHI3][PHI4]-R-EXACT-{PHI1==i, PHI2==0, PHI3==2,
+//    PHI4==0, 1<=i, i<=4}>
+//  <p[PHI1]-R-EXACT-{PHI1==i, 1<=i, i<=4}>
+//  <p[PHI1][PHI2][PHI3][PHI4]-W-EXACT-{PHI1==i, PHI2==0, PHI3==3,
+//    PHI4==0, 1<=i, i<=4}>
+
+      (p[i]->tab2)[0] = (p[i]->tab1)[0];                                /*0085*/
+   }
+}

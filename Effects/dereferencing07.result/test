@@ -1,0 +1,60 @@
+
+Proper effects for "foo"
+
+void foo(int *col)
+{
+//               <must be read   >: col col[0]
+//               <must be written>: col
+   *col++;                                                              /*0004*/
+
+   return;                                                              /*0006*/
+}
+
+Proper effects for "main"
+
+int main()
+{
+   int x;
+   int tab1[10];
+   int tab2[10];
+   int *p;
+//               <must be read   >: x
+//               <must be written>: x
+   x++;                                                                 /*0017*/
+//               <must be read   >: x
+//               <must be written>: x
+   x += 3;                                                              /*0018*/
+//               <must be read   >: p tab1[tab2[x]] tab2[x] x
+//               <must be written>: p[tab1[tab2[x]]]
+   *(p+tab1[tab2[x]]) = 0;                                              /*0019*/
+   return 1;                                                            /*0020*/
+}
+
+Proper regions for "main"
+
+int main()
+{
+   int x;
+   int tab1[10];
+   int tab2[10];
+   int *p;
+
+//  <x-R-EXACT-{}>
+//  <x-W-EXACT-{}>
+
+   x++;                                                                 /*0017*/
+
+//  <x-R-EXACT-{}>
+//  <x-W-EXACT-{}>
+
+   x += 3;                                                              /*0018*/
+
+//  <p-R-EXACT-{}>
+//  <p[PHI1]-W-MAY-{}>
+//  <tab1[PHI1]-R-MAY-{}>
+//  <tab2[PHI1]-R-EXACT-{PHI1==x}>
+//  <x-R-EXACT-{}>
+
+   *(p+tab1[tab2[x]]) = 0;                                              /*0019*/
+   return 1;                                                            /*0020*/
+}
