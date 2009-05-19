@@ -1249,6 +1249,9 @@ recover_structured_while(unstructured u) {
 	body_control = else_c;
 	cond = MakeUnaryCall(CreateIntrinsic(C_NOT_OPERATOR_NAME), cond);
       }
+      else
+	// No while() recognized here...
+	return;
     }
     else
       // No while() recognized here...
