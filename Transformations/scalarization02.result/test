@@ -1,0 +1,20 @@
+      SUBROUTINE SCALARIZATION(X, Y, N)
+      REAL X(N,N), Y(N,N)
+      REAL T(100)
+C     BEGIN BLOCK
+
+C     Expected result: t(i) NOT scalarized (b/c it is copied out)
+      DO J = 1, N                                                       0006
+         DO I = 1, N                                                    0007
+C           BEGIN BLOCK
+            T(I) = X(I,J)                                               0008
+            X(I,J) = Y(I,J)                                             0009
+            Y(I,J) = T(I)                                               0010
+C           END BLOCK
+         ENDDO
+      ENDDO
+
+      PRINT *, T(N)                                                     0014
+
+C     END BLOCK
+      END

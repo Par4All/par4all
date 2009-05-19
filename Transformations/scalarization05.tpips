@@ -22,15 +22,15 @@ echo Initial code
 echo
 display PRINTED_FILE[main]
 
-echo
-echo IN regions
-echo
-activate PRINT_CODE_IN_REGIONS
-display PRINTED_FILE[main]
+#echo
+#echo IN regions
+#echo
+#activate PRINT_CODE_IN_REGIONS
+#display PRINTED_FILE[main]
 
-echo
-echo Privatized regions
-echo
+#echo
+#echo Privatized regions
+#echo
 #activate PRINT_CODE_PRIVATIZED_REGIONS
 #display PRINTED_FILE[main]
 
@@ -40,8 +40,6 @@ echo
 apply SCALARIZATION[main]
 activate PRINT_CODE
 display PRINTED_FILE[main]
-
-quit
 
 close
 delete scalarization05
