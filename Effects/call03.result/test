@@ -24,39 +24,38 @@ Proper effects for "call03"
 void call03()
 {
 //               <must be read   >: TOP-LEVEL:pi
-//               <must be written - post>: (*TOP-LEVEL:pi)
+//               <must be written>: TOP-LEVEL:pi[0]
    *pi = 1;
 //               <must be read   >: TOP-LEVEL:pi
 //               <must be written>: TOP-LEVEL:pi
    pi++;
 //               <must be read   >: TOP-LEVEL:q
-//               <must be written - post>: (*TOP-LEVEL:q)[1]
+//               <must be written>: TOP-LEVEL:q[0][1]
    q->one = 1;
 //               <must be read   >: TOP-LEVEL:q
-//               <must be written - post>: (*TOP-LEVEL:q)[2][4]
+//               <must be written>: TOP-LEVEL:q[0][2][4]
    (q->two)[4] = 2;
 }
 
 Cumulated effects for "call03"
 
 //               <must be read   >: TOP-LEVEL:pi TOP-LEVEL:q
-//               <must be written>: TOP-LEVEL:pi
-//               <must be written - post>: (*TOP-LEVEL:pi)
-//                                  (*TOP-LEVEL:q)
-//                                  [1] (*TOP-LEVEL:q)[2][4]
+//               <must be written>: TOP-LEVEL:pi TOP-LEVEL:pi[0] 
+//                                  TOP-LEVEL:q[0][1] 
+//                                  TOP-LEVEL:q[0][2][4]
 void call03()
 {
 //               <must be read   >: TOP-LEVEL:pi
-//               <must be written - post>: (*TOP-LEVEL:pi)
+//               <must be written>: TOP-LEVEL:pi[0]
    *pi = 1;
 //               <must be read   >: TOP-LEVEL:pi
 //               <must be written>: TOP-LEVEL:pi
    pi++;
 //               <must be read   >: TOP-LEVEL:q
-//               <must be written - post>: (*TOP-LEVEL:q)[1]
+//               <must be written>: TOP-LEVEL:q[0][1]
    q->one = 1;
 //               <must be read   >: TOP-LEVEL:q
-//               <must be written - post>: (*TOP-LEVEL:q)[2][4]
+//               <must be written>: TOP-LEVEL:q[0][2][4]
    (q->two)[4] = 2;
 }
 
@@ -65,9 +64,8 @@ Proper effects for "main"
 main()
 {
 //               <must be read   >: TOP-LEVEL:pi TOP-LEVEL:q
-//               <must be written>: TOP-LEVEL:pi
-//               <must be written - post>: (*TOP-LEVEL:pi)
-//                                  (*TOP-LEVEL:q)
-//                                  [1] (*TOP-LEVEL:q)[2][4]
+//               <must be written>: TOP-LEVEL:pi TOP-LEVEL:pi[0] 
+//                                  TOP-LEVEL:q[0][1] 
+//                                  TOP-LEVEL:q[0][2][4]
    call03();
 }

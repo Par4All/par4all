@@ -23,7 +23,7 @@ void dereferencing01()
 
    q = p;
 //               <must be read   >: p
-//               <must be written - post>: (*p)
+//               <must be written>: p[0]
    *p = 2.;
 }
 
@@ -39,6 +39,6 @@ void dereferencing01()
 
    q = p;
 //               <must be read   >: p
-//               <must be written - post>: (*p)
+//               <must be written>: p[0]
    *p = 2.;
 }

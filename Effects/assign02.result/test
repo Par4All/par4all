@@ -26,13 +26,12 @@ s_t make_s(int i, float x)
 
    p = (s_t *) malloc(sizeof(s_t));
 //               <must be read   >: i p
-//               <must be written - post>: (*p)[1]
+//               <must be written>: p[0][1]
    p->entier = i;
 //               <must be read   >: p x
-//               <must be written - post>: (*p)[2]
+//               <must be written>: p[0][2]
    p->reel = x;
-//               <must be read   >: p
-//               <must be read    - post>: (*p)
+//               <must be read   >: p p[0]
    return *p;
 }
 
@@ -49,13 +48,12 @@ s_t make_s(int i, float x)
 
    p = (s_t *) malloc(sizeof(s_t));
 //               <must be read   >: i p
-//               <must be written - post>: (*p)[1]
+//               <must be written>: p[0][1]
    p->entier = i;
 //               <must be read   >: p x
-//               <must be written - post>: (*p)[2]
+//               <must be written>: p[0][2]
    p->reel = x;
-//               <must be read   >: p
-//               <must be read    - post>: (*p)
+//               <must be read   >: p p[0]
    return *p;
 }
 

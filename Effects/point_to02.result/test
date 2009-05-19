@@ -26,10 +26,10 @@ void point_to02()
    struct s c;
    struct s *p;
 //               <must be read   >: p
-//               <must be written - post>: (*p)[1]
+//               <must be written>: p[0][1]
 
    p->a = 1;
 //               <must be read   >: p
-//               <must be written - post>: (*p)[2][2]
+//               <must be written>: p[0][2][2]
    (p->b)[2] = 3;
 }

@@ -41,20 +41,19 @@ void point_to01()
 
    if (1) {
 //               <must be read   >: p
-//               <must be written - post>: (*p)[1]
+//               <must be written>: p[0][1]
       p->a = 1;
 //               <must be read   >: p
-//               <must be written - post>: (*p)[2]
+//               <must be written>: p[0][2]
       p->b = 2;
 //               <must be read   >: p
-//               <must be written - post>: (*p)[3]
+//               <must be written>: p[0][3]
       p->c = 3;
-//               <must be read   >: p
-//               <must be read    - post>: (*p)[1]
-//               <must be written - post>: (*p)[4]
+//               <must be read   >: p p[0][1]
+//               <must be written>: p[0][4]
       p->d = p->a;
 //               <must be read   >: p
-//               <must be written - post>: (*p)[1] (*p)[4]
+//               <must be written>: p[0][1] p[0][4]
       p->d = p->a = 4;
    }
 }
@@ -76,27 +75,24 @@ void point_to01()
 //               <must be written>: p
 
    p = &c;
-//               <may be read    >: p
-//               <may be read    - post >: (*p)[1]
-//               <may be written - post >: (*p)[1] (*p)[2] (*p)
-//                                  [3] (*p)[4]
+//               <may be read    >: p p[0][1]
+//               <may be written >: p[0][1] p[0][2] p[0][3] p[0][4]
 
    if (1) {
 //               <must be read   >: p
-//               <must be written - post>: (*p)[1]
+//               <must be written>: p[0][1]
       p->a = 1;
 //               <must be read   >: p
-//               <must be written - post>: (*p)[2]
+//               <must be written>: p[0][2]
       p->b = 2;
 //               <must be read   >: p
-//               <must be written - post>: (*p)[3]
+//               <must be written>: p[0][3]
       p->c = 3;
-//               <must be read   >: p
-//               <must be read    - post>: (*p)[1]
-//               <must be written - post>: (*p)[4]
+//               <must be read   >: p p[0][1]
+//               <must be written>: p[0][4]
       p->d = p->a;
 //               <must be read   >: p
-//               <must be written - post>: (*p)[1] (*p)[4]
+//               <must be written>: p[0][1] p[0][4]
       p->d = p->a = 4;
    }
 }

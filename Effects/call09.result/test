@@ -38,8 +38,7 @@ main()
 {
    tf_t s;
    tf_t *sp = &s;
-//               <must be read   >: s[1] sp
-//               <must be read    - post>: (*sp)[1]
+//               <must be read   >: s[1] sp sp[0][1]
 
    call09(s.one, sp->one);
 }
