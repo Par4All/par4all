@@ -2398,7 +2398,7 @@ text_loop_default(
       /* Assumed to be C */
       if ((label != NULL) && (label[0] != '\0')) {
 	pips_debug(9, "the label %s need to be print for a for C loop", label);
-	u = make_unformatted(strdup(label), n, margin, NULL) ;	
+	u = make_unformatted(strdup(label), 0, 0, NULL) ;	
 	ADD_SENTENCE_TO_TEXT(r, first_sentence =
 			     make_sentence(is_sentence_unformatted, u));
       }
