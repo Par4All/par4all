@@ -24,6 +24,9 @@ char vcid_unspaghettify[] = "%A% ($Date: 2004/01/23 13:55:04 $, ) version $Revis
 #include "control.h"
 
 
+/* Avoid infinite restructuring in some cases: */
+enum { N_ITER_RESTRUCTURE_FIX_POINT = 10 };
+
 typedef enum {
     STRUCTURED_NULL_IF = 1901,
     STRUCTURED_IF_THEN = 1966,
@@ -1301,6 +1304,8 @@ unspaghettify_or_restructure_statement(statement mod_stmt)
   /* Track the number of restructurations done for a fix point: */
   int nr = 0;
   int old_nr;
+  /* To track the number of restructuring iterations: */
+  int iter = 0;
 
   // Note that this debug is not controlled by "UNSPAGHETTIFY_DEBUG_LEVEL":
   ifdebug(5) {
@@ -1365,7 +1370,10 @@ unspaghettify_or_restructure_statement(statement mod_stmt)
     nr = total_number_of_restructurations();
     ifdebug(2)
       display_unspaghettify_statistics();
-  } while (nr != old_nr);
+  } while (nr != old_nr && ++iter < N_ITER_RESTRUCTURE_FIX_POINT);
+
+  if (nr != old_nr)
+    pips_user_warning("Possible infinite loop restructuring found.\n");
 
   pips_debug(2, "done\n");
 

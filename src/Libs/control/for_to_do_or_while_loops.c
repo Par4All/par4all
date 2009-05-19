@@ -154,18 +154,16 @@ static bool condition_expression_to_final_bound(expression cond,
 
    @return TRUE if the incrementation is do-loop compatible \`a la Fortran
    - @param is_increasing_p is set to TRUE is the loop index is increasing
-   - @param is_decreasing_p is set to TRUE is the loop index is decreasing
-   - @param pincrement is genereted with the detected increment value expression
+   - @param pincrement is generated with the detected increment value expression
  */
 static bool incrementation_expression_to_increment(expression incr,
 						   entity li,
 						   bool * is_increasing_p,
-						   bool * is_decreasing_p,
 						   expression * pincrement) {
   bool success = FALSE;
   syntax incr_s = expression_syntax(incr);
 
-  if(syntax_call_p(incr_s)) {
+  if (syntax_call_p(incr_s)) {
     call incr_c = syntax_call(incr_s);
     entity op = call_function(incr_c);
     if (! ENDP(call_arguments(incr_c))) {
@@ -182,7 +180,7 @@ static bool incrementation_expression_to_increment(expression incr,
 	}
 	/* Look for i-- or --i: */
 	else if ((ENTITY_POST_DECREMENT_P(op) || ENTITY_PRE_DECREMENT_P(op))) {
-	  * is_decreasing_p = TRUE;
+	  * is_increasing_p = FALSE;
 	  * pincrement = int_to_expression(-1);
 	  success = TRUE;
 	  pips_debug(5, "Decrement operator found!\n");
@@ -201,7 +199,7 @@ static bool incrementation_expression_to_increment(expression incr,
 		pips_debug(5, "Found += with positive increment!\n");
 	      }
 	      else {
-		* is_decreasing_p = TRUE;
+		* is_increasing_p = FALSE;
 		pips_debug(5, "Found += with negative increment!\n");
 	      }
 	    }
@@ -218,7 +216,7 @@ static bool incrementation_expression_to_increment(expression incr,
 		pips_debug(5, "Found -= with negative increment!\n");
 	      }
 	      else {
-		* is_decreasing_p = TRUE;
+		* is_increasing_p = FALSE;
 		pips_debug(5, "Found -= with positive increment!\n");
 	      }
 	    }
@@ -238,7 +236,7 @@ static bool incrementation_expression_to_increment(expression incr,
 		  pips_debug(5, "Found \"i = i + v\" or \"i = v + i\" with positive increment!\n");
 		}
 		else {
-		  * is_decreasing_p = TRUE;
+		  * is_increasing_p = FALSE;
 		  pips_debug(5, "Found \"i = i + v\" or \"i = v + i\" with negative increment!\n");
 		}
 	      }
@@ -283,20 +281,21 @@ loop for_to_do_loop_conversion(expression init,
    */
   entity li = entity_undefined; ///< loop index
   expression lb = expression_undefined; ///< initializing expression
+
   if (init_expression_to_index_and_initial_bound(init, &li, &lb)) {
-    bool is_lower_p;
+    bool is_upper_p;
     expression ub = expression_undefined; ///< The upper bound
-    if (condition_expression_to_final_bound(cond, li, &is_lower_p, &ub)) {
-      bool is_increasing_p = FALSE;
-      bool is_decreasing_p = FALSE;
+
+    if (condition_expression_to_final_bound(cond, li, &is_upper_p, &ub)) {
+      bool is_increasing_p;
 
       if (incrementation_expression_to_increment(incr, li, &is_increasing_p,
-						 &is_decreasing_p,
 						 &increment)) {
-	if(is_lower_p && is_increasing_p)
+	/* We have found a do-loop compatible for-loop: */
+	if (!is_upper_p && is_increasing_p)
 	  pips_user_warning("Loop with lower bound and increasing index %s\n",
 			    entity_local_name(li));
-	if(!is_lower_p && is_decreasing_p)
+	if (is_upper_p && !is_increasing_p)
 	  pips_user_warning("Loop with upper bound and decreasing index %s\n",
 			    entity_local_name(li));
 	lr = make_range(lb, ub, increment);
