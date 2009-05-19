@@ -3,7 +3,6 @@ int
 desugar_loop(int i) {
   int j = 0;
 
-#if 0
   while (j < i) {
     j = j + 1;
     // This test should be structured at the end:
@@ -18,7 +17,6 @@ desugar_loop(int i) {
     j += i;
   }
 
-#endif
   while (j < i) {
     j = j + 1;
     if (j > 100)

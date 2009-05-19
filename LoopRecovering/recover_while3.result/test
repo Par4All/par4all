@@ -39,28 +39,23 @@ int find_while(int i)
 {
 €Unstructured c_1_1 end: c_4_1
 ‚Unstructured Item c_1_1
-C Unstructured node 0x29103b0 -> 0x292cc60 0x29103b0
 
 begin2:   if (i++<9)                                                           /*0006*/
       ;
 ƒUnstructured Successor -> c_2_1 c_1_1
 ‚Unstructured Item c_2_1
-C Unstructured node 0x292cc60 -> 0x292c070
    
    // Just verify it works with 2 consecutive labels:
 end2:   ;
 ƒUnstructured Successor -> c_3_1
 ‚Unstructured Item c_3_1
-C Unstructured node 0x292c070 -> 0x292cfe0 0x292d300
 
 begin:   if (i<9)                                                             /*0014*/
       ;
 ƒUnstructured Successor -> c_4_1 c_5_1
 ‚Unstructured Item c_4_1
-C Unstructured node 0x292cfe0 ->
 ƒUnstructured Successor ->
 ‚Unstructured Item c_5_1
-C Unstructured node 0x292d300 -> 0x292c070
    i = 8*i;                                                             /*0018*/
 ƒUnstructured Successor -> c_3_1
 Unstructured End c_1_1 end: c_4_1

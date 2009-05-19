@@ -1,8 +1,8 @@
-delete recover_while4
+delete desugar_loop_extract
 
 setproperty ABORT_ON_USER_ERROR TRUE
 
-create recover_while4 recover_while4.c
+create desugar_loop_extract desugar_loop_extract.c
 
 activate C_PARSER
 
@@ -11,24 +11,14 @@ setproperty PRETTYPRINT_C_CODE TRUE
 ## To investigate with weird control graphs:
 #setproperty UNSPAGHETTIFY_IN_CONTROLIZER FALSE
 
-display PARSED_PRINTED_FILE[find_while]
+display PRINTED_FILE[desugar_loop]
 
-display PRINTED_FILE[find_while]
+setproperty PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH_VERBOSE TRUE
 
-#setproperty PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH_VERBOSE TRUE
-
-display GRAPH_PRINTED_FILE[find_while]
+#display GRAPH_PRINTED_FILE[desugar_loop]
 
 setproperty UNSPAGHETTIFY_WHILE_RECOVER TRUE
 apply RESTRUCTURE_CONTROL
-
-display PRINTED_FILE
-
-apply RECOVER_FOR_LOOP
-
-display PRINTED_FILE
-
-apply FOR_LOOP_TO_DO_LOOP
 
 display PRINTED_FILE
 
@@ -36,5 +26,5 @@ activate TRANSFORMERS_INTER_FULL
 activate PRINT_CODE_PRECONDITIONS
 
 close
-#delete recover_while4
+delete desugar_loop_extract
 quit

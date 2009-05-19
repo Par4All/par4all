@@ -1,0 +1,32 @@
+int main()
+{
+   int a[100];
+   int i;
+   int j;
+   
+   // A do loop ! Should be parallel
+   for (i = 2;i<100;i += 1)                                             /*0007*/
+      a[i] = 2;                                                         /*0008*/
+   
+   // Should not be a do loop because j is not the expected index !
+   for (i = 2;i<=50;j += 1)                                             /*0011*/
+      a[i] = 2;                                                         /*0012*/
+
+   return 0;                                                            /*0014*/
+}
+int main()
+{
+   int a[100];
+   int i;
+   int j;
+   
+   // A do loop ! Should be parallel
+   for(i = 2; i <= 99; i += 1)                                          /*0007*/
+      a[i] = 2;                                                         /*0008*/
+   
+   // Should not be a do loop because j is not the expected index !
+   for (i = 2;i<=50;j += 1)                                             /*0011*/
+      a[i] = 2;                                                         /*0012*/
+
+   return 0;                                                            /*0014*/
+}
