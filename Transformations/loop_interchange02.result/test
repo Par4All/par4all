@@ -8,11 +8,11 @@ void loop_interchange02(int n, int ni, int nj, int nk)
    int j;
    int k;
 
-l1:   
+l1:
    for(i = 0; i <= ni-1; i += 1)
-l2:      
+l2:
       for(j = 0; j <= nj-1; j += 1)
-l3:         
+l3:
          for(k = 0; k <= nk-1; k += 1)
             x[i][j][k] = 0.;
 }
@@ -28,9 +28,9 @@ void loop_interchange02(int n, int ni, int nj, int nk)
    int j;
    int k;
 
-l1:   
+l1:
    for(i = 0; i <= ni-1; i += 1)
-l2:      
+l2:
       for(jp = 0; jp <= -1+nk; jp += 1)
          for(kp = 0; kp <= -1+nj; kp += 1)
             x[i][kp][jp] = 0.;
@@ -38,6 +38,3 @@ l2:
 
 Warnings
 
-CONTROLIZER[loop_interchange02] (for_to_do_loop_conversion) Loop with lower bound and increasing index 0`k
-CONTROLIZER[loop_interchange02] (for_to_do_loop_conversion) Loop with lower bound and increasing index 0`j
-CONTROLIZER[loop_interchange02] (for_to_do_loop_conversion) Loop with lower bound and increasing index 0`i

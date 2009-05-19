@@ -1,4 +1,4 @@
-// The goal of this test case is to check that all basic reduction operator
+// The goal of this test case is to check that all basic reduction operators
 // are well detected by pips
 
 int main () {
