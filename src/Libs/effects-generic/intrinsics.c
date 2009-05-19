@@ -902,78 +902,6 @@ address_of_effects(entity f __attribute__ ((__unused__)),list args)
     return(lr);
 }
 
-
-/* @return the corresponding list of effects.
- * @param args, the list or arguments.
- * @param update_p, set to true if the operator is an update operator (i.e +=)
- * @param unique_p, set to true if the operator is an unique operator (i.e ++)
- * Three different cases are handled:
- * the standard assignement: x = y;
- * the assignement with update, x+=y, which implies first a read of the lhs
- * the update, x++, which has no rhs
- * 
- */
-static list any_affect_effects_old(entity e __attribute__ ((__unused__)),
-				   list args,
-				   bool update_p,
-				   bool unique_p)
-{
-  list le = NIL;
-  expression lhs = EXPRESSION(CAR(args));
-  syntax s = expression_syntax(lhs);
-
-  pips_debug(5, "begin\n");
-
-  if (syntax_reference_p(s)) 
-    {
-      pips_debug(5, "this is a reference\n");
-
-      if(update_p) 
-	{
-	  pips_debug(5, "update_p is true\n");
-	  le = generic_proper_effects_of_expression(lhs);
-	  /* To avoid sharing between references as we move away from 
-	     preference with C */
-	  // PIER: Need to understand why a generic_proper_effects_of_lhs is
-	  // done on a copy of the reference here. Because of that the 
-	  // reduction phase is puzzled
-	  //le = gen_nconc(le, generic_proper_effects_of_lhs
-	  //(copy_reference(syntax_reference(s))));
-	}
-      le = gen_nconc(le, generic_proper_effects_of_lhs(syntax_reference(s)));	 
-    }
-  else 
-    {
-       pips_debug(5, "this is not a reference\n");
-     
-      if(update_p) 
-	{
-	  pips_debug(5, "update_p is false\n");
-	 
-	  le = generic_proper_effects_of_expression(lhs);	 
-	  /* To avoid sharing in effects which help when combining and
-	     freeing effects, too bad for the memory leak at the
-	     expression level. No time to think about something better for
-	     the time being, although preference is around to help. FI */
-	  le = gen_nconc(le, generic_proper_effects_of_any_lhs(copy_expression(lhs)));
-	}
-      le = gen_nconc(le, generic_proper_effects_of_any_lhs(lhs));	 
-    }
-  
-  if(!unique_p)
-    {
-      pips_debug(5, "unique_p is fase\n");
-	 
-      expression rhs = EXPRESSION(CAR(CDR(args)));
-      le = gen_nconc(le, generic_proper_effects_of_expression(rhs));
-      	 
-    }
-
-  pips_debug(5, "end\n");
-
-  return le;
-}
-
 /* @return the corresponding list of effects.
  * @param args, the list or arguments.
  * @param update_p, set to true if the operator is an update operator (i.e +=)
