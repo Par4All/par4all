@@ -2389,10 +2389,23 @@ text_loop_default(
 	pc = CHAIN_SWORD(pc," {");
     }
 
-    u = make_unformatted(strdup(label), n, margin, pc) ;
-    ADD_SENTENCE_TO_TEXT(r, first_sentence = 
-			 make_sentence(is_sentence_unformatted, u));
-    
+    if(prettyprint_is_fortran) {
+      u = make_unformatted(strdup(label), n, margin, pc) ;
+      ADD_SENTENCE_TO_TEXT(r, first_sentence =
+			   make_sentence(is_sentence_unformatted, u));
+    }
+    else {
+      /* Assumed to be C */
+      if ((label != NULL) && (label[0] != '\0')) {
+	pips_debug(9, "the label %s need to be print for a for C loop", label);
+	u = make_unformatted(strdup(label), n, margin, NULL) ;	
+	ADD_SENTENCE_TO_TEXT(r, first_sentence =
+			     make_sentence(is_sentence_unformatted, u));
+      }
+      u = make_unformatted(NULL, n, margin, pc) ;
+      ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_unformatted, u));
+    }
+
     /* builds the PRIVATE scalar declaration if required
      */
     if(!ENDP(loop_locals(obj)) && (doall_loop_p || all_private)
