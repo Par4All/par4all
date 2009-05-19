@@ -32,7 +32,8 @@ LIB_CFILES =	replace.c \
 		inlining.c \
 		expression_substitution.c \
 		loop_peeling.c \
-		for_loop_recovering.c
+		for_loop_recovering.c \
+		scalarization.c
 
 INC_TARGET =    $(TARGET).h
 

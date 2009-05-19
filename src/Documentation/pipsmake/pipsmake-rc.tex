@@ -6727,6 +6727,21 @@ the option to compute new declarations for instrumented array
 ARRAY_RESIZING_BOTTOM_UP_OPTION 0
 \end{PipsProp}
 
+\subsection{Scalarization}
+
+Scalarization phase.
+
+This function is being implemented by Laurent \textsc{Daverio}.
+
+\begin{PipsMake}
+alias scalarization 'Scalarization'
+scalarization  > MODULE.code
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.privatized_regions
+        < MODULE.copy_out_regions
+\end{PipsMake}
+
 
 %-----------End of Declaration Transformations -------------------------
 

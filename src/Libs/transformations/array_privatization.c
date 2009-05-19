@@ -117,7 +117,7 @@ static bool privatizer(char *module_name)
     entity module;
     statement module_stat;
 
-    pips_assert("Coyp-in not implemented.\n", !copy_in);
+    pips_assert("Copy-in not implemented.\n", !copy_in);
     pips_assert("No array section privatization"
 		" if we do not store as regions.\n", 
 		store_as_regions || ! privatize_sections);
