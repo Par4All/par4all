@@ -5,7 +5,8 @@ int main(int argc, char *argv[])
 {
    int i;
    int j = 1;
-loop:   for(i = 0; i <= 99; i += 1)
+loop:   
+   for(i = 0; i <= 99; i += 1)
       j += 2*i;
    return j;
 }

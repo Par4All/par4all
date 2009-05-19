@@ -8,9 +8,12 @@ void loop_interchange02(int n, int ni, int nj, int nk)
    int j;
    int k;
 
-l1:   for(i = 0; i <= ni-1; i += 1)
-l2:      for(j = 0; j <= nj-1; j += 1)
-l3:         for(k = 0; k <= nk-1; k += 1)
+l1:   
+   for(i = 0; i <= ni-1; i += 1)
+l2:      
+      for(j = 0; j <= nj-1; j += 1)
+l3:         
+         for(k = 0; k <= nk-1; k += 1)
             x[i][j][k] = 0.;
 }
 
@@ -25,8 +28,10 @@ void loop_interchange02(int n, int ni, int nj, int nk)
    int j;
    int k;
 
-l1:   for(i = 0; i <= ni-1; i += 1)
-l2:      for(jp = 0; jp <= -1+nk; jp += 1)
+l1:   
+   for(i = 0; i <= ni-1; i += 1)
+l2:      
+      for(jp = 0; jp <= -1+nk; jp += 1)
          for(kp = 0; kp <= -1+nj; kp += 1)
             x[i][kp][jp] = 0.;
 }
