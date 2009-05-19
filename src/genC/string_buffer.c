@@ -1,5 +1,18 @@
-/* $Id$ */
-/* a la java StringBuffer */
+/* $Id$
+
+   Implement an a la java StringBuffer, a string-like object with
+   efficient modification methods.
+
+   The idea here is to speed-up concatenation of strings by keeping a
+   stack of string and delaying the final build-up of the global string up
+   to an explicit call to the string_buffer_to_string() method.
+
+   In this way, if we have s strings of c characters, the concatenation
+   complexity is in O(sc) with string_buffer_append() instead of O(s^2 c)
+   with concatenate().
+
+   Fabien Coelho, Mines ParisTech/CRI.
+ */
 
 #include <stdlib.h>
 #include "genC.h"
