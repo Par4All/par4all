@@ -1053,7 +1053,7 @@ assign_substring_effects(entity e __attribute__ ((__unused__)), list args)
             pips_error("assign_substring_effects", "not a reference\n");
 
 
-    le = generic_proper_effects_of_lhs(syntax_reference(s));
+    le = generic_proper_effects_of_written_reference(syntax_reference(s));
     le = gen_nconc(le, generic_proper_effects_of_expression(l));
     le = gen_nconc(le, generic_proper_effects_of_expression(u));
 
@@ -1144,8 +1144,8 @@ some_io_effects(entity e __attribute__ ((__unused__)), list args __attribute__ (
     pips_assert("io_effects", private_io_entity != entity_undefined);
 
     ref = make_reference(private_io_entity,indices);
-    le = gen_nconc(le, generic_proper_effects_of_reference(ref));
-    le = gen_nconc(le, generic_proper_effects_of_lhs(ref));
+    le = gen_nconc(le, generic_proper_effects_of_read_reference(ref));
+    le = gen_nconc(le, generic_proper_effects_of_written_reference(ref));
 
     return le;
 }
@@ -1257,8 +1257,8 @@ static list io_effects(entity e, list args)
             pips_assert("private_io_entity is defined", private_io_entity != entity_undefined);
 
             ref = make_reference(private_io_entity, indices);
-            le = gen_nconc(le, generic_proper_effects_of_reference(ref));
-            le = gen_nconc(le, generic_proper_effects_of_lhs(copy_reference(ref)));
+            le = gen_nconc(le, generic_proper_effects_of_read_reference(ref));
+            le = gen_nconc(le, generic_proper_effects_of_written_reference(copy_reference(ref)));
         }
     }
 
@@ -1490,10 +1490,10 @@ static list any_rgs_effects(entity e __attribute__ ((__unused__)), list args, bo
 
   ifdebug(8) print_reference(ref);
 
-  le = gen_nconc(le, generic_proper_effects_of_reference(ref));
+  le = gen_nconc(le, generic_proper_effects_of_read_reference(ref));
 
   if(init_p == TRUE){
-    le = gen_nconc(le, generic_proper_effects_of_lhs(ref));
+    le = gen_nconc(le, generic_proper_effects_of_written_reference(ref));
   }
 
   pips_debug(5, "end\n");
@@ -1670,7 +1670,7 @@ effects_of_iolist(list exprs, tag act)
             pips_debug(6, "is_action_write");
             /* pips_assert("effects_of_iolist", syntax_reference_p(s)); */
             if(syntax_reference_p(s))
-              lep = generic_proper_effects_of_lhs(syntax_reference(s));
+              lep = generic_proper_effects_of_written_reference(syntax_reference(s));
             else
             {
               /* write action on a substring */
@@ -1682,7 +1682,7 @@ effects_of_iolist(list exprs, tag act)
                 expression l = EXPRESSION(CAR(CDR(call_arguments(syntax_call(s)))));
                 expression u = EXPRESSION(CAR(CDR(CDR(call_arguments(syntax_call(s))))));
 
-                lep = generic_proper_effects_of_lhs
+                lep = generic_proper_effects_of_written_reference
                     (syntax_reference(expression_syntax(e)));
                 lep = gen_nconc(lep, generic_proper_effects_of_expression(l));
                 lep = gen_nconc(lep, generic_proper_effects_of_expression(u));
@@ -1744,7 +1744,7 @@ effects_of_implied_do(expression exp, tag act)
      * might execute no iteration.
      */
 
-    le = generic_proper_effects_of_lhs(ref); /* the loop index is must-written */
+    le = generic_proper_effects_of_written_reference(ref); /* the loop index is must-written */
     /* Read effects are masked by the first write to the implied-do loop variable */
 
     /* effects of implied-loop bounds and increment */
@@ -1804,7 +1804,7 @@ effects_of_implied_do(expression exp, tag act)
 
       if (syntax_reference_p(s))
         if (act == is_action_write)
-          lep = generic_proper_effects_of_lhs(syntax_reference(s));
+          lep = generic_proper_effects_of_written_reference(syntax_reference(s));
         else
           lep = generic_proper_effects_of_expression(expr);
       else

@@ -1787,14 +1787,14 @@ int a, *p; &   & \\
       & a & a\\
       &*p & p[0] \\\hline
 
-int t[N], *p, (*q)[N], * u[N], **v; & & \\ 
+int t[N], *p, (*q)[N], *u[N], **v; & & \\ 
         & *t & t[0] \\
         & t[I] & t[I] \\
         & *p & p[0] \\
-         & (*p)[I]& p[0][I]\\ 
+         & p[I]& p[I]\\ 
         & (*q)[I] & q[0][I] \\
-        & *(u[I])& u[I][0]\\
-        & *((*v)[I])& v[0][I][0]\\\hline
+        & *u[I]& u[I][0]\\
+        & *v[I]& v[I][0]\\\hline
 
 typedef struct \{ & & \\
 int num; && \\

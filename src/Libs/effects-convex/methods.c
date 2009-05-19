@@ -58,6 +58,8 @@ set_methods_for_convex_effects()
     reference_to_effect_func = reference_to_convex_region;
     effect_to_store_independent_effect_list_func = 
       region_to_store_independent_region_list;
+    effect_add_expression_dimension_func =
+      convex_region_add_expression_dimension;
 
     effect_union_op = regions_must_convex_hull;
     effects_union_op = RegionsMustUnion;

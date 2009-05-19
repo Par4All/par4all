@@ -182,7 +182,8 @@ set_methods_for_proper_simple_effects()
     reference_to_effect_func = reference_to_simple_effect;
     effect_to_store_independent_effect_list_func = 
       effect_to_store_independent_sdfi_list;
-
+    effect_add_expression_dimension_func =
+      simple_effect_add_expression_dimension;
     effect_union_op = effect_must_union;
 
     /* FIL Changed because of C conditional operator. */
@@ -248,7 +249,7 @@ set_methods_for_simple_effects()
     effects_sup_difference_op = EffectsSupDifference;
     effects_inf_difference_op = EffectsInfDifference;
     effects_transformer_composition_op =
-	effects_composition_with_effect_transformer;
+	simple_effects_composition_with_effect_transformer;
     effects_transformer_inverse_composition_op =
 	effects_composition_with_transformer_nop;
     effects_precondition_composition_op =

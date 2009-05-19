@@ -68,7 +68,8 @@ effect reference_to_simple_effect(reference ref, action ac)
   type t = entity_type(reference_variable(ref));
   type ut = ultimate_type(t);
 
-  pips_debug(8, "Begins for reference: \"%s\"\n", words_to_string(words_reference(ref)));
+  pips_debug(8, "Begins for reference: \"%s\"\n", 
+	     words_to_string(words_reference(ref)));
 
   if(type_variable_p(ut)) {
     variable utv = type_variable(ut);
@@ -79,81 +80,90 @@ effect reference_to_simple_effect(reference ref, action ac)
     list td = variable_dimensions(tv);
 
     /* The dimensions can be hidden in the typedef or before the typedef */
-    if(type_variable_p(t)) {
+    if(type_variable_p(t)) 
+      {
+	is_array_p = is_array_p || (!ENDP(td));
+      }
 
-      is_array_p = is_array_p || (!ENDP(td));
-    }
+    if(is_array_p) 
+      {
+	if((gen_length(ind) == type_depth(t))) 
+	  {
+	    /* The dimensionalities of the index and type are the same: */
+	    /* cell cell_ref = make_cell_reference(copy_reference(ref)); */
+	    cell cell_ref = make_cell_preference(make_preference(ref));
+	    addressing ad = make_addressing_index();
+	    approximation ap = make_approximation_must();
+	    eff = make_effect(cell_ref, ac, ad, ap, make_descriptor_none());
+	  }
+	else if((gen_length(ind) < type_depth(t))) 
+	  {
+	    /* This may happen with an array of structures */
+	    int d = (t==ut) ? gen_length(td) : gen_length(td)+gen_length(utd);
 
-    if(is_array_p) {
-      if((gen_length(ind) == type_depth(t))) {
-	/* The dimensionalities of the index and type are the same: */
+	    /* RK: In the following there is 3 tests with the same code in
+	       it. Sounds it needs some code hoisting... ::-) Or some
+	       debug. Is it really the same for the pointer type? */
+	    /* FI: I'm now lost here... */
+	    if(gen_length(ind)==d) 
+	      {
+		reference n_ref = copy_reference(ref);
+		cell cell_ref = make_cell_reference(n_ref);
+		addressing ad = make_addressing_index();
+		approximation ap = make_approximation_must();
+		eff = make_effect(cell_ref, ac, ad, ap, make_descriptor_none());
+	      }
+	    /* FI: I'm not sure this code is of any positive use */
+	    else if(pointer_type_p(ut)) 
+	      {
+		reference n_ref = copy_reference(ref);
+		cell cell_ref = make_cell_reference(n_ref);
+		addressing ad = make_addressing_index();
+		approximation ap = make_approximation_must();
+		eff = make_effect(cell_ref, ac, ad, ap, make_descriptor_none());
+	    }
+	    else 
+	      {
+		/* FI: Which case are we in?*/
+		/* RK: we may access an array with a lower dimensionality, that
+		   is a slice. Useful for example in Fortran code such as:
+		   PRINT *, an_array
+		   Cf @validation Transformations/unroll2.f
+		   
+		   With this solution it is not the an_array(*) that is marked
+		   as must-read but only an_array. But as stated at the main
+		   comment, the effect depends on the action.
+		   
+		   When calling a function with blah(an_array), an_array is
+		   marked as must-read, for its address.
+		   Cf. @validation Effects/call04.c
+		   Even more interesting:
+		   @validation Effects/call05.c
+		*/
+		reference n_ref = copy_reference(ref);
+		cell cell_ref = make_cell_reference(n_ref);
+		addressing ad = make_addressing_index();
+		approximation ap = make_approximation_must();
+		eff = make_effect(cell_ref, ac, ad, ap, make_descriptor_none());
+	      }
+	  }
+	else 
+	  {
+	    /* The memory is not accessed because the array name is a
+	       constant. It can be used directly or the the base for some
+	       address computation. */
+	    ;
+	  }
+      }
+    else 
+      {
+	/* It is not an array. Addressing is encoded in a different way
+	   for structures, unions and pointers. */
 	cell cell_ref = make_cell_preference(make_preference(ref));
 	addressing ad = make_addressing_index();
 	approximation ap = make_approximation_must();
 	eff = make_effect(cell_ref, ac, ad, ap, make_descriptor_none());
       }
-      else if((gen_length(ind) < type_depth(t))) {
-	/* This may happen with an array of structures */
-	int d = (t==ut) ? gen_length(td) : gen_length(td)+gen_length(utd);
-
-	/* RK: In the following there is 3 tests with the same code in
-	   it. Sounds it needs some code hoisting... ::-) Or some
-	   debug. Is it really the same for the pointer type? */
-	/* FI: I'm now lost here... */
-	if(gen_length(ind)==d) {
-	  reference n_ref = copy_reference(ref);
-	  cell cell_ref = make_cell_reference(n_ref);
-	  addressing ad = make_addressing_index();
-	  approximation ap = make_approximation_must();
-	  eff = make_effect(cell_ref, ac, ad, ap, make_descriptor_none());
-	}
-	/* FI: I'm not sure this code is of any positive use */
-	else if(pointer_type_p(ut)) {
-	  reference n_ref = copy_reference(ref);
-	  cell cell_ref = make_cell_reference(n_ref);
-	  addressing ad = make_addressing_index();
-	  approximation ap = make_approximation_must();
-	  eff = make_effect(cell_ref, ac, ad, ap, make_descriptor_none());
-	}
-	else {
-	  /* FI: Which case are we in?*/
-	  /* RK: we may access an array with a lower dimensionality, that
-	     is a slice. Useful for example in Fortran code such as:
-	       PRINT *, an_array
-	       Cf @validation Transformations/unroll2.f
-
-	     With this solution it is not the an_array(*) that is marked
-	     as must-read but only an_array. But as stated at the main
-	     comment, the effect depends on the action.
-
-	     When calling a function with blah(an_array), an_array is
-	     marked as must-read, for its address.
-	     Cf. @validation Effects/call04.c
-	     Even more interesting:
-	     @validation Effects/call05.c
-	  */
-	  reference n_ref = copy_reference(ref);
-	  cell cell_ref = make_cell_reference(n_ref);
-	  addressing ad = make_addressing_index();
-	  approximation ap = make_approximation_must();
-	  eff = make_effect(cell_ref, ac, ad, ap, make_descriptor_none());
-	}
-      }
-      else {
-	/* The memory is not accessed because the array name is a
-	   constant. It can be used directly or the the base for some
-	   address computation. */
-	;
-      }
-    }
-    else {
-      /* It is not an array. Addressing is encoded in a different way
-	 for structures, unions and pointers. */
-      cell cell_ref = make_cell_preference(make_preference(ref));
-      addressing ad = make_addressing_index();
-      approximation ap = make_approximation_must();
-      eff = make_effect(cell_ref, ac, ad, ap, make_descriptor_none());
-    }
   }
   else if(type_functional_p(ut)) {
     /* Must be a function used to initialize a pointer to a function */
@@ -162,11 +172,75 @@ effect reference_to_simple_effect(reference ref, action ac)
   else {
     pips_internal_error("Unexpected type\n");
   }
-
+  
   pips_debug(8, "end\n");
-
+  
   return eff;
 }
+
+
+/* void simple_effect_add_expression_dimension(effect eff, expression exp)
+ * input    : a simple effect and an expression
+ * output   : nothing
+ * modifies : the effect eff, and normalizes the expression
+ * comment  : adds a last dimension [exp] to the effect if the expression 
+ *            is normlizable. If not adds a last dimension [*], and changes
+ *            the approximation into may.
+ */
+void simple_effect_add_expression_dimension(effect eff, expression exp)
+{
+
+  expression deref_exp;
+  cell eff_c = effect_cell(eff);
+  reference ref;
+  normalized nexp = NORMALIZE_EXPRESSION(exp);
+  
+  ifdebug(8)
+    {
+      pips_debug(8, "begin with effect :\n");
+      print_effect(eff);
+    }
+  
+  if (cell_preference_p(eff_c))
+    {
+      /* it's a preference : we should not modify it */
+      pips_debug(8, "It's a preference\n");
+      ref = copy_reference(preference_reference(cell_preference(eff_c)));
+      preference_reference(cell_preference(eff_c)) = ref;
+    }
+  else
+    {
+      /* it's a reference : let'us modify it */
+      ref = cell_reference(eff_c);
+    }
+  
+  if (normalized_linear_p(nexp))
+    {
+      reference_indices(ref) = gen_nconc(reference_indices(ref),
+					 CONS(EXPRESSION, 
+					      copy_expression(exp), 
+					      NIL));
+    }
+  else
+    {      
+      reference_indices(ref) = gen_nconc(reference_indices(ref),
+					 CONS(EXPRESSION, 
+					      make_unbounded_expression(), 
+					      NIL));
+      effect_approximation_tag(eff) = is_approximation_may; 
+    }  
+  
+  ifdebug(8)
+    {
+      pips_debug(8, "end with effect :\n");
+      print_effect(eff);
+      pips_assert("the effect is not consistent", effect_consistent_p(eff));
+    }
+  
+  return;
+}
+
+
 
 /*********************************************************************************/
 /* SIMPLE EFFECTS                                                                */
@@ -334,3 +408,128 @@ simple_effects_descriptor_normalize(list l_eff __attribute__ ((unused)))
 {
   return;
 }
+
+
+/* 
+ * It's not yet completely safe for C code when pointers are
+ * modified.
+*/
+list simple_effects_composition_with_effect_transformer(list l_eff,
+						   transformer trans
+						   __attribute__((__unused__)))
+{
+  list l_res=NIL;
+  
+  ifdebug(8) 
+    {
+      pips_debug(8, "Begin\n");
+      print_effects(l_eff);
+    }
+
+  FOREACH (EFFECT, eff, l_eff)
+    {
+      l_res = 
+	gen_nconc(l_res, 
+		  effect_to_store_independent_sdfi_list(eff, FALSE) 
+		  );
+    }
+  
+  ifdebug(8) 
+    {
+      pips_debug(8, "Begin\n");
+      print_effects(l_res);
+    }
+  
+  return(l_res);
+}
+
+/* This function does not do what it was designed for : 
+   It should transform the effects l_eff corresponding to S2 with
+   transformer T1 corresponding to S1. 
+   But it uses effects from S2 instead of effects from S1.
+   (see r_rw_effects_of_sequence)
+   I keep it for future reuse after modification.
+   BC.
+*/
+list old_effects_composition_with_effect_transformer(list l_eff,
+						 transformer trans __attribute__((__unused__)))
+{
+  /* FI: used to be nop and wrong information is now preserved
+     intraprocedurally with loops, maybe because I modified simple
+     effects; since we do not have transformers, we use instead the
+     effects themselves, which could be transformed into a
+     transformer... 
+
+     The effects are supposed to be ordered. A write effect must
+     appears before another effect to require an update.
+*/
+  list l1 = list_undefined;
+  list l2 = list_undefined;
+  extern string words_to_string(list);
+
+  ifdebug(8) {
+    pips_debug(8, "Begin: %zd effects before composition:\n", gen_length(l_eff));
+    MAP(EFFECT, eff, {
+	reference r = effect_any_reference(eff);
+	pips_debug(8, "%p: %s\n", eff, words_to_string(effect_words_reference_with_addressing_as_it_is(r, addressing_tag(effect_addressing(eff)))));
+	pips_assert("Effect eff is consitent", effect_consistent_p(eff));
+      },  l_eff);
+  }
+
+  for(l1= l_eff; !ENDP(l1); POP(l1)) {
+    effect e1 = EFFECT(CAR(l1));
+    for(l2 = CDR(l1); !ENDP(l2); POP(l2)) {
+      effect e2 = EFFECT(CAR(l2));
+
+      ifdebug(1) {
+	pips_assert("Effect e1 is consitent", effect_consistent_p(e1));
+	pips_assert("Effect e2 is consitent", effect_consistent_p(e2));
+      }
+
+      ifdebug(8) {
+	reference r1 = effect_any_reference(e1);
+	reference r2 = effect_any_reference(e2);
+	(void) fprintf(stderr, "e1 %p: %s (%s)\n", e1, words_to_string(effect_words_reference_with_addressing_as_it_is(r1, addressing_tag(effect_addressing(e1)))),
+		       action_to_string(effect_action(e1)));
+	(void) fprintf(stderr, "e2 %p: %s (%s)\n", e2,
+		       words_to_string(effect_words_reference_with_addressing_as_it_is(r2, addressing_tag(effect_addressing(e2)))),
+		       action_to_string(effect_action(e2)));
+      }
+
+      e2 = effect_interference(e2, e1);
+
+      ifdebug(8) {
+	reference r2 = effect_any_reference(e2);
+	tag ad2 = addressing_tag(effect_addressing(e2));
+	(void) fprintf(stderr, "resulting e2 %p: %s (%s)\n", e2,
+		       words_to_string(effect_words_reference_with_addressing_as_it_is(r2, ad2)),
+		       action_to_string(effect_action(e2)));
+	pips_assert("New effect e2 is consitent", effect_consistent_p(e2));
+      }
+
+      EFFECT_(CAR(l2)) = e2;
+    }
+  }
+
+  ifdebug(8) {
+    pips_debug(8, "End: %zd effects after composition:\n", gen_length(l_eff));
+    MAP(EFFECT, eff, {
+	reference r = effect_any_reference(eff);
+	pips_debug(8, "%p: %s\n", eff, words_to_string(effect_words_reference_with_addressing_as_it_is(r, addressing_tag(effect_addressing(eff)))));
+      },  l_eff);
+  }
+
+  /* FI: Not generic. */
+  l_eff = proper_effects_combine(l_eff, FALSE);
+
+  ifdebug(8) {
+    pips_debug(8, "End: %zd effects after composition:\n", gen_length(l_eff));
+    MAP(EFFECT, eff, {
+	reference r = effect_any_reference(eff);
+	pips_debug(8, "%p: %s\n", eff, words_to_string(effect_words_reference_with_addressing_as_it_is(r, addressing_tag(effect_addressing(eff)))));
+      },  l_eff);
+  }
+
+  return l_eff;
+}
+
