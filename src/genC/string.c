@@ -43,29 +43,29 @@ string gen_strndup(
     string s, /* la chaine a copier */
     size_t n /* le nombre de caracteres a copier */)
 {
- 	register string r;
-	register size_t i;
+  register string r;
+  register size_t i;
 
-	/* The length must be positive: */
-	assert((intptr_t) n >= 0);
+  /* The length must be positive: */
+  assert((intptr_t) n >= 0);
 
-	/* allocation */
-	if ((r = (string) malloc(n)) == NULL) {
-		fprintf(stderr, "gen_strndup: out of memory\n");
-		exit(1);
-	}
+  /* allocation */
+  if ((r = (string) malloc(n)) == NULL) {
+    fprintf(stderr, "gen_strndup: out of memory\n");
+    exit(1);
+  }
 
-	/* recopie */
-	for (i = 0; i < n && s[i] != '\0'; i += 1 )
-		r[i] = s[i];
+  /* recopie */
+  for (i = 0; i < n && s[i] != '\0'; i += 1 )
+    r[i] = s[i];
 
-	/* padding */
-	while (i < n) {
-		r[i] = '\0';
-		i += 1;
-	}
+  /* padding */
+  while (i < n) {
+    r[i] = '\0';
+    i += 1;
+  }
 
-	return(r);
+  return r;
 }
 
 /* Like strdup() but copy at most n characters.
@@ -74,29 +74,29 @@ string gen_strndup0(
     string s, /* la chaine a copier */
     size_t n /* le nombre de caracteres a copier */)
 {
- 	register string r;
-	register size_t i;
+  register string r;
+  register size_t i;
 
-	/* The length must be positive: */
-	assert((intptr_t) n >= 0);
+  /* The length must be positive: */
+  assert((intptr_t) n >= 0);
 
-	/* allocation */
-	if ((r = (string) malloc(n+1)) == NULL) {
-		fprintf(stderr, "gen_strndup0: out of memory\n");
-		exit(1);
-	}
+  /* allocation */
+  if ((r = (string) malloc(n+1)) == NULL) {
+    fprintf(stderr, "gen_strndup0: out of memory\n");
+    exit(1);
+  }
 
-	/* recopie */
-	for (i = 0; i < n && s[i] != '\0'; i += 1 )
-		r[i] = s[i];
+  /* recopie */
+  for (i = 0; i < n && s[i] != '\0'; i += 1 )
+    r[i] = s[i];
 
-	/* padding */
-	while (i < n+1) {
-		r[i] = '\0';
-		i += 1;
-	}
+  /* padding */
+  while (i < n+1) {
+    r[i] = '\0';
+    i += 1;
+  }
 
-	return(r);
+  return r;
 }
 
 /* CONCATENATE() *********** Last argument must be NULL *********/
@@ -120,20 +120,19 @@ char * itoa(int i) {
   return buf;
 }
 
-
 void init_the_buffer(void)
 {
-    /* initial allocation
-     */
-    if (buffer_size==0)
-    {
-		message_assert("NULL buffer", buffer==NULL);
-		buffer_size = BUFFER_SIZE_INCREMENT;
-		buffer = (string) malloc(buffer_size);
-		message_assert("enough memory", buffer);
-    }
-    current = 0;
-    buffer[0] = '\0';
+  /* initial allocation
+   */
+  if (buffer_size==0)
+  {
+    message_assert("NULL buffer", buffer==NULL);
+    buffer_size = BUFFER_SIZE_INCREMENT;
+    buffer = (string) malloc(buffer_size);
+    message_assert("enough memory", buffer);
+  }
+  current = 0;
+  buffer[0] = '\0';
 }
 
 /* If the string is undefined, just skip it. Well, I hope it will not hide
@@ -209,58 +208,58 @@ string concatenate(string next, ...)
 
 string strupper(string s1, string s2)
 {
-    char *r = s1;
+  char *r = s1;
 
-    while (*s2) {
-		*s1 = (islower((int)*s2)) ? toupper(*s2) : *s2;
-		s1++;
-		s2++;
-    }
+  while (*s2) {
+    *s1 = (islower((int)*s2)) ? toupper(*s2) : *s2;
+    s1++;
+    s2++;
+  }
 
-    *s1 = '\0';
+  *s1 = '\0';
 
-    return r;
+  return r;
 }
 
 string strlower(string s1, string s2)
 {
-    char *r = s1;
+  char *r = s1;
 
-    while (*s2) {
-		*s1 = (isupper((int)*s2)) ? tolower(*s2) : *s2;
-		s1++;
-		s2++;
-    }
+  while (*s2) {
+    *s1 = (isupper((int)*s2)) ? tolower(*s2) : *s2;
+    s1++;
+    s2++;
+  }
 
-    *s1 = '\0';
+  *s1 = '\0';
 
-    return r;
+  return r;
 }
 
 string bool_to_string(bool b)
 {
-    return b? "TRUE": "FALSE";
+  return b? "TRUE": "FALSE";
 }
 
 /* @return the english suffix for i.
  */
 string nth_suffix(int i)
 {
-    string suffix = string_undefined;
+  string suffix = string_undefined;
 
-    message_assert("Formal parameter i is greater or equal to 1", i >= 1);
+  message_assert("Formal parameter i is greater or equal to 1", i >= 1);
 
-    switch(i) {
-    case 1: suffix = "st";
-	break;
-    case 2: suffix = "nd";
-	break;
-    case 3: suffix = "rd";
-	break;
-    default: suffix = "th";
-	break;
-    }
-    return suffix;
+  switch(i) {
+  case 1: suffix = "st";
+    break;
+  case 2: suffix = "nd";
+    break;
+  case 3: suffix = "rd";
+    break;
+  default: suffix = "th";
+    break;
+  }
+  return suffix;
 }
 
 
