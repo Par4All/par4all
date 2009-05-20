@@ -1783,13 +1783,12 @@ list words_type(type obj)
       }
     case is_type_functional:
       {
-	string_buffer result = string_buffer_make();
+	string_buffer result = string_buffer_make(true);
 	string rs = string_undefined;
-
 	dump_functional(type_functional(obj), result);
 	rs = string_buffer_to_string(result);
 	pc = gen_nconc(pc, CONS(STRING, rs, NIL));
-	string_buffer_free(&result, TRUE);
+	string_buffer_free(&result);
 	break;
       }
     case is_type_varargs:

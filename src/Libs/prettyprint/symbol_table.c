@@ -38,15 +38,15 @@ void dump_common_layout(string_buffer result, entity c, bool debug_p, bool isfor
   list equiv_members = NIL;
 
   string_buffer_append(result, 
-		       strdup(concatenate(NL,"Layout for ",isfortran?"common /":"memory area \"",
+		       concatenate(NL,"Layout for ",isfortran?"common /":"memory area \"",
 					  entity_name(c),isfortran?"/":"\""," of size ",
 					  itoa(area_size(type_area(entity_type(c)))),
-					  ":",NL,NULL)));
+					  ":",NL,NULL));
 
   
   if(ENDP(members)) {
     pips_assert("An empty area has size 0", area_size(type_area(entity_type(c))) ==0);
-    string_buffer_append(result, strdup(concatenate("\t* empty area *",NL,NL,NULL)));
+    string_buffer_append(result, concatenate("\t* empty area *",NL,NL,NULL));
   }
   else {
     // Different preconditions for C and fortran
@@ -105,11 +105,11 @@ void dump_common_layout(string_buffer result, entity c, bool debug_p, bool isfor
 	  }
 
 	  string_buffer_append(result,
-			       strdup(concatenate
-				      ("\tVariable ",entity_name(m),"\toffset = ",
-				       itoa(ram_offset(storage_ram(entity_storage(m)))),NULL)));
+			       concatenate
+			       ("\tVariable ",entity_name(m),"\toffset = ",
+				itoa(ram_offset(storage_ram(entity_storage(m)))),NULL));
 	  string_buffer_append(result,
-			       strdup(concatenate("\tsize = ",itoa(s),NL,NULL))); 
+			       concatenate("\tsize = ",itoa(s),NL,NULL));
 	}
       }, 
 	  members);
@@ -127,33 +127,34 @@ void dump_common_layout(string_buffer result, entity c, bool debug_p, bool isfor
 		    (ram_offset(storage_ram(entity_storage(m)))!= -1));
       
 	if(ram_offset(storage_ram(entity_storage(m))) == DYNAMIC_RAM_OFFSET) {
-	  string_buffer_append(result,strdup(concatenate(
-							 "\tDynamic Variable \"",entity_name(m), 
-							 "\"\toffset = UNKNOWN, \tsize = DYNAMIC",
-							 NL,NULL)));
+	  string_buffer_append(result,
+			       concatenate(
+					   "\tDynamic Variable \"",entity_name(m),
+					   "\"\toffset = UNKNOWN, \tsize = DYNAMIC",
+					   NL,NULL));
 	}
 	else if (ram_offset(storage_ram(entity_storage(m))) == UNDEFINED_RAM_OFFSET) {
 	    
 	  string_buffer_append(result,
-			       strdup(concatenate
-				      ("\tExternal Variable \"", entity_name(m),
-				       "\"\toffset = UNKNOWN,\tsize = ",itoa(s),NL,NULL)));
+			       concatenate
+			       ("\tExternal Variable \"", entity_name(m),
+				"\"\toffset = UNKNOWN,\tsize = ",itoa(s),NL,NULL));
 	}
 	else {
 	
 	  string_buffer_append(result,
-			       strdup(concatenate
+			       concatenate
 				      ("\tVariable \"", entity_name(m),"\"\toffset = ",
-				       itoa(ram_offset(storage_ram(entity_storage(m)))),NULL)));
+				       itoa(ram_offset(storage_ram(entity_storage(m)))),NULL));
 	  string_buffer_append(result,
-			       strdup(concatenate("\tsize = ",itoa(s),NL,NULL)));
+			       concatenate("\tsize = ",itoa(s),NL,NULL));
 	}
       
       }, 
 	  members);
     }
     
-    string_buffer_append(result, strdup(concatenate(NL,NULL)));
+    string_buffer_append(result, NL);
 
     MAP(ENTITY, m, 
     {
@@ -169,21 +170,21 @@ void dump_common_layout(string_buffer result, entity c, bool debug_p, bool isfor
       if(!ENDP(equiv_members)) {
 	sort_list_of_entities(equiv_members);
 
-	string_buffer_append(result, strdup(concatenate("\tVariables aliased to this common:",NL,
-							NULL)));
+	string_buffer_append(result, concatenate("\tVariables aliased to this common:",NL,
+							NULL));
 
 	MAP(ENTITY, m, 
 	{
 	  pips_assert("RAM storage",
 		      storage_ram_p(entity_storage(m)));
 	  string_buffer_append(result,
-			       strdup(concatenate
-				      ("\tVariable", entity_name(m) ,"\toffset =",
-				       ram_offset(storage_ram(entity_storage(m))),"\tsize = ",
-				       SafeSizeOfArray(m),NL,NULL))); 
+			       concatenate
+			       ("\tVariable", entity_name(m) ,"\toffset =",
+				ram_offset(storage_ram(entity_storage(m))),"\tsize = ",
+				SafeSizeOfArray(m),NL,NULL));
 	}, 
 	    equiv_members);
-	string_buffer_append(result, strdup(concatenate(NL,NULL)));
+	string_buffer_append(result, concatenate(NL,NULL));
 	gen_free_list(equiv_members);
       }
     }
@@ -211,54 +212,54 @@ void dump_functional(functional f, string_buffer result)
       basic b = variable_basic(v);
       if(basic_pointer_p(b) && type_functional_p(basic_pointer(b))) {
 	functional f = type_functional(basic_pointer(b));
-	string_buffer_append(result, strdup("("));
+	string_buffer_append(result, "(");
 	dump_functional(f,result);
-	string_buffer_append(result, strdup(") *"));
+	string_buffer_append(result, ") *");
       }
       else {
-	string_buffer_append(result, strdup(basic_to_string(b)));
+	string_buffer_append(result, basic_to_string(b));
       }
     }
     else if(type_functional_p(ta)) {
       functional fa = type_functional(ta);
 
-      string_buffer_append(result, strdup("("));
+      string_buffer_append(result, "(");
       dump_functional(fa, result);
-      string_buffer_append(result, strdup(")"));
+      string_buffer_append(result, ")");
     }
     else if(type_varargs_p(ta)) {
-      string_buffer_append(result, strdup(concatenate(type_to_string(ta),":",NULL)));
+      string_buffer_append(result, concatenate(type_to_string(ta),":",NULL));
       ta = type_varargs(ta);
       string_buffer_append(result,
-			   strdup(basic_to_string(variable_basic(type_variable(ta)))));
+			   basic_to_string(variable_basic(type_variable(ta))));
     }
     else if(type_void_p(ta)) {
       /* FI: we could do nothing or put "void". I choose to put "void"
 	 to give more information about the internal
 	 representation. */
-      string_buffer_append(result, strdup(type_to_string(ta)));
+      string_buffer_append(result, type_to_string(ta));
     }
     if(!ENDP(cp->cdr))
-      string_buffer_append(result, strdup(concatenate(" x ",NULL)));
+      string_buffer_append(result, concatenate(" x ",NULL));
   }
   if(ENDP(functional_parameters(f))) {
-    string_buffer_append(result, strdup(concatenate("()",NULL)));
+    string_buffer_append(result, concatenate("()",NULL));
   }
   
-  string_buffer_append(result, strdup(concatenate(" -> ",NULL)));
+  string_buffer_append(result, concatenate(" -> ",NULL));
 
   if(type_variable_p(tr))
     string_buffer_append(result, 
-			 strdup(concatenate(basic_to_string(variable_basic(type_variable(tr)))
-					    /*,NL*/,NULL)));
+			 concatenate(basic_to_string(variable_basic(type_variable(tr)))
+					    /*,NL*/,NULL));
   else if(type_void_p(tr))
-    string_buffer_append(result, strdup(concatenate(type_to_string(tr)/*,NL*/,NULL)));
+    string_buffer_append(result, concatenate(type_to_string(tr)/*,NL*/,NULL));
   else if(type_unknown_p(tr)){
-    string_buffer_append(result, strdup(concatenate(type_to_string(tr)/*,NL*/,NULL)));
+    string_buffer_append(result, concatenate(type_to_string(tr)/*,NL*/,NULL));
   }
   else if(type_varargs_p(tr)) {
-    string_buffer_append(result, strdup(concatenate(type_to_string(tr),":",
-						    basic_to_string(variable_basic(type_variable(type_varargs(tr)))),NULL)));
+    string_buffer_append(result, concatenate(type_to_string(tr),":",
+					     basic_to_string(variable_basic(type_variable(type_varargs(tr)))),NULL));
   }
   else
     /* An argument can be functional, but not (yet) a result. */
@@ -267,7 +268,7 @@ void dump_functional(functional f, string_buffer result)
 
 string get_symbol_table(entity m, bool isfortran)
 {
-  string_buffer result = string_buffer_make();
+  string_buffer result = string_buffer_make(true);
   string result2;
   list decls = gen_copy_seq(code_declarations(value_code(entity_initial(m))));
   int nth = 0;
@@ -281,18 +282,18 @@ string get_symbol_table(entity m, bool isfortran)
   
   gen_sort_list(decls, compare_entities);
 
-  string_buffer_append(result, strdup(concatenate(NL,"Declarations for module \"",
-						  module_local_name(m),"\" with type \"", NULL)));
+  string_buffer_append(result, concatenate(NL,"Declarations for module \"",
+					   module_local_name(m),"\" with type \"", NULL));
 
   dump_functional(type_functional(entity_type(m)), result);
-  string_buffer_append(result, strdup("\""NL));
+  string_buffer_append(result, "\"" NL);
 
   /* List of implicitly and explicitly declared variables, 
      functions and areas */
   if(ENDP(decls))
-    string_buffer_append(result, strdup(concatenate("\n* empty declaration list *",NL,NL,NULL)));
+    string_buffer_append(result, concatenate("\n* empty declaration list *",NL,NL,NULL));
   else
-    string_buffer_append(result, strdup(concatenate("\nVariable list:",NL,NL,NULL)));
+    string_buffer_append(result, concatenate("\nVariable list:",NL,NL,NULL));
   
  
   for(ce=decls; !ENDP(ce); POP(ce)) {
@@ -301,9 +302,9 @@ string get_symbol_table(entity m, bool isfortran)
     //storage s = entity_storage(e);
 
     pips_debug(8, "Processing entity \"%s\"\n", entity_name(e));
-    string_buffer_append(result, strdup(concatenate("\tDeclared entity \"",
-						    entity_name(e),"\" with type \"",
-						    type_to_string(t),"\" ",NULL)));
+    string_buffer_append(result, concatenate("\tDeclared entity \"",
+					     entity_name(e),"\" with type \"",
+					     type_to_string(t),"\" ",NULL));
     
     /* FI: struct, union and enum are also declared (in theory...), but
        their characteristics should be given differently. */
@@ -313,27 +314,27 @@ string get_symbol_table(entity m, bool isfortran)
       basic b = variable_basic(v);
       if(basic_pointer_p(b) && type_functional_p(basic_pointer(b))) {
 	functional f = type_functional(basic_pointer(b));
-	string_buffer_append(result, strdup("\"("));
+	string_buffer_append(result, "\"(");
 	dump_functional(f,result);
-	string_buffer_append(result, strdup(") *\""NL));
+	string_buffer_append(result, ") *\""NL);
       }
       else {
 	string_buffer_append(result, 
-			     strdup(concatenate("\"", basic_to_string(b), "\""NL,NULL)));
+			     concatenate("\"", basic_to_string(b), "\""NL,NULL));
       }
     }
     else if(type_functional_p(t)) {
-      string_buffer_append(result, strdup("\""));
+      string_buffer_append(result, "\"");
       dump_functional(type_functional(t),result);
-      string_buffer_append(result, strdup("\""NL));
+      string_buffer_append(result, "\""NL);
     }
     else if(type_area_p(t)) {
-      string_buffer_append(result,strdup(concatenate("with size ",
-						     itoa(area_size(type_area(t))),NL, NULL)));
+      string_buffer_append(result,concatenate("with size ",
+					      itoa(area_size(type_area(t))),NL, NULL));
     }
     else {
       /* FI: How do we want to print out structures, unions and enums? */
-      string_buffer_append(result, strdup(concatenate(NL,NULL)));
+      string_buffer_append(result, NL);
     }
   }
  
@@ -343,9 +344,9 @@ string get_symbol_table(entity m, bool isfortran)
     //gen_sort_list(decls, compare_entities);
 
     if(ENDP(edecls))
-      string_buffer_append(result, strdup(concatenate("\n* empty extern declaration list *",NL,NL,NULL)));
+      string_buffer_append(result, concatenate("\n* empty extern declaration list *",NL,NL,NULL));
     else
-      string_buffer_append(result, strdup(concatenate("\nExternal variable list:",NL,NL,NULL)));
+      string_buffer_append(result, concatenate("\nExternal variable list:",NL,NL,NULL));
 
     for(ce=edecls; !ENDP(ce); POP(ce)) {
       entity e = ENTITY(CAR(ce));
@@ -353,35 +354,35 @@ string get_symbol_table(entity m, bool isfortran)
 
       pips_debug(8, "Processing external entity \"%s\"\n", entity_name(e));
       pips_assert("e is an entity", entity_domain_number(e)==entity_domain);
-      string_buffer_append(result, strdup(concatenate("\tDeclared external entity \"",
-						      entity_name(e),"\"\twith type \"",
-						      type_to_string(t),"\" ",NULL)));
-    
+      string_buffer_append(result, concatenate("\tDeclared external entity \"",
+					       entity_name(e),"\"\twith type \"",
+					       type_to_string(t),"\" ",NULL));
+
       if(type_variable_p(t)) {
 	variable v = type_variable(t);
 	basic b = variable_basic(v);
 	if(basic_pointer_p(b) && type_functional_p(basic_pointer(b))) {
 	  functional f = type_functional(basic_pointer(b));
-	  string_buffer_append(result, strdup("\"("));
+	  string_buffer_append(result, "\"(");
 	  dump_functional(f,result);
-	  string_buffer_append(result, strdup(") *\""NL));
+	  string_buffer_append(result, ") *\"" NL);
 	}
 	else {
-	  string_buffer_append(result, 
-			       strdup(concatenate("\"", basic_to_string(b), "\""NL,NULL)));
+	  string_buffer_append(result,
+			       concatenate("\"", basic_to_string(b), "\""NL,NULL));
 	}
       }
       else if(type_functional_p(t)) {
-	string_buffer_append(result, strdup("\""));
+	string_buffer_append(result, "\"");
 	dump_functional(type_functional(t),result);
-	string_buffer_append(result, strdup("\""NL));
+	string_buffer_append(result, "\"" NL);
       }
       else if(type_area_p(t)) {
-	string_buffer_append(result,strdup(concatenate("with size ",
-						       itoa(area_size(type_area(t))),NL, NULL)));
+	string_buffer_append(result,concatenate("with size ",
+						itoa(area_size(type_area(t))),NL, NULL));
       }
       else
-	string_buffer_append(result, strdup(concatenate(NL,NULL)));
+	string_buffer_append(result, NL);
     }
   }
 
@@ -395,13 +396,13 @@ string get_symbol_table(entity m, bool isfortran)
       if(storage_formal_p(vs)) {
 	nth++;
 	if(nth==1) {
-	  string_buffer_append(result, strdup(concatenate(NL,"Layout for formal parameters:"
-							  ,NL,NL,NULL)));
+	  string_buffer_append(result, concatenate(NL,"Layout for formal parameters:"
+						   ,NL,NL,NULL));
 	}
-	string_buffer_append(result,strdup(concatenate("\tVariable ", entity_name(v),
-						       "\toffset = ",
-						       itoa(formal_offset(storage_formal(vs))),
-						       "\n", NULL)));
+	string_buffer_append(result, concatenate("\tVariable ", entity_name(v),
+						 "\toffset = ",
+						 itoa(formal_offset(storage_formal(vs))),
+						 "\n", NULL));
       }
       else if(storage_return_p(vs)) {
 	pips_assert("No more than one return variable", entity_undefined_p(rv));
@@ -412,17 +413,17 @@ string get_symbol_table(entity m, bool isfortran)
   /* Return variable */
   if(!entity_undefined_p(rv)) {
     basic rb = variable_basic(type_variable(ultimate_type(entity_type(rv))));
-    string_buffer_append(result, strdup(concatenate(NL,"Layout for return variable:",NL,NL,NULL)));
-    string_buffer_append(result, strdup(concatenate("\tVariable \"",
-						    entity_name(rv),
-						    "\"\tsize = ",
-						    strdup(itoa(SizeOfElements(rb))),
-						    "\n", NULL)));
+    string_buffer_append(result, concatenate(NL,"Layout for return variable:",NL,NL,NULL));
+    string_buffer_append(result, concatenate("\tVariable \"",
+					     entity_name(rv),
+					     "\"\tsize = ",
+					     strdup(itoa(SizeOfElements(rb))),
+					     "\n", NULL));
   }
 
   /* Structure of each area/common */
   if(!ENDP(decls)) {
-    string_buffer_append(result, strdup(concatenate(NL,"Layouts for ",isfortran?"commons:":"memory areas:",NL,NULL)));
+    string_buffer_append(result, concatenate(NL,"Layouts for ",isfortran?"commons:":"memory areas:",NL,NULL));
   }
 
   MAP(ENTITY, e, {
@@ -432,12 +433,13 @@ string get_symbol_table(entity m, bool isfortran)
     }, 
     decls);
     
-  string_buffer_append(result, strdup(concatenate("End of declarations for module ",
-						  module_local_name(m), NL,NL, NULL)));
+  string_buffer_append(result, concatenate("End of declarations for module ",
+					   module_local_name(m), NL,NL, NULL));
 
   gen_free_list(decls);
 
   result2 = string_buffer_to_string(result);
+  string_buffer_free(&result);
 
   return result2;
 }
