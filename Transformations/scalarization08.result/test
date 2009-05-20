@@ -3,13 +3,13 @@ Initial code
 
 void scalarization08(double A[SIZE], double B[SIZE][SIZE])
 {
+   // BEGIN BLOCK
    int i;
    int j;
-//:   BEGIN BLOCK
    for(i = 0; i <= SIZE-1; i += 1)
       for(j = 0; j <= SIZE-1; j += 1)
          A[i] = B[j][i];
-//:   END BLOCK
+   // END BLOCK
 }
 
 IN regions
@@ -20,13 +20,13 @@ IN regions
 
 void scalarization08(double A[SIZE], double B[SIZE][SIZE])
 {
-   int i;
-   int j;
 
 //  <B[PHI1][PHI2]-IN-EXACT-{0<=PHI1, PHI1+1<=TOP-LEVEL:SIZE, 0<=PHI2,
 //    PHI2+1<=TOP-LEVEL:SIZE}>
 
-//:   BEGIN BLOCK
+   // BEGIN BLOCK
+   int i;
+   int j;
 
 //  <B[PHI1][PHI2]-IN-EXACT-{0<=PHI1, PHI1+1<=TOP-LEVEL:SIZE, 0<=PHI2,
 //    PHI2+1<=TOP-LEVEL:SIZE}>
@@ -42,7 +42,7 @@ void scalarization08(double A[SIZE], double B[SIZE][SIZE])
 //    1+j<=TOP-LEVEL:SIZE, 0<=i, 0<=j}>
 
          A[i] = B[j][i];
-//:   END BLOCK
+   // END BLOCK
 }
 
 Privatized regions
@@ -56,15 +56,15 @@ Code after scalarization
 
 void scalarization08(double A[SIZE], double B[SIZE][SIZE])
 {
-   double __ld__1;
-   double __ld__0;
-   int i;
-   int j;
 
 //  <B[PHI1][PHI2]-IN-EXACT-{0<=PHI1, PHI1+1<=TOP-LEVEL:SIZE, 0<=PHI2,
 //    PHI2+1<=TOP-LEVEL:SIZE}>
 
-//:   BEGIN BLOCK
+   // BEGIN BLOCK
+   double __ld__1;
+   double __ld__0;
+   int i;
+   int j;
 
 //  <B[PHI1][PHI2]-IN-EXACT-{0<=PHI1, PHI1+1<=TOP-LEVEL:SIZE, 0<=PHI2,
 //    PHI2+1<=TOP-LEVEL:SIZE}>
@@ -80,5 +80,5 @@ void scalarization08(double A[SIZE], double B[SIZE][SIZE])
 //    1+j<=TOP-LEVEL:SIZE, 0<=i, 0<=j}>
 
          __ld__0 = B[j][i];
-//:   END BLOCK
+   // END BLOCK
 }

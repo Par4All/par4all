@@ -3,28 +3,29 @@ Initial code
 
 int main(int argc, char **argv)
 {
+   // BEGIN BLOCK
    int i;
    int n = 100;
    typedef int myarray[100];
    myarray x;
    myarray y;
    myarray t;
-//:   BEGIN BLOCK
 
    for(i = 0; i <= n-1; i += 1) {
-//:      BEGIN BLOCK
+      // BEGIN BLOCK
       t[i] = x[i];
       x[i] = y[i];
       y[i] = t[i];
-//:      END BLOCK
+      // END BLOCK
    }
-//:   END BLOCK
+   // END BLOCK
 }
 
 Code after scalarization
 
 int main(int argc, char **argv)
 {
+   // BEGIN BLOCK
    int __ld__0;
    int i;
    int n = 100;
@@ -32,14 +33,13 @@ int main(int argc, char **argv)
    myarray x;
    myarray y;
    myarray t;
-//:   BEGIN BLOCK
 
    for(i = 0; i <= n-1; i += 1) {
-//:      BEGIN BLOCK
+      // BEGIN BLOCK
       __ld__0 = x[i];
       x[i] = y[i];
       y[i] = __ld__0;
-//:      END BLOCK
+      // END BLOCK
    }
-//:   END BLOCK
+   // END BLOCK
 }

@@ -3,77 +3,74 @@ Initial code
 
 void scalarization10(double A[SIZE], double B[SIZE][SIZE])
 {
+   // BEGIN BLOCK
    int i;
    int j;
-//:   BEGIN BLOCK
    for(i = 0; i <= SIZE-1; i += 1)
       for(j = 0; j <= SIZE-1; j += 1)
          A[i] = B[j][i]+get(A, i);
-//:   END BLOCK
+   // END BLOCK
 }
 
 Code after inlining
 
 void scalarization10(double A[SIZE], double B[SIZE][SIZE])
 {
+   // BEGIN BLOCK
    double F_0;
    int i;
    int j;
-//:   BEGIN BLOCK
-   //:   BEGIN BLOCK
    for(i = 0; i <= SIZE-1; i += 1)
       for(j = 0; j <= SIZE-1; j += 1) {
-//:         BEGIN BLOCK
-         //:         BEGIN BLOCK
+         // BEGIN BLOCK
+         // BEGIN BLOCK
          F_0 = A[i];
 
          A[i] = B[j][i]+F_0;
-//:         END BLOCK
+         // END BLOCK
       }
-//:   END BLOCK
+   // END BLOCK
 }
 
 Code after forward substitution
 
 void scalarization10(double A[SIZE], double B[SIZE][SIZE])
 {
+   // BEGIN BLOCK
    double F_0;
    int i;
    int j;
-//:   BEGIN BLOCK
-   //:   BEGIN BLOCK
    for(i = 0; i <= SIZE-1; i += 1)
       for(j = 0; j <= SIZE-1; j += 1) {
-//:         BEGIN BLOCK
-         //:         BEGIN BLOCK
+         // BEGIN BLOCK
+         // BEGIN BLOCK
          F_0 = A[i];
 
          A[i] = B[j][i]+A[i];
-//:         END BLOCK
+         // END BLOCK
       }
-//:   END BLOCK
+   // END BLOCK
 }
 
 Code after use-def elimination
 
 void scalarization10(double A[SIZE], double B[SIZE][SIZE])
 {
+   // BEGIN BLOCK
    double F_0;
    int i;
    int j;
-//:   BEGIN BLOCK
-   //:   BEGIN BLOCK
    for(i = 0; i <= SIZE-1; i += 1)
       for(j = 0; j <= SIZE-1; j += 1) {
-//:         BEGIN BLOCK
-//:         BEGIN BLOCK
-         //:         BEGIN BLOCK
-//:         END BLOCK
+         // BEGIN BLOCK
+         // BEGIN BLOCK
+         // BEGIN BLOCK
+         // END BLOCK
 
          A[i] = B[j][i]+A[i];
-//:         END BLOCK
+         // END BLOCK
       }
-//:   END BLOCK
+   // END BLOCK
 }
 
 IN regions
@@ -85,6 +82,12 @@ IN regions
 
 void scalarization10(double A[SIZE], double B[SIZE][SIZE])
 {
+
+//  <A[PHI1]-IN-EXACT-{0<=PHI1, PHI1+1<=TOP-LEVEL:SIZE}>
+//  <B[PHI1][PHI2]-IN-EXACT-{0<=PHI1, PHI1+1<=TOP-LEVEL:SIZE, 0<=PHI2,
+//    PHI2+1<=TOP-LEVEL:SIZE}>
+
+   // BEGIN BLOCK
    double F_0;
    int i;
    int j;
@@ -93,13 +96,6 @@ void scalarization10(double A[SIZE], double B[SIZE][SIZE])
 //  <B[PHI1][PHI2]-IN-EXACT-{0<=PHI1, PHI1+1<=TOP-LEVEL:SIZE, 0<=PHI2,
 //    PHI2+1<=TOP-LEVEL:SIZE}>
 
-//:   BEGIN BLOCK
-
-//  <A[PHI1]-IN-EXACT-{0<=PHI1, PHI1+1<=TOP-LEVEL:SIZE}>
-//  <B[PHI1][PHI2]-IN-EXACT-{0<=PHI1, PHI1+1<=TOP-LEVEL:SIZE, 0<=PHI2,
-//    PHI2+1<=TOP-LEVEL:SIZE}>
-
-   //:   BEGIN BLOCK
    for(i = 0; i <= SIZE-1; i += 1)
 
 //  <A[PHI1]-IN-EXACT-{i==PHI1, 1+i<=TOP-LEVEL:SIZE,
@@ -114,10 +110,10 @@ void scalarization10(double A[SIZE], double B[SIZE][SIZE])
 //  <B[PHI1][PHI2]-IN-EXACT-{PHI1==j, PHI2==i, 1+i<=TOP-LEVEL:SIZE,
 //    1+j<=TOP-LEVEL:SIZE, 0<=i, 0<=j}>
 
-//:         BEGIN BLOCK
-//:         BEGIN BLOCK
-         //:         BEGIN BLOCK
-//:         END BLOCK
+         // BEGIN BLOCK
+         // BEGIN BLOCK
+         // BEGIN BLOCK
+         // END BLOCK
 
 //  <A[PHI1]-IN-EXACT-{PHI1==i, 1+i<=TOP-LEVEL:SIZE,
 //    1+j<=TOP-LEVEL:SIZE, 0<=i, 0<=j}>
@@ -126,9 +122,9 @@ void scalarization10(double A[SIZE], double B[SIZE][SIZE])
 
 
          A[i] = B[j][i]+A[i];
-//:         END BLOCK
+         // END BLOCK
       }
-//:   END BLOCK
+   // END BLOCK
 }
 
 Privatized regions
@@ -143,6 +139,12 @@ Code after scalarization
 
 void scalarization10(double A[SIZE], double B[SIZE][SIZE])
 {
+
+//  <A[PHI1]-IN-EXACT-{0<=PHI1, PHI1+1<=TOP-LEVEL:SIZE}>
+//  <B[PHI1][PHI2]-IN-EXACT-{0<=PHI1, PHI1+1<=TOP-LEVEL:SIZE, 0<=PHI2,
+//    PHI2+1<=TOP-LEVEL:SIZE}>
+
+   // BEGIN BLOCK
    double F_0;
    int i;
    int j;
@@ -151,13 +153,6 @@ void scalarization10(double A[SIZE], double B[SIZE][SIZE])
 //  <B[PHI1][PHI2]-IN-EXACT-{0<=PHI1, PHI1+1<=TOP-LEVEL:SIZE, 0<=PHI2,
 //    PHI2+1<=TOP-LEVEL:SIZE}>
 
-//:   BEGIN BLOCK
-
-//  <A[PHI1]-IN-EXACT-{0<=PHI1, PHI1+1<=TOP-LEVEL:SIZE}>
-//  <B[PHI1][PHI2]-IN-EXACT-{0<=PHI1, PHI1+1<=TOP-LEVEL:SIZE, 0<=PHI2,
-//    PHI2+1<=TOP-LEVEL:SIZE}>
-
-   //:   BEGIN BLOCK
    for(i = 0; i <= SIZE-1; i += 1)
 
 //  <A[PHI1]-IN-EXACT-{i==PHI1, 1+i<=TOP-LEVEL:SIZE,
@@ -172,10 +167,10 @@ void scalarization10(double A[SIZE], double B[SIZE][SIZE])
 //  <B[PHI1][PHI2]-IN-EXACT-{PHI1==j, PHI2==i, 1+i<=TOP-LEVEL:SIZE,
 //    1+j<=TOP-LEVEL:SIZE, 0<=i, 0<=j}>
 
-//:         BEGIN BLOCK
-//:         BEGIN BLOCK
-         //:         BEGIN BLOCK
-//:         END BLOCK
+         // BEGIN BLOCK
+         // BEGIN BLOCK
+         // BEGIN BLOCK
+         // END BLOCK
 
 //  <A[PHI1]-IN-EXACT-{PHI1==i, 1+i<=TOP-LEVEL:SIZE,
 //    1+j<=TOP-LEVEL:SIZE, 0<=i, 0<=j}>
@@ -184,7 +179,7 @@ void scalarization10(double A[SIZE], double B[SIZE][SIZE])
 
 
          A[i] = B[j][i]+A[i];
-//:         END BLOCK
+         // END BLOCK
       }
-//:   END BLOCK
+   // END BLOCK
 }
