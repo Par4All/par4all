@@ -86,9 +86,23 @@ void string_buffer_append(string_buffer sb, string s)
   stack_push(s, sb->ins);
 }
 
+/* append string buffer sb2 to string buffer sb.
+ */
+void string_buffer_append_sb(string_buffer sb, string_buffer sb2)
+{
+  STACK_MAP_X(s, string, string_buffer_append(sb, s), sb2->ins, 0);
+}
+
 /* append string s to string buffer sb, with duplication
  */
 void string_buffer_append_dup(string_buffer sb, string s)
 {
   string_buffer_append_dup(sb, strdup(s));
+}
+
+/* append string buffer sb2 to string buffer sb with string duplication.
+ */
+void string_buffer_append_sb_dup(string_buffer sb, string_buffer sb2)
+{
+  STACK_MAP_X(s, string, string_buffer_append_dup(sb, s), sb2->ins, 0);
 }
