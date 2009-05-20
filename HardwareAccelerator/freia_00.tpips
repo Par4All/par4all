@@ -2,8 +2,14 @@ delete freia_00
 create freia_00 freia_00.c
 activate C_PARSER
 setproperty PRETTYPRINT_C_CODE TRUE
+echo
+echo ! initial function
+echo
 display PRINTED_FILE[freia_stuff]
 apply HARDWARE_ACCELERATOR[freia_stuff]
+echo
+echo ! accelerated function
+echo
 shell cat ./freia_00.database/Src/freia_stuff_helper_0.c
 close
 delete freia_00

@@ -1,0 +1,25 @@
+
+! initial function
+
+freia_error freia_stuff(freia_data_2d o0, freia_data_2d o1, freia_data_2d i0, freia_data_2d i1)
+{
+   freia_aipo_add(o0, i0, i1);                                          /*0014*/
+   freia_aipo_sub(o1, o0, i1);                                          /*0015*/
+   return 0;                                                            /*0016*/
+}
+
+! accelerated function
+
+freia_error freia_stuff_helper_0(freia_data_2d o0, freia_data_2d o1, freia_data_2d i0, freia_data_2d i1)
+{
+  //...
+
+  // stage 0
+  spocinstr.alu[0][0].op = SPOC_ALU_ADD_IN0_IN1;
+  spocinstr.mux[0][0].op = SPOC_MUX_IN1;
+  spocinstr.mux[0][2].op = SPOC_MUX_IN0;
+
+  // stage 1
+  spocinstr.alu[1][0].op = SPOC_ALU_SUB_IN0_IN1;
+  spocinstr.mux[1][0].op = SPOC_MUX_IN1;
+  spocinstr.mux[1][2].op = SPOC_MUX_IN0;
