@@ -305,7 +305,14 @@ static statement isolate_code_portion(statement begin_tag_statement, statement e
     /* Build a new isolated sequence statement */    
     sequence new_sequence = make_sequence(gen_nreverse(isolated_seq_stats));
     instruction sequence_instruction = make_instruction(is_instruction_sequence, new_sequence);
-    statement returned_statement = make_statement(entity_empty_label(), statement_number(sequence_statement), statement_ordering(sequence_statement), empty_comments, sequence_instruction, NIL, NULL);
+    statement returned_statement = make_statement (entity_empty_label(),
+						   statement_number(sequence_statement),
+						   statement_ordering(sequence_statement),
+						   empty_comments,
+						   sequence_instruction,
+						   NIL,
+						   NULL,
+						   extensions_undefined);
     bool isolated_seq_stats_is_inserted = FALSE;
     
     /* Build a new sequence containing isolated sequence statement */

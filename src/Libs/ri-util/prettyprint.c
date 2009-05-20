@@ -274,13 +274,13 @@ char lib_ri_util_prettyprint_c_rcsid[] = "$Header: /home/data/tmp/PIPS/pips_data
   *    Alexis Platonoff, Nov. 18, 1994
 
   * - Modifications of sentence_area to deal with  the fact that
-  *   " only one appearance of a symbolic name as an array name in an 
+  *   " only one appearance of a symbolic name as an array name in an
   *     array declarator in a program unit is permitted."
-  *     (Fortran standard, number 8.1, line 40) 
+  *     (Fortran standard, number 8.1, line 40)
   *   array declarators now only appear with the type declaration, not with the
   *   area. - BC - october 196.
   * - Modification of text_entity_declaration to ensure that the OUTPUT of PIPS
-  *   can also be used as INPUT; in particular, variable declarations must 
+  *   can also be used as INPUT; in particular, variable declarations must
   *   appear
   *   before common declarations. BC.
   * - neither are DATA statements for non integers (FI/FC)
@@ -360,7 +360,7 @@ static bool precedence_p = TRUE;
 
 /******************************************************************* STYLES */
 
-static bool 
+static bool
 pp_style_p(string s)
 {
     return same_string_p(get_string_property(PRETTYPRINT_PARALLEL), s);
@@ -417,7 +417,7 @@ bool one_liner_p(statement s)
   if(!yes && instruction_sequence_p(i)) {
     list sl = sequence_statements(instruction_sequence(i));
     int sc = gen_length(sl);
-    
+
     yes = (sc <= 1) && ENDP(statement_declarations(s));
   }
 
@@ -478,9 +478,9 @@ static bool mark_block (unformatted* t_beg, unformatted* t_end, int n, int margi
 static int words_intrinsic_precedence(call);
 static int intrinsic_precedence(string);
 
-/* exported for craft 
+/* exported for craft
  */
-list 
+list
 words_loop_range(range obj)
 {
     list pc;
@@ -570,7 +570,7 @@ words_range(range obj)
    notation is used to define array sections (see R619, p. 64).
 */
 
-list /* of string */ 
+list /* of string */
 words_subscript_range(range obj)
 {
     list pc = NIL ;
@@ -595,17 +595,17 @@ words_subscript_range(range obj)
 
 /* exported for expression.c
  */
-list 
+list
 words_reference(reference obj)
 {
   list pc = NIL;
   string begin_attachment;
-    
+  
   entity e = reference_variable(obj);
 
   pc = CHAIN_SWORD(pc, entity_user_name(e));
   begin_attachment = STRING(CAR(pc));
-    
+  
   if (reference_indices(obj) != NIL) {
     if (prettyprint_is_fortran)
       {
@@ -613,20 +613,20 @@ words_reference(reference obj)
 	MAPL(pi, {
 	  expression subscript = EXPRESSION(CAR(pi));
 	  syntax ssubscript = expression_syntax(subscript);
-	  
+	
 	  if(syntax_range_p(ssubscript)) {
 	    pc = gen_nconc(pc, words_subscript_range(syntax_range(ssubscript)));
 	  }
 	  else {
 	    pc = gen_nconc(pc, words_subexpression(subscript, 0, TRUE));
 	  }
-	  
+	
 	  if (CDR(pi) != NIL)
 	    pc = CHAIN_SWORD(pc,",");
 	}, reference_indices(obj));
 	pc = CHAIN_SWORD(pc,")");
       }
-    else 
+    else
       {
 	MAPL(pi, {
 	  expression subscript = EXPRESSION(CAR(pi));
@@ -692,7 +692,7 @@ text generate_alternate_return_targets()
       unformatted u1 =
 	make_unformatted
 	(strdup(label_local_name(le)),
-	 STATEMENT_NUMBER_UNDEFINED, 0, 
+	 STATEMENT_NUMBER_UNDEFINED, 0,
 	 CONS(STRING, strdup(prettyprint_is_fortran?"CONTINUE":";"), NIL));
 
       s1 = make_sentence(is_sentence_unformatted, u1);
@@ -709,7 +709,7 @@ text generate_alternate_return_targets()
 /* words_regular_calls used for user subroutine and user function and
    intrinsics called like user function such as MOD(). */
 
-static list 
+static list
 words_regular_call(call obj, bool is_a_subroutine)
 {
   list pc = NIL;
@@ -736,13 +736,13 @@ words_regular_call(call obj, bool is_a_subroutine)
   }
 
   if(type_void_p(functional_result(type_functional(call_compatible_type(entity_type(call_function(obj))))))) {
-    if(is_a_subroutine) 
+    if(is_a_subroutine)
       pc = CHAIN_SWORD(pc, prettyprint_is_fortran?"CALL ":"");
     else
       if(prettyprint_is_fortran) /* to avoid this warning for C*/
 	pips_user_warning("subroutine '%s' used as a function.\n",
 			  entity_name(f));
-      
+    
   }
   else if(is_a_subroutine) {
     if(prettyprint_is_fortran) /* to avoid this warning for C*/
@@ -821,7 +821,7 @@ words_regular_call(call obj, bool is_a_subroutine)
 
 
 /* To deal with attachment on user module usage. */
-static list 
+static list
 words_genuine_regular_call(call obj, bool is_a_subroutine)
 {
   list pc = words_regular_call(obj, is_a_subroutine);
@@ -836,12 +836,12 @@ words_genuine_regular_call(call obj, bool is_a_subroutine)
     else
       attach_regular_call_to_word(STRING(CAR(pc)), obj);
   }
-  
+
   return pc;
 }
 
 
-static list 
+static list
 words_assign_op(call obj,
 		int precedence,
 		bool __attribute__ ((unused)) leftmost)
@@ -861,7 +861,7 @@ words_assign_op(call obj,
 
   /* FI: space_p could be used here to cotnrol spacing around assignment */
   pc = CHAIN_SWORD(pc," ");
-  pc = CHAIN_SWORD(pc, fun); 
+  pc = CHAIN_SWORD(pc, fun);
   pc = CHAIN_SWORD(pc," ");
   if(prettyprint_is_fortran) {
     expression e = EXPRESSION(CAR(CDR(args)));
@@ -887,7 +887,7 @@ words_assign_op(call obj,
   return(pc);
 }
 
-static list 
+static list
 words_substring_op(call obj,
 		   int __attribute__ ((unused)) precedence,
 		   bool __attribute__ ((unused)) leftmost) {
@@ -899,7 +899,7 @@ words_substring_op(call obj,
     /* expression e = EXPRESSION(CAR(CDR(CDR(CDR(call_arguments(obj)))))); */
     int prec = words_intrinsic_precedence(obj);
 
-    pips_assert("words_substring_op", gen_length(call_arguments(obj)) == 3 || 
+    pips_assert("words_substring_op", gen_length(call_arguments(obj)) == 3 ||
 		gen_length(call_arguments(obj)) == 4);
 
     r = EXPRESSION(CAR(call_arguments(obj)));
@@ -926,7 +926,7 @@ words_substring_op(call obj,
     return(pc);
 }
 
-static list 
+static list
 words_assign_substring_op(call obj,
 			  int __attribute__ ((unused)) precedence,
 			  bool __attribute__ ((unused)) leftmost)
@@ -935,7 +935,7 @@ words_assign_substring_op(call obj,
     list pc = NIL;
     expression e = expression_undefined;
     int prec = words_intrinsic_precedence(obj);
-   
+ 
     pips_assert("words_substring_op", gen_length(call_arguments(obj)) == 4);
 
     e = EXPRESSION(CAR(CDR(CDR(CDR(call_arguments(obj))))));
@@ -948,7 +948,7 @@ words_assign_substring_op(call obj,
 }
 
 // Function written by C.A. Mensi to prettyprint C or Fortran code as C code
-static list 
+static list
 words_nullary_op_c(call obj,
 		 int precedence __attribute__ ((unused)),
 		 bool leftmost __attribute__ ((unused)))
@@ -973,7 +973,7 @@ words_nullary_op_c(call obj,
       pc = CHAIN_SWORD(pc, "_f77_intrinsics_pause_(0)");
     else if(same_string_p(fname,CONTINUE_FUNCTION_NAME))
       pc = CHAIN_SWORD(pc, "");
-    else 
+    else
       pips_internal_error("Unknown nullary operator");
   }
   else if(nargs==1){
@@ -1007,7 +1007,7 @@ words_nullary_op_c(call obj,
     pc = CHAIN_SWORD(pc, parentheses_p?"(":" ");
     pc = gen_nconc(pc, words_subexpression(e, precedence, TRUE));
     pc = CHAIN_SWORD(pc, parentheses_p?")":"");
-  } 
+  }
   else if(nargs==2) {
     expression e1 = EXPRESSION(CAR(args));
     expression e2 = EXPRESSION(CAR(CDR(args)));
@@ -1042,11 +1042,11 @@ static list words_nullary_op_fortran(call obj,
   if(same_string_p(fname,RETURN_FUNCTION_NAME)
      ||same_string_p(fname,C_RETURN_FUNCTION_NAME))
     pc = CHAIN_SWORD(pc, "return");
-  else 
+  else
     pc = CHAIN_SWORD(pc, fname);
-    
+  
   // STOP and PAUSE and RETURN in fortran may have 0 or 1 argument.A Mensi
-    
+  
   if(gen_length(args)==1) {
     if(same_string_p(fname,STOP_FUNCTION_NAME)
        || same_string_p(fname,PAUSE_FUNCTION_NAME)
@@ -1076,7 +1076,7 @@ static list words_nullary_op(call obj,
 }
 
 
-static list 
+static list
 words_io_control(list *iol,
 		 int __attribute__ ((unused)) precedence,
 		 bool __attribute__ ((unused)) leftmost)
@@ -1116,7 +1116,7 @@ words_io_control(list *iol,
     return(pc);
 }
 
-static list 
+static list
 words_implied_do(call obj,
 		 int __attribute__ ((unused)) precedence,
 		 bool __attribute__ ((unused)) leftmost)
@@ -1154,7 +1154,7 @@ words_implied_do(call obj,
     return(pc);
 }
 
-static list 
+static list
 words_unbounded_dimension(call __attribute__ ((unused)) obj,
 			  int __attribute__ ((unused)) precedence,
 			  bool __attribute__ ((unused)) leftmost)
@@ -1166,7 +1166,7 @@ words_unbounded_dimension(call __attribute__ ((unused)) obj,
     return(pc);
 }
 
-static list 
+static list
 words_list_directed(call __attribute__ ((unused)) obj,
 		    int __attribute__ ((unused)) precedence,
 		    bool __attribute__ ((unused)) leftmost)
@@ -1178,7 +1178,7 @@ words_list_directed(call __attribute__ ((unused)) obj,
     return(pc);
 }
 
-static list 
+static list
 words_io_inst(call obj,
 	      int precedence, bool leftmost)
 {
@@ -1193,7 +1193,7 @@ words_io_inst(call obj,
   expression unit_arg = expression_undefined;
   string called = entity_local_name(call_function(obj));
   bool space_p = get_bool_property("PRETTYPRINT_LISTS_WITH_SPACES");
-    
+  
   /* AP: I try to convert WRITE to PRINT. Three conditions must be
      fullfilled. The first, and obvious, one, is that the function has
      to be WRITE. Secondly, "FMT" has to be equal to "*". Finally,
@@ -1217,7 +1217,7 @@ words_io_inst(call obj,
       entity f;
       /* The * format is coded as a call to "LIST_DIRECTED_FORMAT_NAME" function: */
       good_fmt = syntax_call_p(expression_syntax(arg))
-	&& value_intrinsic_p(entity_initial(f = 
+	&& value_intrinsic_p(entity_initial(f =
 					    call_function(syntax_call(expression_syntax(arg)))))
 	&& (strcmp(entity_local_name(f),
 		   LIST_DIRECTED_FORMAT_NAME)==0);
@@ -1232,7 +1232,7 @@ words_io_inst(call obj,
       entity f;
       /* The * format is coded as a call to "LIST_DIRECTED_FORMAT_NAME" function: */
       good_unit = syntax_call_p(expression_syntax(arg))
-	&& value_intrinsic_p(entity_initial(f = 
+	&& value_intrinsic_p(entity_initial(f =
 					    call_function(syntax_call(expression_syntax(arg)))))
 	&& (strcmp(entity_local_name(f),
 		   LIST_DIRECTED_FORMAT_NAME)==0);
@@ -1262,7 +1262,7 @@ words_io_inst(call obj,
 	{
 	  pc = CHAIN_SWORD(pc, "PRINT * ");
 	}
-       
+     
       pcio = pio_write;
     }
   else if (good_fmt && good_unit && same_string_p(called, "READ"))
@@ -1270,7 +1270,7 @@ words_io_inst(call obj,
       /* READ (*,*) -> READ * */
 	
       if (pio_write != NIL )	/* READ (*,*) pio -> READ *, pio */
-	{ 
+	{
 	  if(!prettyprint_is_fortran)
 	    pc = CHAIN_SWORD(pc, "_f77_intrinsics_read_(");
 	  else
@@ -1305,7 +1305,7 @@ words_io_inst(call obj,
        see LZ */
     pc = gen_nconc(pc, words_io_control(&pcio, precedence, leftmost));
     pc = CHAIN_SWORD(pc, ") ");
-    /* 
+    /*
        free_words(fmt_words);
     */
   }
@@ -1317,7 +1317,7 @@ words_io_inst(call obj,
     pc = gen_nconc(pc, words_expression(EXPRESSION(CAR(pp))));
     if (CDR(pp) != NIL) {
       POP(pp);
-      if(pp==NIL) 
+      if(pp==NIL)
 	pips_internal_error("missing element in IO list");
       pc = CHAIN_SWORD(pc, space_p? ", " : ",");
     }
@@ -1325,11 +1325,11 @@ words_io_inst(call obj,
 
   if(!prettyprint_is_fortran)
     pc = CHAIN_SWORD(pc, ") ");
-	   
+	 
   return(pc) ;
 }
 
-static list 
+static list
 null(call __attribute__ ((unused)) obj,
      int __attribute__ ((unused)) precedence,
      bool __attribute__ ((unused)) leftmost)
@@ -1346,26 +1346,26 @@ words_prefix_unary_op(call obj,
   expression e = EXPRESSION(CAR(call_arguments(obj)));
   int prec = words_intrinsic_precedence(obj);
   string fun = entity_local_name(call_function(obj));
-  if (strcmp(fun,PRE_INCREMENT_OPERATOR_NAME) == 0) 
+  if (strcmp(fun,PRE_INCREMENT_OPERATOR_NAME) == 0)
     fun = "++";
-  else if (strcmp(fun,PRE_DECREMENT_OPERATOR_NAME) == 0) 
+  else if (strcmp(fun,PRE_DECREMENT_OPERATOR_NAME) == 0)
     fun = "--";
-  else if (strcmp(fun,ADDRESS_OF_OPERATOR_NAME) == 0) 
+  else if (strcmp(fun,ADDRESS_OF_OPERATOR_NAME) == 0)
     fun = "&";
-  else if (strcmp(fun,C_NOT_OPERATOR_NAME) == 0) 
+  else if (strcmp(fun,C_NOT_OPERATOR_NAME) == 0)
     fun = "!";
-  else if (strcmp(fun,BITWISE_NOT_OPERATOR_NAME) == 0) 
+  else if (strcmp(fun,BITWISE_NOT_OPERATOR_NAME) == 0)
     fun = "~";
-  else if (strcmp(fun,DEREFERENCING_OPERATOR_NAME) == 0) 
-      /* Since we put no spaces around an operator (to not change Fortran), the blank 
-	 before '*' is used to avoid the confusion in the case of divide operator, i.e 
+  else if (strcmp(fun,DEREFERENCING_OPERATOR_NAME) == 0)
+      /* Since we put no spaces around an operator (to not change Fortran), the blank
+	 before '*' is used to avoid the confusion in the case of divide operator, i.e
 	 d1 = 1.0 / *det  in function inv_j, SPEC2000 quake benchmark.
 
 	 But we do not want this in a lhs and espcially with a double dereferencing. */
     fun = "*";
-  else if (strcmp(fun,UNARY_PLUS_OPERATOR_NAME) == 0) 
+  else if (strcmp(fun,UNARY_PLUS_OPERATOR_NAME) == 0)
     fun = "+";
-  else if(!prettyprint_is_fortran){ 
+  else if(!prettyprint_is_fortran){
 	if(strcasecmp(fun, NOT_OPERATOR_NAME)==0)
 	  fun="!";
       }
@@ -1393,12 +1393,12 @@ words_postfix_unary_op(call obj,
      fun = "--";
 
     pc = CHAIN_SWORD(pc,fun);
-    
+  
     return(pc);
 }
 
 
-static list 
+static list
 words_unary_minus(call obj, int precedence, bool leftmost)
 {
     list pc = NIL;
@@ -1415,27 +1415,27 @@ words_unary_minus(call obj, int precedence, bool leftmost)
     return(pc);
 }
 
-/* 
+/*
    The precedence of (1/x) is the same as the multiply operator
    (e.g. a*1/b without parentheses). Moreover, the MAXIMAL precedence is
    used for the (x) subterm (e.g. 1/(a*b) 1/(-2) ...). However, 1/x**2 may
    be a correct prettyprint in Fortran (?) */
 /* WARNING : the floating point division is used wether b is an int or not
    ! (1.0/b) -- in fact b should not be an int ! */
-static list /* of string */ 
+static list /* of string */
 words_inverse_op(call obj,
 		 int precedence,
 		 bool __attribute__ ((unused)) leftmost)
 {
   list /* of string */ pc = NIL;
-  
+
   expression e = EXPRESSION(CAR(call_arguments(obj)));
   int prec = words_intrinsic_precedence(obj);
-  
+
   if ( prec < precedence)
     pc = CHAIN_SWORD(pc, "(");
   pc = CHAIN_SWORD(pc, "1./");
-  pc = gen_nconc(pc, words_subexpression(e, MAXIMAL_PRECEDENCE , 
+  pc = gen_nconc(pc, words_subexpression(e, MAXIMAL_PRECEDENCE ,
 					 FALSE));
 
   if ( prec < precedence)
@@ -1461,7 +1461,7 @@ words_goto_label(string tlabel)
     return pc;
 }
 
-static list 
+static list
 eole_fmx_specific_op(call obj,
 		     int __attribute__ ((unused)) precedence,
 		     bool __attribute__ ((unused)) leftmost,
@@ -1471,7 +1471,7 @@ eole_fmx_specific_op(call obj,
   list /* of expressions */ args = call_arguments(obj);
 
   int prec ;
-  
+
   /* open parenthese one  */
   pc = CHAIN_SWORD(pc, "(");
 
@@ -1480,17 +1480,17 @@ eole_fmx_specific_op(call obj,
 
   /* get precedence for mult operator */
   prec = intrinsic_precedence("*");
-  
+
   /* first argument */
   pc = gen_nconc(pc,words_subexpression(EXPRESSION(CAR(args)), prec, TRUE));
-  
+
   /* mult operator */
   pc = CHAIN_SWORD(pc,"*");
 
   /* second argument */
   args = CDR(args);
   pc = gen_nconc(pc,words_subexpression(EXPRESSION(CAR(args)),prec,TRUE));
-  
+
   /* close parenthese two */
   pc = CHAIN_SWORD(pc, ")");
 
@@ -1513,14 +1513,14 @@ eole_fmx_specific_op(call obj,
 /* EOLE : The multiply-add operator is used within the optimize
    transformation ( JZ - sept 98) - fma(a,b,c) -> ((a*b)+c)
  */
-list /* of string */ 
+list /* of string */
 eole_fma_specific_op(call obj, int precedence, bool leftmost)
 {
   return eole_fmx_specific_op(obj, precedence, leftmost, TRUE);
 }
 
 /* MULTIPLY-SUB operator */
-list /* of string */ 
+list /* of string */
 eole_fms_specific_op(call obj, int precedence, bool leftmost)
 {
   return eole_fmx_specific_op(obj, precedence, leftmost, FALSE);
@@ -1530,7 +1530,7 @@ eole_fms_specific_op(call obj, int precedence, bool leftmost)
     prettyprint. For instance, n-ary add and multiply operators which are
     used in the EOLE project use "+" and "*" prettyprints instead of the
     entity_local_name (JZ - sept 98) */
-static string 
+static string
 get_special_prettyprint_for_operator(call obj){
 
   static struct special_operator_prettyprint {
@@ -1542,7 +1542,7 @@ get_special_prettyprint_for_operator(call obj){
     {NULL,NULL}
   };
   int i = 0;
-  string op_name; 
+  string op_name;
 
   /* get the entity name */
   op_name = entity_local_name(call_function(obj));
@@ -1552,7 +1552,7 @@ get_special_prettyprint_for_operator(call obj){
       return tab_operator_prettyprint[i].op_prettyprint;
     else i++;
   }
-  
+
   return op_name;
 }
 
@@ -1565,14 +1565,14 @@ words_infix_nary_op(call obj, int precedence, bool leftmost)
 {
   list /*of string*/ pc = NIL;
   list /* of expressions */ args = call_arguments(obj);
-  
+
   /* get current operator precedence */
   int prec = words_intrinsic_precedence(obj);
 
   expression exp1 = EXPRESSION(CAR(args));
   expression exp2;
 
-  list we1 = words_subexpression(exp1, prec, 
+  list we1 = words_subexpression(exp1, prec,
 				 prec>=MINIMAL_ARITHMETIC_PRECEDENCE? leftmost: TRUE);
   list we2;
 
@@ -1583,13 +1583,13 @@ words_infix_nary_op(call obj, int precedence, bool leftmost)
 
   /* reach the second arg */
   args = CDR(args);
-  
+
   for(; args; args=CDR(args)) { /* for all args */
     exp2 = EXPRESSION(CAR(args));
-    
-    
-    /* 
-     * If the infix operator is either "-" or "/", I prefer not to delete 
+  
+  
+    /*
+     * If the infix operator is either "-" or "/", I prefer not to delete
      * the parentheses of the second expression.
      * Ex: T = X - ( Y - Z ) and T = X / (Y*Z)
      *
@@ -1599,7 +1599,7 @@ words_infix_nary_op(call obj, int precedence, bool leftmost)
       we2 = words_subexpression(exp2, MAXIMAL_PRECEDENCE, FALSE);
     else if ( strcmp(entity_local_name(call_function(obj)), "-") == 0 ) { /* minus operator */
       if ( expression_call_p(exp2) &&
-	   words_intrinsic_precedence(syntax_call(expression_syntax(exp2))) >= 
+	   words_intrinsic_precedence(syntax_call(expression_syntax(exp2))) >=
 	   intrinsic_precedence("*") )
 	/* precedence is greater than * or / */
 	we2 = words_subexpression(exp2, prec, FALSE);
@@ -1610,7 +1610,7 @@ words_infix_nary_op(call obj, int precedence, bool leftmost)
       we2 = words_subexpression(exp2, prec,
 				prec<MINIMAL_ARITHMETIC_PRECEDENCE);
     }
-  
+
     /* operator prettyprint */
     pc = CHAIN_SWORD(pc, get_special_prettyprint_for_operator(obj));
 
@@ -1619,25 +1619,25 @@ words_infix_nary_op(call obj, int precedence, bool leftmost)
   /* close parenthese if necessary */
   if ( prec < precedence )
     pc = CHAIN_SWORD(pc, ")");
-  
+
   return(pc);
 }
 
 
-/* 
- * If the infix operator is either "-" or "/", I prefer not to delete 
+/*
+ * If the infix operator is either "-" or "/", I prefer not to delete
  * the parentheses of the second expression.
  * Ex: T = X - ( Y - Z ) and T = X / (Y*Z)
  *
  * Lei ZHOU       Nov. 4 , 1991
  */
-static list 
+static list
 words_infix_binary_op(call obj, int precedence, bool leftmost)
 {
   list pc = NIL;
   list args = call_arguments(obj);
   int prec = words_intrinsic_precedence(obj);
-  list we1 = words_subexpression(EXPRESSION(CAR(args)), prec, 
+  list we1 = words_subexpression(EXPRESSION(CAR(args)), prec,
 				 prec>=MINIMAL_ARITHMETIC_PRECEDENCE? leftmost: TRUE);
   list we2;
   string fun = entity_local_name(call_function(obj));
@@ -1677,14 +1677,14 @@ words_infix_binary_op(call obj, int precedence, bool leftmost)
   }
 
   if(strcmp(fun, DIVIDE_OPERATOR_NAME) == 0) {
-    /* Do we want to add a space in case we2 starts with a dereferencing operator "*"? 
+    /* Do we want to add a space in case we2 starts with a dereferencing operator "*"?
      Nga suggests to look at the quake benchmark of SPEC2000. */
     we2 = words_subexpression(EXPRESSION(CAR(CDR(args))), MAXIMAL_PRECEDENCE, FALSE);
   }
   else if (strcmp(fun, MINUS_OPERATOR_NAME) == 0 ) {
     expression exp = EXPRESSION(CAR(CDR(args)));
     if(expression_call_p(exp) &&
-       words_intrinsic_precedence(syntax_call(expression_syntax(exp))) >= 
+       words_intrinsic_precedence(syntax_call(expression_syntax(exp))) >=
        intrinsic_precedence(MULTIPLY_OPERATOR_NAME) )
       /* precedence is greater than * or / */
       we2 = words_subexpression(exp, prec, FALSE);
@@ -1720,7 +1720,7 @@ words_infix_binary_op(call obj, int precedence, bool leftmost)
   pc = gen_nconc(pc, we2);
   if(prec < precedence || !precedence_p)
     pc = CHAIN_SWORD(pc, ")");
-    
+  
   return(pc);
 }
 
@@ -1765,7 +1765,7 @@ static list words_conditional_op(call obj,
 
 
 /* precedence needed here
- * According to the Precedence of Operators 
+ * According to the Precedence of Operators
  * Arithmetic > Character > Relational > Logical
  * Added by Lei ZHOU    Nov. 4,91
  *
@@ -1789,9 +1789,9 @@ static struct intrinsic_handler {
 
     {MULTIPLY_OPERATOR_NAME, words_infix_binary_op, 21},
     {DIVIDE_OPERATOR_NAME, words_infix_binary_op, 21},
-    
-    {INVERSE_OPERATOR_NAME, words_inverse_op, 21}, 
-    
+  
+    {INVERSE_OPERATOR_NAME, words_inverse_op, 21},
+  
     {PLUS_OPERATOR_NAME, words_infix_binary_op, 20},
     {MINUS_OPERATOR_NAME, words_infix_binary_op, 20},
 
@@ -1848,24 +1848,24 @@ static struct intrinsic_handler {
     /* These operators are used within the optimize transformation in
 order to manipulate operators such as n-ary add and multiply or
 multiply-add operators ( JZ - sept 98) */
-    {EOLE_FMA_OPERATOR_NAME, eole_fma_specific_op, 
+    {EOLE_FMA_OPERATOR_NAME, eole_fma_specific_op,
                              MINIMAL_ARITHMETIC_PRECEDENCE },
-    {EOLE_FMS_OPERATOR_NAME, eole_fms_specific_op, 
-                             MINIMAL_ARITHMETIC_PRECEDENCE }, 
+    {EOLE_FMS_OPERATOR_NAME, eole_fms_specific_op,
+                             MINIMAL_ARITHMETIC_PRECEDENCE },
     {EOLE_SUM_OPERATOR_NAME, words_infix_nary_op, 20},
     {EOLE_PROD_OPERATOR_NAME, words_infix_nary_op, 21},
 
     /* show IMA/IMS */
-    {IMA_OPERATOR_NAME, eole_fma_specific_op, 
+    {IMA_OPERATOR_NAME, eole_fma_specific_op,
 	                         MINIMAL_ARITHMETIC_PRECEDENCE },
-	{IMS_OPERATOR_NAME, eole_fms_specific_op, 
+	{IMS_OPERATOR_NAME, eole_fms_specific_op,
 	                         MINIMAL_ARITHMETIC_PRECEDENCE },
 
-    /* 05/08/2003 - Nga Nguyen - Here are C intrinsics. 
+    /* 05/08/2003 - Nga Nguyen - Here are C intrinsics.
        The precedence is computed by using Table xx, page 49, book
-       "The C programming language" of Kernighan and Ritchie, and by 
+       "The C programming language" of Kernighan and Ritchie, and by
        taking into account the precedence value of Fortran intrinsics. */
-    
+  
     {FIELD_OPERATOR_NAME, words_infix_binary_op, 30},
     {POINT_TO_OPERATOR_NAME, words_infix_binary_op, 30},
 
@@ -1880,29 +1880,29 @@ multiply-add operators ( JZ - sept 98) */
     /*{"-unary", words_prefix_unary_op, 25},*/
     {BITWISE_NOT_OPERATOR_NAME, words_prefix_unary_op, 25},
     {C_NOT_OPERATOR_NAME, words_prefix_unary_op, 25},
-    
+  
     {C_MODULO_OPERATOR_NAME,  words_infix_binary_op, 21},
-    
+  
     {PLUS_C_OPERATOR_NAME, words_infix_binary_op, 20},
     {MINUS_C_OPERATOR_NAME, words_infix_binary_op, 20},
 
     {LEFT_SHIFT_OPERATOR_NAME, words_infix_binary_op, 19},
-    {RIGHT_SHIFT_OPERATOR_NAME, words_infix_binary_op, 19}, 
+    {RIGHT_SHIFT_OPERATOR_NAME, words_infix_binary_op, 19},
 
     {C_LESS_THAN_OPERATOR_NAME, words_infix_binary_op, 15 },
     {C_GREATER_THAN_OPERATOR_NAME, words_infix_binary_op, 15},
     {C_LESS_OR_EQUAL_OPERATOR_NAME, words_infix_binary_op, 15},
-    {C_GREATER_OR_EQUAL_OPERATOR_NAME, words_infix_binary_op, 15}, 
+    {C_GREATER_OR_EQUAL_OPERATOR_NAME, words_infix_binary_op, 15},
 
     {C_EQUAL_OPERATOR_NAME, words_infix_binary_op, 14},
-    {C_NON_EQUAL_OPERATOR_NAME, words_infix_binary_op, 14},  
-  
-    {BITWISE_AND_OPERATOR_NAME, words_infix_binary_op, 13}, 
+    {C_NON_EQUAL_OPERATOR_NAME, words_infix_binary_op, 14},
+
+    {BITWISE_AND_OPERATOR_NAME, words_infix_binary_op, 13},
     {BITWISE_XOR_OPERATOR_NAME, words_infix_binary_op, 12},
     {BITWISE_OR_OPERATOR_NAME, words_infix_binary_op, 11},
 
-    {C_AND_OPERATOR_NAME, words_infix_binary_op, 8}, 
-    {C_OR_OPERATOR_NAME, words_infix_binary_op, 6},    
+    {C_AND_OPERATOR_NAME, words_infix_binary_op, 8},
+    {C_OR_OPERATOR_NAME, words_infix_binary_op, 6},  
 
     {MULTIPLY_UPDATE_OPERATOR_NAME, words_assign_op, 1},
     {DIVIDE_UPDATE_OPERATOR_NAME, words_assign_op, 1},
@@ -1923,13 +1923,13 @@ multiply-add operators ( JZ - sept 98) */
     {NULL, null, 0}
 };
 
-static list 
+static list
 words_intrinsic_call(call obj, int precedence, bool leftmost)
 {
     struct intrinsic_handler *p = tab_intrinsic_handler;
     char *n = entity_local_name(call_function(obj));
 
-    
+  
     while (p->name != NULL) {
 	if (strcmp(p->name, n) == 0) {
 	  return((*(p->f))(obj, precedence, leftmost));
@@ -1940,7 +1940,7 @@ words_intrinsic_call(call obj, int precedence, bool leftmost)
     return words_regular_call(obj, FALSE);
 }
 
-static int 
+static int
 intrinsic_precedence(string n)
 {
     struct intrinsic_handler *p = tab_intrinsic_handler;
@@ -1972,13 +1972,13 @@ static list words_va_arg(list obj)
   pc = gen_nconc(pc, words_expression(e1));
   pc = CHAIN_SWORD(pc, space_p? ", " : ",");
   pc = gen_nconc(pc, words_type(t2));
-  pc = CHAIN_SWORD(pc,")"); 
+  pc = CHAIN_SWORD(pc,")");
   return pc;
-} 
+}
 
 /* exported for cmfortran.c
  */
-list 
+list
 words_call(
     call obj,
     int precedence,
@@ -1999,9 +1999,9 @@ words_call(
   return pc;
 }
 
-/* exported for expression.c 
+/* exported for expression.c
  */
-list 
+list
 words_syntax(syntax obj)
 {
     list pc = NIL;
@@ -2031,10 +2031,10 @@ words_syntax(syntax obj)
     case is_syntax_va_arg:
       pc = words_va_arg(syntax_va_arg(obj));
       break;
-    default: 
+    default:
       pips_internal_error("unexpected tag\n");
     }
-    
+
     return(pc);
 }
 
@@ -2045,35 +2045,35 @@ words_expression(expression obj)
     return words_syntax(expression_syntax(obj));
 }
 
-/* exported for cmfortran.c 
+/* exported for cmfortran.c
  */
-list 
+list
 words_subexpression(
     expression obj,
     int precedence,
     bool leftmost)
 {
     list pc;
-    
+
     if ( expression_call_p(obj) )
 	pc = words_call(syntax_call(expression_syntax(obj)), precedence, leftmost, FALSE);
-    else 
+    else
 	pc = words_syntax(expression_syntax(obj));
-    
+
     return pc;
 }
 
 
 /**************************************************************** SENTENCE */
 
-static sentence 
+static sentence
 sentence_tail(void)
 {
   return MAKE_ONE_WORD_SENTENCE(0, strdup(prettyprint_is_fortran?"END":"}"));
 }
 
 /* exported for unstructured.c */
-sentence 
+sentence
 sentence_goto_label(
     entity __attribute__ ((unused)) module,
     string label,
@@ -2083,11 +2083,11 @@ sentence_goto_label(
 {
     list pc = words_goto_label(tlabel);
 
-    return(make_sentence(is_sentence_unformatted, 
+    return(make_sentence(is_sentence_unformatted,
 	    make_unformatted(label?strdup(label):NULL, n, margin, pc)));
 }
 
-static sentence 
+static sentence
 sentence_goto(
     entity module,
     string label,
@@ -2095,7 +2095,7 @@ sentence_goto(
     statement obj,
     int n)
 {
-    string tlabel = entity_local_name(statement_label(obj)) + 
+    string tlabel = entity_local_name(statement_label(obj)) +
 	           strlen(LABEL_PREFIX);
     pips_assert("Legal label required", strlen(tlabel)!=0);
     return sentence_goto_label(module, label, margin, tlabel, n);
@@ -2106,7 +2106,7 @@ static text text_block (entity module, string label, int margin, list objs,
 			int n)
 {
   text r = make_text(NIL);
-  
+
   if (ENDP(objs) && !get_bool_property("PRETTYPRINT_EMPTY_BLOCKS")) {
     return(r) ;
   }
@@ -2124,19 +2124,19 @@ static text text_block (entity module, string label, int margin, list objs,
 
   // print the begin block marker if needed
   if (flg_marker == true) {
-    ADD_SENTENCE_TO_TEXT(r, 
+    ADD_SENTENCE_TO_TEXT(r,
 			 make_sentence(is_sentence_unformatted, bm_beg));
   }
   else if ((get_bool_property("PRETTYPRINT_ALL_EFFECTS") ||
 	    get_bool_property("PRETTYPRINT_BLOCKS"))
 	   &&
 	   get_bool_property("PRETTYPRINT_FOR_FORESYS"))
-    ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted, 
+    ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted,
 					  strdup("C$BB\n")));
 
   // append local variables if there is some
   r = insert_locals (r);
-    
+
   // begin  block marker and declarations have already been printed
   // print the block instructions
   for (; objs != NIL; objs = CDR(objs)) {
@@ -2147,10 +2147,10 @@ static text text_block (entity module, string label, int margin, list objs,
     text_sentences(t) = NIL;
     free_text(t);
   }
-    
+
   // print the end block marker if needed
   if (flg_marker == true) {
-    ADD_SENTENCE_TO_TEXT(r, 
+    ADD_SENTENCE_TO_TEXT(r,
 			 make_sentence(is_sentence_unformatted, bm_end));
   }
   return r;
@@ -2171,36 +2171,36 @@ loop_private_variables(loop obj)
 	omp_private = pp_omp_style_p(),
 	some_before = FALSE;
     list l = NIL;
-    
+
     list locals = gen_copy_seq (loop_locals(obj));
     list decl_var = statement_declarations (loop_body (obj));
-    
+
     if (omp_private == TRUE) {
       // In case of openmp the variable declared in the loop body should
       // not be made private, so let's remove them from the list of locals.
       gen_list_and_not (&locals, decl_var);
     }
 
-    /* comma-separated list of private variables. 
+    /* comma-separated list of private variables.
      * built in reverse order to avoid adding at the end...
      */
     MAP(ENTITY, p,
 	{
-	  if((p!=loop_index(obj)) || all_private) 
+	  if((p!=loop_index(obj)) || all_private)
 	    {
-	      if (some_before) 
+	      if (some_before)
 		l = CHAIN_SWORD(l, ",");
 	      else
 		some_before = TRUE; /* from now on commas, triggered... */
 	      l = gen_nconc(l, words_declaration(p,TRUE));
 	    }
-	}, 
+	},
 	locals
 	); /* end of MAP */
 
     gen_free_list (locals);
 
-    pips_debug(5, "#printed %zd/%zd\n", gen_length(l), 
+    pips_debug(5, "#printed %zd/%zd\n", gen_length(l),
 	       gen_length(loop_locals(obj)));
 
     /* stuff around if not empty
@@ -2214,12 +2214,12 @@ loop_private_variables(loop obj)
 	l = CONS(STRING, MAKE_SWORD(private), l);
 	if (hpf_private || omp_private) CHAIN_SWORD(l, ")");
     }
-    
+
     return l;
 }
 
-/* returns a formatted text for the HPF independent and new directive 
- * well, no continuations and so, but the directives do not fit the 
+/* returns a formatted text for the HPF independent and new directive
+ * well, no continuations and so, but the directives do not fit the
  * unformatted domain, because the directive prolog would not be well
  * managed there.
  */
@@ -2232,13 +2232,13 @@ marged(
     string result = (string) malloc(strlen(prefix)+margin+1);
     strcpy(result, prefix);
     if(prettyprint_is_fortran) {
-      for (i=len; margin-->0;) 
+      for (i=len; margin-->0;)
 	result[i++] = ' '; result[i]='\0';
     }
     return result;
 }
 
-static text 
+static text
 text_directive(
     loop obj,   /* the loop we're interested in */
     int margin,
@@ -2257,25 +2257,25 @@ text_directive(
 
     /* start buffer */
     buffer[0] = '\0';
-    
+
     if (execution_parallel_p(loop_execution(obj)))
     {
 	add_to_current_line(buffer, dir, cont, t);
 	add_to_current_line(buffer, parallel, cont, t);
 	l = loop_private_variables(obj);
-	if (l && is_hpf) 
+	if (l && is_hpf)
 	    add_to_current_line(buffer, space_p? ", " : ",", cont, t);
     }
     else if (get_bool_property("PRETTYPRINT_ALL_PRIVATE_VARIABLES"))
     {
 	l = loop_private_variables(obj);
-	if (l) 
+	if (l)
 	{
 	    add_to_current_line(buffer, dir, cont, t);
 	    if (is_omp) add_to_current_line(buffer, "DO", cont, t);
 	}
     }
-    
+  
     if (strlen(buffer)>0)
 	MAP(STRING, s, add_to_current_line(buffer, s, cont, t), l);
 
@@ -2306,10 +2306,10 @@ text_hpf_directive(loop l, int m)
 #define OMP_PARALLELDO		"PARALLEL DO "
 #define OMP_C_SENTINEL 		"#pragma omp"
 #define OMP_C_DIRECTIVE 	OMP_C_SENTINEL " "
-#define OMP_C_CONTINUATION 	OMP_C_SENTINEL "x" 
+#define OMP_C_CONTINUATION 	OMP_C_SENTINEL "x"
 #define OMP_C_PARALLELDO	"parallel for "
 
-static text 
+static text
 text_omp_directive(loop l, int m)
 {
   text t = text_undefined;
@@ -2319,7 +2319,7 @@ text_omp_directive(loop l, int m)
 		       OMP_PARALLELDO);
   else {
     // assume C
-    // text_directive function takes care of private variables 
+    // text_directive function takes care of private variables
     // More should be done to take care of shared variables, reductions
     // and other specific omp clause like lastprivate, copyin ...
     t = text_directive(l, m, OMP_C_DIRECTIVE, OMP_C_CONTINUATION,
@@ -2331,7 +2331,7 @@ text_omp_directive(loop l, int m)
 }
 
 /* exported for fortran90.c */
-text 
+text
 text_loop_default(
     entity module,
     string label,
@@ -2370,7 +2370,7 @@ text_loop_default(
       pc = CHAIN_SWORD(NIL, (doall_loop_p) ? "DOALL " : "DO " );
     else
       pc = CHAIN_SWORD(NIL, (doall_loop_p) ? "forall(" : "for(" );
-    
+
     if(prettyprint_is_fortran && !structured_do && !doall_loop_p && !do_enddo_p) {
 	pc = CHAIN_SWORD(pc, concatenate(do_label, " ", NULL));
     }
@@ -2398,7 +2398,7 @@ text_loop_default(
       /* Assumed to be C */
       if ((label != NULL) && (label[0] != '\0')) {
 	pips_debug(9, "the label %s need to be print for a for C loop", label);
-	u = make_unformatted(strdup(label), 0, 0, NULL) ;	
+	u = make_unformatted(strdup(label), 0, 0, NULL);
 	ADD_SENTENCE_TO_TEXT(r, first_sentence =
 			     make_sentence(is_sentence_unformatted, u));
       }
@@ -2409,17 +2409,17 @@ text_loop_default(
     /* builds the PRIVATE scalar declaration if required
      */
     if(!ENDP(loop_locals(obj)) && (doall_loop_p || all_private)
-       && !hpf_prettyprint) 
+       && !hpf_prettyprint)
     {
 	list /* of string */ lp = loop_private_variables(obj);
 
-	// initialize the local variable text if needed 
+	// initialize the local variable text if needed
 	if ((local_flg == false) && (lp)) {
 	  local_flg = true;
 	  local_var =  make_text(NIL);
 	}
 
-	if (lp) 
+	if (lp)
 	  ADD_SENTENCE_TO_TEXT( local_var, make_sentence(is_sentence_unformatted,
 	        make_unformatted(NULL, 0, margin+INDENTATION, lp)));
     }
@@ -2439,7 +2439,7 @@ text_loop_default(
 	pp_cray_style_p() || pp_craft_style_p() || pp_cmf_style_p())
     {
 	ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"ENDDO"));
-    } 
+    }
 
     attach_loop_to_sentence_up_to_end_of_text(first_sentence, r, obj);
 
@@ -2447,7 +2447,7 @@ text_loop_default(
 }
 
 /* exported for conversion/look_for_nested_loops.c */
-text 
+text
 text_loop(
     entity module,
     string label,
@@ -2491,7 +2491,7 @@ text_loop(
             MERGE_TEXTS(r, aux_r);
           }
         }
-	else if (pp_f90_style_p() && 
+	else if (pp_f90_style_p() &&
 	    instruction_assign_p(statement_instruction(body)) ) {
 	    MERGE_TEXTS(r, text_loop_90(module, label, margin, obj, n));
 	}
@@ -2505,7 +2505,7 @@ text_loop(
     return r;
 }
 
-static text 
+static text
 text_whileloop(
     entity module,
     string label,
@@ -2550,13 +2550,13 @@ text_whileloop(
 	    pc = gen_nconc(pc, words_expression(whileloop_condition(obj)));
 	    pc = CHAIN_SWORD(pc, ")");
 	    u = make_unformatted(strdup(label), n, margin, pc) ;
-	    ADD_SENTENCE_TO_TEXT(r, first_sentence = 
+	    ADD_SENTENCE_TO_TEXT(r, first_sentence =
 				 make_sentence(is_sentence_unformatted, u));
-	    
+	  
 	    /* loop BODY
 	     */
 	    MERGE_TEXTS(r, text_statement(module, margin+INDENTATION, body));
-	    
+	  
 	    /* LOOP postlogue
 	     */
 	    if (structured_do) {
@@ -2564,15 +2564,15 @@ text_whileloop(
 	    }
 	  }
 	else if(one_liner_p(body))
-	  {    
+	  {  
 	    pc = CHAIN_SWORD(NIL,"while (");
 	    pc = gen_nconc(pc, words_expression(whileloop_condition(obj)));
 	    pc = CHAIN_SWORD(pc,") ");
 	    u = make_unformatted(strdup(label), n, margin, pc) ;
 	    ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_unformatted, u));
 	    MERGE_TEXTS(r, text_statement_enclosed(module, margin+INDENTATION, body,!one_liner_p(body)));
-	   
-	    //if (structured_do) 
+	 
+	    //if (structured_do)
 	    //ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"}"));
 	  }
 	else
@@ -2583,12 +2583,12 @@ text_whileloop(
 	    u = make_unformatted(strdup(label), n, margin, pc) ;
 	    ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_unformatted, u));
 	    MERGE_TEXTS(r, text_statement(module, margin+INDENTATION, body));
-	    if (structured_do) 
+	    if (structured_do)
 	    ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"}"));
-	    
+	  
 	  }
       }
-    else   
+    else 
       {
 	/* C do { s; } while (cond); loop*/
 	pc = CHAIN_SWORD(NIL,"do {");
@@ -2602,14 +2602,14 @@ text_whileloop(
 	u = make_unformatted(strdup(label), n, margin, pc) ;
 	ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_unformatted, u));
       }
-    
+  
     /* attach_loop_to_sentence_up_to_end_of_text(first_sentence, r, obj); */
     return r;
 }
 
-/* exported for unstructured.c 
+/* exported for unstructured.c
  */
-text 
+text
 init_text_statement(
     entity module,
     int margin,
@@ -2619,9 +2619,9 @@ init_text_statement(
     text r;
 
     if (get_bool_property("PRETTYPRINT_ALL_EFFECTS")
-	|| !((instruction_block_p(i) && 
-	      !get_bool_property("PRETTYPRINT_BLOCKS")) || 
-	     (instruction_unstructured_p(i) && 
+	|| !((instruction_block_p(i) &&
+	      !get_bool_property("PRETTYPRINT_BLOCKS")) ||
+	     (instruction_unstructured_p(i) &&
 	      !get_bool_property("PRETTYPRINT_UNSTRUCTURED")))) {
       /* FI: before calling the hook,
        * statement_ordering(obj) should be checked */
@@ -2637,20 +2637,20 @@ init_text_statement(
 	char *buffer;
 	int so = statement_ordering(obj) ;
 
-	if (!(instruction_block_p(statement_instruction(obj)) && 
+	if (!(instruction_block_p(statement_instruction(obj)) &&
 	      (! get_bool_property("PRETTYPRINT_BLOCKS")))) {
 
 	    if (so != STATEMENT_ORDERING_UNDEFINED) {
 	      asprintf(&buffer, "%s (%d,%d)\n", PIPS_COMMENT_SENTINEL,
 			ORDERING_NUMBER(so), ORDERING_STATEMENT(so)) ;
-		ADD_SENTENCE_TO_TEXT(r, 
-				     make_sentence(is_sentence_formatted, 
+		ADD_SENTENCE_TO_TEXT(r,
+				     make_sentence(is_sentence_formatted,
 						   buffer)) ;
 	    }
 	    else {
 		if(user_view_p())
-	      ADD_SENTENCE_TO_TEXT(r, 
-				   make_sentence(is_sentence_formatted, 
+	      ADD_SENTENCE_TO_TEXT(r,
+				   make_sentence(is_sentence_formatted,
 						 strdup("C (unreachable)\n")));
 	    }
 	}
@@ -2658,7 +2658,7 @@ init_text_statement(
     return( r ) ;
 }
 
-static text 
+static text
 text_logical_if(
     entity __attribute__ ((unused)) module,
     string label,
@@ -2677,16 +2677,16 @@ text_logical_if(
     instruction ti = statement_instruction(tb);
     call c = instruction_call(ti);
     pc = gen_nconc(pc, words_call(c, 0, TRUE, TRUE));
-    ADD_SENTENCE_TO_TEXT(r, 
-			 make_sentence(is_sentence_unformatted, 
-				       make_unformatted(strdup(label), n, 
+    ADD_SENTENCE_TO_TEXT(r,
+			 make_sentence(is_sentence_unformatted,
+				       make_unformatted(strdup(label), n,
 							margin, pc)));
   }
   else {
     text t = text_statement(module, margin+INDENTATION, tb);
-    ADD_SENTENCE_TO_TEXT(r, 
-			 make_sentence(is_sentence_unformatted, 
-				       make_unformatted(strdup(label), n, 
+    ADD_SENTENCE_TO_TEXT(r,
+			 make_sentence(is_sentence_unformatted,
+				       make_unformatted(strdup(label), n,
 							margin, pc)));
     text_sentences(r) = gen_nconc(text_sentences(r), text_sentences(t));
     text_sentences(t) = NIL;
@@ -2700,7 +2700,7 @@ text_logical_if(
   return(r);
 }
 
-static text 
+static text
 text_block_if(
     entity module,
     string label,
@@ -2725,13 +2725,13 @@ text_block_if(
     else
       pc = CHAIN_SWORD(pc, ") {");
 
-    ADD_SENTENCE_TO_TEXT(r, 
-			 make_sentence(is_sentence_unformatted, 
-				       make_unformatted(strdup(label), n, 
+    ADD_SENTENCE_TO_TEXT(r,
+			 make_sentence(is_sentence_unformatted,
+				       make_unformatted(strdup(label), n,
 							margin, pc)));
-    MERGE_TEXTS(r, text_statement_enclosed(module, margin+INDENTATION, 
+    MERGE_TEXTS(r, text_statement_enclosed(module, margin+INDENTATION,
 				  test_true(obj), !one_liner_true_statement));
-  
+
     test_false_obj = test_false(obj);
     if(statement_undefined_p(test_false_obj)){
 	pips_error("text_test","undefined statement\n");
@@ -2748,7 +2748,7 @@ text_block_if(
 	 && (get_bool_property("PRETTYPRINT_ALL_LABELS"))))
       {
         else_branch_p = TRUE;
-	if (prettyprint_is_fortran) 
+	if (prettyprint_is_fortran)
 	  {
 	    ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"ELSE"));
 	  }
@@ -2763,10 +2763,10 @@ text_block_if(
 	      ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"else {"));
 	    }
 	  }
-	MERGE_TEXTS(r, text_statement(module, margin+INDENTATION, 
+	MERGE_TEXTS(r, text_statement(module, margin+INDENTATION,
 				      test_false_obj));
       }
-    
+  
     if(prettyprint_is_fortran)
       ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,strdup("ENDIF")))
     else if((!else_branch_p && !one_liner_true_statement) || (else_branch_p && !one_liner_false_statement))
@@ -2781,7 +2781,7 @@ text_block_if(
     return(r);
 }
 
-static text 
+static text
 text_io_block_if(
     entity module,
     string label,
@@ -2794,39 +2794,39 @@ text_io_block_if(
     string strglab= local_name(new_label_name(module))+1;
 
     if (!empty_statement_p(test_true(obj))) {
-      
-      r = make_text(CONS(SENTENCE, 
+    
+      r = make_text(CONS(SENTENCE,
 			 sentence_goto_label(module, label, margin,
-					     strglab, n), 
+					     strglab, n),
 			 NIL));
-      
-      ADD_SENTENCE_TO_TEXT(r, 
-			   make_sentence(is_sentence_unformatted, 
-					 make_unformatted(strdup(label), n, 
+    
+      ADD_SENTENCE_TO_TEXT(r,
+			   make_sentence(is_sentence_unformatted,
+					 make_unformatted(strdup(label), n,
 							  margin, pc)));
-      MERGE_TEXTS(r, text_statement(module, margin, 
+      MERGE_TEXTS(r, text_statement(module, margin,
 				    test_true(obj)));
 
 
 
 
 
-      
-      
-      ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_unformatted, 
-					    make_unformatted(strdup(strglab), n, margin, 
-							     CONS(STRING, 
+    
+    
+      ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_unformatted,
+					    make_unformatted(strdup(strglab), n, margin,
+							     CONS(STRING,
 								  strdup(prettyprint_is_fortran?"CONTINUE":";"), NIL))));
-    } 
-    
-    if (!empty_statement_p(test_false(obj))) 
-      MERGE_TEXTS(r, text_statement(module, margin, 
+    }
+  
+    if (!empty_statement_p(test_false(obj)))
+      MERGE_TEXTS(r, text_statement(module, margin,
 				    test_false(obj)));
-    
+  
     return(r);
 }
 
-static text 
+static text
 text_block_ifthen(
     entity module,
     string label,
@@ -2842,24 +2842,24 @@ text_block_ifthen(
     pc = gen_nconc(pc, words_expression(test_condition(obj)));
     pc = CHAIN_SWORD(pc, prettyprint_is_fortran?") THEN": (one_liner_p(tb)?")":") {"));
 
-    ADD_SENTENCE_TO_TEXT(r, 
-			 make_sentence(is_sentence_unformatted, 
-				       make_unformatted(strdup(label), n, 
+    ADD_SENTENCE_TO_TEXT(r,
+			 make_sentence(is_sentence_unformatted,
+				       make_unformatted(strdup(label), n,
 							margin, pc)));
     MERGE_TEXTS(r, text_statement_enclosed(module, margin+INDENTATION, tb, !one_liner_p(tb)));
-    if (!prettyprint_is_fortran && !one_liner_p(tb)) 
+    if (!prettyprint_is_fortran && !one_liner_p(tb))
       ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"}"));
     return(r);
 }
 
-static text 
+static text
 text_block_else(
     entity module,
     string __attribute__ ((unused)) label,
     int margin,
     statement stmt,
     int __attribute__ ((unused)) n)
-{    
+{  
   text r = make_text(NIL);
 
   if (!statement_with_empty_comment_p(stmt)
@@ -2885,21 +2885,21 @@ text_block_else(
 	}
 	else {
 	  ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin, "else {"));
-	  MERGE_TEXTS(r, text_statement(module, margin+INDENTATION, stmt)); 
+	  MERGE_TEXTS(r, text_statement(module, margin+INDENTATION, stmt));
 	  ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin, "}"));
 	}
       }
     }
   /*original code
     ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,prettyprint_is_fortran?"ELSE":(one_liner_p(stmt)?"else":"else {")));
-    MERGE_TEXTS(r, text_statement(module, margin+INDENTATION, stmt)); 
+    MERGE_TEXTS(r, text_statement(module, margin+INDENTATION, stmt));
     if (!prettyprint_is_fortran && !one_liner_p(stmt))
     ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"}"));*/
-        	   
+        	 
   return r;
 }
 
-static text 
+static text
 text_block_elseif(
     entity module,
     string label,
@@ -2915,25 +2915,25 @@ text_block_elseif(
   pc = CHAIN_SWORD(pc, strdup(prettyprint_is_fortran?"ELSEIF (":"else if ("));
   pc = gen_nconc(pc, words_expression(test_condition(obj)));
   pc = CHAIN_SWORD(pc, strdup(prettyprint_is_fortran?") THEN":(one_liner_p(tb)?")":") {")));
-  ADD_SENTENCE_TO_TEXT(r, 
-		       make_sentence(is_sentence_unformatted, 
-				     make_unformatted(strdup(label), n, 
+  ADD_SENTENCE_TO_TEXT(r,
+		       make_sentence(is_sentence_unformatted,
+				     make_unformatted(strdup(label), n,
 						      margin, pc)));
-    
+  
   MERGE_TEXTS(r, text_statement_enclosed(module, margin+INDENTATION, tb,!one_liner_p(tb)));
 
   if (!prettyprint_is_fortran && !one_liner_p(tb)) {
     ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin, strdup("}")));
   }
 
-  if(statement_test_p(fb) 
+  if(statement_test_p(fb)
      && empty_comments_p(statement_comments(fb))
      && entity_empty_label_p(statement_label(fb))) {
     MERGE_TEXTS(r, text_block_elseif(module,
 				     label_local_name(statement_label(fb)),
-				     margin, 
+				     margin,
 				     statement_test(fb), n));
-    
+  
   } else {
     MERGE_TEXTS(r, text_block_else(module, label, margin, fb, n));
   }
@@ -2945,7 +2945,7 @@ text_block_elseif(
   return(r);
 }
 
-static text 
+static text
 text_test(
     entity module,
     string label,
@@ -2986,14 +2986,14 @@ text_test(
 	
 	/* r = text_block_if(module, label, margin, obj, n); */
     }
-    else {   
+    else { 
 	syntax c = expression_syntax(test_condition(obj));
 	
-	if (syntax_reference_p(c)  
+	if (syntax_reference_p(c)
 	    && io_entity_p(reference_variable(syntax_reference(c)))
 	    &&  !get_bool_property("PRETTYPRINT_CHECK_IO_STATEMENTS"))
 	  r = text_io_block_if(module, label, margin, obj, n);
-	else 
+	else
 	  r = text_block_if(module, label, margin, obj, n);
     }
     ifdebug(8){
@@ -3005,14 +3005,14 @@ text_test(
 }
 
 /* hook for adding something in the head. used by hpfc.
- * done so to avoid hpfc->prettyprint dependence in the libs. 
+ * done so to avoid hpfc->prettyprint dependence in the libs.
  * FC. 29/12/95.
  */
 static string (*head_hook)(entity) = NULL;
 void set_prettyprinter_head_hook(string(*f)(entity)){ head_hook=f;}
 void reset_prettyprinter_head_hook(){ head_hook=NULL;}
 
-static text 
+static text
 text_instruction(
     entity module,
     string label,
@@ -3021,7 +3021,7 @@ text_instruction(
     int n)
 {
   text r = text_undefined;
-  
+
   switch (instruction_tag(obj)) {
   case is_instruction_block:
     {
@@ -3045,7 +3045,7 @@ text_instruction(
     }
   case is_instruction_goto:
     {
-      r = make_text(CONS(SENTENCE, 
+      r = make_text(CONS(SENTENCE,
 			 sentence_goto(module, label, margin,
 				       instruction_goto(obj), n), NIL));
       break;
@@ -3062,12 +3062,12 @@ text_instruction(
       }
       else {
 	if (prettyprint_is_fortran)
-	  u = make_unformatted(strdup(label), n, margin, 
-			       words_call(instruction_call(obj), 
+	  u = make_unformatted(strdup(label), n, margin,
+			       words_call(instruction_call(obj),
 					  0, TRUE, TRUE));
 	else // C
-	  u = make_unformatted(strdup(label), n, margin, 
-			     CHAIN_SWORD(words_call(instruction_call(obj), 
+	  u = make_unformatted(strdup(label), n, margin,
+			     CHAIN_SWORD(words_call(instruction_call(obj),
 						    0, TRUE, TRUE),
 					 strdup(";")));
 	s = make_sentence(is_sentence_unformatted, u);
@@ -3081,11 +3081,11 @@ text_instruction(
       // local variable need to be inserted before diging the
       // unstructured graph.
       r = insert_locals (r);
-      
+    
       text tmp = text_undefined;
-      tmp = text_unstructured(module, label, margin, 
+      tmp = text_unstructured(module, label, margin,
 			      instruction_unstructured(obj), n);
-      
+    
       // append the unstructured to the current text if it exists
       if ((r != text_undefined) && (r != NULL)) {
 	MERGE_TEXTS (r, tmp);
@@ -3124,7 +3124,7 @@ bool  C_comment_p(string c){
   char * ccp=c;
   char cc=' ';
 
- init: 
+ init:
   cc=*ccp++;
   if(cc==' '|| cc=='\t' || cc=='\n')
    goto init;
@@ -3137,7 +3137,7 @@ bool  C_comment_p(string c){
    goto end;
  }
 
- slash: 
+ slash:
   cc=*ccp++;
   if(cc=='*')
    goto slash_star;
@@ -3159,16 +3159,16 @@ bool  C_comment_p(string c){
  else
    goto slash_star;
 
- slash_slash: 
+ slash_slash:
   cc=*ccp++;
   if(cc=='\n')
    goto init;
   if(cc=='\0') // The comment may not end first with a '\n'
      goto end;
- else 
+ else
    goto slash_slash;
 
- slash_star_star: 
+ slash_star_star:
   cc=*ccp++;
   if(cc=='/')
    goto init;
@@ -3205,7 +3205,7 @@ text C_any_comment_to_text(int margin, string c)
 	  else if(strlen(cl)>0){
 	    list pc = CHAIN_SWORD(NIL, cl); // cl is uselessly duplicated
 	    pc = CONS(STRING, MAKE_SWORD("//"), pc);
-	    s= make_sentence(is_sentence_unformatted, 
+	    s= make_sentence(is_sentence_unformatted,
 			     make_unformatted((char *) NULL, 0, margin, pc));
 	  }
 	  else {
@@ -3305,6 +3305,13 @@ text text_statement_enclosed(
     pips_internal_error("Blocks should have no comments\n");
   }
 
+  // the first thing to print is statement extensions
+  string ext =  extensions_to_string (statement_extensions (stmt));
+  if (ext != string_undefined) {
+    ADD_SENTENCE_TO_TEXT(r,
+			 MAKE_ONE_WORD_SENTENCE(0, ext));
+  }
+
   /* 31/07/2003 Nga Nguyen : This code is added for C, because a
      statement can have its own declarations */
   list l = statement_declarations(stmt);
@@ -3316,7 +3323,7 @@ text text_statement_enclosed(
 			   MAKE_ONE_WORD_SENTENCE(imargin, "{"));
       nmargin += INDENTATION;
     }
-    // initialize the local variable text if needed 
+    // initialize the local variable text if needed
     if (local_flg == false) {
       local_flg = true;
       local_var =  make_text(NIL);
@@ -3326,24 +3333,24 @@ text text_statement_enclosed(
 
   pips_debug(2, "Begin for statement %s with braces_p=%d\n",
 	     statement_identification(stmt),braces_p);
-  pips_debug(9, "statement_comments: --%s--\n", 
+  pips_debug(9, "statement_comments: --%s--\n",
 	     string_undefined_p(comments)? "<undef>": comments);
- 
+
   if(statement_number(stmt)!=STATEMENT_NUMBER_UNDEFINED &&
      statement_ordering(stmt)==STATEMENT_ORDERING_UNDEFINED) {
-    /* we are in trouble with some kind of dead (?) code... 
+    /* we are in trouble with some kind of dead (?) code...
        but we might as well be dealing with some parsed_code */
     pips_debug(1, "I unexpectedly bumped into dead code?\n");
   }
 
-  if (same_string_p(label, RETURN_LABEL_NAME)) 
+  if (same_string_p(label, RETURN_LABEL_NAME))
     {
       pips_assert("Statement with return label must be a return statement",
 		  return_statement_p(stmt));
 
       /* do not add a redundant RETURN before an END, unless requested */
       if(get_bool_property("PRETTYPRINT_FINAL_RETURN")
-	 || !last_statement_p(stmt)) 
+	 || !last_statement_p(stmt))
 	{
 	  sentence s = MAKE_ONE_WORD_SENTENCE(nmargin, RETURN_FUNCTION_NAME);
 	  temp = make_text(CONS(SENTENCE, s ,NIL));
@@ -3365,7 +3372,7 @@ text text_statement_enclosed(
    }
 
   // append local variables  that might
-  // have not been inserted previously 
+  // have not been inserted previously
   r = insert_locals (r);
 
   /* note about comments: they are duplicated here, but I'm pretty
@@ -3375,7 +3382,7 @@ text text_statement_enclosed(
     MERGE_TEXTS(r, init_text_statement(module, nmargin, stmt));
     if (! string_undefined_p(comments)) {
       if(prettyprint_is_fortran) {
-	ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted, 
+	ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted,
 					      strdup(comments)));
       }
       else {
@@ -3389,7 +3396,7 @@ text text_statement_enclosed(
     /* Preserve comments and empty C instruction */
     if (! string_undefined_p(comments)) {
       if(prettyprint_is_fortran) {
-	ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted, 
+	ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted,
 					      strdup(comments)));
       }
       else {
@@ -3402,11 +3409,11 @@ text text_statement_enclosed(
       // may be mandatory in a test branch or in a loop body.
       // A. Mensi
       sentence s = MAKE_ONE_WORD_SENTENCE(nmargin, strdup(";"));
-      ADD_SENTENCE_TO_TEXT(r, s);	  
+      ADD_SENTENCE_TO_TEXT(r, s);
     }
     free_text(temp);
   }
- 
+
   if (braces_added) {
     ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(imargin, "}"));
   }
@@ -3423,7 +3430,7 @@ text text_statement_enclosed(
 		 statement_number(stmt), label_local_name(statement_label(stmt)),
 		 statement_comments(stmt));
 	pips_error("text_statement", "This block statement should be labelless, numberless"
-	
+
 		   " and commentless.\n");
       }
     }
@@ -3435,7 +3442,7 @@ text text_statement_enclosed(
   }
 
   pips_debug(2, "End for statement %s\n", statement_identification(stmt));
-       
+
   return(r);
 }
 
@@ -3505,7 +3512,7 @@ find_last_statement(statement s)
 	}
       last = statement_undefined;
     }
-    
+
     /* I had a lot of trouble writing the condition for this assert... */
     pips_assert("Last statement is either undefined or a call to return",
 	 statement_undefined_p(last) /* let's give up: it's always safe */
@@ -3519,7 +3526,7 @@ void
 set_last_statement(statement s)
 {
     statement ls = statement_undefined;
-    pips_assert("last statement is undefined", 
+    pips_assert("last statement is undefined",
 		statement_undefined_p(last_statement));
     ls = find_last_statement(s);
     last_statement = ls;
@@ -3555,7 +3562,7 @@ text_named_module(
 
   debug_on("PRETTYPRINT_DEBUG_LEVEL");
   prettyprint_is_fortran = !get_bool_property("PRETTYPRINT_C_CODE");
-  
+
   /* This guard is correct but could be removed if find_last_statement()
    * were robust and/or if the internal representations were always "correct".
    * See also the guard for reset_last_statement()
@@ -3567,31 +3574,31 @@ text_named_module(
 
   if (prettyprint_is_fortran)
     {
-      if ( strcmp(s,"") == 0 
+      if ( strcmp(s,"") == 0
 	   || get_bool_property("PRETTYPRINT_ALL_DECLARATIONS") )
 	{
 	  if (get_bool_property("PRETTYPRINT_HEADER_COMMENTS"))
 	    /* Add the original header comments if any: */
 	    ADD_SENTENCE_TO_TEXT(r, get_header_comments(module));
-	  
-	  ADD_SENTENCE_TO_TEXT(r, 
+
+	  ADD_SENTENCE_TO_TEXT(r,
 			       attach_head_to_sentence(sentence_head(name), module));
-	  
-	  if (head_hook) 
+
+	  if (head_hook)
 	    ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted,
 						  head_hook(module)));
-	  
+
 	  if (get_bool_property("PRETTYPRINT_HEADER_COMMENTS"))
 	    /* Add the original header comments if any: */
 	    ADD_SENTENCE_TO_TEXT(r, get_declaration_comments(module));
-	  
+
 	  MERGE_TEXTS(r, text_declaration(module));
 	  MERGE_TEXTS(r, text_initializations(module));
 	}
-      else 
+      else
 	{
-	  ADD_SENTENCE_TO_TEXT(r, 
-			       attach_head_to_sentence(make_sentence(is_sentence_formatted, 
+	  ADD_SENTENCE_TO_TEXT(r,
+			       attach_head_to_sentence(make_sentence(is_sentence_formatted,
 								     strdup(s)),
 						       module));
 	}
@@ -3603,19 +3610,19 @@ text_named_module(
       if (!compilation_unit_p(entity_name(name)))
 	{
 	  /* Print function header if the current module is not a compilation unit*/
-	  ADD_SENTENCE_TO_TEXT(r,attach_head_to_sentence(sentence_head(name), module)); 
+	  ADD_SENTENCE_TO_TEXT(r,attach_head_to_sentence(sentence_head(name), module));
 	  ADD_SENTENCE_TO_TEXT(r,MAKE_ONE_WORD_SENTENCE(0,"{"));
 	  /* get the declarations for Fortran codes prettyrinted as C,
 	     as the declarations are not located in the module
 	     statement. A.Mensi */
 	  if(ENDP(statement_declarations(stat)) && fortran_module_p(module)) {
 	    list l = code_declarations(value_code(entity_initial(module)));
-	    
+
 	    MERGE_TEXTS(r,c_text_entities(module, l, INDENTATION));
 	  }
 	}
     }
-  
+
   set_alternate_return_set();
   reset_label_counter();
 
@@ -3625,11 +3632,11 @@ text_named_module(
 			       (prettyprint_is_fortran||compilation_unit_p(entity_name(name)))?0:INDENTATION,
 			       stat));
   }
-    
+
   ral = generate_alternate_return_targets();
   reset_alternate_return_set();
   MERGE_TEXTS(r, ral);
-  
+
   if (!compilation_unit_p(entity_name(name)) || prettyprint_is_fortran)
     {
       /* No need to print TAIL (}) if the current module is a C compilation unit*/
@@ -3810,7 +3817,7 @@ static list words_cast(cast obj)
   pc = CHAIN_SWORD(pc, space_p? ") " : ")");
   pc = gen_nconc(pc, words_expression(exp));
   return pc;
-} 
+}
 
 static list words_sizeofexpression(sizeofexpression obj)
 {
@@ -3822,9 +3829,9 @@ static list words_sizeofexpression(sizeofexpression obj)
   }
   else
     pc = gen_nconc(pc, words_expression(sizeofexpression_expression(obj)));
-  pc = CHAIN_SWORD(pc,")"); 
+  pc = CHAIN_SWORD(pc,")");
   return pc;
-} 
+}
 
 static list words_subscript(subscript s)
 {
@@ -3838,7 +3845,7 @@ static list words_subscript(subscript s)
   pc = CHAIN_SWORD(pc,")[");
   MAP(EXPRESSION,exp,
   {
-    if (!first) 
+    if (!first)
       pc = CHAIN_SWORD(pc,",");
     pc = gen_nconc(pc, words_expression(exp));
     first = FALSE;
@@ -3859,7 +3866,7 @@ static list words_application(application a)
   pc = CHAIN_SWORD(pc,")(");
   MAP(EXPRESSION,exp,
   {
-    if (!first) 
+    if (!first)
       pc = CHAIN_SWORD(pc,",");
     pc = gen_nconc(pc, words_expression(exp));
     first = FALSE;
@@ -3879,7 +3886,7 @@ static text text_forloop(entity module,
     text r = make_text(NIL);
     statement body = forloop_body(obj) ;
     //instruction i = statement_instruction(body);
-   
+ 
     pc = CHAIN_SWORD(pc,"for (");
     if (!expression_undefined_p(forloop_initialization(obj)))
       pc = gen_nconc(pc, words_expression(forloop_initialization(obj)));

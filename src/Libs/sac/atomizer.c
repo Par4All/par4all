@@ -219,11 +219,13 @@ static void simd_insert_statement(statement cs, statement stat)
         statement_label(stat) = statement_label(cs);
 
         orginal_statement = make_statement(entity_empty_label(), 
-                statement_number(cs),
-                statement_ordering(cs),
-                statement_comments(cs),
-                statement_instruction(cs),
-                statement_declarations(cs),NULL);
+					   statement_number(cs),
+					   statement_ordering(cs),
+					   statement_comments(cs),
+					   statement_instruction(cs),
+					   statement_declarations(cs),
+					   NULL,
+					   extensions_undefined);
 
         statement_instruction(cs) =
             make_instruction_block(CONS(STATEMENT, stat,

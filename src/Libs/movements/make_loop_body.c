@@ -94,28 +94,28 @@ find_operator(entity module, string oper, string str )
 
     if ((operator = gen_find_tabulated(name, entity_domain)) 
 	== entity_undefined)
-	operator=make_entity(strdup(name), 
-			     make_type(is_type_functional, 
-				       make_functional(NIL, 
+	operator=make_entity(strdup(name),
+			     make_type(is_type_functional,
+				       make_functional(NIL,
 						       make_type(is_type_void,
 								 UU))),
 			     MakeStorageRom(),
 			     make_value(is_value_unknown,NIL));
-    return(operator);    
+    return(operator);
 }
 
-statement 
+statement
 make_statement_operator(entity oper,cons * args)
 {
-return 
- make_statement(entity_empty_label(),
-			      STATEMENT_NUMBER_UNDEFINED,
-			      STATEMENT_ORDERING_UNDEFINED,
-			      string_undefined,
-			      make_instruction(is_instruction_call,
-					       make_call(oper,
-							 args))
-		,NIL,NULL);
+  return  make_statement (entity_empty_label(),
+			  STATEMENT_NUMBER_UNDEFINED,
+			  STATEMENT_ORDERING_UNDEFINED,
+			  string_undefined,
+			  make_instruction(is_instruction_call,
+					   make_call (oper, args)),
+			  NIL,
+			  NULL,
+			  extensions_undefined);
 }
 
 

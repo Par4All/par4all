@@ -123,7 +123,8 @@ statement make_state_variable_assignement_statement (statement stat,
 				      statement_ordering(stat),
 				      empty_comments,
 				      new_instruction,
-				      NIL,NULL);  
+				      NIL,NULL,
+				      extensions_undefined);  
 
   return returned_statement;
 }
@@ -249,7 +250,8 @@ statement make_transition_statement(control current_node,
 					  statement_number(stat),
 					  statement_ordering(stat),
 					  empty_comments,
-					  transition_instruction,NIL,NULL);
+					  transition_instruction,NIL,NULL,
+					  extensions_undefined);
   }
   else if (successors_nb == 2) {
     /* This is a "test" node, ie with a TEST statement, just add 
@@ -296,14 +298,14 @@ statement make_transition_statement(control current_node,
       = make_instruction(is_instruction_sequence,
 			 transition_sequence_if_true);
   
-    transition_statement_if_true 
-      = make_statement
-      (entity_empty_label(),
-       statement_number(stat),
-       statement_ordering(stat),
-       empty_comments,
-       transition_instruction_if_true,NIL,NULL);
-
+    transition_statement_if_true = make_statement (entity_empty_label(),
+						   statement_number(stat),
+						   statement_ordering(stat),
+						   empty_comments,
+						   transition_instruction_if_true,
+						   NIL,NULL,
+						   extensions_undefined);
+    
     test_true(current_test) = transition_statement_if_true;
 
     // Begin computing for the FALSE statement
@@ -329,7 +331,8 @@ statement make_transition_statement(control current_node,
        statement_number(stat),
        statement_ordering(stat),
        empty_comments,
-       transition_instruction_if_false,NIL,NULL);
+       transition_instruction_if_false,NIL,NULL,
+       extensions_undefined);
 
     test_false(current_test) = transition_statement_if_false;
 
@@ -356,7 +359,8 @@ statement make_transition_statement(control current_node,
 				       statement_number(root_statement),
 				       statement_ordering(root_statement),
 				       empty_comments,
-				       test_instruction,NIL,NULL);
+				       test_instruction,NIL,NULL,
+				       extensions_undefined);
 
   return returned_statement;
 
@@ -469,7 +473,8 @@ statement make_fsm_from_statement(statement stat,
 				  statement_number(stat),
 				  statement_ordering(stat),
 				  empty_comments,
-				  loop_instruction,NIL,NULL);
+				  loop_instruction,NIL,NULL,
+				  extensions_undefined);
   
   
   new_sequence 
@@ -486,7 +491,8 @@ statement make_fsm_from_statement(statement stat,
 				      statement_number(stat),
 				      statement_ordering(stat),
 				      empty_comments,
-				      sequence_instruction,NIL,NULL);
+				      sequence_instruction,NIL,NULL,
+				      extensions_undefined);
   /*statement_instruction(loop_body) 
     = make_instruction_block(CONS(STATEMENT,returned_statement,NIL));
   */

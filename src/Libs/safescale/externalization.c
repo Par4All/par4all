@@ -727,7 +727,16 @@ static void distribute_code(string function_name, statement externalized_code, s
     call_comments = strdup(new_tag);
   }
 
-  call_statement = make_statement(entity_empty_label(), statement_number(externalized_code), statement_ordering(externalized_code), call_comments, make_instruction(is_instruction_call, make_call(new_module, call_params)), NIL, NULL);
+  call_statement = make_statement(entity_empty_label(),
+				  statement_number(externalized_code),
+				  statement_ordering(externalized_code),
+				  call_comments,
+				  make_instruction(is_instruction_call,
+						   make_call(new_module,
+							     call_params)),
+				  NIL,
+				  NULL,
+				  extensions_undefined);
   
   pips_debug(7, "BEFORE REPLACING\n");
   pips_debug(7, "externalized_code=\n");

@@ -49,7 +49,8 @@ static control make_condition_from_forloop (forloop curLoop,
 				       empty_comments,
 				       make_instruction(is_instruction_test,
 							condition_test),
-				       NIL,NULL);  
+				       NIL,NULL,
+				       extensions_undefined);
   
   return make_control(condition_statement, NIL, NIL);
 }

@@ -54,11 +54,13 @@ static void simd_insert_statement(statement cs, statement stat)
         statement_label(stat) = statement_label(cs);
 
         oriStat = make_statement(entity_empty_label(), 
-                statement_number(cs),
-                statement_ordering(cs),
-                statement_comments(cs),
-                statement_instruction(cs),
-                NIL,NULL);
+				 statement_number(cs),
+				 statement_ordering(cs),
+				 statement_comments(cs),
+				 statement_instruction(cs),
+				 NIL,
+				 NULL,
+				 extensions_undefined);
 
         statement_instruction(cs) =
             make_instruction_block(CONS(STATEMENT, stat,
@@ -372,11 +374,13 @@ static void transform_if_stat(statement stat, list lStat, list lCond)
                     newTrue, make_empty_statement());
 
             statement newIf = make_statement(entity_empty_label(), 
-                    STATEMENT_NUMBER_UNDEFINED,
-                    STATEMENT_ORDERING_UNDEFINED,
-                    IF_TO_CONVERT,
-                    make_instruction(is_instruction_test, t),
-                    NIL,NULL);
+					     STATEMENT_NUMBER_UNDEFINED,
+					     STATEMENT_ORDERING_UNDEFINED,
+					     IF_TO_CONVERT,
+					     make_instruction(is_instruction_test, t),
+					     NIL,
+					     NULL,
+					     extensions_undefined);
 
             // Add the created statement to the list of output statements
             if(lOutStat == NIL)
@@ -418,11 +422,13 @@ static void transform_if_stat(statement stat, list lStat, list lCond)
                 newTrue, make_empty_statement());
 
         statement newIf = make_statement(entity_empty_label(), 
-                STATEMENT_NUMBER_UNDEFINED,
-                STATEMENT_ORDERING_UNDEFINED,
-                IF_TO_CONVERT,
-                make_instruction(is_instruction_test, t),
-                NIL,NULL);
+					 STATEMENT_NUMBER_UNDEFINED,
+					 STATEMENT_ORDERING_UNDEFINED,
+					 IF_TO_CONVERT,
+					 make_instruction(is_instruction_test, t),
+					 NIL,
+					 NULL,
+					 extensions_undefined);
 
         // Add the created statement to the list of output statements
         if(lOutStat == NIL)

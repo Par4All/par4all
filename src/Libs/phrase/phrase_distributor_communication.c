@@ -52,11 +52,11 @@ typedef dg_vertex_label vertex_label;
  * Build and store new module START_RU.
  * Create statement module_statement
  */
-entity make_start_ru_module (hash_table ht_params, 
-			     statement* module_statement, 
+entity make_start_ru_module (hash_table ht_params,
+			     statement* module_statement,
 			     int number_of_deployment_units,
 			     entity global_common,
-			     list l_commons) 
+			     list l_commons)
 {
   entity start_ru_module;
   entity func_id;
@@ -68,7 +68,7 @@ entity make_start_ru_module (hash_table ht_params,
   sequence new_sequence;
   instruction sequence_instruction;
   entity set_entity = get_current_module_entity();
-  
+ 
   start_ru_module = make_empty_subroutine(strdup(START_RU_MODULE_NAME));
   pips_debug(2, "Creating module %s\n", entity_global_name(start_ru_module));
   reset_current_module_entity();
@@ -83,7 +83,7 @@ entity make_start_ru_module (hash_table ht_params,
 						       start_ru_module,
 						       2);
   }
-  
+ 
   /* Declare CONTROL_DATA common to be visible here */
   declare_common_variables_in_module (global_common, start_ru_module);
 
@@ -98,7 +98,7 @@ entity make_start_ru_module (hash_table ht_params,
   }
 
   HASH_MAP (externalized_function, l_params, {
-    
+   
     entity function = (entity)externalized_function;
     expression test_condition;
     test new_test;
@@ -106,15 +106,15 @@ entity make_start_ru_module (hash_table ht_params,
     statement test_statement;
     statement call_statement;
     list call_params ;
-      
+     
     function_name = entity_local_name(function);
-        
-    called_module_stat = (statement) db_get_memory_resource(DBR_CODE, 
-							    function_name, 
+       
+    called_module_stat = (statement) db_get_memory_resource(DBR_CODE,
+							    function_name,
 							    TRUE);
-    
+   
     called_module = local_name_to_top_level_entity(function_name);
-  
+ 
     /* Compute the parameters of call function */
     call_params = NIL;
 
@@ -122,27 +122,27 @@ entity make_start_ru_module (hash_table ht_params,
     MAP (REGION, reg, {
       expression new_param;
       reference ref = region_reference(reg);
-      entity local_variable 
+      entity local_variable
 	= entity_in_module (get_common_param_name(reference_variable(ref), function), start_ru_module);
       list indices = NIL;
       if (number_of_deployment_units > 1) {
 	list primary_indices = variable_dimensions(type_variable(entity_type(local_variable)));
 	expression to_be_replaced = NULL;
 	MAP (DIMENSION, dim, {
-	  indices = CONS (EXPRESSION, 
+	  indices = CONS (EXPRESSION,
 			  dimension_lower(dim),
 			  indices);
 	  to_be_replaced=dimension_lower(dim);
 	}, primary_indices);
 	gen_list_patch (indices,to_be_replaced,make_expression_from_entity(unit_id));
 	indices = gen_nreverse(indices);
-      }  
+      } 
       new_param = make_entity_expression (local_variable, indices);
       call_params = CONS(EXPRESSION, new_param, call_params);
     }, (list)l_params);
 
     call_params = gen_nreverse(call_params);
-    
+   
     /* Make the CALL statement */
     call_statement = make_statement(entity_empty_label(),
 				    STATEMENT_NUMBER_UNDEFINED,
@@ -150,34 +150,36 @@ entity make_start_ru_module (hash_table ht_params,
 				    empty_comments,
 				    make_instruction(is_instruction_call,
 						     make_call(called_module,call_params)),
-				    NIL,NULL);
+				    NIL,NULL,
+				    extensions_undefined);
 
-    test_condition 
+    test_condition
       = MakeBinaryCall (entity_intrinsic(EQUAL_OPERATOR_NAME),
 			make_expression_from_entity (func_id),
 			make_expression_from_entity (entity_in_module (get_function_id_name(function), start_ru_module)));
-    
-    new_test = make_test (test_condition, call_statement, 
+   
+    new_test = make_test (test_condition, call_statement,
 			  make_continue_statement(entity_undefined));
-    
+   
     test_instruction = make_instruction (is_instruction_test,new_test);
 
     test_statement = make_statement (entity_empty_label(),
 				     STATEMENT_NUMBER_UNDEFINED,
 				     STATEMENT_ORDERING_UNDEFINED,
 				     empty_comments,
-				     test_instruction,NIL,NULL);
+				     test_instruction,NIL,NULL,
+				     extensions_undefined);
 
     stat_seq = CONS (STATEMENT, test_statement, stat_seq);
 
   }, ht_params);
-  
+ 
   stat_seq =  gen_nreverse(CONS(STATEMENT, make_return_statement(start_ru_module), stat_seq));
 
-  new_sequence 
+  new_sequence
     = make_sequence (stat_seq);
-  
-  sequence_instruction 
+ 
+  sequence_instruction
     = make_instruction(is_instruction_sequence,
 		       new_sequence);
 
@@ -185,8 +187,9 @@ entity make_start_ru_module (hash_table ht_params,
 				     STATEMENT_NUMBER_UNDEFINED,
 				     STATEMENT_ORDERING_UNDEFINED,
 				     empty_comments,
-				     sequence_instruction,NIL,NULL);
-  
+				     sequence_instruction,NIL,NULL,
+				     extensions_undefined);
+ 
   store_new_module (strdup(START_RU_MODULE_NAME), start_ru_module, *module_statement);
 
   reset_current_module_entity();
@@ -198,10 +201,10 @@ entity make_start_ru_module (hash_table ht_params,
  * Build and store new module WAIT_RU.
  * Create statement module_statement
  */
-entity make_wait_ru_module (statement* module_statement, 
+entity make_wait_ru_module (statement* module_statement,
 			    int number_of_deployment_units,
 			    entity global_common,
-			    list l_commons) 
+			    list l_commons)
 {
   entity wait_ru_module;
   entity func_id;
@@ -222,7 +225,7 @@ entity make_wait_ru_module (statement* module_statement,
 						       wait_ru_module,
 						       2);
   }
-  
+ 
   /* Declare CONTROL_DATA common to be visible here */
   declare_common_variables_in_module (global_common, wait_ru_module);
 
@@ -235,11 +238,11 @@ entity make_wait_ru_module (statement* module_statement,
     pips_debug(7, "Declarations for WAIT_RU module: \n");
     fprint_environment(stderr, wait_ru_module);
   }
-  
+ 
   *module_statement = make_return_statement(wait_ru_module);
-  
+ 
   store_new_module (strdup(WAIT_RU_MODULE_NAME), wait_ru_module, *module_statement);
-  
+ 
   reset_current_module_entity();
   set_current_module_entity(set_entity);
 
@@ -259,7 +262,7 @@ static statement make_communication_statement (entity function,
 					       boolean is_receiving)
 {
   entity local_entity = entity_in_module (get_common_param_name (region_entity(reg), function), module);
-  
+ 
   ifdebug(2) {
     pips_debug(2, "BEGIN make_communication_statement\n");
     pips_debug(2, "Function: [%s]\n",entity_local_name(function));
@@ -300,7 +303,7 @@ static statement make_communication_statement (entity function,
       }
     }
   }
-  
+ 
   return make_continue_statement(entity_empty_label());
 }
 
@@ -310,12 +313,12 @@ static statement make_communication_statement (entity function,
  */
 static entity make_scalar_communication_module (variable var,
 						string module_name,
-						hash_table ht_communications, 
-						statement* module_statement, 
+						hash_table ht_communications,
+						statement* module_statement,
 						int number_of_deployment_units,
 						entity global_common,
 						list l_commons,
-						boolean is_receiving) 
+						boolean is_receiving)
 {
   entity new_module;
   entity func_id, param_id, param;
@@ -356,7 +359,7 @@ static entity make_scalar_communication_module (variable var,
 					   module_name,
 					   new_module,
 					   param_nb++);
-  
+ 
   /* Declare CONTROL_DATA common to be visible here */
   declare_common_variables_in_module (global_common, new_module);
 
@@ -381,8 +384,8 @@ static entity make_scalar_communication_module (variable var,
     instruction sequence_instruction2;
 
     MAP (REGION, reg, {
-      
-      statement communication_stat 
+     
+      statement communication_stat
 	= make_communication_statement(function,
 				       new_module,
 				       reg,
@@ -390,27 +393,28 @@ static entity make_scalar_communication_module (variable var,
 				       param,
 				       number_of_deployment_units,
 				       is_receiving);
-      
+     
       entity param_id_value = entity_in_module (is_receiving?get_out_param_id_name(region_entity(reg),function):get_in_param_id_name(region_entity(reg),function), new_module);
-      
+     
       test_condition2
       = MakeBinaryCall (entity_intrinsic(EQUAL_OPERATOR_NAME),
 			make_expression_from_entity (param_id),
 			make_expression_from_entity (param_id_value));
 
-      new_test2 = make_test (test_condition2, communication_stat, 
+      new_test2 = make_test (test_condition2, communication_stat,
 			     make_continue_statement(entity_undefined));
-    
+   
       test_instruction2 = make_instruction (is_instruction_test,new_test2);
-    
+   
       test_statement2 = make_statement (entity_empty_label(),
 					STATEMENT_NUMBER_UNDEFINED,
 					STATEMENT_ORDERING_UNDEFINED,
 					empty_comments,
-					test_instruction2,NIL,NULL);
-    
+					test_instruction2,NIL,NULL,
+					extensions_undefined);
+   
       function_proc_l_stats = CONS (STATEMENT, test_statement2, function_proc_l_stats);
- 
+
      /*if (scalar_region_p(reg)) {
 	}*/
     },l_reg);
@@ -419,42 +423,44 @@ static entity make_scalar_communication_module (variable var,
 
   new_sequence2
     = make_sequence (function_proc_l_stats);
-  
-  sequence_instruction2 
+ 
+  sequence_instruction2
     = make_instruction(is_instruction_sequence,
 		       new_sequence2);
-  
+ 
   function_statement = make_statement(entity_empty_label(),
 				      STATEMENT_NUMBER_UNDEFINED,
 				      STATEMENT_ORDERING_UNDEFINED,
 				      empty_comments,
-				      sequence_instruction2,NIL,NULL);
-  
-  test_condition 
+				      sequence_instruction2,NIL,NULL,
+				      extensions_undefined);
+ 
+  test_condition
     = MakeBinaryCall (entity_intrinsic(EQUAL_OPERATOR_NAME),
 		      make_expression_from_entity (func_id),
 		      make_expression_from_entity (entity_in_module (get_function_id_name(function), new_module)));
-  
-    new_test = make_test (test_condition, function_statement, 
+ 
+    new_test = make_test (test_condition, function_statement,
 			  make_continue_statement(entity_undefined));
-    
+   
     test_instruction = make_instruction (is_instruction_test,new_test);
-    
+   
     test_statement = make_statement (entity_empty_label(),
 				     STATEMENT_NUMBER_UNDEFINED,
 				     STATEMENT_ORDERING_UNDEFINED,
 				     empty_comments,
-				     test_instruction,NIL,NULL);
-    
+				     test_instruction,NIL,NULL,
+				     extensions_undefined);
+   
     stat_seq = CONS (STATEMENT, test_statement, stat_seq);
   }, ht_communications);
 
   stat_seq =  gen_nreverse(CONS(STATEMENT, make_return_statement(new_module), stat_seq));
 
-  new_sequence 
+  new_sequence
     = make_sequence (stat_seq);
-  
-  sequence_instruction 
+ 
+  sequence_instruction
     = make_instruction(is_instruction_sequence,
 		       new_sequence);
 
@@ -462,10 +468,11 @@ static entity make_scalar_communication_module (variable var,
 				     STATEMENT_NUMBER_UNDEFINED,
 				     STATEMENT_ORDERING_UNDEFINED,
 				     empty_comments,
-				     sequence_instruction,NIL,NULL);
-  
+				     sequence_instruction,NIL,NULL,
+				     extensions_undefined);
+ 
   store_new_module (module_name, new_module, *module_statement);
-  
+ 
   reset_current_module_entity();
   set_current_module_entity(set_entity);
 
@@ -534,23 +541,23 @@ string get_receive_param_module_name(entity function, region reg)
 
 /**
  * Internally used for building communication modules
- */ 
+ */
 static list make_scalar_communication_modules (hash_table ht_communications,
 					       int number_of_deployment_units,
 					       entity global_common,
 					       list l_commons,
-					       boolean is_receiving) 
+					       boolean is_receiving)
 {
   list l_modules = NIL;
-  
+ 
   HASH_MAP (var, ht_regions_for_functions, {
     string module_name = is_receiving?get_receive_parameter_module_name(var):get_send_parameter_module_name (var);
     statement module_statement;
     pips_debug(2, "Creating module [%s]\n", module_name);
-    l_modules 
+    l_modules
       = CONS (ENTITY,
 	      make_scalar_communication_module (var,
-						module_name, 
+						module_name,
 						ht_regions_for_functions,
 						&module_statement,
 						number_of_deployment_units,
@@ -570,13 +577,13 @@ static list make_scalar_communication_modules (hash_table ht_communications,
 list make_send_scalar_params_modules (hash_table ht_in_communications,
 				      int number_of_deployment_units,
 				      entity global_common,
-				      list l_commons) 
+				      list l_commons)
 {
   return make_scalar_communication_modules (ht_in_communications,
 					    number_of_deployment_units,
 					    global_common,
 					    l_commons,
-					    FALSE); 
+					    FALSE);
 }
 
 /**
@@ -586,37 +593,37 @@ list make_send_scalar_params_modules (hash_table ht_in_communications,
 list make_receive_scalar_params_modules (hash_table ht_out_communications,
 					 int number_of_deployment_units,
 					 entity global_common,
-					 list l_commons) 
+					 list l_commons)
 {
   return make_scalar_communication_modules (ht_out_communications,
 					    number_of_deployment_units,
 					    global_common,
 					    l_commons,
-					    TRUE); 
+					    TRUE);
 }
 
 /**
  * Build and return parameters (PHI1,PHI2) and dynamic variables for
- * region reg.  
+ * region reg. 
  * NOT IMPLEMENTED: suppress unused dynamic variables !!!!
  */
 void compute_region_variables (region reg,
 			       list* l_reg_params,
-			       list* l_reg_variables) 
+			       list* l_reg_variables)
 {
   Psysteme ps_reg;
   Pbase ps_base;
-  
+ 
   ps_reg = region_system(reg);
   ps_base = ps_reg->base;
 
   *l_reg_params = NIL;
   *l_reg_variables = NIL;
-  
+ 
   pips_debug(3, "BEGIN compute_region_variables: \n");
 
   pips_assert("compute_region_variables", ! SC_UNDEFINED_P(ps_reg));
-  
+ 
   for (; ! VECTEUR_NUL_P(ps_base); ps_base = ps_base->succ) {
 
     entity e = (entity) ps_base->var;
@@ -639,7 +646,7 @@ void compute_region_variables (region reg,
     }
   }
   pips_debug(3, "END compute_region_variables: \n");
-}    
+}   
 
 /**
  * Build statement doing data transfer between internal storage for
@@ -654,7 +661,7 @@ static statement make_array_communication_statement(entity function,
 						    int number_of_deployment_units,
 						    boolean is_receiving,
 						    list l_reg_params,
-						    list l_reg_variables) 
+						    list l_reg_variables)
 {
   Psysteme ps_reg;
   reference ref;
@@ -667,7 +674,7 @@ static statement make_array_communication_statement(entity function,
   statement returned_statement;
 
   entity local_entity = entity_in_module (get_common_param_name (region_entity(reg), function), module);
-  
+ 
   ifdebug(2) {
     pips_debug(2, "BEGIN make_array_communication_statement\n");
     pips_debug(2, "Function: [%s]\n",entity_local_name(function));
@@ -704,7 +711,7 @@ static statement make_array_communication_statement(entity function,
 				  param_exp,
 				  NULL);
   }
-  
+ 
 
   pips_debug(2, "Loop Nest:\n");
 
@@ -714,22 +721,22 @@ static statement make_array_communication_statement(entity function,
   divide = entity_intrinsic(DIVIDE_OPERATOR_NAME);
 
   returned_statement = systeme_to_loop_nest(ps_reg,
-					    l_reg_params, 
-					    assignement_statement, 
+					    l_reg_params,
+					    assignement_statement,
 					    divide);
-  
-  
+ 
+ 
   MAP (ENTITY, dyn_var, {
-    pips_debug(2, "Replace: %s with: %s\n", 
+    pips_debug(2, "Replace: %s with: %s\n",
 	       entity_global_name(dyn_var),
 	       get_dynamic_variable_name(dyn_var));
     replace_entity (returned_statement,dyn_var,
 		    entity_in_module(get_dynamic_variable_name(dyn_var), module));
 
   },l_reg_variables);
-  
+ 
   MAP (ENTITY, phi_param, {
-    pips_debug(2, "Replace: %s with: %s\n", 
+    pips_debug(2, "Replace: %s with: %s\n",
 	       entity_global_name(phi_param),
 	       get_ref_var_param_name(phi_param));
     replace_entity (returned_statement,phi_param,
@@ -749,31 +756,31 @@ static statement make_array_communication_statement(entity function,
 /**
  * Creates an integer variable in specified module
  */
-entity create_private_integer_variable_for_new_module (string new_name, 
+entity create_private_integer_variable_for_new_module (string new_name,
 						       string new_module_name,
 						       entity module)
 {
   entity new_variable;
   entity a;
   basic base;
-  
-  if ((gen_find_tabulated(concatenate(new_module_name, 
-				      MODULE_SEP_STRING, 
-				      new_name, 
+ 
+  if ((gen_find_tabulated(concatenate(new_module_name,
+				      MODULE_SEP_STRING,
+				      new_name,
 				      NULL),
-			  entity_domain)) == entity_undefined) 
-    { 
+			  entity_domain)) == entity_undefined)
+    {
       /* This entity does not exist, we can safely create it */
-      
-      new_variable = make_entity (strdup(concatenate(new_module_name, 
-						     MODULE_SEP_STRING, 
+     
+      new_variable = make_entity (strdup(concatenate(new_module_name,
+						     MODULE_SEP_STRING,
 						     new_name, NULL)),
 				  MakeTypeVariable(MakeBasic(is_basic_int), NIL),
 				  storage_undefined,
 				  value_undefined);
-      a = global_name_to_entity(new_module_name, DYNAMIC_AREA_LOCAL_NAME); 
+      a = global_name_to_entity(new_module_name, DYNAMIC_AREA_LOCAL_NAME);
       base = variable_basic(type_variable(entity_type(new_variable)));
-      entity_storage(new_variable) = 
+      entity_storage(new_variable) =
 	make_storage(is_storage_ram,
 		     make_ram(module, a,
 			      (basic_tag(base)!=is_basic_overloaded)?
@@ -784,7 +791,7 @@ entity create_private_integer_variable_for_new_module (string new_name,
       pips_debug(2, "Created new private variable: %s\n", entity_global_name(new_variable));
       return new_variable;
     }
-  else 
+  else
     {
       pips_error("Entity already exist: %s\n", new_name);
       return NULL;
@@ -812,13 +819,13 @@ static entity make_array_communication_module (entity function,
   list l_reg_params; /* list of entities: phi1, phi2,... */
   list l_reg_variables; /* list of dynamic variables....*/
   int param_nb = 1;
-  
+ 
   new_module = make_empty_subroutine(module_name);
   pips_debug(2, "Creating module %s\n", entity_local_name(new_module));
   pips_debug(2, "Function [%s]\n", entity_local_name(function));
   pips_debug(2, "Region: ");
   print_region(reg);
-  
+ 
 
   compute_region_variables(reg,&l_reg_params,&l_reg_variables);
 
@@ -835,7 +842,7 @@ static entity make_array_communication_module (entity function,
 					   module_name,
 					   new_module,
 					   param_nb++);
-  
+ 
   MAP (ENTITY, dyn_var, {
     pips_debug(2, "New parameter: %s\n", get_dynamic_variable_name(dyn_var));
     create_parameter_for_new_module (type_variable(entity_type(dyn_var)),
@@ -844,14 +851,14 @@ static entity make_array_communication_module (entity function,
 				     new_module,
 				     param_nb++);
   },l_reg_variables);
-  
+ 
   MAP (ENTITY, phi_param, {
     pips_debug(2, "New private variable: %s\n", get_ref_var_param_name(phi_param));
     create_private_integer_variable_for_new_module (get_ref_var_param_name(phi_param),
 						    module_name,
 						    new_module);
   },l_reg_params);
-  
+ 
 
 
   /* Declare CONTROL_DATA common to be visible here */
@@ -859,13 +866,13 @@ static entity make_array_communication_module (entity function,
 
   /* Declare common for externalized function to be visible here */
   declare_common_variables_in_module (externalized_fonction_common, new_module);
-  
+ 
   ifdebug(7) {
     pips_debug(7, "Declarations for %s module: \n", module_name);
     fprint_environment(stderr, new_module);
   }
-  
-  module_statement 
+ 
+  module_statement
     = make_array_communication_statement(function,
 					 new_module,
 					 reg,
@@ -875,12 +882,12 @@ static entity make_array_communication_module (entity function,
 					 is_receiving,
 					 l_reg_params,
 					 l_reg_variables);
-  
+ 
   store_new_module (module_name, new_module, module_statement);
-  
+ 
   reset_current_module_entity();
   set_current_module_entity(set_entity);
-  
+ 
   return new_module;
 }
 
@@ -899,7 +906,7 @@ static list make_array_communication_modules (entity function,
 
   MAP (REGION, reg, {
     if (!region_scalar_p(reg)) {
-      returned = CONS (ENTITY, 
+      returned = CONS (ENTITY,
 		       make_array_communication_module (function,
 							reg,
 							global_common,
@@ -912,7 +919,7 @@ static list make_array_communication_modules (entity function,
 
   return returned;
 }
-					    
+					   
 /**
  * Make all SEND_PARAM communication modules for non-scalar regions for a
  * given function
@@ -930,7 +937,7 @@ list make_send_array_params_modules (entity function,
 					   number_of_deployment_units,
 					   FALSE);
 }
-					    
+					   
 /**
  * Make all RECEIVE_PARAM communication modules for non-scalar regions for a
  * given function

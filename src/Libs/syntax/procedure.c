@@ -1954,13 +1954,13 @@ ProcessEntry(
      * entry statement (ces).
      */
 
-    ces = make_statement(entity_empty_label(), 
-				 STATEMENT_NUMBER_UNDEFINED,
-				 MAKE_ORDERING(0,1),
-				 empty_comments,
-				 make_instruction(is_instruction_unstructured,
-						  control_graph(es)),
-			         NIL,NULL);
+    ces = make_statement(entity_empty_label(),
+			 STATEMENT_NUMBER_UNDEFINED,
+			 MAKE_ORDERING(0,1),
+			 empty_comments,
+			 make_instruction(is_instruction_unstructured,
+					  control_graph(es)),
+			 NIL,NULL, extensions_undefined);
     unspaghettify_statement(ces);
 
     /* Compute an external representation of entry statement es for entry e.

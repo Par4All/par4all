@@ -3,7 +3,7 @@
  $Id$
  */
 
-/* Attention, the null statement in C is represented as the continue 
+/* Attention, the null statement in C is represented as the continue
    statement in Fortran (make_continue_statement means make_null_statement)*/
 
 #include <stdlib.h>
@@ -38,14 +38,14 @@ stack BlockStack; /* BlockStack is used to handle block scope */
 list LabeledStatements; /* list of labeled statements of the current module*/
 
 stack SwitchGotoStack = stack_undefined;
-stack SwitchControllerStack = stack_undefined; 
-stack LoopStack = stack_undefined; /* is used for switch statements also, because we do not 
+stack SwitchControllerStack = stack_undefined;
+stack LoopStack = stack_undefined; /* is used for switch statements also, because we do not
 					distinguish a break in a loop or a switch */
 
 void MakeCurrentModule(entity e)
 {
   /* This must be changed later, the storage is of type return and we have to create a new entity*/
-  entity_storage(e) = make_storage_rom() /* make_storage_return(e) */; 
+  entity_storage(e) = make_storage_rom() /* make_storage_return(e) */;
   if (value_undefined_p(entity_initial(e)))
     entity_initial(e) = make_value(is_value_code, make_code(NIL,strdup(""), make_sequence(NIL),NIL));
   /* code_declaration to be updated : only need formal parameters, because the others are added in
@@ -87,7 +87,7 @@ void MakeCurrentModule(entity e)
 
 
   set_current_module_entity(e);
-  init_c_areas(); 
+  init_c_areas();
   LabeledStatements = NIL;
   SwitchGotoStack = stack_make(sequence_domain,0,0);
   SwitchControllerStack = stack_make(expression_domain,0,0);
@@ -118,7 +118,7 @@ void InitializeBlock()
 }
 
 statement MakeBlock(list decls, list stms)
-{ 
+{
   /* To please the controlizer, blocks cannot carry line numbers nor comments */
   /* Anyway, it might be much too late to retrieve the comment
      associated to the beginning of the block. The lost comment
@@ -126,12 +126,12 @@ statement MakeBlock(list decls, list stms)
      done in Fortran, an empty statement should be added at the end of
      the sequence. */
 
-  statement s = make_statement(entity_empty_label(), 
-			       STATEMENT_NUMBER_UNDEFINED /* get_current_C_line_number() */, 
-			       STATEMENT_ORDERING_UNDEFINED, 
+  statement s = make_statement(entity_empty_label(),
+			       STATEMENT_NUMBER_UNDEFINED /* get_current_C_line_number() */,
+			       STATEMENT_ORDERING_UNDEFINED,
 			       empty_comments /* get_current_C_comment() */,
 			       make_instruction_sequence(make_sequence(stms)),
-			       decls, string_undefined);
+			       decls, string_undefined, extensions_undefined);
 
   discard_C_comment();
 
@@ -233,7 +233,8 @@ statement MakeGotoStatement(string label)
 		       get_current_C_line_number(),
 		       STATEMENT_ORDERING_UNDEFINED,
 		       get_current_C_comment(),
-		       make_instruction(is_instruction_goto,s),NIL,NULL);
+		       make_instruction(is_instruction_goto,s),NIL,NULL,
+		       extensions_undefined);
 
   return gts;
 }
@@ -300,7 +301,7 @@ statement MakeWhileLoop(list lexp, statement s, bool before)
 }
 
 statement MakeForloop(expression e1, expression e2, expression e3, statement s)
-{								 
+{								
   forloop f;
   statement smt;
   int i = basic_int((basic) stack_head(LoopStack));
@@ -315,26 +316,27 @@ statement MakeForloop(expression e1, expression e2, expression e3, statement s)
 
  if (!statement_undefined_p(s1))
     {
-      /* This loop has a continue statement which has been transformed to goto 
+      /* This loop has a continue statement which has been transformed to goto
 	 Add the labeled statement at the end of loop body*/
       insert_statement(s,s1,FALSE);
     }
   f = make_forloop(e1,e2,e3,s);
-  smt = make_statement(entity_empty_label(), 
-		       get_current_C_line_number(), 
-		       STATEMENT_ORDERING_UNDEFINED, 
+  smt = make_statement(entity_empty_label(),
+		       get_current_C_line_number(),
+		       STATEMENT_ORDERING_UNDEFINED,
 		       string_undefined,
 		       make_instruction_forloop(f),
-		       NIL, string_undefined);
+		       NIL, string_undefined,
+		       extensions_undefined);
 
   if (!statement_undefined_p(s2))
     {
-      /* This loop has a break statement which has been transformed to goto 
+      /* This loop has a break statement which has been transformed to goto
 	 Add the labeled statement after the loop */
       insert_statement(smt,s2,FALSE);
     }
   pips_assert("For loop is consistent",forloop_consistent_p(f));
-  ifdebug(5) 
+  ifdebug(5)
     {
       printf("For loop statement: \n");
       print_statement(smt);
@@ -349,9 +351,9 @@ statement MakeSwitchStatement(statement s)
      switch (c) {
      case 1:
      s1;
-     case 2: 
-     s2;  
-     default: 
+     case 2:
+     s2; 
+     default:
      sd;
      }
 
@@ -365,11 +367,11 @@ statement MakeSwitchStatement(statement s)
      switch_xxx_default: ;
      sd;
 
-     In si, we can have goto break_xxx; (which was a break) 
+     In si, we can have goto break_xxx; (which was a break)
 
      and break_xxx: ; is inserted at the end of the switch statement
 
-     The statement s corresponds to the body 
+     The statement s corresponds to the body
 
      switch_xxx_case_1: ;
      s1;
@@ -378,12 +380,12 @@ statement MakeSwitchStatement(statement s)
      switch_xxx_default: ;
      sd;
 
-     we have to insert 
+     we have to insert
 
      if (c==1) goto switch_xxx_case_1;
      if (c==2) goto switch_xxx_case_2;
      goto switch_xxx_default;
-     
+    
 
      before s and return the inserted statement.  */
   int i = basic_int((basic) stack_head(LoopStack));
@@ -432,12 +434,12 @@ statement MakeSwitchStatement(statement s)
   free(lab);
   if (!statement_undefined_p(smt))
     {
-      /* This switch has a break statement which has been transformed to goto 
+      /* This switch has a break statement which has been transformed to goto
 	 Add the labeled statement after the switch */
       insert_statement(s,smt,FALSE);
-    }  
+    } 
   pips_assert("Switch is consistent",statement_consistent_p(s));
-  ifdebug(5) 
+  ifdebug(5)
     {
       printf("Switch statement: \n");
       print_statement(s);
@@ -447,12 +449,12 @@ statement MakeSwitchStatement(statement s)
 
 statement MakeCaseStatement(expression e)
 {
-  /* Transform 
-         case e: 
+  /* Transform
+         case e:
      to
          switch_xxx_case_e: ;
-     and generate 	 
-        if (c == e) goto switch_xxx_case_e 
+     and generate 	
+        if (c == e) goto switch_xxx_case_e
      where c is retrieved from SwitchControllerStack
            xxx is unique from LoopStack */
   int i = basic_int((basic) stack_head(LoopStack));
@@ -464,7 +466,7 @@ statement MakeCaseStatement(expression e)
 				     make_continue_statement(entity_empty_label()),
 				     get_current_C_comment());
   expression cond = call_to_expression(make_call(entity_intrinsic("=="),
-						 CONS(EXPRESSION, stack_head(SwitchControllerStack), 
+						 CONS(EXPRESSION, stack_head(SwitchControllerStack),
 						      CONS(EXPRESSION, e, NIL))));
   test t = make_test(cond,MakeGotoStatement(lab),make_continue_statement(entity_undefined));
   sequence CurrentSwitchGotoStack = stack_head(SwitchGotoStack);
@@ -475,9 +477,9 @@ statement MakeCaseStatement(expression e)
 
 statement MakeDefaultStatement()
 {
-  /* Return the labeled statement 
-       switch_xxx_default: ; 
-     and add 
+  /* Return the labeled statement
+       switch_xxx_default: ;
+     and add
        goto switch_xxx_default;
      to the switch header */
   int i = basic_int((basic) stack_head(LoopStack));

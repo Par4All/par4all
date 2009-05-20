@@ -293,7 +293,7 @@ instruction i;
 			   STATEMENT_NUMBER_UNDEFINED,
 			   STATEMENT_ORDERING_UNDEFINED,
 			   empty_comments,
-			   i,NIL,NULL);
+			   i, NIL, NULL, extensions_undefined);
     }
     else {
 	s = make_statement(l,
@@ -301,7 +301,7 @@ instruction i;
 			   STATEMENT_NUMBER_UNDEFINED : get_statement_number(),//get_next_statement_number(),
 			   STATEMENT_ORDERING_UNDEFINED,
 			   empty_comments,
-			   i,NIL,NULL);
+			   i, NIL, NULL, extensions_undefined);
 	NewStmt(l, s);
     }
 
@@ -484,14 +484,14 @@ instruction i;
     }
     else {
 	/* No actual label, no problem */
-	s = make_statement(l, 
+	s = make_statement(l,
 			   (instruction_goto_p(i)||instruction_block_p(i))?
 			   STATEMENT_NUMBER_UNDEFINED : get_statement_number(), //get_next_statement_number(),
 			   STATEMENT_ORDERING_UNDEFINED,
-			   empty_comments, 
-			   i,NIL,NULL);
+			   empty_comments,
+			   i,NIL,NULL, extensions_undefined);
     }
-	
+
     return(s);
 }
 
@@ -680,18 +680,19 @@ string n;
  * everything is fine. Else the target statement has to be synthesized
  * blindly ahead of time.
  */
-instruction 
+instruction
 make_goto_instruction(entity l)
 {
   statement s = LabelToStmt(entity_name(l));
   instruction g = instruction_undefined;
 
   if (s == statement_undefined) {
-    s = make_statement(l, 
+    s = make_statement(l,
 		       STATEMENT_NUMBER_UNDEFINED,
 		       STATEMENT_ORDERING_UNDEFINED,
-		       empty_comments, 
-		       instruction_undefined,NIL,NULL);
+		       empty_comments,
+		       instruction_undefined, NIL, NULL,
+		       extensions_undefined);
     NewStmt(l, s);
   }
 

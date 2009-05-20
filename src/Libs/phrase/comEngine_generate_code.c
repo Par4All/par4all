@@ -370,7 +370,8 @@ static statement make_loopStat1(statement stat, entity transferSize,
 			STATEMENT_NUMBER_UNDEFINED,
 			STATEMENT_ORDERING_UNDEFINED,
 			empty_comments,
-			make_instruction_loop(outerLoop1),NIL,NULL);
+			make_instruction_loop(outerLoop1),NIL,NULL,
+			extensions_undefined);
 }
 
 static statement make_init_prev_ind(statement oldBody)
@@ -477,7 +478,8 @@ static statement usual_loop_tiling(statement stat, statement newBody,
 				  STATEMENT_NUMBER_UNDEFINED,
 				  STATEMENT_ORDERING_UNDEFINED,
 				  empty_comments,
-				  make_instruction_loop(innerLoop),NIL,NULL);
+				  make_instruction_loop(innerLoop),NIL,NULL,
+				  extensions_undefined);
 
       if(!gGenHRE)
 	{
@@ -671,7 +673,8 @@ static statement generate_code_loop(statement stat)
 					 STATEMENT_NUMBER_UNDEFINED,
 					 STATEMENT_ORDERING_UNDEFINED,
 					 empty_comments,
-					 make_instruction_loop(outerLoop),NIL,NULL);
+					 make_instruction_loop(outerLoop),NIL,NULL,
+					 extensions_undefined);
 
       lStats = CONS(STATEMENT, newStat, NIL);
 
@@ -986,7 +989,8 @@ static statement add_exec_mmcd(statement stat)
 				    STATEMENT_ORDERING_UNDEFINED,
 				    empty_comments,
 				    make_instruction(is_instruction_test, t),
-				    NIL,NULL);
+				    NIL,NULL,
+				    extensions_undefined);
 	}
     }
 

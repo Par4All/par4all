@@ -45,7 +45,7 @@ typedef dg_vertex_label vertex_label;
  * Create new variable parameter for a newly created module
  */
 entity create_parameter_for_new_module (variable var,
-					string parameter_name, 
+					string parameter_name,
 					string module_name,
 					entity module,
 					int param_nb)
@@ -54,39 +54,39 @@ entity create_parameter_for_new_module (variable var,
   parameter new_parameter;
   list module_declarations;
   list module_parameters;
-  
-  if ((gen_find_tabulated(concatenate(module_name, 
-				      MODULE_SEP_STRING, 
-				      parameter_name, 
+ 
+  if ((gen_find_tabulated(concatenate(module_name,
+				      MODULE_SEP_STRING,
+				      parameter_name,
 				      NULL),
-			  entity_domain)) == entity_undefined) 
-    { 
+			  entity_domain)) == entity_undefined)
+    {
       /* This entity does not exist, we can safely create it */
-      
-      new_variable = make_entity (strdup(concatenate(module_name, 
-						     MODULE_SEP_STRING, 
+     
+      new_variable = make_entity (strdup(concatenate(module_name,
+						     MODULE_SEP_STRING,
 						     parameter_name, NULL)),
 				  make_type_variable(copy_variable(var)),
 				  make_storage_formal (make_formal(module, param_nb)),
 				  make_value_unknown());
-      
+     
   module_declarations = code_declarations(value_code(entity_initial(module)));
-  
+ 
   code_declarations(value_code(entity_initial(module)))
     = CONS (ENTITY, new_variable, module_declarations);
-  
+ 
   new_parameter = make_parameter (entity_type(new_variable),
 				  make_mode(is_mode_reference, UU),
 				  strdup(""));
-  
+ 
   module_parameters = functional_parameters(type_functional(entity_type(module)));
-  
-  functional_parameters(type_functional(entity_type(module))) 
+ 
+  functional_parameters(type_functional(entity_type(module)))
     = CONS(PARAMETER, new_parameter, module_parameters);
-  
+ 
   return new_variable;
     }
-  else 
+  else
     {
       pips_error("Entity already exist: %s\n", parameter_name);
       return NULL;
@@ -96,12 +96,12 @@ entity create_parameter_for_new_module (variable var,
 /**
  * Create new integer variable parameter for a newly created module
  */
-entity create_integer_parameter_for_new_module (string parameter_name, 
+entity create_integer_parameter_for_new_module (string parameter_name,
 						string module_name,
 						entity module,
 						int param_nb)
 {
-  return create_parameter_for_new_module 
+  return create_parameter_for_new_module
     (make_variable(MakeBasic(is_basic_int), NIL, NIL),
      parameter_name,
      module_name,
@@ -110,12 +110,12 @@ entity create_integer_parameter_for_new_module (string parameter_name,
 }
 
 /**
- * Store (PIPDBM) newly created module module with module_statement 
+ * Store (PIPDBM) newly created module module with module_statement
  * as USER_FILE by saving pretty printing
  */
 void store_new_module (string module_name,
 		       entity module,
-		       statement module_statement) 
+		       statement module_statement)
 {
   string source_file;
   text code;
@@ -139,21 +139,21 @@ void store_new_module (string module_name,
   init_prettyprint(empty_text);
   code = text_module(module, module_statement);
   make_text_resource(module_name,
-		     DBR_SOURCE_FILE, 
+		     DBR_SOURCE_FILE,
 		     ".f",
 		     code);
   close_prettyprint();
-  
+ 
   source_file = db_build_file_resource_name(DBR_SOURCE_FILE, module_name, ".f");
-  
+ 
   pips_debug(5, "Source file : [%s]\n", source_file);
-  
+ 
   DB_PUT_NEW_FILE_RESOURCE (DBR_USER_FILE, module_name, source_file);
   DB_PUT_NEW_FILE_RESOURCE (DBR_INITIAL_FILE, module_name, source_file);
 
   init_prettyprint(empty_text);
   make_text_resource(module_name,
-		     DBR_INITIAL_FILE, 
+		     DBR_INITIAL_FILE,
 		     ".f_initial",
 		     code);
   close_prettyprint();
@@ -172,9 +172,9 @@ entity create_new_common(string name, entity module)
 						 MODULE_SEP_STRING
 						 COMMON_PREFIX,
 						 name,
-						 NULL)); 
+						 NULL));
   type common_type = make_type(is_type_area, make_area(0, NIL));
-  entity StaticArea = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, 
+  entity StaticArea = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,
 					 STATIC_AREA_LOCAL_NAME);
   storage common_storage = make_storage(is_storage_ram,
 					(make_ram(module,StaticArea, 0, NIL)));
@@ -196,7 +196,7 @@ entity create_new_common_variable(string name, entity module, entity common, var
   int old_size, variable_size;
 
   string var_global_name = strdup(concatenate(module_local_name(module),MODULE_SEP_STRING,
-					      name,NULL)); 
+					      name,NULL));
   type var_type = make_type(is_type_variable, var);
   storage var_storage = storage_undefined;
   value var_value = MakeValueUnknown();
@@ -254,33 +254,33 @@ void declare_common_variables_in_module (entity common, entity module)
       }
     }
   }, area_layout(type_area(entity_type(common))));
-  
+ 
   primary_variables = gen_nreverse(primary_variables);
 
   ifdebug(4) {
-    pips_debug(4, "Current layout for %s\n", entity_global_name(common));     
+    pips_debug(4, "Current layout for %s\n", entity_global_name(common));    
     MAP(ENTITY, v, {
-      pips_debug(4, "[%s] offset %d\n", entity_global_name(v),ram_offset(storage_ram(entity_storage(v))));     
+      pips_debug(4, "[%s] offset %d\n", entity_global_name(v),ram_offset(storage_ram(entity_storage(v))));    
    }, area_layout(type_area(entity_type(common))));
-    pips_debug(4, "Primary variables for %s\n", entity_global_name(common));     
+    pips_debug(4, "Primary variables for %s\n", entity_global_name(common));    
     MAP(ENTITY, v, {
-      pips_debug(4, "[%s] offset %d PRIMARY\n", entity_global_name(v),ram_offset(storage_ram(entity_storage(v))));     
+      pips_debug(4, "[%s] offset %d PRIMARY\n", entity_global_name(v),ram_offset(storage_ram(entity_storage(v))));    
    }, primary_variables);
   }
-  
+ 
   MAP (ENTITY, v, {
 
     /* We iterate on the primary variables declared in the common and
        create a new variable mapping the one declared in common */
 
-    entity new_variable;  
-    string name = entity_local_name(v); 
+    entity new_variable; 
+    string name = entity_local_name(v);
     int v_offset = ram_offset(storage_ram(entity_storage(v)));
-    
+   
     /* Creates the name for the new variable */
     string var_global_name = strdup(concatenate(module_local_name(module),
 						MODULE_SEP_STRING,
-						name,NULL)); 
+						name,NULL));
 
     /* Copy type of variable */
     type var_type = copy_type(entity_type(v));
@@ -294,7 +294,7 @@ void declare_common_variables_in_module (entity common, entity module)
     /* Copy initial value of variable */
     value var_value = copy_value(entity_initial(v));
 
-    pips_debug(7, "Build variable %s\n", var_global_name); 
+    pips_debug(7, "Build variable %s\n", var_global_name);
 
     /* Build the new variable */
     new_variable = make_entity(var_global_name,var_type,var_storage,var_value);
@@ -302,13 +302,13 @@ void declare_common_variables_in_module (entity common, entity module)
     /* Mark for addition */
     new_variables = gen_nconc(new_variables,CONS(ENTITY,new_variable,NIL));
 
-    pips_debug(7, "Add to declarations %s\n", var_global_name); 
+    pips_debug(7, "Add to declarations %s\n", var_global_name);
 
     /* Add to declarations.... */
     AddEntityToDeclarations( new_variable,module);
-    
-    pips_debug(7, "New common variable %s declared\n", var_global_name); 
-    
+   
+    pips_debug(7, "New common variable %s declared\n", var_global_name);
+   
   }, primary_variables);
 
   /* Add those new variable to common layout */
@@ -318,15 +318,15 @@ void declare_common_variables_in_module (entity common, entity module)
   }
 
   AddEntityToDeclarations( common,module);
-  pips_debug(3, "Common %s declared in module %s\n", 
-	     entity_local_name(common), 
+  pips_debug(3, "Common %s declared in module %s\n",
+	     entity_local_name(common),
 	     entity_local_name(module));
 }
 
 /*
  * Return CONTROLIZED_STATEMENT_COMMENT
  */
-string get_controlized_statement_comment (entity function) 
+string get_controlized_statement_comment (entity function)
 {
   char *buffer;
   asprintf(&buffer,
@@ -338,7 +338,7 @@ string get_controlized_statement_comment (entity function)
 /*
  * Return IN_PARAM_ID_NAME
  */
-string get_in_param_id_name (entity variable, entity function) 
+string get_in_param_id_name (entity variable, entity function)
 {
   char *buffer;
   asprintf(&buffer,
@@ -351,7 +351,7 @@ string get_in_param_id_name (entity variable, entity function)
 /*
  * Return OUT_PARAM_ID_NAME
  */
-string get_out_param_id_name (entity variable, entity function) 
+string get_out_param_id_name (entity variable, entity function)
 {
   char *buffer;
   asprintf(&buffer,
@@ -364,7 +364,7 @@ string get_out_param_id_name (entity variable, entity function)
 /*
  * Return FUNCTION_ID_NAME
  */
-string get_function_id_name (entity function) 
+string get_function_id_name (entity function)
 {
   char *buffer;
   asprintf(&buffer,
@@ -376,7 +376,7 @@ string get_function_id_name (entity function)
 /*
  * Return FUNCTION_COMMON_NAME
  */
-static string get_function_common_name (entity function) 
+static string get_function_common_name (entity function)
 {
   char *buffer;
   asprintf(&buffer,
@@ -388,7 +388,7 @@ static string get_function_common_name (entity function)
 /*
  * Return COMMON_PARAM_NAME
  */
-string get_common_param_name (entity variable, entity function) 
+string get_common_param_name (entity variable, entity function)
 {
   char *buffer;
   asprintf(&buffer,
@@ -401,7 +401,7 @@ string get_common_param_name (entity variable, entity function)
 /*
  * Return UNIT_ID_NAME
  */
-static string get_unit_id_name (int unit) 
+static string get_unit_id_name (int unit)
 {
   char *buffer;
   asprintf(&buffer,UNIT_ID_NAME,unit);
@@ -411,7 +411,7 @@ static string get_unit_id_name (int unit)
 /*
  * Return SEND_PARAMETER_MODULE_NAME
  */
-string get_send_parameter_module_name (variable var) 
+string get_send_parameter_module_name (variable var)
 {
   char *buffer;
   asprintf(&buffer,SEND_PARAMETER_MODULE_NAME,variable_to_string(var));
@@ -421,7 +421,7 @@ string get_send_parameter_module_name (variable var)
 /*
  * Return RECEIVE_PARAMETER_MODULE_NAME
  */
-string get_receive_parameter_module_name (variable var) 
+string get_receive_parameter_module_name (variable var)
 {
   char *buffer;
   asprintf(&buffer,RECEIVE_PARAMETER_MODULE_NAME,variable_to_string(var));
@@ -431,7 +431,7 @@ string get_receive_parameter_module_name (variable var)
 /**
  * Return entity named name in specified module
  */
-entity entity_in_module (string name, entity module) 
+entity entity_in_module (string name, entity module)
 {
   /* Is it the main module ? */
   if (strchr(entity_local_name(module),'%') != NULL) {
@@ -448,7 +448,7 @@ entity entity_in_module (string name, entity module)
  * information on phrase distribution controlization and initialization of
  * values contained in CONTROL_DATA common
  */
-static statement 
+static statement
 make_global_common_and_initialize (entity main_module,
 				   statement module_stat,
 				   entity *global_common,
@@ -466,14 +466,14 @@ make_global_common_and_initialize (entity main_module,
   int id_function, id_param;
   entity units_nb_variable;
   entity functions_nb_variable;
-  
-  *global_common = create_new_common(CONTROL_DATA_COMMON_NAME, 
+ 
+  *global_common = create_new_common(CONTROL_DATA_COMMON_NAME,
 				     main_module);
   units_nb_variable = create_new_integer_scalar_common_variable(UNITS_NB_NAME,
 								main_module,
 								*global_common);
   new_stat = make_assignement_statement
-    (units_nb_variable, 
+    (units_nb_variable,
      int_expr (number_of_deployment_units), NULL);
   stats_list = CONS (STATEMENT, new_stat,stats_list);
 
@@ -484,50 +484,50 @@ make_global_common_and_initialize (entity main_module,
 						  main_module,
 						  *global_common);
       new_stat = make_assignement_statement
-	(unit_id_variable, 
+	(unit_id_variable,
 	 int_expr (i), NULL);
       stats_list = CONS (STATEMENT, new_stat,stats_list);
     }
   }
-  
-  
+ 
+ 
   functions_nb_variable =
     create_new_integer_scalar_common_variable(FUNCTIONS_NB_NAME,
 					      main_module,
 					      *global_common);
 
   new_stat = make_assignement_statement
-    (functions_nb_variable, 
+    (functions_nb_variable,
      int_expr (hash_table_entry_count(ht_calls)), NULL);
   stats_list = CONS (STATEMENT, new_stat,stats_list);
-  
+ 
   id_function = 1;
 
   HASH_MAP (externalized_function, l_calls_for_function, {
-    
+   
     entity function = (entity)externalized_function;
     entity function_id_variable;
     function_name = entity_local_name(function);
-    pips_debug(2, "Function [%s]\n",function_name); 
-      
+    pips_debug(2, "Function [%s]\n",function_name);
+     
     function_id_variable =
     create_new_integer_scalar_common_variable
     (get_function_id_name(function),
      main_module,
      *global_common);
     new_stat = make_assignement_statement
-    (function_id_variable, 
+    (function_id_variable,
      int_expr (id_function++), NULL);
     stats_list = CONS (STATEMENT, new_stat,stats_list);
-      
+     
     id_param = 1;
-    
+   
     l_in = (list)hash_get(ht_in_regions,function);
     l_out = (list)hash_get(ht_out_regions,function);
 
     /*l_in = regions_dup(load_statement_in_regions(s));
       l_out = regions_dup(load_statement_out_regions(s));*/
-      
+     
     MAP (REGION, reg, {
       reference ref = region_reference(reg);
       entity variable = reference_variable(ref);
@@ -537,11 +537,11 @@ make_global_common_and_initialize (entity main_module,
 	 main_module,
 	 *global_common);
       new_stat = make_assignement_statement
-	(param_id_variable, 
+	(param_id_variable,
 	 int_expr (id_param++), NULL);
       stats_list = CONS (STATEMENT, new_stat,stats_list);
     }, l_in);
-    
+   
     MAP (REGION, reg, {
       reference ref = region_reference(reg);
       entity variable = reference_variable(ref);
@@ -551,26 +551,27 @@ make_global_common_and_initialize (entity main_module,
 	 main_module,
 	 *global_common);
       new_stat = make_assignement_statement
-	(param_id_variable, 
+	(param_id_variable,
 	 int_expr (id_param++), NULL);
       stats_list = CONS (STATEMENT, new_stat,stats_list);
     }, l_out);
-    
+   
   }, ht_calls);
-  
+ 
   new_sequence = make_sequence (stats_list);
-  
+ 
   return make_statement (entity_empty_label(),
 			 STATEMENT_NUMBER_UNDEFINED,
 			 STATEMENT_ORDERING_UNDEFINED,
 			 empty_comments,
 			 make_instruction (is_instruction_sequence,
 					   new_sequence),
-			 NIL,NULL);
-  
+			 NIL,NULL,
+			 extensions_undefined);
+ 
 }
 	
-/** 
+/**
  * Creates and returns a common used to store variable for communications
  * between control code and externalized code
  */
@@ -580,11 +581,11 @@ static entity create_externalized_function_common (entity main_module,
 						   int number_of_deployment_units)
 {
   entity returned_common;
-  
-  returned_common 
-    = create_new_common(get_function_common_name (externalized_function), 
+ 
+  returned_common
+    = create_new_common(get_function_common_name (externalized_function),
 			main_module);
-  
+ 
   /* Creates params variables */
   MAP (REGION, reg, {
     entity in_variable = region_entity(reg);
@@ -592,7 +593,7 @@ static entity create_externalized_function_common (entity main_module,
     /* If many deployment units, add dimension to handle those different units */
     if (number_of_deployment_units > 1) {
       list l_dimensions = variable_dimensions(var);
-      variable_dimensions(var) 
+      variable_dimensions(var)
 	= gen_nconc(l_dimensions,
 		    CONS(DIMENSION,
 			 make_dimension (int_expr(1),int_expr (number_of_deployment_units)),
@@ -603,16 +604,16 @@ static entity create_externalized_function_common (entity main_module,
 			       returned_common,
 			       var);
   }, params_regions);
-  
+ 
   return returned_common;
 }
 
-			    
+			   
 /**
  * Main function for PHRASE_DISTRIBUTION_CONTROL_CODE
  */
-static statement controlize_distribution (statement module_stat, 
-					  entity module) 
+static statement controlize_distribution (statement module_stat,
+					  entity module)
 {
   statement returned_statement = module_stat;
   list l_calls;
@@ -636,7 +637,7 @@ static statement controlize_distribution (statement module_stat,
   hash_table ht_private;
   hash_table ht_in_regions;
   hash_table ht_out_regions;
-    
+   
   hash_table ht_in_communications = hash_table_make(hash_pointer, 0);
   hash_table ht_out_communications = hash_table_make(hash_pointer, 0);
 
@@ -646,9 +647,9 @@ static statement controlize_distribution (statement module_stat,
   /* We identify all the statements containing an externalized-call tag */
   l_calls = get_statements_with_comments_containing(EXTERNALIZED_CODE_PRAGMA_CALL,
 						    module_stat);
-  
+ 
   /* Compute the context of distribution, before to controlize */
-  compute_distribution_controlization_context (l_calls, 
+  compute_distribution_controlization_context (l_calls,
 					       module_stat,
 					       module,
 					       &ht_calls,
@@ -656,35 +657,35 @@ static statement controlize_distribution (statement module_stat,
 					       &ht_private,
 					       &ht_in_regions,
 					       &ht_out_regions);
-  
+ 
 
   if (hash_table_entry_count (ht_calls)) {
-      
+     
     /* OK, be begin deployement... */
-    
+   
     string resp;
-    
+   
     /* Get the loop label form the user */
     resp = user_request("Deployment on how many externalized units ?\n"
-			"(give its number > 0): ");    
+			"(give its number > 0): ");   
 
     if (sscanf(resp,"%d",&number_of_deployment_units) > 0) {
-      
+     
       pips_debug(2, "Deployment on %d units\n", number_of_deployment_units);
-      
+     
       /* Declare global common for controlization and make initializations */
-      returned_statement 
-	= make_global_common_and_initialize (module, 
+      returned_statement
+	= make_global_common_and_initialize (module,
 					     module_stat,
 					     &global_common,
 					     number_of_deployment_units,
 					     ht_calls,
 					     ht_in_regions,
 					     ht_out_regions);
-      
+     
       /* Let's begin to iterate on all externalized functions,
        * in order to build commons and controlization modules */
-      
+     
       pips_debug(2, "Found %d externalized functions\n", hash_table_entry_count(ht_calls));
 
       HASH_MAP (externalized_function, calls_for_f, {
@@ -694,7 +695,7 @@ static statement controlize_distribution (statement module_stat,
 	/* Get the function name */
 	function_name = entity_local_name(f);
 
-	pips_debug(2, "Found %d calls for externalized function %s\n", 
+	pips_debug(2, "Found %d calls for externalized function %s\n",
 		   gen_length((list)calls_for_f),
 		   function_name);
 
@@ -734,26 +735,26 @@ static statement controlize_distribution (statement module_stat,
 					   number_of_deployment_units);
 	
       }, ht_calls);
-      
+     
       /* Build START_RU module */
-      start_ru_module = make_start_ru_module (ht_params, 
-					      &start_ru_module_statement, 
+      start_ru_module = make_start_ru_module (ht_params,
+					      &start_ru_module_statement,
 					      number_of_deployment_units,
 					      global_common,
 					      l_commons);
-      
+     
       /* Build WAIT_RU module */
-      wait_ru_module = make_wait_ru_module (&wait_ru_module_statement, 
+      wait_ru_module = make_wait_ru_module (&wait_ru_module_statement,
 					    number_of_deployment_units,
 					    global_common,
 					    l_commons);
-      
+     
       /* Build SEND_PARAMS modules */
       send_params_modules = make_send_scalar_params_modules (ht_in_communications,
 							     number_of_deployment_units,
 							     global_common,
 							     l_commons);
-      
+     
       /* Build RECEIVE_PARAMS modules */
       receive_params_modules = make_receive_scalar_params_modules (ht_out_communications,
 								   number_of_deployment_units,
@@ -762,7 +763,7 @@ static statement controlize_distribution (statement module_stat,
 
       /* Let's begin to iterate on all externalized functions and statements,
        * in order to add controlization code  */
-      
+     
       HASH_MAP (externalized_function, calls_for_f, {
 	
 	entity f = (entity)externalized_function;
@@ -779,39 +780,39 @@ static statement controlize_distribution (statement module_stat,
 	/* Iterate on all the statements where externalized function is called */
 	
 	MAP (STATEMENT, s, {
-	  
+	 
 	  l_stats = NIL;
 	  unit_id = 0;
-	  
+	 
 	  if (number_of_deployment_units > 1) {
 	    char *question;
 	    unit_id = 0;
 	    do {
 	      asprintf (&question, "Deployment of function %s on which units ?\n(give its number 1-%d):", function_name, number_of_deployment_units);
-	      resp = user_request(question);  
-	      sscanf(resp,"%d",&unit_id);	    
+	      resp = user_request(question); 
+	      sscanf(resp,"%d",&unit_id);	   
           free(question);
 	    }
 	    while ((unit_id <1) || (unit_id > number_of_deployment_units));
-	    
+	   
 	    /* Some debug */
 	    pips_debug(2, "Externalized function [%s] being executed on unit %d:\n", function_name, unit_id);
 	    ifdebug(2) {
 	      pips_debug(2, "Current statement is:\n");
 	      print_statement(s);
-	    }  
+	    } 
 
 	    unit_id_variable = entity_in_module (get_unit_id_name(unit_id), module);
 
 	  }
-	  
+	 
 	  /* Get the called module */
-	  called_module_stat = (statement) db_get_memory_resource(DBR_CODE, 
-								  function_name, 
+	  called_module_stat = (statement) db_get_memory_resource(DBR_CODE,
+								  function_name,
 								  TRUE);
-	  
+	 
 	  called_module = module_name_to_entity(function_name);
-	  
+	 
 	  /* SEND PARAMS calls */
 	  MAP (REGION, reg, {
 
@@ -826,24 +827,24 @@ static statement controlize_distribution (statement module_stat,
 	    pips_debug(7, "Call to [%s]\n", entity_local_name(send_param_module));
 	    pips_debug(7, "Concerned entity is [%s]\n", entity_local_name(param));
 
-	    call_params = CONS (EXPRESSION, 
+	    call_params = CONS (EXPRESSION,
 				make_expression_from_entity(func_id_variable),
 				call_params);
 	    if (number_of_deployment_units > 1) {
-	      call_params = CONS (EXPRESSION, 
+	      call_params = CONS (EXPRESSION,
 				  make_expression_from_entity(unit_id_variable),
 				  call_params);
 	    }
-	    param_id_variable = entity_in_module (get_in_param_id_name(param,f), 
+	    param_id_variable = entity_in_module (get_in_param_id_name(param,f),
 						  module);
-	    call_params = CONS (EXPRESSION, 
+	    call_params = CONS (EXPRESSION,
 				make_expression_from_entity(param_id_variable),
 				call_params);
-	    call_params = CONS (EXPRESSION, 
+	    call_params = CONS (EXPRESSION,
 				make_expression_from_entity(param),
 				call_params);
 
-	    
+	   
 	    if (!region_scalar_p(reg))
 	      {
 		/* Add dynamic variables */
@@ -853,7 +854,7 @@ static statement controlize_distribution (statement module_stat,
 		compute_region_variables(reg,&l_reg_params,&l_reg_variables);
 		
 		MAP (ENTITY, dyn_var, {
-		  call_params = CONS (EXPRESSION, 
+		  call_params = CONS (EXPRESSION,
 				      make_expression_from_entity(dyn_var),
 				      call_params);
 		}, l_reg_variables);
@@ -867,14 +868,15 @@ static statement controlize_distribution (statement module_stat,
 				      make_instruction(is_instruction_call,
 						       make_call(send_param_module,
 								 gen_nreverse(call_params))),
-				      NIL,NULL);
+				      NIL,NULL,
+				      extensions_undefined);
 
 	    l_stats = CONS (STATEMENT,
 			    new_stat,
 			    l_stats);
 
 	  }, (list)hash_get(ht_in_regions,f));
-	  
+	 
 	  /* START_RU_CALL */
 	  {
 	    list start_ru_call_params = CONS(EXPRESSION,
@@ -890,7 +892,8 @@ static statement controlize_distribution (statement module_stat,
 					   make_instruction(is_instruction_call,
 							    make_call(start_ru_module,
 								      start_ru_call_params)),
-					   NIL,NULL),
+					   NIL,NULL,
+					   extensions_undefined),
 			    l_stats);
 	  }
 
@@ -909,10 +912,11 @@ static statement controlize_distribution (statement module_stat,
 					   make_instruction(is_instruction_call,
 							    make_call(wait_ru_module,
 								      wait_ru_call_params)),
-					   NIL,NULL),
+					   NIL,NULL,
+					   extensions_undefined),
 			    l_stats);
 	  }
-	  
+	 
 	  /* RECEIVE PARAMS calls */
 
 	  MAP (REGION, reg, {
@@ -928,20 +932,20 @@ static statement controlize_distribution (statement module_stat,
 	    pips_debug(7, "Call to [%s]\n", entity_local_name(receive_param_module));
 	    pips_debug(7, "Concerned entity is [%s]\n", entity_local_name(param));
 
-	    call_params = CONS (EXPRESSION, 
+	    call_params = CONS (EXPRESSION,
 				make_expression_from_entity(func_id_variable),
 				call_params);
 	    if (number_of_deployment_units > 1) {
-	      call_params = CONS (EXPRESSION, 
+	      call_params = CONS (EXPRESSION,
 				  make_expression_from_entity(unit_id_variable),
 				  call_params);
 	    }
-	    param_id_variable = entity_in_module (get_out_param_id_name(param,f), 
+	    param_id_variable = entity_in_module (get_out_param_id_name(param,f),
 						  module);
-	    call_params = CONS (EXPRESSION, 
+	    call_params = CONS (EXPRESSION,
 				make_expression_from_entity(param_id_variable),
 				call_params);
-	    call_params = CONS (EXPRESSION, 
+	    call_params = CONS (EXPRESSION,
 				make_expression_from_entity(param),
 				call_params);
 
@@ -955,7 +959,7 @@ static statement controlize_distribution (statement module_stat,
 		compute_region_variables(reg,&l_reg_params,&l_reg_variables);
 		
 		MAP (ENTITY, dyn_var, {
-		  call_params = CONS (EXPRESSION, 
+		  call_params = CONS (EXPRESSION,
 				      make_expression_from_entity(dyn_var),
 				      call_params);
 		}, l_reg_variables);
@@ -968,18 +972,19 @@ static statement controlize_distribution (statement module_stat,
 				      make_instruction(is_instruction_call,
 						       make_call(receive_param_module,
 								 gen_nreverse(call_params))),
-				      NIL,NULL);
+				      NIL,NULL,
+				      extensions_undefined);
 
 	    l_stats = CONS (STATEMENT,
 			    new_stat,
 			    l_stats);
 
 	  }, (list)hash_get(ht_out_regions,f));
-	  
+	 
 	  /* Now, just inverse list of statements */
 
 	  l_stats = gen_nreverse(l_stats);
-	  
+	 
 	  /* And replace CALL instruction by SEQUENCE instruction */
 
 	  statement_comments(s) = get_controlized_statement_comment(f);
@@ -996,8 +1001,8 @@ static statement controlize_distribution (statement module_stat,
 	pips_debug(2, "Controlization is done on [%s]\n", entity_local_name(f));
 	
       }, ht_calls);
-      
-      
+     
+     
       hash_table_free(ht_calls);
       hash_table_free(ht_params);
       hash_table_free(ht_private);
@@ -1015,15 +1020,15 @@ static statement controlize_distribution (statement module_stat,
       hash_table_free(ht_out_communications);
 
     }
-    
+   
     else {
       pips_debug(2, "Invalid number. Operation aborted\n");
     }
-    
+   
   }
   return returned_statement;
 }
-  
+ 
 
 /*********************************************************
  * Phase main for PHRASE_DISTRIBUTOR_CONTROL_CODE
@@ -1035,43 +1040,43 @@ bool phrase_distributor_control_code(string module_name)
 {
   statement module_stat;
   entity module;
-  
+ 
   /* set and get the current properties concerning regions */
   set_bool_property("MUST_REGIONS", TRUE);
   set_bool_property("EXACT_REGIONS", TRUE);
   get_regions_properties();
-  
+ 
   /* get the resources */
-  module_stat = (statement) db_get_memory_resource(DBR_CODE, 
-						   module_name, 
+  module_stat = (statement) db_get_memory_resource(DBR_CODE,
+						   module_name,
 						   TRUE);
-  
+ 
   module = module_name_to_entity(module_name);
-  
+ 
   set_current_module_statement(module_stat);
   set_current_module_entity(module_name_to_entity(module_name)); // FI: redundant
-  
+ 
   set_cumulated_rw_effects((statement_effects)
 			   db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
   module_to_value_mappings(module);
-  
+ 
   /* sets dynamic_area */
   if (entity_undefined_p(dynamic_area)) {   	
     dynamic_area = FindOrCreateEntity(module_local_name(module),
-				      DYNAMIC_AREA_LOCAL_NAME); 
+				      DYNAMIC_AREA_LOCAL_NAME);
   }
 
   debug_on("PHRASE_DISTRIBUTOR_DEBUG_LEVEL");
-  
+ 
   /* Get the READ, WRITE, IN and OUT regions of the module
    */
-  set_rw_effects((statement_effects) 
+  set_rw_effects((statement_effects)
 		 db_get_memory_resource(DBR_REGIONS, module_name, TRUE));
-  set_in_effects((statement_effects) 
+  set_in_effects((statement_effects)
 		 db_get_memory_resource(DBR_IN_REGIONS, module_name, TRUE));
-  set_out_effects((statement_effects) 
+  set_out_effects((statement_effects)
 		  db_get_memory_resource(DBR_OUT_REGIONS, module_name, TRUE));
-  
+ 
   /* Now do the job */
 
   pips_debug(2, "BEGIN of PHRASE_DISTRIBUTOR_CONTROL_CODE\n");
@@ -1085,19 +1090,19 @@ bool phrase_distributor_control_code(string module_name)
 
   /* Check the coherency of data */
 
-  pips_assert("Statement structure is consistent after PHRASE_DISTRIBUTOR_CONTROL_CODE", 
+  pips_assert("Statement structure is consistent after PHRASE_DISTRIBUTOR_CONTROL_CODE",
 	      gen_consistent_p((gen_chunk*)module_stat));
-	      
-  pips_assert("Statement is consistent after PHRASE_DISTRIBUTOR_CONTROL_CODE", 
+	     
+  pips_assert("Statement is consistent after PHRASE_DISTRIBUTOR_CONTROL_CODE",
 	       statement_consistent_p(module_stat));
 
-  
-  /* Reorder the module, because new statements have been added */  
+ 
+  /* Reorder the module, because new statements have been added */ 
   module_reorder(module_stat);
   DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, module_stat);
-  DB_PUT_MEMORY_RESOURCE(DBR_CALLEES, module_name, 
+  DB_PUT_MEMORY_RESOURCE(DBR_CALLEES, module_name,
 			 compute_callees(module_stat));
-  
+ 
   /* update/release resources */
   reset_current_module_statement();
   reset_current_module_entity();
@@ -1107,9 +1112,9 @@ bool phrase_distributor_control_code(string module_name)
   reset_in_effects();
   reset_out_effects();
   free_value_mappings();
-  
+ 
   debug_off();
-  
+ 
   return TRUE;
 }
 

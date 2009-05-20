@@ -96,7 +96,8 @@ gener_DOSEQ(
 				statement_number(s_loop),
 				statement_ordering(s_loop),
 				statement_comments(s_loop),
-				instr_lhyp,NIL,NULL);
+				instr_lhyp,NIL,NULL,
+				extensions_undefined);
     return(state_lhyp);
 }
 

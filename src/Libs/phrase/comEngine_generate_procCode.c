@@ -616,7 +616,8 @@ statement make_loop_step_stat(statement stat, entity newOuterInd)
 			    STATEMENT_ORDERING_UNDEFINED,
 			    empty_comments,
 			    make_instruction(is_instruction_test, t),
-			    NIL,NULL);
+			    NIL,NULL,
+			    extensions_undefined);
 
   return stepStat;
 }
@@ -859,7 +860,8 @@ statement make_transStat(statement stat, entity newOuterInd,
 			       STATEMENT_ORDERING_UNDEFINED,
 			       empty_comments,
 			       make_instruction(is_instruction_test, t),
-			       NIL,NULL);
+			       NIL,NULL,
+			       extensions_undefined);
     }
 
   /*statement stepStat = make_loop_step_stat(stat, newOuterInd);

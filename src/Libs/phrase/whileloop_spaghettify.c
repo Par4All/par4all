@@ -53,7 +53,7 @@ static control make_condition_from_whileloop (whileloop the_whileloop,
 					      statement stat)
 {
   statement condition_statement;
-  test condition_test 
+  test condition_test
     = make_test (whileloop_condition(the_whileloop),
 		 make_continue_statement(entity_empty_label()),
 		 make_continue_statement(entity_empty_label()));
@@ -65,8 +65,9 @@ static control make_condition_from_whileloop (whileloop the_whileloop,
 				       empty_comments,
 				       make_instruction (is_instruction_test,
 							 condition_test),
-				       NIL,NULL);  
-  
+				       NIL,NULL,
+				       extensions_undefined); 
+ 
   return make_control (condition_statement, NIL, NIL);
 }
 
@@ -81,12 +82,12 @@ static control make_exit_from_whileloop ()
 
 /**
  * Build and return a new control containing body statement
- * of the unstructured whileloop 
+ * of the unstructured whileloop
  */
-static control make_body_from_whileloop (whileloop the_whileloop, 
+static control make_body_from_whileloop (whileloop the_whileloop,
 					 string module_name)
 {
-  return make_control 
+  return make_control
     (spaghettify_statement(whileloop_body(the_whileloop),
 			   module_name), NIL, NIL);
 }
@@ -95,47 +96,47 @@ static control make_body_from_whileloop (whileloop the_whileloop,
  * Build and return a new unstructured coding the
  * "destructured" whileloop
  */
-static unstructured make_unstructured_from_whileloop (whileloop the_whileloop, 
-						      statement stat, 
-						      string module_name) 
+static unstructured make_unstructured_from_whileloop (whileloop the_whileloop,
+						      statement stat,
+						      string module_name)
 {
   control condition = make_condition_from_whileloop (the_whileloop,stat);
   control exit = make_exit_from_whileloop();
   control body = make_body_from_whileloop(the_whileloop,module_name);
-  
+ 
   /* The first connexion is the FALSE one */
   link_2_control_nodes (condition, exit); /* false condition, we exit from whileloop */
   link_2_control_nodes (condition, body); /* true condition, we go to body */
   link_2_control_nodes (body, condition); /* after body, we go back to condition */
-  
+ 
   return make_unstructured (condition, exit);
 }
- 
-/* 
- * This function takes the statement stat as parameter and return a new 
+
+/*
+ * This function takes the statement stat as parameter and return a new
  * spaghettized statement, asserting stat is a WHILELOOP statement
  */
 statement spaghettify_whileloop (statement stat, string module_name)
 {
   statement returned_statement = stat;
   instruction unstructured_instruction;
-  unstructured new_unstructured;  
+  unstructured new_unstructured; 
 
-  pips_assert("Statement is WHILELOOP in FSM_GENERATION", 
-	      instruction_tag(statement_instruction(stat)) 
+  pips_assert("Statement is WHILELOOP in FSM_GENERATION",
+	      instruction_tag(statement_instruction(stat))
 	      == is_instruction_whileloop);
 
-  pips_debug(2, "spaghettify_whileloop, module %s\n", module_name);   
-  new_unstructured 
-    = make_unstructured_from_whileloop 
+  pips_debug(2, "spaghettify_whileloop, module %s\n", module_name);  
+  new_unstructured
+    = make_unstructured_from_whileloop
     (instruction_whileloop(statement_instruction(stat)),
      stat,
      module_name);
-  
+ 
   unstructured_instruction = make_instruction(is_instruction_unstructured,
 					      new_unstructured);
-  
+ 
   statement_instruction(returned_statement) = unstructured_instruction;
-  
+ 
   return returned_statement;
 }

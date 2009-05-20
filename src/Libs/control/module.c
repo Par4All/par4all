@@ -104,7 +104,8 @@ bool controlizer(string module_name)
 			       make_instruction(is_instruction_unstructured,
 						control_graph(module_stat)),
 			       NIL /* gen_copy_seq(statement_declarations(parsed_mod_stat))*/,
-			       NULL);
+			       NULL,
+			       extensions_undefined);
 
     /* By setting this property, we try to unspaghettify the control
        graph of the module: */

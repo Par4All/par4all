@@ -1083,7 +1083,7 @@
 #define instruction_to_statement(i) \
    make_statement(entity_empty_label(),\
                   STATEMENT_NUMBER_UNDEFINED, STATEMENT_ORDERING_UNDEFINED,\
-                  empty_comments, i,NIL,NULL)
+                  empty_comments, i, NIL, NULL, extensions_undefined)
 
 #define loop_to_instruction(l) make_instruction(is_instruction_loop, l)
 #define test_to_instruction(t) make_instruction(is_instruction_test, t)

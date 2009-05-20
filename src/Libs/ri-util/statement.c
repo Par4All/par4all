@@ -535,27 +535,29 @@ instruction i;
 
 statement make_empty_statement_with_declarations_and_comments(list d, string dt, string c)
 {
-    return(make_statement(entity_empty_label(), 
+    return(make_statement(entity_empty_label(),
 			  STATEMENT_NUMBER_UNDEFINED,
-			  STATEMENT_ORDERING_UNDEFINED, 
+			  STATEMENT_ORDERING_UNDEFINED,
 			  c,
 			  make_instruction_block(NIL),
 			  d,
-			  dt));
+			  dt,
+			  extensions_undefined ));
 }
 
 statement make_empty_statement()
 {
-    return(make_statement(entity_empty_label(), 
+    return(make_statement(entity_empty_label(),
 			  STATEMENT_NUMBER_UNDEFINED,
-			  STATEMENT_ORDERING_UNDEFINED, 
+			  STATEMENT_ORDERING_UNDEFINED,
 			  empty_comments,
-			  make_instruction_block(NIL),NIL,NULL));
+			  make_instruction_block(NIL),NIL,NULL,
+			  extensions_undefined));
 }
 
 /* to be compared with instruction_to_statement() which is a macro (thanks to FC?) ! */
 
-statement 
+statement
 make_stmt_of_instr(instr)
 instruction instr;
 {
@@ -563,7 +565,8 @@ instruction instr;
 			  STATEMENT_NUMBER_UNDEFINED,
 			  STATEMENT_ORDERING_UNDEFINED, 
 			  empty_comments,
-			  instr,NIL,NULL));
+			  instr,NIL,NULL,
+			  extensions_undefined));
 }
 
 instruction 
@@ -613,13 +616,17 @@ make_block_statement_with_stop()
 			  STATEMENT_ORDERING_UNDEFINED,
 			  empty_comments,
 			  make_instruction(is_instruction_call,
-					   make_call(stop_function,NIL)),NIL,NULL);
+					   make_call(stop_function,NIL)),
+			  NIL,
+			  NULL,
+			  extensions_undefined);
 
     b = make_statement(entity_empty_label(),
 			  STATEMENT_NUMBER_UNDEFINED,
 			  STATEMENT_ORDERING_UNDEFINED,
 			  empty_comments,
-			  make_instruction_block(CONS(STATEMENT, stop, NIL)),NIL,NULL);
+			  make_instruction_block(CONS(STATEMENT, stop, NIL)),NIL,NULL,
+			  extensions_undefined);
 
     ifdebug(8) {
 	fputs("make_block_statement_with_stop",stderr);
@@ -661,7 +668,8 @@ list body;
 			  STATEMENT_NUMBER_UNDEFINED,
 			  STATEMENT_ORDERING_UNDEFINED,
 			  empty_comments,
-			  make_instruction_block(body),NIL,NULL);
+			  make_instruction_block(body),NIL,NULL,
+			  extensions_undefined);
 
     return b;
 }
@@ -778,7 +786,8 @@ statement make_whileloop_statement(expression condition,
 		       //pop_current_C_comment(),
 		       string_undefined,
 		       make_instruction_whileloop(w),
-		       NIL, string_undefined);
+		       NIL, string_undefined,
+		       extensions_undefined);
   return smt;
 }
 
@@ -837,7 +846,10 @@ string c; /* comments, default empty_comments (was: "" (was: string_undefined)) 
 		      STATEMENT_ORDERING_UNDEFINED,
 		      c,
 		      make_instruction(is_instruction_call,
-				       make_call(called_function,args)),NIL,NULL);
+				       make_call(called_function,args)),
+		      NIL,
+		      NULL,
+		      extensions_undefined);
 
   ifdebug(8) {
     pips_debug(8, "cs is call to %s\n", function_name);
@@ -1352,12 +1364,15 @@ statement makeloopbody(loop l, statement s_old, bool inner_p)
 			     statement_number(s_old),
 			     statement_ordering(s_old),
 			     statement_comments(s_old),
-			     instr_l,NIL,NULL);
+			     instr_l,NIL,NULL,
+			     extensions_undefined);
     l_body = make_statement(entity_empty_label(),
 			    STATEMENT_NUMBER_UNDEFINED,
 			    STATEMENT_ORDERING_UNDEFINED,
 			    empty_comments,
-			    make_instruction_block(CONS(STATEMENT,state_l,NIL)),NIL,NULL);
+			    make_instruction_block(CONS(STATEMENT,state_l,NIL)),
+			    NIL,NULL,
+			    extensions_undefined);
 
     return(l_body);
 }
@@ -2298,24 +2313,24 @@ statement update_statement_instruction(statement s,instruction i)
   statement_number(s) = STATEMENT_NUMBER_UNDEFINED;
   statement_ordering(s) = STATEMENT_ORDERING_UNDEFINED;
 
-  if (instruction_sequence_p(i) && 
+  if (instruction_sequence_p(i) &&
       ((!statement_with_empty_comment_p(s)) || (!unlabelled_statement_p(s))))
     {
       cs = make_call_statement(CONTINUE_FUNCTION_NAME,
 			       NIL,
-			       statement_label(s), 
+			       statement_label(s),
 			       statement_comments(s));
-	
+
       statement_comments(s) = empty_comments;
       statement_label(s)= entity_empty_label();
-      
+
       /* add the CONTINUE statement before the sequence instruction i */
       seq = CONS(STATEMENT, cs, CONS(STATEMENT,instruction_to_statement(i),NIL));
-      
+
       free_instruction(statement_instruction(s));
       statement_instruction(s) =  make_instruction(is_instruction_sequence,make_sequence(seq));
     }
-    
+
   else
     {
       free_instruction(statement_instruction(s));

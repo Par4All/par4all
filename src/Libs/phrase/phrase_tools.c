@@ -1,6 +1,6 @@
-/* 
+/*
  *
- * This phase is used for PHRASE project. 
+ * This phase is used for PHRASE project.
  *
  * NB: The PHRASE project is an attempt to automatically (or
  * semi-automatically) transform high-level language for partial
@@ -42,39 +42,39 @@ string statement_type_as_string (statement stat)
   instruction i = statement_instruction(stat);
   switch (instruction_tag(i)) {
   case is_instruction_test: {
-    return strdup("TEST");   
+    return strdup("TEST");  
     break;
   }
   case is_instruction_sequence: {
-    return strdup("SEQUENCE");   
+    return strdup("SEQUENCE");  
     break;
   }
   case is_instruction_loop: {
-    return strdup("LOOP");   
+    return strdup("LOOP");  
     break;
   }
   case is_instruction_whileloop: {
-    return strdup("WHILELOOP");   
+    return strdup("WHILELOOP");  
     break;
   }
   case is_instruction_forloop: {
-    return strdup("FORLOOP");   
+    return strdup("FORLOOP");  
     break;
   }
   case is_instruction_call: {
-    return strdup("CALL");   
+    return strdup("CALL");  
     break;
   }
   case is_instruction_unstructured: {
-    return strdup("UNSTRUCTURED");   
+    return strdup("UNSTRUCTURED");  
     break;
   }
   case is_instruction_goto: {
-    return strdup("GOTO");   
+    return strdup("GOTO");  
     break;
   }
   default:
-    return strdup("UNDEFINED");   
+    return strdup("UNDEFINED");  
     break;
   }
 }
@@ -118,14 +118,14 @@ void debug_control (string comments, control a_control, int debug_level) {
  * DEBUG FUNCTION: print debugging informations for
  * an unstructured an_unstructured
  */
-void debug_unstructured (unstructured an_unstructured, 
-			 int debug_level) 
+void debug_unstructured (unstructured an_unstructured,
+			 int debug_level)
 {
   list blocs = NIL ;
   string line = "***********************************************************************\n";
 
   ifdebug (debug_level) {
-    CONTROL_MAP (current_control, { 
+    CONTROL_MAP (current_control, {
       statement s = control_statement (current_control);
       string next_nodes_as_string = "";
       string previous_nodes_as_string = "";
@@ -147,7 +147,7 @@ void debug_unstructured (unstructured an_unstructured,
 						       NULL));
     free(temp);
       }
-      
+     
       for (i=0; i<gen_length(successors); i++) {
 	ordering = statement_ordering(control_statement
 				      (CONTROL(gen_nth(i,successors))));
@@ -159,7 +159,7 @@ void debug_unstructured (unstructured an_unstructured,
 						   NULL));
     free(temp);
       }
-      
+     
       ordering = beautify_ordering (ordering);
       ordering = statement_ordering(s);
       /*if (ordering > 65535) ordering = ordering >> 16;*/
@@ -185,8 +185,8 @@ void debug_unstructured (unstructured an_unstructured,
  * DEBUG FUNCTION: print debugging informations for
  * an unstructured an_unstructured (short version)
  */
-void short_debug_unstructured (unstructured an_unstructured, 
-			       int debug_level) 
+void short_debug_unstructured (unstructured an_unstructured,
+			       int debug_level)
 {
   list blocs = NIL ;
   string entry_as_string, exit_as_string;
@@ -203,7 +203,7 @@ void short_debug_unstructured (unstructured an_unstructured,
 				  "PREVIOUS: ", exit_as_string, "\n",
 				  NULL)));
 
-    CONTROL_MAP (current_control, { 
+    CONTROL_MAP (current_control, {
       string next_nodes_as_string = "";
       string previous_nodes_as_string = "";
       char *title;
@@ -243,47 +243,47 @@ void short_debug_unstructured (unstructured an_unstructured,
  * New variable is added to declarations
  */
 entity clone_variable_with_new_name(entity a_variable,
-				    string new_name, 
+				    string new_name,
 				    string module_name)
 {
   entity module;
   entity new_variable;
 
-  module = module_name_to_entity(module_name); 
+  module = module_name_to_entity(module_name);
   /* Assert that module represent a value code */
   pips_assert("it is a code", value_code_p(entity_initial(module)));
 
-  if ((gen_find_tabulated(concatenate(module_name, 
-				      MODULE_SEP_STRING, 
-				      new_name, 
+  if ((gen_find_tabulated(concatenate(module_name,
+				      MODULE_SEP_STRING,
+				      new_name,
 				      NULL),
-			  entity_domain)) == entity_undefined) 
-    { 
+			  entity_domain)) == entity_undefined)
+    {
       /* This entity does not exist, we can safely create it */
-      
+     
       /* new_variable = copy_entity (a_variable);
-	 entity_name(new_variable)  
-	 = strdup(concatenate(module_name, 
-	 MODULE_SEP_STRING, 
+	 entity_name(new_variable) 
+	 = strdup(concatenate(module_name,
+	 MODULE_SEP_STRING,
 	 new_name, NULL)); */
-      
-      new_variable = make_entity (strdup(concatenate(module_name, 
-						     MODULE_SEP_STRING, 
+     
+      new_variable = make_entity (strdup(concatenate(module_name,
+						     MODULE_SEP_STRING,
 						     new_name, NULL)),
 				  copy_type (entity_type(a_variable)),
 				  copy_storage (entity_storage(a_variable)),
 				  copy_value (entity_initial(a_variable)));
-      
-      /*new_variable 
-	= find_or_create_scalar_entity (strdup(concatenate(module_name, 
-	MODULE_SEP_STRING, 
+     
+      /*new_variable
+	= find_or_create_scalar_entity (strdup(concatenate(module_name,
+	MODULE_SEP_STRING,
 	new_name, NULL)),module_name,
 	is_basic_int);*/
-      
+     
       AddEntityToDeclarations(new_variable,module);
       return new_variable;
     }
-  else 
+  else
     {
       /* This entity already exist, we return null */
       return NULL;
@@ -295,47 +295,47 @@ entity clone_variable_with_new_name(entity a_variable,
  * cloned_variable, with a name obtained by the concatenation
  * of base_name and the statement ordering of statement stat.
  * If such entity already exist, increment statement ordering
- * to get first free name. We assume then that created entity's 
+ * to get first free name. We assume then that created entity's
  * name is unique.
  */
 entity make_variable_from_name_and_entity (entity cloned_variable,
 					   string base_name,
 					   statement stat,
-					   string module_name) 
+					   string module_name)
 {
   string variable_name;
   entity returned_variable = NULL;
   int index = statement_ordering(stat);
   char *buffer;
-  
+ 
   while (returned_variable == NULL) {
-    
+   
     asprintf(&variable_name, base_name, index++);
-    returned_variable 
+    returned_variable
       = clone_variable_with_new_name (cloned_variable,
 				      variable_name,
 				      module_name);
   }
-  
+ 
   return returned_variable;
-  
+ 
 }
 
 /**
  * Build and return new statement which is a binary call with
  * the 2 expressions expression1 and expression2, with empty
- * label, statement number and ordering of statement stat, 
+ * label, statement number and ordering of statement stat,
  * and empty comments
  */
 statement make_binary_call_statement (string operator_name,
 				      expression expression1,
 				      expression expression2,
-				      statement stat) 
+				      statement stat)
 {
-  call assignment_call 
+  call assignment_call
     = make_call (entity_intrinsic(operator_name),
-		 CONS(EXPRESSION, 
-		      expression1, 
+		 CONS(EXPRESSION,
+		      expression1,
 		      CONS(EXPRESSION, expression2, NIL)));
 
   if (stat == NULL) {
@@ -345,7 +345,8 @@ statement make_binary_call_statement (string operator_name,
 			  empty_comments,
 			  make_instruction (is_instruction_call,
 					    assignment_call),
-			  NIL,NULL);  
+			  NIL,NULL,
+			  extensions_undefined); 
   }
   else {
     return make_statement(entity_empty_label(),
@@ -354,7 +355,8 @@ statement make_binary_call_statement (string operator_name,
 			  empty_comments,
 			  make_instruction (is_instruction_call,
 					    assignment_call),
-			  NIL,NULL);  
+			  NIL,NULL,
+			  extensions_undefined); 
   }
 }
 
@@ -373,14 +375,14 @@ statement make_assignement_statement (entity a_variable,
 				     stat);
 }
 
-/** 
+/**
  * Return unstructured for a statement asserting that this one
  * represent an unstructured
  */
-unstructured statement_unstructured (statement stat) 
+unstructured statement_unstructured (statement stat)
 {
-  pips_assert("Statement is UNSTRUCTURED", 
-	      instruction_tag(statement_instruction(stat)) 
+  pips_assert("Statement is UNSTRUCTURED",
+	      instruction_tag(statement_instruction(stat))
 	      == is_instruction_unstructured);
   return instruction_unstructured(statement_instruction(stat));
 }
@@ -389,7 +391,7 @@ unstructured statement_unstructured (statement stat)
  * Special function made for Ronan Keryell who likes a lot
  * when a integer number is coded on 3 bits :-)
  */
-int beautify_ordering (int an_ordering) 
+int beautify_ordering (int an_ordering)
 {
   int ordering_up = (an_ordering & 0xffff0000) >> 16;
   int ordering_down = (an_ordering & 0x0000ffff);
@@ -397,7 +399,7 @@ int beautify_ordering (int an_ordering)
 }
 
 void clean_statement_from_tags (string comment_portion,
-				statement stat) 
+				statement stat)
 {
   string comments;
   char*  next_line;
@@ -406,7 +408,7 @@ void clean_statement_from_tags (string comment_portion,
   if (!statement_with_empty_comment_p(stat)) {
 
     string new_comments = NULL;
- 
+
     searched_string = strdup(comment_portion);
     searched_string[strcspn(comment_portion, "%s")] = '\0';
     comments = strdup(statement_comments(stat));
@@ -425,7 +427,7 @@ void clean_statement_from_tags (string comment_portion,
       }
       while (next_line != NULL);
     }
-    
+   
     if (new_comments != NULL) {
       statement_comments(stat) = new_comments;
     }
@@ -433,7 +435,7 @@ void clean_statement_from_tags (string comment_portion,
       statement_comments(stat) = empty_comments;
     }
   }
-    
+   
 }
 
 typedef struct {
@@ -447,12 +449,12 @@ static void check_if_statement_contains_comment(statement s, void* a_context)
   string comments;
 
   if (!statement_with_empty_comment_p(s)) {
-    
+   
     comments = strdup(statement_comments(s));
-    
-    /*pips_debug(5, "Searching comment: [%s] in [%s]\n", 
+   
+    /*pips_debug(5, "Searching comment: [%s] in [%s]\n",
       context->searched_string, comments);*/
-      
+     
     if (strstr(comments,context->searched_string) != NULL) {
       context->list_of_statements
 	= CONS(STATEMENT,s,context->list_of_statements);
@@ -474,23 +476,23 @@ list get_statements_with_comments_containing (string comment_portion,
 
   /* Reset list */
   context.list_of_statements = NIL;
-  
+ 
   /*ifdebug(5) {
     pips_debug(5, "Searching statements with comments: %s\n",
-	       context.searched_string);      
-    pips_debug(5, "In statement:\n");      
+	       context.searched_string);     
+    pips_debug(5, "In statement:\n");     
     print_statement(stat);
     }*/
 
-  gen_context_recurse(stat, &context, statement_domain, gen_true, 
+  gen_context_recurse(stat, &context, statement_domain, gen_true,
 		      check_if_statement_contains_comment);
-  
+ 
   return context.list_of_statements;
-  
+ 
 }
 
 bool statement_is_contained_in_a_sequence_p (statement root_statement,
-					     statement searched_stat) 
+					     statement searched_stat)
 {
   return (sequence_statement_containing (root_statement,
 					 searched_stat) != NULL);
@@ -502,13 +504,13 @@ typedef struct {
 } sequence_searching_context;
 
 
-static void search_sequence_containing (statement s, 
+static void search_sequence_containing (statement s,
 					void* a_context)
 {
-  sequence_searching_context* context 
+  sequence_searching_context* context
     = (sequence_searching_context*)a_context;
   instruction i = statement_instruction(s);
-  
+ 
   if (instruction_tag(i) == is_instruction_sequence) {
     MAP (STATEMENT, s2, {
       if (s2 == context->searched_statement) {
@@ -526,8 +528,8 @@ statement sequence_statement_containing (statement root_statement,
   context.searched_statement = searched_stat;
   context.found_sequence_statement = NULL;
 
-  gen_context_recurse(root_statement, &context, 
-		      statement_domain, gen_true, 
+  gen_context_recurse(root_statement, &context,
+		      statement_domain, gen_true,
 		      search_sequence_containing);
 
   return context.found_sequence_statement;
@@ -537,9 +539,9 @@ statement sequence_statement_containing (statement root_statement,
  * Replace statement old_stat by statement new_stat, asserting that this
  * statement is contained in a sequence
  */
-void replace_in_sequence_statement_with (statement old_stat, 
+void replace_in_sequence_statement_with (statement old_stat,
 					 statement new_stat,
-					 statement root_stat) 
+					 statement root_stat)
 {
   statement sequence_statement = sequence_statement_containing (root_stat,
 								old_stat);
@@ -548,7 +550,7 @@ void replace_in_sequence_statement_with (statement old_stat,
 
   pips_debug(5, "BEGIN replace_in_sequence_statement_with:\n");
 
-  pips_assert("Statement is contained in a sequence", 
+  pips_assert("Statement is contained in a sequence",
 	      sequence_statement != NULL);
 
   stats_list = sequence_statements(instruction_sequence(statement_instruction(sequence_statement)));
@@ -575,9 +577,9 @@ void replace_in_sequence_statement_with (statement old_stat,
 
   ifdebug(7) {
     pips_debug(7, "I've got this for the sequence\n");
-    print_statement(sequence_statement);    
+    print_statement(sequence_statement);   
     pips_debug(7, "I've got this for the root statement\n");
-    print_statement(root_stat);    
+    print_statement(root_stat);   
   }
 
   pips_debug(5, "END replace_in_sequence_statement_with:\n");
@@ -589,7 +591,7 @@ void replace_in_sequence_statement_with (statement old_stat,
 list references_for_regions (list l_regions)
 {
   list l_ref = NIL;
-  
+ 
   MAP (EFFECT, reg, {
     reference ref = region_reference(reg);
     l_ref = CONS (REFERENCE, ref, l_ref);

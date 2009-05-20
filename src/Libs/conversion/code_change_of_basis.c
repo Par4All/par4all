@@ -18,12 +18,12 @@
 
 /* void scanning_base_to_vect(matrice G,int n,Pbase base,Pvecteur pvg[n])
  * compute  G*base and put the result in a vector pvg[n]
- * ex:     1 2                              
+ * ex:     1 2
        G =      , base = (I, J)   , alor pvg[2] = ((I+2J), (3I+4J))
- 
-           3 4 
+
+           3 4
  */
-void  scanning_base_to_vect(G, n, base, pvg) 
+void  scanning_base_to_vect(G, n, base, pvg)
 matrice G;
 int n;
 Pbase base;
@@ -34,12 +34,12 @@ Pvecteur pvg[];
     Pvecteur pv;
 
     for (i=1; i<=n; i++) {
-	for (j=1,pb=base,pv=NULL; j<=n; j++,pb=pb->succ) 
+	for (j=1,pb=base,pv=NULL; j<=n; j++,pb=pb->succ)
 	    vect_add_elem(&pv,pb->var,ACCESS(G,n,i,j));
-	pvg[i] = pv; 
+	pvg[i] = pv;
     }
 }
-  
+
 /* Pvecteur vect_change_base(Pvecteur pv_old, Pvecteur pvg[],
  * Pbase base_oldindex, Pbase base_newindex)
  * compute the new vector in the new basis pvg[]
@@ -57,9 +57,9 @@ Pvecteur pvg[];
     {
 	r = base_find_variable_rank(base_oldindex, pv->var, (get_variable_name_t) entity_name_or_TCST);
 
-	if (r != -1) 
+	if (r != -1)
 	{ /* var is in base_oldindex */
-	    pv1 = vect_multiply(vect_dup(pvg[r]),pv->val); 
+	    pv1 = vect_multiply(vect_dup(pvg[r]),pv->val);
 	    pv2 = vect_add(pv2,pv1);
 
 	    /* on bousille tranquillement le vecteur sur lequel on itere;-) */
@@ -68,12 +68,12 @@ Pvecteur pvg[];
 	}
     }
 
-    /* clean vector 
+    /* clean vector
      */
     for(b=to_erase; b!=NULL; b=b->succ)
 	vect_erase_var(&pv_old, b->var);
     base_rm(to_erase);
-    
+
     pv2 = vect_add(pv2,pv_old);
 
     return pv2;

@@ -311,7 +311,8 @@ do_clone_statement(statement s, clone_context cc, hash_table ht)
             empty_comments,
             new_instruction_with_decl,
             NIL,
-            NULL);
+            NULL,
+	    extensions_undefined);
 
 }
 

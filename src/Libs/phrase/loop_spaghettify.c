@@ -192,7 +192,8 @@ static control make_initialization_from_loop (loop the_loop,
 				      empty_comments,
 				      make_instruction(is_instruction_sequence,
 						       init_sequence),
-				      NIL, NULL),
+				      NIL, NULL,
+				      extensions_undefined),
 		       NIL, NIL);
 }
 
@@ -260,7 +261,8 @@ static control make_condition_from_loop (loop the_loop,
 				       empty_comments,
 				       make_instruction (is_instruction_test,
 							 condition_test),
-				       NIL,NULL);  
+				       NIL,NULL,
+				       extensions_undefined);  
 
   return make_control (condition_statement, NIL, NIL);
 }
@@ -311,7 +313,8 @@ static control make_body_from_loop (loop the_loop,
 		     empty_comments,
 		     make_instruction (is_instruction_sequence,
 				       body_sequence),
-		     NIL,NULL);  
+		     NIL,NULL,
+		     extensions_undefined);  
   return make_control (body_statement, NIL, NIL);
 }
 

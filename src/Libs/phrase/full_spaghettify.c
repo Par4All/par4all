@@ -99,7 +99,8 @@ static statement full_spaghettify_module (statement module_statement,
 				      stat_ordering,
 				      empty_comments,
 				      unstructured_instruction,
-				      NIL, NULL);
+				      NIL, NULL,
+				      extensions_undefined);
   
   pips_assert("Statement is consistent after FULL_SPAGUETTIFY", 
 	      statement_consistent_p(returned_statement));

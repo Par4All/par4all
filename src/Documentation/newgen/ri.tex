@@ -969,15 +969,15 @@ handle.
 \label{subsection-statement}
 \index{Statement}
 
-\domain{Statement = label:entity x number:int x ordering:int x comments:string x instruction x declarations:entity* x decls_text:string}
+\domain{Statement = label:entity x number:int x ordering:int x comments:string x instruction x declarations:entity* x decls_text:string x extensions }
 {}
 
 Type \texttt{statement} is used as a container of instructions. Methods for
-statements are in Library \texttt{ri-util/statement.c}. Member 
+statements are in Library \texttt{ri-util/statement.c}. Member
 \texttt{label} is an entity of kind label. Such entities can be recognized by
 their names. See Section~\ref{subsection-entity} for more details about
 name structures and handling of statements with no labels and return
-points. Note that statements containing a \texttt{block} or 
+points. Note that statements containing a \texttt{block} or
 \texttt{unstructured} instruction should not have a label, as you might find out
 when using the prettyprinter.
 
@@ -1145,6 +1145,9 @@ of other statement (see~\ref{subsection-instruction} and
 information of this kind is needed, it should be attached to the first
 statement of the sequence or on a CONTINUE (for an empty sequence)
 instead.
+
+Member \texttt{extensions} is used to add various features such as pragmas
+or future extensions to the statements.
 
 \subsubsection{Mappings from statement to statement}
 
@@ -1597,6 +1600,37 @@ Used for example in \verb/use_def_elimination()/ to store the eventual
 control father of a statement in order to travel on the control graph
 associated to a statement. The persistance is needed to avoid freeing
 the control graph when the mapping is freed.
+
+
+\subsection{Extensions}
+\label{sec:extensions}
+
+\domain{Extensions = extension*}
+{}
+
+Extensions are used to extend in a not too much intrusive way the internal
+representation of the code.
+
+\domain{extension = pragma}
+{}
+
+Extensions can be used to add pragmas to statements. Well, right now an
+\texttt{extension} can only be of type \texttt{pragma} but it could be
+something else too some days.
+
+
+\subsubsection{Pragma}
+\label{sec:pragma}
+
+\domain{pragma = string}
+{}
+
+Pragmas fields are used to attach \verb|#pragma| to statements.
+
+Right now for testing a pragma is only a \texttt{string} but at
+middle-term it should be a list of expressions. In this way classical
+transformations may work by side effect on pragmas too (such as variable
+renaming or anything else).
 
 
 % \section{Représentation des expressions}
