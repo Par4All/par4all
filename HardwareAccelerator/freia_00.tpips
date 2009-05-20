@@ -1,0 +1,9 @@
+delete freia_00
+create freia_00 freia_00.c
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+display PRINTED_FILE[freia_stuff]
+apply HARDWARE_ACCELERATOR[freia_stuff]
+close
+delete freia_00
+quit
