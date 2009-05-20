@@ -1,0 +1,46 @@
+delete scalarization13
+
+setproperty ABORT_ON_USER_ERROR TRUE
+setproperty PRETTYPRINT_BLOCKS TRUE
+
+##TODO: explain
+setproperty ARRAY_PRIV_FALSE_DEP_ONLY FALSE
+
+create scalarization13 scalarization13.f
+
+## Needed for substracting set approximations
+activate MUST_REGIONS
+
+echo
+echo Initial code
+echo
+display PRINTED_FILE[SCALARIZATION]
+
+echo
+echo IN regions
+echo
+activate PRINT_CODE_IN_REGIONS
+display PRINTED_FILE[SCALARIZATION]
+
+#echo
+#echo COPY-OUT regions
+#echo
+#activate PRINT_CODE_COPIED_OUT_REGIONS
+#display PRINTED_FILE[SCALARIZATION]
+
+echo
+echo Privatized regions
+echo
+activate PRINT_CODE_PRIVATIZED_REGIONS
+display PRINTED_FILE[SCALARIZATION]
+
+echo
+echo Code after scalarization
+echo
+apply SCALARIZATION[SCALARIZATION]
+display PRINTED_FILE[SCALARIZATION]
+
+close
+delete scalarization13
+quit
+
