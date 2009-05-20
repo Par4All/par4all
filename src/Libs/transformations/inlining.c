@@ -122,7 +122,12 @@ do_substitute_entity(expression exp, struct entity_pair* thecouple)
     {
         reference ref = syntax_reference(expression_syntax(exp));
         entity referenced_entity = reference_variable(ref);
-        if( same_entity_name_p(referenced_entity , thecouple->old) )
+        /*if( same_entity_name_p(referenced_entity,thecouple->old))*/
+		string emn_r = strdup(entity_module_name(referenced_entity));
+		string emn_o = entity_module_name(thecouple->old);
+		string eun_r = entity_user_name(referenced_entity);
+		string eun_o = entity_user_name(thecouple->old);
+        if( same_string_p(emn_r,emn_o) && same_string_p(eun_r,eun_o))
         {
             if( entity_constant_p(thecouple->new) )
             {
@@ -130,9 +135,11 @@ do_substitute_entity(expression exp, struct entity_pair* thecouple)
             }
             else
             {
+				//pips_assert("substitute entities of similar type",gen_length(reference_indices(ref)) == gen_length(variable_dimensions(type_variable(entity_type(thecouple->new)))));
                 reference_variable(ref) = thecouple->new;
             }
         }
+		free(emn_r);
     }
 }
 
@@ -168,7 +175,7 @@ substitute_entity(statement s, entity old, entity new)
 
 
 /* look for entity locally named has `new' in statements `s'
- * when found, fidn a new name and perform substitution
+ * when found, find a new name and perform substitution
  */
 static void
 solve_name_clashes(statement s, entity new)
@@ -193,7 +200,6 @@ solve_name_clashes(statement s, entity new)
         }
     }
 }
-
 static
 bool inline_has_static_declaration(list iter)
 {
@@ -212,6 +218,55 @@ void statement_with_static_declarations_p(statement s,bool* has_static_declarati
     *has_static_declaration|=inline_has_static_declaration( statement_declarations(s) );
 }
 
+static
+entity make_temporary_array_entity(entity efrom, expression from)
+{
+	basic pointers =copy_basic(variable_basic(type_variable(entity_type(efrom))));
+	list dims = gen_copy_seq(variable_dimensions(type_variable(entity_type(efrom))));
+	if(ENDP(CDR(dims))) dims=NIL;
+	else {
+
+		list iter = dims;
+		while(!ENDP(CDR(CDR(iter)))) POP(iter);
+		//free_dimension(DIMENSION(CAR(CDR(iter))));
+		CDR(iter)=NIL;
+	}
+	pointers = make_basic_pointer(make_type_variable(make_variable(pointers,dims,NIL)));
+	entity new = make_new_scalar_variable(
+			get_current_module_entity(),
+			pointers
+			);
+	entity dynamic_area =
+		global_name_to_entity(module_local_name(get_current_module_entity()),DYNAMIC_AREA_LOCAL_NAME);
+	entity_storage(new) = make_storage_ram(
+			make_ram(get_current_module_entity(),
+				dynamic_area,
+				add_any_variable_to_area(dynamic_area,new, fortran_module_p(get_current_module_entity())),                     
+				NIL));
+	entity_initial(new) = make_value_expression(make_expression(make_syntax_cast(make_cast(make_type_variable(make_variable(pointers,NIL,NIL)),(from))),normalized_undefined));
+	AddLocalEntityToDeclarations(new, get_current_module_entity(),
+			c_module_p(get_current_module_entity())?get_current_module_statement():statement_undefined);
+	return new;
+}
+static
+entity make_temporary_scalar_entity(entity efrom, expression from)
+{
+	entity new = make_new_scalar_variable(
+			get_current_module_entity(),
+			copy_basic(variable_basic(type_variable(entity_type(efrom))))
+			);
+	entity dynamic_area =
+		global_name_to_entity(module_local_name(get_current_module_entity()),DYNAMIC_AREA_LOCAL_NAME);
+	entity_storage(new) = make_storage_ram(
+			make_ram(get_current_module_entity(),
+				dynamic_area,
+				add_any_variable_to_area(dynamic_area,new, fortran_module_p(get_current_module_entity())),                     
+				NIL));
+	entity_initial(new) = make_value_expression(from);
+	AddLocalEntityToDeclarations(new, get_current_module_entity(),
+			c_module_p(get_current_module_entity())?get_current_module_statement():statement_undefined);
+	return new;
+}
 
 /* this should inline the call callee
  * calling module inlied_module
@@ -301,7 +356,7 @@ instruction inline_expression_call(expression modified_expression, call callee)
             entity_storage(returned_entity) = make_storage_ram(
                     make_ram(get_current_module_entity(),
                        dynamic_area,
-                      add_any_variable_to_area(dynamic_area,returned_entity, c_module_p(get_current_module_entity())),
+                      add_any_variable_to_area(dynamic_area,returned_entity, fortran_module_p(get_current_module_entity())),
                      NIL)); 
             AddLocalEntityToDeclarations(returned_entity, get_current_module_entity(),
                     c_module_p(get_current_module_entity())?get_current_module_statement():statement_undefined);
@@ -332,7 +387,6 @@ instruction inline_expression_call(expression modified_expression, call callee)
     if( !ENDP(iter) && ENTITY_NAME_P( ENTITY(CAR(iter)), entity_user_name(inlined_module) ) )
             POP(iter); /* pop the first flag if needed */
 
-    list adder = /*statement_declarations(expanded);*/NIL;
     list c_iter = call_arguments(callee);
     for( ; !ENDP(c_iter); POP(iter),POP(c_iter) )
     {
@@ -358,11 +412,12 @@ instruction inline_expression_call(expression modified_expression, call callee)
         {
             need_copy =false;
         }
+        entity new = entity_undefined;
         /* generate a copy for this parameter */
         if(need_copy)
         {
             string emn = entity_module_name(e);
-            entity new_ent = copy_entity(e);
+            new = copy_entity(e);
 
             /* fix name */
             string tname = strdup(concatenate(
@@ -373,39 +428,52 @@ instruction inline_expression_call(expression modified_expression, call callee)
                         entity_local_name(e),
                         NULL
                         ));
-            entity_name(new_ent)=tname;
+            entity_name(new)=tname;
 
             /* fix storage */
             entity dynamic_area = global_name_to_entity(emn, DYNAMIC_AREA_LOCAL_NAME);
-            entity_storage(new_ent)= make_storage_ram(
+            entity_storage(new)= make_storage_ram(
                     make_ram(
                         get_current_module_entity(),
                         dynamic_area,
-                        add_any_variable_to_area(dynamic_area,new_ent, c_module_p(get_current_module_entity())),
+                        add_any_variable_to_area(dynamic_area,new, fortran_module_p(get_current_module_entity())),
                         NIL)
             );
 
             /* fix value */
-            entity_initial(new_ent) = make_value_expression( copy_expression( from ) );
+            entity_initial(new) = make_value_expression( copy_expression( from ) );
+
 
             /* add the entity to our list */
-            adder=CONS(ENTITY,new_ent,adder);
+			//AddLocalEntityToDeclarations(new,get_current_module_entity(),expanded);
+			statement_declarations(expanded)=gen_nconc(CONS(ENTITY,new,NIL), statement_declarations(expanded));
+            gen_context_recurse(expanded, new, statement_domain, gen_true, &solve_name_clashes);
+            substitute_entity(expanded,e,new);
         }
         /* substitute variables */
         else
         {
             /* get new reference */
-            entity new = entity_undefined;
             switch(syntax_tag(expression_syntax(from)))
             {
                 case is_syntax_reference:
                     {
                         reference r = syntax_reference(expression_syntax(from));
-                        if( ENDP(reference_indices(r)))
-                            new = reference_variable(r);
-                        else {
-                            pips_user_error("unhandled case: passing array reference");
-                        }
+						size_t nb_indices = gen_length(reference_indices(r));
+						if( nb_indices == 0 )
+						{
+                        	new = reference_variable(r);
+						}
+						else /* need a temporary variable */
+						{
+							if( ENDP(variable_dimensions(type_variable(entity_type(e)))) )
+								new = make_temporary_scalar_entity(e,from);
+							else
+							{
+								new = make_temporary_array_entity(e,from);
+							}
+
+						}
                     } break;
                     /* this one is more complicated than I thought,
                      * what of the side effect of the call ?
@@ -413,26 +481,10 @@ instruction inline_expression_call(expression modified_expression, call callee)
                      */
                 case is_syntax_call:
                     if( expression_constant_p(from) )
-                    {
                         new = call_function(expression_call(from));
-                    }
                     else
-                    {
-                        new = make_new_scalar_variable(
-                                get_current_module_entity(),
-                                copy_basic(variable_basic(type_variable(entity_type(e))))
-                                );
-                        entity dynamic_area =
-                            global_name_to_entity(module_local_name(get_current_module_entity()),DYNAMIC_AREA_LOCAL_NAME);
-                        entity_storage(new) = make_storage_ram(
-                                make_ram(get_current_module_entity(),
-                                    dynamic_area,
-                                    add_any_variable_to_area(dynamic_area,returned_entity, c_module_p(get_current_module_entity())),                     
-                                    NIL));
-                        entity_initial(new) = make_value_expression(from);
-                        AddLocalEntityToDeclarations(new, get_current_module_entity(),
-                                c_module_p(get_current_module_entity())?get_current_module_statement():statement_undefined);
-                    } break;
+						new = make_temporary_scalar_entity(e,from);
+                    break;
                 default:
                     pips_internal_error("unhandled tag %d\n", syntax_tag(expression_syntax(from)) );
             };
@@ -445,12 +497,6 @@ instruction inline_expression_call(expression modified_expression, call callee)
 
         }
 
-    }
-    if( adder !=NIL)
-    {
-        adder=gen_nreverse(adder);
-        adder=gen_nconc(adder, statement_declarations(expanded));
-        statement_declarations(expanded)=adder;
     }
 
     /* final packing

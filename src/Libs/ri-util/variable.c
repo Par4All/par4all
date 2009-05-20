@@ -180,6 +180,7 @@ reset_unique_variable_numbers()
 #define DEFAULT_LOGICAL_PREFIX 	"L_"
 #define DEFAULT_COMPLEX_PREFIX	"C_"
 #define DEFAULT_STRING_PREFIX	"S_"
+#define DEFAULT_POINTER_PREFIX	"P_"
 
 /* Create a new scalar variable of type b in the given module.
 
@@ -232,6 +233,10 @@ make_new_scalar_variable_with_prefix(string prefix,
 	break;
       case is_basic_string:
 	asprintf(&variable_name, format, DEFAULT_STRING_PREFIX,
+		unique_string_number++);
+	break;
+      case is_basic_pointer:
+	asprintf(&variable_name, format, DEFAULT_POINTER_PREFIX,
 		unique_string_number++);
 	break;
       default:
