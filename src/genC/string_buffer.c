@@ -22,25 +22,27 @@
 typedef struct __string_buffer_head
 {
   stack ins;
+  boolean dup; // whether to duplicate strings
 }
   _string_buffer_head;
 
 /* allocate a new string buffer
  */
-string_buffer string_buffer_make(void)
+string_buffer string_buffer_make(bool dup)
 {
   string_buffer n = (string_buffer) malloc(sizeof(_string_buffer_head));
   message_assert("allocated", n!=NULL);
   n->ins = stack_make(0, 0, 0);
+  n->dup = dup;
   return n;
 }
 
 /* free string buffer structure
  * @arg free_strings also free string contents
  */
-void string_buffer_free(string_buffer *psb, bool free_strings)
+void string_buffer_free(string_buffer *psb)
 {
-  if (free_strings)
+  if ((*psb)->dup)
     STACK_MAP_X(s, string, free(s), (*psb)->ins, 0);
   stack_free(&((*psb)->ins));
   free(*psb);
@@ -83,7 +85,7 @@ void string_buffer_to_file(string_buffer sb, FILE * out)
  */
 void string_buffer_append(string_buffer sb, string s)
 {
-  stack_push(s, sb->ins);
+  stack_push(sb->dup? strdup(s): s, sb->ins);
 }
 
 /* append string buffer sb2 to string buffer sb.
@@ -91,18 +93,4 @@ void string_buffer_append(string_buffer sb, string s)
 void string_buffer_append_sb(string_buffer sb, string_buffer sb2)
 {
   STACK_MAP_X(s, string, string_buffer_append(sb, s), sb2->ins, 0);
-}
-
-/* append string s to string buffer sb, with duplication
- */
-void string_buffer_append_dup(string_buffer sb, string s)
-{
-  string_buffer_append_dup(sb, strdup(s));
-}
-
-/* append string buffer sb2 to string buffer sb with string duplication.
- */
-void string_buffer_append_sb_dup(string_buffer sb, string_buffer sb2)
-{
-  STACK_MAP_X(s, string, string_buffer_append_dup(sb, s), sb2->ins, 0);
 }
