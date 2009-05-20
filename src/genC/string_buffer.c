@@ -28,7 +28,7 @@ typedef struct __string_buffer_head
 
 /* allocate a new string buffer
  */
-string_buffer string_buffer_make(bool dup)
+string_buffer string_buffer_make (bool dup)
 {
   string_buffer n = (string_buffer) malloc(sizeof(_string_buffer_head));
   message_assert("allocated", n!=NULL);
@@ -37,16 +37,27 @@ string_buffer string_buffer_make(bool dup)
   return n;
 }
 
-/* free string buffer structure
- * @arg free_strings also free string contents
+/* @brief free string buffer structure, also free string contents
+ * according to the dup field
+ * @arg psb the string_buffer to free
  */
-void string_buffer_free(string_buffer *psb)
+void string_buffer_free (string_buffer *psb)
 {
   if ((*psb)->dup)
     STACK_MAP_X(s, string, free(s), (*psb)->ins, 0);
   stack_free(&((*psb)->ins));
   free(*psb);
   *psb = NULL;
+}
+
+/* free string buffer structure and force string freeing
+ * @arg psb the string_buffer to free
+ */
+void string_buffer_free_all (string_buffer *psb)
+{
+  message_assert("null pointer", (*psb) != NULL);
+  (*psb)->dup = TRUE;
+  string_buffer_free (psb);
 }
 
 /* return malloc'ed string from string buffer sb
@@ -81,7 +92,8 @@ void string_buffer_to_file(string_buffer sb, FILE * out)
   STACK_MAP_X(s, string, fputs(s, out), sb->ins, 0);
 }
 
-/* append string s to string buffer sb, without duplication
+/* append string s to string buffer sb, the duplication
+ * is done if needed according to the dup fiel.
  */
 void string_buffer_append(string_buffer sb, string s)
 {
