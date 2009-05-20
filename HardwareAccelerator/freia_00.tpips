@@ -4,6 +4,7 @@ activate C_PARSER
 setproperty PRETTYPRINT_C_CODE TRUE
 display PRINTED_FILE[freia_stuff]
 apply HARDWARE_ACCELERATOR[freia_stuff]
+shell cat ./freia_00.database/Src/freia_stuff_helper_0.c
 close
 delete freia_00
 quit
