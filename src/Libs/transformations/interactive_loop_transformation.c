@@ -19,6 +19,7 @@
 
 #include "control.h"
 #include "conversion.h"
+#include "properties.h"
 /* #include "generation.h" */
 
 #include "transformations.h"
@@ -31,7 +32,7 @@ bool selected_loop_p(loop l)
 }
 
 bool interactive_loop_transformation(string module_name,
-				     statement (*loop_transformation)(list))
+				     statement (*loop_transformation)(list,bool (*)(bool)))
 {
     char *lp_label=NULL;
     entity module = module_name_to_entity(module_name);

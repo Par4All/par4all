@@ -218,7 +218,7 @@ static bool whole_loop_dependence_test(loop l)
 		    sg_fprint_as_dense(stderr, gs, gs->base);
 		    sc = sg_to_sc_chernikova(gs);
 		    fprintf(stderr,"\tcorresponding linear system:\n");
-		    sc_fprint(stderr,sc,entity_local_name);
+		    sc_fprint(stderr,sc,(get_variable_name_t)entity_local_name);
 		    sc_rm(sc);
 		}	
 	    }
@@ -238,7 +238,7 @@ static bool whole_loop_dependence_test(loop l)
 		    sg_fprint_as_dense(stderr, gsop, gsop->base);
 		    sc = sg_to_sc_chernikova(gsop);
 		    fprintf(stderr,"\tcorresponding linear system:\n");
-		    sc_fprint(stderr,sc,entity_local_name);
+		    sc_fprint(stderr,sc,(get_variable_name_t)entity_local_name);
 		    sc_rm(sc);
 		}	
 	    }

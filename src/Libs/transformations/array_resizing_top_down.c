@@ -74,6 +74,8 @@
 #include "ri-util.h"
 #include "database.h"
 #include "pipsdbm.h"
+#include "alias-classes.h"
+#include "instrumentation.h"
 #include "resources.h"
 #include "misc.h"
 #include "control.h"
@@ -81,7 +83,6 @@
 #include "semantics.h"
 #include "transformer.h"
 #include "text-util.h" /* for words_to_string*/
-#include "instrumentation.h"
 #include "transformations.h"
 
 #define PREFIX1  "$ARRAY_DECLARATION"
@@ -466,7 +467,7 @@ bool expression_equal_in_context_p(expression e1, expression e2, transformer con
       fprintf(stderr, "\n Second expression : ");    
       print_expression(e2);
       fprintf(stderr, " \n equal in the context ?");
-      fprint_transformer(stderr,context, entity_local_name);
+      fprint_transformer(stderr,context, (get_variable_name_t)entity_local_name);
     }
   if (normalized_linear_p(n1) && normalized_linear_p(n2))
     {
@@ -576,7 +577,7 @@ static list translate_reference_to_callee_frame(expression e, reference ref, tra
       list l_callee_decl = code_declarations(entity_code(current_callee));
       bool in_callee = FALSE;
       /* search for equivalent variable in the list */	  
-      MAP(ENTITY, enti,
+      FOREACH(ENTITY, enti,l_callee_decl)
       {
 	if (same_scalar_location_p(en, enti))
 	  {
@@ -604,7 +605,7 @@ static list translate_reference_to_callee_frame(expression e, reference ref, tra
 	    l = gen_nconc(l,CONS(EXPRESSION,copy_expression(expr),NIL));
 	    break;
 	  }
-      },l_callee_decl);
+      }
       
       /* If en is a pips created common variable, we can add this common declaration
 	 to the callee's declaration list => use this value.
@@ -670,7 +671,7 @@ static list translate_reference_to_callee_frame(expression e, reference ref, tra
 	  ifdebug(4)
 	    {
 	      fprintf(stderr, "\n Syntax reference : using precondition + association \n");
-	      fprint_transformer(stderr,context,entity_local_name);
+	      fprint_transformer(stderr,context,(get_variable_name_t)entity_local_name);
 	    }
 	  for(; !VECTEUR_NUL_P(b); b = b->succ) 
 	    {
@@ -810,7 +811,7 @@ static list translate_call_to_callee_frame(call ca, transformer context)
 		  ifdebug(4)
 		    {
 		      fprintf(stderr, "\n Call : using Precondition + Association to find formal parameter equal to %d \n", i);
-		      fprint_transformer(stderr,context, entity_local_name);
+		      fprint_transformer(stderr,context, (get_variable_name_t)entity_local_name);
 		    }
 		  for (egal = ps->egalites; egal != NULL; egal = egal1) 
 		    {
@@ -1119,14 +1120,14 @@ static bool top_down_adn_call_flt(call c)
 	      ifdebug(4) 
 		{	  
 		  fprintf(stderr, " \n The precondition before \n");
-		  fprint_transformer(stderr,prec, entity_local_name);
+		  fprint_transformer(stderr,prec, (get_variable_name_t)entity_local_name);
 		}
 	      // context = formal_and_actual_parameters_association(c,prec);
 	      context = formal_and_actual_parameters_association(c,transformer_dup(prec));
 	      ifdebug(4) 
 		{	  
 		  fprintf(stderr, " \n The precondition after \n");
-		  fprint_transformer(stderr,prec,entity_local_name);
+		  fprint_transformer(stderr,prec,(get_variable_name_t)entity_local_name);
 		}
 	    }
 	  else 

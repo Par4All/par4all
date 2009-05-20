@@ -87,7 +87,7 @@ static bool prepare_expansion(loop l)
 
     /* Update information about the nesting loops. */
     loop_dimensions = gen_append(loop_dimensions, CONS(DIMENSION, d, NIL));
-    loop_indices = gen_append(loop_indices, CONS(ENTITY, ie, NIL));
+    loop_indices = gen_append(loop_indices, CONS(EXPRESSION, ie, NIL));
     go_down = TRUE;
 
     ifdebug(9) {

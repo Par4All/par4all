@@ -2692,3 +2692,16 @@ expression make_expression_from_entity(entity an_entity)
   
 }
 
+list /* of expression */
+make_list_of_constant(
+    int val,    /* the constant value */
+    int number) /* the length of the created list */
+{
+    list l=NIL;
+
+    pips_assert("valid number", number>=0);
+    for(; number; number--)
+	l = CONS(EXPRESSION, int_to_expression(val), l);
+
+    return l;
+}

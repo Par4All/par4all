@@ -269,7 +269,7 @@ bool nest_parallelization(string module_name)
     return TRUE;
 }
 
-statement parallelization(list lls, bool (*loop_predicate) (/* ??? */))
+statement parallelization(list lls, bool (*loop_predicate) (bool unused/* ??? */))
 {
     statement s = statement_undefined;
 
@@ -516,7 +516,7 @@ statement loop_nest_parallelization(list lls)
     return s;
 }
 
-statement mark_loop_as_parallel(list lls)
+statement mark_loop_as_parallel(list lls, bool (*unused)(bool))
 {
     statement ls = STATEMENT(CAR(lls));
     execution_tag(loop_execution(statement_loop(ls))) = is_execution_parallel;
@@ -524,7 +524,7 @@ statement mark_loop_as_parallel(list lls)
     return ls;
 }
 
-bool nth_loop_p(statement ls)
+bool nth_loop_p(loop ls)
 {
     /* FI: this is *wrong* but should work for a demo :-( */
     static int count = 0;
@@ -618,7 +618,7 @@ bool carried_dependence_p(statement s)
     return FALSE;
 }
 
-int look_for_references_in_statement(statement s, statement (*reference_transformation) (/* ??? */), bool (*reference_predicate) (/* ??? */))
+int look_for_references_in_statement(statement s, reference (*reference_transformation) (reference), bool (*reference_predicate) (reference))
 {
     instruction inst = statement_instruction(s);
     int count = 0;
@@ -682,7 +682,7 @@ int look_for_references_in_statement(statement s, statement (*reference_transfor
     return count;
 }
 
-int look_for_references_in_expression(expression e, statement (*reference_transformation) (/* ??? */), bool (*reference_predicate) (/* ??? */))
+int look_for_references_in_expression(expression e, reference (*reference_transformation) (reference), bool (*reference_predicate) (reference))
 {
     syntax s = expression_syntax(e);
     int count = 0;
@@ -726,7 +726,7 @@ int look_for_references_in_expression(expression e, statement (*reference_transf
     return count;
 }
 
-int look_for_references_in_range(range r, statement (*reference_transformation) (/* ??? */), bool (*reference_predicate) (/* ??? */))
+int look_for_references_in_range(range r, reference (*reference_transformation) (reference), bool (*reference_predicate) (reference))
 {
     int count = 0;
     expression rl = range_lower(r);
@@ -744,7 +744,7 @@ int look_for_references_in_range(range r, statement (*reference_transformation) 
     return count;
 }
 
-int look_for_references_in_call(call c, statement (*reference_transformation) (/* ??? */), bool (*reference_predicate) (/* ??? */))
+int look_for_references_in_call(call c, reference (*reference_transformation) (reference), bool (*reference_predicate) (reference))
 {
     value vin;
     entity f;
