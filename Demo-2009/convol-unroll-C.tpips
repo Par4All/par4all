@@ -13,6 +13,11 @@ setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 
 setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
 
+# for scalarization
+#
+setproperty ARRAY_PRIV_FALSE_DEP_ONLY FALSE
+activate MUST_REGIONS
+
 activate C_PARSER
 
 # Show convolution function
@@ -90,7 +95,8 @@ display PRINTED_FILE
 
 # The code should be scalarized first...
 #
-shell echo missing scalarization
+apply SCALARIZATION
+display PRINTED_FILE
 
 # atomize
 #
@@ -99,9 +105,10 @@ display PRINTED_FILE
 # shell cp convol-unroll-C.database/convol/convol.pref convol08.c
 
 # Loop invariant code motion
+# SG: core dumps
 #
-apply INVARIANT_CODE_MOTION
-display PRINTED_FILE
+#apply INVARIANT_CODE_MOTION
+#display PRINTED_FILE
 # shell cp convol-unroll-C.database/convol/convol.pref convol09.c
 
 quit
