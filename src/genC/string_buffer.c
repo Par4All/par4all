@@ -94,3 +94,19 @@ void string_buffer_append_sb(string_buffer sb, string_buffer sb2)
 {
   STACK_MAP_X(s, string, string_buffer_append(sb, s), sb2->ins, 0);
 }
+
+#include <stdarg.h>
+
+/* append a NULL terminated list of string to sb.
+ */
+void string_buffer_cat(string_buffer sb, string next, ...)
+{
+  va_list args;
+  va_start(args, next);
+  while (next)
+  {
+    string_buffer_append(sb, next);
+    next = va_arg(args, string);
+  }
+  va_end(args);
+}
