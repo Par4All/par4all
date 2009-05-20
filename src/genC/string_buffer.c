@@ -57,6 +57,7 @@ string string_buffer_to_string(string_buffer sb)
   STACK_MAP_X(s, string, bufsize+=strlen(s), sb->ins, 0);
 
   buf = (char*) malloc(sizeof(char)*(bufsize+1));
+  message_assert("allocated", buf!=NULL);
   buf[current] = '\0';
 
   STACK_MAP_X(s, string,
