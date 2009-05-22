@@ -46,12 +46,12 @@ find_loop_from_label(statement s, entity label)
 } 
 
 static void
-peel_loop(statement original_loop, entity new_loop_bound)
+index_set_split_loop(statement original_loop, entity new_loop_bound)
 {
-    pips_assert("peel_loop called on a loop", statement_loop_p(original_loop));
+    pips_assert("index_set_split_loop called on a loop", statement_loop_p(original_loop));
     if(same_entity_p(new_loop_bound,loop_index(statement_loop(loop_statement))))
     {
-        pips_user_error("please set LOOP_PEELING_BOUND property to an entity that is not the loop bound\n");
+        pips_user_error("please set INDEX_SET_SPLITTING_BOUND property to an entity that is not the loop bound\n");
     }
 
     /* split the loop */
@@ -80,7 +80,7 @@ peel_loop(statement original_loop, entity new_loop_bound)
     }
 
     /* fix the bound */
-    bool peel_before_bound = get_bool_property("LOOP_PEELING_PEEL_BEFORE_BOUND");
+    bool index_set_split_before_bound = get_bool_property("INDEX_SET_SPLITTING_SPLIT_BEFORE_BOUND");
     expression increment = range_increment(loop_range(statement_loop(the_second_loop_statement)));
     expression new_loop_bound_expression = make_expression_from_entity(new_loop_bound);
     expression new_loop_bound_expression_with_xcrement = 
@@ -88,7 +88,7 @@ peel_loop(statement original_loop, entity new_loop_bound)
                 make_syntax_call(
                     make_call(
                         CreateIntrinsic(
-                            peel_before_bound?
+                            index_set_split_before_bound?
                             MINUS_OPERATOR_NAME:
                             PLUS_OPERATOR_NAME),
                         CONS(
@@ -105,11 +105,11 @@ peel_loop(statement original_loop, entity new_loop_bound)
                 normalized_undefined
                 );
 
-    expression fst_loop_upper = peel_before_bound ?
+    expression fst_loop_upper = index_set_split_before_bound ?
         new_loop_bound_expression_with_xcrement:
         new_loop_bound_expression;
         new_loop_bound_expression_with_xcrement;
-    expression snd_loop_lower = peel_before_bound ?
+    expression snd_loop_lower = index_set_split_before_bound ?
         new_loop_bound_expression:
         new_loop_bound_expression_with_xcrement;
 
@@ -133,7 +133,7 @@ peel_loop(statement original_loop, entity new_loop_bound)
 
 }
 
-bool loop_peeling(char* module_name)
+bool index_set_splitting(char* module_name)
 {
     /* prelude */
     set_current_module_entity(module_name_to_entity( module_name ));
@@ -152,10 +152,10 @@ bool loop_peeling(char* module_name)
         pips_user_error("no statement with label %s found\n",loop_label);
 
     /* get the bound */
-    string loop_bound = get_string_property("LOOP_PEELING_BOUND");
+    string loop_bound = get_string_property("INDEX_SET_SPLITTING_BOUND");
     entity loop_bound_entity = entity_undefined;
     if( string_undefined_p( loop_bound ) )
-        pips_user_error("please set LOOP_PEELING_BOUND property to a known entity\n");
+        pips_user_error("please set INDEX_SET_SPLITTING_BOUND property to a known entity\n");
     else {
         loop_bound_entity = FindEntity(module_name,loop_bound);
         if(entity_undefined_p(loop_bound_entity)) // maybe its a constant
@@ -173,7 +173,7 @@ bool loop_peeling(char* module_name)
             }
             else
             {
-                pips_user_error("please set LOOP_PEELING_BOUND property to a known entity\n");
+                pips_user_error("please set INDEX_SET_SPLITTING_BOUND property to a known entity\n");
             }
         }
     }
@@ -181,7 +181,7 @@ bool loop_peeling(char* module_name)
 
     /* perform substitution */
     if(statement_loop_p(loop_statement))
-        peel_loop(loop_statement,loop_bound_entity);
+        index_set_split_loop(loop_statement,loop_bound_entity);
 
     /* validate */
     module_reorder(get_current_module_statement());

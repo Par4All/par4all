@@ -5292,43 +5292,42 @@ Partial distribution distributes the statements of a loop nest except
 PARTIAL_DISTRIBUTION FALSE
 \end{PipsProp}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% LOOP PEELING
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Index Set Splitting
 
-\subsection{Index Set Splitting (a.k.a. Loop Peeling for the time being}
-\label{subsection-loop-peeling}
-\index{Loop Peeling}
+\subsection{Index Set Splitting}
+\label{subsection-index-set-splitting}
 \index{Index Set Splitting}
-%%@UserManualDocumentation: loop_peeling
-Index Set Splitting (Loop peeling) splits the loop referenced by
+%%@UserManualDocumentation: index_set_splitting
+Index Set Splitting  splits the loop referenced by
 property \lstinline|LOOP_LABEL| into two loops.  The
 first loop ends at an iteration designated by property
-\lstinline|LOOP_PEELING_BOUND| and the second start therafter.  It
+\lstinline|INDEX_SET_SPLITTING_BOUND| and the second start therafter.  It
 currently only works for do loops.  This transformation is always
-legal. It is currently called loop peeling by mistake. But loop
+legal. Index set
 splitting in combination with loop unrolling could be used to perform
 loop peeling.
 %%!UserManualDocumentation
 \begin{PipsMake}
-alias loop_peeling 'Loop peeling'
-loop_peeling      > MODULE.code
+alias index_set_splitting 'Index Set Splitting'
+index_set_splitting      > MODULE.code
         > PROGRAM.entities
         < PROGRAM.entities
         < MODULE.code
 \end{PipsMake}
 
 
-Loop peeling \emph{requires} the following globals to be set :
+Index Set Splitting \emph{requires} the following globals to be set :
 \begin{itemize}
     \item \lstinline|LOOP_LABEL| is the loop label
-    \item \lstinline|LOOP_PEELING_BOUND| is the splitting bound
+    \item \lstinline|INDEX_SET_SPLITTING_BOUND| is the splitting bound
 \begin{PipsProp}
-LOOP_PEELING_BOUND ""
+INDEX_SET_SPLITTING_BOUND ""
 \end{PipsProp}
 \end{itemize}
 
-Additionnaly, \lstinline|LOOP_PEELING_PEEL_BEFORE_BOUND| can be used to accurately tell to peel the loop before or after the bound given in \lstinline|LOOP_PEELING_BOUND|
+Additionnaly, \lstinline|INDEX_SET_SPLITTING_SPLIT_BEFORE_BOUND| can be used to accurately tell to peel the loop before or after the bound given in \lstinline|INDEX_SET_SPLITTING_BOUND|
 \begin{PipsProp}
-LOOP_PEELING_PEEL_BEFORE_BOUND FALSE
+INDEX_SET_SPLITTING_SPLIT_BEFORE_BOUND FALSE
 \end{PipsProp}
 
 

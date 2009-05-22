@@ -31,7 +31,7 @@ LIB_CFILES =	replace.c \
 		internalize_parallel_code.c \
 		inlining.c \
 		expression_substitution.c \
-		loop_peeling.c \
+		index_set_splitting.c \
 		for_loop_recovering.c \
 		scalarization.c
 
