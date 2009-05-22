@@ -20,9 +20,12 @@ apply UNFOLDING[flgr_get_array_fgUINT16]
 apply INLINING[flgr_set_data_array_vector_fgUINT16]
 apply INLINING[flgr_get_array_fgUINT16]
 apply INLINING[flgr_set_array_fgUINT16]
+apply INLINING_SIMPLE[flgr2d_get_neighborhood_fgUINT16]
+apply INLINING[flgr2d_get_data_array_fgUINT16]
+apply INLINING_SIMPLE[flgr_get_data_array_vector_fgUINT16]
 display PRINTED_FILE[flgr2d_raster_slide_window_fgUINT16]
-#apply UNFOLDING[flgr2d_get_neighborhood_fgUINT16]
-#display PRINTED_FILE[flgr2d_get_neighborhood_fgUINT16]
+#apply PARTIAL_EVAL[flgr2d_raster_slide_window_fgUINT16]
+#display PRINTED_FILE[flgr2d_raster_slide_window_fgUINT16]
 
 
 quit

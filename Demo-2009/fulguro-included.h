@@ -758,6 +758,19 @@
     flgr_set_array_##dtype(pdest,k,arithop(a1,a2));	\
   }							\
   return
+
+  fgUINT16 flgr2d_get_data_array_fgUINT16(fgUINT16** array, int row, int col) {
+    return flgr_get_array_fgUINT16(array[row],col);
+  }
+  void flgr_get_data_array_vector_fgUINT16(fgUINT16 *vector_array, fgUINT16 *data_array, int spp, int pos) {
+    register fgUINT16 val;
+    register int i,k;
+
+    for(k=0,i=pos*spp ; k<spp ; k++,i++) {
+      val = flgr_get_array_fgUINT16(data_array,i);
+      flgr_set_array_fgUINT16(vector_array,k,val);
+    }
+  }
   fgUINT16 flgr_get_array_fgUINT16(fgUINT16* array, int pos) {
     return array[pos];
   }
