@@ -5298,7 +5298,7 @@ PARTIAL_DISTRIBUTION FALSE
 \label{subsection-index-set-splitting}
 \index{Index Set Splitting}
 %%@UserManualDocumentation: index_set_splitting
-Index Set Splitting  splits the loop referenced by
+Index Set Splitting~\cite{rieblFL00}  splits the loop referenced by
 property \lstinline|LOOP_LABEL| into two loops.  The
 first loop ends at an iteration designated by property
 \lstinline|INDEX_SET_SPLITTING_BOUND| and the second start therafter.  It
@@ -5325,7 +5325,7 @@ INDEX_SET_SPLITTING_BOUND ""
 \end{PipsProp}
 \end{itemize}
 
-Additionnaly, \lstinline|INDEX_SET_SPLITTING_SPLIT_BEFORE_BOUND| can be used to accurately tell to peel the loop before or after the bound given in \lstinline|INDEX_SET_SPLITTING_BOUND|
+Additionnaly, \lstinline|INDEX_SET_SPLITTING_SPLIT_BEFORE_BOUND| can be used to accurately tell to split the loop before or after the bound given in \lstinline|INDEX_SET_SPLITTING_BOUND|
 \begin{PipsProp}
 INDEX_SET_SPLITTING_SPLIT_BEFORE_BOUND FALSE
 \end{PipsProp}
@@ -6458,19 +6458,13 @@ EOLE_OPTIMIZATION_STRATEGY "P2SC"
 \index{INLINING\_CALLERS}
 
 %%@UserManualDocumentation: inlining
-This documentation is a work in progress, as well as the documented topic.
-
-
 Inlining is a well known technique.  Basically it replaces a function
 call by the function body.  Current implementation does not work if
 the function has static declarations, access global variables \dots.
 Actually it (seems to) work(s) for pure, non-recursive functions \dots
 and not for any kind of call.  
 
-It should be followed by a call to \verb+UNSPAGHETTIFY+ and
-\verb+SUPPRESS_DEAD_CODE+.
-
-Property \verb/INLINING_CALLERS/ can be set to define the list of
+Property \lstinline|INLINING_CALLERS| can be set to define the list of
 functions where the call sites have to be inlined. By default, all
 call sites of the inlined function are inlined.
 %%!UserManualDocumentation
@@ -6485,9 +6479,22 @@ inlining      > CALLERS.parsed_code
         < MODULE.callers
 \end{PipsMake}
 
+%%@UserManualDocumentation: inlining_simple
+Same as inlining but always simulate the by copy passing
+%%!UserManualDocumentation
+\begin{PipsMake}
+inlining_simple      > CALLERS.parsed_code
+        < PROGRAM.entities
+        < CALLERS.code
+        < CALLERS.printed_file
+		< MODULE.code
+        < MODULE.callers
+\end{PipsMake}
+
 
 The default behavior of inlining is to inline the given module in \textbf{all} call sites.
-Use this property to filter the call sites: only given module names will be considered
+Use \lstinline|INLINING_CALLERS| property to filter the call sites: only given module names will be considered.
+Use \lstinline|INLINING_PURGE_LABELS| to clean useless labels after inlining.
 \begin{PipsProp}
 INLINING_CALLERS ""
 INLINING_PURGE_LABELS TRUE
@@ -6499,14 +6506,8 @@ INLINING_PURGE_LABELS TRUE
 \label{subsection-unfolding}
 
 %%@UserManualDocumentation: unfolding
-This documentation is a work in progress, as well as the documented topic.
-
-
 Unfolding is a complementary transformation of inlining~\ref{subsection-inlining}.
-While inlining inlines all calls to a module in other modules, unfolding inline all calls in a module.
-Thus unfolding the content of the module.
-
-
+While inlining inlines all calls to a module in other modules, unfolding inline all calls in a module, thus unfolding the content of the module.
 %%!UserManualDocumentation
 \begin{PipsMake}
 
@@ -6515,6 +6516,17 @@ unfolding      > MODULE.parsed_code
         < MODULE.code
         < MODULE.printed_file
         < MODULE.cumulated_effects
+        < CALLERS.code
+\end{PipsMake}
+%%@UserManualDocumentation: unfolding_simple
+same as unfolding but always simulate the by copy passing
+%%!UserManualDocumentation
+\begin{PipsMake}
+
+unfolding_simple      > MODULE.parsed_code
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.printed_file
         < CALLERS.code
 \end{PipsMake}
 
@@ -10471,6 +10483,10 @@ statique et dynamique de la complexité des programmes
 scientifiques},
 Thèse de doctorat de l'Université Pierre et Marie Curie, 
 14 Septembre 1994, technical report A/255.
+
+  \bibitem{rieblFL00} Martin Griebl, Paul Feautrier and Christian Lengauer
+{\em Index Set Splitting},
+International Journal of Parallel Programming, 2000.
 
 \end{thebibliography}
 

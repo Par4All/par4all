@@ -214,7 +214,8 @@ make_new_scalar_variable_with_prefix(string prefix,
     if (empty_prefix) {
       /* Use a default type-dependent variable name since the programmer
 	 gave none: */
-      switch(basic_tag(b)) {
+		basic ub = basic_ultimate(b);
+      switch(basic_tag(ub)) {
       case is_basic_int:
 	asprintf(&variable_name,  format, DEFAULT_INT_PREFIX,
 		unique_integer_number++);
@@ -242,7 +243,7 @@ make_new_scalar_variable_with_prefix(string prefix,
       default:
 	pips_error("make_new_scalar_variable_with_prefix",
 		   "unknown basic tag: %d\n",
-		   basic_tag(b));
+		   basic_tag(ub));
 	break;
       }
     }

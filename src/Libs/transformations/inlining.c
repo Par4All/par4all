@@ -26,12 +26,15 @@
 #include "preprocessor.h"
 #include "text-util.h"
 #include "transformations.h"
+#include "parser_private.h"
+#include "syntax.h"
 
 
 static entity       inlined_module;
 static statement    inlined_module_statement;
 static statement    laststmt;
 static entity       returned_entity;
+static bool 		use_effects;
 
 
 /* replace return instruction by a goto
@@ -91,19 +94,19 @@ bool inline_should_inline(call callee)
 static effect
 find_effect_on_entity(statement s, entity e)
 {
-    list cummulated_effects = load_cumulated_rw_effects_list( s );
-    effect found = effect_undefined;
-    MAP(EFFECT, eff,
-    {
-        reference r = effect_any_reference(eff);
-        entity re = reference_variable(r);
-        if( same_entity_name_p(e,re) )
-        {
-           cell c = effect_cell(eff);
-           found = (reference_indices( cell_preference_p(c) ? preference_reference(cell_preference(c)) : cell_reference(c) ) == NIL) ? eff :found ;
-        }
-    }, cummulated_effects);
-    return found;
+	effect found = effect_undefined;
+	list cummulated_effects = load_cumulated_rw_effects_list( s );
+	FOREACH(EFFECT, eff,cummulated_effects)
+	{
+		reference r = effect_any_reference(eff);
+		entity re = reference_variable(r);
+		if( same_entity_name_p(e,re) )
+		{
+			cell c = effect_cell(eff);
+			found = (reference_indices( cell_preference_p(c) ? preference_reference(cell_preference(c)) : cell_reference(c) ) == NIL) ? eff :found ;
+		}
+	}
+	return found;
 }
 
 struct entity_pair
@@ -243,7 +246,7 @@ entity make_temporary_array_entity(entity efrom, expression from)
 				dynamic_area,
 				add_any_variable_to_area(dynamic_area,new, fortran_module_p(get_current_module_entity())),                     
 				NIL));
-	entity_initial(new) = make_value_expression(make_expression(make_syntax_cast(make_cast(make_type_variable(make_variable(pointers,NIL,NIL)),(from))),normalized_undefined));
+	entity_initial(new) = make_value_expression(make_expression(make_syntax_cast(make_cast(make_type_variable(make_variable(pointers,NIL,NIL)),from)),normalized_undefined));
 	AddLocalEntityToDeclarations(new, get_current_module_entity(),
 			c_module_p(get_current_module_entity())?get_current_module_statement():statement_undefined);
 	return new;
@@ -382,8 +385,7 @@ instruction inline_expression_call(expression modified_expression, call callee)
 
     /* this is the only I found to recover the inlined entities' declaration */
     list iter = code_declarations(inlined_code); 
-    while( !ENTITY_NAME_P( ENTITY(CAR(iter)), DYNAMIC_AREA_LOCAL_NAME ) ) POP(iter);
-    POP(iter);/*pop the dynamic area label*/
+    while( area_entity_p(ENTITY(CAR(iter))) ) POP(iter);
     if( !ENDP(iter) && ENTITY_NAME_P( ENTITY(CAR(iter)), entity_user_name(inlined_module) ) )
             POP(iter); /* pop the first flag if needed */
 
@@ -393,25 +395,28 @@ instruction inline_expression_call(expression modified_expression, call callee)
         entity e = ENTITY(CAR(iter));
         expression from = EXPRESSION(CAR(c_iter));
 
-        /* check if there is a write effect on this parameter */
-        effect eff = find_effect_on_entity(inlined_module_statement,e);
         bool need_copy = true;
-        if(  ! effect_undefined_p(eff) )
-        {
-            /* skip if expression is complicated
-             * it could handle the & or * operator, but some extra parenthesis would be needed
-             * just as they are needed when writing macro functions in fact
-             */
-            if( expression_constant_p(from) || expression_reference_p(from))
-            {
-                action a = effect_action(eff);
-                need_copy= action_write_p(a);
-            }
-        }
-        else
-        {
-            need_copy =false;
-        }
+        /* check if there is a write effect on this parameter */
+		if( use_effects )
+		{
+			effect eff = find_effect_on_entity(inlined_module_statement,e);
+			if(  ! effect_undefined_p(eff) )
+			{
+				/* skip if expression is complicated
+				 * it could handle the & or * operator, but some extra parenthesis would be needed
+				 * just as they are needed when writing macro functions in fact
+				 */
+				if( expression_constant_p(from) || expression_reference_p(from))
+				{
+					action a = effect_action(eff);
+					need_copy= action_write_p(a);
+				}
+			}
+			else
+			{
+				need_copy =false;
+			}
+		}
         entity new = entity_undefined;
         /* generate a copy for this parameter */
         if(need_copy)
@@ -454,6 +459,7 @@ instruction inline_expression_call(expression modified_expression, call callee)
         else
         {
             /* get new reference */
+reget:
             switch(syntax_tag(expression_syntax(from)))
             {
                 case is_syntax_reference:
@@ -485,6 +491,24 @@ instruction inline_expression_call(expression modified_expression, call callee)
                     else
 						new = make_temporary_scalar_entity(e,from);
                     break;
+#if 0
+				case is_syntax_subscript:
+					/* need a temporary variable */
+					{
+						if( ENDP(variable_dimensions(type_variable(entity_type(e)))) )
+							new = make_temporary_scalar_entity(e,from);
+						else
+						{
+							new = make_temporary_array_entity(e,from);
+						}
+
+					} break;
+#endif
+
+				case is_syntax_cast:
+					pips_user_warning("ignoring cast\n");
+					from = cast_expression(syntax_cast(expression_syntax(from)));
+					goto reget;
                 default:
                     pips_internal_error("unhandled tag %d\n", syntax_tag(expression_syntax(from)) );
             };
@@ -703,15 +727,15 @@ recompile_module(char* module)
 /* this should inline all calls to module `module_name'
  * in calling modules, if possible ...
  */
-bool
-inlining(char * module_name)
+static
+bool do_inlining(char * module_name)
 {
    /* Get the module ressource */
    inlined_module = module_name_to_entity( module_name );
    inlined_module_statement = 
        (statement) db_get_memory_resource(DBR_CODE, module_name, TRUE);
 
-   set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS,module_name,TRUE));
+   if(use_effects) set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS,module_name,TRUE));
 
    /* check them */
    pips_assert("is a functionnal",entity_function_p(inlined_module) || entity_subroutine_p(inlined_module) );
@@ -742,7 +766,7 @@ inlining(char * module_name)
        recompile_module(caller_name);
    }
 
-   reset_cumulated_rw_effects();
+   if(use_effects) reset_cumulated_rw_effects();
    inlined_module = entity_undefined;
    inlined_module_statement = statement_undefined;
 
@@ -751,6 +775,18 @@ inlining(char * module_name)
    /* Should have worked: */
    return TRUE;
 }
+
+bool inlining(char *module_name)
+{
+	use_effects=true;
+	return do_inlining(module_name);
+}
+bool inlining_simple(char *module_name)
+{
+	use_effects=false;
+	return do_inlining(module_name);
+}
+
 
 
 
@@ -790,7 +826,7 @@ run_inlining(string caller_name, string module_name)
     inlined_module = module_name_to_entity( module_name );
     inlined_module_statement = 
         (statement) db_get_memory_resource(DBR_CODE, module_name, TRUE);
-    set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS,module_name,TRUE));
+    if(use_effects) set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS,module_name,TRUE));
 
     /* check them */
     pips_assert("is a functionnal",entity_function_p(inlined_module) || entity_subroutine_p(inlined_module) );
@@ -798,7 +834,7 @@ run_inlining(string caller_name, string module_name)
 
     /* inline call */
     inline_calls( caller_name );
-    reset_cumulated_rw_effects();
+    if(use_effects) reset_cumulated_rw_effects();
     inlined_module = entity_undefined;
     inlined_module_statement=statement_undefined;
 }
@@ -807,8 +843,8 @@ run_inlining(string caller_name, string module_name)
  * it does not works recursievly, so multiple pass may be needed
  * returns true if at least one function has been inlined
  */
-bool
-unfolding(char* module_name)
+static
+bool do_unfolding(char* module_name)
 {
     /* Get the module ressource */
     entity unfolded_module = module_name_to_entity( module_name );
@@ -871,6 +907,17 @@ unfolding(char* module_name)
 
     debug_off();
     return true;
+}
+
+bool unfolding(char* module_name)
+{
+	use_effects=true;
+	return do_unfolding(module_name);
+}
+bool unfolding_simple(char* module_name)
+{
+	use_effects=false;
+	return do_unfolding(module_name);
 }
 
 
