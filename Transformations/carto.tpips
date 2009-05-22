@@ -18,18 +18,18 @@ module carto
 display PRINTED_FILE
 
 echo
-echo Code after first loop peelings
+echo Code after first index set splitting
 echo
 
 setproperty LOOP_LABEL "l3"
-setproperty LOOP_PEELING_BOUND		"j" 
-setproperty LOOP_PEELING_PEEL_BEFORE_BOUND TRUE
-apply LOOP_PEELING
+setproperty INDEX_SET_SPLITTING_BOUND		"j" 
+setproperty INDEX_SET_SPLITTING_SPLIT_BEFORE_BOUND TRUE
+apply INDEX_SET_SPLITTING
 display PRINTED_FILE
 
 setproperty LOOP_LABEL "l99999"
-setproperty LOOP_PEELING_PEEL_BEFORE_BOUND FALSE
-apply LOOP_PEELING
+setproperty INDEX_SET_SPLITTING_SPLIT_BEFORE_BOUND FALSE
+apply INDEX_SET_SPLITTING
 
 display PRINTED_FILE
 
@@ -41,18 +41,18 @@ apply SUPPRESS_DEAD_CODE
 display PRINTED_FILE
 
 echo
-echo Code after first loop peelings
+echo Code after second  index set splitting
 echo
 
 setproperty LOOP_LABEL "l2"
-setproperty LOOP_PEELING_BOUND		"i" 
-setproperty LOOP_PEELING_PEEL_BEFORE_BOUND TRUE
-apply LOOP_PEELING
+setproperty INDEX_SET_SPLITTING_BOUND		"i" 
+setproperty INDEX_SET_SPLITTING_SPLIT_BEFORE_BOUND TRUE
+apply INDEX_SET_SPLITTING
 display PRINTED_FILE
 
-setproperty LOOP_LABEL "l99997"
-setproperty LOOP_PEELING_PEEL_BEFORE_BOUND FALSE
-apply LOOP_PEELING
+setproperty LOOP_LABEL "l99995"
+setproperty INDEX_SET_SPLITTING_SPLIT_BEFORE_BOUND FALSE
+apply INDEX_SET_SPLITTING
 
 display PRINTED_FILE
 
