@@ -13,6 +13,9 @@ setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
 
 activate C_PARSER
 
+display PRINTED_FILE[flgr2d_convolution]
+apply INLINING_SIMPLE[flgr2d_convolution_fgUINT16]
+display PRINTED_FILE[flgr2d_convolution]
 display PRINTED_FILE[flgr2d_raster_slide_window_fgUINT16]
 
 #set PREPROCESSOR_MISSING_FILE_HANDLING "generate"

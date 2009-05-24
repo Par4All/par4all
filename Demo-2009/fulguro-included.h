@@ -1758,7 +1758,7 @@ FLGR_Ret flgr2d_convolution(FLGR_Data2D *datdest, FLGR_Data2D *datsrc, FLGR_Data
   if((ret=flgr2d_is_data_same_attributes(datdest,datsrc,__FUNCTION__)) != FLGR_RET_OK) return ret;
 
   if(datdest->type==FLGR_UINT16) {
-    flgr2d_convolution_fgUINT16(flgr2d_convolution,datdest,datsrc,nhb);
+    flgr2d_convolution_fgUINT16(datdest,datsrc,nhb);
   }									\
   //FLGR_DISPATCH_PROCEDURE(datdest->type,flgr2d_convolution,datdest,datsrc,nhb);
 
