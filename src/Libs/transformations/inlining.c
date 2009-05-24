@@ -390,6 +390,8 @@ instruction inline_expression_call(expression modified_expression, call callee)
             POP(iter); /* pop the first flag if needed */
 
     list c_iter = call_arguments(callee);
+	size_t n1 = gen_length(iter), n2 = gen_length(c_iter);
+	pips_assert("function call has enough arguments",n1 >= n2);
     for( ; !ENDP(c_iter); POP(iter),POP(c_iter) )
     {
         entity e = ENTITY(CAR(iter));
@@ -621,6 +623,8 @@ void inline_statement_switcher(statement stmt)
                     //free_instruction(*ins);
                     *ins=make_instruction_sequence( make_sequence( gen_nreverse(new_instructions) ) );
                     statement_number(stmt)=STATEMENT_NUMBER_UNDEFINED;
+					if(!empty_comments_p(statement_comments(stmt))) free(statement_comments(stmt));
+                    statement_comments(stmt)=empty_comments;
                 }
             }
             break;
