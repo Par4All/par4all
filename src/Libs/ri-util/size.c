@@ -611,6 +611,17 @@ entity e1, e2;
 
     if(a1!=a2) return FALSE;
 
+    /* Can we have and check static aliasing in a1? */
+    if(stack_area_p(a1))
+      return FALSE;
+
+    if(heap_area_p(a1))
+      return FALSE;
+
+    /* Let's assume we are dealing with Fortran code, but another test
+       should be added about the current module language. No test on
+       dynamic aliasing since we are dealing here with direct read and
+       write effects. */
     o1 = ram_offset(r1);
     o2 = ram_offset(r2);
 
