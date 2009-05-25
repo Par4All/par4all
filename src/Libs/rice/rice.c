@@ -46,10 +46,9 @@ statement (*codegen_fun)(statement, graph, set, int, bool);
     gen_free_list( blocs );
 }
 
-statement rice_statement(stat,l,codegen_fun)
-statement stat;
-int l ;
-statement (*codegen_fun)(statement, graph, set, int, bool);
+statement rice_statement(statement stat, 
+			 int l, 
+			 statement (*codegen_fun)(statement, graph, set, int, bool))
 {
     instruction istat = statement_instruction(stat);
     statement new_stat = stat; // Most statements are modified by side effects
@@ -100,11 +99,10 @@ statement (*codegen_fun)(statement, graph, set, int, bool);
     return(new_stat);
 }
 
-statement 
-rice_loop(statement stat, 
-	  int l,
-	  statement (*codegen_fun)(statement, graph, set, int, bool)
-	  )
+statement rice_loop(statement stat, 
+		    int l,
+		    statement (*codegen_fun)(statement, graph, set, int, bool)
+		    )
 {
   statement nstat;
   instruction istat = statement_instruction(stat);

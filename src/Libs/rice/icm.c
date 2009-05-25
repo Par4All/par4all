@@ -1338,16 +1338,17 @@ void drop_dummy_loops(statement s)
 
 /*
  * Simplify the dependance graph and regenerate the code.
+ *
+ * Using the algorithm described in Chapter xxx of Julien Zory's PhD?
  */
-statement
-icm_codegen(statement stat, 
-	    graph g, 
-	    set /* of statement */ region, 
-	    int level, 
-	    bool task_parallelize_p)
+statement icm_codegen(statement stat, 
+		      graph g, 
+		      set /* of statement */ region, 
+		      int level, 
+		      bool task_parallelize_p)
 {
     statement result = statement_undefined;
-    graph simplyfied_graph = graph_undefined;
+    graph simplified_graph = graph_undefined;
 
     reference_level = level;
 
@@ -1377,7 +1378,7 @@ icm_codegen(statement stat,
 
     /* Simplify the dependance graph */
 
-    simplyfied_graph = copy_graph(g);
+    simplified_graph = copy_graph(g);
 
     /* Definir le mapping entre les vertex originaux et les vertex copies */
 
@@ -1385,12 +1386,12 @@ icm_codegen(statement stat,
 	fprintf(stderr, "Original graph:\n");
 	prettyprint_dependence_graph(stderr, 
 				     statement_undefined, 
-				     simplyfied_graph);    
+				     simplified_graph);    
     }
 
     invariant_entities = set_make(set_pointer);
 
-    simplyfied_graph = SimplifyGraph(simplyfied_graph, 
+    simplified_graph = SimplifyGraph(simplified_graph, 
 				     region, 
 				     level,
 				     NB_SIMPLIFY_PASSES);
@@ -1401,7 +1402,7 @@ icm_codegen(statement stat,
 	fprintf(stderr, "Simplified graph:\n");
 	prettyprint_dependence_graph(stderr, 
 				     statement_undefined, 
-				     simplyfied_graph);    
+				     simplified_graph);    
     }
 
     close_has_level();
@@ -1416,11 +1417,11 @@ icm_codegen(statement stat,
     /* Generate the code (CodeGenerate don't use the first
        parameter...) */
     result =  CodeGenerate(/* big hack */ statement_undefined,
-			   simplyfied_graph, 
+			   simplified_graph, 
 			   region, 
 			   level, 
 			   task_parallelize_p); 
-    free_graph(simplyfied_graph);
+    free_graph(simplified_graph);
 
     ifdebug(4) {
 	printf("\nIntermediate code:\n");
@@ -1457,6 +1458,8 @@ invariant_code_motion(string module_name)
 
     mod_stat = get_current_module_statement();
     
+    set_ordering_to_statement(mod_stat);
+
     current_module_name = module_name;
 
     debug_on("ICM_DEBUG_LEVEL");
@@ -1491,6 +1494,7 @@ invariant_code_motion(string module_name)
 	    fprintf(stderr," gen consistent ");
     }
 
+    // Uselessly reinitialize ordering_to_statement, even if it not set...
     module_reorder(mod_stat);
 
     DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, mod_stat);
@@ -1498,6 +1502,7 @@ invariant_code_motion(string module_name)
     dg = graph_undefined;
     reset_current_module_statement();
     reset_current_module_entity();
+    reset_ordering_to_statement();
 
     debug_off();
     return TRUE;

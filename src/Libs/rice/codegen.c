@@ -359,15 +359,21 @@ statement MakeNestOfStatementList(int l, int nbl,list *lst, list loops, list * b
     return(stat);
 }
 
-/* this function implements Kennedy's algorithm. */
-/* bb: task_parallelize_p is TRUE when we want to parallelize the loop,
-FALSE when we only want to vectorize it */
-statement CodeGenerate(stat, g, region, l, task_parallelize_p)
-statement stat; /* Not used in this function */
-graph g;
-set region;
-int l;
-bool task_parallelize_p;
+/* This function implements Allen & Kennedy's algorithm.
+ *
+ * BB (Bruno Baron): task_parallelize_p is TRUE when we want to
+ * parallelize the loop, FALSE when we only want to vectorize
+ * it. Probably called by "rice_cray", but there is no explicit
+ * information about the vectorization facility in PIPS.
+ *
+ * This function is also used to perform loop invariant code motion
+ * (Julien Zory).
+ */
+statement CodeGenerate(statement __attribute__ ((unused)) stat,
+		       graph g,
+		       set region,
+		       int l,
+		       bool task_parallelize_p)
 {
   list lst =NIL;
   cons *lsccs, *ps;
