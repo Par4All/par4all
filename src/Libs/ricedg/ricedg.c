@@ -221,6 +221,8 @@ char *mod_name;
 	db_get_memory_resource(DBR_CODE, mod_name, TRUE) );
     mod_stat = get_current_module_statement();
    
+    /* FI: set should be used, and reset should be performed later. */
+    //set_ordering_to_statement(mod_stat);
     initialize_ordering_to_statement(mod_stat);
 
     chains = (graph)
@@ -370,6 +372,7 @@ char *mod_name;
     reset_precondition_map();
     reset_cumulated_rw_effects();
     clean_enclosing_loops();
+    reset_ordering_to_statement();
 
     return TRUE;
 }
