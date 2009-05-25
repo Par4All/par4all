@@ -107,14 +107,17 @@ rinitialize_ordering_to_statement(hash_table ots, statement s) {
 }
 
 
-static hash_table
-set_ordering_to_statement(statement s)
+/* To be used instead of initialize_ordering_to_statement() to make
+   sure that the hash table ots is in sync with the current module. */
+hash_table set_ordering_to_statement(statement s)
 {
     hash_table ots =  hash_table_make(hash_int, 0);
     rinitialize_ordering_to_statement(ots, s);
+    OrderingToStatement = ots;
     return ots;
 }
 
+/* To be phased out. */
 void 
 initialize_ordering_to_statement(statement s)
 {
