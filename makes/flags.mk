@@ -17,4 +17,4 @@ LDFLAGS += \
 	-L$(NEWGEN_ROOT)/lib/$(ARCH) \
 	-L$(LINEAR_ROOT)/lib/$(ARCH) \
 	-L$(EXTERN_ROOT)/lib/$(ARCH) \
-	-L$(NEWGEN_DOOM_LIBS)
+	$(NEWGEN_DOOM_LIBS)
