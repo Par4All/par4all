@@ -61,13 +61,12 @@ symbolic_constant_entity_p(entity e)
 */
 void
 AddEntityToDeclarations(entity e, entity module) {
-  /* Add the variable to the module declarations: */
-  list l = code_declarations(EntityCode(module));
-  /* Add the declaration only if not already here: */
-  if (gen_chunk_undefined_p(gen_find_eq(e,l)))
-    code_declarations(EntityCode(module)) = CONS(ENTITY, e, l);
+	/* Add the variable to the module declarations: */
+	list l = code_declarations(EntityCode(module));
+	/* Add the declaration only if not already here: */
+	if (gen_chunk_undefined_p(gen_find_eq(e,l)))
+		code_declarations(EntityCode(module)) = CONS(ENTITY, e, l);
 }
-
 
 /**
  Add the variable entity e to the list of variables of the function
@@ -84,17 +83,31 @@ AddEntityToDeclarations(entity e, entity module) {
  */
 void
 AddLocalEntityToDeclarations(entity e, entity module, statement s) {
-  AddEntityToDeclarations(e, module);
+	/* SG: fix the entity storage if undefined
+	 * it basically recompute the offset of a sclar variable
+	 * I have not found how to do it for a variable size array, so I just dropped the case
+	 */
+	if( storage_undefined_p(entity_storage(e)) && entity_variable_p(e) && entity_scalar_p(e) )
+	{
+		entity dynamic_area = global_name_to_entity(module_local_name(module),DYNAMIC_AREA_LOCAL_NAME);
+		entity_storage(e) = make_storage_ram(
+				make_ram(module,
+					dynamic_area,
+					CurrentOffsetOfArea(dynamic_area, e),
+					NIL)
+				);
+	}
+	AddEntityToDeclarations(e, module);
 
-  if (c_module_p(module)
-      /* A compilation does not have statements */
-      && !compilation_unit_entity_p(module)) {
-    /* In C the variable are local to a statement, so add : */
-    pips_assert("Calling AddLocalEntityToDeclarations from c_module with valid statement", !statement_undefined_p(s) );
-    list l = statement_declarations(s);
-    if (gen_chunk_undefined_p(gen_find_eq(e,l)))
-      statement_declarations(s) = CONS(ENTITY,e,l);
-  }
+	if (c_module_p(module)
+			/* A compilation does not have statements */
+			&& !compilation_unit_entity_p(module)) {
+		/* In C the variable are local to a statement, so add : */
+		pips_assert("Calling AddLocalEntityToDeclarations from c_module with valid statement", !statement_undefined_p(s) );
+		list l = statement_declarations(s);
+		if (gen_chunk_undefined_p(gen_find_eq(e,l)))
+			statement_declarations(s) = CONS(ENTITY,e,l);
+	}
 }
 
 

@@ -239,13 +239,6 @@ entity make_temporary_array_entity(entity efrom, expression from)
 			get_current_module_entity(),
 			pointers
 			);
-	entity dynamic_area =
-		global_name_to_entity(module_local_name(get_current_module_entity()),DYNAMIC_AREA_LOCAL_NAME);
-	entity_storage(new) = make_storage_ram(
-			make_ram(get_current_module_entity(),
-				dynamic_area,
-				add_any_variable_to_area(dynamic_area,new, fortran_module_p(get_current_module_entity())),                     
-				NIL));
 	entity_initial(new) = make_value_expression(make_expression(make_syntax_cast(make_cast(make_type_variable(make_variable(pointers,NIL,NIL)),from)),normalized_undefined));
 	AddLocalEntityToDeclarations(new, get_current_module_entity(),
 			c_module_p(get_current_module_entity())?get_current_module_statement():statement_undefined);
@@ -258,13 +251,6 @@ entity make_temporary_scalar_entity(entity efrom, expression from)
 			get_current_module_entity(),
 			copy_basic(variable_basic(type_variable(entity_type(efrom))))
 			);
-	entity dynamic_area =
-		global_name_to_entity(module_local_name(get_current_module_entity()),DYNAMIC_AREA_LOCAL_NAME);
-	entity_storage(new) = make_storage_ram(
-			make_ram(get_current_module_entity(),
-				dynamic_area,
-				add_any_variable_to_area(dynamic_area,new, fortran_module_p(get_current_module_entity())),                     
-				NIL));
 	entity_initial(new) = make_value_expression(from);
 	AddLocalEntityToDeclarations(new, get_current_module_entity(),
 			c_module_p(get_current_module_entity())?get_current_module_statement():statement_undefined);
@@ -354,13 +340,6 @@ instruction inline_expression_call(expression modified_expression, call callee)
                     get_current_module_entity(),
                     copy_basic(variable_basic(type_variable(treturn)))
             );
-            entity dynamic_area =
-                global_name_to_entity(module_local_name(get_current_module_entity()),DYNAMIC_AREA_LOCAL_NAME);
-            entity_storage(returned_entity) = make_storage_ram(
-                    make_ram(get_current_module_entity(),
-                       dynamic_area,
-                      add_any_variable_to_area(dynamic_area,returned_entity, fortran_module_p(get_current_module_entity())),
-                     NIL)); 
             AddLocalEntityToDeclarations(returned_entity, get_current_module_entity(),
                     c_module_p(get_current_module_entity())?get_current_module_statement():statement_undefined);
 
@@ -443,7 +422,7 @@ instruction inline_expression_call(expression modified_expression, call callee)
                     make_ram(
                         get_current_module_entity(),
                         dynamic_area,
-                        add_any_variable_to_area(dynamic_area,new, fortran_module_p(get_current_module_entity())),
+						CurrentOffsetOfArea(dynamic_area, new),
                         NIL)
             );
 

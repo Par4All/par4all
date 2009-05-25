@@ -838,7 +838,6 @@ static entity make_new_simd_vector(int itemSize, int nbItems, int basicTag)
          num[1 + sizeof(VECTOR_POSTFIX) + 3 ],
          name[sizeof(prefix)+sizeof(num)+1];
     static int number = 0;
-    entity dynamic_area;
 
     mod_ent = get_current_module_entity();
 
@@ -884,13 +883,6 @@ static entity make_new_simd_vector(int itemSize, int nbItems, int basicTag)
     entity str_dec = FindOrCreateEntity(entity_local_name(mod_ent), name);
     entity_type(str_dec) = entity_type(str_type);
 #endif
-
-    dynamic_area = global_name_to_entity(module_local_name(mod_ent),DYNAMIC_AREA_LOCAL_NAME);
-    entity_storage(new_ent) = make_storage(is_storage_ram,
-            make_ram(mod_ent,
-                dynamic_area,
-                add_any_variable_to_area(dynamic_area, new_ent, c_module_p(mod_ent) ),
-                NIL));
 
     AddLocalEntityToDeclarations(new_ent,mod_ent,
             c_module_p(mod_ent)?get_current_module_statement():statement_undefined);
