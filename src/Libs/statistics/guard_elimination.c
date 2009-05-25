@@ -506,7 +506,8 @@ statement unimodular(s)
   l = instruction_loop(statement_instruction(STATEMENT(CAR(lls))));
   lower = range_upper(loop_range(l));
   upper= expression_to_expression_newbase(lower, pvg, base_oldindex);
-  s_lhyp = code_generation(lls, pvg, base_oldindex, base_newindex, sc_newbase);
+  /* FI: I do not know if the last parameter should be TRUE or FALSE */
+  s_lhyp = code_generation(lls, pvg, base_oldindex, base_newindex, sc_newbase, TRUE);
   printf(" finn  \n");
   return(s_lhyp);
 }
