@@ -77,6 +77,20 @@ effects_write_effects(list l_eff)
     return gen_nreverse(l_new);
 }
 
+/* At least one of the effects in l_eff is a write */
+bool effects_write_at_least_once_p(list l_eff)
+{
+  bool write_once_p = FALSE;
+
+  FOREACH(EFFECT, eff, l_eff) {
+    if (effect_write_p(eff)) {
+      write_once_p = TRUE;
+      break;
+    }
+  }
+  return write_once_p;
+}
+
 list
 effects_read_effects_dup(list l_eff)
 {

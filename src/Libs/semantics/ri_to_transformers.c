@@ -708,9 +708,6 @@ user_call_to_transformer(
   pips_debug(8, "begin\n");
   pips_assert("f is a module", entity_module_p(f));
 
-  pips_user_warning("Side effects in actual arguments are not yet taken into account\n."
-		    "Meanwhile, atomize the call site to avoid the problem.\n");
-
   if(!get_bool_property(SEMANTICS_INTERPROCEDURAL)) {
     /*
       pips_user_warning(
@@ -761,6 +758,13 @@ user_call_to_transformer(
 	type tfp = entity_type(fp);
 	basic bfp = variable_basic(type_variable(tfp));
 	basic bexpr = basic_of_expression(expr);
+	list l_eff = expression_to_proper_effects(expr);
+
+	if(effects_write_at_least_once_p(l_eff)) {
+	  pips_user_warning("Side effects in actual arguments are not yet taken into account\n."
+			    "Meanwhile, atomize the call site to avoid the problem.\n");
+	}
+	gen_free_list(l_eff);
 
 	if(!basic_equal_p(bfp, bexpr)) {
 	  pips_user_warning("Type incompatibility\n(formal %s/actual %s)"
