@@ -30,12 +30,12 @@
  * suggested by BB, modified by Yi-Qing. 17/05/92
  *  
  */
-statement code_generation(lls, pvg, base_oldindex, base_newindex, sc_newbase)
-cons *lls;
-Pvecteur pvg[];
-Pbase base_oldindex;
-Pbase base_newindex;
-Psysteme sc_newbase;
+statement code_generation(list lls,
+			  Pvecteur pvg[],
+			  Pbase base_oldindex,
+			  Pbase base_newindex,
+			  Psysteme sc_newbase,
+			  bool preserve_entry_label_p)
 {
     statement state_lhyp = statement_undefined;
     instruction instr_lhyp = instruction_undefined;
@@ -85,6 +85,8 @@ Psysteme sc_newbase;
     
     instr_lhyp = make_instruction(is_instruction_loop,l_hyp);
     state_lhyp = copy_statement(s_loop);
+    if(!preserve_entry_label_p)
+      clear_label(state_lhyp);
     free_instruction(statement_instruction(state_lhyp));
     statement_instruction(state_lhyp) = instr_lhyp;
     return(state_lhyp);

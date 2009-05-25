@@ -59,28 +59,7 @@
 static entity 
 make_tile_index_entity(entity old_index)
 {
-    entity new_index;
-    string old_name;
-    char *new_name = (char*) malloc(33);
-
-    old_name = entity_name(old_index);
-    for (sprintf(new_name, "%s%s", old_name, "_t");
-         gen_find_tabulated(new_name, entity_domain)!=entity_undefined; 
-
-         old_name = new_name) {
-        sprintf(new_name, "%s%s", old_name, "_t");
-	pips_assert("Variable name cannot be longer than 32 characters",
-		    strlen(new_name)<33);
-    }
- 
-   new_index = make_entity(new_name,
-			   copy_type(entity_type(old_index)),
-			   /* Should be AddVariableToCommon(DynamicArea) or
-			      something similar! */
-			   copy_storage(entity_storage(old_index)),
-			   copy_value(entity_initial(old_index)));
-
-    return(new_index);
+  return make_new_index_entity(old_index, "_t");
 }
 
 /* Query the user for a partitioning matrix P
@@ -393,7 +372,7 @@ tiling( list lls)
 
     /* generation of code to scan one tile and update of loop body using pvg */
 
-    s_lhyp = code_generation(lls, pvg, initial_basis, new_basis, sc_tile);
+    s_lhyp = code_generation(lls, pvg, initial_basis, new_basis, sc_tile, FALSE);
 
     /* generation of code for scanning all tiles */
 
