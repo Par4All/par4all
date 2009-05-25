@@ -144,5 +144,16 @@ statement body;
 	reset_ordering_to_statement();
     }
     module_body_reorder(body);
+    /* This should only be done if the ordering to statement already exists... */
+    /* FI: I'd rather use set_ordering_to_statement() so that reset
+       are properly called and no outdated ots hash table remains for
+       ever in the background, but I do not want to break PIPS right
+       now.
+       
+       How do you know ordering to statement to be useful in the future?
+
+       May be, we are going to work on a different module very soon..
+    */
+    //set_ordering_to_statement(body);
     initialize_ordering_to_statement(body);
 }
