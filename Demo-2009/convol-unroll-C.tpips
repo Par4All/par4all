@@ -93,8 +93,13 @@ l400
 display PRINTED_FILE
 # shell cp convol-unroll-C.database/convol/convol.pref convol07.c
 
+activate PRINT_CODE_PRIVATIZED_REGIONS
+display PRINTED_FILE
+
 # The code should be scalarized first...
 #
+
+activate PRINT_CODE
 apply SCALARIZATION
 display PRINTED_FILE
 
@@ -107,8 +112,8 @@ display PRINTED_FILE
 # Loop invariant code motion
 # SG: core dumps
 #
-#apply INVARIANT_CODE_MOTION
-#display PRINTED_FILE
+apply INVARIANT_CODE_MOTION
+display PRINTED_FILE
 # shell cp convol-unroll-C.database/convol/convol.pref convol09.c
 
 quit

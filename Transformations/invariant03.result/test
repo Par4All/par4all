@@ -1,0 +1,82 @@
+
+Initial source code
+
+void invariant03(int n, int ni, int nj)
+{
+   // BEGIN BLOCK
+   float x[n][n];
+   float y[n];
+   int i;
+   int j;
+   float s;
+   float a;
+
+   for(i = 0; i <= ni-1; i += 1)                                        /*0008*/
+      for(j = 0; j <= nj-1; j += 1) {                                   /*0009*/
+         // BEGIN BLOCK
+         s = a*a;                                                       /*0010*/
+         x[i][j] = s;                                                   /*0011*/
+         // END BLOCK
+      }
+   // END BLOCK
+}
+
+Parallelized code
+
+void invariant03(int n, int ni, int nj)
+{
+   // BEGIN BLOCK
+   float x[n][n];
+   float y[n];
+   int i;
+   int j;
+   float s;
+   float a;
+   // BEGIN BLOCK
+
+   for(i = 0; i <= ni-1; i += 1)                                        /*0008*/
+      // BEGIN BLOCK
+      for(j = 0; j <= nj-1; j += 1) {                                   /*0009*/
+         // BEGIN BLOCK
+         s = a*a;                                                       /*0010*/
+         x[i][j] = s;                                                   /*0011*/
+         // END BLOCK
+      }
+      // END BLOCK
+   // END BLOCK
+   // END BLOCK
+}
+
+Source code after invariant code motion
+
+void invariant03(int n, int ni, int nj)
+{
+   // BEGIN BLOCK
+   float x[n][n];
+   float y[n];
+   int i;
+   int j;
+   float s;
+   float a;
+   // BEGIN BLOCK
+
+   // BEGIN BLOCK
+   i = MAX(INT(ni), 0);
+   // BEGIN BLOCK
+   // BEGIN BLOCK                                                       /*0010*/
+   j = MAX(INT(nj), 0);
+   s = a*a;                                                             /*0010*/
+   // END BLOCK                                                         /*0010*/
+   // END BLOCK
+   // END BLOCK
+   for(i = 0; i <= ni-1; i += 1)                                        /*0008*/
+      // BEGIN BLOCK
+      for(j = 0; j <= nj-1; j += 1)                                     /*0009*/
+         x[i][j] = s;                                                   /*0011*/
+      // END BLOCK
+   // END BLOCK
+   // END BLOCK
+}
+
+Warnings
+

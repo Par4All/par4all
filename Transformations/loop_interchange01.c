@@ -3,7 +3,7 @@
  * The initial label must be preserved, i.e. switch from one loop to another
  */
 
-void loop_interchange01(int ni, int nj)
+void loop_interchange01(int n, int ni, int nj)
 {
   float x[n][n];
   int i, j;

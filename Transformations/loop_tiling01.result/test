@@ -1,0 +1,37 @@
+
+Initial source code
+
+void loop_tiling01(int ni, int nj)
+{
+   float x[n][n];
+   int i;
+   int j;
+
+l1:
+   for(i = 0; i <= ni-1; i += 1)
+l2:
+      for(j = 0; j <= nj-1; j += 1)
+         x[i][j] = 0.;
+}
+
+Source code after loop tiling
+
+void loop_tiling01(int ni, int nj)
+{
+   int j_t;
+   int i_t;
+   float x[n][n];
+   int i;
+   int j;
+
+l1:
+   for(i_t = 0; i_t <= (-1+ni)/10; i_t += 1)
+      for(j_t = 0; j_t <= (-1+nj)/10; j_t += 1)
+
+         for(i = 10*i_t; i <= MIN(-1+ni, 9+10*i_t); i += 1)
+            for(j = 10*j_t; j <= MIN(9+10*j_t, -1+nj); j += 1)
+               x[i][j] = 0.;
+}
+
+Warnings
+

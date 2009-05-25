@@ -1,7 +1,7 @@
 
 Initial source code
 
-void loop_interchange01(int ni, int nj)
+void loop_interchange01(int n, int ni, int nj)
 {
    float x[n][n];
    int i;
@@ -16,7 +16,7 @@ l2:
 
 Source code after loop interchange
 
-void loop_interchange01(int ni, int nj)
+void loop_interchange01(int n, int ni, int nj)
 {
    int jp;
    int ip;

@@ -1,0 +1,39 @@
+
+Initial source code
+
+void invariant02(int ni, int nj)
+{
+   int n = 10;
+   float y[n];
+   int i;
+   int j;
+   float s;
+   float a;
+   float b;
+
+   for(i = 0; i <= ni-1; i += 1) {
+      s = a*b;
+      y[i] = s;
+   }
+}
+
+Source code after invariant code motion
+
+void invariant02(int ni, int nj)
+{
+   int n = 10;
+   float y[n];
+   int i;
+   int j;
+   float s;
+   float a;
+   float b;
+
+   i = MAX(INT(ni), 0);
+   s = a*b;
+   for(i = 0; i <= ni-1; i += 1)
+      y[i] = s;
+}
+
+Warnings
+
