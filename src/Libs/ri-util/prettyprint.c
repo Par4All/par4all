@@ -418,7 +418,23 @@ bool one_liner_p(statement s)
     list sl = sequence_statements(instruction_sequence(i));
     int sc = gen_length(sl);
 
-    yes = (sc <= 1) && ENDP(statement_declarations(s));
+    if(sc==1) {
+      /* There may be many lines hidden behind another block construct
+	 when code is generated in a non canonical way as for
+	 {{x=1;y=2;}} */
+      instruction ii = statement_instruction(STATEMENT(CAR(sl)));
+
+      if(instruction_sequence_p(ii)) {
+	/* OK, we could check deeper, but this is only useful for
+	   redundant internal representations. Let's forget about
+	   niceties such as skipping useless braces. */
+	yes = FALSE;
+      }
+      else
+	yes = ENDP(statement_declarations(s));
+    }
+    else 
+      yes = (sc < 1) && ENDP(statement_declarations(s));
   }
 
   return yes;
