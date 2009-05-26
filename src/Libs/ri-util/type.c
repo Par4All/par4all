@@ -773,6 +773,8 @@ some_basic_of_any_expression(expression exp, bool apply_p, bool ultimate_p)
     {
       entity v = reference_variable(syntax_reference(sy));
       type exp_type = ultimate_p? ultimate_type(entity_type(v)) : copy_type(entity_type(v));
+      bool finished = false;
+      list l_ind=NIL, l_dim = NIL;
 
       if(apply_p) {
 	if(!type_functional_p(exp_type))
@@ -790,29 +792,49 @@ some_basic_of_any_expression(expression exp, bool apply_p, bool ultimate_p)
       }
       else {
 	if(type_variable_p(exp_type))
-    {
-	  b = copy_basic(variable_basic(type_variable(exp_type)));
-    }
-	else if(type_functional_p(exp_type)) {
-	  /* A reference to a function returns a pointer to a function of the very same time */
-	  b = make_basic(is_basic_pointer, copy_type(exp_type));
-	}
-	else {
-	  pips_internal_error("Bad reference type tag %d \"%s\"\n",
-			      type_tag(exp_type), type_to_string(exp_type));
-	}
+	  {
+	    b = copy_basic(variable_basic(type_variable(exp_type)));
+
+	    /* BC : if the variable has dimensions, then it's an array name which is converted
+	       into a pointer itself. And each dimension is converted into a pointer on the next one.
+	       (except in a few cases which should be handled in basic_of_call)
+	       to be verified or done
+	    */
+	    
+	    for (l_dim = variable_dimensions(type_variable(exp_type)); !ENDP(l_dim); POP(l_dim))
+	      {
+		b = make_basic(is_basic_pointer, make_type(is_type_variable, make_variable(b, NIL, NIL)));
+	      }
+	  }
+	else if(type_functional_p(exp_type))
+	  {
+	    /* A reference to a function returns a pointer to a function of the very same time */
+	    b = make_basic(is_basic_pointer, copy_type(exp_type));
+	  }
+	else 
+	  {
+	    pips_internal_error("Bad reference type tag %d \"%s\"\n",
+				type_tag(exp_type), type_to_string(exp_type));
+	  }
       }
       /* SG: added so that the basic of a dereferenced pointer is the basic of the dereferenced value
-       */
-      if( basic_pointer_p(b) )
-      {
-          MAP(EXPRESSION,e, { 
-            pips_assert( "reference indicies size and pointer level match",basic_pointer_p(b) );
-            basic bt = copy_basic(variable_basic(type_variable(basic_pointer(b))));
-            free_basic(b);
-            b=bt;        
-          } ,reference_indices( syntax_reference(sy) ) );
-      }
+	 BC : modified because it was assumed that each dimension was of pointer type which is not
+	 true when tab is declared int ** tab[10] and the expression is tab[3][4][5].
+      */
+      for(l_ind = reference_indices(syntax_reference(sy)) ; !ENDP(l_ind) && !finished ; POP(l_ind) )
+	{
+	  if(basic_pointer_p(b))
+	    {
+	      basic bt = copy_basic(variable_basic(type_variable(basic_pointer(b))));
+	      free_basic(b);
+	      b=bt;
+	    }
+	  else
+	    {
+	      /* the basic type is reached. Should I add pips_assert("basic reached, it should be the last index\n", ENDP(CAR(l_ind)))? */
+	      finished = true;
+	    }
+	}
       break;
     }
   case is_syntax_call: 
@@ -866,6 +888,7 @@ some_basic_of_any_expression(expression exp, bool apply_p, bool ultimate_p)
 
   return b;
 }
+
 
 basic 
 basic_of_any_expression(expression exp, bool apply_p)
