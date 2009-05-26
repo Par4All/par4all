@@ -18,14 +18,13 @@
 
 ///@return an empty extensions
 extensions empty_extensions (void) {
-  return extensions_undefined;
+  return make_extensions (NIL);
 }
 
 ///@return TRUE if the extensions field is empty
 ///@param es the extensions to test
 bool empty_extensions_p (extensions es) {
-  return (es == extensions_undefined);
-
+  return (extensions_extension (es) == NIL);
 }
 
 /** Return a new allocated string with the pragma textual representation.
@@ -91,18 +90,17 @@ extensions_to_string(extensions es) {
 
 /** Add a pragma to a statement.
 
-    @param stat is the statement which we want to add a pragma
-    @param s is the string pragma that is strdup()ed in this function.
+    @param stat, the statement which we want to add a pragma
+    @param s, the string pragma.
+    @param copy_flag, to be set to true to duplicate the string
  */
 void
-add_pragma_to_statement(statement st, string s) {
+add_pragma_to_statement(statement st, string s, bool copy_flg) {
   extensions es = statement_extensions(st);
-  /* An undefined extension is transformed in an empty list of extension: */
-  if (empty_extensions_p (es) == TRUE)
-    es = make_extensions(NIL);
-
   /* Make a new pragma: */
-  pragma p = make_pragma(strdup(s));
+  pragma p = pragma_undefined;
+  if (copy_flg == TRUE) p = make_pragma(strdup(s));
+  else p = make_pragma(s);
   extension e = make_extension(p);
   /* Add the new pragma to the extension list: */
   list el = extensions_extension(es);

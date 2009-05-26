@@ -33,6 +33,7 @@ LIB_CFILES =	replace.c \
 		expression_substitution.c \
 		index_set_splitting.c \
 		for_loop_recovering.c \
+		generate_pragma.c \
 		scalarization.c
 
 INC_TARGET =    $(TARGET).h

@@ -1,7 +1,7 @@
 /* Main C functions to print code, sequential or parallel
  *
  * $Id$
- */ 
+ */
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -30,7 +30,7 @@
  * as the text provided. it should be made clear who is to free the
  * texte structure. currently it looks like a massive memory leak.
  */
-bool 
+bool
 make_text_resource(
     string mod_name, /* module name */
     string res_name, /* resource name [DBR_...] */
@@ -39,7 +39,7 @@ make_text_resource(
 {
     string filename, localfilename, dir;
     FILE *fd;
-    
+   
     localfilename = db_build_file_resource_name(res_name, mod_name, file_ext);
     dir = db_get_current_workspace_directory();
     filename = strdup(concatenate(dir, "/", localfilename, NULL));
@@ -54,11 +54,11 @@ make_text_resource(
     DB_PUT_FILE_RESOURCE(res_name, mod_name, localfilename);
     write_an_attachment_file(filename);
     free(filename);
-    
+   
     return TRUE;
 }
 
-bool 
+bool
 make_text_resource_and_free(
     string mod_name,
     string res_name,
@@ -198,39 +198,39 @@ print_parallelized_code_common(
 
 /************************************************************ PIPSMAKE HOOKS */
 
-bool 
+bool
 print_code(string mod_name)
 {
   is_user_view = FALSE;
   return print_code_or_source(mod_name);
 }
 
-bool 
+bool
 print_source(string mod_name)
 {
   is_user_view = TRUE;
   return print_code_or_source(mod_name);
 }
 
-bool 
+bool
 print_parallelized_code(string mod_name)
 {
     return print_parallelized_code_common(mod_name, NULL);
 }
 
-bool 
+bool
 print_parallelized90_code(string mod_name)
 {
     return print_parallelized_code_common(mod_name, "f90");
 }
 
-bool 
+bool
 print_parallelized77_code(string mod_name)
 {
     return print_parallelized_code_common(mod_name, "doall");
 }
 
-bool 
+bool
 print_parallelizedHPF_code(string module_name)
 {
     return print_parallelized_code_common(module_name, "hpf");
@@ -238,7 +238,7 @@ print_parallelizedHPF_code(string module_name)
 
 #define all_priv "PRETTYPRINT_ALL_PRIVATE_VARIABLES"
 
-bool 
+bool
 print_parallelizedOMP_code(string mod_name)
 {
     if (get_bool_property(all_priv))

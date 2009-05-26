@@ -2291,7 +2291,7 @@ text_directive(
 	    if (is_omp) add_to_current_line(buffer, "DO", cont, t);
 	}
     }
-  
+
     if (strlen(buffer)>0)
 	MAP(STRING, s, add_to_current_line(buffer, s, cont, t), l);
 
@@ -2325,7 +2325,7 @@ text_hpf_directive(loop l, int m)
 #define OMP_C_CONTINUATION 	OMP_C_SENTINEL "x"
 #define OMP_C_PARALLELDO	"parallel for "
 
-static text
+text
 text_omp_directive(loop l, int m)
 {
   text t = text_undefined;

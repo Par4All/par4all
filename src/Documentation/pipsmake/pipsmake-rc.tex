@@ -7,12 +7,12 @@
 % Description des enchainements possibles des passes et analyses de PIPS
 % pour pipsmake
 %
-% Attention : chaque phase ne doit utiliser, pour les modules, 
+% Attention : chaque phase ne doit utiliser, pour les modules,
 % que des ressources definies dans une phase precedente !
 %
-% Derivation rules and aliases must be included in verbatim environments. 
+% Derivation rules and aliases must be included in verbatim environments.
 % Nothing else should appear in a verbatim environment.
-% 
+%
 % Modifications:
 %  - a dependence on MODULE.cumulated_effects for print_transformers and
 %    print_preconditions
@@ -24,7 +24,7 @@
 %  - wp65, code generation for distributed memory machines: PUMA,
 %    ESPRIT project 2701, Francois Irigoin, 15 October 1991
 %  - loop_normalize, introduced by A.Platonoff, Oct. 30 1991.
-%  - print_parallelized_code is removed, because it is identical to 
+%  - print_parallelized_code is removed, because it is identical to
 %    print_parallelized77_code. L. Zhou, Jan. 20 1992.
 %  - reductions, Pierre Jouvelot, Apr. 1992
 %  - rice_data_dependence_graph,Pierre Jouvelot, Apr. 1992
@@ -34,7 +34,7 @@
 %  - MODULE.code added as a production of the four parallelization rules
 %    to overcome the inconsistency of hash tables after a
 %    parallelization, Francois Irigoin, 18 May 1993
-%  - Last modification undone because of a 
+%  - Last modification undone because of a
 %   methods_io.c:122: `DBR_PARALLELIZED_CODE' undeclared, outside of functions
 %    in ~pips/Pips/Development/Lib/pipsdbm. Ronan Keryell, 19 may 1993.
 %  - hpfc rules added, Fabien Coelho, 16/09/93
@@ -496,7 +496,7 @@ non-consistent resources cannot be used by accident.
 ACTIVATE_DEL_DERIVED_RES TRUE
 \end{PipsProp}
 
-How often resources should be saved and freed. $0$ means never, and 
+How often resources should be saved and freed. $0$ means never, and
 a positive value means every $n$ applications of a rule. This feature
 was added to allow long big automatic tpips scripts that can coredump and
 be restarted latter on close to the state before the core. As another side
@@ -825,7 +825,7 @@ initializer                     > MODULE.user_file
 \end{PipsMake}
 
 
-Note: the generation of the resource \verb|user_file| here above is mainly 
+Note: the generation of the resource \verb|user_file| here above is mainly
 directed in having the resource concept here. More thought is needed to
 have the concept of user files managed by \PIPSMAKE.
 
@@ -853,7 +853,7 @@ c_initializer                     > MODULE.c_source_file
 The \texttt{unsplit} phase regenerates user files from available
 \verb|printed_file|. The various modules that where initialy stored in
 single file are appended together in a file with the same name. Not that
-just \texttt{fsplit} is reversed, not a preprocessing thru \texttt{cpp}. 
+just \texttt{fsplit} is reversed, not a preprocessing thru \texttt{cpp}.
 Also the \texttt{include} file preprocessing is not reversed.
 
 
@@ -952,7 +952,7 @@ property has been set (see Section~\ref{subsection-source-file}).
 
   \item \texttt{ASSIGN} and assigned \texttt{GOTO} are not in \PIPS{} Fortran.
 
-  \item Computed \texttt{GOTO}s are not in \PIPS{} Fortran. 
+  \item Computed \texttt{GOTO}s are not in \PIPS{} Fortran.
     They are automatically
     replaced by a \texttt{IF...ELSEIF...ENDIF} construct in the parser.
 
@@ -964,24 +964,24 @@ property has been set (see Section~\ref{subsection-source-file}).
 
   \item DO loop headers should have no label. Add a \texttt{CONTINUE} just
     before the loop when it happens. This can be performed automatically if
-    the property 
+    the property
     \verb/PARSER_SIMPLIFY_LABELLED_LOOPS/ is set to \texttt{TRUE}. This
     restriction is imposed by the parallelization phases, not by the parser.
-  
+ 
   \item Complex constants, e.g. \texttt{(0.,1.)}, are not directly
-    recognized by the 
+    recognized by the
     parser. They must be replaced by a call to intrinsic \texttt{CMPLX}. The
     \PIPS{} preprocessing replaces them by a call to \texttt{COMPLX\_}.
 
   \item Function formulae are not recognized by the parser. An undeclared
-    array and/or an 
+    array and/or an
     unsupported macro is diagnosed. They may be substituted in an unsafe way
-    by the preprocessor if the property 
+    by the preprocessor if the property
     \begin{quote}
-      \verb/PARSER_EXPAND_STATEMENT_FUNCTIONS/ 
+      \verb/PARSER_EXPAND_STATEMENT_FUNCTIONS/
     \end{quote}
     is set. If the substitution is considered possibly unsafe, a warning is
-    displayed. 
+    displayed.
 
 \end{enumerate}
 
@@ -997,8 +997,8 @@ which are obsoleted by the current Fortran standard.
 \item The PIPS preprocessing stage included in \texttt{fsplit()} is going
   to name unnamed modules \texttt{MAIN000} and unnamed  blockdata
   \texttt{DATA000} to be consistent with the generated file name.
-  
-\item Hollerith constants are converted to a more readable quoted form, 
+ 
+\item Hollerith constants are converted to a more readable quoted form,
   and then output as such by the prettyprinter.
 
 \end{itemize}
@@ -1019,7 +1019,7 @@ generated for lines ending after column 72.
   more likely to be hidden by the prettyprinter.  There is a large
   range of prettyprinter \PROPERTIES{} to obtain less filtered view of
   the code.
-  
+ 
 \item Formats and character constants are not properly handled. Multiline
   formats and constants are not always reprinted in a Fortran correct
   form.
@@ -1294,7 +1294,7 @@ substitution in the parser. No other processing is available and the
 parser stops with an error message when a statement function declaration
 is encountered.
 
-The default used to be not to perform this unchecked replacement, which might 
+The default used to be not to perform this unchecked replacement, which might
 change the semantics of the program because type coercion is not enforced
 and actual parameters are not assigned to intermediate variables.
 However most statement functions do not require these extra-steps and it
@@ -1724,7 +1724,7 @@ it accesses illegally the stack: see Tom Reps,
 http://pages.cs.wisc.edu/~reps}.
 \marginpar{RK: Not clear (FI: To be deleted)}
 
-Cumulated references integrate proper references over the program code. 
+Cumulated references integrate proper references over the program code.
 
 \emph{FC: I should implement real summary references?}
 
@@ -1769,7 +1769,7 @@ summary effects of the callee.
 
 \begin{PipsMake}
 summary_effects                 > MODULE.summary_effects
-        < PROGRAM.entities 
+        < PROGRAM.entities
         < MODULE.code MODULE.cumulated_effects
 \end{PipsMake}
 
@@ -1793,26 +1793,26 @@ of June 21, 2008 (FI).}
 \begin{PipsMake}
 in_effects > MODULE.in_effects
            > MODULE.cumulated_in_effects
-         < PROGRAM.entities 
-         < MODULE.code  
+         < PROGRAM.entities
+         < MODULE.code 
          < MODULE.cumulated_effects
          < CALLEES.in_summary_effects
 
 in_summary_effects > MODULE.in_summary_effects
-        < PROGRAM.entities 
-        < MODULE.code 
-        < MODULE.in_effects 
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.in_effects
 
 out_summary_effects > MODULE.out_summary_effects
-        < PROGRAM.entities 
-        < MODULE.code 
+        < PROGRAM.entities
+        < MODULE.code
         < CALLERS.out_effects
 
 out_effects > MODULE.out_effects
-        < PROGRAM.entities 
-        < MODULE.code 
-        < MODULE.out_summary_effects   
-        < MODULE.cumulated_in_effects   
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.out_summary_effects  
+        < MODULE.cumulated_in_effects  
 \end{PipsMake}
 
 
@@ -1849,7 +1849,7 @@ proper_reductions > MODULE.proper_reductions
   < CALLEES.summary_reductions
 \end{PipsMake}
 
-The cumulated reductions propagate the reductions in the code, upwards. 
+The cumulated reductions propagate the reductions in the code, upwards.
 
 \begin{PipsMake}
 cumulated_reductions > MODULE.cumulated_reductions
@@ -1931,7 +1931,7 @@ IO statements, or between one DO loop header and unrelated DO loop bound
 expressions using that index variable. It is easy to spot the problem
 because loop indices are not privatized. A prettyprint option,
 \begin{center}
-\verb/PRETTYPRINT_ALL_PRIVATE_VARIABLES/ 
+\verb/PRETTYPRINT_ALL_PRIVATE_VARIABLES/
 \end{center}
 must be set to true to see if
 the loop index is privatized or not). The problem disappears when some
@@ -1948,7 +1948,7 @@ Artificial arcs are added to... (Pierre Jouvelot, help!).
 
 \begin{PipsMake}
 atomic_chains                   > MODULE.chains
-        < PROGRAM.entities 
+        < PROGRAM.entities
         < MODULE.code
         < MODULE.proper_effects
 \end{PipsMake}
@@ -1974,7 +1974,7 @@ anymore when coping with regions.\marginpar{RK->BS: could you precise?}
 
 \begin{PipsMake}
 region_chains                   > MODULE.chains
-        < PROGRAM.entities 
+        < PROGRAM.entities
         < MODULE.code
         < MODULE.proper_regions
 \end{PipsMake}
@@ -1987,7 +1987,7 @@ region_chains                   > MODULE.chains
 When \verb+in_out_regions_chains+ is selected, IN and OUT regions (see
 Sections~\ref{subsubsection-in-regions} and
 \ref{subsubsection-out-regions}) are used instead of READ and WRITE
-regions, only at call sites. Otherwise, usual regions are used. 
+regions, only at call sites. Otherwise, usual regions are used.
 
 Arrays and scalars which are {\em logically} local to callees, but
 exposed to callers because they are statically allocated or formal
@@ -2009,7 +2009,7 @@ simplest dependence test should be selected for best results.
 
 \begin{PipsMake}
 in_out_regions_chains           > MODULE.chains
-        < PROGRAM.entities 
+        < PROGRAM.entities
         < MODULE.code
         < MODULE.proper_regions
         < MODULE.in_regions
@@ -2191,12 +2191,12 @@ alias rice_regions_dependence_graph 'Regions Used'
 Use subscript expressions only (unless regions were used to compute
 use-def chains, in which case regions are used instead). {\tt
   rice\_regions\_dependence\_graph} is a synonym for this rule, but emits a
-warning if {\tt region\_chains} is not selected. 
+warning if {\tt region\_chains} is not selected.
 %%!UserManualDocumentation
 
 \begin{PipsMake}
 rice_fast_dependence_graph      > MODULE.dg
-        < PROGRAM.entities 
+        < PROGRAM.entities
         < MODULE.code
         < MODULE.chains
         < MODULE.cumulated_effects
@@ -2212,7 +2212,7 @@ Use subscript expressions and loop bounds.
 
 \begin{PipsMake}
 rice_full_dependence_graph      > MODULE.dg
-        < PROGRAM.entities 
+        < PROGRAM.entities
         < MODULE.code
         < MODULE.chains
         < MODULE.cumulated_effects
@@ -2297,7 +2297,7 @@ use and complexity of Fourier-Motzkin's pair-wise elimination (fields
   \item[2] number of independences found (on array reference pairs);
 
     {\bf Note:} field 1 minus field 2 is the number of array
-    dependencies. 
+    dependencies.
 
   \item[3] numbers of loop independent dependences between references
     in the  same statement (not useful for program transformation
@@ -2305,18 +2305,18 @@ use and complexity of Fourier-Motzkin's pair-wise elimination (fields
     be subtracted from field 2 to compare results with other
     parallelizers;
 
-  \item[4] numbers of constant dependences; 
+  \item[4] numbers of constant dependences;
 
   \item[5] numbers of exact dependences;
 
     {\bf Note:} field 5 must be greater or equal to field 4.
 
-  \item[6] numbers of inexact dependences involved only by the 
+  \item[6] numbers of inexact dependences involved only by the
            elimination of equation;
   \item[7] numbers of inexact dependences involved only by the F-M
            elimination;
   \item[8] numbers of inexact dependences involved by both elimination of
-           equation and F-M elimination; 
+           equation and F-M elimination;
 
     {\bf Note:} the sum of fields 5 to 8 and field 2 equals field 1
 
@@ -2349,21 +2349,21 @@ use and complexity of Fourier-Motzkin's pair-wise elimination (fields
             faisability of  Di sub-system by the elimination of equation;
   \item[48] numbers of independences found during the test of
             faisability of Di sous-system by the Fourier-Motzkin's
-            elimination; 
+            elimination;
   \item[49] numbers of independences found by the test of lexico-positive
-            for Di sub-system; 
+            for Di sub-system;
 
     {\bf Note:} the sum of fields 41 to 49 equals field 2
 
   \item[50] total number of Fourier-Motzkin's pair-wise eliminations
-     used; 
-  \item[51] number of Fourier-Motzkin's pair-wise elimination 
+     used;
+  \item[51] number of Fourier-Motzkin's pair-wise elimination
     in which the system size doesn't augment after the elimination;
   \item[52-68] complexity counter table of dimension [17]. The
                complexity of one projection by F-M is the product of the
                number of positive inequalities and the number of negatives
                inequalities that contain the eliminated variable. This
-    is an histogram of the products. Products which are less than 
+    is an histogram of the products. Products which are less than
     or equal to 4
     imply that the total number of inequalities does not increase.
     So if no larger product exists, field 50 and 51 must be equal.
@@ -2419,14 +2419,14 @@ PRINT_DEPENDENCE_GRAPH FALSE
 \end{PipsProp}
 
 To print the dependence graph without the dependences on privatized
-variables 
+variables
 
 \begin{PipsProp}
 PRINT_DEPENDENCE_GRAPH_WITHOUT_PRIVATIZED_DEPS FALSE
 \end{PipsProp}
 
 To print the dependence graph without the non-loop-carried dependences:
- 
+
 \begin{PipsProp}
 PRINT_DEPENDENCE_GRAPH_WITHOUT_NOLOOPCARRIED_DEPS FALSE
 \end{PipsProp}
@@ -2517,7 +2517,7 @@ global symbols which function \texttt{flinter} needs to check parameter lists.
 
 Computes statistics about loops in module. It computes the number of
 perfectly and imperfectly  nested loops and gives their depths. And it gives
-the number of nested loops which we can treat with our algorithm.    
+the number of nested loops which we can treat with our algorithm.   
 
 \begin{PipsMake}
 loop_statistics > MODULE.stats_file
@@ -2673,7 +2673,7 @@ Build the fast intraprocedural transformers.
 
 \begin{PipsMake}
 transformers_intra_fast         > MODULE.transformers
-        < PROGRAM.entities 
+        < PROGRAM.entities
         < MODULE.code
         < MODULE.cumulated_effects
         < MODULE.summary_effects
@@ -2681,14 +2681,14 @@ transformers_intra_fast         > MODULE.transformers
 \end{PipsMake}
 
 \subsubsection{Full Intraprocedural Transformers}
-                
+               
 %%@UserManualDocumentation: transformers_intra_full
 Build the improved intraprocedural transformers.
 %%!UserManualDocumentation
 
 \begin{PipsMake}
 transformers_intra_full         > MODULE.transformers
-        < PROGRAM.entities 
+        < PROGRAM.entities
         < MODULE.code
         < MODULE.cumulated_effects
         < MODULE.summary_effects
@@ -2703,7 +2703,7 @@ Build the fast interprocedural transformers.
 
 \begin{PipsMake}
 transformers_inter_fast         > MODULE.transformers
-        < PROGRAM.entities 
+        < PROGRAM.entities
         < MODULE.code
         < MODULE.cumulated_effects
         < MODULE.summary_effects
@@ -2721,7 +2721,7 @@ as default option.).
 
 \begin{PipsMake}
 transformers_inter_full         > MODULE.transformers
-        < PROGRAM.entities 
+        < PROGRAM.entities
         < MODULE.code
         < MODULE.cumulated_effects
         < MODULE.summary_effects
@@ -2740,7 +2740,7 @@ transformers.
 
 \begin{PipsMake}
 refine_transformers         > MODULE.transformers
-        < PROGRAM.entities 
+        < PROGRAM.entities
         < MODULE.code
         < MODULE.cumulated_effects
         < MODULE.summary_effects
@@ -2846,7 +2846,7 @@ is executed. A precondition is of NewGen type "transformer" (see
 
 Option \verb+preconditions_intra+ associates a precondition to each
 statement, assuming that no information is available at the module entry
-point. 
+point.
 
 Inter-procedural preconditions may be computed with {\em
 intra}-procedural transformers but the benefit is not
@@ -2986,7 +2986,7 @@ module preconditions, the callee's summary precondition was updated. This
 old scheme was more efficient but not compatible with program
 transformations because it was impossible to know when the summary
 preconditions of the modules had to be reset to the infeasible
-(a.k.a. empty) precondition. 
+(a.k.a. empty) precondition.
 
 An infeasible precondition means that the module is never called although
 a main is present in the workspace. If no main module is available, a TRUE
@@ -3033,7 +3033,7 @@ preconditions should be more general but no must version exist.
 
 Option \verb+total_preconditions_intra+ associates a precondition to each
 statement, assuming that no information is available at the module return
-point. 
+point.
 
 Inter-procedural total preconditions may be computed with {\em
 intra}-procedural transformers but the benefit is not
@@ -3173,7 +3173,7 @@ variables as they are key variables to understand scientific code
 behavior. However it is possible to analyze scalar variables with other
 data types. Fortran LOGICAL variables are represented as 0/1
 integers. Character string constants and floating point constants are
-represented as undefined values. 
+represented as undefined values.
 
 The analysis is thus limited to constant propagation for character strings
 and floating point values whereas integer and boolean variables are
@@ -3523,7 +3523,7 @@ SS-10, especially for -O2/-O3 optimized code.
 
 \begin{PipsMake}
 uniform_complexities                    > MODULE.complexities
-        < PROGRAM.entities 
+        < PROGRAM.entities
         < MODULE.code MODULE.preconditions
         < CALLEES.summary_complexity
 \end{PipsMake}
@@ -3540,8 +3540,8 @@ statement of a module in order to obtain the modules's summary complexity.
 
 \begin{PipsMake}
 summary_complexity              > MODULE.summary_complexity
-        < PROGRAM.entities 
-        < MODULE.code MODULE.complexities 
+        < PROGRAM.entities
+        < MODULE.code MODULE.complexities
 \end{PipsMake}
 
 \subsection{Floating Point Complexities}
@@ -3557,19 +3557,19 @@ operations, including intrinsics like \texttt{SIN}.
 
 \begin{PipsMake}
 fp_complexities                    > MODULE.complexities
-        < PROGRAM.entities 
+        < PROGRAM.entities
         < MODULE.code MODULE.preconditions
         < CALLEES.summary_complexity
 \end{PipsMake}
 
 %%@UserManualDocumentation: any_complexities
 This enables the default specification within the properties to
-be considered. 
+be considered.
 %%!UserManualDocumentation
 
 \begin{PipsMake}
 any_complexities                    > MODULE.complexities
-        < PROGRAM.entities 
+        < PROGRAM.entities
         < MODULE.code MODULE.preconditions
         < CALLEES.summary_complexity
 \end{PipsMake}
@@ -3678,7 +3678,7 @@ account and have cost unit 1; all other operations have a null cost.
 In the future, we might add a sparc-2 table...
 
 The different elementary table names are defined in
-\verb+complexity-local.h+. They presently are \verb+operation+, 
+\verb+complexity-local.h+. They presently are \verb+operation+,
 \verb+memory+, \verb+index+, \verb+transcend+
 and \verb+trigo+.
 
@@ -3761,7 +3761,7 @@ information about regions.
 Regions are not sets of array elements but functions mapping a store onto a
 convex set of array elements. Regions may be expressed with respect to the
 initial store of a module, or to the store passed to the statement they are
-associated with. 
+associated with.
 
 An array region is described by a convex polyhedron containing equalities
 and inequalities~\cite{T84}: they link the {\em region parameters\/} (or
@@ -3777,13 +3777,13 @@ and \verb+out+ to represent the flow of array elements.
 \item The {\em approximation\/} of the region: \verb+EXACT+ when the region
   exactly represents the requested set of array elements, or \verb+MAY+ or
   \verb+MUST+ if it is an over- or under-approximation ($\text{\must}
-  \incluseg \text{\exact} \incluseg \text{\may}$). 
+  \incluseg \text{\exact} \incluseg \text{\may}$).
 
   Unfortunately, for historical reasons, \verb+MUST+ is still used in the
   implementation instead of \verb+EXACT+, and actual \verb+MUST+ regions are
   not computed. Moreover, the {\tt must\_regions} option in fact computes
-  exact and may regions. 
-  
+  exact and may regions.
+ 
   \verb+MAY+ regions are flow-insensitive regions, whereas \verb+MUST+
   regions are flow sensitive. Any array element touched by any execution of
   a statement is in the \verb+MAY+ region of this statement. Any array
@@ -3813,7 +3813,7 @@ version, as well as functions to compute the new kinds of regions.
 
 Internally, regions are of type \texttt{effect} and as such can be used to build
 use-def chains (see Section~\ref{subsection-chains}). The most important
-option is based on {\em proper regions}. Proper regions are 
+option is based on {\em proper regions}. Proper regions are
 \verb+READ+ and \verb+WRITE+ regions. For simple statements (assignments,
 calls to intrinsic functions), summarization is avoided to preserve
 accuracy. At this inner level of the program control flow graph, the extra
@@ -3823,7 +3823,7 @@ analysis. For tests and loops, proper regions contain the regions associated
 to the condition or the range. And for external calls, proper regions are
 the summary regions of the callee translated into the caller's name space, to
 which are merely appended the regions of the expressions passed as argument
-(no summarization for this step). 
+(no summarization for this step).
 
 %%!UserManualDocumentation
 
@@ -3847,12 +3847,12 @@ This function computes the \verb|MAY| regions in a module.
 may_regions                     > MODULE.regions
                                 > MODULE.proper_regions
                                 > MODULE.inv_regions
-        < PROGRAM.entities 
-        < MODULE.code 
+        < PROGRAM.entities
+        < MODULE.code
         < MODULE.cumulated_effects
         < MODULE.transformers
-        < MODULE.preconditions      
-        < CALLEES.summary_regions 
+        < MODULE.preconditions     
+        < CALLEES.summary_regions
 \end{PipsMake}
 
 \subsection{MUST READ/WRITE Regions}
@@ -3866,12 +3866,12 @@ This function computes the \verb|MUST| regions in a module.
 must_regions                    > MODULE.regions
                                 > MODULE.proper_regions
                                 > MODULE.inv_regions
-        < PROGRAM.entities 
-        < MODULE.code 
+        < PROGRAM.entities
+        < MODULE.code
         < MODULE.cumulated_effects
         < MODULE.transformers
-        < MODULE.preconditions      
-        < CALLEES.summary_regions 
+        < MODULE.preconditions     
+        < CALLEES.summary_regions
 \end{PipsMake}
 
 \subsection{Summary READ/WRITE Regions}
@@ -3886,9 +3886,9 @@ callees.
 
 \begin{PipsMake}
 summary_regions                 > MODULE.summary_regions
-        < PROGRAM.entities 
-        < MODULE.code 
-        < MODULE.regions   
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.regions  
 \end{PipsMake}
 
 \subsection{IN Regions}
@@ -3908,12 +3908,12 @@ knowledgeable enough to select \verb+must_regions+ first.
 in_regions                      > MODULE.in_regions
                                 > MODULE.cumulated_in_regions
                                 > MODULE.inv_in_regions
-        < PROGRAM.entities 
-        < MODULE.code  
+        < PROGRAM.entities
+        < MODULE.code 
         < MODULE.summary_effects
         < MODULE.cumulated_effects
         < MODULE.transformers
-        < MODULE.preconditions 
+        < MODULE.preconditions
         < MODULE.regions
         < MODULE.inv_regions
         < CALLEES.in_summary_regions
@@ -3926,11 +3926,11 @@ in_regions                      > MODULE.in_regions
 
 \begin{PipsMake}
 in_summary_regions              > MODULE.in_summary_regions
-        < PROGRAM.entities 
-        < MODULE.code 
+        < PROGRAM.entities
+        < MODULE.code
         < MODULE.transformers
-        < MODULE.preconditions  
-        < MODULE.in_regions   
+        < MODULE.preconditions 
+        < MODULE.in_regions  
 \end{PipsMake}
 
 
@@ -3943,8 +3943,8 @@ See Section~\ref{subsubsection-out-regions}.
 
 \begin{PipsMake}
 out_summary_regions             > MODULE.out_summary_regions
-        < PROGRAM.entities 
-        < CALLERS.out_regions   
+        < PROGRAM.entities
+        < CALLERS.out_regions  
 \end{PipsMake}
 
 
@@ -3962,10 +3962,10 @@ the subroutines.
 
 \begin{PipsMake}
 out_regions                     > MODULE.out_regions
-        < PROGRAM.entities 
-        < MODULE.code  
+        < PROGRAM.entities
+        < MODULE.code 
         < MODULE.transformers
-        < MODULE.preconditions 
+        < MODULE.preconditions
         < MODULE.regions
         < MODULE.inv_regions
         < MODULE.summary_effects
@@ -4003,7 +4003,7 @@ MUST_REGIONS FALSE
 \end{PipsProp}
 
 The default option is to compute regions without taking into account array
-bounds. Both options have their advantages and drawbacks. 
+bounds. Both options have their advantages and drawbacks.
 
 \begin{PipsProp}
 REGIONS_WITH_ARRAY_BOUNDS FALSE
@@ -4172,12 +4172,12 @@ This function computes the complementary sections in a module.
 %%!UserManualDocumentation
 \begin{PipsMake}
 complementary_sections > MODULE.compsec
-        < PROGRAM.entities 
-        < MODULE.code 
+        < PROGRAM.entities
+        < MODULE.code
         < MODULE.cumulated_effects
         < MODULE.transformers
-        < MODULE.preconditions      
-        < CALLEES.summary_compsec 
+        < MODULE.preconditions     
+        < CALLEES.summary_compsec
 \end{PipsMake}
 
 \subsection{Summary READ/WRITE Complementary Sections}
@@ -4188,9 +4188,9 @@ complementary_sections > MODULE.compsec
 
 \begin{PipsMake}
 summary_complementary_sections > MODULE.summary_compsec
-        < PROGRAM.entities 
-        < MODULE.code 
-        < MODULE.compsec   
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.compsec  
 \end{PipsMake}
 
 
@@ -4379,7 +4379,7 @@ it!\marginpar{RK: Who is working on ? :-/ FI! Could be redesigned by IEF.}
 
 \begin{PipsMake}
 nest_parallelization                    > MODULE.parallelized_code
-        < PROGRAM.entities 
+        < PROGRAM.entities
         < MODULE.code MODULE.dg
 \end{PipsMake}
 
@@ -4612,7 +4612,7 @@ SIMD_AUTO_UNROLL_MINIMIZE_UNROLL TRUE
 This property controls how the ``optimal'' unroll factor is
 computed. Two algorithms can be used. By default, a simple algorithm
 is used, which simply compares the actual size of the variables used
-to the size of the registers to find out the best unroll factor. 
+to the size of the registers to find out the best unroll factor.
 If the property is set to FALSE, a more complex algorithm is used,
 which takes into account the actual SIMD instructions.
 
@@ -4778,12 +4778,12 @@ hpfc_init              > PROGRAM.entities
 
 This phase removes the directives (some special calls) from the code.
 The remappings (implicit or explicit) are also managed at this level,
-through copies between differently shaped arrays. 
+through copies between differently shaped arrays.
 
 To manage calls with distributed arguments, I need to apply the directive
 extraction bottom-up, so that the callers will know about the callees
 through the \verb+hpfc_status+. In order to do that, I first thought of an
-intermediate resource, but there was obscure problem with my fake calls. 
+intermediate resource, but there was obscure problem with my fake calls.
 Thus the dependence static then dynamic directive analyses is enforced at
 the bang sequence request level in the \verb|hpfc_close| phase.
 
@@ -4794,7 +4794,7 @@ mappings. In order to do so it needs its callees' required mappings, hence
 the need to analyze beforehand static directives. The code is cleaned from
 the \verb|hpfc_filter| artifacts after this phase, and all the proper
 information about the HPF stuff included in the routines is stored in
-\verb|hpfc_status|. 
+\verb|hpfc_status|.
 
 \begin{PipsMake}
 hpfc_static_directives         > MODULE.code
@@ -4816,8 +4816,8 @@ hpfc_dynamic_directives         > MODULE.code
 This rule launches the actual compilation. Four files are generated:
 
 \begin{enumerate}
-\item  the host code that mainly deals with I/Os, 
-\item the SPMD node code, 
+\item  the host code that mainly deals with I/Os,
+\item the SPMD node code,
 \item and some initialization stuff for the runtime (2 files).
 \end{enumerate}
 
@@ -4844,9 +4844,9 @@ hpfc_compile           > MODULE.hpfc_host
 
 \subsubsection{HPFC completion}
 
-This rule deals with the compiler closing. It must deal with commons. 
-The hpfc parser selection is put here. 
-%% Maybe not a very good idea? (FC: explain! why not in \verb/hpfc_init/?) 
+This rule deals with the compiler closing. It must deal with commons.
+The hpfc parser selection is put here.
+%% Maybe not a very good idea? (FC: explain! why not in \verb/hpfc_init/?)
 %% I guess nobody should have to require intermediate targets such as ???. Ya!
 %% \marginpar{RK: hmmm; FC?}
 
@@ -4904,7 +4904,7 @@ hpfc_run
 \index{HPFC\_EXTRACT\_EQUALITIES}
 \index{HPFC\_EXTRACT\_LATTICE}
 
-Debugging levels considered by HPFC: 
+Debugging levels considered by HPFC:
 \verb+HPFC_{,DIRECTIVES,IO,REMAPPING}_DEBUG_LEVEL+.
 
   These booleans control whether some computations are directly
@@ -4950,9 +4950,9 @@ HPFC_IGNORE_FCD_SET FALSE
 
 Whether to measure and display the compilation times for remappings,
 and whether to generate outward redundant code for remappings. Also
-whether to generate code that keeps track dynamically of live mappings. 
+whether to generate code that keeps track dynamically of live mappings.
 Also whether not to send data to a twin (a processor that holds the very
-same data for a given array). 
+same data for a given array).
 
 \begin{PipsProp}
 HPFC_TIME_REMAPPINGS FALSE
@@ -5114,8 +5114,8 @@ COMENGINE_NUMBER_OF_FIFO 100
 \index{Safescale}
 \index{Kaapi}
 
-The Safescale project is an attempt to automatically (or semi-automatically) 
-transform sequential code written in C language for the Kaapi runtime. 
+The Safescale project is an attempt to automatically (or semi-automatically)
+transform sequential code written in C language for the Kaapi runtime.
 
 \subsubsection{Distribution init}
 \index{Distribution init}
@@ -5144,7 +5144,7 @@ This phase is intended for the externalization of a block of code.
 alias safescale_distributor 'Safescale distributor'
 
 safescale_distributor                  > MODULE.code
-                                       > MODULE.callees              
+                                       > MODULE.callees             
         ! MODULE.safescale_distributor_init
         < PROGRAM.entities
         < MODULE.code
@@ -5398,7 +5398,7 @@ generalized).
 Full loop unrolling is applied one loop at a time by default. The user
 must specify the loop label. This default feature can be turned off
 and all loops with constant loop bounds and constant increment are
-fully unrolled. 
+fully unrolled.
 
 Use \lstinline|LOOP_LABEL| to pass the desired label if you don't want to give it interactively
 
@@ -5567,7 +5567,7 @@ Tiling for sequences of loop nests
 
 Youcef \textsc{Bouchebaba}'s implementation of tiling for sequences of
 loop nests \ldots
-  
+ 
 \begin{PipsMake}
 alias tiling_sequence 'Tiling sequence of loop nests'
 \end{PipsMake}
@@ -5594,7 +5594,7 @@ This is a test to implement a invariant code motion. It doesn't work currently.
 
 \begin{PipsMake}
 invariant_code_motion             > MODULE.code
-        < PROGRAM.entities 
+        < PROGRAM.entities
         < MODULE.proper_effects
         < MODULE.code MODULE.dg
 \end{PipsMake}
@@ -5619,7 +5619,7 @@ This transformation is implemented by Thi Viet Nga \textsc{Nguyen}.
 alias partial_redundancy_elimination 'Partial Redundancy Elimination'
 
 partial_redundancy_elimination             > MODULE.code
-        < PROGRAM.entities 
+        < PROGRAM.entities
         < MODULE.code
         < MODULE.preconditions
 \end{PipsMake}
@@ -5738,7 +5738,7 @@ question ; an instruction is {\it dead} if it computes only values that
 are not used on any executable path leading from the instruction. The
 transformation that identifies and removes such dead code is called dead
 code elimination. So in fact, Use-def elimination in PIPS is Dead code
-elimination ! 
+elimination !
 
 %%!UserManualDocumentation
 
@@ -5783,11 +5783,11 @@ elimination, for example, uses \texttt{unspaghettify}.
 This control restructuring transformation can be automatically applied
 in the \texttt{controlizer} phase (see
 Section~\ref{subsection-controlized-code}) if the
-\verb|UNSPAGHETTIFY_IN_CONTROLIZER| 
+\verb|UNSPAGHETTIFY_IN_CONTROLIZER|
 property is true.
 
 To add flexibility, the behavior of \texttt{unspaghettify} is
-controlled by the properties 
+controlled by the properties
 \verb|UNSPAGHETTIFY_TEST_RESTRUCTURING|
 and \verb|UNSPAGHETTIFY_RECURSIVE_DECOMPOSITION|
 to allow more
@@ -5868,7 +5868,7 @@ restructure_control          > MODULE.code
 
 %%@UserManualDocumentation: recover_for_loop
 This control-flow transformation try to recover for-loops from
-while-loops. Useful to be run after transformations 
+while-loops. Useful to be run after transformations
 %%!UserManualDocumentation
 
 \begin{PipsMake}
@@ -5998,7 +5998,7 @@ full_spaghettify          > MODULE.code
 %%@UserManualDocumentation: stf
 Transformation \texttt{stf} is a C interface to a Shell script used to
 restructure a Fortran program using ISTST (via the combined tool
-fragment ISTLY = ISTLX/ISTYP and then ISTST) from TOOLPACK~\cite{toolpack,Ost83}. 
+fragment ISTLY = ISTLX/ISTYP and then ISTST) from TOOLPACK~\cite{toolpack,Ost83}.
 
 Be careful, since TOOLPACK is written in Fortran, you need the Fortran
 runtime libraries to run STF if is has not been statically compiled...
@@ -6302,7 +6302,7 @@ Comments from Nga \textsc{Nguyen}: According to~\cite{Aho86} and~\cite{Much97}, 
 name of this optimization should be Constant-Expression Evaluation or
 Constant Folding for integer values. This transformation produces well
 error message at compile time indicating potential error such as division
-by zero.  
+by zero. 
 %%!UserManualDocumentation
 
 \begin{PipsMake}
@@ -6324,7 +6324,7 @@ This function was implemented initially by Bruno \textsc{Baron}.
 Phase \texttt{Reductions} detects generalized instructions and replaces
 them by calls to a run-time library supporting parallel reductions. It was
 developed by Pierre \textsc{Jouvelot} in CommonLISP, as a prototype, to show than
-NewGen data structures were language-neutral. Thus it by-passes some of 
+NewGen data structures were language-neutral. Thus it by-passes some of
 \PIPSMAKE/dbm facilities.
 
 This phase is now obsolete, although reduction detection is critical for
@@ -6435,7 +6435,7 @@ instruction_selection > MODULE.code
 \end{PipsMake}
 
 
-EOLE: Evaluation Optimization of Loops and Expressions. 
+EOLE: Evaluation Optimization of Loops and Expressions.
 Julien Zory stuff integrated within pips. It relies on an external tool
 named \texttt{eole}. The version and options set can be controlled from
 the following properties. The status is experimental. See the
@@ -6462,7 +6462,7 @@ Inlining is a well known technique.  Basically it replaces a function
 call by the function body.  Current implementation does not work if
 the function has static declarations, access global variables \dots.
 Actually it (seems to) work(s) for pure, non-recursive functions \dots
-and not for any kind of call.  
+and not for any kind of call. 
 
 Property \lstinline|INLINING_CALLERS| can be set to define the list of
 functions where the call sites have to be inlined. By default, all
@@ -6537,9 +6537,9 @@ More than one module can be specified, they are seperated by blank spaces.
 \begin{PipsProp}
 UNFOLDING_CALLEES ""
 \end{PipsProp}
- 
+
 \index{UNFOLDING\_FILTER}
-The default behavior of unfolding is to recursively inline all callees from given module, as long as a callee remains. Use \lstinline|UNFOLDING_FILTER| to inline all calls not in the space seperated module list 
+The default behavior of unfolding is to recursively inline all callees from given module, as long as a callee remains. Use \lstinline|UNFOLDING_FILTER| to inline all calls not in the space seperated module list
 \begin{PipsProp}
 UNFOLDING_FILTER ""
 \end{PipsProp}
@@ -6583,7 +6583,7 @@ outline      > MODULE.code
 Clean the declarations of unused variables and commons and so.
 It is not really a code transformation, since only the module entity is
 updated by the process, but it is put as so since it should affect the
-prettyprint. 
+prettyprint.
 
 %%@UserManualDocumentation: clean_declarations
 Clean the declarations of unused variables and commons and so.
@@ -6612,24 +6612,24 @@ approaches have advantages and drawbacks and maybe a combination of these
 ones is needed.
 
 To have 100\% resized arrays, we implement also the code instrumentation
-task, in the top-down approach. 
+task, in the top-down approach.
 
 Different options to compute new declarations for different kinds of
 arrays are described in properties-rc.tex. You can combine the two
-approaches to have a better results by using these options. 
+approaches to have a better results by using these options.
 
 How to use these approaches: after generating new declarations in the
-logfile, you have to use the script 
+logfile, you have to use the script
 \$PIPS\_ROOT/Src/Script/misc/array\_resizing\_instrumentation.pl to replace the unnormalized
-declarations and add new assignments in the source code. 
+declarations and add new assignments in the source code.
 
 \subsubsection{ Top Down Array Resizing}
 %%@UserManualDocumentation: array_resizing_top_down
 
 The  method uses the relationship between actual and formal arguments from parameter-passing
 rules. New array declarations in the called procedure are
-computed with respect to the declarations in the calling procedures. 
-It is  faster than the first one because array regions are not needed. 
+computed with respect to the declarations in the calling procedures.
+It is  faster than the first one because array regions are not needed.
 
 This phase is implemented by Thi Viet Nga \textsc{Nguyen}.
 %%!UserManualDocumentation
@@ -6686,14 +6686,14 @@ declarations for assumed-size (A(*)) and one (A(1) or also called ugly
 assumed-size) array declarators. But
 it also can be used for all kinds of array : local or formal array
 arguments, unnormalized or all kinds of declarations. There are two
-different approaches that can be combined to have better results. 
- 
+different approaches that can be combined to have better results.
+
 \subsubsection*{Top-down Array Resizing}
-There are three different options: 
+There are three different options:
 \begin{itemize}
 \item Using information from the MAIN program or not (1 or 0). If you use
   this option, modules that are never called by the MAIN program are not
-  taken into account. By default, we do not use this information (0).  
+  taken into account. By default, we do not use this information (0). 
 \item Compute new declarations for all kinds of formal array arguments,
   not only assumed-size and one declarations (1 or 0). By default, we
   compute for assumed-size and one only (0).
@@ -6706,7 +6706,7 @@ So the combination of the three above options gives us a number from 0 to
 the order of options. For example, if you want to use information from
 MAIN program to compute new declarations for assumed-size and one array
 declarations, both of them, the option is 4 (100). The default option is 0
-(000). 
+(000).
 
 \begin{PipsProp}
 ARRAY_RESIZING_TOP_DOWN_OPTION 0
@@ -6714,13 +6714,13 @@ ARRAY_RESIZING_TOP_DOWN_OPTION 0
 
 \subsubsection*{Bottom-up Array Resizing}
 
-There are also three different options: 
+There are also three different options:
 \begin{itemize}
 \item Infer new declarations for arrays with declarations created by the
   top-down approach or not (1 or 0). This is a special option because we
   want to combine the two approaches: apply top-down first and then
   bottom-up on the instrumented arrays (their declarations are of from:
-  I\_PIPS\_MODULE\_ARRAY). By default, we do not use this option (0).  
+  I\_PIPS\_MODULE\_ARRAY). By default, we do not use this option (0). 
 \item Compute new declarations for all kinds of array arguments,
   not only assumed-size and one declarations (1 or 0). By default, we
   compute for assumed-size and one only (0).
@@ -6732,7 +6732,7 @@ So the combination of the three above options gives us a number from 0 to
 the order of options. There are some options that exclude others, such as
 the option to compute new declarations for instrumented array
 (I\_PIPS\_MODULE\_ARRAY). The default option is 0
-(000). 
+(000).
 
 \begin{PipsProp}
 ARRAY_RESIZING_BOTTOM_UP_OPTION 0
@@ -6762,14 +6762,14 @@ scalarization  > MODULE.code
 Array bound checking refers to determining whether all array references
 are within their declared range in all of their uses in a program. These
 array  bound checks may be analyses intraprocedurally or
-interprocedurally, depending on the need for accuracy. 
+interprocedurally, depending on the need for accuracy.
 
-There are two versions of intraprocedural array bounds checking: 
+There are two versions of intraprocedural array bounds checking:
 
 \subsection{Elimination of Redundant Tests}
 \label{subsection-array-bound-check_bottom_up}
 
-%%@UserManualDocumentation: array_bound_check_bottom_up 
+%%@UserManualDocumentation: array_bound_check_bottom_up
 This transformation takes as input the current module, adds array range
 checks (lower and upper bound checks) to every statement that has one or
 more array accesses. The output is the module with those added tests.
@@ -6781,16 +6781,16 @@ declarator with the unbounded upper bound of the last dimension, no range check 
 
 Associated with each test is a bound violation error message and in case
 of real access violation, a STOP statement will be put before the current
-statement. 
+statement.
 
 This phase is always followed by the \verb/partial_redundancy_elimination/ for logical
-expression in order to reduce the number of bound checks.  
+expression in order to reduce the number of bound checks. 
 %%!UserManualDocumentation
 
 \begin{PipsMake}
 alias array_bound_check_bottom_up 'Elimination of Redundant Tests'
 array_bound_check_bottom_up            > MODULE.code
-        < PROGRAM.entities 
+        < PROGRAM.entities
         < MODULE.code
 \end{PipsMake}
 
@@ -6799,7 +6799,7 @@ array_bound_check_bottom_up            > MODULE.code
 \label{subsection-array-bound-check_top_down}
 
 %%@UserManualDocumentation: array_bound_check_top_down
-This second implementation is based on the array region analyses phase which benefits some interesting proven properties: 
+This second implementation is based on the array region analyses phase which benefits some interesting proven properties:
 
 \begin{enumerate}
 
@@ -6807,12 +6807,12 @@ This second implementation is based on the array region analyses phase which ben
   that represents a block of code of program is included in the
   declared dimensions of the array, no bound check is needed for this
   block of code.
- 
-\item If a MUST region correspond to one node in the control 
+
+\item If a MUST region correspond to one node in the control
   flow graph that represents a block of code of program contains elements
   which are outside the declared dimensions of the  array, there is
   certainly bound violation in this block of code. An error can be
-  detected just in compilation time. 
+  detected just in compilation time.
 
 \end{enumerate}
 
@@ -6820,19 +6820,19 @@ If none of these two properties are satisfied, we consider the
 approximation of region. In case of MUST region, if the exact bound checks
 can be generated, they will be inserted before the block of code. If not, like in
 case of MAY region, we continue to go down to the children nodes in the
-control flow graph.    
+control flow graph.   
 
  The main advantage
 of this algorithm is that it permits to detect the sure bound violations
 or to tell that there is certainly no bound violation as soon as
 possible, thanks to the context given by preconditions and the top-down
-analyses. 
+analyses.
 %%!UserManualDocumentation
 
 \begin{PipsMake}
 alias array_bound_check_top_down 'Insertion of Unavoidable Tests'
 array_bound_check_top_down   > MODULE.code
-        < PROGRAM.entities 
+        < PROGRAM.entities
         < MODULE.code
         < MODULE.regions
 \end{PipsMake}
@@ -6881,7 +6881,7 @@ Array bounds checking refers to determining whether all array reference
 are within their declared range in all of its uses in a program. Here are
 array bounds checking options for code instrumentation, in order to
 compute the number of bound checks added. We can use only one property for
-these two case, but the meaning is not clear. To be changed ? 
+these two case, but the meaning is not clear. To be changed ?
 
 \begin{PipsProp}
 INITIAL_CODE_ARRAY_BOUND_CHECK_INSTRUMENTATION TRUE
@@ -6890,10 +6890,10 @@ PIPS_CODE_ARRAY_BOUND_CHECK_INSTRUMENTATION FALSE
 
 In practice, bound violations may often occur with arrays in a common block. The
 standard is violated, but programmers think that they are not dangerous
-because the allocated size of the common is not depassed.  
+because the allocated size of the common is not depassed. 
 The following property deals with this kind of bad programming practice. If the
 array is a common variable, it checks if the reference goes beyond the
-size of the common block or not. 
+size of the common block or not.
 
 \begin{PipsProp}
 ARRAY_BOUND_CHECKING_WITH_ALLOCATION_SIZE FALSE
@@ -6909,7 +6909,7 @@ purposes, one may need to display all possible violations such as
 out-of-bound or used-before-set errors, but not
 to stop the program. In this case, a PRINT message is chosen. By default,
 we use the STOP message.
- 
+
 \begin{PipsProp}
 PROGRAM_VERIFICATION_WITH_PRINT_MESSAGE FALSE
 \end{PipsProp}
@@ -6929,7 +6929,7 @@ PROGRAM_VERIFICATION_WITH_PRINT_MESSAGE FALSE
 \textit {Aliasing} occurs when two or more variables refer to the same
 storage location at the same program point. Alias analysis is critical for
 performing most optimizations correctly because we must know for certain
-that we have to take into account 
+that we have to take into account
 all the ways a location, or the value of a variable, may (or must)
 be used or changed. Compile-time alias information is also important for
 program verification, debugging and understanding.
@@ -6950,7 +6950,7 @@ occur due to pointers in languages like LISP, C, C++ or Fortran 90,
 union construct in C or \verb+EQUIVALENCE+ in Fortran. Interprocedural aliases
 are generally created by parameter passing and by access to global
 variables, which propagates intraprocedural aliases  across procedures and
-introduces new aliases.     
+introduces new aliases.    
 
 The basic idea for computing interprocedural aliases is to follow all the
 possible chains of argument-parameters and nonlocal variable-parameter
@@ -6967,7 +6967,7 @@ This analysis is implemented by Thi Viet Nga \textsc{Nguyen}.
 \begin{PipsMake}
 
 alias_propagation           > MODULE.alias_associations
-        < PROGRAM.entities 
+        < PROGRAM.entities
         < MODULE.code
         < CALLERS.alias_associations
         < CALLERS.code
@@ -6998,18 +6998,18 @@ informations of variables in a program, and then to verify
 statically if the program violates the standard restriction on alias or
 not. If these informations are not known at compile-time, we instrument
 the code with tests that check the violation dynamically during
-execution of program. 
+execution of program.
 
 This verification is implemented by Thi Viet Nga \textsc{Nguyen}.
 %%!UserManualDocumentation
 
-% Attention : will we use the preconditions, regions, effects ? 
-% They are may be wrong 
+% Attention : will we use the preconditions, regions, effects ?
+% They are may be wrong
 
 \begin{PipsMake}
 alias alias_check 'Alias Check'
 alias_check   > MODULE.code
-        < PROGRAM.entities 
+        < PROGRAM.entities
         < MODULE.alias_associations
         < MODULE.cumulated_effects
         < ALL.code
@@ -7018,9 +7018,9 @@ alias_check   > MODULE.code
 This is a property to tell the alias propagation and alias checking phase to use
 information from MAIN program or not. If the current module is never
 called by the main program, we do no alias propagation and alias checking
-for this module if the property is on. However, we can 
+for this module if the property is on. However, we can
 do nothing with modules that have no callers at all, because this is a
-top-down approach ! 
+top-down approach !
 
 \begin{PipsProp}
 ALIAS_CHECKING_USING_MAIN_PROGRAM FALSE
@@ -7041,21 +7041,21 @@ works as follows: if we have a MUST IN region at the module statement, the
 corresponding variable must be used before
 being defined, a STOP is inserted. Else, we insert an initialization
 function and go down, insert a verification function before each MUST IN
-at each sub-statements.   
+at each sub-statements.  
 
 This is a top-down analysis that process a procedure before all its
 callees. Information given by callers is used to verify if we have to
 check for the formal parameters in the current module or not. In addition,
 we produce information in the resource MODULE.ubs to tell if the formal
-parameters of the called procedures have to be checked or not.  
- 
+parameters of the called procedures have to be checked or not. 
+
 This verification is implemented by Thi Viet Nga \textsc{Nguyen}.
 %%!UserManualDocumentation
 
 \begin{PipsMake}
 alias used_before_set 'Used Before Set'
 used_before_set   > MODULE.ubs
-        < PROGRAM.entities 
+        < PROGRAM.entities
         < MODULE.code
         < MODULE.in_regions
         < CALLERS.ubs
@@ -7117,7 +7117,7 @@ privatization is much more expensive and still is mainly experimental.
 \subsubsection{Scalar Privatization}
 \index{Scalar Privatization}
 
-%%@UserManualDocumentation: privatize_module 
+%%@UserManualDocumentation: privatize_module
 Privatizer detects variables that are local to a loop nest and marks
 these variables as private. A variable is private to a loop if the
 values assigned to this variable inside the loop cannot reach a
@@ -7127,8 +7127,8 @@ statement outside the loop body.
 \begin{PipsMake}
 alias privatize_module 'Privatize Scalars'
 privatize_module                    > MODULE.code
-        < PROGRAM.entities 
-        < MODULE.code 
+        < PROGRAM.entities
+        < MODULE.code
         < MODULE.proper_effects
         < MODULE.cumulated_effects
         < MODULE.chains
@@ -7228,7 +7228,7 @@ iterations. The first option, when set to false, removes this
 constraint. It is useful for single assignment programs, to discover what
 section is really local to each iteration. When the second option is set to
 false, the copy-out problem is not considered, i.e. only array elements that
-are not further reused in the program continuation can be privatized. 
+are not further reused in the program continuation can be privatized.
 
 \begin{PipsProp}
 ARRAY_PRIV_FALSE_DEP_ONLY TRUE
@@ -7257,7 +7257,7 @@ performed earlier.
 \subsubsection{Scalar Expansion}
 \index{Scalar Expansion}
 
-%%@UserManualDocumentation: scalar_expansion 
+%%@UserManualDocumentation: scalar_expansion
 Loop private scalar variables are expanded when all enclosing loops have
 numerical bounds and increment one.
 %%!UserManualDocumentation
@@ -7265,8 +7265,8 @@ numerical bounds and increment one.
 \begin{PipsMake}
 alias variable_expansion 'Expand Scalar'
 variable_expansion                    > MODULE.code
-        < PROGRAM.entities 
-        < MODULE.code 
+        < PROGRAM.entities
+        < MODULE.code
 \end{PipsMake}
 
 \subsubsection{Array Expansion}
@@ -7416,6 +7416,22 @@ transformation_test    > MODULE.code
         < MODULE.code
 \end{PipsMake}
 
+\section{Extensions Transformations}
+\label{section-extensions_transformations}
+
+\subsection {Open MP Pragma}
+\label{subsection-open_mp_pragma}
+%%@UserManualDocumentation: OMP Pragma
+This transformation will transform a parallel code into a sequential code(cf
+Section~\ref{sec:cons-parall-code} for details) while generating Open MP
+pragma as an extension to statements.
+%%!UserManualDocumentation
+
+\begin{PipsMake}
+ompify_code             > MODULE.code
+        < MODULE.parallelized_code
+\end{PipsMake}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% PRETTYPRINT
 
 \chapter{Output Files (Prettyprinted Files)}
@@ -7552,7 +7568,7 @@ print_source_continuation_conditions   > MODULE.parsed_printed_file
         < MODULE.must_continuation
         < MODULE.may_continuation
         < MODULE.must_summary_continuation
-        < MODULE.may_summary_continuation        
+        < MODULE.may_summary_continuation       
         < MODULE.cumulated_effects
 \end{PipsMake}
 
@@ -7565,7 +7581,7 @@ Display the code decorated with the regions.
 \begin{PipsMake}
 print_source_regions              > MODULE.parsed_printed_file
         < PROGRAM.entities
-        < MODULE.parsed_code 
+        < MODULE.parsed_code
         < MODULE.regions
         < MODULE.summary_regions
         < MODULE.preconditions
@@ -8081,10 +8097,10 @@ replaced ...
 
 When prettyprinting semantic information (preconditions, transformers and
 regions), add a line before and after each piece of information if set to
-\verb+TRUE+. The resulting code is more readable, but is larger.  
+\verb+TRUE+. The resulting code is more readable, but is larger. 
 
 \begin{PipsProp}
-PRETTYPRINT_LOOSE TRUE 
+PRETTYPRINT_LOOSE TRUE
 \end{PipsProp}
 
 By default, each prettyprinted line of Fortran or C code is terminated by its
@@ -8111,7 +8127,7 @@ the statement that requires such a transformation, is used for the
 added statement.
 
 \begin{PipsProp}
-PRETTYPRINT_STATEMENT_NUMBER TRUE 
+PRETTYPRINT_STATEMENT_NUMBER TRUE
 \end{PipsProp}
 
 The structured control structure is shown by using an indentation. The
@@ -8355,7 +8371,7 @@ PRETTYPRINT_BLOCK_IF_ONLY FALSE
 Effects give data that may be read and written in a procedure. These data
 are represented by their entity name (module name+local name). In order to
 have information on the scope of commons, we need to know the common in
-which the entity is declared if any. 
+which the entity is declared if any.
 
 \begin{PipsProp}
 PRETTYPRINT_WITH_COMMON_NAMES FALSE
@@ -8416,7 +8432,7 @@ PRETTYPRINT_DATA_STATEMENTS TRUE
 Where to put the dimension information, which must appear once.
 The default is associated to the type information. It can be associated to
 The type, or preferably to the common if any, or maybe to a dimension
-statement, which is not implemented. 
+statement, which is not implemented.
 
 \begin{PipsProp}
 PRETTYPRINT_VARIABLE_DIMENSIONS "type"
@@ -8866,7 +8882,7 @@ Each module can be decorated by {\em summary} information computed by
 
 If one module has different callers, its sub call tree is replicated
 once for each caller\footnote{In the ICFG , the replication would
-occur for each call site.}. 
+occur for each call site.}.
 
 No fun to read, but how could we avoid it with a
 text output? But it is useful to check large analyses.
@@ -9340,7 +9356,7 @@ print_icfg_with_out_regions              > MODULE.icfg_file
 
 \subsection{ICFG with Loops}
 
-%%@UserManualDocumentation: print_icfg_with_loops 
+%%@UserManualDocumentation: print_icfg_with_loops
 Display the plain ICFG with loops, without any decoration.
 %%!UserManualDocumentation
 \begin{PipsMake}
@@ -9906,7 +9922,7 @@ print_claire_code_with_explicit_motif       > MODULE.claire_printed_file
 
 %%@UserManualDocumentation: print_xml_application
 This pass was developped for the Ter@ops project to generate models
-of functions and application used for automatic mapping by SPEAR. 
+of functions and application used for automatic mapping by SPEAR.
 It generates XML code.
 %%@!UserManualDocumentation
 
@@ -9919,7 +9935,7 @@ print_xml_application      > MODULE.xml_printed_file
     < MODULE.proper_effects
     < MODULE.cumulated_effects
     < MODULE.summary_effects
-    < MODULE.regions       
+    < MODULE.regions      
     < CALLEES.summary_effects
 \end{PipsMake}
 
@@ -9976,7 +9992,7 @@ Feautrier's methods (see~\cite{Fea91}). This method can only be applied
 on static-control code, otherwise an error occurs. Function
 \verb+print_array_dfg+ prints the Data Flow Graph.
 
-In the ouput produced by the array DFG analysis, 
+In the ouput produced by the array DFG analysis,
 each statement is renamed ``\texttt{ins\_}'' followed by the statement number it had in the original
 program and by a digit representing its position among the different
 statements coming from the same statement of the original program.
@@ -10230,7 +10246,7 @@ The transformation menu is displayed as here:
   use_def_elimination
   stf
   freeze_variables
-  partial_redundancy_elimination 
+  partial_redundancy_elimination
 
   array_bound_check_bottom_up
   array_bound_check_top_down
@@ -10390,7 +10406,7 @@ Internal Representation of Fortran Code}, Technical Report E/166, May
 1992. This report is constantly updated and available on-line.
 
   \bibitem{I87} F. Irigoin,
-{\em Partitionnement des boucles imbrique'es. Une tech\-nique 
+{\em Partitionnement des boucles imbrique'es. Une tech\-nique
 d'opti\-mi\-sation des programmes scientifiques},
 Thèse de doctorat de l'université Pierre et Marie Curie, juin 1987
 
@@ -10414,12 +10430,12 @@ January 13-15, pp. 319-329, 1988
 {\em Final Report on Software Caching for Simulated Global Memory},
 PUMA ESPRIT 2701, Deliberable 6.5.1, Tech. Report EMP-CRI-E155, November 1991
 
-  \bibitem{IA92a} F. Irigoin, C. Ancourt, 
+  \bibitem{IA92a} F. Irigoin, C. Ancourt,
 {\em Compilation pour machines à mémoire répartie},
 Algorithmique Parallèle, Cosnard, Nivat, Robert Eds, Masson,
 Ecole de Printemps du LITP, mai 1992
 
-  \bibitem{IA92b} F. Irigoin, C. Ancourt, 
+  \bibitem{IA92b} F. Irigoin, C. Ancourt,
 {\em Automatic Code Distribution},
 Third International Workshop on Compilers for Parallel Computers, Vienne,
 July, 1992
@@ -10440,7 +10456,7 @@ on-line and regularly updated.
 \bibitem{Much97} Steven S. Muchnick,
   {\it Advanced Compiler Design Implementation}
   Morgan Kaufmann Publishers, 1997
-  
+ 
 \bibitem{Ost83} L.~J.~Osterweil, TOOLPACK - An Experimental Software
     Development Environment Research Project,
 {\em IEEE TOSE}, Vol. 9, No. 6, pp.673-685 (1983).
@@ -10474,14 +10490,14 @@ Alto, June 23-27, 1986
 
   \bibitem{Y93} Y. Yang,
 {\em Tests des dépendances et transformations de programme},
-Thèse de doctorat de l'Université Pierre et Marie Curie, 
+Thèse de doctorat de l'Université Pierre et Marie Curie,
 15 Novembre 1993, rapport A/242.
 
   \bibitem{Z94} L. Zhou,
 {\em Analyse
-statique et dynamique de la complexité des programmes 
+statique et dynamique de la complexité des programmes
 scientifiques},
-Thèse de doctorat de l'Université Pierre et Marie Curie, 
+Thèse de doctorat de l'Université Pierre et Marie Curie,
 14 Septembre 1994, technical report A/255.
 
   \bibitem{rieblFL00} Martin Griebl, Paul Feautrier and Christian Lengauer
@@ -10498,8 +10514,8 @@ International Journal of Parallel Programming, 2000.
 
 \end{document}
 
-%%% Local Variables: 
+%%% Local Variables:
 %%% mode: latex
 %%% TeX-master: t
 %%% ispell-local-dictionary: "american"
-%%% End: 
+%%% End:

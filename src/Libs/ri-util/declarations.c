@@ -1249,13 +1249,15 @@ text text_initializations(entity m)
 
   il = sequence_statements(code_initializations(value_code(entity_initial(m))));
 
-  MAP(STATEMENT, is, {
-    if(!empty_comments_p(statement_comments(is))) {
-      ADD_SENTENCE_TO_TEXT(t, make_sentence(is_sentence_formatted, 
-					    strdup(statement_comments(is))));
-    }
-    ADD_SENTENCE_TO_TEXT(t, sentence_data_statement(is));
-  }, il);
+  MAP(STATEMENT, is,
+      {
+	if(!empty_comments_p(statement_comments(is))) {
+	  ADD_SENTENCE_TO_TEXT(t, make_sentence(is_sentence_formatted, 
+						strdup(statement_comments(is))));
+	}
+	ADD_SENTENCE_TO_TEXT(t, sentence_data_statement(is));
+      },
+      il);
 
   return t;
 }
