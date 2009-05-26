@@ -1484,11 +1484,8 @@ static list effects_of_any_ioelem(expression exp, tag act, bool is_fortran)
       /* This is not generic! */
       entity ioptr = make_dummy_io_ptr();
       reference r = make_reference(ioptr, CONS(EXPRESSION, make_unbounded_expression(), NIL));
-      /* effect eff = make_effect(make_cell_reference(r), make_action_write(), make_addressing_index(),
-	 make_approximation_may(), make_descriptor_none());*/
-      /* BC : trying to make things more generic */
       effect eff = (*reference_to_effect_func)(r,make_action_write());
-
+      effect_approximation_tag(eff) = is_approximation_may;
       /* FI: this is really not generic! */
       extern effect c_summary_effect_to_proper_effect(effect, expression);
       effect n_eff = c_summary_effect_to_proper_effect(eff, exp);
