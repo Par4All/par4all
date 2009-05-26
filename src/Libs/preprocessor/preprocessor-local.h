@@ -29,8 +29,10 @@
 
 /* default preprocessor and basic options
  */
-#define CPP_CPP			"cpp -C -ansi" /* alternative values: "gcc -E -C" */
+#define CPP_CPP			"cpp -C" /* alternative values: "gcc -E -C" */
 /* #define CPP_CPPFLAGS		" -P -D__PIPS__ -D__HPFC__ " */
+/* -U__GNUC__ seems to be still useful to avoid spoiling the libC files
+    with too many GCC extensions: */
 #define CPP_CPPFLAGS		" -D__PIPS__ -D__HPFC__ -U__GNUC__ "
 #define FPP_CPP			"cpp -C" /* alternative values: "gcc -E -C" or "fpp" */
 #define FPP_CPPFLAGS		" -P -D__PIPS__ -D__HPFC__ "
