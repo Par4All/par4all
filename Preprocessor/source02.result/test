@@ -13,14 +13,18 @@ Printed files
       PRINT *, "bar02"                                                  0004
 
       END
+
+
       SUBROUTINE FOO01
 
-      PRINT *, "foo01"                                                  0003
+      PRINT *, "foo01"                                                  0005
 
       END
+
+
       SUBROUTINE FOO02
 
-      PRINT *, "foo02"                                                  0003
+      PRINT *, "foo02"                                                  0005
 
       END
 
@@ -29,9 +33,11 @@ Regenerated file
 !!
 !! file for module01.f
 !!
+
+
       SUBROUTINE FOO01
 
-      PRINT *, "foo01"                                                  0003
+      PRINT *, "foo01"                                                  0005
 
       END
 
@@ -43,9 +49,11 @@ Regenerated file
 !!
 !! file for module02.f
 !!
+
+
       SUBROUTINE FOO02
 
-      PRINT *, "foo02"                                                  0003
+      PRINT *, "foo02"                                                  0005
 
       END
 
