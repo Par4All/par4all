@@ -33,8 +33,7 @@ typedef dg_vertex_label vertex_label;
 #include "graph.h"
 #include "chains.h"
 
-/* PRIVATIZABLE checks whether the entity E is privatizable. */
-
+/* privatizable() checks whether the entity e is privatizable. */
 static bool privatizable(entity e)
 {
     storage s = entity_storage( e ) ;
@@ -71,16 +70,18 @@ static void scan_statement(statement s, list loops)
 		gen_nconc(gen_copy_seq(loops), CONS(STATEMENT, s, NIL)) ;
 	list locals = NIL ;
 
-	MAPL( fs, { 
-	    effect f = EFFECT( CAR( fs )) ;
+	FOREACH(EFFECT, f, load_cumulated_rw_effects_list(b)) {
 	    entity e = effect_entity( f ) ;
+	    addressing ad = effect_addressing(f);
 
-	    if( action_write_p( effect_action( f )) &&
-	        privatizable( e ) && 
-	        gen_find_eq( e, locals ) == entity_undefined ) {
+	    if(addressing_index_p(ad)
+	       &&  action_write_p( effect_action( f ))
+	       &&  privatizable( e )
+	       &&  gen_find_eq( e, locals ) == entity_undefined ) {
 		locals = CONS( ENTITY, e, locals ) ;
 	    }
-	}, load_cumulated_rw_effects_list( b )) ;
+	}
+
 	loop_locals( l ) = CONS( ENTITY, loop_index( l ), locals ) ;
 	scan_statement( b, new_loops ) ;
 	hash_del(get_enclosing_loops_map(), (char *) s) ;
@@ -97,6 +98,12 @@ static void scan_statement(statement s, list loops)
     case is_instruction_whileloop: {
 	whileloop l = instruction_whileloop(i);
 	statement b = whileloop_body(l);
+	scan_statement(b, loops ) ;
+	break;
+    }
+    case is_instruction_forloop: {
+	forloop l = instruction_forloop(i);
+	statement b = forloop_body(l);
 	scan_statement(b, loops ) ;
 	break;
     }
@@ -292,8 +299,7 @@ try_privatize(vertex v, statement st, effect f, entity e)
 	}
     }
 
-    MAPL( succs, {
-	successor succ = SUCCESSOR( CAR( succs )) ;
+    FOREACH(SUCCESSOR, succ, vertex_successors(v)) {
 	vertex succ_v = successor_vertex( succ ) ;
 	dg_vertex_label succ_l = 
 	    (dg_vertex_label)vertex_vertex_label( succ_v ) ;
@@ -307,8 +313,7 @@ try_privatize(vertex v, statement st, effect f, entity e)
 	if( v == succ_v ) {
 	    continue ;
 	}
-	MAPL( cs, {
-	    conflict c = CONFLICT( CAR( cs )) ;
+	FOREACH(CONFLICT, c, dg_arc_label_conflicts(arc_l)) {
 	    effect sc = conflict_source( c ) ;
 	    effect sk = conflict_sink( c ) ;
 	    cons *prefix ;
@@ -332,10 +337,8 @@ try_privatize(vertex v, statement st, effect f, entity e)
 	    update_locals( prefix, ls, e ) ;
 	    update_locals( prefix, succ_ls, e ) ;
 	    gen_free_list( prefix ) ;
-	},
-	     dg_arc_label_conflicts( arc_l )) ;
-    },
-	 vertex_successors( v )) ;
+	}
+    }
 
     debug(1, "try_privatize", "End\n");
 }
@@ -382,8 +385,7 @@ bool privatize_module(char *mod_name)
     scan_statement(mod_stat, NIL);
 
     /* remove non private variables from locals */
-    MAPL( vs, {
-	vertex v = VERTEX( CAR( vs )) ;
+    FOREACH(VERTEX, v, graph_vertices( mod_graph )) {
 	dg_vertex_label vl = (dg_vertex_label) vertex_vertex_label( v ) ;
 	statement st = 
 	    ordering_to_statement(dg_vertex_label_statement(vl));
@@ -394,7 +396,7 @@ bool privatize_module(char *mod_name)
 	  print_statement(st);
 	}
 	       
-	MAP(EFFECT, f, {
+	FOREACH(EFFECT, f, load_proper_rw_effects_list( st )) {
 	    entity e = effect_entity( f ) ;
 	    ifdebug(4) {
 	      pips_debug(1, "effect :");
@@ -403,8 +405,8 @@ bool privatize_module(char *mod_name)
 	    if( action_write_p( effect_action( f ))) {
 		try_privatize( v, st, f, e ) ;
 	    }
-	}, load_proper_rw_effects_list( st )) ;
-    }, graph_vertices( mod_graph )) ;
+	}
+    }
 
     /* sort locals
      */
