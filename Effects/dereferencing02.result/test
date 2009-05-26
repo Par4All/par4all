@@ -24,17 +24,15 @@ void dereferencing02()
    double *p = &x;
    double **q = &p;
    int i = 1;
-//               <may be written >: TOP-LEVEL:*MEMORY*
 //               <must be read   >: q
+//               <must be written>: q[0][0]
    
 
    **q = 2.;
 //               <must be read   >: q
-//               <must be written>: i
-//               <must be written - pre>: *(q[i = 2])
+//               <must be written>: q[2][0]
    **(q+(i = 2)) = 3.;
-//               <may be read    >: TOP-LEVEL:*MEMORY*
-//               <must be read   >: q
+//               <must be read   >: q q[0][0]
 //               <must be written>: x
    x = **q;
 //               <must be read   >: q
@@ -47,25 +45,21 @@ void dereferencing02()
 
 Cumulated effetcs for "dereferencing02"
 
-//               <may be read    >: TOP-LEVEL:*MEMORY*
-//               <may be written >: TOP-LEVEL:*MEMORY*
 void dereferencing02()
 {
    double x = 1.;
    double *p = &x;
    double **q = &p;
    int i = 1;
-//               <may be written >: TOP-LEVEL:*MEMORY*
 //               <must be read   >: q
+//               <must be written>: q[0][0]
    
 
    **q = 2.;
 //               <must be read   >: q
-//               <must be written>: i
-//               <may be written - pre >: *(q[*])
+//               <must be written>: q[2][0]
    **(q+(i = 2)) = 3.;
-//               <may be read    >: TOP-LEVEL:*MEMORY*
-//               <must be read   >: q
+//               <must be read   >: q q[0][0]
 //               <must be written>: x
    x = **q;
 //               <must be read   >: q

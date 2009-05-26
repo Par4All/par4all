@@ -20,24 +20,24 @@ Proper effects for "call15"
 void call15(int *pi, tf_t *q)
 {
 //               <must be read   >: pi
-//               <must be written - post>: (*pi)
+//               <must be written>: pi[0]
    *pi = 1;
 //               <must be read   >: q
-//               <must be written - post>: (*q)[1]
+//               <must be written>: q[0][1]
    q->one = 1;
 }
 
 Cumulated effects for "call15"
 
 //               <must be read   >: pi q
-//               <must be written - post>: (*pi) (*q)[1]
+//               <must be written>: pi[0] q[0][1]
 void call15(int *pi, tf_t *q)
 {
 //               <must be read   >: pi
-//               <must be written - post>: (*pi)
+//               <must be written>: pi[0]
    *pi = 1;
 //               <must be read   >: q
-//               <must be written - post>: (*q)[1]
+//               <must be written>: q[0][1]
    q->one = 1;
 }
 

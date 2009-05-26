@@ -96,7 +96,7 @@ byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
    if (strcmp(buffer, "P5")!=0) 
       nrerror("entete du fichier %s invalide\n");
 //               <must be read   >: nrl
-//               <must be written - post>: (*nrl)
+//               <must be written>: nrl[0]
    
    //width  = atoi(readitem(file, buffer));
    //height = atoi(readitem(file, buffer));
@@ -104,13 +104,13 @@ byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
 
    *nrl = 0;
 //               <must be read   >: height nrh
-//               <must be written - post>: (*nrh)
+//               <must be written>: nrh[0]
    *nrh = height-1;
 //               <must be read   >: ncl
-//               <must be written - post>: (*ncl)
+//               <must be written>: ncl[0]
    *ncl = 0;
 //               <must be read   >: nch width
-//               <must be written - post>: (*nch)
+//               <must be written>: nch[0]
    *nch = width-1;
 //               <must be written>: m
    m = bmatrix(*nrl, *nrh, *ncl, *nch);
@@ -142,6 +142,7 @@ Cumulated effects for "LoadPGM_bmatrix"
 //               <may be written >: TOP-LEVEL:*MEMORY* 
 //                                  __IO_EFFECTS:LUNS[*]
 //               <must be read   >: filename nch ncl nrh nrl
+//               <must be written>: nch[0] ncl[0] nrh[0] nrl[0]
 byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
 {
    int height;
@@ -169,7 +170,7 @@ byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
    if (strcmp(buffer, "P5")!=0) 
       nrerror("entete du fichier %s invalide\n");
 //               <must be read   >: nrl
-//               <must be written - post>: (*nrl)
+//               <must be written>: nrl[0]
    
    //width  = atoi(readitem(file, buffer));
    //height = atoi(readitem(file, buffer));
@@ -177,17 +178,17 @@ byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
 
    *nrl = 0;
 //               <must be read   >: height nrh
-//               <must be written - post>: (*nrh)
+//               <must be written>: nrh[0]
    *nrh = height-1;
 //               <must be read   >: ncl
-//               <must be written - post>: (*ncl)
+//               <must be written>: ncl[0]
    *ncl = 0;
 //               <must be read   >: nch width
-//               <must be written - post>: (*nch)
+//               <must be written>: nch[0]
    *nch = width-1;
 //               <must be written>: m
    m = bmatrix(*nrl, *nrh, *ncl, *nch);
-//               <may be read    >: file i width TOP-LEVEL:*MEMORY* 
+//               <may be read    >: file i m[*] width 
 //                                  __IO_EFFECTS:LUNS[*]
 //               <may be written >: file[*] m[*][*] 
 //                                  __IO_EFFECTS:LUNS[*]

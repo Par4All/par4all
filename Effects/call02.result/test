@@ -1,8 +1,12 @@
 
+
 Parsed code for "call02"
 
 void call02(int i, int j, int y[10], int *q[10], tf_t *p)
 {
+   /* i can be modified locally, but it won't show in the summary
+        effects... which creates a problem for transformer and
+        precondition computation. */
    i = j+1;
    y[i] = 0;
    p->one = 1;
@@ -14,6 +18,9 @@ Code for "call02"
 
 void call02(int i, int j, int y[10], int *q[10], tf_t *p)
 {
+   /* i can be modified locally, but it won't show in the summary
+        effects... which creates a problem for transformer and
+        precondition computation. */
    i = j+1;
    y[i] = 0;
    p->one = 1;
@@ -27,68 +34,53 @@ void call02(int i, int j, int y[10], int *q[10], tf_t *p)
 {
 //               <must be read   >: j
 //               <must be written>: i
+   /* i can be modified locally, but it won't show in the summary
+        effects... which creates a problem for transformer and
+        precondition computation. */
    i = j+1;
 //               <must be read   >: i
 //               <must be written>: y[i]
    y[i] = 0;
 //               <must be read   >: p
-//               <must be written - post>: (*p)[1]
+//               <must be written>: p[0][1]
    p->one = 1;
 //               <must be read   >: j p
-//               <must be written - post>: (*p)[2][j]
+//               <must be written>: p[0][2][j]
    (p->two)[j] = 2.;
 //               <must be read   >: i q[i]
-//               <must be written - pre>: *(q[i])
+//               <must be written>: q[i][0]
    *q[i] = 3;
 }
 
 Cumulated effects for "call02"
 
 //               <may be read    >: q[*]
-//               <may be written >: y[*]
+//               <may be written >: p[0][2][*] q[*][0] y[*]
 //               <must be read   >: i j p
-//               <must be written>: i
-//               <may be written - pre >: *(q[*])
-//               <may be written - post >: (*p)[2][*]
-//               <must be written - post>: (*p)[1]
+//               <must be written>: p[0][1]
 void call02(int i, int j, int y[10], int *q[10], tf_t *p)
 {
 //               <must be read   >: j
 //               <must be written>: i
+   /* i can be modified locally, but it won't show in the summary
+        effects... which creates a problem for transformer and
+        precondition computation. */
    i = j+1;
 //               <may be written >: y[*]
 //               <must be read   >: i
    y[i] = 0;
 //               <must be read   >: p
-//               <must be written - post>: (*p)[1]
+//               <must be written>: p[0][1]
    p->one = 1;
+//               <may be written >: p[0][2][*]
 //               <must be read   >: j p
-//               <may be written - post >: (*p)[2][*]
    (p->two)[j] = 2.;
 //               <may be read    >: q[*]
+//               <may be written >: q[*][0]
 //               <must be read   >: i
-//               <may be written - pre >: *(q[*])
    *q[i] = 3;
 }
 
-Cumulated effects for "main"
-
-main()
-{
-   int a;
-   int b;
-   int x[10];
-   int *ap[10];
-   tf_t s;
-   tf_t *sp = &s;
-//               <may be read    >: ap[*]
-//               <must be read   >: a ap b sp x
-//               <may be written - pre >: *(ap[*])
-//               <may be written - post >: (*sp)[2][*]
-//               <must be written - post>: (*sp)[1]
-
-   call02(a, b, x, ap, sp);
-}
 
 Regions for "main"
 
