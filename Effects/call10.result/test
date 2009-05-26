@@ -78,6 +78,7 @@ main()
 {
    tf_t s;
    tf_t *sp = &s;
+//               <may be written >: s[2][*] sp[0][2][*]
 //               <must be read   >: s[1] s[2] sp sp[0][1] sp[0][2]
 
    call10(s.one, s.two, sp->one, sp->two);
