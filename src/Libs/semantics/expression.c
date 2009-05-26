@@ -1490,9 +1490,13 @@ transformer assign_operation_to_transformer(entity val, // assumed to be a value
 
     if(entity_has_values_p(e) /* && integer_scalar_entity_p(e) */) {
       entity ev = entity_to_new_value(e);
+
       //transformer teq = simple_equality_to_transformer(val, ev, TRUE);
+
       tf = assigned_expression_to_transformer(ev, rhs, pre);
-      tf = transformer_add_equality(tf, val, ev);
+      if(!transformer_undefined_p(tf))
+	tf = transformer_add_equality(tf, val, ev);
+
       //tf = transformer_combine(tf, teq);
       //free_transformer(teq);
     }
