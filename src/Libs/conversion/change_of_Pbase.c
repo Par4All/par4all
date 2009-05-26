@@ -43,45 +43,12 @@ Pbase *base_newindex;
     derive_new_basis(base_oldindex, base_newindex, make_index_prime_entity);
 }
 
-
-
-/*
- *create a new entity for a new index 
- */
-entity make_new_index_entity(entity old_index, string suffix)
-{
-	entity new_index;
-	string old_name;
-	char *new_name=NULL;
-
-	old_name = entity_name(old_index);
-
-	/* add a terminal p till a new name is found. */
-	for (asprintf(&new_name, "%s%s", old_name, suffix);
-			gen_find_tabulated(new_name, entity_domain)!=entity_undefined; 
-
-			old_name = new_name) {
-		free(new_name);
-		asprintf(&new_name, "%s%s", old_name, suffix);
-	}
-
-	// FI: copy_storage() cree de l'aliasing entre new_index et old_index
-	// Is this the right place to fix the problem?
-	new_index = make_entity(new_name,
-			copy_type(entity_type(old_index)),
-			storage_undefined,
-			copy_value(entity_initial(old_index)));
-	AddEntityToCurrentModule(new_index);
-	return(new_index);
-}
-
 entity make_index_prime_entity(entity old_index)
 {
   return make_new_index_entity(old_index, "p");
 }
 
-entity make_index_entity(old_index)
-entity old_index;
+entity make_index_entity(entity old_index)
 {
     return make_index_prime_entity(old_index);
 }
