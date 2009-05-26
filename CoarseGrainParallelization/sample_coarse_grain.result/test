@@ -1,0 +1,93 @@
+Select the most precise analysis:
+Compute the intraprocedural preconditions at the same time as
+transformers and use them to improve the accuracy of expression
+and statement transformers:
+Try to restructure the code for more precision:
+Privatize scalar variables on all the modules of the program:
+Ask for some statistics about the job to be done:
+Ask for the parallelization of all the modules of the program with OpenMP output:
+
+      SUBROUTINE A
+      PARAMETER (NVAR=3,NXM=2000,NYM=2000)
+      REAL B(NXM)
+
+!$OMP PARALLEL DO 
+      DO I = 1, NXM                                                     0005
+         B(I) = I                                                       0006
+      ENDDO
+      END
+
+      SUBROUTINE B
+      PARAMETER (NVAR=3,NXM=2000,NYM=2000)
+      REAL C(NXM)
+
+!$OMP PARALLEL DO 
+      DO I = 1, NXM                                                     0005
+         C(I) = 0                                                       0006
+      ENDDO
+      END
+       PROGRAM NS
+       PARAMETER (NVAR=3,NXM=2000,NYM=2000)
+       REAL PHI(NVAR,NXM,NYM),PHI1(NVAR,NXM,NYM)
+       REAL PHIDES(NVAR,NYM)
+       REAL DIST(NXM,NYM),XNOR(2,NXM,NYM),SGN(NXM,NYM)
+       REAL XCOEF(NXM,NYM),XPT(NXM),YPT(NXM)
+
+
+!$OMP PARALLEL DO PRIVATE(I,PX,PY,XCO)
+      DO J = 2, NY-1                                                    0008
+
+!$OMP    PARALLEL DO PRIVATE(PX,PY,XCO)
+         DO I = 2, NX-1                                                 0009
+            XCO = XCOEF(I,J)                                            0010
+            PX = (PHI1(3,I+1,J)-PHI1(3,I-1,J))*H1P2                     0011
+            PY = (PHI1(3,I,J+1)-PHI1(3,I,J-1))*H2P2                     0012
+            PHI1(1,I,J) = PHI1(1,I,J)-DT*PX*XCO                         0013
+            PHI1(2,I,J) = PHI1(2,I,J)-DT*PY*XCO                         0014
+         ENDDO
+      ENDDO
+      END
+Consider the generated parallel as the sequential code now:
+
+      SUBROUTINE A
+      PARAMETER (NVAR=3,NXM=2000,NYM=2000)
+      REAL B(NXM)
+
+!$OMP PARALLEL DO 
+      DO I = 1, NXM                                                     0005
+         B(I) = I                                                       0006
+      ENDDO
+      END
+
+      SUBROUTINE B
+      PARAMETER (NVAR=3,NXM=2000,NYM=2000)
+      REAL C(NXM)
+
+!$OMP PARALLEL DO 
+      DO I = 1, NXM                                                     0005
+         C(I) = 0                                                       0006
+      ENDDO
+      END
+       PROGRAM NS
+       PARAMETER (NVAR=3,NXM=2000,NYM=2000)
+       REAL PHI(NVAR,NXM,NYM),PHI1(NVAR,NXM,NYM)
+       REAL PHIDES(NVAR,NYM)
+       REAL DIST(NXM,NYM),XNOR(2,NXM,NYM),SGN(NXM,NYM)
+       REAL XCOEF(NXM,NYM),XPT(NXM),YPT(NXM)
+
+
+!$OMP PARALLEL DO PRIVATE(I,PX,PY,XCO)
+      DO J = 2, NY-1                                                    0008
+
+!$OMP    PARALLEL DO PRIVATE(PX,PY,XCO)
+         DO I = 2, NX-1                                                 0009
+            XCO = XCOEF(I,J)                                            0010
+            PX = (PHI1(3,I+1,J)-PHI1(3,I-1,J))*H1P2                     0011
+            PY = (PHI1(3,I,J+1)-PHI1(3,I,J-1))*H2P2                     0012
+            PHI1(1,I,J) = PHI1(1,I,J)-DT*PX*XCO                         0013
+            PHI1(2,I,J) = PHI1(2,I,J)-DT*PY*XCO                         0014
+         ENDDO
+      ENDDO
+      END
+Consider the generated parallel as the sequential code now:
+Regenerate the sources from the PIPS transformed code:
