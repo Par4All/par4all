@@ -1,8 +1,8 @@
-delete fgetc
+delete fgetc03
 
 setproprety ABORT_ON_USER_ERROR TRUE
 
-create fgetc fgetc.c
+create fgetc03 fgetc03.c
 
 module main
 

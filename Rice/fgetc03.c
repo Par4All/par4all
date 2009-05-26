@@ -6,6 +6,15 @@
 float imagein_re[N][N];
 float imagein_im[N][N];
 
+unsigned char foo(FILE * fp)
+{
+  unsigned char c = 0;
+  // Bug with proper effects:
+  //return c = * ((unsigned char *) fp);
+  fp++; // The write effect is lost, but not the read effect, as long
+	// use-def elimination is not used
+  return c;
+}
 
 void getimage(void)
 {
@@ -20,7 +29,7 @@ void getimage(void)
      is removed, this bug too... */
   for(i=0;i<N;i++)
     for(j=0;j<N;j++) {
-      c=fgetc(fp);
+      c=foo(fp);
       imagein_re[i][j]=(c==0) ? 0.0 : 1.0;
       imagein_im[i][j]=0.0;
     }
