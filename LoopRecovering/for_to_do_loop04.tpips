@@ -1,6 +1,8 @@
 delete for_to_do_loop04
 create for_to_do_loop04 for_to_do_loop04.c
 
+setproperty CHECK_RESOURCE_USAGE TRUE
+
 #setenv C_SYNTAX_DEBUG_LEVEL 9
 #setproperty GENERATE_MISSING_SOURCE_FILES TRUE
 activate C_PARSER
