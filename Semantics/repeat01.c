@@ -2,16 +2,18 @@
 
 int repeat01()
 {
-  int i, j, n;
+  int i, j;
 
   i = 0;
   j = 1;
-  n = 10;
 
-  do {
-    i++;
-    j += 2;
-  } while(j<n);
+  {
+    int n = 10;
 
+    do {
+      i++;
+      j += 2;
+    } while(j<n);
+  }
   return i+j;
 }
