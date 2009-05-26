@@ -316,7 +316,7 @@ recover_for_loop(char * module_name) {
 
   /* Construct the mapping to get the statements associated to the
      dependence graph: */
-  initialize_ordering_to_statement(module_statement);
+  set_ordering_to_statement(module_statement);
 
   /* The proper effect to detect statement memory effects: */
   set_proper_rw_effects((statement_effects)

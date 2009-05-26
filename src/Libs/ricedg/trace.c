@@ -185,7 +185,7 @@ bool print_filtered_dg_or_dvdg(string mod_name, bool is_dv)
     set_current_module_statement( (statement)
 	db_get_memory_resource(DBR_CODE, mod_name, TRUE) );
     mod_stat = get_current_module_statement();
-    initialize_ordering_to_statement(mod_stat);
+    set_ordering_to_statement(mod_stat);
     
     dg = (graph) db_get_memory_resource(DBR_DG, mod_name, TRUE);
 

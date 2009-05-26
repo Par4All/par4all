@@ -1195,7 +1195,7 @@ bool guard_elimination(string module)
   // recherche le statement dans stat
   // appliquer...
   
-  /* initialize_ordering_to_statement(stat); */
+  /* set_ordering_to_statement(stat); */
   ins=statement_instruction(stat);
   seq=instruction_sequence(ins);
   lis =sequence_statements(seq); 

@@ -516,7 +516,7 @@ use_def_elimination(char * module_name)
    set_current_module_statement(module_statement);
    set_current_module_entity(module_name_to_entity(module_name));
 
-   initialize_ordering_to_statement(module_statement);
+   set_ordering_to_statement(module_statement);
 
    debug_on("USE_DEF_ELIMINATION_DEBUG_LEVEL");
 

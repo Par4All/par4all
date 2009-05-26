@@ -1135,7 +1135,7 @@ bool array_bound_check_top_down(char *module_name)
 						       module_name, 
 						       TRUE);
   set_current_module_statement(module_statement);
-  initialize_ordering_to_statement(module_statement);
+  set_ordering_to_statement(module_statement);
   /* Get the READ and WRITE regions of the module */
   set_rw_effects((statement_effects) 
 		 db_get_memory_resource(DBR_REGIONS, module_name, TRUE)); 

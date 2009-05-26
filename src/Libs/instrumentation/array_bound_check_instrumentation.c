@@ -468,7 +468,7 @@ bool old_array_bound_check_instrumentation(char *module_name)
   module_statement= (statement) 
     db_get_memory_resource(DBR_CODE, module_name, TRUE);  
   set_current_module_statement(module_statement); 
-  initialize_ordering_to_statement(module_statement);      
+  set_ordering_to_statement(module_statement);      
   debug_on("ARRAY_BOUND_CHECK_INSTRUMENTATION_DEBUG_LEVEL");  
   if (get_bool_property("INITIAL_CODE_ARRAY_BOUND_CHECK_INSTRUMENTATION"))   
     {

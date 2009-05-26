@@ -1059,7 +1059,7 @@ bool array_bound_check_bottom_up(char *module_name)
    * Get the code from dbm (true resource) */  
   module_statement= (statement) db_get_memory_resource(DBR_CODE, module_name, TRUE);
   set_current_module_statement(module_statement); 
-  initialize_ordering_to_statement(module_statement);      
+  set_ordering_to_statement(module_statement);      
   debug_on("ARRAY_BOUND_CHECK_BOTTOM_UP_DEBUG_LEVEL"); 
   ifdebug(1)
     {

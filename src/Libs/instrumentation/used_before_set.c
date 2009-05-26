@@ -1041,7 +1041,7 @@ bool used_before_set(char *module_name)
   /* Get IN regions of the module */
   set_in_effects((statement_effects) db_get_memory_resource(DBR_IN_REGIONS,module_name,TRUE));
   regions_init(); 
-  initialize_ordering_to_statement(module_statement);  
+  set_ordering_to_statement(module_statement);  
   debug_on("USED_BEFORE_SET_DEBUG_LEVEL");
   l_in_regions = load_statement_in_regions(module_statement);
   ifdebug(2)

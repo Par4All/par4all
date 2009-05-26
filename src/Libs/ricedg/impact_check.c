@@ -1217,7 +1217,7 @@ bool impact_check(char * module_name)
 	mod_stat = (statement)db_get_memory_resource(DBR_CODE, module_name, TRUE);	
         set_current_module_entity(current_mod);
 
-	initialize_ordering_to_statement(mod_stat);
+	set_ordering_to_statement(mod_stat);
 	init_dynamic_check_list(current_mod);
 
 	/*computing_dominators(control_to_set_of_dominators, load_ctrl_graph(mod_stat));

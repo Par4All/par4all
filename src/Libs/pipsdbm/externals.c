@@ -18,7 +18,7 @@
 #include "paf_ri.h"
 
 /* ??? ri-util stupid cyclic? dependencies */
-extern void initialize_ordering_to_statement();
+extern void set_ordering_to_statement();
 extern void * ordering_to_statement();
 extern char * statement_identification();
 
@@ -126,7 +126,7 @@ pipsdbm_read_statement_mapping(FILE * fd)
     stat = (statement)
 	db_get_memory_resource(DBR_CODE, dbll_current_module, TRUE);
 
-    initialize_ordering_to_statement(stat);
+    set_ordering_to_statement(stat);
 
     /* get meta data.
      */
@@ -242,7 +242,7 @@ pipsdbm_read_statement_function(FILE * fd /* file to read from */)
     stat = (statement)
 	db_get_memory_resource(DBR_CODE, dbll_current_module, TRUE);
 
-    initialize_ordering_to_statement(stat);
+    set_ordering_to_statement(stat);
 
     /* get meta data.
      */

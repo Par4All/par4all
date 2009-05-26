@@ -357,7 +357,7 @@ bool privatize_module(char *mod_name)
 	db_get_memory_resource(DBR_CODE, mod_name, TRUE) );
     mod_stat = get_current_module_statement();
 
-    initialize_ordering_to_statement(mod_stat);
+    set_ordering_to_statement(mod_stat);
     
     mod_inst = statement_instruction(mod_stat);
 

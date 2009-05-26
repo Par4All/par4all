@@ -53,7 +53,7 @@ flinter(char * module_name)
     /* Resource to trace uninitialized variables: */
     dependence_graph =
 	(graph) db_get_memory_resource(DBR_CHAINS, module_name, TRUE);
-    initialize_ordering_to_statement(module_stat);
+    set_ordering_to_statement(module_stat);
 
     set_proper_rw_effects((statement_effects)
 			  db_get_memory_resource(DBR_PROPER_EFFECTS,

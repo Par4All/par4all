@@ -925,7 +925,7 @@ static void add_aliases_for_current_caller()
 {  
   statement caller_statement = (statement) db_get_memory_resource
     (DBR_CODE,caller_name, TRUE);
-  initialize_ordering_to_statement(caller_statement); 
+  set_ordering_to_statement(caller_statement); 
   make_current_statement_stack();
   gen_multi_recurse(caller_statement,
 		    statement_domain, current_statement_filter,current_statement_rewrite,

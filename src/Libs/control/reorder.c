@@ -155,5 +155,5 @@ statement body;
        May be, we are going to work on a different module very soon..
     */
     //set_ordering_to_statement(body);
-    initialize_ordering_to_statement(body);
+    set_ordering_to_statement(body);
 }

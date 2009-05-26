@@ -1202,7 +1202,7 @@ chains(char *module_name, int use)
     }
 
     ifdebug(2) {
-      initialize_ordering_to_statement(module_stat);
+      set_ordering_to_statement(module_stat);
       prettyprint_dependence_graph(stderr, module_stat, module_graph);
     }
 

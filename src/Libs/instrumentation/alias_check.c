@@ -2038,7 +2038,7 @@ bool alias_check(char * module_name)
 	  print_list_of_alias_associations(l_module_aliases);
 	}
       set_current_module_entity(current_mod);
-      initialize_ordering_to_statement(module_statement);  
+      set_ordering_to_statement(module_statement);  
       /* Get the proper and cumulated effects of the module, we have to take both kinds of 
 	 effects because of their difference for an elementary statement: 
 	 V(I) = I  => cumulated effect : <may be written> V(*)

@@ -223,7 +223,7 @@ char *mod_name;
    
     /* FI: set should be used, and reset should be performed later. */
     //set_ordering_to_statement(mod_stat);
-    initialize_ordering_to_statement(mod_stat);
+    set_ordering_to_statement(mod_stat);
 
     chains = (graph)
 	db_get_memory_resource(DBR_CHAINS, mod_name, TRUE);

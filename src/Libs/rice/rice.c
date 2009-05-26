@@ -272,7 +272,7 @@ do_it(
     /* Make sure the dependence graph points towards the code copy */
     if(ordering_to_statement_initialized_p())
 	reset_ordering_to_statement();
-    initialize_ordering_to_statement(mod_parallel_stat);
+    set_ordering_to_statement(mod_parallel_stat);
 
     rice_distribute_only = distribute_p ;
     enclosing = 0;

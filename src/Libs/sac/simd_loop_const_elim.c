@@ -356,7 +356,7 @@ bool simd_loop_const_elim(char * module_name)
     /* Get the code of the module. */
     entity module = module_name_to_entity(module_name);
     statement module_stat = (statement)db_get_memory_resource(DBR_CODE, module_name, TRUE);
-	initialize_ordering_to_statement(module_stat);
+	set_ordering_to_statement(module_stat);
     set_current_module_entity( module);
     set_current_module_statement( module_stat);
     set_cumulated_rw_effects(

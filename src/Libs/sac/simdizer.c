@@ -591,7 +591,7 @@ bool simdizer(char * mod_name)
 
     set_current_module_statement(mod_stmt);
     set_current_module_entity(module_name_to_entity(mod_name));
-	initialize_ordering_to_statement(mod_stmt);
+	set_ordering_to_statement(mod_stmt);
     dependence_graph = 
         (graph) db_get_memory_resource(DBR_DG, mod_name, TRUE);
 

@@ -300,7 +300,7 @@ suppress_trivial_test(char * mod_name)
   set_current_module_entity(module_name_to_entity(mod_name));
   mod_stmt= (statement) db_get_memory_resource(DBR_CODE, mod_name, TRUE);
   set_current_module_statement(mod_stmt);
-  initialize_ordering_to_statement(mod_stmt);	
+  set_ordering_to_statement(mod_stmt);	
 
   debug_on("TRIVIAL_TEST_DEBUG_LEVEL");
 

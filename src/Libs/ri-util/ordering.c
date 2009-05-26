@@ -117,8 +117,10 @@ hash_table set_ordering_to_statement(statement s)
     return ots;
 }
 
-/* To be phased out. */
-void 
+/* To be phased out.
+ * FI recommands not to use this
+ */
+static void 
 initialize_ordering_to_statement(statement s)
 {
     /* FI: I do not like that automatic cleaning any more... */
