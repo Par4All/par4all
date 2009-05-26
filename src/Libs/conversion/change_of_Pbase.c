@@ -69,7 +69,7 @@ entity make_new_index_entity(entity old_index, string suffix)
 	// Is this the right place to fix the problem?
 	new_index = make_entity(new_name,
 			copy_type(entity_type(old_index)),
-			copy_storage(entity_storage(old_index)),
+			storage_undefined,
 			copy_value(entity_initial(old_index)));
 	AddEntityToCurrentModule(new_index);
 	return(new_index);

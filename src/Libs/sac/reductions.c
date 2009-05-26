@@ -124,13 +124,6 @@ static entity make_reduction_vector_entity(reduction r)
     mod_ent = get_current_module_entity();
     list lis = CONS(DIMENSION,make_dimension(int_expr(0),int_expr(0)), NIL);
     new_ent = make_new_array_variable_with_prefix(buffer,mod_ent,base,lis);
-    dynamic_area = global_name_to_entity(module_local_name(mod_ent),DYNAMIC_AREA_LOCAL_NAME);
-    entity_storage(new_ent) = make_storage(is_storage_ram,
-            make_ram(mod_ent,
-                dynamic_area,
-                add_any_variable_to_area(dynamic_area, new_ent, c_module_p(mod_ent)),
-                NIL));
-
     AddLocalEntityToDeclarations(new_ent,mod_ent,
             c_module_p(mod_ent)?get_current_module_statement():statement_undefined);
 
