@@ -542,7 +542,7 @@ statement make_empty_statement_with_declarations_and_comments(list d, string dt,
 			  make_instruction_block(NIL),
 			  d,
 			  dt,
-			  extensions_undefined ));
+			  empty_extensions () ));
 }
 
 statement make_empty_statement()
@@ -552,7 +552,7 @@ statement make_empty_statement()
 			  STATEMENT_ORDERING_UNDEFINED,
 			  empty_comments,
 			  make_instruction_block(NIL),NIL,NULL,
-			  extensions_undefined));
+			  empty_extensions ()));
 }
 
 /* to be compared with instruction_to_statement() which is a macro (thanks to FC?) ! */
@@ -566,7 +566,7 @@ instruction instr;
 			  STATEMENT_ORDERING_UNDEFINED, 
 			  empty_comments,
 			  instr,NIL,NULL,
-			  extensions_undefined));
+			  empty_extensions ()));
 }
 
 instruction 
@@ -619,14 +619,14 @@ make_block_statement_with_stop()
 					   make_call(stop_function,NIL)),
 			  NIL,
 			  NULL,
-			  extensions_undefined);
+			  empty_extensions ());
 
     b = make_statement(entity_empty_label(),
 			  STATEMENT_NUMBER_UNDEFINED,
 			  STATEMENT_ORDERING_UNDEFINED,
 			  empty_comments,
 			  make_instruction_block(CONS(STATEMENT, stop, NIL)),NIL,NULL,
-			  extensions_undefined);
+			  empty_extensions ());
 
     ifdebug(8) {
 	fputs("make_block_statement_with_stop",stderr);
@@ -669,7 +669,7 @@ list body;
 			  STATEMENT_ORDERING_UNDEFINED,
 			  empty_comments,
 			  make_instruction_block(body),NIL,NULL,
-			  extensions_undefined);
+			  empty_extensions ());
 
     return b;
 }
@@ -787,7 +787,7 @@ statement make_whileloop_statement(expression condition,
 		       string_undefined,
 		       make_instruction_whileloop(w),
 		       NIL, string_undefined,
-		       extensions_undefined);
+		       empty_extensions ());
   return smt;
 }
 
@@ -849,7 +849,7 @@ string c; /* comments, default empty_comments (was: "" (was: string_undefined)) 
 				       make_call(called_function,args)),
 		      NIL,
 		      NULL,
-		      extensions_undefined);
+		      empty_extensions ());
 
   ifdebug(8) {
     pips_debug(8, "cs is call to %s\n", function_name);
@@ -1365,14 +1365,14 @@ statement makeloopbody(loop l, statement s_old, bool inner_p)
 			     statement_ordering(s_old),
 			     statement_comments(s_old),
 			     instr_l,NIL,NULL,
-			     extensions_undefined);
+			     statement_extensions(s_old));
     l_body = make_statement(entity_empty_label(),
 			    STATEMENT_NUMBER_UNDEFINED,
 			    STATEMENT_ORDERING_UNDEFINED,
 			    empty_comments,
 			    make_instruction_block(CONS(STATEMENT,state_l,NIL)),
 			    NIL,NULL,
-			    extensions_undefined);
+			    empty_extensions ());
 
     return(l_body);
 }

@@ -105,7 +105,7 @@ bool controlizer(string module_name)
 						control_graph(module_stat)),
 			       NIL /* gen_copy_seq(statement_declarations(parsed_mod_stat))*/,
 			       NULL,
-			       extensions_undefined);
+			       empty_extensions ());
 
     /* By setting this property, we try to unspaghettify the control
        graph of the module: */

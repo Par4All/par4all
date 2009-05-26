@@ -293,7 +293,7 @@ instruction i;
 			   STATEMENT_NUMBER_UNDEFINED,
 			   STATEMENT_ORDERING_UNDEFINED,
 			   empty_comments,
-			   i, NIL, NULL, extensions_undefined);
+			   i, NIL, NULL, empty_extensions ());
     }
     else {
 	s = make_statement(l,
@@ -301,7 +301,7 @@ instruction i;
 			   STATEMENT_NUMBER_UNDEFINED : get_statement_number(),//get_next_statement_number(),
 			   STATEMENT_ORDERING_UNDEFINED,
 			   empty_comments,
-			   i, NIL, NULL, extensions_undefined);
+			   i, NIL, NULL, empty_extensions ());
 	NewStmt(l, s);
     }
 
@@ -489,7 +489,7 @@ instruction i;
 			   STATEMENT_NUMBER_UNDEFINED : get_statement_number(), //get_next_statement_number(),
 			   STATEMENT_ORDERING_UNDEFINED,
 			   empty_comments,
-			   i,NIL,NULL, extensions_undefined);
+			   i,NIL,NULL, empty_extensions ());
     }
 
     return(s);
@@ -692,7 +692,7 @@ make_goto_instruction(entity l)
 		       STATEMENT_ORDERING_UNDEFINED,
 		       empty_comments,
 		       instruction_undefined, NIL, NULL,
-		       extensions_undefined);
+		       empty_extensions ());
     NewStmt(l, s);
   }
 

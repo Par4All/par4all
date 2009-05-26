@@ -339,14 +339,14 @@ sequence for_to_while_loop_conversion(expression init,
 				       empty_comments,
 				       make_instruction(is_instruction_call,
 							syntax_call(s_init)),
-				       NIL,NULL,extensions_undefined);
+				       NIL,NULL,empty_extensions ());
     statement incr_st =  make_statement(entity_empty_label(),
 					STATEMENT_NUMBER_UNDEFINED,
 					STATEMENT_ORDERING_UNDEFINED,
 					empty_comments,
 					make_instruction(is_instruction_call,
 							 syntax_call(s_incr)),
-					NIL,NULL,extensions_undefined);
+					NIL,NULL,empty_extensions ());
     sequence body_seq = make_sequence(CONS(STATEMENT, body,
 					CONS(STATEMENT, incr_st, NIL)));
     statement n_body = make_statement(entity_empty_label(),
@@ -355,7 +355,7 @@ sequence for_to_while_loop_conversion(expression init,
 				      empty_comments,
 				      make_instruction(is_instruction_sequence,
 						       body_seq),
-				     NIL,NULL,extensions_undefined);
+				     NIL,NULL,empty_extensions ());
     whileloop wl_i = make_whileloop(cond, n_body, entity_empty_label(),
 				    make_evaluation_before() );
     statement wl_st =  make_statement(entity_empty_label(),
@@ -364,7 +364,7 @@ sequence for_to_while_loop_conversion(expression init,
 				     comments,
 				     make_instruction(is_instruction_whileloop,
 						      wl_i),
-				     NIL,NULL,extensions_undefined);
+				     NIL,NULL,empty_extensions ());
 
     ifdebug(5) {
       pips_debug(5, "Initialization statement:\n");
@@ -398,7 +398,7 @@ sequence for_to_while_loop_conversion(expression init,
 				     string_undefined,
 				     make_instruction(is_instruction_sequence,
 						      wlseq),
-				     NIL,NULL,extensions_undefined);
+				     NIL,NULL,empty_extensions ());
 
     pips_debug(5, "End with statement:\n");
     print_statement(d_st);

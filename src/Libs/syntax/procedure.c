@@ -1960,7 +1960,7 @@ ProcessEntry(
 			 empty_comments,
 			 make_instruction(is_instruction_unstructured,
 					  control_graph(es)),
-			 NIL,NULL, extensions_undefined);
+			 NIL,NULL, empty_extensions ());
     unspaghettify_statement(ces);
 
     /* Compute an external representation of entry statement es for entry e.

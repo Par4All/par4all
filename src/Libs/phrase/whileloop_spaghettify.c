@@ -66,8 +66,7 @@ static control make_condition_from_whileloop (whileloop the_whileloop,
 				       make_instruction (is_instruction_test,
 							 condition_test),
 				       NIL,NULL,
-				       extensions_undefined); 
- 
+				       statement_extensions(stat));
   return make_control (condition_statement, NIL, NIL);
 }
 

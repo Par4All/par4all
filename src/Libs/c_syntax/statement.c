@@ -131,7 +131,7 @@ statement MakeBlock(list decls, list stms)
 			       STATEMENT_ORDERING_UNDEFINED,
 			       empty_comments /* get_current_C_comment() */,
 			       make_instruction_sequence(make_sequence(stms)),
-			       decls, string_undefined, extensions_undefined);
+			       decls, string_undefined, empty_extensions ());
 
   discard_C_comment();
 
@@ -234,7 +234,7 @@ statement MakeGotoStatement(string label)
 		       STATEMENT_ORDERING_UNDEFINED,
 		       get_current_C_comment(),
 		       make_instruction(is_instruction_goto,s),NIL,NULL,
-		       extensions_undefined);
+		       empty_extensions ());
 
   return gts;
 }
@@ -327,7 +327,7 @@ statement MakeForloop(expression e1, expression e2, expression e3, statement s)
 		       string_undefined,
 		       make_instruction_forloop(f),
 		       NIL, string_undefined,
-		       extensions_undefined);
+		       empty_extensions ());
 
   if (!statement_undefined_p(s2))
     {

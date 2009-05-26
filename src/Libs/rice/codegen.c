@@ -524,7 +524,8 @@ statement body;
 			      STATEMENT_ORDERING_UNDEFINED,
 			      string_undefined,
 			      make_instruction(is_instruction_loop, new_loop),
-			      NIL, NULL, extensions_undefined);
+			      NIL, NULL,
+			      copy_extensions (statement_extensions(old_loop_statement)));
 
   ifdebug(8) {
     pips_assert("Execution is either parallel or sequential",

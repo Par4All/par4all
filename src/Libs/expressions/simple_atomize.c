@@ -139,12 +139,13 @@ statement s;
 						       statement_comments(cs),
 						       statement_instruction(cs),
 						       NIL, NULL,
-						       extensions_undefined),
+						       statement_extensions(cs)),
 					NIL)));
 	  statement_label(cs) = entity_empty_label();
 	  statement_number(cs) = STATEMENT_NUMBER_UNDEFINED;
 	  statement_ordering(cs) = STATEMENT_ORDERING_UNDEFINED;
 	  statement_comments(cs) = empty_comments;
+	  statement_extensions(cs) = empty_extensions ();
 	}
     }
 }

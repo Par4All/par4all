@@ -312,7 +312,7 @@ do_clone_statement(statement s, clone_context cc, hash_table ht)
             new_instruction_with_decl,
             NIL,
             NULL,
-	    extensions_undefined);
+	    empty_extensions ());
 
 }
 

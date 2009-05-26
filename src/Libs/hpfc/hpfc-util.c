@@ -189,7 +189,7 @@ int the_tag;
 			   STATEMENT_ORDERING_UNDEFINED,
 			   string_undefined_p(c)? c: strdup(c),
 			   make_instruction(the_tag, x),NIL,NULL,
-			   extensions_undefined);
+			   copy_extensions (statement_extensions(stat)));
     fix_sequence_statement_attributes_if_sequence(new_s);
     return new_s;
 }

@@ -60,7 +60,7 @@ static void simd_insert_statement(statement cs, statement stat)
 				 statement_instruction(cs),
 				 NIL,
 				 NULL,
-				 extensions_undefined);
+				 statement_extensions(cs));
 
         statement_instruction(cs) =
             make_instruction_block(CONS(STATEMENT, stat,
@@ -72,6 +72,7 @@ static void simd_insert_statement(statement cs, statement stat)
         statement_number(cs) = STATEMENT_NUMBER_UNDEFINED;
         statement_ordering(cs) = STATEMENT_ORDERING_UNDEFINED;
         statement_comments(cs) = empty_comments;
+	statement_extensions(cs) = empty_extensions ();
     }
 }
 
@@ -380,7 +381,7 @@ static void transform_if_stat(statement stat, list lStat, list lCond)
 					     make_instruction(is_instruction_test, t),
 					     NIL,
 					     NULL,
-					     extensions_undefined);
+					     empty_extensions ());
 
             // Add the created statement to the list of output statements
             if(lOutStat == NIL)
@@ -428,7 +429,7 @@ static void transform_if_stat(statement stat, list lStat, list lCond)
 					 make_instruction(is_instruction_test, t),
 					 NIL,
 					 NULL,
-					 extensions_undefined);
+					 empty_extensions ());
 
         // Add the created statement to the list of output statements
         if(lOutStat == NIL)

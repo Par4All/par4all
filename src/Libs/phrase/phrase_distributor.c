@@ -199,7 +199,7 @@ static statement isolate_code_portion (statement begin_tag_statement,
 		       statement_ordering(sequence_statement),
 		       empty_comments,
 		       sequence_instruction,NIL,NULL,
-		       extensions_undefined);
+		       statement_extensions(sequence_statement));
 
     bool isolated_seq_stats_is_inserted = FALSE;
     
@@ -405,7 +405,7 @@ static void distribute_code (string function_name,
 				  make_instruction(is_instruction_call,
 						   make_call(new_module,call_params)),
 				  NIL,NULL,
-				  extensions_undefined);
+				  statement_extensions(externalized_code));
 
   ifdebug(5) {
     pips_debug(5, "BEFORE REPLACING\n");

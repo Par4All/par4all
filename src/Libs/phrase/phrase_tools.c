@@ -346,7 +346,7 @@ statement make_binary_call_statement (string operator_name,
 			  make_instruction (is_instruction_call,
 					    assignment_call),
 			  NIL,NULL,
-			  extensions_undefined); 
+			  empty_extensions ()); 
   }
   else {
     return make_statement(entity_empty_label(),
@@ -356,7 +356,7 @@ statement make_binary_call_statement (string operator_name,
 			  make_instruction (is_instruction_call,
 					    assignment_call),
 			  NIL,NULL,
-			  extensions_undefined); 
+			  statement_extensions(stat));
   }
 }
 

@@ -565,8 +565,7 @@ statement loop_test(statement sl)
 		      STATEMENT_ORDERING_UNDEFINED,
 		      cs,
 		      make_instruction(is_instruction_test, t),NIL,NULL,
-		      extensions_undefined);
-
+		      copy_extensions (statement_extensions(sl)));
   return ts;
 }
 
@@ -629,7 +628,7 @@ hash_table used_labels;
 				      make_instruction(is_instruction_loop, new_l),
 				      statement_declarations(st),
 				      statement_decls_text(st),
-				      extensions_undefined),
+				      statement_extensions(st)),
 		       ADD_PRED(pred, c_res),
 		       ADD_SUCC(succ, c_res )) ;
 	controlized = FALSE;
@@ -707,7 +706,7 @@ statement whileloop_test(statement sl)
 			STATEMENT_ORDERING_UNDEFINED,
 			cs,
 			make_instruction(is_instruction_test, t),NIL,NULL,
-			extensions_undefined);
+			copy_extensions (statement_extensions(sl)));
 
     return ts;
 }
@@ -760,7 +759,7 @@ hash_table used_labels;
 						       new_l),
 				      statement_declarations(st),
 				      statement_decls_text(st),
-				      extensions_undefined),
+				      statement_extensions(st)),
 		       ADD_PRED(pred, c_res),
 		       ADD_SUCC(succ, c_res )) ;
 	controlized = FALSE;
@@ -823,7 +822,7 @@ statement forloop_test(statement sl)
 				STATEMENT_ORDERING_UNDEFINED,
 				cs,
 				make_instruction(is_instruction_test, t),NIL,NULL,
-				extensions_undefined);
+				copy_extensions(statement_extensions(sl)));
 
   ifdebug(8) {
     pips_debug(8, "Condition expression: ");
@@ -931,7 +930,7 @@ hash_table used_labels;
 				  ni,
 				  statement_declarations(st),
 				  statement_decls_text(st),
-				  extensions_undefined),
+				  statement_extensions(st)),
 		   ADD_PRED(pred, c_res),
 		   ADD_SUCC(succ, c_res )) ;
     controlized = FALSE;
@@ -1045,7 +1044,7 @@ compact_list(list ctls,
 				   STATEMENT_ORDERING_UNDEFINED,
 				   string_undefined,
 				   i,NIL,NULL,
-				   extensions_undefined);
+				   empty_extensions ());
 	    ;
 	  }
 	  else {
@@ -1060,7 +1059,7 @@ compact_list(list ctls,
 				   STATEMENT_ORDERING_UNDEFINED,
 				   string_undefined,
 				   i,NIL,NULL,
-				   extensions_undefined);
+				   empty_extensions ());
 	    }
 	    if(instruction_block_p(succ_i=statement_instruction(succ_st))){
 		instruction_block(i) =
@@ -1323,7 +1322,7 @@ hash_table used_labels __attribute__((__unused__));
 				    i,
 				    statement_declarations(st),
 				    statement_decls_text(st),
-				    extensions_undefined);
+				    statement_extensions(st));
 	}
 
 	/* Not a good idea from mine to add this free... RK
@@ -1446,7 +1445,7 @@ hash_table used_labels;
 				  make_instruction(is_instruction_test, it),
 				  statement_declarations(st),
 				  statement_decls_text(st),
-				  extensions_undefined),
+				  statement_extensions(st)),
 		   ADD_PRED(pred, c_res),
 		   CONS(CONTROL, succ, NIL));
     control_predecessors(succ) = ADD_PRED(c_res, succ);

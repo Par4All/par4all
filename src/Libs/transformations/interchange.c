@@ -1,4 +1,4 @@
-/* 
+/*
  * $Id$
  */
 
@@ -38,12 +38,12 @@ extern int set_interchange_parameters();
  *        ...
  *  ENDDO
  */
-statement 
+statement
 gener_DOSEQ(
-    list lls, 
-    Pvecteur *pvg, 
-    Pbase base_oldindex, 
-    Pbase base_newindex, 
+    list lls,
+    Pvecteur *pvg,
+    Pbase base_oldindex,
+    Pbase base_newindex,
     Psysteme sc_newbase)
 {
     statement state_lhyp = statement_undefined;
@@ -53,14 +53,14 @@ gener_DOSEQ(
     range rl = range_undefined;
     expression lower = expression_undefined;
     expression upper = expression_undefined;
-    statement bl = statement_undefined; 
+    statement bl = statement_undefined;
     statement s_loop = statement_undefined;
     Pbase pb = BASE_NULLE;
 
     bl=loop_body(instruction_loop(statement_instruction(STATEMENT(CAR(lls)))));
     statement_newbase(bl,pvg,base_oldindex);
     /* make the parallel loops from inner loop to upper loop*/
-   
+  
     for(pb=base_reversal(base_newindex);lls!=NIL; lls=CDR(lls)) {
 	/* traitement of current loop */
 	s_loop = STATEMENT(CAR(lls));
@@ -73,7 +73,7 @@ gener_DOSEQ(
 
 	if (CDR(lls)!=NULL) {
 	    /* make  the inner sequential loops
-	       they will be the inner parallel loops after 
+	       they will be the inner parallel loops after
 	       integration the phase  of parallelization*/
 	    l_hyp = make_loop(pb->var,
 			      rl,
@@ -87,7 +87,7 @@ gener_DOSEQ(
     }
 
     /* Make the last outer loop which is sequential and can be labelled */
-   
+  
     l_hyp = make_loop(pb->var,rl,bl,loop_label(l_old),
 		      make_execution(is_execution_sequential,UU),
 		      loop_locals(l_old));
@@ -97,7 +97,7 @@ gener_DOSEQ(
 				statement_ordering(s_loop),
 				statement_comments(s_loop),
 				instr_lhyp,NIL,NULL,
-				extensions_undefined);
+				statement_extensions(s_loop));
     return(state_lhyp);
 }
 
@@ -112,7 +112,7 @@ gener_DOSEQ(
  * FI: should be replaced by interchange_two_loops(lls, 1, n)
  */
 
-statement 
+statement
 interchange(list lls,bool (*unused)(bool))
 {
     Psysteme sci;			/* sc initial */
@@ -128,7 +128,7 @@ interchange(list lls,bool (*unused)(bool))
     int m ;				/* number of constraints */
     statement s_lhyp;
     Pvecteur *pvg;
-    Pbase pb;  
+    Pbase pb; 
     expression lower, upper;
     Pvecteur pv1, pv2;
     loop l;
@@ -138,7 +138,7 @@ interchange(list lls,bool (*unused)(bool))
 
     /* make the  system "sc" of constraints of iteration space */
     sci = loop_iteration_domaine_to_sc(lls, &base_oldindex);
-    
+   
     /* create the  matrix A of coefficients of  index in (Psysteme)sci */
     n = base_dimension(base_oldindex);
     m = sci->nb_ineq;
@@ -154,7 +154,7 @@ interchange(list lls,bool (*unused)(bool))
     AG = matrice_new(m,n);
     matrice_multiply(A,G,AG,m,n,n);
 
-    /* create the new system of constraintes (Psysteme scn) with  
+    /* create the new system of constraintes (Psysteme scn) with 
        AG and sci */
     scn = sc_dup(sci);
     matrice_index_sys(scn,base_oldindex,AG,n,m);
@@ -166,18 +166,18 @@ interchange(list lls,bool (*unused)(bool))
     change_of_base_index(base_oldindex,&base_newindex);
     sc_newbase=sc_change_baseindex(sc_dup(sc_row_echelon),
 				   base_oldindex,base_newindex);
-    
+   
     /* generation of interchange  code */
     /*  generation of bounds */
     for (pb=base_newindex; pb!=NULL; pb=pb->succ) {
 	make_bound_expression(pb->var,base_newindex,sc_newbase,&lower,&upper);
     }
-  
+ 
     /* loop body generation */
     pvg = (Pvecteur *)malloc((unsigned)n*sizeof(Svecteur));
     scanning_base_to_vect(G,n,base_newindex,pvg);
     pv1 = sc_row_echelon->inegalites->succ->vecteur;
-    pv2 = vect_change_base(pv1,base_oldindex,pvg);    
+    pv2 = vect_change_base(pv1,base_oldindex,pvg);   
 
     l = instruction_loop(statement_instruction(STATEMENT(CAR(lls))));
     lower = range_upper(loop_range(l));
@@ -192,10 +192,10 @@ interchange(list lls,bool (*unused)(bool))
     return s_lhyp;
 }
 
-statement 
+statement
 interchange_two_loops(
-    list lls, 
-    int n1, 
+    list lls,
+    int n1,
     int n2)
 {
     Psysteme sci;			/* sc initial */
@@ -211,7 +211,7 @@ interchange_two_loops(
     int m ;				/* number of constraints */
     statement s_lhyp;
     Pvecteur *pvg;
-    Pbase pb;  
+    Pbase pb; 
     expression lower, upper;
     Pvecteur pv1, pv2;
     loop l;
@@ -221,7 +221,7 @@ interchange_two_loops(
 
     /* make the  system "sc" of constraints of iteration space */
     sci = loop_iteration_domaine_to_sc(lls, &base_oldindex);
-    
+   
     /* create the  matrix A of coefficients of  index in (Psysteme)sci */
     n = base_dimension(base_oldindex);
     m = sci->nb_ineq;
@@ -237,7 +237,7 @@ interchange_two_loops(
     AG = matrice_new(m,n);
     matrice_multiply(A,G,AG,m,n,n);
 
-    /* create the new system of constraintes (Psysteme scn) with  
+    /* create the new system of constraintes (Psysteme scn) with 
        AG and sci */
     scn = sc_dup(sci);
     matrice_index_sys(scn,base_oldindex,AG,n,m);
@@ -250,18 +250,18 @@ interchange_two_loops(
     sc_newbase =
 	sc_change_baseindex(sc_dup(sc_row_echelon),
 			    base_oldindex,base_newindex);
-    
+   
     /* generation of interchange  code */
     /*  generation of bounds */
     for (pb=base_newindex; pb!=NULL; pb=pb->succ) {
 	make_bound_expression(pb->var,base_newindex,sc_newbase,&lower,&upper);
     }
-  
+ 
     /* loop body generation */
     pvg = (Pvecteur *)malloc((unsigned)n*sizeof(Svecteur));
     scanning_base_to_vect(G,n,base_newindex,pvg);
     pv1 = sc_row_echelon->inegalites->succ->vecteur;
-    pv2 = vect_change_base(pv1,base_oldindex,pvg);    
+    pv2 = vect_change_base(pv1,base_oldindex,pvg);   
 
     l = instruction_loop(statement_instruction(STATEMENT(CAR(lls))));
     lower = range_upper(loop_range(l));

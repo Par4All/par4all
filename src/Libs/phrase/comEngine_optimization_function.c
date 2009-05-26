@@ -135,7 +135,7 @@ static statement make_loopPattern(statement innerStat)
 			STATEMENT_ORDERING_UNDEFINED,
 			empty_comments,
 			make_instruction_loop(newLoop),NIL,NULL,
-			extensions_undefined);
+			empty_extensions ());
 }
 
 static entity gIndEnt = entity_undefined;

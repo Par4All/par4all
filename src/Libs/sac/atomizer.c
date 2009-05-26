@@ -225,7 +225,7 @@ static void simd_insert_statement(statement cs, statement stat)
 					   statement_instruction(cs),
 					   statement_declarations(cs),
 					   NULL,
-					   extensions_undefined);
+					   statement_extensions(cs));
 
         statement_instruction(cs) =
             make_instruction_block(CONS(STATEMENT, stat,
@@ -237,6 +237,7 @@ static void simd_insert_statement(statement cs, statement stat)
         statement_number(cs) = STATEMENT_NUMBER_UNDEFINED;
         statement_ordering(cs) = STATEMENT_ORDERING_UNDEFINED;
         statement_comments(cs) = empty_comments;
+	statement_extensions(cs) = empty_extensions ();
     }
 }
 

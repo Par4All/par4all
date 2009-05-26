@@ -312,7 +312,7 @@ static statement isolate_code_portion(statement begin_tag_statement, statement e
 						   sequence_instruction,
 						   NIL,
 						   NULL,
-						   extensions_undefined);
+						   statement_extensions (sequence_statement));
     bool isolated_seq_stats_is_inserted = FALSE;
     
     /* Build a new sequence containing isolated sequence statement */

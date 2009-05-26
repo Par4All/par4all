@@ -41,7 +41,7 @@
 #include "spaghettify.h"
 #include "phrase_tools.h"
 
-static control full_spaghettify_statement (statement stat, 
+static control full_spaghettify_statement (statement stat,
 					   string module_name,
 					   unstructured u,
 					   control current_control,
@@ -51,17 +51,17 @@ static control connect_unstructured (statement unstructured_statement,
 				     control current_control,
 				     control next_control);
 
-static void reduce_sequence (control current_control, 
+static void reduce_sequence (control current_control,
 				sequence seq,
 				control* new_entry,
-				control* new_exit); 
+				control* new_exit);
 
 static void flatten_unstructured (unstructured the_unstructured);
- 
+
 static control replace_control_with_unstructured (unstructured the_unstructured,
 						  control current_control);
 
-static statement full_spaghettify_module (statement module_statement, 
+static statement full_spaghettify_module (statement module_statement,
 					  string module_name)
 {
   statement returned_statement;
@@ -78,18 +78,18 @@ static statement full_spaghettify_module (statement module_statement,
   exit = make_control(make_continue_statement
 		       (entity_empty_label()), NIL, NIL);
   link_2_control_nodes (entry, exit);
-  new_unstructured 
+  new_unstructured
     = make_unstructured(entry, exit);
-  
+ 
   unstructured_instruction = make_instruction(is_instruction_unstructured,
 					      new_unstructured);
 
-  
+ 
   stat_number = statement_number(module_statement);
   stat_ordering = statement_ordering(module_statement);
 
-  full_spaghettify_statement (module_statement, 
-			      module_name, 
+  full_spaghettify_statement (module_statement,
+			      module_name,
 			      new_unstructured,
 			      entry,
 			      exit);
@@ -100,18 +100,18 @@ static statement full_spaghettify_module (statement module_statement,
 				      empty_comments,
 				      unstructured_instruction,
 				      NIL, NULL,
-				      extensions_undefined);
-  
-  pips_assert("Statement is consistent after FULL_SPAGUETTIFY", 
+				      statement_extensions(module_statement));
+ 
+  pips_assert("Statement is consistent after FULL_SPAGUETTIFY",
 	      statement_consistent_p(returned_statement));
-  
+ 
   ifdebug(2) {
-    CONTROL_MAP (current_control, { 
-      pips_assert("Statement is consistent after FULL_SPAGUETTIFY", 
+    CONTROL_MAP (current_control, {
+      pips_assert("Statement is consistent after FULL_SPAGUETTIFY",
 		  statement_consistent_p(control_statement(current_control)));
-      debug_control("FSM STATE: Module control =======================================",current_control, 2); 
+      debug_control("FSM STATE: Module control =======================================",current_control, 2);
     }, entry, blocs);
-  }  
+  } 
   return returned_statement;
 }
 
@@ -124,10 +124,10 @@ static statement full_spaghettify_module (statement module_statement,
  * NOTE: this function don't do recursively the job, but is generally called
  * by flatten_unstructured which do the job recursively.
  */
-static void reduce_sequence (control current_control, 
+static void reduce_sequence (control current_control,
 			     sequence seq,
 			     control* new_entry,
-			     control* new_exit) 
+			     control* new_exit)
 {
   control first_control = NULL;
   control last_control = NULL;
@@ -153,7 +153,7 @@ static void reduce_sequence (control current_control,
 
   /* Deconnect all the predecessors */
   for (i=0; i<gen_length(predecessors); i++) {
-    pips_debug(5,"Unlink predecessor [%p-%p]\n", 
+    pips_debug(5,"Unlink predecessor [%p-%p]\n",
 	       CONTROL(gen_nth(i,predecessors)),
 	       current_control);
     unlink_2_control_nodes (CONTROL(gen_nth(i,predecessors)), current_control);
@@ -171,7 +171,7 @@ static void reduce_sequence (control current_control,
 
   /* We iterate on each statement in the sequence */
   MAP(STATEMENT, current_stat,
-  { 
+  {
     /* We build a new control node from current statement */
     new_control = make_control (current_stat, NIL, NIL);
     ifdebug(5) {
@@ -181,13 +181,13 @@ static void reduce_sequence (control current_control,
       /* For the first statement... */
       first_control = new_control;
       is_first_control = FALSE;
-      pips_debug(5,"First control %p\n", first_control);    
+      pips_debug(5,"First control %p\n", first_control);   
       *new_entry = first_control;
       /* Reconnect all the predecessors */
       /* ATTENTION link_2_control_nodes add to the list at the first position,
 	 so we need to reconnect in the reverse order */
       for (i=gen_length(predecessors)-1; i>=0; i--) {
-	pips_debug(5,"Relink predecessor [%p-%p]\n", 
+	pips_debug(5,"Relink predecessor [%p-%p]\n",
 		   CONTROL(gen_nth(i,predecessors)),
 		   first_control);
 	link_2_control_nodes (CONTROL(gen_nth(i,predecessors)), first_control);
@@ -203,11 +203,11 @@ static void reduce_sequence (control current_control,
       }
     }
     else {
-      /* If this is not the first statement, we have to link 
+      /* If this is not the first statement, we have to link
 	 it with the previous one */
-      link_2_control_nodes (last_control, new_control); 
-      pips_debug(5,"Other control %p [%p-%p]\n", 
-		 new_control, last_control, new_control);    
+      link_2_control_nodes (last_control, new_control);
+      pips_debug(5,"Other control %p [%p-%p]\n",
+		 new_control, last_control, new_control);   
       /* Deconnect all the OLD successors */
       for (i=0; i<gen_length(successors); i++) {
 	pips_debug(5,"Unlink successor [%p-%p]\n",
@@ -224,12 +224,12 @@ static void reduce_sequence (control current_control,
 		   CONTROL(gen_nth(i,successors)));
 	link_2_control_nodes (new_control, CONTROL(gen_nth(i,successors)));
       }
-    }  
+    } 
     last_control = new_control;
     *new_exit = new_control;
-  }, sequence_statements(seq)); 
+  }, sequence_statements(seq));
 }
-			     
+			    
 
 /**
  * This function takes as entry an unstructured and flatten it:
@@ -238,7 +238,7 @@ static void reduce_sequence (control current_control,
  *    replaced by a sequence of new control nodes formed with the
  *    statements inside the sequence)
  */
-static void flatten_unstructured (unstructured the_unstructured) 
+static void flatten_unstructured (unstructured the_unstructured)
 {
   list blocs = NIL;
   list sequences_to_reduce = NIL;
@@ -247,14 +247,14 @@ static void flatten_unstructured (unstructured the_unstructured)
   int nb_of_unstructured_to_flatten;
   int debug_iteration = 0;
 
-  /* Repeat until there is no more sequences to 
+  /* Repeat until there is no more sequences to
      reduce and unstructured to flatten */
 
-  do { 
+  do {
 
     blocs = NIL;
     debug_iteration++;
-    pips_debug(2,"New iteration %d\n", debug_iteration); 
+    pips_debug(2,"New iteration %d\n", debug_iteration);
 
     sequences_to_reduce = NIL;
     unstructured_to_flatten = NIL;
@@ -262,15 +262,15 @@ static void flatten_unstructured (unstructured the_unstructured)
     ifdebug(5) {
       short_debug_unstructured (the_unstructured, 2);
     }
-    
+   
     /* First, check all the sequences to reduce */
-    CONTROL_MAP (current_control, { 
+    CONTROL_MAP (current_control, {
       instruction i;
       i = statement_instruction(control_statement(current_control));
       switch (instruction_tag(i)) {
-      case is_instruction_sequence: 
+      case is_instruction_sequence:
 	{
-	  sequences_to_reduce 
+	  sequences_to_reduce
 	    = CONS(CONTROL,
 		   current_control,
 		   sequences_to_reduce);
@@ -283,15 +283,15 @@ static void flatten_unstructured (unstructured the_unstructured)
     }, unstructured_entry (the_unstructured), blocs);
 
     nb_of_sequences_to_reduce = gen_length (sequences_to_reduce);
-    
+   
     /* Do the job on the sequences */
     MAP (CONTROL, current_control, {
       instruction i = statement_instruction(control_statement(current_control));
-      control new_entry_of_imbricated; 
+      control new_entry_of_imbricated;
       control new_exit_of_imbricated;
-      pips_debug(2,"Imbricated sequence: REDUCING\n"); 
+      pips_debug(2,"Imbricated sequence: REDUCING\n");
       debug_control ("REDUCE SEQUENCE: ", current_control, 5);
-      reduce_sequence (current_control, 
+      reduce_sequence (current_control,
 		       instruction_sequence(i),
 		       &new_entry_of_imbricated,
 		       &new_exit_of_imbricated);
@@ -300,25 +300,25 @@ static void flatten_unstructured (unstructured the_unstructured)
       if (current_control == unstructured_entry (the_unstructured)) {
 	pips_debug(5,"Changing entry %p for %p\n",
 		   unstructured_entry (the_unstructured),
-		   new_entry_of_imbricated); 
+		   new_entry_of_imbricated);
 	unstructured_entry (the_unstructured) = new_entry_of_imbricated;
       }
       else if (current_control == unstructured_exit (the_unstructured)) {
 	pips_debug(5,"Changing exit %p for %p\n",
 		   unstructured_exit (the_unstructured),
-		   new_exit_of_imbricated); 
+		   new_exit_of_imbricated);
 	unstructured_exit (the_unstructured) = new_exit_of_imbricated;
       }
       /*free_control(current_control);*/
     }, sequences_to_reduce);
 
     /* Check the unstructured to flatten */
-    CONTROL_MAP (current_control, { 
+    CONTROL_MAP (current_control, {
       instruction i = statement_instruction(control_statement(current_control));
       switch (instruction_tag(i)) {
-      case is_instruction_unstructured: 
+      case is_instruction_unstructured:
 	{
-	  unstructured_to_flatten  
+	  unstructured_to_flatten 
 	    = CONS(CONTROL,
 		   current_control,
 		   unstructured_to_flatten);
@@ -336,17 +336,17 @@ static void flatten_unstructured (unstructured the_unstructured)
     MAP (CONTROL, current_control, {
       instruction i = statement_instruction(control_statement(current_control));
       unstructured u = instruction_unstructured(i);
-      pips_debug(2,"Imbricated unstructured: FLATTENING\n"); 
-      pips_debug(5,"Flatten unstructured\n"); 
+      pips_debug(2,"Imbricated unstructured: FLATTENING\n");
+      pips_debug(5,"Flatten unstructured\n");
       debug_control ("FLATTEN UNSTRUCTURED: ", current_control, 5);
       replace_control_with_unstructured (u, current_control);
       /*free_control(current_control);*/
     }, unstructured_to_flatten);
 
   }
-  while (((nb_of_sequences_to_reduce > 0) 
+  while (((nb_of_sequences_to_reduce > 0)
 	 || (nb_of_unstructured_to_flatten > 0)) && (debug_iteration < 3));
-  
+ 
 }
 
 /**
@@ -358,24 +358,24 @@ static control connect_unstructured (statement unstructured_statement,
 				     control current_control,
 				     control next_control)
 {
-  unstructured the_unstructured 
+  unstructured the_unstructured
     = instruction_unstructured(statement_instruction(unstructured_statement));
   control entry, exit;
 
-  pips_assert("Control with 1 successors in CONNECT_UNSTRUCTURED", 
+  pips_assert("Control with 1 successors in CONNECT_UNSTRUCTURED",
 	      gen_length(control_successors(current_control)) == 1);
-  pips_assert("Control with 1 predecessor in CONNECT_UNSTRUCTURED", 
+  pips_assert("Control with 1 predecessor in CONNECT_UNSTRUCTURED",
 	      gen_length(control_predecessors(next_control)) == 1);
-  pips_assert("Control connections in CONNECT_UNSTRUCTURED", 
+  pips_assert("Control connections in CONNECT_UNSTRUCTURED",
 	      CONTROL(gen_nth(0,control_successors(current_control)))
 	      == next_control);
 
   entry = unstructured_entry (the_unstructured);
   exit = unstructured_exit (the_unstructured);
 
-  pips_assert("Exit with no successors in CONNECT_UNSTRUCTURED", 
+  pips_assert("Exit with no successors in CONNECT_UNSTRUCTURED",
 	      gen_length(control_successors(exit)) == 0);
-  /* pips_assert("Entry with no predecessor in CONNECT_UNSTRUCTURED", 
+  /* pips_assert("Entry with no predecessor in CONNECT_UNSTRUCTURED",
      gen_length(control_predecessors(entry)) == 0); */
 
   pips_debug(5,"connect_unstructured BEFORE flatten_unstructured()\n");
@@ -384,7 +384,7 @@ static control connect_unstructured (statement unstructured_statement,
   }
 
   flatten_unstructured (the_unstructured);
-  
+ 
   pips_debug(5,"connect_unstructured AFTER flatten_unstructured()\n");
   ifdebug(5) {
     print_statement (unstructured_statement);
@@ -431,10 +431,10 @@ static control replace_control_with_unstructured (unstructured the_unstructured,
   entry = unstructured_entry (the_unstructured);
   exit = unstructured_exit (the_unstructured);
 
-  /*pips_assert("Entry of unstructured has no predecessor", 
+  /*pips_assert("Entry of unstructured has no predecessor",
     gen_length(control_predecessors(entry)) == 0);*/
 
-  pips_assert("Exit of unstructured has no successor", 
+  pips_assert("Exit of unstructured has no successor",
 	      gen_length(control_successors(exit)) == 0);
 
   /* Reconnect all the predecessors */
@@ -454,11 +454,11 @@ static control replace_control_with_unstructured (unstructured the_unstructured,
   return exit;
 }
 
-/** 
+/**
  * This function recursively takes the stat statement and transform the
  * Control Flow Graph module_unstructured in order to generate equivalent
  * code. The statement to transform is assumed to be executed between
- * controls current_control and next_control.  
+ * controls current_control and next_control. 
  *
  * Generated unstructured is equivalent to a FSM where all the states are
  * the different nodes of the Control Flow Graph
@@ -466,7 +466,7 @@ static control replace_control_with_unstructured (unstructured the_unstructured,
  * This function return the control node corresponding to the new position
  * in the Control Flow Graph
  */
-static control full_spaghettify_statement (statement stat, 
+static control full_spaghettify_statement (statement stat,
 					   string module_name,
 					   unstructured module_unstructured,
 					   control current_control,
@@ -477,34 +477,34 @@ static control full_spaghettify_statement (statement stat,
 
   ifdebug(2) {
     debug_statement("FULL_SPAGHETTIFY: Module statement: =====================================", stat, 2);
-    
-    pips_assert("Control with 1 successors in FULL_SPAGHETTIFY", 
+   
+    pips_assert("Control with 1 successors in FULL_SPAGHETTIFY",
 		gen_length(control_successors(current_control)) == 1);
-    pips_assert("Control with 1 predecessor in FULL_SPAGHETTIFY", 
+    pips_assert("Control with 1 predecessor in FULL_SPAGHETTIFY",
 		gen_length(control_predecessors(next_control)) == 1);
-    pips_assert("Control connections in FULL_SPAGHETTIFY", 
+    pips_assert("Control connections in FULL_SPAGHETTIFY",
 		CONTROL(gen_nth(0,control_successors(current_control)))
 		== next_control);
   }
 
   switch (instruction_tag(i)) {
-  case is_instruction_test: 
+  case is_instruction_test:
     {
-      pips_debug(2, "full_spaghettify_statement: TEST\n"); 
-      return 
+      pips_debug(2, "full_spaghettify_statement: TEST\n");
+      return
 	connect_unstructured (spaghettify_test (stat, module_name),
 			      current_control,
 			      next_control);
       break;
     }
-  case is_instruction_sequence: 
+  case is_instruction_sequence:
     {
       sequence seq = instruction_sequence(i);
       control last_control = current_control;
-      pips_debug(2, "full_spaghettify_statement: SEQUENCE\n");   
+      pips_debug(2, "full_spaghettify_statement: SEQUENCE\n");  
       MAP(STATEMENT, current_stat,
-      { 
-	last_control = full_spaghettify_statement (current_stat, 
+      {
+	last_control = full_spaghettify_statement (current_stat,
 						   module_name,
 						   module_unstructured,
 						   last_control,
@@ -515,16 +515,16 @@ static control full_spaghettify_statement (statement stat,
       break;
     }
   case is_instruction_loop: {
-    pips_debug(2, "full_spaghettify_statement: LOOP\n");   
-    return 
+    pips_debug(2, "full_spaghettify_statement: LOOP\n");  
+    return
       connect_unstructured (spaghettify_loop (stat, module_name),
 			    current_control,
 			    next_control);
     break;
   }
   case is_instruction_whileloop: {
-    pips_debug(2, "full_spaghettify_statement: WHILELOOP\n");   
-    return 
+    pips_debug(2, "full_spaghettify_statement: WHILELOOP\n");  
+    return
       connect_unstructured (spaghettify_whileloop (stat, module_name),
 			    current_control,
 			    next_control);
@@ -538,8 +538,8 @@ static control full_spaghettify_statement (statement stat,
     break;
   }
   case is_instruction_call: {
-    control new_control = make_control (stat, NIL, NIL);  
-    pips_debug(2, "full_spaghettify_statement: CALL\n");   
+    control new_control = make_control (stat, NIL, NIL); 
+    pips_debug(2, "full_spaghettify_statement: CALL\n");  
     unlink_2_control_nodes (current_control, next_control);
     link_2_control_nodes (current_control, new_control);
     link_2_control_nodes (new_control, next_control);
@@ -547,18 +547,18 @@ static control full_spaghettify_statement (statement stat,
     break;
   }
   case is_instruction_unstructured: {
-    pips_debug(2, "full_spaghettify_statement: UNSTRUCTURED\n");   
+    pips_debug(2, "full_spaghettify_statement: UNSTRUCTURED\n");  
     ifdebug(5) {
       print_statement (stat);
     }
-    return 
+    return
       connect_unstructured (stat,
 			    current_control,
 			    next_control);
     break;
   }
   default:
-    pips_user_warning("full_spaghettify_statement: UNDEFINED\n");   
+    pips_user_warning("full_spaghettify_statement: UNDEFINED\n");  
     return current_control;
     break;
   }
@@ -576,29 +576,29 @@ bool full_spaghettify(string module_name)
   entity module;
 
    /* get the resources */
-  statement stat = (statement) db_get_memory_resource(DBR_CODE, 
-						      module_name, 
+  statement stat = (statement) db_get_memory_resource(DBR_CODE,
+						      module_name,
 						      TRUE);
 
   module = module_name_to_entity(module_name);
-  
+ 
   set_current_module_statement(stat);
   set_current_module_entity(module_name_to_entity(module_name)); // FI: redundant
-  
+ 
   debug_on("SPAGUETTIFY_DEBUG_LEVEL");
 
-  /* Now do the job */  
+  /* Now do the job */ 
   stat = full_spaghettify_module(stat, module_name);
 
-  pips_assert("Statement is consistent after FULL_SPAGUETTIFY", 
+  pips_assert("Statement is consistent after FULL_SPAGUETTIFY",
 	      statement_consistent_p(stat));
-  
-  pips_assert("Unstructured is consistent after FULL_SPAGUETTIFY", 
+ 
+  pips_assert("Unstructured is consistent after FULL_SPAGUETTIFY",
 	      unstructured_consistent_p(statement_unstructured(stat)));
 
-  /* Reorder the module, because new statements have been added */  
+  /* Reorder the module, because new statements have been added */ 
   module_reorder(stat);
-  
+ 
   ifdebug(5) {
     pips_debug(5,"====================================================\n");
     pips_debug(5,"Statement BEFORE simple_restructure_statement\n");
@@ -607,35 +607,35 @@ bool full_spaghettify(string module_name)
 
   /* Restructure the module */
   simple_restructure_statement(stat);
-   
+  
   ifdebug(5) {
     pips_debug(5,"====================================================\n");
     pips_debug(5,"Statement AFTER simple_restructure_statement\n");
     print_statement (stat);
   }
 
-  /* Reorder the module, because new statements have been added */  
+  /* Reorder the module, because new statements have been added */ 
   module_reorder(stat);
 
-  pips_assert("Statement is consistent after FULL_SPAGUETTIFY", 
+  pips_assert("Statement is consistent after FULL_SPAGUETTIFY",
 	      statement_consistent_p(stat));
-  
-  /** 
+ 
+  /**
    * ATTENTION
    * after simple_restructure_statement, statement stat is
    * not longer a unstructured, but may be a sequence !!!
    */
-  
+ 
   DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, stat);
-  DB_PUT_MEMORY_RESOURCE(DBR_CALLEES, module_name, 
+  DB_PUT_MEMORY_RESOURCE(DBR_CALLEES, module_name,
 			 compute_callees(stat));
-  
+ 
   /* update/release resources */
   reset_current_module_statement();
   reset_current_module_entity();
-  
+ 
   debug_off();
-  
+ 
   return TRUE;
 }
 

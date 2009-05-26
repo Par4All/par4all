@@ -736,7 +736,7 @@ static void distribute_code(string function_name, statement externalized_code, s
 							     call_params)),
 				  NIL,
 				  NULL,
-				  extensions_undefined);
+				  statement_extensions (externalized_code));
   
   pips_debug(7, "BEFORE REPLACING\n");
   pips_debug(7, "externalized_code=\n");

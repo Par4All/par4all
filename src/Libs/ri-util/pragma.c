@@ -16,6 +16,17 @@
 #include "genC.h"
 #include "ri.h"
 
+///@return an empty extensions
+extensions empty_extensions (void) {
+  return extensions_undefined;
+}
+
+///@return TRUE if the extensions field is empty
+///@param es the extensions to test
+bool empty_extensions_p (extensions es) {
+  return (es == extensions_undefined);
+
+}
 
 /** Return a new allocated string with the pragma textual representation.
 
@@ -60,7 +71,7 @@ string
 extensions_to_string(extensions es) {
   string s = string_undefined;
 
-  if (es != extensions_undefined) {
+  if (empty_extensions_p (es) == FALSE) {
     /* Use a string_buffer for efficient string concatenation: */
     string_buffer sb = string_buffer_make(FALSE);
 
@@ -87,7 +98,7 @@ void
 add_pragma_to_statement(statement st, string s) {
   extensions es = statement_extensions(st);
   /* An undefined extension is transformed in an empty list of extension: */
-  if (es == extensions_undefined)
+  if (empty_extensions_p (es) == TRUE)
     es = make_extensions(NIL);
 
   /* Make a new pragma: */
