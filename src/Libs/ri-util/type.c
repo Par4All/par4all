@@ -928,6 +928,7 @@ type expression_to_type(expression e)
   return t;
 }
 
+
 /* Preserve typedef'ed types when possible */
 type expression_to_user_type(expression e)
 {

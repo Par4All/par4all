@@ -1186,126 +1186,310 @@ effect effect_array_address_substitution(effect eff,
   return n_eff;
 }
 
-/* Substitute, it possible, the formal parameter in eff by its
-   effective value. Since eff is modified by side effects, a copy of
-   the summary effect must be passed. */
-/* FI: Just starting... */
-/* FI: it might be better to return a list of effects including the
-   read implied by the evaluation of ep */
-effect c_summary_effect_to_proper_effect(effect eff,
-					 expression ep) /* effective parameter */
+
+/* list c_summary_effect_to_proper_effects(effect eff, expression real_arg)
+ * input    : a summary effect eff corresponding to a formal parameter,
+ *            and the corresponding actual argument at the current call site.
+ * output   : a list of new effects in the name space of the caller.
+ *            if the translation is not possible, returns a list of effects
+ *            on the memory locations possibly pointed to by the actual
+ *            argument.
+ * modifies : nothing.
+ * comment  : Contrarily to the previous version of this function,
+ *            does not modify eff.
+ * FI: it might be better to return a list of effects including the
+ * read implied by the evaluation of real_arg
+ * BC : no because there can be several effects for one real arg. This would
+ * induce redundant, hence harmful, computations. 
+ */
+list c_summary_effect_to_proper_effects(effect eff, expression real_arg) 
 {
-  effect n_eff = effect_undefined;
-  type ept = expression_to_type(ep);
-  reference r = effect_any_reference(eff);
-  entity fp = reference_variable(r);
-  int dim = 0;
+  list l_eff = NIL; /* the result */
 
-  /* This is going to fail in general: temporary fix for simple cases
-     only, with arrays, but not with structures I guess */
-  if(expression_reference_p(ep)) {
-    reference er = expression_reference(ep);
-    entity erv = reference_variable(er);
-    list erind = reference_indices(er);
-    type ervt = entity_type(erv);
 
-    /* Are we dealing with a pointer or with an array element? */
-    dim = type_depth(ervt) - gen_length(erind);
-  }
+  reference eff_ref = effect_any_reference(eff);
+  list eff_ind = reference_indices(eff_ref);
 
-  /* FI: we probably need a more general definition of "pointer"
-     type. A partialy indexed array is a pointer... */
-  if(pointer_type_p(ept) || dim>0) {
-    syntax eps = expression_syntax(ep);
-    if(syntax_reference_p(eps)) {
-      reference er = syntax_reference(eps);
-      entity ev = reference_variable(er);
-      list eind = reference_indices(er);
-      if(ENDP(eind))
-	n_eff = effect_scalar_substitution(eff, ev);
-      else
-	n_eff = effect_array_substitution(eff, er);
+  ifdebug(8)
+    {
+      pips_debug(8, "begin for real arg %s, and effect :\n", 
+		 words_to_string(words_expression(real_arg)));
+      print_effect(eff);		 
     }
-    else if(syntax_range_p(eps)) {
-      pips_user_error("Illegal effective parameter: range\n");
-    }
-    else if(syntax_call_p(eps)) {
-      call ec = syntax_call(eps);
-      entity eop = call_function(ec);
-      list args = call_arguments(ec);
 
-      if(ENTITY_ADDRESS_OF_P(eop)) {
-	expression arg1 = EXPRESSION(CAR(args));
-	syntax s1 = expression_syntax(arg1);
-	reference r1 = syntax_reference(s1);
-	entity ev1 = reference_variable(r1);
+  /* Whatever the real_arg may be if there is an effect on the sole value of the
+     formal arg, it generates no effect on the caller side.
+  */
 
-	pips_assert("Operator \"address of\" is applied to a reference\n",
-		    syntax_reference_p(s1));
+  if (gen_length(eff_ind) == 0)
+    {
+      pips_debug(5, "effect on the value of the formal parameter -> NIL\n");
+    }
+  else
+    {
+      
+      syntax real_s = expression_syntax(real_arg);
+      type real_arg_t = expression_to_type(real_arg);
+ 
+      pips_debug(5, "type of real argument expression : %s\n",
+		 type_to_string(real_arg_t));
 
-	if(ENDP(reference_indices(r1))) {
-	  n_eff = effect_scalar_address_substitution(eff, ev1);
-	}
-	else {
-	  n_eff = effect_array_address_substitution(eff, r1);
-	}
-      }
-      else if(ENTITY_POINT_TO_P(eop)) {
-	pips_internal_error("not implemented yet\n");
-      }
-      else if(ENTITY_FIELD_P(eop)) {
-	pips_internal_error("not implemented yet\n");
-      }
-      else if(ENTITY_MALLOC_SYSTEM_P(eop)) {
-	n_eff = heap_effect(get_current_module_entity(),
-			    copy_action(effect_action(eff)));
-      }
-      else {
-	/* We do not know what to do with the initial value */
-	n_eff = anywhere_effect(copy_action(effect_action(eff)));
-      }
-    }
-    else if(syntax_cast_p(eps)) {
-      /* Ignore the cast */
-      cast c = syntax_cast(eps);
-      pips_user_warning("Cast effect is ignored\n");
-      n_eff = c_summary_effect_to_proper_effect(eff, cast_expression(c));
-    }
-    else if(syntax_sizeofexpression_p(eps)) {
-      /* No translation possible */
-      n_eff = effect_undefined;
-    }
-    else if(syntax_subscript_p(eps)) {
-      pips_internal_error("Subscript not supported yet\n");
-    }
-    else if(syntax_application_p(eps)) {
-      pips_internal_error("Application not supported yet\n");
-    }
-    else if(syntax_va_arg_p(eps)) {
-      pips_internal_error("va_arg() not supported yet\n");
-    }
-    else {
-      pips_internal_error("Illegal kind of syntax\n");
-    }
-  }
-  else { /* We are not dealing with a pointer */
-    if(action_write_p(effect_action(eff))) {
-      pips_user_warning("Write effect on parameter \"%s\" ignored\n",
-			entity_user_name(fp));
-    }
-    else {
-      /* No need to translate... We might distinguish between useful
-	 and useless effects? Suppose there is no read of the formal
-	 parameter. Do we request effects to compute the value of the
-	 effective parameter? */
-      n_eff = effect_undefined;
-    }
-  }
+      switch (syntax_tag(real_s))
+	{
+	case is_syntax_reference:
+	  {  
+	    reference real_ref = syntax_reference(real_s);
+	    entity real_ent = reference_variable(real_ref);
+	    list real_ind = reference_indices(real_ref);
+	    
+	    /* if it's a pointer or a partially indexed array 
+	     * We should do more testing here to check if types
+	     * are compatible... (see effect_array_substitution ?)
+	     */
+	    if (pointer_type_p(real_arg_t) ||
+		gen_length(real_ind) < type_depth(entity_type(real_ent)))
+	      {
+		reference eff_ref = effect_any_reference(eff);
+		list eff_ind = reference_indices(eff_ref);
 
-  /* Is ep an address expression? */
+		reference new_ref = copy_reference(real_ref);
+		effect new_eff;
+		
+		pips_debug(8, "pointer type real arg reference\n");
+		
+		/* we add the indices of the effect reference
+		   to the real reference */
+		pips_debug(8, "effect on the pointed area : \n");
+		new_eff = (* reference_to_effect_func)
+		  (new_ref,
+		   copy_action(effect_action(eff)));
+		FOREACH(EXPRESSION, eff_ind_exp, eff_ind)
+		  {
+		    (*effect_add_expression_dimension_func)
+		      (new_eff, eff_ind_exp);
+		  }
+		l_eff = gen_nconc(l_eff, CONS(EFFECT, new_eff, NIL));
+		
+		
+	      } /*  if (pointer_type_p(real_arg_t)) */
+	    else
+	      {
+		pips_debug(8, "real arg reference is not a pointer and is not a partially indexed array -> NIL \n");
 
-  free_type(ept);
-  return n_eff;
+	      } /* else */
+	    break;
+	  } /* case is_syntax_reference */ 
+	case is_syntax_subscript:
+	  {
+	    pips_internal_error("Subscript not supported yet\n");
+	    break;
+	  }
+	case is_syntax_call:
+	  {
+	    call real_call = syntax_call(real_s);
+	    entity real_op = call_function(real_call);
+	    list args = call_arguments(real_call);
+	    effect n_eff = effect_undefined;
+	    
+	    if (ENTITY_ASSIGN_P(real_op))
+	      {
+		l_eff = c_summary_effect_to_proper_effects
+		  (eff, EXPRESSION(CAR(CDR(args))));
+	      }
+	    else if(ENTITY_ADDRESS_OF_P(real_op)) 
+	      {
+		expression arg1 = EXPRESSION(CAR(args));
+		syntax s1 = expression_syntax(arg1);
+		reference r1 = syntax_reference(s1);
+		entity ev1 = reference_variable(r1);
+		list l_real_arg = NIL;
+		effect eff1, eff2;
+
+		/* first we compute an effect on the argument of the 
+		 address_of operator (to treat cases like &(n->m))*/
+		/* It's very costly because we do not re-use l_real_arg 
+		   We should maybe scan the real args instead of scanning 
+		   the effects : we would do this only once per
+		   real argument */
+		l_real_arg = generic_proper_effects_of_complex_lhs
+		  (arg1, &eff1, &eff2, effect_write_p(eff));
+		if (effect_undefined_p(eff1))
+		  n_eff =  anywhere_effect
+		    (copy_action(effect_action(eff)));
+		else
+		  {
+		    n_eff = eff1;
+		    effect_approximation(n_eff) = 
+		      copy_approximation(effect_approximation(eff));
+		  }
+		if (!effect_undefined_p(eff2))
+		  free_effect(eff2);
+		gen_free_list(l_real_arg);
+		
+		/* BC : This must certainely be improved 
+		   only simple cases are handled .*/
+		if(ENDP(reference_indices(effect_any_reference(n_eff)))) 
+		  {
+		    expression first_ind = EXPRESSION(CAR(eff_ind));
+		  
+		    /* The operand of & is a scalar expression */
+		    /* the first index of eff reference (which must
+		       be equal to 0) must not be taken into account.
+		       The other indices must be appended to n_eff indices
+		    */
+		    
+		    pips_assert("scalar case : the first index of eff must be equal to [0]", expression_equal_integer_p(first_ind, 0));
+		    FOREACH(EXPRESSION, eff_ind_exp, CDR(eff_ind))
+		      {
+			(*effect_add_expression_dimension_func)
+			  (n_eff, eff_ind_exp);
+		      }
+		  }
+		else 
+		  {
+		    expression first_ind = EXPRESSION(CAR(eff_ind));
+		    reference n_eff_ref = effect_any_reference(n_eff);
+		    expression last_n_eff_ind = 
+		      EXPRESSION(CAR(gen_last(reference_indices(n_eff_ref))));
+		    expression n_exp;
+
+		  
+		    /* The operand of & is subcripted */
+		    /* The first index of eff must be added to the last
+		     * index of n_eff (except if it is unbounded),
+		     * and the remaining indices list 
+		     * be appended to th indices of n_eff
+		     * could be more generic
+		     */
+		    if(!unbounded_expression_p(last_n_eff_ind))
+		      {
+			if(!unbounded_expression_p(first_ind))
+			  {
+			    value v;
+			    n_exp = MakeBinaryCall
+			      (entity_intrinsic(PLUS_OPERATOR_NAME),
+			       last_n_eff_ind, copy_expression(first_ind));
+			    /* Then we must try to evaluate the expression */
+			    v = EvalExpression(n_exp);
+			    if (! value_undefined_p(v) && 
+				value_constant_p(v))
+			      {
+				    constant vc = value_constant(v);
+				    if (constant_int_p(vc))
+				      {
+			    
+					/* free_expression(n_exp);*/
+					n_exp = int_to_expression(constant_int(vc));
+				      }
+			      }
+			  }
+			else
+			  {
+			    n_exp = make_unbounded_expression();
+			  }
+			CAR(gen_last(reference_indices(n_eff_ref))).p 
+			  = (void *) n_exp;
+			/*should we free last_n_eff_ind ? */
+		      }
+		    FOREACH(EXPRESSION, eff_ind_exp, CDR(eff_ind))
+		      {
+			(*effect_add_expression_dimension_func)
+			  (n_eff, eff_ind_exp);
+		      }
+		  }
+	      }
+	    else if(ENTITY_POINT_TO_P(real_op)|| ENTITY_FIELD_P(real_op))
+	      {
+		list l_real_arg = NIL;
+		effect eff1, eff2;
+		/* first we compute an effect on the real_arg */
+		/* It's very costly because we do not re-use l_real_arg 
+		   We should maybe scan the real args instead of scanning 
+		   the effects. */
+		l_real_arg = generic_proper_effects_of_complex_lhs
+		  (real_arg, &eff1, &eff2, effect_write_p(eff));
+		if (effect_undefined_p(eff1))
+		  n_eff =  anywhere_effect
+		    (copy_action(effect_action(eff)));
+		else
+		  {
+		    n_eff = eff1;
+		    effect_approximation(n_eff) = 
+		      copy_approximation(effect_approximation(eff));
+		  }
+		if (!effect_undefined_p(eff2))
+		  free_effect(eff2);
+		gen_free_list(l_real_arg);
+		
+		/* Then we add the indices of the effect reference */
+		/* Well this is valid only in the general case :
+		 * we should verify that types are compatible.
+		 */
+		FOREACH(EXPRESSION, ind, eff_ind)
+		  {
+		    (*effect_add_expression_dimension_func)(n_eff, ind);
+		  
+		  }
+	      }
+	    else if(ENTITY_MALLOC_SYSTEM_P(real_op)) {
+	      n_eff = heap_effect(get_current_module_entity(),
+				  copy_action(effect_action(eff)));
+	    }
+	    else {
+	      /* We do not know what to do with the initial value */
+	      n_eff = anywhere_effect(copy_action(effect_action(eff)));
+	    }
+
+	    if (n_eff != effect_undefined && l_eff == NIL)
+	      l_eff = CONS(EFFECT,n_eff, NIL);
+	    break;
+	  } /* case is_syntax_call */
+	case is_syntax_cast :
+	  {
+	    /* Ignore the cast */
+	    cast c = syntax_cast(real_s);
+	    pips_user_warning("Cast effect is ignored\n");
+	    l_eff = c_summary_effect_to_proper_effects(eff, cast_expression(c));
+	    break;
+	  }
+	case is_syntax_sizeofexpression :
+	  {
+	    pips_debug(5,"sizeof epxression -> NIL");
+	    break;
+	  }
+	case is_syntax_va_arg :
+	  {
+	    pips_internal_error("va_arg() : should have been treated before\n");
+	    break;
+	  }
+	case is_syntax_application :
+	  {
+	    pips_internal_error("Application not supported yet\n");
+	    break;
+	  }
+	case is_syntax_range :
+	  {
+	    pips_user_error("Illegal effective parameter: range\n");
+	    break;
+	  }
+	default:
+	  pips_internal_error("Illegal kind of syntax\n");
+	} /* switch */
+      
+      free_type(real_arg_t);
+
+    } /*else */
+
+
+  ifdebug(8)
+    {
+      pips_debug(8, "end with effects :\n");
+      print_effects(l_eff);		 
+    }
+
+
+  return(l_eff); 
+     
 }
 
 /* FI: I do not know how deep the copying should be and the
@@ -1323,13 +1507,21 @@ list c_summary_to_proper_effects(
   type u_func_t = ultimate_type(entity_type(func));
   list params = functional_parameters(type_functional(u_func_t));
  
-  pips_debug(2, "begin for %s\n", entity_local_name(func));
+  ifdebug(2)
+    {
+      pips_debug(2, "begin for function %s\n", entity_local_name(func));
+      pips_debug(2, "with actual arguments :\n");
+      print_expressions(args);
+      pips_debug(2, "and effects :\n");
+      print_effects(func_sdfi);
+    }
 
   /* first the case of va_args.
    * the approach is conservative : we generate may r/w effects
    * on all actual arguments. This could and should be refined...
    */
 
+  pips_debug(8, "first check for varargs \n");
   MAP(PARAMETER, e_param, 
       {
 	type te = parameter_type(e_param);
@@ -1364,13 +1556,10 @@ list c_summary_to_proper_effects(
 	      {
 		bool force_may_p = true;
 		
-		pips_debug(8, "effect on global entity keeped : %s\n",
+		pips_debug(8, "effect on global entity %s kept.\n",
 			   entity_name(v));
 		
-		/* We keep a may effect on the global entity.
-		 * We do not try to translate the predicate if it's a region
-		 * because it may reference the formal parameters. */
-		
+		/* We keep a may effect on the global entity.*/
 		pel = gen_nconc
 		  (pel, 
 		   (*effect_to_store_independent_effect_list_func)
@@ -1378,14 +1567,14 @@ list c_summary_to_proper_effects(
 	      }
 	  },
 	  func_sdfi);
-       
+      
       ifdebug(8)
 	{
 	  pips_debug(8, "effects on global variables :\n");
 	  (* effects_prettyprint_func)(pel);
 	}
       
-
+      
       /* Then, we add the read effects on actual parameters.
        * (I have to check if it is not done by in the callers of this function)
        */
@@ -1551,62 +1740,47 @@ list c_summary_to_proper_effects(
   else
     {
       check_user_call_site(func, args);
-      
-      for(ce = func_sdfi; !ENDP(ce); POP(ce)) {
-	effect eff = EFFECT(CAR(ce));
-	reference r = effect_any_reference(eff);
-	entity v = reference_variable(r);
-	
-	if(formal_parameter_p(v)) 
-	  {
-	    storage s = entity_storage(v);
-	    formal fs = storage_formal(s);
-	    int rank = formal_offset(fs);
-	    expression ep = EXPRESSION(gen_nth(rank-1, args));
-	    effect n_eff = effect_undefined;
-	    
-	    ifdebug(8){
-	      pips_debug(8, "Summary effect eff=%p: \"%s\"\n", eff,
-			 list_to_string
-			 (effect_words_reference_with_addressing_as_it_is
-			  (effect_any_reference(eff),
-			   addressing_tag(effect_addressing(eff)))));
-	    }
-	    
-	    /* copy_effect cannot be used in case a "preference" is used in the cell */
-	    n_eff = c_summary_effect_to_proper_effect(effect_dup(eff), ep);
-	    
-	    ifdebug(8){
-	      pips_debug(8, "Resulting proper effect: \"%s\"\n",
-			 list_to_string
-			 (effect_words_reference_with_addressing_as_it_is
-			  (effect_any_reference(eff),
-			   addressing_tag(effect_addressing(eff)))));
-	    }
-	    
-	    if(!effect_undefined_p(n_eff))
-	       pel = gen_nconc(pel, CONS(EFFECT, n_eff, NIL));
-	    /* FI: I'm not too sure about this... */
-	    pel = gen_nconc(pel, generic_proper_effects_of_expression(ep));
-	    
-	    ifdebug(8) 
-	      {
-		pips_debug(8, "With expression effects:\n");
-		print_effects(pel);
-	      }
-	  }
-	else {
-	  /* This effect must be a global effect. It does not require
-	     translation in C. However, it may not be in the scope of the caller. */
-	  pel = gen_nconc(pel, CONS(EFFECT, copy_effect(eff), NIL));
-	}
-      }
-    }
 
+      pips_debug(8, "no varargs \n");
+      
+      for(ce = func_sdfi; !ENDP(ce); POP(ce)) 
+	{
+	  effect eff = EFFECT(CAR(ce));
+	  reference r = effect_any_reference(eff);
+	  entity v = reference_variable(r);
+	  
+	  if(formal_parameter_p(v)) 
+	    {
+	      storage s = entity_storage(v);
+	      formal fs = storage_formal(s);
+	      int rank = formal_offset(fs);
+	      expression ep = EXPRESSION(gen_nth(rank-1, args));
+	      list l_sum = NIL;
+
+	      l_sum = c_summary_effect_to_proper_effects(eff, ep);
+	      pel = gen_nconc(pel,l_sum);
+	      
+	      /* FI: I'm not too sure about this... 
+	         BC : It should be done later, because there can be several 
+		 effects for one real arg entity.So it generates redundant 
+		 effects that will need costly unioning.
+	      */
+	      pel = gen_nconc(pel, generic_proper_effects_of_expression(ep));
+	      
+	    } /* if(formal_parameter_p(v)) */
+	  else 
+	    {
+	      /* This effect must be a global effect. It does not require
+		 translation in C. However, it may not be in the scope of the caller. */
+	      pel = gen_nconc(pel, CONS(EFFECT, copy_effect(eff), NIL));
+	    } /* else */
+	} /* for */
+    } /* else */
+  
   ifdebug(5)
     {
       pips_debug(5, "resulting effects :\n");
-       (*effects_prettyprint_func)(pel);
+      (*effects_prettyprint_func)(pel);
     }
   return pel;
 }
@@ -1746,4 +1920,129 @@ simple_effects_forward_translation(
     lc = common_simple_effects_forward_translation(callee, l_eff);
 
     return gen_nconc(lr, lc);
+}
+
+/**************************************************************************/
+
+/* kept because of a use in effects_dynamic_elim : to be removed later BC */
+/* Substitute, it possible, the formal parameter in eff by its
+   effective value. Since eff is modified by side effects, a copy of
+   the summary effect must be passed. */
+/* FI: Just starting... */
+/* FI: it might be better to return a list of effects including the
+   read implied by the evaluation of ep */
+effect c_summary_effect_to_proper_effect(effect eff,
+					 expression ep) /* effective parameter */
+{
+  effect n_eff = effect_undefined;
+  type ept = expression_to_type(ep);
+  reference r = effect_any_reference(eff);
+  entity fp = reference_variable(r);
+  int dim = 0;
+
+  /* This is going to fail in general: temporary fix for simple cases
+     only, with arrays, but not with structures I guess */
+  if(expression_reference_p(ep)) {
+    reference er = expression_reference(ep);
+    entity erv = reference_variable(er);
+    list erind = reference_indices(er);
+    type ervt = entity_type(erv);
+
+    /* Are we dealing with a pointer or with an array element? */
+    dim = type_depth(ervt) - gen_length(erind);
+  }
+
+  /* FI: we probably need a more general definition of "pointer"
+     type. A partialy indexed array is a pointer... */
+  if(pointer_type_p(ept) || dim>0) {
+    syntax eps = expression_syntax(ep);
+    if(syntax_reference_p(eps)) {
+      reference er = syntax_reference(eps);
+      entity ev = reference_variable(er);
+      list eind = reference_indices(er);
+      if(ENDP(eind))
+	n_eff = effect_scalar_substitution(eff, ev);
+      else
+	n_eff = effect_array_substitution(eff, er);
+    }
+    else if(syntax_range_p(eps)) {
+      pips_user_error("Illegal effective parameter: range\n");
+    }
+    else if(syntax_call_p(eps)) {
+      call ec = syntax_call(eps);
+      entity eop = call_function(ec);
+      list args = call_arguments(ec);
+
+      if(ENTITY_ADDRESS_OF_P(eop)) {
+	expression arg1 = EXPRESSION(CAR(args));
+	syntax s1 = expression_syntax(arg1);
+	reference r1 = syntax_reference(s1);
+	entity ev1 = reference_variable(r1);
+
+	pips_assert("Operator \"address of\" is applied to a reference\n",
+		    syntax_reference_p(s1));
+
+	if(ENDP(reference_indices(r1))) {
+	  n_eff = effect_scalar_address_substitution(eff, ev1);
+	}
+	else {
+	  n_eff = effect_array_address_substitution(eff, r1);
+	}
+      }
+      else if(ENTITY_POINT_TO_P(eop)) {
+	pips_internal_error("not implemented yet\n");
+      }
+      else if(ENTITY_FIELD_P(eop)) {
+	pips_internal_error("not implemented yet\n");
+      }
+      else if(ENTITY_MALLOC_SYSTEM_P(eop)) {
+	n_eff = heap_effect(get_current_module_entity(),
+			    copy_action(effect_action(eff)));
+      }
+      else {
+	/* We do not know what to do with the initial value */
+	n_eff = anywhere_effect(copy_action(effect_action(eff)));
+      }
+    }
+    else if(syntax_cast_p(eps)) {
+      /* Ignore the cast */
+      cast c = syntax_cast(eps);
+      pips_user_warning("Cast effect is ignored\n");
+      n_eff = c_summary_effect_to_proper_effect(eff, cast_expression(c));
+    }
+    else if(syntax_sizeofexpression_p(eps)) {
+      /* No translation possible */
+      n_eff = effect_undefined;
+    }
+    else if(syntax_subscript_p(eps)) {
+      pips_internal_error("Subscript not supported yet\n");
+    }
+    else if(syntax_application_p(eps)) {
+      pips_internal_error("Application not supported yet\n");
+    }
+    else if(syntax_va_arg_p(eps)) {
+      pips_internal_error("va_arg() not supported yet\n");
+    }
+    else {
+      pips_internal_error("Illegal kind of syntax\n");
+    }
+  }
+  else { /* We are not dealing with a pointer */
+    if(action_write_p(effect_action(eff))) {
+      pips_user_warning("Write effect on parameter \"%s\" ignored\n",
+			entity_user_name(fp));
+    }
+    else {
+      /* No need to translate... We might distinguish between useful
+	 and useless effects? Suppose there is no read of the formal
+	 parameter. Do we request effects to compute the value of the
+	 effective parameter? */
+      n_eff = effect_undefined;
+    }
+  }
+
+  /* Is ep an address expression? */
+
+  free_type(ept);
+  return n_eff;
 }

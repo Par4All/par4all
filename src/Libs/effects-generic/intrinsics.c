@@ -710,7 +710,7 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
       {long int labs(long, 0, 0},
       {ldiv_t ldiv(long, long, 0, 0},*/
 
-  {"malloc", no_write_effects},
+  {MALLOC_FUNCTION_NAME, no_write_effects},
 
   /*#include <string.h>*/
 

@@ -708,6 +708,9 @@ user_call_to_transformer(
   pips_debug(8, "begin\n");
   pips_assert("f is a module", entity_module_p(f));
 
+  pips_user_warning("Side effects in actual arguments are not yet taken into account\n."
+		    "Meanwhile, atomize the call site to avoid the problem.\n");
+
   if(!get_bool_property(SEMANTICS_INTERPROCEDURAL)) {
     /*
       pips_user_warning(

@@ -241,6 +241,8 @@ set_methods_for_simple_effects()
     reference_to_effect_func = reference_to_simple_effect;
     effect_to_store_independent_effect_list_func = 
       effect_to_store_independent_sdfi_list;
+    effect_add_expression_dimension_func =
+      simple_effect_add_expression_dimension;
 
     effect_union_op = effect_must_union;
     effects_union_op = EffectsMustUnion;
