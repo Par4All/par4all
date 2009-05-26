@@ -121,6 +121,7 @@ bool controlizer(string module_name)
            changed. */
 	module_reorder(module_stat);
 	reset_current_module_statement();
+	reset_ordering_to_statement(); // initialized by module_reorder() for unknown reasons
     }
 
     /* With C code, some local declarations may have been lost by the
