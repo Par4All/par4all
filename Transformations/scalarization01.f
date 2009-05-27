@@ -12,3 +12,15 @@ C     Expected result: t(i) scalarized
       enddo
 
       end
+
+
+      program scalarization01
+      parameter(n=100)
+      real x(n,n), y(n,n)
+      
+      read *,x,y
+      call scalarization(x,y,n)
+      print *,x,y
+
+      end
+

@@ -14,3 +14,14 @@ C     Expected result: t(i) NOT scalarized (b/c it is copied out)
       print *, t(n)
 
       end
+
+      program scalarization02
+      parameter(n=100)
+      real x(n,n), y(n,n)
+      
+      read *,x,y
+      call scalarization(x,y,n)
+      print *,x,y
+
+      end
+
