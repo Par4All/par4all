@@ -282,3 +282,27 @@ string find_suffix(string s, string suffix) {
   /* Not found: */
   return NULL;
 }
+
+///@return a string whithout the last "\n" char
+///@param s, the string to process
+///@param flg, if true do a copy of the string
+string chop_newline (string s, bool flg)
+{
+  if ((s == string_undefined) || (s == NULL)) return s;
+  string r = s;
+  if (flg == TRUE) r = strdup(s);
+  int l = strlen(s);
+  if (l > 0) {
+    if (*(r + l - 1) == '\n') *(r + l - 1) = '\0';
+  }
+  return r;
+}
+
+
+///@return a copy of the string whithout the last "\n" char
+///@param s, the string to process
+string remove_newline_of_string (string s)
+{
+  return chop_newline (s, TRUE) ;
+}
+
