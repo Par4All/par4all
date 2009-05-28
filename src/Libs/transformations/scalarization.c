@@ -340,9 +340,8 @@ static bool loop_scalarization(loop l)
 	  entity sv = make_new_scalar_variable_with_prefix("__ld__", get_current_module_entity(), svb);
 	  AddEntityToCurrentModule(sv);
 	  scalarized_variables = arguments_add_entity(scalarized_variables, pv);
-	  ifdebug(1) {
-	    pips_debug(1, "Creating variable %s\n", entity_name(sv));
-	  }
+	  
+	  pips_user_warning("Creating variable %s for variable %s\n", entity_name(sv), entity_name(pv));	  
 	  
 	  // Substitute all references to pv with references to new variable	  
 	  statement_substitute_scalarized_array_references(s, pv, sv);
@@ -411,7 +410,7 @@ bool scalarization (char * module_name)
     set_cumulated_rw_effects((statement_effects) 
 			     db_get_memory_resource(DBR_REGIONS, module_name, TRUE));
     //    set_cumulated_rw_effects((statement_effects) 
-    //			     db_get_memory_resource(DBR_REGIONS, module_name, TRUE));
+    //			     db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
 
     module_to_value_mappings(module);
   
