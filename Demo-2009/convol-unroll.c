@@ -63,7 +63,7 @@ void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj],
     l200: for(ki = 0; ki<ksi; ki++) {
       l100: for(kj = 0; kj<ksj; kj++) {
 	  new_image[i][j] = new_image[i][j] + 
-	    image[i+ki-ksi/2/*-1*/][j+kj-ksj/2/*-1*/]* 
+	    image[i+ki-ksi/2][j+kj-ksj/2]* 
 	    kernel[ki][kj];
 	}
       }

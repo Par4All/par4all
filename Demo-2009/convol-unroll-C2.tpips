@@ -43,47 +43,50 @@ apply PARTIAL_EVAL[convol]
 display PRINTED_FILE[convol]
 
 echo
+echo after outlining
+echo
+
+apply OUTLINE
+macro_instruction
+n
+n
+n
+n
+n
+n
+n
+y
+display PRINTED_FILE[convol]
+display PRINTED_FILE[macro_instruction]
+
+echo
 echo After double unrolling
 echo
-apply FULL_UNROLL[convol]
+apply FULL_UNROLL[macro_instruction]
 l100
-apply FULL_UNROLL[convol]
+apply FULL_UNROLL[macro_instruction]
 l200
 
 apply PARTIAL_EVAL
-display PRINTED_FILE[convol]
+display PRINTED_FILE[macro_instruction]
 
 apply USE_DEF_ELIMINATION
-display PRINTED_FILE[convol]
-display PRINTED_FILE[convol]
+display PRINTED_FILE[macro_instruction]
+display PRINTED_FILE[macro_instruction]
 
 echo
 echo After atomization
 echo
 setproperty SIMD_EXTRAVAGANT_ATOMIZER TRUE
-apply SIMD_ATOMIZER[convol]
-display PRINTED_FILE[convol]
+apply SIMD_ATOMIZER[macro_instruction]
+display PRINTED_FILE[macro_instruction]
 
 # should be applied but fails
-apply SCALARIZATION
-display PRINTED_FILE[convol]
+#apply SCALARIZATION
 
 # probably useless for terapix microcode
 #apply INVARIANT_CODE_MOTION
 
-echo
-echo detect // loops
-echo
-
-activate PRINT_PARALLELIZEDOMP_CODE
-display PARALLELPRINTED_FILE[convol]
-
-#
-#apply PRIVATIZE_MODULE[convol]
-#display PARALLELPRINTED_FILE[convol]
-
-#apply VARIABLE_EXPANSION[convol]
-#display PARALLELPRINTED_FILE[convol]
 close
 quit
 # EOF
