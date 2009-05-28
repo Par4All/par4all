@@ -63,13 +63,10 @@ void invariant01(int n, int ni, int nj)
       j = MAX(INT(nj), 0);
       s = y[i];                                                         /*0010*/
       // END BLOCK                                                      /*0010*/
-      // END BLOCK
-   }
-   for(i = 0; i <= ni-1; i += 1)                                        /*0008*/
-      // BEGIN BLOCK
       for(j = 0; j <= nj-1; j += 1)                                     /*0009*/
          x[i][j] = s;                                                   /*0011*/
       // END BLOCK
+   }
    // END BLOCK
    // END BLOCK
 }

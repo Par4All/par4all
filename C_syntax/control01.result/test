@@ -8,7 +8,7 @@ int control01(int *in, int *val)
    for (;;) {
       if ((c = pnm_getc(in))==-1)
          return -1;
-      if (c=='#')
+      if (c=='#') {
          for (;;) {
             if ((c = pnm_getc(in))==-1)
                return -1;
@@ -16,6 +16,7 @@ int control01(int *in, int *val)
                goto break_2;
          }
 break_2:         ;
+      }
       else if (c=='0'||c=='1') {
          v = c-'0';
          goto break_1;
