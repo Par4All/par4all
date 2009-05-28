@@ -47,16 +47,6 @@ list list_of_connected_nodes(vertex ver, list l_of_vers)
     return l_of_vers;
 }
 
-string remove_newline_of_string(string s)
-{
-    string r = strdup(s);
-    int l = strlen(s);
-    if (l > 0) {
-        if (*(r + l - 1) == '\n') *(r + l - 1) = '\0';
-    }
-    return r;
-}
-
 static string convert_string_for_daVinci_graph (string s)
 {
   string r;
@@ -147,8 +137,10 @@ void print_graph_of_text_to_daVinci(FILE * f_out, list l_of_vers)
 	MAP(SENTENCE, sen, {
 	    string s = sentence_to_string(sen);
 	    if (first_sentence) {
-	        fprintf(f_out, "l(\"%s\",n(\"\",[a(\"OBJECT\",\"", remove_newline_of_string(s));
-		first_sentence = FALSE;
+	      string tmp = remove_newline_of_string (s);
+	      fprintf(f_out, "l(\"%s\",n(\"\",[a(\"OBJECT\",\"", tmp);
+	      first_sentence = FALSE;
+	      free (tmp);
 	    }
 	    if (strstr(s, CALL_MARK)) {
 	      /*fprintf(f_out, convert_string_for_daVinci_graph(s + strlen(CALL_MARK)));*/
@@ -202,7 +194,9 @@ void print_marged_text_from_starting_node(FILE *fd, int margin, vertex start_ver
 	        vertex ver_child = get_vertex_by_string(call_mark + strlen(CALL_MARK), l_of_vers);
 		print_marged_text_from_starting_node(fd, margin + (call_mark - s), ver_child, l_of_vers);
 	    } else if (strlen(s)) { /* if s in not empty, ok write out */
-	        fprintf(fd, "%*s%s\n", margin, "", remove_newline_of_string(s));
+	      string tmp = remove_newline_of_string(s);
+	      fprintf(fd, "%*s%s\n", margin, "", tmp);
+	      free (tmp);
 	    }
 	}, text_sentences(txt));
     }
