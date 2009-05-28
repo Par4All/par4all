@@ -7,7 +7,8 @@ int func(int n)
 //  <i-PRIVATE-EXACT-{}>
 //  <j-PRIVATE-EXACT-{}>
 //  <x[PHI1]-PRIVATE-EXACT-{0<=PHI1, PHI1<=99}>
-//  <y[PHI1][PHI2]-PRIVATE-MAY-{0<=PHI1, PHI1<=99, 0<=PHI2, PHI2<=99}>
+//  <y[PHI1][PHI2]-PRIVATE-EXACT-{0<=PHI1, PHI1<=99, 0<=PHI2,
+//    PHI2<=99}>
 
    // BEGIN BLOCK
    int x[100];
@@ -24,8 +25,7 @@ int func(int n)
 //    i<=99}>
 
 
-//  <y[PHI1][PHI2]-COPYOUT-EXACT-{PHI1==i, PHI1==n, n==PHI2, 0<=i,
-//    i<=99}>
+//  <y[PHI1][PHI2]-COPYOUT-EXACT-{PHI1==i, PHI1==1, PHI2==1}>
 
       // BEGIN BLOCK
       PRIVATE i,j,x[100],y[100][100]
@@ -37,14 +37,13 @@ int func(int n)
 //    j<=99}>
 
 
-//  <y[PHI1][PHI2]-COPYOUT-EXACT-{PHI1==i, PHI1==n, j==PHI2, PHI2==n,
-//    0<=i, i<=99}>
+//  <y[PHI1][PHI2]-COPYOUT-EXACT-{PHI1==i, PHI1==1, j==PHI2, PHI2==1}>
 
          //t[i] = x[i];
          y[i][j] = x[i]+j;
       // END BLOCK
    }
-   return y[n][n];
+   return y[1][1];
    // END BLOCK
 }
 

@@ -17,10 +17,10 @@ setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 
 setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
 
-echo
-echo Initial code
-echo
-display PRINTED_FILE[main]
+#echo
+#echo Initial code
+#echo
+#display PRINTED_FILE[main]
 
 #echo
 #echo IN regions

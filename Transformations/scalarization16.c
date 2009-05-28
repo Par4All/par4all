@@ -1,19 +1,26 @@
+/* Expected result:
+   x[i] and t[i] can be scalarized
+
+   NOTES:
+   - no copy-out on x[i] and t[i], as they are not copied out. This is OK.
+   - Additionally, one too many scalar is declared (__ld__3)
+ */
+
 #include <stdio.h>
-#define SIZE 100
 
 int func(int n)
 {
-  int x[SIZE], y[SIZE][SIZE], t[SIZE];
+  int x[n], y[n][n];
   int i, j;
 
-  for (i=0 ; i < SIZE ; i++) {
+  for (i=0 ; i < n ; i++) {
     x[i] = i;
-    for (j=0 ; j < SIZE ; j++)
-      t[i] = x[i];
+    for (j=0 ; j < n ; j++) {
+      y[i][j] = x[i] ^ 2;
       y[i][j] = x[i] + j;
-      //x[i] = t[i];
+    }
   }
-  return y[n][n];
+  return y[n-1][n-1];
 }
 
 int main(int argc, char **argv)

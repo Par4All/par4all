@@ -11,6 +11,9 @@ int main(int argc, char **argv)
    myarray y;
    myarray t;
 
+   for(i = 0; i <= n-1; i += 1)
+      scanf("%d %d", &x[i], &y[i]);
+
    for(i = 0; i <= n-1; i += 1) {
       // BEGIN BLOCK
       t[i] = x[i];
@@ -18,6 +21,7 @@ int main(int argc, char **argv)
       y[i] = t[i];
       // END BLOCK
    }
+   printf("%d %d", x[n], y[n]);
    // END BLOCK
 }
 
@@ -34,6 +38,9 @@ int main(int argc, char **argv)
    myarray y;
    myarray t;
 
+   for(i = 0; i <= n-1; i += 1)
+      scanf("%d %d", &x[i], &y[i]);
+
    for(i = 0; i <= n-1; i += 1) {
       // BEGIN BLOCK
       __ld__0 = x[i];
@@ -41,5 +48,6 @@ int main(int argc, char **argv)
       y[i] = __ld__0;
       // END BLOCK
    }
+   printf("%d %d", x[n], y[n]);
    // END BLOCK
 }

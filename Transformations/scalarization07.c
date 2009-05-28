@@ -1,7 +1,7 @@
 /* Scalarize an array hidden behind a typedef.
    Expected results:
-   a) t[i] should be scalarized 
-   b) a declaration should be created for the corresponding scalar
+   a) t[i] scalarized 
+   b) declaration created for the corresponding scalar
 */
 
 #include <stdio.h>

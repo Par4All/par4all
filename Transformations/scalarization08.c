@@ -1,30 +1,36 @@
 /* Expected result:
-   A[i] can be scalarized, but the scalar must be copied back into A[i]
+   x[i] can be scalarized, but the scalar must be copied back into x[i]
+
    NOTES:
    - Bug: no copy-out
    - Additionally, one too many scalar is declared (__ld__1)
  */
 
 #include <stdio.h>
-#define n 10
+#define SIZE 10
     
-void scalarization08(int x[n], int y[n][n])
+int scalarization08(int x[SIZE], int y[SIZE][SIZE])
 {
-  int i,j;
-  for(i=0 ; i < n ; i++)
-    for(j=0 ; j < n ;j++)
-      x[i] = y[j][i] ;
+  int i,j,k;
+  for(i=0 ; i < SIZE ; i++)
+    for(j=0 ; j < SIZE ; j++)
+      x[i] = y[i][j];
+  //printf("%d", x[1]);
+  k = x[1];
+  return k;
 }
 
 int main(int argc, char **argv)
 {
-  int i;
-  int x[n], y[n][n];
+  int i, j;
+  int x[SIZE], y[SIZE][SIZE];
 
-  for (i=0 ; i<n ; i++) {
-    scanf("%d %d", &x[i], &y[i][i]);
-  }
-  scalarization08(x, y);
+  for (i=0 ; i < SIZE ; i++)
+    for (j=0 ; j < SIZE ; j++)
+      //scanf("%d", &y[i][j]);
+      y[i][j] = 100*i+j;
 
-  printf("%d %d", x[n], y[n]);
+  i= scalarization08(x, y);
+
+  printf("%d\n", i);
 }

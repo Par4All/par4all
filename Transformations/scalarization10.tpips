@@ -17,38 +17,38 @@ setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 
 setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
 
-echo
-echo Initial code
-echo
-display PRINTED_FILE[scalarization10]
+#echo
+#echo Initial code
+#echo
+#display PRINTED_FILE[scalarization10]
 
-echo
-echo Code after inlining
-echo
-apply INLINING[get]
-display PRINTED_FILE[scalarization10]
+#echo
+#echo Code after inlining
+#echo
+#apply INLINING[get]
+#display PRINTED_FILE[scalarization10]
 
-echo
-echo Code after forward substitution
-echo
-apply FORWARD_SUBSTITUTE
-display PRINTED_FILE[scalarization10]
+#echo
+#echo Code after forward substitution
+#echo
+#apply FORWARD_SUBSTITUTE
+#display PRINTED_FILE[scalarization10]
 
-echo
-echo Code after use-def elimination
-echo
-apply USE_DEF_ELIMINATION
-display PRINTED_FILE[scalarization10]
+#echo
+#echo Code after use-def elimination
+#echo
+#apply USE_DEF_ELIMINATION
+#display PRINTED_FILE[scalarization10]
 
-echo
-echo IN regions
-echo
-activate PRINT_CODE_IN_REGIONS
-display PRINTED_FILE[scalarization10]
+#echo
+#echo IN regions
+#echo
+#activate PRINT_CODE_IN_REGIONS
+#display PRINTED_FILE[scalarization10]
 
-echo
-echo Privatized regions
-echo
+#echo
+#echo Privatized regions
+#echo
 #activate PRINT_CODE_PRIVATIZED_REGIONS
 #display PRINTED_FILE[scalarization10]
 

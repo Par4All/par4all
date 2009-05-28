@@ -1,9 +1,9 @@
-      SUBROUTINE SCALARIZATION(X, Y, N)
-      REAL X(N,N), Y(N,N)
-      REAL T(100)
-C     BEGIN BLOCK
-
 C     Expected result: t(i) scalarized
+
+      SUBROUTINE SCALARIZATION(X,Y,N)
+      REAL X(N,N), Y(N,N)
+      REAL T(100)    
+C     BEGIN BLOCK
       DO J = 1, N                                                       0006
          DO I = 1, N                                                    0007
 C           BEGIN BLOCK
@@ -13,6 +13,5 @@ C           BEGIN BLOCK
 C           END BLOCK
          ENDDO
       ENDDO
-
 C     END BLOCK
       END

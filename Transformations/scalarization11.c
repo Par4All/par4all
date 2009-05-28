@@ -1,4 +1,4 @@
-/*Expected result: NO scalarization
+/* Expected result: nothing to scalarize
  */
 
 int main(int argc, char **argv)

@@ -1,96 +1,13 @@
 
-Initial code
-
-void scalarization09(double A[SIZE], double B[SIZE][SIZE])
-{
-   // BEGIN BLOCK
-   int i;
-   int j;
-   for(i = 0; i <= SIZE-1; i += 1)
-      for(j = 0; j <= SIZE-1; j += 1)
-         A[i] = B[j][i]+A[i];
-   // END BLOCK
-}
-
-IN regions
-
-
-//  <A[PHI1]-IN-EXACT-{0<=PHI1, PHI1+1<=TOP-LEVEL:SIZE}>
-//  <B[PHI1][PHI2]-IN-EXACT-{0<=PHI1, PHI1+1<=TOP-LEVEL:SIZE, 0<=PHI2,
-//    PHI2+1<=TOP-LEVEL:SIZE}>
-
-void scalarization09(double A[SIZE], double B[SIZE][SIZE])
-{
-
-//  <A[PHI1]-IN-EXACT-{0<=PHI1, PHI1+1<=TOP-LEVEL:SIZE}>
-//  <B[PHI1][PHI2]-IN-EXACT-{0<=PHI1, PHI1+1<=TOP-LEVEL:SIZE, 0<=PHI2,
-//    PHI2+1<=TOP-LEVEL:SIZE}>
-
-   // BEGIN BLOCK
-   int i;
-   int j;
-
-//  <A[PHI1]-IN-EXACT-{0<=PHI1, PHI1+1<=TOP-LEVEL:SIZE}>
-//  <B[PHI1][PHI2]-IN-EXACT-{0<=PHI1, PHI1+1<=TOP-LEVEL:SIZE, 0<=PHI2,
-//    PHI2+1<=TOP-LEVEL:SIZE}>
-
-   for(i = 0; i <= SIZE-1; i += 1)
-
-//  <A[PHI1]-IN-EXACT-{i==PHI1, 1+i<=TOP-LEVEL:SIZE,
-//    1<=TOP-LEVEL:SIZE, 0<=i}>
-//  <B[PHI1][PHI2]-IN-EXACT-{PHI2==i, 0<=PHI1, PHI1+1<=TOP-LEVEL:SIZE,
-//    1+i<=TOP-LEVEL:SIZE, 0<=i}>
-
-      for(j = 0; j <= SIZE-1; j += 1)
-
-//  <A[PHI1]-IN-EXACT-{PHI1==i, 1+i<=TOP-LEVEL:SIZE,
-//    1+j<=TOP-LEVEL:SIZE, 0<=i, 0<=j}>
-//  <B[PHI1][PHI2]-IN-EXACT-{PHI1==j, PHI2==i, 1+i<=TOP-LEVEL:SIZE,
-//    1+j<=TOP-LEVEL:SIZE, 0<=i, 0<=j}>
-
-         A[i] = B[j][i]+A[i];
-   // END BLOCK
-}
-
-Privatized regions
-
-
 Code after scalarization
 
-
-//  <A[PHI1]-IN-EXACT-{0<=PHI1, PHI1+1<=TOP-LEVEL:SIZE}>
-//  <B[PHI1][PHI2]-IN-EXACT-{0<=PHI1, PHI1+1<=TOP-LEVEL:SIZE, 0<=PHI2,
-//    PHI2+1<=TOP-LEVEL:SIZE}>
-
 void scalarization09(double A[SIZE], double B[SIZE][SIZE])
 {
-
-//  <A[PHI1]-IN-EXACT-{0<=PHI1, PHI1+1<=TOP-LEVEL:SIZE}>
-//  <B[PHI1][PHI2]-IN-EXACT-{0<=PHI1, PHI1+1<=TOP-LEVEL:SIZE, 0<=PHI2,
-//    PHI2+1<=TOP-LEVEL:SIZE}>
-
    // BEGIN BLOCK
    int i;
    int j;
-
-//  <A[PHI1]-IN-EXACT-{0<=PHI1, PHI1+1<=TOP-LEVEL:SIZE}>
-//  <B[PHI1][PHI2]-IN-EXACT-{0<=PHI1, PHI1+1<=TOP-LEVEL:SIZE, 0<=PHI2,
-//    PHI2+1<=TOP-LEVEL:SIZE}>
-
    for(i = 0; i <= SIZE-1; i += 1)
-
-//  <A[PHI1]-IN-EXACT-{i==PHI1, 1+i<=TOP-LEVEL:SIZE,
-//    1<=TOP-LEVEL:SIZE, 0<=i}>
-//  <B[PHI1][PHI2]-IN-EXACT-{PHI2==i, 0<=PHI1, PHI1+1<=TOP-LEVEL:SIZE,
-//    1+i<=TOP-LEVEL:SIZE, 0<=i}>
-
       for(j = 0; j <= SIZE-1; j += 1)
-
-//  <A[PHI1]-IN-EXACT-{PHI1==i, 1+i<=TOP-LEVEL:SIZE,
-//    1+j<=TOP-LEVEL:SIZE, 0<=i, 0<=j}>
-//  <B[PHI1][PHI2]-IN-EXACT-{PHI1==j, PHI2==i, 1+i<=TOP-LEVEL:SIZE,
-//    1+j<=TOP-LEVEL:SIZE, 0<=i, 0<=j}>
-
          A[i] = B[j][i]+A[i];
    // END BLOCK
 }

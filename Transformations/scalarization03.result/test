@@ -1,9 +1,9 @@
-      SUBROUTINE SCALARIZATION(X, Y, N)
+C     Expected result: nothing to scalarize
+
+      SUBROUTINE SCALARIZATION(X,Y,N)
       REAL X(N,N), Y(N,N)
       REAL TT
 C     BEGIN BLOCK
-
-C     Expected result: nothing to scalarize
       DO I = 1, N                                                       0006
 C        BEGIN BLOCK
          TT = X(I,I)                                                    0007
@@ -11,6 +11,5 @@ C        BEGIN BLOCK
          Y(I,I) = TT                                                    0009
 C        END BLOCK
       ENDDO
-
 C     END BLOCK
       END
