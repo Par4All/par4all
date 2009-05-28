@@ -1,0 +1,44 @@
+
+Proper effects for "foo"
+
+void foo(int *p)
+{
+//               <must be read   >: p
+//               <must be written>: p[0]
+   *p = 4;                                                              /*0004*/
+   return;                                                              /*0005*/
+}
+
+Proper effects for "main"
+
+int main()
+{
+   int *x;
+   int tab[10];
+   int *tab2[10];
+   int tab3[10][10];
+   int **tab4;
+   int y;
+//               <must be read   >: x
+//               <must be written>: x[0]
+   
+
+   foo(x);                                                              /*0027*/
+//               <must be read   >: tab tab
+//               <must be written>: tab[0]
+   foo(tab);                                                            /*0028*/
+//               <must be read   >: tab2[4] tab2[4]
+//               <must be written>: tab2[4][0]
+   foo(tab2[4]);                                                        /*0029*/
+//               <must be read   >: tab3[5] tab3[5]
+//               <must be written>: tab3[5][0]
+   foo(tab3[5]);                                                        /*0030*/
+//               <must be read   >: tab4[6] tab4[6]
+//               <must be written>: tab4[6][0]
+   foo(tab4[6]);                                                        /*0031*/
+//               <must be written>: y
+   foo(&y);                                                             /*0032*/
+//               <must be written>: tab[1]
+   foo(&tab[1]);                                                        /*0033*/
+   return 1;                                                            /*0034*/
+}
