@@ -1,0 +1,58 @@
+delete scalarization00
+
+setproperty ABORT_ON_USER_ERROR TRUE
+setproperty PRETTYPRINT_BLOCKS TRUE
+
+##TODO: explain
+setproperty ARRAY_PRIV_FALSE_DEP_ONLY FALSE
+
+create scalarization00 scalarization00.c
+
+## Needed for substracting set approximations
+activate MUST_REGIONS
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
+
+#echo
+#echo Initial code
+#echo
+#display PRINTED_FILE[func]
+
+#echo
+#echo Read/Write regions
+#echo
+#activate PRINT_CODE_REGIONS
+#display PRINTED_FILE[func]
+
+#echo
+#echo IN regions
+#echo
+#activate PRINT_CODE_IN_REGIONS
+#display PRINTED_FILE[func]
+
+#echo
+#echo OUT regions
+#echo
+#activate PRINT_CODE_OUT_REGIONS
+#display PRINTED_FILE[func]
+
+echo
+echo Privatized regions
+echo
+activate PRINT_CODE_PRIVATIZED_REGIONS
+display PRINTED_FILE[func]
+
+echo
+echo Code after scalarization
+echo
+#apply SCALARIZATION[func]
+#display PRINTED_FILE[func]
+
+close
+delete scalarization00
+quit
+
