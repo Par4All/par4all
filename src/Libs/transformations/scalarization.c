@@ -136,10 +136,12 @@ bool sc_functional_graph_p(Psysteme g, Pbase d, Pbase r, Pbase dr)
     g4 = sc_copy(g3);
     sc_projection_along_variables_ofl_ctrl(&g4, dr4, OFL_CTRL);
     base_rm(dr4);
-    ifdebug(1) {
-      fprintf(stderr, "g4 =\n");
+    /*
+      ifdebug(1) {
+      pips_debug(1, "g4 =\n");
       sc_print(g4, (get_variable_name_t)entity_local_name);
-    }
+      }
+    */
     if (SC_EMPTY_P(g4)) {
       functional_p = FALSE;
     }
@@ -237,45 +239,64 @@ Pbase make_phi_base(int phi_min, int phi_max)
 }
 
 
+// To store already scalarized vars
+static list scalarized_variables = list_undefined;
+
 static bool loop_scalarization(loop l)
 {
   entity i    = loop_index(l);
   statement s = loop_body(l);
 
-  transformer prec = load_statement_precondition(s);
-  Psysteme D = predicate_system(transformer_relation(transformer_range(prec)));
+  ifdebug(1) {
+    pips_debug(1, "Statement:\n");
+    print_statement(s);
+  }
 
-  effects ie  = load_in_effects(s);
-  effects oe  = load_out_effects(s);
-  effects pe  = load_private_effects(s);
-  effects coe = load_copy_out_effects(s);
+  transformer prec = load_statement_precondition(s);
+  Psysteme D       = predicate_system(transformer_relation(transformer_range(prec)));
+
+  effects ie   = load_in_effects(s);
+  effects oe   = load_out_effects(s);
+  effects pe   = load_private_effects(s);
+  effects coe  = load_copy_out_effects(s);
+  effects crwe = load_cumulated_rw_effects(s);
 
   list irl  = effects_effects(ie);
   list orl  = effects_effects(oe);
   list prl  = effects_effects(pe);
   list corl = effects_effects(coe);
+  list crwl = effects_effects(crwe);
 
   // Accumulate new index in "domain" basis
   loop_indices_b = base_add_variable(loop_indices_b, (Variable) i);
 
   ifdebug(1) {
-    fprintf(stderr, "Entering level-%d loop, index=%s\n", base_dimension(loop_indices_b), entity_name(i));
-    fprintf(stderr, "PRIVATIZED regions:");
+    pips_debug(1, "Entering function...\n");
+    pips_debug(1, "Entering level-%d loop, index=%s\n", base_dimension(loop_indices_b), entity_name(i));
+    pips_debug(1, "OUT regions:\n");
+    print_regions(orl);
+    pips_debug(1, "PRIVATIZED regions:\n");
     print_regions(prl);
-    fprintf(stderr, "COPY OUT regions:");
+    pips_debug(1, "COPY OUT regions:\n");
     print_regions(corl);
+    pips_debug(1, "CUMULATED RW regions:\n");
+    print_regions(crwl);
   }
 
-  // Now we determine which private effects are not copied out. COPY IN effects are not implemented yet
-  // LD 2009/04/10.
-  FOREACH (EFFECT, pr, prl) {
+  // Now we determine which private effects are not copied out.
+  // COPY IN effects are not implemented yet - LD 2009/04/10.
+  FOREACH (EFFECT, pr, crwl) {
     entity pv  = effect_variable(pr);
     entity iv  = (entity) gen_find(pv,  irl, (bool (*)())gen_eq, car_effect_to_variable);
     entity ov  = (entity) gen_find(pv,  orl, (bool (*)())gen_eq, car_effect_to_variable);
     entity cov = (entity) gen_find(pv, corl, (bool (*)())gen_eq, car_effect_to_variable);
-    descriptor d = effect_descriptor(pr);
-    
-    if ( descriptor_convex_p(d)  &&
+
+    descriptor d = effect_descriptor(pr);    
+    action a = effect_action(pr);
+
+    if ( action_write_p(a) &&
+	 descriptor_convex_p(d) &&
+	 !entity_is_argument_p(pv, scalarized_variables) &&
 	 // No test on not-yet-implemented COPY IN
 	 entity_undefined_p(iv)     // pv could maybe be scalarized because it's not in an in region
 	 ) {
@@ -290,10 +311,12 @@ static bool loop_scalarization(loop l)
 	Pbase d_phi_b = BASE_NULLE;
 	Pbase cr = BASE_NULLE;
 
-	ifdebug(1) {
+	/*
+	  ifdebug(1) {
 	  pips_debug(1, "Value of sc:\n");
 	  sc_print(sc, (get_variable_name_t)entity_user_name);
 	}
+	*/
 	
 	// Build base dr using make_local_temporary_integer_value_entity(void)
 	for ( cr = phi_b ; !BASE_UNDEFINED_P(cr) ; cr = vecteur_succ(cr) ) {
@@ -308,13 +331,18 @@ static bool loop_scalarization(loop l)
 	  basic pvb     = variable_basic(pvtv);
 	  basic svb     = copy_basic(pvb);      
 	  
-	  //
 	  //list el       = load_proper_rw_effects_list(s);
+
+	  // Copy the a reference to pv, just in case we need it later
 	  reference pvr = copy_reference(find_reference_to_variable(s, pv));
 
 	  // Create a reference to this new variable and add declaration to module	
 	  entity sv = make_new_scalar_variable_with_prefix("__ld__", get_current_module_entity(), svb);
 	  AddEntityToCurrentModule(sv);
+	  scalarized_variables = arguments_add_entity(scalarized_variables, pv);
+	  ifdebug(1) {
+	    pips_debug(1, "Creating variable %s\n", entity_name(sv));
+	  }
 	  
 	  // Substitute all references to pv with references to new variable	  
 	  statement_substitute_scalarized_array_references(s, pv, sv);
@@ -357,7 +385,7 @@ static void statement_out(statement s)
     loop l = statement_loop(s);
     entity i = loop_index(l);
     ifdebug(1) {
-      fprintf(stderr, "Exiting loop with index %s, size=%d\n", entity_name(i), base_dimension(loop_indices_b));
+      pips_debug(1, "Exiting loop with index %s, size=%d\n", entity_name(i), base_dimension(loop_indices_b));
     }
     loop_indices_b = base_remove_variable(loop_indices_b, (Variable) i);
 
@@ -381,7 +409,9 @@ bool scalarization (char * module_name)
 			  db_get_memory_resource(DBR_PROPER_EFFECTS, module_name, TRUE));
 
     set_cumulated_rw_effects((statement_effects) 
-			     db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
+			     db_get_memory_resource(DBR_REGIONS, module_name, TRUE));
+    //    set_cumulated_rw_effects((statement_effects) 
+    //			     db_get_memory_resource(DBR_REGIONS, module_name, TRUE));
 
     module_to_value_mappings(module);
   
@@ -403,7 +433,9 @@ bool scalarization (char * module_name)
 
     /* We now traverse our module's statements. */
     loop_indices_b = BASE_NULLE;
+    scalarized_variables = NIL;
     gen_recurse(module_stat, statement_domain, statement_in, statement_out);
+    scalarized_variables = list_undefined;
 
     pips_debug(1, "end\n");
     debug_off();
