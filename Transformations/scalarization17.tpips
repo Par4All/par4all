@@ -1,4 +1,4 @@
-delete scalarization00
+delete scalarization17
 
 setproperty ABORT_ON_USER_ERROR TRUE
 setproperty PRETTYPRINT_BLOCKS TRUE
@@ -6,7 +6,7 @@ setproperty PRETTYPRINT_BLOCKS TRUE
 ##TODO: explain
 setproperty ARRAY_PRIV_FALSE_DEP_ONLY FALSE
 
-create scalarization00 scalarization00.c
+create scalarization17 scalarization17.c
 
 ## Needed for substracting set approximations
 activate MUST_REGIONS
@@ -53,6 +53,6 @@ echo
 #display PRINTED_FILE[func]
 
 close
-delete scalarization00
+delete scalarization17
 quit
 
