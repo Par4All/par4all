@@ -47,11 +47,18 @@ Ptsg sg_new()
  * sg_in n'est pas modifie
  *
  * Autre nom (obsolete): cp_sg()
+ *
+ * Extension: duplicate undefined generating systems (FI, 22 May 2009)
+ *
+ * sc_dup() has been replaced by sc_copy() which maintains the order
+ * in the data structure lists. Maybe we need the same change for
+ * generating systems.
  */
-Ptsg sg_dup(sg_in)
-Ptsg sg_in;
+Ptsg sg_dup(Ptsg sg_in)
 {
-    Ptsg sg_out;
+  Ptsg sg_out = SG_UNDEFINED;
+
+  if(!SG_UNDEFINED_P(sg_in)) {
     Pray_dte rd;
     Pray_dte rd_new;
     Psommet s;
@@ -62,29 +69,30 @@ Ptsg sg_in;
     /* duplication de la liste des sommets */
     sg_out->soms_sg.nb_s = sg_in->soms_sg.nb_s;
     for(s = sg_in->soms_sg.ssg; s != NULL; s = s->succ) {
-	s_new = sommet_dup(s);
-	s_new->succ = sg_out->soms_sg.ssg;
-	sg_out->soms_sg.ssg = s_new;
+      s_new = sommet_dup(s);
+      s_new->succ = sg_out->soms_sg.ssg;
+      sg_out->soms_sg.ssg = s_new;
     }
 
     /* duplication de la liste des rayons */
     sg_out->rays_sg.nb_v = sg_in->rays_sg.nb_v;
     for(rd = sg_in->rays_sg.vsg; rd != NULL; rd = rd->succ) {
-	rd_new = ray_dte_dup(rd);
-	rd_new->succ = sg_out->rays_sg.vsg;
-	sg_out->rays_sg.vsg = rd_new;
+      rd_new = ray_dte_dup(rd);
+      rd_new->succ = sg_out->rays_sg.vsg;
+      sg_out->rays_sg.vsg = rd_new;
     }
 
     /* duplication de la liste des droites */
     sg_out->dtes_sg.nb_v = sg_in->dtes_sg.nb_v;
     for(rd = sg_in->dtes_sg.vsg; rd != NULL; rd = rd->succ) {
-	rd_new = ray_dte_dup(rd);
-	rd_new->succ = sg_out->dtes_sg.vsg;
-	sg_out->dtes_sg.vsg = rd_new;
+      rd_new = ray_dte_dup(rd);
+      rd_new->succ = sg_out->dtes_sg.vsg;
+      sg_out->dtes_sg.vsg = rd_new;
     }
 
     sg_out->base = base_dup(sg_in->base);
-    return sg_out;
+  }
+  return sg_out;
 }
 
 /* Ptsg sg_without_line(Ptsg sg_in): allocation d'un systeme generateur
