@@ -123,53 +123,53 @@ void print_graph_of_text_to_daVinci(FILE * f_out, list l_of_vers)
 {
     bool first_node_parent = TRUE;
     fprintf(f_out, "[\n");
-    
-    MAP(VERTEX, ver_parent, {
-        bool first_node_child = TRUE;
-        text node_parent_text = (text)vertex_vertex_label(ver_parent);
-	bool first_sentence = TRUE;
-	
-	if (first_node_parent)
-	    first_node_parent = FALSE;
+
+    FOREACH (VERTEX, ver_parent, l_of_vers) {
+      bool first_node_child = TRUE;
+      text node_parent_text = (text)vertex_vertex_label(ver_parent);
+      bool first_sentence = TRUE;
+
+      if (first_node_parent)
+	first_node_parent = FALSE;
+      else
+	fprintf(f_out, ",\n");
+
+      FOREACH (SENTENCE, sen, text_sentences(node_parent_text)){
+	string s = sentence_to_string(sen);
+	if (first_sentence) {
+	  string tmp = remove_newline_of_string (s);
+	  fprintf(f_out, "l(\"%s\",n(\"\",[a(\"OBJECT\",\"", tmp);
+	  first_sentence = FALSE;
+	  free (tmp);
+	}
+	if (strstr(s, CALL_MARK)) {
+	  /*fprintf(f_out, convert_string_for_daVinci_graph(s + strlen(CALL_MARK)));*/
+	} else {
+	  fputs(convert_string_for_daVinci_graph(s), f_out);
+	}
+      }
+
+      fprintf(f_out, "\")],[\n");
+
+      FOREACH (SUCCESSOR, succ, vertex_successors(ver_parent)){
+	vertex ver_child = successor_vertex(succ);
+	text node_child_text = (text)vertex_vertex_label(ver_child);
+	sentence node_child_sen = SENTENCE(CAR(text_sentences(node_child_text)));
+	string node_name_child = remove_newline_of_string(first_word_of_sentence(node_child_sen));
+
+	if (first_node_child)
+	  first_node_child = FALSE;
 	else
-	    fprintf(f_out, ",\n");
-	
-	MAP(SENTENCE, sen, {
-	    string s = sentence_to_string(sen);
-	    if (first_sentence) {
-	      string tmp = remove_newline_of_string (s);
-	      fprintf(f_out, "l(\"%s\",n(\"\",[a(\"OBJECT\",\"", tmp);
-	      first_sentence = FALSE;
-	      free (tmp);
-	    }
-	    if (strstr(s, CALL_MARK)) {
-	      /*fprintf(f_out, convert_string_for_daVinci_graph(s + strlen(CALL_MARK)));*/
-	    } else {
-	        fprintf(f_out, convert_string_for_daVinci_graph(s));
-	    }
-	}, text_sentences(node_parent_text));
-	
-	fprintf(f_out, "\")],[\n");
+	  fprintf(f_out, ",\n");
+	fprintf(f_out, "  l(\"\",e(\"\",[],r(\"%s\")))", node_name_child);
+	free(node_name_child);
+      }
 
-	MAP(SUCCESSOR, succ, {
-	    vertex ver_child = successor_vertex(succ);
-	    text node_child_text = (text)vertex_vertex_label(ver_child);
-	    sentence node_child_sen = SENTENCE(CAR(text_sentences(node_child_text)));
-	    string node_name_child = remove_newline_of_string(first_word_of_sentence(node_child_sen));
-	    
-	    if (first_node_child)
-	        first_node_child = FALSE;
-	    else
-	        fprintf(f_out, ",\n");
-	    fprintf(f_out, "  l(\"\",e(\"\",[],r(\"%s\")))", node_name_child);
-	    free(node_name_child);
-	}, vertex_successors(ver_parent));
+      fprintf(f_out, "]))");
+    }
 
-	fprintf(f_out, "]))");
-    }, l_of_vers);
-    
     fprintf(f_out, "\n]");
-    
+
     return;
 }
 
