@@ -56,6 +56,7 @@ string reduction_operator_tag_name(tag t)
     case is_reduction_operator_min:         return "min";
     case is_reduction_operator_max:         return "max";
     case is_reduction_operator_and:         return "and";
+    case is_reduction_operator_or:          return "or";
     case is_reduction_operator_bitwise_or:  return "bitwise_or";
     case is_reduction_operator_bitwise_xor: return "bitwise_xor";
     case is_reduction_operator_bitwise_and: return "bitwise_and";
