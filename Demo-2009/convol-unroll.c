@@ -33,6 +33,10 @@ int main() //      program image_processing
 	   kernel_size, kernel_size, kernel);
       }
 
+  for( i = 0; i< image_size; i++) {
+    for( j = 0; j< image_size; j++)
+      printf("%f ",new_image[i][j]);
+  }
   //     print *, new_image
   //      print *, new_image (image_size/2, image_size/2)
 
@@ -59,7 +63,7 @@ void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj],
     l200: for(ki = 0; ki<ksi; ki++) {
       l100: for(kj = 0; kj<ksj; kj++) {
 	  new_image[i][j] = new_image[i][j] + 
-	    image[i+ki-ksi/2-1][j+kj-ksj/2-1]* 
+	    image[i+ki-ksi/2/*-1*/][j+kj-ksj/2/*-1*/]* 
 	    kernel[ki][kj];
 	}
       }
