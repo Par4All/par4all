@@ -1,5 +1,5 @@
 /* $RCSfile: prettyprint.c,v $ (version $Revision$)
- * $Date: 1997/12/10 14:25:25 $, 
+ * $Date: 1997/12/10 14:25:25 $,
  *
  * (pretty)print of reductions.
  *
@@ -49,16 +49,16 @@ string reduction_operator_tag_name(tag t)
 {
     switch(t)
     {
-    case is_reduction_operator_none:        return "none"; 
-    case is_reduction_operator_sum:         return "sum";   
+    case is_reduction_operator_none:        return "none";
+    case is_reduction_operator_sum:         return "sum";
     case is_reduction_operator_csum:        return "csum";
-    case is_reduction_operator_prod:        return "prod"; 
-    case is_reduction_operator_min:         return "min";  
-    case is_reduction_operator_max:         return "max";  
-    case is_reduction_operator_and:         return "and";  
-    case is_reduction_operator_bitwise_or:  return "bitwise_or";   
-    case is_reduction_operator_bitwise_xor: return "bitwise_xor";   
-    case is_reduction_operator_bitwise_and: return "bitwise_and";   
+    case is_reduction_operator_prod:        return "prod";
+    case is_reduction_operator_min:         return "min";
+    case is_reduction_operator_max:         return "max";
+    case is_reduction_operator_and:         return "and";
+    case is_reduction_operator_bitwise_or:  return "bitwise_or";
+    case is_reduction_operator_bitwise_xor: return "bitwise_xor";
+    case is_reduction_operator_bitwise_and: return "bitwise_and";
     default: pips_internal_error("unexpected reduction operator tag!");
     }
 
@@ -94,18 +94,17 @@ static list /* of string */ words_reduction(reduction r)
  */
 static list /* of string */ words_reductions(string note, reductions rs)
 {
-    list /* of string */ ls = NIL;
-    MAP(REDUCTION, r, 
-	ls = gen_nconc(words_reduction(r), ls),
-	reductions_list(rs));
-    
-    return ls? CONS(STRING, strdup(note), ls): NIL;
+  list /* of string */ ls = NIL;
+  FOREACH (REDUCTION, r,reductions_list(rs)) {
+    ls = gen_nconc(words_reduction(r), ls);
+  }
+  return ls? CONS(STRING, strdup(note), ls): NIL;
 }
 
 void print_reduction(reduction r)
 {
     reference ref = reduction_reference(r);
-    fprintf(stderr, "reduction is %s[", 
+    fprintf(stderr, "reduction is %s[",
 	    reduction_operator_tag_name
 	        (reduction_operator_tag(reduction_op(r))));
     if (!reference_undefined_p(ref)) print_reference(ref);
@@ -117,7 +116,7 @@ void print_reduction(reduction r)
 /* function to allocate and returns a text, passed to the prettyprinter
  * uses some static variables:
  * - printed_reductions function
- * - 
+ * -
  */
 static text text_reductions(entity module, int margin, statement s)
 {
@@ -125,11 +124,11 @@ static text text_reductions(entity module, int margin, statement s)
 
     debug_on("REDUCTIONS_DEBUG_LEVEL");
     pips_debug(1, "considering statement %p\n", s);
-    
+
     t = bound_printed_reductions_p(s)? /* unreachable statements? */
 	words_predicate_to_commentary
 	    (words_reductions(note_for_statement(s),
-			      load_printed_reductions(s)), 
+			      load_printed_reductions(s)),
 	     PIPS_COMMENT_SENTINEL):
 		make_text(NIL);
 
@@ -151,8 +150,8 @@ static text text_code_reductions(statement s)
 }
 
 /* handles the required prettyprint
- * ??? what about summary reductions? 
- * should be pprinted with cumulated regions. 
+ * ??? what about summary reductions?
+ * should be pprinted with cumulated regions.
  * @ return TRUE if succeed
  * @param module_name the module name to process
  * @param resource_name the resource to use
@@ -162,8 +161,8 @@ static text text_code_reductions(statement s)
  */
 static bool
 print_any_reductions(
-    string module_name, 
-    string resource_name, 
+    string module_name,
+    string resource_name,
     string decoration_name,
     string summary_name,
     string file_suffix)
@@ -171,13 +170,13 @@ print_any_reductions(
     text t;
 
     debug_on("REDUCTIONS_DEBUG_LEVEL");
-    pips_debug(1, "considering module %s for %s\n", 
+    pips_debug(1, "considering module %s for %s\n",
 	       module_name, decoration_name);
 
     set_current_module_entity(local_name_to_top_level_entity(module_name));
-    set_printed_reductions((pstatement_reductions) 
+    set_printed_reductions((pstatement_reductions)
 	 db_get_memory_resource(resource_name, module_name, TRUE));
-    set_current_module_statement((statement) 
+    set_current_module_statement((statement)
 	 db_get_memory_resource(DBR_CODE, module_name, TRUE));
     reduction_decoration = decoration_name;
 
@@ -185,10 +184,10 @@ print_any_reductions(
 
     if (summary_name)
     {
-	reductions rs = (reductions) 
+	reductions rs = (reductions)
 	    db_get_memory_resource(summary_name, module_name, TRUE);
-	text p = 
-	    words_predicate_to_commentary(words_reductions("summary ", rs), 
+	text p =
+	    words_predicate_to_commentary(words_reductions("summary ", rs),
 					  PIPS_COMMENT_SENTINEL);
 	MERGE_TEXTS(p, t);
 	t=p;
@@ -204,23 +203,23 @@ print_any_reductions(
     debug_off();
     return TRUE;
 }
-    
+
 /* Handlers for PIPSMAKE
  */
 bool print_code_proper_reductions(string module_name)
 {
     return print_any_reductions(module_name,
-				DBR_PROPER_REDUCTIONS, 
-				PROP_DECO, 
+				DBR_PROPER_REDUCTIONS,
+				PROP_DECO,
 				NULL,
 				PROP_SUFFIX);
 }
 
 bool print_code_cumulated_reductions(string module_name)
 {
-    return print_any_reductions(module_name, 
-				DBR_CUMULATED_REDUCTIONS, 
-				CUMU_DECO, 
+    return print_any_reductions(module_name,
+				DBR_CUMULATED_REDUCTIONS,
+				CUMU_DECO,
 				DBR_SUMMARY_REDUCTIONS,
 				CUMU_SUFFIX);
 }
