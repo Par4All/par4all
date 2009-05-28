@@ -7,9 +7,10 @@ int func(int n)
 
   for (i=0 ; i < n ; i++) {
     x[i] = i;
-    for (j=0 ; j < n ; j++)
+    for (j=0 ; j < n ; j++) {
       y[i][j] = x[i] ^ 2;
       y[i][j] = x[i] + j;
+    }
   }
   return y[n][n];
 }
