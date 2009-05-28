@@ -1956,62 +1956,82 @@ unstructured_does_return(unstructured u)
 }
 
 
-/* Insert some statements at the very beginning of another statement.
+/* Insert some statements before or after a given statement.
 
-   It should not work in parsed code with "goto", that is before being
-   controllized, since "goto" points to a given statement and here we
+   It should not be used with parsed code containing "goto", i.e. before being
+   controllized, because "goto" points to a given statement and here we
    change the statement that could be pointed to...
 */
-void
-insert_a_statement_list_in_a_statement(statement target,
-				       list s_list)
+void insert_or_append_a_statement_list(statement target,
+				       list s_list,
+				       bool after_p)
 {
-    if (statement_block_p(target)) {
-	sequence seq = instruction_sequence(statement_instruction(target));
+  if (statement_block_p(target)) {
+    sequence seq = instruction_sequence(statement_instruction(target));
+    if (after_p) // append
+	sequence_statements(seq) = gen_nconc(sequence_statements(seq), s_list);
+    else // insert	
 	sequence_statements(seq) = gen_nconc(s_list, sequence_statements(seq));
-    }
-    else {
-	statement new_statement = make_stmt_of_instr(statement_instruction(target));
-	/* Create the new statement sequence with s_list first: */
-	statement_instruction(target) =
-	    make_instruction_block(gen_nconc(s_list, CONS(STATEMENT,
-							  new_statement,
-							  NIL)));
-	statement_label(new_statement) = statement_label(target);
-	statement_label(target) = entity_empty_label();
-	statement_number(new_statement) = statement_number(target);
-	statement_number(target) = STATEMENT_NUMBER_UNDEFINED;
-	statement_ordering(target) = STATEMENT_ORDERING_UNDEFINED;
-	statement_comments(new_statement) = statement_comments(target);
-	statement_comments(target) = empty_comments;
-    }
+  }
+  else {
+    statement new_statement = make_stmt_of_instr(statement_instruction(target));
+    /* Create the new statement sequence with s_list first: */
+    if (after_p) // append
+      statement_instruction(target) =
+	make_instruction_block(CONS(STATEMENT,
+				    new_statement,
+				    s_list));      
+    else // insert
+      statement_instruction(target) =
+	make_instruction_block(gen_nconc(s_list, CONS(STATEMENT,
+						      new_statement,
+						      NIL)));
+    statement_label(new_statement) = statement_label(target);
+    statement_label(target) = entity_empty_label();
+    statement_number(new_statement) = statement_number(target);
+    statement_number(target) = STATEMENT_NUMBER_UNDEFINED;
+    statement_ordering(target) = STATEMENT_ORDERING_UNDEFINED;
+    statement_comments(new_statement) = statement_comments(target);
+    statement_comments(target) = empty_comments;
+  }
 }
 
-
-/* Insert some statements at the very beginning of another statement: */
-void
-append_a_statement_list_to_a_statement(statement target,
-				       list s_list)
+void insert_a_statement_list_in_a_statement(statement target,
+					    list s_list)
 {
-    if (statement_block_p(target)) {
-	sequence seq = instruction_sequence(statement_instruction(target));
-	sequence_statements(seq) = gen_nconc(sequence_statements(seq), s_list);
-    }
-    else {
-	statement new_statement = make_stmt_of_instr(statement_instruction(target));
-	/* Create the new statement sequence with s_list first: */
-	statement_instruction(target) =
-	    make_instruction_block(CONS(STATEMENT,
-					new_statement,
-					s_list));
-	statement_label(new_statement) = statement_label(target);
-	statement_label(target) = entity_empty_label();
-	statement_number(new_statement) = statement_number(target);
-	statement_number(target) = STATEMENT_NUMBER_UNDEFINED;
-	statement_ordering(target) = STATEMENT_ORDERING_UNDEFINED;
-	statement_comments(new_statement) = statement_comments(target);
-	statement_comments(target) = empty_comments;
-    }
+  insert_or_append_a_statement_list(target, s_list, FALSE);
+}
+
+void append_a_statement_list_to_a_statement(statement target,
+					    list s_list)
+{
+  insert_or_append_a_statement_list(target, s_list, TRUE);
+}
+
+/* Insert one single statement before or after a target statement.
+
+   It should not be used with parsed code containing "goto", i.e. before being
+   controllized, because "goto" points to a given statement and here we
+   change the statement that could be pointed to...
+*/
+void insert_or_append_a_statement(statement target,
+				  statement new,
+				  bool after_p)
+{
+  list s_list = CONS(STATEMENT, new, NIL);
+  insert_or_append_a_statement_list(target, s_list, after_p);
+}
+
+void insert_a_statement(statement target,
+			statement new)
+{
+  insert_or_append_a_statement(target, new, FALSE);
+}
+
+void append_a_statement(statement target,
+			statement new)
+{
+  insert_or_append_a_statement(target, new, TRUE);
 }
 
 
@@ -2558,5 +2578,37 @@ list statement_to_called_user_entities(statement s)
 
   return statement_to_all_included_declarations;
 }
+
+/* Return first reference found */
+static reference first_reference_to_v = reference_undefined;
+static entity variable_searched = entity_undefined;
+static bool first_reference_to_v_p(reference r)
+{
+  bool result= TRUE;
+  if (reference_undefined_p(first_reference_to_v)) {
+    entity rv = reference_variable(r);
+    if (rv == variable_searched) {
+      first_reference_to_v = r;
+      result = FALSE;
+    }
+  }
+  else
+    result = FALSE;
+
+  return result;
+}
+
+reference find_reference_to_variable(statement s, entity v) 
+{
+  reference r = reference_undefined;
+  first_reference_to_v = reference_undefined;
+  variable_searched = v;
+  gen_recurse(s, reference_domain, first_reference_to_v_p, gen_null);
+  r = copy_reference(first_reference_to_v);
+  first_reference_to_v = reference_undefined;
+  variable_searched = entity_undefined;
+  return r;
+}
+
 
 /* That's all folks */
