@@ -118,6 +118,18 @@ int main()
    for(i = 0; i <= 99; i += 1)
 //  call sum[b],
       --b;
+//  loop and[b],
+   
+   // b should be reduced here
+   for(i = 0; i <= 99; i += 1)
+//  call and[b],
+      b = b&&i==i;
+//  loop or[b],
+   
+   // flg should be reduced here
+   for(i = 0; i <= 99; i += 1)
+//  call or[b],
+      b = b||i==i;
 
    return 0;
 }

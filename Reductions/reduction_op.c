@@ -106,5 +106,15 @@ int main () {
     --b;
   }
 
+  // b should be reduced here
+  for (i=0; i < 100; i++) {
+    b = b && (i == i);
+  }
+
+  // flg should be reduced here
+  for (i=0; i < 100; i++) {
+    b = b || (i == i);
+  }
+
   return 0;
 }
