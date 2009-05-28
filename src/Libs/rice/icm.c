@@ -348,15 +348,14 @@ remove_dependance_from_conflicts(list /* of conflict */ conflicts,
 {
     list /* of conflict */ new_conflicts = NIL;
 
-    ifdebug(7) 
-    {
+    ifdebug(7) {
 	fprintf(stderr, "Old conflicts :\n");
 	MAP(CONFLICT, c, { 
 	    prettyprint_conflict(stderr, c); 
 	}, conflicts);
     }
 
-    MAP(CONFLICT, c, {
+    FOREACH(CONFLICT, c, conflicts) {
 	if(conflict_cone(c) != cone_undefined) {
 	    if (action_dependance_p(c, dependance_type))
 	    {
@@ -381,8 +380,7 @@ remove_dependance_from_conflicts(list /* of conflict */ conflicts,
 	else {
 	    new_conflicts = CONS(CONFLICT, c, new_conflicts);
 	}
-
-    }, conflicts);
+    }
 
     /* memory leak : conflicts */
 
@@ -471,7 +469,7 @@ remove_dependance(vertex v1, /* Successors of this vertex are updated */
     list /* of successor */ v1_successors = vertex_successors(v1);
 
     ifdebug(3) {
-	debug(3, "remove_dependance", "Remove ");
+	pips_debug(3, "Remove ");
 	
 	if (dependance_type & FLOW_DEPENDANCE) fprintf(stderr, "F ");
 	if (dependance_type & ANTI_DEPENDANCE) fprintf(stderr, "A ");
@@ -800,7 +798,7 @@ vertex_invariant_p(vertex v,
  *   not exist output(v, z, <= level) v != z
  * then 
  *   remove output(v, v, <= level)
- *   foreach y saitisy
+ *   foreach y satisfying
  *     exist flow(v -> y, infiny)
  *     exist anti(y -> v, <= level)
  *   do remove anti(y -> v, <= level)
@@ -816,7 +814,7 @@ SimplifyInvariantVertex(vertex v, /* Successors of this vertex are updated */
     if (dependance_vertices_p(v, v, OUTPUT_DEPENDANCE, level) &&
 	!exist_non_self_dependance_from_vertex_p(v, 
 						 OUTPUT_DEPENDANCE, level)) {
-	MAP(SUCCESSOR, su, {
+      FOREACH(SUCCESSOR, su, vertex_successors(v)) {
 	    vertex y = successor_vertex(su);
 	    if (!common_ignore_this_vertex(region, y) && 
 		dependance_vertices_p(v, y, FLOW_DEPENDANCE, level) && 
@@ -826,14 +824,16 @@ SimplifyInvariantVertex(vertex v, /* Successors of this vertex are updated */
 						    matching_vertices, 
 						    (char *) y);
 	    }
-	}, vertex_successors(v));
+	}
 
-	remove_dependance(v, v, OUTPUT_DEPENDANCE, 0, load_has_level(st));
+      //remove_dependance(v, v, OUTPUT_DEPENDANCE, 0, load_has_level(st));
+	remove_dependance(v, v, OUTPUT_DEPENDANCE, level, load_has_level(st));
 		    
 	if (!set_empty_p(matching_vertices)) {
 	    SET_MAP(y, {
 		remove_dependance((vertex) y, v, ANTI_DEPENDANCE, 
-				  0, load_has_level(st));
+				  //0, load_has_level(st));
+				  level, load_has_level(st));
 	    }, matching_vertices);
 	}
     }
@@ -854,7 +854,7 @@ DoInvariantsStatements(list /* of scc */ lsccs,
 {
     set /* of statement */ invariant = set_make(set_pointer);
 
-    MAP(SCC, s, {
+    FOREACH(SCC, s, lsccs) {
 	list /* of vertex */ lv = scc_vertices(s);
 
 	if (gen_length(lv) > 1) {
@@ -891,7 +891,7 @@ DoInvariantsStatements(list /* of scc */ lsccs,
 				    (char *) st);
 	    }
 	}
-    }, lsccs); 
+    }
 
     set_free(invariant);
 
@@ -945,7 +945,7 @@ vertex_redundant_p(vertex v,
 	
     /* If there is a flow dependance from v to y and if y is not redundant, 
        then v is not redundant */
-    MAP(SUCCESSOR, su, {
+    FOREACH(SUCCESSOR, su, vertex_successors(v)) {
 	vertex y = successor_vertex(su);
 	if (dependance_vertices_p(v, y, FLOW_DEPENDANCE, level)) {
 	    statement y_st = vertex_to_statement(y);
@@ -964,10 +964,10 @@ vertex_redundant_p(vertex v,
 		return FALSE;
 	    }
 	}
-    }, vertex_successors(v));
+    }
 
     ifdebug(6) {
-	debug(6, "vertex_redundant_p", "");
+	pips_debug(6, "");
 	fprintf(stderr, 
 		"statement %02d is redundant.\n", 
 		statement_number(st));
@@ -985,13 +985,13 @@ SimplifyRedundantVertex(vertex v, /* Successors of this vertex are updated */
 			set /* of statement */ region, 
 			int level)
 {
-    set /* of vertex */ matching_vertices = set_make(set_pointer);
+    set /* of vertices */ matching_vertices = set_make(set_pointer);
     statement st = vertex_to_statement(v);
 
     if (dependance_vertices_p(v, v, OUTPUT_DEPENDANCE, level) &&
 	!exist_non_self_dependance_from_vertex_p(v, 
 						 OUTPUT_DEPENDANCE, level)) {
-	MAP(SUCCESSOR, su, {
+      FOREACH(SUCCESSOR, su, vertex_successors(v)) {
 	    vertex y = successor_vertex(su);
 	    if (!common_ignore_this_vertex(region, y) && 
 		dependance_vertices_p(y, v, FLOW_DEPENDANCE, level) && 
@@ -1001,9 +1001,9 @@ SimplifyRedundantVertex(vertex v, /* Successors of this vertex are updated */
 						    matching_vertices, 
 						    (char *) y);
 	    }
-	}, vertex_successors(v));
+      }
 
-	remove_dependance(v, v, OUTPUT_DEPENDANCE, 0, load_has_level(st));
+      remove_dependance(v, v, OUTPUT_DEPENDANCE, 0, load_has_level(st));
 		    
 	if (!set_empty_p(matching_vertices)) {
 	    SET_MAP(y, {
@@ -1079,7 +1079,7 @@ SimplifyGraph(graph g,
     lsccs = FindAndTopSortSccs(g, region, level);
     reset_sccs_drivers();
 
-    MAP(SCC, elmt, {
+    FOREACH(SCC, elmt, lsccs) {
 	/* Check if the component is strongly connected */
 	if (strongly_connected_p(elmt, level)) {
 	    set new_region = set_make(set_pointer);
@@ -1090,7 +1090,7 @@ SimplifyGraph(graph g,
 
 	    set_free(new_region);
 	}
-    }, lsccs); 
+    }
 
     /* memory leak : lsccs */
 
