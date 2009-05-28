@@ -11,16 +11,16 @@ create scalarization13 scalarization13.f
 ## Needed for substracting set approximations
 activate MUST_REGIONS
 
-echo
-echo Initial code
-echo
-display PRINTED_FILE[SCALARIZATION]
+#echo
+#echo Initial code
+#echo
+#display PRINTED_FILE[SCALARIZATION]
 
-echo
-echo IN regions
-echo
-activate PRINT_CODE_IN_REGIONS
-display PRINTED_FILE[SCALARIZATION]
+#echo
+#echo IN regions
+#echo
+#activate PRINT_CODE_IN_REGIONS
+#display PRINTED_FILE[SCALARIZATION]
 
 #echo
 #echo COPY-OUT regions
@@ -28,11 +28,11 @@ display PRINTED_FILE[SCALARIZATION]
 #activate PRINT_CODE_COPIED_OUT_REGIONS
 #display PRINTED_FILE[SCALARIZATION]
 
-echo
-echo Privatized regions
-echo
-activate PRINT_CODE_PRIVATIZED_REGIONS
-display PRINTED_FILE[SCALARIZATION]
+#echo
+#echo Privatized regions
+#echo
+#activate PRINT_CODE_PRIVATIZED_REGIONS
+#display PRINTED_FILE[SCALARIZATION]
 
 echo
 echo Code after scalarization
