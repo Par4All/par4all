@@ -10,22 +10,22 @@ create("test.c")
 # you can get module object from the modules table
 foo=modules["foo"]
 bar=modules["bar"]
+malabar=modules["malabar"]
 
 # and apply transformation to modules
-foo.apply("inlining")
-
-# code gives us a list of line view of modue's code
-foo.code()
+foo.inlining(CALLERS="bar")
 
 #the good old display, default to PRINTED_FILE, but you can give args
 foo.display()
 bar.display()
+malabar.display()
 bar.apply("print_code")
 
 # recover a list of all labels in the source code ... without pipsing
 ##
 import re # we are gonne use regular expression
 label_re = re.compile("^ *(\w+):")
+# code gives us a list of line view of modue's code
 lines=foo.code()
 labels=[]
 for line in lines:
