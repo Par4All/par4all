@@ -1980,7 +1980,7 @@ void insert_or_append_a_statement_list(statement target,
       statement_instruction(target) =
 	make_instruction_block(CONS(STATEMENT,
 				    new_statement,
-				    s_list));      
+				    s_list));
     else // insert
       statement_instruction(target) =
 	make_instruction_block(gen_nconc(s_list, CONS(STATEMENT,
@@ -1993,6 +1993,8 @@ void insert_or_append_a_statement_list(statement target,
     statement_ordering(target) = STATEMENT_ORDERING_UNDEFINED;
     statement_comments(new_statement) = statement_comments(target);
     statement_comments(target) = empty_comments;
+    statement_extensions(new_statement) = statement_extensions(target);
+    statement_extensions(target) = empty_extensions ();
   }
 }
 
@@ -2049,12 +2051,14 @@ gather_and_remove_all_format_statements_rewrite(statement s)
 	statement_label(new_format) = statement_label(s);
 	statement_number(new_format) = statement_number(s);
 	statement_comments(new_format) = statement_comments(s);
+	statement_extensions(new_format) = statement_extensions(s);
 	/* Replace the old FORMAT with a NOP: */
 	statement_instruction(s) = make_instruction_block(NIL);
 	statement_label(s) = entity_empty_label();
 	statement_number(s) = STATEMENT_NUMBER_UNDEFINED;
 	statement_ordering(s) = STATEMENT_ORDERING_UNDEFINED;
 	statement_comments(s) = empty_comments;
+	statement_extensions(s) = empty_extensions();
 
 	gather_and_remove_all_format_statements_list = CONS(STATEMENT,
 							    new_format,
