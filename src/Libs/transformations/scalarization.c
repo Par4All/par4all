@@ -296,7 +296,7 @@ static bool loop_scalarization(loop l)
 
     if ( action_write_p(a) &&
 	 descriptor_convex_p(d) &&
-	 !entity_is_argument_p(pv, scalarized_variables) &&
+	 !entity_is_argument_p(pv, scalarized_variables) && /* <- comment this for the demo */
 	 // No test on not-yet-implemented COPY IN
 	 entity_undefined_p(iv)     // pv could maybe be scalarized because it's not in an in region
 	 ) {
@@ -440,6 +440,7 @@ bool scalarization (char * module_name)
     debug_off();
 
     /* Save modified code to database */
+	module_reorder(module_stat);
     DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(module_name), module_stat);
 
     /* TODO: Cleanup after scalarization */
