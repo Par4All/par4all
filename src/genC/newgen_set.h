@@ -1,30 +1,36 @@
 /*
 
-	-- NewGen Project
+  $Id$
 
-	The NewGen software has been designed by Remi Triolet and Pierre
-	Jouvelot (Ecole des Mines de Paris). This prototype implementation
-	has been written by Pierre Jouvelot.
+  Copyright 1989-2009 MINES ParisTech
 
-	This software is provided as is, and no guarantee whatsoever is
-	provided regarding its appropriate behavior. Any request or comment
-	should be sent to newgen@isatis.ensmp.fr.
+  This file is part of NewGen.
 
-	(C) Copyright Ecole des Mines de Paris, 1989
+  NewGen is free software: you can redistribute it and/or modify it under the
+  terms of the GNU General Public License as published by the Free Software
+  Foundation, either version 3 of the License, or any later version.
+
+  NewGen is distributed in the hope that it will be useful, but WITHOUT ANY
+  WARRANTY; without even the implied warranty of MERCHANTABILITY or
+  FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public
+  License for more details.
+
+  You should have received a copy of the GNU General Public License along with
+  NewGen.  If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-
 #ifndef SET_INCLUDED
 #define SET_INCLUDED
-/* - set.h
-   
+/*
+
    Pierre Jouvelot (3 Avril 1989)
 
-   Set (of CHAR *) package interface. 
+   Set (of CHAR *) package interface.
 
-   WARNING: You aren't allowed to use = or == between sets. Always use 
-   SET_ASSIGN and SET_EQUAL. */
+   WARNING: You aren't allowed to use = or == between sets. Always use
+   SET_ASSIGN and SET_EQUAL.
+*/
 
 #include "newgen_types.h"
 #include "newgen_hash.h"

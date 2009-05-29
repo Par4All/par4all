@@ -1,39 +1,46 @@
 /*
 
-	-- NewGen Project
+  $Id$
 
-	The NewGen software has been designed by Remi Triolet and Pierre
-	Jouvelot (Ecole des Mines de Paris). This prototype implementation
-	has been written by Pierre Jouvelot.
+  Copyright 1989-2009 MINES ParisTech
 
-	This software is provided as is, and no guarantee whatsoever is
-	provided regarding its appropriate behavior. Any request or comment
-	should be sent to newgen@isatis.ensmp.fr.
+  This file is part of NewGen.
 
-	(C) Copyright Ecole des Mines de Paris, 1989
+  NewGen is free software: you can redistribute it and/or modify it under the
+  terms of the GNU General Public License as published by the Free Software
+  Foundation, either version 3 of the License, or any later version.
+
+  NewGen is distributed in the hope that it will be useful, but WITHOUT ANY
+  WARRANTY; without even the implied warranty of MERCHANTABILITY or
+  FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public
+  License for more details.
+
+  You should have received a copy of the GNU General Public License along with
+  NewGen.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+/*
 
+  This file includes the function used to implement user types
+  in (Common)Lisp.
 
-/* genLisp.c
+  The implementation is based on CL structures. We could provide type
+  informations in order to (potentially) improve the efficiency.
+  The type information (i.e., the index in the Domains table) is put here
+  for compatibility with C only.
 
-   This file includes the function used to implement user types 
-   in (Common)Lisp.
+  . An inlined value is the value,
+  . A list is a Lisp list,
+  . An array is a Lisp array,
+  . An AND type is a DEFSTRUCT,
+  . An OR type is an OR structure with a tag (a keyword) and a value.
 
-   The implementation is based on CL structures. We could provide type
-   informations in order to (potentially) improve the efficiency. 
-   The type information (i.e., the index in the Domains table) is put here
-   for compatibility with C only.
+  Note that boolean (which doesn't exist in Lisp) uses TRUE and FALSE, and
+  so (if (foo-bar x) ...) as to be written (if (true? (foo-bar x))
+  ...)
 
-   . An inlined value is the value,
-   . A list is a Lisp list,
-   . An array is a Lisp array,
-   . An AND type is a DEFSTRUCT,
-   . An OR type is an OR structure with a tag (a keyword) and a value.
+ */
 
-   Note that boolean (which doesn't exist in Lisp) uses TRUE and FALSE, and
-   so (if (foo-bar x) ...) as to be written (if (true? (foo-bar x)) ...) */
-   
 #include <stdio.h>
 #include "newgen_include.h"
 

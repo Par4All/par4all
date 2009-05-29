@@ -1,7 +1,28 @@
 /*
+
+  $Id$
+
+  Copyright 1989-2009 MINES ParisTech
+
+  This file is part of NewGen.
+
+  NewGen is free software: you can redistribute it and/or modify it under the
+  terms of the GNU General Public License as published by the Free Software
+  Foundation, either version 3 of the License, or any later version.
+
+  NewGen is distributed in the hope that it will be useful, but WITHOUT ANY
+  WARRANTY; without even the implied warranty of MERCHANTABILITY or
+  FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public
+  License for more details.
+
+  You should have received a copy of the GNU General Public License along with
+  NewGen.  If not, see <http://www.gnu.org/licenses/>.
+
+*/
+/*
  * STACK MANAGEMENT
  *
- * Fabien COELHO, 05/12/94
+ * Fabien COELHO, 05/12/1994
  *
  * Could be integrated in Newgen as a building type (as lists, mappings).
  * there is no actual need of such a type on the functional point of view.
@@ -10,8 +31,6 @@
  * (direction problem).
  *
  * More thoughts needed.
- *
- * $Id$
  */
 
 #include <stdlib.h>

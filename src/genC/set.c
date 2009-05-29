@@ -1,29 +1,34 @@
 /*
 
-	-- NewGen Project
+  $Id$
 
-	The NewGen software has been designed by Remi Triolet and Pierre
-	Jouvelot (Ecole des Mines de Paris). This prototype implementation
-	has been written by Pierre Jouvelot.
+  Copyright 1989-2009 MINES ParisTech
 
-	This software is provided as is, and no guarantee whatsoever is
-	provided regarding its appropriate behavior. Any request or comment
-	should be sent to newgen@isatis.ensmp.fr.
+  This file is part of NewGen.
 
-	(C) Copyright Ecole des Mines de Paris, 1989
+  NewGen is free software: you can redistribute it and/or modify it under the
+  terms of the GNU General Public License as published by the Free Software
+  Foundation, either version 3 of the License, or any later version.
+
+  NewGen is distributed in the hope that it will be useful, but WITHOUT ANY
+  WARRANTY; without even the implied warranty of MERCHANTABILITY or
+  FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public
+  License for more details.
+
+  You should have received a copy of the GNU General Public License along with
+  NewGen.  If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-
-/* - set.c
-   
+/*
    Pierre Jouvelot (3 Avril 1989)
 
-   Set package for any type of pointer. 
+   Set package for any type of pointer.
 
    To avoid sharing problem, all the routines are 3-adress: S1 = S2 op S3.
    It is up to the user to know what to do (e.g., freeing some temporary
-   memory storage) before S1 is assigned a new value. */
+   memory storage) before S1 is assigned a new value.
+*/
 
 #include <stdio.h>
 #include <stdlib.h>

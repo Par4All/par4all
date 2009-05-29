@@ -1,6 +1,22 @@
 %%
 %% $Id$
 %%
+%% Copyright 1989-2009 MINES ParisTech
+%%
+%% This file is part of NewGen.
+%%
+%% NewGen is free software: you can redistribute it and/or modify it under the
+%% terms of the GNU General Public License as published by the Free Software
+%% Foundation, either version 3 of the License, or any later version.
+%%
+%% NewGen is distributed in the hope that it will be useful, but WITHOUT ANY
+%% WARRANTY; without even the implied warranty of MERCHANTABILITY or
+%% FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public
+%% License for more details.
+%%
+%% You should have received a copy of the GNU General Public License
+%% along with NewGen.  If not, see <http://www.gnu.org/licenses/>.
+%%
 %% -*- Mode: TeX -*-
 %%
 
@@ -64,7 +80,7 @@ list or projection on tuples),
 \item modify certain parts of constructed values,
 \item write and read values to and from files,
 \item recursively deallocate data values (if required by the underlying
-language). 
+language).
 \end{itemize}
 
 This manul describes the specification language used by Newgen (section
@@ -78,7 +94,7 @@ aspects of Newgen (section 6).
 The grammar of Newgen specifications, given in a Yacc-like syntax, is
 the following :
 \begin{verbatim}
-Specification :  Imports Externs Definitions 
+Specification :  Imports Externs Definitions
 
 Imports : Imports IMPORT NAME FROM " NAME " ;
         |
@@ -93,35 +109,35 @@ Definition : Tabulated NAME = Domain ;
 Tabulated : TABULATED
           |
 
-Domain  : Simple Constructed 
+Domain  : Simple Constructed
         | { Namelist }
-        
+
 Simple  : Persistant Basis
         | Persistant Basis *
         | Persistant Basis {}
-        | Persistant Basis Dimensions 
+        | Persistant Basis Dimensions
 
 Persistant : PERSISTANT
            |
 
-Basis   : NAME 
-        | NAME : NAME 
+Basis   : NAME
+        | NAME : NAME
 
-Constructed : x Simple Constructed 
-            | + Simple Constructed 
+Constructed : x Simple Constructed
+            | + Simple Constructed
             | Simple -> Simple
 
-Namelist : NAME , Namelist 
-         | NAME 
+Namelist : NAME , Namelist
+         | NAME
 
-Dimensions : [ INT ] Dimensions 
+Dimensions : [ INT ] Dimensions
            | [ INT ]
 \end{verbatim}
 where terminals should be obvious. Commented lines are signalled by a
 beginning {\tt -}. Note that CPP (the Unix C preprocessor) commands can
 be used everywhere in this file (e.g., to give array dimensions in
 symbolic form); they will be automatically inserted into
-Newgen-generated files.  
+Newgen-generated files.
 
 An {\em imported} domain is any domain defined (in another file) with
 Newgen. Newgen allows multiple-files specifications; any Newgen domain
@@ -163,7 +179,7 @@ and is used to represent in a single type values from different types. A
 product domain is the equivalent of Pascal record types and is used to
 represent in a single type a collection of values.  The arrow type
 \verb:->: is only available in C mode and allows functions to be
-defined. 
+defined.
 
 Domain definitions are mutually recursive inside one specification
 file.
@@ -192,7 +208,7 @@ list_of_names_3 = names:string[ MAX_NAMES ]
 Values created with Newgen primitives are first-class. They can be
 passed to functions (the passing mechanism is a call-by-sharing
 reminiscent of Lisp), stored in data structures and assigned to data
-variables. 
+variables.
 
 \section{An example}
 
@@ -216,8 +232,8 @@ external login
 indisponibility = reservation*
 
 reservation = driver:person x date x destination:location x
-              nbpassager:int x 
-              passager:person[NB_OF_PASSAGERS] x 
+              nbpassager:int x
+              passager:person[NB_OF_PASSAGERS] x
               to_confirm:bool
 
 person = name:string x login
@@ -229,7 +245,7 @@ while the second is {\tt location.newgen}:
 \begin{verbatim}
 - File: location.newgen
 -
-- Since the Ecole des Mines is decentralized, locations 
+- Since the Ecole des Mines is decentralized, locations
 - can vary !
 -
 location = known + other:string
@@ -256,7 +272,7 @@ string (i.e. {\tt char *}) literals can be used, as well as {\tt TRUE}
 and {\tt FALSE} for booleans and {\tt UU} for {\tt unit} values.
 
 From the definition of a domain {\tt a}, the function to be used to
-create a value of that type is 
+create a value of that type is
 \begin{center}
 {\tt make\_a( <list-of-arguments> )}
 \end{center}
@@ -268,7 +284,7 @@ be used; for each domain {\tt a}, an undefined value {\tt a\_undefined}
 is provided.  Also the functions {\tt a\_undefined\_p}, which tests
 whether its argument is undefined, and {\tt copy\_a}, which recursively
 copies its argument (up to tabulated domains and persistant simple
-domains), are provided.  
+domains), are provided.
 
 The list of arguments is empty for an arrow type {\tt f = a \verb:->:
 b} .  A new arrow object can be created by extendign a previous one
@@ -288,7 +304,7 @@ An external value cannot be created within Newgen.
 For a domain {\tt a} that is constructed with a subdomain {\tt b}, use
 the macro {\tt a\_b} to access the {\tt b} field from an {\tt a} value.
 {\em Example}: {\tt string s = person\_name( p );} returns the name of a
-person {\tt p} in the string {\tt s}.  
+person {\tt p} in the string {\tt s}.
 
 For sum domains, the function {\tt or\_tag} accesses the tag (of type
 {\tt tag} which is typedefed). Tags from {\tt a = b+c} are {\tt is\_a\_b}
@@ -308,7 +324,7 @@ use {\tt CAR}.
 {\em Example}: To get the second element of a list {\tt l} of persons,
 use {\tt PERSON( CAR( CDR( l )))}. A library of useful Lisp-like
 functions is provided; look for usage in the files {\tt list.h} and {\t
-list.c}. 
+list.c}.
 
 To acess set elements, use the set access functions that are exported by
 the {\tt set} module; see {\tt set.h} and {\tt set.c} for a list of
@@ -366,7 +382,7 @@ defined.
 
 An extended version of this function is also available to traverse a
 Newgen value with top-down filtering decisions and bottom-up
-rewriting actions on several domains. 
+rewriting actions on several domains.
 The traversal is optimized so that only useful arcs are followed,
 \emph{i.e.} arcs that may lead to a domain to be visited.
 
@@ -383,7 +399,7 @@ gen_multi_recurse(<Newgen Obj> obj,
 \subsection{Modification functions}
 
 To modify a value, use the access function in the left hand side of an
-assignment. 
+assignment.
 {\em Example}: To change the name of the second person, use
 {\tt person\_name( second ) = "new\_name";}.
 
@@ -407,7 +423,7 @@ gen\_write} and read them back with {\tt gen\_read}. In the process,
 sharing and circular lists are preserved.
 {\em Example}: To output a person {\tt p} on a FILE * {\tt fd}, use {\tt
 gen\_write( fd, p )}. To read it back, use {\tt p = (person) gen\_read( fd
-);}. 
+);}.
 
 These IO functions recusively write and read their subcomponents in the
 obvious way, except for tabulated domains. A value from a tabulated
@@ -435,7 +451,7 @@ order of the arguments (such as {\tt reservation\_spec}) is output by
 
 For each external type, you have to call {\tt gen\_init\_external} with
 five arguments: the type (in upper case) with \verb|_NEWGEN_EXTERNAL|
-appended), a read function that receives 
+appended), a read function that receives
 as argument the function to read characters from, a write function that
 expects a {\tt (FILE *)}, a free function that receives an object of
 the external type and a copy function that receives an object of the
@@ -463,16 +479,16 @@ login copy_login( login obj ) ;
 
 main()  {
         gen_read_spec( location_spec, reservation_spec, NULL ) ;
-        gen_init_external( LOGIN_NEWGEN_EXTERNAL, 
-                           read_login, write_login, 
+        gen_init_external( LOGIN_NEWGEN_EXTERNAL,
+                           read_login, write_login,
                            free_login, copy_login ) ;
         {
-        person p = make_person( "Foo", 
+        person p = make_person( "Foo",
                                 (login)read_login( getchar )) ;
 
         /* Write user code here */
         }
-}       
+}
 \end{verbatim}
 
 To run this program, you have to link it with the {\tt genC.a} library.
@@ -499,7 +515,7 @@ have to manage package conflicts with the {\tt shadow} function.
 \subsection{Creation Functions}
 
 From the definition of a domain {\tt a}, the function to be used to
-create a value of that type is 
+create a value of that type is
 \begin{center}
 {\tt (make-a <list-of-arguments>)}
 \end{center}
@@ -511,7 +527,7 @@ outside.
 For every non-inlined type {\tt a}, an undefined value can be obtained
 by calling {\tt make-a} without arguments.
 
-Lists are made of Lisp cons cells. 
+Lists are made of Lisp cons cells.
 {\em Example}: To create a one-element list
 containing person {\tt p} use {\tt (setf l (list p))}.
 
@@ -586,7 +602,7 @@ sharing and circular lists are preserved.
 (gen-write st p)}. To read it back, use {\tt (setf p (gen-read st))}.
 
 See the same subsection in Newgen-C for a discussion about tabulated
-domains. 
+domains.
 
 \subsection{How to use Newgen-Lisp}
 
@@ -630,7 +646,6 @@ successfully used on Sun-3, Sun-4 and ATT-3B5.  Requests and comments
 can be mailed to:
 \begin{verbatim}
                 jouvelot@cri.ensmp.fr
-                jouvelot@lcs.mit.edu
 \end{verbatim}
 
 \end{document}

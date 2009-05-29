@@ -1,35 +1,24 @@
 /*
 
-	-- NewGen Project
+  $Id$
 
-	The NewGen software has been designed by Remi Triolet and Pierre
-	Jouvelot (Ecole des Mines de Paris). This prototype implementation
-	has been written by Pierre Jouvelot.
+  Copyright 1989-2009 MINES ParisTech
 
-	This software is provided as is, and no guarantee whatsoever is
-	provided regarding its appropriate behavior. Any request or comment
-	should be sent to newgen@isatis.ensmp.fr.
+  This file is part of NewGen.
 
-	(C) Copyright Ecole des Mines de Paris, 1989
+  NewGen is free software: you can redistribute it and/or modify it under the
+  terms of the GNU General Public License as published by the Free Software
+  Foundation, either version 3 of the License, or any later version.
+
+  NewGen is distributed in the hope that it will be useful, but WITHOUT ANY
+  WARRANTY; without even the implied warranty of MERCHANTABILITY or
+  FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public
+  License for more details.
+
+  You should have received a copy of the GNU General Public License along with
+  NewGen.  If not, see <http://www.gnu.org/licenses/>.
 
 */
-
-
-/* genC.c
-
-   This file includes the function used to implement user types in C.
-
-   The implementation is based on vectors of gen_chunks. The first one always
-   holds, when considered as an integer, the index in the Domains table of the
-   type of the object.
-
-   . An inlined value is simply stored inside one gen_chunk,
-   . A list is a (CONS *),
-   . A sey is a SET,
-   . An array is a (CHUNK *),
-   . Components values of an AND_OR value are stored in the following gen_chunks.
-   . An OR_OP value has 2 more gen_chunks. The second on is the OR_TAG
-     (an integer). The third is the component value. */
 
 #include <stdio.h>
 #include <ctype.h>
@@ -74,7 +63,7 @@ struct gen_binding *bp ;
 	else {
 	    int size ;
 	    struct domainlist *dlp = bp->domain->co.components ;
-      
+
 	    for( size=0 ; dlp != NULL ; dlp=dlp->cdr, size++ )
 		    ;
 	    return( overhead + size ) ;
@@ -97,7 +86,7 @@ primitive_field( dp )
     switch( dp->ba.type ) {
     case BASIS_DT: {
 	struct gen_binding *bp = dp->ba.constructand ;
-      
+
 	if( IS_INLINABLE( bp )) {
 	    sprintf( buffer, "%s", bp->name ) ;
 	}
