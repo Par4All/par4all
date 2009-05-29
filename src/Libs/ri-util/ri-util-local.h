@@ -21,6 +21,7 @@
 #include "text.h"
 #include "newgen.h"
 #include "cloning.h"
+#define free_clone_context(cc) free(cc) 
 
 /*  special characters
  */

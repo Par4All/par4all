@@ -279,7 +279,6 @@ do_clone_statement(statement s, clone_context cc, hash_table ht)
     if (statement_undefined_p(s)) return s;
 
     entity new_label = do_clone_label(statement_label(s),cc/*, ht*/);
-    instruction new_instruction = do_clone_instruction(statement_instruction(s),cc, ht);
     /* add new declarations to top level statement
      * this prevents difficult scope renaming in C
      */
@@ -295,6 +294,7 @@ do_clone_statement(statement s, clone_context cc, hash_table ht)
             new_declarations_initialization=CONS(STATEMENT,ns,new_declarations_initialization);
         }
     }
+    instruction new_instruction = do_clone_instruction(statement_instruction(s),cc, ht);
     instruction new_instruction_with_decl = ENDP(new_declarations_initialization)?
         new_instruction:
         make_instruction_sequence(
