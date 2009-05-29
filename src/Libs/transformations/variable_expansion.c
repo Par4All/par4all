@@ -121,33 +121,34 @@ static void perform_expansion_and_unstack_index_and_dimension(loop l)
       }
 
       /* Does it contain private variables? */
-      MAP(ENTITY, lv, {
-	/* Do not expand loop indices nor variables already processed! */
-	if(lv!=i && !gen_in_list_p(lv, processed_variables)) {
-	  type t = entity_type(lv);
-	  variable v = type_variable(t);
-	  list dims = variable_dimensions(v);
-	  statement bs = loop_body(l);
+      FOREACH(ENTITY, lv, loop_locals(l))
+	  {
+		  /* Do not expand loop indices nor variables already processed! */
+		  if(lv!=i && !gen_in_list_p(lv, processed_variables)) {
+			  type t = entity_type(lv);
+			  variable v = type_variable(t);
+			  list dims = variable_dimensions(v);
+			  statement bs = loop_body(l);
 
-	  pips_assert("Scalar expansion", dims==NIL);
+			  pips_assert("Scalar expansion", dims==NIL);
 
-	  evl = CONS(ENTITY, lv, evl);
+			  evl = CONS(ENTITY, lv, evl);
 
-	  pips_debug(9, "Update type of %s\n", entity_local_name(lv));
+			  pips_debug(9, "Update type of %s\n", entity_local_name(lv));
 
-	  /* Update its type */
-	  variable_dimensions(v) = gen_full_copy_list(loop_dimensions);
+			  /* Update its type */
+			  variable_dimensions(v) = gen_full_copy_list(loop_dimensions);
 
-	  /* print_type(); */
+			  /* print_type(); */
 
-	  /* Update its references in the loop body */
+			  /* Update its references in the loop body */
 
-	  pips_debug(9, "Expand references to %s\n", entity_local_name(lv));
-	  expanded_variable = lv;
-	  gen_recurse(bs, reference_domain, perform_reference_expansion, gen_null);
-	  expanded_variable = entity_undefined;
-	}
-      }, loop_locals(l));
+			  pips_debug(9, "Expand references to %s\n", entity_local_name(lv));
+			  expanded_variable = lv;
+			  gen_recurse(bs, reference_domain, perform_reference_expansion, gen_null);
+			  expanded_variable = entity_undefined;
+		  }
+	  }
 
       /* Remove the expanded variables and the loop index from the local variable list */
       gen_list_and_not(&loop_locals(l), processed_variables);
