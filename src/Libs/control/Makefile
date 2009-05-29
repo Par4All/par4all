@@ -13,7 +13,8 @@ LIB_CFILES = \
 	cfg.c \
 	unreachable.c \
 	bourdoncle.c \
-	for_to_do_or_while_loops.c
+	for_to_do_or_while_loops.c \
+	dowhile_to_while.c
 
 INC_TARGET =    $(TARGET).h
 

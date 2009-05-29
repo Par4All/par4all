@@ -5901,6 +5901,18 @@ for_loop_to_do_loop          > MODULE.code
         < MODULE.code
 \end{PipsMake}
 
+\subsubsection{Do-while to while-loop transformation}
+\label{sec:do-while to while-loop}
+
+Some transformations only work on while loops \dots{}
+
+\begin{PipsMake}
+alias dowhile_to_while 'Do-while to while-loop transformation'
+
+dowhile_to_while          > MODULE.code
+        < PROGRAM.entities
+        < MODULE.code
+\end{PipsMake}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SPAGHETTIFY
 
@@ -6570,6 +6582,7 @@ The user will be prompted for various question in order to perform the outlining
 outline      > MODULE.code
         > PROGRAM.entities
         < PROGRAM.entities
+        < MODULE.proper_effects
         < MODULE.code
 \end{PipsMake}
 
