@@ -28,9 +28,9 @@ void getimage(void)
 //               <must be written>: j
       for(j = 0; j <= 63; j += 1) {
 //               <may be read    >: __IO_EFFECTS:LUNS[*]
-//               <may be written >: __IO_EFFECTS:LUNS[*]
+//               <may be written >: __IO_EFFECTS:LUNS[*] fp[*]
 //               <must be read   >: fp
-//               <must be written>: c fp[*]
+//               <must be written>: c
          c = fgetc(fp);
 //               <must be read   >: c i j
 //               <must be written>: TOP-LEVEL:imagein_re[i][j]
@@ -56,10 +56,13 @@ void getimage(void)
    /* This loops should not be distributed.  On 2009/05/26, if the main()
         is removed, this bug too... */
    for(i = 0; i <= 63; i += 1)
-      for(j = 0; j <= 63; j += 1) {
+      for(j = 0; j <= 63; j += 1)
          c = fgetc(fp);
+#pragma omp parallel for private(j)
+   for(i = 0; i <= 63; i += 1)
+#pragma omp parallel for private(c)
+      for(j = 0; j <= 63; j += 1)
          imagein_re[i][j] = (c==0?0.0:1.0);
-      }
 #pragma omp parallel for private(j)
    for(i = 0; i <= 63; i += 1)
 #pragma omp parallel for 
