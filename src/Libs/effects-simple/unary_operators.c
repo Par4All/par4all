@@ -25,6 +25,13 @@
 #include "effects-simple.h"
 
 
+#define make_new_effect(cell,action,approximation,descriptor)	\
+    make_effect(cell,\
+		action,\
+		make_addressing_index(),\
+		approximation,\
+		descriptor)
+
 /*********************************************************************************/
 /* REFERENCE EFFECTS                                                             */
 /*********************************************************************************/
@@ -92,9 +99,8 @@ effect reference_to_simple_effect(reference ref, action ac)
 	    /* The dimensionalities of the index and type are the same: */
 	    /* cell cell_ref = make_cell_reference(copy_reference(ref)); */
 	    cell cell_ref = make_cell_preference(make_preference(ref));
-	    addressing ad = make_addressing_index();
 	    approximation ap = make_approximation_must();
-	    eff = make_effect(cell_ref, ac, ad, ap, make_descriptor_none());
+	    eff = make_new_effect(cell_ref, ac, ap, make_descriptor_none());
 	  }
 	else if((gen_length(ind) < type_depth(t))) 
 	  {
@@ -109,18 +115,16 @@ effect reference_to_simple_effect(reference ref, action ac)
 	      {
 		reference n_ref = copy_reference(ref);
 		cell cell_ref = make_cell_reference(n_ref);
-		addressing ad = make_addressing_index();
 		approximation ap = make_approximation_must();
-		eff = make_effect(cell_ref, ac, ad, ap, make_descriptor_none());
+		eff = make_new_effect(cell_ref, ac, ap, make_descriptor_none());
 	      }
 	    /* FI: I'm not sure this code is of any positive use */
 	    else if(pointer_type_p(ut)) 
 	      {
 		reference n_ref = copy_reference(ref);
 		cell cell_ref = make_cell_reference(n_ref);
-		addressing ad = make_addressing_index();
 		approximation ap = make_approximation_must();
-		eff = make_effect(cell_ref, ac, ad, ap, make_descriptor_none());
+		eff = make_new_effect(cell_ref, ac, ap, make_descriptor_none());
 	    }
 	    else 
 	      {
@@ -142,9 +146,8 @@ effect reference_to_simple_effect(reference ref, action ac)
 		*/
 		reference n_ref = copy_reference(ref);
 		cell cell_ref = make_cell_reference(n_ref);
-		addressing ad = make_addressing_index();
 		approximation ap = make_approximation_must();
-		eff = make_effect(cell_ref, ac, ad, ap, make_descriptor_none());
+		eff = make_new_effect(cell_ref, ac, ap, make_descriptor_none());
 	      }
 	  }
 	else 
@@ -160,9 +163,8 @@ effect reference_to_simple_effect(reference ref, action ac)
 	/* It is not an array. Addressing is encoded in a different way
 	   for structures, unions and pointers. */
 	cell cell_ref = make_cell_preference(make_preference(ref));
-	addressing ad = make_addressing_index();
 	approximation ap = make_approximation_must();
-	eff = make_effect(cell_ref, ac, ad, ap, make_descriptor_none());
+	eff = make_new_effect(cell_ref, ac, ap, make_descriptor_none());
       }
   }
   else if(type_functional_p(ut)) {
@@ -284,11 +286,10 @@ simple_effect_free(effect eff)
  reference_to_reference_effect(reference ref, action ac)
  {
    cell cell_ref = make_cell(is_cell_preference, make_preference(ref));
-   addressing ad = make_addressing_index();
    approximation ap = make_approximation(is_approximation_must, UU);
    effect eff;
     
-   eff = make_effect(cell_ref, ac, ad, ap, make_descriptor(is_descriptor_none,UU));  
+   eff = make_new_effect(cell_ref, ac, ap, make_descriptor(is_descriptor_none,UU));  
    return(eff);
  }
 
@@ -305,7 +306,7 @@ list simple_effects_union_over_range(list l_eff,
     list c_eff = list_undefined;
     reference ref = make_reference(i, NIL);
     cell c = make_cell_reference(ref);
-    effect i_eff = make_effect(c, make_action_write(), make_addressing_index(),
+    effect i_eff = make_new_effect(c, make_action_write(), 
 			       make_approximation_must(), make_descriptor_none());
 
     list r_eff_l = proper_effects_of_range(r);
@@ -470,9 +471,7 @@ list old_effects_composition_with_effect_transformer(list l_eff,
   ifdebug(8) {
     pips_debug(8, "Begin: %zd effects before composition:\n", gen_length(l_eff));
     MAP(EFFECT, eff, {
-	reference r = effect_any_reference(eff);
-	pips_debug(8, "%p: %s\n", eff, words_to_string(effect_words_reference_with_addressing_as_it_is(r, addressing_tag(effect_addressing(eff)))));
-	pips_assert("Effect eff is consitent", effect_consistent_p(eff));
+	print_effect(eff);
       },  l_eff);
   }
 
@@ -489,22 +488,17 @@ list old_effects_composition_with_effect_transformer(list l_eff,
       ifdebug(8) {
 	reference r1 = effect_any_reference(e1);
 	reference r2 = effect_any_reference(e2);
-	(void) fprintf(stderr, "e1 %p: %s (%s)\n", e1, words_to_string(effect_words_reference_with_addressing_as_it_is(r1, addressing_tag(effect_addressing(e1)))),
-		       action_to_string(effect_action(e1)));
-	(void) fprintf(stderr, "e2 %p: %s (%s)\n", e2,
-		       words_to_string(effect_words_reference_with_addressing_as_it_is(r2, addressing_tag(effect_addressing(e2)))),
-		       action_to_string(effect_action(e2)));
+	(void) fprintf(stderr, "e1: \n");
+	print_effect(e1);
+	(void) fprintf(stderr, "e2: \n");
+	print_effect(e2);
       }
 
       e2 = effect_interference(e2, e1);
 
       ifdebug(8) {
-	reference r2 = effect_any_reference(e2);
-	tag ad2 = addressing_tag(effect_addressing(e2));
-	(void) fprintf(stderr, "resulting e2 %p: %s (%s)\n", e2,
-		       words_to_string(effect_words_reference_with_addressing_as_it_is(r2, ad2)),
-		       action_to_string(effect_action(e2)));
-	pips_assert("New effect e2 is consitent", effect_consistent_p(e2));
+	(void) fprintf(stderr, "resulting effect e2: \n");
+	print_effect(e2);
       }
 
       EFFECT_(CAR(l2)) = e2;
@@ -512,22 +506,17 @@ list old_effects_composition_with_effect_transformer(list l_eff,
   }
 
   ifdebug(8) {
-    pips_debug(8, "End: %zd effects after composition:\n", gen_length(l_eff));
-    MAP(EFFECT, eff, {
-	reference r = effect_any_reference(eff);
-	pips_debug(8, "%p: %s\n", eff, words_to_string(effect_words_reference_with_addressing_as_it_is(r, addressing_tag(effect_addressing(eff)))));
-      },  l_eff);
+    pips_debug(8, "End: %zd effects before composition:\n", gen_length(l_eff));
+    (*effects_prettyprint_func)(l_eff);
   }
 
   /* FI: Not generic. */
   l_eff = proper_effects_combine(l_eff, FALSE);
 
+
   ifdebug(8) {
     pips_debug(8, "End: %zd effects after composition:\n", gen_length(l_eff));
-    MAP(EFFECT, eff, {
-	reference r = effect_any_reference(eff);
-	pips_debug(8, "%p: %s\n", eff, words_to_string(effect_words_reference_with_addressing_as_it_is(r, addressing_tag(effect_addressing(eff)))));
-      },  l_eff);
+    (*effects_prettyprint_func)(l_eff);
   }
 
   return l_eff;

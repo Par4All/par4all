@@ -270,7 +270,7 @@ effect proper_to_summary_simple_effect(effect eff)
 
     ifdebug(8) {
       pips_debug(8, "Proper effect %p with reference %p: %s\n", eff, r,
-		 words_to_string(effect_words_reference_with_addressing_as_it_is(r, addressing_tag(effect_addressing(eff)))));
+		 words_to_string(words_effect(eff)));
     }
 
     for(cind = inds; !ENDP(cind); POP(cind)) {
@@ -294,7 +294,7 @@ effect proper_to_summary_simple_effect(effect eff)
 
     ifdebug(8) {
       pips_debug(8, "Summary simple effect %p with reference %p: %s\n", eff, r,
-		 words_to_string(effect_words_reference_with_addressing_as_it_is(r, addressing_tag(effect_addressing(eff)))));
+		 words_to_string(words_effect(eff)));
     }
 
     /*
