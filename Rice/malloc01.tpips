@@ -48,6 +48,7 @@ echo
 echo Regions
 echo
 
+activate MUST_REGIONS
 activate PRINT_CODE_REGIONS
 display PRINTED_FILE[malloc01]
 
@@ -60,7 +61,7 @@ display PRINTED_FILE[malloc01]
 #activate PRINT_WHOLE_DEPENDENCE_GRAPH  
 
 display DG_FILE[malloc01]
-quit
+
 echo
 echo Parallelization
 echo
@@ -68,7 +69,7 @@ echo
 activate PRINT_PARALLELIZEDOMP_CODE
 
 display PARALLELPRINTED_FILE[malloc01]
-
+quit
 echo
 echo Parallelization in Fortran (if one of the resources can be made obsolete)
 echo

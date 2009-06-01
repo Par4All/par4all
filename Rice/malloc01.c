@@ -1,6 +1,6 @@
 void malloc01()
 {
-  int * p = malloc(10);
+  int * p = malloc(10*sizeof(int));
   //int p[10];
   int i;
 
