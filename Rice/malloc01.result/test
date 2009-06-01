@@ -46,7 +46,7 @@ void malloc01()
 
 Cumulated effects
 
-//               <may be written >: TOP-LEVEL:*MEMORY*
+//               <may be written >: *HEAP*
 void malloc01()
 {
    int *p = malloc(10);
