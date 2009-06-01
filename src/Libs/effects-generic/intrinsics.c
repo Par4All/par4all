@@ -1487,13 +1487,13 @@ static list effects_of_any_ioelem(expression exp, tag act, bool is_fortran)
       effect eff = (*reference_to_effect_func)(r,make_action_write());
       effect_approximation_tag(eff) = is_approximation_may;
       /* FI: this is really not generic! */
-      extern effect c_summary_effect_to_proper_effect(effect, expression);
-      effect n_eff = c_summary_effect_to_proper_effect(eff, exp);
+      extern list c_summary_effect_to_proper_effects(effect, expression);
+      le = c_summary_effect_to_proper_effects(eff, exp);
       /* FI: We also need the read effects implied by the evaluation
 	 of exp... but I do not know any function available to do
 	 that. generic_proper_effects_of_expression() is ging to
 	 return a bit too much. */
-      le = CONS(EFFECT, n_eff, NIL);
+      
 
       if(FALSE) {
 	/* FI: short term simplification... We need pointers for side effects... */
