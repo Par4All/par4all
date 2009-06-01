@@ -1,0 +1,136 @@
+
+Controlizer output
+
+void malloc02()
+{
+   int *p[10];
+   int i;
+
+   for(i = 0; i <= 9; i += 1) {
+      p[i] = malloc(sizeof(int));
+      p[i] = i;
+   }
+}
+
+Preconditions
+
+
+//  P() {}
+
+void malloc02()
+{
+   int *p[10];
+   int i;
+
+//  P() {}
+
+
+   for(i = 0; i <= 9; i += 1) {
+
+//  P(i) {0<=i, i<=9}
+
+      p[i] = malloc(sizeof(int));
+
+//  P(i) {0<=i, i<=9}
+
+      p[i] = i;
+   }
+}
+
+Proper effects
+
+void malloc02()
+{
+   int *p[10];
+   int i;
+//               <must be written>: i
+
+   for(i = 0; i <= 9; i += 1) {
+//               <must be read   >: i
+//               <must be written>: p[i]
+      p[i] = malloc(sizeof(int));
+//               <must be read   >: i
+//               <must be written>: p[i]
+      p[i] = i;
+   }
+}
+
+Cumulated effects
+
+void malloc02()
+{
+   int *p[10];
+   int i;
+//               <may be read    >: i
+//               <may be written >: p[*]
+//               <must be written>: i
+
+   for(i = 0; i <= 9; i += 1) {
+//               <may be written >: p[*]
+//               <must be read   >: i
+      p[i] = malloc(sizeof(int));
+//               <may be written >: p[*]
+//               <must be read   >: i
+      p[i] = i;
+   }
+}
+
+Regions
+
+void malloc02()
+{
+   int *p[10];
+   int i;
+
+//  <p[PHI1]-W-MAY-{0<=PHI1, PHI1<=9}>
+
+
+   for(i = 0; i <= 9; i += 1) {
+
+//  <p[PHI1]-W-EXACT-{PHI1==i, 0<=i, i<=9}>
+
+      p[i] = malloc(sizeof(int));
+
+//  <p[PHI1]-W-EXACT-{PHI1==i, 0<=i, i<=9}>
+
+      p[i] = i;
+   }
+}
+
+ **************** Effective Dependence Graph ****************
+
+	08 --> 09 with conflicts
+		from <p[i]-W-MUST> to <p[i]-W-MUST> at levels  2
+
+****************** End of Dependence Graph ******************
+
+Parallelization
+
+void malloc02()
+{
+   int *p[10];
+   int i;
+
+#pragma omp parallel for 
+   for(i = 0; i <= 9; i += 1)
+      p[i] = malloc(sizeof(int));
+#pragma omp parallel for 
+   for(i = 0; i <= 9; i += 1)
+      p[i] = i;
+}
+
+Parallelization in Fortran (if one of the resources can be made obsolete)
+
+void malloc02()
+{
+   int *p[10];
+   int i;
+
+#pragma omp parallel for 
+   for(i = 0; i <= 9; i += 1)
+      p[i] = malloc(sizeof(int));
+#pragma omp parallel for 
+   for(i = 0; i <= 9; i += 1)
+      p[i] = i;
+}
+
