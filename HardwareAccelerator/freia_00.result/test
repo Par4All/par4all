@@ -1,7 +1,7 @@
 
 ! initial function
 
-freia_error freia_stuff(freia_data_2d o0, freia_data_2d o1, freia_data_2d i0, freia_data_2d i1)
+freia_error freia_stuff(freia_data2d *o0, freia_data2d *o1, freia_data2d *i0, freia_data2d *i1)
 {
    freia_aipo_add(o0, i0, i1);                                          /*0014*/
    freia_aipo_sub(o1, o0, i1);                                          /*0015*/
