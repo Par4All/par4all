@@ -12,14 +12,43 @@ freia_error freia_stuff(freia_data2d *o0, freia_data2d *o1, freia_data2d *i0, fr
 
 freia_error freia_stuff_helper_0(freia_data2d * o0, freia_data2d * o1, freia_data2d * i0, freia_data2d * i1)
 {
-  //...
+  spoc_instr spocinstr;
+  spoc_param spocparam;
+  spoc_reduction reduc;
+  freia_microcode mcode;
+  freia_dynamic_param dynparam;
+  freia_reduction_results redres;
+  freia_op_sel op = 0;
+  freia_op_param param;
+  freia_error ret;
+
+  //init pipe to nop
+  spoc_init_pipe(&spocinstr, &spocparam, 16);
 
   // stage 0
   spocinstr.alu[0][0].op = SPOC_ALU_ADD_IN0_IN1;
   spocinstr.mux[0][0].op = SPOC_MUX_IN1;
   spocinstr.mux[0][2].op = SPOC_MUX_IN0;
-
   // stage 1
   spocinstr.alu[1][0].op = SPOC_ALU_SUB_IN0_IN1;
   spocinstr.mux[1][0].op = SPOC_MUX_IN1;
   spocinstr.mux[1][2].op = SPOC_MUX_IN0;
+
+  mcode.raw = (freia_ptr) &spocinstr;
+  mcode.size = sizeof(spoc_instr);
+
+  dynparam.raw = (freia_ptr) &spocparam;
+  dynparam.size = sizeof(spoc_param);
+
+  redres.raw = (freia_ptr) &reduc;
+  redres.size = sizeof(spoc_reduction);
+
+  ret = freia_cg_write_microcode(&mcode);
+  ret |= freia_cg_write_dynamic_param(&dynparam);
+
+  // actual call of spoc hardware
+  freia_cg_template_process_2i_2o(op, param, o0, o1, i0, i1);
+
+  // TODO: get reduction results...
+  return ret;
+}
