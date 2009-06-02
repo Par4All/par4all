@@ -75,28 +75,23 @@ typedef struct cons {
    remains line oriented
  */
 
-#define UNIQUE_NAME_1(prefix, x)   prefix##x
-#define UNIQUE_NAME_2(prefix, x)   UNIQUE_NAME_1 (prefix, x)
-/* Should work if 2 FOREACH are not on the same line... */
-#define UNIQUE_NAME  UNIQUE_NAME_2 (iter_, __LINE__)
-
 #if __STDC_VERSION__ >= 199901L
 /* We can use a declaration in the for() */
-#define FOREACH(_fe_CASTER, _fe_item, _fe_list) \
-        list UNIQUE_NAME = (_fe_list);\
-for( _fe_CASTER##_TYPE _fe_item;\
-        !ENDP(UNIQUE_NAME) && (_fe_item= _fe_CASTER(CAR(UNIQUE_NAME) ));\
-        POP(UNIQUE_NAME))
+#define FOREACH(_fe_CASTER, _fe_item, _fe_list)				\
+  list _fe_item##_list = (_fe_list);					\
+  for( _fe_CASTER##_TYPE _fe_item;					\
+       !ENDP(_fe_item##_list) &&					\
+	 (_fe_item = _fe_CASTER(CAR(_fe_item##_list) ));		\
+       POP(_fe_item##_list))
 #else
-#define FOREACH(_fe_CASTER, _fe_item, _fe_list) \
-        list UNIQUE_NAME;\
-        _fe_CASTER##_TYPE _fe_item;\
-for( UNIQUE_NAME= (_fe_list);\
-        !ENDP(UNIQUE_NAME) && (_fe_item= _fe_CASTER(CAR(UNIQUE_NAME) ));\
-        POP(UNIQUE_NAME))
+#define FOREACH(_fe_CASTER, _fe_item, _fe_list)				\
+  _fe_CASTER##_TYPE _fe_item;						\
+  list _fe_item##_list;							\
+  for( _fe_item##_list = (_fe_list);					\
+       !ENDP(_fe_item##_list) &&					\
+	 (_fe_item = _fe_CASTER(CAR(_fe_item##_list) ));		\
+       POP(_fe_item##_list))
 #endif
-
-
 
 /* Fonctions de list.c
  */
@@ -156,7 +151,7 @@ extern list gen_typed_cons GEN_PROTO((_int, void *, list));
 extern list gen_CHUNK_cons GEN_PROTO((gen_chunk *, list));
 extern void gen_list_and GEN_PROTO((list *, list));
 extern void gen_list_and_not GEN_PROTO((list *, list));
-extern void gen_list_patch(list, void *, void *);
-extern int gen_position(void *, list);
+extern void gen_list_patch GEN_PROTO((list, void *, void *));
+extern int gen_position GEN_PROTO((void *, list));
 
 #endif /* newgen_list_included */
