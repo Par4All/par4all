@@ -58,5 +58,5 @@ tp_yacc.h: tp_yacc.c
 completion_list.h :	$(PIPS_ROOT)/include/resources.h \
 			$(PIPS_ROOT)/include/phases.h \
 			$(PIPS_ROOT)/include/printable_resources.h \
-			$(PIPS_ROOT)/etc/properties.rc
+			$(ETC.d)/properties.rc
 	./build_completion_lists.sh $(PIPS_ROOT) > $@

@@ -16,7 +16,12 @@ include $(MAKE.d)/$(ARCH).mk
 #debug_output := $(shell echo no_jpips.mk  > /dev/tty)
 
 # not needed? stats stf jpips make
-FWD_DIRS =	drivers dev env graph misc epips validation hpfc simple_tools
+FWD_DIRS =	drivers dev env graph misc validation hpfc simple_tools
+
+# Compile epips only if needed:
+ifndef PIPS_NO_EPIPS
+	FWD_DIRS += epips
+endif
 
 # Compile Jpips only if needed:
 ifndef PIPS_NO_JPIPS
