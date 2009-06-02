@@ -10,7 +10,7 @@ freia_error freia_stuff(freia_data_2d o0, freia_data_2d o1, freia_data_2d i0, fr
 
 ! accelerated function
 
-freia_error freia_stuff_helper_0(freia_data_2d o0, freia_data_2d o1, freia_data_2d i0, freia_data_2d i1)
+freia_error freia_stuff_helper_0(freia_data2d * o0, freia_data2d * o1, freia_data2d * i0, freia_data2d * i1)
 {
   //...
 
