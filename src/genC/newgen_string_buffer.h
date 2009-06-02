@@ -35,5 +35,6 @@ void string_buffer_to_file(string_buffer, FILE *);
 void string_buffer_append(string_buffer, string);
 void string_buffer_cat(string_buffer, string, ...);
 void string_buffer_append_sb(string_buffer, string_buffer);
+void string_buffer_append_list(string_buffer, list);
 
 #endif /* STRING_BUFFER_INCLUDED */

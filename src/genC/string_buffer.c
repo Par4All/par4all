@@ -113,18 +113,34 @@ void string_buffer_to_file(string_buffer sb, FILE * out)
 }
 
 /* append string s to string buffer sb, the duplication
- * is done if needed according to the dup fiel.
+ * is done if needed according to the dup field.
  */
 void string_buffer_append(string_buffer sb, string s)
 {
   stack_push(sb->dup? strdup(s): s, sb->ins);
 }
 
-/* append string buffer sb2 to string buffer sb.
+/* @brief append the string buffer sb2 to string buffer sb.
+ * @return void
+ * @param sb, the string buffer where to append the second string buffer
+ * @param sb2, the string buffer to append to the fisrt string buffer
  */
 void string_buffer_append_sb(string_buffer sb, string_buffer sb2)
 {
   STACK_MAP_X(s, string, string_buffer_append(sb, s), sb2->ins, 0);
+}
+
+/* @brief append a list of string to a string buffer. Note that each element
+ * of the list is duplicated or not according to the dup field.
+ * @return void
+ * @param sb, the string buffer where to append the whole list
+ * @param l, the list of string to append to the string buffer
+ */
+void string_buffer_append_list(string_buffer sb, list l)
+{
+  FOREACH (STRING, s, l) {
+    string_buffer_append(sb, s);
+  }
 }
 
 #include <stdarg.h>
