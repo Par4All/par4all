@@ -25,12 +25,7 @@
 #include "effects-simple.h"
 
 
-#define make_new_effect(cell,action,approximation,descriptor)	\
-    make_effect(cell,\
-		action,\
-		make_addressing_index(),\
-		approximation,\
-		descriptor)
+
 
 /*********************************************************************************/
 /* REFERENCE EFFECTS                                                             */
@@ -100,7 +95,7 @@ effect reference_to_simple_effect(reference ref, action ac)
 	    /* cell cell_ref = make_cell_reference(copy_reference(ref)); */
 	    cell cell_ref = make_cell_preference(make_preference(ref));
 	    approximation ap = make_approximation_must();
-	    eff = make_new_effect(cell_ref, ac, ap, make_descriptor_none());
+	    eff = make_effect(cell_ref, ac, ap, make_descriptor_none());
 	  }
 	else if((gen_length(ind) < type_depth(t))) 
 	  {
@@ -116,7 +111,7 @@ effect reference_to_simple_effect(reference ref, action ac)
 		reference n_ref = copy_reference(ref);
 		cell cell_ref = make_cell_reference(n_ref);
 		approximation ap = make_approximation_must();
-		eff = make_new_effect(cell_ref, ac, ap, make_descriptor_none());
+		eff = make_effect(cell_ref, ac, ap, make_descriptor_none());
 	      }
 	    /* FI: I'm not sure this code is of any positive use */
 	    else if(pointer_type_p(ut)) 
@@ -124,7 +119,7 @@ effect reference_to_simple_effect(reference ref, action ac)
 		reference n_ref = copy_reference(ref);
 		cell cell_ref = make_cell_reference(n_ref);
 		approximation ap = make_approximation_must();
-		eff = make_new_effect(cell_ref, ac, ap, make_descriptor_none());
+		eff = make_effect(cell_ref, ac, ap, make_descriptor_none());
 	    }
 	    else 
 	      {
@@ -147,7 +142,7 @@ effect reference_to_simple_effect(reference ref, action ac)
 		reference n_ref = copy_reference(ref);
 		cell cell_ref = make_cell_reference(n_ref);
 		approximation ap = make_approximation_must();
-		eff = make_new_effect(cell_ref, ac, ap, make_descriptor_none());
+		eff = make_effect(cell_ref, ac, ap, make_descriptor_none());
 	      }
 	  }
 	else 
@@ -164,7 +159,7 @@ effect reference_to_simple_effect(reference ref, action ac)
 	   for structures, unions and pointers. */
 	cell cell_ref = make_cell_preference(make_preference(ref));
 	approximation ap = make_approximation_must();
-	eff = make_new_effect(cell_ref, ac, ap, make_descriptor_none());
+	eff = make_effect(cell_ref, ac, ap, make_descriptor_none());
       }
   }
   else if(type_functional_p(ut)) {
@@ -289,7 +284,7 @@ simple_effect_free(effect eff)
    approximation ap = make_approximation(is_approximation_must, UU);
    effect eff;
     
-   eff = make_new_effect(cell_ref, ac, ap, make_descriptor(is_descriptor_none,UU));  
+   eff = make_effect(cell_ref, ac, ap, make_descriptor(is_descriptor_none,UU));  
    return(eff);
  }
 
@@ -306,7 +301,7 @@ list simple_effects_union_over_range(list l_eff,
     list c_eff = list_undefined;
     reference ref = make_reference(i, NIL);
     cell c = make_cell_reference(ref);
-    effect i_eff = make_new_effect(c, make_action_write(), 
+    effect i_eff = make_effect(c, make_action_write(), 
 			       make_approximation_must(), make_descriptor_none());
 
     list r_eff_l = proper_effects_of_range(r);

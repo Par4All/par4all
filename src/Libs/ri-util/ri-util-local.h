@@ -1061,12 +1061,12 @@
 
 #define make_simple_effect(reference,action,approximation)\
     make_effect(make_cell(is_cell_preference, make_preference(reference)),\
-		(action), make_addressing_index(), (approximation),	\
+		(action), (approximation),	\
 		make_descriptor(is_descriptor_none,UU))
 
 #define make_convex_effect(reference,action,approximation,system)\
     make_effect(make_cell(is_cell_preference, make_preference(reference)),\
-		(action), make_addressing_index(),(approximation),				\
+		(action), (approximation),				\
 		make_descriptor(is_descriptor_convex,system))
 
 

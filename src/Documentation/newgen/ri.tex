@@ -1925,7 +1925,7 @@ are lists of effects, i.e. lists of lists of regions.
 \label{subsection-effect}
 \index{Effect}\index{Region}
 
-\domain{Effect = cell x action x addressing x approximation x descriptor}
+\domain{Effect = cell x action x approximation x descriptor}
 {}
 \domain{Descriptor = convexunion:Psysteme* + convex:Psysteme + none:unit}
 {}
@@ -1971,11 +1971,6 @@ the statement is later read for a \verb/out/ effect or region. So,
 \verb/read/ and \verb/in/ effects and regions have action \verb/read/ while
 \verb/write/ and \verb/out/ effects and regions have action \verb/write/.
 
-Field \verb/addressing/ specifies the addressing mode. The addressing
-can be direct and indexed, as in \verb/x[i]/, indirect and
-post-indexed, as in \verb/(*p)[i]/, indirect and pre-indexed, as in
-\verb/*(p[i])/. For Fortran code, indirect addressing modes are not
-used.
 
 Field \verb/approximation/ is used to specify if all the memory addresses
 of the reference for simple effects, or of the set of array elements
@@ -2035,19 +2030,6 @@ conditions \cite{Bern66} and in other program transformation conditions:
 read and write. \verb/IN/ regions are represented by \verb/read/ effects
 and \verb/OUT/ regions by \verb/write/ effects.
 
-\subsection{Addressing Modes of an Effect}
-\label{subsection-access}
-\index{Access}
-
-\domain{Addressing = index:unit + pre:unit + post:unit}
-{}
-
-Three addressing modes are used. The default addressing mode is the index
-mode. Scalars are accessed like arrays of 0 dimension. The index mode
-is the only mode used for Fortran programs. The indirect pre-indexing
-mode is used to represent references such as \verb/*(p[i])/. The
-indirect popst-indexing mode is used to represent references such as
-\verb/(*p)[i]/.
 
 \subsection{Approximation of an Effect}
 \label{subsection-approximation}

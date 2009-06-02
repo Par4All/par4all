@@ -114,7 +114,6 @@ effect anywhere_effect(action ac)
     
   any = make_effect(make_cell_reference(make_reference(anywhere, NIL)),
 		    ac,
-		    make_addressing_index(),
 		    make_approximation_may(),
 		    make_descriptor_none());
 
@@ -144,7 +143,6 @@ effect heap_effect(entity m, action ac)
     
   any = make_effect(make_cell_reference(make_reference(heap, NIL)),
 		    ac,
-		    make_addressing_index(),
 		    make_approximation_may(),
 		    make_descriptor_none());
 

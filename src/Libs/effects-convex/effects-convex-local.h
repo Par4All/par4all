@@ -13,7 +13,7 @@
 #define region_undefined_p(reg)  effect_undefined_p((reg))
 #define make_region(reference,action,approximation,system) \
     make_effect(make_cell(is_cell_preference, make_preference(reference)),\
-		(action), make_addressing_index(), (approximation),	\
+		(action), (approximation),	\
 		make_descriptor(is_descriptor_convex,system))
 /* To be avoided. Use region_any_reference() instead */
 #define region_reference(reg) \

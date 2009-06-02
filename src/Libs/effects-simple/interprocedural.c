@@ -1616,7 +1616,6 @@ summary_to_proper_effects(
 #define make_translated_effect(entity,action,approximation)\
     make_effect(make_cell(is_cell_reference, make_reference((entity), NIL)),\
 		make_action(action, UU),\
-		make_addressing_index(),\
 		make_approximation(approximation, UU),\
 		make_descriptor(is_descriptor_none,UU))
 

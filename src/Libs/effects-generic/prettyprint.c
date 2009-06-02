@@ -410,7 +410,7 @@ list /* of string */ effect_words_reference_with_addressing(reference obj, int a
 /* Force the old format for a reference */
 list /* of string */ effect_words_reference(reference obj)
 {
-  return effect_words_reference_with_addressing(obj, is_addressing_index);
+  return effect_words_reference_with_addressing(obj, TRUE);
 }
 /************************************************************ OLD INTERFACES */
 
