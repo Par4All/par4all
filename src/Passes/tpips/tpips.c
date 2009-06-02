@@ -7,6 +7,8 @@
 #include <strings.h>
 #include <sys/param.h>
 
+#include <getopt.h>
+
 #include <readline/readline.h>
 #include <readline/history.h>
 
@@ -1000,7 +1002,7 @@ void tpips_process_a_file(FILE * file, bool use_rl)
  */
 static string default_tpipsrc(void)
 {
-    return strdup(concatenate(getenv("HOME"), "/.tpipsrc", NULL));
+  return strdup(concatenate(getenv("HOME"), "/.tpipsrc", NULL));
 }
 
 extern char *optarg;
@@ -1010,7 +1012,7 @@ static void open_logfile(string filename, char opt)
 {
   if (logfile)
   {
-    fprintf(logfile, 
+    fprintf(logfile,
 	    "# logfile moved to %s by -%c tpips option\n", filename, opt);
     safe_fclose(logfile, "the current log file");
   }
@@ -1019,162 +1021,171 @@ static void open_logfile(string filename, char opt)
 
 static void parse_arguments(int argc, char * argv[])
 {
-    int c;
-    string tpipsrc = default_tpipsrc();
+  int c, opt_ind;
+  string tpipsrc = default_tpipsrc();
+  static struct option lopts[] = {
+    { "version", 0, NULL, 'v' },
+    { "jpips", 0, NULL, 'j' },
+    { "help", 0, NULL, 'h' },
+    { "shell", 0, NULL, 's' },
+    { "log", 1, NULL, 'l' },
+    { "rc", 1, NULL, 'r' },
+    { NULL, 0, NULL, 0 }
+  };
 
-    while ((c = getopt(argc, argv, "ane:l:h?vscr:jwx")) != -1)
+  while ((c = getopt_long(argc, argv, "ane:l:h?vscr:jwx", lopts, &opt_ind))
+	 != -1)
+  {
+    switch (c)
     {
-      switch (c)
+    case 'j':
+      jpips_is_running = TRUE;
+      /* -j => -a */
+    case 'a':
       {
-      case 'j':
-	jpips_is_running = TRUE;
-	/* -j => -a */
-      case 'a':
-	{
-	  string filename = safe_new_tmp_file("tpips_session");
-	  fprintf(stderr, "tpips session logged in \"%s\"\n", filename);
-	  open_logfile(filename, c);
-	  free(filename);
-	  break;
-	}
-      case 's':
-	tpips_is_a_shell = TRUE;
+	string filename = safe_new_tmp_file("tpips_session");
+	fprintf(stderr, "tpips session logged in \"%s\"\n", filename);
+	open_logfile(filename, c);
+	free(filename);
 	break;
-      case 'c':
-	tpips_is_a_shell = FALSE;
-	break;
-      case 'l':
-	open_logfile(optarg, c);
-	break;
-      case 'h':
-      case '?':
-	fprintf (stderr, tpips_usage, argv[0]);
-	return;
-	break;
-      case 'n':
-	tpips_execution_mode = FALSE;
-	break;
-      case 'e':
-	tpips_exec(optarg);
-	break;
-      case 'v':
-	fprintf(stdout,
-		"tpips: (%s)\n"
-		"ARCH=" STRINGIFY(SOFT_ARCH) "\n"
-		"REVS=\n"
-		"%s"
-		"DATE=%s\n"
-		"CC_VERSION=%s\n",
-		argv[0], soft_revisions, soft_date, cc_version);
-	exit(0);
-	break;
-      case 'r':
-	free(tpipsrc);
-	tpipsrc = strdup(optarg);
-	break;
-      case 'w':
-	tpips_wrapper(); /* the wrapper process will never return */
-	break;
-      case 'x':
-	/* tpips could start an xterm and redirect its stdin/stdout
-	 * on it under this option. not implemented yet.
-	 */
-	break;
-      default: 
-	fprintf(stderr, tpips_usage, argv[0]);
-	exit(1);
+      }
+    case 's':
+      tpips_is_a_shell = TRUE;
+      break;
+    case 'c':
+      tpips_is_a_shell = FALSE;
+      break;
+    case 'l':
+      open_logfile(optarg, c);
+      break;
+    case 'h':
+    case '?':
+      fprintf (stderr, tpips_usage, argv[0]);
+      return;
+      break;
+    case 'n':
+      tpips_execution_mode = FALSE;
+      break;
+    case 'e':
+      tpips_exec(optarg);
+      break;
+    case 'v':
+      fprintf(stdout,
+	      "tpips: (%s)\n"
+	      "ARCH=" STRINGIFY(SOFT_ARCH) "\n"
+	      "REVS=\n"
+	      "%s"
+	      "DATE=%s\n"
+	      "CC_VERSION=%s\n",
+	      argv[0], soft_revisions, soft_date, cc_version);
+      exit(0);
+      break;
+    case 'r':
+      free(tpipsrc);
+      tpipsrc = strdup(optarg);
+      break;
+    case 'w':
+      tpips_wrapper(); /* the wrapper process will never return */
+      break;
+    case 'x':
+      /* tpips could start an xterm and redirect its stdin/stdout
+       * on it under this option. not implemented yet.
+       */
+      break;
+    default:
+      fprintf(stderr, tpips_usage, argv[0]);
+      exit(1);
+    }
+  }
+
+  /* sources ~/.tpipsrc or the like, if any.
+   */
+  if (tpipsrc)
+  {
+    if (file_exists_p(tpipsrc))
+    {
+      FILE * rc = fopen(tpipsrc, "r");
+      if (rc)
+      {
+	user_log("sourcing tpips rc file: %s\n", tpipsrc);
+	tpips_process_a_file(rc, FALSE);
+	fclose(rc);
       }
     }
-    
-    /* sources ~/.tpipsrc or the like, if any.
-     */
-    if (tpipsrc)
-    {
-	if (file_exists_p(tpipsrc))
-	{
-	    FILE * rc = fopen(tpipsrc, "r");
-	    if (rc) 
-	    {
-		user_log("sourcing tpips rc file: %s\n", tpipsrc);
-		tpips_process_a_file(rc, FALSE);
-		fclose(rc);
-	    }
-	}
-	free(tpipsrc), tpipsrc=NULL;
-    }
+    free(tpipsrc), tpipsrc=NULL;
+  }
 
-    if (argc == optind)
+  if (argc == optind)
+  {
+    /* no arguments, parses stdin. */
+    bool use_rl = isatty(0);
+    tpips_is_interactive = use_rl;
+    pips_debug(1, "reading from stdin, which is%s a tty\n",
+	       use_rl ? "" : " not");
+    tpips_process_a_file(stdin, use_rl);
+  }
+  else
+  {
+    /* process file arguments. */
+    while (optind < argc)
     {
-	/* no arguments, parses stdin. */
-	bool use_rl = isatty(0);
+      string tps = NULL, saved_srcpath = NULL;
+      FILE * toprocess = (FILE*) NULL;
+      bool use_rl = FALSE;
+
+      if (same_string_p(argv[optind], "-"))
+      {
+	tps = strdup("-");
+	toprocess = stdin;
+	use_rl = isatty(0);
 	tpips_is_interactive = use_rl;
-	pips_debug(1, "reading from stdin, which is%s a tty\n",
-		   use_rl ? "" : " not");
-	tpips_process_a_file(stdin, use_rl);
-    }
-    else 
-    {
-	/* process file arguments. */
-	while (optind < argc)
+      }
+      else
+      {
+	tpips_is_interactive = FALSE;
+	tps = find_file_in_directories(argv[optind],
+				       getenv("PIPS_SRCPATH"));
+	if (tps)
 	{
-	    string tps = NULL, saved_srcpath = NULL;
-	    FILE * toprocess = (FILE*) NULL;
-	    bool use_rl = FALSE;
+	  /* the tpips dirname is appended to PIPS_SRCPATH */
+	  string dir = pips_dirname(tps);
+	  saved_srcpath = pips_srcpath_append(dir);
+	  free(dir), dir = NULL;
 
-	    if (same_string_p(argv[optind], "-")) 
-	    {
-		tps = strdup("-");
-		toprocess = stdin;
-		use_rl = isatty(0);
-		tpips_is_interactive = use_rl;
-	    }
-	    else
-	    {
-		tpips_is_interactive = FALSE;
-		tps = find_file_in_directories(argv[optind], 
-					       getenv("PIPS_SRCPATH"));
-		if (tps)
-		{
-		    /* the tpips dirname is appended to PIPS_SRCPATH */
-		    string dir = pips_dirname(tps);
-		    saved_srcpath = pips_srcpath_append(dir);
-		    free(dir), dir = NULL;
-		    
-		    if ((toprocess = fopen(tps, "r"))==NULL)
-		    {
-			perror(tps);
-			fprintf(stderr, "[TPIPS] cannot open \"%s\"\n", tps);
-			free(tps), tps=NULL;
-		    }
+	  if ((toprocess = fopen(tps, "r"))==NULL)
+	  {
+	    perror(tps);
+	    fprintf(stderr, "[TPIPS] cannot open \"%s\"\n", tps);
+	    free(tps), tps=NULL;
+	  }
 
-		    use_rl = FALSE;
-		}
-		else
-		    fprintf(stderr, "[TPIPS] \"%s\" not found...\n", 
-			    argv[optind]);
-	    }
-	    
-	    if (tps)
-	    {
-		pips_debug(1, "reading from file %s\n", tps);
-	    
-		tpips_process_a_file (toprocess, use_rl);
-
-		if (!same_string_p(tps, "-"))
-		    safe_fclose(toprocess, tps);
-		
-		free(tps), tps = NULL;
-	    }
-	    
-	    if (saved_srcpath) 
-	    {
-		pips_srcpath_set(saved_srcpath);
-		free(saved_srcpath), saved_srcpath = NULL;
-	    }
-
-	    optind++;
+	  use_rl = FALSE;
 	}
+	else
+	  fprintf(stderr, "[TPIPS] \"%s\" not found...\n",
+		  argv[optind]);
+      }
+
+      if (tps)
+      {
+	pips_debug(1, "reading from file %s\n", tps);
+
+	tpips_process_a_file (toprocess, use_rl);
+
+	if (!same_string_p(tps, "-"))
+	  safe_fclose(toprocess, tps);
+	free(tps), tps = NULL;
+      }
+
+      if (saved_srcpath)
+      {
+	pips_srcpath_set(saved_srcpath);
+	free(saved_srcpath), saved_srcpath = NULL;
+      }
+
+      optind++;
     }
+  }
 }
 
 /* MAIN: interactive loop and history management.
