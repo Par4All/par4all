@@ -3,7 +3,7 @@ Controlizer output
 
 void malloc01()
 {
-   int *p = malloc(10);
+   int *p = malloc(10*sizeof(int));
    int i;
 
    for(i = 0; i <= 9; i += 1)
@@ -17,7 +17,7 @@ Preconditions
 
 void malloc01()
 {
-   int *p = malloc(10);
+   int *p = malloc(10*sizeof(int));
    int i;
 
 //  P() {}
@@ -34,7 +34,7 @@ Proper effects
 
 void malloc01()
 {
-   int *p = malloc(10);
+   int *p = malloc(10*sizeof(int));
    int i;
 //               <must be written>: i
 
@@ -46,10 +46,9 @@ void malloc01()
 
 Cumulated effects
 
-//               <may be written >: *HEAP*
 void malloc01()
 {
-   int *p = malloc(10);
+   int *p = malloc(10*sizeof(int));
    int i;
 //               <may be read    >: i
 //               <may be written >: p[*]
@@ -65,10 +64,19 @@ Regions
 
 void malloc01()
 {
-   int *p = malloc(10);
+   int *p = malloc(10*sizeof(int));
    int i;
 
+//  <i-R-EXACT-{}>
+//  <i-W-EXACT-{}>
+//  <p[PHI1]-W-EXACT-{0<=PHI1, PHI1<=9}>
+
+
    for(i = 0; i <= 9; i += 1)
+
+//  <i-R-EXACT-{}>
+//  <p[PHI1]-W-EXACT-{PHI1==i, 0<=i, i<=9}>
+
       p[i] = (double) i;
 }
 
@@ -78,3 +86,6 @@ void malloc01()
 		from <p[i]-W-MUST> to <p[i]-W-MUST> at levels  1
 
 ****************** End of Dependence Graph ******************
+
+Parallelization
+

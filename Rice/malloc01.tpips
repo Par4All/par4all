@@ -48,6 +48,7 @@ echo
 echo Regions
 echo
 
+setproperty PRETTYPRINT_SCALAR_REGIONS TRUE
 activate MUST_REGIONS
 activate PRINT_CODE_REGIONS
 display PRINTED_FILE[malloc01]

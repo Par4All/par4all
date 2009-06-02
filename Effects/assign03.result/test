@@ -25,7 +25,6 @@ void assign03()
 
 Cumulated effetcs for "assign03"
 
-//               <may be written >: *HEAP*
 void assign03()
 {
    extern char *malloc(int);
@@ -41,15 +40,12 @@ Proper effetcs for "foo"
 
 void foo()
 {
-//               <may be written >: assign03:*HEAP*
    assign03();
 }
 
 Cumulated effetcs for "foo"
 
-//               <may be written >: assign03:*HEAP*
 void foo()
 {
-//               <may be written >: assign03:*HEAP*
    assign03();
 }
