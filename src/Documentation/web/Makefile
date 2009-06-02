@@ -39,16 +39,13 @@ HTML_OTHERS =	\
 
 HTMS =	$(HTML_AUTO:.cpp.html=.html) $(HTML_OTHERS)
 
-SCRIPTS =	generate_pips_distributions
-
-SOURCES= $(HTML_AUTO) $(HTML_OTHERS) $(SCRIPTS)
+SOURCES= $(HTML_AUTO) $(HTML_OTHERS)
 
 # Ask to make the html files:
 all: $(HTMS)
 clean: local-clean
 
 INSTALL_HTM= $(HTMS)
-INSTALL_UTL= $(SCRIPTS)
 
 # To deal with non-framed viewer and no server side include:
 APPLY_CPP = $(CC) -E -C -P -
