@@ -1,0 +1,4 @@
+delete conv-cpu
+create conv-cpu conv-cpu.c
+display PRINTED_FILE[%ALL]
+close
