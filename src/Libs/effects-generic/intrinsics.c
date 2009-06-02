@@ -918,7 +918,6 @@ static list any_affect_effects(entity e __attribute__ ((__unused__)),
 {
   list le = NIL;
   expression lhs = EXPRESSION(CAR(args));
-  syntax s = expression_syntax(lhs);
 
   pips_debug(5, "begin\n");
 
@@ -1348,21 +1347,8 @@ static list generic_io_effects(entity e, list args, bool system_p)
        "reference", but this causes a bug in cumulated effects and I
        do not have time to chase it. */
     eff1 = (*reference_to_effect_func)(ref1, make_action_read());
-      /*
-      (make_effect(make_cell_preference(make_preference(ref1)),
-		       make_action_read(),
-		       make_addressing_index(),
-		       must_p? make_approximation_must() : make_approximation_may(),
-		       make_descriptor_none()));
-      */
     eff2 = (*reference_to_effect_func)(ref2, make_action_write());
-    /*
-       (make_effect(make_cell_preference(make_preference(ref2)),
-		       make_action_write(),
-		       make_addressing_index(),
-		       must_p? make_approximation_must() : make_approximation_may(),
-		       make_descriptor_none()));
-    */
+
     if(!must_p) {
       free_approximation(effect_approximation(eff1));
       free_approximation(effect_approximation(eff2));

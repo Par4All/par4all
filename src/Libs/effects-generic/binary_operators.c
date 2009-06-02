@@ -207,8 +207,6 @@ proper_effects_combine(list l_effects, bool scalars_only_p)
   /* entity name -> consp in effect list. */
   hash_table all_read_effects, all_write_effects;
   /* FI: at this level, it's pretty dangerous to combine effects with no constant addresses */
-  //hash_table all_read_pre_effects, all_write_pre_effects;
-  //hash_table all_read_post_effects, all_write_post_effects;
   extern string words_to_string(list);
 
   ifdebug(6) {
@@ -246,7 +244,6 @@ proper_effects_combine(list l_effects, bool scalars_only_p)
     effect current = effect_undefined;
     string n;
     tag a;
-    addressing ad;
     bool may_combine, do_combine = FALSE;
     list do_combine_item = NIL;
     list next = CDR(cur); /* now, as 'cur' may be removed... */
@@ -256,10 +253,8 @@ proper_effects_combine(list l_effects, bool scalars_only_p)
  
    // n = entity_name(effect_entity(current));
     n = words_to_string
-      (effect_words_reference_with_addressing_as_it_is(effect_any_reference(current),
-						       addressing_tag(effect_addressing(current))));
+      (effect_words_reference(effect_any_reference(current)));
     a = effect_action_tag(current);
-    ad = effect_addressing(current);
 
     pips_debug(8,"key: \"\%s\"\n", n);
 
@@ -268,13 +263,11 @@ proper_effects_combine(list l_effects, bool scalars_only_p)
      * in the previous implementation, 'current' was not yet
      * passed thru proper_to_summary_effect_func when tested...
      *
-     * Indirect addressing prevents combining? Why?
-     *
      * FI: effect_scalar_p() should be redefined because the new key
      * used let us deal with complex effects.
      */
     may_combine = (!scalars_only_p || effect_scalar_p(current));
-    //&& addressing_index_p(ad);
+
 
     /* FI: addressing should be checked below against writing of the
        underlying pointer. No time right now. */
@@ -353,12 +346,6 @@ proper_effects_combine(list l_effects, bool scalars_only_p)
   ifdebug(6){
     pips_debug(6, "summary effects: \n"); 
     (*effects_prettyprint_func)(l_effects);
-    MAP(EFFECT, eff, {
-	reference r = effect_any_reference(eff);
-	tag t = addressing_tag(effect_addressing(eff));
-	fprintf(stderr, "Effect %p with reference %p: %s\n", eff, r,
-		words_to_string(effect_words_reference_with_addressing_as_it_is(r,t)));
-      }, l_effects);
   }
 
   /* The keys should be freed as well */
@@ -391,8 +378,7 @@ bool combinable_effects_p(effect eff1, effect eff2)
     return(same_var && same_act);
 }
 
-/* FI: same action, but also same variable, same indexing and same direct
-   addressing. The constraint on addressing could be challenged... */
+/* FI: same action, but also same variable and same indexing  */
 bool effects_same_action_p(effect eff1, effect eff2)
 {
   bool same_p = TRUE;
@@ -403,19 +389,9 @@ bool effects_same_action_p(effect eff1, effect eff2)
   else {
     reference r1 = effect_any_reference(eff1);
     reference r2 = effect_any_reference(eff2);
-    string n1 = words_to_string(effect_words_reference_with_addressing_as_it_is(r1, addressing_tag(effect_addressing(eff1))));
-    string n2 = words_to_string(effect_words_reference_with_addressing_as_it_is(r2, addressing_tag(effect_addressing(eff2))));
-    /*
-      bool same_var, same_act, direct_p;
-      addressing ad1 = effect_addressing(eff1);
-      addressing ad2 = effect_addressing(eff2);
+    string n1 = words_to_string(effect_words_reference(r1));
+    string n2 = words_to_string(effect_words_reference(r2));
 
-      same_var = (effect_entity(eff1) == effect_entity(eff2));
-      same_act = (effect_action_tag(eff1) == effect_action_tag(eff2));
-      direct_p = (addressing_index_p(ad1) && addressing_index_p(ad2));
-
-      same_p = same_var && same_act && direct_p;
-    */
     same_p = same_string_p(n1,n2) && effect_action_tag(eff1)==effect_action_tag(eff2);
     free(n1);
     free(n2);

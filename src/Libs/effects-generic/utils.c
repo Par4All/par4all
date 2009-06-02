@@ -741,14 +741,13 @@ void dump_effect(effect e)
 {
   cell c = effect_cell(e);
   action ac = effect_action(e);
-  addressing ad = effect_addressing(e);
   approximation ap = effect_approximation(e);
   descriptor d = effect_descriptor(e);
 
   effect_consistent_p(e);
-  fprintf(stderr, "Effect %p = (domain=%td, cell=%p, action=%p, addressing=%p,"
+  fprintf(stderr, "Effect %p = (domain=%td, cell=%p, action=%p,"
 	  " approximation=%p, descriptor=%p\n",
-	  e, effect_domain_number(e), c, ac,ad, ap, d);
+	  e, effect_domain_number(e), c, ac, ap, d);
   dump_cell(c);
 }
 

@@ -216,7 +216,7 @@ try_to_recover_for_loop_in_a_while(whileloop wl) {
       print_effect(an_effect);
       dump_effect(an_effect);
     }
-    pips_debug(5, "%p: %s\n", an_effect, words_to_string(effect_words_reference_with_addressing_as_it_is(r, addressing_tag(effect_addressing(an_effect)))));
+    pips_debug(5, "%p: %s\n", an_effect, words_to_string(effect_words_reference(r)));
     if (effect_read_p(an_effect)) {
       /* Look for the reference variable in the statement body transformers: */
       entity rv = reference_variable(r);

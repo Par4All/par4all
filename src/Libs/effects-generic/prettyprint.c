@@ -351,6 +351,8 @@ print_source_or_code_effects_engine(
 
 
 /********************************************************************* MISC */
+/* Now that addressing is alwys indexed, these functions should be removed */
+/* kept for backward compatibility */
 
 /* made from words_reference
  * this function can print entity_name instead of entity_local_name,
@@ -362,17 +364,12 @@ list /* of string */ effect_words_reference_with_addressing_as_it_is_or_not(refe
   string begin_attachment;
   entity e = reference_variable(obj);
    
-  if(ad_tag == is_addressing_post)
-    pc = CHAIN_SWORD(pc, "(*");
-  else if(ad_tag == is_addressing_pre)
-    pc = CHAIN_SWORD(pc, "*(");
   if (get_bool_property("PRETTYPRINT_WITH_COMMON_NAMES")  
       && entity_in_common_p(e)) {
     pc = CHAIN_SWORD(pc, (string) entity_and_common_name(e));
   } else 
     pc = CHAIN_SWORD(pc, entity_minimal_name(e));
-  if(ad_tag == is_addressing_post)
-    pc = CHAIN_SWORD(pc, ")");
+
   begin_attachment = STRING(CAR(pc));
 
   if (reference_indices(obj) != NIL) {
@@ -388,26 +385,12 @@ list /* of string */ effect_words_reference_with_addressing_as_it_is_or_not(refe
       }, reference_indices(obj));
     pc = CHAIN_SWORD(pc,end);
   }
-  else if(!as_it_is_p){
-    string beg = prettyprint_is_fortran? "(*" : "[*";
-    string mid = prettyprint_is_fortran? ",*" : "][*";
-    string end = prettyprint_is_fortran? ")" : "]";
-    int d;
-    /* if( (d=variable_entity_dimension(reference_variable(obj))) != 0) { */
-    if( (d=type_depth(entity_type(reference_variable(obj)))) != 0) {
-      int i;
-      pc = CHAIN_SWORD(pc,beg);
-      for(i = 1; i < d; i++)
-	pc = CHAIN_SWORD(pc,mid);
-      pc = CHAIN_SWORD(pc,end);
-    }
-  }
-  if(ad_tag == is_addressing_pre)
-    pc = CHAIN_SWORD(pc, ")");
+
+
   attach_reference_to_word_list(begin_attachment, STRING(CAR(gen_last(pc))),
 				obj);
 
-  return(pc);
+  return(pc);  
 }
 
 /* Display the subscript expressions as they are (better for debugging!). */

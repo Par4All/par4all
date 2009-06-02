@@ -1378,8 +1378,9 @@ list c_summary_effect_to_proper_effects(effect eff, expression real_arg)
 		  }
 	      }
 	    else if(ENTITY_MALLOC_SYSTEM_P(real_op)) {
-	      n_eff = heap_effect(get_current_module_entity(),
-				  copy_action(effect_action(eff)));
+	      /* BC : do not generate effects on HEAP */
+	      /*n_eff = heap_effect(get_current_module_entity(),
+		copy_action(effect_action(eff)));*/
 	    }
 	    else {
 	      /* We do not know what to do with the initial value */

@@ -72,10 +72,8 @@ static void scan_statement(statement s, list loops)
 
 	FOREACH(EFFECT, f, load_cumulated_rw_effects_list(b)) {
 	    entity e = effect_entity( f ) ;
-	    addressing ad = effect_addressing(f);
 
-	    if(addressing_index_p(ad)
-	       &&  action_write_p( effect_action( f ))
+	    if(action_write_p( effect_action( f ))
 	       &&  privatizable( e )
 	       &&  gen_find_eq( e, locals ) == entity_undefined ) {
 		locals = CONS( ENTITY, e, locals ) ;
