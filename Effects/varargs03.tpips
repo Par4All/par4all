@@ -13,10 +13,10 @@ echo Proper effects for "main"
 echo
 
 activate PRINT_CODE_PROPER_EFFECTS
-display PRINTED_FILE[main]
+display PRINTED_FILE[%ALLFUNC]
 
 activate PRINT_CODE_CUMULATED_EFFECTS
-display PRINTED_FILE[main]
+display PRINTED_FILE[%ALLFUNC]
 
 close
 delete varargs03
