@@ -13,7 +13,9 @@ compile:
 	$(MAKE) -C src phase3
 	$(MAKE) -C src phase4
 	$(MAKE) -C src phase5
+ifndef PIPS_NO_TAGS
 	$(MAKE) tags
+endif
 
 doc: compile
 	$(MAKE) -C src FWD_STOP_ON_ERROR= phase6
