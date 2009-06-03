@@ -12,16 +12,23 @@ Try to restructure the code for more precision:
 Privatize scalar variables on all the modules of the program:
 Ask for some statistics about the job to be done:
 Ask for the parallelization of all the modules of the program with OpenMP output:
-enum {N=9};
-typedef struct {float re; float im;} complex;
-complex imagein[N][N];
-extern int main(int argc, char *argv[]);
-int main(int argc, char *argv[])
+void empty_for()
 {
+   int loops = 10;
+   float h_A[10000*10000];
+   float h_C[10000*10000];
    int i;
    int j;
-   int k;
 
+#pragma omp parallel for private(j)
+   for(i = 0; i <= 9999; i += 1)
+#pragma omp parallel for 
+      for(j = 0; j <= 9999; j += 1)
+         h_A[i*10000+j] = 1;
+#pragma omp parallel for private(j)
+   for(i = 0; i <= 9999; i += 1)
+#pragma omp parallel for 
+      for(j = 0; j <= 9999; j += 1)
+         h_C[i*10000+j] = 0;
 
-   return 0;
 }
