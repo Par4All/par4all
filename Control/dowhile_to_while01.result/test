@@ -20,9 +20,12 @@ int main(int argc, char *argv[])
 {
    int I_0;
    int i = 0;
-   I_0 = 0;
-   I_0 = i++;
-   printf("%d", I_0);
+   {
+      int I_0;
+      I_0 = 0;
+      I_0 = i++;
+      printf("%d", I_0);
+   }
    while (i<10) {
       int j = 0;
       j = i++;
@@ -39,4 +42,3 @@ Run code
 
 0123456789
 0123456789
-
