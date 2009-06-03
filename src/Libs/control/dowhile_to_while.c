@@ -23,12 +23,13 @@ bool dowhile_to_while_walker(statement stmt)
 			/* push while-do instruction */
 			list new_statements = CONS(STATEMENT,instruction_to_statement(instr),NIL);
 			/* duplicate while-do statements and push it */
+			statement duplicated_statement = make_empty_statement();
 			clone_context cc = make_clone_context(
 					get_current_module_entity(),
 					get_current_module_entity(),
-					get_current_module_statement()
+					duplicated_statement
 			);
-			statement duplicated_statement = clone_statement( whileloop_body(wl),cc );
+			instruction_block(statement_instruction(duplicated_statement)) = CONS(STATEMENT,clone_statement( whileloop_body(wl),cc ),NIL);
 			free_clone_context(cc);
 			new_statements=CONS(STATEMENT,duplicated_statement,new_statements);
 			/* create new instruction sequence */
