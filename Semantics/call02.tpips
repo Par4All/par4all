@@ -1,5 +1,5 @@
-delete assign04
-create assign04 assign04.c
+delete call02
+create call02 call02.c
 
 #setenv C_SYNTAX_DEBUG_LEVEL 9
 #setproperty GENERATE_MISSING_SOURCE_FILES TRUE
@@ -11,11 +11,9 @@ setproperty PRETTYPRINT_C_CODE TRUE
 # We want here to analyze for loops directly
 # setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
 # setproperty PRETTYPRINT_BLOCKS TRUE
-# setproperty PPRETTYPRINT_EMPTY_BLOCKS TRUE
+#setproperty PPRETTYPRINT_EMPTY_BLOCKS TRUE
 
-# We do want to use the winning combination for the loop
-# postcondition, except TRANSORMERS_IN_CONTEXT.
-
+# We do want to use the winning combination for the loop postcondition
 activate INTERPROCEDURAL_SUMMARY_PRECONDITION
 activate TRANSFORMERS_INTER_FULL
 activate PRECONDITIONS_INTER_FULL
@@ -26,28 +24,22 @@ echo Source code with proper effects
 echo
 
 activate PRINT_CODE_PROPER_EFFECTS
-display PRINTED_FILE[assign04]
+display PRINTED_FILE[call02]
 
 echo
 echo Source code with cumulated effects
 echo
 
 activate PRINT_CODE_CUMULATED_EFFECTS
-display PRINTED_FILE[assign04]
+display PRINTED_FILE[call02]
 
 echo
 echo Source code with transformers
 echo
 
 activate PRINT_CODE_TRANSFORMERS
-display PRINTED_FILE[assign04]
+display PRINTED_FILE[call02]
 quit
-echo
-echo Source code with preconditions
-echo
-
-activate PRINT_CODE_PRECONDITIONS
-display PRINTED_FILE[assign04]
 
 apply UNSPLIT[%PROGRAM]
 
@@ -57,6 +49,6 @@ echo
 echo Warnings
 echo
 
-shell cat assign04.database/Warnings
+shell cat call02.database/Warnings
 
 quit

@@ -1,0 +1,53 @@
+
+Source code with proper effects
+
+void call02(int i, float x)
+{
+//               <must be read   >: i
+//               <must be written>: i
+   i++;                                                                 /*0004*/
+//               <must be read   >: TOP-LEVEL:j
+//               <must be written>: TOP-LEVEL:j
+   j++;                                                                 /*0005*/
+//               <must be read   >: x
+//               <must be written>: x
+   x++;                                                                 /*0006*/
+}
+
+Source code with cumulated effects
+
+//               <must be read   >: TOP-LEVEL:j i x
+//               <must be written>: TOP-LEVEL:j
+void call02(int i, float x)
+{
+//               <must be read   >: i
+//               <must be written>: i
+   i++;                                                                 /*0004*/
+//               <must be read   >: TOP-LEVEL:j
+//               <must be written>: TOP-LEVEL:j
+   j++;                                                                 /*0005*/
+//               <must be read   >: x
+//               <must be written>: x
+   x++;                                                                 /*0006*/
+}
+
+Source code with transformers
+
+
+//  T(TOP-LEVEL:j) {TOP-LEVEL:j==j#init+1}
+
+void call02(int i, float x)
+{
+
+//  T(i) {i==i#init+1}
+
+   i++;                                                                 /*0004*/
+
+//  T(TOP-LEVEL:j) {TOP-LEVEL:j==j#init+1}
+
+   j++;                                                                 /*0005*/
+
+//  T() {}
+
+   x++;                                                                 /*0006*/
+}

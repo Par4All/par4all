@@ -1,8 +1,8 @@
 /* complex expressions with redundant side effects */
 
-void foo(int i)
+void foo(int j)
 {
-  i++;
+  j++;
 }
 
 void assign04()
