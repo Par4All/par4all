@@ -22,9 +22,7 @@
 
 #include "transformer.h"
 
-transformer 
-transformer_dup(t_in)
-transformer t_in;
+transformer transformer_dup(transformer t_in)
 {
     /* FI: I do not reduce transformer_dup() to a macro calling
        copy_transformer() because I do not want to create problems with

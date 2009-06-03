@@ -272,11 +272,8 @@ bool complex_analyzed_p()
 }
 
 /* The entity is type of one of the analyzed types */
-bool analyzable_scalar_entity_p(entity e)
+bool analyzable_basic_p(basic b)
 {
-  type ut = ultimate_type(entity_type(e));
-  if(type_variable_p(ut) && entity_scalar_p(e)) {
-    basic b = variable_basic(type_variable(ut));
     if(basic_int_p(b) && analyze_integer_scalar_entities)
       return TRUE;
     if(basic_string_p(b) && analyze_string_scalar_entities)
@@ -289,10 +286,37 @@ bool analyzable_scalar_entity_p(entity e)
       return TRUE;
     else
       return FALSE;
+}
+
+/* The entity is type of one of the analyzed types */
+bool analyzable_type_p(type t)
+{
+  bool result = FALSE;
+  type ut = ultimate_type(t);
+
+  /* The type dimension or type_depth could be checked also... */
+  if(type_variable_p(ut) /* && entity_scalar_p(e)*/) {
+    basic b = variable_basic(type_variable(ut));
+    result = analyzable_basic_p(b);
   }
-  else {
-    return FALSE;
+
+  return result;
+}
+
+/* The entity is type of one of the analyzed types */
+bool analyzable_scalar_entity_p(entity e)
+{
+  bool result = FALSE;
+  type ut = ultimate_type(entity_type(e));
+
+  /* entity_scalar_p(e) is information provided by the type. It should
+     be checked by type_variable_p() but I'm not sure of the dimension
+     information carried by ultimate_type() whose purpose was quite
+     different for the C scanner, providing the proper basic. */
+  if(type_variable_p(ut) && entity_scalar_p(e)) {
+    result = analyzable_type_p(ut);
   }
+  return result;
 }
 
 /* The constant may appear as a variable in the linear systems */

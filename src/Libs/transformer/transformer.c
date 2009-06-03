@@ -377,7 +377,7 @@ transformer transformer_safe_combine_with_warnings(transformer tf1, transformer 
   if(transformer_safe_affect_transformer_p(tf1, tf2)) {
     pips_debug(9, "Side effects of tf2 on tf1\n");
     pips_user_warning("Non standard compliant code: side effect in part\n"
-                      "of an expression affect variables used in a later part\n");
+                      "of an expression affects variable(s) used in a later part\n");
     tf12 = transformer_combine(tf1, tf2);
   }
   else if (transformer_safe_affect_transformer_p(tf2, tf1)){
@@ -1142,7 +1142,7 @@ transformer transformer_projection_with_redundancy_elimination_and_check(
     }
 
     /* Step 3: compute new_args, but beware of left over old values! */
-    MAP(ENTITY, e, 
+    FOREACH(ENTITY, e, 	transformer_arguments(t))
     { 
       if(!local_temporary_value_entity_p(e)) {
 	entity v = value_to_variable(e);
@@ -1173,8 +1173,7 @@ transformer transformer_projection_with_redundancy_elimination_and_check(
 	  }
 	}
       }
-    },
-	transformer_arguments(t));
+    }
 
     /* Step 4: update the relation and the arguments field for t */
 
