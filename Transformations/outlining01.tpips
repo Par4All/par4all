@@ -1,0 +1,50 @@
+delete outlining01
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create outlining01 outlining01.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+echo
+echo Initial code
+echo
+
+display PRINTED_FILE[main]
+
+echo
+echo Code after outlining
+echo
+
+apply OUTLINE[main]
+outlined
+n
+n
+n
+n
+n
+n
+n
+n
+y
+n
+n
+display PRINTED_FILE[main]
+display PRINTED_FILE[outlined]
+
+echo
+echo Unsplit resulting code
+echo
+
+apply UNSPLIT
+shell gcc ${VDIR:-.}/outlining01.c -o ${VDIR:-.}/outlining
+shell gcc outlining01.database/Src/outlining01.c outlining01.database/Src/outlined.c -o outlining01.database/Src/outlining
+shell if test `outlining01.database/Src/outlining` = `${VDIR:-.}/outlining`; then echo "ok"; else echo "ko" ; fi
+shell rm -rf outlining01.database/Src/outlining ${VDIR:-.}/outlining
+
+close
+delete outlining01
+quit
+
