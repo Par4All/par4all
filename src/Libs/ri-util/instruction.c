@@ -58,8 +58,7 @@ instruction
 make_continue_instruction() {
   entity called_function;
   called_function = entity_intrinsic(CONTINUE_FUNCTION_NAME);
-  return make_instruction(is_instruction_call,
-			  make_call(called_function,NIL));
+  return MakeNullaryCallInst(called_function);
 }
 
 /** @} */
@@ -128,7 +127,7 @@ instruction_stop_p(instruction i) {
 }
 
 
-/* Test if an instruction is a Fortran FROMAT.
+/* Test if an instruction is a Fortran FORMAT.
 */
 bool
 instruction_format_p(instruction i) {
@@ -164,8 +163,9 @@ void flatten_block_if_necessary(instruction i)
 }
 
 
-/* Checks that an instruction block is a list of assignments, possibly
-   followed by a continue */
+/* Checks if an instruction block is a list of assignments, possibly
+   followed by a continue.
+*/
 bool
 assignment_block_p(i)
 instruction i;
@@ -183,9 +183,14 @@ instruction i;
 }
 
 
-/* Does not work for undefined instructions */
+/* Return a constant string representing symbolically the instruction type.
 
-string 
+   Does not work for undefined instructions.
+
+   @return a constant string such as "WHILE LOOP" for a "while()" or "do
+   while()" loop and so on.
+*/
+string
 instruction_identification(instruction i)
 {
     string instrstring = NULL;

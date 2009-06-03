@@ -175,7 +175,7 @@ stop_statement_p(statement s) {
 }
 
 
-/* Test if a statement is a Fortran FROMAT.
+/* Test if a statement is a Fortran FORMAT.
 */
 bool
 format_statement_p(statement s) {
@@ -527,7 +527,7 @@ instruction instr;
 			  empty_extensions ()));
 }
 
-instruction 
+instruction
 make_assign_instruction(expression l,
                         expression r)
 {
@@ -550,49 +550,7 @@ make_assign_statement(expression l,
 {
     return make_stmt_of_instr(make_assign_instruction(l, r));
 }
-
-/* FI: make_block_statement_with_stop is obsolete, do not use */
 
-statement 
-make_block_statement_with_stop()
-{
-    statement b;
-    statement stop;
-    entity stop_function;
-
-    stop_function = gen_find_tabulated(concatenate(TOP_LEVEL_MODULE_NAME, 
-						   MODULE_SEP_STRING,
-						   "STOP",
-						   NULL),
-				       entity_domain);
-
-    pips_assert("make_block_statement_with_stop", 
-		stop_function != entity_undefined);
-
-    stop = make_statement(entity_empty_label(),
-			  STATEMENT_NUMBER_UNDEFINED,
-			  STATEMENT_ORDERING_UNDEFINED,
-			  empty_comments,
-			  make_instruction(is_instruction_call,
-					   make_call(stop_function,NIL)),
-			  NIL,
-			  NULL,
-			  empty_extensions ());
-
-    b = make_statement(entity_empty_label(),
-			  STATEMENT_NUMBER_UNDEFINED,
-			  STATEMENT_ORDERING_UNDEFINED,
-			  empty_comments,
-			  make_instruction_block(CONS(STATEMENT, stop, NIL)),NIL,NULL,
-			  empty_extensions ());
-
-    ifdebug(8) {
-	fputs("make_block_statement_with_stop",stderr);
-	print_text(stderr, text_statement(entity_undefined,0,b));
-    }
-
-    return b;
-}
 
 statement
 make_nop_statement()

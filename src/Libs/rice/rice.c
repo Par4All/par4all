@@ -99,7 +99,14 @@ statement rice_statement(statement stat,
     return(new_stat);
 }
 
-statement rice_loop(statement stat, 
+
+/* Eventually parallelize a do-loop with à la Rice algorithm.
+
+   @return a statement with the same loop (not parallelized), a statement
+   with a parallelized do-loop or an empty statement (the loop body was
+   empty so it is trivially parallelized in this way).
+*/
+statement rice_loop(statement stat,
 		    int l,
 		    statement (*codegen_fun)(statement, graph, set, int, bool)
 		    )
@@ -140,52 +147,28 @@ statement rice_loop(statement stat,
   }
 
   set_enclosing_loops_map( loops_mapping_of_statement(stat) );
-  /* to deal with empty loops */
-  if (instruction_loop_p(istat)
-      && empty_statement_or_continue_p(b = perfectly_nested_loop_to_body(stat))) {
-    /* The code generation procedure avoid building nest around
-       continue or empty statements. However, even in this case,
-       Ronan Keryell would like to see parallel loop around it for completeness.
-
-       It seemed easier to modify temporarily the input statement
-       rather than finding out in the generation process when continue
-       must be ignored (most of the time) and when they must be
-       preserved.
-
-       Note that empty loops can be optimized by dead code elimination
-       (see SUPPRESS_DEAD_CODE) */
-    instruction i = statement_instruction(b);
-    call c = instruction_call(i);
-    entity cont = call_function(c);
-    statement nb = statement_undefined;
-
-    call_function(c) = global_name_to_entity(TOP_LEVEL_MODULE_NAME, STOP_FUNCTION_NAME);
-
-    //nstat = copy_statement(stat);
-
-    nstat = codegen_fun(stat, dg, region, l, TRUE);
-
-    nb = perfectly_nested_loop_to_body(nstat);
-    call_function(instruction_call(statement_instruction(b))) = cont;
-    call_function(c) = cont;
-  }
-  else
-    nstat = codegen_fun(stat, dg, region, l, TRUE);
+  nstat = codegen_fun(stat, dg, region, l, TRUE);
 
   ifdebug(7){
     pips_debug(7, "consistency checking for CodeGenerate output: ");
     if (statement_consistent_p(nstat))
       fprintf(stderr," gen consistent\n");
   }
-  pips_assert( "nstat is defined", nstat != statement_undefined ) ;
+
+  if (nstat == statement_undefined )
+    /* The code generation did not generate anything, probably because the
+       loop body was empty ("CONTINUE"/";", "{ }"), so no loop is
+       generated: */
+    nstat = make_empty_statement();
+
   /* FI: I'd rather not return a block when a unique loop statement has to
    * be wrapped.
    */
-  pips_assert("block or loop", 
+  pips_assert("block or loop",
 	      instruction_block_p(statement_instruction(nstat)) ||
 	      instruction_loop_p(statement_instruction(nstat))) ;
   statement_label(nstat) = entity_empty_label();
-  statement_number(nstat) = 
+  statement_number(nstat) =
     (statement_block_p(nstat)? STATEMENT_NUMBER_UNDEFINED :
      statement_number(stat));
   statement_ordering(nstat) = statement_ordering(stat);
