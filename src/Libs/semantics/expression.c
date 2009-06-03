@@ -1641,7 +1641,7 @@ integer_call_expression_to_transformer(
   }
   else if(value_code_p(entity_initial(f))) {
     if(get_bool_property(SEMANTICS_INTERPROCEDURAL)) {
-      tf = user_function_call_to_transformer(e, expr);
+      tf = user_function_call_to_transformer(e, expr, pre);
     }
     else {
       /* No need to use effects here. It will be done at a higher level */
@@ -2119,7 +2119,7 @@ float_call_expression_to_transformer(
 	  && get_bool_property(SEMANTICS_INTERPROCEDURAL)) {
     /* Just in case some integer variables were modified by the function
        call, e.g. the count of its dynamic calls. */
-    tf = user_function_call_to_transformer(v, expr);
+    tf = user_function_call_to_transformer(v, expr, pre);
   }
   else {
     switch(arity) {

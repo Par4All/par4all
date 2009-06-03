@@ -142,7 +142,22 @@ transformer declaration_to_transformer(entity v, transformer pre)
     }
     else if (value_expression_p(vv)) {
       expression e = value_expression(vv);
-      tf = any_expression_to_transformer(v, e, pre, FALSE);
+      basic eb = basic_of_expression(e);
+      type vt = ultimate_type(entity_type(v));
+      basic vb = variable_basic(type_variable(vt));
+
+      if(basic_equal_p(eb, vb)) {
+	tf = any_expression_to_transformer(v, e, pre, FALSE);
+	tf = transformer_temporary_value_projection(tf);
+      }
+      else {
+	list el = expression_to_proper_effects(e);
+
+	pips_user_warning("Type mismatch detected in initialization expression."
+			  " May be due to overloading and/or implicit confusion"
+			  " between logical and integer in C\n");
+	tf = effects_to_transformer(el);
+      }
     }
     else {
       pips_internal_error("Unexpected value tag\n");
@@ -191,6 +206,7 @@ transformer declarations_to_transformer(list dl, transformer pre)
       post = transformer_safe_normalize(post, 4);
       btf = transformer_combine(btf, stf);
       btf = transformer_normalize(btf, 4);
+
       ifdebug(1) 
 	pips_assert("btf is a consistent transformer", 
 		    transformer_consistency_p(btf));
@@ -482,9 +498,24 @@ call_to_transformer(call c, transformer pre, list ef) /* effects of call c */
 }
 
 transformer 
-user_function_call_to_transformer(
-				  entity e, /* a value */
-				  expression expr) /* a call to a function */
+user_c_function_call_to_transformer(
+					  entity e, /* a value */
+					  expression expr, /* a call to a function */
+					  transformer pre) /* its precondition */
+{
+  transformer tf = transformer_undefined;
+
+  pips_user_warning("C version not implemented yet. Fortran version used instead\n");
+
+  tf = user_fortran_function_call_to_transformer(e, expr, pre);
+  return tf;
+}
+
+transformer 
+user_fortran_function_call_to_transformer(
+					  entity e, /* a value */
+					  expression expr, /* a call to a function */
+					  transformer __attribute__ ((unused)) pre) /* its precondition */
 {
   syntax s = expression_syntax(expr);
   call c = syntax_call(s);
@@ -600,6 +631,24 @@ user_function_call_to_transformer(
 
     
   return t_caller;
+}
+
+transformer 
+user_function_call_to_transformer(
+				  entity e, /* a value */
+				  expression expr, /* a call to a function */
+				  transformer pre) /* its precondition */
+{
+  transformer tf = transformer_undefined;
+  call c = expression_call(expr);
+  entity f = call_function(c);
+
+  if(c_module_p(f))
+    tf = user_c_function_call_to_transformer(e, expr, pre);
+  else
+    tf = user_fortran_function_call_to_transformer(e, expr, pre);
+
+  return tf;
 }
 
 /* transformer translation
@@ -725,25 +774,29 @@ static transformer c_user_call_to_transformer(entity f,
        mode.
     */
     basic b = basic_of_expression(e);
+    transformer ctf = transformer_undefined;
 
     if(analyzable_scalar_entity_p(fpv)) {
       if(type_equal_p(fpt, apt)) {
 	/* Keep track of fpv to project it later */
 	fpvl = CONS(ENTITY, fpv, fpvl);
+	ctf = 
+	  // FI: I'm at a lost with this flag
+	  //safe_any_expression_to_transformer(fpv, e, cpre, TRUE);
+	  safe_any_expression_to_transformer(fpv, e, cpre, FALSE);
       }
       else
 	pips_user_error("Type incompatibility between call site and declaration"
 			" for %d argument of function %s\n", n, entity_user_name(f));
     }
     else {
-      /* The associated transformer may nevertheless carry useful information */
-      fpv = make_local_temporary_value_entity_with_basic(b); 
+      /* The associated transformer may nevertheless carry useful/necessary information */
+      list el = expression_to_proper_effects(e);
+
+      fpv = make_local_temporary_value_entity_with_basic(b);
+      ctf = effects_to_transformer(el);
     }
 
-    transformer ctf = 
-      // FI: I'm at a lost with this flag
-      //safe_any_expression_to_transformer(fpv, e, cpre, TRUE);
-      safe_any_expression_to_transformer(fpv, e, cpre, FALSE);
     transformer npre = transformer_undefined;
 
     tf = transformer_combine(tf, ctf);
