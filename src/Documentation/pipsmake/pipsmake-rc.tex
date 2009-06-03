@@ -4357,6 +4357,26 @@ rice_cray                   > MODULE.parallelized_code
         < MODULE.code MODULE.dg
 \end{PipsMake}
 
+
+\subsection{Coarse Grain Parallelization}
+\label{subsubsection-coarse-grain-parallelization}
+
+%%@UserManualDocumentation: coarse_grain_parallelization
+Function \verb+coarse_grain_parallelization+ implements a loop parallelization
+algorithm based on array regions. It considers only one loop at a time, its
+body being abstracted by its invariant read and write regions. No loop
+distribution is performed, but any kind of loop body is acceptable
+whereas \textsc{Allen} \& \textsc{Kennedy} algorithm only copes with very simple loop bodies.
+%%!UserManualDocumentation
+
+\begin{PipsMake}
+coarse_grain_parallelization > MODULE.parallelized_code
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.inv_regions
+\end{PipsMake}
+
+
 \subsection{Global Loop Nest Parallelization}
 
 %%@UserManualDocumentation: nest_parallelization
@@ -4662,25 +4682,6 @@ expressions such as \lstinline|a=b[2]+2| into \lstinline|i=b[2];a=i+2|.
 \begin{PipsProp}
 SIMD_EXTRAVAGANT_ATOMIZER FALSE
 \end{PipsProp}
-
-
-\subsection{Coarse Grain Parallelization}
-\label{subsubsection-coarse-grain-parallelization}
-
-%%@UserManualDocumentation: coarse_grain_parallelization
-Function \verb+coarse_grain_parallelization+ implements a loop parallelization
-algorithm based on array regions. It considers only one loop at a time, its
-body being abstracted by its invariant read and write regions. No loop
-distribution is performed, but any kind of loop body is acceptable
-whereas \textsc{Allen} \& \textsc{Kennedy} algorithm only copes with very simple loop bodies.
-%%!UserManualDocumentation
-
-\begin{PipsMake}
-coarse_grain_parallelization > MODULE.parallelized_code
-        < PROGRAM.entities
-        < MODULE.code
-        < MODULE.inv_regions
-\end{PipsMake}
 
 
 \section{Code Distribution}
