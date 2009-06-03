@@ -18,6 +18,7 @@ LIB_CFILES =	contrainte_to_text.c \
 		bound_generation.c \
 		entity.c \
 		variable.c \
+		instruction.c \
 		statement.c \
 		expression.c \
 		type.c \

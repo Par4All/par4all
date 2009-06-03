@@ -116,7 +116,7 @@ statement rice_loop(statement stat,
 
   if ((region = distributable_loop(stat)) == set_undefined) {
     int so = statement_ordering(stat);
-    user_warning("rice_loop", 
+    user_warning("rice_loop",
 		 "Cannot apply Allen & Kennedy's algorithm on "
 		 "loop %s with index %s at Statement %d (%d, %d)"
 		 " because it contains either tests or goto statements"
@@ -128,7 +128,7 @@ statement rice_loop(statement stat,
 		 ORDERING_NUMBER(so), ORDERING_STATEMENT(so));
 
     enclosing++ ;
-    loop_body(instruction_loop(istat)) = 
+    loop_body(instruction_loop(istat)) =
       rice_statement(loop_body(instruction_loop(istat)),l+1,codegen_fun);
     enclosing-- ;
     return(stat);
@@ -142,10 +142,10 @@ statement rice_loop(statement stat,
   set_enclosing_loops_map( loops_mapping_of_statement(stat) );
   /* to deal with empty loops */
   if (instruction_loop_p(istat)
-      && continue_statement_p(b = perfectly_nested_loop_to_body(stat))) {
+      && empty_statement_or_continue_p(b = perfectly_nested_loop_to_body(stat))) {
     /* The code generation procedure avoid building nest around
-       continue statements. However, when there is only one continue,
-       Ronan Keryell would like to see parallel loop around it.
+       continue or empty statements. However, even in this case,
+       Ronan Keryell would like to see parallel loop around it for completeness.
 
        It seemed easier to modify temporarily the input statement
        rather than finding out in the generation process when continue
@@ -169,9 +169,9 @@ statement rice_loop(statement stat,
     call_function(instruction_call(statement_instruction(b))) = cont;
     call_function(c) = cont;
   }
-  else 
+  else
     nstat = codegen_fun(stat, dg, region, l, TRUE);
-	
+
   ifdebug(7){
     pips_debug(7, "consistency checking for CodeGenerate output: ");
     if (statement_consistent_p(nstat))

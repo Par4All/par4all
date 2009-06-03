@@ -199,16 +199,11 @@ reference r;
     return e;
 }
 
-expression MakeBinaryCall(f, eg, ed)
-entity f;
-expression eg, ed;
-{
-  call c =  make_call(f, CONS(EXPRESSION, eg, CONS(EXPRESSION, ed, NIL)));
 
-  return(make_expression(make_syntax(is_syntax_call, c),
-			 normalized_undefined));
-}
+/* Build an expression that call a function or procedure.
 
+   @param c is the call
+ */
 expression call_to_expression(c)
 call c;
 {
@@ -216,22 +211,66 @@ call c;
 			   normalized_undefined);
 }
 
-expression make_call_expression(e, l)
-entity e;
-list l;
-{
-    return(call_to_expression(make_call(e, l)));
+
+/* Build an expression that call an function entity with an argument list.
+
+   @param e is the function entity to call
+   @param l is the list of argument expressions given to the function to call
+ */
+expression make_call_expression(entity e, list l) {
+  return call_to_expression(make_call(e, l));
 }
 
-expression MakeTernaryCallExpr(f, e1, e2, e3)
-entity f;
-expression e1,e2,e3;
-{
-    return(make_call_expression(f,
-	       CONS(EXPRESSION, e1,
-	       CONS(EXPRESSION, e2,
-	       CONS(EXPRESSION, e3,
-		    NULL)))));
+
+/* Creates a call expression to a function with zero arguments.
+
+  @param f is the function entity to call
+  */
+expression
+MakeNullaryCall(entity f) {
+  return make_call_expression(f, NIL);
+}
+
+
+/* Creates a call expression to a function with one argument.
+
+   @param f is the function entity to call
+   @param a is the argument expression given to the function to call
+ */
+expression
+MakeUnaryCall(entity f, expression a) {
+  return make_call_expression(f, CONS(EXPRESSION, a, NIL));
+}
+
+
+/* Creates a call expression to a function with 2 arguments.
+
+   @param f is the function entity to call
+   @param eg is the first argument expression given to the function to call
+   @param ed is the second argument expression given to the function to call
+ */
+expression MakeBinaryCall(entity f, expression eg, expression ed) {
+  return make_call_expression(f, CONS(EXPRESSION, eg,
+				      CONS(EXPRESSION, ed, NIL)));
+}
+
+
+/* Creates a call expression to a function with 3 arguments.
+
+   @param f is the function entity to call
+   @param e1 is the first argument expression given to the function to call
+   @param e2 is the second argument expression given to the function to call
+   @param e3 is the second argument expression given to the function to call
+ */
+expression MakeTernaryCallExpr(entity f,
+			       expression e1,
+			       expression e2,
+			       expression e3) {
+  return make_call_expression(f,
+			      CONS(EXPRESSION, e1,
+				   CONS(EXPRESSION, e2,
+					CONS(EXPRESSION, e3,
+					     NIL))));
 }
 
 
@@ -248,7 +287,7 @@ expression e1,e2,e3;
 expression
 make_assign_expression(expression lhs,
 		       expression rhs) {
-  /* RK: this assert should be relax to deal with *p and so on.
+  /* RK: this assert should be relaxed to deal with *p and so on.
      pips_assert("Need a reference as lhs", expression_reference_p(lhs)); */
   return MakeBinaryCall(CreateIntrinsic(ASSIGN_OPERATOR_NAME), lhs, rhs);
 }

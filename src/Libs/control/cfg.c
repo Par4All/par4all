@@ -89,7 +89,7 @@ unstructured_consistency_p(unstructured u, bool assert_p)
     if(consistency_p && ENDP(control_predecessors(exit_node))) {
 	statement exit_s = control_statement(exit_node);
 
-	if(!statement_continue_p(exit_s)) {
+	if(!continue_statement_p(exit_s)) {
 	    consistency_p = FALSE;
 	    if(assert_p) pips_assert("Unreachable exit node is a CONTINUE statement", FALSE);
 	}

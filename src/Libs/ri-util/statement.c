@@ -77,30 +77,6 @@ empty_code_list_p(list l)
     return TRUE;
 }
 
-/**************************************************************** FLATTENING */
-
-/* flatten if necessary. 
-   detects sequences of sequences and reorder as one sequence.
-   some memory leaks.
- */
-void flatten_block_if_necessary(instruction i)
-{
-  if (instruction_block_p(i))
-  {
-    list ls = NIL;
-    MAP(STATEMENT, s, {
-      instruction ib = statement_instruction(s);
-      if (instruction_block_p(ib))
-	ls = gen_nconc(ls, instruction_block(ib));
-      else
-	ls = gen_nconc(ls, CONS(STATEMENT, s, NIL));
-    },
-      instruction_block(i));
-    gen_free_list(instruction_block(i));
-    instruction_block(i) = ls;
-  }
-}
-
 /*************************************************************** COUNT LOOPS */
 
 static int nseq, npar;
@@ -156,75 +132,66 @@ empty_comments_p(string s)
   return (s == NULL || string_undefined_p(s));
 }
 
-/* PREDICATES ON STATEMENTS */
+/** @defgroup statements_p Predicates on statements
 
-bool 
-empty_statement_p(st)
-statement st;
-{
-    instruction i;
+    @{
+*/
 
-    return(entity_empty_label_p(statement_label(st)) &&
-	   instruction_block_p(i=statement_instruction(st)) &&
-	   ENDP(instruction_block(i)) &&
-	   ENDP(statement_declarations(st)));
+
+/* Test if a statement is an assignment. */
+bool
+assignment_statement_p(statement s) {
+  instruction i = statement_instruction(s);
+
+  return instruction_assign_p(i);
 }
 
-bool 
-assignment_statement_p(s)
-statement s;
-{
-    instruction i = statement_instruction(s);
 
-    return (fortran_instruction_p(i, ASSIGN_OPERATOR_NAME));
-}
-
-bool return_instruction_p(instruction i)
-{
-  return fortran_instruction_p(i, RETURN_FUNCTION_NAME)
-    || fortran_instruction_p(i, C_RETURN_FUNCTION_NAME);
-}
-
-bool return_statement_p(statement s)
-{
+/* Test if a statement is a "return" */
+bool return_statement_p(statement s) {
   instruction i = statement_instruction(s);
   return return_instruction_p(i);
 }
 
-bool 
-continue_statement_p(s)
-statement s;
-{
-    instruction i = statement_instruction(s);
 
-    return (fortran_instruction_p(i, CONTINUE_FUNCTION_NAME));
+/* Test if a statement is a CONTINUE, that is the FORTRAN nop, the ";" in
+   C or the "pass" in Python... according to the language.
+*/
+bool
+continue_statement_p(statement s) {
+  instruction i = statement_instruction(s);
+
+  return instruction_continue_p(i);
 }
 
-bool 
-stop_statement_p(s)
-statement s;
-{
-    instruction i = statement_instruction(s);
 
-    return (fortran_instruction_p(i, STOP_FUNCTION_NAME));
+/* Test if a statement is a Fortran STOP.
+*/
+bool
+stop_statement_p(statement s) {
+  instruction i = statement_instruction(s);
+
+  return instruction_stop_p(i);
 }
 
-bool 
-format_statement_p(s)
-statement s;
-{
-    instruction i = statement_instruction(s);
 
-    return (fortran_instruction_p(i, FORMAT_FUNCTION_NAME));
+/* Test if a statement is a Fortran FROMAT.
+*/
+bool
+format_statement_p(statement s) {
+  instruction i = statement_instruction(s);
+
+  return instruction_format_p(i);
 }
 
-bool 
+
+bool
 write_statement_p(s)
 statement s;
 {
     instruction i = statement_instruction(s);
 
-    return (fortran_instruction_p(i, WRITE_FUNCTION_NAME));
+    return (native_instruction_p(i, WRITE_FUNCTION_NAME));
 }
 
 bool 
@@ -310,13 +277,19 @@ unstructured_statement_p(statement s)
     return(instruction_unstructured_p(statement_instruction(s)));
 }
 
-/* This function should not be used ! See continue_statement_p() */
+/* Test if a statement is empty. */
 bool
-statement_continue_p(s)
-statement s;
+empty_statement_p(st)
+statement st;
 {
-    return continue_statement_p(s);
+    instruction i;
+
+    return(entity_empty_label_p(statement_label(st)) &&
+	   instruction_block_p(i=statement_instruction(st)) &&
+	   ENDP(instruction_block(i)) &&
+	   ENDP(statement_declarations(st)));
 }
+
 
 bool
 unlabelled_statement_p(st)
@@ -512,24 +485,9 @@ statement stat;
 
     return FALSE;
 }
-
-/* checks that a block is a list of assignments, possibly followed by
-   a continue */
-bool 
-assignment_block_p(i)
-instruction i;
-{
-    MAPL(cs,
-     {
-	 statement s = STATEMENT(CAR(cs));
 
-	 if(!assignment_statement_p(s))
-	     if(!(continue_statement_p(s) && ENDP(CDR(cs)) ))
-		 return FALSE;
-     },
-	 instruction_block(i));
-    return TRUE;
-}
+/** @} */
+
 
 /* functions to generate statements */
 
@@ -739,22 +697,12 @@ insure_return_as_last_statement(
     }
 }
 
-instruction 
-make_continue_instruction()
-{
-    entity called_function;
 
-    called_function = entity_intrinsic(CONTINUE_FUNCTION_NAME);
-    return make_instruction(is_instruction_call,
-			    make_call(called_function,NIL));
-}
-
-
-statement 
+statement
 make_continue_statement(l)
 entity l;
 {
-    return make_call_statement(CONTINUE_FUNCTION_NAME, NIL, l, 
+    return make_call_statement(CONTINUE_FUNCTION_NAME, NIL, l,
 			       empty_comments);
 }
 
@@ -791,44 +739,8 @@ statement make_whileloop_statement(expression condition,
   return smt;
 }
 
-
 
-
-instruction 
-MakeUnaryCallInst(f,e)
-entity f;
-expression e;
-{
-    return(make_instruction(is_instruction_call,
-			    make_call(f, CONS(EXPRESSION, e, NIL))));
-}
-
-/* this function creates a call to a function with zero arguments.  */
-
-expression 
-MakeNullaryCall(f)
-entity f;
-{
-    return(make_expression(make_syntax(is_syntax_call, make_call(f, NIL)),
-			   normalized_undefined));
-}
-
-
-/* this function creates a call to a function with one argument. */
-
-expression 
-MakeUnaryCall(f, a)
-entity f;
-expression a;
-{
-  call c =  make_call(f, CONS(EXPRESSION, a, NIL));
-
-  return(make_expression(make_syntax(is_syntax_call, c),
-			 normalized_undefined));
-}
-
-
-statement 
+statement
 make_call_statement(function_name, args, l, c)
 string function_name;
 list args;
@@ -858,10 +770,11 @@ string c; /* comments, default empty_comments (was: "" (was: string_undefined)) 
 
   return cs;
 }
-
-/* */
 
-statement 
+
+/* Extract the body of a perfectly nested loop body.
+ */
+statement
 perfectly_nested_loop_to_body(loop_nest)
 statement loop_nest;
 {
@@ -872,17 +785,22 @@ statement loop_nest;
     case is_instruction_call:
     case is_instruction_whileloop:
     case is_instruction_test:
+      /* By hypothesis we are in a perfectly nested loop and since it is
+	 not a loop, we've reached the loop body: */
         return loop_nest;
 
     case is_instruction_block: {
 	list lb = instruction_block(ins);
+	if (lb == NIL)
+	  /* The loop body is an empty block, such as { } in C: */
+	  return loop_nest;
 	statement first_s = STATEMENT(CAR(lb));
 	instruction first_i = statement_instruction(first_s);
 
 	if(instruction_call_p(first_i))
 	    return loop_nest;
 	else {
-	    if(instruction_block_p(first_i)) 
+	    if(instruction_block_p(first_i))
 		return perfectly_nested_loop_to_body(STATEMENT(CAR(instruction_block(first_i))));
 	    else {
 		pips_assert("perfectly_nested_loop_to_body",
@@ -891,8 +809,9 @@ statement loop_nest;
 	    }
 	}
 	break;
-    } 
+    }
     case is_instruction_loop: {
+      /* It is another loop: dig into it to reach the loop body: */
 	statement sbody = loop_body(instruction_loop(ins));
 	return (perfectly_nested_loop_to_body(sbody));
 	break;
@@ -906,7 +825,7 @@ statement loop_nest;
 
 /* Direct accesses to second level fields */
 
-loop 
+loop
 statement_loop(s)
 statement s;
 {
@@ -915,7 +834,7 @@ statement s;
     return(instruction_loop(statement_instruction(s)));
 }
 
-test 
+test
 statement_test(s)
 statement s;
 {
@@ -941,61 +860,7 @@ statement s;
 
     return(instruction_block(statement_instruction(s)));
 }
-
-/* predicates on instructions */
 
-bool 
-instruction_assign_p(i)
-instruction i;
-{
-    return fortran_instruction_p(i, ASSIGN_OPERATOR_NAME);
-}
-
-bool 
-instruction_continue_p(i)
-instruction i;
-{
-    return fortran_instruction_p(i, CONTINUE_FUNCTION_NAME);
-}
-
-bool 
-instruction_is_return_p(i)
-instruction i;
-{
-    return fortran_instruction_p(i, RETURN_FUNCTION_NAME);
-}
-
-bool 
-instruction_stop_p(i)
-instruction i;
-{
-    return fortran_instruction_p(i, STOP_FUNCTION_NAME);
-}
-
-bool 
-instruction_format_p(i)
-instruction i;
-{
-    return fortran_instruction_p(i, FORMAT_FUNCTION_NAME);
-}
-
-bool 
-fortran_instruction_p(i, s)
-instruction i;
-string s;
-{
-  bool call_s_p = FALSE;
-
-    if (instruction_call_p(i)) {
-	call c = instruction_call(i);
-	entity f = call_function(c);
-
-	if (strcmp(entity_user_name(f), s) == 0)
-	  call_s_p = TRUE;
-    }
-
-    return call_s_p;
-}
 
 /*
   returns the numerical value of loop l increment expression.
@@ -1401,63 +1266,6 @@ statement stmt;
 	return (block_stmt);
     }
     return (stmt);
-}
-
-/* Does not work for undefined instructions */
-
-string 
-instruction_identification(instruction i)
-{
-    string instrstring = NULL;
-
-    switch (instruction_tag(i))
-    {
-    case is_instruction_loop:
-	instrstring="DO LOOP";
-	break;
-    case is_instruction_whileloop:
-	instrstring="WHILE LOOP";
-	break;
-    case is_instruction_test:
-	instrstring="TEST";
-	break;
-    case is_instruction_goto:
-	instrstring="GOTO";
-	break;
-    case is_instruction_call:
-    {if(fortran_instruction_p(i, CONTINUE_FUNCTION_NAME))
-	instrstring="CONTINUE";
-    else if(fortran_instruction_p(i, RETURN_FUNCTION_NAME))
-	instrstring="RETURN";
-    else if(fortran_instruction_p(i, STOP_FUNCTION_NAME))
-	instrstring="STOP";
-    else if(fortran_instruction_p(i, FORMAT_FUNCTION_NAME))
-	instrstring="FORMAT";
-    else if(fortran_instruction_p(i, ASSIGN_OPERATOR_NAME))
-	instrstring="ASSIGN";
-    else {
-	instrstring="CALL";
-    }
-    break;
-    }
-    case is_instruction_block:
-	instrstring="BLOCK";
-	break;
-    case is_instruction_unstructured:
-	instrstring="UNSTRUCTURED";
-	break;
-    case is_instruction_forloop:
-      instrstring="FOR LOOP";
-      break;
-    case is_instruction_expression:
-      instrstring="EXPRESSION";
-      break;
-    default: pips_error("instruction_identification",
-			"ill. instruction tag %d\n", 
-			instruction_tag(i));
-    }
-
-    return instrstring;
 }
 
 /* Does work neither with undefined statements nor with defined

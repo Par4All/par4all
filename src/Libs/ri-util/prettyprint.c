@@ -2755,12 +2755,12 @@ text_block_if(
     if (!statement_with_empty_comment_p(test_false_obj)
 	||
 	(!empty_statement_p(test_false_obj)
-	 && !statement_continue_p(test_false_obj))
+	 && !continue_statement_p(test_false_obj))
 	||
 	(empty_statement_p(test_false_obj)
 	 && (get_bool_property("PRETTYPRINT_EMPTY_BLOCKS")))
 	||
-	(statement_continue_p(test_false_obj)
+	(continue_statement_p(test_false_obj)
 	 && (get_bool_property("PRETTYPRINT_ALL_LABELS"))))
       {
         else_branch_p = TRUE;
@@ -2881,12 +2881,12 @@ text_block_else(
   if (!statement_with_empty_comment_p(stmt)
       ||
       (!empty_statement_p(stmt)
-       && !statement_continue_p(stmt))
+       && !continue_statement_p(stmt))
       ||
       (empty_statement_p(stmt)
        && (get_bool_property("PRETTYPRINT_EMPTY_BLOCKS")))
       ||
-      (statement_continue_p(stmt)
+      (continue_statement_p(stmt)
        && (get_bool_property("PRETTYPRINT_ALL_LABELS"))))
     {
       //code added by Amira Mensi
@@ -2978,7 +2978,7 @@ text_test(
        && statement_call_p(tb)
        && entity_empty_label_p(statement_label(tb))
        && empty_comments_p(statement_comments(tb))
-       && !statement_continue_p(tb)
+       && !continue_statement_p(tb)
        && !get_bool_property("PRETTYPRINT_BLOCK_IF_ONLY")
        && !(call_contains_alternate_returns_p(statement_call(tb))
 	    && get_bool_property("PRETTYPRINT_REGENERATE_ALTERNATE_RETURNS"))) {

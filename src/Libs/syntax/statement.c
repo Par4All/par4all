@@ -573,7 +573,7 @@ bool number_it;
 	    if(!ENDP(CDR(instruction_block(new_i)))) {
 	      ss = STATEMENT(CAR(CDR(instruction_block(new_i))));
 
-	      if(statement_continue_p(fs) && statement_loop_p(ss))
+	      if(continue_statement_p(fs) && statement_loop_p(ss))
 		cs = ss;
 	      else
 		cs = fs;
