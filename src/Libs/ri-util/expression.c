@@ -549,6 +549,20 @@ expression e ;
     return(FALSE);
 }
 
+bool comma_expression_p(expression e)
+{
+  bool result = FALSE;
+
+  if (expression_call_p(e)) {
+    call c = syntax_call(expression_syntax(e));
+    entity f = call_function(c);
+
+    result = ENTITY_COMMA_P(f);
+  }
+
+  return result;
+}
+
 bool expression_list_directed_p(e)
 expression e ;
 {

@@ -1121,6 +1121,11 @@ basic_of_intrinsic(call c, bool apply_p, bool ultimate_p)
       free_basic(rb);
       rb = basic_of_expression(EXPRESSION(CAR(CDR(args))));
     }
+    else if(ENTITY_COMMA_P(f)) {
+      /* The value returned is the value of the last expression in the list. */
+      free_basic(rb);
+      rb = basic_of_expression(EXPRESSION(CAR(gen_last(args))));
+    }
     else {
       free_basic(rb);
       rb = basic_of_expression(EXPRESSION(CAR(args)));

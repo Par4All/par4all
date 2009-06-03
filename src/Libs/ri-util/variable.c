@@ -1121,31 +1121,33 @@ bool call_contains_alternate_returns_p(call c)
 }
 
 /*
- *create a new entity for a new index variable
+ * create a new entity for a new index variable with a name similar to
+ * the old index name, and with the same type, declare it in the
+ * current module and allocate it.
  */
 entity make_new_index_entity(entity old_index, string suffix)
 {
-	entity new_index;
-	string old_name;
-	char *new_name=NULL;
+  entity new_index;
+  string old_name;
+  char *new_name=NULL;
 
-	old_name = entity_name(old_index);
+  old_name = entity_name(old_index);
 
-	/* add a terminal p till a new name is found. */
-	for (asprintf(&new_name, "%s%s", old_name, suffix);
-			gen_find_tabulated(new_name, entity_domain)!=entity_undefined; 
+  /* add a terminal p till a new name is found. */
+  for (asprintf(&new_name, "%s%s", old_name, suffix);
+       gen_find_tabulated(new_name, entity_domain)!=entity_undefined; 
 
-			old_name = new_name) {
-		free(new_name);
-		asprintf(&new_name, "%s%s", old_name, suffix);
-	}
+       old_name = new_name) {
+    free(new_name);
+    asprintf(&new_name, "%s%s", old_name, suffix);
+  }
 
-	// FI: copy_storage() cree de l'aliasing entre new_index et old_index
-	// Is this the right place to fix the problem?
-	new_index = make_entity(new_name,
-			copy_type(entity_type(old_index)),
-			storage_undefined,
-			copy_value(entity_initial(old_index)));
-	AddEntityToCurrentModule(new_index);
-	return(new_index);
+  // FI: copy_storage() cree de l'aliasing entre new_index et old_index
+  // Is this the right place to fix the problem?
+  new_index = make_entity(new_name,
+			  copy_type(entity_type(old_index)),
+			  storage_undefined,
+			  copy_value(entity_initial(old_index)));
+  AddEntityToCurrentModule(new_index);
+  return(new_index);
 }
