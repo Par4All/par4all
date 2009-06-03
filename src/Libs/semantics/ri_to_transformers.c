@@ -400,7 +400,7 @@ intrinsic_to_transformer(
   return tf;
 }
 
-static transformer user_call_to_transformer(entity, list, list);
+static transformer user_call_to_transformer(entity, list, transformer, list);
 
 static transformer 
 call_to_transformer(call c, transformer pre, list ef) /* effects of call c */
@@ -422,7 +422,7 @@ call_to_transformer(call c, transformer pre, list ef) /* effects of call c */
       type rt = ultimate_type(functional_result(type_functional(et)));
 
       if(type_void_p(rt)) {
-      tf = user_call_to_transformer(e, pc, ef);
+	tf = user_call_to_transformer(e, pc, pre, ef);
       reset_temporary_value_counter();
       }
       else {
@@ -511,7 +511,9 @@ user_function_call_to_transformer(
 		!entity_undefined_p(rv));
 
     /* Build a transformer reflecting the call site */
-    t_caller = user_call_to_transformer(f, pc, ef);
+    /* Too bad the precondition is not passed down to evaluate the
+     actual argument expressions...  To be changed in the C version*/
+    t_caller = user_call_to_transformer(f, pc, transformer_undefined, ef);
 
     ifdebug(8) {
       pips_debug(8, "Transformer %p for callee %s:\n",
@@ -687,17 +689,93 @@ transformer_intra_to_inter(
   return ftf;
 }
 
+static transformer c_user_call_to_transformer(entity f,
+					      list pc,
+					      transformer pre,
+					      list __attribute__ ((unused)) ef)
+{
+  transformer cpre = transformer_undefined_p(pre)?
+    transformer_identity() : copy_transformer(pre);
+  transformer tf = transformer_identity();
+  type ft = ultimate_type(entity_type(f));
+  functional fft = type_functional(ft); // proper assert checked earlier
+  list pl = functional_parameters(fft);
+  list cpl = pl; // to simplify debugging
+  int n = 1; /* Formal parameters are counted 1, 2, 3,...*/
+  list fpvl = NIL; // list of formal parameter values
+  transformer t_callee = load_summary_transformer(f);
+
+  if(gen_length(cpl)!=gen_length(pc))
+    pips_user_error("Different numbers of actual and formal parameters for function \"%s\"\n",
+		    entity_user_name(f));
+
+  /* Evaluate actual arguments from left to right linking it to a
+     functional parameter when possible */
+  FOREACH(EXPRESSION,e, pc) {
+    type fpt = parameter_type(PARAMETER(CAR(cpl)));  // formal parameter type
+    type apt = expression_to_type(e); // actual parameter type
+    entity fpv = find_ith_parameter(f, n); // formal parameter variable (and value)
+    /* Because we are using the caller's framework, we cannot use the
+       new/old value naming in the callee's framework
+
+       entity fpvv = entity_to_new_value(fpv);
+
+       Let's cheat: we know fpvv would be fpv. Furthermore, the formal
+       parameter cannot be updated in C because of the value passing
+       mode.
+    */
+    basic b = basic_of_expression(e);
+
+    if(analyzable_scalar_entity_p(fpv)) {
+      if(type_equal_p(fpt, apt)) {
+	/* Keep track of fpv to project it later */
+	fpvl = CONS(ENTITY, fpv, fpvl);
+      }
+      else
+	pips_user_error("Type incompatibility between call site and declaration"
+			" for %d argument of function %s\n", n, entity_user_name(f));
+    }
+    else {
+      /* The associated transformer may nevertheless carry useful information */
+      fpv = make_local_temporary_value_entity_with_basic(b); 
+    }
+
+    transformer ctf = 
+      // FI: I'm at a lost with this flag
+      //safe_any_expression_to_transformer(fpv, e, cpre, TRUE);
+      safe_any_expression_to_transformer(fpv, e, cpre, FALSE);
+    transformer npre = transformer_undefined;
+
+    tf = transformer_combine(tf, ctf);
+    npre = transformer_apply(ctf, cpre);
+    free_transformer(cpre);
+    cpre = npre;
+    POP(cpl);
+    n++;
+    free_type(apt);
+    free_basic(b);
+  }
+
+  /* Combine tf with the summary transformer */
+  tf = transformer_combine(tf, t_callee);
+
+  /* Project the former parameters and the temporary values. */
+  tf = transformer_projection(tf, fpvl);
+  gen_free_list(fpvl);
+  tf = transformer_temporary_value_projection(tf);
+
+  return tf;
+}
+
 /* Effects are necessary to clean up the transformer t_caller. For
    instance, an effect on variable X may not be taken into account in
    t_callee but it may be equivalenced thru a common to a variable i which
    is analyzed in the caller. If X is written, I value is lost. See
    Validation/equiv02.f. */
 
-static transformer 
-user_call_to_transformer(
-    entity f,
-    list pc,
-    list ef)
+static transformer fortran_user_call_to_transformer(entity f,
+						    list pc,
+						    list ef)
 {
   transformer t_callee = transformer_undefined;
   transformer t_caller = transformer_undefined;
@@ -706,179 +784,165 @@ user_call_to_transformer(
   list all_args = list_undefined;
 
   pips_debug(8, "begin\n");
-  pips_assert("f is a module", entity_module_p(f));
 
-  pips_user_warning("Side effects in actual arguments are not yet taken into account\n."
-		    "Meanwhile, atomize the call site to avoid the problem.\n");
+  /* add equations linking formal parameters to argument expressions
+     to transformer t_callee and project along the formal parameters */
+  /* for performance, it  would be better to avoid building formals
+     and to inline entity_to_formal_parameters */
+  /* it wouls also be useful to distinguish between in and out
+     parameters; I'm not sure the information is really available
+     in a field ??? */
+  list formals = module_to_formal_analyzable_parameters(f);
+  list formals_new = NIL;
+  cons * ce;
 
-  if(!get_bool_property(SEMANTICS_INTERPROCEDURAL)) {
-    /*
-      pips_user_warning(
-      "unknown interprocedural transformer for %s\n",
-      entity_local_name(f));
-    */
-    t_caller = effects_to_transformer(ef);
+  t_callee = load_summary_transformer(f);
+
+  ifdebug(8) {
+    Psysteme s = 
+      (Psysteme) predicate_system(transformer_relation(t_callee));
+    pips_debug(8, "Transformer for callee %s:\n", 
+	       entity_local_name(f));
+    dump_transformer(t_callee);
+    sc_fprint(stderr, s, (char * (*)(Variable)) dump_value_name);
   }
-  else {
-    /* add equations linking formal parameters to argument expressions
-       to transformer t_callee and project along the formal parameters */
-    /* for performance, it  would be better to avoid building formals
-       and to inline entity_to_formal_parameters */
-    /* it wouls also be useful to distinguish between in and out
-       parameters; I'm not sure the information is really available
-       in a field ??? */
-    list formals = module_to_formal_analyzable_parameters(f);
-    list formals_new = NIL;
-    cons * ce;
 
-    t_callee = load_summary_transformer(f);
+  t_caller = transformer_dup(t_callee);
 
-    ifdebug(8) {
-      Psysteme s = 
-	(Psysteme) predicate_system(transformer_relation(t_callee));
-      pips_debug(8, "Transformer for callee %s:\n", 
-		 entity_local_name(f));
-      dump_transformer(t_callee);
-      sc_fprint(stderr, s, (char * (*)(Variable)) dump_value_name);
+  /* take care of analyzable formal parameters */
+
+  for( ce = formals; !ENDP(ce); POP(ce)) {
+    entity fp = ENTITY(CAR(ce));
+    int r = formal_offset(storage_formal(entity_storage(fp)));
+    expression expr = find_ith_argument(pc, r);
+
+    if(expr == expression_undefined)
+      pips_user_error("not enough args for %d formal parm."
+		      " %s in call to %s from %s\n",
+		      r, entity_local_name(fp), entity_local_name(f),
+		      get_current_module_entity());
+    else {
+      /* type checking. You already know that fp is a scalar variable */
+      type tfp = entity_type(fp);
+      basic bfp = variable_basic(type_variable(tfp));
+      basic bexpr = basic_of_expression(expr);
+      list l_eff = expression_to_proper_effects(expr);
+
+      if(effects_write_at_least_once_p(l_eff)) {
+	pips_user_warning("Side effects in actual arguments are not yet taken into account\n."
+			  "Meanwhile, atomize the call site to avoid the problem.\n");
+      }
+      gen_free_list(l_eff);
+
+      if(!basic_equal_p(bfp, bexpr)) {
+	pips_user_warning("Type incompatibility\n(formal %s/actual %s)"
+			  "\nfor formal parameter %s (rank %d)"
+			  "\nin call to %s from %s\n",
+			  basic_to_string(bfp), basic_to_string(bexpr),
+			  entity_local_name(fp), r, module_local_name(f),
+			  module_local_name(get_current_module_entity()));
+	continue;
+      }
     }
 
-    t_caller = transformer_dup(t_callee);
+    if(entity_is_argument_p(fp, transformer_arguments(t_callee))) {
+      /* formal parameter e is modified. expr must be a reference */
+      syntax sexpr = expression_syntax(expr);
 
-    /* take care of analyzable formal parameters */
+      if(syntax_reference_p(sexpr)) {
+	entity ap = reference_variable(syntax_reference(sexpr));
 
-    for( ce = formals; !ENDP(ce); POP(ce)) {
-      entity fp = ENTITY(CAR(ce));
-      int r = formal_offset(storage_formal(entity_storage(fp)));
-      expression expr = find_ith_argument(pc, r);
+	if(entity_has_values_p(ap)) {
+	  Psysteme s = (Psysteme) predicate_system(transformer_relation(t_caller));
+	  entity ap_new = entity_to_new_value(ap);
+	  entity ap_old = entity_to_old_value(ap);
 
-      if(expr == expression_undefined)
-	pips_user_error("not enough args for %d formal parm."
-			" %s in call to %s from %s\n",
-			r, entity_local_name(fp), entity_local_name(f),
-			get_current_module_entity());
-      else {
-	/* type checking. You already know that fp is a scalar variable */
-	type tfp = entity_type(fp);
-	basic bfp = variable_basic(type_variable(tfp));
-	basic bexpr = basic_of_expression(expr);
-	list l_eff = expression_to_proper_effects(expr);
-
-	if(effects_write_at_least_once_p(l_eff)) {
-	  pips_user_warning("Side effects in actual arguments are not yet taken into account\n."
-			    "Meanwhile, atomize the call site to avoid the problem.\n");
-	}
-	gen_free_list(l_eff);
-
-	if(!basic_equal_p(bfp, bexpr)) {
-	  pips_user_warning("Type incompatibility\n(formal %s/actual %s)"
-			    "\nfor formal parameter %s (rank %d)"
-			    "\nin call to %s from %s\n",
-			    basic_to_string(bfp), basic_to_string(bexpr),
-			    entity_local_name(fp), r, module_local_name(f),
-			    module_local_name(get_current_module_entity()));
-	  continue;
-	}
-      }
-
-      if(entity_is_argument_p(fp, transformer_arguments(t_callee))) {
-	/* formal parameter e is modified. expr must be a reference */
-	syntax sexpr = expression_syntax(expr);
-
-	if(syntax_reference_p(sexpr)) {
-	  entity ap = reference_variable(syntax_reference(sexpr));
-
-	  if(entity_has_values_p(ap)) {
-	    Psysteme s = (Psysteme) predicate_system(transformer_relation(t_caller));
-	    entity ap_new = entity_to_new_value(ap);
-	    entity ap_old = entity_to_old_value(ap);
-
-	    if(base_contains_variable_p(s->base, (Variable) ap_new)) {
-	      pips_user_error(
-			      "Variable %s seems to be aliased thru variable %s"
-			      " at a call site to %s in %s\n"
-			      "PIPS semantics analysis assumes no aliasing as"
-			      " imposed by the Fortran standard.\n",
-			      entity_name(fp),
-			      entity_name(value_to_variable(ap_new)),
-			      module_local_name(f),
-			      get_current_module_name());
-	    }
-	    else { /* normal case: ap_new==fp_new, ap_old==fp_old */
-	      entity fp_new = external_entity_to_new_value(fp);
-	      entity fp_old = external_entity_to_old_value(fp);
-
-	      t_caller = transformer_value_substitute
-		(t_caller, fp_new, ap_new);
-	      t_caller = transformer_value_substitute
-		(t_caller, fp_old, ap_old);
-	    }
+	  if(base_contains_variable_p(s->base, (Variable) ap_new)) {
+	    pips_user_error(
+			    "Variable %s seems to be aliased thru variable %s"
+			    " at a call site to %s in %s\n"
+			    "PIPS semantics analysis assumes no aliasing as"
+			    " imposed by the Fortran standard.\n",
+			    entity_name(fp),
+			    entity_name(value_to_variable(ap_new)),
+			    module_local_name(f),
+			    get_current_module_name());
 	  }
-	  else { /* Variable ap is not analyzed. The information about fp
-                    will be lost. */
-	    ;
+	  else { /* normal case: ap_new==fp_new, ap_old==fp_old */
+	    entity fp_new = external_entity_to_new_value(fp);
+	    entity fp_old = external_entity_to_old_value(fp);
+
+	    t_caller = transformer_value_substitute
+	      (t_caller, fp_new, ap_new);
+	    t_caller = transformer_value_substitute
+	      (t_caller, fp_old, ap_old);
 	  }
 	}
-	else {
-	  /* Attemps at modifying a value: expr is call, fp is modified */
-	  /* Actual argument is not a reference: it might be a user error!
-	   * Transformers do not carry the may/must information.
-	   * A check with effect list ef should be performed...
-	   *
-	   * FI: does effect computation emit a MUST/MAYwarning?
-	   */
-	  entity fp_new = external_entity_to_new_value(fp);
-	  entity fp_old = external_entity_to_old_value(fp);
-	  list args = arguments_add_entity(arguments_add_entity(NIL, fp_new), fp_old);
-			
-	  pips_user_warning("value (!) might be modified by call to %s\n"
-			    "%dth formal parameter %s\n",
-			    entity_local_name(f), r, entity_local_name(fp));
-	  t_caller = transformer_filter(t_caller, args);
-	  free_arguments(args);
+	else { /* Variable ap is not analyzed. The information about fp
+		  will be lost. */
+	  ;
 	}
       }
       else {
-	/* Formal parameter fp is not modified. Add fp == expr, if possible. */
-	/* We should evaluate expr under a precondition pre... which has
-	   not been passed down. We set pre==tf_undefined. */
+	/* Attemps at modifying a value: expr is call, fp is modified */
+	/* Actual argument is not a reference: it might be a user error!
+	 * Transformers do not carry the may/must information.
+	 * A check with effect list ef should be performed...
+	 *
+	 * FI: does effect computation emit a MUST/MAYwarning?
+	 */
 	entity fp_new = external_entity_to_new_value(fp);
-	transformer t_expr = any_expression_to_transformer(fp_new, expr,
-							   transformer_undefined,
-							   FALSE);
-
-	if(!transformer_undefined_p(t_expr)) {
-	  t_expr = transformer_temporary_value_projection(t_expr);
-	  /* temporary value counter cannot be reset because other
-             temporary values may be in use in a case the user call is a
-             user function call */
-	  /* reset_temporary_value_counter(); */
-	  t_caller = transformer_safe_image_intersection(t_caller, t_expr);
-	  free_transformer(t_expr);
-	}
+	entity fp_old = external_entity_to_old_value(fp);
+	list args = arguments_add_entity(arguments_add_entity(NIL, fp_new), fp_old);
+			
+	pips_user_warning("value (!) might be modified by call to %s\n"
+			  "%dth formal parameter %s\n",
+			  entity_local_name(f), r, entity_local_name(fp));
+	t_caller = transformer_filter(t_caller, args);
+	free_arguments(args);
       }
     }
+    else {
+      /* Formal parameter fp is not modified. Add fp == expr, if possible. */
+      /* We should evaluate expr under a precondition pre... which has
+	 not been passed down. We set pre==tf_undefined. */
+      entity fp_new = external_entity_to_new_value(fp);
+      transformer t_expr = any_expression_to_transformer(fp_new, expr,
+							 transformer_undefined,
+							 FALSE);
+
+      if(!transformer_undefined_p(t_expr)) {
+	t_expr = transformer_temporary_value_projection(t_expr);
+	/* temporary value counter cannot be reset because other
+	   temporary values may be in use in a case the user call is a
+	   user function call */
+	/* reset_temporary_value_counter(); */
+	t_caller = transformer_safe_image_intersection(t_caller, t_expr);
+	free_transformer(t_expr);
+      }
+    }
+  }
   
-    pips_debug(8, "Before formal new values left over are eliminated\n");
-    ifdebug(8)   dump_transformer(t_caller);
+  pips_debug(8, "Before formal new values left over are eliminated\n");
+  ifdebug(8)   dump_transformer(t_caller);
 	
 
-    /* formal new and old values left over are eliminated */
-    MAPL(ce,{entity e = ENTITY(CAR(ce));
-    entity e_new = external_entity_to_new_value(e); 
-    formals_new = CONS(ENTITY, e_new, formals_new);
-    /* test to insure that entity_to_old_value exists */
-    if(entity_is_argument_p(e_new, 
-			    transformer_arguments(t_caller))) {
-      entity e_old = external_entity_to_old_value(e);
-      formals_new = CONS(ENTITY, e_old, formals_new);
-    }},
-	 formals);
+  /* formal new and old values left over are eliminated */
+  MAPL(ce,{entity e = ENTITY(CAR(ce));
+      entity e_new = external_entity_to_new_value(e); 
+      formals_new = CONS(ENTITY, e_new, formals_new);
+      /* test to insure that entity_to_old_value exists */
+      if(entity_is_argument_p(e_new, 
+			      transformer_arguments(t_caller))) {
+	entity e_old = external_entity_to_old_value(e);
+	formals_new = CONS(ENTITY, e_old, formals_new);
+      }},
+    formals);
 		 
-    t_caller = transformer_filter(t_caller, formals_new);
+  t_caller = transformer_filter(t_caller, formals_new);
 		 
-    free_arguments(formals_new);
-    free_arguments(formals);
-  }
+  free_arguments(formals_new);
+  free_arguments(formals);
 
   ifdebug(8) {
     Psysteme s = predicate_system(transformer_relation(t_caller));
@@ -945,6 +1009,28 @@ user_call_to_transformer(
   pips_assert("transformer t_caller is consistent",
 	      transformer_weak_consistency_p(t_caller));
 
+  return t_caller;
+}
+
+static transformer user_call_to_transformer(entity f,
+					    list pc,
+					    transformer pre,
+					    list ef)
+{
+  transformer t_caller = transformer_undefined;
+
+  pips_debug(8, "begin\n");
+  pips_assert("f is a module", entity_module_p(f));
+
+  if(!get_bool_property(SEMANTICS_INTERPROCEDURAL)) {
+    t_caller = effects_to_transformer(ef);
+  }
+  else {
+    if(c_module_p(f))
+      t_caller = c_user_call_to_transformer(f, pc, pre, ef);
+    else
+      t_caller = fortran_user_call_to_transformer(f, pc, ef);
+  }
   return t_caller;
 }
 

@@ -898,8 +898,14 @@ transformer_add_range_condition(
 }
 
 /* INTEGER EXPRESSIONS */
-transformer 
-simple_affine_to_transformer(entity e, Pvecteur a, bool is_internal)
+
+/* FI: I do no longer understand the semantics of
+   "is_internal"... although I designed it.
+
+   Furthermore, this function is no longer very useful as
+   normalization can be performed dynamically again and again at a low cost.
+ */
+transformer simple_affine_to_transformer(entity e, Pvecteur a, bool is_internal)
 {
   transformer tf = transformer_undefined;
   Pvecteur ve = vect_new((Variable) e, VALUE_ONE);
@@ -1188,8 +1194,10 @@ integer_multiply_to_transformer(entity v,
     /* FI: I had to switch the arguments to satisfy a reasonnable
        assert in image_intersection(), but the switch may be
        detrimental to memory allocation. */
-    t1 = transformer_safe_image_intersection(pre, t1);
-    t2 = transformer_safe_image_intersection(pre, t2);
+    //t1 = transformer_safe_image_intersection(pre, t1);
+    //t2 = transformer_safe_image_intersection(pre, t2);
+    t1 = transformer_range(transformer_apply(pre, t1));
+    t2 = transformer_range(transformer_apply(pre, t2));
 
     expression_and_precondition_to_integer_interval(ev1, t1, &lb1, &ub1);
     expression_and_precondition_to_integer_interval(ev2, t2, &lb2, &ub2);
@@ -1492,7 +1500,8 @@ transformer assign_operation_to_transformer(entity val, // assumed to be a value
       entity ev = entity_to_new_value(e);
       //transformer teq = simple_equality_to_transformer(val, ev, TRUE);
       tf = assigned_expression_to_transformer(ev, rhs, pre);
-      tf = transformer_add_equality(tf, val, ev);
+      if(!transformer_undefined_p(tf))
+	tf = transformer_add_equality(tf, val, ev);
       //tf = transformer_combine(tf, teq);
       //free_transformer(teq);
     }
@@ -1625,6 +1634,10 @@ integer_call_expression_to_transformer(
   }
   else if(ENTITY_MAX0_P(f) || ENTITY_MAX_P(f)) {
     tf = max0_to_transformer(e, args, pre, is_internal);
+  }
+  else if(ENTITY_COMMA_P(f)) {
+    // is_internal is dropped...
+    tf = any_expressions_to_transformer(e, args, pre);
   }
   else if(value_code_p(entity_initial(f))) {
     if(get_bool_property(SEMANTICS_INTERPROCEDURAL)) {
@@ -2381,6 +2394,15 @@ any_expression_to_transformer(
 		      "expression may reduce semantic analysis accuracy.\n"
 		      "Apply 'type_checker' to explicit all type coercions.\n",
 		      basic_to_string(bv), basic_to_string(be));
+    /* It might be interesting to go further in case the comma operator is used */
+    if(comma_expression_p(expr)) {
+      call c = syntax_call(expression_syntax(expr));
+      list expr_l = call_arguments(c);
+
+      /* No need to link the returned value as it must be cast to the
+	 proper type. */
+      tf = expressions_to_transformer(expr_l, pre);
+    }
   }
 
   /* tf may be transformer_undefined when no information is derived */
@@ -2415,9 +2437,9 @@ transformer safe_any_expression_to_transformer(
 /* Just to capture side effects as the returned value is
    ignored. Example: "(void) inc(&i);' */
 transformer expression_to_transformer(
-			      expression exp,
-			      transformer pre,
-			      list el)
+				      expression exp,
+				      transformer pre,
+				      list el)
 {
   type et = expression_to_type(exp);
   entity tmpv = make_local_temporary_value_entity(et);
@@ -2537,7 +2559,9 @@ transformer condition_to_transformer(
   return tf;
 }
 
-/* Compute the transformer associated to a list of expressions such as "i=0, j = 1;" */
+/* Compute the transformer associated to a list of expressions such as
+ * "i=0, j = 1;". The value returned is ignored.
+ */
 transformer expressions_to_transformer(list expl,
 				       transformer pre)
 {
@@ -2549,6 +2573,38 @@ transformer expressions_to_transformer(list expl,
        safe_expression_to_transformer() taking care of computing the
        precise effects of exp instead of using the effects of expl. */
     transformer ctf = safe_expression_to_transformer(exp, cpre);
+    transformer npre = transformer_undefined;
+
+    tf = transformer_combine(tf, ctf);
+    npre = transformer_apply(ctf, cpre);
+    free_transformer(cpre);
+    cpre = npre;
+  }
+  free_transformer(cpre);
+  return tf;
+}
+
+/* Compute the transformer associated to a list of expressions such as
+ * "i=0, j = 1;". The value returned is linked to v.
+ *
+ * To be merged with the previous function.
+ */
+transformer any_expressions_to_transformer(entity v,
+					   list expl,
+					   transformer pre)
+{
+  transformer tf = transformer_identity();
+  transformer cpre = transformer_undefined_p(pre)?
+    transformer_identity() : copy_transformer(pre);
+  expression l_exp = EXPRESSION(CAR(gen_last(expl)));
+
+  FOREACH(EXPRESSION, exp, expl) {
+    /* el is an over-appoximation; should be replaced by a
+       safe_expression_to_transformer() taking care of computing the
+       precise effects of exp instead of using the effects of expl. */
+    transformer ctf = (exp==l_exp)? 
+      safe_any_expression_to_transformer(v, exp, cpre, FALSE) :
+      safe_expression_to_transformer(exp, cpre);
     transformer npre = transformer_undefined;
 
     tf = transformer_combine(tf, ctf);

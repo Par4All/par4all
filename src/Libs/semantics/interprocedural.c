@@ -1352,3 +1352,36 @@ transformer update_precondition_with_call_site_preconditions(transformer t,
   current_summary_precondition = transformer_undefined;
   return t;
 }
+
+/* With value passing, writes on formal parameters are not effective interprocedurally. 
+ *
+ * All new values corresponding to formal arguments of f must be
+ * projected out and removed from the arguments list.
+ *
+ * Performed by side-effect on tf.
+*/
+transformer value_passing_summary_transformer(entity f, transformer tf)
+{
+  list al = transformer_arguments(tf); // argument list
+  list mfl = NIL; // modified formal list
+
+  FOREACH(ENTITY, a, al) {
+    storage s = entity_storage(a);
+
+    if(storage_formal_p(s)) {
+      formal fs = storage_formal(s);
+      if(formal_function(fs)==f) {
+	entity nav = entity_to_new_value(a);
+	entity oav = entity_to_old_value(a);
+	mfl = CONS(ENTITY, nav, mfl);
+	mfl = CONS(ENTITY, oav, mfl);
+      }
+    }
+  }
+
+  /* Updates the argument list after the projections */
+  tf = transformer_projection(tf, mfl);
+
+  return tf;
+}
+
