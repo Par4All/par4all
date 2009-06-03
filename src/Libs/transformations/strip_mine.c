@@ -69,43 +69,46 @@ statement loop_strip_mine(statement loop_statement, int chunk_size, int chunk_nu
 	expression e_number = int_to_expression(chunk_number);
 
 	size = MakeBinaryCall(entity_intrinsic("-"), 
-			      expression_dup(ub), expression_dup(lb));
+			      copy_expression(ub), copy_expression(lb));
 	size = MakeBinaryCall(entity_intrinsic("+"), size, e_number);
 	size = MakeBinaryCall(entity_intrinsic("/"), 
-			      size, expression_dup(e_number));
+			      size, copy_expression(e_number));
 	sizem1 = MakeBinaryCall(entity_intrinsic("-"), 
-				expression_dup(size), int_to_expression(1));
+				copy_expression(size), int_to_expression(1));
     }
     else {
 	size = int_to_expression(chunk_size);
 	sizem1 = int_to_expression(chunk_size-1);
     }
     ifdebug(9) {
-	(void) fprintf(stderr, "size = ");
-	print_expression(size);
-	(void) fprintf(stderr, "sizem1 = ");
-	print_expression(sizem1);
+      pips_debug(8, "size = ");
+      print_expression(size);
+      pips_debug(8, "sizem1 = ");
+      print_expression(sizem1);
     }
     
-    /* make sure that the outer loop do not use a continue */
-    /* that will fall in the inner loop body */
+    /* make sure that the outer loop does not use a continue that will
+    end up in the inner loop body */
     loop_label(l)=entity_empty_label();
 
     /* derive a new loop index (FI: only *one* name :-( */
+    /*
     new_index=make_scalar_integer_entity(
 					 strdup(
 						concatenate(
 							    entity_local_name(index),
 							    "_1", 
 							    NULL)), module_name);
-    AddEntityToDeclarations( new_index,module);
+    */
+    new_index = make_new_index_entity(index, "_1");
+    AddEntityToDeclarations(new_index, module);
 
-    /* build the inner loop */
+    /* build the inner loop preserving the initial index set */
     new_l = make_loop(index, 
 		      make_range(entity_to_expression(new_index),
 				 MakeBinaryCall(entity_intrinsic("MIN"),
 						MakeBinaryCall(entity_intrinsic("+"),entity_to_expression(new_index),sizem1),
-						expression_dup(ub)),
+						copy_expression(ub)),
 				 int_to_expression(1)),
 		      b,
 		      entity_empty_label(),
@@ -114,29 +117,26 @@ statement loop_strip_mine(statement loop_statement, int chunk_size, int chunk_nu
 		      make_execution(is_execution_parallel, UU),
 		      NIL);
 
-    new_s = make_statement(entity_empty_label(),
-			   STATEMENT_NUMBER_UNDEFINED,
-			   STATEMENT_ORDERING_UNDEFINED,
-			   string_undefined,
-			   make_instruction(is_instruction_loop, new_l),NIL,NULL,
-			   empty_extensions ());
-    ifdebug(9) {
-	(void) fprintf(stderr, "new inner loop");
-	print_text(stderr,text_statement(entity_undefined,0,new_s));
-	pips_assert("loop_strip_mine", statement_consistent_p(new_s));
+    new_s = instruction_to_statement(make_instruction(is_instruction_loop, new_l));
+
+    ifdebug(8) {
+      pips_debug(8, "new inner loop:");
+      print_statement(new_s);
+      /* print_text(stderr,text_statement(entity_undefined,0,new_s)); */
+      pips_assert("loop_strip_mine", statement_consistent_p(new_s));
     }
     
     /* update the outer loop */
     loop_index(l) = new_index;
-    range_increment(loop_range(l)) = expression_dup(size);
+    range_increment(loop_range(l)) = copy_expression(size);
     loop_body(l) = new_s;
 
-    if(get_debug_level()>=9) {
-	print_text(stderr,text_statement(entity_undefined,0,loop_statement));
-	pips_assert("loop_strip_mine", statement_consistent_p(loop_statement));
+    ifdebug(8) {
+      print_statement(loop_statement);
+      pips_assert("loop_statement consistent_p", statement_consistent_p(loop_statement));
     }
 
-    debug(9, "loop_strip_mine", "end\n");
+    pips_debug(8, "end\n");
     return(loop_statement);
 }
 
@@ -214,6 +214,7 @@ statement loop_chunk_size_and_strip_mine(list lls,bool (*unused)(bool))
 
 bool strip_mine(char *mod_name)
 {
+    entity module = module_name_to_entity(mod_name);
     statement mod_stmt;
     char lp_label[6];
     string resp;
@@ -235,17 +236,23 @@ bool strip_mine(char *mod_name)
 	    user_error("strip_mine", "loop label `%s' does not exist\n", lp_label);
 	}
 
+	set_current_module_entity(module);
+
 	/* DBR_CODE will be changed: argument "pure" should take FALSE but
 	   this would be useless since there is only *one* version of code;
 	   a new version will be put back in the data base after
 	   strip_mineing */
 	mod_stmt = (statement) db_get_memory_resource(DBR_CODE, mod_name, TRUE);
+	set_current_module_statement(mod_stmt);
 
 	look_for_nested_loop_statements(mod_stmt,loop_chunk_size_and_strip_mine,
 					selected_loop_p);
 
 	/* Reorder the module, because new statements have been generated. */
 	module_reorder(mod_stmt);
+
+	reset_current_module_entity();
+	reset_current_module_statement();
 
 	DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(mod_name), mod_stmt);
 	return_status = TRUE;
