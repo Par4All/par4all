@@ -62,19 +62,33 @@ EOF
 function privatize_scalar_variables () {
     cat <<EOF
 echo Privatize scalar variables on all the modules of the program:
-apply PRIVATIZE_MODULE[%ALL]
+apply PRIVATIZE_MODULE[%ALLFUNC]
 
 EOF
 }
 
 
-function openmp_parallelization () {
+function openmp_parallelization_rice () {
     cat <<EOF
 echo Ask for some statistics about the job to be done:
 setproperty PARALLELIZATION_STATISTICS=TRUE
 echo Ask for the parallelization of all the modules of the program with OpenMP output:
+activate RICE_ALL_DEPENDENCE
 activate PRINT_PARALLELIZEDOMP_CODE
-display PARALLELPRINTED_FILE[%ALL]
+display PARALLELPRINTED_FILE[%ALLFUNC]
+
+EOF
+}
+
+
+function openmp_parallelization_coarse_grain () {
+    cat <<EOF
+echo Ask for some statistics about the job to be done:
+setproperty PARALLELIZATION_STATISTICS=TRUE
+echo Ask for the parallelization of all the modules of the program with OpenMP output:
+activate COARSE_GRAIN_PARALLELIZATION
+activate PRINT_PARALLELIZEDOMP_CODE
+display PARALLELPRINTED_FILE[%ALLFUNC]
 
 EOF
 }
@@ -87,7 +101,7 @@ echo Consider the generated parallel as the sequential code now:
 # applying it on the parallel code of another module that may depend
 # of the previous module can lead to reapplying the parallelization each time...
 # So use cappy insted of apply here:
-capply INTERNALIZE_PARALLEL_CODE[%ALL]
+capply INTERNALIZE_PARALLEL_CODE[%ALLFUNC]
 
 EOF
 }
