@@ -28,6 +28,7 @@
 #include "transformations.h"
 #include "parser_private.h"
 #include "syntax.h"
+#include "c_syntax.h"
 
 
 static entity       inlined_module;
@@ -91,10 +92,9 @@ bool inline_should_inline(call callee)
 /* find effects on entity `e' in statement `s'
  * cumulated effects for these statements must have been loaded
  */
-static effect
-find_effect_on_entity(statement s, entity e)
+static
+bool find_write_effect_on_entity(statement s, entity e)
 {
-	effect found = effect_undefined;
 	list cummulated_effects = load_cumulated_rw_effects_list( s );
 	FOREACH(EFFECT, eff,cummulated_effects)
 	{
@@ -103,10 +103,30 @@ find_effect_on_entity(statement s, entity e)
 		if( same_entity_name_p(e,re) )
 		{
 			cell c = effect_cell(eff);
-			found = (reference_indices( cell_preference_p(c) ? preference_reference(cell_preference(c)) : cell_reference(c) ) == NIL) ? eff :found ;
+			if( ENDP( reference_indices( cell_preference_p(c) ? preference_reference(cell_preference(c)) : cell_reference(c) ) ) )
+				if( action_write_p(effect_action(eff) ) )
+					return true;
 		}
 	}
-	return found;
+	return false;
+}
+static
+bool find_read_effect_on_entity(statement s, entity e)
+{
+	list cummulated_effects = load_cumulated_rw_effects_list( s );
+	FOREACH(EFFECT, eff,cummulated_effects)
+	{
+		reference r = effect_any_reference(eff);
+		entity re = reference_variable(r);
+		if( same_entity_name_p(e,re) )
+		{
+			cell c = effect_cell(eff);
+			if( ENDP( reference_indices( cell_preference_p(c) ? preference_reference(cell_preference(c)) : cell_reference(c) ) ) )
+				if( action_read_p(effect_action(eff) ) )
+					return true;
+		}
+	}
+	return false;
 }
 
 struct entity_pair
@@ -239,7 +259,8 @@ entity make_temporary_array_entity(entity efrom, expression from)
 			get_current_module_entity(),
 			pointers
 			);
-	entity_initial(new) = make_value_expression(make_expression(make_syntax_cast(make_cast(make_type_variable(make_variable(pointers,NIL,NIL)),from)),normalized_undefined));
+	entity_initial(new) = expression_undefined_p(from)?value_undefined:
+		make_value_expression(make_expression(make_syntax_cast(make_cast(make_type_variable(make_variable(pointers,NIL,NIL)),from)),normalized_undefined));
 	AddLocalEntityToDeclarations(new, get_current_module_entity(),
 			c_module_p(get_current_module_entity())?get_current_module_statement():statement_undefined);
 	return new;
@@ -251,7 +272,7 @@ entity make_temporary_scalar_entity(entity efrom, expression from)
 			get_current_module_entity(),
 			copy_basic(variable_basic(type_variable(entity_type(efrom))))
 			);
-	entity_initial(new) = make_value_expression(from);
+	entity_initial(new) = expression_undefined_p(from)?value_undefined:make_value_expression(from);
 	AddLocalEntityToDeclarations(new, get_current_module_entity(),
 			c_module_p(get_current_module_entity())?get_current_module_statement():statement_undefined);
 	return new;
@@ -376,30 +397,11 @@ instruction inline_expression_call(expression modified_expression, call callee)
         entity e = ENTITY(CAR(iter));
         expression from = EXPRESSION(CAR(c_iter));
 
-        bool need_copy = true;
         /* check if there is a write effect on this parameter */
-		if( use_effects )
-		{
-			effect eff = find_effect_on_entity(inlined_module_statement,e);
-			if(  ! effect_undefined_p(eff) )
-			{
-				/* skip if expression is complicated
-				 * it could handle the & or * operator, but some extra parenthesis would be needed
-				 * just as they are needed when writing macro functions in fact
-				 */
-				if( expression_constant_p(from) || expression_reference_p(from))
-				{
-					action a = effect_action(eff);
-					need_copy= action_write_p(a);
-				}
-			}
-			else
-			{
-				need_copy =false;
-			}
-		}
-        entity new = entity_undefined;
+        bool need_copy = (!use_effects) || find_write_effect_on_entity(inlined_module_statement,e);
+
         /* generate a copy for this parameter */
+        entity new = entity_undefined;
         if(need_copy)
         {
             string emn = entity_module_name(e);
@@ -829,9 +831,6 @@ run_inlining(string caller_name, string module_name)
 static
 bool do_unfolding(char* module_name)
 {
-    /* Get the module ressource */
-    entity unfolded_module = module_name_to_entity( module_name );
-
     debug_on("UNFOLDING_DEBUG_LEVEL");
 
     /* parse filter property */
@@ -921,10 +920,14 @@ void patch_outlined_reference(expression x, entity e)
         entity e1 = reference_variable(r);
         if(same_entity_p(e,e1))
         {
-            expression X = make_expression(expression_syntax(x),normalized_undefined);
-            expression_syntax(x)=make_syntax_call(make_call(
-                    CreateIntrinsic(DEREFERENCING_OPERATOR_NAME),
-                    CONS(EXPRESSION,X,NIL)));
+			variable v = type_variable(entity_type(e));
+			if( (!basic_pointer_p(variable_basic(v))) && (ENDP(variable_dimensions(v))) ) /* not an array / pointer */
+			{
+				expression X = make_expression(expression_syntax(x),normalized_undefined);
+				expression_syntax(x)=make_syntax_call(make_call(
+							CreateIntrinsic(DEREFERENCING_OPERATOR_NAME),
+							CONS(EXPRESSION,X,NIL)));
+			}
         }
     }
 
@@ -946,71 +949,124 @@ statement outliner(string outline_module_name, list statements_to_outline)
     /* get the relative complements and create the parameter list*/
     gen_list_and_not(&referenced_entities,declared_entities);
 
-    list parameters = NIL;
+	/* make list uniq and sorted : list -> set -> list */
+	{
+		set stmp = set_make(set_pointer);
+		FOREACH(ENTITY,refent,referenced_entities)
+			set_add_element(stmp,stmp,refent);
+
+		list ltmp=NIL;
+		SET_MAP(rent,ltmp=CONS(ENTITY,rent,ltmp),stmp);
+		set_free(stmp);
+		gen_free_list(referenced_entities);
+		gen_sort_list(ltmp,compare_entities);
+		referenced_entities=ltmp;
+	}
+
+
     intptr_t i=0;
-    set enames = set_make(set_string);
     entity new_fun = make_empty_subroutine(outline_module_name);
     statement body = instruction_to_statement(make_instruction_sequence(make_sequence(statements_to_outline)));
 
+	/* all variables are promoted parameters */
     list effective_parameters = NIL;
+    list formal_parameters = NIL;
     FOREACH(ENTITY,e,referenced_entities)
-    {
-        entity dummy_entity = FindOrCreateEntity(
-                outline_module_name,
-                entity_user_name(e)
-        );
-        if(!set_belong_p(enames,entity_name(dummy_entity)))
-        {
-            set_add_element(enames,enames,entity_name(dummy_entity));
-            entity_type(dummy_entity)=copy_type(entity_type(e));
-            entity_storage(dummy_entity)=make_storage_formal(make_formal(dummy_entity,++i));
+	{
+		variable v = type_variable(entity_type(e));
+		/* this adds the dynamic dimensions of array to the parameter list */
+		FOREACH(DIMENSION,d,variable_dimensions(v))
+		{
+			expression ex = dimension_upper(d);
+			if(!expression_constant_p(ex))
+			{
+				reference ref = expression_reference(EXPRESSION(CAR(call_arguments(syntax_call(expression_syntax(ex))))));
+				entity ref_ent = reference_variable(ref);
+				if( entity_undefined_p( FindEntity(outline_module_name,entity_user_name(ref_ent)) ) )
+				{
+					entity dummy_entity = FindOrCreateEntity(
+							outline_module_name,
+							entity_user_name(ref_ent)
+							);
+					entity_type(dummy_entity)=copy_type(entity_type(ref_ent));
+					entity_storage(dummy_entity)=make_storage_formal(make_formal(dummy_entity,++i));
+					formal_parameters=CONS(PARAMETER,make_parameter(
+								copy_type(entity_type(ref_ent)),
+								make_mode_value(), /* to be changed */
+								make_dummy_identifier(dummy_entity)),formal_parameters);
+					effective_parameters=CONS(EXPRESSION,entity_to_expression(ref_ent),effective_parameters);
+				}
+			}
+		}
+		/* this create the dummy parameter */
+		type new_type = copy_type(entity_type(e));
+		entity dummy_entity = FindOrCreateEntity(
+				outline_module_name,
+				entity_user_name(e)
+				);
+		entity_type(dummy_entity)=new_type;
+		entity_storage(dummy_entity)=make_storage_formal(make_formal(dummy_entity,++i));
 
 
-            parameters=CONS(PARAMETER,make_parameter(
-                        copy_type(entity_type(e)),
-                        make_mode_value(), /* to be changed */
-                        make_dummy_identifier(dummy_entity)),parameters);
-            AddEntityToDeclarations(dummy_entity,new_fun);
-
-            effective_parameters=CONS(EXPRESSION,entity_to_expression(e),effective_parameters);
-
-            /* we need to patch this fo C , see below*/
-            if(c_module_p(get_current_module_entity()))
-                gen_context_recurse(body,e,expression_domain,gen_true,patch_outlined_reference);
-        }
-    }
-    set_free(enames);
-
+		formal_parameters=CONS(PARAMETER,make_parameter(
+					copy_type(new_type),
+					make_mode_value(), /* to be changed */
+					make_dummy_identifier(dummy_entity)),formal_parameters);
+		/* this adds the effective parameter */
+		effective_parameters=CONS(EXPRESSION,entity_to_expression(e),effective_parameters);
+	}
 
 
     /* we need to patch parameters , effective parameters and body in C
      * because of by copy function call
+	 * it's not needed if 
+	 * - the parameter is only read 
+	 * - it's an array / pointer
      */
     if(c_module_p(get_current_module_entity()))
     {
-        FOREACH(PARAMETER,p,parameters)
+		list iter = effective_parameters;
+        FOREACH(PARAMETER,p,formal_parameters)
         {
+			expression x = EXPRESSION(CAR(iter));
             entity e = dummy_identifier(parameter_dummy(p));
-            type t = copy_type(entity_type(e));
-            entity_type(e)=make_type_variable(
-                    make_variable(
-                        make_basic_pointer(t),
-                        NIL,
-                        NIL
-                        )
-                    );
-            parameter_type(p)=t;
+			variable v = type_variable(entity_type(e));
+			bool entity_written=false;
+			FOREACH(STATEMENT,stmt,statements_to_outline)
+				entity_written|=find_write_effect_on_entity(stmt,e);
+
+			if( (!basic_pointer_p(variable_basic(v))) && 
+				ENDP(variable_dimensions(v)) &&
+			    entity_written
+			)
+			{
+				type t = copy_type(entity_type(e));
+				entity_type(e)=make_type_variable(
+						make_variable(
+							make_basic_pointer(t),
+							NIL,
+							NIL
+							)
+						);
+				parameter_type(p)=t;
+            	syntax s = expression_syntax(x);
+            	expression X = make_expression(s,normalized_undefined);
+            	expression_syntax(x)=make_syntax_call(make_call(CreateIntrinsic(ADDRESS_OF_OPERATOR_NAME),CONS(EXPRESSION,X,NIL)));
+				gen_context_recurse(body,e,expression_domain,gen_true,patch_outlined_reference);
+			}
+			POP(iter);
         }
-        FOREACH(EXPRESSION,x,effective_parameters)
-        {
-            syntax s = expression_syntax(x);
-            expression X = make_expression(s,normalized_undefined);
-            expression_syntax(x)=make_syntax_call(make_call(CreateIntrinsic(ADDRESS_OF_OPERATOR_NAME),CONS(EXPRESSION,X,NIL)));
-        }
+		pips_assert("no effective parameter left", ENDP(iter));
     }
 
-    /* prepare paramters and body*/
-    functional_parameters(type_functional(entity_type(new_fun)))=parameters;
+    /* prepare parameters and body*/
+    functional_parameters(type_functional(entity_type(new_fun)))=formal_parameters;
+	FOREACH(PARAMETER,p,formal_parameters) {
+		code_declarations(value_code(entity_initial(new_fun))) =
+			gen_nconc(
+					code_declarations(value_code(entity_initial(new_fun))),
+					CONS(ENTITY,dummy_identifier(parameter_dummy(p)),NIL));
+	}
 
     /* we can now begin the outlining */
     bool saved = get_bool_property(STAT_ORDER);
@@ -1018,9 +1074,15 @@ statement outliner(string outline_module_name, list statements_to_outline)
     text t = text_named_module(new_fun, get_current_module_entity(), body);
     add_new_module_from_text(outline_module_name, t, fortran_module_p(get_current_module_entity()));
     set_bool_property(STAT_ORDER,saved);
+	/* horrible hack to prevent declaration duplication 
+	 * signed : Serge Guelton
+	 */
+	gen_free_list(code_declarations(EntityCode(new_fun)));
+	code_declarations(EntityCode(new_fun))=NIL;
+
 
     /* and return the replacement statement */
-    instruction new_inst =  make_instruction_call(make_call(new_fun,effective_parameters));
+    instruction new_inst =  make_instruction_call(make_call(new_fun,gen_nreverse(effective_parameters)));
     statement new_stmt = statement_undefined;
 
     /* perform substitution :
@@ -1132,6 +1194,7 @@ outline(char* module_name)
     /* prelude */
     set_current_module_entity(module_name_to_entity( module_name ));
     set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, module_name, TRUE) );
+ 	set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_PROPER_EFFECTS, module_name, TRUE));
 
     /* retrieve name of the outiled module */
     string outline_module_name = string_undefined;
@@ -1159,6 +1222,7 @@ outline(char* module_name)
     DB_PUT_MEMORY_RESOURCE(DBR_CALLEES, module_name, compute_callees(get_current_module_statement()));
 
     /*postlude*/
+	reset_cumulated_rw_effects();
     reset_current_module_entity();
     reset_current_module_statement();
 
