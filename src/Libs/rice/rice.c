@@ -105,9 +105,21 @@ statement rice_statement(statement stat,
 	  }
 	  break;
       }
-      case is_instruction_whileloop:
-      case is_instruction_forloop:
-      case is_instruction_goto: 
+    case is_instruction_whileloop: {
+      whileloop wl = instruction_whileloop(istat);
+
+      whileloop_body(wl) = rice_statement(whileloop_body(wl), l, codegen_fun);
+      break;
+    }
+    case is_instruction_forloop: {
+      forloop wl = instruction_forloop(istat);
+
+      forloop_body(wl) = rice_statement(forloop_body(wl), l, codegen_fun);
+      break;
+    }
+      case is_instruction_goto:
+	pips_internal_error("Unexpected go to instruction in parsed code\n");
+	break;
       case is_instruction_call: 
 	break;
       case is_instruction_unstructured: {
