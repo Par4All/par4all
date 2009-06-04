@@ -9,7 +9,6 @@
  * any explicit or implicit warranty.
  *
  * Send all queries about this software to sallamar@cvimail.cv.com
- *
  */
 
 /*
