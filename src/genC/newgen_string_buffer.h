@@ -31,10 +31,11 @@ string_buffer string_buffer_make(bool dup);
 void string_buffer_free(string_buffer *);
 void string_buffer_free_all(string_buffer *);
 string string_buffer_to_string(string_buffer);
+string string_buffer_to_string_reverse(string_buffer);
 void string_buffer_to_file(string_buffer, FILE *);
 void string_buffer_append(string_buffer, string);
 void string_buffer_cat(string_buffer, string, ...);
 void string_buffer_append_sb(string_buffer, string_buffer);
-void string_buffer_append_list(string_buffer, list);
+void string_buffer_append_list(string_buffer, list, bool);
 
 #endif /* STRING_BUFFER_INCLUDED */

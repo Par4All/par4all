@@ -105,6 +105,31 @@ string string_buffer_to_string(string_buffer sb)
   return buf;
 }
 
+/* return malloc'ed string from string buffer sb going from bottom to top
+ */
+string string_buffer_to_string_reverse (string_buffer sb)
+{
+  int bufsize = 0, current = 0;
+  char * buf = NULL;
+
+  STACK_MAP_X(s, string, bufsize+=strlen(s), sb->ins, 0);
+
+  buf = (char*) malloc(sizeof(char)*(bufsize+1));
+  message_assert("allocated", buf!=NULL);
+  buf[current] = '\0';
+
+  STACK_MAP_X(s, string,
+  {
+    int len = strlen(s);
+    (void) memcpy(&buf[current], s, len);
+    current += len;
+    buf[current] = '\0';
+  },
+	      sb->ins, 1);
+
+  return buf;
+}
+
 /* put string buffer into file.
  */
 void string_buffer_to_file(string_buffer sb, FILE * out)
@@ -135,9 +160,11 @@ void string_buffer_append_sb(string_buffer sb, string_buffer sb2)
  * @return void
  * @param sb, the string buffer where to append the whole list
  * @param l, the list of string to append to the string buffer
+ * @param flg, set to TRUE if the list need to be added in the revere order
  */
-void string_buffer_append_list(string_buffer sb, list l)
+void string_buffer_append_list(string_buffer sb, list l, bool flg)
 {
+  if (flg == TRUE) l = gen_nreverse (l);
   FOREACH (STRING, s, l) {
     string_buffer_append(sb, s);
   }
