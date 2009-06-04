@@ -1,5 +1,5 @@
-delete call03
-create call03 call03.c
+delete call07
+create call07 call07.c
 
 #setenv C_SYNTAX_DEBUG_LEVEL 9
 #setproperty GENERATE_MISSING_SOURCE_FILES TRUE
@@ -24,21 +24,21 @@ echo Source code with proper effects
 echo
 
 activate PRINT_CODE_PROPER_EFFECTS
-display PRINTED_FILE[call03]
+display PRINTED_FILE[call07]
 
 echo
 echo Source code with cumulated effects
 echo
 
 activate PRINT_CODE_CUMULATED_EFFECTS
-display PRINTED_FILE[call03]
+display PRINTED_FILE[call07]
 
 echo
-echo Source code with transformers for "call03"
+echo Source code with transformers for "call07"
 echo
 
 activate PRINT_CODE_TRANSFORMERS
-display PRINTED_FILE[call03]
+display PRINTED_FILE[call07]
 
 echo
 echo Source code with transformers for "main"
@@ -48,11 +48,11 @@ activate PRINT_CODE_TRANSFORMERS
 display PRINTED_FILE[main]
 
 echo
-echo Source code with preconditions for "call03"
+echo Source code with preconditions for "call07"
 echo
 
 activate PRINT_CODE_PRECONDITIONS
-display PRINTED_FILE[call03]
+display PRINTED_FILE[call07]
 
 echo
 echo Source code with preconditions for "main"
@@ -69,6 +69,6 @@ echo
 echo Warnings
 echo
 
-shell cat call03.database/Warnings
+shell cat call07.database/Warnings
 
 quit

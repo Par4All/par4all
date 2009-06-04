@@ -51,3 +51,7 @@ void call02(int i, float x)
 
    x++;                                                                 /*0006*/
 }
+
+Warnings
+
+PROGRAM_PRECONDITION[] (get_main_entity) no main found, returning call02 instead

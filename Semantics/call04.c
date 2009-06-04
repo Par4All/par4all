@@ -4,14 +4,15 @@ int j = 0;
 
 int call04(int i)
 {
-  i++;
+  i += 10;
   j++;
+
+  return i;
 }
 
 main()
 {
   int ai = 3;
-  float ax = 4.;
 
   ai = call04(ai++);
 

@@ -47,7 +47,7 @@ Request: build resource PRINTED_FILE for module ALIAS_TRANSFORMER.
   TRANSFORMERS_INTER_FULL        building   TRANSFORMERS(ALIAS_TRANSFORMER)
 user warning in translate_global_value: Variable FOO:I is probably aliased with a formal parameter by the current call to FOO from ALIAS_TRANSFORMER.
 This is forbidden by the Fortran 77 standard.
-user warning in user_call_to_transformer: Call to FOO seems never to return. This may be due to an infinite loop in FOO, or to a systematic exit in FOO, or to standard violations (see previous messages)
+user warning in fortran_user_call_to_transformer: Call to FOO seems never to return. This may be due to an infinite loop in FOO, or to a systematic exit in FOO, or to standard violations (see previous messages)
   PRINT_CODE_TRANSFORMERS        building   PRINTED_FILE(ALIAS_TRANSFORMER)
 PRINTED_FILE made for ALIAS_TRANSFORMER.
 Module FOO selected

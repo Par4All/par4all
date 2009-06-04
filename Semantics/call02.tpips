@@ -39,7 +39,6 @@ echo
 
 activate PRINT_CODE_TRANSFORMERS
 display PRINTED_FILE[call02]
-quit
 
 apply UNSPLIT[%PROGRAM]
 
