@@ -1427,11 +1427,11 @@ static list any_rgs_effects(entity e __attribute__ ((__unused__)), list args, bo
 
   ifdebug(8) print_reference(ref);
 
-  le = gen_nconc(le, generic_proper_effects_of_read_reference(ref));
-
-  if(init_p == TRUE){
-    le = gen_nconc(le, generic_proper_effects_of_written_reference(ref));
+  if(init_p != TRUE){
+    le = gen_nconc(le, generic_proper_effects_of_read_reference(ref));
   }
+
+    le = gen_nconc(le, generic_proper_effects_of_written_reference(ref));
 
   pips_debug(5, "end\n");
 
