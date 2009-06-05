@@ -520,90 +520,22 @@ call_to_transformer(call c, transformer pre, list ef) /* effects of call c */
   return(tf);
 }
 
-/* The Fortran and C versions are about the same. Should I revert and
-   unify them, except for t_calle? This could be unified too by
-   calling user_call_to_transformer()? */
-static transformer 
-c_user_function_call_to_transformer(
-				    entity e, /* a value */
-				    expression expr, /* a call to a function */
-				    transformer pre) /* its precondition */
+transformer 
+user_c_function_call_to_transformer(
+					  entity e, /* a value */
+					  expression expr, /* a call to a function */
+					  transformer pre) /* its precondition */
 {
-  transformer t_caller = transformer_undefined;
-  syntax s = expression_syntax(expr);
-  call c = syntax_call(s);
-  entity f = call_function(c);
-  list pc = call_arguments(c);
-  basic rbt = basic_of_call(c, true, true);
-  list ef = expression_to_proper_effects(expr);
+  transformer tf = transformer_undefined;
 
-  pips_debug(8, "begin\n");
-  pips_assert("s is a call", syntax_call_p(s));
+  pips_user_warning("C version not implemented yet. Fortran version used instead\n");
 
-  /* if there is no implicit cast */
-  if(basic_equal_p(rbt, variable_basic(type_variable(entity_type(e))))) {
-    string fn = module_local_name(f);
-    entity rv = global_name_to_entity(fn, fn);
-    entity orv = entity_undefined;
-    transformer t_equal = simple_equality_to_transformer(e, rv, FALSE);
-
-    pips_assert("rv is defined",
-		!entity_undefined_p(rv));
-
-    /* Build a transformer reflecting the call site */
-    /* Too bad the precondition is not passed down to evaluate the
-     actual argument expressions...  To be changed in the C version*/
-    t_caller = c_user_call_to_transformer(f, pc, pre, ef);
-
-    ifdebug(8) {
-      pips_debug(8, "Transformer %p for callee %s:\n",
-		 t_caller, entity_local_name(f));
-      dump_transformer(t_caller);
-    }
-
-    /* Consistency cannot be checked on a non-local transformer */
-    /* pips_assert("t_equal is consistent",
-       transformer_consistency_p(t_equal)); */
-
-    ifdebug(8) {
-      pips_debug(8,
-		 "Transformer %p for equality of %s with %s:\n",
-		 t_equal, entity_local_name(e), entity_name (rv));
-      dump_transformer(t_equal);
-    }
-
-    /* Combine the effect of the function call and of the equality */
-    t_caller = transformer_combine(t_caller, t_equal);
-    free_transformer(t_equal);
-
-    /* Get rid of the temporary representing the function's value */
-    orv = global_new_value_to_global_old_value(rv);
-    if(entity_undefined_p(orv))
-      t_caller = transformer_filter(t_caller, CONS(ENTITY, rv, NIL));
-    else
-      t_caller = transformer_filter(t_caller,
-				    CONS(ENTITY, rv, CONS(ENTITY, orv, NIL)));
-
-    ifdebug(8) {
-      pips_debug(8,
-		 "Final transformer %p for assignment of %s with %s:\n",
-		 t_caller, entity_local_name(e), entity_name(rv));
-      dump_transformer(t_caller);
-    }
-  }
-  else {
-    t_caller = effects_to_transformer(ef);
-  }
-
-  gen_free_list(ef);
-
-  pips_debug(8, "end with t_caller=%p\n", t_caller);
-
-  return t_caller;
+  tf = user_fortran_function_call_to_transformer(e, expr, pre);
+  return tf;
 }
 
-static transformer 
-fortran_user_function_call_to_transformer(
+transformer 
+user_fortran_function_call_to_transformer(
 					  entity e, /* a value */
 					  expression expr, /* a call to a function */
 					  transformer __attribute__ ((unused)) pre) /* its precondition */
@@ -635,7 +567,7 @@ fortran_user_function_call_to_transformer(
     /* Build a transformer reflecting the call site */
     /* Too bad the precondition is not passed down to evaluate the
      actual argument expressions...  To be changed in the C version*/
-    t_caller = fortran_user_call_to_transformer(f, pc, ef);
+    t_caller = user_call_to_transformer(f, pc, transformer_undefined, ef);
 
     ifdebug(8) {
       pips_debug(8, "Transformer %p for callee %s:\n",
@@ -724,7 +656,6 @@ fortran_user_function_call_to_transformer(
   return t_caller;
 }
 
-/* a function call is a call to a non void function in C and to a FUNCTION in Fortran */
 transformer 
 user_function_call_to_transformer(
 				  entity e, /* a value */
@@ -736,9 +667,9 @@ user_function_call_to_transformer(
   entity f = call_function(c);
 
   if(c_module_p(f))
-    tf = c_user_function_call_to_transformer(e, expr, pre);
+    tf = user_c_function_call_to_transformer(e, expr, pre);
   else
-    tf = fortran_user_function_call_to_transformer(e, expr, pre);
+    tf = user_fortran_function_call_to_transformer(e, expr, pre);
 
   return tf;
 }
@@ -830,7 +761,7 @@ transformer_intra_to_inter(
   return ftf;
 }
 
-transformer any_user_call_site_to_transformer(entity f,
+static transformer c_user_call_to_transformer(entity f,
 					      list pc,
 					      transformer pre,
 					      list __attribute__ ((unused)) ef)
@@ -844,6 +775,7 @@ transformer any_user_call_site_to_transformer(entity f,
   list cpl = pl; // to simplify debugging
   int n = 1; /* Formal parameters are counted 1, 2, 3,...*/
   list fpvl = NIL; // list of formal parameter values
+  transformer t_callee = load_summary_transformer(f);
 
   if(gen_length(cpl)!=gen_length(pc))
     pips_user_error("Different numbers of actual and formal parameters for function \"%s\"\n",
@@ -876,23 +808,15 @@ transformer any_user_call_site_to_transformer(entity f,
 	  //safe_any_expression_to_transformer(fpv, e, cpre, TRUE);
 	  safe_any_expression_to_transformer(fpv, e, cpre, FALSE);
       }
-      else {
-	/* Should be an error or a warning? */
-	list el = expression_to_proper_effects(e);
-	/*
+      else
 	pips_user_error("Type incompatibility between call site and declaration"
 			" for %d argument of function %s\n", n, entity_user_name(f));
-	*/
-	pips_user_warning("Type incompatibility between call site and declaration"
-			" for %d argument of function %s\n", n, entity_user_name(f));
-
-	ctf = effects_to_transformer(el);
-      }
     }
     else {
       /* The associated transformer may nevertheless carry useful/necessary information */
       list el = expression_to_proper_effects(e);
 
+      fpv = make_local_temporary_value_entity_with_basic(b);
       ctf = effects_to_transformer(el);
     }
 
@@ -908,27 +832,12 @@ transformer any_user_call_site_to_transformer(entity f,
     free_basic(b);
   }
 
-  gen_free_list(fpvl);
-
-  return tf;
-}
-
-transformer c_user_call_to_transformer(entity f,
-				       list pc,
-				       transformer pre,
-				       list __attribute__ ((unused)) ef)
-{
-  transformer tf = transformer_undefined;
-  transformer t_callee = load_summary_transformer(f);
-
-  /* Compute the call site transformer */
-  tf = any_user_call_site_to_transformer(f, pc, pre, ef);
-
   /* Combine tf with the summary transformer */
   tf = transformer_combine(tf, t_callee);
 
   /* Project the former parameters and the temporary values. */
-  tf = transformer_formal_parameter_projection(tf);
+  tf = transformer_projection(tf, fpvl);
+  gen_free_list(fpvl);
   tf = transformer_temporary_value_projection(tf);
 
   return tf;
@@ -940,9 +849,9 @@ transformer c_user_call_to_transformer(entity f,
    is analyzed in the caller. If X is written, I value is lost. See
    Validation/equiv02.f. */
 
-transformer fortran_user_call_to_transformer(entity f,
-					     list pc,
-					     list ef)
+static transformer fortran_user_call_to_transformer(entity f,
+						    list pc,
+						    list ef)
 {
   transformer t_callee = transformer_undefined;
   transformer t_caller = transformer_undefined;

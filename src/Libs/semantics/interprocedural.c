@@ -353,34 +353,6 @@ transformer add_formal_to_actual_bindings(call c, transformer pre, entity caller
 
   return pre;
 }
-
-/* Take side effects into account:
- *
- * pre := (t(expr )...(t_expr ))(pre)  U  {f  = expr }
- *               n           1              i       i
- * for all i such that formal f_i is an analyzable scalar variable and 
- * as far as expression expr_i is analyzable and of the same type.
- *
- * The algorithmic structure has to be different from the previous one.
- *
- * pre is modified by side effects.
- */
-transformer new_add_formal_to_actual_bindings(call c, transformer pre, entity caller)
-{
-  entity f = call_function(c);
-  list args = call_arguments(c);
-
-  pre = any_user_call_site_to_transformer(f, args, pre, NIL);
-
-  ifdebug(6) {
-    pips_debug(6, "new pre=%p\n", pre);
-    dump_transformer(pre);
-    pips_debug(6, "end for call to %s from %s\n", module_local_name(f),
-	       module_local_name(caller));
-  }
-
-  return pre;
-}
 
 transformer
 precondition_intra_to_inter(entity callee, transformer pre, list le)
@@ -1215,7 +1187,7 @@ static bool process_call(call c)
   }
 
   /* add to call site preconditions the links to the callee formal params */
-  caller_prec = new_add_formal_to_actual_bindings
+  caller_prec = add_formal_to_actual_bindings
     (c, transformer_dup(current_precondition), current_caller);
   ifdebug(PROCESS_CALL_DEBUG_LEVEL) {
     pips_debug(PROCESS_CALL_DEBUG_LEVEL,
@@ -1415,9 +1387,6 @@ transformer value_passing_summary_transformer(entity f, transformer tf)
 {
   list al = transformer_arguments(tf); // argument list
   list mfl = NIL; // modified formal list
-  list omfl = NIL; // modified formal list
-  list tvl = NIL; // temporary value list
-  list ctvl = NIL; // current pointer in tvl
 
   FOREACH(ENTITY, a, al) {
     storage s = entity_storage(a);
@@ -1428,40 +1397,13 @@ transformer value_passing_summary_transformer(entity f, transformer tf)
 	entity nav = entity_to_new_value(a);
 	entity oav = entity_to_old_value(a);
 	mfl = CONS(ENTITY, nav, mfl);
-	omfl = CONS(ENTITY, oav, omfl);
+	mfl = CONS(ENTITY, oav, mfl);
       }
     }
   }
 
-  /* The old values cannot be renamed directly fater projection,
-     because the transformer projection opearator detects an
-     inconsistency. */
-
-  /* Rename old values as temporary values in the caller frame. */
-  FOREACH(ENTITY, oav, omfl) {
-    entity tv = make_local_temporary_value_entity(ultimate_type(entity_type(oav)));
-
-    tvl = CONS(ENTITY, tv, tvl);
-    tf = transformer_value_substitute(tf, oav, tv);
-  }
-
   /* Updates the argument list after the projections */
   tf = transformer_projection(tf, mfl);
-
-  /* Rename tmp values as new values in the caller frame. */
-  tvl = gen_nreverse(tvl);
-  ctvl = tvl;
-  /* oav renamed oav1 because of FOREACH macro implementation */
-  FOREACH(ENTITY, oav1, omfl) {
-    entity tv = ENTITY(CAR(ctvl));
-    entity v = value_to_variable(oav1);
-    entity nav = entity_to_new_value(v);
-
-    tf = transformer_value_substitute(tf, tv, nav);
-    POP(ctvl);
-  }
-
-  gen_free_list(tvl);
 
   return tf;
 }
