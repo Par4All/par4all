@@ -29,6 +29,8 @@
 /* Attention, the null statement in C is represented as the continue
    statement in Fortran (make_continue_statement means make_null_statement)*/
 
+// To have strndup(), asprintf()...:
+#define _GNU_SOURCE
 #include <stdlib.h>
 #include <stdio.h>
 #include <malloc.h>

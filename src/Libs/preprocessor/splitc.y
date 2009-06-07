@@ -88,23 +88,23 @@ void keep_track_of_typedef(string type_name)
   }
 }
 
-/* The following global variables are used to store the information such as 
-   the scope, type and storage of an entity, given by the decl_spec_list, 
-   which are used later by direct_decl to create the entity. 
+/* The following global variables are used to store the information such as
+   the scope, type and storage of an entity, given by the decl_spec_list,
+   which are used later by direct_decl to create the entity.
 
-   For the moment, block scope is not considered. CurrentScope can be File, 
+   For the moment, block scope is not considered. CurrentScope can be File,
    Module, File'FILE_SEP_STRING'Module or TOP-LEVEL*/
 
 /* static string CurrentScope = NULL; */
 /*
-static type CurrentType = type_undefined; 
+static type CurrentType = type_undefined;
 static storage CurrentStorage = storage_undefined;
 static list CurrentQualifiers = NIL; */
 /* static string CurrentDerivedName = NULL; */ /* to remember the name of a struct and add it to the member prefix name*/
 /* static int CurrentMode = 0; */ /* to know the mode of the formal parameter : by value or by reference*/
 
 int csplit_is_external = 0; /* to know if the variable is declared inside or outside a function */
-int csplit_is_function = 0; /* to know if this is the declaration of a function or not, to distinguish between 
+int csplit_is_function = 0; /* to know if this is the declaration of a function or not, to distinguish between
 			      a static variable and a static function */
 /* Shared with the lexical analyzer */
 string csplit_current_function_name = string_undefined;
@@ -154,14 +154,14 @@ static stack TypedefStack = stack_undefined;
  static void PushTypedef()
  {
    pips_debug(8, "csplit_is_typedef = %s\n", bool_to_string(csplit_is_typedef));
-   stack_push((void *) csplit_is_typedef, TypedefStack);
+   stack_push((void *) (_int)csplit_is_typedef, TypedefStack);
    csplit_is_typedef = FALSE;
    pips_debug(8, "csplit_is_typedef = %s\n", bool_to_string(csplit_is_typedef));
  }
 
  static void PopTypedef()
  {
-   csplit_is_typedef = (int) stack_pop(TypedefStack);
+   csplit_is_typedef = (_int) stack_pop(TypedefStack);
    pips_debug(8, "csplit_is_typedef = %s\n", bool_to_string(csplit_is_typedef));
  }
 
@@ -219,7 +219,7 @@ static string general_build_signature(bool arguments_are_defined_p,
     while(s) {
       if(string_undefined_p(s)) {
 	/* We are in trouble */
-	if(arguments_are_defined_p) 
+	if(arguments_are_defined_p)
 	  pips_internal_error("Unexpected undefined argument %d", count+1);
 	else
 	  some_argument_undefined_p = TRUE;
@@ -268,7 +268,7 @@ static string general_build_signature(bool arguments_are_defined_p,
     pips_assert("An argument may be really undefined only if"
 		" arguments are not guaranteed to be defined",
 		!(some_argument_undefined_p && arguments_are_defined_p));
-    pips_assert("If all arguments are defined, the result is defined", 
+    pips_assert("If all arguments are defined, the result is defined",
 		some_argument_undefined_p || !string_undefined_p(r));
 
     pips_debug(8, "Returns: \"%s\"\n", string_undefined_p(r)? "STRING_UNDEFINED" : r);
@@ -308,7 +308,7 @@ static string safe_build_signature(string s1, ...)
      pips_debug(8, "Begin with signature \"%s\"\n", s);
 
      pips_assert("The signature is not empty", *s);
-     
+
      /* source points to the next character to copy and destination to the
         last character copied. The first character is already copied. */
      while(*source) {
@@ -423,7 +423,7 @@ static string new_ellipsis()
 /* Bison declarations */
 
 %union {
-	basic basic;        
+	basic basic;
         char character;
 	cons * liste;
 	dimension dimension;
@@ -434,7 +434,7 @@ static string new_ellipsis()
 	string string;
 	syntax syntax;
 	tag tag;
-	type type; 
+	type type;
 	value value;
         parameter parameter;
 }
@@ -445,7 +445,7 @@ static string new_ellipsis()
 %token <string> TK_FLOATCON
 %token <string> TK_NAMED_TYPE
 
-%token <string> TK_STRINGCON   
+%token <string> TK_STRINGCON
 %token <string> TK_WSTRINGCON
 
 %token TK_EOF
@@ -470,7 +470,7 @@ static string new_ellipsis()
 %token TK_INF_INF TK_SUP_SUP
 %token TK_PLUS_PLUS TK_MINUS_MINUS
 
-%token TK_RPAREN 
+%token TK_RPAREN
 %token TK_LPAREN TK_RBRACE
 %token TK_LBRACE
 %token TK_LBRACKET TK_RBRACKET
@@ -516,13 +516,13 @@ static string new_ellipsis()
 %right TK_EXCLAM TK_TILDE TK_PLUS_PLUS TK_MINUS_MINUS TK_CAST TK_RPAREN TK_ADDROF TK_SIZEOF TK_ALIGNOF
 %left TK_LBRACKET
 %left TK_DOT TK_ARROW TK_LPAREN TK_LBRACE
-%right TK_NAMED_TYPE  
+%right TK_NAMED_TYPE
 %left TK_IDENT
 
 /* Non-terminals informations */
 %start interpret
 
-%type <void> interpret 
+%type <void> interpret
 %type <void> file globals
 %type <void> global
 %type <string> attributes
@@ -539,7 +539,7 @@ static string new_ellipsis()
 %type <string> paren_comma_expression
 %type <void> arguments
 %type <void> bracket_comma_expression
-%type <void> string_list 
+%type <void> string_list
 %type <void> wstring_list
 
 %type <void> initializer
@@ -571,7 +571,7 @@ static string new_ellipsis()
 %type <string> abs_direct_decl
 %type <string> abs_direct_decl_opt
 %type <string> abstract_decl
-%type <string> pointer pointer_opt 
+%type <string> pointer pointer_opt
 %type <void> location
 
 %type <string> id_or_typename
@@ -584,11 +584,11 @@ static string new_ellipsis()
 %type <void> declaration_list
 %type <void> statement_list
 %type <void> for_clause
-%type <string> decl_spec_list 
+%type <string> decl_spec_list
 %type <string> decl_spec_list_opt_no_named
-%type <string> decl_spec_list_opt 
+%type <string> decl_spec_list_opt
 
-%type <string> maybecomma 
+%type <string> maybecomma
 %type <string> parameter_list_startscope
 %type <string> paren_attr_list_ne
 %type <string> old_pardef_list
@@ -597,12 +597,12 @@ static string new_ellipsis()
 
 interpret: file TK_EOF
                         { YYACCEPT; };
-file: globals			 /* do nothing */	
+file: globals			 /* do nothing */
 ;
 globals:
-    /* empty */         {}       /* do nothing */             
-|   global globals      {}       /* do nothing */           
-|   TK_SEMICOLON globals{}       /* do nothing */            
+    /* empty */         {}       /* do nothing */
+|   global globals      {}       /* do nothing */
+|   TK_SEMICOLON globals{}       /* do nothing */
 ;
 
 location:
@@ -611,7 +611,7 @@ location:
 
 /*** Global Definition ***/
 global:
-    declaration     
+    declaration
                         {
 			  pips_debug(5, "declaration->global\n");
 			  csplit_is_external = 1; /* the variable is declared outside of any function */
@@ -623,7 +623,7 @@ global:
 			    free_partial_signature($1);
 			  }
                           reset_csplit_current_beginning();
-			}                 
+			}
 |   function_def
                         {
 			  pips_debug(5, "function_def->global\n");
@@ -633,7 +633,7 @@ global:
 				  get_csplit_current_beginning(),
 				  csplit_line_number);
 
-			  csplit_copy(csplit_definite_function_name, 
+			  csplit_copy(csplit_definite_function_name,
 				      csplit_definite_function_signature,
 				      get_csplit_current_beginning(),
 				      csplit_line_number,
@@ -646,15 +646,15 @@ global:
                         {
                            reset_csplit_current_beginning();
                         }
-|   TK_PRAGMA attr			
-                        { 
+|   TK_PRAGMA attr
+                        {
                           reset_csplit_current_beginning();
 			}
 /* Old-style function prototype. This should be somewhere else, like in
    "declaration". For now we keep it at global scope only because in local
    scope it looks too much like a function call */
 |   TK_IDENT TK_LPAREN old_parameter_list_ne TK_RPAREN old_pardef_list TK_SEMICOLON
-                        { 
+                        {
 			  pips_internal_error("Not implemented yet\n");
 			}
 /* Old style function prototype, but without any arguments */
@@ -663,34 +663,34 @@ global:
 			  pips_internal_error("Not implemented yet\n");
 			}
 /* transformer for a toplevel construct */
-|   TK_AT_TRANSFORM TK_LBRACE global TK_RBRACE TK_IDENT /*to*/ TK_LBRACE globals TK_RBRACE 
-                        { 
+|   TK_AT_TRANSFORM TK_LBRACE global TK_RBRACE TK_IDENT /*to*/ TK_LBRACE globals TK_RBRACE
+                        {
 			  pips_internal_error("Not implemented yet\n");
 			}
 /* transformer for an expression */
-|   TK_AT_TRANSFORMEXPR TK_LBRACE expression TK_RBRACE TK_IDENT /*to*/ TK_LBRACE expression TK_RBRACE 
-                        { 
+|   TK_AT_TRANSFORMEXPR TK_LBRACE expression TK_RBRACE TK_IDENT /*to*/ TK_LBRACE expression TK_RBRACE
+                        {
 			  pips_internal_error("Not implemented yet\n");
 			}
-|   location error TK_SEMICOLON 
-                        { 
+|   location error TK_SEMICOLON
+                        {
 			  pips_user_error("Parse error: location error TK_SEMICOLON \n");
 			}
 ;
 
 id_or_typename:
-    TK_IDENT			
+    TK_IDENT
                         {
 			  $$=new_signature(splitc_text);
 			}
-|   TK_NAMED_TYPE				
+|   TK_NAMED_TYPE
                         { $$=new_signature(splitc_text);}
-|   TK_AT_NAME TK_LPAREN TK_IDENT TK_RPAREN         
+|   TK_AT_NAME TK_LPAREN TK_IDENT TK_RPAREN
                         {
-			   csplit_parser_warning("CIL AT not implemented\n"); 
+			   csplit_parser_warning("CIL AT not implemented\n");
 			   $$ = build_signature(new_signature("at_name"), new_lparen(), new_signature($3),
 						new_rparen(), NULL);
-			}    
+			}
 ;
 
 maybecomma:
@@ -704,7 +704,7 @@ maybecomma:
 
 expression:
     constant
-		        { 
+		        {
 			  $$ = $1;
 			}
 |   TK_IDENT
@@ -726,12 +726,12 @@ expression:
 						    NULL);
                         }
 |   TK_ALIGNOF expression
-		        { 
+		        {
 			  free_partial_signature($2);
 			  $$ = string_undefined;
 			}
 |   TK_ALIGNOF TK_LPAREN type_name TK_RPAREN
-		        { 
+		        {
 			  free_partial_signature($3);
 			  $$ = string_undefined;
 			}
@@ -776,7 +776,7 @@ expression:
 			  $$ = safe_build_signature($1, new_signature("--"), NULL);
 			}
 |   expression TK_ARROW id_or_typename
-		        {	
+		        {
 			  $$ = safe_build_signature($1, new_signature("->"), $3, NULL);
 			}
 |   expression TK_DOT id_or_typename
@@ -823,23 +823,23 @@ expression:
 						    $5, NULL);
 			}
 |   expression TK_PLUS expression
-			{ 
+			{
 			  $$ = safe_build_signature($1, new_signature("+"), $3, NULL);
 			}
 |   expression TK_MINUS expression
-			{ 
+			{
 			  $$ = safe_build_signature($1, new_signature("-"), $3, NULL);
 			}
 |   expression TK_STAR expression
-			{ 
+			{
 			  $$ = safe_build_signature($1, new_signature("*"), $3, NULL);
 			}
 |   expression TK_SLASH expression
-			{ 
+			{
 			  $$ = safe_build_signature($1, new_signature("/"), $3, NULL);
 			}
 |   expression TK_PERCENT expression
-			{ 
+			{
 			  $$ = safe_build_signature($1, new_signature("%"), $3, NULL);
 			}
 |   expression TK_AND_AND expression
@@ -972,7 +972,7 @@ expression:
 			  free_partial_signature($3);
 			  $$ = string_undefined;
 			}
-|   expression TK_INF_INF_EQ expression	
+|   expression TK_INF_INF_EQ expression
 			{
 			  free_partial_signature($1);
 			  free_partial_signature($3);
@@ -998,7 +998,7 @@ expression:
 			  $$ = string_undefined;
 			}
 /* (* GCC's address of labels *)  */
-|   TK_AND_AND TK_IDENT  
+|   TK_AND_AND TK_IDENT
                         {
 			  $$ = string_undefined;
 			}
@@ -1011,25 +1011,25 @@ expression:
 /* FI: I assume that only integer constant are useful in declarations. */
 
 constant:
-    TK_INTCON			
+    TK_INTCON
                         {
 			  $$ = new_signature($1);
 			}
-|   TK_FLOATCON	
+|   TK_FLOATCON
                         {
 			  $$ = string_undefined;
 			}
-|   TK_CHARCON				
+|   TK_CHARCON
                         {
 			  $$ = string_undefined;
 			}
-|   string_constant	
+|   string_constant
                         {
 			  $$ = string_undefined;
                         }
 /*add a nul to strings.  We do this here (rather than in the lexer) to make
   concatenation easy below.*/
-|   wstring_list	
+|   wstring_list
                         {
 			  $$ = string_undefined;
                         }
@@ -1038,17 +1038,17 @@ constant:
 string_constant:
 /* Now that we know this constant isn't part of a wstring, convert it
    back to a string for easy viewing. */
-    string_list         
+    string_list
                         {
 			}
 ;
 one_string_constant:
 /* Don't concat multiple strings.  For asm templates. */
-    TK_STRINGCON       
+    TK_STRINGCON
                         {}
 ;
 string_list:
-    one_string          
+    one_string
                         {
 			}
 |   string_list one_string
@@ -1057,25 +1057,25 @@ string_list:
 ;
 
 wstring_list:
-    TK_WSTRINGCON           
+    TK_WSTRINGCON
                         {
 			}
 |   wstring_list one_string
                         {
 			}
-|   wstring_list TK_WSTRINGCON  
+|   wstring_list TK_WSTRINGCON
                         {
 			}
 /* Only the first string in the list needs an L, so L"a" "b" is the same
  * as L"ab" or L"a" L"b". */
 
-one_string: 
+one_string:
     TK_STRINGCON	{ }
-|   TK_FUNCTION__       
+|   TK_FUNCTION__
                         { }
 |   TK_PRETTY_FUNCTION__
                         { }
-;    
+;
 
 init_expression:
     expression          { free_partial_signature($1);}
@@ -1083,54 +1083,54 @@ init_expression:
 			{ }
 
 initializer_list:    /* ISO 6.7.8. Allow a trailing COMMA */
-    initializer 
-                        { 
+    initializer
+                        {
 			}
 |   initializer TK_COMMA initializer_list_opt
-                        { 
+                        {
 			}
 ;
 initializer_list_opt:
     /* empty */         { }
 |   initializer_list    { }
 ;
-initializer: 
+initializer:
     init_designators eq_opt init_expression
-                        { 
+                        {
 			}
 |   gcc_init_designators init_expression
-                        { 
+                        {
 			}
 |   init_expression     { }
 ;
-eq_opt: 
+eq_opt:
     TK_EQ
                         { }
     /*(* GCC allows missing = *)*/
-|   /*(* empty *)*/     
-                        { 
+|   /*(* empty *)*/
+                        {
 			}
 ;
-init_designators: 
+init_designators:
     TK_DOT id_or_typename init_designators_opt
                         { }
 |   TK_LBRACKET expression TK_RBRACKET init_designators_opt
                         { free_partial_signature($2); }
 |   TK_LBRACKET expression TK_ELLIPSIS expression TK_RBRACKET
                         { free_partial_signature($2); free_partial_signature($4); }
-;         
+;
 init_designators_opt:
     /* empty */         { }
 |   init_designators    {}
 ;
 
 gcc_init_designators:  /*(* GCC supports these strange things *)*/
-    id_or_typename TK_COLON   
-                        { 
+    id_or_typename TK_COLON
+                        {
 			}
 ;
 
-arguments: 
+arguments:
     /* empty */         { }
 |   comma_expression    { free_partial_signature($1); }
 ;
@@ -1139,22 +1139,22 @@ opt_expression:
     /* empty */
                         { $$=strdup(" ");}
 |   comma_expression
-                        { 
+                        {
                           //free_partial_signature($1);
 			  $$ = $1;
 			}
 ;
 
 comma_expression:
-    expression                        
+    expression
                         {
 			  $$ = $1;
 			}
-|   expression TK_COMMA comma_expression 
+|   expression TK_COMMA comma_expression
                         {
 			  $$ = safe_build_signature($1, new_comma(), $3, NULL);
 			}
-|   error TK_COMMA comma_expression      
+|   error TK_COMMA comma_expression
                         {
 			  csplit_parser_error("within expression list.\n");
 			  $$ = string_undefined;
@@ -1172,7 +1172,7 @@ paren_comma_expression:
 			  $$ = safe_build_signature(new_lparen(), $2,
 						    new_rparen(), NULL);
 			}
-|   TK_LPAREN error TK_RPAREN                         
+|   TK_LPAREN error TK_RPAREN
                         {
 			  csplit_parser_error("Error within parenthesized expression.\n");
 			  $$ = string_undefined;
@@ -1180,24 +1180,24 @@ paren_comma_expression:
 ;
 
 bracket_comma_expression:
-    TK_LBRACKET comma_expression TK_RBRACKET 
+    TK_LBRACKET comma_expression TK_RBRACKET
                         {
-			  free_partial_signature($2); 
+			  free_partial_signature($2);
 			}
-|   TK_LBRACKET error TK_RBRACKET  
+|   TK_LBRACKET error TK_RBRACKET
                         {
 			}
 ;
 
 /*** statements ***/
 block: /* ISO 6.8.2 */
-    TK_LBRACE local_labels block_attrs declaration_list statement_list TK_RBRACE   
+    TK_LBRACE local_labels block_attrs declaration_list statement_list TK_RBRACE
                         {
 			  pips_debug(5, "block found at line %d\n",
 				  csplit_line_number);
-			} 
-|   error location TK_RBRACE 
-                        { } 
+			}
+|   error location TK_RBRACE
+                        { }
 ;
 
 block_attrs:
@@ -1206,7 +1206,7 @@ block_attrs:
                         { }
 ;
 
-declaration_list: 
+declaration_list:
     /* empty */         { }
 |   declaration declaration_list
                         {
@@ -1222,13 +1222,13 @@ statement_list:
 |   TK_IDENT TK_COLON	{ }
 ;
 
-local_labels: 
+local_labels:
    /* empty */          {}
 |  TK_LABEL__ local_label_names TK_SEMICOLON local_labels
                         { }
 ;
 
-local_label_names: 
+local_label_names:
    TK_IDENT             {}
 |  TK_IDENT TK_COMMA local_label_names {}
 ;
@@ -1239,44 +1239,44 @@ statement:
 			}
 |   comma_expression TK_SEMICOLON
 	        	{
-			  free_partial_signature($1); 
+			  free_partial_signature($1);
 			}
 |   block               { }
 |   TK_IF paren_comma_expression statement                    %prec TK_IF
                 	{
-			  free_partial_signature($2); 
+			  free_partial_signature($2);
 			}
 |   TK_IF paren_comma_expression statement TK_ELSE statement
 	                {
-			  free_partial_signature($2); 
+			  free_partial_signature($2);
 			}
-|   TK_SWITCH 
+|   TK_SWITCH
                         {
-			} 
-    paren_comma_expression 
+			}
+    paren_comma_expression
                         {
 			  /* free_partial_signature($1); */
-			} 
+			}
     statement
                         {
 			}
-|   TK_WHILE 
+|   TK_WHILE
                         {
-			} 
+			}
     paren_comma_expression statement
 	        	{
 			  /* free_partial_signature($1); */
 			}
 |   TK_DO
                         {
-			} 
+			}
     statement TK_WHILE paren_comma_expression TK_SEMICOLON
 	        	{
 			  /* free_partial_signature($3); */
 			}
 |   TK_FOR
                         {
-			} 
+			}
     TK_LPAREN for_clause opt_expression TK_SEMICOLON opt_expression TK_RPAREN statement
 	                {
 			}
@@ -1285,22 +1285,22 @@ statement:
 			}
 |   TK_CASE expression TK_COLON
                         {
-			  free_partial_signature($2); 
+			  free_partial_signature($2);
 			}
 |   TK_CASE expression TK_ELLIPSIS expression TK_COLON
                         {
-			  free_partial_signature($2); 
-			  free_partial_signature($4); 
+			  free_partial_signature($2);
+			  free_partial_signature($4);
 			}
 |   TK_DEFAULT TK_COLON
 	                {
 			}
-|   TK_RETURN TK_SEMICOLON		 
+|   TK_RETURN TK_SEMICOLON
                         {
 			}
 |   TK_RETURN comma_expression TK_SEMICOLON
 	                {
-			  free_partial_signature($2); 
+			  free_partial_signature($2);
 			}
 |   TK_BREAK TK_SEMICOLON
                         {
@@ -1311,20 +1311,22 @@ statement:
 |   TK_GOTO TK_IDENT TK_SEMICOLON
 		        {
 			}
-|   TK_GOTO TK_STAR comma_expression TK_SEMICOLON 
+|   TK_GOTO TK_STAR comma_expression TK_SEMICOLON
                         {
-			  free_partial_signature($3); 
+			  free_partial_signature($3);
 			}
 |   TK_ASM asmattr TK_LPAREN asmtemplate asmoutputs TK_RPAREN TK_SEMICOLON
                         { }
-|   TK_MSASM            
+|   TK_MSASM
                         { }
-|   error location TK_SEMICOLON  
+|   declaration
+                        { /* In C99 we can have declarations everywhere... */ }
+|   error location TK_SEMICOLON
                         {
-			} 
+			}
 ;
 
-for_clause: 
+for_clause:
     opt_expression TK_SEMICOLON   { }
 |   declaration
                         {
@@ -1345,7 +1347,7 @@ declaration:                                /* ISO 6.7.*/
 			  $$ = string_undefined;
 			  PopTypedef();
 			}
-|   decl_spec_list TK_SEMICOLON	
+|   decl_spec_list TK_SEMICOLON
                         {
 			  pips_debug(5, "decl_spec_list TK_SEMICOLON -> declaration\n");
 			  pips_debug(5, "decl_spec_list=\"%s\"\n", $1);
@@ -1374,7 +1376,7 @@ init_declarator:                             /* ISO 6.7 */
 			  $$ = string_undefined;
                         }
 |   declarator TK_EQ init_expression
-                        { 
+                        {
 			  $$ = string_undefined;
 			}
 ;
@@ -1388,7 +1390,7 @@ init_declarator:                             /* ISO 6.7 */
    as soon as an undefined_string crops up. */
 decl_spec_list:                         /* ISO 6.7 */
                                         /* ISO 6.7.1 */
-    TK_TYPEDEF decl_spec_list_opt          
+    TK_TYPEDEF decl_spec_list_opt
                         {
 			  pips_debug(5, "TK_TYPEDEF decl_spec_list_opt->decl_spec_list\n");
 			  csplit_is_typedef = TRUE;
@@ -1399,8 +1401,8 @@ decl_spec_list:                         /* ISO 6.7 */
 			  $$ = string_undefined;
 			  */
 			  $$ = build_signature(new_signature("typedef"), $2, NULL);
-			}    
-|   TK_EXTERN decl_spec_list_opt           
+			}
+|   TK_EXTERN decl_spec_list_opt
                         {
 			  pips_debug(5, "TK_EXTERN decl_spec_list_opt->decl_spec_list\n");
 			  /*
@@ -1408,8 +1410,8 @@ decl_spec_list:                         /* ISO 6.7 */
 			  $$ = string_undefined;
 			  */
 			  $$ = build_signature(new_signature("extern"), $2, NULL);
-			}    
-|   TK_STATIC decl_spec_list_opt    
+			}
+|   TK_STATIC decl_spec_list_opt
                         {
 			  /* There are 3 cases: static function, external and internal static variable*/
 			  pips_debug(5, "TK_STATIC decl_spec_list_opt->decl_spec_list\n");
@@ -1419,7 +1421,7 @@ decl_spec_list:                         /* ISO 6.7 */
 			  }
 			  $$ = build_signature(new_signature("static"), $2, NULL);
 			}
-|   TK_AUTO decl_spec_list_opt           
+|   TK_AUTO decl_spec_list_opt
                         {
 			  pips_debug(5, "TK_AUTO decl_spec_list_opt->decl_spec_list\n");
 			  /*
@@ -1428,7 +1430,7 @@ decl_spec_list:                         /* ISO 6.7 */
 			  */
 			  $$ = build_signature(new_signature("auto"), $2, NULL);
 			}
-|   TK_REGISTER decl_spec_list_opt        
+|   TK_REGISTER decl_spec_list_opt
                         {
 			  pips_debug(5, "TK_REGISTER decl_spec_list_opt->decl_spec_list\n");
 			  /*
@@ -1447,7 +1449,7 @@ decl_spec_list:                         /* ISO 6.7 */
 			      pips_debug(5, "Useless partial signature $2: %s\n", $2);
 			      free($2);
 			    }
-			    else 
+			    else
 			      pips_debug(5, "$1 and $2 undefined\n");
 			    $$ = string_undefined;
 			  }
@@ -1456,19 +1458,19 @@ decl_spec_list:                         /* ISO 6.7 */
 			    $$ = build_signature($1, $2, NULL);
 			    pips_debug(5, "Partial signature: \"%s\"\n", $$);
 			  }
-			}	
+			}
                                         /* ISO 6.7.4 */
 |   TK_INLINE decl_spec_list_opt
-                        { 
+                        {
 			  pips_debug(5, "TK_INLINE decl_spec_list_opt->decl_spec_list\n");
 			  /*
 			  free_partial_signature($2);
 			  $$ = string_undefined;
 			  */
 			  $$ = build_signature(new_signature("inline"), $2, NULL);
-			}	 
-|   attribute decl_spec_list_opt        
-                        { 
+			}
+|   attribute decl_spec_list_opt
+                        {
 			  pips_debug(5, "attribute decl_spec_list_opt->decl_spec_list\n");
 			  /*
 			  free_partial_signature($1);
@@ -1476,27 +1478,27 @@ decl_spec_list:                         /* ISO 6.7 */
 			  $$ = string_undefined;
 			  */
 			  $$ = build_signature($1, $2, NULL);
-			}	
+			}
 /* specifier pattern variable (must be last in spec list) */
-|   TK_AT_SPECIFIER TK_LPAREN TK_IDENT TK_RPAREN  
-                        { 
+|   TK_AT_SPECIFIER TK_LPAREN TK_IDENT TK_RPAREN
+                        {
 			  pips_debug(5, "TK_AT_SPECIFIER TK_LPAREN TK_IDENT TK_RPAREN->decl_spec_list\n");
 			  /* $$ = string_undefined; */
 			  $$ = build_signature(new_signature("at specifier"),
 					       new_lparen(), new_signature($3),
 					       new_rparen(), NULL);
-			}	
+			}
 ;
 
-/* (* In most cases if we see a NAMED_TYPE we must shift it. Thus we declare 
+/* (* In most cases if we see a NAMED_TYPE we must shift it. Thus we declare
     * NAMED_TYPE to have right associativity  *) */
-decl_spec_list_opt: 
+decl_spec_list_opt:
 /* empty */         { $$=new_empty(); PushTypedef();} %prec TK_NAMED_TYPE
 |   decl_spec_list      { $$=$1;}
 ;
 
-/* (* We add this separate rule to handle the special case when an appearance 
-    * of NAMED_TYPE should not be considered as part of the specifiers but as 
+/* (* We add this separate rule to handle the special case when an appearance
+    * of NAMED_TYPE should not be considered as part of the specifiers but as
     * part of the declarator. IDENT has higher precedence than NAMED_TYPE  *)
  */
 decl_spec_list_opt_no_named:     /* empty */
@@ -1525,57 +1527,57 @@ decl_spec_list_opt_no_named:     /* empty */
 /* To generate the function signature, we need the keywords. */
 
 type_spec:   /* ISO 6.7.2 */
-    TK_VOID             
+    TK_VOID
                         {
 			  pips_debug(8, "TK_VOID->type_spec\n");
 			  $$ = new_signature(splitc_text);
-                        } 
-|   TK_CHAR          
+                        }
+|   TK_CHAR
                         {
 			  pips_debug(8, "TK_CHAR->type_spec\n");
 			  $$ = new_signature(splitc_text);
 			}
-|   TK_SHORT      
+|   TK_SHORT
                         {
 			  pips_debug(8, "TK_SHORT->type_spec\n");
 			  $$ = new_signature(splitc_text);
-			}    
-|   TK_INT  
+			}
+|   TK_INT
                         {
 			  pips_debug(8, "TK_INT->type_spec\n");
 			  $$ = new_signature(splitc_text);
-			}  
+			}
 |   TK_COMPLEX
                         {
 			  pips_debug(8, "TK_COMPLEX->type_spec\n");
 			  $$ = new_signature(splitc_text);
-			}  
+			}
 |   TK_LONG
                         {
 			  pips_debug(8, "TK_LONG->type_spec\n");
 			  $$ = new_signature(splitc_text);
-			}   
-|   TK_FLOAT           
+			}
+|   TK_FLOAT
                         {
 			  pips_debug(8, "TK_FLOAT->type_spec\n");
 			  $$ = new_signature(splitc_text);
 			}
-|   TK_DOUBLE           
+|   TK_DOUBLE
                         {
 			  pips_debug(8, "TK_DOUBLE->type_spec\n");
 			  $$ = new_signature(splitc_text);
 			}
-|   TK_SIGNED     
+|   TK_SIGNED
                         {
 			  pips_debug(8, "TK_SIGNED->type_spec\n");
 			  $$ = new_signature(splitc_text);
 			}
-|   TK_UNSIGNED          
+|   TK_UNSIGNED
                         {
 			  pips_debug(8, "TK_UNSIGNED->type_spec\n");
 			  $$ = new_signature(splitc_text);
 			}
-|   TK_STRUCT id_or_typename                           
+|   TK_STRUCT id_or_typename
                         {
 			  pips_debug(8, "TK_STRUCT id_or_typename->type_spec\n");
 			  /* FI: not clean, but the parser
@@ -1608,7 +1610,7 @@ type_spec:   /* ISO 6.7.2 */
 			  $$ = build_signature(new_signature("struct"), new_lbrace(), $3,
 					       new_rbrace(), NULL);
 			}
-|   TK_UNION id_or_typename 
+|   TK_UNION id_or_typename
                         {
 			  pips_debug(8, "TK_UNION id_or_typename->type_spec\n");
 			  if(strcmp(csplit_current_function_name, $2)==0) {
@@ -1631,7 +1633,7 @@ type_spec:   /* ISO 6.7.2 */
 			  $$ = build_signature(new_signature("union"), new_lbrace(), $3,
 					       new_rbrace(), NULL);
 			}
-|   TK_ENUM id_or_typename   
+|   TK_ENUM id_or_typename
                         {
 			  pips_debug(8, "TK_ENUM id_or_typename->type_spec\n");
 			  if(strcmp(csplit_current_function_name, $2)==0) {
@@ -1646,30 +1648,30 @@ type_spec:   /* ISO 6.7.2 */
 			    reset_csplit_current_function_name();
 			  }
 			  $$ = build_signature(new_signature("enum"), $2, new_lbrace(), $4, $5, new_rbrace(), NULL);
-			}                   
+			}
 |   TK_ENUM TK_LBRACE enum_list maybecomma TK_RBRACE
                         {
 			  pips_debug(8, "TK_ENUM TK_LBRACE enum_list maybecomma TK_RBRACE->type_spec\n");
 			  $$ = build_signature(new_signature("enum"), new_lbrace(), $3, $4, new_rbrace(), NULL);
 			}
-|   TK_NAMED_TYPE  
+|   TK_NAMED_TYPE
                         {
 			  pips_debug(8, "TK_NAMED_TYPE->type_spec\n");
 			  $$ = new_signature($1);
 			}
-|   TK_TYPEOF TK_LPAREN expression TK_RPAREN  
+|   TK_TYPEOF TK_LPAREN expression TK_RPAREN
                         {
 			  pips_debug(8, "TK_TYPEOF TK_LPAREN expression TK_RPAREN->type_spec\n");
 			  $$ = build_signature(new_signature("typeof"), new_lparen(), new_signature("IDoNotWantToDealWithExpressions"), new_rparen(), NULL);
 			}
-|   TK_TYPEOF TK_LPAREN type_name TK_RPAREN    
+|   TK_TYPEOF TK_LPAREN type_name TK_RPAREN
                         {
 			  pips_debug(8, "TK_TYPEOF TK_LPAREN type_name TK_RPAREN->type_spec\n");
 			  $$ = build_signature(new_signature("typeof"), new_lparen(), $3, new_rparen(), NULL);;
 			}
 ;
 
-struct_decl_list: /* (* ISO 6.7.2. Except that we allow empty structs. We 
+struct_decl_list: /* (* ISO 6.7.2. Except that we allow empty structs. We
                       * also allow missing field names. *)
                    */
     /* empty */         { $$ = new_empty(); }
@@ -1677,7 +1679,7 @@ struct_decl_list: /* (* ISO 6.7.2. Except that we allow empty structs. We
                         {
 			  PopTypedef();
 			  $$ = build_signature($1, new_semicolon(), $3, NULL);
-			}             
+			}
 |   decl_spec_list      /* { } */
     field_decl_list TK_SEMICOLON struct_decl_list
                         {
@@ -1692,11 +1694,11 @@ struct_decl_list: /* (* ISO 6.7.2. Except that we allow empty structs. We
 ;
 
 field_decl_list: /* (* ISO 6.7.2 *) */
-    field_decl          
+    field_decl
                         {
 			  $$ = $1;
 			}
-|   field_decl TK_COMMA field_decl_list    
+|   field_decl TK_COMMA field_decl_list
                         {
 			  $$ = build_signature($1, new_comma(), $3, NULL);
 			}
@@ -1704,40 +1706,40 @@ field_decl_list: /* (* ISO 6.7.2 *) */
 
 field_decl: /* (* ISO 6.7.2. Except that we allow unnamed fields. *) */
     declarator          { $$ = $1; }
-|   declarator TK_COLON expression   
+|   declarator TK_COLON expression
                         {
 			  $$ = build_signature($1, new_colon(), $3, NULL);
-			}  
-|   TK_COLON expression 
+			}
+|   TK_COLON expression
                         {
 			  $$ = build_signature(new_colon(), $2, NULL);
 			}
 ;
 
 enum_list: /* (* ISO 6.7.2.2 *) */
-    enumerator	
+    enumerator
                         {
 			  $$ = $1;
 			}
-|   enum_list TK_COMMA enumerator	       
+|   enum_list TK_COMMA enumerator
                         {
 			  $$ = build_signature($1, new_comma(), $3, NULL);
 			}
-|   enum_list TK_COMMA error      
+|   enum_list TK_COMMA error
                         {
 			  csplit_parser_error("in enum list");
 			  $$ = string_undefined;
 			}
 ;
 
-enumerator:	
-    TK_IDENT	
+enumerator:
+    TK_IDENT
                         {
 			  pips_debug(5, "TK_IDENT->enumerator\n");
 			  pips_debug(9, "TK_IDENT=%s\n", $1);
 			  $$ = new_signature($1);
 			}
-|   TK_IDENT TK_EQ expression	
+|   TK_IDENT TK_EQ expression
                         {
 			  pips_debug(5, "TK_IDENT TK_EQ expression->enumerator\n");
 			  pips_debug(9, "TK_IDENT=%s\n", $1);
@@ -1803,7 +1805,7 @@ direct_decl: /* (* ISO 6.7.5 *) */
 			  $$ = build_signature(new_lparen(), $2, $3, new_rparen(), NULL);
 			}
 |   direct_decl TK_LBRACKET attributes comma_expression_opt TK_RBRACKET
-                        { 
+                        {
 			  $$ = build_signature($1, new_lbracket(), $3, $4, new_rbracket(), NULL);
 			}
 |   direct_decl TK_LBRACKET attributes error TK_RBRACKET
@@ -1816,7 +1818,7 @@ direct_decl: /* (* ISO 6.7.5 *) */
 			}
 ;
 
-parameter_list_startscope: 
+parameter_list_startscope:
     TK_LPAREN           { $$ = new_lparen();}
 ;
 
@@ -1838,25 +1840,25 @@ rest_par_list:
 			    $$ = build_signature($1, $2, NULL);
 			}
 ;
-rest_par_list1: 
+rest_par_list1:
     /* empty */         { $$ = new_empty(); }
-|   TK_COMMA TK_ELLIPSIS 
+|   TK_COMMA TK_ELLIPSIS
                         {
 			  $$ = build_signature(new_comma(), new_ellipsis(), NULL);
 			}
-|   TK_COMMA parameter_decl rest_par_list1 
+|   TK_COMMA parameter_decl rest_par_list1
                         {
 			  $$ = build_signature(new_comma(), $2, $3, NULL);
-			}  
-;    
+			}
+;
 
 parameter_decl: /* (* ISO 6.7.5 *) */
-    decl_spec_list declarator 
+    decl_spec_list declarator
                         {
 			  PopTypedef();
 			  $$ = build_signature($1, $2, NULL);
 			}
-|   decl_spec_list abstract_decl 
+|   decl_spec_list abstract_decl
                         {
 			  pips_debug(5, "decl_spec_list abstract_decl->parameter_decl\n");
 			  /*
@@ -1878,28 +1880,28 @@ parameter_decl: /* (* ISO 6.7.5 *) */
 			    $$ = build_signature($1, $2, NULL);
 			  PopTypedef();
 			}
-|   decl_spec_list              
+|   decl_spec_list
                         {
 			  PopTypedef();
 			  $$ = $1;
 			}
-|   TK_LPAREN parameter_decl TK_RPAREN    
-                        { 
+|   TK_LPAREN parameter_decl TK_RPAREN
+                        {
 			  //PopTypedef();
 			  $$ = build_signature(new_lparen(), $2, new_rparen(), NULL);
-			} 
+			}
 ;
 
 /* (* Old style prototypes. Like a declarator *) */
 old_proto_decl:
-    pointer_opt direct_old_proto_decl 
+    pointer_opt direct_old_proto_decl
                         {
 			  $$ = build_signature($1, $2, NULL);
 			}
 ;
 direct_old_proto_decl:
     direct_decl TK_LPAREN old_parameter_list_ne TK_RPAREN old_pardef_list
-                        { 
+                        {
 			  /* You do not need the formal parameter list */
 			  /*
 			  $$ = build_signature($1, new_lparen(), $3, new_rparen(),
@@ -1917,17 +1919,17 @@ direct_old_proto_decl:
 ;
 
 old_parameter_list_ne:
-    TK_IDENT            
+    TK_IDENT
                         {
 			  $$ = new_signature($1);
 			}
-|   TK_IDENT TK_COMMA old_parameter_list_ne   
+|   TK_IDENT TK_COMMA old_parameter_list_ne
                         {
 			  $$ = build_signature($1, new_comma(), $3, NULL);
 			}
 ;
 
-old_pardef_list: 
+old_pardef_list:
     /* empty */         { $$ = new_empty(); }
 |   decl_spec_list old_pardef TK_SEMICOLON TK_ELLIPSIS
                         {
@@ -1942,7 +1944,7 @@ old_pardef_list:
 			  */
 			  PopTypedef();
 			}
-|   decl_spec_list old_pardef TK_SEMICOLON old_pardef_list  
+|   decl_spec_list old_pardef TK_SEMICOLON old_pardef_list
                         {
 			  $$ = build_signature($1, $2, new_semicolon(),
 					       $4, NULL);
@@ -1950,24 +1952,24 @@ old_pardef_list:
 			}
 ;
 
-old_pardef: 
-    declarator            
+old_pardef:
+    declarator
                         {
 			  $$ = $1;
 			}
-|   declarator TK_COMMA old_pardef   
+|   declarator TK_COMMA old_pardef
                         {
 			  $$ = build_signature($1, new_comma(), $3, NULL);
 			}
-|   error       
+|   error
                         {
 			  csplit_parser_error("In old parameter definition\n");
 			  $$ = string_undefined;
 			}
 ;
 
-pointer: /* (* ISO 6.7.5 *) */ 
-    TK_STAR attributes pointer_opt 
+pointer: /* (* ISO 6.7.5 *) */
+    TK_STAR attributes pointer_opt
                         {
 			  pips_debug(5, "TK_STAR attributes pointer_opt -> pointer\n");
 			  pips_debug(5, "attributes: \"%s\", pointer_opt: \"%s\"\n", $2, $3);
@@ -1977,7 +1979,7 @@ pointer: /* (* ISO 6.7.5 *) */
 
 pointer_opt:
     /* empty */         { $$ = new_empty(); }
-|   pointer             
+|   pointer
                         { $$ = $1; }
 ;
 
@@ -1987,7 +1989,7 @@ type_name: /* (* ISO 6.7.6 *) */
 			  PopTypedef();
 			  $$ = build_signature($1, $2, NULL);
 			}
-|   decl_spec_list      
+|   decl_spec_list
                         {
 			  PopTypedef();
 			  $$ = $1;
@@ -1995,20 +1997,20 @@ type_name: /* (* ISO 6.7.6 *) */
 ;
 
 abstract_decl: /* (* ISO 6.7.6. *) */
-    pointer_opt abs_direct_decl attributes  
+    pointer_opt abs_direct_decl attributes
                         {
 			  pips_debug(5, "pointer_opt abs_direct_decl attributes -> abstract_decl\n");
 			  $$ = build_signature($1, $2, $3, NULL);
 			}
-|   pointer                     
+|   pointer
                         {
 			  pips_debug(5, "pointer -> abstract_decl\n");
 			  $$ = $1;
 			}
 ;
 
-abs_direct_decl: /* (* ISO 6.7.6. We do not support optional declarator for 
-                     * functions. Plus Microsoft attributes. See the 
+abs_direct_decl: /* (* ISO 6.7.6. We do not support optional declarator for
+                     * functions. Plus Microsoft attributes. See the
                      * discussion for declarator. *) */
     TK_LPAREN attributes abstract_decl TK_RPAREN
                         {
@@ -2018,7 +2020,7 @@ abs_direct_decl: /* (* ISO 6.7.6. We do not support optional declarator for
                         {
 			  csplit_parser_error("Parse error: TK_LPAREN error TK_RPAREN\n");
 			}
-            
+
 |   abs_direct_decl_opt TK_LBRACKET comma_expression_opt TK_RBRACKET
                         {
 			  $$ = build_signature($1, new_lbracket(), new_signature("IDoNotWantcomma_expression_opt"), new_rbracket(), NULL);
@@ -2027,11 +2029,11 @@ abs_direct_decl: /* (* ISO 6.7.6. We do not support optional declarator for
 |   abs_direct_decl parameter_list_startscope rest_par_list TK_RPAREN
                         {
 			  $$ = build_signature($1, $2, $3, new_rparen(), NULL);
-			}  
+			}
 ;
 
 abs_direct_decl_opt:
-    abs_direct_decl    
+    abs_direct_decl
                         {
 			  $$ = $1;
 			}
@@ -2039,13 +2041,13 @@ abs_direct_decl_opt:
 ;
 
 function_def:  /* (* ISO 6.9.1 *) */
-    function_def_start block   
+    function_def_start block
                         {
-			}	
+			}
 
 function_def_start:  /* (* ISO 6.9.1 *) */
-    decl_spec_list declarator   
-                        { 
+    decl_spec_list declarator
+                        {
 			  pips_debug(5, "decl_spec_list declarator->function_def_start\n");
 			  pips_assert("A temptative function name is available",
 				      !string_undefined_p(csplit_current_function_name));
@@ -2064,10 +2066,10 @@ function_def_start:  /* (* ISO 6.9.1 *) */
 				     csplit_definite_function_name,
 				     csplit_definite_function_signature);
 			  PopTypedef();
-			}	
+			}
 /* (* Old-style function prototype *) */
-|   decl_spec_list old_proto_decl 
-                        { 
+|   decl_spec_list old_proto_decl
+                        {
 			  /* The signature obtained here must be
                              post-processed. The declaration list after
                              the empty parameter list could be entirely
@@ -2092,8 +2094,8 @@ function_def_start:  /* (* ISO 6.9.1 *) */
 			  PopTypedef();
 			}
 /* (* New-style function that does not have a return type *) */
-|   TK_IDENT parameter_list_startscope rest_par_list TK_RPAREN 
-                        { 
+|   TK_IDENT parameter_list_startscope rest_par_list TK_RPAREN
+                        {
 			  pips_debug(5, "TK_IDENT parameter_list_startscope rest_par_list TK_RPAREN->function_def_start");
 			  /* Create the current function */
 			  pips_debug(5, "Rule 3: Function declaration of \"%s\" is located between line %d and line %d\n", $1, get_csplit_current_beginning(), csplit_line_number);
@@ -2109,10 +2111,10 @@ function_def_start:  /* (* ISO 6.9.1 *) */
 			  pips_debug(1, "Signature for function %s: %s\n\n",
 				     csplit_current_function_name,
 				     csplit_definite_function_signature);
-			}	
+			}
 /* (* No return type and no old-style parameter list *) */
 |   TK_IDENT TK_LPAREN old_parameter_list_ne TK_RPAREN old_pardef_list
-                        { 
+                        {
 			  pips_debug(5, "TK_IDENT TK_LPAREN old_parameter_list_ne TK_RPAREN old_pardef_list->function_def_start");
 			  pips_debug(5, "Rule 4: Function \"%s\" declaration is located between line %d and line %d\n",
 				     $1,
@@ -2131,10 +2133,10 @@ function_def_start:  /* (* ISO 6.9.1 *) */
 			  pips_debug(1, "Signature for function %s: %s\n\n",
 				     csplit_current_function_name,
 				     csplit_definite_function_signature);
-			}	
+			}
 /* (* No return type and no parameters *) */
 |   TK_IDENT TK_LPAREN TK_RPAREN
-                        { 
+                        {
 			  pips_debug(5, "TK_IDENT TK_LPAREN TK_RPAREN->function_def_start");
 			  /* MakeCurrentFunction*/
 			  csplit_is_function = 5; /* function's declaration */
@@ -2143,230 +2145,230 @@ function_def_start:  /* (* ISO 6.9.1 *) */
 				     get_csplit_current_beginning(),
 				     csplit_line_number);
 			  pips_internal_error("Not implemented yet");
-			}	
+			}
 ;
 
 /*** GCC attributes ***/
 attributes:
-    /* empty */				
-                        { $$ = new_empty(); }	
+    /* empty */
+                        { $$ = new_empty(); }
 |   attribute attributes
-                        { $$ = build_signature($1, $2, NULL); }	
+                        { $$ = build_signature($1, $2, NULL); }
 ;
 
-/* (* In some contexts we can have an inline assembly to specify the name to 
+/* (* In some contexts we can have an inline assembly to specify the name to
     * be used for a global. We treat this as a name attribute *) */
 attributes_with_asm:
-    /* empty */                         
-                        { $$ = new_empty(); }	
-|   attribute attributes_with_asm       
-                        { $$ = build_signature($1, $2, NULL); }	
-|   TK_ASM TK_LPAREN string_constant TK_RPAREN attributes        
+    /* empty */
+                        { $$ = new_empty(); }
+|   attribute attributes_with_asm
+                        { $$ = build_signature($1, $2, NULL); }
+|   TK_ASM TK_LPAREN string_constant TK_RPAREN attributes
                         {
 			  free_partial_signature($5);
 			  csplit_parser_error("ASM extensions not implemented");
 			  $$ = string_undefined;
-			}                                        
+			}
 ;
- 
+
 attribute:
-    TK_ATTRIBUTE TK_LPAREN paren_attr_list_ne TK_RPAREN	
+    TK_ATTRIBUTE TK_LPAREN paren_attr_list_ne TK_RPAREN
                         {
 			  $$ = build_signature(new_signature("attribute"), new_lparen(), $3,
 					       new_rparen(), NULL);
-			}	                                       
-|   TK_DECLSPEC paren_attr_list_ne       
+			}
+|   TK_DECLSPEC paren_attr_list_ne
                         {
 			  $$ = build_signature(new_signature("decl_spec"), $2, NULL);
-			}	
-|   TK_MSATTR                             
+			}
+|   TK_MSATTR
                         {
 			  $$ = new_signature("msattr");
-			}	
+			}
                                         /* ISO 6.7.3 */
-|   TK_CONST                              
-                        { 
+|   TK_CONST
+                        {
 			  $$ = new_signature("const");
-			}	
-|   TK_RESTRICT                            
-                        { 
+			}
+|   TK_RESTRICT
+                        {
 			  $$ = new_signature("restrict");
-			}	
-|   TK_VOLATILE                            
-                        { 
+			}
+|   TK_VOLATILE
+                        {
 			  $$ = new_signature("volatile");
-			}	
+			}
 ;
 
 /** (* PRAGMAS and ATTRIBUTES *) ***/
-/* (* We want to allow certain strange things that occur in pragmas, so we 
-    * cannot use directly the language of expressions *) */ 
-attr: 
-|   id_or_typename                       
-                        { }	
-|   TK_IDENT TK_COLON TK_INTCON                  
-                        { }	
-|   TK_DEFAULT TK_COLON TK_INTCON               
-                        { }	
-|   TK_IDENT TK_LPAREN  TK_RPAREN                 
-                        { }	
-|   TK_IDENT paren_attr_list_ne             
-                        { }	
-|   TK_INTCON                              
-                        { }	
-|   string_constant                      
-                        { }	
-|   TK_CONST                                
-                        { }	
-|   TK_SIZEOF expression                     
+/* (* We want to allow certain strange things that occur in pragmas, so we
+    * cannot use directly the language of expressions *) */
+attr:
+|   id_or_typename
+                        { }
+|   TK_IDENT TK_COLON TK_INTCON
+                        { }
+|   TK_DEFAULT TK_COLON TK_INTCON
+                        { }
+|   TK_IDENT TK_LPAREN  TK_RPAREN
+                        { }
+|   TK_IDENT paren_attr_list_ne
+                        { }
+|   TK_INTCON
+                        { }
+|   string_constant
+                        { }
+|   TK_CONST
+                        { }
+|   TK_SIZEOF expression
                         {
-			  free_partial_signature($2); 
-			}	
-|   TK_SIZEOF TK_LPAREN type_name TK_RPAREN	                         
-                        { }	
+			  free_partial_signature($2);
+			}
+|   TK_SIZEOF TK_LPAREN type_name TK_RPAREN
+                        { }
 
-|   TK_ALIGNOF expression                   
+|   TK_ALIGNOF expression
                         {
-			  free_partial_signature($2); 
-			}	
-|   TK_ALIGNOF TK_LPAREN type_name TK_RPAREN      
-                        { }	
-|   TK_PLUS expression    	                 
-                        { 
-			  free_partial_signature($2); 
-			}	
-|   TK_MINUS expression 		        
-                        { free_partial_signature($2);}	
-|   TK_STAR expression		       
-                        { free_partial_signature($2);}	
+			  free_partial_signature($2);
+			}
+|   TK_ALIGNOF TK_LPAREN type_name TK_RPAREN
+                        { }
+|   TK_PLUS expression
+                        {
+			  free_partial_signature($2);
+			}
+|   TK_MINUS expression
+                        { free_partial_signature($2);}
+|   TK_STAR expression
+                        { free_partial_signature($2);}
 |   TK_AND expression				                 %prec TK_ADDROF
-	                                
-                        { free_partial_signature($2);}	
-|   TK_EXCLAM expression		       
-                        { free_partial_signature($2);}	
-|   TK_TILDE expression		        
-                        { free_partial_signature($2);}	
-|   attr TK_PLUS attr                      
-                        { }	 
-|   attr TK_MINUS attr                    
-                        { }	
-|   attr TK_STAR expression               
-                        { free_partial_signature($3);}	
-|   attr TK_SLASH attr			
-                        { }	
-|   attr TK_PERCENT attr			
-                        { }	
-|   attr TK_AND_AND attr			
-                        { }	
-|   attr TK_PIPE_PIPE attr			
-                        { }	
-|   attr TK_AND attr			
-                        { 
+
+                        { free_partial_signature($2);}
+|   TK_EXCLAM expression
+                        { free_partial_signature($2);}
+|   TK_TILDE expression
+                        { free_partial_signature($2);}
+|   attr TK_PLUS attr
+                        { }
+|   attr TK_MINUS attr
+                        { }
+|   attr TK_STAR expression
+                        { free_partial_signature($3);}
+|   attr TK_SLASH attr
+                        { }
+|   attr TK_PERCENT attr
+                        { }
+|   attr TK_AND_AND attr
+                        { }
+|   attr TK_PIPE_PIPE attr
+                        { }
+|   attr TK_AND attr
+                        {
 		        }
-|   attr TK_PIPE attr			
-                        { }	
-|   attr TK_CIRC attr			
-                        { }	
-|   attr TK_EQ_EQ attr			
-                        { }	
-|   attr TK_EXCLAM_EQ attr			
-                        { }	
-|   attr TK_INF attr			
-                        { }	
-|   attr TK_SUP attr			
-                        { }	
-|   attr TK_INF_EQ attr			
-                        { }	
-|   attr TK_SUP_EQ attr			
-                        { }	
-|   attr TK_INF_INF attr			
-                        { }	
-|   attr TK_SUP_SUP attr			
-                        { }	
-|   attr TK_ARROW id_or_typename          
-                        { }	
-|   attr TK_DOT id_or_typename            
-                        { }	
-|   TK_LPAREN attr TK_RPAREN                 
-                        { }	 
+|   attr TK_PIPE attr
+                        { }
+|   attr TK_CIRC attr
+                        { }
+|   attr TK_EQ_EQ attr
+                        { }
+|   attr TK_EXCLAM_EQ attr
+                        { }
+|   attr TK_INF attr
+                        { }
+|   attr TK_SUP attr
+                        { }
+|   attr TK_INF_EQ attr
+                        { }
+|   attr TK_SUP_EQ attr
+                        { }
+|   attr TK_INF_INF attr
+                        { }
+|   attr TK_SUP_SUP attr
+                        { }
+|   attr TK_ARROW id_or_typename
+                        { }
+|   attr TK_DOT id_or_typename
+                        { }
+|   TK_LPAREN attr TK_RPAREN
+                        { }
 ;
 
 attr_list_ne:
-|   attr                                  
-                        { }	
-|   attr TK_COMMA attr_list_ne               
-                        { }	
-|   error TK_COMMA attr_list_ne              
-                        { }	
+|   attr
+                        { }
+|   attr TK_COMMA attr_list_ne
+                        { }
+|   error TK_COMMA attr_list_ne
+                        { }
 ;
-paren_attr_list_ne: 
-    TK_LPAREN attr_list_ne TK_RPAREN            
-                        { 
+paren_attr_list_ne:
+    TK_LPAREN attr_list_ne TK_RPAREN
+                        {
 			  csplit_parser_error("Attribute lists are not supported yet.\n");
 			  $$ = build_signature(new_lparen(), new_signature("IDoNotWantAttrListne"), new_rparen(), NULL);
-			}	
-|   TK_LPAREN error TK_RPAREN                   
+			}
+|   TK_LPAREN error TK_RPAREN
                         {
 			  csplit_parser_error("Near attribute list ne");
 			  $$ = string_undefined;
-			}	
+			}
 ;
 /*** GCC TK_ASM instructions ***/
 asmattr:
-    /* empty */                        
+    /* empty */
                         { }
-|   TK_VOLATILE  asmattr                  
+|   TK_VOLATILE  asmattr
                         { }
-|   TK_CONST asmattr                      
-                        { } 
-;
-asmtemplate: 
-    one_string_constant                          
-                        { }
-|   one_string_constant asmtemplate              
+|   TK_CONST asmattr
                         { }
 ;
-asmoutputs: 
-    /* empty */           
+asmtemplate:
+    one_string_constant
                         { }
-|   TK_COLON asmoperands asminputs                       
+|   one_string_constant asmtemplate
+                        { }
+;
+asmoutputs:
+    /* empty */
+                        { }
+|   TK_COLON asmoperands asminputs
                         {  }
 ;
 asmoperands:
-    /* empty */                       
+    /* empty */
                         { }
-|   asmoperandsne                      
+|   asmoperandsne
                         { }
 ;
 asmoperandsne:
-    asmoperand                         
+    asmoperand
                         { }
-|   asmoperandsne TK_COMMA asmoperand    
+|   asmoperandsne TK_COMMA asmoperand
                         { }
 ;
 asmoperand:
-    string_constant TK_LPAREN expression TK_RPAREN    
+    string_constant TK_LPAREN expression TK_RPAREN
                         { free_partial_signature($3);}
-|   string_constant TK_LPAREN error TK_RPAREN         
+|   string_constant TK_LPAREN error TK_RPAREN
                         { }
-; 
-asminputs: 
-    /* empty */               
+;
+asminputs:
+    /* empty */
                         { }
 |   TK_COLON asmoperands asmclobber
-                        { }                        
+                        { }
 ;
 asmclobber:
-    /* empty */                         
+    /* empty */
                         { }
-|   TK_COLON asmcloberlst_ne            
+|   TK_COLON asmcloberlst_ne
                         { }
 ;
 asmcloberlst_ne:
-    one_string_constant 
-                        { }                          
-|   one_string_constant TK_COMMA asmcloberlst_ne 
+    one_string_constant
+                        { }
+|   one_string_constant TK_COMMA asmcloberlst_ne
                         { }
 ;
-  
+
 %%

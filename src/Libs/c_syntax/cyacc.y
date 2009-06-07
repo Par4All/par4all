@@ -80,13 +80,13 @@ extern void discard_comments(void);
 extern string compilation_unit_name;
 extern statement ModuleStatement;
 
-static int CurrentMode = 0; /* to know the mode of the formal parameter: by value or by reference*/
-static bool is_external = TRUE; /* to know if the variable is declared inside or outside a function, so its scope
+static int CurrentMode = 0; /**< to know the mode of the formal parameter: by value or by reference*/
+static bool is_external = TRUE; /**< to know if the variable is declared inside or outside a function, so its scope
 				   is the current function or the compilation unit or TOP-LEVEL*/
-static int enum_counter = 0; /* to compute the enumerator value: val(i) = val(i-1) + 1*/
-static int abstract_counter = 1; /* to create temporary entities for abstract types*/
+static int enum_counter = 0; /**< to compute the enumerator value: val(i) = val(i-1) + 1 */
+static int abstract_counter = 1; /**< to create temporary entities for abstract types */
 
-extern int loop_counter; /* Global counter */
+extern int loop_counter; /**< Global counter */
 extern int derived_counter;
 
 /* The following structures must be stacks because all the related entities are in recursive structures.
@@ -97,11 +97,11 @@ extern stack LoopStack;
 extern stack SwitchControllerStack;
 extern stack SwitchGotoStack;
 
-extern stack StructNameStack; /* to remember the name of a struct/union and add it to the member prefix name*/
+extern stack StructNameStack; /**< to remember the name of a struct/union and add it to the member prefix name*/
 
 extern stack ContextStack;
 
-extern stack FunctionStack; /* to know in which function the current formal arguments are declared */
+extern stack FunctionStack; /**< to know in which function the current formal arguments are declared */
 static void PushFunction(entity f)
 {
   /*
@@ -149,8 +149,8 @@ entity GetFunction()
   return f;
 }
 
-extern stack FormalStack; /* to know if the entity is a formal parameter or not */
-extern stack OffsetStack; /* to know the offset of the formal argument */
+extern stack FormalStack; /**< to know if the entity is a formal parameter or not */
+extern stack OffsetStack; /**< to know the offset of the formal argument */
 
  // FI: I assumed it was the current context; in fact the current
  // context is rather the top of the ContextStack.I tried to maintain
@@ -180,7 +180,7 @@ bool string_struct_scope_p(string s)
 
 bool string_block_scope_p(string s)
 {
-  // A bock scope string is empty or made of numbers each terminated by BLOCK_SEP_STRING
+  // A block scope string is empty or made of numbers each terminated by BLOCK_SEP_STRING
   char valid[12] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', BLOCK_SEP_CHAR, '\0'};
   bool is_block_scope = FALSE;
   string cs = s;
@@ -320,7 +320,7 @@ void EnterScope()
   // Validation/C_syntax/block_scope01.c, identifier x in function foo
   if(C_scope_identifier>=0) {
     string ns = i2a(C_scope_identifier);
-   
+
     c_parser_context_scope(nc) = strdup(concatenate(cs, ns, BLOCK_SEP_STRING, NULL));
     free(ns);
   }
@@ -345,7 +345,7 @@ string GetScope()
      parser */
   if(!stack_empty_p(ContextStack)) {
     c_parser_context c = (c_parser_context) stack_head(ContextStack);
-   
+
     s = c_parser_context_scope(c);
   }
 
@@ -357,7 +357,7 @@ void ExitScope()
   c_parser_context c = (c_parser_context) stack_head(ContextStack);
 
   pips_assert("The current context is defined", !c_parser_context_undefined_p(c));
-  pips_assert("The current contextscope is defined",
+  pips_assert("The current context scope is defined",
 	      !string_undefined_p(c_parser_context_scope(c))
 	      && c_parser_context_scope(c)!=NULL);
   pips_assert("The current context only contains scope information",
@@ -411,7 +411,7 @@ void PopContext()
 
 c_parser_context GetContext()
 {
-   
+
     c_parser_context c = c_parser_context_undefined;
 
     if(!stack_empty_p(ContextStack))
@@ -460,7 +460,7 @@ c_parser_context GetContextCopy()
 %token <string> TK_FLOATCON
 %token <string> TK_NAMED_TYPE
 
-%token <string> TK_STRINGCON  
+%token <string> TK_STRINGCON
 %token <string> TK_WSTRINGCON
 
 %token TK_EOF
@@ -531,7 +531,7 @@ c_parser_context GetContextCopy()
 %right TK_EXCLAM TK_TILDE TK_PLUS_PLUS TK_MINUS_MINUS TK_CAST TK_RPAREN TK_ADDROF TK_SIZEOF TK_ALIGNOF
 %left TK_LBRACKET
 %left TK_DOT TK_ARROW TK_LPAREN TK_LBRACE
-%right TK_NAMED_TYPE 
+%right TK_NAMED_TYPE
 %left TK_IDENT
 
 /* Non-terminals informations */
@@ -604,7 +604,7 @@ c_parser_context GetContextCopy()
 
 interpret: file TK_EOF
                         {YYACCEPT;};
-file: globals			
+file: globals
                         {
 			  /* To handle special case: compilation unit module */
 			  list dl = $1;
@@ -638,7 +638,7 @@ file: globals
 ;
 
 globals:
-    /* empty */         { $$ = NIL; }           
+    /* empty */         { $$ = NIL; }
 |   {is_external = TRUE; } global globals
                         {
 			  /* Each variable should be declared only
@@ -686,7 +686,7 @@ globals:
 			    pips_assert("Each variable is declared once", gen_once_p($$));
 			    ResetCurrentModule();
 			  }
-			}           
+			}
 |   TK_SEMICOLON globals
                         {
 			  pips_assert("Declarations are unique", gen_once_p($2));
@@ -696,7 +696,7 @@ globals:
 			    fprintf(stderr, "\n");
 			  }
 			  $$ = $2;
-			}                
+			}
 ;
 
 location:
@@ -704,14 +704,14 @@ location:
 
 /*** Global Definition ***/
 global:
-declaration         { discard_C_comment();}                
+declaration         { discard_C_comment();}
 |   function_def        { $$ = NIL; }
 |   TK_ASM TK_LPAREN string_constant TK_RPAREN TK_SEMICOLON
                         {
 			  CParserError("ASM not implemented\n");
 			  $$ = NIL;
 			}
-|   TK_PRAGMA attr			
+|   TK_PRAGMA attr
                         {
 			  CParserError("PRAGMA not implemented\n");
 			  $$ = NIL;
@@ -748,8 +748,8 @@ declaration         { discard_C_comment();}
 			  pips_assert("Current function entity is consistent",entity_consistent_p(e));
 			  PopFunction();
 			  stack_pop(FormalStack);
-			  StackPop(OffsetStack);	
-			  $$ = NIL;	
+			  StackPop(OffsetStack);
+			  $$ = NIL;
 			  discard_C_comment();
 			}
 /* Old style function prototype, but without any arguments */
@@ -767,7 +767,7 @@ declaration         { discard_C_comment();}
 			    entity_storage(e) = make_storage_rom();
 			  }
 			  if (value_undefined_p(entity_initial(e)))
-			    entity_initial(e) = make_value(is_value_code,make_code(NIL,strdup(""),make_sequence(NIL),NIL));	
+			    entity_initial(e) = make_value(is_value_code,make_code(NIL,strdup(""),make_sequence(NIL),NIL));
 			  pips_assert("Current function entity is consistent",entity_consistent_p(e));
 			  $$ = NIL;
 			  discard_C_comment();
@@ -792,14 +792,14 @@ declaration         { discard_C_comment();}
 ;
 
 id_or_typename:
-    TK_IDENT			
+    TK_IDENT
                         {}
-|   TK_NAMED_TYPE				
+|   TK_NAMED_TYPE
                         {}
-|   TK_AT_NAME TK_LPAREN TK_IDENT TK_RPAREN        
+|   TK_AT_NAME TK_LPAREN TK_IDENT TK_RPAREN
                         {
 			   CParserError("CIL AT not implemented\n");
-			}   
+			}
 ;
 
 maybecomma:
@@ -876,7 +876,7 @@ expression:
 			  $$ = MakeUnaryCall(CreateIntrinsic(POST_DECREMENT_OPERATOR_NAME), $1);
 			}
 |   expression TK_ARROW id_or_typename
-		        {	
+		        {
 			  /* Find the struct/union type of the expression
 			     then the struct/union member entity and transform it to expression */
 			  expression exp = MemberIdentifierToExpression($1,$3);
@@ -923,7 +923,7 @@ expression:
 			}
 |   expression bracket_comma_expression
 			{
-			  $$ = MakeArrayExpression($1,$2);	
+			  $$ = MakeArrayExpression($1,$2);
 			}
 |   expression TK_QUEST opt_expression TK_COLON expression
 			{
@@ -1060,7 +1060,7 @@ expression:
 			  (void) simplify_C_expression($3);
 			  $$ = MakeBinaryCall(CreateIntrinsic(BITWISE_XOR_UPDATE_OPERATOR_NAME), $1, $3);
 			}
-|   expression TK_INF_INF_EQ expression	
+|   expression TK_INF_INF_EQ expression
 			{
 			  (void) simplify_C_expression($3);
 			  $$ = MakeBinaryCall(CreateIntrinsic(LEFT_SHIFT_UPDATE_OPERATOR_NAME), $1, $3);
@@ -1080,7 +1080,7 @@ expression:
 			  CParserError("GCC constructor expressions not implemented\n");
 			}
 /* (* GCC's address of labels *)  */
-|   TK_AND_AND TK_IDENT 
+|   TK_AND_AND TK_IDENT
                         {
 			  CParserError("GCC's address of labels not implemented\n");
 			}
@@ -1091,26 +1091,26 @@ expression:
 ;
 
 constant:
-    TK_INTCON			
+    TK_INTCON
                         { // Do we know about the size? 2, 4 or 8 bytes?
 			  $$ = make_C_constant_entity($1, is_basic_int, 4);
 			}
-|   TK_FLOATCON	
+|   TK_FLOATCON
                         {
 			  $$ = MakeConstant($1, is_basic_float);
 			}
-|   TK_CHARCON				
+|   TK_CHARCON
                         {
 			  $$ = make_C_constant_entity($1, is_basic_int, 1);
 			}
-|   string_constant	
+|   string_constant
                         {
 			  /* The size will be fixed later, hence 0 here. */
 			  $$ = make_C_constant_entity($1, is_basic_string, 0);
                         }
 /*add a nul to strings.  We do this here (rather than in the lexer) to make
   concatenation easy below.*/
-|   wstring_list	
+|   wstring_list
                         {
 			  $$ = MakeConstant(list_to_string($1),is_basic_string);
                         }
@@ -1119,18 +1119,18 @@ constant:
 string_constant:
 /* Now that we know this constant isn't part of a wstring, convert it
    back to a string for easy viewing. */
-    string_list        
+    string_list
                         {
 			  $$ = list_to_string($1);
 			}
 ;
 one_string_constant:
 /* Don't concat multiple strings.  For asm templates. */
-    TK_STRINGCON      
+    TK_STRINGCON
                         {}
 ;
 string_list:
-    one_string         
+    one_string
                         {
 			  $$ = CONS(STRING,$1,NIL);
 			}
@@ -1141,7 +1141,7 @@ string_list:
 ;
 
 wstring_list:
-    TK_WSTRINGCON          
+    TK_WSTRINGCON
                         {
 			  $$ = CONS(STRING,$1,NIL);
 			}
@@ -1149,7 +1149,7 @@ wstring_list:
                         {
 			  $$ = CONS(STRING,$2,$1);
 			}
-|   wstring_list TK_WSTRINGCON 
+|   wstring_list TK_WSTRINGCON
                         {
 			  $$ = gen_nconc($1,CONS(STRING,$2,NIL));
 			}
@@ -1158,11 +1158,11 @@ wstring_list:
 
 one_string:
     TK_STRINGCON	{ }
-|   TK_FUNCTION__      
+|   TK_FUNCTION__
                         { CParserError("TK_FUNCTION not implemented\n"); }
 |   TK_PRETTY_FUNCTION__
                         { CParserError("TK_PRETTY_FUNCTION not implemented\n"); }
-;   
+;
 
 init_expression:
     expression          {
@@ -1209,7 +1209,7 @@ eq_opt:
     TK_EQ
                         { }
     /*(* GCC allows missing = *)*/
-|   /*(* empty *)*/    
+|   /*(* empty *)*/
                         {
 			  CParserError("gcc missing = not implemented\n");
 			}
@@ -1221,14 +1221,14 @@ init_designators:
                         { }
 |   TK_LBRACKET expression TK_ELLIPSIS expression TK_RBRACKET
                         { }
-;        
+;
 init_designators_opt:
     /* empty */         { $$ = NIL; }
 |   init_designators    {}
 ;
 
 gcc_init_designators:  /*(* GCC supports these strange things *)*/
-    id_or_typename TK_COLON  
+    id_or_typename TK_COLON
                         {
 			  CParserError("gcc init designators not implemented\n");
 			}
@@ -1248,7 +1248,7 @@ opt_expression:
 ;
 
 comma_expression:
-    expression                       
+    expression
                         {
 			  (void) simplify_C_expression($1);
 			  $$ = CONS(EXPRESSION,$1,NIL);
@@ -1258,7 +1258,7 @@ comma_expression:
 			  (void) simplify_C_expression($1);
 			  $$ = CONS(EXPRESSION,$1,$3);
 			}
-|   error TK_COMMA comma_expression     
+|   error TK_COMMA comma_expression
                         {
 			  CParserError("Parse error: error TK_COMMA comma_expression \n");
 			}
@@ -1276,7 +1276,7 @@ paren_comma_expression:
 			  push_current_C_line_number();
 			  $$ = $2;
 			}
-|   TK_LPAREN error TK_RPAREN                        
+|   TK_LPAREN error TK_RPAREN
                         {
 			  CParserError("Parse error: TK_LPAREN error TK_RPAREN \n");
 			}
@@ -1287,7 +1287,7 @@ bracket_comma_expression:
                         {
 			  $$ = $2;
 			}
-|   TK_LBRACKET error TK_RBRACKET 
+|   TK_LBRACKET error TK_RBRACKET
                         {
 			  CParserError("Parse error: TK_LBRACKET error TK_RBRACKET\n");
 			}
@@ -1297,7 +1297,7 @@ bracket_comma_expression:
 block: /* ISO 6.8.2 */
     TK_LBRACE
                         { EnterScope();}
-    local_labels block_attrs declaration_list statement_list TK_RBRACE  
+    local_labels block_attrs declaration_list statement_list TK_RBRACE
                         {
 			  $$ = MakeBlock($5,$6);
 			  ExitScope();
@@ -1554,9 +1554,9 @@ statement:
 			}
 |   TK_ASM asmattr TK_LPAREN asmtemplate asmoutputs TK_RPAREN TK_SEMICOLON
                         { CParserError("ASM not implemented\n"); }
-|   TK_MSASM           
+|   TK_MSASM
                         { CParserError("ASM not implemented\n"); }
-|   error location TK_SEMICOLON 
+|   error location TK_SEMICOLON
                         {
 			  CParserError("Parse error: error location TK_SEMICOLON\n");
 			}
@@ -1588,7 +1588,7 @@ declaration:                               /* ISO 6.7.*/
 			  remove_entity_type_stacks($$);
 			  CleanUpEntities($$);
 			}
-|   decl_spec_list TK_SEMICOLON	
+|   decl_spec_list TK_SEMICOLON
                         {
 			  //stack_pop(ContextStack);
 			  PopContext();
@@ -1599,7 +1599,7 @@ declaration:                               /* ISO 6.7.*/
 init_declarator_list:                       /* ISO 6.7 */
     init_declarator
                         {
-	
+
 			  $$ = CONS(ENTITY,$1,NIL);
 			}
 |   init_declarator TK_COMMA init_declarator_list
@@ -1710,14 +1710,14 @@ decl_spec_list:
 
 my_decl_spec_list:                         /* ISO 6.7 */
                                         /* ISO 6.7.1 */
-    TK_TYPEDEF decl_spec_list_opt         
+    TK_TYPEDEF decl_spec_list_opt
                         {
 			  /* Add TYPEDEF_PREFIX to entity name prefix and make it a rom storage */
 			  c_parser_context_typedef(ycontext) = TRUE;
 			  c_parser_context_storage(ycontext) = make_storage_rom();
 			  $$ = $2;
-			}   
-|   TK_EXTERN decl_spec_list_opt          
+			}
+|   TK_EXTERN decl_spec_list_opt
                         {
 			  /* This can be a variable or a function, whose storage is ram or return  */
 			  /* What is the scope in cyacc.y of this scope modification? */
@@ -1725,18 +1725,18 @@ my_decl_spec_list:                         /* ISO 6.7 */
 			  c_parser_context_scope(ycontext) = strdup(concatenate(TOP_LEVEL_MODULE_NAME,
 									       MODULE_SEP_STRING,NULL));
 			  $$ = $2;
-			}   
-|   TK_STATIC decl_spec_list_opt   
+			}
+|   TK_STATIC decl_spec_list_opt
                         {
 			  c_parser_context_static(ycontext) = TRUE;
 			  $$ = $2;
 			}
-|   TK_AUTO decl_spec_list_opt          
+|   TK_AUTO decl_spec_list_opt
                         {
 			  /* Make dynamic storage for current entity */
 			  $$ = $2;
 			}
-|   TK_REGISTER decl_spec_list_opt       
+|   TK_REGISTER decl_spec_list_opt
                         {
 			  /* Add to type variable qualifiers */
 			  c_parser_context_qualifiers(ycontext) = gen_nconc(c_parser_context_qualifiers(ycontext),
@@ -1747,30 +1747,30 @@ my_decl_spec_list:                         /* ISO 6.7 */
 |   type_spec decl_spec_list_opt_no_named
                         {
 			  $$ = gen_nconc($1,$2);
-			}	
+			}
                                         /* ISO 6.7.4 */
 |   TK_INLINE decl_spec_list_opt
                         {
 			  pips_user_warning("Keyword \"inline\" ignored\n");
 			  $$ = $2;
-			}	
-|   attribute decl_spec_list_opt       
+			}
+|   attribute decl_spec_list_opt
                         {
 			  c_parser_context_qualifiers(ycontext) = CONS(QUALIFIER,$1,c_parser_context_qualifiers(ycontext));
 			  $$ = $2;
-			}	
+			}
 /* specifier pattern variable (must be last in spec list) */
-|   TK_AT_SPECIFIER TK_LPAREN TK_IDENT TK_RPAREN 
+|   TK_AT_SPECIFIER TK_LPAREN TK_IDENT TK_RPAREN
                         {
 			  CParserError("CIL AT not implemented\n");
-			}	
+			}
 ;
 
 /* (* In most cases if we see a NAMED_TYPE we must shift it. Thus we declare
     * NAMED_TYPE to have right associativity  *) */
 decl_spec_list_opt:
     /* empty */
-                        {		 
+                        {
 			  //stack_push((char *) ycontext, ContextStack);
 			  PushContext(ycontext);
 			  $$ = NIL;
@@ -1794,37 +1794,37 @@ decl_spec_list_opt_no_named:
 
 
 type_spec:   /* ISO 6.7.2 */
-    TK_VOID            
+    TK_VOID
                         {
 			  c_parser_context_type(ycontext) = make_type_void();
 			  $$ = NIL;
                         }
-|   TK_CHAR         
+|   TK_CHAR
                         {
 			  c_parser_context_type(ycontext) = make_standard_integer_type(c_parser_context_type(ycontext),
 										      DEFAULT_CHARACTER_TYPE_SIZE);
 			  $$ = NIL;
 			}
-|   TK_SHORT     
+|   TK_SHORT
                         {
 			  c_parser_context_type(ycontext) = make_standard_integer_type(c_parser_context_type(ycontext),
 										      DEFAULT_SHORT_INTEGER_TYPE_SIZE);
 			  $$ = NIL;
-			}   
-|   TK_INT 
+			}
+|   TK_INT
                         {
 			  if (c_parser_context_type(ycontext) == type_undefined)
 			    {
-			      variable v = make_variable(make_basic_int(DEFAULT_INTEGER_TYPE_SIZE),NIL,NIL);	
+			      variable v = make_variable(make_basic_int(DEFAULT_INTEGER_TYPE_SIZE),NIL,NIL);
 			      c_parser_context_type(ycontext) = make_type_variable(v);
 			    }
 			  $$ = NIL;
-			} 
-|   TK_COMPLEX 
+			}
+|   TK_COMPLEX
                         {
 			  if (c_parser_context_type(ycontext) == type_undefined)
 			    {
-			      variable v = make_variable(make_basic_complex(DEFAULT_COMPLEX_TYPE_SIZE),NIL,NIL);	
+			      variable v = make_variable(make_basic_complex(DEFAULT_COMPLEX_TYPE_SIZE),NIL,NIL);
 			      c_parser_context_type(ycontext) = make_type_variable(v);
 			    }
 			  else {
@@ -1842,25 +1842,25 @@ type_spec:   /* ISO 6.7.2 */
 			    }
 			  }
 			  $$ = NIL;
-			} 
+			}
 |   TK_LONG
                         {
 			  c_parser_context_type(ycontext) = make_standard_long_integer_type(c_parser_context_type(ycontext));
 			  $$ = NIL;
-			}  
-|   TK_FLOAT          
+			}
+|   TK_FLOAT
                         {
 			  variable v = make_variable(make_basic_float(DEFAULT_REAL_TYPE_SIZE),NIL,NIL);
 			  c_parser_context_type(ycontext) = make_type_variable(v);
 			  $$ = NIL;
 			}
-|   TK_DOUBLE          
+|   TK_DOUBLE
                         {
 			  variable v = make_variable(make_basic_float(DEFAULT_DOUBLEPRECISION_TYPE_SIZE),NIL,NIL);
 			  c_parser_context_type(ycontext) = make_type_variable(v);
 			  $$ = NIL;
 			}
-|   TK_SIGNED    
+|   TK_SIGNED
                         {
 			  /* see the RI document or ri-util.h for explanation */
 			  variable v = make_variable(make_basic_int(DEFAULT_SIGNED_TYPE_SIZE*10+
@@ -1868,14 +1868,14 @@ type_spec:   /* ISO 6.7.2 */
 			  c_parser_context_type(ycontext) = make_type_variable(v);
 			  $$ = NIL;
 			}
-|   TK_UNSIGNED         
+|   TK_UNSIGNED
                         {
 			  variable v = make_variable(make_basic_int(DEFAULT_UNSIGNED_TYPE_SIZE*10+
 								    DEFAULT_INTEGER_TYPE_SIZE),NIL,NIL);
 			  c_parser_context_type(ycontext) = make_type_variable(v);
 			  $$ = NIL;
 			}
-|   TK_STRUCT id_or_typename                          
+|   TK_STRUCT id_or_typename
                         {
 			  /* Find the entity associated to the struct, current scope can be [file%][module:][block]*/
 			  entity ent = FindOrCreateEntityFromLocalNameAndPrefix($2,STRUCT_PREFIX,is_external);
@@ -1919,7 +1919,7 @@ type_spec:   /* ISO 6.7.2 */
     struct_decl_list TK_RBRACE
                         {
 			  /* Create the struct entity with unique name s */
-			  string s = code_decls_text((code) stack_head(StructNameStack));			
+			  string s = code_decls_text((code) stack_head(StructNameStack));
 			  entity ent = MakeDerivedEntity(s,$4,is_external,is_type_struct);
 			  variable v = make_variable(make_basic_derived(ent),NIL,NIL);
 			  /* Take from $4 the struct/union entities */
@@ -1967,7 +1967,7 @@ type_spec:   /* ISO 6.7.2 */
     struct_decl_list TK_RBRACE
                         {
 			  /* Create the union entity with unique name */
-			  string s = code_decls_text((code) stack_head(StructNameStack));			
+			  string s = code_decls_text((code) stack_head(StructNameStack));
 			  entity ent = MakeDerivedEntity(s,$4,is_external,is_type_union);
 			  variable v = make_variable(make_basic_derived(ent),NIL,NIL);
 			  /* Take from $4 the struct/union entities */
@@ -1976,7 +1976,7 @@ type_spec:   /* ISO 6.7.2 */
 			  c_parser_context_type(ycontext) = make_type_variable(v);
 			  stack_pop(StructNameStack);
 			}
-|   TK_ENUM id_or_typename  
+|   TK_ENUM id_or_typename
                         {
                           /* Find the entity associated to the enum */
 			  entity ent = FindOrCreateEntityFromLocalNameAndPrefix($2,ENUM_PREFIX,is_external);
@@ -1998,7 +1998,7 @@ type_spec:   /* ISO 6.7.2 */
 			    ;
 			  }
 			  c_parser_context_type(ycontext) = make_type_variable(v);
-			  $$ = NIL; 
+			  $$ = NIL;
 			}
 |   TK_ENUM id_or_typename TK_LBRACE enum_list maybecomma TK_RBRACE
                         {
@@ -2007,9 +2007,9 @@ type_spec:   /* ISO 6.7.2 */
 			  variable v = make_variable(make_basic_derived(ent),NIL,NIL);
 
 			  InitializeEnumMemberValues($4);
-			  c_parser_context_type(ycontext) = make_type_variable(v); 
+			  c_parser_context_type(ycontext) = make_type_variable(v);
 			  $$ = CONS(ENTITY,ent,NIL);
-			}                  
+			}
 |   TK_ENUM TK_LBRACE enum_list maybecomma TK_RBRACE
                         {
 			  /* Create the enum entity with unique name */
@@ -2020,14 +2020,14 @@ type_spec:   /* ISO 6.7.2 */
 			  variable v = make_variable(make_basic_derived(ent),NIL,NIL);
 
 			  InitializeEnumMemberValues($3);
-			  c_parser_context_type(ycontext) = make_type_variable(v); 
+			  c_parser_context_type(ycontext) = make_type_variable(v);
 			  $$ = CONS(ENTITY,ent,NIL);
 			}
-|   TK_NAMED_TYPE 
+|   TK_NAMED_TYPE
                         {
 			  entity ent;
-			  ent = FindOrCreateEntityFromLocalNameAndPrefix($1,TYPEDEF_PREFIX,is_external);	
-			 
+			  ent = FindOrCreateEntityFromLocalNameAndPrefix($1,TYPEDEF_PREFIX,is_external);
+
 			  /* Specify the type of the variable that follows this declaration specifier */
 			  if (c_parser_context_typedef(ycontext))
 			    {
@@ -2041,15 +2041,15 @@ type_spec:   /* ISO 6.7.2 */
 			      /* T1 var => the type of var is basic typedef */
 			      variable v = make_variable(make_basic_typedef(ent),NIL,NIL);
 			      pips_debug(8,"T1 var where T1 =  %s\n",entity_name(ent));
-			      c_parser_context_type(ycontext) = make_type_variable(v); 
+			      c_parser_context_type(ycontext) = make_type_variable(v);
 			      $$ = NIL;
 			    }
 			}
-|   TK_TYPEOF TK_LPAREN expression TK_RPAREN 
+|   TK_TYPEOF TK_LPAREN expression TK_RPAREN
                         {
                           CParserError("TYPEOF not implemented\n");
 			}
-|   TK_TYPEOF TK_LPAREN type_name TK_RPAREN   
+|   TK_TYPEOF TK_LPAREN type_name TK_RPAREN
                         {
 			  CParserError("TYPEOF not implemented\n");
 			}
@@ -2066,8 +2066,8 @@ struct_decl_list: /* (* ISO 6.7.2. Except that we allow empty structs. We
 			  /* Create the struct member entity with unique name, the name of the
 			     struct/union is added to the member name prefix */
               string istr = i2a(derived_counter++);
-			  string s = strdup(concatenate("PIPS_MEMBER_",istr,NULL)); 
-			  string derived = code_decls_text((code) stack_head(StructNameStack));		
+			  string s = strdup(concatenate("PIPS_MEMBER_",istr,NULL));
+			  string derived = code_decls_text((code) stack_head(StructNameStack));
 			  entity ent = CreateEntityFromLocalNameAndPrefix(s,strdup(concatenate(derived,
 											       MEMBER_SEP_STRING,NULL)),
 									  is_external);
@@ -2084,16 +2084,16 @@ struct_decl_list: /* (* ISO 6.7.2. Except that we allow empty structs. We
 			  entity_initial(ent) = (value) $1;
 
 			  $$ = CONS(ENTITY,ent,$3);
-			 
+
 			  //stack_pop(ContextStack);
 			  PopContext();
-			}            
+			}
 |   decl_spec_list
                         {
 			  //c_parser_context ycontext = stack_head(ContextStack);
 			  c_parser_context ycontext = GetContext();
 			  /* Add struct/union name and MEMBER_SEP_STRING to entity name */
-			  string derived = code_decls_text((code) stack_head(StructNameStack));		
+			  string derived = code_decls_text((code) stack_head(StructNameStack));
 			  c_parser_context_scope(ycontext) = CreateMemberScope(derived,is_external);
 			  c_parser_context_storage(ycontext) = make_storage_rom();
 			}
@@ -2125,21 +2125,21 @@ struct_decl_list: /* (* ISO 6.7.2. Except that we allow empty structs. We
 ;
 
 field_decl_list: /* (* ISO 6.7.2 *) */
-    field_decl         
+    field_decl
                         {
 			  $$ = CONS(ENTITY,$1,NIL);
 			}
-|   field_decl TK_COMMA field_decl_list   
+|   field_decl TK_COMMA field_decl_list
                         {
 			  $$ = CONS(ENTITY,$1,$3);
 			}
 ;
 
 field_decl: /* (* ISO 6.7.2. Except that we allow unnamed fields. *) */
-    declarator        
+    declarator
                         {
 			}
-|   declarator TK_COLON expression  
+|   declarator TK_COLON expression
                         {
 			  value nv = EvalExpression($3);
 			  constant c = value_constant_p(nv)?
@@ -2152,14 +2152,14 @@ field_decl: /* (* ISO 6.7.2. Except that we allow unnamed fields. *) */
 			  /* Ignore for this moment if the bit is signed or unsigned */
 			  entity_type($1) = make_type_variable(v);
 			  $$ = $1;
-			} 
+			}
 |   TK_COLON expression
                         {
 			  //c_parser_context ycontext = stack_head(ContextStack);
 			  c_parser_context ycontext = GetContext();
 			  /* Unnamed bit-field : special and unique name */
 			  string n = i2a(derived_counter++);
-			  string s = strdup(concatenate(DUMMY_MEMBER_PREFIX,n,NULL)); 
+			  string s = strdup(concatenate(DUMMY_MEMBER_PREFIX,n,NULL));
 			  entity ent = CreateEntityFromLocalNameAndPrefix(s,c_parser_context_scope(ycontext),is_external);
 			  value nv = EvalExpression($2);
 			  constant c = value_constant_p(nv)?
@@ -2175,26 +2175,26 @@ field_decl: /* (* ISO 6.7.2. Except that we allow unnamed fields. *) */
 ;
 
 enum_list: /* (* ISO 6.7.2.2 *) */
-    enumerator	
+    enumerator
                         {
 			  /* initial_value = 0 or $3*/
 			  $$ = CONS(ENTITY,$1,NIL);
 			  enum_counter = 1;
 			}
-|   enum_list TK_COMMA enumerator	      
+|   enum_list TK_COMMA enumerator
                         {
 			  /* Attention to the reverse recursive definition*/
 			  $$ = gen_nconc($1,CONS(ENTITY,$3,NIL));
 			  enum_counter ++;
 			}
-|   enum_list TK_COMMA error     
+|   enum_list TK_COMMA error
                         {
 			  CParserError("Parse error: enum_list TK_COMMA error\n");
 			}
 ;
 
-enumerator:	
-    TK_IDENT	
+enumerator:
+    TK_IDENT
                         {
 			  /* Create an entity of is_basic_int, storage rom
 			     initial_value = 0 if it is the first member
@@ -2218,7 +2218,7 @@ enumerator:
 			  /*  entity_initial(ent) = MakeEnumeratorInitialValue(enum_list,enum_counter);*/
 			  $$ = ent;
 			}
-|   TK_IDENT TK_EQ expression	
+|   TK_IDENT TK_EQ expression
                         {
 			  /* Create an entity of is_basic_int, storage rom, initial_value = $3 */
 			  /* No, enum member must be functional
@@ -2264,7 +2264,7 @@ enumerator:
 			      //pips_internal_error("Constant integer expression not evaluated\n");
 			    }
 			  }
-                            
+
 			  $$ = ent;
 			}
 ;
@@ -2323,7 +2323,7 @@ direct_decl: /* (* ISO 6.7.5 *) */
 			      }
 			    }
 			  }
-			
+
 			  entity_type(e) = type_undefined;
 			  discard_C_comment();
 			  $$ = e;
@@ -2370,7 +2370,7 @@ direct_decl: /* (* ISO 6.7.5 *) */
 			  entity e = GetFunction();
 			  PopFunction();
 			  stack_pop(FormalStack);
-			  StackPop(OffsetStack);	
+			  StackPop(OffsetStack);
 			  /* Intrinsic functions in C such as printf, fprintf, ... are considered
 			     as entities with functional type ???
 			     if (!intrinsic_entity_p(e))*/
@@ -2420,8 +2420,8 @@ rest_par_list1:
     parameter_decl rest_par_list1
                         {
 			  $$ = CONS(PARAMETER,$3,$4);
-			} 
-;   
+			}
+;
 
 parameter_decl: /* (* ISO 6.7.5 *) */
     decl_spec_list declarator
@@ -2446,7 +2446,7 @@ parameter_decl: /* (* ISO 6.7.5 *) */
 			  //stack_pop(ContextStack);
 			  PopContext();
 			}
-|   decl_spec_list             
+|   decl_spec_list
                         {
 			  c_parser_context ycontext = stack_head(ContextStack);
 			  $$ = make_parameter(copy_type(c_parser_context_type(ycontext)),
@@ -2456,7 +2456,7 @@ parameter_decl: /* (* ISO 6.7.5 *) */
 			  //stack_pop(ContextStack);
 			  PopContext();
 			}
-|   TK_LPAREN parameter_decl TK_RPAREN   
+|   TK_LPAREN parameter_decl TK_RPAREN
                         { $$ = $2; }
 ;
 
@@ -2498,11 +2498,11 @@ direct_old_proto_decl:
 ;
 
 old_parameter_list_ne:
-    TK_IDENT           
+    TK_IDENT
                         {
 			  $$ = CONS(STRING,$1,NIL);
 			}
-|   TK_IDENT TK_COMMA old_parameter_list_ne  
+|   TK_IDENT TK_COMMA old_parameter_list_ne
                         {
 			  $$ = CONS(STRING,$1,$3);
 			}
@@ -2513,16 +2513,16 @@ old_pardef_list:
 |   decl_spec_list old_pardef TK_SEMICOLON TK_ELLIPSIS
                         {
 			  UpdateEntities($2,ContextStack,FormalStack,FunctionStack,OffsetStack,is_external,FALSE);
-			  //stack_pop(ContextStack); 
+			  //stack_pop(ContextStack);
 			  PopContext();
 			  /* Can we have struct/union definition in $1 ?*/
 			  /*$$ = gen_nconc($1,$2);*/
 			  $$ = $2;
 			}
-|   decl_spec_list old_pardef TK_SEMICOLON old_pardef_list 
+|   decl_spec_list old_pardef TK_SEMICOLON old_pardef_list
                         {
 			  UpdateEntities($2,ContextStack,FormalStack,FunctionStack,OffsetStack,is_external,FALSE);
-			  //stack_pop(ContextStack);	 
+			  //stack_pop(ContextStack);
 			  PopContext();
 			  /* Can we have struct/union definition in $1 ?*/
 			  /*$$ = gen_nconc($1,gen_nconc($2,$4));*/
@@ -2531,15 +2531,15 @@ old_pardef_list:
 ;
 
 old_pardef:
-    declarator           
+    declarator
                         {
 			  $$ = CONS(ENTITY,$1,NIL);
 			}
-|   declarator TK_COMMA old_pardef  
+|   declarator TK_COMMA old_pardef
                         {
 			  $$ = CONS(ENTITY,$1,$3);
 			}
-|   error      
+|   error
                         {
 			  CParserError("Parse error: error \n");
 			}
@@ -2567,7 +2567,7 @@ type_name: /* (* ISO 6.7.6 *) */
 			  //stack_pop(ContextStack);
 			  PopContext();
 			}
-|   decl_spec_list     
+|   decl_spec_list
                         {
 			  c_parser_context ycontext = stack_head(ContextStack);
 			  $$ = c_parser_context_type(ycontext);
@@ -2577,12 +2577,12 @@ type_name: /* (* ISO 6.7.6 *) */
 ;
 
 abstract_decl: /* (* ISO 6.7.6. *) */
-    pointer_opt abs_direct_decl attributes 
+    pointer_opt abs_direct_decl attributes
                         {
 			  /* Update the type of the direct_decl entity with pointer_opt and attributes*/
 			  if (!type_undefined_p($1))
 			    UpdatePointerEntity($2,$1,$3);
-			  $$ = $2;		
+			  $$ = $2;
 			}
 |   pointer
                         {
@@ -2623,7 +2623,7 @@ abs_direct_decl: /* (* ISO 6.7.6. We do not support optional declarator for
                         {
 			  CParserError("Parse error: TK_LPAREN error TK_RPAREN\n");
 			}
-           
+
 |   abs_direct_decl_opt TK_LBRACKET comma_expression_opt TK_RBRACKET
                         {
 			  UpdateArrayEntity($1,NIL,$3);
@@ -2642,14 +2642,14 @@ abs_direct_decl: /* (* ISO 6.7.6. We do not support optional declarator for
 			  entity e = GetFunction();
 			  PopFunction();
 			  stack_pop(FormalStack);
-			  StackPop(OffsetStack);	
+			  StackPop(OffsetStack);
 			  (void) UpdateFunctionEntity(e,$4);
 			  $$ = e;
-			} 
+			}
 ;
 
 abs_direct_decl_opt:
-    abs_direct_decl   
+    abs_direct_decl
                         { }
 |   /* empty */         {
                           string n = i2a(abstract_counter++);
@@ -2673,7 +2673,7 @@ function_def:  /* (* ISO 6.9.1 *) */
 			  InitializeBlock();
 			  is_external = FALSE;
 			}
-    block  
+    block
                         {
 			  /* Make value_code for current module here */
 			  ModuleStatement = $3;
@@ -2681,7 +2681,7 @@ function_def:  /* (* ISO 6.9.1 *) */
 			  pips_assert("Module declarations are unique", gen_once_p(statement_declarations(ModuleStatement)));
 			  /* Let's delay this? ResetCurrentModule(); */
 			  is_external = TRUE;
-			}	
+			}
 
 function_def_start:  /* (* ISO 6.9.1 *) */
     decl_spec_list declarator
@@ -2693,7 +2693,7 @@ function_def_start:  /* (* ISO 6.9.1 *) */
 			  MakeCurrentModule($2);
 			  clear_C_comment();
 			  pips_assert("Module is consistent\n",entity_consistent_p($2));
-			}	
+			}
 /* (* Old-style function prototype *) */
 |   decl_spec_list old_proto_decl
                         {
@@ -2704,7 +2704,7 @@ function_def_start:  /* (* ISO 6.9.1 *) */
 			  MakeCurrentModule($2);
 			  clear_C_comment();
 			  pips_assert("Module is consistent\n",entity_consistent_p($2));
-			}	
+			}
 /* (* New-style function that does not have a return type *) */
 |   TK_IDENT parameter_list_startscope
                         {
@@ -2726,15 +2726,15 @@ function_def_start:  /* (* ISO 6.9.1 *) */
 			  pips_assert("Current module entity is consistent\n",entity_consistent_p(e));
 			  PopFunction();
 			  stack_pop(FormalStack);
-			  StackPop(OffsetStack);	
-			}	
+			  StackPop(OffsetStack);
+			}
 /* (* No return type and old-style parameter list *) */
 |   TK_IDENT TK_LPAREN old_parameter_list_ne
                         {
 			  entity oe = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,$1);
 			  entity e= oe; //RenameFunctionEntity(oe);
 			  pips_debug(2,"Create current module %s with no return type + old-style parameter list\n",$1);
-			  MakeCurrentModule(e);	
+			  MakeCurrentModule(e);
 			  clear_C_comment();
 			  //pips_assert("e is a module", module_name_p(entity_module_name(e)));
 			  PushFunction(e);
@@ -2750,8 +2750,8 @@ function_def_start:  /* (* ISO 6.9.1 *) */
 			  pips_assert("Current module entity is consistent\n",entity_consistent_p(e));
 			  PopFunction();
 			  stack_pop(FormalStack);
-			  StackPop(OffsetStack);	
-			}	
+			  StackPop(OffsetStack);
+			}
 /* (* No return type and no parameters *) */
 |   TK_IDENT TK_LPAREN TK_RPAREN
                         {
@@ -2763,193 +2763,193 @@ function_def_start:  /* (* ISO 6.9.1 *) */
 			  MakeCurrentModule(e);
 			  clear_C_comment();
 			  pips_assert("Current module entity is consistent\n",entity_consistent_p(e));
-			}	
+			}
 ;
 
 /*** GCC attributes ***/
 attributes:
-    /* empty */				
+    /* empty */
                         { $$ = NIL; }
 |   attribute attributes
-                        { $$ = CONS(QUALIFIER,$1,$2); }	
+                        { $$ = CONS(QUALIFIER,$1,$2); }
 ;
 
 /* (* In some contexts we can have an inline assembly to specify the name to
     * be used for a global. We treat this as a name attribute *) */
 attributes_with_asm:
-    /* empty */                        
-                        { $$ = NIL; }	
-|   attribute attributes_with_asm      
-                        { $$ = CONS(QUALIFIER,$1,$2); }	
-|   TK_ASM TK_LPAREN string_constant TK_RPAREN attributes       
-                        { CParserError("ASM not implemented\n"); }                                       
+    /* empty */
+                        { $$ = NIL; }
+|   attribute attributes_with_asm
+                        { $$ = CONS(QUALIFIER,$1,$2); }
+|   TK_ASM TK_LPAREN string_constant TK_RPAREN attributes
+                        { CParserError("ASM not implemented\n"); }
 ;
 
 attribute:
-    TK_ATTRIBUTE TK_LPAREN paren_attr_list_ne TK_RPAREN	
-                        { CParserError("ATTRIBUTE not implemented\n"); }	                                      
-|   TK_DECLSPEC paren_attr_list_ne      
-                        { CParserError("ATTRIBUTE not implemented\n"); }	
-|   TK_MSATTR                            
-                        { CParserError("ATTRIBUTE not implemented\n"); }	
+    TK_ATTRIBUTE TK_LPAREN paren_attr_list_ne TK_RPAREN
+                        { CParserError("ATTRIBUTE not implemented\n"); }
+|   TK_DECLSPEC paren_attr_list_ne
+                        { CParserError("ATTRIBUTE not implemented\n"); }
+|   TK_MSATTR
+                        { CParserError("ATTRIBUTE not implemented\n"); }
                                         /* ISO 6.7.3 */
-|   TK_CONST                             
+|   TK_CONST
                         {
 			  $$ = make_qualifier_const();
-			}	
-|   TK_RESTRICT                           
+			}
+|   TK_RESTRICT
                         {
 			  $$ = make_qualifier_restrict();
-			}	
-|   TK_VOLATILE                           
+			}
+|   TK_VOLATILE
                         {
 			  $$ = make_qualifier_volatile();
-			}	
+			}
 ;
 
 /** (* PRAGMAS and ATTRIBUTES *) ***/
 /* (* We want to allow certain strange things that occur in pragmas, so we
     * cannot use directly the language of expressions *) */
 attr:
-|   id_or_typename                      
-                        { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }	
-|   TK_IDENT TK_COLON TK_INTCON                 
-                        { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }	
-|   TK_DEFAULT TK_COLON TK_INTCON              
-                        { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }	
-|   TK_IDENT TK_LPAREN  TK_RPAREN                
-                        { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }	
-|   TK_IDENT paren_attr_list_ne            
-                        { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }	
-|   TK_INTCON                             
-                        { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }	
-|   string_constant                     
-                        { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }	
-|   TK_CONST                               
-                        { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }	
-|   TK_SIZEOF expression                    
-                        { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }	
-|   TK_SIZEOF TK_LPAREN type_name TK_RPAREN	                        
-                        { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }	
+|   id_or_typename
+                        { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }
+|   TK_IDENT TK_COLON TK_INTCON
+                        { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }
+|   TK_DEFAULT TK_COLON TK_INTCON
+                        { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }
+|   TK_IDENT TK_LPAREN  TK_RPAREN
+                        { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }
+|   TK_IDENT paren_attr_list_ne
+                        { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }
+|   TK_INTCON
+                        { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }
+|   string_constant
+                        { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }
+|   TK_CONST
+                        { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }
+|   TK_SIZEOF expression
+                        { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }
+|   TK_SIZEOF TK_LPAREN type_name TK_RPAREN
+                        { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }
 
-|   TK_ALIGNOF expression                  
-                        { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }	
-|   TK_ALIGNOF TK_LPAREN type_name TK_RPAREN     
-                        { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }	
-|   TK_PLUS expression    	                
-                        { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }	
-|   TK_MINUS expression 		       
-                        { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }	
-|   TK_STAR expression		      
-                        { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }	
+|   TK_ALIGNOF expression
+                        { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }
+|   TK_ALIGNOF TK_LPAREN type_name TK_RPAREN
+                        { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }
+|   TK_PLUS expression
+                        { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }
+|   TK_MINUS expression
+                        { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }
+|   TK_STAR expression
+                        { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }
 |   TK_AND expression				                 %prec TK_ADDROF
-	                               
-                        { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }	
-|   TK_EXCLAM expression		      
-                        { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }	
-|   TK_TILDE expression		       
-                        { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }	
-|   attr TK_PLUS attr                     
-                        { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }	
-|   attr TK_MINUS attr                   
-                        { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }	
-|   attr TK_STAR expression              
-                        { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }	
-|   attr TK_SLASH attr			
-                        { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }	
-|   attr TK_PERCENT attr			
-                        { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }	
-|   attr TK_AND_AND attr			
-                        { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }	
-|   attr TK_PIPE_PIPE attr			
-                        { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }	
-|   attr TK_AND attr			
+
+                        { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }
+|   TK_EXCLAM expression
+                        { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }
+|   TK_TILDE expression
+                        { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }
+|   attr TK_PLUS attr
+                        { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }
+|   attr TK_MINUS attr
+                        { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }
+|   attr TK_STAR expression
+                        { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }
+|   attr TK_SLASH attr
+                        { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }
+|   attr TK_PERCENT attr
+                        { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }
+|   attr TK_AND_AND attr
+                        { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }
+|   attr TK_PIPE_PIPE attr
+                        { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }
+|   attr TK_AND attr
                         {
 			  CParserError("PRAGMAS and ATTRIBUTES not implemented\n");
 		        }
-|   attr TK_PIPE attr			
-                        { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }	
-|   attr TK_CIRC attr			
-                        { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }	
-|   attr TK_EQ_EQ attr			
-                        { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }	
-|   attr TK_EXCLAM_EQ attr			
-                        { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }	
-|   attr TK_INF attr			
-                        { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }	
-|   attr TK_SUP attr			
-                        { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }	
-|   attr TK_INF_EQ attr			
-                        { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }	
-|   attr TK_SUP_EQ attr			
-                        { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }	
-|   attr TK_INF_INF attr			
-                        { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }	
-|   attr TK_SUP_SUP attr			
-                        { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }	
-|   attr TK_ARROW id_or_typename         
-                        { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }	
-|   attr TK_DOT id_or_typename           
-                        { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }	
-|   TK_LPAREN attr TK_RPAREN                
-                        { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }	
+|   attr TK_PIPE attr
+                        { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }
+|   attr TK_CIRC attr
+                        { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }
+|   attr TK_EQ_EQ attr
+                        { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }
+|   attr TK_EXCLAM_EQ attr
+                        { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }
+|   attr TK_INF attr
+                        { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }
+|   attr TK_SUP attr
+                        { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }
+|   attr TK_INF_EQ attr
+                        { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }
+|   attr TK_SUP_EQ attr
+                        { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }
+|   attr TK_INF_INF attr
+                        { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }
+|   attr TK_SUP_SUP attr
+                        { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }
+|   attr TK_ARROW id_or_typename
+                        { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }
+|   attr TK_DOT id_or_typename
+                        { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }
+|   TK_LPAREN attr TK_RPAREN
+                        { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }
 ;
 
 attr_list_ne:
-|   attr                                 
-                        { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }	
-|   attr TK_COMMA attr_list_ne              
-                        { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }	
-|   error TK_COMMA attr_list_ne             
-                        { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }	
+|   attr
+                        { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }
+|   attr TK_COMMA attr_list_ne
+                        { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }
+|   error TK_COMMA attr_list_ne
+                        { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }
 ;
 paren_attr_list_ne:
-    TK_LPAREN attr_list_ne TK_RPAREN           
-                        { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }	
-|   TK_LPAREN error TK_RPAREN                  
-                        { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }	
+    TK_LPAREN attr_list_ne TK_RPAREN
+                        { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }
+|   TK_LPAREN error TK_RPAREN
+                        { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }
 ;
 /*** GCC TK_ASM instructions ***/
 asmattr:
-    /* empty */                       
+    /* empty */
                         { CParserError("ASM not implemented\n"); }
-|   TK_VOLATILE  asmattr                 
+|   TK_VOLATILE  asmattr
                         { CParserError("ASM not implemented\n"); }
-|   TK_CONST asmattr                     
+|   TK_CONST asmattr
                         { CParserError("ASM not implemented\n"); }
 ;
 asmtemplate:
-    one_string_constant                         
+    one_string_constant
                         { CParserError("ASM not implemented\n"); }
-|   one_string_constant asmtemplate             
+|   one_string_constant asmtemplate
                         { CParserError("ASM not implemented\n"); }
 ;
 asmoutputs:
-    /* empty */          
+    /* empty */
                         { CParserError("ASM not implemented\n"); }
-|   TK_COLON asmoperands asminputs                      
+|   TK_COLON asmoperands asminputs
                         { CParserError("ASM not implemented\n"); }
 ;
 asmoperands:
-    /* empty */                      
+    /* empty */
                         { CParserError("ASM not implemented\n"); }
-|   asmoperandsne                     
+|   asmoperandsne
                         { CParserError("ASM not implemented\n"); }
 ;
 asmoperandsne:
-    asmoperand                        
+    asmoperand
                         { CParserError("ASM not implemented\n"); }
-|   asmoperandsne TK_COMMA asmoperand   
+|   asmoperandsne TK_COMMA asmoperand
                         { CParserError("ASM not implemented\n"); }
 ;
 asmoperand:
-    string_constant TK_LPAREN expression TK_RPAREN   
+    string_constant TK_LPAREN expression TK_RPAREN
                         { CParserError("ASM not implemented\n"); }
-|   string_constant TK_LPAREN error TK_RPAREN        
+|   string_constant TK_LPAREN error TK_RPAREN
                         { CParserError("ASM not implemented\n"); }
 ;
 asminputs:
-    /* empty */              
+    /* empty */
                         { CParserError("ASM not implemented\n"); }
 |   TK_COLON asmoperands asmclobber
                         { CParserError("ASM not implemented\n"); }
