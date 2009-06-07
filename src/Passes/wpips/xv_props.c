@@ -668,14 +668,10 @@ build_aliases()
    char buffer[BSIZE_HERE];
    char true_name[BSIZE_HERE], alias_name[BSIZE_HERE];
    FILE *fd;
-   char * wpips_rc = WPIPS_RC; /* WPIPS_RC hides a strdup()... */
 
    aliases = hash_table_make(hash_string, 0);
 
-   if (wpips_rc == NULL)
-      pips_user_error("Shell variable LIBDIR is undefined. "
-		      "Have you run pipsrc?\n");
-   fd = safe_fopen(wpips_rc, "r");
+   fd = fopen_config(WPIPS_RC, NULL,NULL);
 
    while (fgets(buffer, BSIZE_HERE, fd) != NULL) {
       if (buffer[0] == '-')
@@ -695,8 +691,7 @@ build_aliases()
                   strdup(strupper(upper, true_name)));
       }
    }
-   safe_fclose(fd, wpips_rc);
-   free(wpips_rc);
+   safe_fclose(fd, WPIPS_RC);
 }
 
 void

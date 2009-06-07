@@ -465,14 +465,10 @@ void build_aliases() {
 	char buffer[BSIZE_HERE];
 	char true_name[BSIZE_HERE], alias_name[BSIZE_HERE];
 	FILE *fd;
-	char * gpips_rc = WPIPS_RC; /* WPIPS_RC hides a strdup()... */
 
 	aliases = hash_table_make(hash_string, 0);
 
-	if (gpips_rc == NULL)
-		pips_user_error("Shell variable LIBDIR is undefined. "
-			"Have you run pipsrc?\n");
-	fd = safe_fopen(gpips_rc, "r");
+	fd = fopen_config(WPIPS_RC, NULL,NULL);
 
 	while (fgets(buffer, BSIZE_HERE, fd) != NULL) {
 		if (buffer[0] == '-')
@@ -491,8 +487,7 @@ void build_aliases() {
 			hash_put(aliases, strdup(alias_name), strupper(upper, upper));
 		}
 	}
-	safe_fclose(fd, gpips_rc);
-	free(gpips_rc);
+	safe_fclose(fd, WPIPS_RC);
 }
 
 void display_or_hide_options_frame(GtkWidget * menu_item, gpointer data) {

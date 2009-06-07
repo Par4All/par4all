@@ -253,41 +253,24 @@ read_properties(void)
     string rc;
 
     if (pl != (hash_table) NULL)
-	return;
+    return;
     /* else */
     pl = hash_table_make(hash_string, 0);
     update_property = FALSE;
 
-    /* ${PIPS_ROOT}/Share/properties.rc
+    /* ${PIPS_ROOT}/etc/properties.rc
      */
-    rc = PROPERTIES_LIB_FILE;
-    if ((yyin = fopen(rc, "r")) == NULL) {
-	fprintf(stderr, "[read_properties] no default properties (%s), "
-		"check PIPS installation!\n", rc);
-    } else {
-	parse_properties_file(yyin);
-	fclose(yyin), yyin = (FILE*) NULL;
-    }
-    free(rc);
-
-    /* ${PIPS_PROPERTIESRC}
-     */
-    rc = getenv("PIPS_PROPERTIESRC");
-    if (rc)
+    if( (prop_in = fopen_config(PROPERTIES_RC,NULL,"PIPS_PROPERTIESRC")) )
     {
-	if ((yyin = fopen(rc, "r")) == NULL)
-	    fprintf(stderr, "[read_properties] no properties (%s), "
-		    "check Shell variable $PIPS_PROPERTIESRC\n", rc);
-	/* else */
-	parse_properties_file(yyin);
-	fclose(yyin), yyin = (FILE*) NULL;
+        parse_properties_file(prop_in);
+        fclose(prop_in), prop_in = (FILE*) NULL;
     }
-    
+
     /* ./properties.rc
      */
-    if ((yyin = fopen(PROPERTIES_FILE, "r")) != NULL) {
-	parse_properties_file(yyin);
-	fclose(yyin), yyin = (FILE*) NULL;
+    if ((prop_in = fopen(PROPERTIES_RC, "r")) != NULL) {
+    parse_properties_file(prop_in);
+    fclose(prop_in), prop_in = (FILE*) NULL;
     }
 }
 

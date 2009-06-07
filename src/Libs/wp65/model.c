@@ -68,9 +68,7 @@ void get_model(int * ppn, int * pbn, int * pls)
 {
     FILE * fd;
     if ((fd = fopen(MODEL_RC, "r")) == NULL) {
-	if ((fd = fopen(DEFAULT_MODEL_RC, "r")) == NULL) {
-	    pips_error("get_module", "no default model\n");
-	}
+		fd = fopen_config(MODEL_RC, NULL,NULL);
     }
 
     model_fscan(fd, ppn, pbn, pls);

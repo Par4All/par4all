@@ -695,7 +695,7 @@ char * safe_new_tmp_file(char * prefix)
  * if the file if not found a pips_error is generated
  * canonical_name should be a file name, not a path
  */
-#define CONFIG_DIR "etc"
+#define DEFAULT_CONFIG_DIR "etc"
 #define CONFIG_DEFAULT_RIGHT "r"
 FILE * fopen_config(const string canonical_name, const string cproperty, const string cenv)
 {
@@ -709,8 +709,8 @@ FILE * fopen_config(const string canonical_name, const string cproperty, const s
     if( senv && (fconf = fopen(senv, CONFIG_DEFAULT_RIGHT) ) ) return fconf;
 
     pipsenv=getenv("PIPS_ROOT");
-    if(!pipsenv) pipsenv="";
-    sdefault=concatenate(pipsenv,"/" CONFIG_DIR "/" , canonical_name, NULL) ;
+    if(pipsenv) sdefault=concatenate(pipsenv,"/" DEFAULT_CONFIG_DIR "/" , canonical_name, NULL) ;
+	else sdefault=concatenate(CONFIG_DIR "/", canonical_name,NULL);
     return safe_fopen(sdefault,CONFIG_DEFAULT_RIGHT);
 }
 

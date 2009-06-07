@@ -273,15 +273,9 @@ parse_makefile(void)
     {
 	debug_on("PIPSMAKE_DEBUG_LEVEL");
 
-	pipsmake_rc_file = getenv("PIPS_PIPSMAKERC");
-
-	if (!pipsmake_rc_file)
-	    pipsmake_rc_file = file_exists_p(PIPSMAKE_RC)?
-		strdup(PIPSMAKE_RC): DEFAULT_PIPSMAKE_RC;
-	else
-	    pipsmake_rc_file = strdup(pipsmake_rc_file);
-	
-	yyin = safe_fopen(pipsmake_rc_file, "r");
+	yyin = pipsmake_rc_file?
+			safe_fopen(pipsmake_rc_file, "r"):
+			fopen_config(PIPSMAKE_RC,NULL,"PIPS_PIPSMAKERC");
 
 	init_lex();
 	yyparse();

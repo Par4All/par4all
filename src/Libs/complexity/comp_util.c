@@ -483,59 +483,46 @@ FILE *fd;
  */
 void init_cost_table()
 {
-    char *sep_chars = strdup(" ");
-    char *token, *comma, *file = (char*) malloc(80);
+    char *token, *comma, *filename ;
     float file_factor;
 
-    char *cost_dir = getenv("PIPS_COSTDIR");
-    char *cost_table = strdup(get_string_property("COMPLEXITY_COST_TABLE"));
     char *cost_data = strdup(COST_DATA);
-    char *tmp= (char*) malloc(20);
+    char *tmp=NULL;
 
-    if (!cost_dir) /* the default value */
-	cost_dir = strdup(concatenate(getenv("PIPS_ROOT"),
-				      "/etc/complexity_cost_tables", NULL));
-    else
-	cost_dir = strdup(cost_dir);
+	for(token = strtok(cost_data, " "); (token != NULL);token = strtok(NULL, " ")) {
+		comma = strchr(token, ',');
 
-    pips_assert("some directory and table", cost_dir && cost_table);
-    token = strtok(cost_data, sep_chars);
+		if (comma == NULL) {
+			tmp=strdup(token);
+			file_factor = 1.0;
+		}
+		else {
+			int ii = comma - token;
+			tmp=strndup( token, ii);
+			sscanf(++comma, "%f", &file_factor);
+		}
 
-    while (token != NULL) {
-	comma = strchr(token, ',');
 
-	if (comma == NULL) {
-	    strcpy(tmp, token);
-	    file_factor = 1.0;
+		filename = strdup(concatenate( COMPLEXITY_COST_TABLES "/", get_string_property("COMPLEXITY_COST_TABLE"), "/", tmp, NULL));
+
+		debug(5,"init_cost_table","file_factor is %f\n", file_factor);
+		debug(1,"init_cost_table","cost file is %s\n",filename);
+
+		load_cost_file(fopen_config(filename,NULL,"PIPS_COSTDIR"), file_factor);
+		free(tmp);
+		free(filename);
 	}
-	else {
-	    int ii = comma - token;
-	    strncpy(tmp, token, ii);
-	    *(tmp + ii) = '\0';
-	    sscanf(++comma, "%f", &file_factor);
-	}
 
-
-	file = concatenate(cost_dir,"/", cost_table, "/", tmp, NULL);
-
-	debug(5,"init_cost_table","file_factor is %f\n", file_factor);
-	debug(1,"init_cost_table","cost file is %s\n",file);
-	load_cost_file(file, file_factor);
-	token = strtok(NULL, sep_chars);
-    }
-
-    free(cost_dir);
 }
 
 /* 
- * Load (some) intrinsics costs from file "filename", 
+ * Load (some) intrinsics costs from file "fd", 
  * multiplying them by "file_factor".
  */
-void load_cost_file(filename, file_factor)
-char *filename;
+void load_cost_file(fd, file_factor)
+FILE *fd;
 float file_factor;
 {
-    FILE *fd;
     char *line = (char*) malloc(199);
     char *intrinsic_name = (char*) malloc(30);
     int int_cost, float_cost, double_cost, complex_cost, dcomplex_cost;
@@ -543,15 +530,8 @@ float file_factor;
     float scale_factor = 1.0;
     boolean recognized;
 
-    if (!file_exists_p(filename))
-	user_error("load_cost_table",
-		   "This cost file: %s doesn't exist\n",
-		   filename);
-    else {
-	fd = safe_fopen(filename, "r");
-	
 	if (get_bool_property("COMPLEXITY_INTERMEDIATES")) {
-	    fprintf(stderr, "\nReading cost file '%s' ", filename);
+	    fprintf(stderr, "\nReading cost file ");
 	    if (file_factor != 1.0) 
 		fprintf(stderr, "(x %.2f)", file_factor);
 	}
@@ -588,8 +568,7 @@ float file_factor;
 	if (get_bool_property("COMPLEXITY_INTERMEDIATES")) {
 	    fprintf(stderr, "\nScale factor is %f\n", scale_factor);
 	}
-	safe_fclose(fd, filename);
-    }
+	fclose(fd);
  
     free(intrinsic_name);
     free(line);

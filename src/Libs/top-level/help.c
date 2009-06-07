@@ -43,19 +43,12 @@ get_help_topics(gen_array_t array)
 {
     int index = 0, begin_length;
     FILE *fd;
-    static char *help_file = NULL;
-
     char *line;
 
-    if (help_file == NULL)
-	help_file = XV_HELP_FILE;
 
     begin_length = strlen(BEGIN_STR);
 
-    if ((fd = fopen(help_file, "r")) == NULL) {
-	/* should be show_message */
-	user_log("Could not open help file (%s)\n", help_file);
-    }
+    fd = fopen_config(XV_HELP_RC, NULL,NULL);
 
     while ((line = safe_readline(fd)) != NULL) {
 	if (strncmp(line, BEGIN_STR, begin_length) == 0)
@@ -71,23 +64,15 @@ get_help_topic(string topic, gen_array_t array)
 {
     FILE *fd;
     int selected = FALSE, index=0;
-    static char *help_file;
     int begin_length, end_length;
 
     char *line;
 
-    if (help_file == NULL)
-	help_file = XV_HELP_FILE;
 
     begin_length = strlen(BEGIN_STR);
     end_length = strlen(END_STR);
 
-    if ((fd = fopen(help_file, "r")) == NULL) {
-	perror("Could not open help file\n");
-	/* should be show_message */
-	user_log("Could not open help file (%s)\n", help_file);
-    }
-    else {
+    fd = fopen_config(XV_HELP_RC, NULL,NULL);
 	while ((line = safe_readline(fd)) != NULL) 
 	{
 	    if (strncmp(line, BEGIN_STR, begin_length) == 0 &&
@@ -100,7 +85,6 @@ get_help_topic(string topic, gen_array_t array)
 		gen_array_dupaddto(array, index++, line);
 	    free(line);
 	}
-    }
 
     if (! selected)
 	gen_array_dupaddto(array, index++, "Sorry: no help on this topic");
@@ -109,14 +93,17 @@ get_help_topic(string topic, gen_array_t array)
 }
 
 /* add checkings here (FI: why in help.c?)
+ * SG : PIPS_ROOT should not be required :)
  */
 void 
 pips_checks(void)
 {
+	/*
     if (!getenv("PIPS_ROOT")) {
 	(void) fprintf(stderr, "PIPS_ROOT environment variable not set. \n"
 		       "Set it properly and relaunch.\n");
 	exit(1);
     }
+	*/
 }
 

@@ -30,28 +30,18 @@
 
 #include "specs.h"
 
-/* And now, a nice set of (minor) memory leak sources...
- */
- 
 /* Auxiliary data files
  */
-#define PIPS_ETC(file) \
-    (strdup(concatenate(getenv("PIPS_ROOT"), "/etc/", (file), NULL)))
 
 #define PIPSMAKE_RC "pipsmake.rc"
-#define DEFAULT_PIPSMAKE_RC PIPS_ETC(PIPSMAKE_RC)
 
-#define WPIPS_RC PIPS_ETC("wpips.rc")
+#define WPIPS_RC "wpips.rc"
 
-/* #define BOOTSTRAP_FILE PIPS_ETC("BOOT-STRAP.entities") */
-
-#define XV_HELP_FILE PIPS_ETC("pips_help.txt")
+#define XV_HELP_RC "pips_help.txt"
  
-#define PROPERTIES_FILE "properties.rc"
-#define PROPERTIES_LIB_FILE PIPS_ETC(PROPERTIES_FILE)
+#define PROPERTIES_RC "properties.rc"
  
 #define MODEL_RC "model.rc"
-#define DEFAULT_MODEL_RC PIPS_ETC(MODEL_RC)
  
 /* filename extensions
  */
@@ -79,6 +69,7 @@
 
 /* Where is the output of HPFC in the workspace: */
 #define HPFC_COMPILED_FILE_DIR "hpfc"
+#define COMPLEXITY_COST_TABLES "complexity_cost_tables"
    
 /* say that's all
  */
