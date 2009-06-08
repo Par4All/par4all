@@ -1626,7 +1626,7 @@ init_declarator:                             /* ISO 6.7 */
 			    pips_user_warning("Undefined init_expression, why not use value_unknown?\n");
 			  }
 			  else {
-
+			    (void) simplify_C_expression(nie);
 			    /* Put init_expression in the initial value of entity declarator*/
 			    if(!value_undefined_p(oiv)){
 			      if(value_unknown_p(oiv)) {
