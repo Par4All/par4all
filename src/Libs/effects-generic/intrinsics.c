@@ -1427,24 +1427,26 @@ static list any_rgs_effects(entity e __attribute__ ((__unused__)), list args, bo
 
   ifdebug(8) print_reference(ref);
 
+  /* Read first. */
   if(init_p != TRUE){
     le = gen_nconc(le, generic_proper_effects_of_read_reference(ref));
   }
 
-    le = gen_nconc(le, generic_proper_effects_of_written_reference(ref));
+  /* Init or write back. */
+  le = gen_nconc(le, generic_proper_effects_of_written_reference(ref));
 
   pips_debug(5, "end\n");
 
   return(le);
 }
 
-/* The seed is written */
+/* The seed is written for initialization */
 static list rgsi_effects(entity e, list args)
 {
   return any_rgs_effects( e, args, TRUE);
 }
 
-/* The seed is read */
+/* The seed is read and then written */
 static list rgs_effects(entity e, list args)
 {
   return any_rgs_effects( e, args, FALSE);
