@@ -358,7 +358,7 @@ call_to_postcondition(
 
 /******************************************************** DATA PRECONDITIONS */
 
-/* a remake that works in all cases. FC.
+/* a remake that works in all cases. FC. Isn'it a bit presumptuous? FI.
  *
  * This function works for C as well as Fortran. Its name should be
  * initial_value_to_preconditions.
@@ -372,38 +372,35 @@ call_to_postcondition(
 static transformer data_to_prec_for_variables(entity m, list /* of entity */le) 
 {
   transformer pre = transformer_identity();
+  transformer pre_r = transformer_undefined; // range of pre
   linear_hashtable_pt b = linear_hashtable_make(); /* already seen */
   list ce = list_undefined;
-  
+
   pips_debug(8, "begin for %s\n", module_local_name(m));
-  
+ 
   /* look for entities with an initial value. */
   for(ce = le; !ENDP(ce); POP(ce)) {
     entity e = ENTITY(CAR(ce));
     value val = entity_initial(e);
 
-    if(value_constant_p(val))
-    {
-      constant c = value_constant(val);
-      if (constant_int_p(c))
-      {
-	int int_val = constant_int(value_constant(val));
-	if(entity_has_values_p(e) && !linear_hashtable_isin(b, e))
-	{
+    pips_debug(8, "begin for variable %s\n", entity_name(e));
+ 
+    if (entity_has_values_p(e) && !linear_hashtable_isin(b, e)) {
+      if(value_constant_p(val)) {
+	constant c = value_constant(val);
+	if (constant_int_p(c)) {
+	  int int_val = constant_int(value_constant(val));
+
 	  Pvecteur v = vect_make(VECTEUR_NUL,
 				 (Variable) e, VALUE_ONE,
 				 TCST, int_to_value(-int_val));
 	  pre = transformer_equality_add(pre, v);
 	  linear_hashtable_put_once(b, e, e);
 	}
-      }
-      else if (constant_call_p(c))
-      {
-	if (entity_has_values_p(e) && !linear_hashtable_isin(b, e))
-	{
+	else if (constant_call_p(c)) {
 	  entity f = constant_call(c);
 	  basic bt = variable_basic(type_variable(functional_result
-						 (type_functional(entity_type(f)))));
+						  (type_functional(entity_type(f)))));
 
 	  if((basic_float_p(bt) && float_analyzed_p())
 	     || (basic_string_p(bt) && string_analyzed_p())
@@ -417,18 +414,29 @@ static transformer data_to_prec_for_variables(entity m, list /* of entity */le)
 	  }
 	}
       }
+      else if(value_expression_p(val)) {
+	expression expr = value_expression(val);
+	transformer npre = safe_any_expression_to_transformer(e, expr, pre, FALSE);
+
+	pre = transformer_combine(pre, npre);
+	free_transformer(npre);
+      }
     }
   }
       
+  pre = transformer_temporary_value_projection(pre);
+  pre_r = transformer_range(pre);
+  free_transformer(pre);
+
   linear_hashtable_free(b);
-  pips_assert("some transformer", pre != transformer_undefined);
+  pips_assert("some transformer", pre_r != transformer_undefined);
   
   ifdebug(8) {
-    dump_transformer(pre);
+    dump_transformer(pre_r);
     pips_debug(8, "end for %s\n", module_local_name(m));
   }
   
-  return pre;
+  return pre_r;
 }
 
 /* returns an allocated list of entities that appear in lef.
@@ -456,8 +464,18 @@ transformer data_to_precondition(entity m)
 /* any variable is included. */
 transformer all_data_to_precondition(entity m)
 {
-  transformer pre =
-    data_to_prec_for_variables(m, code_declarations(entity_code(m)));
+  /* FI: it would be nice, if only for debugging, to pass a more
+     restricted list... 
+
+     This assumes the all varibles declared in a statement is also
+     declared at the module level. */
+  //  transformer pre =
+  // data_to_prec_for_variables(m, code_declarations(entity_code(m)));
+  list dl = module_to_all_declarations(m);
+  transformer pre = data_to_prec_for_variables(m, dl);
+
+  gen_free_list(dl);
+
   return pre;
 }
 
@@ -656,7 +674,6 @@ transformer statement_to_postcondition(
 	list non_initial_values =
 	    arguments_difference(transformer_arguments(pre),
 				 get_module_global_arguments());
-	transformer foo = transformer_undefined;
 	list dl = statement_block_p(s) ? statement_declarations(s) : NIL;
 
 	if(!ENDP(statement_declarations(s)) && !statement_block_p(s)) {
@@ -711,18 +728,17 @@ transformer statement_to_postcondition(
            exit conditions of WHILE loops (w05, w06, w07). It is not
            powerful enough for preconditions containing equations with
            three or more variables such as fraer01,...*/
-	foo = transformer_identity();
-	if(!transformer_consistency_p(pre)) {
-	  ;
-	}
-	pre = transformer_normalize(pre, 4);
-	foo = transformer_identity();
+
 	if(!transformer_consistency_p(pre)) {
 	  ;
 	}
 	pre = transformer_normalize(pre, 4);
 
-	foo = transformer_identity();
+	if(!transformer_consistency_p(pre)) {
+	  ;
+	}
+	pre = transformer_normalize(pre, 4);
+
 	if(!transformer_consistency_p(pre)) {
 	    int so = statement_ordering(s);
 	    fprintf(stderr, "statement %03td (%d,%d), precondition %p end:\n",
@@ -732,10 +748,15 @@ transformer statement_to_postcondition(
 	    pips_internal_error("Non-consistent precondition after update\n");
 	}
 
+	/* Do not keep too many initial variables in the preconditions: not so smart? 
+	 * 
+	 * See character01.c, but other counter examples above about
+	 * non_initial_values.
+	 */
+	pre = transformer_filter(pre, non_initial_values);
+
 	/* store the precondition in the ri */
-	store_statement_precondition(s,
-				     transformer_filter(pre,
-							non_initial_values));
+	store_statement_precondition(s, pre);
 
 	gen_free_list(non_initial_values);
     }

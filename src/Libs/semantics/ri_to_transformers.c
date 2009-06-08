@@ -150,7 +150,7 @@ transformer declaration_to_transformer(entity v, transformer pre)
 
   pips_debug(8, "Transformer for declaration of \"%s\"\n", entity_name(v));
 
-  if(entity_has_values_p(v)) {
+  if(entity_has_values_p(v) && !variable_static_p(v)) {
     value vv = entity_initial(v);
     if(value_unknown_p(vv)) {
       tf = transformer_identity();
@@ -170,7 +170,7 @@ transformer declaration_to_transformer(entity v, transformer pre)
       basic vb = variable_basic(type_variable(vt));
 
       if(basic_equal_p(eb, vb)) {
-	tf = any_expression_to_transformer(v, e, pre, FALSE);
+	tf = safe_any_expression_to_transformer(v, e, pre, FALSE);
 	tf = transformer_temporary_value_projection(tf);
       }
       else {
@@ -1663,7 +1663,8 @@ transformer statement_to_transformer(
       /* nt = transformer_normalize(nt, 0); */
     }
     if(!ENDP(dl)) {
-      list vl = variables_to_values(dl);
+      /* Get rid of the non static variables declared in this statement. */
+      list vl = dynamic_variables_to_values(dl);
       if(!ENDP(vl))
 	nt = safe_transformer_projection(nt, vl);
     }
