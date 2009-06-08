@@ -265,7 +265,6 @@ void fprint_makefile(FILE *fd, makefile m)
 makefile 
 parse_makefile(void)
 {
-    string pipsmake_rc_file;
     extern int init_lex();
     extern int yyparse();
 
@@ -273,15 +272,12 @@ parse_makefile(void)
     {
 	debug_on("PIPSMAKE_DEBUG_LEVEL");
 
-	yyin = pipsmake_rc_file?
-			safe_fopen(pipsmake_rc_file, "r"):
-			fopen_config(PIPSMAKE_RC,NULL,"PIPS_PIPSMAKERC");
+	yyin = fopen_config(PIPSMAKE_RC, NULL, "PIPS_PIPSMAKERC");
 
 	init_lex();
 	yyparse();
-	safe_fclose(yyin, pipsmake_rc_file);
-	free(pipsmake_rc_file);
-
+	safe_fclose(yyin, "PIPS_PIPSMAKERC");
+	
 	ifdebug(8) fprint_makefile(stderr, pipsmakefile);
 
 	debug_off();
