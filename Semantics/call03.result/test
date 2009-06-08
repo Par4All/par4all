@@ -76,20 +76,20 @@ main()
 Source code with preconditions for "call03"
 
 
-//  P() {i==3}
+//  P() {TOP-LEVEL:j==0, i==3}
 
 void call03(int i, float x)
 {
 
-//  P() {i==3}
+//  P() {TOP-LEVEL:j==0, i==3}
 
    i++;                                                                 /*0004*/
 
-//  P(i) {i==4}
+//  P(i) {TOP-LEVEL:j==0, i==4}
 
    j++;                                                                 /*0005*/
 
-//  P(TOP-LEVEL:j,i) {TOP-LEVEL:j==j#init+1, i==4}
+//  P(TOP-LEVEL:j,i) {TOP-LEVEL:j==1, i==4, j#init==0}
 
    x++;                                                                 /*0006*/
 }
@@ -97,20 +97,26 @@ void call03(int i, float x)
 Source code with preconditions for "main"
 
 
-//  P() {}
+//  P() {TOP-LEVEL:j==0}
 
 main()
 {
    int ai = 3;
    float ax = 4.;
 
-//  P() {ai==3}
+//  P() {TOP-LEVEL:j==0, ai==3}
 
 
    call03(ai, ax);                                                      /*0017*/
 
-//  P(TOP-LEVEL:j) {TOP-LEVEL:j==j#init+1, ai==3}
+//  P(TOP-LEVEL:j) {TOP-LEVEL:j==1, ai==3, j#init==0}
 
 
    ai = 0;                                                              /*0019*/
 }
+
+Warnings
+
+unknown[unknown] (activate) Rule `PRINT_CODE_TRANSFORMERS' already active
+unknown[unknown] (activate) Rule `PRINT_CODE_PRECONDITIONS' already active
+INTERPROCEDURAL_SUMMARY_PRECONDITION[call03!] (ordinary_summary_precondition) empty precondition to call03! because not in call tree from main.

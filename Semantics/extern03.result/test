@@ -1,0 +1,87 @@
+
+Parsed code for "extern03!"
+
+float delta = 1.;
+float delta2 = delta+2.;
+extern  main();
+
+Cumulated effects for "main"
+
+//               <must be read   >: TOP-LEVEL:delta TOP-LEVEL:delta2
+main()
+{
+//               <must be read   >: TOP-LEVEL:delta TOP-LEVEL:delta2 i
+//               <must be written>: i
+   // BEGIN BLOCK
+   float i = 0.;
+//               <must be read   >: TOP-LEVEL:delta i
+//               <must be written>: i
+
+   i = i+delta;
+//               <must be read   >: TOP-LEVEL:delta i
+//               <must be written>: i
+   i = i+delta;
+//               <must be read   >: TOP-LEVEL:delta2 i
+//               <must be written>: i
+   i = i+delta2;
+   // END BLOCK
+}
+
+Transformers for "main"
+
+
+//  T() {1.+2.==TOP-LEVEL:delta2, 1.==TOP-LEVEL:delta}
+
+main()
+{
+
+//  T() {1.+2.==TOP-LEVEL:delta2, 1.==TOP-LEVEL:delta}
+
+   // BEGIN BLOCK
+   float i = 0.;
+
+//  T(i) {0.+1.==i, 0.==i#init, 1.+2.==TOP-LEVEL:delta2,
+//    1.==TOP-LEVEL:delta}
+
+
+   i = i+delta;
+
+//  T(i) {0.+1.==i#init, 1.+2.==TOP-LEVEL:delta2, 1.==TOP-LEVEL:delta,
+//    1.+i#init==i}
+
+   i = i+delta;
+
+//  T(i) {0.+21.==i#init, 1.+2.==TOP-LEVEL:delta2,
+//    1.==TOP-LEVEL:delta, TOP-LEVEL:delta2+i#init==i}
+
+   i = i+delta2;
+   // END BLOCK
+}
+
+Preconditions for "main"
+
+
+//  P() {1.+2.==TOP-LEVEL:delta2, 1.==TOP-LEVEL:delta}
+
+main()
+{
+
+//  P() {1.+2.==TOP-LEVEL:delta2, 1.==TOP-LEVEL:delta}
+
+   // BEGIN BLOCK
+   float i = 0.;
+
+//  P() {0.==i, 1.+2.==TOP-LEVEL:delta2, 1.==TOP-LEVEL:delta}
+
+
+   i = i+delta;
+
+//  P(i) {0.+1.==i, 1.+2.==TOP-LEVEL:delta2, 1.==TOP-LEVEL:delta}
+
+   i = i+delta;
+
+//  P(i) {0.+21.==i, 1.+2.==TOP-LEVEL:delta2, 1.==TOP-LEVEL:delta}
+
+   i = i+delta2;
+   // END BLOCK
+}

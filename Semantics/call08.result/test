@@ -1,7 +1,7 @@
 
 Source code with proper effects
 
-int call04(int i)
+int call08(int i)
 {
 //               <must be read   >: i
 //               <must be written>: i
@@ -18,7 +18,7 @@ Source code with cumulated effects
 
 //               <must be read   >: TOP-LEVEL:j i
 //               <must be written>: TOP-LEVEL:j
-int call04(int i)
+int call08(int i)
 {
 //               <must be read   >: i
 //               <must be written>: i
@@ -31,12 +31,12 @@ int call04(int i)
    return i;                                                            /*0007*/
 }
 
-Source code with transformers for "call04"
+Source code with transformers for "call08"
 
 
-//  T(TOP-LEVEL:j,call04) {TOP-LEVEL:j==j#init+1, call04==i+10}
+//  T(TOP-LEVEL:j,call08) {TOP-LEVEL:j==j#init+1, call08==i+10}
 
-int call04(int i)
+int call08(int i)
 {
 
 //  T(i) {i==i#init+10}
@@ -47,7 +47,7 @@ int call04(int i)
 
    j++;                                                                 /*0005*/
 
-//  T(call04) {call04==i}
+//  T(call08) {call08==i}
 
 
    return i;                                                            /*0007*/
@@ -62,10 +62,10 @@ main()
 {
    int ai = 3;
 
-//  T(TOP-LEVEL:j,ai) {TOP-LEVEL:j==j#init+1, ai==ai#init+10}
+//  T(TOP-LEVEL:j,ai) {TOP-LEVEL:j==j#init+1, ai==ai#init+11}
 
 
-   ai = call04(ai++);                                                   /*0017*/
+   ai = call08(++ai);                                                   /*0017*/
 
 //  T(ai) {ai==0}
 
@@ -73,23 +73,23 @@ main()
    ai = 0;                                                              /*0019*/
 }
 
-Source code with preconditions for "call04"
+Source code with preconditions for "call08"
 
 
-//  P() {TOP-LEVEL:j==0, i==3}
+//  P() {TOP-LEVEL:j==0, i==4}
 
-int call04(int i)
+int call08(int i)
 {
 
-//  P() {TOP-LEVEL:j==0, i==3}
+//  P() {TOP-LEVEL:j==0, i==4}
 
    i += 10;                                                             /*0004*/
 
-//  P(i) {TOP-LEVEL:j==0, i==13}
+//  P(i) {TOP-LEVEL:j==0, i==14}
 
    j++;                                                                 /*0005*/
 
-//  P(TOP-LEVEL:j,i) {TOP-LEVEL:j==1, i==13, j#init==0}
+//  P(TOP-LEVEL:j,i) {TOP-LEVEL:j==1, i==14, j#init==0}
 
 
    return i;                                                            /*0007*/
@@ -107,9 +107,9 @@ main()
 //  P() {TOP-LEVEL:j==0, ai==3}
 
 
-   ai = call04(ai++);                                                   /*0017*/
+   ai = call08(++ai);                                                   /*0017*/
 
-//  P(TOP-LEVEL:j,ai) {TOP-LEVEL:j==1, ai==13, j#init==0}
+//  P(TOP-LEVEL:j,ai) {TOP-LEVEL:j==1, ai==14, j#init==0}
 
 
    ai = 0;                                                              /*0019*/
@@ -117,15 +117,15 @@ main()
 
 Warnings
 
-INITIAL_PRECONDITION[call04] (add_or_kill_equivalenced_variables) storage return
-TRANSFORMERS_INTER_FULL[call04] (add_or_kill_equivalenced_variables) storage return
-TRANSFORMERS_INTER_FULL[call04] (NormalizeExpression) expression is already normalized
-PRINT_CODE_TRANSFORMERS[call04] (add_or_kill_equivalenced_variables) storage return
+INITIAL_PRECONDITION[call08] (add_or_kill_equivalenced_variables) storage return
+TRANSFORMERS_INTER_FULL[call08] (add_or_kill_equivalenced_variables) storage return
+TRANSFORMERS_INTER_FULL[call08] (NormalizeExpression) expression is already normalized
+PRINT_CODE_TRANSFORMERS[call08] (add_or_kill_equivalenced_variables) storage return
 unknown[unknown] (activate) Rule `PRINT_CODE_TRANSFORMERS' already active
 TRANSFORMERS_INTER_FULL[main] (NormalizeExpression) expression is already normalized
-TRANSFORMERS_INTER_FULL[main] (any_scalar_assign_to_transformer) Variable 0`ai in lhs is uselessly updated by the rhs 'call04(ai++)'
-INTERPROCEDURAL_SUMMARY_PRECONDITION[call04] (NormalizeExpression) expression is already normalized
-PRECONDITIONS_INTER_FULL[call04] (add_or_kill_equivalenced_variables) storage return
-PRINT_CODE_PRECONDITIONS[call04] (add_or_kill_equivalenced_variables) storage return
+TRANSFORMERS_INTER_FULL[main] (any_scalar_assign_to_transformer) Variable 0`ai in lhs is uselessly updated by the rhs 'call08(++ai)'
+INTERPROCEDURAL_SUMMARY_PRECONDITION[call08] (NormalizeExpression) expression is already normalized
+PRECONDITIONS_INTER_FULL[call08] (add_or_kill_equivalenced_variables) storage return
+PRINT_CODE_PRECONDITIONS[call08] (add_or_kill_equivalenced_variables) storage return
 unknown[unknown] (activate) Rule `PRINT_CODE_PRECONDITIONS' already active
-INTERPROCEDURAL_SUMMARY_PRECONDITION[call04!] (ordinary_summary_precondition) empty precondition to call04! because not in call tree from main.
+INTERPROCEDURAL_SUMMARY_PRECONDITION[call08!] (ordinary_summary_precondition) empty precondition to call08! because not in call tree from main.
