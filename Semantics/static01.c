@@ -1,5 +1,5 @@
-/* Check that successive external floating point dependent initializationa are properly taken
-   into account. */
+/* Check that successive initializations are properly taken into
+   account. */
 
 void static01()
 {
