@@ -274,9 +274,10 @@ transformer transformer_combine(transformer t1, transformer t2)
       else {
 	/* if ever e2 is used as e2#new in r1 it must now be
 	   replaced by e2#old */
-	entity e_old = entity_to_old_value(e2);
-	if(base_contains_variable_p(r1->base, (Variable) e2))
+	if(base_contains_variable_p(r1->base, (Variable) e2)) {
+	  entity e_old = entity_to_old_value(e2);
 	  r1 = sc_variable_rename(r1, (Variable) e2, (Variable) e_old);
+	}
 	/* e2 must be appended to a1 as new t1's arguments;
 	   hopefully we are not iterating on a1; but 
 	   entity_is_argument_p() receives a longer argument each time;
@@ -949,7 +950,31 @@ transformer safe_transformer_projection(transformer t, list args)
   return nt;
 }
 
-/* vaues in args must be in t's base */
+transformer 
+transformer_formal_parameter_projection(transformer t)
+{
+  Psysteme sc = predicate_system(transformer_relation(t));
+  Pbase b = sc_base(sc);
+  Pbase cd = BASE_UNDEFINED;
+  list fpl = NIL;
+
+  for(cd = b; !BASE_NULLE_P(cd); cd = vecteur_succ(cd)) {
+    entity val = (entity) vecteur_var(cd);
+    entity var = value_to_variable(val);
+    storage s = entity_storage(var);
+
+    if(storage_formal_p(s))
+      fpl = CONS(ENTITY, var, fpl);
+  }
+
+  t = transformer_projection(t, fpl);
+
+  gen_free_list(fpl);
+
+  return t;
+}
+
+/* values in args must be in t's base */
 /* transformer transformer_projection(transformer t, cons * args):
  * projection of t along the hyperplane defined by values in args;
  * this generate a projection and not a cylinder based on the projection
@@ -1466,18 +1491,19 @@ transformer_affect_transformer_p(transformer tf1, transformer tf2)
 {
   bool affect_p = FALSE;
 
-  /* No need to check if tf1 does not change the memory state */
+  /* No need to check anything if tf1 does not change the memory state */
   if(!ENDP(transformer_arguments(tf1))) {
     Psysteme s2 = predicate_system(transformer_relation(tf2));
     Pcontrainte ceq = sc_egalites(s2);
     Pcontrainte cineq = sc_inegalites(s2);
+
     for(; !CONTRAINTE_UNDEFINED_P(ceq) && !affect_p; ceq = contrainte_succ(ceq)) {
       Pvecteur v = contrainte_vecteur(ceq);
       affect_p = transformer_affect_linear_p(tf1, v);
     }
 
-    for(; !CONTRAINTE_UNDEFINED_P(cineq) && !affect_p; ceq = contrainte_succ(ceq)) {
-      Pvecteur v = contrainte_vecteur(ceq);
+    for(; !CONTRAINTE_UNDEFINED_P(cineq) && !affect_p; cineq = contrainte_succ(cineq)) {
+      Pvecteur v = contrainte_vecteur(cineq);
       affect_p = transformer_affect_linear_p(tf1, v);
     }
   }
