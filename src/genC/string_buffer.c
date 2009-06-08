@@ -160,11 +160,9 @@ void string_buffer_append_sb(string_buffer sb, string_buffer sb2)
  * @return void
  * @param sb, the string buffer where to append the whole list
  * @param l, the list of string to append to the string buffer
- * @param flg, set to TRUE if the list need to be added in the revere order
  */
-void string_buffer_append_list(string_buffer sb, list l, bool flg)
+void string_buffer_append_list(string_buffer sb, list l)
 {
-  if (flg == TRUE) l = gen_nreverse (l);
   FOREACH (STRING, s, l) {
     string_buffer_append(sb, s);
   }
