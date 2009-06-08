@@ -164,9 +164,11 @@ static bool condition_expression_to_final_bound(expression cond,
 }
 
 
-/**
-   Test if a for-loop incrementation expression is do-loop compatible and,
-   if yes, compute the increment expression.
+/*
+   Test if a for-loop incrementation expression is do-loop compatible
+   (i.e. the number of iterations can be computed before entering the
+   loop and hence the increment is known and unchanged) and, if yes,
+   compute the increment expression.
 
    Most of this could be trivial by using the transformers but this
    function is to be used from the controlizer where the semantics
@@ -210,6 +212,12 @@ static bool incrementation_expression_to_increment(expression incr,
 	}
 	else if (! ENDP(CDR(call_arguments(incr_c)))) {
 	  /* Look for stuff like "i += integer". Get the rhs: */
+	  /* This fails with floating point indices as found in
+	     industrial code and with symbolic increments as in
+	     "for(t=0.0; t<t_max; t += delta_t). Floating point
+	     indices should be taken into account. The iteration
+	     direction of the loop should be derived from the bound
+	     expression, using the comparison operator. */
 	  expression inc_v =  EXPRESSION(CAR(CDR(call_arguments(incr_c))));
 	  if (ENTITY_PLUS_UPDATE_P(op)
 	      && extended_integer_constant_expression_p(inc_v)) {
@@ -300,6 +308,12 @@ loop for_to_do_loop_conversion(expression init,
 
    * The incrementation expression does not really matter as long as it
    * updates the loop index by a constant integer value.
+
+   * This algorithme fails with "for(;i<n;i++)" because the initialization
+   * expression plays a key role. We should first look for candidate
+   * indices in all three expressions, init, condition and increment,
+   * and then look for a best candidates. This approache would also
+   * cover cases such as "for(i=0, j=1; i<n, j<=n; i++, j++)".
 
    */
   entity li = entity_undefined; ///< loop index
