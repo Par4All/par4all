@@ -1,5 +1,5 @@
-delete for
-create for for.c
+delete for01
+create for01 for01.c
 
 activate C_PARSER
 
