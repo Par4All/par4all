@@ -112,7 +112,7 @@ void reset_sccs_drivers()
 
 
 /*
-LowlinkCompute is the main function. its behavior is explained in the
+LowlinkCompute is the main function. Its behavior is explained in the
 book mentionned ealier.
 
 g is a graph
@@ -121,96 +121,90 @@ region and level define a sub-graph of g
 
 v is the current vertex 
 */
-void LowlinkCompute(g, region, v, level)
-graph g;
-set region;
-vertex v;
-int level;
+void LowlinkCompute(graph g, set region, vertex v, int level)
 {
-    dg_vertex_label dvl = (dg_vertex_label) vertex_vertex_label(v);
-    sccflags fv = dg_vertex_label_sccflags(dvl);
-    statement sv = ordering_to_statement(dg_vertex_label_statement(dvl));
+  dg_vertex_label dvl = (dg_vertex_label) vertex_vertex_label(v);
+  sccflags fv = dg_vertex_label_sccflags(dvl);
+  statement sv = ordering_to_statement(dg_vertex_label_statement(dvl));
 
-    debug(7, "llc", "vertex is %d (%d %d %d)\n", statement_number(sv), 
-	  sccflags_mark(fv), sccflags_lowlink(fv), sccflags_dfnumber(fv));
+  pips_debug(7, "vertex is %d (%d %d %d)\n", statement_number(sv), 
+	sccflags_mark(fv), sccflags_lowlink(fv), sccflags_dfnumber(fv));
 
-    MARK_OLD(v);
+  MARK_OLD(v);
 
-    sccflags_lowlink(fv) = Count;
-    sccflags_dfnumber(fv) = Count;
+  sccflags_lowlink(fv) = Count;
+  sccflags_dfnumber(fv) = Count;
 
-    Count ++;
+  Count ++;
 
-    Stack[StackPointer++] = v;
+  Stack[StackPointer++] = v;
 
-    MAPL(ps, {
-	successor su = SUCCESSOR(CAR(ps));
+  FOREACH(SUCCESSOR, su, vertex_successors(v)) {
 
-	if (! ignore_this_successor_drv(v,region, su, level)) {
-	    vertex s = successor_vertex(su);
+    if (! ignore_this_successor_drv(v,region, su, level)) {
+      vertex s = successor_vertex(su);
 
-	    if (! ignore_this_vertex_drv(region, s)) {
-		dg_vertex_label dsl = (dg_vertex_label) vertex_vertex_label(s);
-		sccflags fs = dg_vertex_label_sccflags(dsl);
-		statement ss = 
-		    ordering_to_statement(dg_vertex_label_statement(dsl));
+      if (! ignore_this_vertex_drv(region, s)) {
+	dg_vertex_label dsl = (dg_vertex_label) vertex_vertex_label(s);
+	sccflags fs = dg_vertex_label_sccflags(dsl);
+	statement ss = 
+	  ordering_to_statement(dg_vertex_label_statement(dsl));
 
-		debug(7, "llc", "successor before is %d (%d %d %d)\n", 
-		      statement_number(ss), sccflags_mark(fs),
-		      sccflags_lowlink(fs), sccflags_dfnumber(fs));
+	pips_debug(7, "successor before is %d (%d %d %d)\n", 
+	      statement_number(ss), sccflags_mark(fs),
+	      sccflags_lowlink(fs), sccflags_dfnumber(fs));
 
-		if (MARKED_NEW_P(s)) {
-		    LowlinkCompute(g, region, s, level);
-		    debug(7, "llc", "successor after is %d (%d %d %d)\n", 
-			  statement_number(ss), sccflags_mark(fs),
-			  sccflags_lowlink(fs), sccflags_dfnumber(fs));
-		    sccflags_lowlink(fv) = MIN(sccflags_lowlink(fv),
-					       sccflags_lowlink(fs));
-		} 
-		else {
-		    if ((sccflags_dfnumber(fs) < sccflags_dfnumber(fv)) &&
-			IsInStack(s)) {
-			sccflags_lowlink(fv) = MIN(sccflags_dfnumber(fs),
-						   sccflags_lowlink(fv));
-		    }
-		}
-	    }
+	if (MARKED_NEW_P(s)) {
+	  LowlinkCompute(g, region, s, level);
+	  pips_debug(7, "successor after is %d (%d %d %d)\n", 
+		statement_number(ss), sccflags_mark(fs),
+		sccflags_lowlink(fs), sccflags_dfnumber(fs));
+	  sccflags_lowlink(fv) = MIN(sccflags_lowlink(fv),
+				     sccflags_lowlink(fs));
+	} 
+	else {
+	  if ((sccflags_dfnumber(fs) < sccflags_dfnumber(fv)) &&
+	      IsInStack(s)) {
+	    sccflags_lowlink(fv) = MIN(sccflags_dfnumber(fs),
+				       sccflags_lowlink(fv));
+	  }
 	}
-    }, vertex_successors(v));
-
-    if (sccflags_lowlink(fv) == sccflags_dfnumber(fv)) {
-	scc ns = make_scc(NIL, 0);
-	vertex p;
-	sccflags fp;
-	cons *pv = NIL;
-
-	do {
-	    p = Stack[--StackPointer];
-	    fp = dg_vertex_label_sccflags((dg_vertex_label) 
-					  vertex_vertex_label(p));
-	    sccflags_enclosing_scc(fp) = ns;
-	    pv = gen_nconc(pv, CONS(VERTEX, p, NIL));
-	} while (v != p);
-
-	scc_vertices(ns) = pv;
-	sccs_sccs(Components) = gen_nconc(sccs_sccs(Components), 
-					  CONS(SCC, ns, NIL));
+      }
     }
+  }
+
+  if (sccflags_lowlink(fv) == sccflags_dfnumber(fv)) {
+    scc ns = make_scc(NIL, 0);
+    vertex p;
+    sccflags fp;
+    cons *pv = NIL;
+
+    do {
+      p = Stack[--StackPointer];
+      fp = dg_vertex_label_sccflags((dg_vertex_label) 
+				    vertex_vertex_label(p));
+      sccflags_enclosing_scc(fp) = ns;
+      pv = gen_nconc(pv, CONS(VERTEX, p, NIL));
+    } while (v != p);
+
+    scc_vertices(ns) = pv;
+    sccs_sccs(Components) = gen_nconc(sccs_sccs(Components), 
+				      CONS(SCC, ns, NIL));
+  }
 }
 
 
 
 /* this function checks if vertex v is in the stack */
-int IsInStack(v)
-vertex v;
+int IsInStack(vertex v)
 {
-    int i;
+  int i;
 
-    for (i = 0; i < StackPointer; i++)
-	if (Stack[i] == v)
-	    return(TRUE);
+  for (i = 0; i < StackPointer; i++)
+    if (Stack[i] == v)
+      return(TRUE);
 
-    return(FALSE);
+  return(FALSE);
 }
 
 
@@ -228,135 +222,119 @@ g is a graph
 
 region and level define a sub-graph of g
 */
-sccs FindSccs(g, region, level)
-graph g;
-set region;
-int level;
+sccs FindSccs(graph g, set region, int level)
 {
-    cons *vertices = graph_vertices(g);
-    cons *pv;
+  list vertices = graph_vertices(g);
 
-
-    Count = 1;
-    StackPointer = 0;
-    Stack = (vertex *) malloc(sizeof(vertex) * gen_length(vertices));
-    Components = make_sccs(NIL);
+  Count = 1;
+  StackPointer = 0;
+  Stack = (vertex *) malloc(sizeof(vertex) * gen_length(vertices));
+  Components = make_sccs(NIL);
 	
-    for (pv = vertices; pv != NIL; pv = CDR(pv)) {
-	vertex v = VERTEX(CAR(pv));
-	if (! ignore_this_vertex_drv(region, v)) {
-	    dg_vertex_label lv = (dg_vertex_label) vertex_vertex_label(v);
-	    sccflags fv = dg_vertex_label_sccflags(lv);
+  FOREACH(VERTEX, v, vertices) {
+    if (! ignore_this_vertex_drv(region, v)) {
+      dg_vertex_label lv = (dg_vertex_label) vertex_vertex_label(v);
+      sccflags fv = dg_vertex_label_sccflags(lv);
 	    
-	    sccflags_mark(fv) = NEW_MARK;
-	}
+      sccflags_mark(fv) = NEW_MARK;
     }
+  }
 
-    MAPL(pv, {
-	vertex v = VERTEX(CAR(pv));
-	if (! ignore_this_vertex_drv(region, v))
-	    if (MARKED_NEW_P(v)) {
-		LowlinkCompute(g, region, v, level);
+  /* Bug FOREACH */
+  FOREACH(VERTEX, v1, vertices) {
+    if (! ignore_this_vertex_drv(region, v1))
+      if (MARKED_NEW_P(v1)) {
+	LowlinkCompute(g, region, v1, level);
+      }
+  }
+
+  free(Stack);
+
+  ifdebug(3) {
+    pips_debug(3, "Strongly connected components:\n");
+    PrintSccs(Components);    
+    pips_debug(3, "End\n");
+  }
+
+  return(Components);
+}
+
+
+
+void ComputeInDegree(graph g, set region, int l)
+{
+  FOREACH(VERTEX, v, graph_vertices(g)) {
+    if (! ignore_this_vertex_drv(region, v)) {
+      scc sv = VERTEX_ENCLOSING_SCC(v);
+      FOREACH(SUCCESSOR, su, vertex_successors(v)) {
+	if (! ignore_this_successor_drv(v,region, su, l)) {
+	  vertex s = successor_vertex(su);
+	  scc ss = VERTEX_ENCLOSING_SCC(s);
+	  if (sv != ss)
+	    scc_indegree(ss) += 1;
+	}
+      }
+    }
+  }
+}
+
+
+
+list TopSortSccs(graph __attribute__ ((unused)) g,
+		 set region,
+		 int l)
+{
+  list lsccs = NIL, elsccs = NIL, no_ins = NIL;
+
+
+  FOREACH(SCC, s, sccs_sccs(Components)) {
+    if (scc_indegree(s) == 0)
+      no_ins = CONS(SCC, s, no_ins);
+  }
+
+  while (no_ins != NIL) {
+    list pcs;
+    scc cs;
+
+    pcs = no_ins; no_ins = CDR(no_ins);
+    INSERT_AT_END(lsccs, elsccs, pcs);
+
+    pips_debug(3, "updating in degrees ...\n");
+    cs = SCC(CAR(pcs));
+    FOREACH(VERTEX, v, scc_vertices(cs)) {
+      scc sv = VERTEX_ENCLOSING_SCC(v);
+
+      FOREACH(SUCCESSOR, su, vertex_successors(v)) {
+	if (! ignore_this_successor_drv(v,region, su, l)) {
+	  vertex s = successor_vertex(su);
+	  scc ss = VERTEX_ENCLOSING_SCC(s);
+	  if (! ignore_this_vertex_drv(region, s)) {
+	    if (sv != ss) {
+	      if ((scc_indegree(ss) -= 1) == 0) {
+		no_ins = CONS(SCC, ss, no_ins);
+	      }
 	    }
-    }, vertices);
-
-    free(Stack);
-
-    ifdebug(3) {
-	debug(3, "FindSccs", "Strongly connected components:\n");
-	PrintSccs(Components);    
-	debug(3, "FindSccs", "End\n");
-    }
-
-    return(Components);
-}
-
-
-
-void ComputeInDegree(g, region, l)
-graph g;
-set region;
-int l;
-{
-    MAPL(pv, {
-	vertex v = VERTEX(CAR(pv));
-
-	if (! ignore_this_vertex_drv(region, v)) {
-	    scc sv = VERTEX_ENCLOSING_SCC(v);
-	    MAPL(ps, {
-		successor su = SUCCESSOR(CAR(ps));
-		if (! ignore_this_successor_drv(v,region, su, l)) {
-		    vertex s = successor_vertex(su);
-		    scc ss = VERTEX_ENCLOSING_SCC(s);
-		    if (sv != ss)
-			scc_indegree(ss) += 1;
-		}
-	    }, vertex_successors(v));
+	  }
 	}
-    }, graph_vertices(g));
-}
-
-
-
-cons *TopSortSccs(g, region, l)
-graph g;
-set region;
-int l;
-{
-    cons *lsccs = NIL, *elsccs = NIL, *no_ins = NIL;
-
-    MAPL(ps, {
-	scc s = SCC(CAR(ps));
-	if (scc_indegree(s) == 0)
-	    no_ins = CONS(SCC, s, no_ins);
-    }, sccs_sccs(Components));
-
-    while (no_ins != NIL) {
-	cons *pcs;
-	scc cs;
-
-	pcs = no_ins; no_ins = CDR(no_ins);
-	INSERT_AT_END(lsccs, elsccs, pcs);
-
-	debug(3, "TopSortSccs", "updating in degrees ...\n");
-	cs = SCC(CAR(pcs));
-	MAPL(pv, {
-	    vertex v = VERTEX(CAR(pv));
-	    scc sv = VERTEX_ENCLOSING_SCC(v);
-	    MAPL(ps, {
-		successor su = SUCCESSOR(CAR(ps));
-		if (! ignore_this_successor_drv(v,region, su, l)) {
-		    vertex s = successor_vertex(su);
-		    scc ss = VERTEX_ENCLOSING_SCC(s);
-		    if (! ignore_this_vertex_drv(region, s)) {
-			if (sv != ss) {
-			    if ((scc_indegree(ss) -= 1) == 0) {
-				no_ins = CONS(SCC, ss, no_ins);
-			    }
-			}
-		    }
-		}
-	    }, vertex_successors(v));
-	}, scc_vertices(cs));
+      }
     }
+  }
 
-    if (get_debug_level() >= 3) {
-	fprintf(stderr, "[TopSortSccs] topological order:\n");
-	MAPL(ps, {
-	    scc s = SCC(CAR(ps));
-	    fprintf(stderr, "( ");
-	    MAPL(pv, {
-		vertex v = VERTEX(CAR(pv));
-		statement st = vertex_to_statement(v);
+  ifdebug(3) {
+    fprintf(stderr, "[TopSortSccs] topological order:\n");
+    FOREACH(SCC, s, lsccs) {
+      fprintf(stderr, "( ");
+      FOREACH(VERTEX, v, scc_vertices(s)) {
+	statement st = vertex_to_statement(v);
 
-		fprintf(stderr, "%td ", statement_number(st));
-	    }, scc_vertices(s));
-	    fprintf(stderr, ")   -->   ");
-	}, lsccs);
-	fprintf(stderr, "\n");
+	fprintf(stderr, "%td ", statement_number(st));
+      }
+      fprintf(stderr, ")   -->   ");
     }
+    fprintf(stderr, "\n");
+  }
 
-    return(lsccs);
+  return(lsccs);
 }
 
 
@@ -365,46 +343,43 @@ int l;
   Don't forget to set the drivers before the call of this function and to
   reset after!
  */
-cons *FindAndTopSortSccs(g, region, l)
-graph g;
-set region;
-int l;
+list FindAndTopSortSccs(graph g, set region, int l)
 {
-    cons *lsccs;
+  list lsccs;
 
-    ifdebug(8) {
-	debug(8, "FindAndTopSortSccs", "Dependence graph:\n");
-	prettyprint_dependence_graph(stderr, statement_undefined, g);
-    }
+  ifdebug(8) {
+    pips_debug(8, "Dependence graph:\n");
+    prettyprint_dependence_graph(stderr, statement_undefined, g);
+  }
 
-    debug(3, "FindAndTopSortSccs", "computing sccs ...\n");
-    Components = FindSccs(g, region, l);
+  pips_debug(3, "computing sccs ...\n");
 
-    debug(3, "FindAndTopSortSccs", "computing in degrees ...\n");
-    ComputeInDegree(g, region, l);
+  Components = FindSccs(g, region, l);
 
-    debug(3, "FindAndTopSortSccs", "topological sort ...\n");
-    lsccs = TopSortSccs(g, region, l);
+  pips_debug(3, "computing in degrees ...\n");
 
-    return(lsccs);
+  ComputeInDegree(g, region, l);
+
+  pips_debug(3, "topological sort ...\n");
+
+  lsccs = TopSortSccs(g, region, l);
+
+  return(lsccs);
 }
 
 
-void PrintScc(s)
-scc s;
+void PrintScc(scc s)
 {
     fprintf(stderr, "Scc's statements : ");
-    MAPL(pv, {
-	vertex v = VERTEX(CAR(pv));
+    FOREACH(VERTEX, v, scc_vertices(s)) {
 	statement st = vertex_to_statement(v);
 
 	fprintf(stderr, "%02td ", statement_number(st));
-    }, scc_vertices(s));
+    }
     fprintf(stderr, " -  in degree : %td\n", scc_indegree(s));
 }
 
-void PrintSccs(ss)
-sccs ss;
+void PrintSccs(sccs ss)
 {
     fprintf(stderr, "Strongly connected components:\n");
     if(!ENDP(sccs_sccs(ss))) {
