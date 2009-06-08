@@ -107,7 +107,9 @@ rloops_mapping_of_statement(
 	break;
 
       case is_instruction_call:
+	break;
       case is_instruction_goto:
+	pips_internal_error("Go to instruction in CODE internal representation\n");
 	break;
 
       case is_instruction_unstructured: {
@@ -116,9 +118,12 @@ rloops_mapping_of_statement(
       }
 	
       case is_instruction_forloop: {
+	/*
 	  pips_user_error("Use property FOR_TO_WHILE_LOOP_IN_CONTROLIZER or "
 			  "FOR_TO_DO_LOOP_IN_CONTROLIZER to convert for loops into while loops\n");
-	  break ;
+	*/
+	rloops_mapping_of_statement(m, loops, forloop_body(instruction_forloop(i)));
+	break ;
       }
 	
       default:

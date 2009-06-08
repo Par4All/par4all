@@ -839,10 +839,35 @@ list declaration_supporting_references(list dl)
 /* The function itself is not in its declarations. Maybe, it should be changed in the parser?
 
    A new list is allocated to avoid sharing with code_declarations.
- */
+*/
+
 list module_all_declarations(entity m)
 {
   list dl = CONS(ENTITY, m, gen_copy_seq(code_declarations(value_code(entity_initial(m)))));
+
+  return dl;
+}
+
+/*
+   For C, the declaration in the module statements are added.
+
+   Because this function relies on pipsdnm, it should be relocated
+   into another library. Prime candidate is preprocessor : - (
+ */
+#include "pipsdbm.h"
+#include "resources.h"
+list module_to_all_declarations(entity m)
+{
+  list dl = CONS(ENTITY, m, gen_copy_seq(code_declarations(value_code(entity_initial(m)))));
+  bool c_module_p(entity);
+
+  if(c_module_p(m)) {
+    string module_name = entity_user_name(m);
+    statement s = (statement) db_get_memory_resource(DBR_PARSED_CODE, module_name, TRUE);
+    list sdl = statement_to_declarations(s);
+
+    dl = gen_nconc(dl, sdl);
+  }
 
   return dl;
 }
