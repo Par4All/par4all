@@ -464,6 +464,15 @@ basic_equal_p(basic b1, basic b2)
 	return TRUE;
     case is_basic_complex:
 	return basic_complex(b1) == basic_complex(b2);
+    case is_basic_pointer:
+    {
+	  type t1 = basic_pointer(b1);
+	  type t2 = basic_pointer(b2);
+
+	  return type_variable_p(t1) &&
+          type_variable_p(t2) &&
+          basic_equal_p( variable_basic(type_variable(t1)) , variable_basic(type_variable(t2)) );
+    }
     case is_basic_string:
       /* Do we want string types to be equal only if lengths are equal?
        * I do not think so
