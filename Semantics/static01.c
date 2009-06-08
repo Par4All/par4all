@@ -3,7 +3,7 @@
 
 void static01()
 {
-  static int i = 0.;
+  static int i = 0;
 
   i++;
   printf("%d\n", i);
