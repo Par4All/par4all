@@ -1,0 +1,22 @@
+
+Initial code
+
+void foo(int *a)
+{
+   *a = 0;
+}
+void bar(int **a)
+{
+   foo(*a);
+}
+
+Code after inlining
+
+void bar(int **a)
+{
+   int *P_0 = *a;
+   *P_0 = 0;
+}
+
+Unsplit resulting code
+

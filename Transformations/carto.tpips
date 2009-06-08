@@ -2,6 +2,9 @@ delete carto
 
 setproperty ABORT_ON_USER_ERROR TRUE
 
+# fail without this"
+setenv PIPS_CPP="cpp -ansi"
+
 create carto carto.c
 
 activate C_PARSER
