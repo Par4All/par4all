@@ -53,6 +53,8 @@
   -- entity_local_name is replaced by module_local_name. LZ 230993
 */
 
+/* To have strndup(): */
+#define _GNU_SOURCE
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>      /* getenv */

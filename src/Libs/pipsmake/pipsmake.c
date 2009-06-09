@@ -186,7 +186,6 @@ void reset_static_phase_variables()
     /* Error handlers for the transformation library */
     use_def_elimination_error_handler();
     simple_atomize_error_handler();
-    coarse_grain_parallelization_error_handler();
     clone_error_handler();
     array_privatization_error_handler();
 
