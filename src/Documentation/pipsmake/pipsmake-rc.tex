@@ -7468,11 +7468,11 @@ transformation_test    > MODULE.code
 \section{Extensions Transformations}
 \label{section-extensions_transformations}
 
-\subsection {Open MP Pragma}
+\subsection {OpenMP Pragma}
 \label{subsection-open_mp_pragma}
 %%@UserManualDocumentation: OMP Pragma
 This transformation will transform a parallel code into a sequential code(cf
-Section~\ref{sec:cons-parall-code} for details) while generating Open MP
+Section~\ref{sec:cons-parall-code} for details) while generating OpenMP
 pragma as an extension to statements.
 %%!UserManualDocumentation
 
@@ -7483,9 +7483,10 @@ ompify_code             > MODULE.code
 
 \end{PipsMake}
 
-The pragma can be of different types as defined in the ri. The following
-property cam be set to str or expr. Obviously setting str pragma will be
-generated as strings and setting expr pragma will be generated as expressions
+As defined in the ri, the pragma can be of different types. The following
+property can be set to \verb|str| or \verb|expr|. Obviously, if the
+property is set to \verb|str| then pragmas would be generated as strings
+otherwise pragmas would be generated as expressions.
 \begin{PipsProp}
 PRAGMA_TYPE    "str"
 \end{PipsProp}

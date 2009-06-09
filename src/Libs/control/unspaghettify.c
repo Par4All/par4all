@@ -24,7 +24,7 @@
 /* Ronan Keryell, 1995. */
 
 #ifndef lint
-char vcid_unspaghettify[] = "$Id$";
+char vcid_unspaghettify[] = "%A% ($Date: 2004/01/23 13:55:04 $, ) version $Revision: 14223 $, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
 #endif /* lint */
 
 #include <stdlib.h>
