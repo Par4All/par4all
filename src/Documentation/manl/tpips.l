@@ -84,7 +84,7 @@ e.g. after
 partial evaluation.
 
 The
-.Bt tpips
+.B tpips
 commands are listed on-line by the help command.
 Possible arguments are completed or suggested by automatic
 completion (TAB and TAB/TAB). A command may be spread on
