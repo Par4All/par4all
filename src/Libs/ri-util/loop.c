@@ -338,3 +338,21 @@ void sort_all_loop_locals(statement s)
 {
     gen_multi_recurse(s, loop_domain, gen_true, loop_rwt, NULL);
 }
+
+
+/* Test if a loop is parallel.
+
+   It tests the parallel status of the loop but should test extensions
+   such as OpenMP pragma and so on. TODO...
+
+   @param s is the statement that owns the loop. We need this statement to
+   get the pragma for the loop.
+
+   @return TRUE if the loop is parallel.
+*/
+bool parallel_loop_statement_p(statement s) {
+  instruction i = statement_instruction(s);
+  loop l = instruction_loop(i);
+
+  return execution_parallel_p(loop_execution(l));
+}

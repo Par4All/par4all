@@ -69,8 +69,8 @@ statement (*codegen_fun)(statement, graph, set, int, bool);
     gen_free_list( blocs );
 }
 
-statement rice_statement(statement stat, 
-			 int l, 
+statement rice_statement(statement stat,
+			 int l,
 			 statement (*codegen_fun)(statement, graph, set, int, bool))
 {
     instruction istat = statement_instruction(stat);
@@ -120,7 +120,7 @@ statement rice_statement(statement stat,
       case is_instruction_goto:
 	pips_internal_error("Unexpected go to instruction in parsed code\n");
 	break;
-      case is_instruction_call: 
+      case is_instruction_call:
 	break;
       case is_instruction_unstructured: {
 	  unstructured obj_unstructured = instruction_unstructured(istat);
@@ -148,6 +148,7 @@ statement rice_loop(statement stat,
 {
   statement nstat;
   instruction istat = statement_instruction(stat);
+  loop lstat = instruction_loop(istat);
   set region;
   statement b = statement_undefined;
 
@@ -168,13 +169,14 @@ statement rice_loop(statement stat,
 		 entity_local_name(loop_index(instruction_loop(istat))),
 		 statement_number(stat),
 		 ORDERING_NUMBER(so), ORDERING_STATEMENT(so));
-
-    enclosing++ ;
-    loop_body(instruction_loop(istat)) =
-      rice_statement(loop_body(instruction_loop(istat)),l+1,codegen_fun);
-    enclosing-- ;
-    return(stat);
+    goto skip_parallelization_of_this_loop;
   }
+
+  if (!get_bool_property("PARALLELIZE_AGAIN_PARALLEL_CODE")
+      && parallel_loop_statement_p(stat))
+    /* Well the loop is already parallel and we are asked not to do the
+       job again that may lead to less optimal code for the target: */
+    goto skip_parallelization_of_this_loop;
 
   ifdebug(2) {
     debug(2, "rice_loop", "applied on region:\n");
@@ -222,6 +224,14 @@ statement rice_loop(statement stat,
   clean_enclosing_loops();
 
   return nstat;
+
+  /* Skip the parallelization of this loop but go on recursion for
+     eventual loops in this loop body: */
+ skip_parallelization_of_this_loop:
+  enclosing++ ;
+  loop_body(lstat) = rice_statement(loop_body(lstat),l+1,codegen_fun);
+  enclosing-- ;
+  return(stat);
 }
 
 /*
@@ -242,8 +252,8 @@ do_it(
     statement mod_parallel_stat = statement_undefined;
 
     set_current_module_statement( (statement)
-				  db_get_memory_resource(DBR_CODE, 
-							 mod_name, 
+				  db_get_memory_resource(DBR_CODE,
+							 mod_name,
 							 TRUE) );
     mod_stat = get_current_module_statement();
 
@@ -326,7 +336,7 @@ do_it(
 /****************************************************** PIPSMAKE INTERFACE */
 
 bool distributer(string mod_name)
-{  
+{
     bool success;
     entity module = local_name_to_top_level_entity(mod_name);
 
@@ -336,14 +346,14 @@ bool distributer(string mod_name)
 
     success = do_it( mod_name, TRUE, DBR_CODE, &CodeGenerate ) ;
 
-    debug_off();  
+    debug_off();
     reset_current_module_entity();
 
     return success;
 }
 
 static bool rice(string mod_name)
-{ 
+{
     bool success = TRUE;
     entity module = local_name_to_top_level_entity(mod_name);
     set_current_module_entity(module);

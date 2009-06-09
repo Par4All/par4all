@@ -2479,27 +2479,6 @@ parallelization phase.
 COMPUTE_ALL_DEPENDENCES FALSE
 \end{PipsProp}
 
-\subsection{Parallelization properties}
-
-\index{Parallelization}
-
-\subsubsection{Rice (Parallelization)}
-\index{Allen\&Kennedy}
-\index{GENERATE\_NESTED\_PARALLEL\_LOOPS}
-\index{PARALLELIZATION\_STATISTICS}
-
-TRUE to show all parallel loops, FALSE to generate real (vector,
-innermost parallel?) code
-
-\begin{PipsProp}
-GENERATE_NESTED_PARALLEL_LOOPS TRUE
-\end{PipsProp}
-
-Show statistics on the number of loops parallelized by pips.
-\begin{PipsProp}
-PARALLELIZATION_STATISTICS FALSE
-\end{PipsProp}
-
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% FLINTER
@@ -4029,7 +4008,8 @@ bounds. Both options have their advantages and drawbacks.
 REGIONS_WITH_ARRAY_BOUNDS FALSE
 \end{PipsProp}
 
-Comments from Nga Nguyen: The explanation of this property is not clear
+\marginpar{Comments from Nga Nguyen: The explanation of this property is
+  not clear}
 
 I intend to compute disjunctions of regions. As I have already prepared basic
 operators for that purpose, I created two properties to switch between regions
@@ -4234,7 +4214,8 @@ produces a new version of the Module code with DOALL loops exhibited using
 A{\sc llen} \& K{\sc ennedy}'s algorithm. The DOALL syntactic construct is
 non-standard but easy to understand and usual in text book like \cite{Wolfe96}.
 As parallel prettyprinter option, it is possible to use Fortran~90 array
-syntax (see Section~\ref{subsection-parallel-printed-files}).
+syntax (see Section~\ref{subsection-parallel-printed-files}). For C, the
+loops can be output as \texttt{for}-loop decorated with OpenMP pragma.
 
 Remember that A{\sc llen} \& K{\sc ennedy}'s algorithm can only be applied
 on loops with simple bodies, i.e. sequences of assignments, because it
@@ -4265,6 +4246,40 @@ it (although it would be interesting to compute the complexity of a
 parallel code) right now but it should evolves. See
 \S~\ref{sec:cons-parall-code}.
 %%!UserManualDocumentation
+
+
+\subsection{Parallelization properties}
+
+\index{Parallelization}
+
+There are few properties that control the parallelization behaviour.
+
+\subsubsection{Rice (Parallelization)}
+\index{Allen\&Kennedy}
+\index{GENERATE\_NESTED\_PARALLEL\_LOOPS}
+\index{PARALLELIZATION\_STATISTICS}
+
+TRUE to make all possible parallel loops, FALSE to generate real (vector,
+innermost parallel?) code:
+\begin{PipsProp}
+GENERATE_NESTED_PARALLEL_LOOPS TRUE
+\end{PipsProp}
+
+Show statistics on the number of loops parallelized by pips:
+\begin{PipsProp}
+PARALLELIZATION_STATISTICS FALSE
+\end{PipsProp}
+
+
+To select whether parallelization and loop distribution is done again for
+already parallel loops:
+\begin{PipsProp}
+PARALLELIZE_AGAIN_PARALLEL_CODE FALSE
+\end{PipsProp}
+The motivation is when applying \emph{à la} Rice parallelizing to improve
+some sequential code, we may not want loop distribution on already
+parallel code to preserve cache resources.
+
 
 \subsection{Menu for Parallelization Algorithm Selection}
 
