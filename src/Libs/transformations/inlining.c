@@ -1132,16 +1132,16 @@ statement outliner(string outline_module_name, list statements_to_outline)
 static
 bool interactive_statement_picker(statement s,bool started)
 {
-    string statement_text = text_to_string(text_statement(get_current_module_entity(),1,s));
     string answer = string_undefined;
     do {
         while( string_undefined_p(answer) || empty_string_p(answer)  )
         {
-            answer = user_request("%s\n%s\n%s\n%s\n%s\n",
-                "Do you want to pick the following statement ?",
-                "**********************",
-                statement_text,
-                "**********************",
+			user_log("Do you want to pick the following statement ?\n"
+                "*********************************************\n");
+			print_statement(s);
+
+            answer = user_request(
+                "*********************************************\n"
                 "[y/n] ?"
             );
         }

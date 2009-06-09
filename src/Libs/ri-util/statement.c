@@ -918,7 +918,9 @@ void print_statement(statement s)
   set_alternate_return_set();
   reset_label_counter();
   push_current_module_statement(s);
-  print_text(stderr, text_statement(entity_undefined, 0, s));
+  text txt = text_statement(entity_undefined, 0, s);
+  print_text(stderr, txt);
+  free_text(txt);
   pop_current_module_statement();
   reset_alternate_return_set();
   debug_off();
