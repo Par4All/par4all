@@ -136,54 +136,6 @@ l99998:      ;
 }
 float dotprod(float b[1000000], float c[1000000])
 {
-   float RED0[3+1];
-   int LU_IND0;
-   int LU_IB0;
-   int LU_NUB0;
-   float F_0;
-   int i;
-   float a = 0;
-   LU_NUB0 = 1000000;
-   LU_IB0 = 0;
-   LU_IND0 = 0;
-l99999:   ;
-   RED0[0] = 0.000000;
-   RED0[1] = 0.000000;
-   RED0[2] = 0.000000;
-   RED0[3] = 0.000000;
-   for(LU_IND0 = 0; LU_IND0 <= 999999; LU_IND0 += 4) {
-      //c SIMD_COMMENT_0
-
-      F_0 = b[LU_IND0]*c[LU_IND0];
-      //c SIMD_COMMENT_1
-
-      RED0[0] = RED0[0]+F_0;
-      //c SIMD_COMMENT_0
-
-      F_0 = b[LU_IND0+1]*c[LU_IND0+1];
-      //c SIMD_COMMENT_1
-
-      RED0[1] = RED0[1]+F_0;
-      //c SIMD_COMMENT_0
-
-      F_0 = b[LU_IND0+2]*c[LU_IND0+2];
-      //c SIMD_COMMENT_1
-
-      RED0[2] = RED0[2]+F_0;
-      //c SIMD_COMMENT_0
-
-      F_0 = b[LU_IND0+3]*c[LU_IND0+3];
-      //c SIMD_COMMENT_1
-
-      RED0[3] = RED0[3]+F_0;
-l99998:      ;
-   }
-   a = RED0[3]+RED0[2]+RED0[1]+RED0[0]+a;
-   i = 1000000;
-   return a;
-}
-float dotprod(float b[1000000], float c[1000000])
-{
    float F_03;
    float F_02;
    float F_01;
@@ -314,31 +266,24 @@ l99999:   ;
    RED0[1] = 0.000000;
    RED0[2] = 0.000000;
    RED0[3] = 0.000000;
+   SIMD_LOAD_V4SF(v4sf_vec4, &RED0[0]);
    for(LU_IND0 = 0; LU_IND0 <= 999999; LU_IND0 += 4) {
       SIMD_LOAD_V4SF(v4sf_vec0, &c[LU_IND0]);
       SIMD_LOAD_V4SF(v4sf_vec1, &b[LU_IND0]);
       SIMD_MULPS(v4sf_vec2, v4sf_vec1, v4sf_vec0);
-      SIMD_SAVE_GENERIC_V4SF(v4sf_vec2, &F_03, &F_02, &F_01, &F_00);
-      SIMD_LOAD_V4SF(v4sf_vec4, &RED0[0]);
       SIMD_ADDPS(v4sf_vec5, v4sf_vec4, v4sf_vec2);
-      SIMD_SAVE_V4SF(v4sf_vec5, &RED0[0]);
 l99998:      ;
    }
+   SIMD_SAVE_GENERIC_V4SF(v4sf_vec2, &F_03, &F_02, &F_01, &F_00);
+   SIMD_SAVE_V4SF(v4sf_vec5, &RED0[0]);
    a = RED0[3]+RED0[2]+RED0[1]+RED0[0]+a;
    i = 1000000;
    return a;
 }
 float dotprod(float b[1000000], float c[1000000])
 {
-   float v4sf_vec11[3+1];
-   float v4sf_vec10[3+1];
-   float v4sf_vec9[3+1];
-   float v4sf_vec8[3+1];
-   float v4sf_vec7[3+1];
-   float v4sf_vec6[3+1];
    float v4sf_vec5[3+1];
    float v4sf_vec4[3+1];
-   float v4sf_vec3[3+1];
    float v4sf_vec2[3+1];
    float v4sf_vec1[3+1];
    float v4sf_vec0[3+1];
@@ -350,7 +295,6 @@ float dotprod(float b[1000000], float c[1000000])
    int LU_IND0;
    int LU_IB0;
    int LU_NUB0;
-   float F_0;
    int i;
    float a = 0;
    LU_NUB0 = 1000000;
