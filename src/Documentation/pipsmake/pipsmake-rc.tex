@@ -3843,6 +3843,8 @@ the summary regions of the callee translated into the caller's name space, to
 which are merely appended the regions of the expressions passed as argument
 (no summarization for this step).
 
+Together with read/write regions and in regions are computed their invariant versions for loop bodies (\texttt{MODULE.inv\_regions} and \texttt{MODULE.inv\_in\_regions}). For a given loop body, they are equal to the corresponding regions in which all variables that may be modified by the loop body (except the current loop index) are eliminated from the descriptors (convex polyhedron). For other statements, they are equal to the empty list of regions. 
+
 %%!UserManualDocumentation
 
 \subsection{Menu for Array Regions}
