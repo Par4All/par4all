@@ -512,30 +512,26 @@ nom '*D*' est utilisée pour les tableaux de taille non définie
 \domain{Basic = int:int + float:int + logical:int + overloaded:unit + complex:int + string:value + bit:symbolic + pointer:type + derived:entity + typedef:entity}
 
 Type \texttt{basic} is used to store basic type information such has
-\texttt{REAL} or \texttt{INTEGER}. Each member includes a precision
-information, which can be used to derive the number of bytes or bits
-required to store one scalar object of this type. The precision
-information is numerically known for most basic types but not for
-\texttt{overloaded}, \texttt{string}, \texttt{bit}, \texttt{derived},
-\texttt{pointer}. Not that for some C \texttt{int} types, the
-information \texttt{int:int} must be fixed.
+\texttt{REAL} in Fortran or \texttt{int} in C. Each member includes a
+precision information, which can be used to derive the number of bytes
+or bits required to store one scalar object of this type. The
+precision information is numerically known for most basic types but
+not for \texttt{overloaded}, \texttt{string}, \texttt{bit},
+\texttt{derived}, \texttt{pointer}. Note that for some C \texttt{int}
+types, the information \texttt{int:int} must be fixed as the int type
+includes {\texttt signed} and {\texttt unsigned} specifiers as well as
+the {\texttt char} type.
 
-\begin{comment}
-Le domaine \verb/basic/ permet de représenter un type Fortran tel que
-INTEGER ou REAL. La valeur de ce domaine donne la longueur en octets de
-la zone mémoire occupée par une variable de ce type.
-\end{comment}
+For Fortran, note that no \emph{default} type is provided. Untyped
+object are given the current default type when they are first
+encountered. They only can be typed explictly if they still have their
+default type when the type declaration is encountered. PIPS parser is
+implemented in such a way that \texttt{IMPLICIT} statements should
+appear as early as possible in a module declarations.
 
-Note that no \emph{default} type is provided. Untyped object are given
-the current default type when they are first encountered. They only can
-be typed explictly if they still have their default type when the type
-declaration is encountered. PIPS parser is implemented in such a way
-that \texttt{IMPLICIT} statements should appear as early as possible in a
-module declarations.
-
-It is not clear that mapping caracter strings on \verb/string:value/ was
-the right choice. It might have been better to represent them as 1-D
-array of one character.
+It is not clear if mapping Fortran character strings on
+\verb/string:value/ is the right choice. It might be better to
+represent them as 1-D array of one character.
 
 \subsubsection{Dimension}
 \label{subsubsection-dimension}
@@ -630,16 +626,10 @@ When no information about a dummy parameter is available, as in
 \index{Mode}
 \domain{Mode = value:unit + reference:unit}
 
-Type \texttt{mode} is used to carry inout information for formal
-parameters. Member \texttt{value} is used for calling by value. Member 
-\texttt{reference} is used for calling by reference. Fortran uses calls by reference.
-
-\begin{comment}
-Le domaine \verb/mode/ représente le mode de passage d'un paramètre
-formel de module. Le domaine contient un objet du domaine \verb/value/
-pour le mode de passage par valeur et \verb/reference/ pour le passage
-par adresse.
-\end{comment}
+Type \texttt{mode} is used to carry parameter passing information for formal
+parameters. Member \texttt{value} is used for calling by value. Member
+\texttt{reference} is used for calling by reference. Fortran uses
+calls by reference, and C calls by value.
 
 \subsection{Storage}
 \label{subsection-storage}
@@ -718,30 +708,35 @@ the same common are two different variables. They are aliased but they
 are different. They have different global names
 (see~Section~\ref{subsection-entity}).
 
-Member \texttt{section} contains the \emph{area} in which the variable is
-stored. It is an entity of type area (see
-Section~\ref{subsubsection-area}). For each module, there is one area for
-each declared common\footnote{Note that a module may have effects on
-  variables beyond its scope via procedure calls and common variables.}
-and two specific areas called \verb/*STATIC*/ and \verb/*DYNAMIC*/ used
-for local variables. Static variables are explicitly declared in a 
-\texttt{SAVE} statement or implicitly made static by a \texttt{DATA}
-statement\footnote{See Fortran standard Section~(8-11) about SAVE and
-  Section~(9-1) about DATA.} unless they are explicitly declared in a 
-  \texttt{COMMON} because PIPS sets all commons as static. 
-  In other words, dynamic
-commons are not handled by PIPS\footnote{The decision not to handle
-  dynamic commons was based on two remarks: (1) no Fortran compiler in
-  1988 handled dynamic commons and (2) dynamic commons are not lexically
-  scoped which make static analyses very difficult or even impossible.}. By default, variables
-can be stack allocated and are called dynamic variables.
+Member \texttt{section} contains the \emph{area} in which the variable
+is stored. It is an entity of type area (see
+Section~\ref{subsubsection-area}). For each Fortran module, there is
+one area for each declared common\footnote{Note that a module may have
+  effects on variables beyond its scope via procedure calls and common
+  variables.}. For C and Fortran modules, several specific areas
+called \verb/*STATIC*/, \verb/*DYNAMIC*/, \verb/*STACK*/ and \verb/*HEAP*/
+used for local variables. Fortran static variables are explicitly
+declared in a \texttt{SAVE} statement or implicitly made static by a
+\texttt{DATA} statement\footnote{See Fortran standard Section~(8-11)
+  about SAVE and Section~(9-1) about DATA.} unless they are explicitly
+declared in a \texttt{COMMON} because PIPS sets all commons as static.
+In other words, Fortran dynamic commons are not handled by
+PIPS\footnote{The decision not to handle dynamic commons was based on
+  two remarks: (1) no Fortran compiler in 1988 handled dynamic commons
+  and (2) dynamic commons are not lexically scoped which make static
+  analyses very difficult or even impossible.}. By default, variables
+can be stack allocated and are called dynamic variables. When their
+memory footprint is numerically known at compile time, they are
+allocated in the \verb/*DYNAMIC*/ area. If not, they are allocated in
+the \verb/*STACK*/ area. In C, memory space can be allocated in the
+\verb/ *HEAP*/ area.
 
 Member \texttt{offset} is the variable address in its area. Addresses are
 allocated according to the declaration or occurence order. Increasing
 values starting at 0 are used. The memory unit is defined by Fortran
 standard and is one byte for PIPS.
 
-Member \texttt{shared} contains a list of variables which are statically
+Member \texttt{shared} contains a list of variables, which are statically
 aliased with variable whose storage is described. Static aliasing is
 generated by \texttt{EQUIVALENCE} statements\index{Equivalence} and by
 multiple declarations of the same common in different
@@ -749,19 +744,6 @@ procedures. Dynamic aliasing created at call sites is not taken into
 account. Dependence tests, use-def chain computations, semantics
 analysis, region analysis, and other algorithms primarily based on
 variable names must check aliases\index{Aliasing}.
-
-\begin{comment}
-Le domaine \verb/ram/ permet de préciser la déclaration d'une
-variable. Le sous-domaine \verb/function/ indique dans quel module une
-entité est déclarée. Le sous-domaine \verb/section/ indique dans
-quelle aire une entité est stockée; il y a une aire par common
-déclaré et deux aires spéciales nommées \verb/STATIC/ et
-\verb/DYNAMIC/ pour les entités locales. Le sous-domaine \verb/offset/
-donne l'adresse dans l'aire de la variable. Enfin, le sous-domaine 
-\texttt{shared} donne la liste des entités qui partagent statiquement un
-morceau d'espace mémoire avec la variable concerné. En Fortran, le
-partage de mémoire vient des equivalences entre variables.
-\end{comment}
 
 \subsubsection{Formal Storage}
 \label{subsubsection-formal}
@@ -836,7 +818,7 @@ constant defined by a Fortran \texttt{PARAMETER} or a Pascal \texttt{CONST}
 declaration. Member \texttt{expression} contains the hopefully constant
 expression which is statically evaluated by the compiler to find the
 numerical initial value. This value is stored in member \texttt{constant}. 
-Member \texttt{expression} is used to restore user-frinedly
+Member \texttt{expression} is used to restore user-friendly
 declarations but has no other known use. 
 
 \begin{comment}
@@ -906,7 +888,7 @@ parameters and commons are in this list. It also may contain symbolic
 constants, operators and intrinsics declared or referenced in the module.
 
 The order of variables in list \texttt{declarations} must be
-compatible with the language constraints. In general variables or
+compatible with the language constraints. In general, variables or
 entities used in another variable or entity declaration must appear
 first. For instance, in Fortran, if array B is used to declare array A
 as A(B(1)), array B must appear first in \texttt{declarations}. The
@@ -916,7 +898,7 @@ it is up to this piece of code and not up to the prettyprinters to
 obey the languague order rules. Prettyprinters may emit a user warning
 or a user error.
 
-Member \verb/decls_text/ is a copy of the declaration text. This text
+In Fortran, member \verb/decls_text/ is a copy of the declaration text. This text
 starts with comments placed before the module declaration and ends with
 the comment related to the first executable statement of the module
 (i.e. one too many comment is included). This text is used by default by

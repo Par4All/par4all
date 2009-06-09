@@ -32,7 +32,7 @@
     Rémi Triolet\\
     Yi-Qing Yang \\
 \\
-    CRI, École des mines de Paris}
+    CRI, MINES ParisTech}
 
 
 \begin{document}
@@ -42,7 +42,7 @@
 
 The dependence graph specific data structures, as well as auxiliary data
 structures used to compute it, are described in this report. The graph
-itself is a generic graph defined in \verb/Newgen/graph.f.tex/. It is
+itself is a generic graph defined in \verb/Newgen/graph.tex/. It is
 specialized into a dependence graph by using specific arc and vertex
 labels. The standard use-def, def-use and def-def chains are encoded with
 this data structure, as well as non-standard use-use chains useful for
@@ -153,24 +153,14 @@ part of the C3 Linear Algebra library.
 {}
 
 This data type carries information attached to each dependence graph
-verted (a.k.a. node). Graph nodes are of type \verb/node/ defined in
-{\tt graph.f.tex}.  Field \verb/statement/ contains a
-\verb/statement_ordering/, i.e. a statement identifier (see {\tt
-ri.f.tex}. The effective statement can be retrieved using mapping
+vertex (a.k.a. node). Graph nodes are of type \verb/node/ defined in
+{\tt graph.tex}.  Field \verb/statement/ contains a
+\verb/statement_ordering/, i.e. a unique statement identifier (see {\tt
+ri.tex}). The effective statement can be retrieved using mapping
 \verb/OrderingToStatement/.
 
 Field \verb/sccs_flags/ is used to compute strongly connected components
 of the dependence graph.
-
-\begin{comment}
-Ce domaine est utilisé pour contenir les informations qui sont
-attachées à chaque noeud du graphe de dépendances (voir le domaine
-{\tt graph} dans le fichier {\tt graph.f.tex}). Le sous-domaine {\tt
-statement} permet de retrouver l'instruction qui porte la dépendance;
-cet entier est le champ {\tt ordering} de l'instruction concernée. Le
-sous-domaine {\tt sccflags} contient diverses informations utiles pour
-le calcul des composantes fortement connexes.
-\end{comment}
 
 \subsection{DG Vertex Label}
 
@@ -178,7 +168,7 @@ le calcul des composantes fortement connexes.
 {}
 
 This data type contains information attached to a dependence graph arc.
-See Newgen data type \verb/graph/ in file \verb/graph.f.tex/. Each DG arc
+See Newgen data type \verb/graph/ in file \verb/graph.tex/. Each DG arc
 points to the list of all conflicts due to references in either the
 source or the sink statements, i.e. the statements attached to the sink
 or the source vertex.
@@ -186,7 +176,7 @@ or the source vertex.
 \begin{comment}
 Ce domaine est utilisé pour contenir les informations qui sont
 attachées à chaque arc du graphe de dépendances (voir le domaine {\tt
-graph} dans le fichier {\tt graph.f.tex}). Chaque arc du GD contient les
+graph} dans le fichier {\tt graph.tex}). Chaque arc du GD contient les
 conflits entre les deux statements des noeuds du graphe de dépendance.
 \end{comment}
 
@@ -244,7 +234,7 @@ tilings (supernode partitioning).
 The ultimate dependence information is {\em value} and not {\em
 location} based. PIPS contains an implementation of Pr. Feautrier's
 Array Data Flow Graph (DFG). The DFG is implemented with another data
-structure described in \verb/paf_ri.f.tex/.
+structure described in \verb/paf_ri.tex/.
 
 \begin{comment}
 Le domaine cône définit une approximation polyédrique de l'ensemble
