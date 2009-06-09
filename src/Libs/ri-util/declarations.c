@@ -959,7 +959,6 @@ text_equivalence_class(
 		/* ATTENTION: Je n'ai pas considere le cas 
 		 * ou il y a association partielle. De ce fait, offset
 		 * est divisiable par size_elt_1. */
-		char *buffer;
 		int offset = offset2 - offset1;
 		int rest;
 		int current_dim;    

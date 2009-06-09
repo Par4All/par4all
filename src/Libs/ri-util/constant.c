@@ -38,6 +38,7 @@
 #include "misc.h"
 #include "ri.h"
 #include "ri-util.h"
+#include "text-util.h"
 
 extern string make_entity_fullname();
 

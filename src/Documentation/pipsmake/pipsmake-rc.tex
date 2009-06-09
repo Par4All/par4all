@@ -7463,8 +7463,17 @@ pragma as an extension to statements.
 
 \begin{PipsMake}
 ompify_code             > MODULE.code
-        < MODULE.parallelized_code
+        < MODULE.cumulated_reductions
+        < MODULE.code
+
 \end{PipsMake}
+
+The pragma can be of different types as defined in the ri. The following
+property cam be set to str or expr. Obviously setting str pragma will be
+generated as strings and setting expr pragma will be generated as expressions
+\begin{PipsProp}
+PRAGMA_TYPE    "str"
+\end{PipsProp}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% PRETTYPRINT
 

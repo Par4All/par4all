@@ -297,6 +297,34 @@ set region;
   }
 }
 
+/* @return a list of entities that are private in the current
+ * context. The function can also remove from that list all the
+ * variables that are localy declared in the loop body and the loop
+ * indices using the apropriate flags.
+ * @param obj, the loop to look at.
+ * @param local, set to TRUE to remove the  the variables that
+ * are localy declared.
+ * @param indice, set to TRUE to remove the loop indice variable
+ */
+list loop_private_variables_as_entites (loop obj, bool local, bool indice) {
+  // list of entity that are private to the loop according to the previous
+  // phases. For historical reasons private variables are stored in the
+  // locals field of the loop.
+  list result = gen_copy_seq (loop_locals(obj));
+
+  if (local == TRUE) {
+    // list of localy declared entity that are stored in loop body
+    list decl_var = statement_declarations (loop_body (obj));
+    gen_list_and_not (&result, decl_var);
+  }
+  if (indice == TRUE) {
+    gen_remove (&result, loop_index(obj));
+  }
+
+  return result;
+}
+
+
 
 /************************************** SORT ALL LOCALS AFTER PRIVATIZATION */
 

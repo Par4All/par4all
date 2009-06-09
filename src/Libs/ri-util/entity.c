@@ -702,7 +702,7 @@ entity_intrinsic(string name)
 
 
 /* this function does not create an intrinsic function because they must
-   all be created beforehand by the bootstrap hase (see
+   all be created beforehand by the bootstrap phase (see
    bootstrap/bootstrap.c). */
 
 entity 
@@ -1513,7 +1513,7 @@ char * AddPackageToName(p, n)
   return(ps);
 }
 
-/* Returns the binary operator associated to a C update operator such as += 
+/* Returns the binary operator associated to a C update operator such as +=
 
    If the operator is unknown, an undefined entity is returned.
 */
@@ -1529,7 +1529,7 @@ entity update_operator_to_regular_operator(entity op)
     sop = entity_intrinsic(MULTIPLY_OPERATOR_NAME);
   else if(ENTITY_DIVIDE_UPDATE_P(op))
     sop = entity_intrinsic(DIVIDE_OPERATOR_NAME);
-  else if(ENTITY_MODULO_UPDATE_P(op)) 
+  else if(ENTITY_MODULO_UPDATE_P(op))
     sop = entity_intrinsic(C_MODULO_OPERATOR_NAME);
   else if(ENTITY_LEFT_SHIFT_UPDATE_P(op))
     sop = entity_intrinsic(LEFT_SHIFT_OPERATOR_NAME);

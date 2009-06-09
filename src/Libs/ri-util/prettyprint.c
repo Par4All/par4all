@@ -744,8 +744,9 @@ text generate_alternate_return_targets()
   }
   return ral;
 }
+
 
-/* words_regular_calls used for user subroutine and user function and
+/* words_regular_call used for user subroutine and user function and
    intrinsics called like user function such as MOD(). */
 
 static list
@@ -986,6 +987,32 @@ words_assign_substring_op(call obj,
     return(pc);
 }
 
+/** @return a list of string with the prettyprint of a omp reduction clause
+ */
+static list
+words_omp_red(call obj,
+	      int precedence __attribute__ ((unused)),
+	      bool leftmost __attribute__ ((unused)))
+{
+  list result = NIL;
+  entity fct = call_function(obj);
+  result = CHAIN_SWORD(result, entity_user_name(fct));
+  result = CHAIN_SWORD(result, "(");
+  // the reduction arguments as an expression list
+  list args = call_arguments (obj);
+  pips_assert ("no arguments for reduction clause", args != NIL);
+  int nb_arg = 0;
+  FOREACH (EXPRESSION, arg, args) {
+    if (nb_arg != 0)
+      result = (nb_arg == 1)? CHAIN_SWORD(result,":") : CHAIN_SWORD(result,",");
+    result = gen_nconc (result, words_expression (arg));
+    nb_arg++;
+  }
+  pips_assert ("reduction clause has at least two arguments", nb_arg > 1);
+  result = CHAIN_SWORD(result, ")");
+  return result;
+}
+
 // Function written by C.A. Mensi to prettyprint C or Fortran code as C code
 static list
 words_nullary_op_c(call obj,
@@ -1012,6 +1039,10 @@ words_nullary_op_c(call obj,
       pc = CHAIN_SWORD(pc, "_f77_intrinsics_pause_(0)");
     else if(same_string_p(fname,CONTINUE_FUNCTION_NAME))
       pc = CHAIN_SWORD(pc, "");
+    else if ((same_string_p(fname,OMP_OMP_FUNCTION_NAME)) ||
+	     (same_string_p(fname,OMP_FOR_FUNCTION_NAME)) ||
+	     (same_string_p(fname,OMP_PARALLEL_FUNCTION_NAME)))
+      pc = CHAIN_SWORD(pc, fname);
     else
       pips_internal_error("Unknown nullary operator");
   }
@@ -1959,6 +1990,11 @@ multiply-add operators ( JZ - sept 98) */
 
     {COMMA_OPERATOR_NAME, words_comma_op, 0},
 
+    /* OMP pragma function part */
+    {OMP_OMP_FUNCTION_NAME,       words_nullary_op, 0},
+    {OMP_FOR_FUNCTION_NAME,       words_nullary_op, 0},
+    {OMP_PARALLEL_FUNCTION_NAME,  words_nullary_op, 0},
+    {OMP_REDUCTION_FUNCTION_NAME, words_omp_red,    0},
     {NULL, null, 0}
 };
 
@@ -2195,9 +2231,9 @@ static text text_block (entity module, string label, int margin, list objs,
   return r;
 }
 
-/* @return a string with the variable that need to be private in the current
- * context. The context takes care of the kind of output. For example in the
- * case of open mp the variables would be encapsulated into
+/* @return a list of string with the variable that need to be private in the
+ * current context. The context takes care of the kind of output. For example
+ * in the case of open mp the variables would be encapsulated into
  * the private() clause like this: private (a,b).
  * @param obj the loop to look at.
  */
@@ -2211,31 +2247,22 @@ loop_private_variables(loop obj)
 	some_before = FALSE;
     list l = NIL;
 
-    list locals = gen_copy_seq (loop_locals(obj));
-    list decl_var = statement_declarations (loop_body (obj));
-
-    if (omp_private == TRUE) {
-      // In case of openmp the variable declared in the loop body should
-      // not be made private, so let's remove them from the list of locals.
-      gen_list_and_not (&locals, decl_var);
-    }
+    // list of local entities
+    // In case of openmp the variable declared in the loop body should
+    // not be made private, so ask for removing them from the list of locals.
+    // If all_private is FALSE -> remove loop indice from the list of locals.
+    list locals = loop_private_variables_as_entites (obj, omp_private, !all_private);
 
     /* comma-separated list of private variables.
      * built in reverse order to avoid adding at the end...
      */
-    MAP(ENTITY, p,
-	{
-	  if((p!=loop_index(obj)) || all_private)
-	    {
-	      if (some_before)
-		l = CHAIN_SWORD(l, ",");
-	      else
-		some_before = TRUE; /* from now on commas, triggered... */
-	      l = gen_nconc(l, words_declaration(p,TRUE));
-	    }
-	},
-	locals
-	); /* end of MAP */
+    FOREACH (ENTITY, p, locals) {
+      if (some_before)
+	l = CHAIN_SWORD(l, ",");
+      else
+	some_before = TRUE; /* from now on commas, triggered... */
+      l = gen_nconc(l, words_declaration(p,TRUE));
+    }
 
     gen_free_list (locals);
 
@@ -2379,7 +2406,7 @@ text_loop_default(
     int n)
 {
     list pc = NIL;
-    sentence first_sentence;
+    sentence first_sentence = sentence_undefined;
     unformatted u;
     text r = make_text(NIL);
     statement body = loop_body( obj ) ;

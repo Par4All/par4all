@@ -25,6 +25,7 @@ LIB_CFILES =	stub.c \
 		reductions.c \
 		utils.c \
 		transformation.c \
+		pragma.c \
 		prettyprint.c \
 		call.c
 

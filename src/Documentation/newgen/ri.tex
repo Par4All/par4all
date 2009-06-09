@@ -62,7 +62,7 @@ used in PIPS as internal representations of programs. These data
 structures are declared using the NewGen Data Definition Language,
 which insulates them from a particular programming language. They
 currently are translated into C or Common Lisp declarations and basic
-run-time support routines, such as \texttt{make}, \texttt{free}\ldots 
+run-time support routines, such as \texttt{make}, \texttt{free}\ldots
 A basic understanding of Newgen declarations\footnote{If you edit this
   document, please remember that NewGen declarations introduced by
   \expandafter\texttt{\string\domain} must fit on one line in the source
@@ -1640,7 +1640,7 @@ something else too some days.
 \subsubsection{Pragma}
 \label{sec:pragma}
 
-\domain{pragma = string}
+\domain{pragma = string + expression*}
 {}
 
 Pragmas fields are used to attach \verb|#pragma| to statements.

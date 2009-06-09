@@ -38,6 +38,9 @@
   * used in ri.newgen; they should not be mentionned here
   *
   * Idem for type Psysteme (FI 3 November 1990)
+  *
+  * New function call need to be defined to handle omp pragma as a standard
+  * pips expression. To be easily reconized all the deine values start by OMP_
   */
 
 #include "linear.h"
@@ -321,6 +324,14 @@
 #define BUFFEROUT_FUNCTION_NAME         "BUFFEROUT"
 #define ENDFILE_FUNCTION_NAME           "ENDFILE"
 #define FORMAT_FUNCTION_NAME            "FORMAT"
+
+/* OMP related function and opertor names */
+
+#define OMP_OMP_FUNCTION_NAME           "omp"
+#define OMP_FOR_FUNCTION_NAME           "for"
+#define OMP_PRIVATE_FUNCTION_NAME       "private"
+#define OMP_PARALLEL_FUNCTION_NAME      "parallel"
+#define OMP_REDUCTION_FUNCTION_NAME     "reduction"
 
 /*io functions: C library and system io.Amira Mensi*/
 
@@ -778,6 +789,13 @@
 #define ENTITY_IMPLIEDDO_P(e)            ENTITY_NAME_P(e, IMPLIED_DO_NAME)
 #define ENTITY_IO_LIST_P(e)              ENTITY_NAME_P(e, IO_LIST_STRING_NAME)
 #define ENTITY_FORMAT_P(e)               ENTITY_NAME_P(e, "FORMAT")
+
+/* OMP entity test */
+#define ENTITY_OMP_OMP_P                ENTITY_NAME_P(e,OMP_OMP_FUNCTION_NAME)
+#define ENTITY_OMP_FOR_P                ENTITY_NAME_P(e,OMP_FOR_FUNCTION_NAME)
+#define ENTITY_OMP_PRIVATE_P            ENTITY_NAME_P(e,OMP_PRIVATE_FUNCTION_NAME)
+#define ENTITY_OMP_PARALLEL_P           ENTITY_NAME_P(e,OMP_PARALLEL_FUNCTION_NAME)
+#define ENTITY_OMP_REDUCTION_P          ENTITY_NAME_P(e,OMP_REDUCTION_FUNCTION_NAME)
 
 /*io functions: C library and system io.Amira Mensi*/
 

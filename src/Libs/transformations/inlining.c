@@ -32,9 +32,9 @@
  * @date 2009-01-07
  */
 
-#include <stdio.h> 
-#include <stdlib.h> 
-#include <string.h> 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include "genC.h"
 #include "linear.h"
 #include "ri.h"
@@ -304,7 +304,7 @@ entity make_temporary_scalar_entity(entity efrom, expression from)
 /* this should inline the call callee
  * calling module inlied_module
  */
-static 
+static
 instruction inline_expression_call(expression modified_expression, call callee)
 {
 
@@ -340,7 +340,7 @@ instruction inline_expression_call(expression modified_expression, call callee)
     pips_assert("no external declaration",inlined_extern_declaration == NIL);
 
 
-    /* create the new instruction sequence 
+    /* create the new instruction sequence
      * no need to change all entities in the new statements, because we build a new text ressource latter
      */
     statement expanded = copy_statement(inlined_module_statement);
@@ -407,7 +407,7 @@ instruction inline_expression_call(expression modified_expression, call callee)
     string block_level = "0";
 
     /* this is the only I found to recover the inlined entities' declaration */
-    list iter = code_declarations(inlined_code); 
+    list iter = code_declarations(inlined_code);
     while( area_entity_p(ENTITY(CAR(iter))) ) POP(iter);
     if( !ENDP(iter) && ENTITY_NAME_P( ENTITY(CAR(iter)), entity_user_name(inlined_module) ) )
             POP(iter); /* pop the first flag if needed */
@@ -519,7 +519,7 @@ reget:
                     pips_internal_error("unhandled tag %d\n", syntax_tag(expression_syntax(from)) );
             };
 
-            /* check wether the substitution will cause naming clashes 
+            /* check wether the substitution will cause naming clashes
              * then perform the substitution
              */
             gen_context_recurse(expanded, new, statement_domain, gen_true, &solve_name_clashes);
@@ -579,8 +579,8 @@ bool inline_has_inlinable_calls(call callee)
 
 /* this is in charge of replacing instruction by new ones
  * only apply if this instruction does not contain other instructions
- */ 
-static 
+ */
+static
 void inline_statement_switcher(statement stmt)
 {
     instruction *ins=&statement_instruction(stmt);
@@ -740,7 +740,7 @@ bool do_inlining(char * module_name)
 {
    /* Get the module ressource */
    inlined_module = module_name_to_entity( module_name );
-   inlined_module_statement = 
+   inlined_module_statement =
        (statement) db_get_memory_resource(DBR_CODE, module_name, TRUE);
 
    if(use_effects) set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS,module_name,TRUE));
@@ -806,7 +806,7 @@ bool inlining_simple(char *module_name)
 
 /* select every call that is not an intrinsic
  */
-static void 
+static void
 call_selector(call c, set calls_name)
 {
     entity e = call_function(c);
@@ -832,7 +832,7 @@ run_inlining(string caller_name, string module_name)
     statement_has_callee = true;
     /* Get the module ressource */
     inlined_module = module_name_to_entity( module_name );
-    inlined_module_statement = 
+    inlined_module_statement =
         (statement) db_get_memory_resource(DBR_CODE, module_name, TRUE);
     if(use_effects) set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS,module_name,TRUE));
 
@@ -880,7 +880,7 @@ bool do_unfolding(char* module_name)
     /* gather all referenced calls as long as there are some */
     do {
         statement_has_callee = false;
-        statement unfolded_module_statement = 
+        statement unfolded_module_statement =
             (statement) db_get_memory_resource(DBR_CODE, module_name, TRUE);
         /* gather all referenced calls */
         set calls_name = set_make(set_string);
@@ -896,7 +896,7 @@ bool do_unfolding(char* module_name)
 
 
         /* there is something to inline */
-        if( !set_empty_p(calls_name) ) 
+        if( !set_empty_p(calls_name) )
         {
             SET_MAP(call_name, run_inlining(module_name,(string)call_name) ,calls_name);
             recompile_module(module_name);
@@ -1161,7 +1161,7 @@ bool interactive_statement_picker(statement s,bool started)
 static
 void statement_walker(statement s, list* l, bool (*picker)(statement,bool), bool started )
 {
-    if( picker(s,started) ) 
+    if( picker(s,started) )
     {
         *l=CONS(STATEMENT,s,*l);
         started=true;
@@ -1204,11 +1204,11 @@ void statement_walker(statement s, list* l, bool (*picker)(statement,bool), bool
 }
 
 
-/** 
+/**
  * @brief entry point for outline module
  * outlining will be performed using either pragma recognition
  * or interactively
- * 
+ *
  * @param module_name name of the module containg the statements to outline
  */
 bool
@@ -1224,7 +1224,7 @@ outline(char* module_name)
     do {
         outline_module_name = user_request("outline module name ?\n");// should check
     } while( string_undefined_p(outline_module_name) || outline_module_name[0] == '\0' );
-    
+   
 
     /* retrieve statement to outline */
     list statements_to_outline = NIL;

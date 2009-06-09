@@ -3671,6 +3671,14 @@ typedef struct IntrinsicDescriptor
    to pointer, the typing functions are different. So in some cases, we have to
    rename the operators */
 
+/* Pragma can be represented in the pips IR as a list of expression so new
+ * functions/intrinsics are needed. For exmaple to represent OMP pragmas,
+ * following intrinscs are needed:
+ *    1 - omp, parallel and for which are constant so with 0 argument,
+ *    2 - the colom poperator (for reduction) that takes two arguments
+ *    3 - private and reduction that takes a variable number of arguments.
+ */
+
 static IntrinsicDescriptor IntrinsicTypeDescriptorTable[] =
 {
   {PLUS_OPERATOR_NAME, 2, default_intrinsic_type, typing_arithmetic_operator, 0},
@@ -4380,6 +4388,13 @@ static IntrinsicDescriptor IntrinsicTypeDescriptorTable[] =
   {DIRECTIO_FUNCTION_NAME, 2, integer_to_integer_type, 0, 0},
   {OPEN64_FUNCTION_NAME, (INT_MAX), overloaded_to_integer_type, 0, 0},
   {CREAT64_FUNCTION_NAME, 2, overloaded_to_integer_type, 0, 0},
+
+  /* OMP */
+  {OMP_OMP_FUNCTION_NAME,              0, default_intrinsic_type, 0, 0},
+  {OMP_FOR_FUNCTION_NAME,              0, default_intrinsic_type, 0, 0},
+  {OMP_PRIVATE_FUNCTION_NAME,  (INT_MAX), default_intrinsic_type, 0, 0},
+  {OMP_PARALLEL_FUNCTION_NAME,         0, default_intrinsic_type, 0, 0},
+  {OMP_REDUCTION_FUNCTION_NAME,(INT_MAX), default_intrinsic_type, 0, 0},
 
   {NULL, 0, 0, 0, 0}
 };

@@ -32,7 +32,7 @@
 #define make_none_reduction(var) \
     make_reduction(make_reference(var, NIL), \
                    make_reduction_operator(is_reduction_operator_none, UU),\
-		   NIL, NIL)
+                   NIL, NIL)
 
 /* quick debug macros
  */

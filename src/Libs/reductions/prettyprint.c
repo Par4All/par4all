@@ -43,7 +43,7 @@
 
 /****************************************************** STATIC INFORMATION */
 
-GENERIC_LOCAL_FUNCTION(printed_reductions, pstatement_reductions)
+GENERIC_GLOBAL_FUNCTION(printed_reductions, pstatement_reductions)
 static string reduction_decoration = NULL;
 
 /************************************************************* BASIC WORDS */
@@ -135,6 +135,13 @@ void print_reduction(reduction r)
     fprintf(stderr, "]\n");
 }
 
+/************************************************* REDUCTION PRETTY PRINT */
+
+/* function to allocate and returns a text, passed to the prettyprinter
+ * uses some static variables:
+ * - printed_reductions function
+ * -
+ */
 /************************************************* REDUCTION PRETTY PRINT */
 
 /* function to allocate and returns a text, passed to the prettyprinter

@@ -38,6 +38,7 @@
 #include "top-level.h"
 
 #include "ri-util.h"
+#include "preprocessor.h"
 
 /* functions on strings for entity names */
 

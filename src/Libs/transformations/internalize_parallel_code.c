@@ -54,6 +54,7 @@ static char vcid[] = "$Id$";
 
 #include "transformations.h"
 
+
 /* I love writing so simple passes... :-)
   Basically do only a
   DBR_CODE(mod_name) = (DBR_CODE) DBR_PARALLELIZED_CODE(mod_name) */
@@ -61,8 +62,12 @@ bool internalize_parallel_code(char mod_name[])
 {
   debug_on("INTERNALIZE_PARALLEL_CODE_DEBUG_LEVEL");
 
-  parallel_to_sequential (mod_name, FALSE);
+  statement mod_stmt;
 
+  // Get the parallelized code and tell PIPS_DBM we do not want to modify it
+  mod_stmt = (statement) db_get_memory_resource(DBR_PARALLELIZED_CODE,
+						mod_name, FALSE);
+  DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(mod_name), mod_stmt);
   debug(2,"internalize_parallel_code","done for %s\n", mod_name);
   debug_off();
 

@@ -37,6 +37,7 @@
 
 #include "misc.h"
 #include "ri-util.h"
+#include "text-util.h"
 #include "pipsdbm.h"
 #include "effects-generic.h"
 #include "effects-simple.h"
