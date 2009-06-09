@@ -29,8 +29,6 @@
  * Modification : Arnauld LESERVOT
  * Date         : 92 08 27
  * Old version  : prettyprint.old.c
- *
- * $Id$
  */
 
 #include <stdio.h>

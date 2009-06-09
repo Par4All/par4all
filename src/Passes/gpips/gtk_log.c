@@ -21,9 +21,6 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
-/*
- * $Id: xv_log.c 12279 2005-12-23 14:29:06Z coelho $
- */
 
 #include <stdlib.h>
 #include <stdio.h>

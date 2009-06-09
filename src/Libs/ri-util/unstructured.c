@@ -22,8 +22,6 @@
 
 */
  /*
-  * $Id$
-  *
   * Prettyprint unstructured
   */
 

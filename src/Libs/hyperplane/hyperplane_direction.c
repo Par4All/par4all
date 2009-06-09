@@ -22,8 +22,6 @@
 
 */
 /* Find out a legal hyperplane direction. In a first phase, trust the user blindly!
- *
- * $Id$
  */
 
 #include <stdio.h>

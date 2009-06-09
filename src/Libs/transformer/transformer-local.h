@@ -22,8 +22,6 @@
 
 */
  /* include file for transformer library
-  *
-  * $Id$
   */
 
 /* prefix used for value entity names; no conflict should occur with user

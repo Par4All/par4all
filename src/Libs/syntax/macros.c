@@ -22,8 +22,6 @@
 
 */
 /*
- * $Id$
- *
  * Partial Fortran statement functions support by cold expansion.
  */
 

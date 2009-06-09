@@ -45,8 +45,6 @@
  *    - sequence of loop nests (signal processing, Thomson-CSF)
  *    - ...
  * See: http://www.irisa.fr/api/Rajopadhye/tiling
- *
- * $Id$
  */
 
 #include <stdlib.h>

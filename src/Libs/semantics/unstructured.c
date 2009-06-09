@@ -68,9 +68,6 @@
   * it is the entry node because, then, it has an extra-predecessor.
   *
   * Francois Irigoin, July 2002 (First version: October 2000)
-  *
-  * $Id$
-  *
   */
 
 #include <stdio.h>

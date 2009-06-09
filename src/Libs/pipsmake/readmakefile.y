@@ -25,8 +25,6 @@
 /* Some modifications are made to save the current makefile (s.a. files
  * pipsmake/readmakefile.y pipsmake.h )
  *
- * $Id$
- *
  * They only occure between following tags: 
  *
  * Bruno Baron

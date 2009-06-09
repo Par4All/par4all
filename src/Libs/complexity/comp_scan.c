@@ -22,8 +22,6 @@
 
 */
 /* 
- * $Id$
- *
  * scan the Abstract Syntax Tree of a program to count operations
  */
 

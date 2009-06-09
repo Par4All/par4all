@@ -25,8 +25,6 @@
  * package hyperplane.
  *
  * Build a change of basis matrix G compatible with a hyperplane direction h
- *
- * $Id$
  */
 #include <stdlib.h>
 #include <stdio.h>

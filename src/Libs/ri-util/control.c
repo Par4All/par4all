@@ -25,14 +25,10 @@
    It is mainly used by my unspaghettify and the controlizer.
 
    Ronan Keryell.
-   */
-
-/*
- * $Id$
- */
+*/
 
 #ifndef lint
-char vcid_ri_util_control[] = "%A% ($Date: 2002/07/03 09:22:12 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_ri_util_control[] = "$Id$";
 #endif /* lint */
 
 #include <stdlib.h>

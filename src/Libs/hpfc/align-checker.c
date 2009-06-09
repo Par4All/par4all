@@ -30,8 +30,6 @@
  * this should use use-def chains, vectors and so on
  *
  * Fabien Coelho  August 93
- *
- * $Id$
  */
 
 #include "defines-local.h"

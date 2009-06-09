@@ -22,8 +22,6 @@
 
 */
 /* Main C functions to print code, sequential or parallel
- *
- * $Id$
  */
 
 #include <stdlib.h>

@@ -22,8 +22,6 @@
 
 */
 /*
- * $Id$
- *
  * regenerate user files. the modules are put in a file which has the
  * same name as the original user file. All regenerated files are stored
  * in the subdirectory Src of the database. If some includes are

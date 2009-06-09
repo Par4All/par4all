@@ -23,8 +23,6 @@
 */
 /* HPFC module by Fabien COELHO
  *
- * $Id$
- *
  * generates a remapping code. 
  * debug controlled with HPFC_REMAPPING_DEBUG_LEVEL.
  * ??? should drop the renaming domain?

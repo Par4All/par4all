@@ -22,8 +22,6 @@
 
 */
 /* 
- * $Id$
- *
  * Cloning of a subroutine.
  * debug: CLONE_DEBUG_LEVEL
  */

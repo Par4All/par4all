@@ -25,8 +25,6 @@
  * to manage the hpfc data structures.
  *
  * Fabien Coelho, May 1993.
- *
- * $Id$
  */
 
 #include "defines-local.h"

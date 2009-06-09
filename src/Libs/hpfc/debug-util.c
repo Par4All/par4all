@@ -23,8 +23,6 @@
 */
 /* this is a set of functions to help hpfc debugging
  *
- * $Id$
- *
  * Fabien Coelho, May 1993.
  */
 

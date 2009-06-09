@@ -22,10 +22,6 @@
 
 */
 /*
- * $Id$
- */
-
-/*
  * for partial_eval.c:
  *
  * EFORMAT: the expression format used in recursiv evaluations. 

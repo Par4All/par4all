@@ -23,8 +23,6 @@
 */
 /* Messages handling
  *
- * $Id$
- *
  * Fabien Coelho, August 1993
  */
 

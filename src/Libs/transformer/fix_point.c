@@ -23,8 +23,6 @@
 */
  /* transformer package - fix point computations
   *
-  * $Id$
-  *
   * Several algorithms are available:
   *
   *  - two untested versions using Halwachs approach; sc_elarg() was found to

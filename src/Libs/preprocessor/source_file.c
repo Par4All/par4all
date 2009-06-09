@@ -22,8 +22,6 @@
 
 */
 /*
- * $Id$
- *
  * procedures used in both PIPS top-level, wpips and tpips.
  *
  * problems to use those procedures with wpips: show_message() and

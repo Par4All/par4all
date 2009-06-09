@@ -22,8 +22,6 @@
 
 */
 /*
- * $Id$
- *
  * adapted from what can be seen by FC 31/12/96
  * 
  * - static declarations; 

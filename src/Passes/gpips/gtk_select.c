@@ -21,8 +21,6 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
-/* $Id: xv_select.c 12801 2007-10-19 07:08:13Z coelho $
- */
 
 #include <stdio.h>
 #include <stdlib.h>

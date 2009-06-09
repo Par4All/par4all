@@ -22,13 +22,10 @@
 
 */
 /*
-  $Id$
-
   Dead loop elimination.
   Ronan Keryell, 12/1993 -> 1995.
 
   one trip loops fixed, FC 08/01/1998
-
 */
 
 #include <stdio.h> 

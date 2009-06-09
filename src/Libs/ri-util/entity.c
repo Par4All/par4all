@@ -22,8 +22,6 @@
 
 */
 /* Functions closely related to the entity class, constructors, predicates,...
- *
- * $Id$
  */
 // To have strndup():
 #define _GNU_SOURCE

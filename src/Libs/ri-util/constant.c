@@ -22,9 +22,6 @@
 
 */
 /* Deals with constant expressions and constant entities
- *
- * $Id$
- *
  */
 
 #include <stdio.h>

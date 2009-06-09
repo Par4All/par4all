@@ -22,9 +22,6 @@
 
 */
 /* interfaces with pipsmake for hyperplane transformation
- *
- * $Id$
- *
  */
 
 #include <stdio.h>

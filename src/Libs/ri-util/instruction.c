@@ -24,8 +24,6 @@
 /** @file
 
    Methods dealing with instructions.
-
-   $Id$
 */
 
 #include <stdlib.h>

@@ -21,8 +21,6 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
-/* $Id$
- */
 
 #ifndef _STDARG_H
 #include <stdarg.h>

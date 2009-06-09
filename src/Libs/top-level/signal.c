@@ -22,8 +22,6 @@
 
 */
 /*
- * $Id$
- *
  * signal management for pips.
  * moved from misc to top level so as to interact with pipsmake/pipsdbm...
  */

@@ -22,8 +22,6 @@
 
 */
 /*
- * $Id$
- *
  * stuff to include, local to pipsdbm.
  * SHOULD NOT include ri-util.h.
  */

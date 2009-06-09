@@ -22,8 +22,6 @@
 
 */
 /* package semantics
- * 
- * $Id$
  */
 
 #include <stdio.h>

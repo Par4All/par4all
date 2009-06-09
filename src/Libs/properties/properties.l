@@ -24,8 +24,6 @@
 
 %{
 /*
- * $Id$
- * 
  * - 01/1996: PIPS_PROPERTIESRC added. FC.
  * - 09/1997: save/load properties in database. FC.
  */

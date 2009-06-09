@@ -24,13 +24,10 @@
 /* Support and resolve equivalence chains. Allocate addresses in commons
  * and in the static area and in the dynamic area. The heap area is left
  * aside.
- *
- * $Id$
- *
  */
 
 #ifndef lint
-char vcid_syntax_equivalence[] = "%A% ($Date: 2003/08/11 16:25:26 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_syntax_equivalence[] = "$Id$";
 #endif /* lint */
 
 /* equivalence.c: contains EQUIVALENCE related routines */

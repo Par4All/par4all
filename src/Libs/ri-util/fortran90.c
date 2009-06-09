@@ -34,8 +34,6 @@
 
    There are/were memory leaks here since a new expression is constructed.
 
-   $Id$
-
 */
 
 #include <stdio.h>

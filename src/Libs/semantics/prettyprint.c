@@ -22,8 +22,6 @@
 
 */
 /*
- * $Id$
- * 
  * package semantics - prettyprint interface 
  */
 

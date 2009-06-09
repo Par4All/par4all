@@ -21,9 +21,6 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
-/* 
- * $Id$
- */
 
 /* should be some properties to accomodate cray codes?? */
 #define INT_LENGTH 4

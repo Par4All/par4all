@@ -24,11 +24,8 @@
 /* 
  * package regions :  Beatrice Creusillet, September 1994
  *
- * $Id$
- *
  * This File contains the functions that deal with the comparison and
  * combinations of regions.
- *
  */
 
 

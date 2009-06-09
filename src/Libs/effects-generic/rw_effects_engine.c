@@ -28,8 +28,6 @@
  *
  * This File contains the generic functions necessary for the computation of 
  * all types of read and write effects and cumulated references.
- *
- * $Id$
  */
 #include <stdio.h>
 #include <string.h>

@@ -179,8 +179,6 @@
   *  time being (maybe, this has been fixed!)
   *
   * Francois Irigoin, 13 January 1994
-  *
-  * $Id$
   */
 
 #include <stdlib.h>

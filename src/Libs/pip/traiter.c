@@ -21,7 +21,6 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
-/* 	$Id$	 */
 
 #ifndef lint
 static char vcid_pip_traiter[] = "$Id$";

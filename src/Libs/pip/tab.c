@@ -21,7 +21,6 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
-/* 	$Id$	 */
 
 #ifndef lint
 char vcid_pip_tab[] = "$Id$";

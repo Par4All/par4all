@@ -35,8 +35,6 @@
  */
 
 /*
- * $Id$
- *
  * package regions :  Alexis Platonoff, 22 Aout 1990
  * modified : Beatrice Creusillet
  *

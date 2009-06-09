@@ -21,8 +21,7 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
-/* $Id$
- *
+/*
  * Integer constants calculated by preconditions are replaced by their value.
  * Expressions are evaluated to (ICOEF*SUBEXPR + ISHIFT) in order to perform
  * some simplifications.

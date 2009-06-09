@@ -22,8 +22,6 @@
 
 */
 /* 
- * $Id$
- *
  * a safe system call. abort if fails.
  * FC 09/95
  */

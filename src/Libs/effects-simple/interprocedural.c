@@ -28,8 +28,6 @@
  *
  * This File contains functions for the interprocedural computation of simple
  * effects.
- *
- * $Id$
  */
 
 #include <stdio.h>

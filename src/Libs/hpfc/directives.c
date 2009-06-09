@@ -26,8 +26,6 @@
  * These functions deal with HPF directives.
  * (just a big hack, but few lines of code and neither lex nor yacc:-)
  * I'm definitely happy with this. FC.
- *
- * $Id$
  */
 
 #include "defines-local.h"

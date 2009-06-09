@@ -57,8 +57,6 @@
   * statement (total_precondition). This is because it was not realized that
   * preconditions could advantageously be seen as transformers of the initial
   * state when designing the ri.
-  *
-  * $Id$
   */
 
 #include <stdio.h>

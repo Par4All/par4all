@@ -27,8 +27,6 @@
  * and MakeReturn() are sufficient to process regular RETURN statements.
  *
  * Francois Irigoin
- *
- * $Id$
  */
 
 #include <stdio.h>

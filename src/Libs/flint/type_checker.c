@@ -22,8 +22,6 @@
 
 */
 /*
- * $Id$
- *
  * Typecheck Fortran code.
  * by Son PhamDinh 03-05/2000
  */

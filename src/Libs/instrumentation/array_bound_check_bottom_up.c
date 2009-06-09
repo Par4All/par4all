@@ -51,9 +51,7 @@
  * ENNDO
  *
  * Question : other analyses (regions,.. ) are correct ?
-
  *
- * $Id$
  *
  * Version: change the structure of test: 
  * IF (I.LT.lower) THEN STOP "Bound violation ..."

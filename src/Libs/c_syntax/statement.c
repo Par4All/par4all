@@ -22,9 +22,7 @@
 
 */
 
-/*******************  STATEMENTS ******************
- $Id$
- */
+/*******************  STATEMENTS *******************/
 
 /* Attention, the null statement in C is represented as the continue
    statement in Fortran (make_continue_statement means make_null_statement)*/

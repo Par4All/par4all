@@ -22,8 +22,6 @@
 
 */
 /* package hyperplane
- *
- * $Id$
  */
 
 #include  <stdio.h>

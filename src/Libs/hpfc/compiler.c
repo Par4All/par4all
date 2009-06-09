@@ -23,8 +23,6 @@
 */
 /* HPFC - Fabien Coelho, May 1993 and later...
  *
- * $Id$
- *
  * Compiler
  *
  * stat is the current statement to be compiled, and there are

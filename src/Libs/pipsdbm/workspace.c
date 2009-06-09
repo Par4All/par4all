@@ -22,8 +22,6 @@
 
 */
 /*
- * $Id$
- *
  * Workspace management.
  *
  * Basically, a workspace is the object that manages a database.

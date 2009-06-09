@@ -22,8 +22,6 @@
 
 */
 /*
- * $Id$
- *
  * Computation of initial transformers that allow to collect
  * global initializations of BLOCK DATA and so.
  *

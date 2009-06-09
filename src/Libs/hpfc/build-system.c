@@ -28,8 +28,6 @@
  * with the I/O in hpf programs.
  *
  * Fabien COELHO, Feb/Mar 94
- *
- * $Id$
  */
 
 #include "defines-local.h"

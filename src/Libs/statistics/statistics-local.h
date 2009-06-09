@@ -21,9 +21,6 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
-/* 
- * $Id$
- */
 #include "genC.h"    
 
 /* cette structure contient une pile. La tete de cette pile contient le statement courant */

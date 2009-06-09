@@ -22,8 +22,6 @@
 
 */
 /*
- * $Id$
- *
  *  package convex effects :  Be'atrice Creusillet 5/97
  *
  * File: methods.c

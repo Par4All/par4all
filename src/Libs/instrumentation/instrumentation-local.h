@@ -21,4 +21,3 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
-/* $Id$ */

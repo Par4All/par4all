@@ -27,9 +27,6 @@
 
     Lei ZHOU         12 Sep. 1991
     Francois IRIGOIN
-
-    $Id$
-
   */
 
 #include <stdlib.h>

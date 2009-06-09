@@ -23,8 +23,6 @@
 */
 /* Regeneration of declarations from the symbol table
  *
- * $Id$
- *
  * Regeneration of declarations...
  */
 

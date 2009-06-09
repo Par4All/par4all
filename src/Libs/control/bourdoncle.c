@@ -71,8 +71,6 @@
        replicate_cycles() [Not part of Bourdoncle's algorithm: allocate a copy
                            of each scc, i.e. cycle, i.e. while loop for each 
 			   of its "call" sites]
-
- $Id$
 */
 
 #include <stdio.h>

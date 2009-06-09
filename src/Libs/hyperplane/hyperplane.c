@@ -22,9 +22,6 @@
 
 */
 /* package hyperplane
- *
- * $Id$
- *
  */
 
 #include <stdlib.h>

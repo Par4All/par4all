@@ -21,12 +21,10 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
-/* $Id$
-   Ronan Keryell, 1995.
- */
+/* Ronan Keryell, 1995. */
 
 #ifndef lint
-char vcid_unspaghettify[] = "%A% ($Date: 2004/01/23 13:55:04 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_unspaghettify[] = "$Id$";
 #endif /* lint */
 
 #include <stdlib.h>

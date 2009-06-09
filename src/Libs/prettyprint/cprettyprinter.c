@@ -22,7 +22,6 @@
 
 */
 /*
-   $Id$
 
    Try to prettyprint the RI in C.
    Very basic at the time.

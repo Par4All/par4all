@@ -21,7 +21,6 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
-/* $Id$ */
 
 #ifndef ACCESS_DESCRIPTION_H
 #define ACCESS_DESCRIPTION_H

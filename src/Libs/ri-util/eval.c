@@ -22,8 +22,6 @@
 
 */
 /* 
- * $Id$
- * 
 
 This file contains a set of functions to evaluate integer constant
 expressions. The algorithm is built on a recursive analysis of the

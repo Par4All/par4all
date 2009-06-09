@@ -23,8 +23,6 @@
 */
 /* Pot-pourri of utilities for the internal representation. 
  * Some functions could be moved to non-generic files such as entity.c.
- *
- * $Id$
  */
 #include <stdio.h>
 #include <string.h>

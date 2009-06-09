@@ -22,9 +22,7 @@
 
 */
 /* Interface with pipsmake for interactive loop transformations: loop
- *interchange, hyperplane method,...
- *
- * $Id$
+ * interchange, hyperplane method,...
  */
 
 #include <stdio.h>

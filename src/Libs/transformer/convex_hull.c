@@ -22,8 +22,6 @@
 
 */
  /*
-  * $Id$
-  *
   * transformer package - convex hull computation
   *
   * Francois Irigoin, 21 April 1990

@@ -21,12 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
-/*
- * $Id$
- */
 
 #ifndef lint
-char vcid_syntax_expression[] = "%A% ($Date: 2005/08/24 15:19:31 $, ) version $Revision$, got on %D%, %T% [%P%].\n Copyright (c) École des Mines de Paris Proprietary.";
+char vcid_syntax_expression[] = "$Id$";
 #endif /* lint */
 
 #include <stdio.h>

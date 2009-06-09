@@ -27,8 +27,6 @@
  * ~~~~~~~~~~~~~~~~~~~~~
  *
  * This File contains the functions computing the private regions.
- *
- * $Id$
  */
 
 #include <stdlib.h>

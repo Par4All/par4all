@@ -25,8 +25,6 @@
  *
  * new declarations compilation.
  * normalization of HPF declarations.
- *
- * $Id$
  */
  
 #include "defines-local.h"

@@ -22,8 +22,6 @@
 
 */
 /*
- * $Id$
- *
  * Here is the database!
  *
  * Here are just the internals. 

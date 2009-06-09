@@ -22,8 +22,6 @@
 
 */
 /*
- * $Id$
- *
  * Stub functions for old passes that have been moved out.
  */
 

@@ -23,8 +23,6 @@
 */
 /* Handling of entity as program variables 
  * (see also entity.c for generic entities)
- *
- * $Id$
  */
 
 // To have asprintf:

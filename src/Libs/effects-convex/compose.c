@@ -23,8 +23,6 @@
 */
 /* package convex effects :  Be'atrice Creusillet 6/97
  *
- * $Id$
- *
  * File: compose.c
  * ~~~~~~~~~~~~~~~
  *

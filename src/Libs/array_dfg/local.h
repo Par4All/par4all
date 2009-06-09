@@ -21,10 +21,6 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
-/*
- * $Id$
- */
-
 /* Ansi includes 	*/
 #include <stdio.h>
 #include <stdlib.h>

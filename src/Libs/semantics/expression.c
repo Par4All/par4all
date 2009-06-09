@@ -56,8 +56,6 @@
   * process. For example:
   *
   * j = 2; i = j + (j = 0) + j;
-  *
-  * $Id$
   */
 #include <stdio.h>
 #include <string.h>

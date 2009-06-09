@@ -29,9 +29,6 @@
   * bottom-up on the call tree.
   *
   * Francois Irigoin, April 1990
-  *
-  * $Id$
-  *
   */
 
 #include <stdio.h>

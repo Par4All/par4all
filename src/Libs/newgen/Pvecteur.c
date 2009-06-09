@@ -22,8 +22,6 @@
 
 */
  /*
-  * $Id$
-  *
   * NewGen interface with C3 type Pvecteur for PIPS project 
   *
   * Remi Triolet

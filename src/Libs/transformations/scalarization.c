@@ -22,9 +22,6 @@
 
 */
 /* package scalarization
- *
- * $Id$
- *
  */
 
 #include <stdlib.h>

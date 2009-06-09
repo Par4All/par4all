@@ -22,8 +22,6 @@
 
 */
 /*
- * $Id$
- *
  * Load, Save, Free a resource, with available methods.
  * DBLL = Data Base Low Level
  */

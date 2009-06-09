@@ -23,8 +23,6 @@
 */
 /* package generic effects :  Be'atrice Creusillet 5/97
  *
- * $Id$
- *
  * File: intrinsics.c
  * ~~~~~~~~~~~~~~~~~~
  *

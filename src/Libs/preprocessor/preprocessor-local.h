@@ -22,8 +22,6 @@
 
 */
 /* Preprocessing and splitting of Fortran and C files
- *
- * $Id$
  */
 
 /* the name of the environment variable where source files are searched for. */

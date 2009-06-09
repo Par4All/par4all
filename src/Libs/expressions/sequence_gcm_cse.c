@@ -22,8 +22,6 @@
 
 */
 /* 
-   $Id$
-
    Global code motion and Common subexpression elimination for nested
    sequences (a sort of perfect loop nest).
 */

@@ -23,8 +23,6 @@
 */
 /* An atomizer that uses the one made by Fabien Coelho for HPFC.
 
-   $Id$
-
    Ronan Keryell, 17/5/1995. 
 */
 

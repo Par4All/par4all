@@ -22,8 +22,6 @@
 
 */
 /*
- * $Id$
- *
  * Associated to each resource, the methods to read, write, free or check it.
  * For some reason the is no significant default, although the gen_* methods
  * would fit most needs.

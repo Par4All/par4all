@@ -22,7 +22,6 @@
 
 */
 /*
-  $Id$
  
   LOOP_UNROLL()
 

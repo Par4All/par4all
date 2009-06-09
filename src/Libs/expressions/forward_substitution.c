@@ -22,8 +22,6 @@
 
 */
 /*
- * $Id$
- * 
  * Perform forward substitution when possible.
  *
  * The main purpose of such a transformation is to undo manual

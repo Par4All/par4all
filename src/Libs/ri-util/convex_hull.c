@@ -22,8 +22,6 @@
 
 */
 /*
- * $Id$
- *
  * Functions which should/could be in linear...
  */
 

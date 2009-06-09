@@ -22,8 +22,6 @@
 
 */
 /*
- * $Id$
- *
  * Fabien Coelho, May 1993
  */
 

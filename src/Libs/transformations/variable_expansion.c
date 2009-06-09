@@ -27,8 +27,6 @@
  * ~~~~~~~~~~~~~~~~~~~~
  *
  * This File contains the functions expanding local variables used in DO loops into arrays.
- *
- * $Id$
  */
 
 #include <stdlib.h>

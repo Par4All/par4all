@@ -43,8 +43,6 @@
   * Be'atrice Apvrille, August 1993
   */
 
-/* $Id$ */
-
 #include <stdio.h>
 #include <string.h>
 

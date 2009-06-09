@@ -22,7 +22,6 @@
 
 */
 /*
-   $Id$
 
    Try to prettyprint the RI in CLAIRE.
    Very basic at the time.

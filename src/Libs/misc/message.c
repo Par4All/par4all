@@ -22,8 +22,6 @@
 
 */
 /*
- * $Id$
- * 
  * error & message handling handling routines (s.a. debug.c) :
  * user_log()
  * user_request()

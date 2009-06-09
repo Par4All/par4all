@@ -24,8 +24,6 @@
 /* static variables and related access functions concerning the current module
  *
  * Be'atrice Apvrille, august 27, 1993
- *
- * $Id$
  */
 
 /* used to store the summary transformer ? 

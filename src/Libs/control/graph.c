@@ -21,7 +21,6 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
-/* $Id$ */
 
 #include <stdio.h>
 #include <strings.h>

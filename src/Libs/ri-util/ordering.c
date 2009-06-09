@@ -22,8 +22,6 @@
 
 */
 /*
- * $Id$
- *
  * Defines a static mapping from orderings to statements.
  * must be initialize_ordering_to_statement, and afterwards
  * reset_ordering_to_statement.

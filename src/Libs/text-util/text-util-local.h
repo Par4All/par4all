@@ -21,9 +21,6 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
-/*
- * $Id$
- */
 
 /* is_fortran is declared in ri-util, but it's not the proper location
    as text-util is supposed to be independent of ri-util. But

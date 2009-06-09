@@ -22,8 +22,6 @@
 
 */
 /* HPFC by Fabien Coelho, May 1993 and later...
- *
- * $Id$
  */
 
 #include "defines-local.h"

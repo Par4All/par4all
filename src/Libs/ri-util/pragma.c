@@ -22,8 +22,6 @@
 
 */
 /*
-  $Id$
-
   This file define methods to deal with objects extensions and pragma
   used as extensions to statements in the PIPS internal representation.
 

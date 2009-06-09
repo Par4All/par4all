@@ -22,9 +22,6 @@
 
 */
 /*
- * $Id$
- *
- *
  * Functions to handle all declarations, but some related to functional
  * entities
  *

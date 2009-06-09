@@ -22,8 +22,6 @@
 
 */
 /*
- * $Id$
- * 
  * clean the declarations of a module.
  * to be called from pipsmake.
  * 

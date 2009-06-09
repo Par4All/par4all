@@ -24,8 +24,6 @@
 /* Runtime Support Functions Management
  *
  * Fabien Coelho, May and June 1993
- *
- * $Id$
  */
 
 #include "defines-local.h"

@@ -24,8 +24,6 @@
 /* Overlap Analysis Module for HPFC
  * 
  * Fabien Coelho, August 1993
- *
- * $Id$
  */
 
 #include "defines-local.h"

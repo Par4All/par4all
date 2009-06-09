@@ -22,8 +22,6 @@
 
 */
 /*
- * $Id$
- *
  * Some functions to manage special (non newgen) resources.
  */
 

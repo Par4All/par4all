@@ -25,8 +25,6 @@
  *
  * in this file there are functions to generate the 
  * run-time resolution parameters.
- *
- * $Id$
  */
 
 #include "defines-local.h"

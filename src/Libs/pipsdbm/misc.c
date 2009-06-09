@@ -22,8 +22,6 @@
 
 */
 /*
- * $Id$
- *
  * Directly from the old implementation of pipsdbm.
  * Too many static buffers in my opinion;-) FC.
  */

@@ -22,8 +22,6 @@
 
 */
 /*
- * $Id$
- *
  * Build a graph for the callgraph, instead of a tree.
  * Some other formats could be thought of, maybe?
  * Code by Corinne Ancourt and Fabien Coelho.

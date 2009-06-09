@@ -22,8 +22,6 @@
 
 */
 /*
- * $Id$
- * 
  * pipsmake: call by need (make),
  * rule selection (activate),
  * explicit call (apply/capply)

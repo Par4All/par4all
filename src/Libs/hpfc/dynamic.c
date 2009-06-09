@@ -27,8 +27,6 @@
  * dynamic mappings (re*). It includes keeping track of variables 
  * tagged as dynamic, and managing the static synonyms introduced
  * to deal with them in HPFC.
- *
- * $Id$
  */
 
 #include "defines-local.h"

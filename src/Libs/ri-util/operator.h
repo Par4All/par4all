@@ -22,8 +22,6 @@
 
 */
 /* 
- * $Id$
- *
  * FI: these values were taken from syntax/tokyacc.h but I do not 
  * think they matter. Wouldn't an enum be better?
  *

@@ -22,9 +22,6 @@
 
 */
  /* semantic analysis: processing of loops
-  *
-  * $Id$
-  *
   */
 #include <stdio.h>
 #include <string.h>

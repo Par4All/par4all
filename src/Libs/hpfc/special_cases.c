@@ -22,8 +22,6 @@
 
 */
 /* HPFC module, Fabien Coelho, May 1993.
- *
- * $Id$
  */
 
 #include "defines-local.h"

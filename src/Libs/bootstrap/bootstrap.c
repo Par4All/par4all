@@ -22,8 +22,6 @@
 
 */
 /*
-  $Id$
-
   Symbol table initialization with Fortran operators, commands and
   intrinsics
 

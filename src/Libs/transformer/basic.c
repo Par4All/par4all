@@ -24,8 +24,6 @@
  /* transformer package - basic routines
   *
   * Francois Irigoin
-  *
-  * $Id$
   */
 
 #include <stdio.h>

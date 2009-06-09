@@ -22,8 +22,6 @@
 
 */
  /*
-  * $Id$
-  *
   * Functions for the expressions
   *
   * Yi-Qing YANG, Lei ZHOU, Francois IRIGOIN, Fabien COELHO

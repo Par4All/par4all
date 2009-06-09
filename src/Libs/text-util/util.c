@@ -24,8 +24,6 @@
 /*
  * The motivation of text is to delay string concatenation by dealing with
  * lists of strings instead as more as possible.
-
- * $Id$
  */
 
 #include <stdio.h>

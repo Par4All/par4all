@@ -21,9 +21,6 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
-/*
- * $Id$
- */
 
 #define PIPSDBM_DEBUG_LEVEL "PIPSDBM_DEBUG_LEVEL"
 

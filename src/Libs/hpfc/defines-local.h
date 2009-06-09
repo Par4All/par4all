@@ -23,8 +23,6 @@
 */
 /*
  * HPFC module by Fabien COELHO
- *
- * $Id$
  */
 
 /* Most includes are centralized here.

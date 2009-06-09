@@ -21,12 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
-/* $Id: xv_props.c 12279 2005-12-23 14:29:06Z coelho $ */
 
 #ifndef lint
-char
-		vcid_xv_props[] =
-				"%A% ($Date: 2002/03/15 07:55:53 $, ) version $Revision: 12279 $, got on %D%, %T% [%P%].\n Copyright (c) �cole des Mines de Paris Proprietary.";
+char vcid_xv_props[] = "$Id$";
 #endif /* lint */
 
 #include <stdlib.h>

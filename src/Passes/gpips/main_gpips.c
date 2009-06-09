@@ -22,8 +22,6 @@
 
 */
 /*
- * $Id: main_gpips.c 12279 2005-12-23 14:29:06Z coelho $
- *
  * This file contains the main for gpips.
  * Please, do not change anything! do any change to wpips_main().
  *

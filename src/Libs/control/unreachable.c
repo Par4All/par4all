@@ -23,8 +23,6 @@
 */
 /*
  * Detection of unreachable code, from the control flow point of view.
- *
- * $Id$
  */
 
 #include <stdio.h>

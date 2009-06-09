@@ -21,11 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
-/* $Id$ */
 
 #ifndef lint
-char vcid_control_control[] =
-"$Id$\nCopyright (c) École des Mines de Paris Proprietary.";
+char vcid_control_control[] = "$Id$";
 #endif /* lint */
 
 /* - control.c

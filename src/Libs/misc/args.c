@@ -21,8 +21,7 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
-/* $Id$
- *
+/*
  * there was some static buffer management here.
  * now it relies on dynamic arrays.
  */

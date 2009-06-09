@@ -22,8 +22,6 @@
 
 */
 /* Global computation of CALLERS, HEIGHT and DEPTH
- *
- * $Id$
  */
 
 

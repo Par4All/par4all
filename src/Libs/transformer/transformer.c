@@ -22,8 +22,6 @@
 
 */
  /* Predicate transformer package: sc complexity level
-  *
-  * $Id$
   */
 
 #include <stdio.h>
