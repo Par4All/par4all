@@ -129,319 +129,330 @@ entity find_final_statement_label(statement s)
  */
 /* static string current_module_name = NULL; */
 
-void loop_unroll(statement loop_statement, int rate)
+void do_loop_unroll(statement loop_statement, int rate, void (*statement_post_processor)(statement))
 {
     debug(2, "loop_unroll", "unroll %d times\n", rate);
     pips_assert("loop_unroll", 
-		instruction_loop_p(statement_instruction(loop_statement)));
+            instruction_loop_p(statement_instruction(loop_statement)));
     /* "bad argument type\n"); */
     pips_assert("loop_unroll", rate > 0);
     /* "loop unrolling rate not strictly positive: %d\n", rate); */
 
-{
-    loop il = instruction_loop(statement_instruction(loop_statement));
-    range lr = loop_range(il);
-    entity ind = loop_index(il);
-    basic indb = variable_basic(type_variable(entity_type(ind)));
-    expression lb = range_lower(lr),
-               ub = range_upper(lr),
-               inc = range_increment(lr);
-    entity nub, ib, lu_ind;
-    expression rhs_expr, expr;
-    string module_name = db_get_current_module_name();
-    entity mod_ent = module_name_to_entity(module_name);
-    entity label_entity;
-    statement body, stmt;
-    instruction block, inst;
-    range rg;
-    int lbval, ubval, incval;
-    bool numeric_range_p = FALSE;
-
-    pips_assert("loop_unroll", mod_ent != entity_undefined);
-    /* "module entity undefined\n"); */
-    if(get_debug_level()==7) {
-	/* Start debug in Newgen */
-	gen_debug |= GEN_DBG_CHECK;
+    {
+        loop il = instruction_loop(statement_instruction(loop_statement));
+        range lr = loop_range(il);
+        entity ind = loop_index(il);
+        basic indb = variable_basic(type_variable(entity_type(ind)));
+        expression lb = range_lower(lr),
+                   ub = range_upper(lr),
+                   inc = range_increment(lr);
+        entity nub, ib, lu_ind;
+        expression rhs_expr, expr;
+        string module_name = db_get_current_module_name();
+        entity mod_ent = module_name_to_entity(module_name);
+        entity label_entity;
+        statement body, stmt;
+        instruction block, inst;
+        range rg;
+        int lbval, ubval, incval;
+        bool numeric_range_p = FALSE;
+        
+            pips_assert("loop_unroll", mod_ent != entity_undefined);
+        /* "module entity undefined\n"); */
+        if(get_debug_level()==7) {
+            /* Start debug in Newgen */
+            gen_debug |= GEN_DBG_CHECK;
+        }
+        /* Validity of transformation should be checked */
+        /* ie.: - pas d'effets de bords dans les expressions duplique'es */
+
+        /* get rid of labels in loop body */
+        (void) clear_labels (loop_body (il));
+
+        /* Instruction block is created and will contain everything */
+        block = make_instruction_block(NIL);
+
+        /* Entity LU_NUB is created and initializing statement is created
+         * LU_NUB = ((UB - LB) + INC)/INC 
+         */
+        /* 
+           nub = make_scalar_integer_entity(NORMALIZED_UPPER_BOUND_NAME, 
+           module_name);
+           AddEntityToDeclarations( mod_ent, nub);
+           */
+        nub = make_new_scalar_variable_with_prefix(NORMALIZED_UPPER_BOUND_NAME, 
+                mod_ent,
+                copy_basic(indb)
+                /* MakeBasic(is_basic_int)*/);
+        AddEntityToCurrentModule(nub);
+
+        if (expression_integer_value(lb, &lbval) 
+                && expression_integer_value(ub, &ubval) 
+                && expression_integer_value(inc, &incval)) {
+            numeric_range_p = TRUE;
+            pips_assert("loop_unroll", incval != 0);
+            rhs_expr = int_expr(FORTRAN_DIV(ubval-lbval+incval, incval));
+        }
+        else {
+            expr= MakeBinaryCall(entity_intrinsic(PLUS_OPERATOR_NAME),
+                    MakeBinaryCall(entity_intrinsic(MINUS_OPERATOR_NAME), 
+                        copy_expression(ub), 
+                        copy_expression(lb) ),
+                    copy_expression(inc) );
+            rhs_expr = MakeBinaryCall(entity_intrinsic(DIVIDE_OPERATOR_NAME),
+                    expr,
+                    copy_expression(inc) );
+        }
+        expr = make_ref_expr(nub, NIL);
+        stmt = make_assign_statement(expr,
+                rhs_expr );
+        if(get_debug_level()==9) {
+            expression_consistent_p(expr);
+        }
+        /* The first statement gets label of the initial loop */
+        statement_label(stmt) = statement_label(loop_statement);
+        statement_label(loop_statement) = entity_empty_label();
+        instruction_block(block) = CONS(STATEMENT, stmt, NIL);
+
+        /* Entity LU_IB is created and initializing statement is created 
+         * LU_IB = MOD(LU_NUB, rate)
+         */
+        /*
+           ib = make_scalar_integer_entity(INTERMEDIATE_BOUND_NAME,
+           module_name);
+           AddEntityToDeclarations( mod_ent, ib);
+           */
+        ib = make_new_scalar_variable_with_prefix(INTERMEDIATE_BOUND_NAME, 
+                mod_ent,
+                copy_basic(indb)
+                /* MakeBasic(is_basic_int)*/);
+        AddEntityToCurrentModule(ib);
+
+        if (numeric_range_p) {
+            rhs_expr = int_expr(FORTRAN_MOD(FORTRAN_DIV(ubval-lbval+incval, 
+                            incval), rate));
+        }
+        else {
+            rhs_expr = MakeBinaryCall(entity_intrinsic("MOD"),
+                    make_ref_expr(nub, NIL),
+                    int_expr(rate));
+        }
+
+        expr = make_expression(make_syntax(is_syntax_reference, 
+                    make_reference(ib, NIL) ),
+                normalized_undefined);
+        stmt = make_assign_statement(expr, rhs_expr);
+        instruction_block(block)= gen_nconc(instruction_block(block),
+                CONS(STATEMENT, stmt, NIL ));
+        
+            /* Loop for some of the first iterations created:
+             * DO LU_IND = 0, LU_IB-1, 1
+             *    BODY(I\(LU_IND*INC + LB))
+             * ENDDO
+             */
+            /* Entity LU_IND is created */
+            /*
+               lu_ind = make_scalar_integer_entity(INDEX_NAME,module_name);
+               AddEntityToDeclarations( mod_ent, lu_ind);
+               */
+            lu_ind = make_new_scalar_variable_with_prefix(INDEX_NAME, 
+                    mod_ent,
+                    copy_basic(indb)
+                    );
+        AddEntityToCurrentModule(lu_ind);
+
+        /* Loop range is created */
+        rg = make_range(MakeIntegerConstantExpression("0"),
+                MakeBinaryCall(entity_intrinsic(MINUS_OPERATOR_NAME),
+                    make_ref_expr(ib, NIL),
+                    int_expr(1) ),
+                MakeIntegerConstantExpression("1") );
+        if(get_debug_level()>=9) {
+            pips_assert("loop_unroll", range_consistent_p(rg));
+        }
+
+        /* Create body of the loop, with updated index */
+        body = copy_statement(loop_body(il));
+        ifdebug(9) {
+            pips_assert("loop_unroll", statement_consistent_p(body));
+            /* "gen_copy_tree returns bad statement\n"); */
+        }
+        expr = MakeBinaryCall(entity_intrinsic(PLUS_OPERATOR_NAME),
+                MakeBinaryCall(entity_intrinsic(MULTIPLY_OPERATOR_NAME), 
+                    make_ref_expr(lu_ind, NIL),
+                    copy_expression(inc)),
+                copy_expression(lb));
+        ifdebug(9) {
+            pips_assert("loop_unroll", expression_consistent_p(expr));
+            /* "gen_copy_tree returns bad expression(s)\n"); */
+        }
+        StatementReplaceReference(body,
+                make_reference(ind,NIL),
+                expr);
+        if( statement_post_processor)
+            statement_post_processor(body);
+        free_expression(expr);
+
+        label_entity = make_new_label(module_name);
+        stmt = make_continue_statement(label_entity);
+        body = make_block_statement(CONS(STATEMENT, body,
+                    CONS(STATEMENT, stmt, NIL)));
+        if(get_debug_level()>=9) {
+            pips_assert("loop_unroll", statement_consistent_p(body));
+        }
+
+        /* Create loop and insert it in block */
+        inst = make_instruction(is_instruction_loop,
+                make_loop(lu_ind, 
+                    rg, 
+                    body, 
+                    label_entity,
+                    make_execution(is_execution_sequential, 
+                        UU),
+                    NIL));
+
+        if(get_debug_level()>=9) {
+            pips_assert("loop_unroll", instruction_consistent_p(inst));
+        }
+
+        instruction_block(block)= gen_nconc(instruction_block(block),
+                CONS(STATEMENT,
+                    make_stmt_of_instr(inst),
+                    NIL ));
+        
+            /* Unrolled loop created:
+             * DO LU_IND = LU_IB, LU_NUB-1, rate
+             *    BODY(I\(LU_IND*INC + LB))
+             *    BODY(I\((LU_IND+1)*INC + LB))
+             *    ...
+             *    BODY(I\((LU_IND+(rate-1))*INC + LB))
+             * ENDDO
+             */
+            /* Loop range is created */
+            rg = make_range(make_ref_expr(ib, NIL),
+                    MakeBinaryCall(entity_intrinsic(MINUS_OPERATOR_NAME),
+                        make_ref_expr(nub, NIL),
+                        int_expr(1) ),
+                    int_expr(rate) );
+
+        /* Create body of the loop, with updated index */
+        body = make_empty_block_statement();
+        label_entity = make_new_label(module_name);
+        instruction_block(statement_instruction(body)) =  
+            CONS(STATEMENT, make_continue_statement(label_entity), NIL);
+        while(--rate>=0) {
+            /* Last transformated old loop added first */
+            expression tmp_expr;
+            statement transformed_stmt;
+            list body_block = instruction_block(statement_instruction(body));
+
+            transformed_stmt = copy_statement(loop_body(il));
+            ifdebug(9)
+                statement_consistent_p(transformed_stmt);
+            tmp_expr = MakeBinaryCall(entity_intrinsic(PLUS_OPERATOR_NAME),
+                    make_ref_expr(lu_ind, NIL),
+                    int_expr(rate) );
+            expr = MakeBinaryCall(entity_intrinsic(PLUS_OPERATOR_NAME),
+                    MakeBinaryCall(entity_intrinsic(MULTIPLY_OPERATOR_NAME), 
+                        tmp_expr,
+                        copy_expression(inc) ),
+                    copy_expression(lb) );
+            ifdebug(9) {
+                pips_assert("loop_unroll", expression_consistent_p(expr));
+            }
+            StatementReplaceReference(transformed_stmt,
+                    make_reference(ind,NIL),
+                    expr);
+            ifdebug(9) {
+                pips_assert("loop_unroll", statement_consistent_p(transformed_stmt));
+            }
+            free_expression(expr);
+
+            ifdebug(9) {
+                pips_assert("loop_unroll", statement_consistent_p(transformed_stmt));
+            }
+
+
+            /* Add the transformated old loop body (transformed_stmt) at
+             * the begining of the loop */
+            instruction_block(statement_instruction(body)) = CONS(STATEMENT,
+                    transformed_stmt,
+                    body_block);
+        }
+
+        /* Create loop and insert it in block */
+        /* ?? Should execution be the same as initial loop? */
+        inst = make_instruction(is_instruction_loop,
+                make_loop(lu_ind, 
+                    rg, 
+                    body, 
+                    label_entity,
+                    make_execution(is_execution_sequential, 
+                        UU),
+                    NIL));
+
+        if(get_debug_level()>=9) {
+            pips_assert("loop_unroll", instruction_consistent_p(inst));
+        }
+
+
+        instruction_block(block)= gen_nconc(instruction_block(block),
+                CONS(STATEMENT,
+                    make_stmt_of_instr(inst),
+                    NIL ));
+        
+            /* Generate a statement to reinitialize old index 
+             * IND = LB + MAX(NUB,0)*INC
+             */
+            expr = MakeBinaryCall(entity_intrinsic(MULTIPLY_OPERATOR_NAME),
+                    MakeBinaryCall(entity_intrinsic(MAX0_OPERATOR_NAME), 
+                        make_ref_expr(nub, NIL),
+                        int_expr(0) ),
+                    copy_expression(inc) );
+        rhs_expr = MakeBinaryCall(entity_intrinsic(PLUS_OPERATOR_NAME),
+                copy_expression(lb),
+                expr);
+        expr = make_ref_expr(ind, NIL);
+        stmt = make_assign_statement(expr,
+                rhs_expr );
+        ifdebug(9) {
+            print_text(stderr,text_statement(entity_undefined,0,stmt));
+            pips_assert("loop_unroll", statement_consistent_p(stmt));
+        }
+        instruction_block(block)= gen_nconc(instruction_block(block),
+                CONS(STATEMENT, stmt, NIL ));
+
+
+        /* Free old instruction and replace with block */
+        /* FI: according to me, gen_copy_tree() does not create a copy sharing nothing
+         * with its actual parameter; if the free is executed, Pvecteur normalized_linear
+         * is destroyed (18 January 1993) */
+        /* gen_free(statement_instruction(loop_statement)); */
+        statement_instruction(loop_statement) = block;
+        /* Do not forget to move forbidden information associated with
+block: */
+        fix_sequence_statement_attributes(loop_statement);
+
+        ifdebug(9) {
+            print_text(stderr,text_statement(entity_undefined,0,loop_statement));
+            pips_assert("loop_unroll", statement_consistent_p(loop_statement));
+        }
+        /* ?? Bad condition */
+        if(get_debug_level()==7) {
+            /* Stop debug in Newgen */
+            gen_debug &= ~GEN_DBG_CHECK;
+        }
     }
-    /* Validity of transformation should be checked */
-    /* ie.: - pas d'effets de bords dans les expressions duplique'es */
-
-    /* get rid of labels in loop body */
-    (void) clear_labels (loop_body (il));
-
-    /* Instruction block is created and will contain everything */
-    block = make_instruction_block(NIL);
-
-    /* Entity LU_NUB is created and initializing statement is created
-     * LU_NUB = ((UB - LB) + INC)/INC 
-     */
-    /* 
-    nub = make_scalar_integer_entity(NORMALIZED_UPPER_BOUND_NAME, 
-				     module_name);
-    AddEntityToDeclarations( mod_ent, nub);
-    */
-    nub = make_new_scalar_variable_with_prefix(NORMALIZED_UPPER_BOUND_NAME, 
-					       mod_ent,
-					       copy_basic(indb)
-					       /* MakeBasic(is_basic_int)*/);
-    AddEntityToCurrentModule(nub);
-
-    if (expression_integer_value(lb, &lbval) 
-	&& expression_integer_value(ub, &ubval) 
-	&& expression_integer_value(inc, &incval)) {
-	numeric_range_p = TRUE;
-	pips_assert("loop_unroll", incval != 0);
-	rhs_expr = int_expr(FORTRAN_DIV(ubval-lbval+incval, incval));
-    }
-    else {
-	expr= MakeBinaryCall(entity_intrinsic(PLUS_OPERATOR_NAME),
-			 MakeBinaryCall(entity_intrinsic(MINUS_OPERATOR_NAME), 
-					copy_expression(ub), 
-					copy_expression(lb) ),
-			 copy_expression(inc) );
-	rhs_expr = MakeBinaryCall(entity_intrinsic(DIVIDE_OPERATOR_NAME),
-				  expr,
-				  copy_expression(inc) );
-    }
-    expr = make_ref_expr(nub, NIL);
-    stmt = make_assign_statement(expr,
-				 rhs_expr );
-    if(get_debug_level()==9) {
-	expression_consistent_p(expr);
-    }
-    /* The first statement gets label of the initial loop */
-    statement_label(stmt) = statement_label(loop_statement);
-    statement_label(loop_statement) = entity_empty_label();
-    instruction_block(block) = CONS(STATEMENT, stmt, NIL);
-
-    /* Entity LU_IB is created and initializing statement is created 
-     * LU_IB = MOD(LU_NUB, rate)
-     */
-    /*
-    ib = make_scalar_integer_entity(INTERMEDIATE_BOUND_NAME,
-				    module_name);
-    AddEntityToDeclarations( mod_ent, ib);
-    */
-    ib = make_new_scalar_variable_with_prefix(INTERMEDIATE_BOUND_NAME, 
-					      mod_ent,
-					      copy_basic(indb)
-					      /* MakeBasic(is_basic_int)*/);
-    AddEntityToCurrentModule(ib);
-
-    if (numeric_range_p) {
-	rhs_expr = int_expr(FORTRAN_MOD(FORTRAN_DIV(ubval-lbval+incval, 
-						    incval), rate));
-    }
-    else {
-	rhs_expr = MakeBinaryCall(entity_intrinsic("MOD"),
-				  make_ref_expr(nub, NIL),
-				  int_expr(rate));
-    }
-
-    expr = make_expression(make_syntax(is_syntax_reference, 
-				       make_reference(ib, NIL) ),
-			   normalized_undefined);
-    stmt = make_assign_statement(expr, rhs_expr);
-    instruction_block(block)= gen_nconc(instruction_block(block),
-					CONS(STATEMENT, stmt, NIL ));
-
-    /* Loop for some of the first iterations created:
-     * DO LU_IND = 0, LU_IB-1, 1
-     *    BODY(I\(LU_IND*INC + LB))
-     * ENDDO
-     */
-    /* Entity LU_IND is created */
-    /*
-    lu_ind = make_scalar_integer_entity(INDEX_NAME,module_name);
-    AddEntityToDeclarations( mod_ent, lu_ind);
-    */
-    lu_ind = make_new_scalar_variable_with_prefix(INDEX_NAME, 
-						  mod_ent,
-						  copy_basic(indb)
-	);
-    AddEntityToCurrentModule(lu_ind);
-
-    /* Loop range is created */
-    rg = make_range(MakeIntegerConstantExpression("0"),
-		    MakeBinaryCall(entity_intrinsic(MINUS_OPERATOR_NAME),
-				   make_ref_expr(ib, NIL),
-				   int_expr(1) ),
-		    MakeIntegerConstantExpression("1") );
-    if(get_debug_level()>=9) {
-	pips_assert("loop_unroll", range_consistent_p(rg));
-    }
-
-    /* Create body of the loop, with updated index */
-    body = copy_statement(loop_body(il));
-    ifdebug(9) {
-	pips_assert("loop_unroll", statement_consistent_p(body));
-	/* "gen_copy_tree returns bad statement\n"); */
-    }
-    expr = MakeBinaryCall(entity_intrinsic(PLUS_OPERATOR_NAME),
-			  MakeBinaryCall(entity_intrinsic(MULTIPLY_OPERATOR_NAME), 
-					 make_ref_expr(lu_ind, NIL),
-					 copy_expression(inc)),
-			  copy_expression(lb));
-    ifdebug(9) {
-	pips_assert("loop_unroll", expression_consistent_p(expr));
-	    /* "gen_copy_tree returns bad expression(s)\n"); */
-    }
-    StatementReplaceReference(body,
-			      make_reference(ind,NIL),
-			      expr);
-    free_expression(expr);
-
-    label_entity = make_new_label(module_name);
-    stmt = make_continue_statement(label_entity);
-    body = make_block_statement(CONS(STATEMENT, body,
-				     CONS(STATEMENT, stmt, NIL)));
-    if(get_debug_level()>=9) {
-	pips_assert("loop_unroll", statement_consistent_p(body));
-    }
-
-    /* Create loop and insert it in block */
-    inst = make_instruction(is_instruction_loop,
-			    make_loop(lu_ind, 
-				      rg, 
-				      body, 
-				      label_entity,
-				      make_execution(is_execution_sequential, 
-						     UU),
-				      NIL));
-
-    if(get_debug_level()>=9) {
-	pips_assert("loop_unroll", instruction_consistent_p(inst));
-    }
-
-    instruction_block(block)= gen_nconc(instruction_block(block),
-					CONS(STATEMENT,
-					     make_stmt_of_instr(inst),
-					     NIL ));
-
-    /* Unrolled loop created:
-     * DO LU_IND = LU_IB, LU_NUB-1, rate
-     *    BODY(I\(LU_IND*INC + LB))
-     *    BODY(I\((LU_IND+1)*INC + LB))
-     *    ...
-     *    BODY(I\((LU_IND+(rate-1))*INC + LB))
-     * ENDDO
-     */
-    /* Loop range is created */
-    rg = make_range(make_ref_expr(ib, NIL),
-		    MakeBinaryCall(entity_intrinsic(MINUS_OPERATOR_NAME),
-				   make_ref_expr(nub, NIL),
-				   int_expr(1) ),
-		    int_expr(rate) );
-
-    /* Create body of the loop, with updated index */
-    body = make_empty_block_statement();
-    label_entity = make_new_label(module_name);
-    instruction_block(statement_instruction(body)) =  
-	CONS(STATEMENT, make_continue_statement(label_entity), NIL);
-    while(--rate>=0) {
-	/* Last transformated old loop added first */
-	expression tmp_expr;
-	statement transformed_stmt;
-	list body_block = instruction_block(statement_instruction(body));
-
-	transformed_stmt = copy_statement(loop_body(il));
-	ifdebug(9)
-	    statement_consistent_p(transformed_stmt);
-	tmp_expr = MakeBinaryCall(entity_intrinsic(PLUS_OPERATOR_NAME),
-				  make_ref_expr(lu_ind, NIL),
-				  int_expr(rate) );
-	expr = MakeBinaryCall(entity_intrinsic(PLUS_OPERATOR_NAME),
-			      MakeBinaryCall(entity_intrinsic(MULTIPLY_OPERATOR_NAME), 
-					     tmp_expr,
-					     copy_expression(inc) ),
-			      copy_expression(lb) );
-	ifdebug(9) {
-	    pips_assert("loop_unroll", expression_consistent_p(expr));
-	}
-	StatementReplaceReference(transformed_stmt,
-				  make_reference(ind,NIL),
-				  expr);
-	ifdebug(9) {
-	    pips_assert("loop_unroll", statement_consistent_p(transformed_stmt));
-	}
-	free_expression(expr);
-	
-	ifdebug(9) {
-	    pips_assert("loop_unroll", statement_consistent_p(transformed_stmt));
-	}
-
-	
-	/* Add the transformated old loop body (transformed_stmt) at
-	 * the begining of the loop */
-	instruction_block(statement_instruction(body)) = CONS(STATEMENT,
-							      transformed_stmt,
-							      body_block);
-    }
-
-    /* Create loop and insert it in block */
-    /* ?? Should execution be the same as initial loop? */
-    inst = make_instruction(is_instruction_loop,
-			    make_loop(lu_ind, 
-				      rg, 
-				      body, 
-				      label_entity,
-				      make_execution(is_execution_sequential, 
-						     UU),
-				      NIL));
-
-    if(get_debug_level()>=9) {
-	pips_assert("loop_unroll", instruction_consistent_p(inst));
-    }
-
-
-    instruction_block(block)= gen_nconc(instruction_block(block),
-					CONS(STATEMENT,
-					     make_stmt_of_instr(inst),
-					     NIL ));
-
-    /* Generate a statement to reinitialize old index 
-     * IND = LB + MAX(NUB,0)*INC
-     */
-    expr = MakeBinaryCall(entity_intrinsic(MULTIPLY_OPERATOR_NAME),
-			  MakeBinaryCall(entity_intrinsic(MAX0_OPERATOR_NAME), 
-					 make_ref_expr(nub, NIL),
-					 int_expr(0) ),
-			  copy_expression(inc) );
-    rhs_expr = MakeBinaryCall(entity_intrinsic(PLUS_OPERATOR_NAME),
-			      copy_expression(lb),
-			      expr);
-    expr = make_ref_expr(ind, NIL);
-    stmt = make_assign_statement(expr,
-				 rhs_expr );
-    ifdebug(9) {
-	print_text(stderr,text_statement(entity_undefined,0,stmt));
-	pips_assert("loop_unroll", statement_consistent_p(stmt));
-    }
-    instruction_block(block)= gen_nconc(instruction_block(block),
-					CONS(STATEMENT, stmt, NIL ));
-
-
-    /* Free old instruction and replace with block */
-    /* FI: according to me, gen_copy_tree() does not create a copy sharing nothing
-     * with its actual parameter; if the free is executed, Pvecteur normalized_linear
-     * is destroyed (18 January 1993) */
-    /* gen_free(statement_instruction(loop_statement)); */
-    statement_instruction(loop_statement) = block;
-    /* Do not forget to move forbidden information associated with
-       block: */
-    fix_sequence_statement_attributes(loop_statement);
-    
-    ifdebug(9) {
-	print_text(stderr,text_statement(entity_undefined,0,loop_statement));
-	pips_assert("loop_unroll", statement_consistent_p(loop_statement));
-    }
-    /* ?? Bad condition */
-    if(get_debug_level()==7) {
-	/* Stop debug in Newgen */
-	gen_debug &= ~GEN_DBG_CHECK;
-    }
-}
     debug(3, "loop_unroll", "done\n");
+}
+
+/* fallbacks on do_loop_unroll
+ * without statement post processing
+ */
+void
+loop_unroll(statement loop_statement, int rate)
+{
+    do_loop_unroll(loop_statement, rate, NULL);
 }
 
 /* get rid of the loop by body duplication; 

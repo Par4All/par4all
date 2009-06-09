@@ -277,6 +277,7 @@ entity sac_make_new_variable(entity module, basic b)
  */
 static void simd_atomize_call(call c, statement cs)
 {
+    statement stat ;
 
     // Each call argument is atomize if needed
     FOREACH(EXPRESSION, ce,call_arguments(c))
@@ -293,16 +294,11 @@ static void simd_atomize_call(call c, statement cs)
             {
                 simd_atomize_call(cc, cs);
 
-                statement stat = simd_atomize_this_expression(sac_make_new_variable, ce);
-
-                if(stat == NULL)
+                if( (stat = simd_atomize_this_expression(sac_make_new_variable, ce) ) )
                 {
-                    return;
+                    change_basic_if_needed(stat);
+                    simd_insert_statement(cs, stat);
                 }
-
-                change_basic_if_needed(stat);
-
-                simd_insert_statement(cs, stat);
             }
         }
         /* SG: we may want to atomize array indexing
@@ -315,8 +311,8 @@ static void simd_atomize_call(call c, statement cs)
             reference r = syntax_reference(s);
             if( reference_variable(r) && !ENDP(reference_indices(r)) )
             {
-                statement stat = simd_atomize_this_expression(sac_make_new_variable, ce);
-                simd_insert_statement(cs, stat);
+                if( (stat = simd_atomize_this_expression(sac_make_new_variable, ce)) )
+                    simd_insert_statement(cs, stat);
             }
         }
     }
@@ -326,6 +322,7 @@ static void simd_atomize_call(call c, statement cs)
 */
 static void atomize_call_statement(statement cs)
 {
+    statement stat;
     call c = instruction_call(statement_instruction(cs));
 
     // Initialize orginal_statement if this is the first argument
@@ -350,8 +347,8 @@ static void atomize_call_statement(statement cs)
                 // let's atomize the current argument
                 if(!ENTITY_ASSIGN_P(call_function(c)) || get_bool_property("SIMD_EXTRAVAGANT_ATOMIZER") )
                 {
-                    statement stat = simd_atomize_this_expression(sac_make_new_variable, ce);
-                    simd_insert_statement(cs, stat);
+                    if( (stat = simd_atomize_this_expression(sac_make_new_variable, ce)) )
+                        simd_insert_statement(cs, stat);
                 }
             }
         }
