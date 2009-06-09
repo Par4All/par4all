@@ -1,44 +1,28 @@
 
-Privatized regions
+Code after scalarization
 
 int func(int n)
 {
-
-//  <i-PRIVATE-EXACT-{}>
-//  <j-PRIVATE-EXACT-{}>
-//  <t[PHI1]-PRIVATE-EXACT-{0<=PHI1, PHI1<=99}>
-//  <x[PHI1]-PRIVATE-EXACT-{0<=PHI1, PHI1<=99}>
-//  <y[PHI1][PHI2]-PRIVATE-EXACT-{PHI2==100, 0<=PHI1, PHI1<=99}>
-
    // BEGIN BLOCK
-   int x[100];
-   int y[100][100];
-   int t[100];
+   int __ld__1;
+   int __ld__0;
+   int x[n];
+   int y[n][n];
    int i;
    int j;
 
-   for(i = 0; i <= 99; i += 1) {
-
-//  <j-PRIVATE-EXACT-{}>
-//  <t[PHI1]-PRIVATE-EXACT-{PHI1==i, 0<=i, i<=99}>
-//  <x[PHI1]-PRIVATE-EXACT-{PHI1==i, 0<=i, i<=99}>
-//  <y[PHI1][PHI2]-PRIVATE-EXACT-{PHI1==i, PHI2==100, 0<=i, i<=99}>
-
+   for(i = 0; i <= n-1; i += 1) {
       // BEGIN BLOCK
-      PRIVATE i,j,t[100],x[100],y[100][100]
-      x[i] = i;
-      for(j = 0; j <= 99; j += 1)
-         PRIVATE j,t[100]
-
-//  <t[PHI1]-PRIVATE-EXACT-{PHI1==i, 0<=i, i<=99, 0<=j, j<=99}>
-
-         t[i] = x[i];
-      y[i][j] = x[i]+j;
+      __ld__0 = i;
+      for(j = 0; j <= n-1; j += 1) {
+         // BEGIN BLOCK
+         __ld__1 = __ld__0^2;
+         __ld__1 = __ld__0+j;
+         y[i][j] = __ld__1;
+         // END BLOCK
+      }
       // END BLOCK
    }
-   return y[n][n];
+   return y[n-1][n-1];
    // END BLOCK
 }
-
-Code after scalarization
-

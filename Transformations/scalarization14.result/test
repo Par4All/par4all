@@ -1,0 +1,32 @@
+
+Code after scalarization
+
+int func(int n)
+{
+   // BEGIN BLOCK
+   int __ld__3;
+   int __ld__2;
+   int __ld__1;
+   int __ld__0;
+   int x[100];
+   int y[100][100];
+   int t[100];
+   int i;
+   int j;
+
+   for(i = 0; i <= 99; i += 1) {
+      // BEGIN BLOCK
+      __ld__1 = i;
+      for(j = 0; j <= 99; j += 1) {
+         // BEGIN BLOCK
+         __ld__0 = __ld__1;
+         __ld__2 = __ld__1+j+__ld__0;
+         y[i][j] = __ld__2;
+         // END BLOCK
+      }
+      // END BLOCK
+   }
+   i = y[n][n]+y[0][0]+y[0][n]+y[n][0];
+   return i;
+   // END BLOCK
+}

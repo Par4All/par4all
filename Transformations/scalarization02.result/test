@@ -4,15 +4,17 @@ C     Expected result: t(i) scalarized (although it is copied out)
       REAL X(N,N), Y(N,N)
       REAL T(100)      
 C     BEGIN BLOCK
-      DO J = 1, N                                                       0006
-         DO I = 1, N                                                    0007
+      DO I = 1, N                                                       0006
+C        BEGIN BLOCK
+         DO J = 1, N                                                    0007
 C           BEGIN BLOCK
             __ld__0 = X(I,J)                                            0008
             X(I,J) = Y(I,J)                                             0009
             Y(I,J) = __ld__0                                            0010
-            T(I) = __ld__0
 C           END BLOCK
          ENDDO
+         T(I) = __ld__0
+C        END BLOCK
       ENDDO
       PRINT *, T(N)                                                     0013
 C     END BLOCK

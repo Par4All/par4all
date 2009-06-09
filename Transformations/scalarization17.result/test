@@ -6,7 +6,7 @@ IN regions
 //  <B[PHI1][PHI2]-IN-EXACT-{0<=PHI1, PHI1+1<=TOP-LEVEL:SIZE, 0<=PHI2,
 //    PHI2+1<=TOP-LEVEL:SIZE}>
 
-void scalarization09(double A[SIZE], double B[SIZE][SIZE])
+void scalarization17(double A[SIZE], double B[SIZE][SIZE])
 {
 
 //  <A[PHI1]-IN-EXACT-{0<=PHI1, PHI1+1<=TOP-LEVEL:SIZE}>
@@ -41,16 +41,28 @@ void scalarization09(double A[SIZE], double B[SIZE][SIZE])
 
 OUT regions
 
-void scalarization09(double A[SIZE], double B[SIZE][SIZE])
+
+//  <A[PHI1]-OUT-EXACT-{PHI1==0, PHI1+1<=TOP-LEVEL:SIZE}>
+
+void scalarization17(double A[SIZE], double B[SIZE][SIZE])
 {
+
+//  <A[PHI1]-OUT-EXACT-{PHI1==0, PHI1+1<=TOP-LEVEL:SIZE}>
+
    // BEGIN BLOCK
    int i;
    int j;
+
+//  <A[PHI1]-OUT-EXACT-{PHI1==0, PHI1+1<=TOP-LEVEL:SIZE}>
+
    for(i = 0; i <= SIZE-1; i += 1)
+
+//  <A[PHI1]-OUT-EXACT-{PHI1==i, PHI1==0, 1+i<=TOP-LEVEL:SIZE}>
+
       for(j = 0; j <= SIZE-1; j += 1)
 
-//  <A[PHI1]-OUT-EXACT-{i==PHI1, 1+i<=TOP-LEVEL:SIZE,
-//    2+j<=TOP-LEVEL:SIZE, 0<=i, 0<=j}>
+//  <A[PHI1]-OUT-MAY-{PHI1==i, 0<=PHI1, PHI1+1<=TOP-LEVEL:SIZE,
+//    1+j<=TOP-LEVEL:SIZE, 0<=j}>
 
          A[i] = B[j][i]+A[i];
    // END BLOCK
@@ -58,7 +70,7 @@ void scalarization09(double A[SIZE], double B[SIZE][SIZE])
 
 Code after scalarization
 
-void scalarization09(double A[SIZE], double B[SIZE][SIZE])
+void scalarization17(double A[SIZE], double B[SIZE][SIZE])
 {
    // BEGIN BLOCK
    double __ld__0;
@@ -69,6 +81,7 @@ void scalarization09(double A[SIZE], double B[SIZE][SIZE])
       __ld__0 = A[i];
       for(j = 0; j <= SIZE-1; j += 1)
          __ld__0 = B[j][i]+__ld__0;
+      A[i] = __ld__0;
       // END BLOCK
    }
    // END BLOCK

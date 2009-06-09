@@ -4,8 +4,8 @@ C     Expected result: t(i) scalarized
       REAL X(N,N), Y(N,N)
       REAL T(100)    
 C     BEGIN BLOCK
-      DO J = 1, N                                                       0006
-         DO I = 1, N                                                    0007
+      DO I = 1, N                                                       0006
+         DO J = 1, N                                                    0007
 C           BEGIN BLOCK
             __ld__0 = X(I,J)                                            0008
             X(I,J) = Y(I,J)                                             0009

@@ -1,0 +1,59 @@
+
+IN regions
+
+void scalarization19(double B[SIZE][SIZE])
+{
+   // BEGIN BLOCK
+   int i;
+   int j;
+   for(i = 0; i <= SIZE-1; i += 1)
+      for(j = 0; j <= SIZE-1; j += 1)
+         B[i][j] = 0.;
+   // END BLOCK
+}
+
+OUT regions
+
+
+//  <B[PHI1][PHI2]-OUT-EXACT-{PHI1==0, PHI1+1<=TOP-LEVEL:SIZE,
+//    0<=PHI2, PHI2+1<=TOP-LEVEL:SIZE}>
+
+void scalarization19(double B[SIZE][SIZE])
+{
+
+//  <B[PHI1][PHI2]-OUT-EXACT-{PHI1==0, PHI1+1<=TOP-LEVEL:SIZE,
+//    0<=PHI2, PHI2+1<=TOP-LEVEL:SIZE}>
+
+   // BEGIN BLOCK
+   int i;
+   int j;
+
+//  <B[PHI1][PHI2]-OUT-EXACT-{PHI1==0, PHI1+1<=TOP-LEVEL:SIZE,
+//    0<=PHI2, PHI2+1<=TOP-LEVEL:SIZE}>
+
+   for(i = 0; i <= SIZE-1; i += 1)
+
+//  <B[PHI1][PHI2]-OUT-EXACT-{PHI1==i, PHI1==0, 0<=PHI2,
+//    PHI2+1<=TOP-LEVEL:SIZE, 1+i<=TOP-LEVEL:SIZE}>
+
+      for(j = 0; j <= SIZE-1; j += 1)
+
+//  <B[PHI1][PHI2]-OUT-EXACT-{PHI1==i, PHI1==0, j==PHI2,
+//    1+i<=TOP-LEVEL:SIZE, 1+j<=TOP-LEVEL:SIZE, 0<=j}>
+
+         B[i][j] = 0.;
+   // END BLOCK
+}
+
+Code after scalarization
+
+void scalarization19(double B[SIZE][SIZE])
+{
+   // BEGIN BLOCK
+   int i;
+   int j;
+   for(i = 0; i <= SIZE-1; i += 1)
+      for(j = 0; j <= SIZE-1; j += 1)
+         B[i][j] = 0.;
+   // END BLOCK
+}
