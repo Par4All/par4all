@@ -55,15 +55,8 @@ bool set_pattern()
 
         statement s = (statement) db_get_memory_resource(DBR_CODE, pattern_module_name, TRUE);
         instruction i = statement_instruction(s);
-        /* check the two way of encoding returns */
-        if( instruction_return_p(i) )
-        {
-            pattern = instruction_return(i);
-        }
-        else if( return_instruction_p(i) )
-        {
+        if( return_instruction_p(i) )
             pattern = EXPRESSION(CAR(call_arguments(instruction_call(i))));
-        }
         else {
             pips_user_warning("%s used as pattern for expression substitution, but is not a module with a single return !\n", pattern_module_name);
             return false;

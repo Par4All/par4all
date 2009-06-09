@@ -68,7 +68,7 @@ void inline_return_remover(instruction ins,instruction tail_ins)
 {
     if( return_instruction_p( ins ) && ins !=tail_ins )
     {
-        free_expression(instruction_return(ins));
+        free_call(instruction_call(ins));
         instruction_tag(ins)=is_instruction_goto;
         instruction_goto(ins)=copy_statement(laststmt);
     }
@@ -598,7 +598,6 @@ void inline_statement_switcher(statement stmt)
                 }
             } break;
         /* handle those with a gen_recurse */
-        case is_instruction_return:
         case is_instruction_expression:
             {
                 list new_instructions=NIL;
@@ -1194,7 +1193,6 @@ void statement_walker(statement s, list* l, bool (*picker)(statement,bool), bool
                 statement_walker(forloop_body(instruction_forloop(i)),l,picker,started);
                 break;
             case is_instruction_unstructured:
-            case is_instruction_return:
             case is_instruction_expression:
             case is_instruction_goto:
             case is_instruction_call:

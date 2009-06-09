@@ -130,8 +130,8 @@ instruction_continue_p(instruction i) {
 
 
 /* Test if an instruction is a "return"
-
    Note that this function is not named "instruction_return_p" since
+   it would mean return is a field of instruction ... which used to be the case :)
 */
 bool
 return_instruction_p(instruction i) {

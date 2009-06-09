@@ -287,8 +287,6 @@ do_clone_instruction(instruction i, clone_context cc, hash_table ht)
             return make_instruction_multitest(do_clone_multitest(instruction_multitest(i),cc, ht));
         case is_instruction_forloop:
             return make_instruction_forloop(do_clone_forloop(instruction_forloop(i),cc, ht));
-        case is_instruction_return:
-            return make_instruction_return(do_clone_expression(instruction_return(i),cc, ht));
         case is_instruction_expression:
             return make_instruction_expression(do_clone_expression(instruction_expression(i),cc, ht));
     };

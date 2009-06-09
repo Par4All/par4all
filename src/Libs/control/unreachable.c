@@ -191,12 +191,6 @@ propagate(statement s) {
       continued = !ENTITY_STOP_P(f) && !ENTITY_ABORT_SYSTEM_P(f) && !ENTITY_EXIT_SYSTEM_P(f);
       break;
     }
-    case is_instruction_return:
-    {
-      continued = TRUE; /* FI: might be FALSE, but this depends on the
-			   precise semantics of this function */
-      break;
-    }
     case is_instruction_expression:
     {
       continued = TRUE; /* FI: interprocedural exit possible:-( */

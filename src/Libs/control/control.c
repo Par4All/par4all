@@ -466,12 +466,9 @@ bool controlize(
       controlized = controlize_forloop(st, instruction_forloop(i),
 				       pred, succ, c_res, used_labels);
       break;
-    case is_instruction_return:
-      controlized =  TRUE;
-      break;
     case is_instruction_expression:
       /* PJ: controlize_call() controlize any "nice" statement */
-      controlized = controlize_call(st, pred, succ, c_res);
+      controlized = return_instruction_p(i) || controlize_call(st, pred, succ, c_res);
 
       break;
     default:
