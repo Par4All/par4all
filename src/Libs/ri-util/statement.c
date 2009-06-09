@@ -2374,6 +2374,7 @@ list statement_to_called_user_entities(statement s)
 /* Return first reference found */
 static reference first_reference_to_v = reference_undefined;
 static entity variable_searched = entity_undefined;
+
 static bool first_reference_to_v_p(reference r)
 {
   bool result= TRUE;
@@ -2400,6 +2401,64 @@ reference find_reference_to_variable(statement s, entity v)
   first_reference_to_v = reference_undefined;
   variable_searched = entity_undefined;
   return r;
+}
+
+static int reference_count = -1;
+
+/* Count static references */
+static bool count_static_references_to_v_p(reference r)
+{
+  bool result= TRUE;
+    entity rv = reference_variable(r);
+    if (rv == variable_searched) {
+      reference_count++;
+    }
+  return result;
+}
+
+int count_static_references_to_variable(statement s, entity v) 
+{
+  reference_count = 0;
+  variable_searched = v;
+  gen_recurse(s, reference_domain, count_static_references_to_v_p, gen_null);
+  variable_searched = entity_undefined;
+  return reference_count;
+}
+
+/* Estimate count of dynamic references */
+static int    loop_depth;
+
+static bool count_references_to_v_p(reference r)
+{
+  bool result= TRUE;
+    entity rv = reference_variable(r);
+    if (rv == variable_searched) {
+      /* 10: arbitrary value for references nested in at least one loop */
+      reference_count += (loop_depth > 0 ? 10 : 1 );
+    }
+  return result;
+}
+
+static bool count_loop_in(loop __attribute__ ((unused)) l)
+{
+  loop_depth++;
+  return TRUE;
+}
+
+static void count_loop_out(loop __attribute__ ((unused)) l)
+{
+  loop_depth--;
+}
+
+int count_references_to_variable(statement s, entity v)
+{
+  reference_count = 0;
+  loop_depth = 0;
+  variable_searched = v;
+  gen_multi_recurse(s, loop_domain, count_loop_in, count_loop_out,
+		    reference_domain, count_references_to_v_p, gen_null, NULL);
+  variable_searched = entity_undefined;
+  return reference_count;
 }
 
 

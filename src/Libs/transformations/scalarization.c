@@ -287,9 +287,6 @@ static bool loop_scalarization(loop l)
   list corl = effects_effects(coe);
   list crwl = effects_effects(crwe);
 
-  // Accumulate new index in "domain" basis
-  loop_indices_b = base_add_variable(loop_indices_b, (Variable) i);
-
   ifdebug(1) {
     pips_debug(1, "Entering function...\n");
     pips_debug(1, "Entering level-%d loop, index=%s\n", base_dimension(loop_indices_b), entity_name(i));
@@ -309,23 +306,29 @@ static bool loop_scalarization(loop l)
     entity pv  = effect_variable(pr);
     entity iv  = (entity) gen_find(pv,  irl, (bool (*)())gen_eq, car_effect_to_variable);
     entity ov  = (entity) gen_find(pv,  orl, (bool (*)())gen_eq, car_effect_to_variable);
-    entity cov = (entity) gen_find(pv, corl, (bool (*)())gen_eq, car_effect_to_variable);
+    //entity cov = (entity) gen_find(pv, corl, (bool (*)())gen_eq, car_effect_to_variable);
 
     descriptor d = effect_descriptor(pr);    
-    action a = effect_action(pr);
+    //action a = effect_action(pr);
 
-    if ( action_write_p(a) &&
+    if ( /* action_write_p(a) && */
 	 descriptor_convex_p(d) &&
-	 !entity_is_argument_p(pv, scalarized_variables) && /* <- comment this for the demo */
-	 // No test on not-yet-implemented COPY IN
-	 entity_undefined_p(iv)     // pv could maybe be scalarized because it's not in an in region
+	 !entity_is_argument_p(pv, scalarized_variables)
 	 ) {
 	
       Psysteme sc = descriptor_convex(d);
       int nd = type_depth(entity_type(pv));
 
+      // Number of occurrences
+      int no = count_references_to_variable(s, pv);
+
+      bool read_pv    = effects_read_variable_p(crwl, pv);
+      bool written_pv = effects_write_variable_p(crwl, pv);
+      bool read_and_written_pv = read_pv && written_pv;
+
+
       //if (!entity_scalar_p(pv))
-      if (nd > 0) {
+      if (nd > 0 && (no > 2 || (no > 1 && !read_and_written_pv))) {
 
 	Pbase phi_b = make_phi_base(1, nd);
 	Pbase d_phi_b = BASE_NULLE;
@@ -365,6 +368,7 @@ static bool loop_scalarization(loop l)
 	  
 	  // Substitute all references to pv with references to new variable	  
 	  statement_substitute_scalarized_array_references(s, pv, sv);
+
 	  //if (!entity_undefined_p(cov)) {
 	  if (!entity_undefined_p(ov)) {
 	    // Generate copy-out code
@@ -374,6 +378,18 @@ static bool loop_scalarization(loop l)
 	  else {
 	    //free_reference(pvr);
 	  }
+
+	  if (!entity_undefined_p(iv)) {
+	    // Generate copy-in code
+	    statement ci_s =
+	      make_assign_statement(entity_to_expression(sv),
+				    reference_to_expression(copy_reference(pvr)));
+	    insert_a_statement(s, ci_s);
+	  }
+	  else {
+	    //free_reference(pvr);
+	  }
+
 	}
 	base_rm(phi_b);
 	base_rm(d_phi_b);
@@ -391,6 +407,17 @@ static bool statement_in(statement ls)
   bool result = TRUE;
   if (statement_loop_p(ls)) {
     loop l = statement_loop(ls);
+
+    /* Insert a marker to keep track of the privatized variables
+       inside loop l, lest they are privatized a second time in an inner
+       loop.
+    */
+    entity i = loop_index(l);    
+    scalarized_variables = arguments_add_entity(scalarized_variables, i);
+
+    // Accumulate new index in "domain" basis
+    loop_indices_b = base_add_variable(loop_indices_b, (Variable) i);
+
     result = loop_scalarization(l);
   }
   return result;
@@ -403,9 +430,30 @@ static void statement_out(statement s)
   if (statement_loop_p(s)) {
     loop l = statement_loop(s);
     entity i = loop_index(l);
+    list nl = NIL;
+
     ifdebug(1) {
-      pips_debug(1, "Exiting loop with index %s, size=%d\n", entity_name(i), base_dimension(loop_indices_b));
+      pips_debug( 1, "Exiting loop with index %s, size=%d\n",
+		  entity_name(i), base_dimension(loop_indices_b));
     }
+
+    /* Remove variables privatized in the current look, so that
+       successive loops don't interfere with each other.
+    */
+    
+    for (list el=scalarized_variables; !ENDP(el); POP(el)) {
+      entity e = ENTITY(CAR(el));
+      if (e == i) {
+	break;
+      }
+      else {
+	nl = CONS(ENTITY, e, nl);
+      }
+    }
+    gen_free_list(scalarized_variables);
+    scalarized_variables = gen_nreverse(nl);
+
+    //
     loop_indices_b = base_remove_variable(loop_indices_b, (Variable) i);
 
   }

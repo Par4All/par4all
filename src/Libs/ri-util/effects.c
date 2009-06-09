@@ -606,3 +606,31 @@ string action_to_string(action ac)
 {
   return action_read_p(ac)? "read" : "write";
 }
+
+bool effects_write_variable_p(list el, entity v)
+{
+  bool result = FALSE;
+  FOREACH(EFFECT, e, el) {
+    action a  = effect_action(e);
+    entity ev = effect_entity(e);
+    if (action_write_p(a) && ev == v) {
+      result = TRUE;
+      break;
+    }
+  }
+  return result;
+}
+
+bool effects_read_variable_p(list el, entity v)
+{
+  bool result = FALSE;
+  FOREACH(EFFECT, e, el) {
+    action a  = effect_action(e);
+    entity ev = effect_entity(e);
+    if (action_read_p(a) && ev == v) {
+      result = TRUE;
+      break;
+    }
+  }
+  return result;
+}

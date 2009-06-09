@@ -450,7 +450,7 @@ int i;
 /* functions for effects */
 entity effect_entity(effect e)
 {
-  return(reference_variable(effect_reference(e)));
+  return(reference_variable(effect_any_reference(e)));
 }
 
 /* functions for references */
