@@ -1,0 +1,13 @@
+int test(int d)
+{
+   int c;
+   c = d+3*5;
+   return d+d*d;
+}
+int test(int d)
+{
+   int c;
+   c = muladd(3, 5, d);
+   return muladd(d, d, d);
+}
+
