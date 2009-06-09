@@ -23,8 +23,7 @@
 #ifndef newgen_map_included
 #define newgen_map_included
 
-/* $Id$
- *
+/*
  * These are the functions defined in the Newgen map library. 
  */
 
