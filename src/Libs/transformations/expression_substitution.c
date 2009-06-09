@@ -42,6 +42,10 @@
 static expression pattern = expression_undefined;
 static string pattern_module_name = string_undefined;
 
+/* retrieves the expression used as a pattern based on
+ * the one - statement function given in a property
+ * and sets static variables accordingly
+ */
 static
 bool set_pattern()
 {
@@ -51,6 +55,7 @@ bool set_pattern()
 
         statement s = (statement) db_get_memory_resource(DBR_CODE, pattern_module_name, TRUE);
         instruction i = statement_instruction(s);
+        /* check the two way of encoding returns */
         if( instruction_return_p(i) )
         {
             pattern = instruction_return(i);
@@ -73,10 +78,11 @@ bool set_pattern()
 }
 
 static 
-void expression_similar_to_pattern(expression e)
+void replace_expression_similar_to_pattern(expression e)
 {
-    hash_table symbols;
-    if(expression_similar_get_context_p(e,pattern,&symbols))
+    hash_table symbols; // contains the symbols gathered during the matching
+    // match e against pattern and stocks symbols in hash_table
+    if(expression_similar_get_context_p(e,pattern,&symbols)) 
     {
         entity pattern_entity = global_name_to_entity(TOP_LEVEL_MODULE_NAME,pattern_module_name);
         expression_normalized(e) = normalized_undefined;
@@ -108,6 +114,8 @@ void expression_similar_to_pattern(expression e)
     }
 }
 
+/* simple pass that performs substitution of expression by module call
+ */
 bool expression_substitution(string module_name)
 {
     /* prelude */
@@ -122,7 +130,7 @@ bool expression_substitution(string module_name)
             get_current_module_statement(),
             expression_domain,
             gen_true,
-            &expression_similar_to_pattern
+            &replace_expression_similar_to_pattern
         );
     }
 
