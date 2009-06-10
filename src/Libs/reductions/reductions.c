@@ -214,7 +214,7 @@ list_of_compatible_reductions(reductions rs)
     },
 	le);
     gen_free_list(le);
-   
+
     return lnr;
 }
 
@@ -379,8 +379,6 @@ bool proper_reductions(string module_name)
 
     debug_on("REDUCTIONS_DEBUG_LEVEL");
     pips_debug(1, "considering module %s\n", module_name);
-
-    pips_user_warning("being implemented, keep cool...\n");
 
     init_proper_reductions();
     set_generic_effects_as_needed();
@@ -567,8 +565,6 @@ bool cumulated_reductions(string module_name)
     debug_on("REDUCTIONS_DEBUG_LEVEL");
     pips_debug(1, "considering module %s\n", module_name);
 
-    pips_user_warning("being implemented, keep cool\n");
-
     init_cumulated_reductions();
     set_generic_effects_as_needed();
 
@@ -600,7 +596,7 @@ bool cumulated_reductions(string module_name)
     reset_current_module_entity();
     reset_current_module_statement();
     generic_effects_reset_all_methods();
-   
+
     debug_off();
     return TRUE;
 }

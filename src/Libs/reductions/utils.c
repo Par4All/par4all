@@ -424,8 +424,12 @@ function_reduction_operator_p(
       OKAY(is_reduction_operator_bitwise_or, TRUE);
     else if (ENTITY_BITWISE_XOR_P(f))
       OKAY(is_reduction_operator_bitwise_xor, TRUE);
+    else if (ENTITY_EQUIV_P(f))
+      OKAY(is_reduction_operator_eqv, TRUE);
+    else if (ENTITY_NON_EQUIV_P(f))
+      OKAY(is_reduction_operator_neqv, TRUE);
     else
-	return FALSE;
+      return FALSE;
 }
 
 /* returns the possible operator of expression e if it is a reduction,
@@ -464,13 +468,15 @@ static bool extract_reduction_update_operator (entity operator,
     OKAY(is_reduction_operator_sum, TRUE);
   else if (ENTITY_MULTIPLY_UPDATE_P (operator))
     OKAY(is_reduction_operator_prod, TRUE);
+  else if (ENTITY_DIVIDE_UPDATE_P (operator))
+    OKAY(is_reduction_operator_prod, TRUE);
   else if (ENTITY_BITWISE_OR_UPDATE_P (operator))
     OKAY (is_reduction_operator_bitwise_or, TRUE);
   else if (ENTITY_BITWISE_AND_UPDATE_P (operator))
     OKAY(is_reduction_operator_bitwise_and, TRUE);
   else if (ENTITY_BITWISE_XOR_UPDATE_P (operator))
     OKAY(is_reduction_operator_bitwise_xor, TRUE);
- 
+
   return FALSE;
 }
 
@@ -488,7 +494,7 @@ static bool extract_reduction_unary_update_operator (entity operator,
       ENTITY_PRE_INCREMENT_P(operator) ||
       ENTITY_PRE_DECREMENT_P(operator))
     OKAY_WO_COMM (is_reduction_operator_sum);
- 
+
   return FALSE;
 }
 
@@ -520,12 +526,10 @@ reduction_function_compatible_p(
  * - refererence looked for fsr_ref,
  * - reduction operator tag fsr_op,
  * - returned reference fsr_found,
- * - boolean fsr_okay.
  */
 static reference fsr_ref;
 static reference fsr_found;
 static tag fsr_op;
-static bool fsr_okay;
 
 static bool fsr_reference_flt(reference r)
 {
@@ -559,11 +563,6 @@ static bool fsr_call_flt(call c)
       list /* of expression */ le = call_arguments(c);
       pips_assert("length is two", gen_length(le)==2);
       gen_recurse_stop(EXPRESSION(CAR(CDR(le))));
-
-      // check for integer division which is considered as non reductable
-      if (basic_int_p(entity_basic(reference_variable(fsr_ref))) &&
-	  (fsr_op==is_reduction_operator_prod))
-	fsr_okay = FALSE;
     }
 
     return TRUE;
@@ -580,15 +579,14 @@ equal_reference_in_expression_p(
     fsr_ref = r;
     fsr_op  = rop;
     fsr_found = NULL;
-    fsr_okay = TRUE; /* no int / */
 
     gen_multi_recurse(e,
 		      call_domain, fsr_call_flt, gen_null,
 		      reference_domain, fsr_reference_flt, gen_null,
 		      NULL);
-   
+
     *pfound = fsr_found;
-    return ((red_up_op || (fsr_found != NULL)) && fsr_okay);
+    return (red_up_op || (fsr_found != NULL));
 }
 
 /******************************************************** NO OTHER EFFECTS */

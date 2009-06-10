@@ -83,6 +83,8 @@ string reduction_operator_tag_name(tag t)
     case is_reduction_operator_bitwise_or:  return "bitwise_or";
     case is_reduction_operator_bitwise_xor: return "bitwise_xor";
     case is_reduction_operator_bitwise_and: return "bitwise_and";
+    case is_reduction_operator_eqv:         return "eqv";
+    case is_reduction_operator_neqv:        return "neqv";
     default: pips_internal_error("unexpected reduction operator tag!");
     }
 
