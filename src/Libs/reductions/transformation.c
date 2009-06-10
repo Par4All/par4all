@@ -21,9 +21,7 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
-/* $RCSfile: transformation.c,v $ (version $Revision$)
- * $Date: 1996/06/14 16:25:01 $, 
- *
+/*
  * code transformationa for reductions.
  *
  * FC, June 1996.
@@ -42,5 +40,5 @@ bool loop_reductions(string module)
     return TRUE;
 }
 
-/* end of $RCSfile: transformation.c,v $
+/* end of it
  */

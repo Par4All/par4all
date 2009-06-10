@@ -54,6 +54,6 @@ cat <<EOF
 };
 EOF
 
-# end of $RCSfile: make-builder-map,v $
+# end of it
 #
 

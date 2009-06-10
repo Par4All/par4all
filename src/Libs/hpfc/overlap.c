@@ -23,9 +23,6 @@
 */
 /* Overlap Management Module for HPFC
  * Fabien Coelho, August 1993
- *
- * $RCSfile: overlap.c,v $ ($Date: 1996/12/26 10:49:45 $, )
- * version $Revision$
  */
 
 #include "defines-local.h"

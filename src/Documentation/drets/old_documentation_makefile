@@ -1,8 +1,7 @@
+# $Id$
+#
 # PROJET PIPS: EXPLOITATION DE LA DOCUMENTATION
 # ---------------------------------------------
-# $RCSfile: old_documentation_makefile,v $ ($Date: 1996/08/22 22:48:14 $, )
-# version $Revision$
-# got on %D%, %T%
 #
 # DEUX OBJECTIFS:
 # - Extraction de fichiers headers et de fichiers de regles a partir de

@@ -86,5 +86,3 @@ key="${NAME}.`hostname`.`whoami`.`date +"%H.%M.%S.%j.%y"`"
   echo "! end of file $filename"
   echo "!"
 } > $init
-
-# end of $RCSfile: hpfc_generate_init,v $

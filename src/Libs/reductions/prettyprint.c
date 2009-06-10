@@ -21,9 +21,7 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
-/* $RCSfile: prettyprint.c,v $ (version $Revision$)
- * $Date: 1997/12/10 14:25:25 $,
- *
+/*
  * (pretty)print of reductions.
  *
  * FC, June 1996.
@@ -257,5 +255,5 @@ bool print_code_cumulated_reductions(string module_name)
 				CUMU_SUFFIX);
 }
 
-/* end of $RCSfile: prettyprint.c,v $
+/* end of it
  */

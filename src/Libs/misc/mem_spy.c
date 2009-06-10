@@ -23,8 +23,6 @@
 */
 /* MEM_SPY : Package to track memory usage.
  * Beatrice Creusillet - August 1995 
- * $RCSfile: mem_spy.c,v $ (version $Revision$)
- * $Date: 1997/07/18 12:03:19 $, .
  */
 /* Usage:
  *

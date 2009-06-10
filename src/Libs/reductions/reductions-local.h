@@ -21,9 +21,6 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
-/* $RCSfile: reductions-local.h,v $ (version $Revision$)
- * $Date: 1996/06/22 10:32:12 $, 
- */
 /* shorthands for REDUCTION:
  */
 #define reduction_variable(r) reference_variable(reduction_reference(r))
@@ -42,5 +39,5 @@
   ifdebug(level){pips_debug(level, msg); \
                  gen_map(print_reduction, reductions_list(reds));}
 
-/* end of $RCSfile: reductions-local.h,v $
+/* end of it
  */

@@ -25,8 +25,6 @@
   *
   * Higher level functions
   *
-  * File: $RCSfile: instruction_to_wp65_code.c,v $
-  *
   * PUMA, ESPRIT contract 2701
   *
   * Francois Irigoin, Corinne Ancourt

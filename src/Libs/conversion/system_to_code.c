@@ -24,10 +24,6 @@
 /*
  * HPFC module by Fabien COELHO,
  *    moved to conversion on 15 May 94
- *
- * SCCS stuff:
- * $RCSfile: system_to_code.c,v $ version $Revision$, 
- * ($Date: 1998/04/14 19:58:59 $, ) 
  */
 
 /* Standard includes

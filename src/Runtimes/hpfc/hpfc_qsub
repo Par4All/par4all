@@ -41,5 +41,3 @@ cat <<-EOF
 	${1}_main -npes ${npes} 2> run.err > run.out
 EOF
 
-# end of $RCSfile: hpfc_qsub,v $
-#

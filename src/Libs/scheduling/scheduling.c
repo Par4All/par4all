@@ -21,10 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
-/* 	$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/scheduling/RCS/scheduling.c,v 1.15 2003/08/18 09:43:21 coelho Exp $ \n Copyright (c) École des Mines de Paris Proprietary	 */
 
 #ifndef lint
-char vcid_scheduling_scheduling[] = "$Header: /home/data/tmp/PIPS/pips_data/trunk/src/Libs/scheduling/RCS/scheduling.c,v 1.15 2003/08/18 09:43:21 coelho Exp $ \n Copyright (c) École des Mines de Paris Proprietary";
+char vcid_scheduling_scheduling[] = "$Id$";
 #endif /* lint */
 
 #include <stdlib.h>

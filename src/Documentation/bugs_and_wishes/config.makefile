@@ -1,5 +1,4 @@
-# $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/08/21 13:12:55 $, 
+# $Id$
 
 ETEX = 	pips_bugs.tex
 
@@ -17,6 +16,3 @@ ps: $(PS)
 clean: local-clean
 local-clean:
 	$(RM) $(DVI) $(PS)
-
-# end of $RCSfile: config.makefile,v $
-#

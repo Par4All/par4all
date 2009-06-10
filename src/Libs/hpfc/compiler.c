@@ -781,5 +781,5 @@ hpf_compiler(
     }
 }
 
-/*   That is all for $RCSfile: compiler.c,v $
+/*   That is all
  */

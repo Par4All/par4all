@@ -1,10 +1,8 @@
+! $Id$
+!
 ! testing Xpomp display facilities in Fortran 77 / HPF
 !
 ! (c) Ronan.Keryell@cri.ensmp.fr 1996
-!
-! $RCSfile: fractal.f,v $ (version $Revision$)
-! $Date: 1996/10/25 21:29:48 $, 
-!
 !
       program fractal
 
@@ -151,5 +149,5 @@
  20   continue
       end
 
-! end of $RCSfile: fractal.f,v $
+! end of it
 

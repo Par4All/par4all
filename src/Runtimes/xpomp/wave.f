@@ -1,10 +1,9 @@
+! $Id$
+!
 ! Wave propagation in HPF with xpomp
 !
 ! Ronan KERYELL (POMP C version) and 
 ! Fabien COELHO (HPF version)
-!
-! $RCSfile: wave.f,v $ (version $Revision$)
-! $Date: 1996/09/07 16:53:39 $, 
 !
 
 !
@@ -261,5 +260,5 @@
 
       end
 
-! end of $RCSfile: wave.f,v $
+! end of it
 

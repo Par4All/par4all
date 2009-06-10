@@ -33,5 +33,5 @@
       end if
       end
 !
-! end of $RCSfile: hpfc_main.f,v $
+! end of it
 !

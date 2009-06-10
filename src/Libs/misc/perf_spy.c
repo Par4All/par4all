@@ -21,9 +21,7 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
-/* $RCSfile: perf_spy.c,v $ (version $Revision$)
- * $Date: 1996/07/25 15:08:02 $, .
- *
+/*
  * functions to spy performances. 
  * I agree, -pg does a better job, but for page fault and related issues...
  */

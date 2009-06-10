@@ -28,5 +28,5 @@
       call host
       end
 !
-! end of $RCSfile: hpfc_main_host.f,v $
+! end of it
 !

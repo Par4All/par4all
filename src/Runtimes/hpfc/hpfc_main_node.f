@@ -28,5 +28,5 @@
       call node
       end
 !
-! end of $RCSfile: hpfc_main_node.f,v $
+! end of it
 !

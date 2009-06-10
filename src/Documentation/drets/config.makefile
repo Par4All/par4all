@@ -1,7 +1,4 @@
-#
-# $RCSfile: config.makefile,v $ (version $Revision$)
-# $Date: 1996/10/31 10:38:45 $, 
-#
+# $Id$
 
 SOURCES=list_of_reports \
 	old_documentation_makefile \
@@ -51,5 +48,5 @@ local-clean:
 	$(RM) -r $(INSTALL_DOC) $(INSTALL_HTM) \
 		$(INSTALL_DOC:.ps=.html) $(INSTALL_DOC:.ps=.dvi)
 
-# end of $RCSfile: config.makefile,v $
+# end of it
 #

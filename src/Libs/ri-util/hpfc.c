@@ -21,9 +21,7 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
-/* $RCSfile: hpfc.c,v $ (version $Revision$)
- * $Date: 1998/04/14 15:20:42 $, 
- *
+/*
  * functions to test hpfc-related special entities. needed by syntax.
  * moved here from hpfc to break a cyclic dependence hpfc -> syntax.
  * done on 22/09/95 by FC. Hpfc and sytax *must* be independent.

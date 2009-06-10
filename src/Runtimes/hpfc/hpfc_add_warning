@@ -55,6 +55,3 @@ rm -f $tmp
 
 rm -f $name
 mv $tmp $name
-
-# end of $RCSfile: hpfc_add_warning,v $
-#

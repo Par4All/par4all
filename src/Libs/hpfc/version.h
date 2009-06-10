@@ -22,11 +22,6 @@
 
 */
 /* This file is part of HPFC within PIPS.
- *
- * $RCSfile: version.h,v $ version $Revision$
- * $Date: 1996/03/20 19:41:03 $, 
- *
- * (c) Fabien COELHO
  */
 
 /* Rough history of HPFC versions:

@@ -21,9 +21,7 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
-/* $RCSfile: call.c,v $ (version $Revision$)
- * $Date: 1996/12/18 09:04:16 $, 
- *
+/*
  * Fabien COELHO
  */
 
@@ -126,5 +124,5 @@ translate_reductions(
 }
    
 
-/* end of $RCSfile: call.c,v $
+/* end of it
  */

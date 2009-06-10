@@ -21,8 +21,7 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
-! $RCSfile: wave_parameters.h,v $ (version $Revision$)
-! $Date: 1996/09/03 23:19:57 $, 
+!
 ! size parameters for a simple wave propagation
 !
 
@@ -71,4 +70,4 @@
 !hpf$ processors p(2,2)
 !hpf$ distribute t(block,block) onto p
 
-! end of $RCSfile: wave_parameters.h,v $
+! end of it

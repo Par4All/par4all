@@ -22,8 +22,6 @@
 
 */
 /* Package generation (for the hyperplane transformation?)
- * $RCSfile: look_for_nested_loops.c,v $ version $Revision$, 
- * ($Date: 1999/07/05 15:30:42 $, ) 
  */
 
 #include <stdio.h>

@@ -21,10 +21,6 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
-/*
- * $RCSfile: xv_transform.c,v $ (version $Revision: 12279 $)
- * $Date: 1998/04/16 14:45:33 $,
- */
 
 #include <stdio.h>
 

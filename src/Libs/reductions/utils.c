@@ -21,9 +21,7 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
-/* $RCSfile: utils.c,v $ (version $Revision$)
- * $Date: 1997/07/21 12:40:34 $,
- *
+/*
  * utilities for reductions.
  *
  * FC, June 1996.
