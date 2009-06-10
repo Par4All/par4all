@@ -134,7 +134,7 @@ Commencement du code
       include "hpfc_commons.h"
       include "hpfc_includes.h"
       include "HPFTEST03_parameters.h"
-      INTEGER I_0,I
+      INTEGER I_0, I
       REAL*4 A1(1:6)
       CALL HPFC INIT NODE
 C     
