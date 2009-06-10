@@ -30,7 +30,7 @@
 #include <math.h>
 
 #include "genC.h"
-#include "genspec.h"
+#include "gram.h"
 
 #ifdef FLEX_SCANNER
 #undef yywrap
