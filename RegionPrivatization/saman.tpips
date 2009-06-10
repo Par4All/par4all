@@ -25,8 +25,8 @@ activate PRINT_CODE_OUT_REGIONS
 echo saman out regions
 display PRINTED_FILE
 
-activate ARRAY_SECTION_PRIVATIZER 
-activate PRINT_CODE_PRIVATIZED_REGIONS 
+activate ARRAY_SECTION_PRIVATIZER
+activate PRINT_CODE_PRIVATIZED_REGIONS
 echo saman privatized regions
 display PRINTED_FILE
 

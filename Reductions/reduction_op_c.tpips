@@ -1,6 +1,6 @@
 #
-delete reduction_op
-create reduction_op reduction_op.c
+delete reduction_op_c
+create reduction_op_c reduction_op.c
 
 #activate some debug mode
 #setenv TEXT_DEBUG_LEVEL 9
@@ -31,6 +31,6 @@ activate PRINT_CODE_CUMULATED_REDUCTIONS
 display PRINTED_FILE(main)
 
 close
-delete reduction_op
+delete reduction_op_c
 quit
 # EOF

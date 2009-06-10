@@ -5,128 +5,83 @@ int main()
    float y = 10.0;
    float x = 1.0;
 //  loop sum[b],
-   
-   // b should be reduced here
+
    for(i = 0; i <= 99; i += 1)
 //  call sum[b],
       b = b+i;
 //  loop prod[b],
-   
-   // b should be reduced here
    for(i = 0; i <= 99; i += 1)
 //  call prod[b],
       b = b*i;
-   
-   // b should not be reduced here
-   // because "/" on int is not accepted
+//  loop sum[b],
    for(i = 0; i <= 99; i += 1)
+//  call sum[b],
+      b = b-i;
+//  loop prod[b],
+   for(i = 0; i <= 99; i += 1)
+//  call prod[b],
       b = b/i;
 //  loop bitwise_and[b],
-   
-   // b should be reduced here
    for(i = 0; i <= 99; i += 1)
 //  call bitwise_and[b],
       b = b&i;
 //  loop bitwise_xor[b],
-   
-   // b should be reduced here
    for(i = 0; i <= 99; i += 1)
 //  call bitwise_xor[b],
       b = b^i;
 //  loop bitwise_or[b],
-   
-   // b should be reduced here
    for(i = 0; i <= 99; i += 1)
 //  call bitwise_or[b],
       b = b|i;
 //  loop sum[b],
-   
-   // b should be reduced here
    for(i = 0; i <= 99; i += 1)
 //  call sum[b],
       b += i;
 //  loop prod[b],
-   
-   // b should be reduced here
    for(i = 0; i <= 99; i += 1)
 //  call prod[b],
       b *= i;
-   
-   // b should not be reduced here
-   // because "/" on int is not accepted
-   for(i = 0; i <= 99; i += 1)
-      b /= i;
 //  loop sum[b],
-   
-   // b should be reduced here
    for(i = 0; i <= 99; i += 1)
 //  call sum[b],
       b -= i;
+//  loop prod[b],
+   for(i = 0; i <= 99; i += 1)
+//  call prod[b],
+      b /= i;
 //  loop bitwise_and[b],
-   
-   // b should be reduced here
    for(i = 0; i <= 99; i += 1)
 //  call bitwise_and[b],
       b &= i;
-//  loop bitwise_or[b],
-   
-   // b should be reduced here
-   for(i = 0; i <= 99; i += 1)
-//  call bitwise_or[b],
-      b |= i;
 //  loop bitwise_xor[b],
-   
-   // b should be reduced here
    for(i = 0; i <= 99; i += 1)
 //  call bitwise_xor[b],
       b ^= i;
-//  loop prod[y],
-   
-   // b should be reduced here
-   // because "/" on float is accepted
+//  loop bitwise_or[b],
    for(i = 0; i <= 99; i += 1)
-//  call prod[y],
-      y = y/x;
-//  loop prod[y],
-   
-   // b should be reduced here
-   // because "/" on float is accepted
-   for(i = 0; i <= 99; i += 1)
-//  call prod[y],
-      y = y/x;
+//  call bitwise_or[b],
+      b |= i;
 //  loop sum[b],
-   
-   // b should be reduced here
    for(i = 0; i <= 99; i += 1)
 //  call sum[b],
       b++;
 //  loop sum[b],
-   
-   // b should be reduced here
    for(i = 0; i <= 99; i += 1)
 //  call sum[b],
       b--;
 //  loop sum[b],
-   
-   // b should be reduced here
    for(i = 0; i <= 99; i += 1)
 //  call sum[b],
       ++b;
 //  loop sum[b],
-   
-   // b should be reduced here
    for(i = 0; i <= 99; i += 1)
 //  call sum[b],
       --b;
 //  loop and[b],
-   
-   // b should be reduced here
    for(i = 0; i <= 99; i += 1)
 //  call and[b],
       b = b&&i==i;
 //  loop or[b],
-   
-   // flg should be reduced here
    for(i = 0; i <= 99; i += 1)
 //  call or[b],
       b = b||i==i;

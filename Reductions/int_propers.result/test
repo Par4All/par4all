@@ -33,9 +33,11 @@ C  call sum[S],
       S = S+3-J                                                         0020
 C  call sum[S],
       S = L+K+S+J                                                       0021
+C  call prod[P],
 !
       P = 3*I*P/J                                                       0023
       P = 2*I/P                                                         0024
+C  call prod[P],
       P = P/L                                                           0025
       S = K-S                                                           0026
       END
@@ -74,9 +76,11 @@ C  call sum[S],
       S = S+3-J                                                         0020
 C  call sum[S],
       S = L+K+S+J                                                       0021
+C  call prod[P],
 !
       P = 3*I*P/J                                                       0023
       P = 2*I/P                                                         0024
+C  call prod[P],
       P = P/L                                                           0025
       S = K-S                                                           0026
       END
