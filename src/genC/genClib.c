@@ -34,7 +34,7 @@
 #include "genC.h"
 #include "newgen_include.h"
 #include "newgen_hash.h"
-#include "read.h"
+#include "genread.h"
 
 /* starting the scanner.
  */

@@ -33,7 +33,7 @@
 
 #include "genC.h"
 #include "newgen_include.h"
-#include "read.h"
+#include "genread.h"
 
 #ifdef FLEX_SCANNER
 #undef yywrap
