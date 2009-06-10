@@ -315,4 +315,4 @@ void yyreset_lex(void)
 #endif
 }
 
-/* end of it
+/* end of it */
