@@ -289,8 +289,6 @@ void do_loop_unroll(statement loop_statement, int rate, void (*statement_post_pr
         StatementReplaceReference(body,
                 make_reference(ind,NIL),
                 expr);
-        if( statement_post_processor)
-            statement_post_processor(body);
         free_expression(expr);
 
         label_entity = make_new_label(module_name);
@@ -371,6 +369,8 @@ void do_loop_unroll(statement loop_statement, int rate, void (*statement_post_pr
             ifdebug(9) {
                 pips_assert("loop_unroll", statement_consistent_p(transformed_stmt));
             }
+			if( statement_post_processor)
+				statement_post_processor(transformed_stmt);
 
 
             /* Add the transformated old loop body (transformed_stmt) at
