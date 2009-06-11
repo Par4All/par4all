@@ -26,7 +26,7 @@
 umask 0077
 
 [[ $(hostname -f) = 'hendaye.cri.ensmp.fr' ]] || {
-  echo "script must run on hendaye, but $(hostname) found" >&2
+  echo "script must run on hendaye.cri.ensmp.fr, but $(hostname -f) found" >&2
   exit 1
 }
 
