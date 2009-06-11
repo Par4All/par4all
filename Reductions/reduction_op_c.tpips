@@ -1,6 +1,6 @@
 #
 delete reduction_op_c
-create reduction_op_c reduction_op.c
+create reduction_op_c reduction_op_c.c
 
 #activate some debug mode
 #setenv TEXT_DEBUG_LEVEL 9
