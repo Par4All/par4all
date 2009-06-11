@@ -16,8 +16,3 @@
       common /sum/ s(10)
       s(i)=s(i)+j
       end
-!tps$ echo PROPER REDUCTIONS
-!tps$ activate PRINT_CODE_PROPER_REDUCTIONS
-!tps$ display PRINTED_FILE($ALL)
-!tps$ activate PRINT_CODE_CUMULATED_REDUCTIONS
-!tps$ display PRINTED_FILE($ALL)
