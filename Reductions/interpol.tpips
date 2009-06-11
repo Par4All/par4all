@@ -17,9 +17,9 @@ create interpol interpol.f
 
 echo PROPER REDUCTIONS
 activate PRINT_CODE_PROPER_REDUCTIONS
-display PRINTED_FILE($ALL)
+display PRINTED_FILE[%ALL]
 activate PRINT_CODE_CUMULATED_REDUCTIONS
-display PRINTED_FILE($ALL)
+display PRINTED_FILE[%ALL]
 
 close
 delete interpol
