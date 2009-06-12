@@ -4,8 +4,6 @@
 int main () {
   int b = 0;
   int i = 0;
-  float y = 10.0;
-  float x = 1.0;
 
   for (i=0; i < 100; i++) {
     b = b + i;

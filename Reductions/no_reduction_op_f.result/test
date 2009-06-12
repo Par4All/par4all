@@ -1,0 +1,9 @@
+! The goal of this test case is to check that all basic cases where
+! reduction is not possible are well detected by pips. None of the loops in
+! the programm should be reduced
+
+      PROGRAM PARALLEL
+      DO I = 1, N
+         S = 1-S
+      ENDDO
+      END
