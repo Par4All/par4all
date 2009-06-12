@@ -337,12 +337,11 @@ static bool pr_call_flt(call c)
 
     pips_debug(9, "considering call to %s\n", entity_name(call_function(c)));
 
-    if (call_proper_reduction_p(head, c, &red))
-
-	/* direct proper reduction
-	 */
-	reductions_list(reds) =
-	    CONS(REDUCTION, red, reductions_list(reds));
+    if (call_proper_reduction_p(head, c, &red)) {
+      // direct proper reduction
+      reductions_list(reds) =
+	CONS(REDUCTION, red, reductions_list(reds));
+    }
     else if (entity_module_p(call_function(c)))
     {
 	last_translated_module_call = c;
