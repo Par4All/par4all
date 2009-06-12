@@ -90,7 +90,7 @@ basic get_basic_from_array_ref(reference ref)
     if(!type_variable_p(t))
         return bas;
 
-    bas = variable_basic(type_variable(t));
+    bas = variable_basic(type_variable(ultimate_type(t)));
 
     gIndexCount = 0;
 

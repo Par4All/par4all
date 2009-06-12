@@ -273,49 +273,26 @@ entity sac_make_new_variable(entity module, basic b)
     return e;
 }
 
-/* This function recursively atomizes a call
- */
-static void simd_atomize_call(call c, statement cs)
+static
+void simd_do_atomize(expression ce, statement cs)
 {
-    statement stat ;
+	syntax s = expression_syntax(ce);
+	statement stat =statement_undefined;
 
-    // Each call argument is atomize if needed
-    FOREACH(EXPRESSION, ce,call_arguments(c))
-    {
-        syntax s = expression_syntax(ce);
+	// Atomize expression only if this is a call expression
+	if(syntax_call_p(s))
+	{
+		call cc = syntax_call(s);
 
-        // Atomize expression only if this is a call expression
-        if(syntax_call_p(s))
-        {
-            call cc = syntax_call(s);
-
-            // Atomize expression only if the call is not a constant
-            if(FUNC_TO_ATOMIZE_P(cc))
-            {
-                simd_atomize_call(cc, cs);
-
-                if( (stat = simd_atomize_this_expression(sac_make_new_variable, ce) ) )
-                {
-                    change_basic_if_needed(stat);
-                    simd_insert_statement(cs, stat);
-                }
-            }
-        }
-        /* SG: we may want to atomize array indexing
-         * that is a = b[i] + c -> d = b[i]; a = d+ c
-         * this is usefull for grouping array load / store in
-         * some particular case
-         */
-        else if( get_bool_property("SIMD_EXTRAVAGANT_ATOMIZER") && syntax_reference_p(s))
-        {
-            reference r = syntax_reference(s);
-            if( reference_variable(r) && !ENDP(reference_indices(r)) )
-            {
-                if( (stat = simd_atomize_this_expression(sac_make_new_variable, ce)) )
-                    simd_insert_statement(cs, stat);
-            }
-        }
-    }
+		// Atomize expression only if the call is not a constant
+		if(FUNC_TO_ATOMIZE_P(cc))
+		{
+			// If the current call is not an assign call,
+			// let's atomize the current argument
+			if( (stat = simd_atomize_this_expression(sac_make_new_variable, ce)) )
+				simd_insert_statement(cs, stat);
+		}
+	}
 }
 
 /* This function is called for each call statement and atomize it
@@ -328,31 +305,11 @@ static void atomize_call_statement(statement cs)
     // Initialize orginal_statement if this is the first argument
     orginal_statement=cs;
 
-    // For each call argument, the argument is atomized
-    // if needed
-    FOREACH(EXPRESSION, ce,call_arguments(c))
-    {
-        syntax s = expression_syntax(ce);
-
-        // Atomize expression only if this is a call expression
-        if(syntax_call_p(s))
-        {
-            call cc = syntax_call(s);
-
-            // Atomize expression only if the call is not a constant
-            if(FUNC_TO_ATOMIZE_P(cc))
-            {
-                simd_atomize_call(cc, cs);
-                // If the current call is not an assign call,
-                // let's atomize the current argument
-                if(!ENTITY_ASSIGN_P(call_function(c)) || get_bool_property("SIMD_EXTRAVAGANT_ATOMIZER") )
-                {
-                    if( (stat = simd_atomize_this_expression(sac_make_new_variable, ce)) )
-                        simd_insert_statement(cs, stat);
-                }
-            }
-        }
-    }
+    // For each call argument, the argument is atomized if needed
+	if( ENTITY_ASSIGN_P(call_function(c)) )
+		gen_context_recurse(EXPRESSION(CAR(CDR(call_arguments(c)))),cs,expression_domain,gen_true,simd_do_atomize);
+	else
+		gen_context_recurse(c,cs,expression_domain,gen_true,simd_do_atomize);
 }
 
 /* This function is called for all statements in the code
