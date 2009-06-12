@@ -71,10 +71,13 @@ typedef struct cons {
   }
 
 
-/* FOREACH, similar to MAP but more gdb/emacs/vim... friendly since it
-   remains line oriented
+/* FOREACH, similar to MAP but more gdb/emacs/vim...
+ * friendly since it remains line oriented.
+ *
+ * FOREACH(T, v, l) generates a "v_list" variable, so this name cannot
+ * be used in the same scope for another variable, and the same index
+ * name cannot be used in another FOREACH in the same scope either.
  */
-
 #if __STDC_VERSION__ >= 199901L
 /* We can use a declaration in the for() */
 #define FOREACH(_fe_CASTER, _fe_item, _fe_list)				\
@@ -84,6 +87,7 @@ typedef struct cons {
 	 (_fe_item = _fe_CASTER(CAR(_fe_item##_list) ));		\
        POP(_fe_item##_list))
 #else
+/* older C standard... */
 #define FOREACH(_fe_CASTER, _fe_item, _fe_list)				\
   _fe_CASTER##_TYPE _fe_item;						\
   list _fe_item##_list;							\
