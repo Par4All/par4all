@@ -2,8 +2,6 @@ int main()
 {
    int b = 0;
    int i = 0;
-   float y = 10.0;
-   float x = 1.0;
 //  loop sum[b],
 
    for(i = 0; i <= 99; i += 1)
