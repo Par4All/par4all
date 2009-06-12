@@ -34,7 +34,7 @@ bool loop_reductions(string module)
     debug_on("REDUCTIONS_DEBUG_LEVEL");
     pips_debug(1, "considering module %s\n", module);
 
-    pips_user_warning("not implemented yet\n");
+    pips_assert ("not implemented yet\n", FALSE);
 
     debug_off();
     return TRUE;

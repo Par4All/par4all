@@ -809,26 +809,25 @@ summary_effect_to_proper_effect(
       pips_internal_error("It is assumed that parameters are passed by reference\n");
     }
 
-    if (storage_formal_p(st))
-    {
-	/* find the corresponding argument and returns the reference */
-	effect res = (*effect_dup_func)(e);
-	int n = formal_offset(storage_formal(st));
-	expression nth = EXPRESSION(gen_nth(n-1, call_arguments(c)));
+    if (storage_formal_p(st)) {
+      pips_debug (9, "storage formal case\n");
+      /* find the corresponding argument and returns the reference */
+      effect res = (*effect_dup_func)(e);
+      int n = formal_offset(storage_formal(st));
+      expression nth = EXPRESSION(gen_nth(n-1, call_arguments(c)));
 
-	pips_assert("expression is a reference or read effect", 
-		    effect_read_p(e) || expression_reference_p(nth));
-	/* FI: a preference is forced here */
-	effect_reference(res) = expression_reference(nth);
+      pips_assert("expression is a reference or read effect", 
+		  effect_read_p(e) || expression_reference_p(nth));
+      /* FI: a preference is forced here */
+      effect_reference(res) = expression_reference(nth);
 
-	le = CONS(EFFECT, res, NIL);
+      le = CONS(EFFECT, res, NIL);
     }
-    else if (storage_ram_p(st))
-    {
-	list le;
-	le = global_effect_translation
-	    (e, call_function(c), get_current_module_entity());
-	/* le = proper_effects_contract(le); */
+    else if (storage_ram_p(st)) {
+      pips_debug (9, "storage ram case\n");
+      le = global_effect_translation (e,
+				      call_function(c),
+				      get_current_module_entity());
     }
     return le;
 }

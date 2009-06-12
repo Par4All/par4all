@@ -116,7 +116,6 @@ bool summary_reductions(string module_name)
 
     debug_on("REDUCTIONS_DEBUG_LEVEL");
     pips_debug(1, "considering module %s\n", module_name);
-    pips_user_warning("not implemented yet\n");
 
     set_generic_effects_as_needed();
     set_current_module_entity(local_name_to_top_level_entity(module_name));
