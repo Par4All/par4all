@@ -71,31 +71,47 @@ typedef struct cons {
   }
 
 
+
+/* Some CPP magics to get a line-number-dependent "unique" identifier: */
+#define UNIQUE_NAME_1(prefix, x)   prefix##x
+#define UNIQUE_NAME_2(prefix, x)   UNIQUE_NAME_1 (prefix, x)
+/* Should work if 2 FOREACH are not on the same line... */
+#define UNIQUE_NAME  UNIQUE_NAME_2 (iter_, __LINE__)
+
+
+#if __STDC_VERSION__ >= 199901L
 /* FOREACH, similar to MAP but more gdb/emacs/vim...
  * friendly since it remains line oriented.
  *
  * FOREACH(T, v, l) generates a "v_list" variable, so this name cannot
  * be used in the same scope for another variable, and the same index
  * name cannot be used in another FOREACH in the same scope either.
+ *
+ * We can use a declaration in the for()
  */
-#if __STDC_VERSION__ >= 199901L
-/* We can use a declaration in the for() */
-#define FOREACH(_fe_CASTER, _fe_item, _fe_list)				\
-  list _fe_item##_list = (_fe_list);					\
+#define FOREACH(_fe_CASTER, _fe_item, _fe_list) \
+  list UNIQUE_NAME = (_fe_list);		\
   for( _fe_CASTER##_TYPE _fe_item;					\
-       !ENDP(_fe_item##_list) &&					\
-	 (_fe_item = _fe_CASTER(CAR(_fe_item##_list) ));		\
-       POP(_fe_item##_list))
+       !ENDP(UNIQUE_NAME) && (_fe_item= _fe_CASTER(CAR(UNIQUE_NAME) ));	\
+       POP(UNIQUE_NAME))
 #else
-/* older C standard... */
+/* FOREACH, similar to MAP but more gdb/emacs/vim...
+ * friendly since it remains line oriented.
+ *
+ * FOREACH(T, v, l) generates a "v_list" variable, so this name cannot
+ * be used in the same scope for another variable, and the same index
+ * name cannot be used in another FOREACH in the same scope either.
+ *
+ * Older C standard...
+ */
 #define FOREACH(_fe_CASTER, _fe_item, _fe_list)				\
+  list UNIQUE_NAME;							\
   _fe_CASTER##_TYPE _fe_item;						\
-  list _fe_item##_list;							\
-  for( _fe_item##_list = (_fe_list);					\
-       !ENDP(_fe_item##_list) &&					\
-	 (_fe_item = _fe_CASTER(CAR(_fe_item##_list) ));		\
-       POP(_fe_item##_list))
+  for( UNIQUE_NAME= (_fe_list);						\
+       !ENDP(UNIQUE_NAME) && (_fe_item= _fe_CASTER(CAR(UNIQUE_NAME) ));	\
+       POP(UNIQUE_NAME))
 #endif
+
 
 /* Fonctions de list.c
  */
