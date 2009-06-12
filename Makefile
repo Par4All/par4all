@@ -1,5 +1,7 @@
 # $Id$
 
+default: clean
+
 # The option used by default for validating. Can be overridden by the
 # command line "make VOPT=..." or the environment variable:
 VOPT	= -v --archive --diff
