@@ -6,6 +6,12 @@ VOPT	= -v --archive --diff
 
 FIND	= find . -name '.svn' -type d -prune -o
 
+.PHONY: full-clean
+full-clean: clean
+	$(FIND) -name 'SUMMARY_Archive' -type d -print0 \
+	     -o -name 'RESULTS' -type d -print0 | \
+	  xargs -0 $(RM) -r
+
 .PHONY: clean
 clean:
 	$(MAKE) TARGET=. clean-target
@@ -15,8 +21,10 @@ TARGET	:= $(shell grep '^[a-zA-Z]' defaults)
 
 .PHONY: clean-target
 clean-target:
+	here=$(PWD) ; \
 	for d in $(TARGET) ; do \
 	  echo "### cleaning $$d" ; \
+	  cd $$d ; \
 	  $(FIND) -name '*~' -type f -print0 \
 	     -o -name 'core' -type f -print0 \
 	     -o -name 'a.out' -type f -print0 \
@@ -24,14 +32,16 @@ clean-target:
 	     -o -name '*.filtered' -type f -print0 \
 	     -o -name '*.o' -type f -print0 | xargs -0 $(RM) ; \
 	  $(FIND) -name '*.database' -type d -print0 \
+	     -o -name 'RESULTS' -type d -print0 \
 	     -o -name 'validation_results.*' -type d -print0 | \
 		xargs -0 $(RM) -r ; \
+	  cd $$here ; \
 	done
 	$(RM) properties.rc a.out core *.o
-	$(RM) -r RESULTS
 
 .PHONY: validate
 validate: clean-target
+	$(RM) -r RESULTS
 	PIPS_MORE=cat pips_validate $(VOPT) -V $(PWD) -O RESULTS $(TARGET)
 
 .PHONY: accept
@@ -57,7 +67,13 @@ private:
 
 # validate one sub directory
 validate-%: %
-	test -d $< && $(MAKE) TARGET=$< validate
+	# test -d $< && $(MAKE) TARGET=$< validate
+	[ -d $< ] && { \
+	  $(MAKE) TARGET=$< clean-target ; \
+	  cd $< ; \
+	  $(RM) -r RESULTS ; \
+	  PIPS_MORE=cat pips_validate $(VOPT) -V $(PWD)/$< -O RESULTS . ; \
+	}
 
 # special handling of private
 PRIV	= $(wildcard private/*)
