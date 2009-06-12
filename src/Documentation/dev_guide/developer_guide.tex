@@ -126,9 +126,9 @@ the reports about NewGen~\cite{Jouv:89,Jouv:90}. A good understanding of
 
 \section{Getting PIPS sources}
 
-The sources of NewGen, Linear and Pips are managed under subversion.  They
-are accessible from anywhere in the world by the http protocol at
-\url{http://svn.cri.ensmp.fr/pips.html}
+The sources of NewGen, Linear and Pips are managed under subversion
+(svn). They are accessible from anywhere in the world by the http
+protocol at \url{http://svn.cri.ensmp.fr/pips.html}
 
 \subsection{Directories overview}
 \label{sec:directories-overview}
@@ -334,7 +334,7 @@ directly in you \texttt{.emacs} with stuff like:
 \subsection{Developing PIPS under SVN}
 \label{sec:dev-svn}
 
-A basic understanding of svn operations and concepts such as
+A basic understanding of subversion operations and concepts such as
 \emph{repository, checkout, status, commit} are necessary to develop in
 PIPS.  See for instance the SVN book at
 \LINK{http://svnbook.red-bean.com/} and other resources on the
@@ -363,6 +363,18 @@ pips' trunk, you shoud develop in a branch of your own. To do so:
   For instance, a login \texttt{calvin} and some password may be attributed.
   Calvin will have his own development area under \texttt{branches/calvin}
   in the subversion repository.
+
+  The developer branch is private by default. It means that what you
+  do in the branch is your own affair, and no message is sent to the
+  world on commits. For interns, the default policy is to send a
+  message to the intern and the developer responsible for his/her
+  work.
+
+  For HPC-Project related accounts, branch commits are send to the
+  corresponding list.
+
+  \textbf{Please do commit your work at least once a day, even if it does not
+  work yet!}
 
 \item Extract your own PIPS with the setup script (\texttt{setup\_pips.sh})
   mentionned above.
@@ -608,6 +620,41 @@ sym-linked to \texttt{svn/pips/trunk/makes}. So if you want to modify the
 and commit it. It will be commited into the \texttt{svn/nlpmake/trunk}
 repository anyway.
 
+\subsection{The nomadic developer}
+\label{sec:nomadic}
+
+The SVN centralized development model assumes that you are connected
+to the repository. If you are stuck in a train between Paris
+and Brest (in the very far west), you may find it inconvenient not to
+be able to access the repository history and other details about
+previous commits.
+
+If so, consider using \texttt{git-svn} or \texttt{svk} to have full
+copy of your branch or of the trunk on your laptop. Then you can
+develop offline including branching and commits. You will be able
+to push back your changes once you get to civilized surroundings.
+
+Why not switch all this stuff to \texttt{git}, which is so
+\emph{cool}? There are several answers:
+\begin{description}
+\item[system] we already use subversion extensively at CRI for many
+  projects, which are backed-up regularly.
+\item[change management] subversion is hard enough, and learning a new
+  tool with a different model is a significant investment, which can
+  only be justified with a clear added value.
+  GIT is harder to understand and to learn than SVN.
+\item[backup] with GIT, there is no natural backup on commits, as they are
+  stored locally: you have to push your changes. This induces a greater
+  risk of losing developments.
+\item[development model] a centralized model helps with the development
+  coordination, with distributing mails on commits to revelant
+  recipients, and so on. It helps to access all developer branches.
+\item[nomadic] the nomadic developer special needs can be addressed by
+  other means (\emph{e.g.} git-svn) without necessarily impacting the
+  common infrastructure.
+\item[coordination] is easier in a centralized models, where source
+  divergence can be detected in one place, and possibly managed.
+\end{description}
 
 \section{Shell environment (sh, ksh, bash, csh, tcsh)}
 \label{sec:shell}
