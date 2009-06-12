@@ -56,7 +56,8 @@ summary_to_proper_reference(
       lref = CONS(REFERENCE, effect_reference(ef), lref);
     }
 
-    gen_full_free_list(lef);
+    gen_map(gen_free, lef);
+    gen_free_list(lef);
     return lref;
 }
 
