@@ -8,23 +8,30 @@ FIND	= find . -name '.svn' -type d -prune -o
 
 .PHONY: clean
 clean:
-	$(FIND) -name '*~' -type f -print0 \
-	     -o -name 'core' -type f -print0 \
-	     -o -name 'a.out' -type f -print0 \
-	     -o -name 'out' -type f -print0 \
-	     -o -name '*.filtered' -type f -print0 \
-	     -o -name '*.o' -type f -print0 | xargs -0 $(RM)
-	$(FIND) -name '*.database' -type d -print0 \
-	     -o -name 'validation_results.*' -type d -print0 | \
-		xargs -0 $(RM) -r
-	$(RM) properties.rc
-	$(RM) -r RESULTS
+	$(MAKE) TARGET=. clean-target
 
 # subdirectories to consider
 TARGET	:= $(shell grep '^[a-zA-Z]' defaults)
 
+.PHONY: clean-target
+clean-target:
+	for d in $(TARGET) ; do \
+	  echo "### cleaning $$d" ; \
+	  $(FIND) -name '*~' -type f -print0 \
+	     -o -name 'core' -type f -print0 \
+	     -o -name 'a.out' -type f -print0 \
+	     -o -name 'out' -type f -print0 \
+	     -o -name '*.filtered' -type f -print0 \
+	     -o -name '*.o' -type f -print0 | xargs -0 $(RM) ; \
+	  $(FIND) -name '*.database' -type d -print0 \
+	     -o -name 'validation_results.*' -type d -print0 | \
+		xargs -0 $(RM) -r ; \
+	done
+	$(RM) properties.rc a.out core *.o
+	$(RM) -r RESULTS
+
 .PHONY: validate
-validate: clean
+validate: clean-target
 	PIPS_MORE=cat pips_validate $(VOPT) -V $(PWD) -O RESULTS $(TARGET)
 
 .PHONY: accept
