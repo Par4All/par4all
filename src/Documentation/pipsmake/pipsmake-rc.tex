@@ -5396,8 +5396,11 @@ unroll                          > MODULE.code
 \end{PipsMake}
 
 Use \lstinline|LOOP_LABEL| and \lstinline|UNROLL_RATE| if you don't want to unroll interactively
+You can also set \lstinline|LOOP_UNROLL_MERGE| to use the same declarations among all the unrolled statement
+(only meaningful in \texttt{C}).
 \begin{PipsProp}
 UNROLL_RATE 0
+LOOP_UNROLL_MERGE FALSE
 \end{PipsProp}
 
 

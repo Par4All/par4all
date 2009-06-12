@@ -375,9 +375,31 @@ void do_loop_unroll(statement loop_statement, int rate, void (*statement_post_pr
 
             /* Add the transformated old loop body (transformed_stmt) at
              * the begining of the loop */
-            instruction_block(statement_instruction(body)) = CONS(STATEMENT,
-                    transformed_stmt,
-                    body_block);
+			if( get_bool_property("LOOP_UNROLL_MERGE") && instruction_block_p(statement_instruction(transformed_stmt)) ) {
+					if(ENDP(statement_declarations(body)))
+						statement_declarations(body)=statement_declarations(transformed_stmt);
+					else {
+						list declaration_initializations = NIL;
+						FOREACH(ENTITY,e,statement_declarations(transformed_stmt))
+						{
+							statement s = make_assign_statement(
+									make_expression_from_entity(e),
+									copy_expression(value_expression(entity_initial(e))));
+							declaration_initializations=CONS(STATEMENT,s,declaration_initializations);
+						}
+						declaration_initializations=gen_nreverse(declaration_initializations);
+						instruction_block(statement_instruction(transformed_stmt))=
+							gen_nconc(declaration_initializations,instruction_block(statement_instruction(transformed_stmt)));
+					}
+					instruction_block(statement_instruction(body)) =
+					gen_nconc( instruction_block(statement_instruction(body)),
+							instruction_block(statement_instruction(transformed_stmt)));
+			}
+			else {
+				instruction_block(statement_instruction(body)) = CONS(STATEMENT,
+						transformed_stmt,
+						body_block);
+			}
         }
 
         /* Create loop and insert it in block */
