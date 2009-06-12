@@ -365,9 +365,9 @@ pips' trunk, you shoud develop in a branch of your own. To do so:
   in the subversion repository.
 
   The developer branch is private by default. It means that what you
-  do in the branch is your own affair, and no message is sent to the
+  do in the branch is your own business, and no message is sent to the
   world on commits. For interns, the default policy is to send a
-  message to the intern and the developer responsible for his/her
+  message to the intern and the developer(s) responsible for his/her
   work.
 
   For HPC-Project related accounts, branch commits are send to the
@@ -627,15 +627,16 @@ The SVN centralized development model assumes that you are connected
 to the repository. If you are stuck in a train between Paris
 and Brest (in the very far west), you may find it inconvenient not to
 be able to access the repository history and other details about
-previous commits.
+previous commits, especially if the current version is broken.
 
 If so, consider using \texttt{git-svn} or \texttt{svk} to have full
 copy of your branch or of the trunk on your laptop. Then you can
 develop offline including branching and commits. You will be able
-to push back your changes once you get to civilized surroundings.
+to push back into the SVN server your changes once you get back to
+civilized surroundings.
 
 Why not switch all this stuff to \texttt{git}, which is so
-\emph{cool}? There are several answers:
+\emph{cool}? There are several reasons:
 \begin{description}
 \item[system] we already use subversion extensively at CRI for many
   projects, which are backed-up regularly.
