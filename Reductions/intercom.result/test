@@ -21,6 +21,7 @@ C  call sum[S],
          DO J = 1, I                                                    0012
 C  call sum[S],
             S = S+I                                                     0013
+C  call sum[S],
             CALL INC                                                    0014
          ENDDO
       ENDDO
@@ -59,10 +60,13 @@ C  call sum[S],
             S = S+I                                                     0008
          ENDDO
       ENDDO
+C  loop sum[S],
       DO I = 1, 10                                                      0011
+C  loop sum[S],
          DO J = 1, I                                                    0012
 C  call sum[S],
             S = S+I                                                     0013
+C  call sum[S],
             CALL INC                                                    0014
          ENDDO
       ENDDO
