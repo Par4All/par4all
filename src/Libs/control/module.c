@@ -102,6 +102,8 @@ bool controlizer(string module_name)
 
   parsed_mod_stat = (statement) db_get_memory_resource(DBR_PARSED_CODE, module_name, TRUE);
   module_stat =  copy_statement(parsed_mod_stat) ;
+  /* To have the debug in unspaghettify_statement() working: */
+  set_current_module_statement(module_stat);
 
   debug_on("CONTROL_DEBUG_LEVEL");
 
@@ -130,35 +132,27 @@ bool controlizer(string module_name)
 			       NULL,
 			       empty_extensions ());
 
-    /* By setting this property, we try to unspaghettify the control
-       graph of the module: */
+  /* By setting this property, we try to unspaghettify the control graph
+     of the module: */
+  if (get_bool_property("UNSPAGHETTIFY_IN_CONTROLIZER"))
+    unspaghettify_statement(module_stat);
 
-    if (get_bool_property("UNSPAGHETTIFY_IN_CONTROLIZER")) {
+  /* Reorder the module, because we have a new statement structure. */
+  module_reorder(module_stat);
 
-	/* To have the debug in unspaghettify_statement() working: */
-	set_current_module_statement(module_stat);
+  /* With C code, some local declarations may have been lost by the
+     (current) restructurer */
+  if(c_module_p(m))
+    module_stat = update_unstructured_declarations(module_stat);
 
-	unspaghettify_statement(module_stat);
+  statement_consistent_p(module_stat);
 
-	/* Reorder the module, because statements may have been
-           changed. */
-	module_reorder(module_stat);
-	reset_current_module_statement();
-	reset_ordering_to_statement(); // initialized by module_reorder() for unknown reasons
-    }
+  DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, module_stat);
 
-    /* With C code, some local declarations may have been lost by the
-       (current) restructurer */
-    if(c_module_p(m))
-      module_stat = update_unstructured_declarations(module_stat);
+  reset_current_module_entity();
+  reset_current_module_statement();
 
-    statement_consistent_p(module_stat);
+  debug_off();
 
-    DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, module_stat);
-
-    reset_current_module_entity();
-
-    debug_off();
-
-    return TRUE;
+  return TRUE;
 }

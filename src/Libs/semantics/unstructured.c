@@ -848,8 +848,8 @@ static bool process_unreachable_node(control c,
 
   if(!meaningless_control_p(c)) {
     if(statement_ordering(s)==STATEMENT_ORDERING_UNDEFINED) {
-      pips_user_warning("Improper control restructuration, statement with no ordering:%s",
-			statement_identification(s));
+      pips_internal_error("Improper control restructuration, statement with no ordering:%s",
+			  statement_identification(s));
     }
 
     if(transformer_undefined_p

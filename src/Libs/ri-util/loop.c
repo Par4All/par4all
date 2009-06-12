@@ -346,7 +346,8 @@ void sort_all_loop_locals(statement s)
    such as OpenMP pragma and so on. TODO...
 
    @param s is the statement that owns the loop. We need this statement to
-   get the pragma for the loop.
+   get the pragma for the loop. It assumes the statement is an instruction
+   with a loop in it.
 
    @return TRUE if the loop is parallel.
 */

@@ -43,14 +43,23 @@ char vcid_ri_util_control[] = "$Id$";
 #include "text-util.h"
 #include "misc.h"
 
-/* Build recursively the list of all controls reachable from any control of
- * an unstructured. It is usually called from the CONTROL_MAP macro,
- * with the entry node of an unstructured as initial argument. It uses
- * both successors and predecessors to define reachability.
- *
- * l must be initialized, if only to NIL, but no list_undefined;
- */
+/* \defgroup control_visitors Control node visitors */
 
+/* @{ */
+
+/* Build recursively the list of all controls reachable from a control of
+   an unstructured.
+
+   It is usually called from the CONTROL_MAP macro, with the entry node of
+   an unstructured as initial argument. It uses both successors and
+   predecessors to define reachability.
+
+   @param c is a control node to start with
+
+   @param l is a list used to stored the visited nodes. It must be
+   initialized to the list of nodes to skip. To visit all the nodes from
+   c, just give a list variable initialized to NIL
+*/
 void
 control_map_get_blocs( c, l )
 control c ;
@@ -67,8 +76,20 @@ cons **l ;
     control_predecessors( c )) ;
 }
 
-/* Same as above, but follows predecessors only */
 
+/* Build recursively the list of all controls backward-reachable from a
+   control of an unstructured.
+
+   It is usually called from the BACKWARD_CONTROL_MAP macro, with the
+   entry node of an unstructured as initial argument. It uses predecessors
+   to define reachability.
+
+   @param c is a control node to start with
+
+   @param l is a list used to stored the visited nodes. It must be
+   initialized to the list of nodes to skip. To visit all the nodes from
+   c, just give a list variable initialized to NIL
+*/
 void
 backward_control_map_get_blocs( c, l )
 control c ;
@@ -81,8 +102,21 @@ cons **l ;
 	  control_predecessors( c )) ;
 }
 
-/* transitive closure of c's predecessors, but for control f. This is used
-   to process subgraphs. */
+
+/* Transitive closure of c's predecessors, but for control f.
+
+   It is like backward_control_map_get_blocs() but avoid visiting a
+   control node. It is used to visit subgraphs begining at c and ending at
+   f (excluded).
+
+   @param c is a control node to start with
+
+   @param f is a control node not to visit
+
+   @param l is a list used to stored the visited nodes. It must be
+   initialized to the list of nodes to skip. To visit all the nodes from
+   c, just give a list variable initialized to NIL
+*/
 void
 backward_control_map_get_blocs_but(control c, control f, list * l )
 {
@@ -93,8 +127,20 @@ backward_control_map_get_blocs_but(control c, control f, list * l )
   }, control_predecessors( c )) ;
 }
 
-/* Same as above, but follows successors only */
 
+/* Build recursively the list of all controls forward-reachable from a
+   control of an unstructured.
+
+   It is usually called from the FORWARD_CONTROL_MAP macro, with the entry
+   node of an unstructured as initial argument. It uses successors to
+   define reachability.
+
+   @param c is a control node to start with
+
+   @param l is a list used to stored the visited nodes. It must be
+   initialized to the list of nodes to skip. To visit all the nodes from
+   c, just give a list variable initialized to NIL
+*/
 void
 forward_control_map_get_blocs( c, l )
 control c ;
@@ -107,8 +153,20 @@ cons **l ;
 	  control_successors( c )) ;
 }
 
-/* transitive closure of c's successors, but for control f. This is used
-   to process subgraphs. */
+/* Transitive closure of c's successors, but for control f.
+
+   It is like forward_control_map_get_blocs() but avoid visiting a
+   control node. It is used to visit subgraphs begining at c and ending at
+   f (excluded).
+
+   @param c is a control node to start with
+
+   @param f is a control node not to visit
+
+   @param l is a list used to stored the visited nodes. It must be
+   initialized to the list of nodes to skip. To visit all the nodes from
+   c, just give a list variable initialized to NIL
+*/
 void
 forward_control_map_get_blocs_but(control c, control f, list * l )
 {
@@ -119,6 +177,7 @@ forward_control_map_get_blocs_but(control c, control f, list * l )
   }, control_successors( c )) ;
 }
 
+
 /* Same as above, but follows successors by minimal path lengths. It is OK
    if there is only one path length when computing transformers and/or
    preconditions. However, if a node is reached by several paths, the node
@@ -126,7 +185,6 @@ forward_control_map_get_blocs_but(control c, control f, list * l )
 
    This last condition assumes infinite path length for nodes in cycles
    (?). It is not implemented. */
-
 void
 wide_forward_control_map_get_blocs( c, l )
 control c ;
@@ -152,6 +210,8 @@ cons **l ;
 
   *l = nodes;
 }
+/* @} */
+
 
 /* Test if a control node is in a list of control nodes: */
 bool
@@ -359,6 +419,47 @@ check_control_coherency(control c)
 
     set_free(stmts);
     gen_free_list(blocs);
+}
+
+
+/*
+  Prettyprinting of control nodes for debugging purposes
+*/
+static void print_control_node(control c)
+{
+  fprintf(stderr,
+	  "ctr %p, %zd preds, %zd succs: %s", 
+          c,
+	  gen_length(control_predecessors(c)),
+	  gen_length(control_successors(c)),
+	  safe_statement_identification(control_statement(c)));
+  fprintf(stderr,"\tsuccessors:\n");
+  MAP(CONTROL, s, {
+    fprintf(stderr, "\t\t%p %s", s,
+	    safe_statement_identification(control_statement(s)));
+  }, control_successors(c));
+  fprintf(stderr,"\tpredecessors:\n");
+  MAP(CONTROL, p, {
+    fprintf(stderr, "\t\t%p %s", p,
+	    safe_statement_identification(control_statement(p)));
+  }, control_predecessors(c));
+  fprintf(stderr, "\n");
+}
+
+
+/* Display identification of a list of control nodes */
+static void print_control_nodes(list l)
+{
+  if(ENDP(l)) {
+    fprintf(stderr, "empty control list");
+  }
+  else {
+    MAP(CONTROL, c, {
+      fprintf(stderr, "%p, %s", c,
+	      safe_statement_identification(control_statement(c)));
+    }, l);
+  }
+  fprintf(stderr, "\n");
 }
 
 

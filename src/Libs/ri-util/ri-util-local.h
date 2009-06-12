@@ -1340,47 +1340,166 @@ the variable is unsigned, signed or not */
 #endif
 
 /* Empty comments (i.e. default comments) */
-
 #define empty_comments string_undefined
 
-/* Macro to walk through controls reachable from the entry node of an
- * unstructured. Reachability is defined by successors and predecessors
- * (i.e. the control flow graph is seen as non-directed.
- *
- * A list of control is built. Most of the time, it must be freed
- * on exit from CONTROL_MAP().
- */
+/* \addtogroup control_visitors */
 
-/*
-#define CONTROL_MAP( ctl, code, c, list ) \
-{ \
-    cons *_cm_list_init = (list) ; \
-    cons *_cm_list = _cm_list_init ; \
-    if( _cm_list == NIL ) {\
-         get_blocs( c, &_cm_list ) ; \
-         _cm_list = gen_nreverse( _cm_list ) ; \
-    }\
-    MAPL( _cm_ctls, {control ctl = CONTROL( CAR( _cm_ctls )) ; \
- \
-                 code ;}, \
-          _cm_list ) ; \
-   if( _cm_list_init == NIL ) \
-        list = _cm_list ; \
-}
+/* @{ */
+/* Macro to walk through all the controls reachable from a given control
+  node of an unstructured
+
+  Reachability is defined by successors and predecessors (i.e. the control
+  flow graph is seen as non-directed)
+
+  @param ctl is a name of a control node variable that is declared inside
+  this macro and is used by the following code to access the visited
+  control node
+
+  @param code is the actions to execute on the visited control node
+
+  @param c is a control node to start visiting with
+
+  @param list is a list that will store the visited control nodes. It is
+  used mainly for this macro to avoid visiting twice a node. The simple
+  usage is to give a list variable initialized to NIL. A nice side effect
+  is that it will contain the list of all the reachable control nodes. Do
+  not forget to free this list afterwards. Another classical usage is to
+  give to the macro a list with a list of nodes to avoid visiting.
 */
+#define CONTROL_MAP( ctl, code, c, list )				\
+  do {									\
+    GENERIC_CONTROL_MAP( control_map_get_blocs, ctl, code, c, list )	\
+      } while(0)
 
-#define CONTROL_MAP( ctl, code, c, list ) \
-    GENERIC_CONTROL_MAP( control_map_get_blocs, ctl, code, c, list )
 
-#define BACKWARD_CONTROL_MAP( ctl, code, c, list ) \
-    GENERIC_CONTROL_MAP( backward_control_map_get_blocs, ctl, code, c, list )
+/* Walk through all the controls of un unstructured
 
-#define FORWARD_CONTROL_MAP( ctl, code, c, list ) \
-    GENERIC_CONTROL_MAP( forward_control_map_get_blocs, ctl, code, c, list )
+  This macro do not work indeed because often the...
 
-#define WIDE_FORWARD_CONTROL_MAP( ctl, code, c, list ) \
-    GENERIC_CONTROL_MAP( wide_forward_control_map_get_blocs, ctl, code, c, list )
+  The nodes are those reachable from the entry node and also from the exit
+  node (that may be unreachable from the entry node of th unstructured).
 
+  Reachability is defined by successors and predecessors (i.e. the control
+  flow graph is seen as non-directed)
+
+  @param c is a name of a control node variable that is declared inside
+  this macro and is used by the following code to access the visited
+  control node
+
+  @param code is the actions to execute on the visited control node
+
+  @param u is the unstructured to visit
+
+  @param l is a list that will store the visited control nodes. It is used
+  mainly for this macro to avoid visiting twice a node. The simple usage
+  is to give a list variable initialized to NIL. A nice side effect is
+  that it will contain the list of all the reachable control nodes. Do not
+  forget to free this list afterwards. Another classical usage is to give
+  to the macro a list with a list of nodes to avoid visiting.
+*/
+#define UNSTRUCTURED_CONTROL_MAP(c, u, l, code)				\
+  /* The implementation is sub-optimal because it duplicates the	\
+     code... */								\
+  do {									\
+    /* First get the control nodes reachable from the entry node: */	\
+    control_map_get_blocs(unstructured_entry(u), &l);			\
+    /* Add then the control nodes reachable from the exit nodes if not	\
+       already in: */							\
+    control_map_get_blocs(unstructured_exit(u), &l);			\
+    /* Reverse the list because previous construction was done in the	\
+       reverse way: */							\
+    l = gen_nreverse(l);						\
+    /* Iterate on all the selected control nodes: */			\
+    FOREACH(CONTROL, c, l)						\
+      code								\
+  } while(0)
+
+
+/* Walk through all the controls forward-reachable from a given control
+  node of an unstructured
+
+  Reachability is defined by successor-only relation (i.e. the control
+  flow graph is seen as directed)
+
+  @param ctl is a name of a control node variable that is declared inside
+  this macro and is used by the following code to access the visited
+  control node
+
+  @param code is the actions to execute on the visited control node
+
+  @param c is a control node to start visiting with
+
+  @param list is a list that will store the visited control nodes. It is
+  used mainly for this macro to avoid visiting twice a node. The simple
+  usage is to give a list variable initialized to NIL. A nice side effect
+  is that it will contain the list of all the forward-reachable control
+  nodes. Do not forget to free this list afterwards. Another classical
+  usage is to give to the macro a list with a list of nodes to avoid
+  visiting.
+*/
+#define FORWARD_CONTROL_MAP( ctl, code, c, list )			\
+  do {									\
+    GENERIC_CONTROL_MAP( forward_control_map_get_blocs, ctl, code, c, list ) \
+      } while(0)
+
+
+/* Walk through all the controls backward-reachable from a given control
+  node of an unstructured
+
+  Reachability is defined by predecessor-only relation (i.e. the control
+  flow graph is seen as directed)
+
+  @param ctl is a name of a control node variable that is declared inside
+  this macro and is used by the following code to access the visited
+  control node
+
+  @param code is the actions to execute on the visited control node
+
+  @param c is a control node to start visiting with
+
+  @param list is a list that will store the visited control nodes. It is
+  used mainly for this macro to avoid visiting twice a node. The simple
+  usage is to give a list variable initialized to NIL. A nice side effect
+  is that it will contain the list of all the backward-reachable control
+  nodes. Do not forget to free this list afterwards. Another classical
+  usage is to give to the macro a list with a list of nodes to avoid
+  visiting.
+*/
+#define BACKWARD_CONTROL_MAP( ctl, code, c, list )			\
+  do {									\
+    GENERIC_CONTROL_MAP( backward_control_map_get_blocs, ctl, code, c, list ) \
+    } while(0)
+
+
+/* Walk through all the controls backward-reachable from a given control
+  node of an unstructured
+
+  Reachability is defined by successor-only relation (i.e. the control
+  flow graph is seen as directed)
+
+  @param ctl is a name of a control node variable that is declared inside
+  this macro and is used by the following code to access the visited
+  control node
+
+  @param code is the actions to execute on the visited control node
+
+  @param c is a control node to start visiting with
+
+  @param list is a list that will store the visited control nodes. It is
+  used mainly for this macro to avoid visiting twice a node. The simple
+  usage is to give a list variable initialized to NIL. A nice side effect
+  is that it will contain the list of all the reachable control nodes. Do
+  not forget to free this list afterwards. Another classical usage is to
+  give to the macro a list with a list of nodes to avoid visiting.
+*/
+#define WIDE_FORWARD_CONTROL_MAP( ctl, code, c, list )		\
+   do {								\
+     GENERIC_CONTROL_MAP(wide_forward_control_map_get_blocs,	\
+			 ctl, code, c, list )			\
+     } while(0)
+
+
+/* The control node visiting engine. */
 #define GENERIC_CONTROL_MAP( get_controls, ctl, code, c, list ) \
 { \
     cons *_cm_list_init = (list) ; \
@@ -1397,6 +1516,8 @@ the variable is unsigned, signed or not */
         list = _cm_list ; \
 }
 
+
+/* @} */
 
 /* that is all for ri-util-local.h
  */

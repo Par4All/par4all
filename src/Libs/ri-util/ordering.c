@@ -21,10 +21,14 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
-/*
- * Defines a static mapping from orderings to statements.
- * must be initialize_ordering_to_statement, and afterwards
- * reset_ordering_to_statement.
+
+/** @file ordering.c
+
+    Defines a static mapping from orderings to statements.
+    must be initialize_ordering_to_statement, and afterwards
+    reset_ordering_to_statement.
+
+    For information on ordering, see control/reorder.c
  */
 
 #include <stdio.h>
@@ -50,13 +54,17 @@
  */
 static hash_table OrderingToStatement = hash_table_undefined;
 
-bool 
+
+/* Test if the ordering to statement is initialized */
+bool
 ordering_to_statement_initialized_p()
 {
     return OrderingToStatement != hash_table_undefined;
 }
 
-void 
+
+/* Dump the ordering with the corresponding statement address */
+void
 print_ordering_to_statement(void)
 {
     HASH_MAP(ko, vs, {
@@ -69,7 +77,10 @@ print_ordering_to_statement(void)
     }, OrderingToStatement);
 }
 
-static statement 
+
+/* Get the statement from an ordering in a given ordering to statement
+   table */
+static statement
 apply_ordering_to_statement(hash_table ots, _int o)
 {
     statement s;
@@ -81,7 +92,7 @@ apply_ordering_to_statement(hash_table ots, _int o)
 
     s = (statement) hash_get(ots, (char *) o);
 
-    if(s == statement_undefined) 
+    if(s == statement_undefined)
 	pips_internal_error("no statement for order %td=(%td,%td)\n",
 			    o, ORDERING_NUMBER(o), ORDERING_STATEMENT(o));
 
@@ -107,14 +118,23 @@ static bool
 add_ordering_of_the_statement(statement s,
 			      void * a_context) {
   hash_table ots = (hash_table) a_context;
-  if (statement_ordering(s) != STATEMENT_ORDERING_UNDEFINED)
-    hash_put(ots, (char *) statement_ordering(s), (char *) s);
+  pips_assert("ordering should be defined",
+	      statement_ordering(s) != STATEMENT_ORDERING_UNDEFINED);
+  hash_put(ots, (char *) statement_ordering(s), (char *) s);
 
   // Go on walking down the RI:
   return TRUE;
 }
 
 
+/* Initialize the ordering to statement mapping by iterating from a given
+   statement
+
+   @param ots is ordering to statement hash-table to fill
+
+   @param s is the statement to start with. Typically the module
+   statement.
+*/
 static void
 rinitialize_ordering_to_statement(hash_table ots, statement s) {
   /* Simplify this with a gen_recurse to avoid dealing with all the new
@@ -138,24 +158,11 @@ hash_table set_ordering_to_statement(statement s)
     return ots;
 }
 
-/* To be phased out.
- * FI recommands not to use this
- */
-static void 
-initialize_ordering_to_statement(statement s)
-{
-    /* FI: I do not like that automatic cleaning any more... */
-    if (OrderingToStatement != hash_table_undefined) {
-	reset_ordering_to_statement();
-    }
 
-    OrderingToStatement = set_ordering_to_statement(s);
-}
-
-void 
+void
 reset_ordering_to_statement(void)
 {
-    pips_assert("hash table is defined", 
+    pips_assert("hash table is defined",
 		OrderingToStatement!=hash_table_undefined);
 
     hash_table_free(OrderingToStatement),
