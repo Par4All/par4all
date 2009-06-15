@@ -39,6 +39,16 @@ static void compute_all_reduction (statement stmt) {
   all_reduction = all_reduction && statement_is_reduction (stmt);
 }
 
+///@return true if the reductions are applied on scalars only
+///@param reds, the reductions to analyze
+static bool reductions_on_scalar (reductions reds) {
+  FOREACH (REDUCTION, red, reductions_list(reds)) {
+    reference ref = reduction_reference (red);
+    if (reference_indices (ref) != NIL) return FALSE;
+  }
+  return TRUE;
+}
+
 //******************************************************PRAGMA AS EXPRESSIONS
 
 ///@return an entiy describing the reduction operator
@@ -210,16 +220,20 @@ list reductions_get_omp_pragma_expr (loop l, statement stmt) {
   list exprs = NULL;
   // check that reduction as been detected at loop level
   if  (statement_is_reduction (stmt) == TRUE) {
-    // reset the all reduction flag
-    reset_all_reduction ();
-    // check that all the statements of the loop are reductions otherwise, do
-    // not generate omp reduction pragma
-    // the test is too restrictive so need to be improved
-    gen_recurse(l, statement_domain, gen_true, compute_all_reduction);
-    if (all_reduction == TRUE) {
-      reductions rs = load_printed_reductions(stmt);
-      FOREACH (REDUCTION, red, reductions_list(rs)) {
-	exprs = reduction_as_expr (red);
+    reductions rs = load_printed_reductions(stmt);
+    // check that the reductions are done on scalars and not arrays
+    if (reductions_on_scalar (rs) == TRUE) {
+      // reset the all reduction flag
+      reset_all_reduction ();
+      // check that all the statements of the loop are reductions otherwise, do
+      // not generate omp reduction pragma
+      // the test is too restrictive so need to be improved
+      gen_recurse(l, statement_domain, gen_true, compute_all_reduction);
+      if (all_reduction == TRUE) {
+	reductions rs = load_printed_reductions(stmt);
+	FOREACH (REDUCTION, red, reductions_list(rs)) {
+	  exprs = reduction_as_expr (red);
+	}
       }
     }
   }
@@ -234,16 +248,19 @@ string reductions_get_omp_pragma_str (loop l, statement stmt) {
   string str  = string_undefined;
   // check that reduction as been detected at loop level
   if  (statement_is_reduction (stmt) == TRUE) {
-    // reset the all reduction flag
-    reset_all_reduction ();
-    // check that all the statements of the loop are reductions otherwise, do
-    // not generate omp reduction pragma
-    // the test is too restrictive so need to be improved
-    gen_recurse(l, statement_domain, gen_true, compute_all_reduction);
-    if (all_reduction == TRUE) {
-      reductions rs = load_printed_reductions(stmt);
-      FOREACH (REDUCTION, red, reductions_list(rs)) {
-	str = reduction_as_str (red);
+    reductions rs = load_printed_reductions(stmt);
+    // check that the reductions are done on scalars and not arrays
+    if (reductions_on_scalar (rs) == TRUE) {
+      // reset the all reduction flag
+      reset_all_reduction ();
+      // check that all the statements of the loop are reductions otherwise, do
+      // not generate omp reduction pragma
+      // the test is too restrictive so need to be improved
+      gen_recurse(l, statement_domain, gen_true, compute_all_reduction);
+      if (all_reduction == TRUE) {
+	FOREACH (REDUCTION, red, reductions_list(rs)) {
+	  str = reduction_as_str (red);
+	}
       }
     }
   }
