@@ -21,7 +21,7 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
-
+#define _GNU_SOURCE
 #include "genC.h"
 #include "linear.h"
 #include "ri.h"
@@ -239,7 +239,7 @@ entity get_function_entity(string name)
     entity e = local_name_to_top_level_entity(name); 
     if ( entity_undefined_p( e ) )
     {
-        pips_internal_error("entity %s not defined, please load the appropriate definition source file",name);
+        pips_user_warning("entity %s not defined, please load the appropriate definition source file",name);
     }
 
     return e;

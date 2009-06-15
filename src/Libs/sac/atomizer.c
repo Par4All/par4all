@@ -190,78 +190,81 @@ static void get_type_max_width(call ca, int* maxWidth)
  */
 static void change_basic_if_needed(statement stat)
 {
-    expression lExp = EXPRESSION(CAR(call_arguments(statement_call(stat))));
-    expression rExp = EXPRESSION(CAR(CDR(call_arguments(statement_call(stat)))));
-    int maxWidth = -1;
+	if( statement_call_p(stat) && ENTITY_ASSIGN_P(call_function(statement_call(stat))))
+	{
+		int maxWidth = -1;
+		expression lExp = EXPRESSION(CAR(call_arguments(statement_call(stat))));
+		expression rExp = EXPRESSION(CAR(CDR(call_arguments(statement_call(stat)))));
 
-    // Check that the right expression is a call statement
-    if(!expression_call_p(rExp))
-    {
-        return;
-    }
+		// Check that the right expression is a call statement
+		if(expression_call_p(rExp))
+		{
 
-    // Check that the statement can be potentially integrated in a 
-    // SIMD statement
-    if(match_statement(stat) != NIL)
-    {
-        get_type_max_width(syntax_call(expression_syntax(rExp)), &maxWidth);
-    }
+			// Check that the statement can be potentially integrated in a 
+			// SIMD statement
+			if(match_statement(stat) != NIL)
+			{
+				get_type_max_width(syntax_call(expression_syntax(rExp)), &maxWidth);
+			}
 
-    // If the maxWidth of the right expression is smaller than the width 
-    // of the current left expression, then replace the left expression width 
-    // by maxWidth
-    if(maxWidth > 0)
-    {
-        basic lExpBasic = expression_basic(lExp);
+			// If the maxWidth of the right expression is smaller than the width 
+			// of the current left expression, then replace the left expression width 
+			// by maxWidth
+			if(maxWidth > 0)
+			{
+				basic lExpBasic = expression_basic(lExp);
 
-        switch(basic_tag(lExpBasic))
-        {
-            case is_basic_int: maxWidth=MIN(maxWidth,(basic_int(lExpBasic))); break;
-            case is_basic_float:  maxWidth=MIN(maxWidth,(basic_float(lExpBasic))); break;
-            case is_basic_logical:  maxWidth=MIN(maxWidth,(basic_logical(lExpBasic))); break;
-            default:pips_internal_error("basic_tag %u not supported yet",basic_tag(lExpBasic));
-        }
-    }
+				switch(basic_tag(lExpBasic))
+				{
+					case is_basic_int: maxWidth=MIN(maxWidth,(basic_int(lExpBasic))); break;
+					case is_basic_float:  maxWidth=MIN(maxWidth,(basic_float(lExpBasic))); break;
+					case is_basic_logical:  maxWidth=MIN(maxWidth,(basic_logical(lExpBasic))); break;
+					default:pips_internal_error("basic_tag %u not supported yet",basic_tag(lExpBasic));
+				}
+			}
+		}
+	}
 }
 
 /* This function insert stat before orginal_statement in the code
  */
 static void simd_insert_statement(statement cs, statement stat)
 {
-    // If cs is already a sequence, we just need to insert stat in cs
-    if(instruction_sequence_p(statement_instruction(cs)))
-    {
-        instruction_block(statement_instruction(cs)) = gen_insert_before(stat,
-                orginal_statement,
-                instruction_block(statement_instruction(cs)));
-    }
-    // If cs is not a sequence, we have to create one sequence composed of
-    // cs then orginal_statement
-    else
-    {
-        statement_label(stat) = statement_label(cs);
+	change_basic_if_needed(stat);
+	// If cs is already a sequence, we just need to insert stat in cs
+	if(instruction_sequence_p(statement_instruction(cs)))
+	{
+		instruction_block(statement_instruction(cs)) = gen_insert_before(stat,
+				orginal_statement,
+				instruction_block(statement_instruction(cs)));
+	}
+	// If cs is not a sequence, we have to create one sequence composed of
+	// cs then orginal_statement
+	else
+	{
+		statement_label(stat) = statement_label(cs);
 
-        orginal_statement = make_statement(entity_empty_label(), 
-					   statement_number(cs),
-					   statement_ordering(cs),
-					   statement_comments(cs),
-					   statement_instruction(cs),
-					   statement_declarations(cs),
-					   NULL,
-					   statement_extensions(cs));
+		orginal_statement = make_statement(entity_empty_label(), 
+				statement_number(cs),
+				statement_ordering(cs),
+				statement_comments(cs),
+				statement_instruction(cs),
+				statement_declarations(cs),
+				NULL,
+				statement_extensions(cs));
 
-        statement_instruction(cs) =
-            make_instruction_block(CONS(STATEMENT, stat,
-                        CONS(STATEMENT,
-                            orginal_statement,
-                            NIL)));
+		statement_instruction(cs) =
+			make_instruction_block(CONS(STATEMENT, stat,
+						CONS(STATEMENT,
+							orginal_statement,
+							NIL)));
 
-        statement_label(cs) = entity_empty_label();
-        statement_number(cs) = STATEMENT_NUMBER_UNDEFINED;
-        statement_ordering(cs) = STATEMENT_ORDERING_UNDEFINED;
-        statement_comments(cs) = empty_comments;
-	statement_extensions(cs) = empty_extensions ();
-    }
+		statement_label(cs) = entity_empty_label();
+		statement_number(cs) = STATEMENT_NUMBER_UNDEFINED;
+		statement_ordering(cs) = STATEMENT_ORDERING_UNDEFINED;
+		statement_comments(cs) = empty_comments;
+		statement_extensions(cs) = empty_extensions ();
+	}
 }
 
 static
@@ -299,7 +302,6 @@ void simd_do_atomize(expression ce, statement cs)
 */
 static void atomize_call_statement(statement cs)
 {
-    statement stat;
     call c = instruction_call(statement_instruction(cs));
 
     // Initialize orginal_statement if this is the first argument
@@ -307,9 +309,14 @@ static void atomize_call_statement(statement cs)
 
     // For each call argument, the argument is atomized if needed
 	if( ENTITY_ASSIGN_P(call_function(c)) )
-		gen_context_recurse(EXPRESSION(CAR(CDR(call_arguments(c)))),cs,expression_domain,gen_true,simd_do_atomize);
-	else
-		gen_context_recurse(c,cs,expression_domain,gen_true,simd_do_atomize);
+	{
+		expression rhs = EXPRESSION(CAR(CDR(call_arguments(c))));
+		if( expression_call_p(rhs) )
+		{
+			FOREACH(EXPRESSION, arg,call_arguments(expression_call(rhs)))
+				gen_context_recurse(arg,cs,expression_domain,gen_true,simd_do_atomize);
+		}
+	}
 }
 
 /* This function is called for all statements in the code

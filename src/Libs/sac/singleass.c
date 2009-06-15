@@ -351,6 +351,7 @@ bool single_assignment(char * mod_name)
 
     set_current_module_statement(mod_stmt);
     set_current_module_entity(module_name_to_entity(mod_name));
+	set_ordering_to_statement(mod_stmt);
 
     set_proper_rw_effects((statement_effects) 
             db_get_memory_resource(DBR_PROPER_EFFECTS, mod_name, TRUE));
@@ -381,6 +382,7 @@ bool single_assignment(char * mod_name)
     reset_current_module_statement();
     reset_current_module_entity();
     reset_proper_rw_effects();
+	reset_ordering_to_statement();
 
     debug_off();
 

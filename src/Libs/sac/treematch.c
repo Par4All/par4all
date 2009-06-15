@@ -122,7 +122,7 @@ void simd_reset_finalArgType()
 
 static void simd_fill_curArgType_call(call ca)
 {
-    MAP(EXPRESSION, arg,
+    FOREACH(EXPRESSION, arg, call_arguments(ca))
     {
         syntax s = expression_syntax(arg);
 
@@ -148,15 +148,12 @@ static void simd_fill_curArgType_call(call ca)
             default:pips_internal_error("syntax_tag %u not supported yet",syntax_tag(s));
 
         }
-    },
-        call_arguments(ca));
-
+    }
 }
 
 void simd_fill_finalArgType(statement stat)
 {
     simd_fill_curArgType_call(statement_call(stat));
-
     finalArgType = gen_copy_seq(curArgType);
 }
 
@@ -169,39 +166,40 @@ bool simd_check_argType()
 {
     list pCurBas = curArgType;
 
-    MAPL(pFinBas,
-    {
-        basic curBas = BASIC(CAR(pCurBas));
-        basic finBas = BASIC(CAR(pFinBas));
+    FOREACH(BASIC, finBas, finalArgType)
+	{
+		basic curBas = BASIC(CAR(pCurBas));
 
-        if((!(((basic_int_p(finBas)) &&  (basic_int(finBas) == 0)) ||
-                        ((basic_int_p(curBas)) &&  (basic_int(curBas) == 0)))) &&
-                !basic_equal_p(curBas, finBas))
-        {
-            return FALSE;
-        }
+		if((!(((basic_int_p(finBas)) &&  (basic_int(finBas) == 0)) ||
+						((basic_int_p(curBas)) &&  (basic_int(curBas) == 0)))) &&
+				!basic_equal_p(curBas, finBas))
+		{
+			return false;
+		}
 
-        if(((basic_int_p(finBas)) &&  (basic_int(finBas) == 0)))
-        {
-            basic_tag(finBas) = basic_tag(curBas);
+		else if(((basic_int_p(finBas)) &&  (basic_int(finBas) == 0)))
+		{
+			basic_tag(finBas) = basic_tag(curBas);
 
-            switch(basic_tag(curBas))
-            {
-                case is_basic_int: basic_int(finBas) = basic_int(curBas); break;
-                case is_basic_float: basic_float(finBas) = basic_float(curBas); break;
-                case is_basic_logical: basic_logical(finBas) = basic_logical(curBas); break;
-                default:pips_internal_error("basic_tag %u not supported yet",basic_tag(curBas));
-            }
-        }
+			switch(basic_tag(curBas))
+			{
+				case is_basic_int: basic_int(finBas) = basic_int(curBas); break;
+				case is_basic_float: basic_float(finBas) = basic_float(curBas); break;
+				case is_basic_logical: basic_logical(finBas) = basic_logical(curBas); break;
+				default:pips_internal_error("basic_tag %u not supported yet",basic_tag(curBas));
+			}
+		}
 
-        pCurBas = CDR(pCurBas);
+		pCurBas = CDR(pCurBas);
+		if(ENDP(pCurBas) )
+			return false;
 
-    }, finalArgType);
+	}
 
     gen_free_list(curArgType);
     curArgType = NIL;
 
-    return TRUE;
+    return true;
 }
 
 static matchTree make_tree()

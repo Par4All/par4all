@@ -137,7 +137,6 @@ static entity make_reduction_vector_entity(reduction r)
     extern list integer_entities, real_entities, double_entities;
     basic base = get_basic_from_array_ref(reduction_reference(r));
     entity new_ent, mod_ent;
-    entity dynamic_area;
     static int counter = 0;
     static const char prefix[] = "RED" ;
     static char buffer[ 1 + 3 + sizeof(prefix) ];

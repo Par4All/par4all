@@ -50,6 +50,7 @@ typedef dg_vertex_label vertex_label;
 #include "control.h"
 
 #include "effects-convex.h"
+#include "preprocessor.h"
 
 static
 bool simd_replace_parameters( hash_table array_to_vector )
@@ -128,7 +129,7 @@ void simd_trace_call(statement s, hash_table array_to_vector)
             expression e = EXPRESSION(CAR(CDR(args)));
             syntax s = expression_syntax(e);
             bool through_address_of = false;
-            if( through_address_of=(syntax_call_p(s) && ENTITY_ADDRESS_OF_P(call_function(syntax_call(s)))))
+            if( (through_address_of=(syntax_call_p(s) && ENTITY_ADDRESS_OF_P(call_function(syntax_call(s))))) )
                 s = expression_syntax(EXPRESSION(CAR(call_arguments(syntax_call(s)))));
             pips_assert("parameter is a reference", syntax_reference_p(s));
             reference r = syntax_reference(s);
@@ -163,7 +164,7 @@ bool simd_memory_packing(char *mod_name)
         /* first step : create a vector <> array table */
         hash_table array_to_vector = hash_table_make(hash_pointer,0);
         gen_context_recurse(mod_stmt, array_to_vector, statement_domain, gen_true, simd_trace_call);
-        if(failed=hash_table_empty_p(array_to_vector))
+        if(( failed=hash_table_empty_p(array_to_vector)) )
         {
             pips_user_warning("I did not find any simd load / store operation :'(\n");
             goto simd_memory_packing_end;
@@ -173,12 +174,11 @@ bool simd_memory_packing(char *mod_name)
          * and modify their type to fit the real array size
          */
         bool replaced_something = simd_replace_parameters(array_to_vector);
-        if( failed = !replaced_something )
+        if( ( failed = !replaced_something ) )
         {
             pips_user_warning("I did not find any vectorized array in module parameters :'(\n");
             goto simd_memory_packing_end;
         }
-        entity ee =module_name_to_entity(mod_name);
         add_new_module_from_text( mod_name,
                 text_module(get_current_module_entity(),get_current_module_statement()),
                 fortran_module_p(get_current_module_entity())
