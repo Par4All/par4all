@@ -1,5 +1,5 @@
-delete interprocedural
-create interprocedural interprocedural.c
+delete enhancement
+create enhancement enhancement.c
 
 #activate some debug mode
 #setenv TEXT_DEBUG_LEVEL 9
@@ -23,13 +23,13 @@ setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
 setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
 activate C_SYMBOL_TABLE
 
-apply PRIVATIZE_MODULE(main)
+apply PRIVATIZE_MODULE(%ALL)
 
 #activate PRINT_CODE_PROPER_REDUCTIONS
 activate PRINT_CODE_CUMULATED_REDUCTIONS
-display PRINTED_FILE(main)
+display PRINTED_FILE(%ALL)
 
 close
-delete interprocedural
+delete enhancement
 quit
 # EOF
