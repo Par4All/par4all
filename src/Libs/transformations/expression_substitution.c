@@ -33,11 +33,13 @@
 
 #include "ri-util.h"
 #include "pipsdbm.h"
+#include "control.h"
 
 #include "misc.h"
 
 #include "resources.h"
 #include "properties.h"
+#include "transformations.h"
 
 static expression pattern = expression_undefined;
 static string pattern_module_name = string_undefined;
@@ -68,6 +70,7 @@ bool set_pattern()
         pips_user_warning("EXPRESSION_SUBSTITUTION_PATTERN undefined, but needed to perform expression substitution\n");
         return false;
     }
+	return true;
 }
 
 static 

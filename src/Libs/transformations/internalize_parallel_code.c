@@ -38,11 +38,6 @@
   Ronan.Keryell@enstb.org
  */
 
-#ifndef lint
-static char vcid[] = "$Id$";
-#endif /* lint */
-
-
 #include "genC.h"
 #include "misc.h"
 #include "linear.h"

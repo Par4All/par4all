@@ -48,6 +48,7 @@
 
 #include "arithmetique.h"
 #include "properties.h"
+#include "preprocessor.h"
 
 #include "transformations.h"
 

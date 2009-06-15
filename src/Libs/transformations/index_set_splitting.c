@@ -131,7 +131,7 @@ index_set_split_loop(statement original_loop, entity new_loop_bound)
     expression fst_loop_upper = index_set_split_before_bound ?
         new_loop_bound_expression_with_xcrement:
         new_loop_bound_expression;
-        new_loop_bound_expression_with_xcrement;
+
     expression snd_loop_lower = index_set_split_before_bound ?
         new_loop_bound_expression:
         new_loop_bound_expression_with_xcrement;

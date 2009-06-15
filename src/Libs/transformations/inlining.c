@@ -133,24 +133,6 @@ bool find_write_effect_on_entity(statement s, entity e)
 	}
 	return false;
 }
-static
-bool find_read_effect_on_entity(statement s, entity e)
-{
-	list cummulated_effects = load_cumulated_rw_effects_list( s );
-	FOREACH(EFFECT, eff,cummulated_effects)
-	{
-		reference r = effect_any_reference(eff);
-		entity re = reference_variable(r);
-		if( same_entity_name_p(e,re) )
-		{
-			cell c = effect_cell(eff);
-			if( ENDP( reference_indices( cell_preference_p(c) ? preference_reference(cell_preference(c)) : cell_reference(c) ) ) )
-				if( action_read_p(effect_action(eff) ) )
-					return true;
-		}
-	}
-	return false;
-}
 
 struct entity_pair
 {
@@ -637,14 +619,6 @@ void inline_statement_switcher(statement stmt)
     };
 }
 
-static void
-clean_unused_entities(entity e)
-{
-    string s=entity_module_name(e);
-    string ref = entity_local_name(get_current_module_entity());
-    if( same_string_p(s,ref))
-        gen_clear_tabulated_element((gen_chunk*)e);
-}
 /* this should replace all call to `inlined' in `module'
  * by the expansion of `inlined'
  */
@@ -1239,7 +1213,7 @@ outline(char* module_name)
 
     /* validate */
     module_reorder(get_current_module_statement());
-    DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, get_current_module_statement());
+    DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, new_stmt);
     DB_PUT_MEMORY_RESOURCE(DBR_CALLEES, module_name, compute_callees(get_current_module_statement()));
 
     /*postlude*/

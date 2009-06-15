@@ -39,6 +39,7 @@
 #include "resources.h"
 #include "pipsdbm.h"
 #include "properties.h"
+#include "preprocessor.h"
 #include "prettyprint.h"
 #include "semantics.h"
 
@@ -152,9 +153,6 @@ entity build_a_clone_for(
     string name = entity_local_name(cloned), new_name, comments;
     entity new_fun;
     statement stat;
-    type saved_t; 
-    storage saved_s;
-    value saved_v;
     bool saved_b1, saved_b2;
     text t;
 
