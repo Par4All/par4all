@@ -795,6 +795,11 @@ translate_effect(entity called_func, list real_args, reference real_ref,
  *
  * FI: it assumes reference passing (check added).
  */
+/** @return the list of effect of the callee translated into the caller
+ *  name space
+ *  @param c, the called function
+ *  @param e, the effect to translate
+ */
 list /* of effect */
 summary_effect_to_proper_effect(
     call c,
@@ -806,28 +811,29 @@ summary_effect_to_proper_effect(
     entity f = call_function(c);
 
     if(!parameter_passing_by_reference_p(f)) {
-      pips_internal_error("It is assumed that parameters are passed by reference\n");
-    }
+      // not handeled case return an empty list
+      pips_user_warning("not handeled case, need to be implemented\n");
+    } else {
+      if (storage_formal_p(st)) {
+	pips_debug (9, "storage formal case\n");
+	/* find the corresponding argument and returns the reference */
+	effect res = (*effect_dup_func)(e);
+	int n = formal_offset(storage_formal(st));
+	expression nth = EXPRESSION(gen_nth(n-1, call_arguments(c)));
 
-    if (storage_formal_p(st)) {
-      pips_debug (9, "storage formal case\n");
-      /* find the corresponding argument and returns the reference */
-      effect res = (*effect_dup_func)(e);
-      int n = formal_offset(storage_formal(st));
-      expression nth = EXPRESSION(gen_nth(n-1, call_arguments(c)));
+	pips_assert("expression is a reference or read effect",
+		    effect_read_p(e) || expression_reference_p(nth));
+	/* FI: a preference is forced here */
+	effect_reference(res) = expression_reference(nth);
 
-      pips_assert("expression is a reference or read effect", 
-		  effect_read_p(e) || expression_reference_p(nth));
-      /* FI: a preference is forced here */
-      effect_reference(res) = expression_reference(nth);
-
-      le = CONS(EFFECT, res, NIL);
-    }
-    else if (storage_ram_p(st)) {
-      pips_debug (9, "storage ram case\n");
-      le = global_effect_translation (e,
-				      call_function(c),
-				      get_current_module_entity());
+	le = CONS(EFFECT, res, NIL);
+      }
+      else if (storage_ram_p(st)) {
+	pips_debug (9, "storage ram case\n");
+	le = global_effect_translation (e,
+					call_function(c),
+					get_current_module_entity());
+      }
     }
     return le;
 }

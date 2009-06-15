@@ -666,7 +666,7 @@ call_proper_reduction_p (
   //no right operand for unary operator
   if (unary_op == FALSE) erhs = EXPRESSION(CAR(CDR(le)));
   if (syntax_reference_p(expression_syntax(elhs)) == FALSE) {
-    pips_user_warning ("not handeled case, no reduction will be detected");
+    pips_user_warning ("not handeled case, no reduction will be detected\n");
     return FALSE;
   }
   lhs = syntax_reference(expression_syntax(elhs));

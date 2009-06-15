@@ -25,7 +25,10 @@ static void reset_all_reduction (void) {
 ///@return TRUE if the statement is a reduction
 ///@param stmt, the statement to test for reduction
 static bool statement_is_reduction (statement stmt) {
-  return bound_printed_reductions_p (stmt);
+  // test that we have a reachable statement
+  if (bound_printed_reductions_p (stmt) == FALSE) return FALSE;
+  int size = gen_length (reductions_list (load_printed_reductions(stmt)));
+  return (size != 0);
 }
 
 ///@brief remenber if all the statement analazed are reduction
@@ -205,7 +208,7 @@ void reductions_pragma_omp_end (void) {
 ///@param stmt, the statement to analyzed for reductions, must be a loop
 list reductions_get_omp_pragma_expr (loop l, statement stmt) {
   list exprs = NULL;
-  // check that we have a reachable statements to process
+  // check that reduction as been detected at loop level
   if  (statement_is_reduction (stmt) == TRUE) {
     // reset the all reduction flag
     reset_all_reduction ();
@@ -229,7 +232,7 @@ list reductions_get_omp_pragma_expr (loop l, statement stmt) {
 ///@param stmt, the statement to analyzed for reductions, must be a loop
 string reductions_get_omp_pragma_str (loop l, statement stmt) {
   string str  = string_undefined;
-  // check that we have a reachable statements to process
+  // check that reduction as been detected at loop level
   if  (statement_is_reduction (stmt) == TRUE) {
     // reset the all reduction flag
     reset_all_reduction ();
