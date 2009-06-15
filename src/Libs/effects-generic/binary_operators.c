@@ -404,20 +404,32 @@ bool combinable_effects_p(effect eff1, effect eff2)
 /* FI: same action, but also same variable and same indexing  */
 bool effects_same_action_p(effect eff1, effect eff2)
 {
-  bool same_p = TRUE;
+  bool same_p = false;
   extern string words_to_string(list);
 
   if (effect_undefined_p(eff1) || effect_undefined_p(eff2))
-    same_p = TRUE;
-  else {
+    same_p = true;
+  else if (effect_action_tag(eff1)!=effect_action_tag(eff2)) 
+    {
+      same_p = false;
+    }
+  else 
+    {
     reference r1 = effect_any_reference(eff1);
     reference r2 = effect_any_reference(eff2);
-    string n1 = words_to_string(effect_words_reference(r1));
-    string n2 = words_to_string(effect_words_reference(r2));
-
-    same_p = same_string_p(n1,n2) && effect_action_tag(eff1)==effect_action_tag(eff2);
-    free(n1);
-    free(n2);
+    
+    if (same_entity_p(reference_variable(r1), reference_variable(r2)))
+      {
+	string n1 = words_to_string(effect_words_reference(r1));
+	string n2 = words_to_string(effect_words_reference(r2));
+	
+	same_p = same_string_p(n1,n2);
+	free(n1);
+	free(n2);
+      }
+    else
+      same_p = false;
+	
   }
   return same_p;
 }

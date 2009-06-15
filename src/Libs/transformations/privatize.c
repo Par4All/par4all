@@ -330,10 +330,20 @@ try_privatize(vertex v, statement st, effect f, entity e)
 	    ordering_to_statement(dg_vertex_label_statement(succ_l));
 	instruction succ_i = statement_instruction( succ_st ) ;
 	cons *succ_ls = load_statement_enclosing_loops( succ_st ) ;
-		  
-	if( v == succ_v ) {
+	
+
+	/* this portion of code induced the erroneous privatization of 
+	   non-private variables, for instance in :
+	     DO I = 1,10
+	       J = J +1 a(I) = J
+	     ENDDO
+	   so I comment it out. But some loops are not parallelized anymore
+	   for instance Semantics/choles, Ricedg/private and Prettyprint/matmul.
+	   (see ticket #152). BC.
+	*/
+	/* if( v == succ_v ) {
 	    continue ;
-	}
+	    }*/
 	FOREACH(CONFLICT, c, dg_arc_label_conflicts(arc_l)) {
 	    effect sc = conflict_source( c ) ;
 	    effect sk = conflict_sink( c ) ;
@@ -354,10 +364,18 @@ try_privatize(vertex v, statement st, effect f, entity e)
 		  entity_local_name(e), statement_number(st), statement_number(succ_st));
 	    debug(5,"try_privatize","remove %s from locals in enclosing loops\n",
 		  entity_local_name(e));
-	    prefix = loop_prefix( ls, succ_ls ) ;
-	    update_locals( prefix, ls, e ) ;
-	    update_locals( prefix, succ_ls, e ) ;
-	    gen_free_list( prefix ) ;
+
+	    if (v==succ_v)
+	      {
+		update_locals( NIL, ls, e ); /* remove e from all enclosing loops */ 
+	      }
+	    else
+	      {
+		prefix = loop_prefix( ls, succ_ls ) ;
+		update_locals( prefix, ls, e ) ;
+		update_locals( prefix, succ_ls, e ) ;
+		gen_free_list( prefix ) ;
+	      }
 	}
     }
 
