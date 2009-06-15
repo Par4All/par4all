@@ -1,0 +1,45 @@
+// OMP style
+int main()
+{
+   int b[size];
+   int i = 0;
+   int j = 0;
+
+#pragma omp parallel for 
+   for(i = 0; i <= size-1; i += 1)                                      /*0007*/
+      b[i] = 0;                                                         /*0008*/
+
+#pragma omp parallel for private(i)
+   for(j = 0; j <= size-1; j += 1)                                      /*0011*/
+      for(i = 0; i <= 99; i += 1)                                       /*0012*/
+         b[j] = b[j]+i;                                                 /*0013*/
+
+   for(i = 0; i <= 99; i += 1)                                          /*0017*/
+#pragma omp parallel for 
+      for(j = 0; j <= size-1; j += 1)                                   /*0018*/
+         b[j] = b[j]+i;                                                 /*0019*/
+
+   return 0;                                                            /*0023*/
+}
+int main()
+{
+   int b[size];
+   int i = 0;
+   int j = 0;
+
+#pragma omp parallel for 
+   for(i = 0; i <= size-1; i += 1)                                      /*0007*/
+      b[i] = 0;                                                         /*0008*/
+
+#pragma omp parallel for private(i)
+   for(j = 0; j <= size-1; j += 1)                                      /*0011*/
+      for(i = 0; i <= 99; i += 1)                                       /*0012*/
+         b[j] = b[j]+i;                                                 /*0013*/
+
+   for(i = 0; i <= 99; i += 1)                                          /*0017*/
+#pragma omp parallel for 
+      for(j = 0; j <= size-1; j += 1)                                   /*0018*/
+         b[j] = b[j]+i;                                                 /*0019*/
+
+   return 0;                                                            /*0023*/
+}
