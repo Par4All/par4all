@@ -667,7 +667,7 @@ static string get_vect_name_from_data(int argc, expression exp)
 static
 void replace_subscript(expression e)
 {
-    if( !simd_vector_p(e) )
+    if( !simd_vector_p(e) && ! expression_constant_p(e) )
     {
         expression e_copy = copy_expression(e);
         if( ! syntax_undefined_p( expression_syntax(e) ) ) free_syntax(expression_syntax(e));
