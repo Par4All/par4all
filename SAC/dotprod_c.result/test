@@ -188,9 +188,6 @@ l99998:      ;
 }
 float dotprod(float b[1000000], float c[1000000])
 {
-   float v4sf_vec11[3+1];
-   float v4sf_vec10[3+1];
-   float v4sf_vec9[3+1];
    float v4sf_vec8[3+1];
    float v4sf_vec7[3+1];
    float v4sf_vec6[3+1];
@@ -235,9 +232,6 @@ l99998:      ;
 }
 float dotprod(float b[1000000], float c[1000000])
 {
-   float v4sf_vec11[3+1];
-   float v4sf_vec10[3+1];
-   float v4sf_vec9[3+1];
    float v4sf_vec8[3+1];
    float v4sf_vec7[3+1];
    float v4sf_vec6[3+1];

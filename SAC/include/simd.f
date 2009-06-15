@@ -317,16 +317,6 @@
       vec(4) = base(4)
       end
 
-      subroutine simd_load_v4qi_to_v4hi(vec, base)
-      integer*2 vec(4)
-      integer*1 base(4)
-      
-      vec(1) = base(1)
-      vec(2) = base(2)
-      vec(3) = base(3)
-      vec(4) = base(4)
-      end
-      
       subroutine simd_load_generic_v4hi(vec, x1, x2, x3, x4)
       integer*2 vec(4)
       integer*2 x1
@@ -663,3 +653,4 @@
       dest(7) = -src(7)
       dest(8) = -src(8)
       end
+
