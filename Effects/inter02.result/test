@@ -24,16 +24,16 @@ int main()
    
 
    foo(x);                                                              /*0027*/
-//               <must be read   >: tab tab
+//               <must be read   >: tab
 //               <must be written>: tab[0]
    foo(tab);                                                            /*0028*/
-//               <must be read   >: tab2[4] tab2[4]
+//               <must be read   >: tab2[4] 
 //               <must be written>: tab2[4][0]
    foo(tab2[4]);                                                        /*0029*/
-//               <must be read   >: tab3[5] tab3[5]
+//               <must be read   >: tab3[5] 
 //               <must be written>: tab3[5][0]
    foo(tab3[5]);                                                        /*0030*/
-//               <must be read   >: tab4[6] tab4[6]
+//               <must be read   >: tab4 tab4[6]
 //               <must be written>: tab4[6][0]
    foo(tab4[6]);                                                        /*0031*/
 //               <must be written>: y

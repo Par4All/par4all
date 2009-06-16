@@ -13,7 +13,7 @@ void init(mys *m)
 //               <must be read   >: m
 //               <must be written>: m[0][2][0]
    (m->tab1)[0] = 10;                                                   /*0017*/
-//               <must be read   >: m
+//               <must be read   >: m m[0][3]
 //               <must be written>: m[0][3][0]
    (m->tab2)[0] = 20;                                                   /*0018*/
 //               <must be written>: i
@@ -21,7 +21,7 @@ void init(mys *m)
 //               <must be read   >: i m
 //               <must be written>: m[0][2][i]
       (m->tab1)[i] = 1;                                                 /*0021*/
-//               <must be read   >: i m m[0][2][i]
+//               <must be read   >: i m m[0][2][i] m[0][3]
 //               <must be written>: m[0][3][i]
       (m->tab2)[i] = (m->tab1)[i];                                      /*0022*/
    }
@@ -43,6 +43,7 @@ void init2(mys *n)
    m.tab2 = malloc(5*sizeof(int));                                      /*0034*/
 //               <must be written>: m[2][0]
    (m.tab1)[0] = 10;                                                    /*0035*/
+//               <must be read   >: m[3]
 //               <must be written>: m[3][0]
    (m.tab2)[0] = 20;                                                    /*0036*/
 //               <must be written>: i
@@ -50,7 +51,7 @@ void init2(mys *n)
 //               <must be read   >: i
 //               <must be written>: m[2][i]
       (m.tab1)[i] = 1;                                                  /*0039*/
-//               <must be read   >: i m[2][i]
+//               <must be read   >: i m[2][i] m[3]
 //               <must be written>: m[3][i]
       (m.tab2)[i] = (m.tab1)[i];                                        /*0040*/
    }
@@ -65,33 +66,33 @@ void init3(mys **p)
    p = malloc(5*sizeof(mys *));                                         /*0048*/
 //               <must be written>: i
    for(i = 0; i <= 4; i += 1) {                                         /*0049*/
-//               <must be read   >: i
+//               <must be read   >: i p
 //               <must be written>: p[i]
       p[i] = malloc(sizeof(mys));                                       /*0051*/
-//               <must be read   >: i p[i]
+//               <must be read   >: i p p[i]
 //               <must be written>: p[i][0][3]
       p[i]->tab2 = malloc(5*sizeof(int));                               /*0052*/
    }
-//               <must be read   >: p[0]
+//               <must be read   >: p p[0]
 //               <must be written>: p[0][0][1]
 
    p[0]->num = 11;                                                      /*0055*/
-//               <must be read   >: p[0]
+//               <must be read   >: p p[0]
 //               <must be written>: p[0][0][2][0]
    (p[0]->tab1)[0] = 20;                                                /*0056*/
-//               <must be read   >: p[0]
+//               <must be read   >: p p[0] p[0][0][3]
 //               <must be written>: p[0][0][3][0]
    (p[0]->tab2)[0] = 30;                                                /*0057*/
 //               <must be written>: i
 
    for(i = 1; i <= 4; i += 1) {                                         /*0059*/
-//               <must be read   >: i p[i]
+//               <must be read   >: i p p[i]
 //               <must be written>: p[i][0][1]
       p[i]->num = 10;                                                   /*0061*/
-//               <must be read   >: i p[i]
+//               <must be read   >: i p p[i]
 //               <must be written>: p[i][0][2][0]
       (p[i]->tab1)[0] = 21;                                             /*0062*/
-//               <must be read   >: i p[i] p[i][0][2][0] p[i]
+//               <must be read   >: i p p[i] p[i][0][2][0] p[i][0][3] 
 //               <must be written>: p[i][0][3][0]
       (p[i]->tab2)[0] = (p[i]->tab1)[0];                                /*0063*/
    }
@@ -118,7 +119,7 @@ void init4(mys *p[5])
 //               <must be read   >: p[0]
 //               <must be written>: p[0][0][2][0]
    (p[0]->tab1)[0] = 20;                                                /*0077*/
-//               <must be read   >: p[0]
+//               <must be read   >: p[0] p[0][0][3]
 //               <must be written>: p[0][0][3][0]
    (p[0]->tab2)[0] = 30;                                                /*0078*/
 //               <must be written>: i
@@ -131,7 +132,7 @@ void init4(mys *p[5])
 //               <must be read   >: i p[i]
 //               <must be written>: p[i][0][2][0]
       (p[i]->tab1)[0] = 21;                                             /*0084*/
-//               <must be read   >: i p[i] p[i][0][2][0] p[i]
+//               <must be read   >: i p[i][0][2][0] p[i] p[i][0][3] 
 //               <must be written>: p[i][0][3][0]
       (p[i]->tab2)[0] = (p[i]->tab1)[0];                                /*0085*/
    }
@@ -159,6 +160,7 @@ void init(mys *m)
    (m->tab1)[0] = 10;                                                   /*0017*/
 
 //  <m-R-EXACT-{}>
+//  <m[PHI1][PHI2]-R-EXACT-{PHI1==0, PHI2==3}>
 //  <m[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==0, PHI2==3, PHI3==0}>
 
    (m->tab2)[0] = 20;                                                   /*0018*/
@@ -176,6 +178,7 @@ void init(mys *m)
 
 //  <i-R-EXACT-{}>
 //  <m-R-EXACT-{}>
+//  <m[PHI1][PHI2]-R-EXACT-{PHI1==0, PHI2==3, 0<=i, i<=4}>
 //  <m[PHI1][PHI2][PHI3]-R-EXACT-{PHI1==0, PHI2==2, PHI3==i, 0<=i,
 //    i<=4}>
 //  <m[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==0, PHI2==3, PHI3==i, 0<=i,
@@ -211,6 +214,7 @@ void init2(mys *n)
 
    (m.tab1)[0] = 10;                                                    /*0035*/
 
+//  <m[PHI1]-R-EXACT-{PHI1==3}>
 //  <m[PHI1][PHI2]-W-EXACT-{PHI1==3, PHI2==0}>
 
    (m.tab2)[0] = 20;                                                    /*0036*/
@@ -225,6 +229,7 @@ void init2(mys *n)
       (m.tab1)[i] = 1;                                                  /*0039*/
 
 //  <i-R-EXACT-{}>
+//  <m[PHI1]-R-EXACT-{PHI1==3, 0<=i, i<=4}>
 //  <m[PHI1][PHI2]-R-EXACT-{PHI1==2, PHI2==i, 0<=i, i<=4}>
 //  <m[PHI1][PHI2]-W-EXACT-{PHI1==3, PHI2==i, 0<=i, i<=4}>
 
@@ -247,11 +252,13 @@ void init3(mys **p)
    for(i = 0; i <= 4; i += 1) {                                         /*0049*/
 
 //  <i-R-EXACT-{}>
+//  <p-R-EXACT-{}>
 //  <p[PHI1]-W-EXACT-{PHI1==i, 0<=i, i<=4}>
 
       p[i] = malloc(sizeof(mys));                                       /*0051*/
 
 //  <i-R-EXACT-{}>
+//  <p-R-EXACT-{}>
 //  <p[PHI1]-R-EXACT-{PHI1==i, 0<=i, i<=4}>
 //  <p[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==i, PHI2==0, PHI3==3, 0<=i,
 //    i<=4}>
@@ -259,19 +266,23 @@ void init3(mys **p)
       p[i]->tab2 = malloc(5*sizeof(int));                               /*0052*/
    }
 
+//  <p-R-EXACT-{}>
 //  <p[PHI1]-R-EXACT-{PHI1==0, i==5}>
 //  <p[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==0, PHI2==0, PHI3==1, i==5}>
 
 
    p[0]->num = 11;                                                      /*0055*/
 
+//  <p-R-EXACT-{}>
 //  <p[PHI1]-R-EXACT-{PHI1==0, i==5}>
 //  <p[PHI1][PHI2][PHI3][PHI4]-W-EXACT-{PHI1==0, PHI2==0, PHI3==2,
 //    PHI4==0, i==5}>
 
    (p[0]->tab1)[0] = 20;                                                /*0056*/
 
+//  <p-R-EXACT-{}>
 //  <p[PHI1]-R-EXACT-{PHI1==0, i==5}>
+//  <p[PHI1][PHI2][PHI3]-R-EXACT-{PHI1==0, PHI2==0, PHI3==3, i==5}>
 //  <p[PHI1][PHI2][PHI3][PHI4]-W-EXACT-{PHI1==0, PHI2==0, PHI3==3,
 //    PHI4==0, i==5}>
 
@@ -283,6 +294,7 @@ void init3(mys **p)
    for(i = 1; i <= 4; i += 1) {                                         /*0059*/
 
 //  <i-R-EXACT-{}>
+//  <p-R-EXACT-{}>
 //  <p[PHI1]-R-EXACT-{PHI1==i, 1<=i, i<=4}>
 //  <p[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==i, PHI2==0, PHI3==1, 1<=i,
 //    i<=4}>
@@ -290,6 +302,7 @@ void init3(mys **p)
       p[i]->num = 10;                                                   /*0061*/
 
 //  <i-R-EXACT-{}>
+//  <p-R-EXACT-{}>
 //  <p[PHI1]-R-EXACT-{PHI1==i, 1<=i, i<=4}>
 //  <p[PHI1][PHI2][PHI3][PHI4]-W-EXACT-{PHI1==i, PHI2==0, PHI3==2,
 //    PHI4==0, 1<=i, i<=4}>
@@ -297,7 +310,10 @@ void init3(mys **p)
       (p[i]->tab1)[0] = 21;                                             /*0062*/
 
 //  <i-R-EXACT-{}>
+//  <p-R-EXACT-{}>
 //  <p[PHI1]-R-EXACT-{PHI1==i, 1<=i, i<=4}>
+//  <p[PHI1][PHI2][PHI3]-R-EXACT-{PHI1==i, PHI2==0, PHI3==3, 1<=i,
+//    i<=4}>
 //  <p[PHI1][PHI2][PHI3][PHI4]-R-EXACT-{PHI1==i, PHI2==0, PHI3==2,
 //    PHI4==0, 1<=i, i<=4}>
 //  <p[PHI1]-R-EXACT-{PHI1==i, 1<=i, i<=4}>
@@ -344,6 +360,7 @@ void init4(mys *p[5])
    (p[0]->tab1)[0] = 20;                                                /*0077*/
 
 //  <p[PHI1]-R-EXACT-{PHI1==0, i==5}>
+//  <p[PHI1][PHI2][PHI3]-R-EXACT-{PHI1==0, PHI2==0, PHI3==3, i==5}>
 //  <p[PHI1][PHI2][PHI3][PHI4]-W-EXACT-{PHI1==0, PHI2==0, PHI3==3,
 //    PHI4==0, i==5}>
 
@@ -371,6 +388,8 @@ void init4(mys *p[5])
 
 //  <i-R-EXACT-{}>
 //  <p[PHI1]-R-EXACT-{PHI1==i, 1<=i, i<=4}>
+//  <p[PHI1][PHI2][PHI3]-R-EXACT-{PHI1==i, PHI2==0, PHI3==3, 1<=i,
+//    i<=4}>
 //  <p[PHI1][PHI2][PHI3][PHI4]-R-EXACT-{PHI1==i, PHI2==0, PHI3==2,
 //    PHI4==0, 1<=i, i<=4}>
 //  <p[PHI1]-R-EXACT-{PHI1==i, 1<=i, i<=4}>
