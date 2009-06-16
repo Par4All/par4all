@@ -25,7 +25,7 @@ Variable list:
 	Declared entity "decl30:*STACK*" with type "area" with size 0
 	Declared entity "decl30:*STATIC*" with type "area" with size 0
 	Declared entity "decl30:0`foo" with type "functional" "double * -> double"
-	Declared entity "decl30:0`x" with type "variable" "double *"
+	Declared entity "decl30:0`x" with type "variable" "double[] *"
 	Declared entity "decl30:0`z" with type "variable" "double"
 
 * empty extern declaration list *

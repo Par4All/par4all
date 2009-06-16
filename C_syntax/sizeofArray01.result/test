@@ -11,7 +11,7 @@ Variable list:
 	Declared entity "fcompat:*STATIC*" with type "area" with size 0
 	Declared entity "fcompat:0`a" with type "variable" "int"
 	Declared entity "fcompat:0`c" with type "variable" "int"
-	Declared entity "fcompat:0`p" with type "variable" "int *"
+	Declared entity "fcompat:0`p" with type "variable" "int[n+1] *"
 	Declared entity "sizeofArray01!:*STATIC*" with type "area" with size 0
 
 * empty extern declaration list *
