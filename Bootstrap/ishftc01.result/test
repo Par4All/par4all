@@ -1,0 +1,67 @@
+
+Parsed printed file
+
+      PROGRAM ISHFTC01
+
+      INTEGER I
+      INTEGER J
+      INTEGER K
+      INTEGER H
+
+      I = 2                                                             0008
+      J = 3                                                             0009
+      K = 3                                                             0010
+      H = ISHFTC(K, I, J)                                               0011
+      PRINT *, 'H = ', H                                                0012
+
+      END
+
+Proper effects
+
+      PROGRAM ISHFTC01
+
+      INTEGER I
+      INTEGER J
+      INTEGER K
+      INTEGER H
+C               <must be written>: I
+
+      I = 2                                                             0008
+C               <must be written>: J
+      J = 3                                                             0009
+C               <must be written>: K
+      K = 3                                                             0010
+C               <must be read   >: I J K
+C               <must be written>: H
+      H = ISHFTC(K, I, J)                                               0011
+C               <must be read   >: H __IO_EFFECTS:LUNS(6)
+C               <must be written>: __IO_EFFECTS:LUNS(6)
+      PRINT *, 'H = ', H                                                0012
+
+      END
+
+Cumulated effetcs
+
+C               <must be read   >: __IO_EFFECTS:LUNS(6)
+C               <must be written>: __IO_EFFECTS:LUNS(6)
+      PROGRAM ISHFTC01
+
+      INTEGER I
+      INTEGER J
+      INTEGER K
+      INTEGER H
+C               <must be written>: I
+
+      I = 2                                                             0008
+C               <must be written>: J
+      J = 3                                                             0009
+C               <must be written>: K
+      K = 3                                                             0010
+C               <must be read   >: I J K
+C               <must be written>: H
+      H = ISHFTC(K, I, J)                                               0011
+C               <must be read   >: H __IO_EFFECTS:LUNS(6)
+C               <must be written>: __IO_EFFECTS:LUNS(6)
+      PRINT *, 'H = ', H                                                0012
+
+      END

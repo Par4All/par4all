@@ -1,0 +1,49 @@
+
+Parsed printed file
+
+      PROGRAM MVBITS01
+
+      INTEGER TO
+
+
+      TO = 6                                                            0006
+      MVBITS(7, 2, 2, TO, 0)                                            0007
+      PRINT *, 'TO = ', TO                                              0008
+
+      END
+
+Proper effects
+
+      PROGRAM MVBITS01
+
+      INTEGER TO
+C               <must be written>: TO
+
+
+      TO = 6                                                            0006
+C               <must be read   >: TO
+      MVBITS(7, 2, 2, TO, 0)                                            0007
+C               <must be read   >: TO __IO_EFFECTS:LUNS(6)
+C               <must be written>: __IO_EFFECTS:LUNS(6)
+      PRINT *, 'TO = ', TO                                              0008
+
+      END
+
+Cumulated effetcs
+
+C               <must be read   >: __IO_EFFECTS:LUNS(6)
+C               <must be written>: __IO_EFFECTS:LUNS(6)
+      PROGRAM MVBITS01
+
+      INTEGER TO
+C               <must be written>: TO
+
+
+      TO = 6                                                            0006
+C               <must be read   >: TO
+      MVBITS(7, 2, 2, TO, 0)                                            0007
+C               <must be read   >: TO __IO_EFFECTS:LUNS(6)
+C               <must be written>: __IO_EFFECTS:LUNS(6)
+      PRINT *, 'TO = ', TO                                              0008
+
+      END
