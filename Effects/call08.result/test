@@ -22,7 +22,7 @@ Proper effects for "call08"
 void call08(int r, int m, int *x)
 {
    int j;
-//               <must be read   >: r
+//               <must be read   >: r x
 //               <must be written>: x[4]
 
    x[4] = 10*r+4;
@@ -30,12 +30,12 @@ void call08(int r, int m, int *x)
 
 Cumulated effects for "call08"
 
-//               <must be read   >: r
+//               <must be read   >: r x
 //               <must be written>: x[4]
 void call08(int r, int m, int *x)
 {
    int j;
-//               <must be read   >: r
+//               <must be read   >: r x
 //               <must be written>: x[4]
 
    x[4] = 10*r+4;

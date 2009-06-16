@@ -17,7 +17,7 @@ Proper effects for "call16"
 
 void call16(int _i, int *_a, int *_b, int *_c)
 {
-//               <must be read   >: _b[_i] _c[_i] _i
+//               <must be read   >: _a _b _b[_i] _c _c[_i] _i
 //               <must be written>: _a[_i]
    _a[_i] = _b[_i]+_c[_i];
 }
@@ -26,12 +26,12 @@ Cumulated effects for "call16"
 
 //               <may be read    >: _b[*] _c[*]
 //               <may be written >: _a[*]
-//               <must be read   >: _i
+//               <must be read   >: _a _b _c _i
 void call16(int _i, int *_a, int *_b, int *_c)
 {
 //               <may be read    >: _b[*] _c[*]
 //               <may be written >: _a[*]
-//               <must be read   >: _i
+//               <must be read   >: _a _b _c _i
    _a[_i] = _b[_i]+_c[_i];
 }
 
