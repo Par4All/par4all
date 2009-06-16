@@ -11,25 +11,10 @@
       include "hpfc_includes.h"
       include "HPFTEST22_parameters.h"
       INTEGER ALPHA1, LALPHA1, PSI1, T LID, I, I_0, I_1, I_2
-      INTEGER K(1:10), J(1:10)
+      INTEGER J(1:10), K(1:10)
       LOGICAL L_0
       CALL HPFC INIT HOST
       PRINT *, 'hpftest22 running'
-! collecting distributed variable K
-      DO PSI1 = 1, 5
-         BUF INDEX = 0
-         RECEIVED NOT PERFORMED = .FALSE.
-         SIZE OF RECEIVED BUFFER = 0
-         T LID = PSI1
-         CALL HPFC RCV FROM NODE(T LID)
-         CALL HPFC INTEGER4 BUFUPK
-         DO ALPHA1 = -1+2*PSI1, 2*PSI1
-            LALPHA1 = 2+ALPHA1-2*PSI1
-            BUF INDEX = BUF INDEX+1
-            K(ALPHA1) = HPFC INTEGER4 BUFF(BUF INDEX)
-         ENDDO
-      ENDDO
-! end of collect
 ! collecting distributed variable J
       DO PSI1 = 1, 5
          BUF INDEX = 0
@@ -42,6 +27,21 @@
             LALPHA1 = 2+ALPHA1-2*PSI1
             BUF INDEX = BUF INDEX+1
             J(ALPHA1) = HPFC INTEGER4 BUFF(BUF INDEX)
+         ENDDO
+      ENDDO
+! end of collect
+! collecting distributed variable K
+      DO PSI1 = 1, 5
+         BUF INDEX = 0
+         RECEIVED NOT PERFORMED = .FALSE.
+         SIZE OF RECEIVED BUFFER = 0
+         T LID = PSI1
+         CALL HPFC RCV FROM NODE(T LID)
+         CALL HPFC INTEGER4 BUFUPK
+         DO ALPHA1 = -1+2*PSI1, 2*PSI1
+            LALPHA1 = 2+ALPHA1-2*PSI1
+            BUF INDEX = BUF INDEX+1
+            K(ALPHA1) = HPFC INTEGER4 BUFF(BUF INDEX)
          ENDDO
       ENDDO
 ! end of collect
@@ -57,21 +57,6 @@
       CALL HPFC INTEGER4 BUFPCK
       CALL HPFC HCAST
 ! end of update
-! collecting distributed variable K
-      DO PSI1 = 2, 4
-         BUF INDEX = 0
-         RECEIVED NOT PERFORMED = .FALSE.
-         SIZE OF RECEIVED BUFFER = 0
-         T LID = PSI1
-         CALL HPFC RCV FROM NODE(T LID)
-         CALL HPFC INTEGER4 BUFUPK
-         DO ALPHA1 = MAX(3, -1+2*PSI1), MIN(7, 2*PSI1)
-            LALPHA1 = 2+ALPHA1-2*PSI1
-            BUF INDEX = BUF INDEX+1
-            K(ALPHA1) = HPFC INTEGER4 BUFF(BUF INDEX)
-         ENDDO
-      ENDDO
-! end of collect
 ! collecting distributed variable J
       DO PSI1 = 1, 5
          BUF INDEX = 0
@@ -84,6 +69,21 @@
             LALPHA1 = 2+ALPHA1-2*PSI1
             BUF INDEX = BUF INDEX+1
             J(ALPHA1) = HPFC INTEGER4 BUFF(BUF INDEX)
+         ENDDO
+      ENDDO
+! end of collect
+! collecting distributed variable K
+      DO PSI1 = 2, 4
+         BUF INDEX = 0
+         RECEIVED NOT PERFORMED = .FALSE.
+         SIZE OF RECEIVED BUFFER = 0
+         T LID = PSI1
+         CALL HPFC RCV FROM NODE(T LID)
+         CALL HPFC INTEGER4 BUFUPK
+         DO ALPHA1 = MAX(3, -1+2*PSI1), MIN(7, 2*PSI1)
+            LALPHA1 = 2+ALPHA1-2*PSI1
+            BUF INDEX = BUF INDEX+1
+            K(ALPHA1) = HPFC INTEGER4 BUFF(BUF INDEX)
          ENDDO
       ENDDO
 ! end of collect
@@ -163,18 +163,6 @@
          K(I_3) = MOD(I+6, 10)+1
          J(I_3) = 11-I
       ENDDO
-! collecting distributed variable K
-      PSI1 = MY POS(1,1)
-      BUF INDEX = 0
-      SEND NOT INITIALIZED = .TRUE.
-      DO ALPHA1 = -1+2*PSI1, 2*PSI1
-         LALPHA1 = 2+ALPHA1-2*PSI1
-         BUF INDEX = BUF INDEX+1
-         HPFC INTEGER4 BUFF(BUF INDEX) = K(LALPHA1)
-      ENDDO
-      CALL HPFC INTEGER4 BUFPCK
-      CALL HPFC SND TO HOST
-! end of collect
 ! collecting distributed variable J
       PSI1 = MY POS(1,1)
       BUF INDEX = 0
@@ -183,6 +171,18 @@
          LALPHA1 = 2+ALPHA1-2*PSI1
          BUF INDEX = BUF INDEX+1
          HPFC INTEGER4 BUFF(BUF INDEX) = J(LALPHA1)
+      ENDDO
+      CALL HPFC INTEGER4 BUFPCK
+      CALL HPFC SND TO HOST
+! end of collect
+! collecting distributed variable K
+      PSI1 = MY POS(1,1)
+      BUF INDEX = 0
+      SEND NOT INITIALIZED = .TRUE.
+      DO ALPHA1 = -1+2*PSI1, 2*PSI1
+         LALPHA1 = 2+ALPHA1-2*PSI1
+         BUF INDEX = BUF INDEX+1
+         HPFC INTEGER4 BUFF(BUF INDEX) = K(LALPHA1)
       ENDDO
       CALL HPFC INTEGER4 BUFPCK
       CALL HPFC SND TO HOST
@@ -196,6 +196,18 @@
       BUF INDEX = BUF INDEX+1
       I = HPFC INTEGER4 BUFF(BUF INDEX)
 ! end of update
+! collecting distributed variable J
+      PSI1 = MY POS(1,1)
+      BUF INDEX = 0
+      SEND NOT INITIALIZED = .TRUE.
+      DO ALPHA1 = -1+2*PSI1, 2*PSI1
+         LALPHA1 = 2+ALPHA1-2*PSI1
+         BUF INDEX = BUF INDEX+1
+         HPFC INTEGER4 BUFF(BUF INDEX) = J(LALPHA1)
+      ENDDO
+      CALL HPFC INTEGER4 BUFPCK
+      CALL HPFC SND TO HOST
+! end of collect
 ! collecting distributed variable K
       PSI1 = MY POS(1,1)
       IF (PSI1.LE.4.AND.2.LE.PSI1) THEN
@@ -209,18 +221,6 @@
          CALL HPFC INTEGER4 BUFPCK
          CALL HPFC SND TO HOST
       ENDIF
-! end of collect
-! collecting distributed variable J
-      PSI1 = MY POS(1,1)
-      BUF INDEX = 0
-      SEND NOT INITIALIZED = .TRUE.
-      DO ALPHA1 = -1+2*PSI1, 2*PSI1
-         LALPHA1 = 2+ALPHA1-2*PSI1
-         BUF INDEX = BUF INDEX+1
-         HPFC INTEGER4 BUFF(BUF INDEX) = J(LALPHA1)
-      ENDDO
-      CALL HPFC INTEGER4 BUFPCK
-      CALL HPFC SND TO HOST
 ! end of collect
       CALL HPFC NODE END
       END
