@@ -37,12 +37,7 @@
 #include "contrainte.h"
 #include "sc.h"
 #include "paf_ri.h"
-
-/* ??? ri-util stupid cyclic? dependencies */
-extern void set_ordering_to_statement();
-extern void reset_ordering_to_statement();
-extern void * ordering_to_statement();
-extern char * statement_identification();
+#include "ri-util.h"
 
 /********************************************************************* UTILS */
 

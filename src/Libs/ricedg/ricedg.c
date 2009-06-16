@@ -244,9 +244,6 @@ char *mod_name;
 	db_get_memory_resource(DBR_CODE, mod_name, TRUE) );
     mod_stat = get_current_module_statement();
    
-    /* FI: set should be used, and reset should be performed later. */
-    //set_ordering_to_statement(mod_stat);
-    set_ordering_to_statement(mod_stat);
 
     chains = (graph)
 	db_get_memory_resource(DBR_CHAINS, mod_name, TRUE);
@@ -303,6 +300,7 @@ char *mod_name;
     }
    
     debug_on("QUICK_PRIVATIZER_DEBUG_LEVEL");
+	set_ordering_to_statement(mod_stat);
     quick_privatize_graph(dg);
     debug_off();
 
@@ -325,6 +323,7 @@ char *mod_name;
     ifdebug(1) {
 	mem_spy_end("After DG computation");
     }
+	reset_ordering_to_statement();
   
     ifdebug(3) {
 	printf("\nThe results of statistique of test of dependence are:\n");
@@ -395,7 +394,6 @@ char *mod_name;
     reset_precondition_map();
     reset_cumulated_rw_effects();
     clean_enclosing_loops();
-    reset_ordering_to_statement();
 
     return TRUE;
 }
