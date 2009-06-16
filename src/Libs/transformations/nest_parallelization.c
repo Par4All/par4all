@@ -258,8 +258,6 @@ bool nest_parallelization(string module_name)
     dg = (graph) db_get_memory_resource(DBR_DG, module_name, TRUE);
 
     /* Make sure the dependence graph points towards the code copy */
-    if(ordering_to_statement_initialized_p())
-	reset_ordering_to_statement();
     set_ordering_to_statement(mod_parallel_stat);
 
     debug_on("NEST_PARALLELIZATION_DEBUG_LEVEL");
@@ -288,6 +286,7 @@ bool nest_parallelization(string module_name)
 
     reset_current_module_statement();
     reset_current_module_entity();
+	reset_ordering_to_statement();
 
     return TRUE;
 }

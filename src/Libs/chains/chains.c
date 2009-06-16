@@ -1242,6 +1242,9 @@ chains(char *module_name, int use)
     clean_enclosing_loops();
     reset_current_module_statement();
     reset_current_module_entity();
+	ifdebug(2) {
+		reset_ordering_to_statement();
+	}
     /* reset_entity_to_size(); */
 
     debug_on("CHAINS_DEBUG_LEVEL");

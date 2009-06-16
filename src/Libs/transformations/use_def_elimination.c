@@ -558,6 +558,7 @@ use_def_elimination(char * module_name)
    reset_proper_rw_effects();
    reset_current_module_statement();
    reset_current_module_entity();
+   reset_ordering_to_statement();
 
    /* Should have worked: */
    return TRUE;

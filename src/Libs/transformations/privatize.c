@@ -458,6 +458,7 @@ bool privatize_module(char *mod_name)
     reset_current_module_statement();
     reset_proper_rw_effects();
     reset_cumulated_rw_effects();
+	reset_ordering_to_statement();
     clean_enclosing_loops();
 
     return TRUE;

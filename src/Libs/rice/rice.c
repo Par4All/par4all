@@ -298,8 +298,6 @@ do_it(
     }
 
     /* Make sure the dependence graph points towards the code copy */
-    if(ordering_to_statement_initialized_p())
-	reset_ordering_to_statement();
     set_ordering_to_statement(mod_parallel_stat);
 
     rice_distribute_only = distribute_p ;
@@ -329,6 +327,7 @@ do_it(
 
     dg = graph_undefined;
     reset_current_module_statement();
+	reset_ordering_to_statement();
     return TRUE;
 }
 

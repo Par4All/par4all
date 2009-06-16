@@ -346,6 +346,7 @@ suppress_trivial_test(char * mod_name)
 
   reset_current_module_statement();
   reset_current_module_entity();
+  reset_ordering_to_statement();
 
   debug(1,"trivial_test_elimination", "End for %s\n", mod_name);
   

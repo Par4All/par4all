@@ -406,6 +406,7 @@ recover_for_loop(char * module_name) {
   reset_proper_rw_effects();
   reset_current_module_statement();
   reset_current_module_entity();
+  reset_ordering_to_statement();
   free_value_mappings();
 
   /* Should have worked: */
