@@ -40,6 +40,7 @@
 
 /* ??? ri-util stupid cyclic? dependencies */
 extern void set_ordering_to_statement();
+extern void reset_ordering_to_statement();
 extern void * ordering_to_statement();
 extern char * statement_identification();
 
@@ -158,6 +159,8 @@ pipsdbm_read_statement_mapping(FILE * fd)
 	pips_assert("valid ordering", so!=STATEMENT_ORDERING_UNDEFINED);
 	hash_put(result,(void*)ordering_to_statement(so),(void*)gen_read(fd));
     }
+
+	reset_ordering_to_statement();
 
     return result;
 }
@@ -282,6 +285,8 @@ pipsdbm_read_statement_function(FILE * fd /* file to read from */)
 	pips_assert("valid ordering", so!=STATEMENT_ORDERING_UNDEFINED);
 	HASH_EXTEND(p, p, h, ordering_to_statement(so), gen_read(fd));
     }
+
+	reset_ordering_to_statement();
 
     return result;
 }
