@@ -28,6 +28,11 @@ echo Proper effects for "foo2"
 echo
 display PRINTED_FILE[foo2]
 
+echo
+echo Proper effects for "foo3"
+echo
+display PRINTED_FILE[foo3]
+
 
 activate PRINT_CODE_PROPER_REGIONS
 
@@ -40,6 +45,12 @@ echo
 echo Proper regions for "foo2"
 echo
 display PRINTED_FILE[foo2]
+
+echo
+echo Proper regions for "foo3"
+echo
+display PRINTED_FILE[foo3]
+
 
 
 close
