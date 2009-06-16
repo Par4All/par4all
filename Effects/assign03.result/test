@@ -17,7 +17,7 @@ void assign03()
    extern char *malloc(int);
    double *p = (double *) malloc(10*sizeof(double));
    int j = 2;
-//               <must be read   >: j
+//               <must be read   >: j p
 //               <must be written>: p[j]
 
    p[j] = 1.;
@@ -31,7 +31,7 @@ void assign03()
    double *p = (double *) malloc(10*sizeof(double));
    int j = 2;
 //               <may be written >: p[*]
-//               <must be read   >: j
+//               <must be read   >: j p
 
    p[j] = 1.;
 }
