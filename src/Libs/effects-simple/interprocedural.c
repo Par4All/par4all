@@ -1025,7 +1025,7 @@ list c_actual_argument_to_may_summary_effects(expression real_arg)
 	    /* The problem is that when the expression is an array
 	       name there won't be any effect generated ! 
 	    */
-	    /* I think I should call generic_proper_effects_of_complex_lhs BC. */
+	    /* I think I should call generic_proper_effects_of_complex_address_expression BC. */
 	    real_arg_eff = generic_proper_effects_of_any_lhs(real_arg);
          
 	    ifdebug(6)
@@ -1275,7 +1275,7 @@ list c_summary_effect_to_proper_effects(effect eff, expression real_arg)
 		reference r1 = syntax_reference(s1);
 		entity ev1 = reference_variable(r1);
 		list l_real_arg = NIL;
-		effect eff1, eff2;
+		effect eff1;
 
 		/* first we compute an effect on the argument of the 
 		 address_of operator (to treat cases like &(n->m))*/
@@ -1283,8 +1283,8 @@ list c_summary_effect_to_proper_effects(effect eff, expression real_arg)
 		   We should maybe scan the real args instead of scanning 
 		   the effects : we would do this only once per
 		   real argument */
-		l_real_arg = generic_proper_effects_of_complex_lhs
-		  (arg1, &eff1, &eff2, effect_write_p(eff));
+		l_real_arg = generic_proper_effects_of_complex_address_expression
+		  (arg1, &eff1, effect_write_p(eff));
 		if (effect_undefined_p(eff1))
 		  n_eff =  anywhere_effect
 		    (copy_action(effect_action(eff)));
@@ -1294,8 +1294,6 @@ list c_summary_effect_to_proper_effects(effect eff, expression real_arg)
 		    effect_approximation(n_eff) = 
 		      copy_approximation(effect_approximation(eff));
 		  }
-		if (!effect_undefined_p(eff2))
-		  free_effect(eff2);
 		gen_free_list(l_real_arg);
 		
 		/* BC : This must certainely be improved 
@@ -1373,13 +1371,13 @@ list c_summary_effect_to_proper_effects(effect eff, expression real_arg)
 	    else if(ENTITY_POINT_TO_P(real_op)|| ENTITY_FIELD_P(real_op))
 	      {
 		list l_real_arg = NIL;
-		effect eff1, eff2;
+		effect eff1;
 		/* first we compute an effect on the real_arg */
 		/* It's very costly because we do not re-use l_real_arg 
 		   We should maybe scan the real args instead of scanning 
 		   the effects. */
-		l_real_arg = generic_proper_effects_of_complex_lhs
-		  (real_arg, &eff1, &eff2, effect_write_p(eff));
+		l_real_arg = generic_proper_effects_of_complex_address_expression
+		  (real_arg, &eff1, effect_write_p(eff));
 		if (effect_undefined_p(eff1))
 		  n_eff =  anywhere_effect
 		    (copy_action(effect_action(eff)));
@@ -1389,8 +1387,6 @@ list c_summary_effect_to_proper_effects(effect eff, expression real_arg)
 		    effect_approximation(n_eff) = 
 		      copy_approximation(effect_approximation(eff));
 		  }
-		if (!effect_undefined_p(eff2))
-		  free_effect(eff2);
 		gen_free_list(l_real_arg);
 		
 		/* Then we add the indices of the effect reference */

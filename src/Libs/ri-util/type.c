@@ -30,6 +30,7 @@
 #include "misc.h"
 
 #include "ri-util.h"
+#include "text-util.h"
 
 /* generation of types */
 
@@ -943,34 +944,8 @@ basic_of_expression(expression exp)
   return basic_of_any_expression(exp, FALSE);
 }
 
-/* Replace typedef'ed types by combinations of basic types */
-type expression_to_type(expression e)
-{
-  /* does not cover references to functions ...*/
-  /* Could be more elaborated with array types for array expressions */
-  type t = type_undefined;
-  basic b = basic_of_expression(e);
-  variable v = make_variable(b, NIL, NIL);
-
-  t = make_type(is_type_variable, v);
-
-  return t;
-}
 
 
-/* Preserve typedef'ed types when possible */
-type expression_to_user_type(expression e)
-{
-  /* does not cover references to functions ...*/
-  /* Could be more elaborated with array types for array expressions */
-  type t = type_undefined;
-  basic b = some_basic_of_any_expression(e, FALSE, FALSE);
-  variable v = make_variable(b, NIL, NIL);
-
-  t = make_type(is_type_variable, v);
-
-  return t;
-}
 
 /* basic basic_of_call(call c): returns the basic of the result given
  * by the call "c". If ultimate_p is true, replaced typdef'ed types by
@@ -1445,6 +1420,398 @@ basic_maximum(basic fb1, basic fb2)
 }
 
 /* END_EOLE */
+
+/**************************************************** expression_to_type */
+
+/**
+   @return the (newly allocated) type of the result given by call to an 
+   intrinsic function. 
+   This type must be computed with the basic of the arguments of the 
+   intrinsic for overloaded operators. It should be able to accomodate 
+   more than two arguments as for generic min and max operators.
+*/
+
+type intrinsic_call_to_type(call c)
+{
+
+  entity f = call_function(c);
+  list args = call_arguments(c);
+ 
+  type rt = functional_result(type_functional(entity_type(f)));
+  basic rb = variable_basic(type_variable(rt));
+
+  type t = type_undefined; /* the result */
+
+  pips_debug(7, "Intrinsic call to intrinsic \"%s\" with a priori result type \"%s\"\n",
+	     module_local_name(f),
+	     words_to_string(words_type(rt)));
+
+  if(basic_overloaded_p(rb)) 
+    {
+     
+      if (ENDP(args)) 
+	{
+	  /* I don't know the type since there is no arguments !
+	     Bug encountered with a FMT=* in a PRINT.
+	     RK, 21/02/1994 : */
+	  /* leave it overloaded */
+	  t = copy_type(rt);
+	}
+      else if(ENTITY_ADDRESS_OF_P(f)) 
+	{	  
+	  expression e = EXPRESSION(CAR(args));
+	  t = expression_to_type(e);
+	  t = make_type(is_type_variable,
+			make_variable( make_basic(is_basic_pointer,t),
+				       NIL, NIL ));
+	  
+	}
+      else if(ENTITY_DEREFERENCING_P(f)) 
+	{
+	  expression e = EXPRESSION(CAR(args));
+	  type ct = expression_to_type(e);
+	  
+	  if (type_variable_p(ct))
+	    {
+	      variable cv = type_variable(ct);
+	      basic cb = variable_basic(cv);
+	      list cd = variable_dimensions(cv);
+	      
+	      if(basic_pointer_p(cb)) 
+		{
+		  t = copy_type(ultimate_type(basic_pointer(cb)));
+		  pips_assert("The pointed type is consistent", 
+			      type_consistent_p(t));
+		  free_type(ct);
+		}
+	      else
+		{
+		  pips_assert("Dereferencing of a non-pointer expression : it must be an array\n", !ENDP(cd));
+		  		   
+		  variable_dimensions(cv) = CDR(cd);
+		  cd->cdr = NIL;
+		  gen_full_free_list(cd);
+		  t = ct;
+		}
+	    }
+	  else
+	    {
+	      pips_internal_error("dereferencing of a non-variable : not handled yet\n");
+	    }
+	}
+      else if(ENTITY_POINT_TO_P(f) || ENTITY_FIELD_P(f)) 
+	{
+	  expression e1 = EXPRESSION(CAR(args));
+	  expression e2 = EXPRESSION(CAR(CDR(args)));
+
+	  pips_assert("Two arguments for POINT_TO or FIELD \n", 
+		      gen_length(args)==2);
+
+	  ifdebug(8) 
+	    {
+	      pips_debug(8, "Point to case, e1 = ");
+	      print_expression(e1);
+	      pips_debug(8, " and e2 = ");
+	      print_expression(e1);
+	      pips_debug(8, "\n");
+	    }
+	  t = expression_to_type(e2);
+	}
+      else if(ENTITY_BRACE_INTRINSIC_P(f)) 
+	{
+	  /* We should reconstruct a struct type or an array type... */
+	  t= make_type(is_type_variable, make_variable(make_basic_overloaded(),
+						       NIL,NIL));
+	}
+      else if(ENTITY_ASSIGN_P(f)) 
+	{
+	  /* returns the type of the left hand side */
+	  t = expression_to_type(EXPRESSION(CAR(args)));
+	}
+      else if(ENTITY_COMMA_P(f)) 
+	{
+	  /* The value returned is the value of the last expression in the list. */
+	  
+	  t = expression_to_type(EXPRESSION(CAR(gen_last(args))));
+	}
+      else 
+	{
+	  
+	  type ct = expression_to_type(EXPRESSION(CAR(args)));
+	  
+	  MAP(EXPRESSION, arg, {
+	      type nt = expression_to_type(arg);
+	      basic nb = variable_basic(type_variable(nt));
+	      basic cb = variable_basic(type_variable(ct));
+
+	      /* re-use an existing function. we do not take into
+		 account variable dimensions here. It may not be correct.
+		 but it's not worse than the previously existing version
+		 of expression_to_type
+	      */
+	      basic b = basic_maximum(cb, nb);
+	      
+	      free_type(ct);
+	      free_type(nt);
+	      ct = make_type(is_type_variable, make_variable(b, NIL, NIL));
+	      
+	    }, CDR(args));
+	  t = ct;
+	}
+      
+    }
+  
+  pips_debug(7, "Intrinsic call to intrinsic \"%s\" with a posteriori result type \"%s\"\n",
+	     module_local_name(f),
+	     words_to_string(words_type(t)));
+  
+  return t;  
+}
+
+
+type call_to_type(call c)
+{
+    entity e = call_function(c);
+    type t = type_undefined;
+
+    switch (value_tag(entity_initial(e)))
+    {
+    case is_value_code:
+      t = make_type(is_type_variable,
+		    make_variable(copy_basic(basic_of_external(c)),
+				  NIL, NIL));
+      break;
+    case is_value_intrinsic: 
+      
+      t = intrinsic_call_to_type(c);
+      break;
+    case is_value_symbolic: 
+      /* b = make_basic(is_basic_overloaded, UU); */
+      t = make_type(is_type_variable,
+		    make_variable(copy_basic(basic_of_constant(c)),
+				  NIL, NIL));
+      break;
+    case is_value_constant:
+      t = make_type(is_type_variable,
+		    make_variable(copy_basic(basic_of_constant(c)),
+				  NIL, NIL));
+      break;
+    case is_value_unknown:
+      pips_debug(1, "function %s has no initial value.\n"
+		 " Maybe it has not been parsed yet.\n",
+		 entity_name(e));
+      t = make_type(is_type_variable,
+		    make_variable(copy_basic(basic_of_external(c)),
+				  NIL, NIL));
+      break;
+    default: pips_internal_error("unknown tag %d\n", t);
+      /* Never go there... */
+    }
+    
+    return t;
+}
+
+
+
+
+/* Replace typedef'ed types by combinations of basic types */
+type expression_to_type(expression exp)
+{
+  /* does not cover references to functions ...*/
+  /* Could be more elaborated with array types for array expressions */
+  type t = type_undefined;
+
+  syntax s_exp = expression_syntax(exp);
+
+  ifdebug(6){
+    pips_debug(6, "begins with expression :");
+    print_expression(exp);
+    pips_debug(6, "\n");
+  }
+
+  switch(syntax_tag(s_exp)) 
+    {
+    case is_syntax_reference:
+      {
+	reference ref = syntax_reference(s_exp);
+	type exp_type = ultimate_type(entity_type(reference_variable(ref)));
+	
+	pips_debug(6, "reference case \n");
+
+	if(type_variable_p(exp_type))
+	  {
+	    type ct = exp_type; /* current type */
+	    basic cb = variable_basic(type_variable(exp_type)); /* current basic */
+	    
+	    list cd = variable_dimensions(type_variable(exp_type)); /* current dimensions */
+	    list l_inds = reference_indices(ref);
+
+	    pips_debug(7, "reference to a variable, "
+		       "we iterate over the indices if any \n");
+
+
+	    while (!ENDP(l_inds))
+	      {
+
+		ifdebug(7) {
+		  pips_debug(7, "new iteration : current type : %s\n", 
+			     words_to_string(words_type(ct)));
+		  pips_debug(7, "current list of indices: \n");
+		  print_expressions(l_inds);
+		}
+		if(!ENDP(cd))
+		  {
+		    pips_debug(7, "poping one type dimension and one index\n");
+		    POP(cd);
+		    POP(l_inds);
+		  }
+		else
+		  {
+		    pips_debug(7,"going through pointer dimension. \n");
+		    pips_assert("reference has too many indices :" 
+				" pointer expected\n", basic_pointer_p(cb));
+		    ct= basic_pointer(cb);
+		    cb = variable_basic(type_variable(ct));
+		    cd = variable_dimensions(type_variable(ct));
+		    POP(l_inds);
+		  }
+	      }
+
+	    /* Warning : qualifiers are set to NIL, because I do not see
+	     the need for something else for the moment. BC. 
+	    */
+	    t = make_type(is_type_variable,
+			  make_variable(copy_basic(cb),
+					gen_full_copy_list(cd),
+					NIL));
+	  }
+	else if(type_functional_p(exp_type))
+	  {
+	    /* A reference to a function returns a pointer to a function 
+	       of the very same time */
+	    t = make_type(is_type_variable,
+			  make_variable
+			  (make_basic(is_basic_pointer, copy_type(exp_type)),
+			   NIL, NIL));
+	  }
+	else 
+	  {
+	    pips_internal_error("Bad reference type tag %d \"%s\"\n",
+				type_tag(exp_type), type_to_string(exp_type));
+	  }
+	
+	break;
+      }
+    case is_syntax_call: 
+      {
+	pips_debug(6, "call case \n");
+	t = call_to_type(syntax_call(s_exp));
+	break;
+      }
+    case is_syntax_range: 
+      {
+	pips_debug(6, "range case \n");
+	/* Well, let's assume range are well formed... */
+	t = expression_to_type(range_lower(syntax_range(s_exp)));
+	break;
+      }
+    case is_syntax_cast: 
+      {
+	pips_debug(6, "cast case \n");
+	t = copy_type(cast_type(syntax_cast(s_exp)));
+	if (type_tag(t) != is_type_variable)
+	  pips_internal_error("Bad reference type tag %d\n",type_tag(t));
+	break;
+      }
+    case is_syntax_sizeofexpression: 
+      {
+	sizeofexpression se = syntax_sizeofexpression(s_exp);
+	pips_debug(6, "size of case \n");
+	if (sizeofexpression_type_p(se))
+	  {
+	    t = copy_type(sizeofexpression_type(se));
+	    if (type_tag(t) != is_type_variable)
+	      pips_internal_error("Bad reference type tag %d\n",type_tag(t));
+	  }
+	else
+	  {
+	    t = expression_to_type(sizeofexpression_expression(se));
+	  }
+	break;
+      }
+    case is_syntax_subscript: 
+      {
+	/* current type */
+	type ct = expression_to_type(subscript_array(syntax_subscript(s_exp)));
+	/* current basic */ 
+	basic cb = variable_basic(type_variable(ct)); 
+	/* current dimensions */
+	list cd = variable_dimensions(type_variable(ct)); 
+	list l_inds = subscript_indices(syntax_subscript(s_exp));
+	
+	pips_debug(6, "subscript case \n");
+
+	while (!ENDP(l_inds))
+	  {
+	    if(!ENDP(cd))
+	      {
+		POP(cd);
+		POP(l_inds);
+	      }
+	    else
+	      {
+		pips_assert("reference has too many indices : pointer expected\n", basic_pointer_p(cb));
+		ct= basic_pointer(cb);
+		cb = variable_basic(type_variable(ct));
+		cd = variable_dimensions(type_variable(ct));
+	      }
+	  }
+	
+	/* Warning : qualifiers are set to NIL, because I do not see
+	   the need for something else for the moment. BC. 
+	*/
+	t = make_type(is_type_variable,
+		      make_variable(copy_basic(cb),
+				    gen_full_copy_list(cd),
+				    NIL));
+	
+	break;
+      }
+    case is_syntax_application:
+      {
+	pips_debug(6, "application case \n");
+	t = expression_to_type(application_function(syntax_application(s_exp)));
+	break;
+      }
+    default:
+      pips_internal_error("Bad syntax tag %d\n", syntax_tag(s_exp));
+      /* Never go there... */
+      
+    }
+  
+  pips_debug(6, "returns with %s\n", words_to_string(words_type(t)));
+  
+  return t;
+}
+
+
+/* Preserve typedef'ed types when possible */
+type expression_to_user_type(expression e)
+{
+  /* does not cover references to functions ...*/
+  /* Could be more elaborated with array types for array expressions */
+  type t = type_undefined;
+  basic b = some_basic_of_any_expression(e, FALSE, FALSE);
+  variable v = make_variable(b, NIL, NIL);
+
+  t = make_type(is_type_variable, v);
+
+  return t;
+}
+
+/*************************************************************************/
+
+
 
 bool 
 overloaded_type_p(type t)

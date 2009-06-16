@@ -381,7 +381,7 @@ print_source_or_code_effects_engine(
  * this function can print entity_name instead of entity_local_name,
  * when the entity is not called in the current program.
  */
-list /* of string */ effect_words_reference_with_addressing_as_it_is_or_not(reference obj, int ad_tag, bool as_it_is_p)
+list /* of string */ effect_words_reference(reference obj)
 {
   list pc = NIL;
   string begin_attachment;
@@ -416,25 +416,7 @@ list /* of string */ effect_words_reference_with_addressing_as_it_is_or_not(refe
   return(pc);  
 }
 
-/* Display the subscript expressions as they are (better for debugging!). */
-list /* of string */ effect_words_reference_with_addressing_as_it_is(reference obj, int ad_tag)
-{
-  return effect_words_reference_with_addressing_as_it_is_or_not(obj, ad_tag, TRUE);
-}
 
-/* Display fake unbounded expressions to comply with the referenced variable type. */
-list /* of string */ effect_words_reference_with_addressing(reference obj, int ad_tag)
-{
-  //return effect_words_reference_with_addressing_as_it_is_or_not(obj, ad_tag, FALSE);
-  /* For debugging */
-  return effect_words_reference_with_addressing_as_it_is_or_not(obj, ad_tag, TRUE);
-}
-
-/* Force the old format for a reference */
-list /* of string */ effect_words_reference(reference obj)
-{
-  return effect_words_reference_with_addressing(obj, TRUE);
-}
 /************************************************************ OLD INTERFACES */
 
 static void 

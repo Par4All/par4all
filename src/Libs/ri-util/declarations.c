@@ -50,7 +50,7 @@ extern bool prettyprint_is_fortran;
 text c_text_entity(entity module, entity e, int margin);
 list c_words_entity(type t, list name);
 static list words_qualifier(list obj);
-static list words_dimensions(list dims);
+list words_dimensions(list dims);
 
 /********************************************************************* WORDS */
 
@@ -1777,6 +1777,9 @@ list words_type(type obj)
       {
 	basic b = variable_basic(type_variable(obj));
 	pc = words_basic(b);
+	pc = gen_nconc
+	  (pc, 
+	   words_dimensions(variable_dimensions(type_variable(obj))));
 	break;
       }
     case is_type_void:
@@ -1859,7 +1862,7 @@ static list words_brace_expression(expression exp)
   return pc;
 }
 
-static list words_dimensions(list dims)
+list words_dimensions(list dims)
 {
   list pc = NIL;
   bool space_p = get_bool_property("PRETTYPRINT_LISTS_WITH_SPACES");
