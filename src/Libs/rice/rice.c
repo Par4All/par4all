@@ -307,7 +307,7 @@ do_it(
     mod_parallel_stat = rice_statement(mod_parallel_stat,1,codegen_fun);
 
     /* Regenerate statement_ordering for the parallel code */
-    reset_ordering_to_statement();
+	reset_ordering_to_statement();
     module_body_reorder(mod_parallel_stat);
 
     ifdebug(7)
@@ -327,7 +327,6 @@ do_it(
 
     dg = graph_undefined;
     reset_current_module_statement();
-	reset_ordering_to_statement();
     return TRUE;
 }
 
