@@ -1,0 +1,13 @@
+// OMP style
+int main()
+{
+   float a[10];
+   int m = 0;
+   int n = 0;
+
+   for(m = 0; m <= 9; m += 1) {                                         /*0007*/
+      n = n+1;                                                          /*0008*/
+      a[m] = n;                                                         /*0009*/
+   }
+   return 0;                                                            /*0011*/
+}

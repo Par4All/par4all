@@ -79,7 +79,7 @@ Consider the generated parallel as the sequential code now:
 !$OMP PARALLEL DO PRIVATE(I)
       DO J = 2, NY-1                                                    0008
 
-!$OMP    PARALLEL DO PRIVATE(PX,PY,XCO)
+!$OMP    PARALLEL DO PRIVATE(XCO,PY,PX)
          DO I = 2, NX-1                                                 0009
             XCO = XCOEF(I,J)                                            0010
             PX = (PHI1(3,I+1,J)-PHI1(3,I-1,J))*H1P2                     0011
