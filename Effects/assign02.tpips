@@ -22,6 +22,9 @@ echo
 echo Proper effetcs for "make_s"
 echo
 
+
+setenv PROPER_EFFECTS_DEBUG_LEVEL 8
+
 activate PRINT_CODE_PROPER_EFFECTS
 display PRINTED_FILE[make_s]
 

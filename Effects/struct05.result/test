@@ -84,7 +84,7 @@ int struct05()
    struct two x[10];
    int i = 0;
 
-//  T(i) {0<=i}
+//  T(i) {i#init==0, 0<=i}
 
 
    for(i = 0; i <= 9; i += 1)
