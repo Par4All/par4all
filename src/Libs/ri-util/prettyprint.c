@@ -1160,7 +1160,7 @@ null(call __attribute__ ((unused)) obj,
 
 static list
 words_prefix_unary_op(call obj,
-		      int __attribute__ ((unused)) precedence,
+		      int  precedence,
 		      bool __attribute__ ((unused)) leftmost)
 {
   list pc = NIL;
@@ -1190,15 +1190,21 @@ words_prefix_unary_op(call obj,
 	if(strcasecmp(fun, NOT_OPERATOR_NAME)==0)
 	  fun="!";
       }
+
   pc = CHAIN_SWORD(pc,fun);
   pc = gen_nconc(pc, words_subexpression(e, prec, FALSE));
+
+  if((prec < precedence) || (!precedence_p)) {
+    pc = CONS(STRING, MAKE_SWORD("("), pc);
+    pc = CHAIN_SWORD(pc, ")");
+  }
 
   return(pc);
 }
 
 static list
 words_postfix_unary_op(call obj,
-		       int __attribute__ ((unused)) precedence,
+		       int  precedence,
 		       bool __attribute__ ((unused)) leftmost)
 {
     list pc = NIL;
@@ -1214,7 +1220,12 @@ words_postfix_unary_op(call obj,
      fun = "--";
 
     pc = CHAIN_SWORD(pc,fun);
-  
+
+    if((prec < precedence) ||  (!precedence_p)) {
+      pc = CONS(STRING, MAKE_SWORD("("), pc);
+      pc = CHAIN_SWORD(pc, ")");
+    }
+
     return(pc);
 }
 
@@ -1608,9 +1619,6 @@ static struct intrinsic_handler {
     {UNARY_MINUS_OPERATOR_NAME, words_unary_minus, 25},
     /* {"--", words_unary_minus, 19}, */
 
-    {MULTIPLY_OPERATOR_NAME, words_infix_binary_op, 21},
-    {DIVIDE_OPERATOR_NAME, words_infix_binary_op, 21},
-  
     {INVERSE_OPERATOR_NAME, words_inverse_op, 21},
   
     {PLUS_OPERATOR_NAME, words_infix_binary_op, 20},
@@ -1686,24 +1694,25 @@ multiply-add operators ( JZ - sept 98) */
        The precedence is computed by using Table xx, page 49, book
        "The C programming language" of Kernighan and Ritchie, and by
        taking into account the precedence value of Fortran intrinsics. */
-  
+
     {FIELD_OPERATOR_NAME, words_infix_binary_op, 30},
     {POINT_TO_OPERATOR_NAME, words_infix_binary_op, 30},
+    {POST_INCREMENT_OPERATOR_NAME, words_postfix_unary_op, 30},
+    {POST_DECREMENT_OPERATOR_NAME, words_postfix_unary_op, 30},
 
-    {POST_INCREMENT_OPERATOR_NAME, words_postfix_unary_op, 25},
-    {POST_DECREMENT_OPERATOR_NAME, words_postfix_unary_op, 25},
     {PRE_INCREMENT_OPERATOR_NAME,  words_prefix_unary_op, 25},
     {PRE_DECREMENT_OPERATOR_NAME,  words_prefix_unary_op, 25},
     {ADDRESS_OF_OPERATOR_NAME,     words_prefix_unary_op,25},
     {DEREFERENCING_OPERATOR_NAME,  words_prefix_unary_op, 25},
-
     {UNARY_PLUS_OPERATOR_NAME, words_prefix_unary_op, 25},
     /*{"-unary", words_prefix_unary_op, 25},*/
     {BITWISE_NOT_OPERATOR_NAME, words_prefix_unary_op, 25},
     {C_NOT_OPERATOR_NAME, words_prefix_unary_op, 25},
-  
+
     {C_MODULO_OPERATOR_NAME,  words_infix_binary_op, 21},
-  
+    {MULTIPLY_OPERATOR_NAME, words_infix_binary_op, 21},
+    {DIVIDE_OPERATOR_NAME, words_infix_binary_op, 21},
+
     {PLUS_C_OPERATOR_NAME, words_infix_binary_op, 20},
     {MINUS_C_OPERATOR_NAME, words_infix_binary_op, 20},
 
