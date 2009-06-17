@@ -23,6 +23,6 @@ void comment06()
 
    p++->foo = 1;
    p--->foo = 1;
-   ++p->foo = 1;
-   --p->foo = 1;
+   (++p)->foo = 1;
+   (--p)->foo = 1;
 }

@@ -23,6 +23,6 @@ void point_to01()
 
    p++->foo = 1;
    p--->foo = 1;
-   ++p->foo = 1;
-   --p->foo = 1;
+   (++p)->foo = 1;
+   (--p)->foo = 1;
 }

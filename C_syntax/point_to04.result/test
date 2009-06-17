@@ -25,6 +25,6 @@ void point_to04()
 
    p++->foo = 1;
    p--->foo = 1;
-   ++p->foo = 1;
-   --p->foo = 1;
+   (++p)->foo = 1;
+   (--p)->foo = 1;
 }
