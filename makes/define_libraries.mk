@@ -32,8 +32,7 @@ linear.libs	= matrice union polyedre sparse_sc sc contrainte sg sommet \
 
 ######################################################################## OTHERS
 
-# SG: not needed
-# other.libs	= m
+other.libs	= m
 
 ##################################################################### EXTERNALS
 
