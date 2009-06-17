@@ -40,7 +40,8 @@
 #include "ri-util.h"
 
 //***********************************************************Local constant
-static const string PRAGMA_HEADER = "#pragma";
+static const string C_PRAGMA_HEADER = "#pragma";
+static const string FORT_PRAGMA_HEADER = "!$";
 
 
 /*****************************************************A CONSTRUCTOR LIKE PART
@@ -122,6 +123,51 @@ list pragma_omp_parallel_for_as_exprs (void) {
 /***************************************************** PRETTYPRINT PART
  */
 
+
+/** @return a new allocated string to close the extension.
+ *  @param es, the extension to be closed
+ *
+ *  Today we only generate omp parallel do pragma so the close is pretty
+ *  easy. Later we will have to analyze the extension to generate the
+ *  close string accordingly.
+ */
+string close_extension (extension e) {
+  string result = string_undefined;
+  if (get_prettyprint_is_fortran () == TRUE)
+    result = strdup(concatenate (FORT_PRAGMA_HEADER, "omp end parallel do",
+				 NULL));
+  return result;
+}
+
+/** @return a new allocated string to close the extensions.
+ *  @param es, the extensions to be closed
+ *  @param nl, set to TRUE to get the string with a final new line character
+ */
+string
+close_extensions (extensions es, bool nl) {
+  string s = string_undefined;
+
+  if (empty_extensions_p (es) == FALSE) {
+    /* Use a string_buffer for efficient string concatenation: */
+    string_buffer sb = string_buffer_make(FALSE);
+
+    list el = extensions_extension(es);
+    FOREACH(EXTENSION, e, el) {
+      s = close_extension(e);
+      if (s != string_undefined) {
+	string_buffer_append(sb, s);
+	if (nl == TRUE) string_buffer_append(sb, strdup ("\n"));
+	nl = TRUE;
+      }
+    }
+    s = string_buffer_to_string(sb);
+    /* Free the buffer with its strings: */
+    string_buffer_free_all(&sb);
+  }
+
+  return s;
+}
+
 /** @return a new allocated string with the pragma textual representation.
  */
 string
@@ -155,9 +201,12 @@ pragma_to_string (pragma p) {
     pips_internal_error("Unknown pragama type\n");
     break;
   }
-  if (s != string_undefined)
-    s = strdup(concatenate (PRAGMA_HEADER, " ", s, NULL));
-
+  if (s != string_undefined) {
+    if (get_prettyprint_is_fortran() == TRUE)
+      s = strdup(concatenate (FORT_PRAGMA_HEADER, s, NULL));
+    else
+      s = strdup(concatenate (C_PRAGMA_HEADER, " ", s, NULL));
+  }
   return s;
 }
 
@@ -187,10 +236,11 @@ extension_to_string(extension e) {
  *
  *  @return string_undefined if es is extension_undefined, an malloc()ed
  *  textual string either.
+ *  @param es, the extensions to translate to strings
+ *  @param nl, set to TRUE to get the string with a final new line character
  */
 string
-extensions_to_string(extensions es) {
-  bool flg = FALSE;
+extensions_to_string(extensions es, bool nl) {
   string s = string_undefined;
 
   if (empty_extensions_p (es) == FALSE) {
@@ -199,10 +249,10 @@ extensions_to_string(extensions es) {
 
     list el = extensions_extension(es);
     FOREACH(EXTENSION, e, el) {
-      if (flg == TRUE) string_buffer_append(sb, strdup ("\n"));
       s = extension_to_string(e);
       string_buffer_append(sb, s);
-      flg = TRUE;
+      if (nl == TRUE) string_buffer_append(sb, strdup ("\n"));
+      nl = TRUE;
     }
     s = string_buffer_to_string(sb);
     /* Free the buffer with its strings: */

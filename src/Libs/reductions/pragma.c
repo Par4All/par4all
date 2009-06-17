@@ -8,7 +8,8 @@
 #include "local-header.h"
 
 //***********************************************************Local constant
-static const string OMP_PRAGMA_FOR_HEADER = "omp parallel for";
+static const string OMP_PRAGMA_FOR_HEADER_C = "omp parallel for";
+static const string OMP_PRAGMA_FOR_HEADER_F = "omp parallel do";
 static const string REDUCTION_KEYWORD = "reduction";
 
 //***********************************************************Local variable
@@ -186,7 +187,9 @@ static string omp_operator_str (reduction_operator o) {
 static string reduction_as_str (reduction r)
 {
   string str;
-  str = concatenate (OMP_PRAGMA_FOR_HEADER, " ", REDUCTION_KEYWORD,
+  string header = (get_prettyprint_is_fortran ()) ? OMP_PRAGMA_FOR_HEADER_F :
+                                                    OMP_PRAGMA_FOR_HEADER_C;
+  str = concatenate (header, " ", REDUCTION_KEYWORD,
 		     "(", omp_operator_str (reduction_op(r)), ":",
 		     words_to_string(words_reference(reduction_reference(r))),
 		     ")", NULL);

@@ -133,12 +133,21 @@ static void pragma_str_for (loop l, statement stmt) {
   str = text_to_string (t);
   // text appends one uselless \n at the end of the string so remove it
   chop_newline (str, FALSE);
-  // we also need to skip the "#pragma"
-  string tmp = strchr (str, ' ') + 1;
-  // insert the pragma as a string to the current statement
   if ((str !=string_undefined) && (str != NULL) && (strcmp (str, "") != 0)) {
-    add_pragma_str_to_statement (stmt, tmp, TRUE);
-    pips_debug (5, "new for pragma as an extension added: %s \n", str);
+    string tmp = string_undefined;
+    if (get_prettyprint_is_fortran () == TRUE) {
+      // for fortran case we need to look at the O of OMP and skip !$
+      tmp = strchr (str, 'O');
+    }
+    else {
+      // for C case we need to look at the o of omp and skip #pragma"
+      tmp = strchr (str, 'o');
+    }
+    // insert the pragma as a string to the current statement
+    if ((tmp !=string_undefined) && (tmp != NULL) && (strcmp (tmp, "") != 0)) {
+      add_pragma_str_to_statement (stmt, tmp, TRUE);
+      pips_debug (5, "new for pragma as an extension added: %s \n", str);
+    }
   }
   return;
 }

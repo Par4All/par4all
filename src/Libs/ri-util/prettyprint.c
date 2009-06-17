@@ -863,11 +863,12 @@ static list words_nullary_op_fortran(call obj,
   if(same_string_p(fname,RETURN_FUNCTION_NAME)
      ||same_string_p(fname,C_RETURN_FUNCTION_NAME))
     pc = CHAIN_SWORD(pc, "return");
+  else if (same_string_p(fname,OMP_FOR_FUNCTION_NAME))
+    pc = CHAIN_SWORD(pc, "do");
   else
     pc = CHAIN_SWORD(pc, fname);
-  
+
   // STOP and PAUSE and RETURN in fortran may have 0 or 1 argument.A Mensi
-  
   if(gen_length(args)==1) {
     if(same_string_p(fname,STOP_FUNCTION_NAME)
        || same_string_p(fname,PAUSE_FUNCTION_NAME)
@@ -3131,11 +3132,10 @@ text text_statement_enclosed(
     pips_internal_error("Blocks should have no comments\n");
   }
 
-  // the first thing to print is statement extensions
-  string ext =  extensions_to_string (statement_extensions (stmt));
+  // the first thing to do is to print the statement extensions
+  string ext =  extensions_to_string (statement_extensions (stmt), TRUE);
   if (ext != string_undefined) {
-    ADD_SENTENCE_TO_TEXT(r,
-			 MAKE_ONE_WORD_SENTENCE(0, ext));
+    ADD_SENTENCE_TO_TEXT(r,make_sentence(is_sentence_formatted, ext));
   }
 
   /* 31/07/2003 Nga Nguyen : This code is added for C, because a
@@ -3244,6 +3244,12 @@ text text_statement_enclosed(
     ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(imargin, "}"));
   }
   attach_statement_information_to_text(r, stmt);
+
+  // the last thing to do is close the extension
+  string close =  close_extensions (statement_extensions (stmt), TRUE);
+  if (close != string_undefined) {
+    ADD_SENTENCE_TO_TEXT(r,make_sentence(is_sentence_formatted, close));
+  }
 
   ifdebug(1) {
     if (instruction_sequence_p(i)) {
