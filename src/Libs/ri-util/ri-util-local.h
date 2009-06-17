@@ -323,6 +323,20 @@
 #define ENDFILE_FUNCTION_NAME           "ENDFILE"
 #define FORMAT_FUNCTION_NAME            "FORMAT"
 
+
+/* Bit manipulation functions */
+#define ISHFT_OPERATOR_NAME             "ISHFT"
+#define ISHFTC_OPERATOR_NAME            "ISHFTC" 
+#define IBITS_OPERATOR_NAME             "IBITS" 
+#define MVBITS_OPERATOR_NAME            "MVBITS"
+#define BTEST_OPERATOR_NAME             "BTEST"
+#define IBSET_OPERATOR_NAME             "IBSET"
+#define IBCLR_OPERATOR_NAME             "IBCLR"
+#define BIT_SIZE_OPERATOR_NAME          "BIT_SIZE"          
+#define IAND_OPERATOR_NAME              "IAND"
+#define IEOR_OPERATOR_NAME              "IEOR"
+#define IOR_OPERATOR_NAME               "IOR"
+
 /* OMP related function and opertor names */
 
 #define OMP_OMP_FUNCTION_NAME           "omp"
@@ -787,6 +801,19 @@
 #define ENTITY_IMPLIEDDO_P(e)            ENTITY_NAME_P(e, IMPLIED_DO_NAME)
 #define ENTITY_IO_LIST_P(e)              ENTITY_NAME_P(e, IO_LIST_STRING_NAME)
 #define ENTITY_FORMAT_P(e)               ENTITY_NAME_P(e, "FORMAT")
+
+/* Bit manipulation functions. Amira Mensi */
+#define ENTITY_ISHFT_P(e)                ENTITY_NAME_P(e, "ISHFT")
+#define ENTITY_ISHFTC_P(e)               ENTITY_NAME_P(e, "ISHFTC")
+#define ENTITY_IBITS_P(e)                ENTITY_NAME_P(e, "IBITS")
+#define ENTITY_MVBITS_P(e)               ENTITY_NAME_P(e, "MVBITS")
+#define ENTITY_BTEST_P(e)                ENTITY_NAME_P(e, "BTEST")
+#define ENTITY_IBSET_P(e)                ENTITY_NAME_P(e, "IBSET")
+#define ENTITY_IBCLR_P(e)                ENTITY_NAME_P(e, "IBCLR")
+#define ENTITY_BIT_SIZE_P(e)             ENTITY_NAME_P(e, "BIT_SIZE")
+#define ENTITY_IOR_P(e)                  ENTITY_NAME_P(e, "IOR")
+#define ENTITY_IEOR_P(e)                 ENTITY_NAME_P(e, "IEOR")
+#define ENTITY_IAND_P(e)                 ENTITY_NAME_P(e, "IAND")
 
 /* OMP entity test */
 #define ENTITY_OMP_OMP_P                ENTITY_NAME_P(e,OMP_OMP_FUNCTION_NAME)

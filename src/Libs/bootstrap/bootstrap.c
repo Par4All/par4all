@@ -387,6 +387,22 @@ overloaded_to_logical_type(int n)
   return t;
 }
 
+/* to handle BTEST function which takes integer as parameter and
+   returns logical. Amira Mensi */
+static type
+integer_to_logical_type(int n)
+{
+  type t = type_undefined;
+  functional ft = functional_undefined;
+
+  ft = make_functional(NIL, MakeLogicalResult());
+  functional_parameters(ft) =
+    make_parameter_list(n, MakeIntegerParameter);
+  t = make_type(is_type_functional, ft);
+
+  return t;
+}
+
 static type
 integer_to_integer_type(int n)
 {
@@ -1838,6 +1854,22 @@ typing_function_int_to_real(call c, type_context_p context)
   free_basic(type_REAL);
   return result;
 }
+
+/* function added to handle one of the bit manipulation functions :
+   BTEST. Amira Mensi */
+static basic
+typing_function_int_to_logical(call c, type_context_p context)
+{
+  basic result, type_INT = make_basic_int(4);
+  basic type_LOGICAL = make_basic_float(4);
+  result = typing_function_argument_type_to_return_type(c, context,
+                                                        type_INT,
+                                                        type_LOGICAL);
+  free_basic(type_INT);
+  free_basic(type_LOGICAL);
+  return result;
+}
+
 static basic
 typing_function_double_to_int(call c, type_context_p context)
 {
@@ -3939,6 +3971,19 @@ static IntrinsicDescriptor IntrinsicTypeDescriptorTable[] =
    typing_function_format_name, 0},
   {UNBOUNDED_DIMENSION_NAME, 0, default_intrinsic_type,
    typing_function_overloaded, 0},
+
+  /* Bit manipulation functions : ISO/IEC 1539 */
+  {ISHFT_OPERATOR_NAME, 2, integer_to_integer_type, typing_function_int_to_int, 0},
+  {ISHFTC_OPERATOR_NAME, 3,integer_to_integer_type, typing_function_int_to_int, 0},
+  {IBITS_OPERATOR_NAME, 3, integer_to_integer_type, typing_function_int_to_int, 0},
+  {MVBITS_OPERATOR_NAME, 5,integer_to_integer_type, typing_function_int_to_int, 0},
+  {BTEST_OPERATOR_NAME, 2,integer_to_logical_type, typing_function_int_to_logical, 0},
+  {IBSET_OPERATOR_NAME, 2,integer_to_integer_type, typing_function_int_to_int, 0},
+  {IBCLR_OPERATOR_NAME, 2,integer_to_integer_type, typing_function_int_to_int, 0},
+  {BIT_SIZE_OPERATOR_NAME, 2,integer_to_integer_type, typing_function_int_to_int, 0},
+  {IAND_OPERATOR_NAME, 2,integer_to_integer_type, typing_function_int_to_int, 0},
+  {IEOR_OPERATOR_NAME, 2,integer_to_integer_type, typing_function_int_to_int, 0},
+  {IOR_OPERATOR_NAME, 2,integer_to_integer_type, typing_function_int_to_int, 0},
 
   /* These operators are used within the OPTIMIZE transformation in
      order to manipulate operators such as n-ary add and multiply or

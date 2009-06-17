@@ -234,6 +234,7 @@ defined according to the standard ISO/IEC 9899. Amira Mensi */
   {BUFFERIN_FUNCTION_NAME,      "xrwr",    is_action_read, is_approximation_must},
   {BUFFEROUT_FUNCTION_NAME,     "xrrr",    is_action_read, is_approximation_must},
 
+ 
   {0,                            0,        0,              0}
 };
 
@@ -405,6 +406,21 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
 
   {IMA_OPERATOR_NAME,                      no_write_effects },
   {IMS_OPERATOR_NAME,                      no_write_effects },
+
+  /* Bits manipulation functions. Amira Mensi */
+
+
+  {ISHFT_OPERATOR_NAME,                    no_write_effects },
+  {ISHFTC_OPERATOR_NAME,                   no_write_effects },
+  {IBITS_OPERATOR_NAME,                    no_write_effects },
+  {MVBITS_OPERATOR_NAME,                   no_write_effects },
+  {BTEST_OPERATOR_NAME,                    no_write_effects },
+  {IBCLR_OPERATOR_NAME,                    no_write_effects },
+  {BIT_SIZE_OPERATOR_NAME,                 no_write_effects },
+  {IBSET_OPERATOR_NAME,                    no_write_effects },
+  {IAND_OPERATOR_NAME,                     no_write_effects },
+  {IEOR_OPERATOR_NAME,                     no_write_effects },
+  {IOR_OPERATOR_NAME,                      no_write_effects },
 
   /* Here are C intrinsics.*/
 
