@@ -1194,7 +1194,7 @@ words_prefix_unary_op(call obj,
   pc = CHAIN_SWORD(pc,fun);
   pc = gen_nconc(pc, words_subexpression(e, prec, FALSE));
 
-  if((prec < precedence) || (!precedence_p)) {
+  if(prec < precedence ||  (!precedence_p && precedence>0)) {
     pc = CONS(STRING, MAKE_SWORD("("), pc);
     pc = CHAIN_SWORD(pc, ")");
   }
@@ -1221,7 +1221,7 @@ words_postfix_unary_op(call obj,
 
     pc = CHAIN_SWORD(pc,fun);
 
-    if((prec < precedence) ||  (!precedence_p)) {
+    if(prec < precedence ||  (!precedence_p && precedence>0)) {
       pc = CONS(STRING, MAKE_SWORD("("), pc);
       pc = CHAIN_SWORD(pc, ")");
     }
