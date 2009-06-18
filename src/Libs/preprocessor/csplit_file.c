@@ -84,11 +84,11 @@ static string current_workspace_name = string_undefined;
 
 /* Disambiguate the compilation unit base name (special character to avoid
  * conflicts with function names and rank if same basename exists
- * elsewhere in user files), 
+ * elsewhere in user files).
  *
  * Do not create the corresponding directory and within it the compilation unit file.
  *
- * Initialize compilation_unit_file by opening this last file. 
+ * Initialize compilation_unit_file by opening this last file.
  *
  * Set the current_compilation_unit_file_name.
  * */
@@ -128,7 +128,7 @@ void csplit_open_compilation_unit(string input_file_name)
 
   /* Loop over counter not implemented. */
 
-  pips_assert("compilation_unit_file is defined", 
+  pips_assert("compilation_unit_file is defined",
 	      compilation_unit_file != NULL);
 
   current_compilation_unit_file_name = unambiguous_file_name;
@@ -153,7 +153,7 @@ void csplit_open_compilation_unit(string input_file_name)
 
   /* Keep track of the new compilation unit as a "module" stored in a file */
 
-  fprintf(module_list_file, "%s %s\n", 
+  fprintf(module_list_file, "%s %s\n",
 	  current_compilation_unit_name,
 	  current_compilation_unit_file_name);
   free(simpler_file_name);
@@ -260,7 +260,7 @@ void csplit_copy(string module_name, string signature, int first_line, int last_
     pips_user_error("Duplicate function \"%s\".\n"
 		    "Copy in file %s from input file %s is ignored\n"
 		    "Check source code with a compiler or set property %s\n",
-		    module_name, 
+		    module_name,
 		    unambiguous_module_file_name,
 		    splitc_input_file_name,
 		    "PIPS_CHECK_FORTRAN");
@@ -319,19 +319,27 @@ void csplit_error_handler()
   reset_keyword_typedef_table();
 }
 
-void csplit_reset() 
+void csplit_reset()
 {
   /* Reset keyword table */
   reset_current_input_line();
   reset_csplit_line_number();
   reset_keyword_typedef_table();
 }
-
-/* Returns an error message or NULL if no error has occured. */
+
+
+/** Split a C file into one file per module (function or procedure) plus
+
+    @param dir_name the directory name where the input file is to pick
+    @param file_name the the C input file name to split
+    @param out file opened to record module and compilation unit names
+
+    @return an error message or NULL if no error has occured.
+*/
 string  csplit(
 	       char * dir_name,
 	       char * file_name,
-	       FILE * out /* File open to record module and compilation unit names */
+	       FILE * out
 )
 {
   extern FILE * splitc_in;
@@ -370,7 +378,7 @@ string  csplit(
   TRY {
     splitc_parse();
     error_message = NULL;
-    UNCATCH(any_exception_error); 
+    UNCATCH(any_exception_error);
   }
 
   csplit_close_compilation_unit();

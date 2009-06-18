@@ -177,11 +177,18 @@ floatnum (({decfloat}|{hexfloat}){floatsuffix}?)
 ident ({letter}|"_")({letter}|{decdigit}|"_")*
 attribident (({letter}|"_")({letter}|{decdigit}|"_"|":"))
 blank [ \t\r]+
-escape ('\\'_)
-hex_escape ('\\'[xX]{hexdigit}+)
-oct_escape ('\\'{octdigit}{octdigit}?{octdigit}?)
+escape \\
+ /* From C norm A.1: */
+hex_escape ({escape}x{hexdigit}{1,2})
+wide_hex_escape ({escape}x{hexdigit}{1,8})
+oct_escape ({escape}{octdigit}{1,3})
+char_escape ({escape}[abfnrtv\'\\?"])
+/* " */
+universal-character-name ({escape}(u{hexdigit}{4}|U{hexdigit}{8}))
+
 
 %%
+
 "/*"([^\*]|(\*+[^\/\*]))*(\*)+"/"	{
                                 /* Difficulties: stars contiguous to the opening
                                    or closing parts. */
@@ -234,45 +241,33 @@ oct_escape ('\\'{octdigit}{octdigit}?{octdigit}?)
 				return(TK_PRAGMA);
                         }
 
-\'[^\\]\'               {
+\'([^\\]|{char_escape}|{oct_escape}|{hex_escape}|{universal-character-name})\'           {
+                                /* Escaped character constants. Their
+                                   syntax is understood in PIPS character
+                                   constant construtors. */
                                 pips_debug(9,"TK_CHARCON: %s\n",yytext);
                                 yylval.string = strdup(yytext);
 				return(TK_CHARCON);
                         }
-\'\\[abfnrtv\'\\]\'     {
-                                pips_debug(9,"TK_CHARCON: %s\n",yytext);
-                                yylval.string = strdup(yytext);
-				return(TK_CHARCON);
-                        }
-\'\\0[0-9]*\'           {
-                                pips_debug(9,"TK_CHARCON: %s\n",yytext);
-                                yylval.string = strdup(yytext);
-				return(TK_CHARCON);
-                        }
-L\'[^\\]\'              {
-                                pips_debug(9,"TK_CHARCON wide character constant: %s\n",yytext);
-                                yylval.string = strdup(yytext);
-				return(TK_CHARCON);
-                        }
-L\'\\[abfnrtv\'\\]\'    {
-                                pips_debug(9,"TK_CHARCON wide character constant: %s\n",yytext);
-                                yylval.string = strdup(yytext);
-				return(TK_CHARCON);
-                        }
-L\'\\0[0-9]*\'          {
+
+L\'([^\\]|{char_escape}|{oct_escape}|{wide_hex_escape}|{universal-character-name})\'           {
+                                /* Escaped wide character constants. Their
+                                   syntax is understood in PIPS character
+                                   constant construtors. */
                                 pips_debug(9,"TK_CHARCON wide character constant: %s\n",yytext);
                                 yylval.string = strdup(yytext);
 				return(TK_CHARCON);
                         }
 
-\"([^\"]|(\\\"))*\"	{
+\"(\\\"|[^\"\\]|\\[^\"])*\"	{
                                 pips_debug(5,"TK_STRINGCON regular or wide string: %s\n",yytext);
                                 /* the "world" in L"Hello, " "world" should be treated as
                                    wide even though there's no L immediately preceding it */
                                 yylval.string = strdup(yytext);
 				return(TK_STRINGCON);
                         }
-L\"([^\"]|(\"\")|(\\\"))*\"	{
+
+L\"(\\\"|[^\"\\]|\\[^\"])*\"	{
                                 pips_debug(5,"TK_WSTRINGCON wide string: %s\n",yytext);
                                 yylval.string = strdup(yytext);
 				return(TK_WSTRINGCON);

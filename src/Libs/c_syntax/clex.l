@@ -339,6 +339,7 @@ void init_C_comment()
 
 %}
 
+
 /* This should be used instead of the manual computation of
    C_line_number...
 */
@@ -370,11 +371,18 @@ floatnum (({decfloat}|{hexfloat}){floatsuffix}?)
 ident ({letter}|"_")({letter}|{decdigit}|"_")*
 attribident (({letter}|"_")({letter}|{decdigit}|"_"|":"))
 blank [ \t\r]+
-escape ('\\'_)
-hex_escape ('\\'[xX]{hexdigit}+)
-oct_escape ('\\'{octdigit}{octdigit}?{octdigit}?)
+escape \\
+ /* From C norm A.1: */
+hex_escape ({escape}x{hexdigit}{1,2})
+wide_hex_escape ({escape}x{hexdigit}{1,8})
+oct_escape ({escape}{octdigit}{1,3})
+char_escape ({escape}[abfnrtv\'\\?"])
+/* " */
+universal-character-name ({escape}(u{hexdigit}{4}|U{hexdigit}{8}))
+
 
 %%
+
 "/*"([^\*]|(\*+[^\/\*]))*(\*)+"/"	{
                                 pips_debug(9,"Comment %s\n",yytext);
                                 C_line_number += character_occurences_in_string(yytext, '\n');
@@ -422,49 +430,43 @@ oct_escape ('\\'{octdigit}{octdigit}?{octdigit}?)
                                 C_line_number++;
                         }
 "_Pragma" 	        {
-                                pips_debug(9,"Pragma not implemented %s\n",yytext);
+                                pips_debug(9,"Pragma soon implemented %s\n",yytext);
 				return(TK_PRAGMA);
                         }
 
-\'[^\\]\'               {
+\'([^\\]|{char_escape}|{oct_escape}|{hex_escape}|{universal-character-name})\'           {
+                                /* Escaped character constants. Their
+                                   syntax is understood in PIPS character
+                                   constant construtors. */
                                 pips_debug(9,"TK_CHARCON: %s\n",yytext);
                                 yylval.string = strdup(yytext);
 				return(TK_CHARCON);
                         }
-\'\\[abfnrtv\'\\]\'     {
-                                pips_debug(9,"TK_CHARCON: %s\n",yytext);
-                                yylval.string = strdup(yytext);
-				return(TK_CHARCON);
-                        }
-\'\\0[0-9]*\'           {
-                                pips_debug(9,"TK_CHARCON: %s\n",yytext);
-                                yylval.string = strdup(yytext);
-				return(TK_CHARCON);
-                        }
-L\'[^\\]\'              {
-                                pips_debug(9,"TK_CHARCON wide character constant: %s\n",yytext);
-                                yylval.string = strdup(yytext);
-				return(TK_CHARCON);
-                        }
-L\'\\[abfnrtv\'\\]\'    {
-                                pips_debug(9,"TK_CHARCON wide character constant: %s\n",yytext);
-                                yylval.string = strdup(yytext);
-				return(TK_CHARCON);
-                        }
-L\'\\0[0-9]*\'          {
+
+L\'([^\\]|{char_escape}|{oct_escape}|{wide_hex_escape}|{universal-character-name})\'           {
+                                /* Escaped wide character constants. Their
+                                   syntax is understood in PIPS character
+                                   constant construtors. */
                                 pips_debug(9,"TK_CHARCON wide character constant: %s\n",yytext);
                                 yylval.string = strdup(yytext);
 				return(TK_CHARCON);
                         }
 
-\"([^\"]|(\\\"))*\"	{
+\"(\\\"|[^\"\\]|\\[^\"])*\"	{
                                 pips_debug(9,"TK_STRINGCON regular or wide string: %s\n",yytext);
-                                /* the "world" in L"Hello, " "world" should be treated as
-                                   wide even though there's no L immediately preceding it */
+                                /* the "world" in L"Hello, " "world"
+                                   should be treated as wide even though
+                                   there's no L immediately preceding
+                                   it */
+                                /* Indeed there is no special caracter
+				   handling here since it is done
+				   somewhere else in PIPS in the constant
+				   string constructor. */
                                 yylval.string = strdup(yytext);
 				return(TK_STRINGCON);
                         }
-L\"([^\"]|(\"\")|(\\\"))*\"	{
+
+L\"(\\\"|[^\"\\]|\\[^\"])*\"	{
                                 pips_debug(9,"TK_WSTRINGCON wide string: %s\n",yytext);
                                 yylval.string = strdup(yytext);
 				return(TK_WSTRINGCON);
