@@ -676,7 +676,7 @@ static string process_thru_C_pp(string name)
     /* To manage file encoding */
     int eol_code = -1;
 
-    (void) strcpy(old_include_options, "-I. ");
+    (void) strcpy(old_include_options, " -I. ");
     new_include_options = include_options+strlen(include_options);
     dir_name = db_get_directory_name_for_module(WORKSPACE_TMP_SPACE);
     simpler = pips_basename(name, C_FILE_SUFFIX);
