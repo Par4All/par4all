@@ -1,0 +1,34 @@
+Select the most precise analysis:
+Compute the intraprocedural preconditions at the same time as
+transformers and use them to improve the accuracy of expression
+and statement transformers:
+Try to restructure the code for more precision:
+Privatize variables on all the modules of the program:
+Ask for some statistics about the job to be done:
+Ask for the parallelization of all the modules of the program with OpenMP output:
+       PROGRAM NS
+       PARAMETER (NVAR=3,NXM=2000,NYM=2000)
+       REAL PHI1(NVAR,NXM,NYM)
+       REAL XCOEF(NXM,NYM)
+
+      NX = 101                                                          0006
+      NY = 101                                                          0007
+
+! This loop nest should be parallelized on j
+! xco, px and py should be privatized
+
+!$OMP PARALLEL DO PRIVATE(I,PX,PY,XCO)
+      DO J = 2, NY-1                                                    0011
+
+!$OMP    PARALLEL DO PRIVATE(PX,PY,XCO)
+         DO I = 2, NX-1                                                 0012
+            XCO = XCOEF(I,J)                                            0013
+            PX = (PHI1(3,I+1,J)-PHI1(3,I-1,J))*H1P2                     0014
+            PY = (PHI1(3,I,J+1)-PHI1(3,I,J-1))*H2P2                     0015
+            PHI1(1,I,J) = PHI1(1,I,J)-DT*PX*XCO                         0016
+            PHI1(2,I,J) = PHI1(2,I,J)-DT*PY*XCO                         0017
+         ENDDO
+      ENDDO
+      END
+Consider the generated parallel as the sequential code now:
+Regenerate the sources from the PIPS transformed code:

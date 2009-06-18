@@ -15,7 +15,7 @@ activate MUST_REGIONS
 activate TRANSFORMERS_INTER_FULL
 activate INTERPROCEDURAL_SUMMARY_PRECONDITION
 activate PRECONDITIONS_INTER_FULL
-activate REGION_CHAINS
+#activate REGION_CHAINS
 # Compute the intraprocedural preconditions at the same time as
 #   transformers and use them to improve the accuracy of expression
 #   and statement transformers:

@@ -1,6 +1,6 @@
-delete boom
+delete char03
 setproperty ABORT_ON_USER_ERROR TRUE
-create boom boom.c
+create char03 char03.c
 
 #activate some debug mode
 #setenv TEXT_DEBUG_LEVEL 9
@@ -23,10 +23,6 @@ setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
 #setproperty PRETTYPRINT_BLOCKS TRUE
 
 display PRINTED_FILE(main)
-display PRINTED_FILE(boom)
-
-
-close
-#delete boom
+#delete char03
 quit
 # EOF
