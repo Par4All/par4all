@@ -73,17 +73,17 @@ void fpointer01(char c, void *_stream, void (*my_fputc)(const char c, void *_str
 
       while (*col<indent) {
          my_fputc(' ', _stream);
-         *nbout++;
-         *col++;
+         (*nbout)++;
+         (*col)++;
       }
 
-      *col++;
+      (*col)++;
    }
    
    /* dans tous les cas il faut afficher le caractere passe */
 
    my_fputc(c, _stream);
-   *nbout++;
+   (*nbout)++;
 }
 
 Proper effects for "fpointer01"
@@ -93,90 +93,78 @@ void fpointer01(char c, void *_stream, void (*my_fputc)(const char c, void *_str
 //               <must be read   >: c
    if (c=='\n'||c=='\r')
 //               <must be read   >: col
-//               <must be written - post>: (*col)
+//               <must be written>: col[0]
       /* on change de ligne */
 
       *col = 0;
    else {
-//               <must be read   >: col indent
-//               <must be read    - post>: (*col)
+//               <must be read   >: col col[0] indent
       /* indentation ok ? */
 
       while (*col<indent) {
          my_fputc(' ', _stream);
-//               <must be read   >: nbout
-//               <must be written>: nbout
-//               <must be read    - post>: (*nbout)
-         *nbout++;
-//               <must be read   >: col
-//               <must be written>: col
-//               <must be read    - post>: (*col)
-         *col++;
+//               <must be read   >: nbout nbout[0]
+//               <must be written>: nbout[0]
+         (*nbout)++;
+//               <must be read   >: col col[0]
+//               <must be written>: col[0]
+         (*col)++;
       }
-//               <must be read   >: col
-//               <must be written>: col
-//               <must be read    - post>: (*col)
+//               <must be read   >: col col[0]
+//               <must be written>: col[0]
 
-      *col++;
+      (*col)++;
    }
    
    /* dans tous les cas il faut afficher le caractere passe */
 
    my_fputc(c, _stream);
-//               <must be read   >: nbout
-//               <must be written>: nbout
-//               <must be read    - post>: (*nbout)
-   *nbout++;
+//               <must be read   >: nbout nbout[0]
+//               <must be written>: nbout[0]
+   (*nbout)++;
 }
 
 Cumulated effects for "fpointer01"
 
-//               <may be read    >: TOP-LEVEL:*MEMORY* indent
-//               <must be read   >: c col nbout
-//               <may be written - post >: (*col)
+//               <may be read    >: col[0] indent
+//               <must be read   >: c col nbout nbout[0]
+//               <must be written>: col[0] nbout[0]
 void fpointer01(char c, void *_stream, void (*my_fputc)(const char c, void *_stream), int *col, int indent, int *nbout)
 {
-//               <may be read    >: TOP-LEVEL:*MEMORY* col indent 
-//                                  nbout
-//               <may be written >: col nbout
+//               <may be read    >: col[0] indent nbout nbout[0]
+//               <may be written >: nbout[0]
 //               <must be read   >: c col
-//               <may be written - post >: (*col)
+//               <must be written>: col[0]
    if (c=='\n'||c=='\r')
 //               <must be read   >: col
-//               <must be written - post>: (*col)
+//               <must be written>: col[0]
       /* on change de ligne */
 
       *col = 0;
    else {
-//               <may be read    >: TOP-LEVEL:*MEMORY*
-//               <must be read   >: col indent nbout
-//               <must be written>: col nbout
-//               <must be read    - post>: (*col)
+//               <must be read   >: col col[0] indent nbout nbout[0]
+//               <must be written>: col[0] nbout[0]
       /* indentation ok ? */
 
       while (*col<indent) {
          my_fputc(' ', _stream);
-//               <must be read   >: nbout
-//               <must be written>: nbout
-//               <must be read    - post>: (*nbout)
-         *nbout++;
-//               <must be read   >: col
-//               <must be written>: col
-//               <must be read    - post>: (*col)
-         *col++;
+//               <must be read   >: nbout nbout[0]
+//               <must be written>: nbout[0]
+         (*nbout)++;
+//               <must be read   >: col col[0]
+//               <must be written>: col[0]
+         (*col)++;
       }
-//               <must be read   >: col
-//               <must be written>: col
-//               <must be read    - post>: (*col)
+//               <must be read   >: col col[0]
+//               <must be written>: col[0]
 
-      *col++;
+      (*col)++;
    }
    
    /* dans tous les cas il faut afficher le caractere passe */
 
    my_fputc(c, _stream);
-//               <must be read   >: nbout
-//               <must be written>: nbout
-//               <must be read    - post>: (*nbout)
-   *nbout++;
+//               <must be read   >: nbout nbout[0]
+//               <must be written>: nbout[0]
+   (*nbout)++;
 }
