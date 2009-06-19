@@ -27,7 +27,7 @@
    kennedizable.
 
  */
-
+#define __GNU_SOURCE__
 #include <stdio.h>
 #include <string.h>
 
@@ -43,6 +43,7 @@
 #include "dg.h"
 #include "control.h"
 #include "pipsdbm.h"
+#include "transformations.h"
 
 #include "resources.h"
 
@@ -464,10 +465,108 @@ bool privatize_module(char *mod_name)
     return TRUE;
 }
 
+/** 
+ * @name localize declaration
+ * @{ */
+
+/** 
+ * @brief old entity -> new entities list
+ */
+static hash_table old_entity_to_new = hash_table_undefined;
+
+/** 
+ * @brief walk statements and perform localization based on the locals field
+ * of loop statement
+ * 
+ * @param s 
+ */
+static
+bool localize_declaration_walker(statement s)
+{
+	static statement parent_statement = statement_undefined;
+	if( statement_loop_p(s) )
+	{
+		loop l = statement_loop(s);
+
+		FOREACH(ENTITY,e,loop_locals(l))
+		{
+			int n = get_statement_depth(parent_statement,get_current_module_statement());
+			string new_entity_local_name = NULL;
 
 
+			asprintf(&new_entity_local_name,"%d" BLOCK_SEP_STRING "%s%d",n,entity_user_name(e),n);
+			entity new_entity = FindOrCreateEntity(get_current_module_name(),new_entity_local_name);
+			free(new_entity_local_name);
+			entity_type(new_entity)=copy_type(entity_type(e));
+			entity_initial(new_entity)=copy_value(entity_initial(e));
+
+			AddLocalEntityToDeclarations(new_entity,get_current_module_entity(),parent_statement);
+
+			list previous_replacements = hash_get(old_entity_to_new,e);
+			if( previous_replacements == HASH_UNDEFINED_VALUE )
+				previous_replacements = CONS(ENTITY,new_entity,NIL);
+			previous_replacements=gen_nconc(previous_replacements,CONS(ENTITY,e,NIL));
+			hash_put(old_entity_to_new,e,previous_replacements);
+			FOREACH(ENTITY,prev,previous_replacements)
+				substitute_entity(s,prev,new_entity);
+		}
+	}
+	parent_statement=s;
+	return true;
+}
 
 
+/** 
+ * @brief walks through all statements and create statement_blocks where needed to hold further declarations
+ * 
+ * @param s concenrned statement
+ */
+static
+void prepare_localize_declaration_walker(statement s)
+{
+	if( statement_loop_p(s) )
+	{
+		instruction i = statement_instruction(s);
+		loop l = instruction_loop(i);
 
+		/* create a new statement to hold the future private declaration */
+		if( !ENDP(loop_locals(l)))
+		{
+			statement new_statement = make_stmt_of_instr(i);
+			instruction iblock = make_instruction_block(CONS(STATEMENT,new_statement,NIL));
+			statement_instruction(s)=iblock;
+		}
+	}
+}
 
+/** 
+ * @brief make loop local variables declared in the innermost statement
+ * 
+ * @param mod_name name of the module being processed
+ * 
+ * @return 
+ */
+bool
+localize_declaration(char *mod_name)
+{
+	/* prelude */
+	set_current_module_entity(module_name_to_entity(mod_name) );
+	set_current_module_statement( (statement) db_get_memory_resource(DBR_CODE, mod_name, TRUE) );
 
+	/* propagate local informations to loop statements */ 
+
+	old_entity_to_new=hash_table_make(hash_pointer,HASH_DEFAULT_SIZE); // used to keep track of what has been done 
+	gen_recurse(get_current_module_statement(),statement_domain,gen_true,prepare_localize_declaration_walker); // create the statement_block where needed
+	gen_recurse(get_current_module_statement(),statement_domain,localize_declaration_walker,gen_null); // use loop_locals data to fill local declarations
+	hash_table_free(old_entity_to_new);
+
+	/* validate */
+	module_reorder(get_current_module_statement());
+	DB_PUT_MEMORY_RESOURCE(DBR_CODE, mod_name, get_current_module_statement());
+
+	/* postlude */
+	reset_current_module_entity();
+	reset_current_module_statement();
+	return true;
+}
+/**  @} */

@@ -7186,6 +7186,36 @@ privatize_module                    > MODULE.code
         < MODULE.chains
 \end{PipsMake}
 
+%%@UserManualDocumentation: localize_declaration
+Use informations from \ref{Scalar Privatization} to change \texttt{C}
+variable declarations.
+For instance
+\begin{lstlisting}
+int i,j;
+for(i=0;i<10;i++)
+	for(j=0;j<10;j++)
+	...
+\end{lstlisting}
+becomes
+\begin{lstlisting}
+int i;
+for(i=0;i<10;i++)
+{
+	int j;
+	for(j=0;j<10;j++)
+	...
+}
+\end{lstlisting}
+%%!UserManualDocumentation
+
+\begin{PipsMake}
+localize_declaration > MODULE.code
+		! MODULE.privatize_module
+        < PROGRAM.entities
+        < MODULE.code
+\end{PipsMake}
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% ARRAY PRIVATIZATION
 
 \subsubsection{Array Privatization}
