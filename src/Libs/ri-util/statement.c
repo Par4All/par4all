@@ -2466,10 +2466,10 @@ int count_references_to_variable(statement s, entity v)
 
 static bool is_substatement = false;
 
-bool statement_substatement_walker_p(statement s, statement root)
+bool statement_substatement_walker(statement some, statement s)
 {
-	is_substatement = (s!=root);
-	return !is_substatement;
+	is_substatement = (some==s);
+	return  !is_substatement;
 }
 
 /** 
@@ -2483,7 +2483,13 @@ bool statement_substatement_walker_p(statement s, statement root)
 bool statement_substatement_p(statement s, statement root)
 {
 	is_substatement= false;
-	gen_context_recurse(s,root,statement_domain,statement_substatement_walker_p,gen_null);
+	printf("searching::::::::::::::\n");
+	print_statement(s);
+	printf("inside::::::::::::\n");
+	print_statement(root);
+	gen_context_recurse(root,s,statement_domain,statement_substatement_walker,gen_null);
+	if(is_substatement) printf(":::::::::found !\n");
+	else printf("::::::::not found !\n");
 	return is_substatement;
 }
 
@@ -2491,14 +2497,15 @@ bool statement_substatement_p(statement s, statement root)
  * @brief computes the block-depth of a statement
  * usefull to generate entity declared at particular block level
  * 
- * @param s inner statement
- * @param root outer statement 
+ * @param s statement we compute the depth of
+ * @param root outer statement containing s 
  * 
  * @return positive integer
  */
 int get_statement_depth(statement s, statement root)
 {
-	if( s == root ) return 0;
+	if( s == root )
+		return 0;
 	else {
 		instruction i = statement_instruction(root);
 		switch(instruction_tag(i))

@@ -535,6 +535,10 @@ void prepare_localize_declaration_walker(statement s)
 			statement new_statement = make_stmt_of_instr(i);
 			instruction iblock = make_instruction_block(CONS(STATEMENT,new_statement,NIL));
 			statement_instruction(s)=iblock;
+			statement_comments(new_statement) = statement_comments(s);
+			statement_comments(s)=empty_comments;
+			statement_label(new_statement) = statement_label(new_statement);
+			statement_label(s)=entity_empty_label();
 		}
 	}
 }
@@ -550,13 +554,17 @@ bool
 localize_declaration(char *mod_name)
 {
 	/* prelude */
+	debug_on("LOCALIZE_DEBUG_LEVEL");
+	pips_debug(1,"begin localize_declaration ...");
 	set_current_module_entity(module_name_to_entity(mod_name) );
 	set_current_module_statement( (statement) db_get_memory_resource(DBR_CODE, mod_name, TRUE) );
 
 	/* propagate local informations to loop statements */ 
 
 	old_entity_to_new=hash_table_make(hash_pointer,HASH_DEFAULT_SIZE); // used to keep track of what has been done 
+	pips_debug(1,"create block statement");
 	gen_recurse(get_current_module_statement(),statement_domain,gen_true,prepare_localize_declaration_walker); // create the statement_block where needed
+	pips_debug(2,"convert loop_locals to local declrations");
 	gen_recurse(get_current_module_statement(),statement_domain,localize_declaration_walker,gen_null); // use loop_locals data to fill local declarations
 	hash_table_free(old_entity_to_new);
 
@@ -565,8 +573,10 @@ localize_declaration(char *mod_name)
 	DB_PUT_MEMORY_RESOURCE(DBR_CODE, mod_name, get_current_module_statement());
 
 	/* postlude */
+	debug_off();
 	reset_current_module_entity();
 	reset_current_module_statement();
+	pips_debug(1,"end localize_declaration");
 	return true;
 }
 /**  @} */
