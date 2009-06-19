@@ -2468,7 +2468,8 @@ static bool is_substatement = false;
 
 bool statement_substatement_walker(statement some, statement s)
 {
-	is_substatement = (some==s);
+	if( !is_substatement)
+		is_substatement = (some==s);
 	return  !is_substatement;
 }
 
@@ -2483,13 +2484,13 @@ bool statement_substatement_walker(statement some, statement s)
 bool statement_substatement_p(statement s, statement root)
 {
 	is_substatement= false;
-	printf("searching::::::::::::::\n");
-	print_statement(s);
-	printf("inside::::::::::::\n");
-	print_statement(root);
+	//printf("searching::::::::::::::\n");
+	//print_statement(s);
+	//printf("inside::::::::::::\n");
+	//print_statement(root);
 	gen_context_recurse(root,s,statement_domain,statement_substatement_walker,gen_null);
-	if(is_substatement) printf(":::::::::found !\n");
-	else printf("::::::::not found !\n");
+	//if(is_substatement) printf(":::::::::found !\n");
+	//else printf("::::::::not found !\n");
 	return is_substatement;
 }
 
