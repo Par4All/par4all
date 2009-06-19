@@ -36,11 +36,17 @@ echo
 echo After strip mining and partial eval
 echo
 apply STRIP_MINE[convol]
-l300
+l400
 0
 128
 apply PARTIAL_EVAL[convol]
 display PRINTED_FILE[convol]
+
+echo
+echo after privatization
+echo
+
+apply LOCALIZE_DECLARATION[convol]
 
 echo
 echo after outlining
@@ -54,39 +60,38 @@ n
 n
 n
 n
-n
 y
 display PRINTED_FILE[convol]
 display PRINTED_FILE[macro_instruction]
 
-echo
-echo After double unrolling
-echo
-apply FULL_UNROLL[macro_instruction]
-l100
-apply FULL_UNROLL[macro_instruction]
-l200
-
-apply PARTIAL_EVAL
-display PRINTED_FILE[macro_instruction]
-
-apply USE_DEF_ELIMINATION
-display PRINTED_FILE[macro_instruction]
-display PRINTED_FILE[macro_instruction]
-
-echo
-echo After atomization
-echo
-setproperty SIMD_EXTRAVAGANT_ATOMIZER TRUE
-apply SIMD_ATOMIZER[macro_instruction]
-display PRINTED_FILE[macro_instruction]
-
-# should be applied but fails
-#apply SCALARIZATION
-
-# probably useless for terapix microcode
-#apply INVARIANT_CODE_MOTION
-
-close
-quit
-# EOF
+#echo
+#echo After double unrolling
+#echo
+#apply FULL_UNROLL[macro_instruction]
+#l100
+#apply FULL_UNROLL[macro_instruction]
+#l200
+#
+#apply PARTIAL_EVAL
+#display PRINTED_FILE[macro_instruction]
+#
+#apply USE_DEF_ELIMINATION
+#display PRINTED_FILE[macro_instruction]
+#display PRINTED_FILE[macro_instruction]
+#
+#echo
+#echo After atomization
+#echo
+#setproperty SIMD_EXTRAVAGANT_ATOMIZER TRUE
+#apply SIMD_ATOMIZER[macro_instruction]
+#display PRINTED_FILE[macro_instruction]
+#
+## should be applied but fails
+##apply SCALARIZATION
+#
+## probably useless for terapix microcode
+##apply INVARIANT_CODE_MOTION
+#
+#close
+#quit
+## EOF

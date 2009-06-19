@@ -13,6 +13,7 @@ setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
 
 activate C_PARSER
 
+display PRINTED_FILE[main]
 display PRINTED_FILE[flgr2d_convolution]
 apply INLINING_SIMPLE[flgr2d_convolution_fgUINT16]
 display PRINTED_FILE[flgr2d_convolution]
@@ -26,7 +27,10 @@ apply INLINING_SIMPLE[flgr2d_get_neighborhood_fgUINT16]
 apply INLINING[flgr2d_get_data_array_fgUINT16]
 apply INLINING_SIMPLE[flgr_get_data_array_vector_fgUINT16]
 display PRINTED_FILE[flgr2d_raster_slide_window_fgUINT16]
+display PRINTED_FILE[flgr2d_get_nhb_convolution_fgUINT16]
+
 #apply INLINING_SIMPLE[flgr2d_raster_slide_window_fgUINT16]
+#display PRINTED_FILE[flgr2d_convolution]
 #apply PARTIAL_EVAL[flgr2d_raster_slide_window_fgUINT16]
 #display PRINTED_FILE[flgr2d_raster_slide_window_fgUINT16]
 

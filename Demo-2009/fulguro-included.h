@@ -758,6 +758,42 @@
     flgr_set_array_##dtype(pdest,k,arithop(a1,a2));	\
   }							\
   return
+#define FLGR_MACRO_GET_NHB_CONV_2D(dtype)			\
+  int i,k;							\
+  int spp = extr->spp;						\
+  dtype *presult = (dtype *) result->array;			\
+  dtype *list_data_val;						\
+  dtype *list_nhb_val;						\
+  int *size = extr->size;					\
+  fgFLOAT64 a,b,sum;						\
+  fgFLOAT64 tmp;						\
+								\
+  								\
+								\
+  for(k=0 ; k<spp ; k++) {					\
+    list_data_val = (dtype *) extr->list_data_val[k];		\
+    list_nhb_val = (dtype *) extr->list_nhb_val[k];		\
+								\
+    tmp=0;							\
+    sum=0;							\
+								\
+    for(i=0 ; i<size[k] ; i++){					\
+      a = (fgFLOAT64) list_data_val[i];				\
+      b = (fgFLOAT64) list_nhb_val[i];				\
+      tmp = tmp + (a*b);					\
+      sum = sum + (fabs(b));					\
+								\
+    }								\
+								\
+    if(sum!=0)							\
+      flgr_set_array_##dtype(presult,k,(dtype) (tmp/sum));	\
+  }								\
+								\
+  return
+
+void flgr2d_get_nhb_convolution_fgUINT16(FLGR_Vector *result, FLGR_NhbBox2D *extr) {
+  FLGR_MACRO_GET_NHB_CONV_2D(fgUINT16);
+}
 
   fgUINT16 flgr2d_get_data_array_fgUINT16(fgUINT16** array, int row, int col) {
     return flgr_get_array_fgUINT16(array[row],col);
