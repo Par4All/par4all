@@ -154,36 +154,6 @@ expression e;
     return result;
 }
 
-expression expression_dup(expression ex)
-{
-    return copy_expression(ex);
-}
-
-syntax syntax_dup(syntax s)
-{
-    return copy_syntax(s);
-}
-
-normalized normalized_dup(normalized n)
-{
-    return copy_normalized(n);
-}
-
-reference reference_dup(reference r)
-{
-    return copy_reference(r);
-}
-
-range range_dup(range r)
-{
-    return copy_range(r);
-}
-
-call call_dup(call c)
-{
-    return copy_call(c);
-}
-
 expression expression_mult(ex)
 expression ex;
 {

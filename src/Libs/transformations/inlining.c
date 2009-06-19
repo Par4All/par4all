@@ -60,6 +60,12 @@ static statement    laststmt;
 static entity       returned_entity;
 static bool 		use_effects;
 
+static void reset_expression_normalized(expression e)
+{
+    if(!normalized_undefined_p(expression_normalized(e)))
+        free_normalized(expression_normalized(e));
+    expression_normalized(e)=normalized_undefined;
+}
 
 /* replace return instruction by a goto
  */
@@ -134,72 +140,6 @@ bool find_write_effect_on_entity(statement s, entity e)
 	return false;
 }
 
-struct entity_pair
-{
-    entity old;
-    entity new;
-};
-
-/* substitute `thecouple->new' to `thecouple->old' in `exp'
- * if `exp' is a reference
- */
-static void
-do_substitute_entity(expression exp, struct entity_pair* thecouple)
-{
-    if( expression_reference_p(exp) )
-    {
-        reference ref = syntax_reference(expression_syntax(exp));
-        entity referenced_entity = reference_variable(ref);
-        /*if( same_entity_name_p(referenced_entity,thecouple->old))*/
-		string emn_r = strdup(entity_module_name(referenced_entity));
-		string emn_o = entity_module_name(thecouple->old);
-		string eun_r = entity_user_name(referenced_entity);
-		string eun_o = entity_user_name(thecouple->old);
-        if( same_string_p(emn_r,emn_o) && same_string_p(eun_r,eun_o))
-        {
-            if( entity_constant_p(thecouple->new) )
-            {
-                expression_syntax(exp) = make_syntax_call(make_call(thecouple->new,NIL));
-            }
-            else
-            {
-				//pips_assert("substitute entities of similar type",gen_length(reference_indices(ref)) == gen_length(variable_dimensions(type_variable(entity_type(thecouple->new)))));
-                reference_variable(ref) = thecouple->new;
-            }
-        }
-		free(emn_r);
-    }
-}
-
-static void reset_expression_normalized(expression e)
-{
-    if(!normalized_undefined_p(expression_normalized(e)))
-        free_normalized(expression_normalized(e));
-    expression_normalized(e)=normalized_undefined;
-}
-
-static void
-do_substitute_all_entities(statement s, struct entity_pair* thecouple)
-{
-    FOREACH(ENTITY,decl_ent,statement_declarations(s))
-    {
-        value v = entity_initial(decl_ent);
-        if( !value_undefined_p(v) && value_expression_p( v ) )
-            gen_context_recurse( v, thecouple, expression_domain, gen_true, do_substitute_entity);
-    }
-}
-
-/* substitute `thecouple->new' to `thecouple->old' in `s'
- */
-void
-substitute_entity(statement s, entity old, entity new)
-{
-    struct entity_pair thecouple = { old, new };
-
-    gen_context_multi_recurse( s, &thecouple, expression_domain, gen_true, do_substitute_entity,
-            statement_domain,gen_true, do_substitute_all_entities, NULL);
-
-}
 
 
 /* look for entity locally named has `new' in statements `s'
@@ -1208,12 +1148,12 @@ outline(char* module_name)
     statements_to_outline=gen_nreverse(statements_to_outline);
 
     /* apply outlining */
-    statement new_stmt = outliner(outline_module_name,statements_to_outline);
+    (void*)outliner(outline_module_name,statements_to_outline);
 
 
     /* validate */
     module_reorder(get_current_module_statement());
-    DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, new_stmt);
+    DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, get_current_module_statement());
     DB_PUT_MEMORY_RESOURCE(DBR_CALLEES, module_name, compute_callees(get_current_module_statement()));
 
     /*postlude*/

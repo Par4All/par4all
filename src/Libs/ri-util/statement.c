@@ -2460,6 +2460,78 @@ int count_references_to_variable(statement s, entity v)
   variable_searched = entity_undefined;
   return reference_count;
 }
+/** 
+ * @name get_statement_depth and its auxilary functions
+ * @{ */
+
+static bool is_substatement = false;
+
+bool statement_substatement_walker_p(statement s, statement root)
+{
+	is_substatement = (s!=root);
+	return !is_substatement;
+}
+
+/** 
+ * @brief search a statement inside a statement
+ * 
+ * @param s searched statement 
+ * @param root where to start searching from
+ * 
+ * @return true if found
+ */
+bool statement_substatement_p(statement s, statement root)
+{
+	is_substatement= false;
+	gen_context_recurse(s,root,statement_domain,statement_substatement_walker_p,gen_null);
+	return is_substatement;
+}
+
+/** 
+ * @brief computes the block-depth of a statement
+ * usefull to generate entity declared at particular block level
+ * 
+ * @param s inner statement
+ * @param root outer statement 
+ * 
+ * @return positive integer
+ */
+int get_statement_depth(statement s, statement root)
+{
+	if( s == root ) return 0;
+	else {
+		instruction i = statement_instruction(root);
+		switch(instruction_tag(i))
+		{
+			case is_instruction_sequence:
+				{
+					FOREACH(STATEMENT,stmt,instruction_block(i))
+					{
+						if(statement_substatement_p(s,stmt))
+							return 1+get_statement_depth(s,stmt);
+					}
+					pips_internal_error("you should never reach this point");
+				} 
+			case is_instruction_test:
+				return 
+					statement_substatement_p(s,test_true(instruction_test(i))) ?
+					get_statement_depth(s,test_true(instruction_test(i))):
+					get_statement_depth(s,test_false(instruction_test(i)));
+			case is_instruction_loop:
+				return get_statement_depth(s,loop_body(instruction_loop(i)));
+			case is_instruction_whileloop:
+				return get_statement_depth(s,whileloop_body(instruction_whileloop(i)));
+			case is_instruction_forloop:
+				return get_statement_depth(s,forloop_body(instruction_forloop(i)));
+			case is_instruction_unstructured:
+				pips_internal_error("not implemented for unstructured");
+			default:
+				pips_internal_error("you should never reach this point");
+		};
+	}
+}
+
+/**  @} */
 
 
 /* That's all folks */
