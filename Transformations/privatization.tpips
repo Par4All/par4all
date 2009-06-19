@@ -1,0 +1,45 @@
+delete privatization
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create privatization privatization.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
+
+echo
+echo Initial code
+echo
+
+display PRINTED_FILE[main]
+
+echo
+echo Code after privatization
+echo
+
+apply LOCALIZE_DECLARATION[main]
+display PRINTED_FILE[main]
+
+echo
+echo Unsplit resulting code
+echo
+
+apply UNSPLIT
+
+echo
+echo Run code
+echo
+
+shell gcc ${VDIR:-.}/privatization.c
+shell ./a.out 
+shell gcc privatization.database/Src/privatization.c
+shell ./a.out 
+shell rm -f a.out
+
+close
+delete privatization
+quit
+
+
