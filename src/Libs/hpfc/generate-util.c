@@ -140,7 +140,7 @@ hpfc_add_2(
 {
     entity plus = entity_intrinsic(PLUS_OPERATOR_NAME);
     return(make_assign_statement
-	   (expression_dup(exp), 
+	   (copy_expression(exp), 
 	    MakeBinaryCall(plus, exp, int_to_expression(2))));
 
 }

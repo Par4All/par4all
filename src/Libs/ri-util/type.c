@@ -672,8 +672,8 @@ please_give_me_a_basic_for_an_expression(expression e)
 dimension 
 dimension_dup(dimension d)
 {
-    return(make_dimension(expression_dup(dimension_lower(d)),
-			  expression_dup(dimension_upper(d))));
+    return(make_dimension(copy_expression(dimension_lower(d)),
+			  copy_expression(dimension_upper(d))));
 }
 
 list 

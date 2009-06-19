@@ -1389,6 +1389,9 @@ statement st;
     case is_instruction_unstructured:
 	le = load_proper_rw_effects_list(st);
 	break ;
+	case is_instruction_forloop:
+		pips_error( "load_statement_effects", "not implemented for c for loops\nconsider setting FOR_TO_DO_LOOP_IN_CONTROLIZER to TRUE\n", t ) ;
+		break;
     default:
 	pips_error( "load_statement_effects", "Unknown tag %d\n", t ) ;
     }

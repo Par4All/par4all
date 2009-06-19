@@ -455,7 +455,7 @@ hash_table fst; /* forward substitute table */
 	      exp1 = (expression) hash_get(fst,
 					   (char*) reference_variable(ref));
 	      if ( exp1 != expression_undefined )
-		*pexp =  expression_dup( exp1 );
+		*pexp =  copy_expression( exp1 );
 	      debug( 5, "forward_substitute_in_exp",
 		    "forwarding in reference : end\n" );
 	      break ;

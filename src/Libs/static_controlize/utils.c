@@ -324,7 +324,7 @@ list *ell;
 			   else 
 			     exp2 = MakeBinaryCall(ENTITY_AND,
 				     sc_opposite_exp_of_conjunction(exp3, ell),
-						   expression_dup( exp2 ) );
+						   copy_expression( exp2 ) );
 			}, ndf_normalized_test(arg1, ell));
 			ret_list = ndf_normalized_test(exp2, ell);
 			return( ret_list );
@@ -479,10 +479,10 @@ list *ell;
 			ne = normalize_test_leaves(e, ell);
 			if (ne == expression_undefined) return(ne);
 			ADD_ELEMENT_TO_LIST(new_args, EXPRESSION, 
-					expression_dup( ne ));
+					copy_expression( ne ));
 			}, args);
 		call_arguments(syntax_call( s )) = new_args;
-		ret_exp = expression_dup( exp );
+		ret_exp = copy_expression( exp );
 		debug(7, "normalize_test_leaves", "returning : %s\n",
 			words_to_string(words_expression( ret_exp )) );
 		return( ret_exp );
@@ -586,7 +586,7 @@ list *ell;
 		MAPL( exp_ptr,{
 			e = EXPRESSION(CAR( exp_ptr ));
 			ret_exp = MakeBinaryCall( ENTITY_OR,
-					expression_dup( ret_exp ), e );
+					copy_expression( ret_exp ), e );
 		}, ndf_list );
 	}
 
@@ -732,7 +732,7 @@ list l;
 		expression exp;
 
 		exp = EXPRESSION(CAR( l ));
-		ADD_ELEMENT_TO_LIST( ret_list, EXPRESSION, expression_dup(exp) );
+		ADD_ELEMENT_TO_LIST( ret_list, EXPRESSION, copy_expression(exp) );
 	}
 
 	debug(9, "sc_list_of_exp_dup", "end\n");

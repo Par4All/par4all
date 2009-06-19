@@ -187,7 +187,7 @@ region region_dup(region reg)
     if(cell_preference_p(region_cell(new_reg))) {
       /* work around persistency of effect reference */
       preference p = cell_preference(region_cell(new_reg));
-      preference_reference(p) = reference_dup(region_any_reference(reg));
+      preference_reference(p) = copy_reference(region_any_reference(reg));
     }
 
     debug_region_consistency(new_reg);
@@ -1264,7 +1264,7 @@ effect reference_whole_region(reference ref, tag tac)
     action ac = make_action(tac, UU);
     approximation ap = make_approximation(is_approximation_may, UU);
     
-    new_eff = make_region(reference_dup(make_regions_reference(e)), ac, ap, 
+    new_eff = make_region(copy_reference(make_regions_reference(e)), ac, ap, 
 			  make_whole_array_predicate(e));
     return(new_eff);
 }  

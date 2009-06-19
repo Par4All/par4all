@@ -227,10 +227,10 @@ int *Gcount_nlc;
   nub =   make_op_exp(DIVIDE_OPERATOR_NAME,
 		      make_op_exp(PLUS_OPERATOR_NAME,
 				  make_op_exp(MINUS_OPERATOR_NAME,
-					      expression_dup(ru),
-					      expression_dup(rl)),
-				  expression_dup(ri)),
-		      expression_dup(ri));
+					      copy_expression(ru),
+					      copy_expression(rl)),
+				  copy_expression(ri)),
+		      copy_expression(ri));
   nub2 = copy_expression(nub);
 
   ADD_ELEMENT_TO_LIST( stmt_list, STATEMENT, before_stmt );
@@ -246,13 +246,13 @@ int *Gcount_nlc;
   new_index_exp = make_op_exp(PLUS_OPERATOR_NAME,
 			      make_op_exp(MINUS_OPERATOR_NAME,
 					  make_op_exp(MULTIPLY_OPERATOR_NAME,
-						      expression_dup(ri),
+						      copy_expression(ri),
 						      nlc_exp),
-					  expression_dup(ri)),
-			      expression_dup(rl));
+					  copy_expression(ri)),
+			      copy_expression(rl));
   hash_put(fst, (char*) index, (char*) new_index_exp);
 
-  nub3 = expression_dup( nub );
+  nub3 = copy_expression( nub );
   if ( expression_constant_p( nub3 )) {
     int upper = expression_to_int( nub3 );
     if ( upper > 0 )
@@ -262,19 +262,19 @@ int *Gcount_nlc;
     max_ent = gen_find_tabulated(make_entity_fullname(TOP_LEVEL_MODULE_NAME,
 						      MAX_OPERATOR_NAME),
 				 entity_domain);
-    exp_max = make_max_exp(max_ent, expression_dup( nub ),
+    exp_max = make_max_exp(max_ent, copy_expression( nub ),
 			   make_integer_constant_expression( 0 ));
   }
   if ( exp_max == expression_undefined )
-    exp_plus = expression_dup( rl );
+    exp_plus = copy_expression( rl );
   else
     exp_plus = make_op_exp(PLUS_OPERATOR_NAME,
 			   make_op_exp( MULTIPLY_OPERATOR_NAME,
-				       expression_dup( ri ),
+				       copy_expression( ri ),
 				       exp_max),
-			   expression_dup( rl ));
+			   copy_expression( rl ));
   index_exp = make_entity_expression( index, NIL );
-  end_stmt = make_assign_statement( expression_dup(index_exp), exp_plus );
+  end_stmt = make_assign_statement( copy_expression(index_exp), exp_plus );
   ADD_ELEMENT_TO_LIST( stmt_list, STATEMENT, end_stmt);
 
   ln_of_statement(loop_body(l), fst , ell, etl, swfl, Gcount_nlc);

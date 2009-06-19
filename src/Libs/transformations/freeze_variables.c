@@ -144,7 +144,7 @@ static void freeze_variables_in_statement(statement s, entity_lists * el)
 		  || rw_effect_on_variable_p(efs,ent,READ_EFF)) {
 		/* if call  and READ effect on ent, initialize new_ent=ent*/   
 		e1 = reference_to_expression(make_reference(new_ent, NIL));
-		e2 = reference_to_expression(reference_dup(r));
+		e2 = reference_to_expression(copy_reference(r));
 		i1 = make_assign_instruction(e1,e2);
 		s1=make_stmt_of_instr(i1);
 		statement_label(s)= entity_empty_label();
@@ -157,7 +157,7 @@ static void freeze_variables_in_statement(statement s, entity_lists * el)
 	      
 	      /* insert after: if (new_ent.NE.ent) STOP */
 	      e1 = reference_to_expression(make_reference(new_ent, NIL));
-	      e2 = reference_to_expression(reference_dup(r));
+	      e2 = reference_to_expression(copy_reference(r));
 	      c1 = make_call(entity_intrinsic(NON_EQUAL_OPERATOR_NAME),
 			     CONS(EXPRESSION, e1, CONS(EXPRESSION, e2, NIL)));
 	      

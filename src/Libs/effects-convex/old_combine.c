@@ -534,7 +534,7 @@ effect regions_must_convex_hull(region r1, region r2)
 
     if(sc_rn_p(sr))
     { 
-	reference refr = reference_dup(region_any_reference(r1));
+	reference refr = copy_reference(region_any_reference(r1));
 	tag acr = region_action_tag(r1);
 
 	pips_debug(1, "sr sc_rn (maybe due to an overflow error)\n");
@@ -750,7 +750,7 @@ static effect regions_may_convex_hull(region r1, region r2)
 
     if(sc_rn_p(sr))
     { 
-	reference refr = reference_dup(region_any_reference(r1));
+	reference refr = copy_reference(region_any_reference(r1));
 	tag acr = region_action_tag(r1);
 
 	pips_debug(1,"sr sc_rn (maybe due to an overflow error)\n");

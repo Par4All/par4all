@@ -276,7 +276,7 @@ simple_effect_dup(effect eff)
 
   if(cell_preference_p(effect_cell(new_eff))) {
     /* FI: memory leak? we allocate something and put it behind a persistent pointer */
-    effect_reference(new_eff) = reference_dup(effect_reference(new_eff));
+    effect_reference(new_eff) = copy_reference(effect_reference(new_eff));
   }
 
   ifdebug(8) pips_assert("the new effect is consistent", effect_consistent_p(new_eff));

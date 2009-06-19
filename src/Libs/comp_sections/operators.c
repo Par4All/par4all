@@ -41,7 +41,7 @@ comp_desc InitCompDesc(reference ref, tag ReadWrite)
   /*}}}*/
   
   pips_debug(3, "begin\n");
-  DupRef = reference_dup(ref);
+  DupRef = copy_reference(ref);
 
   e = reference_variable(DupRef);
   

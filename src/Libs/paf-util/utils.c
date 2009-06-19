@@ -787,7 +787,7 @@ expression exp;
  nexp = NORMALIZE_EXPRESSION(exp);
 
  if(normalized_complex_p(nexp))
-    neg_exp = expression_dup(exp);
+    neg_exp = copy_expression(exp);
  else
    {
     Pvecteur vexp, new_vec;

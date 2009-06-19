@@ -180,7 +180,7 @@ switch(instruction_tag(inst))
     SET_STATEMENT_MAPPING( Gstatic_control_map, test_true( t ), sc1);
     gen_remove( &Genclosing_tests, (chunk*) test_condition( t ));
 
-    exp1 = MakeUnaryCall( ENTITY_NOT, expression_dup( test_condition(t) ));
+    exp1 = MakeUnaryCall( ENTITY_NOT, copy_expression( test_condition(t) ));
     if ( (exp2 = sc_conditional(exp1, &Genclosing_loops)) ==
 	expression_undefined) {
 	exp2 = exp1;

@@ -96,7 +96,7 @@ comp_desc comp_region_dup(comp_desc reg)
     /* debug_region_consistency(reg); */
     new_reg = copy_comp_desc(reg);
     /* work around persistency of comp_desc reference */
-    comp_desc_reference(new_reg) = reference_dup(comp_desc_reference(reg)); 
+    comp_desc_reference(new_reg) = copy_reference(comp_desc_reference(reg)); 
     return(new_reg);
 }
 /* void region_add_to_regions(region reg, list l_reg)

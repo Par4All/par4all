@@ -123,7 +123,7 @@ text text_loop_craft(module, label, margin, obj, n, lr, lidx)
     
     args = call_arguments(instruction_call(i));
     if(!ENDP(args))
-      lhs_exp = expression_dup(EXPRESSION(CAR(args)));
+      lhs_exp = copy_expression(EXPRESSION(CAR(args)));
     else
       user_error("text_loop_craft",
 		 "Call to an assign with no argument\n");

@@ -419,7 +419,7 @@ static bool remove_dead_loop(statement s, instruction i, loop l)
 
   init_val = copy_expression(rl = range_lower(lr = loop_range(l))); 
   /*pips_assert("remove_dead_loop", gen_defined_p(init_val));*/
-  /*expression init_val = expression_dup(range_lower(loop_range(l)));*/
+  /*expression init_val = copy_expression(range_lower(loop_range(l)));*/
 
   /* Assume here that index is a scalar variable... :-) */
   pips_assert("remove_dead_loop", entity_scalar_p(loop_index(l)));
