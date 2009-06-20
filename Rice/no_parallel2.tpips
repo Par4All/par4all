@@ -10,7 +10,6 @@ create no_parallel2 no_parallel2.f
 #setenv SEMANTICS_DEBUG_LEVEL 9
 #setenv PRETTYPRINT_DEBUG_LEVEL 9
 
-apply PRIVATIZE_MODULE(%ALL)
 echo // OMP style
 activate PRINT_PARALLELIZEDOMP_CODE
 display PARALLELPRINTED_FILE(%ALL)
