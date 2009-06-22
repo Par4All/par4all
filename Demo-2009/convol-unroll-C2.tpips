@@ -47,6 +47,8 @@ echo after privatization
 echo
 
 apply LOCALIZE_DECLARATION[convol]
+apply CLEAN_DECLARATIONS[convol]
+display PRINTED_FILE[convol]
 
 echo
 echo after outlining
