@@ -16,11 +16,13 @@ Proper effetcs for "PRINT01"
       PROGRAM PRINT01
 
       REAL X(10)
+C               <may be written >: X(*)
 C               <must be read   >: __IO_EFFECTS:LUNS(5)
-C               <must be written>: X __IO_EFFECTS:LUNS(5)
+C               <must be written>: __IO_EFFECTS:LUNS(5)
 
       READ *, X                                                         0005
-C               <must be read   >: X __IO_EFFECTS:LUNS(6)
+C               <may be read    >: X(*)
+C               <must be read   >: __IO_EFFECTS:LUNS(6)
 C               <must be written>: __IO_EFFECTS:LUNS(6)
 
       PRINT *, X                                                        0007
@@ -36,11 +38,13 @@ C                                  __IO_EFFECTS:LUNS(6)
       PROGRAM PRINT01
 
       REAL X(10)
+C               <may be written >: X(*)
 C               <must be read   >: __IO_EFFECTS:LUNS(5)
-C               <must be written>: X __IO_EFFECTS:LUNS(5)
+C               <must be written>: __IO_EFFECTS:LUNS(5)
 
       READ *, X                                                         0005
-C               <must be read   >: X __IO_EFFECTS:LUNS(6)
+C               <may be read    >: X(*)
+C               <must be read   >: __IO_EFFECTS:LUNS(6)
 C               <must be written>: __IO_EFFECTS:LUNS(6)
 
       PRINT *, X                                                        0007
