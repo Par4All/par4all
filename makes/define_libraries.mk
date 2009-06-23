@@ -46,7 +46,7 @@ extern.libs	= polylib
 
 pipslibs.libs	= \
 	top-level pipsmake wp65 hpfc hyperplane \
-	instrumentation statistics expressions transformations \
+	instrumentation statistics expressions transformations hwac \
 	movements bootstrap callgraph icfg chains complexity \
 	conversion prettyprint atomizer syntax c_syntax \
 	effects-simple effects-convex effects-generic alias-classes \
