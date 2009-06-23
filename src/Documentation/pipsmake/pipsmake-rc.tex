@@ -5232,6 +5232,7 @@ phrase_comEngine_distributor                       > MODULE.code
         < MODULE.summary_complexity
 \end{PipsMake}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% TRANSFORMATIONS
 
 \chapter{Program Transformations}
 \label{section-program-transformations}
@@ -5606,7 +5607,7 @@ Tiling for sequences of loop nests
 
 Youcef \textsc{Bouchebaba}'s implementation of tiling for sequences of
 loop nests \ldots
- 
+
 \begin{PipsMake}
 alias tiling_sequence 'Tiling sequence of loop nests'
 \end{PipsMake}
@@ -5617,9 +5618,38 @@ tiling_sequence      > MODULE.code
         < MODULE.code
 \end{PipsMake}
 
+\subsection{Hardware Accelerator}
+\label{hardware-accelerator}
 
+Generate code for a particular hardware accelerator.
+It looks generic, but it may not be such a good idea if
+different targets require different costly analyses.
+
+\begin{PipsMake}
+hardware_accelerator	> MODULE.code
+        < PROGRAM.entities
+        < MODULE.code
+\end{PipsMake}
+
+The next property describe the input API which is considered for
+acceleration. The freia image manipulation API is the currently considered.
+\begin{PipsProp}
+HWAC_INPUT "freia"
+\end{PipsProp}
+
+The target hardware is:
+\begin{PipsProp}
+HWAC_TARGET "spoc"
+\end{PipsProp}
+
+Depth of the target Spoc accelerator:
+\begin{PipsProp}
+HWAC_SPOC_DEPTH 8
+\end{PipsProp}
 
 %-----------End of Loop Transformations -------------------------
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% REDUNDANCY ELIMINATION
 
 \section{Redundancy Elimination}
 

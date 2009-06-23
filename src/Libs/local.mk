@@ -35,6 +35,6 @@ FWD_DIRS	= \
 	effects effects-generic effects-simple semantics complexity \
 	continuation reductions regions effects-convex alias-classes \
 	callgraph icfg ricedg \
-	chains rice hyperplane transformations expressions \
+	chains rice hyperplane transformations hwac expressions \
 	statistics instrumentation hpfc atomizer safescale sac phrase wp65 \
 	preprocessor pipsmake
