@@ -1,5 +1,5 @@
-delete interpol
-create interpol interpol.f
+delete for
+create for for.c
 
 #activate some debug mode
 #setenv TEXT_DEBUG_LEVEL 9
@@ -10,18 +10,20 @@ create interpol interpol.f
 #setenv PIPSDBM_DEBUG_LEVEL 9
 #setenv C_SYNTAX_DEBUG_LEVEL 9
 #setenv SEMANTICS_DEBUG_LEVEL 9
-setenv REDUCTIONS_DEBUG_LEVEL 5
+#setenv REDUCTIONS_DEBUG_LEVEL 9
 #setenv PRETTYPRINT_DEBUG_LEVEL 9
 
-#setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+#SELECT C LANGUAGE
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 
-echo PROPER REDUCTIONS
-activate PRINT_CODE_PROPER_REDUCTIONS
-display PRINTED_FILE[%ALL]
+
+#activate PRINT_CODE_PROPER_REDUCTIONS
 activate PRINT_CODE_CUMULATED_REDUCTIONS
-display PRINTED_FILE[%ALL]
+display PRINTED_FILE(main)
 
 close
-delete interpol
+delete for
 quit
 # EOF
