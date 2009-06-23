@@ -553,7 +553,8 @@ effect regions_must_convex_hull(region r1, region r2)
 
 	/* we return a whole array region */
 	appr = is_approximation_may;
-	reg = reference_whole_region(refr, acr);	
+	reg = reference_whole_region(refr, acr);
+	effect_to_may_effect(reg);
 	ifdebug(8)
 	{
 	    pips_debug(8, "final region : \n");
@@ -763,7 +764,8 @@ static effect regions_may_convex_hull(region r1, region r2)
 
 	/* we return a whole array region */
 	appr = is_approximation_may;
-	reg = reference_whole_region(refr, acr);	
+	reg = reference_whole_region(refr, acr);
+	effect_to_may_effect(reg);
 	ifdebug(8)
 	{
 	    pips_debug(8, "final region : \n");

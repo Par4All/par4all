@@ -43,6 +43,7 @@
 #include "text-util.h"
 #include "ri-util.h"
 #include "properties.h"
+#include "preprocessor.h"
 
 #include "effects-generic.h"
 #include "effects-simple.h"
@@ -66,138 +67,183 @@ reference_effect_free(effect eff)
     free_effect(eff);
 }
 
-/* FI: this function is not that simple as it depends on the type of
-   the referenced variable and maybe of the action.
+/**
+ @param ref is a reference
+ @param ac is an action
+ @return a simple effect representing a memory access.
 
-   If s is a structure with a field a, it is called in the very same
-   way when a field is modified:
+ This function trusts the reference ref : no check is done to know
+ if the effect is legal (for instance a read effect on a partially
+ subscripted array). This has to be done at a higher level. (BC)
 
-   s.a = 1;
-
-   and when the whole structure is assigned:
-
-   s = s2;
  */
 effect reference_to_simple_effect(reference ref, action ac)
 {
-/* It should be this one, but it does not work. Maybe there is a clash with
-   old uses of make_simple_effects. Or persistancy is not properly handled?
-   - bc.
-*/
-  /* FI: this should be revisited now that I have cleaned up a lot of
-     the effects library to handled the two kinds of cells. */
-  /* cell cell_ref = make_cell(is_cell_reference, copy_reference(ref)); */
-
+  entity ent = reference_variable(ref);
   effect eff = effect_undefined;
-  list ind = reference_indices(ref);
-  type t = entity_type(reference_variable(ref));
-  type ut = ultimate_type(t);
 
   pips_debug(8, "Begins for reference: \"%s\"\n", 
 	     words_to_string(words_reference(ref)));
-
-  if(type_variable_p(ut)) {
-    variable utv = type_variable(ut);
-    list utd = variable_dimensions(utv);
-    //basic utb = variable_basic(utv);
-    bool is_array_p = !ENDP(utd);
-    variable tv = type_variable(t);
-    list td = variable_dimensions(tv);
-
-    /* The dimensions can be hidden in the typedef or before the typedef */
-    if(type_variable_p(t)) 
-      {
-	is_array_p = is_array_p || (!ENDP(td));
-      }
-
-    if(is_array_p) 
-      {
-	if((gen_length(ind) == type_depth(t))) 
-	  {
-	    /* The dimensionalities of the index and type are the same: */
-	    /* cell cell_ref = make_cell_reference(copy_reference(ref)); */
-	    cell cell_ref = make_cell_preference(make_preference(ref));
-	    approximation ap = make_approximation_must();
-	    eff = make_effect(cell_ref, ac, ap, make_descriptor_none());
-	  }
-	else if((gen_length(ind) < type_depth(t))) 
-	  {
-	    /* This may happen with an array of structures */
-	    int d = (t==ut) ? gen_length(td) : gen_length(td)+gen_length(utd);
-
-	    /* RK: In the following there is 3 tests with the same code in
-	       it. Sounds it needs some code hoisting... ::-) Or some
-	       debug. Is it really the same for the pointer type? */
-	    /* FI: I'm now lost here... */
-	    if(gen_length(ind)==d) 
-	      {
-		reference n_ref = copy_reference(ref);
-		cell cell_ref = make_cell_reference(n_ref);
-		approximation ap = make_approximation_must();
-		eff = make_effect(cell_ref, ac, ap, make_descriptor_none());
-	      }
-	    /* FI: I'm not sure this code is of any positive use */
-	    else if(pointer_type_p(ut)) 
-	      {
-		reference n_ref = copy_reference(ref);
-		cell cell_ref = make_cell_reference(n_ref);
-		approximation ap = make_approximation_must();
-		eff = make_effect(cell_ref, ac, ap, make_descriptor_none());
+  
+  if (same_string_p(entity_name(ent), ALL_MEMORY_ENTITY_NAME))
+    {
+      /* anywhere effect */
+      eff = make_effect(make_cell_reference(ref),
+			ac,
+			make_approximation_may(),
+			make_descriptor_none());
+    }
+  else
+    {    
+      
+      list ind = reference_indices(ref);
+      type t = entity_type(reference_variable(ref));
+      type ut = ultimate_type(t);
+      
+      
+      if(type_variable_p(ut)) 
+	{
+	  variable utv = type_variable(ut);
+	  list utd = variable_dimensions(utv);
+	  //basic utb = variable_basic(utv);
+	  bool is_array_p = !ENDP(utd);
+	  variable tv = type_variable(t);
+	  list td = variable_dimensions(tv);
+	  
+	  /* The dimensions can be hidden in the typedef or 
+	     before the typedef */
+	  if(type_variable_p(t)) 
+	    {
+	      is_array_p = is_array_p || (!ENDP(td));
 	    }
-	    else 
-	      {
-		/* FI: Which case are we in?*/
-		/* RK: we may access an array with a lower dimensionality, that
-		   is a slice. Useful for example in Fortran code such as:
-		   PRINT *, an_array
-		   Cf @validation Transformations/unroll2.f
-		   
-		   With this solution it is not the an_array(*) that is marked
-		   as must-read but only an_array. But as stated at the main
-		   comment, the effect depends on the action.
-		   
-		   When calling a function with blah(an_array), an_array is
-		   marked as must-read, for its address.
-		   Cf. @validation Effects/call04.c
-		   Even more interesting:
-		   @validation Effects/call05.c
-		*/
-		reference n_ref = copy_reference(ref);
-		cell cell_ref = make_cell_reference(n_ref);
-		approximation ap = make_approximation_must();
-		eff = make_effect(cell_ref, ac, ap, make_descriptor_none());
-	      }
-	  }
-	else 
-	  {
-	    /* The memory is not accessed because the array name is a
-	       constant. It can be used directly or the the base for some
-	       address computation. */
-	    ;
-	  }
-      }
-    else 
-      {
-	/* It is not an array. Addressing is encoded in a different way
-	   for structures, unions and pointers. */
-	cell cell_ref = make_cell_preference(make_preference(ref));
-	approximation ap = make_approximation_must();
-	eff = make_effect(cell_ref, ac, ap, make_descriptor_none());
-      }
-  }
-  else if(type_functional_p(ut)) {
-    /* Must be a function used to initialize a pointer to a function */
-    ;
-  }
-  else {
-    pips_internal_error("Unexpected type\n");
-  }
+	  
+	  if (is_array_p)
+	    {
+	      if((int) gen_length(ind) == type_depth(t))
+		{
+		  /* The dimensionalities of the index and type are the same: */
+		  /* cell cell_ref = make_cell_reference(copy_reference(ref)); */
+		  cell cell_ref = make_cell_preference(make_preference(ref));
+		  approximation ap = make_approximation_must();
+		  eff = make_effect(cell_ref, ac, ap, make_descriptor_none());
+		}
+	      else
+		{
+
+		  /* if we are in C we trust the reference */
+		  if (c_module_p(get_current_module_entity()))
+		    {
+		      reference n_ref = copy_reference(ref);
+		      cell cell_ref = make_cell_reference(n_ref);
+		      approximation ap = make_approximation_must();
+		      eff = make_effect(cell_ref, ac, ap, make_descriptor_none());
+		    }
+		  else
+		    {
+		      /* we are in Fortran. A reference to TAB with no 
+			 index is a reference to the whole array 
+		      */
+		      /* there is a memory leak here if ac has been allocated 
+		       for the sole purpose of this function call 
+		      */ 
+
+		      pips_assert("invalid number of reference indices \n",
+				  gen_length(variable_dimensions(tv)) > 
+				  gen_length(ind));
+	  
+		      pips_debug(7, "less ref indices than number of dimensions\n");
+		      /* generate effects on whole (sub-)array */
+	  	  
+		      eff = make_effect
+			(make_cell_reference(copy_reference(ref)),
+			 ac, make_approximation_must(), make_descriptor_none());
+		      
+		      FOREACH(DIMENSION, c_t_dim, 
+			      gen_nthcdr((int) gen_length(ind),
+					 variable_dimensions(tv)))
+			{		      
+			  simple_effect_add_expression_dimension
+			    (eff, make_unbounded_expression());		      
+			} /* FOREACH */
+		      
+		    }
+		}
+	    }
+	  else
+	    {
+	      /* It is a scalar : keep the actual reference */
+	      cell cell_ref = make_cell_preference(make_preference(ref));
+	      approximation ap = make_approximation_must();
+	      eff = make_effect(cell_ref, ac, ap, make_descriptor_none());
+	    }
+	}
+      else
+	{
+	  reference n_ref = copy_reference(ref);
+	  cell cell_ref = make_cell_reference(n_ref);
+	  approximation ap = make_approximation_must();
+	  eff = make_effect(cell_ref, ac, ap, make_descriptor_none()); 
+	}
+    }
   
   pips_debug(8, "end\n");
   
   return eff;
 }
 
+
+/**
+   @param ref is a reference.
+   @param tac is an action tag (read or write)
+   @return a simple effect corresponding to the reference to which 
+           lacking dimensions (according to the type of the entity)
+	   are added (as unbounded dimensions). 
+ */
+effect reference_whole_simple_effect(reference ref,  tag tac)
+{
+  effect eff = effect_undefined;
+  entity ent = reference_variable(ref);
+  list l_inds = reference_indices(ref);
+  type t = entity_type(ent);
+
+  eff = reference_to_simple_effect(ref,make_action(tac, UU));
+
+  if(type_variable_p(t))
+    {
+      variable v = type_variable(t);
+      
+      pips_debug(6, "variable case, number of dimensions : %d\n",
+		 (int) gen_length(variable_dimensions(v)));
+      
+      if(gen_length(variable_dimensions(v)) == gen_length(l_inds))
+	{
+	  pips_debug(7, "ref indices matches number of dimensions\n");
+	}
+      else
+	{		  
+	  pips_assert("invalid number of reference indices \n",
+		      gen_length(variable_dimensions(v)) > 
+		      gen_length(l_inds));
+	  
+	  pips_debug(7, "less ref indices than number of dimensions\n");
+	  /* generate effects on whole (sub-)array */
+	  	  
+	  
+	  FOREACH(DIMENSION, c_t_dim, 
+		  gen_nthcdr((int) gen_length(l_inds),
+			     variable_dimensions(v)))
+	    {		      
+	      simple_effect_add_expression_dimension
+		(eff, make_unbounded_expression());		      
+	    } /* FOREACH */
+	  
+	} /* else */
+      
+    } /* if type_variable_p */
+
+  return eff;  
+}
+  
 
 /* void simple_effect_add_expression_dimension(effect eff, expression exp)
  * input    : a simple effect and an expression
@@ -210,7 +256,6 @@ effect reference_to_simple_effect(reference ref, action ac)
 void simple_effect_add_expression_dimension(effect eff, expression exp)
 {
 
-  expression deref_exp;
   cell eff_c = effect_cell(eff);
   reference ref;
   normalized nexp = NORMALIZE_EXPRESSION(exp);
@@ -504,8 +549,6 @@ list old_effects_composition_with_effect_transformer(list l_eff,
       }
 
       ifdebug(8) {
-	reference r1 = effect_any_reference(e1);
-	reference r2 = effect_any_reference(e2);
 	(void) fprintf(stderr, "e1: \n");
 	print_effect(e1);
 	(void) fprintf(stderr, "e2: \n");

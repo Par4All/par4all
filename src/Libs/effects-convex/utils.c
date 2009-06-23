@@ -1082,12 +1082,17 @@ static Psysteme make_whole_array_predicate(entity e)
 }
 
 
-/* effect make_reference_region(reference ref, tag tac) 
- * input    : a variable reference.
- * output   : a region corresponding to this reference.
- * modifies : nothing.
- * comment  : should be used only for the basis of complex references
- *            (see generic_proper_effects_of_complex_lhs)
+/** 
+    for C modules, the reference is trusted.
+    for Fortran modules, if the number of indices is less than the 
+    number of declared dimensions, it is assumed that it's a reference
+    to the whole (sub-)array, and array bounds are added for the 
+    lacking dimensions.
+    
+ @param ref is a reference
+ @param tac is an action tag (read or write)
+ @return an effect representing a region corresponding to the reference.
+
  */
 effect make_reference_region(reference ref, tag tac)
 {
@@ -1110,57 +1115,39 @@ effect make_reference_region(reference ref, tag tac)
       pips_debug(3,"type depth is %d\n", d);
     }
     
-  /* FI: If t is a pointer type, then d should depend on the type_depth of the pointed type... */
+  /* FI: If t is a pointer type, then d should depend on the type_depth 
+     of the pointed type... */
   if (d>0 || pointer_p)
     {
       int idim;
       list ind = reference_indices(ref);
       int n_ind = gen_length(ind);
+      int max_phi = 0;
       
       pips_debug(8, "pointer or array case \n");
       
-      pips_assert("The number of indices is less or equal to the type depth, unless we are dealing with a pointer",
+      pips_assert("The number of indices is less or equal to the type depth, "
+		  "unless we are dealing with a pointer",
 		  (int) gen_length(ind) <= d || pointer_p);
     
-      if (fortran_module_p(get_current_module_entity()))
+      if (fortran_module_p(get_current_module_entity())
+	  && n_ind < d)
 	{
-	  pips_debug(8, "fortran case \n");
-	  if (n_ind < d)
-	    /* Nga Nguyen 04 June 2002 . Bug for regions, 
-	       see Validation/Regions/incr3.f
-	       If the whole array is accessed (ind = NIL), for example 
-	       DIMENSION DECOUP(2)
-	       WRITE *,DECOUP
-	       all array elements must be added in the region
-	       
-	       They can be added later by function 
-	       append_declaration_sc_if_exact_without_constraints 
-	       but if the current region is used, 
-	       it is not consistent => core dumped
-	    */
-	    sc = entity_declaration_sc(e); 
-	  else 
-	    {
-	      sc = make_whole_array_predicate(e);
-	    } 	  
-	  for (dim = 1; dim <= d; dim++)
-	    reg_ref_inds = gen_nconc(reg_ref_inds,
-				     CONS(EXPRESSION,
-					  make_phi_expression(dim),
-					  NIL));
-
+	  /* dealing with whole array references as in TAB = 1.0 */
+	  sc = entity_declaration_sc(e);
+	  max_phi = d;
 	}
       else
 	{
-	  /* we are in C : we trust the reference */
-	  pips_debug(8, "C case : we trust the reference \n");
 	  sc = sc_new();
-	  for (dim = 1; dim <= n_ind; dim++)
-	    reg_ref_inds = gen_nconc(reg_ref_inds,
-				     CONS(EXPRESSION,
-					  make_phi_expression(dim),
-					  NIL));
+	  max_phi = n_ind;
 	}
+      
+      for (dim = 1; dim <= max_phi; dim++)
+	reg_ref_inds = gen_nconc(reg_ref_inds,
+				 CONS(EXPRESSION,
+				      make_phi_expression(dim),
+				      NIL));
       
       /* we add the constraints corresponding to the reference indices */
       for (idim = 1; ind != NIL; idim++, ind = CDR(ind)) 
@@ -1188,16 +1175,16 @@ effect make_reference_region(reference ref, tag tac)
 	    }
 	  else
 	    {
-	   
+	      
 	      dim_linear_p = 
 		sc_add_phi_equation(sc, exp_ind, idim, IS_EG, PHI_FIRST);
-	    
+	      
 	      pips_debug(3, "%slinear equation.\n", dim_linear_p? "": "non-");
 	    }
 	  linear_p = linear_p && dim_linear_p;	    
 	} /* for */
     } /* if (d>0 || pointer_p) */
- 
+  
   else
     {
       pips_debug(8, "non-pointer scalar type\n");
@@ -1252,21 +1239,125 @@ reference make_regions_psi_reference(entity ent)
 /* effect reference_whole_region(reference ref, tag tac, tap)
  * input    : a variable reference, and the action of the region.
  * output   : a region representing the entire memory space allocated
- *            to the variable reference : the systeme of constraints is
- *            a sc_rn(phi_1, ..., phi_n) except if REGIONS_WITH_ARRAY_BOUNDS
- *            is true. The region is a MAY region.
+ *            to the variable *reference* (and not entity, this is useful
+ *            for partially subscripted arrays, as is the case for 
+ *            PRINT *, A, where A is an array, see for instance
+ *            Regions/incr3. BC).
+ *            the systeme of constraints is a sc_rn(phi_1, ..., phi_n) 
+ *            except if REGIONS_WITH_ARRAY_BOUNDS is true. 
+ *            The resulting region is a MUST region if everything is linear,
+ *            MAY otherwise. It's the responsibility of the caller to change it
+ *            according to the calling context. (BC).
  * modifies : nothing.
  */
 effect reference_whole_region(reference ref, tag tac)
 {
     entity e = reference_variable(ref);
-    effect new_eff;
+    type t = entity_type(e);
+    int d = type_depth(t), dim;
+    boolean linear_p = TRUE;
+    Psysteme sc;
+    bool pointer_p = pointer_type_p(ultimate_type(t));
+ 
+    effect reg = effect_undefined;
+    list reg_ref_inds = NIL;
     action ac = make_action(tac, UU);
     approximation ap = make_approximation(is_approximation_may, UU);
     
-    new_eff = make_region(copy_reference(make_regions_reference(e)), ac, ap, 
-			  make_whole_array_predicate(e));
-    return(new_eff);
+    ifdebug(3)
+      {
+	pips_debug(3, "Reference : \"%s\"", 
+		   words_to_string(words_reference(ref)));
+	fprintf(stderr, "(it's %s a pointer)\n", pointer_p?"":"not");
+	pips_debug(3,"type depth is %d\n", d);
+      }
+    
+    /* FI: If t is a pointer type, then d should depend on the type_depth 
+       of the pointed type... */
+    if (d>0 || pointer_p)
+      {
+	int idim;
+	list ind = reference_indices(ref);
+	int n_ind = gen_length(ind);
+	
+	pips_debug(8, "pointer or array case \n");
+	
+	pips_assert("The number of indices is less or equal to the type depth, "
+		    "unless we are dealing with a pointer",
+		    (int) gen_length(ind) <= d || pointer_p);
+	
+	
+	if (n_ind < d)	
+	  sc = entity_declaration_sc(e);
+	else       
+	  sc = make_whole_array_predicate(e);
+	
+	for (dim = 1; dim <= d; dim++)
+	  reg_ref_inds = gen_nconc(reg_ref_inds,
+				   CONS(EXPRESSION,
+					make_phi_expression(dim),
+					NIL));
+	
+	/* we add the constraints corresponding to the reference indices */
+	for (idim = 1; ind != NIL; idim++, ind = CDR(ind)) 
+	  {
+	    /* For equalities. */
+	    expression exp_ind = EXPRESSION(CAR(ind));
+	    boolean dim_linear_p;
+	    bool unbounded_p =  unbounded_expression_p(exp_ind);
+	    
+	    ifdebug(3) 
+	      {
+		if (unbounded_p)
+		  pips_debug(3, "unbounded dimension PHI%d\n",idim);
+		else
+		  pips_debug(3, "addition of equality :\nPHI%d - %s = 0\n",
+			   idim, words_to_string(words_expression(exp_ind)));
+	      }
+	    
+	    if (unbounded_p)
+	      {
+		/* we must add PHI_idim in the Psystem base */
+		entity phi = make_phi_entity(idim);	
+		sc_base_add_variable(sc, (Variable) phi);
+		dim_linear_p = false;
+	      }
+	    else
+	      {
+		
+		dim_linear_p = 
+		  sc_add_phi_equation(sc, exp_ind, idim, IS_EG, PHI_FIRST);
+		
+		pips_debug(3, "%slinear equation.\n", dim_linear_p? "": "non-");
+	      }
+	  linear_p = linear_p && dim_linear_p;	    
+	  } /* for */
+      } /* if (d>0 || pointer_p) */
+    
+    else
+      {
+	pips_debug(8, "non-pointer scalar type\n");
+	sc = sc_new();
+      }/* if else */
+    
+    /* There was a preference originally : let's try a reference since a new
+       reference is built for each region. BC */
+    reg = make_region(
+		      make_reference(reference_variable(ref), reg_ref_inds),
+		      make_action(tac, UU),
+		      make_approximation
+		      (linear_p? is_approximation_must : is_approximation_may,
+		       UU),
+		    sc);
+    debug_region_consistency(reg);
+    
+    ifdebug(3) 
+      {
+	pips_debug(3, "end : region is :\n");
+	print_region(reg);
+      }
+    return(reg);
+
 }  
 
 region entity_whole_region(entity e, tag tac)

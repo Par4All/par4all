@@ -1497,11 +1497,14 @@ static list effects_of_any_ioelem(expression exp, tag act, bool is_fortran)
   list le = NIL;
   //syntax s = expression_syntax(exp);
 
-  pips_debug(5, "begin with act=%c\n", act);
+  pips_debug(5, "begin with expression %s, act=%s\n",
+	     words_to_string(words_expression(exp)),
+	     (act == is_action_write) ? "w" : 
+	     ((act == 'x') ? "read-write" : "r"));
 
   if (act == 'w' || act == 'x' || act == is_action_write) {
     pips_debug(6, "is_action_write or read-write\n");
- 
+    
     if(is_fortran)
       le = generic_proper_effects_of_any_lhs(exp);
     else { /* C language */
@@ -1519,11 +1522,11 @@ static list effects_of_any_ioelem(expression exp, tag act, bool is_fortran)
 	 that. generic_proper_effects_of_expression() is ging to
 	 return a bit too much. */
       
-
+      
       if(FALSE) {
 	/* FI: short term simplification... We need pointers for side effects... */
 	syntax s = expression_syntax(exp);
-
+	
 	if(syntax_reference_p(s)) {
 	  /* This is not possible as parameters are passed by value,
 	     except if an address is passed, for instance an array or a
@@ -1532,10 +1535,10 @@ static list effects_of_any_ioelem(expression exp, tag act, bool is_fortran)
 	  entity v = reference_variable(r);
 	  type t = entity_type(v);
 	  type ut = ultimate_type(t); /* FI: is ultimate_type() enough? */
-
+	  
 	  if(type_variable_p(ut)) {
 	    variable vt = type_variable(ut);
-
+	    
 	    if(!ENDP(variable_dimensions(vt))) {
 	      /* Fine, this is an array */
 	      le = generic_proper_effects_of_any_lhs(exp);
@@ -1563,13 +1566,13 @@ static list effects_of_any_ioelem(expression exp, tag act, bool is_fortran)
 	  call c = syntax_call(s);
 	  entity op = call_function(c);
 	  list nargs = call_arguments(c);
-
+	  
 	  if(ENTITY_DEREFERENCING_P(op)) {
 	    pips_internal_error("Effects thru dereferenced pointers not implemented yet");
 	  }
 	  if(ENTITY_ADDRESS_OF_P(op)) {
 	    expression e = EXPRESSION(CAR(nargs));
-
+	    
 	    pips_assert("one argument", gen_length(nargs)==1);
 	    le = generic_proper_effects_of_any_lhs(e);
 	  }
@@ -1580,14 +1583,15 @@ static list effects_of_any_ioelem(expression exp, tag act, bool is_fortran)
       }
     }
   }
-
+  
   if(act ==  'r' || act == 'x' || act == is_action_read) {
     pips_debug(6, "is_action_read or read-write\n");
     le = gen_nconc(le, generic_proper_effects_of_expression(exp));
   }
+  
 
   pips_debug(5, "end\n");
-
+  
   return le;
 }
 
@@ -1607,13 +1611,14 @@ effects_of_iolist(list exprs, tag act)
     list lep = NIL;
     expression exp = EXPRESSION(CAR(exprs));
 
-    pips_debug(5, "begin\n");
+    pips_debug(5, "begin with exp = %s\n",
+	       words_to_string(words_expression(exp)));
 
     if (expression_implied_do_p(exp))
         lep = effects_of_implied_do(exp, act);
     else
-    {
-        if (act == is_action_write)
+    {        
+       if (act == is_action_write)
         {
             syntax s = expression_syntax(exp);
 
@@ -1646,10 +1651,9 @@ effects_of_iolist(list exprs, tag act)
             pips_debug(6, "is_action_read");
             lep = generic_proper_effects_of_expression(exp);
         }
-    }
-
+    } /* if (expression_implied_do_p(exp)) */
     pips_debug(5, "end\n");
-
+    
     return lep;
 }
 

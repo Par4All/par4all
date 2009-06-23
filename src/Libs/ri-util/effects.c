@@ -122,6 +122,7 @@ statement_has_a_module_formal_argument_write_effect_p(statement s,
    persistant pointer.
 
    Action a is integrated in the new effect (aliasing).
+   NOT GENERIC AT ALL. USE make_anywhere_effect INSTEAD (BC).
  */
 effect anywhere_effect(action ac)
 {

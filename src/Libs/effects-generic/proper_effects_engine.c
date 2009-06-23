@@ -152,15 +152,22 @@ generic_proper_effects_of_range(range r)
 /**
  @param ref a reference.
  @param *pme : a pointer on the main effect corresponding to the reference.
+               if there is no effect (partially subscripted array for instance)
+	       then *pme is set to effect undefined. If the main effect 
+               could not be computed, *pme is set to a new anywhere effect.
  @param write_p : true if the main effect is write, false otherwise.
+ @param allow_read_on_pme : true if we want to allow the generation of 
+                read effects on reference even if it's a partially subscripted
+		array. The default value should be false, but it is useful
+                to set it to true when recusrsively building pme).
  @return : a list of read effects corresponding to the intermediate reads
            performed to access the main memory location.
 
- What should we do in case of an undefined effect at any step ?
 */
 list generic_p_proper_effect_of_reference(reference ref, 
 					  effect *pme, 
-					  bool write_p)
+					  bool write_p,
+					  bool allow_partials_on_pme)
 {
   list le = NIL; /* list of read effects */
 
@@ -170,16 +177,19 @@ list generic_p_proper_effect_of_reference(reference ref,
   
   type t = ultimate_type(entity_type(ent));
   
+  *pme = effect_undefined;
    
+  
+
   /* now we generate the read effects on intermediate pointer dimensions */
   /* if the entity reference is a pointer, then we scan the dimensions
      until we reach a non-pointer basic.
   */
-  
 
-  if (type_variable_p(t))
+  if (type_variable_p(t) && c_module_p(get_current_module_entity()))
     {
       variable v = type_variable(t);
+      basic b = variable_basic(v);
       
       pips_debug(4, "reference %s to entity %s of basic %s and" 
 		 " number of dimensions %d.\n",
@@ -189,7 +199,7 @@ list generic_p_proper_effect_of_reference(reference ref,
 		 (int) gen_length(variable_dimensions(v)));
       
       
-      if (basic_pointer_p(variable_basic(v)))
+      if (basic_pointer_p(b))
 	{
 	  reference read_ref = make_reference(ent, NIL);
 	  list l_dim_tmp = variable_dimensions(v);
@@ -249,16 +259,32 @@ list generic_p_proper_effect_of_reference(reference ref,
 	    }
 	  free_reference(read_ref); 
 	}
+      
+      /* no read or write effects on partial array if 
+	 allow_partials_on_pme is false */
+      if(basic_pointer_p(b) ||
+	 (!basic_pointer_p(b) && 
+	  (allow_partials_on_pme || 
+	   gen_length(variable_dimensions(v)) == gen_length(l_inds))))
+	{
+	  *pme = (*reference_to_effect_func)
+	    (ref, write_p?make_action_write():make_action_read());
+	}
     }
-
-  /* compute the main effect on the reference */
-  *pme = (*reference_to_effect_func)
-    (ref, write_p?make_action_write():make_action_read());
+  else
+    {
+      
+      /* just compute the main effect on the reference 
+       This should maybe be refined ? */
+      
+      *pme = (*reference_to_effect_func)
+	(ref, write_p?make_action_write():make_action_read());
+    }
   
-  
-  /* we must add the read effects on the indices */
-  le = gen_nconc(le, generic_proper_effects_of_expressions
-		 (reference_indices(ref)));
+  /* we must add the read effects on the indices ; these reads are performed
+   before the main effect */
+  le = gen_nconc(generic_proper_effects_of_expressions
+		 (reference_indices(ref)), le);
   
   ifdebug(4)
     {
@@ -304,14 +330,13 @@ generic_proper_effects_of_reference(reference ref, bool written_p)
 	{
 	  effect eff;
 	  
-	  le =  generic_p_proper_effect_of_reference(ref, &eff, written_p);
+	  le =  generic_p_proper_effect_of_reference(ref, &eff, written_p,
+						     false);
 	  
-	  if (effect_undefined_p(eff))
+	  if (!effect_undefined_p(eff))
 	    {
-	      eff = anywhere_effect(written_p? make_action_write() : 
-					 make_action_read()); 
+	      le = gen_nconc(le, CONS(EFFECT, eff, NIL));
 	    }
-	  le = gen_nconc(le, CONS(EFFECT, eff, NIL));
 	  
 	  (*effects_precondition_composition_op)(le, context);
 	}
@@ -355,9 +380,20 @@ generic_proper_effects_of_written_reference(reference ref)
 }
 
 
-/* Go down along the first argument till you find a reference or a
-   dereferencing and build the effect e by side effects as well as the
-   auxiliary effect list on the way back up*/
+/**
+ @return : a list of read effects corresponding to intermediate read memory 
+         accesses during the evaluation of add_exp.
+ @param add_exp is the expression which memory effects we are looking for
+ @param pme is a Pointer towards the Main memory Effect of add_exp.
+ @param write_p is a boolean set to true if the main effect is write, false 
+         otherwise.
+
+ Go down along the first argument till you find a reference or a
+ dereferencing and build the effect *pme by side effects as well as the
+ auxiliary effect list le on the way back up.
+ checks at each step that no effect is generated on partially subscripted 
+ arrays.
+*/
 list generic_proper_effects_of_complex_address_expression(expression add_exp, effect * pme, int write_p)
 {
   list le = NIL;
@@ -378,7 +414,7 @@ list generic_proper_effects_of_complex_address_expression(expression add_exp, ef
     {
       reference ref = syntax_reference(s);
       le = generic_p_proper_effect_of_reference(copy_reference(ref), pme, 
-						write_p);
+						write_p, true);
 
       finished_p = TRUE;
       result_computed_p = TRUE;
@@ -397,7 +433,7 @@ list generic_proper_effects_of_complex_address_expression(expression add_exp, ef
 	     could also happend with hardware*/
 	  pips_user_warning("Constant in a lhs expression: \"\%s\"\n",
 			    words_to_string(words_expression(add_exp)));
-	  /* Will be converted into an anywhere effect by the caller */
+	  /* Will be converted into an anywhere effect */
 	  mr = reference_undefined;
 	  finished_p = TRUE;
 	}
@@ -607,8 +643,9 @@ list generic_proper_effects_of_complex_address_expression(expression add_exp, ef
 	{
 	  if(reference_undefined_p(mr)) 
 	    {
-	      pips_debug(4, "mr is undefined\n");
-	      *pme = effect_undefined;
+	      pips_debug(4, "mr is undefined -> anywhere effect\n");
+	      *pme = make_anywhere_effect
+		(write_p?make_action_write():make_action_read());
 	    }
 	  else 
 	    {
@@ -632,7 +669,7 @@ list generic_proper_effects_of_complex_address_expression(expression add_exp, ef
       
       pips_debug(8,"Returning from recursive call of generic_proper_effects_of_complex_address_expression : \n");
       
-      if(!effect_undefined_p(*pme)) 
+      if(!effect_undefined_p(*pme) && !anywhere_effect_p(*pme)) 
 	{
 	  /* Let's try to refine *pme with the current expression, the
 	     current operator if any and the current second expression
@@ -773,10 +810,10 @@ list generic_proper_effects_of_complex_address_expression(expression add_exp, ef
   
   if(!finished_p && !effect_undefined_p(*pme)) 
     {
-      /* The sub-effect could not be refined */
-      /* Should'nt we replace pme with an anywhere effect ? */
+      /* The sub-effect could not be refined : it's an anywhere effect */
       free_effect(*pme);
-      *pme = effect_undefined;
+      *pme = make_anywhere_effect
+	(write_p?make_action_write():make_action_read());
     }
   
   ifdebug(8) 
@@ -842,15 +879,7 @@ list generic_proper_effects_of_address_expression(expression addexp, int write_p
 	    le = CONS(EFFECT, e, le);	    
 	    (*effects_precondition_composition_op)(le, context);
 	    
-	  }
-	else 
-	  {
-	    /* add an anywhere effect */
-	    ge = anywhere_effect
-	      (write_p? make_action_write() : make_action_read());
-	    le = CONS(EFFECT, ge, le);
-	    
-	  }
+	  }	
 
 	ifdebug(8) {
 	  pips_debug(8, "Effect for a call:\n");
@@ -1089,7 +1118,7 @@ bool check_sdfi_effects_p(entity func, list func_sdfi)
 	check_p = FALSE;
       }
 
-      if(rank>gen_length(functional_parameters(type_functional(ut)))) {
+      if(rank> (int) gen_length(functional_parameters(type_functional(ut)))) {
 	fprintf(stderr, "Formal parameter \"%s\" is ranked %d out of %zd!\n",
 		entity_name(v), rank, gen_length(functional_parameters(type_functional(ut))));
 	check_p = FALSE;

@@ -259,9 +259,9 @@ list effects_dynamic_elim(list l_eff)
   }
 
   if(add_anywhere_write_effect_p)
-    l_res = CONS(EFFECT, anywhere_effect(make_action_write()), l_res);
+    l_res = CONS(EFFECT, make_anywhere_effect(make_action_write()), l_res);
   if(add_anywhere_read_effect_p)
-    l_res = CONS(EFFECT, anywhere_effect(make_action_read()), l_res);
+    l_res = CONS(EFFECT, make_anywhere_effect(make_action_read()), l_res);
   return(l_res);
 }
 
@@ -1286,7 +1286,7 @@ list c_summary_effect_to_proper_effects(effect eff, expression real_arg)
 		l_real_arg = generic_proper_effects_of_complex_address_expression
 		  (arg1, &eff1, effect_write_p(eff));
 		if (effect_undefined_p(eff1))
-		  n_eff =  anywhere_effect
+		  n_eff =  make_anywhere_effect
 		    (copy_action(effect_action(eff)));
 		else
 		  {
@@ -1379,7 +1379,7 @@ list c_summary_effect_to_proper_effects(effect eff, expression real_arg)
 		l_real_arg = generic_proper_effects_of_complex_address_expression
 		  (real_arg, &eff1, effect_write_p(eff));
 		if (effect_undefined_p(eff1))
-		  n_eff =  anywhere_effect
+		  n_eff =  make_anywhere_effect
 		    (copy_action(effect_action(eff)));
 		else
 		  {
@@ -1406,7 +1406,7 @@ list c_summary_effect_to_proper_effects(effect eff, expression real_arg)
 	    }
 	    else {
 	      /* We do not know what to do with the initial value */
-	      n_eff = anywhere_effect(copy_action(effect_action(eff)));
+	      n_eff = make_anywhere_effect(copy_action(effect_action(eff)));
 	    }
 
 	    if (n_eff != effect_undefined && l_eff == NIL)

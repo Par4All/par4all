@@ -624,6 +624,7 @@ transformer context;
 		region  formal_reg = 
 		    reference_whole_region(make_regions_reference(formal_ent),
 				     is_action_read);
+		effect_to_may_effect(formal_reg);
 		l_formal = RegionsMustUnion(l_formal, 
 					    CONS(EFFECT, formal_reg, NIL), 
 					    regions_same_action_p);
