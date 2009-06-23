@@ -66,7 +66,7 @@ static void pragma_expr_for_reduction (loop l, statement stmt) {
   return;
 }
 
-/// @brief generate "pragma for" as a list of expressions
+/// @brief generate "pragma omp for" as a list of expressions
 /// @return void
 /// @param l, the loop to analyze for omp for
 /// @param stmt, the statament where the pragma should be attached

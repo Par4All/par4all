@@ -59,7 +59,13 @@ string note_for_statement(statement s)
     case is_instruction_test: return "test ";
     case is_instruction_call: return "call ";
     case is_instruction_unstructured: return "unst ";
-    default: pips_internal_error("unexpected instruction tag");
+    case is_instruction_whileloop: return "while ";
+    case is_instruction_goto: return "goto ";
+    case is_instruction_forloop: return "for ";
+    case is_instruction_expression: return "expr ";
+    default: 
+      pips_internal_error("unexpected instruction tag");
+      break;
     }
     return "";
 }

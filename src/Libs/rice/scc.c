@@ -127,7 +127,7 @@ void LowlinkCompute(graph g, set region, vertex v, int level)
   sccflags fv = dg_vertex_label_sccflags(dvl);
   statement sv = ordering_to_statement(dg_vertex_label_statement(dvl));
 
-  pips_debug(7, "vertex is %d (%d %d %d)\n", statement_number(sv), 
+  pips_debug(7, "vertex is %ld (%ld %ld %ld)\n", statement_number(sv), 
 	sccflags_mark(fv), sccflags_lowlink(fv), sccflags_dfnumber(fv));
 
   MARK_OLD(v);
@@ -150,13 +150,13 @@ void LowlinkCompute(graph g, set region, vertex v, int level)
 	statement ss = 
 	  ordering_to_statement(dg_vertex_label_statement(dsl));
 
-	pips_debug(7, "successor before is %d (%d %d %d)\n", 
+	pips_debug(7, "successor before is %ld (%ld %ld %ld)\n",
 	      statement_number(ss), sccflags_mark(fs),
 	      sccflags_lowlink(fs), sccflags_dfnumber(fs));
 
 	if (MARKED_NEW_P(s)) {
 	  LowlinkCompute(g, region, s, level);
-	  pips_debug(7, "successor after is %d (%d %d %d)\n", 
+	  pips_debug(7, "successor after is %ld (%ld %ld %ld)\n",
 		statement_number(ss), sccflags_mark(fs),
 		sccflags_lowlink(fs), sccflags_dfnumber(fs));
 	  sccflags_lowlink(fv) = MIN(sccflags_lowlink(fv),
@@ -212,7 +212,7 @@ int IsInStack(vertex v)
 /* 
 FindSccs is the interface function to compute the SCCs of a graph. It
 marks all nodes as 'not visited' and then apply the main function
-LowlinkCompute on all vertices. 
+LowlinkCompute on all vertices.
 
 A vertex is processed only if it belongs to region. Later, successors
 will be processed if they can be reached through arcs whose level is
@@ -230,12 +230,16 @@ sccs FindSccs(graph g, set region, int level)
   StackPointer = 0;
   Stack = (vertex *) malloc(sizeof(vertex) * gen_length(vertices));
   Components = make_sccs(NIL);
-	
+
   FOREACH(VERTEX, v, vertices) {
     if (! ignore_this_vertex_drv(region, v)) {
       dg_vertex_label lv = (dg_vertex_label) vertex_vertex_label(v);
       sccflags fv = dg_vertex_label_sccflags(lv);
-	    
+      if (fv == sccflags_undefined) {
+	pips_debug (7, "fv has not been set so far");
+	fv = make_sccflags(scc_undefined, 0, 0, 0);
+	dg_vertex_label_sccflags(lv) = fv;
+      }
       sccflags_mark(fv) = NEW_MARK;
     }
   }

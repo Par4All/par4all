@@ -166,15 +166,12 @@ update_reduction_under_effect(
     if (effect_read_p(eff)) return TRUE;
 
     /* now var is written */
-    MAP(ENTITY, e,
-    {
-	if (entity_conflict_p(var, e))
-	{
-	    updated = TRUE;
-	    remove_variable_from_reduction(red, e);
-	}
-    },
-	reduction_dependences(red));
+    FOREACH (ENTITY, e, reduction_dependences(red)) {
+      if (entity_conflict_p(var, e)) {
+	updated = TRUE;
+	remove_variable_from_reduction(red, e);
+      }
+    }
 
     if (updated)
     {
@@ -196,19 +193,16 @@ find_reduction_of_var(
     reductions reds,
     reduction *pr)
 {
-    MAP(REDUCTION, r,
-    {
-	entity red_var = reduction_variable(r);
-	if (red_var==var)
-	{
-	    *pr = copy_reduction(r);
-	    return TRUE;
-	}
-	else if (entity_conflict_p(red_var, var))
-	    return FALSE; /* I will not combine them... */
-    },
-	reductions_list(reds));
-    return TRUE;
+  FOREACH (REDUCTION, r, reductions_list(reds)) {
+    entity red_var = reduction_variable(r);
+    if (red_var==var) {
+      *pr = copy_reduction(r);
+      return TRUE;
+    }
+    else if (entity_conflict_p(red_var, var))
+      return FALSE; /* I will not combine them... */
+  }
+  return TRUE;
 }
 
 /* merge two reductions into first so as to be compatible with both.
@@ -289,47 +283,40 @@ update_compatible_reduction(
 
     if (found)
     {
-	if (!reduction_none_p(*pr)) /* some reduction already available */
-	    return merge_two_reductions(*pr, found);
-	else /* must update the reduction with the encountered effects */
-	{
-	    MAP(ENTITY, e,
-		remove_variable_from_reduction(found, e),
-		reduction_dependences(*pr));
-
-	    free_reduction(*pr); *pr = found;
-	    return TRUE;
+      if (!reduction_none_p(*pr)) /* some reduction already available */
+	return merge_two_reductions(*pr, found);
+      else { /* must update the reduction with the encountered effects */
+	FOREACH (ENTITY, e,reduction_dependences(*pr)) {
+	  remove_variable_from_reduction(found, e);
 	}
+	free_reduction(*pr); *pr = found;
+	return TRUE;
+      }
     }
     /* else
      * now no new reduction waas found, must check *pr against effects
      */
     if (!reduction_none_p(*pr)) /* some reduction */
-    {
-	MAP(EFFECT, e,
-	    if (!update_reduction_under_effect(*pr, e))
-	    {
-		DEBUG_REDUCTION(8, "kill of ", *pr);
-		pips_debug(8, "under effect to %s\n",
-			   entity_name(effect_variable(e)));
-
-		return FALSE;
-	    },
-	    le);
+      {
+	FOREACH (EFFECT, e, le) {
+	  if (!update_reduction_under_effect(*pr, e)) {
+	    DEBUG_REDUCTION(8, "kill of ", *pr);
+	    pips_debug(8, "under effect to %s\n",
+		       entity_name(effect_variable(e)));
+	    return FALSE;
+	  }
+	}
     }
     else
     {
-	MAP(EFFECT, e,
-	{
-	    if (entity_conflict_p(effect_variable(e), var))
-	        return FALSE;
-	    else if (effect_write_p(e)) /* stores for latter cleaning */
-		reduction_dependences(*pr) =
-		    gen_once(effect_variable(e), reduction_dependences(*pr));
-	},
-	    le);
+      FOREACH (EFFECT, e, le) {
+	if (entity_conflict_p(effect_variable(e), var))
+	  return FALSE;
+	else if (effect_write_p(e)) /* stores for latter cleaning */
+	  reduction_dependences(*pr) = gen_once(effect_variable(e),
+						reduction_dependences(*pr));
+      }
     }
-   
     return TRUE;
 }
 
@@ -349,14 +336,12 @@ bool pure_function_p(entity f)
 
     if (entity_module_p(f))
     {
-	MAP(EFFECT, e,
-	    {
-		if (effect_write_p(e)) /* a side effect!? */
-		    return FALSE;
-		if (io_effect_entity_p(effect_variable(e))) /* LUNS */
-		    return FALSE;
-	    },
-	load_summary_effects(f));
+      FOREACH (EFFECT, e, load_summary_effects(f)) {
+	if (effect_write_p(e)) /* a side effect!? */
+	  return FALSE;
+	if (io_effect_entity_p(effect_variable(e))) /* LUNS */
+	  return FALSE;
+      }
     }
 
     return TRUE;
@@ -606,15 +591,13 @@ no_other_effects_on_references (
 
     pips_debug(7,"entity name: %s\n", entity_name(var));
 
-    MAP(EFFECT, e,
-    {
+    FOREACH (EFFECT, e, le) {
       reference r = effect_reference(e);
       if (!gen_in_list_p(r, lr) &&
 	  entity_conflict_p(reference_variable(r), var))
 	return FALSE;
       pips_debug(7,"refrence r: %p of entity: %s\n", r, entity_name (reference_variable(r)));
-    },
-	le);
+    }
 
     return TRUE;
 }
@@ -708,7 +691,9 @@ call_proper_reduction_p (
   }
   pips_debug(8, "no other effects\n");
 
-  MAP(REFERENCE, r, lp = CONS(PREFERENCE, make_preference(r), lp), lr);
+  FOREACH (REFERENCE, r, lr) {
+    lp = CONS(PREFERENCE, make_preference(r), lp);
+  }
   gen_free_list(lr), lr = NIL;
 
   // well, it is ok for a reduction now!

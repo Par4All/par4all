@@ -944,7 +944,7 @@ dg_vertex_label dg_vl;
 {
   debug(9, "dg_vertex_label_dup", "doing for statement n. : %d\n",
 	(int) dg_vertex_label_statement( dg_vl ) );
-  return( make_dg_vertex_label(dg_vertex_label_statement(dg_vl),NULL));
+  return( make_dg_vertex_label(dg_vertex_label_statement(dg_vl),sccflags_undefined));
 }
 
 /*=======================================================================*/

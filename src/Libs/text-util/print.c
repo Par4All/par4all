@@ -90,7 +90,7 @@ sentence s;
 	    putc(' ', fd);
 	col = 7+em;
 
-	pips_assert("print_sentence", col <= 72);
+	pips_assert("print_sentence", col <= MAX_LINE_LENGTH);
 
 	while (lw) {
 	    string w = STRING(CAR(lw));
@@ -110,7 +110,7 @@ sentence s;
 		if (col + strlen(w) > 70) {
 		    /* complete current line */
 		    if (n > 0) {
-			for (i = col; i <= 72; i++) putc(' ', fd);
+			for (i = col; i <= MAX_LINE_LENGTH; i++) putc(' ', fd);
 			fprintf(fd, "%04d", n);
 		    }
 
@@ -144,7 +144,7 @@ sentence s;
 		int ncar;
 
 		/* complete the current line */
-		ncar = 72 - col + 1;
+		ncar = MAX_LINE_LENGTH - col + 1;
 		fprintf(fd,"%.*s", ncar, line);
 		line += ncar;
 		col = 73;
@@ -157,7 +157,7 @@ sentence s;
 		*/
 
 		while(strlen(line)!=0) {
-		    ncar = MIN(72 - 7 +1, strlen(line));
+		    ncar = MIN(MAX_LINE_LENGTH - 7 +1, strlen(line));
 
 		    /* start a new line with its prefix but no indentation
 		     * since string constants may be broken onto two lines */
@@ -183,10 +183,10 @@ sentence s;
 	    free(w);
 	}
 
-	pips_assert("print_sentence", col <= 72);
+	pips_assert("print_sentence", col <= MAX_LINE_LENGTH);
 
 	if (n > 0) {
-	    for (i = col; i <= 72; i++) putc(' ', fd);
+	    for (i = col; i <= MAX_LINE_LENGTH; i++) putc(' ', fd);
 	    fprintf(fd, "%04d", n);
 	}
 	putc('\n', fd);

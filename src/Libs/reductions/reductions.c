@@ -152,10 +152,10 @@ add_reduced_variables(
     list /* of entity */ le,
     reductions rs)
 {
-    MAP(REDUCTION, r,
-	le = gen_once(reduction_variable(r), le),
-	reductions_list(rs));
-    return le;
+  FOREACH (REDUCTION, r, reductions_list(rs)) {
+    le = gen_once(reduction_variable(r), le);
+  }
+  return le;
 }
 
 static list /* of entity */
@@ -165,9 +165,14 @@ list_of_reduced_variables(
 {
     list /* of entity */ le = NIL;
     le = add_reduced_variables(le, load_proper_reductions(node));
-    MAP(STATEMENT, s,
-	le = add_reduced_variables(le, load_cumulated_reductions(s)),
-	ls);
+    FOREACH (STATEMENT, s, ls) {
+      if (bound_cumulated_reductions_p(s) == TRUE)
+	le = add_reduced_variables(le, load_cumulated_reductions(s));
+      else {
+	pips_debug(5, "stat %s %p\n", note_for_statement(s), s);
+	pips_assert ("should not happen, all statements should have been visited for reduction", FALSE);
+      }
+    }
     return le;
 }
 
@@ -441,17 +446,20 @@ build_reduction_of_variable(
 	return FALSE;
     }
 
-    MAP(STATEMENT, s,
-    {
-	if (!update_compatible_reduction
-	    (pr, var, load_rw_effects_list(s),
-	     load_cumulated_reductions(s)))
-	{
+    FOREACH (STATEMENT, s, ls) {
+      if (bound_cumulated_reductions_p(s) == TRUE) {
+	if (!update_compatible_reduction (pr, var, load_rw_effects_list(s),
+					  load_cumulated_reductions(s)))
+	  {
 	    free_reduction(*pr);
 	    return FALSE;
-	}
-    },
-	ls);
+	  }
+      }
+      else {
+	pips_debug(5, "stat %s %p\n", note_for_statement(s), s);
+	pips_assert ("should not happen, all statements should have been visited for reduction", FALSE);
+      }
+    }
 
     return TRUE;
 }
@@ -475,10 +483,9 @@ build_creductions_of_statement(
 	       note_for_statement(node), node, gen_length(le));
 
     /* for each candidate, extract the reduction if any */
-    MAP(ENTITY, var,
-	if (build_reduction_of_variable(var, node, ls, &r))
-	    lr = CONS(REDUCTION, r, lr),
-	le);
+    FOREACH (ENTITY, var, le)
+      if (build_reduction_of_variable(var, node, ls, &r))
+	lr = CONS(REDUCTION, r, lr);
 
     /* store the result */
     pips_debug(5, "stat %s %p -> %td reductions\n",
@@ -507,6 +514,20 @@ static void cr_loop_rwt(loop l)
     gen_free_list(ls);
 }
 
+static void cr_whileloop_rwt(whileloop l)
+{
+    list /* of statement */ ls = CONS(STATEMENT, whileloop_body(l), NIL);
+    build_creductions_of_statement(crt_stat_head(), ls);
+    gen_free_list(ls);
+}
+
+static void cr_forloop_rwt(forloop l)
+{
+    list /* of statement */ ls = CONS(STATEMENT, forloop_body(l), NIL);
+    build_creductions_of_statement(crt_stat_head(), ls);
+    gen_free_list(ls);
+}
+
 static void cr_test_rwt(test t)
 {
     list /* of statement */ ls =
@@ -528,6 +549,8 @@ static void cr_call_rwt(call c)
 {
     statement s = crt_stat_head();
     store_cumulated_reductions(s, copy_reductions(load_proper_reductions(s)));
+    pips_debug(5, "stat %s %p\n",
+	       note_for_statement(s), s);
 }
 
 /* Perform the bottom-up propagation of cumulated reductions
@@ -543,6 +566,8 @@ static void compute_cumulated_reductions(statement s)
 		      statement_domain, crt_stat_filter, crt_stat_rewrite,
 		      sequence_domain, gen_true, cr_sequence_rwt,
 		      loop_domain, gen_true, cr_loop_rwt,
+		      whileloop_domain, gen_true, cr_whileloop_rwt,
+		      forloop_domain, gen_true, cr_forloop_rwt,
 		      test_domain, gen_true, cr_test_rwt,
 		      unstructured_domain, gen_true, cr_unstructured_rwt,
 		      call_domain, gen_true, cr_call_rwt,
