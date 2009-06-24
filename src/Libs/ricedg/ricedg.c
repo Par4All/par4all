@@ -229,7 +229,7 @@ char *mod_name;
     entity module = local_name_to_top_level_entity(mod_name);
 
     debug_on("RICEDG_DEBUG_LEVEL");
-    debug(1,"rice_dependence_graph", 
+    debug(1,"rice_dependence_graph",
 	  "Computing Rice dependence graph for %s\n", mod_name);
 
     ifdebug(1) {
@@ -243,7 +243,9 @@ char *mod_name;
     set_current_module_statement( (statement)
 	db_get_memory_resource(DBR_CODE, mod_name, TRUE) );
     mod_stat = get_current_module_statement();
-   
+
+    /* we need the statements from their ordering for the dependance-graph: */
+    set_ordering_to_statement(mod_stat);
 
     chains = (graph)
 	db_get_memory_resource(DBR_CHAINS, mod_name, TRUE);
@@ -264,7 +266,7 @@ char *mod_name;
 		current_shared_obj_table_size());
 	mem_spy_begin();
     }
-    
+
     hash_warn_on_redefinition();
     dg = copy_graph (chains);
 
@@ -300,7 +302,7 @@ char *mod_name;
     }
    
     debug_on("QUICK_PRIVATIZER_DEBUG_LEVEL");
-	set_ordering_to_statement(mod_stat);
+
     quick_privatize_graph(dg);
     debug_off();
 
@@ -323,8 +325,7 @@ char *mod_name;
     ifdebug(1) {
 	mem_spy_end("After DG computation");
     }
-	reset_ordering_to_statement();
-  
+
     ifdebug(3) {
 	printf("\nThe results of statistique of test of dependence are:\n");
 	printf("NbrArrayDepInit = %d\n",NbrArrayDepInit); 
@@ -389,6 +390,7 @@ char *mod_name;
 
     DB_PUT_MEMORY_RESOURCE(DBR_DG, mod_name, (char*) dg);
 
+    reset_ordering_to_statement();
     reset_current_module_entity();
     reset_current_module_statement();
     reset_precondition_map();
