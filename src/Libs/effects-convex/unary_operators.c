@@ -108,7 +108,10 @@ convex_regions_union_over_range(list l_reg, entity index, range r,
     else /* range information is included in descriptor */
     {
 	Psysteme sc_range = descriptor_convex(d);
-	l_reg = array_regions_sc_append(l_reg, sc_range, FALSE);
+	if (add_precondition_to_scalar_convex_regions)
+	  l_reg = all_regions_sc_append(l_reg, sc_range, FALSE);
+	else
+	  l_reg = array_regions_sc_append(l_reg, sc_range, FALSE);
 	ifdebug(6){
 	    pips_debug(6, "regions before elimination of index %s.\n",
 		       entity_minimal_name(index));

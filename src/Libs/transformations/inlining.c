@@ -1153,7 +1153,7 @@ outline(char* module_name)
 
     /* validate */
     module_reorder(get_current_module_statement());
-    DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, get_current_module_statement());
+    DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, new_stmt);
     DB_PUT_MEMORY_RESOURCE(DBR_CALLEES, module_name, compute_callees(get_current_module_statement()));
 
     /*postlude*/

@@ -149,6 +149,14 @@ list beta_entities_list(int beta_min, int beta_max)
 static entity phi[NB_MAX_ARRAY_DIM]; /* phi entities */
 static entity psi[NB_MAX_ARRAY_DIM]; /* psi entities */
 
+#ifndef bool_undefined
+
+#define bool_undefined ((bool) (-15))
+#define bool_undefined_p(b) ((b)==bool_undefined)
+#endif
+
+bool add_precondition_to_scalar_convex_regions = bool_undefined;
+
 void regions_init()
 {
     int i;
@@ -161,12 +169,14 @@ void regions_init()
     {
 	beta[i] = entity_undefined;
     }
-    set_region_interprocedural_translation(); 
+    set_region_interprocedural_translation();
+    add_precondition_to_scalar_convex_regions = false;
 }
 
 void regions_end()
 {
-    reset_region_interprocedural_translation(); 
+    reset_region_interprocedural_translation();
+    add_precondition_to_scalar_convex_regions = bool_undefined;
 
 }
 

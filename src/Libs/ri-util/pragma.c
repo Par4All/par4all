@@ -38,12 +38,10 @@
 #include "misc.h"
 #include "ri.h"
 #include "ri-util.h"
-#include "text-util.h"
 
 //***********************************************************Local constant
 static const string C_PRAGMA_HEADER = "#pragma";
 static const string FORT_PRAGMA_HEADER = "!$";
-static const string FORT_OMP_CONTINUATION = "\n!$omp& ";
 
 
 /*****************************************************A CONSTRUCTOR LIKE PART
@@ -177,7 +175,6 @@ pragma_to_string (pragma p) {
   bool flg   = FALSE;
   list l_str = NULL; //list of string
   list l_expr = NULL; // list of expression
-  size_t line_sz = 0; // the pragma line size
   string s = string_undefined;
   string_buffer sb = string_buffer_make(FALSE);
 
@@ -188,28 +185,12 @@ pragma_to_string (pragma p) {
   case is_pragma_expression:
     l_expr = pragma_expression (p);
     FOREACH (EXPRESSION, e, l_expr) {
-      if (flg == TRUE) {
+      if (flg == TRUE)
 	string_buffer_append (sb, strdup (" "));
-	line_sz +=1;
-      }
       flg = TRUE;
       l_str = words_expression(e);
       l_str = gen_nreverse (l_str);
-      if (get_prettyprint_is_fortran() == TRUE) {
-	// In fortran line size can not be more than 72
-	FOREACH (STRING, str, l_str) {
-	  pips_assert ("algo bug", line_sz < MAX_LINE_LENGTH);
-	  size_t size = strlen (str);
-	  pips_assert ("not handled case need to split the str between two lines",
-		       size < (MAX_LINE_LENGTH - 6));
-	  line_sz += size;
-	  if (line_sz >= MAX_LINE_LENGTH) {
-	    gen_insert_before (strdup (FORT_OMP_CONTINUATION), str, l_str);
-	    line_sz = size;
-	  }
-	}
-      }
-      string_buffer_append_list (sb, l_str);
+      string_buffer_append_list(sb, l_str);
       gen_free_list (l_str);
     }
     s = string_buffer_to_string_reverse (sb);
@@ -221,9 +202,8 @@ pragma_to_string (pragma p) {
     break;
   }
   if (s != string_undefined) {
-    if (get_prettyprint_is_fortran() == TRUE) {
+    if (get_prettyprint_is_fortran() == TRUE)
       s = strdup(concatenate (FORT_PRAGMA_HEADER, s, NULL));
-    }
     else
       s = strdup(concatenate (C_PRAGMA_HEADER, " ", s, NULL));
   }

@@ -58,6 +58,7 @@
 
 
 #include "effects-generic.h"
+#include "effects-convex.h"
 
 
 /* ============================================================================= 
@@ -416,9 +417,14 @@ static void in_effects_of_loop(loop l)
 	    descriptor range_descriptor  = descriptor_undefined;
 	    Value incr;
 	    Pvecteur v_i_i_prime = VECTEUR_UNDEFINED;
+	    bool saved_add_precondition_to_scalar_convex_regions =
+	      add_precondition_to_scalar_convex_regions;
 
 	    pips_debug(7, "linear loop range.\n");
-		
+	   
+	    add_precondition_to_scalar_convex_regions = true;
+
+	    
 	    /* OPTIMIZATION: */
 	    /* keep only in global_write the write regions corresponding to 
 	     * regions in global_in. */
@@ -430,7 +436,7 @@ static void in_effects_of_loop(loop l)
 		pips_debug(4, "reduced W(i)= \n");
 		(*effects_prettyprint_func)(global_write);
 	    }
-    
+	    
 	    
 	    /* VIRTUAL NORMALIZATION OF LOOP (the new increment is equal 
 	     * to +/-1). 
@@ -438,6 +444,17 @@ static void in_effects_of_loop(loop l)
 	     * range descriptor. Effects are updated at the same time. 
 	     */
 	    range_descriptor = (*loop_descriptor_make_func)(l); 
+
+	    /* first work around the fact that loop precondtions have not been
+	       added to scalar regions
+	    */
+	    global_write = scalar_regions_sc_append(global_write, 
+				     descriptor_convex(range_descriptor), 
+				     TRUE);
+	    global_in = scalar_regions_sc_append(global_in, 
+				     descriptor_convex(range_descriptor), 
+				     TRUE);
+
 	    (*effects_loop_normalize_func)(global_write, i, r,
 					   &new_i, range_descriptor, TRUE);
 	    (*effects_loop_normalize_func)(global_in, i, r,
@@ -504,7 +521,9 @@ static void in_effects_of_loop(loop l)
 	    
 	    /* We eliminate the loop index */
 	    (*effects_union_over_range_op)(global_in, i, range_undefined, 
-					   descriptor_undefined);	  
+					   descriptor_undefined);
+	    add_precondition_to_scalar_convex_regions =
+	      saved_add_precondition_to_scalar_convex_regions;
 	}
     }
     
