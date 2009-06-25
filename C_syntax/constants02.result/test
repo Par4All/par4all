@@ -38,7 +38,7 @@ main()
 Preconditions
 
 
-//  P() {}
+//  P() {i==-1}
 
 main()
 {
