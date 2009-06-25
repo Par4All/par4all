@@ -17,6 +17,7 @@ echo Parsed printed file for "decl34"
 echo
 
 display PARSED_PRINTED_FILE[decl34]
+display PRINTED_FILE[decl34]
 
 close
 delete decl34

@@ -23,19 +23,31 @@ PRINTED FILE (after controlization)
 main()
 {
    int i = 0;
-
-/* if with gotos */
-   if (i>1) {
-   }
-   else {
-      goto lab2;
-   }
-   /* goto lab1 */
-   
-   /* lab1 statement */
-lab1:   i = i+1;
+/* if with gotos */   if (i>1) goto lab1;
    /* goto lab2 */
-   
+   goto lab2;
+   /* goto lab1 *//* lab1 statement */
+lab1:   i = i+1;
+   /* lab2 statement */
+lab2:   ;
+   i = i-1;
+   printf("%d\n", i);
+}
+
+Unsplit goto
+
+/*
+ * file for goto.c
+ */
+extern  main();
+main()
+{
+   int i = 0;
+/* if with gotos */   if (i>1) goto lab1;
+   /* goto lab2 */
+   goto lab2;
+   /* goto lab1 *//* lab1 statement */
+lab1:   i = i+1;
    /* lab2 statement */
 lab2:   ;
    i = i-1;

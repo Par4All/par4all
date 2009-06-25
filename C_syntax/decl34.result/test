@@ -3,6 +3,11 @@ Parsed printed file for "decl34"
 
 void decl34(void)
 {
-   int i = 0;                                                          /*0005*/
-   int j = i;                                                          /*0005*/
+   int i = 0;
+   int j = i;
+}
+void decl34(void)
+{
+   int i = 0;
+   int j = i;
 }

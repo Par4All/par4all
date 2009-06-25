@@ -10,7 +10,7 @@ int unstructured02()
    int lambda;
    int n;
 
-   for (i = 1;i<=n;i++)
+   for (i = 1;i<=n;i++) {
       while (a2!=0) {
          for (i = 0;i<n;i++)
             if (a2==a1)
@@ -34,6 +34,7 @@ SKIP:         if (a2==a1)
          a2 = a1;
       }
 break_2:      ;
+   }
    return 1;
 }
 

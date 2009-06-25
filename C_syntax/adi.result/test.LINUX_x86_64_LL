@@ -6,7 +6,7 @@ Unsplit adi
  */
 extern double sqrt(double);
 extern double fabs(double);
-extern void adi();
+extern void adi(double **a, double **b, double **c, double **d, double **e, double **f, double **g, double **u, int jmax, int k, double alpha, double beta, double eps);
 extern void tridag();
 void adi(double **a, double **b, double **c, double **d, double **e, double **f, double **g, double **u, int jmax, int k, double alpha, double beta, double eps)
 {
