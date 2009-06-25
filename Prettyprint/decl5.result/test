@@ -14,11 +14,10 @@
       END
 # after cleaning declarations...
       PROGRAM DECL5
-      REAL*4 A, B, C, A1, A2, A3, B3, C2(1:5), C3(1:2)
+      REAL*4 B, B3, C2(1:5), C3(1:2)
       COMMON /BLA/ A1, A2, A3
       COMMON /FOO/ A, B, C
       EQUIVALENCE (C3(2), C2)
-      EQUIVALENCE (A3, B3)
 ! use
       PRINT *, B, B3, C2(2), C3(2)                                      0018
       END

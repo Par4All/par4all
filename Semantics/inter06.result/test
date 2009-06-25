@@ -37,7 +37,7 @@ PRINTED_FILE made for INCR.
 Module INTER06 selected
 Request: build resource PRINTED_FILE for module INTER06.
   TRANSFORMERS_INTER_FULL        building   TRANSFORMERS(INTER06)
-user warning in user_call_to_transformer: Type incompatibility
+user warning in fortran_user_call_to_transformer: Type incompatibility
 (formal INTEGER*4/actual REAL*4)
 for formal parameter I (rank 1)
 in call to INCR from INTER06

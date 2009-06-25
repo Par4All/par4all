@@ -213,8 +213,10 @@
       include "CGC_parameters.h"
       INTEGER*4 N
       PARAMETER (N = 4500)
-      INTEGER I_2, I_3, I_4, LALPHA1, LALPHAp1, PSI1, PSIp1, T LID, 
-     &CGC SOL UP1, CGC SOL LO1
+      INTEGER*4 N
+      PARAMETER (N = 4500)
+      INTEGER I_2, I_3, I_4, CGC SOL UP1, CGC SOL LO1, PSIp1, LALPHA1
+     &, LALPHAp1, T LID, PSI1
       REAL*4 F_0, SOL(CGC SOL LO1:CGC SOL UP1), SOL_1(1:N)
 ! all livenesss for SOL
       LIVE MAPPING(4) = .FALSE.
@@ -355,6 +357,8 @@
       include "hpfc_commons.h"
       include "hpfc_includes.h"
       include "MAIN_parameters.h"
+      INTEGER*4 N
+      PARAMETER (N = 4500)
       INTEGER*4 N
       PARAMETER (N = 4500)
       INTEGER ALPHA1, LALPHA1, PSI1, I_0, I_1, I_2, I_3

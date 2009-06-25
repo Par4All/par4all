@@ -427,9 +427,9 @@ c
       include "FULLCOPY_parameters.h"
       INTEGER*4 N
       PARAMETER (N = 512)
-      INTEGER ALPHA1, ALPHA2, LALPHA1, LALPHA2, LALPHAp1, LALPHAp2, 
-     &PSI1, PSI2, PSIp1, PSIp2, T LID, I_10, I_11, I_12, I_13, I_6, 
-     &I_7, I_8, I_9, I, J
+      INTEGER ALPHA1, ALPHA2, LALPHA1, LALPHA2, PSI1, PSI2, I_10, 
+     &I_11, I_12, I_13, I_6, I_7, I_8, I_9, I, J, LALPHAp1, LALPHAp2
+     &, PSIp2, PSIp1, T LID
       REAL*4 A(1:256, 1:256), B(1:256, 1:256), B_1(1:256, 1:256), A_1
      &(1:256, 1:256)
       CALL HPFC INIT NODE

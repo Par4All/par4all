@@ -32,8 +32,9 @@
       INTEGER*4 M
       PARAMETER (M = 10)
       INTEGER J
-      REAL*4 X1, C, D(1:M), V, W
+      REAL*4 X1, C, D(1:M), V
       COMMON /FOO/ V, W
+      COMMON /BLA/ X, Y, Z
 ! some code
       C = 3.0                                                           0021
       DO J = 1, 3                                                       0022

@@ -69,6 +69,12 @@
       include "hpfc_commons.h"
       include "hpfc_includes.h"
       include "DESCRIPTIVE_3_parameters.h"
+      INTEGER*4 N
+      PARAMETER (N = 20)
+      INTEGER*4 N
+      PARAMETER (N = 20)
+      INTEGER*4 N
+      PARAMETER (N = 20)
       INTEGER A(0:6, 1:2)
       CALL HPFC INIT NODE
 ! all livenesss for A

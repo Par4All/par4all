@@ -267,9 +267,9 @@
       include "REPLICATION_parameters.h"
       INTEGER*4 N
       PARAMETER (N = 100)
-      INTEGER HPFC BUFID, HPFC INFO, LALPHA1, LALPHAp1, PSI1, PSI2, 
-     &PSI3, PSIp1, PSIp2, PSIp3, T LID, TMP3, I_2, I_3, I_4, I_5, I_7
-     &, I_9, I_8, I_6, I, B
+      INTEGER I_2, I_3, I_4, I_5, I_7, I_9, I_8, I_6, I, B, HPFC INFO
+     &, LALPHA1, LALPHAp1, HPFC BUFID, PSIp3, PSIp1, T LID, PSIp2, 
+     &PSI1, TMP3, PSI3, PSI2
       INTEGER A(1:10), A_1(1:50), A_2(1:20)
       CALL HPFC INIT NODE
       CALL HPFC LOOP BOUNDS(I_3, I_4, I_5, 1, N, 3, 1)

@@ -6,8 +6,6 @@
       PARAMETER (N = 5)
       INTEGER*4 M
       PARAMETER (M = 1)
-      REAL*4 P
-      PARAMETER (P = 2)
       REAL*4 Q
       PARAMETER (Q = 10)
       include 'FOO.h'
@@ -22,8 +20,6 @@
       SUBROUTINE BLA
       INTEGER*4 N
       PARAMETER (N = 5)
-      INTEGER*4 M
-      PARAMETER (M = 2)
       REAL*4 P
       PARAMETER (P = 1)
       REAL*4 QX

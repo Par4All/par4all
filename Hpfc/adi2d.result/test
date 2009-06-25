@@ -755,15 +755,15 @@
       PARAMETER (N = 1024)
       INTEGER*4 N
       PARAMETER (N = 1024)
-      INTEGER ALPHA1, ALPHA2, LALPHA1, LALPHA2, LALPHAp1, LALPHAp2, 
-     &PSI1, PSIp1, T LID, I_22, I_23, I_24, I_25, I_26, I_27, I_28, 
-     &I_29, I_30, I_31, I_32, I_33, I_34, I_35, I_36, I_37, I_38, 
-     &I_39, I_40, I_41, I_42, I_43, I_44, I_45, I_46, I_47, I_48, 
-     &I_49, I_50, I_51, I_52, I_53, I_54, I_55, I_56, I_57, I_58, 
-     &I_59, I_60, I_61, I_62, I_63, I_64, I_65, I_66, I_67, I_68, 
-     &I_69, I_70, I_71, I_72, I_73, I_74, I_75, I_76, I_77, I, J, K, 
-     &I_LOCAL, I_12, I_13, I_14, I_15, I_16, I_17, I_18, I_19, I_20, 
-     &I_21
+      INTEGER ALPHA1, ALPHA2, LALPHA1, LALPHA2, PSI1, I_22, I_23, 
+     &I_24, I_25, I_26, I_27, I_28, I_29, I_30, I_31, I_32, I_33, 
+     &I_34, I_35, I_36, I_37, I_38, I_39, I_40, I_41, I_42, I_43, 
+     &I_44, I_45, I_46, I_47, I_48, I_49, I_50, I_51, I_52, I_53, 
+     &I_54, I_55, I_56, I_57, I_58, I_59, I_60, I_61, I_62, I_63, 
+     &I_64, I_65, I_66, I_67, I_68, I_69, I_70, I_71, I_72, I_73, 
+     &I_74, I_75, I_76, I_77, I, J, K, I_LOCAL, I_12, I_13, I_14, 
+     &I_15, I_16, I_17, I_18, I_19, I_20, I_21, LALPHAp1, LALPHAp2, 
+     &PSIp1, T LID
       REAL*8 U(1:128, 1:N), UH(1:128, 1:N), B(1:128, 1:N), ALPHA, AP2
      &, AM2, INV, S, U_1(1:N, 1:128), UH_1(1:N, 1:128), B_1(1:N, 1:
      &128)

@@ -32,10 +32,6 @@ Request: build resource PRINTED_FILE for module SAVEGLOBAL.
   PROGRAM_PRECONDITION           building   PROGRAM_PRECONDITION()
   TRANSFORMERS_INTER_FULL        building   TRANSFORMERS(FOO)
   TRANSFORMERS_INTER_FULL        building   TRANSFORMERS(SAVEGLOBAL)
-user warning in user_call_to_transformer: Side effects in actual arguments are not yet taken into account
-.Meanwhile, atomize the call site to avoid the problem.
-user warning in user_call_to_transformer: Side effects in actual arguments are not yet taken into account
-.Meanwhile, atomize the call site to avoid the problem.
   CALLGRAPH                      building   CALLERS(FOO)
                                  building   CALLERS(SAVEGLOBAL)
                                  building   HEIGHT(FOO)

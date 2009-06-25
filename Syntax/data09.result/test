@@ -59,10 +59,6 @@ user warning in fix_storage: DATA for variable M declared in COMMON *BLANK*: not
   TRANSFORMERS_INTER_FULL        building   TRANSFORMERS(INIT2)
   TRANSFORMERS_INTER_FULL        building   TRANSFORMERS(INIT1)
   TRANSFORMERS_INTER_FULL        building   TRANSFORMERS(DATA09)
-user warning in user_call_to_transformer: Side effects in actual arguments are not yet taken into account
-.Meanwhile, atomize the call site to avoid the problem.
-user warning in user_call_to_transformer: Side effects in actual arguments are not yet taken into account
-.Meanwhile, atomize the call site to avoid the problem.
   CALLGRAPH                      building   CALLERS(DATA09)
                                  building   CALLERS(INIT1)
                                  building   CALLERS(INIT2)

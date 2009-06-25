@@ -27,13 +27,12 @@ void c_clean_declarations01(int x)
    int y;
 
    if (y) {
-      y++;
+      int x = y++;
 
       y = 1;
    }
    else {
-      0;
-      y--;
+      int z = y--;
 
       y = -1;
    }

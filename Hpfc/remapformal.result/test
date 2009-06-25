@@ -59,6 +59,8 @@
       include "hpfc_commons.h"
       include "hpfc_includes.h"
       include "FORMALREMAPPEDNOTUSED_parameters.h"
+      INTEGER*4 N
+      PARAMETER (N = 10)
       INTEGER I_0
       REAL*4 SOL(1:5)
       CALL HPFC INIT NODE
@@ -315,8 +317,10 @@
       include "NOREMAP_parameters.h"
       INTEGER*4 N
       PARAMETER (N = 10)
-      INTEGER LALPHA1, LALPHAp1, PSI1, PSIp1, T LID, I_2, 
-     &NOREMAP SOL UP1, NOREMAP SOL LO1
+      INTEGER*4 N
+      PARAMETER (N = 10)
+      INTEGER I_2, NOREMAP SOL UP1, NOREMAP SOL LO1, PSIp1, LALPHA1, 
+     &LALPHAp1, T LID, PSI1
       REAL*4 SOL(NOREMAP SOL LO1:NOREMAP SOL UP1), SOL_1(1:N)
 ! all livenesss for SOL
       LIVE MAPPING(3) = .FALSE.

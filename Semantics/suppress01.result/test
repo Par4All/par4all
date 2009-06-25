@@ -71,7 +71,7 @@ C  P(I) {}
 
 Warning:
 
-TRANSFORMERS_INTER_FULL[SUPPRESS01] (user_call_to_transformer) Type incompatibility
+TRANSFORMERS_INTER_FULL[SUPPRESS01] (fortran_user_call_to_transformer) Type incompatibility
 INTERPROCEDURAL_SUMMARY_PRECONDITION[INCR] (add_formal_to_actual_bindings) Type incompatibility
 
 

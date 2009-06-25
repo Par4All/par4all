@@ -63,8 +63,12 @@
       END
 # after cleaning declarations (u and a6 dropped)
       PROGRAM DECL6
-      INTEGER*4 A
-      PARAMETER (A = 1)
+      INTEGER*4 A3
+      PARAMETER (A3 = A2)
+      INTEGER*4 I4
+      PARAMETER (I4 = I3)
+      INTEGER*4 N
+      PARAMETER (N = O+P)
       INTEGER*4 B
       PARAMETER (B = 10)
       INTEGER*4 C
@@ -73,12 +77,6 @@
       PARAMETER (D = 14)
       INTEGER*4 E
       PARAMETER (E = 15)
-      INTEGER*4 O
-      PARAMETER (O = A+4)
-      INTEGER*4 P
-      PARAMETER (P = O)
-      INTEGER*4 N
-      PARAMETER (N = O+P)
       INTEGER*4 M
       PARAMETER (M = N+5)
       INTEGER*4 X
@@ -87,12 +85,6 @@
       PARAMETER (Y = 3)
       INTEGER*4 Z
       PARAMETER (Z = Y+X)
-      INTEGER*4 A1
-      PARAMETER (A1 = 1)
-      INTEGER*4 A2
-      PARAMETER (A2 = A1)
-      INTEGER*4 A3
-      PARAMETER (A3 = A2)
       INTEGER*4 A4
       PARAMETER (A4 = A3)
       INTEGER*4 A5
@@ -101,14 +93,6 @@
       PARAMETER (A7 = A8)
       INTEGER*4 A8
       PARAMETER (A8 = 8)
-      INTEGER*4 I1
-      PARAMETER (I1 = 1)
-      INTEGER*4 I2
-      PARAMETER (I2 = I1)
-      INTEGER*4 I3
-      PARAMETER (I3 = I2)
-      INTEGER*4 I4
-      PARAMETER (I4 = I3)
       INTEGER*4 I5
       PARAMETER (I5 = I4)
       INTEGER*4 I6

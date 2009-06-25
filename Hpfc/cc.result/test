@@ -216,8 +216,8 @@
       include "hpfc_commons.h"
       include "hpfc_includes.h"
       include "CC_parameters.h"
-      INTEGER ALPHA1, ALPHA2, LALPHA1, LALPHA2, LALPHAp1, LALPHAp2, 
-     &PSI1, PSI2, PSIp1, PSIp2, T LID, I_2, I_3
+      INTEGER ALPHA1, ALPHA2, LALPHA1, LALPHA2, PSI1, PSI2, I_2, I_3
+     &, LALPHAp1, LALPHAp2, T LID, PSIp2, PSIp1
       REAL*4 A(1:50, 1:50), A_1(1:50, 1:50)
       CALL HPFC INIT NODE
 ! all livenesss for A

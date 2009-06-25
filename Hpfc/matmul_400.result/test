@@ -628,10 +628,10 @@ c
       PARAMETER (N = 400)
       INTEGER*4 N
       PARAMETER (N = 400)
-      INTEGER ALPHA1, ALPHA2, LALPHA1, LALPHA2, LALPHAp1, LALPHAp2, 
-     &PSI1, PSI2, PSIp1, PSIp2, T LID, TMP3, I_10, I_11, I_12, I_13, 
-     &I_14, I_15, I_16, I_17, I_18, I_19, I_20, I_21, I_22, I_23, I_8
-     &, I_9, I, J, K, L, U
+      INTEGER ALPHA1, ALPHA2, LALPHA1, LALPHA2, PSI1, PSI2, I_10, 
+     &I_11, I_12, I_13, I_14, I_15, I_16, I_17, I_18, I_19, I_20, 
+     &I_21, I_22, I_23, I_8, I_9, I, J, K, L, U, PSIp2, LALPHAp1, 
+     &LALPHAp2, T LID, PSIp1, TMP3
       REAL*8 A(1:200, 1:200), B(1:200, 1:200), C(1:200, 1:200), A_1(1
      &:200, 1:N), B_1(1:N, 1:200)
       CALL HPFC INIT NODE

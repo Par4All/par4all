@@ -23,6 +23,13 @@ apply LOCALIZE_DECLARATION[main]
 display PRINTED_FILE[main]
 
 echo
+echo Code after declaration cleaning
+echo
+
+apply CLEAN_DECLARATIONS[main]
+display PRINTED_FILE[main]
+
+echo
 echo Unsplit resulting code
 echo
 

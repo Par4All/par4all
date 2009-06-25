@@ -18,6 +18,7 @@ echo
 module conv_cpu
 display PRINTED_FILE
 
+setproperty LOOP_UNROLL_MERGE TRUE
 source ${VDIR:-.}/include/benchmark.tpips.h
 
 echo
