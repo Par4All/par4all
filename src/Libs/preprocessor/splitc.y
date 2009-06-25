@@ -72,6 +72,8 @@ extern int splitc_lex(void);
 extern void splitc_error(char *);
 extern int get_csplit_current_beginning(void);
 extern int get_user_current_beginning(void);
+extern size_t get_current_csplit_file_offset(void);
+extern size_t get_csplit_file_offset_beginning(void);
 extern void reset_csplit_current_beginning(void);
 extern int csplit_line_number;
 extern string splitc_text;
@@ -617,7 +619,9 @@ global:
 			  csplit_is_external = 1; /* the variable is declared outside of any function */
 			  /* csplit_is_typedef = 0; */
 			  pips_debug(1, "Declaration is located between line %d and line %d\n", get_csplit_current_beginning(), csplit_line_number);
-			  csplit_append_to_compilation_unit(csplit_line_number);
+			  /* Useless since it is dealt by csplit_copy()
+			     later */
+			  //csplit_append_to_compilation_unit(csplit_line_number, get_current_csplit_file_offset());
 			  if(!string_undefined_p($1)) {
 			    pips_debug(1, "Definition: \"%s\"\n", $1);
 			    free_partial_signature($1);
@@ -633,10 +637,14 @@ global:
 				  get_csplit_current_beginning(),
 				  csplit_line_number);
 
+			  /* Hmm... It happens to early to gather
+			     following comments to its module... */
 			  csplit_copy(csplit_definite_function_name,
 				      csplit_definite_function_signature,
 				      get_csplit_current_beginning(),
 				      csplit_line_number,
+				      get_csplit_file_offset_beginning(),
+				      get_current_csplit_file_offset(),
 				      get_user_current_beginning(),
 				      current_function_is_static_p);
 

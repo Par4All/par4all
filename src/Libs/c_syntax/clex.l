@@ -370,7 +370,6 @@ floatsuffix [fFlL]
 floatnum (({decfloat}|{hexfloat}){floatsuffix}?)
 ident ({letter}|"_")({letter}|{decdigit}|"_")*
 attribident (({letter}|"_")({letter}|{decdigit}|"_"|":"))
-blank [ \t\r]+
 escape \\
  /* From C norm A.1: */
 hex_escape ({escape}x{hexdigit}{1,2})
@@ -414,9 +413,7 @@ universal-character-name ({escape}(u{hexdigit}{4}|U{hexdigit}{8}))
                                    }
                                 }
                         }
-{blank}			{
-                                /* Eat up whitespaces */
-                        }
+
 \n                      {
                                 pips_debug(9,"New line %d\n", C_line_number);
 
@@ -429,6 +426,11 @@ universal-character-name ({escape}(u{hexdigit}{4}|U{hexdigit}{8}))
 				pips_debug(3,"CNew line %s\n", yytext);
                                 C_line_number++;
                         }
+
+[[:blank:]]		{
+                                /* Eat up whitespaces */
+                        }
+
 "_Pragma" 	        {
                                 pips_debug(9,"Pragma soon implemented %s\n",yytext);
 				return(TK_PRAGMA);

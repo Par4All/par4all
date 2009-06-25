@@ -73,34 +73,69 @@ extern string csplit_definite_function_signature;
 extern bool csplit_is_static_p;
 extern int check_signature_balance(void);
 
-int csplit_line_number = 1; /* To be exported to the parser for
-			  ; splitting the preprocessed file */
-int user_line_number = 1; /* To be exported to the parser for error
-			; messages related to the user file*/
+int csplit_line_number = 1; /**< To be exported to the parser for
+				splitting the preprocessed file */
+int user_line_number = 1; /**< To be exported to the parser for error
+			      messages related to the user file */
 
-void gdb_marker()
+/* To track current file position: */
+#define YY_USER_ACTION update_csplit_file_offset_information();
+size_t current_csplit_file_offset = 0;
+size_t csplit_file_offset_beginning = 0;
+
+/* A state-machine to gather the trailing comments of a statement with an
+   heuristic to decide if some comments and spaces will go into the
+   previous or next top-level construct: */
+enum gather_comment_state_t {
+  PUT_IN_NEXT_TOP_LEVEL_CONSTRUCT, /**< Normal mode: comments and spaces
+				     are associated to the top-level
+				     construct to encounter: */
+  GATHER_SPACES, /**< We gather only spaces in the previous top-level
+		    construct */
+  GATHER_COMMENT, /**< We gather comments in the previous top-level construct */
+};
+/* Indeed it does not work since csplit_copy() is called from splitc.y
+   when a function definition is found and thus we cannot gather the
+   comment in it... :-( */
+enum gather_comment_state_t
+  gather_comment_state_machine = PUT_IN_NEXT_TOP_LEVEL_CONSTRUCT;
+
+
+static void gdb_marker()
 {
 /* Just to be able to set an easy breakpoint */
 ;
 }
 
+
+/* Reinitialise global position numbers for a new file. */
 void reset_csplit_line_number()
 {
   csplit_line_number = 1;
   user_line_number = 1;
+  current_csplit_file_offset = 0;
+  csplit_file_offset_beginning = 0;
+  gather_comment_state_machine = PUT_IN_NEXT_TOP_LEVEL_CONSTRUCT;
 }
 
 static int csplit_current_beginning = 1000000;
 static int user_current_beginning = 1000000;
 
-static void update_csplit_current_beginning()
-{
+
+/* If we encounter a possible function begin, just snapshot the position
+   of the function beginning: */
+static void update_csplit_current_beginning() {
   user_current_beginning = csplit_current_beginning > csplit_line_number?
     user_line_number : user_current_beginning;
   csplit_current_beginning = csplit_current_beginning > csplit_line_number?
     csplit_line_number : csplit_current_beginning;
+  /* From now, the comments and spaces are associated to the current
+     top-level construct: */
+  gather_comment_state_machine = PUT_IN_NEXT_TOP_LEVEL_CONSTRUCT;
 }
 
+
+/* This function is called at the end of any top-level C construct: */
 void reset_csplit_current_beginning()
 {
   int leaked = 0;
@@ -108,6 +143,14 @@ void reset_csplit_current_beginning()
   csplit_current_beginning = 1000000;
   user_current_beginning = 1000000;
   csplit_is_static_p = FALSE;
+
+  /* Snapshot the current file position as a potential function begin: */
+  csplit_file_offset_beginning = current_csplit_file_offset;
+
+  /* Aggregate following spaces and comments on the sameline to the
+     previous top-level construct: */
+  gather_comment_state_machine = GATHER_COMMENT;
+
 
   if(!string_undefined_p(csplit_current_function_name))
     free(csplit_current_function_name);
@@ -132,10 +175,33 @@ int get_csplit_current_beginning()
   return csplit_current_beginning;
 }
 
-int get_user_current_beginning()
-{
+
+/* Get the current line number in the file to split from the user point of
+   view (before preprocessor expansion): */
+int get_user_current_beginning() {
   return user_current_beginning;
 }
+
+
+/* Get the file position in the file to split where the current function
+   begins: */
+size_t get_csplit_file_offset_beginning() {
+  return csplit_file_offset_beginning;
+}
+
+
+/* Get the current file position in the file to split: */
+size_t get_current_csplit_file_offset() {
+  return current_csplit_file_offset;
+}
+
+
+/* Function called each time a token is read to trac file position
+   information: */
+void update_csplit_file_offset_information() {
+  current_csplit_file_offset += yyleng;
+}
+
 
 static int lf_count(string s)
 {
@@ -154,6 +220,9 @@ extern int csplit_is_function;
 
 extern intptr_t is_c_keyword_typedef(char * s);
 %}
+
+/* To track file line number automatically: */
+%option yylineno
 
 decdigit [0-9]
 octdigit [0-7]
@@ -176,7 +245,6 @@ floatsuffix [fFlL]
 floatnum (({decfloat}|{hexfloat}){floatsuffix}?)
 ident ({letter}|"_")({letter}|{decdigit}|"_")*
 attribident (({letter}|"_")({letter}|{decdigit}|"_"|":"))
-blank [ \t\r]+
 escape \\
  /* From C norm A.1: */
 hex_escape ({escape}x{hexdigit}{1,2})
@@ -189,17 +257,30 @@ universal-character-name ({escape}(u{hexdigit}{4}|U{hexdigit}{8}))
 
 %%
 
-"/*"([^\*]|(\*+[^\/\*]))*(\*)+"/"	{
+("/*"([^*]|"*"[^/])*"*/")|("/"(\\\n)*"/"[^\n]*)	{
+	  /* Taken from the Flex manual A.4.3: can deal with both kind of
+	     comments, even // in multiline form... */
                                 /* Difficulties: stars contiguous to the opening
-                                   or closing parts. */
-                                /* Bug FI: line feed are not counted! */
-                                csplit_line_number += lf_count(yytext);
-                                user_line_number += lf_count(yytext);
-                                pips_debug(5,"Comment \"%s\"\n",yytext);
+                            or closing parts. */
+			  /* Bug FI: line feed are not counted! */
+			  csplit_line_number += lf_count(yytext);
+			  user_line_number += lf_count(yytext);
+
+
+			  pips_debug(5,"Comment \"%s\"\n",yytext);
+
+			  if (gather_comment_state_machine == GATHER_COMMENT)
+			    /* This comment is associated to previous
+			       top-level construct: */
+			    reset_csplit_current_beginning();
+			  if (gather_comment_state_machine == GATHER_SPACES)
+			    /* We encounter a comment whereas we were
+			       gathering spaces into the previous
+			       top-level construct. So now this comment
+			       will go in the next top-level construct: */
+			    gather_comment_state_machine = PUT_IN_NEXT_TOP_LEVEL_CONSTRUCT;
                         }
-"//"[^\n]*                {
-                                pips_debug(5,"Comment %s\n",yytext);
-                        }
+
 ^"#"[^\n]*              {
                                 /* csplit_line_number++; */
                                 pips_debug(5,"Pragma comment %s\n",yytext);
@@ -228,20 +309,50 @@ universal-character-name ({escape}(u{hexdigit}{4}|U{hexdigit}{8}))
                                    }
                                 }
                         }
-{blank}			{
-                                /* Eat up whitespaces */
-                        }
+
 \n                      {
-                                csplit_line_number++;
-                                user_line_number++;
-                                pips_debug(5, "New line %d, ext=%d, func=%d\n", csplit_line_number, csplit_is_external, csplit_is_function);
+                          csplit_line_number++;
+			  user_line_number++;
+			  pips_debug(5, "New line %d, ext=%d, func=%d\n", csplit_line_number, csplit_is_external, csplit_is_function);
+
+			  if (gather_comment_state_machine == GATHER_COMMENT) {
+			    /* We encounter a newline, stop gathering
+			       comments and gather spaces from now: */
+			    //gather_comment_state_machine = GATHER_SPACES;
+			    /* Well, ideed, we want to be compatible with
+			       old behaviour: associate newlines and other
+			       from now to next top-level construct: */
+			    gather_comment_state_machine = PUT_IN_NEXT_TOP_LEVEL_CONSTRUCT;
+			    /* Associate the current \n to the previous
+			       top-level construct: */
+			    reset_csplit_current_beginning();
+			  }
+			  if (gather_comment_state_machine == GATHER_SPACES) {
+			    /* Add this newline to the previous top-level
+			       construct: */
+			     reset_csplit_current_beginning();
+			  }
                         }
+
+[[:blank:]]		{
+                          /* Eat up whitespaces. After the previous '\n'
+			     since it includes '\n' and we want
+			     lower priority */
+			  if (gather_comment_state_machine == GATHER_COMMENT
+			      || gather_comment_state_machine == GATHER_SPACES) {
+			    /* Add this space to the previous top-level
+			       construct: */
+			     reset_csplit_current_beginning();
+			  }
+                        }
+
 "_Pragma" 	        {
                                 pips_debug(5,"Pragma not implemented %s\n",yytext);
 				return(TK_PRAGMA);
                         }
 
 \'([^\\]|{char_escape}|{oct_escape}|{hex_escape}|{universal-character-name})\'           {
+  /* Have a look to Flex A.4.3 too... */
                                 /* Escaped character constants. Their
                                    syntax is understood in PIPS character
                                    constant construtors. */
