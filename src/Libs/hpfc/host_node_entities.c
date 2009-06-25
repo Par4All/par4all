@@ -216,33 +216,6 @@ void update_list_for_module(list l, entity module)
     MAPL(cx, update_object_for_module(CHUNK(CAR(cx)), module), l);
 }
 
-/* removed unreferenced items in the common
- * the global map refenreced_variables should be set and ok
- * the variables updated are those local to the common...
- */
-void clean_common_declaration(entity common)
-{
-    type t = entity_type(common);
-    list l = NIL, lnew = NIL;
-
-    pips_assert("area", type_area_p(t));
-    pips_assert("defined referenced variables", 
-		!referenced_variables_undefined_p());
-
-    l = area_layout(type_area(t));
-
-    MAP(ENTITY, var,
-    {
-	if (bound_referenced_variables_p(var) &&
-	    local_entity_of_module_p(var, common))
-	    lnew = CONS(ENTITY, var, lnew);
-    },
-	l);
-
-    gen_free_list(l);
-    area_layout(type_area(t)) = lnew;
-}
-
 /* this function creates a new expression using the mapping of
  * old to new variables map.
  * some of the structures generated may be shared...

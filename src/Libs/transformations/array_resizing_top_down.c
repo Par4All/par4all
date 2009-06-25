@@ -191,7 +191,7 @@ entity make_new_common(string name, entity mod)
   entity StaticArea = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, STATIC_AREA_LOCAL_NAME);
   storage common_storage = make_storage(is_storage_ram,
 					(make_ram(mod,StaticArea, 0, NIL)));
-  value common_value = MakeValueUnknown();
+  value common_value = make_value_code(make_code(NIL,string_undefined,make_sequence(NIL),NIL));
   return  make_entity(common_global_name,common_type,common_storage,common_value);
 }
 

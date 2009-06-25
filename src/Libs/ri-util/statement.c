@@ -46,6 +46,7 @@
 #include "ri-util.h"
 
 #include "properties.h"
+#include "effects-simple.h"
 
 
 /******************************************************* EMPTY STATEMENT */
@@ -1332,23 +1333,19 @@ statement_with_empty_comment_p(statement s)
 }
 
 
-static string gather_all_comments_of_a_statement_string;
-
-
 static bool 
-gather_all_comments_of_a_statement_filter(statement s)
+gather_all_comments_of_a_statement_filter(statement s, string * all_comments)
 {
-  string the_comments = statement_comments(s);
-  if (!empty_comments_p(the_comments)) {
-    string old = gather_all_comments_of_a_statement_string;
-    if (old == NULL)
-	/* For now, no comment has been gathered: */
-	old = strdup("");
-    gather_all_comments_of_a_statement_string =
-      strdup(concatenate(old, the_comments, NULL));
-    free(old);
-  }
-  return TRUE;
+    string the_comments = statement_comments(s);
+    if (!empty_comments_p(the_comments)) {
+        string old = *all_comments;
+        *all_comments = strdup(
+                old==NULL?
+                the_comments:
+                concatenate(old, the_comments, NULL));
+        free(old);
+    }
+    return true;
 }
 
 
@@ -1360,15 +1357,10 @@ gather_all_comments_of_a_statement_filter(statement s)
 string
 gather_all_comments_of_a_statement(statement s)
 {
-    gather_all_comments_of_a_statement_string = NULL;
-    gen_multi_recurse(s, statement_domain,
-		gather_all_comments_of_a_statement_filter, gen_null,
-		      NULL);
-    
-    if (gather_all_comments_of_a_statement_string == NULL)
-	return empty_comments;
-    else
-	return gather_all_comments_of_a_statement_string;
+    string comments = NULL;
+    gen_context_recurse(s, &comments, statement_domain,
+		gather_all_comments_of_a_statement_filter, gen_null);
+    return comments?comments:empty_comments;
 }
 
 
@@ -1825,32 +1817,27 @@ void append_a_statement(statement target,
 }
 
 
-static list gather_and_remove_all_format_statements_list;
-
-
 void
-gather_and_remove_all_format_statements_rewrite(statement s)
+gather_and_remove_all_format_statements_rewrite(statement s,list *all_formats)
 {
     instruction i = statement_instruction(s);
     if (instruction_format_p(i)) {
-	/* Put the instruction with the statement attributes in
+        /* Put the instruction with the statement attributes in
            new_format. */
-	statement new_format = make_stmt_of_instr(i);
-	statement_label(new_format) = statement_label(s);
-	statement_number(new_format) = statement_number(s);
-	statement_comments(new_format) = statement_comments(s);
-	statement_extensions(new_format) = statement_extensions(s);
-	/* Replace the old FORMAT with a NOP: */
-	statement_instruction(s) = make_instruction_block(NIL);
-	statement_label(s) = entity_empty_label();
-	statement_number(s) = STATEMENT_NUMBER_UNDEFINED;
-	statement_ordering(s) = STATEMENT_ORDERING_UNDEFINED;
-	statement_comments(s) = empty_comments;
-	statement_extensions(s) = empty_extensions();
+        statement new_format = make_stmt_of_instr(i);
+        statement_label(new_format) = statement_label(s);
+        statement_number(new_format) = statement_number(s);
+        statement_comments(new_format) = statement_comments(s);
+        statement_extensions(new_format) = statement_extensions(s);
+        /* Replace the old FORMAT with a NOP: */
+        statement_instruction(s) = make_instruction_block(NIL);
+        statement_label(s) = entity_empty_label();
+        statement_number(s) = STATEMENT_NUMBER_UNDEFINED;
+        statement_ordering(s) = STATEMENT_ORDERING_UNDEFINED;
+        statement_comments(s) = empty_comments;
+        statement_extensions(s) = empty_extensions();
 
-	gather_and_remove_all_format_statements_list = CONS(STATEMENT,
-							    new_format,
-							    gather_and_remove_all_format_statements_list);
+        *all_formats = CONS(STATEMENT, new_format,*all_formats);
     }
 }
 
@@ -1861,17 +1848,12 @@ gather_and_remove_all_format_statements_rewrite(statement s)
 list
 gather_and_remove_all_format_statements(statement s)
 {
-    gather_and_remove_all_format_statements_list = NIL;
+    list all_formats = NIL;
     
-    gen_multi_recurse(s, statement_domain,
-		gen_true,
-		gather_and_remove_all_format_statements_rewrite,
-		      NULL);
+    gen_context_recurse(s,&all_formats, statement_domain,
+		gen_true, gather_and_remove_all_format_statements_rewrite);
     
-    gather_and_remove_all_format_statements_list =
-	gen_nreverse(gather_and_remove_all_format_statements_list);
-    
-    return gather_and_remove_all_format_statements_list;
+    return all_formats = gen_nreverse(all_formats);
 }
 
 
@@ -2537,6 +2519,270 @@ int get_statement_depth(statement s, statement root)
 				pips_internal_error("you should never reach this point");
 		};
 	}
+}
+
+/**  @} */
+
+/** 
+ * @name declarations updater
+ * @{ */
+
+/** 
+ * helper looking in a reference for referenced entities
+ * 
+ * @param r reference to check
+ * @param re set to fill
+ */
+static
+void statement_clean_declarations_reference_walker(reference r, set re)
+{
+    set_add_element(re,re,reference_variable(r));
+}
+
+/** 
+ * helper looking in a call for referenced entities
+ * 
+ * @param c call to check
+ * @param re set to fill
+ */
+static
+void statement_clean_declarations_call_walker(call c, set re)
+{
+    set_add_element(re,re,call_function(c));
+}
+
+/** 
+ * helper looking in a loop for referenced entities
+ * 
+ * @param l loop to check
+ * @param re set to fill
+ */
+static
+void statement_clean_declarations_loop_walker(loop l, set re)
+{
+    set_add_element(re,re,loop_index(l));
+}
+
+
+/** 
+ * helper looking in a list for referenced entities
+ * 
+ * @param l list to check
+ * @param re set to fill
+ */
+static
+void statement_clean_declarations_list_walker(list l, set re)
+{
+    FOREACH(ENTITY,e,l)
+        set_add_element(re,re,e);
+}
+
+/** 
+ * helper looking in a ram for referenced entities
+ * 
+ * @param r ram to check
+ * @param re set to fill
+ */
+static
+void statement_clean_declarations_ram_walker(ram r, set re)
+{
+    statement_clean_declarations_list_walker(ram_shared(r),re);
+}
+
+/** 
+ * helper looking in an area for referenced entities
+ * 
+ * @param a area to check
+ * @param re set to fill
+ */
+static
+void statement_clean_declarations_area_walker(area a, set re)
+{
+    statement_clean_declarations_list_walker(area_layout(a),re);
+}
+
+/** 
+ * helper diving into an entity to find referenced entities
+ * 
+ * @param e entity to dive into
+ * @param re set to fill
+ * 
+ */
+static
+void entity_get_referenced_entities(entity e, set re)
+{
+    gen_context_multi_recurse(entity_type(e),re,
+            reference_domain,gen_true,statement_clean_declarations_reference_walker,
+            call_domain,gen_true,statement_clean_declarations_call_walker,
+            NULL
+            );
+    gen_context_multi_recurse(entity_initial(e),re,
+            call_domain,gen_true,statement_clean_declarations_call_walker,
+            reference_domain,gen_true,statement_clean_declarations_reference_walker,
+            area_domain,gen_true,statement_clean_declarations_area_walker,
+            ram_domain,gen_true,statement_clean_declarations_ram_walker,
+            NULL);
+}
+
+/** 
+ * helper iterating over statement declaration to find referenced entities
+ * 
+ * @param s statement to check
+ * @param re set to fill
+ */
+static
+void statement_clean_declarations_statement_walker(statement s, set re)
+{
+    FOREACH(ENTITY,e,statement_declarations(s))
+        entity_get_referenced_entities(e,re);
+}
+
+
+/** 
+ * retrieves the set of entites used in s
+ * 
+ * @param s  statement to check
+ * 
+ * @return set of referenced entities
+ */
+set statement_get_referenced_entities(statement s)
+{
+    /* gather entities from s*/
+    set referenced_entities = set_make(set_pointer);
+    gen_context_multi_recurse(s,referenced_entities,
+            loop_domain,gen_true,statement_clean_declarations_loop_walker,
+            reference_domain,gen_true,statement_clean_declarations_reference_walker,
+            call_domain,gen_true,statement_clean_declarations_call_walker,
+            statement_domain,gen_true,statement_clean_declarations_statement_walker,
+            ram_domain,gen_true,statement_clean_declarations_ram_walker,
+            NULL);
+
+    /* gather all entities referenced by referenced entities */
+    set other_referenced_entities = set_make(set_pointer);
+    SET_MAP(e,{
+        entity_get_referenced_entities((entity)e,other_referenced_entities);
+    },referenced_entities);
+
+    /* merge results */
+    set_union(referenced_entities,other_referenced_entities,referenced_entities);
+    set_free(other_referenced_entities);
+
+    return referenced_entities;
+}
+
+/** 
+ * remove useless entities from declarations
+ * an entity is flagged useless when no reference is found in stmt
+ * and when it is not used by an entity found in stmt
+ * 
+ * @param declarations list of entity to purge
+ * @param stmt statement where entities are used
+ * 
+ * @return a list of used declarations
+ */
+static
+list statement_clean_declarations_helper(list declarations, statement stmt)
+{
+    list new_declarations = NIL;
+    set referenced_entities = statement_get_referenced_entities(stmt);
+
+    declarations=gen_nreverse(declarations);
+
+    /* look for entity that are used in the statement */
+    FOREACH(ENTITY,e,declarations)
+    {
+        bool add_entity_to_declaration_p = true;
+        /* area and parameters are always used */
+        if( ! formal_parameter_p(e) && ! entity_area_p(e) )
+        {
+            /* entities whose declaration has a side effect are always used too */
+            bool has_side_effects_p = false;
+            value v = entity_initial(e);
+            storage s = entity_storage(e);
+            if( value_expression_p(v) )
+            {
+                list effects = expression_to_proper_effects(value_expression(v));
+                FOREACH(EFFECT, eff, effects)
+                {
+                    if( action_write_p(effect_action(eff)) ) has_side_effects_p = true;
+                }
+                gen_full_free_list(effects);
+            }
+
+            if( ! has_side_effects_p )
+            {
+                add_entity_to_declaration_p=set_belong_p(referenced_entities,e);
+            }
+        }
+
+        /* if we found some usefulness , add it */
+        if(add_entity_to_declaration_p) {
+            new_declarations=CONS(ENTITY,e,new_declarations);
+        }
+    }
+
+
+    set_free(referenced_entities);
+
+    return new_declarations;
+}
+
+/** 
+ * check if all entities used in s and module are declared in module
+ * does not work as well as expected on c module because it does not fill the statement declaration
+ * @param module module to check
+ * @param s statement where reference can be found
+ */
+static
+void entity_generate_missing_declarations(entity module, statement s)
+{
+    /* gather referenced entities */
+    set referenced_entities = statement_get_referenced_entities(s);
+    set ref_tmp = set_make(set_pointer);
+    /* gather all entities referenced by referenced entities */
+    SET_MAP(e0,{entity_get_referenced_entities((entity)e0,ref_tmp);},referenced_entities);
+
+    referenced_entities=set_union(referenced_entities,ref_tmp,referenced_entities);
+    set_free(ref_tmp);
+
+    /* fill the declarations with missing entities (ohhhhh a nice 0(n²) algorithm*/
+    list new = NIL;
+    SET_MAP(e1,{
+            if(gen_chunk_undefined_p(gen_find_eq(e1,entity_declarations(module))))
+                new=CONS(ENTITY,e1,new);
+    }, referenced_entities);
+
+    set_free(referenced_entities);
+    sort_list_of_entities(new);
+    entity_declarations(module)=gen_nconc(new,entity_declarations(module));
+}
+
+
+/** 
+ * remove all the entity declared in s but never referenced
+ * it's a lower version of use-def-elim !
+ * 
+ * @param s statement to check
+ */
+void statement_clean_declarations(statement s)
+{
+    list l = statement_declarations(s);
+    statement_declarations(s)=statement_clean_declarations_helper(l,s);
+    gen_free_list(l);
+}
+
+/** 
+ * remove all entities declared in module but never used in s
+ * 
+ * @param module module to check
+ * @param s statement where entites may be used
+ */
+void entity_clean_declarations(entity module,statement s)
+{
+    list l=entity_declarations(module);
+    entity_declarations(module)=statement_clean_declarations_helper(l,s);
+    gen_free_list(l);
+    entity_generate_missing_declarations(module,s);
 }
 
 /**  @} */

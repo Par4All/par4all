@@ -50,7 +50,7 @@ void add_a_common(entity c)
 static void compile_common(entity c)
 {
     declaration_with_overlaps_for_module(c);
-    clean_common_declaration(load_new_host(c));
+//    statement_remove_unused_declarations(statement_undefined,load_new_host(c));
     put_generated_resources_for_common(c);
 }
 
@@ -469,9 +469,18 @@ compile_module(entity module)
     update_object_for_module(host_stat, host_module);
     update_object_for_module(entity_code(host_module), host_module);
     
-    insure_global_declaration_coherency(host_module, host_stat, NIL);
-    insure_global_declaration_coherency(node_module, node_stat, 
-					get_include_entities());
+    entity_clean_declarations(host_module,host_stat);
+    entity_clean_declarations(node_module,node_stat);
+
+    /* SG: we need to add included entites into node_module declaration
+     * but only if they are not already present
+     * see how beautiful the list usage is, a O(n^2) algorithm !
+     */
+    list included_entities_to_add = NIL;
+    FOREACH(ENTITY,e,get_include_entities())
+        if( gen_chunk_undefined_p(gen_find_eq(e,entity_declarations(node_module))) )
+            included_entities_to_add=CONS(ENTITY,e,included_entities_to_add);
+    entity_declarations(node_module)=gen_nconc(entity_declarations(node_module),included_entities_to_add);
 
     /*  MORE CODE CLEANING
      */
@@ -533,9 +542,6 @@ bool hpfc_init(string name)
 
     init_hpfc_status();
     save_hpfc_status();
-
-    /* ??? */
-    init_referenced_variables();
 
     debug_off();
     return TRUE;
@@ -809,7 +815,6 @@ bool hpfc_close(string name)
      * pipsdbm will run into troubles when trying to free the resource...
      */
     save_hpfc_status();
-    close_referenced_variables(); /* ??? hum. */
     
     /* ??? the next function is in pipsmake... (should be in pipsdbm only,
      * but pipsmake manages its own cache which must be destroyed also...

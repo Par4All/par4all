@@ -478,7 +478,7 @@ static hash_table old_entity_to_new = hash_table_undefined;
  * @brief walk statements and perform localization based on the locals field
  * of loop statement
  * 
- * @param s 
+ * @param s statement to examine
  */
 static
 bool localize_declaration_walker(statement s)
@@ -498,7 +498,7 @@ bool localize_declaration_walker(statement s)
 			entity new_entity = FindOrCreateEntity(get_current_module_name(),new_entity_local_name);
 			free(new_entity_local_name);
 			entity_type(new_entity)=copy_type(entity_type(e));
-			entity_initial(new_entity)=copy_value(entity_initial(e));
+            entity_initial(new_entity) = make_value_constant(MakeConstantLitteral());
 
 			AddLocalEntityToDeclarations(new_entity,get_current_module_entity(),parent_statement);
 

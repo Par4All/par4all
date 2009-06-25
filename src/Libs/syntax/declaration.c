@@ -1015,16 +1015,16 @@ make_common_entity(entity c)
 {
     if (!entity_common_p(c))
     {
-	if (type_undefined_p(entity_type(c)))
-	{
-	    entity_type(c) = make_type(is_type_area, make_area(0, NIL));
+        if (type_undefined_p(entity_type(c)))
+        {
+            entity_type(c) = make_type(is_type_area, make_area(0, NIL));
             entity_storage(c) = 
                 make_storage(is_storage_ram, 
-                             (make_ram(get_current_module_entity(),
-                                       StaticArea, 0, NIL)));
-            entity_initial(c) = MakeValueUnknown();
+                        (make_ram(get_current_module_entity(),
+                                  StaticArea, 0, NIL)));
+            entity_initial(c) = make_value_code(make_code(NIL,string_undefined,make_sequence(NIL),NIL));
             AddEntityToDeclarations(c, get_current_module_entity());
-	}
+        }
     }
 
     return c;
@@ -1814,7 +1814,7 @@ entity m;
 	    ifdebug(1) {
 		print_common_layout(stderr, e, TRUE);
 	    }
-	    if(!SPECIAL_AREA_P(e)) {
+	    if(!entity_special_area_p(e)) {
 		/* User declarations of commons imply the offset and
 		   cannot conflict with equivalences, whereas static and
 		   dynamic variables must first comply with
@@ -1918,7 +1918,7 @@ entity c;
 		 * has not been entered at all if we are dealing wih te last parsed
 		 * module... which is always the case up to now!
 		 */
-		if(top_level_entity_p(c) || SPECIAL_AREA_P(c)) {
+		if(top_level_entity_p(c) || entity_special_area_p(c)) {
 		    int s = common_to_size(c);
 		    int new_s = ram_offset(storage_ram(entity_storage(current)))
 			+SafeSizeOfArray(current);
@@ -1932,7 +1932,7 @@ entity c;
 		/* Variables declared in the static and dynamic areas were
                    assigned offsets dynamically. The result may be
                    ok. */
-		pips_assert("Offsets should always be updated",SPECIAL_AREA_P(c));
+		pips_assert("Offsets should always be updated",entity_special_area_p(c));
 	    }
 
 	    previous = current;

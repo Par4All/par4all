@@ -267,7 +267,7 @@ init_host_and_node_entities ()
      {
 	 type t = entity_type(e);
 
-	 if (type_area_p(t) && !SPECIAL_COMMON_P(e))
+	 if (type_area_p(t) && !entity_special_area_p(e))
 	 {
 	     debug(3, "init_host_and_node_entities",    /* COMMONS */
 		   "considering common %s\n", entity_name(e));

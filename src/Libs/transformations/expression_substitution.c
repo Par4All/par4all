@@ -84,11 +84,11 @@ void replace_expression_similar_to_pattern(expression e)
         expression_normalized(e) = normalized_undefined;
 
         /* recover pattern's arguments */
-        list iter = code_declarations(value_code(entity_initial(pattern_entity)));
-        while( !ENTITY_NAME_P( ENTITY(CAR(iter)), DYNAMIC_AREA_LOCAL_NAME ) ) POP(iter);
-            POP(iter);/*pop the dynamic area label*/
-        if( !ENDP(iter) && ENTITY_NAME_P( ENTITY(CAR(iter)), entity_user_name(pattern_entity) ) )
-            POP(iter); /* pop the first flag if needed */
+        list iter = NIL;
+        FOREACH(ENTITY,e,code_declarations(value_code(entity_initial(pattern_entity))))
+            if(entity_formal_p(e))
+                iter=CONS(ENTITY,e,iter);
+        iter=gen_nreverse(iter);
 
         /* fill the arguments */
         list args = NIL;

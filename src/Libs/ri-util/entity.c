@@ -75,6 +75,7 @@ list make_unbounded_subscripts(int d)
   return sl;
 }
 
+
 static entity
 make_empty_module(
     string full_name,
@@ -104,13 +105,13 @@ make_empty_module(
 
     name = module_local_name(e);
     DynamicArea = FindOrCreateEntity(name, DYNAMIC_AREA_LOCAL_NAME);
-    entity_type(DynamicArea) = make_type(is_type_area, make_area(0, NIL));
+    entity_type(DynamicArea) = make_type_area(make_area(0, NIL));
     entity_storage(DynamicArea) = MakeStorageRom();
     entity_initial(DynamicArea) = MakeValueUnknown();
     AddEntityToDeclarations(DynamicArea, e);
 
     StaticArea = FindOrCreateEntity(name, STATIC_AREA_LOCAL_NAME);
-    entity_type(StaticArea) = make_type(is_type_area, make_area(0, NIL));
+    entity_type(StaticArea) = make_type_area(make_area(0, NIL));
     entity_storage(StaticArea) = MakeStorageRom();
     entity_initial(StaticArea) = MakeValueUnknown();
     AddEntityToDeclarations(StaticArea, e);
@@ -295,8 +296,6 @@ string entity_global_name(entity e)
 /*const*/ string module_local_name(entity e)
 {
   /* No difference between modules and other entities, except for prefixes */
-  /* Allocates a new string */
-
   string name = local_name(entity_name(e));
 
   return (name
@@ -593,7 +592,7 @@ entity_in_common_p(entity e)
     storage s = entity_storage(e);
 
     return(storage_ram_p(s) && 
-	   !SPECIAL_COMMON_P(ram_section(storage_ram(s))));
+	   !entity_special_area_p(ram_section(storage_ram(s))));
 }
 
 string 
@@ -1030,7 +1029,7 @@ common_members_of_module(
 {
   list result = NIL;
   int cumulated_offset = 0;
-  pips_assert("entity is a common", type_area_p(entity_type(common)));
+  pips_assert("entity is a common", entity_area_p(common));
 
   list ld =  area_layout(type_area(entity_type(common)));
   entity v = entity_undefined;
@@ -1135,7 +1134,7 @@ check_common_inclusion(entity common)
     bool ok = TRUE;
     list /* of entity */ lv, lref;
     entity ref;
-    pips_assert("entity is a common", type_area_p(entity_type(common)));
+    pips_assert("entity is a common", entity_area_p(common));
     lv = area_layout(type_area(entity_type(common)));
 
     if (!lv) return TRUE; /* empty common! */
@@ -1306,7 +1305,7 @@ bool member_entity_p(entity e)
 }
 
 /* is p a formal parameter? */
-bool formal_entity_p(entity p)
+bool entity_formal_p(entity p)
 {
   storage es = entity_storage(p);
   bool is_formal = storage_formal_p(es);
@@ -1633,3 +1632,17 @@ substitute_entity(statement s, entity old, entity new)
 }
 
 /** @} */
+
+
+/** 
+ * checks if an entity is an equivalent
+ * 
+ * @param e entity to check
+ * 
+ * @return true if entity is an equivalent
+ */
+bool entity_equivalence_p(entity e)
+{
+    return storage_ram_p(entity_storage(e))
+        && !ENDP( ram_shared(storage_ram(entity_storage(e)) ));
+}

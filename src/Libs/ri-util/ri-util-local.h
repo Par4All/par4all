@@ -776,16 +776,6 @@
                                          ENTITY_NON_EQUAL_P(e) || \
                                          ENTITY_EQUAL_P(e) )
 
-/* Special areas are sometimes tested by top_level_entity_p() because they
-   are not top level entities whereas user commons are. */
-#define SPECIAL_AREA_P(e) \
-    ((same_string_p(module_local_name(e), DYNAMIC_AREA_LOCAL_NAME)) || \
-     (same_string_p(module_local_name(e), STATIC_AREA_LOCAL_NAME)) || \
-     (same_string_p(module_local_name(e), STACK_AREA_LOCAL_NAME)) || \
-     (same_string_p(module_local_name(e), HEAP_AREA_LOCAL_NAME)))
-
-#define SPECIAL_COMMON_P(e) SPECIAL_AREA_P(e)
-
 #define ENTITY_NAME_P(e, name)(same_string_p(entity_user_name(e),name))
 
 /* Fortran IO Management */

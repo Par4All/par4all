@@ -422,7 +422,7 @@ void module_to_value_mappings(entity m)
 	     by the vallue passing mode but the copu may nevertheless
 	     be written inside the function. */
 	  if(analyzable_scalar_entity_p(e)
-	     && (action_write_p(a) || (c_module_p(m) && formal_entity_p(e)))) 
+	     && (action_write_p(a) || (c_module_p(m) && entity_formal_p(e)))) 
 	      add_interprocedural_value_entities(e);
       },
 	 module_inter_effects);

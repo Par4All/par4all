@@ -230,7 +230,7 @@ list effects_dynamic_elim(list l_eff)
 	}
 	break;
       case is_storage_rom:
-	if(!area_entity_p(eff_ent) && !anywhere_effect_p(eff))
+	if(!entity_special_area_p(eff_ent) && !anywhere_effect_p(eff))
 	  ignore_this_effect = TRUE;
 	break;
 	/*  pips_internal_error("bad tag for %s (rom)\n", 

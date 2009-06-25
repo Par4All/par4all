@@ -1062,7 +1062,7 @@ text_equivalences(
 	    entity common = ram_section(r);
 	    list l_shared = ram_shared(r);
 	    
-	    if (no_commons && !SPECIAL_COMMON_P(common))
+	    if (no_commons && !entity_special_area_p(common))
 		break;
 
 	    ifdebug(EQUIV_DEBUG)
@@ -1433,7 +1433,7 @@ text_entity_declaration(
     bool var = type_variable_p(te);
     bool in_ram = storage_ram_p(entity_storage(e));
     bool in_common = in_ram &&
-      !SPECIAL_COMMON_P(ram_section(storage_ram(entity_storage(e))));
+      !entity_special_area_p(ram_section(storage_ram(entity_storage(e))));
     bool skip_it = same_string_p(entity_local_name(e),
 				 entity_local_name(module));
 	
@@ -1445,7 +1445,7 @@ text_entity_declaration(
        && formal_label_replacement_p(e))
       continue;
 
-    if (!print_commons && area_p && !SPECIAL_COMMON_P(e) && !pp_cinc)
+    if (!print_commons && area_p && !entity_special_area_p(e) && !pp_cinc)
       {
 	area_decl = 
 	  CONS(SENTENCE, make_sentence(is_sentence_formatted,
@@ -1481,7 +1481,7 @@ text_entity_declaration(
 	/*            AREAS: COMMONS and SAVEs
 	 */	     
 	pips_debug(7, "considered as a regular common\n");
-	if (pp_cinc && !SPECIAL_COMMON_P(e))
+	if (pp_cinc && !entity_special_area_p(e))
 	  {
 	    text t = text_area_included(e, module);
 	    MERGE_TEXTS(t_area, t);

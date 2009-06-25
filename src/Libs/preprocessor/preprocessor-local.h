@@ -58,7 +58,7 @@
 #define FPP_CPP			"cpp -C" /* alternative values: "gcc -E -C" or "fpp" */
 #define FPP_CPPFLAGS		" -P -D__PIPS__ -D__HPFC__ "
 
-#define DEFAULT_PIPS_FLINT "f77 -c -ansi"
+#define DEFAULT_PIPS_FLINT "gfortran -c "
 
 
 /* Define some functions from the .l or .y since cproto cannot dig them out: */

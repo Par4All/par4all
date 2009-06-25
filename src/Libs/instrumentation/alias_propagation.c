@@ -673,7 +673,7 @@ static void formal_variable_add_aliases(call c,call_site cs, entity actual_var,
 	   a newgen data in the caller which is freed before , no more in the memory */
 	entity sec = alias_association_section(aa);
 	list actual_path = alias_association_call_chain(aa); 
-	if ((!SPECIAL_AREA_P(sec) && common_is_visible_p(sec,current_mod))
+	if ((!entity_special_area_p(sec) && common_is_visible_p(sec,current_mod))
 	    || same_section_formal_variable_in_list_p(actual_var,sec,actual_path,l_actuals,l_caller_aliases)
 	    || same_section_common_variable_in_list_p(sec,l_actuals))
 	  {

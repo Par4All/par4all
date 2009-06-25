@@ -329,12 +329,12 @@ instruction inline_expression_call(expression modified_expression, call callee)
     string block_level = "0";
 
     /* this is the only I found to recover the inlined entities' declaration */
-    list iter = code_declarations(inlined_code);
-    while( area_entity_p(ENTITY(CAR(iter))) ) POP(iter);
-    if( !ENDP(iter) && ENTITY_NAME_P( ENTITY(CAR(iter)), entity_user_name(inlined_module) ) )
-            POP(iter); /* pop the first flag if needed */
+    list formal_parameters = NIL;
+    FOREACH(ENTITY,cd,code_declarations(inlined_code))
+        if( entity_formal_p(cd)) formal_parameters=CONS(ENTITY,cd,formal_parameters);
 
     list c_iter = call_arguments(callee);
+    list iter = gen_nreverse(formal_parameters);
 	size_t n1 = gen_length(iter), n2 = gen_length(c_iter);
 	pips_assert("function call has enough arguments",n1 >= n2);
     for( ; !ENDP(c_iter); POP(iter),POP(c_iter) )
@@ -450,6 +450,7 @@ reget:
         }
 
     }
+    gen_free_list(formal_parameters);
 
     /* final packing
      * we (may have) generated goto so unstructured is mandatory
@@ -624,7 +625,7 @@ recompile_module(char* module)
         list p = NIL;
         FOREACH(ENTITY, e, entity_declarations(modified_module))
         {
-            if(! area_entity_p(e) )
+            if(! entity_area_p(e) )
                 gen_clear_tabulated_element((gen_chunk*)e);
 
             else

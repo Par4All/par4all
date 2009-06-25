@@ -476,29 +476,33 @@ int i;
 
 bool dynamic_area_p(entity aire)
 {
-  return(strcmp(entity_local_name(aire), DYNAMIC_AREA_LOCAL_NAME) == 0);
+  return same_string_p(module_local_name(aire), DYNAMIC_AREA_LOCAL_NAME);
 }
 
 bool static_area_p(entity aire)
 {
-  return(strcmp(entity_local_name(aire), STATIC_AREA_LOCAL_NAME) == 0);
+  return same_string_p(module_local_name(aire), STATIC_AREA_LOCAL_NAME);
 }
 
 bool heap_area_p(entity aire)
 {
-  return(strcmp(entity_local_name(aire), HEAP_AREA_LOCAL_NAME) == 0);
+  return same_string_p(module_local_name(aire),HEAP_AREA_LOCAL_NAME);
 }
 
 bool stack_area_p(entity aire)
 {
-  return(strcmp(entity_local_name(aire), STACK_AREA_LOCAL_NAME) == 0);
+  return same_string_p(module_local_name(aire),STACK_AREA_LOCAL_NAME);
 }
 
-bool area_entity_p(entity a)
+bool entity_area_p(entity e)
 {
-  return static_area_p(a) || dynamic_area_p(a) || heap_area_p(a) || stack_area_p(a);
+  return !type_undefined_p(entity_type(e)) && type_area_p(entity_type(e));//static_area_p(e) || dynamic_area_p(e) || heap_area_p(e) || stack_area_p(e);
 }
-
+bool entity_special_area_p(entity e)
+{
+  return entity_area_p(e) &&
+      ( static_area_p(e) || dynamic_area_p(e) || heap_area_p(e) || stack_area_p(e) );
+}
 
 /* Test if a string can be a Fortran 77 comment: */
 bool comment_string_p(const string comment)

@@ -42,16 +42,25 @@
 #include "resources.h"
 #include "pipsdbm.h"
 
-bool
-clean_declarations(string name)
+/** 
+ * recursievely call statement_remove_unused_declarations on all module statement
+ * 
+ * @param module_name name of the processed module
+ */
+void
+clean_declarations(char * module_name)
 {
-    entity module;
-    statement stat;
-    module = module_name_to_entity(name);
-    set_current_module_entity(module);
-    stat = (statement) db_get_memory_resource(DBR_CODE, name, TRUE);
-    insure_declaration_coherency_of_module(module, stat);
-    db_put_or_update_memory_resource(DBR_CODE, name, (char*) stat, TRUE);
+    /* prelude*/
+    set_current_module_entity(module_name_to_entity( module_name ));
+    set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, module_name, TRUE) );
+
+    /* body*/
+    entity_clean_declarations(get_current_module_entity(),get_current_module_statement());
+    gen_recurse(get_current_module_statement(),statement_domain,gen_true,statement_clean_declarations);
+    DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(module_name), get_current_module_statement());
+
+    /*postlude */
     reset_current_module_entity();
-    return TRUE;
+    reset_current_module_statement();
+    return true;
 }

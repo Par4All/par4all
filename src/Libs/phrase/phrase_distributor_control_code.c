@@ -185,33 +185,6 @@ void store_new_module (string module_name,
 }
 	
 /**
- * Creates and declares a new common
- */
-entity create_new_common(string name, entity module)
-{
-  entity new_common;
-  string module_name = entity_local_name (module);
-  string common_global_name = strdup(concatenate(module_name,
-						 MODULE_SEP_STRING
-						 COMMON_PREFIX,
-						 name,
-						 NULL));
-  type common_type = make_type(is_type_area, make_area(0, NIL));
-  entity StaticArea = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,
-					 STATIC_AREA_LOCAL_NAME);
-  storage common_storage = make_storage(is_storage_ram,
-					(make_ram(module,StaticArea, 0, NIL)));
-  value common_value = MakeValueUnknown();
-  new_common = make_entity(common_global_name,
-			   common_type,
-			   common_storage,
-			   common_value);
-  AddEntityToDeclarations( new_common,module);
-  pips_debug(2, "New common %s created in module %s\n", name, module_name);
-  return new_common;
-}
-
-/**
  * Creates and declares a new variable for a newly created common
  */
 entity create_new_common_variable(string name, entity module, entity common, variable var)
@@ -490,7 +463,7 @@ make_global_common_and_initialize (entity main_module,
   entity units_nb_variable;
   entity functions_nb_variable;
  
-  *global_common = create_new_common(CONTROL_DATA_COMMON_NAME,
+  *global_common = make_new_common(CONTROL_DATA_COMMON_NAME,
 				     main_module);
   units_nb_variable = create_new_integer_scalar_common_variable(UNITS_NB_NAME,
 								main_module,
@@ -606,7 +579,7 @@ static entity create_externalized_function_common (entity main_module,
   entity returned_common;
  
   returned_common
-    = create_new_common(get_function_common_name (externalized_function),
+    = make_new_common(get_function_common_name (externalized_function),
 			main_module);
  
   /* Creates params variables */

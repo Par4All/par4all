@@ -1451,7 +1451,7 @@ void UseDummyArguments(entity f)
     /* make a list of formal parameters */
     for(cd = dl; !ENDP(cd); POP(cd)) {
       entity v = ENTITY(CAR(cd));
-      if(formal_entity_p(v)) {
+      if(entity_formal_p(v)) {
 	pips_debug(8, "Formal parameter: \"%s\"\n", entity_name(v));
 	formals = gen_nconc(formals, CONS(ENTITY, v, NIL));
       }
@@ -1514,7 +1514,7 @@ void UseFormalArguments(entity f)
     */
     for(cd = dl; !ENDP(cd); POP(cd)) {
       entity v = ENTITY(CAR(cd));
-      if(formal_entity_p(v)) {
+      if(entity_formal_p(v)) {
 	pips_debug(8, "Formal parameter: \"%s\"\n", entity_name(v));
 	if(dummy_parameter_entity_p(v))
 	  formals = gen_nconc(formals, CONS(ENTITY, v, NIL));
@@ -1658,7 +1658,7 @@ void RemoveDummyArguments(entity f, list refs)
     /* make a list of formal dummy parameters */
     for(cd = dl; !ENDP(cd); POP(cd)) {
       entity v = ENTITY(CAR(cd));
-      if(formal_entity_p(v)) {
+      if(entity_formal_p(v)) {
 	pips_debug(8, "Formal dummy parameter: \"%s\"\n", entity_name(v));
 	/* Since the compilation order is not known, the standard
 	   formal parameters may already exist and they should not be
