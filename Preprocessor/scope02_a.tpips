@@ -1,9 +1,9 @@
-delete ${WSPACE}
+delete scope02_a
 
 setproperty ABORT_ON_USER_ERROR TRUE
 setenv SHELL /bin/bash
 
-create ${WSPACE} ${FILE}
+create scope02_a scope02_a.c
 
 # Display result of csplit, including for the compilation unit(s).
 
@@ -15,12 +15,12 @@ create ${WSPACE} ${FILE}
 # display C_SOURCE_FILE[%ALL]
 
 # Get rid of preprocessed files
-shell rm -f ${WSPACE}.database/Tmp/*.c
+shell rm -f scope02_a.database/Tmp/*.c
 
-# Display all C files, including compilation units, but get rid of pragmas,
+# Display all C files, including compilation units, but get rid of pragams,
 # except the line number pragma to avoid dependencies on gcc and/or preprocessor version
-shell cat ${WSPACE}.database/*/*.c|sed -e '/^# 1[^0-9][^0-9]*/d'
+shell cat scope02_a.database/*/*.c|sed -e '/^# 1[^0-9][^0-9]*/d'
 
 close
-delete ${WSPACE}
+delete scope02_a
 quit
