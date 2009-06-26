@@ -33,43 +33,32 @@ static bool quick_privatize_statement_pair(statement /*s1*/, statement /*s2*/,
 					   list /*conflicts*/);
 
 void quick_privatize_graph(dep_graph)
-graph dep_graph;
+     graph dep_graph;
 {
+  /* we analyze arcs exiting from loop statements */
+  FOREACH (VERTEX, v1, graph_vertices(dep_graph)) {
+    statement s1 = vertex_to_statement(v1);
+    list successors = vertex_successors(v1);
+    if (statement_loop_p(s1)) {
+      loop l = statement_loop(s1);
+      list locals = loop_locals(l);
+      entity ind = loop_index(l);
 
-    /* we analyze arcs exiting from loop statements */
-    MAP(VERTEX, v1, 
-    {
-	statement s1 = vertex_to_statement(v1);
-	list successors = vertex_successors(v1);
-	
-	if (statement_loop_p(s1)) 
-	{
-	    loop l = statement_loop(s1);
-	    list locals = loop_locals(l);
-	    entity ind = loop_index(l);
-	    
-	    if (gen_find_eq(ind, locals) == entity_undefined) 
-	    {
-		if (quick_privatize_loop(s1, successors)) 
-		{
-		    debug(1, "quick_privatize_graph", 
-			  "Index for loop %d privatized\n",
-			  statement_number(s1));
-		    
-		    loop_locals(l) = CONS(ENTITY, ind, locals);
-		}
-		else 
-		{
-		    debug(1, "quick_privatize_graph", 
-			  "could not privatize loop %d\n", statement_number(s1));
-		}
-	    }
+      if (gen_find_eq(ind, locals) == entity_undefined) {
+	if (quick_privatize_loop(s1, successors)) {
+	  debug(1, "quick_privatize_graph",
+		"Index for loop %d privatized\n",
+		statement_number(s1));
+	  loop_locals(l) = CONS(ENTITY, ind, locals);
 	}
-    },
-	graph_vertices(dep_graph) );
+	else {
+	  debug(1, "quick_privatize_graph",
+		"could not privatize loop %d\n", statement_number(s1));
+	}
+      }
+    }
+  }
 }
-
-
 
 static bool quick_privatize_loop(stat, successors)
 statement stat;
