@@ -15,6 +15,7 @@ activate PRINT_PARALLELIZEDOMP_CODE
 display PARALLELPRINTED_FILE(%ALL)
 
 close
+
 delete no_parallel2
 quit
 # EOF
