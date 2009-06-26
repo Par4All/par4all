@@ -297,8 +297,8 @@ char *mod_name;
 
     set_enclosing_loops_map( loops_mapping_of_statement(mod_stat));
     ifdebug(3) {
-	printf("\nThe number of DOs :\n");
-	printf(" Nbrdo=%d",Nbrdo);
+      fprintf(stderr, "\nThe number of DOs :\n");
+      fprintf(stderr, " Nbrdo=%d",Nbrdo);
     }
     debug_on("QUICK_PRIVATIZER_DEBUG_LEVEL");
     quick_privatize_graph(dg);
@@ -325,39 +325,39 @@ char *mod_name;
     }
 
     ifdebug(3) {
-	printf("\nThe results of statistique of test of dependence are:\n");
-	printf("NbrArrayDepInit = %d\n",NbrArrayDepInit); 
-	printf("NbrIndepFind = %d\n",NbrIndepFind); 
-	printf("NbrAllEquals = %d\n",NbrAllEquals);
-	printf("NbrDepCnst = %d\n",NbrDepCnst);
-	printf("NbrTestExact= %d\n",NbrTestExact);
-	printf("NbrDepInexactEq= %d\n",NbrDepInexactEq);
-	printf("NbrDepInexactFM= %d\n",NbrDepInexactFM);
-	printf("NbrDepInexactEFM= %d\n",NbrDepInexactEFM);
-	printf("NbrScalDep = %d\n",NbrScalDep);
-	printf("NbrIndexDep = %d\n",NbrIndexDep);
-	printf("deptype[][]");
+	fprintf(stderr,"\nThe results of statistique of test of dependence are:\n");
+	fprintf(stderr,"NbrArrayDepInit = %d\n",NbrArrayDepInit); 
+	fprintf(stderr,"NbrIndepFind = %d\n",NbrIndepFind); 
+	fprintf(stderr,"NbrAllEquals = %d\n",NbrAllEquals);
+	fprintf(stderr,"NbrDepCnst = %d\n",NbrDepCnst);
+	fprintf(stderr,"NbrTestExact= %d\n",NbrTestExact);
+	fprintf(stderr,"NbrDepInexactEq= %d\n",NbrDepInexactEq);
+	fprintf(stderr,"NbrDepInexactFM= %d\n",NbrDepInexactFM);
+	fprintf(stderr,"NbrDepInexactEFM= %d\n",NbrDepInexactEFM);
+	fprintf(stderr,"NbrScalDep = %d\n",NbrScalDep);
+	fprintf(stderr,"NbrIndexDep = %d\n",NbrIndexDep);
+	fprintf(stderr,"deptype[][]");
 	for (i=0;i<=4;i++)
 	    for(j=0;j<=2;j++)
-		printf("%d  ", deptype[i][j]);
-	printf("\nconstdep[][]");
+		fprintf(stderr,"%d  ", deptype[i][j]);
+	fprintf(stderr,"\nconstdep[][]");
 	for (i=0;i<=4;i++)
 	    for(j=0;j<=2;j++)
-		printf("%d  ", constdep[i][j]);
-	printf("\nNbrTestCnst = %d\n",NbrTestCnst); 
-	printf("NbrTestGcd = %d\n",NbrTestGcd);
-	printf("NbrTestSimple = %d\n",NbrTestSimple);
-	printf("NbrTestDiCnst = %d\n",NbrTestDiCnst);
-	printf("NbrTestProjEqDi = %d\n",NbrTestProjEqDi);
-	printf("NbrTestProjFMDi = %d\n",NbrTestProjFMDi);
-	printf("NbrTestProjEq = %d\n",NbrTestProjEq);
-	printf("NbrTestProjFM = %d\n",NbrTestProjFM);
-	printf("NbrTestDiVar = %d\n",NbrTestDiVar);
-	printf("NbrProjFMTotal = %d\n",NbrProjFMTotal);
-	printf("NbrFMSystNonAug = %d\n",NbrFMSystNonAug);
-	printf("FMComp[]");
-	for (i=0;i<17;i++)
-	    printf("%d ", FMComp[i]);
+		fprintf(stderr,"%d  ", constdep[i][j]);
+	fprintf(stderr,"\nNbrTestCnst = %d\n",NbrTestCnst); 
+	fprintf(stderr,"NbrTestGcd = %d\n",NbrTestGcd);
+	fprintf(stderr,"NbrTestSimple = %d\n",NbrTestSimple);
+	fprintf(stderr,"NbrTestDiCnst = %d\n",NbrTestDiCnst);
+	fprintf(stderr,"NbrTestProjEqDi = %d\n",NbrTestProjEqDi);
+	fprintf(stderr,"NbrTestProjFMDi = %d\n",NbrTestProjFMDi);
+	fprintf(stderr,"NbrTestProjEq = %d\n",NbrTestProjEq);
+	fprintf(stderr,"NbrTestProjFM = %d\n",NbrTestProjFM);
+	fprintf(stderr,"NbrTestDiVar = %d\n",NbrTestDiVar);
+	fprintf(stderr,"NbrProjFMTotal = %d\n",NbrProjFMTotal);
+	fprintf(stderr,"NbrFMSystNonAug = %d\n",NbrFMSystNonAug);
+	fprintf(stderr,"FMComp[]");
+	for (i=0;i<18;i++)
+	    fprintf(stderr,"%d ", FMComp[i]);
     }
     /* write the result to the file correspondant in the order of :
        module,NbrArrayDeptInit,NbrIndeptFind,NbrArrayDepInit,NbrScalDep,
@@ -2621,7 +2621,7 @@ char *mod_name;
     fprintf(fp, " %d %d %d %d %d %d %d %d %d %d %d",NbrTestCnst,NbrTestGcd,
 	    NbrTestSimple,NbrTestDiCnst,NbrTestProjEqDi,NbrTestProjFMDi,NbrTestProjEq,
 	    NbrTestProjFM,NbrTestDiVar,NbrProjFMTotal,NbrFMSystNonAug);
-    for (i=0;i<17;i++)
+    for (i=0;i<18;i++)
 	    fprintf(fp," %d", FMComp[i]);
     fprintf(fp,"\n");
 
