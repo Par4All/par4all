@@ -41,16 +41,16 @@ vertex get_vertex_in_list(list in_l, string in_s)
  */
 void prettyprint_graph_text(FILE * out_f, list l_of_vers)
 {
-    MAP(VERTEX, ver, {
-        MAP(SUCCESSOR, succ, {
-	  fprintf(out_f, (string)vertex_vertex_label(ver));
-	  fprintf(out_f, " ");
-	  fprintf(out_f, (string)vertex_vertex_label(successor_vertex(succ)));
-	  fprintf(out_f, " ");
-	  fprintf(out_f, (string)successor_arc_label(succ));
-	  fprintf(out_f, "\n");
-	}, vertex_successors(ver));
-    }, l_of_vers);
+  FOREACH (VERTEX, ver, l_of_vers) {
+    FOREACH (SUCCESSOR, succ,  vertex_successors(ver)) {
+      fputs((string) vertex_vertex_label (ver), out_f);
+      fprintf(out_f, " ");
+      fputs((string) vertex_vertex_label (successor_vertex(succ)), out_f);
+      fprintf(out_f, " ");
+      fputs((string) successor_arc_label (succ), out_f);
+      fprintf(out_f, "\n");
+    }
+  }
 }
 
 /* print a graph to daVinci format, each label of successor is represented by 
@@ -89,7 +89,7 @@ void prettyprint_graph_daVinci(FILE * out_f, list l_of_vers) {
 	fprintf(out_f, "]))");
     }, l_of_vers);
 
-    fprintf(out_f, gr_buffer);
+    fprintf(out_f, "%s", gr_buffer);
     fprintf(out_f, "\n]");
     free(gr_buffer);
 }

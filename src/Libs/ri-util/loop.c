@@ -71,7 +71,7 @@ rloops_mapping_of_unstructured(
     gen_free_list(blocs) ;
 }
 
-static void 
+static void
 rloops_mapping_of_statement(
     statement_mapping m,
     list loops,
@@ -116,7 +116,7 @@ rloops_mapping_of_statement(
 	  rloops_mapping_of_unstructured(m, loops,instruction_unstructured(i));
 	  break ;
       }
-	
+
       case is_instruction_forloop: {
 	/*
 	  pips_user_error("Use property FOR_TO_WHILE_LOOP_IN_CONTROLIZER or "
@@ -125,7 +125,6 @@ rloops_mapping_of_statement(
 	rloops_mapping_of_statement(m, loops, forloop_body(instruction_forloop(i)));
 	break ;
       }
-	
       default:
 	pips_internal_error("unexpected tag %d\n", instruction_tag(i));
     }
@@ -133,22 +132,21 @@ rloops_mapping_of_statement(
 
 
 
-statement_mapping 
+statement_mapping
 loops_mapping_of_statement(statement stat)
-{   
+{
     statement_mapping loops_map;
     loops_map = MAKE_STATEMENT_MAPPING();
     Nbrdo = 0;
     rloops_mapping_of_statement(loops_map, NIL, stat);
 
     if (get_debug_level() >= 7) {
-	STATEMENT_MAPPING_MAP(stat, loops, {
-	    fprintf(stderr, "statement %td in loops ", 
-		    statement_number((statement) stat));
-	    MAP(STATEMENT, s, 
-		fprintf(stderr, "%td ", statement_number(s)),
-		(list) loops);
-	    fprintf(stderr, "\n");
+      STATEMENT_MAPPING_MAP(stat, loops, {
+	  fprintf(stderr, "statement %td in loops ",
+		  statement_number((statement) stat));
+	  FOREACH (STATEMENT, s,loops)
+	    fprintf(stderr, "%td ", statement_number(s));
+	  fprintf(stderr, "\n");
 	}, loops_map)
     }
     return(loops_map);

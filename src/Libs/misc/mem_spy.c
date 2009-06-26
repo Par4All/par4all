@@ -137,7 +137,7 @@ void mem_spy_reset()
 	if (current_size_stack != NULL)
 	    free(current_size_stack);
 	if (cumul_size_stack != NULL)
-	    free(cumul_size_stack);	    
+	    free(cumul_size_stack);
     }
     verbosity = 2;
 }

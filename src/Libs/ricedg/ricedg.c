@@ -77,11 +77,12 @@ int NbrTestProjFM=0;
 int NbrTestDiVar=0;
 int NbrProjFMTotal=0;
 int NbrFMSystNonAug=0;
-int FMComp[17];   /*for counting the number of F-M complexity less than 16.
+int FMComp[18];   /*for counting the number of F-M complexity less than 16.
 		     The complexity of one projection by F-M is multiply 
 		     of the nbr. of inequations positive and the nbr. of 
 		     inequations negatives who containe the variable
-		     eliminated.*/ 
+		     eliminated.The last elem of the array (ie FMComp[17])
+		     is used to count cases with complexity over 16*/
 boolean is_test_exact = TRUE;
 boolean is_test_inexact_eq = FALSE;
 boolean is_test_inexact_fm = FALSE;
@@ -243,10 +244,11 @@ char *mod_name;
     set_current_module_statement( (statement)
 	db_get_memory_resource(DBR_CODE, mod_name, TRUE) );
     mod_stat = get_current_module_statement();
-   
 
-    chains = (graph)
-	db_get_memory_resource(DBR_CHAINS, mod_name, TRUE);
+    /* we need the statements from their ordering for the dependance-graph: */
+    set_ordering_to_statement(mod_stat);
+
+    chains = (graph) db_get_memory_resource(DBR_CHAINS, mod_name, TRUE);
 
     ResetLoopCounter();
 
@@ -264,7 +266,7 @@ char *mod_name;
 		current_shared_obj_table_size());
 	mem_spy_begin();
     }
-    
+
     hash_warn_on_redefinition();
     dg = copy_graph (chains);
 
@@ -280,7 +282,7 @@ char *mod_name;
     ifdebug(8) {  	
 	prettyprint_dependence_graph(stderr, mod_stat, dg);
     }
-    
+
     debug_off();
 
     if(dg_type == DG_SEMANTICS)
@@ -298,9 +300,7 @@ char *mod_name;
 	printf("\nThe number of DOs :\n");
 	printf(" Nbrdo=%d",Nbrdo);
     }
-   
     debug_on("QUICK_PRIVATIZER_DEBUG_LEVEL");
-	set_ordering_to_statement(mod_stat);
     quick_privatize_graph(dg);
     debug_off();
 
@@ -310,7 +310,7 @@ char *mod_name;
 	    constdep[i][j] = 0;
 	}
     }
-	    
+
     /* walk thru mod_stat to find well structured loops.
        update dependence graph for these loops. */
 
@@ -323,8 +323,7 @@ char *mod_name;
     ifdebug(1) {
 	mem_spy_end("After DG computation");
     }
-	reset_ordering_to_statement();
-  
+
     ifdebug(3) {
 	printf("\nThe results of statistique of test of dependence are:\n");
 	printf("NbrArrayDepInit = %d\n",NbrArrayDepInit); 
@@ -389,6 +388,7 @@ char *mod_name;
 
     DB_PUT_MEMORY_RESOURCE(DBR_DG, mod_name, (char*) dg);
 
+    reset_ordering_to_statement();
     reset_current_module_entity();
     reset_current_module_statement();
     reset_precondition_map();
@@ -413,13 +413,18 @@ rdg_unstructured(unstructured u)
 static void 
 rdg_statement(statement stat)
 {
+    forloop fl = forloop_undefined;
+    whileloop wl = whileloop_undefined;
+    statement body = statement_undefined;
     instruction istat = statement_instruction(stat);
 
     switch (instruction_tag(istat)) {
 
-      case is_instruction_block:
-	MAP(STATEMENT, s, rdg_statement(s), instruction_block(istat));
-	break;
+      case is_instruction_block: {
+        FOREACH (STATEMENT, s, instruction_block(istat))
+	  rdg_statement(s);
+        break;
+      }
 
       case is_instruction_test:
 	rdg_statement(test_true(instruction_test(istat)));
@@ -430,8 +435,17 @@ rdg_statement(statement stat)
 	rdg_loop(stat);
 	break;
       case is_instruction_whileloop:
-      case is_instruction_goto: 
-      case is_instruction_call: 
+	wl = instruction_whileloop (istat);
+	body = whileloop_body (wl);
+	rdg_statement (body);
+	break;
+      case is_instruction_forloop:
+	fl = instruction_forloop (istat);
+	body = forloop_body (fl);
+	rdg_statement (body);
+	break;
+      case is_instruction_goto:
+      case is_instruction_call:
 	break;
 
       case is_instruction_unstructured:
@@ -440,10 +454,9 @@ rdg_statement(statement stat)
 
       default:
 	pips_error("rdg_statement", "case default reached\n");
+	break;
     }
 }
-
-
 
 static void 
 rdg_loop(stat)
@@ -608,14 +621,14 @@ rice_update_dependence_graph(
 	    dg_arc_label dal = (dg_arc_label) successor_arc_label(su);
 	    list true_conflicts = NIL;
 	    list pc, pchead;
-	    
+
 	    if (! set_belong_p(region, (char *) s2)) 
 	    {
 		pss = ps;
 		ps = CDR(ps);
 		continue;
 	    }
-	    
+
 	    pc = dg_arc_label_conflicts(dal);
 	    pchead = pc;
 	    while (pc !=NIL) 
@@ -623,8 +636,7 @@ rice_update_dependence_graph(
 		conflict c = CONFLICT(CAR(pc)) ;
 		effect e1 = conflict_source(c);
 		effect e2 = conflict_sink(c);
-			
-		   
+
 		ifdebug(4) {
 		    fprintf(stderr, "dep %02td (", statement_number(s1));
 		    print_words(stderr, words_effect(e1));
@@ -632,7 +644,7 @@ rice_update_dependence_graph(
 		    print_words(stderr, words_effect(e2));
 		    fprintf(stderr, ") \n");
 		}
-		
+
 		if (conflict_cone(c) != cone_undefined) 
 		{
 		    /* This conflict cone has been updated. */
@@ -661,7 +673,7 @@ rice_update_dependence_graph(
 
 		    /*looking for the opposite dependence from (s2,e2) to 
 		      (s1,e1) */
-		    
+
 		    /* Make sure that you do not try to find the very same
 		     * conflict: eliminate symmetric conflicts like dd's,
 		     * and, if the KEEP-READ-READ-DEPENDENCE option is on,
@@ -675,7 +687,7 @@ rice_update_dependence_graph(
 		    {
 			debug (4, "rice_update_dependence_graph", 
 			       "looking for the opposite dependence");  
-			
+
 			ps2su = vertex_successors(v2); 
 			ps2sus = NIL;
 			while (ps2su !=NIL && !Finds2s1) 
@@ -719,11 +731,11 @@ rice_update_dependence_graph(
 				continue;
 			    }
 			}
-			
+
 			/* if (!Finds2s1) 
 			   pips_error("rice_update_dependence_graph",  
 			   "Expected opposite dependence are not found"); */
-			
+
 			if (Finds2s1) 
 			{
 			    ifdebug(4)  
@@ -737,7 +749,7 @@ rice_update_dependence_graph(
 				fprintf(stderr, ") \n");
 			    }
 			}
-			
+
 		    }
 
 		    llv1 = gen_copy_seq(llv);
@@ -750,7 +762,7 @@ rice_update_dependence_graph(
 		    {
 			debug(4,"", "\nThe dependence (s1,e1)-->(s2,e2)"
 			      " must be removed. \n");
-			
+
 			conflict_source(c) = effect_undefined;
 			conflict_sink(c) = effect_undefined;
 			free_conflict(c);
@@ -774,11 +786,11 @@ rice_update_dependence_graph(
 			if (levelsop == NIL) {
 			    debug(4,"","\nThe dependence (s2,e2)-->(s1,e1)"
 				  " must be removed.\n");
-			    
+
 			    conflict_source(cs2s1) = effect_undefined;
 			    conflict_sink(cs2s1) = effect_undefined;
 			    /*gen_free(cs2s1);*/
-			    
+
 			    if(pchead == pchead1) 
 				/* They are in the same conflicts list */
 				gen_remove(&pchead, cs2s1);
@@ -810,7 +822,7 @@ rice_update_dependence_graph(
 				}
 			    }
 			}
-			
+
 			else {
 			    debug(4, "",
 				  "\nUpdating the dependence (s2,e2)-->(s1,e1)\n");
@@ -825,9 +837,8 @@ rice_update_dependence_graph(
 		}
 		pc = CDR(pc);
 	    }
-	  
+
 	   /* gen_free_list(dg_arc_label_conflicts(dal));*/
-	    
 	    if (true_conflicts != NIL) 
 	    {
 		dg_arc_label_conflicts(dal) = true_conflicts;
@@ -2322,10 +2333,11 @@ static Ptsg
 dependence_cone_positive(dep_sc)
 Psysteme dep_sc;
 {
-    Psysteme sc_env= SC_UNDEFINED;
-    Ptsg sg_env = sg_new();
+    Psysteme volatile sc_env= SC_UNDEFINED;
+    Ptsg volatile sg_env = sg_new();
     Pbase b;
-    int n,i, j;
+    int n, j;
+    int volatile i;
 
     if (SC_UNDEFINED_P(dep_sc))
 	return(sg_env);
@@ -2337,7 +2349,7 @@ Psysteme dep_sc;
     sc_env = sc_empty(base_dup(dep_sc->base));
     n = dep_sc->dimension;
     b = dep_sc->base;
-    
+
     for (i=1; i<=n; i++) 
     {	
 	Psysteme sub_sc = sc_dup(dep_sc);
@@ -2348,7 +2360,6 @@ Psysteme dep_sc;
 	ifdebug(1) {
 	    mem_spy_begin();
 	}
-	
 	for(j=1, b1=b; j<=i-1; j++, b1=b1->succ)
 	{		
 	    /* add the contraints  bj = 0 (1<=j<i) */
@@ -2356,20 +2367,19 @@ Psysteme dep_sc;
 	    pc = contrainte_make(v);
 	    sc_add_eg(sub_sc,pc);
 	}
-	
 	/* add the contraints - bi <= -1 (1<=j<i) */
 	v = vect_new(b1->var,-1);
 	vect_add_elem(&v, TCST , 1);
 	pc = contrainte_make(v);
 	sc_add_ineg(sub_sc,pc);
-	
+
 	ifdebug(7) 
 	{ 
 	    fprintf(stderr,
 		    "\nInitial sub lexico-positive dependence system:\n");
 	    sc_syst_debug(sub_sc); 
 	}
-	
+
 	/* dans le cas d'une erreur d'overflow, on fait comme si le test 
 	 *  avait renvoye' true. bc.
 	 */  
@@ -2384,7 +2394,7 @@ Psysteme dep_sc;
 		sc_rm(sub_sc);
 		debug(7,"dependence_cone_positive", 
 		      "sub lexico-positive dependence system not feasible\n");
-		
+
 		ifdebug(1) {
 		    mem_spy_end("dependence_cone_positive: one iteration," 
 				" continue 1");
@@ -2393,9 +2403,9 @@ Psysteme dep_sc;
 		continue;
 	    }
 	    else UNCATCH(overflow_error);
-	   
+
 	}
-	
+
 	if ((sub_sc = sc_normalize(sub_sc))== NULL)
 	{ 
 	    debug(7, "Dependence_cone_positive", 
@@ -2406,7 +2416,7 @@ Psysteme dep_sc;
 	    }
 	    continue;	    
 	}
-	
+
 	/* We get a normalized sub lexico-positive dependence system */
 	ifdebug(7) 
 	{ 
@@ -2426,13 +2436,13 @@ Psysteme dep_sc;
 	}
 
 	sc_rm(sub_sc);
-	
+
 	ifdebug(7) 
 	{ 
 	    fprintf(stderr, "Dependence system of the enveloppe of subs "
 		    "lexico-positive dependence:\n");
 	    sc_syst_debug(sc_env);
-	    
+
 	    if (!SC_UNDEFINED_P(sc_env) && !sc_rn_p(sc_env))
 	    {
 		sg_env = sc_to_sg_chernikova(sc_env);
@@ -2450,9 +2460,8 @@ Psysteme dep_sc;
 	ifdebug(1) {
 	    mem_spy_end("dependence_cone_positive: one iteration");
 	}
-	
     } 
-    
+
     if (!SC_UNDEFINED_P(sc_env) && sc_dimension(sc_env)!= 0) {
 
 	ifdebug(1) {
@@ -2470,11 +2479,9 @@ Psysteme dep_sc;
     ifdebug(1) {
 	mem_spy_end("dependence_cone_positive");
     }
-    
+
     return (sg_env);
 }
-
-
 
 static list 
 loop_variant_list(stat)
@@ -2486,28 +2493,22 @@ statement stat;
 
     pips_assert("loop_variant_list", statement_loop_p(stat));
 
-    MAP(EFFECT, ef, 
-     {
-	 entity en = effect_entity(ef) ;
-	 if( action_write_p( effect_action( ef )) && entity_integer_scalar_p( en )) 
-	     lv = gen_nconc(lv, CONS(ENTITY, en, NIL));
-     }, 
-	 load_cumulated_rw_effects_list(stat) ) ;
-    
+    FOREACH (EFFECT, ef, load_cumulated_rw_effects_list(stat)) {
+      entity en = effect_entity(ef) ;
+      if( action_write_p( effect_action( ef )) && entity_integer_scalar_p( en )) 
+	lv = gen_nconc(lv, CONS(ENTITY, en, NIL));
+    }
     l = statement_loop(stat);
     locals = loop_locals(l);
-    MAP(ENTITY, v,
-    {
-	if (gen_find_eq(v,lv) == entity_undefined) 
-	    lv = CONS(ENTITY, v, lv);
-    }, locals);
+    FOREACH (ENTITY, v, locals) {
+      if (gen_find_eq(v,lv) == entity_undefined) 
+	lv = CONS(ENTITY, v, lv);
+    }
     locals = statement_declarations(loop_body(l));
-    MAP(ENTITY, v,
-    {
-	if (gen_find_eq(v,lv) == entity_undefined) 
-	    lv = CONS(ENTITY, v, lv);
-    }, locals);
-    
+    FOREACH (ENTITY, v, locals) {
+      if (gen_find_eq(v,lv) == entity_undefined) 
+	lv = CONS(ENTITY, v, lv);
+    }
     return(lv);
 }
 

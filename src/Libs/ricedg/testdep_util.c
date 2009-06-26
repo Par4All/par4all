@@ -929,7 +929,7 @@ Pvecteur pv;
  */
 boolean 
 sc_minmax_of_variable_optim(ps, var, pmin, pmax)
-Psysteme ps;
+Psysteme volatile ps;
 Variable var;
 Value *pmin, *pmax;
 {
