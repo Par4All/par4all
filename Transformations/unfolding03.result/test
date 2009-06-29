@@ -40,7 +40,6 @@ void flgr1d_arith_add_fgINT32(FLGR_Data1D *datdest, FLGR_Data1D *data1, FLGR_Dat
       v1 = flgr1d_get_data_array_fgINT32(psrc1, j);
       v2 = flgr1d_get_data_array_fgINT32(psrc2, j);
       I_0 = v1+v2;
-
       result = I_0;
       flgr1d_set_data_array_fgINT32(pdest, j, result);
    }
