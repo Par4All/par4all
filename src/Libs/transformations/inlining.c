@@ -910,53 +910,25 @@ statement outliner(string outline_module_name, list statements_to_outline)
     list effective_parameters = NIL;
     list formal_parameters = NIL;
     FOREACH(ENTITY,e,referenced_entities)
-	{
+    {
         type t = entity_type(e);
-        if( type_variable_p(t))
-        {
-            variable v = type_variable(t);
-            /* this adds the dynamic dimensions of array to the parameter list */
-            FOREACH(DIMENSION,d,variable_dimensions(v))
-            {
-                expression ex = dimension_upper(d);
-                if(!expression_constant_p(ex))
-                {
-                    reference ref = expression_reference(EXPRESSION(CAR(call_arguments(syntax_call(expression_syntax(ex))))));
-                    entity ref_ent = reference_variable(ref);
-                    if( entity_undefined_p( FindEntity(outline_module_name,entity_user_name(ref_ent)) ) )
-                    {
-                        entity dummy_entity = FindOrCreateEntity(
-                                outline_module_name,
-                                entity_user_name(ref_ent)
-                                );
-                        entity_type(dummy_entity)=copy_type(entity_type(ref_ent));
-                        entity_storage(dummy_entity)=make_storage_formal(make_formal(dummy_entity,++i));
-                        formal_parameters=CONS(PARAMETER,make_parameter(
-                                    copy_type(entity_type(ref_ent)),
-                                    make_mode_value(), /* to be changed */
-                                    make_dummy_identifier(dummy_entity)),formal_parameters);
-                        effective_parameters=CONS(EXPRESSION,entity_to_expression(ref_ent),effective_parameters);
-                    }
-                }
-            }
-        }
-		/* this create the dummy parameter */
-		type new_type = copy_type(t);
-		entity dummy_entity = FindOrCreateEntity(
-				outline_module_name,
-				entity_user_name(e)
-				);
-		entity_type(dummy_entity)=new_type;
-		entity_storage(dummy_entity)=make_storage_formal(make_formal(dummy_entity,++i));
+        /* this create the dummy parameter */
+        type new_type = copy_type(t);
+        entity dummy_entity = FindOrCreateEntity(
+                outline_module_name,
+                entity_user_name(e)
+                );
+        entity_type(dummy_entity)=new_type;
+        entity_storage(dummy_entity)=make_storage_formal(make_formal(dummy_entity,++i));
 
 
-		formal_parameters=CONS(PARAMETER,make_parameter(
-					copy_type(new_type),
-					make_mode_value(), /* to be changed */
-					make_dummy_identifier(dummy_entity)),formal_parameters);
-		/* this adds the effective parameter */
-		effective_parameters=CONS(EXPRESSION,entity_to_expression(e),effective_parameters);
-	}
+        formal_parameters=CONS(PARAMETER,make_parameter(
+                    copy_type(new_type),
+                    make_mode_value(), /* to be changed */
+                    make_dummy_identifier(dummy_entity)),formal_parameters);
+        /* this adds the effective parameter */
+        effective_parameters=CONS(EXPRESSION,entity_to_expression(e),effective_parameters);
+    }
 
 
     /* we need to patch parameters , effective parameters and body in C
