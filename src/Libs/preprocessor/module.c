@@ -46,14 +46,6 @@
    some global variables assumed properly set
  */
 
-static list current_module_declaration_list = list_undefined;
-
-static void add_local_statement_declarations(statement s)
-{
-  current_module_declaration_list = gen_nconc(current_module_declaration_list,
-					      gen_copy_seq(statement_declarations(s)));
-}
-
 /* Retrieve all declarations linked to a module, but the local
    variables private to loops. Allocate and build a new list which
    will have to be freed by the caller.
@@ -68,15 +60,7 @@ list module_declarations(entity m)
 {
   statement s = get_current_module_statement();
   list dl = gen_copy_seq(code_declarations(value_code(entity_initial(m))));
-
-  current_module_declaration_list = NIL;
-
-    gen_multi_recurse
-      (s,
-       statement_domain, add_local_statement_declarations, gen_null,
-       NULL);
-
-  dl = gen_nconc(dl, current_module_declaration_list);
+  dl = gen_nconc(dl, statement_to_declarations(s));
 
   /* FI: maybe we should also look up the declarations in the compilation unit... */
 
@@ -259,4 +243,53 @@ entity_minimal_name(entity e)
   }
 
   return emn;
+}
+
+/* build a textual representation of the modified module and update db
+ */
+void
+recompile_module(char* module)
+{
+    entity modified_module = module_name_to_entity(module);
+    statement modified_module_statement =
+        (statement) db_get_memory_resource(DBR_CODE, module, TRUE);
+
+    set_current_module_entity( modified_module );
+    set_current_module_statement( modified_module_statement );
+
+    /* build and register textual representation */
+    text t = text_module(get_current_module_entity(), modified_module_statement);
+    string dirname = db_get_current_workspace_directory();
+    string res = fortran_module_p(modified_module)? DBR_INITIAL_FILE : DBR_C_SOURCE_FILE;
+    string filename = db_get_file_resource(res,module,TRUE);
+    string fullname = strdup(concatenate(dirname, "/",filename, NULL));
+    FILE* f = safe_fopen(fullname,"w");
+    print_text(f,t);
+    fclose(f);
+    DB_PUT_FILE_RESOURCE(res,module,filename);
+
+    /* the module will be reparsed, so fix(=delete) all its previous entites */
+    {
+        list p = NIL;
+        FOREACH(ENTITY, e, entity_declarations(modified_module))
+        {
+            if(! entity_area_p(e) )
+                gen_clear_tabulated_element((gen_chunk*)e);
+
+            else
+                p = CONS(ENTITY,e,p);
+        }
+        entity_declarations(modified_module) = gen_nreverse(p);
+        code_initializations(value_code(entity_initial(modified_module)))=make_sequence(NIL);
+    }
+
+    reset_current_module_entity();
+    reset_current_module_statement();
+
+    bool parsing_ok =(fortran_module_p(modified_module)) ? parser(module) : c_parser(module);
+    if(!parsing_ok)
+        pips_user_error("failed to recompile module");
+    if(!controlizer(module))
+        pips_user_warning("failed to apply controlizer after recompilation");
+
 }

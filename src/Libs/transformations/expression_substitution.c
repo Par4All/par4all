@@ -57,6 +57,11 @@ bool set_pattern()
 
         statement s = (statement) db_get_memory_resource(DBR_CODE, pattern_module_name, TRUE);
         instruction i = statement_instruction(s);
+        if( instruction_block_p(i))
+        {
+            list l = instruction_block(i);
+            if(!ENDP(l)) i = statement_instruction(STATEMENT(CAR(l)));
+        }
         if( return_instruction_p(i) )
             pattern = EXPRESSION(CAR(call_arguments(instruction_call(i))));
         else {

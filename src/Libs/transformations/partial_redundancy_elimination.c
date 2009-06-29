@@ -44,9 +44,21 @@
 #include "misc.h"
 #include "expressions.h"
 #include "transformer.h"
+#include "alias_private.h"
 #include "instrumentation.h"
 #include "semantics.h" /* for module_to_value_mappings() */
 #include "transformations.h"
+
+#include "ray_dte.h"
+#include "sommet.h"
+#include "sg.h"
+#include "polyedre.h"
+#include "dg.h"
+typedef dg_arc_label arc_label;
+typedef dg_vertex_label vertex_label;
+#include "graph.h"
+
+#include "ricedg.h"
 
 /* Statistic variables: */
 static int number_of_simplified_expressions;

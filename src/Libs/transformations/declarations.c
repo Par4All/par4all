@@ -46,8 +46,9 @@
  * recursievely call statement_remove_unused_declarations on all module statement
  * 
  * @param module_name name of the processed module
+ * @return alaways successful
  */
-void
+bool
 clean_declarations(char * module_name)
 {
     /* prelude*/

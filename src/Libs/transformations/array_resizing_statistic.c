@@ -39,6 +39,7 @@
 #include "control.h"
 #include "properties.h"
 #include "semantics.h"
+#include "alias_private.h"
 #include "instrumentation.h"
 #include "transformations.h"
 

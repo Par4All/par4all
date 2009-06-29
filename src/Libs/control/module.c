@@ -137,13 +137,14 @@ bool controlizer(string module_name)
   if (get_bool_property("UNSPAGHETTIFY_IN_CONTROLIZER"))
     unspaghettify_statement(module_stat);
 
-  /* Reorder the module, because we have a new statement structure. */
-  module_reorder(module_stat);
 
   /* With C code, some local declarations may have been lost by the
      (current) restructurer */
   if(c_module_p(m))
     module_stat = update_unstructured_declarations(module_stat);
+
+  /* Reorder the module, because we have a new statement structure. */
+  module_reorder(module_stat);
 
   statement_consistent_p(module_stat);
 

@@ -42,6 +42,8 @@
 #include "properties.h"
 #include "preprocessor.h"
 
+#include "parser_private.h"
+#include "syntax.h"
 bool
 variable_entity_p(entity e)
 {

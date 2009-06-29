@@ -57,34 +57,29 @@
 #define STATIC_BUFFER_SZ 100
 
 
-static bool statement_is_empty;
-
-static bool cannot_be_empty(void)
+static bool cannot_be_empty(bool *statement_is_empty)
 {
-    statement_is_empty = FALSE;
     gen_recurse_stop(NULL);
-    return FALSE;
+    return *statement_is_empty = false;;
 }
 
-static bool call_filter(call c)
+static bool call_filter(call c,bool *statement_is_empty)
 {
     entity e = call_function(c);
     if (ENTITY_CONTINUE_P(e) || ENTITY_RETURN_P(e))
-	return FALSE;
+        return false;
     else
-	return cannot_be_empty();
+        return cannot_be_empty(statement_is_empty);
 }
 
 bool 
 empty_code_p(statement s)
 {
     if ((!s) || statement_undefined_p(s)) 
-	return TRUE;
+        return true;
 
-    statement_is_empty = TRUE;
-    gen_multi_recurse(s,
-		      call_domain, call_filter, gen_null,
-		      NULL);
+    bool statement_is_empty = true;
+    gen_context_recurse(s,&statement_is_empty, call_domain, call_filter, gen_null);
 
     pips_debug(3, "returning %d\n", statement_is_empty);
 
@@ -95,7 +90,7 @@ bool
 empty_code_list_p(list l)
 {
     MAP(STATEMENT, s, if (!empty_code_p(s)) return FALSE, l);
-    return TRUE;
+    return true;
 }
 
 /*************************************************************** COUNT LOOPS */
@@ -1887,19 +1882,16 @@ put_formats_at_module_end(statement s)
 }
 
 
-static bool format_inside_statement_has_been_found;
-
-
 bool
-figure_out_if_it_is_a_format(instruction i)
+figure_out_if_it_is_a_format(instruction i, bool *format_inside_statement_has_been_found)
 {
     if (instruction_format_p(i)) {
-	format_inside_statement_has_been_found = TRUE;
-	/* Useless to go on further: */
-	gen_recurse_stop(NULL);
-	return FALSE;
+        *format_inside_statement_has_been_found = true;
+        /* Useless to go on further: */
+        gen_recurse_stop(NULL);
+        return false;
     }
-    return TRUE;
+    return true;
 }
 
 
@@ -1907,11 +1899,10 @@ figure_out_if_it_is_a_format(instruction i)
 bool
 format_inside_statement_p(statement s)
 {
-    format_inside_statement_has_been_found = FALSE;
+    bool format_inside_statement_has_been_found = false;
     
-    gen_multi_recurse(s, instruction_domain,
-		figure_out_if_it_is_a_format,
-		gen_null, NULL);
+    gen_context_recurse(s,&format_inside_statement_has_been_found,
+            instruction_domain,	figure_out_if_it_is_a_format, gen_null);
 
     return format_inside_statement_has_been_found;
 }
@@ -2281,64 +2272,55 @@ statement add_comment_and_line_number(statement s, string sc, int sn)
   }
   return ns;
 }
-
-static list statement_to_all_included_declarations;
 
-static bool add_statement_declarations(statement s)
+static bool add_statement_declarations(statement s, list *statement_to_all_included_declarations)
 {
   list dl = statement_declarations(s);
   if(!ENDP(dl)) {
-    statement_to_all_included_declarations
-      = gen_nconc(statement_to_all_included_declarations,
+    *statement_to_all_included_declarations
+      = gen_nconc(*statement_to_all_included_declarations,
 		  gen_copy_seq(dl));
   }
-  return TRUE;
+  return true;
 }
 
 /* Get a list of all variables declared recursively within a statement */
 list statement_to_declarations(statement s)
 {
-  statement_to_all_included_declarations = NIL;
+  list statement_to_all_included_declarations = NIL;
 
-  gen_multi_recurse(s, statement_domain, add_statement_declarations, gen_null, NULL);
+  gen_context_recurse(s,&statement_to_all_included_declarations, statement_domain, add_statement_declarations, gen_null);
 
   return statement_to_all_included_declarations;
 }
-
-static list statement_to_all_included_referenced_entities;
 
-static bool add_statement_referenced_entities(reference r)
+static bool add_statement_referenced_entities(reference r,list *statement_to_all_included_referenced_entities)
 {
   /* Sometimes, a function may be referenced, for instance in a
      function pointer assignment. */
   entity v = reference_variable(r);
 
-  statement_to_all_included_referenced_entities
-    = gen_nconc(statement_to_all_included_referenced_entities,
-		CONS(ENTITY, v, NIL));
+  *statement_to_all_included_referenced_entities
+    = CONS(ENTITY, v,*statement_to_all_included_referenced_entities);
   return TRUE;
 }
 
 /* Get a list of all variables referenced recursively within a statement */
 list statement_to_referenced_entities(statement s)
 {
-  statement_to_all_included_referenced_entities = NIL;
+  list statement_to_all_included_referenced_entities = NIL;
 
-  gen_multi_recurse(s, reference_domain, add_statement_referenced_entities, gen_null, NULL);
+  gen_context_recurse(s,&statement_to_all_included_referenced_entities, reference_domain, add_statement_referenced_entities, gen_null);
 
-  return statement_to_all_included_referenced_entities;
+  return gen_nreverse(statement_to_all_included_referenced_entities);
 }
-
-static list statement_to_all_included_called_user_entities;
 
-static bool add_statement_called_user_entities(call c)
+static bool add_statement_called_user_entities(call c,list *statement_to_all_included_called_user_entities)
 {
   entity f = call_function(c);
 
   if(!intrinsic_entity_p(f)) {
-    statement_to_all_included_called_user_entities
-      = gen_nconc(statement_to_all_included_called_user_entities,
-		  CONS(ENTITY, f, NIL));
+      *statement_to_all_included_called_user_entities=CONS(ENTITY,f,*statement_to_all_included_called_user_entities);
   }
   return TRUE;
 }
@@ -2346,11 +2328,11 @@ static bool add_statement_called_user_entities(call c)
 /* Get a list of all user function called recursively within a statement */
 list statement_to_called_user_entities(statement s)
 {
-  statement_to_all_included_called_user_entities = NIL;
+  list statement_to_all_included_called_user_entities = NIL;
 
-  gen_multi_recurse(s, statement_domain, add_statement_called_user_entities, gen_null, NULL);
+  gen_context_recurse(s,&statement_to_all_included_called_user_entities, statement_domain, add_statement_called_user_entities, gen_null);
 
-  return statement_to_all_included_declarations;
+  return gen_nreverse(statement_to_all_included_called_user_entities);
 }
 
 /* Return first reference found */
@@ -2501,6 +2483,7 @@ int get_statement_depth(statement s, statement root)
 							return 1+get_statement_depth(s,stmt);
 					}
 					pips_internal_error("you should never reach this point");
+                    return -1;
 				} 
 			case is_instruction_test:
 				return 
@@ -2515,10 +2498,13 @@ int get_statement_depth(statement s, statement root)
 				return get_statement_depth(s,forloop_body(instruction_forloop(i)));
 			case is_instruction_unstructured:
 				pips_internal_error("not implemented for unstructured");
+                return -1;
 			default:
 				pips_internal_error("you should never reach this point");
+                return -1;
 		};
 	}
+
 }
 
 /**  @} */
@@ -2548,7 +2534,9 @@ void statement_clean_declarations_reference_walker(reference r, set re)
 static
 void statement_clean_declarations_call_walker(call c, set re)
 {
-    set_add_element(re,re,call_function(c));
+    entity e = call_function(c);
+    if(!entity_constant_p(e) && ! intrinsic_entity_p(e) )
+        set_add_element(re,re,e);
 }
 
 /** 
@@ -2698,7 +2686,6 @@ list statement_clean_declarations_helper(list declarations, statement stmt)
             /* entities whose declaration has a side effect are always used too */
             bool has_side_effects_p = false;
             value v = entity_initial(e);
-            storage s = entity_storage(e);
             if( value_expression_p(v) )
             {
                 list effects = expression_to_proper_effects(value_expression(v));

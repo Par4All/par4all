@@ -54,6 +54,9 @@
 #include "c_syntax.h"
 
 
+/** 
+ * @name inlining
+ * @{ */
 static entity       inlined_module;
 static statement    inlined_module_statement;
 static statement    laststmt;
@@ -596,58 +599,13 @@ inline_calls(char * module)
         	pips_user_warning("failed to remove useless labels after restructure_control in inlining");
 }
 
-/* build a textual representation of the modified module and update db
- * SG: this code should not be there
- */
-void
-recompile_module(char* module)
-{
-    entity modified_module = module_name_to_entity(module);
-    statement modified_module_statement =
-        (statement) db_get_memory_resource(DBR_CODE, module, TRUE);
-
-    set_current_module_entity( modified_module );
-    set_current_module_statement( modified_module_statement );
-
-    /* build and register textual representation */
-    text t = text_module(get_current_module_entity(), modified_module_statement);
-    string dirname = db_get_current_workspace_directory();
-    string res = fortran_module_p(modified_module)? DBR_INITIAL_FILE : DBR_C_SOURCE_FILE;
-    string filename = db_get_file_resource(res,module,TRUE);
-    string fullname = strdup(concatenate(dirname, "/",filename, NULL));
-    FILE* f = safe_fopen(fullname,"w");
-    print_text(f,t);
-    fclose(f);
-    DB_PUT_FILE_RESOURCE(res,module,filename);
-
-    /* the module will be reparsed, so fix(=delete) all its previous entites */
-    {
-        list p = NIL;
-        FOREACH(ENTITY, e, entity_declarations(modified_module))
-        {
-            if(! entity_area_p(e) )
-                gen_clear_tabulated_element((gen_chunk*)e);
-
-            else
-                p = CONS(ENTITY,e,p);
-        }
-        entity_declarations(modified_module) = gen_nreverse(p);
-        code_initializations(value_code(entity_initial(modified_module)))=make_sequence(NIL);
-    }
-
-    reset_current_module_entity();
-    reset_current_module_statement();
-
-    bool parsing_ok =(fortran_module_p(modified_module)) ? parser(module) : c_parser(module);
-    if(!parsing_ok)
-        pips_user_error("failed to recompile module");
-    if(!controlizer(module))
-        pips_user_warning("failed to apply controlizer after recompilation");
-
-}
-
-/* this should inline all calls to module `module_name'
+/** 
+ * this should inline all calls to module `module_name'
  * in calling modules, if possible ...
+ * 
+ * @param module_name name of the module to inline
+ * 
+ * @return true if we did something
  */
 static
 bool do_inlining(char * module_name)
@@ -698,27 +656,43 @@ bool do_inlining(char * module_name)
    return TRUE;
 }
 
+/** 
+ * perform inlining using effects
+ * 
+ * @param module_name name of the module to inline
+ * 
+ * @return 
+ */
 bool inlining(char *module_name)
 {
 	use_effects=true;
 	return do_inlining(module_name);
 }
+
+/** 
+ * perform inlining without using effects
+ * 
+ * @param module_name name of the module to inline
+ * 
+ * @return 
+ */
 bool inlining_simple(char *module_name)
 {
 	use_effects=false;
 	return do_inlining(module_name);
 }
 
+/**  @} */
 
+/** 
+ * @name unfolding
+ * @{ */
 
-
-/**************************************************************************************
- *
- *                  UNFOLD SECTION
- *
- **************************************************************************************/
-
-/* select every call that is not an intrinsic
+/** 
+ * put c into calls_name if c is not an intrinsic
+ * 
+ * @param c call to check
+ * @param calls_name set containing registered entity names
  */
 static void
 call_selector(call c, set calls_name)
@@ -727,18 +701,19 @@ call_selector(call c, set calls_name)
     if( !entity_constant_p(e) && !intrinsic_entity_p(e) && !entity_symbolic_p(e) )
     {
         string name = entity_local_name(e);
-        if( !set_belong_p(calls_name,name) )
-        {
-            set_add_element(calls_name,calls_name,name);
-        }
+        set_add_element(calls_name,calls_name,name);
     }
 
 }
 
-static bool statement_has_callee = false;
+static bool statement_has_callee = false; ///< set to true when a call is found
 
-/* get ressources for the call to inline and call
+/** 
+ * get ressources for the call to inline and call
  * apropriate inlining function
+ * 
+ * @param caller_name calling module name
+ * @param module_name called module name
  */
 static void
 run_inlining(string caller_name, string module_name)
@@ -761,9 +736,14 @@ run_inlining(string caller_name, string module_name)
     inlined_module_statement=statement_undefined;
 }
 
-/* this should inline all call in module `module_name'
+/** 
+ * this should inline all call in module `module_name'
  * it does not works recursievly, so multiple pass may be needed
  * returns true if at least one function has been inlined
+ * 
+ * @param module_name name of the module to unfold
+ * 
+ * @return true if we did something
  */
 static
 bool do_unfolding(char* module_name)
@@ -828,23 +808,37 @@ bool do_unfolding(char* module_name)
     return true;
 }
 
+/** 
+ * perform unfolding using effect
+ * 
+ * @param module_name name of the module to unfold
+ * 
+ * @return 
+ */
 bool unfolding(char* module_name)
 {
 	use_effects=true;
 	return do_unfolding(module_name);
 }
+
+/** 
+ * perform unfolding without using effects
+ * 
+ * @param module_name name of the module to unfold
+ * 
+ * @return true upon success
+ */
 bool unfolding_simple(char* module_name)
 {
 	use_effects=false;
 	return do_unfolding(module_name);
 }
+/**  @} */
 
 
-/*********************************************************************************************
- *
- *  outlining part
- *
- */
+/** 
+ * @name outlining
+ * @{ */
 
 #define STAT_ORDER "PRETTYPRINT_STATEMENT_NUMBER"
 
@@ -870,6 +864,17 @@ void patch_outlined_reference(expression x, entity e)
 
 }
 
+/** 
+ * outline the statements in statements_to_outline into a module named outline_module_name
+ * the outlined statements are replaced by a call to the newly generated module
+ * statements_to_outline is modified in place to represent that call
+ * 
+ * @param outline_module_name name of the new module
+ * @param statements_to_outline statements to outline into outline_module_name
+ * 
+ * @return pointer to the newly generated statement (already inserted in statements_to_outline)
+ */
+static
 statement outliner(string outline_module_name, list statements_to_outline)
 {
     pips_assert("there are some statements to outline",!ENDP(statements_to_outline));
@@ -877,28 +882,24 @@ statement outliner(string outline_module_name, list statements_to_outline)
     /* retreive referenced and declared entities */
     list referenced_entities = NIL,
          declared_entities = NIL ;
+    set sreferenced_entities = set_make(set_pointer);
+
     FOREACH(STATEMENT, s, statements_to_outline)
     {
-        referenced_entities=gen_nconc(referenced_entities, statement_to_referenced_entities(s));
+        set tmp = statement_get_referenced_entities(s);
+        set_union(sreferenced_entities,tmp,sreferenced_entities);
+        set_free(tmp);
         declared_entities =gen_nconc(declared_entities, statement_to_declarations(s));
     }
+    /* set to list */
+    referenced_entities=set_to_list(sreferenced_entities);
+    set_free(sreferenced_entities);
 
     /* get the relative complements and create the parameter list*/
     gen_list_and_not(&referenced_entities,declared_entities);
+    gen_free_list(declared_entities);
 
-	/* make list uniq and sorted : list -> set -> list */
-	{
-		set stmp = set_make(set_pointer);
-		FOREACH(ENTITY,refent,referenced_entities)
-			set_add_element(stmp,stmp,refent);
-
-		list ltmp=NIL;
-		SET_MAP(rent,ltmp=CONS(ENTITY,rent,ltmp),stmp);
-		set_free(stmp);
-		gen_free_list(referenced_entities);
-		gen_sort_list(ltmp,compare_entities);
-		referenced_entities=ltmp;
-	}
+    gen_sort_list(referenced_entities,compare_entities);
 
 
     intptr_t i=0;
@@ -910,33 +911,37 @@ statement outliner(string outline_module_name, list statements_to_outline)
     list formal_parameters = NIL;
     FOREACH(ENTITY,e,referenced_entities)
 	{
-		variable v = type_variable(entity_type(e));
-		/* this adds the dynamic dimensions of array to the parameter list */
-		FOREACH(DIMENSION,d,variable_dimensions(v))
-		{
-			expression ex = dimension_upper(d);
-			if(!expression_constant_p(ex))
-			{
-				reference ref = expression_reference(EXPRESSION(CAR(call_arguments(syntax_call(expression_syntax(ex))))));
-				entity ref_ent = reference_variable(ref);
-				if( entity_undefined_p( FindEntity(outline_module_name,entity_user_name(ref_ent)) ) )
-				{
-					entity dummy_entity = FindOrCreateEntity(
-							outline_module_name,
-							entity_user_name(ref_ent)
-							);
-					entity_type(dummy_entity)=copy_type(entity_type(ref_ent));
-					entity_storage(dummy_entity)=make_storage_formal(make_formal(dummy_entity,++i));
-					formal_parameters=CONS(PARAMETER,make_parameter(
-								copy_type(entity_type(ref_ent)),
-								make_mode_value(), /* to be changed */
-								make_dummy_identifier(dummy_entity)),formal_parameters);
-					effective_parameters=CONS(EXPRESSION,entity_to_expression(ref_ent),effective_parameters);
-				}
-			}
-		}
+        type t = entity_type(e);
+        if( type_variable_p(t))
+        {
+            variable v = type_variable(t);
+            /* this adds the dynamic dimensions of array to the parameter list */
+            FOREACH(DIMENSION,d,variable_dimensions(v))
+            {
+                expression ex = dimension_upper(d);
+                if(!expression_constant_p(ex))
+                {
+                    reference ref = expression_reference(EXPRESSION(CAR(call_arguments(syntax_call(expression_syntax(ex))))));
+                    entity ref_ent = reference_variable(ref);
+                    if( entity_undefined_p( FindEntity(outline_module_name,entity_user_name(ref_ent)) ) )
+                    {
+                        entity dummy_entity = FindOrCreateEntity(
+                                outline_module_name,
+                                entity_user_name(ref_ent)
+                                );
+                        entity_type(dummy_entity)=copy_type(entity_type(ref_ent));
+                        entity_storage(dummy_entity)=make_storage_formal(make_formal(dummy_entity,++i));
+                        formal_parameters=CONS(PARAMETER,make_parameter(
+                                    copy_type(entity_type(ref_ent)),
+                                    make_mode_value(), /* to be changed */
+                                    make_dummy_identifier(dummy_entity)),formal_parameters);
+                        effective_parameters=CONS(EXPRESSION,entity_to_expression(ref_ent),effective_parameters);
+                    }
+                }
+            }
+        }
 		/* this create the dummy parameter */
-		type new_type = copy_type(entity_type(e));
+		type new_type = copy_type(t);
 		entity dummy_entity = FindOrCreateEntity(
 				outline_module_name,
 				entity_user_name(e)
@@ -1136,7 +1141,7 @@ outline(char* module_name)
     string outline_module_name = string_undefined;
     do {
         outline_module_name = user_request("outline module name ?\n");// should check
-    } while( string_undefined_p(outline_module_name) || outline_module_name[0] == '\0' );
+    } while( !outline_module_name || string_undefined_p(outline_module_name) || outline_module_name[0] == '\0' );
    
 
     /* retrieve statement to outline */
@@ -1149,7 +1154,7 @@ outline(char* module_name)
     statements_to_outline=gen_nreverse(statements_to_outline);
 
     /* apply outlining */
-    (void*)outliner(outline_module_name,statements_to_outline);
+    (void)outliner(outline_module_name,statements_to_outline);
 
 
     /* validate */
@@ -1165,3 +1170,4 @@ outline(char* module_name)
 
     return true;
 }
+/**  @} */

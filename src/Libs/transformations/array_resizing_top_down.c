@@ -98,6 +98,7 @@
 #include "database.h"
 #include "pipsdbm.h"
 #include "alias-classes.h"
+#include "alias_private.h"
 #include "instrumentation.h"
 #include "resources.h"
 #include "misc.h"

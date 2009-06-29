@@ -422,6 +422,7 @@ check_control_coherency(control c)
 }
 
 
+#if 0
 /*
   Prettyprinting of control nodes for debugging purposes
 */
@@ -461,6 +462,7 @@ static void print_control_nodes(list l)
   }
   fprintf(stderr, "\n");
 }
+#endif
 
 
 /* Display a list of control: */
