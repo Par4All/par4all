@@ -1,0 +1,30 @@
+delete split_pragma2
+create split_pragma2 split_pragma2.f
+
+#activate some debug mode
+#setenv TEXT_DEBUG_LEVEL 9
+#setenv PARSER_DEBUG_LEVEL 9
+#setenv RICEDG_DEBUG_LEVEL 9
+#setenv SYNTAX_DEBUG_LEVEL 9
+#setenv C_SYNTAX_DEBUG_LEVEL 9
+#setenv SEMANTICS_DEBUG_LEVEL 9
+#setenv PRETTYPRINT_DEBUG_LEVEL 9
+
+#SELECT C LANGUAGE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+setproperty PRAGMA_TYPE "expr"
+
+apply PRIVATIZE_MODULE(SPLIT_PRAGMA2)
+echo // OMP style
+activate PRINT_PARALLELIZEDOMP_CODE
+display PARALLELPRINTED_FILE(SPLIT_PRAGMA2)
+
+apply INTERNALIZE_PARALLEL_CODE
+apply OMPIFY_CODE
+display PRINTED_FILE(SPLIT_PRAGMA2)
+
+close
+delete split_pragma2
+quit
+# EOF
