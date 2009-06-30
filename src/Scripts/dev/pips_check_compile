@@ -98,10 +98,10 @@ svn up > out 2> err || report 3 "cannot 'svn up'"
 touch VERSION
 mv VERSION PREVIOUS
 {
-  echo pips: $(svnversion $dir/pips)
-  echo newgen: $(svnversion $dir/newgen)
-  echo linear: $(svnversion $dir/linear)
-  echo nlpmake: $(svnversion $dir/pips/makes)
+  echo pips: $(svnversion pips)
+  echo newgen: $(svnversion newgen)
+  echo linear: $(svnversion linear)
+  echo nlpmake: $(svnversion pips/makes)
 } > VERSION
 
 if cmp -s VERSION PREVIOUS
