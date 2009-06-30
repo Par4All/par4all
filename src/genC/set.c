@@ -248,3 +248,17 @@ int set_own_allocated_memory(set s)
 {
     return sizeof(set_chunk)+hash_table_own_allocated_memory(s->table);
 }
+
+/** 
+ * create a list from a set
+ * the set is not freed
+ * @param s set where the data are
+ * 
+ * @return a list of elements from s
+ */
+list set_to_list(set s)
+{
+    list l =NIL;
+    SET_MAP(v,l=gen_cons(v,l),s);
+    return l;
+}
