@@ -104,7 +104,7 @@ mv VERSION PREVIOUS
   echo nlpmake: $(svnversion pips/makes)
 } > VERSION
 
-if cmp -s VERSION PREVIOUS
+if ! cmp -s VERSION PREVIOUS
 then
   # something may have changed, let us recompile
   make unbuild > out 2> err || report 4 "cannot 'make unbuild'"
