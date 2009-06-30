@@ -1,0 +1,101 @@
+#! /bin/bash
+#
+# $Id$
+#
+# Copyright 1989-2009 MINES ParisTech
+#
+# This file is part of PIPS.
+#
+# PIPS is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# any later version.
+#
+# PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.
+#
+# See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+# checks that pips does compile.
+
+prod=${1:-.}
+dest=${2:-coelho@cri.ensmp.fr}
+
+# report state changes
+function report()
+{
+  local current=$1 msg=$2 previous='unknown' repos status
+  test -f STATE && read previous < STATE
+
+  # no change, no report
+  [ "$previous" -a "$current" = "$previous" ] && exit 0
+
+  if [ $current -eq 0 ]
+  then status=ok
+  else status=KO
+  fi
+
+  # generate report
+  {
+    # summary
+    echo PIPS compilation status has changed to $status
+
+    # details
+    echo previous state: $previous
+    echo new state: $current
+    echo message: $msg
+
+    # revisions
+    echo
+    echo pips: $(svnversion pips)
+    echo newgen: $(svnversion newgen)
+    echo linear: $(svnversion linear)
+    echo nlpmake: $(svnversion pips/makes)
+
+    if [ $status = 'KO' ]
+    then
+      # show stderr/stdout
+      test -f err && {
+        echo
+        echo err:
+        tail -10 err
+      }
+
+      test -f out && {
+        echo
+        echo out:
+        tail -10 out
+      }
+
+      # show recent commits
+      echo
+      echo last commits:
+      for repos in pips newgen linear pips/makes
+      do
+        echo $repos:
+	svn log --revision COMMITTED $repos
+      done
+    fi
+  } | mailx -s "PIPS compilation status is $status" $dest
+
+  # new state
+  echo $current > STATE
+}
+
+# check
+[ -d $prod -a -d $prod/.svn ] || report 1 "working copy '$prod' not found"
+cd $prod || report 2 "cannot 'cd $prod'"
+rm -f out err
+#svn up > out 2> err || report 3 "cannot 'svn up'"
+#make unbuild > out 2> err || report 4 "cannot 'make unbuild'"
+make build > out 2> err || report 5 "cannot 'make build'"
+test -x pips/bin/$(./pips/makes/arch.sh)/tpips || report 6 "no tpips found!"
+
+# clean up
+rm -f out err
+report 0 "pips is fine"
