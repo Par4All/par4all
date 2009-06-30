@@ -114,6 +114,5 @@ then
   # clean up
   rm -f out err
   report 0 "pips is fine"
-else
-  # no updates
+# ELSE no updates
 fi
