@@ -32,7 +32,7 @@ function report()
   local current=$1 msg=$2 previous='unknown' repos status
 
   # log report...
-  echo "$(date): $current" >> LOG
+  echo "$(date): $current ($SECONDS seconds)" >> LOG
 
   test -f STATE && read previous < STATE
   # no change, no report
