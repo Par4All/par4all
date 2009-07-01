@@ -30,8 +30,11 @@ dest=${2:-coelho@cri.ensmp.fr}
 function report()
 {
   local current=$1 msg=$2 previous='unknown' repos status
-  test -f STATE && read previous < STATE
 
+  # log report...
+  echo "$(date): $current" >> LOG
+
+  test -f STATE && read previous < STATE
   # no change, no report
   [ "$previous" -a "$current" = "$previous" ] && exit 0
 
