@@ -210,9 +210,7 @@ statement st ;
 	   let's kludge this for the time being, 5 August 1992
 	   */
 	if(!instruction_block_p(statement_instruction(st))) {
-	    MAPL( peffects, {
-		effect e = EFFECT( CAR( peffects )) ;
-
+	  FOREACH(EFFECT, e, load_statement_effects(st) ) {
 		if(fortran_compatible_effect_p(e)) {
 		  if( action_write_p( effect_action( e )) &&
 		      approximation_must_p( effect_approximation( e ))) {
@@ -222,7 +220,7 @@ statement st ;
 		else {
 		  pips_user_warning("Non-Fortran effects are ignored\n");
 		}
-	    }, load_statement_effects(st) ) ;
+	    }
 	}
     }
     else {
@@ -243,14 +241,13 @@ statement st ;
 
 static void init_control() ;
 
-static void init_statement( st )
-statement st ;
+static void init_statement(statement st)
 {
-    instruction i ;
+    instruction i = statement_instruction( st );
 
     init_one_statement( st ) ;
 
-    switch( instruction_tag( i = statement_instruction( st ))) {
+    switch( instruction_tag(i)) {
     case is_instruction_block:
 	MAPL( sts, {init_statement( STATEMENT( CAR( sts )));},
 	      instruction_block( i )) ;
@@ -265,15 +262,20 @@ statement st ;
     case is_instruction_whileloop:
 	init_statement(whileloop_body( instruction_whileloop( i ))) ;
 	break ;
-    case is_instruction_goto: 
+    case is_instruction_forloop:
+	init_statement(forloop_body( instruction_forloop( i ))) ;
+	break ;
+    case is_instruction_expression: 
     case is_instruction_call:
 	break ;
     case is_instruction_unstructured:
 	init_control( unstructured_control( instruction_unstructured( i ))) ;
 	break ;
+    case is_instruction_goto: 
+	pips_internal_error("Go to instruction in CODE datastructure %d\n", instruction_tag( i )) ;
+	break;
     default:
-	pips_error( "init_statement", "Unknown tag %d\n", 
-		    instruction_tag( i )) ;
+	pips_internal_error("Unknown tag %d\n", instruction_tag( i )) ;
     }
 }
 
@@ -449,9 +451,10 @@ cons *l ;
    are always killed by execution of loop body. Effect masking is performed
    on locals (i.e., gen set is pruned from local definitions). */
 
-static void genkill_loop( l, st )
-loop l ;
-statement st ;
+/* FI: what should be made for while and for loops as well as for all
+   (block) occurences of local variables? */
+
+static void genkill_loop(loop l, statement st)
 {
     statement b = loop_body( l ) ;
     set gen = GEN( st ) ;
@@ -475,9 +478,27 @@ statement st ;
     gen_free_list(locals);
 }
 
-static void genkill_whileloop( l, st )
-whileloop l ;
-statement st ;
+/* FI: should be fused with whileloop case and loop case when loop
+   locals are removed */
+static void genkill_forloop(forloop l, statement st)
+{
+    statement b = forloop_body( l ) ;
+    set gen = GEN( st ) ;
+    set ref = REF( st ) ;
+    list locals = statement_declarations(st);
+
+    genkill_statement( b ) ;
+
+    set_union( gen, gen,  GEN( b )) ;
+    set_union( ref, ref, REF( b )) ;
+
+    if( get_bool_property( "CHAINS_MASK_EFFECTS" )) {
+	mask_effects( gen, locals ) ;
+	mask_effects( ref, locals ) ;
+    }
+}
+
+static void genkill_whileloop(whileloop l, statement st)
 {
     statement b = whileloop_body( l ) ;
     set gen = GEN( st ) ;
@@ -596,6 +617,11 @@ statement st ;
     case is_instruction_whileloop: {
 	whileloop l = instruction_whileloop(i);
 	genkill_whileloop( l, st );
+	break;
+    }
+    case is_instruction_forloop: {
+	forloop l = instruction_forloop(i);
+	genkill_forloop( l, st );
 	break;
     }
     case is_instruction_unstructured:
@@ -1362,8 +1388,7 @@ graph statement_dependence_graph(statement s)
 static bool rgch = FALSE;
 static bool iorgch = FALSE;
 
-static list load_statement_effects(st)
-statement st;
+static list load_statement_effects(statement st)
 {
     instruction inst = statement_instruction( st );
     tag t = instruction_tag( inst );
@@ -1384,16 +1409,18 @@ statement st;
     case is_instruction_block: 
     case is_instruction_test: 
     case is_instruction_loop: 
-    case is_instruction_whileloop: 
-    case is_instruction_goto: 
+    case is_instruction_whileloop:
     case is_instruction_unstructured:
 	le = load_proper_rw_effects_list(st);
 	break ;
-	case is_instruction_forloop:
-		pips_error( "load_statement_effects", "not implemented for c for loops\nconsider setting FOR_TO_DO_LOOP_IN_CONTROLIZER to TRUE\n", t ) ;
-		break;
+    case is_instruction_forloop:
+      pips_internal_error("not implemented for C for loops\nconsider setting FOR_TO_DO_LOOP_IN_CONTROLIZER to TRUE\n", t ) ;
+      break;
+    case is_instruction_goto: 
+	pips_internal_error( "Go to statement in CODE data structure %d\n", t ) ;
+      break;
     default:
-	pips_error( "load_statement_effects", "Unknown tag %d\n", t ) ;
+	pips_internal_error( "Unknown tag %d\n", t ) ;
     }
     
     return le;
