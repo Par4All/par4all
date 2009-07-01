@@ -1193,14 +1193,17 @@ static transformer
 integer_multiply_to_transformer(entity v,
 				expression e1,
 				expression e2,
-				transformer pre,
+				transformer ipre,
 				bool is_internal)
 {
   transformer tf = transformer_undefined;
   entity v1 = make_local_temporary_value_entity(entity_type(v));
-  transformer t1 = integer_expression_to_transformer(v1, e1, pre, is_internal);
+  transformer t1 = safe_integer_expression_to_transformer(v1, e1, ipre, is_internal);
   entity v2 = make_local_temporary_value_entity(entity_type(v));
-  transformer t2 = integer_expression_to_transformer(v2, e2, pre, is_internal);
+  transformer npre = transformer_safe_apply(t1, ipre);
+  transformer t2 = safe_integer_expression_to_transformer(v2, e2, npre, is_internal);
+  transformer pre = transformer_undefined_p(ipre)? transformer_identity() :
+    copy_transformer(ipre);
 
   pips_debug(8, "Begin\n");
 
@@ -1283,6 +1286,8 @@ integer_multiply_to_transformer(entity v,
   else if(!transformer_undefined_p(t2)) {
     free_transformer(t2);
   }
+
+  free_transformer(pre);
 
   if(transformer_undefined_p(tf)) {
     /* let's assume no impact from side effects */
@@ -1744,6 +1749,23 @@ integer_expression_to_transformer(
   }
 
   pips_debug(8, "end with tf=%p\n", tf);
+
+  return tf;
+}
+
+/* Always return a defined transformer, using effects in case a more precise analysis fails */
+transformer 
+safe_integer_expression_to_transformer(
+    entity v,
+    expression expr,
+    transformer pre,
+    bool is_internal) /* Do check wrt to value mappings... if you are
+			 not dealing with interprocedural issues */
+{
+  transformer tf = integer_expression_to_transformer(v, expr, pre, is_internal);
+
+  if(transformer_undefined_p(tf))
+    tf = expression_effects_to_transformer(expr);
 
   return tf;
 }
@@ -2342,6 +2364,35 @@ transformer transformer_add_any_relation_information(
   return pre;
 }
 
+/* A set of functions to compute the transformer associated to an
+   expression evaluated in a given context.
+
+   The choices are:
+
+   1. Do I need the value of the expression? It seems strange but in
+   some cases, the expression value is discarded. See ofr instance the C for construct.
+
+   Keyword: "any" implies that the expression value is needed
+
+   2. In case of failure, do I need an approximate transformer based
+   on memory effects or an undefined transformer because I want to try
+   something else?
+
+   Keyword: "safe" implies that effects are used and that no undefined
+   transformer is returned.
+
+   3. In case of interprocedural call, am I ready to fail? This might
+   be useful for the libraries "control" and "effects", but is not
+   implemented yet.
+
+   Suggested keyword: "light"
+
+   4. Conditional expressions require specific treatment because the
+   boolean analysis is not well linked to the integer analysis and
+   because C uses implicit conditions: if(n) means if(n!=0).
+
+   5. Expression lists are a special case of expression.
+ */
 
 /* This function may return an undefined transformers if it fails to
    capture the semantics of expr in the polyhedral framework. */
