@@ -2341,11 +2341,18 @@ bool simplify_C_expression(expression e)
 	if(type_variable_p(rt)) {
 	  basic rb = variable_basic(type_variable(rt));
 
+	  if(basic_overloaded_p(rb)) {
+	    rb = basic_of_expression(e);
+	  }
+	  else 
+	    rb = copy_basic(rb);
+
 	  /* FI: I guess, typedef equivalent to those could also be declared substituable */
 	  can_be_substituted_p =
 	    basic_int_p(rb)
 	    || basic_float_p(rb) 
 	    || basic_complex_p(rb); /* Should not occur in C */
+	  free_basic(rb);
 	}
 	else {
 	  can_be_substituted_p = FALSE;

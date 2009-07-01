@@ -434,7 +434,10 @@ list module_to_all_declarations(entity m)
     statement s = (statement) db_get_memory_resource(DBR_PARSED_CODE, module_name, TRUE);
     list sdl = statement_to_declarations(s);
 
-    dl = gen_nconc(dl, sdl);
+    FOREACH(ENTITY, e, sdl) {
+      if(!entity_is_argument_p(e, dl))
+	dl = gen_nconc(dl, CONS(ENTITY, e, NIL));
+    }
   }
 
   return dl;
