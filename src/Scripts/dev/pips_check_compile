@@ -23,6 +23,10 @@
 
 # checks that pips does compile.
 
+# TODO
+# - nice ?
+# - lock working copy ?
+
 prod=${1:-.}
 dest=${2:-coelho@cri.ensmp.fr}
 
