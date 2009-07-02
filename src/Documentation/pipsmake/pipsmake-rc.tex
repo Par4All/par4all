@@ -6539,8 +6539,8 @@ EOLE_OPTIMIZATION_STRATEGY "P2SC"
 \index{INLINING\_CALLERS}
 
 %%@UserManualDocumentation: inlining
-Inlining is a well known technique.  Basically it replaces a function
-call by the function body.  Current implementation does not work if
+Inlining is a well known technique.  Basically, it replaces a function
+call by the function body. The current implementation does not work if
 the function has static declarations, access global variables \dots.
 Actually it (seems to) work(s) for pure, non-recursive functions \dots
 and not for any kind of call. 
@@ -6561,7 +6561,7 @@ inlining      > CALLERS.parsed_code
 \end{PipsMake}
 
 %%@UserManualDocumentation: inlining_simple
-Same as inlining but always simulate the by copy passing
+Same as inlining but always simulate the by-copy argument passing
 %%!UserManualDocumentation
 \begin{PipsMake}
 inlining_simple      > CALLERS.parsed_code
@@ -6587,8 +6587,10 @@ INLINING_PURGE_LABELS TRUE
 \label{subsection-unfolding}
 
 %%@UserManualDocumentation: unfolding
-Unfolding is a complementary transformation of inlining~\ref{subsection-inlining}.
-While inlining inlines all calls to a module in other modules, unfolding inline all calls in a module, thus unfolding the content of the module.
+Unfolding is a complementary transformation of
+inlining~\ref{subsection-inlining}.  While inlining inlines all calls to a
+module in other modules, unfolding inlines all calls in a module, thus
+unfolding the content of the module.
 %%!UserManualDocumentation
 \begin{PipsMake}
 
@@ -6599,8 +6601,9 @@ unfolding      > MODULE.parsed_code
         < MODULE.cumulated_effects
         < CALLERS.code
 \end{PipsMake}
+
 %%@UserManualDocumentation: unfolding_simple
-same as unfolding but always simulate the by copy passing
+Same as unfolding but always simulates the by-copy argument passing
 %%!UserManualDocumentation
 \begin{PipsMake}
 
@@ -6633,7 +6636,7 @@ UNFOLDING_FILTER ""
 This documentation is a work in progress, as well as the documented topic.
 
 
-Outlining is the oppositie transformation of inlining~\ref{subsection-inlining}.
+Outlining is the opposite transformation of inlining~\ref{subsection-inlining}.
 It creates a new module based on some statements from an existing module.
 The new module body is similar to the piece of code outlined from the existing modules.
 The old statements are replaced by a call to the new module.
