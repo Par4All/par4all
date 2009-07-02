@@ -1410,12 +1410,10 @@ static list load_statement_effects(statement st)
     case is_instruction_test: 
     case is_instruction_loop: 
     case is_instruction_whileloop:
+    case is_instruction_forloop:
     case is_instruction_unstructured:
 	le = load_proper_rw_effects_list(st);
 	break ;
-    case is_instruction_forloop:
-      pips_internal_error("not implemented for C for loops\nconsider setting FOR_TO_DO_LOOP_IN_CONTROLIZER to TRUE\n", t ) ;
-      break;
     case is_instruction_goto: 
 	pips_internal_error( "Go to statement in CODE data structure %d\n", t ) ;
       break;
