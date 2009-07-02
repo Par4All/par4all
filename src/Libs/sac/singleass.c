@@ -332,16 +332,14 @@ bool single_assignment(char * mod_name)
 
     set_current_module_statement(mod_stmt);
     set_current_module_entity(module_name_to_entity(mod_name));
-	set_ordering_to_statement(mod_stmt);
+    /* Construct the ordering-to-statement mapping so that we can use the
+       dependence graph: */
+    set_ordering_to_statement(mod_stmt);
 
     set_proper_rw_effects((statement_effects)
             db_get_memory_resource(DBR_PROPER_EFFECTS, mod_name, TRUE));
 
     debug_on("SINGLE_ASSIGNMENT_DEBUG_LEVEL");
-
-    /* Construct the ordering-to-statement mapping so that we can use the
-       dependence graph: */
-    set_ordering_to_statement(mod_stmt);
 
     /* Now do the job */
     single_assign_statement(dg);
