@@ -179,6 +179,15 @@ $(ARCH)/%.o: %.f; $(F77CMP) `pwd`/$< -o $@
 %.c: %.m4c;	$(M4FLT) $(M4COPT) $< > $@
 %.h: %.m4h;	$(M4FLT) $(M4HOPT) $< > $@
 
+# To debug weird macro behaviour, add "file+cpp" target to build a file
+# that is preprocessed by the C preprocessor. For example "make blah.c+cpp"
+# builds a preprocessed version of blah.c.
+#
+# Options specific to gcc: keep macro definitions in the file too, keep
+# comments, display the list of include files.
+%+cpp: %
+	$(PREPROC) -dD -CC -H $< > $@
+
 
 # A rule to debug Makefile forwarding used by forward.mk.
 # Do not warn downwards:
