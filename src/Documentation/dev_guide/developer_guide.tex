@@ -902,11 +902,6 @@ If you need some specific rules or targets, you have to write some
 makefile whith named ending with the \texttt{.mk} extension: they will be
 included in the global \texttt{Makefile}.
 
-By default, PIPS \texttt{make} does not stop on error but reports them on
-standard error output. But if you want to have \texttt{make} stopping on
-the first error to help debugging, just add \verb|FWD_STOP_ON_ERROR=1| to
-the \texttt{make} invocation.
-
 The rationale for relying on GNU make rather than make is that in the
 previous situation the software was relying heavily on SUN make special
 features, thus was highly not portable. Now it is more portable, say as
@@ -1029,6 +1024,26 @@ include $(ROOT)/makes/main.mk
   \label{fig:config_makefile}
 \end{figure}
 
+
+\subsection{Debugging}
+\label{sec:debugging}
+
+By default, PIPS \texttt{make} does not stop on error but reports them on
+standard error output. But if you want to have \texttt{make} stopping on
+the first error to help debugging, just add \verb|FWD_STOP_ON_ERROR=1| to
+the \texttt{make} invocation.
+
+PIPS use a lot of macro processing to ease the programmer life but in some
+case, it may be difficult what happens in some weird situation. To help
+the programmer, there is a special \texttt{+cpp} target to build a
+CPP-preprocessed version of a file. For example
+\begin{verbatim}
+make ricedg.c+cpp
+\end{verbatim}
+make a preprocessed version of the file \texttt{ricedg.c}. To help
+debugging, gcc-specific options are added to have the macro definitions at
+the beginning of the file too, to keep the comments and display the list
+of included files.
 
 
 \section{Validation}
