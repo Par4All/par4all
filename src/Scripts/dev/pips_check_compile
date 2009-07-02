@@ -35,11 +35,14 @@ function report()
 {
   local current=$1 msg=$2 previous='unknown' repos status
 
-  # log report...
-  echo "$(date): $current ($SECONDS seconds)" >> LOG
+  # log report anyway...
+  echo "$(date): $current ($SECONDS seconds) $msg" >> LOG
 
-  test -f STATE && read previous < STATE
+  # no compilation
+  [ $current = 'skip' ] && exit 0
+
   # no change, no report
+  test -f STATE && read previous < STATE
   [ "$previous" -a "$current" = "$previous" ] && exit 0
 
   if [ $current -eq 0 ]
@@ -121,5 +124,7 @@ then
   # clean up
   rm -f out err
   report 0 "pips is fine"
-# ELSE no updates
+else
+  # no updates
+  report skip "no commit since last check"
 fi
