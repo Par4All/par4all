@@ -105,7 +105,7 @@ rm -f out err
 
 svn up > out 2> err || report 3 "cannot 'svn up'"
 
-touch CURRENT
+[ -f CURRENT ] || touch CURRENT
 mv CURRENT PREVIOUS
 {
   echo pips: $(svnversion pips)
