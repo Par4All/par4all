@@ -877,9 +877,18 @@ some_basic_of_any_expression(expression exp, bool apply_p, bool ultimate_p)
   case is_syntax_cast: 
     {
       type t = cast_type(syntax_cast(sy));
-      if (type_tag(t) != is_type_variable)
-	pips_internal_error("Bad reference type tag %d\n",type_tag(t));
-      b = copy_basic(variable_basic(type_variable(t)));
+
+      if (type_tag(t) != is_type_variable) {
+	if(type_void_p(t))
+	  /* This happens with the assert macro... but could happen
+	     anywhere as in (void) printf(...); */
+	  /* FI: I cannot think of anything better... */
+	  b = basic_undefined;
+	else
+	  pips_internal_error("Bad reference type tag %d\n",type_tag(t));
+      }
+      else
+	b = copy_basic(variable_basic(type_variable(t)));
       break;
     }
   case is_syntax_sizeofexpression: 
@@ -906,6 +915,26 @@ some_basic_of_any_expression(expression exp, bool apply_p, bool ultimate_p)
   case is_syntax_application:
     {
       b = basic_of_any_expression(application_function(syntax_application(sy)), TRUE);
+      break;
+    }
+  case is_syntax_va_arg:
+    {
+      /* the second argument is the type of the returned object */
+      sizeofexpression sofe = SIZEOFEXPRESSION(CAR(CDR(syntax_va_arg(sy))));
+
+      if(sizeofexpression_type_p(sofe)) {
+	type t = ultimate_type(sizeofexpression_type(sofe));
+
+	if(type_variable_p(t))
+	  b = copy_basic(variable_basic(type_variable(t)));
+	else
+	  pips_internal_error("Not implemented\n");
+      }
+      else {
+	expression e = sizeofexpression_expression(sofe);
+	b = basic_of_any_expression(e, TRUE);
+	pips_internal_error("expression not expected here\n");
+      }
       break;
     }
   default:
@@ -1129,6 +1158,14 @@ basic_of_intrinsic(call c, bool apply_p, bool ultimate_p)
       /* The value returned is the value of the last expression in the list. */
       free_basic(rb);
       rb = basic_of_expression(EXPRESSION(CAR(gen_last(args))));
+    }
+    else if(ENTITY_CONDITIONAL_P(f)) {
+      /* The value returned is the value of the first expression in
+	 the list after the condition. The second expression is
+	 assumed to have the same value because the code is assumed
+	 correct. */
+      free_basic(rb);
+      rb = basic_of_expression(EXPRESSION(CAR(CDR(args))));
     }
     else {
       free_basic(rb);

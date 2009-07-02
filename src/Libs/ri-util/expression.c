@@ -2335,24 +2335,31 @@ bool simplify_C_expression(expression e)
 	//pips_assert("The function type is functional", type_functional_p(entity_type(f)));
 
 	MAP(EXPRESSION, se, {
-	  (void) simplify_C_expression(se);
-	}, call_arguments(c));
+	    (void) simplify_C_expression(se);
+	  }, call_arguments(c));
 
 	if(type_variable_p(rt)) {
 	  basic rb = variable_basic(type_variable(rt));
 
 	  if(basic_overloaded_p(rb)) {
+	    /* a void expression such as (void) 0 results in an undefined basic. */
 	    rb = basic_of_expression(e);
 	  }
 	  else 
 	    rb = copy_basic(rb);
 
-	  /* FI: I guess, typedef equivalent to those could also be declared substituable */
-	  can_be_substituted_p =
-	    basic_int_p(rb)
-	    || basic_float_p(rb) 
-	    || basic_complex_p(rb); /* Should not occur in C */
-	  free_basic(rb);
+	  if(!basic_undefined_p(rb)) {
+	    /* FI: I guess, typedef equivalent to those could also be declared substituable */
+	    can_be_substituted_p =
+	      basic_int_p(rb)
+	      || basic_float_p(rb) 
+	      || basic_complex_p(rb); /* Should not occur in C */
+	    free_basic(rb);
+	  }
+	  else {
+	    /* e must be a void expression, i.e. an expression returning no value */
+	    can_be_substituted_p = FALSE;
+	  }
 	}
 	else {
 	  can_be_substituted_p = FALSE;
