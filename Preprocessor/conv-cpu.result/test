@@ -171,9 +171,27 @@
 /* If none of the ANSI/POSIX macros are defined, use POSIX.1 and POSIX.2
    (and IEEE Std 1003.1b-1993 unless _XOPEN_SOURCE is defined).  */
 # 295 "/usr/include/features.h" 3 4
+/* Define __STDC_IEC_559__ and other similar macros.  */
+/* Copyright (C) 2005 Free Software Foundation, Inc.
+   This file is part of the GNU C Library.
+
+   The GNU C Library is free software; you can redistribute it and/or
+   modify it under the terms of the GNU Lesser General Public
+   License as published by the Free Software Foundation; either
+   version 2.1 of the License, or (at your option) any later version.
+
+   The GNU C Library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   Lesser General Public License for more details.
+
+   You should have received a copy of the GNU Lesser General Public
+   License along with the GNU C Library; if not, write to the Free
+   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+   02111-1307 USA.  */
+# 26 "/usr/include/bits/predefs.h" 3 4
 /* We do support the IEC 559 math functionality, real and complex.  */
-
-
+# 297 "/usr/include/features.h" 2 3 4
 
 /* wchar_t uses ISO 10646-1 (2nd ed., published 2000-09-15) / Unicode 3.1.  */
 
@@ -411,7 +429,7 @@
 
 /* Determine the wordsize from the preprocessor defines.  */
 # 349 "/usr/include/sys/cdefs.h" 2 3 4
-# 331 "/usr/include/features.h" 2 3 4
+# 330 "/usr/include/features.h" 2 3 4
 
 
 /* If we don't have __REDIRECT, prototypes will be missing if
@@ -424,6 +442,14 @@
 
 
 /* Decide whether we can define 'extern inline' functions in headers.  */
+
+
+
+
+
+
+/* There are some functions that must be declared 'extern inline' even with
+   -Os when building LIBC, or they'll end up undefined.  */
 
 
 
@@ -449,7 +475,7 @@
    in the C library which is a stub, meaning it will fail
    every time called, usually setting errno to ENOSYS.  */
 # 10 "/usr/include/gnu/stubs.h" 2 3 4
-# 355 "/usr/include/features.h" 2 3 4
+# 362 "/usr/include/features.h" 2 3 4
 # 26 "/usr/include/stdlib.h" 2 3 4
 
 /* Get size_t, wchar_t and NULL from <stddef.h>.  */
@@ -1216,7 +1242,7 @@ typedef unsigned long int u_int64_t;
 typedef int register_t;
 # 216 "/usr/include/sys/types.h" 3 4
 /* In BSD <sys/types.h> is expected to define BYTE_ORDER.  */
-/* Copyright (C) 1992, 1996, 1997, 2000 Free Software Foundation, Inc.
+/* Copyright (C) 1992, 1996, 1997, 2000, 2008 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -1274,6 +1300,42 @@ typedef int register_t;
 
 /* Some machines may need to use a different endianness for floating point
    values.  */
+# 60 "/usr/include/endian.h" 3 4
+/* Conversion interfaces.  */
+/* Macros to swap the order of bytes in integer values.
+   Copyright (C) 1997, 1998, 2000, 2002, 2003, 2007, 2008
+   Free Software Foundation, Inc.
+   This file is part of the GNU C Library.
+
+   The GNU C Library is free software; you can redistribute it and/or
+   modify it under the terms of the GNU Lesser General Public
+   License as published by the Free Software Foundation; either
+   version 2.1 of the License, or (at your option) any later version.
+
+   The GNU C Library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   Lesser General Public License for more details.
+
+   You should have received a copy of the GNU Lesser General Public
+   License along with the GNU C Library; if not, write to the Free
+   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+   02111-1307 USA.  */
+# 28 "/usr/include/bits/byteswap.h" 3 4
+/* Determine the wordsize from the preprocessor defines.  */
+# 29 "/usr/include/bits/byteswap.h" 2 3 4
+
+/* Swap bytes in 16 bit value.  */
+# 47 "/usr/include/bits/byteswap.h" 3 4
+/* This is better than nothing.  */
+
+
+
+
+
+
+/* Swap bytes in 32 bit value.  */
+# 62 "/usr/include/endian.h" 2 3 4
 # 218 "/usr/include/sys/types.h" 2 3 4
 
 /* It also defines `fd_set' and the FD_* macros for `select'.  */
@@ -2300,12 +2362,7 @@ extern char *realpath (const char * __name,
 
 
 typedef int (*__compar_fn_t) (const void *, const void *);
-
-
-
-
-
-
+# 680 "/usr/include/stdlib.h" 3 4
 
 /* Do a binary search for KEY in BASE, which consists of NMEMB elements
    of SIZE bytes each, using COMPAR to perform the comparisons.  */
@@ -2317,6 +2374,11 @@ extern void *bsearch (const void *__key, const void *__base,
    using COMPAR to perform the comparisons.  */
 extern void qsort (void *__base, size_t __nmemb, size_t __size,
      __compar_fn_t __compar) ;
+
+
+
+
+
 
 
 /* Return the absolute value of X.  */
@@ -2339,7 +2401,7 @@ extern div_t div (int __numer, int __denom)
 extern ldiv_t ldiv (long int __numer, long int __denom)
      ;
 
-# 721 "/usr/include/stdlib.h" 3 4
+# 729 "/usr/include/stdlib.h" 3 4
 /* Convert floating point numbers to strings.  The returned values are
    valid only until another call to the same function.  */
 
@@ -2424,13 +2486,13 @@ extern size_t wcstombs (char * __s,
    in the program's current locale.  Returns 1 if affirmative, 0 if
    negative, and -1 if not matching.  */
 extern int rpmatch (const char *__response) ;
-# 828 "/usr/include/stdlib.h" 3 4
+# 836 "/usr/include/stdlib.h" 3 4
 /* X/Open pseudo terminal handling.  */
 
 
 /* Return a master pseudo-terminal handle.  */
 extern int posix_openpt (int __oflag) ;
-# 864 "/usr/include/stdlib.h" 3 4
+# 872 "/usr/include/stdlib.h" 3 4
 /* Put the 1 minute, 5 minute and 15 minute load averages into the first
    NELEM elements of LOADAVG.  Return the number written (never more than
    three, but may be less than NELEM), or -1 if an error occurred.  */
@@ -2440,9 +2502,9 @@ extern int getloadavg (double __loadavg[], int __nelem)
 
 
 /* Define some macros helping to catch buffer overflows.  */
-# 883 "/usr/include/stdlib.h" 3 4
+# 891 "/usr/include/stdlib.h" 3 4
 
-# 10 "$VDIR/conv-cpu.c" 2
+# 10 "./conv-cpu.c" 2
 
 
 /*
@@ -2707,9 +2769,27 @@ int main(int argc, char* argv[])
 /* If none of the ANSI/POSIX macros are defined, use POSIX.1 and POSIX.2
    (and IEEE Std 1003.1b-1993 unless _XOPEN_SOURCE is defined).  */
 # 295 "/usr/include/features.h" 3 4
+/* Define __STDC_IEC_559__ and other similar macros.  */
+/* Copyright (C) 2005 Free Software Foundation, Inc.
+   This file is part of the GNU C Library.
+
+   The GNU C Library is free software; you can redistribute it and/or
+   modify it under the terms of the GNU Lesser General Public
+   License as published by the Free Software Foundation; either
+   version 2.1 of the License, or (at your option) any later version.
+
+   The GNU C Library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   Lesser General Public License for more details.
+
+   You should have received a copy of the GNU Lesser General Public
+   License along with the GNU C Library; if not, write to the Free
+   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+   02111-1307 USA.  */
+# 26 "/usr/include/bits/predefs.h" 3 4
 /* We do support the IEC 559 math functionality, real and complex.  */
-
-
+# 297 "/usr/include/features.h" 2 3 4
 
 /* wchar_t uses ISO 10646-1 (2nd ed., published 2000-09-15) / Unicode 3.1.  */
 
@@ -2947,7 +3027,7 @@ int main(int argc, char* argv[])
 
 /* Determine the wordsize from the preprocessor defines.  */
 # 349 "/usr/include/sys/cdefs.h" 2 3 4
-# 331 "/usr/include/features.h" 2 3 4
+# 330 "/usr/include/features.h" 2 3 4
 
 
 /* If we don't have __REDIRECT, prototypes will be missing if
@@ -2960,6 +3040,14 @@ int main(int argc, char* argv[])
 
 
 /* Decide whether we can define 'extern inline' functions in headers.  */
+
+
+
+
+
+
+/* There are some functions that must be declared 'extern inline' even with
+   -Os when building LIBC, or they'll end up undefined.  */
 
 
 
@@ -2985,7 +3073,7 @@ int main(int argc, char* argv[])
    in the C library which is a stub, meaning it will fail
    every time called, usually setting errno to ENOSYS.  */
 # 10 "/usr/include/gnu/stubs.h" 2 3 4
-# 355 "/usr/include/features.h" 2 3 4
+# 362 "/usr/include/features.h" 2 3 4
 # 26 "/usr/include/stdlib.h" 2 3 4
 
 /* Get size_t, wchar_t and NULL from <stddef.h>.  */
@@ -3752,7 +3840,7 @@ typedef unsigned long int u_int64_t;
 typedef int register_t;
 # 216 "/usr/include/sys/types.h" 3 4
 /* In BSD <sys/types.h> is expected to define BYTE_ORDER.  */
-/* Copyright (C) 1992, 1996, 1997, 2000 Free Software Foundation, Inc.
+/* Copyright (C) 1992, 1996, 1997, 2000, 2008 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -3810,6 +3898,42 @@ typedef int register_t;
 
 /* Some machines may need to use a different endianness for floating point
    values.  */
+# 60 "/usr/include/endian.h" 3 4
+/* Conversion interfaces.  */
+/* Macros to swap the order of bytes in integer values.
+   Copyright (C) 1997, 1998, 2000, 2002, 2003, 2007, 2008
+   Free Software Foundation, Inc.
+   This file is part of the GNU C Library.
+
+   The GNU C Library is free software; you can redistribute it and/or
+   modify it under the terms of the GNU Lesser General Public
+   License as published by the Free Software Foundation; either
+   version 2.1 of the License, or (at your option) any later version.
+
+   The GNU C Library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   Lesser General Public License for more details.
+
+   You should have received a copy of the GNU Lesser General Public
+   License along with the GNU C Library; if not, write to the Free
+   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+   02111-1307 USA.  */
+# 28 "/usr/include/bits/byteswap.h" 3 4
+/* Determine the wordsize from the preprocessor defines.  */
+# 29 "/usr/include/bits/byteswap.h" 2 3 4
+
+/* Swap bytes in 16 bit value.  */
+# 47 "/usr/include/bits/byteswap.h" 3 4
+/* This is better than nothing.  */
+
+
+
+
+
+
+/* Swap bytes in 32 bit value.  */
+# 62 "/usr/include/endian.h" 2 3 4
 # 218 "/usr/include/sys/types.h" 2 3 4
 
 /* It also defines `fd_set' and the FD_* macros for `select'.  */
@@ -4836,12 +4960,7 @@ extern char *realpath (const char * __name,
 
 
 typedef int (*__compar_fn_t) (const void *, const void *);
-
-
-
-
-
-
+# 680 "/usr/include/stdlib.h" 3 4
 
 /* Do a binary search for KEY in BASE, which consists of NMEMB elements
    of SIZE bytes each, using COMPAR to perform the comparisons.  */
@@ -4853,6 +4972,11 @@ extern void *bsearch (const void *__key, const void *__base,
    using COMPAR to perform the comparisons.  */
 extern void qsort (void *__base, size_t __nmemb, size_t __size,
      __compar_fn_t __compar) ;
+
+
+
+
+
 
 
 /* Return the absolute value of X.  */
@@ -4875,7 +4999,7 @@ extern div_t div (int __numer, int __denom)
 extern ldiv_t ldiv (long int __numer, long int __denom)
      ;
 
-# 721 "/usr/include/stdlib.h" 3 4
+# 729 "/usr/include/stdlib.h" 3 4
 /* Convert floating point numbers to strings.  The returned values are
    valid only until another call to the same function.  */
 
@@ -4960,13 +5084,13 @@ extern size_t wcstombs (char * __s,
    in the program's current locale.  Returns 1 if affirmative, 0 if
    negative, and -1 if not matching.  */
 extern int rpmatch (const char *__response) ;
-# 828 "/usr/include/stdlib.h" 3 4
+# 836 "/usr/include/stdlib.h" 3 4
 /* X/Open pseudo terminal handling.  */
 
 
 /* Return a master pseudo-terminal handle.  */
 extern int posix_openpt (int __oflag) ;
-# 864 "/usr/include/stdlib.h" 3 4
+# 872 "/usr/include/stdlib.h" 3 4
 /* Put the 1 minute, 5 minute and 15 minute load averages into the first
    NELEM elements of LOADAVG.  Return the number written (never more than
    three, but may be less than NELEM), or -1 if an error occurred.  */
@@ -4976,9 +5100,9 @@ extern int getloadavg (double __loadavg[], int __nelem)
 
 
 /* Define some macros helping to catch buffer overflows.  */
-# 883 "/usr/include/stdlib.h" 3 4
+# 891 "/usr/include/stdlib.h" 3 4
 
-# 10 "$VDIR/conv-cpu.c" 2
+# 10 "./conv-cpu.c" 2
 
 
 /*

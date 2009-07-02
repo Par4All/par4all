@@ -166,9 +166,27 @@
 /* If none of the ANSI/POSIX macros are defined, use POSIX.1 and POSIX.2
    (and IEEE Std 1003.1b-1993 unless _XOPEN_SOURCE is defined).  */
 # 295 "/usr/include/features.h" 3 4
+/* Define __STDC_IEC_559__ and other similar macros.  */
+/* Copyright (C) 2005 Free Software Foundation, Inc.
+   This file is part of the GNU C Library.
+
+   The GNU C Library is free software; you can redistribute it and/or
+   modify it under the terms of the GNU Lesser General Public
+   License as published by the Free Software Foundation; either
+   version 2.1 of the License, or (at your option) any later version.
+
+   The GNU C Library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   Lesser General Public License for more details.
+
+   You should have received a copy of the GNU Lesser General Public
+   License along with the GNU C Library; if not, write to the Free
+   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+   02111-1307 USA.  */
+# 26 "/usr/include/bits/predefs.h" 3 4
 /* We do support the IEC 559 math functionality, real and complex.  */
-
-
+# 297 "/usr/include/features.h" 2 3 4
 
 /* wchar_t uses ISO 10646-1 (2nd ed., published 2000-09-15) / Unicode 3.1.  */
 
@@ -406,7 +424,7 @@
 
 /* Determine the wordsize from the preprocessor defines.  */
 # 349 "/usr/include/sys/cdefs.h" 2 3 4
-# 331 "/usr/include/features.h" 2 3 4
+# 330 "/usr/include/features.h" 2 3 4
 
 
 /* If we don't have __REDIRECT, prototypes will be missing if
@@ -419,6 +437,14 @@
 
 
 /* Decide whether we can define 'extern inline' functions in headers.  */
+
+
+
+
+
+
+/* There are some functions that must be declared 'extern inline' even with
+   -Os when building LIBC, or they'll end up undefined.  */
 
 
 
@@ -444,7 +470,7 @@
    in the C library which is a stub, meaning it will fail
    every time called, usually setting errno to ENOSYS.  */
 # 10 "/usr/include/gnu/stubs.h" 2 3 4
-# 355 "/usr/include/features.h" 2 3 4
+# 362 "/usr/include/features.h" 2 3 4
 # 29 "/usr/include/stdio.h" 2 3 4
 
 
@@ -1796,7 +1822,7 @@ extern void funlockfile (FILE *__stream) ;
    several optimizing inline functions and macros.  */
 # 912 "/usr/include/stdio.h" 3 4
 
-# 2 "$VDIR/vik1.c" 2
+# 2 "./vik1.c" 2
 /* Copyright (C) 1991-1994,1996-2002,2003,2005,2006
 	Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -2392,10 +2418,10 @@ extern int futimes (int __fd, const struct timeval __tvp[2]) ;
    NOTE: `timercmp' does not work for >= or <=.  */
 # 191 "/usr/include/sys/time.h" 3 4
 
-# 3 "$VDIR/vik1.c" 2
+# 3 "./vik1.c" 2
 /* $XdotOrg: lib/X11/include/X11/Xlib.h,v 1.6 2005-11-08 06:33:25 jkj Exp $ */
 /* $Xorg: Xlib.h,v 1.6 2001/02/09 02:03:38 xorgcvs Exp $ */
-/* 
+/*
 
 Copyright 1985, 1986, 1987, 1991, 1998  The Open Group
 
@@ -2788,7 +2814,7 @@ typedef unsigned long int u_int64_t;
 typedef int register_t;
 # 216 "/usr/include/sys/types.h" 3 4
 /* In BSD <sys/types.h> is expected to define BYTE_ORDER.  */
-/* Copyright (C) 1992, 1996, 1997, 2000 Free Software Foundation, Inc.
+/* Copyright (C) 1992, 1996, 1997, 2000, 2008 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -2846,6 +2872,42 @@ typedef int register_t;
 
 /* Some machines may need to use a different endianness for floating point
    values.  */
+# 60 "/usr/include/endian.h" 3 4
+/* Conversion interfaces.  */
+/* Macros to swap the order of bytes in integer values.
+   Copyright (C) 1997, 1998, 2000, 2002, 2003, 2007, 2008
+   Free Software Foundation, Inc.
+   This file is part of the GNU C Library.
+
+   The GNU C Library is free software; you can redistribute it and/or
+   modify it under the terms of the GNU Lesser General Public
+   License as published by the Free Software Foundation; either
+   version 2.1 of the License, or (at your option) any later version.
+
+   The GNU C Library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   Lesser General Public License for more details.
+
+   You should have received a copy of the GNU Lesser General Public
+   License along with the GNU C Library; if not, write to the Free
+   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+   02111-1307 USA.  */
+# 28 "/usr/include/bits/byteswap.h" 3 4
+/* Determine the wordsize from the preprocessor defines.  */
+# 29 "/usr/include/bits/byteswap.h" 2 3 4
+
+/* Swap bytes in 16 bit value.  */
+# 47 "/usr/include/bits/byteswap.h" 3 4
+/* This is better than nothing.  */
+
+
+
+
+
+
+/* Swap bytes in 32 bit value.  */
+# 62 "/usr/include/endian.h" 2 3 4
 # 218 "/usr/include/sys/types.h" 2 3 4
 
 /* It also defines `fd_set' and the FD_* macros for `select'.  */
@@ -3219,17 +3281,17 @@ typedef unsigned char KeyCode;
 /* Event names.  Used in "type" field in XEvent structures.  Not to be
 confused with event masks above.  They start from 2 because 0 and 1
 are reserved in the protocol for errors and replies. */
-# 222 "/usr/include/X11/X.h" 3 4
+# 223 "/usr/include/X11/X.h" 3 4
 /* Key masks. Used as modifiers to GrabButton and GrabKey, results of QueryPointer,
    state in various key-, mouse-, and button-related events. */
-# 234 "/usr/include/X11/X.h" 3 4
+# 235 "/usr/include/X11/X.h" 3 4
 /* modifier names.  Used to build a SetModifierMapping request or
    to read a GetModifierMapping request.  These correspond to the
    masks defined above. */
-# 247 "/usr/include/X11/X.h" 3 4
+# 248 "/usr/include/X11/X.h" 3 4
 /* button masks.  Used in same manner as Key masks above. Not to be confused
    with button names below. */
-# 259 "/usr/include/X11/X.h" 3 4
+# 260 "/usr/include/X11/X.h" 3 4
 /* button names. Used as arguments to GrabButton and as detail in ButtonPress
    and ButtonRelease events.  Not to be confused with button masks above.
    Note that 0 is already defined above as "AnyButton".  */
@@ -3241,9 +3303,9 @@ are reserved in the protocol for errors and replies. */
 
 
 /* Notify modes */
-# 278 "/usr/include/X11/X.h" 3 4
+# 279 "/usr/include/X11/X.h" 3 4
 /* Notify detail */
-# 289 "/usr/include/X11/X.h" 3 4
+# 290 "/usr/include/X11/X.h" 3 4
 /* Visibility notify */
 
 
@@ -3289,7 +3351,7 @@ are reserved in the protocol for errors and replies. */
 
 
 /* AllowEvents modes */
-# 344 "/usr/include/X11/X.h" 3 4
+# 345 "/usr/include/X11/X.h" 3 4
 /* Used in SetInputFocus, GetInputFocus */
 
 
@@ -3299,7 +3361,7 @@ are reserved in the protocol for errors and replies. */
 /*****************************************************************
  * ERROR CODES 
  *****************************************************************/
-# 384 "/usr/include/X11/X.h" 3 4
+# 385 "/usr/include/X11/X.h" 3 4
 /*****************************************************************
  * WINDOW DEFINITIONS 
  *****************************************************************/
@@ -3311,11 +3373,11 @@ are reserved in the protocol for errors and replies. */
 
 
 /* Window attributes for CreateWindow and ChangeWindowAttributes */
-# 412 "/usr/include/X11/X.h" 3 4
+# 413 "/usr/include/X11/X.h" 3 4
 /* ConfigureWindow structure */
-# 423 "/usr/include/X11/X.h" 3 4
+# 424 "/usr/include/X11/X.h" 3 4
 /* Bit Gravity */
-# 437 "/usr/include/X11/X.h" 3 4
+# 438 "/usr/include/X11/X.h" 3 4
 /* Window gravity + bit gravity above */
 
 
@@ -3367,7 +3429,7 @@ are reserved in the protocol for errors and replies. */
  *****************************************************************/
 
 /* graphics functions, as in GC.alu */
-# 506 "/usr/include/X11/X.h" 3 4
+# 507 "/usr/include/X11/X.h" 3 4
 /* LineStyle */
 
 
@@ -3429,7 +3491,7 @@ are reserved in the protocol for errors and replies. */
 
 /* GC components: masks used in CreateGC, CopyGC, ChangeGC, OR'ed into
    GC.stateChanges */
-# 593 "/usr/include/X11/X.h" 3 4
+# 594 "/usr/include/X11/X.h" 3 4
 /*****************************************************************
  * FONTS 
  *****************************************************************/
@@ -3480,13 +3542,13 @@ are reserved in the protocol for errors and replies. */
 /***************************************************************** 
  * KEYBOARD/POINTER STUFF
  *****************************************************************/
-# 651 "/usr/include/X11/X.h" 3 4
+# 652 "/usr/include/X11/X.h" 3 4
 /* masks for ChangeKeyboardControl */
-# 670 "/usr/include/X11/X.h" 3 4
+# 671 "/usr/include/X11/X.h" 3 4
 /*****************************************************************
  * SCREEN SAVER STUFF 
  *****************************************************************/
-# 685 "/usr/include/X11/X.h" 3 4
+# 686 "/usr/include/X11/X.h" 3 4
 /* for ForceScreenSaver */
 
 
@@ -3509,7 +3571,7 @@ are reserved in the protocol for errors and replies. */
 /* Display classes  used in opening the connection 
  * Note that the statically allocated ones are even numbered and the
  * dynamically changeable ones are odd numbered */
-# 716 "/usr/include/X11/X.h" 3 4
+# 717 "/usr/include/X11/X.h" 3 4
 /* Byte order  used in imageByteOrder and bitmapBitOrder */
 # 61 "/usr/include/X11/Xlib.h" 2 3 4
 
@@ -3790,10 +3852,10 @@ typedef struct {
  unsigned long background;/* background pixel */
  int line_width; /* line width */
  int line_style; /* LineSolid, LineOnOffDash, LineDoubleDash */
- int cap_style; /* CapNotLast, CapButt, 
+ int cap_style; /* CapNotLast, CapButt,
 				   CapRound, CapProjecting */
  int join_style; /* JoinMiter, JoinRound, JoinBevel */
- int fill_style; /* FillSolid, FillTiled, 
+ int fill_style; /* FillSolid, FillTiled,
 				   FillStippled, FillOpaeueStippled */
  int fill_rule; /* EvenOddRule, WindingRule */
  int arc_mode; /* ArcChord, ArcPieSlice */
@@ -3998,7 +4060,7 @@ typedef struct _XImage {
  } f;
 } XImage;
 
-/* 
+/*
  * Data structure for XReconfigureWindow
  */
 typedef struct {
@@ -4019,7 +4081,7 @@ typedef struct {
  char pad;
 } XColor;
 
-/* 
+/*
  * Data structures for graphics operations.  On most machines, these are
  * congruent with the wire protocol structures, so reformatting the data
  * can be avoided on these architectures.
@@ -4226,7 +4288,7 @@ typedef struct {
  int mode; /* NotifyNormal, NotifyGrab, NotifyUngrab */
  int detail;
  /*
-	 * NotifyAncestor, NotifyVirtual, NotifyInferior, 
+	 * NotifyAncestor, NotifyVirtual, NotifyInferior,
 	 * NotifyNonlinear,NotifyNonlinearVirtual
 	 */
  int same_screen; /* same screen flag */
@@ -4246,9 +4308,9 @@ typedef struct {
 				   NotifyGrab, NotifyUngrab */
  int detail;
  /*
-	 * NotifyAncestor, NotifyVirtual, NotifyInferior, 
+	 * NotifyAncestor, NotifyVirtual, NotifyInferior,
 	 * NotifyNonlinear,NotifyNonlinearVirtual, NotifyPointer,
-	 * NotifyPointerRoot, NotifyDetailNone 
+	 * NotifyPointerRoot, NotifyDetailNone
 	 */
 } XFocusChangeEvent;
 typedef XFocusChangeEvent XFocusInEvent;
@@ -4544,6 +4606,22 @@ typedef struct {
  Window window; /* window on which event was requested in event mask */
 } XAnyEvent;
 
+
+/***************************************************************
+ *
+ * GenericEvent.  This event is the standard event for all newer extensions.
+ */
+
+typedef struct
+    {
+    int type; /* of event. Always GenericEvent */
+    unsigned long serial; /* # of last request processed */
+    int send_event; /* true if from SendEvent request */
+    Display *display; /* Display the event was read from */
+    int extension; /* major opcode of extension that caused the event */
+    int evtype; /* actual event type. */
+    } XGenericEvent;
+
 /*
  * this union is defined so Xlib can always use the same sized
  * event structure internally, to avoid memory fragmentation.
@@ -4687,7 +4765,7 @@ typedef struct {
     int delta;
     XFontSet font_set;
 } XwcTextItem;
-# 1129 "/usr/include/X11/Xlib.h" 3 4
+# 1145 "/usr/include/X11/Xlib.h" 3 4
 typedef struct {
     int charset_count;
     char **charset_list;
@@ -4739,7 +4817,7 @@ typedef struct {
     unsigned short count_styles;
     XIMStyle *supported_styles;
 } XIMStyles;
-# 1241 "/usr/include/X11/Xlib.h" 3 4
+# 1257 "/usr/include/X11/Xlib.h" 3 4
 typedef void *XVaNestedList;
 
 typedef struct {
@@ -4753,7 +4831,7 @@ typedef struct {
 } XICCallback;
 
 typedef unsigned long XIMFeedback;
-# 1265 "/usr/include/X11/Xlib.h" 3 4
+# 1281 "/usr/include/X11/Xlib.h" 3 4
 typedef struct _XIMText {
     unsigned short length;
     XIMFeedback *feedback;
@@ -4780,7 +4858,7 @@ typedef unsigned long XIMResetState;
 
 
 typedef unsigned long XIMStringConversionFeedback;
-# 1299 "/usr/include/X11/Xlib.h" 3 4
+# 1315 "/usr/include/X11/Xlib.h" 3 4
 typedef struct _XIMStringConversionText {
     unsigned short length;
     XIMStringConversionFeedback *feedback;
@@ -4970,7 +5048,7 @@ extern XImage *XGetSubImage(
     int /* dest_y */
 );
 
-/* 
+/*
  * X function declarations.
  */
 extern Display *XOpenDisplay(
@@ -7494,7 +7572,7 @@ extern int _Xwctomb(
 );
 
 
-# 4 "$VDIR/vik1.c" 2
+# 4 "./vik1.c" 2
 /* $Xorg: keysym.h,v 1.4 2001/02/09 02:03:23 xorgcvs Exp $ */
 
 /***********************************************************
@@ -7605,7 +7683,7 @@ SOFTWARE.
  * engraving) of a keyboard layout. This file assigns mnemonic macro
  * names for these keysyms.
  *
- * This file is also compiled (by xc/lib/X11/util/makekeys.c) into
+ * This file is also compiled (by src/util/makekeys.c in libX11) into
  * hash tables that can be accessed with X11 library functions such as
  * XStringToKeysym() and XKeysymToString().
  *
@@ -7642,17 +7720,26 @@ SOFTWARE.
  *    /^\#define XK_([a-zA-Z_0-9]+)\s+0x([0-9a-f]+)\s*\/\*\(U+([0-9A-F]{4,6}) (.*)\)\*\/\s*$/
  *    /^\#define XK_([a-zA-Z_0-9]+)\s+0x([0-9a-f]+)\s*(\/\*\s*(.*)\s*\*\/)?\s*$/
  *
- * When adding new keysyms to this file, do not forget to also update the
- * mappings in xc/lib/X11/KeyBind.c and the protocol specification in
- * xc/doc/specs/XProtocol/X11.keysyms.
- */
-
-/*
- * Now that the Xorg code base is managed in Git repositories, the KeyBind.c
- * and X11.keysyms files mentioned in the last comment block are located at:
+ * Before adding new keysyms, please do consider the following: In
+ * addition to the keysym names defined in this file, the
+ * XStringToKeysym() and XKeysymToString() functions will also handle
+ * any keysym string of the form "U0020" to "U007E" and "U00A0" to
+ * "U10FFFF" for all possible Unicode characters. In other words,
+ * every possible Unicode character has already a keysym string
+ * defined algorithmically, even if it is not listed here. Therefore,
+ * defining an additional keysym macro is only necessary where a
+ * non-hexadecimal mnemonic name is needed, or where the new keysym
+ * does not represent any existing Unicode character.
  *
- * src/KeyBind.c in the repo git://anongit.freedesktop.org/xorg/lib/libX11
- * specs/XProtocol/X11.keysyms in the repo git://anongit.freedesktop.org/xorg/doc/xorg-docs
+ * When adding new keysyms to this file, do not forget to also update the
+ * following:
+ *
+ *   - the mappings in src/KeyBind.c in the repo
+ *     git://anongit.freedesktop.org/xorg/lib/libX11
+ *
+ *   - the protocol specification in specs/XProtocol/X11.keysyms
+ *     in the repo git://anongit.freedesktop.org/xorg/doc/xorg-docs
+ *
  */
 
 
@@ -7663,7 +7750,7 @@ SOFTWARE.
  * programming, but could have been arbitrary (at the cost of lookup
  * tables in client code).
  */
-# 131 "/usr/include/X11/keysymdef.h" 3 4
+# 140 "/usr/include/X11/keysymdef.h" 3 4
 /* International & multi-key character composition */
 
 
@@ -7673,60 +7760,62 @@ SOFTWARE.
 
 
 /* Japanese keyboard support */
-# 162 "/usr/include/X11/keysymdef.h" 3 4
+# 171 "/usr/include/X11/keysymdef.h" 3 4
 /* 0xff31 thru 0xff3f are under XK_KOREAN */
 
 /* Cursor control & motion */
-# 179 "/usr/include/X11/keysymdef.h" 3 4
+# 188 "/usr/include/X11/keysymdef.h" 3 4
 /* Misc functions */
-# 196 "/usr/include/X11/keysymdef.h" 3 4
+# 205 "/usr/include/X11/keysymdef.h" 3 4
 /* Keypad functions, keypad numbers cleverly chosen to map to ASCII */
-# 239 "/usr/include/X11/keysymdef.h" 3 4
+# 248 "/usr/include/X11/keysymdef.h" 3 4
 /*
  * Auxiliary functions; note the duplicate definitions for left and right
  * function keys;  Sun keyboards and a few other manufacturers have such
  * function key groups on the left and/or right sides of the keyboard.
  * We've not found a keyboard with more than 35 function keys total.
  */
-# 307 "/usr/include/X11/keysymdef.h" 3 4
+# 316 "/usr/include/X11/keysymdef.h" 3 4
 /* Modifiers */
-# 326 "/usr/include/X11/keysymdef.h" 3 4
+# 335 "/usr/include/X11/keysymdef.h" 3 4
 /*
  * Keyboard (XKB) Extension function and modifier keys
  * (from Appendix C of "The X Keyboard Extension: Protocol Specification")
  * Byte 3 = 0xfe
  */
-# 452 "/usr/include/X11/keysymdef.h" 3 4
+# 420 "/usr/include/X11/keysymdef.h" 3 4
+/* dead vowels for universal syllable entry */
+# 486 "/usr/include/X11/keysymdef.h" 3 4
 /*
  * 3270 Terminal Keys
  * Byte 3 = 0xfd
  */
-# 490 "/usr/include/X11/keysymdef.h" 3 4
+# 524 "/usr/include/X11/keysymdef.h" 3 4
 /*
  * Latin 1
  * (ISO/IEC 8859-1 = Unicode U+0020..U+00FF)
  * Byte 3 = 0
  */
-# 696 "/usr/include/X11/keysymdef.h" 3 4
+# 730 "/usr/include/X11/keysymdef.h" 3 4
 /*
  * Latin 2
  * Byte 3 = 1
  */
-# 761 "/usr/include/X11/keysymdef.h" 3 4
+# 795 "/usr/include/X11/keysymdef.h" 3 4
 /*
  * Latin 3
  * Byte 3 = 2
  */
-# 792 "/usr/include/X11/keysymdef.h" 3 4
+# 826 "/usr/include/X11/keysymdef.h" 3 4
 /*
  * Latin 4
  * Byte 3 = 3
  */
-# 836 "/usr/include/X11/keysymdef.h" 3 4
+# 870 "/usr/include/X11/keysymdef.h" 3 4
 /*
  * Latin 8
  */
-# 868 "/usr/include/X11/keysymdef.h" 3 4
+# 902 "/usr/include/X11/keysymdef.h" 3 4
 /*
  * Latin 9
  * Byte 3 = 0x13
@@ -7742,70 +7831,70 @@ SOFTWARE.
  * Katakana
  * Byte 3 = 4
  */
-# 957 "/usr/include/X11/keysymdef.h" 3 4
+# 991 "/usr/include/X11/keysymdef.h" 3 4
 /*
  * Arabic
  * Byte 3 = 5
  */
-# 1056 "/usr/include/X11/keysymdef.h" 3 4
+# 1090 "/usr/include/X11/keysymdef.h" 3 4
 /*
  * Cyrillic
  * Byte 3 = 6
  */
-# 1204 "/usr/include/X11/keysymdef.h" 3 4
+# 1238 "/usr/include/X11/keysymdef.h" 3 4
 /*
  * Greek
  * (based on an early draft of, and not quite identical to, ISO/IEC 8859-7)
  * Byte 3 = 7
  */
-# 1288 "/usr/include/X11/keysymdef.h" 3 4
+# 1322 "/usr/include/X11/keysymdef.h" 3 4
 /*
  * Technical
  * (from the DEC VT330/VT420 Technical Character Set, http://vt100.net/charsets/technical.html)
  * Byte 3 = 8
  */
-# 1346 "/usr/include/X11/keysymdef.h" 3 4
+# 1380 "/usr/include/X11/keysymdef.h" 3 4
 /*
  * Special
  * (from the DEC VT100 Special Graphics Character Set)
  * Byte 3 = 9
  */
-# 1379 "/usr/include/X11/keysymdef.h" 3 4
+# 1413 "/usr/include/X11/keysymdef.h" 3 4
 /*
  * Publishing
  * (these are probably from a long forgotten DEC Publishing
  * font that once shipped with DECwrite)
  * Byte 3 = 0x0a
  */
-# 1472 "/usr/include/X11/keysymdef.h" 3 4
+# 1506 "/usr/include/X11/keysymdef.h" 3 4
 /*
  * APL
  * Byte 3 = 0x0b
  */
-# 1499 "/usr/include/X11/keysymdef.h" 3 4
+# 1533 "/usr/include/X11/keysymdef.h" 3 4
 /*
  * Hebrew
  * Byte 3 = 0x0c
  */
-# 1547 "/usr/include/X11/keysymdef.h" 3 4
+# 1581 "/usr/include/X11/keysymdef.h" 3 4
 /*
  * Thai
  * Byte 3 = 0x0d
  */
-# 1639 "/usr/include/X11/keysymdef.h" 3 4
+# 1673 "/usr/include/X11/keysymdef.h" 3 4
 /*
  * Korean
  * Byte 3 = 0x0e
  */
-# 1663 "/usr/include/X11/keysymdef.h" 3 4
+# 1697 "/usr/include/X11/keysymdef.h" 3 4
 /* Hangul Consonant Characters */
-# 1695 "/usr/include/X11/keysymdef.h" 3 4
+# 1729 "/usr/include/X11/keysymdef.h" 3 4
 /* Hangul Vowel Characters */
-# 1718 "/usr/include/X11/keysymdef.h" 3 4
+# 1752 "/usr/include/X11/keysymdef.h" 3 4
 /* Hangul syllable-final (JongSeong) Characters */
-# 1747 "/usr/include/X11/keysymdef.h" 3 4
+# 1781 "/usr/include/X11/keysymdef.h" 3 4
 /* Ancient Hangul Consonant Characters */
-# 1756 "/usr/include/X11/keysymdef.h" 3 4
+# 1790 "/usr/include/X11/keysymdef.h" 3 4
 /* Ancient Hangul Vowel Characters */
 
 
@@ -7823,18 +7912,18 @@ SOFTWARE.
 /*
  * Armenian
  */
-# 1867 "/usr/include/X11/keysymdef.h" 3 4
+# 1901 "/usr/include/X11/keysymdef.h" 3 4
 /*
  * Georgian
  */
-# 1913 "/usr/include/X11/keysymdef.h" 3 4
+# 1947 "/usr/include/X11/keysymdef.h" 3 4
 /*
  * Azeri (and other Turkic or Caucasian languages)
  */
 
 
 /* latin */
-# 1933 "/usr/include/X11/keysymdef.h" 3 4
+# 1967 "/usr/include/X11/keysymdef.h" 3 4
 /* those are not really Caucasus */
 /* For Inupiak */
 
@@ -7844,10 +7933,10 @@ SOFTWARE.
 /*
  * Vietnamese
  */
-# 2056 "/usr/include/X11/keysymdef.h" 3 4
+# 2090 "/usr/include/X11/keysymdef.h" 3 4
 /* one, two and three are defined above. */
 # 76 "/usr/include/X11/keysym.h" 2 3 4
-# 5 "$VDIR/vik1.c" 2
+# 5 "./vik1.c" 2
 
 
                          Window L;
@@ -7882,7 +7971,7 @@ XCreatePixmap (K, L,e,d=D,((&((_XPrivDisplay)K)->screens[0])->root_depth)),u=h=q
 XPending (K)?C[F+
 XLookupKeysym (&O.xkey,0&
 XNextEvent (K,&O))]^=O.type==2||O.type==3,p:0;
-# 48 "$VDIR/vik1.c"
+# 48 "./vik1.c"
                             /* Some more code */
 
 
@@ -7921,7 +8010,7 @@ XCreatePixmap (K, L,e,d=D,((&((_XPrivDisplay)K)->screens[0])->root_depth)),u=h=q
 XPending (K)?C[F+
 XLookupKeysym (&O.xkey,0&
 XNextEvent (K,&O))]^=O.type==2||O.type==3,p:0;
-# 48 "$VDIR/vik1.c"
+# 48 "./vik1.c"
                             /* Some more code */
 
 
@@ -8105,9 +8194,27 @@ XNextEvent (K,&O))]^=O.type==2||O.type==3,p:0;
 /* If none of the ANSI/POSIX macros are defined, use POSIX.1 and POSIX.2
    (and IEEE Std 1003.1b-1993 unless _XOPEN_SOURCE is defined).  */
 # 295 "/usr/include/features.h" 3 4
+/* Define __STDC_IEC_559__ and other similar macros.  */
+/* Copyright (C) 2005 Free Software Foundation, Inc.
+   This file is part of the GNU C Library.
+
+   The GNU C Library is free software; you can redistribute it and/or
+   modify it under the terms of the GNU Lesser General Public
+   License as published by the Free Software Foundation; either
+   version 2.1 of the License, or (at your option) any later version.
+
+   The GNU C Library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   Lesser General Public License for more details.
+
+   You should have received a copy of the GNU Lesser General Public
+   License along with the GNU C Library; if not, write to the Free
+   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+   02111-1307 USA.  */
+# 26 "/usr/include/bits/predefs.h" 3 4
 /* We do support the IEC 559 math functionality, real and complex.  */
-
-
+# 297 "/usr/include/features.h" 2 3 4
 
 /* wchar_t uses ISO 10646-1 (2nd ed., published 2000-09-15) / Unicode 3.1.  */
 
@@ -8345,7 +8452,7 @@ XNextEvent (K,&O))]^=O.type==2||O.type==3,p:0;
 
 /* Determine the wordsize from the preprocessor defines.  */
 # 349 "/usr/include/sys/cdefs.h" 2 3 4
-# 331 "/usr/include/features.h" 2 3 4
+# 330 "/usr/include/features.h" 2 3 4
 
 
 /* If we don't have __REDIRECT, prototypes will be missing if
@@ -8358,6 +8465,14 @@ XNextEvent (K,&O))]^=O.type==2||O.type==3,p:0;
 
 
 /* Decide whether we can define 'extern inline' functions in headers.  */
+
+
+
+
+
+
+/* There are some functions that must be declared 'extern inline' even with
+   -Os when building LIBC, or they'll end up undefined.  */
 
 
 
@@ -8383,7 +8498,7 @@ XNextEvent (K,&O))]^=O.type==2||O.type==3,p:0;
    in the C library which is a stub, meaning it will fail
    every time called, usually setting errno to ENOSYS.  */
 # 10 "/usr/include/gnu/stubs.h" 2 3 4
-# 355 "/usr/include/features.h" 2 3 4
+# 362 "/usr/include/features.h" 2 3 4
 # 29 "/usr/include/stdio.h" 2 3 4
 
 
@@ -9735,7 +9850,7 @@ extern void funlockfile (FILE *__stream) ;
    several optimizing inline functions and macros.  */
 # 912 "/usr/include/stdio.h" 3 4
 
-# 2 "$VDIR/vik1.c" 2
+# 2 "./vik1.c" 2
 /* Copyright (C) 1991-1994,1996-2002,2003,2005,2006
 	Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -10331,10 +10446,10 @@ extern int futimes (int __fd, const struct timeval __tvp[2]) ;
    NOTE: `timercmp' does not work for >= or <=.  */
 # 191 "/usr/include/sys/time.h" 3 4
 
-# 3 "$VDIR/vik1.c" 2
+# 3 "./vik1.c" 2
 /* $XdotOrg: lib/X11/include/X11/Xlib.h,v 1.6 2005-11-08 06:33:25 jkj Exp $ */
 /* $Xorg: Xlib.h,v 1.6 2001/02/09 02:03:38 xorgcvs Exp $ */
-/* 
+/*
 
 Copyright 1985, 1986, 1987, 1991, 1998  The Open Group
 
@@ -10727,7 +10842,7 @@ typedef unsigned long int u_int64_t;
 typedef int register_t;
 # 216 "/usr/include/sys/types.h" 3 4
 /* In BSD <sys/types.h> is expected to define BYTE_ORDER.  */
-/* Copyright (C) 1992, 1996, 1997, 2000 Free Software Foundation, Inc.
+/* Copyright (C) 1992, 1996, 1997, 2000, 2008 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -10785,6 +10900,42 @@ typedef int register_t;
 
 /* Some machines may need to use a different endianness for floating point
    values.  */
+# 60 "/usr/include/endian.h" 3 4
+/* Conversion interfaces.  */
+/* Macros to swap the order of bytes in integer values.
+   Copyright (C) 1997, 1998, 2000, 2002, 2003, 2007, 2008
+   Free Software Foundation, Inc.
+   This file is part of the GNU C Library.
+
+   The GNU C Library is free software; you can redistribute it and/or
+   modify it under the terms of the GNU Lesser General Public
+   License as published by the Free Software Foundation; either
+   version 2.1 of the License, or (at your option) any later version.
+
+   The GNU C Library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   Lesser General Public License for more details.
+
+   You should have received a copy of the GNU Lesser General Public
+   License along with the GNU C Library; if not, write to the Free
+   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+   02111-1307 USA.  */
+# 28 "/usr/include/bits/byteswap.h" 3 4
+/* Determine the wordsize from the preprocessor defines.  */
+# 29 "/usr/include/bits/byteswap.h" 2 3 4
+
+/* Swap bytes in 16 bit value.  */
+# 47 "/usr/include/bits/byteswap.h" 3 4
+/* This is better than nothing.  */
+
+
+
+
+
+
+/* Swap bytes in 32 bit value.  */
+# 62 "/usr/include/endian.h" 2 3 4
 # 218 "/usr/include/sys/types.h" 2 3 4
 
 /* It also defines `fd_set' and the FD_* macros for `select'.  */
@@ -11158,17 +11309,17 @@ typedef unsigned char KeyCode;
 /* Event names.  Used in "type" field in XEvent structures.  Not to be
 confused with event masks above.  They start from 2 because 0 and 1
 are reserved in the protocol for errors and replies. */
-# 222 "/usr/include/X11/X.h" 3 4
+# 223 "/usr/include/X11/X.h" 3 4
 /* Key masks. Used as modifiers to GrabButton and GrabKey, results of QueryPointer,
    state in various key-, mouse-, and button-related events. */
-# 234 "/usr/include/X11/X.h" 3 4
+# 235 "/usr/include/X11/X.h" 3 4
 /* modifier names.  Used to build a SetModifierMapping request or
    to read a GetModifierMapping request.  These correspond to the
    masks defined above. */
-# 247 "/usr/include/X11/X.h" 3 4
+# 248 "/usr/include/X11/X.h" 3 4
 /* button masks.  Used in same manner as Key masks above. Not to be confused
    with button names below. */
-# 259 "/usr/include/X11/X.h" 3 4
+# 260 "/usr/include/X11/X.h" 3 4
 /* button names. Used as arguments to GrabButton and as detail in ButtonPress
    and ButtonRelease events.  Not to be confused with button masks above.
    Note that 0 is already defined above as "AnyButton".  */
@@ -11180,9 +11331,9 @@ are reserved in the protocol for errors and replies. */
 
 
 /* Notify modes */
-# 278 "/usr/include/X11/X.h" 3 4
+# 279 "/usr/include/X11/X.h" 3 4
 /* Notify detail */
-# 289 "/usr/include/X11/X.h" 3 4
+# 290 "/usr/include/X11/X.h" 3 4
 /* Visibility notify */
 
 
@@ -11228,7 +11379,7 @@ are reserved in the protocol for errors and replies. */
 
 
 /* AllowEvents modes */
-# 344 "/usr/include/X11/X.h" 3 4
+# 345 "/usr/include/X11/X.h" 3 4
 /* Used in SetInputFocus, GetInputFocus */
 
 
@@ -11238,7 +11389,7 @@ are reserved in the protocol for errors and replies. */
 /*****************************************************************
  * ERROR CODES 
  *****************************************************************/
-# 384 "/usr/include/X11/X.h" 3 4
+# 385 "/usr/include/X11/X.h" 3 4
 /*****************************************************************
  * WINDOW DEFINITIONS 
  *****************************************************************/
@@ -11250,11 +11401,11 @@ are reserved in the protocol for errors and replies. */
 
 
 /* Window attributes for CreateWindow and ChangeWindowAttributes */
-# 412 "/usr/include/X11/X.h" 3 4
+# 413 "/usr/include/X11/X.h" 3 4
 /* ConfigureWindow structure */
-# 423 "/usr/include/X11/X.h" 3 4
+# 424 "/usr/include/X11/X.h" 3 4
 /* Bit Gravity */
-# 437 "/usr/include/X11/X.h" 3 4
+# 438 "/usr/include/X11/X.h" 3 4
 /* Window gravity + bit gravity above */
 
 
@@ -11306,7 +11457,7 @@ are reserved in the protocol for errors and replies. */
  *****************************************************************/
 
 /* graphics functions, as in GC.alu */
-# 506 "/usr/include/X11/X.h" 3 4
+# 507 "/usr/include/X11/X.h" 3 4
 /* LineStyle */
 
 
@@ -11368,7 +11519,7 @@ are reserved in the protocol for errors and replies. */
 
 /* GC components: masks used in CreateGC, CopyGC, ChangeGC, OR'ed into
    GC.stateChanges */
-# 593 "/usr/include/X11/X.h" 3 4
+# 594 "/usr/include/X11/X.h" 3 4
 /*****************************************************************
  * FONTS 
  *****************************************************************/
@@ -11419,13 +11570,13 @@ are reserved in the protocol for errors and replies. */
 /***************************************************************** 
  * KEYBOARD/POINTER STUFF
  *****************************************************************/
-# 651 "/usr/include/X11/X.h" 3 4
+# 652 "/usr/include/X11/X.h" 3 4
 /* masks for ChangeKeyboardControl */
-# 670 "/usr/include/X11/X.h" 3 4
+# 671 "/usr/include/X11/X.h" 3 4
 /*****************************************************************
  * SCREEN SAVER STUFF 
  *****************************************************************/
-# 685 "/usr/include/X11/X.h" 3 4
+# 686 "/usr/include/X11/X.h" 3 4
 /* for ForceScreenSaver */
 
 
@@ -11448,7 +11599,7 @@ are reserved in the protocol for errors and replies. */
 /* Display classes  used in opening the connection 
  * Note that the statically allocated ones are even numbered and the
  * dynamically changeable ones are odd numbered */
-# 716 "/usr/include/X11/X.h" 3 4
+# 717 "/usr/include/X11/X.h" 3 4
 /* Byte order  used in imageByteOrder and bitmapBitOrder */
 # 61 "/usr/include/X11/Xlib.h" 2 3 4
 
@@ -11729,10 +11880,10 @@ typedef struct {
  unsigned long background;/* background pixel */
  int line_width; /* line width */
  int line_style; /* LineSolid, LineOnOffDash, LineDoubleDash */
- int cap_style; /* CapNotLast, CapButt, 
+ int cap_style; /* CapNotLast, CapButt,
 				   CapRound, CapProjecting */
  int join_style; /* JoinMiter, JoinRound, JoinBevel */
- int fill_style; /* FillSolid, FillTiled, 
+ int fill_style; /* FillSolid, FillTiled,
 				   FillStippled, FillOpaeueStippled */
  int fill_rule; /* EvenOddRule, WindingRule */
  int arc_mode; /* ArcChord, ArcPieSlice */
@@ -11937,7 +12088,7 @@ typedef struct _XImage {
  } f;
 } XImage;
 
-/* 
+/*
  * Data structure for XReconfigureWindow
  */
 typedef struct {
@@ -11958,7 +12109,7 @@ typedef struct {
  char pad;
 } XColor;
 
-/* 
+/*
  * Data structures for graphics operations.  On most machines, these are
  * congruent with the wire protocol structures, so reformatting the data
  * can be avoided on these architectures.
@@ -12165,7 +12316,7 @@ typedef struct {
  int mode; /* NotifyNormal, NotifyGrab, NotifyUngrab */
  int detail;
  /*
-	 * NotifyAncestor, NotifyVirtual, NotifyInferior, 
+	 * NotifyAncestor, NotifyVirtual, NotifyInferior,
 	 * NotifyNonlinear,NotifyNonlinearVirtual
 	 */
  int same_screen; /* same screen flag */
@@ -12185,9 +12336,9 @@ typedef struct {
 				   NotifyGrab, NotifyUngrab */
  int detail;
  /*
-	 * NotifyAncestor, NotifyVirtual, NotifyInferior, 
+	 * NotifyAncestor, NotifyVirtual, NotifyInferior,
 	 * NotifyNonlinear,NotifyNonlinearVirtual, NotifyPointer,
-	 * NotifyPointerRoot, NotifyDetailNone 
+	 * NotifyPointerRoot, NotifyDetailNone
 	 */
 } XFocusChangeEvent;
 typedef XFocusChangeEvent XFocusInEvent;
@@ -12483,6 +12634,22 @@ typedef struct {
  Window window; /* window on which event was requested in event mask */
 } XAnyEvent;
 
+
+/***************************************************************
+ *
+ * GenericEvent.  This event is the standard event for all newer extensions.
+ */
+
+typedef struct
+    {
+    int type; /* of event. Always GenericEvent */
+    unsigned long serial; /* # of last request processed */
+    int send_event; /* true if from SendEvent request */
+    Display *display; /* Display the event was read from */
+    int extension; /* major opcode of extension that caused the event */
+    int evtype; /* actual event type. */
+    } XGenericEvent;
+
 /*
  * this union is defined so Xlib can always use the same sized
  * event structure internally, to avoid memory fragmentation.
@@ -12626,7 +12793,7 @@ typedef struct {
     int delta;
     XFontSet font_set;
 } XwcTextItem;
-# 1129 "/usr/include/X11/Xlib.h" 3 4
+# 1145 "/usr/include/X11/Xlib.h" 3 4
 typedef struct {
     int charset_count;
     char **charset_list;
@@ -12678,7 +12845,7 @@ typedef struct {
     unsigned short count_styles;
     XIMStyle *supported_styles;
 } XIMStyles;
-# 1241 "/usr/include/X11/Xlib.h" 3 4
+# 1257 "/usr/include/X11/Xlib.h" 3 4
 typedef void *XVaNestedList;
 
 typedef struct {
@@ -12692,7 +12859,7 @@ typedef struct {
 } XICCallback;
 
 typedef unsigned long XIMFeedback;
-# 1265 "/usr/include/X11/Xlib.h" 3 4
+# 1281 "/usr/include/X11/Xlib.h" 3 4
 typedef struct _XIMText {
     unsigned short length;
     XIMFeedback *feedback;
@@ -12719,7 +12886,7 @@ typedef unsigned long XIMResetState;
 
 
 typedef unsigned long XIMStringConversionFeedback;
-# 1299 "/usr/include/X11/Xlib.h" 3 4
+# 1315 "/usr/include/X11/Xlib.h" 3 4
 typedef struct _XIMStringConversionText {
     unsigned short length;
     XIMStringConversionFeedback *feedback;
@@ -12909,7 +13076,7 @@ extern XImage *XGetSubImage(
     int /* dest_y */
 );
 
-/* 
+/*
  * X function declarations.
  */
 extern Display *XOpenDisplay(
@@ -15433,7 +15600,7 @@ extern int _Xwctomb(
 );
 
 
-# 4 "$VDIR/vik1.c" 2
+# 4 "./vik1.c" 2
 /* $Xorg: keysym.h,v 1.4 2001/02/09 02:03:23 xorgcvs Exp $ */
 
 /***********************************************************
@@ -15544,7 +15711,7 @@ SOFTWARE.
  * engraving) of a keyboard layout. This file assigns mnemonic macro
  * names for these keysyms.
  *
- * This file is also compiled (by xc/lib/X11/util/makekeys.c) into
+ * This file is also compiled (by src/util/makekeys.c in libX11) into
  * hash tables that can be accessed with X11 library functions such as
  * XStringToKeysym() and XKeysymToString().
  *
@@ -15581,17 +15748,26 @@ SOFTWARE.
  *    /^\#define XK_([a-zA-Z_0-9]+)\s+0x([0-9a-f]+)\s*\/\*\(U+([0-9A-F]{4,6}) (.*)\)\*\/\s*$/
  *    /^\#define XK_([a-zA-Z_0-9]+)\s+0x([0-9a-f]+)\s*(\/\*\s*(.*)\s*\*\/)?\s*$/
  *
- * When adding new keysyms to this file, do not forget to also update the
- * mappings in xc/lib/X11/KeyBind.c and the protocol specification in
- * xc/doc/specs/XProtocol/X11.keysyms.
- */
-
-/*
- * Now that the Xorg code base is managed in Git repositories, the KeyBind.c
- * and X11.keysyms files mentioned in the last comment block are located at:
+ * Before adding new keysyms, please do consider the following: In
+ * addition to the keysym names defined in this file, the
+ * XStringToKeysym() and XKeysymToString() functions will also handle
+ * any keysym string of the form "U0020" to "U007E" and "U00A0" to
+ * "U10FFFF" for all possible Unicode characters. In other words,
+ * every possible Unicode character has already a keysym string
+ * defined algorithmically, even if it is not listed here. Therefore,
+ * defining an additional keysym macro is only necessary where a
+ * non-hexadecimal mnemonic name is needed, or where the new keysym
+ * does not represent any existing Unicode character.
  *
- * src/KeyBind.c in the repo git://anongit.freedesktop.org/xorg/lib/libX11
- * specs/XProtocol/X11.keysyms in the repo git://anongit.freedesktop.org/xorg/doc/xorg-docs
+ * When adding new keysyms to this file, do not forget to also update the
+ * following:
+ *
+ *   - the mappings in src/KeyBind.c in the repo
+ *     git://anongit.freedesktop.org/xorg/lib/libX11
+ *
+ *   - the protocol specification in specs/XProtocol/X11.keysyms
+ *     in the repo git://anongit.freedesktop.org/xorg/doc/xorg-docs
+ *
  */
 
 
@@ -15602,7 +15778,7 @@ SOFTWARE.
  * programming, but could have been arbitrary (at the cost of lookup
  * tables in client code).
  */
-# 131 "/usr/include/X11/keysymdef.h" 3 4
+# 140 "/usr/include/X11/keysymdef.h" 3 4
 /* International & multi-key character composition */
 
 
@@ -15612,60 +15788,62 @@ SOFTWARE.
 
 
 /* Japanese keyboard support */
-# 162 "/usr/include/X11/keysymdef.h" 3 4
+# 171 "/usr/include/X11/keysymdef.h" 3 4
 /* 0xff31 thru 0xff3f are under XK_KOREAN */
 
 /* Cursor control & motion */
-# 179 "/usr/include/X11/keysymdef.h" 3 4
+# 188 "/usr/include/X11/keysymdef.h" 3 4
 /* Misc functions */
-# 196 "/usr/include/X11/keysymdef.h" 3 4
+# 205 "/usr/include/X11/keysymdef.h" 3 4
 /* Keypad functions, keypad numbers cleverly chosen to map to ASCII */
-# 239 "/usr/include/X11/keysymdef.h" 3 4
+# 248 "/usr/include/X11/keysymdef.h" 3 4
 /*
  * Auxiliary functions; note the duplicate definitions for left and right
  * function keys;  Sun keyboards and a few other manufacturers have such
  * function key groups on the left and/or right sides of the keyboard.
  * We've not found a keyboard with more than 35 function keys total.
  */
-# 307 "/usr/include/X11/keysymdef.h" 3 4
+# 316 "/usr/include/X11/keysymdef.h" 3 4
 /* Modifiers */
-# 326 "/usr/include/X11/keysymdef.h" 3 4
+# 335 "/usr/include/X11/keysymdef.h" 3 4
 /*
  * Keyboard (XKB) Extension function and modifier keys
  * (from Appendix C of "The X Keyboard Extension: Protocol Specification")
  * Byte 3 = 0xfe
  */
-# 452 "/usr/include/X11/keysymdef.h" 3 4
+# 420 "/usr/include/X11/keysymdef.h" 3 4
+/* dead vowels for universal syllable entry */
+# 486 "/usr/include/X11/keysymdef.h" 3 4
 /*
  * 3270 Terminal Keys
  * Byte 3 = 0xfd
  */
-# 490 "/usr/include/X11/keysymdef.h" 3 4
+# 524 "/usr/include/X11/keysymdef.h" 3 4
 /*
  * Latin 1
  * (ISO/IEC 8859-1 = Unicode U+0020..U+00FF)
  * Byte 3 = 0
  */
-# 696 "/usr/include/X11/keysymdef.h" 3 4
+# 730 "/usr/include/X11/keysymdef.h" 3 4
 /*
  * Latin 2
  * Byte 3 = 1
  */
-# 761 "/usr/include/X11/keysymdef.h" 3 4
+# 795 "/usr/include/X11/keysymdef.h" 3 4
 /*
  * Latin 3
  * Byte 3 = 2
  */
-# 792 "/usr/include/X11/keysymdef.h" 3 4
+# 826 "/usr/include/X11/keysymdef.h" 3 4
 /*
  * Latin 4
  * Byte 3 = 3
  */
-# 836 "/usr/include/X11/keysymdef.h" 3 4
+# 870 "/usr/include/X11/keysymdef.h" 3 4
 /*
  * Latin 8
  */
-# 868 "/usr/include/X11/keysymdef.h" 3 4
+# 902 "/usr/include/X11/keysymdef.h" 3 4
 /*
  * Latin 9
  * Byte 3 = 0x13
@@ -15681,70 +15859,70 @@ SOFTWARE.
  * Katakana
  * Byte 3 = 4
  */
-# 957 "/usr/include/X11/keysymdef.h" 3 4
+# 991 "/usr/include/X11/keysymdef.h" 3 4
 /*
  * Arabic
  * Byte 3 = 5
  */
-# 1056 "/usr/include/X11/keysymdef.h" 3 4
+# 1090 "/usr/include/X11/keysymdef.h" 3 4
 /*
  * Cyrillic
  * Byte 3 = 6
  */
-# 1204 "/usr/include/X11/keysymdef.h" 3 4
+# 1238 "/usr/include/X11/keysymdef.h" 3 4
 /*
  * Greek
  * (based on an early draft of, and not quite identical to, ISO/IEC 8859-7)
  * Byte 3 = 7
  */
-# 1288 "/usr/include/X11/keysymdef.h" 3 4
+# 1322 "/usr/include/X11/keysymdef.h" 3 4
 /*
  * Technical
  * (from the DEC VT330/VT420 Technical Character Set, http://vt100.net/charsets/technical.html)
  * Byte 3 = 8
  */
-# 1346 "/usr/include/X11/keysymdef.h" 3 4
+# 1380 "/usr/include/X11/keysymdef.h" 3 4
 /*
  * Special
  * (from the DEC VT100 Special Graphics Character Set)
  * Byte 3 = 9
  */
-# 1379 "/usr/include/X11/keysymdef.h" 3 4
+# 1413 "/usr/include/X11/keysymdef.h" 3 4
 /*
  * Publishing
  * (these are probably from a long forgotten DEC Publishing
  * font that once shipped with DECwrite)
  * Byte 3 = 0x0a
  */
-# 1472 "/usr/include/X11/keysymdef.h" 3 4
+# 1506 "/usr/include/X11/keysymdef.h" 3 4
 /*
  * APL
  * Byte 3 = 0x0b
  */
-# 1499 "/usr/include/X11/keysymdef.h" 3 4
+# 1533 "/usr/include/X11/keysymdef.h" 3 4
 /*
  * Hebrew
  * Byte 3 = 0x0c
  */
-# 1547 "/usr/include/X11/keysymdef.h" 3 4
+# 1581 "/usr/include/X11/keysymdef.h" 3 4
 /*
  * Thai
  * Byte 3 = 0x0d
  */
-# 1639 "/usr/include/X11/keysymdef.h" 3 4
+# 1673 "/usr/include/X11/keysymdef.h" 3 4
 /*
  * Korean
  * Byte 3 = 0x0e
  */
-# 1663 "/usr/include/X11/keysymdef.h" 3 4
+# 1697 "/usr/include/X11/keysymdef.h" 3 4
 /* Hangul Consonant Characters */
-# 1695 "/usr/include/X11/keysymdef.h" 3 4
+# 1729 "/usr/include/X11/keysymdef.h" 3 4
 /* Hangul Vowel Characters */
-# 1718 "/usr/include/X11/keysymdef.h" 3 4
+# 1752 "/usr/include/X11/keysymdef.h" 3 4
 /* Hangul syllable-final (JongSeong) Characters */
-# 1747 "/usr/include/X11/keysymdef.h" 3 4
+# 1781 "/usr/include/X11/keysymdef.h" 3 4
 /* Ancient Hangul Consonant Characters */
-# 1756 "/usr/include/X11/keysymdef.h" 3 4
+# 1790 "/usr/include/X11/keysymdef.h" 3 4
 /* Ancient Hangul Vowel Characters */
 
 
@@ -15762,18 +15940,18 @@ SOFTWARE.
 /*
  * Armenian
  */
-# 1867 "/usr/include/X11/keysymdef.h" 3 4
+# 1901 "/usr/include/X11/keysymdef.h" 3 4
 /*
  * Georgian
  */
-# 1913 "/usr/include/X11/keysymdef.h" 3 4
+# 1947 "/usr/include/X11/keysymdef.h" 3 4
 /*
  * Azeri (and other Turkic or Caucasian languages)
  */
 
 
 /* latin */
-# 1933 "/usr/include/X11/keysymdef.h" 3 4
+# 1967 "/usr/include/X11/keysymdef.h" 3 4
 /* those are not really Caucasus */
 /* For Inupiak */
 
@@ -15783,10 +15961,10 @@ SOFTWARE.
 /*
  * Vietnamese
  */
-# 2056 "/usr/include/X11/keysymdef.h" 3 4
+# 2090 "/usr/include/X11/keysymdef.h" 3 4
 /* one, two and three are defined above. */
 # 76 "/usr/include/X11/keysym.h" 2 3 4
-# 5 "$VDIR/vik1.c" 2
+# 5 "./vik1.c" 2
 
 
                          Window L;
