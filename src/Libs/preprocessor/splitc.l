@@ -257,12 +257,8 @@ universal-character-name ({escape}(u{hexdigit}{4}|U{hexdigit}{8}))
 
 %%
 
-("/*"([^*]|"*"[^/])*"*/")|("/"(\\\n)*"/"[^\n]*)	{
-	  /* Taken from the Flex manual A.4.3: can deal with both kind of
-	     comments, even // in multiline form... */
-                                /* Difficulties: stars contiguous to the opening
-                            or closing parts. */
-			  /* Bug FI: line feed are not counted! */
+("/*"([^*]|("*"+[^/*]))*"*"+"/")|("//"("\\\n"|[^\n])*"\n"?)	{
+	 // Bug in the Flex 2.5.35 manual A.4.3, "/***/" fails. :-(
 			  csplit_line_number += lf_count(yytext);
 			  user_line_number += lf_count(yytext);
 

@@ -382,13 +382,9 @@ universal-character-name ({escape}(u{hexdigit}{4}|U{hexdigit}{8}))
 
 %%
 
-"/*"([^\*]|(\*+[^\/\*]))*(\*)+"/"	{
+("/*"([^*]|("*"+[^/*]))*"*"+"/")|("//"("\\\n"|[^\n])*"\n"?)	{
                                 pips_debug(9,"Comment %s\n",yytext);
                                 C_line_number += character_occurences_in_string(yytext, '\n');
-                                update_C_comment(yytext);
-                        }
-"//"[^\n]*              {
-                                pips_debug(9,"Comment %s\n",yytext);
                                 update_C_comment(yytext);
                         }
 ^"#"[^\n]*              {
