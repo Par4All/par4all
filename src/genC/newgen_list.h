@@ -79,7 +79,6 @@ typedef struct cons {
 #define UNIQUE_NAME  UNIQUE_NAME_2 (iter_, __LINE__)
 
 
-#if __STDC_VERSION__ >= 199901L
 /* FOREACH, similar to MAP but more gdb/emacs/vim...
  * friendly since it remains line oriented.
  *
@@ -94,23 +93,6 @@ typedef struct cons {
   for( _fe_CASTER##_TYPE _fe_item;					\
        !ENDP(UNIQUE_NAME) && (_fe_item= _fe_CASTER(CAR(UNIQUE_NAME) ));	\
        POP(UNIQUE_NAME))
-#else
-/* FOREACH, similar to MAP but more gdb/emacs/vim...
- * friendly since it remains line oriented.
- *
- * FOREACH(T, v, l) generates a "v_list" variable, so this name cannot
- * be used in the same scope for another variable, and the same index
- * name cannot be used in another FOREACH in the same scope either.
- *
- * Older C standard...
- */
-#define FOREACH(_fe_CASTER, _fe_item, _fe_list)				\
-  list UNIQUE_NAME;							\
-  _fe_CASTER##_TYPE _fe_item;						\
-  for( UNIQUE_NAME= (_fe_list);						\
-       !ENDP(UNIQUE_NAME) && (_fe_item= _fe_CASTER(CAR(UNIQUE_NAME) ));	\
-       POP(UNIQUE_NAME))
-#endif
 
 
 /* Fonctions de list.c
