@@ -63,10 +63,13 @@ entity previouscompunit;
 */
 
 /* To keep track of the current dummy parameter naming. */
-static int current_dummy_parameter_number;
+/* A function can be redeclared and it is difficult to make a
+   difference between "void foo(int u, int u);", which not in the
+   standard, and "void foo(int u); void foo(int u); which is fine" */
+static int current_dummy_parameter_number=0;
 
 static void set_current_dummy_parameter_number(int n)
-{current_dummy_parameter_number=n;}
+{extern int c_lineno; current_dummy_parameter_number=n+c_lineno;}
 
 void reset_current_dummy_parameter_number()
 {current_dummy_parameter_number=0;}
@@ -701,6 +704,8 @@ entity FindEntityFromLocalNameAndPrefix(string name,string prefix)
   /* Is it a formal parameter not yet converted in the function frame? */
   if(entity_undefined_p(ent)) {
     extern string int_to_string(int);
+
+    /* Should we change the current dummy parameter number? */
     string sn = i2a(get_current_dummy_parameter_number());
 
     global_name = (concatenate(DUMMY_PARAMETER_PREFIX,sn,MODULE_SEP_STRING,
@@ -918,17 +923,25 @@ entity FindOrCreateCurrentEntity(string name,
 	    extern string int_to_string(int);
 
 	    if(typedef_entity_p(function)) {
-	      string sn = i2a((_int) function); // To get a unique identifier for each function typedef
+	      string sn =string_undefined;
+
+	      // To get a unique identifier for each function typedef
+	      set_current_dummy_parameter_number((_int) ft);
+	      sn = i2a(get_current_dummy_parameter_number());
 	      ent = find_or_create_entity(concatenate(DUMMY_PARAMETER_PREFIX,sn,
-							     MODULE_SEP_STRING,name,NULL));
+						      MODULE_SEP_STRING,name,NULL));
 	      free(sn);
 	    }
 	    else if(!type_undefined_p(ft) && type_variable_p(ft)
 		&& basic_pointer_p(variable_basic(type_variable(ft)))) {
-	      string sn = i2a((_int) ft); // To get a unique identifier for each function pointerdeclaration, dummy or not
+	      string sn = string_undefined;
+
+	      // To get a unique identifier for each function pointerdeclaration, dummy or not
 	      set_current_dummy_parameter_number((_int) ft);
+	      sn = i2a(get_current_dummy_parameter_number());
+
 	      ent = find_or_create_entity(concatenate(DUMMY_PARAMETER_PREFIX,sn,
-							     MODULE_SEP_STRING,name,NULL));
+						      MODULE_SEP_STRING,name,NULL));
 	      free(sn);
 	    }
 	    else {
@@ -936,10 +949,12 @@ entity FindOrCreateCurrentEntity(string name,
 	      // To get a unique identifier for each function (This
 	      // may not be sufficient as a function can be declared
 	      // any number of times with any parameter names)
-	      string sn = i2a((_int) function);
+	      string sn = string_undefined;
+
 	      set_current_dummy_parameter_number((_int) function);
+	      sn = i2a(get_current_dummy_parameter_number());
 	      ent = find_or_create_entity(concatenate(DUMMY_PARAMETER_PREFIX,sn,
-							     MODULE_SEP_STRING,name,NULL));
+						      MODULE_SEP_STRING,name,NULL));
 	      free(sn);
 	      /*
 	      if(top_level_entity_p(function))
@@ -1469,7 +1484,7 @@ void UseDummyArguments(entity f)
 	 (although it should not) */
       formal_function(pfs) = entity_undefined;
       /* Let's hope there are no other pointers towards dummy formal parameters */
-      free_entity(p);
+      //free_entity(p);
     }
     gen_free_list(formals);
   }
@@ -2074,7 +2089,7 @@ void CleanUpEntities(list le)
       /* Update entity in current entity list */
       CAR(ce).p = (gen_chunk *) ne;
 
-      free_entity(e);
+      //free_entity(e);
     }
   }
 }

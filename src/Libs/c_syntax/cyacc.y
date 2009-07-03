@@ -1578,12 +1578,15 @@ for_clause:
 declaration:                               /* ISO 6.7.*/
     decl_spec_list init_declarator_list TK_SEMICOLON
                         {
-			  pips_assert("Declaration list are not redundant", gen_once_p($2));
-			  pips_assert("Variable $1 has not been declared before", !gen_in_list_p($1, $2));
+			  list l1 = $1; // To ease debugging
+			  list l2 = $2;
+			  pips_assert("Declaration list are not redundant", gen_once_p(l2));
+			  /* this assertion is wrong: l1 should be an item, not a list */
+			  pips_assert("Variable $1 has not been declared before", !gen_in_list_p(l1, l2));
 			  UpdateEntities($2,ContextStack,FormalStack,FunctionStack,OffsetStack,is_external,TRUE);
 			  //stack_pop(ContextStack);
 			  PopContext();
-			  $$ = gen_nconc($1,$2);
+			  $$ = gen_nconc(l1,l2);
 			  /* Remove their type stacks */
 			  remove_entity_type_stacks($$);
 			  CleanUpEntities($$);
@@ -2300,7 +2303,14 @@ direct_decl: /* (* ISO 6.7.5 *) */
 			    stack_push((char *) entity_type(e),s);
 			    put_to_entity_type_stack_table(e,s);
 			  }
-			  else {
+			  else { 
+			    /* e has already been defined since a type
+			       stack is associated to it. At least, it
+			       the mapping from entity to type stack
+			       is well managed. Since entities are
+			       sometimes destroyed, a new entity might
+			       end up with the same memory address and
+			       hence the same type stack. */
 			    entity cm = get_current_module_entity();
 			    /* A function can be redeclared inside itself. see C_syntax/extern.c */
 			    if(cm!=e) {
@@ -2560,10 +2570,14 @@ pointer_opt:
 type_name: /* (* ISO 6.7.6 *) */
     decl_spec_list abstract_decl
                         {
-			  UpdateAbstractEntity($2,ContextStack);
-			  $$ = copy_type(entity_type($2));
-			  RemoveFromExterns($2);
-			  free_entity($2);
+			  entity e = $2;
+			  list el = CONS(ENTITY, e, NIL);
+			  UpdateAbstractEntity(e,ContextStack);
+			  $$ = copy_type(entity_type(e));
+			  RemoveFromExterns(e);
+			  remove_entity_type_stacks(el);
+			  gen_free_list(el);
+			  free_entity(e);
 			  //stack_pop(ContextStack);
 			  PopContext();
 			}
@@ -2587,24 +2601,25 @@ abstract_decl: /* (* ISO 6.7.6. *) */
 |   pointer
                         {
 			  string n = i2a(abstract_counter++);
-			  $$ = FindOrCreateCurrentEntity(strdup(concatenate(DUMMY_ABSTRACT_PREFIX,
-									    n,NULL)),
+			  entity e = FindOrCreateCurrentEntity(strdup(concatenate(DUMMY_ABSTRACT_PREFIX,
+										  n,NULL)),
 							 ContextStack,
 							 FormalStack,
 							 FunctionStack,
 							 is_external);
 			  free(n);
-			  UpdatePointerEntity($$,$1,NIL);
+			  UpdatePointerEntity(e,$1,NIL);
 			  /* Initialize the type stack and push the type of found/created entity to the stack.
-			     It can be undefined if the entity hasnot been parsed, or a given type which is
+			     It can be undefined if the entity has not been parsed, or a given type which is
 			     used later to check if the declarations are the same for one entity.
 			     This stack is put temporarily in the storage of the entity, not a global variable
 			     for each declarator to avoid being erased by recursion */
 			  stack s = stack_make(type_domain, 0, 0);
 			  //entity_storage($$) = (storage) s;
-			  stack_push((char *) entity_type($$),s);
-			  put_to_entity_type_stack_table($$, s);
+			  stack_push((char *) entity_type(e),s);
+			  put_to_entity_type_stack_table(e, s);
 			  /*entity_type($$) = type_undefined;*/
+			  $$ = e;
 			}
 ;
 
@@ -2653,7 +2668,7 @@ abs_direct_decl_opt:
                         { }
 |   /* empty */         {
                           string n = i2a(abstract_counter++);
-			  $$ = FindOrCreateCurrentEntity(strdup(concatenate(DUMMY_ABSTRACT_PREFIX,
+			  entity e = FindOrCreateCurrentEntity(strdup(concatenate(DUMMY_ABSTRACT_PREFIX,
 									    n,NULL)),
 							 ContextStack,FormalStack,
 							 FunctionStack,
@@ -2661,9 +2676,10 @@ abs_direct_decl_opt:
 			  free(n);
 			  stack s = stack_make(type_domain,0,0);
 			  //entity_storage($$) = (storage) s;
-			  stack_push((char *) entity_type($$),s);
-			  put_to_entity_type_stack_table($$, s);
-			  entity_type($$) = type_undefined;
+			  stack_push((char *) entity_type(e),s);
+			  put_to_entity_type_stack_table(e, s);
+			  entity_type(e) = type_undefined;
+			  $$ = e;
     }
 ;
 
