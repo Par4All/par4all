@@ -504,11 +504,10 @@ static transformer ordinary_summary_precondition(string module_name,
 
     reset_call_site_number();
 
-    MAP(STRING, caller_name, 
-    {
+    FOREACH(STRING, caller_name, callees_callees(callers)) {
       entity caller = module_name_to_entity(caller_name);
       t = update_precondition_with_call_site_preconditions(t, caller, callee);
-    }, callees_callees(callers));
+    }
 
     if (ENDP(callees_callees(callers)) && 
 	some_main_entity_p()) {

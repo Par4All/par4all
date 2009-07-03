@@ -368,16 +368,19 @@ transformer new_add_formal_to_actual_bindings(call c, transformer pre, entity ca
   entity f = call_function(c);
   list args = call_arguments(c);
 
-  pre = any_user_call_site_to_transformer(f, args, pre, NIL);
+  transformer tf = any_user_call_site_to_transformer(f, args, pre, NIL);
+  transformer new_pre = transformer_apply(tf, pre);
 
   ifdebug(6) {
-    pips_debug(6, "new pre=%p\n", pre);
-    dump_transformer(pre);
+    pips_debug(6, "new pre=%p\n", new_pre);
+    dump_transformer(new_pre);
     pips_debug(6, "end for call to %s from %s\n", module_local_name(f),
 	       module_local_name(caller));
   }
 
-  return pre;
+  free_transformer(tf);
+
+  return new_pre;
 }
 
 transformer
@@ -1345,7 +1348,7 @@ transformer update_precondition_with_call_site_preconditions(transformer t,
   /* summary effects for the callee */
   summary_effects_of_callee = load_summary_effects(callee);
 
-  pips_assert("update_precondition_with_call_site_preconditions",
+  pips_assert("callee is the current module",
 	      get_current_module_entity() == callee);
 
   reset_current_module_entity();
