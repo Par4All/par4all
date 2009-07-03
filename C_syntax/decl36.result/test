@@ -1,0 +1,14 @@
+
+PRINTED FILE for "decl36"
+
+void decl36(int i)
+{
+   i++;
+}
+
+PRINTED FILE for "decl36!"
+
+extern void decl36(int i);
+extern void decl36(int i);
+extern  main();
+extern void decl36(int i);

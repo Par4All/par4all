@@ -1,0 +1,13 @@
+
+PRINTED FILE for "decl37"
+
+void decl37()
+{
+   string a = (void *) 0;
+   string b;
+}
+
+PRINTED FILE for "decl37!"
+
+typedef char *string;
+extern void decl37();
