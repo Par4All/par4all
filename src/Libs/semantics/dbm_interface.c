@@ -926,7 +926,11 @@ bool module_name_to_preconditions(char *module_name)
     
     module_to_value_mappings( get_current_module_entity() );
 
-    /* set the list of global values */
+    /* set the list of global values. This is a bit too restrictive in
+       C as the formal arguments, even modified in the procedure body,
+       will not appear in the transformer_arguments. Should we add
+       missing formal arguments to this list? See for instance
+       "character01.c". */
     set_module_global_arguments(transformer_arguments(t_inter));
 
     /* debug_on(SEMANTICS_DEBUG_LEVEL); */
