@@ -36,7 +36,7 @@ function report()
   local current=$1 msg=$2 previous='unknown' repos status
 
   # log report anyway...
-  echo "$(date): $current ($SECONDS seconds) $msg" >> LOG
+  echo "$(date +%Y%m%d%H%M%S): $current ($SECONDS seconds) $msg" >> LOG
 
   # no compilation
   [ $current = 'skip' ] && exit 0
