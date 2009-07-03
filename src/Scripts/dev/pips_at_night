@@ -77,6 +77,9 @@ do
     -v|--validate) valids="$valids validation" ;;
     -av|--add-validation) valids="$valids $1" ; shift ;;
     --add-validation=*) valids="$valids ${opt#*=}" ;;
+    -wto|--with-timeout) vopt="$vopt -T 1000" ;;
+    -T|--timeout) vopt="$vopt -T $1" ; shift ;;
+    --timeout=*) vopt="$vopt -T ${opt#*=}" ;;
     # help
     -h|--help) err 'display help message' 0 ;;
     *) err "unexpected option '$opt'" 1 ;;
