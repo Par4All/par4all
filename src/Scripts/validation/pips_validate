@@ -56,6 +56,9 @@ keep_archive=
 # Where is stored the validation archives:
 archive_dir_basename=SUMMARY_Archive
 
+# Whether to run with some timeout
+timeout=''
+
 # fix collation (sort) order to default ASCII for all validations
 unset LANG LC_ALL LC_COLLATE
 export LC_ALL=C
@@ -94,6 +97,7 @@ function usage()
 	"  -a|--auto-result-create: create a .result directory if it does\n" \
 	"     not exist yet. Useful to create a new validation test,\n" \
 	"     followed by a manual accept\n" \
+        "  -T|--timeout seconds) timout for one file (default none)\n" \
 	"  validation directories (e.g. Semantics Regions ...)\n" \
 	"  or files (e.g. Semantics/w14.f ...)\n"
   fi
@@ -149,6 +153,8 @@ while [ "$1" ] ; do
       # archive to detect changes
       -d|--diff) display_diff=1; keep_archive=1 ;;
       -k|--archive) keep_archive=1 ;;
+      -T|--timeout) timeout="timeout $1" ; shift ;;
+      --timeout=*) timeout="timeout ${opt#*=}";;
       # error
       *) usage 1 "unexpected option: $opt"
   esac
@@ -156,6 +162,9 @@ done
 
 # use a full path name
 [[ $vdir == .* ]] && vdir=$PWD/$vdir
+
+# ignore timeout if not available
+type timeout > /dev/null 2>&1 || timeout=''
 
 # option checks
 [[ -d $vdir ]] || usage 3 "no validation directory: $vdir"
@@ -281,17 +290,17 @@ function validate_file()
     verb 3 "$prefix.test method"
     verb 4 "$full_name.test"
     # ??? what about using default_test substitution?!
-    $full_name.test 2> $out.err ; status=$?
+    $timeout $full_name.test 2> $out.err ; status=$?
 
   elif [[ -r $full_name.tpips ]] ; then
     verb 3 "$prefix.tpips method"
     verb 4 "$tpips $full_name.tpips"
-    $tpips $full_name.tpips 2> $out.err ; status=$?
+    $timeout $tpips $full_name.tpips 2> $out.err ; status=$?
 
   elif [[ -r $full_name.tpips2 ]] ; then
     verb 3 "$prefix.tpips2 method (with stderr... bad idea)"
     verb 4 "$tpips $full_name.tpips"
-    $tpips $full_name.tpips2 2>&1 ; status=$?
+    $timeout $tpips $full_name.tpips2 2>&1 ; status=$?
 
   elif [[ -r $dir/default_test ]] ; then
     verb 3 'default_test method'
@@ -300,24 +309,24 @@ function validate_file()
 	-e "s/tested_dir/${dir//\//\\/}/g" \
 	-e "s/tested_name/$name/g" \
 	-e "s/TESTED_NAME/$upper/g" \
-	< $dir/default_test | /bin/sh 2> $out.err
+	< $dir/default_test | $timout /bin/sh 2> $out.err
     status=$?
 
   elif [[ -r $dir/default_tpips ]] ; then
     verb 3 'default_tpips method'
     verb 4 "FILE=$file WSPACE=$name ${tpips} $dir/default_tpips"
     FILE=$file WSPACE=$name \
-	${tpips} $dir/default_tpips 2> $out.err ; status=$?
+	$timeout ${tpips} $dir/default_tpips 2> $out.err ; status=$?
 
   else
     verb 3 'default method: Init/Display/Delete'
     {
-      Delete $name 2> /dev/null 1>&2 # ignore delete failure...
-      Init -f $file -d $name ; status=$?
+      $timeout Delete $name 2> /dev/null 1>&2 # ignore delete failure...
+      $timeout Init -f $file -d $name ; status=$?
       while read module ; do
 	Display -m $module -w $name ; status=$?
       done < $name.database/modules
-      Delete $name 2> /dev/null 1>&2 # ignore delete failure...
+      $timeout Delete $name 2> /dev/null 1>&2 # ignore delete failure...
     } 2> $out.err
   fi > $out.tmp
 
