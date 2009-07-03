@@ -86,10 +86,7 @@ Request: build resource PRINTED_FILE for module INCR.
   INTERPROCEDURAL_SUMMARY_PRECONDITION building   SUMMARY_PRECONDITION(INTER06)
   PRECONDITIONS_INTER_FULL       building   PRECONDITIONS(INTER06)
   INTERPROCEDURAL_SUMMARY_PRECONDITION building   SUMMARY_PRECONDITION(INCR)
-user warning in add_formal_to_actual_bindings: Type incompatibility
-(INTEGER*4/REAL*4)
-for formal parameter I (rank 1)
-in call to INCR from INTER06
+user warning in any_user_call_site_to_transformer: Type incompatibility between call site and declaration for argument I (rank 1) of function INCR called from function INTER06: INTEGER*4/REAL*4
   PRECONDITIONS_INTER_FULL       building   PRECONDITIONS(INCR)
   PRINT_CODE_PRECONDITIONS       building   PRINTED_FILE(INCR)
 PRINTED_FILE made for INCR.

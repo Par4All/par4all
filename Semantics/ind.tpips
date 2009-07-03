@@ -14,5 +14,5 @@ display PRINTED_FILE[DATAST]
 echo --- Preconditions for module IND
 display PRINTED_FILE[IND]
 close
-delete ind
+#delete ind
 quit

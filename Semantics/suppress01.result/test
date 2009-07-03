@@ -72,7 +72,7 @@ C  P(I) {}
 Warning:
 
 TRANSFORMERS_INTER_FULL[SUPPRESS01] (fortran_user_call_to_transformer) Type incompatibility
-INTERPROCEDURAL_SUMMARY_PRECONDITION[INCR] (add_formal_to_actual_bindings) Type incompatibility
+INTERPROCEDURAL_SUMMARY_PRECONDITION[INCR] (any_user_call_site_to_transformer) Type incompatibility between call site and declaration for argument X (rank 1) of function INCR called from function SUPPRESS01: REAL*4/INTEGER*4
 
 
       SUBROUTINE INCR(X)
