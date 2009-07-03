@@ -25,8 +25,8 @@
 
 umask 0077
 
-expected='hendaye.cri.ensmp.fr'
-hostname=$(hostname -f)
+expected='hendaye'
+hostname=$(hostname)
 
 [[ "$hostname" = "$expected" ]] || {
   echo "script must run on '$expected', not '$hostname'" >&2
