@@ -82,7 +82,7 @@
 /* The set of all memory areas */
 #define ALL_MEMORY_ENTITY_NAME          "TOP-LEVEL:*MEMORY*"
 
-/* For enum and struct and union without names (see c_syntaxcyacc.y */
+/* For enum and struct and union without names (see c_syntax/cyacc.y) */
 #define DUMMY_ENUM_PREFIX               "_PIPS_ENUM_"
 #define DUMMY_STRUCT_PREFIX             "_PIPS_STRUCT_"
 #define DUMMY_UNION_PREFIX              "_PIPS_UNION_"
