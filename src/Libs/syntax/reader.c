@@ -68,10 +68,11 @@
  * successifs,   meme   sans   blanc   pour   les    separer,    comme    dans
  * 'IntegerFunctionASSIGN(X)'.
  *
- * Lorsqu'un operateur .XX. est detecte, il est remplace dans  le  source  par
- * '_XX_'.  Ainsi,  lex peut faire la difference entre une constante reelle et
- * un operateur, comme dans '(X+1._EQ_5)'. Modification: underscore is replaced
- * by percent to allow safely underscore in identifiers.
+ * Lorsqu'un operateur .XX. est detecte, il est remplace dans le source
+ * par '%XX%'.  Ainsi, lex peut faire la difference entre une constante
+ * reelle et un operateur, comme dans '(X+1.%EQ%5)'. It used to be '_' but
+ * the underscore is replaced by percent to allow safely underscore in
+ * identifiers.
  *
  * Nullary operators .TRUE. and .FALSE. are also converted but are later
  * seen as constants instead.
@@ -700,7 +701,7 @@ GetChar(FILE * fp)
 		
 	if (c == EOF) {
 	    if (!EmptyBuffer) {
-		user_warning("GetChar",
+ 		user_warning("GetChar",
 			     "incomplete last line !!!\n");
 		c = '\n';
 	    }
@@ -754,7 +755,7 @@ GetChar(FILE * fp)
 }
 
 /* All physical lines of a statement are put together in a unique buffer 
- * called "Line". Each character in each physical line is retrieved with
+ * called "line_buffer". Each character in each physical line is retrieved with
  * GetChar().
  */
 int 
@@ -928,7 +929,7 @@ ReadLine(FILE * fp)
 	iPrevComm = iComm;
     }
 
-    /* debug(9, "ReadLine", "Aggregation of continuation lines: '%s'\n", Line); */
+    pips_debug(9, "Aggregation of continuation lines: '%s'\n", line_buffer);
 
     return(TypeOfLine);
 }
