@@ -62,6 +62,16 @@ set set_singleton(set_type type, void * p)
     return( s ) ;
 }
 
+
+/* Assign a set with the content of another set.
+
+   @param s1 the set to write into
+   @param s2 the set to copy
+
+   If the same set is given twice, nothing is done.
+
+   @return the target set.
+*/
 set set_assign( s1, s2 )
 set s1, s2 ;
 {

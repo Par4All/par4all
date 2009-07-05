@@ -112,14 +112,15 @@ typedef union gen_chunk {
  * they are provided here for the internal types.
  */
 enum internal_type {
-  unit_domain = 0,
-  bool_domain = 1,
-  char_domain = 2,
-  int_domain  = 3,
-  intptr_t_domain  = 3,
-  _int_domain = 3,
-  float_domain = 4,
-  string_domain = 5
+  unit_domain = 1, /**< Start at 1 to be able to iterate on them with
+		      gen_recurse() functions */
+  bool_domain,
+  char_domain,
+  int_domain,
+  intptr_t_domain = int_domain,
+  _int_domain = int_domain,
+  float_domain,
+  string_domain
 };
 
 /* utils for typed cons */

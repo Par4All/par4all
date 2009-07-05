@@ -2734,44 +2734,68 @@ gen_allocated_memory(
 }
 
 /*********************************************************** MULTI RECURSION */
-/* @defgroup Gen_Multi_Recurse
- *    quick and Intelligent Recursion Thru Gen_Multi_Recurse
- *
- *    Fabien COELHO, Jun-Sep-Dec 94
- *
- */
 
-/* Useful functions
- *
- * they may be used by some recursion
- *  - when no rewrite is needed
- *  - when the filter is always yes
- *  - when it is false, to stop the recursion on some types
- */
+/** @defgroup gen_multi_recurse NewGen quick and intelligent recursion on objects (visitor pattern) */
+/** @{ */
+
+/** @defgroup gen_recurse_useful NewGen useful functions for recursion visitors 
+ 
+    They may be used by some recursion
+    - when no rewrite is needed
+    - when the filter is always yes
+    - when it is false, to stop the recursion on some types
+*/
+
+/** @{ */
+
+/** Ignore the argument.
+
+    It is useful for example in a gen_recurse when we do not want to do
+    anything in the rewrite part (bottom-up).
+*/
 void gen_null(void * p)
 {
   message_assert("argument not used", p==p);
   return;
 }
+
+/** Return TRUE and ignore the argument.
+
+    Useful in a gen_recurse when we don't want to do anything in the filter
+    part (top-down) but keeping visiting.
+*/
 bool gen_true(gen_chunk * p)
 {
   message_assert("argument not used", p==p);
   return TRUE;
 }
+
+/** Return TRUE and ignore the argument. */
 bool gen_false(gen_chunk * p)
 {
   message_assert("argument not used", p==p);
   return FALSE;
 }
+
+/** Just return the argument. */
 void * gen_identity(void * x)
 {
   return x;
 }
+
+/** Abort when called.
+
+   Useful in a gen_recurse if we want to be sure a type of object is not
+   here for example.
+*/
 void gen_core(void * p)
 {
   message_assert("argument not used", p==p);
   abort();
 }
+
+/** @} */
+/** @} */
 
 /* GLOBAL VARIABLES: to deal with decision tables
  *
@@ -3144,11 +3168,17 @@ quick_multi_recurse_simple_in(gen_chunk * obj, union domain * dp)
 		 itoa(dp->ba.type)), FALSE)));
 }
 
-/*  tells the recursion not to go in this object
- *  This may be interesting when the recursion modifies
- *  the visited data structure.
- *  if obj is NULL, the whole recursion is stopped !
- */
+
+/** @addtogroup gen_multi_recurse */
+
+/** @{ */
+
+/** Tells the recursion not to go in this object
+    
+    This may be interesting when the recursion modifies
+    the visited data structure.
+    if obj is NULL, the whole recursion is stopped !
+*/
 void
 gen_recurse_stop(void * obj)
 {
@@ -3158,20 +3188,13 @@ gen_recurse_stop(void * obj)
 	gen_trav_stop_recursion = TRUE;
 }
 
-/*  MULTI RECURSION FUNCTION
- *
- *  gen_context_multi_recurse(obj, context,
- *                           [domain, filter, rewrite,]*
- *                           NULL);
- *
- *  recurse from object obj,
- *  applies filter_i on encountered domain_i objects,
- *  if true, recurses down from the domain_i object,
- *       and applies rewrite_i on exit from the object.
- *
- * ??? bug : you can't visit domain 0 if any...
- * I can't remember what it is used for.
- */
+/**  Multi recursion generic visitor function
+ 
+     It is more intended for internal use, but may be useful instead of
+     gen_context_multi_recurse() to give iteration parameters as a va_list.
+
+     Refer to the documentation of gen_context_multi_recurse()
+*/
 static void
 gen_internal_context_multi_recurse(void * o, void * context, va_list pvar)
 {
@@ -3245,10 +3268,21 @@ gen_internal_context_multi_recurse(void * o, void * context, va_list pvar)
     current_mrc = saved_mrc;
 }
 
-/*  upward compatibility, old gen_recurse function syntax
- *  could be a define.
- */
-
+/**  Multi-recursion with context function visitor
+ 
+     gen_context_multi_recurse(obj, context,
+                               [domain, filter, rewrite,]*
+                               NULL);
+ 
+     recurse from object obj (in a top-down way),
+     applies filter_i on encountered domain_i objects with the context,
+     if true, recurses down from the domain_i object,
+     and applies rewrite_i on exit from the object (in a bottom-up way).
+ 
+     Bug : you can't visit domain number 0 if any... The good news is that
+     there is no NewGen object of domain number 0, since it seems that to
+     start at 7 for user domains...
+*/
 void gen_context_multi_recurse(void * o, void * context, ...)
 {
     va_list pvar;
@@ -3257,6 +3291,21 @@ void gen_context_multi_recurse(void * o, void * context, ...)
     va_end(pvar);
 }
 
+/** Multi recursion visitor function
+ 
+    gen_context_multi_recurse(obj, context,
+                              [domain, filter, rewrite,]*
+                              NULL);
+ 
+    recurse from object obj (in a top-down way),
+    applies filter_i on encountered domain_i objects with the context,
+    if true, recurses down from the domain_i object,
+    and applies rewrite_i on exit from the object (in a bottom-up way).
+ 
+    Bug : you can't visit domain number 0 if any... The good news is that
+    there is no NewGen object of domain number 0, since it seems that to
+    start at 7 for user domains...
+*/
 void gen_multi_recurse(void * o, ...)
 {
     va_list pvar;
@@ -3269,11 +3318,26 @@ void gen_multi_recurse(void * o, ...)
 #undef gen_recurse
 #endif
 
+/** Visit all the objects from a given types found in an object.
+
+    @param obj the object to start visiting
+
+    @param domain the type of objects we want to visit
+
+    @param filter the filter method (function) to apply to an encountered
+    object of the good type during the prefix (top-down) visit. If it
+    returns TRUE, the recursion is going on. If it returns FALSE, the visit
+    does not go further inside this object and the rewrite method is not be
+    called during the bottom-up visit.
+
+    @param rewrite is the method (function) to apply to an encountered
+    object of the good type during the prefix (bottom-up) visit
+ */
 void gen_recurse(
-    void * obj,
+    void * obj, /**< starting point */
     int domain,
-    bool (*filter)(),
-    void (*rewrite)())
+    bool (*filter)(gen_chunk * encountered_object),
+    void (*rewrite)(gen_chunk * encountered_object))
 {
     gen_multi_recurse(obj, domain, filter, rewrite, NULL);
 }
@@ -3282,19 +3346,41 @@ void gen_recurse(
 #undef gen_context_recurse
 #endif
 
+/** Visit all the objects from a given types found in an object with a context.
+
+    @param obj the object to start visiting
+
+    @param domain the type of objects we want to visit
+    
+    @param context is a pointer that is given to the filter and rewrite
+    methods too. It is quite useful when one wants side effects on other
+    objects without having to rely on dirty global variable
+
+    @param filter the filter method (function) to apply to an encountered
+    object of the good type during the prefix (top-down) visit. Its second
+    argument is the context passed texto from the global context
+    parameter. If the method returns TRUE, the recursion is going on. If
+    it returns FALSE, the visit does not go further inside this object and
+    the rewrite method is not be called during the bottom-up visit.
+
+    @param rewrite is the method (function) to apply to an encountered
+    object of the good type during the prefix (bottom-up) visit. Its
+    second argument is the context passed texto from the global context
+    parameter
+ */
 void gen_context_recurse(
-    void * obj, /* starting point */
+    void * obj, /**< starting point */
     void * context,
     int domain,
-    bool (*filter)(),
-    void (*rewrite)())
+    bool (*filter)(gen_chunk * encountered_object, void * context),
+    void (*rewrite)(gen_chunk * encountered_object, void * context))
 {
     gen_context_multi_recurse(obj, context, domain, filter, rewrite, NULL);
 }
 
-/** @defgroup gen_recurse_heritage NewGen inheritance tracking.
+/** @defgroup gen_recurse_heritage NewGen inheritance tracking during visiting object
 
-   Methods to get parent information during recursion. */
+   Methods to get parent information constructed during recursion. */
 
 /** @{ */
 
@@ -3323,7 +3409,7 @@ gen_get_recurse_previous_visited_object() {
    @p is the object we want the ancestor
    @return the object parent. If it fails, it returns:
      - NULL if the current object is the root of the recursion (so no parent)
-     - HASH_UNDEFINED_VALUE if the current object
+     - HASH_UNDEFINED_VALUE if the current object does not have any ancestor.
 */
 gen_chunk
 gen_get_recurse_ancestor(void * object) {
@@ -3357,6 +3443,7 @@ gen_stop_recurse_ancestor_tracking() {
   gen_record_tracking_p = FALSE;
 }
 
+/** @} */
 /** @} */
 
 
