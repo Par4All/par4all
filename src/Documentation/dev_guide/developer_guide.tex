@@ -59,20 +59,21 @@
 
 \author{
 \begin{tabular}{rl}
-  François & IRIGOIN\\
-  Pierre & JOUVELOT\\
-  Rémi & TRIOLET\\
-  Arnauld & LESERVOT\\
-  Alexis & PLATONOFF\\
-  Ronan & KERYELL\\
-  Béatrice & CREUSILLET\\
-  Fabien & COELHO\\
-  Corinne & ANCOURT
+  Corinne & \textsc{Ancourt}\\
+  Fabien & \textsc{Coelho}\\
+  Béatrice & \textsc{Creusillet}\\
+  Serge & \textsc{Guelton}\\
+  François & \textsc{Irigoin}\\
+  Pierre & \textsc{Jouvelot}\\
+  Ronan & \textsc{Keryell}\\
+  Arnauld & \textsc{Leservot}\\
+  Alexis & \textsc{Platonoff}\\
+  Rémi & \textsc{Triolet}
 \end{tabular}\\
   \emph{... and so many other contributors...}
 }
 
-\date{August 1996 - May 2009}
+\date{August 1996 - July 2009}
 
 \renewcommand{\indexname}{Index}
 \makeindex
@@ -192,7 +193,7 @@ or outdated, it is advised to restart from scratch by runing
 For more information about the PIPS Makefile infrastructure, see
 Section~\ref{sec:underst-makef-infr}.
 
-\subsection{Important Note}
+\subsection{Important note}
 
 It is important to realize that:
 \begin{enumerate}
@@ -212,7 +213,7 @@ It is important to realize that:
 \label{sec:devel-envir}
 
 
-\subsection{Browsing the source files with Doxygen}
+\subsection{Browsing and documenting the source files with Doxygen}
 \label{sec:brows-source-files}
 
 To help digging into the sources, Doxygen is used to generate an
@@ -234,6 +235,20 @@ The \texttt{make} target \texttt{doxygen-plain}
 or \texttt{doxygen-graph} can be used to generate only a documentation
 without or with call and caller graphs. Note that generating the graph
 version for PIPS lasts several hours on a 2009 computer...
+
+Of course, developers in PIPS should use the Doxygen syntax to have a more
+useful documentation.
+
+Modules and submodules in Doxygen are quite useful to group related
+objects and structure concepts in the documentation. For an example, have
+a look to \verb|@defgroup|, \verb|@addtogroup|, \verb|@{| and \verb|@}| in
+\verb|newgen/src/genC/genClib.c| and the resulting module \emph{NewGen
+  quick and intelligent recursion on objects (visitor pattern)} and its
+submodules in the documentation. Be careful: a title group must be on the
+same line and cannot be split !
+
+A good practice should be to present main useful functions and concepts to
+know by a PIPS programmer as modules and submodules.
 
 
 \subsection{Developing with the Emacs editor}
@@ -1183,7 +1198,12 @@ Three validation scripts are available:
     The environment variables \texttt{FILE} and \texttt{WSPACE} contain
     the full-path file name and the file name prefix.
 
-  \item if none of these cases apply, the scripts parallelize all modules.
+  \item if none of these cases apply, the scripts parallelize all modules
+    by using the PIPS shell interface: \texttt{Delete} the old workspace
+    if any, \texttt{Init} a new one from the Fortran file,
+    \texttt{Display} all the parallelize modules and \texttt{Delete} the
+    workspace. Since it runs in several \texttt{pips} processes, it is a
+    natural way to exercise PIPS persistence.
   \end{enumerate}
 
   For maintenance purposes, the \texttt{default\_tpips} approach is the
@@ -1963,6 +1983,65 @@ provided. Do not forget that there may be several successive requests with
 That means that the work depends on the objectives and the complexity of
 the new language. If the Pascal language is added it should be easy, if an
 object-oriented is added, it should be hard\ldots
+
+
+\section{Common programming patterns in PIPS}
+\label{sec:comm-progr-patt}
+
+\subsection{Using NewGen iterators on the RI}
+\label{sec:using-newg-iter}
+
+NewGen iterators are very effective to visit the PIPS internal
+representation, as any other NewGen objects. For more documentation, look
+at the Doxygen module \emph{NewGen quick and intelligent recursion on
+  objects (visitor pattern)}} and its submodules.
+
+Considering a call to:
+\begin{lstlisting}
+gen_recurse(some_statement,
+            statement_domain,
+            some_filter,
+            some_action);
+\end{lstlisting}
+it will walk on all statements (because of \verb|statement_domain|)
+included in the tree-like structure \verb|some_statement|.
+
+Consider a module
+\begin{lstlisting}
+void foo()
+{
+	int i,j;
+	i=10;
+	for(j=0;j<i;j++)
+		i/=2;
+	printf("%d\n",j);
+}
+\end{lstlisting}
+Its structure is more or less (from the module statement point of view):
+\begin{verbatim}
+block statement
+\_ 	call statement // i=10
+	for loop  statement
+	\_ block statement
+		\_ call statement i/=2
+	call statement // printf ...
+\end{verbatim}
+\verb|some_filter| will be called in a depth-first fashion (prefix-order)
+with the visited statement given as parameter, so that \verb|some_filter|
+can investigate iteratively every statement. If \verb|some_filter| returns
+\texttt{FALSE}, \verb|gen_recurse| stop descending (but not visiting
+somewhere else).
+
+That means here: first on the block statement, recurse into it, the call,
+the loop, recurse, the block, etc
+
+So it recurses into a statement only if the return value of the filter is
+\texttt{TRUE}, otherwise it does not recurse.
+
+Then on all statements previously visited, \verb|some_action| is called,
+in a bottom-up fashion (postfix-order).
+
+
 
 \newpage
 \noindent
