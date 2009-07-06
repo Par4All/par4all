@@ -5,5 +5,4 @@
          A(I) = 0.                                                      0005
       ENDDO
 
-      RETURN
       END
