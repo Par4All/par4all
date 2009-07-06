@@ -288,6 +288,7 @@ instruction_to_total_precondition(
   test t = test_undefined;
   loop l = loop_undefined;
   whileloop wl = whileloop_undefined;
+  forloop fl = forloop_undefined;
   call c = call_undefined;
 
   pips_debug(9,"begin t_post=%p tf=%p\n", t_post, tf);
@@ -304,9 +305,25 @@ instruction_to_total_precondition(
     l = instruction_loop(i);
     t_pre = loop_to_total_precondition(t_post, l, tf, context);
     break;
-  case is_instruction_whileloop:
-    wl = instruction_whileloop(i);
-    t_pre = whileloop_to_total_precondition(t_post, wl, tf, context);
+  case is_instruction_whileloop: {
+    whileloop wl = instruction_whileloop(i);
+    evaluation ev = whileloop_evaluation(wl);
+
+    if(evaluation_before_p(ev)) {
+      t_pre = whileloop_to_total_precondition(t_post, wl, tf, context);
+    }
+    else {
+      pips_user_error("Use property ??? to eliminate C repeat loops, "
+		      "which are not handled directly\n");
+    }
+    break;
+  }
+  case is_instruction_forloop:
+    pips_user_error("Use properties FOR_TO_DO_LOOP_IN_CONTROLIZER and"
+		    "FOR_TO_WHILE_LOOP_IN_CONTROLIZER to eliminate C for loops, which are"
+		    "not (yet) handled directly\n");
+    //fl = instruction_forloop(i);
+    //t_pre = forloop_to_total_precondition(t_post, fl, tf, context);
     break;
   case is_instruction_goto:
     pips_error("instruction_to_total_precondition",
@@ -341,7 +358,8 @@ statement_to_total_precondition(
   /* Preconditions may be useful to deal with tests and loops and to find
      out if some control paths do not exist */
   /* transformer context = transformer_undefined; */
-  transformer context = load_statement_precondition(s);
+  transformer pre = load_statement_precondition(s);
+  transformer context = transformer_range(pre);
 
   pips_debug(1,"begin\n");
 
@@ -438,6 +456,8 @@ statement_to_total_precondition(
 	    ORDERING_STATEMENT(so), t_pre);
     print_transformer(t_pre) ;
   }
+
+  free_transformer(context);
 
   pips_assert("unexpected sharing",t_post!=t_pre);
 

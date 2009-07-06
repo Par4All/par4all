@@ -1166,7 +1166,8 @@ static bool memorize_precondition(statement s)
      * corresponding call site should be ignored, as well
      * as call sites in statements controlled by s
      */
-    current_precondition = load_statement_semantic(s);
+    /* FI: probably a memory leak is started here */
+    current_precondition = transformer_range(load_statement_semantic(s));
 
     pips_assert("current precondition is defined",
 		current_precondition!=transformer_undefined);
@@ -1387,21 +1388,11 @@ transformer update_precondition_with_call_site_preconditions(transformer t,
   current_callee = entity_undefined;
   current_precondition = transformer_undefined;
   summary_effects_of_callee = list_undefined;
-  /* FI: I believed that convex hull was performed by side effect only.
-   * The two arguments are potentially modified, but a new transformer
-   * is allocated
-   */
-  /*
-    pips_assert("update_precondition_with_call_site_preconditions",
-    t == transformer_undefined || 
-    t == current_summary_precondition);
-  */
-  /* FI: To be tried when I'm courageous!
-     if(t!=transformer_undefined)
-     free_transformer(t);
-  */
-  t = current_summary_precondition;
+
+  /* This normalization seems pretty uneffective for fraer01.tpips */
+  t = transformer_normalize(current_summary_precondition, 4);
   current_summary_precondition = transformer_undefined;
+
   return t;
 }
 

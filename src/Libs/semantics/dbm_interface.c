@@ -1011,7 +1011,7 @@ bool module_name_to_total_preconditions(char *module_name)
 		       db_get_memory_resource(DBR_TRANSFORMERS, module_name, TRUE));
 
   set_precondition_map( (statement_mapping) 
-		       db_get_memory_resource(DBR_TRANSFORMERS, module_name, TRUE));
+		       db_get_memory_resource(DBR_PRECONDITIONS, module_name, TRUE));
 
 
   t_inter = (transformer) 

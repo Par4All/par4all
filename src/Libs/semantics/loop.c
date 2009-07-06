@@ -60,12 +60,13 @@
 
 /* General handling of structured loops: while, repeat, for, do.
  *
- * Because the functions for "do" and "while" loops pre-existed this
- * framework, they have not (yet) been reimplemented with it. Their
+ * Because the functions for "do" loops pre-existed this framework,
+ * they have not (yet) been reimplemented with it. Their
  * implementations are likely to be more CPU efficient because only
  * useful objects are computed whereas the general case requires the
  * computation and use of neutral and absorbent elements such as
- * tranformer_identity() and transformer_empty().
+ * tranformer_identity() and transformer_empty(). The functions for
+ * "while" loops have been rewritten to check the genericity.
  *
  * Slightly different equations are used for the repeat loop, which
  * executes once or at least twice instead of zero or at least
@@ -107,14 +108,14 @@
  * to reduce the approximation in the * operator (see below).
  *
  * Since we store only one transformer per statement (no such thing as
- * proper and cumulated effects), we store t_bodystar instead of
+ * proper and cumulated effects), we store t_body_star instead of
  * t_loop. Note that the range of t_body_star can be restricted by the
  * union of the ranges of t_enter and t_continue (or t_next) which are
  * the last transitions to occur in t_body_star.
  *
- * But to obtain a correct transformer for the bottom-up composition,
- * we fix the resulting transformer in statement_to_transformer with
- * the equation:
+ * But to obtain a correct transformer for the bottom-up composition
+ * of transformers, we fix the resulting transformer in
+ * statement_to_transformer with the equation:
  *
  * t_loop = t_init ; t_skip + t_body_star ; t_body ; t_inc; t_exit
  *
@@ -199,7 +200,7 @@ transformer any_loop_to_transformer(transformer t_init,
   // temporary memory leaks
   t_next_star = (* transformer_fix_point_operator)(t_next);
   post_next = transformer_range(transformer_apply(transformer_combine(t_next_star, t_next), post_body));
-  pre_body = transformer_convex_hull(post_next, post_enter);
+  pre_body = transformer_range(transformer_convex_hull(post_next, post_enter));
 
   /* Compute the body transformer */
   // statement_to_transformer() allocated a new transformer which is not the stored transformer
@@ -219,10 +220,10 @@ transformer any_loop_to_transformer(transformer t_init,
   /* and add the continuation condition, pre_iteration improved with
      knowledge about the body, npre_iteration. Note that pre_iteration
      would also provide correct results, although less accurate. */
-  post_loop_star = transformer_apply(t_fbody_star, post_enter);
+  post_loop_star = transformer_apply(t_fbody_star, enter_condition);
   post_loop_plus = transformer_apply(t_fbody, post_loop_star);
   post_loop = transformer_range(post_loop_plus);
-  npre_iteration = transformer_convex_hull(post_enter, post_loop);
+  npre_iteration = transformer_convex_hull(enter_condition, post_loop);
   t_body_star = transformer_combine(t_body_star, npre_iteration);
 
   /* Any transformer or other data structure to free? */
