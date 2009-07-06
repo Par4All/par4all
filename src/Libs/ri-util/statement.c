@@ -2522,7 +2522,9 @@ int get_statement_depth(statement s, statement root)
 static
 void statement_clean_declarations_reference_walker(reference r, set re)
 {
-    set_add_element(re,re,reference_variable(r));
+    entity e = reference_variable(r);
+    if( !entity_constant_p(e) && ! intrinsic_entity_p(e) )
+        set_add_element(re,re,e);
 }
 
 /** 
@@ -2535,7 +2537,7 @@ static
 void statement_clean_declarations_call_walker(call c, set re)
 {
     entity e = call_function(c);
-    if(!entity_constant_p(e) && ! intrinsic_entity_p(e) )
+    if( !entity_constant_p(e) && ! intrinsic_entity_p(e) )
         set_add_element(re,re,e);
 }
 
@@ -2548,7 +2550,9 @@ void statement_clean_declarations_call_walker(call c, set re)
 static
 void statement_clean_declarations_loop_walker(loop l, set re)
 {
-    set_add_element(re,re,loop_index(l));
+    entity e = loop_index(l);
+    if( !entity_constant_p(e) && ! intrinsic_entity_p(e) )
+        set_add_element(re,re,e);
 }
 
 
@@ -2562,7 +2566,8 @@ static
 void statement_clean_declarations_list_walker(list l, set re)
 {
     FOREACH(ENTITY,e,l)
-        set_add_element(re,re,e);
+        if( !entity_constant_p(e) && ! intrinsic_entity_p(e) )
+            set_add_element(re,re,e);
 }
 
 /** 
@@ -2769,7 +2774,143 @@ void entity_clean_declarations(entity module,statement s)
     list l=entity_declarations(module);
     entity_declarations(module)=statement_clean_declarations_helper(l,s);
     gen_free_list(l);
-    entity_generate_missing_declarations(module,s);
+    if(fortran_module_p(module)) /* to keep backward compatibility with hpfc*/
+        entity_generate_missing_declarations(module,s);
+}
+
+/**  @} */
+
+
+
+
+/** 
+ * @name statement finders
+ * find statements with particular constraints
+ * @{ */
+
+/** 
+ * structure used by find_statements_with_label_walker
+ */
+struct fswl {
+    list l; ///< list of statement matching condition
+    entity key; ///< used for the condition
+};
+
+/** 
+ * helper to find statement with a particular label
+ * as label should be unique, the function stops once a statement is found
+ * 
+ * @param s statement to inspect
+ * @param p struct containing the list to fill and the label to search
+ * 
+ * @return 
+ */
+static
+bool find_statements_with_label_walker(statement s, struct fswl *p)
+{
+    if( same_entity_p(statement_label(s),p->key) ||
+            (statement_loop_p(s)&& same_entity_p(loop_label(statement_loop(s)),p->key)) )
+    {
+        p->l=CONS(STATEMENT,s,p->l);
+        gen_recurse_stop(NULL);
+    }
+    return true;
+}
+
+/** 
+ * find a statement in s with entity label
+ * 
+ * @param s statement to search into
+ * @param label label of the searched statement
+ * 
+ * @return list containing a unique element
+ * a list is returned for coherence with the other find_satements functions
+ */
+list find_statements_with_label(statement s, entity label)
+{
+    struct fswl p = {  NIL, label };
+    gen_context_recurse(s,&p,statement_domain,find_statements_with_label_walker,gen_null);
+    return p.l;
+}
+
+static
+bool find_statements_interactively_walker(statement s, list *l)
+{
+    string answer = string_undefined;
+    do {
+        while( string_undefined_p(answer) || empty_string_p(answer)  )
+        {
+			user_log("Do you want to pick the following statement ?\n"
+                "*********************************************\n");
+			print_statement(s);
+
+            answer = user_request(
+                "*********************************************\n"
+                "[y/n] ?"
+            );
+            if( !answer ) pips_user_error("you did not answer !\n");
+        }
+        if( answer[0]!='y' && answer[0]!='n' )
+        {
+            pips_user_warning("answer by 'y' or 'n' !\n");
+            free(answer);
+            answer=string_undefined;
+        }
+    } while(string_undefined_p(answer));
+    bool pick = answer[0]=='y';
+    if(pick) {
+        *l=CONS(STATEMENT,s,*l);
+        return false;
+    }
+    else if( !ENDP(*l) )
+        gen_recurse_stop(NULL);
+    return true;
+}
+
+/** 
+ * prompt the user to select contiguous statement in s
+ * 
+ * @param s statement to search into
+ * 
+ * @return list of selected statement
+ */
+list find_statements_interactively(statement s)
+{
+    list l =NIL;
+    gen_context_recurse(s,&l,statement_domain,find_statements_interactively_walker,gen_null);
+    return gen_nreverse(l);
+}
+
+/** 
+ * used to pass parameters to find_statements_with_comment_walker
+ */
+struct fswp {
+    list l;
+    string begin;
+};
+
+static
+bool find_statements_with_pragma_walker(statement s, struct fswp *p)
+{
+    list exs = extensions_extension(statement_extensions(s));
+    FOREACH(EXTENSION,ex,exs)
+    {
+        pragma pr = extension_pragma(ex);
+        if(pragma_string_p(pr) && strstr(pragma_string(pr),p->begin))
+        {
+            p->l=CONS(STATEMENT,s,p->l);
+            gen_recurse_stop(NULL);
+        }
+    }
+    return true;
+}
+
+
+list find_statements_with_pragma(statement s, string begin)
+{
+    struct fswp p = { NIL, begin };
+    gen_context_recurse(s,&p,statement_domain,find_statements_with_pragma_walker,gen_null);
+    return gen_nreverse(p.l);
 }
 
 /**  @} */

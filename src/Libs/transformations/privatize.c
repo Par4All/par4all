@@ -563,17 +563,20 @@ void prepare_localize_declaration_walker(statement s)
 		instruction i = statement_instruction(s);
 		loop l = instruction_loop(i);
 
-		/* create a new statement to hold the future private declaration */
+		/* create a new statement to hold the future private declaration
+         * SG: as a side effect, pragmas on the loop are moved to the enclosing block
+         * __this_is_usefull__ at least to me ^^
+         */
 		if( !ENDP(loop_locals(l)))
-		{
-			statement new_statement = make_stmt_of_instr(i);
-			instruction iblock = make_instruction_block(CONS(STATEMENT,new_statement,NIL));
-			statement_instruction(s)=iblock;
-			statement_comments(new_statement) = statement_comments(s);
-			statement_comments(s)=empty_comments;
-			statement_label(new_statement) = statement_label(new_statement);
-			statement_label(s)=entity_empty_label();
-		}
+        {
+            statement new_statement = make_stmt_of_instr(i);
+            instruction iblock = make_instruction_block(CONS(STATEMENT,new_statement,NIL));
+            statement_instruction(s)=iblock;
+            statement_comments(new_statement) = statement_comments(s);
+            statement_comments(s)=empty_comments;
+            statement_label(new_statement) = statement_label(s);
+            statement_label(s)=entity_empty_label();
+        }
 	}
 }
 
@@ -613,4 +616,6 @@ localize_declaration(char *mod_name)
 	pips_debug(1,"end localize_declaration");
 	return true;
 }
+
+
 /**  @} */

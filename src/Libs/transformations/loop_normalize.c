@@ -26,12 +26,13 @@
  * Author   :   Arnauld LESERVOT & Alexis PLATONOFF
  * Date     :	27 04 93
  * Modified :   moved to Lib/transformations, AP, sep 95
+ *      strongly modernized by SG
  * Documents:	"Implementation du Data Flow Graph dans Pips"
  * Comments :	
  *
- * Functions of normalization of DO loops. Normalization consists in renaming
+ * Functions of normalization of DO loops. Normalization consists in changing
  * the loop index so as to have something like:
- *      DO NLC = 0, UPPER, 1
+ *      DO I = 0, UPPER, 1
  *
  * If the old DO loops was:
  *      DO I = lower, upper, incre
@@ -49,8 +50,8 @@
  *        INST
  *      ENDDO
  * is normalized in:
- *      DO NLC = 0, 2, 1
- *        I = 4*NLC + 2
+ *      DO I = 0, 2, 1
+ *        I = 4*I + 2
  *        INST
  *      ENDDO
  *      I = 14
@@ -60,14 +61,14 @@
  *        INST
  *      ENDDO
  * is normalized in:
- *      DO NLC = 0, -1, 1
- *        I = 4*NLC + 2
+ *      DO I = 0, -1, 1
+ *        I = 4*I + 2
  *        INST
  *      ENDDO
  *      I = 2
  *
- * The "NLC" variables are the Normalized Loop Counters. Their implicit type
- * is INTEGER.
+ * SG: normalized loop used to have a new loop counter.
+ * It made code less reeadable, so I supressed this
  *
  * If a loop has a label, it is removed. For example:
  *      DO 10 I = 1, 10, 1
@@ -112,325 +113,170 @@
 #include "resources.h"
 #include "transformations.h"
 
-#define ADD_ELEMENT_TO_LIST( _list, _type, _element) \
-    (_list = gen_nconc( _list, CONS( _type, _element, NIL)))
-
-/*============================================================================*/
-/* void loop_normalize(string mod_name): Apply the loop normalization upon
- * a module of name "mod_name".
- *
- * You may note the reorder of the module body. It is necessary if you want to
- * make others analyses upon the generated CODE.
- */
-bool loop_normalize(mod_name)
-char *mod_name;
+struct param { entity ent; expression exp; };
+static
+void do_substitute_expression(expression e, struct param *p)
 {
-  statement mod_stat;
-  int Gcount_nlc;
-  hash_table 	Gforward_substitute_table;
-  list		Genclosing_loops;
-  list		Genclosing_tests;
-  list 		Gscalar_written_forward;
+    if( expression_reference_p(e) )
+    {
+        reference r = expression_reference(e);
+        if(same_entity_p(p->ent, reference_variable(r) ))
+        {
+            free_syntax(expression_syntax(e));
+            expression_syntax(e) = copy_syntax(expression_syntax(p->exp));
+            unnormalize_expression(e);
+        }
+    }
+}
 
-  debug_on("LOOP_NORMALIZE_DEBUG_LEVEL");
+static
+void do_substitute_expression_in_declarations(list decl, struct param *p)
+{
+    FOREACH(ENTITY,e,decl)
+    {
+        value v = entity_initial(e);
+        if( value_expression_p(v) )
+            gen_context_recurse(value_expression(v),p,expression_domain,gen_true,do_substitute_expression);
+    }
+}
 
-  if (get_debug_level() > 1) {
-    user_log("\n\n *** LOOP_NORMALIZE for %s\n", mod_name);
-  }
+static
+void do_substitute_expression_in_statement(statement s, struct param *p)
+{
+    do_substitute_expression_in_declarations(statement_declarations(s),p);
+}
 
-  /* Sets the current module to "mod_name". */
-  set_current_module_entity(module_name_to_entity(mod_name));
+/** 
+ * statement normalization
+ * normalize a statement if it's a loop
+ * 
+ * @param s statement to normalize
+ * 
+ */
+static
+void loop_normalize_statement(statement s)
+{
+    if( statement_loop_p(s) )
+    {
+        loop l = statement_loop(s);
+        debug(4, __FUNCTION__ , "begin loop\n");
+        if( normalizable_loop_p(l) && ! normal_loop_p(l) )
+        {
+            entity index = loop_index( l );
+            range lr = loop_range( l );
+            expression rl = range_lower( lr );
+            expression ru = range_upper( lr );
+            expression ri = range_increment( lr );
+            int incre = expression_to_int( ri );
 
-  mod_stat = (statement) db_get_memory_resource(DBR_CODE, mod_name, TRUE);
- 
-  /* Initialization of the NLC counters. It numbers the NLC variables
-   * created during the computation.
-   */
-  Gcount_nlc = 0;
+            expression nub =   make_op_exp(DIVIDE_OPERATOR_NAME,
+                    make_op_exp(PLUS_OPERATOR_NAME,
+                        make_op_exp(MINUS_OPERATOR_NAME,ru,rl),
+                        ri),
+                    copy_expression(ri));
+            expression nub2 = copy_expression(nub);
 
-  /* Initialize the lists and the hash table */
-  Genclosing_loops      	= (list) NIL;
-  Genclosing_tests      	= (list) NIL;
-  Gscalar_written_forward = (list) NIL;
-  Gforward_substitute_table = hash_table_make( hash_pointer, 0 );
- 
-  /* Compute the loops normalization of the module. */
+            expression nlc_exp = entity_to_expression(index);
+            range_lower( lr ) = make_integer_constant_expression( 1 );
+            range_upper( lr ) = nub2;
+            range_increment( lr ) = make_integer_constant_expression( 1 );
 
-  /* No longer assumption on a global unstructured around... */
-  (void) ln_of_statement(mod_stat,
-		  Gforward_substitute_table, &Genclosing_loops,
-		  &Genclosing_tests, &Gscalar_written_forward,
-		  &Gcount_nlc);
-  
-  debug_off();
+            expression new_index_exp = make_op_exp(PLUS_OPERATOR_NAME,
+                    make_op_exp(MINUS_OPERATOR_NAME,
+                        make_op_exp(MULTIPLY_OPERATOR_NAME,
+                            copy_expression(ri),
+                            nlc_exp),
+                        copy_expression(ri)),
+                    copy_expression(rl));
 
-  /* Reorder the module. It is necessary because new statements have been
-   * generated.
-   */
-  module_reorder(mod_stat);
 
-  /* Save the new generated CODE. */
-  DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(mod_name), mod_stat);
+            expression nub3 = copy_expression( nub );
+            expression exp_max = expression_undefined, exp_plus = expression_undefined;
+            if ( expression_constant_p( nub3 )) {
+                int upper = expression_to_int( nub3 );
+                if ( upper > 0 )
+                    exp_max = make_integer_constant_expression( upper );
+            }
+            else {
+                entity max_ent = FindEntity(TOP_LEVEL_MODULE_NAME,MAX_OPERATOR_NAME);
+                exp_max = make_max_exp(max_ent, copy_expression( nub ),
+                        make_integer_constant_expression( 0 ));
+            }
+            if ( expression_undefined_p(exp_max) )
+                exp_plus = copy_expression( rl );
+            else
+                exp_plus = make_op_exp(PLUS_OPERATOR_NAME,
+                        make_op_exp( MULTIPLY_OPERATOR_NAME,
+                            copy_expression( ri ),
+                            exp_max),
+                        copy_expression( rl ));
+            expression index_exp = entity_to_expression( index );
+            statement end_stmt = make_assign_statement( copy_expression(index_exp), exp_plus );
 
-  if (get_debug_level() > 1) {
-    user_log("\n\n *** LOOP_NORMALIZE done\n");
-  }
+            /* commit the changes */
 
-  reset_current_module_entity();
+            /* #0 replace all references to index in loop_body(l) by new_index_exp */
+            struct param p = { index, new_index_exp };
+            gen_context_multi_recurse(loop_body(l),&p,
+                    expression_domain,gen_true,do_substitute_expression,
+                    statement_domain,gen_true,do_substitute_expression_in_statement,
+                    NULL);
 
-  return TRUE;
+            /* #1 copy s into a new statement */
+            statement new_statement = make_empty_statement();
+            statement_label(new_statement)=statement_label(s);
+            statement_comments(new_statement)=statement_comments(s);
+            statement_declarations(new_statement)=statement_declarations(s);
+            statement_extensions(new_statement)=statement_extensions(s);
+            statement_decls_text(new_statement)=statement_decls_text(s);
+            statement_instruction(new_statement)=statement_instruction(s);
+            /* #2 reset the non relevant fields of new_statement */
+            statement_label(s)=entity_empty_label();
+            statement_number(s)=STATEMENT_NUMBER_UNDEFINED;
+            statement_ordering(s)=STATEMENT_ORDERING_UNDEFINED;
+            statement_comments(s)=empty_comments;
+            statement_declarations(s)=NIL;
+            statement_extensions(s)=empty_extensions();
+            statement_decls_text(s)=NULL;
+            /* #3 make s a block instead of a loop */
+            statement_instruction(s) = make_instruction_block(CONS(STATEMENT,new_statement,CONS(STATEMENT,end_stmt,NIL)));
+
+            debug( 4, __FUNCTION__, "end LOOP\n");
+        }
+    }
 }
 
 
-/*==================================================================*/
-/* list ln_of_loop((loop) l, hash_table fst, list *ell, *etl,
- * *swfl, int *Gcount_nlc) AL 04/93
+/** 
+ * Apply the loop normalization upon a module
+ * 
+ * @param mod_name name of the normalized module
+ * 
+ * @return true
  */
-list ln_of_loop( l, fst, ell, etl, swfl, Gcount_nlc)
-loop l;
-hash_table fst; /* forward substitute table */
-list *ell,  /* enclosing loops list */
-     *etl,  /* enclosing tests list */
-     *swfl; /* scalar written forward list */
-int *Gcount_nlc;
+bool loop_normalize(char *mod_name)
 {
-  entity          index, nlc_ent, max_ent;
-  expression      rl, ru, ri, nub, nlc_exp, exp_plus;
-  expression	nub2, nub3, index_exp, new_index_exp;
-  expression      exp_max = expression_undefined;
-  range           lr;
-  statement       before_stmt = make_continue_statement(entity_empty_label());
-  statement       end_stmt = statement_undefined;
-  int             incre;
-  list            stmt_list = NIL;
-  
-  debug(4, "ln_of_loop", "begin LOOP\n");
+    /* prelude */
+    debug_on("LOOP_NORMALIZE_DEBUG_LEVEL");
+    if (get_debug_level() > 1) user_log("\n\n *** LOOP_NORMALIZE for %s\n", mod_name);
 
-  loop_label( l ) = entity_empty_label();
-  loop_body( l ) = make_block_with_stmt( loop_body( l ));
-  index = loop_index( l );
+    set_current_module_entity(module_name_to_entity(mod_name));
+    set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, mod_name, TRUE));
 
-  /* If it is not a constant step, we just normalize the loop body */
-  if(!normalizable_loop_p(l)) {
-    ADD_ELEMENT_TO_LIST(*swfl, ENTITY, index);
-    (void) ln_of_statement(loop_body( l ), fst, ell,
-		    etl, swfl, Gcount_nlc);
-    return( make_undefined_list() );
-  }
 
-  lr = loop_range( l );
-  rl = range_lower( lr );
-  ru = range_upper( lr );
-  ri = range_increment( lr );
-  incre = expression_to_int( ri );
+    /* Compute the loops normalization of the module. */
+    gen_recurse(get_current_module_statement(),statement_domain,gen_true,loop_normalize_statement);
 
-  nub =   make_op_exp(DIVIDE_OPERATOR_NAME,
-		      make_op_exp(PLUS_OPERATOR_NAME,
-				  make_op_exp(MINUS_OPERATOR_NAME,
-					      copy_expression(ru),
-					      copy_expression(rl)),
-				  copy_expression(ri)),
-		      copy_expression(ri));
-  nub2 = copy_expression(nub);
+    /* commit changes */
+    module_reorder(get_current_module_statement()); ///< we may have had statements
+    DB_PUT_MEMORY_RESOURCE(DBR_CODE, mod_name, get_current_module_statement());
 
-  ADD_ELEMENT_TO_LIST( stmt_list, STATEMENT, before_stmt );
+    /* postlude */
+    if (get_debug_level() > 1) user_log("\n\n *** LOOP_NORMALIZE done\n");
+    debug_off();
+    reset_current_module_entity();
+    reset_current_module_statement();
 
-  nlc_ent = make_nlc_entity(Gcount_nlc);
-  ADD_ELEMENT_TO_LIST(*swfl, ENTITY, nlc_ent);
-  nlc_exp = make_entity_expression( nlc_ent, NIL);
-  loop_index( l ) = nlc_ent;
-  range_lower( lr ) = make_integer_constant_expression( 1 );
-  range_upper( lr ) = nub2;
-  range_increment( lr ) = make_integer_constant_expression( 1 );
-
-  new_index_exp = make_op_exp(PLUS_OPERATOR_NAME,
-			      make_op_exp(MINUS_OPERATOR_NAME,
-					  make_op_exp(MULTIPLY_OPERATOR_NAME,
-						      copy_expression(ri),
-						      nlc_exp),
-					  copy_expression(ri)),
-			      copy_expression(rl));
-  hash_put(fst, (char*) index, (char*) new_index_exp);
-
-  nub3 = copy_expression( nub );
-  if ( expression_constant_p( nub3 )) {
-    int upper = expression_to_int( nub3 );
-    if ( upper > 0 )
-      exp_max = make_integer_constant_expression( upper );
-  }
-  else {
-    max_ent = gen_find_tabulated(make_entity_fullname(TOP_LEVEL_MODULE_NAME,
-						      MAX_OPERATOR_NAME),
-				 entity_domain);
-    exp_max = make_max_exp(max_ent, copy_expression( nub ),
-			   make_integer_constant_expression( 0 ));
-  }
-  if ( exp_max == expression_undefined )
-    exp_plus = copy_expression( rl );
-  else
-    exp_plus = make_op_exp(PLUS_OPERATOR_NAME,
-			   make_op_exp( MULTIPLY_OPERATOR_NAME,
-				       copy_expression( ri ),
-				       exp_max),
-			   copy_expression( rl ));
-  index_exp = make_entity_expression( index, NIL );
-  end_stmt = make_assign_statement( copy_expression(index_exp), exp_plus );
-  ADD_ELEMENT_TO_LIST( stmt_list, STATEMENT, end_stmt);
-
-  ln_of_statement(loop_body(l), fst , ell, etl, swfl, Gcount_nlc);
-
-  hash_del(fst, (char*) index );
-  debug( 4, "ln_of_loop", "end LOOP\n");
-  return( stmt_list );
+    return true;
 }
 
-
-/*==================================================================*/
-/* list ln_of_statement(statement s, hash_table fst, list
- * *ell, *etl, *swfl, int *Gcount_nlc): Normalization of a statement.
- *
- * Before walking down the statements, we forward-substitute the 
- * new-loop-counters on each type of statements.
- * We then return a list of two statements to be put 
- * before and after statement 's'. These two new statements
- * are generated by loops when they are treated. 
- * See document for more detail, section : "Normalisation des boucles".
- */
-list ln_of_statement(s, fst, ell, etl, swfl, Gcount_nlc)
-statement s;
-hash_table fst; /* forward substitute table */
-list *ell,  /* enclosing loops list */
-     *etl,  /* enclosing tests list */
-     *swfl; /* scalar written forward list */
-int *Gcount_nlc;
-{
-instruction 	inst = statement_instruction(s);
-list		return_list = NIL;
-
-
-debug(3, "ln_of_statement", "begin STATEMENT\n");
-return_list = make_undefined_list();
-
-switch(instruction_tag(inst))
-  {
-  case is_instruction_block :
-    {
-    list tail, head;
-
-    tail = instruction_block(inst);
-    for(head = NIL ; tail != NIL; )
-      {
-      statement stmt, before_stmt, after_stmt;
-      list 	insert_stmt;
-
-      stmt = STATEMENT(CAR(tail));
-      insert_stmt = ln_of_statement(stmt, fst, ell,
-						etl, swfl, Gcount_nlc);
-      before_stmt = STATEMENT(CAR( insert_stmt ));
-      after_stmt  = STATEMENT(CAR(CDR( insert_stmt )));
-
-      if( before_stmt != statement_undefined)
-      		ADD_ELEMENT_TO_LIST( head, STATEMENT, before_stmt);
-      ADD_ELEMENT_TO_LIST( head, STATEMENT, stmt );
-      if ( after_stmt != statement_undefined ) 
-		ADD_ELEMENT_TO_LIST( head, STATEMENT, after_stmt );
-
-      tail = CDR(tail);
-      }
-    instruction_block(inst) = head;
-    break;
-    }
-  case is_instruction_test :
-    {
-    test t = instruction_test(inst);
-    (void) forward_substitute_in_exp(&test_condition(t), fst);
-    ADD_ELEMENT_TO_LIST(*etl, EXPRESSION, test_condition(t) );
-    test_true(t) = make_block_with_stmt( test_true(t) );
-    test_false(t) = make_block_with_stmt( test_false(t) );
-    ln_of_statement(test_true(t), fst, ell,
-				etl, swfl, Gcount_nlc);
-    ln_of_statement(test_false(t), fst, ell,
-				etl, swfl, Gcount_nlc);
-    gen_remove(etl, (gen_chunk*) test_condition( t ));
-    break;
-    }
-  case is_instruction_loop :
-    {
-    (void) forward_substitute_in_loop(&instruction_loop(inst), fst);
-    ADD_ELEMENT_TO_LIST(*ell, LOOP, instruction_loop( inst ));  
-    return_list = ln_of_loop(instruction_loop(inst), fst, ell,
-					 etl, swfl, Gcount_nlc);
-    gen_remove(ell, (gen_chunk*) instruction_loop( inst ));
-    break;
-    }
-  case is_instruction_call : 
-    {
-    (void) forward_substitute_in_call(&instruction_call(inst), fst);
-    scalar_written_in_call( instruction_call( inst ), ell,
-			   etl, swfl);
-    break;
-    }
-  case is_instruction_goto : break;
-  case is_instruction_unstructured :
-    {
-    ln_of_unstructured(instruction_unstructured(inst), fst, ell,
-				   etl, swfl, Gcount_nlc);
-    break;
-    }
-  default : pips_error("ln_of_statement", "Bad instruction tag");
-  }
-debug(3, "ln_of_statement", "end STATEMENT\n");
-return( return_list );
-}
-
-
-/*==================================================================*/
-/* void ln_of_unstructured(unstructured u, fst): Normalization
- * of an unstructured instruction.
- */
-void ln_of_unstructured(u, fst, ell, etl, swfl, Gcount_nlc)
-unstructured u;
-hash_table fst; /* forward substitute table */
-list *ell,  /* enclosing loops list */
-     *etl,  /* enclosing tests list */
-     *swfl; /* scalar written forward list */
-int *Gcount_nlc;
-{
-	list blocs = NIL, lc;
-	list insert_stmts;
-
-	debug(2, "ln_of_unstructured", "begin UNSTRUCTURED\n");
-	control_map_get_blocs(unstructured_control(u), &blocs ) ;
-	blocs = gen_nreverse( blocs ) ;
-
-	for(lc = blocs; lc != NIL; lc = CDR(lc)) {
-		list   		head = NIL;
-		control 	ctl;
-		statement 	before_stmt, after_stmt, stmt;
-
-		ctl 		= CONTROL(CAR( lc ));
-		stmt 		= control_statement( ctl );
-		insert_stmts 	= ln_of_statement(stmt, fst,
-							      ell, etl,
-							      swfl,
-							      Gcount_nlc);
-		before_stmt 	= STATEMENT(CAR( insert_stmts ));
-		after_stmt 	= STATEMENT(CAR(CDR( insert_stmts )));
-
-	   if (!undefined_statement_list_p( insert_stmts )) {
-		if( before_stmt != statement_undefined)
-			ADD_ELEMENT_TO_LIST( head, STATEMENT, before_stmt );
-		ADD_ELEMENT_TO_LIST( head, STATEMENT, stmt ); 
-  		if ( after_stmt != statement_undefined )
-			ADD_ELEMENT_TO_LIST( head, STATEMENT, after_stmt );
-		stmt = make_block_with_stmt( stmt );
-		instruction_block(statement_instruction( stmt )) = head;
-		head = NIL;
-	   }
-	}
-
-	gen_free_list(blocs);
-	debug(2, "ln_of_unstructured", "end UNSTRUCTURED\n");
-}
-
-/*==================================================================*/

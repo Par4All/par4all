@@ -874,7 +874,6 @@ void patch_outlined_reference(expression x, entity e)
  * 
  * @return pointer to the newly generated statement (already inserted in statements_to_outline)
  */
-static
 statement outliner(string outline_module_name, list statements_to_outline)
 {
     pips_assert("there are some statements to outline",!ENDP(statements_to_outline));
@@ -898,6 +897,12 @@ statement outliner(string outline_module_name, list statements_to_outline)
     /* get the relative complements and create the parameter list*/
     gen_list_and_not(&referenced_entities,declared_entities);
     gen_free_list(declared_entities);
+
+    /* purge the functions from the parameter list, we assume they are declared externally */
+    list tmp_list=NIL;
+    FOREACH(ENTITY,e,referenced_entities)
+        if( ! entity_function_p(e) ) tmp_list=CONS(ENTITY,e,tmp_list);
+    referenced_entities=tmp_list;
 
     gen_sort_list(referenced_entities,compare_entities);
 
@@ -1020,83 +1025,10 @@ statement outliner(string outline_module_name, list statements_to_outline)
 }
 
 
-static
-bool interactive_statement_picker(statement s,bool started)
-{
-    string answer = string_undefined;
-    do {
-        while( string_undefined_p(answer) || empty_string_p(answer)  )
-        {
-			user_log("Do you want to pick the following statement ?\n"
-                "*********************************************\n");
-			print_statement(s);
-
-            answer = user_request(
-                "*********************************************\n"
-                "[y/n] ?"
-            );
-        }
-        if( answer[0]!='y' && answer[0]!='n' )
-        {
-            pips_user_warning("answer by 'y' or 'n' !\n");
-            free(answer);
-            answer=string_undefined;
-        }
-    } while(string_undefined_p(answer));
-
-    if(!started &&  answer[0]=='y') started=true;
-
-    return  answer[0]=='y';
-}
-
-static
-void statement_walker(statement s, list* l, bool (*picker)(statement,bool), bool started )
-{
-    if( picker(s,started) )
-    {
-        *l=CONS(STATEMENT,s,*l);
-        started=true;
-    }
-    else if( !started )
-    {
-        instruction i = statement_instruction(s);
-        switch(instruction_tag(i))
-        {
-            case is_instruction_sequence:
-                {
-                    FOREACH(STATEMENT,S,sequence_statements(instruction_sequence(i)))
-                        statement_walker(S,l,picker,started);
-                } break;
-            case is_instruction_test:
-                {
-                    statement_walker(test_true(instruction_test(i)),l,picker,started);
-                    statement_walker(test_false(instruction_test(i)),l,picker,started);
-                } break;
-            case is_instruction_loop:
-                statement_walker(loop_body(instruction_loop(i)),l,picker,started);
-                break;
-            case is_instruction_whileloop:
-                statement_walker(whileloop_body(instruction_whileloop(i)),l,picker,started);
-                break;
-            case is_instruction_multitest:
-                statement_walker(multitest_body(instruction_multitest(i)),l,picker,started);
-                break;
-            case is_instruction_forloop:
-                statement_walker(forloop_body(instruction_forloop(i)),l,picker,started);
-                break;
-            case is_instruction_unstructured:
-            case is_instruction_expression:
-            case is_instruction_goto:
-            case is_instruction_call:
-                break;
-        };
-    }
-}
-
 
 /**
  * @brief entry point for outline module
- * outlining will be performed using either pragma recognition
+ * outlining will be performed using either comment recognition
  * or interactively
  *
  * @param module_name name of the module containg the statements to outline
@@ -1110,20 +1042,20 @@ outline(char* module_name)
  	set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_PROPER_EFFECTS, module_name, TRUE));
 
     /* retrieve name of the outiled module */
-    string outline_module_name = string_undefined;
-    do {
-        outline_module_name = user_request("outline module name ?\n");// should check
-    } while( !outline_module_name || string_undefined_p(outline_module_name) || outline_module_name[0] == '\0' );
-   
+    string outline_module_name = get_string_property_or_ask("OUTLINE_MODULE_NAME","outline module name ?\n");
 
     /* retrieve statement to outline */
-    list statements_to_outline = NIL;
-    statement_walker(get_current_module_statement(),&statements_to_outline,&interactive_statement_picker,false);
-    /* we may want to try another picker later ;-) */
-
-
-    /* may need a sort */
-    statements_to_outline=gen_nreverse(statements_to_outline);
+    list statements_to_outline = find_statements_with_pragma(get_current_module_statement(),OUTLINE_PRAGMA) ;
+    if(ENDP(statements_to_outline)) {
+        if( empty_string_p(get_string_property("OUTLINE_LABEL")) ) {
+            statements_to_outline=find_statements_interactively(get_current_module_statement());
+        }
+        else  {
+            string stmt_label=get_string_property("OUTLINE_LABEL");
+            entity stmt_label_entity = find_label_entity(module_name,stmt_label);
+            statements_to_outline = find_statements_with_label(get_current_module_statement(),stmt_label_entity);
+        }
+    }
 
     /* apply outlining */
     (void)outliner(outline_module_name,statements_to_outline);

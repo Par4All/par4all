@@ -133,7 +133,7 @@ gener_DOSEQ(
  */
 
 statement
-interchange(list lls,bool (*unused)(bool))
+interchange(list lls,bool (*unused)(loop))
 {
     Psysteme sci;			/* sc initial */
     Psysteme scn;			/* sc nouveau */

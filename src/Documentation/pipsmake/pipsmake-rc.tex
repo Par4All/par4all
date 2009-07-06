@@ -4401,6 +4401,52 @@ rice_data_dependence            > MODULE.parallelized_code
         < MODULE.code MODULE.dg
 \end{PipsMake}
 
+
+\subsection{Parallelization for Terapix architecture}
+\index{Terapix}
+
+%%@UserManualDocumentation: kernelize
+auxillary pass that should be called by the other passes.
+It finds the kernel at \verb+LOOP_LABEL+ and flag it with a pragma for further use
+%%!UserManualDocumentation
+\begin{PipsMake}
+kernelize				> MODULE.code
+		! MODULE.privatize_module
+		! MODULE.internalize_parallel_code
+		> PROGRAM.entities
+		< PROGRAM.entities
+		< MODULE.code
+\end{PipsMake}
+The property \verb+KERNEL_NBNODES+ is used to set the number of nodes for this kernel.
+
+\begin{PipsProp}
+KERNEL_NBNODES 128
+KERNEL_LABEL ""
+\end{PipsProp}
+
+%%@UserManualDocumentation: terapixify
+Function \verb+terapixify+ targets the \em{Terapix} multiprocessor from Thales.
+This vector architecture require the generation of micro-codes (a.k.a ''kernels'' in the GPU terminology).
+A microcode is a code portion that will be executed symmetrically on all processors of the machines.
+They only work on parallel loops and can contain inner loops, but no branching.
+This pass basically picks a parallel loop, strip-mines it and apply outlining to the tiled loop.
+%%!UserManualDocumentation
+
+\begin{PipsMake}
+terapixify				> MODULE.code
+		! MODULE.kernelize
+		! MODULE.localize_declaration
+		! MODULE.clean_declarations
+		! MODULE.outline
+\end{PipsMake}
+
+The property \verb+OUTLINE_MODULE_NAME+ will be used as microcode name.
+If not set, it will be asked for interactively.
+The property \verb+OUTLINE_LABEL+ is used to select a statement
+\begin{PipsProp}
+OUTLINE_LABEL ""
+\end{PipsProp}
+
 \subsection{Parallelization and Vectorization for Cray Multiprocessors}
 \index{Cray}
 
@@ -6684,6 +6730,13 @@ outline      > MODULE.code
         < MODULE.code
 \end{PipsMake}
 
+The property \verb+OUTLINE_MODULE_NAME+ is used as new module name, and the user is prompted if not set.
+If set, property \verb+OUTLINE_LABEL+ is used to choose the statement to outline
+\begin{PipsProp}
+OUTLINE_MODULE_NAME ""
+OUTLINE_LABEL ""
+\end{PipsProp}
+
 
 %-----------End of Expression Transformations -------------------------
 
@@ -7309,7 +7362,6 @@ localize_declaration > MODULE.code
         < PROGRAM.entities
         < MODULE.code
 \end{PipsMake}
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% ARRAY PRIVATIZATION
 

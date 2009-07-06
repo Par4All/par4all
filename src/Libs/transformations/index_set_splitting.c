@@ -68,11 +68,11 @@ find_loop_from_label(statement s, entity label)
     return true;
 } 
 
-static void
+void
 index_set_split_loop(statement original_loop, entity new_loop_bound)
 {
     pips_assert("index_set_split_loop called on a loop", statement_loop_p(original_loop));
-    if(same_entity_p(new_loop_bound,loop_index(statement_loop(loop_statement))))
+    if(same_entity_p(new_loop_bound,loop_index(statement_loop(original_loop))))
     {
         pips_user_error("please set INDEX_SET_SPLITTING_BOUND property to an entity that is not the loop bound\n");
     }
@@ -88,7 +88,7 @@ index_set_split_loop(statement original_loop, entity new_loop_bound)
 
     statement second_loop_statement = clone_statement(original_loop,cc);
 
-    free/*_clone_context*/(cc);
+    free_clone_context(cc);
 
     /* clone statement may have had declarations to the statement
      * has a consequence the return statement may not be a for loop, but a sequence

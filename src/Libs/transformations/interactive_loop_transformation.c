@@ -53,7 +53,7 @@ bool selected_loop_p(loop l)
 }
 
 bool interactive_loop_transformation(string module_name,
-				     statement (*loop_transformation)(list,bool (*)(bool)))
+				     statement (*loop_transformation)(list,bool (*)(loop)))
 {
     char *lp_label=NULL;
     entity module = module_name_to_entity(module_name);

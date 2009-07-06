@@ -51,7 +51,7 @@
  *  
 */
 void look_for_nested_loop_statements(statement s,
-				     statement (*loop_transformation)(list, bool (*)(bool)),
+				     statement (*loop_transformation)(list, bool (*)(loop)),
 				     bool (*loop_predicate)(loop))
 {
     instruction i;

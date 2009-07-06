@@ -53,7 +53,8 @@ LIB_CFILES =	replace.c \
 		index_set_splitting.c \
 		for_loop_recovering.c \
 		generate_pragma.c \
-		scalarization.c
+		scalarization.c \
+		terapixify.c
 
 INC_TARGET =    $(TARGET).h
 

@@ -383,10 +383,14 @@ void do_loop_unroll(statement loop_statement, int rate, void (*statement_post_pr
 						list declaration_initializations = NIL;
 						FOREACH(ENTITY,e,statement_declarations(transformed_stmt))
 						{
-							statement s = make_assign_statement(
-									make_expression_from_entity(e),
-									copy_expression(value_expression(entity_initial(e))));
-							declaration_initializations=CONS(STATEMENT,s,declaration_initializations);
+                            value v = entity_initial(e);
+                            if( value_expression_p(v) )
+                            {
+                                statement s = make_assign_statement(
+                                        make_expression_from_entity(e),
+                                        copy_expression(value_expression(v)));
+                                declaration_initializations=CONS(STATEMENT,s,declaration_initializations);
+                            }
 						}
 						declaration_initializations=gen_nreverse(declaration_initializations);
 						instruction_block(statement_instruction(transformed_stmt))=
@@ -532,32 +536,59 @@ void full_loop_unroll(statement loop_statement)
     (void) clear_labels (loop_body (il));
 
     for(iter = lbval; iter <= ubval; iter += incval) {
-	statement transformed_stmt;
+        statement transformed_stmt;
 
-	transformed_stmt = copy_statement(loop_body(il));
-	ifdebug(9)
-	    statement_consistent_p(transformed_stmt);
-	expr = int_to_expression(iter);
-	ifdebug(9) {
-	    pips_assert("full_loop_unroll", expression_consistent_p(expr));
-	}
-	StatementReplaceReference(transformed_stmt,
-				  make_reference(ind,NIL),
-				  expr);
-	ifdebug(9) {
-	    pips_assert("full_loop_unroll", statement_consistent_p(transformed_stmt));
-	}
-	free_expression(expr);
+        transformed_stmt = copy_statement(loop_body(il));
+        ifdebug(9)
+            statement_consistent_p(transformed_stmt);
+        expr = int_to_expression(iter);
+        ifdebug(9) {
+            pips_assert("full_loop_unroll", expression_consistent_p(expr));
+        }
+        StatementReplaceReference(transformed_stmt,
+                make_reference(ind,NIL),
+                expr);
+        ifdebug(9) {
+            pips_assert("full_loop_unroll", statement_consistent_p(transformed_stmt));
+        }
+        free_expression(expr);
 
-	ifdebug(9) {
-	    pips_assert("full_loop_unroll", statement_consistent_p(transformed_stmt));
-	}
-	
-	/* Add the transformated old loop body (transformed_stmt) at
-	 * the end of the loop */
-	 instruction_block(block) = 
-	     gen_nconc(instruction_block(block),
-		       CONS(STATEMENT, transformed_stmt, NIL));
+        ifdebug(9) {
+            pips_assert("full_loop_unroll", statement_consistent_p(transformed_stmt));
+        }
+
+        /* Add the transformated old loop body (transformed_stmt) at
+         * the end of the loop */
+        if( statement_block_p(transformed_stmt) && get_bool_property("LOOP_UNROLL_MERGE"))
+        {
+            if(ENDP(statement_declarations(loop_statement)))
+                statement_declarations(loop_statement)=statement_declarations(transformed_stmt);
+            else {
+                list declaration_initializations = NIL;
+                FOREACH(ENTITY,e,statement_declarations(transformed_stmt))
+                {
+                    value v = entity_initial(e);
+                    if( value_expression_p(v) )
+                    {
+                        statement s = make_assign_statement(
+                                make_expression_from_entity(e),
+                                copy_expression(value_expression(v)));
+                        declaration_initializations=CONS(STATEMENT,s,declaration_initializations);
+                    }
+                }
+                declaration_initializations=gen_nreverse(declaration_initializations);
+                instruction_block(statement_instruction(transformed_stmt))=
+                    gen_nconc(declaration_initializations,instruction_block(statement_instruction(transformed_stmt)));
+            }
+            instruction_block(block) =
+                gen_nconc( instruction_block(block),
+                        instruction_block(statement_instruction(transformed_stmt)));
+        }
+        else {
+            instruction_block(block) = 
+                gen_nconc(instruction_block(block),
+                        CONS(STATEMENT, transformed_stmt, NIL));
+        }
     }
 
     /* Generate a CONTINUE to carry the final loop body label in case an

@@ -220,21 +220,23 @@ static bool incrementation_expression_to_increment(expression incr,
 	     expression, using the comparison operator. */
 	  expression inc_v =  EXPRESSION(CAR(CDR(call_arguments(incr_c))));
 	  if (ENTITY_PLUS_UPDATE_P(op)
-	      && extended_integer_constant_expression_p(inc_v)) {
-	    int v = expression_to_int(inc_v);
-	    if (v != 0) {
-	      * pincrement = inc_v;
-	      success = TRUE;
-	      if (v > 0 ) {
-		* is_increasing_p = TRUE;
-		pips_debug(5, "Found += with positive increment!\n");
-	      }
-	      else {
-		* is_increasing_p = FALSE;
-		pips_debug(5, "Found += with negative increment!\n");
-	      }
-	    }
-	  }
+              && extended_integer_constant_expression_p(inc_v)) {
+          value val = EvalExpression(inc_v);
+          int v = constant_int(value_constant(val));
+          if (v != 0) {
+              * pincrement = inc_v;
+              success = TRUE;
+              if (v > 0 ) {
+                  * is_increasing_p = TRUE;
+                  pips_debug(5, "Found += with positive increment!\n");
+              }
+              else {
+                  * is_increasing_p = FALSE;
+                  pips_debug(5, "Found += with negative increment!\n");
+              }
+          }
+          free_value(val);
+      }
 	  /* Look for "i -= integer": */
 	  else if(ENTITY_MINUS_UPDATE_P(op)
 		  && extended_integer_constant_expression_p(inc_v)) {

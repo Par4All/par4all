@@ -291,7 +291,7 @@ bool nest_parallelization(string module_name)
     return TRUE;
 }
 
-statement parallelization(list lls, bool (*loop_predicate) (bool unused/* ??? */))
+statement parallelization(list lls, bool (*loop_predicate) (loop))
 {
     statement s = statement_undefined;
 
@@ -538,7 +538,7 @@ statement loop_nest_parallelization(list lls)
     return s;
 }
 
-statement mark_loop_as_parallel(list lls, bool (*unused)(bool))
+statement mark_loop_as_parallel(list lls, bool (*unused)(loop))
 {
     statement ls = STATEMENT(CAR(lls));
     execution_tag(loop_execution(statement_loop(ls))) = is_execution_parallel;

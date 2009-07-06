@@ -203,7 +203,10 @@ do_clone_test(test t, clone_context cc, hash_table ht)
 static loop
 do_clone_loop(loop l, clone_context cc, hash_table ht)
 {
-    entity new_entity = do_clone_entity(loop_index(l),cc, ht);
+    entity new_entity = 
+         gen_chunk_undefined_p(gen_find_eq(loop_index(l),loop_locals(l))) ?
+            do_clone_entity(loop_index(l),cc, ht):
+            loop_index(l);
     return make_loop(
             new_entity,
             do_clone_range(loop_range(l),cc, ht),
@@ -306,7 +309,8 @@ do_clone_statement(statement s, clone_context cc, hash_table ht)
     FOREACH(ENTITY, e, statement_declarations(s))
     {
         entity new_entity = do_clone_entity(e,cc, ht);
-        if(! expression_undefined_p( value_expression(entity_initial(e)) ))
+        if(! value_unknown_p(entity_initial(e)) &&
+                !expression_undefined_p( value_expression(entity_initial(e)) ) )
         {
             statement ns = make_assign_statement(
                     entity_to_expression(new_entity),

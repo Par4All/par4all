@@ -312,6 +312,20 @@ get_string_property(const string name)
     return property_string(p);
 }
 
+
+string 
+get_string_property_or_ask(const string name,const char question[]) 
+{ 
+    property p = get_property(name, FALSE); 
+    if (! property_string_p(p)) 
+        error("property %s is not string\n", name); 
+    string s = property_string(p); 
+    while(!s || string_undefined_p(s) || s[0] == '\0' ) 
+        s = user_request(question); 
+ 
+    return s; 
+}
+
 void 
 set_string_property(const string name, string s)
 {
