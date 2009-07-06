@@ -29,6 +29,7 @@
 #include <strings.h>
 #include <sys/param.h>
 
+/* Sometimes, already included by unistd.h */
 #include <getopt.h>
 
 #include <readline/readline.h>
