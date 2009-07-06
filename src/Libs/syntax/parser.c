@@ -260,7 +260,7 @@ the_actual_parser(
     /* scanner is initialized */
     ScanNewFile();
 
-    pips_assert("the_actual_parser", CurrentFN==NULL);
+    pips_assert("CurrentFN is NULL", CurrentFN==NULL);
     dir = db_get_current_workspace_directory();
     CurrentFN = 
 	strdup(concatenate(dir, "/",

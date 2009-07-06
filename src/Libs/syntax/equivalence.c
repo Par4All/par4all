@@ -727,7 +727,7 @@ ComputeAddresses()
                  EQUIVALENCEd with such a variable. It could be declared
                  in a COMMON. */
 	      pips_user_warning("Variable %s with varying dimension cannot be reallocated"
-				" in stack because it has laready been allocated in %s\n",
+				" in stack because it has already been allocated in %s\n",
 				entity_local_name(a), entity_local_name(sec));
 	      ParserError("SafeSizeOfArray", "Storage cannot be redefined to stack");
 	    }
