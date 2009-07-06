@@ -1,0 +1,20 @@
+C     Check that j is not privatized in the first loop, but privatized
+C     in the second one... However, j is not initialized before its use
+C     in the first loop, the value of j does not matter and hence j can
+C     be privatized in both loops, But unlike privatization01,f, j is
+C     used in the next loop nest. Hence j cannot be privatized.
+
+      SUBROUTINE PRIVATIZATION09
+      INTEGER A(10)
+
+      DO I = 1, 10                                                      0010
+         PRIVATE I
+         J = J+1                                                        0011
+         A(I) = J                                                       0012
+      ENDDO
+
+      DO I = 1, 10                                                      0015
+         PRIVATE I
+         A(I) = J                                                       0016
+      ENDDO
+      END

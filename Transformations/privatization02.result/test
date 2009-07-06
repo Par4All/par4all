@@ -1,0 +1,15 @@
+Check that J is privatized in the outermost loop
+
+      SUBROUTINE PRIVATIZATION02
+      INTEGER A(10)
+
+      DO I = 1, 10                                                      0006
+         PRIVATE I,J,K
+         J = 0                                                          0007
+         DO K = 1, 10                                                   0008
+            PRIVATE K
+            J = J+1                                                     0009
+         ENDDO
+         A(I) = J                                                       0011
+      ENDDO
+      END

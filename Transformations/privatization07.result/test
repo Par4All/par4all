@@ -1,0 +1,16 @@
+C     Check that J is not privatized in the outermost loop very similar
+C     to privatization02.f)
+
+      SUBROUTINE PRIVATIZATION07
+      INTEGER A(10)
+
+      J = 0                                                             0007
+      DO I = 1, 10                                                      0008
+         PRIVATE I,K
+         DO K = 1, 10                                                   0009
+            PRIVATE K
+            J = J+1                                                     0010
+         ENDDO
+         A(I) = J                                                       0012
+      ENDDO
+      END

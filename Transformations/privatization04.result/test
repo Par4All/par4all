@@ -1,0 +1,13 @@
+C     Check that j is not privatized; just likre privatization03.f, but
+C     without the initialization. But the lack of initialization makes
+C     privatization fine as the output is undefined.
+
+      SUBROUTINE PRIVATIZATION04
+      INTEGER A(10)
+
+      DO I = 1, 10                                                      0008
+         PRIVATE I,J
+         J = J+1                                                        0009
+         A(I) = J                                                       0010
+      ENDDO
+      END

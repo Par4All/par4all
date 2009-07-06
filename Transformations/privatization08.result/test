@@ -1,0 +1,20 @@
+C     Check that J is not privatized in the first loop, but privatized
+C     in the second one. This is the same vase as privatization01.f, but
+C     with a proper initialization of J
+
+      SUBROUTINE PRIVATIZATION08
+      INTEGER A(10)
+
+      J = 0                                                             0008
+      DO I = 1, 10                                                      0009
+         PRIVATE I
+         J = J+1                                                        0010
+         A(I) = J                                                       0011
+      ENDDO
+
+      DO I = 1, 10                                                      0014
+         PRIVATE I,J
+         J = 1                                                          0015
+         A(I) = J                                                       0016
+      ENDDO
+      END
