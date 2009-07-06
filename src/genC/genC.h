@@ -112,7 +112,7 @@ typedef union gen_chunk {
  * they are provided here for the internal types.
  */
 enum internal_type {
-  unit_domain = 1, /**< Start at 1 to be able to iterate on them with
+  unit_domain = 0, /**< Should start at 1 to be able to iterate on them with
 		      gen_recurse() functions */
   bool_domain,
   char_domain,
