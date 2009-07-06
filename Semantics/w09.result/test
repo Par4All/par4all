@@ -32,8 +32,8 @@ C  T(M) {M==0, MS==0, S==0}
 C (0,4)
       M = 0                                                             0010
 
-C  T(M,MS,S) {M#init<=M, M+MS#init+2S#init<=M#init+MS+2S,
-C    MS#init+3S#init<=MS+3S, S#init<=S}
+C  T(M,MS,S) {M#init==0, MS#init==0, S#init==0, 0<=M, MS<=3M,
+C    MS<=2M+2S, M<=MS+2S, MS<=2, 0<=MS+3S, 0<=S, S<=4}
 
 C (0,5)
 
@@ -80,14 +80,18 @@ C           END BLOCK
          ENDIF
       ENDDO
 
-C  T() {0<=M, MS<=3M, M<=MS+2S, 0<=M+S, MS<=3, MS+3S<=15, 0<=S, S<=5}
+C  T() {0<=M, MS<=3M, M<=MS+2S, 5<=5M+S, 2<=2M+5S, 1<=M+4S, 1<=M+S,
+C    M<=2S+3, M+S<=15, MS<=3, 15<=5MS+13S, 1<=MS+3S, MS+3S<=15, 0<=S,
+C    S<=5}
 
 C (0,13)
 
       PRINT *, MS, S, M                                                 0022
 
-C  T(MS,S) {0<=M, MS#init<=3M, M<=MS#init+2S#init, 0<=M+S#init,
-C    MS#init<=3, MS#init+3S#init<=15, 0<=S#init, S#init<=5}
+C  T(MS,S) {0<=M, MS#init<=3M, M<=MS#init+2S#init, 5<=5M+S#init,
+C    2<=2M+5S#init, 1<=M+4S#init, 1<=M+S#init, M<=2S#init+3,
+C    M+S#init<=15, MS#init<=3, 15<=5MS#init+13S#init,
+C    1<=MS#init+3S#init, MS#init+3S#init<=15, 0<=S#init, S#init<=5}
 
 C (0,14)
       READ *, S, MS                                                     0023
@@ -201,8 +205,9 @@ C (0,13)
 
       PRINT *, MS, S, M                                                 0022
 
-C  P(M,MS,S) {0<=M, MS<=3M, M<=MS+2S, 5<=5M+S, 0<=M+S, MS<=3,
-C    15<=5MS+13S, MS+3S<=15, 0<=S, S<=5}
+C  P(M,MS,S) {0<=M, MS<=3M, M<=MS+2S, 5<=5M+S, 2<=2M+5S, 1<=M+4S,
+C    1<=M+S, M<=2S+3, M+S<=15, MS<=3, 15<=5MS+13S, 1<=MS+3S,
+C    MS+3S<=15, 0<=S, S<=5}
 
 C (0,14)
       READ *, S, MS                                                     0023

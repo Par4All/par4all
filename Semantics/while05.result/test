@@ -21,13 +21,24 @@ int while05()
 //  T(i,n) {i+n==i#init+n#init-1}
 
 
-   while (--n) 
+   while (--n) {
+
+//  T() {}
+
+      printf("loop: i=%d, n=%d, i+n=%d\n", i, n, i+n);
 
 //  T(i) {i==i#init+1}
 
       i++;
+   }
+
+//  T() {}
+
+
+   printf("exit: i=%d, n=%d, i+n=%d\n", i, n, i+n);
 
 //  T(while05) {i==while05}
+
 
    return i;
 }
@@ -54,13 +65,24 @@ int while05()
 //  P(i,n) {i==0, n==10}
 
 
-   while (--n) 
+   while (--n) {
+
+//  P(i,n) {i+n==10}
+
+      printf("loop: i=%d, n=%d, i+n=%d\n", i, n, i+n);
 
 //  P(i,n) {i+n==10}
 
       i++;
+   }
 
 //  P(i,n) {10<=i+n, i+n<=11}
+
+
+   printf("exit: i=%d, n=%d, i+n=%d\n", i, n, i+n);
+
+//  P(i,n) {10<=i+n, i+n<=11}
+
 
    return i;
 }

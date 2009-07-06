@@ -69,7 +69,7 @@ void complete04()
       // BEGIN BLOCK
       int j = 0;
 
-//  T(i,j) {0<=i, i+1<=n, j#init<=j, 1<=n}
+//  T(i,j) {i+j#init==j, 0<=i, i+j#init+1<=j+n, i+1<=n, j#init<=j}
 
       for (i = 0;i<n;i++)                                               /*0010*/
 
@@ -110,7 +110,7 @@ void complete04()
 
       for (i = 0;i<n;i++)                                               /*0010*/
 
-//  P(i,j) {0<=i, i+1<=n, 0<=j}
+//  P(i,j) {i==j, 0<=i, i+1<=n}
 
          j++;                                                           /*0011*/
       // END BLOCK
