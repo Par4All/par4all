@@ -1951,9 +1951,8 @@ because loop indices are not privatized. A prettyprint option,
 \begin{center}
 \verb/PRETTYPRINT_ALL_PRIVATE_VARIABLES/
 \end{center}
-must be set to true to see if
-the loop index is privatized or not). The problem disappears when some
-loop indices are renamed.
+must be set to true to see if the loop index is privatized or
+not). The problem disappears when some loop indices are renamed.
 
 The problem is due to the internal representation of DO loops: \PIPS{} has
 no way to distinguish between initialization effects and increment
@@ -3017,10 +3016,28 @@ summary_precondition            > MODULE.summary_precondition
 \index{Total Precondition}
 
 %%@UserManualDocumentation: total preconditions
-A total precondition for a statement $s$ in a module $m$ is a predicate true
+Total preconditions are interesting to optimize the nominal behavior
+of a terminating application. It is assumed that the application ends
+in the main procedure. All other exits, aborts or stops, explicit or
+implicit such as buffer oveflows and zero divide and null pointer
+dereferencing, are considered exceptions. This also applies at the
+module level. Modules nominally return. Other control flows are
+considered exceptions. Non-terminating modules have an empty total
+precondition\footnote{Non-termination conditions could also be
+  propagated backwards to provide an over-approximation of the
+  conditions under which an application never terminates,
+  i.e. conditions for liveness.}. The standard preconditions can be
+refined by anding with the total preconditions to get information
+about the nominal behavior. Similar sources of increased accuracy are
+the array declarations and the array references, which can be
+exploited directly with properties described in
+section~\ref{subsubsection:array-declarations-and-accesses}. These two
+properties should be set to true whenever possible.
+
+Hence, a total precondition for a statement $s$ in a module $m$ is a predicate true
 for every state from which the final state of $m$, in which $s$
 is executed, is reached. It is an over-approximation of the theoretical
-total precondition. Hence, if the predicate is false, the final state
+total precondition. So, if the predicate is false, the final control state
 cannot be reached. A total precondition is of NewGen type "transformer" (see
 \Pri{}) and total\_preconditions is of type \verb+statement_mapping+.
 
@@ -3043,6 +3060,12 @@ Since these two options for transformer and total precondition computations are
 independent, \verb/transformer_full_inter/ and
 \verb/total_preconditions_inter/ must be both (independently) selected
 to obtain the best possible results.
+
+\paragraph{Status:}
+This is a set of experimental passes. The intraprocedural part is
+implemented. The interprocedural part is not implemented yet, waiting
+for an expressed practical interest. Neither C for loops nor repeat
+loops are supported.
 %%!UserManualDocumentation
 
 \subsubsection{Menu for Total Preconditions}
@@ -3066,6 +3089,7 @@ total_preconditions_intra            > MODULE.total_preconditions
         < PROGRAM.entities
         < MODULE.cumulated_effects
         < MODULE.transformers
+        < MODULE.preconditions
         < MODULE.summary_effects
         < MODULE.summary_transformer
         < MODULE.code
@@ -3089,6 +3113,7 @@ total_preconditions_inter        > MODULE.total_preconditions
         < MODULE.code
         < MODULE.cumulated_effects
         < MODULE.transformers
+        < MODULE.preconditions
         < MODULE.summary_total_postcondition
         < MODULE.summary_effects
         < CALLEES.summary_effects
@@ -3203,6 +3228,7 @@ SEMANTICS_ANALYZE_SCALAR_COMPLEX_VARIABLES FALSE
 \end{PipsProp}
 
 \subsubsection{Array declarations and accesses}
+\label{subsubsection:array-declarations-and-accesses}
 \index{SEMANTICS\_TRUST\_ARRAY\_DECLARATIONS}
 \index{SEMANTICS\_TRUST\_ARRAY\_REFERENCES}
 
@@ -7150,6 +7176,38 @@ used_before_set   > MODULE.ubs
 
 \section{Miscellanous Transformations}
 
+The following warning paragraphs should not be located here, but the
+whole introduction has to be updated to take into account the merger
+with properties-rc.tex, the new content (the transformation section
+has been exploded) and the new passes such as gpips. No time right
+now. FI.
+
+All PIPS transformations assume that the initial code is legal
+according to the language standard. In other words, its semantics is
+well defined. Otherwise, it is impossible to maintain a constant
+semantics through program transformations. So uninitialized variables,
+for instance, can lead to codes that seem wrong, because they are
+likely to give different outputs than the initial code. But this does
+not matter as the initial code output is undefined and could well be
+the new output,
+
+Also, remember that dead code does not impact the semantics in an
+observable way. Hence dead code can be transformed in apparently weird
+ways. For instance, all loops that are part of a dead code section can
+be found parallel, although they are obviously sequential, because all
+the references will carry an unfeasible predicate. In fact, reference
+A(I), placed in a dead code section, does not reference the memory and
+does not have to be part of the dependence graph.
+
+Dead code can crop out in many modules when a whole application linked
+with a library is analyzed. All unused library modules are dead for
+PIPS.
+
+On the other hand, missing source modules synthesized by PIPS may also
+lead to weird results because they are integrated in the application
+with empty definitions. Their call sites have no impact on the
+application semantics.
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% TYPE CHECK
 
 \subsection{Type Checker}
@@ -7207,6 +7265,10 @@ Privatizer detects variables that are local to a loop nest and marks
 these variables as private. A variable is private to a loop if the
 values assigned to this variable inside the loop cannot reach a
 statement outside the loop body.
+
+Note that illegal code, for instance code with uninitialized
+variables, can lead to surprising privatizations, which are still
+correct since the initial semantics is unspecified.
 %%!UserManualDocumentation
 
 \begin{PipsMake}
@@ -7886,7 +7948,22 @@ print_code                      > MODULE.printed_file
 \subsection{Sequential View with Transformers}
 
 %%@UserManualDocumentation: print_code_transformers
-Display the code decorated with the transformers.
+Display the code statements decorated with their transformers, except
+for loops, which are decorated with the transformer from the loop
+entering states to the loop body states. The effective loop
+transformer, linking the input to the output state of a loop, is
+recomputed when needed and can be deduced from the precondition of the
+next statement after the loop\footnote{PIPS design maps statement to
+  decorations. For one loop statement, we need two transformers: one
+  transformer to propagate the loop precondition as loop body
+  precondition and a second transformer to propagate the loop
+  precondition as loop postcondition. The second transformer can be
+  deduced from the first one, but not the first one from the second
+  one, and the second transformer is not used to compute the loop
+  postcondition as it is more accurate to use the body
+  postcondition. It is however computed to derive a compound statement
+  transformer, e.g. the loop is part of block, which is part of a
+  module statement, and then junked.}.
 %%!UserManualDocumentation
 
 \begin{PipsMake}
