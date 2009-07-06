@@ -1,0 +1,9 @@
+
+Compilation warnings (I miss the errors!)
+
+PARSER[MULLER05] (SizeOfArray) Array size incompatible with 32 bit signed integers
+Maximum number of elements: 134217727, number of elements declared: 134217728
+PARSER[MULLER05] (SafeSizeOfArray) Varying size of array "MULLER05:U0"
+PARSER[MULLER05] (SafeSizeOfArray) An integer PARAMETER may have been initialized with a real value?
+PARSER[MULLER05] (set_debug_stack_pointer) debug level stack is set to 2
+unknown[unknown] (safe_do_something) Request aborted under pipsmake: build resource PRINTED_FILE for module MULLER05.
