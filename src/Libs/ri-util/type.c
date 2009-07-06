@@ -1557,7 +1557,7 @@ type intrinsic_call_to_type(call c)
       else if(ENTITY_BRACE_INTRINSIC_P(f)) 
 	{
 	  /* We should reconstruct a struct type or an array type... */
-	  t= make_type(is_type_variable, make_variable(make_basic_overloaded(),
+	  t = make_type(is_type_variable, make_variable(make_basic_overloaded(),
 						       NIL,NIL));
 	}
       else if(ENTITY_ASSIGN_P(f)) 
@@ -1595,8 +1595,10 @@ type intrinsic_call_to_type(call c)
 	    }, CDR(args));
 	  t = ct;
 	}
-      
     }
+  else {
+    t = copy_type(rt);
+  }
   
   pips_debug(7, "Intrinsic call to intrinsic \"%s\" with a posteriori result type \"%s\"\n",
 	     module_local_name(f),

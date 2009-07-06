@@ -61,21 +61,24 @@ int number_of_initial_values(list args)
   return niv;
 }
 
-/* This function computes the total size of a variable, ie. the product of
-the number of elements and the size of each element, when it is a constant. 
+/* This function computes the total size of a variable in bytes,
+ie. the product of the number of elements and the size of each element
+in byte, when this size is a constant.
 
 Arrays cannot be sized by a variable according to Fortran 77 standard,
-unless they are formal parameters (see SafeSizeOfArray).
+unless they are formal parameters (see SafeSizeOfArray). This
+restriction is lifted for arrays allocated in the area *STACK*.
 
 Arrays can be sized by expressions according to C latest standard (see
 Validation/C_syntax/array_declarators.c). Then their sizes are not
 available at compile time and their addresses in stack cannot be
-computed (see CSafeSizeOfArray).
+computed at compiler time (see CSafeSizeOfArray).
 
+Since the size is returned in a signed int, there is a maximum PIPS
+size for an array.
 */
 
-bool
-SizeOfArray(entity e, int * s)
+bool SizeOfArray(entity e, int * s)
 {
   type et = entity_type(e);
   type uet = ultimate_type(et);
@@ -83,6 +86,7 @@ SizeOfArray(entity e, int * s)
   bool ok = TRUE;
   int se = -1;
   int ne = -1;
+  int mne = -1;
 
   assert(type_variable_p(et) && type_variable_p(uet));
   a = type_variable(et);
@@ -149,7 +153,22 @@ SizeOfArray(entity e, int * s)
     }
   }
 
-  * s = ok? ne * se : se;
+  /* Check for 32 bit signed overflows */
+  mne = INT_MAX/se;
+
+  if(ok) {
+    if(mne>=ne)
+      *s = ne*se;
+    else {
+      pips_user_warning("Array size incompatible with 32 bit signed integers\n"
+			"Maximum number of elements: %d, number of elements declared: %d\n",
+			mne, ne);
+      ok = FALSE;
+    }
+  }
+  else {
+    *s = se;
+  }
 
   return ok;
 }
