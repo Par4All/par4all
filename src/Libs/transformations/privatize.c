@@ -24,7 +24,12 @@
 /* -- privatize.c 
 
    This algorithm introduces local definitions into loops that are
-   kennedizable.
+   kennedizable. The privatization is only performed on dynamic scalar
+   variables (could be extended to STACK variables, but why would you
+   allocate a variable in the PIPS *STACK* area). It is based on the
+   dependence levels. The variable can only be private to loops
+   containing all dependence arcs related to the variable. This should
+   fail in C when a dynamic variable is initialized.
 
  */
 #define _GNU_SOURCE
@@ -62,8 +67,17 @@ static bool privatizable(entity e)
 {
     storage s = entity_storage( e ) ;
 
+    /* For C, it should be checked that e has no initial value because
+       there is no dependence arc between the initialization in t he
+       declaration and the other references. This is not very smart,
+       because it all depends on where e is declared.
+
+       Also, stack_area_p() would be OK for a privatization.
+    */
+
     return( entity_scalar_p( e ) && 
 	    storage_ram_p( s ) &&
+	    value_unknown_p(entity_initial(e)) &&
 	    dynamic_area_p( ram_section( storage_ram( s )))) ;
 }
 
@@ -172,99 +186,93 @@ static list loop_prefix(list l1, list l2)
 /* UPDATE_LOCALS removes the entity E from the locals of loops in LS that
    are not in common with the PREFIX. */
 
-static void 
-update_locals(list prefix, list ls, entity e)
+static void update_locals(list prefix, list ls, entity e)
 {
-  debug(1, "update_locals", "Begin\n");
+  pips_debug(1, "Begin\n");
 
-    if( ENDP( prefix )) {
-      if(!ENDP(ls)) {
-	ifdebug(1) {
-	    debug(1, "update_locals", "Removing %s", entity_name( e )) ;
-	    fprintf( stderr, " from locals of " ) ;
-	    MAPL( sts, {statement st = STATEMENT( CAR( sts )) ;
-			
-			fprintf( stderr, "%d ", statement_number( st )) ;},
-		 ls ) ;
-	    fprintf( stderr, "\n" ) ;
+  if( ENDP( prefix )) {
+    if(!ENDP(ls)) {
+      ifdebug(1) {
+	pips_debug(1, "Removing %s from locals of ", entity_name( e )) ;
+	FOREACH(STATEMENT, st, ls) {
+	  pips_debug(1, "%d ", statement_number( st )) ;
 	}
-	MAPL( sts, {statement st = STATEMENT( CAR( sts )) ;
-		    instruction i = statement_instruction( st ) ;
-
-		    pips_assert( "remove_local", instruction_loop_p( i )) ;
-		    gen_remove( &loop_locals( instruction_loop( i )), e );},
-	      ls ) ;
+	pips_debug(1, "\n" ) ;
       }
-      else {
-	debug(1, "update_locals", "ls is empty, end of recursion\n");
+      FOREACH(STATEMENT, st, ls) {
+	instruction i = statement_instruction( st ) ;
+
+	pips_assert( "instruction i is a loop", instruction_loop_p( i )) ;
+	gen_remove( &loop_locals( instruction_loop( i )), e );
+	pips_debug(1, "Variable %s is removed from locals of statement %d\n",
+		   entity_name(e), statement_number(st));
       }
     }
     else {
-	pips_assert( "update_locals", 
-		     STATEMENT( CAR( prefix )) == STATEMENT( CAR( ls ))) ;
-
-	debug(1, "update_locals", "Recurse on common prefix\n");
-
-	update_locals( CDR( prefix ), CDR( ls ), e ) ;
+      pips_debug(1, "ls is empty, end of recursion\n");
     }
+  }
+  else {
+    pips_assert( "The first statements in prefix and in ls are the same statement", 
+		 STATEMENT( CAR( prefix )) == STATEMENT( CAR( ls ))) ;
 
-  debug(1, "update_locals", "End\n");
+    pips_debug(1, "Recurse on common prefix\n");
+
+    update_locals( CDR( prefix ), CDR( ls ), e ) ;
+  }
+
+  pips_debug(1, "End\n");
 }
 
 /* expression_implied_do_index_p
    return true if the given entity is the index of an implied do
    contained in the given expression. --DB
 */
-static bool expression_implied_do_index_p(expression exp,entity e)
+static bool expression_implied_do_index_p(expression exp, entity e)
 {
   bool li=FALSE;
   bool dep=FALSE;
-  if (expression_implied_do_p(exp))
-    {
-      list args = call_arguments(syntax_call(expression_syntax(exp)));
-      expression arg1 = EXPRESSION(CAR(args)); /* loop index */
-      expression arg2 = EXPRESSION(CAR(CDR(args))); /* loop range */
-      entity index = reference_variable(syntax_reference(expression_syntax(arg1)));
-      range r = syntax_range(expression_syntax(arg2));
-      list range_effects;
 
-      debug(5,"expression_implied_do_index_p","begin\n");
-      debug(7,"expression_implied_do_index_p",
-	    "%s implied do index ? index: %s\n",
-		entity_name(e),entity_name(index));
+  if (expression_implied_do_p(exp)) {
+    list args = call_arguments(syntax_call(expression_syntax(exp)));
+    expression arg1 = EXPRESSION(CAR(args)); /* loop index */
+    expression arg2 = EXPRESSION(CAR(CDR(args))); /* loop range */
+    entity index = reference_variable(syntax_reference(expression_syntax(arg1)));
+    range r = syntax_range(expression_syntax(arg2));
+    list range_effects;
 
-      range_effects = proper_effects_of_range(r);
+    pips_debug(5, "begin\n");
+    pips_debug(7, "%s implied do index ? index: %s\n",
+	       entity_name(e),entity_name(index));
 
-      MAP(EFFECT, eff, 
-	  {
-	    if (reference_variable(effect_any_reference(eff)) == e &&
-		action_read_p(effect_action(eff))) 
-	      {
-			
-		debug(7, "expression_implied_do_index_p", 
-			      "index read in range expressions\n");
-		dep=TRUE;
-			
-	      }
-	   }, range_effects);
-      free_effects(make_effects(range_effects));
+    range_effects = proper_effects_of_range(r);
+
+    FOREACH(EFFECT, eff, range_effects) {
+      if (reference_variable(effect_any_reference(eff)) == e &&
+	  action_read_p(effect_action(eff))) {
+	  pips_debug(7, "index read in range expressions\n");
+	  dep=TRUE;
+      }
+    }
+
+    free_effects(make_effects(range_effects));
   
-      if (!dep)
-	{
-	  if (same_entity_p(e,index)) li=TRUE;
-	  else 
-	    MAP(EXPRESSION,expr,{
-	      syntax s = expression_syntax(expr);
-	      if(syntax_call_p(s))
-		{
-		  debug(5,"expression_implied_do_index_p","Nested implied do\n");
-		  if (expression_implied_do_index_p(expr,e))
-		    li=TRUE;
-		}
-	    },CDR(CDR(args)));
+    if (!dep) {
+      if (same_entity_p(e,index))
+	li=TRUE;
+      else {
+	FOREACH(EXPRESSION,expr, CDR(CDR(args))) {
+	  syntax s = expression_syntax(expr);
+	  if(syntax_call_p(s)) {
+	    pips_debug(5,"Nested implied do\n");
+	    if (expression_implied_do_index_p(expr,e))
+	      li=TRUE;
+	  }
 	}
-  debug(5,"expression_implied_do_index_p","end\n");
-}
+      }
+    }
+    pips_debug(5,"end\n");
+  }
   return li;
 }
 
@@ -293,94 +301,120 @@ bool is_implied_do_index(entity e, instruction ins)
    statement ST of the vertex V of the dependency graph. Arrays are not 
    privatized. */
 
-static void 
-try_privatize(vertex v, statement st, effect f, entity e)
+static void try_privatize(vertex v, statement st, effect f, entity e)
 {
-    cons *ls ;
+  list ls ;
 
-    /* BC : really dirty : overrides problems in the computation of effects 
-       for C programs; Should be fixed later. */
-    if (anywhere_effect_p(f))
-      {return;}
+  /* BC : really dirty : overrides problems in the computation of effects 
+     for C programs; Should be fixed later. */
+  if (anywhere_effect_p(f))
+    {return;}
 
-    if( !entity_scalar_p( e )) {
-	return ;
+  if( !entity_scalar_p( e )) {
+    return ;
+  }
+
+  ls = load_statement_enclosing_loops(st);
+
+  ifdebug(1) {
+    if(statement_loop_p(st)) {
+      pips_debug(1, "Trying to privatize %s in loop statement %d with local(s) ",
+		 entity_local_name( e ), statement_number( st )) ;
+      print_arguments(loop_locals(statement_loop(st)));
     }
-
-    ls = load_statement_enclosing_loops(st);
-
-    ifdebug(1) {
-	if(statement_loop_p(st)) {
-	    debug(1, "try_privatize", "Trying to privatize %s in loop statement %d with local(s) ",
-		  entity_local_name( e ), statement_number( st )) ;
-	    print_arguments(loop_locals(statement_loop(st)));
-	}
-	else {
-	    debug(1, "try_privatize", "Trying to privatize %s in statement %d\n",
-	    entity_local_name( e ), statement_number( st )) ;
-	}
+    else {
+      pips_debug(1, "Trying to privatize %s in statement %d\n",
+		 entity_local_name( e ), statement_number( st )) ;
     }
+  }
 
-    FOREACH(SUCCESSOR, succ, vertex_successors(v)) {
-	vertex succ_v = successor_vertex( succ ) ;
-	dg_vertex_label succ_l = 
-	    (dg_vertex_label)vertex_vertex_label( succ_v ) ;
-	dg_arc_label arc_l = 
-	    (dg_arc_label)successor_arc_label( succ ) ;
-	statement succ_st = 
-	    ordering_to_statement(dg_vertex_label_statement(succ_l));
-	instruction succ_i = statement_instruction( succ_st ) ;
-	cons *succ_ls = load_statement_enclosing_loops( succ_st ) ;
-	
+  FOREACH(SUCCESSOR, succ, vertex_successors(v)) {
+    vertex succ_v = successor_vertex( succ ) ;
+    dg_vertex_label succ_l = 
+      (dg_vertex_label)vertex_vertex_label( succ_v ) ;
+    dg_arc_label arc_l = 
+      (dg_arc_label)successor_arc_label( succ ) ;
+    statement succ_st = 
+      ordering_to_statement(dg_vertex_label_statement(succ_l));
+    instruction succ_i = statement_instruction( succ_st ) ;
+    list succ_ls = load_statement_enclosing_loops( succ_st ) ;
 
-	/* this portion of code induced the erroneous privatization of 
-	   non-private variables, for instance in :
-	     DO I = 1,10
-	       J = J +1 a(I) = J
-	     ENDDO
-	   so I comment it out. But some loops are not parallelized anymore
-	   for instance Semantics/choles, Ricedg/private and Prettyprint/matmul.
-	   (see ticket #152). BC.
-	*/
-	/* if( v == succ_v ) {
-	    continue ;
-	    }*/
-	FOREACH(CONFLICT, c, dg_arc_label_conflicts(arc_l)) {
-	    effect sc = conflict_source( c ) ;
-	    effect sk = conflict_sink( c ) ;
-	    cons *prefix ;
+    /* this portion of code induced the erroneous privatization of 
+       non-private variables, for instance in :
+
+       DO I = 1,10
+       J = J +1 
+       a(I) = J
+       ENDDO
+
+       so I comment it out. But some loops are not parallelized
+       anymore for instance Semantics/choles, Ricedg/private and
+       Prettyprint/matmul.  (see ticket #152). BC.
+
+       In fact, J is privatizable in the above loop if J is not
+       initialized. We have to remember that PIPS maintains the
+       semantics of well-defined code, but correctly output weird
+       results when it does not matter. We also have to remember that
+       a PIPS phase that has been used for almost 20 years is unlikely
+       to be buggy with Fortran code. For C code, careful extensions
+       might be needed: in this case, dynamic variables can be
+       initialized and the initialization is not taken into account by
+       the dependence graph (for the time being). Hence function
+       "privatizable" was made a bit mor restrictive.
+
+       The test commented out is correct, but not explained. SO I
+       chose to change the behavior at a lower level, where it is
+       easier to understand. Ticket #152 should probably be
+       closed. FI.
+    */
+    /*
+      if( v == succ_v) {
+      continue ;
+      }
+    */
+
+    FOREACH(CONFLICT, c, dg_arc_label_conflicts(arc_l)) {
+      effect sc = conflict_source( c ) ;
+      effect sk = conflict_sink( c ) ;
+      cons *prefix ;
 			     
-	    if(!entity_conflict_p( e, effect_entity( sc )) ||
-	       !entity_conflict_p( e, effect_entity( sk )) ||
-	       action_write_p( effect_action( sk))) {
-		continue ;
-	    }
-	    /* PC dependance and the sink is a loop index */
-	    if(action_read_p( effect_action( sk )) &&
-	       (instruction_loop_p( succ_i) ||
-	       is_implied_do_index( e, succ_i))) {
-		continue ;
-	    }
-	    debug(5,"try_privatize","Conflict for %s between statements %d and %d\n",
-		  entity_local_name(e), statement_number(st), statement_number(succ_st));
-	    debug(5,"try_privatize","remove %s from locals in enclosing loops\n",
-		  entity_local_name(e));
+      /* Take into account def-def and use-def arcs only */
+      if(!entity_conflict_p( e, effect_entity( sc )) ||
+	 !entity_conflict_p( e, effect_entity( sk )) ||
+	 action_write_p( effect_action( sk))) {
+	continue ;
+      }
+      /* PC dependance and the sink is a loop index */
+      if(action_read_p( effect_action( sk )) &&
+	 (instruction_loop_p( succ_i) ||
+	  is_implied_do_index( e, succ_i))) {
+	continue ;
+      }
+      pips_debug(5,"Conflict for %s between statements %d and %d\n",
+		 entity_local_name(e), statement_number(st), statement_number(succ_st));
 
-	    if (v==succ_v)
-	      {
-		update_locals( NIL, ls, e ); /* remove e from all enclosing loops */ 
-	      }
-	    else
-	      {
-		prefix = loop_prefix( ls, succ_ls ) ;
-		update_locals( prefix, ls, e ) ;
-		update_locals( prefix, succ_ls, e ) ;
-		gen_free_list( prefix ) ;
-	      }
-	}
+      if (v==succ_v) {
+	/* No decision can be made from this couple of effects alone */
+	;
+	//pips_debug(5,"remove %s from locals in all enclosing loops\n",
+	//	   entity_local_name(e));
+	//update_locals( NIL, ls, e ); /* remove e from all enclosing loops */ 
+      }
+      else {
+	pips_debug(5,"remove %s from locals in non common enclosing loops\n",
+		   entity_local_name(e));
+	prefix = loop_prefix( ls, succ_ls ) ;
+	/* e cannot be a local variable at a lower level than
+	   the common prefix because of this dependence
+	   arc. */
+	update_locals( prefix, ls, e ) ;
+	update_locals( prefix, succ_ls, e ) ;
+	gen_free_list( prefix ) ;
+      }
     }
+  }
 
-    debug(1, "try_privatize", "End\n");
+  pips_debug(1, "End\n");
 }
 
 /* PRIVATIZE_DG looks for definition of entities that are locals to the loops
