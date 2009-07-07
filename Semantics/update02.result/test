@@ -38,6 +38,7 @@ void update02()
 //               <must be read   >: i
 //               <must be written>: i j
    j = --i;
+//               <must be read   >: j
    foo(j);
 }
 
@@ -64,6 +65,7 @@ void update02()
 //               <must be read   >: i
 //               <must be written>: i j
    j = --i;
+//               <must be read   >: j
    foo(j);
 }
 

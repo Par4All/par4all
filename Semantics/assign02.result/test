@@ -19,6 +19,7 @@ void assign02()
 //               <must be read   >: i j
 //               <must be written>: i j
    (j = 2*i, i = j+1);
+//               <must be read   >: i
    /* i is assigned before k, left-to-right evaluation */
    
    
@@ -47,6 +48,7 @@ void assign02()
 //               <must be read   >: i j
 //               <must be written>: i j
    (j = 2*i, i = j+1);
+//               <must be read   >: i
    /* i is assigned before k, left-to-right evaluation */
    
    

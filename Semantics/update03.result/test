@@ -24,6 +24,7 @@ void update03()
 //               <must be read   >: i
 //               <must be written>: i
    i = (i += 2)+1;
+//               <must be read   >: i
    foo(i);
 }
 
@@ -40,6 +41,7 @@ void update03()
 //               <must be read   >: i
 //               <must be written>: i
    i = (i += 2)+1;
+//               <must be read   >: i
    foo(i);
 }
 

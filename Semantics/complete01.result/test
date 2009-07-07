@@ -16,6 +16,7 @@ void complete01()
          j++;                                                           /*0010*/
       // END BLOCK
    }
+//               <must be read   >: i
 
    foo(i);                                                              /*0015*/
    // END BLOCK
@@ -42,6 +43,7 @@ void complete01()
          j++;                                                           /*0010*/
       // END BLOCK
    }
+//               <must be read   >: i
 
    foo(i);                                                              /*0015*/
    // END BLOCK

@@ -54,7 +54,7 @@ main()
 //               <must be written>: i
 
    for(i = 0; i <= d1-1; i += 1)
-//               <must be read   >: d1 i
+//               <must be read   >: d1 d2 i
 //               <must be written>: y[i][4]
       call07(i, d2, &y[i][0]);
 }
@@ -68,13 +68,13 @@ main()
    int y[d1][d2];
    int i;
    int j;
-//               <may be read    >: i
+//               <may be read    >: d2 i
 //               <may be written >: y[*][4]
 //               <must be read   >: d1
 //               <must be written>: i
 
    for(i = 0; i <= d1-1; i += 1)
 //               <may be written >: y[*][4]
-//               <must be read   >: d1 i
+//               <must be read   >: d1 d2 i
       call07(i, d2, &y[i][0]);
 }

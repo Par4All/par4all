@@ -25,6 +25,7 @@ void decl05()
 {
    int i = 1;
    int j = i+1;
+//               <must be read   >: i
 
    foo(i);
 }

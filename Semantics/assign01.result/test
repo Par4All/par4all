@@ -8,6 +8,7 @@ void assign01()
 //               <must be written>: i j
 
    i = 2+(j = 1)+3;                                                     /*0007*/
+//               <must be read   >: i
 
    foo(i);                                                              /*0009*/
 }
@@ -21,6 +22,7 @@ void assign01()
 //               <must be written>: i j
 
    i = 2+(j = 1)+3;                                                     /*0007*/
+//               <must be read   >: i
 
    foo(i);                                                              /*0009*/
 }
