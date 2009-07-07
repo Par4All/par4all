@@ -21,3 +21,11 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+
+
+/* To choose the concepts used to compute dependence chains */
+enum chain_type {
+  USE_PROPER_EFFECTS = 1,
+  USE_REGIONS,
+  USE_IN_OUT_REGIONS
+};

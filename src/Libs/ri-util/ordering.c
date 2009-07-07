@@ -160,6 +160,7 @@ hash_table set_ordering_to_statement(statement s)
 }
 
 
+/* Reset the mapping from ordering to statement. */
 void
 reset_ordering_to_statement(void)
 {

@@ -129,19 +129,73 @@ static hash_table Ref_out ;		/* Ref_out maps each statement to the
 static graph dg ;			/* dg is the dependency graph */
 
 static hash_table Vertex_statement ;	/* Vertex_statement maps each 
-					   statemen to its vertex in the 
+					   statement to its vertex in the 
 					   dependency graph. */
 
 static bool one_trip_do ;
 static bool keep_read_read_dependences ;
 static bool disambiguate_constant_subscripts ;
 
-static void set_effects(char *module_name, int use);
 static void reset_effects();
 static list load_statement_effects(statement st);
 
 static void local_print_statement_set(char *msg, set s);
-
+
+
+/* Acces functions for debug only */
+
+/* PRINT_STATEMENT_SET displays on stderr, the MSG followed by the set
+   of statement numbers present in the set S. */
+
+static void local_print_statement_set( msg, s )
+char *msg ;
+set s ;
+{
+    fprintf( stderr, "\t%s ", msg ) ;
+    SET_MAP( st, {
+	fprintf(stderr, ",%p (%td) ", 
+		st, statement_number( (statement)st ));
+    }, s ) ;
+    fprintf( stderr, "\n" );
+}
+
+hash_table kill_table()
+{
+    return( Kill ) ;
+}
+
+hash_table gen_table()
+{
+    return( Gen ) ;
+}
+
+hash_table def_in_table()
+{
+    return( Def_in ) ;
+}
+
+hash_table def_out_table()
+{
+    return( Def_out ) ;
+}
+
+hash_table ref_in_table()
+{
+    return( Def_in ) ;
+}
+
+hash_table ref_out_table()
+{
+    return( Def_out ) ;
+}
+
+hash_table defs_table()
+{
+    return( Defs ) ;
+}
+
+
+
 /* VERTEX_STATEMENT returns the vertex associated to the statement ST in the
    dependence graph DG. */
 
@@ -154,6 +208,7 @@ statement st ;
     return( v ) ;
 }
 
+/* Add a statement to the defining statement set of an entity. */
 static void add_entity_to_defs( e, st )
 entity e ;
 statement st ;
@@ -174,21 +229,24 @@ statement st ;
 	      ram_shared( storage_ram( s ))) ;
     }
 }
-
-/* INIT_ONE_STATEMENT initializes the global data structures needed
-   for usedef computation of one statement ST. */
 
-static void init_one_statement( st )
+
+/* Initializes the global data structures needed for usedef computation of
+   one statement.
+*/
+static bool init_one_statement( st )
 statement st ;
 {
     if( GEN( st ) == (set) HASH_UNDEFINED_VALUE ) {
+      /* If the statement has never been seen, allocate new sets: */
 	dg_vertex_label l ;
 	vertex v ;
 
 	ifdebug(2) {
-	    fprintf(stderr, "Init statement %td with effects %p\n", 
-		    statement_number( st ), load_statement_effects(st) );
-	    print_effects( load_statement_effects(st) ) ;
+	  fprintf(stderr, "Init statement %td with effects %p, ordering %tx\n", 
+		  statement_number( st ), load_statement_effects(st),
+		  statement_ordering(st));
+	  print_effects( load_statement_effects(st) ) ;
 	}
 	hash_put( Gen, (char *)st, (char *)MAKE_STATEMENT_SET()) ;
 	hash_put( Ref, (char *)st, (char *)MAKE_STATEMENT_SET()) ;
@@ -198,6 +256,7 @@ statement st ;
 	hash_put( Ref_in, (char *)st, (char *)MAKE_STATEMENT_SET()) ;
 	hash_put( Ref_out, (char *)st, (char *)MAKE_STATEMENT_SET()) ;
 
+	/* Create a new vertex in the DG for the statement: */
 	l = make_dg_vertex_label(statement_ordering(st), 
 				 sccflags_undefined ) ;
 	v = make_vertex( l, NIL ) ;
@@ -224,6 +283,8 @@ statement st ;
 	}
     }
     else {
+      /* If the statement has already been seen, reset the sets associated
+	 to it: */
 	set_clear( GEN( st )) ;
 	set_clear( REF( st )) ;
 	set_clear( KILL( st )) ;
@@ -232,71 +293,11 @@ statement st ;
 	set_clear( REF_OUT( st )) ;
 	set_clear( REF_IN( st )) ;
     }
+    /* Go on recursing down: */
+    return TRUE;
 }
-
-/* INIT_STATEMENT recursively initializes the sets of gens,
-   kills, ins and outs for the statements that appear in ST. Moreover, the
-   set of defs are computed; note that not only call statements are there,
-   but also enclosing statements (e.g, blocks and loops). */
 
-static void init_control() ;
 
-static void init_statement(statement st)
-{
-    instruction i = statement_instruction( st );
-
-    init_one_statement( st ) ;
-
-    switch( instruction_tag(i)) {
-    case is_instruction_block:
-	MAPL( sts, {init_statement( STATEMENT( CAR( sts )));},
-	      instruction_block( i )) ;
-	break ;
-    case is_instruction_test:
-	init_statement( test_true( instruction_test( i )));
-	init_statement( test_false( instruction_test( i )));
-	break ;
-    case is_instruction_loop:
-	init_statement( loop_body( instruction_loop( i ))) ;
-	break ;
-    case is_instruction_whileloop:
-	init_statement(whileloop_body( instruction_whileloop( i ))) ;
-	break ;
-    case is_instruction_forloop:
-	init_statement(forloop_body( instruction_forloop( i ))) ;
-	break ;
-    case is_instruction_expression: 
-    case is_instruction_call:
-	break ;
-    case is_instruction_unstructured:
-	init_control( unstructured_control( instruction_unstructured( i ))) ;
-	break ;
-    case is_instruction_goto: 
-	pips_internal_error("Go to instruction in CODE datastructure %d\n", instruction_tag( i )) ;
-	break;
-    default:
-	pips_internal_error("Unknown tag %d\n", instruction_tag( i )) ;
-    }
-}
-
-static void init_control( ct )
-control ct ;
-{
-    cons *blocs = NIL ;
-
-    ifdebug(1) {
-	mem_spy_begin();
-    }
-
-    CONTROL_MAP( c, {init_statement( control_statement( c ));},
-		 ct, blocs ) ;
-    gen_free_list( blocs ) ;
-
-    ifdebug(1) {
-	mem_spy_end("init_control");
-    }
-}
-
 /* The GENKILL_xxx functions implement the computation of GEN, REF and 
    KILL sets
    from Aho, Sethi and Ullman "Compilers" (p. 612). This is slightly
@@ -445,15 +446,16 @@ cons *l ;
 	  to_mask ) ;
     gen_free_list( to_mask ) ;
 }
-
+
+
 /* GENKILL_LOOP has to deal specially with the loop variable which is not
    managed in the Dragon book. If loops are at least one trip, then statements
    are always killed by execution of loop body. Effect masking is performed
-   on locals (i.e., gen set is pruned from local definitions). */
+   on locals (i.e., gen set is pruned from local definitions).
 
-/* FI: what should be made for while and for loops as well as for all
-   (block) occurences of local variables? */
-
+   FI: what should be made for while and for loops as well as for all
+   (block) occurences of local variables?
+*/
 static void genkill_loop(loop l, statement st)
 {
     statement b = loop_body( l ) ;
@@ -818,8 +820,11 @@ unstructured u ;
     ifdebug(1) {
 	mem_spy_end("inout_unstructured");
     }
-}					
-
+}
+
+
+/* Computes the in and out sets of a statement.
+ */
 static void inout_statement( st )
 statement st ;
 {
@@ -833,13 +838,18 @@ statement st ;
     */
     
     ifdebug(2) {
-	fprintf( stderr, "%*s> Statement %p (%td):\n", 
+	fprintf( stderr, "%*s> Computing DEF_IN and OUT of statement %p (%td):\n", 
 		 indent++, "", st, statement_number( st )) ;
 	local_print_statement_set( "DEF_IN", DEF_IN( st )) ;
 	local_print_statement_set( "DEF_OUT", DEF_OUT( st )) ;
 	local_print_statement_set( "REF_IN", REF_IN( st )) ;
 	local_print_statement_set( "REF_OUT", REF_OUT( st )) ;
     }
+
+    genkill_statement( st ) ;
+    set_assign( DEF_OUT( st ), GEN( st )) ;
+    set_assign( REF_OUT( st ), REF( st )) ;
+
     switch( instruction_tag( i = statement_instruction( st ))) {
     case is_instruction_block: 
 	inout_block( st, instruction_block( i )) ;
@@ -1167,221 +1177,78 @@ control c ;
     }
 }
 
-
-#define USE_PROPER_EFFECTS 1
-#define USE_REGIONS 2
-#define USE_IN_OUT_REGIONS 3
 
-bool atomic_chains(module_name)
-char *module_name;
-{
-    return chains(module_name, USE_PROPER_EFFECTS);
-}
-
-bool region_chains(module_name)
-char *module_name;
-{
-    return chains(module_name, USE_REGIONS);
-}
-
-bool in_out_regions_chains(module_name)
-char *module_name;
-{
-    return chains(module_name, USE_IN_OUT_REGIONS);
-}
+/** @brief compute from a given statement, the dependency graph.
 
 
-bool 
-chains(char *module_name, int use)
-{
-    statement module_stat;
-    instruction module_inst;
-    control module_cont = control_undefined ;
-    graph module_graph;
-    void print_graph() ;
-
-    debug_on("CHAINS_DEBUG_LEVEL");
-
-    ifdebug(1) {
-	mem_spy_init(0, 100000., NET_MEASURE, 0);
-	mem_spy_begin();
-	mem_spy_begin();
-    }
-
-    debug_off();
-
-    set_current_module_statement( (statement)
-	db_get_memory_resource(DBR_CODE, module_name, TRUE) );
-    module_stat = get_current_module_statement();
-    set_current_module_entity(local_name_to_top_level_entity(module_name));
-    /* set_entity_to_size(); should be performed at the workspace level */
-
-    debug_on("CHAINS_DEBUG_LEVEL");
-
-    ifdebug(1) {
-	mem_spy_end("Chains: resources loaded");
-	mem_spy_begin();
-    }
-   
-    pips_debug(1, "finding enclosing loops ...\n");
-    set_enclosing_loops_map( loops_mapping_of_statement(module_stat) );
-
-    module_inst = statement_instruction(module_stat);
-
-    if (! instruction_unstructured_p(module_inst)) {
-	module_cont = make_control(module_stat, NIL, NIL) ;
-
-	module_inst = make_instruction(is_instruction_unstructured,
-				       make_unstructured(module_cont,
-							 module_cont)) ;
-    }
-    set_effects(module_name,use);
-
-    ifdebug(1) {
-	mem_spy_end("Chains: Preamble");
-	mem_spy_begin();
-    }
-
-    module_graph = 
-	dependence_graph(instruction_unstructured(module_inst));
-
-    ifdebug(1) {
-	mem_spy_end("Chains: Computation");
-	mem_spy_begin();
-    }
-
-    ifdebug(2) {
-      set_ordering_to_statement(module_stat);
-      prettyprint_dependence_graph(stderr, module_stat, module_graph);
-    }
-
-    debug_off();
-
-    if( !control_undefined_p( module_cont )) {
-	control_statement (module_cont) = statement_undefined;
-	free_instruction( module_inst );
-    }
-
-    DB_PUT_MEMORY_RESOURCE(DBR_CHAINS, module_name, (char*) module_graph);
-
-    reset_effects();
-    clean_enclosing_loops();
-    reset_current_module_statement();
-    reset_current_module_entity();
-	ifdebug(2) {
-		reset_ordering_to_statement();
-	}
-    /* reset_entity_to_size(); */
-
-    debug_on("CHAINS_DEBUG_LEVEL");
-    ifdebug(1) {
-	mem_spy_end("Chains: Deallocation");
-	mem_spy_end("Chains");
-	mem_spy_reset();
-    }
-    debug_off();
-
-    return TRUE;
-}
-
-
-
-/* DEPENDENCE_GRAPH computes, from the control graph U, the dependency 
-   graph. */
-
-graph dependence_graph( u )
-unstructured u ;
-{
-    control c = unstructured_control( u ) ;
-
-    one_trip_do = get_bool_property( "ONE_TRIP_DO" ) ;
-    keep_read_read_dependences = 
-	    get_bool_property( "KEEP_READ_READ_DEPENDENCE" ) ;
-    disambiguate_constant_subscripts = 
-	    get_bool_property( "CHAINS_DISAMBIGUATE_CONSTANT_SUBSCRIPTS" ) ;
-
-    ifdebug(1) {
-	mem_spy_begin();
-	mem_spy_begin();
-    }
-
-    Gen = hash_table_make( hash_pointer, INIT_STATEMENT_SIZE ) ;
-    Ref = hash_table_make( hash_pointer, INIT_STATEMENT_SIZE ) ;
-    Kill = hash_table_make( hash_pointer, INIT_STATEMENT_SIZE ) ;
-    Def_in = hash_table_make( hash_pointer, INIT_STATEMENT_SIZE ) ;
-    Def_out = hash_table_make( hash_pointer, INIT_STATEMENT_SIZE ) ;
-    Ref_in = hash_table_make( hash_pointer, INIT_STATEMENT_SIZE ) ;
-    Ref_out = hash_table_make( hash_pointer, INIT_STATEMENT_SIZE ) ;
-    Defs = hash_table_make( hash_pointer, INIT_ENTITY_SIZE ) ;
-    Vertex_statement = hash_table_make( hash_pointer, INIT_STATEMENT_SIZE ) ;
-    dg = make_graph( NIL ) ;
-    init_control( c ) ;
-    inout_control( c ) ;
-    usedef_control( c ) ;
-
-#define TABLE_FREE(t) \
-    {HASH_MAP( k, v, {set_free( (set)v ) ;}, t ) ; hash_table_free(t);}
-
-    ifdebug(1) {
-	mem_spy_end("dependence_graph: after computation");
-	mem_spy_begin();
-    }
-
-    TABLE_FREE( Gen ) ;
-    TABLE_FREE( Ref ) ;
-    TABLE_FREE( Kill ) ;
-    TABLE_FREE( Def_in ) ;
-    TABLE_FREE( Def_out ) ;
-    TABLE_FREE( Ref_in ) ;
-    TABLE_FREE( Ref_out ) ;
-    TABLE_FREE( Defs ) ;
-
-    hash_table_free( Vertex_statement ) ;
-
-
-    ifdebug(1) {
-	mem_spy_end("dependence graph: after freeing the hash tables");
-	mem_spy_end("dependence_graph");
-    }
-
-    return( dg ) ;
-}
-
-
-
-/* STATEMENT_DEPENDENCE_GRAPH computes, from the statement s, the dependency 
- * graph. Statement s is assumed "controlized", i.e. GOTO have been replaced
- * by unstructured.
+    Statement s is assumed "controlized", i.e. GOTO have been replaced by
+    unstructured.
  *
  * FI: this function is bugged. As Pierre said, you have to start with
  * an unstructured for the use-def chain computation to be correct.
  */
+graph statement_dependence_graph(statement s) {
+  one_trip_do = get_bool_property("ONE_TRIP_DO") ;
+  keep_read_read_dependences = get_bool_property("KEEP_READ_READ_DEPENDENCE");
+  disambiguate_constant_subscripts =
+    get_bool_property("CHAINS_DISAMBIGUATE_CONSTANT_SUBSCRIPTS");
+
+  ifdebug(1) {
+    mem_spy_begin();
+    mem_spy_begin();
+  }
+
+  Gen = hash_table_make(hash_pointer, INIT_STATEMENT_SIZE) ;
+  Ref = hash_table_make(hash_pointer, INIT_STATEMENT_SIZE) ;
+  Kill = hash_table_make(hash_pointer, INIT_STATEMENT_SIZE) ;
+  Def_in = hash_table_make(hash_pointer, INIT_STATEMENT_SIZE) ;
+  Def_out = hash_table_make(hash_pointer, INIT_STATEMENT_SIZE) ;
+  Ref_in = hash_table_make(hash_pointer, INIT_STATEMENT_SIZE) ;
+  Ref_out = hash_table_make(hash_pointer, INIT_STATEMENT_SIZE) ;
+  Defs = hash_table_make(hash_pointer, INIT_ENTITY_SIZE) ;
+  Vertex_statement = hash_table_make(hash_pointer, INIT_STATEMENT_SIZE) ;
+
+  dg = make_graph(NIL) ;
+
+  /* Initialize data structures for all the statements
+  
+     It recursively initializes the sets of gens, kills, ins and outs for
+     the statements that appear in st. Moreover, the set of defs are
+     computed; note that not only call statements are there, but also
+     enclosing statements (e.g, blocks and loops). */
+  gen_recurse(s, statement_domain,
+	      init_one_statement,
+	      gen_identity);
+  inout_statement(s) ;
+  usedef_statement(s) ;
+#define TABLE_FREE(t)							\
+  {HASH_MAP( k, v, {set_free( (set)v ) ;}, t ) ; hash_table_free(t);}
+
+  ifdebug(1) {
+    mem_spy_end("dependence_graph: after computation");
+    mem_spy_begin();
+  }
+
+  TABLE_FREE(Gen) ;
+  TABLE_FREE(Ref) ;
+  TABLE_FREE(Kill) ;
+  TABLE_FREE(Def_in) ;
+  TABLE_FREE(Def_out) ;
+  TABLE_FREE(Ref_in) ;
+  TABLE_FREE(Ref_out) ;
+  TABLE_FREE(Defs) ;
+
+  hash_table_free(Vertex_statement) ;
 
 
+  ifdebug(1) {
+    mem_spy_end("dependence graph: after freeing the hash tables");
+    mem_spy_end("dependence_graph");
+  }
 
-graph statement_dependence_graph(statement s)
-{
-    one_trip_do = get_bool_property( "ONE_TRIP_DO" ) ;
-    keep_read_read_dependences = 
-	    get_bool_property( "KEEP_READ_READ_DEPENDENCE" ) ;
-
-    Gen = hash_table_make( hash_pointer, INIT_STATEMENT_SIZE ) ;
-    Ref = hash_table_make( hash_pointer, INIT_STATEMENT_SIZE ) ;
-    Kill = hash_table_make( hash_pointer, INIT_STATEMENT_SIZE ) ;
-    Def_in = hash_table_make( hash_pointer, INIT_STATEMENT_SIZE ) ;
-    Def_out = hash_table_make( hash_pointer, INIT_STATEMENT_SIZE ) ;
-    Ref_in = hash_table_make( hash_pointer, INIT_STATEMENT_SIZE ) ;
-    Ref_out = hash_table_make( hash_pointer, INIT_STATEMENT_SIZE ) ;
-    Defs = hash_table_make( hash_pointer, INIT_ENTITY_SIZE ) ;
-    Vertex_statement = hash_table_make( hash_pointer, INIT_STATEMENT_SIZE ) ;
-
-    dg = make_graph( NIL ) ;
-    init_statement( s ) ;
-    inout_statement( s ) ;
-    usedef_statement( s ) ;
-    return( dg ) ;
+  return(dg) ;
 }
-
+
 
 /* functions for effects maps */
 
@@ -1425,10 +1292,9 @@ static list load_statement_effects(statement st)
 }
 
 
-static void set_effects(module_name, use)
-char *module_name;
-int use;
-{
+/* Select the type of effects used to compute dependence chains */
+static void set_effects(char *module_name,
+			enum chain_type use) {
     switch(use) {
 
     case USE_PROPER_EFFECTS: 
@@ -1481,59 +1347,113 @@ static void reset_effects()
 }
 
 
-/* Acces functions for debug only */
+/* Compute chain dependence for a module accordind different kinds of
+   store-like effects.
 
-/* PRINT_STATEMENT_SET displays on stderr, the MSG followed by the set
-   of statement numbers present in the set S. */
+   @param module_name is the name of the module we want to compute the
+   chains
 
-static void local_print_statement_set( msg, s )
-char *msg ;
-set s ;
-{
-    fprintf( stderr, "\t%s ", msg ) ;
-    SET_MAP( st, {
-	fprintf(stderr, ",%p (%td) ", 
-		st, statement_number( (statement)st ));
-    }, s ) ;
-    fprintf( stderr, "\n" );
+   @param use the type of effects we want to use to compute the dependence
+   chains
+
+   @return TRUE because we are very comfident it works :-)
+ */
+bool 
+chains(char * module_name,
+       enum chain_type use) {
+  statement module_stat;
+  instruction module_inst;
+  graph module_graph;
+  void print_graph() ;
+
+  debug_on("CHAINS_DEBUG_LEVEL");
+
+  ifdebug(1) {
+    mem_spy_init(0, 100000., NET_MEASURE, 0);
+    mem_spy_begin();
+    mem_spy_begin();
+  }
+
+  debug_off();
+
+  set_current_module_statement((statement) db_get_memory_resource(DBR_CODE,
+								  module_name,
+								  TRUE));
+  module_stat = get_current_module_statement();
+  set_current_module_entity(local_name_to_top_level_entity(module_name));
+  /* set_entity_to_size(); should be performed at the workspace level */
+
+  debug_on("CHAINS_DEBUG_LEVEL");
+
+  ifdebug(1) {
+    mem_spy_end("Chains: resources loaded");
+    mem_spy_begin();
+  }
+   
+  pips_debug(1, "finding enclosing loops ...\n");
+  set_enclosing_loops_map( loops_mapping_of_statement(module_stat) );
+
+  module_inst = statement_instruction(module_stat);
+
+  set_effects(module_name,use);
+
+  ifdebug(1) {
+    mem_spy_end("Chains: Preamble");
+    mem_spy_begin();
+  }
+
+  module_graph = statement_dependence_graph(module_stat);
+
+  ifdebug(1) {
+    mem_spy_end("Chains: Computation");
+    mem_spy_begin();
+  }
+
+  ifdebug(2) {
+    set_ordering_to_statement(module_stat);
+    prettyprint_dependence_graph(stderr, module_stat, module_graph);
+    reset_ordering_to_statement();
+  }
+
+  debug_off();
+
+  DB_PUT_MEMORY_RESOURCE(DBR_CHAINS, module_name, (char*) module_graph);
+
+  reset_effects();
+  clean_enclosing_loops();
+  reset_current_module_statement();
+  reset_current_module_entity();
+
+  debug_on("CHAINS_DEBUG_LEVEL");
+  ifdebug(1) {
+    mem_spy_end("Chains: Deallocation");
+    mem_spy_end("Chains");
+    mem_spy_reset();
+  }
+  debug_off();
+
+  return TRUE;
 }
 
-hash_table kill_table()
-{
-    return( Kill ) ;
-}
 
-hash_table gen_table()
-{
-    return( Gen ) ;
-}
 
-hash_table def_in_table()
-{
-    return( Def_in ) ;
-}
-
-hash_table def_out_table()
-{
-    return( Def_out ) ;
-}
-
-hash_table ref_in_table()
-{
-    return( Def_in ) ;
-}
-
-hash_table ref_out_table()
-{
-    return( Def_out ) ;
-}
-
-hash_table defs_table()
-{
-    return( Defs ) ;
+/* Phase to compute atomic chains based on proper effects (simple memory
+   accesses)
+ */
+bool atomic_chains(char * module_name) {
+  return chains(module_name, USE_PROPER_EFFECTS);
 }
 
 
+/* Phase to compute atomic chains based on array regions
+ */
+bool region_chains(char * module_name) {
+  return chains(module_name, USE_REGIONS);
+}
 
 
-
+/* Phase to compute atomic chains based on in-out array regions
+ */
+bool in_out_regions_chains(char * module_name) {
+  return chains(module_name, USE_IN_OUT_REGIONS);
+}
