@@ -1415,242 +1415,242 @@ text_entity_declaration(
    */
   pp_cinc = same_string_p(how_common, "include") && !force_common;
 
-  MAP(ENTITY, e,
+  FOREACH(ENTITY, e,ldecl)
   {
-    type te = entity_type(e);
-    bool func = 
-      type_functional_p(te) && storage_rom_p(entity_storage(e));
-    value v = entity_initial(e);
-    bool param = func && value_symbolic_p(v);
-    bool external =     /* subroutines won't be declared */
-      (func && 
-       (value_code_p(v) || value_unknown_p(v) /* not parsed callee */) &&
-       !(type_void_p(functional_result(type_functional(te))) ||
-	 (type_variable_p(functional_result(type_functional(te))) &&
-	  basic_overloaded_p(variable_basic(type_variable
-					    (functional_result(type_functional(te))))))));
-    bool area_p = type_area_p(te);
-    bool var = type_variable_p(te);
-    bool in_ram = storage_ram_p(entity_storage(e));
-    bool in_common = in_ram &&
-      !entity_special_area_p(ram_section(storage_ram(entity_storage(e))));
-    bool skip_it = same_string_p(entity_local_name(e),
-				 entity_local_name(module));
-	
-    pips_debug(3, "entity name is %s\n", entity_name(e));
+      type te = entity_type(e);
+      bool func = 
+          type_functional_p(te) && storage_rom_p(entity_storage(e));
+      value v = entity_initial(e);
+      bool param = func && value_symbolic_p(v);
+      bool external =     /* subroutines won't be declared */
+          (func && 
+           (value_code_p(v) || value_unknown_p(v) /* not parsed callee */) &&
+           !(type_void_p(functional_result(type_functional(te))) ||
+               (type_variable_p(functional_result(type_functional(te))) &&
+                basic_overloaded_p(variable_basic(type_variable
+                        (functional_result(type_functional(te))))))));
+      bool area_p = type_area_p(te);
+      bool var = type_variable_p(te);
+      bool in_ram = storage_ram_p(entity_storage(e));
+      bool in_common = in_ram &&
+          !entity_special_area_p(ram_section(storage_ram(entity_storage(e))));
+      bool skip_it = same_string_p(entity_local_name(e),
+              entity_local_name(module));
 
-    /* Do not declare variables used to replace formal labels */
-    if(storage_formal_p(entity_storage(e))
-       && get_bool_property("PRETTYPRINT_REGENERATE_ALTERNATE_RETURNS")
-       && formal_label_replacement_p(e))
-      continue;
+      pips_debug(3, "entity name is %s\n", entity_name(e));
 
-    if (!print_commons && area_p && !entity_special_area_p(e) && !pp_cinc)
+      /* Do not declare variables used to replace formal labels */
+      if(storage_formal_p(entity_storage(e))
+              && get_bool_property("PRETTYPRINT_REGENERATE_ALTERNATE_RETURNS")
+              && formal_label_replacement_p(e))
+          continue;
+
+      if (!print_commons && area_p && !entity_special_area_p(e) && !pp_cinc)
       {
-	area_decl = 
-	  CONS(SENTENCE, make_sentence(is_sentence_formatted,
-				       common_hook(module, e)),
-	       area_decl);
+          area_decl = 
+              CONS(SENTENCE, make_sentence(is_sentence_formatted,
+                          common_hook(module, e)),
+                      area_decl);
       }
 
-    if (skip_it)
+      if (skip_it)
       {
-	pips_debug(5, "skipping function %s\n", entity_name(e));
+          pips_debug(5, "skipping function %s\n", entity_name(e));
       }
-    else if (!print_commons && (area_p || (var && in_common && pp_cinc)))
+      else if (!print_commons && (area_p || (var && in_common && pp_cinc)))
       {
-	pips_debug(5, "skipping entity %s\n", entity_name(e));
+          pips_debug(5, "skipping entity %s\n", entity_name(e));
       }
-    else if (param)
+      else if (param)
       {
-	/*        PARAMETER
-	 */
-	pips_debug(7, "considered as a parameter\n");
-	lparam = CONS(ENTITY, e, lparam);
+          /*        PARAMETER
+          */
+          pips_debug(7, "considered as a parameter\n");
+          lparam = CONS(ENTITY, e, lparam);
       } 
-    else if (external)
+      else if (external)
       {
-	/*        EXTERNAL
-	 */
-	pips_debug(7, "considered as an external\n");
-	before = CONS(SENTENCE, sentence_basic_declaration(e), before);
-	before = CONS(SENTENCE, sentence_external(e), before);
+          /*        EXTERNAL
+          */
+          pips_debug(7, "considered as an external\n");
+          before = CONS(SENTENCE, sentence_basic_declaration(e), before);
+          before = CONS(SENTENCE, sentence_external(e), before);
       }
-    else if (area_p && !dynamic_area_p(e) && !heap_area_p(e) && !stack_area_p(e) && !empty_static_area_p(e))
+      else if (area_p && !dynamic_area_p(e) && !heap_area_p(e) && !stack_area_p(e) && !empty_static_area_p(e))
       {
-	/*            AREAS: COMMONS and SAVEs
-	 */	     
-	pips_debug(7, "considered as a regular common\n");
-	if (pp_cinc && !entity_special_area_p(e))
-	  {
-	    text t = text_area_included(e, module);
-	    MERGE_TEXTS(t_area, t);
-	  }
-	else
-	  area_decl = CONS(SENTENCE, 
-			   sentence_area(e, module, pp_in_common), 
-			   area_decl);
+          /*            AREAS: COMMONS and SAVEs
+          */	     
+          pips_debug(7, "considered as a regular common\n");
+          if (pp_cinc && !entity_special_area_p(e))
+          {
+              text t = text_area_included(e, module);
+              MERGE_TEXTS(t_area, t);
+          }
+          else
+              area_decl = CONS(SENTENCE, 
+                      sentence_area(e, module, pp_in_common), 
+                      area_decl);
       }
-    else if (var && !(in_common && pp_cinc))
+      else if (var && !(in_common && pp_cinc))
       {
-	basic b = variable_basic(type_variable(te));
-	bool pp_dim = pp_in_type || variable_static_p(e);
+          basic b = variable_basic(type_variable(te));
+          bool pp_dim = pp_in_type || variable_static_p(e);
 
-	pips_debug(7, "is a variable...\n");
-	    
-	switch (basic_tag(b)) 
-	  {
-	  case is_basic_int:
-	    /* simple integers are moved ahead... */
+          pips_debug(7, "is a variable...\n");
 
-	    pips_debug(7, "is an integer\n");
-	    if (variable_dimensions(type_variable(te)))
-	      {
-		string s = string_undefined;
-		switch (basic_int(b))
-		  {
-		  case 4: ppi = &pi4;
-		    s = "INTEGER ";
-		    break;  
-		  case 2: ppi = &pi2;
-		    s = "INTEGER*2 ";
-		    break;
-		  case 8: ppi = &pi8;
-		    s = "INTEGER*8 ";
-		    break;
-		  case 1: ppi = &pi1;
-		    s = "INTEGER*1 ";
-		    break;
-		
-		  default: pips_internal_error("Unexpected integer size");
-		  }
-		*ppi = CHAIN_SWORD(*ppi, *ppi==NIL ? s : space_p? ", " : ",");
-		*ppi = gen_nconc(*ppi, words_declaration(e, pp_dim)); 
-	      }
-	    else
-	      {
-		string s = string_undefined;
+          switch (basic_tag(b)) 
+          {
+              case is_basic_int:
+                  /* simple integers are moved ahead... */
 
-		switch (basic_int(b))
-		  {
-		  case 4: pph = &ph4;
-		    s = "INTEGER ";
-		    break;
-		  case 2: pph = &ph2;
-		    s = "INTEGER*2 ";
-		    break;
-		  case 8: pph = &ph8;
-		    s = "INTEGER*8 ";
-		    break;
-		  case 1: pph = &ph1;
-		    s = "INTEGER*1 ";
-		    break;
-		  default: pips_internal_error("Unexpected integer size");
-		  }
-		*pph = CHAIN_SWORD(*pph, *pph==NIL ? s : (space_p? ", " : ","));
-		*pph = gen_nconc(*pph, words_declaration(e, pp_dim)); 
-	      }
-	    break;
-	  case is_basic_float:
-	    pips_debug(7, "is a float\n");
-	    switch (basic_float(b))
-	      {
-	      case 4:
-		pf4 = CHAIN_SWORD(pf4, pf4==NIL ? "REAL*4 " : (space_p? ", " : ","));
-		pf4 = gen_nconc(pf4, words_declaration(e, pp_dim));
-		break;
-	      case 8:
-	      default:
-		pf8 = CHAIN_SWORD(pf8, pf8==NIL ? "REAL*8 " : (space_p? ", " : ","));
-		pf8 = gen_nconc(pf8, words_declaration(e, pp_dim));
-		break;
-	      }
-	    break;			
-	  case is_basic_complex:
-	    pips_debug(7, "is a complex\n");
-	    switch (basic_complex(b))
-	      {
-	      case 8:
-		pc8 = CHAIN_SWORD(pc8, pc8==NIL ? "COMPLEX*8 " : (space_p? ", " : ","));
-		pc8 = gen_nconc(pc8, words_declaration(e, pp_dim));
-		break;
-	      case 16:
-	      default:
-		pc16 = CHAIN_SWORD(pc16, pc16==NIL ? "COMPLEX*16 " : (space_p? ", " : ","));
-		pc16 = gen_nconc(pc16, words_declaration(e, pp_dim));
-		break;
-	      }
-	    break;
-	  case is_basic_logical:
-	    pips_debug(7, "is a logical\n");
-	    pl = CHAIN_SWORD(pl, pl==NIL ? "LOGICAL " : (space_p? ", " : ","));
-	    pl = gen_nconc(pl, words_declaration(e, pp_dim));
-	    break;
-	  case is_basic_overloaded:
-	    /* nothing! some in hpfc I guess...
-	     */
-	    break; 
-	  case is_basic_string:
-	    {
-	      value v = basic_string(b);
-	      pips_debug(7, "is a string\n");
-		
-	      if (value_constant_p(v) && constant_int_p(value_constant(v)))
-		{
-		  int i = constant_int(value_constant(v));
-		    
-		  if (i==1)
-		    {
-		      ps = CHAIN_SWORD(ps, ps==NIL ? "CHARACTER " : (space_p? ", " : ","));
-		      ps = gen_nconc(ps, words_declaration(e, pp_dim));
-		    }
-		  else
-		    {
-		      list chars=NIL;
-		      chars = CHAIN_SWORD(chars, "CHARACTER*");
-		      chars = CHAIN_IWORD(chars, i);
-		      chars = CHAIN_SWORD(chars, " ");
-		      chars = gen_nconc(chars, 
-					words_declaration(e, pp_dim));
-		      attach_declaration_size_type_to_words
-			(chars, "CHARACTER", i);
-		      ADD_WORD_LIST_TO_TEXT(t_chars, chars);
-		    }
-		}
-	      else if (value_unknown_p(v))
-		{
-		  list chars=NIL;
-		  chars = CHAIN_SWORD(chars, "CHARACTER*(*) ");
-		  chars = gen_nconc(chars, 
-				    words_declaration(e, pp_dim));
-		  attach_declaration_type_to_words
-		    (chars, "CHARACTER*(*)");
-		  ADD_WORD_LIST_TO_TEXT(t_chars, chars);
-		}
-	      else if (value_symbolic_p(v))
-		{
-		  list chars = NIL;
-		  symbolic s = value_symbolic(v);
-		  chars = CHAIN_SWORD(chars, "CHARACTER*(");
-		  chars = gen_nconc(chars, 
-				    words_expression(symbolic_expression(s)));
-		  chars = CHAIN_SWORD(chars, ") ");
-		  chars = gen_nconc(chars, words_declaration(e, pp_dim));
+                  pips_debug(7, "is an integer\n");
+                  if (variable_dimensions(type_variable(te)))
+                  {
+                      string s = string_undefined;
+                      switch (basic_int(b))
+                      {
+                          case 4: ppi = &pi4;
+                                  s = "INTEGER ";
+                                  break;  
+                          case 2: ppi = &pi2;
+                                  s = "INTEGER*2 ";
+                                  break;
+                          case 8: ppi = &pi8;
+                                  s = "INTEGER*8 ";
+                                  break;
+                          case 1: ppi = &pi1;
+                                  s = "INTEGER*1 ";
+                                  break;
 
-		  attach_declaration_type_to_words
-		    (chars, "CHARACTER*(*)");
-		  ADD_WORD_LIST_TO_TEXT(t_chars, chars);
-		}
-	      else
-		pips_internal_error("unexpected value\n");
-	      break;
-	    }
-	  default:
-	    pips_internal_error("unexpected basic tag (%d)\n",
-				basic_tag(b));
-	  }
+                          default: pips_internal_error("Unexpected integer size");
+                      }
+                      *ppi = CHAIN_SWORD(*ppi, *ppi==NIL ? s : space_p? ", " : ",");
+                      *ppi = gen_nconc(*ppi, words_declaration(e, pp_dim)); 
+                  }
+                  else
+                  {
+                      string s = string_undefined;
+
+                      switch (basic_int(b))
+                      {
+                          case 4: pph = &ph4;
+                                  s = "INTEGER ";
+                                  break;
+                          case 2: pph = &ph2;
+                                  s = "INTEGER*2 ";
+                                  break;
+                          case 8: pph = &ph8;
+                                  s = "INTEGER*8 ";
+                                  break;
+                          case 1: pph = &ph1;
+                                  s = "INTEGER*1 ";
+                                  break;
+                          default: pips_internal_error("Unexpected integer size");
+                      }
+                      *pph = CHAIN_SWORD(*pph, *pph==NIL ? s : (space_p? ", " : ","));
+                      *pph = gen_nconc(*pph, words_declaration(e, pp_dim)); 
+                  }
+                  break;
+              case is_basic_float:
+                  pips_debug(7, "is a float\n");
+                  switch (basic_float(b))
+                  {
+                      case 4:
+                          pf4 = CHAIN_SWORD(pf4, pf4==NIL ? "REAL*4 " : (space_p? ", " : ","));
+                          pf4 = gen_nconc(pf4, words_declaration(e, pp_dim));
+                          break;
+                      case 8:
+                      default:
+                          pf8 = CHAIN_SWORD(pf8, pf8==NIL ? "REAL*8 " : (space_p? ", " : ","));
+                          pf8 = gen_nconc(pf8, words_declaration(e, pp_dim));
+                          break;
+                  }
+                  break;			
+              case is_basic_complex:
+                  pips_debug(7, "is a complex\n");
+                  switch (basic_complex(b))
+                  {
+                      case 8:
+                          pc8 = CHAIN_SWORD(pc8, pc8==NIL ? "COMPLEX*8 " : (space_p? ", " : ","));
+                          pc8 = gen_nconc(pc8, words_declaration(e, pp_dim));
+                          break;
+                      case 16:
+                      default:
+                          pc16 = CHAIN_SWORD(pc16, pc16==NIL ? "COMPLEX*16 " : (space_p? ", " : ","));
+                          pc16 = gen_nconc(pc16, words_declaration(e, pp_dim));
+                          break;
+                  }
+                  break;
+              case is_basic_logical:
+                  pips_debug(7, "is a logical\n");
+                  pl = CHAIN_SWORD(pl, pl==NIL ? "LOGICAL " : (space_p? ", " : ","));
+                  pl = gen_nconc(pl, words_declaration(e, pp_dim));
+                  break;
+              case is_basic_overloaded:
+                  /* nothing! some in hpfc I guess...
+                  */
+                  break; 
+              case is_basic_string:
+                  {
+                      value v = basic_string(b);
+                      pips_debug(7, "is a string\n");
+
+                      if (value_constant_p(v) && constant_int_p(value_constant(v)))
+                      {
+                          int i = constant_int(value_constant(v));
+
+                          if (i==1)
+                          {
+                              ps = CHAIN_SWORD(ps, ps==NIL ? "CHARACTER " : (space_p? ", " : ","));
+                              ps = gen_nconc(ps, words_declaration(e, pp_dim));
+                          }
+                          else
+                          {
+                              list chars=NIL;
+                              chars = CHAIN_SWORD(chars, "CHARACTER*");
+                              chars = CHAIN_IWORD(chars, i);
+                              chars = CHAIN_SWORD(chars, " ");
+                              chars = gen_nconc(chars, 
+                                      words_declaration(e, pp_dim));
+                              attach_declaration_size_type_to_words
+                                  (chars, "CHARACTER", i);
+                              ADD_WORD_LIST_TO_TEXT(t_chars, chars);
+                          }
+                      }
+                      else if (value_unknown_p(v))
+                      {
+                          list chars=NIL;
+                          chars = CHAIN_SWORD(chars, "CHARACTER*(*) ");
+                          chars = gen_nconc(chars, 
+                                  words_declaration(e, pp_dim));
+                          attach_declaration_type_to_words
+                              (chars, "CHARACTER*(*)");
+                          ADD_WORD_LIST_TO_TEXT(t_chars, chars);
+                      }
+                      else if (value_symbolic_p(v))
+                      {
+                          list chars = NIL;
+                          symbolic s = value_symbolic(v);
+                          chars = CHAIN_SWORD(chars, "CHARACTER*(");
+                          chars = gen_nconc(chars, 
+                                  words_expression(symbolic_expression(s)));
+                          chars = CHAIN_SWORD(chars, ") ");
+                          chars = gen_nconc(chars, words_declaration(e, pp_dim));
+
+                          attach_declaration_type_to_words
+                              (chars, "CHARACTER*(*)");
+                          ADD_WORD_LIST_TO_TEXT(t_chars, chars);
+                      }
+                      else
+                          pips_internal_error("unexpected value\n");
+                      break;
+                  }
+              default:
+                  pips_internal_error("unexpected basic tag (%d)\n",
+                          basic_tag(b));
+          }
       }
-  }, /* sorted_ */ ldecl);
+  }
     
   /* usually they are sorted in order, and appended backwards,
    * hence the reversion.
