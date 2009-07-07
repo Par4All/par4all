@@ -764,11 +764,11 @@ static string process_thru_fortran_pp(string name)
     fpp = getenv(FPP_PIPS_ENV);
     fpp_options = getenv(FPP_PIPS_OPTIONS_ENV);
 
-    /* Note: the preprocessor used **must** know somehow about Fortran
-     * and its lexical and comment conventions. This is ok with gcc
-     * when g77 is included. Otherwise, "'" appearing in Fortran comments
-     * results in errors to be reported.
-     * Well, the return code could be ignored maybe, but I prefer not to.
+    /* Note: the preprocessor used **must** know somehow about Fortran and
+     * its lexical and comment conventions. This is ok with gcc when g77
+     * or gfortran is included. Otherwise, "'" appearing in Fortran
+     * comments results in errors to be reported.  Well, the return code
+     * could be ignored maybe, but I prefer not to.
      */
 
     /* FI->FC: it should be a safe_system_no_abort(). Errors are

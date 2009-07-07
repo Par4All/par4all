@@ -55,7 +55,16 @@
 /* -U__GNUC__ seems to be still useful to avoid spoiling the libC files
     with too many GCC extensions: */
 #define CPP_CPPFLAGS		" -D__PIPS__ -D__HPFC__ -U__GNUC__ "
-#define FPP_CPP			"cpp -C" /* alternative values: "gcc -E -C" or "fpp" */
+
+/** The preprocessor to use for Fortran files.
+
+    Alternative values: "gcc -E -C" or "fpp". The issue with cpp or gcc -E
+    is that they don't undestand Fortran and chokes on unbalanced strings
+    in Fortran comments and so on.
+*/
+#define FPP_CPP			"gfortran -E"
+
+/** The default preprocessor flags to use with Fortran files */
 #define FPP_CPPFLAGS		" -P -D__PIPS__ -D__HPFC__ "
 
 #define DEFAULT_PIPS_FLINT "gfortran -c "
