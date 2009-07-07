@@ -1,9 +1,11 @@
+
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6}>
+
       PROGRAM GUERIN05
 
-C     Bugs in IN and OUT scalar regions for the specified sections:
-C     scalar k is not seen as imported by the loop, although it is
-C     imported by the loop body. But, if k is replaced by k(1), k(1) is
-C     seen as simported.
+C     Bug fixed in IN scalar regions for the specified sections:
+C     scalar k is now correctly seen as imported by the loop.
 
 ! MIL-STD-1753 Fortran extension not in PIPS
 !       implicit none
@@ -13,6 +15,8 @@ C     seen as simported.
 C  <I-W-EXACT-{}>
 C  <K-R-EXACT-{}>
 C  <K-W-EXACT-{}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6}>
 
 C (0,1)
 C     BEGIN BLOCK
@@ -21,30 +25,77 @@ C  <K-W-EXACT-{}>
 
 C (0,2)
 
-      K = 0                                                             0013
+      K = 0                                                             0011
 
 C  <I-W-EXACT-{}>
 C  <K-R-EXACT-{}>
 C  <K-W-EXACT-{}>
 
 C (0,3)
-      DO I = 1, 1                                                       0014
+      DO I = 1, 1                                                       0012
 
 C  <K-R-EXACT-{}>
 C  <K-W-EXACT-{}>
 
 C (0,4)
-         K = K+1                                                        0015
+         K = K+1                                                        0013
       ENDDO
+
+C  <K-R-EXACT-{}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6, I==2}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6, I==2}>
+
+C (0,5)
+
+      PRINT *, K                                                        0016
+
+C     END BLOCK
+      END
+
+C  <__IO_EFFECTS:LUNS(PHI1)-IN-EXACT-{PHI1==6}>
+
+      PROGRAM GUERIN05
+
+C     Bug fixed in IN scalar regions for the specified sections:
+C     scalar k is now correctly seen as imported by the loop.
+
+! MIL-STD-1753 Fortran extension not in PIPS
+!       implicit none
+
+      INTEGER K, I
+
+C  <__IO_EFFECTS:LUNS(PHI1)-IN-EXACT-{PHI1==6}>
+
+C (0,1)
+C     BEGIN BLOCK
+C (0,2)
+
+      K = 0                                                             0011
+
+C  <K-IN-EXACT-{}>
+
+C (0,3)
+      DO I = 1, 1                                                       0012
+
+C  <K-IN-EXACT-{}>
+
+C (0,4)
+         K = K+1                                                        0013
+      ENDDO
+
+C  <K-IN-EXACT-{}>
+C  <__IO_EFFECTS:LUNS(PHI1)-IN-EXACT-{PHI1==6, I==2}>
+
+C (0,5)
+
+      PRINT *, K                                                        0016
 
 C     END BLOCK
       END
       PROGRAM GUERIN05
 
-C     Bugs in IN and OUT scalar regions for the specified sections:
-C     scalar k is not seen as imported by the loop, although it is
-C     imported by the loop body. But, if k is replaced by k(1), k(1) is
-C     seen as simported.
+C     Bug fixed in IN scalar regions for the specified sections:
+C     scalar k is now correctly seen as imported by the loop.
 
 ! MIL-STD-1753 Fortran extension not in PIPS
 !       implicit none
@@ -52,17 +103,23 @@ C     seen as simported.
       INTEGER K, I
 C (0,1)
 C     BEGIN BLOCK
+
+C  <K-OUT-EXACT-{}>
+
 C (0,2)
 
-      K = 0                                                             0013
+      K = 0                                                             0011
+
+C  <K-OUT-EXACT-{}>
+
 C (0,3)
-      DO I = 1, 1                                                       0014
-
-C  <K-IN-EXACT-{}>
-
+      DO I = 1, 1                                                       0012
 C (0,4)
-         K = K+1                                                        0015
+         K = K+1                                                        0013
       ENDDO
+C (0,5)
+
+      PRINT *, K                                                        0016
 
 C     END BLOCK
       END
