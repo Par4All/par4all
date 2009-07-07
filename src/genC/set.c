@@ -262,13 +262,34 @@ int set_own_allocated_memory(set s)
 /** 
  * create a list from a set
  * the set is not freed
+ * @warning no assumption can be made on the ordering of returned list
  * @param s set where the data are
  * 
- * @return a list of elements from s
+ * @return an allocated list of elements from s
  */
 list set_to_list(set s)
 {
     list l =NIL;
     SET_MAP(v,l=gen_cons(v,l),s);
     return l;
+}
+
+/** 
+ * turns a list into a set
+ * all duplicated elements are lost
+ * 
+ * @param l list to turn into a set
+ * @param st type of elements in the list
+ * 
+ * @return allocated set of elements from @a l
+ * @warning list_to_set(set_to_list(s))!=s
+ */
+set list_to_set(list l,set_type st)
+{
+    set s = set_make(st);
+    while(!ENDP(l)) {
+        set_add_element(s,s,CAR(l).p);
+        POP(l);
+    }
+    return s;
 }

@@ -52,23 +52,27 @@ typedef struct {
 #define SET_MAP(element,code,set) \
     { HASH_MAP(_set_map_key, element, code, (set)->table); }
 
-/* functions declared in set.c */
+struct cons;
 
-extern set set_add_element GEN_PROTO (( set, set, void *)) ;
-extern set set_del_element GEN_PROTO(( set, set, void *)) ;
-extern set set_assign GEN_PROTO(( set, set )) ;
-extern bool set_belong_p GEN_PROTO(( set, void *)) ;
-extern void set_clear GEN_PROTO(( set )) ;
-extern set set_difference GEN_PROTO(( set, set, set )) ;
-extern bool set_equal GEN_PROTO(( set, set )) ;
-extern void set_free GEN_PROTO(( set )) ;
-extern set set_intersection GEN_PROTO(( set, set, set )) ;
-extern set set_make GEN_PROTO(( set_type )) ;
-extern set set_singleton GEN_PROTO(( set_type, void * )) ;
-extern set set_union GEN_PROTO(( set, set, set )) ;
-extern bool set_empty_p GEN_PROTO(( set )) ;
-extern void gen_set_closure GEN_PROTO(( void(*)(void*,set), set )) ;
-extern void gen_set_closure_iterate GEN_PROTO((void(*)(void*,set), set, bool));
-extern int set_own_allocated_memory GEN_PROTO((set));
+/* functions declared in set.c */
+extern set set_make(set_type typ);
+extern set set_singleton(set_type type, void *p);
+extern set set_assign(set s1, set s2);
+extern set set_add_element(set s1, set s2, void *e);
+extern bool set_belong_p(set s, void *e);
+extern set set_union(set s1, set s2, set s3);
+extern set set_intersection(set s1, set s2, set s3);
+extern set set_difference(set s1, set s2, set s3);
+extern set set_del_element(set s1, set s2, void *e);
+extern set set_delfree_element(set s1, set s2, void *e);
+extern bool set_equal(set s1, set s2);
+extern void set_clear(set s);
+extern void set_free(set s);
+extern bool set_empty_p(set s);
+extern void gen_set_closure_iterate(void (*iterate)(void *, set), set initial, bool dont_iterate_twice);
+extern void gen_set_closure(void (*iterate)(void *, set), set initial);
+extern int set_own_allocated_memory(set s);
+extern struct cons* set_to_list(set s);
+extern set list_to_set(struct cons* l, set_type st);
 
 #endif
