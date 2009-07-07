@@ -527,31 +527,71 @@
       INTEGER ALPHA1, ALPHA2, LALPHA1, LALPHA2, PSI1, T LID, K
       REAL*8 U(1:N, 1:N), ALPHA, AP2, AM2, S
       CALL HPFC INIT HOST
+
+
       PRINT *, '2D ADI running'
+
 ! init U
 !
 ! with this mapping, it results in useless communication when
 ! initializing Uh from U as from the outside loop...
 ! some code replication and guard could avoid this one?
+
+
+
       ALPHA = 8.0D0/DBLE(N)
       AP2 = ALPHA+2.0D0
       AM2 = ALPHA-2.0D0
+
       CALL HPFC HTIMEON
+
 ! ITERATIVE LOOP on k:
+
       DO K = 1, 10
+
          PRINT *, 'k = ', K
+
+
 ! U -> Uh
+
+
+
+
+
+
 ! Initialize B
+
+
+
 ! forward sweep along columns
+
+
+
 ! backward sweep along columns
+
+
+
 ! Uh -> U
+
+
+
+
+
+
 ! Initialize B
+
+
+
       ENDDO
+
       CALL HPFC HTIMEOFF('full computation')
+
       PRINT *, '2D ADI done'
+
 !
 ! some output to check the result...
 !
+
       CALL HPRE SUM HPFC REAL8(S, 1)
       CALL HPOST SUM HPFC REAL8(S, 1)
 ! collecting distributed variable U
@@ -571,8 +611,10 @@
          ENDDO
       ENDDO
 ! end of collect
+
       PRINT *, 'U(:,:) = ', U(10,10), U(11,10), U(10,11)
       PRINT *, 'SUM(U) = ', S
+
       CALL HPFC HOST END
       END
 !
@@ -800,11 +842,15 @@
 ! direct remapping for U
       LIVE MAPPING(6) = .TRUE.
       MSTATUS(6) = 6
+
+
+
 ! init U
 !
 ! with this mapping, it results in useless communication when
 ! initializing Uh from U as from the outside loop...
 ! some code replication and guard could avoid this one?
+
       DO J = 1, N
          IF (MY POS(1,1).EQ.1) THEN
             I_LOCAL = 0
@@ -818,16 +864,25 @@
             U(128,J) = 30.0D0
          ENDIF
       ENDDO
+
+
       ALPHA = 8.0D0/DBLE(N)
       AP2 = ALPHA+2.0D0
       AM2 = ALPHA-2.0D0
+
       CALL HPFC NTIMEON
+
 ! ITERATIVE LOOP on k:
+
       DO K = 1, 10
+
+
 ! U -> Uh
+
          DO I_26 = I_27, I_28
             UH(I_26,1) = U(I_26,1)
          ENDDO
+
          DO J = 2, N-1
             IF (MY POS(1,1).EQ.1) THEN
                I_LOCAL = 0
@@ -843,14 +898,17 @@
                UH(128,J) = U(128,J)
             ENDIF
          ENDDO
+
          DO I_34 = I_35, I_36
             UH(I_34,N) = U(I_34,N)
          ENDDO
+
          IF (MY POS(1,1).EQ.1) THEN
             DO J = 2, N-1
                UH(2,J) = UH(2,J)+U(1,J)
             ENDDO
          ENDIF
+
          IF (MY POS(1,1).EQ.8) THEN
             DO J = 2, N-1
                UH(127,J) = UH(127,J)+U(128,J)
@@ -875,13 +933,18 @@
          LIVE MAPPING(6) = .FALSE.
 ! end of liveness management
 ! end remappings
+
 ! Initialize B
+
          DO I_38 = I_39, I_40
             DO I = 2, N-1
                B_1(I,I_38) = AP2
             ENDDO
          ENDDO
+
+
 ! forward sweep along columns
+
          DO I_42 = I_43, I_44
             DO I = 3, N-1
                I_14 = I-1
@@ -891,10 +954,13 @@
                UH_1(I,I_42) = UH_1(I,I_42)+UH_1(I_15,I_42)*INV
             ENDDO
          ENDDO
+
          DO I_46 = I_47, I_48
             UH_1(N-1,I_46) = UH_1(N-1,I_46)/B_1(N-1,I_46)
          ENDDO
+
 ! backward sweep along columns
+
          DO I_50 = I_51, I_52
             DO I = N-2, 2, -1
                I_16 = I+1
@@ -902,12 +968,16 @@
      &         I_50)
             ENDDO
          ENDDO
+
+
 ! Uh -> U
+
          IF (MY POS(1,1).EQ.1) THEN
             DO I = 1, N
                U_1(I,1) = UH_1(I,1)
             ENDDO
          ENDIF
+
          DO I_54 = I_55, I_56
             U_1(1,I_54) = UH_1(1,I_54)
             DO I = 2, N-1
@@ -918,16 +988,19 @@
             ENDDO
             U_1(N,I_54) = UH_1(N,I_54)
          ENDDO
+
          IF (MY POS(1,1).EQ.8) THEN
             DO I = 1, N
                U_1(I,128) = UH_1(I,128)
             ENDDO
          ENDIF
+
          IF (MY POS(1,1).EQ.1) THEN
             DO I = 2, N-1
                U_1(I,2) = U_1(I,2)+UH_1(I,1)
             ENDDO
          ENDIF
+
          IF (MY POS(1,1).EQ.8) THEN
             DO I = 2, N-1
                U_1(I,127) = U_1(I,127)+UH_1(I,128)
@@ -952,13 +1025,18 @@
          LIVE MAPPING(3) = .FALSE.
 ! end of liveness management
 ! end remappings
+
 ! Initialize B
+
          DO J = 2, N-1
             DO I_58 = I_59, I_60
                B(I_58,J) = AP2
             ENDDO
          ENDDO
-! forward sweep along rows
+
+
+! forward sweep along rows 
+
          DO J = 3, N-1
             DO I_62 = I_63, I_64
                I_19 = J-1
@@ -968,21 +1046,28 @@
                U(I_62,J) = U(I_62,J)+U(I_62,I_20)*INV
             ENDDO
          ENDDO
+
          DO I_66 = I_67, I_68
             U(I_66,N-1) = U(I_66,N-1)/B(I_66,N-1)
          ENDDO
+
 ! backward sweep along rows
+
          DO J = N-2, 2, -1
             DO I_70 = I_71, I_72
                I_21 = J+1
                U(I_70,J) = (U(I_70,J)+U(I_70,I_21))/B(I_70,J)
             ENDDO
          ENDDO
+
       ENDDO
+
       CALL HPFC NTIMEOFF('full computation')
+
 !
 ! some output to check the result...
 !
+
       CALL NPRE SUM HPFC REAL8(S, 1)
       DO J = 1, N
          DO I_74 = I_75, I_76
@@ -1008,6 +1093,7 @@
          CALL HPFC SND TO HOST
       ENDIF
 ! end of collect
+
       CALL HPFC NODE END
       END
 !

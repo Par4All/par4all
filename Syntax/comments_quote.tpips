@@ -1,0 +1,18 @@
+delete comments_quote
+setproperty ABORT_ON_USER_ERROR TRUE
+create comments_quote comments_quote.f
+
+display USER_FILE
+
+
+echo
+echo Sequential version:
+display PRINTED_FILE 
+
+echo
+echo Parallel version:
+display PARALLELPRINTED_FILE
+
+close
+delete comments_quote
+quit
