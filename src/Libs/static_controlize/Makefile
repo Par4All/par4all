@@ -22,8 +22,7 @@
 TARGET	= static_controlize
 
 LIB_CFILES = \
-	prettyprint.c loop_normalize.c static_controlize.c \
-	utils.c forward_substitute.c
+	prettyprint.c static_controlize.c utils.c 
 
 INC_TARGET =    $(TARGET).h
 
