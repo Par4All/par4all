@@ -61,6 +61,7 @@ bool dowhile_to_while_walker(statement stmt)
 			statement_instruction(stmt)=new_instr;
 		}
 	}
+    return true;
 }
 
 bool

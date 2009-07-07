@@ -167,7 +167,7 @@ solve_name_clashes(statement s, entity new)
             } while( gen_find_tabulated( ename, entity_domain) != entity_undefined );
             entity_name(solve_clash)=ename;
             CAR(l).p = (void*)solve_clash;
-            substitute_entity(s,decl_ent,solve_clash);
+            replace_entity(s,decl_ent,solve_clash);
         }
     }
 }
@@ -384,7 +384,7 @@ instruction inline_expression_call(expression modified_expression, call callee)
 			//AddLocalEntityToDeclarations(new,get_current_module_entity(),expanded);
 			statement_declarations(expanded)=gen_nconc(CONS(ENTITY,new,NIL), statement_declarations(expanded));
             gen_context_recurse(expanded, new, statement_domain, gen_true, &solve_name_clashes);
-            substitute_entity(expanded,e,new);
+            replace_entity(expanded,e,new);
         }
         /* substitute variables */
         else
@@ -448,7 +448,7 @@ reget:
              * then perform the substitution
              */
             gen_context_recurse(expanded, new, statement_domain, gen_true, &solve_name_clashes);
-            substitute_entity(expanded,e,new);
+            replace_entity(expanded,e,new);
 
         }
 

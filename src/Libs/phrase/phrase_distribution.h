@@ -243,11 +243,6 @@ string get_send_parameter_module_name (variable var);
  */
 string get_receive_parameter_module_name (variable var);
  
-/**
- * Return entity named name in specified module
- */
-entity entity_in_module (string name, entity module);
-
 /*
  * Return IN_PARAM_ID_NAME
  */
@@ -257,20 +252,6 @@ string get_in_param_id_name (entity variable, entity function);
  * Return OUT_PARAM_ID_NAME
  */
 string get_out_param_id_name (entity variable, entity function);
-
-/**
- * Replaces all the references to entity pointed by old by references 
- * created with new_variable.
- * Update loop indexes by replacing index entity by new entity
- */
-void replace_entity (statement stat, entity old, entity new_variable);
-
- /**
- * Replaces all the references to reference pointed by ref by references 
- * created with new_variable.
- * Update loop indexes by replacing index entity by new entity
- */
-void replace_reference (statement stat, reference ref, entity new_variable);
 
 /**
  * Build and return parameters (PHI1,PHI2) and dynamic variables for

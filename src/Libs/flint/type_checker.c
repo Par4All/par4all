@@ -26,6 +26,7 @@
  * by Son PhamDinh 03-05/2000
  */
 
+#define _GNU_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
 

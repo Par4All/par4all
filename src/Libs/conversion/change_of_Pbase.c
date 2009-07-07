@@ -32,6 +32,7 @@
 
 #include "genC.h"
 #include "ri.h"
+#include "ri-util.h"
 
 #include "boolean.h"
 #include "vecteur.h"

@@ -61,6 +61,7 @@
 #include "transformer.h"
 
 #include "semantics.h"
+#include "preprocessor.h"
 
 extern Psysteme sc_projection_by_eq(Psysteme sc, Pcontrainte eq, Variable v);
 

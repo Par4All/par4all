@@ -929,7 +929,7 @@ ReadLine(FILE * fp)
 	iPrevComm = iComm;
     }
 
-    pips_debug(9, "Aggregation of continuation lines: '%s'\n", line_buffer);
+    pips_debug(9, "Aggregation of continuation lines: '%s'\n", (char*)line_buffer);
 
     return(TypeOfLine);
 }

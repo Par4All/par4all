@@ -27,6 +27,7 @@
   -- entity_local_name is replaced by module_local_name. LZ 230993
 */
 
+#define _GNU_SOURCE
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>

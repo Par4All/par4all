@@ -498,67 +498,6 @@ static string get_externalized_function_private_param_name(entity variable)
 }
 
 
-/**
-   Replace entity searched_entity stored in a_context by entity replacement_entity also stored in a_context if entity is found in a syntax reference
- */
-static void replace_entity_when_required(syntax s, void* a_context)
-{
-  replace_reference_context* context = (replace_reference_context*)a_context;
-
-  if (syntax_tag(s) == is_syntax_reference) 
-  {
-    reference ref = syntax_reference(s);
-
-    if (same_entity_p(reference_variable(ref), context->searched_entity)) 
-    {
-      pips_debug(7, "Found reference, replace it.\n");
-
-      syntax_reference(s) = make_reference(context->replacement_entity, reference_indices(ref));
-    }
-  }
-}
-
-
-/**
-   Replace entity searched_entity stored in a_context by entity replacement_entity also stored in a_context if entity represents index of the loop
- */
-static void replace_loop_index_when_required(loop l, void* a_context)
-{
-  replace_reference_context* context = (replace_reference_context*)a_context;
-
-  if (same_entity_p(loop_index(l), context->searched_entity)) 
-  {
-    pips_debug(7, "Found loop index, replace it.\n");
-
-    loop_index(l) = context->replacement_entity;
-  }
-}
-
-
-/**
-   Replace all the references to reference pointed by ref by references created with new_variable and update loop indexes by replacing index entity by new entity
- */
-static void replace_reference(statement stat, reference ref, entity new_variable) 
-{
-  replace_reference_context context;
-
-  context.searched_entity = reference_variable(ref);
-  context.replacement_entity = new_variable;
-
-  /* StatementReplaceReference(stat, ref, make_expression_from_entity(new_variable)); */
-  /* StatementReplaceEntity (stat, reference_variable(ref), new_variable);*/
-  
-  pips_debug(7, "[BEGIN] replace_reference %s with %s\n", entity_local_name(context.searched_entity), entity_local_name(context.replacement_entity));
-
-  /* Do the job on all references */
-  gen_context_recurse(stat, &context, syntax_domain, gen_true, replace_entity_when_required);
-
-  /* Do the job for loops */
-  gen_context_recurse(stat, &context, loop_domain, gen_true, replace_loop_index_when_required);  
- 
-  pips_debug(7, "[END] replace_reference %s with %s\n", entity_local_name(context. searched_entity), entity_local_name(context.replacement_entity));
-}
-
 
 /**
    Declare in the newly created module a new variable and replace all occurences to the old variable by the new created

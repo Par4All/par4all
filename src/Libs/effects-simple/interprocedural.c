@@ -171,7 +171,6 @@ list effects_dynamic_elim(list l_eff)
 		if(/*FALSE && */value_expression_p(v)) {
 		  expression ae = value_expression(v);
 		  /* Save the action before the effect may be changed */
-		  action ac = effect_action(eff);
 		  list nel, fel;
 
 		  /* re-use an existing function... */
@@ -1271,10 +1270,7 @@ list c_summary_effect_to_proper_effects(effect eff, expression real_arg)
 	    else if(ENTITY_ADDRESS_OF_P(real_op)) 
 	      {
 		expression arg1 = EXPRESSION(CAR(args));
-		syntax s1 = expression_syntax(arg1);
-		reference r1 = syntax_reference(s1);
-		entity ev1 = reference_variable(r1);
-		list l_real_arg = NIL;
+        list l_real_arg = NIL;
 		effect eff1;
 
 		/* first we compute an effect on the argument of the 

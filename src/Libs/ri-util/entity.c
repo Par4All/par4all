@@ -1543,95 +1543,8 @@ entity update_operator_to_regular_operator(entity op)
 }
 
 
-/** @defgroup entity substituion in statements
- * it is not unusual to generate a new entity,
- * this helper functions will take care of substituing all referenced to
- * an old entity by reference in new entities
- * @{
- */
-
-struct entity_pair
-{
-    entity old;
-    entity new;
-};
-
-/** @brief substitute `thecouple->new' to `thecouple->old' in `exp'
- *  only works if `exp' is a reference
- */
-static void
-do_substitute_entity(expression exp, struct entity_pair* thecouple)
-{
-    if( expression_reference_p(exp) )
-    {
-        reference ref = syntax_reference(expression_syntax(exp));
-        entity referenced_entity = reference_variable(ref);
-        /*if( same_entity_name_p(referenced_entity,thecouple->old))*/
-		string emn_r = strdup(entity_module_name(referenced_entity));
-		string emn_o = entity_module_name(thecouple->old);
-		string eun_r = entity_user_name(referenced_entity);
-		string eun_o = entity_user_name(thecouple->old);
-        if( same_string_p(emn_r,emn_o) && same_string_p(eun_r,eun_o))
-        {
-            if( entity_constant_p(thecouple->new) )
-            {
-                expression_syntax(exp) = make_syntax_call(make_call(thecouple->new,NIL));
-            }
-            else
-            {
-				//pips_assert("substitute entities of similar type",gen_length(reference_indices(ref)) == gen_length(variable_dimensions(type_variable(entity_type(thecouple->new)))));
-                reference_variable(ref) = thecouple->new;
-            }
-        }
-		free(emn_r);
-    }
-}
 
 
-static void
-do_substitute_all_entities(statement s, struct entity_pair* thecouple)
-{
-    FOREACH(ENTITY,decl_ent,statement_declarations(s))
-    {
-        value v = entity_initial(decl_ent);
-        if( !value_undefined_p(v) && value_expression_p( v ) )
-            gen_context_recurse( v, thecouple, expression_domain, gen_true, do_substitute_entity);
-    }
-}
-
-static void do_substitute_entity_in_loop(loop l, struct entity_pair* thecouple)
-{
-	string emn_l = entity_module_name(loop_index(l));
-	string emn_o = entity_module_name(thecouple->old);
-	string eun_l = entity_user_name(loop_index(l));
-	string eun_o = entity_user_name(thecouple->old);
-	if( same_string_p(emn_l,emn_o) && same_string_p(eun_l,eun_o))
-	{
-		loop_index(l) = thecouple->new;
-	}
-
-}
-
-/** 
- * @brief recursievly substitute new to old in s
- * 
- * @param s statement where the substitution must be done
- * @param old old entity
- * @param new new entity
- */
-void
-substitute_entity(statement s, entity old, entity new)
-{
-    struct entity_pair thecouple = { old, new };
-
-    gen_context_multi_recurse( s, &thecouple, expression_domain, gen_true, do_substitute_entity,
-            statement_domain,gen_true, do_substitute_all_entities,
-			loop_domain,gen_true, do_substitute_entity_in_loop,
-			NULL);
-
-}
-
-/** @} */
 
 
 /** 
@@ -1645,4 +1558,53 @@ bool entity_equivalence_p(entity e)
 {
     return storage_ram_p(entity_storage(e))
         && !ENDP( ram_shared(storage_ram(entity_storage(e)) ));
+}
+
+/** 
+ * compare entity names
+ * 
+ * @param e1 first entity
+ * @param e2 second entity
+ * 
+ * @return true if e1 and e2 have the same name
+ */
+bool same_entity_name_p(entity e1, entity e2)
+{
+    return same_string_p(entity_name(e1), entity_name(e2));
+}
+
+/** 
+ * look for @a ent in @a ent_l
+ * 
+ * @param ent entity to find
+ * @param ent_l list to scan
+ * 
+ * @return true if @a ent belongs to @a ent_l
+ */
+bool entity_in_list_p(entity ent, list ent_l)
+{
+    return !gen_chunk_undefined_p(gen_find_eq(ent,ent_l));
+}
+
+/* returns l1 after elements of l2 but not of l1 have been appended to l1. */
+/* l2 is freed */
+/** 
+ * append all elements of l2 not in l1 to l1 and free l2
+ * 
+ * @param l1 list to append entities to
+ * @param l2 list from which the new entities come
+ * 
+ * @return @a l1 with extra new entities appended
+ */
+list concat_new_entities(list l1, list l2)
+{
+    list new_l2=NIL;
+    set s = list_to_set(l1,set_pointer);
+    FOREACH(ENTITY,e,l2) {
+        if( ! set_belong_p(s,e) )
+            new_l2=CONS(ENTITY,e,new_l2);
+    }
+    gen_free_list(l2);
+    set_free(s);
+    return gen_nconc(l1, gen_nreverse(new_l2));
 }

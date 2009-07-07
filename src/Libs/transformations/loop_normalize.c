@@ -113,38 +113,6 @@
 #include "resources.h"
 #include "transformations.h"
 
-struct param { entity ent; expression exp; };
-static
-void do_substitute_expression(expression e, struct param *p)
-{
-    if( expression_reference_p(e) )
-    {
-        reference r = expression_reference(e);
-        if(same_entity_p(p->ent, reference_variable(r) ))
-        {
-            free_syntax(expression_syntax(e));
-            expression_syntax(e) = copy_syntax(expression_syntax(p->exp));
-            unnormalize_expression(e);
-        }
-    }
-}
-
-static
-void do_substitute_expression_in_declarations(list decl, struct param *p)
-{
-    FOREACH(ENTITY,e,decl)
-    {
-        value v = entity_initial(e);
-        if( value_expression_p(v) )
-            gen_context_recurse(value_expression(v),p,expression_domain,gen_true,do_substitute_expression);
-    }
-}
-
-static
-void do_substitute_expression_in_statement(statement s, struct param *p)
-{
-    do_substitute_expression_in_declarations(statement_declarations(s),p);
-}
 
 /** 
  * statement normalization
@@ -167,7 +135,6 @@ void loop_normalize_statement(statement s)
             expression rl = range_lower( lr );
             expression ru = range_upper( lr );
             expression ri = range_increment( lr );
-            int incre = expression_to_int( ri );
 
             expression nub =   make_op_exp(DIVIDE_OPERATOR_NAME,
                     make_op_exp(PLUS_OPERATOR_NAME,
@@ -216,11 +183,7 @@ void loop_normalize_statement(statement s)
             /* commit the changes */
 
             /* #0 replace all references to index in loop_body(l) by new_index_exp */
-            struct param p = { index, new_index_exp };
-            gen_context_multi_recurse(loop_body(l),&p,
-                    expression_domain,gen_true,do_substitute_expression,
-                    statement_domain,gen_true,do_substitute_expression_in_statement,
-                    NULL);
+            replace_entity_by_expression(loop_body(l),index,new_index_exp);
 
             /* #1 copy s into a new statement */
             statement new_statement = make_empty_statement();

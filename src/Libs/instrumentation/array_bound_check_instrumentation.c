@@ -559,7 +559,7 @@ bool array_bound_check_instrumentation(char *module_name)
 	if (variable_in_common_p(ent))
 	  {
 	    entity sec = ram_section(storage_ram(entity_storage(ent)));	
-	    if (!entity_in_list(sec,l_commons)) 
+	    if (!entity_in_list_p(sec,l_commons)) 
 	      {
 		area a = type_area(entity_type(sec));
 		list l = area_layout(a);

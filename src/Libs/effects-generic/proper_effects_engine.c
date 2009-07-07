@@ -50,6 +50,7 @@
 
 #include "properties.h"
 #include "pipsmake.h"
+#include "preprocessor.h"
 
 #include "transformer.h"
 #include "semantics.h"
@@ -674,9 +675,6 @@ list generic_proper_effects_of_complex_address_expression(expression add_exp, ef
 	  /* Let's try to refine *pme with the current expression, the
 	     current operator if any and the current second expression
 	     when it exists */
-	  reference mr = effect_any_reference(*pme);
-	  list mr_inds = reference_indices(mr);
-	  
 	  pips_debug(4, "*pme is defined : try to refine it\n");
 
 	  if(syntax_reference_p(s)) 
@@ -866,7 +864,6 @@ list generic_proper_effects_of_address_expression(expression addexp, int write_p
     case is_syntax_subscript:
       {
 	effect e = effect_undefined; /* main data read-write effect: p[*] */
-	effect ge = effect_undefined; /* generic effect */
       
 	pips_debug(5, "call or subscript case\n");
 	/* Look for a main read-write effect of the lhs and for its 

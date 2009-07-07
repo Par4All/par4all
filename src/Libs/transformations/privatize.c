@@ -542,7 +542,7 @@ bool localize_declaration_walker(statement s)
 			previous_replacements=gen_nconc(previous_replacements,CONS(ENTITY,e,NIL));
 			hash_put(old_entity_to_new,e,previous_replacements);
 			FOREACH(ENTITY,prev,previous_replacements)
-				substitute_entity(s,prev,new_entity);
+				replace_entity(s,prev,new_entity);
 		}
 	}
 	parent_statement=s;

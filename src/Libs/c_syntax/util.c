@@ -2139,12 +2139,6 @@ void UpdateAbstractEntity(entity e, stack ContextStack)
 }
 
 
-bool entity_in_list_p(entity e, list le)
-{
-  MAP(ENTITY, f, if (e==f) return TRUE, le);
-  return FALSE;
-}
-
 void RemoveFromExterns(entity e)
 {
   entity f = get_current_module_entity();

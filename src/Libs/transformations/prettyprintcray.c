@@ -48,40 +48,6 @@
 
 #include "transformations.h"
 
-bool same_entity_name_p(entity e1, entity e2)
-{
-    return(strcmp(entity_name(e1), entity_name(e2))==0);
-}
-
-bool entity_in_list(entity ent, cons *ent_l)
-{
-    MAP(ENTITY, e, {
-	if (same_entity_p(ent, e)) {
-	    debug(9, "entity_in_list", "entity %s found\n",
-		  entity_local_name(ent));
-	    return TRUE;
-	}
-    }, ent_l);
-
-    return FALSE;
-}
-
-/* returns l1 after elements of l2 but not of l1 have been appended to l1. */
-/* l2 is freed */
-list concat_new_entities(list l1, list l2)
-{
-    list new_l2=NIL;
-
-    MAPL(le, {
-	entity e = ENTITY(CAR(le));
-
-	if (!entity_in_list(e, l1)) {
-	    new_l2 = gen_nconc(new_l2, CONS(ENTITY, e, NIL));
-	}
-    }, l2);
-    gen_free_list(l2);
-    return(gen_nconc(l1, new_l2));
-}
 
 /* returns a list of all entities which:
  * - are concerned with cumulated effects (cfx) of the loop_body
@@ -99,8 +65,8 @@ list real_loop_locals(loop lp, effects cfx)
 	entity 
 	    ent = reference_variable(effect_any_reference(eff));
 
-	if (!entity_in_list(ent, rll)
-	    && entity_in_list(ent,loop_locals(lp)) ) 
+	if (!entity_in_list_p(ent, rll)
+	    && entity_in_list_p(ent,loop_locals(lp)) ) 
 	{
 	    /* ent is a real loop local */
 	    debug(7, "real_loop_locals", "real loop local: %s\n",
@@ -109,7 +75,7 @@ list real_loop_locals(loop lp, effects cfx)
 	}
     }, effects_effects(cfx));
 
-    if( !entity_in_list(loop_index(lp), rll) ) 
+    if( !entity_in_list_p(loop_index(lp), rll) ) 
     {
 	rll= CONS(ENTITY, loop_index(lp), rll);
     }
@@ -264,10 +230,10 @@ text text_microtasked_loop(entity module, int margin, statement lp_stt)
 	 *
 	 * FC 28/09/93
 	 */
-	if ((!entity_in_list(ent, loop_locals(lp))) &&
-	    (!entity_in_list(ent, ent_l)) &&
+	if ((!entity_in_list_p(ent, loop_locals(lp))) &&
+	    (!entity_in_list_p(ent, ent_l)) &&
 	    (!same_entity_p(ent, loop_index(lp))) &&
-	    (!entity_in_list(ent, lp_shared)))
+	    (!entity_in_list_p(ent, lp_shared)))
 	{
 	    /* ent is a new shared entity */
 	    if (np>0)

@@ -953,7 +953,7 @@ static void initialize_and_verify_common_variable(entity ent, region reg)
 	  string area_name = module_local_name(sec);
 	  ifdebug(1)
 	    fprintf(stderr,"\nCommon variable %s not in main module scope\n",entity_name(ent)); 
-	  if (!entity_in_list(sec,l_initialized_commons)) 
+	  if (!entity_in_list_p(sec,l_initialized_commons)) 
 	    {
 	      fprintf(out,"%s\t%s\t%s\t(0,1)\n",PREFIX1,file_name,module_local_name(current_mod));
 	      if (strcmp(area_name, BLANK_COMMON_LOCAL_NAME) == 0) 

@@ -287,8 +287,6 @@ instruction_to_total_precondition(
   transformer t_pre = transformer_undefined;
   test t = test_undefined;
   loop l = loop_undefined;
-  whileloop wl = whileloop_undefined;
-  forloop fl = forloop_undefined;
   call c = call_undefined;
 
   pips_debug(9,"begin t_post=%p tf=%p\n", t_post, tf);

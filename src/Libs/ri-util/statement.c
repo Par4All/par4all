@@ -47,6 +47,7 @@
 
 #include "properties.h"
 #include "effects-simple.h"
+#include "preprocessor.h"
 
 
 /******************************************************* EMPTY STATEMENT */

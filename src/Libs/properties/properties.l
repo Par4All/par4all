@@ -248,8 +248,6 @@ parse_properties_file(FILE * fd)
 static void 
 read_properties(void)
 {
-    string rc;
-
     if (pl != (hash_table) NULL)
     return;
     /* else */

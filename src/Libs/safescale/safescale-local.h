@@ -65,9 +65,3 @@ typedef struct
   statement searched_statement;
   statement found_sequence_statement;
 } sequence_searching_context;
-
-typedef struct 
-{
-  entity searched_entity;
-  entity replacement_entity;
-} replace_reference_context;

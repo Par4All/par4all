@@ -295,7 +295,7 @@ cons *sl;
  * unstructured u
  */
 void look_for_nested_loops_unstructured(unstructured u,
-					statement (*loop_transformation) (list),
+					statement (*loop_transformation) (list, bool (*)(loop)),
 					bool (*loop_predicate)(loop))
 {
     cons *blocs = NIL;
