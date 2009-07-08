@@ -19,10 +19,20 @@
   NewGen.  If not, see <http://www.gnu.org/licenses/>.
 
 */
-/*
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdarg.h>
+#include "genC.h"
+#include "newgen_include.h"
+
+/** @defgroup newgen_list NewGen functions dealing with list objects 
 
   The following functions implement a small library of utilities in the
   Lisp tradition.
+
+  Lists are pointers to chunk objects that are linked together in a single
+  forward way.
 
   . GEN_EQ is pointer comparison,
   . GEN_LENGTH returns the length of the list CP,
@@ -87,11 +97,7 @@
      0 if not present
 */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdarg.h>
-#include "genC.h"
-#include "newgen_include.h"
+/** @{ */
 
 int gen_eq(void * obj1, void * obj2)
 {
@@ -724,6 +730,8 @@ int gen_position(void * item, list l)
   }
   return 0;
 }
+
+/** @} */
 
 
 /*   That is all

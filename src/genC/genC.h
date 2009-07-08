@@ -62,8 +62,8 @@ typedef union gen_chunk {
   _int i;
   float f;
   string s;
-  void * e; /* for externals */
-  struct cons * l;
+  void * e; /**< For externals (foreign objects) */
+  struct cons * l; /**< A pointer to a list element */
   set t;
   hash_table h;
   union gen_chunk * p;
