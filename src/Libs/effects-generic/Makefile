@@ -33,7 +33,8 @@ LIB_CFILES = \
 	binary_operators.c \
 	utils.c \
 	prettyprint.c \
-	intrinsics.c
+	intrinsics.c \
+	interprocedural.c
 
 INC_TARGET =    $(TARGET).h
 

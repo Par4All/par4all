@@ -103,9 +103,15 @@ set_methods_for_proper_references()
     effects_union_over_range_op = simple_effects_union_over_range;
     vector_to_descriptor_func = effects_undefined_vector_to_descriptor;
 
-    effects_backward_translation_op = simple_effects_backward_translation;
+    effects_translation_init_func = simple_effects_translation_init;
+    effects_translation_end_func = simple_effects_translation_end;
+
+    effects_backward_translation_op = generic_effects_backward_translation;
+    fortran_effects_backward_translation_op = simple_effects_backward_translation;
     effects_forward_translation_op = simple_effects_forward_translation;/*FC*/
     effects_local_to_global_translation_op = effects_dynamic_elim;
+    c_effects_on_formal_parameter_backward_translation_func =
+      c_simple_effects_on_formal_parameter_backward_translation;
 
     load_context_func = load_undefined_context;
     load_transformer_func = load_undefined_transformer;
@@ -161,9 +167,17 @@ set_methods_for_cumulated_references()
     /* FC was: effects_undefined_union_over_range */
 
     vector_to_descriptor_func = effects_undefined_vector_to_descriptor;
-    effects_backward_translation_op = simple_effects_backward_translation;
+
+
+    effects_translation_init_func = simple_effects_translation_init;
+    effects_translation_end_func = simple_effects_translation_end;
+
+    effects_backward_translation_op = generic_effects_backward_translation;
+    fortran_effects_backward_translation_op = simple_effects_backward_translation;
     effects_forward_translation_op = simple_effects_forward_translation;
     effects_local_to_global_translation_op = effects_dynamic_elim;
+    c_effects_on_formal_parameter_backward_translation_func =
+      c_simple_effects_on_formal_parameter_backward_translation;
 
     load_context_func = load_undefined_context;
     load_transformer_func = load_undefined_transformer;
@@ -231,9 +245,18 @@ set_methods_for_proper_simple_effects()
     effects_loop_normalize_func = effects_undefined_loop_normalize;
     effects_union_over_range_op = simple_effects_union_over_range;
     vector_to_descriptor_func = effects_undefined_vector_to_descriptor;
-    effects_backward_translation_op = simple_effects_backward_translation;
+
+
+
+    effects_translation_init_func = simple_effects_translation_init;
+    effects_translation_end_func = simple_effects_translation_end;
+
+    effects_backward_translation_op = generic_effects_backward_translation;
+    fortran_effects_backward_translation_op = simple_effects_backward_translation;
     effects_forward_translation_op = simple_effects_forward_translation;
     effects_local_to_global_translation_op = effects_dynamic_elim;
+    c_effects_on_formal_parameter_backward_translation_func =
+      c_simple_effects_on_formal_parameter_backward_translation;
 
     load_context_func = load_undefined_context;
     load_transformer_func = load_undefined_transformer;
@@ -286,8 +309,16 @@ set_methods_for_simple_effects()
     effects_loop_normalize_func = effects_loop_normalize_nop;
     effects_union_over_range_op = simple_effects_union_over_range;
     vector_to_descriptor_func = effects_undefined_vector_to_descriptor;
+
+
+    effects_translation_init_func = simple_effects_translation_init;
+    effects_translation_end_func = simple_effects_translation_end;
+
     effects_backward_translation_op = simple_effects_backward_translation;
+    fortran_effects_backward_translation_op = simple_effects_backward_translation;
     effects_forward_translation_op = simple_effects_forward_translation;
+    c_effects_on_formal_parameter_backward_translation_func =
+      c_simple_effects_on_formal_parameter_backward_translation;
 
     effects_local_to_global_translation_op = effects_dynamic_elim;
 

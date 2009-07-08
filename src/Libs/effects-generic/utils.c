@@ -98,10 +98,20 @@ list (*effects_union_over_range_op)(list, entity, range, descriptor);
 descriptor (*vector_to_descriptor_func)(Pvecteur);
 
 /* interprocedural translation */
+void (*effects_translation_init_func)(entity /* callee */, 
+				      list /* real_args */);
+void (*effects_translation_end_func)();
 list (*effects_backward_translation_op)(entity, list, list, transformer);
+list (*fortran_effects_backward_translation_op)(entity, list, list, transformer);
 list (*effects_forward_translation_op)(entity /* callee */, list /* args */,
 				       list /* effects */,
 				       transformer /* context */);
+
+list (*c_effects_on_formal_parameter_backward_translation_func)
+(list /* of effects */, 
+ expression /* args */, 
+ transformer /* context */);
+
 
 /* local to global name space translation */
 list (*effects_local_to_global_translation_op)(list);

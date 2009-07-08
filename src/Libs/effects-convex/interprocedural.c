@@ -79,6 +79,23 @@
 
 /* jmp_buf overflow_error;*/
 
+
+/*********************************************************** INITIALIZATION */
+
+void convex_regions_translation_init(entity callee, list real_args )
+{
+    set_interprocedural_translation_context_sc(callee, real_args);
+    set_forward_arguments_to_eliminate();
+
+}
+
+void convex_regions_translation_end()
+{
+    reset_translation_context_sc();
+    reset_arguments_to_eliminate();
+}
+
+
 /************************************************************** INTERFACES  */
 
 static statement current_stmt = statement_undefined;

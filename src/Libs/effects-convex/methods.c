@@ -103,7 +103,11 @@ set_methods_for_convex_effects()
     effects_union_over_range_op = convex_regions_union_over_range;
     vector_to_descriptor_func = vector_to_convex_descriptor;
 
+    effects_translation_init_func = convex_regions_translation_init;
+    effects_translation_end_func = convex_regions_translation_end;
+
     effects_backward_translation_op = convex_regions_backward_translation;
+    fortran_effects_backward_translation_op = convex_regions_backward_translation;
     effects_forward_translation_op = convex_regions_forward_translation;
     effects_local_to_global_translation_op = regions_dynamic_elim;
 

@@ -1161,7 +1161,8 @@ generic_proper_effects_of_external(entity func, list args)
     return le;  
 }
 
-/* list proper_effects_of_call(call c, transformer context, list *plpropreg)
+/** 
+
  * @return the list of effects found.
  * @param c, a call, which can be a call to a subroutine, but also
  * to an function, or to an intrinsic, or even an assignement.
