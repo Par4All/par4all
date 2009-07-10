@@ -1048,19 +1048,6 @@ standard error output. But if you want to have \texttt{make} stopping on
 the first error to help debugging, just add \verb|FWD_STOP_ON_ERROR=1| to
 the \texttt{make} invocation.
 
-PIPS use a lot of macro processing to ease the programmer life but in some
-case, it may be difficult what happens in some weird situation. To help
-the programmer, there is a special \texttt{+cpp} target to build a
-CPP-preprocessed version of a file. For example
-\begin{verbatim}
-make ricedg.c+cpp
-\end{verbatim}
-make a preprocessed version of the file \texttt{ricedg.c}. To help
-debugging, gcc-specific options are added to have the macro definitions at
-the beginning of the file too, to keep the comments and display the list
-of included files.
-
-
 \section{Validation}
 \label{sec:validation}
 
@@ -1300,8 +1287,58 @@ PIPS_GRAPHICAL_DIFF=pips_emacs_diff manual_accept LoopRecovering
   A filter has to be a shell script getting an input file as its first
   parameter and printing the filtered file to the standard output.
 
-\section{Debugging and NewGen}
+\section{Debugging: NewGen, macros, debug levels,...}
 \label{sec:newgen}
+
+\subsection{Debugging PIPS C source code for the compiler}
+
+PIPS use a lot of macro processing to ease the programmer life with
+NewGen, but, in some cases, it may be difficult to understand what
+happens to the C source code. To help the programmer, there is a
+special \texttt{+cpp} target to build a CPP-preprocessed version of a
+file. For example
+\begin{verbatim}
+make ricedg.c+cpp
+\end{verbatim}
+make a preprocessed version of the file \texttt{ricedg.c}. To help
+debugging, gcc-specific options are added to have the macro
+definitions at the beginning of the file too, to keep the comments and
+display the list of included files.
+
+\subsection{Debugging PIPS C source code dynamiccaly}
+
+We use environment variables \verb/xxxx_DEBUG_LEVEL/ to control
+debugging output at the library level. So, one library (or phase)
+\verb/x/ calls library \verb/y/, the entry points in \verb/x/ should
+handle the debugging level as \verb/Y_DEBUG_LEVEL/ and not
+\verb/X_DEBUG_LEVEL/. See for instance the main entries in library
+\verb/pipsdbm/. You can detecte them because they all contain a call
+to \verb/debug_on()/ on entry and a call to \verb/debug_off()/ on
+exit.
+
+
+A library with different component may also define several debug
+levels, with different names. For instance, \verb/SAC_DEBUG_LEVEL/,
+\verb/SAC_ATOMIZER_DEBUG_LEVEL/, \verb/SAC_SIMD_LOOP_UNROLL_DEBUG_LEVEL/,
+etc... Unspaghettify is supposed to be controlled by
+\verb/CONTROL_DEBUG_LEVEL/, or by something more restrictive.
+
+Let suppose you develop your own CUDA library. Then you should have
+your own \verb/CUDA_DEBUG_LEVEL/, used with
+\verb/debug_on("CUDA_DEBUG_LEVEL")/, \verb/debug_off(/),
+\verb/ifdebug()/ to guard debugging code and \verb/pips_debug()/ to
+reduce the number of \verb/fprintf(stderr,...)/ and add useful
+information automatically, e.g. the current function name.
+
+The current debug level is a global variable called
+\verb/the_current_debug_level/, which can be set easily under
+gdb. Calls to \verb/debug_on/ and \verb/debug_off/ push and pop the
+hidden debug level stack.
+
+If the environement variable is not set or if it set to 0, there is no
+debug output. The largest value for debugging is 9.
+
+\subsection{Debugging and NewGen}
 
 NewGen is a software engineering tool, from which almost all PIPS data
 structures are generated. It is described in ???. It is considered as an
