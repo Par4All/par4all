@@ -198,7 +198,6 @@ pragma_to_string (pragma p) {
       if (get_prettyprint_is_fortran() == TRUE) {
 	// In fortran line size can not be more than 72
 	FOREACH (STRING, str, l_str) {
-	  fprintf (stderr, "entry size: %d\n", line_sz);
 	  pips_assert ("algo bug", line_sz < MAX_LINE_LENGTH - 7);
 	  size_t size = strlen (str);
 	  pips_assert ("not handled case need to split the str between two lines",
@@ -208,7 +207,6 @@ pragma_to_string (pragma p) {
 	    gen_insert_before (strdup (FORT_OMP_CONTINUATION), str, l_str);
 	    line_sz = size;
 	  }
-	  fprintf (stderr, "out size: %d\n", line_sz);
 	}
       }
       string_buffer_append_list (sb, l_str);
