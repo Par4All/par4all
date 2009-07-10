@@ -1317,7 +1317,7 @@ to \verb/debug_on()/ on entry and a call to \verb/debug_off()/ on
 exit.
 
 
-A library with different component may also define several debug
+A library with different components may also define several debug
 levels, with different names. For instance, \verb/SAC_DEBUG_LEVEL/,
 \verb/SAC_ATOMIZER_DEBUG_LEVEL/, \verb/SAC_SIMD_LOOP_UNROLL_DEBUG_LEVEL/,
 etc... Unspaghettify is supposed to be controlled by
@@ -1328,7 +1328,12 @@ your own \verb/CUDA_DEBUG_LEVEL/, used with
 \verb/debug_on("CUDA_DEBUG_LEVEL")/, \verb/debug_off(/),
 \verb/ifdebug()/ to guard debugging code and \verb/pips_debug()/ to
 reduce the number of \verb/fprintf(stderr,...)/ and add useful
-information automatically, e.g. the current function name.
+information automatically, e.g. the current function name. Another
+debugging macro, \verb/debug/, is now obsolete and must be replaced by
+\verb/pips_debug/ which add the current function name
+automatically. So, the second parameter of calls to \verb/debug/,
+which is the current function name, must be deleted. This makes code
+maintenance easier.
 
 The current debug level is a global variable called
 \verb/the_current_debug_level/, which can be set easily under
@@ -1337,6 +1342,12 @@ hidden debug level stack.
 
 If the environement variable is not set or if it set to 0, there is no
 debug output. The largest value for debugging is 9.
+
+Another macro, \verb/pips_assert/, is useful to enforce contracts
+between callers and callees. The first argument describes the
+assertion, but it is often misused to give the current function
+name. This is useless because the information is added by the macro
+itself.
 
 \subsection{Debugging and NewGen}
 
