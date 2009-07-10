@@ -3273,20 +3273,22 @@ gen_internal_context_multi_recurse(void * o, void * context, va_list pvar)
     current_mrc = saved_mrc;
 }
 
-/**  Multi-recursion with context function visitor
+/** Multi-recursion with context function visitor
  
-     gen_context_multi_recurse(obj, context,
-                               [domain, filter, rewrite,]*
-                               NULL);
+    gen_context_multi_recurse(obj, context,
+                              [domain, filter, rewrite,]*
+                              NULL);
  
-     recurse from object obj (in a top-down way),
-     applies filter_i on encountered domain_i objects with the context,
-     if true, recurses down from the domain_i object,
-     and applies rewrite_i on exit from the object (in a bottom-up way).
+    recurse from object obj (in a top-down way), applies filter_i on
+    encountered domain_i objects with the context, if true, recurses
+    down from the domain_i object, and applies rewrite_i on exit from
+    the object (in a bottom-up way).
  
-     Bug : you can't visit domain number 0 if any... The good news is that
-     there is no NewGen object of domain number 0, since it seems that to
-     start at 7 for user domains...
+    Newgen persistant fields are not visited.
+ 
+    Bug : you can't visit domain number 0 if any... The good news is that
+    there is no NewGen object of domain number 0, since it seems that to
+    start at 7 for user domains...
 */
 void gen_context_multi_recurse(void * o, void * context, ...)
 {
@@ -3305,7 +3307,10 @@ void gen_context_multi_recurse(void * o, void * context, ...)
     recurse from object obj (in a top-down way),
     applies filter_i on encountered domain_i objects with the context,
     if true, recurses down from the domain_i object,
-    and applies rewrite_i on exit from the object (in a bottom-up way).
+    and applies rewrite_i on exit from the object (in a bottom-up
+    way).
+
+    Newgen persistant fields are not visited.
  
     Bug : you can't visit domain number 0 if any... The good news is that
     there is no NewGen object of domain number 0, since it seems that to
@@ -3359,7 +3364,7 @@ void gen_recurse(
     
     @param context is a pointer that is given to the filter and rewrite
     methods too. It is quite useful when one wants side effects on other
-    objects without having to rely on dirty global variable
+    objects without having to rely on (dirty) global variables.
 
     @param filter the filter method (function) to apply to an encountered
     object of the good type during the prefix (top-down) visit. Its second
