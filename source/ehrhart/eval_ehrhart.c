@@ -31,8 +31,8 @@ int in_domain(Polyhedron *P, Value *list_args) {
 
   if( !P )
           return( 0 );
-  POL_ENSURE_FACETS(P);
-  POL_ENSURE_VERTICES(P);
+
+  POL_ENSURE_INEQUALITIES(P);
 
   value_init(v); 
   
