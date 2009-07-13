@@ -434,8 +434,6 @@ bool privatize_module(char *mod_name)
 	db_get_memory_resource(DBR_CODE, mod_name, TRUE) );
     mod_stat = get_current_module_statement();
 
-    set_ordering_to_statement(mod_stat);
-    
     mod_inst = statement_instruction(mod_stat);
 
     /*
@@ -453,6 +451,8 @@ bool privatize_module(char *mod_name)
 	db_get_memory_resource(DBR_CHAINS, mod_name, TRUE);
 
     debug_on("PRIVATIZE_DEBUG_LEVEL");
+    set_ordering_to_statement(mod_stat);
+    
 
     /* Build maximal lists of private variables in loop locals */
     /* scan_unstructured(instruction_unstructured(mod_inst), NIL); */
