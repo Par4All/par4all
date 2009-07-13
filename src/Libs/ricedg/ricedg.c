@@ -245,8 +245,6 @@ char *mod_name;
 	db_get_memory_resource(DBR_CODE, mod_name, TRUE) );
     mod_stat = get_current_module_statement();
 
-    /* we need the statements from their ordering for the dependance-graph: */
-    set_ordering_to_statement(mod_stat);
 
     chains = (graph) db_get_memory_resource(DBR_CHAINS, mod_name, TRUE);
 
@@ -303,6 +301,8 @@ char *mod_name;
       fprintf(stderr, " Nbrdo=%d",Nbrdo);
     }
     debug_on("QUICK_PRIVATIZER_DEBUG_LEVEL");
+    /* we need the statements from their ordering for the dependance-graph: */
+    set_ordering_to_statement(mod_stat);
     quick_privatize_graph(dg);
     debug_off();
 
