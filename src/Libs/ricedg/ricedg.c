@@ -282,7 +282,6 @@ char *mod_name;
     }
 
     debug_off();
-    reset_ordering_to_statement();
 
     if(dg_type == DG_SEMANTICS)
 	set_precondition_map( (statement_mapping)
@@ -293,7 +292,6 @@ char *mod_name;
 
     debug_on("RICEDG_DEBUG_LEVEL");
     debug(1, "rice_dependence_graph", "finding enclosing loops ...\n");
-    set_ordering_to_statement(mod_stat);
 
     set_enclosing_loops_map( loops_mapping_of_statement(mod_stat));
     ifdebug(3) {
