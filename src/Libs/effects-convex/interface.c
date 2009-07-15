@@ -273,6 +273,20 @@ print_source_regions(string module_name)
 }
 
 bool
+print_code_inv_regions(string module_name)
+{
+    return print_code_any_regions(module_name, is_rw, FALSE, FALSE, 
+			  DBR_INV_REGIONS, DBR_SUMMARY_REGIONS, ".reg");
+}
+
+bool
+print_source_inv_regions(string module_name)
+{
+    return print_code_any_regions(module_name, is_rw, TRUE, FALSE, 
+			  DBR_INV_REGIONS, DBR_SUMMARY_REGIONS, ".ureg");
+}
+
+bool
 print_code_in_regions(string module_name)
 {
     return print_code_any_regions(module_name, is_inout, FALSE, FALSE, 

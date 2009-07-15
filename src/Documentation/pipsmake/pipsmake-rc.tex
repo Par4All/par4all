@@ -7829,6 +7829,24 @@ print_source_regions              > MODULE.parsed_printed_file
         < MODULE.cumulated_effects
 \end{PipsMake}
 
+\subsection{User View with Invariant Regions}
+
+%%@UserManualDocumentation: print_source_regions
+Display the code decorated with the regions.
+%%!UserManualDocumentation
+
+\begin{PipsMake}
+print_source_inv_regions              > MODULE.parsed_printed_file
+        < PROGRAM.entities
+        < MODULE.parsed_code
+        < MODULE.inv_regions
+        < MODULE.summary_regions
+        < MODULE.preconditions
+        < MODULE.transformers
+        < MODULE.cumulated_effects
+\end{PipsMake}
+
+\
 \subsection{User View with IN Regions}
 
 %%@UserManualDocumentation: print_source_in_regions
@@ -7965,6 +7983,7 @@ alias print_code_complexities 'Statements & Complexities'
 alias print_code_preconditions 'Statements & Preconditions'
 alias print_code_total_preconditions 'Statements & Total Preconditions'
 alias print_code_regions 'Statements & Regions'
+alias print_code_regions 'Statements & Invariant Regions'
 alias print_code_complementary_sections 'Statements & Complementary Sections'
 alias print_code_in_regions 'Statements & IN Regions'
 alias print_code_out_regions 'Statements & OUT Regions'
@@ -8137,6 +8156,25 @@ print_code_proper_regions              > MODULE.printed_file
         < MODULE.transformers
         < MODULE.cumulated_effects
 \end{PipsMake}
+
+\subsection{Sequential View with Invariant Regions}
+
+%%@UserManualDocumentation: print_code_regions
+Display the code decorated with the invariant read/write regions.
+%%!UserManualDocumentation
+
+\begin{PipsMake}
+print_code_inv_regions              > MODULE.printed_file
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.inv_regions
+        < MODULE.summary_regions
+        < MODULE.preconditions
+        < MODULE.transformers
+        < MODULE.cumulated_effects
+\end{PipsMake}
+
+
 
 \subsection{Sequential View with IN Regions}
 
