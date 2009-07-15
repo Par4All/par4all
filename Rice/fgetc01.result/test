@@ -27,7 +27,7 @@ void getimage(void)
    for(i = 0; i <= 63; i += 1)
 //               <must be written>: j
       for(j = 0; j <= 63; j += 1) {
-//               <may be read    >: __IO_EFFECTS:LUNS[*]
+//               <may be read    >: __IO_EFFECTS:LUNS[*] fp[*]
 //               <may be written >: __IO_EFFECTS:LUNS[*] fp[*]
 //               <must be read   >: fp
 //               <must be written>: c

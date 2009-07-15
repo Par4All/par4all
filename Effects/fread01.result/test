@@ -9,7 +9,8 @@ int main()
       printf("fread failed");
    fclose(fp);
 }
-//               <may be read    >: __IO_EFFECTS:LUNS[1] 
+//               <may be read    >: TOP-LEVEL:*MEMORY* 
+//                                  __IO_EFFECTS:LUNS[1] 
 //                                  __IO_EFFECTS:LUNS[*]
 //               <may be written >: TOP-LEVEL:*MEMORY* 
 //                                  __IO_EFFECTS:LUNS[1] 
@@ -23,7 +24,7 @@ int main()
 //               <may be written >: __IO_EFFECTS:LUNS[*]
 //               <must be written>: fp
    fp = fopen("file.txt", "rb");
-//               <may be read    >: __IO_EFFECTS:LUNS[*]
+//               <may be read    >: __IO_EFFECTS:LUNS[*] fp[*]
 //               <may be written >: __IO_EFFECTS:LUNS[*] buf[*] fp[*]
 //               <must be read   >: fp
 //               <must be written>: n
@@ -35,7 +36,7 @@ int main()
 //               <must be read   >: __IO_EFFECTS:LUNS[1]
 //               <must be written>: __IO_EFFECTS:LUNS[1]
       printf("fread failed");
-//               <may be read    >: __IO_EFFECTS:LUNS[*]
+//               <may be read    >: __IO_EFFECTS:LUNS[*] fp[*]
 //               <may be written >: __IO_EFFECTS:LUNS[*] fp[*]
 //               <must be read   >: fp
    fclose(fp);

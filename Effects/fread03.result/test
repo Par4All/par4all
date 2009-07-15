@@ -45,7 +45,7 @@ Proper effects for "ReadPGMrow"
 
 void ReadPGMrow(FILE *file, int width, byte *line)
 {
-//               <may be read    >: __IO_EFFECTS:LUNS[*]
+//               <may be read    >: file[*] __IO_EFFECTS:LUNS[*]
 //               <may be written >: file[*] line[*] 
 //                                  __IO_EFFECTS:LUNS[*]
 //               <must be read   >: file width
@@ -54,13 +54,13 @@ void ReadPGMrow(FILE *file, int width, byte *line)
 
 Cumulated effects for "ReadPGMrow"
 
-//               <may be read    >: __IO_EFFECTS:LUNS[*]
+//               <may be read    >: file[*] __IO_EFFECTS:LUNS[*]
 //               <may be written >: file[*] line[*] 
 //                                  __IO_EFFECTS:LUNS[*]
 //               <must be read   >: file width
 void ReadPGMrow(FILE *file, int width, byte *line)
 {
-//               <may be read    >: __IO_EFFECTS:LUNS[*]
+//               <may be read    >: file[*] __IO_EFFECTS:LUNS[*]
 //               <may be written >: file[*] line[*] 
 //                                  __IO_EFFECTS:LUNS[*]
 //               <must be read   >: file width
@@ -81,7 +81,7 @@ byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
 //               <must be written>: buffer
 
    buffer = (char *) calloc(80, sizeof(char));
-//               <may be read    >: __IO_EFFECTS:LUNS[*]
+//               <may be read    >: filename[*] __IO_EFFECTS:LUNS[*]
 //               <may be written >: __IO_EFFECTS:LUNS[*]
 //               <must be read   >: filename
 //               <must be written>: file
@@ -112,18 +112,20 @@ byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
 //               <must be read   >: nch width
 //               <must be written>: nch[0]
    *nch = width-1;
+//               <must be read   >: nch nch[0] ncl ncl[0] nrh nrh[0] 
+//                                  nrl nrl[0]
 //               <must be written>: m
    m = bmatrix(*nrl, *nrh, *ncl, *nch);
 //               <must be read   >: height
 //               <must be written>: i
 
    for(i = 0; i <= height-1; i += 1)
-//               <may be read    >: __IO_EFFECTS:LUNS[*]
+//               <may be read    >: file[*] __IO_EFFECTS:LUNS[*]
 //               <may be written >: file[*] m[i][*] 
 //                                  __IO_EFFECTS:LUNS[*]
 //               <must be read   >: file height i m m[i] width
       ReadPGMrow(file, width, m[i]);
-//               <may be read    >: __IO_EFFECTS:LUNS[*]
+//               <may be read    >: file[*] __IO_EFFECTS:LUNS[*]
 //               <may be written >: file[*] __IO_EFFECTS:LUNS[*]
 //               <must be read   >: file
 
@@ -137,11 +139,12 @@ byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
 
 Cumulated effects for "LoadPGM_bmatrix"
 
-//               <may be read    >: TOP-LEVEL:*MEMORY* 
+//               <may be read    >: filename[*] TOP-LEVEL:*MEMORY* 
 //                                  __IO_EFFECTS:LUNS[*]
 //               <may be written >: TOP-LEVEL:*MEMORY* 
 //                                  __IO_EFFECTS:LUNS[*]
-//               <must be read   >: filename nch ncl nrh nrl
+//               <must be read   >: filename nch nch[0] ncl ncl[0] nrh
+//                                  nrh[0] nrl nrl[0]
 //               <must be written>: nch[0] ncl[0] nrh[0] nrl[0]
 byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
 {
@@ -155,7 +158,7 @@ byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
 //               <must be written>: buffer
 
    buffer = (char *) calloc(80, sizeof(char));
-//               <may be read    >: __IO_EFFECTS:LUNS[*]
+//               <may be read    >: filename[*] __IO_EFFECTS:LUNS[*]
 //               <may be written >: __IO_EFFECTS:LUNS[*]
 //               <must be read   >: filename
 //               <must be written>: file
@@ -186,9 +189,11 @@ byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
 //               <must be read   >: nch width
 //               <must be written>: nch[0]
    *nch = width-1;
+//               <must be read   >: nch nch[0] ncl ncl[0] nrh nrh[0] 
+//                                  nrl nrl[0]
 //               <must be written>: m
    m = bmatrix(*nrl, *nrh, *ncl, *nch);
-//               <may be read    >: file i m m[*] width 
+//               <may be read    >: file file[*] i m m[*] width 
 //                                  __IO_EFFECTS:LUNS[*]
 //               <may be written >: file[*] m[*][*] 
 //                                  __IO_EFFECTS:LUNS[*]
@@ -196,12 +201,12 @@ byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
 //               <must be written>: i
 
    for(i = 0; i <= height-1; i += 1)
-//               <may be read    >: m[*] __IO_EFFECTS:LUNS[*]
+//               <may be read    >: file[*] m[*] __IO_EFFECTS:LUNS[*]
 //               <may be written >: file[*] m[*][*] 
 //                                  __IO_EFFECTS:LUNS[*]
 //               <must be read   >: file height i m width
       ReadPGMrow(file, width, m[i]);
-//               <may be read    >: __IO_EFFECTS:LUNS[*]
+//               <may be read    >: file[*] __IO_EFFECTS:LUNS[*]
 //               <may be written >: file[*] __IO_EFFECTS:LUNS[*]
 //               <must be read   >: file
 
