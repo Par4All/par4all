@@ -465,7 +465,6 @@ list generic_proper_effects_of_complex_address_expression(expression add_exp, ef
 	      }
 	    
 	    /* MINUS_C should be handled as well BC */
-	    /* all this stuff should be moved in another function BC */
 	    if(ENTITY_PLUS_C_P(s_op)) 
 	      {
 		/* case *(e1+e2) */
@@ -475,63 +474,51 @@ list generic_proper_effects_of_complex_address_expression(expression add_exp, ef
 		syntax s1 = expression_syntax(e1);
 		expression e2 = EXPRESSION(CAR(CDR(s_args)));
 		
-		if(syntax_reference_p(s1)) 
+		pips_debug(8,"*(p+q) case, with p = %s and q = %s\n",
+			   words_to_string(words_expression(e1)),
+			   words_to_string(words_expression(e2)));
+
+		le = generic_proper_effects_of_complex_address_expression
+		  (e1, pme, write_p);
+		if (! effect_undefined_p(*pme)&& !anywhere_effect_p(*pme))
 		  {
-		    reference r1 = syntax_reference(s1);
-		    entity v1 = reference_variable(r1);
-		    type t1 = ultimate_type(entity_type(v1));
-		    if(type_variable_p(t1)) 
+		    syntax s2 = expression_syntax(e2);
+		    
+		    /* we must add a read effect on *pme if it is a pointer
+		       type
+		    */
+		    if (effect_pointer_type_p(*pme))
 		      {
-			variable vt1 = type_variable(t1);
-			basic b1 = variable_basic(vt1);
-			if(basic_pointer_p(b1))
-			  {
-			    /*normalized ne2 = NORMALIZE_EXPRESSION(e2);*/
-			    syntax s2 = expression_syntax(e2);
-
-			    /* deal with case *(p+(i=exp))
-			     * the effect is equivalent to an effect on *(p+exp)
-			     */
-			    if (syntax_call_p(s2))
-			      {
-				call s2_c = syntax_call(s2);
-				entity s2_op = call_function(s2_c);
-				list s2_args = call_arguments(s2_c);
-				if (ENTITY_ASSIGN_P(s2_op))
-				  {
-				    e2 =  EXPRESSION(CAR(CDR(s2_args)));
-				  }
-			      }
-			    
-			    /* We should verify here that e2 does not contain
-			     * a call to an external or io function.
-			     * In this case, we should generate an unbounded
-			     * dimension. BC.
-			     */
-			    mr = make_reference(v1, CONS(EXPRESSION,e2,NIL));
-
-			    /* if we are dealing with a pointer, add a read
-			       on the reference to le */
-			    if (pointer_type_p(t1))
-			      {
-				effect eff_read;
-				pips_debug(4, "It's a pointer; we add a read effect \n");
-	  
-				eff_read = (*reference_to_effect_func)
-				  (make_reference(v1,NIL), make_action_read());
-				le = CONS(EFFECT, eff_read, NIL);
-			      }
-			    le = gen_nconc(le, generic_proper_effects_of_expression(e2));
-			    finished_p = TRUE;
-			  } /* if(basic_pointer_p(b1)) */
+			effect eff_read;
+			pips_debug(4, "It's a pointer; we add a read effect \n");
+			
+			eff_read = copy_effect(*pme);
+			effect_action_tag(eff_read) = is_action_read;
+			le = gen_nconc(le, CONS(EFFECT, eff_read, NIL));
 		      }
+		    
+		    /* deal with case *(p+(i=exp))
+		     * the effect is equivalent to an effect on *(p+exp)
+		     */
+		    if (syntax_call_p(s2))
+		      {
+			call s2_c = syntax_call(s2);
+			entity s2_op = call_function(s2_c);
+			list s2_args = call_arguments(s2_c);
+			if (ENTITY_ASSIGN_P(s2_op))
+			  {
+			    e2 =  EXPRESSION(CAR(CDR(s2_args)));
+			  }
+		      }
+		    
+		    (*effect_add_expression_dimension_func)(*pme, e2);
 		  }
-		if(!finished_p) 
-		  {
-		  le = generic_proper_effects_of_expression(add_exp);
-		  mr = reference_undefined;
-		  finished_p = TRUE;
-		  }
+		le = gen_nconc(le, 
+			       generic_proper_effects_of_expression(e2));
+		
+		finished_p = TRUE;
+		result_computed_p = true;
+		 
 	      }
 	    /* Other functions to process: p++, ++p, p--, --p */
 	    else if(ENTITY_POST_INCREMENT_P(s_op) || 
@@ -796,13 +783,18 @@ list generic_proper_effects_of_complex_address_expression(expression add_exp, ef
 	      finished_p = true;
 	      
 	    }
-      else 
-	{
-	  /* we should be finished already because we do not know how to
-	     handle these constructs and we knew that before going down
-	     and up. */
-	  pips_internal_error("Something wrong in RI or missing");
-	}
+	  else if(syntax_cast_p(s)) 
+	    {
+	      /* nothing to do */
+	      finished_p = true;
+	    }
+	  else 
+	    {
+	      /* we should be finished already because we do not know how to
+		 handle these constructs and we knew that before going down
+		 and up. */
+	      pips_internal_error("Something wrong in RI or missing");
+	    }
 	} /* end of !effect_undefined_p(*pme) */
     } /* */
   

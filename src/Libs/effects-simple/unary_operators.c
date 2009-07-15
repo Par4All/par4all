@@ -279,20 +279,79 @@ void simple_effect_add_expression_dimension(effect eff, expression exp)
       /* it's a reference : let'us modify it */
       ref = cell_reference(eff_c);
     }
+
+  reference_indices(ref) = gen_nconc(reference_indices(ref),
+				     CONS(EXPRESSION, 
+					  copy_expression(exp), 
+					  NIL));
   
+  
+  if(unbounded_expression_p(exp))
+    {
+      effect_approximation_tag(eff) = is_approximation_may;
+    }
+  ifdebug(8)
+    {
+      pips_debug(8, "end with effect :\n");
+      print_effect(eff);
+      pips_assert("the effect is not consistent", effect_consistent_p(eff));
+    }
+  
+  return;
+}
+
+/**
+ This function changes the ith index of the effect reference
+ into the given expression exp if it is normalizable, and into and
+ unbounded expression otherwise (in which case the effect approximation is
+ set to may).
+
+ @param eff is a simple effect
+ @param exp is the new expression for the ith index
+ @param i is the range of the index to change.
+
+ */
+void simple_effect_change_ith_dimension_expression(effect eff, expression exp,
+					       int i)
+{
+
+  cell eff_c = effect_cell(eff);
+  reference ref;
+  normalized nexp = NORMALIZE_EXPRESSION(exp);
+  list l_ind;
+  
+  ifdebug(8)
+    {
+      pips_debug(8, "begin with effect :\n");
+      print_effect(eff);
+    }
+  
+  if (cell_preference_p(eff_c))
+    {
+      /* it's a preference : we change for a reference cell */
+      pips_debug(8, "It's a preference\n");
+      ref = copy_reference(preference_reference(cell_preference(eff_c)));
+      free_cell(eff_c);
+      effect_cell(eff) = make_cell_reference(ref);
+    }
+  else
+    {
+      /* it's a reference : let'us modify it */
+      ref = cell_reference(eff_c);
+    }
+  
+  l_ind = gen_nthcdr(i-1,reference_indices(ref));
+  pips_assert("ith index must exist",!ENDP(l_ind));
+  
+  free_expression(EXPRESSION(CAR(l_ind)));
+
   if (normalized_linear_p(nexp))
     {
-      reference_indices(ref) = gen_nconc(reference_indices(ref),
-					 CONS(EXPRESSION, 
-					      copy_expression(exp), 
-					      NIL));
+      EXPRESSION_(CAR(l_ind)) =  copy_expression(exp);
     }
   else
     {      
-      reference_indices(ref) = gen_nconc(reference_indices(ref),
-					 CONS(EXPRESSION, 
-					      make_unbounded_expression(), 
-					      NIL));
+      EXPRESSION_(CAR(l_ind)) =  make_unbounded_expression();
       effect_approximation_tag(eff) = is_approximation_may; 
     }  
   
@@ -300,7 +359,6 @@ void simple_effect_add_expression_dimension(effect eff, expression exp)
     {
       pips_debug(8, "end with effect :\n");
       print_effect(eff);
-      pips_assert("the effect is not consistent", effect_consistent_p(eff));
     }
   
   return;
