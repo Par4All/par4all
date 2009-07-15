@@ -224,7 +224,7 @@ static int dbll_stat_file(string file_name, bool okifnotthere)
     return time;
 }
 
-/* it is impportant that the workspace directory does not appear in the
+/* It is impportant that the workspace directory does not appear in the
  * file name so as to allow workspaces to be moveable.
  */
 int dbll_stat_local_file(string file_name, bool okifnotthere)

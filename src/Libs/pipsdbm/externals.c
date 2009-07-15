@@ -91,12 +91,12 @@ pipsdbm_free_entities(char * p)
  * this table associates statement to any newgen type. 
  * now explicit newgen functions ("->") should be prefered.
  * the storing of the mapping is based on the statement ordering for
- * latter reconstruction with the CODE. 
+ * later reconstruction with the CODE. 
  * tabulating statements would help, but is that desirable?
  *
  * MY opinion is that all newgen objects should have a unique id
  * associated to it, as an addditional hidden field, to support 
- * persistence. more easily. Well, there would be some problemes, too.
+ * persistence more easily. Well, there would be some problemes, too.
  *
  * FC.
  */
@@ -111,10 +111,20 @@ statement_mapping_count(statement_mapping h)
     return n;
 }
 
+/** Write a statement mapping.
+
+    This function is quite too low level... It mixes raw printf in a FILE
+    with gen_write. To survive other NewGen backend (XML), fprintf could
+    be replaced with a gen_fprintf() that could encapsulate the output in
+    a CDATA for example in the case of XML.
+
+    But in this case it should be a call to something like
+    gen_write_int(fd, order) instead to do even simpler.
+*/
 void
 pipsdbm_write_statement_mapping(
-    FILE * fd, /* file to write to */
-    statement_mapping h /* hash table to dump */)
+    FILE * fd, /**< file to write to */
+    statement_mapping h /**< hash table to dump */)
 {
   fprintf(fd, "%d\n", statement_mapping_count(h));
   STATEMENT_MAPPING_MAP(s, v,
@@ -131,6 +141,18 @@ pipsdbm_write_statement_mapping(
 			h);
 }
 
+
+/** Read a statement mapping.
+
+    This function is quite too low level... It mixes raw getc() from a
+    FILE with gen_read. To survive other NewGen backend (XML), fprintf
+    could be replaced with a gen_getc() that could peek in a CDATA for
+    example in the case of XML.
+
+    But in this case it should be a call to something like so =
+    gen_read_int(fd) instead to do even simpler and read an int value (in
+    textual form or in <int>...</int> in the case of XML.
+*/
 hash_table
 pipsdbm_read_statement_mapping(FILE * fd)
 {
@@ -223,13 +245,16 @@ pipsdbm_consistent_statement_function(gen_chunkp map)
     return TRUE;
 }
 
-/* the stored stuff need be based on the ordering...
- * because newgen wont regenerate pointers...
- */
+/* the stored stuff need be based on the ordering...  because newgen won't
+   regenerate pointers...
+
+   Should use a higher level pipsdbm_write_statement_mapping() to survive
+   to XML
+*/
 void
 pipsdbm_write_statement_function(
-    FILE * fd, /* file to write to */
-    gen_chunkp map /* statement function */)
+    FILE * fd, /**< file to write to */
+    gen_chunkp map /**< statement function */)
 {
     hash_table h = (map+1)->h;
     fprintf(fd, "%td\n%d\n", map->i, number_of_ordered_statements(h));
@@ -248,8 +273,12 @@ pipsdbm_write_statement_function(
 	h);
 }
 
+
+/* Should use a higher level pipsdbm_write_statement_mapping() to survive
+   to XML
+*/
 gen_chunkp
-pipsdbm_read_statement_function(FILE * fd /* file to read from */)
+pipsdbm_read_statement_function(FILE * fd /**< file to read from */)
 {
     statement stat; 
     int domain, n;

@@ -33,12 +33,60 @@
 
 /* conform to old interface.
  */
+
+/** Put a memory resource into the current workspace database
+
+    @ingroup pipsdbm
+    
+    This function allows to update a memory resource already available.
+
+    @param rname is a resource name, such as DBR_CODE for the code of a
+    module. The construction of these aliases are DBB_ + the uppercased
+    name of a resource defined in pipsmake-rc.tex. They are defined
+    automatically in include/resources.h
+
+    @param oname is the resource owner name, typically a module name.
+    
+    @param res_val is an opaque pointer to the resource to be
+    stored. Methods defined in methods.h will know how to deal with.
+*/
 #define DB_PUT_MEMORY_RESOURCE(res_name, own_name, res_val) \
   db_put_or_update_memory_resource(res_name, own_name, (void*) res_val, TRUE)
 
-/* put a resource which is a file. it is just a resource as any other.
- */
+/** Put a file resource into the current workspace database
+
+    @ingroup pipsdbm
+    
+    This function allows to update a file resource already available.
+
+    @param rname is a resource name, such as DBR_CODE for the code of a
+    module. The construction of these aliases are DBB_ + the uppercased
+    name of a resource defined in pipsmake-rc.tex. They are defined
+    automatically in include/resources.h
+
+    @param oname is the resource owner name, typically a module name.
+    
+    @param res_val is an opaque pointer to the resource to be
+    stored. Methods defined in methods.h will know how to deal with.
+*/
 #define DB_PUT_FILE_RESOURCE DB_PUT_MEMORY_RESOURCE
+
+/** Put a new file resource into the current workspace database
+
+    @ingroup pipsdbm
+    
+    This function disallows to update a resource already available.
+
+    @param rname is a resource name, such as DBR_CODE for the code of a
+    module. The construction of these aliases are DBB_ + the uppercased
+    name of a resource defined in pipsmake-rc.tex. They are defined
+    automatically in include/resources.h
+
+    @param oname is the resource owner name, typically a module name.
+    
+    @param res_val is an opaque pointer to the resource to be
+    stored. Methods defined in methods.h will know how to deal with.
+*/
 #define DB_PUT_NEW_FILE_RESOURCE(res_name, own_name, res_val) \
   db_put_or_update_memory_resource(res_name, own_name, (void*) res_val, FALSE)
 

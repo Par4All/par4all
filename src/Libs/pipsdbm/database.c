@@ -336,6 +336,8 @@ static void db_clean_db_resources()
   ifdebug(9) dump_all_db_resource_status(stderr, "db_clean_db_resources");
 }
 
+/** Delete a resource
+ */
 void db_delete_resource(string rname, string oname)
 {
     db_resource r;
@@ -681,9 +683,51 @@ string db_get_resource_id(string rname, string oname)
     return (char*) get_real_db_resource(rname, oname);
 }
 
-/* Return the pointer to the resource, whatever it is.
- * Assert that the resource is available.
- * If pure is false, then the resource is saved on disk before being returned.
+
+/** Return the pointer to the resource, whatever it is.
+ 
+    @ingroup pipsdbm
+ 
+    Assume that the resource is available.
+ 
+    @param rname is a resource name, such as DBR_CODE for the code of a
+    module. The construction of these aliases are DBB_ + the uppercased
+    name of a resource defined in pipsmake-rc.tex. They are defined
+    automatically in include/resources.h
+
+    @param oname is the resource owner name, typically a module name.
+    
+    @param pure is used to declare the programmer intentions about the
+    future of the resource.
+
+    - If pure is TRUE, the real resource is given as usual. If the
+      programmer use it in a read-only way, this is fine and the good way
+      to go. If it is modified by the programmer in a phase, all
+      subsequent phases that use this resource will access a modified
+      resource in an unnoticed way and use other resources that will be
+      out-of-sync because unnoticed by pipsmake. So in this case, the
+      programmer is assumed to put back the modified in the database later
+      to notify pipsmake.
+
+    - If pure is FALSE, then the resource is saved on disk and/or marked
+      as outdated before being returned. The idea is that we can modify
+      and use this resource as we want in a phase, it is a throwable
+      resource. Next time someone will want to use this resource, it will
+      be read back from disk or recomputed and nobody will seen it has
+      been changed by the first phase. The idea here is to behave as if
+      db_get_memory_resource() return a copy, so you are responsible of
+      its future (garbage collecting for example if you do not want it any
+      longer).
+
+      This feature has been introduced in a time when gen_copy() did not
+      exist to duplicate resources and using persistence as a way to get a
+      copy was a sensible trick. But now we have gen_copy(), it is far
+      more efficient to use it instead of writing it to disk and parsing
+      it again or recomputing it. So in all new phases developed in PIPS,
+      pure should be always TRUE and gen_copy() should be used when
+      necessary.
+
+    @return an opaque pointer to the resource in memory.
  */
 string db_get_memory_resource(string rname, string oname, bool pure)
 {
@@ -708,13 +752,15 @@ string db_get_memory_resource(string rname, string oname, bool pure)
     
     if (!pure)
     {
-      /* save if possible to hide side effects. */
+      /* Save if possible to hide side effects. */
       if (dbll_storable_p(rname)) {
 	db_save_resource(rname, oname, r); /* the pointer is there... */
 	/* make as stored now... */
 	db_resource_pointer(r) = NULL;
 	db_status_tag(db_resource_db_status(r)) = is_db_status_stored;
-      } else /* lost */
+      } else
+	/* Mark the resource as lost so next time it will be required,
+	   pipsmake will recompute it for example: */
 	db_delete_resource(rname, oname);
     }
 
@@ -759,43 +805,76 @@ void db_set_resource_as_required(string rname, string oname)
   db_resource_time(r) = db_get_logical_time();
 }
 
-void db_put_or_update_memory_resource(
-    string rname, string oname, void * p, bool update_is_ok)
-{
-    db_resource r;
-    DB_OK;
 
-    debug_on("PIPSDBM_DEBUG_LEVEL");
-    pips_debug(2, "putting or updating %s[%s]\n", rname, oname);
-    ifdebug(7) pips_assert("resource is consistent", 
-			   dbll_check_resource(rname, oname, p));
+/** Put a resource into the current workspace database
 
-    r = find_or_create_db_resource(rname, oname);
-    if (db_status_undefined_p(db_resource_db_status(r)))
-	/* was just created */
-	db_resource_db_status(r) = make_db_status_loaded();
-    else
-    {
-	if (!update_is_ok && !db_resource_required_p(r))
-	    pips_internal_error("resource %s[%s] already there\n", 
-				rname, oname);
-    }
+    @ingroup pipsdbm
     
-    /* store data */
-    db_resource_pointer(r) = p; /** ??? memory leak? depends? */
-    db_status_tag(db_resource_db_status(r)) = is_db_status_loaded;
-    db_resource_time(r) = db_get_logical_time();
+    @param rname is a resource name, such as DBR_CODE for the code of a
+    module. The construction of these aliases are DBB_ + the uppercased
+    name of a resource defined in pipsmake-rc.tex. They are defined
+    automatically in include/resources.h
 
-    if (displayable_file_p(rname))
-      db_resource_file_time(r) =
-	  dbll_stat_local_file(db_resource_pointer(r), FALSE);
-    else
-      db_resource_file_time(r) = 0; /* or what else? */
+    @param oname is the resource owner name, typically a module name.
+    
+    @param p is an opaque pointer to the resource to be stored. Methods
+    defined in methods.h will know how to deal with.
 
-    debug_db_resource(9, rname, oname, r);
-    debug_off();
+    @param update_is_ok is a parameter to allow updating a resource.
+
+    - If FALSE and a resource is valid and not marked as required, this
+      function will fail
+
+    - If TRUE, even if a resource is valid and not marked as required,
+      this function will succeed to update it.
+*/
+void db_put_or_update_memory_resource(string rname,
+				      string oname,
+				      void * p,
+				      bool update_is_ok) {
+  db_resource r;
+  /* Check the database coherency: */
+  DB_OK;
+
+  debug_on("PIPSDBM_DEBUG_LEVEL");
+  pips_debug(2, "putting or updating %s[%s]\n", rname, oname);
+  ifdebug(7) pips_assert("resource is consistent", 
+			 dbll_check_resource(rname, oname, p));
+
+  /* Get the database resource associated to the given resource: */
+  r = find_or_create_db_resource(rname, oname);
+  if (db_status_undefined_p(db_resource_db_status(r)))
+    /* The resource does not exist: it was just created, so mark it as
+       loaded into memory: */
+    db_resource_db_status(r) = make_db_status_loaded();
+  else
+    /* The resource already exists... */
+    if (!update_is_ok && !db_resource_required_p(r))
+      /* If the resource is not required and we do not want to update it: */
+      pips_internal_error("resource %s[%s] already there\n", 
+			  rname, oname);
+  
+  /* Store data */
+  db_resource_pointer(r) = p; /**< ??? memory leak? depends? */
+  /* Mark the resource as loaded into memory: */
+  db_status_tag(db_resource_db_status(r)) = is_db_status_loaded;
+  /* Timestamp the resource with the current logical time: */
+  db_resource_time(r) = db_get_logical_time();
+
+  if (displayable_file_p(rname))
+    /* If there is a text file associated to the resource, get its
+       modification time: */
+    db_resource_file_time(r) =
+      dbll_stat_local_file(db_resource_pointer(r), FALSE);
+  else
+    db_resource_file_time(r) = 0; /**< Or what else? */
+
+  debug_db_resource(9, rname, oname, r);
+  debug_off();
 }
 
+/** Delete all the resources of a given type
+ */
 void db_unput_resources(string rname)
 {
     db_symbol r;
@@ -915,7 +994,11 @@ int db_delete_obsolete_resources(bool (*keep_p)(string, string))
     return ndeleted;
 }
 
-/* returns whether name is a "valid" module?
+
+
+/** Return whether name is a "valid" module.
+ *
+ * @ingroup pipsdbm
  *
  * As FI points out to me (FC), it just means that the
  * name has been used by some-one, some-where, some-time...
@@ -977,7 +1060,14 @@ gen_array_t db_get_module_list_initial_order(void)
   return a;  
 }
 
-/* returns an allocated array a with the sorted list of modules.
+
+/** @addtogroup pipsdbm */
+
+/** @{ */
+
+
+/* Returns an allocated array a with the sorted list of modules.
+ *
  * strings are duplicated.  
  *
  * Compilation units were not added because Fabien Coelho wanted to
@@ -988,6 +1078,9 @@ gen_array_t db_get_module_list_initial_order(void)
  * up to the validation designer to avoid including varying stuff in
  * test files. Another possibility would be to regenerate include
  * statements...
+ *
+ * @param module_p is used to select or not compilation units too. If
+ * TRUE, compilation units are also included.
  */
 gen_array_t db_get_module_or_function_list(bool module_p)
 {
@@ -1008,12 +1101,26 @@ gen_array_t db_get_module_or_function_list(bool module_p)
     return a;
 }
 
+
+/** Get an array of all the modules (functions, procedures and compilation
+    units) of a workspace.
+
+    @return an array of sorted strdup()ed strings.
+ */
 gen_array_t db_get_module_list(void)
 {
   return db_get_module_or_function_list(TRUE);
 }
 
+
+/** Get an array of all the functions and procedures (not compilation
+    units) of a workspace.
+
+    @return an array of sorted strdup()ed strings.
+ */
 gen_array_t db_get_function_list(void)
 {
   return db_get_module_or_function_list(FALSE);
 }
+
+/** @} */
