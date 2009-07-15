@@ -1,0 +1,11 @@
+delete namelist
+
+create namelist  namelist.F
+
+display PRINTED_FILE(%ALL)
+
+close
+
+delete namelist
+quit
+# EOF
