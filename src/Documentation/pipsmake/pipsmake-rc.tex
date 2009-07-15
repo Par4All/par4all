@@ -4480,6 +4480,7 @@ whereas \textsc{Allen} \& \textsc{Kennedy} algorithm only copes with very simple
 coarse_grain_parallelization > MODULE.parallelized_code
         < PROGRAM.entities
         < MODULE.code
+        < MODULE.cumulated_effects
         < MODULE.inv_regions
 \end{PipsMake}
 
@@ -8123,7 +8124,10 @@ print_code_continuation_conditions   > MODULE.printed_file
 \end{PipsMake}
 
 
-\subsection{Sequential View with Regions}
+\subsection{Sequential view with regions}
+
+\subsubsection{Sequential view with plain regions}
+\label{sec:plain-regions}
 
 %%@UserManualDocumentation: print_code_regions
 Display the code decorated with the regions.
@@ -8140,7 +8144,7 @@ print_code_regions              > MODULE.printed_file
         < MODULE.cumulated_effects
 \end{PipsMake}
 
-\subsection{Sequential View with Proper Regions}
+\subsubsection{Sequential view with proper regions}
 
 %%@UserManualDocumentation: print_code_proper_regions
 Display the code decorated with the proper regions.
@@ -8157,7 +8161,8 @@ print_code_proper_regions              > MODULE.printed_file
         < MODULE.cumulated_effects
 \end{PipsMake}
 
-\subsection{Sequential View with Invariant Regions}
+
+\subsubsection{Sequential view with invariant regions}
 
 %%@UserManualDocumentation: print_code_regions
 Display the code decorated with the invariant read/write regions.
@@ -8175,8 +8180,7 @@ print_code_inv_regions              > MODULE.printed_file
 \end{PipsMake}
 
 
-
-\subsection{Sequential View with IN Regions}
+\subsubsection{Sequential view with IN regions}
 
 %%@UserManualDocumentation: print_code_in_regions
 Display the code decorated with the IN regions.
@@ -8193,7 +8197,7 @@ print_code_in_regions              > MODULE.printed_file
         < MODULE.cumulated_effects
 \end{PipsMake}
 
-\subsection{Sequential View with OUT Regions}
+\subsubsection{Sequential view with OUT regions}
 
 %%@UserManualDocumentation: print_code_out_regions
 Display the code decorated with the OUT regions.
@@ -8210,7 +8214,7 @@ print_code_out_regions              > MODULE.printed_file
         < MODULE.cumulated_effects
 \end{PipsMake}
 
-\subsection{Sequential View with Privatized Regions}
+\subsubsection{Sequential view with privatized regions}
 
 %%@UserManualDocumentation: print_code_privatized_regions
 Display the code decorated with the privatized regions.
@@ -8226,7 +8230,7 @@ print_code_privatized_regions       > MODULE.printed_file
         < MODULE.copy_out_regions
 \end{PipsMake}
 
-\subsection{Sequential View with Complementary Sections}
+\subsection{Sequential view with complementary sections}
 
 %%@UserManualDocumentation: print_code_complementary_sections
 Display the code decorated with complementary sections.
