@@ -956,7 +956,6 @@ list generic_effect_generate_all_accessible_paths_effects(effect eff,
   else
     {
       reference ref = effect_any_reference(eff);
-      int n_ref_inds = gen_length(reference_indices(ref));
       entity ent = reference_variable(ref);
       type t = ultimate_type(entity_type(ent));
       int d = effect_type_depth(t);
@@ -1040,3 +1039,77 @@ list generic_effect_generate_all_accessible_paths_effects(effect eff,
   return(l_res);
 }
 
+/******************************************************************/
+
+/** 
+ NOT YET IMPLEMENTED FOR STRUCT, UNION, ENUM, VARARGS AND FUNCTIONAL TYPES.
+
+ @param eff is an effect
+ @return true if the effect reference maybe an access path to a pointer
+*/
+bool effect_pointer_type_p(effect eff)
+{
+  bool p = false, finished = false;
+  reference ref = effect_any_reference(eff);
+  list l_ind = reference_indices(ref);
+  entity ent = reference_variable(ref);
+  type t = entity_type(ent), ct;
+
+  ct = t;
+  pips_debug(8, "begin with effect reference %s\n",
+	     words_to_string(words_reference(ref)));
+
+  while (!finished)
+    {
+      switch (type_tag(ct))
+	{
+	case is_type_variable :
+	  {
+	    variable v = type_variable(ct);
+	    basic b = variable_basic(v);
+	    list l_dim = variable_dimensions(v);
+	    
+	    pips_debug(8, "variable case, of dimension %d\n", 
+		       (int) gen_length(variable_dimensions(v))); 
+
+	    while (!ENDP(l_dim) && !ENDP(l_ind))
+	      {
+		POP(l_dim);
+		POP(l_ind);
+	      }
+	    
+	    if(ENDP(l_ind) && ENDP(l_dim))
+	      {
+	      if(basic_pointer_p(b))
+		{
+		  p = true;		  
+		  finished = true;
+		}
+	      else
+		finished = true;
+	      }
+	    else if (ENDP(l_dim)) /* && !ENDP(l_ind) by construction */
+	      {
+		pips_assert("the current basic should be a pointer\n", 
+			    basic_pointer_p(b));	
+		ct = basic_pointer(b);
+		POP(l_ind); /* there is an index for the pointer */
+	      }	
+	    else /* ENDP(l_ind) but !ENDP(l_dim) */
+	      {
+		finished = true;
+	      }
+	    
+	    break;
+	  }
+	default:
+	  {
+	    pips_internal_error("case not handled yet\n");
+	  }
+	} /*switch */  
+  
+    }/*while */
+  pips_debug(8, "end with p = %s\n", p== false ? "false" : "true");
+  return p;
+
+}
