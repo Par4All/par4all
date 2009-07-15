@@ -27,11 +27,14 @@ endif
 
 # ARCH (or default provided)
 
-# INC_TARGET: header file for directory (on INC_CFILES or LIB_CFILES)
+# INC_TARGET: header file for directory (build from INC_CFILES or LIB_CFILES)
 
-# LIB_CFILES: C files that are included in the library
+# LIB_CFILES: C files that are used in the library
+# INC_CFILES : the source really used to generate the INC_TARGET from cproto.
+#              If not defined, it is initialized from LIB_CFILES
 # LIB_TARGET: generated library file
-# BIN_TARGET: generated binary files
+# BIN_TARGET: generated binary files from the library
+# OTHER_CFILES : sources used to build the BIN_TARGET with the library too
 
 # files to be installed in subdirectories:
 # INSTALL_INC: headers to be installed (INC_TARGET not included)
