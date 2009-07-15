@@ -1271,8 +1271,6 @@ effect reference_whole_region(reference ref, tag tac)
  
     effect reg = effect_undefined;
     list reg_ref_inds = NIL;
-    action ac = make_action(tac, UU);
-    approximation ap = make_approximation(is_approximation_may, UU);
     
     ifdebug(3)
       {
@@ -1407,7 +1405,7 @@ list region_to_store_independent_region_list(effect reg, bool force_may_p)
  * output   : nothing
  * modifies : the region reg, and normalizes the expression
  * comment  : adds a last dimension phi_last to the region. If the expression 
- *            is normalizable, also addas a constraint phi_last = exp. Else, 
+ *            is normalizable, also adds a constraint phi_last = exp. Else, 
  *            changes the approximation into may.
  */
 void convex_region_add_expression_dimension(effect reg, expression exp)
@@ -1464,8 +1462,53 @@ void convex_region_add_expression_dimension(effect reg, expression exp)
   return;
 }
 
+/**
+ eliminate phi_i from the region Psystem, and adds the constraint 
+ phi_i==exp if exp is normalizable. 
 
+ @param reg a convex region
+ @param exp the new expresion for the region ith dimension
+ @param i is the rank of the dimension to change.
 
+ */
+void convex_region_change_ith_dimension_expression(effect reg, expression exp,
+						   int i)
+{
+  list l_phi_i = CONS(ENTITY,make_phi_entity(i),NIL);
+  bool dim_linear_p;
+  
+  /* first eliminate PHI_i variable from the system */
+  region_exact_projection_along_parameters(reg, l_phi_i);
+  gen_free_list(l_phi_i);
+
+  /* then add the new constraint in the system if the expression exp 
+     is not unbounded */
+  if(unbounded_expression_p(exp))
+    {
+      pips_debug(8, "unbounded expression \n");
+      effect_approximation_tag(reg) = is_approximation_may; 
+    }
+  else
+    {
+      dim_linear_p = 
+	sc_add_phi_equation(region_system(reg), exp, i, IS_EG, PHI_FIRST);
+      
+      if (!dim_linear_p)
+	{
+	  pips_debug(8, "non linear expression : change approximation to may\n");
+	  effect_approximation_tag(reg) = is_approximation_may; 
+	}
+    }
+  ifdebug(8)
+    {
+      pips_debug(8, "end with region :\n");
+      print_region(reg);
+      pips_assert("the region is consistent", effect_consistent_p(reg));
+    }
+  
+  
+  return;
+}
 
 
 /************************************************************ PHI ENTITIES */

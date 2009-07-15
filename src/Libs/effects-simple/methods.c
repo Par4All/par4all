@@ -221,6 +221,8 @@ set_methods_for_proper_simple_effects()
       effect_to_store_independent_sdfi_list;
     effect_add_expression_dimension_func =
       simple_effect_add_expression_dimension;
+    effect_change_ith_dimension_expression_func =
+      simple_effect_change_ith_dimension_expression;
     effect_union_op = effect_must_union;
 
     /* FIL Changed because of C conditional operator. */
@@ -289,6 +291,8 @@ set_methods_for_simple_effects()
       effect_to_store_independent_sdfi_list;
     effect_add_expression_dimension_func =
       simple_effect_add_expression_dimension;
+    effect_change_ith_dimension_expression_func =
+      simple_effect_change_ith_dimension_expression;
 
     effect_union_op = effect_must_union;
     effects_union_op = EffectsMustUnion;

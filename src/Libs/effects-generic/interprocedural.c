@@ -82,22 +82,24 @@ list generic_fortran_effects_backward_translation(
 
 /************************************************************ C */
 
-/* list c_actual_argument_to_may_summary_effects(expression real_arg)
- * input    : an expression corresponding to a function actual argument.
- * output   : a list of effects corresponding to the possible effects
- *            the function could do on the actual argument
- * modifies : nothing.
- * comment  :
- */
-list c_actual_argument_to_may_summary_effects(expression real_arg)
-{
-  list l_res = NIL;
+/**
+ 
+ @param real_arg the real argument expression
+ @param act is a tag to choose the action of the main effect :
+        'r' for read, 'w' for write, and 'x' for read and write.
+ @return a list of effects corresponding to the possible effects
+         the function could do on the actual argument
 
-  list l_real_arg_eff = NIL;
-  effect real_arg_eff;
+ */
+list c_actual_argument_to_may_summary_effects(expression real_arg, tag act)
+{
+  list l_res = NIL, l_tmp;
+  effect real_arg_eff = effect_undefined;
 
   type real_arg_t = expression_to_type(real_arg);
   int real_arg_t_d = effect_type_depth(real_arg_t);
+  transformer context = effects_private_current_context_head();
+	    
 
   pips_debug(6,"actual argument %s, with type %s, and type depth %d\n", 
 	     words_to_string(words_expression(real_arg)),
@@ -109,167 +111,150 @@ list c_actual_argument_to_may_summary_effects(expression real_arg)
     }
   else
     {
+      syntax s = expression_syntax(real_arg);
       
-      switch(type_tag(real_arg_t))
+      switch(syntax_tag(s))
 	{
-	case is_type_functional :
+	case is_syntax_call:
+	  /*
+	    just a special case for :
+	    - the assignment 
+	    - and the ADDRESS_OF operator to avoid
+            losing to musch information because we don't know how to 
+            represent &p access path in the general case.
+	  */
 	  {
-	    pips_internal_error("functional type case not handeld yet\n");
-	    break;
-	  }
-	case is_type_variable :
-	case is_type_struct :
-	case is_type_union :
-	  {	    
-	    list l_tmp = NIL;
-	    transformer context = effects_private_current_context_head();
-
-	    pips_debug(8, "variable, struct or union \n");
-	    
- 	    /* first we compute the effects on the argument as if it 
-	       were a lhs */
-	    /* The problem is that when the expression is an array
-	       name there won't be any effect generated ! 
-	    */
-	    
-	    l_tmp = generic_proper_effects_of_complex_address_expression
-	      (real_arg, &real_arg_eff, true);
-	    effects_free(l_tmp);
-	    
-	    l_real_arg_eff = CONS(EFFECT, real_arg_eff, l_real_arg_eff);
-	    (*effects_precondition_composition_op)(l_real_arg_eff, context);
-	    
-	    ifdebug(6)
+	    call real_call = syntax_call(s);
+	    entity real_op = call_function(real_call);
+	    list args = call_arguments(real_call);
+	    	    
+	    if (ENTITY_ASSIGN_P(real_op))
 	      {
-		pips_debug
-		  (6, 
-		   " effects on real_arg expression %s are :\n",
-		   words_to_string(words_expression(real_arg)));
-		(* effects_prettyprint_func)(l_real_arg_eff);
+		pips_debug(5, "assignment case \n");
+		l_res  = c_actual_argument_to_may_summary_effects
+		  (EXPRESSION(CAR(CDR(args))), act);
+		break;
 	      }
-      
-	    /* Then, we replace write effects on references with read and 
-	     * write effects on the pointed variables if it makes sense.
-	     * we skip read effects since they have already been computed 
-	     * before. do not correspond to the actual argument */
-	    FOREACH(EFFECT, eff, l_real_arg_eff)
-		{
-		  if (effect_write_p(eff))
-		    {
-		      /*BC :  this should be moved into another function, 
-			which should be recursive to handle structs and unions 
-		      */
-		      reference ref = effect_any_reference(eff);
-		      int n_ref_inds = gen_length(reference_indices(ref));
-		      entity ent = reference_variable(ref);
-		      type t = ultimate_type(entity_type(ent));
-		      int d = effect_type_depth(t);
+	    else if(ENTITY_ADDRESS_OF_P(real_op)) 
+	      {
+		expression arg1 = EXPRESSION(CAR(args));
+		
+		pips_debug(5, "address_of case \n");
+		l_tmp = generic_proper_effects_of_complex_address_expression
+		  (arg1, &real_arg_eff, true);
+		effects_free(l_tmp);
+		
+		if (anywhere_effect_p(real_arg_eff))
+		  {		    
+		    pips_debug(6, "anywhere effects \n");
+		    l_res = gen_nconc
+		      (l_res,
+		       effect_to_effects_with_given_tag(real_arg_eff, act));
+		  }
+		else
+		  {
+		    type eff_type =  expression_to_type(arg1);
 
-		      int n_inds; /* current number of indices */
-		      type c_t; /* current type of the current effect */
-		      bool finished; 
+		    if(!ENDP(reference_indices(effect_any_reference(real_arg_eff))))
+		      {					
+			/* The operand of & is subcripted */
+			/* the effect last index must be changed to '*' if it's
+                           not already the case 
+			*/
+			reference eff_ref;
+			expression last_eff_ind;
+			expression n_exp;
+			
+			eff_ref = effect_any_reference(real_arg_eff);
+			last_eff_ind = 
+			  EXPRESSION(CAR(gen_last(reference_indices(eff_ref))));
+		  
+			if(!unbounded_expression_p(last_eff_ind))
+			  {		
+			    n_exp = make_unbounded_expression();
+			    (*effect_change_ith_dimension_expression_func)
+			      (real_arg_eff, n_exp, 
+			       gen_length(reference_indices(eff_ref)));
+			    free_expression(n_exp);
 
-		      effect eff_read = effect_undefined;; 
-		      effect eff_write = copy_effect(eff);
-
-		      ifdebug(6)
-			{
-			  pips_debug(6, "considering effect : \n");
-			  print_effect(eff);
-			  pips_debug(6, " with entity effect type depth %d \n",d);
-			}
-		      pips_assert("The effect reference should be a partially subscripted array or a pointer\n", 
-				  n_ref_inds < d);
-
-		      c_t = t;
-		      finished = false;
-		      n_inds = 0;
-		      while(!finished && n_inds<d)
-			{
-			  switch (type_tag(c_t))
-			    {
-			    case is_type_variable :
-			      {
-				variable v = type_variable(c_t);
-				basic b = variable_basic(v);
-				bool add_effect = false;
-				
-				pips_debug(8, "variable case, of dimension %d, n_inds = %d\n", 
-					   (int) gen_length(variable_dimensions(v)), n_inds); 
-				FOREACH(DIMENSION, c_t_dim, 
-					variable_dimensions(v))
-				  {
-				    if(n_inds>=n_ref_inds)
-				      {
-					(*effect_add_expression_dimension_func)
-					  (eff_write, make_unbounded_expression());
-					add_effect = true;
-				      }
-				    n_inds++;
-				  }
-				  
-				if(basic_pointer_p(b))
-				  {
-				    pips_debug(8, "pointer case, n_inds = %d\n", n_inds);
-				    if(n_inds>=n_ref_inds)
-				      {
-					
-					(*effect_add_expression_dimension_func)
-					  (eff_write, make_unbounded_expression());
-					add_effect = true;
-					
-				      }
-				    n_inds++;
-				    c_t = basic_pointer(b);
-				  }
-				
-				if (add_effect)
-				  {				   		
-				    eff_read = copy_effect(eff_write);
-				    effect_action_tag(eff_read) = is_action_read;				    
-				    ifdebug(8)
-				      {
-					pips_debug(8, "adding read and write effects to l_res : \n");
-					print_effect(eff_write);
-					print_effect(eff_read);
-				      }
-
-				    l_res = gen_nconc(l_res, CONS(EFFECT, eff_write, NIL));
-				    l_res = gen_nconc(l_res, CONS(EFFECT, eff_read, NIL));
-				  }
-				else
-				  {
-				    pips_debug(8, "no need to add the current effect : all dimensions are already represented.\n");
-				  }
-				
-				finished = true;
-
-				break;
-			      }
-			    default:
-			      {
-				finished = true;
-				pips_internal_error("case not handled yet");
-			      }
-			    } /*switch */
-			  
-			} /*while*/
-		    } /* end of if (effect_write_p)*/
-		} /* FOREACH */
-	    
-	    /* The next statement was here to avoid memory leaks. 
-	       But it aborts ! I don't know why, maybe due to preferences 
-	       As it should maybe disappear with the change of effects, 
-	       I leave it as it is, as I intend to build the interprocedural 
-	       translation differently. (BC) */ 
-	    /*effects_free(l_real_arg_eff);*/
+			  }
+		      }
+		    
+		    l_res = gen_nconc
+		      (l_res,
+		       effect_to_effects_with_given_tag(real_arg_eff, 
+							act));
+		    
+		    /* add effects on accessible paths */
+		    
+		    l_res = gen_nconc
+		      (l_res,
+		       generic_effect_generate_all_accessible_paths_effects
+		       (real_arg_eff, eff_type, act));
+		  }
+		break;
+	      }
+	  }  
+	case is_syntax_reference:
+	case is_syntax_subscript:
+	  {
+	    pips_debug(5, "general call, reference or subscript case \n");
+	    l_tmp = generic_proper_effects_of_complex_address_expression
+		  (real_arg, &real_arg_eff, true);
+	    effects_free(l_tmp);
+		
+	    if (anywhere_effect_p(real_arg_eff))
+	      {		    
+		pips_debug(6, "anywhere effects \n");
+		l_res = gen_nconc
+		  (l_res,
+		   effect_to_effects_with_given_tag(real_arg_eff, 
+							  act));
+	      }
+	    else
+	      {
+		l_res = gen_nconc
+		  (l_res,
+		   generic_effect_generate_all_accessible_paths_effects
+		   (real_arg_eff, real_arg_t, act));	
+	      }
+	  
+	  }
+	  break;	  
+	case is_syntax_cast: 
+	  {	    
+	    l_res = c_actual_argument_to_may_summary_effects
+	      (cast_expression(syntax_cast(s)), act);
+	  }
+	  break;
+	case is_syntax_sizeofexpression:
+	  {
+	    /* generate no effects : this case should never appear because
+	     * of the test if (real_arg_t_d == 0) 
+	     */	       
+	  }
+	  break;	    
+	case is_syntax_va_arg: 
+	  {
+	    list al = syntax_va_arg(s);
+	    sizeofexpression ae = SIZEOFEXPRESSION(CAR(al));
+	    l_res = c_actual_argument_to_may_summary_effects
+	      (sizeofexpression_expression(ae), act);
 	    break;
 	  }
 	default:
-	  pips_internal_error("default type case : not handled \n"); 
-	} /* du switch */
+	  pips_internal_error("case not handled\n");
+	}
       
     } /* else du if (real_arg_t_d == 0) */
+    
+  (*effects_precondition_composition_op)(l_res, context);
+ 
+  ifdebug(6)
+    {
+      pips_debug(6, "end, resulting effects are :\n");
+      (*effects_prettyprint_func)(l_res);
+    }
   return(l_res);
 }
 
@@ -390,7 +375,8 @@ list generic_c_effects_backward_translation(entity callee,
 	{
 	  pips_debug(5, "vararg case \n");
 	  l_eff = gen_nconc(l_eff, 
-			    c_actual_argument_to_may_summary_effects(real_arg));
+			    c_actual_argument_to_may_summary_effects(real_arg, 
+								     'x'));
 	}  
       else
 	{

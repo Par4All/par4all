@@ -165,69 +165,79 @@ static IoElementDescriptor IoElementDescriptorTable[] = {
 
   /* C IO intrinsics */
 
-  /* The field IoElementName is used to describe the function's
-pattern: r to say that there's a read effect on the argument, w to say
-that there's a write effect and x to say that there's a read and write
-effect on the argument. The "*" is used to say that the last effect is
-repeted for the last arguments (varargs).  the function's pattern is
-defined according to the standard ISO/IEC 9899. Amira Mensi */
+  /* The field IoElementName is used to describe the function's pattern
+     defined according to the standard ISO/IEC 9899 (BC, july 2009) :
+     n      when there is only the read effect on the value of the actual 
+            argument.
+     r,w,x  for read, write, or read and write effects on the object
+            pointed to by the actual argument.         
+     *      means that the last effect is repeated for the last arguments
+            (varargs).
+     s      for a FILE * argument ("s" stands for "stream").
+     f      for an integer file descriptor (unix io system calls). 
+     v      for a va_list argument (this could be enhanced in the future
+            to distinguish between read and write effects on the components
+            of the va_list).
 
-  {PRINTF_FUNCTION_NAME,        "rr*",     is_action_read, is_approximation_must},
-  {FPRINTF_FUNCTION_NAME,       "xrr*",    is_action_read, is_approximation_must},
+     The tag fields are not relevant. 
+     
+  */
+  
+  {PRINTF_FUNCTION_NAME,        "rn*",     is_action_read, is_approximation_must},
+  {FPRINTF_FUNCTION_NAME,       "srn*",    is_action_read, is_approximation_must},
   {SCANF_FUNCTION_NAME,         "rw*",     is_action_read, is_approximation_must},
-  {FSCANF_FUNCTION_NAME,        "xrw*",    is_action_read, is_approximation_must},
+  {FSCANF_FUNCTION_NAME,        "srw*",    is_action_read, is_approximation_must},
   {PUTS_FUNCTION_NAME,          "r",       is_action_read, is_approximation_must},
   {GETS_FUNCTION_NAME,          "w",       is_action_read, is_approximation_must},
-  {FPUTS_FUNCTION_NAME,         "rw*",     is_action_read, is_approximation_must},
-  {FGETS_FUNCTION_NAME,         "wrx",     is_action_read, is_approximation_must},
-  {FPUTC_FUNCTION_NAME,         "rx",      is_action_read, is_approximation_must},
+  {FPUTS_FUNCTION_NAME,         "rs",     is_action_read, is_approximation_must},
+  {FGETS_FUNCTION_NAME,         "wns",     is_action_read, is_approximation_must},
   {FOPEN_FUNCTION_NAME,         "rr",      is_action_read, is_approximation_must},
-  {FCLOSE_FUNCTION_NAME,        "x",       is_action_read, is_approximation_must},
-  {SNPRINTF_FUNCTION_NAME,      "xrrr",    is_action_read, is_approximation_must},
-  {SPRINTF_FUNCTION_NAME,       "wr*",     is_action_read, is_approximation_must},
+  {FCLOSE_FUNCTION_NAME,        "s",       is_action_read, is_approximation_must},
+  {SNPRINTF_FUNCTION_NAME,      "wnrn*",    is_action_read, is_approximation_must},
+  {SPRINTF_FUNCTION_NAME,       "wrn*",     is_action_read, is_approximation_must},
   {SSCANF_FUNCTION_NAME,        "rrw*",    is_action_read, is_approximation_must},
-  {VFPRINTF_FUNCTION_NAME,      "rr",      is_action_read, is_approximation_must},
-  {VFSCANF_FUNCTION_NAME,       "xrw",     is_action_read, is_approximation_must},
-  {VPRINTF_FUNCTION_NAME,       "rr",      is_action_read, is_approximation_must},
-  {VSNPRINTF_FUNCTION_NAME,     "wrrr",    is_action_read, is_approximation_must},
-  {VSPRINTF_FUNCTION_NAME,      "wrr",     is_action_read, is_approximation_must},
-  {VSSCANF_FUNCTION_NAME,       "rrw",     is_action_read, is_approximation_must},
-  {VSCANF_FUNCTION_NAME,        "rr",      is_action_read, is_approximation_must},
-  {FPUTC_FUNCTION_NAME,         "rx",      is_action_read, is_approximation_must},
-  {GETC_FUNCTION_NAME,          "x",       is_action_read, is_approximation_must},
-  {_IO_GETC_FUNCTION_NAME,      "x",       is_action_read, is_approximation_must},
-  {FGETC_FUNCTION_NAME,         "x",       is_action_read, is_approximation_must},
-  {GETCHAR_FUNCTION_NAME,       "r",       is_action_read, is_approximation_must},
-  {PUTC_FUNCTION_NAME,          "rx",      is_action_read, is_approximation_must},
-  {_IO_PUTC_FUNCTION_NAME,      "rx",      is_action_read, is_approximation_must},
-  {PUTCHAR_FUNCTION_NAME,       "r",       is_action_read, is_approximation_must},
-  {UNGETC_FUNCTION_NAME,        "rx",      is_action_read, is_approximation_must},
-  {FREAD_FUNCTION_NAME,         "wrrx",    is_action_read, is_approximation_must},
-  {FWRITE_FUNCTION_NAME,        "rrrx",    is_action_read, is_approximation_must},
-  {FGETPOS_FUNCTION_NAME,       "xr",      is_action_read, is_approximation_must},
-  {FSEEK_FUNCTION_NAME,         "wrr",     is_action_read, is_approximation_must},
-  {FSETPOS_FUNCTION_NAME,       "xw",      is_action_read, is_approximation_must},
-  {FTELL_FUNCTION_NAME,         "x",       is_action_read, is_approximation_must},
-  {C_REWIND_FUNCTION_NAME,      "x",       is_action_read, is_approximation_must},
-  {CLEARERR_FUNCTION_NAME,      "w",       is_action_read, is_approximation_must},
-  {FEOF_FUNCTION_NAME,          "r",       is_action_read, is_approximation_must},
-  {FERROR_FUNCTION_NAME,        "x",       is_action_read, is_approximation_must},
+  {VFPRINTF_FUNCTION_NAME,      "srv",      is_action_read, is_approximation_must},
+  {VFSCANF_FUNCTION_NAME,       "srv",     is_action_read, is_approximation_must},
+  {VPRINTF_FUNCTION_NAME,       "rv",      is_action_read, is_approximation_must},
+  {VSNPRINTF_FUNCTION_NAME,     "wnrv",    is_action_read, is_approximation_must},
+  {VSPRINTF_FUNCTION_NAME,      "wrv",     is_action_read, is_approximation_must},
+  {VSSCANF_FUNCTION_NAME,       "rrv",     is_action_read, is_approximation_must},
+  {VSCANF_FUNCTION_NAME,        "rv",      is_action_read, is_approximation_must},
+  {FPUTC_FUNCTION_NAME,         "ns",      is_action_read, is_approximation_must},
+  {GETC_FUNCTION_NAME,          "s",       is_action_read, is_approximation_must},
+  {_IO_GETC_FUNCTION_NAME,      "s",       is_action_read, is_approximation_must},
+  {FGETC_FUNCTION_NAME,         "s",       is_action_read, is_approximation_must},
+  {GETCHAR_FUNCTION_NAME,       "",       is_action_read, is_approximation_must},
+  {PUTC_FUNCTION_NAME,          "ns",      is_action_read, is_approximation_must},
+  {_IO_PUTC_FUNCTION_NAME,      "ns",      is_action_read, is_approximation_must},
+  {PUTCHAR_FUNCTION_NAME,       "n",       is_action_read, is_approximation_must},
+  {UNGETC_FUNCTION_NAME,        "ns",      is_action_read, is_approximation_must},
+  {FREAD_FUNCTION_NAME,         "wnns",    is_action_read, is_approximation_must},
+  {FWRITE_FUNCTION_NAME,        "rnns",    is_action_read, is_approximation_must},
+  {FGETPOS_FUNCTION_NAME,       "sw",      is_action_read, is_approximation_must},
+  {FSEEK_FUNCTION_NAME,         "snn",     is_action_read, is_approximation_must},
+  {FSETPOS_FUNCTION_NAME,       "sr",      is_action_read, is_approximation_must},
+  {FTELL_FUNCTION_NAME,         "s",       is_action_read, is_approximation_must},
+  {C_REWIND_FUNCTION_NAME,      "s",       is_action_read, is_approximation_must},
+  {CLEARERR_FUNCTION_NAME,      "s",       is_action_read, is_approximation_must},
+  {FEOF_FUNCTION_NAME,          "s",       is_action_read, is_approximation_must},
+  {FERROR_FUNCTION_NAME,        "s",       is_action_read, is_approximation_must},
   {PERROR_FUNCTION_NAME,        "r",       is_action_read, is_approximation_must},
 
   /* UNIX IO system calls */
 
-  {C_OPEN_FUNCTION_NAME,        "rrr",     is_action_read, is_approximation_must},
-  {CREAT_FUNCTION_NAME,         "rr",      is_action_read, is_approximation_must},
-  {C_CLOSE_FUNCTION_NAME,       "r",       is_action_read, is_approximation_must},
-  {C_WRITE_FUNCTION_NAME,       "rrr",     is_action_read, is_approximation_must},
-  {C_READ_FUNCTION_NAME,        "rwr",     is_action_read, is_approximation_must},
-  {FCNTL_FUNCTION_NAME,         "rrr",     is_action_read, is_approximation_must},
-  {FSYNC_FUNCTION_NAME,         "r",       is_action_read, is_approximation_must},
-  {FDATASYNC_FUNCTION_NAME,     "r",       is_action_read, is_approximation_must},
-  {IOCTL_FUNCTION_NAME,         "rr*",     is_action_read, is_approximation_must},
-  {SELECT_FUNCTION_NAME,        "rrrrr",   is_action_read, is_approximation_must},
-  {PSELECT_FUNCTION_NAME,       "rrrrrr",  is_action_read, is_approximation_must},
-  {FSTAT_FUNCTION_NAME,         "rw",      is_action_read, is_approximation_must},
+  {C_OPEN_FUNCTION_NAME,        "nn",     is_action_read, is_approximation_must},
+  {CREAT_FUNCTION_NAME,         "nn",      is_action_read, is_approximation_must},
+  {C_CLOSE_FUNCTION_NAME,       "f",       is_action_read, is_approximation_must},
+  {C_WRITE_FUNCTION_NAME,       "frr",     is_action_read, is_approximation_must},
+  {C_READ_FUNCTION_NAME,        "fwn",     is_action_read, is_approximation_must},
+  {FCNTL_FUNCTION_NAME,         "fnn*",     is_action_read, is_approximation_must},
+  {FSYNC_FUNCTION_NAME,         "f",       is_action_read, is_approximation_must},
+  {FDATASYNC_FUNCTION_NAME,     "f",       is_action_read, is_approximation_must},
+  {IOCTL_FUNCTION_NAME,         "fn*",     is_action_read, is_approximation_must},
+  {SELECT_FUNCTION_NAME,        "nrrrr",   is_action_read, is_approximation_must},
+  {PSELECT_FUNCTION_NAME,       "nrrrrw",  is_action_read, is_approximation_must},
+  {FSTAT_FUNCTION_NAME,         "nw",      is_action_read, is_approximation_must},
 
   /* Fortran extensions for asynchronous IO's */
 
@@ -1257,29 +1267,32 @@ static list generic_io_effects(entity e, list args, bool system_p)
   p = SearchCIoElement(entity_local_name(e));
   lenght=strlen(p->IoElementName);
 
-  MAP(EXPRESSION,exp,{
-    //if we have * as last argument, we repeat the effect of the
-    //penultimate argument for the rest of the arguments
-
-    if(p->IoElementName[lenght-1]=='*' && i==lenght-1)
-      lep = effects_of_C_ioelem(exp, p->IoElementName[lenght-2]);
-    else
-      lep = effects_of_C_ioelem(exp, p->IoElementName[i]);
-
-    i=i+1;
-
-    if (p->MayOrMust == is_approximation_may)
-      effects_to_may_effects(lep);
-
-    le = gen_nconc(le, lep);
-
-    ifdebug(8) {
-      extern void print_effects(list);
-
-      print_effects(lep);
+  FOREACH(EXPRESSION, arg, args)
+    {
+      //if we have * as last argument, we repeat the effect of the
+      //penultimate argument for the rest of the arguments
+      
+      if(p->IoElementName[lenght-1]=='*' && i>=lenght-1)
+	lep = effects_of_C_ioelem(arg, p->IoElementName[lenght-2]);
+      else
+	lep = effects_of_C_ioelem(arg, p->IoElementName[i]);
+      
+      i=i+1;
+      
+      if (p->MayOrMust == is_approximation_may)
+	effects_to_may_effects(lep);
+      
+      le = gen_nconc(le, lep);
+      
+      ifdebug(8) 
+	{
+	  pips_debug(8, "effects for argument %s :\n",
+		     words_to_string(words_expression(arg)));	
+	  (*effects_prettyprint_func)(lep);
+	}
     }
-  }, args);
 
+  /* special cases */
   /* We simulate actions on files by read/write actions
      to a special static integer array.
      GO:
@@ -1287,96 +1300,53 @@ static list generic_io_effects(entity e, list args, bool system_p)
      the array, because it updates the file-pointer so
      it reads it and then writes it ...*/
 
-  if(!system_p) {
-    /* FILE * file descriptors are used */
-    if(ENTITY_PRINTF_P(e) || ENTITY_PUTCHAR_P(e) || ENTITY_PUTS_P(e)|| ENTITY_VPRINTF_P(e))
-      // The output is written into stdout
+  if(!system_p) 
+    {
+      /* FILE * file descriptors are used */
+      if(ENTITY_PRINTF_P(e) || ENTITY_PUTCHAR_P(e) || 
+	 ENTITY_PUTS_P(e)|| ENTITY_VPRINTF_P(e))
+	// The output is written into stdout
       unit = int_to_expression(STDOUT_FILENO);
-    else if (ENTITY_SCANF_P(e) || ENTITY_GETS_P(e) || ENTITY_VSCANF_P(e) || ENTITY_GETCHAR_P(e))
+    else if (ENTITY_SCANF_P(e) || ENTITY_GETS_P(e) || 
+	     ENTITY_VSCANF_P(e) || ENTITY_GETCHAR_P(e))
       //The input is obtained from stdin
       unit = int_to_expression(STDIN_FILENO);
     else if (ENTITY_PERROR_P(e))
       unit = int_to_expression(STDERR_FILENO);
-    else if (ENTITY_SSCANF_P(e)
-             || ENTITY_VSNPRINTF_P(e)||ENTITY_VSPRINTF_P(e)||ENTITY_VSSCANF_P(e)) {
-      // The input is a string(the first argument is a char*)
-      file_p = FALSE;;
-    }
-    else if (ENTITY_SPRINTF_P(e) || ENTITY_SNPRINTF_P(e)
-             || ENTITY_VSPRINTF_P(e) || ENTITY_VSNPRINTF_P(e)) {
-      // The output is a string(the first argument is a char*)
-      file_p = FALSE;;
-    }
-    else if (ENTITY_FPUTC_P(e) || ENTITY_FPUTS_P(e) || ENTITY_PUTC_P(e)  || ENTITY__IO_PUTC_P(e) || ENTITY_UNGETC_P(e))
-      // the second argument is a file descriptor
-      ;
-    else if (ENTITY_FGETS_P(e))
-      //the third argument is a file descriptor
-      ;
-    else if (ENTITY_FREAD_P(e) || ENTITY_FWRITE_P(e))
-      //the fourth argument is a file descriptor
-      ;
-    else if(ENTITY_FPRINTF_P(e)     || ENTITY_VFPRINTF_P(e) || ENTITY_FSCANF_P(e) || ENTITY_VFSCANF_P(e)
-            || ENTITY_FGETC_P(e)    || ENTITY_GETC_P(e)  || ENTITY__IO_GETC_P(e) || ENTITY_FGETPOS_P(e)
-            || ENTITY_FSEEK_P(e)    || ENTITY_FSETPOS_P(e) || ENTITY_FTELL_P(e)
-            || ENTITY_FSETPOS_P(e)  || ENTITY_FTELL_P(e) || ENTITY_C_REWIND_P(e)
-            || ENTITY_CLEARERR_P(e) || ENTITY_FEOF_P(e) || ENTITY_FERROR_P(e)
-            || ENTITY_FCLOSE_P(e))
-      // all the following functions have in common the first argument is a file descriptor.
-      ;
+   
     else if(ENTITY_FOPEN_P(e))
       // the fopen function has the path's file as first argument.
-      ;
+      unit = make_unbounded_expression();
+      
     else if(ENTITY_BUFFERIN_P(e) || ENTITY_BUFFEROUT_P(e))
       // the first argument is an integer specifying the logical unit
       // The expression should be evaluated and used if an integer is returned
-      ;
-    else
-      pips_internal_error("Which C library io command? \%s\n", entity_name(e));
+      unit = make_unbounded_expression();
+    
   }
-  else {
-    /* Integer file descriptors are used */
-    if(ENTITY_C_WRITE_SYSTEM_P(e) || ENTITY_C_READ_SYSTEM_P(e)
-       || ENTITY_C_CLOSE_SYSTEM_P(e) || ENTITY_FCNTL_SYSTEM_P(e)
-       || ENTITY_FSYNC_SYSTEM_P(e) || ENTITY_FDATASYNC_SYSTEM_P(e)
-       || ENTITY_IOCTL_SYSTEM_P(e) || ENTITY_FDATASYNC_SYSTEM_P(e)
-       ) {
-      /* The first argument must be an integer expression, which may
-         be statically evaluable. */
-      unit = copy_expression(EXPRESSION(CAR(args)));;
+  else
+    {
+      if(ENTITY_SELECT_SYSTEM_P(e) || ENTITY_PSELECT_SYSTEM_P(e)) 
+	{
+	  /* Several file descriptors are read */
+	  ;
+	}      
     }
-    else if(ENTITY_C_OPEN_SYSTEM_P(e) || ENTITY_CREAT_SYSTEM_P(e)) {
-      /* No information about the fd returned */
-      ;
-    }
-    else if(ENTITY_SELECT_SYSTEM_P(e) || ENTITY_PSELECT_SYSTEM_P(e)) {
-      /* Several file descriptors are read */
-      ;
-    }
-    else
-      pips_internal_error("Which Unix io command? \"\%s\"\n", entity_name(e));
-  }
 
-  if(file_p) {
-    bool must_p = TRUE;
+  if(!expression_undefined_p(unit)) 
+    {
     reference ref1 = reference_undefined;
     effect eff1 = effect_undefined;
     reference ref2 = reference_undefined;
     effect eff2 = effect_undefined;
 
-    if(expression_undefined_p(unit)) {
-      indices = CONS(EXPRESSION, make_unbounded_expression(), NIL);
-      must_p = FALSE;
-    }
-    else {
-      indices = CONS(EXPRESSION, unit, NIL);
-    }
-
+    indices = CONS(EXPRESSION, unit, NIL);
+    
     private_io_entity = global_name_to_entity
-      (IO_EFFECTS_PACKAGE_NAME,
-       IO_EFFECTS_ARRAY_NAME);
+      (IO_EFFECTS_PACKAGE_NAME, IO_EFFECTS_ARRAY_NAME);
 
-    pips_assert("private_io_entity is defined", private_io_entity != entity_undefined);
+    pips_assert("private_io_entity is defined", 
+		private_io_entity != entity_undefined);
 
     ref1 = make_reference(private_io_entity, indices);
     ref2 = copy_reference(ref1);
@@ -1386,16 +1356,16 @@ static list generic_io_effects(entity e, list args, bool system_p)
     eff1 = (*reference_to_effect_func)(ref1, make_action_read());
     eff2 = (*reference_to_effect_func)(ref2, make_action_write());
 
-    if(!must_p) {
-      free_approximation(effect_approximation(eff1));
-      free_approximation(effect_approximation(eff2));
-      effect_approximation(eff1) = make_approximation_may();
-      effect_approximation(eff2) = make_approximation_may();
-    }
+    if(unbounded_expression_p(unit)) 
+      {
+	effect_approximation_tag(eff1) = is_approximation_may;
+	effect_approximation_tag(eff2) = is_approximation_may;
+      }
+
     ifdebug(8) print_reference(ref1);
     le = gen_nconc(le, CONS(EFFECT, eff1, CONS(EFFECT, eff2, NIL)));
   }
-
+  
   pips_debug(5, "end\n");
 
   return(le);
@@ -1600,9 +1570,98 @@ static list effects_of_ioelem(expression exp, tag act)
   return effects_of_any_ioelem(exp, act, TRUE);
 }
 
-static list effects_of_C_ioelem(expression exp, tag act)
+/**
+   Computes the effects of an io C intrinsic function on the actual
+   argument arg according to the action tag act.
+   proper effects on the evaluation of the argument are systematically added.
+
+ @param arg is an actual argument of a C io intrinsic function
+ @param act is an action tag as described in the  IoElementDescriptorTable.
+        (its value can be either 'f', 's', 'r', 'w','x', 'v' or 'n').
+ */
+static list effects_of_C_ioelem(expression arg, tag act)
 {
-  return effects_of_any_ioelem(exp, act, FALSE);
+  list le = NIL; /* result list */
+  expression unit = expression_undefined;
+  list indices = NIL;
+  reference ref1, ref2;
+  effect eff1, eff2;
+  bool must_p;
+  entity private_io_entity;
+
+  pips_debug(5, "begin with expression %s and tag %c\n",
+	     words_to_string(words_expression(arg)), act);
+
+  le = gen_nconc(le, generic_proper_effects_of_expression(arg));
+
+  switch (act)
+    {
+    case 'f':
+      unit = copy_expression(arg);
+    case 's':      
+      pips_debug(5, "stream or integer file descriptor case \n");
+      
+            /* We simulate actions on files by read/write actions
+	       to a special static integer array.
+	       GO:
+	       It is necessary to do a read and write action to
+	       the array, because it updates the file-pointer so
+	       it reads it and then writes it ...
+	    */
+      
+       indices = CONS(EXPRESSION, 
+		      act == 'f'? unit : make_unbounded_expression(), 
+		      NIL);
+       must_p = act == 'f' ? true : false;
+       private_io_entity = global_name_to_entity
+	 (IO_EFFECTS_PACKAGE_NAME,
+	  IO_EFFECTS_ARRAY_NAME);
+
+       pips_assert("private_io_entity is defined\n", 
+		   private_io_entity != entity_undefined);
+       
+       ref1 = make_reference(private_io_entity, indices);
+       ref2 = copy_reference(ref1);
+       /* FI: I would like not to use "preference" instead of
+	  "reference", but this causes a bug in cumulated effects and I
+	  do not have time to chase it. */
+       eff1 = (*reference_to_effect_func)(ref1, make_action_read());
+       eff2 = (*reference_to_effect_func)(ref2, make_action_write());
+       
+       if(!must_p) 
+	 {
+	   effect_approximation_tag(eff1) = is_approximation_may;
+	   effect_approximation_tag(eff2) = is_approximation_may;
+	 }
+       le = gen_nconc(le, CONS(EFFECT, eff1, CONS(EFFECT, eff2, NIL)));
+       /* and the effects on the file pointer */
+       le = gen_nconc(le, c_actual_argument_to_may_summary_effects(arg, 'x'));
+
+       break;
+    case 'v':
+      pips_debug(5, "va_list case \n");
+
+      /* we generate a read and a write effect on the va_list : 
+         this is not really correct, since the va_list itself cannot be
+	 modified, but it's internal fields only. BC. 
+      */
+      
+      le = gen_nconc(le, generic_proper_effects_of_any_lhs(arg));
+      break;
+    case 'r':
+    case 'w':
+    case 'x':
+      pips_debug(5, "potential pointer \n");
+      le = gen_nconc(le, c_actual_argument_to_may_summary_effects(arg, act));
+      break;
+    case 'n':
+      pips_debug(5, "only effects on actual argument evaluation\n");
+      break;
+    default :
+      pips_internal_error("unknown tag\n");
+    }
+
+  return le;
 }
 
 static list

@@ -1269,7 +1269,7 @@ list c_simple_effects_on_formal_parameter_backward_translation(list l_sum_eff,
 	  {
 	    l_eff = gen_nconc
 	      (l_eff, 
-	       c_actual_argument_to_may_summary_effects(real_arg));	    
+	       c_actual_argument_to_may_summary_effects(real_arg, 'x'));
 	  }
 	
 	if (n_eff != effect_undefined && l_eff == NIL)
@@ -1726,7 +1726,8 @@ list c_summary_to_proper_effects(
       
       MAP(EXPRESSION, arg,
 	  {
-	    pel = gen_nconc(pel, c_actual_argument_to_may_summary_effects(arg));
+	    pel = gen_nconc
+	      (pel, c_actual_argument_to_may_summary_effects(arg, 'x'));
 	    
 	  }, args);
       

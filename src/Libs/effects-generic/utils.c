@@ -62,6 +62,8 @@ void (*effect_free_func)(effect eff);
 effect (*reference_to_effect_func)(reference, action);
 list (*effect_to_store_independent_effect_list_func)(effect, bool);
 void (*effect_add_expression_dimension_func)(effect eff, expression exp);
+void (*effect_change_ith_dimension_expression_func)(effect eff, expression exp, 
+					       int i);
 
 /* union */
 effect (*effect_union_op)(effect, effect);
@@ -869,3 +871,172 @@ effect make_anywhere_effect(action ac)
   return anywhere_eff;
   
 }
+
+
+/********************** Effects on all accessible paths  ***************/
+
+/**
+  @param eff_write a write effect
+  @param is the action of the generated effects :
+         'r' for read, 'w' for write, and 'x' for read and write.
+  @return a list of effects. beware : eff_write is included in the list.
+
+ */
+list effect_to_effects_with_given_tag(effect eff, tag act)
+{
+  list l_res = NIL;
+  effect eff_read = effect_undefined;
+  effect eff_write = effect_undefined;
+  extern void print_effect(effect);
+	
+  pips_assert("effect is defined \n", !effect_undefined_p(eff));
+
+  if (act == 'x')
+    {      
+      eff_write = eff;
+      effect_action_tag(eff_write) = is_action_write;
+      eff_read = copy_effect(eff_write);
+      effect_action_tag(eff_read) = is_action_read;
+    }
+  else if (act == 'r')
+    {
+      
+      eff_read = eff;
+      effect_action_tag(eff_read) = is_action_read;
+      eff_write = effect_undefined;
+    }
+  else
+    {
+      eff_read = effect_undefined;
+      eff_write = eff;
+      effect_action_tag(eff_write) = is_action_write;
+    }
+  
+  ifdebug(8)
+    {
+      pips_debug(8, "adding effects to l_res : \n");
+      if(!effect_undefined_p(eff_write)) 
+	print_effect(eff_write);
+      if(!effect_undefined_p(eff_read)) 
+	print_effect(eff_read);
+    }
+  
+  if(!effect_undefined_p(eff_write)) 
+    l_res = gen_nconc(l_res, CONS(EFFECT, eff_write, NIL));
+  if(!effect_undefined_p(eff_read)) 
+    l_res = gen_nconc(l_res, CONS(EFFECT, eff_read, NIL)); 
+
+  return l_res;
+}
+
+/**
+   @param eff is an effect whose reference is the beginning access path.
+          it is not modified or re-used.
+   @param eff_type is the type of the object represented by the effect
+          access path. This avoids computing it at each step.
+   @param act is the action of the generated effects :
+              'r' for read, 'w' for write, and 'x' for read and write.
+   @return a list of effects on all the accessible paths from eff reference.
+ */
+list generic_effect_generate_all_accessible_paths_effects(effect eff, 
+							  type eff_type, 
+							  tag act)
+{
+  list l_res = NIL;
+  pips_assert("the effect must be defined\n", !effect_undefined_p(eff));
+  extern void print_effect(effect);
+	
+  
+  if (anywhere_effect_p(eff))
+    {
+      /* there is no other accessible path */
+      pips_debug(6, "anywhere effect -> returning NIL \n");
+      
+    }
+  else
+    {
+      reference ref = effect_any_reference(eff);
+      int n_ref_inds = gen_length(reference_indices(ref));
+      entity ent = reference_variable(ref);
+      type t = ultimate_type(entity_type(ent));
+      int d = effect_type_depth(t);
+      effect eff_write = effect_undefined;
+
+      /* this may lead to memory leak if no different access path is 
+	 reachable */
+      eff_write = copy_effect(eff);
+      
+      ifdebug(6)
+	{
+	  pips_debug(6, "considering effect : \n");
+	  print_effect(eff);
+	  pips_debug(6, " with entity effect type depth %d \n",
+		     d);
+	}
+      
+           
+      switch (type_tag(eff_type))
+	{
+	case is_type_variable :
+	  {
+	    variable v = type_variable(eff_type);
+	    basic b = variable_basic(v);
+	    bool add_effect = false;
+	    
+	    pips_debug(8, "variable case, of dimension %d\n", 
+		       (int) gen_length(variable_dimensions(v))); 
+
+	    /* we first add the array dimensions if any */
+	    FOREACH(DIMENSION, c_t_dim, 
+		    variable_dimensions(v))
+	      {
+		(*effect_add_expression_dimension_func)
+		  (eff_write, make_unbounded_expression());
+		add_effect = true;
+	      }
+	    /* And add the generated effect */
+	    if (add_effect)
+	      {
+		l_res = gen_nconc
+		  (l_res,
+		   effect_to_effects_with_given_tag(eff_write,act));
+		add_effect = false;
+	      }
+
+	    /* If the basic is a pointer type, we must add an effect
+	       with a supplementary dimension, and then recurse
+               on the pointed type.
+	    */
+	    if(basic_pointer_p(b))
+	      {
+		pips_debug(8, "pointer case, \n");
+				
+		eff_write = copy_effect(eff_write);
+		(*effect_add_expression_dimension_func)
+		  (eff_write, make_unbounded_expression());
+		
+		l_res = gen_nconc
+		  (l_res,
+		   effect_to_effects_with_given_tag(eff_write,act));
+		
+		l_res = gen_nconc
+		  (l_res,
+		   generic_effect_generate_all_accessible_paths_effects
+		   (eff_write,  basic_pointer(b), act));
+		
+	      }	    	    
+	    
+	    break;
+	  }
+	default:
+	  {
+	    pips_internal_error("case not handled yet\n");
+	  }
+	} /*switch */
+      
+    } /* else */
+  
+  
+  return(l_res);
+}
+
