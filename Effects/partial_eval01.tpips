@@ -15,13 +15,6 @@ echo
 display PRINTED_FILE[duck]
 
 echo
-echo Code after array conversion
-echo
-
-apply ARRAY_TO_POINTER[duck]
-display PRINTED_FILE[duck]
-
-echo
 echo Code after partial eval
 echo
 
