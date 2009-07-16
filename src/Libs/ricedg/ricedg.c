@@ -278,7 +278,9 @@ char *mod_name;
 
     debug(8,"rice_dependence_graph","original graph\n");
     ifdebug(8) {  	
-	prettyprint_dependence_graph(stderr, mod_stat, dg);
+        set_ordering_to_statement(mod_stat);
+        prettyprint_dependence_graph(stderr, mod_stat, dg);
+        reset_ordering_to_statement();
     }
 
     debug_off();
