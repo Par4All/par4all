@@ -400,7 +400,7 @@
 #define FSETPOS_FUNCTION_NAME           "fsetpos"
 #define FTELL_FUNCTION_NAME             "ftell"
 #define C_REWIND_FUNCTION_NAME          "rewind"
-#define CLEARERR_FUNCTION_NAME          "clearer"
+#define CLEARERR_FUNCTION_NAME          "clearerr"
 #define FEOF_FUNCTION_NAME              "feof"
 #define FERROR_FUNCTION_NAME            "ferror"
 #define PERROR_FUNCTION_NAME            "perror"
