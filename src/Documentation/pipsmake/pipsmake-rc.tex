@@ -1668,7 +1668,7 @@ computation are described in~\cite{IJT92}. Another description is
 available on line, in \Pri{} Technical Report.
 
 Note that the standard name in the Dragon book is likely ot be {\em
-Gen} and {\em Kill} sets, but PIPS used the more general concept of
+Gen} and {\em Kill} sets, but PIPS uses the more general concept of
 {\em effect} developped by P.~Jouvelot and D.~Gifford.
 
 \subsection{Proper Effects}
@@ -1676,20 +1676,32 @@ Gen} and {\em Kill} sets, but PIPS used the more general concept of
 \index{Proper Effects}
 \index{Effects (Proper)}
 
-The proper effects of a statement are lists of variables read or written by
-the statement. They are used to build use-def chains and then the
-dependence graph.
+The proper effects of a statement basically are a list of variables
+that may be read or written by the statement. They are used to build use-def
+chains and then the dependence graph.
 
 Proper means that the effects of a compound statement do not include the
-effects of lower level statement. For instance, body of a loop, true and
-false branches of test statement, control nodes in an unstructured
+effects of lower level statements. For instance, the body of a loop, true and
+false branches of a test statement, control nodes in an unstructured
 statement ... are ignored to compute the proper effects of a loop, a
 test or an unstructured.
 
-Variables private to loop are handled like regular variable.
+Summary effects (see
+Section~\ref{subsubection-summary-data-flow-information}) of a called
+module are used to compute the proper effects at the corresponding
+call sites. They are translated from the callee's scope into the
+caller's scope. The translation is based on the actual-to-formal
+binding. If too many actual arguments are defined, a user warning is
+issued but the processing goes on because a simple semantics is
+available: ignore useless actual arguments. If too few actual
+arguments are provided, a user error is issued because the effects of
+the call are not defined. It would be necessary to assume either a
+general \verb+READ+ or a general \verb+WRITE+ for each read or written
+formal parameter with no actual counterpart\marginpar{This is
+implemented for calls by reference as in Fortran. The call-by-value
+implementation is on-going. See Amira Mensi.}.
 
-Proper references try to keep the local references as much as possible. WE
-have to think a little more about this concept.
+Variables private to loop are handled like regular variable.
 
 \begin{PipsMake}
 proper_effects                  > MODULE.proper_effects
@@ -1702,10 +1714,10 @@ proper_effects                  > MODULE.proper_effects
 \subsection{Filtered Proper Effects}
 \label{subsubsection-filtered-proper-effects}
 
+\marginpar{To be continued...by whom?}
 This phase collects information about where a given global variable is
 actually modified in the program.
 
-\marginpar{To be continued...by whom?}
 
 \begin{PipsMake}
 filter_proper_effects         > MODULE.filtered_proper_effects
@@ -1735,41 +1747,9 @@ cumulated_effects               > MODULE.cumulated_effects
 
 Cumulated memory effects do not take into account local effects on
 private variables, such as variables declared in C blocks or in
-Fortran parallel DO loops. Interprocedurally, memory effects on
-dynamic (a.k.a. stack allocated) variables are ignored in summary
-effects because they cannot be observed by the callers\footnote{Unless
-it accesses illegally the stack: see Tom Reps,
-http://pages.cs.wisc.edu/~reps}.
-\marginpar{RK: Not clear (FI: To be deleted)}
+Fortran parallel DO loops. 
 
-Cumulated references integrate proper references over the program code.
 
-\emph{FC: I should implement real summary references?}
-
-\begin{PipsMake}
-proper_references       > MODULE.proper_references
-        < PROGRAM.entities
-        < MODULE.code
-        < CALLEES.summary_effects
-
-cumulated_references    > MODULE.cumulated_references
-        < PROGRAM.entities
-        < MODULE.code
-        < MODULE.proper_references
-\end{PipsMake}
-
-Cumulated effects of a all module are used to compute the proper
-effects of the corresponding call sites. They are translated from the
-callee's scope into the caller's scope. The translation is based on
-the actual-to-formal binding. If too many actual arguments are
-defined, a user warning is issued but the processing goes on because a
-simple semantics is available: ignore useless actual arguments. If too
-few actual arguments are provided, a user error is issued because the
-effects of the call are not defined. It would be necessary to assume
-either a general \verb+READ+ or a general \verb+WRITE+ for each read
-or written formal parameter with no actual counterpart\marginpar{This
-is implemented for calls by reference as in Fortran. The call-by-value
-implementation is on-going. See Amira Mensi.}.
 
 \subsection{Summary Data Flow Information (SDFI)}
 \label{subsubection-summary-data-flow-information}
@@ -1778,12 +1758,13 @@ implementation is on-going. See Amira Mensi.}.
 Summary data flow information is the simplest interprocedural
 information needed to take procedure into account in a
 parallelizer. They were introduced in Parafrase. The
-\verb+summary_effects+ of a module are the cumulated effects of its top
-level statement, but effects on local dynamic variables are ignored and
-subscript expressions of remaining effects are eliminated.
+\verb+summary_effects+ of a module are the cumulated effects of its
+top level statement, but effects on local dynamic variables are
+ignored (because they cannot be observed by the callers\footnote{Unless
+it accesses illegally the stack: see Tom Reps,
+http://pages.cs.wisc.edu/~reps}) and subscript expressions of remaining
+effects are eliminated.
 
-The proper effects of a call site are computed by translating the
-summary effects of the callee.
 
 \begin{PipsMake}
 summary_effects                 > MODULE.summary_effects
@@ -1806,7 +1787,6 @@ statement are not part of the IN or OUT effects. Variables defined
 before they are used ar not part of the IN effects. OUT effects
 require an interprocedural analysis\footnote{They are not validated as
 of June 21, 2008 (FI).}
-\marginpar{RK: What are they? (FI: To be deleted)}
 
 \begin{PipsMake}
 in_effects > MODULE.in_effects
@@ -1832,6 +1812,41 @@ out_effects > MODULE.out_effects
         < MODULE.out_summary_effects  
         < MODULE.cumulated_in_effects  
 \end{PipsMake}
+
+\subsection{Proper and Cumulated References}
+\label{subsubsection-cumulated-effects}
+\index{Cumulated Effects}
+\index{Effects (Cumulated)}
+
+The concept of {\em proper references} is not yet clearly defined. The
+original idea is to keep track of the actual objects of newgen domain
+{\tt reference} used in the program representation of the current
+statement, while retaining if they correspond to a read or a write of
+the corresponding memory locations. Proper references are
+represented as effects.  
+
+For C programs, where memory accesses are not necesseraly represented
+by objects of newgen domain {\tt reference}, the semantics of this
+analysis is unclear.
+
+Cumulated references gather proper references over the program
+code, without taking into account the modification of memory stores by
+the program execution. 
+
+\emph{FC: I should implement real summary references?}
+
+\begin{PipsMake}
+proper_references       > MODULE.proper_references
+        < PROGRAM.entities
+        < MODULE.code
+        < CALLEES.summary_effects
+
+cumulated_references    > MODULE.cumulated_references
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.proper_references
+\end{PipsMake}
+
 
 
 \subsection{Effect Properties}
@@ -1981,12 +1996,15 @@ due to summarization at simple statement level (see
 Section~\ref{subsection-array-regions}).
 
 
-Region-based chains only are compatible with the Rice Fast Dependence Graph
-option (see Section~\ref{subsubsection-menu-for-dependence-tests}).  Other
-dependence tests are likely to lack accuracy because a transitive check has
-been added by Béatrice \textsc{Creusillet} to improve speed. The other tests could
-not improve the simplest test based on regions. Note that it is not fast
-anymore when coping with regions.\marginpar{RK->BS: could you precise?}
+Region-based chains are only compatible with the Rice Fast Dependence Graph
+option (see Section~\ref{subsubsection-menu-for-dependence-tests})
+which has been extended to deal with them\footnote{When using regions,
+the {\em fast} qualifier does not stand anymore, because the dependence
+test involves dealing with convex systems that contain much more
+contraints than when using the sole array indices.}.  Other
+dependence tests do not use region descritors (their convex system),
+because they cannot improve the Rice Fast Dependence test based on regions. 
+ 
 %%!UserManualDocumentation
 
 \begin{PipsMake}
@@ -2001,23 +2019,23 @@ region_chains                   > MODULE.chains
 %%@UserManualDocumentation: in_out_regions_chains
 \label{subsubsection-in-out-region-based-chains}
 
+Beware : this option is for experimental use only; resulting parallel code
+may not be equivalent to input code (see the explanations below).
+
 When \verb+in_out_regions_chains+ is selected, IN and OUT regions (see
 Sections~\ref{subsubsection-in-regions} and
-\ref{subsubsection-out-regions}) are used instead of READ and WRITE
-regions, only at call sites. Otherwise, usual regions are used.
+\ref{subsubsection-out-regions}) are used at call sites instead of
+READ and WRITE regions. For all other statements, usual READ and WRITE
+regions are used. 
 
-Arrays and scalars which are {\em logically} local to callees, but
-exposed to callers because they are statically allocated or formal
-parameters, are ignored. The resulting parallel loops require some
-reallocation work in the callees. Ideally, the logically local
-variables should be made {\em physically} local automatically,
-e.g. stack allocated or dynamically allocated, but this memory
-allocation transformation is not (yet) implemented in
-\PIPS{}. \marginpar{RK: Not clear (FI: To be deleted?)}
-
-Thus \verb+in_out_regions_chains+ are not safe: the resulting code is
-not equivalent to the input code. It is only useful for manual
-experiments.
+As a consequence, arrays and scalars which could be declared as
+local in callees, but are exposed to callers because they are
+statically allocated or are formal parameters, are ignored, increasing
+the opportunities to detect parallel loops. But as the program
+transformation which consists in {\em privatizing} variables in
+modules is not yet implemented in \PIPS{}, the code resulting from the
+parallelization with \verb+in_out_regions_chains+ may not be
+equivalent to the original sequential code. 
 
 As for region-based chains (see
 Section~\ref{subsubsection-read-write-region-based-chains}), the
@@ -3774,28 +3792,22 @@ COMPLEXITY_EARLY_EVALUATION FALSE
 \index{Region}
 \index{Array Region}
 
-Regions of module statements.
 %%@UserManualDocumentation: regions
-A local region provides an approximation of the effects a statement has on
-the module variables.  See~\cite{T84,TIF86,Pla90,C90,CI95,CI96} for more
-information about regions.
 
 
-Regions are not sets of array elements but functions mapping a store onto a
-convex set of array elements. Regions may be expressed with respect to the
-initial store of a module, or to the store passed to the statement they are
-associated with.
+Array regions are functions mapping a memory store onto a convex set
+of array elements. They are used to represent the memory effects of
+modules or statements. Hence, they are expressed with respect to the
+initial store of the module or to the store immediately preceding the
+execution of the statement they are associated with. 
 
-An array region is described by a convex polyhedron containing equalities
-and inequalities~\cite{T84}: they link the {\em region parameters\/} (or
-$\phi$ variables) that represent the array dimensions, to the values of the
-program integer scalar variables. Two other characteristics are also of
-interest:
-%
+Apart from the array name and its dimension descriptors (or
+$\phi$ variables), an array region contains three additional informations:
+ 
 \begin{itemize}
 \item The {\em type\/} of the region: \verb+READ+ (\verb+R+) or \verb+WRITE+
-(\verb+W+) to represent the effects of statements and procedures; \verb+in+
-and \verb+out+ to represent the flow of array elements.
+(\verb+W+) to represent the effects of statements and procedures; \verb+IN+
+and \verb+OUT+ to represent the flow of array elements.
 
 \item The {\em approximation\/} of the region: \verb+EXACT+ when the region
   exactly represents the requested set of array elements, or \verb+MAY+ or
@@ -3811,9 +3823,13 @@ and \verb+out+ to represent the flow of array elements.
   regions are flow sensitive. Any array element touched by any execution of
   a statement is in the \verb+MAY+ region of this statement. Any array
   element in the \verb+MUST+ region of a statement is accessed by any
-  execution of this statement. \end{itemize}
-%
+  execution of this statement. 
 
+\item  a convex polyhedron containing equalities and inequalities:
+  they link the $\phi$ variables that represent the array dimensions,
+  to the values of the program integer scalar variables. 
+\end{itemize}
+ 
 For instance, the region:
 \begin{alltt}
   \begin{center}
@@ -3825,30 +3841,41 @@ the first and second dimensions of \verb+A+, corresponds to an assignment
 of the element \verb+A(I,I)+.
 
 
-\verb+MAY+ \verb+READ+ and \verb+WRITE+ region analysis was first designed
-by Rémi \textsc{Triolet} and then revisited by François \textsc{Irigoin}. The concept of
-region is being revisited by Béatrice \textsc{Creusillet}, who added \verb+MUST+,
-\verb+IN+ and \verb+OUT+ regions. Alexis \textsc{Platonoff} implemented the first
-version of region analysis in \PIPS{}. These regions were computed with
-respect to the initial stores of the modules. François \textsc{Irigoin} and,
-mainly, Béatrice \textsc{Creusillet} added new functionalities to this first
-version, as well as functions to compute the new kinds of regions.
-
 Internally, regions are of type \texttt{effect} and as such can be used to build
-use-def chains (see Section~\ref{subsection-chains}). The most important
-option is based on {\em proper regions}. Proper regions are
+use-def chains (see
+Section~\ref{subsubsection-read-write-region-based-chains}). Regions
+chains are built using {\em proper regions} which are particular
 \verb+READ+ and \verb+WRITE+ regions. For simple statements (assignments,
 calls to intrinsic functions), summarization is avoided to preserve
 accuracy. At this inner level of the program control flow graph, the extra
 amount of memory necessary to store regions without computing their convex
-hull should not be too high compare to the expected gain for dependence
+hull should not be too high compared to the expected gain for dependence
 analysis. For tests and loops, proper regions contain the regions associated
-to the condition or the range. And for external calls, proper regions are
-the summary regions of the callee translated into the caller's name space, to
-which are merely appended the regions of the expressions passed as argument
-(no summarization for this step).
+to the condition or the range. And for external calls, proper regions
+are the {\em summary regions} of the callee translated into the caller's name
+space, to which are merely appended the regions of the expressions
+passed as argument (no summarization for this step).
 
-Together with read/write regions and in regions are computed their invariant versions for loop bodies (\texttt{MODULE.inv\_regions} and \texttt{MODULE.inv\_in\_regions}). For a given loop body, they are equal to the corresponding regions in which all variables that may be modified by the loop body (except the current loop index) are eliminated from the descriptors (convex polyhedron). For other statements, they are equal to the empty list of regions. 
+Together with READ/WRITE regions and IN regions are computed their
+invariant versions for loop bodies (\texttt{MODULE.inv\_regions} and
+\texttt{MODULE.inv\_in\_regions}). For a given loop body, they are
+equal to the corresponding regions in which all variables that may be
+modified by the loop body (except the current loop index) are
+eliminated from the descriptors (convex polyhedron). For other
+statements, they are equal to the empty list of regions.  
+
+\verb+MAY+ \verb+READ+ and \verb+WRITE+ region analysis was first designed
+by Rémi \textsc{Triolet}~\cite{T84} and then revisited by François
+\textsc{Irigoin}~\cite{TIF86}. Alexis \textsc{Platonoff}~\cite{Pla90}
+implemented the first version of region analysis in \PIPS{}. These
+regions were computed with respect to the initial stores of the
+modules. François \textsc{Irigoin} and, mainly, Béatrice
+\textsc{Creusillet}~\cite{CI95,CI96,C96}, added new functionalities to
+this first version as well as functions to compute \verb+MUST+
+regions, and \verb+IN+ and \verb+OUT+ regions.  
+
+Array regions for C programs are currently under development.
+
 
 %%!UserManualDocumentation
 
@@ -3904,10 +3931,9 @@ must_regions                    > MODULE.regions
 \index{Summary Region}
 \index{Region (Summary)}
 
-SUMMARY\_REGIONS. Regions of a module. A summary region provides an
-approximation of the effects observable by a caller that a module has on
-its variables and, indirectly, on the global and static variables of its
-callees.
+Module summary regions provides an approximation of the effects it's
+execution has on its callers variables as well as on global and
+static variables of its callees.
 
 \begin{PipsMake}
 summary_regions                 > MODULE.summary_regions
@@ -4015,7 +4041,7 @@ out_regions                     > MODULE.out_regions
 if {\tt MUST\_REGIONS} is true, then it computes regions using the
 algorithm described in report E/181/CRI, called {\em $T^{-1}$
 algorithm}. It provides more accurate regions, and preserve MUST
-approximations more often. But it is less efficient. Its default value
+approximations more often. As it is more costly, its default value
 is FALSE. EXACT\_REGIONS is true for the moment for backward
 compatibility only.
 
@@ -4028,18 +4054,33 @@ MUST_REGIONS FALSE
 \end{PipsProp}
 
 The default option is to compute regions without taking into account array
-bounds. Both options have their advantages and drawbacks.
+bounds. The next property can be turned to {\tt TRUE} to
+systematically add them in
+the region descriptors. Both options have their advantages and drawbacks. 
 
 \begin{PipsProp}
 REGIONS_WITH_ARRAY_BOUNDS FALSE
 \end{PipsProp}
 
-\marginpar{Comments from Nga Nguyen: The explanation of this property is
-  not clear}
 
-I intend to compute disjunctions of regions. As I have already prepared basic
-operators for that purpose, I created two properties to switch between regions
-and disjunctions of regions. For the moment, they are always false.
+The current implementation of effects (simple effects as well as
+convex array regions) relies on a generic engine which is independent
+of the effect descriptor representation. The current representation
+for array regions, parameterized integer convex polyhedra, allows
+various patterns an provides the ability to exploit context
+information at a reasonable expense. However, some very common
+patterns such as nine-point stencils used in seismic computations or
+red-black patterns cannot be represented. It has been a long lasting
+temptation to try other repesentations~\cite{C96}. 
+
+A Complementary sections (see Section~\ref{subsection-complementary-sections})
+implementation was formerly began as a set of new phases by
+Manjunathaiah \textsc{Muniyappa}, but is not maintained anymore. 
+
+And Nga Nguyen more recently created two properties to switch between
+regions and disjunctions of regions (she has already prepared basic
+operators). For the moment, they are always {\tt FALSE}.
+
 
 \begin{PipsProp}
 DISJUNCT_REGIONS FALSE
@@ -4049,11 +4090,12 @@ DISJUNCT_REGIONS FALSE
 DISJUNCT_IN_OUT_REGIONS FALSE
 \end{PipsProp}
 
-Statistics may be obtained about the computation of array regions. When the first
-property ({\tt REGIONS\_OP\_STATISTICS}) is set to ({\tt TRUE}) statistics are
+Statistics may be obtained about the computation of array
+regions. When the next 
+property ({\tt REGIONS\_OP\_STATISTICS}) is set to {\tt TRUE} statistics are
 provided about operators on regions (union, intersection,
-projection,\dots). The second property turns on the collection of statistics
-about the interprocedural translation.
+projection,\dots). The second next property turns on the collection of
+statistics about the interprocedural translation.
 
 \begin{PipsProp}
 REGIONS_OP_STATISTICS FALSE
@@ -4187,8 +4229,11 @@ print_alias_classes > MODULE.alias_file
 alias compsec 'Complementary Sections'
 \end{PipsMake}
 
-A new type of array regions, from Manjunathaiah \textsc{Muniyappa}.
-\marginpar{RK: Sounds great ! :-) FI: Validation? Experimental?}
+A new representation of array regions added in \PIPS{} by
+Manjunathaiah \textsc{Muniyappa}. This anlysis is not maintained
+anymore.
+
+
 
 \subsection{READ/WRITE Complementary Sections}
 \label{subsubsection-complementary-sections}
@@ -10655,12 +10700,18 @@ Rapport interne EMP-CRI-E129, septembre 1990
 Performance Fortran}},
 Rapport interne EMP-CRI-A238, juin 1993
 
+ 
+  \bibitem{C96} Béatrice Creusillet {\em
+Analyses de régions de tableaux et applications}, 
+Thèse de doctorat de l'Ecolde des Mines de Paris,
+Décembre 1996 (available as A/295/CRI).
+ 
   \bibitem{CI95} Béatrice Creusillet, François Irigoin, {\em
 Interprocedural Array Region Analyses}, Workshop on Languages and
 Compilers for Parallel Computing, LCPC'95, Colombus, OHIO, USA, 10-12
 Août 1995 (also available as TR A/270).
 
-\bibitem{CI96} Béatrice Creusillet, François Irigoin, {\em Interprocedural
+  \bibitem{CI96} Béatrice Creusillet, François Irigoin, {\em Interprocedural
     Array Region Analyses}, International Journal on Parallel Programming
   (special issue on Languages and Compilers for Parallel Computing, LCPC'95),
   24(6), (also available as TR A/282).
