@@ -47,7 +47,6 @@ Ask for the parallelization of all the modules of the program with OpenMP output
          ENDDO
       ENDDO
       END
-Consider the generated parallel as the sequential code now:
 
       SUBROUTINE A
       PARAMETER (NVAR=3,NXM=2000,NYM=2000)
@@ -89,5 +88,4 @@ Consider the generated parallel as the sequential code now:
          ENDDO
       ENDDO
       END
-Consider the generated parallel as the sequential code now:
 Regenerate the sources from the PIPS transformed code:
