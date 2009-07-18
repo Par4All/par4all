@@ -1204,9 +1204,17 @@ Three validation scripts are available:
   This script is also used by the various nightly validations such as
   \verb|pips_at_night|.
 
-\item[manual\_accept] \index{Validate} interactive script to accept new
-  validation results. It accepts a list of directories to ask for
-  accepting or it deals with all the validation by default.
+\item[pips\_manual\_accept] \index{Validate} interactive script to accept
+  new validation results. It accepts a list of directories or validation
+  files to ask for accepting or it deals with all the validation by
+  default.
+
+  If the script is used without any parameter all the validation
+  acceptation is asked for all the validation differences.
+
+  If the script is called with \verb|--new|, then the validation
+  acceptance is asked against what is newer in the last validation than in
+  the previous one.
 
   Once you have accepts the new states as a reference for some validation
   items, you need to commit these changes to the validation repository, if
@@ -1217,7 +1225,7 @@ Three validation scripts are available:
   environment variable to \verb|pips_emacs_diff| to use graphical Ediff
   merge mode sounds like a good idea. You can use it like:
 \begin{verbatim}
-PIPS_GRAPHICAL_DIFF=pips_emacs_diff manual_accept LoopRecovering
+PIPS_GRAPHICAL_DIFF=pips_emacs_diff pips_manual_accept --new
 \end{verbatim}
 
 \item[pips\_force\_accept] to massively accept some changes in a

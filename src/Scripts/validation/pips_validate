@@ -246,7 +246,7 @@ function validate_file()
       mkdir $full_name.result
       touch $full_name.result/test
       echo "Directory $full_name.result created."
-      echo "Think to run a manual_accept to set the results of the validation"
+      echo "Think to run a pips_manual_accept to set the results of the validation"
       echo "  of this file as the reference."
     else
       verb 1 "skipping $file: no matching result directory"

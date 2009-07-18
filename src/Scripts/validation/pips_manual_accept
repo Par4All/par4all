@@ -78,7 +78,13 @@ function handle_directory()
 
 if [[ ! $@ ]] ; then
     # If no directory names given, ask for accepting all the validation
-    set *
+    set -- *
+fi
+
+if [[ $1 == "--new" ]] ; then
+  # Validate all against what is newer in the last validation than in the
+  # previous one:
+  set -- `diff SUMMARY_Archive/SUMMARY-previous SUMMARY_Archive/SUMMARY-last | sed -n 's/> changed: //p'`
 fi
 
 for arg ; do
