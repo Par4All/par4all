@@ -8,14 +8,18 @@ C     See also privatization07, 08, 09 and 10
       SUBROUTINE PRIVATIZATION01
       INTEGER A(10)
 
+
+!$OMP DOPRIVATE(I,J)
       DO I = 1, 10                                                      0011
-         PRIVATE I,J
+         PRIVATE(I,J)
          J = J+1                                                        0012
          A(I) = J                                                       0013
       ENDDO
 
+
+!$OMP DOPRIVATE(I,J)
       DO I = 1, 10                                                      0016
-         PRIVATE I,J
+         PRIVATE(I,J)
          J = 1                                                          0017
          A(I) = J                                                       0018
       ENDDO

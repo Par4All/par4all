@@ -31,6 +31,7 @@ void invariant02(int ni, int nj)
 
    i = MAX(INT(ni), 0);
    s = a*b;
+#pragma omp parallel for 
    for(i = 0; i <= ni-1; i += 1)
       y[i] = s;
 }

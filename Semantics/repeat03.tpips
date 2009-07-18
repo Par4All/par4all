@@ -42,14 +42,10 @@ setproperty PARALLELIZATION_STATISTICS=TRUE
 echo Ask for the parallelization of all the modules of the program with OpenMP getimage:
 activate PRINT_PARALLELIZEDOMP_CODE
 display PARALLELPRINTED_FILE[getimage]
-activate COARSE_GRAIN_PARALLELIZATION
-capply INTERNALIZE_PARALLEL_CODE[getimage]
+apply COARSE_GRAIN_PARALLELIZATION[getimage]
 
 module getimage
-display PARALLELPRINTED_FILE[getimage]
-echo Consider the generated parallel as the sequential code now:
-capply INTERNALIZE_PARALLEL_CODE[getimage]
-setproperty PRETTYPRINT_SEQUENTIAL_STYLE    "omp"
+display PRINTED_FILE[getimage]
 echo Regenerate the sources from the PIPS transformed code:
 apply UNSPLIT
 close

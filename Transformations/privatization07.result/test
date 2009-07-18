@@ -5,10 +5,14 @@ C     to privatization02.f)
       INTEGER A(10)
 
       J = 0                                                             0007
+
+!$OMP DOPRIVATE(I,K)
       DO I = 1, 10                                                      0008
-         PRIVATE I,K
+         PRIVATE(I,K)
+
+!$OMP    DOPRIVATE(K)
          DO K = 1, 10                                                   0009
-            PRIVATE K
+            PRIVATE(K)
             J = J+1                                                     0010
          ENDDO
          A(I) = J                                                       0012

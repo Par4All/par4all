@@ -7,14 +7,18 @@ C     used in the next loop nest. Hence j cannot be privatized.
       SUBROUTINE PRIVATIZATION09
       INTEGER A(10)
 
+
+!$OMP DOPRIVATE(I)
       DO I = 1, 10                                                      0010
-         PRIVATE I
+         PRIVATE(I)
          J = J+1                                                        0011
          A(I) = J                                                       0012
       ENDDO
 
+
+!$OMP DOPRIVATE(I)
       DO I = 1, 10                                                      0015
-         PRIVATE I
+         PRIVATE(I)
          A(I) = J                                                       0016
       ENDDO
       END

@@ -9,10 +9,7 @@ C     NOTE: scalarization takes place all the same
       REAL X(N), Y(N)      
 C     BEGIN BLOCK
       DO I = 1, N                                                       0007
-C        BEGIN BLOCK
-         __ld__0 = Y(I)                                                 0008
-         X(I) = __ld__0
-C        END BLOCK
+         X(I) = Y(I)                                                    0008
       ENDDO
 C     END BLOCK
       END

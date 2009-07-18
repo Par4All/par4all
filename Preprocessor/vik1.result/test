@@ -1822,7 +1822,7 @@ extern void funlockfile (FILE *__stream) ;
    several optimizing inline functions and macros.  */
 # 912 "/usr/include/stdio.h" 3 4
 
-# 2 "./vik1.c" 2
+# 2 "$VDIR/vik1.c" 2
 /* Copyright (C) 1991-1994,1996-2002,2003,2005,2006
 	Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -2418,7 +2418,7 @@ extern int futimes (int __fd, const struct timeval __tvp[2]) ;
    NOTE: `timercmp' does not work for >= or <=.  */
 # 191 "/usr/include/sys/time.h" 3 4
 
-# 3 "./vik1.c" 2
+# 3 "$VDIR/vik1.c" 2
 /* $XdotOrg: lib/X11/include/X11/Xlib.h,v 1.6 2005-11-08 06:33:25 jkj Exp $ */
 /* $Xorg: Xlib.h,v 1.6 2001/02/09 02:03:38 xorgcvs Exp $ */
 /*
@@ -7572,7 +7572,7 @@ extern int _Xwctomb(
 );
 
 
-# 4 "./vik1.c" 2
+# 4 "$VDIR/vik1.c" 2
 /* $Xorg: keysym.h,v 1.4 2001/02/09 02:03:23 xorgcvs Exp $ */
 
 /***********************************************************
@@ -7936,7 +7936,7 @@ SOFTWARE.
 # 2090 "/usr/include/X11/keysymdef.h" 3 4
 /* one, two and three are defined above. */
 # 76 "/usr/include/X11/keysym.h" 2 3 4
-# 5 "./vik1.c" 2
+# 5 "$VDIR/vik1.c" 2
 
 
                          Window L;
@@ -7971,7 +7971,7 @@ XCreatePixmap (K, L,e,d=D,((&((_XPrivDisplay)K)->screens[0])->root_depth)),u=h=q
 XPending (K)?C[F+
 XLookupKeysym (&O.xkey,0&
 XNextEvent (K,&O))]^=O.type==2||O.type==3,p:0;
-# 48 "./vik1.c"
+# 48 "$VDIR/vik1.c"
                             /* Some more code */
 
 
@@ -8010,7 +8010,7 @@ XCreatePixmap (K, L,e,d=D,((&((_XPrivDisplay)K)->screens[0])->root_depth)),u=h=q
 XPending (K)?C[F+
 XLookupKeysym (&O.xkey,0&
 XNextEvent (K,&O))]^=O.type==2||O.type==3,p:0;
-# 48 "./vik1.c"
+# 48 "$VDIR/vik1.c"
                             /* Some more code */
 
 
@@ -9850,7 +9850,7 @@ extern void funlockfile (FILE *__stream) ;
    several optimizing inline functions and macros.  */
 # 912 "/usr/include/stdio.h" 3 4
 
-# 2 "./vik1.c" 2
+# 2 "$VDIR/vik1.c" 2
 /* Copyright (C) 1991-1994,1996-2002,2003,2005,2006
 	Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -10446,7 +10446,7 @@ extern int futimes (int __fd, const struct timeval __tvp[2]) ;
    NOTE: `timercmp' does not work for >= or <=.  */
 # 191 "/usr/include/sys/time.h" 3 4
 
-# 3 "./vik1.c" 2
+# 3 "$VDIR/vik1.c" 2
 /* $XdotOrg: lib/X11/include/X11/Xlib.h,v 1.6 2005-11-08 06:33:25 jkj Exp $ */
 /* $Xorg: Xlib.h,v 1.6 2001/02/09 02:03:38 xorgcvs Exp $ */
 /*
@@ -15600,7 +15600,7 @@ extern int _Xwctomb(
 );
 
 
-# 4 "./vik1.c" 2
+# 4 "$VDIR/vik1.c" 2
 /* $Xorg: keysym.h,v 1.4 2001/02/09 02:03:23 xorgcvs Exp $ */
 
 /***********************************************************
@@ -15964,7 +15964,7 @@ SOFTWARE.
 # 2090 "/usr/include/X11/keysymdef.h" 3 4
 /* one, two and three are defined above. */
 # 76 "/usr/include/X11/keysym.h" 2 3 4
-# 5 "./vik1.c" 2
+# 5 "$VDIR/vik1.c" 2
 
 
                          Window L;

@@ -5,8 +5,10 @@ C     privatization fine as the output is undefined.
       SUBROUTINE PRIVATIZATION04
       INTEGER A(10)
 
+
+!$OMP DOPRIVATE(I,J)
       DO I = 1, 10                                                      0008
-         PRIVATE I,J
+         PRIVATE(I,J)
          J = J+1                                                        0009
          A(I) = J                                                       0010
       ENDDO

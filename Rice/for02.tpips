@@ -62,11 +62,8 @@ echo Ask for some statistics about the job to be done:
 setproperty PARALLELIZATION_STATISTICS=TRUE
 echo Ask for the parallelization of "for02"
 activate RICE_ALL_DEPENDENCE
-activate COARSE_GRAIN_PARALLELIZATION
-activate PRINT_PARALLELIZEDOMP_CODE
-
-display PARALLELPRINTED_FILE[for02]
+apply COARSE_GRAIN_PARALLELIZATION[for02]
+display PRINTED_FILE[for02]
 
 close
 quit
-

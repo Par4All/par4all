@@ -7,7 +7,9 @@ display PRINTED_FILE
 
 echo
 echo Parallel version:
-activate COARSE_GRAIN_PARALLELIZATION
+apply COARSE_GRAIN_PARALLELIZATION
+display PRINTED_FILE 
+
 display PARALLELPRINTED_FILE
 
 close

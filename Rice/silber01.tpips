@@ -1,7 +1,7 @@
 create silber01 silber01.f
 module SILBER01
-activate COARSE_GRAIN_PARALLELIZATION
-display PARALLELPRINTED_FILE[SILBER01]
+apply COARSE_GRAIN_PARALLELIZATION
+display PRINTED_FILE
 close
 delete silber01
 quit

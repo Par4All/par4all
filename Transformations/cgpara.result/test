@@ -3,7 +3,9 @@ C     parallelization phase of PIPS
       SUBROUTINE TEST1(A,N)
       INTEGER N,A(N),I
 
-      DOALL I = 1, N                                                    0006
+
+!$OMP PARALLEL DO 
+      DO I = 1, N                                                       0006
          A(I) = 0                                                       0007
       ENDDO
       END
@@ -20,7 +22,9 @@ C     parallelization phase of PIPS
       INTEGER N,A(N,N),I,J
 
       DO I = 1, N                                                       0005
-         DOALL J = 1, N                                                 0006
+
+!$OMP    PARALLEL DO 
+         DO J = 1, N                                                    0006
             A(I,J) = A(I+1,J)                                           0007
          ENDDO
       ENDDO
@@ -30,7 +34,9 @@ C     parallelization phase of PIPS
       INTEGER N,A(N,N),I,J
 
       DO I = 1, N                                                       0005
-         DOALL J = 1, N                                                 0006
+
+!$OMP    PARALLEL DO 
+         DO J = 1, N                                                    0006
             A(I,J) = A(I+1,J)                                           0007
          ENDDO
       ENDDO
@@ -39,11 +45,15 @@ C     parallelization phase of PIPS
       SUBROUTINE TEST4(A,N,K)
       INTEGER N,A(N),I,K
 
-      DOALL I = 1, N                                                    0005
+
+!$OMP PARALLEL DO 
+      DO I = 1, N                                                       0005
          IF (I.NE.K) A(I) = 0                                           0006
       ENDDO
 
-      DOALL I = 1, N                                                    0011
+
+!$OMP PARALLEL DO 
+      DO I = 1, N                                                       0011
          IF (I.LE.K) GOTO 99999                                         0012
 
          IF (I.GE.K) THEN                                               0017

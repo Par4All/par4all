@@ -3,10 +3,14 @@ C     Check that j is privatized when there is a def-def arc
       SUBROUTINE PRIVATIZATION06
       INTEGER A(10, 10)
 
+
+!$OMP DOPRIVATE(I,J,K)
       DO I = 1, 10                                                      0006
+
+!$OMP    DOPRIVATE(J,K)
          DO K = 1, 10                                                   0007
-         PRIVATE I,J,K
-            PRIVATE J,K
+         PRIVATE(I,J,K)
+            PRIVATE(J,K)
             J = 0                                                       0008
             J = 1                                                       0009
             A(I,K) = J                                                  0010

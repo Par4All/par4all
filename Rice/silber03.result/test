@@ -5,7 +5,9 @@ C     presented at CPC'98
 
       REAL A(N), B(N)
 
-      DOALL I = 1, N                                                    0008
+
+!$OMP PARALLEL DO 
+      DO I = 1, N                                                       0008
          IF (A(I).GE.0.) B(I) = 0.                                      0009
          A(I) = 1.                                                      0012
       ENDDO

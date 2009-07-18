@@ -7,10 +7,10 @@ extern int main(int argc, char *argv[]);
 int main(int argc, char *argv[]) {
   return inC1(argc);
 }
-# 1 "./missing01.c"
+# 1 "$VDIR/missing01.c"
 # 1 "<built-in>"
 # 1 "<command-line>"
-# 1 "./missing01.c"
+# 1 "$VDIR/missing01.c"
 /* To test the stub generation of the missing int inC1(int) */
 extern int main(int argc, char *argv [ ]);
 int inC1(int f1)

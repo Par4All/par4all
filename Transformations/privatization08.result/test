@@ -6,14 +6,18 @@ C     with a proper initialization of J
       INTEGER A(10)
 
       J = 0                                                             0008
+
+!$OMP DOPRIVATE(I)
       DO I = 1, 10                                                      0009
-         PRIVATE I
+         PRIVATE(I)
          J = J+1                                                        0010
          A(I) = J                                                       0011
       ENDDO
 
+
+!$OMP DOPRIVATE(I,J)
       DO I = 1, 10                                                      0014
-         PRIVATE I,J
+         PRIVATE(I,J)
          J = 1                                                          0015
          A(I) = J                                                       0016
       ENDDO

@@ -2504,7 +2504,7 @@ extern int getloadavg (double __loadavg[], int __nelem)
 /* Define some macros helping to catch buffer overflows.  */
 # 891 "/usr/include/stdlib.h" 3 4
 
-# 10 "./conv-cpu.c" 2
+# 10 "$VDIR/conv-cpu.c" 2
 
 
 /*
@@ -5102,7 +5102,7 @@ extern int getloadavg (double __loadavg[], int __nelem)
 /* Define some macros helping to catch buffer overflows.  */
 # 891 "/usr/include/stdlib.h" 3 4
 
-# 10 "./conv-cpu.c" 2
+# 10 "$VDIR/conv-cpu.c" 2
 
 
 /*

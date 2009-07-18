@@ -55,16 +55,12 @@ echo Ask for some statistics about the job to be done:
 setproperty PARALLELIZATION_STATISTICS=TRUE
 echo Ask for the parallelization of all the modules of the program with OpenMP output:
 activate RICE_ALL_DEPENDENCE
-activate COARSE_GRAIN_PARALLELIZATION
-activate PRINT_PARALLELIZEDOMP_CODE
+apply COARSE_GRAIN_PARALLELIZATION[getimage]
+display PRINTED_FILE[getimage]
 
-module getimage
-display PARALLELPRINTED_FILE[getimage]
-module main
-display PARALLELPRINTED_FILE[main]
-echo Consider the generated parallel as the sequential code now:
-capply INTERNALIZE_PARALLEL_CODE[getimage,main]
-setproperty PRETTYPRINT_SEQUENTIAL_STYLE    "omp"
+apply COARSE_GRAIN_PARALLELIZATION[main]
+display PRINTED_FILE[main]
+
 echo Regenerate the sources from the PIPS transformed code:
 apply UNSPLIT
 close

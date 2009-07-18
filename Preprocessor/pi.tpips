@@ -42,12 +42,9 @@ capply INTERNALIZE_PARALLEL_CODE[main]
 echo Ask for some statistics about the job to be done:
 setproperty PARALLELIZATION_STATISTICS=TRUE
 echo Ask for the parallelization of all the modules of the program with OpenMP output:
-activate COARSE_GRAIN_PARALLELIZATION
-activate PRINT_PARALLELIZEDOMP_CODE
-display PARALLELPRINTED_FILE[main]
-echo Consider the generated parallel as the sequential code now:
-capply INTERNALIZE_PARALLEL_CODE[main]
-setproperty PRETTYPRINT_SEQUENTIAL_STYLE    "omp"
+apply COARSE_GRAIN_PARALLELIZATION
+display PRINTED_FILE[main]
+
 echo Regenerate the sources from the PIPS transformed code:
 apply UNSPLIT
 close
