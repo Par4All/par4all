@@ -43,9 +43,6 @@ echo
 echo after paralellization
 echo
 
-activate COARSE_GRAIN_PARALLELIZATION
-#apply INTERNALIZE_PARALLEL_CODE[convol]
-
 setproperty LOOP_LABEL "l400"
 setproperty OUTLINE_MODULE_NAME "microcode"
 apply TERAPIXIFY[convol]

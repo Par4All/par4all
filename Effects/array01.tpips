@@ -68,10 +68,8 @@ echo
 echo Printed files after parallelization
 echo
 
-activate COARSE_GRAIN_PARALLELIZATION
-
-activate PRINT_PARALLELIZEDOMP_CODE
-display PARALLELPRINTED_FILE[ARRAY01]
+apply COARSE_GRAIN_PARALLELIZATION
+display PRINTED_FILE[ARRAY01]
 
 close
 delete array01

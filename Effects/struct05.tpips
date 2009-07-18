@@ -68,10 +68,8 @@ echo
 echo Printed files after parallelization
 echo
 
-activate COARSE_GRAIN_PARALLELIZATION
-
-activate PRINT_PARALLELIZEDOMP_CODE
-display PARALLELPRINTED_FILE[struct05]
+apply COARSE_GRAIN_PARALLELIZATION[struct05]
+display PRINTED_FILE[struct05]
 
 close
 # delete struct05

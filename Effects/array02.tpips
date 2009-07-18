@@ -68,9 +68,7 @@ echo
 echo Printed files after parallelization
 echo
 
-activate COARSE_GRAIN_PARALLELIZATION
-
-activate PRINT_PARALLELIZEDOMP_CODE
+apply COARSE_GRAIN_PARALLELIZATION[array02]
 display PARALLELPRINTED_FILE[array02]
 
 close

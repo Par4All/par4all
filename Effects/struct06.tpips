@@ -47,9 +47,6 @@ echo
 echo Printed files after parallelization
 echo
 
-# Should be useless
-# activate COARSE_GRAIN_PARALLELIZATION
-
 activate PRINT_PARALLELIZEDOMP_CODE
 display PARALLELPRINTED_FILE[struct06]
 

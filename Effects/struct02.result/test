@@ -218,10 +218,21 @@ int struct02()
    struct two x[10];
    int i = 0;
 
-#pragma omp parallel for 
+//  <x[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1<=9, 1<=PHI2, PHI2<=2}>
+
+
    for(i = 0; i <= 9; i += 1)
+
+//  <x[PHI1][PHI2]-W-EXACT-{PHI1==i, 1<=PHI2, PHI2<=2, 0<=i, i<=9}>
+
       if (1) {
+
+//  <x[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==1, 0<=i, i<=9}>
+
          x[i].first = 1;
+
+//  <x[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==2, 0<=i, i<=9}>
+
          x[i].second = 0;
       }
       else {

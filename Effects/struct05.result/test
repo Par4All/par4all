@@ -177,9 +177,20 @@ int struct05()
    struct two x[10];
    int i = 0;
 
-#pragma omp parallel for 
+//  <x[PHI1][PHI2]-R-EXACT-{PHI2==2, 0<=PHI1, PHI1<=9}>
+//  <x[PHI1][PHI2]-W-EXACT-{PHI2==1, 0<=PHI1, PHI1<=9}>
+
+
    for(i = 0; i <= 9; i += 1)
+
+//  <x[PHI1][PHI2]-R-EXACT-{PHI1==i, PHI2==2, 0<=i, i<=9}>
+//  <x[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==1, 0<=i, i<=9}>
+
       if (1)
+
+//  <x[PHI1][PHI2]-R-EXACT-{PHI1==i, PHI2==2, 0<=i, i<=9}>
+//  <x[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==1, 0<=i, i<=9}>
+
          x[i].first = x[i].second;
       else
          x[i].second = x[i].first;
