@@ -48,7 +48,7 @@ validate: clean-target
 
 .PHONY: accept
 accept:
-	manual_accept $(TARGET)
+	pips_manual_accept $(TARGET)
 
 # extract private (restricted access) validation
 .PHONY: private
