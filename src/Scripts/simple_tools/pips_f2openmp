@@ -46,8 +46,6 @@ source ${SimpleTool_dir}/simple_tools.bash
     openmp_parallelization_rice
     internalize_parallel_code
     openmp_parallelization_coarse_grain
-    internalize_parallel_code
-    select_omp_sequential_output
     regenerate_source
 } | tpips
 

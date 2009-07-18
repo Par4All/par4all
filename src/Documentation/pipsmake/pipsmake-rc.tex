@@ -4521,8 +4521,13 @@ distribution is performed, but any kind of loop body is acceptable
 whereas \textsc{Allen} \& \textsc{Kennedy} algorithm only copes with very simple loop bodies.
 %%!UserManualDocumentation
 
+For nasty reasons about effects that are statement addresses to effects
+mapping, it changes the code instead of producing a
+\verb|parallelized_code| resource. It is not a big deal since often we
+want to modify the code again and we should use
+\verb|internalize_parallel_code| just after.
 \begin{PipsMake}
-coarse_grain_parallelization > MODULE.parallelized_code
+coarse_grain_parallelization > MODULE.code
         < PROGRAM.entities
         < MODULE.code
         < MODULE.cumulated_effects
@@ -5776,7 +5781,9 @@ HWAC_SPOC_DEPTH 8
 
 
 %%@UserManualDocumentation: invariant_code_motion
-This is a test to implement a invariant code motion. It doesn't work currently.
+This is a test to implement a loop-invariant code motion.
+
+A side effect of this transformation is that the code is parallelized too.
 %%!UserManualDocumentation
 
 \begin{PipsMake}
@@ -5785,6 +5792,7 @@ invariant_code_motion             > MODULE.code
         < MODULE.proper_effects
         < MODULE.code MODULE.dg
 \end{PipsMake}
+
 
 \subsection{Partial Redundancy Elimination}
 \label{subsection-partial_redundancy_elimination}
@@ -8520,8 +8528,10 @@ application of \verb|INTERNALIZE_PARALLEL_CODE| the parallel code that is
 hidden in the sequential code. Possible values are: \texttt{do doall f90
   hpf cray craft cmf omp}.
 
+By default, parallel information is displayed with am OpenMP flavor since
+it is widely used nowadays.
 \begin{PipsProp}
-PRETTYPRINT_SEQUENTIAL_STYLE    "do"
+PRETTYPRINT_SEQUENTIAL_STYLE    "omp"
 \end{PipsProp}
 
 

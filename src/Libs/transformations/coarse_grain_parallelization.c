@@ -72,6 +72,9 @@ typedef dg_vertex_label vertex_label;
 
 #include "ricedg.h"
 
+static bool local_use_reductions_p;
+
+
 /** Parallelize a loop by using region informations to prove iteration
     independance.
 
@@ -269,25 +272,41 @@ static void coarse_grain_loop_parallelization(statement module_stat)
     @param module_name is the name of the module to parallelize
     @return TRUE in case of success. Indeed, return alway true. :-)
  */
-bool coarse_grain_parallelization(string module_name)
+bool coarse_grain_parallelization_main(string module_name,
+				       bool use_reductions_p)
 {
     statement module_stat;
     entity module;
 
+    /* Warn everybody here if we use or not reductions: */
+    local_use_reductions_p = use_reductions_p;
+
     /* Get the code of the module. */
-    set_current_module_entity(module_name_to_entity(module_name));
-    module = get_current_module_entity();
-    /* Ask for a throwable copy of the CODE since we rewrite it on the fly
-       to build a PARALLELIZED_CODE with it: */
-    set_current_module_statement((statement)db_get_memory_resource(DBR_CODE,
-								   module_name,
-								   FALSE));
-    module_stat = get_current_module_statement();
+    /* Build a copy of the CODE since we rewrite it on the fly to build a
+       PARALLELIZED_CODE with it. Do not use
+       db_get_memory_resource(,,FALSE) since it is more efficient to use a
+       gen_copy_statement() and it has nasty effects on informations
+       attached on the DBR_CODE with the statement addresses (see Trac
+       ticket #159 in 2009).
+
+       Well, indeed even this does not work. So this phase change the code
+       resource... */
+    module_stat = db_get_memory_resource(DBR_CODE,
+					 module_name,
+					 TRUE);
+
+    set_current_module_statement(module_stat);
+    module = module_name_to_entity(module_name);
+    set_current_module_entity(module);
+
+    /* Get and use cumulated_effects: */
     set_cumulated_rw_effects((statement_effects)
 	   db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
+
+    /* Build mapping between variables and semantics informations: */
     module_to_value_mappings(module);
 
-    /* Invariant  read/write regions */
+    /* Get and use invariant read/write regions */
     set_invariant_rw_effects((statement_effects)
 	db_get_memory_resource(DBR_INV_REGIONS, module_name, TRUE));
 
@@ -302,7 +321,7 @@ bool coarse_grain_parallelization(string module_name)
 
     /* hey, actually it is not implemented as a transformation...
      */
-    DB_PUT_MEMORY_RESOURCE(DBR_PARALLELIZED_CODE,
+    DB_PUT_MEMORY_RESOURCE(DBR_CODE,
 			   module_name,
 			   (char*) module_stat);
 
@@ -316,4 +335,32 @@ bool coarse_grain_parallelization(string module_name)
     free_value_mappings();
 
     return TRUE;
+}
+
+/** Parallelize code by using region informations to prove iteration
+    independance.
+
+    @param module_name is the name of the module to parallelize
+    @return TRUE in case of success. Indeed, return alway true. :-)
+ */
+bool coarse_grain_parallelization(string module_name) {
+  /* Do not use reductions: */
+  return coarse_grain_parallelization_main(module_name, FALSE);
+}
+
+
+/** Parallelize code by using region informations to prove iteration
+    independance. Use reduction information to filter out false
+    dependencies.
+
+    This is an independant phase and not only a property since we need
+    more resources.
+
+    @param module_name is the name of the module to parallelize
+    @return TRUE in case of success. Indeed, return alway true. :-)
+ */
+bool coarse_grain_parallelization_with_reduction(string module_name) {
+  /* Use reductions: */
+  /* not implemented: */
+  return coarse_grain_parallelization_main(module_name, TRUE);
 }

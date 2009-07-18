@@ -87,9 +87,9 @@ pipsdbm_free_entities(char * p)
 
 /**************************************************** OLD STATEMENT MAPPING */
 
-/* the old statement_mapping is an hash_table managed directly.
+/* The old statement_mapping is an hash_table managed directly.
  * this table associates statement to any newgen type. 
- * now explicit newgen functions ("->") should be prefered.
+ * Now explicit newgen functions ("->") should be prefered.
  * the storing of the mapping is based on the statement ordering for
  * later reconstruction with the CODE. 
  * tabulating statements would help, but is that desirable?
@@ -274,7 +274,7 @@ pipsdbm_write_statement_function(
 }
 
 
-/* Should use a higher level pipsdbm_write_statement_mapping() to survive
+/* Should use a higher level pipsdbm_read_statement_mapping() to survive
    to XML
 */
 gen_chunkp

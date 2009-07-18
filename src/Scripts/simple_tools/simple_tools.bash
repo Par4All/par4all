@@ -107,9 +107,8 @@ function openmp_parallelization_coarse_grain () {
 echo Ask for some statistics about the job to be done:
 setproperty PARALLELIZATION_STATISTICS=TRUE
 echo Ask for the parallelization of all the modules of the program with OpenMP output:
-activate COARSE_GRAIN_PARALLELIZATION
-activate PRINT_PARALLELIZEDOMP_CODE
-display PARALLELPRINTED_FILE[%ALLFUNC]
+apply COARSE_GRAIN_PARALLELIZATION[%ALLFUNC]
+display PRINTED_FILE[%ALLFUNC]
 
 EOF
 }
