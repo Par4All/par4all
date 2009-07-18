@@ -11,23 +11,23 @@ b:   printf("b\n");
    goto a;
 }
 
-//  P() {}
+//  P() {i==5}
 
 int main()
 {
    int i = 5;
 
-//  P() {}
+//  P() {i==5}
 
    printf("Begin\n");
 
-//  P() {}
+//  P() {i==5}
 
    
    /* The a label */
 a:   printf("a\n");
 
-//  P() {}
+//  P() {i==5}
 
    /* The b label */
 b:   printf("b\n");
@@ -35,7 +35,7 @@ b:   printf("b\n");
    goto a;
 }
 
-//  P() {}
+//  P() {i==5}
 
 int main()
 {

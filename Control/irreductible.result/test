@@ -16,21 +16,21 @@ l99999:   ;
    goto b;
 }
 
-//  P() {}
+//  P() {i==5}
 
 int main()
 {
    int i = 5;
 
-//  P() {}
+//  P() {i==5}
 
    printf("Begin\n");
 
-//  P() {}
+//  P() {i==5}
 
    if ((rand()&1)==0) goto l99999;
 
-//  P() {}
+//  P(_RANDOM_EFFECTS:GEN_SEED) {i==5}
 
    
    /* The a label */
@@ -38,7 +38,7 @@ a:   printf("a\n");
    /* The b label */
    ;
 
-//  P() {}
+//  P(_RANDOM_EFFECTS:GEN_SEED) {i==5}
 
    /* The b label */
 b:   printf("b\n");
@@ -48,7 +48,7 @@ l99999:   ;
    goto b;
 }
 
-//  P() {}
+//  P() {i==5}
 
 int main()
 {
@@ -62,14 +62,14 @@ int main()
 
    if ((rand()&1)==0) goto b;
 
-//  P() {i==5}
+//  P(_RANDOM_EFFECTS:GEN_SEED) {i==5}
 
    
    /* The a label */
 a:   printf("a\n");
    /* The b label */
 
-//  P() {i==5}
+//  P(_RANDOM_EFFECTS:GEN_SEED) {i==5}
 
    /* The b label */
 b:   printf("b\n");
