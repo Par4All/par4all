@@ -30,7 +30,7 @@
 prod=${1:-.}
 dest=${2:-coelho@cri.ensmp.fr}
 
-# report state changes
+# report status changes
 function report()
 {
   local current=$1 msg=$2 previous='unknown' repos status
@@ -45,6 +45,7 @@ function report()
   test -f STATE && read previous < STATE
   [ "$previous" -a "$current" = "$previous" ] && exit 0
 
+  # 2 char summary
   if [ $current -eq 0 ]
   then status=ok
   else status=KO
@@ -70,7 +71,7 @@ function report()
 
     if [ $status = 'KO' ]
     then
-      # show stderr/stdout
+      # show stderr/stdout?
       test -f err && {
         echo
         echo err:
@@ -96,6 +97,9 @@ function report()
 
   # new state
   echo $current > STATE
+
+  # good bye!
+  exit 0
 }
 
 # check
