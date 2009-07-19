@@ -38,6 +38,7 @@
 #include "genC.h"
 
 /* internally defined structure.
+ * the string_buffer pointer type is defined in "newgen_string_buffer.h"
  */
 typedef struct __string_buffer_head
 {
@@ -47,6 +48,8 @@ typedef struct __string_buffer_head
   _string_buffer_head;
 
 /* allocate a new string buffer
+ * @param dup tell whether to string duplicated appended strings
+ * if so, the strings will be freed later.
  */
 string_buffer string_buffer_make (bool dup)
 {
@@ -76,7 +79,7 @@ void string_buffer_free (string_buffer *psb)
 void string_buffer_free_all (string_buffer *psb)
 {
   message_assert("null pointer", (*psb) != NULL);
-  (*psb)->dup = TRUE;
+  (*psb)->dup = true;
   string_buffer_free (psb);
 }
 
@@ -171,6 +174,8 @@ void string_buffer_append_list(string_buffer sb, list l)
 #include <stdarg.h>
 
 /* append a NULL terminated list of string to sb.
+ * @param sb string buffer to be appended to
+ * @param next... appended strings
  */
 void string_buffer_cat(string_buffer sb, string next, ...)
 {
