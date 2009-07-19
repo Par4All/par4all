@@ -23,7 +23,7 @@
 
 script=${0/*\//}
 
-rev='$Rev: 13803 $'
+rev='$Rev$'
 rev=${rev/*: /}
 rev=${rev/ */}
 
