@@ -64,7 +64,7 @@ main()
    int y[d1][d2];
    int i;
    int j;
-//               <may be written >: y[*]
+//               <may be written >: y[*][*]
 //               <must be read   >: d1 d2
 
    call14(d1, d2, (int *) y);

@@ -28,27 +28,27 @@ void call05(int r, int m, int *x)
 //               <must be written>: j
 
    for(j = 0; j <= m-1; j += 1)
-//               <must be read   >: j m r
+//               <must be read   >: j m r x
 //               <must be written>: x[j]
       x[j] = 10*r+j;
 }
 
 Cumulated effects for "call05"
 
-//               <may be read    >: r
+//               <may be read    >: r x
 //               <may be written >: x[*]
 //               <must be read   >: m
 void call05(int r, int m, int *x)
 {
    int j;
-//               <may be read    >: j r
+//               <may be read    >: j r x
 //               <may be written >: x[*]
 //               <must be read   >: m
 //               <must be written>: j
 
    for(j = 0; j <= m-1; j += 1)
 //               <may be written >: x[*]
-//               <must be read   >: j m r
+//               <must be read   >: j m r x
       x[j] = 10*r+j;
 }
 
