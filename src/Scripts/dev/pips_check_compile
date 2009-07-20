@@ -24,8 +24,9 @@
 # checks that pips does compile.
 
 # TODO
-# - nice ?
-# - lock working copy ?
+# - nice?
+# - lock working copy?
+# - check last commit in trunk instead of last commit in repos!
 
 prod=${1:-.}
 dest=${2:-coelho@cri.ensmp.fr}
