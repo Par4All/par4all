@@ -321,7 +321,22 @@ static void rw_effects_of_loop(loop l)
     /* We get the loop transformer, which gives the loop invariant */
     /* We must remove the loop index from the list of modified variables */
     loop_trans = (*load_transformer_func)(current_stat);
+    
+    ifdebug(8) 
+      {
+	pips_debug(8, "loop transformer : \n");
+	dump_transformer(loop_trans);
+      }
+    
     loop_trans = transformer_remove_variable_and_dup(loop_trans, i);
+
+    ifdebug(8) 
+      {
+	pips_debug(8, "loop transformer after removing loop index %s : \n",
+		   entity_name(i));
+	dump_transformer(loop_trans);
+      }
+
     
     /* And we compute the invariant RW effects. */
     l_body = (*effects_transformer_composition_op)(l_body, loop_trans);

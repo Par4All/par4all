@@ -263,7 +263,7 @@ list generic_p_proper_effect_of_reference(reference ref,
       
       /* no read or write effects on partial array if 
 	 allow_partials_on_pme is false */
-      if(basic_pointer_p(b) ||
+      if((basic_pointer_p(b) && gen_length(variable_dimensions(v)) <= gen_length(l_inds))||
 	 (!basic_pointer_p(b) && 
 	  (allow_partials_on_pme || 
 	   gen_length(variable_dimensions(v)) == gen_length(l_inds))))

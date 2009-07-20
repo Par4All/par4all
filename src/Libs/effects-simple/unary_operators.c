@@ -186,7 +186,11 @@ effect reference_to_simple_effect(reference ref, action ac)
 	}
     }
   
-  pips_debug(8, "end\n");
+  ifdebug(8)
+    {
+      pips_debug(8, "end with effect\n");
+      print_effect(eff);
+    }
   
   return eff;
 }
