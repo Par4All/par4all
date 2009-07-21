@@ -1,6 +1,6 @@
 #
-delete array
-create array array.c
+delete array2
+create array2 array2.c
 
 #activate some debug mode
 #setenv TEXT_DEBUG_LEVEL 9
@@ -32,6 +32,6 @@ apply OMPIFY_CODE
 display PRINTED_FILE(main)
 
 close
-delete array
+delete array2
 quit
 # EOF
