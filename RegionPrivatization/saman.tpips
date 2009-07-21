@@ -28,6 +28,7 @@ display PRINTED_FILE
 activate ARRAY_SECTION_PRIVATIZER
 activate PRINT_CODE_PRIVATIZED_REGIONS
 echo saman privatized regions
+setproperty PRETTYPRINT_SEQUENTIAL_STYLE "do"
 display PRINTED_FILE
 
 close

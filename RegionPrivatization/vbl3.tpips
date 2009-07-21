@@ -8,6 +8,7 @@ display PRINTED_FILE[VBL3]
 activate PRINT_CODE_OUT_REGIONS # Statements & OUT Regions
 display PRINTED_FILE[VBL3]
 activate PRINT_CODE_PRIVATIZED_REGIONS # Statements & Privatized Regions
+setproperty PRETTYPRINT_SEQUENTIAL_STYLE "do"
 display PRINTED_FILE[VBL3]
 close
 delete vbl3

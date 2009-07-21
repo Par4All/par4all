@@ -181,6 +181,7 @@ int struct05()
 //  <x[PHI1][PHI2]-W-EXACT-{PHI2==1, 0<=PHI1, PHI1<=9}>
 
 
+#pragma omp parallel for 
    for(i = 0; i <= 9; i += 1)
 
 //  <x[PHI1][PHI2]-R-EXACT-{PHI1==i, PHI2==2, 0<=i, i<=9}>

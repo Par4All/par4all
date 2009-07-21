@@ -62,8 +62,8 @@ echo Printed files after parallelization
 echo
 
 apply COARSE_GRAIN_PARALLELIZATION
-activate PRINT_PARALLELIZEDOMP_CODE
-display PARALLELPRINTED_FILE[ARRAY01]
+#setproperty PRETTYPRINT_SEQUENTIAL_STYLE omp
+display PRINTED_FILE[ARRAY01]
 
 close
 delete array01
