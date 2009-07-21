@@ -271,13 +271,14 @@ void partial_eval_expression_and_regenerate(expression *ep, Psysteme ps, effects
 
     regenerate_expression(&ef, ep);
 
-    ifdebug(5)
-      if(!expression_consistent_p(*ep)) {
-	pips_internal_error("bad evaluation");
-      }
-      else {
-	print_eformat(ef, "after regenerate");
-      }
+    ifdebug(5) {
+        if(!expression_consistent_p(*ep)) {
+            pips_internal_error("bad evaluation");
+        }
+        else {
+            print_eformat(ef, "after regenerate");
+        }
+    }
 }
 
 struct eformat partial_eval_expression_and_copy(expression expr, Psysteme ps, effects fx)
@@ -333,8 +334,6 @@ struct eformat partial_eval_syntax(expression e, Psysteme ps, effects fx)
   }
   case is_syntax_subscript: {
     subscript sub = syntax_subscript(s);
-    list el = subscript_indices(sub);
-
     partial_eval_expression_and_regenerate(&(subscript_array(sub)), ps, fx);
 
     /*
@@ -348,7 +347,6 @@ struct eformat partial_eval_syntax(expression e, Psysteme ps, effects fx)
   }
   case is_syntax_application: {
     application a = syntax_application(s);
-    list al = application_arguments(a);
 
     partial_eval_expression_and_regenerate(&(application_function(a)), ps, fx);
 
@@ -780,7 +778,29 @@ struct eformat partial_eval_plus_operator(expression *ep1,
     struct eformat ef;
 
     ef = partial_eval_plus_or_minus_operator(PERFORM_ADDITION,
-					     ep1, ep2, ps, fx);
+            ep1, ep2, ps, fx);
+
+    return ef;
+}
+
+struct eformat partial_eval_plus_c_operator(expression *ep1,
+					  expression *ep2,
+					  Psysteme ps,
+					  effects fx)
+{
+    struct eformat ef = eformat_undefined;
+    basic b1 = basic_of_expression(*ep1);
+    basic b2 = basic_of_expression(*ep2);
+    if( !basic_pointer_p(b1) && !basic_pointer_p(b2) )
+    {
+        ef = partial_eval_plus_operator(ep1,ep2,ps,fx);
+    }
+    else {
+        partial_eval_expression_and_regenerate(ep1,ps,fx);
+        partial_eval_expression_and_regenerate(ep2,ps,fx);
+    }
+    free_basic(b1);
+    free_basic(b2);
 
     return ef;
 }
@@ -795,6 +815,26 @@ struct eformat partial_eval_minus_operator(expression *ep1,
     ef = partial_eval_plus_or_minus_operator(PERFORM_SUBTRACTION,
 					     ep1, ep2, ps, fx);
 
+    return ef;
+}
+struct eformat partial_eval_minus_c_operator(expression *ep1,
+					  expression *ep2,
+					  Psysteme ps,
+					  effects fx)
+{
+    struct eformat ef = eformat_undefined;
+    basic b1 = basic_of_expression(*ep1);
+    basic b2 = basic_of_expression(*ep2);
+    if( !basic_pointer_p(b1) && !basic_pointer_p(b2) )
+    {
+        ef = partial_eval_minus_operator(ep1,ep2,ps,fx);
+    }
+    else {
+        partial_eval_expression_and_regenerate(ep1,ps,fx);
+        partial_eval_expression_and_regenerate(ep2,ps,fx);
+    }
+    free_basic(b1);
+    free_basic(b2);
     return ef;
 }
 
@@ -950,7 +990,9 @@ static struct perform_switch {
     struct eformat (*binary_operator)(expression *, expression *, Psysteme, effects);
 } binary_operator_switch[] = {
     {PLUS_OPERATOR_NAME, partial_eval_plus_operator},
+    {PLUS_C_OPERATOR_NAME, partial_eval_plus_c_operator},
     {MINUS_OPERATOR_NAME, partial_eval_minus_operator},
+    {MINUS_C_OPERATOR_NAME, partial_eval_minus_c_operator},
     {MULTIPLY_OPERATOR_NAME, partial_eval_mult_operator},
     {DIVIDE_OPERATOR_NAME, partial_eval_div_operator},
     {POWER_OPERATOR_NAME, partial_eval_power_operator},
@@ -1290,136 +1332,116 @@ expression generate_monome(int coef, expression expr)
 }
 
 
-void recursiv_partial_eval(statement stmt)
+/** 
+ * apply partial eval on each statement
+ * we cannot recurse on something other than a statement
+ * beacuase we use the effects & preco nditions attached to the statement
+ * @param stmt statement to partial_eval
+ */
+void partial_eval_statement(statement stmt)
 {
     instruction inst = statement_instruction(stmt);
     statement_effects fx_map = get_proper_rw_effects();
 
-    debug(8, "recursiv_partial_eval", "begin with tag %d\n", 
-	  instruction_tag(inst));
+    debug(8, __func__, "begin with tag %d\n",  instruction_tag(inst));
 
     switch(instruction_tag(inst)) {
-      case is_instruction_block :
-	MAPL( sts, {
-	    statement s = STATEMENT(CAR(sts));
+        case is_instruction_block :
+            {
+                FOREACH(ENTITY,e,statement_declarations(stmt)) {
+                    value v =entity_initial(e);
+                    if(value_expression_p(v))
+                        partial_eval_expression_and_regenerate(&value_expression(v),stmt_prec(stmt),stmt_to_fx(stmt,fx_map));
+                }
+            } break;
+        case is_instruction_test :
+            {
+                test t = instruction_test(inst);
+                partial_eval_expression_and_regenerate(&test_condition(t), 
+                        stmt_prec(stmt), 
+                        stmt_to_fx(stmt,fx_map));
+                if(get_debug_level()>=9) {
+                    print_text(stderr, text_statement(entity_undefined, 0, stmt));
+                    pips_assert(__func__, statement_consistent_p(stmt));
+                }
+            } break;
+        case is_instruction_loop : 
+            {
+                loop l = instruction_loop(inst);
+                range r = loop_range(l);
+                partial_eval_expression_and_regenerate(&range_lower(r), 
+                        stmt_prec(stmt), 
+                        stmt_to_fx(stmt,fx_map));
+                partial_eval_expression_and_regenerate(&range_upper(r), 
+                        stmt_prec(stmt), 
+                        stmt_to_fx(stmt,fx_map));
+                partial_eval_expression_and_regenerate(&range_increment(r), 
+                        stmt_prec(stmt), 
+                        stmt_to_fx(stmt,fx_map));
+                add_live_loop_index(loop_index(l));
+                rm_live_loop_index(loop_index(l));
 
-	    recursiv_partial_eval(s);
-	}, instruction_block(inst));
-	break;
-      case is_instruction_test : {
-	  test t = instruction_test(inst);
-	  partial_eval_expression_and_regenerate(&test_condition(t), 
-						 stmt_prec(stmt), 
-						 stmt_to_fx(stmt,fx_map));
-	  recursiv_partial_eval(test_true(t));
-	  recursiv_partial_eval(test_false(t));
-	  if(get_debug_level()>=9) {
-	      print_text(stderr, text_statement(entity_undefined, 0, stmt));
-	      pips_assert("recursiv_partial_eval", statement_consistent_p(stmt));
-	  }
-	  break;
-      }
-      case is_instruction_loop : {
-	  loop l = instruction_loop(inst);
-	  range r = loop_range(l);
-	  partial_eval_expression_and_regenerate(&range_lower(r), 
-						 stmt_prec(stmt), 
-						 stmt_to_fx(stmt,fx_map));
-	  partial_eval_expression_and_regenerate(&range_upper(r), 
-						 stmt_prec(stmt), 
-						 stmt_to_fx(stmt,fx_map));
-	  partial_eval_expression_and_regenerate(&range_increment(r), 
-						 stmt_prec(stmt), 
-						 stmt_to_fx(stmt,fx_map));
-	  add_live_loop_index(loop_index(l));
-	  recursiv_partial_eval(loop_body(l));
-	  rm_live_loop_index(loop_index(l));
+                if(get_debug_level()>=9) {
+                    print_text(stderr, text_statement(entity_undefined, 0, stmt));
+                    pips_assert(__func__, statement_consistent_p(stmt));
+                }
+            } break;
+        case is_instruction_forloop :
+            {
+                forloop fl = instruction_forloop(inst);
 
-	  if(get_debug_level()>=9) {
-	      print_text(stderr, text_statement(entity_undefined, 0, stmt));
-	      pips_assert("recursiv_partial_eval", statement_consistent_p(stmt));
-	  }
-	  break;
-      }      
-      case is_instruction_forloop : {
-	  forloop fl = instruction_forloop(inst);
+                partial_eval_expression_and_regenerate(&forloop_initialization(fl), 
+                        stmt_prec(stmt), 
+                        stmt_to_fx(stmt,fx_map));
+                // FI: wrong precondition!
+                partial_eval_expression_and_regenerate(&forloop_condition(fl), 
+                        stmt_prec(stmt), 
+                        stmt_to_fx(stmt,fx_map));
+                // FI: wrong precondition!
+                partial_eval_expression_and_regenerate(&forloop_increment(fl), 
+                        stmt_prec(stmt), 
+                        stmt_to_fx(stmt,fx_map));
+                //add_live_loop_index(loop_index(l));
+                //rm_live_loop_index(loop_index(l));
 
-	  partial_eval_expression_and_regenerate(&forloop_initialization(fl), 
-						 stmt_prec(stmt), 
-						 stmt_to_fx(stmt,fx_map));
-	  // FI: wrong precondition!
-	  partial_eval_expression_and_regenerate(&forloop_condition(fl), 
-						 stmt_prec(stmt), 
-						 stmt_to_fx(stmt,fx_map));
-	  // FI: wrong precondition!
-	  partial_eval_expression_and_regenerate(&forloop_increment(fl), 
-						 stmt_prec(stmt), 
-						 stmt_to_fx(stmt,fx_map));
-	  //add_live_loop_index(loop_index(l));
-	  recursiv_partial_eval(forloop_body(fl));
-	  //rm_live_loop_index(loop_index(l));
+                if(get_debug_level()>=9) {
+                    print_text(stderr, text_statement(entity_undefined, 0, stmt));
+                    pips_assert(__func__, statement_consistent_p(stmt));
+                }
+            } break;
+        case is_instruction_whileloop :
+            {
+                /* The whileloop precondition cannot be used to evaluate the
+                   while condition. It must be unioned with the body postcondition.
+                   partial_eval_expression_and_regenerate(&whileloop_condition(l), 
+                   stmt_prec(stmt), 
+                   stmt_to_fx(stmt,fx_map));
+                   */
+                /* Also, two kinds of while must be handled */
+                /* Short term fix... we might as well not try anything for
+                   the while condition */
+                /* partial_eval_expression_and_regenerate(&whileloop_condition(l), 
+                   SC_UNDEFINED, 
+                   stmt_to_fx(stmt,fx_map));
+                   */
 
-	  if(get_debug_level()>=9) {
-	      print_text(stderr, text_statement(entity_undefined, 0, stmt));
-	      pips_assert("recursiv_partial_eval", statement_consistent_p(stmt));
-	  }
-	  break;
-      }      
-    case is_instruction_whileloop : {
-	  whileloop l = instruction_whileloop(inst);
-
-	  /* The whileloop precondition cannot be used to evaluate the
-	     while condition. It must be unioned with the body postcondition.
-	  partial_eval_expression_and_regenerate(&whileloop_condition(l), 
-						 stmt_prec(stmt), 
-						 stmt_to_fx(stmt,fx_map));
-	  */
-	  /* Also, two kinds of while must be handled */
-	  /* Short term fix... we might as well not try anything for
-	     the while condition */
-	  /* partial_eval_expression_and_regenerate(&whileloop_condition(l), 
-						 SC_UNDEFINED, 
-						 stmt_to_fx(stmt,fx_map));
-	  */
-	 recursiv_partial_eval(whileloop_body(l));
-	 
-	  if(get_debug_level()>=9) {
-	      print_text(stderr, text_statement(entity_undefined, 0, stmt));
-	      pips_assert("recursiv_partial_eval", statement_consistent_p(stmt));
-	  }
-	  break;
-      }
-      case is_instruction_call : {
-	  partial_eval_call_and_regenerate(instruction_call(inst), 
-					   stmt_prec(stmt), 
-					   stmt_to_fx(stmt,fx_map));
-	  break;
-      }
-      case is_instruction_goto :
-	break;
-      case is_instruction_unstructured : {
-	  /* ?? What should I do? */
-	  /* pips_error("recursiv_partial_eval", "?? :-(\n"); */
-	  /* FI: I do not understand why Bruno (?) had metaphysical
-	   * problems here
-	   */
-	  list blocs = NIL;
-
-	  CONTROL_MAP(ctl, {
-	      statement st = control_statement(ctl);
-
-	      debug(5, "partial_eval", "will eval in statement number %d\n",
-		    statement_number(st));
-
-	      recursiv_partial_eval(st);	
-	  }, unstructured_control(instruction_unstructured(inst)), blocs);
-
-	  gen_free_list(blocs);
-      }
-	break;
-    default : 
-	pips_error("recursiv_partial_eval", 
-		   "Bad instruction tag %d", instruction_tag(inst));
+                if(get_debug_level()>=9) {
+                    print_text(stderr, text_statement(entity_undefined, 0, stmt));
+                    pips_assert(__func__, statement_consistent_p(stmt));
+                }
+            } break;
+        case is_instruction_call :
+            {
+                partial_eval_call_and_regenerate(instruction_call(inst), 
+                        stmt_prec(stmt), 
+                        stmt_to_fx(stmt,fx_map));
+            } break;
+        case is_instruction_goto :
+            break;
+        case is_instruction_unstructured :
+            break;
+        default : 
+            pips_error(__func__, "Bad instruction tag %d", instruction_tag(inst));
     }
 }
 
@@ -1432,8 +1454,6 @@ partial_eval(char *module_name)
 { 
   entity module;
   statement module_statement;
-  instruction mod_inst;
-  cons *blocs = NIL;
 
   /* be carrefull not to get any mapping before the code */
   /* DBR_CODE will be changed: argument "pure" is TRUE because 
@@ -1460,52 +1480,14 @@ partial_eval(char *module_name)
 
   set_live_loop_indices();
 	
-  mod_inst = statement_instruction(module_statement);
-	
   debug_on("PARTIAL_EVAL_DEBUG_LEVEL");
-	
-  switch (instruction_tag (mod_inst)) {
-	  
-  case is_instruction_block:
-    MAP(STATEMENT, stmt, {recursiv_partial_eval (stmt);}, 
-	instruction_block (mod_inst));
-    break;
-    
-  case is_instruction_unstructured:
-    /* go through unstructured and apply recursiv_partial_eval */
-    CONTROL_MAP(ctl, {
-      statement st = control_statement(ctl);
-      
-      debug(5, "partial_eval", "will eval in statement number %d\n",
-	    statement_number(st));
-      
-      recursiv_partial_eval(st);	
-    }, unstructured_control(instruction_unstructured(mod_inst)), blocs);
-	  
-    gen_free_list(blocs);
-    break;
-  case is_instruction_call:
-    if (return_statement_p(module_statement) || continue_statement_p(module_statement))
-      break;
-
-  case is_instruction_test:
-  case is_instruction_loop:
-  case is_instruction_whileloop:
-  case is_instruction_goto:
-    recursiv_partial_eval(module_statement);
-    break;
-
-  default:
-    pips_error("partial_eval", "Non-acceptable instruction tag %d\n",
-	       instruction_tag (mod_inst));
-  }
-  
+  gen_recurse(module_statement,statement_domain,gen_true,partial_eval_statement);
   debug_off();
 
   /* Reorder the module, because new statements may have been generated. */
   module_reorder(module_statement);
 
-  DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(module_name),module_statement);
+  DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name,module_statement);
 
   reset_live_loop_indices();
   reset_precondition_map();

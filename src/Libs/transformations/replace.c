@@ -287,7 +287,7 @@ void ReplaceReference(char *mod_name, reference ref, expression next_expr)
     /* Reorder the module, because new statements have been generated. */
     module_reorder(mod_stat);
 
-    DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(mod_name), mod_stat);
+    DB_PUT_MEMORY_RESOURCE(DBR_CODE, mod_name, mod_stat);
 
     debug(2,"ReplaceReference","Done for %s\n", mod_name);
     debug_off();

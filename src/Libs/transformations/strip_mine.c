@@ -277,7 +277,7 @@ bool strip_mine(char *mod_name)
 	reset_current_module_entity();
 	reset_current_module_statement();
 
-	DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(mod_name), mod_stmt);
+	DB_PUT_MEMORY_RESOURCE(DBR_CODE, mod_name, mod_stmt);
 	return_status = TRUE;
     }
     

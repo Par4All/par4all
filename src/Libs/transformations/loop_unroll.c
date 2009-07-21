@@ -809,7 +809,7 @@ unroll(char *mod_name)
 	    /* Reorder the module, because new statements have been generated. */
 	    module_reorder(mod_stmt);
 
-	    DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(mod_name), mod_stmt);
+	    DB_PUT_MEMORY_RESOURCE(DBR_CODE, mod_name, mod_stmt);
         /*postlude*/
         reset_current_module_entity();
         reset_current_module_statement();
@@ -877,67 +877,67 @@ bool apply_full_loop_unroll(statement s)
 bool
 full_unroll(char * mod_name)
 {
-  statement mod_stmt;
-  char lp_label[6];
-  string resp;
-  entity lb_ent = entity_undefined;
-  bool return_status = TRUE;
+    statement mod_stmt;
+    char lp_label[6];
+    string resp;
+    entity lb_ent = entity_undefined;
+    bool return_status = TRUE;
 
-  debug_on("FULL_UNROLL_DEBUG_LEVEL");
+    debug_on("FULL_UNROLL_DEBUG_LEVEL");
 
-  if(get_bool_property("FULL_UNROLL_INTERACTIVELY")) {
-    /* Get the loop label form the user */
-    resp = user_request("Which loop do you want to unroll fully?\n"
-			"(give its label): ");
-    if (resp[0] == '\0') {
-      user_log("Full loop unrolling has been cancelled.\n");
-      return_status = FALSE;
-    }
-    else {    
-      sscanf(resp, "%s", lp_label);
-      lb_ent = find_label_entity(mod_name, lp_label);
-      if (lb_ent == entity_undefined) {
-	user_error("unroll", "loop label `%s' does not exist\n", lp_label);
-      }
+    if(get_bool_property("FULL_UNROLL_INTERACTIVELY")) {
+        /* Get the loop label form the user */
+        resp = user_request("Which loop do you want to unroll fully?\n"
+                "(give its label): ");
+        if (resp[0] == '\0') {
+            user_log("Full loop unrolling has been cancelled.\n");
+            return_status = FALSE;
+        }
+        else {    
+            sscanf(resp, "%s", lp_label);
+            lb_ent = find_label_entity(mod_name, lp_label);
+            if (lb_ent == entity_undefined) {
+                user_error("unroll", "loop label `%s' does not exist\n", lp_label);
+            }
 
-      debug(1,"full_unroll","Fully unroll loop %s in module %s\n",
-	    lp_label, mod_name);
+            debug(1,"full_unroll","Fully unroll loop %s in module %s\n",
+                    lp_label, mod_name);
 
-      searched_loop_label = lb_ent;
-    }
-  }
-
-  if(return_status) {
-
-    mod_stmt = (statement) db_get_memory_resource(DBR_CODE, mod_name, TRUE);
-    /* prelude */
-    set_current_module_entity(module_name_to_entity( mod_name ));
-    set_current_module_statement( mod_stmt);
-
-    if(entity_undefined_p(searched_loop_label)) {
-      gen_recurse (mod_stmt, statement_domain, 
-		   apply_full_loop_unroll, gen_null);
-    }
-    else {
-      gen_recurse (mod_stmt, statement_domain, 
-		   find_loop_and_fully_unroll, gen_null);
+            searched_loop_label = lb_ent;
+        }
     }
 
-    /* Reorder the module, because new statements have been generated. */
-    module_reorder(mod_stmt);
+    if(return_status) {
 
-    searched_loop_label = entity_undefined;
+        mod_stmt = (statement) db_get_memory_resource(DBR_CODE, mod_name, TRUE);
+        /* prelude */
+        set_current_module_entity(module_name_to_entity( mod_name ));
+        set_current_module_statement( mod_stmt);
 
-    DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(mod_name), mod_stmt);
-    /*postlude*/
-    reset_current_module_entity();
-    reset_current_module_statement();
-  }
+        if(entity_undefined_p(searched_loop_label)) {
+            gen_recurse (mod_stmt, statement_domain, 
+                    apply_full_loop_unroll, gen_null);
+        }
+        else {
+            gen_recurse (mod_stmt, statement_domain, 
+                    find_loop_and_fully_unroll, gen_null);
+        }
 
-  debug(2,"unroll","done for %s\n", mod_name);
-  debug_off();
+        /* Reorder the module, because new statements have been generated. */
+        module_reorder(mod_stmt);
 
-  return return_status;
+        searched_loop_label = entity_undefined;
+
+        DB_PUT_MEMORY_RESOURCE(DBR_CODE, mod_name, mod_stmt);
+        /*postlude*/
+        reset_current_module_entity();
+        reset_current_module_statement();
+    }
+
+    debug(2,"unroll","done for %s\n", mod_name);
+    debug_off();
+
+    return return_status;
 }
 
 
@@ -1012,7 +1012,7 @@ bool full_unroll_pragma(char * mod_name)
   /* Reorder the module, because new statements have been generated. */
   module_reorder(mod_stmt);
 
-  DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(mod_name), mod_stmt);
+  DB_PUT_MEMORY_RESOURCE(DBR_CODE, mod_name, mod_stmt);
 
   /* Provide statistics about changes performed */
   if(number_of_unrolled_loops == number_of_requested_unrollings) {

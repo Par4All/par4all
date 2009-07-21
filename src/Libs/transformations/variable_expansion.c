@@ -243,7 +243,7 @@ bool scalar_expansion(char *module_name)
     pips_debug(1, "end\n");
     debug_off();
 
-    DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(module_name), module_stat);
+    DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, module_stat);
 
     return(TRUE);
 }

@@ -210,13 +210,9 @@ static bool privatizer(char *module_name)
 
     if (store_as_regions)
     {
-	DB_PUT_MEMORY_RESOURCE(DBR_PRIVATIZED_REGIONS, 
-			       strdup(module_name),
-			       (char*) get_private_effects());
+	DB_PUT_MEMORY_RESOURCE(DBR_PRIVATIZED_REGIONS, module_name, (char*) get_private_effects());
 	
-	DB_PUT_MEMORY_RESOURCE(DBR_COPY_OUT_REGIONS, 
-			       strdup(module_name),
-			       (char*) get_copy_out_effects());
+	DB_PUT_MEMORY_RESOURCE(DBR_COPY_OUT_REGIONS, module_name, (char*) get_copy_out_effects());
 	
     }
 
@@ -224,7 +220,7 @@ static bool privatizer(char *module_name)
      */
     sort_all_loop_locals(module_stat);
 
-    DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(module_name), module_stat);
+    DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, module_stat);
 
     reset_current_module_entity();
     reset_current_module_statement();
@@ -868,7 +864,7 @@ declarations_privatizer(char *mod_name)
 
     debug_off();
 
-    DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(mod_name), module_stat);
+    DB_PUT_MEMORY_RESOURCE(DBR_CODE, mod_name, module_stat);
 
     dynamic_area = entity_undefined;
     reset_current_module_entity();

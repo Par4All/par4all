@@ -58,7 +58,7 @@ clean_declarations(char * module_name)
     /* body*/
     entity_clean_declarations(get_current_module_entity(),get_current_module_statement());
     gen_recurse(get_current_module_statement(),statement_domain,gen_true,statement_clean_declarations);
-    DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(module_name), get_current_module_statement());
+    DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, get_current_module_statement());
 
     /*postlude */
     reset_current_module_entity();

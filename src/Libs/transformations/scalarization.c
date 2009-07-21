@@ -509,7 +509,7 @@ bool scalarization (char * module_name)
 
     /* Save modified code to database */
 	module_reorder(module_stat);
-    DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(module_name), module_stat);
+    DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, module_stat);
 
     /* TODO: Cleanup after scalarization */
     pips_assert("Loop index Pbase is empty", BASE_NULLE_P(loop_indices_b));

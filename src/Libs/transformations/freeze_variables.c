@@ -264,7 +264,7 @@ boolean freeze_variables(char *mod_name)
     
   /* Reorder the module, because new statements have been added */  
     module_reorder(mod_stmt);
-    DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(mod_name),mod_stmt);
+    DB_PUT_MEMORY_RESOURCE(DBR_CODE, mod_name,mod_stmt);
     reset_proper_rw_effects();
     reset_cumulated_rw_effects();
     reset_current_module_statement();

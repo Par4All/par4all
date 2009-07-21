@@ -152,7 +152,7 @@ bool kernelize(char * module_name)
     set_current_module_entity(module_name_to_entity( module_name ));
     set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, module_name, TRUE) );
 
-    /* rereive loop label */
+    /* retreive loop label */
     string loop_label_name = get_string_property_or_ask("LOOP_LABEL","label of the loop to turn into a kernel ?\n");
     entity loop_label_entity = find_label_entity(module_name,loop_label_name);
     if( entity_undefined_p(loop_label_entity) )
@@ -184,6 +184,195 @@ bool kernelize(char * module_name)
 bool terapixify(char * module_name)
 {
     /* everything is done by pispmake */
+    return true;
+}
+
+/** 
+ * transform each subscript in expression @a exp into the equivalent pointer arithmetic expression
+ * 
+ * @param exp expression to inspect
+ * 
+ * @return true 
+ */
+static
+bool expression_array_to_pointer(expression exp)
+{
+    if(expression_reference_p(exp))
+    {
+        reference ref = expression_reference(exp);
+        if( ! ENDP(reference_indices(ref) ) )
+        {
+            /* we need to check if we know the dimension of this reference */
+            size_t nb_indices =gen_length(reference_indices(ref)); 
+            size_t nb_dims =gen_length(variable_dimensions(type_variable(entity_type(reference_variable(ref))))) ; 
+
+            /* create a new reference without subscripts */
+            reference ref_without_indices = make_reference(reference_variable(ref),NIL);
+            /* get the base type of the reference */
+            type type_without_indices = make_type_variable(make_variable(
+                        copy_basic(variable_basic(type_variable(entity_type(reference_variable(ref))))),
+                        NIL,
+                        gen_full_copy_list(variable_qualifiers(type_variable(entity_type(reference_variable(ref)))))));
+
+            expression address_computation = EXPRESSION(CAR(reference_indices(ref)));
+            /* create an expression for the new reference, possibly casted */
+            expression base_ref = reference_to_expression(ref_without_indices);
+            if( ! basic_pointer_p( variable_basic(type_variable(entity_type(reference_variable(ref) ) ) ) ) )
+            {
+                base_ref = make_expression(
+                        make_syntax_cast(
+                            make_cast(
+                                make_type_variable(
+                                    make_variable(
+                                        make_basic_pointer(type_without_indices),NIL,NIL
+                                        )
+                                    ),
+                                base_ref)
+                            ),
+                        normalized_undefined);
+            }
+
+            /* iterate on the dimensions & indices to create the pointer expression */
+            list dims = variable_dimensions(type_variable(entity_type(reference_variable(ref))));
+            list indices = reference_indices(ref);
+            POP(indices);
+            if(!ENDP(dims)) POP(dims); // the first dimension is unused
+            /* SG: we use PLUS_OPERATOR_NAME as long as we d not use pointer arithmetic */
+            FOREACH(DIMENSION,dim,dims)
+            {
+                expression dimension_size = MakeBinaryCall(
+                        CreateIntrinsic(PLUS_OPERATOR_NAME),
+                        MakeBinaryCall(
+                            CreateIntrinsic(MINUS_OPERATOR_NAME),
+                            copy_expression(dimension_upper(dim)),
+                            copy_expression(dimension_lower(dim))
+                            ),
+                        make_expression_1());
+
+                if( !ENDP(indices) ) { /* there may be more dimensions than indices */
+                    expression index_expression = EXPRESSION(CAR(indices));
+                    address_computation = MakeBinaryCall(
+                            CreateIntrinsic(PLUS_OPERATOR_NAME),
+                            index_expression,
+                            MakeBinaryCall(
+                                CreateIntrinsic(MULTIPLY_OPERATOR_NAME),
+                                dimension_size,address_computation
+                                )
+                            );
+                    POP(indices);
+                }
+                else {
+                    address_computation = MakeBinaryCall(
+                            CreateIntrinsic(MULTIPLY_OPERATOR_NAME),
+                            dimension_size,address_computation
+                            );
+                }
+            }
+            /* there may be more indices than dimensions */
+            FOREACH(EXPRESSION,e,indices)
+            {
+                address_computation = MakeBinaryCall(
+                        CreateIntrinsic(PLUS_OPERATOR_NAME),
+                        address_computation,e
+                        );
+            }
+
+            /* we now add the DEREFERENCING_OPERATOR, if needed */
+            syntax new_syntax = syntax_undefined;
+            if(nb_indices == nb_dims || nb_dims == 0 ) {
+                new_syntax=make_syntax_call(
+                        make_call(
+                            CreateIntrinsic(DEREFERENCING_OPERATOR_NAME),
+                            CONS(EXPRESSION,MakeBinaryCall(
+                                    CreateIntrinsic(PLUS_C_OPERATOR_NAME),
+                                    base_ref,
+                                    address_computation), NIL)
+                            )
+                        );
+            }
+            else {
+                new_syntax = make_syntax_call(
+                        make_call(CreateIntrinsic(PLUS_C_OPERATOR_NAME),
+                            CONS(EXPRESSION,base_ref,CONS(EXPRESSION,address_computation,NIL))));
+            }
+
+            /* free stuffs */
+            unnormalize_expression(exp);
+            gen_free_list(reference_indices(ref));
+            reference_indices(ref)=NIL;
+            free_syntax(expression_syntax(exp));
+
+            /* validate changes */
+            expression_syntax(exp)=new_syntax;
+        }
+
+    }
+    /* not tested */
+    else if( syntax_subscript_p(expression_syntax(exp) ) )
+    {
+        subscript s = syntax_subscript(expression_syntax(exp));
+        pips_assert("non empty subscript",!ENDP(subscript_indices(s)));
+        call c = make_call(
+                CreateIntrinsic(PLUS_C_OPERATOR_NAME),
+                CONS(EXPRESSION,copy_expression(subscript_array(s)),
+                    CONS(EXPRESSION,EXPRESSION(CAR(subscript_indices(s))),NIL)));
+        list indices = subscript_indices(s);
+        POP(indices);
+        FOREACH(EXPRESSION,e,indices)
+        {
+            c = make_call(
+                    CreateIntrinsic(PLUS_OPERATOR_NAME),
+                    CONS(EXPRESSION,call_to_expression(c),
+                        CONS(EXPRESSION,e,NIL)));
+        }
+        unnormalize_expression(exp);
+        gen_free_list(subscript_indices(s));
+        subscript_indices(s)=NIL;
+        free_syntax(expression_syntax(exp));
+        expression_syntax(exp)=make_syntax_call(c);
+
+
+    }
+    return true;
+}
+
+/** 
+ * call expression_array_to_pointer on each entity declared in statement @s
+ * 
+ * @param s statement to inspect
+ * 
+ * @return true
+ */
+static
+bool declaration_array_to_pointer(statement s)
+{
+    FOREACH(ENTITY,e,statement_declarations(s))
+        gen_recurse(entity_initial(e),expression_domain,expression_array_to_pointer,gen_null);
+    return true;
+}
+
+bool array_to_pointer(char *module_name)
+{
+    /* prelude */
+    set_current_module_entity(module_name_to_entity( module_name ));
+    set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, module_name, TRUE) );
+
+    /* run transformation */
+    if(!c_module_p(get_current_module_entity()))
+        pips_user_warning("this transformation will have no effect on a fortran module\n");
+    else
+        gen_multi_recurse(get_current_module_statement(),
+                expression_domain,expression_array_to_pointer,gen_null,
+                statement_domain,declaration_array_to_pointer,gen_null,
+                NULL);
+
+    /* validate */
+    module_reorder(get_current_module_statement());
+    DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name,get_current_module_statement());
+
+    /*postlude*/
+    reset_current_module_entity();
+    reset_current_module_statement();
     return true;
 }
 
