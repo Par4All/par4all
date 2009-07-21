@@ -312,6 +312,12 @@ hpfc_parser(string module)
 {
     return the_actual_parser(module, DBR_HPFC_FILTERED_FILE);
 }
+// pour STEP
+bool
+directive_parser(string module)
+{
+  return the_actual_parser(module, DBR_DIRECTIVE_FILTERED_FILE);
+}
 
 bool 
 parser(string module)

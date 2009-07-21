@@ -4439,6 +4439,8 @@ static IntrinsicDescriptor IntrinsicTypeDescriptorTable[] =
   {OMP_PARALLEL_FUNCTION_NAME,         0, default_intrinsic_type, 0, 0},
   {OMP_REDUCTION_FUNCTION_NAME,(INT_MAX), default_intrinsic_type, 0, 0},
 
+#include "STEP_RT_bootstrap.h"
+
   {NULL, 0, 0, 0, 0}
 };
 

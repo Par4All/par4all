@@ -1,0 +1,5 @@
+*********************************************************************
+* This "STEP.h" and "mpif.h" are is used as default source for      *
+* preprocessing 'include' in generated source file before splitting *
+*********************************************************************
+

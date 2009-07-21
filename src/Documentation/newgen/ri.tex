@@ -39,11 +39,11 @@
 
 \title{PIPS: Internal Representation of Fortran and C Code}
 \author{Fabien Coelho\\
-  Béatrice Creusillet\\
-  François Irigoin \\
+  Bï¿½atrice Creusillet\\
+  Franï¿½ois Irigoin \\
   Pierre Jouvelot \\
   Ronan Keryell \\
-  Rémi Triolet\\
+  Rï¿½mi Triolet\\
   \\
   CRI, M\&S, MINES ParisTech}
 \date{\svnInfoLongDate{}, revision r\svnInfoRevision}
@@ -74,7 +74,7 @@ more information about NewGen see \cite{JT89,JT90}.
 This document is part of PIPS documentation and its \LaTeX version is
 located in \verb+$PIPS_ROOT/src/Documentation/newgen/ri.tex+
 (\textbf{ri} stands for Internal Representation, 
-\emph{représentation interne} in French). 
+\emph{reprï¿½sentation interne} in French). 
 It is used to generate a PIPS include file called 
 \verb+$PIPS_ROOT/include/ri.h+. The functions available to manipulate
 these data structures are grouped in library
@@ -86,11 +86,11 @@ representation, but they are clustered in a (hopefully) meaningful way.
 %%$
 
 \begin{comment}
-Ce document est utilisé directement et automatiquement par l'outil
-de génie logiciel NewGen pour générer les déclarations des structures
-de données utilisées dans le projet PIPS, ainsi que les routines de
+Ce document est utilisï¿½ directement et automatiquement par l'outil
+de gï¿½nie logiciel NewGen pour gï¿½nï¿½rer les dï¿½clarations des structures
+de donnï¿½es utilisï¿½es dans le projet PIPS, ainsi que les routines de
 base qui les manipulent. C'est pourquoi l'ordre des sections n'est pas
-nécessairement naturel.
+nï¿½cessairement naturel.
 \end{comment}
 
 Some external C data structures, used by the PIPS internal
@@ -113,13 +113,13 @@ code, \texttt{effects} and \texttt{regions} for type \texttt{effects}, and
 \texttt{transformers} and \texttt{semantics} for type \texttt{transformer}.
 
 \begin{comment}
-Après une description rapide des structures de données externes à la
-représentation interne de PIPS, nous présentons successivement les
-notions d'entités, de code et d'expressions et la manière dont elles
-sont utilisées pour encoder un programme Fortran. Nous détaillons
-ensuite deux structures de données supplémentaires, les effets et les
-\emph{transformers} qui sont utilisés pour le calcul de dépendance
-interprocédural et pour l'analyse syntaxique interprocédurale.
+Aprï¿½s une description rapide des structures de donnï¿½es externes ï¿½ la
+reprï¿½sentation interne de PIPS, nous prï¿½sentons successivement les
+notions d'entitï¿½s, de code et d'expressions et la maniï¿½re dont elles
+sont utilisï¿½es pour encoder un programme Fortran. Nous dï¿½taillons
+ensuite deux structures de donnï¿½es supplï¿½mentaires, les effets et les
+\emph{transformers} qui sont utilisï¿½s pour le calcul de dï¿½pendance
+interprocï¿½dural et pour l'analyse syntaxique interprocï¿½durale.
 \end{comment}
 
 The binding of Fortran to the PIPS internal representation is covered in
@@ -127,9 +127,9 @@ greater details in Technical Report EMP-CAII-E105 (in French). The data
 structure management tool NewGen is introduced in TR EMP-CRI-A191.
 
 \begin{comment}
-La manière dont les constructions de Fortran sont représentées est
-décrite dans une des sections du rapport EMP-CAII-E105. NewGen est
-présenté dans le rapport EMP-CRI-A191.
+La maniï¿½re dont les constructions de Fortran sont reprï¿½sentï¿½es est
+dï¿½crite dans une des sections du rapport EMP-CAII-E105. NewGen est
+prï¿½sentï¿½ dans le rapport EMP-CRI-A191.
 \end{comment}
 
 \section{External Data Structures}
@@ -161,11 +161,11 @@ build systems of equations and inequalities. Such systems are of type
 \texttt{Psysteme}.
 
 \begin{comment}
-Le domaine \texttt{Pvecteur} est utilisé pour représenter les
-expressions linéaires telles que \texttt{3I+2} (voir le domaine 
-\texttt{normalized}) ou des contraintes linéaires telles que \texttt{3I + J <= 2}
-ou \texttt{3I == J}. Ces contraintes sont utilisées dans les systèmes
-linéaires (voir le domaine \texttt{Psysteme}).
+Le domaine \texttt{Pvecteur} est utilisï¿½ pour reprï¿½senter les
+expressions linï¿½aires telles que \texttt{3I+2} (voir le domaine 
+\texttt{normalized}) ou des contraintes linï¿½aires telles que \texttt{3I + J <= 2}
+ou \texttt{3I == J}. Ces contraintes sont utilisï¿½es dans les systï¿½mes
+linï¿½aires (voir le domaine \texttt{Psysteme}).
 \end{comment}
 
 An object of type \texttt{Pvecteur} is a list of pairs $(c,v)$ where $c$ is
@@ -178,13 +178,13 @@ module names are used to prefix names of regular variables, no name
 conflict with a program variable called \texttt{TCST} can occur.
 
 \begin{comment}
-Un Pvecteur est une suite de monômes, un monôme étant un couple
+Un Pvecteur est une suite de monï¿½mes, un monï¿½me ï¿½tant un couple
 (coefficient,variable).  Le coefficient d'un tel couple est un entier,
-positif ou négatif. La variable est une entité, sauf dans le cas du
-terme constant qui est représenté par la variable prédéfinie de nom
+positif ou nï¿½gatif. La variable est une entitï¿½, sauf dans le cas du
+terme constant qui est reprï¿½sentï¿½ par la variable prï¿½dï¿½finie de nom
 \texttt{TCST}\footnote{Comme on rajoute le nom des modules devant les
 noms de variables, il ne peut pas y avoir de conflict avec une
-éventuelle variable \texttt{TCST}.}.
+ï¿½ventuelle variable \texttt{TCST}.}.
 \end{comment}
 
 Expressions in programs are stored as affine integer expressions,
@@ -194,7 +194,7 @@ the two representations is hard to maintain, especially during program
 transformations.
 
 \begin{comment}
-Les expressions apparaissant dans le programme analysé sont mises
+Les expressions apparaissant dans le programme analysï¿½ sont mises
 sous cette forme quand c'est possible.
 \end{comment}
 
@@ -204,8 +204,8 @@ the CNRS C3 program. See~??? for more details about this library and its
 content.
 
 \begin{comment}
-La structure de données Pvecteur est importée de la bibliothèque d'algèbre
-linéaire en nombres entiers du CRI.
+La structure de donnï¿½es Pvecteur est importï¿½e de la bibliothï¿½que d'algï¿½bre
+linï¿½aire en nombres entiers du CRI.
 \end{comment}
 
 \subsection{Set of Affine Constraints}
@@ -222,12 +222,12 @@ They appear here for the semantics analysis and are used by the
 \texttt{predicate} type (see Section~\ref{semantics}).
 
 \begin{comment}
-Le domaine \texttt{Psysteme} est utilisé pour représenter les systèmes
-d'équations et d'inéquations linéaires qui apparaissent lors
-de la phase d'analyse sémantique (voir le domaine \texttt{predicate}).
+Le domaine \texttt{Psysteme} est utilisï¿½ pour reprï¿½senter les systï¿½mes
+d'ï¿½quations et d'inï¿½quations linï¿½aires qui apparaissent lors
+de la phase d'analyse sï¿½mantique (voir le domaine \texttt{predicate}).
 
-Les Psystemes sont aussi implicitement utilisés pour effectuer le
-calcul de dépendance.
+Les Psystemes sont aussi implicitement utilisï¿½s pour effectuer le
+calcul de dï¿½pendance.
 \end{comment}
 
 Objects of type \texttt{Psysteme} contain six fields:
@@ -245,14 +245,14 @@ Redundant information is stored to accelerate frequent tests and
 consistency must be insured carefully.
 
 \begin{comment}
-Un Psysteme est formé de six champs:
+Un Psysteme est formï¿½ de six champs:
 \begin{itemize}
-  \item une liste d'égalités,
-  \item le nombre des égalités,
-  \item une liste d'inégalités,
-  \item le nombre d'inégalités,
-  \item la dimension de l'espace de référence,
-  \item une base de l'espace de référence.
+  \item une liste d'ï¿½galitï¿½s,
+  \item le nombre des ï¿½galitï¿½s,
+  \item une liste d'inï¿½galitï¿½s,
+  \item le nombre d'inï¿½galitï¿½s,
+  \item la dimension de l'espace de rï¿½fï¿½rence,
+  \item une base de l'espace de rï¿½fï¿½rence.
 \end{itemize}
 \end{comment}
 
@@ -261,8 +261,8 @@ from our Integer Linear Algebra Library. This library contains an
 extensive set of functions on Psystems. See ??? for more details.
 
 \begin{comment}
-Comme le domaine Pvecteur, la structure de données Psysteme est
-importée de la bibliothèque d'algèbre linéaire en nombres entiers du
+Comme le domaine Pvecteur, la structure de donnï¿½es Psysteme est
+importï¿½e de la bibliothï¿½que d'algï¿½bre linï¿½aire en nombres entiers du
 CRI.
 \end{comment}
 
@@ -322,18 +322,18 @@ object, it is known. A value can be anything that makes sense. For
 instance, the value of a module is its \texttt{code}.
 
 \begin{comment}
-Tout objet ayant un nom dans un programme Fortran est représenté par
-une \verb/entity/. Un tel objet peut être un module, une variable, un
-common, un opérateur, une constante, un label, etc... Pour chaque objet,
-le sous-domaine \verb/name/ de l'entité donne le nom de l'objet tel
-qu'il apparaît dans le texte source du programme préfixé par le nom du
-package dans lequel l'entité est déclarée, le sous-domaine
-\verb/type/ donne le type de l'entité, le sous-domaine \verb/storage/
-le genre d'allocation mémoire utilisé pour l'entité, et finalement,
+Tout objet ayant un nom dans un programme Fortran est reprï¿½sentï¿½ par
+une \verb/entity/. Un tel objet peut ï¿½tre un module, une variable, un
+common, un opï¿½rateur, une constante, un label, etc... Pour chaque objet,
+le sous-domaine \verb/name/ de l'entitï¿½ donne le nom de l'objet tel
+qu'il apparaï¿½t dans le texte source du programme prï¿½fixï¿½ par le nom du
+package dans lequel l'entitï¿½ est dï¿½clarï¿½e, le sous-domaine
+\verb/type/ donne le type de l'entitï¿½, le sous-domaine \verb/storage/
+le genre d'allocation mï¿½moire utilisï¿½ pour l'entitï¿½, et finalement,
 le sous-domaine \verb/initial/ donne la valeur initiale, si elle est
-connue, de l'entité. Le terme valeur initiale a ici un sens assez
-large, puisqu'il s'agit par exemple du code pour les entités
-représentant des modules.
+connue, de l'entitï¿½. Le terme valeur initiale a ici un sens assez
+large, puisqu'il s'agit par exemple du code pour les entitï¿½s
+reprï¿½sentant des modules.
 \end{comment}
 
 Functions mostly dealing with entities are grouped in
@@ -378,15 +378,15 @@ varying number of arguments such as \verb/MAX/. Member \texttt{void} is used
 to declare the functional types of subroutines and programs.
 
 \begin{comment}
-Le domaine \verb/type/ représente le type d'une entité.  Le
-sous-domaine \verb/statement/ est utilisé pour les labels
-d'instruction.  Le sous-domaine \verb/area/ est utilisé pour les
-commons et pour les deux zones statique et dynamique associée à chaque
-module.  Le sous-domaine \verb/variable/ est utilisé pour toutes les
-variables, y compris les paramètres formels et le résultat d'une
-fonction Fortran.  Le sous-domaine \verb/functional/ est utilisé pour les
+Le domaine \verb/type/ reprï¿½sente le type d'une entitï¿½.  Le
+sous-domaine \verb/statement/ est utilisï¿½ pour les labels
+d'instruction.  Le sous-domaine \verb/area/ est utilisï¿½ pour les
+commons et pour les deux zones statique et dynamique associï¿½e ï¿½ chaque
+module.  Le sous-domaine \verb/variable/ est utilisï¿½ pour toutes les
+variables, y compris les paramï¿½tres formels et le rï¿½sultat d'une
+fonction Fortran.  Le sous-domaine \verb/functional/ est utilisï¿½ pour les
 fonctions, pour les subroutines et pour le programme principal.  Le
-sous-domaine \verb/void/ est utilisé pour le résultat d'une subroutine
+sous-domaine \verb/void/ est utilisï¿½ pour le rï¿½sultat d'une subroutine
 ou d'un programme principal.
 \end{comment}
 
@@ -406,7 +406,7 @@ Fortran~77 compiler. Dynamic commons cannot be statically identified
 because a dynamic binding is used.
 
 \begin{comment}
-Le domaine \texttt{area} est utilisé pour représenter les aires de
+Le domaine \texttt{area} est utilisï¿½ pour reprï¿½senter les aires de
 stockage des variables telles que les commons et les aires statiques ou
 dynamiques. Les commons Fortran sont des objets globaux et leur package de
 rattachement est donc \verb/TOP-LEVEL/. Les autres aires sont locales 
@@ -425,8 +425,8 @@ true in the current version which only emits a warning.
 
 \begin{comment}
 Le sous-domaine \texttt{size} donne la taille de l'aire
-exprimée en octets (\emph{character storage unit} de la norme ANSI
-X3.9-1978, \S~2.13). Cette taille est la taille maximum rencontrée
+exprimï¿½e en octets (\emph{character storage unit} de la norme ANSI
+X3.9-1978, \S~2.13). Cette taille est la taille maximum rencontrï¿½e
 parmi les modules d'un programme. 
 \end{comment}
 
@@ -440,8 +440,8 @@ as prefix. Their offsets in the common are stored in Type \texttt{storage}
 
 \begin{comment}
 Le sous-domaine \texttt{layout} donne la
-liste des entités stockées dans cette aire. Il s'agit des variables
-déclarées dans ce common dans n'importe quel module.
+liste des entitï¿½s stockï¿½es dans cette aire. Il s'agit des variables
+dï¿½clarï¿½es dans ce common dans n'importe quel module.
 \end{comment}
 
 As long as no program transformation has been applied, the textual order
@@ -462,10 +462,10 @@ declarations are in fact stored as a huge string which is used by
 prettyprinter as long as it is consistent with the code.
 
 \begin{comment}
-L'ordre des déclarations des variables est respecté, ce qui
-permettrait de reproduire des programmes sources fidèles à ce
-qu'étaient les programmes initiaux\footnote{Les déclarations sont en
-fait conservées sous forme textuelle pour garantir une fidélité
+L'ordre des dï¿½clarations des variables est respectï¿½, ce qui
+permettrait de reproduire des programmes sources fidï¿½les ï¿½ ce
+qu'ï¿½taient les programmes initiaux\footnote{Les dï¿½clarations sont en
+fait conservï¿½es sous forme textuelle pour garantir une fidï¿½litï¿½
 absolue.}.
 \end{comment}
 
@@ -482,10 +482,10 @@ Field \texttt{dimensions} is a list of lower and upper bound pairs.
 Scalar variables are of dimension 0 and have an empty dimension list.
 
 \begin{comment}
-Le domaine \verb/variable/ représente le type d'une variable.  Le
+Le domaine \verb/variable/ reprï¿½sente le type d'une variable.  Le
 sous-domaine \verb/basic/ donne le type Fortran de la variable.  Le
 sous-domaine \verb/dimensions/ donne la liste des dimensions de la variable.
-Un scalaire est un tableau de zéro dimension.
+Un scalaire est un tableau de zï¿½ro dimension.
 \end{comment}
 
 Each dimension is an expression, which is not always numerically
@@ -498,9 +498,9 @@ declared in libraries such as (\verb/DIMENSION T(*)/). Its name is
 \texttt{UNBOUNDED-DIMENSION}.}.
 
 \begin{comment}
-Chaque dimension est une expression, qui n'est pas nécessairement
-constante dans le cas des tableaux formels. La constante prédéfinie de
-nom '*D*' est utilisée pour les tableaux de taille non définie
+Chaque dimension est une expression, qui n'est pas nï¿½cessairement
+constante dans le cas des tableaux formels. La constante prï¿½dï¿½finie de
+nom '*D*' est utilisï¿½e pour les tableaux de taille non dï¿½finie
 (\verb/DIMENSION T(*)/).
 \end{comment}
 
@@ -544,9 +544,9 @@ an upper bounds. These bounds may not be numerically known at compile
 time when they are used to define formal arrays.
 
 \begin{comment}
-Le domaine \verb/dimension/ permet de représenter une dimension d'un
-tableau, c'est-à-dire un couple borne inférieure -- sous-domaine
-\verb/lower/ -- borne supérieure -- sous-domaine \verb/upper/.
+Le domaine \verb/dimension/ permet de reprï¿½senter une dimension d'un
+tableau, c'est-ï¿½-dire un couple borne infï¿½rieure -- sous-domaine
+\verb/lower/ -- borne supï¿½rieure -- sous-domaine \verb/upper/.
 \end{comment}
 
 \subsubsection{Qualifier}
@@ -573,11 +573,11 @@ contains the result type. Type \texttt{void} is used for subroutines and
 main programs.
 
 \begin{comment}
-Le domaine \verb/functional/ représente le type d'un module,
-c'est-à-dire une fonction, une subroutine ou un programme principal. Le
+Le domaine \verb/functional/ reprï¿½sente le type d'un module,
+c'est-ï¿½-dire une fonction, une subroutine ou un programme principal. Le
 sous-domaine \verb/parameters/ donne le type et le mode de passage de
-chaque paramètre, et le sous-domaine \verb/result/ donne le type du
-résultat. Ce dernier type vaut \verb/void/ pour les subroutines et les
+chaque paramï¿½tre, et le sous-domaine \verb/result/ donne le type du
+rï¿½sultat. Ce dernier type vaut \verb/void/ pour les subroutines et les
 programmes principaux.
 \end{comment}
 
@@ -590,10 +590,10 @@ intrinsics and called \emph{intrinsics} in PIPS.} such as \texttt{WRITE}
 which is highly polymorphic.
 
 \begin{comment}
-Il n'y a pas de moyens simples pour représenter les fonctions ou
-sous-programmes à nombre variable de paramètres. Bien que ce soit
-interdit pour les modules définis par le programmeur, de nombreux
-intrinsèques comme \verb+MIN0+ ou \verb+WRITE+ n'ont pas un profil
+Il n'y a pas de moyens simples pour reprï¿½senter les fonctions ou
+sous-programmes ï¿½ nombre variable de paramï¿½tres. Bien que ce soit
+interdit pour les modules dï¿½finis par le programmeur, de nombreux
+intrinsï¿½ques comme \verb+MIN0+ ou \verb+WRITE+ n'ont pas un profil
 unique.
 \end{comment}
 
@@ -643,10 +643,10 @@ are many storage spaces, but they do not have to exist physically in the
 machine. Some of them would not appear in a simple compiler.
 
 \begin{comment}
-Le domaine \verb/storage/ permet de préciser dans quelle zone de la
-mémoire est stockée une entité. Il y a plusieurs zones, qui ne
-correspondent pas nécessairement à la réalité, c'est-à-dire aux
-zones de mémoire qui seraient affectées par un compilateur.
+Le domaine \verb/storage/ permet de prï¿½ciser dans quelle zone de la
+mï¿½moire est stockï¿½e une entitï¿½. Il y a plusieurs zones, qui ne
+correspondent pas nï¿½cessairement ï¿½ la rï¿½alitï¿½, c'est-ï¿½-dire aux
+zones de mï¿½moire qui seraient affectï¿½es par un compilateur.
 \end{comment}
 
 Member \texttt{return} is appropriate for Fortran and C functions. The
@@ -658,10 +658,10 @@ entity accessible thru the \texttt{return} field is the corresponding
 function.
 
 \begin{comment}
-Le sous-domaine \verb/return/ permet de représenter les variables ayant
+Le sous-domaine \verb/return/ permet de reprï¿½senter les variables ayant
 pour nom le nom d'une fonction et auxquelles on affecte la valeur que la
-fonction doit retourner. L'entité pointée par \verb/return/ est la
-fonction concernée.
+fonction doit retourner. L'entitï¿½ pointï¿½e par \verb/return/ est la
+fonction concernï¿½e.
 \end{comment}
 
 Member \texttt{ram} is only used for variables having an address in
@@ -669,16 +669,16 @@ some memory space. The memory space may be linked to a module or to a
 common. Those may be accessed thru the \texttt{ram} field.
 
 \begin{comment}
-Le sous-domaine \verb/ram/ est reservé aux variables ayant une adresse
-en mémoire. Il permet de préciser dans quelle fonction et
-éventuellement dans quel common ces variables ont été déclarées.
+Le sous-domaine \verb/ram/ est reservï¿½ aux variables ayant une adresse
+en mï¿½moire. Il permet de prï¿½ciser dans quelle fonction et
+ï¿½ventuellement dans quel common ces variables ont ï¿½tï¿½ dï¿½clarï¿½es.
 \end{comment}
 
 Member \texttt{formal} is the special space for formal parameters. Of
 course, they do not have their own address.
 
 \begin{comment}
-Le sous-domaine \verb/formal/ est réservé aux paramètres formels des
+Le sous-domaine \verb/formal/ est rï¿½servï¿½ aux paramï¿½tres formels des
 modules.
 \end{comment}
 
@@ -688,9 +688,9 @@ values (defined by Fortran \texttt{PARAMETER} statement or by the semantics
 analysis or by the region analyses), numerical constant,...
 
 \begin{comment}
-Le sous-domaine \verb/rom/ est utilisé pour toutes les entités dont la
+Le sous-domaine \verb/rom/ est utilisï¿½ pour toutes les entitï¿½s dont la
 valeur n'est pas modifiable, telles que les fonctions, les labels, les
-opérateurs, etc.
+opï¿½rateurs, etc.
 \end{comment}
 
 \subsubsection{RAM Storage}
@@ -757,11 +757,11 @@ through the \texttt{function} member and the rank of this parameter in the
 formal parameter list. The first parameter has rank 1, not 0.
 
 \begin{comment}
-Le domaine \verb/formal/ indique le module dans lequel un paramètre formel
-est déclaré grâce au sous-domaine \verb/function/, et le rang de ce
-paramètre dans la liste des paramètres grâce au sous-domaine
+Le domaine \verb/formal/ indique le module dans lequel un paramï¿½tre formel
+est dï¿½clarï¿½ grï¿½ce au sous-domaine \verb/function/, et le rang de ce
+paramï¿½tre dans la liste des paramï¿½tres grï¿½ce au sous-domaine
 \verb/offset/.
-Le premier paramètre a un rang de 1 et non de 0.
+Le premier paramï¿½tre a un rang de 1 et non de 0.
 \end{comment}
 
 \subsection{Value}
@@ -790,15 +790,15 @@ value. Also, variables which are not statically initialized by a
 \texttt{DATA} statement, (probably) have an \texttt{unknown} initial value.
 
 \begin{comment}
-Le domaine \verb/value/ permet de représenter les
-valeurs initiales des entités. Le sous-domaine \verb/code/ est utilisé
-pour les entités modules. Le sous-domaine \verb/symbolic/ est utilisé
-pour les entités constantes symboliques. Le sous-domaine
-\verb/constant/ est utilisé pour les entités constantes. Le
-sous-domaine \verb/intrinsic/ est utilisé pour toutes les entités qui
-ne dépendent que du langage, telles que les intrinsics Fortran, les
-opérateurs, les instructions, etc. Enfin le sous-domaine
-\verb/unknown/ est utilisé pour les valeurs initiales inconnues.
+Le domaine \verb/value/ permet de reprï¿½senter les
+valeurs initiales des entitï¿½s. Le sous-domaine \verb/code/ est utilisï¿½
+pour les entitï¿½s modules. Le sous-domaine \verb/symbolic/ est utilisï¿½
+pour les entitï¿½s constantes symboliques. Le sous-domaine
+\verb/constant/ est utilisï¿½ pour les entitï¿½s constantes. Le
+sous-domaine \verb/intrinsic/ est utilisï¿½ pour toutes les entitï¿½s qui
+ne dï¿½pendent que du langage, telles que les intrinsics Fortran, les
+opï¿½rateurs, les instructions, etc. Enfin le sous-domaine
+\verb/unknown/ est utilisï¿½ pour les valeurs initiales inconnues.
 \end{comment}
 
 Additional value kinds would be necessary to encode the initial value of
@@ -822,13 +822,13 @@ Member \texttt{expression} is used to restore user-friendly
 declarations but has no other known use. 
 
 \begin{comment}
-Le domaine \verb/symbolic/ est utilisé pour représenter la valeur
-initiale d'une entité constante symbolique, c'est-à-dire les PARAMETER
+Le domaine \verb/symbolic/ est utilisï¿½ pour reprï¿½senter la valeur
+initiale d'une entitï¿½ constante symbolique, c'est-ï¿½-dire les PARAMETER
 de Fortran ou les CONST de Pascal. Le sous-domaine \verb/expression/
-permet de stocker l'expression qui a permis d'évaluer la valeur
+permet de stocker l'expression qui a permis d'ï¿½valuer la valeur
 initiale contenue dans le sous-domaine \verb/constant/. Le sous-domaine
-\verb/expression/ n'est utile qui si on cherche à reproduire un texte
-source fidèle.
+\verb/expression/ n'est utile qui si on cherche ï¿½ reproduire un texte
+source fidï¿½le.
 \end{comment}
 
 \subsubsection{Constant Value}
@@ -921,10 +921,10 @@ include every single common in every procedure.
 
 \begin{comment}
 Le sous-domaine \texttt{decls\_text} contient le texte exact de toutes les
-déclarations du module; ce texte est utilisé par défaut par le
-prettyprinter tant qu'il existe. Quand le code a été fortement
-transformé, le prettyprinter régénère des déclarations
-synthétiques.
+dï¿½clarations du module; ce texte est utilisï¿½ par dï¿½faut par le
+prettyprinter tant qu'il existe. Quand le code a ï¿½tï¿½ fortement
+transformï¿½, le prettyprinter rï¿½gï¿½nï¿½re des dï¿½clarations
+synthï¿½tiques.
 \end{comment}
 
 \subsection{Callees}
@@ -948,10 +948,10 @@ list \texttt{callees} is associated to each module and can be retrieved
 through a call to \texttt{pipsdbm}.
 
 \begin{comment}
-Le domaine \texttt{callees} sert à porter des informations
-interprocédurales, et sera enrichi dans le futur.  Le sous-domaine 
+Le domaine \texttt{callees} sert ï¿½ porter des informations
+interprocï¿½durales, et sera enrichi dans le futur.  Le sous-domaine 
 \texttt{callees} contient la liste des noms des sous-programmes et fonctions
-directement appelés dans le code. Il contient une partie du callgraph.
+directement appelï¿½s dans le code. Il contient une partie du callgraph.
 \end{comment}
 
 A set of such variables, \verb/callers/\footnote{Obviously,
@@ -983,12 +983,12 @@ when using the prettyprinter.
 
 \begin{comment}
 Le domaine \verb/statement/ permet de
-repérer les instructions d'un module.  Le sous-domaine \verb/label/
-contient une entité qui définit le label\footnote{Un statement dont
+repï¿½rer les instructions d'un module.  Le sous-domaine \verb/label/
+contient une entitï¿½ qui dï¿½finit le label\footnote{Un statement dont
 l'instruction est un \verb/block/ ou un \verb/unstructured/ n'a jamais
-de label.}. Un label spécial est défini pour les RETURN, ce qui permet
-de convertir les appels à RETURN en des branchements à ce label
-spécial. Un autre label spécial, \verb/empty_label/, est utilisé pour
+de label.}. Un label spï¿½cial est dï¿½fini pour les RETURN, ce qui permet
+de convertir les appels ï¿½ RETURN en des branchements ï¿½ ce label
+spï¿½cial. Un autre label spï¿½cial, \verb/empty_label/, est utilisï¿½ pour
 les statements sans label.
 \end{comment}
 
@@ -1019,13 +1019,13 @@ not exist at all, for instance for fully synthesized statements.
 Note that parser messages are labelled by physical line numbers.
 
 \begin{comment}
-Le sous-domaine \verb/number/ contient un numéro permettant de repérer
+Le sous-domaine \verb/number/ contient un numï¿½ro permettant de repï¿½rer
 le statement pour le debugging ou l'information de l'utilisateur (valeur
-par defaut: \verb+STATEMENT_NUMBER_UNDEFINED+). Ce numéro est défini
-par l'utilisateur ou implicitement par le parser qui prend le numéro de
-la première ligne de l'instruction dans le fichier source. Il n'est (en
-principe) jamais modifié par PIPS. Après déroulage de boucle,
-plusieurs \verb/statement/s peuvent avoir le même numéro.
+par defaut: \verb+STATEMENT_NUMBER_UNDEFINED+). Ce numï¿½ro est dï¿½fini
+par l'utilisateur ou implicitement par le parser qui prend le numï¿½ro de
+la premiï¿½re ligne de l'instruction dans le fichier source. Il n'est (en
+principe) jamais modifiï¿½ par PIPS. Aprï¿½s dï¿½roulage de boucle,
+plusieurs \verb/statement/s peuvent avoir le mï¿½me numï¿½ro.
 \end{comment}
 
 Member \texttt{ordering} is a 32-bit statement internal identifier. It is
@@ -1052,21 +1052,21 @@ is changed. It must be reloaded when a different module is analyzed
 because only one copy of this hash-table is available within PIPS.
 
 \begin{comment}
-Le sous-domaine \verb/ordering/ contient un entier caractéristique du
-statement; il est formé de la concaténation du numéro de composante
-dans le graphe de contrôle (numéro du control) et du numéro de
-statement dans dans cette composante; cet entier sert à comparer
+Le sous-domaine \verb/ordering/ contient un entier caractï¿½ristique du
+statement; il est formï¿½ de la concatï¿½nation du numï¿½ro de composante
+dans le graphe de contrï¿½le (numï¿½ro du control) et du numï¿½ro de
+statement dans dans cette composante; cet entier sert ï¿½ comparer
 l'ordre lexical des statements et sa valeur par defaut est
-\verb+STATEMENT_ORDERING_UNDEFINED+. Il est automatiquement recalculé
-après chaque transformation de programme. 
+\verb+STATEMENT_ORDERING_UNDEFINED+. Il est automatiquement recalculï¿½
+aprï¿½s chaque transformation de programme. 
 
-Il est aussi utilisé comme nom absolu d'un \verb/statement/ quand des
-structures de données comme les tables de hash-code sont écrites sur
-disque ou relues. Il est aussi utilisé pour établi un lien entre les
-noeuds du graphe de dépendance et les statements. Il est possible de
-créer une table de correspondance entre \verb/ordering/ et
-\verb/statement/, mais elle ne fait pas partie de la représentation
-interne et doit cond être calculée explicitement.
+Il est aussi utilisï¿½ comme nom absolu d'un \verb/statement/ quand des
+structures de donnï¿½es comme les tables de hash-code sont ï¿½crites sur
+disque ou relues. Il est aussi utilisï¿½ pour ï¿½tabli un lien entre les
+noeuds du graphe de dï¿½pendance et les statements. Il est possible de
+crï¿½er une table de correspondance entre \verb/ordering/ et
+\verb/statement/, mais elle ne fait pas partie de la reprï¿½sentation
+interne et doit cond ï¿½tre calculï¿½e explicitement.
 \end{comment}
 
 Member \texttt{ordering} is not computed for all statements reachable
@@ -1084,13 +1084,13 @@ from the entry or the exit control of an unstructured are fully lost by
 the controlizer.
 
 \begin{comment}
-Notons que le champs \verb/ordering/ n'est pas forcément calculé pour
+Notons que le champs \verb/ordering/ n'est pas forcï¿½ment calculï¿½ pour
 tous les statements. En particulier, les statements qui ne sont pas
-accessibles d'après le flot de contrôle n'en ont pas. Les statements
-sans étiquette se trouvant derrière un GOTO en sont un exemple. Les
-statements peuvent être parcourus de manière sélective, suivant le
-flot de contrôle, avec la macro \verb/CONTROL_MAP/\index{CONTROL MAP},
-ou de manière systématique avec les fonctions de parcours de NewGen,
+accessibles d'aprï¿½s le flot de contrï¿½le n'en ont pas. Les statements
+sans ï¿½tiquette se trouvant derriï¿½re un GOTO en sont un exemple. Les
+statements peuvent ï¿½tre parcourus de maniï¿½re sï¿½lective, suivant le
+flot de contrï¿½le, avec la macro \verb/CONTROL_MAP/\index{CONTROL MAP},
+ou de maniï¿½re systï¿½matique avec les fonctions de parcours de NewGen,
 \verb/gen_recurse/\index{gen\_recurse},
 \verb/gen_multi_recurse/\index{gen\_multi\_recurse}\ldots
 \end{comment}
@@ -1120,12 +1120,12 @@ that may disappear during processing, such as CONTINUE, RETURN and
 GO~TO, may disappear too.
 
 \begin{comment}
-Le sous-domaine \texttt{comments} contient le texte du commentaire associé
-a ce statement dans le programme initial; ce texte est utilisé par le
-prettyprinter. Ce sont les commentaires qui précèdent le statement
-qui s'y trouvent associés. En l'absence de commentaires, ce champ
-prend la valeur \verb/string_undefined/. Les commentaires associés à
-des instructions qui peuvent disparaître au cours des traitements comme
+Le sous-domaine \texttt{comments} contient le texte du commentaire associï¿½
+a ce statement dans le programme initial; ce texte est utilisï¿½ par le
+prettyprinter. Ce sont les commentaires qui prï¿½cï¿½dent le statement
+qui s'y trouvent associï¿½s. En l'absence de commentaires, ce champ
+prend la valeur \verb/string_undefined/. Les commentaires associï¿½s ï¿½
+des instructions qui peuvent disparaï¿½tre au cours des traitements comme
 CONTINUE, RETURN et GOTO, peuvent aussi disparaitre.
 \end{comment}
 
@@ -1199,19 +1199,19 @@ pretty-printers. The pretty-printers are able to restore Fortran-77
 Section~\ref{subsubsection-unstructured}.
 
 \begin{comment}
-Le domaine \verb/instruction/ permet de représenter les instructions
-d'un module. Une instruction peut être un sous-domaine \verb/block/,
-c'est-à-dire une liste de \verb/statement/, un sous-domaine \verb/test/
+Le domaine \verb/instruction/ permet de reprï¿½senter les instructions
+d'un module. Une instruction peut ï¿½tre un sous-domaine \verb/block/,
+c'est-ï¿½-dire une liste de \verb/statement/, un sous-domaine \verb/test/
 pour les instructions de test, un sous-domaine \verb/loop/ pour les
-boucles séquentielles, un sous-domaine \verb/goto/ pour les goto qui
+boucles sï¿½quentielles, un sous-domaine \verb/goto/ pour les goto qui
 contient le
 \verb/statement/ vers lequel le goto se branche, un sous-domaine
 \verb/call/ pour toutes les autres instructions (affectation, appel de
-subroutine, entrées-sorties, return, stop, etc) ou un sous-domaine de
-\verb/unstructured/ dans le cas ou` l'on traite d'un graphe de contrôle
-structuré. Toutes ces instructions
-sont représentées par des appels à des fonctions prédéfinies dont
-nous étudierons la nature plus loin.
+subroutine, entrï¿½es-sorties, return, stop, etc) ou un sous-domaine de
+\verb/unstructured/ dans le cas ou` l'on traite d'un graphe de contrï¿½le
+structurï¿½. Toutes ces instructions
+sont reprï¿½sentï¿½es par des appels ï¿½ des fonctions prï¿½dï¿½finies dont
+nous ï¿½tudierons la nature plus loin.
 \end{comment}
 
 Several PIPS contributors have asked for a \verb/while/ construct.
@@ -1256,14 +1256,14 @@ combinations of such \texttt{test} instructions and other PIPS instructions
 by the parser, which may add \texttt{goto} statements, and by the controlizer.
 
 \begin{comment}
-Le domaine \verb/test/ permet de représenter toutes les instructions à base
-de contrôle. Le sous-domaine \verb/condition/ contient l'expression à
+Le domaine \verb/test/ permet de reprï¿½senter toutes les instructions ï¿½ base
+de contrï¿½le. Le sous-domaine \verb/condition/ contient l'expression ï¿½
 tester, et les deux sous-domaines \verb/true/ et \verb/false/ contiennent les
-instructions à exécuter selon la valeur du test.
+instructions ï¿½ exï¿½cuter selon la valeur du test.
 
-Il faut noter que chaque instruction de contrôle de Fortran,
-à l'exception de l'instruction \verb/DO/, est
-transformée en une combinaison sémantiquement équivalente de \verb/test/s
+Il faut noter que chaque instruction de contrï¿½le de Fortran,
+ï¿½ l'exception de l'instruction \verb/DO/, est
+transformï¿½e en une combinaison sï¿½mantiquement ï¿½quivalente de \verb/test/s
 et de \verb/goto/s.
 \end{comment}
 
@@ -1307,15 +1307,15 @@ statement and instruction, would make coding more difficult.
 
 
 \begin{comment}
-Le domaine \verb/loop/ permet de représenter les boucles du type DO Fortran
-ou FOR Pascal. Le sous-domaine \verb/index/ contient l'entité indice de
+Le domaine \verb/loop/ permet de reprï¿½senter les boucles du type DO Fortran
+ou FOR Pascal. Le sous-domaine \verb/index/ contient l'entitï¿½ indice de
 boucle, le sous-domaine \verb/range/ contient les bornes de la boucle, le
-sous-domaine \verb/body/ contient le corps de la boucle, c'est-à-dire un
+sous-domaine \verb/body/ contient le corps de la boucle, c'est-ï¿½-dire un
 \verb/statement/, le sous-domaine \verb/label/ contient le label de fin de boucle,
-c'est-à-dire une entité. Le sous-domaine \verb/execution/ définit le
-comportement dynamique d'une boucle. Les entités présentes dans
+c'est-ï¿½-dire une entitï¿½. Le sous-domaine \verb/execution/ dï¿½finit le
+comportement dynamique d'une boucle. Les entitï¿½s prï¿½sentes dans
 \verb/locals/ sont propres au corps de boucle (les effets sur elles sont
-masqués quand on sort de la boucle).
+masquï¿½s quand on sort de la boucle).
 \end{comment}
 
 \index{Execution}\index{Sequential Loop}\index{Parallel Loop}
@@ -1327,10 +1327,10 @@ sequentially (\texttt{sequential} or if it may be executed concurrently
 recognizes sequential loops.
 
 \begin{comment}
-Le domain \verb/execution/ définit la sémantique d'une boucle:
-\verb/sequential/ correspond à une boucle DO classique, \verb/parallel/
-définit un boucle dont les instances d'itération peuvent être
-exécutées en parallèle.
+Le domain \verb/execution/ dï¿½finit la sï¿½mantique d'une boucle:
+\verb/sequential/ correspond ï¿½ une boucle DO classique, \verb/parallel/
+dï¿½finit un boucle dont les instances d'itï¿½ration peuvent ï¿½tre
+exï¿½cutï¿½es en parallï¿½le.
 \end{comment}
 
 \label{range}
@@ -1343,10 +1343,10 @@ fields are used to store the lower bound (\verb/lower/), the upper bound
 (\verb/upper/) and the step expression (\verb/increment/).
 
 \begin{comment}
-Le domaine \verb/range/ permet de représenter les bornes des boucles DO
+Le domaine \verb/range/ permet de reprï¿½senter les bornes des boucles DO
 Fortran. Il y a trois sous-domaines \verb/lower/, \verb/upper/ et \verb/increment/ de
-type \verb/expression/ qui sont respectivement la borne inférieure, la borne
-supérieure et l'incrément.
+type \verb/expression/ qui sont respectivement la borne infï¿½rieure, la borne
+supï¿½rieure et l'incrï¿½ment.
 \end{comment}
 
 Expressions of type range can be used in other context. For instance,
@@ -1400,21 +1400,21 @@ useful to reduce the size of the datastructure definition as well as the
 code required for many algorithms.
 
 \begin{comment}
-Le domaine \verb/call/ permet de représenter les commandes et les
+Le domaine \verb/call/ permet de reprï¿½senter les commandes et les
 appels de fonctions Fortran sous une forme unique pseudo-fonctionelle.
-Ces pseudo-fonctions jouent un rôle important dans notre
-représentation intermédiaire puisque les constantes, les opérateurs
-comme + et *, les intrinsèques comme \texttt{MOD} ou \texttt{SIN} et surtout
-les commandes (i.e. instructions) Fortran, à commencer par
+Ces pseudo-fonctions jouent un rï¿½le important dans notre
+reprï¿½sentation intermï¿½diaire puisque les constantes, les opï¿½rateurs
+comme + et *, les intrinsï¿½ques comme \texttt{MOD} ou \texttt{SIN} et surtout
+les commandes (i.e. instructions) Fortran, ï¿½ commencer par
 l'assignation et en continuant avec \texttt{READ, WRITE, PAUSE, OPEN,
 CLOSE, RETURN, CALL, FORMAT,}
-etc., sont représentées comme les appels de fonctions définies par
+etc., sont reprï¿½sentï¿½es comme les appels de fonctions dï¿½finies par
 l'utilisateur. Le nombre d'arguments de chaque pseudo-fonction varie: 0
-pour les constantes, 1 ou 2 pour les opérateurs, etc. Les commandes
-Fortran, les opérateurs et les intrinsèques sont caractérisés par
-des pseudo-fonctions prédéfinies. Cette convention permet de diminuer
-considérablement la taille de la définition de la représentation
-ainsi que le volume de code nécessaire à de nombreux algorithmes.
+pour les constantes, 1 ou 2 pour les opï¿½rateurs, etc. Les commandes
+Fortran, les opï¿½rateurs et les intrinsï¿½ques sont caractï¿½risï¿½s par
+des pseudo-fonctions prï¿½dï¿½finies. Cette convention permet de diminuer
+considï¿½rablement la taille de la dï¿½finition de la reprï¿½sentation
+ainsi que le volume de code nï¿½cessaire ï¿½ de nombreux algorithmes.
 \end{comment}
 
 Type \verb/function/ points towards the entity associated with the
@@ -1422,9 +1422,9 @@ called function. Subtype \verb/arguments/ is a list of \verb/expression/
 objects which represent the actual arguments for the function.
 
 \begin{comment}
-Le sous-domaine \verb/function/ est une entité qui définit la fonction
-appelée. Le sous-domaine \verb/arguments/ est une liste de sous-domaines
-\verb/expression/ qui représente les arguments d'appel de la fonction.
+Le sous-domaine \verb/function/ est une entitï¿½ qui dï¿½finit la fonction
+appelï¿½e. Le sous-domaine \verb/arguments/ est une liste de sous-domaines
+\verb/expression/ qui reprï¿½sente les arguments d'appel de la fonction.
 \end{comment}
 
 
@@ -1622,7 +1622,7 @@ something else too some days.
 \subsubsection{Pragma}
 \label{sec:pragma}
 
-\domain{pragma = string + expression*}
+\domain{pragma = string + expression* + entity}
 {}
 
 Pragmas fields are used to attach \verb|#pragma| to statements.
@@ -1669,7 +1669,7 @@ by the following list:
 Note that the \verb|#pragma| is automatically generated by the prettyprinter and does
 not need to be represented in the pragma extension.
 
-% \section{Représentation des expressions}
+% \section{Reprï¿½sentation des expressions}
 \section{Expressions}
 \label{expression}
 \index{Expression}
@@ -1759,14 +1759,14 @@ and the list length is not checked, but in the parser. That is, there is
 no independent consistency checker.}.
 
 \begin{comment}
-Le domaine \verb/reference/ est utilisé pour représenter une
-référence à un élément de tableau\footnote{Les variables scalaires
-étant représentées par des tableaux de dimension 0, les références
+Le domaine \verb/reference/ est utilisï¿½ pour reprï¿½senter une
+rï¿½fï¿½rence ï¿½ un ï¿½lï¿½ment de tableau\footnote{Les variables scalaires
+ï¿½tant reprï¿½sentï¿½es par des tableaux de dimension 0, les rï¿½fï¿½rences
 a des scalaires sont aussi prises en compte. Elles contiennent une liste
 vide d'expressions d'indices.}.  Le sous-domaine \verb/variable/
-contient une entité définissant la variable référencée. Le
+contient une entitï¿½ dï¿½finissant la variable rï¿½fï¿½rencï¿½e. Le
 sous-domaine \verb/indices/ contient une liste \texttt{expression}s qui sont les
-indices de la référence.
+indices de la rï¿½fï¿½rence.
 \end{comment}
 
 \subsubsection{Range}
@@ -1821,7 +1821,7 @@ that the expression is \emph{complex} in the mathematical sense.}).
 
 \begin{comment}
 Le domaine \texttt{normalized} permet de savoir si une expression est une
-expression linéaire construite sur les variables simples entières
+expression linï¿½aire construite sur les variables simples entiï¿½res
 (sous-domaine \texttt{linear}) ou non (sous-domaine \texttt{complex}).
 \end{comment}
 
@@ -1830,9 +1830,9 @@ Field \verb/complex/ is used if the expression is not affine, e.g.
 variables, e.g. \texttt{T(I-1) + T(I) + T(I+1)}.
 
 \begin{comment}
-Le sous-domaine \texttt{complex} est utilisé si l'expression n'est pas
-linéaire (ex: \texttt{I*J+4}) ou si elle est linéaire mais contient autre
-chose que des références à des scalaires entiers (ex: \texttt{T(I-1) +
+Le sous-domaine \texttt{complex} est utilisï¿½ si l'expression n'est pas
+linï¿½aire (ex: \texttt{I*J+4}) ou si elle est linï¿½aire mais contient autre
+chose que des rï¿½fï¿½rences ï¿½ des scalaires entiers (ex: \texttt{T(I-1) +
 T(I) + T(I+1)}).
 \end{comment}
 
@@ -1843,8 +1843,8 @@ used. This may cause problems when using the NewGen
 \verb/gen_defined_p()/ consistency checker.
 
 \begin{comment}
-La forme normalisée n'existe pas si l'expression n'a pas encore été
-examinée.
+La forme normalisï¿½e n'existe pas si l'expression n'a pas encore ï¿½tï¿½
+examinï¿½e.
 \end{comment}
 
 A C Macro, \verb/NORMALIZE_EXPRESSION/ is used to perform the
@@ -2046,8 +2046,8 @@ as well as pseudo-variables, known as \verb/PHI/ variables. There is one
 \verb/PHI/ variable per array dimension.
 
 Field \verb/context/ only is used for effects known as \emph{array
-regions}. They were defined by Rémi Triolet in~\cite{Trio84} and
-extended by Béatrice Creusillet in~\cite{Creu96}.
+regions}. They were defined by Rï¿½mi Triolet in~\cite{Trio84} and
+extended by Bï¿½atrice Creusillet in~\cite{Creu96}.
 
 There should not be much strict aliasing between effects in an effect
 list, but this is (was?) not checked and enforced. Some efforts are
@@ -2082,11 +2082,11 @@ other ones may never access it, and some may access it or not dependeing
 on the statement occurence. Such effects are of the \verb/may/ kind.
 
 \begin{comment}
-La présence de tests et boucles ne permet pas de déterminer en général
-si une variable est effectivement lue ou écrite lors de l'exécution
-d'un \texttt{statement}. Il se peut même que certaines exécutions
-y accèdent et que d'autres n'y fassent pas référence. Les effets
-calculés sont alors de type \texttt{may}.
+La prï¿½sence de tests et boucles ne permet pas de dï¿½terminer en gï¿½nï¿½ral
+si une variable est effectivement lue ou ï¿½crite lors de l'exï¿½cution
+d'un \texttt{statement}. Il se peut mï¿½me que certaines exï¿½cutions
+y accï¿½dent et que d'autres n'y fassent pas rï¿½fï¿½rence. Les effets
+calculï¿½s sont alors de type \texttt{may}.
 \end{comment}
 
 Sometimes, a simple statement, such as an assignment like \texttt{J = 2},
@@ -2104,11 +2104,11 @@ numerically known.
 
 \begin{comment}
 Dans quelques cas particuliers, comme une affectation simple \texttt{I = 2},
-l'effet est certain (\emph{must}). Il peut alors être utilisé dans
+l'effet est certain (\emph{must}). Il peut alors ï¿½tre utilisï¿½ dans
 le calcul des \emph{use-def chains} pour effectuer un \emph{kill} sur les
 variables scalaires. Un effet \emph{must} sur un tableau ne signifie pas
-que tout le tableau est lu ou écrit mais qu'au moins un de ses
-éléments l'est.
+que tout le tableau est lu ou ï¿½crit mais qu'au moins un de ses
+ï¿½lï¿½ments l'est.
 \end{comment}
 
 \subsection{Mapping from Statements to Effects}
@@ -2142,9 +2142,9 @@ variables are taken into account. Note that the data structure does not
 enforce the integer and scalar conditions.
 
 \begin{comment}
-Le domaine \texttt{transformer} définit une relation entre deux états
-mémoire. Cette relation
-porte sur les valeurs des variables scalaires entières d'un module ou
+Le domaine \texttt{transformer} dï¿½finit une relation entre deux ï¿½tats
+mï¿½moire. Cette relation
+porte sur les valeurs des variables scalaires entiï¿½res d'un module ou
 des variables globales au programme.
 \end{comment}
 
@@ -2160,21 +2160,21 @@ value is considered a final value and no value entity is allocated.
 
 \begin{comment}
 Les variables qui apparaissent dans la liste des arguments sont celles
-qui ont été modifiées entre les deux états. Deux valeurs
-sont donc associées à chacune d'entre elles: la pre- et la
-post-valeur.  Les post-valeurs sont portées par les entités
-elles-mêmes. Les pré-valeurs sont portées par des entités
-spéciales. Les variables scalaires entières qui ne sont pas modifiées
+qui ont ï¿½tï¿½ modifiï¿½es entre les deux ï¿½tats. Deux valeurs
+sont donc associï¿½es ï¿½ chacune d'entre elles: la pre- et la
+post-valeur.  Les post-valeurs sont portï¿½es par les entitï¿½s
+elles-mï¿½mes. Les prï¿½-valeurs sont portï¿½es par des entitï¿½s
+spï¿½ciales. Les variables scalaires entiï¿½res qui ne sont pas modifiï¿½es
 et qui n'apparaissent donc pas dans la liste des arguments n'ont qu'une
-seule valeur, portée par l'entité correspondant à la variable.
+seule valeur, portï¿½e par l'entitï¿½ correspondant ï¿½ la variable.
 \end{comment}
 
 The relationship between the initial and final store is abstracted by a
 set of affine equations and inequations on the values.
 
 \begin{comment}
-La relation est définie par des égalités et des inégalités
-linéaires entre valeurs.
+La relation est dï¿½finie par des ï¿½galitï¿½s et des inï¿½galitï¿½s
+linï¿½aires entre valeurs.
 \end{comment}
 
 Two kinds of transformers are used in PIPS. The first kind is linked to
@@ -2186,19 +2186,19 @@ module or of a whole program and the store just before the execution of
 this statement. Such a transformer si called a \emph{precondition}.
 
 \begin{comment}
-Deux types de transformers sont utilisés. Le premier est propre à un
+Deux types de transformers sont utilisï¿½s. Le premier est propre ï¿½ un
 \texttt{statement} et donne une abstraction de son effet sur les variables
-entières. Les variables qui apparaissent dans la liste des arguments
-sont celles qui sont affectées lors de son exécution.  Le second,
-aussi associé à un \texttt{statement}, donne une relation entre l'état
-initial d'un module et l'état précédent l'exécution de ce \texttt{statement}.
+entiï¿½res. Les variables qui apparaissent dans la liste des arguments
+sont celles qui sont affectï¿½es lors de son exï¿½cution.  Le second,
+aussi associï¿½ ï¿½ un \texttt{statement}, donne une relation entre l'ï¿½tat
+initial d'un module et l'ï¿½tat prï¿½cï¿½dent l'exï¿½cution de ce \texttt{statement}.
 \end{comment}
 
 Transformers and preconditions are computed by semantics analyses,
 either intra- or inter-procedurally.
 
 \begin{comment}
-Les transformers ne sont définis qu'après une phase d'analyse sémantique.
+Les transformers ne sont dï¿½finis qu'aprï¿½s une phase d'analyse sï¿½mantique.
 \end{comment}
 
 \subsection{Predicate}
@@ -2217,12 +2217,12 @@ linking two different points of a program (\emph{transformer}). It may
 also define an array region (see Section~\ref{subsection-effect}).
 
 \begin{comment}
-Le domaine \texttt{predicate} définit une relation entre valeurs de
-variables scalaires entières. Son interprétation est fonction de
-son utilisation. Il peut s'agir soit d'un prédicat valable en
-un point du programme (i.e. un invariant), soit d'un prédicat
+Le domaine \texttt{predicate} dï¿½finit une relation entre valeurs de
+variables scalaires entiï¿½res. Son interprï¿½tation est fonction de
+son utilisation. Il peut s'agir soit d'un prï¿½dicat valable en
+un point du programme (i.e. un invariant), soit d'un prï¿½dicat
 valable entre deux points du programme. Il s'agit alors d'une
-abstraction d'une commande, c'est-à-dire d'un \texttt{transformer}.
+abstraction d'une commande, c'est-ï¿½-dire d'un \texttt{transformer}.
 \end{comment}
 
 
@@ -2304,8 +2304,8 @@ have been added to NewGen. They are not systematically used.
 
 % pipsmake
 \bibitem{Baro91} B. Baron,
-\emph{Construction flexible et cohérente pour la compilation
-interprocédurale}, 
+\emph{Construction flexible et cohï¿½rente pour la compilation
+interprocï¿½durale}, 
 Rapport interne EMP-CRI-E157, juillet 1991
 
 \bibitem{Bern66} A. J. Bernstein, \emph{Analysis of Programs for
@@ -2313,8 +2313,8 @@ Parallel Processing}, IEEE Transactions on Electronic Computers,
 Vol.~15, n.~5, pp. 757-763, Oct. 1966.
 
 \bibitem{Creu96} B. Creusillet,
-\emph{Analyses de régions de tableaux et applications}, Thèse de
-Docteurat, École des mines de Paris, Décembre 1996
+\emph{Analyses de rï¿½gions de tableaux et applications}, Thï¿½se de
+Docteurat, ï¿½cole des mines de Paris, Dï¿½cembre 1996
 
 \bibitem{JT89} P. Jouvelot, R. Triolet,
 \emph{NewGen: A Language Independent Program Generator},
@@ -2325,13 +2325,13 @@ Rapport Interne CAII 191, 1989
 Rapport Interne CAII ???, 1990
 
 \bibitem{Trio90} R. Triolet,
-\emph{PIPSMAKE and PIPSDBM: Motivations et fonctionalités},
+\emph{PIPSMAKE and PIPSDBM: Motivations et fonctionalitï¿½s},
 Rapport Interne CAII TR~E/133
 
 \bibitem{Trio84} R. Triolet,
-\emph{Contribution à la parallélisation automatique de programmes
-Fortran comportant des appels de procédures}, Thèse de
-Docteur-Ingénieur, Université Pierre et Marie Curie, décembre 1984.
+\emph{Contribution ï¿½ la parallï¿½lisation automatique de programmes
+Fortran comportant des appels de procï¿½dures}, Thï¿½se de
+Docteur-Ingï¿½nieur, Universitï¿½ Pierre et Marie Curie, dï¿½cembre 1984.
 
 \bibitem{TrIr91} R. Triolet,  F. Irigoin,
 \emph{PIPS High-Level Software Interface: Pipsmake}

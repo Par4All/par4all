@@ -1,6 +1,6 @@
 /*
 
-  $Id$
+  $Id: pragma.c 14504 2009-07-10 15:53:46Z villalon $
 
   Copyright 1989-2009 MINES ParisTech
 
@@ -39,6 +39,9 @@
 #include "ri.h"
 #include "ri-util.h"
 #include "text-util.h"
+#include "outlining_private.h"
+#include "step_private.h"
+#include "step.h"
 
 //***********************************************************Local constant
 static const string C_PRAGMA_HEADER = "#pragma";
@@ -136,8 +139,13 @@ list pragma_omp_parallel_for_as_exprs (void) {
 string close_extension (extension e) {
   string result = string_undefined;
   if (get_prettyprint_is_fortran () == TRUE)
-    result = strdup(concatenate (FORT_PRAGMA_HEADER, "omp end parallel do",
-				 NULL));
+    {
+      if (pragma_entity_p(extension_pragma(e)))
+	result=directive_to_string(load_global_directives(pragma_entity(extension_pragma(e))),true);
+      else
+	result = strdup(concatenate (FORT_PRAGMA_HEADER, "omp end parallel do",
+				     NULL));
+    }
   return result;
 }
 
@@ -215,6 +223,9 @@ pragma_to_string (pragma p) {
     s = string_buffer_to_string_reverse (sb);
     // Free the buffer with its strings
     string_buffer_free_all(&sb);
+    break;
+  case is_pragma_entity:
+    return directive_to_string(load_global_directives(pragma_entity(p)),false);
     break;
   default:
     pips_internal_error("Unknown pragama type\n");
@@ -316,6 +327,20 @@ add_pragma_expr_to_statement(statement st, list l) {
   /* Make a new pragma: */
   pragma p = pragma_undefined;
   p = make_pragma_expression(l);
+  extension e = make_extension(p);
+  /* Add the new pragma to the extension list: */
+  list el = extensions_extension(es);
+  el = gen_extension_cons(e, el);
+  extensions_extension(es) = el;
+}
+
+
+void add_pragma_entity_to_statement(statement st, entity en)
+{
+  extensions es = statement_extensions(st);
+  /* Make a new pragma: */
+  pragma p = pragma_undefined;
+  p = make_pragma_entity(en);
   extension e = make_extension(p);
   /* Add the new pragma to the extension list: */
   list el = extensions_extension(es);

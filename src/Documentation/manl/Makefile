@@ -1,4 +1,4 @@
-# $Id$
+# $Id: Makefile 14207 2009-06-04 10:35:07Z coelho $
 #
 # Copyright 1989-2009 MINES ParisTech
 #

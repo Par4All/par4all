@@ -1,4 +1,4 @@
-# $Id$
+# $Id: pipsmake.sed 14219 2009-06-04 11:34:06Z coelho $
 #
 # Copyright 1989-2009 MINES ParisTech
 #

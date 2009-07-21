@@ -631,6 +631,13 @@ words_genuine_regular_call(call obj, bool is_a_subroutine)
   return pc;
 }
 
+static list
+words_call_intrinsic(call obj,
+		     int __attribute__ ((unused)) precedence,
+		     bool __attribute__ ((unused)) leftmost)
+{
+  return words_regular_call(obj, TRUE);
+}
 
 static list
 words_assign_op(call obj,
@@ -1756,6 +1763,9 @@ multiply-add operators ( JZ - sept 98) */
     {OMP_FOR_FUNCTION_NAME,       words_nullary_op, 0},
     {OMP_PARALLEL_FUNCTION_NAME,  words_nullary_op, 0},
     {OMP_REDUCTION_FUNCTION_NAME, words_omp_red,    0},
+
+#include "STEP_RT_intrinsic.h"
+
     {NULL, null, 0}
 };
 

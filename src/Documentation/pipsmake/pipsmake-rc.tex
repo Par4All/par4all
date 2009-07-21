@@ -217,7 +217,7 @@
 \newcommand{\Display}{\LINK{\texttt{Display}}{http://www.cri.ensmp.fr/pips/Display.html}}
 \newcommand{\Delete}{\LINK{\texttt{Delete}}{http://www.cri.ensmp.fr/pips/Delete.html}}
 
-%% Pour Béatrice :
+%% Pour Bï¿½atrice :
 \newcommand{\exact}[0]{{\tt EXACT}}
 \newcommand{\incluseg}{\subseteq}
 \newcommand{\phik}[1]{\ifmmode\phi_{#1}\else$\phi_{#1}$\fi}
@@ -239,7 +239,7 @@
 
 %\begin{PipsExample}
 %petit essai
-%à mettre ailleurs ! @!#%!#&@*I#(**()\\$$ pour tester
+%ï¿½ mettre ailleurs ! @!#%!#&@*I#(**()\\$$ pour tester
 %\end{PipsExample}
 
 %% The environment used to mark up the menus layout :
@@ -2156,7 +2156,7 @@ DFG.
 
 There are several ways to compute a dependence graph. Some of them are
 fast (\textsc{Banerjee}'s one for instance) but provide poor results, others
-might be slower (Rémi's one for instance) but produce better
+might be slower (Rï¿½mi's one for instance) but produce better
 results.
 
 Three different dependence tests are available, all based on
@@ -2201,9 +2201,9 @@ on property \verb/RICEDG_PROVIDE_STATISTICS/ (more details in the
 most relevant information for a whole program.
 
 The main contributors for the design and development of dependence
-analysis are Rémi \textsc{Triolet}, François \textsc{Irigoin} and Yi-qing
+analysis are Rï¿½mi \textsc{Triolet}, Franï¿½ois \textsc{Irigoin} and Yi-qing
 \textsc{Yang}~\cite{Y93}. The code was improved by Corinne
-\textsc{Ancourt} and Béatrice \textsc{Creusillet}.
+\textsc{Ancourt} and Bï¿½atrice \textsc{Creusillet}.
 %%!UserManualDocumentation
 
 \subsection{Menu for Dependence Tests}
@@ -2565,7 +2565,7 @@ polynomial} equations between scalar integer variables. SUIF~\cite{}
 also performs some kind of semantics analysis.
 
 The semantics analysis part of \PIPS{} was designed and developed by
-François \textsc{Irigoin}.
+Franï¿½ois \textsc{Irigoin}.
 
 \subsection{Transformers}
 \label{subsubsection-transformers}
@@ -2610,7 +2610,7 @@ since call statements are accepted. Interprocedural algorithms use the
 Fast algorithms use a very primitive non-iterative transitive closure
 algorithm (two possible versions: flow sensitive or flow insensitive).
 Full algorithms use a transitive closure algorithm based on vector
-subspace (i.e. \emph{à la} K{\sc arr}~\cite{Karr76}) or one based on
+subspace (i.e. \emph{ï¿½ la} K{\sc arr}~\cite{Karr76}) or one based on
 the discrete derivatives~\cite{Irigoin2006}. The iterative fixpoint
 algorithm for transformers (i.e. H{\sc albwachs}/C{\sc
 ousot}~\cite{HC78} is implemented but not used because the results
@@ -3527,7 +3527,7 @@ The first version of the complexity estimator was designed and
 developed by Pierre \textsc{Berthomier}. It was restricted to intra-procedural
 analysis. This first version was enlarged and validated on real code for
 SPARC-2 machines by Lei Z{\sc hou}~\cite{Z94}. Since, it has been modified
-slightly by François I{\sc rigoin}. For simple programs, complexity
+slightly by Franï¿½ois I{\sc rigoin}. For simple programs, complexity
 estimation are strongly correlated with execution times. The estimations
 can be used to see if program transformations are beneficial.
 
@@ -3865,11 +3865,11 @@ eliminated from the descriptors (convex polyhedron). For other
 statements, they are equal to the empty list of regions.  
 
 \verb+MAY+ \verb+READ+ and \verb+WRITE+ region analysis was first designed
-by Rémi \textsc{Triolet}~\cite{T84} and then revisited by François
+by Rï¿½mi \textsc{Triolet}~\cite{T84} and then revisited by Franï¿½ois
 \textsc{Irigoin}~\cite{TIF86}. Alexis \textsc{Platonoff}~\cite{Pla90}
 implemented the first version of region analysis in \PIPS{}. These
 regions were computed with respect to the initial stores of the
-modules. François \textsc{Irigoin} and, mainly, Béatrice
+modules. Franï¿½ois \textsc{Irigoin} and, mainly, Bï¿½atrice
 \textsc{Creusillet}~\cite{CI95,CI96,C96}, added new functionalities to
 this first version as well as functions to compute \verb+MUST+
 regions, and \verb+IN+ and \verb+OUT+ regions.  
@@ -4347,7 +4347,7 @@ already parallel loops:
 \begin{PipsProp}
 PARALLELIZE_AGAIN_PARALLEL_CODE FALSE
 \end{PipsProp}
-The motivation is when applying \emph{à la} Rice parallelizing to improve
+The motivation is when applying \emph{ï¿½ la} Rice parallelizing to improve
 some sequential code, we may not want loop distribution on already
 parallel code to preserve cache resources.
 
@@ -4873,7 +4873,7 @@ generated code, e.g. to propagate constant or eliminate dead code.
 Note that use-use dependencies are used to allocate temporary arrays in
 local memory (i.e. in the software cache).
 
-This compilation scheme was designed by Corinne \textsc{Ancourt} and François
+This compilation scheme was designed by Corinne \textsc{Ancourt} and Franï¿½ois
 \textsc{Irigoin}. It uses theoretical results in~\cite{AI91}. Its input is a very
 small subset of Fortran program (e.g. procedure calls are not supported).
 It was implemented by the designers, with help from Lei \textsc{Zhou}.
@@ -5155,7 +5155,136 @@ HPFC_REDUNDANT_SYSTEMS_FOR_REMAPS FALSE
 \subsection{STEP: MPI code generation from OpenMP programs}
 \label{sec:step:-mpi-code}
 
-\marginpar{RK: IT SudParis : include your work here}
+\begin{PipsMake}
+outlining_init              > PROGRAM.outlined
+\end{PipsMake}
+
+\begin{PipsMake}
+step_outlining                   > PROGRAM.outlined
+                            > MODULE.code
+                            > MODULE.callees
+   < PROGRAM.entities
+   < PROGRAM.outlined
+   < MODULE.code
+   < MODULE.callees
+\end{PipsMake}
+
+\begin{PipsProp}
+OUTLINING_NAME "outline"
+OUTLINING_FROM 0
+OUTLINING_TO 0
+OUTLINING_SYMBOLIC TRUE
+\end{PipsProp}
+
+\begin{PipsMake}
+step_inlining               > PROGRAM.outlined
+                            > MODULE.code
+                            > MODULE.callees
+   < PROGRAM.entities
+   < PROGRAM.outlined
+   < MODULE.code
+   < MODULE.callees
+\end{PipsMake}
+
+\begin{PipsProp}
+INLINING_LABEL 0
+\end{PipsProp}
+
+
+\begin{PipsMake}
+directives_init             > PROGRAM.directives
+\end{PipsMake}
+
+\begin{PipsMake}
+directive_filter            > MODULE.directive_filtered_file
+   < MODULE.source_file
+\end{PipsMake}
+
+\begin{PipsMake}
+directive_parser            > MODULE.parsed_code
+                            > MODULE.callees
+   < PROGRAM.entities
+   < MODULE.directive_filtered_file
+\end{PipsMake}
+
+\begin{PipsMake}
+step_directives             > PROGRAM.directives
+                            > PROGRAM.outlined
+                            > MODULE.code
+                            > MODULE.callees
+   ! MODULE.directive_parser
+   < PROGRAM.directives
+   < PROGRAM.outlined
+   < PROGRAM.entities
+   < MODULE.code
+   < MODULE.callees
+\end{PipsMake}
+
+
+\begin{PipsMake}
+step_init                   > PROGRAM.step_status
+\end{PipsMake}
+
+\begin{PipsMake}
+step_atomize                > MODULE.code
+                            > MODULE.step_atomized
+   < PROGRAM.entities
+   < MODULE.code
+\end{PipsMake}
+
+\begin{PipsMake}
+step_analyse                > PROGRAM.step_status
+   < PROGRAM.directives
+   < PROGRAM.step_status
+   < PROGRAM.entities
+   < MODULE.code
+   < MODULE.summary_regions
+   < MODULE.in_summary_regions
+   < MODULE.out_summary_regions
+\end{PipsMake}
+
+\begin{PipsMake}
+step_unatomize              > MODULE.code
+                            > MODULE.step_atomized
+   < PROGRAM.entities
+   < MODULE.step_atomized
+   < MODULE.code
+\end{PipsMake}
+
+\begin{PipsMake}
+step_mpi                   > PROGRAM.step_status
+   < PROGRAM.directives
+   < PROGRAM.step_status
+   < PROGRAM.outlined
+   < PROGRAM.entities
+   < MODULE.code
+
+step_omp                   > PROGRAM.step_status
+   < PROGRAM.directives
+   < PROGRAM.step_status
+   < PROGRAM.outlined
+   < PROGRAM.entities
+   < MODULE.code
+
+step_compile               > PROGRAM.step_status
+                           > MODULE.code
+                           > MODULE.callees
+   ! CALLEES.step_compile
+   < PROGRAM.directives
+   < PROGRAM.step_status
+   < PROGRAM.outlined
+   < PROGRAM.entities
+   < MODULE.code
+
+step_install               > PROGRAM.user_file
+                           > ALL.user_file
+   < ALL.user_file
+   < ALL.printed_file
+\end{PipsMake}
+
+\begin{PipsProp}
+STEP_INSTALL_PATH ""
+\end{PipsProp}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% PHRASE
 
@@ -6258,7 +6387,7 @@ logic (such as FPGAs or DataPaths).
 
 This library provides phases allowing to build and modify "Finite State
 Machine"-like code portions which will be later synthetized in
-reconfigurable units. This was implemented by Sylvain \textsc{Guérin}.
+reconfigurable units. This was implemented by Sylvain \textsc{Guï¿½rin}.
 
 \subsubsection{FSM Generation}
 \label{paragraph-fsm-generation}
@@ -10294,8 +10423,8 @@ print_xml_application      > MODULE.xml_printed_file
 \chapter{Feautrier Methods (a.k.a. Polyhedral Method)}
 \label{section-feautrier-methods}
 
-This part of \PIPS{} was implemented at Centre d'Études Atomiques,
-Limeil-Brévannes, by Benoît de \textsc{Dinechin}, Arnauld
+This part of \PIPS{} was implemented at Centre d'ï¿½tudes Atomiques,
+Limeil-Brï¿½vannes, by Benoï¿½t de \textsc{Dinechin}, Arnauld
 \textsc{Leservot} and Alexis \textsc{Platonoff}.
 
 Unfortunately, this part is no longer used in PIPS right now because of
@@ -10690,7 +10819,7 @@ Seventh Annual Workshop on Languages and Compilers for Parallel
 Computing, Ithaca (NY), August 1994
 
   \bibitem{B91} B. Baron,
-{\em Construction flexible et cohérente pour la compilation interprocédurale},
+{\em Construction flexible et cohï¿½rente pour la compilation interprocï¿½durale},
 Rapport interne EMP-CRI-E157, juillet 1991
 
   \bibitem{BIJ91} B. Baron, F. Irigoin, P. Jouvelot,
@@ -10706,22 +10835,22 @@ Rapport interne EMP-CRI-E130, septembre 1990
 Rapport interne EMP-CRI-E129, septembre 1990
 
   \bibitem{C93} F. Coelho,
-{\em Étude et réalisation d'un compilateur pour le {\em High
+{\em ï¿½tude et rï¿½alisation d'un compilateur pour le {\em High
 Performance Fortran}},
 Rapport interne EMP-CRI-A238, juin 1993
 
  
-  \bibitem{C96} Béatrice Creusillet {\em
-Analyses de régions de tableaux et applications}, 
-Thèse de doctorat de l'Ecolde des Mines de Paris,
-Décembre 1996 (available as A/295/CRI).
+  \bibitem{C96} Bï¿½atrice Creusillet {\em
+Analyses de rï¿½gions de tableaux et applications}, 
+Thï¿½se de doctorat de l'Ecolde des Mines de Paris,
+Dï¿½cembre 1996 (available as A/295/CRI).
  
-  \bibitem{CI95} Béatrice Creusillet, François Irigoin, {\em
+  \bibitem{CI95} Bï¿½atrice Creusillet, Franï¿½ois Irigoin, {\em
 Interprocedural Array Region Analyses}, Workshop on Languages and
 Compilers for Parallel Computing, LCPC'95, Colombus, OHIO, USA, 10-12
-Août 1995 (also available as TR A/270).
+Aoï¿½t 1995 (also available as TR A/270).
 
-  \bibitem{CI96} Béatrice Creusillet, François Irigoin, {\em Interprocedural
+  \bibitem{CI96} Bï¿½atrice Creusillet, Franï¿½ois Irigoin, {\em Interprocedural
     Array Region Analyses}, International Journal on Parallel Programming
   (special issue on Languages and Compilers for Parallel Computing, LCPC'95),
   24(6), (also available as TR A/282).
@@ -10766,7 +10895,7 @@ Internal Representation of Fortran Code}, Technical Report E/166, May
   \bibitem{I87} F. Irigoin,
 {\em Partitionnement des boucles imbrique'es. Une tech\-nique
 d'opti\-mi\-sation des programmes scientifiques},
-Thèse de doctorat de l'université Pierre et Marie Curie, juin 1987
+Thï¿½se de doctorat de l'universitï¿½ Pierre et Marie Curie, juin 1987
 
   \bibitem{IT87a} F. Irigoin, R. Triolet,
 {\em Automatic DO-Loop Partitioning for Improving
@@ -10789,8 +10918,8 @@ January 13-15, pp. 319-329, 1988
 PUMA ESPRIT 2701, Deliberable 6.5.1, Tech. Report EMP-CRI-E155, November 1991
 
   \bibitem{IA92a} F. Irigoin, C. Ancourt,
-{\em Compilation pour machines à mémoire répartie},
-Algorithmique Parallèle, Cosnard, Nivat, Robert Eds, Masson,
+{\em Compilation pour machines ï¿½ mï¿½moire rï¿½partie},
+Algorithmique Parallï¿½le, Cosnard, Nivat, Robert Eds, Masson,
 Ecole de Printemps du LITP, mai 1992
 
   \bibitem{IA92b} F. Irigoin, C. Ancourt,
@@ -10804,7 +10933,7 @@ J.J.~Dongarra and B.~Tourancheau Eds, Elsevier,
 Workshop CNRS-NSF, Saint-Hilaire du Touvet, Sept. 1992
 
   \bibitem{I94} F. Irigoin, \& al.,
-{\em Projet PIPS. Environnement de développement},
+{\em Projet PIPS. Environnement de dï¿½veloppement},
 Rapport interne EMP-CRI-E146, novembre 1994. This report is available
 on-line and regularly updated.
 
@@ -10823,12 +10952,12 @@ on-line and regularly updated.
   ISPRA Courses on Information Sciences 1986}, ISPRA, Kluwer Academic,
   1989
 
-\bibitem{Pla90} A. Platonoff, {\em Calcul des effets des procédures au
-  moyen des régions}, Rapport interne EMP-CAII-I132, juin 1990
+\bibitem{Pla90} A. Platonoff, {\em Calcul des effets des procï¿½dures au
+  moyen des rï¿½gions}, Rapport interne EMP-CAII-I132, juin 1990
 
-\bibitem{Pla95a} A. Platonoff, {\em Contribution à la Distribution
-  Automatique des Données pour Machines Massivement Parallèles},
-  Thèse de doctorat de l'université Pierre et Marie Curie, 9 mars
+\bibitem{Pla95a} A. Platonoff, {\em Contribution ï¿½ la Distribution
+  Automatique des Donnï¿½es pour Machines Massivement Parallï¿½les},
+  Thï¿½se de doctorat de l'universitï¿½ Pierre et Marie Curie, 9 mars
   1995.
 
 \bibitem{Pla95b} A. Platonoff, Automatic Data Distribution for Massively
@@ -10836,10 +10965,10 @@ on-line and regularly updated.
   Parallel Computers}, Malaga, Spain, June 1995.
 
   \bibitem{T84} R. Triolet,
-{\em Contribution à la parallélisation automatique de programmes
-Fortran comportant des appels de procédure},
-Thèse de docteur-ingénieur, Université Pierre et Marie Curie,
-décembre 1984
+{\em Contribution ï¿½ la parallï¿½lisation automatique de programmes
+Fortran comportant des appels de procï¿½dure},
+Thï¿½se de docteur-ingï¿½nieur, Universitï¿½ Pierre et Marie Curie,
+dï¿½cembre 1984
 
   \bibitem{TIF86} R. Triolet, F. Irigoin, P. Feautrier,
 {\em Direct Parallelization of Call Statements},
@@ -10847,15 +10976,15 @@ ACM SIGPLAN'86 Symposium on Compiler Construction, Hyatt Rickeys Hotel, Palo
 Alto, June 23-27, 1986
 
   \bibitem{Y93} Y. Yang,
-{\em Tests des dépendances et transformations de programme},
-Thèse de doctorat de l'Université Pierre et Marie Curie,
+{\em Tests des dï¿½pendances et transformations de programme},
+Thï¿½se de doctorat de l'Universitï¿½ Pierre et Marie Curie,
 15 Novembre 1993, rapport A/242.
 
   \bibitem{Z94} L. Zhou,
 {\em Analyse
-statique et dynamique de la complexité des programmes
+statique et dynamique de la complexitï¿½ des programmes
 scientifiques},
-Thèse de doctorat de l'Université Pierre et Marie Curie,
+Thï¿½se de doctorat de l'Universitï¿½ Pierre et Marie Curie,
 14 Septembre 1994, technical report A/255.
 
   \bibitem{rieblFL00} Martin Griebl, Paul Feautrier and Christian Lengauer

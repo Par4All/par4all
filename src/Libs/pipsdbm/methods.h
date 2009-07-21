@@ -172,6 +172,12 @@
 { DBR_SYMBOL_TABLE_FILE,	STRING_METHODS },
 { DBR_XML_PRINTED_FILE,		STRING_METHODS },
 
+/* STEP FILES
+ */
+{ DBR_DIRECTIVE_FILTERED_FILE,  STRING_METHODS },
+{ DBR_STEP_STATUS,              NEWGEN_METHODS },
+{ DBR_STEP_ATOMIZED,            NEWGEN_METHODS },
+
 /* HPFC GENERATED FILES
  */
 { DBR_HPFC_FILTERED_FILE, 	STRING_METHODS },
@@ -197,6 +203,7 @@
 { DBR_CODE, 			NEWGEN_METHODS },
 { DBR_HEIGHT, 			STRING_METHODS },
 { DBR_DEPTH, 			STRING_METHODS },
+{ DBR_OUTLINED, 		NEWGEN_METHODS },
 
   /* DECLARATIONS is a special resource to impose that each compilation unit
      must be parsed before its functions. It is in fact a hash table 

@@ -1,6 +1,6 @@
 /*
 
-  $Id$
+  $Id: index_set_splitting.c 14476 2009-07-06 14:03:26Z guelton $
 
   Copyright 1989-2009 MINES ParisTech
 
