@@ -276,6 +276,7 @@ get_any_effects_text(
     entity module;
     statement module_stat, user_stat = statement_undefined;
     text txt = make_text(NIL);
+    string pp;
 
     /* current entity
      */
@@ -291,6 +292,16 @@ get_any_effects_text(
     /* resources to be prettyprinted...
      */
     load_resources(module_name);
+
+   /* Since we want to prettyprint with a sequential syntax, save the
+       PRETTYPRINT_PARALLEL property that may select the parallel output
+       style before overriding it: */
+    pp = strdup(get_string_property("PRETTYPRINT_PARALLEL"));
+    /* Select the default prettyprint style for sequential prettyprint: */
+    set_string_property("PRETTYPRINT_PARALLEL",
+			get_string_property("PRETTYPRINT_SEQUENTIAL_STYLE"));
+
+
 
     debug_on("EFFECTS_DEBUG_LEVEL");
 
@@ -309,6 +320,8 @@ get_any_effects_text(
     /* prepare the prettyprinting */
     init_prettyprint(text_statement_any_effect_type);
 
+
+ 
     /* summary regions first */
     MERGE_TEXTS(txt, text_summary_any_effect_type(module));
 
@@ -326,6 +339,12 @@ get_any_effects_text(
     close_prettyprint();
 
     debug_off();
+
+
+    /* Restore the previous PRETTYPRINT_PARALLEL property for the next
+       parallel code prettyprint: */
+    set_string_property("PRETTYPRINT_PARALLEL", pp);
+    free(pp);
 
     reset_current_module_entity();
     reset_current_module_statement();
