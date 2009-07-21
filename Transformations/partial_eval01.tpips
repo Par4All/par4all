@@ -1,0 +1,44 @@
+delete partial_eval01
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create partial_eval01 partial_eval01.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+echo
+echo Initial code
+echo
+
+display PRINTED_FILE[duck]
+
+echo
+echo Code after array conversion
+echo
+
+apply ARRAY_TO_POINTER[duck]
+display PRINTED_FILE[duck]
+
+echo
+echo Code after partial eval
+echo
+
+apply PARTIAL_EVAL[duck]
+display PRINTED_FILE[duck]
+
+echo
+echo Unsplit resulting code
+echo
+
+apply UNSPLIT
+shell gcc ${VDIR:-.}/partial_eval01.c -o ${VDIR:-.}/partial_eval
+shell gcc partial_eval01.database/Src/partial_eval01.c  -o partial_eval01.database/Src/partial_eval
+shell if test `partial_eval01.database/Src/partial_eval` = `${VDIR:-.}/partial_eval`; then echo "ok"; else echo "ko" ; fi
+shell rm -rf partial_eval01.database/Src/partial_eval ${VDIR:-.}/partial_eval
+
+close
+delete partial_eval01
+quit
+

@@ -60,7 +60,7 @@ int FIR()
 
 //  P(ifr) {ifr==0}
 
-      if (ifr==0)
+      if (0==0)
          ;
 
 //  P(ifr) {ifr==1}

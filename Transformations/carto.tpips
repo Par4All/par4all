@@ -53,7 +53,7 @@ setproperty INDEX_SET_SPLITTING_SPLIT_BEFORE_BOUND TRUE
 apply INDEX_SET_SPLITTING
 display PRINTED_FILE
 
-setproperty LOOP_LABEL "l99995"
+setproperty LOOP_LABEL "l99992"
 setproperty INDEX_SET_SPLITTING_SPLIT_BEFORE_BOUND FALSE
 apply INDEX_SET_SPLITTING
 
@@ -63,6 +63,7 @@ echo
 echo Code after dead code elimination
 echo
 
+apply SUPPRESS_DEAD_CODE
 apply SUPPRESS_DEAD_CODE
 display PRINTED_FILE
 

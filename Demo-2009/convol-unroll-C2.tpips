@@ -85,6 +85,10 @@ display PRINTED_FILE[microcode]
 
 # probably useless for terapix microcode
 #apply INVARIANT_CODE_MOTION
+apply ARRAY_TO_POINTER[microcode]
+display PRINTED_FILE[microcode]
+apply PARTIAL_EVAL[microcode]
+display PRINTED_FILE[microcode]
 
 close
 quit
