@@ -59,7 +59,7 @@ fi
     cd $target/prod;
     make doxygen
     DOXYGEN_PUBLISH_LOCATION_DIR=/var/www/pips/doxygen make doxygen-publish
-)
+) >> out.$$ 2>> err.$$
 
 mv out.$$ $target/out
 mv err.$$ $target/err
