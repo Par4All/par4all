@@ -1352,7 +1352,12 @@ transformer update_precondition_with_call_site_preconditions(transformer t,
   pips_assert("callee is the current module",
 	      get_current_module_entity() == callee);
 
+  entity old_entity = get_current_module_entity();
+  statement old_statement = get_current_module_statement();
+
   reset_current_module_entity();
+  reset_current_module_statement();
+
   set_current_module_entity(caller);
   set_current_module_statement(caller_statement);
   current_summary_precondition = t;
@@ -1382,7 +1387,8 @@ transformer update_precondition_with_call_site_preconditions(transformer t,
   reset_current_module_statement();
   reset_cumulated_rw_effects();
   reset_semantic_map();
-  set_current_module_entity(callee);
+  set_current_module_entity(old_entity);
+  set_current_module_statement(old_statement);
 
   current_caller = entity_undefined;
   current_callee = entity_undefined;

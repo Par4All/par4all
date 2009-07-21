@@ -557,6 +557,7 @@ bool summary_precondition(char * module_name)
   debug_on(SEMANTICS_DEBUG_LEVEL);
 
   set_current_module_entity(callee);
+  set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, module_name, TRUE)); 
 
   if(entity_main_module_p(callee)) {
     t = main_summary_precondition(callee);
@@ -564,10 +565,6 @@ bool summary_precondition(char * module_name)
   else {
     t = ordinary_summary_precondition(module_name, callee);
   }
-
-  /* Cannot be set earlier because, current statement is used and
-     re-used by ordinary_summary_precondition(). */
-  set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, module_name, TRUE)); 
 
   /* Add declaration information: arrays cannot be empty (Fortran
    * standard, Section 5.1.2)
