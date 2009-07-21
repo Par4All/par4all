@@ -5,13 +5,6 @@ setproperty ABORT_ON_USER_ERROR TRUE
 
 create array01 array01.f
 
-# activate C_PARSER
-
-# setproperty PRETTYPRINT_C_CODE TRUE
-# setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
-# setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
-# setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
-
 echo
 echo Parsed printed file for "ARRAY01"
 echo
@@ -69,7 +62,8 @@ echo Printed files after parallelization
 echo
 
 apply COARSE_GRAIN_PARALLELIZATION
-display PRINTED_FILE[ARRAY01]
+activate PRINT_PARALLELIZEDOMP_CODE
+display PARALLELPRINTED_FILE[ARRAY01]
 
 close
 delete array01

@@ -102,13 +102,9 @@ Printed files after parallelization
       SUBROUTINE ARRAY01
       REAL X(10)
 
-C  <X(PHI1)-W-EXACT-{1<=PHI1, PHI1<=10}>
 
-
+!$OMP PARALLEL DO 
       DO I = 1, 10                                                      0004
-
-C  <X(PHI1)-W-EXACT-{PHI1==I, 1<=I, I<=10}>
-
          X(I) = 0.                                                      0005
       ENDDO
 
