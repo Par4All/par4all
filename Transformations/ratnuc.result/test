@@ -155,9 +155,10 @@ C     ------------------------------------------------------------------
       COMMON  /COMPROG/  FACMIX,FLUM,PEXTER,TAUEX,PSTART
       COMMON  /COMPROI/  NP,NPP1
 C     ------------------------------------------------------------------
-      DOALL I = 2, NPP1                                                 0024
-         PRIVATE ALPHA,E,ECN,EPP,F11,F14,G11,G14,GAMA,PSI,RAT,RO,SQTR
-     &   ,T,T13,W,X,Y,ZCN
+
+!$OMP PARALLEL DO PRIVATE(ALPHA,E,ECN,EPP,F11,F14,G11,G14,GAMA,PSI,
+!$OMPxRAT,RO,SQTR,T,T13,W,X,Y,ZCN)
+      DO 1 I = 2, NPP1                                                  0024
          QNUC(I) = 0.0D0                                                0025
          RATX(I) = 0.0D0                                                0026
          X = XXA(I)                                                     0027
@@ -206,7 +207,6 @@ C     1              *(1.D0-1.D0/ALPHA)
             ENDIF
          ENDIF
 1        CONTINUE                                                       0071
-      ENDDO
       QNUC(1) = 0.0D0                                                   0072
       RATX(1) = 0.0D0                                                   0073
       END
