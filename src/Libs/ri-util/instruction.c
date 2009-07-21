@@ -1,6 +1,6 @@
 /*
 
-  $Id: instruction.c 14258 2009-06-09 15:21:42Z guelton $
+  $Id$
 
   Copyright 1989-2009 MINES ParisTech
 

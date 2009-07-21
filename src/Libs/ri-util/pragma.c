@@ -1,6 +1,6 @@
 /*
 
-  $Id: pragma.c 14504 2009-07-10 15:53:46Z villalon $
+  $Id$
 
   Copyright 1989-2009 MINES ParisTech
 

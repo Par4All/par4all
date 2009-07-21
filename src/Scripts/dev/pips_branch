@@ -1,6 +1,6 @@
 #! /bin/bash
 #
-# $Id: pips_branch 14207 2009-06-04 10:35:07Z coelho $
+# $Id$
 #
 # Copyright 1989-2009 MINES ParisTech
 #
@@ -28,7 +28,7 @@
 
 # script revision
 script=${0##*/}
-rev='$Revision: 14207 $'
+rev='$Revision$'
 rev=${rev#* }
 rev=${rev% *}
 

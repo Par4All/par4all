@@ -1,6 +1,6 @@
 /*
 
-  $Id: simd_memory_packing.c 14300 2009-06-15 15:24:27Z guelton $
+  $Id$
 
   Copyright 1989-2009 MINES ParisTech
 
