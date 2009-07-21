@@ -52,7 +52,8 @@ pipslibs.libs	= \
 	effects-simple effects-convex effects-generic alias-classes \
 	comp_sections semantics control continuation rice ricedg \
 	pipsdbm transformer preprocessor ri-util properties \
-	text-util misc properties reductions flint sac safescale phrase newgen
+	text-util misc properties reductions flint sac safescale phrase newgen \
+	step
 
 pips.libs	= \
 	$(pipslibs.libs) $(newgen.libs) $(linear.libs) \
