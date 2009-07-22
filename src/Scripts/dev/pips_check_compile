@@ -26,7 +26,6 @@
 # TODO
 # - nice?
 # - lock working copy?
-# - check last commit in trunk instead of last commit in repos!
 
 prod=${1:-.}
 dest=${2:-coelho@cri.ensmp.fr}
@@ -113,10 +112,10 @@ svn up > out 2> err || report 3 "cannot 'svn up'"
 [ -f CURRENT ] || touch CURRENT
 mv CURRENT PREVIOUS
 {
-  echo pips: $(svnversion pips)
-  echo newgen: $(svnversion newgen)
-  echo linear: $(svnversion linear)
-  echo nlpmake: $(svnversion pips/makes)
+  echo pips: $(svnversion -c pips)
+  echo newgen: $(svnversion -c newgen)
+  echo linear: $(svnversion -c linear)
+  echo nlpmake: $(svnversion -c pips/makes)
 } > CURRENT
 
 if ! cmp -s CURRENT PREVIOUS
