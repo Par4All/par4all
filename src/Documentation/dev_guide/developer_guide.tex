@@ -706,17 +706,21 @@ git svn clone http://svn.cri.ensmp;fr/svn/nlpmake/trunk nlpmake
 
 git svn clone http://svn.cri.ensmp;fr/svn/newgen/trunk newgen
 ln -s ../nlpmake/makes newgen/makes
+echo /makes >> newgen/.git/info/exclude
 
 git svn clone http://svn.cri.ensmp;fr/svn/linear/trunk linear
 ln -s ../nlpmake/makes linear/makes
+echo /makes >> linear/.git/info/exclude
 
 # this one takes one hour on a file repos...
 git svn clone http://svn.cri.ensmp;fr/svn/pips/trunk pips
 ln -s ../nlpmake/makes pips/makes
+echo /makes >> pips/.git/info/exclude
 
 # niveau branches/coelho: non, semble sortir tout l'historique...
 git svn clone http://svn.cri.ensmp;fr/svn/pips/branches/coelho/hwac hwac
 ln -s ../nlpmake/makes hwac/makes
+echo /makes >> hwac/.git/info/exclude
 
 # live your life within git
 # what about properties?
