@@ -1134,9 +1134,11 @@ how to run the validation. Basically, one must simply type \texttt{make}.
 See various examples around to add new validation files.  The preferred
 way is to provide a source file \texttt{MyTest.f} or \texttt{MyTest.c}, a
 corresponding \texttt{MyTest.tpips} script, and store the standard output
-of the \texttt{.tpips} script into \texttt{MyTest.result/out}.
+of the \texttt{.tpips} script into \texttt{MyTest.result/test}.
 
-The output \texttt{MyTest.result/out} is then compared against the
+During the validation process (when you execute a make validate),
+the validation output, wich is stored in \texttt{MyTest.result/out},
+is compared against the
 reference \texttt{MyTest.result/test} to know if the validation is
 correct. So to install a new validation item, you need to create the
 reference \texttt{MyTest.result/test}. \texttt{pips\_validate -a} (see
@@ -1146,7 +1148,7 @@ reference file is possible for special cases. In fact depending on
 the compiler used for example, you can get floating point numbers in
 different formats. Then you might want to post process the output to
 make it compliant with the reference. To make this possible a filtering
-phase is included in the validation process and is explained in 
+phase is included in the validation process and is explained in
 \S~\ref{sec:filtering}.
 
 For more complex validations, a \texttt{.tpips} script without a direct
@@ -1162,9 +1164,8 @@ it is possible to use validation scripts instead.
 But it is best \textbf{not} using the following validation scripts
 directly, but rather to rely on the \texttt{Makefile} in the validation
 directory, which has very convenient targets including \texttt{validate
-  accept clean}.  Using this approach does not require the validation
+accept clean}.  Using this approach does not require the validation
 directory to be under \texttt{\$PIPS\_ROOT}.
-
 
 \subsection{Validation makefile}
 \label{sec:validation-makefile}
@@ -1193,10 +1194,24 @@ make TARGET=LoopRecovering validate
 The \texttt{VOPT} \texttt{make} variable can be used to pass and modify
 default options for the validation.
 
+\subsection{Validation output}
+\label{sec:validation-output}
+
+As an output the make validate creates a RESULTS directory. This directory contains:
+a \texttt{SUMMARY} file, and 3 different file types (\texttt{.err}, \texttt{.diff} and
+\texttt{.out}). Those files are named using the following rule : FolderName\_TestCaseName.xxx
+
+\begin{itemize}
+\item Obviusly the \texttt{SUMMARY} file contains a summary of the previous validation.
+\item \texttt{FolderName\_TestCaseName.err} contains the execution stderr of the test case
+  named TestCaseName that you can find in the folder named FolderName.
+\item \texttt{FolderName\_TestCaseName.diff} contains the diff of the output with the expected one.
+\item \texttt{FolderName\_TestCaseName.out} contains the stdout of the test case
+  named TestCaseName that you can find in the folder named FolderName.
+\end{itemize}
 
 \subsection{Validation scripts}
 \label{sec:validation-scripts}
-
 
 Three validation scripts are available:
 \begin{description}
