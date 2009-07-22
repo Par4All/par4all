@@ -41,7 +41,7 @@ function handle_out_file()
     [ -f $ref.$arch ] && ref=$ref.$arch
 
     # show differences
-    if [ -f $file ] ; then
+    if [ -f $ref ] ; then
 	echo "CONSIDERING $ref and $outfile"
 	something=1
 	if [[ ! $PIPS_GRAPHICAL_DIFF ]] ; then
