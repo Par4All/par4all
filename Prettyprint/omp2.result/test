@@ -1,0 +1,40 @@
+// OMP style
+int main()
+{
+   float a[10][10][10][10][10];
+   int i;
+   int j;
+   int k;
+   int l;
+   int m;
+   float x;
+   i = 0;                                                               /*0006*/
+   j = 0;                                                               /*0007*/
+   k = 0;                                                               /*0008*/
+   l = 0;                                                               /*0009*/
+   m = 0;                                                               /*0010*/
+   x = 2.12;                                                            /*0011*/
+
+#pragma omp parallel for private(j)
+   for(i = 0; i <= 9; i += 1)                                           /*0013*/
+#pragma omp parallel for private(k)
+      for(j = 0; j <= 9; j += 1) {                                      /*0014*/
+         float z;
+         z = 0.0;                                                       /*0017*/
+#pragma omp parallel for private(l,z)
+         for(k = 0; k <= 9; k += 1) {                                   /*0018*/
+            z = k*2.0;                                                  /*0019*/
+#pragma omp parallel for private(m)
+            for(l = 0; l <= 9; l += 1)                                  /*0020*/
+#pragma omp parallel for 
+               for(m = 0; m <= 9; m += 1) {                             /*0021*/
+                  float y;
+                  y = 2.0;                                              /*0024*/
+                  // comments 4
+                  y = 3.5+x+z;                                          /*0026*/
+                  a[i][j][k][l][m] = x*y;                               /*0027*/
+               }
+         }
+      }
+   return 0;                                                            /*0033*/
+}
