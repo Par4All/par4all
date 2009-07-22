@@ -1,0 +1,4 @@
+cd ${VDIR:-.}
+run_step.script -f -g src do_private.f
+
+for f in do_private/src/* ; do echo "###################### $f ######################"; cat $f; done

@@ -1,0 +1,4 @@
+cd ${VDIR:-.}
+run_step.script -f -g src pi.f
+
+for f in pi/src/* ; do echo "###################### $f ######################"; cat $f; done

@@ -1,0 +1,4 @@
+cd ${VDIR:-.}
+run_step.script -f -g src md.f
+
+for f in md/src/* ; do echo "###################### $f ######################"; cat $f; done

@@ -1,0 +1,6 @@
+cd ${VDIR:-.}
+run_step.script -f -g src barrier.f
+
+for f in barrier/src/* ; do echo "###################### $f ######################"; cat $f; done
+
+exit 0;

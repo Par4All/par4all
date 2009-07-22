@@ -1,0 +1,4 @@
+cd ${VDIR:-.}
+run_step.script -f -g src sum.f
+
+for f in sum/src/* ; do echo "###################### $f ######################"; cat $f; done
