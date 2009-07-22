@@ -24,13 +24,11 @@ int main()
    
 
    foo(x);                                                              /*0027*/
-//               <must be read   >: tab
 //               <must be written>: tab[0]
    foo(tab);                                                            /*0028*/
-//               <must be read   >: tab2[4] 
+//               <must be read   >: tab2[4]
 //               <must be written>: tab2[4][0]
    foo(tab2[4]);                                                        /*0029*/
-//               <must be read   >: tab3[5] 
 //               <must be written>: tab3[5][0]
    foo(tab3[5]);                                                        /*0030*/
 //               <must be read   >: tab4 tab4[6]
