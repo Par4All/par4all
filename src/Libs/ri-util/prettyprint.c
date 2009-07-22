@@ -2109,7 +2109,7 @@ text_directive(
 	if (l)
 	{
 	    add_to_current_line(buffer, dir, cont, t);
-	    if (is_omp) add_to_current_line(buffer, "DO", cont, t);
+	    if (is_omp) add_to_current_line(buffer, "DO ", cont, t);
 	}
     }
 
