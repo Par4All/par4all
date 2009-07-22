@@ -7,7 +7,7 @@ typedef struct	{
 
 complex imagein[N][N];
 
-int
+float
 main(int argc, char *argv[]) {
   int i,j,k;
 

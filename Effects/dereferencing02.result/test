@@ -32,10 +32,10 @@ void dereferencing02()
    
 
    **q = 2.;
-//               <must be read   >: q[0]
+//               <must be read   >: q q[0]
 //               <must be written>: q[0][0]
    **(q+(i = 0)) = 3.;
-//               <must be read   >: w[2]
+//               <must be read   >: w w[2]
 //               <must be written>: w[2][0]
    **(w+(i = 2)) = 4.;
 //               <must be read   >: q q[0][0] q[0]
@@ -65,10 +65,10 @@ void dereferencing02()
    
 
    **q = 2.;
-//               <must be read   >: q[0]
+//               <must be read   >: q q[0]
 //               <must be written>: q[0][0]
    **(q+(i = 0)) = 3.;
-//               <must be read   >: w[2]
+//               <must be read   >: w w[2]
 //               <must be written>: w[2][0]
    **(w+(i = 2)) = 4.;
 //               <must be read   >: q q[0][0] q[0]

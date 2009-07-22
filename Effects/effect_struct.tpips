@@ -29,8 +29,22 @@ setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
 echo Try to restructure the code for more precision:
 setproperty UNSPAGHETTIFY_TEST_RESTRUCTURING=TRUE
 setproperty UNSPAGHETTIFY_RECURSIVE_DECOMPOSITION=TRUE
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE
+
+activate PRINT_CODE_REGIONS
+display PRINTED_FILE
+
+
 echo Privatize scalar variables on all the modules of the program:
-apply PRIVATIZE_MODULE[effect_struct!]
+apply PRIVATIZE_MODULE
+apply COARSE_GRAIN_PARALLELIZATION
+activate PRINT_CODE
+display PRINTED_FILE
 close
 delete effect_struct
 quit
