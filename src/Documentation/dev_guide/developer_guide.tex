@@ -674,6 +674,10 @@ Why not switch all this stuff to \texttt{git}, which is so
   divergence can be detected in one place, and possibly managed.
 \end{description}
 
+At HPC Project we use GIT with central servers, so the previous points
+from CRI are rather out-of-focus...
+
+
 \subsubsection{git-svn}
 \label{sec:git-svn}
 
@@ -702,32 +706,32 @@ Here is a summary of operations:
 \begin{verbatim}
 # create copies of the repositories' trunks that
 # you may wish to edit. Example:
-git svn clone http://svn.cri.ensmp;fr/svn/nlpmake/trunk nlpmake
+git svn clone --stdlayout http://svn.cri.ensmp.fr/svn/nlpmake
 
-git svn clone http://svn.cri.ensmp;fr/svn/newgen/trunk newgen
+git svn clone --stdlayout http://svn.cri.ensmp.fr/svn/newgen
 ln -s ../nlpmake/makes newgen/makes
 echo /makes >> newgen/.git/info/exclude
 
-git svn clone http://svn.cri.ensmp;fr/svn/linear/trunk linear
+git svn clone --stdlayout http://svn.cri.ensmp.fr/svn/linear
 ln -s ../nlpmake/makes linear/makes
 echo /makes >> linear/.git/info/exclude
 
-# this one takes one hour on a file repos...
-git svn clone http://svn.cri.ensmp;fr/svn/pips/trunk pips
+# This one takes 1 or 2 hours on a file repos...
+# Deal with the fact that branches are hierarchized per user,
+# so if I'm the user coelho
+git svn clone --stdlayout -branches=branches/coelho \
+    http://svn.cri.ensmp.fr/svn/pips
 ln -s ../nlpmake/makes pips/makes
 echo /makes >> pips/.git/info/exclude
 
-# niveau branches/coelho: non, semble sortir tout l'historique...
-git svn clone http://svn.cri.ensmp;fr/svn/pips/branches/coelho/hwac hwac
-ln -s ../nlpmake/makes hwac/makes
-echo /makes >> hwac/.git/info/exclude
+git svn clone --stdlayout http://svn.cri.ensmp.fr/svn/validation
 
 # live your life within git
 # what about properties?
 # svn:ignore & .git/info/exclude?
 
 # when online, update/resync from svn
-for d in newgen linear pips makes ; do
+for d in newgen linear pips nlpmake validation; do
   pushd $d
   # consider running with option --dry-run
   git svn rebase
@@ -739,6 +743,83 @@ cd pips
 git svn dcommit --dry-run
 git svn dcommit
 \end{verbatim}
+}
+
+If you want to track all the branches of PIPS (and if you have the right to),
+you may try:
+{\scriptsize
+\begin{verbatim}
+git svn clone --branches=trunk/ancourt \
+              --branches=trunk/bouchebaba \
+              --branches=trunk/carothers \
+              --branches=trunk/coelho \
+              --branches=trunk/creusillet \
+              --branches=trunk/duong \
+              --branches=trunk/gall \
+              --branches=trunk/girodias \
+              --branches=trunk/godet \
+              --branches=trunk/guelton \
+              --branches=trunk/ief \
+              --branches=trunk/irigoin \
+              --branches=trunk/kalra \
+              --branches=trunk/keryell \
+              --branches=trunk/lplassart \
+              --branches=trunk/mensi \
+              --branches=trunk/muller \
+              --branches=trunk/villalon \
+              --branches=trunk \
+              --stdlayout \
+              http://svn.cri.ensmp.fr/svn/pips 
+\end{verbatim}
+}
+to track branches in the user-specific directory. But since there also
+some ``normal'' branches with no hierarchy (such as \texttt{daverio},
+\verb|teraops_20090319|), there is also the \verb|--branches=trunk| for
+them.
+
+Since in the PIPS repositories there is also some quite old history (based
+on RCS, because SCCS history has been lost...), the history does not fit
+into classical SVN \texttt{trunk}, \texttt{branches} and \texttt{tags} and
+thus cannot either be understood well by \texttt{git-svn}. So for ultimate
+PIPS historian, you can have also a copy of the repository with
+\texttt{git-svn} without using the
+\texttt{trunk}/\texttt{branches}/\texttt{tags} convention. For this, just
+use a plain \texttt{git-svn} with:
+\begin{verbatim}
+git svn clone http://svn.cri.ensmp.fr/svn/nlpmake
+git svn clone http://svn.cri.ensmp.fr/svn/linear
+git svn clone http://svn.cri.ensmp.fr/svn/newgen
+git svn clone http://svn.cri.ensmp.fr/svn/validation
+git svn clone http://svn.cri.ensmp.fr/svn/pips
+\end{verbatim}
+
+
+How to organize this? For example Ronan \texttt{Keryell} uses this
+hierarchy in a \texttt{PIPS} directory:
+\begin{description}
+\item[\texttt{git-svn-total}:] stores all the PIPS history without
+  \texttt{trunk}/\texttt{branches}/\texttt{tags} convention:
+  \begin{itemize}
+  \item \texttt{linear}
+  \item \texttt{newgen}
+  \item \texttt{nlpmake}
+  \item \texttt{pips}
+  \item \texttt{validation} 
+  \end{itemize}
+\item[\texttt{git-svn-work}:] stores the PIPS working copies he uses to
+  work in with the \texttt{trunk}/\texttt{branches}/\texttt{tags}
+  convention:
+  \begin{itemize}
+  \item \texttt{linear}
+  \item \texttt{newgen}
+  \item \texttt{nlpmake}
+  \item \texttt{pips}: the working copy with \texttt{keryell}'s branches;
+  \item \texttt{pips-all-branches}: the working copy with all the user
+    branches;
+  \item \texttt{validation}
+  \end{itemize}
+\end{description}
+
 
 \section{Shell environment (sh, ksh, bash, csh, tcsh)}
 \label{sec:shell}
