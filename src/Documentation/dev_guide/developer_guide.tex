@@ -643,12 +643,14 @@ to the repository. If you are stuck in a train between Paris
 and Brest (in the very far west), you may find it inconvenient not to
 be able to access the repository history and other details about
 previous commits, especially if the current version is broken.
+In order to help prevent this situation, pips is checked and possibly
+fully recompiled every 20 minutes.
 
-If so, consider using \texttt{git-svn} or \texttt{svk} to have full
-copy of your branch or of the trunk on your laptop. Then you can
-develop offline including branching and commits. You will be able
-to push back into the SVN server your changes once you get back to
-civilized surroundings.
+So if you are Ronan, consider using \texttt{git-svn} or \texttt{svk}
+to have full copy of your branch or of the trunk on your laptop. Then
+you can develop offline including branching and commits. You will be
+able to push back into the SVN server your changes once you get back
+to civilized surroundings.
 
 Why not switch all this stuff to \texttt{git}, which is so
 \emph{cool}? There are several reasons:
@@ -671,6 +673,68 @@ Why not switch all this stuff to \texttt{git}, which is so
 \item[coordination] is easier in a centralized models, where source
   divergence can be detected in one place, and possibly managed.
 \end{description}
+
+\subsubsection{git-svn}
+\label{sec:git-svn}
+
+This section assumes that you have a good working knowledge of both
+GIT and SVN. If you use GIT, do not forget to save your repository
+regularly.
+
+\texttt{git-svn} is a porcelain which ensures a limited compatibility
+between a centralized SVN repository and a local GIT repository. It
+provides the ability to pull/push commits from a single branch in an
+SVN repository. Beware of the limitations:
+\begin{itemize}
+\item branches and tags in more than one directory (we use
+  subdirectories in \texttt{branches}) are not managed~;
+\item SVN properties are mostly ignored (ignore, externals\ldots)~;
+\item cloning the pips tree does take a long time~;
+\item it does not know about branch management in subversion (since 1.5)~;
+\end{itemize}
+So just use \texttt{git-svn} to manage an already created branch which
+will be seen as the \texttt{master} branch by GIT. Creating new
+branches under GIT and hoping to have them appearing under SVN seems
+hopeless.
+
+Here is a summary of operations:
+{\scriptsize
+\begin{verbatim}
+# create copies of the repositories' trunks that
+# you may wish to edit. Example:
+git svn clone http://svn.cri.ensmp;fr/svn/nlpmake/trunk nlpmake
+
+git svn clone http://svn.cri.ensmp;fr/svn/newgen/trunk newgen
+ln -s ../nlpmake/makes newgen/makes
+
+git svn clone http://svn.cri.ensmp;fr/svn/linear/trunk linear
+ln -s ../nlpmake/makes linear/makes
+
+# this one takes one hour on a file repos...
+git svn clone http://svn.cri.ensmp;fr/svn/pips/trunk pips
+ln -s ../nlpmake/makes pips/makes
+
+# niveau branches/coelho: non, semble sortir tout l'historique...
+git svn clone http://svn.cri.ensmp;fr/svn/pips/branches/coelho/hwac hwac
+ln -s ../nlpmake/makes hwac/makes
+
+# live your life within git
+# what about properties?
+# svn:ignore & .git/info/exclude?
+
+# when online, update/resync from svn
+for d in newgen linear pips makes ; do
+  pushd $d
+  # consider running with option --dry-run
+  git svn rebase
+  popd
+done
+
+# push your local commits to svn
+cd pips
+git svn dcommit --dry-run
+git svn dcommit
+\end{verbatim}
 
 \section{Shell environment (sh, ksh, bash, csh, tcsh)}
 \label{sec:shell}
