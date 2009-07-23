@@ -1,0 +1,53 @@
+#! /bin/sh
+
+# Apply some git actions to some git repositories found below the current
+# directory
+
+# $Id$
+# Ronan.Keryell@hpc-project.com
+
+# If no argument is given, act as git svn rebase
+if [[ ! $@ ]] ; then
+    actions="svn rebase"
+else
+    actions=$@
+fi
+
+# Link PIPS "makes" to an already installed version of PIPS from svn with
+# setup.sh:
+function pips_link_makes() {
+    if [[ -z "$PIPS_ROOT" ]] ; then
+	echo "PIPS_ROOT variable is not set"
+	echo "You should have a running PIPS installation somewhere and have"
+	echo "sourced pipsrc.csh or pipsrc.sh"
+	exit 1
+    fi
+    local_dir_name=`basename $1`
+    # There is no generic makes in nlpmake and validation
+    if [[ $local_dir_name != nlpmake && $local_dir_name != validation ]]; then
+	# Delete a previous existing version if any because it may point
+	# to an old place:
+	rm makes
+	echo "  Add a symbolic link to the working PIPS makes infrastructure"
+	echo "  ($PIPS_ROOT/makes) here"
+	ln -s $PIPS_ROOT/makes
+    fi
+}
+
+# Don't dig lower than a depth of 4 in the directories for efficiency reasons:
+git_dirs=`find . -maxdepth 4 -name .git`
+
+for g in $git_dirs; do
+    d=`dirname $g`
+    (
+	echo Entering directory $d:
+	cd $d
+	if [[ $actions == "pips link-makes" ]]; then
+	    pips_link_makes $d
+	else
+	    echo "    Action: git $actions"
+	    git $actions
+	fi
+    )
+    echo
+done

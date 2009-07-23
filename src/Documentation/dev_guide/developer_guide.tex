@@ -35,17 +35,17 @@
 %%  \usepackage{url}}
 \usepackage{url}
 \usepackage{xspace,makeidx}
+
+%% For nice rendering of source codes:
 \usepackage[hyper,procnames]{listings}
-
-\sloppy
-
-%% heu...
 \lstset{extendedchars=true, language=C, basicstyle=\footnotesize\ttfamily, numbers=left,
   numberstyle=\tiny, stepnumber=2, numberfirstline=true, showspaces=true,
   showstringspaces=false, showtabs=true,
   tabsize=8, tab=\rightarrowfill, keywordstyle=\bf,
   stringstyle=\rmfamily, commentstyle=\rmfamily\itshape,
   index=[1][keywords],indexprocnames=true}
+
+\sloppy
 
 \newcommand{\LINK}[1]{\url{#1}\xspace}
 
@@ -643,7 +643,7 @@ to the repository. If you are stuck in a train between Paris
 and Brest (in the very far west), you may find it inconvenient not to
 be able to access the repository history and other details about
 previous commits, especially if the current version is broken.
-In order to help prevent this situation, pips is checked and possibly
+In order to help preventing this situation anyway, PIPS is checked and possibly
 fully recompiled every 20 minutes.
 
 So if you are Ronan, consider using \texttt{git-svn} or \texttt{svk}
@@ -674,11 +674,11 @@ Why not switch all this stuff to \texttt{git}, which is so
   divergence can be detected in one place, and possibly managed.
 \end{description}
 
-At HPC Project we use GIT with central servers, so the previous points
-from CRI are rather out-of-focus...
+At HPC Project we use GIT with central servers, so the previous points of
+view from CRI are rather out-of-focus...
 
 
-\subsubsection{git-svn}
+\subsubsection{The git-svn gateway}
 \label{sec:git-svn}
 
 This section assumes that you have a good working knowledge of both
@@ -819,6 +819,33 @@ hierarchy in a \texttt{PIPS} directory:
   \item \texttt{validation}
   \end{itemize}
 \end{description}
+
+
+\subsubsection{The pips\_git script}
+\label{sec:pips_git-script}
+
+To apply a same \texttt{git} command on GIT repositories below the current
+directory, you can use the \verb|pips_git| script. By default, the
+action is to do the equivalent of a \texttt{svn update}, that is a
+\texttt{git svn rebase}:
+\begin{verbatim}
+pips_git
+\end{verbatim}
+because it is the most used command.
+
+For example to get the status of all your GIT
+repositories, use:
+\begin{verbatim}
+pips_git status
+\end{verbatim}
+
+There are also PIPS specific instructions to \verb|pips_git|:
+\begin{itemize}
+\item \texttt{pips link-makes}: this adds into the GIT repositories a link
+  to \verb|PIPS_ROOT/makes| so that you can compile PIPS components
+  directly in them and install it to an already installed version of PIPS
+  somewhere.
+\end{itemize}
 
 
 \section{Shell environment (sh, ksh, bash, csh, tcsh)}
@@ -1324,17 +1351,19 @@ Three validation scripts are available:
 
   The scripts looks for validation scripts in the following order:
   \begin{enumerate}
-  \item a corresponding \texttt{.test} file, and executes it.
+  \item a corresponding \textbf{executable} \texttt{.test} file, and
+    executes it. If th file is not \textbf{executable}, this validation
+    test is marked as \textbf{failed};
 
   \item a \texttt{.tpips} file which is executed as a
-    tpips script.
+    tpips script;
 
   \item a corresponding \texttt{.tpips2} file which is executed as a
-    tpips script, with the error stream redirect.
+    tpips script, with the error stream redirect;
 
     Validating the error stream is a \textbf{very bad idea} as it leads
     to never ending regression variations. It is even worth when the
-    output comes from external tools such as compilers error output.
+    output comes from external tools such as compilers error output;
 
   \item a \texttt{default\_test} file as a template for a \texttt{.test} file.
 
@@ -1342,12 +1371,12 @@ Three validation scripts are available:
     (\texttt{tested\_file}, \texttt{tested\_dir}, \texttt{tested\_name}
     and \texttt{TESTED\_NAME} are substituted by the full file name,
     the validation directory, the name prefix in lower or upper)
-    and then it executes the generated test file.
+    and then it executes the generated test file;
 
   \item a \texttt{default\_tpips} file and runs it with \textsc{tpips}.
 
     The environment variables \texttt{FILE} and \texttt{WSPACE} contain
-    the full-path file name and the file name prefix.
+    the full-path file name and the file name prefix;
 
   \item if none of these cases apply, the scripts parallelize all modules
     by using the PIPS shell interface: \texttt{Delete} the old workspace

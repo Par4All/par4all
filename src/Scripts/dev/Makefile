@@ -30,7 +30,8 @@ INSTALL_UTL =	analyze_libraries \
 		pips_publish_www \
 		pips_svn_stat \
 		build_so_files \
-		pips_branch
+		pips_branch \
+		pips_git
 
 # common stuff
 ifdef PIPS_ROOT
