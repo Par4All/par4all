@@ -1,6 +1,6 @@
 C     Nga Nguyen 
 C     This example is extracted from hydro2d.f (SPEC CFP95)
-C     IN EXACT for B at module statement
+C     False result: IN EXACT for B at module statement
 C     Reason : preconditions have loop exit conditions but transformers do not. 
 
       SUBROUTINE FCT (UTRA)
@@ -9,30 +9,33 @@ C     Reason : preconditions have loop exit conditions but transformers do not.
       COMMON /ADVC/  MQ,NQ
       DIMENSION UTRA(MP,NP)
       DIMENSION B(NP),A(MP)
+
+C  <B(PHI1)-IN-MAY-{1<=PHI1, PHI1<=NQ, MQ<=0}>
+
 C     BEGIN BLOCK
 
-      DO 20 I = 1, MQ                                                   0001
+      DO 20 I = 1, MQ                                                   0013
 C        BEGIN BLOCK
-         A(I) = 1.0D0                                                   0002
-20       CONTINUE                                                       0003
+         A(I) = 1.0D0                                                   0014
+20       CONTINUE                                                       0015
 C        END BLOCK
 
-      DO 40 J = 1, NQ                                                   0004
+      DO 40 J = 1, NQ                                                   0017
 C        BEGIN BLOCK
-         B(J) = 1.0D0                                                   0005
-40       CONTINUE                                                       0006
+         B(J) = 1.0D0                                                   0018
+40       CONTINUE                                                       0019
 C        END BLOCK
 
 C  <A(PHI1)-IN-EXACT-{1<=PHI1, PHI1<=MQ, 1<=NQ}>
 C  <B(PHI1)-IN-EXACT-{1<=PHI1, PHI1<=NQ, 1<=MQ}>
 
 
-      DO 200 J = 1, NQ                                                  0007
+      DO 200 J = 1, NQ                                                  0021
 
 C  <A(PHI1)-IN-EXACT-{1<=PHI1, PHI1<=MQ, 1<=J, J<=NQ}>
 C  <B(PHI1)-IN-EXACT-{PHI1==J, 1<=J, J<=NQ, 1<=MQ}>
 
-         DO 200 I = 1, MQ                                               0008
+         DO 200 I = 1, MQ                                               0022
 
 C  <A(PHI1)-IN-EXACT-{PHI1==I, 1<=I, I<=MQ, 1<=J, J<=NQ}>
 C  <B(PHI1)-IN-EXACT-{PHI1==J, 1<=I, I<=MQ, 1<=J, J<=NQ}>
@@ -42,8 +45,8 @@ C           BEGIN BLOCK
 C  <A(PHI1)-IN-EXACT-{PHI1==I, 1<=I, I<=MQ, 1<=J, J<=NQ}>
 C  <B(PHI1)-IN-EXACT-{PHI1==J, 1<=I, I<=MQ, 1<=J, J<=NQ}>
 
-            UTRA(I,J) = B(J)+A(I)                                       0009
-200         CONTINUE                                                    0010
+            UTRA(I,J) = B(J)+A(I)                                       0023
+200         CONTINUE                                                    0024
 C           END BLOCK
 
 C     END BLOCK
