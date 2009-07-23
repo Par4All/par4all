@@ -7,7 +7,7 @@ C     with a proper initialization of J
 
       J = 0                                                             0008
 
-!$OMP DOPRIVATE(I)
+!$OMP DO PRIVATE(I)
       DO I = 1, 10                                                      0009
          PRIVATE(I)
          J = J+1                                                        0010
@@ -15,7 +15,7 @@ C     with a proper initialization of J
       ENDDO
 
 
-!$OMP DOPRIVATE(I,J)
+!$OMP DO PRIVATE(I,J)
       DO I = 1, 10                                                      0014
          PRIVATE(I,J)
          J = 1                                                          0015

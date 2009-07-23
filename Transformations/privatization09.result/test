@@ -8,7 +8,7 @@ C     used in the next loop nest. Hence j cannot be privatized.
       INTEGER A(10)
 
 
-!$OMP DOPRIVATE(I)
+!$OMP DO PRIVATE(I)
       DO I = 1, 10                                                      0010
          PRIVATE(I)
          J = J+1                                                        0011
@@ -16,7 +16,7 @@ C     used in the next loop nest. Hence j cannot be privatized.
       ENDDO
 
 
-!$OMP DOPRIVATE(I)
+!$OMP DO PRIVATE(I)
       DO I = 1, 10                                                      0015
          PRIVATE(I)
          A(I) = J                                                       0016

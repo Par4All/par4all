@@ -6,7 +6,7 @@ C     privatization fine as the output is undefined.
       INTEGER A(10)
 
 
-!$OMP DOPRIVATE(I,J)
+!$OMP DO PRIVATE(I,J)
       DO I = 1, 10                                                      0008
          PRIVATE(I,J)
          J = J+1                                                        0009

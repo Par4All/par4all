@@ -12,7 +12,7 @@ C     See also privatization01, 07, 08, 09 and 10
       DATA J/0/
 
 
-!$OMP DOPRIVATE(I)
+!$OMP DO PRIVATE(I)
       DO I = 1, 10                                                      0014
          PRIVATE(I)
          J = J+1                                                        0015
@@ -20,7 +20,7 @@ C     See also privatization01, 07, 08, 09 and 10
       ENDDO
 
 
-!$OMP DOPRIVATE(I)
+!$OMP DO PRIVATE(I)
       DO I = 1, 10                                                      0019
          PRIVATE(I)
          J = 1                                                          0020

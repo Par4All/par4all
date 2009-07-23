@@ -4,7 +4,7 @@ C     Check that j is privatized
       INTEGER A(10)
 
 
-!$OMP DOPRIVATE(I,J)
+!$OMP DO PRIVATE(I,J)
       DO I = 1, 10                                                      0006
          PRIVATE(I,J)
          J = 0                                                          0007

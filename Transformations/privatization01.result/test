@@ -9,7 +9,7 @@ C     See also privatization07, 08, 09 and 10
       INTEGER A(10)
 
 
-!$OMP DOPRIVATE(I,J)
+!$OMP DO PRIVATE(I,J)
       DO I = 1, 10                                                      0011
          PRIVATE(I,J)
          J = J+1                                                        0012
@@ -17,7 +17,7 @@ C     See also privatization07, 08, 09 and 10
       ENDDO
 
 
-!$OMP DOPRIVATE(I,J)
+!$OMP DO PRIVATE(I,J)
       DO I = 1, 10                                                      0016
          PRIVATE(I,J)
          J = 1                                                          0017
