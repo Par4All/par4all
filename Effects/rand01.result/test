@@ -24,15 +24,15 @@ int main()
    double virgule;
 //               <must be written>: graine
    graine = 50;
-//               <must be read   >: _RANDOM_EFFECTS:GEN_SEED graine
+//               <must be read   >: graine
 //               <must be written>: _RANDOM_EFFECTS:GEN_SEED
    srandom(graine);
 //               <must be read   >: _RANDOM_EFFECTS:GEN_SEED
-//               <must be written>: virgule
+//               <must be written>: _RANDOM_EFFECTS:GEN_SEED virgule
    /* generator initialization */
    virgule = (double) rand()/(2147483647+1);
 //               <must be read   >: _RANDOM_EFFECTS:GEN_SEED
-//               <must be written>: entier
+//               <must be written>: _RANDOM_EFFECTS:GEN_SEED entier
    entier = 1+rand();
 }
 
@@ -52,19 +52,20 @@ int main()
 
    graine = 50;
 
-//  <_RANDOM_EFFECTS:GEN_SEED-R-EXACT-{}>
 //  <_RANDOM_EFFECTS:GEN_SEED-W-EXACT-{}>
 //  <graine-R-EXACT-{}>
 
    srandom(graine);
 
 //  <_RANDOM_EFFECTS:GEN_SEED-R-EXACT-{}>
+//  <_RANDOM_EFFECTS:GEN_SEED-W-EXACT-{}>
 //  <virgule-W-EXACT-{}>
 
    /* generator initialization */
    virgule = (double) rand()/(2147483647+1);
 
 //  <_RANDOM_EFFECTS:GEN_SEED-R-EXACT-{}>
+//  <_RANDOM_EFFECTS:GEN_SEED-W-EXACT-{}>
 //  <entier-W-EXACT-{}>
 
    entier = 1+rand();
