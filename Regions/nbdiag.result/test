@@ -1,7 +1,9 @@
 
-C  <A(PHI1,PHI2)-IN-EXACT-{1<=PHI1, PHI1<=3NP, 1<=PHI2, PHI2<=3NP}>
-C  <B(PHI1,PHI2)-IN-EXACT-{1<=PHI1, PHI1<=3NP, 1<=PHI2, PHI2<=3NP}>
-C  <RL(PHI1,PHI2)-IN-MAY-{PHI2==1, 1<=NP}>
+C  T() {}
+
+C Nga Nguyen 5 March 2002 : this example violates the Fortran standard 
+C Adjustable array's bounds must be a dummy argument or in a common block
+C DIMENSION A(N,N),B(N,N),RL(N,N)
 
 C***********************************************************************
 C Excerpt from Cr2cnf from ONERA
@@ -12,63 +14,346 @@ C***********************************************************************
 C  ROUTINE DE CALCUL DE A=A-TB*DIAG(RL)*B .
       COMMON/TOTO/Z1(640),Z2(640),Z3(640)
       DIMENSION A(N,N),B(N,N),RL(N,N)
+
+C  T(I,J,K,N) {N==3NP, 3NP+1<=J}
+
+C     BEGIN BLOCK
+
+C  T(N) {N==3NP}
+
 C     added to simulate actual preconditions
-      N = 3*NP                                                          0001
+      N = 3*NP                                                          0015
+
+C  T(K) {}
+
+      DO 1 K = 1, N                                                     0016
+
+C  T() {}
+
+1        Z1(K) = RL(K*(N+1)-N,1)                                        0017
+
+C  T(I,J,K) {}
+
+      DO 2 J = 1, N                                                     0018
+
+C  T(I,K) {N+1<=K}
+
+C        BEGIN BLOCK
+
+C  T(K) {}
+
+         DO 3 K = 1, N                                                  0019
+
+C  T() {}
+
+3           Z2(K) = Z1(K)*B(K,J)                                        0020
+
+C  T(I,K) {}
+
+         DO 4 K = 1, N, 3                                               0021
+
+C  T(I) {}
+
+            DO 4 I = 1, N                                               0022
+
+C  T() {}
+
+4              A(I,J) = A(I,J)-B(K,I)*Z2(K)-B(K+1,I)*Z2(K+1)-B(K+2,I)   0023
+     &         *Z2(K+2)                                                 0023
+
+C  T() {}
+
+2        CONTINUE                                                       0024
+C        END BLOCK
+C     END BLOCK
+      END
+
+C  P() {}
+
+C Nga Nguyen 5 March 2002 : this example violates the Fortran standard 
+C Adjustable array's bounds must be a dummy argument or in a common block
+C DIMENSION A(N,N),B(N,N),RL(N,N)
+
+C***********************************************************************
+C Excerpt from Cr2cnf from ONERA
+C Purpose: in regions of Z2
+C***********************************************************************
+      SUBROUTINE NBDIAG(A,B,RL,NP)
+      IMPLICIT REAL*8(A-H,O-Z)
+C  ROUTINE DE CALCUL DE A=A-TB*DIAG(RL)*B .
+      COMMON/TOTO/Z1(640),Z2(640),Z3(640)
+      DIMENSION A(N,N),B(N,N),RL(N,N)
+
+C  P() {}
+
+C     BEGIN BLOCK
+
+C  P() {}
+
+C     added to simulate actual preconditions
+      N = 3*NP                                                          0015
+
+C  P(N) {N==3NP}
+
+      DO 1 K = 1, N                                                     0016
+
+C  P(K,N) {N==3NP, 1<=K, K<=3NP}
+
+1        Z1(K) = RL(K*(N+1)-N,1)                                        0017
+
+C  P(K,N) {N==3NP, 1<=K, 3NP+1<=K}
+
+      DO 2 J = 1, N                                                     0018
+
+C  P(I,J,K,N) {N==3NP, 1<=J, J<=3NP}
+
+C        BEGIN BLOCK
+
+C  P(I,J,K,N) {N==3NP, 1<=J, J<=3NP}
+
+         DO 3 K = 1, N                                                  0019
+
+C  P(I,J,K,N) {N==3NP, 1<=J, J<=3NP, 1<=K, K<=3NP}
+
+3           Z2(K) = Z1(K)*B(K,J)                                        0020
+
+C  P(I,J,K,N) {K==3NP+1, N==3NP, 1<=J, J<=3NP, 1<=NP}
+
+         DO 4 K = 1, N, 3                                               0021
+
+C  P(I,J,K,N) {N==3NP, 1<=J, J<=3NP, 1<=K, K<=3NP, 1<=NP}
+
+            DO 4 I = 1, N                                               0022
+
+C  P(I,J,K,N) {N==3NP, 1<=I, I<=3NP, 1<=J, J<=3NP, 1<=K, K<=3NP,
+C    1<=NP}
+
+4              A(I,J) = A(I,J)-B(K,I)*Z2(K)-B(K+1,I)*Z2(K+1)-B(K+2,I)   0023
+     &         *Z2(K+2)                                                 0023
+
+C  P(I,J,K,N) {I==3NP+1, N==3NP, 1<=J, J<=3NP, 4<=K, 3NP+1<=K,
+C    K<=3NP+3, 1<=NP}
+
+2        CONTINUE                                                       0024
+C        END BLOCK
+C     END BLOCK
+      END
+
+C  <A(PHI1,PHI2)-R-EXACT-{1<=PHI1, PHI1<=3NP, 1<=PHI2, PHI2<=3NP}>
+C  <A(PHI1,PHI2)-W-EXACT-{1<=PHI1, PHI1<=3NP, 1<=PHI2, PHI2<=3NP}>
+C  <B(PHI1,PHI2)-R-MAY-{1<=PHI1, PHI1<=3NP, 1<=PHI2, PHI2<=3NP}>
+C  <RL(PHI1,PHI2)-R-MAY-{PHI2==1, 1<=NP}>
+C  <Z1(PHI1)-R-EXACT-{1<=PHI1, PHI1<=3NP}>
+C  <Z1(PHI1)-W-EXACT-{1<=PHI1, PHI1<=3NP}>
+C  <Z2(PHI1)-R-EXACT-{5<=2PHI1+3NP, 1<=PHI1, PHI1<=3NP}>
+C  <Z2(PHI1)-W-EXACT-{1<=PHI1, PHI1<=3NP}>
+
+C Nga Nguyen 5 March 2002 : this example violates the Fortran standard 
+C Adjustable array's bounds must be a dummy argument or in a common block
+C DIMENSION A(N,N),B(N,N),RL(N,N)
+
+C***********************************************************************
+C Excerpt from Cr2cnf from ONERA
+C Purpose: in regions of Z2
+C***********************************************************************
+      SUBROUTINE NBDIAG(A,B,RL,NP)
+      IMPLICIT REAL*8(A-H,O-Z)
+C  ROUTINE DE CALCUL DE A=A-TB*DIAG(RL)*B .
+      COMMON/TOTO/Z1(640),Z2(640),Z3(640)
+      DIMENSION A(N,N),B(N,N),RL(N,N)
+
+C  <A(PHI1,PHI2)-R-EXACT-{1<=PHI1, PHI1<=3NP, 1<=PHI2, PHI2<=3NP}>
+C  <A(PHI1,PHI2)-W-EXACT-{1<=PHI1, PHI1<=3NP, 1<=PHI2, PHI2<=3NP}>
+C  <B(PHI1,PHI2)-R-MAY-{1<=PHI1, PHI1<=3NP, 1<=PHI2, PHI2<=3NP}>
+C  <RL(PHI1,PHI2)-R-MAY-{PHI2==1, 1<=NP}>
+C  <Z1(PHI1)-R-EXACT-{1<=PHI1, PHI1<=3NP}>
+C  <Z1(PHI1)-W-EXACT-{1<=PHI1, PHI1<=3NP}>
+C  <Z2(PHI1)-R-EXACT-{5<=2PHI1+3NP, 1<=PHI1, PHI1<=3NP}>
+C  <Z2(PHI1)-W-EXACT-{1<=PHI1, PHI1<=3NP}>
+
+C     BEGIN BLOCK
+C     added to simulate actual preconditions
+      N = 3*NP                                                          0015
+
+C  <RL(PHI1,PHI2)-R-MAY-{PHI2==1, N==3NP, 1<=NP}>
+C  <Z1(PHI1)-W-EXACT-{1<=PHI1, PHI1<=3NP, N==3NP}>
+
+      DO 1 K = 1, N                                                     0016
+
+C  <RL(PHI1,PHI2)-R-MAY-{PHI2==1, N==3NP, 1<=K, K<=3NP}>
+C  <Z1(PHI1)-W-EXACT-{PHI1==K, N==3NP, 1<=K, K<=3NP}>
+
+1        Z1(K) = RL(K*(N+1)-N,1)                                        0017
+
+C  <A(PHI1,PHI2)-R-EXACT-{1<=PHI1, PHI1<=3NP, 1<=PHI2, PHI2<=3NP,
+C    N==3NP}>
+C  <A(PHI1,PHI2)-W-EXACT-{1<=PHI1, PHI1<=3NP, 1<=PHI2, PHI2<=3NP,
+C    N==3NP}>
+C  <B(PHI1,PHI2)-R-MAY-{1<=PHI1, PHI1<=3NP, 1<=PHI2, PHI2<=3NP,
+C    N==3NP}>
+C  <Z1(PHI1)-R-EXACT-{1<=PHI1, PHI1<=3NP, N==3NP}>
+C  <Z2(PHI1)-R-EXACT-{5<=2PHI1+3NP, 1<=PHI1, PHI1<=3NP, N==3NP}>
+C  <Z2(PHI1)-W-EXACT-{1<=PHI1, PHI1<=3NP, N==3NP}>
+
+      DO 2 J = 1, N                                                     0018
+
+C  <A(PHI1,PHI2)-R-EXACT-{PHI2==J, 1<=PHI1, PHI1<=3NP, N==3NP, 1<=J,
+C    J<=3NP}>
+C  <A(PHI1,PHI2)-W-EXACT-{PHI2==J, 1<=PHI1, PHI1<=3NP, N==3NP, 1<=J,
+C    J<=3NP}>
+C  <B(PHI1,PHI2)-R-MAY-{1<=PHI1, PHI1<=3NP, 1<=PHI2, PHI2<=3NP,
+C    N==3NP, 1<=J, J<=3NP}>
+C  <Z1(PHI1)-R-EXACT-{1<=PHI1, PHI1<=3NP, N==3NP, 1<=J, J<=3NP}>
+C  <Z2(PHI1)-R-EXACT-{5<=2PHI1+3NP, 1<=PHI1, PHI1<=3NP, N==3NP, 1<=J,
+C    J<=3NP}>
+C  <Z2(PHI1)-W-EXACT-{1<=PHI1, PHI1<=3NP, N==3NP, 1<=J, J<=3NP}>
+
+C        BEGIN BLOCK
+
+C  <B(PHI1,PHI2)-R-EXACT-{PHI2==J, 1<=PHI1, PHI1<=3NP, N==3NP, 1<=J,
+C    J<=3NP}>
+C  <Z1(PHI1)-R-EXACT-{1<=PHI1, PHI1<=3NP, N==3NP, 1<=J, J<=3NP}>
+C  <Z2(PHI1)-W-EXACT-{1<=PHI1, PHI1<=3NP, N==3NP, 1<=J, J<=3NP}>
+
+         DO 3 K = 1, N                                                  0019
+
+C  <B(PHI1,PHI2)-R-EXACT-{PHI1==K, PHI2==J, N==3NP, 1<=J, J<=3NP,
+C    1<=K, K<=3NP}>
+C  <Z1(PHI1)-R-EXACT-{PHI1==K, N==3NP, 1<=J, J<=3NP, 1<=K, K<=3NP}>
+C  <Z2(PHI1)-W-EXACT-{PHI1==K, N==3NP, 1<=J, J<=3NP, 1<=K, K<=3NP}>
+
+3           Z2(K) = Z1(K)*B(K,J)                                        0020
+
+C  <A(PHI1,PHI2)-R-EXACT-{PHI2==J, 1<=PHI1, PHI1<=3NP, N==3NP, 1<=J,
+C    J<=3NP}>
+C  <A(PHI1,PHI2)-W-EXACT-{PHI2==J, 1<=PHI1, PHI1<=3NP, N==3NP, 1<=J,
+C    J<=3NP}>
+C  <B(PHI1,PHI2)-R-EXACT-{5<=2PHI1+3NP, 1<=PHI1, PHI1<=3NP, 1<=PHI2,
+C    PHI2<=3NP, N==3NP, 1<=J, J<=3NP}>
+C  <Z2(PHI1)-R-EXACT-{5<=2PHI1+3NP, 1<=PHI1, PHI1<=3NP, N==3NP, 1<=J,
+C    J<=3NP}>
+
+         DO 4 K = 1, N, 3                                               0021
+
+C  <A(PHI1,PHI2)-R-EXACT-{PHI2==J, 1<=PHI1, PHI1<=3NP, N==3NP, 1<=J,
+C    J<=3NP, 1<=K, K<=3NP}>
+C  <A(PHI1,PHI2)-W-EXACT-{PHI2==J, 1<=PHI1, PHI1<=3NP, N==3NP, 1<=J,
+C    J<=3NP, 1<=K, K<=3NP}>
+C  <B(PHI1,PHI2)-R-EXACT-{3+2K<=2PHI1+3NP, K<=PHI1, PHI1<=2+K,
+C    1<=PHI2, PHI2<=3NP, N==3NP, 1<=J, J<=3NP, 1<=K, K<=3NP}>
+C  <Z2(PHI1)-R-EXACT-{3+2K<=2PHI1+3NP, K<=PHI1, PHI1<=2+K, N==3NP,
+C    1<=J, J<=3NP, 1<=K, K<=3NP}>
+
+            DO 4 I = 1, N                                               0022
+
+C  <A(PHI1,PHI2)-R-EXACT-{PHI1==I, PHI2==J, N==3NP, 1<=I, I<=3NP,
+C    1<=J, J<=3NP, 1<=K, K<=3NP}>
+C  <A(PHI1,PHI2)-W-EXACT-{PHI1==I, PHI2==J, N==3NP, 1<=I, I<=3NP,
+C    1<=J, J<=3NP, 1<=K, K<=3NP}>
+C  <B(PHI1,PHI2)-R-EXACT-{PHI2==I, 3+2K<=2PHI1+3NP, K<=PHI1,
+C    PHI1<=2+K, 1<=PHI2, PHI2<=3NP, N==3NP, 1<=J, J<=3NP, 1<=K,
+C    K<=3NP}>
+C  <Z2(PHI1)-R-EXACT-{3+2K<=2PHI1+3NP, K<=PHI1, PHI1<=2+K, N==3NP,
+C    1<=I, I<=3NP, 1<=J, J<=3NP, 1<=K, K<=3NP}>
+
+4              A(I,J) = A(I,J)-B(K,I)*Z2(K)-B(K+1,I)*Z2(K+1)-B(K+2,I)   0023
+     &         *Z2(K+2)                                                 0023
+2        CONTINUE                                                       0024
+C        END BLOCK
+C     END BLOCK
+      END
+
+C  <A(PHI1,PHI2)-IN-EXACT-{1<=PHI1, PHI1<=3NP, 1<=PHI2, PHI2<=3NP}>
+C  <B(PHI1,PHI2)-IN-MAY-{1<=PHI1, PHI1<=3NP, 1<=PHI2, PHI2<=3NP}>
+C  <RL(PHI1,PHI2)-IN-MAY-{PHI2==1, 1<=NP}>
+
+C Nga Nguyen 5 March 2002 : this example violates the Fortran standard 
+C Adjustable array's bounds must be a dummy argument or in a common block
+C DIMENSION A(N,N),B(N,N),RL(N,N)
+
+C***********************************************************************
+C Excerpt from Cr2cnf from ONERA
+C Purpose: in regions of Z2
+C***********************************************************************
+      SUBROUTINE NBDIAG(A,B,RL,NP)
+      IMPLICIT REAL*8(A-H,O-Z)
+C  ROUTINE DE CALCUL DE A=A-TB*DIAG(RL)*B .
+      COMMON/TOTO/Z1(640),Z2(640),Z3(640)
+      DIMENSION A(N,N),B(N,N),RL(N,N)
+
+C  <A(PHI1,PHI2)-IN-EXACT-{1<=PHI1, PHI1<=3NP, 1<=PHI2, PHI2<=3NP}>
+C  <B(PHI1,PHI2)-IN-MAY-{1<=PHI1, PHI1<=3NP, 1<=PHI2, PHI2<=3NP}>
+C  <RL(PHI1,PHI2)-IN-MAY-{PHI2==1, 1<=NP}>
+
+C     BEGIN BLOCK
+C     added to simulate actual preconditions
+      N = 3*NP                                                          0015
 
 C  <RL(PHI1,PHI2)-IN-MAY-{PHI2==1, N==3NP, 1<=NP}>
 
-      DO 1 K = 1, N                                                     0002
+      DO 1 K = 1, N                                                     0016
 
 C  <RL(PHI1,PHI2)-IN-MAY-{PHI2==1, N==3NP, 1<=K, K<=3NP}>
 
-1        Z1(K) = RL(K*(N+1)-N,1)                                        0003
+1        Z1(K) = RL(K*(N+1)-N,1)                                        0017
 
 C  <A(PHI1,PHI2)-IN-EXACT-{1<=PHI1, PHI1<=3NP, 1<=PHI2, PHI2<=3NP,
 C    N==3NP}>
-C  <B(PHI1,PHI2)-IN-EXACT-{1<=PHI1, PHI1<=3NP, 1<=PHI2, PHI2<=3NP,
+C  <B(PHI1,PHI2)-IN-MAY-{1<=PHI1, PHI1<=3NP, 1<=PHI2, PHI2<=3NP,
 C    N==3NP, 1<=NP}>
 C  <Z1(PHI1)-IN-EXACT-{1<=PHI1, PHI1<=3NP, N==3NP, 1<=NP}>
 
-      DO 2 J = 1, N                                                     0004
+      DO 2 J = 1, N                                                     0018
+
+C  <A(PHI1,PHI2)-IN-EXACT-{J==PHI2, 1<=PHI1, PHI1<=3NP, 3NP==N, 1<=J,
+C    J<=3NP}>
+C  <B(PHI1,PHI2)-IN-MAY-{1<=PHI1, PHI1<=3NP, 1<=PHI2, PHI2<=3NP,
+C    N==3NP, 1<=J, J<=3NP}>
+C  <Z1(PHI1)-IN-EXACT-{1<=PHI1, PHI1<=3NP, N==3NP, 1<=J, J<=3NP}>
+
+C        BEGIN BLOCK
 
 C  <B(PHI1,PHI2)-IN-EXACT-{PHI2==J, 1<=PHI1, PHI1<=3NP, N==3NP, 1<=J,
 C    J<=3NP}>
 C  <Z1(PHI1)-IN-EXACT-{1<=PHI1, PHI1<=3NP, N==3NP, 1<=J, J<=3NP}>
 
-         DO 3 K = 1, N                                                  0005
+         DO 3 K = 1, N                                                  0019
 
 C  <B(PHI1,PHI2)-IN-EXACT-{PHI1==K, PHI2==J, N==3NP, 1<=J, J<=3NP,
 C    1<=K, K<=3NP}>
 C  <Z1(PHI1)-IN-EXACT-{PHI1==K, N==3NP, 1<=J, J<=3NP, 1<=K, K<=3NP}>
 
-3           Z2(K) = Z1(K)*B(K,J)                                        0006
+3           Z2(K) = Z1(K)*B(K,J)                                        0020
 
 C  <A(PHI1,PHI2)-IN-EXACT-{J==PHI2, 1<=PHI1, PHI1<=3NP, 3NP==N, 1<=J,
 C    J<=3NP, 1<=NP}>
-C  <B(PHI1,PHI2)-IN-EXACT-{1<=PHI1, PHI1<=3NP, 1<=PHI2, PHI2<=3NP,
-C    N==3NP, 1<=J, J<=3NP, 1<=NP}>
-C  <Z2(PHI1)-IN-EXACT-{1<=PHI1, PHI1<=3NP, N==3NP, 1<=J, J<=3NP,
-C    1<=NP}>
+C  <B(PHI1,PHI2)-IN-EXACT-{5<=2PHI1+3NP, 1<=PHI1, PHI1<=3NP, 1<=PHI2,
+C    PHI2<=3NP, N==3NP, 1<=J, J<=3NP, 1<=NP}>
+C  <Z2(PHI1)-IN-EXACT-{5<=2PHI1+3NP, 1<=PHI1, PHI1<=3NP, N==3NP, 1<=J,
+C    J<=3NP, 1<=NP}>
 
-         DO 4 K = 1, N, 3                                               0007
+         DO 4 K = 1, N, 3                                               0021
 
 C  <A(PHI1,PHI2)-IN-EXACT-{J==PHI2, 1<=PHI1, PHI1<=3NP, 3NP==N, 1<=J,
 C    J<=3NP, 1<=K, K<=3NP}>
-C  <B(PHI1,PHI2)-IN-EXACT-{K<=PHI1, PHI1<=2+K, 1<=PHI2, PHI2<=3NP,
-C    N==3NP, 1<=J, J<=3NP, 1<=K, K<=3NP}>
-C  <Z2(PHI1)-IN-EXACT-{K<=PHI1, PHI1<=2+K, N==3NP, 1<=J, J<=3NP, 1<=K,
-C    K<=3NP, 1<=NP}>
+C  <B(PHI1,PHI2)-IN-EXACT-{3+2K<=2PHI1+3NP, K<=PHI1, PHI1<=2+K,
+C    1<=PHI2, PHI2<=3NP, N==3NP, 1<=J, J<=3NP, 1<=K, K<=3NP}>
+C  <Z2(PHI1)-IN-EXACT-{3+2K<=2PHI1+3NP, K<=PHI1, PHI1<=2+K, N==3NP,
+C    1<=J, J<=3NP, 1<=K, K<=3NP, 1<=NP}>
 
-            DO 4 I = 1, N                                               0008
+            DO 4 I = 1, N                                               0022
 
 C  <A(PHI1,PHI2)-IN-EXACT-{PHI1==I, PHI2==J, N==3NP, 1<=I, I<=3NP,
 C    1<=J, J<=3NP, 1<=K, K<=3NP}>
-C  <B(PHI1,PHI2)-IN-EXACT-{PHI2==I, K<=PHI1, PHI1<=2+K, N==3NP, 1<=I,
-C    I<=3NP, 1<=J, J<=3NP, 1<=K, K<=3NP}>
-C  <Z2(PHI1)-IN-EXACT-{K<=PHI1, PHI1<=2+K, N==3NP, 1<=I, I<=3NP, 1<=J,
-C    J<=3NP, 1<=K, K<=3NP}>
+C  <B(PHI1,PHI2)-IN-EXACT-{PHI2==I, 3+2K<=2PHI1+3NP, K<=PHI1,
+C    PHI1<=2+K, 1<=PHI2, PHI2<=3NP, N==3NP, 1<=J, J<=3NP, 1<=K,
+C    K<=3NP}>
+C  <Z2(PHI1)-IN-EXACT-{3+2K<=2PHI1+3NP, K<=PHI1, PHI1<=2+K, N==3NP,
+C    1<=I, I<=3NP, 1<=J, J<=3NP, 1<=K, K<=3NP}>
 
-4              A(I,J) = A(I,J)-B(K,I)*Z2(K)-B(K+1,I)*Z2(K+1)-B(K+2,I)   0009
-     &         *Z2(K+2)                                                 0009
-2        CONTINUE                                                       0010
+4              A(I,J) = A(I,J)-B(K,I)*Z2(K)-B(K+1,I)*Z2(K+1)-B(K+2,I)   0023
+     &         *Z2(K+2)                                                 0023
+2        CONTINUE                                                       0024
+C        END BLOCK
+C     END BLOCK
       END
