@@ -39,7 +39,7 @@ void malloc01()
 //               <must be written>: i
 
    for(i = 0; i <= 9; i += 1)
-//               <must be read   >: i
+//               <must be read   >: i p
 //               <must be written>: p[i]
       p[i] = (double) i;
 }
@@ -50,13 +50,13 @@ void malloc01()
 {
    int *p = malloc(10*sizeof(int));
    int i;
-//               <may be read    >: i
+//               <may be read    >: i p
 //               <may be written >: p[*]
 //               <must be written>: i
 
    for(i = 0; i <= 9; i += 1)
 //               <may be written >: p[*]
-//               <must be read   >: i
+//               <must be read   >: i p
       p[i] = (double) i;
 }
 
@@ -69,12 +69,14 @@ void malloc01()
 
 //  <i-R-EXACT-{}>
 //  <i-W-EXACT-{}>
+//  <p-R-EXACT-{}>
 //  <p[PHI1]-W-EXACT-{0<=PHI1, PHI1<=9}>
 
 
    for(i = 0; i <= 9; i += 1)
 
 //  <i-R-EXACT-{}>
+//  <p-R-EXACT-{}>
 //  <p[PHI1]-W-EXACT-{PHI1==i, 0<=i, i<=9}>
 
       p[i] = (double) i;
