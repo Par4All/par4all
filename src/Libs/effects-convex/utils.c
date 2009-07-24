@@ -1193,6 +1193,12 @@ effect make_reference_region(reference ref, tag tac)
 	    }
 	  linear_p = linear_p && dim_linear_p;	    
 	} /* for */
+
+      /* add array bounds if asked for */
+      if (array_bounds_p())	
+	sc = sc_safe_append(sc, 
+			    sc_safe_normalize(entity_declaration_sc(e)));
+
     } /* if (d>0 || pointer_p) */
   
   else
