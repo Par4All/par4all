@@ -303,3 +303,26 @@ void AddNoise(int ny, int nx, Cplfloat pt_in[ny][nx], float Sigma2, Cplfloat pt_
 
 PRINT REGIONS for main
 
+
+//  <_RANDOM_EFFECTS:GEN_SEED-R-EXACT-{}>
+//  <_RANDOM_EFFECTS:GEN_SEED-W-EXACT-{}>
+
+main()
+{
+   int ny = 10;
+   int nx = 10;
+   Cplfloat pt_in[ny][nx];
+   float Sigma2;
+   Cplfloat pt_out[ny][nx];
+
+//  <_RANDOM_EFFECTS:GEN_SEED-R-EXACT-{}>
+//  <_RANDOM_EFFECTS:GEN_SEED-W-EXACT-{}>
+//  <Sigma2-R-EXACT-{}>
+//  <nx-R-EXACT-{}>
+//  <ny-R-EXACT-{}>
+//  <pt_in-R-MAY-{}>
+//  <pt_out-W-MAY-{}>
+
+
+   AddNoise(ny, nx, pt_in, Sigma2, pt_out);
+}
