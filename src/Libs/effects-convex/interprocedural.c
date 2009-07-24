@@ -754,7 +754,8 @@ static list common_region_translation(entity callee, region reg,
      * It is the case for variables dexcribing I/O effects (LUNS).
      */
 
-    if (top_level_entity_p(reg_ent))
+    if (top_level_entity_p(reg_ent) || io_entity_p(reg_ent)
+	|| rand_effects_entity_p(reg_ent))
     {
 	pips_debug(5,"top-level entity.\n");	
 	new_reg = region_translation
@@ -765,15 +766,7 @@ static list common_region_translation(entity callee, region reg,
 	return(new_regions);
     }
 
-    if (io_entity_p(reg_ent)) {
-	pips_debug(5,"top-level entity.\n");	
-	new_reg = region_translation
-		    (reg, source_func, reference_undefined,
-		     reg_ent, target_func, reference_undefined,
-		     0, backward);
-	new_regions = CONS(EFFECT, new_reg, NIL);
-	return(new_regions);
-    }
+    
 
     ifdebug(6)
     {

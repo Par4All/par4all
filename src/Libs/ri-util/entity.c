@@ -673,6 +673,15 @@ io_entity_p(entity e)
 }
 
 bool 
+rand_effects_entity_p(entity e)
+{
+    return(strncmp(RAND_EFFECTS_PACKAGE_NAME, 
+		   entity_name(e),
+		   strlen(entity_module_name(e))) == 0);
+}
+
+
+bool 
 intrinsic_entity_p(entity e)
 {
   return (!value_undefined_p(entity_initial(e)) && value_intrinsic_p(entity_initial(e)));
