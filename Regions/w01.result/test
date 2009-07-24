@@ -56,7 +56,7 @@ C  T(N) {N==10}
 
       N = 10                                                            0004
 
-C  T(I) {}
+C  T(I) {I+1<=N, I#init+1<=N}
 
       DO WHILE (I.LT.N)                                                 0005
 
