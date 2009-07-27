@@ -2218,23 +2218,21 @@ void UpdateDerivedEntity(list ld, entity e, stack ContextStack)
 list TakeDeriveEntities(list le)
 {
   list lres = NIL;
-  MAP(ENTITY, e, 
-  {
+  FOREACH (ENTITY, e, le) {
     list ltmp = (list) entity_initial(e);
     if (ltmp != NIL)
       lres = gen_nconc(lres,ltmp);
     entity_initial(e) = value_undefined;
-  },le);
+  }
+  pips_assert ("cyclic list generated", gen_list_cyclic_p (lres) == FALSE);
   return lres;
 }
 
 void UpdateDerivedEntities(list ld, list le, stack ContextStack)
 {
-  MAP(ENTITY, e,
-  {
+  FOREACH (ENTITY, e, le) {
     UpdateDerivedEntity(ld,e,ContextStack);
-  },le);
-
+  }
 }
 
 void InitializeEnumMemberValues(list lem)
