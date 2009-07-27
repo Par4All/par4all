@@ -960,7 +960,7 @@ static void free_obj_out(
   newgen_free((void *) obj) ;
 }
 
-/* GEN_LOCAL_FREE frees the object OBJ with or withou KEEPing the sharing. */
+/* GEN_LOCAL_FREE frees the object OBJ with or without KEEPing the sharing. */
 
 static int
 persistant_simple_in( obj, dp )

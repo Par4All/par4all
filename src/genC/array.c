@@ -68,7 +68,7 @@ gen_array_free(gen_array_t a)
   gen_free_area((void**)a, sizeof(struct _gen_array_chunk_t));
 }
 
-void 
+void
 gen_array_full_free(gen_array_t a)
 {
   size_t i;
