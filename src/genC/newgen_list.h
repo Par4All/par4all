@@ -326,6 +326,6 @@ extern void gen_list_and GEN_PROTO((list *, list));
 extern void gen_list_and_not GEN_PROTO((list *, list));
 extern void gen_list_patch GEN_PROTO((list, void *, void *));
 extern int gen_position GEN_PROTO((void *, list));
-extern int gen_list_cyclic_p (list ml);
+extern bool gen_list_cyclic_p (list ml);
 
 #endif /* newgen_list_included */

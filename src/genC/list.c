@@ -112,11 +112,11 @@ int gen_eq(void * obj1, void * obj2)
  * one element points to a previously visited element.
  * @param list, the list to check
  */
-int gen_list_cyclic_p (list ml)
+bool gen_list_cyclic_p (list ml)
 {
-  int i         = 0;
-  int result    = FALSE;
-  set adresses = set_make (set_pointer);
+  int  i        = 0;
+  bool result   = FALSE;
+  set  adresses = set_make (set_pointer);
 
   for (i = 1; ml != NIL; ml = ml->cdr, i++) {
     if (set_belong_p ( adresses, ml)) {
