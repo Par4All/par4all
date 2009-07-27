@@ -30,31 +30,26 @@
 prod=${1:-.}
 dest=${2:-coelho@cri.ensmp.fr}
 
-# report status changes
+# report current-state message
+# current-state: ok skip KO:*
 function report()
 {
-  local current=$1 msg=$2 previous='unknown' repos status
+  local current=$1 msg=$2 previous='unknown' repos
 
   # log report anyway...
   echo "$(date +%Y%m%d%H%M%S): $current ($SECONDS seconds) $msg" >> LOG
 
-  # no compilation
+  # no compilation, nothing to report
   [ $current = 'skip' ] && exit 0
 
   # no change, no report
   test -f STATE && read previous < STATE
   [ "$previous" -a "$current" = "$previous" ] && exit 0
 
-  # 2 char summary
-  if [ $current -eq 0 ]
-  then status=ok
-  else status=KO
-  fi
-
   # generate report
   {
     # summary
-    echo PIPS compilation status has changed to $status
+    echo PIPS compilation status has changed to $current
 
     # details
     echo previous state: $previous
@@ -69,7 +64,7 @@ function report()
     echo previous:
     cat PREVIOUS
 
-    if [ $status = 'KO' ]
+    if [ $current != 'ok' ]
     then
       # show stderr/stdout?
       test -f err && {
@@ -93,21 +88,21 @@ function report()
 	svn log --revision COMMITTED $repos
       done
     fi
-  } | mailx -s "PIPS compilation status is $status" $dest
+  } | mailx -s "PIPS compilation status is $current" $dest
 
-  # new state
+  # record new state
   echo $current > STATE
 
-  # good bye!
+  # good bye! always 0 for cron
   exit 0
 }
 
 # check
-[ -d $prod -a -d $prod/.svn ] || report 1 "working copy '$prod' not found"
-cd $prod || report 2 "cannot 'cd $prod'"
+[ -d $prod -a -d $prod/.svn ] || report 'KO:no-wc' "working copy '$prod' not found"
+cd $prod || report 'KO:cd-prod' "cannot 'cd $prod'"
 rm -f out err
 
-svn up > out 2> err || report 3 "cannot 'svn up'"
+svn up > out 2> err || report 'KO:svn-up' "cannot 'svn up'"
 
 [ -f CURRENT ] || touch CURRENT
 mv CURRENT PREVIOUS
@@ -121,14 +116,14 @@ mv CURRENT PREVIOUS
 if ! cmp -s CURRENT PREVIOUS
 then
   # something may have changed, let us recompile
-  make unbuild > out 2> err || report 4 "cannot 'make unbuild'"
-  make build > out 2> err || report 5 "cannot 'make build'"
+  make unbuild > out 2> err || report 'KO:make-unbuild' "cannot 'make unbuild'"
+  make build > out 2> err || report 'KO:make-build' "cannot 'make build'"
   test -x pips/bin/$(./pips/makes/arch.sh)/tpips || report 6 "no tpips found!"
 
   # clean up
   rm -f out err
-  report 0 "pips is fine"
+  report 'ok' "pips is fine"
 else
   # no updates
-  report skip "no commit since last check"
+  report 'skip' "no commit since last check"
 fi
