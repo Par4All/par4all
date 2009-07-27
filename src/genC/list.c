@@ -137,10 +137,8 @@ int gen_list_cyclic_p (list ml)
  */
 size_t gen_length(list cp)
 {
-  size_t i ;
-  for( i=0; cp != NIL ; cp = cp->cdr, i++) {
-    message_assert ("list length above the limit", i < 1000000);
-  }
+  size_t i;
+  for (i = 0; cp != NIL ; cp = cp->cdr, i++) {;}
   return i;
 }
 
