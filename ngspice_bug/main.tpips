@@ -29,6 +29,6 @@ apply UNSPLIT(%ALL)
 close
 
 
-#delete ngspice
+delete ngspice
 quit
 # EOF
