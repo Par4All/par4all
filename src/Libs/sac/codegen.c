@@ -1018,8 +1018,9 @@ static statementInfo make_simd_statement_info(opcodeClass kind, opcode oc, list*
     si = make_statementInfo_simd(ssi);
 
     list temp = args[0];
+    int nb_new_entities = nbargs > 1 ? nbargs -1 : nbargs;
     /* create the simd vector entities */
-    for(j=0; j<nbargs; j++)
+    for(j=0; j<nb_new_entities; j++)
     {
         int basicTag = get_basic_from_opcode(oc, j);
 
@@ -1029,6 +1030,10 @@ static statementInfo make_simd_statement_info(opcodeClass kind, opcode oc, list*
                     basicTag);
 
         temp = CDR(temp);
+    }
+    /* we use two address functions */
+    if(nb_new_entities < nbargs) {
+        simdStatementInfo_vectors(ssi)[nb_new_entities] = simdStatementInfo_vectors(ssi)[nb_new_entities-1];
     }
 
     /* Fill the matrix of arguments */
@@ -1139,7 +1144,7 @@ list make_simd_statements(list kinds, cons* first, cons* last)
         /* compute the opcode to use */
         oc = get_optimal_opcode(type, index, args);
 
-        if (oc == opcode_undefined)
+        if (opcode_undefined_p(oc))
         {
             /* No optimized opcode found... */
             for( index = 0;
