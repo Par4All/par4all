@@ -225,10 +225,10 @@ c SIMD_COMMENT_2
       PARAMETER (SIZE = 10000)
       INTEGER*2 I_03, I_02, I_01, I_00, I_0
       INTEGER LU_IND0, LU_IB0, LU_NUB0, I
-      INTEGER*2 v4hi_vec5(0:3), v4hi_vec4(0:3), v4hi_vec3(0:3), 
-     &v4hi_vec2(0:3), v4hi_vec1(0:3), v4hi_vec0(0:3), RED0(0:3), A(1:
-     &1), B(1:SIZE), C(1:SIZE)
-      INTEGER v2si_vec7(0:1), v2si_vec6(0:1)
+      INTEGER*2 v4hi_vec7(0:3), v4hi_vec6(0:3), v4hi_vec5(0:3), 
+     &v4hi_vec4(0:3), v4hi_vec3(0:3), v4hi_vec2(0:3), v4hi_vec1(0:3)
+     &, v4hi_vec0(0:3), RED0(0:3), A(1:1), B(1:SIZE), C(1:SIZE)
+      INTEGER v2si_vec9(0:1), v2si_vec8(0:1)
 
       A(1) = 0                                                          0012
 99999 CONTINUE
@@ -237,13 +237,13 @@ c SIMD_COMMENT_2
       RED0(2) = 0
       RED0(3) = 0
       DO 99998 LU_IND0 = 0, 9999, 4
-         CALL SIMD_LOAD_V4HI(v4hi_vec0, C(LU_IND0+1))
+         CALL SIMD_LOAD_V4HI(v4hi_vec2, C(LU_IND0+1))
          CALL SIMD_LOAD_V4HI(v4hi_vec1, B(LU_IND0+1))
-         CALL SIMD_MULW(v4hi_vec1, v4hi_vec1, v4hi_vec0)
-         CALL SIMD_SAVE_GENERIC_V4HI(v4hi_vec1, I_03, I_02, I_01, 
+         CALL SIMD_MULW(v4hi_vec0, v4hi_vec1, v4hi_vec2)
+         CALL SIMD_SAVE_GENERIC_V4HI(v4hi_vec0, I_03, I_02, I_01, 
      &   I_00)
          CALL SIMD_LOAD_V4HI(v4hi_vec3, RED0(0))
-         CALL SIMD_ADDW(v4hi_vec3, v4hi_vec3, v4hi_vec1)
+         CALL SIMD_ADDW(v4hi_vec3, v4hi_vec3, v4hi_vec0)
          CALL SIMD_SAVE_V4HI(v4hi_vec3, RED0(0))
 c SIMD_COMMENT_2
 99998    CONTINUE
@@ -255,10 +255,10 @@ c SIMD_COMMENT_2
       PARAMETER (SIZE = 10000)
       INTEGER*2 I_03, I_02, I_01, I_00, I_0
       INTEGER LU_IND0, LU_IB0, LU_NUB0, I
-      INTEGER*2 v4hi_vec5(0:3), v4hi_vec4(0:3), v4hi_vec3(0:3), 
-     &v4hi_vec2(0:3), v4hi_vec1(0:3), v4hi_vec0(0:3), RED0(0:3), A(1:
-     &1), B(1:SIZE), C(1:SIZE)
-      INTEGER v2si_vec7(0:1), v2si_vec6(0:1)
+      INTEGER*2 v4hi_vec7(0:3), v4hi_vec6(0:3), v4hi_vec5(0:3), 
+     &v4hi_vec4(0:3), v4hi_vec3(0:3), v4hi_vec2(0:3), v4hi_vec1(0:3)
+     &, v4hi_vec0(0:3), RED0(0:3), A(1:1), B(1:SIZE), C(1:SIZE)
+      INTEGER v2si_vec9(0:1), v2si_vec8(0:1)
 
       A(1) = 0                                                          0012
 99999 CONTINUE
@@ -267,11 +267,11 @@ c SIMD_COMMENT_2
       RED0(2) = 0
       RED0(3) = 0
       DO 99998 LU_IND0 = 0, 9999, 4
-         CALL SIMD_LOAD_V4HI(v4hi_vec0, C(LU_IND0+1))
+         CALL SIMD_LOAD_V4HI(v4hi_vec2, C(LU_IND0+1))
          CALL SIMD_LOAD_V4HI(v4hi_vec1, B(LU_IND0+1))
-         CALL SIMD_MULW(v4hi_vec1, v4hi_vec1, v4hi_vec0)
+         CALL SIMD_MULW(v4hi_vec0, v4hi_vec1, v4hi_vec2)
          CALL SIMD_LOAD_V4HI(v4hi_vec3, RED0(0))
-         CALL SIMD_ADDW(v4hi_vec3, v4hi_vec3, v4hi_vec1)
+         CALL SIMD_ADDW(v4hi_vec3, v4hi_vec3, v4hi_vec0)
          CALL SIMD_SAVE_V4HI(v4hi_vec3, RED0(0))
 c SIMD_COMMENT_2
 99998    CONTINUE
@@ -283,10 +283,10 @@ c SIMD_COMMENT_2
       PARAMETER (SIZE = 10000)
       INTEGER*2 I_03, I_02, I_01, I_00, I_0
       INTEGER LU_IND0, LU_IB0, LU_NUB0, I
-      INTEGER*2 v4hi_vec5(0:3), v4hi_vec4(0:3), v4hi_vec3(0:3), 
-     &v4hi_vec2(0:3), v4hi_vec1(0:3), v4hi_vec0(0:3), RED0(0:3), A(1:
-     &1), B(1:SIZE), C(1:SIZE)
-      INTEGER v2si_vec7(0:1), v2si_vec6(0:1)
+      INTEGER*2 v4hi_vec7(0:3), v4hi_vec6(0:3), v4hi_vec5(0:3), 
+     &v4hi_vec4(0:3), v4hi_vec3(0:3), v4hi_vec2(0:3), v4hi_vec1(0:3)
+     &, v4hi_vec0(0:3), RED0(0:3), A(1:1), B(1:SIZE), C(1:SIZE)
+      INTEGER v2si_vec9(0:1), v2si_vec8(0:1)
 
       A(1) = 0                                                          0012
 99999 CONTINUE
@@ -296,10 +296,10 @@ c SIMD_COMMENT_2
       RED0(3) = 0
       CALL SIMD_LOAD_V4HI(v4hi_vec3, RED0(0))
       DO 99998 LU_IND0 = 0, 9999, 4
-         CALL SIMD_LOAD_V4HI(v4hi_vec0, C(LU_IND0+1))
+         CALL SIMD_LOAD_V4HI(v4hi_vec2, C(LU_IND0+1))
          CALL SIMD_LOAD_V4HI(v4hi_vec1, B(LU_IND0+1))
-         CALL SIMD_MULW(v4hi_vec1, v4hi_vec1, v4hi_vec0)
-         CALL SIMD_ADDW(v4hi_vec3, v4hi_vec3, v4hi_vec1)
+         CALL SIMD_MULW(v4hi_vec0, v4hi_vec1, v4hi_vec2)
+         CALL SIMD_ADDW(v4hi_vec3, v4hi_vec3, v4hi_vec0)
 c SIMD_COMMENT_2
 99998    CONTINUE
       CALL SIMD_SAVE_V4HI(v4hi_vec3, RED0(0))
@@ -310,8 +310,8 @@ c SIMD_COMMENT_2
       INTEGER*2 SIZE
       PARAMETER (SIZE = 10000)
       INTEGER LU_IND0
-      INTEGER*2 v4hi_vec3(0:3), v4hi_vec1(0:3), v4hi_vec0(0:3), RED0(
-     &0:3), A(1:1), B(1:SIZE), C(1:SIZE)
+      INTEGER*2 v4hi_vec3(0:3), v4hi_vec2(0:3), v4hi_vec1(0:3), 
+     &v4hi_vec0(0:3), RED0(0:3), A(1:1), B(1:SIZE), C(1:SIZE)
 
       A(1) = 0                                                          0012
 99999 CONTINUE
@@ -321,10 +321,10 @@ c SIMD_COMMENT_2
       RED0(3) = 0
       CALL SIMD_LOAD_V4HI(v4hi_vec3, RED0(0))
       DO 99998 LU_IND0 = 0, 9999, 4
-         CALL SIMD_LOAD_V4HI(v4hi_vec0, C(LU_IND0+1))
+         CALL SIMD_LOAD_V4HI(v4hi_vec2, C(LU_IND0+1))
          CALL SIMD_LOAD_V4HI(v4hi_vec1, B(LU_IND0+1))
-         CALL SIMD_MULW(v4hi_vec1, v4hi_vec1, v4hi_vec0)
-         CALL SIMD_ADDW(v4hi_vec3, v4hi_vec3, v4hi_vec1)
+         CALL SIMD_MULW(v4hi_vec0, v4hi_vec1, v4hi_vec2)
+         CALL SIMD_ADDW(v4hi_vec3, v4hi_vec3, v4hi_vec0)
 c SIMD_COMMENT_2
 99998    CONTINUE
       CALL SIMD_SAVE_V4HI(v4hi_vec3, RED0(0))
