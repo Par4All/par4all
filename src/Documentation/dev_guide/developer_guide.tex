@@ -721,17 +721,21 @@ provides the ability to pull/push commits from a single branch in an
 SVN repository. Beware of the limitations:
 \begin{itemize}
 \item branches and tags in more than one directory (we use
-  subdirectories in \texttt{branches}) are not managed~;
-\item SVN properties are mostly ignored (ignore, externals\ldots)~;
-\item cloning the pips tree does take a long time~;
-\item it does not know about branch management in subversion (since 1.5)~;
+  subdirectories in \texttt{branches}) are not clearly managed;
+\item SVN properties are mostly ignored (ignore, externals\ldots);
+\item cloning the pips tree does take a long time;
+\item it does not know about branch management in subversion (since 1.5),
+  so merging an svn branch from git and pushing back the result breaks
+  svn branch management; 
+\item commit messages pushed from \texttt{git-svn} may be quite unhelpful;
 \end{itemize}
 So just use \texttt{git-svn} to manage an already created branch which
 will be seen as the \texttt{master} branch by GIT. Creating new
 branches under GIT and hoping to have them appearing under SVN seems
 hopeless.
 
-Here is a summary of operations:
+Here is a summary of operations\footnote{ISTM that this ammended version does not work
+or is at least error prone. Fabien.}:
 {\scriptsize
 \begin{verbatim}
 # create copies of the repositories' trunks that
@@ -775,46 +779,16 @@ git svn dcommit
 \end{verbatim}
 }
 
-If you want to track all the branches of PIPS (and if you have the right to),
-you may try:
-{\scriptsize
-\begin{verbatim}
-git svn clone --branches=trunk/ancourt \
-              --branches=trunk/bouchebaba \
-              --branches=trunk/carothers \
-              --branches=trunk/coelho \
-              --branches=trunk/creusillet \
-              --branches=trunk/duong \
-              --branches=trunk/gall \
-              --branches=trunk/girodias \
-              --branches=trunk/godet \
-              --branches=trunk/guelton \
-              --branches=trunk/ief \
-              --branches=trunk/irigoin \
-              --branches=trunk/kalra \
-              --branches=trunk/keryell \
-              --branches=trunk/lplassart \
-              --branches=trunk/mensi \
-              --branches=trunk/muller \
-              --branches=trunk/villalon \
-              --branches=trunk \
-              --stdlayout \
-              http://svn.cri.ensmp.fr/svn/pips 
-\end{verbatim}
-}
-to track branches in the user-specific directory. But since there also
-some ``normal'' branches with no hierarchy (such as \texttt{daverio},
-\verb|teraops_20090319|), there is also the \verb|--branches=trunk| for
-them.
-
 Since in the PIPS repositories there is also some quite old history (based
-on RCS, because SCCS history has been lost...), the history does not fit
-into classical SVN \texttt{trunk}, \texttt{branches} and \texttt{tags} and
-thus cannot either be understood well by \texttt{git-svn}. So for ultimate
-PIPS historian, you can have also a copy of the repository with
-\texttt{git-svn} without using the
-\texttt{trunk}/\texttt{branches}/\texttt{tags} convention. For this, just
-use a plain \texttt{git-svn} with:
+on RCS and SCCS\footnote{introduced at CRI by Keryell Ronan on May 17, 1993}),
+the history does not fit into classical SVN \texttt{trunk},
+\texttt{branches} and \texttt{tags} and thus cannot either be understood well by \texttt{git-svn}.
+%%
+So for ultimate PIPS historian which does not want to use \texttt{svnsync}, you can have also a
+copy of the repository with \texttt{git-svn} without using the
+\texttt{trunk}/\texttt{branches}/\texttt{tags} convention.
+%%
+For this, just use a plain \texttt{git-svn} with:
 \begin{verbatim}
 git svn clone http://svn.cri.ensmp.fr/svn/nlpmake
 git svn clone http://svn.cri.ensmp.fr/svn/linear
