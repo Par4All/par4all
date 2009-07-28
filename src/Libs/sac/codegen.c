@@ -1005,7 +1005,7 @@ static statementInfo make_simd_statement_info(opcodeClass kind, opcode oc, list*
 {
     statementInfo si;
     simdStatementInfo ssi;
-    int i,j, nbargs;
+    int i, nbargs;
 
     /* find out the number of arguments needed */
     nbargs = opcodeClass_nbArgs(kind);
@@ -1017,24 +1017,32 @@ static statementInfo make_simd_statement_info(opcodeClass kind, opcode oc, list*
             (statementArgument*)malloc(sizeof(statementArgument) * nbargs * opcode_vectorSize(oc)));
     si = make_statementInfo_simd(ssi);
 
-    list temp = args[0];
-    int nb_new_entities = nbargs > 1 ? nbargs -1 : nbargs;
     /* create the simd vector entities */
-    for(j=0; j<nb_new_entities; j++)
+    hash_table reference_to_entity = hash_table_make(hash_pointer,HASH_DEFAULT_SIZE);
+    int j=nbargs-1;
+    FOREACH(EXPRESSION,exp,*args)
     {
         int basicTag = get_basic_from_opcode(oc, j);
-
-        simdStatementInfo_vectors(ssi)[j] = 
-            make_new_simd_vector(get_subwordSize_from_opcode(oc, j),
-                    opcode_vectorSize(oc),
-                    basicTag);
-
-        temp = CDR(temp);
+        simdStatementInfo_vectors(ssi)[j] = entity_undefined;
+#if 1
+         HASH_MAP(key,val, {
+            if( reference_equal_p(expression_reference(exp),(reference)key ) ) {
+                simdStatementInfo_vectors(ssi)[j] = val;
+                break;
+            }
+        },reference_to_entity)
+#endif
+        if( entity_undefined_p(simdStatementInfo_vectors(ssi)[j]) )
+        {
+            simdStatementInfo_vectors(ssi)[j] = 
+                make_new_simd_vector(get_subwordSize_from_opcode(oc, j),
+                        opcode_vectorSize(oc),
+                        basicTag);
+            hash_put(reference_to_entity,expression_reference(exp),simdStatementInfo_vectors(ssi)[j]);
+        }
+        --j;
     }
-    /* we use two address functions */
-    if(nb_new_entities < nbargs) {
-        simdStatementInfo_vectors(ssi)[nb_new_entities] = simdStatementInfo_vectors(ssi)[nb_new_entities-1];
-    }
+    hash_table_free(reference_to_entity);
 
     /* Fill the matrix of arguments */
     for(j=0; j<opcode_vectorSize(oc); j++)
