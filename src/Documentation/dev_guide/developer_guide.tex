@@ -677,6 +677,36 @@ Why not switch all this stuff to \texttt{git}, which is so
 At HPC Project we use GIT with central servers, so the previous points of
 view from CRI are rather out-of-focus...
 
+\subsubsection{Keeping a local copy of PIPS repositories with \texttt{svnsync}}
+\label{sec:svnsync}
+
+In order to access pips logs at anytime, you may consider keeping
+a local copy of pips repositories anywhere you want, including on a
+laptop, with the \texttt{svnsync} command. 
+The operation is mostly network bound: it takes under 15~minutes
+to copy the whole history of the 5~repositories from the CRI LAN.
+Beware that this copy must only be used read-only.
+
+{\scriptsize
+\begin{verbatim}
+mkdir PIPS_SVN
+cd PIPS_SVN
+# initialize the copy
+for r in nlpmake newgen linear pips validation ; do
+  svnadmin create $r
+  echo -e '#!/bin/sh\nexit 0' > $r/hooks/pre-revprop-change
+  chmod +x $r/hooks/pre-revprop-change
+  svnsync init file://$PWD/$r http://svn.cri.ensmp.fr/svn/$r
+done
+
+# then sync from time to time.
+# it takes a some time the first time, obviously...
+# in the PIPS_SVN directory do:
+for r in nlpmake newgen linear pips validation ; do
+  svnsync sync file://$PWD/$r
+done
+\end{verbatim}
+}
 
 \subsubsection{The git-svn gateway}
 \label{sec:git-svn}
