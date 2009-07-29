@@ -1,0 +1,5 @@
+Select some options to deal with the C Language:
+Parse as C:
+Prettyprint the source as C, of course
+Do not display original number lines as comment:
+typedef enum {_IEEE_=-1, _SVID_, _XOPEN_, _POSIX_, _ISOC_} _LIB_VERSION_TYPE;
