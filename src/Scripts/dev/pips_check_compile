@@ -25,13 +25,12 @@
 
 # TODO
 # - nice?
-# - lock working copy?
 
 prod=${1:-.}
 dest=${2:-coelho@cri.ensmp.fr}
 
 # report current-state message
-# current-state: ok skip KO:*
+# current-state: ok skip locked KO:*
 function report()
 {
   local current=$1 msg=$2 previous='unknown' repos
@@ -39,12 +38,18 @@ function report()
   # log report anyway...
   echo "$(date +%Y%m%d%H%M%S): $current ($SECONDS seconds) $msg" >> LOG
 
+  # out if locked
+  [ $current = 'locked' ] && {
+    echo "message: $msg" | mailx -s 'PIPS compilation status is locked' $dest
+    exit 0
+  }
+
   # no compilation, nothing to report
-  [ $current = 'skip' ] && exit 0
+  [ $current = 'skip' ] && { rmdir .lock ; exit 0 ; }
 
   # no change, no report
   test -f STATE && read previous < STATE
-  [ "$previous" -a "$current" = "$previous" ] && exit 0
+  [ "$previous" -a "$current" = "$previous" ] && { rmdir .lock ; exit 0 ; }
 
   # generate report
   {
@@ -94,6 +99,7 @@ function report()
   echo $current > STATE
 
   # good bye! always 0 for cron
+  rmdir .lock
   exit 0
 }
 
@@ -101,6 +107,8 @@ function report()
 [ -d $prod -a -d $prod/.svn ] || report 'KO:no-wc' "working copy '$prod' not found"
 cd $prod || report 'KO:cd-prod' "cannot 'cd $prod'"
 rm -f out err
+
+mkdir .lock || report 'locked' "working copy '$prod' is already locked..."
 
 svn up > out 2> err || report 'KO:svn-up' "cannot 'svn up'"
 
