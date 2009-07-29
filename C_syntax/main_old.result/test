@@ -1,0 +1,7 @@
+Select some options to deal with the C Language:
+Parse as C:
+Prettyprint the source as C, of course
+Do not display original number lines as comment:
+main(int argc, char *argv[])
+{
+}
