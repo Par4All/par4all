@@ -26,11 +26,11 @@
  * Remi Triolet, Yi-qing Yang
  *
  * Modifications:
- *  - new option to use semantics analysis results (Francois Irigoin, 
+ *  - new option to use semantics analysis results (Francois Irigoin,
  *    12 April 1991)
  *
  *  - compute the dependence cone, the statistics.
- *    (Yi-Qing, August 1991) 
+ *    (Yi-Qing, August 1991)
  *
  *  - updated using DEFINE_CURRENT_MAPPING, BA, September 3, 1993
  *
@@ -40,7 +40,7 @@
  *  - TestDependence split into different procedures for more readability.
  *    (BC, August 1995).
  *
- *  - creation of quick_privatize.c and prettyprint.c to reduce 
+ *  - creation of quick_privatize.c and prettyprint.c to reduce
  *    the size of ricedg.c (FI, Oct. 1995)
  *
  * Notes:
@@ -78,8 +78,8 @@ int NbrTestDiVar=0;
 int NbrProjFMTotal=0;
 int NbrFMSystNonAug=0;
 int FMComp[18];   /*for counting the number of F-M complexity less than 16.
-		     The complexity of one projection by F-M is multiply 
-		     of the nbr. of inequations positive and the nbr. of 
+		     The complexity of one projection by F-M is multiply
+		     of the nbr. of inequations positive and the nbr. of
 		     inequations negatives who containe the variable
 		     eliminated.The last elem of the array (ie FMComp[17])
 		     is used to count cases with complexity over 16*/
@@ -95,7 +95,7 @@ int Nbrdo;
 
 /* to map statements to execution contexts */
       /* Psysteme_undefined is not defined in sc.h; as Psysteme is external,
-       * I define it here. BA, September 1993 
+       * I define it here. BA, September 1993
        */
 #define Psysteme_undefined SC_UNDEFINED
 DEFINE_CURRENT_MAPPING(context, Psysteme)
@@ -113,9 +113,9 @@ static bool PRINT_RSDG = FALSE;
 
 
 /* Different types of dependence tests:
- *  
+ *
  * switch dg_type:
- * 
+ *
  *      DG_FAST: no context constraints are added
  *      DG_FULL: use loop bounds as context
  *      DG_SEMANTICS : use preconditions as context
@@ -128,7 +128,7 @@ static bool PRINT_RSDG = FALSE;
 
 static int dg_type = DG_FAST;
 
-    
+
 /*********************************************************************************/
 /* INTERFACE FUNCTIONS                                                           */
 /*********************************************************************************/
@@ -136,33 +136,25 @@ static int dg_type = DG_FAST;
 static bool rice_dependence_graph(char */*mod_name*/);
 
 
-bool 
-rice_fast_dependence_graph(mod_name)
-char *mod_name;
+bool rice_fast_dependence_graph(char *mod_name)
 {
     dg_type = DG_FAST;
     return rice_dependence_graph(mod_name);
 }
 
-bool 
-rice_full_dependence_graph(mod_name)
-char *mod_name;
+bool rice_full_dependence_graph(char *mod_name)
 {
     dg_type = DG_FULL;
     return rice_dependence_graph(mod_name);
 }
 
-bool 
-rice_semantics_dependence_graph(mod_name)
-char *mod_name;
+bool rice_semantics_dependence_graph(char *mod_name)
 {
     dg_type = DG_SEMANTICS;
     return rice_dependence_graph(mod_name);
 }
 
-bool 
-rice_regions_dependence_graph(mod_name)
-char *mod_name;
+bool rice_regions_dependence_graph(char *mod_name)
 {
     if (!same_string_p(rule_phase(find_rule_by_resource("CHAINS")),
 		       "REGION_CHAINS"))
@@ -184,17 +176,17 @@ static void rdg_statement(statement /*stat*/);
 static void rdg_loop(statement /*stat*/);
 static void rice_update_dependence_graph(statement /*stat*/, set /*region*/);
 static list TestCoupleOfEffects(statement /*s1*/, effect /*e1*/, statement /*s2*/,
-				 effect /*e2*/, list /*llv*/, Ptsg */*gs*/, 
+				 effect /*e2*/, list /*llv*/, Ptsg */*gs*/,
 				 list */*levelsop*/, Ptsg */*gsop*/);
-static list TestDependence(list /*n1*/, Psysteme /*sc1*/, statement /*s1*/, 
-			    effect /*ef1*/, reference /*r1*/, list /*n2*/, 
-			    Psysteme /*sc2*/, statement /*s2*/, effect /*ef2*/, 
-			    reference /*r2*/, list /*llv*/, Ptsg */*gs*/, 
+static list TestDependence(list /*n1*/, Psysteme /*sc1*/, statement /*s1*/,
+			    effect /*ef1*/, reference /*r1*/, list /*n2*/,
+			    Psysteme /*sc2*/, statement /*s2*/, effect /*ef2*/,
+			    reference /*r2*/, list /*llv*/, Ptsg */*gs*/,
 			    list */*levelsop*/, Ptsg */*gsop*/);
 static boolean build_and_test_dependence_context(reference /*r1*/, reference /*r2*/,
 						 Psysteme /*sc1*/, Psysteme /*sc2*/,
-						 Psysteme */*psc_dep*/, 
-						 list /*llv*/, 
+						 Psysteme */*psc_dep*/,
+						 list /*llv*/,
 						 list /*s2_enc_loops*/);
 static boolean gcd_and_constant_dependence_test(reference /*r1*/, reference /*r2*/,
 						list /*llv*/, list /*s2_enc_loops*/,
@@ -202,11 +194,11 @@ static boolean gcd_and_constant_dependence_test(reference /*r1*/, reference /*r2
 static void dependence_system_add_lci_and_di(Psysteme */*psc_dep*/,
 					     list /*s1_enc_loops*/,
 					     Pvecteur */*p_DiIncNonCons*/);
-static list TestDiVariables(Psysteme /*ps*/, int /*cl*/, statement /*s1*/, 
+static list TestDiVariables(Psysteme /*ps*/, int /*cl*/, statement /*s1*/,
 			     effect /*ef1*/, statement /*s2*/, effect /*ef2*/);
 static Ptsg dependence_cone_positive(Psysteme /*dep_sc*/);
 static list loop_variant_list(statement /*stat*/);
-static boolean TestDiCnst(Psysteme /*ps*/, int /*cl*/, statement /*s1*/, 
+static boolean TestDiCnst(Psysteme /*ps*/, int /*cl*/, statement /*s1*/,
 			  effect /*ef1*/, statement /*s2*/, effect /*ef2*/);
 
 
@@ -215,11 +207,9 @@ static boolean TestDiCnst(Psysteme /*ps*/, int /*cl*/, statement /*s1*/,
 
 extern int current_shared_obj_table_size(void); /* in genClib.c */
 
-/* The supplementary call to init_ordering_to_statement should be 
+/* The supplementary call to init_ordering_to_statement should be
    avoided if ordering.c were more clever. */
-static bool 
-rice_dependence_graph(mod_name)
-char *mod_name;
+static bool rice_dependence_graph(char *mod_name)
 {
     FILE *fp;
 
@@ -230,8 +220,7 @@ char *mod_name;
     entity module = local_name_to_top_level_entity(mod_name);
 
     debug_on("RICEDG_DEBUG_LEVEL");
-    debug(1,"rice_dependence_graph", 
-	  "Computing Rice dependence graph for %s\n", mod_name);
+    pips_debug(1, "Computing Rice dependence graph for %s\n", mod_name);
 
     ifdebug(1) {
 	mem_spy_init(0, 5*1024, NET_MEASURE, 0);
@@ -245,7 +234,6 @@ char *mod_name;
 	db_get_memory_resource(DBR_CODE, mod_name, TRUE) );
     mod_stat = get_current_module_statement();
 
-
     chains = (graph) db_get_memory_resource(DBR_CHAINS, mod_name, TRUE);
 
     ResetLoopCounter();
@@ -258,9 +246,9 @@ char *mod_name;
     }
 
     ifdebug(1) {
-	fprintf(stderr, "Space for chains: %d bytes\n", 
+	fprintf(stderr, "Space for chains: %d bytes\n",
 		gen_allocated_memory((gen_chunk *) chains));
-	fprintf(stderr, "Space for obj_table: %d bytes\n", 
+	fprintf(stderr, "Space for obj_table: %d bytes\n",
 		current_shared_obj_table_size());
 	mem_spy_begin();
     }
@@ -270,18 +258,18 @@ char *mod_name;
 
     ifdebug(1) {
 	mem_spy_end("After DG copy");
-	fprintf(stderr, "Space for chains's copy: %d bytes\n", 
-		gen_allocated_memory((gen_chunk *) dg));	
-	fprintf(stderr, "Space for obj_table: %d bytes\n", 
+	fprintf(stderr, "Space for chains's copy: %d bytes\n",
+		gen_allocated_memory((gen_chunk *) dg));
+	fprintf(stderr, "Space for obj_table: %d bytes\n",
 		current_shared_obj_table_size());
     }
 
-    debug(8,"rice_dependence_graph","original graph\n");
-    ifdebug(8) {  	
-        set_ordering_to_statement(mod_stat);
-        prettyprint_dependence_graph(stderr, mod_stat, dg);
-        reset_ordering_to_statement();
-    }
+    pips_debug(8,"original graph\n");
+    ifdebug(8) {
+      set_ordering_to_statement(mod_stat);
+      prettyprint_dependence_graph(stderr, mod_stat, dg);
+      reset_ordering_to_statement();
+   }
 
     debug_off();
 
@@ -289,11 +277,11 @@ char *mod_name;
 	set_precondition_map( (statement_mapping)
 	    db_get_memory_resource(DBR_PRECONDITIONS, mod_name, TRUE) );
 
-    set_cumulated_rw_effects((statement_effects) 
+    set_cumulated_rw_effects((statement_effects)
 	db_get_memory_resource(DBR_CUMULATED_EFFECTS, mod_name, TRUE) );
 
     debug_on("RICEDG_DEBUG_LEVEL");
-    debug(1, "rice_dependence_graph", "finding enclosing loops ...\n");
+    pips_debug(1, "finding enclosing loops ...\n");
 
     set_enclosing_loops_map( loops_mapping_of_statement(mod_stat));
     ifdebug(3) {
@@ -301,8 +289,12 @@ char *mod_name;
       fprintf(stderr, " Nbrdo=%d",Nbrdo);
     }
     debug_on("QUICK_PRIVATIZER_DEBUG_LEVEL");
-    /* we need the statements from their ordering for the dependance-graph: */
+
+    /* we need to access the statements from their ordering for the
+       dependance-graph: */
+    /* Do this as late as possible as it is also used by pipsdbm... */
     set_ordering_to_statement(mod_stat);
+
     quick_privatize_graph(dg);
     debug_off();
 
@@ -328,8 +320,8 @@ char *mod_name;
 
     ifdebug(3) {
 	fprintf(stderr,"\nThe results of statistique of test of dependence are:\n");
-	fprintf(stderr,"NbrArrayDepInit = %d\n",NbrArrayDepInit); 
-	fprintf(stderr,"NbrIndepFind = %d\n",NbrIndepFind); 
+	fprintf(stderr,"NbrArrayDepInit = %d\n",NbrArrayDepInit);
+	fprintf(stderr,"NbrIndepFind = %d\n",NbrIndepFind);
 	fprintf(stderr,"NbrAllEquals = %d\n",NbrAllEquals);
 	fprintf(stderr,"NbrDepCnst = %d\n",NbrDepCnst);
 	fprintf(stderr,"NbrTestExact= %d\n",NbrTestExact);
@@ -346,7 +338,7 @@ char *mod_name;
 	for (i=0;i<=4;i++)
 	    for(j=0;j<=2;j++)
 		fprintf(stderr,"%d  ", constdep[i][j]);
-	fprintf(stderr,"\nNbrTestCnst = %d\n",NbrTestCnst); 
+	fprintf(stderr,"\nNbrTestCnst = %d\n",NbrTestCnst);
 	fprintf(stderr,"NbrTestGcd = %d\n",NbrTestGcd);
 	fprintf(stderr,"NbrTestSimple = %d\n",NbrTestSimple);
 	fprintf(stderr,"NbrTestDiCnst = %d\n",NbrTestDiCnst);
@@ -374,13 +366,12 @@ char *mod_name;
 
     /* FI: this is not a proper way to do it */
     if (get_bool_property("PRINT_DEPENDENCE_GRAPH") || PRINT_RSDG) {
-	dg_name = strdup(concatenate(db_get_current_workspace_directory(), 
-			             "/", mod_name, ".dg", NULL));
+	dg_name = strdup(concatenate(db_get_current_workspace_directory(),
+				     "/", mod_name, ".dg", NULL));
 	fp = safe_fopen(dg_name, "w");
 	prettyprint_dependence_graph(fp, mod_stat, dg);
 	safe_fclose(fp,dg_name);
     }
-    
 
     ifdebug(1) {
 	mem_spy_reset();
@@ -400,8 +391,7 @@ char *mod_name;
     return TRUE;
 }
 
-static void 
-rdg_unstructured(unstructured u)
+static void rdg_unstructured(unstructured u)
 {
     list blocs = NIL ;
 
@@ -412,8 +402,7 @@ rdg_unstructured(unstructured u)
     gen_free_list( blocs );
 }
 
-static void 
-rdg_statement(statement stat)
+static void rdg_statement(statement stat)
 {
     forloop fl = forloop_undefined;
     whileloop wl = whileloop_undefined;
@@ -423,9 +412,9 @@ rdg_statement(statement stat)
     switch (instruction_tag(istat)) {
 
       case is_instruction_block: {
-        FOREACH (STATEMENT, s, instruction_block(istat))
+	FOREACH (STATEMENT, s, instruction_block(istat))
 	  rdg_statement(s);
-        break;
+	break;
       }
 
       case is_instruction_test:
@@ -460,16 +449,14 @@ rdg_statement(statement stat)
     }
 }
 
-static void 
-rdg_loop(stat)
-statement stat;
+static void rdg_loop(statement stat)
 {
     set region;
 
-    if (get_bool_property("COMPUTE_ALL_DEPENDENCES")) 
+    if (get_bool_property("COMPUTE_ALL_DEPENDENCES"))
     {
 	region = region_of_loop(stat);
-	ifdebug(7)  
+	ifdebug(7)
 	{
 	    fprintf(stderr, "[rdg_loop] applied on region:\n");
 	    print_statement_set(stderr, region);
@@ -478,7 +465,7 @@ statement stat;
     }
     else
     {
-	if ((region = distributable_loop(stat)) == set_undefined) 
+	if ((region = distributable_loop(stat)) == set_undefined)
 	{
 	    instruction i = statement_instruction(stat) ;
 
@@ -520,7 +507,7 @@ statement stat;
  * element removal;
  *
  * - the same conflict may appear twice, once as a def-use conflict and
- * once as a use-def conflicts; since dependence testing may be long, 
+ * once as a use-def conflicts; since dependence testing may be long,
  * the conflict and its symmetric conflict are processed simultaneously;
  * of course, conflict list and dependence arc updates become tricky,
  *
@@ -537,7 +524,7 @@ statement stat;
  *
  * - because of the use-def/def-use symmetry, a conflict may already
  * have been processed when it is accessed;
- * 
+ *
  * - due to a strange feature in the NewGen declarations, the arcs
  * are called "successors"; variables in the procedure are named with
  * the same convention except... except when they are not; so a so-called
@@ -554,7 +541,7 @@ statement stat;
  * exists.
  *
  * The procedure is made of many too many nested loops and tests:
- * 
+ *
  * for all vertex v1 in graph dg
  *    if statement s1 associated to v1 in region
  *	 for all arcs a1 outgoing from v1
@@ -575,11 +562,10 @@ statement stat;
  *
  * Good luck for the restructuring! I'm not sure the current procedure
  * might not end up removing as a2 the very same arc a1 it uses to
- * iterate... 
+ * iterate...
  */
 
-static void 
-rice_update_dependence_graph(
+static void rice_update_dependence_graph(
     statement stat,
     set region)
 {
@@ -589,7 +575,7 @@ rice_update_dependence_graph(
     pips_assert("statement is a loop", statement_loop_p(stat));
 
     pips_debug(1, "updating dependence graph\n");
-    
+
     if(dg_type == DG_FULL) {
 	pips_debug(1, "computing execution contexts\n");
 	set_context_map( contexts_mapping_of_nest(stat) );
@@ -603,7 +589,7 @@ rice_update_dependence_graph(
 	fprintf(stderr,"\n");
     }
 
-    for (pv1 = graph_vertices(dg); pv1 != NIL; pv1 = CDR(pv1)) 
+    for (pv1 = graph_vertices(dg); pv1 != NIL; pv1 = CDR(pv1))
     {
 	vertex v1 = VERTEX(CAR(pv1));
 	dg_vertex_label dvl1 = (dg_vertex_label) vertex_vertex_label(v1);
@@ -614,8 +600,8 @@ rice_update_dependence_graph(
 	dg_vertex_label_sccflags(dvl1) = make_sccflags(scc_undefined, 0, 0, 0);
 
 	ps = vertex_successors(v1);
-	pss = NIL; 
-	while (ps != NIL) 
+	pss = NIL;
+	while (ps != NIL)
 	{
 	    successor su = SUCCESSOR(CAR(ps));
 	    vertex v2 = successor_vertex(su);
@@ -624,7 +610,7 @@ rice_update_dependence_graph(
 	    list true_conflicts = NIL;
 	    list pc, pchead;
 
-	    if (! set_belong_p(region, (char *) s2)) 
+	    if (! set_belong_p(region, (char *) s2))
 	    {
 		pss = ps;
 		ps = CDR(ps);
@@ -633,7 +619,7 @@ rice_update_dependence_graph(
 
 	    pc = dg_arc_label_conflicts(dal);
 	    pchead = pc;
-	    while (pc !=NIL) 
+	    while (pc !=NIL)
 	    {
 		conflict c = CONFLICT(CAR(pc)) ;
 		effect e1 = conflict_source(c);
@@ -647,14 +633,14 @@ rice_update_dependence_graph(
 		    fprintf(stderr, ") \n");
 		}
 
-		if (conflict_cone(c) != cone_undefined) 
+		if (conflict_cone(c) != cone_undefined)
 		{
 		    /* This conflict cone has been updated. */
-		    ifdebug(4) { 
-			fprintf(stderr, 
+		    ifdebug(4) {
+			fprintf(stderr,
 				" \nThis dependence has been computed.\n");
 		    }
-		    true_conflicts = gen_nconc(true_conflicts, 
+		    true_conflicts = gen_nconc(true_conflicts,
 					       CONS(CONFLICT, c, NIL));
 		}
 		else  /*Compute this conflit and the opposite one */
@@ -673,7 +659,7 @@ rice_update_dependence_graph(
 
 		    Finds2s1 = FALSE;
 
-		    /*looking for the opposite dependence from (s2,e2) to 
+		    /*looking for the opposite dependence from (s2,e2) to
 		      (s1,e1) */
 
 		    /* Make sure that you do not try to find the very same
@@ -685,47 +671,46 @@ rice_update_dependence_graph(
 			  && (action_write_p(effect_action(e2)))) &&
 			!((s1==s2) && (action_read_p(effect_action(e1)))
 			  && (action_read_p(effect_action(e2)))) )
-             /* && (reference_indices(effect_any_reference(e1))) != NIL) */
+		      /* && (reference_indices(effect_any_reference(e1))) != NIL) */
 		    {
-			debug (4, "rice_update_dependence_graph", 
-			       "looking for the opposite dependence");  
+		      pips_debug (4, "looking for the opposite dependence");
 
-			ps2su = vertex_successors(v2); 
+			ps2su = vertex_successors(v2);
 			ps2sus = NIL;
-			while (ps2su !=NIL && !Finds2s1) 
+			while (ps2su !=NIL && !Finds2s1)
 			{
 			    s2su = SUCCESSOR(CAR(ps2su));
 			    v1bis = successor_vertex(s2su);
 			    s1bis = vertex_to_statement(v1bis);
-			    if (s1bis != s1) 
+			    if (s1bis != s1)
 			    {
 				ps2sus = ps2su;
 				ps2su = CDR(ps2su);
 				continue;
 			    }
-			    else 
+			    else
 			    {
-				dals2s1 = (dg_arc_label) 
-				    successor_arc_label(s2su); 
+				dals2s1 = (dg_arc_label)
+				    successor_arc_label(s2su);
 				pcs2s1 = dg_arc_label_conflicts(dals2s1);
 				pchead1 = pcs2s1;
-				while ((pcs2s1!=NIL) && !Finds2s1) 
+				while ((pcs2s1!=NIL) && !Finds2s1)
 				{
-				    cs2s1 =  CONFLICT(CAR(pcs2s1));   
+				    cs2s1 =  CONFLICT(CAR(pcs2s1));
 				    e1bis = conflict_source(cs2s1);
 				    e2bis = conflict_sink(cs2s1);
-				    if (e1bis==e2 && e2bis==e1) 
+				    if (e1bis==e2 && e2bis==e1)
 				    {
 					Finds2s1 = TRUE;
 					continue;
 				    }
-				    else 
+				    else
 				    {
 					pcs2s1 = CDR(pcs2s1);
 					continue;
 				    }
 				}
-				if (!Finds2s1) 
+				if (!Finds2s1)
 				{
 				    ps2sus = ps2su;
 				    ps2su = CDR(ps2su);
@@ -734,18 +719,18 @@ rice_update_dependence_graph(
 			    }
 			}
 
-			/* if (!Finds2s1) 
-			   pips_error("rice_update_dependence_graph",  
+			/* if (!Finds2s1)
+			   pips_error("rice_update_dependence_graph",
 			   "Expected opposite dependence are not found"); */
 
-			if (Finds2s1) 
+			if (Finds2s1)
 			{
-			    ifdebug(4)  
+			    ifdebug(4)
 			    {
-				fprintf(stderr, "\n dep %02td (", 
+				fprintf(stderr, "\n dep %02td (",
 					statement_number(s2));
 				print_words(stderr, words_effect(e1bis));
-				fprintf(stderr, ") --> %02td (", 
+				fprintf(stderr, ") --> %02td (",
 					statement_number(s1));
 				print_words(stderr, words_effect(e2bis));
 				fprintf(stderr, ") \n");
@@ -760,7 +745,7 @@ rice_update_dependence_graph(
 						 &levelsop, &gsop);
 
 		    /* updating DG for the dependence (s1,e1)-->(s2,e2)*/
-		    if (levels == NIL) 
+		    if (levels == NIL)
 		    {
 			debug(4,"", "\nThe dependence (s1,e1)-->(s2,e2)"
 			      " must be removed. \n");
@@ -769,20 +754,20 @@ rice_update_dependence_graph(
 			conflict_sink(c) = effect_undefined;
 			free_conflict(c);
 		    }
-		    else 
+		    else
 		    {
-			debug(4,"", 
-			      "\nUpdating the dependence (s1,e1)-->(s2,e2)\n");  
+			debug(4,"",
+			      "\nUpdating the dependence (s1,e1)-->(s2,e2)\n");
 
 			if (!SG_UNDEFINED_P(gs))
 			    conflict_cone(c) = make_cone(levels,gs);
 			else
 			    conflict_cone(c) = make_cone(levels,SG_UNDEFINED);
-			true_conflicts = gen_nconc(true_conflicts, 
+			true_conflicts = gen_nconc(true_conflicts,
 						   CONS(CONFLICT, c, NIL));
-		    } 
+		    }
 
-		    if (Finds2s1) 
+		    if (Finds2s1)
 		    {
 			/* updating DG for the dependence (s2,e2)-->(s1,e1)*/
 			if (levelsop == NIL) {
@@ -793,20 +778,20 @@ rice_update_dependence_graph(
 			    conflict_sink(cs2s1) = effect_undefined;
 			    /*gen_free(cs2s1);*/
 
-			    if(pchead == pchead1) 
+			    if(pchead == pchead1)
 				/* They are in the same conflicts list */
 				gen_remove(&pchead, cs2s1);
-			    else 
+			    else
 			    {
 				gen_remove(&pchead1, cs2s1);
-				if (pchead1 != NIL) 
+				if (pchead1 != NIL)
 				{
 				    dg_arc_label_conflicts(dals2s1) = pchead1;
-				    successor_arc_label_(s2su) = 
+				    successor_arc_label_(s2su) =
 					newgen_arc_label(dals2s1);
 				}
-				else 
-				{ 
+				else
+				{
 				    /* This successor has only one
 				       conflict that has been killed.*/
 				    successor_vertex(s2su) = vertex_undefined;
@@ -817,7 +802,7 @@ rice_update_dependence_graph(
 				    if (ps2sus == NIL) {
 					vertex_successors(v2) = ps2su;
 				    }
-				    else 
+				    else
 				    {
 					CDR(ps2sus) = ps2su;
 				    }
@@ -831,40 +816,40 @@ rice_update_dependence_graph(
 
 			    if (!SG_UNDEFINED_P(gsop))
 				conflict_cone(cs2s1) = make_cone(levelsop,gsop);
-			    else 
-				conflict_cone(cs2s1) = 
-				    make_cone(levelsop,SG_UNDEFINED);	
-			}  
-		    }  
+			    else
+				conflict_cone(cs2s1) =
+				    make_cone(levelsop,SG_UNDEFINED);
+			}
+		    }
 		}
 		pc = CDR(pc);
 	    }
 
 	   /* gen_free_list(dg_arc_label_conflicts(dal));*/
-	    if (true_conflicts != NIL) 
+	    if (true_conflicts != NIL)
 	    {
 		dg_arc_label_conflicts(dal) = true_conflicts;
 		pss = ps;
 		ps = CDR(ps);
 	    }
-	    else 
+	    else
 	    {
 		successor_vertex(su) = vertex_undefined;
 		successor_arc_label_(su) = (arc_label) dg_arc_label_undefined;
 		free_successor(su);
 		ps = CDR(ps);
-		if (pss == NIL) 
+		if (pss == NIL)
 		    vertex_successors(v1) = ps;
-		else 
+		else
 		    CDR(pss) = ps;
 	    }
 	    /*ifdebug(4){ prettyprint_dependence_graph(stderr, mod_stat, dg); }*/
 	}
     }
 
-    ifdebug(8) 
+    ifdebug(8)
     {
-	fprintf(stderr, "[rice_update_dependence_graph] updated graph\n");
+      pips_debug(8,"updated graph\n");
 	print_statement_set(stderr, region);
 	prettyprint_dependence_graph(stderr, get_current_module_statement(), dg);
     }
@@ -879,9 +864,8 @@ rice_update_dependence_graph(
 
 
 
-static list 
-TestCoupleOfEffects(
-    statement s1, effect e1, 
+static list TestCoupleOfEffects(
+    statement s1, effect e1,
     statement s2, effect e2,
     list llv, /* must be freed */
     Ptsg * gs,
@@ -895,7 +879,6 @@ TestCoupleOfEffects(
     list n2 = load_statement_enclosing_loops(s2);
     Psysteme sc2 = SC_UNDEFINED;
     reference r2 = effect_any_reference(e2) ;
-    
 
     switch (dg_type)
     {
@@ -904,7 +887,6 @@ TestCoupleOfEffects(
 	/* use region information if some is available */
 	sc1 = effect_system(e1);
 	sc2 = effect_system(e2);
-	
 	break;
     }
 
@@ -922,12 +904,12 @@ TestCoupleOfEffects(
 	       too often modified by the loop body */
 	transformer t1 = load_statement_precondition(s1);
 	transformer t2 = load_statement_precondition(s2);
-	
+
 	sc1 = (Psysteme) predicate_system(transformer_relation(t1));
 	sc2 = (Psysteme) predicate_system(transformer_relation(t2));
 	break;
     }
-	
+
     default :
 	pips_error ("TestCoupleOfEffects",
 		    "Unknown dependence test %d\n", dg_type);
@@ -935,11 +917,11 @@ TestCoupleOfEffects(
     }
 
 
-    return TestCoupleOfReferences(n1, sc1, s1, e1, r1, n2, sc2, s2, e2, 
+    return TestCoupleOfReferences(n1, sc1, s1, e1, r1, n2, sc2, s2, e2,
 				  r2, llv, gs, levelsop, gsop);
 }
 
-/* 
+/*
  * This function checks if two references have memory locations in common.
  *
  * The problem is obvious for references to the same scalar variable.
@@ -953,7 +935,7 @@ TestCoupleOfEffects(
  * TestDependence() is called.
 */
 
-list 
+list
 TestCoupleOfReferences(
 		       list n1,
 		       Psysteme sc1 __attribute__ ((unused)),
@@ -967,85 +949,83 @@ TestCoupleOfReferences(
 		       reference r2,
 		       list llv __attribute__ ((unused)),
 		       Ptsg * gs __attribute__ ((unused)),
-		       list * levelsop __attribute__ ((unused)), 
+		       list * levelsop __attribute__ ((unused)),
 		       Ptsg * gsop __attribute__ ((unused)))
 {
     _int i, cl, dims, ty;
     list levels = NIL, levels1 = NIL;
 
-    entity e1 = reference_variable(r1), 
+    entity e1 = reference_variable(r1),
     e2 = reference_variable(r2);
 
     list b1 = reference_indices(r1),
-         b2 = reference_indices(r2);
+      b2 = reference_indices(r2);
 
     ifdebug(1) {
 	mem_spy_begin();
     }
 
-    if(e1 != e2) 
+    if(e1 != e2)
     {
 	fprintf(stderr, "dep %02td (", statement_number(s1));
 	print_words(stderr, words_effect(ef1));
 	fprintf(stderr, ") --> %02td (", statement_number(s2));
 	print_words(stderr, words_effect(ef2));
 	fprintf(stderr, ") \n");
-	user_warning("TestCoupleOfReferences",
-		     "Dependence between differents variables: "
-		     "%s and %s\nDependence assumed\n",
-		     entity_local_name(e1), entity_local_name(e2));
-	
+	pips_user_warning("Dependence between differents variables: "
+			  "%s and %s\nDependence assumed\n",
+			  entity_local_name(e1), entity_local_name(e2));
     }
 
     /* if (e1 == e2 && !entity_scalar_p(e1) && !entity_scalar_p(e2)) */
     /* FI: Why these two tests under the condition e1==e2? */
-    if (e1 == e2 && !entity_atomic_reference_p(e1) && !entity_atomic_reference_p(e2)) 
+    if (e1 == e2 && !entity_atomic_reference_p(e1) && !entity_atomic_reference_p(e2))
     {
-	if (get_bool_property("RICEDG_STATISTICS_ALL_ARRAYS")) 
+	if (get_bool_property("RICEDG_STATISTICS_ALL_ARRAYS"))
 	{
 	    NbrArrayDepInit++;
 	}
-	else 
+	else
 	{
-	    if (b1 != NIL && b2 != NIL) 
-		NbrArrayDepInit++; 
+	    if (b1 != NIL && b2 != NIL)
+		NbrArrayDepInit++;
 	}
-	    
-	if (b1 == NIL || b2 == NIL) 
+
+	if (b1 == NIL || b2 == NIL)
 	{
-	    /* A(*) reference appears in the dependence graph */ 
+	    /* A(*) reference appears in the dependence graph */
 	    cl = FindMaximumCommonLevel(n1, n2);
 
-	    for (i = 1; i <= cl; i++) 
+	    for (i = 1; i <= cl; i++)
 		levels = gen_nconc(levels, CONS(INT, i, NIL));
 
-	    if (statement_possible_less_p(s1, s2)) 
+	    if (statement_possible_less_p(s1, s2))
 		levels = gen_nconc(levels, CONS(INT, cl+1, NIL));
 
 	    if (Finds2s1) {
-		for (i = 1; i <= cl; i++) 
+		for (i = 1; i <= cl; i++)
 		    levels1 = gen_nconc(levels1, CONS(INT, i, NIL));
-		
-		if (statement_possible_less_p(s2, s1)) 
+
+		if (statement_possible_less_p(s2, s1))
 		    levels1 = gen_nconc(levels1, CONS(INT, cl+1, NIL));
-		
+
 		*levelsop = levels1;
 	    }
 
 	    gen_free_list(llv);
 	}
-	else 
+	else
 	{
 	    /* llv is freed here */
 	    levels = TestDependence(n1, sc1, s1, ef1, r1, n2,sc2,s2, ef2,
-				    r2,llv,gs,levelsop,gsop); 
+				    r2,llv,gs,levelsop,gsop);
 	}
 
-	if (get_bool_property("RICEDG_STATISTICS_ALL_ARRAYS") ||  
-	    (b1 != NIL && b2 != NIL) ) 
+	if (get_bool_property("RICEDG_STATISTICS_ALL_ARRAYS") ||
+	    (b1 != NIL && b2 != NIL) )
 	{
-	    if (levels != NIL)  
-	    {	
+	    if (levels != NIL)
+	    {
 		/* test the dependence type, constant dependence?  */
 		dims = gen_length(b1);
 		ty = dep_type(effect_action(ef1),effect_action(ef2));
@@ -1056,9 +1036,9 @@ TestCoupleOfReferences(
 		    constdep[dims][ty]++;
 		}
 	    }
-		
-	    if (*levelsop != NIL) 
-	    {				
+
+	    if (*levelsop != NIL)
+	    {
 		/* test the dependence type, constant dependence?
 		   exact dependence? */
 		dims = gen_length(b1);
@@ -1070,27 +1050,27 @@ TestCoupleOfReferences(
 		    constdep[dims][ty]++;
 		}
 	    }
-	    
-	    if(levels != NIL || *levelsop != NIL) 
+
+	    if(levels != NIL || *levelsop != NIL)
 	    {
 		if(is_test_exact) NbrTestExact++;
-		else 
+		else
 		{
-		    if (is_test_inexact_eq) 
+		    if (is_test_inexact_eq)
 		    {
 			if (is_test_inexact_fm) NbrDepInexactEFM++;
 			else NbrDepInexactEq++;
 		    }
 		    else NbrDepInexactFM++;
-		}		
+		}
 	    }
-	       
-	    ifdebug(6) 
+
+	    ifdebug(6)
 	    {
-		if(is_test_exact) 
+		if(is_test_exact)
 		    fprintf(stderr, "\nThis test is exact! \n");
-		else 
-		    if (is_test_inexact_eq) 
+		else
+		    if (is_test_inexact_eq)
 			fprintf(stderr, "\nTest not exact : "
 				"non-exact elimination of equation!");
 		    else
@@ -1102,50 +1082,49 @@ TestCoupleOfReferences(
 	ifdebug(1) {
 	    mem_spy_end("TestCoupleOfReferences-1");
 	}
-	
+
 	return(levels);
-    } 
-	
-    else 
+    }
+
+    else
     { /* the case of scalar variables and equivalenced arrays */
 	cl = FindMaximumCommonLevel(n1, n2);
-	
-	for (i = 1; i <= cl; i++) 
+
+	for (i = 1; i <= cl; i++)
 	    levels = gen_nconc(levels, CONS(INT, i, NIL));
-	
-	if (statement_possible_less_p(s1, s2)) 
+
+	if (statement_possible_less_p(s1, s2))
 	    levels = gen_nconc(levels, CONS(INT, cl+1, NIL));
-	
-	if ((instruction_loop_p(statement_instruction(s1)))|| 
+
+	if ((instruction_loop_p(statement_instruction(s1)))||
 	    instruction_loop_p(statement_instruction(s2)))
 	    NbrIndexDep ++;
-	else 
+	else
 	{/*scalar variable dependence */
 	    NbrScalDep ++;
 	    ty = dep_type(effect_action(ef1),effect_action(ef2));
 	    deptype[0][ty]++;
 	}
-	
-	if (Finds2s1) 
+
+	if (Finds2s1)
 	{
-	    for (i = 1; i <= cl; i++) 
+	    for (i = 1; i <= cl; i++)
 		levels1 = gen_nconc(levels1, CONS(INT, i, NIL));
-	    
-	    if (statement_possible_less_p(s2, s1)) 
+
+	    if (statement_possible_less_p(s2, s1))
 		levels1 = gen_nconc(levels1, CONS(INT, cl+1, NIL));
-	    
+
 	    *levelsop = levels1;
-	    if ((instruction_loop_p(statement_instruction(s1)))|| 
+	    if ((instruction_loop_p(statement_instruction(s1)))||
 		instruction_loop_p(statement_instruction(s2)))
 		NbrIndexDep ++;
-	    else 
+	    else
 	    {/*case of scalar variable dependence */
 		NbrScalDep ++;
 		ty = dep_type(effect_action(ef2),effect_action(ef1));
-		deptype[0][ty]++;	
+		deptype[0][ty]++;
 	    }
 	}
-	
 
 	ifdebug(1) {
 	    mem_spy_end("TestCoupleOfReferences-2");
@@ -1159,7 +1138,7 @@ TestCoupleOfReferences(
  *                             statement s1, s2, effect ef1, ef2,
  *                             reference r1, r2, list llv,
  *                             list *levelsop, Ptsg *gs,*gsop)
- * input    : 
+ * input    :
  *      list n1, n2      : enclosing loops for statements s1 and s2;
  *      Psysteme sc1, sc2: current context for each statement;
  *      statement s1, s2 : currently analyzed statements;
@@ -1190,7 +1169,7 @@ TestCoupleOfReferences(
  *  2. The computation of levels and cone for s1->s2
  *  3. The very same computation for s2->s1
  *
- * Modification : 
+ * Modification :
  *
  * - ajout des tests de faisabilites pour le systeme initial,
  * avant la projection. Yi-Qing (18/10/91)
@@ -1207,10 +1186,10 @@ TestCoupleOfReferences(
  *
  * - sc_rm() added for dep_syst, dep_syst1, dep_syst_op and dep_syst2
  */
-static list 
+static list
 TestDependence(
-    list n1, Psysteme sc1, statement s1, effect ef1, reference r1, 
-    list n2, Psysteme sc2, statement s2, effect ef2, reference r2, 
+    list n1, Psysteme sc1, statement s1, effect ef1, reference r1,
+    list n2, Psysteme sc2, statement s2, effect ef2, reference r2,
     list llv,
     Ptsg * gs,
     list * levelsop,
@@ -1224,7 +1203,7 @@ TestDependence(
     /* Automatic variables read in a CATCH block need to be declared volatile as
      * specified by the documentation*/
     Pbase volatile tmp_base;
-   
+
     int l, cl;
     list levels;
     Pvecteur DiIncNonCons = NULL;
@@ -1235,19 +1214,18 @@ TestDependence(
     }
 
     /* Elimination of loop indices from loop variants llv */
-    /* We use n2 because we take care of variables modified in 
+    /* We use n2 because we take care of variables modified in
        an iteration only for the second system. */
-    MAP(STATEMENT, s, 
+    MAP(STATEMENT, s,
     {
 	entity i = loop_index(statement_loop(s));
 	gen_remove(&llv,i); /* llv is dead, must be freed... */
     },
 	n2);
 
-    ifdebug(6) 
+    ifdebug(6)
     {
-	debug(6, "TestDependence",
-	      "loop variants after removing loop indices :\n");
+	pips_debug(6, "loop variants after removing loop indices :\n");
 	print_arguments(llv);
     }
 
@@ -1255,28 +1233,28 @@ TestDependence(
 	mem_spy_end("TestDependence: Step 1.a");
 	mem_spy_begin();
     }
-    
+
     /* Build the dependence context system from the two initial context systems
-     * sc1 and sc2. BC 
+     * sc1 and sc2. BC
      */
-    if (!build_and_test_dependence_context(r1, r2, sc1, sc2, &dep_syst, 
-					   llv, n2)) 
+    if (!build_and_test_dependence_context(r1, r2, sc1, sc2, &dep_syst,
+					   llv, n2))
     {
 	/* the context system is not feasible : no dependence. BC */
 	/* No dep_syst() to deallocate either, FI */
 	NbrIndepFind++;
-	debug(4, "TestDependence", "context system not feasible\n");
+	pips_debug(4, "context system not feasible\n");
 	*levelsop = NIL;
 
 	ifdebug(1) {
 	    mem_spy_end("TestDependence: Step 1.b.a");
 	    mem_spy_end("TestDependence-1");
 	}
-	
+
 	gen_free_list(llv);
 	return NIL;
     }
-    
+
 
     ifdebug(1) {
 	mem_spy_end("TestDependence: Step 1.b.b");
@@ -1284,10 +1262,10 @@ TestDependence(
     }
 
     /* Further construction of the dependence system; Constant and GCD tests
-     * at the same time. 
+     * at the same time.
      */
     assert(sc_weak_consistent_p(dep_syst));
-    if (gcd_and_constant_dependence_test(r1,r2,llv,n2,&dep_syst)) 
+    if (gcd_and_constant_dependence_test(r1,r2,llv,n2,&dep_syst))
     {
 	/* independence proved */
 	/* FI: the next statement was commented out... */
@@ -1313,7 +1291,7 @@ TestDependence(
 
     dependence_system_add_lci_and_di(&dep_syst, n1, &DiIncNonCons);
 
-    ifdebug(6)  
+    ifdebug(6)
     {
 	fprintf(stderr, "\ninitial system is:\n");
 	sc_syst_debug(dep_syst);
@@ -1328,9 +1306,9 @@ TestDependence(
     if ((dep_syst = sc_normalize(dep_syst)) == SC_EMPTY)
     {
 	/* dep_syst has already been deallocated */
-	NbrTestSimple++;	
+	NbrTestSimple++;
 	NbrIndepFind++;
-	debug(4, "TestDependence", "initial normalized system not feasible\n");
+	pips_debug(4, "initial normalized system not feasible\n");
 	*levelsop = NIL;
 
 	ifdebug(1) {
@@ -1353,7 +1331,7 @@ TestDependence(
 	mem_spy_begin();
     }
 
-    if (TestDiCnst(dep_syst, cl, s1, ef1, s2, ef2) == TRUE ) 
+    if (TestDiCnst(dep_syst, cl, s1, ef1, s2, ef2) == TRUE )
     {
 	/* find independences (non loop carried dependence, intra-statement).*/
 	/* Such dependences are counted here as independence, but other
@@ -1362,7 +1340,7 @@ TestDependence(
 	 */
 	NbrTestDiCnst++;
 	NbrIndepFind++;
-	debug(4,"TestDependence","\nTestDiCnst succeeded!\n");
+	pips_debug(4,"\nTestDiCnst succeeded!\n");
 	*levelsop = NIL;
 
 	ifdebug(1) {
@@ -1377,7 +1355,7 @@ TestDependence(
 	mem_spy_end("TestDependence: Step 1.g.b");
 	mem_spy_begin();
     }
-	
+
     is_test_exact = TRUE;
     is_test_inexact_eq = FALSE;
     is_test_inexact_fm = FALSE;
@@ -1396,18 +1374,18 @@ TestDependence(
 	 * variables?!?
 	 */
 	/* eliminate non di variables from the basis */
-	for (coord = tmp_base; !VECTEUR_NUL_P(coord); coord = coord->succ) 
+	for (coord = tmp_base; !VECTEUR_NUL_P(coord); coord = coord->succ)
 	{
 	    Variable v = vecteur_var(coord);
-	    l = DiVarLevel((entity) v);	    
-	    if (l <= 0 || l > cl)     
-		base_add_variable(dep_syst_base, v);		
+	    l = DiVarLevel((entity) v);
+	    if (l <= 0 || l > cl)
+		base_add_variable(dep_syst_base, v);
 	}
 	dep_syst = sc_rn(dep_syst_base);
     }
     TRY {
-	if (sc_proj_optim_on_di_ofl(cl, &dep_syst) == FALSE) {	
-	    debug(4,"TestDependence",
+	if (sc_proj_optim_on_di_ofl(cl, &dep_syst) == FALSE) {
+	    pips_debug(4,
 		  "projected system by sc_proj_optim_on_di() is not feasible\n");
 	    sc_rm(dep_syst);
 	    NbrIndepFind++;
@@ -1426,7 +1404,7 @@ TestDependence(
 
     base_rm(tmp_base);
 
-    ifdebug(6) 
+    ifdebug(6)
     {
 	fprintf(stderr, "projected system is:\n");
 	sc_syst_debug(dep_syst);
@@ -1437,10 +1415,10 @@ TestDependence(
 	mem_spy_begin();
     }
 
-    if (!sc_faisabilite_optim(dep_syst)) 
+    if (!sc_faisabilite_optim(dep_syst))
     {
 	/* Here, the long jump overflow buffer is handled at a lower level! */
-	debug(4,"TestDependence", "projected system not feasible\n");
+	pips_debug(4, "projected system not feasible\n");
 	NbrIndepFind++;
 	*levelsop = NIL;
 
@@ -1451,8 +1429,8 @@ TestDependence(
 
 	return(NIL);
     }
-    
-    ifdebug(6)  
+
+    ifdebug(6)
     {
 	fprintf(stderr, "normalised projected system is:\n");
 	sc_syst_debug(dep_syst);
@@ -1471,12 +1449,12 @@ TestDependence(
      * FI: I'm lost for this step. My guess DiIncNonCons==VECTEUR_NUL
      * in 99.99 % of all cases...
      */
-    if (dep_syst != NULL) 
+    if (dep_syst != NULL)
     {
 	while (DiIncNonCons != NULL){
 	    Variable di;
 	    Value val;
-	    
+
 	    di = DiIncNonCons->var;
 	    if (sc_value_of_variable(dep_syst, di, &val) ==  TRUE)
 		if (value_notzero_p(val)){
@@ -1485,10 +1463,10 @@ TestDependence(
 	    DiIncNonCons = DiIncNonCons->succ;
 	}
     }
-    
-    ifdebug(4) 
+
+    ifdebug(4)
     {
-	fprintf(stderr, 
+	fprintf(stderr,
 		"normalised projected system after DiIncNonCons elimination is:\n");
 	sc_syst_debug(dep_syst);
     }
@@ -1502,7 +1480,7 @@ TestDependence(
 	mem_spy_end("TestDependence: first phase");
 	mem_spy_begin();
     }
-    
+
     /* Compute the levels for dependence arc s1 to s2 and of the opposite
      * dependence arc s2 to s1. Also compute the dependence cones if some
      * level exists (FI: shouldn't it be a loop-carried level?).
@@ -1510,13 +1488,13 @@ TestDependence(
      * For both cases, two systems are allocated, one is used to find the
      * dependence levels, the other one to compute the dependence cone.
      *
-     * For s1->s2, dep_syst is used to compute the levels and dep_syst1 
+     * For s1->s2, dep_syst is used to compute the levels and dep_syst1
      * the cone.
      *
      * For s2->s1, dep_syst_op (op==oppposite) is used to find the dependence
      * levels, and dep_syst2 the dependence cone.
-     */  
-    
+     */
+
     /* Build the dependence system for the opposite arc s2->s1
      * before dep_syst is modified
      */
@@ -1527,13 +1505,13 @@ TestDependence(
 
     /* Start processing for arc s1->s2 */
 
-    ifdebug(4) 
+    ifdebug(4)
     {
 	debug(4,"", "\nComputes the levels and DC for dep: (s1,e1)->(s2,e2)\n");
 	fprintf(stderr, "\nThe distance system for dep is:\n");
 	sc_syst_debug(dep_syst);
     }
-    
+
     /* Make a proper copy of dep_syst before it is destroyed to compute
      * dependence levels. The basis must be in a specific order to check
      * lexico-positivity.
@@ -1541,7 +1519,7 @@ TestDependence(
     dep_syst1 = sc_dup(dep_syst);
     b = MakeDibaseinorder(cl);
     base_rm(dep_syst1->base);
-    dep_syst1->base = b; 
+    dep_syst1->base = b;
     dep_syst1->dimension = cl;
 
     if (dep_syst1->dimension == dep_syst1->nb_eq)
@@ -1554,7 +1532,7 @@ TestDependence(
 
     /* if (levels == NIL) NbrTestDiVar++;  Qui l'a enleve', pourquoi ? */
 
-    if (levels != NIL) 
+    if (levels != NIL)
     {
 
 	ifdebug(1) {
@@ -1581,10 +1559,10 @@ TestDependence(
 	{
 	    list l_tmp = levels;
 	    boolean ok = FALSE;
-	    
+
 	    pips_debug(5, "dependence cone not feasible\n");
 	    MAP(INT, ll, {if (ll == cl+1) ok = TRUE;}, l_tmp);
-	    
+
 	    if (ok)
 	    {
 		pips_debug(5, "innermost level found and kept\n");
@@ -1603,24 +1581,24 @@ TestDependence(
 
     /* print results for arc s1->s2 */
 
-    ifdebug(4) 
-    {	
+    ifdebug(4)
+    {
 	fprintf(stderr, "\nThe levels for dep (s1,s2) are:");
-	MAP(INT, pl, 
+	MAP(INT, pl,
 	{
 	    fprintf(stderr, " %d", pl);
 	}, levels);
-	
-	if(!SG_UNDEFINED_P(*gs)) 
+
+	if(!SG_UNDEFINED_P(*gs))
 	{
-	    fprintf(stderr, 
+	    fprintf(stderr,
 		    "\nThe lexico-positive dependence cone for"
 		    " dep (s1,s2) :\n");
 	    print_dependence_cone(stderr, *gs, b);
-	} 
-	else 
+	}
+	else
 	    fprintf(stderr,"\nLexico-positive dependence cone"
-		    " doesn't exist for dep (s1,s2).\n"); 
+		    " doesn't exist for dep (s1,s2).\n");
     }
 
 
@@ -1631,17 +1609,17 @@ TestDependence(
 
     /* Start the processing for arc s2->s1 */
 
-    if (Finds2s1) 
+    if (Finds2s1)
     {
-	
-	debug(4,"","Computes the levels and DC for dep_op: (s2,e2)->(s1,e1)\n"); 
-	ifdebug(4) 
+
+	pips_debug(4,"Computes the levels and DC for dep_op: (s2,e2)->(s1,e1)\n");
+	ifdebug(4)
 	{
-	    fprintf(stderr, "\nThe invers distance system for dep_op is:\n");  
+	    fprintf(stderr, "\nThe invers distance system for dep_op is:\n");
 	    sc_syst_debug(dep_syst_op);
-	}    	
-	
-	dep_syst2 = sc_dup(dep_syst_op);    
+	}
+
+	dep_syst2 = sc_dup(dep_syst_op);
 	b = MakeDibaseinorder(cl);
 	base_rm(dep_syst2->base);
 	dep_syst2->base = b;
@@ -1690,34 +1668,34 @@ TestDependence(
 	    }
 	}
 
-	ifdebug(4) 
-	{	
+	ifdebug(4)
+	{
 	    fprintf(stderr, "\nThe levels for dep_op (s2,s1) is:");
-	    MAP(INT, pl, 
+	    MAP(INT, pl,
 	    {
 		fprintf(stderr, " %d", pl);
 	    }, *levelsop);
-	    
-	    if(!SG_UNDEFINED_P(*gsop)) 
+
+	    if(!SG_UNDEFINED_P(*gsop))
 	    {
 		fprintf(stderr,  "\nThe lexico-positive Dependence "
 			"cone for dep_op (s2,s1):\n");
 		print_dependence_cone(stderr,*gsop,b);
-	    } 
-	    else 
+	    }
+	    else
 		fprintf(stderr,"\nLexico-positive dependence cone "
-			"does not exist for dep_op (s2,s1).\n"); 
-	    
-	}    
+			"does not exist for dep_op (s2,s1).\n");
+
+	}
     }
-    
-    if (levels == NIL && *levelsop == NIL) 
+
+    if (levels == NIL && *levelsop == NIL)
     {
 	NbrTestDiVar++;
 	NbrIndepFind++;
-	if ( s1 == s2 ) 
+	if ( s1 == s2 )
 	{
-	    /* the case of "all equals" independence at the same statement*/ 
+	    /* the case of "all equals" independence at the same statement*/
 	    NbrAllEquals++;
 	}
 
@@ -1725,24 +1703,24 @@ TestDependence(
 	    mem_spy_end("TestDependence: third phase");
 	    mem_spy_end("TestDependence-7");
 	}
-	
+
 	return(NIL);
     }
-    
+
 
     ifdebug(1) {
 	mem_spy_end("TestDependence: third phase");
 	mem_spy_end("TestDependence");
     }
 
-    return(levels);    
+    return(levels);
 }
 
 
 /* static boolean build_and_test_dependence_context(reference r1, r2,
  *                                                  Psystem sc1, sc2, *psc_dep,
  *                                                  list llv, s2_enc_loops)
- * input    : 
+ * input    :
  *      reference r1, r2  : current array references;
  *      Psystem sc1, sc2  : context systems for r1 and r2;
  *                          they might be modified and even be freed (!)
@@ -1759,8 +1737,8 @@ TestDependence(
  *                          SC_EMPTY otherwise; no need to sc_rm() in the
  *                          latter case.
  *
- * side effects : 
- *      psc_dep           : points toward the dependence context system built 
+ * side effects :
+ *      psc_dep           : points toward the dependence context system built
  *                          from sc1 and sc2, r1 and r2, and llv.
  *                          Dependence distance variables (di) are introduced
  *                          in sc2, along with the dsi variables to take care
@@ -1781,11 +1759,11 @@ TestDependence(
  *    dependence test will be tested with an even stronger test, this
  *    should have no accuracy impact (FI, 12 December 1995)
  */
-static boolean 
+static boolean
 build_and_test_dependence_context(
-    reference r1, reference r2, 
-    Psysteme sc1, Psysteme sc2, 
-    Psysteme * psc_dep, 
+    reference r1, reference r2,
+    Psysteme sc1, Psysteme sc2,
+    Psysteme * psc_dep,
     list llv, list s2_enc_loops)
 {
     Psysteme sc_dep, sc_tmp;
@@ -1798,66 +1776,66 @@ build_and_test_dependence_context(
     /* Construction of initial systems sc_dep and sc_tmp from sc1 and sc2
        if not undefined
        */
-    if (SC_UNDEFINED_P(sc1) && SC_UNDEFINED_P(sc2)) 
+    if (SC_UNDEFINED_P(sc1) && SC_UNDEFINED_P(sc2))
     {
 	sc_dep = sc_new();
     }
-    else 
+    else
     {
 	if(SC_UNDEFINED_P(sc1))
 	    sc_dep = sc_new();
-	else 
+	else
 	{
 	    /* sc_dep = sc1, but:
-	     * we keep only useful constraints in the predicate 
-	     * (To avoid overflow errors, and to make projections easier) 
+	     * we keep only useful constraints in the predicate
+	     * (To avoid overflow errors, and to make projections easier)
 	     */
-	    Pbase variables = BASE_UNDEFINED;	    
-	    
-	    if (sc_empty_p(sc1)) 
+	    Pbase variables = BASE_UNDEFINED;
+
+	    if (sc_empty_p(sc1))
 	    {
 		*psc_dep = SC_EMPTY;
-		debug(4, "build_and_test_dependence_context", 
+		pips_debug(4,
 		      "first initial normalized system sc1 not feasible\n");
 		return(FALSE);
 	    }
 
-	    ifdebug(6) 
+	    ifdebug(6)
 	    {
 		debug(6, "", "Initial system sc1 before restrictions : \n");
 		sc_syst_debug(sc1);
 	    }
 
-	    MAP(EXPRESSION, ex1, 
+	    MAP(EXPRESSION, ex1,
 	    {
 		normalized x1 = NORMALIZE_EXPRESSION(ex1);
-		
-		if (normalized_linear_p(x1)) 
+
+		if (normalized_linear_p(x1))
 		{
 		    Pvecteur v1;
-		    Pvecteur v;		    
+		    Pvecteur v;
 		    v1 = (Pvecteur) normalized_linear(x1);
-		    for(v = v1; !VECTEUR_NUL_P(v); v = v->succ) 
-		    { 
-			if (vecteur_var(v) != TCST) 
-			    variables = base_add_variable(variables, 
+		    for(v = v1; !VECTEUR_NUL_P(v); v = v->succ)
+		    {
+			if (vecteur_var(v) != TCST)
+			    variables = base_add_variable(variables,
 							  vecteur_var(v));
-		    } 		    
+		    }
 		}
 	    },
 		reference_indices(r1));
-	    
+
 	    sc_dep = sc_restricted_to_variables_transitive_closure(sc1,
 								   variables);
 	}
 
 	if(SC_UNDEFINED_P(sc2))
 	    sc_tmp = sc_new();
-	else 
+	else
 	{
 	    /* sc_tmp = sc2, but:
-	     * we keep only useful constraints in the predicate 
-	     * (To avoid overflow errors, and to make projections easier) 
+	     * we keep only useful constraints in the predicate
+	     * (To avoid overflow errors, and to make projections easier)
 	     *
 	     * FI: I'm not sure this is correct. I'm afraid sc2 might
 	     * be unfeasible and become feasible due to a careless
@@ -1869,15 +1847,15 @@ build_and_test_dependence_context(
 	     */
 	    Pbase variables = BASE_UNDEFINED;
 
-	    if (sc_empty_p(sc2)) 
+	    if (sc_empty_p(sc2))
 	    {
 		*psc_dep = SC_EMPTY;
-		debug(4, "build_and_test_dependence_context", 
+		pips_debug(4,
 		      "second initial normalized system not feasible\n");
 		return(FALSE);
 	    }
-	    
-	    ifdebug(6) 
+
+	    ifdebug(6)
 	    {
 		debug(6, "", "Initial system sc2 before restrictions : \n");
 		sc_syst_debug(sc2);
@@ -1886,38 +1864,38 @@ build_and_test_dependence_context(
 	    MAP(EXPRESSION, ex2,
 	    {
 		normalized x2 = NORMALIZE_EXPRESSION(ex2);
-		
-		if (normalized_linear_p(x2)) 
+
+		if (normalized_linear_p(x2))
 		{
 		    Pvecteur v2;
 		    Pvecteur v;
-		    
+
 		    v2 = (Pvecteur) normalized_linear(x2);
-		    for(v = v2; !VECTEUR_NUL_P(v); v = v->succ) 
-		    { 
-			if (vecteur_var(v) != TCST) 
-			    variables = base_add_variable(variables, 
+		    for(v = v2; !VECTEUR_NUL_P(v); v = v->succ)
+		    {
+			if (vecteur_var(v) != TCST)
+			    variables = base_add_variable(variables,
 							  vecteur_var(v));
-		    } 
-		    
+		    }
+
 		}
 	    },
 		reference_indices(r2));
-	    
+
 	    sc_tmp = sc_restricted_to_variables_transitive_closure(sc2,
 								   variables);
 	}
-	
-	ifdebug(6) 
+
+	ifdebug(6)
 	{
 	    debug(6, "", "Initial systems after restrictions : \n");
 	    sc_syst_debug(sc_dep);
 	    sc_syst_debug(sc_tmp);
 	}
-	
+
 	/* introduce dependence distance variable if loop increment value
 	   is known or ... */
-	for (pc = s2_enc_loops, l = 1; pc != NIL ; pc = CDR(pc), l++) 
+	for (pc = s2_enc_loops, l = 1; pc != NIL ; pc = CDR(pc), l++)
 	{
 	    loop lo = statement_loop(STATEMENT(CAR(pc)));
 	    entity i2 = loop_index(lo);
@@ -1940,12 +1918,12 @@ build_and_test_dependence_context(
 	     * sc_minmax_of_variable()
 	     */
 	    inc = loop_increment_value(lo);
-	    if (inc != 0)  
+	    if (inc != 0)
 		sc_add_di(l, i2, sc_tmp, inc);
 	    else
 		sc_chg_var(sc_tmp, (Variable) i2, (Variable) GetLiVar(l));
 	}
-	
+
 	/* take care of variables modified in the loop */
 	for (pc = llv, l=1; pc!=NIL; pc = CDR(pc),l++) {
 	    sc_add_dsi(l,ENTITY(CAR(pc)),sc_tmp);
@@ -1958,9 +1936,9 @@ build_and_test_dependence_context(
 
     }
 
-    ifdebug(6) 
+    ifdebug(6)
     {
-	debug(6, "build_and_test_dependence_context",
+	pips_debug(6,
 	      "\ndependence context is:\n");
 	sc_syst_debug(sc_dep);
     }
@@ -1970,10 +1948,10 @@ build_and_test_dependence_context(
 }
 
 
-/* static boolean gcd_and_constant_dependence_test(references r1, r2, 
+/* static boolean gcd_and_constant_dependence_test(references r1, r2,
  *                                                 list llv, s2_enc_loops,
  *                                                 Psysteme *psc_dep)
- * input    : 
+ * input    :
  *      references r1, r2 : current references;
  *      list llv          : loop nest variant list;
  *      list s2_enc_loops : enclosing loops for statement s2;
@@ -1986,21 +1964,21 @@ build_and_test_dependence_context(
  *    by build_and_test_dependence_context.
  *  - no side effects on r1, r2,...
  */
-static boolean 
+static boolean
 gcd_and_constant_dependence_test(
-    reference r1, reference r2, 
-    list llv, list s2_enc_loops, 
+    reference r1, reference r2,
+    list llv, list s2_enc_loops,
     Psysteme * psc_dep)
 {
     list pc1, pc2, pc;
     int l;
 
     /* Further construction of the dependence system; Constant and GCD tests
-     * at the same time. 
+     * at the same time.
      */
     pc1 = reference_indices(r1);
     pc2 = reference_indices(r2);
-    while (pc1 != NIL && pc2 != NIL) 
+    while (pc1 != NIL && pc2 != NIL)
     {
 	expression ex1, ex2;
 	normalized x1, x2;
@@ -2011,14 +1989,14 @@ gcd_and_constant_dependence_test(
 	ex2 = EXPRESSION(CAR(pc2));
 	x2 = NORMALIZE_EXPRESSION(ex2);
 
-	if (normalized_linear_p(x1) && normalized_linear_p(x2)) 
+	if (normalized_linear_p(x1) && normalized_linear_p(x2))
 	{
 	    Pvecteur v1, v2, v;
 
 	    v1 = (Pvecteur) normalized_linear(x1);
 	    v2 = vect_dup((Pvecteur) normalized_linear(x2));
 
-	    for (pc = s2_enc_loops, l = 1; pc!=NIL; pc = CDR(pc), l++) 
+	    for (pc = s2_enc_loops, l = 1; pc!=NIL; pc = CDR(pc), l++)
 	    {
 		loop lo = statement_loop(STATEMENT(CAR(pc)));
 		entity i = loop_index(lo);
@@ -2033,64 +2011,63 @@ gcd_and_constant_dependence_test(
 		else
 		    vect_chg_var(&v2, (Variable) i, (Variable) GetLiVar(l));
 	    }
-    
-	    for (pc = llv, l=1; pc!=NIL; pc = CDR(pc),l++) 
+
+	    for (pc = llv, l=1; pc!=NIL; pc = CDR(pc),l++)
 	    {
-		vect_add_elem(&v2, (Variable) GetDsiVar(l), 
+		vect_add_elem(&v2, (Variable) GetDsiVar(l),
 			      vect_coeff((Variable) ENTITY(CAR(pc)), v2));
 	    }
 
-	    if (! VECTEUR_UNDEFINED_P(v = vect_substract(v1, v2))) 
+	    if (! VECTEUR_UNDEFINED_P(v = vect_substract(v1, v2)))
 	    {
 		Pcontrainte c = contrainte_make(v);
-	    
+
 		/* case of T(3)=... et T(4)=... */
 		if (contrainte_constante_p(c) && value_notzero_p(COEFF_CST(c)))
 		{
 		    NbrTestCnst++;
-		    debug(4,"TestDependence","TestCnst succssed!");
+		    pips_debug(4,"TestCnst succeeded!");
 		    return(TRUE);
 		}
 		/* test of GCD */
 		if (egalite_normalize(c) == FALSE)
 		{
 		    NbrTestGcd++;
-		    debug(4,"TestDependence","TestGcd succeeded!\n");
-		    return(TRUE);	
-		}	
+		    pips_debug(4,"TestGcd succeeded!\n");
+		    return(TRUE);
+		}
 		sc_add_eg(*psc_dep, c);
 	    }
 	    vect_rm(v2);
 	}
 
-	pc1 = CDR(pc1); 
+	pc1 = CDR(pc1);
 	pc2 = CDR(pc2);
     }
 
 
     if (pc1 != NIL || pc2 != NIL) {
-	pips_error("gcd_and_constant_dependence_test",
-		   "numbers of subscript expressions differ\n");
+	pips_internal_error("numbers of subscript expressions differ\n");
     }
 
     return(FALSE);
 }
 
 
-   
+
 /* static void dependence_system_add_lci_and_di(Psysteme *psc_dep,
  *                                              list s1_enc_loops,
  *                                              Pvecteur *p_DiIncNonCons)
- * input    : 
+ * input    :
  *      Psysteme *psc_dep : pointer toward the dependence system;
  *      list s1_enc_loops : statement s1 enclosing loops;
  *      Pvecteur *p_DiIncNonCons : pointer toward DiIncNonCons.
  *
  * output   : none
  *
- * modifies : 
+ * modifies :
  *
- *  *psc_dep, the dependence systeme (addition of constraints with lci and di 
+ *  *psc_dep, the dependence systeme (addition of constraints with lci and di
  *            variables, if useful; lci is a loop counter, di an iteration
  *            difference variable);
  *
@@ -2100,7 +2077,7 @@ gcd_and_constant_dependence_test(
  *
  * comment  : DiIncNonCons must be undefined on entry.
  */
-static void 
+static void
 dependence_system_add_lci_and_di(psc_dep, s1_enc_loops,
 					     p_DiIncNonCons)
 Psysteme *psc_dep;
@@ -2109,14 +2086,14 @@ Pvecteur *p_DiIncNonCons;
 {
     int l;
     list pc;
-   
-    pips_assert("dependence_system_add_lci_and_di", 
+
+    pips_assert("dependence_system_add_lci_and_di",
 		VECTEUR_UNDEFINED_P(*p_DiIncNonCons));
 
     /* Addition of lck, the loop counters, and di, the iteration difference,
      * variables (if useful).
      */
-    for (pc = s1_enc_loops,l = 1; pc != NIL; pc = CDR(pc), l++) 
+    for (pc = s1_enc_loops,l = 1; pc != NIL; pc = CDR(pc), l++)
     {
 	loop lo = statement_loop(STATEMENT(CAR(pc)));
 	entity ind = loop_index(lo);
@@ -2132,8 +2109,8 @@ Pvecteur *p_DiIncNonCons;
 	 * Else, this new equation would be redundant
 	 */
 	/* make   nl + inc*lc# - ind = 0 */
-	if (inc != 0 && inc != 1 && inc != -1 && normalized_linear_p(nl)) 
-	{	   
+	if (inc != 0 && inc != 1 && inc != -1 && normalized_linear_p(nl))
+	{
 	    Pcontrainte pc;
 	    entity lc;
 	    Pvecteur pv;
@@ -2145,13 +2122,13 @@ Pvecteur *p_DiIncNonCons;
 	    pc = contrainte_make(pv);
 	    sc_add_eg(*psc_dep, pc);
 	}
-	
+
 	/* If the loop increment is unknown, which is expressed by inc==0,
 	 * well, I do not understand what li variables are, not how they work
 	 */
 	/* make d#i - l#i + ind = 0 ,
 	   add d#i in list of DiIncNonCons*/
-	if (inc == 0) 
+	if (inc == 0)
 	{
 	    Pcontrainte pc;
 	    Pvecteur pv = NULL;
@@ -2166,11 +2143,11 @@ Pvecteur *p_DiIncNonCons;
 
 	    vect_add_elem(p_DiIncNonCons, (Variable) di, 1);
 	}
-	    
+
     }
 
     /* Update basis */
-    if(!BASE_NULLE_P((*psc_dep)->base)) 
+    if(!BASE_NULLE_P((*psc_dep)->base))
     {
 	vect_rm((*psc_dep)->base);
 	(*psc_dep)->base = BASE_UNDEFINED;
@@ -2188,15 +2165,15 @@ Pvecteur *p_DiIncNonCons;
  * out the set of possible values for di variables, the iteration differences
  * for which a dependence exist.
  *
- * Loops are numbered from 1 to cl, the maximum nesting level. 
+ * Loops are numbered from 1 to cl, the maximum nesting level.
  * At each step, the di variable corresponding to the current nesting level
  * is examined.
  *
  * Dependences levels added to the graph depend on the sign of the values
  * computed for di. There is a dependence from s1 to s2 if di can be
- * positive and from s2 to s1 if di can be negative. 
+ * positive and from s2 to s1 if di can be negative.
  *
- * There are no loop-carried dependence if di is equal to zero. The 
+ * There are no loop-carried dependence if di is equal to zero. The
  * corresponding level is cl+1.
  *
  * Finally, di is set to 0 at the end of the loop since
@@ -2216,14 +2193,19 @@ Pvecteur *p_DiIncNonCons;
  *
  *   pss is deallocated by sc_minmax_of_variable_optim()
  *
- * Modification : 
+ * Modification :
  *
  * -  variable NotPositive added to take into acounnt the case di<=0.
  *    Yi Qing (10/91)
  */
 
-static list 
-TestDiVariables(Psysteme ps, int cl, statement s1, effect ef1 __attribute__ ((unused)), statement s2, effect ef2 __attribute__ ((unused)))
+static list
+TestDiVariables(Psysteme ps,
+		int cl,
+		statement s1,
+		effect ef1 __attribute__ ((unused)),
+		statement s2,
+		effect ef2 __attribute__ ((unused)))
 {
     list levels = NIL;
     _int l;
@@ -2263,7 +2245,7 @@ TestDiVariables(Psysteme ps, int cl, statement s1, effect ef1 __attribute__ ((un
 	NotPositif = value_zero_p(max) && value_neg_p(min);
 
 	ifdebug(7)
-	{	    
+	{
 	    pips_debug(7, "values: ");
 	    fprint_string_Value(stderr, "min = ", min);
 	    fprint_string_Value(stderr, "  max = ",max);
@@ -2308,13 +2290,15 @@ TestDiVariables(Psysteme ps, int cl, statement s1, effect ef1 __attribute__ ((un
      * common loop nest).
      *
      * WARNING:
-     * If the source and target statements are identical, we do not add the
-     * innermost level because the parallelization phase (rice) does not appreciate.
-     * In order to be correct, we should add this level 1) because the statement
-     * may be a call to an external routine, in which case we cannot be sure
-     * that all the writes are performed before the reads and 2) even in the case
-     * of a single assignement, the generated code must preserve the order of
-     * the write and read memory operations. BC.
+     *
+     * If the source and target statements are identical, we do not
+     * add the innermost level because the parallelization phase
+     * (rice) does not appreciate.  In order to be correct, we should
+     * add this level 1) because the statement may be a call to an
+     * external routine, in which case we cannot be sure that all the
+     * writes are performed before the reads and 2) even in the case
+     * of a single assignement, the generated code must preserve the
+     * order of the write and read memory operations. BC.
      */
     if (!all_level_founds && s1 != s2 && statement_possible_less_p(s1, s2) )
     {
@@ -2352,8 +2336,8 @@ Psysteme dep_sc;
     n = dep_sc->dimension;
     b = dep_sc->base;
 
-    for (i=1; i<=n; i++) 
-    {	
+    for (i=1; i<=n; i++)
+    {
 	Psysteme sub_sc = sc_dup(dep_sc);
 	Pvecteur v;
 	Pcontrainte pc;
@@ -2363,7 +2347,7 @@ Psysteme dep_sc;
 	    mem_spy_begin();
 	}
 	for(j=1, b1=b; j<=i-1; j++, b1=b1->succ)
-	{		
+	{
 	    /* add the contraints  bj = 0 (1<=j<i) */
 	    v = vect_new(b1->var,1);
 	    pc = contrainte_make(v);
@@ -2375,16 +2359,16 @@ Psysteme dep_sc;
 	pc = contrainte_make(v);
 	sc_add_ineg(sub_sc,pc);
 
-	ifdebug(7) 
-	{ 
+	ifdebug(7)
+	{
 	    fprintf(stderr,
 		    "\nInitial sub lexico-positive dependence system:\n");
-	    sc_syst_debug(sub_sc); 
+	    sc_syst_debug(sub_sc);
 	}
 
-	/* dans le cas d'une erreur d'overflow, on fait comme si le test 
+	/* dans le cas d'une erreur d'overflow, on fait comme si le test
 	 *  avait renvoye' true. bc.
-	 */  
+	 */
 	CATCH(overflow_error)
 	{
 	    pips_debug(1, "overflow error.\n");
@@ -2392,15 +2376,14 @@ Psysteme dep_sc;
 	TRY
 	{
 	    if (! sc_integer_feasibility_ofl_ctrl(sub_sc, FWD_OFL_CTRL, TRUE))
-	    { 
+	    {
 		sc_rm(sub_sc);
-		debug(7,"dependence_cone_positive", 
-		      "sub lexico-positive dependence system not feasible\n");
+		pips_debug(7,"sub lexico-positive dependence system not feasible\n");
 
 		ifdebug(1) {
-		    mem_spy_end("dependence_cone_positive: one iteration," 
+		    mem_spy_end("dependence_cone_positive: one iteration,"
 				" continue 1");
-		} 
+		}
 		UNCATCH(overflow_error);
 		continue;
 	    }
@@ -2409,19 +2392,18 @@ Psysteme dep_sc;
 	}
 
 	if ((sub_sc = sc_normalize(sub_sc))== NULL)
-	{ 
-	    debug(7, "Dependence_cone_positive", 
-		  "normalized system not feasible\n");
+	{
+	    pips_debug(7, "normalized system not feasible\n");
 
 	    ifdebug(1) {
 		mem_spy_end("dependence_cone_positive: one iteration, continue 1");
 	    }
-	    continue;	    
+	    continue;
 	}
 
 	/* We get a normalized sub lexico-positive dependence system */
-	ifdebug(7) 
-	{ 
+	ifdebug(7)
+	{
 	    fprintf(stderr,
 		    "Normalized sub lexico-positive dependence system :\n");
 	    sc_syst_debug(sub_sc);
@@ -2439,8 +2421,8 @@ Psysteme dep_sc;
 
 	sc_rm(sub_sc);
 
-	ifdebug(7) 
-	{ 
+	ifdebug(7)
+	{
 	    fprintf(stderr, "Dependence system of the enveloppe of subs "
 		    "lexico-positive dependence:\n");
 	    sc_syst_debug(sc_env);
@@ -2450,7 +2432,7 @@ Psysteme dep_sc;
 		sg_env = sc_to_sg_chernikova(sc_env);
 		fprintf(stderr, "Enveloppe of the subs lexico-positive "
 			"dependence cones:\n");
-		if(!SG_UNDEFINED_P(sg_env) && vect_size(sg_env->base) != 0) 
+		if(!SG_UNDEFINED_P(sg_env) && vect_size(sg_env->base) != 0)
 		{
 		    print_dependence_cone(stderr,sg_env,sg_env->base);
 		    sg_rm(sg_env);
@@ -2462,7 +2444,7 @@ Psysteme dep_sc;
 	ifdebug(1) {
 	    mem_spy_end("dependence_cone_positive: one iteration");
 	}
-    } 
+    }
 
     if (!SC_UNDEFINED_P(sc_env) && sc_dimension(sc_env)!= 0) {
 
@@ -2485,7 +2467,7 @@ Psysteme dep_sc;
     return (sg_env);
 }
 
-static list 
+static list
 loop_variant_list(stat)
 statement stat;
 {
@@ -2497,18 +2479,18 @@ statement stat;
 
     FOREACH (EFFECT, ef, load_cumulated_rw_effects_list(stat)) {
       entity en = effect_entity(ef) ;
-      if( action_write_p( effect_action( ef )) && entity_integer_scalar_p( en )) 
+      if( action_write_p( effect_action( ef )) && entity_integer_scalar_p( en ))
 	lv = gen_nconc(lv, CONS(ENTITY, en, NIL));
     }
     l = statement_loop(stat);
     locals = loop_locals(l);
     FOREACH (ENTITY, v, locals) {
-      if (gen_find_eq(v,lv) == entity_undefined) 
+      if (gen_find_eq(v,lv) == entity_undefined)
 	lv = CONS(ENTITY, v, lv);
     }
     locals = statement_declarations(loop_body(l));
     FOREACH (ENTITY, v, locals) {
-      if (gen_find_eq(v,lv) == entity_undefined) 
+      if (gen_find_eq(v,lv) == entity_undefined)
 	lv = CONS(ENTITY, v, lv);
     }
     return(lv);
@@ -2516,18 +2498,18 @@ statement stat;
 
 /* this function detects intra-statement, non loop carried dependence
  * ( Di=(0,0,...0) and s1 = s2).
- */ 
-static boolean 
+ */
+static boolean
 TestDiCnst(Psysteme ps, int cl, statement s1, effect ef1 __attribute__ ((unused)),
-	   statement s2, effect ef2 __attribute__ ((unused)))  
+	   statement s2, effect ef2 __attribute__ ((unused)))
 {
   int l;
 
   ifdebug(1) {
       mem_spy_begin();
   }
-    
-  for (l = 1; l <=cl; l++) 
+
+  for (l = 1; l <=cl; l++)
   {
       Variable di = (Variable) GetDiVar(l);
       Psysteme pss;
@@ -2546,7 +2528,7 @@ TestDiCnst(Psysteme ps, int cl, statement s1, effect ef1 __attribute__ ((unused)
 	  mem_spy_end("TestDiCnst: sc_value_of_variable");
       }
 
-      if ( success_p ) 
+      if ( success_p )
       {
 	  if (value_notzero_p(val)) {
 	      ifdebug(1) {
@@ -2567,14 +2549,14 @@ TestDiCnst(Psysteme ps, int cl, statement s1, effect ef1 __attribute__ ((unused)
       mem_spy_end("TestDiCnst: exit 3");
   }
   /* case of di zero */
-  if (s1 == s2) 
+  if (s1 == s2)
   {
       NbrAllEquals++;
       return(TRUE);
   }
   else return(FALSE);
 }
-	    
+
 
 
 
@@ -2583,16 +2565,14 @@ TestDiCnst(Psysteme ps, int cl, statement s1, effect ef1 __attribute__ ((unused)
 
 
 
-void 
-writeresult(mod_name)
-char *mod_name;
+void writeresult(char *mod_name)
 {
     FILE *fp;
     string filename;
     int i,j;
 
 
-    switch (dg_type) 
+    switch (dg_type)
     {
     case DG_FAST:
 	filename = "resulttestfast"; break;
@@ -2605,7 +2585,7 @@ char *mod_name;
 	return; /* to avoid warnings from compiler */
     }
 
-    filename = strdup(concatenate(db_get_current_workspace_directory(), "/", 
+    filename = strdup(concatenate(db_get_current_workspace_directory(), "/",
 				  mod_name, ".", filename, 0));
 
     fp = safe_fopen(filename, "w");
