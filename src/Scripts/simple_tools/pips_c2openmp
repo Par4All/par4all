@@ -43,8 +43,8 @@ source ${SHR_d}/simple_tools.bash
     select_c_language
     select_most_precise_analysis
     privatize_scalar_variables
-    openmp_parallelization_rice
-    internalize_parallel_code
+    #openmp_parallelization_rice
+    #internalize_parallel_code
     openmp_parallelization_coarse_grain
     regenerate_source
 } | tpips
