@@ -45,11 +45,11 @@ function report()
   }
 
   # no compilation, nothing to report
-  [ $current = 'skip' ] && { rmdir .lock ; exit 0 ; }
+  [ $current = 'skip' ] && { rmdir LOCK ; exit 0 ; }
 
   # no change, no report
   test -f STATE && read previous < STATE
-  [ "$previous" -a "$current" = "$previous" ] && { rmdir .lock ; exit 0 ; }
+  [ "$previous" -a "$current" = "$previous" ] && { rmdir LOCK ; exit 0 ; }
 
   # generate report
   {
@@ -99,7 +99,7 @@ function report()
   echo $current > STATE
 
   # good bye! always 0 for cron
-  rmdir .lock
+  rmdir LOCK
   exit 0
 }
 
@@ -108,7 +108,7 @@ function report()
 cd $prod || report 'KO:cd-prod' "cannot 'cd $prod'"
 
 # manual locking based on mkdir
-mkdir .lock > /dev/null 2>&1 || report 'locked' "working copy '$prod' is already locked..."
+mkdir LOCK > /dev/null 2>&1 || report 'locked' "working copy '$prod' is already locked..."
 
 rm -f out err
 svn up >> out 2>> err || report 'KO:svn-up' "cannot 'svn up'"
