@@ -20,14 +20,20 @@
 #
 
 TARGET	= c_syntax
-YOPT	=	-d
+
+# Rename all the lexer/parser entities c_... instead of yy... since there are
+# many other parsers in PIPS:
+#YOPT	= --defines --locations --name-prefix=c_
+#LOPT	= --bison-bridge --bison-location --prefix=c_
+YOPT	= --defines --name-prefix=c_
+LOPT	= --prefix=c_
 
 INC_CFILES =	c_parser.c \
 		statement.c \
 		util.c
 
-DERIVED_HEADERS = cyacc.h
-DERIVED_CFILES	= cyacc.c clexer.c
+DERIVED_HEADERS = cyacc.tab.h clexer.h
+DERIVED_CFILES	= cyacc.tab.c clexer.c
 
 LIB_CFILES = 	$(INC_CFILES) $(DERIVED_CFILES)
 
@@ -50,19 +56,21 @@ $(TARGET).h: $(DERIVED_HEADERS) $(DERIVED_CFILES)
 clean: local-clean
 
 local-clean:
-	$(RM) $(DERIVED_CFILES) $(DERIVED_HEADERS) y.tab.[ch]
+	$(RM) $(DERIVED_CFILES) $(DERIVED_HEADERS)
 
 # C parser
 
 YY2C	= sed '/^FILE \*yyin/s/=[^,;]*//g;s/YY/C_/g;s/yy/c_/g'
 
-cyacc.c: cyacc.y
-	$(PARSE) `pwd`/cyacc.y
-	$(YY2C) y.tab.c > cyacc.c
-	$(YY2C) y.tab.h > cyacc.h
-	$(RM) y.tab.c y.tab.h
+cyacc.tab.c : cyacc.y
+	$(BISON) $(YOPT) `pwd`/cyacc.y
+	#$(YY2C) y.tab.c > cyacc.c
+	#$(YY2C) y.tab.h > cyacc.h
+	#$(RM) y.tab.c y.tab.h
 
-cyacc.h: cyacc.c
+cyacc.tab.h: cyacc.tab.c
 
-clexer.c: clex.l cyacc.h
-	$(SCAN) `pwd`/clex.l | $(YY2C) > $@
+clexer.c: clex.l cyacc.tab.h
+	$(FLEX) $(LFLAGS) $(LOPT) --header-file=clexer.h --outfile=`pwd`/$@ `pwd`/clex.l
+
+clexer.h: clexer.c

@@ -65,7 +65,7 @@
 #include "misc.h"
 
 #include "c_syntax.h"
-#include "cyacc.h"
+#include "cyacc.tab.h"
 
 #define FIRST_C_LINE_NUMBER (1)
 #define UNDEFINED_C_LINE_NUMBER (-1)
@@ -437,7 +437,7 @@ universal-character-name ({escape}(u{hexdigit}{4}|U{hexdigit}{8}))
                                    syntax is understood in PIPS character
                                    constant construtors. */
                                 pips_debug(9,"TK_CHARCON: %s\n",yytext);
-                                yylval.string = strdup(yytext);
+                                c_lval.string = strdup(yytext);
 				return(TK_CHARCON);
                         }
 
@@ -446,7 +446,7 @@ L\'([^\\]|{char_escape}|{oct_escape}|{wide_hex_escape}|{universal-character-name
                                    syntax is understood in PIPS character
                                    constant construtors. */
                                 pips_debug(9,"TK_CHARCON wide character constant: %s\n",yytext);
-                                yylval.string = strdup(yytext);
+                                c_lval.string = strdup(yytext);
 				return(TK_CHARCON);
                         }
 
@@ -460,33 +460,33 @@ L\'([^\\]|{char_escape}|{oct_escape}|{wide_hex_escape}|{universal-character-name
 				   handling here since it is done
 				   somewhere else in PIPS in the constant
 				   string constructor. */
-                                yylval.string = strdup(yytext);
+                                c_lval.string = strdup(yytext);
 				return(TK_STRINGCON);
                         }
 
 L\"(\\\"|[^\"\\]|\\[^\"])*\"	{
                                 pips_debug(9,"TK_WSTRINGCON wide string: %s\n",yytext);
-                                yylval.string = strdup(yytext);
+                                c_lval.string = strdup(yytext);
 				return(TK_WSTRINGCON);
                         }
 {floatnum}		{
                                 pips_debug(9,"TK_FLOATCON %s\n",yytext);
-                                yylval.string = strdup(yytext);
+                                c_lval.string = strdup(yytext);
 				return(TK_FLOATCON);
                         }
 {hexnum}		{
                                 pips_debug(9,"Hexnum TK_INTCON %s\n",yytext);
-                                yylval.string = strdup(yytext);
+                                c_lval.string = strdup(yytext);
 				return(TK_INTCON);
                         }
 {octnum}		{
                                 pips_debug(9,"Octnum TK_INTCON %s\n",yytext);
-                                yylval.string = strdup(yytext);
+                                c_lval.string = strdup(yytext);
 				return(TK_INTCON);
                         }
 {intnum}		{
                                 pips_debug(9,"TK_INTCON %s\n",yytext);
-                                yylval.string = strdup(yytext);
+                                c_lval.string = strdup(yytext);
 				return(TK_INTCON);
                         }
 "!quit!"		{
@@ -706,7 +706,7 @@ L\"(\\\"|[^\"\\]|\\[^\"])*\"	{
                                 if (t>0)
 				   {
 				       pips_debug(9,"Keyword or typedef name: %s\n",yytext);
-                                       yylval.string = strdup(yytext);
+                                       c_lval.string = strdup(yytext);
 				       /* Some comments are lost, but not especially in declarations
 				       because type keywords may appear in casts */
 				       if(t==TK_ELSE /*|| (t>=TK_CHAR && t <=TK_REGISTER)*/ )
@@ -716,7 +716,7 @@ L\"(\\\"|[^\"\\]|\\[^\"])*\"	{
 				else
 				   {
 				       pips_debug(9,"Identifier: %s\n",yytext);
-                                       yylval.string = strdup(yytext);
+                                       c_lval.string = strdup(yytext);
                                        /* push_current_C_comment(); */
 				       return(TK_IDENT);
 				   }
@@ -730,17 +730,17 @@ L\"(\\\"|[^\"\\]|\\[^\"])*\"	{
 			}
 %%
 
-void yyerror(char * msg)
+void c_error(char * msg)
 {
     user_warning("yyerror", "C %s near \"%s\" at line %d\n", msg, yytext, yylineno);
     CParserError("Parsing failed\n");
 }
 
-void yyreset_lex(void)
+void c_reset_lex(void)
 {
-    yylineno = 1;
+    c_lineno = 1;
 #ifdef FLEX_SCANNER
-    yyrestart(yyin);
+    c_restart(c_in);
 #else
     /* reset lex... Might be better to read the whole file?
      */
@@ -750,6 +750,6 @@ void yyreset_lex(void)
 #endif
 }
 
-#ifndef yywrap
-int yywrap() { return 1;}
+#ifndef c_wrap
+int c_wrap() { return 1;}
 #endif

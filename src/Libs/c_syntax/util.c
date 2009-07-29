@@ -38,7 +38,7 @@
 #include "syntax.h" /* FI: To dump the symbol table. move in ri-util? */
 #include "text-util.h"
 
-#include "cyacc.h"
+#include "cyacc.tab.h"
 
 #include "resources.h"
 #include "database.h"

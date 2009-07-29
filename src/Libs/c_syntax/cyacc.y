@@ -70,10 +70,10 @@
 
 #include "c_syntax.h"
 
-#define C_ERROR_VERBOSE 1 /* much clearer error messages with bison */
+#include "cyacc.tab.h"
+#include "clexer.h"
 
-extern int c_lex(void);
-extern void c_error(char *);
+#define C_ERROR_VERBOSE 1 /* much clearer error messages with bison */
 
 extern void discard_comments(void);
 
@@ -2314,20 +2314,19 @@ direct_decl: /* (* ISO 6.7.5 *) */
 			    entity cm = get_current_module_entity();
 			    /* A function can be redeclared inside itself. see C_syntax/extern.c */
 			    if(cm!=e) {
-			      extern int yylineno; /* from lexer */
 			      /* Dummy parameters can also be redeclared
 				 as long as their types are equal */
 			      if(dummy_parameter_entity_p(e)) {
 				pips_user_warning("Dummy parameter \"%s\" is redefined at line %d (%d)\n",
 						  entity_user_name(e),
-						  get_current_C_line_number(), yylineno);
+						  get_current_C_line_number(), c_lineno);
 				CParserError("Dummy redefinition accepted by gcc but not compatible with ISO standard."
 					     " Try to compile with \"gcc -ansi -c\"\n");
 			      }
 			      else {
 				pips_user_warning("Variable \"%s\" is redefined at line %d (%d)\n",
 						  entity_user_name(e) /* entity_name(e)*/,
-						  get_current_C_line_number(), yylineno);
+						  get_current_C_line_number(), c_lineno);
 				CParserError("Variable redefinition not compatible with ISO standard."
 					     " Try to compile with \"gcc -ansi -c\"\n");
 			      }
