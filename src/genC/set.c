@@ -200,8 +200,7 @@ void set_free(set s)
     gen_free_area((void**) s, sizeof(set_chunk));
 }
 
-bool 
-set_empty_p(set s)
+bool set_empty_p(set s)
 {
     SET_MAP(x, return FALSE, s);
     return TRUE;
@@ -259,12 +258,12 @@ int set_own_allocated_memory(set s)
     return sizeof(set_chunk)+hash_table_own_allocated_memory(s->table);
 }
 
-/** 
+/**
  * create a list from a set
  * the set is not freed
  * @warning no assumption can be made on the ordering of returned list
  * @param s set where the data are
- * 
+ *
  * @return an allocated list of elements from s
  */
 list set_to_list(set s)
