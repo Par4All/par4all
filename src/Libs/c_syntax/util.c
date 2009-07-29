@@ -919,7 +919,8 @@ entity FindOrCreateCurrentEntity(string name,
 	    /* Formal parameter for a function declaration or for a
 	       function definition or for a pointer to a function or
 	       for a functional typedef */
-	    type ft = (type)stack_head(get_from_entity_type_stack_table(function));
+	    stack st = get_from_entity_type_stack_table(function);
+	    type ft = stack_undefined_p(st)? type_undefined : (type)stack_head(st);
 	    extern string int_to_string(int);
 
 	    if(typedef_entity_p(function)) {
