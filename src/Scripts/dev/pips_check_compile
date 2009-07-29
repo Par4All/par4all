@@ -103,14 +103,15 @@ function report()
   exit 0
 }
 
-# check
+# check for working copy
 [ -d $prod -a -d $prod/.svn ] || report 'KO:no-wc' "working copy '$prod' not found"
 cd $prod || report 'KO:cd-prod' "cannot 'cd $prod'"
+
+# manual locking based on mkdir
+mkdir .lock > /dev/null 2>&1 || report 'locked' "working copy '$prod' is already locked..."
+
 rm -f out err
-
-mkdir .lock || report 'locked' "working copy '$prod' is already locked..."
-
-svn up > out 2> err || report 'KO:svn-up' "cannot 'svn up'"
+svn up >> out 2>> err || report 'KO:svn-up' "cannot 'svn up'"
 
 [ -f CURRENT ] || touch CURRENT
 mv CURRENT PREVIOUS
