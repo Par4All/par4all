@@ -394,7 +394,7 @@ Pbase basis;
     if (SG_UNDEFINED_P(dc)) fprintf(fd, "NULL \n");
     else {
 	fprintf(fd,"basis :");
-	base_fprint(fd, basis, (get_variable_name_t) entity_local_name);
+	base_fprint(fd, basis, (get_variable_name_t) safe_entity_name);
 	fprintf(fd,"%d vertice(s) :",sg_nbre_sommets(dc));
 	v = sg_sommets(dc);
 	for(; v!=NULL; v= v->succ) {
