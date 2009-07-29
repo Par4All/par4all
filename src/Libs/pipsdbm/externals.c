@@ -310,7 +310,7 @@ pipsdbm_read_statement_function(FILE * fd /**< file to read from */)
 	HASH_EXTEND(p, p, h, ordering_to_statement(so), gen_read(fd));
     }
 
-	reset_ordering_to_statement();
+    reset_ordering_to_statement();
 
     return result;
 }
