@@ -27,6 +27,8 @@ CMKDEP	= -M
 LD	= $(CC)
 RANLIB	= ranlib
 LEX	= flex
+# Some parts really need flex:
+FLEX	= flex
 LFLAGS	=
 FC	= f77
 FFLAGS	= -O -g
@@ -38,6 +40,8 @@ CC_VERSION	= $(CC) --version | head -1
 
 # The parser can no longer be compiled with yacc...
 YACC	= bison
+# Some parts really need bison:
+BISON	= bison
 YFLAGS	= -y
 
 PROTO   = cproto
