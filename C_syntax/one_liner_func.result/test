@@ -1,0 +1,8 @@
+void f(void)
+{
+}
+extern void f(void);
+void f(void)
+{
+}
+extern void f(void);

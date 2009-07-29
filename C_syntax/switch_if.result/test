@@ -1,0 +1,101 @@
+
+PARSED PRINTED FILE
+
+void pretty()
+{
+   char *p;
+   if (n==1)
+      goto switch_1_case_1;
+   if (n==2)
+      goto switch_1_case_2;
+   if (n==3)
+      goto switch_1_case_3;
+   goto break_1;
+switch_1_case_1:   ;
+   p = "one";
+   if (0)
+switch_1_case_2:      ;
+   p = "two";
+   if (0)
+switch_1_case_3:      ;
+   p = "three";
+   printf("%s", p);
+   goto break_1;
+break_1:   ;
+}
+
+PRINTED FILE
+
+void pretty()
+{
+   extern  n();
+   char *p;
+   if (n==1) goto switch_1_case_1;
+   if (n==2) goto switch_1_case_2;
+   if (n==3) {
+   }
+   else {
+      goto break_1;
+   }
+switch_1_case_3:   ;
+l99999:   ;
+   p = "three";
+   printf("%s", p);
+   goto break_1;
+switch_1_case_2:   ;
+l99998:   ;
+   p = "two";
+   if (0) {
+      goto switch_1_case_3;
+   }
+   else {
+      goto l99999;
+   }
+switch_1_case_1:   ;
+   p = "one";
+   if (0) {
+      goto switch_1_case_2;
+   }
+   else {
+      goto l99998;
+   }
+break_1:   ;
+}
+
+printed file after RESTRUCTURE_CONTROL
+
+void pretty()
+{
+   extern  n();
+   char *p;
+   if (n==1) goto switch_1_case_1;
+   if (n==2) goto switch_1_case_2;
+   if (n==3) {
+   }
+   else {
+      goto break_1;
+   }
+switch_1_case_3:   ;
+l99999:   ;
+   p = "three";
+   printf("%s", p);
+   goto break_1;
+switch_1_case_2:   ;
+l99998:   ;
+   p = "two";
+   if (0) {
+      goto switch_1_case_3;
+   }
+   else {
+      goto l99999;
+   }
+switch_1_case_1:   ;
+   p = "one";
+   if (0) {
+      goto switch_1_case_2;
+   }
+   else {
+      goto l99998;
+   }
+break_1:   ;
+}

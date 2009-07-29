@@ -1,0 +1,43 @@
+int a(char *b)
+{
+   fputs(b);                                                            /*0002*/
+}
+float b(double c)
+{
+   return b;                                                            /*0003*/
+}
+float c(int d)
+{
+   return i+d;                                                          /*0002*/
+}
+void f(void)
+{
+}
+extern void f(void);
+extern int a(char *b);
+extern float b(double c);
+int i = 9;
+extern float c(int d);
+double zz;
+int a(char *b)
+{
+   fputs(b);                                                            /*0002*/
+}
+float b(double c)
+{
+   float b;
+   return b;                                                            /*0003*/
+}
+float c(int d)
+{
+   return i+d;                                                          /*0002*/
+}
+void f(void)
+{
+}
+extern void f(void);
+extern int a(char *b);
+extern float b(double c);
+int i = 9;
+extern float c(int d);
+double zz;

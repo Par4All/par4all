@@ -2454,7 +2454,11 @@ in this Software without prior written authorization from The Open Group.
  *	interface library (Xlib) to the X Window System Protocol (V11).
  *	Structures and symbols starting with "_" are private to the library.
  */
-# 52 "/usr/include/X11/Xlib.h" 3 4
+
+
+
+
+
 /* Copyright (C) 1991,1992,1994,1995,1996,1997,1998,1999,2000,2001,2002,2006
    	Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -3162,9 +3166,7 @@ typedef union
 
 
 
-# 53 "/usr/include/X11/Xlib.h" 2 3 4
-
-
+# 42 "/usr/include/X11/Xlib.h" 2 3 4
 
 
 
@@ -3573,7 +3575,7 @@ are reserved in the protocol for errors and replies. */
  * dynamically changeable ones are odd numbered */
 # 717 "/usr/include/X11/X.h" 3 4
 /* Byte order  used in imageByteOrder and bitmapBitOrder */
-# 61 "/usr/include/X11/Xlib.h" 2 3 4
+# 48 "/usr/include/X11/Xlib.h" 2 3 4
 
 /* applications should not depend on these two headers being included! */
 /* Xfuncproto.h.  Generated from Xfuncproto.h.in by configure.  */
@@ -3608,7 +3610,7 @@ in this Software without prior written authorization from The Open Group.
 /* Definitions to make function prototypes manageable */
 # 53 "/usr/include/X11/Xfuncproto.h" 3 4
 /* Function prototype configuration (see configure for more info) */
-# 64 "/usr/include/X11/Xlib.h" 2 3 4
+# 51 "/usr/include/X11/Xlib.h" 2 3 4
 /*
  * O/S-dependent (mis)feature macro definitions
  *
@@ -3650,8 +3652,9 @@ in this Software without prior written authorization from The Open Group.
  * symbol does NOT mean that the POSIX environment is the default.
  * You may still have to define _POSIX_SOURCE to get it.
  */
-# 65 "/usr/include/X11/Xlib.h" 2 3 4
-# 75 "/usr/include/X11/Xlib.h" 3 4
+# 52 "/usr/include/X11/Xlib.h" 2 3 4
+
+
 /* Copyright (C) 1989, 1997, 1998, 1999, 2000, 2002, 2004
    Free Software Foundation, Inc.
 
@@ -3788,8 +3791,8 @@ typedef int wchar_t;
 /* A null pointer constant.  */
 # 413 "/usr/lib/gcc/x86_64-linux-gnu/4.3.3/include/stddef.h" 3 4
 /* Offset of member MEMBER in a struct of type TYPE. */
-# 76 "/usr/include/X11/Xlib.h" 2 3 4
-# 93 "/usr/include/X11/Xlib.h" 3 4
+# 55 "/usr/include/X11/Xlib.h" 2 3 4
+# 72 "/usr/include/X11/Xlib.h" 3 4
 extern int
 _Xmblen(
 
@@ -3806,9 +3809,9 @@ _Xmblen(
 
 
 typedef char *XPointer;
-# 154 "/usr/include/X11/Xlib.h" 3 4
+# 133 "/usr/include/X11/Xlib.h" 3 4
 /* macros for screen oriented applications (toolkit) */
-# 177 "/usr/include/X11/Xlib.h" 3 4
+# 156 "/usr/include/X11/Xlib.h" 3 4
 /*
  * Extensions need a way to hang private data on some structures.
  */
@@ -4765,7 +4768,7 @@ typedef struct {
     int delta;
     XFontSet font_set;
 } XwcTextItem;
-# 1145 "/usr/include/X11/Xlib.h" 3 4
+# 1124 "/usr/include/X11/Xlib.h" 3 4
 typedef struct {
     int charset_count;
     char **charset_list;
@@ -4817,7 +4820,7 @@ typedef struct {
     unsigned short count_styles;
     XIMStyle *supported_styles;
 } XIMStyles;
-# 1257 "/usr/include/X11/Xlib.h" 3 4
+# 1236 "/usr/include/X11/Xlib.h" 3 4
 typedef void *XVaNestedList;
 
 typedef struct {
@@ -4831,7 +4834,7 @@ typedef struct {
 } XICCallback;
 
 typedef unsigned long XIMFeedback;
-# 1281 "/usr/include/X11/Xlib.h" 3 4
+# 1260 "/usr/include/X11/Xlib.h" 3 4
 typedef struct _XIMText {
     unsigned short length;
     XIMFeedback *feedback;
@@ -4858,7 +4861,7 @@ typedef unsigned long XIMResetState;
 
 
 typedef unsigned long XIMStringConversionFeedback;
-# 1315 "/usr/include/X11/Xlib.h" 3 4
+# 1294 "/usr/include/X11/Xlib.h" 3 4
 typedef struct _XIMStringConversionText {
     unsigned short length;
     XIMStringConversionFeedback *feedback;
@@ -10482,7 +10485,11 @@ in this Software without prior written authorization from The Open Group.
  *	interface library (Xlib) to the X Window System Protocol (V11).
  *	Structures and symbols starting with "_" are private to the library.
  */
-# 52 "/usr/include/X11/Xlib.h" 3 4
+
+
+
+
+
 /* Copyright (C) 1991,1992,1994,1995,1996,1997,1998,1999,2000,2001,2002,2006
    	Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -11190,9 +11197,7 @@ typedef union
 
 
 
-# 53 "/usr/include/X11/Xlib.h" 2 3 4
-
-
+# 42 "/usr/include/X11/Xlib.h" 2 3 4
 
 
 
@@ -11601,7 +11606,7 @@ are reserved in the protocol for errors and replies. */
  * dynamically changeable ones are odd numbered */
 # 717 "/usr/include/X11/X.h" 3 4
 /* Byte order  used in imageByteOrder and bitmapBitOrder */
-# 61 "/usr/include/X11/Xlib.h" 2 3 4
+# 48 "/usr/include/X11/Xlib.h" 2 3 4
 
 /* applications should not depend on these two headers being included! */
 /* Xfuncproto.h.  Generated from Xfuncproto.h.in by configure.  */
@@ -11636,7 +11641,7 @@ in this Software without prior written authorization from The Open Group.
 /* Definitions to make function prototypes manageable */
 # 53 "/usr/include/X11/Xfuncproto.h" 3 4
 /* Function prototype configuration (see configure for more info) */
-# 64 "/usr/include/X11/Xlib.h" 2 3 4
+# 51 "/usr/include/X11/Xlib.h" 2 3 4
 /*
  * O/S-dependent (mis)feature macro definitions
  *
@@ -11678,8 +11683,9 @@ in this Software without prior written authorization from The Open Group.
  * symbol does NOT mean that the POSIX environment is the default.
  * You may still have to define _POSIX_SOURCE to get it.
  */
-# 65 "/usr/include/X11/Xlib.h" 2 3 4
-# 75 "/usr/include/X11/Xlib.h" 3 4
+# 52 "/usr/include/X11/Xlib.h" 2 3 4
+
+
 /* Copyright (C) 1989, 1997, 1998, 1999, 2000, 2002, 2004
    Free Software Foundation, Inc.
 
@@ -11816,8 +11822,8 @@ typedef int wchar_t;
 /* A null pointer constant.  */
 # 413 "/usr/lib/gcc/x86_64-linux-gnu/4.3.3/include/stddef.h" 3 4
 /* Offset of member MEMBER in a struct of type TYPE. */
-# 76 "/usr/include/X11/Xlib.h" 2 3 4
-# 93 "/usr/include/X11/Xlib.h" 3 4
+# 55 "/usr/include/X11/Xlib.h" 2 3 4
+# 72 "/usr/include/X11/Xlib.h" 3 4
 extern int
 _Xmblen(
 
@@ -11834,9 +11840,9 @@ _Xmblen(
 
 
 typedef char *XPointer;
-# 154 "/usr/include/X11/Xlib.h" 3 4
+# 133 "/usr/include/X11/Xlib.h" 3 4
 /* macros for screen oriented applications (toolkit) */
-# 177 "/usr/include/X11/Xlib.h" 3 4
+# 156 "/usr/include/X11/Xlib.h" 3 4
 /*
  * Extensions need a way to hang private data on some structures.
  */
@@ -12793,7 +12799,7 @@ typedef struct {
     int delta;
     XFontSet font_set;
 } XwcTextItem;
-# 1145 "/usr/include/X11/Xlib.h" 3 4
+# 1124 "/usr/include/X11/Xlib.h" 3 4
 typedef struct {
     int charset_count;
     char **charset_list;
@@ -12845,7 +12851,7 @@ typedef struct {
     unsigned short count_styles;
     XIMStyle *supported_styles;
 } XIMStyles;
-# 1257 "/usr/include/X11/Xlib.h" 3 4
+# 1236 "/usr/include/X11/Xlib.h" 3 4
 typedef void *XVaNestedList;
 
 typedef struct {
@@ -12859,7 +12865,7 @@ typedef struct {
 } XICCallback;
 
 typedef unsigned long XIMFeedback;
-# 1281 "/usr/include/X11/Xlib.h" 3 4
+# 1260 "/usr/include/X11/Xlib.h" 3 4
 typedef struct _XIMText {
     unsigned short length;
     XIMFeedback *feedback;
@@ -12886,7 +12892,7 @@ typedef unsigned long XIMResetState;
 
 
 typedef unsigned long XIMStringConversionFeedback;
-# 1315 "/usr/include/X11/Xlib.h" 3 4
+# 1294 "/usr/include/X11/Xlib.h" 3 4
 typedef struct _XIMStringConversionText {
     unsigned short length;
     XIMStringConversionFeedback *feedback;
