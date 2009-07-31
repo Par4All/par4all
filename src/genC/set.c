@@ -39,10 +39,9 @@
 
 void set_clear(), set_free();
 
-/* Implementation of the Set package. */
-    
-set set_make( typ )
-set_type typ ;
+/* creates an empty set
+ */
+set set_make(set_type typ)
 {
     set hp = (set) alloc(sizeof(set_chunk));
 
@@ -55,11 +54,13 @@ set_type typ ;
     return( hp ) ;
 }
 
-set set_singleton(set_type type, void * p) 
+/* create a singleton set
+ */
+set set_singleton(set_type type, void * p)
 {
-    set s = set_make( type ) ;
-    hash_put( s->table, p, p ) ;
-    return( s ) ;
+  set s = set_make( type ) ;
+  hash_put( s->table, p, p ) ;
+  return s;
 }
 
 
@@ -72,17 +73,16 @@ set set_singleton(set_type type, void * p)
 
    @return the target set.
 */
-set set_assign( s1, s2 )
-set s1, s2 ;
+set set_assign(set s1, set s2)
 {
-    if( s1 == s2 ) {
-	return( s1 ) ;
-    }
-    else {
-	set_clear( s1 ) ;
-	HASH_MAP( k, v, {hash_put( s1->table, k, v ) ;}, s2->table ) ;
-	return( s1 ) ;
-    }
+  if (s1 == s2) {
+    return s1;
+  }
+  else {
+    set_clear( s1 );
+    HASH_MAP( k, v, {hash_put( s1->table, k, v ) ;}, s2->table );
+    return s1;
+  }
 }
 
 set set_add_element(set s1, set s2, void * e)
@@ -103,15 +103,15 @@ set set_add_element(set s1, set s2, void * e)
 
 bool set_belong_p(set s, void * e)
 {
-    /* GO 7/8/95:
+  /* GO 7/8/95:
        Problem for set_string type because the value returned by
        hash_get is not the same than the pointer value, only the
        content of the string is the same ...
-       
-       return( hash_get(s->table, (char *) e) == (char *) e) ;
-       */
 
-    return hash_get(s->table, e) != HASH_UNDEFINED_VALUE;
+       return( hash_get(s->table, (char *) e) == (char *) e) ;
+  */
+
+  return hash_get(s->table, e) != HASH_UNDEFINED_VALUE;
 }
 
 set set_union(set s1, set s2, set s3)
@@ -131,17 +131,17 @@ set set_intersection(set s1, set s2, set s3)
     if( s1 != s2 && s1 != s3 ) {
 	set_clear( s1 ) ;
 	HASH_MAP( k, v, {if( hash_get( s2->table, k )
-			    != HASH_UNDEFINED_VALUE ) 
-				 hash_put( s1->table, k, v ) ;}, 
+			    != HASH_UNDEFINED_VALUE )
+				 hash_put( s1->table, k, v ) ;},
 		 s3->table ) ;
 	return( s1 ) ;
     }
     else {
 	set tmp = set_make( s1->type ) ;
 
-	HASH_MAP( k, v, {if( hash_get( s1->table, k ) 
-			    != HASH_UNDEFINED_VALUE ) 
-				 hash_put( tmp->table, k, v ) ;}, 
+	HASH_MAP( k, v, {if( hash_get( s1->table, k )
+			    != HASH_UNDEFINED_VALUE )
+				 hash_put( tmp->table, k, v ) ;},
 		 (s1 == s2) ? s3->table : s2->table ) ;
 	set_assign( s1, tmp ) ;
 	set_free( tmp ) ;
@@ -151,9 +151,9 @@ set set_intersection(set s1, set s2, set s3)
 
 set set_difference(set s1, set s2, set s3)
 {
-    set_assign( s1, s2 ) ;
-    HASH_MAP( k, ignore, {hash_del( s1->table, k );}, s3->table ) ;
-    return( s1 ) ;
+  set_assign(s1, s2);
+  HASH_MAP(k, ignore, hash_del( s1->table, k ), s3->table);
+  return s1;
 }
 
 set set_del_element(set s1, set s2, void * e)
@@ -167,43 +167,41 @@ set set_del_element(set s1, set s2, void * e)
 set set_delfree_element(set s1, set s2, void * e)
 {
   void * pe;
-  set_assign( s1, s2 ) ;
-  (void) hash_delget( s1->table, e ,&pe);
+  set_assign(s1, s2);
+  (void) hash_delget(s1->table, e ,&pe);
   free(pe);
-  return( s1 ) ;
+  return s1;
 }
 
 bool set_equal(set s1, set s2)
 {
-    bool equal ;
-    
-    equal = TRUE ;
-    HASH_MAP( k, ignore, {
-	if( hash_get( s2->table, k ) == HASH_UNDEFINED_VALUE ) 
-		return( FALSE );
-    }, s1->table ) ;
-    HASH_MAP( k, ignore, {
-	if( hash_get( s1->table, k ) == HASH_UNDEFINED_VALUE )
-		return( FALSE );
-    }, s2->table ) ;
-    return( equal ) ;
+  bool equal = true;
+  HASH_MAP( k, ignore, {
+      if( hash_get( s2->table, k ) == HASH_UNDEFINED_VALUE )
+	return false;
+    }, s1->table);
+  HASH_MAP(k, ignore, {
+      if( hash_get( s1->table, k ) == HASH_UNDEFINED_VALUE )
+	return false;
+    }, s2->table);
+  return equal;
 }
 
 void set_clear(set s)
 {
-    hash_table_clear( s->table ) ;
+  hash_table_clear(s->table);
 }
 
 void set_free(set s)
 {
-    hash_table_free(s->table);
-    gen_free_area((void**) s, sizeof(set_chunk));
+  hash_table_free(s->table);
+  gen_free_area((void**) s, sizeof(set_chunk));
 }
 
 bool set_empty_p(set s)
 {
-    SET_MAP(x, return FALSE, s);
-    return TRUE;
+  SET_MAP(x, return FALSE, s);
+  return TRUE;
 }
 
 void
@@ -250,12 +248,12 @@ void gen_set_closure(
     void (*iterate)(void *, set),
     set initial)
 {
-    gen_set_closure_iterate(iterate, initial, TRUE);
+  gen_set_closure_iterate(iterate, initial, TRUE);
 }
 
 int set_own_allocated_memory(set s)
 {
-    return sizeof(set_chunk)+hash_table_own_allocated_memory(s->table);
+  return sizeof(set_chunk)+hash_table_own_allocated_memory(s->table);
 }
 
 /**
@@ -268,27 +266,27 @@ int set_own_allocated_memory(set s)
  */
 list set_to_list(set s)
 {
-    list l =NIL;
-    SET_MAP(v,l=gen_cons(v,l),s);
-    return l;
+  list l =NIL;
+  SET_MAP(v, l=gen_cons(v,l), s);
+  return l;
 }
 
-/** 
+/**
  * turns a list into a set
  * all duplicated elements are lost
- * 
+ *
  * @param l list to turn into a set
  * @param st type of elements in the list
- * 
+ *
  * @return allocated set of elements from @a l
  * @warning list_to_set(set_to_list(s))!=s
  */
 set list_to_set(list l,set_type st)
 {
-    set s = set_make(st);
-    while(!ENDP(l)) {
-        set_add_element(s,s,CAR(l).p);
-        POP(l);
-    }
-    return s;
+  set s = set_make(st);
+  while(!ENDP(l)) {
+    set_add_element(s, s, CAR(l).p);
+    POP(l);
+  }
+  return s;
 }
