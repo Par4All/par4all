@@ -35,7 +35,8 @@
   forward way.
 
   . GEN_EQ is pointer comparison,
-  . GEN_LENGTH returns the length of the list CP,
+  . GEN_LENGTH returns the length of the list CP, if it is not cyclic,
+  or loop forever
   . GEN_MAPL applies (*FP) to every CDR of CP.
   . GEN_MAP applies (*FP) to every item of the list.
   . GEN_REDUCE successively applies (*FP) on R adn every CRD of CP.
@@ -133,7 +134,7 @@ bool gen_list_cyclic_p (list ml)
 }
 
 /** @return the length of the list
- *  @param cp, the list to evaluate
+ *  @param cp, the list to evaluate, assumed to be acyclic
  */
 size_t gen_length(list cp)
 {
@@ -196,7 +197,7 @@ void gen_insert_after(void * no, void * o, list l)
     CDR(obj_cons) = CONS(CHUNK, new_obj, CDR(obj_cons));
 }
 
-/* 
+/*
    insert object "no" before object "o" in the list "l". Return the new
    list.
 */
@@ -204,13 +205,13 @@ list gen_insert_before(void * no, void * o, list l)
 {
   gen_chunk * new_obj = (gen_chunk*) no;
   gen_chunk * obj = (gen_chunk*) o;
-  
+
   list r = NIL; /* result   */
   list c = l;   /* current  */
   list p = NIL; /* previous */
-  
+
   /* search obj in list */
-  for ( ; c!=NIL ; c=c->cdr) 
+  for ( ; c!=NIL ; c=c->cdr)
     if ( CHUNK(CAR(c))==obj )
       break;
     else
@@ -223,7 +224,7 @@ list gen_insert_before(void * no, void * o, list l)
     r = l;
   }
   else { /* obj is the first object */
-    r = CONS(CHUNK, new_obj, c); 
+    r = CONS(CHUNK, new_obj, c);
   }
   return r;
 }

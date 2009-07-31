@@ -190,9 +190,22 @@ bool hash_warn_on_redefinition_p(void)
 
 /* this function makes a hash table of size size. if size is less or
    equal to zero a default size is used. the type of keys is given by
-   key_type (see hash.txt for further details). */
+   key_type (see hash.txt for further details; where is hash.txt?).
 
-hash_table hash_table_make(hash_key_type key_type, size_t size)
+   private_equal_p() is a predicate to decide if two elements are equal
+   or not
+
+   private_rank() returns an integer in interval [0,size-1]
+
+   if private_equal_p(e1, e2) then private_rank(e1)==private_rank(e2)
+   or results are unpredicatbale.
+
+   No functionality has been used or tested for hash_type==hash_private.
+ */
+hash_table hash_table_generic_make(hash_key_type key_type,
+				   size_t size,
+				   int (private_equal_p)(const void *, const void *),
+				   _uint (private_rank)(const void *, size_t))
 {
     register size_t i;
     hash_table htp;
@@ -241,12 +254,24 @@ hash_table hash_table_make(hash_key_type key_type, size_t size)
 	htp->equals = hash_pointer_equal;
 	htp->rank = hash_pointer_rank;
 	break;
+    case hash_private:
+	htp->equals = private_equal_p;
+	htp->rank = private_rank;
+	break;
     default:
 	fprintf(stderr, "[make_hash_table] bad type %d\n", key_type);
 	abort();
     }
 
     return htp;
+}
+
+hash_table hash_table_make(hash_key_type key_type, size_t size)
+{
+  message_assert("key_type is not hash_private for this interface",
+		 key_type!=hash_private);
+  /* Use default functions for equality check and rank computation. */
+  return hash_table_generic_make(key_type, size, NULL, NULL);
 }
 
 static size_t max_size_seen = 0;
@@ -826,4 +851,17 @@ void hash_map_update(hash_table h, void * k, void * v)
 {
   hash_map_del(h, k);
   hash_map_put(h, k, v);
+}
+
+/* Because the hash table data structure is hidden in this source
+   file hash.c and not exported via the newgen_include.h, it is not
+   possible to access its fields in other files, e.g. set.c. */
+hash_equals_t hash_table_equals_function(hash_table h)
+{
+  return h->rank;
+}
+
+hash_rank_t hash_table_rank_function(hash_table h)
+{
+  return h->rank;
 }

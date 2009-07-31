@@ -25,25 +25,28 @@
 
 #define HASH_DEFAULT_SIZE 7
 
-typedef enum hash_key_type { 
-    hash_string, hash_int, hash_pointer, hash_chunk } hash_key_type;
+/* Equality and rank functions are provided for strings, integers,
+   pointers and Newgen chunks. The user can provide his/her own
+   functions by using hash_private. */
+typedef enum hash_key_type {
+  hash_string, hash_int, hash_pointer, hash_chunk, hash_private } hash_key_type;
 
 
-/* Define hash_table structure which is hided.
+/* Define hash_table structure which is hidden.
  * The only thing we know about it is that the entries are in an array
  * pointed to by hash_table_array(htp), it contains hash_table_size(htp)
  * elements. These elements can be read with hash_entry_val(...) or
  * hash_entry_key(...). If the key is HASH_ENTRY_FREE or
- * HASH_ENTRY_FREE_FOR_PUT then the slot is empty. 
+ * HASH_ENTRY_FREE_FOR_PUT then the slot is empty.
  */
 
 struct __hash_table;
 typedef struct __hash_table *hash_table;
 
-/* Value of an undefined hash_table 
+/* Value of an undefined hash_table
  */
 
-#define hash_table_undefined ((hash_table)gen_chunk_undefined)  
+#define hash_table_undefined ((hash_table)gen_chunk_undefined)
 #define hash_table_undefined_p(h) ((h)==hash_table_undefined)
 
 /* value returned by hash_get() when the key is not found; could also be
@@ -63,7 +66,7 @@ typedef struct __hash_table *hash_table;
             code ; }}
 
 /* Let's define a new version of
- * hash_put_or_update() using the warn_on_redefinition 
+ * hash_put_or_update() using the warn_on_redefinition
  */
 
 #define hash_put_or_update(h, k, v)			\
@@ -75,7 +78,7 @@ if (hash_warn_on_redefinition_p() == TRUE)		\
 } else							\
     hash_put((hash_table)h, (void*)k, (void*)v);
 
-/* functions declared in hash.c 
+/* functions declared in hash.c
  */
 extern void hash_warn_on_redefinition GEN_PROTO((void));
 extern void hash_dont_warn_on_redefinition GEN_PROTO((void));
@@ -86,10 +89,15 @@ extern bool hash_defined_p GEN_PROTO((hash_table, void *));
 extern void hash_put GEN_PROTO((hash_table, void *, void *));
 extern void hash_table_clear GEN_PROTO((hash_table));
 extern void hash_table_free GEN_PROTO((hash_table));
-extern hash_table hash_table_make GEN_PROTO((hash_key_type key_type, size_t size));
+extern hash_table hash_table_make GEN_PROTO((hash_key_type key_type,
+					     size_t size));
+extern hash_table hash_table_generic_make GEN_PROTO((hash_key_type key_type,
+						     size_t size,
+						     int (private_equal_p)(const void *, const void *),
+						     _uint (private_rank)(const void *, size_t)));
 extern void hash_table_print_header GEN_PROTO((hash_table, FILE *));
 extern void hash_table_print GEN_PROTO((hash_table));
-extern void hash_table_fprintf GEN_PROTO((FILE *, char *(*)(), 
+extern void hash_table_fprintf GEN_PROTO((FILE *, char *(*)(),
 					  char *(*)(), hash_table));
 extern void hash_update GEN_PROTO((hash_table, void *, void*));
 extern bool hash_warn_on_redefinition_p GEN_PROTO((void));
@@ -109,6 +117,13 @@ extern void hash_map_put GEN_PROTO((hash_table, void *, void *));
 extern void hash_map_update GEN_PROTO((hash_table, void *, void *));
 extern void * hash_map_del GEN_PROTO((hash_table, void *));
 extern bool hash_map_defined_p GEN_PROTO((hash_table, void *));
+
+/* These two types could/should be declared and used earlier */
+typedef  int (* hash_equals_t)(const void *, const void *);
+extern hash_equals_t hash_table_equals_function(hash_table h);
+
+typedef _uint (* hash_rank_t)(const void *, _uint);
+extern hash_rank_t hash_table_rank_function(hash_table h);
 
 #endif /* newgen_hash_included */
 

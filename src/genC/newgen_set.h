@@ -41,6 +41,10 @@ typedef enum {
     set_pointer = hash_pointer
 } set_type ;
 
+/* FI: I do not understand why the type is duplicated at the set
+   level. Is there a potential consistency problem with the hash
+   table type? Is this a consequence of the decision to hide the
+   actual hash_table data structure? */
 typedef struct {
     hash_table table ;
     set_type type ;
@@ -55,6 +59,9 @@ typedef struct {
 struct cons;
 
 /* functions declared in set.c */
+extern set set_generic_make(set_type typ,
+			    int (private_equal_p)(const void *, const void *),
+			    _uint (private_rank)(const void *, size_t));
 extern set set_make(set_type typ);
 extern set set_singleton(set_type type, void *p);
 extern set set_assign(set s1, set s2);
