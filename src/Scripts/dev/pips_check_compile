@@ -21,13 +21,14 @@
 # along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-# checks that pips does compile.
-
-# TODO
-# - nice?
+# usage: $0 /path/to/prod email.address@somewhere
+# - check that pips does still compile.
+# - designed to be run from cron.
+# - report is sent by mail if the status changed.
+# - if there is a persistant LOCK, investigate by hand.
 
 prod=${1:-.}
-dest=${2:-coelho@cri.ensmp.fr}
+dest=${2:-$LOGNAME@cri.ensmp.fr}
 
 # report current-state message
 # current-state: ok skip locked KO:*
@@ -111,7 +112,7 @@ cd $prod || report 'KO:cd-prod' "cannot 'cd $prod'"
 mkdir LOCK > /dev/null 2>&1 || report 'locked' "working copy '$prod' is already locked..."
 
 rm -f out err
-svn up >> out 2>> err || report 'KO:svn-up' "cannot 'svn up'"
+nice svn up >> out 2>> err || report 'KO:svn-up' "cannot 'svn up'"
 
 [ -f CURRENT ] || touch CURRENT
 mv CURRENT PREVIOUS
@@ -125,8 +126,8 @@ mv CURRENT PREVIOUS
 if ! cmp -s CURRENT PREVIOUS
 then
   # something may have changed, let us recompile
-  make unbuild > out 2> err || report 'KO:make-unbuild' "cannot 'make unbuild'"
-  make build > out 2> err || report 'KO:make-build' "cannot 'make build'"
+  nice make unbuild > out 2> err || report 'KO:make-unbuild' "cannot 'make unbuild'"
+  nice make build > out 2> err || report 'KO:make-build' "cannot 'make build'"
   test -x pips/bin/$(./pips/makes/arch.sh)/tpips || report 6 "no tpips found!"
 
   # clean up
