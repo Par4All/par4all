@@ -260,90 +260,93 @@ MakeAnyScalarResult(tag t, _int size)
  * string_type_size() could be used but it is probably not very robust.
  *
  * Second Warning: current version only compares ultimate_types
- * but check the various typedef that follows
+ * but check the various typedef that follows.
  *
  * typedef int foo;
- * 
- * Doit-on retourner TRUE or FALSE pour la paire (int, foo)?
- * 
+ *
+ * type_equal_p(int, foo)==TRUE, because foo is simply a renaming for int
+ *
  * typedef struct a {
  *     int x;
  *     int y;
  * } a_t;
- * 
+ *
  * typedef struct b {
  *     int x;
  *     int y;
  * } b_t;
- * 
- * Doit-on retourner TRUE or FALSE pour la paire (a_t, b_t)?
- * 
+ *
+ * type_equal_p(a_t, b_t)==FALSE, because the underlying structures
+ * have different names and because the C type system does not use
+ * structural equivalence.
+ *
  * typedef struct  {
  *     int x;
  *     int y;
  * } c_t;
- * 
+ *
  * typedef struct  {
  *     int x;
  *     int y;
  * } d_t;
- * 
- * Doit-on retourner TRUE or FALSE pour la paire (c_t, d_t) quand les structures sont nommees implicitement? Quid de (a_t, d_t) et des autres combinaisons?
- * 
+ *
+ * type_EQUAL_P(c_t, d_t)==FALSE because strcutures (or unions or
+ * enums) with implicit names receive each a unique name.
+ *
  * typedef int foo[n+n];
- * 
+ *
  * typedef int fii[2*n];
- * 
- * Doit-on retourner TRUE or FALSE pour la paire (foo, fii)? 
+ *
+ * type_equal_p(foo, fii)==undefined, because it depends on their
+ * respective stores. FI: I do not know what's implemented, see
+ * variable_equal_p().
  */
-bool 
-type_equal_p(t1, t2)
-type t1;
-type t2;
+/* the unknown type is not handled in a satisfactory way: in some
+   sense, it should be declared equal to any other type but the
+   undefined type; currently unknown is equal to unknown, and
+   different from other types.
+
+   undefined types could also be seen in a different way, as really
+   undefined values; so if t1 or t2 is undefined, the procedure
+   should abort; but type_undefined is considered equal to type_undefined.
+
+   Francois Irigoin, 10 March 1992
+*/
+bool type_equal_p(type t1, type t2)
 {
-    /* the unknown type is not handled in a satisfactory way: in some
-       sense, it should be declared equal to any other type but the
-       undefined type;
-
-       undefined types could also be seen in a different way, as really
-       undefined values; so if t1 or t2 is undefined, the procedure
-       should abort 
-
-       Francois Irigoin, 10 March 1992
-       */
   bool tequal = FALSE;
   t1= ultimate_type(t1);
   t2= ultimate_type(t2);
 
-    if(t1 == t2)
-	return TRUE;
-    else if (t1 == type_undefined && t2 != type_undefined)
-	return FALSE;
-    else if (t1 != type_undefined && t2 == type_undefined)
-	return FALSE;
-    else if (type_tag(t1) != type_tag(t2))
-	return FALSE;
+  if(t1 == t2)
+    return TRUE;
+  else if (t1 == type_undefined && t2 != type_undefined)
+    return FALSE;
+  else if (t1 != type_undefined && t2 == type_undefined)
+    return FALSE;
+  else if (type_tag(t1) != type_tag(t2))
+    return FALSE;
 
-    /* assertion: t1 and t2 are defined and have the same tag */
-    switch(type_tag(t1)) {
-    case is_type_statement:
-	return TRUE;
-    case is_type_area:
-	return area_equal_p(type_area(t1), type_area(t2));
-    case is_type_variable:
-      tequal = variable_equal_p(type_variable(t1), type_variable(t2));
-      return tequal;
-    case is_type_functional:
-	return functional_equal_p(type_functional(t1), type_functional(t2));
-    case is_type_unknown:
-	return TRUE;
-    case is_type_void:
-	return TRUE;
-    default: 
-	pips_error("type_equal_p", "unexpected tag %d\n", type_tag(t1));
-    }
+  /* assertion: t1 and t2 are defined and have the same tag */
+  switch(type_tag(t1)) {
+  case is_type_statement:
+    return TRUE;
+  case is_type_area:
+    return area_equal_p(type_area(t1), type_area(t2));
+  case is_type_variable:
+    tequal = variable_equal_p(type_variable(t1), type_variable(t2));
+    return tequal;
+  case is_type_functional:
+    return functional_equal_p(type_functional(t1), type_functional(t2));
+  case is_type_unknown:
+    return TRUE;
+  case is_type_void:
+    return TRUE;
+  default:
+    pips_error("type_equal_p", "unexpected tag %d\n", type_tag(t1));
+  }
 
-    return FALSE; /* just to avoid a warning */
+  return FALSE; /* just to avoid a warning */
 }
 
 type make_scalar_integer_type(_int n)
@@ -382,8 +385,7 @@ dimension_equal_p(
 	same_expression_name_p(dimension_upper(d1), dimension_upper(d2));
 }
 
-bool 
-variable_equal_p(variable v1, variable v2)
+bool variable_equal_p(variable v1, variable v2)
 {
   if(v1 == v2)
       return TRUE;
@@ -396,7 +398,7 @@ variable_equal_p(variable v1, variable v2)
   else {
       list ld1 = variable_dimensions(v1);
       list ld2 = variable_dimensions(v2);
-      
+
       if(ld1==NIL && ld2==NIL)
 	  return TRUE;
       else 
@@ -424,8 +426,7 @@ variable_equal_p(variable v1, variable v2)
   return TRUE;
 }
 
-bool 
-basic_equal_p(basic b1, basic b2)
+bool basic_equal_p(basic b1, basic b2)
 {
     if( basic_typedef_p(b1) )
     {
@@ -1124,8 +1125,13 @@ basic_of_intrinsic(call c, bool apply_p, bool ultimate_p)
 	  }
 	}
       }
-      else
-	pips_internal_error("Dereferencing of a non-pointer expression\n");
+      else {
+	/* This can also be a user error, but if the function is
+	   called from the parser, a CParserError() should be called:
+	   how to guess what to do? */
+	pips_internal_error("Dereferencing of a non-pointer expression\n"
+			    "Please use gcc to check that your source code is legal\n");
+      }
     }
     else if(ENTITY_POINT_TO_P(f)) {
       //pips_internal_error("Point to case not implemented yet\n");
@@ -2371,7 +2377,7 @@ int number_of_fields(type t)
 /* Compute the list of entities implied in the definition of a
    type. This list is empty for basic types such as int or char. But
    it increases rapidly with typedef, struct, union, bit and dimensions
-   which can use enum elements in sizing expressions. 
+   which can use enum elements in sizing expressions.
 
    The supporting entities are gathered in an updated list, sel,
    supporting entity list. If entity a depends on entity b, b must
@@ -2381,7 +2387,7 @@ int number_of_fields(type t)
 
 static set supporting_types = set_undefined;
 
-list functional_type_supporting_entities(list sel, functional f)
+list recursive_functional_type_supporting_entities(list sel, set vt, functional f)
 {
   ifdebug(8) {
     pips_debug(8, "Begin: ");
@@ -2390,10 +2396,10 @@ list functional_type_supporting_entities(list sel, functional f)
   }
 
   MAP(PARAMETER, p,
-      sel = type_supporting_entities(sel, parameter_type(p)),
+      sel = recursive_type_supporting_entities(sel, vt, parameter_type(p)),
       functional_parameters(f));
 
-  sel = type_supporting_entities(sel, functional_result(f));
+  sel = recursive_type_supporting_entities(sel, vt, functional_result(f));
 
   ifdebug(8) {
     pips_debug(8, "End: ");
@@ -2404,7 +2410,18 @@ list functional_type_supporting_entities(list sel, functional f)
   return sel;
 }
 
-list enum_supporting_entities(list sel, entity e)
+list functional_type_supporting_entities(list sel, functional f)
+{
+  set vt = set_make(hash_pointer);
+
+  sel = recursive_functional_type_supporting_entities(sel, vt, f);
+
+  set_free(vt);
+
+  return sel;
+}
+
+list enum_supporting_entities(list sel, set vt, entity e)
 {
   type t = entity_type(e);
   list ml = type_enum(t);
@@ -2425,7 +2442,7 @@ list enum_supporting_entities(list sel, entity e)
 
     pips_assert("m is an enum member", value_symbolic_p(v));
 
-    sel = constant_expression_supporting_entities(sel, symbolic_expression(s));
+    sel = constant_expression_supporting_entities(sel, vt, symbolic_expression(s));
   }
 
   ifdebug(8) {
@@ -2437,7 +2454,7 @@ list enum_supporting_entities(list sel, entity e)
   return sel;
 }
 
-list generic_constant_expression_supporting_entities(list sel, expression e, bool language_c_p)
+list generic_constant_expression_supporting_entities(list sel, set vt, expression e, bool language_c_p)
 {
   syntax s = expression_syntax(e);
 
@@ -2457,21 +2474,21 @@ list generic_constant_expression_supporting_entities(list sel, expression e, boo
 	extern entity find_enum_of_member(entity);
 	entity e_of_f = find_enum_of_member(f);
 	sel = CONS(ENTITY, e_of_f, sel);
-	sel = enum_supporting_entities(sel, e_of_f);
+	sel = enum_supporting_entities(sel, vt, e_of_f);
       }
       else {
 	/* In Fortran, symbolic constant are declared directly, but
 	   the may depend on other symbolic constants */
 	value v = entity_initial(f);
 	symbolic s = value_symbolic(v);
-	
+
 	sel = CONS(ENTITY, f, sel);
-	sel = generic_symbolic_supporting_entities(sel, s, language_c_p);
+	sel = generic_symbolic_supporting_entities(sel, vt, s, language_c_p);
       }
     }
 
     MAP(EXPRESSION, se, {
-      sel = generic_constant_expression_supporting_entities(sel, se, language_c_p);
+	sel = generic_constant_expression_supporting_entities(sel, vt, se, language_c_p);
     }, call_arguments(c));
   }
   else if(syntax_reference_p(s)) {
@@ -2482,7 +2499,7 @@ list generic_constant_expression_supporting_entities(list sel, expression e, boo
        useless with because types are visited only once. */
     sel = gen_nconc(sel, CONS(ENTITY, v, NIL));
     MAP(EXPRESSION, se, {
-	sel = generic_constant_expression_supporting_entities(sel, se, language_c_p);
+	sel = generic_constant_expression_supporting_entities(sel, vt, se, language_c_p);
       }, inds);
   }
   else {
@@ -2500,31 +2517,37 @@ list generic_constant_expression_supporting_entities(list sel, expression e, boo
 }
 
 /* C version */
-list constant_expression_supporting_entities(list sel, expression e)
+list constant_expression_supporting_entities(list sel, set vt, expression e)
 {
-  return generic_constant_expression_supporting_entities(sel, e, TRUE);
+  return generic_constant_expression_supporting_entities(sel, vt, e, TRUE);
 }
 
 /* Fortran version */
 list fortran_constant_expression_supporting_entities(list sel, expression e)
 {
-  return generic_constant_expression_supporting_entities(sel, e, FALSE);
+  set vt = set_make(hash_pointer);
+
+  sel = generic_constant_expression_supporting_entities(sel, vt, e, FALSE);
+
+  set_free(vt);
+
+  return sel;
 }
 
-list generic_symbolic_supporting_entities(list sel, symbolic s, bool language_c_p)
+list generic_symbolic_supporting_entities(list sel, set vt, symbolic s, bool language_c_p)
 {
   expression e = symbolic_expression(s);
-  sel = generic_constant_expression_supporting_entities(sel, e, language_c_p);
+  sel = generic_constant_expression_supporting_entities(sel, vt, e, language_c_p);
   return sel;
 }
 
 /* C version */
-list symbolic_supporting_entities(list sel, symbolic s)
+list symbolic_supporting_entities(list sel, set vt, symbolic s)
 {
-  return generic_symbolic_supporting_entities(sel, s, TRUE);
+  return generic_symbolic_supporting_entities(sel, vt, s, TRUE);
 }
 
-list basic_supporting_entities(list sel, basic b)
+list basic_supporting_entities(list sel, set vt, basic b)
 {
 
   ifdebug(8) {
@@ -2541,17 +2564,17 @@ list basic_supporting_entities(list sel, basic b)
      basic_string_p(b))
     ;
   else if(basic_bit_p(b))
-    sel = symbolic_supporting_entities(sel, basic_bit(b));
+    sel = symbolic_supporting_entities(sel, vt, basic_bit(b));
   else if(basic_pointer_p(b))
-    sel = type_supporting_entities(sel, basic_pointer(b));
+    sel = recursive_type_supporting_entities(sel, vt, basic_pointer(b));
   else if(basic_derived_p(b)) {
     sel = CONS(ENTITY, basic_derived(b), sel);
-    sel = type_supporting_entities(sel, entity_type(basic_derived(b)));
+    sel = recursive_type_supporting_entities(sel, vt, entity_type(basic_derived(b)));
   }
   else if(basic_typedef_p(b)) {
     entity se = basic_typedef(b);
     sel = CONS(ENTITY, se, sel);
-    sel = type_supporting_entities(sel, entity_type(se));
+    sel = recursive_type_supporting_entities(sel, vt, entity_type(se));
   }
   else
     pips_internal_error("Unrecognized basic tag %d\n", basic_tag(b));
@@ -2565,7 +2588,7 @@ list basic_supporting_entities(list sel, basic b)
   return sel;
 }
 
-list variable_type_supporting_entities(list sel, variable v)
+list variable_type_supporting_entities(list sel, set vt, variable v)
 {
   basic b = variable_basic(v);
   list dims = variable_dimensions(v);
@@ -2576,15 +2599,74 @@ list variable_type_supporting_entities(list sel, variable v)
     fprintf(stderr, "\n");
   }
 
-  MAP(DIMENSION, d, {
+  FOREACH(DIMENSION, d, dims) {
     expression l = dimension_lower(d);
     expression u = dimension_upper(d);
-    sel = constant_expression_supporting_entities(sel, l);
-    sel = constant_expression_supporting_entities(sel, u);
-  }, dims);
+    sel = constant_expression_supporting_entities(sel, vt, l);
+    sel = constant_expression_supporting_entities(sel, vt, u);
+  }
 
-  sel = basic_supporting_entities(sel, b);
+  sel = basic_supporting_entities(sel, vt, b);
 
+  ifdebug(8) {
+    pips_debug(8, "End: ");
+    print_entities(sel);
+    fprintf(stderr, "\n");
+  }
+
+  return sel;
+}
+
+list recursive_type_supporting_entities(list sel, set vt, type t)
+{
+
+  ifdebug(8) {
+    pips_debug(8, "Begin: ");
+    print_entities(sel);
+    fprintf(stderr, "\n");
+  }
+
+  if(!set_belong_p(vt, t)) {
+    vt = set_add_element(vt, vt, t);
+    if(type_functional_p(t))
+      sel = recursive_functional_type_supporting_entities(sel, vt, type_functional(t));
+    else if(type_variable_p(t))
+      sel = variable_type_supporting_entities(sel, vt, type_variable(t));
+    else if(type_varargs_p(t))
+      pips_user_warning("varargs case not implemented yet\n"); /* do nothing? */
+    else if(type_void_p(t))
+      ;
+    else if(type_struct_p(t)) {
+      list sse = type_struct(t);
+
+      MAP(ENTITY, se, {
+	  sel = recursive_type_supporting_entities(sel, vt, entity_type(se));
+	}, sse);
+    }
+    else if(type_union_p(t)) {
+      list use = type_union(t);
+
+      MAP(ENTITY, se, {
+	  sel = recursive_type_supporting_entities(sel, vt, entity_type(se));
+	}, use);
+    }
+    else if(type_enum_p(t)) {
+      list ese = type_enum(t);
+
+      MAP(ENTITY, se, {
+	  sel = recursive_type_supporting_entities(sel, vt, entity_type(se));
+	}, ese);
+    }
+    else if(type_unknown_p(t))
+      /* This could be considered a pips_internal_error(), at least when
+	 the internal representation is built. */
+      ;
+    else if(type_statement_p(t))
+      /* This is weird, but labels also are declared*/
+      ;
+    else
+      pips_internal_error("Unexpected type with tag %d\n", type_tag(t));
+  }
   ifdebug(8) {
     pips_debug(8, "End: ");
     print_entities(sel);
@@ -2596,51 +2678,10 @@ list variable_type_supporting_entities(list sel, variable v)
 
 list type_supporting_entities(list sel, type t)
 {
-
-  ifdebug(8) {
-    pips_debug(8, "Begin: ");
-    print_entities(sel);
-    fprintf(stderr, "\n");
-  }
-
-  if(type_functional_p(t))
-    sel = functional_type_supporting_entities(sel, type_functional(t));
-  else if(type_variable_p(t))
-    sel = variable_type_supporting_entities(sel, type_variable(t));
-  else if(type_varargs_p(t))
-    pips_user_warning("varargs case not implemented yet\n"); /* do nothing? */
-  else if(type_void_p(t))
-    ;
-  else if(type_struct_p(t)) {
-    list sse = type_struct(t);
-
-    MAP(ENTITY, se, {
-      sel = type_supporting_entities(sel, entity_type(se));
-    }, sse);
-  }
-  else if(type_union_p(t)) {
-    list use = type_union(t);
-
-    MAP(ENTITY, se, {
-      sel = type_supporting_entities(sel, entity_type(se));
-    }, use);
-  }
-  else if(type_enum_p(t)) {
-    list ese = type_enum(t);
-
-    MAP(ENTITY, se, {
-      sel = type_supporting_entities(sel, entity_type(se));
-    }, ese);
-  }
-  else
-    pips_internal_error("Unexpected type with tag %d\n", type_tag(t));
-
-  ifdebug(8) {
-    pips_debug(8, "End: ");
-    print_entities(sel);
-    fprintf(stderr, "\n");
-  }
-
+  /* keep track of already visited types */
+  set vt = set_make(hash_pointer);
+  sel = recursive_type_supporting_entities(sel, vt, t);
+  set_free(vt);
   return sel;
 }
 
@@ -2808,7 +2849,7 @@ list basic_supporting_references(list srl, basic b)
   }
   else
     pips_internal_error("Unrecognized basic tag %d\n", basic_tag(b));
- 
+
   ifdebug(9) {
     pips_debug(8, "End: ");
     print_references(srl);
@@ -2854,7 +2895,7 @@ list fortran_type_supporting_entities(list srl, type t)
     print_references(srl);
     fprintf(stderr, "\n");
   }
-  
+
   if(type_functional_p(t))
     ;
   else if(type_variable_p(t)) {
@@ -2896,7 +2937,7 @@ static list recursive_type_supporting_references(list srl, type t)
       print_references(srl);
       fprintf(stderr, "\n");
     }
-  
+
     if(type_functional_p(t))
       srl = functional_type_supporting_references(srl, type_functional(t));
     else if(type_variable_p(t))
@@ -3180,7 +3221,203 @@ int effect_basic_depth(basic b)
 
   return d;
 }
+
+/* Compute the list of types implied in the definition of a
+   type. This list is empty for basic types such as int or char. But
+   it increases rapidly with typedef, struct and union. We assume that
+   expressions in enum, bit and dimensions are not relevant.
 
+   The relationship between stl, the supporting type list, and the set
+   vt, already visited types, herited from type_supporting_entities()
+   is not clear. It might be better to simply return vt...
+*/
+static list recursive_type_supporting_types(list stl, set vt, type t);
+
+/* Very basic and crude debugging function */
+static void print_types(list tl)
+{
+  bool first_p = TRUE;
+
+  fprintf(stderr, "Type list: ");
+
+  FOREACH(TYPE, t, tl) {
+    fprintf(stderr, first_p? "%p" : ", %p", t);
+    first_p = FALSE;
+  }
+
+  fprintf(stderr, "\n");
+}
+
+static list recursive_functional_type_supporting_types(list stl, set vt, functional f)
+{
+  ifdebug(8) {
+    pips_debug(8, "Begin: ");
+    print_entities(stl);
+    fprintf(stderr, "\n");
+  }
+
+  FOREACH(PARAMETER, p, functional_parameters(f))
+    stl = recursive_type_supporting_types(stl, vt, parameter_type(p));
+
+  stl = recursive_type_supporting_types(stl, vt, functional_result(f));
+
+  ifdebug(8) {
+    pips_debug(8, "End: ");
+    print_entities(stl);
+    fprintf(stderr, "\n");
+  }
+
+  return stl;
+}
+
+/* FI: I'm not sure this function is of any use */
+list functional_type_supporting_types(functional f)
+{
+  set vt = set_make(hash_pointer);
+  list stl = NIL;
+
+  stl = recursive_functional_type_supporting_types(stl, vt, f);
+
+  set_free(vt);
+
+  return stl;
+}
+
+static list basic_supporting_types(list stl, set vt, basic b)
+{
+
+  ifdebug(8) {
+    pips_debug(8, "Begin: ");
+    print_entities(stl);
+    fprintf(stderr, "\n");
+  }
+
+  if(basic_int_p(b) ||
+     basic_float_p(b) ||
+     basic_logical_p(b) ||
+     basic_overloaded_p(b) ||
+     basic_complex_p(b) ||
+     basic_string_p(b))
+    ;
+  else if(basic_bit_p(b))
+    ;
+  else if(basic_pointer_p(b))
+    stl = recursive_type_supporting_types(stl, vt, basic_pointer(b));
+  else if(basic_derived_p(b)) {
+    entity de = basic_derived(b);
+    type dt = entity_type(de);
+    stl = CONS(ENTITY, de, stl);
+    stl = recursive_type_supporting_types(stl, vt, dt);
+  }
+  else if(basic_typedef_p(b)) {
+    entity se = basic_typedef(b);
+    type st = entity_type(se);
+    stl = CONS(ENTITY, se, stl);
+    stl = recursive_type_supporting_entities(stl, vt, st);
+  }
+  else
+    pips_internal_error("Unrecognized basic tag %d\n", basic_tag(b));
+
+  ifdebug(8) {
+    pips_debug(8, "End: ");
+    print_entities(stl);
+    fprintf(stderr, "\n");
+  }
+
+  return stl;
+}
+
+static list variable_type_supporting_types(list stl, set vt, variable v)
+{
+  /* The dimensions cannot contain a type declaration */
+  basic b = variable_basic(v);
+
+  ifdebug(8) {
+    pips_debug(8, "Begin: ");
+    print_entities(stl);
+    fprintf(stderr, "\n");
+  }
+
+  stl = basic_supporting_types(stl, vt, b);
+
+  ifdebug(8) {
+    pips_debug(8, "End: ");
+    print_entities(stl);
+    fprintf(stderr, "\n");
+  }
+
+  return stl;
+}
+
+static list recursive_type_supporting_types(list stl, set vt, type t)
+{
+
+  ifdebug(8) {
+    pips_debug(8, "Begin: ");
+    print_entities(stl);
+    fprintf(stderr, "\n");
+  }
+
+  if(!set_belong_p(vt, t)) {
+    vt = set_add_element(vt, vt, t);
+    if(type_functional_p(t))
+      stl = recursive_functional_type_supporting_types(stl, vt, type_functional(t));
+    else if(type_variable_p(t))
+      stl = variable_type_supporting_types(stl, vt, type_variable(t));
+    else if(type_varargs_p(t))
+      pips_user_warning("varargs case not implemented yet\n"); /* do nothing? */
+    else if(type_void_p(t))
+      ;
+    else if(type_struct_p(t)) {
+      list sse = type_struct(t);
+
+      FOREACH(ENTITY, se, sse) {
+	stl = recursive_type_supporting_types(stl, vt, entity_type(se));
+      }
+    }
+    else if(type_union_p(t)) {
+      list use = type_union(t);
+
+      FOREACH(ENTITY, se, use) {
+	stl = recursive_type_supporting_types(stl, vt, entity_type(se));
+      }
+    }
+    else if(type_enum_p(t))
+      /* Hopefully, a dummy type declaration cannot be put among enum
+	 members declarations. */
+      ;
+    else if(type_unknown_p(t))
+      /* This could be considered a pips_internal_error(), at least when
+	 the internal representation is built. */
+      ;
+    else if(type_statement_p(t))
+      /* This is weird, but labels also are declared*/
+      ;
+    else
+      pips_internal_error("Unexpected type with tag %d\n", type_tag(t));
+  }
+  ifdebug(8) {
+    pips_debug(8, "End: ");
+    print_entities(stl);
+    fprintf(stderr, "\n");
+  }
+
+  return stl;
+}
+
+/* Return the list of types used to define type t. The goal is to find
+   out if a dummy data structure (struct, union or enum) is used
+   within another one and hence does not need to be printed out by the
+   prettyprinter. */
+list type_supporting_types(type t)
+{
+  /* keep track of already visited types */
+  set vt = set_make(hash_pointer);
+  list stl = NIL;
+  stl = recursive_type_supporting_types(stl, vt, t);
+  set_free(vt);
+  return stl;
+}
 /*
  *  that is all
  */

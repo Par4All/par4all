@@ -571,16 +571,30 @@ bool entity_enum_member_p(entity e)
   return value_symbolic_p(ev);
 }
 
-bool 
-local_entity_of_module_p(e, module)
-entity e, module;
+bool entity_struct_p(entity e)
+{
+  string ln = entity_local_name(e);
+  bool struct_p = (*ln==STRUCT_PREFIX_CHAR)
+    || (strstr(entity_name(e),DUMMY_STRUCT_PREFIX)==NULL);
+  return struct_p;
+}
+
+bool entity_union_p(entity e)
+{
+  string ln = entity_local_name(e);
+  bool union_p = (*ln==UNION_PREFIX_CHAR)
+    || (strstr(entity_name(e),DUMMY_UNION_PREFIX)==NULL);
+  return union_p;
+}
+
+bool local_entity_of_module_p(entity e, entity module)
 {
     bool
-	result = same_string_p(entity_module_name(e), 
+	result = same_string_p(entity_module_name(e),
 			       module_local_name(module));
 
     debug(6, "local_entity_of_module_p",
-	  "%s %s %s\n", 
+	  "%s %s %s\n",
 	  entity_name(e), result ? "in" : "not in", entity_name(module));
 
 	  return(result);
@@ -1384,13 +1398,13 @@ bool extern_entity_p(entity module, entity e)
    //}
   //else
     //return(static_module_name_p(e));
-  */ 
+  */
   /* return ((compilation_unit_entity_p(module) && gen_in_list_p(e,ram_shared(storage_ram(entity_storage(module)))))
 	  ||(!compilation_unit_entity_p(module) && (strstr(entity_name(e),TOP_LEVEL_MODULE_NAME) != NULL)));
   */
     return ((compilation_unit_entity_p(module) && gen_in_list_p(e,code_externs(value_code(entity_initial(module)))))
 	  ||(!compilation_unit_entity_p(module) && (strstr(entity_name(e),TOP_LEVEL_MODULE_NAME) != NULL)));
-  
+
 }
 
 string storage_to_string(storage s)
@@ -1420,9 +1434,9 @@ entity entity_to_module_entity(entity e)
 {
   entity m = entity_undefined;
 
-  if(top_level_entity_p(e)) 
+  if(top_level_entity_p(e))
     m = e;
-  else if(entity_module_p(e)) 
+  else if(entity_module_p(e))
     m = e;
   else {
     string mn = entity_module_name(e);
@@ -1556,25 +1570,25 @@ entity update_operator_to_regular_operator(entity op)
 
 
 
-/** 
+/**
  * checks if an entity is an equivalent
- * 
+ *
  * @param e entity to check
- * 
+ *
  * @return true if entity is an equivalent
  */
 bool entity_equivalence_p(entity e)
 {
     return storage_ram_p(entity_storage(e))
-        && !ENDP( ram_shared(storage_ram(entity_storage(e)) ));
+      && !ENDP( ram_shared(storage_ram(entity_storage(e)) ));
 }
 
-/** 
+/**
  * compare entity names
- * 
+ *
  * @param e1 first entity
  * @param e2 second entity
- * 
+ *
  * @return true if e1 and e2 have the same name
  */
 bool same_entity_name_p(entity e1, entity e2)
@@ -1582,12 +1596,12 @@ bool same_entity_name_p(entity e1, entity e2)
     return same_string_p(entity_name(e1), entity_name(e2));
 }
 
-/** 
+/**
  * look for @a ent in @a ent_l
- * 
+ *
  * @param ent entity to find
  * @param ent_l list to scan
- * 
+ *
  * @return true if @a ent belongs to @a ent_l
  */
 bool entity_in_list_p(entity ent, list ent_l)
@@ -1597,12 +1611,12 @@ bool entity_in_list_p(entity ent, list ent_l)
 
 /* returns l1 after elements of l2 but not of l1 have been appended to l1. */
 /* l2 is freed */
-/** 
+/**
  * append all elements of l2 not in l1 to l1 and free l2
- * 
+ *
  * @param l1 list to append entities to
  * @param l2 list from which the new entities come
- * 
+ *
  * @return @a l1 with extra new entities appended
  */
 list concat_new_entities(list l1, list l2)
@@ -1616,4 +1630,71 @@ list concat_new_entities(list l1, list l2)
     gen_free_list(l2);
     set_free(s);
     return gen_nconc(l1, gen_nreverse(new_l2));
+}
+
+/**
+ * check if e is used to declare one of the entities in entity list ldecl
+ *
+ * @param e entity to check
+ * @param ldecl list of entities whose declaration may use e
+ *
+ * @return @a TRUE if e appears in one of the declaration in ldecl
+ */
+bool entity_used_in_declarations_p(entity e, list ldecl)
+{
+  bool found_p = FALSE;
+
+  FOREACH(ENTITY, d, ldecl) {
+    type dt = entity_type(d);
+    list sel = type_supporting_entities(NIL, dt);
+
+    if(gen_in_list_p(e, sel)) {
+      pips_debug(8, "entity \"%s\" is used to declare entity \"%s\"\n",
+		 entity_name(e), entity_name(d));
+      found_p = TRUE;
+      gen_free_list(sel);
+      break;
+    }
+    else {
+      gen_free_list(sel);
+    }
+  }
+
+  return found_p;
+}
+
+/**
+ * check if e is used to declare one of the entities in entity list ldecl
+ *
+ * @param e entity to check
+ * @param ldecl list of entities whose declaration may use e
+ *
+ * @return @a TRUE if e appears in one of the declaration in ldecl
+ */
+bool type_used_in_type_declarations_p(entity e, list ldecl)
+{
+  bool found_p = FALSE;
+
+  FOREACH(ENTITY, d, ldecl) {
+    /* The dummy declaration may be hidden in a struct or a union
+       declaration. Maybe it could also be hidden in a function
+       declaration. */
+    type dt = entity_type(d);
+    if(entity_struct_p(d) || entity_union_p(d) || type_functional_p(dt)) {
+      list stl = type_supporting_types(dt);
+
+      if(gen_in_list_p(e, stl)) {
+	pips_debug(8, "entity \"%s\" is used to declare entity \"%s\"\n",
+		   entity_name(e), entity_name(d));
+	found_p = TRUE;
+	gen_free_list(stl);
+	break;
+      }
+      else {
+	gen_free_list(stl);
+      }
+    }
+  }
+
+  return found_p;
 }

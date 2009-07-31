@@ -405,10 +405,10 @@ list words_basic(basic obj)
 	  entity ent = basic_typedef(obj);
 	  pc = CHAIN_SWORD(pc,entity_user_name(ent));
 	  break;
-	}  
+	}
       default:
 	pips_error("words_basic", "unexpected tag");
-    }   
+    }
     return(pc);
 }
 
@@ -2180,24 +2180,29 @@ text c_text_entities(entity module, list ldecl, int margin)
   text r = make_text(NIL);
   list l = ldecl;
 
-  for( ; !ENDP(l); POP(l)) {
-    entity e = ENTITY(CAR(l));
+  FOREACH(ENTITY, e, ldecl) {
     text tmp = text_undefined;
     type t = entity_type(e);
 
-    if(!type_area_p(t) && ! type_statement_p(t) && !type_unknown_p(t) && !storage_formal_p(entity_storage(e))) {
+    if(!type_area_p(t)
+       && ! type_statement_p(t)
+       && !type_unknown_p(t)
+       && !storage_formal_p(entity_storage(e))) {
       string n = entity_name(e);
-      /* Dummy enum must be printed anyway because their members are exposed directly. */
-      if(/*(strstr(n,DUMMY_ENUM_PREFIX)==NULL)&& */
-	 (strstr(n,DUMMY_STRUCT_PREFIX)==NULL)
-	 &&(strstr(n,DUMMY_UNION_PREFIX)==NULL)) {
+
+      /* Dummy enum must be printed sometimes because their members
+	 are exposed directly. */
+      if(((strstr(n,DUMMY_ENUM_PREFIX)==NULL)
+	  || !type_used_in_type_declarations_p(e, ldecl))
+	 && (strstr(n,DUMMY_STRUCT_PREFIX)==NULL)
+	 && (strstr(n,DUMMY_UNION_PREFIX)==NULL)) {
 	tmp = c_text_entity(module, e, margin);
 	MERGE_TEXTS(r,tmp);
       }
     }
   }
 
-  return r; 
+  return r;
 }
 
 text c_text_entity(entity module, entity e, int margin)
@@ -2209,38 +2214,38 @@ text c_text_entity(entity module, entity e, int margin)
   value val = entity_initial(e);
   list pc = NIL;
   bool space_p = get_bool_property("PRETTYPRINT_LISTS_WITH_SPACES");
- 
+
   pips_debug(5,"Print declaration for entity %s in module %s\n",
 	     entity_name(e),
 	     entity_undefined_p(module)? "UNDEFINED" : entity_name(module));
 
-  /* A declaration has two parts: declaration specifiers and declarator (even with initializer) 
-     In declaration specifiers, we can have : 
+  /* A declaration has two parts: declaration specifiers and declarator (even with initializer)
+     In declaration specifiers, we can have:
      - storage specifiers : typedef, extern, static, auto, register
-     - type specifiers : void, char, short, int, long, float, double, signed, unsigned, 
-                         struct-or-union specifiers, enum specifier, typedef name 
-     - type qualifiers : const, restrict, volatile 
+     - type specifiers : void, char, short, int, long, float, double, signed, unsigned,
+                         struct-or-union specifiers, enum specifier, typedef name
+     - type qualifiers : const, restrict, volatile
      - function specifiers : inline */
 
   /* This part is for storage specifiers */
   if (!entity_undefined_p(module) && extern_entity_p(module, e))
     pc = CHAIN_SWORD(pc,"extern ");
-  
+
   if (strstr(entity_name(e),TYPEDEF_PREFIX) != NULL)
     pc = CHAIN_SWORD(pc,"typedef ");
- 
+
   /* The global variables stored in static area and in ram but they
      are not static so a condition is needed, which checks if it is not a
      global variable*/
   // entity m = get_current_module_entity();
   if ((storage_ram_p(s)
        && static_area_p(ram_section(storage_ram(s)))
-       && !strstr(entity_name(e),TOP_LEVEL_MODULE_NAME)) 
+       && !strstr(entity_name(e),TOP_LEVEL_MODULE_NAME))
       || (entity_module_p(e) && static_module_p(e)))
     pc = CHAIN_SWORD(pc,"static ");
 
   /* This part is for type specifiers, type qualifiers, function specifiers and declarator
-     Three special cases for struct/union/enum definitions are treated here. 
+     Three special cases for struct/union/enum definitions are treated here.
      Variable (scalar, array), pointer, function, variables of type struct/union/enum and typedef 
      are treated by function c_words_entity */
 
@@ -2258,7 +2263,7 @@ text c_text_entity(entity module, entity e, int margin)
       ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_unformatted,
 					    make_unformatted(NULL,0,margin,pc)));
       MERGE_TEXTS(r,fields);
-      ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"};")); 
+      ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"};"));
       break;
     }
   case is_type_union:
@@ -2274,7 +2279,7 @@ text c_text_entity(entity module, entity e, int margin)
       ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_unformatted,
 					    make_unformatted(NULL,0,margin,pc)));
       MERGE_TEXTS(r,fields);
-      ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"};")); 
+      ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"};"));
       break;
     }
   case is_type_enum:
@@ -2320,7 +2325,7 @@ text c_text_entity(entity module, entity e, int margin)
   case is_type_unknown:
     {
       pc = gen_nconc(pc,c_words_entity(t,CHAIN_SWORD(NIL,name)));
-      /* This part is for declarator initialization if there is. 
+      /* This part is for declarator initialization if there is.
 	 If the entity is declared extern wrt current module, do not add this initialization*/
       if (!entity_undefined_p(module) && !extern_entity_p(module,e) && !value_undefined_p(val))
 	{
@@ -2330,7 +2335,7 @@ text c_text_entity(entity module, entity e, int margin)
 	      pc = CHAIN_SWORD(pc," = ");
 	      if (brace_expression_p(exp))
 		pc = gen_nconc(pc,words_brace_expression(exp));
-	      else 
+	      else
 		pc = gen_nconc(pc,words_expression(exp));
 	    }
 	}
@@ -2343,15 +2348,18 @@ text c_text_entity(entity module, entity e, int margin)
   case is_type_statement:
   case is_type_area:
   default:
-    pips_error("c_text_entity", "unexpected type tag");
+    pips_internal_error("unexpected type tag\n");
   }
-  return r; 
+  return r;
 }
 
 
-/* The fprint_functional() and fprint_environment() functions are moved from syntax/declaration.c */ 
+/* The fprint_functional() and fprint_environment() functions are
+   moved from syntax/declaration.c */
 
-/* C Version of print_common_layout this is called by fprint_environment(). This function is much simpler than Fortran Version */
+/* C Version of print_common_layout this is called by
+   fprint_environment(). This function is much simpler than Fortran
+   Version */
 
 list get_common_members(entity common,
 			entity __attribute__ ((unused)) module,
@@ -2403,14 +2411,14 @@ void print_C_common_layout(FILE * fd, entity c, bool debug_p)
 	  //     entity_module_name(c));
 	}
       }
-    MAP(ENTITY, m, 
+    MAP(ENTITY, m,
     {
       pips_assert("RAM storage",
 		  storage_ram_p(entity_storage(m)));
       int s;
       // There can be a Array whose size is not known (Dynamic Variables)
       SizeOfArray(m, &s);
-      
+
       pips_assert("An area has no offset as -1",
 		  (ram_offset(storage_ram(entity_storage(m)))!= -1));
       if(ram_offset(storage_ram(entity_storage(m))) == DYNAMIC_RAM_OFFSET) {
@@ -2419,29 +2427,29 @@ void print_C_common_layout(FILE * fd, entity c, bool debug_p)
 		       entity_name(m));
       }
       else if(ram_offset(storage_ram(entity_storage(m))) == UNDEFINED_RAM_OFFSET) {
-	    
+
 	(void) fprintf(fd,
-		       "\tExternal Variable %s,\toffset = UNKNOWN,\tsize = %d\n", 
+		       "\tExternal Variable %s,\toffset = UNKNOWN,\tsize = %d\n",
 		       entity_name(m),s);
       }
       else {
 	(void) fprintf(fd,
-		       "\tVariable %s,\toffset = %td,\tsize = %d\n", 
+		       "\tVariable %s,\toffset = %td,\tsize = %d\n",
 		       entity_name(m),
 		       ram_offset(storage_ram(entity_storage(m))),
 		       s);
       }
       //}
-    }, 
+    },
 	members);
     (void) fprintf(fd, "\n");
     /* Look for variables aliased with a variable in this common */
-    MAP(ENTITY, m, 
+    MAP(ENTITY, m,
     {
       list equiv = ram_shared(storage_ram(entity_storage(m)));
 
       equiv_members = arguments_union(equiv_members, equiv);
-    }, 
+    },
 	members);
 
     if(!ENDP(equiv_members)){
@@ -2453,16 +2461,16 @@ void print_C_common_layout(FILE * fd, entity c, bool debug_p)
 
 	(void) fprintf(fd, "\tVariables aliased to this common:\n");
 
-	MAP(ENTITY, m, 
+	MAP(ENTITY, m,
 	{
 	  pips_assert("RAM storage",
 		      storage_ram_p(entity_storage(m)));
 	  (void) fprintf(fd,
-			 "\tVariable %s,\toffset = %td,\tsize = %d\n", 
+			 "\tVariable %s,\toffset = %td,\tsize = %d\n",
 			 entity_name(m),
 			 ram_offset(storage_ram(entity_storage(m))),
 			 SafeSizeOfArray(m));
-	}, 
+	},
 	    equiv_members);
 	(void) fprintf(fd, "\n");
 	gen_free_list(equiv_members);
@@ -2549,7 +2557,7 @@ void fprint_any_environment(FILE * fd, entity m, bool is_fortran)
        the parsing process. */
     gen_sort_list(decls, compare_entities);
 
-    (void) fprintf(fd, "\nDeclarations for module %s with type ", 
+    (void) fprintf(fd, "\nDeclarations for module %s with type ",
 		   module_local_name(m));
     fprint_functional(fd, type_functional(entity_type(m)));
     (void) fprintf(fd, "\n\n");
@@ -2559,10 +2567,10 @@ void fprint_any_environment(FILE * fd, entity m, bool is_fortran)
 		storage_rom_p(entity_storage(m))
 		|| storage_return_p(entity_storage(m)));
 
-    /* List of implicitly and explicitly declared variables, 
+    /* List of implicitly and explicitly declared variables,
        functions and areas */
 
-    (void) fprintf(fd, "%s\n", ENDP(decls)? 
+    (void) fprintf(fd, "%s\n", ENDP(decls)?
 		   "* empty declaration list *\n\n": "Variable list:\n\n");
 
     MAP(ENTITY, e, {
@@ -2656,9 +2664,9 @@ void fprint_any_environment(FILE * fd, entity m, bool is_fortran)
 	else
 	  print_C_common_layout(fd, e, FALSE);
       }
-    }, 
+    },
 	decls);
-    
+
     (void) fprintf(fd, "End of declarations for module %s\n\n",
 		   module_local_name(m));
 
