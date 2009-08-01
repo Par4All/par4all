@@ -73,10 +73,10 @@ end=$(date)
   echo "result=$result"
   echo
   echo "software revisions used in this night job:"
-  echo "pips: $(svnversion $target/prod/pips)"
-  echo "newgen: $(svnversion $target/prod/newgen)"
-  echo "linear: $(svnversion $target/prod/linear)"
-  echo "nlpmake: $(svnversion $target/prod/pips/makes)"
-  echo "validation: $(svnversion $target/validation)"
-  echo "private: $(svnversion $target/private)"
+  echo "pips: $(svnversion -c $target/prod/pips)"
+  echo "newgen: $(svnversion -c $target/prod/newgen)"
+  echo "linear: $(svnversion -c $target/prod/linear)"
+  echo "nlpmake: $(svnversion -c $target/prod/pips/makes)"
+  echo "validation: $(svnversion -c $target/validation)"
+  echo "private: $(svnversion -c $target/private)"
 } | ${PIPS_MAIL:-Mail} -s "[pips] hendaye night job $result" $email
