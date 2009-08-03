@@ -42,6 +42,8 @@ typedef enum hash_key_type {
 
 struct __hash_table;
 typedef struct __hash_table *hash_table;
+typedef _uint (* hash_rank_t)(const void *, size_t);
+typedef  int (* hash_equals_t)(const void *, const void *);
 
 /* Value of an undefined hash_table
  */
@@ -93,8 +95,8 @@ extern hash_table hash_table_make GEN_PROTO((hash_key_type key_type,
 					     size_t size));
 extern hash_table hash_table_generic_make GEN_PROTO((hash_key_type key_type,
 						     size_t size,
-						     int (private_equal_p)(const void *, const void *),
-						     _uint (private_rank)(const void *, size_t)));
+						     hash_equals_t equals_p,
+						     hash_rank_t rank));
 extern void hash_table_print_header GEN_PROTO((hash_table, FILE *));
 extern void hash_table_print GEN_PROTO((hash_table));
 extern void hash_table_fprintf GEN_PROTO((FILE *, char *(*)(),
@@ -119,10 +121,8 @@ extern void * hash_map_del GEN_PROTO((hash_table, void *));
 extern bool hash_map_defined_p GEN_PROTO((hash_table, void *));
 
 /* These two types could/should be declared and used earlier */
-typedef  int (* hash_equals_t)(const void *, const void *);
 extern hash_equals_t hash_table_equals_function(hash_table h);
 
-typedef _uint (* hash_rank_t)(const void *, _uint);
 extern hash_rank_t hash_table_rank_function(hash_table h);
 
 #endif /* newgen_hash_included */

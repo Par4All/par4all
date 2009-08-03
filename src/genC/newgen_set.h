@@ -35,10 +35,12 @@
 #include "newgen_types.h"
 #include "newgen_hash.h"
 
+/* Note: hash_chunk is not included in set_type */
 typedef enum {
     set_string = hash_string ,
     set_int = hash_int,
-    set_pointer = hash_pointer
+    set_pointer = hash_pointer,
+    set_private = hash_private
 } set_type ;
 
 /* FI: I do not understand why the type is duplicated at the set
@@ -60,8 +62,8 @@ struct cons;
 
 /* functions declared in set.c */
 extern set set_generic_make(set_type typ,
-			    int (private_equal_p)(const void *, const void *),
-			    _uint (private_rank)(const void *, size_t));
+			    hash_equals_t equals_p,
+			    hash_rank_t rank);
 extern set set_make(set_type typ);
 extern set set_singleton(set_type type, void *p);
 extern set set_assign(set s1, set s2);

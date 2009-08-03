@@ -48,8 +48,8 @@ void set_clear(), set_free();
 /* discrepancy: size_t sometimes, _uint elsewhere */
 /* why not use the functional types now defined in newgen_hash.h? */
 set set_generic_make(set_type typ,
-		     int (private_equal_p)(const void *, const void *),
-		     _uint (private_rank)(const void *, size_t))
+		     hash_equals_t private_equal_p,
+		     hash_rank_t private_rank)
 {
   set hp = (set) alloc(sizeof(set_chunk));
 
@@ -243,14 +243,14 @@ void gen_set_closure_iterate(void (*iterate)(void *, set),
   set_type t = initial->type;
 
   seen = set_generic_make(t,
-			  hash_table_equals_function(initial),
-			  hash_table_rank_function(initial));
+			  hash_table_equals_function(initial->table),
+			  hash_table_rank_function(initial->table));
   curr = set_generic_make(t,
-			  hash_table_equals_function(initial),
-			  hash_table_rank_function(initial));
+			  hash_table_equals_function(initial->table),
+			  hash_table_rank_function(initial->table));
   next = set_generic_make(t,
-			  hash_table_equals_function(initial),
-			  hash_table_rank_function(initial));
+			  hash_table_equals_function(initial->table),
+			  hash_table_rank_function(initial->table));
 
   set_assign(curr, initial);
 

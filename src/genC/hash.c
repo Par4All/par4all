@@ -60,8 +60,8 @@ struct __hash_table {
   hash_key_type type;                  /* the type of keys... */
   size_t size;                         /* size of actual array */
   size_t n_entry;                      /* number of associations stored */
-  _uint (*rank)(const void*, _uint);   /* how to compute rank for key */
-  int (*equals)(const void*, const void*);    /* how to compare keys */
+  hash_rank_t rank;                    /* how to compute rank for key */
+  hash_equals_t equals;                /* how to compare keys */
   hash_entry *array;                   /* actual array */
   size_t limit;                        /* max entries before reallocation */
 
@@ -204,8 +204,8 @@ bool hash_warn_on_redefinition_p(void)
  */
 hash_table hash_table_generic_make(hash_key_type key_type,
 				   size_t size,
-				   int (private_equal_p)(const void *, const void *),
-				   _uint (private_rank)(const void *, size_t))
+				   hash_equals_t private_equal_p,
+				   hash_rank_t private_rank)
 {
     register size_t i;
     hash_table htp;
@@ -858,7 +858,7 @@ void hash_map_update(hash_table h, void * k, void * v)
    possible to access its fields in other files, e.g. set.c. */
 hash_equals_t hash_table_equals_function(hash_table h)
 {
-  return h->rank;
+  return h->equals;
 }
 
 hash_rank_t hash_table_rank_function(hash_table h)
