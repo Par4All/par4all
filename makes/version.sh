@@ -23,11 +23,11 @@
 
 for dir
 do
-    if type svnversion > /dev/null
+    if type svnversion > /dev/null 2>&1
     then
 	if [ -d $dir/.svn ]
 	then
-	    echo $(svn info $dir | sed -n -e '2s/.*: //p')@$(svnversion $dir)
+	    echo $(svn info $dir | sed -n -e '2s/.*: //p')@$(svnversion -c $dir)
 	else
 	    echo 'unknown@unknown'
 	fi
