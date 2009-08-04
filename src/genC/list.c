@@ -437,7 +437,7 @@ list gen_full_copy_list(list l)
 
     while (! ENDP(l)) {
 	cons *p = CONS(CHUNK, gen_copy_tree(CHUNK(CAR(l))), NIL);
-	
+
 	if (nle == NIL)
 	    nlb = p;
 	else
@@ -466,9 +466,9 @@ gen_free_string_list(list /* of string */ ls)
 
 list gen_last(list l)
 {
-    if (ENDP(l)) return(l);         /* NIL case */
+    if (ENDP(l)) return l;         /* NIL case */
     while (!ENDP(CDR(l))) l=CDR(l); /* else go to the last */
-    return(l);
+    return l;
 }
 
 static void gen_remove_from_list(list * pl, void * o, bool once)
@@ -485,11 +485,11 @@ static void gen_remove_from_list(list * pl, void * o, bool once)
       free(tmp);
       if (once) return;
     }
-    else 
+    else
       pc = &CDR(*pc);
   }
 }
-	
+
 void gen_remove(list * cpp, void * o)
 {
   gen_remove_from_list(cpp, o, FALSE);
@@ -587,8 +587,8 @@ void gen_free_area(void ** p, int size)
  * within the list. If some of the cons are shared, it may trouble
  * the data and the program.
  *
- * See man qsort about the compare function: 
- *  - 2 pointers to the data are passed, 
+ * See man qsort about the compare function:
+ *  - 2 pointers to the data are passed,
  *  - and the result is <, =, > 0 if the comparison is lower than, equal...
  *
  * FC 27/12/94
@@ -597,7 +597,7 @@ void gen_sort_list(list l, int (*compare)())
 {
     list c;
     int n = gen_length(l);
-    gen_chunk 
+    gen_chunk
 	**table = (gen_chunk**) alloc(n*sizeof(gen_chunk*)),
 	**point;
 
@@ -605,7 +605,7 @@ void gen_sort_list(list l, int (*compare)())
      */
     for (c=l, point=table; !ENDP(c); c=CDR(c), point++)
 	*point = CHUNK(CAR(c));
-    
+
     /*    then sorted,
      */
     qsort(table, n, sizeof(gen_chunk*), compare);
@@ -615,17 +615,17 @@ void gen_sort_list(list l, int (*compare)())
     for (c=l, point=table; !ENDP(c); c=CDR(c), point++)
 	CHUNK(CAR(c)) = *point;
 
-    gen_free_area((void**) table, n*sizeof(gen_chunk*)); 
+    gen_free_area((void**) table, n*sizeof(gen_chunk*));
 }
 
 /* void gen_closure(iterate, initial)
  * list [of X] (*iterate)([ X, list of X ]), initial;
- * 
+ *
  * what: computes the transitive closure of sg starting from sg.
  * how: iterate till stability.
  * input: an iterate function and an initial list for the closure.
  *        the iterate functions performs some computations on X
- *        and should update the list of X to be looked at at the next 
+ *        and should update the list of X to be looked at at the next
  *        iteration. This list must be returned by the function.
  * output: none.
  * side effects:
@@ -781,6 +781,24 @@ int gen_position(void * item, list l)
     }
   }
   return 0;
+}
+
+/* extract the n first head elements from *lp.
+ */
+list gen_list_head(list * lp, int n)
+{
+  if (n<=0) return NIL;
+  // else n>0, something to skip
+  list head = *lp;
+  list last = *lp;
+  n--;
+  while (n--) {
+    message_assert("still some items", last);
+    last = CDR(last);
+  }
+  *lp = CDR(last);
+  CDR(last) = NIL;
+  return head;
 }
 
 /** @} */
