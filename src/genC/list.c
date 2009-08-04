@@ -783,14 +783,17 @@ int gen_position(void * item, list l)
   return 0;
 }
 
-/* extract the n first head elements from *lp.
+/* @return exactly the first n elements from *lp as a list;
+ * *lp points to the remaining list, as a side effect.
+ * if gen_length(*lp) is less than n, the function aborts.
+ * @param lp pointeur to the list.1
+ * @param n number of items to extract.
  */
 list gen_list_head(list * lp, int n)
 {
   if (n<=0) return NIL;
   // else n>0, something to skip
-  list head = *lp;
-  list last = *lp;
+  list head = *lp, last = *lp;
   n--;
   while (n--) {
     message_assert("still some items", last);
