@@ -56,11 +56,15 @@ typedef char *string ;
 /* RK wants an "int" which is the size of a "pointer".
  * However, the use of the relevant "intptr_t" type in the code
  * amounts to source file defacing, hence this definition. FC.
- * The ifndef macro is to avoid a double definition it the type
+ * The ifndef macro is to avoid a double definition if the type
  * needs to be defined in the C3/linear library as well.
  */
 typedef intptr_t _int;
 typedef uintptr_t _uint;
+// also add corresponding format string
+#include <inttypes.h>
+#define _intFMT PRIuPTR
+#define _uintFMT "u" PRIuPTR
 #define _INT_TYPE_DEFINED
 #endif /* _INT_TYPE_DEFINED */
 
