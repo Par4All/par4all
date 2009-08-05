@@ -71,7 +71,7 @@ static string read_token(int (*f)())
   static int bufsize = 0;
   int index = 0, c;
 
-  if (!buf) 
+  if (!buf)
   {
     bufsize = 64; /* should be ok for most codes. */
     buf = (char*) malloc(bufsize * sizeof(char));
@@ -86,7 +86,7 @@ static string read_token(int (*f)())
       buf = (char*) realloc(buf, bufsize * sizeof(char));
       pips_assert("realloc ok", buf);
     }
-    
+
     if (c == '\\')
     {
       c = f();
@@ -100,18 +100,18 @@ static string read_token(int (*f)())
   return buf;
 }
 
-/* output is "([val var ]* )" 
+/* output is "([val var ]* )"
  */
 void vect_gen_write(FILE *fd, Pvecteur v)
 {
     Pvecteur p;
 
     putc('(', fd);
-    for (p = v; p != NULL; p = p->succ) 
+    for (p = v; p != NULL; p = p->succ)
     {
       fprint_Value(fd, val_of(p));
       putc(' ', fd);
-      print_token(fd, (p->var == (Variable) 0) ? TCST_NAME : 
+      print_token(fd, (p->var == (Variable) 0) ? TCST_NAME :
 		  entity_name((entity) p->var));
       putc(' ', fd);
     }
@@ -135,7 +135,7 @@ Pvecteur vect_gen_read(FILE * fd __attribute__ ((unused)),
     sscan_Value(sval, &val);
     svar = read_token(f);
 
-    if (same_string_p(svar, TCST_NAME) || 
+    if (same_string_p(svar, TCST_NAME) ||
 	same_string_p(svar, TCST_OLD_NAME))
     {
       var = (Variable) 0;
@@ -147,7 +147,7 @@ Pvecteur vect_gen_read(FILE * fd __attribute__ ((unused)),
     }
     vect_add_elem(&p, var, val);
   }
-   
+
   p = vect_reversal(p);
   return p;
 }
@@ -174,7 +174,7 @@ int contrainte_gen_allocated_memory(Pcontrainte pc)
 {
     int result = 0;
     for(; pc; pc=pc->succ)
-	result += sizeof(Scontrainte) + 
+	result += sizeof(Scontrainte) +
 	    vect_gen_allocated_memory(pc->vecteur);
     return result;
 }

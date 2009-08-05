@@ -634,9 +634,11 @@ entity entity_to_intermediate_value(entity e)
   return i;
 }
 
+/* This function could be made more robust by checking the storage of
+   e. Formal parameters of analyzable type always have values. */
 bool entity_has_values_p(entity e)
 {
-  /* is e variable whose value(s) (already) are analyzed?
+  /* is e a variable whose value(s) (already) are analyzed?
    */
   pips_assert("value hash table is defined", 
 	      !hash_table_undefined_p(hash_entity_to_new_value));

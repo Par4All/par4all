@@ -1125,7 +1125,7 @@ effect make_reference_region(reference ref, tag tac)
       pips_debug(3,"type depth is %d\n", d);
     }
     
-  /* FI: If t is a pointer type, then d should depend on the type_depth 
+  /* FI: If t is a pointer type, then d should depend on the type_depth
      of the pointed type... */
   if (d>0 || pointer_p)
     {
@@ -1133,13 +1133,15 @@ effect make_reference_region(reference ref, tag tac)
       list ind = reference_indices(ref);
       int n_ind = gen_length(ind);
       int max_phi = 0;
-      
+      /* imported from preprocessor.h */
+      extern bool fortran_module_p(entity);
+
       pips_debug(8, "pointer or array case \n");
-      
+
       pips_assert("The number of indices is less or equal to the type depth, "
 		  "unless we are dealing with a pointer",
 		  (int) gen_length(ind) <= d || pointer_p);
-    
+
       if (fortran_module_p(get_current_module_entity())
 	  && n_ind < d)
 	{
@@ -1152,7 +1154,7 @@ effect make_reference_region(reference ref, tag tac)
 	  sc = sc_new();
 	  max_phi = n_ind;
 	}
-      
+
       for (dim = 1; dim <= max_phi; dim++)
 	reg_ref_inds = gen_nconc(reg_ref_inds,
 				 CONS(EXPRESSION,
@@ -1160,14 +1162,14 @@ effect make_reference_region(reference ref, tag tac)
 				      NIL));
       
       /* we add the constraints corresponding to the reference indices */
-      for (idim = 1; ind != NIL; idim++, ind = CDR(ind)) 
+      for (idim = 1; ind != NIL; idim++, ind = CDR(ind))
 	{
 	  /* For equalities. */
 	  expression exp_ind = EXPRESSION(CAR(ind));
 	  boolean dim_linear_p;
 	  bool unbounded_p =  unbounded_expression_p(exp_ind);
 	  
-	  ifdebug(3) 
+	  ifdebug(3)
 	    {
 	      if (unbounded_p)
 		pips_debug(3, "unbounded dimension PHI%d\n",idim);
@@ -1179,14 +1181,14 @@ effect make_reference_region(reference ref, tag tac)
 	  if (unbounded_p)
 	    {
 	      /* we must add PHI_idim in the Psystem base */
-	      entity phi = make_phi_entity(idim);	
+	      entity phi = make_phi_entity(idim);
 	      sc_base_add_variable(sc, (Variable) phi);
 	      dim_linear_p = false;
 	    }
 	  else
 	    {
 	      
-	      dim_linear_p = 
+	      dim_linear_p =
 		sc_add_phi_equation(sc, exp_ind, idim, IS_EG, PHI_FIRST);
 	      
 	      pips_debug(3, "%slinear equation.\n", dim_linear_p? "": "non-");
@@ -1398,7 +1400,8 @@ region entity_whole_region(entity e, tag tac)
  *            which are independent from the store. 
  * modifies : nothing.
  */
-list region_to_store_independent_region_list(effect reg, bool force_may_p)
+list region_to_store_independent_region_list(effect reg,
+					     bool __attribute__ ((unused)) force_may_p)
 {
     reference ref =  effect_any_reference(reg);
     effect eff = reference_whole_region(ref, region_action_tag(eff));
@@ -1595,7 +1598,7 @@ expression make_phi_expression(int n)
     ref = make_reference(phi, NIL);
     synt = make_syntax(is_syntax_reference, ref);
     exp = make_expression(synt,  normalized_undefined);
-    
+
     return(exp);
 }
 
@@ -1610,7 +1613,7 @@ boolean vect_contains_phi_p(Pvecteur v)
     for(; !VECTEUR_NUL_P(v); v = v->succ) 
 	if (variable_phi_p((entity) var_of(v)))
 	    return(TRUE);
-    
+
     return(FALSE);
 }
 
@@ -1636,37 +1639,37 @@ boolean vect_contains_phi_p(Pvecteur v)
  *            The indice of the region descriptor (PHI) is given by "dim".
  *            The equation is added only if the expression (expr) is a normalized one.
  *
- *            Note : the basis of the system is updated.
+ *            Note : the basis of the system sc is updated.
  */
 bool sc_add_phi_equation(Psysteme sc, expression expr, int dim, bool is_eg,
 			 bool is_phi_first)
 {
     normalized nexpr = NORMALIZE_EXPRESSION(expr);
-  
+
     /* Nga Nguyen: 29 August 2001 
        Add  a value mapping test => filter variables that are not analysed by semantics analyses 
        such as equivalenced variables. If not, the regions will be false (see bugregion.f)
        Attention: value hash table may not be defined */
 
-    if (normalized_linear_p(nexpr))
-      // if (normalized_linear_p(nexpr) && value_mappings_compatible_vector_p(normalized_linear(nexpr)))
-    {
-	entity phi = make_phi_entity(dim);	
+    if (normalized_linear_p(nexpr)) {
+      Pvecteur v2 = vect_copy(normalized_linear(nexpr));
+
+      if (value_mappings_compatible_vector_p(v2)) {
+	entity phi = make_phi_entity(dim);
 	Pvecteur v1 = vect_new((Variable) phi, VALUE_ONE);
-	Pvecteur v2 = normalized_linear(nexpr);
 	Pvecteur vect;
-	
-	if (is_phi_first) 
+
+	if (is_phi_first)
 	    vect = vect_substract(v1, v2);
-	else 
+	else
 	    vect = vect_substract(v2, v1);
 	vect_rm(v1);
 	/* vect_rm(v2); */
-	
+
 	if(!VECTEUR_NUL_P(vect)) 
 	{
 	    pips_assert("sc_add_phi_equation", !SC_UNDEFINED_P(sc));
-	    
+
 	    if (is_eg) 
 	    {
 		sc_add_egalite(sc, contrainte_make(vect));
@@ -1675,43 +1678,63 @@ bool sc_add_phi_equation(Psysteme sc, expression expr, int dim, bool is_eg,
 	    {
 		sc_add_inegalite(sc, contrainte_make(vect));
 	    }
-	    
+
 	    /* The basis of sc has to be updated with the new entities
 	       introduced with the constraint addition. */
 	    for(; !VECTEUR_NUL_P(vect); vect = vect->succ)
 		if(vect->var != TCST)
 		    sc->base = vect_add_variable(sc->base, vect->var);
-	    
+
 	    sc->dimension = vect_size(sc->base);
 	}
 
-	return(TRUE);
+	return TRUE;
+      }
+      else {
+	/* Some variables are not analyzed by semantics, for instance
+	   because they are statically aliased in a non-analyzed way */
+	vect_rm(v2);
+	return FALSE;
+      }
     }
     else
       /* the expression is not linear */
-      { 
-	/* Nga Nguyen: 29 August 2001  
-	   If the expression expr is not a linear expression, we try to retrieve more 
-	   information by using function any_expression_to_transformer, for cases like:
-	   
-	   ITAB(I/2) => {2*PHI1 <= I <= 2*PHI1+1}
-	   ITAB(MOD(I,3)) => {0 <= PHI1 <= 2}, ...
-	   
-	   The function any_expression_to_transformer() returns a transformer that may 
-	   contain temporary variables so we have to project these variables.
-	   
-	   The approximation will become MAY (although in some cases, it is MUST) */
-	
-	entity phi = make_phi_entity(dim);	
-	transformer trans = any_expression_to_transformer(phi,expr,transformer_identity(),TRUE);
-	if (!transformer_undefined_p(trans))
-	  {
-	    transformer new_trans = transformer_temporary_value_projection(trans);
-	    Psysteme p_trans = predicate_system(transformer_relation(new_trans));
-	    sc = sc_safe_append(sc,p_trans);
-	  }
+      {
+	if(is_eg) {
+	  /* Nga Nguyen: 29 August 2001
+	     If the expression expr is not a linear expression, we try to retrieve more
+	     information by using function any_expression_to_transformer, for cases like:
+
+	     ITAB(I/2) => {2*PHI1 <= I <= 2*PHI1+1}
+	     ITAB(MOD(I,3)) => {0 <= PHI1 <= 2}, ...
+
+	     The function any_expression_to_transformer() returns a transformer that may
+	     contain temporary variables so we have to project these variables.
+
+	     The approximation will become MAY (although in some cases, it is MUST) */
+
+	  entity phi = make_phi_entity(dim);
+	  transformer trans = any_expression_to_transformer(phi,expr,transformer_identity(),TRUE);
+
+	  /* Careful: side-effects are lost */
+	  if (!transformer_undefined_p(trans))
+	    {
+	      transformer new_trans = transformer_temporary_value_projection(trans);
+	      Psysteme p_trans = predicate_system(transformer_relation(new_trans));
+	      sc = sc_safe_append(sc,p_trans);
+	    }
+	  return FALSE;
+	}
+	else {
+	  /* An inequation should be generated
+	   *
+	   * We end up here, for instance, with an unbounded dimension.
+	   */
+	  pips_user_warning("Case not implemented as well as it could be\n");
+	  return FALSE;
+	}
       }
-    return(FALSE);
+    return FALSE;
 }
 
 
@@ -1719,9 +1742,9 @@ bool sc_add_phi_equation(Psysteme sc, expression expr, int dim, bool is_eg,
  * input    : the base of a region
  * output   : nothing.
  * modifies : *ppbase.
- * comment  : sorts the base such that the PHI variables come first.	
+ * comment  : sorts the base such that the PHI variables come first.
  *            it is usefull for the convex_hull, to preserve the form
- *            of the predicate.   
+ *            of the predicate.
  */
 void phi_first_sort_base(Pbase *ppbase)
 {
