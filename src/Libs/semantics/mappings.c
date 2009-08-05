@@ -24,7 +24,7 @@
  /* Variable value mappings package 
   *
   * Establish mappings between analyzed scalar variable entities and
-  * variable value entities for a given module
+  * variable value entities for a given module (see transformer/value.c).
   *
   * Handle equivalences too.
   *
@@ -526,15 +526,18 @@ void module_to_value_mappings(entity m)
 }
 
 /* transform a vector based on variable entities into a vector based
- * on new value entities; does nothing most of the time; does a little
- * in the presence of equivalenced variables
+ * on new value entities when possible; does nothing most of the time;
+ * does a little in the presence of equivalenced variables
  *
- * Ugly because it has a hidden side effect on v and because it's
- * implementation dependent on type Pvecteur
+ * Ugly because it has a hidden side effect on v to handle Fortran
+ * equivalences and because its implementation is dependent on type
+ * Pvecteur.
+ *
+ * Assume that the value mappings are available (as implied by the
+ * function's name!), which may not be true when dealing with call
+ * sites.
  */
-bool 
-value_mappings_compatible_vector_p(v)
-Pvecteur v;
+bool value_mappings_compatible_vector_p(Pvecteur v)
 {
   for(;!VECTEUR_NUL_P(v); v = v->succ) {
     if(vecteur_var(v) != TCST) {
@@ -553,7 +556,7 @@ Pvecteur v;
       /* Or a variable value */
       else if(entity_has_values_p(e)) {
 	entity new_v = entity_to_new_value(e);
-	
+
 	if(new_v != entity_undefined)
 	  vecteur_var(v) = (Variable) new_v;
 	else
