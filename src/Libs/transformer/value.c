@@ -61,24 +61,27 @@
   * avoid confusion between variables and values. The value name is the
   * variable name, suffixed by "#new".
   *
-  * Old values and intermediate values are referenced via special entities,
-  * distinguished by their names.
+  * Old values and intermediate values are referenced via special
+  * entities, distinguished by their names made of a specific prefix
+  * followed by a number (see OLD_VALUE_PREFIX and
+  * INTERMEDIATE_VALUE_PREFIX in transformer.h).
   *
   * The type of a value is the type of the associated entity. Equivalenced
   * variables are handled only if they all have the same type.
   *
-  * Pre-values for local dynamic entities are named "o#XX", where "XX"
-  * is a number. A pre-value is associated to an entity via a hash table
-  * used by the function entity_to_old_value(). Static aliasing (i.e.
-  * EQUIVALENCEs) is dealed with by associating the same value entities
-  * to the two aliased variable entities.
+  * Pre-values, a.k.a. old values, for local dynamic entities are
+  * named "o#XX", where "XX" is a number. A pre-value is associated to
+  * an entity via a hash table used by the function
+  * entity_to_old_value(). Static aliasing (i.e.  EQUIVALENCEs) is
+  * dealed with by associating the same value entity to the two
+  * aliased variable entities.
   * 
-  * Pre-values for analyzed scalar formal parameters and analyzed scalar
-  * global variables are represented by special entities named from
-  * the relevant variable entity, by suffixing its name by "#init". These
-  * values have to be represented by specific entities to let us consider
-  * parameter values at entry point and to let us perform interprocedural
-  * semantics analysis.
+  * Pre-values, a.k.a. old values, for analyzed scalar formal
+  * parameters and analyzed scalar global variables are represented by
+  * special entities named from the relevant variable entity, by
+  * suffixing its name by "#init". These values have to be represented
+  * by specific entities to let us consider parameter values at entry
+  * point and to let us perform interprocedural semantics analysis.
   *
   * Intermediate values are referenced by special entities named "i#XX",
   * which are reused from procedure to procedure. Within a procedure,
@@ -88,8 +91,8 @@
   * names I#new, I#old and I#tmp and to print readable debug information.
   *
   * To accelerate conversions between new, old and intermediate value
-  * entities, four hash tables are set up for each module before
-  * semantics analysis is started:
+  * entities, four hash tables must set up for each module before
+  * semantics analysis is started or used:
   *
   *  - hash_entity_to_new_value associates an entity representing a new
   *  value to each scalar variable with an analyzed type; this value
@@ -104,10 +107,10 @@
   *
   *  - hash_entity_to_intermediate_value
   *
-  *  - hash_value_to_name: associates readable names to value entity;
+  *  - hash_value_to_name: associates user-readable names to value entity;
   *    used for debugging and display purposes.
   *
-  * Francois Irigoin, December 1989 (updated June 2001)
+  * Francois Irigoin, December 1989 (updated June 2001,... August 2009)
   *
   * Modifications:
   *
