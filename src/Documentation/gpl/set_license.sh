@@ -33,7 +33,7 @@ do
   # type...
   case $file in
     *.sh|*.pl|*.py|*.sed) type=sh ;;
-    *.tex|*.bib|*.sty) type=tex ;;
+    *.tex|*.bib|*.sty|*.w) type=tex ;;
     *.mk|Makefile) type=sh ;;
     *.[chly]|*.java) type=h ;;
     *.f) type=f ;;
