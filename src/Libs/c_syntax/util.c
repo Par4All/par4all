@@ -2208,24 +2208,78 @@ void UpdateDerivedEntity(list ld, entity e, stack ContextStack)
 	}
       entity_type(e) = t2;
     }
-  entity_storage(e) = make_storage_rom(); 
-  
-  /* Temporally put the list of struct/union entities defined in decl_psec_list to 
-     initial value of ent*/
+  entity_storage(e) = make_storage_rom();
+
+  /* Temporally put the list of struct/union entities defined in
+     decl_psec_list to initial value of ent*/
   entity_initial(e) = (value) ld;
-  
+
 }
 
-list TakeDeriveEntities(list le)
+list TakeDerivedEntities(list le)
 {
   list lres = NIL;
-  FOREACH (ENTITY, e, le) {
-    list ltmp = (list) entity_initial(e);
-    if (ltmp != NIL)
-      lres = gen_nconc(lres,ltmp);
-    entity_initial(e) = value_undefined;
+
+  if(!ENDP(le)) { /* To simplify debugging */
+
+    pips_debug(0, "Begin\n");
+
+    ifdebug(8) {
+      pips_debug(0, "Input entity list: ");
+      print_entities(le);
+      fprintf(stderr, "\n");
+    }
+
+    FOREACH (ENTITY, e, le) {
+      /* The list is tored there at line 2087 of cyacc.y (5 August
+	 2009) */
+      list ltmp = (list) entity_initial(e);
+
+      pips_assert("e is an entity", e->_type_==entity_domain);
+      pips_debug(0, "entity e: %s (%p)\n", entity_name(e), e);
+
+      if (ltmp != NIL) {
+	/* lres = gen_nconc(lres,ltmp);*/
+	FOREACH(ENTITY, de, ltmp) {
+
+	  pips_assert("de is an entity", de->_type_==entity_domain);
+	  pips_debug(0, "entity de: %s (%p)\n", entity_name(de), de);
+
+	  if(!gen_in_list_p(de, lres)) {
+	    lres = gen_nconc(lres, CONS(ENTITY, de, NIL));
+	  }
+	}
+      }
+      /* The ltmp lists seem to be somehow shared as shown in
+       * ngspice/main.tpips. The previous implementation of the
+       * current function generated cyclic lists. The new
+       * implementation is incompatible with a proper memory
+       * management.
+       *
+       * I do not understand what's done in c_syntax/cyacc.y. The
+       * trace obtained from C_syntax/ngspice01.c shows that the same
+       * derived entities appear several times when dummy structs and
+       * unions are embedded as in ngspice01.c
+       */
+      //gen_free_list(ltmp);
+      entity_initial(e) = value_undefined;
+    }
+    pips_assert ("an acyclic list is generated", !gen_list_cyclic_p (lres));
+
+    ifdebug(8) {
+      pips_debug(0, "Output entity list: ");
+      if(ENDP(lres)) {
+      fprintf(stderr, "NIL\n");
+      }
+      else {
+      print_entities(lres);
+      fprintf(stderr, "\n");
+      }
+    }
+
+    pips_debug(0, "End\n");
   }
-  pips_assert ("cyclic list generated", gen_list_cyclic_p (lres) == FALSE);
+
   return lres;
 }
 

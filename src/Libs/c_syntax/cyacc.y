@@ -1906,7 +1906,7 @@ type_spec:   /* ISO 6.7.2 */
 			  /* Specify the type of the variable that follows this declaration specifier*/
 			  variable v = make_variable(make_basic_derived(ent),NIL,NIL);
 			  /* Take from $5 the struct/union entities */
-			  list le = TakeDeriveEntities($5);
+			  list le = TakeDerivedEntities($5);
 			  $$ = gen_nconc(le,CONS(ENTITY,ent,NIL));
 			  c_parser_context_type(ycontext) = make_type_variable(v);
 			  stack_pop(StructNameStack);
@@ -1926,7 +1926,7 @@ type_spec:   /* ISO 6.7.2 */
 			  entity ent = MakeDerivedEntity(s,$4,is_external,is_type_struct);
 			  variable v = make_variable(make_basic_derived(ent),NIL,NIL);
 			  /* Take from $4 the struct/union entities */
-			  list le = TakeDeriveEntities($4);
+			  list le = TakeDerivedEntities($4);
 			  $$ = gen_nconc(le,CONS(ENTITY,ent,NIL));
 			  c_parser_context_type(ycontext) = make_type_variable(v);
 			  stack_pop(StructNameStack);
@@ -1952,7 +1952,7 @@ type_spec:   /* ISO 6.7.2 */
 			  entity ent = MakeDerivedEntity($2,$5,is_external,is_type_union);
 			  variable v = make_variable(make_basic_derived(ent),NIL,NIL);
 			  /* Take from $5 the struct/union entities */
-			  list le = TakeDeriveEntities($5);
+			  list le = TakeDerivedEntities($5);
 			  $$ = gen_nconc(le,CONS(ENTITY,ent,NIL));
 			  c_parser_context_type(ycontext) = make_type_variable(v);
 			  stack_pop(StructNameStack);
@@ -1974,7 +1974,7 @@ type_spec:   /* ISO 6.7.2 */
 			  entity ent = MakeDerivedEntity(s,$4,is_external,is_type_union);
 			  variable v = make_variable(make_basic_derived(ent),NIL,NIL);
 			  /* Take from $4 the struct/union entities */
-			  list le = TakeDeriveEntities($4);
+			  list le = TakeDerivedEntities($4);
 			  $$ = gen_nconc(le,CONS(ENTITY,ent,NIL));
 			  c_parser_context_type(ycontext) = make_type_variable(v);
 			  stack_pop(StructNameStack);
@@ -2083,7 +2083,7 @@ struct_decl_list: /* (* ISO 6.7.2. Except that we allow empty structs. We
 			  /* Temporally put the list of struct/union
 			     entities defined in $1 to initial value
 			     of ent. FI: where is it retrieved? in
-			     TakeDeriveEntities()? */
+			     TakeDerivedEntities()? */
 			  entity_initial(ent) = (value) $1;
 
 			  $$ = CONS(ENTITY,ent,$3);
