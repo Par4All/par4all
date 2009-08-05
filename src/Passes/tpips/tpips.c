@@ -729,6 +729,11 @@ void tpips_help(string line)
 	    "\tname: module, modules, workspace, directory\n");
     TP_HELP("shell", "shell   [<shell-function>]\n",
 	 "\tallow shell functions call\n");
+    TP_HELP("version", "version\n",
+         "\tshow tpips version informations, such as:\n"
+	 "\t\trepository revisions used by the compilation\n"
+	 "\t\tdate of compilation\n"
+	 "\t\tcompiler used\n");
     TP_HELP("owner", "- owner : variable*\n",
 	 "\tList of available owners:\n"
 	 "\t\t%%MODULE\n"

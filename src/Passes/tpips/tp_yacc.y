@@ -35,7 +35,7 @@
 %token TK_CDIR TK_INFO TK_PWD TK_HELP TK_SHOW TK_SOURCE
 %token TK_SHELL TK_ECHO TK_UNKNOWN
 %token TK_QUIT TK_EXIT
-%token TK_LINE TK_CHECKACTIVE
+%token TK_LINE TK_CHECKACTIVE TK_VERSION
 
 %token TK_OWNER_NAME
 %token TK_OWNER_ALL
@@ -478,6 +478,7 @@ command: TK_ENDOFLINE { /* may be empty! */ }
 	| i_shell
 	| i_setprop
 	| i_quit
+	| i_version
 	| i_exit
 	| i_help
 	| i_unknown
@@ -495,6 +496,20 @@ i_quit: TK_QUIT TK_ENDOFLINE
 i_exit: TK_EXIT TK_ENDOFLINE 
 	{
 	    exit(0); /* rather rough! */
+	}
+	;
+
+i_version: TK_VERSION TK_ENDOFLINE
+	{
+	  fprintf(stdout,
+		  // "tpips: (%s)\n"
+      		  "ARCH=" STRINGIFY(SOFT_ARCH) "\n"
+                  "REVS=\n"
+                  "%s"
+                  "DATE=%s\n"
+                  "CC_VERSION=%s\n",
+                  soft_revisions, soft_date, cc_version);
+	  fflush(stdout);
 	}
 	;
 
