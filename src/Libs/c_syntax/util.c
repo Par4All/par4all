@@ -2222,7 +2222,7 @@ list TakeDerivedEntities(list le)
 
   if(!ENDP(le)) { /* To simplify debugging */
 
-    pips_debug(0, "Begin\n");
+    pips_debug(8, "Begin\n");
 
     ifdebug(8) {
       pips_debug(0, "Input entity list: ");
@@ -2236,14 +2236,14 @@ list TakeDerivedEntities(list le)
       list ltmp = (list) entity_initial(e);
 
       pips_assert("e is an entity", e->_type_==entity_domain);
-      pips_debug(0, "entity e: %s (%p)\n", entity_name(e), e);
+      pips_debug(8, "entity e: %s (%p)\n", entity_name(e), e);
 
       if (ltmp != NIL) {
 	/* lres = gen_nconc(lres,ltmp);*/
 	FOREACH(ENTITY, de, ltmp) {
 
 	  pips_assert("de is an entity", de->_type_==entity_domain);
-	  pips_debug(0, "entity de: %s (%p)\n", entity_name(de), de);
+	  pips_debug(8, "entity de: %s (%p)\n", entity_name(de), de);
 
 	  if(!gen_in_list_p(de, lres)) {
 	    lres = gen_nconc(lres, CONS(ENTITY, de, NIL));
@@ -2277,7 +2277,7 @@ list TakeDerivedEntities(list le)
       }
     }
 
-    pips_debug(0, "End\n");
+    pips_debug(8, "End\n");
   }
 
   return lres;
