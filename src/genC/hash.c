@@ -215,6 +215,12 @@ hash_table hash_table_generic_make(hash_key_type key_type,
     size = get_next_hash_table_size(size);
 
     htp = (hash_table) alloc(sizeof(struct __hash_table));
+
+    if( htp == (hash_table)NULL ) {
+      (void) fprintf( stderr, "hash_table_generic_make: cannot allocate\n" ) ;
+      exit( 1 ) ;
+    }
+
     htp->type = key_type;
     htp->size = size;
     htp->n_entry = 0;

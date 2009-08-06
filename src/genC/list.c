@@ -115,22 +115,30 @@ int gen_eq(void * obj1, void * obj2)
  */
 bool gen_list_cyclic_p (list ml)
 {
-  int  i        = 0;
-  bool result   = FALSE;
-  set  adresses = set_make (set_pointer);
+  /* a list with 0 or 1 element is not cyclic */
+  bool cyclic_p   = ! (ENDP(ml) || ENDP(CDR(ml)));
 
-  for (i = 1; ml != NIL; ml = ml->cdr, i++) {
-    if (set_belong_p ( adresses, ml)) {
-      fprintf(stderr, "warning: cycle found");
-      fprintf(stderr, "next elem %d:'%p' already in list\n",
-	      i, ml);
-      result = TRUE;
-      break;
+  if(cyclic_p) { /* it may be cyclic */
+    list cl; /* To ease debugging */
+    int  i        = 1;
+    set  adresses = set_make (set_pointer);
+
+    for (cl = ml; !ENDP(cl); POP(cl), i++) {
+      if (set_belong_p ( adresses, cl)) {
+	fprintf(stderr, "warning: cycle found");
+	fprintf(stderr, "next elem %d:'%p' already in list\n",
+		i, cl);
+	cyclic_p = TRUE;
+	break;
+      }
+      set_add_element (adresses, adresses, cl);
+      cyclic_p = FALSE;
     }
-    set_add_element (adresses, adresses, ml);
+
+    set_free (adresses);
   }
-  set_free (adresses);
-  return result;
+
+  return cyclic_p;
 }
 
 /** @return the length of the list
@@ -571,6 +579,8 @@ bool gen_once_p(list l)
 /* free an area.
  * @param p pointer to the zone to be freed.
  * @param size size in bytes.
+ *
+ * Why is this function located in list.c?
  */
 void gen_free_area(void ** p, int size)
 {
