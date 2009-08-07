@@ -1704,7 +1704,6 @@ statement Tiling_buffer_allocation ()
 		  Pvecteur pv1,pv2;
 		  statement s1,s2;
 		  test t;
-		  list list;
 		  expression exp1,exp2,exp;
 		  pos=position_one_element(P1,l+1);
 		  pv1= vect_make(VECTEUR_NUL,iter[pos-1], VALUE_ONE,TCST ,VALUE_ZERO);
@@ -1940,7 +1939,6 @@ statement Tiling_buffer_allocation ()
 	      Pvecteur pv1,pv2;
 	      statement s1,s2;
 	      test t;
-	      list list;
 	      expression exp1,exp2,exp;
 	      pos=position_one_element(P1,l+1);
 	      pv1= vect_make(VECTEUR_NUL,iter[pos-1], VALUE_ONE,TCST ,VALUE_ZERO);
