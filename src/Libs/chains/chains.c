@@ -28,7 +28,7 @@
    - If a statement has more than one def (e.g., call statements), then
      it is never killed. This is a conservative assumption, but doesn't
      catch killings like:
-     
+
      i,j = 3 ; if foo then i=1 ; j=2 else i=3 ; j=4 ; endif.
 
      where after the test, the (i,j) assignment is still alive. 
@@ -745,24 +745,37 @@ loop lo ;
     }
 }
 
-static void inout_whileloop( st, lo )
-statement st ;
-whileloop lo ;
+static void inout_whileloop(statement st, whileloop wl)
 {
-    statement l = whileloop_body( lo ) ;
+    statement wlb = whileloop_body( wl ) ;
     set diff = MAKE_STATEMENT_SET() ;
 
-    set_union( DEF_IN( l ), GEN( st ),
+    set_union( DEF_IN( wlb ), GEN( st ),
 	       set_difference( diff, DEF_IN( st ), KILL( st )));
     set_free( diff ) ;
-    set_union( REF_IN( l ), REF_IN( st ), REF( st )) ;
-    inout_statement( l ) ;
+    set_union( REF_IN( wlb ), REF_IN( st ), REF( st )) ;
+    inout_statement( wlb ) ;
 
-    set_union( DEF_OUT( st ), DEF_OUT( l ), DEF_IN( st )) ;
-    set_union( REF_OUT( st ), REF_OUT( l ), REF_IN( st )) ;
-  
-  
+    set_union( DEF_OUT( st ), DEF_OUT( wlb ), DEF_IN( st )) ;
+    set_union( REF_OUT( st ), REF_OUT( wlb ), REF_IN( st )) ;
 }
+
+/* cut-and-pasted from inout_whileloop() */
+static void inout_forloop(statement st, forloop fl)
+{
+    statement flb = forloop_body( fl ) ;
+    set diff = MAKE_STATEMENT_SET() ;
+
+    set_union( DEF_IN( flb ), GEN( st ),
+	       set_difference( diff, DEF_IN( st ), KILL( st )));
+    set_free( diff ) ;
+    set_union( REF_IN( flb ), REF_IN( st ), REF( st )) ;
+    inout_statement( flb ) ;
+
+    set_union( DEF_OUT( st ), DEF_OUT( flb ), DEF_IN( st )) ;
+    set_union( REF_OUT( st ), REF_OUT( flb ), REF_IN( st )) ;
+}
+
 static void inout_call(statement st, call c)
 {
     set diff = MAKE_STATEMENT_SET() ;
@@ -825,8 +838,7 @@ unstructured u ;
 
 /* Computes the in and out sets of a statement.
  */
-static void inout_statement( st )
-statement st ;
+static void inout_statement(statement st)
 {
     instruction i ;
     static int indent = 0 ;
@@ -836,7 +848,7 @@ statement st ;
 	mem_spy_begin();
     }
     */
-    
+
     ifdebug(2) {
 	fprintf( stderr, "%*s> Computing DEF_IN and OUT of statement %p (%td):\n", 
 		 indent++, "", st, statement_number( st )) ;
@@ -851,7 +863,7 @@ statement st ;
     set_assign( REF_OUT( st ), REF( st )) ;
 
     switch( instruction_tag( i = statement_instruction( st ))) {
-    case is_instruction_block: 
+    case is_instruction_block:
 	inout_block( st, instruction_block( i )) ;
 	break ;
     case is_instruction_test:
@@ -863,10 +875,13 @@ statement st ;
     case is_instruction_whileloop:
 	inout_whileloop( st, instruction_whileloop( i )) ;
 	break ;
+    case is_instruction_forloop:
+	inout_forloop( st, instruction_forloop( i )) ;
+	break ;
     case is_instruction_call:
 	inout_call( st, instruction_call( i )) ;
 	break ;
-    case is_instruction_goto: 
+    case is_instruction_goto:
 	pips_error( "inout_statement", "Unexpected tag %d\n", i ) ;
 	break ;
     case is_instruction_unstructured:
@@ -1178,6 +1193,9 @@ statement st ;
 	break ;
     case is_instruction_whileloop:
 	usedef_statement( whileloop_body( instruction_whileloop( i ))) ;
+	break ;
+    case is_instruction_forloop:
+	usedef_statement( forloop_body( instruction_forloop( i ))) ;
 	break ;
     case is_instruction_call:
     case is_instruction_goto:
