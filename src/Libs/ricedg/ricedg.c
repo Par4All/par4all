@@ -933,6 +933,13 @@ static list TestCoupleOfEffects(
  *
  * When both references are to the same array variable, the function
  * TestDependence() is called.
+ *
+ * FI: When both references are relative to the same pointer variable, the
+ * variable value is *assumed* to be the same in the two statements and
+ * the function TestDependence() is called. Transformers on pointers
+ * should be used to check that the pointer value is constant. The
+ * simplest transformer would be the written memory effects for the
+ * common enclosing loop.
 */
 
 list
@@ -955,11 +962,13 @@ TestCoupleOfReferences(
     _int i, cl, dims, ty;
     list levels = NIL, levels1 = NIL;
 
-    entity e1 = reference_variable(r1),
-    e2 = reference_variable(r2);
+    entity e1 = reference_variable(r1);
+    entity e2 = reference_variable(r2);
 
-    list b1 = reference_indices(r1),
-      b2 = reference_indices(r2);
+    list b1 = reference_indices(r1);
+    list b2 = reference_indices(r2);
+
+    type t1 = ultimate_type(entity_type(e1));
 
     ifdebug(1) {
 	mem_spy_begin();
@@ -978,11 +987,18 @@ TestCoupleOfReferences(
     }
 
     /* if (e1 == e2 && !entity_scalar_p(e1) && !entity_scalar_p(e2)) */
-    /* FI: Why these two tests under the condition e1==e2? */
+    /* FI: Why have two tests under the condition e1==e2? */
+
     /* FI: this test must be modified to take pointer dereferencing
-       such as p[i] into account, although p as an entity generates
-       atomic references */
-    if (e1 == e2 && !entity_atomic_reference_p(e1) && !entity_atomic_reference_p(e2))
+     * such as p[i] into account, although p as an entity generates
+     * atomic references.
+     *
+     * If chains.c were updated, we could also check that:
+     * gen_length(b1)==gen_length(b2).
+     */
+    if (e1 == e2
+	&& (!entity_atomic_reference_p(e1)
+	    || (pointer_type_p(t1) && gen_length(b1)>0)))
     {
 	if (get_bool_property("RICEDG_STATISTICS_ALL_ARRAYS"))
 	{
