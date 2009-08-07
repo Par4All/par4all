@@ -57,17 +57,10 @@ string gen_strndup(
     string s, /* la chaine a copier */
     size_t n /* le nombre de caracteres a copier */)
 {
-  register string r;
-  register size_t i;
+  size_t i;
 
-  /* The length must be positive: */
-  assert((intptr_t) n >= 0);
-
-  /* allocation */
-  if ((r = (string) malloc(n)) == NULL) {
-    fprintf(stderr, "gen_strndup: out of memory\n");
-    exit(1);
-  }
+  string r = (string) malloc(n);
+  message_assert("allocated", r);
 
   /* recopie */
   for (i = 0; i < n && s[i] != '\0'; i += 1 )
@@ -91,14 +84,8 @@ string gen_strndup0(
   register string r;
   register size_t i;
 
-  /* The length must be positive: */
-  assert((intptr_t) n >= 0);
-
-  /* allocation */
-  if ((r = (string) malloc(n+1)) == NULL) {
-    fprintf(stderr, "gen_strndup0: out of memory\n");
-    exit(1);
-  }
+  r = (string) malloc(n+1);
+  message_assert("allocated", r);
 
   /* recopie */
   for (i = 0; i < n && s[i] != '\0'; i += 1 )

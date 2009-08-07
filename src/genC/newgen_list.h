@@ -39,10 +39,10 @@
 typedef struct cons {
   gen_chunk car; /**< The data payload of a list element */
   struct cons *cdr ; /**< The pointer to the next element. It is NIL if none */
-} cons, * list ;
+} cons;
 
 /** The empty list (nil in Lisp) */
-#define NIL ((cons *)NULL)
+#define NIL ((list)NULL)
 
 /** Modify a list pointer to point on the next element of the list
 
@@ -310,7 +310,7 @@ extern list gen_once GEN_PROTO((void *, list));
 extern bool gen_in_list_p GEN_PROTO((void *, list));
 extern int gen_occurences GEN_PROTO((void *, list));
 extern bool gen_once_p GEN_PROTO((list));
-extern void gen_sort_list GEN_PROTO((list, int (*)())) ;
+extern void gen_sort_list GEN_PROTO((list, int (*)(const void*,const void*))) ;
 extern void gen_closure GEN_PROTO((list (*)(), list));
 extern list gen_make_list GEN_PROTO((int, ...));
 extern list gen_copy_string_list GEN_PROTO((list));

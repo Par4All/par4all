@@ -82,6 +82,10 @@ typedef int unit ;
 #define array_undefined NULL
 #define array_undefined_p(a) ((a)==NULL)
 
+struct cons;
+typedef struct cons * list;
+
+// obsolete?
 #ifdef __STRICT_ANSI__
 #define GEN_PROTO(x) x
 #else

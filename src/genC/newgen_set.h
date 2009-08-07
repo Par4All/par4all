@@ -58,8 +58,6 @@ typedef struct {
 #define SET_MAP(element,code,set) \
     { HASH_MAP(_set_map_key, element, code, (set)->table); }
 
-struct cons;
-
 /* functions declared in set.c */
 extern set set_generic_make(set_type typ,
 			    hash_equals_t equals_p,
@@ -81,7 +79,8 @@ extern bool set_empty_p(set s);
 extern void gen_set_closure_iterate(void (*iterate)(void *, set), set initial, bool dont_iterate_twice);
 extern void gen_set_closure(void (*iterate)(void *, set), set initial);
 extern int set_own_allocated_memory(set s);
-extern struct cons* set_to_list(set s);
-extern set list_to_set(struct cons* l, set_type st);
+extern list set_to_list(set);
+extern list set_to_sorted_list(set, int (*)(const void *, const void *));
+extern set list_to_set(list, set_type);
 
 #endif

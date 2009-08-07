@@ -52,11 +52,8 @@ set set_generic_make(set_type typ,
 		     hash_rank_t private_rank)
 {
   set hp = (set) alloc(sizeof(set_chunk));
+  message_assert("allocated", hp);
 
-  if( hp == (set)NULL ) {
-    (void) fprintf( stderr, "set_generic_make: cannot allocate\n" ) ;
-    exit( 1 ) ;
-  }
   hp->table = hash_table_generic_make( typ,
 				       INITIAL_SET_SIZE,
 				       private_equal_p,
@@ -302,6 +299,16 @@ list set_to_list(set s)
 {
   list l =NIL;
   SET_MAP(v, l=gen_cons(v,l), s);
+  return l;
+}
+
+/* @return a sorted list from a set.
+ * provide comparison function as gen_sort_list.
+ */
+list set_to_sorted_list(set s, int (*cmp)(const void *,const void *))
+{
+  list l = set_to_list(s);
+  gen_sort_list(l, cmp);
   return l;
 }
 
