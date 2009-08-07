@@ -180,6 +180,7 @@ bool sc_functional_graph_p(Psysteme g, Pbase d, Pbase r, Pbase dr)
       }
     }
   }
+  // Cleanup
   sc_rm(g1);
   sc_rm(g2);
   sc_rm(g3);
@@ -301,11 +302,10 @@ static bool loop_scalarization(loop l)
   }
 
   // Now we determine which private effects are not copied out.
-  // COPY IN effects are not implemented yet - LD 2009/04/10.
   FOREACH (EFFECT, pr, crwl) {
     entity pv  = effect_variable(pr);
-    entity iv  = (entity) gen_find(pv,  irl, (bool (*)())gen_eq, car_effect_to_variable);
-    entity ov  = (entity) gen_find(pv,  orl, (bool (*)())gen_eq, car_effect_to_variable);
+    entity iv  = (entity) gen_find(pv, irl, (bool (*)())gen_eq, car_effect_to_variable);
+    entity ov  = (entity) gen_find(pv, orl, (bool (*)())gen_eq, car_effect_to_variable);
     //entity cov = (entity) gen_find(pv, corl, (bool (*)())gen_eq, car_effect_to_variable);
 
     descriptor d = effect_descriptor(pr);    
@@ -327,9 +327,29 @@ static bool loop_scalarization(loop l)
       bool read_and_written_pv = read_pv && written_pv;
 
 
-      //if (!entity_scalar_p(pv))
-      if (nd > 0 && (no > 2 || (no > 1 && !read_and_written_pv))) {
+      //if (!entity_scalar_p(pv)) -- replaced by 'nd > 0'
 
+      /* Profitability:
+
+	 - no > 2: if the number of references if greater than 2, the
+           copy-in and copy-out code overhead is assumed to be small
+           enough to make scalarization profitable.
+	   
+	 - no > 1: if the number of references is 2, the copy-in *xor*
+           the copy-out overhead meets the above criterion.
+
+	 - else: if there is neither copy-in nor copy-out,
+           privatization is always useful.
+
+       */
+      if (nd > 0
+	  && (no > 2 
+	      || (no > 1 && !read_and_written_pv)
+	      || (entity_undefined_p(iv) && entity_undefined_p(ov))
+	      )
+	  ) {
+
+	
 	Pbase phi_b = make_phi_base(1, nd);
 	Pbase d_phi_b = BASE_NULLE;
 	Pbase cr = BASE_NULLE;
@@ -349,7 +369,7 @@ static bool loop_scalarization(loop l)
 
 	if (sc_totally_functional_graph_p(sc, loop_indices_b, D, phi_b, d_phi_b)) {
 	  // Create new temp var of same type as pv
-	  type pvt      = ultimate_type(entity_type(pv)); // ultime_type "un-hides" typedefs
+	  type pvt      = ultimate_type(entity_type(pv)); // ultimate_type "un-hides" typedefs
 	  variable pvtv = type_variable(pvt);
 	  basic pvb     = variable_basic(pvtv);
 	  basic svb     = copy_basic(pvb);      
