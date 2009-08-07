@@ -574,7 +574,7 @@ static void rice_update_dependence_graph(
 
     pips_assert("statement is a loop", statement_loop_p(stat));
 
-    pips_debug(1, "updating dependence graph\n");
+    pips_debug(1, "Begin\n");
 
     if(dg_type == DG_FULL) {
 	pips_debug(1, "computing execution contexts\n");
@@ -979,6 +979,9 @@ TestCoupleOfReferences(
 
     /* if (e1 == e2 && !entity_scalar_p(e1) && !entity_scalar_p(e2)) */
     /* FI: Why these two tests under the condition e1==e2? */
+    /* FI: this test must be modified to take pointer dereferencing
+       such as p[i] into account, although p as an entity generates
+       atomic references */
     if (e1 == e2 && !entity_atomic_reference_p(e1) && !entity_atomic_reference_p(e2))
     {
 	if (get_bool_property("RICEDG_STATISTICS_ALL_ARRAYS"))
