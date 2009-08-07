@@ -1620,14 +1620,19 @@ boolean vect_contains_phi_p(Pvecteur v)
 
 /* bool sc_add_phi_equation(Psysteme sc, expression expr,
  *                       int dim, bool is_eg, bool is_phi_first)
- * input    : a region predicate, an expression caracterizing a PHI variable of
- *            range dim, two booleans indicating if the equation to
- *            create is an equality or an inequality, and this last case, 
- *            the direction of the inequality.
- * output   : TRUE if expr is linear, FALSE otherwise, which means that sc does 
- *            not contain the information associated to expr (MAY region).
- * modifies : adds an equation containing a PHI variable to the system of constraints
- *            given in argument.
+ *
+ * input :    a region predicate, an expression caracterizing a PHI
+ *            variable of range dim, two booleans indicating if the
+ *            equation to create is an equality or an inequality, and
+ *            this last case, the direction of the inequality.
+ *
+ * output :   TRUE if expr is linear, FALSE otherwise, which means that
+ *            sc does not contain all the information associated to expr
+ *            (MAY region).
+ *
+ * modifies : adds an equation containing a PHI variable to the system
+ *            of constraints given in argument.
+ *
  * comment  : The equation can, in fact, be an equality or an inequality :
  *
  *            If it is an equality   (is_eg == TRUE)  :
@@ -1636,10 +1641,20 @@ boolean vect_contains_phi_p(Pvecteur v)
  *                   (is_phi_first == FALSE)        expr - PHI  <= 0
  *                   (is_phi_first == TRUE )        PHI  - expr <= 0
  *
- *            The indice of the region descriptor (PHI) is given by "dim".
- *            The equation is added only if the expression (expr) is a normalized one.
+ *            The indice of the region descriptor (PHI) is given by
+ *            "dim".  The equation is added only if the expression
+ *            (expr) is a normalized linear one, compatible with the
+ *            semantics analysis.
  *
  *            Note : the basis of the system sc is updated.
+ *
+ *            Warning: this function may return wrong results when
+ *            expressions used as subscripts have side-effects. Also
+ *            this function would return more precise results if
+ *            information about the store in which the expression is
+ *            evaluated were passed. The problem exists in
+ *            reference_to_convex_region() and in
+ *            generic_p_proper_effect_of_reference().
  */
 bool sc_add_phi_equation(Psysteme sc, expression expr, int dim, bool is_eg,
 			 bool is_phi_first)
