@@ -1036,84 +1036,117 @@ effect fin, fout ;
 }
 
 /* ADD_CONFLICTS adds conflitc arcs to the dependence graph dg between the
-   in-coming statement STIN and the out-going STOUT. 
+   in-coming statement STIN and the out-going STOUT.
    Note that output dependencies
    are not minimal (e.g., i = s ; s = ... ; s = ...) creates an oo-dep between
    the i assingment and the last s assignment. */
 
-static void add_conflicts( stin, stout, which )
-statement stin, stout ;
-bool (*which)() ;
+static void add_conflicts(statement stin,
+			  statement stout,
+			  bool (*which)())
 {
-    vertex vin ;
-    vertex vout = vertex_statement( stout ) ;
-    cons *effect_ins = load_statement_effects( stin ) ;
-    cons *effect_outs = load_statement_effects( stout ) ;
-    cons *cs = NIL ;
+  vertex vin ;
+  vertex vout = vertex_statement( stout ) ;
+  cons *effect_ins = load_statement_effects( stin ) ;
+  cons *effect_outs = load_statement_effects( stout ) ;
+  cons *cs = NIL ;
 
-    ifdebug(1) {
-	mem_spy_begin();
+  ifdebug(1) {
+    mem_spy_begin();
+  }
+
+  ifdebug(2) {
+    _int stin_o = statement_ordering(stin);
+    _int stout_o = statement_ordering(stout);
+    fprintf( stderr, "Conflicts %td (%td,%td) (%p) -> %td (%td,%td) (%p) %s\n",
+	     statement_number(stin), ORDERING_NUMBER(stin_o), ORDERING_STATEMENT(stin_o), stin,
+	     statement_number(stout), ORDERING_NUMBER(stout_o), ORDERING_STATEMENT(stout_o), stout,
+	     (which == ud) ? "ud" : "dd_du" ) ;
+  }
+  vin = vertex_statement( stin ) ;
+
+  /* To speed up pushnew_conflict() without damaging the integrity of
+     the use-def chains */
+  ifdebug(1) {
+    if(!gen_once_p(effect_ins)) {
+      pips_error("add_conflicts", "effect_ins are redundant\n");
     }
-
-    ifdebug(2) {
-      _int stin_o = statement_ordering(stin);
-      _int stout_o = statement_ordering(stout);
-	fprintf( stderr, "Conflicts %td (%td,%td) (%p) -> %td (%td,%td) (%p) %s\n",
-		statement_number(stin), ORDERING_NUMBER(stin_o), ORDERING_STATEMENT(stin_o), stin,
-		statement_number(stout), ORDERING_NUMBER(stout_o), ORDERING_STATEMENT(stout_o), stout,
-		(which == ud) ? "ud" : "dd_du" ) ;
+    if(!gen_once_p(effect_outs)) {
+      pips_error("add_conflicts", "effect_outs are redundant\n");
     }
-    vin = vertex_statement( stin ) ;
+  }
 
-    /* To speed up pushnew_conflict() without damaging the integrity of
-       the use-def chains */
-    ifdebug(1) {
-	if(!gen_once_p(effect_ins)) {
-	    pips_error("add_conflicts", "effect_ins are redundant\n");
+  FOREACH(EFFECT, fin, effect_ins) {
+    entity ein = effect_entity( fin ) ;
+
+    FOREACH(EFFECT, fout, effect_outs) {
+      entity eout = effect_entity( fout ) ;
+
+      if( entity_conflict_p( ein, eout ) && (*which)( fin, fout )) {
+	type tin = ultimate_type(entity_type(ein));
+	type tout = ultimate_type(entity_type(eout));
+	bool add_conflict_p = TRUE;
+
+	if(pointer_type_p(tin) && pointer_type_p(tout)) {
+	  reference rin = effect_any_reference(fin);
+	  reference rout = effect_any_reference(fout);
+
+	  /* In case we are dealing with pointers, three
+	   * possibilities:
+	   *
+	   * 1. references are p and q and are dealt the standard way
+	   *
+	   * 2. references are p[i][...] and q[k][] and are dealt
+	   * later by an improved dependence test taking into account
+	   * access paths of different length.
+	   *
+	   * 3. references are p or q and q[i][...] or p[j...] and
+	   * they do not create conflicts if the user hasn't created
+	   * any strange sharing. This should be validated by a
+	   * property and/or by type checking: if the types of the two
+	   * references are different and if no strange casting is
+	   * used... For the time being, let's experiment.
+	   *
+	   * FI: This is a first cut and should be refined with
+	   * Beatrice to handle references such as p[i] and p[i][j]
+	   * and made safer with aliasing information from Amira.
+	   */
+	  add_conflict_p = !((gen_length(reference_indices(rin))==0)
+			     ^ (gen_length(reference_indices(rout))==0));
 	}
-	if(!gen_once_p(effect_outs)) {
-	    pips_error("add_conflicts", "effect_outs are redundant\n");
+
+	if(add_conflict_p) {
+	  list loops = load_statement_enclosing_loops(stout);
+	  reference rin = effect_reference(fin);
+	  reference rout = effect_reference(fout);
+	  bool remove_this_conflict_p = disambiguate_constant_subscripts?
+	    references_do_not_conflict_p(rin, rout): FALSE;
+
+	  MAPL(pl, {
+	      statement el = STATEMENT(CAR(pl));
+	      entity il = loop_index(statement_loop(el));
+	      remove_this_conflict_p |= entity_conflict_p(ein, il);
+	    }, loops);
+
+	  if (!remove_this_conflict_p)
+	    cs = pushnew_conflict( fin, fout, cs ) ;
 	}
+      }
     }
+  }
 
-    MAPL( fins, {
-	effect fin = EFFECT( CAR( fins )) ;
-	entity ein = effect_entity( fin ) ;
 
-	MAPL(fouts, {
-	    effect fout = EFFECT( CAR( fouts )) ;
-	    entity eout = effect_entity( fout ) ;
+  /* il faut verifier que l'arc vin/vout n'existe pas deja !! */
+  if( !ENDP( cs )) {
+    successor s = make_successor( make_dg_arc_label( cs ), vout ) ;
 
-	    if( entity_conflict_p( ein, eout ) && (*which)( fin, fout )) {
-		list loops = load_statement_enclosing_loops(stout);
-		reference rin = effect_reference(fin);
-		reference rout = effect_reference(fout);
-		bool remove_this_conflict_p = disambiguate_constant_subscripts?
-		    references_do_not_conflict_p(rin, rout): FALSE;
+    vertex_successors( vin ) =
+      CONS( SUCCESSOR, s, vertex_successors( vin )) ;
+  }
 
-		MAPL(pl, {
-		    statement el = STATEMENT(CAR(pl));
-		    entity il = loop_index(statement_loop(el));
-		    remove_this_conflict_p |= entity_conflict_p(ein, il);
-		}, loops);
-
-		if (!remove_this_conflict_p)
-		    cs = pushnew_conflict( fin, fout, cs ) ;
-	    }
-	}, effect_outs );
-    }, effect_ins ) ;
-
-    /* il faut verifier que l'arc vin/vout n'existe pas deja !! */
-    if( !ENDP( cs )) {
-	successor s = make_successor( make_dg_arc_label( cs ), vout ) ;
-	    
-	vertex_successors( vin ) = 
-		CONS( SUCCESSOR, s, vertex_successors( vin )) ;
-    }
-
-    ifdebug(1) {
-	mem_spy_end("add_conflicts");
-    }
+  ifdebug(1) {
+    mem_spy_end("add_conflicts");
+  }
 }
 
 /* USEDEF_STATEMENT updates the dependence graph between the statement ST and
@@ -1132,22 +1165,22 @@ statement st ;
     SET_MAP( in, {add_conflicts( (statement)in, st, ud ) ;}, REF_IN( st )) ;
 
     switch( t = instruction_tag( i )) {
-    case is_instruction_block: 
+    case is_instruction_block:
 	MAPL( sts, {usedef_statement( STATEMENT( CAR( sts ))) ;},
 	      instruction_block( i )) ;
 	break ;
-    case is_instruction_test: 
+    case is_instruction_test:
 	usedef_statement( test_true( instruction_test( i )));
 	usedef_statement( test_false( instruction_test( i )) );
 	break ;
-    case is_instruction_loop: 
+    case is_instruction_loop:
 	usedef_statement( loop_body( instruction_loop( i ))) ;
 	break ;
-    case is_instruction_whileloop: 
+    case is_instruction_whileloop:
 	usedef_statement( whileloop_body( instruction_whileloop( i ))) ;
 	break ;
-    case is_instruction_call: 
-    case is_instruction_goto: 
+    case is_instruction_call:
+    case is_instruction_goto:
 	break ;
     case is_instruction_unstructured:
 	usedef_control( unstructured_control( instruction_unstructured( i ))) ;
@@ -1211,7 +1244,7 @@ graph statement_dependence_graph(statement s) {
   dg = make_graph(NIL) ;
 
   /* Initialize data structures for all the statements
-  
+
      It recursively initializes the sets of gens, kills, ins and outs for
      the statements that appear in st. Moreover, the set of defs are
      computed; note that not only call statements are there, but also
@@ -1261,33 +1294,33 @@ static list load_statement_effects(statement st)
     tag t = instruction_tag( inst );
     tag call_t;
     list le = NIL;
-    
+
     switch( t ) {
-    case is_instruction_call: 
+    case is_instruction_call:
 	call_t =
 	    value_tag(entity_initial(call_function( instruction_call( inst ))));
-	if ( iorgch && (call_t == is_value_code)) 
+	if ( iorgch && (call_t == is_value_code))
 	{
-	    list l_in = load_statement_in_regions(st); 
+	    list l_in = load_statement_in_regions(st);
 	    list l_out = load_statement_out_regions(st);
 	    le = gen_append(l_in,l_out);
 	    break;
 	}
-    case is_instruction_block: 
-    case is_instruction_test: 
-    case is_instruction_loop: 
+    case is_instruction_block:
+    case is_instruction_test:
+    case is_instruction_loop:
     case is_instruction_whileloop:
     case is_instruction_forloop:
     case is_instruction_unstructured:
 	le = load_proper_rw_effects_list(st);
 	break ;
-    case is_instruction_goto: 
-	pips_internal_error( "Go to statement in CODE data structure %d\n", t ) ;
+    case is_instruction_goto:
+	pips_internal_error( "Go to statement in CODE data structure %d\n", t );
       break;
     default:
 	pips_internal_error( "Unknown tag %d\n", t ) ;
     }
-    
+
     return le;
 }
 
@@ -1297,39 +1330,40 @@ static void set_effects(char *module_name,
 			enum chain_type use) {
     switch(use) {
 
-    case USE_PROPER_EFFECTS: 
+    case USE_PROPER_EFFECTS:
 	rgch = FALSE;
 	iorgch = FALSE;
 	set_proper_rw_effects((statement_effects)
                db_get_memory_resource(DBR_PROPER_EFFECTS, module_name, TRUE));
 	break;
 
-	/* In fact, we use proper regions only; proper regions of calls are 
-         * similar to regions, except for expressions given as arguments,
-	 * whose regions are simply appended to the list (non convex hull).
-	 * For simple statements (assignments), proper regions contain the list 
-	 * elementary regions (there is no summarization, i.e no convex hull).
-	 * For loops and tests, proper regions contain the elements accessed in
-	 * the tests and loop range. BC. 
+	/* In fact, we use proper regions only; proper regions of
+         * calls are similar to regions, except for expressions given
+         * as arguments, whose regions are simply appended to the list
+         * (non convex hull).  For simple statements (assignments),
+         * proper regions contain the list elementary regions (there
+         * is no summarization, i.e no convex hull).  For loops and
+         * tests, proper regions contain the elements accessed in the
+         * tests and loop range. BC.
 	 */
-    case USE_REGIONS: 
+    case USE_REGIONS:
 	rgch = TRUE;
 	iorgch = FALSE;
-	set_proper_rw_effects((statement_effects) 
+	set_proper_rw_effects((statement_effects)
 	       db_get_memory_resource(DBR_PROPER_REGIONS, module_name, TRUE));
 	break;
 
 	/* For experimental purpose only */
-    case USE_IN_OUT_REGIONS: 
+    case USE_IN_OUT_REGIONS:
 	rgch = FALSE;
 	iorgch = TRUE;
-	set_proper_rw_effects((statement_effects) 
+	set_proper_rw_effects((statement_effects)
 	       db_get_memory_resource(DBR_PROPER_REGIONS, module_name, TRUE));
-	set_in_effects((statement_effects) 
+	set_in_effects((statement_effects)
 	       db_get_memory_resource(DBR_IN_REGIONS, module_name, TRUE));
-	set_out_effects((statement_effects) 
+	set_out_effects((statement_effects)
 	       db_get_memory_resource(DBR_OUT_REGIONS, module_name, TRUE));
-	break;    
+	break;
 
     default: pips_error("set_effects", "ill. parameter use = %d\n", use);
     }
@@ -1358,9 +1392,9 @@ static void reset_effects()
 
    @return TRUE because we are very comfident it works :-)
  */
-bool 
-chains(char * module_name,
-       enum chain_type use) {
+bool chains(char * module_name,
+	    enum chain_type use)
+{
   statement module_stat;
   instruction module_inst;
   graph module_graph;
@@ -1389,7 +1423,7 @@ chains(char * module_name,
     mem_spy_end("Chains: resources loaded");
     mem_spy_begin();
   }
-   
+
   pips_debug(1, "finding enclosing loops ...\n");
   set_enclosing_loops_map( loops_mapping_of_statement(module_stat) );
 
