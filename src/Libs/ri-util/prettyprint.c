@@ -84,6 +84,8 @@ char lib_ri_util_prettyprint_c_rcsid[] = "$Id$";
 #include "prettyprint.h"
 #include "preprocessor.h"
 
+#include "STEP_name.h"
+
 /* operator precedences are in the [0,100] range */
 
 #define MAXIMAL_PRECEDENCE 100

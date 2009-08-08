@@ -59,6 +59,9 @@
 
 #include "bootstrap.h"
 
+// needed for some names...
+#include "STEP_name.h"
+
 #include "misc.h"
 #include "pipsdbm.h"
 #include "parser_private.h"

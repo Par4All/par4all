@@ -344,9 +344,6 @@
 #define OMP_PARALLEL_FUNCTION_NAME      "parallel"
 #define OMP_REDUCTION_FUNCTION_NAME     "reduction"
 
-/* STEP */
-#include "STEP_name.h"
-
 /*io functions: C library and system io.Amira Mensi*/
 
 /* unistd.h */
