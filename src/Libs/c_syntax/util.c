@@ -876,7 +876,7 @@ entity FindOrCreateCurrentEntity(string name,
       pips_debug(5,"of current function %s\n",entity_user_name(function));
     /* function is only used for formal variables*/
   }
-  
+
   if (is_typedef)
     {
       /* Tell the lexer about the new type names : add to keyword_typedef_table */
@@ -890,7 +890,7 @@ entity FindOrCreateCurrentEntity(string name,
 	{
 	  /* Prefix for the current struct: use full_scope */
 	  ent = find_or_create_entity(concatenate(full_scope,name,NULL));
-	  if (is_external 
+	  if (is_external
 	      && !member_entity_p(ent) /* Maybe it would have been
 					  better to push "external" in
 					  the context */
@@ -992,12 +992,12 @@ entity FindOrCreateCurrentEntity(string name,
 								   MODULE_SEP_STRING,
 								   compilation_unit_name,
 								   name,NULL));
-		  else 
+		  else
 		    ent = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,name);
 		}
-	      else 
+	      else
 		{
-		  /* This is a variable/function declared inside a module's body: add block scope here 
+		  /* This is a variable/function declared inside a module's body: add block scope here
 		     Attention, the scope of a function declared in module is the module, not global.*/
 		  if (static_module_p(get_current_module_entity()))
 		    /* The module name is unambiguous because it is used by pipdbm */
@@ -1005,7 +1005,7 @@ entity FindOrCreateCurrentEntity(string name,
 								   MODULE_SEP_STRING,
 								   block_scope,
 								   name,
-								   NULL));      
+								   NULL));
 		  else
 		    ent = find_or_create_entity((concatenate(get_current_module_name(),
 								   MODULE_SEP_STRING,
@@ -1032,23 +1032,19 @@ void UpdateParenEntity(entity e, list lq)
   type t = entity_type(e);
   pips_debug(3,"Update entity in parentheses \"%s\" with type \"%s\"\n",
 	     entity_name(e), safe_type_to_string(entity_type(e)));
-  if (lq != NIL)
-    {
-      if (type_undefined_p(t))
-	t = make_type_variable(make_variable(basic_undefined,list_undefined,lq));
-      else 
-	{
-	  if (type_variable_p(t))
-	    {
-	      variable v = type_variable(t);
-	      variable_qualifiers(v) = gen_nconc(variable_qualifiers(v),lq);
-	    }
-	  else 
-	    {
-	      CParserError("Attributes for not variable type\n");
-	    }
-	}
+  if (lq != NIL) {
+    if (type_undefined_p(t))
+      t = make_type_variable(make_variable(basic_undefined,list_undefined,lq));
+    else {
+      if (type_variable_p(t)) {
+	variable v = type_variable(t);
+	variable_qualifiers(v) = gen_nconc(variable_qualifiers(v),lq);
+      }
+      else {
+	CParserError("Attributes for not variable type\n");
+      }
     }
+  }
 }
 
 
@@ -1362,13 +1358,13 @@ void CCompilationUnitMemoryAllocations(entity module, boolean first_p)
       }
 
       // Add some preconditions here
-      if(storage_ram_p(s)) 	    {
+      if(storage_ram_p(s)) {
 	ram r = storage_ram(s);
 	entity a = ram_section(r);
 	/* check the type of variable here to avoid conflict declarations */
 	if(!gen_in_list_p(var, code_externs(value_code(entity_initial(module))))) {
-	  if(ram_offset(r) != UNDEFINED_RAM_OFFSET 
-	     && ram_offset(r) != UNKNOWN_RAM_OFFSET 
+	  if(ram_offset(r) != UNDEFINED_RAM_OFFSET
+	     && ram_offset(r) != UNKNOWN_RAM_OFFSET
 	     && ram_offset(r) != DYNAMIC_RAM_OFFSET ) {
 	    if(first_p) {
 	      pips_user_warning
@@ -1412,14 +1408,14 @@ void CModuleMemoryAllocation(entity module)
 {
   list ld = entity_declarations(module);
   entity var = entity_undefined;
-  
+
   pips_debug(8,"MEMORY ALLOCATION BEGINS\n");
   nodecl_p(module,ModuleStatement);
   //print_entities(ld);
   for(; !ENDP(ld); ld = CDR(ld))
     {
       var = ENTITY(CAR(ld));
-     
+
       if(type_variable_p(entity_type(var)))
 	{
 	  storage s = entity_storage(var);
@@ -1854,16 +1850,16 @@ void UpdateEntity(entity e, stack ContextStack, stack FormalStack, stack Functio
   }
   else if(type_variable_p(ultimate_type(entity_type(e)))) {
     /* The entities for the type_variable is added to the
-       current module and the declarations*/  
+       current module and the declarations*/
     entity function = get_current_module_entity();
-	    
+
     /* It is too early to use extern_entity_p() */
     //if(extern_entity_p(function, e))
     if(strstr(entity_name(e),TOP_LEVEL_MODULE_NAME) != NULL)
       if(!empty_scope_p(c_parser_context_scope(context)))
 	/* Keyword EXTERN has just been encountered */
 	AddToExterns(e,function);
-	    
+
     /* To avoid multiple declarations */
     if(!gen_in_list_p(e, code_externs(value_code(entity_initial(function)))) &&
        gen_in_list_p(e, code_declarations(value_code(entity_initial(function))))) {
@@ -1925,8 +1921,8 @@ void UpdateEntity(entity e, stack ContextStack, stack FormalStack, stack Functio
   }
   else
     pips_assert("not implemented yet", FALSE);
-  
-   
+
+
   /************************* INITIAL VALUE PART ****************************************/
   if(value_undefined_p(entity_initial(e))) {
     entity_initial(e) = make_value_unknown();
@@ -2133,9 +2129,9 @@ void UpdateAbstractEntity(entity e, stack ContextStack)
       t2 = UpdateType(t1,t2);
     }
   entity_type(e) = t2;
-   
+
   /************************* STORAGE PART *******************************************/
-  
+
   entity_storage(e) = storage_undefined;
 }
 
@@ -2197,10 +2193,10 @@ void UpdateDerivedEntity(list ld, entity e, stack ContextStack)
       c_parser_context context = stack_head(ContextStack);
       type tc = c_parser_context_type(context);
       type t1,t2;
-      
+
       /* what about context qualifiers ? */
       t2 = UpdateType(t,tc);
-      
+
       while (stack_size(s) > 1)
 	{
 	  t1 = stack_pop(s);

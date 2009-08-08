@@ -1644,22 +1644,38 @@ init_declarator:                             /* ISO 6.7 */
 				  ;
 				}
 				else {
-				  pips_user_warning("double definition of initial"
-						    " value for variable %s\n", entity_name(v));
-				  fprintf(stderr, "New initial value expression:\n");
-				  print_expression(nie);
-				  fprintf(stderr, "Current initial value:\n");
-				  if(value_expression_p(oiv)) {
-				    print_expression(value_expression(oiv));
+				  type vt =entity_type(v);
+				  type uvt = type_undefined_p(vt)? type_undefined
+				    : ultimate_type(entity_type(v));
+				  if(!type_undefined_p(uvt) &&
+				     ((pointer_type_p(uvt) &&
+				       type_functional_p(basic_pointer(variable_basic(type_variable(uvt)))))
+				      || type_functional_p(uvt)) ) {
+				    /* A pointer to a function
+				       already has value code as
+				       initial value. We may not even
+				       know yet it's a pointer... */
+				    pips_user_warning("The initialization of a function pointer is lost\n");
 				  }
 				  else {
-				    fprintf(stderr, "Value tag: %d\n", value_tag(entity_initial(v)));
+				    pips_user_warning("double definition of initial"
+						      " value for variable %s\n", entity_name(v));
+				    fprintf(stderr, "New initial value expression:\n");
+				    print_expression(nie);
+				    fprintf(stderr, "Current initial value:\n");
+				    if(value_expression_p(oiv)) {
+				      print_expression(value_expression(oiv));
+				    }
+				    else {
+				      fprintf(stderr, "Value tag: %d\n", value_tag(entity_initial(v)));
+				    }
+				    pips_internal_error("Scoping not implemented yet, might be the reason\n");
 				  }
-				  pips_internal_error("Scoping not implemented yet, might be the reason\n");
 				}
 			      }
 			    }
-			    entity_initial(v) = make_value_expression(nie);
+			    if(value_undefined_p(entity_initial(v)))
+			      entity_initial(v) = make_value_expression(nie);
 			  }
 			}
 ;
@@ -2369,8 +2385,16 @@ direct_decl: /* (* ISO 6.7.5 *) */
 			  /* Well, here it can be a function or a pointer to a function */
 			  entity e = $1; //RenameFunctionEntity($1);
 			  if (value_undefined_p(entity_initial(e))
-			      ||value_unknown_p(entity_initial(e)))
+			      ||value_unknown_p(entity_initial(e))) {
+			    /* If it is a pointer, its value is going
+			       to be "unknown" or "expression"; if it is
+			       a function, its value is going to be
+			       "code". If the value cannot stay
+			       undefined, it should be made
+			       unknown... */
 			    entity_initial(e) = make_value(is_value_code,make_code(NIL,strdup(""),make_sequence(NIL), NIL));
+			    //entity_initial(e) = make_value_unknown();
+			  }
 			  //pips_assert("e is a module", module_name_p(entity_module_name(e)));
 			  PushFunction(e);
 			}
