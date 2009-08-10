@@ -101,7 +101,7 @@ static _uint hash_int_rank(const void*, size_t);
 static int hash_pointer_equal(const void*, const void*);
 static _uint hash_pointer_rank(const void*, size_t);
 static int hash_string_equal(const char*, const char*);
-static _uint hash_string_rank(const void*, size_t);
+extern _uint hash_string_rank(const void*, size_t);
 static int hash_chunk_equal(const gen_chunk*, const gen_chunk*) ;
 static _uint hash_chunk_rank(const gen_chunk*, size_t);
 
@@ -568,8 +568,7 @@ hash_enlarge_table(hash_table htp)
  *   h = ROTATION(...,h) ^ T[ (h^(*s)) % 256];
  * mais...
  */
-
-static _uint hash_string_rank(const void * key, size_t size)
+_uint hash_string_rank(const void * key, size_t size)
 {
   _uint v = 0;
   const char * s;

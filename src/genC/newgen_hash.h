@@ -122,8 +122,8 @@ extern bool hash_map_defined_p GEN_PROTO((hash_table, void *));
 
 /* These two types could/should be declared and used earlier */
 extern hash_equals_t hash_table_equals_function(hash_table h);
-
 extern hash_rank_t hash_table_rank_function(hash_table h);
+extern _uint hash_string_rank(const void *, size_t);
 
 #endif /* newgen_hash_included */
 
