@@ -1995,7 +1995,7 @@ void UpdateEntity(entity e, stack ContextStack, stack FormalStack, stack Functio
 	     entity_name(e),
 	     list_to_string(safe_c_words_entity(entity_type(e), NIL)),
 	     storage_to_string(entity_storage(e)));
-  
+
   pips_assert("Current entity is consistent",entity_consistent_p(e));
 }
 
@@ -2734,4 +2734,65 @@ void StackPush(stack OffsetStack)
 {
   int i = basic_int((basic) stack_head(OffsetStack));
   stack_push((char *) make_basic_int(i+1),OffsetStack); 
+}
+
+/* Be careful if the initial value has already been set.
+ *
+ * Detect double definitions when possible
+ *
+ * Take care of the special case of pointers to functions.
+ */
+void set_entity_initial(entity v, expression nie)
+{
+  value oiv = entity_initial(v);
+
+  if(!value_undefined_p(oiv) && value_unknown_p(oiv)) {
+    free_value(oiv);
+    entity_initial(v) = value_undefined;
+    oiv = value_undefined;
+  }
+
+  if(!value_undefined_p(oiv)) {
+    if(compilation_unit_p(get_current_module_name())) {
+      /* The compilation unit has already
+	 been scanned once for
+	 declarations. Double definitions
+	 are no surprise...*/
+      ;
+    }
+    else {
+      type vt = entity_type(v);
+      type uvt = type_undefined_p(vt)? type_undefined
+	: ultimate_type(entity_type(v));
+      if(!type_undefined_p(uvt) &&
+	 ((pointer_type_p(uvt) &&
+	   type_functional_p(basic_pointer(variable_basic(type_variable(uvt)))))
+	  || type_functional_p(uvt)) ) {
+	/* A pointer to a function already has value code as initial
+	   value. We may not even know yet it's a pointer... */
+	code c = value_code(oiv);
+	statement s = make_expression_statement(nie);
+
+	code_initializations(c) = make_sequence(CONS(STATEMENT, s, NIL));
+	//pips_user_warning("The initialization of a function pointer is lost\n");
+      }
+      else {
+	pips_user_warning("double definition of initial"
+			  " value for variable %s\n", entity_name(v));
+	fprintf(stderr, "New initial value expression:\n");
+	print_expression(nie);
+	fprintf(stderr, "Current initial value:\n");
+	if(value_expression_p(oiv)) {
+	  print_expression(value_expression(oiv));
+	}
+	else {
+	  fprintf(stderr, "Value tag: %d\n", value_tag(entity_initial(v)));
+	}
+	pips_internal_error("Scoping might be the reason\n");
+      }
+    }
+  }
+
+  if(value_undefined_p(entity_initial(v)))
+    entity_initial(v) = make_value_expression(nie);
 }

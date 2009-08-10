@@ -65,14 +65,14 @@ void dump_common_layout(string_buffer result, entity c, bool debug_p, bool isfor
 					  itoa(area_size(type_area(entity_type(c)))),
 					  ":",NL,NULL));
 
-  
+
   if(ENDP(members)) {
     pips_assert("An empty area has size 0", area_size(type_area(entity_type(c))) ==0);
     string_buffer_append(result, concatenate("\t* empty area *",NL,NL,NULL));
   }
   else {
     // Different preconditions for C and fortran
- 
+
     if(isfortran){
       if(area_size(type_area(entity_type(c)))==0
 	 && fortran_relevant_area_entity_p(c))
@@ -99,13 +99,12 @@ void dump_common_layout(string_buffer result, entity c, bool debug_p, bool isfor
 	}
     }
     if(isfortran){
-      MAP(ENTITY, m, 
-      {
+      FOREACH(ENTITY, m, members) {
 	pips_assert("RAM storage",
 		    storage_ram_p(entity_storage(m)));
 	if(ram_function(storage_ram(entity_storage(m)))==mod) {
 	  int s;
-    
+
 	  if(ram_section(storage_ram(entity_storage(m)))!=c) {
 	    pips_error("print_common_layout",
 		       "Variable %s declared in area %s but allocated in area %s\n",
@@ -133,21 +132,19 @@ void dump_common_layout(string_buffer result, entity c, bool debug_p, bool isfor
 	  string_buffer_append(result,
 			       concatenate("\tsize = ",itoa(s),NL,NULL));
 	}
-      }, 
-	  members);
+      }
     }
-    else{
-      MAP(ENTITY, m, 
-      {
+    else {
+      FOREACH(ENTITY, m, members) {
 	pips_assert("RAM storage",
 		    storage_ram_p(entity_storage(m)));
 	int s;
-      
+
 	SizeOfArray(m, &s);
 
 	pips_assert("An area has no offset as -1",
 		    (ram_offset(storage_ram(entity_storage(m)))!= -1));
-      
+
 	if(ram_offset(storage_ram(entity_storage(m))) == DYNAMIC_RAM_OFFSET) {
 	  string_buffer_append(result,
 			       concatenate(
@@ -156,14 +153,13 @@ void dump_common_layout(string_buffer result, entity c, bool debug_p, bool isfor
 					   NL,NULL));
 	}
 	else if (ram_offset(storage_ram(entity_storage(m))) == UNDEFINED_RAM_OFFSET) {
-	    
 	  string_buffer_append(result,
 			       concatenate
 			       ("\tExternal Variable \"", entity_name(m),
-				"\"\toffset = UNKNOWN,\tsize = ",itoa(s),NL,NULL));
+				"\"\toffset = UNKNOWN,\tsize = ",
+				s>0?itoa(s): "unknown", NL, NULL));
 	}
 	else {
-	
 	  string_buffer_append(result,
 			       concatenate
 				      ("\tVariable \"", entity_name(m),"\"\toffset = ",
@@ -171,23 +167,18 @@ void dump_common_layout(string_buffer result, entity c, bool debug_p, bool isfor
 	  string_buffer_append(result,
 			       concatenate("\tsize = ",itoa(s),NL,NULL));
 	}
-      
-      }, 
-	  members);
+      }
     }
-    
+
     string_buffer_append(result, NL);
 
-    MAP(ENTITY, m, 
-    {
+    FOREACH(ENTITY, m, members) {
       list equiv = ram_shared(storage_ram(entity_storage(m)));
 
       equiv_members = arguments_union(equiv_members, equiv);
-    }, 
-	members);
+    }
 
     if(!ENDP(equiv_members)){
-
       equiv_members = arguments_difference(equiv_members, members);
       if(!ENDP(equiv_members)) {
 	sort_list_of_entities(equiv_members);
@@ -195,8 +186,7 @@ void dump_common_layout(string_buffer result, entity c, bool debug_p, bool isfor
 	string_buffer_append(result, concatenate("\tVariables aliased to this common:",NL,
 							NULL));
 
-	MAP(ENTITY, m, 
-	{
+	FOREACH(ENTITY, m, equiv_members) {
 	  pips_assert("RAM storage",
 		      storage_ram_p(entity_storage(m)));
 	  string_buffer_append(result,
@@ -204,8 +194,7 @@ void dump_common_layout(string_buffer result, entity c, bool debug_p, bool isfor
 			       ("\tVariable", entity_name(m) ,"\toffset =",
 				ram_offset(storage_ram(entity_storage(m))),"\tsize = ",
 				SafeSizeOfArray(m),NL,NULL));
-	}, 
-	    equiv_members);
+	}
 	string_buffer_append(result, concatenate(NL,NULL));
 	gen_free_list(equiv_members);
       }
@@ -301,7 +290,7 @@ string get_symbol_table(entity m, bool isfortran)
 
   /* To simplify validation, at the expense of some information about
      the parsing process. */
-  
+
   gen_sort_list(decls, compare_entities);
 
   string_buffer_append(result, concatenate(NL,"Declarations for module \"",
@@ -316,8 +305,7 @@ string get_symbol_table(entity m, bool isfortran)
     string_buffer_append(result, concatenate("\n* empty declaration list *",NL,NL,NULL));
   else
     string_buffer_append(result, concatenate("\nVariable list:",NL,NL,NULL));
-  
- 
+
   for(ce=decls; !ENDP(ce); POP(ce)) {
     entity e = ENTITY(CAR(ce));
     type t = entity_type(e);
@@ -327,7 +315,7 @@ string get_symbol_table(entity m, bool isfortran)
     string_buffer_append(result, concatenate("\tDeclared entity \"",
 					     entity_name(e),"\" with type \"",
 					     type_to_string(t),"\" ",NULL));
-    
+
     /* FI: struct, union and enum are also declared (in theory...), but
        their characteristics should be given differently. */
     if(type_variable_p(t)
@@ -359,7 +347,7 @@ string get_symbol_table(entity m, bool isfortran)
       string_buffer_append(result, NL);
     }
   }
- 
+
   if(!isfortran) {
     list edecls = gen_copy_seq(code_externs(value_code(entity_initial(m))));
 
@@ -452,9 +440,9 @@ string get_symbol_table(entity m, bool isfortran)
       if(type_area_p(entity_type(e))) {
 	dump_common_layout(result, e, FALSE, isfortran);
       }
-    }, 
+    },
     decls);
-    
+
   string_buffer_append(result, concatenate("End of declarations for module ",
 					   module_local_name(m), NL,NL, NULL));
 

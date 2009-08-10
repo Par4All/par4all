@@ -733,7 +733,7 @@ type_to_string(type t)
     case is_type_varargs:
 	return "varargs";
     case is_type_unknown:
-	return "unknow";
+	return "unknown";
     case is_type_void:
 	return "void";
     case is_type_struct:
@@ -2092,15 +2092,16 @@ bool pointer_type_p(type t)
 	  && (variable_dimensions(type_variable(t)) == NIL));
 }
 
-/* Returns TRUE if t is of type struct, union or enum. Need to distinguish 
-   with the case struct/union/enum in type in RI, these are the definitions 
-   of the struct/union/enum themselve, not a variable of this type. 
+/* Returns TRUE if t is of type struct, union or enum. Need to
+   distinguish with the case struct/union/enum in type in RI, these
+   are the definitions of the struct/union/enum themselve, not a
+   variable of this type.
 
    Example : struct foo var;*/
 
 bool derived_type_p(type t)
 {
-  return (type_variable_p(t) && basic_derived_p(variable_basic(type_variable(t))) 
+  return (type_variable_p(t) && basic_derived_p(variable_basic(type_variable(t)))
 	  && (variable_dimensions(type_variable(t)) == NIL));
 }
 
@@ -2578,7 +2579,7 @@ list basic_supporting_entities(list sel, set vt, basic b)
   }
   else
     pips_internal_error("Unrecognized basic tag %d\n", basic_tag(b));
- 
+
   ifdebug(8) {
     pips_debug(8, "End: ");
     print_entities(sel);

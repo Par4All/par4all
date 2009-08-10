@@ -154,7 +154,7 @@ bool SizeOfArray(entity e, int * s)
   }
 
   /* Check for 32 bit signed overflows */
-  mne = INT_MAX/se;
+  mne = se>0 ? INT_MAX/se : INT_MAX;
 
   if(ok) {
     if(mne>=ne)
@@ -263,8 +263,8 @@ int type_memory_size(type t)
   /* A struct (or a union) may be hidden, with its declaration
      located in the source code of a library. For instance,
      "_IO_FILE_plus" in stdio.h. Since it contains at least one byte,
-     let set s to 1 */
-  s = s>0? s : 1;
+     let set s to 1? Or let the caller deal with the problem? */
+  // s = s>0? s : 1;
   return s;
 }
 
@@ -344,7 +344,8 @@ _int SizeOfElements(basic b)
     pips_error("SizeOfElements", "Ill. tag %d for basic", basic_tag(b));
   }
 
-  pips_assert("e is not zero", e!=0);
+  /* Size can be zero, i.e. unknown, for an external variable */
+  //pips_assert("e is not zero", e!=0);
 
   return e;
 }

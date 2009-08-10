@@ -1622,7 +1622,6 @@ init_declarator:                             /* ISO 6.7 */
                         {
 			  entity v = $1;
 			  expression nie = $3;
-			  value oiv = entity_initial(v);
 
 			  if(expression_undefined_p(nie)) {
 			    /* Do nothing, leave the initial field of entity as it is. */
@@ -1631,51 +1630,7 @@ init_declarator:                             /* ISO 6.7 */
 			  else {
 			    (void) simplify_C_expression(nie);
 			    /* Put init_expression in the initial value of entity declarator*/
-			    if(!value_undefined_p(oiv)){
-			      if(value_unknown_p(oiv)) {
-				free_value(oiv);
-			      }
-			      else {
-				if(compilation_unit_p(get_current_module_name())) {
-				  /* The compilation unit has already
-				     been scanned once for
-				     declarations. Double definitions
-				     are no surprise...*/
-				  ;
-				}
-				else {
-				  type vt =entity_type(v);
-				  type uvt = type_undefined_p(vt)? type_undefined
-				    : ultimate_type(entity_type(v));
-				  if(!type_undefined_p(uvt) &&
-				     ((pointer_type_p(uvt) &&
-				       type_functional_p(basic_pointer(variable_basic(type_variable(uvt)))))
-				      || type_functional_p(uvt)) ) {
-				    /* A pointer to a function
-				       already has value code as
-				       initial value. We may not even
-				       know yet it's a pointer... */
-				    pips_user_warning("The initialization of a function pointer is lost\n");
-				  }
-				  else {
-				    pips_user_warning("double definition of initial"
-						      " value for variable %s\n", entity_name(v));
-				    fprintf(stderr, "New initial value expression:\n");
-				    print_expression(nie);
-				    fprintf(stderr, "Current initial value:\n");
-				    if(value_expression_p(oiv)) {
-				      print_expression(value_expression(oiv));
-				    }
-				    else {
-				      fprintf(stderr, "Value tag: %d\n", value_tag(entity_initial(v)));
-				    }
-				    pips_internal_error("Scoping not implemented yet, might be the reason\n");
-				  }
-				}
-			      }
-			    }
-			    if(value_undefined_p(entity_initial(v)))
-			      entity_initial(v) = make_value_expression(nie);
+			    set_entity_initial(v, nie);
 			  }
 			}
 ;

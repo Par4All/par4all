@@ -561,16 +561,14 @@ make_assign_instruction(expression l,
 }
 
 
-statement
-make_assign_statement(expression l,
-                      expression r)
+statement make_assign_statement(expression l,
+				expression r)
 {
     return make_stmt_of_instr(make_assign_instruction(l, r));
 }
 
 
-statement
-make_nop_statement()
+statement make_nop_statement()
 {
     /* Attention: this function and the next one produce the same result,
      * but they are not semantically equivalent. An empty block may be
@@ -581,8 +579,7 @@ make_nop_statement()
     return s;
 }
 
-statement 
-make_empty_block_statement()
+statement make_empty_block_statement()
 {
     statement b;
 
@@ -591,9 +588,7 @@ make_empty_block_statement()
     return b;
 }
 
-statement 
-make_block_statement(body)
-list body;
+statement make_block_statement(list body)
 {
     statement b;
 
@@ -613,9 +608,7 @@ instruction make_instruction_block(list statements)
     return make_instruction_sequence(make_sequence(statements));
 }
 
-statement 
-make_return_statement(module)
-entity module;
+statement make_return_statement(entity module)
 {
     char *module_name = entity_local_name(module);
     string name = concatenate( module_name, MODULE_SEP_STRING, LABEL_PREFIX,
@@ -635,13 +628,13 @@ statement make_stop_statement(string message)
 {
      list args=NIL; 
      expression e;
-  
+
      e = make_call_expression(MakeConstant(message,is_basic_string),NIL);
-       
+
      args = CONS(EXPRESSION,e,NIL);
 
      return make_call_statement(STOP_FUNCTION_NAME, args, entity_undefined, empty_comments);
-   
+
 }
 
 
@@ -673,9 +666,7 @@ insure_return_as_last_statement(
 }
 
 
-statement
-make_continue_statement(l)
-entity l;
+statement make_continue_statement(entity l)
 {
     return make_call_statement(CONTINUE_FUNCTION_NAME, NIL, l,
 			       empty_comments);
@@ -715,8 +706,7 @@ statement make_whileloop_statement(expression condition,
 }
 
 
-statement
-make_call_statement(function_name, args, l, c)
+statement make_call_statement(function_name, args, l, c)
 string function_name;
 list args;
 entity l; /* label, default entity_undefined */
@@ -746,7 +736,14 @@ string c; /* comments, default empty_comments (was: "" (was: string_undefined)) 
   return cs;
 }
 
+statement make_expression_statement(expression e)
+{
+  instruction i = make_instruction_expression(e);
+  statement s = instruction_to_statement(i);
 
+  return s;
+}
+
 /* Extract the body of a perfectly nested loop body.
  */
 statement
@@ -939,7 +936,7 @@ void print_statement_of_module(statement s, string mn)
 text statement_to_text(statement s)
 {
   text t = text_undefined;
-  
+
   debug_on("PRETTYPRINT_DEBUG_LEVEL");
   set_alternate_return_set();
   reset_label_counter();
