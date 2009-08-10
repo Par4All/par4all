@@ -197,11 +197,10 @@ ValueSizeOfArray(entity e)
 
 	taille_elt = (Value) SizeOfElements(variable_basic(a));
 	longueur = ValueNumberOfElements(variable_dimensions(a));
-	
+
 	return(value_mult(taille_elt,longueur));
-	
 }
-    
+
 
 /* BEGIN_EOLE */ /* - please do not remove this line */
 /* Lines between BEGIN_EOLE and END_EOLE tags are automatically included
@@ -224,7 +223,7 @@ int CSafeSizeOfArray(entity a)
 int entity_memory_size(entity dt)
 {
   /* dt is assumed to be a derived type: struct, union, and maybe enum */
-  type t = entity_type(dt);
+  type t = ultimate_type(entity_type(dt));
   int s = type_memory_size(t);
 
   return s;
@@ -261,6 +260,11 @@ int type_memory_size(type t)
     pips_internal_error("arg. with unknown tag %d\n", type_tag(t));
     break;
   }
+  /* A struct (or a union) may be hidden, with its declaration
+     located in the source code of a library. For instance,
+     "_IO_FILE_plus" in stdio.h. Since it contains at least one byte,
+     let set s to 1 */
+  s = s>0? s : 1;
   return s;
 }
 
@@ -339,6 +343,8 @@ _int SizeOfElements(basic b)
   default:
     pips_error("SizeOfElements", "Ill. tag %d for basic", basic_tag(b));
   }
+
+  pips_assert("e is not zero", e!=0);
 
   return e;
 }
