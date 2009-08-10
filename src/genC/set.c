@@ -97,12 +97,14 @@ set set_assign(set s1, set s2)
     return s1;
   }
   else {
-    set_clear( s1 );
-    HASH_MAP( k, v, {hash_put( s1->table, k, v ) ;}, s2->table );
+    set_clear(s1);
+    HASH_MAP(k, v, hash_put( s1->table, k, v ), s2->table);
     return s1;
   }
 }
 
+/* @return s1 = s2 u { e }.
+ */
 set set_add_element(set s1, set s2, void * e)
 {
   if( s1 == s2 ) {
@@ -119,6 +121,8 @@ set set_add_element(set s1, set s2, void * e)
   }
 }
 
+/* @return whether e \in s.
+ */
 bool set_belong_p(set s, void * e)
 {
   /* GO 7/8/95:
@@ -132,18 +136,22 @@ bool set_belong_p(set s, void * e)
   return hash_get(s->table, e) != HASH_UNDEFINED_VALUE;
 }
 
+/* @return s1 = s2 u s3.
+ */
 set set_union(set s1, set s2, set s3)
 {
   if( s1 != s3 ) {
-    set_assign( s1, s2 ) ;
-    HASH_MAP( k, v, {hash_put( s1->table, k, v ) ;}, s3->table ) ;
+    set_assign(s1, s2) ;
+    HASH_MAP( k, v, hash_put( s1->table, k, v), s3->table ) ;
   }
   else {
-    HASH_MAP( k, v, {hash_put( s1->table, k, v ) ;}, s2->table ) ;
+    HASH_MAP( k, v, hash_put( s1->table, k, v), s2->table ) ;
   }
-  return( s1 ) ;
+  return s1;
 }
 
+/* @return s1 = s2 n s3.
+ */
 set set_intersection(set s1, set s2, set s3)
 {
   if( s1 != s2 && s1 != s3 ) {
@@ -169,18 +177,22 @@ set set_intersection(set s1, set s2, set s3)
   }
 }
 
+/* @return s1 = s2 - s3.
+ */
 set set_difference(set s1, set s2, set s3)
 {
   set_assign(s1, s2);
-  HASH_MAP(k, ignore, hash_del( s1->table, k ), s3->table);
+  HASH_MAP(k, ignore, hash_del(s1->table, k), s3->table);
   return s1;
 }
 
+/* @return s1 = s2 - { e }.
+ */
 set set_del_element(set s1, set s2, void * e)
 {
-    set_assign( s1, s2 ) ;
-    hash_del( s1->table, e );
-    return( s1 ) ;
+  set_assign( s1, s2 ) ;
+  hash_del( s1->table, e );
+  return s1;
 }
 
 /* May be useful for string sets ... NOT TESTED
@@ -303,7 +315,7 @@ list set_to_list(set s)
 }
 
 /* @return a sorted list from a set.
- * provide comparison function as gen_sort_list.
+ * provide comparison function as gen_sort_list, which calls "qsort".
  */
 list set_to_sorted_list(set s, int (*cmp)(const void *,const void *))
 {
