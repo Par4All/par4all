@@ -479,6 +479,9 @@ list gen_last(list l)
     return l;
 }
 
+/* remove item o from list *pl which is modified as a side effect.
+ * @param once whether to do it once, or to look for all occurences.
+ */
 static void gen_remove_from_list(list * pl, void * o, bool once)
 {
   list * pc = pl;
@@ -498,6 +501,8 @@ static void gen_remove_from_list(list * pl, void * o, bool once)
   }
 }
 
+/* remove all occurences of item o from list *cpp, which is thus modified.
+ */
 void gen_remove(list * cpp, void * o)
 {
   gen_remove_from_list(cpp, o, FALSE);
