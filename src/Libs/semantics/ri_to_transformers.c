@@ -398,9 +398,10 @@ test_to_transformer(test t, transformer pre, list ef) /* effects of t */
   return tf;
 }
 
-transformer 
-intrinsic_to_transformer(
-    entity e, list pc, transformer pre, list ef) /* effects of intrinsic call */
+transformer intrinsic_to_transformer(entity e,
+				     list pc,
+				     transformer pre,
+				     list ef) /* effects of intrinsic call */
 {
   transformer tf = transformer_undefined;
 
@@ -1234,6 +1235,8 @@ transformer c_return_to_transformer(entity e __attribute__ ((__unused__)),
 	tf = any_expression_to_transformer(rv, expr, pre, FALSE);
 	if(transformer_undefined_p(tf))
 	  tf = effects_to_transformer(ef);
+	else
+	  tf = transformer_temporary_value_projection(tf);
 	tf = transformer_add_value_update(tf, rv);
       }
     }
