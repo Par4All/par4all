@@ -385,7 +385,9 @@
 #define VSNPRINTF_FUNCTION_NAME         "vsnprintf"
 #define VSPRINTF_FUNCTION_NAME          "vsprintf"
 #define SPRINTF_FUNCTION_NAME           "sprintf"
+#define VSCANF_FUNCTION_NAME            "vscanf"
 #define VSSCANF_FUNCTION_NAME           "vsscanf"
+#define VFSCANF_FUNCTION_NAME           "vfscanf"
 #define GETC_FUNCTION_NAME              "getc"
 #define _IO_GETC_FUNCTION_NAME          "_IO_getc" /* libio.h */
 #define GETCHAR_FUNCTION_NAME           "getchar"
