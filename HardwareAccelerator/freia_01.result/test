@@ -85,9 +85,8 @@ freia_status freia_stuff(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
    freia_data2d *tmp2 = freia_common_create_data(16, 128, 128);
    
    // o = inf(i0 + i1, i0) - i0
-   freia_stuff_helper_0(o, i0, i1);                                     /*0010*/
    ;
-   ;
+   freia_stuff_helper_0(o, i0, i1);                                     /*0012*/
 
    freia_common_destruct_data(tmp1);                                    /*0014*/
    freia_common_destruct_data(tmp2);                                    /*0015*/
