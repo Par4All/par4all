@@ -1,5 +1,4 @@
 // Minimal self contained types for these headers
-struct __freia_data2d;
 typedef struct __freia_data2d * freia_data2d;
 typedef enum { FREIA_OK, FREIA_ERROR } freia_status;
 typedef int int32_t;
