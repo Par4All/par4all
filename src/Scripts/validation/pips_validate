@@ -31,16 +31,48 @@ rev=${rev/ */}
 
 shopt -s extglob
 
+# find pips root (to find scripts arch.sh & version.sh), see pips.sh
+if [[ $PIPS_ROOT ]]
+then
+  root="$PIPS_ROOT"
+else
+  # find the actual directory of the current script
+  # I have not found this information in any of bash variables.
+  case $0 in
+    /*)
+      # script launched with an absolute path: /abs/path/to/{bin,utils}/XXX
+      where=`dirname $0`
+      ;;
+    */*)
+      # script launched with a relative path: rel/path/to/{bin,utils}/XXX
+      where=$PWD/`dirname $0`
+      ;;
+    *)
+      # else script launched based on PATH: XXX
+      name=`basename $0`
+      where=`type -p $name`
+      ;;
+  esac
+
+  # check that we get something...
+  [ "$where" ] || error 2 "no such directory: $where"
+
+  # derive pips root by stripping the last directory component of this script
+  root=`dirname $where`
+
+  [ -d ${root} ] || error 2 "no such directory: $root"
+fi
+
 # DEFAULTS
 # where is the validation?
-vdir=${PIPS_VALIDDIR:-$PIPS_ROOT/../../validation}
+vdir=${PIPS_VALIDDIR:-$root/../../validation}
 
 # default running directory
 rdir=.
 recurse=
 
 # get default architecture and tpips/pips
-arch=${PIPS_ARCH:-$($PIPS_ROOT/makes/arch.sh)}
+arch=${PIPS_ARCH:-$($root/makes/arch.sh)}
 tpips=$(type -p tpips)
 pips=$(type -p pips)
 
@@ -114,10 +146,6 @@ function verb()
       echo " $msg"
   } >&2
 }
-
-# checks
-[[ $PIPS_ROOT ]] || usage 2 'PIPS_ROOT must be defined'
-[[ -d $PIPS_ROOT ]] || usage 2 "no root directory: $PIPS_ROOT"
 
 # get options
 while [ "$1" ] ; do
@@ -206,7 +234,7 @@ fi
 
 echo "validation for $@
 in directory ${vdir}/
-  $($PIPS_ROOT/makes/version.sh $vdir)
+  $($root/makes/version.sh $vdir)
 for $arch architecture
 output in directory ${odir}/
 with pips=$pips
