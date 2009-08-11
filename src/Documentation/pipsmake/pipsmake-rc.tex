@@ -4456,6 +4456,7 @@ It finds the kernel at \verb+LOOP_LABEL+ and flag it with a pragma for further u
 %%!UserManualDocumentation
 \begin{PipsMake}
 kernelize				> MODULE.code
+		> MODULE.callees
 		! MODULE.privatize_module
 		! MODULE.coarse_grain_parallelization
 		> PROGRAM.entities
@@ -4466,7 +4467,6 @@ The property \verb+KERNEL_NBNODES+ is used to set the number of nodes for this k
 
 \begin{PipsProp}
 KERNEL_NBNODES 128
-KERNEL_LABEL ""
 \end{PipsProp}
 
 %%@UserManualDocumentation: terapixify

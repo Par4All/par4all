@@ -65,7 +65,7 @@ bool do_kernelize(statement s, entity loop_label)
             (statement_loop_p(s) && same_entity_p(loop_label(statement_loop(s)),loop_label)))
     {
         if( !instruction_loop_p(statement_instruction(s)) )
-            pips_user_error("you choosed a label of a non-doloop statement");
+            pips_user_error("you choosed a label of a non-doloop statement\n");
 
         loop l = instruction_loop(statement_instruction(s));
 
@@ -165,6 +165,7 @@ bool kernelize(char * module_name)
     /* validate */
     module_reorder(get_current_module_statement());
     DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name,get_current_module_statement());
+    DB_PUT_MEMORY_RESOURCE(DBR_CALLEES, module_name, compute_callees(get_current_module_statement()));
 
     /*postlude*/
     reset_current_module_entity();
