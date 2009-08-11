@@ -48,6 +48,7 @@ $(TMP_PREFIX)$(PYTHON_MODULE).c:$(PYTHON_MODULE).tmp $(PYTHON_MODULE).c
 
 $(PYTHON_MODULE).h:$(TMP_PREFIX)$(PYTHON_MODULE).c
 	$(PROTOIZE) $< > $@
+	echo "extern char *activate(char *phase);" >> $@
 
 $(PYTHON_MODULE).I:$(PYTHON_MODULE).i $(PYTHON_MODULE).h
 	sed -e 's/SWIG_MODULE_NAME/$(PYTHON_MODULE)/' $^ > $@
@@ -73,6 +74,9 @@ check:sample.py all
 	python -c "import pypips"
 	python -c "import pyps"
 	PAGER=cat ./$<
+
+checkall:xpc.py
+	python ./xpc.py --module=foo --sources=carto.c,get.c --algo=genetic --nbgen=2 --CPPFLAGS=-DSIZE=100
 
 DOCSTRING=%%@UserManualDocumentation:
 pyps.py: ../../Documentation/pipsmake/pipsmake-rc.tex _pyps.py pipsmakerc2python.pl

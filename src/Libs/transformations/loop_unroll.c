@@ -149,17 +149,12 @@ void do_loop_unroll(statement loop_statement, int rate, void (*statement_post_pr
                    inc = range_increment(lr);
         entity nub, ib, lu_ind;
         expression rhs_expr, expr;
-        string module_name = db_get_current_module_name();
-        entity mod_ent = module_name_to_entity(module_name);
         entity label_entity;
         statement body, stmt;
         instruction block, inst;
         range rg;
         int lbval, ubval, incval;
         bool numeric_range_p = FALSE;
-        
-            pips_assert("loop_unroll", mod_ent != entity_undefined);
-        /* "module entity undefined\n"); */
         if(get_debug_level()==7) {
             /* Start debug in Newgen */
             gen_debug |= GEN_DBG_CHECK;
@@ -176,13 +171,8 @@ void do_loop_unroll(statement loop_statement, int rate, void (*statement_post_pr
         /* Entity LU_NUB is created and initializing statement is created
          * LU_NUB = ((UB - LB) + INC)/INC 
          */
-        /* 
-           nub = make_scalar_integer_entity(NORMALIZED_UPPER_BOUND_NAME, 
-           module_name);
-           AddEntityToDeclarations( mod_ent, nub);
-           */
         nub = make_new_scalar_variable_with_prefix(NORMALIZED_UPPER_BOUND_NAME, 
-                mod_ent,
+                get_current_module_entity(),
                 copy_basic(indb)
                 /* MakeBasic(is_basic_int)*/);
         AddEntityToCurrentModule(nub);
@@ -218,13 +208,8 @@ void do_loop_unroll(statement loop_statement, int rate, void (*statement_post_pr
         /* Entity LU_IB is created and initializing statement is created 
          * LU_IB = MOD(LU_NUB, rate)
          */
-        /*
-           ib = make_scalar_integer_entity(INTERMEDIATE_BOUND_NAME,
-           module_name);
-           AddEntityToDeclarations( mod_ent, ib);
-           */
         ib = make_new_scalar_variable_with_prefix(INTERMEDIATE_BOUND_NAME, 
-                mod_ent,
+                get_current_module_entity(),
                 copy_basic(indb)
                 /* MakeBasic(is_basic_int)*/);
         AddEntityToCurrentModule(ib);
@@ -252,12 +237,8 @@ void do_loop_unroll(statement loop_statement, int rate, void (*statement_post_pr
              * ENDDO
              */
             /* Entity LU_IND is created */
-            /*
-               lu_ind = make_scalar_integer_entity(INDEX_NAME,module_name);
-               AddEntityToDeclarations( mod_ent, lu_ind);
-               */
             lu_ind = make_new_scalar_variable_with_prefix(INDEX_NAME, 
-                    mod_ent,
+                    get_current_module_entity(),
                     copy_basic(indb)
                     );
         AddEntityToCurrentModule(lu_ind);
@@ -287,12 +268,10 @@ void do_loop_unroll(statement loop_statement, int rate, void (*statement_post_pr
             pips_assert("loop_unroll", expression_consistent_p(expr));
             /* "gen_copy_tree returns bad expression(s)\n"); */
         }
-        StatementReplaceReference(body,
-                make_reference(ind,NIL),
-                expr);
+        replace_entity_by_expression(body,ind,expr);
         free_expression(expr);
 
-        label_entity = make_new_label(module_name);
+        label_entity = make_new_label(get_current_module_name());
         stmt = make_continue_statement(label_entity);
         body = make_block_statement(CONS(STATEMENT, body,
                     CONS(STATEMENT, stmt, NIL)));
@@ -336,7 +315,7 @@ void do_loop_unroll(statement loop_statement, int rate, void (*statement_post_pr
 
         /* Create body of the loop, with updated index */
         body = make_empty_block_statement();
-        label_entity = make_new_label(module_name);
+        label_entity = make_new_label(get_current_module_name());
         instruction_block(statement_instruction(body)) =  
             CONS(STATEMENT, make_continue_statement(label_entity), NIL);
         while(--rate>=0) {
@@ -359,9 +338,8 @@ void do_loop_unroll(statement loop_statement, int rate, void (*statement_post_pr
             ifdebug(9) {
                 pips_assert("loop_unroll", expression_consistent_p(expr));
             }
-            StatementReplaceReference(transformed_stmt,
-                    make_reference(ind,NIL),
-                    expr);
+            replace_entity_by_expression(transformed_stmt,ind,expr);
+
             ifdebug(9) {
                 pips_assert("loop_unroll", statement_consistent_p(transformed_stmt));
             }
@@ -370,41 +348,41 @@ void do_loop_unroll(statement loop_statement, int rate, void (*statement_post_pr
             ifdebug(9) {
                 pips_assert("loop_unroll", statement_consistent_p(transformed_stmt));
             }
-			if( statement_post_processor)
-				statement_post_processor(transformed_stmt);
+            if( statement_post_processor)
+                statement_post_processor(transformed_stmt);
 
 
             /* Add the transformated old loop body (transformed_stmt) at
              * the begining of the loop */
-			if( get_bool_property("LOOP_UNROLL_MERGE") && instruction_block_p(statement_instruction(transformed_stmt)) ) {
-					if(ENDP(statement_declarations(body)))
-						statement_declarations(body)=statement_declarations(transformed_stmt);
-					else {
-						list declaration_initializations = NIL;
-						FOREACH(ENTITY,e,statement_declarations(transformed_stmt))
-						{
-                            value v = entity_initial(e);
-                            if( value_expression_p(v) )
-                            {
-                                statement s = make_assign_statement(
-                                        make_expression_from_entity(e),
-                                        copy_expression(value_expression(v)));
-                                declaration_initializations=CONS(STATEMENT,s,declaration_initializations);
-                            }
-						}
-						declaration_initializations=gen_nreverse(declaration_initializations);
-						instruction_block(statement_instruction(transformed_stmt))=
-							gen_nconc(declaration_initializations,instruction_block(statement_instruction(transformed_stmt)));
-					}
-					instruction_block(statement_instruction(body)) =
-					gen_nconc( instruction_block(statement_instruction(body)),
-							instruction_block(statement_instruction(transformed_stmt)));
-			}
-			else {
-				instruction_block(statement_instruction(body)) = CONS(STATEMENT,
-						transformed_stmt,
-						body_block);
-			}
+            if( get_bool_property("LOOP_UNROLL_MERGE") && instruction_block_p(statement_instruction(transformed_stmt)) ) {
+                if(ENDP(statement_declarations(body)))
+                    statement_declarations(body)=statement_declarations(transformed_stmt);
+                else {
+                    list declaration_initializations = NIL;
+                    FOREACH(ENTITY,e,statement_declarations(transformed_stmt))
+                    {
+                        value v = entity_initial(e);
+                        if( value_expression_p(v) )
+                        {
+                            statement s = make_assign_statement(
+                                    make_expression_from_entity(e),
+                                    copy_expression(value_expression(v)));
+                            declaration_initializations=CONS(STATEMENT,s,declaration_initializations);
+                        }
+                    }
+                    declaration_initializations=gen_nreverse(declaration_initializations);
+                    instruction_block(statement_instruction(transformed_stmt))=
+                        gen_nconc(declaration_initializations,instruction_block(statement_instruction(transformed_stmt)));
+                }
+                instruction_block(statement_instruction(body)) =
+                    gen_nconc( instruction_block(statement_instruction(body)),
+                            instruction_block(statement_instruction(transformed_stmt)));
+            }
+            else {
+                instruction_block(statement_instruction(body)) = CONS(STATEMENT,
+                        transformed_stmt,
+                        body_block);
+            }
         }
 
         /* Create loop and insert it in block */
@@ -482,6 +460,7 @@ loop_unroll(statement loop_statement, int rate)
     do_loop_unroll(loop_statement, rate, NULL);
 }
 
+
 /* get rid of the loop by body duplication; 
  * the loop body is duplicated as many times
  * as there were iterations
@@ -545,9 +524,7 @@ void full_loop_unroll(statement loop_statement)
         ifdebug(9) {
             pips_assert("full_loop_unroll", expression_consistent_p(expr));
         }
-        StatementReplaceReference(transformed_stmt,
-                make_reference(ind,NIL),
-                expr);
+        replace_entity_by_expression(transformed_stmt,ind,expr);
         ifdebug(9) {
             pips_assert("full_loop_unroll", statement_consistent_p(transformed_stmt));
         }
@@ -638,91 +615,6 @@ void full_loop_unroll(statement loop_statement)
     debug(3, "full_loop_unroll", "done\n");
 }
 
-/* 
- * recursiv_loop_unroll(stmt, lb_ent, rate)
- * if stmt is a loop labeled lb_ent, unrolls it rate times and returns FALSE;
- * else go through the control graph until FALSE is returned; returns TRUE 
- * when not found.
- *
- * BB, 6.12.91
- */
-bool recursiv_loop_unroll(statement stmt, entity lb_ent, int rate)
-{
-    instruction inst = statement_instruction(stmt);
-    entity stmt_label = statement_label(stmt);
-    bool not_done = TRUE;
-
-    debug(8, "recursiv_loop_unroll", "begin with tag %d\n", 
-	  instruction_tag(inst));
-
-    switch(instruction_tag(inst)) {
-      case is_instruction_block :
-	MAPL( sts, {
-	    statement s = STATEMENT(CAR(sts));
-
-	    if(!recursiv_loop_unroll(s, lb_ent, rate)) {
-		not_done = FALSE;
-		break;
-	    }
-	}, instruction_block(inst));
-	break;
-      case is_instruction_test : {
-	  test t = instruction_test(inst);
-
-	  not_done =  recursiv_loop_unroll(test_true(t), lb_ent, rate) ?
-		 recursiv_loop_unroll(test_false(t), lb_ent, rate) : FALSE;
-
-	  break;
-      }
-      case is_instruction_loop : {
-	  entity do_lab_ent = loop_label(instruction_loop(inst));
-	  /* is it the right label? */
-	  if ( entity_undefined_p(do_lab_ent) && entity_undefined_p(stmt_label) ) {
-	      pips_error("recursive_loop_unroll", "DO label undefined\n");
-	      not_done = TRUE;
-	  }
-	  else if (gen_eq(lb_ent, do_lab_ent) || gen_eq(lb_ent,stmt_label) ) {
-	      loop_unroll(stmt, rate);
-	      not_done = FALSE;
-	  }
-	  else {
-	      statement b = loop_body(instruction_loop(inst));
-	      debug(8, "recursiv_loop_unroll", 
-		    "loop labeled %s not unrolled; goind downwards\n", 
-		    local_name(entity_name(do_lab_ent)) );
-	      not_done = recursiv_loop_unroll(b, lb_ent, rate);
-	  }
-	  break;
-      }
-      case is_instruction_call :
-	  not_done = TRUE;
-	  break;
-      case is_instruction_goto :
-	  pips_error("recursiv_loop_unroll", 
-		       "Unexpected goto\n");
-	break;
-      case is_instruction_whileloop:
-	  pips_error("recursiv_loop_unroll", 
-		       "Unexpected while loop - not yet implemented\n");
-	break;
-      case is_instruction_unstructured :
-	  /* ?? What should I do? go down the unstructured!
-	   * there is a special macro for that! 
-	   */
-	  pips_error("recursiv_loop_unroll", "Sorry: unstructured not implemented\n");
-	  break;
-	default : 
-	    pips_error("recursiv_loop_unroll", 
-		       "Bad instruction tag\n");
-    }
-
-    debug(8, "recursiv_loop_unroll", "end with result: %s\n", 
-	  bool_to_string(not_done));
-
-    return not_done;
-}
-
-
 /* Top-level functions
  */
 
@@ -731,136 +623,84 @@ unroll(char *mod_name)
 {
     statement mod_stmt;
     instruction mod_inst;
-    cons *blocs = NIL;
-    char lp_label[6];
+    char *lp_label = NULL;
     entity lb_ent;
     int rate;
-    string resp;
-    bool return_status;
+    bool return_status =true;
 
     debug_on("UNROLL_DEBUG_LEVEL");
 
     /* Get the loop label form the user */
-    resp = user_request("Which loop do you want to unroll?\n(give its label): ");
-    if (resp[0] == '\0')
-	/* User asked to cancel: */
-	return_status = FALSE;
-    else {    
-	sscanf(resp, "%s", lp_label);
-	lb_ent = find_label_entity(mod_name, lp_label);
-	if (lb_ent == entity_undefined)
-	    user_error("unroll", "loop label `%s' does not exist\n", lp_label);
+    lp_label=get_string_property_or_ask("LOOP_LABEL","Which loop do you want to unroll?\n(give its label):");
+    if( empty_string_p(lp_label) )
+        return_status = false;
+    else {
+        lb_ent = find_label_entity(mod_name, lp_label);
+        if (entity_undefined_p(lb_ent))
+            user_error("unroll", "loop label `%s' does not exist\n", lp_label);
 
-	/* Get the unrolling factor from the user */
-	resp = user_request("How many times do you want to unroll?\n(choose integer greater or egal to 2): ");
-	if (resp[0] == '\0')
-	    /* User asked to cancel: */
-	    return_status = FALSE;
-	else {
-	    if(sscanf(resp, "%d", &rate)!=1 || rate <= 1) {
-		user_error("unroll", "unroll factor should be greater than 2\n");
-	    }
+        /* Get the unrolling factor from the user */
+        rate = get_int_property("UNROLL_RATE");
+        if( rate <= 1 ) {
+            string resp = user_request("How many times do you want to unroll?\n(choose integer greater or egal to 2): ");
 
-	    debug(1,"unroll","Unroll %d times loop %s in module %s\n",
-		  rate, lp_label, mod_name);
+            if (empty_string_p(resp))
+                /* User asked to cancel: */
+                return_status = false;
+            else {
+                if(sscanf(resp, "%d", &rate)!=1 || rate <= 1)
+                    user_error("unroll", "unroll factor should be greater than 2\n");
+            }
+        }
+        if( return_status ) {
 
-	    /* Sets the current module to "mod_name". */
-	    /* current_module(module_name_to_entity(mod_name)); */
+            debug(1,"unroll","Unroll %d times loop %s in module %s\n",
+                    rate, lp_label, mod_name);
 
-	    /* DBR_CODE will be changed: argument "pure" should take FALSE 
-	       but this would be useless
-	       since there is only *one* version of code; a new version 
-	       will be put back in the
-	       data base after unrolling */
+            /* Sets the current module to "mod_name". */
+            /* current_module(module_name_to_entity(mod_name)); */
 
-	    mod_stmt = (statement) db_get_memory_resource(DBR_CODE, mod_name, TRUE);
-	    mod_inst = statement_instruction(mod_stmt);
+            /* DBR_CODE will be changed: argument "pure" should take FALSE 
+               but this would be useless
+               since there is only *one* version of code; a new version 
+               will be put back in the
+               data base after unrolling */
 
-        /* prelude */
-        set_current_module_entity(module_name_to_entity( mod_name ));
-        set_current_module_statement( mod_stmt);
+            mod_stmt = (statement) db_get_memory_resource(DBR_CODE, mod_name, TRUE);
+            mod_inst = statement_instruction(mod_stmt);
 
-	    switch (instruction_tag (mod_inst)) {
+            /* prelude */
+            set_current_module_entity(module_name_to_entity( mod_name ));
+            set_current_module_statement( mod_stmt);
 
-	    case is_instruction_block:
-		MAP(STATEMENT, stmt, {recursiv_loop_unroll (stmt, lb_ent, rate);}, 
-		    instruction_block (mod_inst));
-		break;
+            /* do the job */
+            statement loop_statement = find_loop_from_label(mod_stmt,lb_ent);
+            if( ! statement_undefined_p(loop_statement) )
+                loop_unroll(loop_statement,rate);
+            else
+                pips_user_error("label '%s' is not linked to a loop\n", lp_label);
 
-	    case is_instruction_unstructured:
+            /* Reorder the module, because new statements have been generated. */
+            module_reorder(mod_stmt);
 
-		/* go through unstructured and apply recursiv_loop_unroll */
-		CONTROL_MAP(ctl, {
-		    statement st = control_statement(ctl);
-
-		    debug(5, "unroll", "will replace in statement %d\n",
-			  statement_number(st));
-		    recursiv_loop_unroll(st, lb_ent, rate);	
-		}, unstructured_control(instruction_unstructured(mod_inst)), blocs);
-	
-		gen_free_list(blocs);
-		break;
-
-	    default:
-		user_warning ("unroll", "Non-acceptable instruction tag %d\n",
-			      instruction_tag (mod_inst));
-	    }
-
-	    /* Reorder the module, because new statements have been generated. */
-	    module_reorder(mod_stmt);
-
-	    DB_PUT_MEMORY_RESOURCE(DBR_CODE, mod_name, mod_stmt);
-        /*postlude*/
-        reset_current_module_entity();
-        reset_current_module_statement();
-	    return_status = TRUE;
-	}
+            DB_PUT_MEMORY_RESOURCE(DBR_CODE, mod_name, mod_stmt);
+            /*postlude*/
+            reset_current_module_entity();
+            reset_current_module_statement();
+            return_status = true;
+        }
     }
-    
+
     debug(2,"unroll","done for %s\n", mod_name);
     debug_off();
 
-    if (return_status == FALSE)
-	user_log("Loop unrolling has been cancelled.\n");
-    
+    if ( ! return_status )
+        user_log("Loop unrolling has been cancelled.\n");
+
     return return_status;
 }
 
-static entity searched_loop_label = entity_undefined;
-
-bool find_loop_and_fully_unroll(statement s)
-{
-  instruction inst = statement_instruction (s);
-  bool go_on = TRUE;
-
-
-  if(instruction_loop_p(inst)) {
-    entity do_lab_ent = entity_undefined;
-
-    if(c_module_p(get_current_module_entity())) {
-      do_lab_ent = statement_label(s);
-    }
-    else { // Fortran assumed
-      do_lab_ent = loop_label(instruction_loop(inst));
-    }
-
-    /* is it the right label? */
-    if (do_lab_ent == entity_undefined) {
-      pips_error("recursive_loop_unroll", "DO label undefined\n");
-      go_on = FALSE;
-    }
-    else if (gen_eq(searched_loop_label, do_lab_ent)) {
-      full_loop_unroll(s);
-      go_on = FALSE;
-    }
-    else {
-      go_on = TRUE;
-    }
-  }
-
-  return go_on;
-}
-
+static
 bool apply_full_loop_unroll(statement s)
 {
   instruction inst = statement_instruction (s);
@@ -878,64 +718,53 @@ bool
 full_unroll(char * mod_name)
 {
     statement mod_stmt;
-    char lp_label[6];
-    string resp;
+    char *lp_label = string_undefined;
     entity lb_ent = entity_undefined;
-    bool return_status = TRUE;
+    bool return_status = true;
 
     debug_on("FULL_UNROLL_DEBUG_LEVEL");
 
-    if(get_bool_property("FULL_UNROLL_INTERACTIVELY")) {
-        /* Get the loop label form the user */
-        resp = user_request("Which loop do you want to unroll fully?\n"
-                "(give its label): ");
-        if (resp[0] == '\0') {
-            user_log("Full loop unrolling has been cancelled.\n");
-            return_status = FALSE;
-        }
-        else {    
-            sscanf(resp, "%s", lp_label);
-            lb_ent = find_label_entity(mod_name, lp_label);
-            if (lb_ent == entity_undefined) {
-                user_error("unroll", "loop label `%s' does not exist\n", lp_label);
-            }
-
-            debug(1,"full_unroll","Fully unroll loop %s in module %s\n",
-                    lp_label, mod_name);
-
-            searched_loop_label = lb_ent;
-        }
-    }
-
-    if(return_status) {
-
+    /* user interaction */
+    lp_label = get_string_property_or_ask("LOOP_LABEL","loop to fully unroll ?");
+    if( empty_string_p(lp_label) )
+        return_status = false;
+    else {
+        lb_ent = find_label_entity(mod_name,lp_label);
+        if( entity_undefined_p(lb_ent) )
+            pips_user_warning("loop label `%s' does not exist, unrolling all loops\n", lp_label);
         mod_stmt = (statement) db_get_memory_resource(DBR_CODE, mod_name, TRUE);
+
         /* prelude */
         set_current_module_entity(module_name_to_entity( mod_name ));
         set_current_module_statement( mod_stmt);
 
-        if(entity_undefined_p(searched_loop_label)) {
+        /* do the job */
+        if(entity_undefined_p(lb_ent)) {
             gen_recurse (mod_stmt, statement_domain, 
                     apply_full_loop_unroll, gen_null);
         }
         else {
-            gen_recurse (mod_stmt, statement_domain, 
-                    find_loop_and_fully_unroll, gen_null);
+            statement loop_statement = find_loop_from_label(mod_stmt,lb_ent);
+            if( statement_undefined_p(loop_statement) )
+                pips_user_error("label '%s' is not put on a loop\n",lp_label);
+            else
+                full_loop_unroll(loop_statement);
         }
 
         /* Reorder the module, because new statements have been generated. */
         module_reorder(mod_stmt);
-
-        searched_loop_label = entity_undefined;
 
         DB_PUT_MEMORY_RESOURCE(DBR_CODE, mod_name, mod_stmt);
         /*postlude*/
         reset_current_module_entity();
         reset_current_module_statement();
     }
-
+    if( !return_status)
+        user_log("transformation has been cancelled\n");
     debug(2,"unroll","done for %s\n", mod_name);
     debug_off();
+        /* Reorder the module, because new statements have been generated. */
+        module_reorder(mod_stmt);
 
     return return_status;
 }

@@ -21,7 +21,7 @@
 
 TARGET	= transformations
 
-LIB_CFILES =	replace.c \
+LIB_CFILES =	\
 		loop_unroll.c \
 		prettyprintcray.c \
 		strip_mine.c \

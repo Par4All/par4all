@@ -917,22 +917,24 @@ statement outliner(string outline_module_name, list statements_to_outline)
     FOREACH(ENTITY,e,referenced_entities)
     {
         type t = entity_type(e);
-        /* this create the dummy parameter */
-        type new_type = copy_type(t);
-        entity dummy_entity = FindOrCreateEntity(
-                outline_module_name,
-                entity_user_name(e)
-                );
-        entity_type(dummy_entity)=new_type;
-        entity_storage(dummy_entity)=make_storage_formal(make_formal(dummy_entity,++i));
+        if( type_variable_p(t) ) {
+            /* this create the dummy parameter */
+            type new_type = copy_type(t);
+            entity dummy_entity = FindOrCreateEntity(
+                    outline_module_name,
+                    entity_user_name(e)
+                    );
+            entity_type(dummy_entity)=new_type;
+            entity_storage(dummy_entity)=make_storage_formal(make_formal(dummy_entity,++i));
 
 
-        formal_parameters=CONS(PARAMETER,make_parameter(
-                    copy_type(new_type),
-                    make_mode_value(), /* to be changed */
-                    make_dummy_identifier(dummy_entity)),formal_parameters);
-        /* this adds the effective parameter */
-        effective_parameters=CONS(EXPRESSION,entity_to_expression(e),effective_parameters);
+            formal_parameters=CONS(PARAMETER,make_parameter(
+                        copy_type(new_type),
+                        make_mode_value(), /* to be changed */
+                        make_dummy_identifier(dummy_entity)),formal_parameters);
+            /* this adds the effective parameter */
+            effective_parameters=CONS(EXPRESSION,entity_to_expression(e),effective_parameters);
+        }
     }
 
 
@@ -948,31 +950,34 @@ statement outliner(string outline_module_name, list statements_to_outline)
         FOREACH(PARAMETER,p,formal_parameters)
         {
 			expression x = EXPRESSION(CAR(iter));
+            entity ex = reference_variable(expression_reference(x));
             entity e = dummy_identifier(parameter_dummy(p));
-			variable v = type_variable(entity_type(e));
-			bool entity_written=false;
-			FOREACH(STATEMENT,stmt,statements_to_outline)
-				entity_written|=find_write_effect_on_entity(stmt,e);
+            if( type_variable_p(entity_type(ex)) ) {
+                variable v = type_variable(entity_type(ex));
+                bool entity_written=false;
+                FOREACH(STATEMENT,stmt,statements_to_outline)
+                    entity_written|=find_write_effect_on_entity(stmt,ex);
 
-			if( (!basic_pointer_p(variable_basic(v))) && 
-				ENDP(variable_dimensions(v)) &&
-			    entity_written
-			)
-			{
-				type t = copy_type(entity_type(e));
-				entity_type(e)=make_type_variable(
-						make_variable(
-							make_basic_pointer(t),
-							NIL,
-							NIL
-							)
-						);
-				parameter_type(p)=t;
-            	syntax s = expression_syntax(x);
-            	expression X = make_expression(s,normalized_undefined);
-            	expression_syntax(x)=make_syntax_call(make_call(CreateIntrinsic(ADDRESS_OF_OPERATOR_NAME),CONS(EXPRESSION,X,NIL)));
-				gen_context_recurse(body,e,expression_domain,gen_true,patch_outlined_reference);
-			}
+                if( (!basic_pointer_p(variable_basic(v))) && 
+                        ENDP(variable_dimensions(v)) &&
+                        entity_written
+                  )
+                {
+                    type t = copy_type(entity_type(e));
+                    entity_type(e)=make_type_variable(
+                            make_variable(
+                                make_basic_pointer(t),
+                                NIL,
+                                NIL
+                                )
+                            );
+                    parameter_type(p)=t;
+                    syntax s = expression_syntax(x);
+                    expression X = make_expression(s,normalized_undefined);
+                    expression_syntax(x)=make_syntax_call(make_call(CreateIntrinsic(ADDRESS_OF_OPERATOR_NAME),CONS(EXPRESSION,X,NIL)));
+                    gen_context_recurse(body,ex,expression_domain,gen_true,patch_outlined_reference);
+                }
+            }
 			POP(iter);
         }
 		pips_assert("no effective parameter left", ENDP(iter));

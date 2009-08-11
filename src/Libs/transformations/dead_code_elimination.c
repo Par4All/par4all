@@ -1090,8 +1090,12 @@ void statement_remove_useless_label(statement s)
     {
         if( !entity_empty_label_p( statement_label(s) ) )
         {
-            free_entity(statement_label(s));
+            /* SG should free_entity ? */
             statement_label(s)=entity_empty_label();
+            if( instruction_loop_p(i) )
+                loop_label(instruction_loop(i))=entity_empty_label();
+            if( instruction_whileloop_p(i) )
+                whileloop_label(instruction_whileloop(i))=entity_empty_label();
         }
     }
 }
@@ -1114,7 +1118,10 @@ remove_useless_label(char* module_name)
    set_current_module_entity( module );
    set_current_module_statement( module_statement );
 
-   gen_recurse(module_statement,statement_domain, gen_true, statement_remove_useless_label);
+   gen_multi_recurse(module_statement,
+           statement_domain, gen_true, statement_remove_useless_label,
+           unstructured_domain, gen_false,gen_null,
+           NULL);
 
    module_reorder(module_statement);
    DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, module_statement);

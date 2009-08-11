@@ -84,6 +84,8 @@ symbolic_constant_entity_p(entity e)
 */
 void
 AddEntityToDeclarations(entity e, entity module) {
+    pips_assert("module is fine",entity_consistent_p(module));
+    pips_assert("entity is fine",entity_consistent_p(e));
 	/* Add the variable to the module declarations: */
 	list l = code_declarations(EntityCode(module));
 	/* Add the declaration only if not already here: */

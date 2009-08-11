@@ -857,7 +857,7 @@ static entity make_new_simd_vector(int itemSize, int nbItems, int basicTag)
     basic simdVector;
 
     entity new_ent, mod_ent;
-    char prefix[5]={ 'v', '0', '\0', '\0', '\0' },
+    char prefix[6]={ 'v', '0', '\0', '\0', '\0', '\0' },
          num[1 + sizeof(VECTOR_POSTFIX) + 3 ],
          name[sizeof(prefix)+sizeof(num)+1];
     static int number = 0;
@@ -893,7 +893,7 @@ static entity make_new_simd_vector(int itemSize, int nbItems, int basicTag)
             break;
     }
 
-    pips_assert("buffer doesnot overflow",number<1000);
+    pips_assert("buffer doesnot overflow",number<10000);
     sprintf(name, "%s%s%u",prefix,VECTOR_POSTFIX,number++);
     list lis=CONS(DIMENSION, make_dimension(int_to_expression(0),int_to_expression(nbItems-1)), NIL);  
     new_ent = make_new_array_variable_with_prefix(name, mod_ent , simdVector, lis);

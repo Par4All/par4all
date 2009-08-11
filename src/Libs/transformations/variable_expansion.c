@@ -190,7 +190,6 @@ bool scalar_expansion(char *module_name)
     statement module_stat;
 
     pips_user_warning("\nExperimental phase: on-going debugging!\n");
-    pips_user_warning("\nPrivatize variables before you run this phase\n");
 
     /* Why would I need this? To access declarations for instance */
     set_current_module_entity(module_name_to_entity(module_name) );

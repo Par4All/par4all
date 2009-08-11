@@ -179,12 +179,12 @@ bool sc_functional_graph_p(Psysteme g, Pbase d, Pbase r, Pbase dr)
 	}
       }
     }
+    // Cleanup
+    sc_rm(g1);
+    sc_rm(g2);
+    sc_rm(g3);
+    sc_rm(g4);
   }
-  // Cleanup
-  sc_rm(g1);
-  sc_rm(g2);
-  sc_rm(g3);
-  sc_rm(g4);
 
   return functional_p;
 }

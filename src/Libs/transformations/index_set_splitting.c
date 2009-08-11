@@ -1,6 +1,6 @@
 /*
 
-  $Id$
+  $Id: index_set_splitting.c 14476 2009-07-06 14:03:26Z guelton $
 
   Copyright 1989-2009 MINES ParisTech
 
@@ -50,22 +50,33 @@
 
 #include "transformations.h"
 
-static statement loop_statement = statement_undefined;
+struct flfl {
+    entity label;
+    statement found;
+};
 
 static bool
-find_loop_from_label(statement s, entity label)
+find_loop_from_label_walker(statement s, struct flfl *p)
 {
     instruction inst = statement_instruction (s);
     if(instruction_loop_p(inst)) {
 	  entity do_lab_ent = loop_label(instruction_loop(inst));
 	  entity stmt_lab_ent = statement_label(s);
-	  if (gen_eq(label, do_lab_ent) || gen_eq(label, stmt_lab_ent) )
+	  if (gen_eq(p->label, do_lab_ent) || gen_eq(p->label, stmt_lab_ent) )
       {
-          loop_statement=s;
-          return false;
+          p->found=s;
+          gen_recurse_stop(NULL);
       }
     }
     return true;
+} 
+
+statement
+find_loop_from_label(statement s, entity label)
+{
+    struct flfl p = { label, statement_undefined };
+    gen_context_recurse(s,&p,statement_domain,find_loop_from_label_walker,gen_null);
+    return p.found;
 } 
 
 void
@@ -169,8 +180,7 @@ bool index_set_splitting(char* module_name)
             entity_undefined_p((loop_label_entity=find_label_entity(module_name, loop_label))) )
         pips_user_error("please set LOOP_LABEL property to a valid label\n");
 
-    loop_statement=statement_undefined;
-    gen_context_recurse(get_current_module_statement(), loop_label_entity, statement_domain, find_loop_from_label, gen_null);
+    statement loop_statement=find_loop_from_label(get_current_module_statement(),loop_label_entity);
     if(statement_undefined_p(loop_statement))
         pips_user_error("no statement with label %s found\n",loop_label);
 

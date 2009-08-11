@@ -21,6 +21,8 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+%option nounput
+%option noinput
 
 %{
 /*
@@ -102,7 +104,7 @@ void parse_properties_string(char *s)
 %%
 TRUE                    { return(TTRUE); }
 FALSE			{ return(TFALSE); }
-[0-9]+       		{ return(TNUMB); }
+-?[0-9]+       		{ return(TNUMB); }
 [-_a-zA-Z][-_a-zA-Z0-9]* { return(TIDENT); }
 \"[^\"]*\"		{ /*"*/return(TSTRING); }
 ^[ \t]*#.*$		{ /* comments are skipped. */ }

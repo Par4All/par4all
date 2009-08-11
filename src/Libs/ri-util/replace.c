@@ -9,7 +9,7 @@
 
 #include "ri-util.h"
 
-/** @defgroup entity repalcement in statements
+/** @defgroup entity replacement in statements
  * it is not unusual to generate a new entity,
  * this helper functions will take care of substituing all referenced to
  * an old entity by reference in new entities
@@ -79,12 +79,12 @@ static void replace_entity_loop_walker(loop l, struct entity_pair* thecouple)
 /** 
  * @brief recursievly substitute new to old in s
  * 
- * @param s statement where the substitution must be done
+ * @param s newgen type where the substitution must be done
  * @param old old entity
  * @param new new entity
  */
 void
-replace_entity(statement s, entity old, entity new)
+replace_entity(void* s, entity old, entity new)
 {
     struct entity_pair thecouple = { old, new };
 
@@ -96,13 +96,13 @@ replace_entity(statement s, entity old, entity new)
 }
 
 void
-replace_entities(statement s, hash_table ht)
+replace_entities(void* s, hash_table ht)
 {
     HASH_MAP(k, v, replace_entity(s,(entity)k,(entity)v);, ht);
 }
 
 void
-replace_reference(statement s, reference old, entity new)
+replace_reference(void* s, reference old, entity new)
 {
     /* if the reference is a scalar, it's similar to replace_entity, otherwise, it's replace_entity_by_expression */
     if( ENDP(reference_indices(old)) )
@@ -155,10 +155,10 @@ void replace_entity_by_expression_loop_walker(loop l, struct param *p)
 
 /** 
  * replace all reference to entity @a ent by expression @e exp
- * in statement @s
+ * in @a s. @s can be any newgen type !
  */
 void
-replace_entity_by_expression(statement s, entity ent, expression exp)
+replace_entity_by_expression(void* s, entity ent, expression exp)
 {
     struct param p = { ent, exp };
     gen_context_multi_recurse(s,&p,
@@ -168,7 +168,7 @@ replace_entity_by_expression(statement s, entity ent, expression exp)
             NULL);
 }
 void
-replace_entities_by_expression(statement s, hash_table ht)
+replace_entities_by_expression(void* s, hash_table ht)
 {
     HASH_MAP(k, v, replace_entity_by_expression(s,(entity)k,(expression)v);, ht);
 }

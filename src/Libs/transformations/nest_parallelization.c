@@ -776,40 +776,36 @@ int look_for_references_in_call(call c, reference (*reference_transformation) (r
 
     f = call_function(c);
     vin = entity_initial(f);
-	
+
     switch (value_tag(vin)) {
-      case is_value_constant:
-	/* nothing to replace */
-	break;
-      case is_value_symbolic:
-	pips_error("CallReplaceReference", 
-		   "case is_value_symbolic: replacement not implemented\n");
-	break;
-      case is_value_intrinsic:
-      case is_value_unknown:
-	/* We assume that it is legal to replace arguments (because it should
-	   have been verified with the effects that the index is not WRITTEN).
-	   */
-	MAPL(a, {
-	    count += look_for_references_in_expression(EXPRESSION(CAR(a)), 
-						       reference_transformation,
-						       reference_predicate);
-	}, call_arguments(c));
-	break;
-      case is_value_code:
-	MAPL(a, {
-	    count += look_for_references_in_expression(EXPRESSION(CAR(a)), 
-						       reference_transformation,
-						       reference_predicate);
-	}, call_arguments(c));
-	break;
-      default:
-	pips_error("look_for_references_in_call", "unknown tag: %d\n", 
-		   (int) value_tag(vin));
+        case is_value_constant:
+            /* nothing to replace */
+            break;
+        case is_value_symbolic:
+            pips_error(__func__, 
+                    "case is_value_symbolic: not implemented\n");
+            break;
+        case is_value_intrinsic:
+        case is_value_unknown:
+        case is_value_code:
+            {
+                /* We assume that it is legal to replace arguments (because it should
+                   have been verified with the effects that the index is not WRITTEN).
+                   */
+                FOREACH(EXPRESSION,e,call_arguments(c))
+                {
+                    count += look_for_references_in_expression(e, 
+                            reference_transformation,
+                            reference_predicate);
+                }
+            } break;
+        default:
+            pips_error(__func__, "unknown tag: %d\n", 
+                    (int) value_tag(vin));
 
     }
 
-    debug(5, "look_for_references_in_call", "end %d\n", count);
+    debug(5, __func__ , "end %d\n", count);
 
     return count;
 }

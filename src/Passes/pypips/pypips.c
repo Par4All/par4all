@@ -21,11 +21,15 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#include <stdlib.h>
+
 #define pips_user_error(...) do { fprintf(stderr, __VA_ARGS__); return; } while(0)
+
+#define TEMP_FILE_NAME ".pipsout.XXXXXX"
 
 static void begin_catch_stdout()
 {
-    stdout=freopen(".pyps.out","w+",stdout);
+    stdout=freopen(TEMP_FILE_NAME,"w+",stdout);
 }
 static char* end_catch_stdout()
 {
@@ -35,6 +39,7 @@ static char* end_catch_stdout()
     char * whole_file=calloc(1+(end-start),sizeof(char));
     fread(whole_file,end-start,sizeof(char),stdout);
     stdout=freopen("/dev/tty","w",stdout);
+    remove(TEMP_FILE_NAME);
     return whole_file;
 }
 
@@ -152,6 +157,4 @@ char* show(char * rcname, char *target)
     perform(just_show,&ror);
     return end_catch_stdout();
 }
-
-
 

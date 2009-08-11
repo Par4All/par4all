@@ -85,7 +85,7 @@ static void checkReplaceReference(expression e, reference ref)
                                        reference r = syntax_reference(s);
                                        /* replace if equal to ref */
                                        if ( reference_indices(r) == NIL ) {
-                                           if ( simple_ref_eq_p(syntax_reference(s), ref) && 
+                                           if ( reference_equal_p(syntax_reference(s), ref) && 
                                                    ((gRepOnlyInIndex && (gInIndex != 0)) || !gRepOnlyInIndex)) {
                                                gReplaceAllowed = TRUE;
                                            }
@@ -163,7 +163,7 @@ static void daExpressionReplaceReference(list e, reference ref, expression next)
                                        reference r = syntax_reference(s);
                                        /* replace if equal to ref */
                                        if ( reference_indices(r) == NIL ) {
-                                           if ( simple_ref_eq_p(syntax_reference(s), ref)) {
+                                           if ( reference_equal_p(syntax_reference(s), ref)) {
                                                expression exp = EXPRESSION(CAR(e));
                                                expression_syntax(exp) = copy_syntax(expression_syntax(next));
                                                gRepDone = TRUE;

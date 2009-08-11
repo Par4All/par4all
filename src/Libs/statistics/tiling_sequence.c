@@ -496,7 +496,6 @@ static statement  fusion()
   sequence seq=NULL;
   statement s;
   loop ls=NULL;
-  void ExpressionReplaceReference();
   /* calculer les delais des differents nis */
   compute_delay_merged_nest();
   /* calculer les bornes du nid fusionne */
@@ -584,12 +583,9 @@ static statement  fusion()
 	  pv = vect_make(VECTEUR_NUL, sequen[i].nd[j].index, VALUE_ONE,
 			 TCST,value_uminus(MATRIX_ELEM(sequen[i].delai,j+1,1)));
 	  delai_plus=Pvecteur_to_expression(pv);
-	  ExpressionReplaceReference(gauche,
-				     make_reference((entity) sequen[i].nd[j].index,NIL),delai_plus);
-	  MAP(EXPRESSION,exp,{ 
-	    ExpressionReplaceReference(exp,
-				       make_reference((entity) sequen[i].nd[j].index,NIL),delai_plus);
-	  },call_arguments( syntax_call(expression_syntax(droite))));
+      replace_entity_by_expression(gauche,(entity) sequen[i].nd[j].index,delai_plus);
+      FOREACH(EXPRESSION,exp,call_arguments( syntax_call(expression_syntax(droite))))
+          replace_entity_by_expression(exp,(entity) sequen[i].nd[j].index,delai_plus);
 	};
       if (e==NULL)
 	s=sequen[i].s;
@@ -744,7 +740,6 @@ static statement fusion_buffer()
    instruction ins;
    statement s;
    loop ls;
-  void ExpressionReplaceReference();
   compute_delay_merged_nest();
   compute_bound_merged_nest ();
    
@@ -873,13 +868,8 @@ static statement fusion_buffer()
 	      delai_plus=Pvecteur_to_expression(pv);
 	      
 	      
-	      MAP(EXPRESSION,exp,{  
-		ExpressionReplaceReference(exp,
-					   make_reference((entity) sequen[i].nd[j].index,NIL),delai_plus);
-		
-	      },call_arguments( syntax_call(expression_syntax(droite))));
-	      
-	      
+          FOREACH(EXPRESSION,exp,call_arguments( syntax_call(expression_syntax(droite))))
+              replace_entity_by_expression(exp,(entity) sequen[i].nd[j].index,delai_plus);
 	      
 	    };
 
@@ -1090,7 +1080,6 @@ statement Hierarchical_tiling ()
   int plus;
   Value elem_mat1,elem_mat2;
   Psysteme  loop_iteration_domaine_to_sc();
-  void ExpressionReplaceReference();
   name_file = user_request("nom du fichier pour la matrice A ");
   infp = safe_fopen(name_file,"r");
   matrix_fscan(infp,&A,&rw,&cl);
@@ -1264,12 +1253,9 @@ statement Hierarchical_tiling ()
 	  },call_arguments(c)) ;
 	  pv = vect_make(tiling_indice[j],TCST,value_uminus(MATRIX_ELEM(sequen[i].delai,j+1,1)));
 	  delai_plus=Pvecteur_to_expression(pv);
-	  ExpressionReplaceReference(gauche,
-				     make_reference((entity) sequen[i].nd[j].index,NIL),delai_plus);
-	  MAP(EXPRESSION,exp,{ 
-	    ExpressionReplaceReference(exp,
-				       make_reference((entity) sequen[i].nd[j].index,NIL),delai_plus);
-	  },call_arguments( syntax_call(expression_syntax(droite))));
+      replace_entity_by_expression(gauche,(entity) sequen[i].nd[j].index,delai_plus);
+      FOREACH(EXPRESSION,exp,call_arguments( syntax_call(expression_syntax(droite))))
+          replace_entity_by_expression(exp,(entity) sequen[i].nd[j].index,delai_plus);
 	};
       t= make_test(e,sequen[i].s,make_block_statement(NIL));
       s=test_to_statement(t);
@@ -1322,7 +1308,6 @@ statement Tiling_buffer_allocation ()
   statement *scopy[nid_nbr];
   Psysteme  loop_iteration_domaine_to_sc();
   Variable *iter, *itert;
-  void ExpressionReplaceReference();
   name_file = user_request("nom du fichier pour la matrice A ");
   infp = safe_fopen(name_file,"r");
   matrix_fscan(infp,&A,&rw,&cl);
@@ -1625,8 +1610,7 @@ statement Tiling_buffer_allocation ()
 		  expression delai_plus;
 		  pv = vect_make(VECTEUR_NUL,iter[l], VALUE_ONE, TCST,-MATRIX_ELEM(temp[k],l+1,1));
 		  delai_plus=Pvecteur_to_expression(pv);
-		  ExpressionReplaceReference(exp,
-					     make_reference((entity) iter[l],NIL), delai_plus);
+          replace_entity_by_expression(exp,(entity)iter[l],delai_plus);
 		}
 	      expt=EXPRESSION( CAR(lis));
 	      lis=CDR(lis);
@@ -1658,8 +1642,7 @@ statement Tiling_buffer_allocation ()
 			  t=value_minus(MATRIX_ELEM(ATEP,r+1,1),MATRIX_ELEM(temp[k],pos,1));
 			  pv = vect_make(VECTEUR_NUL,iter[pos-1], VALUE_ONE, TCST,t);
 			  delai_plus=Pvecteur_to_expression(pv);
-			  ExpressionReplaceReference(exp,
-						     make_reference((entity) iter[pos-1],NIL), delai_plus);
+              replace_entity_by_expression(exp,(entity)iter[pos-1],delai_plus);
 			}		   
 		      
 		      else	     
@@ -1668,8 +1651,7 @@ statement Tiling_buffer_allocation ()
 			  pos=position_one_element(P1,r+1);
 			  pv = vect_make(VECTEUR_NUL,iter[pos-1], VALUE_ONE, TCST,-MATRIX_ELEM(temp[k],pos,1));
 			  delai_plus=Pvecteur_to_expression(pv);
-			  ExpressionReplaceReference(exp,
-						     make_reference((entity) iter[pos-1],NIL), delai_plus);
+              replace_entity_by_expression(exp,(entity)iter[pos-1],delai_plus);
 			}
 		    }
 
@@ -1685,11 +1667,7 @@ statement Tiling_buffer_allocation ()
 			pos=position_one_element(P1,l+1);
 			pv= vect_make(VECTEUR_NUL ,itert[pos-1], VALUE_ONE,TCST,-VALUE_ONE);
 			delai_plus=Pvecteur_to_expression(pv);
-			ExpressionReplaceReference(exp,
-						   make_reference((entity) itert[pos-1],NIL), delai_plus);
-
-
-
+            replace_entity_by_expression(exp,(entity)itert[pos-1],delai_plus);
 
 		      };
 		    r++;
@@ -1858,8 +1836,7 @@ statement Tiling_buffer_allocation ()
 	      expression delai_plus;
 	      pv = vect_make(VECTEUR_NUL,iter[l], VALUE_ONE, TCST,-MATRIX_ELEM(temp[k],l+1,1));
 	      delai_plus=Pvecteur_to_expression(pv);
-	      ExpressionReplaceReference(exp,
-					 make_reference((entity) iter[l],NIL), delai_plus);
+          replace_entity_by_expression(exp,(entity)iter[l],delai_plus);
 	    }
 	  expt=EXPRESSION( CAR(lis));
 	  lis=CDR(lis);
@@ -1893,8 +1870,7 @@ statement Tiling_buffer_allocation ()
 			  t=value_minus(MATRIX_ELEM(ATEP,r+1,1),MATRIX_ELEM(temp[k],pos,1));
 			  pv = vect_make(VECTEUR_NUL,iter[pos-1], VALUE_ONE, TCST,t);
 			  delai_plus=Pvecteur_to_expression(pv);
-			  ExpressionReplaceReference(exp,
-						     make_reference((entity) iter[pos-1],NIL), delai_plus);
+              replace_entity_by_expression(exp,(entity) iter[pos-1], delai_plus);
 			}		   
 		      
 		      else	     
@@ -1903,8 +1879,7 @@ statement Tiling_buffer_allocation ()
 			  pos=position_one_element(P1,r+1);
 			  pv = vect_make(VECTEUR_NUL,iter[pos-1], VALUE_ONE, TCST,-MATRIX_ELEM(temp[k],pos,1));
 			  delai_plus=Pvecteur_to_expression(pv);
-			  ExpressionReplaceReference(exp,
-						     make_reference((entity) iter[pos-1],NIL), delai_plus);
+              replace_entity_by_expression(exp,(entity) iter[pos-1], delai_plus);
 			}
 		    
 		}
@@ -1921,8 +1896,7 @@ statement Tiling_buffer_allocation ()
 		    pv= vect_make(VECTEUR_NUL ,itert[pos-1], VALUE_ONE,TCST,-VALUE_ONE);
 		 
 		    delai_plus=Pvecteur_to_expression(pv);
-		    ExpressionReplaceReference(exp,
-					       make_reference((entity) itert[pos-1],NIL), delai_plus);
+            replace_entity_by_expression(exp,(entity) itert[pos-1], delai_plus);
 		    
 
 		  
@@ -2161,10 +2135,8 @@ statement Tiling_buffer_allocation ()
 		      pv = vect_make(tiling_indice[l],TCST,value_uminus(MATRIX_ELEM(sequen[i].delai,l+1,1)));
 		      delai_plus=Pvecteur_to_expression(pv);
 		   
-		      MAP(EXPRESSION,exp,{ 
-			ExpressionReplaceReference(exp,
-						   make_reference((entity) sequen[i].nd[l].index,NIL),delai_plus);
-		      },call_arguments( syntax_call(expression_syntax(droite))));
+		      FOREACH(EXPRESSION,exp,call_arguments( syntax_call(expression_syntax(droite))))
+                  replace_entity_by_expression(exp,(entity)  sequen[i].nd[l].index, delai_plus);
 		    }
 		}
 	    }	      
@@ -2187,8 +2159,7 @@ statement Tiling_buffer_allocation ()
 	    {  
 	      pv = vect_make(tiling_indice[j],TCST,value_uminus(MATRIX_ELEM(sequen[i].delai,j+1,1)));
 	      delai_plus=Pvecteur_to_expression(pv);
-	      ExpressionReplaceReference(gauche,
-					 make_reference((entity) sequen[i].nd[j].index,NIL),delai_plus);
+          replace_entity_by_expression(gauche,(entity)  sequen[i].nd[j].index, delai_plus);
 	    }
 	  c= instruction_call(statement_instruction(( ps2 )));
 	  m=0;
@@ -2200,8 +2171,7 @@ statement Tiling_buffer_allocation ()
 	    {  
 	      pv = vect_make(tiling_indice[j],TCST,value_uminus(MATRIX_ELEM(sequen[i].delai,j+1,1)));
 	      delai_plus=Pvecteur_to_expression(pv);
-	      ExpressionReplaceReference(gauche,
-					 make_reference((entity) sequen[i].nd[j].index,NIL),delai_plus);
+          replace_entity_by_expression(gauche,(entity)  sequen[i].nd[j].index, delai_plus);
 	    }
 
 
@@ -2350,7 +2320,6 @@ statement  Tiling2_buffer()
   int plus;
   Value elem_mat1,elem_mat2;
   Psysteme  loop_iteration_domaine_to_sc();
-  void ExpressionReplaceReference();
   //  void  full_loop_unroll();
   name_file = user_request("nom du fichier pour la matrice A ");
   infp = safe_fopen(name_file,"r");
@@ -2564,12 +2533,9 @@ statement  Tiling2_buffer()
 	  },call_arguments(c)) ;
 	  pv = vect_make(tiling_indice[j],TCST,value_uminus(MATRIX_ELEM(sequen[i].delai,j+1,1)));
 	  delai_plus=Pvecteur_to_expression(pv);
-	  ExpressionReplaceReference(gauche,
-				     make_reference((entity) sequen[i].nd[j].index,NIL),delai_plus);
-	  MAP(EXPRESSION,exp,{ 
-	    ExpressionReplaceReference(exp,
-				       make_reference((entity) sequen[i].nd[j].index,NIL),delai_plus);
-	  },call_arguments( syntax_call(expression_syntax(droite))));
+      replace_entity_by_expression(gauche,(entity) sequen[i].nd[j].index,delai_plus);
+      FOREACH(EXPRESSION,exp,call_arguments( syntax_call(expression_syntax(droite))))
+        replace_entity_by_expression(exp,(entity) sequen[i].nd[j].index,delai_plus);
 	};
       t= make_test(e,sequen[i].s,make_block_statement(NIL));
       s=test_to_statement(t);

@@ -327,7 +327,7 @@ static bool process_true_stat(expression cond, statement stat, list * outStat, l
                         statDone = CONS(STATEMENT, rStat, statDone);
                     }
 
-                    saCallReplace(rc, lRef, newVar);
+                    replace_reference(rc,lRef,newVar);
 
                 }, CDR(cs));
 

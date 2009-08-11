@@ -5,15 +5,15 @@ from pyps import *
 
 
 # a worspace ID is automagically created ... may be not a good feature
-create("test.c")
+w = workspace("test.c")
 
 # you can get module object from the modules table
-foo=modules["foo"]
-bar=modules["bar"]
-malabar=modules["malabar"]
+foo=w["foo"]
+bar=w["bar"]
+malabar=w["malabar"]
 
 # and apply transformation to modules
-foo.inlining(CALLERS="bar")
+foo.inlining(CALLERS="bar",PURGE_LABELS=False)
 
 #the good old display, default to PRINTED_FILE, but you can give args
 foo.display()
@@ -42,10 +42,8 @@ if labels:
 
 # new feature ! save the source code somewhere, so that it can be used after
 # the workspace is deleted
-foo.save()
-
-#funny way to save the whole file
-module("test","test.c").save("test2.c")
+w.save(indir="sample")
+w.compile(outdir="sample", link=False)
 
 # close *and* delete the workspace
-close()
+del w

@@ -5721,6 +5721,17 @@ strip_mine                          > MODULE.code
         < MODULE.code
 \end{PipsMake}
 
+Behavior of strip mining can be controlled by the following properties:
+\begin{itemize}
+\item \verb+LOOP_LABEL+ selects the loop to strip mine
+\item \verb+STRIP_MINE_KIND+ can be set to 0 (fixed-size chunks) or 1 (fixed number of chunks). Negative value is used for interactive prompt.
+\item \verb+STRIP_MINE_FACTOR+ controls the size of the chunk or the number of chunk depending on \verb+STRIP_MINE_KIND+.  Negative value is used for interactive prompt.
+\end{itemize}
+\begin{PipsProp}
+STRIP_MINE_KIND -1
+STRIP_MINE_FACTOR -1
+\end{PipsProp}
+
 \subsection{Loop Interchange}
 \label{subsection-loop-interchange}
 \index{Loop Interchange}
@@ -7696,6 +7707,7 @@ numerical bounds and increment one.
 \begin{PipsMake}
 alias variable_expansion 'Expand Scalar'
 variable_expansion                    > MODULE.code
+		! MODULE.privatize_module
         < PROGRAM.entities
         < MODULE.code
 \end{PipsMake}

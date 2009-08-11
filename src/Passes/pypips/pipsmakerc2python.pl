@@ -23,7 +23,7 @@ sub print_python_method {
 
 	def $name(self,**props):
 		"""$doc"""
-		_set_properties(self._update_props("$name",props))
+		self.ws._set_property(self.__update_props("$name",props))
 		self.apply("$name")
 
 EOF
@@ -38,7 +38,11 @@ foreach(@doc_strings)
 }
 
 # parse the string for properties
-my @properties=($rc=~/\\begin{PipsProp}\s*\n+([^ ]+).*?\\end{PipsProp}/gms);
+#my @properties=($rc=~/\\begin{PipsProp}\s*\n+([^ ]+).*?\\end{PipsProp}/gms);
+#print "\tall_properties=frozenset([";
+#foreach(@properties) { print "\"$_\","; }
+#print "\"it's a megablast\"])\n";
+my @properties=($rc=~/\\begin{PipsProp}\s*\n(?:\n*([^ ]+)[^\n]+\n)+?\\end{PipsProp}/gms);
 print "\tall_properties=frozenset([";
 foreach(@properties) { print "\"$_\","; }
 print "\"it's a megablast\"])\n";

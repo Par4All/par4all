@@ -44,7 +44,7 @@
 #include "resources.h"
 #include "control.h"
 #include "conversion.h"
-/* #include "generation.h" */
+#include "properties.h"
 #include "transformations.h"
 
 extern entity selected_label;
@@ -69,8 +69,6 @@ statement loop_strip_mine(statement loop_statement, int chunk_size, int chunk_nu
     entity index = loop_index(l);
     statement b = loop_body(l);
     entity new_index = entity_undefined;
-    char * module_name = db_get_current_module_name();
-    entity module = module_name_to_entity(module_name);
     
     debug(9, "loop_strip_mine", "begin: chunk_size = %d,chunk_number = %d\n",
 	  chunk_size, chunk_number);
@@ -115,23 +113,17 @@ statement loop_strip_mine(statement loop_statement, int chunk_size, int chunk_nu
     loop_label(l)=entity_empty_label();
 
     /* derive a new loop index (FI: only *one* name :-( */
-    /*
-    new_index=make_scalar_integer_entity(
-					 strdup(
-						concatenate(
-							    entity_local_name(index),
-							    "_1", 
-							    NULL)), module_name);
-    */
     new_index = make_new_index_entity(index, "_1");
-    AddEntityToDeclarations(new_index, module);
+    AddEntityToDeclarations(new_index, get_current_module_entity());
 
     /* build the inner loop preserving the initial index set */
+    expression fst_min_param=MakeBinaryCall(entity_intrinsic("+"),entity_to_expression(new_index),sizem1);
+    expression snd_min_parameter=copy_expression(ub);
+    expression min_exp = 
+        MakeBinaryCall(entity_intrinsic(MIN_OPERATOR_NAME),fst_min_param,snd_min_parameter);
     new_l = make_loop(index, 
 		      make_range(entity_to_expression(new_index),
-				 MakeBinaryCall(entity_intrinsic("MIN"),
-						MakeBinaryCall(entity_intrinsic("+"),entity_to_expression(new_index),sizem1),
-						copy_expression(ub)),
+                  min_exp,
 				 int_to_expression(1)),
 		      b,
 		      entity_empty_label(),
@@ -175,61 +167,63 @@ statement loop_chunk_size_and_strip_mine(list lls,bool (*unused)(loop))
     string resp;
     int kind, factor;
     statement stmt, new_s;
-    bool cancel_status = FALSE;
     int chunk_size = -1;
     int chunk_number = -1;
 
-
-    for (; CDR(lls) != NIL; lls = CDR(lls));
-    stmt = STATEMENT(CAR(lls));
+    stmt = STATEMENT(CAR(gen_last(lls)));
 
     /* Get the strip_mining kind from the user */
-    resp = user_request("Type of strip-mining:\n - in fixed-size chunks "
-			"(enter 0)\n - in a fixed number of chunks (enter 1)");
-    if (resp[0] == '\0') {
-	cancel_status = TRUE;
+    kind=get_int_property("STRIP_MINE_KIND");
+    if( kind!=0 && kind!=1 ) {
+        resp = user_request("Type of strip-mining:\n - in fixed-size chunks "
+                "(enter 0)\n - in a fixed number of chunks (enter 1)");
+        if ( empty_string_p(resp) ) {
+            goto cancel;
+        }
+        else {
+            if(sscanf(resp, "%d", &kind)!=1 || (kind!= 0 && kind !=1)) {
+                pips_user_error("strip_mining kind should be either 0 or 1!\n");
+            }
+        }
+    }
+
+    factor=get_int_property("STRIP_MINE_FACTOR");
+    if(factor<=1) {
+
+        /* Get the strip_mining factor from the user */
+        resp = user_request("What's the stripe %s?\n"
+                "(choose integer greater or egal to 2): ", 
+                kind ? "number" : "size");
+        if ( empty_string_p(resp) ) {
+            goto cancel;
+        }
+        else {
+            if(sscanf(resp, "%d", &factor)!=1 || factor <= 1) {
+                user_error("strip_mine", 
+                        "stripe size or number should be greater than 2\n");
+            }
+        }
+    }
+
+    if(kind==0) {
+        chunk_size = factor;
+        chunk_number = -1;
     }
     else {
-	/* CA(15/1/93):if(sscanf(resp, "%d", &kind)!=1 || kind !=1) { 
-	   replaced by */
-	if(sscanf(resp, "%d", &kind)!=1 || (kind!= 0 && kind !=1)) {
-	    pips_user_error("strip_mining kind should be either 0 or 1!\n");
-	}
-
-	/* Get the strip_mining factor from the user */
-	resp = user_request("What's the stripe %s?\n"
-			    "(choose integer greater or egal to 2): ", 
-			    kind ? "number" : "size");
-	if (resp[0] == '\0') {
-	    cancel_status = TRUE;
-	}
-	else {
-	    if(sscanf(resp, "%d", &factor)!=1 || factor <= 1) {
-		user_error("strip_mine", 
-			   "stripe size or number should be greater than 2\n");
-	    }
-
-	    if(kind==0) {
-		chunk_size = factor;
-		chunk_number = -1;
-	    }
-	    else {
-		chunk_size = -1;
-		chunk_number = factor;
-	    }
-
-	    pips_debug(1,"strip mine in %d chunks of size %d \n",
-		  chunk_number, chunk_size);
-	}
+        chunk_size = -1;
+        chunk_number = factor;
     }
-    if (cancel_status) {
-	user_log("Strip mining has been cancelled.\n");
-	/* Return the statement unchanged: */
-	new_s = stmt;
-    }
-    else
-	new_s = loop_strip_mine(stmt,chunk_size,chunk_number);
-   return(new_s);
+
+    pips_debug(1,"strip mine in %d chunks of size %d \n",
+            chunk_number, chunk_size);
+    new_s = loop_strip_mine(stmt,chunk_size,chunk_number);
+    return(new_s);
+
+cancel:
+    user_log("Strip mining has been cancelled.\n");
+
+    /* Return the statement unchanged: */
+    return stmt;
 }
 
 /* Top-level function
@@ -239,46 +233,43 @@ bool strip_mine(char *mod_name)
 {
     entity module = module_name_to_entity(mod_name);
     statement mod_stmt;
-    char lp_label[6];
-    string resp;
+    char *lp_label=NULL;
     bool return_status;
 
     debug_on("STRIP_MINE_DEBUG_LEVEL");
 
     /* Get the loop label form the user */
-    resp = user_request("Which loop do you want to strip_mine?\n"
-			"(give its label): ");
-    if (resp[0] == '\0') {
-	user_log("Strip mining has been cancelled.\n");
-	return_status = FALSE;
+    lp_label=get_string_property_or_ask("LOOP_LABEL","Which loop do you want to strip_mine?\n" "(give its label): ");
+    if (lp_label[0] == '\0') {
+        user_log("Strip mining has been cancelled.\n");
+        return_status = false;
     }
     else {
-	sscanf(resp, "%s", lp_label);
-	selected_label = find_label_entity(mod_name, lp_label);
-	if (selected_label==entity_undefined) {
-	    user_error("strip_mine", "loop label `%s' does not exist\n", lp_label);
-	}
+        selected_label = find_label_entity(mod_name, lp_label);
+        if (entity_undefined_p(selected_label)) {
+            user_error("strip_mine", "loop label `%s' does not exist\n", lp_label);
+        }
 
-	set_current_module_entity(module);
+        set_current_module_entity(module);
 
-	/* DBR_CODE will be changed: argument "pure" should take FALSE but
-	   this would be useless since there is only *one* version of code;
-	   a new version will be put back in the data base after
-	   strip_mineing */
-	mod_stmt = (statement) db_get_memory_resource(DBR_CODE, mod_name, TRUE);
-	set_current_module_statement(mod_stmt);
+        /* DBR_CODE will be changed: argument "pure" should take FALSE but
+           this would be useless since there is only *one* version of code;
+           a new version will be put back in the data base after
+           strip_mineing */
+        mod_stmt = (statement) db_get_memory_resource(DBR_CODE, mod_name, TRUE);
+        set_current_module_statement(mod_stmt);
 
-	look_for_nested_loop_statements(mod_stmt,loop_chunk_size_and_strip_mine,
-					selected_loop_p);
+        look_for_nested_loop_statements(mod_stmt,loop_chunk_size_and_strip_mine,
+                selected_loop_p);
 
-	/* Reorder the module, because new statements have been generated. */
-	module_reorder(mod_stmt);
+        /* Reorder the module, because new statements have been generated. */
+        module_reorder(mod_stmt);
 
-	reset_current_module_entity();
-	reset_current_module_statement();
+        reset_current_module_entity();
+        reset_current_module_statement();
 
-	DB_PUT_MEMORY_RESOURCE(DBR_CODE, mod_name, mod_stmt);
-	return_status = TRUE;
+        DB_PUT_MEMORY_RESOURCE(DBR_CODE, mod_name, mod_stmt);
+        return_status = true;
     }
     
     debug(2,"strip_mine","done for %s\n", mod_name);
