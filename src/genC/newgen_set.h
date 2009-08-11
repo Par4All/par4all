@@ -62,6 +62,7 @@ extern set set_make(set_type typ);
 extern set set_singleton(set_type type, void *p);
 extern set set_assign(set s1, set s2);
 extern set set_dup(set);
+extern int set_size(set);
 extern set set_add_element(set s1, set s2, void *e);
 extern bool set_belong_p(set s, void *e);
 extern bool list_in_set_p(list, set);

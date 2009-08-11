@@ -278,10 +278,18 @@ void set_free(set s)
   gen_free_area((void**) s, sizeof(struct _set_chunk));
 }
 
+/* returns the number of items in s.
+ */
+int set_size(set s)
+{
+  return hash_table_entry_count(s->table);
+}
+
+/* tell whether set s is empty.
+ */
 bool set_empty_p(set s)
 {
-  SET_MAP(x, return FALSE, s);
-  return TRUE;
+  return set_size(s)==0;
 }
 
 void gen_set_closure_iterate(void (*iterate)(void *, set),
