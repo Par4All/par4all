@@ -31,11 +31,7 @@ PDF 	= $(TEX:%.tex=%.pdf)
 
 INSTALL_DOC =	$(PDF)
 
-ifdef NEWGEN_ROOT
-ROOT	= $(NEWGEN_ROOT)
-else
 ROOT	= ../..
-endif
 include $(ROOT)/makes/main.mk
 
 all: $(INSTALL_DOC)

@@ -2,12 +2,7 @@
 
 all: reserv
 
-ifdef NEWGEN_ROOT
-ROOT	= $(NEWGEN_ROOT)
-else
 ROOT	= ../..
-endif
-
 include $(ROOT)/makes/main.mk
 
 local:	test_hash test_reserv
