@@ -1928,7 +1928,7 @@ extern freia_status my_erode_6c(freia_data2d *o, freia_data2d *i0, int32_t *p0);
 extern freia_status my_dilate_6c(freia_data2d *o, freia_data2d *i0, int32_t *p0);
 freia_status my_absdiff(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 {
-   return my_absdiff_helper_0(o, i1, i0);                               /*0079*/
+   return my_absdiff_helper_0(o, i0, i1);                               /*0079*/
 }
 freia_status my_absdiff_const(freia_data2d *o, freia_data2d *i0, int32_t p0)
 {
@@ -1936,7 +1936,7 @@ freia_status my_absdiff_const(freia_data2d *o, freia_data2d *i0, int32_t p0)
 }
 freia_status my_add(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 {
-   return my_add_helper_0(o, i1, i0);                                   /*0055*/
+   return my_add_helper_0(o, i0, i1);                                   /*0055*/
 }
 freia_status my_add_const(freia_data2d *o, freia_data2d *i0, int32_t p0)
 {
@@ -1944,7 +1944,7 @@ freia_status my_add_const(freia_data2d *o, freia_data2d *i0, int32_t p0)
 }
 freia_status my_addsat(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 {
-   return my_addsat_helper_0(o, i1, i0);                                /*0067*/
+   return my_addsat_helper_0(o, i0, i1);                                /*0067*/
 }
 freia_status my_addsat_const(freia_data2d *o, freia_data2d *i0, int32_t p0)
 {
@@ -1952,7 +1952,7 @@ freia_status my_addsat_const(freia_data2d *o, freia_data2d *i0, int32_t p0)
 }
 freia_status my_and(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 {
-   return my_and_helper_0(o, i1, i0);                                   /*0115*/
+   return my_and_helper_0(o, i0, i1);                                   /*0115*/
 }
 freia_status my_and_const(freia_data2d *o, freia_data2d *i0, int32_t p0)
 {
@@ -1980,7 +1980,7 @@ freia_status my_dilate_8c(freia_data2d *o, freia_data2d *i0, int32_t *p0)
 }
 freia_status my_div(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 {
-   return my_div_helper_0(o, i1, i0);                                   /*0103*/
+   return my_div_helper_0(o, i0, i1);                                   /*0103*/
 }
 freia_status my_div_const(freia_data2d *o, freia_data2d *i0, int32_t p0)
 {
@@ -2020,7 +2020,7 @@ freia_status my_global_vol(freia_data2d *image, int32_t *vol)
 }
 freia_status my_inf(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 {
-   return my_inf_helper_0(o, i1, i0);                                   /*0005*/
+   return my_inf_helper_0(o, i0, i1);                                   /*0005*/
 }
 freia_status my_inf_const(freia_data2d *o, freia_data2d *i0, int32_t p0)
 {
@@ -2028,7 +2028,7 @@ freia_status my_inf_const(freia_data2d *o, freia_data2d *i0, int32_t p0)
 }
 freia_status my_mul(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 {
-   return my_mul_helper_0(o, i1, i0);                                   /*0091*/
+   return my_mul_helper_0(o, i0, i1);                                   /*0091*/
 }
 freia_status my_mul_const(freia_data2d *o, freia_data2d *i0, int32_t p0)
 {
@@ -2040,7 +2040,7 @@ freia_status my_not(freia_data2d *o, freia_data2d *i0)
 }
 freia_status my_or(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 {
-   return my_or_helper_0(o, i1, i0);                                    /*0127*/
+   return my_or_helper_0(o, i0, i1);                                    /*0127*/
 }
 freia_status my_or_const(freia_data2d *o, freia_data2d *i0, int32_t p0)
 {
@@ -2052,7 +2052,7 @@ freia_status my_set_constant(freia_data2d *o, int32_t p0)
 }
 freia_status my_sub(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 {
-   return my_sub_helper_0(o, i1, i0);                                   /*0031*/
+   return my_sub_helper_0(o, i0, i1);                                   /*0031*/
 }
 freia_status my_sub_const(freia_data2d *o, freia_data2d *i0, int32_t p0)
 {
@@ -2060,7 +2060,7 @@ freia_status my_sub_const(freia_data2d *o, freia_data2d *i0, int32_t p0)
 }
 freia_status my_subsat(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 {
-   return my_subsat_helper_0(o, i1, i0);                                /*0043*/
+   return my_subsat_helper_0(o, i0, i1);                                /*0043*/
 }
 freia_status my_subsat_const(freia_data2d *o, freia_data2d *i0, int32_t p0)
 {
@@ -2068,7 +2068,7 @@ freia_status my_subsat_const(freia_data2d *o, freia_data2d *i0, int32_t p0)
 }
 freia_status my_sup(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 {
-   return my_sup_helper_0(o, i1, i0);                                   /*0019*/
+   return my_sup_helper_0(o, i0, i1);                                   /*0019*/
 }
 freia_status my_sup_const(freia_data2d *o, freia_data2d *i0, int32_t p0)
 {
@@ -2080,7 +2080,7 @@ freia_status my_threshold(freia_data2d *o, freia_data2d *i0, int32_t p0, int32_t
 }
 freia_status my_xor(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 {
-   return my_xor_helper_0(o, i1, i0);                                   /*0139*/
+   return my_xor_helper_0(o, i0, i1);                                   /*0139*/
 }
 freia_status my_xor_const(freia_data2d *o, freia_data2d *i0, int32_t p0)
 {
