@@ -35,14 +35,35 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+
 #include "genC.h"
 #include "newgen_set.h"
 
+/* FI: I do not understand why the type is duplicated at the set
+   level. Is there a potential consistency problem with the hash
+   table type? Is this a consequence of the decision to hide the
+   actual hash_table data structure?
+*/
+struct _set_chunk {
+  hash_table table;
+  set_type type;
+};
+
 #define INITIAL_SET_SIZE 10
 
-void set_clear(), set_free();
+/* return the internal hash table of set s
+ */
+hash_table set_private_get_hash_table(set s)
+{
+  return s->table;
+}
 
-/* Implementation of the Set package. */
+/* return the type of set s
+ */
+set_type set_get_type(set s)
+{
+  return s->type;
+}
 
 /* Create an empty set of any type */
 /* discrepancy: size_t sometimes, _uint elsewhere */
@@ -51,7 +72,7 @@ set set_generic_make(set_type typ,
 		     hash_equals_t private_equal_p,
 		     hash_rank_t private_rank)
 {
-  set hp = (set) alloc(sizeof(set_chunk));
+  set hp = (set) alloc(sizeof(struct _set_chunk));
   message_assert("allocated", hp);
 
   hp->table = hash_table_generic_make( typ,
@@ -59,7 +80,7 @@ set set_generic_make(set_type typ,
 				       private_equal_p,
 				       private_rank ) ;
   hp->type = typ ;
-  return( hp ) ;
+  return hp;
 }
 
 /* Create an empty set of any type but hash_private */
@@ -103,6 +124,15 @@ set set_assign(set s1, set s2)
   }
 }
 
+/* @return duplicated set
+ */
+set set_dup(set s)
+{
+  set n = set_make(s->type);
+  HASH_MAP(k, v, hash_put(n->table, k, v ), s->table);
+  return n;
+}
+
 /* @return s1 = s2 u { e }.
  */
 set set_add_element(set s1, set s2, void * e)
@@ -134,6 +164,16 @@ bool set_belong_p(set s, void * e)
   */
 
   return hash_get(s->table, e) != HASH_UNDEFINED_VALUE;
+}
+
+/* @return whether all items in l are in s
+ */
+bool list_in_set_p(list l, set s)
+{
+  FOREACH(CHUNK, c, l)
+    if (!set_belong_p(s, c))
+      return false;
+  return true;
 }
 
 /* @return s1 = s2 u s3.
@@ -235,7 +275,7 @@ void set_clear(set s)
 void set_free(set s)
 {
   hash_table_free(s->table);
-  gen_free_area((void**) s, sizeof(set_chunk));
+  gen_free_area((void**) s, sizeof(struct _set_chunk));
 }
 
 bool set_empty_p(set s)
@@ -296,7 +336,7 @@ void gen_set_closure(void (*iterate)(void *, set),
 
 int set_own_allocated_memory(set s)
 {
-  return sizeof(set_chunk)+hash_table_own_allocated_memory(s->table);
+  return sizeof(struct _set_chunk)+hash_table_own_allocated_memory(s->table);
 }
 
 /**
@@ -325,27 +365,18 @@ list set_to_sorted_list(set s, int (*cmp)(const void *,const void *))
 }
 
 /**
- * turns a list into a set
+ * assigns a list contents to a set
  * all duplicated elements are lost
  *
+ * @param s set being assigned to.
  * @param l list to turn into a set
- * @param st type of elements in the list
- *
- * @return allocated set of elements from @a l
- * @warning list_to_set(set_to_list(s))!=s
- *
- * The interface is not consistent with set.c: the resulting set could
- * be passed as an argument, which would solve the hash_private
- * issue. Also, this constructor could be moved next to other set
- * constructors.
  */
-set list_to_set(list l, set_type st)
+/* assign the contents of a list to a set.
+ */
+set set_assign_list(set s, list l)
 {
-  set s = set_make(st);
-  message_assert("st is not hash_private", st!=hash_private);
-  while(!ENDP(l)) {
-    set_add_element(s, s, CAR(l).p);
-    POP(l);
-  }
+  set_clear(s);
+  FOREACH(CHUNK, i, l)
+    set_add_element(s, s, i);
   return s;
 }

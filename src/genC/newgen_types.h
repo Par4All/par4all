@@ -82,7 +82,6 @@ typedef int unit ;
 #define array_undefined NULL
 #define array_undefined_p(a) ((a)==NULL)
 
-struct cons;
 typedef struct cons * list;
 
 // obsolete?

@@ -35,28 +35,24 @@
 #include "newgen_types.h"
 #include "newgen_hash.h"
 
+typedef struct _set_chunk * set;
+
 /* Note: hash_chunk is not included in set_type */
 typedef enum {
-    set_string = hash_string ,
-    set_int = hash_int,
-    set_pointer = hash_pointer,
-    set_private = hash_private
+  set_string = hash_string ,
+  set_int = hash_int,
+  set_pointer = hash_pointer,
+  set_private = hash_private
 } set_type ;
-
-/* FI: I do not understand why the type is duplicated at the set
-   level. Is there a potential consistency problem with the hash
-   table type? Is this a consequence of the decision to hide the
-   actual hash_table data structure? */
-typedef struct {
-    hash_table table ;
-    set_type type ;
-} set_chunk, *set ;
 
 #define set_undefined ((set)(-16))
 #define set_undefined_p(s) ((s)==set_undefined)
 
-#define SET_MAP(element,code,set) \
-    { HASH_MAP(_set_map_key, element, code, (set)->table); }
+#define SET_MAP(element,code,the_set)					\
+  {									\
+    HASH_MAP(_set_map_key, element, code,				\
+	     set_private_get_hash_table(the_set));			\
+  }
 
 /* functions declared in set.c */
 extern set set_generic_make(set_type typ,
@@ -65,8 +61,10 @@ extern set set_generic_make(set_type typ,
 extern set set_make(set_type typ);
 extern set set_singleton(set_type type, void *p);
 extern set set_assign(set s1, set s2);
+extern set set_dup(set);
 extern set set_add_element(set s1, set s2, void *e);
 extern bool set_belong_p(set s, void *e);
+extern bool list_in_set_p(list, set);
 extern set set_union(set s1, set s2, set s3);
 extern set set_intersection(set s1, set s2, set s3);
 extern set set_difference(set s1, set s2, set s3);
@@ -81,6 +79,10 @@ extern void gen_set_closure(void (*iterate)(void *, set), set initial);
 extern int set_own_allocated_memory(set s);
 extern list set_to_list(set);
 extern list set_to_sorted_list(set, int (*)(const void *, const void *));
-extern set list_to_set(list, set_type);
+extern set set_assign_list(set, list);
+extern set_type set_get_type(set);
+
+// do not call me please...
+extern hash_table set_private_get_hash_table(set);
 
 #endif
