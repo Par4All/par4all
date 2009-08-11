@@ -1,0 +1,86 @@
+
+Initial code
+
+int foo(int seed[100])
+{
+   int a[100];
+   int b[100];
+   int c[100];
+   int i;
+   /* init */
+   for(i = 0; i <= 99; i += 1) {
+      a[i] = seed[i];
+      b[i] = seed[99-i];
+   }
+   /* compute */
+kernel:
+   for(i = 0; i <= 99; i += 1)
+      c[i] = a[i]+b[i];
+   /* print result */
+   for(i = 0; i <= 99; i += 1)
+      printf("%d ", c[i]);
+   printf("\n");
+}
+
+Code after kernelization
+
+int foo(int seed[100])
+{
+   int i_1;
+   int a[100];
+   int b[100];
+   int c[100];
+   int i;
+   /* init */
+#pragma omp parallel for 
+   for(i = 0; i <= 99; i += 1) {
+      a[i] = seed[i];
+      b[i] = seed[99-i];
+   }
+#pragma outline this
+   /* compute */
+#pragma omp parallel for private(i)
+kernel:
+   for(i_1 = 0; i_1 <= 100; i_1 += 10) {
+      i = KERNEL_ID()+i_1;
+      c[i] = a[i]+b[i];
+   }
+l99999:
+   for(i = 100+1; i <= 99; i += 1)
+      c[i] = a[i]+b[i];
+   /* print result */
+   for(i = 0; i <= 99; i += 1)
+      printf("%d ", c[i]);
+   printf("\n");
+}
+
+Code after cleanup
+
+int foo(int seed[100])
+{
+   int i_1;
+   int a[100];
+   int b[100];
+   int c[100];
+   int i;
+   /* init */
+#pragma omp parallel for 
+   for(i = 0; i <= 99; i += 1) {
+      a[i] = seed[i];
+      b[i] = seed[99-i];
+   }
+#pragma outline this
+   /* compute */
+#pragma omp parallel for private(i)
+kernel:
+   for(i_1 = 0; i_1 <= 100; i_1 += 10) {
+      i = KERNEL_ID()+i_1;
+      c[i] = a[i]+b[i];
+   }
+l99999:   i = 100+1;
+   /* print result */
+   for(i = 0; i <= 99; i += 1)
+      printf("%d ", c[i]);
+   printf("\n");
+   ;
+}

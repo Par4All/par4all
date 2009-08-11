@@ -39,6 +39,6 @@ shell if test `array_to_pointer01.database/Src/array_to_pointer` = `${VDIR:-.}/a
 shell rm -rf array_to_pointer01.database/Src/array_to_pointer ${VDIR:-.}/array_to_pointer
 
 close
-#delete array_to_pointer01
+delete array_to_pointer01
 quit
 
