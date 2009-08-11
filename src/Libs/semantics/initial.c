@@ -82,7 +82,7 @@ get_main_entity(void)
     }
 
     /* ??? some default if there is no main... */
-    pips_user_warning("no main found, returning %s instead\n", 
+    pips_user_warning("no main found, returning %s instead\n",
 		      gen_array_item(modules,0));
     m = module_name_to_entity(gen_array_item(modules, 0));
     gen_array_full_free(modules);
@@ -93,8 +93,7 @@ get_main_entity(void)
 
 /* Compute an initial transformer.
  */
-bool 
-initial_precondition(string name)
+bool initial_precondition(string name)
 {
     entity module = module_name_to_entity(name);
     transformer prec;
@@ -102,15 +101,15 @@ initial_precondition(string name)
     debug_on("SEMANTICS_DEBUG_LEVEL");
 
     set_current_module_entity(module);
-    set_current_module_statement( (statement) 
+    set_current_module_statement( (statement)
 	db_get_memory_resource(DBR_CODE, name, TRUE));
-    set_cumulated_rw_effects((statement_effects) 
+    set_cumulated_rw_effects((statement_effects)
 		   db_get_memory_resource(DBR_CUMULATED_EFFECTS, name, TRUE));
     module_to_value_mappings(module);
 
     prec = all_data_to_precondition(module);
 
-    ifdebug(1) 
+    ifdebug(1)
 	pips_assert("consistent initial precondition before filtering", 
 		    transformer_consistency_p(prec));
 
