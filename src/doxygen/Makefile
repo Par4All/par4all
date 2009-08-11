@@ -19,11 +19,7 @@
 # along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-ifdef LINEAR_ROOT
-ROOT    = $(LINEAR_ROOT)
-else
 ROOT    = ../..
-endif
 
 LINEAR_SOURCE_DIR = $(ROOT)/src
 
@@ -41,10 +37,10 @@ PROJECT_NAME           = Linear
 # the documentation at once.
 GENERATE_TAGFILE_NAME       = Linear.doxygen-tag
 
-DEFAULT_DOXYGEN_CONFIG = $(LINEAR_SOURCE_DIR)/../makes/share/doxygen/Doxyfile
+DEFAULT_DOXYGEN_CONFIG = $(ROOT)/makes/share/doxygen/Doxyfile
 
 include $(ROOT)/makes/main.mk
-include $(LINEAR_SOURCE_DIR)/../makes/doxygen.mk
+include $(ROOT)/makes/doxygen.mk
 
 # If needed:
 #make_destination_dir :

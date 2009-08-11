@@ -37,10 +37,6 @@ INSTALL_INC	+= $(OTHER_HEADERS)
 
 ################################################################## COMMON STUFF
 
-ifdef LINEAR_ROOT
-ROOT    = $(LINEAR_ROOT)
-else
 ROOT    = ../..
-endif
 PROJECT = linear
 include $(ROOT)/makes/main.mk
