@@ -749,11 +749,15 @@ int hash_table_entry_count(hash_table htp)
     return htp->n_entry;
 }
 
+/* returns the size of the internal array.
+ */
 int hash_table_size(hash_table htp)
 {
     return htp->size;
 }
 
+/* returns the type of the hash_table.
+ */
 hash_key_type hash_table_type(hash_table htp)
 {
     return htp->type;

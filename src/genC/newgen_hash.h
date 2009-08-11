@@ -40,7 +40,6 @@ typedef enum hash_key_type {
  * HASH_ENTRY_FREE_FOR_PUT then the slot is empty.
  */
 
-struct __hash_table;
 typedef struct __hash_table *hash_table;
 typedef _uint (* hash_rank_t)(const void *, size_t);
 typedef  int (* hash_equals_t)(const void *, const void *);
@@ -59,13 +58,16 @@ typedef  int (* hash_equals_t)(const void *, const void *);
 
 #define hash_table_empty_p(htp) (hash_table_entry_count(htp) == 0)
 
-#define HASH_MAP(k,v,code,h) \
-    {\
-    hash_table _map_hash_h = (h) ; \
-    register void * _map_hash_p = NULL; \
-    void *k, *v; \
-    while ((_map_hash_p = hash_table_scan(_map_hash_h,_map_hash_p,&k,&v))) { \
-            code ; }}
+#define HASH_MAP(k,v,code,h)						\
+  {									\
+    hash_table _map_hash_h = (h) ;					\
+    register void * _map_hash_p = NULL;					\
+    void *k, *v;							\
+    while ((_map_hash_p =						\
+	    hash_table_scan(_map_hash_h, _map_hash_p, &k, &v))) {	\
+      code;								\
+    }									\
+  }
 
 /* Let's define a new version of
  * hash_put_or_update() using the warn_on_redefinition
