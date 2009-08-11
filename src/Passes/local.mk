@@ -52,7 +52,7 @@ ifndef PIPS_NO_GPIPS
 endif
 
 # compile pypips only if required
-ifndef PIPS_NO_PYPIPS
+ifdef PIPS_PYPIPS
 	FWD_DIRS	+= pypips
 endif
 
