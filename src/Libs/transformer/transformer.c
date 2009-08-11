@@ -920,7 +920,6 @@ transformer transformer_temporary_value_projection(transformer tf)
     pips_assert("No temporary values exist in the system since a reset "
 		"counter for them has been performed\n", ENDP(tv));
   }
-  
 
   gen_free_list(tv);
 
@@ -1102,7 +1101,7 @@ transformer transformer_projection_with_redundancy_elimination_and_check(
       entity volatile e = ENTITY(CAR(cea));
       pips_assert("base contains variable to project...",
 		  base_contains_variable_p(sc_base(r), (Variable) e));
- 
+
       pips_debug(9, "Projection of %s\n", entity_name(e));
 
       CATCH(overflow_error) 
@@ -1110,10 +1109,10 @@ transformer transformer_projection_with_redundancy_elimination_and_check(
 	  /* FC */
 	  pips_user_warning("overflow error in projection of %s, "
 			    "variable eliminated\n",
-			    entity_name(e)); 
+			    entity_name(e));
 	  r = sc_elim_var(r, (Variable) e);
 	}
-      TRY 
+      TRY
 	{
 	  /* sc_projection_along_variable_ofl_ctrl_timeout_ctrl */
 	  sc_projection_along_variable_ofl_ctrl
@@ -1122,7 +1121,7 @@ transformer transformer_projection_with_redundancy_elimination_and_check(
 	}
 
       sc_base_remove_variable(r,(Variable) e);
-	 
+
       /* could eliminate redundancy at each projection stage to avoid
        * explosion of the constraint number...  however it is pretty
        * expensive to do so. But we explode with NPRIO in FPPP (Spec
@@ -1188,8 +1187,7 @@ transformer transformer_projection_with_redundancy_elimination_and_check(
     }
 
     /* Step 3: compute new_args, but beware of left over old values! */
-    FOREACH(ENTITY, e, 	transformer_arguments(t))
-    { 
+    FOREACH(ENTITY, e, transformer_arguments(t)) {
       if(!local_temporary_value_entity_p(e)) {
 	entity v = value_to_variable(e);
 
