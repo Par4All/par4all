@@ -1106,10 +1106,37 @@ bool effect_pointer_type_p(effect eff)
 	  {
 	    pips_internal_error("case not handled yet\n");
 	  }
-	} /*switch */  
-  
+	} /*switch */
+
     }/*while */
   pips_debug(8, "end with p = %s\n", p== false ? "false" : "true");
   return p;
 
+}
+
+bool regions_weakly_consistent_p(list rl)
+{
+  FOREACH(EFFECT, r, rl) {
+    descriptor rd = effect_descriptor(r);
+
+    if(descriptor_convex_p(rd)) {
+      Psysteme rsc = descriptor_convex(rd);
+
+      pips_assert("rsc is weakly consistent", sc_weak_consistent_p(rsc));
+    }
+  }
+  return TRUE;
+}
+
+bool region_weakly_consistent_p(effect r)
+{
+  descriptor rd = effect_descriptor(r);
+
+  if(descriptor_convex_p(rd)) {
+    Psysteme rsc = descriptor_convex(rd);
+
+    pips_assert("rsc is weakly consistent", sc_weak_consistent_p(rsc));
+  }
+
+  return TRUE;
 }

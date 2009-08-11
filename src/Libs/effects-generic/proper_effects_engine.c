@@ -175,12 +175,12 @@ list generic_p_proper_effect_of_reference(reference ref,
   entity ent = reference_variable(ref);
   list l_inds = reference_indices(ref);
   list l_inds_tmp = l_inds;
-  
+
   type t = ultimate_type(entity_type(ent));
-  
+
   *pme = effect_undefined;
-   
-  
+
+
 
   /* now we generate the read effects on intermediate pointer dimensions */
   /* if the entity reference is a pointer, then we scan the dimensions
@@ -191,108 +191,113 @@ list generic_p_proper_effect_of_reference(reference ref,
     {
       variable v = type_variable(t);
       basic b = variable_basic(v);
-      
-      pips_debug(4, "reference %s to entity %s of basic %s and" 
+
+      pips_debug(4, "reference %s to entity %s of basic %s and"
 		 " number of dimensions %d.\n",
 		 words_to_string(words_reference(ref)),
 		 entity_name(ent),
 		 basic_to_string(variable_basic(v)),
 		 (int) gen_length(variable_dimensions(v)));
-      
-      
+
       if (basic_pointer_p(b))
 	{
 	  reference read_ref = make_reference(ent, NIL);
 	  list l_dim_tmp = variable_dimensions(v);
-	  
+
 	  pips_debug(8, "it's a pointer type. l_dim_tmp = %d, "
 		     "l_inds_tmp = %d\n",
 		     (int) gen_length(l_dim_tmp),
 		     (int) gen_length(l_inds_tmp));
-	  
+
 	  /* while there is non partially subscripted references to pointers */
 	  while((basic_pointer_p(variable_basic(v)))
 		&& gen_length(l_dim_tmp) < gen_length(l_inds_tmp) )
 	    {
 	      effect eff_read;
-	      
-	      /* first we add the indices corresponding to the current array 
-		 dimensions if any 
+
+	      /* first we add the indices corresponding to the current
+		 array dimensions if any
 	      */
-	      
+
 	      pips_debug(8, "l_dim_tmp = %d, l_inds_tmp = %d\n",
 			 (int) gen_length(l_dim_tmp),
 			 (int) gen_length(l_inds_tmp));
-	      
+
 	      while (!ENDP(l_dim_tmp))
 		{
-		  reference_indices(read_ref)= 
-		    gen_nconc(reference_indices(read_ref), 
+		  reference_indices(read_ref)=
+		    gen_nconc(reference_indices(read_ref),
 			      CONS(EXPRESSION, EXPRESSION(CAR(l_inds_tmp)),
-				   NIL)); 
+				   NIL));
 		  POP(l_dim_tmp);
 		  POP(l_inds_tmp);
 		}
-	      
+
 	      pips_debug(4, "adding a read effect on reference %s\n",
 			 words_to_string(words_reference(read_ref)));
-	      
-	      eff_read = (*reference_to_effect_func)(copy_reference(read_ref), 
+
+	      eff_read = (*reference_to_effect_func)(copy_reference(read_ref),
 						     make_action_read());
+	      pips_assert("le is weakly consistent", regions_weakly_consistent_p(le));
 	      le = gen_nconc(le, CONS(EFFECT, eff_read, NIL));
-	      
-	      
+	      pips_assert("le is weakly consistent", regions_weakly_consistent_p(le));
+
 	      v = type_variable(basic_pointer(variable_basic(v)));
 	      l_dim_tmp = variable_dimensions(v);
-	      
-	      /* if there are remaining indices, there is necessarily an index 
+
+	      /* if there are remaining indices, there is necessarily an index
 		 to reach the pointed dimension */
 	      if(!ENDP(l_inds_tmp))
 		{
 		  pips_debug(4, "adding an index for pointer dimension \n");
-		  reference_indices(read_ref)= 
-		    gen_nconc(reference_indices(read_ref), 
-			      CONS(EXPRESSION, 
-				   copy_expression(EXPRESSION(CAR(l_inds_tmp))), 
-				   NIL)); 
+		  reference_indices(read_ref)=
+		    gen_nconc(reference_indices(read_ref),
+			      CONS(EXPRESSION,
+				   copy_expression(EXPRESSION(CAR(l_inds_tmp))),
+				   NIL));
 		  POP(l_inds_tmp);
 		}
 	    }
-	  free_reference(read_ref); 
+	  free_reference(read_ref);
 	}
-      
-      /* no read or write effects on partial array if 
+
+      /* no read or write effects on partial array if
 	 allow_partials_on_pme is false */
       if((basic_pointer_p(b) && gen_length(variable_dimensions(v)) <= gen_length(l_inds))||
-	 (!basic_pointer_p(b) && 
-	  (allow_partials_on_pme || 
+	 (!basic_pointer_p(b) &&
+	  (allow_partials_on_pme ||
 	   gen_length(variable_dimensions(v)) == gen_length(l_inds))))
 	{
 	  *pme = (*reference_to_effect_func)
 	    (ref, write_p?make_action_write():make_action_read());
+	  pips_assert("*pme is wekly consistent", region_weakly_consistent_p(*pme));
 	}
     }
   else
     {
-      
-      /* just compute the main effect on the reference 
+
+      /* just compute the main effect on the reference
+
        This should maybe be refined ? */
-      
+
       *pme = (*reference_to_effect_func)
 	(ref, write_p?make_action_write():make_action_read());
+      pips_assert("*pme is wekly consistent", region_weakly_consistent_p(*pme));
     }
-  
+
   /* we must add the read effects on the indices ; these reads are performed
    before the main effect */
+  pips_assert("le is weakly consistent", regions_weakly_consistent_p(le));
   le = gen_nconc(generic_proper_effects_of_expressions
 		 (reference_indices(ref)), le);
-  
+  pips_assert("le is weakly consistent", regions_weakly_consistent_p(le));
+
   ifdebug(4)
     {
       pips_debug(4, "ending with effects : \n");
       (*effects_prettyprint_func)(le);
     }
-  
+
   return le;
 }
 
@@ -302,21 +307,20 @@ list generic_p_proper_effect_of_reference(reference ref,
  * input    : a reference and a boolean true if it is a written reference.
  * output   : the corresponding list of effects.
  * modifies : nothing.
- * comment  : effects of a reference that is either read or written. 	
+ * comment  : effects of a reference that is either read or written.
  */
-list 
-generic_proper_effects_of_reference(reference ref, bool written_p)
+list generic_proper_effects_of_reference(reference ref, bool written_p)
 {
   list le = NIL;
   entity v = reference_variable(ref);
 
-  pips_debug(3, "begin with reference %s\n", 
+  pips_debug(3, "begin with reference %s\n",
 	     words_to_string(words_reference(ref)));
   /* structure fields are referenced, not called, altough they are constant... */
-  if(!entity_field_p(v)) 
+  if(!entity_field_p(v))
     {
       transformer context;
-      
+
     /* CA: lazy, because in the in region backward translation of formal
      * parameters that are not simple references on the caller side,
      * this stuff may be called without proper context.
@@ -326,22 +330,25 @@ generic_proper_effects_of_reference(reference ref, bool written_p)
       else {
 	context = effects_private_current_context_head();
       }
-      
-      if (! (*empty_context_test)(context)) 
+
+      if (! (*empty_context_test)(context))
 	{
 	  effect eff;
-	  
+
+	  pips_assert("le is weakly consistent", regions_weakly_consistent_p(le));
 	  le =  generic_p_proper_effect_of_reference(ref, &eff, written_p,
-						     false);
-	  
+						     FALSE);
+	  pips_assert("le is weakly consistent", regions_weakly_consistent_p(le));
+
 	  if (!effect_undefined_p(eff))
 	    {
 	      le = gen_nconc(le, CONS(EFFECT, eff, NIL));
+	      pips_assert("le is weakly consistent", regions_weakly_consistent_p(le));
 	    }
-	  
+
 	  (*effects_precondition_composition_op)(le, context);
 	}
-      
+
       pips_debug(3, "end\n");
     }
   return(le);
@@ -352,10 +359,9 @@ generic_proper_effects_of_reference(reference ref, bool written_p)
  * input    : a reference that is read.
  * output   : the corresponding list of effects.
  * modifies : nothing.
- * comment  : effects of a reference that is read 	
+ * comment  : effects of a reference that is read
  */
-list 
-generic_proper_effects_of_read_reference(reference ref)
+list generic_proper_effects_of_read_reference(reference ref)
 {
   list le = NIL;
 
@@ -368,15 +374,14 @@ generic_proper_effects_of_read_reference(reference ref)
  * input    : a reference that is written.
  * output   : the corresponding list of effects.
  * modifies : nothing.
- * comment  : effects of a reference that is written	
+ * comment  : effects of a reference that is written
  */
-list 
-generic_proper_effects_of_written_reference(reference ref)
-{    
+list generic_proper_effects_of_written_reference(reference ref)
+{
   list le = NIL;
- 
+
   le = generic_proper_effects_of_reference(ref, TRUE);
-  
+
   return(le);
 }
 
@@ -758,7 +763,7 @@ list generic_proper_effects_of_complex_address_expression(expression add_exp, ef
 	      type t_s_exp = expression_to_type(s_exp);
 
 	      pips_debug(4, "It's a subscript\n");
-	      
+
 	      /* if the array expression is a pointer, we must add a read
 		 effect on it, that is to say a read effect on *pme.
 	      */
@@ -778,17 +783,17 @@ list generic_proper_effects_of_complex_address_expression(expression add_exp, ef
 		{
 		  (*effect_add_expression_dimension_func)(*pme, ind_exp);
 		  le = gen_nconc(le, generic_proper_effects_of_expression(ind_exp));
-		  
+
 		}
 	      finished_p = true;
-	      
+
 	    }
-	  else if(syntax_cast_p(s)) 
+	  else if(syntax_cast_p(s))
 	    {
 	      /* nothing to do */
 	      finished_p = true;
 	    }
-	  else 
+	  else
 	    {
 	      /* we should be finished already because we do not know how to
 		 handle these constructs and we knew that before going down
@@ -797,7 +802,7 @@ list generic_proper_effects_of_complex_address_expression(expression add_exp, ef
 	    }
 	} /* end of !effect_undefined_p(*pme) */
     } /* */
-  
+
   if(!finished_p && !effect_undefined_p(*pme)) 
     {
       /* The sub-effect could not be refined : it's an anywhere effect */
