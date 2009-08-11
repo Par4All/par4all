@@ -30,15 +30,17 @@ LIB_CFILES =	debug.c \
 		exception.c \
 		mem_spy.c \
 		perf_spy.c \
-		malloc_debug.c 
+		malloc_debug.c
 
 INC_TARGET =	$(TARGET).h
 
 LIB_TARGET      = lib$(TARGET).a
 
-CPPFLAGS+='-DCONFIG_DIR="$(ETC.d)"'
-
 # common stuff
 ROOT    = ../../..
 PROJECT = pips
 include $(ROOT)/makes/main.mk
+
+# local stuff
+here	:=	$(shell pwd)
+CPPFLAGS+='-DCONFIG_DIR="$(here)/$(ETC.d)"'
