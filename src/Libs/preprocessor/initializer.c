@@ -69,8 +69,7 @@ nth_formal_name(int n) {
 
 
 /* Generate an entry for one formal parameter of a stub declaration */
-static sentence
-stub_var_decl(parameter p, int n, bool is_fortran)
+static sentence stub_var_decl(parameter p, int n, bool is_fortran)
 {
   sentence result;
   type t = parameter_type(p);
@@ -115,8 +114,7 @@ stub_var_decl(parameter p, int n, bool is_fortran)
 
 
 /* Generate the head of a stub source for a missing source. */
-static sentence
-stub_head(entity f, bool is_fortran)
+static sentence stub_head(entity f, bool is_fortran)
 {
   list ls = NIL;
   type t = entity_type(f);
@@ -127,25 +125,25 @@ stub_head(entity f, bool is_fortran)
 
   fu = type_functional(t);
   n = gen_length(functional_parameters(fu));
-    
+
   /* is it a subroutine or a function? */
   if(!type_void_p(functional_result(fu)))
     {
       type tf = functional_result(fu);
       pips_assert("result is a variable", type_variable_p(tf));
-      ls = CONS(STRING, strdup(is_fortran? " FUNCTION " : " "), 
+      ls = CONS(STRING, strdup(is_fortran? " FUNCTION " : " "),
 		CONS(STRING,
 		     strdup(basic_to_string(variable_basic(type_variable(tf)))),
 		     NIL));
     }
-  else 
+  else
     ls = CONS(STRING, strdup(is_fortran? "SUBROUTINE ":"void "), NIL);
 
   ls = CONS(STRING, strdup(module_local_name(f)), ls);
-    
+
   if(is_fortran) {
     /* generate the formal parameter list. */
-    for(number=1; number<=n; number++) 
+    for(number=1; number<=n; number++)
       ls = CONS(STRING, nth_formal_name(number),
 		CONS(STRING, strdup(number==1? "(": ", "), ls));
 
@@ -168,18 +166,17 @@ stub_head(entity f, bool is_fortran)
 	ls = CONS(STRING, strdup(")"), ls);
       }
     }
-    else 
+    else
       ls = CONS(STRING, strdup("()"), ls);
   }
-  return make_sentence(is_sentence_unformatted, 
+  return make_sentence(is_sentence_unformatted,
 		       make_unformatted(string_undefined, 0, 0, gen_nreverse(ls)));
 }
 
 
 /* Generate the text for a missing module.
  */
-static text 
-stub_text(entity module, bool is_fortran)
+static text stub_text(entity module, bool is_fortran)
 {
     sentence warning, head;
     type t = entity_type(module);
@@ -202,21 +199,40 @@ stub_text(entity module, bool is_fortran)
 
     warning = make_sentence(is_sentence_formatted,
 			    strdup(is_fortran? FILE_WARNING:C_FILE_WARNING_EFFECT));
-    head = stub_head(module, is_fortran);
-    
-    MAP(PARAMETER, p, {
-      type t = parameter_type(p);
-      if(!type_void_p(t))
-	ls = CONS(SENTENCE, stub_var_decl(p, n++, is_fortran), ls);
-    }, functional_parameters(type_functional(t)));
+    if(is_fortran) {
+      head = stub_head(module, is_fortran);
 
-    ls = CONS(SENTENCE, make_sentence(is_sentence_unformatted,
-	     make_unformatted(string_undefined, 0, 0, 
-			      CONS(STRING, strdup(is_fortran?"END":"{}"), NIL))), ls);
-    
-    ls = CONS(SENTENCE, warning, CONS(SENTENCE, head, gen_nreverse(ls)));
+      FOREACH(PARAMETER, p, functional_parameters(type_functional(t))) {
+	type t = parameter_type(p);
+	if(!type_void_p(t))
+	  ls = CONS(SENTENCE, stub_var_decl(p, n++, is_fortran), ls);
+      }
 
-    st = make_text(ls);
+      ls = CONS(SENTENCE, make_sentence(is_sentence_unformatted,
+					make_unformatted(string_undefined, 0, 0,
+							 CONS(STRING, strdup(is_fortran?"END":"{}"), NIL))), ls);
+
+      ls = CONS(SENTENCE, warning, CONS(SENTENCE, head, gen_nreverse(ls)));
+
+      st = make_text(ls);
+    }
+    else { /* assume is_C */
+	sentence bs = make_sentence(is_sentence_unformatted,
+				    make_unformatted(string_undefined, 0, 0,
+						     CONS(STRING, strdup("{}"), NIL)));
+	string name = entity_user_name(module);
+	type t = entity_type(module);
+	list pc = generic_c_words_entity(t, CHAIN_SWORD(NIL,name), FALSE, TRUE);
+
+	// st = c_text_entity(entity_undefined, module, 0);
+	st = make_text(NIL);
+	ADD_SENTENCE_TO_TEXT(st, make_sentence(is_sentence_unformatted,
+					       make_unformatted(NULL, 0, 0, pc)));
+	text_sentences(st) = gen_nconc(CONS(SENTENCE, warning, NIL),
+					text_sentences(st)) ;
+	text_sentences(st) = gen_nconc(text_sentences(st),
+				       CONS(SENTENCE, bs, NIL));
+    }
 
     ifdebug(8) {
       if(!is_fortran) {
@@ -230,8 +246,7 @@ stub_text(entity module, bool is_fortran)
 
 /* Generate the text of a compilation unit for a missing C module.
  */
-static text 
-compilation_unit_text(entity cu, entity module)
+static text compilation_unit_text(entity cu, entity module)
 {
     sentence warning = sentence_undefined;
     type t = entity_type(module);
@@ -242,7 +257,7 @@ compilation_unit_text(entity cu, entity module)
     // The text output of the compilation unit:
     text cut = make_text(NIL);
     //entity e = entity_undefined;
-    
+
     pips_assert("We must be in a C prettyprinter environment", !get_prettyprint_is_fortran());
 
     if (type_undefined_p(t))
@@ -278,7 +293,7 @@ compilation_unit_text(entity cu, entity module)
     ifdebug(8) {
       pips_debug(8, "List of supporting entities: ");
       print_entities(nsel);
-      fprintf(stderr, "\n");
+      fprintf(stderr, "\n\n");
     }
 
     pips_assert("Each entity appears only once", gen_once_p(nsel));
@@ -320,7 +335,7 @@ compilation_unit_text(entity cu, entity module)
    structured up-to-date.
 
    Useful for code generation, out-lining, stub generation...
- 
+
    Should be checked with different module with the same name... Maybe a
    conflict in WORKSPACE_TMP_SPACE ?
 */
@@ -339,7 +354,7 @@ add_new_module_from_text(string module_name,
     /* For C only: compilation unit cu and compilation unit name cun */
     string cun = string_undefined;
     entity cu = entity_undefined;
- 
+
     if(entity_undefined_p(m))
     {
       pips_user_error(
@@ -359,7 +374,7 @@ add_new_module_from_text(string module_name,
 	cu = MakeCompilationUnitEntity(cun);
       }
     }
-    
+
     /* pips' current directory is just above the workspace
      */
     file_name = strdup(concatenate(module_name, is_fortran? FORTRAN_FILE_SUFFIX : PP_C_ED, NULL));
@@ -367,7 +382,7 @@ add_new_module_from_text(string module_name,
     dir_name = db_get_current_workspace_directory();
     src_name = strdup(concatenate(WORKSPACE_TMP_SPACE, "/", file_name, NULL));
     full_name = strdup(concatenate(dir_name, "/", src_name, NULL));
-    init_name = 
+    init_name =
       db_build_file_resource_name(res, module_name, is_fortran? FORTRAN_INITIAL_FILE_SUFFIX : C_FILE_SUFFIX);
     finit_name = strdup(concatenate(dir_name, "/", init_name, NULL));
 
@@ -479,7 +494,7 @@ ask_a_missing_file(string module, bool is_fortran)
     string file;
     bool ok, cont;
     string res= is_fortran? DBR_INITIAL_FILE : DBR_C_SOURCE_FILE;
-    
+
     /* Should be simplified... */
     do {
 	file = user_request("Please enter a file for module %s\n or \"quit\" to abort or \"generate\" to generate a stub\n", module);

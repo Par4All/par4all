@@ -2393,7 +2393,7 @@ list recursive_functional_type_supporting_entities(list sel, set vt, functional 
   ifdebug(8) {
     pips_debug(8, "Begin: ");
     print_entities(sel);
-    fprintf(stderr, "\n");
+    fprintf(stderr, "\n\n");
   }
 
   MAP(PARAMETER, p,
@@ -2405,7 +2405,7 @@ list recursive_functional_type_supporting_entities(list sel, set vt, functional 
   ifdebug(8) {
     pips_debug(8, "End: ");
     print_entities(sel);
-    fprintf(stderr, "\n");
+    fprintf(stderr, "\n\n");
   }
 
   return sel;
@@ -2433,7 +2433,7 @@ list enum_supporting_entities(list sel, set vt, entity e)
   ifdebug(8) {
     pips_debug(8, "Begin: ");
     print_entities(sel);
-    fprintf(stderr, "\n");
+    fprintf(stderr, "\n\n");
   }
 
   for(cm = ml; !ENDP(cm); POP(cm)) {
@@ -2449,7 +2449,7 @@ list enum_supporting_entities(list sel, set vt, entity e)
   ifdebug(8) {
     pips_debug(8, "End: ");
     print_entities(sel);
-    fprintf(stderr, "\n");
+    fprintf(stderr, "\n\n");
   }
 
   return sel;
@@ -2462,7 +2462,7 @@ list generic_constant_expression_supporting_entities(list sel, set vt, expressio
   ifdebug(8) {
     pips_debug(8, "Begin: ");
     print_entities(sel);
-    fprintf(stderr, "\n");
+    fprintf(stderr, "\n\n");
   }
 
   if(syntax_call_p(s)) {
@@ -2474,8 +2474,9 @@ list generic_constant_expression_supporting_entities(list sel, set vt, expressio
 	/* In C, f cannot be declared directly, we need its enum */
 	extern entity find_enum_of_member(entity);
 	entity e_of_f = find_enum_of_member(f);
-	sel = CONS(ENTITY, e_of_f, sel);
+	//sel = CONS(ENTITY, e_of_f, sel);
 	sel = enum_supporting_entities(sel, vt, e_of_f);
+	sel = gen_nconc(sel, CONS(ENTITY, e_of_f, NIL));
       }
       else {
 	/* In Fortran, symbolic constant are declared directly, but
@@ -2483,8 +2484,9 @@ list generic_constant_expression_supporting_entities(list sel, set vt, expressio
 	value v = entity_initial(f);
 	symbolic s = value_symbolic(v);
 
-	sel = CONS(ENTITY, f, sel);
+	//sel = CONS(ENTITY, f, sel);
 	sel = generic_symbolic_supporting_entities(sel, vt, s, language_c_p);
+	sel = gen_nconc(sel, CONS(ENTITY, f, NIL));
       }
     }
 
@@ -2498,10 +2500,11 @@ list generic_constant_expression_supporting_entities(list sel, set vt, expressio
     list inds = reference_indices(r);
     /* Could be guarded so as not to be added twice. Guard might be
        useless with because types are visited only once. */
-    sel = gen_nconc(sel, CONS(ENTITY, v, NIL));
+    //sel = gen_nconc(sel, CONS(ENTITY, v, NIL));
     MAP(EXPRESSION, se, {
 	sel = generic_constant_expression_supporting_entities(sel, vt, se, language_c_p);
       }, inds);
+	sel = gen_nconc(sel, CONS(ENTITY, v, NIL));
   }
   else {
     /* do nothing */
@@ -2511,7 +2514,7 @@ list generic_constant_expression_supporting_entities(list sel, set vt, expressio
   ifdebug(8) {
     pips_debug(8, "End: ");
     print_entities(sel);
-    fprintf(stderr, "\n");
+    fprintf(stderr, "\n\n");
   }
 
   return sel;
@@ -2554,7 +2557,7 @@ list basic_supporting_entities(list sel, set vt, basic b)
   ifdebug(8) {
     pips_debug(8, "Begin: ");
     print_entities(sel);
-    fprintf(stderr, "\n");
+    fprintf(stderr, "\n\n");
   }
 
   if(basic_int_p(b) ||
@@ -2569,13 +2572,15 @@ list basic_supporting_entities(list sel, set vt, basic b)
   else if(basic_pointer_p(b))
     sel = recursive_type_supporting_entities(sel, vt, basic_pointer(b));
   else if(basic_derived_p(b)) {
-    sel = CONS(ENTITY, basic_derived(b), sel);
+    //sel = CONS(ENTITY, basic_derived(b), sel);
     sel = recursive_type_supporting_entities(sel, vt, entity_type(basic_derived(b)));
+    sel = gen_nconc(sel, CONS(ENTITY, basic_derived(b), NIL));
   }
   else if(basic_typedef_p(b)) {
     entity se = basic_typedef(b);
-    sel = CONS(ENTITY, se, sel);
+    //sel = CONS(ENTITY, se, sel);
     sel = recursive_type_supporting_entities(sel, vt, entity_type(se));
+    sel = gen_nconc(sel, CONS(ENTITY, se, NIL));
   }
   else
     pips_internal_error("Unrecognized basic tag %d\n", basic_tag(b));
@@ -2583,7 +2588,7 @@ list basic_supporting_entities(list sel, set vt, basic b)
   ifdebug(8) {
     pips_debug(8, "End: ");
     print_entities(sel);
-    fprintf(stderr, "\n");
+    fprintf(stderr, "\n\n");
   }
 
   return sel;
@@ -2612,7 +2617,7 @@ list variable_type_supporting_entities(list sel, set vt, variable v)
   ifdebug(8) {
     pips_debug(8, "End: ");
     print_entities(sel);
-    fprintf(stderr, "\n");
+    fprintf(stderr, "\n\n");
   }
 
   return sel;
@@ -2624,7 +2629,7 @@ list recursive_type_supporting_entities(list sel, set vt, type t)
   ifdebug(8) {
     pips_debug(8, "Begin: ");
     print_entities(sel);
-    fprintf(stderr, "\n");
+    fprintf(stderr, "\n\n");
   }
 
   if(!set_belong_p(vt, t)) {
@@ -2671,7 +2676,7 @@ list recursive_type_supporting_entities(list sel, set vt, type t)
   ifdebug(8) {
     pips_debug(8, "End: ");
     print_entities(sel);
-    fprintf(stderr, "\n");
+    fprintf(stderr, "\n\n");
   }
 
   return sel;
@@ -3235,7 +3240,7 @@ int effect_basic_depth(basic b)
 static list recursive_type_supporting_types(list stl, set vt, type t);
 
 /* Very basic and crude debugging function */
-static void print_types(list tl)
+void print_types(list tl)
 {
   bool first_p = TRUE;
 

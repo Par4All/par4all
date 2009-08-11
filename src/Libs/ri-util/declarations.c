@@ -1846,7 +1846,7 @@ static list words_brace_expression(expression exp)
   pc = CHAIN_SWORD(pc,"{");
   MAP(EXPRESSION,e,
   {
-    if (!first) 
+    if (!first)
       pc = CHAIN_SWORD(pc, space_p? ", " : ",");
     if (brace_expression_p(e))
       pc = gen_nconc(pc,words_brace_expression(e));
@@ -1891,7 +1891,7 @@ list words_dimensions(list dims)
    10 pointers, each pointer points to a function
    with no parameter and the return type is int)  */
 
-list generic_c_words_entity(type t, list name, bool is_safe)
+list generic_c_words_entity(type t, list name, bool is_safe, bool add_dummy_parameter_name_p)
 {
   list pc = NIL;
   bool space_p = get_bool_property("PRETTYPRINT_LISTS_WITH_SPACES");
@@ -1909,6 +1909,7 @@ list generic_c_words_entity(type t, list name, bool is_safe)
       list lparams = functional_parameters(f);
       list cparam = list_undefined;
       bool first = TRUE;
+      int pnum;
 
       pips_debug(9,"Function type with name = \"%s\" and length %zd\n",
 		 list_to_string(name), gen_length(name));
@@ -1916,39 +1917,47 @@ list generic_c_words_entity(type t, list name, bool is_safe)
       if ((gen_length(name) > 1)
 	  || ((gen_length(name) == 1) && (strcmp(STRING(CAR(name)),"*")==0)))
 	{
-	  /* Function name is an expression like *vfs[] in (*vfs[])() 
+	  /* Function name is an expression like *vfs[] in (*vfs[])()
 	     (syntax = application), or an abstract function type, so parentheses must be added */
 	  pc = CHAIN_SWORD(NIL,"(");
 	  pc = gen_nconc(pc,name);
 	  pc = CHAIN_SWORD(pc,")(");
 
 	}
-      else 
+      else
 	{
 	  /* Function name is a simple reference */
 	  pc = CHAIN_SWORD(name,"(");
 	}
 
-      for(cparam = lparams; !ENDP(cparam); POP(cparam)) {
+      for(cparam = lparams, pnum = 1; !ENDP(cparam); POP(cparam), pnum++) {
 	parameter p = PARAMETER(CAR(cparam));
 	type t1 = parameter_type(p);
 	string pn = dummy_unknown_p(parameter_dummy(p))?
 	  string_undefined : strdup(entity_local_name(dummy_identifier(parameter_dummy(p))));
 
-	//pips_debug(3,"Parameter type %s\n ",type_undefined_p(t1)? "type_undefined" : words_to_string(words_type(t1)));
+	if(add_dummy_parameter_name_p && string_undefined_p(pn)) {
+	  /* RK wants us to use another better function, but its name
+	     is not documented next to itoa() source code and here
+	     the string is going to be strduped, which makes itoa() a
+	     better choice. */
+	  pn = concatenate("f", itoa(pnum), NULL);
+	}
+
+	  //pips_debug(3,"Parameter type %s\n ",type_undefined_p(t1)? "type_undefined" : words_to_string(words_type(t1)));
 	if (!first)
 	  pc = gen_nconc(pc,CHAIN_SWORD(NIL, space_p? ", " : ","));
 	/* c_words_entity(t1,NIL) should be replaced by c_words_entity(t1,name_of_corresponding_parameter) */
 	pc = gen_nconc(pc,
-		       generic_c_words_entity(t1, 
+		       generic_c_words_entity(t1,
 					      string_undefined_p(pn)? NIL : CONS(STRING, strdup(pn), NIL),
-					      is_safe));
+					      is_safe, FALSE));
 	pips_debug(9,"List of parameters \"%s\"\n ",list_to_string(pc));
 	first = FALSE;
       }
 
       pc = CHAIN_SWORD(pc,")");
-      return generic_c_words_entity(t2,pc,is_safe);
+      return generic_c_words_entity(t2,pc,is_safe, FALSE);
     }
 
   if (pointer_type_p(t))
@@ -1960,7 +1969,7 @@ list generic_c_words_entity(type t, list name, bool is_safe)
       if (variable_qualifiers(type_variable(t)) != NIL)
 	pc = gen_nconc(pc,words_qualifier(variable_qualifiers(type_variable(t))));
       pc = gen_nconc(pc,name);
-      return generic_c_words_entity(t1,pc,is_safe);
+      return generic_c_words_entity(t1,pc,is_safe, FALSE);
     }
 
   /* Add type qualifiers if there are */
@@ -2011,7 +2020,7 @@ list generic_c_words_entity(type t, list name, bool is_safe)
       pips_debug(8, "Before concatenation, pc=\"\%s\"\n", list_to_string(pc));
       if(pc!=NIL)
 	pc = CHAIN_SWORD(pc, " ");
-      return gen_nconc(pc,generic_c_words_entity(t1,gen_nconc(tmp,words_dimensions(dims)),is_safe));
+      return gen_nconc(pc,generic_c_words_entity(t1,gen_nconc(tmp,words_dimensions(dims)),is_safe, FALSE));
     }
 
   if (derived_type_p(t))
@@ -2156,7 +2165,7 @@ list generic_c_words_entity(type t, list name, bool is_safe)
 
 list c_words_entity(type t, list name)
 {
-  list pc = generic_c_words_entity(t, name, FALSE);
+  list pc = generic_c_words_entity(t, name, FALSE, FALSE);
 
   ifdebug(8) {
     string s = list_to_string(pc);
@@ -2168,7 +2177,7 @@ list c_words_entity(type t, list name)
 
 list safe_c_words_entity(type t, list name)
 {
-  return generic_c_words_entity(t, name, TRUE);
+  return generic_c_words_entity(t, name, TRUE, FALSE);
 }
 
 text c_text_entities(entity module, list ldecl, int margin)

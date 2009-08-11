@@ -419,7 +419,7 @@ list module_all_declarations(entity m)
 /*
    For C, the declaration in the module statements are added.
 
-   Because this function relies on pipsdnm, it should be relocated
+   Because this function relies on pipsdbm, it should be relocated
    into another library. Prime candidate is preprocessor : - (
  */
 #include "pipsdbm.h"
@@ -430,7 +430,8 @@ list module_to_all_declarations(entity m)
   bool c_module_p(entity);
 
   if(c_module_p(m)) {
-    string module_name = entity_user_name(m);
+    //string module_name = entity_user_name(m);
+    string module_name = entity_local_name(m);
     statement s = (statement) db_get_memory_resource(DBR_PARSED_CODE, module_name, TRUE);
     list sdl = statement_to_declarations(s);
 
