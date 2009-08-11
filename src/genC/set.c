@@ -365,18 +365,27 @@ list set_to_sorted_list(set s, int (*cmp)(const void *,const void *))
 }
 
 /**
+ * add list l items to set s, which is returned.
+ *
+ * @param s modified set
+ * @param l provided list
+ */
+set set_append_list(set s, list l)
+{
+  FOREACH(CHUNK, i, l)
+    set_add_element(s, s, i);
+  return s;
+}
+
+/**
  * assigns a list contents to a set
  * all duplicated elements are lost
  *
  * @param s set being assigned to.
  * @param l list to turn into a set
  */
-/* assign the contents of a list to a set.
- */
 set set_assign_list(set s, list l)
 {
   set_clear(s);
-  FOREACH(CHUNK, i, l)
-    set_add_element(s, s, i);
-  return s;
+  return set_append_list(s, l);
 }

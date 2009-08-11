@@ -79,6 +79,7 @@ extern void gen_set_closure(void (*iterate)(void *, set), set initial);
 extern int set_own_allocated_memory(set s);
 extern list set_to_list(set);
 extern list set_to_sorted_list(set, int (*)(const void *, const void *));
+extern set set_append_list(set, list);
 extern set set_assign_list(set, list);
 extern set_type set_get_type(set);
 
