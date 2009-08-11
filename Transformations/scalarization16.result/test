@@ -1,7 +1,7 @@
 
 Code after scalarization
 
-int func(int n)
+int scalarization16(int n)
 {
    // BEGIN BLOCK
    int __ld__1;
@@ -17,7 +17,7 @@ int func(int n)
       for(j = 0; j <= n-1; j += 1) {
          // BEGIN BLOCK
          __ld__1 = __ld__0^2;
-         __ld__1 = __ld__0+j;
+         __ld__1 = __ld__1+__ld__0+j;
          y[i][j] = __ld__1;
          // END BLOCK
       }

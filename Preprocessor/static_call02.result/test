@@ -126,7 +126,7 @@ End of declarations for module bar
 
 bar!
 
-Declarations for module "bar!" with type "() -> unknow"
+Declarations for module "bar!" with type "() -> unknown"
 
 Variable list:
 
@@ -214,7 +214,7 @@ End of declarations for module foo
 
 foo!
 
-Declarations for module "foo!" with type "() -> unknow"
+Declarations for module "foo!" with type "() -> unknown"
 
 Variable list:
 
@@ -356,7 +356,7 @@ End of declarations for module main
 
 static_call02!
 
-Declarations for module "static_call02!" with type "() -> unknow"
+Declarations for module "static_call02!" with type "() -> unknown"
 
 Variable list:
 

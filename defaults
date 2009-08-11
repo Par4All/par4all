@@ -26,6 +26,6 @@ Examples
 Prettyprint
 LoopRecovering
 OpenMP
-ngspice_bug
+# ngspice_bug:
 Step
 Bootstrap

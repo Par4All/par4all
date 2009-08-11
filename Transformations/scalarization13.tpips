@@ -14,31 +14,31 @@ activate MUST_REGIONS
 #echo
 #echo Initial code
 #echo
-#display PRINTED_FILE[SCALARIZATION]
+#display PRINTED_FILE[SCALARIZATION13]
 
 #echo
 #echo IN regions
 #echo
 #activate PRINT_CODE_IN_REGIONS
-#display PRINTED_FILE[SCALARIZATION]
+#display PRINTED_FILE[SCALARIZATION13]
 
 #echo
 #echo COPY-OUT regions
 #echo
 #activate PRINT_CODE_COPIED_OUT_REGIONS
-#display PRINTED_FILE[SCALARIZATION]
+#display PRINTED_FILE[SCALARIZATION13]
 
 #echo
 #echo Privatized regions
 #echo
 #activate PRINT_CODE_PRIVATIZED_REGIONS
-#display PRINTED_FILE[SCALARIZATION]
+#display PRINTED_FILE[SCALARIZATION13]
 
 echo
 echo Code after scalarization
 echo
-apply SCALARIZATION[SCALARIZATION]
-display PRINTED_FILE[SCALARIZATION]
+apply SCALARIZATION[SCALARIZATION13]
+display PRINTED_FILE[SCALARIZATION13]
 
 close
 delete scalarization13

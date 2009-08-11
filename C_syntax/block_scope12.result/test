@@ -28,9 +28,9 @@ Layout for return variable:
 Layouts for memory areas:
 
 Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
-	External Variable "TOP-LEVEL:_IO_2_1_stdin_"	offset = UNKNOWN,	size = 0
-	External Variable "TOP-LEVEL:_IO_2_1_stdout_"	offset = UNKNOWN,	size = 0
-	External Variable "TOP-LEVEL:_IO_2_1_stderr_"	offset = UNKNOWN,	size = 0
+	External Variable "TOP-LEVEL:_IO_2_1_stdin_"	offset = UNKNOWN,	size = unknown
+	External Variable "TOP-LEVEL:_IO_2_1_stdout_"	offset = UNKNOWN,	size = unknown
+	External Variable "TOP-LEVEL:_IO_2_1_stderr_"	offset = UNKNOWN,	size = unknown
 	External Variable "TOP-LEVEL:stdin"	offset = UNKNOWN,	size = 4
 	External Variable "TOP-LEVEL:stdout"	offset = UNKNOWN,	size = 4
 	External Variable "TOP-LEVEL:stderr"	offset = UNKNOWN,	size = 4

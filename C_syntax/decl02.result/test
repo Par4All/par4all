@@ -3,7 +3,7 @@ Symbol table for "decl02!"
 
 decl02!
 
-Declarations for module "decl02!" with type "() -> unknow"
+Declarations for module "decl02!" with type "() -> unknown"
 
 Variable list:
 
@@ -54,7 +54,7 @@ typedef long STD_uint32;
 static const char *cmd = "No cmd";
 static const char *file = "No file";
 static STD_uint32 line;
-const char MEM_checked_class[] = "allocateur avec suivi";
+const  char MEM_checked_class[] = "allocateur avec suivi";
 int array[] = {1, 2, 3};
 
 Printed file
@@ -63,5 +63,5 @@ typedef long STD_uint32;
 static const char *cmd = "No cmd";
 static const char *file = "No file";
 static STD_uint32 line;
-const char MEM_checked_class[] = "allocateur avec suivi";
+const  char MEM_checked_class[] = "allocateur avec suivi";
 int array[] = {1, 2, 3};

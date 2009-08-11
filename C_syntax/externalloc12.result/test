@@ -1,6 +1,6 @@
 bar!
 
-Declarations for module "bar!" with type "() -> unknow"
+Declarations for module "bar!" with type "() -> unknown"
 
 Variable list:
 
@@ -39,7 +39,7 @@ End of declarations for module bar!
 
 foo!
 
-Declarations for module "foo!" with type "() -> unknow"
+Declarations for module "foo!" with type "() -> unknown"
 
 Variable list:
 

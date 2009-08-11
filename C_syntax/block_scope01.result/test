@@ -4,7 +4,7 @@ Symbol tables
 Possible bug in CCOmpilationUnitMemoryAllocation() for "block_scope01!"
 block_scope01!
 
-Declarations for module "block_scope01!" with type "() -> unknow"
+Declarations for module "block_scope01!" with type "() -> unknown"
 
 Variable list:
 

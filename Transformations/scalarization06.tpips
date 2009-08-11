@@ -22,6 +22,12 @@ echo Initial code
 echo
 display PRINTED_FILE[main]
 
+echo
+echo RW regions
+echo
+activate PRINT_CODE_PROPER_REGIONS
+display PRINTED_FILE[main]
+
 #echo
 #echo IN regions
 #echo

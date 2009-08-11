@@ -1,0 +1,76 @@
+Select some options to deal with the C Language:
+Parse as C:
+Prettyprint the source as C, of course
+int main(int argc, char *argv[])
+{
+   int i;
+   int j;
+
+init_kernel:   i = 1;                                                               /*0006*/
+compute_kernel:   j = i+2;                                                             /*0008*/
+
+   printf("Value is %d\n", j);                                          /*0010*/
+
+   return 0;                                                            /*0012*/
+}
+int main(int argc, char *argv[])
+{
+   int i;
+   int j;
+
+init_kernel:   i = 1;                                                               /*0006*/
+compute_kernel:   j = i+2;                                                             /*0008*/
+
+   printf("Value is %d\n", j);                                          /*0010*/
+
+   return 0;                                                            /*0012*/
+}
+All the kernel parameters should be passed correctly
+void compute_kernel(int i, int *j)
+{
+compute_kernel:   *j = i+2;                                                            /*0003*/
+}
+void compute_kernel(int i, int *j);
+void init_kernel(int *i)
+{
+
+init_kernel:   *i = 1;                                                              /*0004*/
+}
+void init_kernel(int *i);
+int main(int argc, char *argv[])
+{
+   int i;
+   int j;
+
+init_kernel:   init_kernel(&i);                                                     /*0006*/
+compute_kernel:   compute_kernel(i, &j);                                               /*0008*/
+
+   printf("Value is %d\n", j);                                          /*0010*/
+
+   return 0;                                                            /*0012*/
+}
+extern int main(int argc, char *argv[]);
+void compute_kernel(int i, int *j)
+{
+compute_kernel:   *j = i+2;                                                            /*0003*/
+}
+void compute_kernel(int i, int *j);
+void init_kernel(int *i)
+{
+
+init_kernel:   *i = 1;                                                              /*0004*/
+}
+void init_kernel(int *i);
+int main(int argc, char *argv[])
+{
+   int i;
+   int j;
+
+init_kernel:   init_kernel(&i);                                                     /*0006*/
+compute_kernel:   compute_kernel(i, &j);                                               /*0008*/
+
+   printf("Value is %d\n", j);                                          /*0010*/
+
+   return 0;                                                            /*0012*/
+}
+extern int main(int argc, char *argv[]);

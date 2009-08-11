@@ -25,7 +25,7 @@ Request: build resource PARSED_PRINTED_FILE for module multideclsinfile!.
   COMPILATION_UNIT_PARSER        building   DECLARATIONS(multideclsinfile!)
 user warning in UpdateEntity: Multiple declarations of variable a in file
 
-Declarations for module multideclsinfile! with type  () ->  unknow
+Declarations for module multideclsinfile! with type  () ->  unknown
 
 
 Variable list:

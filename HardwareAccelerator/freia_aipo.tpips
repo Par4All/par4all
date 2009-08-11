@@ -1,0 +1,21 @@
+delete freia_aipo
+#setenv PIPS_HWAC_DEBUG_LEVEL=9
+create freia_aipo freia_aipo.c
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+echo
+echo ! initial functions
+echo
+display PRINTED_FILE[%ALL]
+apply HARDWARE_ACCELERATOR[%ALL]
+echo
+echo ! accelerated functions
+echo
+shell cat ./freia_aipo.database/Src/*_helper_*.c
+echo
+echo ! new functions
+echo
+display PRINTED_FILE[%ALL]
+close
+delete freia_aipo
+quit

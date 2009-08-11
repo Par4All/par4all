@@ -322,7 +322,6 @@ extern int __ilogbl(double __x);
 extern double scalbl(double __x, double __n);
 extern double __scalbl(double __x, double __n);
 extern int signgam;
-enum {_IEEE_=-1, _SVID_, _XOPEN_, _POSIX_, _ISOC_};
 typedef enum {_IEEE_=-1, _SVID_, _XOPEN_, _POSIX_, _ISOC_} _LIB_VERSION_TYPE;
 extern _LIB_VERSION_TYPE _LIB_VERSION;
 struct exception {
@@ -662,7 +661,6 @@ extern int __ilogbl(double __x);
 extern double scalbl(double __x, double __n);
 extern double __scalbl(double __x, double __n);
 extern int signgam;
-enum {_IEEE_=-1, _SVID_, _XOPEN_, _POSIX_, _ISOC_};
 typedef enum {_IEEE_=-1, _SVID_, _XOPEN_, _POSIX_, _ISOC_} _LIB_VERSION_TYPE;
 extern _LIB_VERSION_TYPE _LIB_VERSION;
 struct exception {

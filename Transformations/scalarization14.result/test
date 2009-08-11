@@ -1,11 +1,9 @@
 
 Code after scalarization
 
-int func(int n)
+int scalarization14(int n)
 {
    // BEGIN BLOCK
-   int __ld__3;
-   int __ld__2;
    int __ld__1;
    int __ld__0;
    int x[100];
@@ -20,8 +18,7 @@ int func(int n)
       for(j = 0; j <= 99; j += 1) {
          // BEGIN BLOCK
          __ld__0 = __ld__1;
-         __ld__2 = __ld__1+j+__ld__0;
-         y[i][j] = __ld__2;
+         y[i][j] = __ld__1+j+__ld__0;
          // END BLOCK
       }
       // END BLOCK

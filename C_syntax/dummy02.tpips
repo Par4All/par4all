@@ -1,0 +1,25 @@
+delete dummy02
+create dummy02 dummy02.c
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+activate C_PARSER
+
+echo
+echo Parsed printed file for "dummy02!"
+echo
+
+display PARSED_PRINTED_FILE[dummy02!]
+
+echo
+echo Printed file for "dummy02!"
+echo
+
+display PRINTED_FILE[dummy02!]
+
+close
+
+delete dummy02
+
+quit

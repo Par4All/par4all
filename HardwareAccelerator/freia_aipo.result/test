@@ -1,0 +1,2088 @@
+
+! initial functions
+
+typedef struct __freia_data2d *freia_data2d;
+typedef enum {FREIA_OK, FREIA_ERROR} freia_status;
+typedef int int32_t;
+typedef unsigned int uint32_t;
+extern freia_data2d *freia_common_create_data(uint32_t, uint32_t, uint32_t);
+extern freia_status freia_common_destruct_data(freia_data2d *);
+extern freia_status freia_aipo_inf(freia_data2d *, freia_data2d *, freia_data2d *);
+extern freia_status freia_aipo_inf_const(freia_data2d *, freia_data2d *, int32_t);
+extern freia_status freia_aipo_sup(freia_data2d *, freia_data2d *, freia_data2d *);
+extern freia_status freia_aipo_sup_const(freia_data2d *, freia_data2d *, int32_t);
+extern freia_status freia_aipo_sub(freia_data2d *, freia_data2d *, freia_data2d *);
+extern freia_status freia_aipo_sub_const(freia_data2d *, freia_data2d *, int32_t);
+extern freia_status freia_aipo_subsat(freia_data2d *, freia_data2d *, freia_data2d *);
+extern freia_status freia_aipo_subsat_const(freia_data2d *, freia_data2d *, int32_t);
+extern freia_status freia_aipo_add(freia_data2d *, freia_data2d *, freia_data2d *);
+extern freia_status freia_aipo_add_const(freia_data2d *, freia_data2d *, int32_t);
+extern freia_status freia_aipo_addsat(freia_data2d *, freia_data2d *, freia_data2d *);
+extern freia_status freia_aipo_addsat_const(freia_data2d *, freia_data2d *, int32_t);
+extern freia_status freia_aipo_absdiff(freia_data2d *, freia_data2d *, freia_data2d *);
+extern freia_status freia_aipo_absdiff_const(freia_data2d *, freia_data2d *, int32_t);
+extern freia_status freia_aipo_mul(freia_data2d *, freia_data2d *, freia_data2d *);
+extern freia_status freia_aipo_mul_const(freia_data2d *, freia_data2d *, int32_t);
+extern freia_status freia_aipo_div(freia_data2d *, freia_data2d *, freia_data2d *);
+extern freia_status freia_aipo_div_const(freia_data2d *, freia_data2d *, int32_t);
+extern freia_status freia_aipo_and(freia_data2d *, freia_data2d *, freia_data2d *);
+extern freia_status freia_aipo_and_const(freia_data2d *, freia_data2d *, int32_t);
+extern freia_status freia_aipo_or(freia_data2d *, freia_data2d *, freia_data2d *);
+extern freia_status freia_aipo_or_const(freia_data2d *, freia_data2d *, int32_t);
+extern freia_status freia_aipo_xor(freia_data2d *, freia_data2d *, freia_data2d *);
+extern freia_status freia_aipo_xor_const(freia_data2d *, freia_data2d *, int32_t);
+extern freia_status freia_aipo_not(freia_data2d *, freia_data2d *);
+extern freia_status freia_aipo_convolution(freia_data2d *, freia_data2d *, int32_t *, uint32_t, uint32_t);
+extern freia_status freia_aipo_fast_correlation(freia_data2d *, freia_data2d *, freia_data2d *, uint32_t);
+extern freia_status freia_aipo_min(freia_data2d *, int32_t *);
+extern freia_status freia_aipo_max(freia_data2d *, int32_t *);
+extern freia_status freia_aipo_global_min_coord(freia_data2d *, int32_t *, int32_t *, int32_t *);
+extern freia_status freia_aipo_global_max_coord(freia_data2d *, int32_t *, int32_t *, int32_t *);
+extern freia_status freia_aipo_global_vol(freia_data2d *, int32_t *);
+extern freia_status freia_aipo_copy(freia_data2d *, freia_data2d *);
+extern freia_status freia_aipo_cast(freia_data2d *, freia_data2d *);
+extern freia_status freia_aipo_set_constant(freia_data2d *, int32_t);
+extern freia_status freia_aipo_threshold(freia_data2d *, freia_data2d *, int32_t, int32_t, int32_t);
+extern freia_status freia_aipo_erode_8c(freia_data2d *, freia_data2d *, int32_t *);
+extern freia_status freia_aipo_dilate_8c(freia_data2d *, freia_data2d *, int32_t *);
+extern freia_status freia_aipo_erode_6c(freia_data2d *, freia_data2d *, int32_t *);
+extern freia_status freia_aipo_dilate_6c(freia_data2d *, freia_data2d *, int32_t *);
+extern freia_status my_inf(freia_data2d *o, freia_data2d *i0, freia_data2d *i1);
+extern freia_status my_inf_const(freia_data2d *o, freia_data2d *i0, int32_t p0);
+extern freia_status my_sup(freia_data2d *o, freia_data2d *i0, freia_data2d *i1);
+extern freia_status my_sup_const(freia_data2d *o, freia_data2d *i0, int32_t p0);
+extern freia_status my_sub(freia_data2d *o, freia_data2d *i0, freia_data2d *i1);
+extern freia_status my_sub_const(freia_data2d *o, freia_data2d *i0, int32_t p0);
+extern freia_status my_subsat(freia_data2d *o, freia_data2d *i0, freia_data2d *i1);
+extern freia_status my_subsat_const(freia_data2d *o, freia_data2d *i0, int32_t p0);
+extern freia_status my_add(freia_data2d *o, freia_data2d *i0, freia_data2d *i1);
+extern freia_status my_add_const(freia_data2d *o, freia_data2d *i0, int32_t p0);
+extern freia_status my_addsat(freia_data2d *o, freia_data2d *i0, freia_data2d *i1);
+extern freia_status my_addsat_const(freia_data2d *o, freia_data2d *i0, int32_t p0);
+extern freia_status my_absdiff(freia_data2d *o, freia_data2d *i0, freia_data2d *i1);
+extern freia_status my_absdiff_const(freia_data2d *o, freia_data2d *i0, int32_t p0);
+extern freia_status my_mul(freia_data2d *o, freia_data2d *i0, freia_data2d *i1);
+extern freia_status my_mul_const(freia_data2d *o, freia_data2d *i0, int32_t p0);
+extern freia_status my_div(freia_data2d *o, freia_data2d *i0, freia_data2d *i1);
+extern freia_status my_div_const(freia_data2d *o, freia_data2d *i0, int32_t p0);
+extern freia_status my_and(freia_data2d *o, freia_data2d *i0, freia_data2d *i1);
+extern freia_status my_and_const(freia_data2d *o, freia_data2d *i0, int32_t p0);
+extern freia_status my_or(freia_data2d *o, freia_data2d *i0, freia_data2d *i1);
+extern freia_status my_or_const(freia_data2d *o, freia_data2d *i0, int32_t p0);
+extern freia_status my_xor(freia_data2d *o, freia_data2d *i0, freia_data2d *i1);
+extern freia_status my_xor_const(freia_data2d *o, freia_data2d *i0, int32_t p0);
+extern freia_status my_not(freia_data2d *o, freia_data2d *i0);
+extern freia_status my_convolution(freia_data2d *o, freia_data2d *i0, int32_t *p0, uint32_t p1, uint32_t p2);
+extern freia_status my_fast_correlation(freia_data2d *o, freia_data2d *i0, freia_data2d *i1, uint32_t p0);
+extern freia_status my_global_min(freia_data2d *i0, int32_t *p0);
+extern freia_status my_global_max(freia_data2d *i0, int32_t *p0);
+extern freia_status my_global_min_coord(freia_data2d *i0, int32_t *p0, int32_t *p1, int32_t *p2);
+extern freia_status my_global_max_coord(freia_data2d *i0, int32_t *p0, int32_t *p1, int32_t *p2);
+extern freia_status my_global_vol(freia_data2d *image, int32_t *vol);
+extern freia_status my_copy(freia_data2d *o, freia_data2d *i0);
+extern freia_status my_cast(freia_data2d *o, freia_data2d *i0);
+extern freia_status my_set_constant(freia_data2d *o, int32_t p0);
+extern freia_status my_threshold(freia_data2d *o, freia_data2d *i0, int32_t p0, int32_t p1, int32_t p2);
+extern freia_status my_erode_8c(freia_data2d *o, freia_data2d *i0, int32_t *p0);
+extern freia_status my_dilate_8c(freia_data2d *o, freia_data2d *i0, int32_t *p0);
+extern freia_status my_erode_6c(freia_data2d *o, freia_data2d *i0, int32_t *p0);
+extern freia_status my_dilate_6c(freia_data2d *o, freia_data2d *i0, int32_t *p0);
+freia_status my_absdiff(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
+{
+   return freia_aipo_absdiff(o, i0, i1);                                /*0079*/
+}
+freia_status my_absdiff_const(freia_data2d *o, freia_data2d *i0, int32_t p0)
+{
+   return freia_aipo_absdiff_const(o, i0, p0);                          /*0085*/
+}
+freia_status my_add(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
+{
+   return freia_aipo_add(o, i0, i1);                                    /*0055*/
+}
+freia_status my_add_const(freia_data2d *o, freia_data2d *i0, int32_t p0)
+{
+   return freia_aipo_add_const(o, i0, p0);                              /*0061*/
+}
+freia_status my_addsat(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
+{
+   return freia_aipo_addsat(o, i0, i1);                                 /*0067*/
+}
+freia_status my_addsat_const(freia_data2d *o, freia_data2d *i0, int32_t p0)
+{
+   return freia_aipo_addsat_const(o, i0, p0);                           /*0073*/
+}
+freia_status my_and(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
+{
+   return freia_aipo_and(o, i0, i1);                                    /*0115*/
+}
+freia_status my_and_const(freia_data2d *o, freia_data2d *i0, int32_t p0)
+{
+   return freia_aipo_and_const(o, i0, p0);                              /*0121*/
+}
+freia_status my_cast(freia_data2d *o, freia_data2d *i0)
+{
+   return freia_aipo_cast(o, i0);                                       /*0203*/
+}
+freia_status my_convolution(freia_data2d *o, freia_data2d *i0, int32_t *p0, uint32_t p1, uint32_t p2)
+{
+   return freia_aipo_convolution(o, i0, p0, p1, p2);                    /*0158*/
+}
+freia_status my_copy(freia_data2d *o, freia_data2d *i0)
+{
+   return freia_aipo_copy(o, i0);                                       /*0198*/
+}
+freia_status my_dilate_6c(freia_data2d *o, freia_data2d *i0, int32_t *p0)
+{
+   return freia_aipo_dilate_6c(o, i0, p0);                              /*0239*/
+}
+freia_status my_dilate_8c(freia_data2d *o, freia_data2d *i0, int32_t *p0)
+{
+   return freia_aipo_dilate_8c(o, i0, p0);                              /*0227*/
+}
+freia_status my_div(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
+{
+   return freia_aipo_div(o, i0, i1);                                    /*0103*/
+}
+freia_status my_div_const(freia_data2d *o, freia_data2d *i0, int32_t p0)
+{
+   return freia_aipo_div_const(o, i0, p0);                              /*0109*/
+}
+freia_status my_erode_6c(freia_data2d *o, freia_data2d *i0, int32_t *p0)
+{
+   return freia_aipo_erode_6c(o, i0, p0);                               /*0233*/
+}
+freia_status my_erode_8c(freia_data2d *o, freia_data2d *i0, int32_t *p0)
+{
+   return freia_aipo_erode_8c(o, i0, p0);                               /*0221*/
+}
+freia_status my_fast_correlation(freia_data2d *o, freia_data2d *i0, freia_data2d *i1, uint32_t p0)
+{
+   return freia_aipo_fast_correlation(o, i0, i1, p0);                   /*0164*/
+}
+freia_status my_global_max(freia_data2d *i0, int32_t *p0)
+{
+   return freia_aipo_global_max(i0, p0);                                /*0175*/
+}
+freia_status my_global_max_coord(freia_data2d *i0, int32_t *p0, int32_t *p1, int32_t *p2)
+{
+   return freia_aipo_global_max_coord(i0, p0, p1, p2);                  /*0187*/
+}
+freia_status my_global_min(freia_data2d *i0, int32_t *p0)
+{
+   return freia_aipo_global_min(i0, p0);                                /*0170*/
+}
+freia_status my_global_min_coord(freia_data2d *i0, int32_t *p0, int32_t *p1, int32_t *p2)
+{
+   return freia_aipo_global_min_coord(i0, p0, p1, p2);                  /*0181*/
+}
+freia_status my_global_vol(freia_data2d *image, int32_t *vol)
+{
+   return freia_aipo_global_vol(image, vol);                            /*0192*/
+}
+freia_status my_inf(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
+{
+   return freia_aipo_inf(o, i0, i1);                                    /*0005*/
+}
+freia_status my_inf_const(freia_data2d *o, freia_data2d *i0, int32_t p0)
+{
+   return freia_aipo_inf_const(o, i0, p0);                              /*0013*/
+}
+freia_status my_mul(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
+{
+   return freia_aipo_mul(o, i0, i1);                                    /*0091*/
+}
+freia_status my_mul_const(freia_data2d *o, freia_data2d *i0, int32_t p0)
+{
+   return freia_aipo_mul_const(o, i0, p0);                              /*0097*/
+}
+freia_status my_not(freia_data2d *o, freia_data2d *i0)
+{
+   return freia_aipo_not(o, i0);                                        /*0151*/
+}
+freia_status my_or(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
+{
+   return freia_aipo_or(o, i0, i1);                                     /*0127*/
+}
+freia_status my_or_const(freia_data2d *o, freia_data2d *i0, int32_t p0)
+{
+   return freia_aipo_and_const(o, i0, p0);                              /*0133*/
+}
+freia_status my_set_constant(freia_data2d *o, int32_t p0)
+{
+   return freia_aipo_set_constant(o, p0);                               /*0208*/
+}
+freia_status my_sub(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
+{
+   return freia_aipo_sub(o, i0, i1);                                    /*0031*/
+}
+freia_status my_sub_const(freia_data2d *o, freia_data2d *i0, int32_t p0)
+{
+   return freia_aipo_sub_const(o, i0, p0);                              /*0037*/
+}
+freia_status my_subsat(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
+{
+   return freia_aipo_subsat(o, i0, i1);                                 /*0043*/
+}
+freia_status my_subsat_const(freia_data2d *o, freia_data2d *i0, int32_t p0)
+{
+   return freia_aipo_subsat_const(o, i0, p0);                           /*0049*/
+}
+freia_status my_sup(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
+{
+   return freia_aipo_sup(o, i0, i1);                                    /*0019*/
+}
+freia_status my_sup_const(freia_data2d *o, freia_data2d *i0, int32_t p0)
+{
+   return freia_aipo_sup_const(o, i0, p0);                              /*0025*/
+}
+freia_status my_threshold(freia_data2d *o, freia_data2d *i0, int32_t p0, int32_t p1, int32_t p2)
+{
+   return freia_aipo_threshold(o, i0, p0, p1, p2);                      /*0214*/
+}
+freia_status my_xor(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
+{
+   return freia_aipo_xor(o, i0, i1);                                    /*0139*/
+}
+freia_status my_xor_const(freia_data2d *o, freia_data2d *i0, int32_t p0)
+{
+   return freia_aipo_xor_const(o, i0, p0);                              /*0145*/
+}
+
+! accelerated functions
+
+// FREIA-SPoC helper function for module my_absdiff_const
+freia_status my_absdiff_const_helper_0(freia_data2d * o0, freia_data2d * i0, int32_t cst0)
+{
+  spoc_instr si;
+  spoc_param sp;
+  spoc_reduction reduc;
+  freia_microcode mcode;
+  freia_dynamic_param dynparam;
+  freia_reduction_results redres;
+  freia_op_sel op = 0;
+  freia_op_param param;
+  freia_status ret;
+
+  // init pipe to nop
+  spoc_init_pipe(&si, &sp, 16);
+
+  // stage 0
+  si.alu[0][0].op = SPOC_ALU_ABSSUB_IN0_CONST;
+  si.alu[0][0].constant = cst0;
+
+  // ??? what about setting links?
+  si.mux[0][0].op = SPOC_MUX_IN1;
+  si.mux[0][2].op = SPOC_MUX_IN0;
+
+  mcode.raw = (freia_ptr) &si;
+  mcode.size = sizeof(spoc_instr);
+
+  dynparam.raw = (freia_ptr) &sp;
+  dynparam.size = sizeof(spoc_param);
+
+  redres.raw = (freia_ptr) &reduc;
+  redres.size = sizeof(spoc_reduction);
+
+  ret = freia_cg_write_microcode(&mcode);
+  ret |= freia_cg_write_dynamic_param(&dynparam);
+
+  // actual call of spoc hardware
+  freia_cg_template_process_1i_1o(op, param, o0, i0);
+
+  // get reductions
+  freia_cg_read_reduction_results(&redres);
+
+  return ret;
+}
+// FREIA-SPoC helper function for module my_absdiff
+freia_status my_absdiff_helper_0(freia_data2d * o0, freia_data2d * i0, freia_data2d * i1)
+{
+  spoc_instr si;
+  spoc_param sp;
+  spoc_reduction reduc;
+  freia_microcode mcode;
+  freia_dynamic_param dynparam;
+  freia_reduction_results redres;
+  freia_op_sel op = 0;
+  freia_op_param param;
+  freia_status ret;
+
+  // init pipe to nop
+  spoc_init_pipe(&si, &sp, 16);
+
+  // stage 0
+  si.alu[0][0].op = SPOC_ALU_ABSSUB_IN0_IN1;
+
+  // ??? what about setting links?
+  si.mux[0][0].op = SPOC_MUX_IN1;
+  si.mux[0][2].op = SPOC_MUX_IN0;
+
+  mcode.raw = (freia_ptr) &si;
+  mcode.size = sizeof(spoc_instr);
+
+  dynparam.raw = (freia_ptr) &sp;
+  dynparam.size = sizeof(spoc_param);
+
+  redres.raw = (freia_ptr) &reduc;
+  redres.size = sizeof(spoc_reduction);
+
+  ret = freia_cg_write_microcode(&mcode);
+  ret |= freia_cg_write_dynamic_param(&dynparam);
+
+  // actual call of spoc hardware
+  freia_cg_template_process_2i_1o(op, param, o0, i0, i1);
+
+  // get reductions
+  freia_cg_read_reduction_results(&redres);
+
+  return ret;
+}
+// FREIA-SPoC helper function for module my_add_const
+freia_status my_add_const_helper_0(freia_data2d * o0, freia_data2d * i0, int32_t cst0)
+{
+  spoc_instr si;
+  spoc_param sp;
+  spoc_reduction reduc;
+  freia_microcode mcode;
+  freia_dynamic_param dynparam;
+  freia_reduction_results redres;
+  freia_op_sel op = 0;
+  freia_op_param param;
+  freia_status ret;
+
+  // init pipe to nop
+  spoc_init_pipe(&si, &sp, 16);
+
+  // stage 0
+  si.alu[0][0].op = SPOC_ALU_ADD_IN0_CONST;
+  si.alu[0][0].constant = cst0;
+
+  // ??? what about setting links?
+  si.mux[0][0].op = SPOC_MUX_IN1;
+  si.mux[0][2].op = SPOC_MUX_IN0;
+
+  mcode.raw = (freia_ptr) &si;
+  mcode.size = sizeof(spoc_instr);
+
+  dynparam.raw = (freia_ptr) &sp;
+  dynparam.size = sizeof(spoc_param);
+
+  redres.raw = (freia_ptr) &reduc;
+  redres.size = sizeof(spoc_reduction);
+
+  ret = freia_cg_write_microcode(&mcode);
+  ret |= freia_cg_write_dynamic_param(&dynparam);
+
+  // actual call of spoc hardware
+  freia_cg_template_process_1i_1o(op, param, o0, i0);
+
+  // get reductions
+  freia_cg_read_reduction_results(&redres);
+
+  return ret;
+}
+// FREIA-SPoC helper function for module my_add
+freia_status my_add_helper_0(freia_data2d * o0, freia_data2d * i0, freia_data2d * i1)
+{
+  spoc_instr si;
+  spoc_param sp;
+  spoc_reduction reduc;
+  freia_microcode mcode;
+  freia_dynamic_param dynparam;
+  freia_reduction_results redres;
+  freia_op_sel op = 0;
+  freia_op_param param;
+  freia_status ret;
+
+  // init pipe to nop
+  spoc_init_pipe(&si, &sp, 16);
+
+  // stage 0
+  si.alu[0][0].op = SPOC_ALU_ADD_IN0_IN1;
+
+  // ??? what about setting links?
+  si.mux[0][0].op = SPOC_MUX_IN1;
+  si.mux[0][2].op = SPOC_MUX_IN0;
+
+  mcode.raw = (freia_ptr) &si;
+  mcode.size = sizeof(spoc_instr);
+
+  dynparam.raw = (freia_ptr) &sp;
+  dynparam.size = sizeof(spoc_param);
+
+  redres.raw = (freia_ptr) &reduc;
+  redres.size = sizeof(spoc_reduction);
+
+  ret = freia_cg_write_microcode(&mcode);
+  ret |= freia_cg_write_dynamic_param(&dynparam);
+
+  // actual call of spoc hardware
+  freia_cg_template_process_2i_1o(op, param, o0, i0, i1);
+
+  // get reductions
+  freia_cg_read_reduction_results(&redres);
+
+  return ret;
+}
+// FREIA-SPoC helper function for module my_addsat_const
+freia_status my_addsat_const_helper_0(freia_data2d * o0, freia_data2d * i0, int32_t cst0)
+{
+  spoc_instr si;
+  spoc_param sp;
+  spoc_reduction reduc;
+  freia_microcode mcode;
+  freia_dynamic_param dynparam;
+  freia_reduction_results redres;
+  freia_op_sel op = 0;
+  freia_op_param param;
+  freia_status ret;
+
+  // init pipe to nop
+  spoc_init_pipe(&si, &sp, 16);
+
+  // stage 0
+  si.alu[0][0].op = SPOC_ALU_ADDSAT_IN0_CONST;
+  si.alu[0][0].constant = cst0;
+
+  // ??? what about setting links?
+  si.mux[0][0].op = SPOC_MUX_IN1;
+  si.mux[0][2].op = SPOC_MUX_IN0;
+
+  mcode.raw = (freia_ptr) &si;
+  mcode.size = sizeof(spoc_instr);
+
+  dynparam.raw = (freia_ptr) &sp;
+  dynparam.size = sizeof(spoc_param);
+
+  redres.raw = (freia_ptr) &reduc;
+  redres.size = sizeof(spoc_reduction);
+
+  ret = freia_cg_write_microcode(&mcode);
+  ret |= freia_cg_write_dynamic_param(&dynparam);
+
+  // actual call of spoc hardware
+  freia_cg_template_process_1i_1o(op, param, o0, i0);
+
+  // get reductions
+  freia_cg_read_reduction_results(&redres);
+
+  return ret;
+}
+// FREIA-SPoC helper function for module my_addsat
+freia_status my_addsat_helper_0(freia_data2d * o0, freia_data2d * i0, freia_data2d * i1)
+{
+  spoc_instr si;
+  spoc_param sp;
+  spoc_reduction reduc;
+  freia_microcode mcode;
+  freia_dynamic_param dynparam;
+  freia_reduction_results redres;
+  freia_op_sel op = 0;
+  freia_op_param param;
+  freia_status ret;
+
+  // init pipe to nop
+  spoc_init_pipe(&si, &sp, 16);
+
+  // stage 0
+  si.alu[0][0].op = SPOC_ALU_ADDSAT_IN0_IN1;
+
+  // ??? what about setting links?
+  si.mux[0][0].op = SPOC_MUX_IN1;
+  si.mux[0][2].op = SPOC_MUX_IN0;
+
+  mcode.raw = (freia_ptr) &si;
+  mcode.size = sizeof(spoc_instr);
+
+  dynparam.raw = (freia_ptr) &sp;
+  dynparam.size = sizeof(spoc_param);
+
+  redres.raw = (freia_ptr) &reduc;
+  redres.size = sizeof(spoc_reduction);
+
+  ret = freia_cg_write_microcode(&mcode);
+  ret |= freia_cg_write_dynamic_param(&dynparam);
+
+  // actual call of spoc hardware
+  freia_cg_template_process_2i_1o(op, param, o0, i0, i1);
+
+  // get reductions
+  freia_cg_read_reduction_results(&redres);
+
+  return ret;
+}
+// FREIA-SPoC helper function for module my_and_const
+freia_status my_and_const_helper_0(freia_data2d * o0, freia_data2d * i0, int32_t cst0)
+{
+  spoc_instr si;
+  spoc_param sp;
+  spoc_reduction reduc;
+  freia_microcode mcode;
+  freia_dynamic_param dynparam;
+  freia_reduction_results redres;
+  freia_op_sel op = 0;
+  freia_op_param param;
+  freia_status ret;
+
+  // init pipe to nop
+  spoc_init_pipe(&si, &sp, 16);
+
+  // stage 0
+  si.alu[0][0].op = SPOC_ALU_AND_IN0_CONST;
+  si.alu[0][0].constant = cst0;
+
+  // ??? what about setting links?
+  si.mux[0][0].op = SPOC_MUX_IN1;
+  si.mux[0][2].op = SPOC_MUX_IN0;
+
+  mcode.raw = (freia_ptr) &si;
+  mcode.size = sizeof(spoc_instr);
+
+  dynparam.raw = (freia_ptr) &sp;
+  dynparam.size = sizeof(spoc_param);
+
+  redres.raw = (freia_ptr) &reduc;
+  redres.size = sizeof(spoc_reduction);
+
+  ret = freia_cg_write_microcode(&mcode);
+  ret |= freia_cg_write_dynamic_param(&dynparam);
+
+  // actual call of spoc hardware
+  freia_cg_template_process_1i_1o(op, param, o0, i0);
+
+  // get reductions
+  freia_cg_read_reduction_results(&redres);
+
+  return ret;
+}
+// FREIA-SPoC helper function for module my_and
+freia_status my_and_helper_0(freia_data2d * o0, freia_data2d * i0, freia_data2d * i1)
+{
+  spoc_instr si;
+  spoc_param sp;
+  spoc_reduction reduc;
+  freia_microcode mcode;
+  freia_dynamic_param dynparam;
+  freia_reduction_results redres;
+  freia_op_sel op = 0;
+  freia_op_param param;
+  freia_status ret;
+
+  // init pipe to nop
+  spoc_init_pipe(&si, &sp, 16);
+
+  // stage 0
+  si.alu[0][0].op = SPOC_ALU_AND_IN0_IN1;
+
+  // ??? what about setting links?
+  si.mux[0][0].op = SPOC_MUX_IN1;
+  si.mux[0][2].op = SPOC_MUX_IN0;
+
+  mcode.raw = (freia_ptr) &si;
+  mcode.size = sizeof(spoc_instr);
+
+  dynparam.raw = (freia_ptr) &sp;
+  dynparam.size = sizeof(spoc_param);
+
+  redres.raw = (freia_ptr) &reduc;
+  redres.size = sizeof(spoc_reduction);
+
+  ret = freia_cg_write_microcode(&mcode);
+  ret |= freia_cg_write_dynamic_param(&dynparam);
+
+  // actual call of spoc hardware
+  freia_cg_template_process_2i_1o(op, param, o0, i0, i1);
+
+  // get reductions
+  freia_cg_read_reduction_results(&redres);
+
+  return ret;
+}
+// FREIA-SPoC helper function for module my_copy
+freia_status my_copy_helper_0(freia_data2d * o0, freia_data2d * i0)
+{
+  spoc_instr si;
+  spoc_param sp;
+  spoc_reduction reduc;
+  freia_microcode mcode;
+  freia_dynamic_param dynparam;
+  freia_reduction_results redres;
+  freia_op_sel op = 0;
+  freia_op_param param;
+  freia_status ret;
+
+  // init pipe to nop
+  spoc_init_pipe(&si, &sp, 16);
+
+  // stage 0
+
+  mcode.raw = (freia_ptr) &si;
+  mcode.size = sizeof(spoc_instr);
+
+  dynparam.raw = (freia_ptr) &sp;
+  dynparam.size = sizeof(spoc_param);
+
+  redres.raw = (freia_ptr) &reduc;
+  redres.size = sizeof(spoc_reduction);
+
+  ret = freia_cg_write_microcode(&mcode);
+  ret |= freia_cg_write_dynamic_param(&dynparam);
+
+  // actual call of spoc hardware
+  freia_cg_template_process_1i_1o(op, param, o0, i0);
+
+  // get reductions
+  freia_cg_read_reduction_results(&redres);
+
+  return ret;
+}
+// FREIA-SPoC helper function for module my_dilate_6c
+freia_status my_dilate_6c_helper_0(freia_data2d * o0, freia_data2d * i0, int32_t *kern0)
+{
+  spoc_instr si;
+  spoc_param sp;
+  spoc_reduction reduc;
+  freia_microcode mcode;
+  freia_dynamic_param dynparam;
+  freia_reduction_results redres;
+  freia_op_sel op = 0;
+  freia_op_param param;
+  freia_status ret;
+
+  // init pipe to nop
+  spoc_init_pipe(&si, &sp, 16);
+
+  // stage 0
+  si.poc[0][0].op=SPOC_POC_DILATE;
+  si.poc[0][0].grid=SPOC_POC_6_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[0][0].kernel[i] = kern0[i];
+
+  mcode.raw = (freia_ptr) &si;
+  mcode.size = sizeof(spoc_instr);
+
+  dynparam.raw = (freia_ptr) &sp;
+  dynparam.size = sizeof(spoc_param);
+
+  redres.raw = (freia_ptr) &reduc;
+  redres.size = sizeof(spoc_reduction);
+
+  ret = freia_cg_write_microcode(&mcode);
+  ret |= freia_cg_write_dynamic_param(&dynparam);
+
+  // actual call of spoc hardware
+  freia_cg_template_process_1i_1o(op, param, o0, i0);
+
+  // get reductions
+  freia_cg_read_reduction_results(&redres);
+
+  return ret;
+}
+// FREIA-SPoC helper function for module my_dilate_8c
+freia_status my_dilate_8c_helper_0(freia_data2d * o0, freia_data2d * i0, int32_t *kern0)
+{
+  spoc_instr si;
+  spoc_param sp;
+  spoc_reduction reduc;
+  freia_microcode mcode;
+  freia_dynamic_param dynparam;
+  freia_reduction_results redres;
+  freia_op_sel op = 0;
+  freia_op_param param;
+  freia_status ret;
+
+  // init pipe to nop
+  spoc_init_pipe(&si, &sp, 16);
+
+  // stage 0
+  si.poc[0][0].op=SPOC_POC_DILATE;
+  si.poc[0][0].grid=SPOC_POC_8_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[0][0].kernel[i] = kern0[i];
+
+  mcode.raw = (freia_ptr) &si;
+  mcode.size = sizeof(spoc_instr);
+
+  dynparam.raw = (freia_ptr) &sp;
+  dynparam.size = sizeof(spoc_param);
+
+  redres.raw = (freia_ptr) &reduc;
+  redres.size = sizeof(spoc_reduction);
+
+  ret = freia_cg_write_microcode(&mcode);
+  ret |= freia_cg_write_dynamic_param(&dynparam);
+
+  // actual call of spoc hardware
+  freia_cg_template_process_1i_1o(op, param, o0, i0);
+
+  // get reductions
+  freia_cg_read_reduction_results(&redres);
+
+  return ret;
+}
+// FREIA-SPoC helper function for module my_div_const
+freia_status my_div_const_helper_0(freia_data2d * o0, freia_data2d * i0, int32_t cst0)
+{
+  spoc_instr si;
+  spoc_param sp;
+  spoc_reduction reduc;
+  freia_microcode mcode;
+  freia_dynamic_param dynparam;
+  freia_reduction_results redres;
+  freia_op_sel op = 0;
+  freia_op_param param;
+  freia_status ret;
+
+  // init pipe to nop
+  spoc_init_pipe(&si, &sp, 16);
+
+  // stage 0
+  si.alu[0][0].op = SPOC_ALU_DIV_IN0_CONST;
+  si.alu[0][0].constant = cst0;
+
+  // ??? what about setting links?
+  si.mux[0][0].op = SPOC_MUX_IN1;
+  si.mux[0][2].op = SPOC_MUX_IN0;
+
+  mcode.raw = (freia_ptr) &si;
+  mcode.size = sizeof(spoc_instr);
+
+  dynparam.raw = (freia_ptr) &sp;
+  dynparam.size = sizeof(spoc_param);
+
+  redres.raw = (freia_ptr) &reduc;
+  redres.size = sizeof(spoc_reduction);
+
+  ret = freia_cg_write_microcode(&mcode);
+  ret |= freia_cg_write_dynamic_param(&dynparam);
+
+  // actual call of spoc hardware
+  freia_cg_template_process_1i_1o(op, param, o0, i0);
+
+  // get reductions
+  freia_cg_read_reduction_results(&redres);
+
+  return ret;
+}
+// FREIA-SPoC helper function for module my_div
+freia_status my_div_helper_0(freia_data2d * o0, freia_data2d * i0, freia_data2d * i1)
+{
+  spoc_instr si;
+  spoc_param sp;
+  spoc_reduction reduc;
+  freia_microcode mcode;
+  freia_dynamic_param dynparam;
+  freia_reduction_results redres;
+  freia_op_sel op = 0;
+  freia_op_param param;
+  freia_status ret;
+
+  // init pipe to nop
+  spoc_init_pipe(&si, &sp, 16);
+
+  // stage 0
+  si.alu[0][0].op = SPOC_ALU_DIV_IN0_IN1;
+
+  // ??? what about setting links?
+  si.mux[0][0].op = SPOC_MUX_IN1;
+  si.mux[0][2].op = SPOC_MUX_IN0;
+
+  mcode.raw = (freia_ptr) &si;
+  mcode.size = sizeof(spoc_instr);
+
+  dynparam.raw = (freia_ptr) &sp;
+  dynparam.size = sizeof(spoc_param);
+
+  redres.raw = (freia_ptr) &reduc;
+  redres.size = sizeof(spoc_reduction);
+
+  ret = freia_cg_write_microcode(&mcode);
+  ret |= freia_cg_write_dynamic_param(&dynparam);
+
+  // actual call of spoc hardware
+  freia_cg_template_process_2i_1o(op, param, o0, i0, i1);
+
+  // get reductions
+  freia_cg_read_reduction_results(&redres);
+
+  return ret;
+}
+// FREIA-SPoC helper function for module my_erode_6c
+freia_status my_erode_6c_helper_0(freia_data2d * o0, freia_data2d * i0, int32_t *kern0)
+{
+  spoc_instr si;
+  spoc_param sp;
+  spoc_reduction reduc;
+  freia_microcode mcode;
+  freia_dynamic_param dynparam;
+  freia_reduction_results redres;
+  freia_op_sel op = 0;
+  freia_op_param param;
+  freia_status ret;
+
+  // init pipe to nop
+  spoc_init_pipe(&si, &sp, 16);
+
+  // stage 0
+  si.poc[0][0].op=SPOC_POC_ERODE;
+  si.poc[0][0].grid=SPOC_POC_6_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[0][0].kernel[i] = kern0[i];
+
+  mcode.raw = (freia_ptr) &si;
+  mcode.size = sizeof(spoc_instr);
+
+  dynparam.raw = (freia_ptr) &sp;
+  dynparam.size = sizeof(spoc_param);
+
+  redres.raw = (freia_ptr) &reduc;
+  redres.size = sizeof(spoc_reduction);
+
+  ret = freia_cg_write_microcode(&mcode);
+  ret |= freia_cg_write_dynamic_param(&dynparam);
+
+  // actual call of spoc hardware
+  freia_cg_template_process_1i_1o(op, param, o0, i0);
+
+  // get reductions
+  freia_cg_read_reduction_results(&redres);
+
+  return ret;
+}
+// FREIA-SPoC helper function for module my_erode_8c
+freia_status my_erode_8c_helper_0(freia_data2d * o0, freia_data2d * i0, int32_t *kern0)
+{
+  spoc_instr si;
+  spoc_param sp;
+  spoc_reduction reduc;
+  freia_microcode mcode;
+  freia_dynamic_param dynparam;
+  freia_reduction_results redres;
+  freia_op_sel op = 0;
+  freia_op_param param;
+  freia_status ret;
+
+  // init pipe to nop
+  spoc_init_pipe(&si, &sp, 16);
+
+  // stage 0
+  si.poc[0][0].op=SPOC_POC_ERODE;
+  si.poc[0][0].grid=SPOC_POC_6_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[0][0].kernel[i] = kern0[i];
+
+  mcode.raw = (freia_ptr) &si;
+  mcode.size = sizeof(spoc_instr);
+
+  dynparam.raw = (freia_ptr) &sp;
+  dynparam.size = sizeof(spoc_param);
+
+  redres.raw = (freia_ptr) &reduc;
+  redres.size = sizeof(spoc_reduction);
+
+  ret = freia_cg_write_microcode(&mcode);
+  ret |= freia_cg_write_dynamic_param(&dynparam);
+
+  // actual call of spoc hardware
+  freia_cg_template_process_1i_1o(op, param, o0, i0);
+
+  // get reductions
+  freia_cg_read_reduction_results(&redres);
+
+  return ret;
+}
+// FREIA-SPoC helper function for module my_global_max_coord
+freia_status my_global_max_coord_helper_0(freia_data2d * i0, int32_t * red0, uint32_t * red1, uint32_t * red2)
+{
+  spoc_instr si;
+  spoc_param sp;
+  spoc_reduction reduc;
+  freia_microcode mcode;
+  freia_dynamic_param dynparam;
+  freia_reduction_results redres;
+  freia_op_sel op = 0;
+  freia_op_param param;
+  freia_status ret;
+
+  // init pipe to nop
+  spoc_init_pipe(&si, &sp, 16);
+
+  // stage 0
+
+  mcode.raw = (freia_ptr) &si;
+  mcode.size = sizeof(spoc_instr);
+
+  dynparam.raw = (freia_ptr) &sp;
+  dynparam.size = sizeof(spoc_param);
+
+  redres.raw = (freia_ptr) &reduc;
+  redres.size = sizeof(spoc_reduction);
+
+  ret = freia_cg_write_microcode(&mcode);
+  ret |= freia_cg_write_dynamic_param(&dynparam);
+
+  // actual call of spoc hardware
+  freia_cg_template_process_1i(op, param, i0);
+
+  // get reductions
+  freia_cg_read_reduction_results(&redres);
+
+  // get reduction results
+  *red0 = (int32_t) reduc.measure[0][0].maximum;
+  *red1 = (uint32_t) reduc.measure[0][0].max_coord_x;
+  *red2 = (uint32_t) reduc.measure[0][0].max_coord_y;
+
+  return ret;
+}
+// FREIA-SPoC helper function for module my_global_max
+freia_status my_global_max_helper_0(freia_data2d * i0, int32_t * red0)
+{
+  spoc_instr si;
+  spoc_param sp;
+  spoc_reduction reduc;
+  freia_microcode mcode;
+  freia_dynamic_param dynparam;
+  freia_reduction_results redres;
+  freia_op_sel op = 0;
+  freia_op_param param;
+  freia_status ret;
+
+  // init pipe to nop
+  spoc_init_pipe(&si, &sp, 16);
+
+  // stage 0
+
+  mcode.raw = (freia_ptr) &si;
+  mcode.size = sizeof(spoc_instr);
+
+  dynparam.raw = (freia_ptr) &sp;
+  dynparam.size = sizeof(spoc_param);
+
+  redres.raw = (freia_ptr) &reduc;
+  redres.size = sizeof(spoc_reduction);
+
+  ret = freia_cg_write_microcode(&mcode);
+  ret |= freia_cg_write_dynamic_param(&dynparam);
+
+  // actual call of spoc hardware
+  freia_cg_template_process_1i(op, param, i0);
+
+  // get reductions
+  freia_cg_read_reduction_results(&redres);
+
+  // get reduction results
+  *red0 = (int32_t) reduc.measure[0][0].maximum;
+
+  return ret;
+}
+// FREIA-SPoC helper function for module my_global_min_coord
+freia_status my_global_min_coord_helper_0(freia_data2d * i0, int32_t * red0, uint32_t * red1, uint32_t * red2)
+{
+  spoc_instr si;
+  spoc_param sp;
+  spoc_reduction reduc;
+  freia_microcode mcode;
+  freia_dynamic_param dynparam;
+  freia_reduction_results redres;
+  freia_op_sel op = 0;
+  freia_op_param param;
+  freia_status ret;
+
+  // init pipe to nop
+  spoc_init_pipe(&si, &sp, 16);
+
+  // stage 0
+
+  mcode.raw = (freia_ptr) &si;
+  mcode.size = sizeof(spoc_instr);
+
+  dynparam.raw = (freia_ptr) &sp;
+  dynparam.size = sizeof(spoc_param);
+
+  redres.raw = (freia_ptr) &reduc;
+  redres.size = sizeof(spoc_reduction);
+
+  ret = freia_cg_write_microcode(&mcode);
+  ret |= freia_cg_write_dynamic_param(&dynparam);
+
+  // actual call of spoc hardware
+  freia_cg_template_process_1i(op, param, i0);
+
+  // get reductions
+  freia_cg_read_reduction_results(&redres);
+
+  // get reduction results
+  *red0 = (int32_t) reduc.measure[0][0].maximum;
+  *red1 = (uint32_t) reduc.measure[0][0].max_coord_x;
+  *red2 = (uint32_t) reduc.measure[0][0].max_coord_y;
+
+  return ret;
+}
+// FREIA-SPoC helper function for module my_global_min
+freia_status my_global_min_helper_0(freia_data2d * i0, int32_t * red0)
+{
+  spoc_instr si;
+  spoc_param sp;
+  spoc_reduction reduc;
+  freia_microcode mcode;
+  freia_dynamic_param dynparam;
+  freia_reduction_results redres;
+  freia_op_sel op = 0;
+  freia_op_param param;
+  freia_status ret;
+
+  // init pipe to nop
+  spoc_init_pipe(&si, &sp, 16);
+
+  // stage 0
+
+  mcode.raw = (freia_ptr) &si;
+  mcode.size = sizeof(spoc_instr);
+
+  dynparam.raw = (freia_ptr) &sp;
+  dynparam.size = sizeof(spoc_param);
+
+  redres.raw = (freia_ptr) &reduc;
+  redres.size = sizeof(spoc_reduction);
+
+  ret = freia_cg_write_microcode(&mcode);
+  ret |= freia_cg_write_dynamic_param(&dynparam);
+
+  // actual call of spoc hardware
+  freia_cg_template_process_1i(op, param, i0);
+
+  // get reductions
+  freia_cg_read_reduction_results(&redres);
+
+  // get reduction results
+  *red0 = (int32_t) reduc.measure[0][0].minimum;
+
+  return ret;
+}
+// FREIA-SPoC helper function for module my_global_vol
+freia_status my_global_vol_helper_0(freia_data2d * i0, int32_t * red0)
+{
+  spoc_instr si;
+  spoc_param sp;
+  spoc_reduction reduc;
+  freia_microcode mcode;
+  freia_dynamic_param dynparam;
+  freia_reduction_results redres;
+  freia_op_sel op = 0;
+  freia_op_param param;
+  freia_status ret;
+
+  // init pipe to nop
+  spoc_init_pipe(&si, &sp, 16);
+
+  // stage 0
+
+  mcode.raw = (freia_ptr) &si;
+  mcode.size = sizeof(spoc_instr);
+
+  dynparam.raw = (freia_ptr) &sp;
+  dynparam.size = sizeof(spoc_param);
+
+  redres.raw = (freia_ptr) &reduc;
+  redres.size = sizeof(spoc_reduction);
+
+  ret = freia_cg_write_microcode(&mcode);
+  ret |= freia_cg_write_dynamic_param(&dynparam);
+
+  // actual call of spoc hardware
+  freia_cg_template_process_1i(op, param, i0);
+
+  // get reductions
+  freia_cg_read_reduction_results(&redres);
+
+  // get reduction results
+  *red0 = (int32_t) reduc.measure[0][0].volume;
+
+  return ret;
+}
+// FREIA-SPoC helper function for module my_inf_const
+freia_status my_inf_const_helper_0(freia_data2d * o0, freia_data2d * i0, int32_t cst0)
+{
+  spoc_instr si;
+  spoc_param sp;
+  spoc_reduction reduc;
+  freia_microcode mcode;
+  freia_dynamic_param dynparam;
+  freia_reduction_results redres;
+  freia_op_sel op = 0;
+  freia_op_param param;
+  freia_status ret;
+
+  // init pipe to nop
+  spoc_init_pipe(&si, &sp, 16);
+
+  // stage 0
+  si.alu[0][0].op = SPOC_ALU_INF_IN0_CONST;
+  si.alu[0][0].constant = cst0;
+
+  // ??? what about setting links?
+  si.mux[0][0].op = SPOC_MUX_IN1;
+  si.mux[0][2].op = SPOC_MUX_IN0;
+
+  mcode.raw = (freia_ptr) &si;
+  mcode.size = sizeof(spoc_instr);
+
+  dynparam.raw = (freia_ptr) &sp;
+  dynparam.size = sizeof(spoc_param);
+
+  redres.raw = (freia_ptr) &reduc;
+  redres.size = sizeof(spoc_reduction);
+
+  ret = freia_cg_write_microcode(&mcode);
+  ret |= freia_cg_write_dynamic_param(&dynparam);
+
+  // actual call of spoc hardware
+  freia_cg_template_process_1i_1o(op, param, o0, i0);
+
+  // get reductions
+  freia_cg_read_reduction_results(&redres);
+
+  return ret;
+}
+// FREIA-SPoC helper function for module my_inf
+freia_status my_inf_helper_0(freia_data2d * o0, freia_data2d * i0, freia_data2d * i1)
+{
+  spoc_instr si;
+  spoc_param sp;
+  spoc_reduction reduc;
+  freia_microcode mcode;
+  freia_dynamic_param dynparam;
+  freia_reduction_results redres;
+  freia_op_sel op = 0;
+  freia_op_param param;
+  freia_status ret;
+
+  // init pipe to nop
+  spoc_init_pipe(&si, &sp, 16);
+
+  // stage 0
+  si.alu[0][0].op = SPOC_ALU_INF_IN0_IN1;
+
+  // ??? what about setting links?
+  si.mux[0][0].op = SPOC_MUX_IN1;
+  si.mux[0][2].op = SPOC_MUX_IN0;
+
+  mcode.raw = (freia_ptr) &si;
+  mcode.size = sizeof(spoc_instr);
+
+  dynparam.raw = (freia_ptr) &sp;
+  dynparam.size = sizeof(spoc_param);
+
+  redres.raw = (freia_ptr) &reduc;
+  redres.size = sizeof(spoc_reduction);
+
+  ret = freia_cg_write_microcode(&mcode);
+  ret |= freia_cg_write_dynamic_param(&dynparam);
+
+  // actual call of spoc hardware
+  freia_cg_template_process_2i_1o(op, param, o0, i0, i1);
+
+  // get reductions
+  freia_cg_read_reduction_results(&redres);
+
+  return ret;
+}
+// FREIA-SPoC helper function for module my_mul_const
+freia_status my_mul_const_helper_0(freia_data2d * o0, freia_data2d * i0, int32_t cst0)
+{
+  spoc_instr si;
+  spoc_param sp;
+  spoc_reduction reduc;
+  freia_microcode mcode;
+  freia_dynamic_param dynparam;
+  freia_reduction_results redres;
+  freia_op_sel op = 0;
+  freia_op_param param;
+  freia_status ret;
+
+  // init pipe to nop
+  spoc_init_pipe(&si, &sp, 16);
+
+  // stage 0
+  si.alu[0][0].op = SPOC_ALU_MUL_IN0_CONST;
+  si.alu[0][0].constant = cst0;
+
+  // ??? what about setting links?
+  si.mux[0][0].op = SPOC_MUX_IN1;
+  si.mux[0][2].op = SPOC_MUX_IN0;
+
+  mcode.raw = (freia_ptr) &si;
+  mcode.size = sizeof(spoc_instr);
+
+  dynparam.raw = (freia_ptr) &sp;
+  dynparam.size = sizeof(spoc_param);
+
+  redres.raw = (freia_ptr) &reduc;
+  redres.size = sizeof(spoc_reduction);
+
+  ret = freia_cg_write_microcode(&mcode);
+  ret |= freia_cg_write_dynamic_param(&dynparam);
+
+  // actual call of spoc hardware
+  freia_cg_template_process_1i_1o(op, param, o0, i0);
+
+  // get reductions
+  freia_cg_read_reduction_results(&redres);
+
+  return ret;
+}
+// FREIA-SPoC helper function for module my_mul
+freia_status my_mul_helper_0(freia_data2d * o0, freia_data2d * i0, freia_data2d * i1)
+{
+  spoc_instr si;
+  spoc_param sp;
+  spoc_reduction reduc;
+  freia_microcode mcode;
+  freia_dynamic_param dynparam;
+  freia_reduction_results redres;
+  freia_op_sel op = 0;
+  freia_op_param param;
+  freia_status ret;
+
+  // init pipe to nop
+  spoc_init_pipe(&si, &sp, 16);
+
+  // stage 0
+  si.alu[0][0].op = SPOC_ALU_MUL_IN0_IN1;
+
+  // ??? what about setting links?
+  si.mux[0][0].op = SPOC_MUX_IN1;
+  si.mux[0][2].op = SPOC_MUX_IN0;
+
+  mcode.raw = (freia_ptr) &si;
+  mcode.size = sizeof(spoc_instr);
+
+  dynparam.raw = (freia_ptr) &sp;
+  dynparam.size = sizeof(spoc_param);
+
+  redres.raw = (freia_ptr) &reduc;
+  redres.size = sizeof(spoc_reduction);
+
+  ret = freia_cg_write_microcode(&mcode);
+  ret |= freia_cg_write_dynamic_param(&dynparam);
+
+  // actual call of spoc hardware
+  freia_cg_template_process_2i_1o(op, param, o0, i0, i1);
+
+  // get reductions
+  freia_cg_read_reduction_results(&redres);
+
+  return ret;
+}
+// FREIA-SPoC helper function for module my_not
+freia_status my_not_helper_0(freia_data2d * o0, freia_data2d * i0)
+{
+  spoc_instr si;
+  spoc_param sp;
+  spoc_reduction reduc;
+  freia_microcode mcode;
+  freia_dynamic_param dynparam;
+  freia_reduction_results redres;
+  freia_op_sel op = 0;
+  freia_op_param param;
+  freia_status ret;
+
+  // init pipe to nop
+  spoc_init_pipe(&si, &sp, 16);
+
+  // stage 0
+  si.alu[0][0].op = SPOC_ALU_NOT_IN0;
+
+  // ??? what about setting links?
+  si.mux[0][0].op = SPOC_MUX_IN1;
+  si.mux[0][2].op = SPOC_MUX_IN0;
+
+  mcode.raw = (freia_ptr) &si;
+  mcode.size = sizeof(spoc_instr);
+
+  dynparam.raw = (freia_ptr) &sp;
+  dynparam.size = sizeof(spoc_param);
+
+  redres.raw = (freia_ptr) &reduc;
+  redres.size = sizeof(spoc_reduction);
+
+  ret = freia_cg_write_microcode(&mcode);
+  ret |= freia_cg_write_dynamic_param(&dynparam);
+
+  // actual call of spoc hardware
+  freia_cg_template_process_1i_1o(op, param, o0, i0);
+
+  // get reductions
+  freia_cg_read_reduction_results(&redres);
+
+  return ret;
+}
+// FREIA-SPoC helper function for module my_or_const
+freia_status my_or_const_helper_0(freia_data2d * o0, freia_data2d * i0, int32_t cst0)
+{
+  spoc_instr si;
+  spoc_param sp;
+  spoc_reduction reduc;
+  freia_microcode mcode;
+  freia_dynamic_param dynparam;
+  freia_reduction_results redres;
+  freia_op_sel op = 0;
+  freia_op_param param;
+  freia_status ret;
+
+  // init pipe to nop
+  spoc_init_pipe(&si, &sp, 16);
+
+  // stage 0
+  si.alu[0][0].op = SPOC_ALU_AND_IN0_CONST;
+  si.alu[0][0].constant = cst0;
+
+  // ??? what about setting links?
+  si.mux[0][0].op = SPOC_MUX_IN1;
+  si.mux[0][2].op = SPOC_MUX_IN0;
+
+  mcode.raw = (freia_ptr) &si;
+  mcode.size = sizeof(spoc_instr);
+
+  dynparam.raw = (freia_ptr) &sp;
+  dynparam.size = sizeof(spoc_param);
+
+  redres.raw = (freia_ptr) &reduc;
+  redres.size = sizeof(spoc_reduction);
+
+  ret = freia_cg_write_microcode(&mcode);
+  ret |= freia_cg_write_dynamic_param(&dynparam);
+
+  // actual call of spoc hardware
+  freia_cg_template_process_1i_1o(op, param, o0, i0);
+
+  // get reductions
+  freia_cg_read_reduction_results(&redres);
+
+  return ret;
+}
+// FREIA-SPoC helper function for module my_or
+freia_status my_or_helper_0(freia_data2d * o0, freia_data2d * i0, freia_data2d * i1)
+{
+  spoc_instr si;
+  spoc_param sp;
+  spoc_reduction reduc;
+  freia_microcode mcode;
+  freia_dynamic_param dynparam;
+  freia_reduction_results redres;
+  freia_op_sel op = 0;
+  freia_op_param param;
+  freia_status ret;
+
+  // init pipe to nop
+  spoc_init_pipe(&si, &sp, 16);
+
+  // stage 0
+  si.alu[0][0].op = SPOC_ALU_OR_IN0_IN1;
+
+  // ??? what about setting links?
+  si.mux[0][0].op = SPOC_MUX_IN1;
+  si.mux[0][2].op = SPOC_MUX_IN0;
+
+  mcode.raw = (freia_ptr) &si;
+  mcode.size = sizeof(spoc_instr);
+
+  dynparam.raw = (freia_ptr) &sp;
+  dynparam.size = sizeof(spoc_param);
+
+  redres.raw = (freia_ptr) &reduc;
+  redres.size = sizeof(spoc_reduction);
+
+  ret = freia_cg_write_microcode(&mcode);
+  ret |= freia_cg_write_dynamic_param(&dynparam);
+
+  // actual call of spoc hardware
+  freia_cg_template_process_2i_1o(op, param, o0, i0, i1);
+
+  // get reductions
+  freia_cg_read_reduction_results(&redres);
+
+  return ret;
+}
+// FREIA-SPoC helper function for module my_set_constant
+freia_status my_set_constant_helper_0(freia_data2d * o0, , int32_t cst0)
+{
+  spoc_instr si;
+  spoc_param sp;
+  spoc_reduction reduc;
+  freia_microcode mcode;
+  freia_dynamic_param dynparam;
+  freia_reduction_results redres;
+  freia_op_sel op = 0;
+  freia_op_param param;
+  freia_status ret;
+
+  // init pipe to nop
+  spoc_init_pipe(&si, &sp, 16);
+
+  // stage 0
+  si.alu[0][0].op = SPOC_ALU_COPY_CONST;
+  si.alu[0][0].constant = cst0;
+
+  // ??? what about setting links?
+  si.mux[0][0].op = SPOC_MUX_IN1;
+  si.mux[0][2].op = SPOC_MUX_IN0;
+
+  mcode.raw = (freia_ptr) &si;
+  mcode.size = sizeof(spoc_instr);
+
+  dynparam.raw = (freia_ptr) &sp;
+  dynparam.size = sizeof(spoc_param);
+
+  redres.raw = (freia_ptr) &reduc;
+  redres.size = sizeof(spoc_reduction);
+
+  ret = freia_cg_write_microcode(&mcode);
+  ret |= freia_cg_write_dynamic_param(&dynparam);
+
+  // actual call of spoc hardware
+  freia_cg_template_process_1o(op, param, o0);
+
+  // get reductions
+  freia_cg_read_reduction_results(&redres);
+
+  return ret;
+}
+// FREIA-SPoC helper function for module my_sub_const
+freia_status my_sub_const_helper_0(freia_data2d * o0, freia_data2d * i0, int32_t cst0)
+{
+  spoc_instr si;
+  spoc_param sp;
+  spoc_reduction reduc;
+  freia_microcode mcode;
+  freia_dynamic_param dynparam;
+  freia_reduction_results redres;
+  freia_op_sel op = 0;
+  freia_op_param param;
+  freia_status ret;
+
+  // init pipe to nop
+  spoc_init_pipe(&si, &sp, 16);
+
+  // stage 0
+  si.alu[0][0].op = SPOC_ALU_SUB_IN0_CONST;
+  si.alu[0][0].constant = cst0;
+
+  // ??? what about setting links?
+  si.mux[0][0].op = SPOC_MUX_IN1;
+  si.mux[0][2].op = SPOC_MUX_IN0;
+
+  mcode.raw = (freia_ptr) &si;
+  mcode.size = sizeof(spoc_instr);
+
+  dynparam.raw = (freia_ptr) &sp;
+  dynparam.size = sizeof(spoc_param);
+
+  redres.raw = (freia_ptr) &reduc;
+  redres.size = sizeof(spoc_reduction);
+
+  ret = freia_cg_write_microcode(&mcode);
+  ret |= freia_cg_write_dynamic_param(&dynparam);
+
+  // actual call of spoc hardware
+  freia_cg_template_process_1i_1o(op, param, o0, i0);
+
+  // get reductions
+  freia_cg_read_reduction_results(&redres);
+
+  return ret;
+}
+// FREIA-SPoC helper function for module my_sub
+freia_status my_sub_helper_0(freia_data2d * o0, freia_data2d * i0, freia_data2d * i1)
+{
+  spoc_instr si;
+  spoc_param sp;
+  spoc_reduction reduc;
+  freia_microcode mcode;
+  freia_dynamic_param dynparam;
+  freia_reduction_results redres;
+  freia_op_sel op = 0;
+  freia_op_param param;
+  freia_status ret;
+
+  // init pipe to nop
+  spoc_init_pipe(&si, &sp, 16);
+
+  // stage 0
+  si.alu[0][0].op = SPOC_ALU_SUB_IN0_IN1;
+
+  // ??? what about setting links?
+  si.mux[0][0].op = SPOC_MUX_IN1;
+  si.mux[0][2].op = SPOC_MUX_IN0;
+
+  mcode.raw = (freia_ptr) &si;
+  mcode.size = sizeof(spoc_instr);
+
+  dynparam.raw = (freia_ptr) &sp;
+  dynparam.size = sizeof(spoc_param);
+
+  redres.raw = (freia_ptr) &reduc;
+  redres.size = sizeof(spoc_reduction);
+
+  ret = freia_cg_write_microcode(&mcode);
+  ret |= freia_cg_write_dynamic_param(&dynparam);
+
+  // actual call of spoc hardware
+  freia_cg_template_process_2i_1o(op, param, o0, i0, i1);
+
+  // get reductions
+  freia_cg_read_reduction_results(&redres);
+
+  return ret;
+}
+// FREIA-SPoC helper function for module my_subsat_const
+freia_status my_subsat_const_helper_0(freia_data2d * o0, freia_data2d * i0, int32_t cst0)
+{
+  spoc_instr si;
+  spoc_param sp;
+  spoc_reduction reduc;
+  freia_microcode mcode;
+  freia_dynamic_param dynparam;
+  freia_reduction_results redres;
+  freia_op_sel op = 0;
+  freia_op_param param;
+  freia_status ret;
+
+  // init pipe to nop
+  spoc_init_pipe(&si, &sp, 16);
+
+  // stage 0
+  si.alu[0][0].op = SPOC_ALU_SUBSAT_IN0_CONST;
+  si.alu[0][0].constant = cst0;
+
+  // ??? what about setting links?
+  si.mux[0][0].op = SPOC_MUX_IN1;
+  si.mux[0][2].op = SPOC_MUX_IN0;
+
+  mcode.raw = (freia_ptr) &si;
+  mcode.size = sizeof(spoc_instr);
+
+  dynparam.raw = (freia_ptr) &sp;
+  dynparam.size = sizeof(spoc_param);
+
+  redres.raw = (freia_ptr) &reduc;
+  redres.size = sizeof(spoc_reduction);
+
+  ret = freia_cg_write_microcode(&mcode);
+  ret |= freia_cg_write_dynamic_param(&dynparam);
+
+  // actual call of spoc hardware
+  freia_cg_template_process_1i_1o(op, param, o0, i0);
+
+  // get reductions
+  freia_cg_read_reduction_results(&redres);
+
+  return ret;
+}
+// FREIA-SPoC helper function for module my_subsat
+freia_status my_subsat_helper_0(freia_data2d * o0, freia_data2d * i0, freia_data2d * i1)
+{
+  spoc_instr si;
+  spoc_param sp;
+  spoc_reduction reduc;
+  freia_microcode mcode;
+  freia_dynamic_param dynparam;
+  freia_reduction_results redres;
+  freia_op_sel op = 0;
+  freia_op_param param;
+  freia_status ret;
+
+  // init pipe to nop
+  spoc_init_pipe(&si, &sp, 16);
+
+  // stage 0
+  si.alu[0][0].op = SPOC_ALU_SUBSAT_IN0_IN1;
+
+  // ??? what about setting links?
+  si.mux[0][0].op = SPOC_MUX_IN1;
+  si.mux[0][2].op = SPOC_MUX_IN0;
+
+  mcode.raw = (freia_ptr) &si;
+  mcode.size = sizeof(spoc_instr);
+
+  dynparam.raw = (freia_ptr) &sp;
+  dynparam.size = sizeof(spoc_param);
+
+  redres.raw = (freia_ptr) &reduc;
+  redres.size = sizeof(spoc_reduction);
+
+  ret = freia_cg_write_microcode(&mcode);
+  ret |= freia_cg_write_dynamic_param(&dynparam);
+
+  // actual call of spoc hardware
+  freia_cg_template_process_2i_1o(op, param, o0, i0, i1);
+
+  // get reductions
+  freia_cg_read_reduction_results(&redres);
+
+  return ret;
+}
+// FREIA-SPoC helper function for module my_sup_const
+freia_status my_sup_const_helper_0(freia_data2d * o0, freia_data2d * i0, int32_t cst0)
+{
+  spoc_instr si;
+  spoc_param sp;
+  spoc_reduction reduc;
+  freia_microcode mcode;
+  freia_dynamic_param dynparam;
+  freia_reduction_results redres;
+  freia_op_sel op = 0;
+  freia_op_param param;
+  freia_status ret;
+
+  // init pipe to nop
+  spoc_init_pipe(&si, &sp, 16);
+
+  // stage 0
+  si.alu[0][0].op = SPOC_ALU_SUP_IN0_CONST;
+  si.alu[0][0].constant = cst0;
+
+  // ??? what about setting links?
+  si.mux[0][0].op = SPOC_MUX_IN1;
+  si.mux[0][2].op = SPOC_MUX_IN0;
+
+  mcode.raw = (freia_ptr) &si;
+  mcode.size = sizeof(spoc_instr);
+
+  dynparam.raw = (freia_ptr) &sp;
+  dynparam.size = sizeof(spoc_param);
+
+  redres.raw = (freia_ptr) &reduc;
+  redres.size = sizeof(spoc_reduction);
+
+  ret = freia_cg_write_microcode(&mcode);
+  ret |= freia_cg_write_dynamic_param(&dynparam);
+
+  // actual call of spoc hardware
+  freia_cg_template_process_1i_1o(op, param, o0, i0);
+
+  // get reductions
+  freia_cg_read_reduction_results(&redres);
+
+  return ret;
+}
+// FREIA-SPoC helper function for module my_sup
+freia_status my_sup_helper_0(freia_data2d * o0, freia_data2d * i0, freia_data2d * i1)
+{
+  spoc_instr si;
+  spoc_param sp;
+  spoc_reduction reduc;
+  freia_microcode mcode;
+  freia_dynamic_param dynparam;
+  freia_reduction_results redres;
+  freia_op_sel op = 0;
+  freia_op_param param;
+  freia_status ret;
+
+  // init pipe to nop
+  spoc_init_pipe(&si, &sp, 16);
+
+  // stage 0
+  si.alu[0][0].op = SPOC_ALU_SUP_IN0_IN1;
+
+  // ??? what about setting links?
+  si.mux[0][0].op = SPOC_MUX_IN1;
+  si.mux[0][2].op = SPOC_MUX_IN0;
+
+  mcode.raw = (freia_ptr) &si;
+  mcode.size = sizeof(spoc_instr);
+
+  dynparam.raw = (freia_ptr) &sp;
+  dynparam.size = sizeof(spoc_param);
+
+  redres.raw = (freia_ptr) &reduc;
+  redres.size = sizeof(spoc_reduction);
+
+  ret = freia_cg_write_microcode(&mcode);
+  ret |= freia_cg_write_dynamic_param(&dynparam);
+
+  // actual call of spoc hardware
+  freia_cg_template_process_2i_1o(op, param, o0, i0, i1);
+
+  // get reductions
+  freia_cg_read_reduction_results(&redres);
+
+  return ret;
+}
+// FREIA-SPoC helper function for module my_threshold
+freia_status my_threshold_helper_0(freia_data2d * o0, freia_data2d * i0, int32_t inf0, int32_t sup1, bool bin2)
+{
+  spoc_instr si;
+  spoc_param sp;
+  spoc_reduction reduc;
+  freia_microcode mcode;
+  freia_dynamic_param dynparam;
+  freia_reduction_results redres;
+  freia_op_sel op = 0;
+  freia_op_param param;
+  freia_status ret;
+
+  // init pipe to nop
+  spoc_init_pipe(&si, &sp, 16);
+
+  // stage 0
+  si.th[0][0].op =    (bin2)? SPOC_TH_BINARIZE : SPOC_TH_NO_BINARIZE;
+  sp.th[0][0].boundmin = inf0;
+  sp.th[0][0].boundmax = sup1;
+
+  mcode.raw = (freia_ptr) &si;
+  mcode.size = sizeof(spoc_instr);
+
+  dynparam.raw = (freia_ptr) &sp;
+  dynparam.size = sizeof(spoc_param);
+
+  redres.raw = (freia_ptr) &reduc;
+  redres.size = sizeof(spoc_reduction);
+
+  ret = freia_cg_write_microcode(&mcode);
+  ret |= freia_cg_write_dynamic_param(&dynparam);
+
+  // actual call of spoc hardware
+  freia_cg_template_process_1i_1o(op, param, o0, i0);
+
+  // get reductions
+  freia_cg_read_reduction_results(&redres);
+
+  return ret;
+}
+// FREIA-SPoC helper function for module my_xor_const
+freia_status my_xor_const_helper_0(freia_data2d * o0, freia_data2d * i0, int32_t cst0)
+{
+  spoc_instr si;
+  spoc_param sp;
+  spoc_reduction reduc;
+  freia_microcode mcode;
+  freia_dynamic_param dynparam;
+  freia_reduction_results redres;
+  freia_op_sel op = 0;
+  freia_op_param param;
+  freia_status ret;
+
+  // init pipe to nop
+  spoc_init_pipe(&si, &sp, 16);
+
+  // stage 0
+  si.alu[0][0].op = SPOC_ALU_XOR_IN0_CONST;
+  si.alu[0][0].constant = cst0;
+
+  // ??? what about setting links?
+  si.mux[0][0].op = SPOC_MUX_IN1;
+  si.mux[0][2].op = SPOC_MUX_IN0;
+
+  mcode.raw = (freia_ptr) &si;
+  mcode.size = sizeof(spoc_instr);
+
+  dynparam.raw = (freia_ptr) &sp;
+  dynparam.size = sizeof(spoc_param);
+
+  redres.raw = (freia_ptr) &reduc;
+  redres.size = sizeof(spoc_reduction);
+
+  ret = freia_cg_write_microcode(&mcode);
+  ret |= freia_cg_write_dynamic_param(&dynparam);
+
+  // actual call of spoc hardware
+  freia_cg_template_process_1i_1o(op, param, o0, i0);
+
+  // get reductions
+  freia_cg_read_reduction_results(&redres);
+
+  return ret;
+}
+// FREIA-SPoC helper function for module my_xor
+freia_status my_xor_helper_0(freia_data2d * o0, freia_data2d * i0, freia_data2d * i1)
+{
+  spoc_instr si;
+  spoc_param sp;
+  spoc_reduction reduc;
+  freia_microcode mcode;
+  freia_dynamic_param dynparam;
+  freia_reduction_results redres;
+  freia_op_sel op = 0;
+  freia_op_param param;
+  freia_status ret;
+
+  // init pipe to nop
+  spoc_init_pipe(&si, &sp, 16);
+
+  // stage 0
+  si.alu[0][0].op = SPOC_ALU_XOR_IN0_IN1;
+
+  // ??? what about setting links?
+  si.mux[0][0].op = SPOC_MUX_IN1;
+  si.mux[0][2].op = SPOC_MUX_IN0;
+
+  mcode.raw = (freia_ptr) &si;
+  mcode.size = sizeof(spoc_instr);
+
+  dynparam.raw = (freia_ptr) &sp;
+  dynparam.size = sizeof(spoc_param);
+
+  redres.raw = (freia_ptr) &reduc;
+  redres.size = sizeof(spoc_reduction);
+
+  ret = freia_cg_write_microcode(&mcode);
+  ret |= freia_cg_write_dynamic_param(&dynparam);
+
+  // actual call of spoc hardware
+  freia_cg_template_process_2i_1o(op, param, o0, i0, i1);
+
+  // get reductions
+  freia_cg_read_reduction_results(&redres);
+
+  return ret;
+}
+
+! new functions
+
+typedef struct __freia_data2d *freia_data2d;
+typedef enum {FREIA_OK, FREIA_ERROR} freia_status;
+typedef int int32_t;
+typedef unsigned int uint32_t;
+extern freia_data2d *freia_common_create_data(uint32_t, uint32_t, uint32_t);
+extern freia_status freia_common_destruct_data(freia_data2d *);
+extern freia_status freia_aipo_inf(freia_data2d *, freia_data2d *, freia_data2d *);
+extern freia_status freia_aipo_inf_const(freia_data2d *, freia_data2d *, int32_t);
+extern freia_status freia_aipo_sup(freia_data2d *, freia_data2d *, freia_data2d *);
+extern freia_status freia_aipo_sup_const(freia_data2d *, freia_data2d *, int32_t);
+extern freia_status freia_aipo_sub(freia_data2d *, freia_data2d *, freia_data2d *);
+extern freia_status freia_aipo_sub_const(freia_data2d *, freia_data2d *, int32_t);
+extern freia_status freia_aipo_subsat(freia_data2d *, freia_data2d *, freia_data2d *);
+extern freia_status freia_aipo_subsat_const(freia_data2d *, freia_data2d *, int32_t);
+extern freia_status freia_aipo_add(freia_data2d *, freia_data2d *, freia_data2d *);
+extern freia_status freia_aipo_add_const(freia_data2d *, freia_data2d *, int32_t);
+extern freia_status freia_aipo_addsat(freia_data2d *, freia_data2d *, freia_data2d *);
+extern freia_status freia_aipo_addsat_const(freia_data2d *, freia_data2d *, int32_t);
+extern freia_status freia_aipo_absdiff(freia_data2d *, freia_data2d *, freia_data2d *);
+extern freia_status freia_aipo_absdiff_const(freia_data2d *, freia_data2d *, int32_t);
+extern freia_status freia_aipo_mul(freia_data2d *, freia_data2d *, freia_data2d *);
+extern freia_status freia_aipo_mul_const(freia_data2d *, freia_data2d *, int32_t);
+extern freia_status freia_aipo_div(freia_data2d *, freia_data2d *, freia_data2d *);
+extern freia_status freia_aipo_div_const(freia_data2d *, freia_data2d *, int32_t);
+extern freia_status freia_aipo_and(freia_data2d *, freia_data2d *, freia_data2d *);
+extern freia_status freia_aipo_and_const(freia_data2d *, freia_data2d *, int32_t);
+extern freia_status freia_aipo_or(freia_data2d *, freia_data2d *, freia_data2d *);
+extern freia_status freia_aipo_or_const(freia_data2d *, freia_data2d *, int32_t);
+extern freia_status freia_aipo_xor(freia_data2d *, freia_data2d *, freia_data2d *);
+extern freia_status freia_aipo_xor_const(freia_data2d *, freia_data2d *, int32_t);
+extern freia_status freia_aipo_not(freia_data2d *, freia_data2d *);
+extern freia_status freia_aipo_convolution(freia_data2d *, freia_data2d *, int32_t *, uint32_t, uint32_t);
+extern freia_status freia_aipo_fast_correlation(freia_data2d *, freia_data2d *, freia_data2d *, uint32_t);
+extern freia_status freia_aipo_min(freia_data2d *, int32_t *);
+extern freia_status freia_aipo_max(freia_data2d *, int32_t *);
+extern freia_status freia_aipo_global_min_coord(freia_data2d *, int32_t *, int32_t *, int32_t *);
+extern freia_status freia_aipo_global_max_coord(freia_data2d *, int32_t *, int32_t *, int32_t *);
+extern freia_status freia_aipo_global_vol(freia_data2d *, int32_t *);
+extern freia_status freia_aipo_copy(freia_data2d *, freia_data2d *);
+extern freia_status freia_aipo_cast(freia_data2d *, freia_data2d *);
+extern freia_status freia_aipo_set_constant(freia_data2d *, int32_t);
+extern freia_status freia_aipo_threshold(freia_data2d *, freia_data2d *, int32_t, int32_t, int32_t);
+extern freia_status freia_aipo_erode_8c(freia_data2d *, freia_data2d *, int32_t *);
+extern freia_status freia_aipo_dilate_8c(freia_data2d *, freia_data2d *, int32_t *);
+extern freia_status freia_aipo_erode_6c(freia_data2d *, freia_data2d *, int32_t *);
+extern freia_status freia_aipo_dilate_6c(freia_data2d *, freia_data2d *, int32_t *);
+extern freia_status my_inf(freia_data2d *o, freia_data2d *i0, freia_data2d *i1);
+extern freia_status my_inf_const(freia_data2d *o, freia_data2d *i0, int32_t p0);
+extern freia_status my_sup(freia_data2d *o, freia_data2d *i0, freia_data2d *i1);
+extern freia_status my_sup_const(freia_data2d *o, freia_data2d *i0, int32_t p0);
+extern freia_status my_sub(freia_data2d *o, freia_data2d *i0, freia_data2d *i1);
+extern freia_status my_sub_const(freia_data2d *o, freia_data2d *i0, int32_t p0);
+extern freia_status my_subsat(freia_data2d *o, freia_data2d *i0, freia_data2d *i1);
+extern freia_status my_subsat_const(freia_data2d *o, freia_data2d *i0, int32_t p0);
+extern freia_status my_add(freia_data2d *o, freia_data2d *i0, freia_data2d *i1);
+extern freia_status my_add_const(freia_data2d *o, freia_data2d *i0, int32_t p0);
+extern freia_status my_addsat(freia_data2d *o, freia_data2d *i0, freia_data2d *i1);
+extern freia_status my_addsat_const(freia_data2d *o, freia_data2d *i0, int32_t p0);
+extern freia_status my_absdiff(freia_data2d *o, freia_data2d *i0, freia_data2d *i1);
+extern freia_status my_absdiff_const(freia_data2d *o, freia_data2d *i0, int32_t p0);
+extern freia_status my_mul(freia_data2d *o, freia_data2d *i0, freia_data2d *i1);
+extern freia_status my_mul_const(freia_data2d *o, freia_data2d *i0, int32_t p0);
+extern freia_status my_div(freia_data2d *o, freia_data2d *i0, freia_data2d *i1);
+extern freia_status my_div_const(freia_data2d *o, freia_data2d *i0, int32_t p0);
+extern freia_status my_and(freia_data2d *o, freia_data2d *i0, freia_data2d *i1);
+extern freia_status my_and_const(freia_data2d *o, freia_data2d *i0, int32_t p0);
+extern freia_status my_or(freia_data2d *o, freia_data2d *i0, freia_data2d *i1);
+extern freia_status my_or_const(freia_data2d *o, freia_data2d *i0, int32_t p0);
+extern freia_status my_xor(freia_data2d *o, freia_data2d *i0, freia_data2d *i1);
+extern freia_status my_xor_const(freia_data2d *o, freia_data2d *i0, int32_t p0);
+extern freia_status my_not(freia_data2d *o, freia_data2d *i0);
+extern freia_status my_convolution(freia_data2d *o, freia_data2d *i0, int32_t *p0, uint32_t p1, uint32_t p2);
+extern freia_status my_fast_correlation(freia_data2d *o, freia_data2d *i0, freia_data2d *i1, uint32_t p0);
+extern freia_status my_global_min(freia_data2d *i0, int32_t *p0);
+extern freia_status my_global_max(freia_data2d *i0, int32_t *p0);
+extern freia_status my_global_min_coord(freia_data2d *i0, int32_t *p0, int32_t *p1, int32_t *p2);
+extern freia_status my_global_max_coord(freia_data2d *i0, int32_t *p0, int32_t *p1, int32_t *p2);
+extern freia_status my_global_vol(freia_data2d *image, int32_t *vol);
+extern freia_status my_copy(freia_data2d *o, freia_data2d *i0);
+extern freia_status my_cast(freia_data2d *o, freia_data2d *i0);
+extern freia_status my_set_constant(freia_data2d *o, int32_t p0);
+extern freia_status my_threshold(freia_data2d *o, freia_data2d *i0, int32_t p0, int32_t p1, int32_t p2);
+extern freia_status my_erode_8c(freia_data2d *o, freia_data2d *i0, int32_t *p0);
+extern freia_status my_dilate_8c(freia_data2d *o, freia_data2d *i0, int32_t *p0);
+extern freia_status my_erode_6c(freia_data2d *o, freia_data2d *i0, int32_t *p0);
+extern freia_status my_dilate_6c(freia_data2d *o, freia_data2d *i0, int32_t *p0);
+freia_status my_absdiff(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
+{
+   return my_absdiff_helper_0(o, i1, i0);                               /*0079*/
+}
+freia_status my_absdiff_const(freia_data2d *o, freia_data2d *i0, int32_t p0)
+{
+   return my_absdiff_const_helper_0(o, i0, p0);                         /*0085*/
+}
+freia_status my_add(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
+{
+   return my_add_helper_0(o, i1, i0);                                   /*0055*/
+}
+freia_status my_add_const(freia_data2d *o, freia_data2d *i0, int32_t p0)
+{
+   return my_add_const_helper_0(o, i0, p0);                             /*0061*/
+}
+freia_status my_addsat(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
+{
+   return my_addsat_helper_0(o, i1, i0);                                /*0067*/
+}
+freia_status my_addsat_const(freia_data2d *o, freia_data2d *i0, int32_t p0)
+{
+   return my_addsat_const_helper_0(o, i0, p0);                          /*0073*/
+}
+freia_status my_and(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
+{
+   return my_and_helper_0(o, i1, i0);                                   /*0115*/
+}
+freia_status my_and_const(freia_data2d *o, freia_data2d *i0, int32_t p0)
+{
+   return my_and_const_helper_0(o, i0, p0);                             /*0121*/
+}
+freia_status my_cast(freia_data2d *o, freia_data2d *i0)
+{
+   return freia_aipo_cast(o, i0);                                       /*0203*/
+}
+freia_status my_convolution(freia_data2d *o, freia_data2d *i0, int32_t *p0, uint32_t p1, uint32_t p2)
+{
+   return freia_aipo_convolution(o, i0, p0, p1, p2);                    /*0158*/
+}
+freia_status my_copy(freia_data2d *o, freia_data2d *i0)
+{
+   return my_copy_helper_0(o, i0);                                      /*0198*/
+}
+freia_status my_dilate_6c(freia_data2d *o, freia_data2d *i0, int32_t *p0)
+{
+   return my_dilate_6c_helper_0(o, i0, p0);                             /*0239*/
+}
+freia_status my_dilate_8c(freia_data2d *o, freia_data2d *i0, int32_t *p0)
+{
+   return my_dilate_8c_helper_0(o, i0, p0);                             /*0227*/
+}
+freia_status my_div(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
+{
+   return my_div_helper_0(o, i1, i0);                                   /*0103*/
+}
+freia_status my_div_const(freia_data2d *o, freia_data2d *i0, int32_t p0)
+{
+   return my_div_const_helper_0(o, i0, p0);                             /*0109*/
+}
+freia_status my_erode_6c(freia_data2d *o, freia_data2d *i0, int32_t *p0)
+{
+   return my_erode_6c_helper_0(o, i0, p0);                              /*0233*/
+}
+freia_status my_erode_8c(freia_data2d *o, freia_data2d *i0, int32_t *p0)
+{
+   return my_erode_8c_helper_0(o, i0, p0);                              /*0221*/
+}
+freia_status my_fast_correlation(freia_data2d *o, freia_data2d *i0, freia_data2d *i1, uint32_t p0)
+{
+   return freia_aipo_fast_correlation(o, i0, i1, p0);                   /*0164*/
+}
+freia_status my_global_max(freia_data2d *i0, int32_t *p0)
+{
+   return my_global_max_helper_0(i0, p0);                               /*0175*/
+}
+freia_status my_global_max_coord(freia_data2d *i0, int32_t *p0, int32_t *p1, int32_t *p2)
+{
+   return my_global_max_coord_helper_0(i0, p0, p1, p2);                 /*0187*/
+}
+freia_status my_global_min(freia_data2d *i0, int32_t *p0)
+{
+   return my_global_min_helper_0(i0, p0);                               /*0170*/
+}
+freia_status my_global_min_coord(freia_data2d *i0, int32_t *p0, int32_t *p1, int32_t *p2)
+{
+   return my_global_min_coord_helper_0(i0, p0, p1, p2);                 /*0181*/
+}
+freia_status my_global_vol(freia_data2d *image, int32_t *vol)
+{
+   return my_global_vol_helper_0(image, vol);                           /*0192*/
+}
+freia_status my_inf(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
+{
+   return my_inf_helper_0(o, i1, i0);                                   /*0005*/
+}
+freia_status my_inf_const(freia_data2d *o, freia_data2d *i0, int32_t p0)
+{
+   return my_inf_const_helper_0(o, i0, p0);                             /*0013*/
+}
+freia_status my_mul(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
+{
+   return my_mul_helper_0(o, i1, i0);                                   /*0091*/
+}
+freia_status my_mul_const(freia_data2d *o, freia_data2d *i0, int32_t p0)
+{
+   return my_mul_const_helper_0(o, i0, p0);                             /*0097*/
+}
+freia_status my_not(freia_data2d *o, freia_data2d *i0)
+{
+   return my_not_helper_0(o, i0);                                       /*0151*/
+}
+freia_status my_or(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
+{
+   return my_or_helper_0(o, i1, i0);                                    /*0127*/
+}
+freia_status my_or_const(freia_data2d *o, freia_data2d *i0, int32_t p0)
+{
+   return my_or_const_helper_0(o, i0, p0);                              /*0133*/
+}
+freia_status my_set_constant(freia_data2d *o, int32_t p0)
+{
+   return my_set_constant_helper_0(o, p0);                              /*0208*/
+}
+freia_status my_sub(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
+{
+   return my_sub_helper_0(o, i1, i0);                                   /*0031*/
+}
+freia_status my_sub_const(freia_data2d *o, freia_data2d *i0, int32_t p0)
+{
+   return my_sub_const_helper_0(o, i0, p0);                             /*0037*/
+}
+freia_status my_subsat(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
+{
+   return my_subsat_helper_0(o, i1, i0);                                /*0043*/
+}
+freia_status my_subsat_const(freia_data2d *o, freia_data2d *i0, int32_t p0)
+{
+   return my_subsat_const_helper_0(o, i0, p0);                          /*0049*/
+}
+freia_status my_sup(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
+{
+   return my_sup_helper_0(o, i1, i0);                                   /*0019*/
+}
+freia_status my_sup_const(freia_data2d *o, freia_data2d *i0, int32_t p0)
+{
+   return my_sup_const_helper_0(o, i0, p0);                             /*0025*/
+}
+freia_status my_threshold(freia_data2d *o, freia_data2d *i0, int32_t p0, int32_t p1, int32_t p2)
+{
+   return my_threshold_helper_0(o, i0, p0, p1, p2);                     /*0214*/
+}
+freia_status my_xor(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
+{
+   return my_xor_helper_0(o, i1, i0);                                   /*0139*/
+}
+freia_status my_xor_const(freia_data2d *o, freia_data2d *i0, int32_t p0)
+{
+   return my_xor_const_helper_0(o, i0, p0);                             /*0145*/
+}

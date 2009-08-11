@@ -11,6 +11,10 @@ echo
 echo ! accelerated function
 echo
 shell cat ./freia_00.database/Src/freia_stuff_helper_0.c
+echo
+echo ! new function
+echo
+display PRINTED_FILE[freia_stuff]
 close
 delete freia_00
 quit

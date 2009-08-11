@@ -28,19 +28,17 @@ int main(char *fmt1, ...)
   (void) fprintf(fp, "%s%d", i_name, i);
 
   va_start(vl, fmt1);
-  // (void) vfscanf(fp, fmt1, vl);
+  (void) vfscanf(fp, fmt1, vl);
   va_end(vl);
   va_start(vl, fmt1);
   (void) vfprintf(fp, fmt1, vl);
   va_end(vl);
-  
-  
-  
+
   (void) scanf("%s%d",i_name, &i);
   (void) printf(fmt2, i_name, i);
-  
+
   va_start(vl, fmt1);
-  // (void) vscanf(fmt1, vl);
+  (void) vscanf(fmt1, vl);
   va_end(vl);
   va_start(vl, fmt1);
   (void) vprintf(fmt1, vl);
@@ -50,9 +48,9 @@ int main(char *fmt1, ...)
   (void) sscanf(buf1, fmt2, i_name, &i);
   (void) sprintf(buf2, fmt2, i_name, i);
   (void) snprintf(buf2, 100, fmt2, i_name, i);
-  
+
   va_start(vl, fmt1);
-  // (void) vsscanf(buf1, fmt1,vl);
+  (void) vsscanf(buf1, fmt1,vl);
   va_end(vl);
   va_start(vl, fmt1);
   (void) vsnprintf(buf2, 100, fmt1, vl);
@@ -62,7 +60,7 @@ int main(char *fmt1, ...)
   va_end(vl);
 
   // character IO functions
-  
+
   c = fgetc(fp);
   (void) fgets(buf1, max, fp);
   (void) fputc(c, fp);
@@ -79,18 +77,18 @@ int main(char *fmt1, ...)
   (void) puts(buf1);
 
   // direct IO functions
-  
+
   nr = fread(buf2, sizeof(char), n, fp);
   nr = fwrite(buf2, sizeof(char), n, fp);
-  
+
   // file positionning functions
   (void) fgetpos(fp, fp_pos);
   (void) fgetpos(fp, &pos);
-  
+
   (void) fseek(fp, 0L, SEEK_SET);
 
   (void) fsetpos(fp, fp_pos);
-  
+
   fp_pos_indic = ftell(fp);
   rewind(fp);
 
@@ -105,6 +103,5 @@ int main(char *fmt1, ...)
 
 
   fprintf(stderr, "The END\n");
-  
 }
 

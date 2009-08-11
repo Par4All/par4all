@@ -84,10 +84,17 @@ void malloc01()
 
  **************** Effective Dependence Graph ****************
 
-	09 --> 09 with conflicts
-		from <p[i]-W-MUST> to <p[i]-W-MUST> at levels  1
 
 ****************** End of Dependence Graph ******************
 
 Parallelization
 
+void malloc01()
+{
+   int *p = malloc(10*sizeof(int));
+   int i;
+
+#pragma omp parallel for 
+   for(i = 0; i <= 9; i += 1)
+      p[i] = (double) i;
+}

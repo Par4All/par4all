@@ -1,17 +1,11 @@
-typedef struct __freia_data2d;
-typedef struct __freia_data2d * freia_data2d;
-typedef int freia_error;
+#include "freia.h"
 
-extern freia_error
-freia_aipo_add(freia_data2d * o, freia_data2d * i0, freia_data2d * i1);
-extern freia_error
-freia_aipo_sub(freia_data2d * o, freia_data2d * i0, freia_data2d * i1);
-
-freia_error
-freia_stuff(freia_data2d * o0, freia_data2d * o1,
-	    freia_data2d * i0, freia_data2d * i1)
+freia_status
+freia_stuff(freia_data2d * o, freia_data2d * i0, freia_data2d * i1)
 {
-  freia_aipo_add(o0, i0, i1);
-  freia_aipo_sub(o1, o0, i1);
-  return 0;
+  freia_data2d * tmp = freia_common_create_data(16, 128, 128);
+  freia_aipo_add(tmp, i0, i1);
+  freia_aipo_sub(o, tmp, i1);
+  freia_common_destruct_data(tmp);
+  return FREIA_OK;
 }

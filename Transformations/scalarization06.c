@@ -3,10 +3,8 @@
    a) t[i] should be scalarized
    b) a declaration should be created for the corresponding scalar
 
-   -> BUG
-
-   Note: as of today, regions are not computed for pointers
-   (LD, 19 May 2009)
+   -> THIS TEST FAILS because as of today, regions are not computed
+   for pointers (LD, 19 May 2009)
 */
 
 #include <stdio.h>

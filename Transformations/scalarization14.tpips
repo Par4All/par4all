@@ -20,37 +20,37 @@ setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
 #echo
 #echo Initial code
 #echo
-#display PRINTED_FILE[func]
+#display PRINTED_FILE[scalarization14]
 
 #echo
 #echo Read/Write regions
 #echo
 #activate PRINT_CODE_REGIONS
-#display PRINTED_FILE[func]
+#display PRINTED_FILE[scalarization14]
 
 #echo
 #echo IN regions
 #echo
 #activate PRINT_CODE_IN_REGIONS
-#display PRINTED_FILE[func]
+#display PRINTED_FILE[scalarization14]
 
 #echo
 #echo OUT regions
 #echo
 #activate PRINT_CODE_OUT_REGIONS
-#display PRINTED_FILE[func]
+#display PRINTED_FILE[scalarization14]
 
 #echo
 #echo Privatized regions
 #echo
 #activate PRINT_CODE_PRIVATIZED_REGIONS
-#display PRINTED_FILE[func]
+#display PRINTED_FILE[scalarization14]
 
 echo
 echo Code after scalarization
 echo
-apply SCALARIZATION[func]
-display PRINTED_FILE[func]
+apply SCALARIZATION[scalarization14]
+display PRINTED_FILE[scalarization14]
 
 close
 delete scalarization14

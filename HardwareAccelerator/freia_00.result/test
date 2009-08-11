@@ -1,43 +1,51 @@
 
 ! initial function
 
-freia_error freia_stuff(freia_data2d *o0, freia_data2d *o1, freia_data2d *i0, freia_data2d *i1)
+freia_status freia_stuff(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 {
-   freia_aipo_add(o0, i0, i1);                                          /*0014*/
-   freia_aipo_sub(o1, o0, i1);                                          /*0015*/
-   return 0;                                                            /*0016*/
+   freia_data2d *tmp = freia_common_create_data(16, 128, 128);
+   freia_aipo_add(tmp, i0, i1);                                         /*0006*/
+   freia_aipo_sub(o, tmp, i1);                                          /*0007*/
+   freia_common_destruct_data(tmp);                                     /*0008*/
+   return FREIA_OK;                                                     /*0009*/
 }
 
 ! accelerated function
 
-freia_error freia_stuff_helper_0(freia_data2d * o0, freia_data2d * o1, freia_data2d * i0, freia_data2d * i1)
+// FREIA-SPoC helper function for module freia_stuff
+freia_status freia_stuff_helper_0(freia_data2d * o0, freia_data2d * i0, freia_data2d * i1)
 {
-  spoc_instr spocinstr;
-  spoc_param spocparam;
+  spoc_instr si;
+  spoc_param sp;
   spoc_reduction reduc;
   freia_microcode mcode;
   freia_dynamic_param dynparam;
   freia_reduction_results redres;
   freia_op_sel op = 0;
   freia_op_param param;
-  freia_error ret;
+  freia_status ret;
 
-  //init pipe to nop
-  spoc_init_pipe(&spocinstr, &spocparam, 16);
+  // init pipe to nop
+  spoc_init_pipe(&si, &sp, 16);
 
   // stage 0
-  spocinstr.alu[0][0].op = SPOC_ALU_ADD_IN0_IN1;
-  spocinstr.mux[0][0].op = SPOC_MUX_IN1;
-  spocinstr.mux[0][2].op = SPOC_MUX_IN0;
-  // stage 1
-  spocinstr.alu[1][0].op = SPOC_ALU_SUB_IN0_IN1;
-  spocinstr.mux[1][0].op = SPOC_MUX_IN1;
-  spocinstr.mux[1][2].op = SPOC_MUX_IN0;
+  si.alu[0][0].op = SPOC_ALU_ADD_IN0_IN1;
 
-  mcode.raw = (freia_ptr) &spocinstr;
+  // ??? what about setting links?
+  si.mux[0][0].op = SPOC_MUX_IN1;
+  si.mux[0][2].op = SPOC_MUX_IN0;
+
+  // stage 1
+  si.alu[1][0].op = SPOC_ALU_SUB_IN0_IN1;
+
+  // ??? what about setting links?
+  si.mux[1][0].op = SPOC_MUX_IN1;
+  si.mux[1][2].op = SPOC_MUX_IN0;
+
+  mcode.raw = (freia_ptr) &si;
   mcode.size = sizeof(spoc_instr);
 
-  dynparam.raw = (freia_ptr) &spocparam;
+  dynparam.raw = (freia_ptr) &sp;
   dynparam.size = sizeof(spoc_param);
 
   redres.raw = (freia_ptr) &reduc;
@@ -47,8 +55,21 @@ freia_error freia_stuff_helper_0(freia_data2d * o0, freia_data2d * o1, freia_dat
   ret |= freia_cg_write_dynamic_param(&dynparam);
 
   // actual call of spoc hardware
-  freia_cg_template_process_2i_2o(op, param, o0, o1, i0, i1);
+  freia_cg_template_process_2i_1o(op, param, o0, i0, i1);
 
-  // TODO: get reduction results...
+  // get reductions
+  freia_cg_read_reduction_results(&redres);
+
   return ret;
+}
+
+! new function
+
+freia_status freia_stuff(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
+{
+   freia_data2d *tmp = freia_common_create_data(16, 128, 128);
+   freia_stuff_helper_0(o, i1, i0);                                     /*0006*/
+   ;
+   freia_common_destruct_data(tmp);                                     /*0008*/
+   return FREIA_OK;                                                     /*0009*/
 }

@@ -2,8 +2,8 @@
    x[i] can be scalarized, but the scalar must be copied back into x[i]
 
    NOTES:
-   - Bug: no copy-out
-   - Additionally, one too many scalar is declared (__ld__1)
+   - this code is meaningless: x[i] is redefined before it is used.
+
  */
 
 #include <stdio.h>

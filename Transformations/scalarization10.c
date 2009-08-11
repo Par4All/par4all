@@ -1,8 +1,7 @@
-/* Expected result:
-   A[i] can be scalarized, but the scalar must be copied in from A[I],
-   and then back into A[i]
+/* Expected result: A[i] can be scalarized, the scalar must be copied
+   in from A[I], but not back into A[i], because it's never used in
+   this context: the scalarization10 is never called.
 
-   NOTE: no scalarization (LD, 19 May 2009)
  */
 
 int SIZE = 10;

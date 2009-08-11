@@ -5,7 +5,7 @@ C     Expected result: nothing needs to be scalarized
 C
 C     NOTE: scalarization takes place all the same
 
-      SUBROUTINE SCALARIZATION(X,Y,N)
+      SUBROUTINE SCALARIZATION13(X,Y,N)
       REAL X(N), Y(N)      
 C     BEGIN BLOCK
       DO I = 1, N                                                       0007

@@ -1,6 +1,8 @@
 void fp(int x)
 {
-    void (*f)(int)=fp;
-    void (*g)(int);
-    g(x);
-} 
+  void (*f)(int)=fp;
+  //void (*f)(int);
+  void (*g)(int y) = f;
+  //f = fp;
+  g(x);
+}

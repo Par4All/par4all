@@ -12,21 +12,19 @@ C
 
 C  T() {}
 
-      J = 0                                                             0001
+      J = 0                                                             0009
 
 C  T(I) {}
 
-C  <ITAB(PHI1)-W-EXACT-{PHI1==J}>
-      DO I = 1, 12                                                      0002
+      DO I = 1, 12                                                      0010
 
 C  T() {}
 
-         J = J+1                                                        0003
+         J = J+1                                                        0011
 
 C  T() {}
 
-C  <ITAB(PHI1)-W-EXACT-{PHI1==J, 1<=I, I<=12}>
-         ITAB(J) = 1000                                                 0004
+         ITAB(J) = 1000                                                 0012
       ENDDO
       END
 
@@ -43,21 +41,19 @@ C
 
 C  P() {}
 
-      J = 0                                                             0001
+      J = 0                                                             0009
 
 C  P() {}
 
-C  <ITAB(PHI1)-W-EXACT-{PHI1==J}>
-      DO I = 1, 12                                                      0002
+      DO I = 1, 12                                                      0010
 
 C  P(I) {1<=I, I<=12}
 
-         J = J+1                                                        0003
+         J = J+1                                                        0011
 
 C  P(I) {1<=I, I<=12}
 
-C  <ITAB(PHI1)-W-EXACT-{PHI1==J, 1<=I, I<=12}>
-         ITAB(J) = 1000                                                 0004
+         ITAB(J) = 1000                                                 0012
       ENDDO
       END
 C Nga Nguyen: This example shows a bug in regions
@@ -68,17 +64,15 @@ C
       PROGRAM BUGREGION
       DIMENSION ITAB(2000)
       EQUIVALENCE (ITAB(10),J)
-      J = 0                                                             0001
+      J = 0                                                             0009
 
 C  <ITAB(PHI1)-W-MAY-{}>
 
-C  <ITAB(PHI1)-W-EXACT-{PHI1==J}>
-      DO I = 1, 12                                                      0002
-         J = J+1                                                        0003
+      DO I = 1, 12                                                      0010
+         J = J+1                                                        0011
 
 C  <ITAB(PHI1)-W-MAY-{1<=I, I<=12}>
 
-C  <ITAB(PHI1)-W-EXACT-{PHI1==J, 1<=I, I<=12}>
-         ITAB(J) = 1000                                                 0004
+         ITAB(J) = 1000                                                 0012
       ENDDO
       END

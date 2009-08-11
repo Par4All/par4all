@@ -1,0 +1,43 @@
+delete outline05
+create outline05 outline05.c
+echo Select some options to deal with the C Language:
+echo Parse as C:
+activate C_PARSER
+echo If possible, transform simple for-loops into do-loop à la Fortran, simpler to analyze:
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+echo Prettyprint the source as C, of course
+setproperty PRETTYPRINT_C_CODE TRUE
+
+echo Select the most precise analysis:
+activate MUST_REGIONS
+activate TRANSFORMERS_INTER_FULL
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate PRECONDITIONS_INTER_FULL
+#activate REGION_CHAINS
+
+# To validate also the debug level :-)
+setenv COARSE_GRAIN_PARALLELIZATION_DEBUG_LEVEL 5
+
+display PARSED_PRINTED_FILE[main]
+activate PRINT_CODE_INV_REGIONS
+display PRINTED_FILE[main]
+apply LOCALIZE_DECLARATION[%ALLFUNC]
+display PRINTED_FILE[main]
+apply CLEAN_DECLARATIONS[%ALLFUNC]
+apply COARSE_GRAIN_PARALLELIZATION[main]
+display PRINTED_FILE[main]
+
+setproperty OUTLINE_LABEL "init_kernel"
+setproperty OUTLINE_MODULE_NAME "init_kernel"
+apply OUTLINE[main]
+display PRINTED_FILE[%ALL]
+apply LOCALIZE_DECLARATION[%ALLFUNC]
+display PRINTED_FILE[init_kernel]
+apply CLEAN_DECLARATIONS[%ALLFUNC]
+display PRINTED_FILE[init_kernel]
+apply COARSE_GRAIN_PARALLELIZATION[init_kernel]
+display PRINTED_FILE[%ALL]
+display PARALLELPRINTED_FILE[%ALLFUNC]
+
+close
+quit
