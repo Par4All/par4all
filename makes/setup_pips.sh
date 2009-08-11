@@ -174,6 +174,7 @@ export PIPS_SVN=$SVN_CRI/pips
 export EXTERN_ROOT=$prod/extern
 export NEWGEN_ROOT=$prod/newgen
 export LINEAR_ROOT=$prod/linear
+# compiling or running pips "basically" does not require PIPS_ROOT
 #export PIPS_ROOT=$prod/pips
 
 # fix path
