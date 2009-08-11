@@ -743,14 +743,14 @@ same_entity_p(entity e1, entity e2)
 
 /*  Comparison function for qsort.
  */
-int 
-compare_entities(entity *pe1, entity *pe2)
+int
+compare_entities(const entity *pe1, const entity *pe2)
 {
   int
     null_1 = (*pe1==(entity)NULL),
     null_2 = (*pe2==(entity)NULL);
-    
-  if (null_1 || null_2) 
+
+  if (null_1 || null_2)
     return(null_2-null_1);
   else {
     /* FI: Which sorting do you want? */
@@ -763,21 +763,21 @@ compare_entities(entity *pe1, entity *pe2)
     //free(s2);
     //
     //return c;
-    return(strcmp(entity_name(*pe1), entity_name(*pe2)));
+    return strcmp(entity_name(*pe1), entity_name(*pe2));
   }
 }
 
 /* sorted in place.
  */
-void 
+void
 sort_list_of_entities(list l)
 {
-    gen_sort_list(l, compare_entities);
+  gen_sort_list(l, (int(*)(const void*,const void*)) compare_entities);
 }
 
 /*   TRUE if var1 <= var2
  */
-bool 
+bool
 lexicographic_order_p(entity var1, entity var2)
 {
     /*   TCST is before anything else
@@ -785,7 +785,7 @@ lexicographic_order_p(entity var1, entity var2)
     if ((Variable) var1==TCST) return(TRUE);
     if ((Variable) var2==TCST) return(FALSE);
 
-    /* else there are two entities 
+    /* else there are two entities
      */
 
     return(strcmp(entity_local_name(var1), entity_local_name(var2))<=0);
@@ -793,12 +793,12 @@ lexicographic_order_p(entity var1, entity var2)
 
 /* return the basic associated to entity e if it's a function/variable/constant
  * basic_undefined otherwise */
-basic 
+basic
 entity_basic(entity e)
 {
     if (e != entity_undefined) {
 	type t = entity_type(e);
-	
+
 	if (type_functional_p(t))
 	    t = functional_result(type_functional(t));
 	if (type_variable_p(t))
@@ -808,10 +808,10 @@ entity_basic(entity e)
 }
 
 /* return TRUE if the basic associated with entity e matchs the passed tag */
-bool 
+bool
 entity_basic_p(entity e,_int basictag)
 {
-    return (basic_tag(entity_basic(e)) == basictag);
+  return basic_tag(entity_basic(e)) == basictag;
 }
 
 /* Checks that el only contains entity*/
@@ -1621,8 +1621,9 @@ bool entity_in_list_p(entity ent, list ent_l)
  */
 list concat_new_entities(list l1, list l2)
 {
-    list new_l2=NIL;
-    set s = list_to_set(l1,set_pointer);
+    list new_l2 = NIL;
+    set s = set_make(set_pointer);
+    set_assign_list(s, l1);
     FOREACH(ENTITY,e,l2) {
         if( ! set_belong_p(s,e) )
             new_l2=CONS(ENTITY,e,new_l2);
