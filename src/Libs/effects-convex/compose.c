@@ -57,32 +57,36 @@ convex_regions_inverse_transformer_compose(list l_reg, transformer trans)
     return l_reg;
 }
 
-list 
-convex_regions_precondition_compose(list l_reg, transformer context)
+list convex_regions_precondition_compose(list l_reg, transformer context)
 {
-    list l_res = NIL;
-    Psysteme sc_context = predicate_system(transformer_relation(context));
-    
-    ifdebug(8)
-	{
-	    pips_debug(8, "context: \n");
-	    sc_syst_debug(sc_context);
-	}
-	
-    MAP(EFFECT, reg,
-	{
-	  /* FI: this leads to problems when the context might become
-	     later empty: there won't be any way to find out; in one
-	     case I do not remember, the IN effects end up wrong;
-	     however, adding descriptors for all scalar references may
-	     slow down the region computation a lot. */
-	    if (! effect_scalar_p(reg) )
-		region_sc_append(reg, sc_context, FALSE);
+  list l_res = NIL;
+  Psysteme sc_context = predicate_system(transformer_relation(context));
 
-	    if (!region_empty_p(reg))
-		l_res = CONS(EFFECT, reg, l_res);    
-	},
-	l_reg);
+  pips_assert("sc is weakly consistent", sc_weak_consistent_p(sc_context));
+  ifdebug(8) {
+    pips_debug(8, "context: \n");
+    sc_syst_debug(sc_context);
+  }
 
-    return l_res;
+  FOREACH(EFFECT, reg, l_reg) {
+    /* FI: this leads to problems when the context might become
+       later empty: there won't be any way to find out; in one
+       case I do not remember, the IN effects end up wrong;
+       however, adding descriptors for all scalar references may
+       slow down the region computation a lot. */
+    if (!effect_scalar_p(reg) ) {
+      descriptor reg_d = effect_descriptor(reg);
+      Psysteme reg_sc = descriptor_convex_p(reg_d)? descriptor_convex(reg_d) : NULL;
+
+      pips_assert("sc_context is weakly consistent", sc_weak_consistent_p(sc_context));
+      pips_assert("reg_sc is weakly consistent", sc_weak_consistent_p(reg_sc));
+      region_sc_append(reg, sc_context, FALSE);
+      pips_assert("sc_context is weakly consistent", sc_weak_consistent_p(sc_context));
+      pips_assert("reg_sc is weakly consistent", sc_weak_consistent_p(reg_sc));
+    }
+    if (!region_empty_p(reg))
+      l_res = CONS(EFFECT, reg, l_res);
+  }
+
+  return l_res;
 }

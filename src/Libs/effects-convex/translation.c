@@ -313,7 +313,7 @@ static bool dims_array_init(entity array, dimension* dims, int dim_array)
 		    vect_constant_p(pvlo) && value_one_p(val_of(pvlo)))
 		{
 		    pips_user_warning("\nvariable (%s): "
-				      "last upper dimension equal to lower;" 
+				      "last upper dimension equal to lower;"
 				      " assuming unbounded upper bound\n",
 				      entity_name(array));
 		    dim =
@@ -344,34 +344,33 @@ static Psysteme entity_assumed_declaration_sc(dimension* dims, int ndim)
 
     for (dim=1; dim<=ndim; dim++)
     {
-	sc_add_phi_equation(sc, dimension_lower(dims[dim-1]), 
-			    dim, NOT_EG, NOT_PHI_FIRST);
-	sc_add_phi_equation(sc, dimension_upper(dims[dim-1]), 
-			    dim, NOT_EG, PHI_FIRST);
+      (void) sc_add_phi_equation(&sc, dimension_lower(dims[dim-1]),
+				 dim, NOT_EG, NOT_PHI_FIRST);
+      (void) sc_add_phi_equation(&sc, dimension_upper(dims[dim-1]),
+				 dim, NOT_EG, PHI_FIRST);
     }
 
     return sc;
 }
 
 
-void 
-region_translation_init(entity ent_1, reference rf_1,
-			entity ent_2, reference rf_2,
-			Value offset_1_m_2)
+void region_translation_init(entity ent_1, reference rf_1,
+			     entity ent_2, reference rf_2,
+			     Value offset_1_m_2)
 {
     array_1 = ent_1;
     array_2 = ent_2;
     ref_1 = rf_1;
     ref_2 = rf_2;
-    reference_p = 
+    reference_p =
       !(reference_undefined_p(ref_1) && reference_undefined_p(ref_2));
     offset = offset_1_m_2;
-    
+
     dim_1 = NumberOfDimension(array_1);
     dim_2 = NumberOfDimension(array_2);
-    
+
     if (statistics_p) mat_dim_stat[dim_1][dim_2]++;
-    
+
     size_elt_1 = int_to_value(SizeOfElements(
 	variable_basic(type_variable(entity_type(array_1)))));
     size_elt_2 = int_to_value(SizeOfElements(

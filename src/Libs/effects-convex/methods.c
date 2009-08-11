@@ -132,13 +132,13 @@ set_methods_for_convex_effects()
 
     db_get_summary_rw_effects_func = db_get_convex_summary_rw_regions;
     db_put_summary_rw_effects_func = db_put_convex_summary_rw_regions;
-    
+
     db_get_in_effects_func = db_get_convex_in_regions;
     db_put_in_effects_func = db_put_convex_in_regions;
-    
+
     db_get_cumulated_in_effects_func = db_get_convex_cumulated_in_regions;
     db_put_cumulated_in_effects_func = db_put_convex_cumulated_in_regions;
-    
+
     db_get_invariant_in_effects_func = db_get_convex_invariant_in_regions;
     db_put_invariant_in_effects_func = db_put_convex_invariant_in_regions;
 
@@ -147,7 +147,7 @@ set_methods_for_convex_effects()
 
     db_get_out_effects_func = db_get_convex_out_regions;
     db_put_out_effects_func = db_put_convex_out_regions;
-    
+
     db_get_summary_out_effects_func = db_get_convex_summary_out_regions;
     db_put_summary_out_effects_func = db_put_convex_summary_out_regions;
 
@@ -155,8 +155,7 @@ set_methods_for_convex_effects()
     set_descriptor_range_p(TRUE);
 }
 
-void 
-init_convex_rw_prettyprint(string module_name)
+void init_convex_rw_prettyprint(string __attribute__ ((unused)) module_name)
 {
     effects_prettyprint_func = print_rw_regions;
     effects_to_text_func = text_rw_array_regions;
@@ -172,8 +171,8 @@ init_convex_rw_regions(string module_name)
 
     /* Get the transformers and preconditions of the module. */
     set_transformer_map( (statement_mapping)
-	db_get_memory_resource(DBR_TRANSFORMERS, module_name, TRUE) );	
-    set_precondition_map( (statement_mapping) 
+	db_get_memory_resource(DBR_TRANSFORMERS, module_name, TRUE) );
+    set_precondition_map( (statement_mapping)
 	db_get_memory_resource(DBR_PRECONDITIONS, module_name, TRUE) );
 
     /* for intermediate values */
@@ -184,15 +183,13 @@ init_convex_rw_regions(string module_name)
     init_convex_rw_prettyprint(module_name);
 }
 
-void 
-init_convex_inout_prettyprint(string module_name)
+void init_convex_inout_prettyprint(string __attribute__ ((unused)) module_name)
 {
     effects_prettyprint_func = print_inout_regions;
     effects_to_text_func = text_inout_array_regions;
 }
 
-void
-init_convex_in_out_regions(string module_name)
+void init_convex_in_out_regions(string module_name)
 {
     regions_init();
     if (!same_string_p(rule_phase(find_rule_by_resource("REGIONS")),
@@ -202,11 +199,11 @@ init_convex_in_out_regions(string module_name)
     set_bool_property("MUST_REGIONS", TRUE);
     set_bool_property("EXACT_REGIONS", TRUE);
     get_in_out_regions_properties();
-			  
+
     /* Get the transformers and preconditions of the module. */
     set_transformer_map( (statement_mapping)
-	db_get_memory_resource(DBR_TRANSFORMERS, module_name, TRUE) );	
-    set_precondition_map( (statement_mapping) 
+	db_get_memory_resource(DBR_TRANSFORMERS, module_name, TRUE) );
+    set_precondition_map( (statement_mapping)
 	db_get_memory_resource(DBR_PRECONDITIONS, module_name, TRUE) );
 
     /* for intermediate values */
@@ -217,8 +214,7 @@ init_convex_in_out_regions(string module_name)
     init_convex_inout_prettyprint(module_name);
 }
 
-void 
-reset_convex_rw_regions(string module_name)
+void reset_convex_rw_regions(string module_name)
 {
     regions_end();
     region_translation_statistics_close(module_name, "rw");
@@ -228,8 +224,7 @@ reset_convex_rw_regions(string module_name)
     free_value_mappings();
 }
 
-void 
-reset_convex_in_out_regions(string module_name)
+void reset_convex_in_out_regions(string __attribute__ ((unused)) module_name)
 {
     regions_end();
     reset_transformer_map();
@@ -250,16 +245,14 @@ init_convex_summary_rw_regions(string module_name)
     init_convex_rw_prettyprint(module_name);
 }
 
-void
-reset_convex_summary_rw_regions(string module_name)
+void reset_convex_summary_rw_regions(string __attribute__ ((unused)) module_name)
 {
     regions_end();
     reset_cumulated_rw_effects();
     free_value_mappings();
 }
 
-void
-init_convex_summary_in_out_regions(string module_name)
+void init_convex_summary_in_out_regions(string module_name)
 {
     regions_init();
     set_bool_property("MUST_REGIONS", TRUE);
@@ -273,15 +266,14 @@ init_convex_summary_in_out_regions(string module_name)
     init_convex_inout_prettyprint(module_name);
 }
 
-void 
-reset_convex_prettyprint(string module_name)
+void reset_convex_prettyprint(string __attribute__ ((unused)) module_name)
 {
     effects_prettyprint_func = (generic_prettyprint_function) abort;
     effects_to_text_func = (generic_text_function) abort;
 }
 
 void
-reset_convex_summary_in_out_regions(string module_name)
+reset_convex_summary_in_out_regions(string __attribute__ ((unused)) module_name)
 {
     regions_end();
     reset_cumulated_rw_effects();

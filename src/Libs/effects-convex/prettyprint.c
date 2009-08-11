@@ -63,7 +63,7 @@
  * output   : the name of entity.
  * modifies : nothing.
  * comment  : allows to "catch" the PHIs entities, else, it works like
- *            pips_user_value_name() (see semantics.c).	
+ *            pips_user_value_name() (see semantics.c).
  */
 char *
 pips_region_user_name(entity ent)
@@ -82,7 +82,7 @@ pips_region_user_name(entity ent)
 	    name = entity_local_name(ent);
 	else
 	    /**** ARGH why using this stuff in transformer... ******/
-            /* if (entity_has_values_p(ent)) */
+	    /* if (entity_has_values_p(ent)) */
 	    /* else name = entity_name(ent); */
 	    name = entity_minimal_name(ent);
     }
@@ -91,7 +91,8 @@ pips_region_user_name(entity ent)
 }
 
 string
-region_sc_to_string(string s, Psysteme ps)
+region_sc_to_string(string __attribute__ ((unused)) s,
+		    Psysteme __attribute__ ((unused)) ps)
 {
     pips_internal_error("implementation dropped\n");
     return string_undefined;
@@ -101,7 +102,7 @@ region_sc_to_string(string s, Psysteme ps)
 
 /* text text_region(effect reg)
  * input    : a region
- * output   : a text consisting of several lines of commentaries, 
+ * output   : a text consisting of several lines of commentaries,
  *            representing the region
  * modifies : nothing
  */
@@ -178,19 +179,19 @@ text_region(effect reg)
     sc_rm(sc);
     base_rm(sorted_base);
 
-    /* CLOSE 
+    /* CLOSE
      */
     if (!foresys) append(">");
     close_current_line(line_buffer, t_reg,str_prefix);
 
-    return t_reg;   
+    return t_reg;
 }
 
 
 /* text text_array_regions(list l_reg, string ifread, string ifwrite)
  * input    : a list of regions
  * output   : a text representing this list of regions.
- * comment  : if the number of array regions is not nul, and if 
+ * comment  : if the number of array regions is not nul, and if
  *            PRETTYPRINT_LOOSE is TRUE, then empty lines are
  *            added before and after the text of the list of regions.
  */
@@ -200,43 +201,42 @@ text_array_regions(list l_reg, string ifread, string ifwrite)
     text reg_text = make_text(NIL);
     /* in case of loose_prettyprint, at least one region to print? */
     boolean loose_p = get_bool_property("PRETTYPRINT_LOOSE");
-    boolean one_p = FALSE;  
+    boolean one_p = FALSE;
 
     set_action_interpretation(ifread, ifwrite);
 
     /* GO: No redundant test anymore, see  text_statement_array_regions */
-    if (l_reg != (list) HASH_UNDEFINED_VALUE && l_reg != list_undefined) 
+    if (l_reg != (list) HASH_UNDEFINED_VALUE && l_reg != list_undefined)
     {
-	gen_sort_list(l_reg, effect_compare);
-	MAP(EFFECT, reg,
+      gen_sort_list(l_reg, (int (*)(const void *,const void *)) effect_compare);
+	FOREACH(EFFECT, reg, l_reg)
 	{
 	    entity ent = effect_entity(reg);
-	    if ( get_bool_property("PRETTYPRINT_SCALAR_REGIONS") || 
-		! entity_atomic_reference_p(ent)) 
+	    if ( get_bool_property("PRETTYPRINT_SCALAR_REGIONS") ||
+		! entity_atomic_reference_p(ent))
 	    {
 		if (loose_p && !one_p )
 		{
-		    ADD_SENTENCE_TO_TEXT(reg_text, 
-					 make_sentence(is_sentence_formatted, 
+		    ADD_SENTENCE_TO_TEXT(reg_text,
+					 make_sentence(is_sentence_formatted,
 						       strdup("\n")));
 		    one_p = TRUE;
 		}
 		MERGE_TEXTS(reg_text, text_region(reg));
-	    }	
-	},
-	    l_reg);
+	    }
+	}
 
 	if (loose_p && one_p)
-	    ADD_SENTENCE_TO_TEXT(reg_text, 
-				 make_sentence(is_sentence_formatted, 
+	    ADD_SENTENCE_TO_TEXT(reg_text,
+				 make_sentence(is_sentence_formatted,
 					       strdup("\n")));
     }
 
     reset_action_interpretation();
     return reg_text;
 }
-
-/* practical interfaces 
+
+/* practical interfaces
  */
 text text_inout_array_regions(list l)
 { return text_array_regions(l, ACTION_IN, ACTION_OUT);}
@@ -401,16 +401,16 @@ print_region(effect r)
 /************************************************* STATISTICS FOR OPERATORS */
 
 
-void
-print_regions_op_statistics(char *mod_name, int regions_type)
+void print_regions_op_statistics(char __attribute__ ((unused)) *mod_name,
+				 int regions_type)
 {
     string prefix = string_undefined;
 
     switch (regions_type) {
-    case R_RW : 
+    case R_RW :
 	prefix = "rrw-";
 	break;
-    case R_IN : 
+    case R_IN :
 	prefix = "rin-";
 	break;
     case R_OUT :

@@ -21,10 +21,10 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
-/* 
+/*
  * package regions :  Be'atrice Creusillet, September 1994
  *
- * ------------ 
+ * ------------
  * projection.c
  * ------------
  *
@@ -1015,21 +1015,21 @@ void region_exact_projection_along_variable(region reg, entity var)
 	if (op_statistics_p())
 	{
 	    nb_proj_var++;
-	    if (region_approximation_tag(reg) == is_approximation_must) 
+	    if (region_approximation_tag(reg) == is_approximation_must)
 		nb_proj_var_pot_must++;
 	}
-		
+
 	ifdebug(3)
 	{
 	    pips_debug(3, "initial region :\n");
 	    print_region(reg);
 	}
-	
-	if (base_contains_variable_p(sc->base, (Variable) var)) 
+
+	if (base_contains_variable_p(sc->base, (Variable) var))
 	{
 	    CATCH(overflow_error)
 	    {
-		region reg_tmp = 
+		region reg_tmp =
 		    reference_whole_region(region_any_reference(reg),
 					   region_action_tag(reg));
 		cell c_tmp = region_cell(reg_tmp);
@@ -1046,24 +1046,24 @@ void region_exact_projection_along_variable(region reg, entity var)
 	    }
 	    TRY {
 		list l_phi_var = region_phi_cfc_variables(reg);
-		
+
 		if (gen_find_eq(var, l_phi_var) == chunk_undefined)
 		{
 		    sc_projection_along_variable_ofl_ctrl(&sc,(Variable) var,
-							  FWD_OFL_CTRL); 
+							  FWD_OFL_CTRL);
 		    sc_base_remove_variable(sc, (Variable) var);
-		    sc = region_sc_normalize(sc,2);	
+		    sc = region_sc_normalize(sc,2);
 		    region_system_(reg) = newgen_Psysteme(sc);
-		    
+
 		    if (op_statistics_p() &&
 			(region_approximation_tag(reg)==is_approximation_must))
 			nb_proj_var_must++;
 		}
-		else 
+		else
 		{
 		    Pvecteur pv_var = NULL;
 		    boolean is_proj_exact = TRUE;
-		    
+
 		    vect_add_elem(&pv_var, (Variable) var, VALUE_ONE);
 		    sc = sc_projection_ofl_along_variables_with_test
 			(sc, pv_var,  &is_proj_exact);
@@ -1411,7 +1411,7 @@ static int constraints_nb_phi_eq(Pcontrainte eqs)
     for(; !CONTRAINTE_UNDEFINED_P(eqs); eqs = eqs->succ)
 	if (vect_contains_phi_p(eqs->vecteur))
 	    nb_phi_eq++;
-    
+
     return(nb_phi_eq);
 }
 
@@ -1422,23 +1422,24 @@ static int constraints_nb_phi_eq(Pcontrainte eqs)
  * output   : TRUE if its projection of regions along index is safe (see
  *            conditions in report E/185).
  * modifies : nothing
- * comment  :	
+ * comment  :
  */
-boolean region_projection_along_index_safe_p(entity index, range l_range)
+boolean region_projection_along_index_safe_p(entity __attribute__ ((unused)) index,
+					     range l_range)
 {
     boolean projection_of_index_safe = FALSE;
     normalized n, nub, nlb;
     expression e_incr = range_increment(l_range);
     Value incr = VALUE_ZERO;
-    
+
     /* Is the loop increment numerically known ? */
     n = NORMALIZE_EXPRESSION(e_incr);
-    if(normalized_linear_p(n)) 
+    if(normalized_linear_p(n))
     {
 	Pvecteur v_incr = normalized_linear(n);
-	pips_assert("project_regions_along_index_safe_p", 
+	pips_assert("project_regions_along_index_safe_p",
 		    !VECTEUR_NUL_P(v_incr));
-	if(vect_constant_p(v_incr)) 
+	if(vect_constant_p(v_incr))
 	    incr = vect_coeff(TCST, v_incr);
     }
     

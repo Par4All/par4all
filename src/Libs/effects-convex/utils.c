@@ -402,11 +402,11 @@ Psysteme region_sc_normalize(Psysteme sc_reg, int level)
 	    sc_reg = sc_empty(b);	
 	else 
 	    base_rm(b);
-	
+
 	sc_reg->dimension = vect_size(sc_reg->base);
     }
     return(sc_reg);
-    
+
 }
 
 /* void region_sc_append(region reg, Psysteme sc, bool nredund_p)
@@ -422,10 +422,10 @@ void region_sc_append_and_normalize(region reg, Psysteme sc, int level)
   Psysteme sc_reg;
   Psysteme copy = sc_dup(sc);
 
-  /* pips_assert("region context must be defined\n", 
+  /* pips_assert("region context must be defined\n",
      !transformer_undefined_p(region_context(reg))); */
 
-  sc_reg = region_system(reg);    
+  sc_reg = region_system(reg);
   if(!sc_weak_consistent_p(sc_reg)) {
     pips_debug(8, "Inconsistent region: \n");
     sc_syst_debug(sc_reg);
@@ -433,15 +433,15 @@ void region_sc_append_and_normalize(region reg, Psysteme sc, int level)
   }
   assert(sc_weak_consistent_p(copy));
   copy = sc_safe_normalize(copy);
-  sc_reg = sc_safe_append(sc_safe_normalize(sc_reg), copy); 
+  sc_reg = sc_safe_append(sc_safe_normalize(sc_reg), copy);
   assert(sc_weak_consistent_p(sc_reg));
-  if (level!=-1) 
+  if (level!=-1)
     sc_reg = region_sc_normalize(sc_reg, level);
   assert(sc_weak_consistent_p(sc_reg));
-    
+
   sc_rm(copy);
 
-  region_system_(reg) = newgen_Psysteme(sc_reg);      
+  region_system_(reg) = newgen_Psysteme(sc_reg);
 }
 
 /* void regions_sc_append(list l_reg, Psysteme sc, boolean arrays_only, 
@@ -761,35 +761,35 @@ list region_entities_cfc_variables(region reg, list l_ent)
 list sc_entities_cfc_variables(Psysteme sc, list l_ent)
 {
     Pcontrainte c, c_pred, c_suiv;
-    Pvecteur v_ent = VECTEUR_NUL, v, v_res = VECTEUR_NUL;    
+    Pvecteur v_ent = VECTEUR_NUL, v, v_res = VECTEUR_NUL;
     list l_res = NIL;
-    
+
     if (ENDP(l_ent))
 	return NIL;
-    
+
     ifdebug(8) {
 	pips_debug(8, "system: \n");
-	sc_syst_debug(sc);	
+	sc_syst_debug(sc);
 	debug(8, "", "variables :\n");
 	print_arguments(l_ent);
     }
-    
+
     pips_assert("sc_entities_cfc_variables", !SC_UNDEFINED_P(sc));
-    
-    /* cas particuliers */ 
+
+    /* cas particuliers */
     if(sc_rn_p(sc) || sc_empty_p(sc))
-	/* ne rien faire et renvoyer (nil) */ 
+	/* ne rien faire et renvoyer (nil) */
 	return(NIL);
- 
+
     sc = sc_dup(sc);
-    
+
     /* we make a vector containing the initial entities */
-    MAP(ENTITY, e, 
+    MAP(ENTITY, e,
     {
 	vect_add_elem(&v_ent, (Variable) e, VALUE_ONE);
     },
 	l_ent);
-    
+
     v_res = vect_dup(v_ent);
     
     /* sc has no particularity. We just scan its equalities and inequalities 
@@ -1052,7 +1052,7 @@ reference make_regions_reference(entity ent)
  *            the base of the latter contains the phi variables if 
  *            the input variable is an array.
  * modifies : nothing;
- * comment  :	
+ * comment  :
  */
 static Psysteme make_whole_array_predicate(entity e)
 {
@@ -1080,25 +1080,25 @@ static Psysteme make_whole_array_predicate(entity e)
 	    entity phi = make_phi_entity(dim);
 	    sc_base_add_variable(ps, (Variable) phi);
 	}
-	
+
 	/* add array bounds if asked for */
 	/* FI: To be improved for arrays embedded within structures. */
-	if (array_bounds_p())	
-	    ps = sc_safe_append(ps, 
+	if (array_bounds_p())
+	    ps = sc_safe_append(ps,
 				sc_safe_normalize(entity_declaration_sc(e)));
-    }    
-    
+    }
+
     return ps;
 }
 
 
-/** 
-    for C modules, the reference is trusted.
-    for Fortran modules, if the number of indices is less than the 
-    number of declared dimensions, it is assumed that it's a reference
-    to the whole (sub-)array, and array bounds are added for the 
-    lacking dimensions.
-    
+/**
+    for C modules, the reference is trusted.  for Fortran modules, if
+    the number of indices is less than the number of declared
+    dimensions, it is assumed that it's a reference to the whole
+    (sub-)array, and array bounds are added for the lacking
+    dimensions.
+
  @param ref is a reference
  @param tac is an action tag (read or write)
  @return an effect representing a region corresponding to the reference.
@@ -1119,12 +1119,12 @@ effect make_reference_region(reference ref, tag tac)
 
   ifdebug(3)
     {
-      pips_debug(3, "Reference : \"%s\"", 
+      pips_debug(3, "Reference : \"%s\"",
 		 words_to_string(words_reference(ref)));
       fprintf(stderr, "(it's %s a pointer)\n", pointer_p?"":"not");
       pips_debug(3,"type depth is %d\n", d);
     }
-    
+
   /* FI: If t is a pointer type, then d should depend on the type_depth
      of the pointed type... */
   if (d>0 || pointer_p)
@@ -1160,7 +1160,9 @@ effect make_reference_region(reference ref, tag tac)
 				 CONS(EXPRESSION,
 				      make_phi_expression(dim),
 				      NIL));
-      
+
+      pips_assert("sc is weakly consistent", sc_weak_consistent_p(sc));
+
       /* we add the constraints corresponding to the reference indices */
       for (idim = 1; ind != NIL; idim++, ind = CDR(ind))
 	{
@@ -1168,7 +1170,7 @@ effect make_reference_region(reference ref, tag tac)
 	  expression exp_ind = EXPRESSION(CAR(ind));
 	  boolean dim_linear_p;
 	  bool unbounded_p =  unbounded_expression_p(exp_ind);
-	  
+
 	  ifdebug(3)
 	    {
 	      if (unbounded_p)
@@ -1177,7 +1179,7 @@ effect make_reference_region(reference ref, tag tac)
 		pips_debug(3, "addition of equality :\nPHI%d - %s = 0\n",
 			   idim, words_to_string(words_expression(exp_ind)));
 	    }
-	  
+
 	  if (unbounded_p)
 	    {
 	      /* we must add PHI_idim in the Psystem base */
@@ -1187,28 +1189,35 @@ effect make_reference_region(reference ref, tag tac)
 	    }
 	  else
 	    {
-	      
+	      pips_assert("sc is weakly consistent", sc_weak_consistent_p(sc));
 	      dim_linear_p =
-		sc_add_phi_equation(sc, exp_ind, idim, IS_EG, PHI_FIRST);
-	      
+		sc_add_phi_equation(&sc, exp_ind, idim, IS_EG, PHI_FIRST);
+
+	      pips_assert("sc is weakly consistent", sc_weak_consistent_p(sc));
 	      pips_debug(3, "%slinear equation.\n", dim_linear_p? "": "non-");
 	    }
-	  linear_p = linear_p && dim_linear_p;	    
+	  linear_p = linear_p && dim_linear_p;
 	} /* for */
 
+      pips_assert("sc is weakly consistent", sc_weak_consistent_p(sc));
+
       /* add array bounds if asked for */
-      if (array_bounds_p())	
-	sc = sc_safe_append(sc, 
+      if (array_bounds_p()) {
+	sc = sc_safe_append(sc,
 			    sc_safe_normalize(entity_declaration_sc(e)));
+	pips_assert("sc is weakly consistent", sc_weak_consistent_p(sc));
+      }
 
     } /* if (d>0 || pointer_p) */
-  
+
   else
     {
       pips_debug(8, "non-pointer scalar type\n");
       sc = sc_new();
     }/* if else */
-  
+
+  pips_assert("sc is weakly consistent", sc_weak_consistent_p(sc));
+
   /* There was a preference originally : let's try a reference since a new
      reference is built for each region. BC */
   reg = make_region(
@@ -1219,14 +1228,14 @@ effect make_reference_region(reference ref, tag tac)
 		     UU),
 		    sc);
   debug_region_consistency(reg);
-  
-  ifdebug(3) 
+
+  ifdebug(3)
     {
       pips_debug(3, "end : region is :\n");
       print_region(reg);
     }
   return(reg);
-}    
+}
 
 /* reference make_regions_psi_reference(entity ent)
  * input    : a variable entity.
@@ -1239,17 +1248,17 @@ reference make_regions_psi_reference(entity ent)
     list regions_ref_inds = NIL, ent_list_dim = NIL;
     int dim;
     type ent_ty = entity_type(ent);
-    
+
     if (type_variable_p(ent_ty))
 	ent_list_dim = variable_dimensions(type_variable(ent_ty));
-    
+
     if (! entity_scalar_p(ent))
 	for (dim = 1; ent_list_dim != NIL; ent_list_dim = CDR(ent_list_dim), dim++)
 	    regions_ref_inds = gen_nconc(regions_ref_inds,
 					 CONS(EXPRESSION,
 					      make_psi_expression(dim),
 					      NIL));
-    
+
     return(make_reference(ent, regions_ref_inds));
 }
 
@@ -1276,53 +1285,53 @@ effect reference_whole_region(reference ref, tag tac)
     boolean linear_p = TRUE;
     Psysteme sc;
     bool pointer_p = pointer_type_p(ultimate_type(t));
- 
+
     effect reg = effect_undefined;
     list reg_ref_inds = NIL;
-    
+
     ifdebug(3)
       {
-	pips_debug(3, "Reference : \"%s\"", 
+	pips_debug(3, "Reference : \"%s\"",
 		   words_to_string(words_reference(ref)));
 	fprintf(stderr, "(it's %s a pointer)\n", pointer_p?"":"not");
 	pips_debug(3,"type depth is %d\n", d);
       }
-    
-    /* FI: If t is a pointer type, then d should depend on the type_depth 
+
+    /* FI: If t is a pointer type, then d should depend on the type_depth
        of the pointed type... */
     if (d>0 || pointer_p)
       {
 	int idim;
 	list ind = reference_indices(ref);
 	int n_ind = gen_length(ind);
-	
+
 	pips_debug(8, "pointer or array case \n");
-	
+
 	pips_assert("The number of indices is less or equal to the type depth, "
 		    "unless we are dealing with a pointer",
 		    (int) gen_length(ind) <= d || pointer_p);
-	
-	
-	if (n_ind < d)	
+
+
+	if (n_ind < d)
 	  sc = entity_declaration_sc(e);
-	else       
+	else
 	  sc = make_whole_array_predicate(e);
-	
+
 	for (dim = 1; dim <= d; dim++)
 	  reg_ref_inds = gen_nconc(reg_ref_inds,
 				   CONS(EXPRESSION,
 					make_phi_expression(dim),
 					NIL));
-	
+
 	/* we add the constraints corresponding to the reference indices */
-	for (idim = 1; ind != NIL; idim++, ind = CDR(ind)) 
+	for (idim = 1; ind != NIL; idim++, ind = CDR(ind))
 	  {
 	    /* For equalities. */
 	    expression exp_ind = EXPRESSION(CAR(ind));
 	    boolean dim_linear_p;
 	    bool unbounded_p =  unbounded_expression_p(exp_ind);
-	    
-	    ifdebug(3) 
+
+	    ifdebug(3)
 	      {
 		if (unbounded_p)
 		  pips_debug(3, "unbounded dimension PHI%d\n",idim);
@@ -1330,32 +1339,32 @@ effect reference_whole_region(reference ref, tag tac)
 		  pips_debug(3, "addition of equality :\nPHI%d - %s = 0\n",
 			   idim, words_to_string(words_expression(exp_ind)));
 	      }
-	    
+
 	    if (unbounded_p)
 	      {
 		/* we must add PHI_idim in the Psystem base */
-		entity phi = make_phi_entity(idim);	
+		entity phi = make_phi_entity(idim);
 		sc_base_add_variable(sc, (Variable) phi);
 		dim_linear_p = false;
 	      }
 	    else
 	      {
-		
-		dim_linear_p = 
-		  sc_add_phi_equation(sc, exp_ind, idim, IS_EG, PHI_FIRST);
-		
+
+		dim_linear_p =
+		  sc_add_phi_equation(&sc, exp_ind, idim, IS_EG, PHI_FIRST);
+
 		pips_debug(3, "%slinear equation.\n", dim_linear_p? "": "non-");
 	      }
-	  linear_p = linear_p && dim_linear_p;	    
+	  linear_p = linear_p && dim_linear_p;
 	  } /* for */
       } /* if (d>0 || pointer_p) */
-    
+
     else
       {
 	pips_debug(8, "non-pointer scalar type\n");
 	sc = sc_new();
       }/* if else */
-    
+
     /* There was a preference originally : let's try a reference since a new
        reference is built for each region. BC */
     reg = make_region(
@@ -1366,38 +1375,38 @@ effect reference_whole_region(reference ref, tag tac)
 		       UU),
 		    sc);
     debug_region_consistency(reg);
-    
-    ifdebug(3) 
+
+    ifdebug(3)
       {
 	pips_debug(3, "end : region is :\n");
 	print_region(reg);
       }
     return(reg);
 
-}  
+}
 
 region entity_whole_region(entity e, tag tac)
 {
     region new_eff;
     action ac = make_action(tac, UU);
     approximation ap = make_approximation(is_approximation_may, UU);
-    
-    new_eff = make_region(make_regions_reference(e), ac, ap, 
+
+    new_eff = make_region(make_regions_reference(e), ac, ap,
 			  make_whole_array_predicate(e));
     return(new_eff);
-}  
+}
 
 
 /* list region_to_store_independent_region_list(effect reg, bool force_may_p)
  * input    : a region and a boolean;
- * output   : a list with a unique region representing the entire memory space 
- *            allocated to the variable reference : the systeme of constraints 
+ * output   : a list with a unique region representing the entire memory space
+ *            allocated to the variable reference : the systeme of constraints
  *            is a sc_rn(phi_1, ..., phi_n) except if REGIONS_WITH_ARRAY_BOUNDS
  *            is true. The region is a MAY region.
- *            The boolean force_may_p is here for consistency with 
- *            effect_to_store_independent_sdfi_list. 
+ *            The boolean force_may_p is here for consistency with
+ *            effect_to_store_independent_sdfi_list.
  *            We could refine this function in order to keep constraints
- *            which are independent from the store. 
+ *            which are independent from the store.
  * modifies : nothing.
  */
 list region_to_store_independent_region_list(effect reg,
@@ -1453,13 +1462,13 @@ void convex_region_add_expression_dimension(effect reg, expression exp)
 					   NIL));
 
   /* Then add the corresponding constraint to the Psystem */
-  dim_linear_p = 
-    sc_add_phi_equation(region_system(reg), exp, dim, IS_EG, PHI_FIRST);
+  dim_linear_p =
+    sc_add_phi_equation(&region_system(reg), exp, dim, IS_EG, PHI_FIRST);
 
   if (!dim_linear_p)
     {
       pips_debug(8, "non linear expression : change approximation to may\n");
-      effect_approximation_tag(reg) = is_approximation_may; 
+      effect_approximation_tag(reg) = is_approximation_may;
     }
   ifdebug(8)
     {
@@ -1467,13 +1476,13 @@ void convex_region_add_expression_dimension(effect reg, expression exp)
       print_region(reg);
       pips_assert("the region is consistent", effect_consistent_p(reg));
     }
-  
+
   return;
 }
 
 /**
- eliminate phi_i from the region Psystem, and adds the constraint 
- phi_i==exp if exp is normalizable. 
+ eliminate phi_i from the region Psystem, and adds the constraint
+ phi_i==exp if exp is normalizable.
 
  @param reg a convex region
  @param exp the new expresion for the region ith dimension
@@ -1485,64 +1494,64 @@ void convex_region_change_ith_dimension_expression(effect reg, expression exp,
 {
   list l_phi_i = CONS(ENTITY,make_phi_entity(i),NIL);
   bool dim_linear_p;
-  
+
   /* first eliminate PHI_i variable from the system */
   region_exact_projection_along_parameters(reg, l_phi_i);
   gen_free_list(l_phi_i);
 
-  /* then add the new constraint in the system if the expression exp 
+  /* then add the new constraint in the system if the expression exp
      is not unbounded */
   if(unbounded_expression_p(exp))
     {
       pips_debug(8, "unbounded expression \n");
-      effect_approximation_tag(reg) = is_approximation_may; 
+      effect_approximation_tag(reg) = is_approximation_may;
     }
   else
     {
-      dim_linear_p = 
-	sc_add_phi_equation(region_system(reg), exp, i, IS_EG, PHI_FIRST);
-      
+      dim_linear_p =
+	sc_add_phi_equation(&region_system(reg), exp, i, IS_EG, PHI_FIRST);
+
       if (!dim_linear_p)
 	{
 	  pips_debug(8, "non linear expression : change approximation to may\n");
-	  effect_approximation_tag(reg) = is_approximation_may; 
+	  effect_approximation_tag(reg) = is_approximation_may;
 	}
     }
+
   ifdebug(8)
     {
       pips_debug(8, "end with region :\n");
       print_region(reg);
       pips_assert("the region is consistent", effect_consistent_p(reg));
     }
-  
-  
+
   return;
 }
 
-
+
 /************************************************************ PHI ENTITIES */
 
-/* entity make_phi_entity(int n) 
+/* entity make_phi_entity(int n)
  * input    : an integer n giving the range of the PHI entity.
  * output   : the entity PHI_n.
  * modifies : phi[] (eventually).
- * comment  : finds or generates an entity representing a region descriptor 
+ * comment  : finds or generates an entity representing a region descriptor
  *            of indice n.
- *            A region descriptor representes the value domain of one dimension 
+ *            A region descriptor representes the value domain of one dimension
  *            of an array, this dimension is represented by the indice.
  *            Fortran accepts a maximum of 7 dimensions.
  *
- *            Once a region descriptor is created, it is stored into a static array 
- *            (phi[]); thus, each next time a region descriptor entity is needed, 
+ *            Once a region descriptor is created, it is stored into a static array
+ *            (phi[]); thus, each next time a region descriptor entity is needed,
  *            it is just picked up in phi[].
  *            If the region descriptor is not in phi[], it may be in the table
  *            where all entities are stored, because of previous computations.
- *            At last, if it is not found there, it is created. 
+ *            At last, if it is not found there, it is created.
  */
 entity make_phi_entity(int n)
 {
     pips_assert("phi index between 1 and NB_MAX_ARRAY_DIM\n", 1<=n && n<=NB_MAX_ARRAY_DIM);
-    
+
     /* phi indices are between 1 to NB_MAX_ARRAY_DIM. array indices are between 0 to NB_MAX_ARRAY_DIM-1. */
     if (phi[n-1] == entity_undefined)
     {
@@ -1557,7 +1566,7 @@ entity make_phi_entity(int n)
 	(void) sprintf(phi_name+3,"%d",n);
 	s = strdup(concatenate(REGIONS_MODULE_NAME,
 			       MODULE_SEP_STRING, phi_name, (char *) NULL));
-	
+
 	if ((v = gen_find_tabulated(s, entity_domain)) == entity_undefined) 
 	{
 	    v = make_entity(s, make_scalar_integer_type(4),
@@ -1574,10 +1583,10 @@ list phi_entities_list(int phi_min, int phi_max)
 {
     list l_phi = NIL;
     int i;
-    
-    for(i=phi_min; i<=phi_max; i++) 
+
+    for(i=phi_min; i<=phi_max; i++)
 	l_phi = gen_nconc(l_phi, CONS(ENTITY, make_phi_entity(i), NIL));
-    
+
     return(l_phi);
 }
 
@@ -1593,7 +1602,7 @@ expression make_phi_expression(int n)
     reference ref;
     syntax synt;
     expression exp;
-    
+
     phi = make_phi_entity(n);
     ref = make_reference(phi, NIL);
     synt = make_syntax(is_syntax_reference, ref);
@@ -1610,7 +1619,7 @@ expression make_phi_expression(int n)
  */
 boolean vect_contains_phi_p(Pvecteur v)
 {
-    for(; !VECTEUR_NUL_P(v); v = v->succ) 
+    for(; !VECTEUR_NUL_P(v); v = v->succ)
 	if (variable_phi_p((entity) var_of(v)))
 	    return(TRUE);
 
@@ -1618,8 +1627,8 @@ boolean vect_contains_phi_p(Pvecteur v)
 }
 
 
-/* bool sc_add_phi_equation(Psysteme sc, expression expr,
- *                       int dim, bool is_eg, bool is_phi_first)
+/* bool sc_add_phi_equation(Psysteme * psc, expression expr,
+ *                          int dim, bool is_eg, bool is_phi_first)
  *
  * input :    a region predicate, an expression caracterizing a PHI
  *            variable of range dim, two booleans indicating if the
@@ -1656,100 +1665,116 @@ boolean vect_contains_phi_p(Pvecteur v)
  *            reference_to_convex_region() and in
  *            generic_p_proper_effect_of_reference().
  */
-bool sc_add_phi_equation(Psysteme sc, expression expr, int dim, bool is_eg,
+bool sc_add_phi_equation(Psysteme *psc, expression expr, int dim, bool is_eg,
 			 bool is_phi_first)
 {
-    normalized nexpr = NORMALIZE_EXPRESSION(expr);
+  normalized nexpr = NORMALIZE_EXPRESSION(expr);
+  bool must_p = FALSE; /* Do we capture the semantics of the
+			  subscript expression exactly for sure? */
+  Psysteme sc = *psc;
 
-    /* Nga Nguyen: 29 August 2001 
-       Add  a value mapping test => filter variables that are not analysed by semantics analyses 
-       such as equivalenced variables. If not, the regions will be false (see bugregion.f)
-       Attention: value hash table may not be defined */
+  /* Nga Nguyen: 29 August 2001
+     Add  a value mapping test => filter variables that are not analysed by semantics analyses
+     such as equivalenced variables. If not, the regions will be false (see bugregion.f)
+     Attention: value hash table may not be defined */
 
-    if (normalized_linear_p(nexpr)) {
-      Pvecteur v2 = vect_copy(normalized_linear(nexpr));
+  pips_assert("sc is weakly consistent", SC_UNDEFINED_P(sc) || sc_weak_consistent_p(sc));
 
-      if (value_mappings_compatible_vector_p(v2)) {
-	entity phi = make_phi_entity(dim);
-	Pvecteur v1 = vect_new((Variable) phi, VALUE_ONE);
-	Pvecteur vect;
+  if (normalized_linear_p(nexpr)) {
+    Pvecteur v2 = vect_copy(normalized_linear(nexpr));
 
-	if (is_phi_first)
-	    vect = vect_substract(v1, v2);
-	else
-	    vect = vect_substract(v2, v1);
-	vect_rm(v1);
-	/* vect_rm(v2); */
+    if (value_mappings_compatible_vector_p(v2)) {
+      entity phi = make_phi_entity(dim);
+      Pvecteur v1 = vect_new((Variable) phi, VALUE_ONE);
+      Pvecteur vect;
 
-	if(!VECTEUR_NUL_P(vect)) 
+      if (is_phi_first)
+	vect = vect_substract(v1, v2);
+      else
+	vect = vect_substract(v2, v1);
+
+      vect_rm(v1);
+      /* vect_rm(v2); */
+
+      if(!VECTEUR_NUL_P(vect))
 	{
-	    pips_assert("sc_add_phi_equation", !SC_UNDEFINED_P(sc));
+	  pips_assert("sc is defined", !SC_UNDEFINED_P(sc));
 
-	    if (is_eg) 
+	  if (is_eg)
 	    {
-		sc_add_egalite(sc, contrainte_make(vect));
+	      sc_add_egalite(sc, contrainte_make(vect));
 	    }
-	    else
+	  else
 	    {
-		sc_add_inegalite(sc, contrainte_make(vect));
+	      sc_add_inegalite(sc, contrainte_make(vect));
 	    }
 
-	    /* The basis of sc has to be updated with the new entities
-	       introduced with the constraint addition. */
-	    for(; !VECTEUR_NUL_P(vect); vect = vect->succ)
-		if(vect->var != TCST)
-		    sc->base = vect_add_variable(sc->base, vect->var);
+	  /* The basis of sc has to be updated with the new entities
+	     introduced with the constraint addition. */
+	  for(; !VECTEUR_NUL_P(vect); vect = vect->succ)
+	    if(vect->var != TCST)
+	      sc->base = vect_add_variable(sc->base, vect->var);
 
-	    sc->dimension = vect_size(sc->base);
+	  sc->dimension = vect_size(sc->base);
 	}
 
-	return TRUE;
-      }
-      else {
-	/* Some variables are not analyzed by semantics, for instance
-	   because they are statically aliased in a non-analyzed way */
-	vect_rm(v2);
-	return FALSE;
-      }
+      must_p = TRUE;
     }
-    else
-      /* the expression is not linear */
-      {
-	if(is_eg) {
-	  /* Nga Nguyen: 29 August 2001
-	     If the expression expr is not a linear expression, we try to retrieve more
-	     information by using function any_expression_to_transformer, for cases like:
+    else {
+      /* Some variables are not analyzed by semantics, for instance
+	 because they are statically aliased in a non-analyzed way */
+      /* No information about this subscript expression is added in
+	 the region. */
+      vect_rm(v2);
+      must_p = FALSE;
+    }
+  }
+  else /* the expression is not linear */ {
+    if(is_eg) {
+      /* Nga Nguyen: 29 August 2001
+	 If the expression expr is not a linear expression, we try to retrieve more
+	 information by using function any_expression_to_transformer, for cases like:
 
-	     ITAB(I/2) => {2*PHI1 <= I <= 2*PHI1+1}
-	     ITAB(MOD(I,3)) => {0 <= PHI1 <= 2}, ...
+	 ITAB(I/2) => {2*PHI1 <= I <= 2*PHI1+1}
+	 ITAB(MOD(I,3)) => {0 <= PHI1 <= 2}, ...
 
-	     The function any_expression_to_transformer() returns a transformer that may
-	     contain temporary variables so we have to project these variables.
+	 The function any_expression_to_transformer() returns a transformer that may
+	 contain temporary variables so we have to project these variables.
 
-	     The approximation will become MAY (although in some cases, it is MUST) */
+	 The approximation will become MAY (although in some cases, it is MUST) */
 
-	  entity phi = make_phi_entity(dim);
-	  transformer trans = any_expression_to_transformer(phi,expr,transformer_identity(),TRUE);
+      entity phi = make_phi_entity(dim);
+      transformer trans = any_expression_to_transformer(phi,expr,transformer_identity(),TRUE);
 
-	  /* Careful: side-effects are lost */
-	  if (!transformer_undefined_p(trans))
-	    {
-	      transformer new_trans = transformer_temporary_value_projection(trans);
-	      Psysteme p_trans = predicate_system(transformer_relation(new_trans));
-	      sc = sc_safe_append(sc,p_trans);
-	    }
-	  return FALSE;
-	}
-	else {
-	  /* An inequation should be generated
-	   *
-	   * We end up here, for instance, with an unbounded dimension.
-	   */
-	  pips_user_warning("Case not implemented as well as it could be\n");
-	  return FALSE;
-	}
+      /* Careful: side-effects are lost */
+      if (!transformer_undefined_p(trans)) {
+	transformer new_trans = transformer_temporary_value_projection(trans);
+	Psysteme p_trans = sc_copy(predicate_system(transformer_relation(new_trans)));
+
+	/* trans has been transformed into new_trans by the
+	   projection */
+	//free_transformer(trans);
+	free_transformer(new_trans);
+	/* When sc is Rn, sc is not updated but freed and a copy of
+	   p_trans is returned. */
+	sc = sc_safe_append(sc, p_trans);
       }
-    return FALSE;
+      must_p = FALSE;
+    }
+    else {
+      /* An inequation should be generated.
+       *
+       * We end up here, for instance, with an unbounded
+       * dimension. but we could also have a non-linear
+       * declaration such as t[n*n];
+       */
+      pips_user_warning("Case not implemented as well as it could be\n");
+      must_p = FALSE;
+    }
+  }
+  pips_assert("sc is weakly consistent", sc_weak_consistent_p(sc));
+  *psc = sc;
+  return must_p;
 }
 
 
@@ -1771,19 +1796,19 @@ void phi_first_sort_base(Pbase *ppbase)
 	vect_debug(*ppbase);
     }
 
-    for( v = (Pvecteur) *ppbase; !VECTEUR_NUL_P(v); v = v->succ) 
+    for( v = (Pvecteur) *ppbase; !VECTEUR_NUL_P(v); v = v->succ)
     {
 	/* if a PHI variable is encountered, and if it is not the first term
-         * of the base, or it is not preceded only by PHI variables, then 
+         * of the base, or it is not preceded only by PHI variables, then
 	 * we put it at the head of the vector. */
-	if (strncmp(entity_name((entity) v->var), REGIONS_MODULE_NAME, 10) == 0) 
+	if (strncmp(entity_name((entity) v->var), REGIONS_MODULE_NAME, 10) == 0)
 	{
-	    if (phi_only) 
+	    if (phi_only)
 	    {
 		v_pred = v;
 		if (first) first = FALSE;
 	    }
-	    else 
+	    else
 	    {
 		v_pred->succ = v->succ;
 		v->succ = (Pvecteur) *ppbase;
@@ -1791,9 +1816,9 @@ void phi_first_sort_base(Pbase *ppbase)
 		v = v_pred;
 	    }
 	}
-	else 
+	else
 	{
-	    if (phi_only) 
+	    if (phi_only)
 	    {
 		first = FALSE;
 		phi_only = FALSE;
@@ -1814,7 +1839,7 @@ void phi_first_sort_base(Pbase *ppbase)
  * input    : a base
  * output   : the number of phi variables in this base.
  * modifies : nothing.
- * comment  :	
+ * comment  :
  */
 int base_nb_phi(Pbase b)
 {
@@ -1828,34 +1853,34 @@ int base_nb_phi(Pbase b)
 
     return(n_phi);
 }
-
+
 /*********************************************************************************/
 /* PSY ENTITIES                                                                  */
 /*********************************************************************************/
 
-/* entity make_psi_entity(int n) 
+/* entity make_psi_entity(int n)
  * input    : an integer n giving the range of the PHI entity.
  * output   : the entity PHI_n.
  * modifies : psi[] (eventually).
- * comment  : finds or generates an entity representing a region descriptor 
+ * comment  : finds or generates an entity representing a region descriptor
  *            of indice n.
- *            A region descriptor representes the value domain of one dimension 
+ *            A region descriptor representes the value domain of one dimension
  *            of an array, this dimension is represented by the indice.
  *            Fortran accepts a maximum of 7 dimensions.
  *
- *            Once a region descriptor is created, it is stored into a static array 
- *            (psi[]); thus, each next time a region descriptor entity is needed, 
+ *            Once a region descriptor is created, it is stored into a static array
+ *            (psi[]); thus, each next time a region descriptor entity is needed,
  *            it is just picked up in psi[].
  *            If the region descriptor is not in psi[], it may be in the table
  *            where all entities are stored, because of previous computations.
- *            At last, if it is not found there, it is created. 
+ *            At last, if it is not found there, it is created.
  */
 entity make_psi_entity(int n)
 {
     pips_assert("psy index between 1 and NB_MAX_ARRAY_DIM\n", 1<=n && n<=NB_MAX_ARRAY_DIM);
 
     /* psi indices are between 1 to NB_MAX_ARRAY_DIM. Array indices are between 0 to NB_MAX_ARRAY_DIM-1. */
-    if (psi[n-1] == entity_undefined) 
+    if (psi[n-1] == entity_undefined)
     {
 	entity v;
 	char psi_name[6];
@@ -1868,7 +1893,7 @@ entity make_psi_entity(int n)
 	(void) sprintf(psi_name+3,"%d",n);
 	s = strdup(concatenate(REGIONS_MODULE_NAME,
 			       MODULE_SEP_STRING, psi_name, (char *) NULL));
-	
+
 	if ((v = gen_find_tabulated(s, entity_domain)) == entity_undefined) 
 	{
 	    v = make_entity(s,
@@ -1876,7 +1901,7 @@ entity make_psi_entity(int n)
 			    make_storage(is_storage_rom, UU),
 			    value_undefined);
 	}
-	
+
 	psi[n-1] = v;
     }
     return (psi[n-1]);
@@ -1888,9 +1913,9 @@ list psi_entities_list(int psi_min, int psi_max)
     list l_psi = NIL;
     int i;
 
-    for(i=psi_min; i<=psi_max; i++) 
+    for(i=psi_min; i<=psi_max; i++)
 	l_psi = gen_nconc(l_psi, CONS(ENTITY, make_psi_entity(i), NIL));
-    
+
     return(l_psi);
 }
 
@@ -1912,7 +1937,7 @@ expression make_psi_expression(int n)
  * input    : a base
  * output   : the number of psi variables in this base.
  * modifies : nothing.
- * comment  :	
+ * comment  :
  */
 int base_nb_psi(Pbase b)
 {
@@ -1923,7 +1948,7 @@ int base_nb_psi(Pbase b)
 
     return(n_psi);
 }
-
+
 /*********************************************************************************/
 /* PHI AND PSY ENTITIES                                                          */
 /*********************************************************************************/
@@ -1935,8 +1960,8 @@ int base_nb_psi(Pbase b)
  *            or indirectly
  * modifies : nothing
  * comment  : "cfc" stands for "Composante Fortement Connexe"; because
- *            if systems are considered as graphs which vertices are 
- *            the constraints and which edges connect constraints 
+ *            if systems are considered as graphs which vertices are
+ *            the constraints and which edges connect constraints
  *            concerning at least one common variable, then this
  *            function searches for the variables contained in
  *            the strongly connected component that also contains
@@ -1945,7 +1970,7 @@ int base_nb_psi(Pbase b)
 list region_phi_cfc_variables(region reg)
 {
     list l_ent;
-    
+
     if (region_scalar_p(reg))
 	return(NIL);
 
@@ -1954,8 +1979,8 @@ list region_phi_cfc_variables(region reg)
     else
 	l_ent = phi_entities_list(1,NumberOfDimension(region_entity(reg)));
 
-    /* ps_reg has no particularity. We just scan its equalities and inequalities 
-     * to find which variables are related to the PHI variables */ 
+    /* ps_reg has no particularity. We just scan its equalities and inequalities
+     * to find which variables are related to the PHI variables */
     return(region_entities_cfc_variables(reg, l_ent));
 }
 
@@ -1974,8 +1999,8 @@ void psi_to_phi_region(region reg)
     if (ndims != 0)
     {
 	Psysteme ps = region_system(reg);;
-	for(i = 1; i<= ndims; i++) 
-	    sc_variable_rename(ps, (Variable) make_psi_entity(i), 
+	for(i = 1; i<= ndims; i++)
+	    sc_variable_rename(ps, (Variable) make_psi_entity(i),
 			       (Variable) make_phi_entity(i));
     }
 
@@ -2000,11 +2025,11 @@ void phi_to_psi_region(region reg)
     if (ndims != 0)
     {
 	Psysteme ps = region_system(reg);;
-	for(i = 1; i<= ndims; i++) 
-	    sc_variable_rename(ps, (Variable) make_phi_entity(i), 
-			       (Variable) make_psi_entity(i)); 
+	for(i = 1; i<= ndims; i++)
+	    sc_variable_rename(ps, (Variable) make_phi_entity(i),
+			       (Variable) make_psi_entity(i));
     }
-    reg_ref = make_regions_psi_reference(region_entity(reg)); 
+    reg_ref = make_regions_psi_reference(region_entity(reg));
     reference_variable(effect_reference(reg)) = entity_undefined;
     free_reference(effect_reference(reg));
     effect_reference(reg) = reg_ref;
@@ -2025,12 +2050,12 @@ boolean psi_region_p(region reg)
 		       (syntax_reference
 			(expression_syntax
 			 (EXPRESSION
-			  (CAR(reference_indices(region_any_reference(reg))))))))) 
+			  (CAR(reference_indices(region_any_reference(reg)))))))))
 	return TRUE;
-    else 
-	return FALSE;    
+    else
+	return FALSE;
 }
-
+
 /************************************************************* PROPERTIES */
 
 static bool exact_regions_property = FALSE;
@@ -2090,7 +2115,7 @@ void get_in_out_regions_properties()
     if (op_statistics_property) reset_op_statistics();
 }
 
- 
+
 /********************************** COMPARISON FUNCTIONS FOR QSORT, AND SORT */
 
 static Pbase base_for_compare = BASE_NULLE;
@@ -2100,10 +2125,10 @@ static void set_bases_for_compare(Pbase sorted_base)
 {
     Pbase b = sorted_base;
     base_for_compare = sorted_base;
-    
+
     for(;!BASE_NULLE_P(b) && variable_phi_p((entity) var_of(b)); b = b->succ);
-    
-    no_phi_base_for_compare = b;    
+
+    no_phi_base_for_compare = b;
 }
 
 static void reset_bases_for_compare()
@@ -2113,7 +2138,7 @@ static void reset_bases_for_compare()
 }
 
 static int compare_region_constraints(Pcontrainte *pc1, Pcontrainte *pc2,
-				      bool equality_p); 
+				      bool equality_p);
 static int compare_region_vectors(Pvecteur *pv1, Pvecteur *pv2);
 static int compare_region_entities(entity *pe1, entity *pe2);
 
@@ -2133,7 +2158,7 @@ static int compare_region_inequalities(Pcontrainte *pc1, Pcontrainte *pc2)
  *            of the variables (phi variables first).
  * output   : nothing.
  * modifies : sc
- * comment  : sorts each constraint of sc using compare_regions_vectors, and 
+ * comment  : sorts each constraint of sc using compare_regions_vectors, and
  *            sorts the constraints between them.
  */
 void region_sc_sort(Psysteme sc, Pbase sorted_base)
@@ -2175,17 +2200,17 @@ void region_sc_sort(Psysteme sc, Pbase sorted_base)
  */
 Pcontrainte 
 region_constraints_sort(
-    Pcontrainte c, 
-    Pbase sorted_base, 
+    Pcontrainte c,
+    Pbase sorted_base,
     bool equality_p)
 {
-    set_bases_for_compare(sorted_base);    
+    set_bases_for_compare(sorted_base);
     c = constraints_sort_with_compare
-      //	(c, BASE_NULLE, equality_p? 
-      (c, sorted_base, equality_p? 
+      //	(c, BASE_NULLE, equality_p?
+      (c, sorted_base, equality_p?
        ((int (*)()) compare_region_equalities): ((int (*)()) compare_region_inequalities));
     reset_bases_for_compare();
-    return(c);           
+    return(c);
 }
 
 
@@ -2197,18 +2222,18 @@ region_constraints_sort(
  */
 Pbase region_sorted_base_dup(region reg)
 {
-    Pbase sbase = base_dup(sc_base(region_system(reg)));    
+    Pbase sbase = base_dup(sc_base(region_system(reg)));
     vect_sort_in_place( &sbase, compare_region_vectors);
-    return(sbase);    
+    return(sbase);
 }
 
 
-/* static int compare_region_constraints(Pcontrainte *pc1, *pc2) 
+/* static int compare_region_constraints(Pcontrainte *pc1, *pc2)
  * input    : two constraints from a reigon predicate.
  * output   : an integer for qsort: <0 if c1 must come first, >0 if c2 must come
  *            first, 0 if the two constraints are equivalent.
  * modifies : nothing
- * comment  : The criterium for the sorting is based first on the number of phi 
+ * comment  : The criterium for the sorting is based first on the number of phi
  *            variables in the constraints, second, on the order between variables
  *            given by two static variables that must be initialized first.
  *            (see a few screens before).
@@ -2221,13 +2246,13 @@ static int compare_region_constraints(Pcontrainte *pc1, Pcontrainte *pc2,
 	v2 = (*pc2)->vecteur;
 
     int nb_phi_1 = base_nb_phi((Pbase) v1),
-        nb_phi_2 = base_nb_phi((Pbase) v2);
-    
+      nb_phi_2 = base_nb_phi((Pbase) v2);
+
     Pbase b = BASE_NULLE;
     Value val_1, val_2;
 
     /* not the same number of phi variables */
-    if (nb_phi_1 != nb_phi_2) 
+    if (nb_phi_1 != nb_phi_2)
     {
 	/* one has no phi variables */
 	if ((nb_phi_1 == 0) || (nb_phi_2 == 0))
@@ -2236,16 +2261,16 @@ static int compare_region_constraints(Pcontrainte *pc1, Pcontrainte *pc2,
 	else
 	    return( (nb_phi_1 > nb_phi_2)? +1 : -1);
     }
-    
+
     if (nb_phi_1 == 0)
-	/* both have no phi variables : the comparison basis only consists of 
-	   variables other than phi variables */ 
+	/* both have no phi variables : the comparison basis only
+	   consists of variables other than phi variables */
 	b = no_phi_base_for_compare;
-    else 
+    else
     {
 	/* particular treatment for phi variables */
 	b = base_for_compare;
-	for(; b!= no_phi_base_for_compare; b = b->succ) 
+	for(; b!= no_phi_base_for_compare; b = b->succ)
 	{
 	    val_1 = vect_coeff(var_of(b), v1);
 	    val_2 = vect_coeff(var_of(b), v2);
@@ -2253,12 +2278,12 @@ static int compare_region_constraints(Pcontrainte *pc1, Pcontrainte *pc2,
 		if (value_zero_p(val_1))
 		    return(1);
 		if (value_zero_p(val_2))
-		    return(-1);	    
+		    return(-1);
 		return VALUE_TO_INT(value_minus(val_1,val_2));
 	    }
-	}	
+	}
     }
-    
+
 
     if(equality_p)
     {
@@ -2280,18 +2305,18 @@ static int compare_region_constraints(Pcontrainte *pc1, Pcontrainte *pc2,
 			negative_terms++;
 		}
 	    }
-	    
+
 	    if(negative_terms > positive_terms)
 		vect_chg_sgn(v);
 	    else
 		if(negative_terms == positive_terms)
 		    /* entities are already sorted in v */
-		    if ((vecteur_var(v) != TCST) && 
+		    if ((vecteur_var(v) != TCST) &&
 			value_neg_p(vecteur_val(v)))
 			vect_chg_sgn(v);
 	}
     }
-    
+
     /* variables other than phis are handled */
     for(; !BASE_NULLE_P(b); b = b->succ) {
 	val_1 = vect_coeff(var_of(b), v1);
@@ -2301,23 +2326,23 @@ static int compare_region_constraints(Pcontrainte *pc1, Pcontrainte *pc2,
 	    if (value_zero_p(val_1))
 		return(1);
 	    if (value_zero_p(val_2))
-		return(-1);	
+		return(-1);
 	    return VALUE_TO_INT(value_minus(val_1,val_2));
 	}
     }
-    
+
     val_1 = vect_coeff(TCST, v1);
     val_2 = vect_coeff(TCST, v2);
-    
+
     if (value_ne(val_1,val_2))
     {
 	if (value_zero_p(val_1))
 	    return(1);
 	if (value_zero_p(val_2))
-	    return(-1);	
+	    return(-1);
 	return VALUE_TO_INT(value_minus(val_1,val_2));
     }
-    
+
     return(0);
 }
 
@@ -2346,20 +2371,20 @@ static int compare_region_entities(entity *pe1, entity *pe2)
     int phi_1 = FALSE, phi_2 = FALSE,
 	null_1 = (*pe1==(entity)NULL),
 	null_2 = (*pe2==(entity)NULL);
-    
+
     if (null_1 && null_2)
 	return(0);
-    
+
     if (!null_1) phi_1 = variable_phi_p(*pe1);
     if (!null_2) phi_2 = variable_phi_p(*pe2);
 
     if (null_1 && phi_2)
 	return(1);
 
-    if (null_2 && phi_1) 
+    if (null_2 && phi_1)
 	return (-1);
 
-    if (null_1 || null_2) 
+    if (null_1 || null_2)
 	return(null_2-null_1);
 
     /* if both entities are phi variables, or neither one */
@@ -2374,12 +2399,11 @@ static int compare_region_entities(entity *pe1, entity *pe2)
       free(s2);
       return result;
     }
-    /* if one and only one of the entities is a phi variable */ 
+    /* if one and only one of the entities is a phi variable */
     else
-	return(phi_2 - phi_1);    
+	return(phi_2 - phi_1);
 }
-
-
+
 /********************************** MANIPULATION OF ENTITIES AND VARIABLES */
 
 
@@ -2392,33 +2416,33 @@ Psysteme entity_declaration_sc(entity e)
     for (dim = 1; !ENDP(ldim); dim++, ldim = CDR(ldim))
     {
 	expression dl, du;
-	
+
 	dl = dimension_lower(DIMENSION(CAR(ldim)));
 	ifdebug(8) {
 	    debug(8, "entity_declaration_sc",
 		  "addition of inequality :\n%s - PHI%d <= 0\n",
 		  words_to_string(words_expression(dl)), dim);
 	}
-	sc_add_phi_equation(sc, dl, dim, NOT_EG, NOT_PHI_FIRST);
-	
+	(void) sc_add_phi_equation(&sc, dl, dim, NOT_EG, NOT_PHI_FIRST);
+
 	du = dimension_upper(DIMENSION(CAR(ldim)));
 	ifdebug(8) {
 	    debug(8, "entity_declaration_sc",
 		  "addition of inequality :\nPHI%d - %s <= 0\n",
 		  dim, words_to_string(words_expression(du)));
 	}
-	sc_add_phi_equation(sc, du, dim, NOT_EG, PHI_FIRST);
-	
-    } /* for */ 
+	(void) sc_add_phi_equation(&sc, du, dim, NOT_EG, PHI_FIRST);
+
+    } /* for */
     return(sc);
 }
 
-/* list variables_to_int_variables(list l_var) 
+/* list variables_to_int_variables(list l_var)
  * input    : a list of variables
- * output   : a list containing the intermediate variables corresponding to 
+ * output   : a list containing the intermediate variables corresponding to
  *            initial variables, in the same order.
  * modifies : nothing.
- * comment  :	
+ * comment  :
  */
 list variables_to_int_variables(list l_var)
 {
@@ -2429,38 +2453,37 @@ list variables_to_int_variables(list l_var)
 	 entity e_int = entity_to_intermediate_value(e);
 	 list l_tmp = CONS(ENTITY, e_int, NIL);
 	 l_int = gen_nconc(l_int, l_tmp);/* to be in the same order as l_var */
-	 debug(8, "", "%s -> %s\n", 
+	 debug(8, "", "%s -> %s\n",
 	       (e == (entity) TCST) ? "TCST" : pips_user_value_name(e),
 	       (e_int == (entity) TCST) ? "TCST" : pips_user_value_name(e_int));
      },
 	 l_var);
-    
+
     return(l_int);
 }
 
 
-/* list variables_to_old_variables(list l_var) 
+/* list variables_to_old_variables(list l_var)
  * input    : a list of variables
- * output   : a list containing the old variables corresponding to 
+ * output   : a list containing the old variables corresponding to
  *            initial variables, in the same order.
  * modifies : nothing.
- * comment  :	
+ * comment  :
  */
 list variables_to_old_variables(list l_var)
 {
     list l_old = NIL;
 
-    MAP(ENTITY, e, 
+    FOREACH(ENTITY, e, l_var)
      {
 	 entity e_old = entity_to_old_value(e);
 	 list l_tmp = CONS(ENTITY, e_old, NIL);
 	 l_old = gen_nconc(l_old, l_tmp); /* to be in the same order as l_var */
-	 debug(8, "", "%s -> %s\n", 
+	 debug(8, "", "%s -> %s\n",
 	       (e == (entity) TCST) ? "TCST" : pips_user_value_name(e),
 	       (e_old == (entity) TCST) ? "TCST" : pips_user_value_name(e_old));
-     },
-	 l_var);
-    
+     }
+
     return(l_old);
 }
 
@@ -2471,21 +2494,21 @@ list variables_to_old_variables(list l_var)
  *            and the list of the new names.
  * output   : the system in which the variables are renamed.
  * modifies : the initial system.
- * comment  :	
+ * comment  :
  */
 Psysteme sc_list_variables_rename(Psysteme sc, list l_var, list l_var_new)
 {
     list ll_var_new = l_var_new;
 
-    MAP(ENTITY, e, 
+    MAP(ENTITY, e,
      {
 	 entity e_new = ENTITY(CAR(ll_var_new));
-	 sc = sc_variable_rename(sc, (Variable) e, (Variable) e_new);	
+	 sc = sc_variable_rename(sc, (Variable) e, (Variable) e_new);
 	 ll_var_new = CDR(ll_var_new);
      },
 	 l_var);
+
     return(sc);
-    
 }
 
 
@@ -2494,7 +2517,7 @@ Psysteme sc_list_variables_rename(Psysteme sc, list l_var, list l_var_new)
  * input    : an entity representing a function.
  * output   : the unsorted list (of entities) of parameters of the function "func".
  * modifies : nothing.
- * comment  : Made from "entity_to_formal_integer_parameters()" that considers 
+ * comment  : Made from "entity_to_formal_integer_parameters()" that considers
  *            only integer variables.
  */
 list function_formal_parameters(entity func)
@@ -2511,7 +2534,7 @@ list function_formal_parameters(entity func)
 	     formals = CONS(ENTITY, e, formals);
      },
 	 decl);
-    
+
     return (formals);
 }
 
@@ -2530,18 +2553,18 @@ char *func_entity_name(entity e)
 
 
 /* bool same_common_variables_p(entity e1, e2)
- * output   : returns TRUE if both entities, which are common variables, 
+ * output   : returns TRUE if both entities, which are common variables,
  *            occupy the same place in a COMMON, and, also, have
- *            the same shape. 
+ *            the same shape.
  * modifies : nothing .
- * comment  :	
+ * comment  :
  *            Four comparisons have to be made :
  *                1. offset in the COMMON
  *                2. Fortran type
  *                3. number of dimensions
  *                4. dimensions size (in case of arrays)
  *
- *            Note : this function is used with common variables of the same 
+ *            Note : this function is used with common variables of the same
  *            COMMON in two different subroutines.
  */
 bool same_common_variables_p(entity e1, entity e2)
@@ -2561,7 +2584,7 @@ bool same_common_variables_p(entity e1, entity e2)
 	user_error("same_common_array_p", "not COMMON entities : %s or %s",
 		   entity_name(e1), entity_name(e2));
     }
-    
+
     offs1 = ram_offset(storage_ram(st1));
     offs2 = ram_offset(storage_ram(st2));
 
@@ -2569,7 +2592,7 @@ bool same_common_variables_p(entity e1, entity e2)
     if (offs1 == offs2) {
 	type ty1, ty2;
 	basic basic1, basic2;
-	
+
 	ty1 = entity_type(e1);
 	ty2 = entity_type(e2);
 	if ((! (type_tag(ty1) == is_type_variable)) ||
@@ -2606,7 +2629,7 @@ bool same_common_variables_p(entity e1, entity e2)
     return(equal);
 }
 
-
+
 /*************************** MANIPULATION OF PRECONDITIONS AND TRANSFORMERS */
 
 
@@ -2640,13 +2663,12 @@ Psysteme sc_loop_proper_precondition(loop l)
 
     return sc;
 }
-
+
 /******************************************************************** MISC */
 
-/* is the context empty? 
+/* is the context empty?
  */
-bool 
-empty_convex_context_p(transformer context)
+bool empty_convex_context_p(transformer context)
 {
     Psysteme sc_context;
 
@@ -2664,7 +2686,7 @@ empty_convex_context_p(transformer context)
 	return TRUE;
     }
 
-    /* else 
+    /* else
      */
 
     sc_context = predicate_system(transformer_relation(context));
@@ -2673,6 +2695,5 @@ empty_convex_context_p(transformer context)
 
 string region_to_string(effect reg __attribute__ ((unused)))
 {
-    return strdup("[region_to_string] not more implemented\n");
+    return strdup("[region_to_string] no longer implemented\n");
 }
-
