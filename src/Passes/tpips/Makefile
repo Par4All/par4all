@@ -35,12 +35,7 @@ BIN_TARGET	= $(TARGET)
 INSTALL_LIB = 	$(ARCH)/main_tpips.o
 
 # common stuff
-ifdef PIPS_ROOT
-ROOT    = $(PIPS_ROOT)
-else
 ROOT    = ../../..
-endif
-
 PROJECT = pips
 include $(ROOT)/makes/main.mk
 
@@ -72,8 +67,8 @@ tp_yacc.c: tp_yacc.y
 tp_yacc.h: tp_yacc.c
 
 # tpips completion
-completion_list.h :	$(PIPS_ROOT)/include/resources.h \
-			$(PIPS_ROOT)/include/phases.h \
-			$(PIPS_ROOT)/include/printable_resources.h \
+completion_list.h :	$(ROOT)/include/resources.h \
+			$(ROOT)/include/phases.h \
+			$(ROOT)/include/printable_resources.h \
 			$(ETC.d)/properties.rc
-	./build_completion_lists.sh $(PIPS_ROOT) > $@
+	./build_completion_lists.sh $(ROOT) > $@

@@ -444,11 +444,10 @@ sh> svn commit my-branch-name
 \item Develop, test, commit within your branch\ldots
 
   \textbf{CAUTION!}
-  This requires that your \verb.PIPS_ROOT. environment variable
-  points to your development branch instead of the trunk, otherwise
-  the compilation of the branch install files into the other location
-  pointed to by this variable. You may also check for the right
-  settings for \verb.EXTERN_ROOT. \verb.NEWGEN_ROOT. and
+  When testing, check that the \verb.PIPS_ROOT. environment variable
+  points to your development branch instead of the trunk.
+  You may also check for the right settings for
+  \verb.EXTERN_ROOT. \verb.NEWGEN_ROOT. and
   \verb.LINEAR_ROOT. variables, as well as your \verb.PATH. to
   ensure that the right executable is used.
 
@@ -617,24 +616,19 @@ initialized as described in section~\ref{sec:shell}.
 
 If you compile into a directory, in the \texttt{prod} directory installed by
 the installation script, your branch directory or whatever, the compiled
-stuff from a directory goes to \verb/$NEWGEN_ROOT/, \verb/$LINEAR_ROOT/
-and \verb/$PIPS_ROOT/ respectively, use the
-\texttt{Makefile} definitions from their
-\verb/$/\emph{*}\verb/_ROOT/ and are build with library found in the other
-\verb/$/\emph{*}\verb/_ROOT/ directory. The Makefile parts are picked into
-\verb/$/\emph{*}\verb|_ROOT/makes| directory, \emph{except} for
-\texttt{Makefile} that are local symbolic links.
-%$
+stuff from a directory goes to the corresponding \texttt{bin lib}
+directories next to the \texttt{src} directory.
+%%
+The \emph{Makefile} definitions are taken from the corresponding
+\texttt{makes} directory next to the \texttt{src} sources.
 
 For example, if you have a local PIPS copy in the \texttt{svn/pips/trunk}
 and you compile with \texttt{make}, it will build against
 \verb/$NEWGEN_ROOT/ and \verb/$LINEAR_ROOT/, it will install into
-\verb/$PIPS_ROOT/ and will use \texttt{Makefile} stuff from
-\verb|$PIPS_ROOT/makes|, and only few forwarding \texttt{Makefile} are
-sym-linked to \texttt{svn/pips/trunk/makes}. So if you want to modify the
-\texttt{Makefile} infrastructure, modify mainly \verb|$PIPS_ROOT/makes| %$
-and commit it. It will be commited into the \texttt{svn/nlpmake/trunk}
-repository anyway.
+\texttt{bin} and will use \emph{Makefile} stuff from \texttt{makes}.
+So if you want to modify the \emph{Makefile} infrastructure, modify
+the \texttt{makes} directory and commit. It will be committed into the
+\texttt{svn/nlpmake/trunk} repository anyway.
 
 \subsection{The nomadic developer}
 \label{sec:nomadic}
@@ -1151,9 +1145,8 @@ some passes or documentation parts, such as:
 \item[\texttt{depend}:] \texttt{make depend}\index{make!depend} must be
   used regularly to keep file dependencies up-to-date. The local header
   file corresponding to the current pass or library must have been
-  created\marginpar{Is this line obsolete?} before, otherwise \texttt{make
-    depend} selects the header file from \verb+$PIPS_ROOT/include+, and
-  the local header will never be created;%% $
+  created before, otherwise \texttt{make depend} selects the header
+  file from \texttt{include}, and the local header will never be created;
 \item[\texttt{fast}:] {\tt make fast}\index{make!fast} recompile the local
   library and relink the executables with the global libraries (defined
   according to the environment variables, by default the \texttt{prod}
@@ -1207,12 +1200,7 @@ INC_TARGET =    $(TARGET).h
 LIB_TARGET =    lib$(TARGET).a
 
 # common stuff
-ifdef PIPS_ROOT
-ROOT    = $(PIPS_ROOT)
-else
 ROOT    = ../../..
-endif
-
 PROJECT = pips
 include $(ROOT)/makes/main.mk
 \end{verbatim}
@@ -1789,8 +1777,8 @@ several parsers and lexers).
 
 The {\tt Makefile} calls the PIPS make infrastructure to define
 for example a default \texttt{recompile} entry to install
-the library in the production hierarchy, typically in
-\verb|$PIPS_ROOT/include| and \verb|$PIPS_ROOT/lib|.
+the library in the production hierarchy, typically in directories
+\texttt{include} and \texttt{lib} at the root.
 
 Great care must be taken when creating the library header file
 \texttt{\emph{L}.h}.  This file includes the local header file

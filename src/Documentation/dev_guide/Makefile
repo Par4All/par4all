@@ -29,14 +29,8 @@ DOC.subd = $(INSTALL_HTM)
 #TO_BE_PUBLISH = $(INSTALL_DOC) $(INSTALL_HTM)
 
 # common stuff
-ifdef PIPS_ROOT
-ROOT    = $(PIPS_ROOT)
-else
 ROOT    = ../../..
-endif
-
 PROJECT	= pips
-
 include $(ROOT)/makes/main.mk
 
 # local stuff

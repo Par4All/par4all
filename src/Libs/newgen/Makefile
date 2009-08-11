@@ -31,15 +31,10 @@ INC_TARGET =	$(TARGET).h
 
 LIB_TARGET =	lib$(TARGET).a
 
-# common stuff
-ifdef PIPS_ROOT
-ROOT    = $(PIPS_ROOT)
-else
 ROOT    = ../../..
-endif
 
 # where to find newgen generated files...
-inc_dir = $(PIPS_ROOT)/include
+inc_dir = $(ROOT)/include
 
 NEWGEN_CFILES = $(notdir $(wildcard $(inc_dir)/*.c))
 

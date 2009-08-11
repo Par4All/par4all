@@ -25,18 +25,14 @@
 # must generate Doxygen documentation for NewGen, Linear and PIPS in the
 # same run.
 
-# common stuff
-ifdef PIPS_ROOT
-ROOT    = $(PIPS_ROOT)
-else
 ROOT    = ../../..
-endif
 
 # Assume that that PIPS has already been compiled to have the newgen
 # and linear objects already generated.
 
 # Try to figure out where newgen and linear are if not specified. Useful
 # when bootstrapping PIPS:
+# PIPS_ROOT   = $(ROOT)
 NEWGEN_ROOT ?= $(ROOT)/../newgen
 LINEAR_ROOT ?= $(ROOT)/../linear
 

@@ -41,18 +41,13 @@ INC_TARGET =    $(TARGET).h
 LIB_TARGET =    lib$(TARGET).a
 
 # common stuff
-ifdef PIPS_ROOT
-ROOT    = $(PIPS_ROOT)
-else
 ROOT    = ../../..
-endif
-
 PROJECT = pips
 include $(ROOT)/makes/main.mk
 
+# local stuff
 $(TARGET).h: $(DERIVED_HEADERS) $(DERIVED_CFILES) 
 
-# local stuff
 clean: local-clean
 
 local-clean:

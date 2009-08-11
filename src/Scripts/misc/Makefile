@@ -30,11 +30,6 @@ INSTALL_UTL =	pips-deal-with-include \
 		logfile_to_tpips
 
 # common stuff
-ifdef PIPS_ROOT
-ROOT    = $(PIPS_ROOT)
-else
 ROOT    = ../../..
-endif
-
 #PROJECT = pips
 include $(ROOT)/makes/main.mk

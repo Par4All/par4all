@@ -45,11 +45,6 @@ F.awk =		dg-statistics.awk \
 INSTALL_UTL = 	$(SCRIPTS) $(F.awk)
 
 # common stuff
-ifdef PIPS_ROOT
-ROOT    = $(PIPS_ROOT)
-else
 ROOT    = ../../..
-endif
-
 #PROJECT = pips
 include $(ROOT)/makes/main.mk

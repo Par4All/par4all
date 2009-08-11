@@ -9,17 +9,12 @@ INSTALL_EXE = $(F.sh)
 INSTALL_SHR = STEP.f STEP.h
 
 # common stuff
-ifdef PIPS_ROOT
-ROOT    = $(PIPS_ROOT)
-else
 ROOT    = ../../..
-endif
-
 PROJECT = pips
-
-FILTRE = ./filtre_macro
-
 include $(ROOT)/makes/main.mk
+
+# local stuff
+FILTRE = ./filtre_macro
 
 COM_SUBROUTINES.f: COM_SUBROUTINES.F
 	cpp $(LOCAL_CPP_FLAG) -U INTERLACED $< | $(FILTRE) > $@

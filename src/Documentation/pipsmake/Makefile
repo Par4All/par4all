@@ -48,8 +48,6 @@ DOC.subd = $(INSTALL_HTM)
 
 DERIVED_FILES=	$(INSTALL_ETC) $(DERIVED_INC) $(INSTALL_DOC)
 
-AUTO =	$(PIPS_ROOT)/Include/auto
-
 all: $(DERIVED_FILES)
 
 # the documentation must generate its derived headers as soon as possible
@@ -131,9 +129,5 @@ local-clean:
 		*.aux *.log *.ind *.idx *.toc *.ilg *.dvi *.ps *.out *.brf
 
 # common stuff
-ifdef PIPS_ROOT
-ROOT    = $(PIPS_ROOT)
-else
 ROOT    = ../../..
-endif
 include $(ROOT)/makes/main.mk

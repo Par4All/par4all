@@ -392,12 +392,7 @@ local-clean:
 	test ! -d $(RT_ARCH) || rmdir $(RT_ARCH)
 
 # common stuff
-ifdef PIPS_ROOT
-ROOT    = $(PIPS_ROOT)
-else
 ROOT    = ../../..
-endif
-
 PROJECT = pips
 include $(ROOT)/makes/main.mk
 

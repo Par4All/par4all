@@ -25,12 +25,7 @@ all:_$(PYTHON_MODULE).so pyps.py
 
 
 # common stuff
-ifdef PIPS_ROOT
-ROOT    = $(PIPS_ROOT)
-else
 ROOT    = ../../..
-endif
-
 PROJECT = pips
 include $(ROOT)/makes/main.mk
 
@@ -39,7 +34,7 @@ include $(ROOT)/makes/main.mk
 TMP_PREFIX=the_
 PYPS_STDOUT=pypsout
 
-$(PYTHON_MODULE).tmp:$(PIPS_ROOT)/src/Passes/tpips/tp_yacc.y
+$(PYTHON_MODULE).tmp: $(ROOT)/src/Passes/tpips/tp_yacc.y
 	sed -n -e '/%{/,/%}/ p' $< | sed -e '1 d' -e '$$ d' > $@
 
 $(TMP_PREFIX)$(PYTHON_MODULE).c:$(PYTHON_MODULE).tmp $(PYTHON_MODULE).c
