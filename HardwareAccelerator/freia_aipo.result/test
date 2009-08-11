@@ -1012,9 +1012,9 @@ freia_status my_global_min_coord_helper_0(freia_data2d * i0, int32_t * red0, uin
   freia_cg_read_reduction_results(&redres);
 
   // get reduction results
-  *red0 = (int32_t) reduc.measure[0][0].maximum;
-  *red1 = (uint32_t) reduc.measure[0][0].max_coord_x;
-  *red2 = (uint32_t) reduc.measure[0][0].max_coord_y;
+  *red0 = (int32_t) reduc.measure[0][0].minimum;
+  *red1 = (uint32_t) reduc.measure[0][0].min_coord_x;
+  *red2 = (uint32_t) reduc.measure[0][0].min_coord_y;
 
   return ret;
 }
