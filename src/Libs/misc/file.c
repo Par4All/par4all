@@ -694,20 +694,36 @@ char * safe_new_tmp_file(char * prefix)
  */
 #define DEFAULT_CONFIG_DIR "etc"
 #define CONFIG_DEFAULT_RIGHT "r"
-FILE * fopen_config(const string canonical_name, const string cproperty, const string cenv)
+FILE *
+fopen_config(const string canonical_name,
+	     const string cproperty,
+	     const string cenv)
 {
-    char * senv=NULL,*sproperty=NULL,*pipsenv=NULL,*sdefault=NULL;
-    FILE * fconf = NULL;
-    if(cproperty) sproperty=get_string_property(cproperty);
-    if(cenv) senv=getenv(cenv);
+  FILE * fconf;
 
-    /* try various combinaison : pips property, then pips env var, then default */
-    if( sproperty && (fconf = fopen(sproperty, CONFIG_DEFAULT_RIGHT) ) ) return fconf;
-    if( senv && (fconf = fopen(senv, CONFIG_DEFAULT_RIGHT) ) ) return fconf;
+  // try various combinaison :
+  // pips property
+  if (cproperty) {
+    string sproperty = get_string_property(cproperty);
+    if (sproperty && (fconf = fopen(sproperty, CONFIG_DEFAULT_RIGHT)))
+      return fconf;
+  }
 
-    pipsenv=getenv("PIPS_ROOT");
-    if(pipsenv) sdefault=concatenate(pipsenv,"/" DEFAULT_CONFIG_DIR "/" , canonical_name, NULL) ;
-	else sdefault=concatenate(CONFIG_DIR "/", canonical_name,NULL);
-    return safe_fopen(sdefault,CONFIG_DEFAULT_RIGHT);
+  // then pips env var
+  if (cenv) {
+    string senv = getenv(cenv);
+    if (senv && (fconf = fopen(senv, CONFIG_DEFAULT_RIGHT)))
+      return fconf;
+  }
+
+  // then default, with PIPS_ROOT if set
+  string pipsenv = getenv("PIPS_ROOT");
+  string sdefault;
+  if(pipsenv)
+    sdefault =
+      concatenate(pipsenv,"/" DEFAULT_CONFIG_DIR "/" , canonical_name, NULL);
+  else
+    sdefault = concatenate(CONFIG_DIR "/", canonical_name, NULL);
+
+  return safe_fopen(sdefault, CONFIG_DEFAULT_RIGHT);
 }
-
