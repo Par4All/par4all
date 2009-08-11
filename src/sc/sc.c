@@ -306,7 +306,7 @@ Psysteme sc;
  *
  * Note: 
  *  - there is no explicit check of TCST in the basis;
- * TCST should *not* be in the basis for some use of Psystemes, 
+ * TCST should *not* be in the basis for some use of Psystemes,
  * like transformers in PIPS.
  * */
 boolean sc_weak_consistent_p(Psysteme sc)
@@ -316,9 +316,18 @@ boolean sc_weak_consistent_p(Psysteme sc)
     weak_consistent = !SC_UNDEFINED_P(sc);
 
     if(weak_consistent) {
-	weak_consistent = (sc->nb_eq == nb_elems_list(sc_egalites(sc)))
-	    && (sc->nb_ineq == nb_elems_list(sc_inegalites(sc)))
-		    && (sc_dimension(sc) == base_dimension(sc_base(sc)));
+      /* The test is broken down into three lines to increase the
+	 information available when Valgrind detects a memory access
+	 error. */
+      int neq =  nb_elems_list(sc_egalites(sc));
+      int nineq = nb_elems_list(sc_inegalites(sc));
+      int dim =  base_dimension(sc_base(sc));
+
+      weak_consistent = (sc->nb_eq == neq);
+      weak_consistent = weak_consistent
+	&& (sc->nb_ineq == nineq);
+      weak_consistent = weak_consistent
+	&& (sc_dimension(sc) == dim);
     }
 
     if(weak_consistent && sc_dimension(sc) != 0) {

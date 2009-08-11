@@ -241,8 +241,8 @@ Psysteme s3;
 }
 
 /* Psysteme sc_safe_append(Psysteme s1, Psysteme s2)
- * input    : 
- * output   : calcul de l'intersection des polyedres definis par s1 et 
+ * input    :
+ * output   : calcul de l'intersection des polyedres definis par s1 et
  *            par s2 sous forme d'un systeme de contraintes et renvoi de s1.
  *
  *            s1 := intersection(s1,s2)
@@ -270,7 +270,7 @@ Psysteme s2;
     else if(sc_rn_p(s2))
 	/* ne rien faire et renvoyer s1 apre`s mise a` jour de la base */
 	;
-    else if(sc_empty_p(s1)) 
+    else if(sc_empty_p(s1))
 	/* ne rien faire et renvoyer s1 apre`s mise a` jour de la base */
 	;
     else if(sc_empty_p(s2)) {
@@ -288,7 +288,7 @@ Psysteme s2;
 	    sc_add_inegalite(s1,contrainte_copy(c));
 	}
     }
-    
+
     /* update s1 basis with s2's vectors */
     b = s1->base;
     for(coord = s2->base; !VECTEUR_NUL_P(coord); coord = coord->succ) {

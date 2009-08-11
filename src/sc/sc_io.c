@@ -136,25 +136,28 @@ Psysteme * ps;
  * using variable_dump_name(); lost of original variables' names
  * now compatible with sc_fscan()
  * Better use sc_default_name(Psysteme)
- * DN(5/8/2002) 
+ * DN(5/8/2002)
  */
 void sc_dump(sc)
 Psysteme sc;
 {
-    if(!SC_UNDEFINED_P(sc)) {
+  if(!SC_UNDEFINED_P(sc)) {
 
-       	(void) fprintf(stderr,"#DIMENSION: (%d)  ",sc->dimension);
-	(void) fprintf(stderr,"INEGALITES (%d)  ",sc_nbre_inegalites(sc));
-	(void) fprintf(stderr,"EGALITES (%d)  ",sc_nbre_egalites(sc));
-	(void) fprintf(stderr,"\nVAR ");	
-	base_fprint(stderr,sc->base, variable_dump_name);
-	(void) fprintf(stderr,"  {\n");
-	inegalites_fprint(stderr,sc->inegalites, variable_dump_name);
-	egalites_fprint(stderr,sc->egalites, variable_dump_name);	
-	(void) fprintf(stderr,"  }\n");
-    }
-    else
-	(void) fprintf(stderr, "SC_RN ou SC_EMPTY ou SC_UNDEFINED\n");
+    (void) fprintf(stderr,"#DIMENSION: (%d)  ",sc->dimension);
+    (void) fprintf(stderr,"INEGALITES (%d)  ",sc_nbre_inegalites(sc));
+    (void) fprintf(stderr,"EGALITES (%d)  ",sc_nbre_egalites(sc));
+    //(void) fprintf(stderr,"BASE (%p)  ", sc->base);
+    //(void) fprintf(stderr,"LISTE INEGALITES (%p)  ", sc->inegalites);
+    //(void) fprintf(stderr,"LISTE EGALITES (%p)  ", sc->egalites);
+    (void) fprintf(stderr,"\nVAR ");
+    base_fprint(stderr,sc->base, variable_dump_name);
+    (void) fprintf(stderr,"  {\n");
+    inegalites_fprint(stderr,sc->inegalites, variable_dump_name);
+    egalites_fprint(stderr,sc->egalites, variable_dump_name);
+    (void) fprintf(stderr,"  }\n");
+  }
+  else
+    (void) fprintf(stderr, "SC_RN ou SC_EMPTY ou SC_UNDEFINED\n");
 }
 
 /* void sc_default_dump(Psysteme sc): dump to stderr
