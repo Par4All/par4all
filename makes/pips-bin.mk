@@ -49,7 +49,7 @@ $(ARCH)/fpips:
 # all libraries as installed...
 PIPSLIBS_LIBS	= \
 	$(addsuffix .a, \
-		$(addprefix $(PIPS_ROOT)/lib/$(ARCH)/lib,$(pipslibs.libs)))
+		$(addprefix $(ROOT)/lib/$(ARCH)/lib,$(pipslibs.libs)))
 
 NEWGEN_LIBS	= \
 	$(addsuffix .a, \

@@ -19,17 +19,14 @@
 # along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+include $(MAKE.d)/flags.mk
+
 AR	= ar
 ARFLAGS	= -rv
 CC	= cc -T cray-t3d
 CFLAGS	= -O 3
 CMKDEP	= -M
-CPPFLAGS= -I$(NEWGEN_ROOT)/Include -I$(LINEAR_ROOT)/Include \
-		-I$(PIPS_ROOT)/Include -I$(EXTERN_ROOT)/Include
 LD	= $(CC)
-LDFLAGS	= -g -L./$(ARCH) -L$(PIPS_ROOT)/Lib/$(ARCH) \
-		-L$(NEWGEN_ROOT)/Lib/$(ARCH) -L$(LINEAR_ROOT)/Lib/$(ARCH) \
-		-L$(EXTERN_ROOT)/Lib/$(ARCH)
 RANLIB	= :
 LEX	= lex
 LFLAGS	=

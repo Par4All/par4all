@@ -20,9 +20,11 @@
 #
 
 # macros related to any compilation.
+# put $(ROOT) ahead so as to override *_ROOT
 
 CPPFLAGS += \
 	-I. \
+	-I$(ROOT)/include \
 	-I$(NEWGEN_ROOT)/include \
 	-I$(LINEAR_ROOT)/include \
 	-I$(PIPS_ROOT)/include \
@@ -30,8 +32,8 @@ CPPFLAGS += \
 
 LDFLAGS += \
 	-L./$(ARCH) \
+	-L$(ROOT)/lib/$(ARCH) \
 	-L$(PIPS_ROOT)/lib/$(ARCH) \
 	-L$(NEWGEN_ROOT)/lib/$(ARCH) \
 	-L$(LINEAR_ROOT)/lib/$(ARCH) \
-	-L$(EXTERN_ROOT)/lib/$(ARCH) \
-	$(NEWGEN_DOOM_LIBS)
+	-L$(EXTERN_ROOT)/lib/$(ARCH)

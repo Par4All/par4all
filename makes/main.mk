@@ -60,6 +60,7 @@ ifndef INSTALL_DIR
 INSTALL_DIR	= $(ROOT)
 endif # INSTALL_DIR
 
+# is this one really needed?
 ifndef PIPS_ROOT
 PIPS_ROOT	= $(ROOT)/../pips
 endif # PIPS_ROOT
@@ -227,10 +228,10 @@ depend: $(DERIVED_HEADERS) $(INC_TARGET)
 	$(MAKEDEP) $(LIB_CFILES) $(OTHER_CFILES) $(DERIVED_CFILES) | \
 	sed \
 		-e 's,^\(.*\.o:\),$(ARCH)/\1,;' \
-		-e 's,$(subst .,\.,$(PIPS_ROOT)),$$(PIPS_ROOT),g' \
+		-e 's,$(subst .,\.,$(ROOT)),$$(ROOT),g' \
 		-e 's,$(subst .,\.,$(LINEAR_ROOT)),$$(LINEAR_ROOT),g' \
 		-e 's,$(subst .,\.,$(NEWGEN_ROOT)),$$(NEWGEN_ROOT),g' \
-		-e 's,$(subst .,\.,$(ROOT)),$$(ROOT),g' > $(DEPEND)
+		-e 's,$(subst .,\.,$(PIPS_ROOT)),$$(PIPS_ROOT),g' > $(DEPEND)
 
 clean: depend-clean
 

@@ -1,8 +1,2 @@
-* PIPS_ROOT & co
-- should we get rid of them in the dev process ?
-  the situation when so compiles an src with 
-  PIPS_ROOT pointing to some other sources should
-  be at least checked for and possibly avoided?
-
 * PIPS_ARCH
 - cleanup obsolete architectures?

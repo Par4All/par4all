@@ -174,10 +174,10 @@ export PIPS_SVN=$SVN_CRI/pips
 export EXTERN_ROOT=$prod/extern
 export NEWGEN_ROOT=$prod/newgen
 export LINEAR_ROOT=$prod/linear
-export PIPS_ROOT=$prod/pips
+#export PIPS_ROOT=$prod/pips
 
 # fix path
-PATH=\$PIPS_ROOT/bin:\$PIPS_ROOT/utils:\$NEWGEN_ROOT/bin:\$PATH
+PATH=$prod/pips/bin:$prod/pips/utils:\$NEWGEN_ROOT/bin:\$PATH
 EOF
 
 if [ -n "$PIPS_F77" ]; then

@@ -62,23 +62,23 @@ else # not OLD_TEST
 ifndef BIN_TARGET
 $(ARCH)/tpips:
 	$(RM) $@
-	ln -s $(PIPS_ROOT)/bin/$@ $@
+	ln -s $(ROOT)/bin/$@ $@
 
 $(ARCH)/pips:
 	$(RM) $@
-	ln -s $(PIPS_ROOT)/bin/$@ $@
+	ln -s $(ROOT)/bin/$@ $@
 
 # full recompilation from a library
 full: $(ARCH)/tpips $(ARCH)/pips
-	$(MAKE) -C $(PIPS_ROOT) compile
+	$(MAKE) -C $(ROOT) compile
 
 # fast tpips recompilation
 fast-tpips: $(ARCH)/tpips compile
-	$(MAKE) -C $(PIPS_ROOT)/src/Passes/tpips compile
+	$(MAKE) -C $(ROOT)/src/Passes/tpips compile
 
 # fast pips recompilation
 fast-pips: $(ARCH)/pips compile
-	$(MAKE) -C $(PIPS_ROOT)/src/Passes/pips compile
+	$(MAKE) -C $(ROOT)/src/Passes/pips compile
 
 # generate both pips and tpips, useful for validation
 fast: fast-tpips fast-pips
@@ -96,7 +96,7 @@ ifdef VALIDATE_TARGET
 ifdef PIPS_VALIDDIR
 VALID.dir	= $(PIPS_VALIDDIR)
 else # no PIPS_VALIDDIR
-VALID.dir	= $(ROOT)/../../valid
+VALID.dir	= $(ROOT)/../../validation
 endif # PIPS_VALIDDIR
 
 validate: fast
