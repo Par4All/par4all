@@ -1,0 +1,3 @@
+This validation needs some rethinking: the validated output
+is about 350KB for every test, 349KB of which are common to
+all tests. Checking it once should be enough...
