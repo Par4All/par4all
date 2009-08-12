@@ -66,7 +66,8 @@ typedef enum {
  * }
  *
  * note that due to variables which are declared in the current scope:
- * - the "var" name must be unique in the scope.
+ * - the "var" name must be unique in the scope, and is used as a
+ *   suffix for declaring temporaries.
  * - put braces around the macro when using it as a loop body or
  *   condition case.
  *
@@ -74,16 +75,21 @@ typedef enum {
  * Just change the scalar variable name "var" if need be.
  */
 #define SET_FOREACH(type_name, the_item, the_set)			\
-  hash_table _hash_##the_item##_##the_set =				\
+  hash_table _hash_##the_item =						\
     set_private_get_hash_table(the_set);				\
-  void * _value_##the_item##_##the_set;					\
-  void * _point_##the_item##_##the_set = NULL;				\
+  void * _value_##the_item;						\
+  void * _point_##the_item = NULL;					\
   type_name the_item;							\
-  for (; (_point_##the_item##_##the_set =				\
-            hash_table_scan(_hash_##the_item##_##the_set,		\
-                            _point_##the_item##_##the_set,		\
-                            (void **) &the_item,			\
-			    &_value_##the_item##_##the_set));)
+  for (; (_point_##the_item =						\
+	  hash_table_scan(_hash_##the_item,				\
+			  _point_##the_item,				\
+			  (void **) &the_item,				\
+			  &_value_##the_item));)
+
+/* what about this replacement?
+#define SET_MAP(the_item, the_code, the_set)		\
+  { SET_FOREACH(void *, the_item, the_set) the_code; }
+*/
 
 /* functions implemented in set.c */
 // CONSTRUCTORS
