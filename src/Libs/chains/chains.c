@@ -974,8 +974,8 @@ control ct ;
 		       set_difference( diff, DEF_IN( st ), KILL( st ))) ;
 	     set_assign( r_oldout, REF_OUT( st )) ;
 	     set_union( REF_OUT( st ), REF( st ), REF_IN( st )) ;
-	     change |= (!set_equal( d_oldout, DEF_OUT( st )) ||
-			!set_equal( r_oldout, REF_OUT( st )));
+	     change |= (!set_equal_p( d_oldout, DEF_OUT( st )) ||
+			!set_equal_p( r_oldout, REF_OUT( st )));
 	 }, ct, blocs ) ;
     }
 

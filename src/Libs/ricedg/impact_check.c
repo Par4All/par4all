@@ -556,7 +556,7 @@ static void __attribute__ ((unused)) computing_dominators(hash_table control_to_
 
 	set_union(dominator_dn, dominator_dn, dominator_dp);
 
-	if (!set_equal(dominator_dn,
+	if (!set_equal_p(dominator_dn,
 			create_or_get_a_set_from_control(n, control_to_set_of_dominators)))
 	  {
 	    change = TRUE;
