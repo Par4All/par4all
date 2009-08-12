@@ -896,23 +896,19 @@ precondition_add_condition_information(
   return post;
 }
 
-transformer 
-transformer_add_domain_condition(
-    transformer tf,
-    expression c,
-    transformer context,
-    bool veracity)
+transformer transformer_add_domain_condition(transformer tf,
+					     expression c,
+					     transformer context,
+					     bool veracity)
 {
   tf = transformer_add_condition_information(tf, c, context, veracity);
   return tf;
 }
 
-transformer 
-transformer_add_range_condition(
-    transformer tf,
-    expression c,
-    transformer context,
-    bool veracity)
+transformer transformer_add_range_condition(transformer tf,
+					    expression c,
+					    transformer context,
+					    bool veracity)
 {
   tf = precondition_add_condition_information(tf, c, context, veracity);
   return tf;
@@ -968,8 +964,7 @@ transformer simple_affine_to_transformer(entity e, Pvecteur a, bool is_internal)
   return tf;
 }
 
-transformer 
-affine_to_transformer(entity e, Pvecteur a, bool assignment)
+transformer affine_to_transformer(entity e, Pvecteur a, bool assignment)
 {
   transformer tf = transformer_undefined;
   Pvecteur ve = vect_new((Variable) e, VALUE_ONE);
@@ -1026,8 +1021,7 @@ affine_to_transformer(entity e, Pvecteur a, bool assignment)
   return tf;
 }
 
-transformer 
-affine_increment_to_transformer(entity e, Pvecteur a)
+transformer affine_increment_to_transformer(entity e, Pvecteur a)
 {
     transformer tf = transformer_undefined;
 
@@ -1047,7 +1041,7 @@ static transformer modulo_to_transformer(entity e, /* assumed to be a value */
   pips_debug(8, "begin with pre=%p\n", pre);
 
   /* Should be rewritten with expression_to_transformer */
-    
+
   if(integer_constant_expression_p(arg2)) {
     int d = integer_constant_expression_value(arg2);
     Pvecteur ub = vect_new((Variable) e, VALUE_ONE);
@@ -1149,7 +1143,7 @@ integer_divide_to_transformer(entity e,
 
   pips_debug(8, "begin with is_internal=%s\n",
 	     bool_to_string(is_internal));
- 
+
   /* pips_assert("Precondition is unused", transformer_undefined_p(pre)); */
   pips_assert("Shut up the compiler", pre==pre);
 
@@ -1159,7 +1153,7 @@ integer_divide_to_transformer(entity e,
        renamed and checked at the same time by
        value_mappings_compatible_vector_p() */
     Pvecteur vlb =
-      vect_multiply(vect_dup(normalized_linear(n1)), VALUE_MONE); 
+      vect_multiply(vect_dup(normalized_linear(n1)), VALUE_MONE);
     Pvecteur vub = vect_dup(normalized_linear(n1));
     Pcontrainte clb = CONTRAINTE_UNDEFINED;
     Pcontrainte cub = CONTRAINTE_UNDEFINED;
@@ -1304,12 +1298,11 @@ integer_multiply_to_transformer(entity v,
   return tf;
 }
 
-static transformer 
-integer_power_to_transformer(entity e,
-			     expression arg1,
-			     expression arg2,
-			     transformer pre,
-			     bool is_internal)
+static transformer integer_power_to_transformer(entity e,
+						expression arg1,
+						expression arg2,
+						transformer pre,
+						bool is_internal)
 {
   transformer tf = transformer_undefined;
   normalized n1 = NORMALIZE_EXPRESSION(arg1);
@@ -1389,7 +1382,7 @@ integer_power_to_transformer(entity e,
     }
     else if(d==1) {
       Pvecteur v = vect_dup(normalized_linear(n1));
-      
+
       vect_add_elem(&v, (Variable) e, VALUE_MONE);
       tf = make_transformer(NIL,
 			    make_predicate(sc_make(contrainte_make(v),
@@ -1543,9 +1536,9 @@ transformer assign_operation_to_transformer(entity val, // assumed to be a value
 
 static transformer 
 integer_nullary_operation_to_transformer(
-					 entity e, 
-					 entity f, 
-					 transformer pre __attribute__ ((unused)), 
+					 entity e,
+					 entity f,
+					 transformer pre __attribute__ ((unused)),
 					 bool is_internal __attribute__ ((unused)))
 {
   transformer tf = transformer_undefined;
@@ -1561,7 +1554,7 @@ integer_nullary_operation_to_transformer(
 
     /* Two inequalities should be added... */
 
-    b = vect_add_variable(b, (Variable) e);  
+    b = vect_add_variable(b, (Variable) e);
     s->base = b;
     s->dimension = vect_size(b);
 
@@ -1571,13 +1564,11 @@ integer_nullary_operation_to_transformer(
   return tf;
 }
 
-static transformer 
-integer_unary_operation_to_transformer(
-    entity e,
-    entity op,
-    expression e1,
-    transformer pre,
-    bool is_internal)
+static transformer integer_unary_operation_to_transformer(entity e,
+							  entity op,
+							  expression e1,
+							  transformer pre,
+							  bool is_internal)
 {
   transformer tf = transformer_undefined;
 
@@ -1592,14 +1583,12 @@ integer_unary_operation_to_transformer(
   return tf;
 }
 
-static transformer 
-integer_binary_operation_to_transformer(
-    entity e,
-    entity op,
-    expression e1,
-    expression e2,
-    transformer pre,
-    bool is_internal)
+static transformer integer_binary_operation_to_transformer(entity e,
+							   entity op,
+							   expression e1,
+							   expression e2,
+							   transformer pre,
+							   bool is_internal)
 {
   transformer tf = transformer_undefined;
 
@@ -2228,8 +2217,8 @@ transformer float_expression_to_transformer(entity v,
 transformer transformer_add_any_relation_information(
 	transformer pre, /* precondition */
 	entity op,
-	expression e1, 
-	expression e2, 
+	expression e1,
+	expression e2,
 	transformer context,
 	bool veracity,   /* the relation is true or not */
 	bool upwards)    /* compute transformer or precondition */
@@ -2407,6 +2396,19 @@ any_expression_to_transformer(
   basic be = basic_of_expression(expr);
   basic bv = variable_basic(type_variable(entity_type(v)));
 
+  if(basic_typedef_p(be)) {
+    entity te = basic_typedef(be);
+    type nte = ultimate_type(entity_type(te));
+
+    pips_assert("nte is of type variable", type_variable_p(nte));
+
+    /* Should basic of expression take care of this? */
+    pips_debug(8, "Fix basic be\n");
+
+    free_basic(be);
+    be = copy_basic(variable_basic(type_variable(nte)));
+  }
+
   ifdebug(8) {
     pips_debug(8, "begin for entity %s of type %s and %s expression ", entity_local_name(v),
 	       basic_to_string(bv), basic_to_string(be));
@@ -2457,6 +2459,8 @@ any_expression_to_transformer(
 	pips_internal_error("illegal overloaded type for an expression\n");
       break;
     }
+    case is_basic_typedef:
+      pips_internal_error("entities of type \"typedef\" cannot be analyzed\n");
     default:
       pips_internal_error("unknown basic b=%d\n", basic_tag(be));
     }
@@ -2479,7 +2483,7 @@ any_expression_to_transformer(
 
   /* tf may be transformer_undefined when no information is derived */
   ifdebug(1) {
-    if(!transformer_undefined_p(pre)) 
+    if(!transformer_undefined_p(pre))
       pips_assert("No obvious aliasing between tf and pre", tf!=pre);
   }
   pips_debug(8, "end with tf=%p\n", tf);
