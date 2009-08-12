@@ -41,17 +41,9 @@
 #ifndef STACK_INCLUDED
 #define STACK_INCLUDED
 
-#ifdef __STDC__
-#define _PROTO(x) x
-#else
-#define _PROTO(x) ()
-#endif
-
 /*  encapsulated types
  */
-struct __stack_head;
 typedef struct __stack_head *stack;
-struct __stack_iterator;
 typedef struct __stack_iterator *stack_iterator;
 
 /*  defines for empty values
@@ -62,37 +54,37 @@ typedef struct __stack_iterator *stack_iterator;
 #define stack_undefined  ((stack)-14)
 #define stack_undefined_p(s) ((s)==stack_undefined)
 
-#define STACK_CHECK(s)\
-  message_assert("stack null or undefined",\
+#define STACK_CHECK(s)						\
+  message_assert("stack null or undefined",			\
                  !STACK_NULL_P(s) && !stack_undefined_p(s))
 
 /*   allocation
  */
-extern stack stack_make _PROTO((int, int, int)); /* type, bucket_size, policy */
-extern void stack_free _PROTO((stack*));
-extern stack stack_copy _PROTO((stack));
+extern stack stack_make (int, int, int); /* type, bucket_size, policy */
+extern void stack_free (stack*);
+extern stack stack_copy (stack);
 
 /*   observers
  */
-extern int stack_size _PROTO((stack));
-extern int stack_type _PROTO((stack));
-extern int stack_bsize _PROTO((stack));
-extern int stack_policy _PROTO((stack));
-extern int stack_max_extent _PROTO((stack));
+extern int stack_size(stack);
+extern int stack_type(stack);
+extern int stack_bsize(stack);
+extern int stack_policy(stack);
+extern int stack_max_extent(stack);
 
 /*   miscellaneous
  */
-extern int stack_consistent_p _PROTO((stack));
-extern int stack_empty_p _PROTO((stack));
-extern void stack_info _PROTO((FILE*, stack));
-extern void stack_map _PROTO((stack, void(*)()));
+extern int stack_consistent_p(stack);
+extern bool stack_empty_p(stack);
+extern void stack_info(FILE*, stack);
+extern void stack_map(stack, void(*)());
 
 /*   stack use
  */
-extern void stack_push _PROTO((void*, stack));
-extern void *stack_pop _PROTO((stack));
-extern void *stack_head _PROTO((stack));
-extern void *stack_replace _PROTO((void*, stack));
+extern void stack_push(void*, stack);
+extern void *stack_pop(stack);
+extern void *stack_head(stack);
+extern void *stack_replace(void*, stack);
 
 /*   stack iterator
  *
@@ -100,10 +92,10 @@ extern void *stack_replace _PROTO((void*, stack));
  *   it is not very efficient, due to the many function calls.
  *   Consider gen_map first which has a very small overhead.
  */
-extern stack_iterator stack_iterator_init _PROTO((stack, int)); /* X-ward */
-extern int stack_iterator_next_and_go _PROTO((stack_iterator, void**));
-extern void stack_iterator_end _PROTO((stack_iterator*));
-extern int stack_iterator_end_p _PROTO((stack_iterator)); /* not needed */
+extern stack_iterator stack_iterator_init(stack, int); /* X-ward */
+extern int stack_iterator_next_and_go(stack_iterator, void**);
+extern void stack_iterator_end(stack_iterator*);
+extern int stack_iterator_end_p(stack_iterator); /* not needed */
 
 /* applies _code on the items of _stack downward , with _item of _itemtype.
  */
@@ -121,8 +113,6 @@ extern int stack_iterator_end_p _PROTO((stack_iterator)); /* not needed */
 
 #define STACK_MAP(_item, _itemtype, _code, _stack)	\
   STACK_MAP_X(_item, _itemtype, _code, _stack, 1)
-
-#undef _PROTO
 #endif
 
 /*  That is all

@@ -24,18 +24,25 @@
 #ifndef STRING_BUFFER_INCLUDED
 #define STRING_BUFFER_INCLUDED
 
-struct __string_buffer_head;
 typedef struct __string_buffer_head * string_buffer;
 
+// CONSTRUCTOR
 string_buffer string_buffer_make(bool dup);
+// DESTRUCTORS
 void string_buffer_free(string_buffer *);
 void string_buffer_free_all(string_buffer *);
-string string_buffer_to_string(string_buffer);
-string string_buffer_to_string_reverse(string_buffer);
-void string_buffer_to_file(string_buffer, FILE *);
+// TEST
+size_t string_buffer_size(string_buffer);
+bool string_buffer_empty_p(string_buffer);
+// OPERATIONS
+void string_buffer_reset(string_buffer);
 void string_buffer_append(string_buffer, string);
 void string_buffer_cat(string_buffer, string, ...);
 void string_buffer_append_sb(string_buffer, string_buffer);
 void string_buffer_append_list(string_buffer, list);
+// CONVERSIONS
+string string_buffer_to_string(string_buffer);
+string string_buffer_to_string_reverse(string_buffer);
+void string_buffer_to_file(string_buffer, FILE *);
 
 #endif /* STRING_BUFFER_INCLUDED */

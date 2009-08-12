@@ -283,15 +283,20 @@ void stack_free(stack * ps)
 
 /*    STACK MISCELLANEOUS
  */
-#define STACK_OBSERVER(name, what)\
-int stack_##name(s) stack s; { STACK_CHECK(s); return(what);}
+#define STACK_OBSERVER(name, what)				\
+  int stack_##name(stack s) { STACK_CHECK(s); return(what); }
 
 STACK_OBSERVER(size, s->size)
 STACK_OBSERVER(bsize, s->bucket_size)
 STACK_OBSERVER(policy, s->policy)
 STACK_OBSERVER(max_extent, s->max_extent)
-STACK_OBSERVER(empty_p, s->size==0)
 STACK_OBSERVER(consistent_p, 1) /* well, it is not implemented */
+
+bool stack_empty_p(stack s)
+{
+  STACK_CHECK(s);
+  return s->size==0;
+}
 
 #undef STACK_OBSERVER
 

@@ -60,11 +60,21 @@ string_buffer string_buffer_make (bool dup)
   return n;
 }
 
+/* remove stack contents
+ */
+void string_buffer_reset(string_buffer sb)
+{
+  while (!stack_empty_p(sb->ins)) {
+    string s = (string) stack_pop(sb->ins);
+    if (sb->dup) free(s);
+  }
+}
+
 /* @brief free string buffer structure, also free string contents
  * according to the dup field
  * @arg psb the string_buffer to free
  */
-void string_buffer_free (string_buffer *psb)
+void string_buffer_free(string_buffer *psb)
 {
   if ((*psb)->dup)
     STACK_MAP_X(s, string, free(s), (*psb)->ins, 0);
@@ -83,17 +93,32 @@ void string_buffer_free_all (string_buffer *psb)
   string_buffer_free (psb);
 }
 
+/* return the size of the string in string_buffer sb
+ */
+size_t string_buffer_size(string_buffer sb)
+{
+  size_t size = 0;
+  STACK_MAP_X(s, string, size+=strlen(s), sb->ins, 0);
+  return size;
+}
+
+/* return whether string_buffer sb is empty.
+ */
+bool string_buffer_empty_p(string_buffer sb)
+{
+  return string_buffer_size(sb)==0;
+}
+
 /* return malloc'ed string from string buffer sb
  */
 string string_buffer_to_string(string_buffer sb)
 {
-  int bufsize = 0, current = 0;
-  char * buf = NULL;
+  size_t bufsize = string_buffer_size(sb);
 
-  STACK_MAP_X(s, string, bufsize+=strlen(s), sb->ins, 0);
-
-  buf = (char*) malloc(bufsize+1);
+  string buf = (string) malloc(bufsize+1);
   message_assert("allocated", buf!=NULL);
+
+  int current = 0;
   buf[current] = '\0';
 
   STACK_MAP_X(s, string,
@@ -112,13 +137,12 @@ string string_buffer_to_string(string_buffer sb)
  */
 string string_buffer_to_string_reverse (string_buffer sb)
 {
-  int bufsize = 0, current = 0;
-  char * buf = NULL;
+  size_t bufsize = string_buffer_size(sb);
 
-  STACK_MAP_X(s, string, bufsize+=strlen(s), sb->ins, 0);
-
-  buf = (char*) malloc(bufsize+1);
+  string buf = (string) malloc(bufsize+1);
   message_assert("allocated", buf!=NULL);
+
+  int current = 0;
   buf[current] = '\0';
 
   STACK_MAP_X(s, string,
@@ -140,12 +164,12 @@ void string_buffer_to_file(string_buffer sb, FILE * out)
   STACK_MAP_X(s, string, fputs(s, out), sb->ins, 0);
 }
 
-/* append string s to string buffer sb, the duplication
+/* append string s (if non empty) to string buffer sb, the duplication
  * is done if needed according to the dup field.
  */
 void string_buffer_append(string_buffer sb, string s)
 {
-  stack_push(sb->dup? strdup(s): s, sb->ins);
+  if (*s) stack_push(sb->dup? strdup(s): s, sb->ins);
 }
 
 /* @brief append the string buffer sb2 to string buffer sb.
