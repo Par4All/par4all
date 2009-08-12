@@ -346,7 +346,7 @@ add_new_module_from_text(string module_name,
 					    text heading*/) {
     boolean success_p = TRUE;
     entity m = local_name_to_top_level_entity(module_name);
-    string file_name, dir_name, src_name, full_name, init_name, finit_name; 
+    string file_name, dir_name, src_name, full_name, init_name, finit_name;
     /* relative to the current directory */
     FILE * f;
     string res = is_fortran? DBR_INITIAL_FILE : DBR_C_SOURCE_FILE;

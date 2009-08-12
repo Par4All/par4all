@@ -430,7 +430,14 @@ static entity make_local_intermediate_value_entity(type t)
 
 entity make_local_temporary_value_entity(type t)
 {
-  return make_local_value_entity(local_temporary_value_counter++, 2, t);
+  entity tv = entity_undefined;
+
+  if(analyzable_type_p(t))
+    tv = make_local_value_entity(local_temporary_value_counter++, 2, t);
+  else
+    pips_internal_error("Request for a temporary value with a non analyzable type\n");
+
+  return tv;
 }
 
 entity make_local_temporary_value_entity_with_basic(basic b)
