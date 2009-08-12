@@ -487,7 +487,6 @@ freia_status one_pipe(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
    // t1 = i1 / i0
    // t2 = t1 + i0
    // o  = t2 ^ i0
-   ;
    one_pipe_helper_0(o, i0, i1);                                        /*0015*/
 
    freia_common_destruct_data(t1);                                      /*0017*/
@@ -514,12 +513,6 @@ freia_status one_big_pipe(freia_data2d *o, freia_data2d *i0, freia_data2d *i1, i
    // t6 = t4 & t5
    // t7 = m()
    // o  = t6 * t7
-   ;
-   ;
-   ;
-   ;
-   ;
-   ;
    one_big_pipe_helper_0(o, i1, i0, c1, c2, c3, c4, c5);                /*0054*/
 
    freia_common_destruct_data(t1);                                      /*0056*/
