@@ -225,12 +225,19 @@ static entity scalarized_replacement_variable = entity_undefined;
 
 // gen_recurse callback function for statement_substitute_scalarized_array_references
 static bool reference_substitute(reference r) {
+  bool result = FALSE;
   entity v = reference_variable(r);
   if (v == scalarized_array) {
-    reference_variable(r) = scalarized_replacement_variable;
-    reference_indices(r) = NIL; // TODO: add missing gen_full_free_list(reference_indices(r))
+    // Scalarize only if r refers to an array element and not to a slice
+    list inds = reference_indices(r);
+    int d = type_depth(ultimate_type(entity_type(v)));
+    if (gen_length(inds) == d) {
+      reference_variable(r) = scalarized_replacement_variable;
+      reference_indices(r) = NIL; // TODO: add missing gen_full_free_list(reference_indices(r))
+      result = TRUE;
+    }
   }
-  return TRUE;
+  return result;
 }
 
 
@@ -380,7 +387,7 @@ static bool loop_scalarization(loop l)
 	  reference pvr = copy_reference(find_reference_to_variable(s, pv));
 
 	  // Create a reference to this new variable and add declaration to module	
-	  entity sv = make_new_scalar_variable_with_prefix("__ld__", get_current_module_entity(), svb);
+	  entity sv = make_new_scalar_variable_with_prefix("__scalar__", get_current_module_entity(), svb);
 	  AddEntityToCurrentModule(sv);
 	  scalarized_variables = arguments_add_entity(scalarized_variables, pv);
 	  
