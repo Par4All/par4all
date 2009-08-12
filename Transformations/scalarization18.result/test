@@ -110,26 +110,26 @@ Code after scalarization
 void scalarization18(double A[SIZE], double B[SIZE][SIZE])
 {
    // BEGIN BLOCK
-   double __ld__1;
-   double __ld__0;
+   double __scalar__1;
+   double __scalar__0;
    int i;
    int j;
 
    for(i = 0; i <= SIZE-1; i += 1) {
       // BEGIN BLOCK
-      __ld__0 = A[i];
+      __scalar__0 = A[i];
       for(j = 0; j <= SIZE-1; j += 1)
-         __ld__0 = B[j][i]+__ld__0;
-      A[i] = __ld__0;
+         __scalar__0 = B[j][i]+__scalar__0;
+      A[i] = __scalar__0;
       // END BLOCK
    }
 
    for(i = 0; i <= SIZE-1; i += 1) {
       // BEGIN BLOCK
-      __ld__1 = A[i];
+      __scalar__1 = A[i];
       for(j = 0; j <= SIZE-1; j += 1)
-         __ld__1 = B[j][i]+__ld__1;
-      A[i] = __ld__1;
+         __scalar__1 = B[j][i]+__scalar__1;
+      A[i] = __scalar__1;
       // END BLOCK
    }
    // END BLOCK

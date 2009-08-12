@@ -8,12 +8,12 @@ C     BEGIN BLOCK
 C        BEGIN BLOCK
          DO J = 1, N                                                    0007
 C           BEGIN BLOCK
-            __ld__0 = X(I,J)                                            0008
+            __scalar__0 = X(I,J)                                        0008
             X(I,J) = Y(I,J)                                             0009
-            Y(I,J) = __ld__0                                            0010
+            Y(I,J) = __scalar__0                                        0010
 C           END BLOCK
          ENDDO
-         T(I) = __ld__0
+         T(I) = __scalar__0
 C        END BLOCK
       ENDDO
       PRINT *, T(N)                                                     0013

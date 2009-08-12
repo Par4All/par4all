@@ -30,15 +30,15 @@ Code after scalarization
 int scalarization08(int x[10], int y[10][10])
 {
    // BEGIN BLOCK
-   int __ld__0;
+   int __scalar__0;
    int i;
    int j;
    int k;
    for(i = 0; i <= 9; i += 1) {
       // BEGIN BLOCK
       for(j = 0; j <= 9; j += 1)
-         __ld__0 = y[i][j];
-      x[i] = __ld__0;
+         __scalar__0 = y[i][j];
+      x[i] = __scalar__0;
       // END BLOCK
    }
    //printf("%d", x[1]);

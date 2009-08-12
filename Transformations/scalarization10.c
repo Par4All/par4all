@@ -1,6 +1,4 @@
-/* Expected result: A[i] can be scalarized, the scalar must be copied
-   in from A[I], but not back into A[i], because it's never used in
-   this context: the scalarization10 is never called.
+/* Expected result: A[i] is not scalarized, because it is not profitable here.
 
  */
 
