@@ -52,7 +52,8 @@ F.tex =	ri.tex \
 	ri_C.tex \
 	cloning.tex \
 	outlining_private.tex \
-	step_private.tex
+	step_private.tex \
+	freia_spoc_private.tex
 
 SOURCES = $(F.tex) unstructured.idraw newgen_domain.sty optimizer.tex
 
