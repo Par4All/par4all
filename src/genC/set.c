@@ -245,7 +245,9 @@ set set_delfree_element(set s1, set s2, void * e)
 bool set_inclusion_p(set s1, set s2)
 {
   if (s1==s2) return true;
-  SET_MAP(i, if (!set_belong_p(s2, i)) return false, s1);
+  SET_FOREACH(void *, i, s1)
+    if (!set_belong_p(s2, i))
+      return false;
   return true;
 }
 
@@ -308,19 +310,21 @@ void gen_set_closure_iterate(void (*iterate)(void *, set),
   set_assign(curr, initial);
 
   while (!set_empty_p(curr))
+  {
+    SET_FOREACH(void *, x, curr)
+      iterate(x, next);
+
+    if (dont_iterate_twice)
     {
-      SET_MAP(x, iterate(x, next), curr);
-      if (dont_iterate_twice)
-	{
-	  (void) set_union(seen, seen, curr);
-	  set_difference(curr, next, seen);
-	}
-      else
-	{
-	  set_assign(curr, next);
-	}
-      set_clear(next);
+      set_union(seen, seen, curr);
+      set_difference(curr, next, seen);
     }
+    else
+    {
+      set_assign(curr, next);
+    }
+    set_clear(next);
+  }
 
   set_free(curr);
   set_free(seen);
@@ -354,7 +358,8 @@ int set_own_allocated_memory(set s)
 list set_to_list(set s)
 {
   list l =NIL;
-  SET_MAP(v, l=gen_cons(v,l), s);
+  SET_FOREACH(void *, v, s)
+    l = gen_cons(v,l);
   return l;
 }
 
@@ -406,18 +411,18 @@ set_to_string_buffer(string name, set s, string(*item_name)(void *))
 {
   string_buffer sb = string_buffer_make(true);
   if (name)
-    string_buffer_cat(sb, name, " = { ", NULL);
+    string_buffer_cat(sb, name, " = (", itoa(set_size(s)), ") { ", NULL);
   else
-    string_buffer_append(sb, "{ ");
+    string_buffer_cat(sb, " (", itoa(set_size(s)), ") { ", NULL);
 
   bool first = true;
-  SET_MAP(i,
-    {
-      if (first) first = false;
-      else string_buffer_append(sb, ", ");
-      string_buffer_append(sb, item_name(i));
-    }
-	  , s);
+  SET_FOREACH(void *, i, s)
+  {
+    if (first) first = false;
+    else string_buffer_append(sb, ", ");
+    string_buffer_append(sb, item_name(i));
+  }
+
   string_buffer_append(sb, " }");
   return sb;
 }
@@ -441,5 +446,6 @@ void set_fprint(FILE * out, string name, set s, string(*item_name)(void *))
 {
   string_buffer sb = set_to_string_buffer(name, s, item_name);
   string_buffer_to_file(sb, out);
+  putc('\n', out);
   string_buffer_free(&sb);
 }

@@ -57,6 +57,20 @@ typedef enum {
 	     set_private_get_hash_table(the_set));			\
   }
 
+// Ronan, I wish to avoid an ugly double macro expansion hack here.
+// Just change the scalar variable name if need be.
+#define SET_FOREACH(type_name, the_item, the_set)			\
+  hash_table _hash_##the_item##_##the_set =				\
+    set_private_get_hash_table(the_set);				\
+  void * _value_##the_item##_##the_set;					\
+  void * _point_##the_item##_##the_set = NULL;				\
+  type_name the_item;							\
+  for (; (_point_##the_item##_##the_set =				\
+            hash_table_scan(_hash_##the_item##_##the_set,		\
+                            _point_##the_item##_##the_set,		\
+                            (void **) &the_item,			\
+			    &_value_##the_item##_##the_set));)
+
 /* functions implemented in set.c */
 // CONSTRUCTORS
 extern set set_generic_make(set_type, hash_equals_t, hash_rank_t);
