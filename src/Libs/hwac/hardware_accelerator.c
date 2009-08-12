@@ -34,11 +34,55 @@
 #include "resources.h"
 #include "pipsdbm.h"
 
+#include "hwac.h"
+
 #define HWAC_INPUT "HWAC_INPUT"
 #define HWAC_TARGET "HWAC_TARGET"
 
 #define FREIA_API "freia"
 #define SPOC_HW "spoc"
+
+static void remove_continues(sequence seq)
+{
+  list ls = NIL;
+  string_buffer comments = string_buffer_make(true);
+  FOREACH(STATEMENT, s, sequence_statements(seq))
+  {
+    if (!continue_statement_p(s))
+    {
+      if (!string_buffer_empty_p(comments))
+      {
+	if (!statement_with_empty_comment_p(s))
+	{
+	  string_buffer_append(comments, statement_comments(s));
+	  free(statement_comments(s));
+	  statement_comments(s) = NULL;
+	}
+	statement_comments(s) = string_buffer_to_string(comments);
+	string_buffer_reset(comments);
+      }
+      ls = CONS(STATEMENT, s, ls);
+    }
+    else // continue statement, removed
+    {
+      // ??? what about labels?
+      // keep comments! attach them to the next available statement in
+      // the sequence, otherwise goodbye!
+      if (!statement_with_empty_comment_p(s))
+	string_buffer_append(comments, statement_comments(s));
+      free_statement(s);
+    }
+  }
+  ls = gen_nreverse(ls);
+  gen_free_list(sequence_statements(seq));
+  string_buffer_free(&comments);
+  sequence_statements(seq) = ls;
+}
+
+static void cleanup_continues(statement stat)
+{
+  gen_recurse(stat, sequence_domain, gen_true, remove_continues);
+}
 
 int hardware_accelerator(string module)
 {
@@ -65,7 +109,13 @@ int hardware_accelerator(string module)
 
   // just call a stupid algorithm for testing purposes...
   // if (same_string_p(input, FREIA_API) && same_string_p(target, SPOC_HW))
-  // freia_spoc_compile(module, mod_stat);
+  freia_spoc_compile(module, mod_stat);
+
+  // mimimal cleanup
+  cleanup_continues(mod_stat);
+
+  // put new code
+  DB_PUT_MEMORY_RESOURCE(DBR_CODE, module, mod_stat);
 
   // update/release resources
   reset_current_module_statement();

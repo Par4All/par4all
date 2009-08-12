@@ -5891,6 +5891,10 @@ Generate code for a particular hardware accelerator.
 It looks generic, but it may not be such a good idea if
 different targets require different costly analyses.
 
+FC: I'm unsure about this one. Different hardware accelerators may
+required different analyses, so an \texttt{activate} may be more
+appropriate?
+
 \begin{PipsMake}
 hardware_accelerator	> MODULE.code
         < PROGRAM.entities

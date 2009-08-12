@@ -22,7 +22,8 @@
 TARGET	= hwac
 
 LIB_CFILES = \
-	hardware_accelerator.c
+	hardware_accelerator.c \
+	freia_spoc.c
 
 INC_TARGET =    $(TARGET).h
 
