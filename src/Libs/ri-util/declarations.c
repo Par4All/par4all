@@ -1918,7 +1918,8 @@ list generic_c_words_entity(type t, list name, bool is_safe, bool add_dummy_para
 	  || ((gen_length(name) == 1) && (strcmp(STRING(CAR(name)),"*")==0)))
 	{
 	  /* Function name is an expression like *vfs[] in (*vfs[])()
-	     (syntax = application), or an abstract function type, so parentheses must be added */
+	     (syntax = application), or an abstract function type, so
+	     parentheses must be added */
 	  pc = CHAIN_SWORD(NIL,"(");
 	  pc = gen_nconc(pc,name);
 	  pc = CHAIN_SWORD(pc,")(");
@@ -1934,17 +1935,22 @@ list generic_c_words_entity(type t, list name, bool is_safe, bool add_dummy_para
 	parameter p = PARAMETER(CAR(cparam));
 	type t1 = parameter_type(p);
 	string pn = dummy_unknown_p(parameter_dummy(p))?
-	  string_undefined : strdup(entity_local_name(dummy_identifier(parameter_dummy(p))));
+	  string_undefined
+	  : strdup(entity_local_name(dummy_identifier(parameter_dummy(p))));
 
-	if(add_dummy_parameter_name_p && string_undefined_p(pn)) {
-	  /* RK wants us to use another better function, but its name
-	     is not documented next to itoa() source code and here
-	     the string is going to be strduped, which makes itoa() a
-	     better choice. */
+	if(add_dummy_parameter_name_p
+	   && string_undefined_p(pn)
+	   && !type_varargs_p(t1)) {
+	  /* RK wants us to use another better function than itoa, but
+	     its name is not documented next to itoa() source code and
+	     here the string is going to be strduped, which makes
+	     itoa() a better choice. */
 	  pn = concatenate("f", itoa(pnum), NULL);
 	}
 
-	  //pips_debug(3,"Parameter type %s\n ",type_undefined_p(t1)? "type_undefined" : words_to_string(words_type(t1)));
+	/*pips_debug(3,"Parameter type %s\n ",
+	type_undefined_p(t1)? "type_undefined" :
+	words_to_string(words_type(t1))); */
 	if (!first)
 	  pc = gen_nconc(pc,CHAIN_SWORD(NIL, space_p? ", " : ","));
 	/* c_words_entity(t1,NIL) should be replaced by c_words_entity(t1,name_of_corresponding_parameter) */
