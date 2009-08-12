@@ -21,17 +21,24 @@
 # along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+# show repository, revisions and committed for directory arguments
+
 for dir
 do
     if type svnversion > /dev/null 2>&1
     then
 	if [ -d $dir/.svn ]
 	then
-	    echo $(svn info $dir | sed -n -e '2s/.*: //p')@$(svnversion -c $dir)
+	    repos=$(svn info $dir | sed -n -e '2s/.*: //p')
+	    revision=$(svnversion $dir)
+	    committed=$(svnversion -c $dir)
+	    echo "$repos@$revision ($committed)"
 	else
-	    echo 'unknown@unknown'
+	    # not a working copy
+	    echo 'unknown@unknown (unknown)'
 	fi
     else
-	echo 'unknown@unknown'
+	# svnversion not found
+	echo 'unknown@unknown (unknown)'
     fi
 done
