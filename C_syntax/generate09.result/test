@@ -46,6 +46,5 @@ int func(sem_t *);
 //     be updated by the user with READ and WRITE effects on
 //     formal parameters to be useful...
 //
-int func(f1)
-sem_t * f1;
+int func(sem_t *f1)
 {}

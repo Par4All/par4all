@@ -28,7 +28,5 @@ int func(int, double *);
 //     be updated by the user with READ and WRITE effects on
 //     formal parameters to be useful...
 //
-int func(f1, f2)
-int f1;
-double * f2;
+int func(int f1, double *f2)
 {}

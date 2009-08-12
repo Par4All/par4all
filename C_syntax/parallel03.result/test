@@ -62,17 +62,17 @@ void parallel03()
 
 Parallelization in Fortran (if one of the resources can be made obsolete)
 
-void parallel03()
-{
-   double x[10];
-   double y[10];
-   int i;
+      SUBROUTINE parallel03
+      INTEGER i
+      REAL*8 x(0:10-1), y(0:10-1)
+      y(0) = 0.
 
-   y[0] = 0.;
-#pragma omp parallel for 
-   for(i = 1; i <= 9; i += 1)
-      x[i] = (double) i;
-   for(i = 1; i <= 9; i += 1)
-      y[i] = y[i-1]+x[i];
-}
+!$OMP PARALLEL DO 
+      DO i = 1, 9
+         x(i) = (REAL*8()) i
+      ENDDO
+      DO i = 1, 9
+         y(i) = y(i-1)+x(i)
+      ENDDO
+      END
 

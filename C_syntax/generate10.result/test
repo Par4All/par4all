@@ -1,0 +1,51 @@
+
+Parsed printed file
+
+void generate10()
+{
+   extern int func(int a, ...);
+   int i;
+   int j;
+   int k;
+
+   func(i, j, k);
+}
+
+Printed file
+
+void generate10()
+{
+   extern int func(int a, ...);
+   int i;
+   int j;
+   int k;
+
+   func(i, j, k);
+}
+
+Printed file generate10 with intraprocedural preconditions
+
+
+//  P() {}
+
+void generate10()
+{
+   extern int func(int a, ...);
+   int i;
+   int j;
+   int k;
+
+//  P() {}
+
+
+   func(i, j, k);
+}
+
+Printed file func with intraprocedural preconditions
+
+
+//  P() {}
+
+int func(int a, ...)
+{
+}
