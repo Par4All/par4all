@@ -19,6 +19,40 @@ freia_status one_pipe(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 
    return FREIA_OK;                                                     /*0020*/
 }
+freia_status one_more_pipe(freia_data2d *o, freia_data2d *i, int32_t *k, int32_t inf, int32_t sup, bool bin, int32_t *m, int32_t *v)
+{
+   freia_data2d *t0 = freia_common_create_data(16, 128, 128);
+   freia_data2d t1 = freia_common_create_data(16, 128, 128);
+   freia_data2d t2 = freia_common_create_data(16, 128, 128);
+   freia_data2d t3 = freia_common_create_data(16, 128, 128);
+   freia_data2d t4 = freia_common_create_data(16, 128, 128);
+   
+   // to test operator compaction
+   // t0 = erode(i)
+   // t1 = dilate(i)
+   // t2 = t0 - t1
+   // t3 = threshold(t2)
+   // t4 = threshold(t0)
+   // v  = vol(t3)
+   // m  = min(t4)
+   // o  = t4 + t3
+   freia_aipo_erode_8c(t0, i, k);                                       /*0089*/
+   freia_aipo_dilate_6c(t1, i, k);                                      /*0090*/
+   freia_aipo_sub(t2, t1, t0);                                          /*0091*/
+   freia_aipo_threshold(t3, t2, inf, sup, bin);                         /*0092*/
+   freia_aipo_threshold(t4, t0, inf, sup, bin);                         /*0093*/
+   freia_aipo_global_vol(t3, v);                                        /*0094*/
+   freia_aipo_global_min(t4, m);                                        /*0095*/
+   freia_aipo_add(o, t3, t4);                                           /*0096*/
+
+   freia_common_destruct_data(t0);                                      /*0098*/
+   freia_common_destruct_data(t1);                                      /*0099*/
+   freia_common_destruct_data(t2);                                      /*0100*/
+   freia_common_destruct_data(t3);                                      /*0101*/
+   freia_common_destruct_data(t4);                                      /*0102*/
+
+   return FREIA_OK;                                                     /*0104*/
+}
 freia_status one_big_pipe(freia_data2d *o, freia_data2d *i0, freia_data2d *i1, int32_t c1, int32_t c2, int32_t c3, int32_t c4, int32_t c5)
 {
    freia_data2d *t1 = freia_common_create_data(16, 128, 128);
@@ -62,9 +96,9 @@ freia_status two_pipes(freia_data2d *o0, freia_data2d *o1, freia_data2d *i0, fre
    // two pipeline calls are necessary
    // o0 = i0 * i1
    // o1 = i0 & i1
-   freia_aipo_mul(o0, i0, i1);                                          /*0074*/
-   freia_aipo_and(o1, i0, i1);                                          /*0075*/
-   return FREIA_OK;                                                     /*0076*/
+   freia_aipo_mul(o0, i0, i1);                                          /*0114*/
+   freia_aipo_and(o1, i0, i1);                                          /*0115*/
+   return FREIA_OK;                                                     /*0116*/
 }
 freia_status three_pipes(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 {
@@ -75,14 +109,14 @@ freia_status three_pipes(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
    // t1 = i0 * i1
    // t2 = i0 & i1
    // o  = t1 | t2
-   freia_aipo_mul(t1, i0, i1);                                          /*0090*/
-   freia_aipo_and(t2, i0, i1);                                          /*0091*/
-   freia_aipo_or(o, t1, t2);                                            /*0092*/
+   freia_aipo_mul(t1, i0, i1);                                          /*0130*/
+   freia_aipo_and(t2, i0, i1);                                          /*0131*/
+   freia_aipo_or(o, t1, t2);                                            /*0132*/
 
-   freia_common_destruct_data(t1);                                      /*0094*/
-   freia_common_destruct_data(t2);                                      /*0095*/
+   freia_common_destruct_data(t1);                                      /*0134*/
+   freia_common_destruct_data(t2);                                      /*0135*/
 
-   return FREIA_OK;                                                     /*0097*/
+   return FREIA_OK;                                                     /*0137*/
 }
 
 ! accelerated functions
@@ -185,6 +219,92 @@ freia_status one_big_pipe_helper_0(freia_data2d * o0, freia_data2d * i0, freia_d
 
   // get reductions
   freia_cg_read_reduction_results(&redres);
+
+  return ret;
+}
+#include <freiaCommon.h>
+#include <freiaCoarseGrain.h>
+#include <spoc.h>
+
+// FREIA-SPoC helper function for module one_more_pipe
+freia_status one_more_pipe_helper_0(freia_data2d * o0, freia_data2d * i0, int32_t *kern0, int32_t *kern1, int32_t inf2, int32_t sup3, bool bin4, int32_t inf5, int32_t sup6, bool bin7, int32_t * red8, int32_t * red9)
+{
+  spoc_instr si;
+  spoc_param sp;
+  spoc_reduction reduc;
+  freia_microcode mcode;
+  freia_dynamic_param dynparam;
+  freia_reduction_results redres;
+  freia_op_sel op = 0;
+  freia_op_param param;
+  freia_status ret;
+
+  // init pipe to nop
+  spoc_init_pipe(&si, &sp, 16);
+
+  // stage 0
+  si.poc[0][0].op=SPOC_POC_ERODE;
+  si.poc[0][0].grid=SPOC_POC_8_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[0][0].kernel[i] = kern0[i];
+
+  // stage 1
+  si.poc[1][0].op=SPOC_POC_DILATE;
+  si.poc[1][0].grid=SPOC_POC_6_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[1][0].kernel[i] = kern1[i];
+
+  // stage 2
+  si.alu[2][0].op = SPOC_ALU_SUB_IN0_IN1;
+
+  // ??? what about setting links?
+  si.mux[2][0].op = SPOC_MUX_IN1;
+  si.mux[2][2].op = SPOC_MUX_IN0;
+
+  // stage 3
+  si.th[3][0].op =    (bin4)? SPOC_TH_BINARIZE : SPOC_TH_NO_BINARIZE;
+  sp.th[3][0].boundmin = inf2;
+  sp.th[3][0].boundmax = sup3;
+
+  // stage 4
+  si.th[4][0].op =    (bin7)? SPOC_TH_BINARIZE : SPOC_TH_NO_BINARIZE;
+  sp.th[4][0].boundmin = inf5;
+  sp.th[4][0].boundmax = sup6;
+
+  // stage 5
+
+  // stage 6
+
+  // stage 7
+  si.alu[7][0].op = SPOC_ALU_ADD_IN0_IN1;
+
+  // ??? what about setting links?
+  si.mux[7][0].op = SPOC_MUX_IN1;
+  si.mux[7][2].op = SPOC_MUX_IN0;
+
+  mcode.raw = (freia_ptr) &si;
+  mcode.size = sizeof(spoc_instr);
+
+  dynparam.raw = (freia_ptr) &sp;
+  dynparam.size = sizeof(spoc_param);
+
+  redres.raw = (freia_ptr) &reduc;
+  redres.size = sizeof(spoc_reduction);
+
+  ret = freia_cg_write_microcode(&mcode);
+  ret |= freia_cg_write_dynamic_param(&dynparam);
+
+  // actual call of spoc hardware
+  freia_cg_template_process_1i_1o(op, param, o0, i0);
+
+  // get reductions
+  freia_cg_read_reduction_results(&redres);
+
+  // get reduction results
+  *red8 = (int32_t) reduc.measure[5][0].volume;
+
+  // get reduction results
+  *red9 = (int32_t) reduc.measure[6][0].minimum;
 
   return ret;
 }
@@ -494,6 +614,33 @@ freia_status one_pipe(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 
    return FREIA_OK;                                                     /*0020*/
 }
+freia_status one_more_pipe(freia_data2d *o, freia_data2d *i, int32_t *k, int32_t inf, int32_t sup, bool bin, int32_t *m, int32_t *v)
+{
+   freia_data2d *t0 = freia_common_create_data(16, 128, 128);
+   freia_data2d t1 = freia_common_create_data(16, 128, 128);
+   freia_data2d t2 = freia_common_create_data(16, 128, 128);
+   freia_data2d t3 = freia_common_create_data(16, 128, 128);
+   freia_data2d t4 = freia_common_create_data(16, 128, 128);
+   
+   // to test operator compaction
+   // t0 = erode(i)
+   // t1 = dilate(i)
+   // t2 = t0 - t1
+   // t3 = threshold(t2)
+   // t4 = threshold(t0)
+   // v  = vol(t3)
+   // m  = min(t4)
+   // o  = t4 + t3
+   one_more_pipe_helper_0(o, i, k, k, inf, sup, bin, inf, sup, bin, v, m);             /*0096*/
+
+   freia_common_destruct_data(t0);                                      /*0098*/
+   freia_common_destruct_data(t1);                                      /*0099*/
+   freia_common_destruct_data(t2);                                      /*0100*/
+   freia_common_destruct_data(t3);                                      /*0101*/
+   freia_common_destruct_data(t4);                                      /*0102*/
+
+   return FREIA_OK;                                                     /*0104*/
+}
 freia_status one_big_pipe(freia_data2d *o, freia_data2d *i0, freia_data2d *i1, int32_t c1, int32_t c2, int32_t c3, int32_t c4, int32_t c5)
 {
    freia_data2d *t1 = freia_common_create_data(16, 128, 128);
@@ -530,9 +677,9 @@ freia_status two_pipes(freia_data2d *o0, freia_data2d *o1, freia_data2d *i0, fre
    // two pipeline calls are necessary
    // o0 = i0 * i1
    // o1 = i0 & i1
-   two_pipes_helper_1(o0, i0, i1);                                      /*0074*/
-   two_pipes_helper_0(o1, i0, i1);                                      /*0075*/
-   return FREIA_OK;                                                     /*0076*/
+   two_pipes_helper_1(o0, i0, i1);                                      /*0114*/
+   two_pipes_helper_0(o1, i0, i1);                                      /*0115*/
+   return FREIA_OK;                                                     /*0116*/
 }
 freia_status three_pipes(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 {
@@ -543,12 +690,12 @@ freia_status three_pipes(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
    // t1 = i0 * i1
    // t2 = i0 & i1
    // o  = t1 | t2
-   three_pipes_helper_2(t1, i0, i1);                                    /*0090*/
-   three_pipes_helper_1(t2, i0, i1);                                    /*0091*/
-   three_pipes_helper_0(o, t1, t2);                                     /*0092*/
+   three_pipes_helper_2(t1, i0, i1);                                    /*0130*/
+   three_pipes_helper_1(t2, i0, i1);                                    /*0131*/
+   three_pipes_helper_0(o, t1, t2);                                     /*0132*/
 
-   freia_common_destruct_data(t1);                                      /*0094*/
-   freia_common_destruct_data(t2);                                      /*0095*/
+   freia_common_destruct_data(t1);                                      /*0134*/
+   freia_common_destruct_data(t2);                                      /*0135*/
 
-   return FREIA_OK;                                                     /*0097*/
+   return FREIA_OK;                                                     /*0137*/
 }
