@@ -1,6 +1,7 @@
 // Minimal self contained types for these headers
 typedef struct __freia_data2d * freia_data2d;
 typedef enum { FREIA_OK, FREIA_ERROR } freia_status;
+typedef enum { false, true } bool;
 typedef int int32_t;
 typedef unsigned int uint32_t; // ??? for convolution & correlation
 
@@ -48,7 +49,7 @@ extern freia_status freia_aipo_global_vol(freia_data2d *, int32_t *);
 extern freia_status freia_aipo_copy(freia_data2d *, freia_data2d *);
 extern freia_status freia_aipo_cast(freia_data2d *, freia_data2d *);
 extern freia_status freia_aipo_set_constant(freia_data2d *, int32_t);
-extern freia_status freia_aipo_threshold(freia_data2d *, freia_data2d *, int32_t, int32_t,int32_t);
+extern freia_status freia_aipo_threshold(freia_data2d *, freia_data2d *, int32_t, int32_t, bool);
 // Morpho
 extern freia_status freia_aipo_erode_8c(freia_data2d *, freia_data2d *, int32_t *);
 extern freia_status freia_aipo_dilate_8c(freia_data2d *, freia_data2d *, int32_t *);

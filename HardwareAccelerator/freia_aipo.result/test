@@ -3,6 +3,7 @@
 
 typedef struct __freia_data2d *freia_data2d;
 typedef enum {FREIA_OK, FREIA_ERROR} freia_status;
+typedef enum {false, true} bool;
 typedef int int32_t;
 typedef unsigned int uint32_t;
 extern freia_data2d *freia_common_create_data(uint32_t, uint32_t, uint32_t);
@@ -42,7 +43,7 @@ extern freia_status freia_aipo_global_vol(freia_data2d *, int32_t *);
 extern freia_status freia_aipo_copy(freia_data2d *, freia_data2d *);
 extern freia_status freia_aipo_cast(freia_data2d *, freia_data2d *);
 extern freia_status freia_aipo_set_constant(freia_data2d *, int32_t);
-extern freia_status freia_aipo_threshold(freia_data2d *, freia_data2d *, int32_t, int32_t, int32_t);
+extern freia_status freia_aipo_threshold(freia_data2d *, freia_data2d *, int32_t, int32_t, bool);
 extern freia_status freia_aipo_erode_8c(freia_data2d *, freia_data2d *, int32_t *);
 extern freia_status freia_aipo_dilate_8c(freia_data2d *, freia_data2d *, int32_t *);
 extern freia_status freia_aipo_erode_6c(freia_data2d *, freia_data2d *, int32_t *);
@@ -927,7 +928,7 @@ freia_status my_erode_8c_helper_0(freia_data2d * o0, freia_data2d * i0, int32_t 
 
   // stage 0
   si.poc[0][0].op=SPOC_POC_ERODE;
-  si.poc[0][0].grid=SPOC_POC_6_CONNEX;
+  si.poc[0][0].grid=SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
     sp.poc[0][0].kernel[i] = kern0[i];
 
@@ -1990,6 +1991,7 @@ freia_status my_xor_helper_0(freia_data2d * o0, freia_data2d * i0, freia_data2d 
 
 typedef struct __freia_data2d *freia_data2d;
 typedef enum {FREIA_OK, FREIA_ERROR} freia_status;
+typedef enum {false, true} bool;
 typedef int int32_t;
 typedef unsigned int uint32_t;
 extern freia_data2d *freia_common_create_data(uint32_t, uint32_t, uint32_t);
@@ -2029,7 +2031,7 @@ extern freia_status freia_aipo_global_vol(freia_data2d *, int32_t *);
 extern freia_status freia_aipo_copy(freia_data2d *, freia_data2d *);
 extern freia_status freia_aipo_cast(freia_data2d *, freia_data2d *);
 extern freia_status freia_aipo_set_constant(freia_data2d *, int32_t);
-extern freia_status freia_aipo_threshold(freia_data2d *, freia_data2d *, int32_t, int32_t, int32_t);
+extern freia_status freia_aipo_threshold(freia_data2d *, freia_data2d *, int32_t, int32_t, bool);
 extern freia_status freia_aipo_erode_8c(freia_data2d *, freia_data2d *, int32_t *);
 extern freia_status freia_aipo_dilate_8c(freia_data2d *, freia_data2d *, int32_t *);
 extern freia_status freia_aipo_erode_6c(freia_data2d *, freia_data2d *, int32_t *);
