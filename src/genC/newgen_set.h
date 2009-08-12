@@ -57,8 +57,22 @@ typedef enum {
 	     set_private_get_hash_table(the_set));			\
   }
 
-// Ronan, I wish to avoid an ugly double macro expansion hack here.
-// Just change the scalar variable name if need be.
+/**
+ * enumerate set elements in their internal order.
+ * caution, this enumeration is not deterministic!
+ *
+ * SET_FOREACH(var_type, var, set_instance) {
+ *   instructions;
+ * }
+ *
+ * note that due to variables which are declared in the current scope:
+ * - the "var" name must be unique in the scope.
+ * - put braces around the macro when using it as a loop body or
+ *   condition case.
+ *
+ * Ronan, I wish to avoid an ugly double macro expansion hack here.
+ * Just change the scalar variable name "var" if need be.
+ */
 #define SET_FOREACH(type_name, the_item, the_set)			\
   hash_table _hash_##the_item##_##the_set =				\
     set_private_get_hash_table(the_set);				\
