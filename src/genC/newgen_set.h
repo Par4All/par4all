@@ -90,7 +90,9 @@ extern set set_del_element(set, set, void *);
 extern set set_delfree_element(set, set, void *);
 extern void gen_set_closure_iterate(void (*)(void *, set), set, bool);
 extern void gen_set_closure(void (*)(void *, set), set);
-// conversions
+// CONVERSIONS
+extern string set_to_string(string, set, string(*)(void *));
+extern void set_fprint(FILE *, string, set, string(*)(void *));
 extern list set_to_sorted_list(set, int (*)(const void *, const void *));
 // no not use set_to_list, the output is not deterministic
 extern list set_to_list(set);

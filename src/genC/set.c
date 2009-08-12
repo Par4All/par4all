@@ -393,3 +393,53 @@ set set_assign_list(set s, list l)
   set_clear(s);
   return set_append_list(s, l);
 }
+
+/************************************************** UTILITIES FOR DEBUGGING */
+
+#include "newgen_string_buffer.h"
+
+/* convert set s to a string_buffer
+ * used internally, but may be exported if needed.
+ */
+static string_buffer
+set_to_string_buffer(string name, set s, string(*item_name)(void *))
+{
+  string_buffer sb = string_buffer_make(true);
+  if (name)
+    string_buffer_cat(sb, name, " = { ", NULL);
+  else
+    string_buffer_append(sb, "{ ");
+
+  bool first = true;
+  SET_MAP(i,
+    {
+      if (first) first = false;
+      else string_buffer_append(sb, ", ");
+      string_buffer_append(sb, item_name(i));
+    }
+	  , s);
+  string_buffer_append(sb, " }");
+  return sb;
+}
+
+/* return allocated string for set s
+ * @param name set description
+ * @param s the set
+ * @param item_name user function to build a string for each item
+ */
+string set_to_string(string name, set s, string (*item_name)(void *))
+{
+  string_buffer sb = set_to_string_buffer(name, s, item_name);
+  string res = string_buffer_to_string(sb);
+  string_buffer_free(&sb);
+  return res;
+}
+
+/* print set s to file stream out.
+ */
+void set_fprint(FILE * out, string name, set s, string(*item_name)(void *))
+{
+  string_buffer sb = set_to_string_buffer(name, s, item_name);
+  string_buffer_to_file(sb, out);
+  string_buffer_free(&sb);
+}
