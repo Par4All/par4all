@@ -155,14 +155,6 @@ set set_add_element(set s1, set s2, void * e)
  */
 bool set_belong_p(set s, void * e)
 {
-  /* GO 7/8/95:
-       Problem for set_string type because the value returned by
-       hash_get is not the same than the pointer value, only the
-       content of the string is the same ...
-
-       return( hash_get(s->table, (char *) e) == (char *) e) ;
-  */
-
   return hash_get(s->table, e) != HASH_UNDEFINED_VALUE;
 }
 
@@ -248,28 +240,28 @@ set set_delfree_element(set s1, set s2, void * e)
   return s1;
 }
 
-/* predicate set_emtpty_p but predicate set_equal without suffix _p */
-bool set_equal(set s1, set s2)
+/* return whether s1 \in s2
+ */
+bool set_inclusion_p(set s1, set s2)
 {
-  bool equal = true;
-  HASH_MAP( k, ignore, {
-      if( hash_get( s2->table, k ) == HASH_UNDEFINED_VALUE )
-	return false;
-    }, s1->table);
-  HASH_MAP(k, ignore, {
-      if( hash_get( s1->table, k ) == HASH_UNDEFINED_VALUE )
-	return false;
-    }, s2->table);
-  return equal;
+  SET_MAP(i, if (!set_belong_p(s2, i)) return false, s1);
+  return true;
+}
+
+/* returns whether s1 == s2
+ */
+bool set_equal_p(set s1, set s2)
+{
+  return set_inclusion_p(s1, s2) && set_inclusion_p(s2, s1);
 }
 
 /* Assign the empty set to s
- *
- * To be consistent, s should be returned, no?
+ * s := {}
  */
-void set_clear(set s)
+set set_clear(set s)
 {
   hash_table_clear(s->table);
+  return s;
 }
 
 void set_free(set s)
@@ -286,6 +278,7 @@ int set_size(set s)
 }
 
 /* tell whether set s is empty.
+ * returnn s=={}
  */
 bool set_empty_p(set s)
 {

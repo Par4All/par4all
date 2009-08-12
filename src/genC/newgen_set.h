@@ -48,43 +48,51 @@ typedef enum {
 #define set_undefined ((set)(-16))
 #define set_undefined_p(s) ((s)==set_undefined)
 
+// old compatibility, do not use
+#define set_equal(s1,s2) set_equal_p(s1,s2)
+
 #define SET_MAP(element,code,the_set)					\
   {									\
     HASH_MAP(_set_map_key, element, code,				\
 	     set_private_get_hash_table(the_set));			\
   }
 
-/* functions declared in set.c */
-extern set set_generic_make(set_type typ,
-			    hash_equals_t equals_p,
-			    hash_rank_t rank);
-extern set set_make(set_type typ);
-extern set set_singleton(set_type type, void *p);
-extern set set_assign(set s1, set s2);
+/* functions implemented in set.c */
+// CONSTRUCTORS
+extern set set_generic_make(set_type, hash_equals_t, hash_rank_t);
+extern set set_make(set_type);
+extern set set_singleton(set_type, void *);
 extern set set_dup(set);
+// DESTRUCTOR
+extern void set_free(set);
+// OBSERVERS
 extern int set_size(set);
-extern set set_add_element(set s1, set s2, void *e);
+extern int set_own_allocated_memory(set);
+extern set_type set_get_type(set);
+// do not call this one, please...
+extern hash_table set_private_get_hash_table(set);
+// TESTS
 extern bool set_belong_p(set s, void *e);
 extern bool list_in_set_p(list, set);
-extern set set_union(set s1, set s2, set s3);
-extern set set_intersection(set s1, set s2, set s3);
-extern set set_difference(set s1, set s2, set s3);
-extern set set_del_element(set s1, set s2, void *e);
-extern set set_delfree_element(set s1, set s2, void *e);
-extern bool set_equal(set s1, set s2);
-extern void set_clear(set s);
-extern void set_free(set s);
-extern bool set_empty_p(set s);
-extern void gen_set_closure_iterate(void (*iterate)(void *, set), set initial, bool dont_iterate_twice);
-extern void gen_set_closure(void (*iterate)(void *, set), set initial);
-extern int set_own_allocated_memory(set s);
-extern list set_to_list(set);
-extern list set_to_sorted_list(set, int (*)(const void *, const void *));
+extern bool set_equal_p(set, set);
+extern bool set_empty_p(set);
+extern bool set_inclusion_p(set, set);
+// OPERATIONS
+extern set set_clear(set);
+extern set set_assign(set, set);
 extern set set_append_list(set, list);
 extern set set_assign_list(set, list);
-extern set_type set_get_type(set);
+extern set set_add_element(set, set, void *);
+extern set set_union(set, set, set);
+extern set set_intersection(set, set, set);
+extern set set_difference(set, set, set);
+extern set set_del_element(set, set, void *);
+extern set set_delfree_element(set, set, void *);
+extern void gen_set_closure_iterate(void (*)(void *, set), set, bool);
+extern void gen_set_closure(void (*)(void *, set), set);
+// conversions
+extern list set_to_sorted_list(set, int (*)(const void *, const void *));
+// no not use set_to_list, the output is not deterministic
+extern list set_to_list(set);
 
-// do not call me please...
-extern hash_table set_private_get_hash_table(set);
-
-#endif
+#endif // SET_INCLUDED
