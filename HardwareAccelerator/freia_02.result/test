@@ -19,6 +19,44 @@ freia_status one_pipe(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 
    return FREIA_OK;                                                     /*0020*/
 }
+freia_status one_big_pipe(freia_data2d *o, freia_data2d *i0, freia_data2d *i1, int32_t c1, int32_t c2, int32_t c3, int32_t c4, int32_t c5)
+{
+   freia_data2d *t1 = freia_common_create_data(16, 128, 128);
+   freia_data2d *t2 = freia_common_create_data(16, 128, 128);
+   freia_data2d *t3 = freia_common_create_data(16, 128, 128);
+   freia_data2d *t4 = freia_common_create_data(16, 128, 128);
+   freia_data2d *t5 = freia_common_create_data(16, 128, 128);
+   freia_data2d *t6 = freia_common_create_data(16, 128, 128);
+   freia_data2d *t7 = freia_common_create_data(16, 128, 128);
+   
+   // 1 pipeline call is enough
+   // t1 = f(i0)
+   // t2 = g(i1)
+   // t3 = t1 + t2
+   // t4 = h(t1)
+   // t5 = i(t3)
+   // t6 = t4 & t5
+   // t7 = m()
+   // o  = t6 * t7
+   freia_aipo_add_const(t1, i0, c1);                                    /*0047*/
+   freia_aipo_addsat_const(t2, i1, c2);                                 /*0048*/
+   freia_aipo_add(t3, t1, t2);                                          /*0049*/
+   freia_aipo_mul_const(t4, t1, c3);                                    /*0050*/
+   freia_aipo_div_const(t5, t3, c4);                                    /*0051*/
+   freia_aipo_and(t6, t4, t5);                                          /*0052*/
+   freia_aipo_set_constant(t7, c5);                                     /*0053*/
+   freia_aipo_mul(o, t6, t7);                                           /*0054*/
+
+   freia_common_destruct_data(t1);                                      /*0056*/
+   freia_common_destruct_data(t2);                                      /*0057*/
+   freia_common_destruct_data(t3);                                      /*0058*/
+   freia_common_destruct_data(t4);                                      /*0059*/
+   freia_common_destruct_data(t5);                                      /*0060*/
+   freia_common_destruct_data(t6);                                      /*0061*/
+   freia_common_destruct_data(t7);                                      /*0062*/
+
+   return FREIA_OK;                                                     /*0064*/
+}
 freia_status two_pipes(freia_data2d *o0, freia_data2d *o1, freia_data2d *i0, freia_data2d *i1)
 {
    // two pipeline calls are necessary
@@ -31,6 +69,107 @@ freia_status two_pipes(freia_data2d *o0, freia_data2d *o1, freia_data2d *i0, fre
 
 ! accelerated functions
 
+#include <freiaCommon.h>
+#include <freiaCoarseGrain.h>
+#include <spoc.h>
+
+// FREIA-SPoC helper function for module one_big_pipe
+freia_status one_big_pipe_helper_0(freia_data2d * o0, freia_data2d * i0, freia_data2d * i1, int32_t cst0, int32_t cst1, int32_t cst2, int32_t cst3, int32_t cst4)
+{
+  spoc_instr si;
+  spoc_param sp;
+  spoc_reduction reduc;
+  freia_microcode mcode;
+  freia_dynamic_param dynparam;
+  freia_reduction_results redres;
+  freia_op_sel op = 0;
+  freia_op_param param;
+  freia_status ret;
+
+  // init pipe to nop
+  spoc_init_pipe(&si, &sp, 16);
+
+  // stage 0
+  si.alu[0][0].op = SPOC_ALU_ADD_IN0_CONST;
+  si.alu[0][0].constant = cst0;
+
+  // ??? what about setting links?
+  si.mux[0][0].op = SPOC_MUX_IN1;
+  si.mux[0][2].op = SPOC_MUX_IN0;
+
+  // stage 1
+  si.alu[1][0].op = SPOC_ALU_ADDSAT_IN0_CONST;
+  si.alu[1][0].constant = cst1;
+
+  // ??? what about setting links?
+  si.mux[1][0].op = SPOC_MUX_IN1;
+  si.mux[1][2].op = SPOC_MUX_IN0;
+
+  // stage 2
+  si.alu[2][0].op = SPOC_ALU_ADD_IN0_IN1;
+
+  // ??? what about setting links?
+  si.mux[2][0].op = SPOC_MUX_IN1;
+  si.mux[2][2].op = SPOC_MUX_IN0;
+
+  // stage 3
+  si.alu[3][0].op = SPOC_ALU_MUL_IN0_CONST;
+  si.alu[3][0].constant = cst2;
+
+  // ??? what about setting links?
+  si.mux[3][0].op = SPOC_MUX_IN1;
+  si.mux[3][2].op = SPOC_MUX_IN0;
+
+  // stage 4
+  si.alu[4][0].op = SPOC_ALU_DIV_IN0_CONST;
+  si.alu[4][0].constant = cst3;
+
+  // ??? what about setting links?
+  si.mux[4][0].op = SPOC_MUX_IN1;
+  si.mux[4][2].op = SPOC_MUX_IN0;
+
+  // stage 5
+  si.alu[5][0].op = SPOC_ALU_AND_IN0_IN1;
+
+  // ??? what about setting links?
+  si.mux[5][0].op = SPOC_MUX_IN1;
+  si.mux[5][2].op = SPOC_MUX_IN0;
+
+  // stage 6
+  si.alu[6][0].op = SPOC_ALU_COPY_CONST;
+  si.alu[6][0].constant = cst4;
+
+  // ??? what about setting links?
+  si.mux[6][0].op = SPOC_MUX_IN1;
+  si.mux[6][2].op = SPOC_MUX_IN0;
+
+  // stage 7
+  si.alu[7][0].op = SPOC_ALU_MUL_IN0_IN1;
+
+  // ??? what about setting links?
+  si.mux[7][0].op = SPOC_MUX_IN1;
+  si.mux[7][2].op = SPOC_MUX_IN0;
+
+  mcode.raw = (freia_ptr) &si;
+  mcode.size = sizeof(spoc_instr);
+
+  dynparam.raw = (freia_ptr) &sp;
+  dynparam.size = sizeof(spoc_param);
+
+  redres.raw = (freia_ptr) &reduc;
+  redres.size = sizeof(spoc_reduction);
+
+  ret = freia_cg_write_microcode(&mcode);
+  ret |= freia_cg_write_dynamic_param(&dynparam);
+
+  // actual call of spoc hardware
+  freia_cg_template_process_2i_1o(op, param, o0, i0, i1);
+
+  // get reductions
+  freia_cg_read_reduction_results(&redres);
+
+  return ret;
+}
 #include <freiaCommon.h>
 #include <freiaCoarseGrain.h>
 #include <spoc.h>
@@ -113,7 +252,7 @@ freia_status two_pipes_helper_0(freia_data2d * o0, freia_data2d * i0, freia_data
   spoc_init_pipe(&si, &sp, 16);
 
   // stage 0
-  si.alu[0][0].op = SPOC_ALU_MUL_IN0_IN1;
+  si.alu[0][0].op = SPOC_ALU_AND_IN0_IN1;
 
   // ??? what about setting links?
   si.mux[0][0].op = SPOC_MUX_IN1;
@@ -157,7 +296,7 @@ freia_status two_pipes_helper_1(freia_data2d * o0, freia_data2d * i0, freia_data
   spoc_init_pipe(&si, &sp, 16);
 
   // stage 0
-  si.alu[0][0].op = SPOC_ALU_AND_IN0_IN1;
+  si.alu[0][0].op = SPOC_ALU_MUL_IN0_IN1;
 
   // ??? what about setting links?
   si.mux[0][0].op = SPOC_MUX_IN1;
@@ -203,12 +342,49 @@ freia_status one_pipe(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 
    return FREIA_OK;                                                     /*0020*/
 }
+freia_status one_big_pipe(freia_data2d *o, freia_data2d *i0, freia_data2d *i1, int32_t c1, int32_t c2, int32_t c3, int32_t c4, int32_t c5)
+{
+   freia_data2d *t1 = freia_common_create_data(16, 128, 128);
+   freia_data2d *t2 = freia_common_create_data(16, 128, 128);
+   freia_data2d *t3 = freia_common_create_data(16, 128, 128);
+   freia_data2d *t4 = freia_common_create_data(16, 128, 128);
+   freia_data2d *t5 = freia_common_create_data(16, 128, 128);
+   freia_data2d *t6 = freia_common_create_data(16, 128, 128);
+   freia_data2d *t7 = freia_common_create_data(16, 128, 128);
+   
+   // 1 pipeline call is enough
+   // t1 = f(i0)
+   // t2 = g(i1)
+   // t3 = t1 + t2
+   // t4 = h(t1)
+   // t5 = i(t3)
+   // t6 = t4 & t5
+   // t7 = m()
+   // o  = t6 * t7
+   ;
+   ;
+   ;
+   ;
+   ;
+   ;
+   one_big_pipe_helper_0(o, i1, i0, c1, c2, c3, c4, c5);                /*0054*/
+
+   freia_common_destruct_data(t1);                                      /*0056*/
+   freia_common_destruct_data(t2);                                      /*0057*/
+   freia_common_destruct_data(t3);                                      /*0058*/
+   freia_common_destruct_data(t4);                                      /*0059*/
+   freia_common_destruct_data(t5);                                      /*0060*/
+   freia_common_destruct_data(t6);                                      /*0061*/
+   freia_common_destruct_data(t7);                                      /*0062*/
+
+   return FREIA_OK;                                                     /*0064*/
+}
 freia_status two_pipes(freia_data2d *o0, freia_data2d *o1, freia_data2d *i0, freia_data2d *i1)
 {
    // two pipeline calls are necessary
    // o0 = i0 * i1
    // o1 = i0 & i1
-   two_pipes_helper_0(o0, i0, i1);                                      /*0074*/
-   two_pipes_helper_1(o1, i0, i1);                                      /*0075*/
+   two_pipes_helper_1(o0, i0, i1);                                      /*0074*/
+   two_pipes_helper_0(o1, i0, i1);                                      /*0075*/
    return FREIA_OK;                                                     /*0076*/
 }
