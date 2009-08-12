@@ -36,3 +36,4 @@ clean: local-clean
 
 local-clean:
 	$(RM) $(INSTALL_DOC) *.aux *.toc *.idx *.ilg *.ind *.log *.dvi *.ps *.pdf *.out
+	$(RM) -r tpips-user-manual.htdoc
