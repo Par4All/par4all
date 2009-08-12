@@ -1,5 +1,5 @@
 delete freia_01
-#setenv PIPS_HWAC_DEBUG_LEVEL=9
+#setenv PIPS_HWAC_DEBUG_LEVEL=5
 create freia_01 freia_01.c
 activate C_PARSER
 setproperty PRETTYPRINT_C_CODE TRUE
@@ -11,7 +11,7 @@ apply HARDWARE_ACCELERATOR[freia_stuff]
 echo
 echo ! accelerated function
 echo
-shell cat ./freia_01.database/Src/freia_stuff_helper_0.c
+shell cat ./freia_01.database/Src/freia_stuff_helper_functions.c
 echo
 echo ! new function
 echo

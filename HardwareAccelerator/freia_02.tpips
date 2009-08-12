@@ -17,7 +17,7 @@ echo
 #apply HARDWARE_ACCELERATOR[one_big_pipe]
 apply HARDWARE_ACCELERATOR[two_pipes]
 #apply HARDWARE_ACCELERATOR[three_pipes]
-shell cat ./freia_02.database/Src/*_helper_*.c
+shell cat ./freia_02.database/Src/*_helper_functions.c
 echo
 echo ! new function
 echo

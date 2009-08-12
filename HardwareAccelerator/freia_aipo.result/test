@@ -250,6 +250,10 @@ freia_status my_xor_const(freia_data2d *o, freia_data2d *i0, int32_t p0)
 
 ! accelerated functions
 
+#include <freiaCommon.h>
+#include <freiaCoarseGrain.h>
+#include <spoc.h>
+
 // FREIA-SPoC helper function for module my_absdiff_const
 freia_status my_absdiff_const_helper_0(freia_data2d * o0, freia_data2d * i0, int32_t cst0)
 {
@@ -294,6 +298,10 @@ freia_status my_absdiff_const_helper_0(freia_data2d * o0, freia_data2d * i0, int
 
   return ret;
 }
+#include <freiaCommon.h>
+#include <freiaCoarseGrain.h>
+#include <spoc.h>
+
 // FREIA-SPoC helper function for module my_absdiff
 freia_status my_absdiff_helper_0(freia_data2d * o0, freia_data2d * i0, freia_data2d * i1)
 {
@@ -337,6 +345,10 @@ freia_status my_absdiff_helper_0(freia_data2d * o0, freia_data2d * i0, freia_dat
 
   return ret;
 }
+#include <freiaCommon.h>
+#include <freiaCoarseGrain.h>
+#include <spoc.h>
+
 // FREIA-SPoC helper function for module my_add_const
 freia_status my_add_const_helper_0(freia_data2d * o0, freia_data2d * i0, int32_t cst0)
 {
@@ -381,6 +393,10 @@ freia_status my_add_const_helper_0(freia_data2d * o0, freia_data2d * i0, int32_t
 
   return ret;
 }
+#include <freiaCommon.h>
+#include <freiaCoarseGrain.h>
+#include <spoc.h>
+
 // FREIA-SPoC helper function for module my_add
 freia_status my_add_helper_0(freia_data2d * o0, freia_data2d * i0, freia_data2d * i1)
 {
@@ -424,6 +440,10 @@ freia_status my_add_helper_0(freia_data2d * o0, freia_data2d * i0, freia_data2d 
 
   return ret;
 }
+#include <freiaCommon.h>
+#include <freiaCoarseGrain.h>
+#include <spoc.h>
+
 // FREIA-SPoC helper function for module my_addsat_const
 freia_status my_addsat_const_helper_0(freia_data2d * o0, freia_data2d * i0, int32_t cst0)
 {
@@ -468,6 +488,10 @@ freia_status my_addsat_const_helper_0(freia_data2d * o0, freia_data2d * i0, int3
 
   return ret;
 }
+#include <freiaCommon.h>
+#include <freiaCoarseGrain.h>
+#include <spoc.h>
+
 // FREIA-SPoC helper function for module my_addsat
 freia_status my_addsat_helper_0(freia_data2d * o0, freia_data2d * i0, freia_data2d * i1)
 {
@@ -511,6 +535,10 @@ freia_status my_addsat_helper_0(freia_data2d * o0, freia_data2d * i0, freia_data
 
   return ret;
 }
+#include <freiaCommon.h>
+#include <freiaCoarseGrain.h>
+#include <spoc.h>
+
 // FREIA-SPoC helper function for module my_and_const
 freia_status my_and_const_helper_0(freia_data2d * o0, freia_data2d * i0, int32_t cst0)
 {
@@ -555,6 +583,10 @@ freia_status my_and_const_helper_0(freia_data2d * o0, freia_data2d * i0, int32_t
 
   return ret;
 }
+#include <freiaCommon.h>
+#include <freiaCoarseGrain.h>
+#include <spoc.h>
+
 // FREIA-SPoC helper function for module my_and
 freia_status my_and_helper_0(freia_data2d * o0, freia_data2d * i0, freia_data2d * i1)
 {
@@ -598,6 +630,10 @@ freia_status my_and_helper_0(freia_data2d * o0, freia_data2d * i0, freia_data2d 
 
   return ret;
 }
+#include <freiaCommon.h>
+#include <freiaCoarseGrain.h>
+#include <spoc.h>
+
 // FREIA-SPoC helper function for module my_copy
 freia_status my_copy_helper_0(freia_data2d * o0, freia_data2d * i0)
 {
@@ -636,6 +672,10 @@ freia_status my_copy_helper_0(freia_data2d * o0, freia_data2d * i0)
 
   return ret;
 }
+#include <freiaCommon.h>
+#include <freiaCoarseGrain.h>
+#include <spoc.h>
+
 // FREIA-SPoC helper function for module my_dilate_6c
 freia_status my_dilate_6c_helper_0(freia_data2d * o0, freia_data2d * i0, int32_t *kern0)
 {
@@ -678,6 +718,10 @@ freia_status my_dilate_6c_helper_0(freia_data2d * o0, freia_data2d * i0, int32_t
 
   return ret;
 }
+#include <freiaCommon.h>
+#include <freiaCoarseGrain.h>
+#include <spoc.h>
+
 // FREIA-SPoC helper function for module my_dilate_8c
 freia_status my_dilate_8c_helper_0(freia_data2d * o0, freia_data2d * i0, int32_t *kern0)
 {
@@ -720,6 +764,10 @@ freia_status my_dilate_8c_helper_0(freia_data2d * o0, freia_data2d * i0, int32_t
 
   return ret;
 }
+#include <freiaCommon.h>
+#include <freiaCoarseGrain.h>
+#include <spoc.h>
+
 // FREIA-SPoC helper function for module my_div_const
 freia_status my_div_const_helper_0(freia_data2d * o0, freia_data2d * i0, int32_t cst0)
 {
@@ -764,6 +812,10 @@ freia_status my_div_const_helper_0(freia_data2d * o0, freia_data2d * i0, int32_t
 
   return ret;
 }
+#include <freiaCommon.h>
+#include <freiaCoarseGrain.h>
+#include <spoc.h>
+
 // FREIA-SPoC helper function for module my_div
 freia_status my_div_helper_0(freia_data2d * o0, freia_data2d * i0, freia_data2d * i1)
 {
@@ -807,6 +859,10 @@ freia_status my_div_helper_0(freia_data2d * o0, freia_data2d * i0, freia_data2d 
 
   return ret;
 }
+#include <freiaCommon.h>
+#include <freiaCoarseGrain.h>
+#include <spoc.h>
+
 // FREIA-SPoC helper function for module my_erode_6c
 freia_status my_erode_6c_helper_0(freia_data2d * o0, freia_data2d * i0, int32_t *kern0)
 {
@@ -849,6 +905,10 @@ freia_status my_erode_6c_helper_0(freia_data2d * o0, freia_data2d * i0, int32_t 
 
   return ret;
 }
+#include <freiaCommon.h>
+#include <freiaCoarseGrain.h>
+#include <spoc.h>
+
 // FREIA-SPoC helper function for module my_erode_8c
 freia_status my_erode_8c_helper_0(freia_data2d * o0, freia_data2d * i0, int32_t *kern0)
 {
@@ -891,6 +951,10 @@ freia_status my_erode_8c_helper_0(freia_data2d * o0, freia_data2d * i0, int32_t 
 
   return ret;
 }
+#include <freiaCommon.h>
+#include <freiaCoarseGrain.h>
+#include <spoc.h>
+
 // FREIA-SPoC helper function for module my_global_max_coord
 freia_status my_global_max_coord_helper_0(freia_data2d * i0, int32_t * red0, uint32_t * red1, uint32_t * red2)
 {
@@ -934,6 +998,10 @@ freia_status my_global_max_coord_helper_0(freia_data2d * i0, int32_t * red0, uin
 
   return ret;
 }
+#include <freiaCommon.h>
+#include <freiaCoarseGrain.h>
+#include <spoc.h>
+
 // FREIA-SPoC helper function for module my_global_max
 freia_status my_global_max_helper_0(freia_data2d * i0, int32_t * red0)
 {
@@ -975,6 +1043,10 @@ freia_status my_global_max_helper_0(freia_data2d * i0, int32_t * red0)
 
   return ret;
 }
+#include <freiaCommon.h>
+#include <freiaCoarseGrain.h>
+#include <spoc.h>
+
 // FREIA-SPoC helper function for module my_global_min_coord
 freia_status my_global_min_coord_helper_0(freia_data2d * i0, int32_t * red0, uint32_t * red1, uint32_t * red2)
 {
@@ -1018,6 +1090,10 @@ freia_status my_global_min_coord_helper_0(freia_data2d * i0, int32_t * red0, uin
 
   return ret;
 }
+#include <freiaCommon.h>
+#include <freiaCoarseGrain.h>
+#include <spoc.h>
+
 // FREIA-SPoC helper function for module my_global_min
 freia_status my_global_min_helper_0(freia_data2d * i0, int32_t * red0)
 {
@@ -1059,6 +1135,10 @@ freia_status my_global_min_helper_0(freia_data2d * i0, int32_t * red0)
 
   return ret;
 }
+#include <freiaCommon.h>
+#include <freiaCoarseGrain.h>
+#include <spoc.h>
+
 // FREIA-SPoC helper function for module my_global_vol
 freia_status my_global_vol_helper_0(freia_data2d * i0, int32_t * red0)
 {
@@ -1100,6 +1180,10 @@ freia_status my_global_vol_helper_0(freia_data2d * i0, int32_t * red0)
 
   return ret;
 }
+#include <freiaCommon.h>
+#include <freiaCoarseGrain.h>
+#include <spoc.h>
+
 // FREIA-SPoC helper function for module my_inf_const
 freia_status my_inf_const_helper_0(freia_data2d * o0, freia_data2d * i0, int32_t cst0)
 {
@@ -1144,6 +1228,10 @@ freia_status my_inf_const_helper_0(freia_data2d * o0, freia_data2d * i0, int32_t
 
   return ret;
 }
+#include <freiaCommon.h>
+#include <freiaCoarseGrain.h>
+#include <spoc.h>
+
 // FREIA-SPoC helper function for module my_inf
 freia_status my_inf_helper_0(freia_data2d * o0, freia_data2d * i0, freia_data2d * i1)
 {
@@ -1187,6 +1275,10 @@ freia_status my_inf_helper_0(freia_data2d * o0, freia_data2d * i0, freia_data2d 
 
   return ret;
 }
+#include <freiaCommon.h>
+#include <freiaCoarseGrain.h>
+#include <spoc.h>
+
 // FREIA-SPoC helper function for module my_mul_const
 freia_status my_mul_const_helper_0(freia_data2d * o0, freia_data2d * i0, int32_t cst0)
 {
@@ -1231,6 +1323,10 @@ freia_status my_mul_const_helper_0(freia_data2d * o0, freia_data2d * i0, int32_t
 
   return ret;
 }
+#include <freiaCommon.h>
+#include <freiaCoarseGrain.h>
+#include <spoc.h>
+
 // FREIA-SPoC helper function for module my_mul
 freia_status my_mul_helper_0(freia_data2d * o0, freia_data2d * i0, freia_data2d * i1)
 {
@@ -1274,6 +1370,10 @@ freia_status my_mul_helper_0(freia_data2d * o0, freia_data2d * i0, freia_data2d 
 
   return ret;
 }
+#include <freiaCommon.h>
+#include <freiaCoarseGrain.h>
+#include <spoc.h>
+
 // FREIA-SPoC helper function for module my_not
 freia_status my_not_helper_0(freia_data2d * o0, freia_data2d * i0)
 {
@@ -1317,6 +1417,10 @@ freia_status my_not_helper_0(freia_data2d * o0, freia_data2d * i0)
 
   return ret;
 }
+#include <freiaCommon.h>
+#include <freiaCoarseGrain.h>
+#include <spoc.h>
+
 // FREIA-SPoC helper function for module my_or_const
 freia_status my_or_const_helper_0(freia_data2d * o0, freia_data2d * i0, int32_t cst0)
 {
@@ -1361,6 +1465,10 @@ freia_status my_or_const_helper_0(freia_data2d * o0, freia_data2d * i0, int32_t 
 
   return ret;
 }
+#include <freiaCommon.h>
+#include <freiaCoarseGrain.h>
+#include <spoc.h>
+
 // FREIA-SPoC helper function for module my_or
 freia_status my_or_helper_0(freia_data2d * o0, freia_data2d * i0, freia_data2d * i1)
 {
@@ -1404,6 +1512,10 @@ freia_status my_or_helper_0(freia_data2d * o0, freia_data2d * i0, freia_data2d *
 
   return ret;
 }
+#include <freiaCommon.h>
+#include <freiaCoarseGrain.h>
+#include <spoc.h>
+
 // FREIA-SPoC helper function for module my_set_constant
 freia_status my_set_constant_helper_0(freia_data2d * o0, , int32_t cst0)
 {
@@ -1448,6 +1560,10 @@ freia_status my_set_constant_helper_0(freia_data2d * o0, , int32_t cst0)
 
   return ret;
 }
+#include <freiaCommon.h>
+#include <freiaCoarseGrain.h>
+#include <spoc.h>
+
 // FREIA-SPoC helper function for module my_sub_const
 freia_status my_sub_const_helper_0(freia_data2d * o0, freia_data2d * i0, int32_t cst0)
 {
@@ -1492,6 +1608,10 @@ freia_status my_sub_const_helper_0(freia_data2d * o0, freia_data2d * i0, int32_t
 
   return ret;
 }
+#include <freiaCommon.h>
+#include <freiaCoarseGrain.h>
+#include <spoc.h>
+
 // FREIA-SPoC helper function for module my_sub
 freia_status my_sub_helper_0(freia_data2d * o0, freia_data2d * i0, freia_data2d * i1)
 {
@@ -1535,6 +1655,10 @@ freia_status my_sub_helper_0(freia_data2d * o0, freia_data2d * i0, freia_data2d 
 
   return ret;
 }
+#include <freiaCommon.h>
+#include <freiaCoarseGrain.h>
+#include <spoc.h>
+
 // FREIA-SPoC helper function for module my_subsat_const
 freia_status my_subsat_const_helper_0(freia_data2d * o0, freia_data2d * i0, int32_t cst0)
 {
@@ -1579,6 +1703,10 @@ freia_status my_subsat_const_helper_0(freia_data2d * o0, freia_data2d * i0, int3
 
   return ret;
 }
+#include <freiaCommon.h>
+#include <freiaCoarseGrain.h>
+#include <spoc.h>
+
 // FREIA-SPoC helper function for module my_subsat
 freia_status my_subsat_helper_0(freia_data2d * o0, freia_data2d * i0, freia_data2d * i1)
 {
@@ -1622,6 +1750,10 @@ freia_status my_subsat_helper_0(freia_data2d * o0, freia_data2d * i0, freia_data
 
   return ret;
 }
+#include <freiaCommon.h>
+#include <freiaCoarseGrain.h>
+#include <spoc.h>
+
 // FREIA-SPoC helper function for module my_sup_const
 freia_status my_sup_const_helper_0(freia_data2d * o0, freia_data2d * i0, int32_t cst0)
 {
@@ -1666,6 +1798,10 @@ freia_status my_sup_const_helper_0(freia_data2d * o0, freia_data2d * i0, int32_t
 
   return ret;
 }
+#include <freiaCommon.h>
+#include <freiaCoarseGrain.h>
+#include <spoc.h>
+
 // FREIA-SPoC helper function for module my_sup
 freia_status my_sup_helper_0(freia_data2d * o0, freia_data2d * i0, freia_data2d * i1)
 {
@@ -1709,6 +1845,10 @@ freia_status my_sup_helper_0(freia_data2d * o0, freia_data2d * i0, freia_data2d 
 
   return ret;
 }
+#include <freiaCommon.h>
+#include <freiaCoarseGrain.h>
+#include <spoc.h>
+
 // FREIA-SPoC helper function for module my_threshold
 freia_status my_threshold_helper_0(freia_data2d * o0, freia_data2d * i0, int32_t inf0, int32_t sup1, bool bin2)
 {
@@ -1750,6 +1890,10 @@ freia_status my_threshold_helper_0(freia_data2d * o0, freia_data2d * i0, int32_t
 
   return ret;
 }
+#include <freiaCommon.h>
+#include <freiaCoarseGrain.h>
+#include <spoc.h>
+
 // FREIA-SPoC helper function for module my_xor_const
 freia_status my_xor_const_helper_0(freia_data2d * o0, freia_data2d * i0, int32_t cst0)
 {
@@ -1794,6 +1938,10 @@ freia_status my_xor_const_helper_0(freia_data2d * o0, freia_data2d * i0, int32_t
 
   return ret;
 }
+#include <freiaCommon.h>
+#include <freiaCoarseGrain.h>
+#include <spoc.h>
+
 // FREIA-SPoC helper function for module my_xor
 freia_status my_xor_helper_0(freia_data2d * o0, freia_data2d * i0, freia_data2d * i1)
 {
