@@ -1,0 +1,214 @@
+
+! initial functions
+
+freia_status one_pipe(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
+{
+   freia_data2d *t1 = freia_common_create_data(16, 128, 128);
+   freia_data2d *t2 = freia_common_create_data(16, 128, 128);
+   
+   // 1 pipeline call is enough
+   // t1 = i1 / i0
+   // t2 = t1 + i0
+   // o  = t2 ^ i0
+   freia_aipo_div(t1, i1, i0);                                          /*0013*/
+   freia_aipo_add(t2, t1, i0);                                          /*0014*/
+   freia_aipo_xor(o, t2, i0);                                           /*0015*/
+
+   freia_common_destruct_data(t1);                                      /*0017*/
+   freia_common_destruct_data(t2);                                      /*0018*/
+
+   return FREIA_OK;                                                     /*0020*/
+}
+freia_status two_pipes(freia_data2d *o0, freia_data2d *o1, freia_data2d *i0, freia_data2d *i1)
+{
+   // two pipeline calls are necessary
+   // o0 = i0 * i1
+   // o1 = i0 & i1
+   freia_aipo_mul(o0, i0, i1);                                          /*0074*/
+   freia_aipo_and(o1, i0, i1);                                          /*0075*/
+   return FREIA_OK;                                                     /*0076*/
+}
+
+! accelerated functions
+
+#include <freiaCommon.h>
+#include <freiaCoarseGrain.h>
+#include <spoc.h>
+
+// FREIA-SPoC helper function for module one_pipe
+freia_status one_pipe_helper_0(freia_data2d * o0, freia_data2d * i0, freia_data2d * i1)
+{
+  spoc_instr si;
+  spoc_param sp;
+  spoc_reduction reduc;
+  freia_microcode mcode;
+  freia_dynamic_param dynparam;
+  freia_reduction_results redres;
+  freia_op_sel op = 0;
+  freia_op_param param;
+  freia_status ret;
+
+  // init pipe to nop
+  spoc_init_pipe(&si, &sp, 16);
+
+  // stage 0
+  si.alu[0][0].op = SPOC_ALU_DIV_IN0_IN1;
+
+  // ??? what about setting links?
+  si.mux[0][0].op = SPOC_MUX_IN1;
+  si.mux[0][2].op = SPOC_MUX_IN0;
+
+  // stage 1
+  si.alu[1][0].op = SPOC_ALU_ADD_IN0_IN1;
+
+  // ??? what about setting links?
+  si.mux[1][0].op = SPOC_MUX_IN1;
+  si.mux[1][2].op = SPOC_MUX_IN0;
+
+  // stage 2
+  si.alu[2][0].op = SPOC_ALU_XOR_IN0_IN1;
+
+  // ??? what about setting links?
+  si.mux[2][0].op = SPOC_MUX_IN1;
+  si.mux[2][2].op = SPOC_MUX_IN0;
+
+  mcode.raw = (freia_ptr) &si;
+  mcode.size = sizeof(spoc_instr);
+
+  dynparam.raw = (freia_ptr) &sp;
+  dynparam.size = sizeof(spoc_param);
+
+  redres.raw = (freia_ptr) &reduc;
+  redres.size = sizeof(spoc_reduction);
+
+  ret = freia_cg_write_microcode(&mcode);
+  ret |= freia_cg_write_dynamic_param(&dynparam);
+
+  // actual call of spoc hardware
+  freia_cg_template_process_2i_1o(op, param, o0, i0, i1);
+
+  // get reductions
+  freia_cg_read_reduction_results(&redres);
+
+  return ret;
+}
+#include <freiaCommon.h>
+#include <freiaCoarseGrain.h>
+#include <spoc.h>
+
+// FREIA-SPoC helper function for module two_pipes
+freia_status two_pipes_helper_0(freia_data2d * o0, freia_data2d * i0, freia_data2d * i1)
+{
+  spoc_instr si;
+  spoc_param sp;
+  spoc_reduction reduc;
+  freia_microcode mcode;
+  freia_dynamic_param dynparam;
+  freia_reduction_results redres;
+  freia_op_sel op = 0;
+  freia_op_param param;
+  freia_status ret;
+
+  // init pipe to nop
+  spoc_init_pipe(&si, &sp, 16);
+
+  // stage 0
+  si.alu[0][0].op = SPOC_ALU_MUL_IN0_IN1;
+
+  // ??? what about setting links?
+  si.mux[0][0].op = SPOC_MUX_IN1;
+  si.mux[0][2].op = SPOC_MUX_IN0;
+
+  mcode.raw = (freia_ptr) &si;
+  mcode.size = sizeof(spoc_instr);
+
+  dynparam.raw = (freia_ptr) &sp;
+  dynparam.size = sizeof(spoc_param);
+
+  redres.raw = (freia_ptr) &reduc;
+  redres.size = sizeof(spoc_reduction);
+
+  ret = freia_cg_write_microcode(&mcode);
+  ret |= freia_cg_write_dynamic_param(&dynparam);
+
+  // actual call of spoc hardware
+  freia_cg_template_process_2i_1o(op, param, o0, i0, i1);
+
+  // get reductions
+  freia_cg_read_reduction_results(&redres);
+
+  return ret;
+}
+
+// FREIA-SPoC helper function for module two_pipes
+freia_status two_pipes_helper_1(freia_data2d * o0, freia_data2d * i0, freia_data2d * i1)
+{
+  spoc_instr si;
+  spoc_param sp;
+  spoc_reduction reduc;
+  freia_microcode mcode;
+  freia_dynamic_param dynparam;
+  freia_reduction_results redres;
+  freia_op_sel op = 0;
+  freia_op_param param;
+  freia_status ret;
+
+  // init pipe to nop
+  spoc_init_pipe(&si, &sp, 16);
+
+  // stage 0
+  si.alu[0][0].op = SPOC_ALU_AND_IN0_IN1;
+
+  // ??? what about setting links?
+  si.mux[0][0].op = SPOC_MUX_IN1;
+  si.mux[0][2].op = SPOC_MUX_IN0;
+
+  mcode.raw = (freia_ptr) &si;
+  mcode.size = sizeof(spoc_instr);
+
+  dynparam.raw = (freia_ptr) &sp;
+  dynparam.size = sizeof(spoc_param);
+
+  redres.raw = (freia_ptr) &reduc;
+  redres.size = sizeof(spoc_reduction);
+
+  ret = freia_cg_write_microcode(&mcode);
+  ret |= freia_cg_write_dynamic_param(&dynparam);
+
+  // actual call of spoc hardware
+  freia_cg_template_process_2i_1o(op, param, o0, i0, i1);
+
+  // get reductions
+  freia_cg_read_reduction_results(&redres);
+
+  return ret;
+}
+
+! new functions
+
+freia_status one_pipe(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
+{
+   freia_data2d *t1 = freia_common_create_data(16, 128, 128);
+   freia_data2d *t2 = freia_common_create_data(16, 128, 128);
+   
+   // 1 pipeline call is enough
+   // t1 = i1 / i0
+   // t2 = t1 + i0
+   // o  = t2 ^ i0
+   ;
+   one_pipe_helper_0(o, i0, i1);                                        /*0015*/
+
+   freia_common_destruct_data(t1);                                      /*0017*/
+   freia_common_destruct_data(t2);                                      /*0018*/
+
+   return FREIA_OK;                                                     /*0020*/
+}
+freia_status two_pipes(freia_data2d *o0, freia_data2d *o1, freia_data2d *i0, freia_data2d *i1)
+{
+   // two pipeline calls are necessary
+   // o0 = i0 * i1
+   // o1 = i0 & i1
+   two_pipes_helper_0(o0, i0, i1);                                      /*0074*/
+   two_pipes_helper_1(o1, i0, i1);                                      /*0075*/
+   return FREIA_OK;                                                     /*0076*/
+}
