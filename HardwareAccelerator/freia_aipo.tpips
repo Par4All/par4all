@@ -1,3 +1,4 @@
+# generate accelerated functions for all AIPO functions.
 delete freia_aipo
 #setenv PIPS_HWAC_DEBUG_LEVEL=5
 create freia_aipo freia_aipo.c
@@ -7,10 +8,10 @@ echo
 echo ! initial functions
 echo
 display PRINTED_FILE[%ALL]
-apply HARDWARE_ACCELERATOR[%ALL]
 echo
 echo ! accelerated functions
 echo
+apply HARDWARE_ACCELERATOR[%ALL]
 shell cat ./freia_aipo.database/Src/*_helper_functions.c
 echo
 echo ! new functions
