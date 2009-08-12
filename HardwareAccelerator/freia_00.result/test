@@ -1,7 +1,7 @@
 
 ! initial function
 
-freia_status freia_stuff(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
+freia_status freia_00(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 {
    freia_data2d *tmp = freia_common_create_data(16, 128, 128);
    freia_aipo_add(tmp, i0, i1);                                         /*0006*/
@@ -16,8 +16,8 @@ freia_status freia_stuff(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 #include <freiaCoarseGrain.h>
 #include <spoc.h>
 
-// FREIA-SPoC helper function for module freia_stuff
-freia_status freia_stuff_helper_0(freia_data2d * o0, freia_data2d * i0, freia_data2d * i1)
+// FREIA-SPoC helper function for module freia_00
+freia_status freia_00_helper_0(freia_data2d * o0, freia_data2d * i0, freia_data2d * i1)
 {
   spoc_instr si;
   spoc_param sp;
@@ -69,10 +69,10 @@ freia_status freia_stuff_helper_0(freia_data2d * o0, freia_data2d * i0, freia_da
 
 ! new function
 
-freia_status freia_stuff(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
+freia_status freia_00(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 {
    freia_data2d *tmp = freia_common_create_data(16, 128, 128);
-   freia_stuff_helper_0(o, i1, i0);                                     /*0007*/
+   freia_00_helper_0(o, i1, i0);                                        /*0007*/
    freia_common_destruct_data(tmp);                                     /*0008*/
    return FREIA_OK;                                                     /*0009*/
 }

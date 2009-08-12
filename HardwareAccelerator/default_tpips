@@ -1,0 +1,21 @@
+delete ${WSPACE}
+#setenv PIPS_HWAC_DEBUG_LEVEL=5
+create ${WSPACE} ${FILE}
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+echo
+echo ! initial function
+echo
+display PRINTED_FILE[${WSPACE}]
+echo
+echo ! accelerated function
+echo
+apply HARDWARE_ACCELERATOR[${WSPACE}]
+shell cat ./${WSPACE}.database/Src/${WSPACE}_helper_functions.c
+echo
+echo ! new function
+echo
+display PRINTED_FILE[${WSPACE}]
+close
+delete ${WSPACE}
+quit

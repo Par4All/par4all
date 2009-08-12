@@ -1,7 +1,7 @@
 #include "freia.h"
 
 freia_status
-freia_stuff(freia_data2d * o, freia_data2d * i0, freia_data2d * i1)
+freia_01(freia_data2d * o, freia_data2d * i0, freia_data2d * i1)
 {
   freia_data2d 
     * tmp1 = freia_common_create_data(16, 128, 128),
