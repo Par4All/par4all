@@ -29,8 +29,36 @@ setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
 echo Try to restructure the code for more precision:
 setproperty UNSPAGHETTIFY_TEST_RESTRUCTURING=TRUE
 setproperty UNSPAGHETTIFY_RECURSIVE_DECOMPOSITION=TRUE
+
+echo
+echo Preconditions for "main"
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE
+
+
+echo
+echo Regions for "main"
+echo
+
+activate PRINT_CODE_REGIONS
+display PRINTED_FILE
+
+echo
+echo MUST Regions for "main"
+echo
+
+activate MUST_REGIONS
+activate PRINT_CODE_REGIONS
+display PRINTED_FILE
+
+activate PRINT_CODE
+
 echo Privatize scalar variables on all the modules of the program:
 apply PRIVATIZE_MODULE[%ALLFUNC]
+
+display PRINTED_FILE
 
 echo Ask for some statistics about the job to be done:
 setproperty PARALLELIZATION_STATISTICS=TRUE
