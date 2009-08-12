@@ -9,22 +9,24 @@ echo
 display PRINTED_FILE[one_pipe]
 display PRINTED_FILE[one_big_pipe]
 display PRINTED_FILE[two_pipes]
-#display PRINTED_FILE[three_pipes]
+display PRINTED_FILE[three_pipes]
 echo
 echo ! accelerated functions
 echo
 apply HARDWARE_ACCELERATOR[one_pipe]
 apply HARDWARE_ACCELERATOR[one_big_pipe]
 apply HARDWARE_ACCELERATOR[two_pipes]
-#apply HARDWARE_ACCELERATOR[three_pipes]
+apply HARDWARE_ACCELERATOR[three_pipes]
 shell cat ./freia_02.database/Src/*_helper_functions.c
 echo
 echo ! new functions
 echo
+# what about some cleanup on these functions?
+# empty continue...
 display PRINTED_FILE[one_pipe]
 display PRINTED_FILE[one_big_pipe]
 display PRINTED_FILE[two_pipes]
-#display PRINTED_FILE[three_pipes]
+display PRINTED_FILE[three_pipes]
 close
 delete freia_02
 quit
