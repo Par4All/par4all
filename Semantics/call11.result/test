@@ -1,0 +1,113 @@
+
+Source code with proper effects
+
+double call11(void)
+{
+   double x = 3.;
+//               <must be read   >: TOP-LEVEL:j
+//               <must be written>: TOP-LEVEL:j
+   j++;                                                                 /*0005*/
+//               <must be read   >: x
+
+   return x;                                                            /*0007*/
+}
+
+Source code with cumulated effects
+
+//               <must be read   >: TOP-LEVEL:j
+//               <must be written>: TOP-LEVEL:j
+double call11(void)
+{
+   double x = 3.;
+//               <must be read   >: TOP-LEVEL:j
+//               <must be written>: TOP-LEVEL:j
+   j++;                                                                 /*0005*/
+//               <must be read   >: x
+
+   return x;                                                            /*0007*/
+}
+
+Source code with transformers for "call11"
+
+
+//  T(TOP-LEVEL:j) {TOP-LEVEL:j==j#init+1}
+
+double call11(void)
+{
+   double x = 3.;
+
+//  T(TOP-LEVEL:j) {TOP-LEVEL:j==j#init+1}
+
+   j++;                                                                 /*0005*/
+
+//  T() {}
+
+
+   return x;                                                            /*0007*/
+}
+
+Source code with transformers for "main"
+
+
+//  T(TOP-LEVEL:j) {TOP-LEVEL:j==j#init+1}
+
+main()
+{
+   int ai = 3;
+
+//  T(TOP-LEVEL:j) {TOP-LEVEL:j==j#init+1}
+
+
+   call11();                                                            /*0017*/
+
+//  T(ai) {ai==0}
+
+
+   ai = 0;                                                              /*0019*/
+}
+
+Source code with preconditions for "call11"
+
+
+//  P() {TOP-LEVEL:j==0}
+
+double call11(void)
+{
+   double x = 3.;
+
+//  P() {TOP-LEVEL:j==0}
+
+   j++;                                                                 /*0005*/
+
+//  P(TOP-LEVEL:j) {TOP-LEVEL:j==1, j#init==0}
+
+
+   return x;                                                            /*0007*/
+}
+
+Source code with preconditions for "main"
+
+
+//  P() {TOP-LEVEL:j==0}
+
+main()
+{
+   int ai = 3;
+
+//  P() {TOP-LEVEL:j==0, ai==3}
+
+
+   call11();                                                            /*0017*/
+
+//  P(TOP-LEVEL:j) {TOP-LEVEL:j==1, ai==3, j#init==0}
+
+
+   ai = 0;                                                              /*0019*/
+}
+
+Warnings
+
+unknown[unknown] (activate) Rule `PRINT_CODE_TRANSFORMERS' already active
+TRANSFORMERS_INTER_FULL[main] (call_to_transformer) Result of function "call11" ignored.
+unknown[unknown] (activate) Rule `PRINT_CODE_PRECONDITIONS' already active
+INTERPROCEDURAL_SUMMARY_PRECONDITION[call11!] (ordinary_summary_precondition) empty precondition to call11! because not in call tree from main.
