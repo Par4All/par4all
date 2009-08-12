@@ -30,6 +30,9 @@
 prod=${1:-.}
 dest=${2:-$LOGNAME@cri.ensmp.fr}
 
+# remove pips-related environment variables to use default settings
+unset -v EXTERN_ROOT NEWGEN_ROOT LINEAR_ROOT PIPS_ROOT PIPS_ARCH
+
 # report current-state message
 # current-state: ok skip locked KO:*
 function report()
