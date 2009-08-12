@@ -243,14 +243,14 @@ freia_status one_more_pipe_helper_0(freia_data2d * o0, freia_data2d * i0, int32_
   spoc_init_pipe(&si, &sp, 16);
 
   // stage 0
-  si.poc[0][0].op=SPOC_POC_ERODE;
-  si.poc[0][0].grid=SPOC_POC_8_CONNEX;
+  si.poc[0][0].op = SPOC_POC_ERODE;
+  si.poc[0][0].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
     sp.poc[0][0].kernel[i] = kern0[i];
 
   // stage 1
-  si.poc[1][0].op=SPOC_POC_DILATE;
-  si.poc[1][0].grid=SPOC_POC_6_CONNEX;
+  si.poc[1][0].op = SPOC_POC_DILATE;
+  si.poc[1][0].grid = SPOC_POC_6_CONNEX;
   for(i=0 ; i<9 ; i++)
     sp.poc[1][0].kernel[i] = kern1[i];
 

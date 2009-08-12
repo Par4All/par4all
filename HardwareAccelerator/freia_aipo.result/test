@@ -694,8 +694,8 @@ freia_status my_dilate_6c_helper_0(freia_data2d * o0, freia_data2d * i0, int32_t
   spoc_init_pipe(&si, &sp, 16);
 
   // stage 0
-  si.poc[0][0].op=SPOC_POC_DILATE;
-  si.poc[0][0].grid=SPOC_POC_6_CONNEX;
+  si.poc[0][0].op = SPOC_POC_DILATE;
+  si.poc[0][0].grid = SPOC_POC_6_CONNEX;
   for(i=0 ; i<9 ; i++)
     sp.poc[0][0].kernel[i] = kern0[i];
 
@@ -740,8 +740,8 @@ freia_status my_dilate_8c_helper_0(freia_data2d * o0, freia_data2d * i0, int32_t
   spoc_init_pipe(&si, &sp, 16);
 
   // stage 0
-  si.poc[0][0].op=SPOC_POC_DILATE;
-  si.poc[0][0].grid=SPOC_POC_8_CONNEX;
+  si.poc[0][0].op = SPOC_POC_DILATE;
+  si.poc[0][0].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
     sp.poc[0][0].kernel[i] = kern0[i];
 
@@ -881,8 +881,8 @@ freia_status my_erode_6c_helper_0(freia_data2d * o0, freia_data2d * i0, int32_t 
   spoc_init_pipe(&si, &sp, 16);
 
   // stage 0
-  si.poc[0][0].op=SPOC_POC_ERODE;
-  si.poc[0][0].grid=SPOC_POC_6_CONNEX;
+  si.poc[0][0].op = SPOC_POC_ERODE;
+  si.poc[0][0].grid = SPOC_POC_6_CONNEX;
   for(i=0 ; i<9 ; i++)
     sp.poc[0][0].kernel[i] = kern0[i];
 
@@ -927,8 +927,8 @@ freia_status my_erode_8c_helper_0(freia_data2d * o0, freia_data2d * i0, int32_t 
   spoc_init_pipe(&si, &sp, 16);
 
   // stage 0
-  si.poc[0][0].op=SPOC_POC_ERODE;
-  si.poc[0][0].grid=SPOC_POC_8_CONNEX;
+  si.poc[0][0].op = SPOC_POC_ERODE;
+  si.poc[0][0].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
     sp.poc[0][0].kernel[i] = kern0[i];
 
