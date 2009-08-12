@@ -440,8 +440,9 @@ transformer intrinsic_to_transformer(entity e,
 
 static transformer user_call_to_transformer(entity, list, transformer, list);
 
-static transformer 
-call_to_transformer(call c, transformer pre, list ef) /* effects of call c */
+static transformer call_to_transformer(call c,
+				       transformer pre,
+				       list ef) /* effects of call c */
 {
   transformer tf = transformer_undefined;
   entity e = call_function(c);
@@ -461,15 +462,30 @@ call_to_transformer(call c, transformer pre, list ef) /* effects of call c */
 
       if(type_void_p(rt)) {
 	tf = user_call_to_transformer(e, pc, pre, ef);
-      reset_temporary_value_counter();
+	reset_temporary_value_counter(); // might not be a good idea
+					 // with expression lists?
       }
       else {
+	if(analyzable_type_p(rt)) {
 	/* A temporary variable should be allocated and
 	   user_function_call_to_transformer() be used. The variable
 	   should then be projected to keep only the side effects of
 	   the call. */
-	pips_user_error("Result of function %s ignored. Not supported yet.\n",
-			entity_user_name(e));
+	  entity trv = make_local_temporary_value_entity(rt);
+	  expression expr = call_to_expression(c);
+
+	  tf = user_function_call_to_transformer(trv, expr, pre);
+	  tf = transformer_temporary_value_projection(tf);
+	  reset_temporary_value_counter();
+	  pips_user_warning("Analyzable result of function \"%s\" ignored.\n",
+			    entity_user_name(e));
+	}
+	else {
+	  tf = user_call_to_transformer(e, pc, pre, ef);
+	  reset_temporary_value_counter(); // might not be a good idea
+	  pips_user_warning("Result of function \"%s\" ignored.\n",
+			    entity_user_name(e));
+	}
       }
     }
     else
@@ -522,7 +538,7 @@ call_to_transformer(call c, transformer pre, list ef) /* effects of call c */
 /* The Fortran and C versions are about the same. Should I revert and
    unify them, except for t_calle? This could be unified too by
    calling user_call_to_transformer()? */
-static transformer 
+static transformer
 c_user_function_call_to_transformer(
 				    entity e, /* a value */
 				    expression expr, /* a call to a function */
@@ -719,7 +735,7 @@ fortran_user_function_call_to_transformer(
 
   pips_debug(8, "end with t_caller=%p\n", t_caller);
 
-    
+
   return t_caller;
 }
 
@@ -772,10 +788,10 @@ transformer_intra_to_inter(
    * FI: the resulting intermediate transformer is not consistent (18 July 2003)
    */
   /*
-  MAPL(ca, 
+  MAPL(ca,
   {entity e = ENTITY(CAR(ca));
   if(!effects_write_entity_p(le, e) &&
-     !storage_return_p(entity_storage(e))) 
+     !storage_return_p(entity_storage(e)))
     lost_args = arguments_add_entity(lost_args, e);
   },
        old_args);
@@ -844,9 +860,14 @@ transformer any_user_call_site_to_transformer(entity f,
   int n = 1; /* Formal parameters are counted 1, 2, 3,...*/
   list fpvl = NIL; // list of formal parameter values
 
-  if(gen_length(cpl)!=gen_length(pc))
-    pips_user_error("Different numbers of actual and formal parameters for function \"%s\"\n",
-		    entity_user_name(f));
+  if(gen_length(pl)!= gen_length(pc)) {
+    /* This may happen with a void declaration */
+    if(!(gen_length(pl)==1 && gen_length(pc)==0
+	 && type_void_p(parameter_type(PARAMETER(CAR(pl))))))
+      pips_user_error("Different numbers of actual and formal parameters"
+		      "(%d and %d) for function \"%s\"\n",
+		      gen_length(pl), gen_length(pc), entity_user_name(f));
+  }
 
   /* Evaluate actual arguments from left to right linking it to a
      functional parameter when possible */

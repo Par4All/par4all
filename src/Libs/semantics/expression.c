@@ -128,7 +128,7 @@ generic_minmax_to_transformer(entity e,
     type t = entity_type(e);
     entity tmp = make_local_temporary_value_entity(t);
     transformer tfe = any_expression_to_transformer(tmp, arg, pre, is_internal);
-	
+
     Pvecteur v = vect_new((Variable) tmp, VALUE_ONE);
     Pcontrainte cv = CONTRAINTE_UNDEFINED;
 
