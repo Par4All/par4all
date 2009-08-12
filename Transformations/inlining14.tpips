@@ -1,0 +1,43 @@
+delete inlining14
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create inlining14 inlining14.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+setproperty PREPROCESSOR_MISSING_FILE_HANDLING "generate"
+
+echo
+echo Initial code
+echo
+
+display PRINTED_FILE[freia_cipo_dilate]
+display PRINTED_FILE[freia_cipo_outer_gradient]
+
+echo
+echo Because %ALL is modified by code synthesis, let's get ready
+echo
+
+display CALLGRAPH_FILE[freia_cipo_outer_gradient]
+
+echo
+echo Code after inlining
+echo
+
+apply INLINING[freia_cipo_dilate]
+display PRINTED_FILE[freia_cipo_outer_gradient]
+
+echo
+echo Unsplit resulting code
+echo
+
+apply UNSPLIT
+shell gcc -c inlining14.database/Src/inlining14.c
+
+close
+delete inlining14
+quit
+
