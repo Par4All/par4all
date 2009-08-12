@@ -29,3 +29,4 @@ OpenMP
 # ngspice_bug:
 Step
 Bootstrap
+HardwareAccelerator
