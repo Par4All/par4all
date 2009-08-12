@@ -252,7 +252,8 @@ bool set_inclusion_p(set s1, set s2)
  */
 bool set_equal_p(set s1, set s2)
 {
-  return set_inclusion_p(s1, s2) && set_inclusion_p(s2, s1);
+  return set_size(s1)==set_size(s2) &&
+    set_inclusion_p(s1, s2) && set_inclusion_p(s2, s1);
 }
 
 /* Assign the empty set to s
