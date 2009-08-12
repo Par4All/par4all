@@ -244,6 +244,7 @@ set set_delfree_element(set s1, set s2, void * e)
  */
 bool set_inclusion_p(set s1, set s2)
 {
+  if (s1==s2) return true;
   SET_MAP(i, if (!set_belong_p(s2, i)) return false, s1);
   return true;
 }
@@ -252,6 +253,7 @@ bool set_inclusion_p(set s1, set s2)
  */
 bool set_equal_p(set s1, set s2)
 {
+  if (s1==s2) return true;
   return set_size(s1)==set_size(s2) &&
     set_inclusion_p(s1, s2) && set_inclusion_p(s2, s1);
 }
