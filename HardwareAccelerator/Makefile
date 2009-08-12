@@ -14,6 +14,7 @@ test: $(F.test)
 
 force-test:
 	$(RM) $(F.test)
+	# parallel validation...
 	$(MAKE) test
 
 %.result/test: %.tpips
