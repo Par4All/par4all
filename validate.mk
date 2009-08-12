@@ -1,69 +1,82 @@
 # $Id$
 
+# pips exes
 TPIPS	= tpips
 PIPS	= pips
+
+# default output file
+TEST	= test
 
 # source files
 F.c	= $(wildcard *.c)
 F.f	= $(wildcard *.f)
 F.F	= $(wildcard *.F)
+
+# result directory
 F.result= $(wildcard *.result)
 
 # validation scripts
 F.tpips	= $(wildcard *.tpips)
 F.test	= $(wildcard *.test)
 
-# validation targets
-F.valid	= $(F.result:%=%/test)
+# validation output
+F.valid	= $(F.result:%=%/$(TEST))
 
 here	:= $(shell pwd)
 FLT	= sed -e 's,$(here),$$VDIR,g'
+OK	= exit 0
 
 # default target is to clean
 clean:
 	$(RM) *~ *.result/out out err $(F.c:%.c=%.o) a.out *.tmp
 	$(RM) -r *.database
 
-validate: $(F.valid)
-
-force-validate:
+# regenerate "test" files: svn diff show the diffs!
+validate:
 	$(RM) $(F.valid)
-	$(MAKE) validate
+	$(MAKE) $(F.valid)
+
+# generate "out" files
+validate-out:
+	$(MAKE) TEST=out validate
 
 # shell script
-%.result/test: %.test
-	$< | $(FLT)  > $@ ; exit 0
+%.result/$(TEST): %.test
+	$< | $(FLT)  > $@ ; $(OK)
 
 # tpips scripts
-%.result/test: %.tpips
-	$(TPIPS) $< | $(FLT) > $@ ; exit 0
+%.result/$(TEST): %.tpips
+	$(TPIPS) $< | $(FLT) > $@ ; $(OK)
 
-%.result/test: %.tpips2
-	$(TPIPS) $< 2<&1 | $(FLT) > $@ ; exit 0
+%.result/$(TEST): %.tpips2
+	$(TPIPS) $< 2<&1 | $(FLT) > $@ ; $(OK)
 
 # default_tpips
 # FILE could be $<
-%.result/test: %.c default_tpips
+%.result/$(TEST): %.c default_tpips
 	WSPACE=$* FILE=$(here)/$< VDIR=$(here) $(TPIPS) default_tpips \
-	| $(FLT) > $@ ; exit 0
+	| $(FLT) > $@ ; $(OK)
 
-%.result/test: %.f default_tpips
+%.result/$(TEST): %.f default_tpips
 	WSPACE=$* FILE=$(here)/$< VDIR=$(here) $(TPIPS) default_tpips \
-	| $(FLT) > $@ ; exit 0
+	| $(FLT) > $@ ; $(OK)
 
-%.result/test: %.F default_tpips
+%.result/$(TEST): %.F default_tpips
 	WSPACE=$* FILE=$(here)/$< VDIR=$(here) $(TPIPS) default_tpips \
-	| $(FLT) > $@ ; exit 0
+	| $(FLT) > $@ ; $(OK)
 
-# default_test relies on substitutions
+# default_test relies on substitutions...
 DEFTEST	= default_test2
-%.result/test: %.c $(DEFTEST)
-	WSPACE=$* FILE=$(here)/$< sh $(DEFTEST) | $(FLT) > $@ ; exit 0
+%.result/$(TEST): %.c $(DEFTEST)
+	WSPACE=$* FILE=$(here)/$< sh $(DEFTEST) \
+	| $(FLT) > $@ ; $(OK)
 
-%.result/test: %.f default_test
-	WSPACE=$* FILE=$(here)/$< sh $(DEFTEST) | $(FLT) > $@ ; exit 0
+%.result/$(TEST): %.f default_test
+	WSPACE=$* FILE=$(here)/$< sh $(DEFTEST) \
+	| $(FLT) > $@ ; $(OK)
 
-%.result/test: %.F default_test
-	WSPACE=$* FILE=$(here)/$< sh $(DEFTEST) | $(FLT) > $@ ; exit 0
+%.result/$(TEST): %.F default_test
+	WSPACE=$* FILE=$(here)/$< sh $(DEFTEST) \
+	| $(FLT) > $@ ; $(OK)
 
 # what about nothing?
