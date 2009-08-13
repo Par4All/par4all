@@ -2,6 +2,7 @@
 - inlining, full_unroll, dead code elim... 
 - image reuse?
 - scalar deps?
+- check => ok => deadcode
 
 * input
 - may skip unrelated statements?
