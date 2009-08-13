@@ -15,6 +15,7 @@
 - pipe overflow
 - add checks in generated code (img size and so)?
 - parametric img size/depth?
+- show DAG!
 
 * post
 - remove malloc/free if not used
