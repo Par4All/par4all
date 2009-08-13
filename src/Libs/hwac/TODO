@@ -1,0 +1,20 @@
+* pre
+- inlining, full_unroll, dead code elim... 
+- image reuse?
+- scalar deps?
+
+* input
+- may skip unrelated statements?
+- check/remove more implicit hypothesis
+
+* output
+- compaction and symmetry
+- handle wiring
+- tell pipsdbm about generated files?
+
+* post
+- remove malloc/free if not used
+- cleanup declarations
+
+* validation
+- check all AIPO
