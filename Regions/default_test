@@ -1,5 +1,6 @@
 #!/bin/sh
 
+Delete $WSPACE
 # ??? this is a very bad idea for running a parallel validation...
 echo "PRETTYPRINT_BLOCK_IF_ONLY TRUE" > properties.rc
 if Pips -f $FILE -w $WSPACE -m $NAME -s mustreg -s prcr -b PF >&2
