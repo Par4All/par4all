@@ -53,6 +53,7 @@ validate-out:
 
 # default_tpips
 # FILE could be $<
+# VDIR could be avoided if running in local directory?
 %.result/$(TEST): %.c default_tpips
 	WSPACE=$* FILE=$(here)/$< VDIR=$(here) $(TPIPS) default_tpips \
 	| $(FLT) > $@ ; $(OK)
@@ -65,7 +66,8 @@ validate-out:
 	WSPACE=$* FILE=$(here)/$< VDIR=$(here) $(TPIPS) default_tpips \
 	| $(FLT) > $@ ; $(OK)
 
-# default_test relies on substitutions...
+# default_test relies on FILE WSPACE NAME
+# Semantics & Regions create local "properties.rc":-(
 DEFTEST	= default_test2
 %.result/$(TEST): %.c $(DEFTEST)
 	WSPACE=$* FILE=$(here)/$< sh $(DEFTEST) \
