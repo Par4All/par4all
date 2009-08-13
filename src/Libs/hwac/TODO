@@ -2,7 +2,7 @@
 - inlining, full_unroll, dead code elim... 
 - image reuse?
 - scalar deps?
-- check => ok => deadcode
+- check => ok => deadcode (#define)
 
 * input
 - may skip unrelated statements?
@@ -13,6 +13,8 @@
 - handle wiring
 - tell pipsdbm about generated files?
 - pipe overflow
+- add checks in generated code (img size and so)?
+- parametric img size/depth?
 
 * post
 - remove malloc/free if not used
