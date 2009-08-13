@@ -2753,9 +2753,8 @@ gen_allocated_memory(
     It is useful for example in a gen_recurse when we do not want to do
     anything in the rewrite part (bottom-up).
 */
-void gen_null(void * p)
+void gen_null(__attribute__((unused)) void * unused)
 {
-  message_assert("argument not used", p==p);
   return;
 }
 
@@ -2764,10 +2763,9 @@ void gen_null(void * p)
     Useful as a filter in a gen_recurse when we don't want to do anything
     in the filter part (top-down) but keeping visiting.
 */
-bool gen_true(gen_chunk * p)
+bool gen_true( __attribute__((unused)) gen_chunk * unused)
 {
-  message_assert("argument not used", p==p);
-  return TRUE;
+  return true;
 }
 
 /** Return FALSE and ignore the argument.
@@ -2776,10 +2774,9 @@ bool gen_true(gen_chunk * p)
     recursing in a type/domain of object but do not prevent other domains
     precised in the gen_multi_recurse() to be investigated.
 */
-bool gen_false(gen_chunk * p)
+bool gen_false( __attribute__((unused)) gen_chunk * unused)
 {
-  message_assert("argument not used", p==p);
-  return FALSE;
+  return false;
 }
 
 /** Just return the argument. */
