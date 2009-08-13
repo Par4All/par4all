@@ -15,6 +15,10 @@ shell cat ./${WSPACE}.database/Src/${WSPACE}_helper_functions.c
 echo
 echo ! new function
 echo
+#setenv PIPS_CUDV_DEBUG_LEVEL=8
+setproperty DYNAMIC_ALLOCATION="freia_common_create_data"
+setproperty DYNAMIC_DEALLOCATION="freia_common_destruct_data"
+apply CLEAN_UNUSED_DYNAMIC_VARIABLES[${WSPACE}]
 display PRINTED_FILE[${WSPACE}]
 close
 delete ${WSPACE}

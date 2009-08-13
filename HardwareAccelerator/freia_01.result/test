@@ -85,14 +85,9 @@ freia_status freia_01_helper_0(freia_data2d * o0, freia_data2d * i0, freia_data2
 
 freia_status freia_01(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 {
-   freia_data2d *tmp1 = freia_common_create_data(16, 128, 128);
-   freia_data2d *tmp2 = freia_common_create_data(16, 128, 128);
    
    // o = inf(i0 + i1, i0) - i0
    freia_01_helper_0(o, i0, i1);                                        /*0012*/
-
-   freia_common_destruct_data(tmp1);                                    /*0014*/
-   freia_common_destruct_data(tmp2);                                    /*0015*/
 
    return FREIA_OK;                                                     /*0017*/
 }
