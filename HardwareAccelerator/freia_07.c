@@ -24,8 +24,8 @@ freia_07(
 
   freia_common_destruct_data(t0);
   freia_common_destruct_data(t1);
+  freia_common_destruct_data(t2);
   freia_common_destruct_data(t3);
-  freia_common_destruct_data(t4);
 
   return FREIA_OK;
 }

@@ -7,17 +7,17 @@ freia_04(freia_data2d * o, freia_data2d * i,
 	 int32_t inf, int32_t sup, bool bin,
 	 int32_t * m, int32_t * v)
 {
-  freia_data2d *
-    t0 = freia_common_create_data(16, 128, 128),
-    t1 = freia_common_create_data(16, 128, 128),
-    t2 = freia_common_create_data(16, 128, 128),
-    t3 = freia_common_create_data(16, 128, 128),
-    t4 = freia_common_create_data(16, 128, 128);
+  freia_data2d
+    * t0 = freia_common_create_data(16, 128, 128),
+    * t1 = freia_common_create_data(16, 128, 128),
+    * t2 = freia_common_create_data(16, 128, 128),
+    * t3 = freia_common_create_data(16, 128, 128),
+    * t4 = freia_common_create_data(16, 128, 128);
 
   // to test operator compaction
   // t0 = erode(i)
   // t1 = dilate(i)
-  // t2 = t0 - t1
+  // t2 = t1 - t0
   // t3 = threshold(t2)
   // t4 = threshold(t0)
   // v  = vol(t3)
