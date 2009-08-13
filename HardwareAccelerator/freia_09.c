@@ -6,7 +6,7 @@
 #define BPP   (16)
 
 extern freia_status
-freia_cipo_gradient(freia_data2d *, freia_data2d *, int32_t, uint32_t);
+freia_cipo_inner_gradient(freia_data2d *, freia_data2d *, int32_t, uint32_t);
 
 freia_status
 freia_08(freia_data2d * o,
@@ -26,9 +26,9 @@ freia_08(freia_data2d * o,
   // T-rex motion detection
   // i0, i1, i2 are successive input images
   // the could be a loop with a pipeline
-  freia_cipo_gradient(g0, i0, connexity, size);
-  freia_cipo_gradient(g1, i1, connexity, size);
-  freia_cipo_gradient(g2, i2, connexity, size);
+  freia_cipo_inner_gradient(g0, i0, connexity, size);
+  freia_cipo_inner_gradient(g1, i1, connexity, size);
+  freia_cipo_inner_gradient(g2, i2, connexity, size);
   freia_aipo_absdiff(d1, g2, g1);
   freia_aipo_absdiff(d0, g1, g0);
   freia_aipo_inf(o, d1, d0);
