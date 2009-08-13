@@ -11,7 +11,7 @@
 * output
 - compaction and symmetry
 - handle wiring
-- tell pipsdbm about generated files?
+- tell pipsdbm about generated files and fix callees?
 - pipe overflow
 - add checks in generated code (img size and so)?
 - parametric img size/depth?
