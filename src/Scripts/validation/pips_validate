@@ -332,12 +332,9 @@ function validate_file()
 
   elif [[ -r $dir/default_test ]] ; then
     verb 3 'default_test method'
-    # perform some substitutions on the fly...
-    sed -e "s/tested_file/${file//\//\\/}/g" \
-	-e "s/tested_dir/${dir//\//\\/}/g" \
-	-e "s/tested_name/$name/g" \
-	-e "s/TESTED_NAME/$upper/g" \
-	< $dir/default_test | $timout /bin/sh 2> $out.err
+    # juste rely on env var, as tpips
+    FILE=$file WSPACE=$name NAME=$upper \
+      $timeout $dir/default_test 2> $out.err
     status=$?
 
   elif [[ -r $dir/default_tpips ]] ; then
