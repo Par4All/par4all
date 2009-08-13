@@ -11,6 +11,7 @@
 - compaction and symmetry
 - handle wiring
 - tell pipsdbm about generated files?
+- pipe overflow
 
 * post
 - remove malloc/free if not used
