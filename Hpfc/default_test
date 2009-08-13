@@ -5,9 +5,9 @@
 # $Id$
 #
 
-echo "--- Hpfc Validation for tested_file"
+echo "--- Hpfc Validation for ${FILE}"
 echo
 
 # uses the validate command of the hpfc driver.
 
-hpfc validate tested_file include/stub.f
+hpfc validate ${FILE} include/stub.f

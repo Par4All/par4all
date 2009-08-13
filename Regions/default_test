@@ -1,15 +1,15 @@
 #!/bin/sh
 
+# ??? this is a very bad idea for running a parallel validation...
 echo "PRETTYPRINT_BLOCK_IF_ONLY TRUE" > properties.rc
-if Pips -f tested_file -w tested_name -m tested_name -s mustreg \
-	-s prcr -b PF >&2
+if Pips -f $FILE -w $WSPACE -m $NAME -s mustreg -s prcr -b PF >&2
 then
-	echo "--- Regions for TESTED_NAME" 
+	echo "--- Regions for $NAME" 
 	Display -l regi
 	exit_status=0
 else
 	exit_status=1
 fi
-Delete tested_name
+Delete $WSPACE
 rm properties.rc
 exit $exit_status
