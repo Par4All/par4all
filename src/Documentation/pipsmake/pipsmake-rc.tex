@@ -6978,6 +6978,26 @@ clean_declarations      > MODULE.code
         < MODULE.code
 \end{PipsMake}
 
+In C, dynamic variables which are allocated and freed but otherwise
+never used can be removed. This phase removes the calls to the
+dynamic allocation functions (\emph{malloc} and \emph{free} or
+user defined equivalents), and remove their declarations.
+
+%%@UserManualDocumentation: clean_dynamic_variables
+Clean unused local dynamic variables by removing malloc/free calls.
+%%!UserManualDocumentation
+\begin{PipsMake}
+clean_unused_dynamic_variables > MODULE.code
+	< PROGRAM.entities
+	< MODULE.code
+\end{PipsMake}
+
+It may be a regular expression instead of a function name?
+\begin{PipsProp}
+DYNAMIC_ALLOCATION "malloc"
+DYNAMIC_DEALLOCATION "free"
+\end{PipsProp}
+
 \subsection{Array Resizing}
 \label{subsubsection-array-resizing}
 
