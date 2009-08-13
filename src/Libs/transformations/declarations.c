@@ -119,6 +119,8 @@ void cleanup_continues(statement stat)
 
 /****************************************************** DYNAMIC DECLARATIONS */
 
+#define expr_var(e) reference_variable(expression_reference(e))
+
 #define call_assign_p(c)						\
   same_string_p(entity_local_name(call_function(c)), ASSIGN_OPERATOR_NAME)
 
@@ -151,7 +153,8 @@ static bool ignore_call_flt(call c, struct helper * ctx)
       gen_recurse_stop(EXPRESSION(CAR(args)));
     }
 
-    // ??? should I also ignore "var = NULL" ?
+    // ??? should I also ignore "var = NULL"?
+    // and other constant assignments?
   }
 
   return true;
@@ -172,8 +175,9 @@ static bool loop_flt(loop l, struct helper * ctx)
 static bool unused_local_variable_p(entity var, set used, string module)
 {
   return same_string_p(entity_module_name(var), module)
-    && ! same_string_p(entity_local_name(var), module)
-    && ! set_belong_p(used, var)
+    // keep function auto-declaration for recursion
+    && !same_string_p(entity_local_name(var), module)
+    && !set_belong_p(used, var)
     && type_variable_p(ultimate_type(entity_type(var)));
 }
 
@@ -191,13 +195,9 @@ static void cleanup_call(call c, struct helper * ctx)
     if (gen_length(args)==1)
     {
       expression arg = EXPRESSION(CAR(args));
-      if (expression_reference_p(arg))
-      {
-	if (unused_local_variable_p
-	    (reference_variable(expression_reference(arg)),
-	     ctx->referenced, ctx->module))
+      if (expression_reference_p(arg) &&
+	  unused_local_variable_p(expr_var(arg), ctx->referenced, ctx->module))
 	  replace = true;
-      }
     }
   }
   else if (call_assign_p(c))
@@ -209,13 +209,9 @@ static void cleanup_call(call c, struct helper * ctx)
 		      ctx->func_malloc))
     {
       expression arg = EXPRESSION(CAR(args));
-      if (expression_reference_p(arg))
-      {
-	if (unused_local_variable_p
-	    (reference_variable(expression_reference(arg)),
-	     ctx->referenced, ctx->module))
-	  replace = true;
-      }
+      if (expression_reference_p(arg) &&
+	  unused_local_variable_p(expr_var(arg), ctx->referenced, ctx->module))
+	replace = true;
     }
     // var = NULL?
   }
@@ -223,6 +219,7 @@ static void cleanup_call(call c, struct helper * ctx)
   if (replace)
   {
     pips_debug(6, "replacing...\n");
+    // ??? is continue always appropriate?
     call_function(c) = entity_intrinsic(CONTINUE_FUNCTION_NAME);
     gen_full_free_list(call_arguments(c));
     call_arguments(c) = NIL;
@@ -245,6 +242,7 @@ static void dynamic_cleanup(string module, statement stat)
 
   struct helper help;
   help.module = module;
+  // use dynamic definition for malloc/free.
   help.func_malloc = get_string_property("DYNAMIC_ALLOCATION");
   help.func_free = get_string_property("DYNAMIC_DEALLOCATION");
   help.referenced = set_make(set_pointer);
@@ -263,13 +261,8 @@ static void dynamic_cleanup(string module, statement stat)
     gen_context_multi_recurse
       (entity_initial(var), &help,
        reference_domain, reference_flt, gen_null,
-       // loop_domain, loop_flt, gen_null,
        call_domain, ignore_call_flt, gen_null,
        NULL);
-  }
-
-  ifdebug(4) {
-    set_fprint(stderr, "referenced", help.referenced, entity_local_name);
   }
 
   // pass 2: cleanup calls to  "= malloc" and "free" in code
@@ -281,12 +274,10 @@ static void dynamic_cleanup(string module, statement stat)
 
   // and in declarations
   list decls = entity_declarations(mod), kept = NIL;
-  pips_debug(5, "%d declarations in %s\n", (int) gen_length(decls), module);
   FOREACH(ENTITY, var, decls)
   {
     if (unused_local_variable_p(var, help.referenced, module))
     {
-      pips_debug(3, "cleaning entity %s\n", entity_name(var));
       value init = entity_initial(var);
       if (value_expression_p(init))
       {
@@ -297,22 +288,21 @@ static void dynamic_cleanup(string module, statement stat)
     else
       kept = CONS(ENTITY, var, kept);
   }
-  // ??? this does not seem to work:-(
+  // is it useful? declarations are attached to statements in C.
   entity_declarations(mod) = gen_nreverse(kept);
   gen_free_list(decls), decls = NIL;
-  pips_debug(5, "now %d declarations in %s\n",
-	     gen_length(entity_declarations(mod)), module);
 
   set_free(help.referenced);
 }
 
-bool
-clean_unused_dynamic_variables(string module)
+/* function called by pipsmake.
+ */
+bool clean_unused_dynamic_variables(string module)
 {
   debug_on("PIPS_CUDV_DEBUG_LEVEL");
 
   // get stuff from pipsdbm
-  set_current_module_entity(module_name_to_entity( module ));
+  set_current_module_entity(module_name_to_entity(module));
   set_current_module_statement
     ((statement) db_get_memory_resource(DBR_CODE, module, TRUE) );
 
