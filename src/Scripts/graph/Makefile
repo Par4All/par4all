@@ -23,7 +23,7 @@ SCRIPTS = \
 	Cdavinci \
 	Fdavinci \
 	Rdavinci \
-	filtre.pl \
+	dg2dv.pl \
 	onegraph.pl \
 	display_pips_daVinci \
 	pips_graph2daVinci \

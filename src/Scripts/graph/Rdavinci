@@ -1,3 +1,5 @@
+#!/bin/sh
+#
 # $Id$
 #
 # Copyright 1989-2009 MINES ParisTech
@@ -24,7 +26,7 @@
 # Pour plus de clarete sont filtres les noms des procedures et les effects Read-Write
 # Sont affiches les noms des commons et des variables pour lesquelles il y a dependance
 
-sort -u $1.database/$2/$2.dg | sed '/^\([0-9]*\) \1 /d;/IO_EFFECTS/d;s/[RW] [RW]/O N/;s/<\([^:]*\):\([^:]*\):\([^:>]*\)>/<\1:\3>/g' | sort -u > tmpdavinci2
-
-perl filtre.pl tmpdavinci2 > cg2.daVinci
-
+sort -u $1.database/$2/$2.dg |
+sed '/^\([0-9]*\) \1 /d;/IO_EFFECTS/d;s/[RW] [RW]/O N/;s/<\([^:]*\):\([^:]*\):\([^:>]*\)>/<\1:\3>/g' |
+sort -u |
+dg2dv.pl > dg_$1_$2.daVinci

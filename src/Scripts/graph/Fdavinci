@@ -1,3 +1,5 @@
+#!/bin/sh
+#
 # $Id$
 #
 # Copyright 1989-2009 MINES ParisTech
@@ -23,7 +25,7 @@
 # et d'une procedure $2
 # Sont filtres les autodependances
 
-sort -u $1.database/$2/$2.dg | sed '/^\([0-9]*\) \1 /d;/IO_EFFECTS/d' | sort -u > tmpdavinci1
-
-perl filtre.pl tmpdavinci1 > cg1.daVinci
-
+sort -u $1.database/$2/$2.dg |
+sed '/^\([0-9]*\) \1 /d;/IO_EFFECTS/d' |
+sort -u |
+dg2dv.pl > dg_$1_$2.daVinci
