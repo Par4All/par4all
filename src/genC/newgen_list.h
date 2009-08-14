@@ -134,14 +134,16 @@ typedef struct cons {
     For example, to insert a PIPS statement s at the beginning of a
     statement list sl you can write:
 
-    list new_list = CONS(STATEMENT, s, sl);
+      list new_list = CONS(STATEMENT, s, sl);
 
     Another way is to directly use the specialized NewGen list constructor
     for the type:
 
-    list new_list = gen_STATEMENT_cons(s, sl);
+      list new_list = gen_STATEMENT_cons(s, sl);
 
-    
+    Note that it also works with just the type name, as:
+
+      list l = CONS(statement, s, l);
 */
 #define CONS(_t_,_i_,_l_) gen_##_t_##_cons((_i_),(_l_))
 
