@@ -12,6 +12,7 @@ echo
 echo ! accelerated functions
 echo
 apply HARDWARE_ACCELERATOR[%ALL]
+shell cat ./freia_aipo.database/*/*.dot
 shell cat ./freia_aipo.database/Src/*_helper_functions.c
 echo
 echo ! new functions

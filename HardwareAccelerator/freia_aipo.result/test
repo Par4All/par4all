@@ -251,6 +251,992 @@ freia_status my_xor_const(freia_data2d *o, freia_data2d *i0, int32_t p0)
 
 ! accelerated functions
 
+// graph for dag "dag_0" of module "my_absdiff" in dot format
+digraph "dag_0" {
+  // inputs
+  "i0" [shape=box];
+  "i1" [shape=box];
+
+  // outputs
+  "o" [shape=box];
+
+  // computation vertices
+  "79 absdiff" [shape=circle];
+  "i0" -> "79 absdiff";
+  "i1" -> "79 absdiff";
+  "79 absdiff" -> "o";
+}
+// graph for dag "my_absdiff_helper_0" of module "my_absdiff" in dot format
+digraph "my_absdiff_helper_0" {
+  // inputs
+  "i0" [shape=box];
+  "i1" [shape=box];
+
+  // outputs
+  "o" [shape=box];
+
+  // computation vertices
+  "79 absdiff" [shape=circle];
+  "i0" -> "79 absdiff";
+  "i1" -> "79 absdiff";
+  "79 absdiff" -> "o";
+}
+// graph for dag "dag_0" of module "my_absdiff_const" in dot format
+digraph "dag_0" {
+  // inputs
+  "i0" [shape=box];
+
+  // outputs
+  "o" [shape=box];
+
+  // computation vertices
+  "85 absdiff_const" [shape=circle];
+  "i0" -> "85 absdiff_const";
+  "85 absdiff_const" -> "o";
+}
+// graph for dag "my_absdiff_const_helper_0" of module "my_absdiff_const" in dot format
+digraph "my_absdiff_const_helper_0" {
+  // inputs
+  "i0" [shape=box];
+
+  // outputs
+  "o" [shape=box];
+
+  // computation vertices
+  "85 absdiff_const" [shape=circle];
+  "i0" -> "85 absdiff_const";
+  "85 absdiff_const" -> "o";
+}
+// graph for dag "dag_0" of module "my_add" in dot format
+digraph "dag_0" {
+  // inputs
+  "i0" [shape=box];
+  "i1" [shape=box];
+
+  // outputs
+  "o" [shape=box];
+
+  // computation vertices
+  "55 add" [shape=circle];
+  "i0" -> "55 add";
+  "i1" -> "55 add";
+  "55 add" -> "o";
+}
+// graph for dag "my_add_helper_0" of module "my_add" in dot format
+digraph "my_add_helper_0" {
+  // inputs
+  "i0" [shape=box];
+  "i1" [shape=box];
+
+  // outputs
+  "o" [shape=box];
+
+  // computation vertices
+  "55 add" [shape=circle];
+  "i0" -> "55 add";
+  "i1" -> "55 add";
+  "55 add" -> "o";
+}
+// graph for dag "dag_0" of module "my_add_const" in dot format
+digraph "dag_0" {
+  // inputs
+  "i0" [shape=box];
+
+  // outputs
+  "o" [shape=box];
+
+  // computation vertices
+  "61 add_const" [shape=circle];
+  "i0" -> "61 add_const";
+  "61 add_const" -> "o";
+}
+// graph for dag "my_add_const_helper_0" of module "my_add_const" in dot format
+digraph "my_add_const_helper_0" {
+  // inputs
+  "i0" [shape=box];
+
+  // outputs
+  "o" [shape=box];
+
+  // computation vertices
+  "61 add_const" [shape=circle];
+  "i0" -> "61 add_const";
+  "61 add_const" -> "o";
+}
+// graph for dag "dag_0" of module "my_addsat" in dot format
+digraph "dag_0" {
+  // inputs
+  "i0" [shape=box];
+  "i1" [shape=box];
+
+  // outputs
+  "o" [shape=box];
+
+  // computation vertices
+  "67 addsat" [shape=circle];
+  "i0" -> "67 addsat";
+  "i1" -> "67 addsat";
+  "67 addsat" -> "o";
+}
+// graph for dag "my_addsat_helper_0" of module "my_addsat" in dot format
+digraph "my_addsat_helper_0" {
+  // inputs
+  "i0" [shape=box];
+  "i1" [shape=box];
+
+  // outputs
+  "o" [shape=box];
+
+  // computation vertices
+  "67 addsat" [shape=circle];
+  "i0" -> "67 addsat";
+  "i1" -> "67 addsat";
+  "67 addsat" -> "o";
+}
+// graph for dag "dag_0" of module "my_addsat_const" in dot format
+digraph "dag_0" {
+  // inputs
+  "i0" [shape=box];
+
+  // outputs
+  "o" [shape=box];
+
+  // computation vertices
+  "73 addsat_const" [shape=circle];
+  "i0" -> "73 addsat_const";
+  "73 addsat_const" -> "o";
+}
+// graph for dag "my_addsat_const_helper_0" of module "my_addsat_const" in dot format
+digraph "my_addsat_const_helper_0" {
+  // inputs
+  "i0" [shape=box];
+
+  // outputs
+  "o" [shape=box];
+
+  // computation vertices
+  "73 addsat_const" [shape=circle];
+  "i0" -> "73 addsat_const";
+  "73 addsat_const" -> "o";
+}
+// graph for dag "dag_0" of module "my_and" in dot format
+digraph "dag_0" {
+  // inputs
+  "i0" [shape=box];
+  "i1" [shape=box];
+
+  // outputs
+  "o" [shape=box];
+
+  // computation vertices
+  "115 and" [shape=circle];
+  "i0" -> "115 and";
+  "i1" -> "115 and";
+  "115 and" -> "o";
+}
+// graph for dag "my_and_helper_0" of module "my_and" in dot format
+digraph "my_and_helper_0" {
+  // inputs
+  "i0" [shape=box];
+  "i1" [shape=box];
+
+  // outputs
+  "o" [shape=box];
+
+  // computation vertices
+  "115 and" [shape=circle];
+  "i0" -> "115 and";
+  "i1" -> "115 and";
+  "115 and" -> "o";
+}
+// graph for dag "dag_0" of module "my_and_const" in dot format
+digraph "dag_0" {
+  // inputs
+  "i0" [shape=box];
+
+  // outputs
+  "o" [shape=box];
+
+  // computation vertices
+  "121 and_const" [shape=circle];
+  "i0" -> "121 and_const";
+  "121 and_const" -> "o";
+}
+// graph for dag "my_and_const_helper_0" of module "my_and_const" in dot format
+digraph "my_and_const_helper_0" {
+  // inputs
+  "i0" [shape=box];
+
+  // outputs
+  "o" [shape=box];
+
+  // computation vertices
+  "121 and_const" [shape=circle];
+  "i0" -> "121 and_const";
+  "121 and_const" -> "o";
+}
+// graph for dag "dag_0" of module "my_copy" in dot format
+digraph "dag_0" {
+  // inputs
+  "i0" [shape=box];
+
+  // outputs
+  "o" [shape=box];
+
+  // computation vertices
+  "198 copy" [shape=circle];
+  "i0" -> "198 copy";
+  "198 copy" -> "o";
+}
+// graph for dag "my_copy_helper_0" of module "my_copy" in dot format
+digraph "my_copy_helper_0" {
+  // inputs
+  "i0" [shape=box];
+
+  // outputs
+  "o" [shape=box];
+
+  // computation vertices
+  "198 copy" [shape=circle];
+  "i0" -> "198 copy";
+  "198 copy" -> "o";
+}
+// graph for dag "dag_0" of module "my_dilate_6c" in dot format
+digraph "dag_0" {
+  // inputs
+  "i0" [shape=box];
+
+  // outputs
+  "o" [shape=box];
+
+  // computation vertices
+  "239 dilate_6c" [shape=circle];
+  "i0" -> "239 dilate_6c";
+  "239 dilate_6c" -> "o";
+}
+// graph for dag "my_dilate_6c_helper_0" of module "my_dilate_6c" in dot format
+digraph "my_dilate_6c_helper_0" {
+  // inputs
+  "i0" [shape=box];
+
+  // outputs
+  "o" [shape=box];
+
+  // computation vertices
+  "239 dilate_6c" [shape=circle];
+  "i0" -> "239 dilate_6c";
+  "239 dilate_6c" -> "o";
+}
+// graph for dag "dag_0" of module "my_dilate_8c" in dot format
+digraph "dag_0" {
+  // inputs
+  "i0" [shape=box];
+
+  // outputs
+  "o" [shape=box];
+
+  // computation vertices
+  "227 dilate_8c" [shape=circle];
+  "i0" -> "227 dilate_8c";
+  "227 dilate_8c" -> "o";
+}
+// graph for dag "my_dilate_8c_helper_0" of module "my_dilate_8c" in dot format
+digraph "my_dilate_8c_helper_0" {
+  // inputs
+  "i0" [shape=box];
+
+  // outputs
+  "o" [shape=box];
+
+  // computation vertices
+  "227 dilate_8c" [shape=circle];
+  "i0" -> "227 dilate_8c";
+  "227 dilate_8c" -> "o";
+}
+// graph for dag "dag_0" of module "my_div" in dot format
+digraph "dag_0" {
+  // inputs
+  "i0" [shape=box];
+  "i1" [shape=box];
+
+  // outputs
+  "o" [shape=box];
+
+  // computation vertices
+  "103 div" [shape=circle];
+  "i0" -> "103 div";
+  "i1" -> "103 div";
+  "103 div" -> "o";
+}
+// graph for dag "my_div_helper_0" of module "my_div" in dot format
+digraph "my_div_helper_0" {
+  // inputs
+  "i0" [shape=box];
+  "i1" [shape=box];
+
+  // outputs
+  "o" [shape=box];
+
+  // computation vertices
+  "103 div" [shape=circle];
+  "i0" -> "103 div";
+  "i1" -> "103 div";
+  "103 div" -> "o";
+}
+// graph for dag "dag_0" of module "my_div_const" in dot format
+digraph "dag_0" {
+  // inputs
+  "i0" [shape=box];
+
+  // outputs
+  "o" [shape=box];
+
+  // computation vertices
+  "109 div_const" [shape=circle];
+  "i0" -> "109 div_const";
+  "109 div_const" -> "o";
+}
+// graph for dag "my_div_const_helper_0" of module "my_div_const" in dot format
+digraph "my_div_const_helper_0" {
+  // inputs
+  "i0" [shape=box];
+
+  // outputs
+  "o" [shape=box];
+
+  // computation vertices
+  "109 div_const" [shape=circle];
+  "i0" -> "109 div_const";
+  "109 div_const" -> "o";
+}
+// graph for dag "dag_0" of module "my_erode_6c" in dot format
+digraph "dag_0" {
+  // inputs
+  "i0" [shape=box];
+
+  // outputs
+  "o" [shape=box];
+
+  // computation vertices
+  "233 erode_6c" [shape=circle];
+  "i0" -> "233 erode_6c";
+  "233 erode_6c" -> "o";
+}
+// graph for dag "my_erode_6c_helper_0" of module "my_erode_6c" in dot format
+digraph "my_erode_6c_helper_0" {
+  // inputs
+  "i0" [shape=box];
+
+  // outputs
+  "o" [shape=box];
+
+  // computation vertices
+  "233 erode_6c" [shape=circle];
+  "i0" -> "233 erode_6c";
+  "233 erode_6c" -> "o";
+}
+// graph for dag "dag_0" of module "my_erode_8c" in dot format
+digraph "dag_0" {
+  // inputs
+  "i0" [shape=box];
+
+  // outputs
+  "o" [shape=box];
+
+  // computation vertices
+  "221 erode_8c" [shape=circle];
+  "i0" -> "221 erode_8c";
+  "221 erode_8c" -> "o";
+}
+// graph for dag "my_erode_8c_helper_0" of module "my_erode_8c" in dot format
+digraph "my_erode_8c_helper_0" {
+  // inputs
+  "i0" [shape=box];
+
+  // outputs
+  "o" [shape=box];
+
+  // computation vertices
+  "221 erode_8c" [shape=circle];
+  "i0" -> "221 erode_8c";
+  "221 erode_8c" -> "o";
+}
+// graph for dag "dag_0" of module "my_global_max" in dot format
+digraph "dag_0" {
+  // inputs
+  "i0" [shape=box];
+
+  // outputs
+
+  // computation vertices
+  "175 global_max" [shape=circle];
+  "i0" -> "175 global_max";
+}
+// graph for dag "my_global_max_helper_0" of module "my_global_max" in dot format
+digraph "my_global_max_helper_0" {
+  // inputs
+  "i0" [shape=box];
+
+  // outputs
+
+  // computation vertices
+  "175 global_max" [shape=circle];
+  "i0" -> "175 global_max";
+}
+// graph for dag "dag_0" of module "my_global_max_coord" in dot format
+digraph "dag_0" {
+  // inputs
+  "i0" [shape=box];
+
+  // outputs
+
+  // computation vertices
+  "187 global_max_coord" [shape=circle];
+  "i0" -> "187 global_max_coord";
+}
+// graph for dag "my_global_max_coord_helper_0" of module "my_global_max_coord" in dot format
+digraph "my_global_max_coord_helper_0" {
+  // inputs
+  "i0" [shape=box];
+
+  // outputs
+
+  // computation vertices
+  "187 global_max_coord" [shape=circle];
+  "i0" -> "187 global_max_coord";
+}
+// graph for dag "dag_0" of module "my_global_min" in dot format
+digraph "dag_0" {
+  // inputs
+  "i0" [shape=box];
+
+  // outputs
+
+  // computation vertices
+  "170 global_min" [shape=circle];
+  "i0" -> "170 global_min";
+}
+// graph for dag "my_global_min_helper_0" of module "my_global_min" in dot format
+digraph "my_global_min_helper_0" {
+  // inputs
+  "i0" [shape=box];
+
+  // outputs
+
+  // computation vertices
+  "170 global_min" [shape=circle];
+  "i0" -> "170 global_min";
+}
+// graph for dag "dag_0" of module "my_global_min_coord" in dot format
+digraph "dag_0" {
+  // inputs
+  "i0" [shape=box];
+
+  // outputs
+
+  // computation vertices
+  "181 global_min_coord" [shape=circle];
+  "i0" -> "181 global_min_coord";
+}
+// graph for dag "my_global_min_coord_helper_0" of module "my_global_min_coord" in dot format
+digraph "my_global_min_coord_helper_0" {
+  // inputs
+  "i0" [shape=box];
+
+  // outputs
+
+  // computation vertices
+  "181 global_min_coord" [shape=circle];
+  "i0" -> "181 global_min_coord";
+}
+// graph for dag "dag_0" of module "my_global_vol" in dot format
+digraph "dag_0" {
+  // inputs
+  "image" [shape=box];
+
+  // outputs
+
+  // computation vertices
+  "192 global_vol" [shape=circle];
+  "image" -> "192 global_vol";
+}
+// graph for dag "my_global_vol_helper_0" of module "my_global_vol" in dot format
+digraph "my_global_vol_helper_0" {
+  // inputs
+  "image" [shape=box];
+
+  // outputs
+
+  // computation vertices
+  "192 global_vol" [shape=circle];
+  "image" -> "192 global_vol";
+}
+// graph for dag "dag_0" of module "my_inf" in dot format
+digraph "dag_0" {
+  // inputs
+  "i0" [shape=box];
+  "i1" [shape=box];
+
+  // outputs
+  "o" [shape=box];
+
+  // computation vertices
+  "5 inf" [shape=circle];
+  "i0" -> "5 inf";
+  "i1" -> "5 inf";
+  "5 inf" -> "o";
+}
+// graph for dag "my_inf_helper_0" of module "my_inf" in dot format
+digraph "my_inf_helper_0" {
+  // inputs
+  "i0" [shape=box];
+  "i1" [shape=box];
+
+  // outputs
+  "o" [shape=box];
+
+  // computation vertices
+  "5 inf" [shape=circle];
+  "i0" -> "5 inf";
+  "i1" -> "5 inf";
+  "5 inf" -> "o";
+}
+// graph for dag "dag_0" of module "my_inf_const" in dot format
+digraph "dag_0" {
+  // inputs
+  "i0" [shape=box];
+
+  // outputs
+  "o" [shape=box];
+
+  // computation vertices
+  "13 inf_const" [shape=circle];
+  "i0" -> "13 inf_const";
+  "13 inf_const" -> "o";
+}
+// graph for dag "my_inf_const_helper_0" of module "my_inf_const" in dot format
+digraph "my_inf_const_helper_0" {
+  // inputs
+  "i0" [shape=box];
+
+  // outputs
+  "o" [shape=box];
+
+  // computation vertices
+  "13 inf_const" [shape=circle];
+  "i0" -> "13 inf_const";
+  "13 inf_const" -> "o";
+}
+// graph for dag "dag_0" of module "my_mul" in dot format
+digraph "dag_0" {
+  // inputs
+  "i0" [shape=box];
+  "i1" [shape=box];
+
+  // outputs
+  "o" [shape=box];
+
+  // computation vertices
+  "91 mul" [shape=circle];
+  "i0" -> "91 mul";
+  "i1" -> "91 mul";
+  "91 mul" -> "o";
+}
+// graph for dag "my_mul_helper_0" of module "my_mul" in dot format
+digraph "my_mul_helper_0" {
+  // inputs
+  "i0" [shape=box];
+  "i1" [shape=box];
+
+  // outputs
+  "o" [shape=box];
+
+  // computation vertices
+  "91 mul" [shape=circle];
+  "i0" -> "91 mul";
+  "i1" -> "91 mul";
+  "91 mul" -> "o";
+}
+// graph for dag "dag_0" of module "my_mul_const" in dot format
+digraph "dag_0" {
+  // inputs
+  "i0" [shape=box];
+
+  // outputs
+  "o" [shape=box];
+
+  // computation vertices
+  "97 mul_const" [shape=circle];
+  "i0" -> "97 mul_const";
+  "97 mul_const" -> "o";
+}
+// graph for dag "my_mul_const_helper_0" of module "my_mul_const" in dot format
+digraph "my_mul_const_helper_0" {
+  // inputs
+  "i0" [shape=box];
+
+  // outputs
+  "o" [shape=box];
+
+  // computation vertices
+  "97 mul_const" [shape=circle];
+  "i0" -> "97 mul_const";
+  "97 mul_const" -> "o";
+}
+// graph for dag "dag_0" of module "my_not" in dot format
+digraph "dag_0" {
+  // inputs
+  "i0" [shape=box];
+
+  // outputs
+  "o" [shape=box];
+
+  // computation vertices
+  "151 not" [shape=circle];
+  "i0" -> "151 not";
+  "151 not" -> "o";
+}
+// graph for dag "my_not_helper_0" of module "my_not" in dot format
+digraph "my_not_helper_0" {
+  // inputs
+  "i0" [shape=box];
+
+  // outputs
+  "o" [shape=box];
+
+  // computation vertices
+  "151 not" [shape=circle];
+  "i0" -> "151 not";
+  "151 not" -> "o";
+}
+// graph for dag "dag_0" of module "my_or" in dot format
+digraph "dag_0" {
+  // inputs
+  "i0" [shape=box];
+  "i1" [shape=box];
+
+  // outputs
+  "o" [shape=box];
+
+  // computation vertices
+  "127 or" [shape=circle];
+  "i0" -> "127 or";
+  "i1" -> "127 or";
+  "127 or" -> "o";
+}
+// graph for dag "my_or_helper_0" of module "my_or" in dot format
+digraph "my_or_helper_0" {
+  // inputs
+  "i0" [shape=box];
+  "i1" [shape=box];
+
+  // outputs
+  "o" [shape=box];
+
+  // computation vertices
+  "127 or" [shape=circle];
+  "i0" -> "127 or";
+  "i1" -> "127 or";
+  "127 or" -> "o";
+}
+// graph for dag "dag_0" of module "my_or_const" in dot format
+digraph "dag_0" {
+  // inputs
+  "i0" [shape=box];
+
+  // outputs
+  "o" [shape=box];
+
+  // computation vertices
+  "133 and_const" [shape=circle];
+  "i0" -> "133 and_const";
+  "133 and_const" -> "o";
+}
+// graph for dag "my_or_const_helper_0" of module "my_or_const" in dot format
+digraph "my_or_const_helper_0" {
+  // inputs
+  "i0" [shape=box];
+
+  // outputs
+  "o" [shape=box];
+
+  // computation vertices
+  "133 and_const" [shape=circle];
+  "i0" -> "133 and_const";
+  "133 and_const" -> "o";
+}
+// graph for dag "dag_0" of module "my_set_constant" in dot format
+digraph "dag_0" {
+  // inputs
+
+  // outputs
+  "o" [shape=box];
+
+  // computation vertices
+  "208 set_constant" [shape=circle];
+  "208 set_constant" -> "o";
+}
+// graph for dag "my_set_constant_helper_0" of module "my_set_constant" in dot format
+digraph "my_set_constant_helper_0" {
+  // inputs
+
+  // outputs
+  "o" [shape=box];
+
+  // computation vertices
+  "208 set_constant" [shape=circle];
+  "208 set_constant" -> "o";
+}
+// graph for dag "dag_0" of module "my_sub" in dot format
+digraph "dag_0" {
+  // inputs
+  "i0" [shape=box];
+  "i1" [shape=box];
+
+  // outputs
+  "o" [shape=box];
+
+  // computation vertices
+  "31 sub" [shape=circle];
+  "i0" -> "31 sub";
+  "i1" -> "31 sub";
+  "31 sub" -> "o";
+}
+// graph for dag "my_sub_helper_0" of module "my_sub" in dot format
+digraph "my_sub_helper_0" {
+  // inputs
+  "i0" [shape=box];
+  "i1" [shape=box];
+
+  // outputs
+  "o" [shape=box];
+
+  // computation vertices
+  "31 sub" [shape=circle];
+  "i0" -> "31 sub";
+  "i1" -> "31 sub";
+  "31 sub" -> "o";
+}
+// graph for dag "dag_0" of module "my_sub_const" in dot format
+digraph "dag_0" {
+  // inputs
+  "i0" [shape=box];
+
+  // outputs
+  "o" [shape=box];
+
+  // computation vertices
+  "37 sub_const" [shape=circle];
+  "i0" -> "37 sub_const";
+  "37 sub_const" -> "o";
+}
+// graph for dag "my_sub_const_helper_0" of module "my_sub_const" in dot format
+digraph "my_sub_const_helper_0" {
+  // inputs
+  "i0" [shape=box];
+
+  // outputs
+  "o" [shape=box];
+
+  // computation vertices
+  "37 sub_const" [shape=circle];
+  "i0" -> "37 sub_const";
+  "37 sub_const" -> "o";
+}
+// graph for dag "dag_0" of module "my_subsat" in dot format
+digraph "dag_0" {
+  // inputs
+  "i0" [shape=box];
+  "i1" [shape=box];
+
+  // outputs
+  "o" [shape=box];
+
+  // computation vertices
+  "43 subsat" [shape=circle];
+  "i0" -> "43 subsat";
+  "i1" -> "43 subsat";
+  "43 subsat" -> "o";
+}
+// graph for dag "my_subsat_helper_0" of module "my_subsat" in dot format
+digraph "my_subsat_helper_0" {
+  // inputs
+  "i0" [shape=box];
+  "i1" [shape=box];
+
+  // outputs
+  "o" [shape=box];
+
+  // computation vertices
+  "43 subsat" [shape=circle];
+  "i0" -> "43 subsat";
+  "i1" -> "43 subsat";
+  "43 subsat" -> "o";
+}
+// graph for dag "dag_0" of module "my_subsat_const" in dot format
+digraph "dag_0" {
+  // inputs
+  "i0" [shape=box];
+
+  // outputs
+  "o" [shape=box];
+
+  // computation vertices
+  "49 subsat_const" [shape=circle];
+  "i0" -> "49 subsat_const";
+  "49 subsat_const" -> "o";
+}
+// graph for dag "my_subsat_const_helper_0" of module "my_subsat_const" in dot format
+digraph "my_subsat_const_helper_0" {
+  // inputs
+  "i0" [shape=box];
+
+  // outputs
+  "o" [shape=box];
+
+  // computation vertices
+  "49 subsat_const" [shape=circle];
+  "i0" -> "49 subsat_const";
+  "49 subsat_const" -> "o";
+}
+// graph for dag "dag_0" of module "my_sup" in dot format
+digraph "dag_0" {
+  // inputs
+  "i0" [shape=box];
+  "i1" [shape=box];
+
+  // outputs
+  "o" [shape=box];
+
+  // computation vertices
+  "19 sup" [shape=circle];
+  "i0" -> "19 sup";
+  "i1" -> "19 sup";
+  "19 sup" -> "o";
+}
+// graph for dag "my_sup_helper_0" of module "my_sup" in dot format
+digraph "my_sup_helper_0" {
+  // inputs
+  "i0" [shape=box];
+  "i1" [shape=box];
+
+  // outputs
+  "o" [shape=box];
+
+  // computation vertices
+  "19 sup" [shape=circle];
+  "i0" -> "19 sup";
+  "i1" -> "19 sup";
+  "19 sup" -> "o";
+}
+// graph for dag "dag_0" of module "my_sup_const" in dot format
+digraph "dag_0" {
+  // inputs
+  "i0" [shape=box];
+
+  // outputs
+  "o" [shape=box];
+
+  // computation vertices
+  "25 sup_const" [shape=circle];
+  "i0" -> "25 sup_const";
+  "25 sup_const" -> "o";
+}
+// graph for dag "my_sup_const_helper_0" of module "my_sup_const" in dot format
+digraph "my_sup_const_helper_0" {
+  // inputs
+  "i0" [shape=box];
+
+  // outputs
+  "o" [shape=box];
+
+  // computation vertices
+  "25 sup_const" [shape=circle];
+  "i0" -> "25 sup_const";
+  "25 sup_const" -> "o";
+}
+// graph for dag "dag_0" of module "my_threshold" in dot format
+digraph "dag_0" {
+  // inputs
+  "i0" [shape=box];
+
+  // outputs
+  "o" [shape=box];
+
+  // computation vertices
+  "214 threshold" [shape=circle];
+  "i0" -> "214 threshold";
+  "214 threshold" -> "o";
+}
+// graph for dag "my_threshold_helper_0" of module "my_threshold" in dot format
+digraph "my_threshold_helper_0" {
+  // inputs
+  "i0" [shape=box];
+
+  // outputs
+  "o" [shape=box];
+
+  // computation vertices
+  "214 threshold" [shape=circle];
+  "i0" -> "214 threshold";
+  "214 threshold" -> "o";
+}
+// graph for dag "dag_0" of module "my_xor" in dot format
+digraph "dag_0" {
+  // inputs
+  "i0" [shape=box];
+  "i1" [shape=box];
+
+  // outputs
+  "o" [shape=box];
+
+  // computation vertices
+  "139 xor" [shape=circle];
+  "i0" -> "139 xor";
+  "i1" -> "139 xor";
+  "139 xor" -> "o";
+}
+// graph for dag "my_xor_helper_0" of module "my_xor" in dot format
+digraph "my_xor_helper_0" {
+  // inputs
+  "i0" [shape=box];
+  "i1" [shape=box];
+
+  // outputs
+  "o" [shape=box];
+
+  // computation vertices
+  "139 xor" [shape=circle];
+  "i0" -> "139 xor";
+  "i1" -> "139 xor";
+  "139 xor" -> "o";
+}
+// graph for dag "dag_0" of module "my_xor_const" in dot format
+digraph "dag_0" {
+  // inputs
+  "i0" [shape=box];
+
+  // outputs
+  "o" [shape=box];
+
+  // computation vertices
+  "145 xor_const" [shape=circle];
+  "i0" -> "145 xor_const";
+  "145 xor_const" -> "o";
+}
+// graph for dag "my_xor_const_helper_0" of module "my_xor_const" in dot format
+digraph "my_xor_const_helper_0" {
+  // inputs
+  "i0" [shape=box];
+
+  // outputs
+  "o" [shape=box];
+
+  // computation vertices
+  "145 xor_const" [shape=circle];
+  "i0" -> "145 xor_const";
+  "145 xor_const" -> "o";
+}
 #include <freiaCommon.h>
 #include <freiaCoarseGrain.h>
 #include <spoc.h>
