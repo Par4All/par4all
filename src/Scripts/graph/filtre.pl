@@ -21,14 +21,19 @@
 # along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+use strict;
+
+my %suivants = ();
+my %infos = ();
+
 #
 # nodeedge source destination
 #
 # routine pour construire un arc a partir du noeud source vers destination
 #
-sub nodeedge
+sub nodeedge($$)
 {
-    ($src,$dst) = @_;
+    my ($src,$dst) = @_;
 #    print "\"$src->$dst\"\n";
     print "l(\"$src->$dst\",e(\"\",[],r(\"$src->$dst\")))\n";
 }
@@ -36,13 +41,13 @@ sub nodeedge
 #
 # node src
 #
-sub node
+sub node($)
 {
-    $src = $_[0];
+    my $src = $_[0];
     print "l(\"$src\",n(\"\",[a(\"OBJECT\",\"$src\"),a(\"COLOR\",\"red\")],[\n";
-    undef %dejavu;
-    $first=1;
-    foreach $dst (@{$suivants{$src}})
+    my %dejavu = ();
+    my $first=1;
+    foreach my $dst (@{$suivants{$src}})
     {
 	unless ($dejavu{$dst}) { 
 	     print "," unless $first;
@@ -58,10 +63,10 @@ sub node
 #
 # construction d un arc labelle.
 #
-sub edge
+sub edge($)
 {
-    $clef = $_[0];
-    ($src, $dst) = split(/->/, $clef);
+    my $clef = $_[0];
+    my ($src, $dst) = split(/->/, $clef);
 #    print "l(\"$clef\",n(\"\",[a(\"OBJECT\",\"$clef\")],[\n";
 
 #    foreach $what (@{$infos{$clef}})
@@ -70,7 +75,7 @@ sub edge
 #   }
     print "l(\"$clef\",n(\"\",[a(\"OBJECT\",\"";
 
-   foreach $what (@{$infos{$clef}})
+   foreach my $what (@{$infos{$clef}})
    {
 	print "$what\\n";
    }
@@ -83,23 +88,25 @@ sub edge
 # lit les arguments.
 # 
 
+my @nodes = ();
+
 while (<>)
 {
-    chop;
-    ($srcx, $dstx, $ef1, $ef2, $var1, $junk, $var2, $src, $dst, $junk2) = split(/ /);
+    chomp;
+    my ($srcx, $dstx, $ef1, $ef2, $var1, $junk, $var2, $src, $dst, $junk2) = split(/ /);
     push @nodes, $dst;
     push @{$suivants{$src}}, $dst;
     push @{$infos{"$src->$dst"}}, "$ef1 $ef2 $var1 $var2";
 }
 
-undef %proccessed;
 
 #
 # creation des noeuds.
 #
-$first=1;
+my $first=1;
+my %proccessed = ();
 print "[";
-foreach $nd (keys %suivants, @nodes)
+for my $nd (sort(keys %suivants, @nodes))
 { 
     unless ($proccessed{$nd}) 
     {
@@ -114,7 +121,7 @@ foreach $nd (keys %suivants, @nodes)
 # creation des arcs.
 #
 
-foreach $ed (keys %infos)
+for my $ed (sort keys %infos)
 {
    print "\,";
    edge $ed;
