@@ -15,5 +15,5 @@ main()
   int ** pp = &p;
 
   **pp = 0;
-  **p = space01(1,j,3.);
+  *p = space01(1,j,3.);
 }
