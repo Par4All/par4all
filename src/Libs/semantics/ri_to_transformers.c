@@ -114,14 +114,14 @@ transformer filter_transformer(transformer t, list e)
       /* I do not know yet if I should keep old values... */
       entity new_val = entity_to_new_value(v);
       b = vect_add_variable(b, (Variable) new_val);
-      
+
       if(entity_is_argument_p(v, transformer_arguments(t))) {
 	args = arguments_add_entity(args, v);
       }
     }
   },
       e);
-  
+
   /* FI: I should check if sc is sc_empty but I haven't (yet) found a
      cheap syntactic test */
   s = sc_restricted_to_variables_transitive_closure(sc, b);
@@ -132,13 +132,13 @@ transformer filter_transformer(transformer t, list e)
 
 /* Recursive Descent in Data Structure Statement */
 
-/* SHARING : returns the transformer stored in the database. Make a copy 
- * before using it. The copy is not made here because the result is not 
- * always used after a call to this function, and it would create non 
- * reachable structures. Another solution would be to store a copy and free 
- * the unused result in the calling function but transformer_free does not 
- * really free the transformer. Not very clean. 
- * BC, oct. 94 
+/* SHARING : returns the transformer stored in the database. Make a
+ * copy before using it. The copy is not made here because the result
+ * is not always used after a call to this function, and it would
+ * create non reachable structures. Another solution would be to store
+ * a copy and free the unused result in the calling function but
+ * transformer_free does not really free the transformer. Not very
+ * clean.  BC, oct. 94
  */
 
 /* It is assumed that entity_has_values_p(v)==TRUE */
@@ -172,12 +172,30 @@ transformer declaration_to_transformer(entity v, transformer pre)
 	tf = transformer_temporary_value_projection(tf);
       }
       else {
-	list el = expression_to_proper_effects(e);
+	if(basic_int_p(eb) && basic_int_p(vb)) {
+	  int i1 = basic_int(eb);
+	  int i2 = basic_int(vb);
+	  if(ABS(i1-i2)==10) {
+	    tf = safe_any_expression_to_transformer(v, e, pre, FALSE);
+	    tf = transformer_temporary_value_projection(tf);
+	    pips_user_warning("Possible conversion issue between signed and"
+			      " unsigned int\n");
+	  }
+	  else {
+	    tf = safe_any_expression_to_transformer(v, e, pre, FALSE);
+	    tf = transformer_temporary_value_projection(tf);
+	    pips_user_warning("Possible conversion issue between diffent kinds"
+			      " of  ints and/or char (%dd and %d)\n", i1, i2);
+	  }
+	}
+	else {
+	  list el = expression_to_proper_effects(e);
 
-	pips_user_warning("Type mismatch detected in initialization expression."
-			  " May be due to overloading and/or implicit confusion"
-			  " between logical and integer in C\n");
-	tf = effects_to_transformer(el);
+	  pips_user_warning("Type mismatch detected in initialization expression."
+			    " May be due to overloading and/or implicit confusion"
+			    " between logical and integer in C\n");
+	  tf = effects_to_transformer(el);
+	}
       }
     }
     else {
@@ -440,9 +458,10 @@ transformer intrinsic_to_transformer(entity e,
 
 static transformer user_call_to_transformer(entity, list, transformer, list);
 
-static transformer call_to_transformer(call c,
-				       transformer pre,
-				       list ef) /* effects of call c */
+/* Use to be static, but may be called from expressions in C. */
+transformer call_to_transformer(call c,
+				transformer pre,
+				list ef) /* effects of call c */
 {
   transformer tf = transformer_undefined;
   entity e = call_function(c);
@@ -891,7 +910,7 @@ transformer any_user_call_site_to_transformer(entity f,
       if(type_equal_p(fpt, apt)) {
 	/* Keep track of fpv to project it later */
 	fpvl = CONS(ENTITY, fpv, fpvl);
-	ctf = 
+	ctf =
 	  // FI: I'm at a lost with this flag
 	  //safe_any_expression_to_transformer(fpv, e, cpre, TRUE);
 	  safe_any_expression_to_transformer(fpv, e, cpre, FALSE);
@@ -1086,7 +1105,7 @@ transformer fortran_user_call_to_transformer(entity f,
 	entity fp_new = external_entity_to_new_value(fp);
 	entity fp_old = external_entity_to_old_value(fp);
 	list args = arguments_add_entity(arguments_add_entity(NIL, fp_new), fp_old);
-			
+
 	pips_user_warning("value (!) might be modified by call to %s\n"
 			  "%dth formal parameter %s\n",
 			  entity_local_name(f), r, entity_local_name(fp));
@@ -1114,7 +1133,7 @@ transformer fortran_user_call_to_transformer(entity f,
       }
     }
   }
-  
+
   pips_debug(8, "Before formal new values left over are eliminated\n");
   ifdebug(8)   dump_transformer(t_caller);
 	
@@ -1376,7 +1395,7 @@ transformer integer_assign_to_transformer(expression lhs,
 	tf = assigned_expression_to_transformer(e, rhs, ef);
 	}
       */
-      /* Check that *some* read or write effects are on integer 
+      /* Check that *some* read or write effects are on integer
        * scalar entities. This is almost always true... Let's hope
        * assigned_expression_to_transformer() returns quickly for array
        * expressions used to initialize a scalar integer entity.
@@ -1406,7 +1425,7 @@ transformer any_scalar_assign_to_transformer(entity v,
   if(entity_has_values_p(v)) {
     entity v_new = entity_to_new_value(v);
     entity v_old = entity_to_old_value(v);
-    entity tmp = make_local_temporary_value_entity(entity_type(v));
+    entity tmp = make_local_temporary_value_entity(ultimate_type(entity_type(v)));
 
     tf = any_expression_to_transformer(tmp, rhs, pre, TRUE);
 

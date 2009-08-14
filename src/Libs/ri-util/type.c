@@ -1652,7 +1652,7 @@ type call_to_type(call c)
     default: pips_internal_error("unknown tag %d\n", t);
       /* Never go there... */
     }
-    
+
     return t;
 }
 
@@ -1674,20 +1674,20 @@ type expression_to_type(expression exp)
     pips_debug(6, "\n");
   }
 
-  switch(syntax_tag(s_exp)) 
+  switch(syntax_tag(s_exp))
     {
     case is_syntax_reference:
       {
 	reference ref = syntax_reference(s_exp);
 	type exp_type = ultimate_type(entity_type(reference_variable(ref)));
-	
+
 	pips_debug(6, "reference case \n");
 
 	if(type_variable_p(exp_type))
 	  {
 	    type ct = exp_type; /* current type */
 	    basic cb = variable_basic(type_variable(exp_type)); /* current basic */
-	    
+
 	    list cd = variable_dimensions(type_variable(exp_type)); /* current dimensions */
 	    list l_inds = reference_indices(ref);
 
@@ -1699,7 +1699,7 @@ type expression_to_type(expression exp)
 	      {
 
 		ifdebug(7) {
-		  pips_debug(7, "new iteration : current type : %s\n", 
+		  pips_debug(7, "new iteration : current type : %s\n",
 			     words_to_string(words_type(ct)));
 		  pips_debug(7, "current list of indices: \n");
 		  print_expressions(l_inds);
@@ -1713,7 +1713,7 @@ type expression_to_type(expression exp)
 		else
 		  {
 		    pips_debug(7,"going through pointer dimension. \n");
-		    pips_assert("reference has too many indices :" 
+		    pips_assert("reference has too many indices :"
 				" pointer expected\n", basic_pointer_p(cb));
 		    ct= basic_pointer(cb);
 		    cb = variable_basic(type_variable(ct));
@@ -1723,7 +1723,7 @@ type expression_to_type(expression exp)
 	      }
 
 	    /* Warning : qualifiers are set to NIL, because I do not see
-	     the need for something else for the moment. BC. 
+	     the need for something else for the moment. BC.
 	    */
 	    t = make_type(is_type_variable,
 			  make_variable(copy_basic(cb),
@@ -1732,43 +1732,43 @@ type expression_to_type(expression exp)
 	  }
 	else if(type_functional_p(exp_type))
 	  {
-	    /* A reference to a function returns a pointer to a function 
+	    /* A reference to a function returns a pointer to a function
 	       of the very same time */
 	    t = make_type(is_type_variable,
 			  make_variable
 			  (make_basic(is_basic_pointer, copy_type(exp_type)),
 			   NIL, NIL));
 	  }
-	else 
+	else
 	  {
 	    pips_internal_error("Bad reference type tag %d \"%s\"\n",
 				type_tag(exp_type), type_to_string(exp_type));
 	  }
-	
+
 	break;
       }
-    case is_syntax_call: 
+    case is_syntax_call:
       {
 	pips_debug(6, "call case \n");
 	t = call_to_type(syntax_call(s_exp));
 	break;
       }
-    case is_syntax_range: 
+    case is_syntax_range:
       {
 	pips_debug(6, "range case \n");
 	/* Well, let's assume range are well formed... */
 	t = expression_to_type(range_lower(syntax_range(s_exp)));
 	break;
       }
-    case is_syntax_cast: 
+    case is_syntax_cast:
       {
 	pips_debug(6, "cast case \n");
 	t = copy_type(cast_type(syntax_cast(s_exp)));
-	if (type_tag(t) != is_type_variable)
+	if (!type_void_p(t) && type_tag(t) != is_type_variable)
 	  pips_internal_error("Bad reference type tag %d\n",type_tag(t));
 	break;
       }
-    case is_syntax_sizeofexpression: 
+    case is_syntax_sizeofexpression:
       {
 	sizeofexpression se = syntax_sizeofexpression(s_exp);
 	pips_debug(6, "size of case \n");
@@ -1784,16 +1784,16 @@ type expression_to_type(expression exp)
 	  }
 	break;
       }
-    case is_syntax_subscript: 
+    case is_syntax_subscript:
       {
 	/* current type */
 	type ct = expression_to_type(subscript_array(syntax_subscript(s_exp)));
-	/* current basic */ 
-	basic cb = variable_basic(type_variable(ct)); 
+	/* current basic */
+	basic cb = variable_basic(type_variable(ct));
 	/* current dimensions */
-	list cd = variable_dimensions(type_variable(ct)); 
+	list cd = variable_dimensions(type_variable(ct));
 	list l_inds = subscript_indices(syntax_subscript(s_exp));
-	
+
 	pips_debug(6, "subscript case \n");
 
 	while (!ENDP(l_inds))
@@ -1811,15 +1811,14 @@ type expression_to_type(expression exp)
 		cd = variable_dimensions(type_variable(ct));
 	      }
 	  }
-	
+
 	/* Warning : qualifiers are set to NIL, because I do not see
-	   the need for something else for the moment. BC. 
+	   the need for something else for the moment. BC.
 	*/
 	t = make_type(is_type_variable,
 		      make_variable(copy_basic(cb),
 				    gen_full_copy_list(cd),
 				    NIL));
-	
 	break;
       }
     case is_syntax_application:
@@ -1831,14 +1830,36 @@ type expression_to_type(expression exp)
     default:
       pips_internal_error("Bad syntax tag %d\n", syntax_tag(s_exp));
       /* Never go there... */
-      
     }
-  
+
   pips_debug(6, "returns with %s\n", words_to_string(words_type(t)));
-  
+
   return t;
 }
 
+/* If the expression is casted, return its type before cast */
+type expression_to_uncasted_type(expression exp)
+{
+  type t = type_undefined;
+  syntax s_exp = expression_syntax(exp);
+
+  ifdebug(6){
+    pips_debug(6, "begins with expression :");
+    print_expression(exp);
+    pips_debug(6, "\n");
+  }
+
+  if(syntax_cast_p(s_exp)) {
+    expression sub_exp = cast_expression(syntax_cast(s_exp));
+
+    t = expression_to_uncasted_type(sub_exp);
+  }
+  else {
+    t = expression_to_type(exp);
+  }
+
+  return t;
+}
 
 /* Preserve typedef'ed types when possible */
 type expression_to_user_type(expression e)

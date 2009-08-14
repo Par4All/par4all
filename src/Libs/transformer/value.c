@@ -432,6 +432,9 @@ entity make_local_temporary_value_entity(type t)
 {
   entity tv = entity_undefined;
 
+  /* FI: is it easier to admit value of type void than to make a
+     special case? Let see if it works... No, it's not a good idea
+     because value are assumed of type variable in many places. */
   if(analyzable_type_p(t))
     tv = make_local_value_entity(local_temporary_value_counter++, 2, t);
   else

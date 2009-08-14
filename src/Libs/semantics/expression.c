@@ -2385,8 +2385,7 @@ transformer transformer_add_any_relation_information(
 
 /* This function may return an undefined transformers if it fails to
    capture the semantics of expr in the polyhedral framework. */
-transformer 
-any_expression_to_transformer(
+transformer any_expression_to_transformer(
 			      entity v, // value of the expression
 			      expression expr,
 			      transformer pre,
@@ -2394,7 +2393,7 @@ any_expression_to_transformer(
 {
   transformer tf = transformer_undefined;
   basic be = basic_of_expression(expr);
-  basic bv = variable_basic(type_variable(entity_type(v)));
+  basic bv = variable_basic(type_variable(ultimate_type(entity_type(v))));
 
   if(basic_typedef_p(be)) {
     entity te = basic_typedef(be);
@@ -2421,16 +2420,16 @@ any_expression_to_transformer(
     switch(basic_tag(be)) {
     case is_basic_int:
       if(integer_analyzed_p()) {
-      if(basic_int_p(bv)) {
-	tf = integer_expression_to_transformer(v, expr, pre, is_internal);
-      }
-      else {
-	pips_user_warning("Integer expression assigned to float value\n"
-			  "Apply PIPS type checker for better results\n");
-	/* Constants, at least, could be typed coerced */
-	/* Redundant with explicit type coercion also available in PIPS */
-	/* To be done later */
-      }
+	if(basic_int_p(bv)) {
+	  tf = integer_expression_to_transformer(v, expr, pre, is_internal);
+	}
+	else {
+	  pips_user_warning("Integer expression assigned to float value\n"
+			    "Apply PIPS type checker for better results\n");
+	  /* Constants, at least, could be typed coerced */
+	  /* Redundant with explicit type coercion also available in PIPS */
+	  /* To be done later */
+	}
       }
       break;
     case is_basic_logical:
@@ -2518,14 +2517,51 @@ transformer expression_to_transformer(
 				      list el)
 {
   type et = expression_to_type(exp);
-  entity tmpv = make_local_temporary_value_entity(et);
-  /* FI: I do not remember the meaning of the last parameter */
-  transformer tf = any_expression_to_transformer(tmpv, exp, pre, FALSE);
+  entity tmpv = entity_undefined;
+  transformer tf = transformer_undefined;
 
+  if(type_void_p(et)) {
+    /* FI: I assume this implies a cast to (void) but I'm wrong for
+       any call to a void function. */
+    syntax s_exp = expression_syntax(exp);
+
+    if(syntax_cast_p(s_exp)) {
+      expression sub_exp = cast_expression(syntax_cast(s_exp));
+      type cet = expression_to_type(sub_exp);
+
+      if(analyzable_type_p(cet)) {
+	entity tmpv = make_local_temporary_value_entity(cet);
+
+	/* FI: I do not remember the meaning of the last parameter */
+	tf = any_expression_to_transformer(tmpv, sub_exp, pre, FALSE);
+      }
+      free_type(cet);
+    }
+    else if(syntax_call_p(s_exp)) {
+      /* Must be a call to a void function */
+      call c = syntax_call(s_exp);
+      list el = expression_to_proper_effects(exp);;
+      tf = call_to_transformer(c, pre, el);
+    }
+    else {
+      /* Wait till it happpens... */
+      pips_internal_error("This case is not handled yet\n");
+    }
+  }
+  else if(analyzable_type_p(et)) {
+    entity tmpv = make_local_temporary_value_entity(et);
+    /* FI: I do not remember the meaning of the last parameter */
+    tf = any_expression_to_transformer(tmpv, exp, pre, FALSE);
+  }
+
+  /* If everything else has failed. */
   if(transformer_undefined_p(tf))
     tf = effects_to_transformer(el);
   else
     tf = transformer_temporary_value_projection(tf);
+
+  free_type(et);
+
   return tf;
 }
 
