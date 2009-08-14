@@ -61,7 +61,11 @@ typedef enum {
  * enumerate set elements in their internal order.
  * caution, this enumeration is not deterministic!
  *
- * SET_FOREACH(var_type, var, set_instance) {
+ * @param var_type is the plain type name (*not* capitalized).
+ * @param var variable name, unique in scope
+ * @param the_set expression that lead to a set, for instance a variable
+ *
+ * SET_FOREACH(var_type, var, the_set) {
  *   instructions;
  * }
  *
