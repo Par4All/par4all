@@ -1,0 +1,89 @@
+delete inlining16
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create inlining16 inlining16.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+setproperty PREPROCESSOR_MISSING_FILE_HANDLING "generate"
+
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
+
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate TRANSFORMERS_INTER_FULL
+activate PRECONDITIONS_INTER_FULL
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+
+echo
+echo Initial code
+echo
+
+display PRINTED_FILE[freia_cipo_dilate]
+display PRINTED_FILE[freia_cipo_outer_gradient]
+
+echo
+echo Because %ALL is modified by code synthesis, let's get ready
+echo
+
+display CALLGRAPH_FILE[freia_cipo_outer_gradient]
+
+echo
+echo Code after inlining
+echo
+
+apply INLINING[freia_cipo_dilate]
+display PRINTED_FILE[freia_cipo_outer_gradient]
+
+echo
+echo Preconditions after inlining and after partial eval
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[main]
+display PRINTED_FILE[freia_cipo_outer_gradient]
+
+echo
+echo Code after partial eval
+echo
+
+activate PRINT_CODE
+apply PARTIAL_EVAL[freia_cipo_outer_gradient]
+display PRINTED_FILE[freia_cipo_outer_gradient]
+
+echo
+echo Code after dead code elimination
+echo
+
+activate PRINT_CODE
+apply SUPPRESS_DEAD_CODE[freia_cipo_outer_gradient]
+display PRINTED_FILE[freia_cipo_outer_gradient]
+
+echo
+echo Code after full loop unrolling
+echo
+
+# The main implies connectivity 8
+
+# apply FULL_UNROLL[freia_cipo_outer_gradient]
+# l4
+# apply FULL_UNROLL[freia_cipo_outer_gradient]
+# l6
+apply FULL_UNROLL[freia_cipo_outer_gradient]
+l8
+
+display PRINTED_FILE[freia_cipo_outer_gradient]
+
+echo
+echo Unsplit resulting code
+echo
+
+apply UNSPLIT
+shell gcc -c inlining16.database/Src/inlining16.c
+
+close
+delete inlining16
+quit
+
