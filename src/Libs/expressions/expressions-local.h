@@ -36,3 +36,4 @@ struct eformat {
     boolean simpler;
 };
 
+typedef struct eformat eformat_t;
