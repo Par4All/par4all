@@ -909,9 +909,12 @@ or synthesized, the field \verb/decls_text/ is destroyed and set to the
 empty string\footnote{A symbolic constant should be used instead of the
 C empty string constant "".} to force declaration generation.
 
-Member \texttt{initializations} contains static initialization derived from
-the DATA statements. They are represented as a sequence of calls to a
-pseudo static initialization function.
+In Fortran, member \texttt{initializations} contains static
+initialization derived from the DATA statements. They are represented
+as a sequence of calls to a pseudo static initialization function. In
+Cn, member \texttt{initializations} is not used for functions, but it
+is used for pointers to functions when they are initialized within
+declarations.
 
 Member \texttt{externs} contains variables declared within the scope but
 not allocated there. They must be provided by some other module at link time.
