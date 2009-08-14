@@ -185,13 +185,14 @@ typedef struct cons {
     @param _fe_list is the list parameter to iterate on
 */
 #define FOREACH(_fe_CASTER, _fe_item, _fe_list) \
-  list UNIQUE_NAME = (_fe_list);		\
+  list UNIQUE_NAME = (_fe_list);					\
   for( _fe_CASTER##_TYPE _fe_item;					\
-       !ENDP(UNIQUE_NAME) && (_fe_item= _fe_CASTER(CAR(UNIQUE_NAME) ));	\
+       !ENDP(UNIQUE_NAME) &&						\
+	 (_fe_item= _fe_CASTER##_CAST(CAR(UNIQUE_NAME) ));		\
        POP(UNIQUE_NAME))
 
 /** Apply some code on the addresses of all the elements of a list
- 
+
     @param _map_list_cp is the variable that will iterate on the adresses
     of all the list elements to be accessed in _code
 

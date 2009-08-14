@@ -100,6 +100,24 @@ typedef union gen_chunk {
 #define FLOAT_TYPE float
 #define STRING_TYPE string
 
+#define bool_TYPE bool
+#define char_TYPE char
+#define int_TYPE int
+#define float_TYPE float
+#define string_TYPE string
+
+#define BOOL_CAST(x) BOOL(x)
+#define CHAR_CAST(x) CHAR(x)
+#define INT_CAST(x) INT(x)
+#define FLOAT_CAST(x) FLOAT(x)
+#define STRING_CAST(x) STRING(x)
+
+#define bool_CAST(x) BOOL(x)
+#define char_CAST(x) CHAR(x)
+#define int_CAST(x) INT(x)
+#define float_CAST(x) FLOAT(x)
+#define string_CAST(x) STRING(x)
+
 #define CONSP_TYPE list
 #define LIST_TYPE list
 #define SETP_TYPE set
@@ -107,6 +125,30 @@ typedef union gen_chunk {
 #define CHUNK_TYPE gen_chunkp
 #define CHUNKP_TYPE gen_chunkp
 #define HASH_TYPE hash_table
+
+#define consp_TYPE list
+#define list_TYPE list
+#define setp_TYPE set
+#define set_TYPE set
+#define chunk_TYPE gen_chunkp
+#define chunkp_TYPE gen_chunkp
+#define hash_TYPE hash_table
+
+#define CONSP_CAST(x) LIST(x)
+#define LIST_CAST(x) LIST(x)
+#define SETP_CAST(x) SET(x)
+#define SET_CAST(x) SET(x)
+#define CHUNK_CAST(x) CHUNK(x)
+#define CHUNKP_CAST(x) CHUNKP(x)
+#define HASH_CAST(x) HASH_TABLE(x)
+
+#define consp_CAST(x) LIST(x)
+#define list_CAST(x) LIST(x)
+#define setp_CAST(x) SET(x)
+#define set_CAST(x) SET(x)
+#define chunk_CAST(x) CHUNK(x)
+#define chunkp_CAST(x) CHUNKP(x)
+#define hash_CAST(x) HASH_TABLE(x)
 
 /* some other macros need the domain number to keep track of the type.
  * they are provided here for the internal types.

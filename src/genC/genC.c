@@ -671,7 +671,12 @@ generate_domain(
     fprintf(header,
 	    "/* %s\n */\n"
 	    "#define %s(x) ((%s)((x).p))\n"
+	    // foo_CAST FOO_CAST
+	    "#define %s_CAST(x) %s(x)\n"
+	    "#define %s_CAST(x) %s(x)\n"
 	    "#define %s_(x) ((x).e)\n"
+	    // foo_TYPE FOO_TYPE
+	    "#define %s_TYPE %s\n"
 	    "#define %s_TYPE %s\n"
 	    "#define %s_undefined ((%s)gen_chunk_undefined)\n"
 	    "#define %s_undefined_p(x) ((x)==%s_undefined)\n"
@@ -685,8 +690,11 @@ generate_domain(
 	    "extern list gen_%s_cons(%s, list);\n",
 	    Name, /* comments */
 	    Name, name, /* defines... */
+	    name, Name,
+	    Name, Name,
 	    Name,
-	    Name, name,
+	    Name, name, // XXX_TYPE
+	    name, name, // xxx_TYPE
 	    name, name,
 	    name, name,
 	    name, name, name, /* copy */
