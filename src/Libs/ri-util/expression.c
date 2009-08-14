@@ -84,16 +84,16 @@ static string actual_fortran_string_to_compare(string fs, int * plength)
 
 /* compare pips fortran string constants from the fortran point of view.
  *
- * as of 3.1 and 6.3.5 of the Fortran 77 standard, the character order 
+ * as of 3.1 and 6.3.5 of the Fortran 77 standard, the character order
  * is not fully specified. It states:
  *  - A < B < C ... < Z
  *  - 0 < 1 < 2 ... < 9
- *  - blank < 0 
+ *  - blank < 0
  *  - blank < A
  *  - 9 < A  *OR* Z < 0
  * since these rules are ascii compatible, we'll take ascii.
  * in practice, this may be implementation dependent?
- * 
+ *
  * @param fs1 constant fortran string (entity name is fine)
  * @param fs2 constant fortran string (entity name is fine)
  * @return -n 0 +n depending on < == >, n first differing char.
@@ -127,38 +127,36 @@ int fortran_string_compare(string fs1, string fs2)
  *  this is a preliminary version. should be improved.
  *  was in HPFC.
  */
-tag suggest_basic_for_expression(e)
-expression e;
+tag suggest_basic_for_expression(expression e)
 {
-    tag	result = basic_tag(expression_basic(e));
+  tag	result = basic_tag(expression_basic(e));
 
-    if (result==is_basic_overloaded)
+  if (result==is_basic_overloaded)
     {
-	syntax s = expression_syntax(e);
+      syntax s = expression_syntax(e);
 
-	/*  must be a call
-	 */
-	assert(syntax_call_p(s));
+      /*  must be a call
+       */
+      assert(syntax_call_p(s));
 
-	if (ENTITY_RELATIONAL_OPERATOR_P(call_function(syntax_call(s))))
-	    result = is_basic_logical;
-	else
+      if (ENTITY_RELATIONAL_OPERATOR_P(call_function(syntax_call(s))))
+	result = is_basic_logical;
+      else
 	{
-	    /* else some clever analysis could be done
-	     */
-	    pips_user_warning("an overloaded is turned into an int...\n");
-	    result = is_basic_int;
+	  /* else some clever analysis could be done
+	   */
+	  pips_user_warning("an overloaded is turned into an int...\n");
+	  result = is_basic_int;
 	}
     }
 
-    return result;
+  return result;
 }
 
-expression expression_mult(ex)
-expression ex;
+expression expression_mult(expression ex)
 {
-    pips_error("expression_mult", "not implemented\n");
-    return ex;
+  pips_error("expression_mult", "not implemented\n");
+  return ex;
 }
 
 /* if v is a constant, returns a constant call.
@@ -166,28 +164,27 @@ expression ex;
  */
 expression entity_to_expression(entity e)
 {
- if(entity_symbolic_p(e))
-   return call_to_expression(make_call(e, NIL));
- else if (entity_constant_p(e))
-   return call_to_expression(make_call(e, NIL));
- else /* should be a scalar variable! */
-   return reference_to_expression(make_reference(e, NIL));
+  if(entity_symbolic_p(e))
+    return call_to_expression(make_call(e, NIL));
+  else if (entity_constant_p(e))
+    return call_to_expression(make_call(e, NIL));
+  else /* should be a scalar variable! */
+    return reference_to_expression(make_reference(e, NIL));
 }
 
 /*
- * remarks: why is the default to normalized_complex~? 
+ * remarks: why is the default to normalized_complex~?
  * should be undefined, OR normalized if possible.
  * I put normalize_reference... FC 27/09/93 and june 94
  */
-expression reference_to_expression(r)
-reference r;
+expression reference_to_expression(reference r)
 {
-    expression e;
-    syntax s = make_syntax(is_syntax_reference, r);
+  expression e;
+  syntax s = make_syntax(is_syntax_reference, r);
 
-    e = make_expression(s, normalize_reference(r));
+  e = make_expression(s, normalize_reference(r));
 
-    return e;
+  return e;
 }
 
 
@@ -195,11 +192,10 @@ reference r;
 
    @param c is the call
  */
-expression call_to_expression(c)
-call c;
+expression call_to_expression(call c)
 {
-    return make_expression(make_syntax(is_syntax_call, c),
-			   normalized_undefined);
+  return make_expression(make_syntax(is_syntax_call, c),
+			 normalized_undefined);
 }
 
 
@@ -208,7 +204,8 @@ call c;
    @param e is the function entity to call
    @param l is the list of argument expressions given to the function to call
  */
-expression make_call_expression(entity e, list l) {
+expression make_call_expression(entity e, list l)
+{
   return call_to_expression(make_call(e, l));
 }
 
@@ -217,8 +214,8 @@ expression make_call_expression(entity e, list l) {
 
   @param f is the function entity to call
   */
-expression
-MakeNullaryCall(entity f) {
+expression MakeNullaryCall(entity f)
+{
   return make_call_expression(f, NIL);
 }
 
@@ -228,8 +225,8 @@ MakeNullaryCall(entity f) {
    @param f is the function entity to call
    @param a is the argument expression given to the function to call
  */
-expression
-MakeUnaryCall(entity f, expression a) {
+expression MakeUnaryCall(entity f, expression a)
+{
   return make_call_expression(f, CONS(EXPRESSION, a, NIL));
 }
 
@@ -286,15 +283,14 @@ make_assign_expression(expression lhs,
 
 /* predicates on expressions */
 
-bool expression_call_p(e)
-expression e;
+bool expression_call_p(expression e)
 {
-    return(syntax_call_p(expression_syntax(e)));
+  return(syntax_call_p(expression_syntax(e)));
 }
 
 call expression_call(expression e)
 {
-    return(syntax_call(expression_syntax(e)));
+  return(syntax_call(expression_syntax(e)));
 }
 
 
@@ -307,7 +303,8 @@ bool expression_reference_p(expression e) {
 
 /* Test if an expression is a reference to a given variable entity.
  */
-bool is_expression_reference_to_entity_p(expression e, entity v) {
+bool is_expression_reference_to_entity_p(expression e, entity v)
+{
   bool is_e_reference_to_v = FALSE;
 
   if(expression_reference_p(e)) {
@@ -335,7 +332,7 @@ bool logical_operator_expression_p(expression e)
   if (expression_call_p(e))
     {
       entity op = call_function(syntax_call(expression_syntax(e)));
-      if (ENTITY_AND_P(op) || ENTITY_OR_P(op) || ENTITY_NOT_P(op) || 
+      if (ENTITY_AND_P(op) || ENTITY_OR_P(op) || ENTITY_NOT_P(op) ||
 	  ENTITY_EQUIV_P(op) ||ENTITY_NON_EQUIV_P(op))
 	return TRUE;
       return FALSE;
@@ -350,7 +347,7 @@ bool relational_expression_p(expression e)
   if (expression_call_p(e))
     {
       entity op = call_function(syntax_call(expression_syntax(e)));
-      if (ENTITY_RELATIONAL_OPERATOR_P(op)) 
+      if (ENTITY_RELATIONAL_OPERATOR_P(op))
 	return TRUE;
       return FALSE;
     }
@@ -367,60 +364,60 @@ bool integer_expression_p(expression e)
 }
 
 bool logical_expression_p(expression e)
-{  
+{
   /* A logical expression is either one of the following:
    * - a logical constant
    * - the symbolic name of a logical constant
-   * - a logical variable name 
+   * - a logical variable name
    * - a logical array element name
    * - a logical function reference
    * - a relational expression (.LT.,.LE.,.EQ.,.NE.,.GT.,.GE.)
-   * - is formed by combining together one or more of the above 
-   *   entities using parentheses and the logical operators 
+   * - is formed by combining together one or more of the above
+   *   entities using parentheses and the logical operators
    *   .NOT.,.AND.,.OR.,.EQV.,.NEQV. */
 
-  /* NN:  In fact, I didn't use the PIPS function : basic_of_expression because of 2 reasons : 
-   * - the function basic_of_intrinsic use the macro : ENTITY_LOGICAL_OPERATOR_P 
+  /* NN:  In fact, I didn't use the PIPS function : basic_of_expression because of 2 reasons :
+   * - the function basic_of_intrinsic use the macro : ENTITY_LOGICAL_OPERATOR_P
    *   which is not like the Fortran Standard definition (the above comments)
-   * - the case where an expression is a range is not considered here for a 
+   * - the case where an expression is a range is not considered here for a
    *   logical expression */
-  
+
   syntax s = expression_syntax(e);
   basic b;
   entity func;
 
   debug(2, "logical expression", "\n");
-  
+
   switch(syntax_tag(s)) {
   case is_syntax_reference:
-    {        
+    {
       b = variable_basic(type_variable(entity_type(reference_variable(syntax_reference(s)))));
       if (basic_logical_p(b))
 	return TRUE;
-      return FALSE;     
+      return FALSE;
     }
   case is_syntax_call:
     {
-      if (operator_expression_p(e,TRUE_OPERATOR_NAME) || 
+      if (operator_expression_p(e,TRUE_OPERATOR_NAME) ||
 	  operator_expression_p(e,FALSE_OPERATOR_NAME) ||
-	  relational_expression_p(e)|| 
+	  relational_expression_p(e)||
 	  logical_operator_expression_p(e) )
 	return TRUE;
       func = call_function(syntax_call(expression_syntax(e)));
       b = variable_basic(type_variable(functional_result(type_functional(entity_type(func)))));
-      if (basic_logical_p(b)) return TRUE;   
+      if (basic_logical_p(b)) return TRUE;
 
       /* The case of symbolic name of a logical constant is not treated here */
 
       return FALSE;
     }
-  case is_syntax_range: 
+  case is_syntax_range:
     return FALSE;
   default: pips_error("basic_of_expression", "Bad syntax tag");
     return FALSE;
   }
-  
-  debug(2, "logical expression", " ends\n");  
+
+  debug(2, "logical expression", " ends\n");
 }
 
 
@@ -430,7 +427,7 @@ bool logical_expression_p(expression e)
  *                        0 , otherwise */
 
 int trivial_expression_p(expression e)
-{  
+{
   if (relational_expression_p(e))
     {
       /* If e is a relational expression*/
@@ -443,69 +440,69 @@ int trivial_expression_p(expression e)
       n1 = NORMALIZE_EXPRESSION(e1);
       n2 = NORMALIZE_EXPRESSION(e2);
       op = call_function(syntax_call(expression_syntax(e)));
-     
+
       ifdebug(3) {
 	fprintf(stderr, "Normalizes of  expression:");
 	print_expression(e);
 	print_normalized(n1);
 	print_normalized(n2);
       }
- 
+
       if (normalized_linear_p(n1) && normalized_linear_p(n2))
 	{
 	  Pvecteur v1 = normalized_linear(n1);
 	  Pvecteur v2 = normalized_linear(n2);
 	  Pvecteur v = vect_substract(v1,v2);
-	   
-	  /* The test if an expression is trivial (always TRUE or FALSE) or not 
-	   * depends on the operator of the expression : 
+
+	  /* The test if an expression is trivial (always TRUE or FALSE) or not
+	   * depends on the operator of the expression :
 	   * (op= {<=,<,>=,>,==,!=}) so we have to treat each different case */
-	  
+
 	  if (vect_constant_p(v))
 	    {
 	      if (ENTITY_NON_EQUAL_P(op))
 		{
-		  /* Expression :  v != 0 */	
+		  /* Expression :  v != 0 */
 		  if (VECTEUR_NUL_P(v)) return -1;
 		  if (value_zero_p(val_of(v))) return -1;
-		  if (value_notzero_p(val_of(v))) return 1;	
+		  if (value_notzero_p(val_of(v))) return 1;
 		}
 	      if (ENTITY_EQUAL_P(op))
 		{
 		  /* Expression :  v == 0 */
 		  if (VECTEUR_NUL_P(v)) return 1;
 		  if (value_zero_p(val_of(v))) return 1;
-		  if (value_notzero_p(val_of(v))) return -1;	
-		}	
+		  if (value_notzero_p(val_of(v))) return -1;
+		}
 	      if (ENTITY_GREATER_OR_EQUAL_P(op))
 		{
 		  /* Expression :  v >= 0 */
 		  if (VECTEUR_NUL_P(v)) return 1;
 		  if (value_posz_p(val_of(v))) return 1;
-		  if (value_neg_p(val_of(v))) return -1;	
-		}	
+		  if (value_neg_p(val_of(v))) return -1;
+		}
 	      if (ENTITY_LESS_OR_EQUAL_P(op))
 		{
 		  /* Expression :  v <= 0 */
 		  if (VECTEUR_NUL_P(v)) return 1;
 		  if (value_negz_p(val_of(v))) return 1;
-		  if (value_pos_p(val_of(v))) return -1;	
-		}	
+		  if (value_pos_p(val_of(v))) return -1;
+		}
 	      if (ENTITY_LESS_THAN_P(op))
 		{
 		  /* Expression :  v < 0 */
 		  if (VECTEUR_NUL_P(v)) return -1;
 		  if (value_neg_p(val_of(v))) return 1;
-		  if (value_posz_p(val_of(v))) return -1;	
-		}	
+		  if (value_posz_p(val_of(v))) return -1;
+		}
 	      if (ENTITY_GREATER_THAN_P(op))
 		{
 		  /* Expression :  v > 0 */
 		  if (VECTEUR_NUL_P(v)) return -1;
 		  if (value_pos_p(val_of(v))) return 1;
-		  if (value_negz_p(val_of(v))) return -1;	
-		}	
-	    }	
+		  if (value_negz_p(val_of(v))) return -1;
+		}
+	    }
 	  return 0;
 	}
       return 0;
@@ -834,12 +831,12 @@ expression make_false_expression()
   return make_call_expression(MakeConstant(FALSE_OPERATOR_NAME,is_basic_logical),NIL);
 }
 
-bool true_expression_p(expression e) 
+bool true_expression_p(expression e)
 {
   return operator_expression_p(e,TRUE_OPERATOR_NAME);
 }
 
-bool false_expression_p(expression e) 
+bool false_expression_p(expression e)
 {
   return operator_expression_p(e,FALSE_OPERATOR_NAME);
 }
@@ -849,29 +846,26 @@ bool false_expression_p(expression e)
  * output   : TRUE if the last dimension is unbounded (*),
  *            FALSE otherwise.
  * modifies : nothing
- * comment  : 
+ * comment  :
  */
 boolean unbounded_dimension_p(dim)
 dimension dim;
 {
     syntax dim_synt = expression_syntax(dimension_upper(dim));
     boolean res = FALSE;
-    
+
     if (syntax_call_p(dim_synt)) {
 	string dim_nom = entity_local_name(call_function(syntax_call(dim_synt)));
-	
+
 	if (same_string_p(dim_nom, UNBOUNDED_DIMENSION_NAME))
 	    res = TRUE;
     }
-	
+
     return(res);
-	
 }
 
 
-expression find_ith_argument(args, n)
-list args;
-int n;
+expression find_ith_argument(list args, int n)
 {
     int i;
     pips_assert("find_ith_argument", n > 0);
@@ -885,9 +879,7 @@ int n;
 }
 
 /* find_ith_expression() is obsolet; use find_ith_argument() instead */
-expression find_ith_expression(le, r)
-list le;
-int r;
+expression find_ith_expression(list le, int r)
 {
     /* the first element is one */
     /* two local variables, useless but for debugging */
@@ -900,7 +892,7 @@ int r;
 	;
 
     if(ENDP(cle))
-	pips_error("find_ith_expression", 
+	pips_error("find_ith_expression",
 		   "not enough elements in expresion list\n");
 
     return EXPRESSION(CAR(cle));
@@ -909,13 +901,12 @@ int r;
 /* transform an int into an expression and generate the corresponding
    entity if necessary; it is not clear if strdup() is always/sometimes
    necessary and if a memory leak occurs; wait till syntax/expression.c
-   is merged with ri-util/expression.c 
+   is merged with ri-util/expression.c
 
    Negative constants do not seem to be included in PIPS internal
    representation.
   */
-expression
-int_to_expression(_int i)
+expression int_to_expression(_int i)
 {
   char constant_name[3*sizeof(i)];
     expression e;
@@ -935,8 +926,7 @@ int_to_expression(_int i)
  * any change.
  * FC.
  */
-expression Value_to_expression(v)
-Value v;
+expression Value_to_expression(Value v)
 {
     return(int_to_expression(VALUE_TO_INT(v)));
 }
@@ -946,20 +936,16 @@ Value v;
    added before their index expressions are scanned;
 
    references to functions and constants (which are encoded as null-ary
-   functions) are not recorded 
+   functions) are not recorded
 */
-list expression_to_reference_list(e, lr)
-expression e;
-list lr;
+list expression_to_reference_list(expression e, list lr)
 {
     syntax s = expression_syntax(e);
     lr = syntax_to_reference_list(s, lr);
     return lr;
 }
 
-list syntax_to_reference_list(s, lr)
-syntax s;
-list lr;
+list syntax_to_reference_list(syntax s, list lr)
 {
     switch(syntax_tag(s)) {
     case is_syntax_reference:
@@ -984,7 +970,7 @@ list lr;
 	     call_arguments(syntax_call(s)));
 	break;
     default:
-	pips_error("syntax_to_reference_list","illegal tag %d\n", 
+	pips_error("syntax_to_reference_list","illegal tag %d\n",
 		   syntax_tag(s));
 
     }
@@ -995,8 +981,7 @@ list lr;
    stage.
    Do not make macros of those printing functions */
 
-void print_expression(e)
-expression e;
+void print_expression(expression e)
 {
     normalized n;
 
@@ -1036,20 +1021,17 @@ void print_syntax_expressions(list le)
 
 }
 
-void print_syntax(s)
-syntax s;
+void print_syntax(syntax s)
 {
     print_words(stderr,words_syntax(s));
 }
 
-void print_reference(r)
-reference r;
+void print_reference(reference r)
 {
     print_words(stderr,words_reference(r));
 }
 
-void print_reference_list(lr)
-list lr;
+void print_reference_list(list lr)
 {
     if(ENDP(lr))
 	fputs("NIL", stderr);
@@ -1070,8 +1052,7 @@ void print_references(list rl)
   print_reference_list(rl);
 }
 
-void print_normalized(n)
-normalized n;
+void print_normalized(normalized n)
 {
     if(normalized_complex_p(n))
 	(void) fprintf(stderr,"COMPLEX\n");
@@ -1081,12 +1062,10 @@ normalized n;
 	vect_debug((Pvecteur)normalized_linear(n));
 }
 
-bool expression_equal_p(e1, e2)
-expression e1;
-expression e2;
+bool expression_equal_p(expression e1, expression e2)
 {
   syntax s1, s2;
-  
+
   /* Add expression_undefined tests to avoid segmentation fault */
 
   if (expression_undefined_p(e1) && expression_undefined_p(e2))
@@ -1101,165 +1080,157 @@ expression e2;
   return syntax_equal_p(s1, s2);
 }
 
-bool 
-same_expression_p(expression e1, expression e2)
+bool same_expression_p(expression e1, expression e2)
 {
-    normalized n1, n2;
+  normalized n1, n2;
 
+  n1 = expression_normalized(e1);
+  n2 = expression_normalized(e2);
+
+  /* lazy normalization.
+   */
+  if (normalized_undefined_p(n1)) {
+    normalize_all_expressions_of(e1);
     n1 = expression_normalized(e1);
+  }
+
+  if (normalized_undefined_p(n2)) {
+    normalize_all_expressions_of(e2);
     n2 = expression_normalized(e2);
+  }
 
-    /* lazy normalization.
-     */
-    if (normalized_undefined_p(n1)) {
-	normalize_all_expressions_of(e1);
-        n1 = expression_normalized(e1);
-    }
-
-    if (normalized_undefined_p(n2)) {
-	normalize_all_expressions_of(e2);
-        n2 = expression_normalized(e2);
-    }
-
-    if (normalized_linear_p(n1) && normalized_linear_p(n2))
-	return vect_equal(normalized_linear(n1), normalized_linear(n2));
-    else
-	return expression_equal_p(e1, e2);
+  if (normalized_linear_p(n1) && normalized_linear_p(n2))
+    return vect_equal(normalized_linear(n1), normalized_linear(n2));
+  else
+    return expression_equal_p(e1, e2);
 }
 
-bool 
-syntax_equal_p(syntax s1, syntax s2)
+bool syntax_equal_p(syntax s1, syntax s2)
 {
-    tag t1 = syntax_tag(s1);
-    tag t2 = syntax_tag(s2);
+  tag t1 = syntax_tag(s1);
+  tag t2 = syntax_tag(s2);
 
-    if(t1!=t2)
-	return FALSE;
-
-    switch(t1) {
-    case is_syntax_reference:
-	return reference_equal_p(syntax_reference(s1), syntax_reference(s2));
-	break;
-    case is_syntax_range:
-	return range_equal_p(syntax_range(s1), syntax_range(s2));
-	break;
-    case is_syntax_call:
-	return call_equal_p(syntax_call(s1), syntax_call(s2));
-	break;
-    default:
-	break;
-    }
-
-    pips_error("syntax_equal_p", "ill. tag\n");
+  if(t1!=t2)
     return FALSE;
+
+  switch(t1) {
+  case is_syntax_reference:
+    return reference_equal_p(syntax_reference(s1), syntax_reference(s2));
+    break;
+  case is_syntax_range:
+    return range_equal_p(syntax_range(s1), syntax_range(s2));
+    break;
+  case is_syntax_call:
+    return call_equal_p(syntax_call(s1), syntax_call(s2));
+    break;
+  default:
+    break;
+  }
+
+  pips_error("syntax_equal_p", "ill. tag\n");
+  return FALSE;
 }
 
-bool 
-reference_equal_p(reference r1, reference r2)
+bool reference_equal_p(reference r1, reference r2)
 {
-    entity v1 = reference_variable(r1);
-    entity v2 = reference_variable(r2);
+  entity v1 = reference_variable(r1);
+  entity v2 = reference_variable(r2);
 
-    list dims1 = reference_indices(r1);
-    list dims2 = reference_indices(r2);
+  list dims1 = reference_indices(r1);
+  list dims2 = reference_indices(r2);
 
-    if(v1 != v2)
-	return FALSE;
+  if(v1 != v2)
+    return FALSE;
 
-    if(gen_length(dims1) != gen_length(dims2))
-	return FALSE;
-    /*
-       pips_internal_error("Different dimensions for %s: %d and %d\n",
-       entity_local_name(v1), gen_length(dims1), gen_length(dims2));
-       */
+  if(gen_length(dims1) != gen_length(dims2))
+    return FALSE;
+  /*
+    pips_internal_error("Different dimensions for %s: %d and %d\n",
+    entity_local_name(v1), gen_length(dims1), gen_length(dims2));
+  */
 
-    for(; !ENDP(dims1); POP(dims1), POP(dims2))
-	if(!expression_equal_p(EXPRESSION(CAR(dims1)), EXPRESSION(CAR(dims2))))
-	    return FALSE;
+  for(; !ENDP(dims1); POP(dims1), POP(dims2))
+    if(!expression_equal_p(EXPRESSION(CAR(dims1)), EXPRESSION(CAR(dims2))))
+      return FALSE;
 
-    return TRUE;
+  return TRUE;
 }
 
-bool 
-range_equal_p(range r1, range r2)
+bool range_equal_p(range r1, range r2)
 {
-    return expression_equal_p(range_lower(r1), range_lower(r2))
-	&& expression_equal_p(range_upper(r1), range_upper(r2))
-	    && expression_equal_p(range_increment(r1), range_increment(r2));
+  return expression_equal_p(range_lower(r1), range_lower(r2))
+    && expression_equal_p(range_upper(r1), range_upper(r2))
+    && expression_equal_p(range_increment(r1), range_increment(r2));
 }
 
-bool 
-call_equal_p(call c1, call c2)
+bool call_equal_p(call c1, call c2)
 {
-    entity f1 = call_function(c1);
-    entity f2 = call_function(c2);
-    list args1 = call_arguments(c1);
-    list args2 = call_arguments(c2);
+  entity f1 = call_function(c1);
+  entity f2 = call_function(c2);
+  list args1 = call_arguments(c1);
+  list args2 = call_arguments(c2);
 
-    if(f1 != f2)
-	return FALSE;
+  if(f1 != f2)
+    return FALSE;
 
-    if(gen_length(args1) != gen_length(args2)) /* this should be a bug */
-	return FALSE;
+  if(gen_length(args1) != gen_length(args2)) /* this should be a bug */
+    return FALSE;
 
-    for(; !ENDP(args1); POP(args1), POP(args2))
-	if(!expression_equal_p(EXPRESSION(CAR(args1)), EXPRESSION(CAR(args2))))
-	    return FALSE;
+  for(; !ENDP(args1); POP(args1), POP(args2))
+    if(!expression_equal_p(EXPRESSION(CAR(args1)), EXPRESSION(CAR(args2))))
+      return FALSE;
 
-    return TRUE;
+  return TRUE;
 }
 
 /* expression make_integer_constant_expression(int c)
  *  make expression for integer
  */
-expression 
-make_integer_constant_expression(int c)
+expression make_integer_constant_expression(int c)
 {
-    expression ex_cons;
-    entity ce;   
-   
-    ce = make_integer_constant_entity(c);
-    /* make expression for the constant c*/
-    ex_cons = make_expression(
-			      make_syntax(is_syntax_call,
-					  make_call(ce,NIL)), 
-			      normalized_undefined);
-    return (ex_cons);
+  expression ex_cons;
+  entity ce;
+
+  ce = make_integer_constant_entity(c);
+  /* make expression for the constant c*/
+  ex_cons = make_expression(
+			    make_syntax(is_syntax_call,
+					make_call(ce,NIL)),
+			    normalized_undefined);
+  return (ex_cons);
 }
 
-int 
-integer_constant_expression_value(expression e)
+int integer_constant_expression_value(expression e)
 {
   pips_assert("is constant", integer_constant_expression_p(e));
   return signed_integer_constant_expression_value(e);
 }
 
-int 
-signed_integer_constant_expression_value(expression e)
+int signed_integer_constant_expression_value(expression e)
 {
-    /* could be coded by geting directly the value of the constant entity... */
-    /* also available as integer_constant_p() which has *two* arguments */
+  /* could be coded by geting directly the value of the constant entity... */
+  /* also available as integer_constant_p() which has *two* arguments */
 
-    normalized n = normalized_undefined;
-    int val = 0;
+  normalized n = normalized_undefined;
+  int val = 0;
 
-    pips_assert("is signed constant", signed_integer_constant_expression_p(e));
+  pips_assert("is signed constant", signed_integer_constant_expression_p(e));
 
-    n = NORMALIZE_EXPRESSION(e);
-    if(normalized_linear_p(n)) {
-	Pvecteur v = (Pvecteur) normalized_linear(n);
+  n = NORMALIZE_EXPRESSION(e);
+  if(normalized_linear_p(n)) {
+    Pvecteur v = (Pvecteur) normalized_linear(n);
 
-	if(vect_constant_p(v)) {
-	    Value x = vect_coeff(TCST, v);
-	    val = VALUE_TO_INT(x);
-	    }
-	else
-	    pips_internal_error("non constant expression\n");
+    if(vect_constant_p(v)) {
+      Value x = vect_coeff(TCST, v);
+      val = VALUE_TO_INT(x);
     }
     else
-	pips_internal_error("non affine expression\n");
+      pips_internal_error("non constant expression\n");
+  }
+  else
+    pips_internal_error("non affine expression\n");
 
-    return val;
+  return val;
 }
 
 
@@ -1270,86 +1241,84 @@ signed_integer_constant_expression_value(expression e)
 /* expression make_factor_expression(int coeff, entity vari)
  * make the expression "coeff*vari"  where vari is an entity.
  */
-expression 
-make_factor_expression(int coeff, entity vari)
+expression make_factor_expression(int coeff, entity vari)
 {
-    expression e1, e2, e3;
-    entity operateur_multi;
+  expression e1, e2, e3;
+  entity operateur_multi;
 
-    e1 = make_integer_constant_expression(coeff);
-    if (vari==NULL)
-	return(e1);			/* a constant only */
+  e1 = make_integer_constant_expression(coeff);
+  if (vari==NULL)
+    return(e1);			/* a constant only */
+  else {
+    e2 = make_expression(make_syntax(is_syntax_reference,
+				     make_reference(vari, NIL)),
+			 normalized_undefined);
+    if (coeff == 1) return(e2);
     else {
-	e2 = make_expression(make_syntax(is_syntax_reference,
-					 make_reference(vari, NIL)),
-			     normalized_undefined);
-	if (coeff == 1) return(e2);
-	else {
-	    operateur_multi = gen_find_tabulated("TOP-LEVEL:*",entity_domain);
-	    e3 = make_expression(make_syntax(is_syntax_call,
-					     make_call(operateur_multi,
-				       CONS(EXPRESSION, e1,
-				       CONS(EXPRESSION, e2,
-					    NIL)))),
-				 normalized_undefined);
-	    return (e3);
-	}
+      operateur_multi = gen_find_tabulated("TOP-LEVEL:*",entity_domain);
+      e3 = make_expression(make_syntax(is_syntax_call,
+				       make_call(operateur_multi,
+						 CONS(EXPRESSION, e1,
+						      CONS(EXPRESSION, e2,
+							   NIL)))),
+			   normalized_undefined);
+      return (e3);
     }
+  }
 }
 
 /* make expression for vector (Pvecteur)
  */
-expression 
-make_vecteur_expression(Pvecteur pv)
+expression make_vecteur_expression(Pvecteur pv)
 {
-    /* sort: to insure a deterministic generation of the expression.
-     * note: the initial system is *NOT* touched.
-     * ??? Sometimes the vectors are shared, so you cant modify them
-     *     that easily. Many cores in Hpfc (deducables), Wp65, and so.
-     * ok, I'm responsible for some of them:-)
-     *
-     *  (c) FC 24/11/94
-     */
-    Pvecteur
-	v_sorted = vect_sort(pv, compare_Pvecteur),
-	v = v_sorted;
-    expression 	factor1, factor2;
-    entity op_add, op_sub;
-    int coef;
+  /* sort: to insure a deterministic generation of the expression.
+   * note: the initial system is *NOT* touched.
+   * ??? Sometimes the vectors are shared, so you cant modify them
+   *     that easily. Many cores in Hpfc (deducables), Wp65, and so.
+   * ok, I'm responsible for some of them:-)
+   *
+   *  (c) FC 24/11/94
+   */
+  Pvecteur
+    v_sorted = vect_sort(pv, compare_Pvecteur),
+    v = v_sorted;
+  expression factor1, factor2;
+  entity op_add, op_sub;
+  int coef;
 
-    op_add = entity_intrinsic(PLUS_OPERATOR_NAME);
-    op_sub = entity_intrinsic(MINUS_OPERATOR_NAME);
+  op_add = entity_intrinsic(PLUS_OPERATOR_NAME);
+  op_sub = entity_intrinsic(MINUS_OPERATOR_NAME);
 
-    if (VECTEUR_NUL_P(v)) 
-	return make_integer_constant_expression(0);
+  if (VECTEUR_NUL_P(v))
+    return make_integer_constant_expression(0);
 
-    coef = VALUE_TO_INT(vecteur_val(v));
+  coef = VALUE_TO_INT(vecteur_val(v));
 
-    if (coef==-1) /* let us avoid -1*var, we prefer -var */
+  if (coef==-1) /* let us avoid -1*var, we prefer -var */
     {
-	entity op_ums = entity_intrinsic(UNARY_MINUS_OPERATOR_NAME);
-	factor1 = make_factor_expression(1, (entity) vecteur_var(v));
-	factor1 = call_to_expression
-	    (make_call(op_ums, CONS(EXPRESSION, factor1, NIL)));
+      entity op_ums = entity_intrinsic(UNARY_MINUS_OPERATOR_NAME);
+      factor1 = make_factor_expression(1, (entity) vecteur_var(v));
+      factor1 = call_to_expression
+	(make_call(op_ums, CONS(EXPRESSION, factor1, NIL)));
     }
-    else
-	factor1 = make_factor_expression(coef, (entity) vecteur_var(v));
+  else
+    factor1 = make_factor_expression(coef, (entity) vecteur_var(v));
 
-    for (v=v->succ; v!=NULL; v=v->succ)
+  for (v=v->succ; v!=NULL; v=v->succ)
     {
-	coef = VALUE_TO_INT(vecteur_val(v));
-	pips_assert("some coefficient", coef!=0);
-	factor2 = make_factor_expression(ABS(coef), (entity) vecteur_var(v));
-	factor1 = call_to_expression
-	    (make_call(coef>0? op_add: op_sub,
-		       CONS(EXPRESSION, factor1,
-		       CONS(EXPRESSION, factor2,
-			    NIL))));
+      coef = VALUE_TO_INT(vecteur_val(v));
+      pips_assert("some coefficient", coef!=0);
+      factor2 = make_factor_expression(ABS(coef), (entity) vecteur_var(v));
+      factor1 = call_to_expression
+	(make_call(coef>0? op_add: op_sub,
+		   CONS(EXPRESSION, factor1,
+			CONS(EXPRESSION, factor2,
+			     NIL))));
     }
 
-    vect_rm(v_sorted);
+  vect_rm(v_sorted);
 
-    return factor1;
+  return factor1;
 }
 
 /* generates var = linear expression from the Pvecteur.
@@ -1359,28 +1328,26 @@ make_vecteur_expression(Pvecteur pv)
    ??? should manage an (positive remainder) integer divide ?  Have a look
    to make_constraint_expression instead?
  */
-statement
-Pvecteur_to_assign_statement(
-    entity var,
-    Pvecteur v)
+statement Pvecteur_to_assign_statement(entity var,
+				       Pvecteur v)
 {
-    statement result;
-    Pvecteur vcopy;
-    Value coef;
-    
-    coef = vect_coeff((Variable) var, v);
-    assert(value_le(value_abs(coef),VALUE_ONE));
+  statement result;
+  Pvecteur vcopy;
+  Value coef;
 
-    vcopy = vect_dup(v);
-    
-    if (value_notzero_p(coef)) vect_erase_var(&vcopy, (Variable) var);
-    if (value_one_p(coef)) vect_chg_sgn(vcopy);
-	
-    result = make_assign_statement(entity_to_expression(var),
-				   make_vecteur_expression(vcopy));
-    vect_rm(vcopy);
+  coef = vect_coeff((Variable) var, v);
+  assert(value_le(value_abs(coef),VALUE_ONE));
 
-    return result;
+  vcopy = vect_dup(v);
+
+  if (value_notzero_p(coef)) vect_erase_var(&vcopy, (Variable) var);
+  if (value_one_p(coef)) vect_chg_sgn(vcopy);
+
+  result = make_assign_statement(entity_to_expression(var),
+				 make_vecteur_expression(vcopy));
+  vect_rm(vcopy);
+
+  return result;
 }
 
 
@@ -1389,63 +1356,64 @@ Pvecteur_to_assign_statement(
   For example: for a constraint of index I : aI + linear_expr(J,K,TCST) <=0
   @return the new expression for I that is -expr_linear(J,K,TCST)/a
  */
-expression make_constraint_expression(Pvecteur v, Variable index) {
-    Pvecteur pv;
-    expression ex1, ex2, ex;
-    entity div;
-    Value coeff;
+expression make_constraint_expression(Pvecteur v, Variable index)
+{
+  Pvecteur pv;
+  expression ex1, ex2, ex;
+  entity div;
+  Value coeff;
 
-    /*search the couple (var,val) where var is equal to index and extract it */
-    pv = vect_dup(v);
-    coeff = vect_coeff(index, pv);
-    vect_erase_var(&pv, index);
+  /*search the couple (var,val) where var is equal to index and extract it */
+  pv = vect_dup(v);
+  coeff = vect_coeff(index, pv);
+  vect_erase_var(&pv, index);
 
-    if (VECTEUR_NUL_P(pv))
-      /* If the vector wihout the index is the vector null, we have simply
-	 index = 0: */
-      return make_integer_constant_expression(0);
+  if (VECTEUR_NUL_P(pv))
+    /* If the vector wihout the index is the vector null, we have simply
+       index = 0: */
+    return make_integer_constant_expression(0);
 
-    /* If the coefficient for the index is positive, inverse all the
-       vector since the index goes at the other side of "=": */
-    if (value_pos_p(coeff))
-      vect_chg_sgn(pv);
-    else {
-      /* If coeff is negative, correct the future division rounding (by
-	 -coeff) by adding (coeff - 1) to the vector first: */
-      value_absolute(coeff);
-      vect_add_elem(&pv, TCST, value_minus(coeff, VALUE_ONE));
-    }
+  /* If the coefficient for the index is positive, inverse all the
+     vector since the index goes at the other side of "=": */
+  if (value_pos_p(coeff))
+    vect_chg_sgn(pv);
+  else {
+    /* If coeff is negative, correct the future division rounding (by
+       -coeff) by adding (coeff - 1) to the vector first: */
+    value_absolute(coeff);
+    vect_add_elem(&pv, TCST, value_minus(coeff, VALUE_ONE));
+  }
 
-    if(vect_size(pv) == 1 && vecteur_var(pv) == TCST) {
-      /* If the vector is simply coeff.index=c, directly generate and
-	 return c/coeff: */
-      vecteur_val(pv) = value_pdiv(vecteur_val(pv), coeff);
-      return make_vecteur_expression(pv);
-    }
+  if(vect_size(pv) == 1 && vecteur_var(pv) == TCST) {
+    /* If the vector is simply coeff.index=c, directly generate and
+       return c/coeff: */
+    vecteur_val(pv) = value_pdiv(vecteur_val(pv), coeff);
+    return make_vecteur_expression(pv);
+  }
 
-    /* Generate an expression from the linear vector: */
-    ex1 = make_vecteur_expression(pv);
+  /* Generate an expression from the linear vector: */
+  ex1 = make_vecteur_expression(pv);
 
-    if (value_gt(coeff, VALUE_ONE)) {
-      /* If coeff > 1, divide all the expression by coeff: */
-      /* FI->YY: before generating a division, you should test if it could
-	   not be performed statically; you have to check if ex1 is not a
-	   constant expression, which is fairly easy since you still have
-	   its linear form, pv */
-      div = gen_find_tabulated("TOP-LEVEL:/",entity_domain);
-      pips_assert("Division operator not found", div != entity_undefined);
+  if (value_gt(coeff, VALUE_ONE)) {
+    /* If coeff > 1, divide all the expression by coeff: */
+    /* FI->YY: before generating a division, you should test if it could
+       not be performed statically; you have to check if ex1 is not a
+       constant expression, which is fairly easy since you still have
+       its linear form, pv */
+    div = gen_find_tabulated("TOP-LEVEL:/",entity_domain);
+    pips_assert("Division operator not found", div != entity_undefined);
 
-      ex2 = make_integer_constant_expression(VALUE_TO_INT(coeff));
-      ex = make_expression(make_syntax(is_syntax_call,
-				       make_call(div,
-						 CONS(EXPRESSION,ex1,
-						      CONS(EXPRESSION,
-							   ex2,NIL)))),
-			   normalized_undefined);
-      return(ex);
-    }
-    else
-      return(ex1);
+    ex2 = make_integer_constant_expression(VALUE_TO_INT(coeff));
+    ex = make_expression(make_syntax(is_syntax_call,
+				     make_call(div,
+					       CONS(EXPRESSION,ex1,
+						    CONS(EXPRESSION,
+							 ex2,NIL)))),
+			 normalized_undefined);
+    return(ex);
+  }
+  else
+    return(ex1);
 }
 
 
@@ -1485,108 +1453,104 @@ expression make_contrainte_expression(Pcontrainte pc, Variable index) {
  *
  */
 /* rather use make_vecteur_expression which was already there */
-expression 
-Pvecteur_to_expression(Pvecteur vect)
+expression Pvecteur_to_expression(Pvecteur vect)
 {
-    Pvecteur Vs;
-    expression aux_exp, new_exp;
-    entity plus_ent, mult_ent, minus_ent, unary_minus_ent, op_ent;
-    
-    new_exp = expression_undefined;
-    Vs = vect;
-    
-    debug( 7, "Pvecteur_to_expression", "doing\n");
-    if(!VECTEUR_NUL_P(Vs))
+  Pvecteur Vs;
+  expression aux_exp, new_exp;
+  entity plus_ent, mult_ent, minus_ent, unary_minus_ent, op_ent;
+
+  new_exp = expression_undefined;
+  Vs = vect;
+
+  debug( 7, "Pvecteur_to_expression", "doing\n");
+  if(!VECTEUR_NUL_P(Vs))
     {
-	entity var = (entity) Vs->var;
-	int val = VALUE_TO_INT(Vs->val);
-	
-  /* We get the entities corresponding to the three operations +, - and *. */
-  plus_ent = gen_find_tabulated(make_entity_fullname(TOP_LEVEL_MODULE_NAME,
-                                                     PLUS_OPERATOR_NAME),
-                                entity_domain);
-  minus_ent = gen_find_tabulated(make_entity_fullname(TOP_LEVEL_MODULE_NAME,
-                                                      MINUS_OPERATOR_NAME),
-                                 entity_domain);
-  mult_ent = gen_find_tabulated(make_entity_fullname(TOP_LEVEL_MODULE_NAME,
-                                                     MULTIPLY_OPERATOR_NAME),
-                                entity_domain);
-  unary_minus_ent =
-         gen_find_tabulated(make_entity_fullname(TOP_LEVEL_MODULE_NAME,
-                                                 UNARY_MINUS_OPERATOR_NAME),
-		 	    entity_domain);
+      entity var = (entity) Vs->var;
+      int val = VALUE_TO_INT(Vs->val);
 
-  /* Computation of the first variable of the vector. */
-  if(term_cst(Vs))
-    /* Special case of the constant term. */
-    new_exp = make_integer_constant_expression(val);
-  else if( (val != 1) && (val != -1) )
-    new_exp = MakeBinaryCall(mult_ent,
-                             make_integer_constant_expression(val),
-                             make_entity_expression(var, NIL));
-  else if (val == 1)
-    /* We eliminate this value equal to one. */
-    new_exp = make_entity_expression(var, NIL);
-  else /* val == -1 */
-    new_exp = MakeUnaryCall(unary_minus_ent, make_entity_expression(var, NIL));
+      /* We get the entities corresponding to the three operations +, - and *. */
+      plus_ent = gen_find_tabulated(make_entity_fullname(TOP_LEVEL_MODULE_NAME,
+							 PLUS_OPERATOR_NAME),
+				    entity_domain);
+      minus_ent = gen_find_tabulated(make_entity_fullname(TOP_LEVEL_MODULE_NAME,
+							  MINUS_OPERATOR_NAME),
+				     entity_domain);
+      mult_ent = gen_find_tabulated(make_entity_fullname(TOP_LEVEL_MODULE_NAME,
+							 MULTIPLY_OPERATOR_NAME),
+				    entity_domain);
+      unary_minus_ent =
+	gen_find_tabulated(make_entity_fullname(TOP_LEVEL_MODULE_NAME,
+						UNARY_MINUS_OPERATOR_NAME),
+			   entity_domain);
 
-  /* Computation of the rest of the vector. */
-  for(Vs = vect->succ; !VECTEUR_NUL_P(Vs); Vs = Vs->succ)
-    {
-    var = (entity) Vs->var;
-    val = VALUE_TO_INT(Vs->val);
+      /* Computation of the first variable of the vector. */
+      if(term_cst(Vs))
+	/* Special case of the constant term. */
+	new_exp = make_integer_constant_expression(val);
+      else if( (val != 1) && (val != -1) )
+	new_exp = MakeBinaryCall(mult_ent,
+				 make_integer_constant_expression(val),
+				 make_entity_expression(var, NIL));
+      else if (val == 1)
+	/* We eliminate this value equal to one. */
+	new_exp = make_entity_expression(var, NIL);
+      else /* val == -1 */
+	new_exp = MakeUnaryCall(unary_minus_ent, make_entity_expression(var, NIL));
 
-    if (val < 0)
-      {
-      op_ent = minus_ent;
-      val = -val;
-      }
-    else
-      op_ent = plus_ent;
+      /* Computation of the rest of the vector. */
+      for(Vs = vect->succ; !VECTEUR_NUL_P(Vs); Vs = Vs->succ)
+	{
+	  var = (entity) Vs->var;
+	  val = VALUE_TO_INT(Vs->val);
 
-    if(term_cst(Vs))
-      /* Special case of the constant term. */
-      aux_exp = make_integer_constant_expression(val);
-    else if(val != 1)
-      aux_exp = MakeBinaryCall(mult_ent,
-                               make_integer_constant_expression(val),
-                               make_entity_expression(var, NIL));
-    else
-      /* We eliminate this value equal to one. */
-      aux_exp = make_entity_expression(var, NIL);
+	  if (val < 0)
+	    {
+	      op_ent = minus_ent;
+	      val = -val;
+	    }
+	  else
+	    op_ent = plus_ent;
 
-    new_exp = MakeBinaryCall(op_ent, new_exp, aux_exp);
+	  if(term_cst(Vs))
+	    /* Special case of the constant term. */
+	    aux_exp = make_integer_constant_expression(val);
+	  else if(val != 1)
+	    aux_exp = MakeBinaryCall(mult_ent,
+				     make_integer_constant_expression(val),
+				     make_entity_expression(var, NIL));
+	  else
+	    /* We eliminate this value equal to one. */
+	    aux_exp = make_entity_expression(var, NIL);
+
+	  new_exp = MakeBinaryCall(op_ent, new_exp, aux_exp);
+	}
     }
-    }
-    return(new_exp);
+  return(new_exp);
 }
 
 
-reference expression_reference(e)
-expression e;
+reference expression_reference(expression e)
 {
     return syntax_reference(expression_syntax(e));
 }
-
+
 /* predicates on references */
 
-bool 
-array_reference_p(r)
-reference r;
+bool array_reference_p(reference r)
 {
-    /* two possible meanings:
-     * - the referenced variable is declared as an array
-     * - the reference is to an array element
-     *
-     * This makes a difference in procedure calls and IO statements
-     *
-     * The second interpretation is chosen.
-     */
+  /* two possible meanings:
+   * - the referenced variable is declared as an array
+   * - the reference is to an array element
+   *
+   * This makes a difference in procedure calls and IO statements
+   *
+   * The second interpretation is chosen.
+   */
 
-    return reference_indices(r) != NIL;
+  return reference_indices(r) != NIL;
 }
 
-/* If TRUE is returned, the two references cannot conflict unless array 
+/* If TRUE is returned, the two references cannot conflict unless array
  * bound declarations are violated. If FALSE is returned, the two references
  * may conflict.
  *
@@ -1599,95 +1563,88 @@ reference r;
  * If needed, an extra effort could be made for aliased arrays.
  */
 
-bool
-references_do_not_conflict_p(reference r1, reference r2)
+bool references_do_not_conflict_p(reference r1, reference r2)
 {
-    bool do_not_conflict = FALSE;
-    entity v1 = reference_variable(r1);
-    entity v2 = reference_variable(r2);
+  bool do_not_conflict = FALSE;
+  entity v1 = reference_variable(r1);
+  entity v2 = reference_variable(r2);
 
-    if(v1==v2) {
-	list s1 = reference_indices(r1);
-	list s2 = reference_indices(r2);
-	if(!ENDP(s1) && gen_length(s1)==gen_length(s2)) {
-	    list cs1, cs2;
-	    for(cs1=s1, cs2=s2; !ENDP(cs1) && !do_not_conflict; POP(cs1), POP(cs2)) {
-		expression sub1 = EXPRESSION(CAR(cs1));
-		expression sub2 = EXPRESSION(CAR(cs2));
-		if(expression_constant_p(sub1) && expression_constant_p(sub2)) {
-		    /* FI: OK, it would be better to use their normalized forms */
-		    do_not_conflict = (expression_to_int(sub1)!=expression_to_int(sub2));
-		}
-	    }
+  if(v1==v2) {
+    list s1 = reference_indices(r1);
+    list s2 = reference_indices(r2);
+    if(!ENDP(s1) && gen_length(s1)==gen_length(s2)) {
+      list cs1, cs2;
+      for(cs1=s1, cs2=s2; !ENDP(cs1) && !do_not_conflict; POP(cs1), POP(cs2)) {
+	expression sub1 = EXPRESSION(CAR(cs1));
+	expression sub2 = EXPRESSION(CAR(cs2));
+	if(expression_constant_p(sub1) && expression_constant_p(sub2)) {
+	  /* FI: OK, it would be better to use their normalized forms */
+	  do_not_conflict = (expression_to_int(sub1)!=expression_to_int(sub2));
 	}
+      }
     }
+  }
 
-    return do_not_conflict;
+  return do_not_conflict;
 }
 
 /*
  *    Utils from hpfc on 15 May 94, FC
  *
  */
-expression 
-expression_list_to_binary_operator_call(list l, entity op)
+expression expression_list_to_binary_operator_call(list l, entity op)
 {
-    int
-	len = gen_length(l);
-    expression
-	result = expression_undefined;
+  int
+    len = gen_length(l);
+  expression
+    result = expression_undefined;
 
-    pips_assert("list_to_binary_operator_call", len!=0);
+  pips_assert("list_to_binary_operator_call", len!=0);
 
-    result = EXPRESSION(CAR(l));
+  result = EXPRESSION(CAR(l));
 
-    MAPL(ce,
-     {
+  MAPL(ce,
+       {
 	 result = MakeBinaryCall(op, EXPRESSION(CAR(ce)), result);
-     },
-	 CDR(l));
+       },
+       CDR(l));
 
-    return(result);
+  return(result);
 }
 
-
-expression 
-expression_list_to_conjonction(list l)
+expression expression_list_to_conjonction(list l)
 {
-    int	len = gen_length(l);
-    entity and = entity_intrinsic(AND_OPERATOR_NAME);
-    return(len==0? 
-	   MakeNullaryCall(entity_intrinsic(".TRUE.")):
-	   expression_list_to_binary_operator_call(l, and));
+  int	len = gen_length(l);
+  entity and = entity_intrinsic(AND_OPERATOR_NAME);
+  return(len==0?
+	 MakeNullaryCall(entity_intrinsic(".TRUE.")):
+	 expression_list_to_binary_operator_call(l, and));
 }
 
 /* bool expression_intrinsic_operation_p(expression exp): Returns TRUE
  * if "exp" is an expression with a call to an intrinsic operation.
  */
-bool 
-expression_intrinsic_operation_p(exp)
-expression exp;
+bool expression_intrinsic_operation_p(expression exp)
 {
-    entity e;
-    syntax syn = expression_syntax(exp);
+  entity e;
+  syntax syn = expression_syntax(exp);
 
-    if (syntax_tag(syn) != is_syntax_call)
-	return (FALSE);
+  if (syntax_tag(syn) != is_syntax_call)
+    return (FALSE);
 
-    e = call_function(syntax_call(syn));
+  e = call_function(syntax_call(syn));
 
-    return(value_tag(entity_initial(e)) == is_value_intrinsic);
+  return(value_tag(entity_initial(e)) == is_value_intrinsic);
 }
 
 /* bool call_constant_p(call c): Returns TRUE if "c" is a call to a constant,
  * that is, a constant number or a symbolic constant.
  */
-bool 
-call_constant_p(call c)
+bool call_constant_p(call c)
 {
-    value cv = entity_initial(call_function(c));
-    return( (value_tag(cv) == is_value_constant) ||
-	   (value_tag(cv) == is_value_symbolic)   );
+  value cv = entity_initial(call_function(c));
+  return( (value_tag(cv) == is_value_constant) ||
+	  (value_tag(cv) == is_value_symbolic)   );
 }
 
 
@@ -1695,13 +1652,12 @@ call_constant_p(call c)
 /* bool expression_equal_integer_p(expression exp, int i): returns TRUE if
  * "exp" is a constant value equal to "i".
  */
-bool 
-expression_equal_integer_p(expression exp, int i)
+bool expression_equal_integer_p(expression exp, int i)
 {
-    debug( 7, "expression_equal_integer", "doing\n");
-    if(expression_constant_p(exp))
-	return(expression_to_int(exp) == i);
-    return(FALSE);
+  debug( 7, "expression_equal_integer", "doing\n");
+  if(expression_constant_p(exp))
+    return(expression_to_int(exp) == i);
+  return(FALSE);
 }
 
 /*=================================================================*/
@@ -1727,105 +1683,102 @@ expression_equal_integer_p(expression exp, int i)
  * Note: The function MakeBinaryCall() comes from Pips/.../syntax/expression.c
  *       The function make_integer_constant_expression() comes from ri-util.
  */
-expression 
-make_op_exp(op_name, exp1, exp2)
-char *op_name;
-expression exp1, exp2;
+expression make_op_exp(char *op_name, expression exp1, expression exp2)
 {
-    expression result_exp = expression_undefined;
-    entity op_ent, unary_minus_ent;
-    
-    debug( 7, "make_op_exp", "doing\n");
-    op_ent = gen_find_tabulated(make_entity_fullname(TOP_LEVEL_MODULE_NAME,
-						     op_name), entity_domain);
-    unary_minus_ent =
-	gen_find_tabulated(make_entity_fullname(TOP_LEVEL_MODULE_NAME,
-						UNARY_MINUS_OPERATOR_NAME),
-			   entity_domain);
-    
-    debug(5, "make_op_exp", "begin OP EXP : %s  %s  %s\n",
-	  words_to_string(words_expression(exp1)),
-                        op_name,
-	  words_to_string(words_expression(exp2)));
-    
-    if( ! ENTITY_FOUR_OPERATION_P(op_ent) )
-	user_error("make_op_exp", "operation must be : +, -, * or /");
-    
-    if( expression_constant_p(exp1) && expression_constant_p(exp2) )
-    {
-	int val1, val2;
-	
-	debug(6, "make_op_exp", "Constant expressions\n");
+  expression result_exp = expression_undefined;
+  entity op_ent, unary_minus_ent;
 
-	val1 = expression_to_int(exp1);
-	val2 = expression_to_int(exp2);
-	
-	if (ENTITY_PLUS_P(op_ent))
-	    result_exp = make_integer_constant_expression(val1 + val2);
-	else if(ENTITY_MINUS_P(op_ent))
-	    result_exp = make_integer_constant_expression(val1 - val2);
-	else if(ENTITY_MULTIPLY_P(op_ent))
-	    result_exp = make_integer_constant_expression(val1 * val2);
-	else /* ENTITY_DIVIDE_P(op_ent) */
-	    /* we compute here as FORTRAN would do */
-	    result_exp = make_integer_constant_expression((int) (val1 / val2));
-    }
-    else
+  debug( 7, "make_op_exp", "doing\n");
+  op_ent = gen_find_tabulated(make_entity_fullname(TOP_LEVEL_MODULE_NAME,
+						   op_name), entity_domain);
+  unary_minus_ent =
+    gen_find_tabulated(make_entity_fullname(TOP_LEVEL_MODULE_NAME,
+					    UNARY_MINUS_OPERATOR_NAME),
+		       entity_domain);
+
+  debug(5, "make_op_exp", "begin OP EXP : %s  %s  %s\n",
+	words_to_string(words_expression(exp1)),
+	op_name,
+	words_to_string(words_expression(exp2)));
+
+  if( ! ENTITY_FOUR_OPERATION_P(op_ent) )
+    user_error("make_op_exp", "operation must be : +, -, * or /");
+
+  if( expression_constant_p(exp1) && expression_constant_p(exp2) )
     {
-	/* We need to know the integer linearity of both expressions. */
-	normalized nor1 = NORMALIZE_EXPRESSION(exp1);
-	normalized nor2 = NORMALIZE_EXPRESSION(exp2);
-	
-	if((normalized_tag(nor1) == is_normalized_linear) &&
-	   (normalized_tag(nor2) == is_normalized_linear) &&
-	   (ENTITY_PLUS_P(op_ent) || ENTITY_MINUS_P(op_ent)) )
-	{
-	    debug(6, "make_op_exp", "Linear operation\n");
-	    
-	    result_exp = make_lin_op_exp(op_ent, exp1, exp2);
-	}
-	else if(expression_equal_integer_p(exp1, 0))
-	{
-	    if (ENTITY_PLUS_P(op_ent))
-		result_exp = exp2;
-	    else if(ENTITY_MINUS_P(op_ent))
-		result_exp = MakeUnaryCall(unary_minus_ent, exp2);
-	    else /* ENTITY_MULTIPLY_P(op_ent) || ENTITY_DIVIDE_P(op_ent) */
-		result_exp = make_integer_constant_expression(0);
-	}
-	else if(expression_equal_integer_p(exp1, 1))
-	{
-	    if(ENTITY_MULTIPLY_P(op_ent))
-		result_exp = exp2;
-	}
-	else if(expression_equal_integer_p(exp2, 0))
-	{
-	    if (ENTITY_PLUS_P(op_ent) || ENTITY_MINUS_P(op_ent))
-		result_exp = exp1;
-	    else if (ENTITY_MULTIPLY_P(op_ent))
-		result_exp = make_integer_constant_expression(0);
-	    else /* ENTITY_DIVIDE_P(op_ent) */
-		user_error("make_op_exp", "division by zero");
-	}
-	else if(expression_equal_integer_p(exp2, 1))
-	{
-	    if(ENTITY_MULTIPLY_P(op_ent) || ENTITY_DIVIDE_P(op_ent))
-		result_exp = exp1;
-	}
-	
-	/* Both expressions are unnormalized because they might be reused in
-	 * an unnormalized expression. */
-	unnormalize_expression(exp1);
-	unnormalize_expression(exp2);
+      int val1, val2;
+
+      debug(6, "make_op_exp", "Constant expressions\n");
+
+      val1 = expression_to_int(exp1);
+      val2 = expression_to_int(exp2);
+
+      if (ENTITY_PLUS_P(op_ent))
+	result_exp = make_integer_constant_expression(val1 + val2);
+      else if(ENTITY_MINUS_P(op_ent))
+	result_exp = make_integer_constant_expression(val1 - val2);
+      else if(ENTITY_MULTIPLY_P(op_ent))
+	result_exp = make_integer_constant_expression(val1 * val2);
+      else /* ENTITY_DIVIDE_P(op_ent) */
+	/* we compute here as FORTRAN would do */
+	result_exp = make_integer_constant_expression((int) (val1 / val2));
     }
-    
-    if(result_exp == expression_undefined)
-	result_exp = MakeBinaryCall(op_ent, exp1, exp2);
-    
-    debug(5, "make_op_exp", "end   OP EXP : %s\n",
-	  words_to_string(words_expression(result_exp)));
-    
-    return (result_exp);
+  else
+    {
+      /* We need to know the integer linearity of both expressions. */
+      normalized nor1 = NORMALIZE_EXPRESSION(exp1);
+      normalized nor2 = NORMALIZE_EXPRESSION(exp2);
+
+      if((normalized_tag(nor1) == is_normalized_linear) &&
+	 (normalized_tag(nor2) == is_normalized_linear) &&
+	 (ENTITY_PLUS_P(op_ent) || ENTITY_MINUS_P(op_ent)) )
+	{
+	  pips_debug(6, "Linear operation\n");
+
+	  result_exp = make_lin_op_exp(op_ent, exp1, exp2);
+	}
+      else if(expression_equal_integer_p(exp1, 0))
+	{
+	  if (ENTITY_PLUS_P(op_ent))
+	    result_exp = exp2;
+	  else if(ENTITY_MINUS_P(op_ent))
+	    result_exp = MakeUnaryCall(unary_minus_ent, exp2);
+	  else /* ENTITY_MULTIPLY_P(op_ent) || ENTITY_DIVIDE_P(op_ent) */
+	    result_exp = make_integer_constant_expression(0);
+	}
+      else if(expression_equal_integer_p(exp1, 1))
+	{
+	  if(ENTITY_MULTIPLY_P(op_ent))
+	    result_exp = exp2;
+	}
+      else if(expression_equal_integer_p(exp2, 0))
+	{
+	  if (ENTITY_PLUS_P(op_ent) || ENTITY_MINUS_P(op_ent))
+	    result_exp = exp1;
+	  else if (ENTITY_MULTIPLY_P(op_ent))
+	    result_exp = make_integer_constant_expression(0);
+	  else /* ENTITY_DIVIDE_P(op_ent) */
+	    user_error("make_op_exp", "division by zero");
+	}
+      else if(expression_equal_integer_p(exp2, 1))
+	{
+	  if(ENTITY_MULTIPLY_P(op_ent) || ENTITY_DIVIDE_P(op_ent))
+	    result_exp = exp1;
+	}
+
+      /* Both expressions are unnormalized because they might be reused in
+       * an unnormalized expression. */
+      unnormalize_expression(exp1);
+      unnormalize_expression(exp2);
+    }
+
+  if(result_exp == expression_undefined)
+    result_exp = MakeBinaryCall(op_ent, exp1, exp2);
+
+  debug(5, "make_op_exp", "end   OP EXP : %s\n",
+	words_to_string(words_expression(result_exp)));
+
+  return (result_exp);
 }
 
 
@@ -1839,30 +1792,27 @@ expression exp1, exp2;
  * Pvecteur_to_expression() is a function that rebuilds an expression
  * from a Pvecteur.
  */
-expression 
-make_lin_op_exp(op_ent, exp1, exp2)
-entity op_ent;
-expression exp1, exp2;
+expression make_lin_op_exp(entity op_ent, expression exp1, expression exp2)
 {
-    Pvecteur V1, V2, newV = VECTEUR_NUL;
+  Pvecteur V1, V2, newV = VECTEUR_NUL;
 
-    debug( 7, "make_lin_op_exp", "doing\n");
-    if((normalized_tag(expression_normalized(exp1)) == is_normalized_complex) ||
-       (normalized_tag(expression_normalized(exp2)) == is_normalized_complex))
-	user_error("make_lin_op_exp",
-		   "expressions MUST be linear and normalized");
-    
-    V1 = (Pvecteur) normalized_linear(expression_normalized(exp1));
-    V2 = (Pvecteur) normalized_linear(expression_normalized(exp2));
-    
-    if (ENTITY_PLUS_P(op_ent))
-	newV = vect_add(V1, V2);
-    else if (ENTITY_MINUS_P(op_ent))
-	newV = vect_substract(V1, V2);
-    else
-	pips_error("make_lin_op_exp", "operation must be : + or -");
-    
-    return(Pvecteur_to_expression(newV));
+  debug( 7, "make_lin_op_exp", "doing\n");
+  if((normalized_tag(expression_normalized(exp1)) == is_normalized_complex) ||
+     (normalized_tag(expression_normalized(exp2)) == is_normalized_complex))
+    user_error("make_lin_op_exp",
+	       "expressions MUST be linear and normalized");
+
+  V1 = (Pvecteur) normalized_linear(expression_normalized(exp1));
+  V2 = (Pvecteur) normalized_linear(expression_normalized(exp2));
+
+  if (ENTITY_PLUS_P(op_ent))
+    newV = vect_add(V1, V2);
+  else if (ENTITY_MINUS_P(op_ent))
+    newV = vect_substract(V1, V2);
+  else
+    pips_error("make_lin_op_exp", "operation must be : + or -");
+
+  return(Pvecteur_to_expression(newV));
 }
 
 /*=================================================================*/
@@ -1873,28 +1823,26 @@ expression exp1, exp2;
  * This is very useful when you combine expressions. It prohibits
  * unnormalized expressions with normalized sub-expressions.
  */
-void 
-unnormalize_expression(exp)
-expression exp;
+void unnormalize_expression(expression exp)
 {
-    syntax sy;
-    
-    debug( 9, "unnormalize_expression", "doing\n");
-    /* FI: memory leak... */
-    expression_normalized(exp) = normalized_undefined;
-    sy = expression_syntax(exp);
-    
-    if(syntax_tag(sy) == is_syntax_call)
+  syntax sy;
+
+  debug( 9, "unnormalize_expression", "doing\n");
+  /* FI: memory leak... */
+  expression_normalized(exp) = normalized_undefined;
+  sy = expression_syntax(exp);
+
+  if(syntax_tag(sy) == is_syntax_call)
     {
-	call c = syntax_call(sy);
-	value v = entity_initial(call_function(c));
-	
-	/* We unnormalize the arguments of the intrinsic functions. */
-	if(value_tag(v) == is_value_intrinsic)
+      call c = syntax_call(sy);
+      value v = entity_initial(call_function(c));
+
+      /* We unnormalize the arguments of the intrinsic functions. */
+      if(value_tag(v) == is_value_intrinsic)
 	{
-	    list la = call_arguments(c);
-	    for(; la != NIL; la = CDR(la))
-		unnormalize_expression(EXPRESSION(CAR(la)));
+	  list la = call_arguments(c);
+	  for(; la != NIL; la = CDR(la))
+	    unnormalize_expression(EXPRESSION(CAR(la)));
 	}
     }
 }
@@ -1911,46 +1859,44 @@ expression exp;
  *       upon an expression for which the function expression_constant_p()
  *       returns TRUE (See the commentary given for it).
  */
-int 
-expression_to_int(exp)
-expression exp;
+int expression_to_int(expression exp)
 {
-    int rv = 0;
+  int rv = 0;
 
-    debug( 7, "expression_to_int", "doing\n");
-    if(expression_constant_p(exp)) {
-	call c = syntax_call(expression_syntax(exp));
-	switch(value_tag(entity_initial(call_function(c)))) {
-	case is_value_constant:	{
-	    rv = constant_int(value_constant(entity_initial(call_function(c))));
-	    break;
-	}
-	case is_value_intrinsic: {
-	    rv = 0 - expression_to_int(EXPRESSION(CAR(call_arguments(c))));
-	    break;
-	}
-	default:
-	pips_error("expression_to_int",
-		   "expression is not an integer constant");
-	}
+  debug( 7, "expression_to_int", "doing\n");
+  if(expression_constant_p(exp)) {
+    call c = syntax_call(expression_syntax(exp));
+    switch(value_tag(entity_initial(call_function(c)))) {
+    case is_value_constant:	{
+      rv = constant_int(value_constant(entity_initial(call_function(c))));
+      break;
     }
-    else if(expression_call_p(exp)) {
-      /* Is it an integer parameter? */
-      entity p = call_function(syntax_call(expression_syntax(exp)));
-      value v = entity_initial(p);
+    case is_value_intrinsic: {
+      rv = 0 - expression_to_int(EXPRESSION(CAR(call_arguments(c))));
+      break;
+    }
+    default:
+      pips_error("expression_to_int",
+		 "expression is not an integer constant");
+    }
+  }
+  else if(expression_call_p(exp)) {
+    /* Is it an integer parameter? */
+    entity p = call_function(syntax_call(expression_syntax(exp)));
+    value v = entity_initial(p);
 
-      if(value_symbolic_p(v) && constant_int_p(symbolic_constant(value_symbolic(v)))) {
-	rv = constant_int(symbolic_constant(value_symbolic(v)));
-      }
-      else {
-	pips_error("expression_to_int",
-		   "expression is not an integer constant");
-      }
+    if(value_symbolic_p(v) && constant_int_p(symbolic_constant(value_symbolic(v)))) {
+      rv = constant_int(symbolic_constant(value_symbolic(v)));
     }
-    else
-	pips_error("expression_to_int",
-		   "expression is not an integer constant");
-    return(rv);
+    else {
+      pips_error("expression_to_int",
+		 "expression is not an integer constant");
+    }
+  }
+  else
+    pips_error("expression_to_int",
+	       "expression is not an integer constant");
+  return(rv);
 }
 
 /*=================================================================*/
@@ -1960,9 +1906,7 @@ expression exp;
  * Note : A negative constant can be represented with a call to the unary
  *        minus intrinsic function upon a positive value.
  */
-bool
-expression_constant_p(exp)
-expression exp;
+bool expression_constant_p(expression exp)
 {
     if(syntax_call_p(expression_syntax(exp)))
     {
@@ -1981,8 +1925,8 @@ expression exp;
     }
     return(FALSE);
 }
-bool
-expression_one_p(expression exp)
+
+bool expression_one_p(expression exp)
 {
   bool one_p = FALSE;
 
@@ -2007,70 +1951,63 @@ expression_one_p(expression exp)
 
 bool same_expression_name_p(expression, expression);
 
-bool 
-same_lexpr_name_p(list l1, list l2)
+bool same_lexpr_name_p(list l1, list l2)
 {
-    if (gen_length(l1)!=gen_length(l2))
-	return FALSE;
-    /* else */
-    for(; l1 && l2; POP(l1), POP(l2))
-	if (!same_expression_name_p(EXPRESSION(CAR(l1)), EXPRESSION(CAR(l2))))
-	    return FALSE;
-    return TRUE;
-}
-
-bool
-same_entity_lname_p(entity e1, entity e2)
-{
-    return same_string_p(entity_local_name(e1), entity_local_name(e2));
-}
-
-bool
-same_call_name_p(call c1, call c2)
-{
-    return same_entity_lname_p(call_function(c1), call_function(c2)) &&
-	same_lexpr_name_p(call_arguments(c1), call_arguments(c2));
-}
-
-bool
-same_ref_name_p(reference r1, reference r2)
-{
-    return same_entity_lname_p(reference_variable(r1), reference_variable(r2)) 
-	&& same_lexpr_name_p(reference_indices(r1), reference_indices(r2));
-}
-
-bool 
-same_range_name_p(range r1, range r2)
-{
-    return same_expression_name_p(range_lower(r1), range_lower(r2)) &&
-	same_expression_name_p(range_upper(r1), range_upper(r2)) &&
-	same_expression_name_p(range_increment(r1), range_increment(r2));
-}
-
-bool
-same_syntax_name_p(syntax s1, syntax s2)
-{
-    if (syntax_tag(s1)!=syntax_tag(s2)) 
-	return FALSE;
-    /* else */
-    switch (syntax_tag(s1))
-    {
-    case is_syntax_call: 
-	return same_call_name_p(syntax_call(s1), syntax_call(s2));
-    case is_syntax_reference:
-	return same_ref_name_p(syntax_reference(s1), syntax_reference(s2));
-    case is_syntax_range:
-	return same_range_name_p(syntax_range(s1), syntax_range(s2));
-    default:
-	pips_internal_error("unexpected syntax tag\n");
-    }
+  if (gen_length(l1)!=gen_length(l2))
     return FALSE;
+  /* else */
+  for(; l1 && l2; POP(l1), POP(l2))
+    if (!same_expression_name_p(EXPRESSION(CAR(l1)), EXPRESSION(CAR(l2))))
+      return FALSE;
+  return TRUE;
 }
 
-bool 
-same_expression_name_p(expression e1, expression e2)
+bool same_entity_lname_p(entity e1, entity e2)
 {
-    return same_syntax_name_p(expression_syntax(e1), expression_syntax(e2));
+  return same_string_p(entity_local_name(e1), entity_local_name(e2));
+}
+
+bool same_call_name_p(call c1, call c2)
+{
+  return same_entity_lname_p(call_function(c1), call_function(c2)) &&
+    same_lexpr_name_p(call_arguments(c1), call_arguments(c2));
+}
+
+bool same_ref_name_p(reference r1, reference r2)
+{
+  return same_entity_lname_p(reference_variable(r1), reference_variable(r2))
+    && same_lexpr_name_p(reference_indices(r1), reference_indices(r2));
+}
+
+bool same_range_name_p(range r1, range r2)
+{
+  return same_expression_name_p(range_lower(r1), range_lower(r2)) &&
+    same_expression_name_p(range_upper(r1), range_upper(r2)) &&
+    same_expression_name_p(range_increment(r1), range_increment(r2));
+}
+
+bool same_syntax_name_p(syntax s1, syntax s2)
+{
+  if (syntax_tag(s1)!=syntax_tag(s2))
+    return FALSE;
+  /* else */
+  switch (syntax_tag(s1))
+    {
+    case is_syntax_call:
+      return same_call_name_p(syntax_call(s1), syntax_call(s2));
+    case is_syntax_reference:
+      return same_ref_name_p(syntax_reference(s1), syntax_reference(s2));
+    case is_syntax_range:
+      return same_range_name_p(syntax_range(s1), syntax_range(s2));
+    default:
+      pips_internal_error("unexpected syntax tag\n");
+    }
+  return FALSE;
+}
+
+bool same_expression_name_p(expression e1, expression e2)
+{
+  return same_syntax_name_p(expression_syntax(e1), expression_syntax(e2));
 }
 
 /************************************************************* DAVINCI GRAPH */
@@ -2095,7 +2032,7 @@ static bool  davinci_dump_expression_rc(
   s = expression_syntax(e);
   switch (syntax_tag(s))
   {
-  case is_syntax_call: 
+  case is_syntax_call:
     {
       call c = syntax_call(s);
       name = entity_local_name(call_function(c));
@@ -2120,26 +2057,26 @@ static bool  davinci_dump_expression_rc(
     color = "";
     pips_internal_error("unexpected syntax tag (%d)\n", syntax_tag(s));
   }
-  
+
     /* daVinci node prolog. */
-  fprintf(out, "l(\"%zx\",n(\"\",[a(\"OBJECT\",\"%s\")%s%s],[", 
+  fprintf(out, "l(\"%zx\",n(\"\",[a(\"OBJECT\",\"%s\")%s%s],[",
 	  (_uint) e, name, color, shape);
-  
-  MAP(EXPRESSION, son, 
-  {      
+
+  MAP(EXPRESSION, son,
+  {
     if (!first) fprintf(out, ",\n");
     else { fprintf(out, "\n"); first=FALSE; }
-    fprintf(out, " l(\"%zx->%zx\",e(\"\",[],r(\"%zx\")))", 
+    fprintf(out, " l(\"%zx->%zx\",e(\"\",[],r(\"%zx\")))",
 	    (_uint) e, (_uint) son, (_uint) son);
   },
     sons);
 
     /* node epilog */
   fprintf(out, "]))\n");
-  
-  MAP(EXPRESSION, son, 
-  { 
-    if (something) fprintf(out, ","); 
+
+  MAP(EXPRESSION, son,
+  {
+    if (something) fprintf(out, ",");
     something = davinci_dump_expression_rc(out, son, seen);
   }, sons);
 
@@ -2188,10 +2125,10 @@ expression substitute_entity_in_expression(entity old, entity new, expression e)
 
   s = expression_syntax(e);
   t = syntax_tag(s);
-  switch (t){ 
-  case is_syntax_call:  
+  switch (t){
+  case is_syntax_call:
     {
-      c = syntax_call(s);      
+      c = syntax_call(s);
       args = call_arguments(c);
       while (!ENDP(args))
 	{
@@ -2200,19 +2137,19 @@ expression substitute_entity_in_expression(entity old, entity new, expression e)
 	  tempargs = gen_nconc(tempargs,CONS(EXPRESSION,temp,NIL));
 	  args = CDR(args);
 	}
-      
+
       call_arguments(syntax_call(expression_syntax(retour))) = tempargs;
 
       if (same_entity_p(call_function(c),old))
 	call_function(syntax_call(expression_syntax(retour))) = new;
-      else 
+      else
 	call_function(syntax_call(expression_syntax(retour))) = call_function(c);
 
       break;
     }
   case is_syntax_reference:
-    { 
-      re = syntax_reference(s);      
+    {
+      re = syntax_reference(s);
       args = reference_indices(re);
       while (!ENDP(args))
 	{
@@ -2221,31 +2158,30 @@ expression substitute_entity_in_expression(entity old, entity new, expression e)
 	  tempargs = gen_nconc(tempargs,CONS(EXPRESSION,temp,NIL));
 	  args = CDR(args);
 	}
-      
+
       reference_indices(syntax_reference(expression_syntax(retour))) = tempargs;
 
       if (same_entity_p(reference_variable(re),old))
 	reference_variable(syntax_reference(expression_syntax(retour))) = new;
-      else 
+      else
 	reference_variable(syntax_reference(expression_syntax(retour))) = reference_variable(re);
 
       break;
     }
   case is_syntax_range:
     {
-      ra = syntax_range(s);  
+      ra = syntax_range(s);
       low = range_lower(ra);
       range_lower(syntax_range(expression_syntax(retour))) = substitute_entity_in_expression(old,new,low);
-  
+
       up = range_upper(ra);
       range_upper(syntax_range(expression_syntax(retour))) = substitute_entity_in_expression(old,new,up);
 
-   
+
       inc = range_increment(ra);
       range_increment(syntax_range(expression_syntax(retour))) = substitute_entity_in_expression(old,new,inc);
-  
+
       break;
-	    
     }
   }
 
@@ -2261,7 +2197,7 @@ bool simplify_C_expression(expression e)
   bool can_be_substituted_p = FALSE;
 
   pips_debug(9, "Begin\n");
-  
+
   switch(syntax_tag(s)) {
   case is_syntax_reference:
     {
@@ -2284,7 +2220,7 @@ bool simplify_C_expression(expression e)
 
 	  can_be_substituted_p =
 	    basic_int_p(bt)
-	    || basic_float_p(bt) 
+	    || basic_float_p(bt)
 	    || basic_overloaded_p(bt) /* Might be wrong, but necessary */
 	    || basic_complex_p(bt) /* Should not occur in old C code */
 	    || basic_logical_p(bt); /* Should not occur in old C code */
@@ -2306,7 +2242,7 @@ bool simplify_C_expression(expression e)
 
 	can_be_substituted_p =
 	  basic_int_p(rb)
-	  || basic_float_p(rb) 
+	  || basic_float_p(rb)
 	  || basic_complex_p(rb); /* Should not occur in C, before C99 */
       }
       else if(gen_length(call_arguments(c))==2) {
@@ -2345,14 +2281,14 @@ bool simplify_C_expression(expression e)
 	    /* a void expression such as (void) 0 results in an undefined basic. */
 	    rb = basic_of_expression(e);
 	  }
-	  else 
+	  else
 	    rb = copy_basic(rb);
 
 	  if(!basic_undefined_p(rb)) {
 	    /* FI: I guess, typedef equivalent to those could also be declared substituable */
 	    can_be_substituted_p =
 	      basic_int_p(rb)
-	      || basic_float_p(rb) 
+	      || basic_float_p(rb)
 	      || basic_complex_p(rb); /* Should not occur in C */
 	    free_basic(rb);
 	  }
@@ -2367,7 +2303,7 @@ bool simplify_C_expression(expression e)
       }
       break;
     }
-  case is_syntax_range: 
+  case is_syntax_range:
     {
       range r = syntax_range(s);
       expression le = range_lower(r);
@@ -2381,7 +2317,7 @@ bool simplify_C_expression(expression e)
       }
   case is_syntax_cast:
   case is_syntax_sizeofexpression:
-  case is_syntax_subscript: 
+  case is_syntax_subscript:
   case is_syntax_application:
   case is_syntax_va_arg:
       can_be_substituted_p = FALSE;
@@ -2506,7 +2442,7 @@ void check_user_call_site(entity func, list args)
   /* check the number of parameters */
   list l_formals = module_formal_parameters(func);
   int n_formals = (int) gen_length(l_formals);
-   
+
   if ((int) gen_length(args) < n_formals)
     {
       /* this is really a user error.
@@ -2524,7 +2460,7 @@ void check_user_call_site(entity func, list args)
     }
   else if ((int) gen_length(args) > n_formals)
     {
-      /* This can be survived... */        
+      /* This can be survived... */
       fprintf(stderr,"%d formal arguments for module%s:\n",
 	      n_formals,module_local_name(func));
       dump_arguments(l_formals);
@@ -2538,14 +2474,14 @@ void check_user_call_site(entity func, list args)
   gen_free_list(l_formals), l_formals=NIL;
 }
 
-/* just returns the entity of an expression... 
+/* just returns the entity of an expression...
  * SG: moved here from hpfc
  */
 entity expression_to_entity(e)
 expression e;
 {
     syntax s = expression_syntax(e);
-    
+
     switch (syntax_tag(s))
     {
     case is_syntax_call:
@@ -2553,162 +2489,161 @@ expression e;
     case is_syntax_reference:
 	return reference_variable(syntax_reference(s));
     case is_syntax_range:
-    default: 
+    default:
 	pips_internal_error("unexpected syntax tag: %d\n", syntax_tag(s));
-	return entity_undefined; 
+	return entity_undefined;
     }
 }
 
 
-/** 
+/**
  * @brief perform the real similarity comparaison between two expressions
  * target is matched against pattern, and expression <> argument is strored in symbols
- * 
+ *
  * @param target cheked expression
  * @param pattern pattern expression
  * @param symbols map storing entity <> expression tuple
- * 
+ *
  * @return true if similar
  */
-static
-bool _expression_similar_p(expression target, expression pattern,hash_table symbols)
+static bool _expression_similar_p(expression target, expression pattern,hash_table symbols)
 {
-    bool similar=true;
-    syntax starget = expression_syntax(target),
-           spattern = expression_syntax(pattern);
+  bool similar=true;
+  syntax starget = expression_syntax(target),
+    spattern = expression_syntax(pattern);
 
-    /* cast handler */
-    if( syntax_cast_p( spattern ) )
+  /* cast handler */
+  if( syntax_cast_p( spattern ) )
     {
-        pips_user_warning("cast badly handled\n");
-        return _expression_similar_p(target, cast_expression(syntax_cast(spattern)),symbols);
+      pips_user_warning("cast badly handled\n");
+      return _expression_similar_p(target, cast_expression(syntax_cast(spattern)),symbols);
     }
-    
-    switch(syntax_tag(spattern) )
+
+  switch(syntax_tag(spattern) )
     {
-        /* we memorize reference from target and pattern in the symbol table
-         * similar to \1 in sed
-         */
-        case is_syntax_reference:
-            {
-                if( syntax_reference_p(starget) ||
-                        ( syntax_call_p(starget) && call_constant_p(syntax_call(starget))) ||
-                        syntax_sizeofexpression_p(starget) ||
-                        syntax_subscript_p(starget)
-                  )
-                {
-                    reference r = syntax_reference(spattern);
-                    /* simple variable */
-                    if(ENDP(reference_indices(r)))
-                    {
+      /* we memorize reference from target and pattern in the symbol table
+       * similar to \1 in sed
+       */
+    case is_syntax_reference:
+      {
+	if( syntax_reference_p(starget) ||
+	    ( syntax_call_p(starget) && call_constant_p(syntax_call(starget))) ||
+	    syntax_sizeofexpression_p(starget) ||
+	    syntax_subscript_p(starget)
+	    )
+	  {
+	    reference r = syntax_reference(spattern);
+	    /* simple variable */
+	    if(ENDP(reference_indices(r)))
+	      {
 
-                        expression val = hash_get(symbols,entity_name(reference_variable(r)));
-                        if ( val == HASH_UNDEFINED_VALUE )
-                            hash_put(symbols,entity_name(reference_variable(r)), target);
-                        else
-                            similar = syntax_equal_p(expression_syntax(val),starget);
-                    }
-                    else 
-                    {
-                        pips_user_warning("arrays are not supported in expression_similar\n");
-                        similar=false;
-                    }
-                }
-                else
-                {
-                    similar=false;
-                }
-            } break;
-        /* recursively compare each arguments if call do not differ */
-        case is_syntax_call:
-            if( syntax_call_p(starget) &&
-                    same_entity_p( call_function(syntax_call(starget)), call_function(syntax_call(spattern)) ) )
-            {
-                list iter = call_arguments(syntax_call(spattern));
-                FOREACH(EXPRESSION, etarget, call_arguments(syntax_call(starget) ) )
-                {
-                    if( ENDP(iter) ) { similar = false; break; }/* could occur with va args */
-                    expression epattern = EXPRESSION(CAR(iter));
-                    similar&= _expression_similar_p(etarget,epattern,symbols);
-                    POP(iter);
-                }
-            }
-            else
-            {
-                similar =false;
-            }
-            break;
-        /* SG: will this be usefull ?*/
-        case is_syntax_range:
-            similar = syntax_range_p(starget) && 
-                _expression_similar_p(range_lower(syntax_range(starget)),range_lower(syntax_range(spattern)),symbols) &&
-                _expression_similar_p(range_upper(syntax_range(starget)),range_upper(syntax_range(spattern)),symbols) &&
-                _expression_similar_p(range_increment(syntax_range(starget)),range_increment(syntax_range(spattern)),symbols);
-            break;
+		expression val = hash_get(symbols,entity_name(reference_variable(r)));
+		if ( val == HASH_UNDEFINED_VALUE )
+		  hash_put(symbols,entity_name(reference_variable(r)), target);
+		else
+		  similar = syntax_equal_p(expression_syntax(val),starget);
+	      }
+	    else
+	      {
+		pips_user_warning("arrays are not supported in expression_similar\n");
+		similar=false;
+	      }
+	  }
+	else
+	  {
+	    similar=false;
+	  }
+      } break;
+      /* recursively compare each arguments if call do not differ */
+    case is_syntax_call:
+      if( syntax_call_p(starget) &&
+	  same_entity_p( call_function(syntax_call(starget)), call_function(syntax_call(spattern)) ) )
+	{
+	  list iter = call_arguments(syntax_call(spattern));
+	  FOREACH(EXPRESSION, etarget, call_arguments(syntax_call(starget) ) )
+	    {
+	      if( ENDP(iter) ) { similar = false; break; }/* could occur with va args */
+	      expression epattern = EXPRESSION(CAR(iter));
+	      similar&= _expression_similar_p(etarget,epattern,symbols);
+	      POP(iter);
+	    }
+	}
+      else
+	{
+	  similar =false;
+	}
+      break;
+      /* SG: will this be usefull ?*/
+    case is_syntax_range:
+      similar = syntax_range_p(starget) &&
+	_expression_similar_p(range_lower(syntax_range(starget)),range_lower(syntax_range(spattern)),symbols) &&
+	_expression_similar_p(range_upper(syntax_range(starget)),range_upper(syntax_range(spattern)),symbols) &&
+	_expression_similar_p(range_increment(syntax_range(starget)),range_increment(syntax_range(spattern)),symbols);
+      break;
 
-        /* SG:not supported yet */
-        case is_syntax_cast:
-            pips_user_warning("cast ignored\n");
-            similar = _expression_similar_p(cast_expression(syntax_cast(starget)),pattern,symbols);
-            break;
+      /* SG:not supported yet */
+    case is_syntax_cast:
+      pips_user_warning("cast ignored\n");
+      similar = _expression_similar_p(cast_expression(syntax_cast(starget)),pattern,symbols);
+      break;
 
-        case is_syntax_sizeofexpression:
-            if( syntax_sizeofexpression_p(starget) )
-            {
-                sizeofexpression seo_target = syntax_sizeofexpression(starget);
-                sizeofexpression seo_pattern = syntax_sizeofexpression(spattern);
-                if( sizeofexpression_type(seo_pattern) )
-                    similar = sizeofexpression_type_p(seo_target) &&
-                        type_equal_p( sizeofexpression_type(seo_target), sizeofexpression_type(seo_pattern) );
-                else
-                    similar = _expression_similar_p(sizeofexpression_expression(seo_target),
-                            sizeofexpression_expression(seo_pattern),
-                            symbols );
-            }
-            else
-            {
-                similar =false;
-            }
-            break;
+    case is_syntax_sizeofexpression:
+      if( syntax_sizeofexpression_p(starget) )
+	{
+	  sizeofexpression seo_target = syntax_sizeofexpression(starget);
+	  sizeofexpression seo_pattern = syntax_sizeofexpression(spattern);
+	  if( sizeofexpression_type(seo_pattern) )
+	    similar = sizeofexpression_type_p(seo_target) &&
+	      type_equal_p( sizeofexpression_type(seo_target), sizeofexpression_type(seo_pattern) );
+	  else
+	    similar = _expression_similar_p(sizeofexpression_expression(seo_target),
+					    sizeofexpression_expression(seo_pattern),
+					    symbols );
+	}
+      else
+	{
+	  similar =false;
+	}
+      break;
 
-        case is_syntax_subscript:
-            if( syntax_subscript_p(starget) )
-            {
-                subscript sub_target = syntax_subscript(starget),
-                          sub_pattern = syntax_subscript(spattern);
-                similar&= _expression_similar_p( subscript_array(sub_target), subscript_array(sub_pattern),symbols );
+    case is_syntax_subscript:
+      if( syntax_subscript_p(starget) )
+	{
+	  subscript sub_target = syntax_subscript(starget),
+	    sub_pattern = syntax_subscript(spattern);
+	  similar&= _expression_similar_p( subscript_array(sub_target), subscript_array(sub_pattern),symbols );
 
-                list iter = subscript_indices(sub_pattern);
-                FOREACH(EXPRESSION, etarget, subscript_indices(sub_target) )
-                {
-                    if( ENDP(iter) ) { similar = false; break; }/* could occur with va args */
-                    expression epattern = EXPRESSION(CAR(iter));
-                    similar&= _expression_similar_p(etarget,epattern,symbols);
-                    POP(iter);
-                }
-            }
-            else
-                similar =false;
-            break;
-        case is_syntax_application:
-            pips_user_warning("application similarity not implemented yet\n");
-            similar=false;
-            break;
-        case is_syntax_va_arg:
-            pips_user_warning("va_arg similarity not implemented yet\n");
-            similar=false;
-            break;
+	  list iter = subscript_indices(sub_pattern);
+	  FOREACH(EXPRESSION, etarget, subscript_indices(sub_target) )
+	    {
+	      if( ENDP(iter) ) { similar = false; break; }/* could occur with va args */
+	      expression epattern = EXPRESSION(CAR(iter));
+	      similar&= _expression_similar_p(etarget,epattern,symbols);
+	      POP(iter);
+	    }
+	}
+      else
+	similar =false;
+      break;
+    case is_syntax_application:
+      pips_user_warning("application similarity not implemented yet\n");
+      similar=false;
+      break;
+    case is_syntax_va_arg:
+      pips_user_warning("va_arg similarity not implemented yet\n");
+      similar=false;
+      break;
     };
-    return similar;
+  return similar;
 }
-/** 
+/**
  * @brief similar to expression_similar_p but the hash_map
  * containing the crossref value is retured for further use
- * 
+ *
  * @param target expression to compare
  * @param pattern expression serving as pattern
  * @param symbol_table pointer to unallocated hash_map, in the end it will contain a set of pair (original syntax reference name, substituted syntax element). Must be freed, but only if expressions are similar
- * 
+ *
  * @return true if expressions are similar
  */
 bool expression_similar_get_context_p(expression target, expression pattern, hash_table* symbol_table)
@@ -2719,7 +2654,7 @@ bool expression_similar_get_context_p(expression target, expression pattern, has
     return similar;
 }
 
-/** 
+/**
  * @brief compare if two expressions are similar
  * that is can we exchange target and pattern by substituing
  * variables
@@ -2729,15 +2664,15 @@ bool expression_similar_get_context_p(expression target, expression pattern, has
  *  1+b ~  1+c
  * @param target expression that sould match with pattern
  * @param pattern the pattern to match
- * 
+ *
  * @return true if expressions are similar
  */
 bool expression_similar_p(expression target, expression pattern)
 {
-    hash_table symbol_table = hash_table_make(hash_pointer,HASH_DEFAULT_SIZE);
-    bool similar = _expression_similar_p(target,pattern,symbol_table);
-    hash_table_free(symbol_table);
-    return similar;
+  hash_table symbol_table = hash_table_make(hash_pointer,HASH_DEFAULT_SIZE);
+  bool similar = _expression_similar_p(target,pattern,symbol_table);
+  hash_table_free(symbol_table);
+  return similar;
 }
 
 /**
@@ -2747,19 +2682,17 @@ bool expression_similar_p(expression target, expression pattern)
 expression make_expression_from_entity(entity an_entity)
 {
   return make_entity_expression(an_entity, NIL);
-  
 }
 
 list /* of expression */
-make_list_of_constant(
-    int val,    /* the constant value */
-    int number) /* the length of the created list */
+make_list_of_constant(int val,    /* the constant value */
+		      int number) /* the length of the created list */
 {
-    list l=NIL;
+  list l=NIL;
 
-    pips_assert("valid number", number>=0);
-    for(; number; number--)
-	l = CONS(EXPRESSION, int_to_expression(val), l);
+  pips_assert("valid number", number>=0);
+  for(; number; number--)
+    l = CONS(EXPRESSION, int_to_expression(val), l);
 
-    return l;
+  return l;
 }
