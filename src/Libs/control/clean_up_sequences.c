@@ -35,9 +35,9 @@ char vcid_clean_up_sequences[] = "%A% ($Date: 2004/02/16 15:24:55 $, ) version $
 #endif /* lint */
 
 
-#include <stdlib.h> 
-#include <stdio.h> 
-#include <malloc.h> 
+#include <stdlib.h>
+#include <stdio.h>
+#include <malloc.h>
 
 #include "linear.h"
 
@@ -111,7 +111,7 @@ compute_statement_to_goto_table_filter(instruction i)
 
 	pips_debug(7, "Adding GOTO from instruction %p to statement %p.\n",
 		   i, s);
-	
+
 	if (!hash_defined_p(statement_to_goto_table, (char *) s)) {
 	    hash_put(statement_to_goto_table,
 		     (char *) s,
@@ -143,11 +143,11 @@ compute_statement_to_goto_table(statement s)
 {
     pips_assert("Map statement_to_goto_table should be uninitialized.\n",
 		statement_to_goto_table == NULL);
-    
+
     statement_to_goto_table = hash_table_make(hash_pointer, 0);
     gen_recurse(s, instruction_domain,
 		compute_statement_to_goto_table_filter,
-		gen_null);          
+		gen_null);
 }
 
 
@@ -179,7 +179,7 @@ adjust_goto_from_to(statement s1,
 			instruction_goto(i) == s1);
 	    instruction_goto(i) = s2;
 	    pips_debug(6, "Adjusting GOTO from instruction %p -> statement %p to statement %p.\n",
-		       i, s1, s2);      
+		       i, s1, s2);
 	}, (list) hash_get(statement_to_goto_table, (char *) s1));
     }
 }
@@ -222,7 +222,6 @@ void clean_up_sequences_rewrite(statement s)
 		 statement_number(s), label_local_name(statement_label(s)),
 		 empty_comments_p(statement_comments(s))? "" : statement_comments(s));
 	pips_error("text_statement", "This block statement should be labelless, numberless"
-			 
 		   " and commentless.\n");
       }
 
@@ -252,7 +251,7 @@ void clean_up_sequences_rewrite(statement s)
 
 	if (empty_statement_or_labelless_continue_p(st)) {
 	  ifdebug(9)
-	    fprintf(stderr, "[ Empty statement or continue ]\n");		
+	    fprintf(stderr, "[ Empty statement or continue ]\n");
 
 	  if (!statement_with_empty_comment_p(st)) {
 	    /* Keep the comment to put it on the next
@@ -305,7 +304,7 @@ void clean_up_sequences_rewrite(statement s)
 	  deal_with_pending_comment(st, &the_comments);
 	}
       }
-	    
+
       /* Remove the list of unused statements with the
 	 statemenents them-self: */
       gen_full_free_list(delete_sts);
@@ -332,7 +331,7 @@ void clean_up_sequences_rewrite(statement s)
 	 statements: */
       gen_free_list(sequence_statements(instruction_sequence(i)));
       sequence_statements(instruction_sequence(i)) = useful_sts;
-       
+
       if (gen_length(useful_sts) == 1
 	  && ENDP(statement_declarations(s))) {
 	/* A sequence of only 1 instruction can be replaced by
@@ -355,7 +354,7 @@ void clean_up_sequences_rewrite(statement s)
 	pips_debug(3, "Sequence with 1 statement replaced by 1 statement...\n");
 	clean_up_1_statement_sequence++;
       }
-	    
+
       ifdebug(5) {
 	pips_debug(5, "Statement at exit:\n");
 	print_statement(s);
@@ -375,7 +374,7 @@ clean_up_sequences_internal(statement s)
     compute_statement_to_goto_table(s);
     gen_recurse(s, statement_domain,
 		gen_true,
-		clean_up_sequences_rewrite);  
+		clean_up_sequences_rewrite);
     discard_statement_to_goto_table();
     debug_off();
 }
