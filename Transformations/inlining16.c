@@ -101,4 +101,8 @@ int main()
 				   imin,
 				   connexity,
 				   size);
+  (void) freia_cipo_outer_gradient(imout,
+				   imin,
+				   connexity,
+				   size);
 }

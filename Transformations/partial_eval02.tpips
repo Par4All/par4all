@@ -1,0 +1,57 @@
+delete partial_eval02
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create partial_eval02 partial_eval02.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
+
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate TRANSFORMERS_INTER_FULL
+activate PRECONDITIONS_INTER_FULL
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+
+echo
+echo Initial code for "partial_eval02"
+echo
+
+display PRINTED_FILE[partial_eval02]
+
+echo
+echo Initial code for "main"
+echo
+
+display PRINTED_FILE[main]
+
+echo
+echo Code after partial evalaluation for "partial_eval02"
+echo
+
+apply PARTIAL_EVAL[partial_eval02]
+display PRINTED_FILE[partial_eval02]
+
+echo
+echo Code after partial evalaluation for "main"
+echo
+
+apply PARTIAL_EVAL[main]
+display PRINTED_FILE[main]
+
+echo
+echo Unsplit resulting code
+echo
+
+apply UNSPLIT
+shell gcc ${VDIR:-.}/partial_eval02.c -o ${VDIR:-.}/partial_eval
+shell gcc partial_eval02.database/Src/partial_eval02.c  -o partial_eval02.database/Src/partial_eval
+shell if test `partial_eval02.database/Src/partial_eval` = `${VDIR:-.}/partial_eval`; then echo "ok"; else echo "ko" ; fi
+shell rm -rf partial_eval02.database/Src/partial_eval ${VDIR:-.}/partial_eval
+
+close
+# delete partial_eval02
+quit
+

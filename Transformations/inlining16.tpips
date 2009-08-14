@@ -31,7 +31,7 @@ echo
 display CALLGRAPH_FILE[freia_cipo_outer_gradient]
 
 echo
-echo Code after inlining
+echo Code after inlining of "freia_cipo_dilate"
 echo
 
 apply INLINING[freia_cipo_dilate]
@@ -76,6 +76,21 @@ l8
 
 display PRINTED_FILE[freia_cipo_outer_gradient]
 
+# echo
+# echo Code after use-def elimination: bad results due to synthetic code, among other things
+# echo
+# 
+# activate PRINT_CODE
+# apply USE_DEF_ELIMINATION[freia_cipo_outer_gradient]
+# display PRINTED_FILE[freia_cipo_outer_gradient]
+
+echo
+echo Code after inlining of "freia_cipo_outer_gradient"
+echo
+
+apply INLINING[freia_cipo_outer_gradient]
+display PRINTED_FILE[main]
+
 echo
 echo Unsplit resulting code
 echo
@@ -84,6 +99,6 @@ apply UNSPLIT
 shell gcc -c inlining16.database/Src/inlining16.c
 
 close
-delete inlining16
+# delete inlining16
 quit
 
