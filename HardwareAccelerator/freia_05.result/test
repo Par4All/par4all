@@ -13,6 +13,56 @@ freia_status freia_05(freia_data2d *o0, freia_data2d *o1, freia_data2d *i0, frei
 
 ! accelerated function
 
+// graph for dag "dag_0" of module "freia_05" in dot format
+digraph "dag_0" {
+  // inputs
+  "i0" [shape=box];
+  "i1" [shape=box];
+
+  // outputs
+  "o0" [shape=box];
+  "o1" [shape=box];
+
+  // computation vertices
+  "10 and" [shape=circle];
+  "i0" -> "10 and";
+  "i1" -> "10 and";
+  "10 and" -> "o1";
+  "9 mul" [shape=circle];
+  "i0" -> "9 mul";
+  "i1" -> "9 mul";
+  "9 mul" -> "o0";
+}
+// graph for dag "freia_05_helper_0" of module "freia_05" in dot format
+digraph "freia_05_helper_0" {
+  // inputs
+  "i0" [shape=box];
+  "i1" [shape=box];
+
+  // outputs
+  "o1" [shape=box];
+
+  // computation vertices
+  "10 and" [shape=circle];
+  "i0" -> "10 and";
+  "i1" -> "10 and";
+  "10 and" -> "o1";
+}
+// graph for dag "freia_05_helper_1" of module "freia_05" in dot format
+digraph "freia_05_helper_1" {
+  // inputs
+  "i0" [shape=box];
+  "i1" [shape=box];
+
+  // outputs
+  "o0" [shape=box];
+
+  // computation vertices
+  "9 mul" [shape=circle];
+  "i0" -> "9 mul";
+  "i1" -> "9 mul";
+  "9 mul" -> "o0";
+}
 #include <freiaCommon.h>
 #include <freiaCoarseGrain.h>
 #include <spoc.h>

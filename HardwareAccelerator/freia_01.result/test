@@ -19,6 +19,48 @@ freia_status freia_01(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 
 ! accelerated function
 
+// graph for dag "dag_0" of module "freia_01" in dot format
+digraph "dag_0" {
+  // inputs
+  "i0" [shape=box];
+  "i1" [shape=box];
+
+  // outputs
+  "o" [shape=box];
+
+  // computation vertices
+  "12 sub" [shape=circle];
+  "i0" -> "12 sub";
+  "12 sub" -> "o";
+  "11 inf" [shape=circle];
+  "11 inf" -> "12 sub";
+  "i0" -> "11 inf";
+  "10 add" [shape=circle];
+  "10 add" -> "11 inf";
+  "i0" -> "10 add";
+  "i1" -> "10 add";
+}
+// graph for dag "freia_01_helper_0" of module "freia_01" in dot format
+digraph "freia_01_helper_0" {
+  // inputs
+  "i0" [shape=box];
+  "i1" [shape=box];
+
+  // outputs
+  "o" [shape=box];
+
+  // computation vertices
+  "12 sub" [shape=circle];
+  "i0" -> "12 sub";
+  "12 sub" -> "o";
+  "11 inf" [shape=circle];
+  "11 inf" -> "12 sub";
+  "i0" -> "11 inf";
+  "10 add" [shape=circle];
+  "10 add" -> "11 inf";
+  "i0" -> "10 add";
+  "i1" -> "10 add";
+}
 #include <freiaCommon.h>
 #include <freiaCoarseGrain.h>
 #include <spoc.h>

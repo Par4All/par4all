@@ -11,6 +11,7 @@ echo
 echo ! accelerated function
 echo
 apply HARDWARE_ACCELERATOR[${WSPACE}]
+shell cat ./${WSPACE}.database/${WSPACE}/*.dot
 shell cat ./${WSPACE}.database/Src/${WSPACE}_helper_functions.c
 echo
 echo ! new function
