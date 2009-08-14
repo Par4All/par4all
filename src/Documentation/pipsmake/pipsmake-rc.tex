@@ -7141,9 +7141,34 @@ ARRAY_RESIZING_BOTTOM_UP_OPTION 0
 
 \subsection{Scalarization}
 
-Scalarization phase.
+Scalarization is the process of replacing array references with scalar
+variables wherever appropriate. Expected benefits include lower memory
+footprint (e.g. registers can be used instead of allocating heap
+space) and hence, better execution times.
 
-This function is being implemented by Laurent \textsc{Daverio}.
+Scalarizing a given array reference is subject to two successive
+criteria, a Legality criterion and a Profitability criterion:
+
+\begin{itemize}
+\item The Legality criterion is evaluated first. It tries and
+  determine if replacing the reference might lead to breaking
+  dependence arcs, due to hidden references to the element,
+  e.g. ``get(A,i)'' instead of ``A[i]''. In that case, no
+  scalarization takes place.
+
+\item The Profitability criterion is then evaluated, to try and
+  eliminate cases where scalarization would yield no satisfactory
+  performance gains, e.g. when a scalarized reference has to be
+  immediately copied back into the original reference.
+\end{itemize}
+
+Scalarized variables use the prefix ``__scalar__'' and are thus easily
+identified. Depending on the situation, they will be copied-in
+(``__scalar0__ = A[i]'') and/or back into the array (``A[i] =
+__scalar0__'').
+
+Scalarization is currently applicable both to Fortran and C code.
+
 
 \begin{PipsMake}
 alias scalarization 'Scalarization'
