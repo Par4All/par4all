@@ -386,7 +386,7 @@ bool logical_expression_p(expression e)
   basic b;
   entity func;
 
-  debug(2, "logical expression", "\n");
+  pips_debug(2, "\n");
 
   switch(syntax_tag(s)) {
   case is_syntax_reference:
@@ -2216,7 +2216,7 @@ bool simplify_C_expression(expression e)
 	basic bt = basic_undefined;
 
 	if(type_variable_p(rt)) { /* FI: What if not? core dump? */
-	  bt = variable_basic(type_variable(rt));
+	  bt = variable_basic(type_variable(ultimate_type(rt)));
 
 	  can_be_substituted_p =
 	    basic_int_p(bt)

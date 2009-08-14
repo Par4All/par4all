@@ -155,9 +155,9 @@ effects stmt_to_fx(statement stmt, statement_effects fx_map)
 {
   effects fx;
 
-  pips_assert("stmt_prec", stmt != statement_undefined);
+  pips_assert("stmt is defined", stmt != statement_undefined);
 
-  debug(9, "stmt_to_fx",
+  pips_debug(9,
 	"Look for effects for statement at %p (ordering %d, number %d):\n",
 	stmt, statement_ordering(stmt), statement_number(stmt));
 
@@ -207,7 +207,7 @@ Psysteme stmt_prec(statement stmt)
 
   pips_assert("stmt_prec", stmt != statement_undefined);
 
-  debug(9, "stmt_prec",
+  pips_debug(9,
 	"Look for preconditions for statement at %p (ordering %d, number %d):\n",
 	stmt, statement_ordering(stmt), statement_number(stmt));
 
@@ -390,8 +390,11 @@ eformat_t partial_eval_reference(expression e, Psysteme ps, effects fx)
     return(eformat_undefined);
   }
 
+  /* FI: this test may be wrong for enum variables? Does it matter?
+     what can you do with enum anyway? Well, they can be replaced by
+     their values */
   if(!type_variable_p(entity_type(var)) ||
-     !basic_int_p(variable_basic(type_variable(entity_type(var)))) ) {
+     !basic_int_p(variable_basic(type_variable(ultimate_type(entity_type(var))))) ) {
     debug(9, "partial_eval_reference",
 	  "Reference to a non-scalar-integer variable %s cannot be evaluated\n",
 	  entity_name(var));
@@ -488,7 +491,7 @@ eformat_t partial_eval_reference(expression e, Psysteme ps, effects fx)
 
 void partial_eval_call_and_regenerate(call ca, Psysteme ps, effects fx)
 {
-  pips_assert("partial_eval_call_and_regenerate",
+  pips_assert("ca is a defined call",
 	      ca!= call_undefined);
 
   MAPL(le, {
@@ -1358,28 +1361,33 @@ void partial_eval_statement(statement stmt)
 					     stmt_to_fx(stmt,fx_map));
       if(get_debug_level()>=9) {
 	print_text(stderr, text_statement(entity_undefined, 0, stmt));
-	pips_assert(__func__, statement_consistent_p(stmt));
+	pips_assert("stmt is consistent", statement_consistent_p(stmt));
       }
     } break;
   case is_instruction_loop :
     {
       loop l = instruction_loop(inst);
       range r = loop_range(l);
+      effects fx = stmt_to_fx(stmt,fx_map);
+      Psysteme sc = stmt_prec(stmt);
+
+      /* Assuming no side-effects in loop bounds, sc is constant... */
+
       partial_eval_expression_and_regenerate(&range_lower(r),
-					     stmt_prec(stmt),
-					     stmt_to_fx(stmt,fx_map));
+					     sc,
+					     fx);
       partial_eval_expression_and_regenerate(&range_upper(r),
-					     stmt_prec(stmt),
-					     stmt_to_fx(stmt,fx_map));
+					     sc,
+					     fx);
       partial_eval_expression_and_regenerate(&range_increment(r),
-					     stmt_prec(stmt),
-					     stmt_to_fx(stmt,fx_map));
+					     sc,
+					     fx);
       add_live_loop_index(loop_index(l));
       rm_live_loop_index(loop_index(l));
 
       if(get_debug_level()>=9) {
 	print_text(stderr, text_statement(entity_undefined, 0, stmt));
-	pips_assert(__func__, statement_consistent_p(stmt));
+	pips_assert("stmt is consistent", statement_consistent_p(stmt));
       }
     } break;
   case is_instruction_forloop :
@@ -1436,7 +1444,7 @@ void partial_eval_statement(statement stmt)
   case is_instruction_unstructured :
     break;
   default :
-    pips_error(__func__, "Bad instruction tag %d", instruction_tag(inst));
+    pips_internal_error("Bad instruction tag %d", instruction_tag(inst));
   }
 }
 
