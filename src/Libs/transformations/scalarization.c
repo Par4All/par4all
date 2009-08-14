@@ -63,24 +63,29 @@ Psysteme sc_add_offset_variables(Psysteme g, Pbase b, Pbase db)
 {
   Pbase gb = sc_base(g);
 
-  // Check validity conditions: b must appear in g's basis but db must not, and dim(b) == dim(db)
-  if (base_included_p(b, gb) && !base_included_p(db, gb) && base_dimension(b)==base_dimension(db)) {
+  /* check validity conditions:
+     - b must appear in g's basis but db must not, and
+     - b and db must have the same dimension.
+   */
+  if (base_included_p(b,gb) 
+      && !base_included_p(db,gb) 
+      && base_dimension(b)==base_dimension(db)
+      ) {
 
     Pcontrainte eqs   = sc_egalites(g);
-    Pcontrainte ineqs = sc_inegalites(g);
-    
-    Pcontrainte c = CONTRAINTE_UNDEFINED;
+    Pcontrainte ineqs = sc_inegalites(g);    
+    Pcontrainte c     = CONTRAINTE_UNDEFINED;
 
-    // Update g's basis
+    /* update g's basis */
     Pbase tb = sc_base(g);
     sc_base(g) = base_union(tb, db);
     sc_dimension(g) += base_dimension(db);
     base_rm(tb);
 
-    for( c = eqs ; !CONTRAINTE_UNDEFINED_P(c) ; c= contrainte_succ(c) ) {
+    for(c = eqs ; !CONTRAINTE_UNDEFINED_P(c) ; c = contrainte_succ(c)) {
       Pbase cb  = BASE_NULLE;
       Pbase cdb = BASE_NULLE;
-      for ( cb=b,cdb=db ; !BASE_NULLE_P(cb) ; cb = vecteur_succ(cb), cdb = vecteur_succ(cdb)) {
+      for (cb=b,cdb=db ; !BASE_NULLE_P(cb) ; cb = vecteur_succ(cb), cdb = vecteur_succ(cdb)) {
 	Variable v     = vecteur_var(cb);
  	Variable dv    = vecteur_var(cdb);
 	Value    coeff = vect_coeff(v, contrainte_vecteur(c));	
@@ -88,10 +93,10 @@ Psysteme sc_add_offset_variables(Psysteme g, Pbase b, Pbase db)
       }
     }
 
-    for( c = ineqs ; !CONTRAINTE_UNDEFINED_P(c) ; c= contrainte_succ(c) ) {
+    for(c = ineqs ; !CONTRAINTE_UNDEFINED_P(c) ; c= contrainte_succ(c)) {
       Pbase cb  = BASE_NULLE;
       Pbase cdb = BASE_NULLE;
-      for ( cb=b,cdb=db ; !BASE_NULLE_P(cb) ; cb = vecteur_succ(cb), cdb = vecteur_succ(cdb)) {
+      for (cb=b,cdb=db ; !BASE_NULLE_P(cb) ; cb = vecteur_succ(cb), cdb = vecteur_succ(cdb)) {
 	Variable v     = vecteur_var(cb);
 	Variable dv    = vecteur_var(cdb);
 	Value    coeff = vect_coeff(v, contrainte_vecteur(c));	
@@ -99,22 +104,22 @@ Psysteme sc_add_offset_variables(Psysteme g, Pbase b, Pbase db)
       }
     }
   }
-
   return g;
 }
 
 
 /* 
- * This function checks that graph g is a function graph from domain d
- * to range r.
- *
- * Return value : TRUE if the graph is certainly
- * functional, FALSE if it *might* be not functional.
- *
- * NOTE: parameter dr could be derived from r within this function,
- * but we do not know how to create generic variables in Linear. The
- * initial implementation used a PIPS function to generate the new
- * variables.
+   This function checks that graph g is a function graph from domain d
+   to range r.
+ 
+   Return value :
+   - TRUE if the graph is certainly functional,
+   - FALSE if it *might* be not functional.
+ 
+   NOTE: parameter dr could be derived from r within this function,
+   but we do not know how to create generic variables in Linear. The
+   initial implementation used a PIPS function to generate the new
+   variables.
  */
 
 bool sc_functional_graph_p(Psysteme g, Pbase d, Pbase r, Pbase dr)
@@ -123,11 +128,10 @@ bool sc_functional_graph_p(Psysteme g, Pbase d, Pbase r, Pbase dr)
 
   Psysteme g1, g2, g3, g4;
 
-  // Check validity conditions: d and r should be included in g's basis.
+  // check validity conditions: d and r should be included in g's basis.
   Pbase gb = sc_base(g);
   if (!(base_included_p(d, gb) && base_included_p(r, gb))) {
-
-    // Illegal arguments
+    // illegal arguments
     functional_p = FALSE; //TODO
   }
   else {
@@ -141,11 +145,11 @@ bool sc_functional_graph_p(Psysteme g, Pbase d, Pbase r, Pbase dr)
     // Substitute r by r + dr in g2 (indexed by dimension)
     g2 = sc_add_offset_variables(g2, r, dr);
 
-    // Merge g1 and g2 into a unique system g3.
+    // Merge g1 and g2 into a unique system g3, eliminating redundencies.
     g3 = sc_intersection(SC_EMPTY, g1, g2);
-    g3 = sc_elim_redond(g3); // remove redundencies
+    g3 = sc_elim_redond(g3);
     
-    // Project g3 on dr space -> g4. If projection fails, return FALSE.
+    // Project g3 on dr space -> result: g4. If projection fails, return FALSE.
     Pbase dr4 = BASE_NULLE;
     // dr4 := list of variables of g3's basis which are not in dr
     for ( cr = sc_base(g3) ; !BASE_UNDEFINED_P(cr) ; cr = vecteur_succ(cr) ) {
@@ -165,8 +169,7 @@ bool sc_functional_graph_p(Psysteme g, Pbase d, Pbase r, Pbase dr)
     if (SC_EMPTY_P(g4)) {
       functional_p = FALSE;
     }
-    else {
-    
+    else {    
       // Check that all r_b_i variables are null, using sc_minmax_of_variables()    
       for ( cr = dr ; !BASE_UNDEFINED_P(cr) ; cr = vecteur_succ(cr) ) {
 	Psysteme g4b = sc_copy(g4);
@@ -185,11 +188,14 @@ bool sc_functional_graph_p(Psysteme g, Pbase d, Pbase r, Pbase dr)
     sc_rm(g3);
     sc_rm(g4);
   }
-
   return functional_p;
 }
 
 
+/* 
+   This function checks that graph g is a total function graph from
+   domain d to range r.
+*/
 bool sc_totally_functional_graph_p( Psysteme g, // function graph
 				    Pbase d,    // domain's basis
 				    Psysteme D, // membership predicate for functional domain
@@ -219,7 +225,7 @@ bool sc_totally_functional_graph_p( Psysteme g, // function graph
 // We need a Pbase to accumulate loop indices during loop traversal
 static Pbase loop_indices_b = BASE_NULLE;
 
-// Needed for callback function reference_substitute
+// These are needed for callback function reference_substitute
 static entity scalarized_array = entity_undefined;
 static entity scalarized_replacement_variable = entity_undefined;
 
@@ -261,7 +267,7 @@ Pbase make_phi_base(int phi_min, int phi_max)
 {
   Pbase phi_b = BASE_NULLE;
   int i;
-  for( i=phi_min; i<=phi_max; i++ ) 
+  for(i=phi_min; i<=phi_max; i++) 
     phi_b = base_add_variable(phi_b, (Variable) make_phi_entity(i));
   return(phi_b);
 }
@@ -306,7 +312,7 @@ static bool loop_scalarization(loop l)
     print_regions(corl);
     pips_debug(1, "CUMULATED RW regions:\n");
     print_regions(crwl);
-  }
+    }
 
   // Now we determine which private effects are not copied out.
   FOREACH (EFFECT, pr, crwl) {
@@ -326,101 +332,115 @@ static bool loop_scalarization(loop l)
       Psysteme sc = descriptor_convex(d);
       int nd = type_depth(entity_type(pv));
 
-      // Number of occurrences
-      int no = count_references_to_variable(s, pv);
+      // Number of *element* and *variable* occurrences
+      int neo = count_references_to_variable_element(s, pv);
+      int nvo = count_references_to_variable(s, pv);
+      
+      /* Legality criterion:
 
-      bool read_pv    = effects_read_variable_p(crwl, pv);
-      bool written_pv = effects_write_variable_p(crwl, pv);
-      bool read_and_written_pv = read_pv && written_pv;
+	 if nvo is greater than neo, there must be hidden references
+	 to the element, and the substitution might break dependence
+	 arcs.
+
+	 So, we go on only if the two are equal.
+
+      */
+
+      if (nvo == neo) {
+	
+	bool read_pv    = effects_read_variable_p(crwl, pv);
+	bool written_pv = effects_write_variable_p(crwl, pv);
+	bool read_and_written_pv = read_pv && written_pv;
 
 
-      //if (!entity_scalar_p(pv)) -- replaced by 'nd > 0'
+	//if (!entity_scalar_p(pv)) -- replaced by 'nd > 0'
 
-      /* Profitability:
+	/* Profitability criterion:
 
-	 - no > 2: if the number of references if greater than 2, the
+	   - neo > 2: if the number of references if greater than 2, the
            copy-in and copy-out code overhead is assumed to be small
            enough to make scalarization profitable.
 	   
-	 - no > 1: if the number of references is 2, the copy-in *xor*
+	   - neo > 1: if the number of references is 2, the copy-in *xor*
            the copy-out overhead meets the above criterion.
 
-	 - else: if there is neither copy-in nor copy-out,
+	   - else: if there is neither copy-in nor copy-out,
            privatization is always useful.
-
-       */
-      if (nd > 0
-	  && (no > 2 
-	      || (no > 1 && !read_and_written_pv)
-	      || (entity_undefined_p(iv) && entity_undefined_p(ov))
-	      )
-	  ) {
-
-	
-	Pbase phi_b = make_phi_base(1, nd);
-	Pbase d_phi_b = BASE_NULLE;
-	Pbase cr = BASE_NULLE;
-
-	/*
-	  ifdebug(1) {
-	  pips_debug(1, "Value of sc:\n");
-	  sc_print(sc, (get_variable_name_t)entity_user_name);
-	}
 	*/
+
+	if (nd > 0
+	    && (neo > 2 
+		|| (neo > 1 && !read_and_written_pv)
+		|| (entity_undefined_p(iv) && entity_undefined_p(ov))
+		)
+	    ) {
+
 	
-	// Build base dr using make_local_temporary_integer_value_entity(void)
-	for ( cr = phi_b ; !BASE_UNDEFINED_P(cr) ; cr = vecteur_succ(cr) ) {
-	  entity e_d_phi_b = make_local_temporary_integer_value_entity();
-	  d_phi_b = base_add_variable(d_phi_b, (Variable) e_d_phi_b);
+	  Pbase phi_b = make_phi_base(1, nd);
+	  Pbase d_phi_b = BASE_NULLE;
+	  Pbase cr = BASE_NULLE;
+
+	  /*
+	    ifdebug(1) {
+	    pips_debug(1, "Value of sc:\n");
+	    sc_print(sc, (get_variable_name_t)entity_user_name);
+	    }
+	  */
+	
+	  // Build base dr using make_local_temporary_integer_value_entity(void)
+	  for ( cr = phi_b ; !BASE_UNDEFINED_P(cr) ; cr = vecteur_succ(cr) ) {
+	    entity e_d_phi_b = make_local_temporary_integer_value_entity();
+	    d_phi_b = base_add_variable(d_phi_b, (Variable) e_d_phi_b);
+	  }
+
+	  if (sc_totally_functional_graph_p(sc, loop_indices_b, D, phi_b, d_phi_b)) {
+	    // Create new temp var of same type as pv
+	    type pvt      = ultimate_type(entity_type(pv)); // ultimate_type "un-hides" typedefs
+	    variable pvtv = type_variable(pvt);
+	    basic pvb     = variable_basic(pvtv);
+	    basic svb     = copy_basic(pvb);      
+	  
+	    //list el       = load_proper_rw_effects_list(s);
+
+	    // Copy the a reference to pv, just in case we need it later
+	    reference pvr = copy_reference(find_reference_to_variable(s, pv));
+
+	    // Create a reference to this new variable and add declaration to module	
+	    entity sv = make_new_scalar_variable_with_prefix("__scalar__", get_current_module_entity(), svb);
+	    AddEntityToCurrentModule(sv);
+	    scalarized_variables = arguments_add_entity(scalarized_variables, pv);
+	  
+	    pips_user_warning("Creating variable %s for variable %s\n", entity_name(sv), entity_name(pv));	  
+	  
+	    // Substitute all references to pv with references to new variable	  
+	    statement_substitute_scalarized_array_references(s, pv, sv);
+
+	    //if (!entity_undefined_p(cov)) {
+	    if (!entity_undefined_p(ov)) {
+	      // Generate copy-out code
+	      statement co_s = make_assign_statement(reference_to_expression(pvr), entity_to_expression(sv));
+	      append_a_statement(s, co_s);
+	    }
+	    else {
+	      //free_reference(pvr);
+	    }
+
+	    if (!entity_undefined_p(iv)) {
+	      // Generate copy-in code
+	      statement ci_s =
+		make_assign_statement(entity_to_expression(sv),
+				      reference_to_expression(copy_reference(pvr)));
+	      insert_a_statement(s, ci_s);
+	    }
+	    else {
+	      //free_reference(pvr);
+	    }
+
+	  }
+	  base_rm(phi_b);
+	  base_rm(d_phi_b);
+	  reset_temporary_value_counter();
 	}
-
-	if (sc_totally_functional_graph_p(sc, loop_indices_b, D, phi_b, d_phi_b)) {
-	  // Create new temp var of same type as pv
-	  type pvt      = ultimate_type(entity_type(pv)); // ultimate_type "un-hides" typedefs
-	  variable pvtv = type_variable(pvt);
-	  basic pvb     = variable_basic(pvtv);
-	  basic svb     = copy_basic(pvb);      
-	  
-	  //list el       = load_proper_rw_effects_list(s);
-
-	  // Copy the a reference to pv, just in case we need it later
-	  reference pvr = copy_reference(find_reference_to_variable(s, pv));
-
-	  // Create a reference to this new variable and add declaration to module	
-	  entity sv = make_new_scalar_variable_with_prefix("__scalar__", get_current_module_entity(), svb);
-	  AddEntityToCurrentModule(sv);
-	  scalarized_variables = arguments_add_entity(scalarized_variables, pv);
-	  
-	  pips_user_warning("Creating variable %s for variable %s\n", entity_name(sv), entity_name(pv));	  
-	  
-	  // Substitute all references to pv with references to new variable	  
-	  statement_substitute_scalarized_array_references(s, pv, sv);
-
-	  //if (!entity_undefined_p(cov)) {
-	  if (!entity_undefined_p(ov)) {
-	    // Generate copy-out code
-	    statement co_s = make_assign_statement(reference_to_expression(pvr), entity_to_expression(sv));
-	    append_a_statement(s, co_s);
-	  }
-	  else {
-	    //free_reference(pvr);
-	  }
-
-	  if (!entity_undefined_p(iv)) {
-	    // Generate copy-in code
-	    statement ci_s =
-	      make_assign_statement(entity_to_expression(sv),
-				    reference_to_expression(copy_reference(pvr)));
-	    insert_a_statement(s, ci_s);
-	  }
-	  else {
-	    //free_reference(pvr);
-	  }
-
-	}
-	base_rm(phi_b);
-	base_rm(d_phi_b);
-	reset_temporary_value_counter();
       }
     }
   }
@@ -428,7 +448,7 @@ static bool loop_scalarization(loop l)
 }
 
 
-// gen_recurse callback on entering statement. If it's a loop, process it.
+// gen_recurse callback on entering a statement. If it's a loop, process it.
 static bool statement_in(statement ls)
 {
   bool result = TRUE;
@@ -451,31 +471,28 @@ static bool statement_in(statement ls)
 }
 
 
-// gen_recurse callback on exiting loop
+// gen_recurse callback on exiting a statement. If it's a loop, process it.
 static void statement_out(statement s)
 {
   if (statement_loop_p(s)) {
-    loop l = statement_loop(s);
+    loop l   = statement_loop(s);
     entity i = loop_index(l);
-    list nl = NIL;
+    list nl  = NIL;
 
     ifdebug(1) {
-      pips_debug( 1, "Exiting loop with index %s, size=%d\n",
-		  entity_name(i), base_dimension(loop_indices_b));
+      pips_debug(1, "Exiting loop with index %s, size=%d\n",
+		 entity_name(i), base_dimension(loop_indices_b));
     }
 
-    /* Remove variables privatized in the current look, so that
+    /* Remove variables privatized in the current loop, so that
        successive loops don't interfere with each other.
     */
-    
     for (list el=scalarized_variables; !ENDP(el); POP(el)) {
       entity e = ENTITY(CAR(el));
-      if (e == i) {
+      if (e == i)
 	break;
-      }
-      else {
-	nl = CONS(ENTITY, e, nl);
-      }
+      else
+	nl = CONS(ENTITY, e, nl);      
     }
     gen_free_list(scalarized_variables);
     scalarized_variables = gen_nreverse(nl);

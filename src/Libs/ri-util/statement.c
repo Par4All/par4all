@@ -2393,11 +2393,27 @@ static int    loop_depth;
 static bool count_references_to_v_p(reference r)
 {
   bool result= TRUE;
-    entity rv = reference_variable(r);
-    if (rv == variable_searched) {
+  entity rv = reference_variable(r);
+  if (rv == variable_searched) {
+    /* 10: arbitrary value for references nested in at least one loop */
+    reference_count += (loop_depth > 0 ? 10 : 1 );
+  }
+  return result;
+}
+
+/* This function checks reference to proper elements, not slices */
+static bool count_element_references_to_v_p(reference r)
+{
+  bool result= TRUE;
+  entity rv = reference_variable(r);
+  if (rv == variable_searched) {
+    list inds = reference_indices(r);
+    int d = type_depth(ultimate_type(entity_type(rv)));
+    if (gen_length(inds) == d) {
       /* 10: arbitrary value for references nested in at least one loop */
       reference_count += (loop_depth > 0 ? 10 : 1 );
     }
+  }
   return result;
 }
 
@@ -2419,6 +2435,16 @@ int count_references_to_variable(statement s, entity v)
   variable_searched = v;
   gen_multi_recurse(s, loop_domain, count_loop_in, count_loop_out,
 		    reference_domain, count_references_to_v_p, gen_null, NULL);
+  variable_searched = entity_undefined;
+  return reference_count;
+}
+int count_references_to_variable_element(statement s, entity v)
+{
+  reference_count = 0;
+  loop_depth = 0;
+  variable_searched = v;
+  gen_multi_recurse(s, loop_domain, count_loop_in, count_loop_out,
+		    reference_domain, count_element_references_to_v_p, gen_null, NULL);
   variable_searched = entity_undefined;
   return reference_count;
 }
