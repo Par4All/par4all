@@ -42,9 +42,6 @@
 #define FREIA_API "freia"
 #define SPOC_HW "spoc"
 
-/* in transformations */
-extern void cleanup_continues(statement);
-
 int hardware_accelerator(string module)
 {
   string input = get_string_property(HWAC_INPUT);
@@ -72,8 +69,8 @@ int hardware_accelerator(string module)
   // if (same_string_p(input, FREIA_API) && same_string_p(target, SPOC_HW))
   freia_spoc_compile(module, mod_stat);
 
-  // mimimal cleanup
-  cleanup_continues(mod_stat);
+  // some cleanup
+  clean_up_sequences(mod_stat);
 
   // put new code
   DB_PUT_MEMORY_RESOURCE(DBR_CODE, module, mod_stat);

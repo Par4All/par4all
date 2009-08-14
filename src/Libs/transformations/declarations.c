@@ -43,6 +43,7 @@
 #include "pipsdbm.h"
 #include "misc.h"
 #include "properties.h"
+#include "control.h" // for clean_up_sequences
 
 /**
  * recursively call statement_remove_unused_declarations on all module statement
@@ -71,50 +72,6 @@ clean_declarations(char * module_name)
   reset_current_module_entity();
   reset_current_module_statement();
   return true;
-}
-
-/************************************* REMOVE USELESS CONTINUES IN SEQUENCES */
-
-static void remove_continues(sequence seq)
-{
-  list ls = NIL;
-  string_buffer comments = string_buffer_make(true);
-  FOREACH(STATEMENT, s, sequence_statements(seq))
-  {
-    if (!continue_statement_p(s))
-    {
-      if (!string_buffer_empty_p(comments))
-      {
-	if (!statement_with_empty_comment_p(s))
-	{
-	  string_buffer_append(comments, statement_comments(s));
-	  free(statement_comments(s));
-	  statement_comments(s) = NULL;
-	}
-	statement_comments(s) = string_buffer_to_string(comments);
-	string_buffer_reset(comments);
-      }
-      ls = CONS(STATEMENT, s, ls);
-    }
-    else // continue statement, removed
-    {
-      // ??? what about labels?
-      // keep comments! attach them to the next available statement in
-      // the sequence, otherwise goodbye!
-      if (!statement_with_empty_comment_p(s))
-	string_buffer_append(comments, statement_comments(s));
-      free_statement(s);
-    }
-  }
-  ls = gen_nreverse(ls);
-  gen_free_list(sequence_statements(seq));
-  string_buffer_free(&comments);
-  sequence_statements(seq) = ls;
-}
-
-void cleanup_continues(statement stat)
-{
-  gen_recurse(stat, sequence_domain, gen_true, remove_continues);
 }
 
 /****************************************************** DYNAMIC DECLARATIONS */
@@ -307,7 +264,7 @@ bool clean_unused_dynamic_variables(string module)
     ((statement) db_get_memory_resource(DBR_CODE, module, TRUE) );
 
   dynamic_cleanup(module, get_current_module_statement());
-  cleanup_continues(get_current_module_statement());
+  clean_up_sequences(get_current_module_statement());
 
   // results
   DB_PUT_MEMORY_RESOURCE(DBR_CODE, module, get_current_module_statement());
