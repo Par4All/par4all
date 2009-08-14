@@ -7162,10 +7162,9 @@ criteria, a Legality criterion and a Profitability criterion:
   immediately copied back into the original reference.
 \end{itemize}
 
-Scalarized variables use the prefix ``__scalar__'' and are thus easily
+Scalarized variables use the prefix \verb/___scalar__/ and are thus easily
 identified. Depending on the situation, they will be copied-in
-(``__scalar0__ = A[i]'') and/or back into the array (``A[i] =
-__scalar0__'').
+(\verb/__scalar0__ = A[i]/) and/or back into the array (\verb/A[i] = __scalar0__/).
 
 Scalarization is currently applicable both to Fortran and C code.
 
