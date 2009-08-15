@@ -9,7 +9,7 @@ extern freia_status
 freia_cipo_inner_gradient(freia_data2d *, freia_data2d *, int32_t, uint32_t);
 
 freia_status
-freia_08(freia_data2d * o,
+freia_09(freia_data2d * o,
 	 freia_data2d * i0,
 	 freia_data2d * i1,
 	 freia_data2d * i2)
