@@ -40,6 +40,9 @@ validate:
 validate-out:
 	$(MAKE) TEST=out validate
 
+# generate missing "test" files
+test: $(F.valid)
+
 # shell script
 %.result/$(TEST): %.test
 	$< | $(FLT)  > $@ ; $(OK)
