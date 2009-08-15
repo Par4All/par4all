@@ -70,8 +70,9 @@ freia_status my_dilate_6c_helper_0(freia_data2d * o0, freia_data2d * i0, int32_t
 
 
   // STAGE 0
-  // i0 [0 input 0] -> [0 poc 0] o
+  // i0 [0 input 0] -> [0 poc 0] 5 dilate_6c
   // nope
+  // poc 5 dilate_6c stage 0 side 0
   si.poc[0][0].op = SPOC_POC_DILATE;
   si.poc[0][0].grid = SPOC_POC_6_CONNEX;
   for(i=0 ; i<9 ; i++)
@@ -79,7 +80,7 @@ freia_status my_dilate_6c_helper_0(freia_data2d * o0, freia_data2d * i0, int32_t
 
 
   // output image o on 0
-  // o [0 poc 0] -> [0 output 0] o
+  // o [0 poc 0] -> [0 output 0] 0 null
   si.mux[0][0].op = SPOC_MUX_IN0;
 
   mcode.raw = (freia_ptr) &si;

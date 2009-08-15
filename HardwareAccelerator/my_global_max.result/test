@@ -64,7 +64,7 @@ freia_status my_global_max_helper_0(freia_data2d * i0, int32_t * red0)
 
 
   // STAGE 0
-  // i0 [0 input 0] -> [0 measure 0] i0
+  // i0 [0 input 0] -> [0 measure 0] 0 null
   si.mux[0][0].op = SPOC_MUX_IN0;
 
 
@@ -88,7 +88,7 @@ freia_status my_global_max_helper_0(freia_data2d * i0, int32_t * red0)
   // get reductions
   freia_cg_read_reduction_results(&redres);
 
-  // get reduction results
+  // measure 4 global_max stage 0 side 0
   *red0 = (int32_t) reduc.measure[0][0].maximum;
 
   return ret;

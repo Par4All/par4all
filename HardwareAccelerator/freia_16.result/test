@@ -106,35 +106,37 @@ freia_status freia_16_helper_0(freia_data2d * o0, freia_data2d * o1, freia_data2
 
 
   // STAGE 0
-  // i [0 input 0] -> [0 measure 0] i
+  // i [0 input 0] -> [0 measure 0] 0 null
   si.mux[0][0].op = SPOC_MUX_IN0;
 
-  // i [0 measure 0] -> [0 measure 0] i
+  // i [0 measure 0] -> [0 measure 0] 0 null
   // nope
 
-  // i [0 measure 0] -> [0 measure 0] i
+  // i [0 measure 0] -> [0 measure 0] 0 null
   // nope
 
 
   // STAGE 1
-  // i [0 measure 0] -> [1 poc 0] o1
-  // i [1 input 0] -> [1 poc 0] o1
+  // i [0 measure 0] -> [1 poc 0] 8 erode_6c
+  // i [1 input 0] -> [1 poc 0] 8 erode_6c
   // nope
+  // poc 8 erode_6c stage 1 side 0
   si.poc[1][0].op = SPOC_POC_ERODE;
   si.poc[1][0].grid = SPOC_POC_6_CONNEX;
   for(i=0 ; i<9 ; i++)
     sp.poc[1][0].kernel[i] = kern3[i];
 
-  // i [1 input 0] -> [1 alu] o0
+  // i [1 input 0] -> [1 alu] 7 add_const
   // nope
+  // alu 7 add_const stage 1
   si.alu[1][0].op = SPOC_ALU_ADD_IN0_CONST;
   si.alu[1][0].constant = cst4;
 
 
   // output image o1 on 0 and image o0 on 1
-  // o1 [1 poc 0] -> [1 output 0] o1
+  // o1 [1 poc 0] -> [1 output 0] 0 null
   si.mux[1][0].op = SPOC_MUX_IN0;
-  // o0 [1 alu] -> [1 output 1] o0
+  // o0 [1 alu] -> [1 output 1] 0 null
   si.mux[1][1].op = SPOC_MUX_IN0;
   si.mux[1][3].op = SPOC_MUX_IN0;
 
@@ -156,13 +158,13 @@ freia_status freia_16_helper_0(freia_data2d * o0, freia_data2d * o1, freia_data2
   // get reductions
   freia_cg_read_reduction_results(&redres);
 
-  // get reduction results
+  // measure 9 global_min stage 0 side 0
   *red0 = (int32_t) reduc.measure[0][0].minimum;
 
-  // get reduction results
+  // measure 10 global_max stage 0 side 0
   *red1 = (int32_t) reduc.measure[0][0].maximum;
 
-  // get reduction results
+  // measure 11 global_vol stage 0 side 0
   *red2 = (int32_t) reduc.measure[0][0].volume;
 
   return ret;

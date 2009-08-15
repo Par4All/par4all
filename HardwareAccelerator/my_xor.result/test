@@ -76,15 +76,16 @@ freia_status my_xor_helper_0(freia_data2d * o0, freia_data2d * i0, freia_data2d 
 
 
   // STAGE 0
-  // i0 [0 input 0] -> [0 alu] o
+  // i0 [0 input 0] -> [0 alu] 5 xor
   // nope
-  // i1 [0 input 1] -> [0 alu] o
+  // i1 [0 input 1] -> [0 alu] 5 xor
   // nope
+  // alu 5 xor stage 0
   si.alu[0][0].op = SPOC_ALU_XOR_IN0_IN1;
 
 
   // output image o on 0
-  // o [0 alu] -> [0 output 0] o
+  // o [0 alu] -> [0 output 0] 0 null
   si.mux[0][0].op = SPOC_MUX_IN1;
   si.mux[0][2].op = SPOC_MUX_IN0;
 

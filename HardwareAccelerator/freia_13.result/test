@@ -92,23 +92,26 @@ freia_status freia_13_helper_0(freia_data2d * o0, freia_data2d * o1, , int32_t c
 
 
   // STAGE 0
+  // alu 11 set_constant stage 0
   si.alu[0][0].op = SPOC_ALU_COPY_CONST;
   si.alu[0][0].constant = cst0;
 
 
   // STAGE 1
-  // 0`t [0 alu] -> [1 poc 0] o0
+  // 0`t [0 alu] -> [1 poc 0] 12 erode_8c
   si.mux[0][0].op = SPOC_MUX_IN1;
   si.mux[0][2].op = SPOC_MUX_IN0;
-  // 0`t [1 input 0] -> [1 poc 0] o0
+  // 0`t [1 input 0] -> [1 poc 0] 12 erode_8c
   // nope
+  // poc 12 erode_8c stage 1 side 0
   si.poc[1][0].op = SPOC_POC_ERODE;
   si.poc[1][0].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
     sp.poc[1][0].kernel[i] = kern1[i];
 
-  // 0`t [1 input 0] -> [1 poc 1] o1
+  // 0`t [1 input 0] -> [1 poc 1] 13 dilate_8c
   // nope
+  // poc 13 dilate_8c stage 1 side 1
   si.poc[1][1].op = SPOC_POC_DILATE;
   si.poc[1][1].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
@@ -116,9 +119,9 @@ freia_status freia_13_helper_0(freia_data2d * o0, freia_data2d * o1, , int32_t c
 
 
   // output image o0 on 0 and image o1 on 1
-  // o0 [1 poc 0] -> [1 output 0] o0
+  // o0 [1 poc 0] -> [1 output 0] 0 null
   si.mux[1][0].op = SPOC_MUX_IN0;
-  // o1 [1 poc 1] -> [1 output 1] o1
+  // o1 [1 poc 1] -> [1 output 1] 0 null
   si.mux[1][3].op = SPOC_MUX_IN1;
 
   mcode.raw = (freia_ptr) &si;

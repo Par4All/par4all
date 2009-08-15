@@ -141,12 +141,12 @@ freia_status freia_17_helper_0(freia_data2d * o0, freia_data2d * i0)
 
 
   // STAGE 0
-  // i [0 input 0] -> [0 input 0] 0`t5
+  // i [0 input 0] -> [0 input 0] 27 copy
   // nope
 
 
   // output image 0`t5 on 0
-  // 0`t5 [0 input 0] -> [0 output 0] 0`t5
+  // 0`t5 [0 input 0] -> [0 output 0] 0 null
   si.mux[0][0].op = SPOC_MUX_IN0;
 
   mcode.raw = (freia_ptr) &si;
@@ -186,17 +186,17 @@ freia_status freia_17_helper_1(freia_data2d * o0, freia_data2d * o1, freia_data2
 
 
   // STAGE 0
-  // i [0 input 0] -> [0 input 0] 0`t3
+  // i [0 input 0] -> [0 input 0] 25 copy
   // nope
 
-  // i [0 input 0] -> [0 input 1] 0`t4
+  // i [0 input 0] -> [0 input 1] 26 copy
   // nope
 
 
   // output image 0`t3 on 0 and image 0`t4 on 1
-  // 0`t3 [0 input 0] -> [0 output 0] 0`t3
+  // 0`t3 [0 input 0] -> [0 output 0] 0 null
   si.mux[0][0].op = SPOC_MUX_IN0;
-  // 0`t4 [0 input 1] -> [0 output 1] 0`t4
+  // 0`t4 [0 input 1] -> [0 output 1] 0 null
   si.mux[0][3].op = SPOC_MUX_IN1;
 
   mcode.raw = (freia_ptr) &si;

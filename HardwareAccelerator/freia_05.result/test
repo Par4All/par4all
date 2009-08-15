@@ -106,15 +106,16 @@ freia_status freia_05_helper_0(freia_data2d * o0, freia_data2d * i0, freia_data2
 
 
   // STAGE 0
-  // i0 [0 input 0] -> [0 alu] o1
+  // i0 [0 input 0] -> [0 alu] 10 and
   // nope
-  // i1 [0 input 1] -> [0 alu] o1
+  // i1 [0 input 1] -> [0 alu] 10 and
   // nope
+  // alu 10 and stage 0
   si.alu[0][0].op = SPOC_ALU_AND_IN0_IN1;
 
 
   // output image o1 on 0
-  // o1 [0 alu] -> [0 output 0] o1
+  // o1 [0 alu] -> [0 output 0] 0 null
   si.mux[0][0].op = SPOC_MUX_IN1;
   si.mux[0][2].op = SPOC_MUX_IN0;
 
@@ -155,15 +156,16 @@ freia_status freia_05_helper_1(freia_data2d * o0, freia_data2d * i0, freia_data2
 
 
   // STAGE 0
-  // i0 [0 input 0] -> [0 alu] o0
+  // i0 [0 input 0] -> [0 alu] 9 mul
   // nope
-  // i1 [0 input 1] -> [0 alu] o0
+  // i1 [0 input 1] -> [0 alu] 9 mul
   // nope
+  // alu 9 mul stage 0
   si.alu[0][0].op = SPOC_ALU_MUL_IN0_IN1;
 
 
   // output image o0 on 0
-  // o0 [0 alu] -> [0 output 0] o0
+  // o0 [0 alu] -> [0 output 0] 0 null
   si.mux[0][0].op = SPOC_MUX_IN1;
   si.mux[0][2].op = SPOC_MUX_IN0;
 

@@ -64,12 +64,13 @@ freia_status my_set_constant_helper_0(freia_data2d * o0, , int32_t cst0)
 
 
   // STAGE 0
+  // alu 4 set_constant stage 0
   si.alu[0][0].op = SPOC_ALU_COPY_CONST;
   si.alu[0][0].constant = cst0;
 
 
   // output image o on 0
-  // o [0 alu] -> [0 output 0] o
+  // o [0 alu] -> [0 output 0] 0 null
   si.mux[0][0].op = SPOC_MUX_IN1;
   si.mux[0][2].op = SPOC_MUX_IN0;
 

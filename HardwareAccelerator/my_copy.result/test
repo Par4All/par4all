@@ -70,12 +70,12 @@ freia_status my_copy_helper_0(freia_data2d * o0, freia_data2d * i0)
 
 
   // STAGE 0
-  // i0 [0 input 0] -> [0 input 0] o
+  // i0 [0 input 0] -> [0 input 0] 4 copy
   // nope
 
 
   // output image o on 0
-  // o [0 input 0] -> [0 output 0] o
+  // o [0 input 0] -> [0 output 0] 0 null
   si.mux[0][0].op = SPOC_MUX_IN0;
 
   mcode.raw = (freia_ptr) &si;
