@@ -1,0 +1,17 @@
+
+! initial function
+
+freia_status my_cast(freia_data2d *o, freia_data2d *i0)
+{
+   return freia_aipo_cast(o, i0);                                       /*0004*/
+}
+
+! accelerated function
+
+
+! new function
+
+freia_status my_cast(freia_data2d *o, freia_data2d *i0)
+{
+   return freia_aipo_cast(o, i0);                                       /*0004*/
+}

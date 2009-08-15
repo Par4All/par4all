@@ -1,0 +1,89 @@
+
+! initial function
+
+freia_status my_global_max(freia_data2d *i0, int32_t *p0)
+{
+   return freia_aipo_global_max(i0, p0);                                /*0004*/
+}
+
+! accelerated function
+
+// graph for dag "dag_0" of module "my_global_max" in dot format
+digraph "dag_0" {
+  // inputs
+  "i0" [shape=box];
+
+  // outputs
+
+  // computation vertices
+  "4 global_max" [shape=circle];
+  "i0" -> "4 global_max";
+}
+// graph for dag "my_global_max_helper_0" of module "my_global_max" in dot format
+digraph "my_global_max_helper_0" {
+  // inputs
+  "i0" [shape=box];
+
+  // outputs
+
+  // computation vertices
+  "4 global_max" [shape=circle];
+  "i0" -> "4 global_max";
+}
+#include <freiaCommon.h>
+#include <freiaCoarseGrain.h>
+#include <spoc.h>
+
+// FREIA-SPoC helper function for module my_global_max
+freia_status my_global_max_helper_0(freia_data2d * i0, int32_t * red0)
+{
+  spoc_instr si;
+  spoc_param sp;
+  spoc_reduction reduc;
+  freia_microcode mcode;
+  freia_dynamic_param dynparam;
+  freia_reduction_results redres;
+  freia_op_sel op = 0;
+  freia_op_param param;
+  freia_status ret;
+
+  // init pipe to nop
+  spoc_init_pipe(&si, &sp, 16);
+
+  // stage 0
+
+  // i0 [0 none 0] -> [0 measure 0] i0
+  si.mux[0][0].op = SPOC_MUX_IN0;
+
+  // no output image
+
+  mcode.raw = (freia_ptr) &si;
+  mcode.size = sizeof(spoc_instr);
+
+  dynparam.raw = (freia_ptr) &sp;
+  dynparam.size = sizeof(spoc_param);
+
+  redres.raw = (freia_ptr) &reduc;
+  redres.size = sizeof(spoc_reduction);
+
+  ret = freia_cg_write_microcode(&mcode);
+  ret |= freia_cg_write_dynamic_param(&dynparam);
+
+  // actual call of spoc hardware
+  freia_cg_template_process_1i(op, param, i0);
+
+  // get reductions
+  freia_cg_read_reduction_results(&redres);
+
+  // get reduction results
+  *red0 = (int32_t) reduc.measure[0][0].maximum;
+
+  return ret;
+}
+
+! new function
+
+freia_status my_global_max(freia_data2d *i0, int32_t *p0)
+{
+   return my_global_max_helper_0(i0, p0);                               /*0004*/
+}

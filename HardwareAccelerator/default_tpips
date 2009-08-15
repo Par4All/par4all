@@ -1,5 +1,6 @@
 delete ${WSPACE}
 #setenv PIPS_HWAC_DEBUG_LEVEL=5
+#setenv PIPS_HWAC_DEBUG_LEVEL=7
 create ${WSPACE} ${FILE}
 activate C_PARSER
 setproperty PRETTYPRINT_C_CODE TRUE

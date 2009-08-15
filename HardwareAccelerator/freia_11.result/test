@@ -4,7 +4,7 @@
 freia_status freia_11(freia_data2d *o, freia_data2d *i)
 {
    // input used twice
-   // o = i + i
+   // o = i - i
    freia_aipo_sub(o, i, i);                                             /*0007*/
    return FREIA_OK;                                                     /*0008*/
 }
@@ -60,9 +60,15 @@ freia_status freia_11_helper_0(freia_data2d * o0, freia_data2d * i0)
   spoc_init_pipe(&si, &sp, 16);
 
   // stage 0
-  si.alu[0][0].op = SPOC_ALU_SUB_IN0_IN1;
 
-  // ??? what about setting links?
+  si.alu[0][0].op = SPOC_ALU_SUB_IN0_IN1;
+  // i [0 none 0] -> [0 alu] o
+  // nope
+  // i [0 none 1] -> [0 alu] o
+  // nope
+
+  // output one image
+  // o [0 alu] -> [0 output 0] o
   si.mux[0][0].op = SPOC_MUX_IN1;
   si.mux[0][2].op = SPOC_MUX_IN0;
 
@@ -92,7 +98,7 @@ freia_status freia_11_helper_0(freia_data2d * o0, freia_data2d * i0)
 freia_status freia_11(freia_data2d *o, freia_data2d *i)
 {
    // input used twice
-   // o = i + i
+   // o = i - i
    freia_11_helper_0(o, i);                                             /*0007*/
    return FREIA_OK;                                                     /*0008*/
 }

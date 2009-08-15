@@ -69,16 +69,29 @@ freia_status freia_00_helper_0(freia_data2d * o0, freia_data2d * i0, freia_data2
   spoc_init_pipe(&si, &sp, 16);
 
   // stage 0
-  si.alu[0][0].op = SPOC_ALU_ADD_IN0_IN1;
 
-  // ??? what about setting links?
-  si.mux[0][0].op = SPOC_MUX_IN1;
-  si.mux[0][2].op = SPOC_MUX_IN0;
+  si.alu[0][0].op = SPOC_ALU_ADD_IN0_IN1;
+  // i1 [0 none 0] -> [0 alu] 0`tmp
+  // nope
+  // i0 [0 none 1] -> [0 alu] 0`tmp
+  // nope
 
   // stage 1
-  si.alu[1][0].op = SPOC_ALU_SUB_IN0_IN1;
 
-  // ??? what about setting links?
+  si.alu[1][0].op = SPOC_ALU_SUB_IN0_IN1;
+  // i1 [0 none 0] -> [1 alu] o
+  si.mux[0][0].op = SPOC_MUX_IN1;
+  si.mux[0][2].op = SPOC_MUX_IN0;
+  // i1 [1 none 0] -> [1 alu] o
+  // nope
+  // 0`tmp [0 alu] -> [1 alu] o
+  si.mux[0][1].op = SPOC_MUX_IN0;
+  si.mux[0][3].op = SPOC_MUX_IN0;
+  // 0`tmp [1 none 1] -> [1 alu] o
+  // nope
+
+  // output one image
+  // o [1 alu] -> [1 output 0] o
   si.mux[1][0].op = SPOC_MUX_IN1;
   si.mux[1][2].op = SPOC_MUX_IN0;
 

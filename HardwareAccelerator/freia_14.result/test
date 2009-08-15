@@ -1,0 +1,120 @@
+
+! initial function
+
+freia_status freia_14(freia_data2d *o, int32_t c)
+{
+   freia_data2d *t = freia_common_create_data(16, 128, 128);
+   // 2 alu to alu paths
+   // t = h()
+   // o = t + t
+   freia_aipo_set_constant(t, c);                                       /*0009*/
+   freia_aipo_add(o, t, t);                                             /*0010*/
+
+   freia_common_destruct_data(t);                                       /*0012*/
+   return FREIA_OK;                                                     /*0013*/
+}
+
+! accelerated function
+
+// graph for dag "dag_0" of module "freia_14" in dot format
+digraph "dag_0" {
+  // inputs
+
+  // outputs
+  "o" [shape=box];
+
+  // computation vertices
+  "10 add" [shape=circle];
+  "10 add" -> "o";
+  "9 set_constant" [shape=circle];
+  "9 set_constant" -> "10 add";
+}
+// graph for dag "freia_14_helper_0" of module "freia_14" in dot format
+digraph "freia_14_helper_0" {
+  // inputs
+
+  // outputs
+  "o" [shape=box];
+
+  // computation vertices
+  "10 add" [shape=circle];
+  "10 add" -> "o";
+  "9 set_constant" [shape=circle];
+  "9 set_constant" -> "10 add";
+}
+#include <freiaCommon.h>
+#include <freiaCoarseGrain.h>
+#include <spoc.h>
+
+// FREIA-SPoC helper function for module freia_14
+freia_status freia_14_helper_0(freia_data2d * o0, , int32_t cst0)
+{
+  spoc_instr si;
+  spoc_param sp;
+  spoc_reduction reduc;
+  freia_microcode mcode;
+  freia_dynamic_param dynparam;
+  freia_reduction_results redres;
+  freia_op_sel op = 0;
+  freia_op_param param;
+  freia_status ret;
+
+  // init pipe to nop
+  spoc_init_pipe(&si, &sp, 16);
+
+  // stage 0
+
+  si.alu[0][0].op = SPOC_ALU_COPY_CONST;
+  si.alu[0][0].constant = cst0;
+
+  // stage 1
+
+  si.alu[1][0].op = SPOC_ALU_ADD_IN0_IN1;
+  // 0`t [0 alu] -> [1 alu] o
+  si.mux[0][0].op = SPOC_MUX_IN1;
+  si.mux[0][2].op = SPOC_MUX_IN0;
+  // 0`t [1 none 0] -> [1 alu] o
+  // nope
+  // 0`t [0 alu] -> [1 alu] o
+  si.mux[0][1].op = SPOC_MUX_IN0;
+  si.mux[0][3].op = SPOC_MUX_IN0;
+  // 0`t [1 none 1] -> [1 alu] o
+  // nope
+
+  // output one image
+  // o [1 alu] -> [1 output 0] o
+  si.mux[1][0].op = SPOC_MUX_IN1;
+  si.mux[1][2].op = SPOC_MUX_IN0;
+
+  mcode.raw = (freia_ptr) &si;
+  mcode.size = sizeof(spoc_instr);
+
+  dynparam.raw = (freia_ptr) &sp;
+  dynparam.size = sizeof(spoc_param);
+
+  redres.raw = (freia_ptr) &reduc;
+  redres.size = sizeof(spoc_reduction);
+
+  ret = freia_cg_write_microcode(&mcode);
+  ret |= freia_cg_write_dynamic_param(&dynparam);
+
+  // actual call of spoc hardware
+  freia_cg_template_process_1o(op, param, o0);
+
+  // get reductions
+  freia_cg_read_reduction_results(&redres);
+
+  return ret;
+}
+
+! new function
+
+freia_status freia_14(freia_data2d *o, int32_t c)
+{
+   // 2 alu to alu paths
+   // t = h()
+   // o = t + t
+   freia_14_helper_0(o, c);                                             /*0010*/
+
+   return FREIA_OK;                                                     /*0013*/
+}

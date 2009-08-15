@@ -1,0 +1,100 @@
+
+! initial function
+
+freia_status my_add(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
+{
+   return freia_aipo_add(o, i0, i1);                                    /*0005*/
+}
+
+! accelerated function
+
+// graph for dag "dag_0" of module "my_add" in dot format
+digraph "dag_0" {
+  // inputs
+  "i0" [shape=box];
+  "i1" [shape=box];
+
+  // outputs
+  "o" [shape=box];
+
+  // computation vertices
+  "5 add" [shape=circle];
+  "i0" -> "5 add";
+  "i1" -> "5 add";
+  "5 add" -> "o";
+}
+// graph for dag "my_add_helper_0" of module "my_add" in dot format
+digraph "my_add_helper_0" {
+  // inputs
+  "i0" [shape=box];
+  "i1" [shape=box];
+
+  // outputs
+  "o" [shape=box];
+
+  // computation vertices
+  "5 add" [shape=circle];
+  "i0" -> "5 add";
+  "i1" -> "5 add";
+  "5 add" -> "o";
+}
+#include <freiaCommon.h>
+#include <freiaCoarseGrain.h>
+#include <spoc.h>
+
+// FREIA-SPoC helper function for module my_add
+freia_status my_add_helper_0(freia_data2d * o0, freia_data2d * i0, freia_data2d * i1)
+{
+  spoc_instr si;
+  spoc_param sp;
+  spoc_reduction reduc;
+  freia_microcode mcode;
+  freia_dynamic_param dynparam;
+  freia_reduction_results redres;
+  freia_op_sel op = 0;
+  freia_op_param param;
+  freia_status ret;
+
+  // init pipe to nop
+  spoc_init_pipe(&si, &sp, 16);
+
+  // stage 0
+
+  si.alu[0][0].op = SPOC_ALU_ADD_IN0_IN1;
+  // i0 [0 none 0] -> [0 alu] o
+  // nope
+  // i1 [0 none 1] -> [0 alu] o
+  // nope
+
+  // output one image
+  // o [0 alu] -> [0 output 0] o
+  si.mux[0][0].op = SPOC_MUX_IN1;
+  si.mux[0][2].op = SPOC_MUX_IN0;
+
+  mcode.raw = (freia_ptr) &si;
+  mcode.size = sizeof(spoc_instr);
+
+  dynparam.raw = (freia_ptr) &sp;
+  dynparam.size = sizeof(spoc_param);
+
+  redres.raw = (freia_ptr) &reduc;
+  redres.size = sizeof(spoc_reduction);
+
+  ret = freia_cg_write_microcode(&mcode);
+  ret |= freia_cg_write_dynamic_param(&dynparam);
+
+  // actual call of spoc hardware
+  freia_cg_template_process_2i_1o(op, param, o0, i0, i1);
+
+  // get reductions
+  freia_cg_read_reduction_results(&redres);
+
+  return ret;
+}
+
+! new function
+
+freia_status my_add(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
+{
+   return my_add_helper_0(o, i0, i1);                                   /*0005*/
+}

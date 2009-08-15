@@ -1,0 +1,135 @@
+
+! initial function
+
+freia_status freia_15(freia_data2d *o, freia_data2d *i, int32_t *r0, int32_t *r1, int32_t *r2, int32_t c)
+{
+   // test re ordering of mes
+   freia_aipo_add_const(o, i, c);                                       /*0007*/
+   freia_aipo_global_min(i, r0);                                        /*0008*/
+   freia_aipo_global_max(i, r1);                                        /*0009*/
+   freia_aipo_global_vol(i, r2);                                        /*0010*/
+   return FREIA_OK;                                                     /*0011*/
+}
+
+! accelerated function
+
+// graph for dag "dag_0" of module "freia_15" in dot format
+digraph "dag_0" {
+  // inputs
+  "i" [shape=box];
+
+  // outputs
+  "o" [shape=box];
+
+  // computation vertices
+  "10 global_vol" [shape=circle];
+  "i" -> "10 global_vol";
+  "9 global_max" [shape=circle];
+  "i" -> "9 global_max";
+  "8 global_min" [shape=circle];
+  "i" -> "8 global_min";
+  "7 add_const" [shape=circle];
+  "i" -> "7 add_const";
+  "7 add_const" -> "o";
+}
+// graph for dag "freia_15_helper_0" of module "freia_15" in dot format
+digraph "freia_15_helper_0" {
+  // inputs
+  "i" [shape=box];
+
+  // outputs
+  "o" [shape=box];
+
+  // computation vertices
+  "7 add_const" [shape=circle];
+  "i" -> "7 add_const";
+  "7 add_const" -> "o";
+  "10 global_vol" [shape=circle];
+  "i" -> "10 global_vol";
+  "9 global_max" [shape=circle];
+  "i" -> "9 global_max";
+  "8 global_min" [shape=circle];
+  "i" -> "8 global_min";
+}
+#include <freiaCommon.h>
+#include <freiaCoarseGrain.h>
+#include <spoc.h>
+
+// FREIA-SPoC helper function for module freia_15
+freia_status freia_15_helper_0(freia_data2d * o0, freia_data2d * i0, int32_t * red0, int32_t * red1, int32_t * red2, int32_t cst3)
+{
+  spoc_instr si;
+  spoc_param sp;
+  spoc_reduction reduc;
+  freia_microcode mcode;
+  freia_dynamic_param dynparam;
+  freia_reduction_results redres;
+  freia_op_sel op = 0;
+  freia_op_param param;
+  freia_status ret;
+
+  // init pipe to nop
+  spoc_init_pipe(&si, &sp, 16);
+
+  // stage 0
+
+  // i [0 none 0] -> [0 measure 0] i
+  si.mux[0][0].op = SPOC_MUX_IN0;
+
+  // i [0 measure 0] -> [0 measure 0] i
+  // nope
+
+  // i [0 measure 0] -> [0 measure 0] i
+  // nope
+
+  // stage 1
+
+  si.alu[1][0].op = SPOC_ALU_ADD_IN0_CONST;
+  si.alu[1][0].constant = cst3;
+  // i [0 measure 0] -> [1 alu] o
+  // i [1 none 0] -> [1 alu] o
+  // nope
+
+  // output one image
+  // o [1 alu] -> [1 output 0] o
+  si.mux[1][0].op = SPOC_MUX_IN1;
+  si.mux[1][2].op = SPOC_MUX_IN0;
+
+  mcode.raw = (freia_ptr) &si;
+  mcode.size = sizeof(spoc_instr);
+
+  dynparam.raw = (freia_ptr) &sp;
+  dynparam.size = sizeof(spoc_param);
+
+  redres.raw = (freia_ptr) &reduc;
+  redres.size = sizeof(spoc_reduction);
+
+  ret = freia_cg_write_microcode(&mcode);
+  ret |= freia_cg_write_dynamic_param(&dynparam);
+
+  // actual call of spoc hardware
+  freia_cg_template_process_1i_1o(op, param, o0, i0);
+
+  // get reductions
+  freia_cg_read_reduction_results(&redres);
+
+  // get reduction results
+  *red0 = (int32_t) reduc.measure[0][0].minimum;
+
+  // get reduction results
+  *red1 = (int32_t) reduc.measure[0][0].maximum;
+
+  // get reduction results
+  *red2 = (int32_t) reduc.measure[0][0].volume;
+
+  return ret;
+}
+
+! new function
+
+freia_status freia_15(freia_data2d *o, freia_data2d *i, int32_t *r0, int32_t *r1, int32_t *r2, int32_t c)
+{
+   // test re ordering of mes
+   freia_15_helper_0(o, i, r0, r1, r2, c);                              /*0007*/
+   return FREIA_OK;                                                     /*0011*/
+}
