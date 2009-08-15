@@ -54,16 +54,17 @@ validate-out:
 # default_tpips
 # FILE could be $<
 # VDIR could be avoided if running in local directory?
-%.result/$(TEST): %.c default_tpips
-	WSPACE=$* FILE=$(here)/$< VDIR=$(here) $(TPIPS) default_tpips \
+DFTPIPS	= default_tpips
+%.result/$(TEST): %.c $(DFTPIPS)
+	WSPACE=$* FILE=$(here)/$< VDIR=$(here) $(TPIPS) $(DFTPIPS) \
 	| $(FLT) > $@ ; $(OK)
 
-%.result/$(TEST): %.f default_tpips
-	WSPACE=$* FILE=$(here)/$< VDIR=$(here) $(TPIPS) default_tpips \
+%.result/$(TEST): %.f $(DFTPIPS)
+	WSPACE=$* FILE=$(here)/$< VDIR=$(here) $(TPIPS) $(DFTPIPS) \
 	| $(FLT) > $@ ; $(OK)
 
-%.result/$(TEST): %.F default_tpips
-	WSPACE=$* FILE=$(here)/$< VDIR=$(here) $(TPIPS) default_tpips \
+%.result/$(TEST): %.F $(DFTPIPS)
+	WSPACE=$* FILE=$(here)/$< VDIR=$(here) $(TPIPS) $(DFTPIPS) \
 	| $(FLT) > $@ ; $(OK)
 
 # default_test relies on FILE WSPACE NAME
@@ -73,11 +74,11 @@ DEFTEST	= default_test2
 	WSPACE=$* FILE=$(here)/$< sh $(DEFTEST) \
 	| $(FLT) > $@ ; $(OK)
 
-%.result/$(TEST): %.f default_test
+%.result/$(TEST): %.f $(DEFTEST)
 	WSPACE=$* FILE=$(here)/$< sh $(DEFTEST) \
 	| $(FLT) > $@ ; $(OK)
 
-%.result/$(TEST): %.F default_test
+%.result/$(TEST): %.F $(DEFTEST)
 	WSPACE=$* FILE=$(here)/$< sh $(DEFTEST) \
 	| $(FLT) > $@ ; $(OK)
 
