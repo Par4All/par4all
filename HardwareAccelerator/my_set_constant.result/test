@@ -46,6 +46,7 @@ freia_status my_set_constant_helper_0(freia_data2d * o0, , int32_t cst0)
   freia_op_sel op = 0;
   freia_op_param param;
   freia_status ret;
+  int i;
 
   // init pipe to nop
   spoc_init_pipe(&si, &sp, 16);

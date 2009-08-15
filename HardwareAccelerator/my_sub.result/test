@@ -54,6 +54,7 @@ freia_status my_sub_helper_0(freia_data2d * o0, freia_data2d * i0, freia_data2d 
   freia_op_sel op = 0;
   freia_op_param param;
   freia_status ret;
+  int i;
 
   // init pipe to nop
   spoc_init_pipe(&si, &sp, 16);
