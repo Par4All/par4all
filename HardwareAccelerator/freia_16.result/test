@@ -80,8 +80,8 @@ freia_status freia_16_helper_0(freia_data2d * o0, freia_data2d * o1, freia_data2
   // init pipe to nop
   spoc_init_pipe(&si, &sp, 16);
 
-  // stage 0
 
+  // STAGE 0
   // i [0 none 0] -> [0 measure 0] i
   si.mux[0][0].op = SPOC_MUX_IN0;
 
@@ -91,20 +91,21 @@ freia_status freia_16_helper_0(freia_data2d * o0, freia_data2d * o1, freia_data2
   // i [0 measure 0] -> [0 measure 0] i
   // nope
 
-  // stage 1
 
+  // STAGE 1
+  // i [0 measure 0] -> [1 poc 0] o1
+  // i [1 none 0] -> [1 poc 0] o1
+  // nope
   si.poc[1][0].op = SPOC_POC_ERODE;
   si.poc[1][0].grid = SPOC_POC_6_CONNEX;
   for(i=0 ; i<9 ; i++)
     sp.poc[1][0].kernel[i] = kern3[i];
-  // i [0 measure 0] -> [1 poc 0] o1
-  // i [1 none 0] -> [1 poc 0] o1
-  // nope
 
-  si.alu[1][0].op = SPOC_ALU_ADD_IN0_CONST;
-  si.alu[1][0].constant = cst4;
   // i [1 none 0] -> [1 alu] o0
   // nope
+  si.alu[1][0].op = SPOC_ALU_ADD_IN0_CONST;
+  si.alu[1][0].constant = cst4;
+
 
   // output two images...
   // o1 [1 poc 0] -> [1 output 0] o1

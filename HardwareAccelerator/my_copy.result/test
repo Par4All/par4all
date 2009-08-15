@@ -54,13 +54,14 @@ freia_status my_copy_helper_0(freia_data2d * o0, freia_data2d * i0)
   // init pipe to nop
   spoc_init_pipe(&si, &sp, 16);
 
-  // stage 1
 
+  // STAGE 1
   // i0 [0 none 0] -> [1 none 0] o
   si.mux[0][0].op = SPOC_MUX_IN1;
   si.mux[0][2].op = SPOC_MUX_IN0;
   // i0 [1 none 0] -> [1 none 0] o
   // nope
+
 
   // output one image
   // o [1 none 0] -> [1 output 0] o

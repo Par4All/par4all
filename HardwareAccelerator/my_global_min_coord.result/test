@@ -50,10 +50,11 @@ freia_status my_global_min_coord_helper_0(freia_data2d * i0, int32_t * red0, uin
   // init pipe to nop
   spoc_init_pipe(&si, &sp, 16);
 
-  // stage 0
 
+  // STAGE 0
   // i0 [0 none 0] -> [0 measure 0] i0
   si.mux[0][0].op = SPOC_MUX_IN0;
+
 
   // no output image
 

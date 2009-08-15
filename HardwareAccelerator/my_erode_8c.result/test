@@ -54,14 +54,15 @@ freia_status my_erode_8c_helper_0(freia_data2d * o0, freia_data2d * i0, int32_t 
   // init pipe to nop
   spoc_init_pipe(&si, &sp, 16);
 
-  // stage 0
 
+  // STAGE 0
+  // i0 [0 none 0] -> [0 poc 0] o
+  // nope
   si.poc[0][0].op = SPOC_POC_ERODE;
   si.poc[0][0].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
     sp.poc[0][0].kernel[i] = kern0[i];
-  // i0 [0 none 0] -> [0 poc 0] o
-  // nope
+
 
   // output one image
   // o [0 poc 0] -> [0 output 0] o

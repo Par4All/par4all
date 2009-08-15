@@ -54,12 +54,13 @@ freia_status my_mul_const_helper_0(freia_data2d * o0, freia_data2d * i0, int32_t
   // init pipe to nop
   spoc_init_pipe(&si, &sp, 16);
 
-  // stage 0
 
-  si.alu[0][0].op = SPOC_ALU_MUL_IN0_CONST;
-  si.alu[0][0].constant = cst0;
+  // STAGE 0
   // i0 [0 none 0] -> [0 alu] o
   // nope
+  si.alu[0][0].op = SPOC_ALU_MUL_IN0_CONST;
+  si.alu[0][0].constant = cst0;
+
 
   // output one image
   // o [0 alu] -> [0 output 0] o
