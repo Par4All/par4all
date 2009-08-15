@@ -1,0 +1,383 @@
+
+! initial function
+
+freia_status freia_20(freia_data2d *o, freia_data2d *i, int32_t *k)
+{
+   freia_data2d *t0 = freia_common_create_data(16, 128, 128);
+   freia_data2d *t1 = freia_common_create_data(16, 128, 128);
+   freia_data2d *t2 = freia_common_create_data(16, 128, 128);
+   freia_data2d *t3 = freia_common_create_data(16, 128, 128);
+   freia_data2d *t4 = freia_common_create_data(16, 128, 128);
+   freia_data2d *t5 = freia_common_create_data(16, 128, 128);
+   freia_data2d *t6 = freia_common_create_data(16, 128, 128);
+   freia_data2d *t7 = freia_common_create_data(16, 128, 128);
+   freia_data2d *t8 = freia_common_create_data(16, 128, 128);
+   freia_data2d *t9 = freia_common_create_data(16, 128, 128);
+   freia_data2d *ta = freia_common_create_data(16, 128, 128);
+   freia_data2d *tb = freia_common_create_data(16, 128, 128);
+   
+   // long pipeline that must be cut
+   freia_aipo_erode_8c(t0, i, k);                                       /*0020*/
+   freia_aipo_erode_6c(t1, t0, k);                                      /*0021*/
+   freia_aipo_dilate_8c(t2, t1, k);                                     /*0022*/
+   freia_aipo_dilate_6c(t3, t2, k);                                     /*0023*/
+   freia_aipo_erode_8c(t4, t3, k);                                      /*0024*/
+   freia_aipo_erode_6c(t5, t4, k);                                      /*0025*/
+   freia_aipo_dilate_8c(t6, t5, k);                                     /*0026*/
+   freia_aipo_dilate_6c(t7, t6, k);                                     /*0027*/
+   // should cut here
+   freia_aipo_erode_8c(t8, t7, k);                                      /*0029*/
+   freia_aipo_erode_6c(t9, t8, k);                                      /*0030*/
+   freia_aipo_dilate_8c(ta, t9, k);                                     /*0031*/
+   freia_aipo_dilate_6c(tb, ta, k);                                     /*0032*/
+   freia_aipo_erode_8c(o, tb, k);                                       /*0033*/
+
+   freia_common_destruct_data(t0);                                      /*0035*/
+   freia_common_destruct_data(t1);                                      /*0036*/
+   freia_common_destruct_data(t2);                                      /*0037*/
+   freia_common_destruct_data(t3);                                      /*0038*/
+   freia_common_destruct_data(t4);                                      /*0039*/
+   freia_common_destruct_data(t5);                                      /*0040*/
+   freia_common_destruct_data(t6);                                      /*0041*/
+   freia_common_destruct_data(t7);                                      /*0042*/
+   freia_common_destruct_data(t8);                                      /*0043*/
+   freia_common_destruct_data(t9);                                      /*0044*/
+   freia_common_destruct_data(ta);                                      /*0045*/
+   freia_common_destruct_data(tb);                                      /*0046*/
+
+   return FREIA_OK;                                                     /*0048*/
+}
+
+! accelerated function
+
+// graph for dag "dag_0" of module "freia_20" in dot format
+digraph "dag_0" {
+  // inputs
+  "i" [shape=box];
+
+  // outputs
+  "o" [shape=box];
+
+  // computation vertices
+  "33 erode_8c" [shape=circle];
+  "33 erode_8c" -> "o";
+  "32 dilate_6c" [shape=circle];
+  "32 dilate_6c" -> "33 erode_8c";
+  "31 dilate_8c" [shape=circle];
+  "31 dilate_8c" -> "32 dilate_6c";
+  "30 erode_6c" [shape=circle];
+  "30 erode_6c" -> "31 dilate_8c";
+  "29 erode_8c" [shape=circle];
+  "29 erode_8c" -> "30 erode_6c";
+  "27 dilate_6c" [shape=circle];
+  "27 dilate_6c" -> "29 erode_8c";
+  "26 dilate_8c" [shape=circle];
+  "26 dilate_8c" -> "27 dilate_6c";
+  "25 erode_6c" [shape=circle];
+  "25 erode_6c" -> "26 dilate_8c";
+  "24 erode_8c" [shape=circle];
+  "24 erode_8c" -> "25 erode_6c";
+  "23 dilate_6c" [shape=circle];
+  "23 dilate_6c" -> "24 erode_8c";
+  "22 dilate_8c" [shape=circle];
+  "22 dilate_8c" -> "23 dilate_6c";
+  "21 erode_6c" [shape=circle];
+  "21 erode_6c" -> "22 dilate_8c";
+  "20 erode_8c" [shape=circle];
+  "20 erode_8c" -> "21 erode_6c";
+  "i" -> "20 erode_8c";
+}
+// graph for dag "dag_cleaned_0" of module "freia_20" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "i" [shape=box];
+
+  // outputs
+  "o" [shape=box];
+
+  // computation vertices
+  "33 erode_8c" [shape=circle];
+  "33 erode_8c" -> "o";
+  "32 dilate_6c" [shape=circle];
+  "32 dilate_6c" -> "33 erode_8c";
+  "31 dilate_8c" [shape=circle];
+  "31 dilate_8c" -> "32 dilate_6c";
+  "30 erode_6c" [shape=circle];
+  "30 erode_6c" -> "31 dilate_8c";
+  "29 erode_8c" [shape=circle];
+  "29 erode_8c" -> "30 erode_6c";
+  "27 dilate_6c" [shape=circle];
+  "27 dilate_6c" -> "29 erode_8c";
+  "26 dilate_8c" [shape=circle];
+  "26 dilate_8c" -> "27 dilate_6c";
+  "25 erode_6c" [shape=circle];
+  "25 erode_6c" -> "26 dilate_8c";
+  "24 erode_8c" [shape=circle];
+  "24 erode_8c" -> "25 erode_6c";
+  "23 dilate_6c" [shape=circle];
+  "23 dilate_6c" -> "24 erode_8c";
+  "22 dilate_8c" [shape=circle];
+  "22 dilate_8c" -> "23 dilate_6c";
+  "21 erode_6c" [shape=circle];
+  "21 erode_6c" -> "22 dilate_8c";
+  "20 erode_8c" [shape=circle];
+  "20 erode_8c" -> "21 erode_6c";
+  "i" -> "20 erode_8c";
+}
+// graph for dag "freia_20_helper_0" of module "freia_20" in dot format
+digraph "freia_20_helper_0" {
+  // inputs
+  "i" [shape=box];
+
+  // outputs
+  "o" [shape=box];
+
+  // computation vertices
+  "33 erode_8c" [shape=circle];
+  "33 erode_8c" -> "o";
+  "32 dilate_6c" [shape=circle];
+  "32 dilate_6c" -> "33 erode_8c";
+  "31 dilate_8c" [shape=circle];
+  "31 dilate_8c" -> "32 dilate_6c";
+  "30 erode_6c" [shape=circle];
+  "30 erode_6c" -> "31 dilate_8c";
+  "29 erode_8c" [shape=circle];
+  "29 erode_8c" -> "30 erode_6c";
+  "27 dilate_6c" [shape=circle];
+  "27 dilate_6c" -> "29 erode_8c";
+  "26 dilate_8c" [shape=circle];
+  "26 dilate_8c" -> "27 dilate_6c";
+  "25 erode_6c" [shape=circle];
+  "25 erode_6c" -> "26 dilate_8c";
+  "24 erode_8c" [shape=circle];
+  "24 erode_8c" -> "25 erode_6c";
+  "23 dilate_6c" [shape=circle];
+  "23 dilate_6c" -> "24 erode_8c";
+  "22 dilate_8c" [shape=circle];
+  "22 dilate_8c" -> "23 dilate_6c";
+  "21 erode_6c" [shape=circle];
+  "21 erode_6c" -> "22 dilate_8c";
+  "20 erode_8c" [shape=circle];
+  "20 erode_8c" -> "21 erode_6c";
+  "i" -> "20 erode_8c";
+}
+#include <freiaCommon.h>
+#include <freiaCoarseGrain.h>
+#include <spoc.h>
+
+// FREIA-SPoC helper function for module freia_20
+freia_status freia_20_helper_0(freia_data2d * o0, freia_data2d * i0, int32_t *kern0, int32_t *kern1, int32_t *kern2, int32_t *kern3, int32_t *kern4, int32_t *kern5, int32_t *kern6, int32_t *kern7, int32_t *kern8, int32_t *kern9, int32_t *kern10, int32_t *kern11, int32_t *kern12)
+{
+  spoc_instr si;
+  spoc_param sp;
+  spoc_reduction reduc;
+  freia_microcode mcode;
+  freia_dynamic_param dynparam;
+  freia_reduction_results redres;
+  freia_op_sel op = 0;
+  freia_op_param param;
+  freia_status ret;
+  int i;
+
+  // init pipe to nop
+  spoc_init_pipe(&si, &sp, 16);
+
+
+  // STAGE 0
+  // i [0 input 0] -> [0 poc 0] 20 erode_8c
+  // nope
+  // poc 20 erode_8c stage 0 side 0
+  si.poc[0][0].op = SPOC_POC_ERODE;
+  si.poc[0][0].grid = SPOC_POC_8_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[0][0].kernel[i] = kern0[i];
+
+
+  // STAGE 1
+  // 0`t0 [0 poc 0] -> [1 poc 0] 21 erode_6c
+  si.mux[0][0].op = SPOC_MUX_IN1;
+  si.mux[0][2].op = SPOC_MUX_IN0;
+  // 0`t0 [1 input 0] -> [1 poc 0] 21 erode_6c
+  // nope
+  // poc 21 erode_6c stage 1 side 0
+  si.poc[1][0].op = SPOC_POC_ERODE;
+  si.poc[1][0].grid = SPOC_POC_6_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[1][0].kernel[i] = kern1[i];
+
+
+  // STAGE 2
+  // 0`t1 [1 poc 0] -> [2 poc 0] 22 dilate_8c
+  si.mux[1][0].op = SPOC_MUX_IN1;
+  si.mux[1][2].op = SPOC_MUX_IN0;
+  // 0`t1 [2 input 0] -> [2 poc 0] 22 dilate_8c
+  // nope
+  // poc 22 dilate_8c stage 2 side 0
+  si.poc[2][0].op = SPOC_POC_DILATE;
+  si.poc[2][0].grid = SPOC_POC_8_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[2][0].kernel[i] = kern2[i];
+
+
+  // STAGE 3
+  // 0`t2 [2 poc 0] -> [3 poc 0] 23 dilate_6c
+  si.mux[2][0].op = SPOC_MUX_IN1;
+  si.mux[2][2].op = SPOC_MUX_IN0;
+  // 0`t2 [3 input 0] -> [3 poc 0] 23 dilate_6c
+  // nope
+  // poc 23 dilate_6c stage 3 side 0
+  si.poc[3][0].op = SPOC_POC_DILATE;
+  si.poc[3][0].grid = SPOC_POC_6_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[3][0].kernel[i] = kern3[i];
+
+
+  // STAGE 4
+  // 0`t3 [3 poc 0] -> [4 poc 0] 24 erode_8c
+  si.mux[3][0].op = SPOC_MUX_IN1;
+  si.mux[3][2].op = SPOC_MUX_IN0;
+  // 0`t3 [4 input 0] -> [4 poc 0] 24 erode_8c
+  // nope
+  // poc 24 erode_8c stage 4 side 0
+  si.poc[4][0].op = SPOC_POC_ERODE;
+  si.poc[4][0].grid = SPOC_POC_8_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[4][0].kernel[i] = kern4[i];
+
+
+  // STAGE 5
+  // 0`t4 [4 poc 0] -> [5 poc 0] 25 erode_6c
+  si.mux[4][0].op = SPOC_MUX_IN1;
+  si.mux[4][2].op = SPOC_MUX_IN0;
+  // 0`t4 [5 input 0] -> [5 poc 0] 25 erode_6c
+  // nope
+  // poc 25 erode_6c stage 5 side 0
+  si.poc[5][0].op = SPOC_POC_ERODE;
+  si.poc[5][0].grid = SPOC_POC_6_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[5][0].kernel[i] = kern5[i];
+
+
+  // STAGE 6
+  // 0`t5 [5 poc 0] -> [6 poc 0] 26 dilate_8c
+  si.mux[5][0].op = SPOC_MUX_IN1;
+  si.mux[5][2].op = SPOC_MUX_IN0;
+  // 0`t5 [6 input 0] -> [6 poc 0] 26 dilate_8c
+  // nope
+  // poc 26 dilate_8c stage 6 side 0
+  si.poc[6][0].op = SPOC_POC_DILATE;
+  si.poc[6][0].grid = SPOC_POC_8_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[6][0].kernel[i] = kern6[i];
+
+
+  // STAGE 7
+  // 0`t6 [6 poc 0] -> [7 poc 0] 27 dilate_6c
+  si.mux[6][0].op = SPOC_MUX_IN1;
+  si.mux[6][2].op = SPOC_MUX_IN0;
+  // 0`t6 [7 input 0] -> [7 poc 0] 27 dilate_6c
+  // nope
+  // poc 27 dilate_6c stage 7 side 0
+  si.poc[7][0].op = SPOC_POC_DILATE;
+  si.poc[7][0].grid = SPOC_POC_6_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[7][0].kernel[i] = kern7[i];
+
+
+  // STAGE 8
+  // 0`t7 [7 poc 0] -> [8 poc 0] 29 erode_8c
+  si.mux[7][0].op = SPOC_MUX_IN1;
+  si.mux[7][2].op = SPOC_MUX_IN0;
+  // 0`t7 [8 input 0] -> [8 poc 0] 29 erode_8c
+  // nope
+  // poc 29 erode_8c stage 8 side 0
+  si.poc[8][0].op = SPOC_POC_ERODE;
+  si.poc[8][0].grid = SPOC_POC_8_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[8][0].kernel[i] = kern8[i];
+
+
+  // STAGE 9
+  // 0`t8 [8 poc 0] -> [9 poc 0] 30 erode_6c
+  si.mux[8][0].op = SPOC_MUX_IN1;
+  si.mux[8][2].op = SPOC_MUX_IN0;
+  // 0`t8 [9 input 0] -> [9 poc 0] 30 erode_6c
+  // nope
+  // poc 30 erode_6c stage 9 side 0
+  si.poc[9][0].op = SPOC_POC_ERODE;
+  si.poc[9][0].grid = SPOC_POC_6_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[9][0].kernel[i] = kern9[i];
+
+
+  // STAGE 10
+  // 0`t9 [9 poc 0] -> [10 poc 0] 31 dilate_8c
+  si.mux[9][0].op = SPOC_MUX_IN1;
+  si.mux[9][2].op = SPOC_MUX_IN0;
+  // 0`t9 [10 input 0] -> [10 poc 0] 31 dilate_8c
+  // nope
+  // poc 31 dilate_8c stage 10 side 0
+  si.poc[10][0].op = SPOC_POC_DILATE;
+  si.poc[10][0].grid = SPOC_POC_8_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[10][0].kernel[i] = kern10[i];
+
+
+  // STAGE 11
+  // 0`ta [10 poc 0] -> [11 poc 0] 32 dilate_6c
+  si.mux[10][0].op = SPOC_MUX_IN1;
+  si.mux[10][2].op = SPOC_MUX_IN0;
+  // 0`ta [11 input 0] -> [11 poc 0] 32 dilate_6c
+  // nope
+  // poc 32 dilate_6c stage 11 side 0
+  si.poc[11][0].op = SPOC_POC_DILATE;
+  si.poc[11][0].grid = SPOC_POC_6_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[11][0].kernel[i] = kern11[i];
+
+
+  // STAGE 12
+  // 0`tb [11 poc 0] -> [12 poc 0] 33 erode_8c
+  si.mux[11][0].op = SPOC_MUX_IN1;
+  si.mux[11][2].op = SPOC_MUX_IN0;
+  // 0`tb [12 input 0] -> [12 poc 0] 33 erode_8c
+  // nope
+  // poc 33 erode_8c stage 12 side 0
+  si.poc[12][0].op = SPOC_POC_ERODE;
+  si.poc[12][0].grid = SPOC_POC_8_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[12][0].kernel[i] = kern12[i];
+
+
+  // output image o on 0
+  // o [12 poc 0] -> [12 output 0] 0 null
+  si.mux[12][0].op = SPOC_MUX_IN0;
+
+  mcode.raw = (freia_ptr) &si;
+  mcode.size = sizeof(spoc_instr);
+
+  dynparam.raw = (freia_ptr) &sp;
+  dynparam.size = sizeof(spoc_param);
+
+  redres.raw = (freia_ptr) &reduc;
+  redres.size = sizeof(spoc_reduction);
+
+  ret = freia_cg_write_microcode(&mcode);
+  ret |= freia_cg_write_dynamic_param(&dynparam);
+
+  // actual call of spoc hardware
+  freia_cg_template_process_2i_2o(op, param, o0, NULL, i0, NULL);
+
+  return ret;
+}
+
+! new function
+
+freia_status freia_20(freia_data2d *o, freia_data2d *i, int32_t *k)
+{
+   
+   // long pipeline that must be cut// should cut here
+   freia_20_helper_0(o, i, k, k, k, k, k, k, k, k, k, k, k, k, k);      /*0033*/
+
+   return FREIA_OK;                                                     /*0048*/
+}
