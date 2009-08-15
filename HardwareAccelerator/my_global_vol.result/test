@@ -19,6 +19,17 @@ digraph "dag_0" {
   "4 global_vol" [shape=circle];
   "image" -> "4 global_vol";
 }
+// graph for dag "dag_cleaned_0" of module "my_global_vol" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "image" [shape=box];
+
+  // outputs
+
+  // computation vertices
+  "4 global_vol" [shape=circle];
+  "image" -> "4 global_vol";
+}
 // graph for dag "my_global_vol_helper_0" of module "my_global_vol" in dot format
 digraph "my_global_vol_helper_0" {
   // inputs

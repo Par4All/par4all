@@ -72,6 +72,36 @@ digraph "dag_0" {
   "25 add_const" -> "27 add";
   "i0" -> "25 add_const";
 }
+// graph for dag "dag_cleaned_0" of module "freia_03" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "i1" [shape=box];
+  "i0" [shape=box];
+
+  // outputs
+  "o" [shape=box];
+
+  // computation vertices
+  "32 mul" [shape=circle];
+  "32 mul" -> "o";
+  "31 set_constant" [shape=circle];
+  "31 set_constant" -> "32 mul";
+  "30 and" [shape=circle];
+  "30 and" -> "32 mul";
+  "29 div_const" [shape=circle];
+  "29 div_const" -> "30 and";
+  "28 mul_const" [shape=circle];
+  "28 mul_const" -> "30 and";
+  "27 add" [shape=circle];
+  "27 add" -> "29 div_const";
+  "26 addsat_const" [shape=circle];
+  "26 addsat_const" -> "27 add";
+  "i1" -> "26 addsat_const";
+  "25 add_const" [shape=circle];
+  "25 add_const" -> "28 mul_const";
+  "25 add_const" -> "27 add";
+  "i0" -> "25 add_const";
+}
 // graph for dag "freia_03_helper_0" of module "freia_03" in dot format
 digraph "freia_03_helper_0" {
   // inputs

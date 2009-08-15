@@ -21,6 +21,19 @@ digraph "dag_0" {
   "i0" -> "5 inf_const";
   "5 inf_const" -> "o";
 }
+// graph for dag "dag_cleaned_0" of module "my_inf_const" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "i0" [shape=box];
+
+  // outputs
+  "o" [shape=box];
+
+  // computation vertices
+  "5 inf_const" [shape=circle];
+  "i0" -> "5 inf_const";
+  "5 inf_const" -> "o";
+}
 // graph for dag "my_inf_const_helper_0" of module "my_inf_const" in dot format
 digraph "my_inf_const_helper_0" {
   // inputs

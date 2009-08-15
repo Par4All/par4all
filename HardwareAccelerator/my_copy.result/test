@@ -21,6 +21,19 @@ digraph "dag_0" {
   "i0" -> "4 copy";
   "4 copy" -> "o";
 }
+// graph for dag "dag_cleaned_0" of module "my_copy" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "i0" [shape=box];
+
+  // outputs
+  "o" [shape=box];
+
+  // computation vertices
+  "4 copy" [shape=circle];
+  "i0" -> "4 copy";
+  "4 copy" -> "o";
+}
 // graph for dag "my_copy_helper_0" of module "my_copy" in dot format
 digraph "my_copy_helper_0" {
   // inputs

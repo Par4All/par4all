@@ -23,6 +23,21 @@ digraph "dag_0" {
   "i1" -> "5 and";
   "5 and" -> "o";
 }
+// graph for dag "dag_cleaned_0" of module "my_and" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "i0" [shape=box];
+  "i1" [shape=box];
+
+  // outputs
+  "o" [shape=box];
+
+  // computation vertices
+  "5 and" [shape=circle];
+  "i0" -> "5 and";
+  "i1" -> "5 and";
+  "5 and" -> "o";
+}
 // graph for dag "my_and_helper_0" of module "my_and" in dot format
 digraph "my_and_helper_0" {
   // inputs

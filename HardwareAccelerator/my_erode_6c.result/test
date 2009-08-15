@@ -21,6 +21,19 @@ digraph "dag_0" {
   "i0" -> "5 erode_6c";
   "5 erode_6c" -> "o";
 }
+// graph for dag "dag_cleaned_0" of module "my_erode_6c" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "i0" [shape=box];
+
+  // outputs
+  "o" [shape=box];
+
+  // computation vertices
+  "5 erode_6c" [shape=circle];
+  "i0" -> "5 erode_6c";
+  "5 erode_6c" -> "o";
+}
 // graph for dag "my_erode_6c_helper_0" of module "my_erode_6c" in dot format
 digraph "my_erode_6c_helper_0" {
   // inputs

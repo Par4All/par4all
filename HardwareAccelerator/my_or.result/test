@@ -23,6 +23,21 @@ digraph "dag_0" {
   "i1" -> "5 or";
   "5 or" -> "o";
 }
+// graph for dag "dag_cleaned_0" of module "my_or" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "i0" [shape=box];
+  "i1" [shape=box];
+
+  // outputs
+  "o" [shape=box];
+
+  // computation vertices
+  "5 or" [shape=circle];
+  "i0" -> "5 or";
+  "i1" -> "5 or";
+  "5 or" -> "o";
+}
 // graph for dag "my_or_helper_0" of module "my_or" in dot format
 digraph "my_or_helper_0" {
   // inputs

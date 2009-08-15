@@ -40,6 +40,27 @@ digraph "dag_0" {
   "i0" -> "10 add";
   "i1" -> "10 add";
 }
+// graph for dag "dag_cleaned_0" of module "freia_01" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "i0" [shape=box];
+  "i1" [shape=box];
+
+  // outputs
+  "o" [shape=box];
+
+  // computation vertices
+  "12 sub" [shape=circle];
+  "i0" -> "12 sub";
+  "12 sub" -> "o";
+  "11 inf" [shape=circle];
+  "11 inf" -> "12 sub";
+  "i0" -> "11 inf";
+  "10 add" [shape=circle];
+  "10 add" -> "11 inf";
+  "i0" -> "10 add";
+  "i1" -> "10 add";
+}
 // graph for dag "freia_01_helper_0" of module "freia_01" in dot format
 digraph "freia_01_helper_0" {
   // inputs

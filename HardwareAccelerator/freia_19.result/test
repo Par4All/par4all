@@ -33,6 +33,19 @@ digraph "dag_0" {
   "11 copy" -> "12 copy";
   "i" -> "11 copy";
 }
+// graph for dag "dag_cleaned_0" of module "freia_19" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "i" [shape=box];
+
+  // outputs
+  "o" [shape=box];
+
+  // computation vertices
+  "12 copy" [shape=circle];
+  "i" -> "12 copy";
+  "12 copy" -> "o";
+}
 // graph for dag "freia_19_helper_0" of module "freia_19" in dot format
 digraph "freia_19_helper_0" {
   // inputs
@@ -43,10 +56,8 @@ digraph "freia_19_helper_0" {
 
   // computation vertices
   "12 copy" [shape=circle];
+  "i" -> "12 copy";
   "12 copy" -> "o";
-  "11 copy" [shape=circle];
-  "11 copy" -> "12 copy";
-  "i" -> "11 copy";
 }
 #include <freiaCommon.h>
 #include <freiaCoarseGrain.h>
@@ -71,10 +82,7 @@ freia_status freia_19_helper_0(freia_data2d * o0, freia_data2d * i0)
 
 
   // STAGE 0
-  // i [0 input 0] -> [0 input 0] 0`t
-  // nope
-
-  // 0`t [0 input 0] -> [0 input 0] o
+  // i [0 input 0] -> [0 input 0] o
   // nope
 
 

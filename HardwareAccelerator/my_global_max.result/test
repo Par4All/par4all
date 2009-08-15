@@ -19,6 +19,17 @@ digraph "dag_0" {
   "4 global_max" [shape=circle];
   "i0" -> "4 global_max";
 }
+// graph for dag "dag_cleaned_0" of module "my_global_max" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "i0" [shape=box];
+
+  // outputs
+
+  // computation vertices
+  "4 global_max" [shape=circle];
+  "i0" -> "4 global_max";
+}
 // graph for dag "my_global_max_helper_0" of module "my_global_max" in dot format
 digraph "my_global_max_helper_0" {
   // inputs

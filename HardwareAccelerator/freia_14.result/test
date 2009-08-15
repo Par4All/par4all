@@ -29,6 +29,19 @@ digraph "dag_0" {
   "9 set_constant" [shape=circle];
   "9 set_constant" -> "10 add";
 }
+// graph for dag "dag_cleaned_0" of module "freia_14" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+
+  // outputs
+  "o" [shape=box];
+
+  // computation vertices
+  "10 add" [shape=circle];
+  "10 add" -> "o";
+  "9 set_constant" [shape=circle];
+  "9 set_constant" -> "10 add";
+}
 // graph for dag "freia_14_helper_0" of module "freia_14" in dot format
 digraph "freia_14_helper_0" {
   // inputs

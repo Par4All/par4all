@@ -23,6 +23,21 @@ digraph "dag_0" {
   "i1" -> "5 subsat";
   "5 subsat" -> "o";
 }
+// graph for dag "dag_cleaned_0" of module "my_subsat" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "i0" [shape=box];
+  "i1" [shape=box];
+
+  // outputs
+  "o" [shape=box];
+
+  // computation vertices
+  "5 subsat" [shape=circle];
+  "i0" -> "5 subsat";
+  "i1" -> "5 subsat";
+  "5 subsat" -> "o";
+}
 // graph for dag "my_subsat_helper_0" of module "my_subsat" in dot format
 digraph "my_subsat_helper_0" {
   // inputs

@@ -35,6 +35,23 @@ digraph "dag_0" {
   "11 set_constant" -> "13 dilate_8c";
   "11 set_constant" -> "12 erode_8c";
 }
+// graph for dag "dag_cleaned_0" of module "freia_13" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+
+  // outputs
+  "o0" [shape=box];
+  "o1" [shape=box];
+
+  // computation vertices
+  "13 dilate_8c" [shape=circle];
+  "13 dilate_8c" -> "o1";
+  "12 erode_8c" [shape=circle];
+  "12 erode_8c" -> "o0";
+  "11 set_constant" [shape=circle];
+  "11 set_constant" -> "13 dilate_8c";
+  "11 set_constant" -> "12 erode_8c";
+}
 // graph for dag "freia_13_helper_0" of module "freia_13" in dot format
 digraph "freia_13_helper_0" {
   // inputs
