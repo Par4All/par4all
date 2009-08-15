@@ -71,26 +71,26 @@ freia_status freia_12_helper_0(freia_data2d * o0, freia_data2d * o1, freia_data2
 
 
   // STAGE 0
-  // i0 [0 none 1] -> [0 poc 0] o0
+  // i0 [0 input 1] -> [0 poc 1] o0
   // nope
-  si.poc[0][0].op = SPOC_POC_ERODE;
-  si.poc[0][0].grid = SPOC_POC_8_CONNEX;
-  for(i=0 ; i<9 ; i++)
-    sp.poc[0][0].kernel[i] = kern0[i];
-
-  // i1 [0 none 0] -> [0 poc 1] o1
-  // nope
-  si.poc[0][1].op = SPOC_POC_DILATE;
+  si.poc[0][1].op = SPOC_POC_ERODE;
   si.poc[0][1].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[0][1].kernel[i] = kern1[i];
+    sp.poc[0][1].kernel[i] = kern0[i];
+
+  // i1 [0 input 0] -> [0 poc 0] o1
+  // nope
+  si.poc[0][0].op = SPOC_POC_DILATE;
+  si.poc[0][0].grid = SPOC_POC_8_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[0][0].kernel[i] = kern1[i];
 
 
-  // output two images...
-  // o0 [0 poc 0] -> [0 output 0] o0
-  si.mux[0][0].op = SPOC_MUX_IN0;
-  // o1 [0 poc 1] -> [0 output 1] o1
+  // output image o0 on 1 and image o1 on 0
+  // o0 [0 poc 1] -> [0 output 1] o0
   si.mux[0][3].op = SPOC_MUX_IN1;
+  // o1 [0 poc 0] -> [0 output 0] o1
+  si.mux[0][0].op = SPOC_MUX_IN0;
 
   mcode.raw = (freia_ptr) &si;
   mcode.size = sizeof(spoc_instr);
@@ -105,10 +105,7 @@ freia_status freia_12_helper_0(freia_data2d * o0, freia_data2d * o1, freia_data2
   ret |= freia_cg_write_dynamic_param(&dynparam);
 
   // actual call of spoc hardware
-  freia_cg_template_process_2i_2o(op, param, o0, o1, i0, i1);
-
-  // get reductions
-  freia_cg_read_reduction_results(&redres);
+  freia_cg_template_process_2i_2o(op, param, o1, o0, i0, i1);
 
   return ret;
 }

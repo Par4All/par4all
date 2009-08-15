@@ -56,13 +56,13 @@ freia_status my_subsat_const_helper_0(freia_data2d * o0, freia_data2d * i0, int3
 
 
   // STAGE 0
-  // i0 [0 none 0] -> [0 alu] o
+  // i0 [0 input 0] -> [0 alu] o
   // nope
   si.alu[0][0].op = SPOC_ALU_SUBSAT_IN0_CONST;
   si.alu[0][0].constant = cst0;
 
 
-  // output one image
+  // output image o on 0
   // o [0 alu] -> [0 output 0] o
   si.mux[0][0].op = SPOC_MUX_IN1;
   si.mux[0][2].op = SPOC_MUX_IN0;
@@ -80,10 +80,7 @@ freia_status my_subsat_const_helper_0(freia_data2d * o0, freia_data2d * i0, int3
   ret |= freia_cg_write_dynamic_param(&dynparam);
 
   // actual call of spoc hardware
-  freia_cg_template_process_1i_1o(op, param, o0, i0);
-
-  // get reductions
-  freia_cg_read_reduction_results(&redres);
+  freia_cg_template_process_2i_2o(op, param, o0, NULL, i0, NULL);
 
   return ret;
 }

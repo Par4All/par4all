@@ -1,0 +1,247 @@
+
+! initial function
+
+freia_status freia_17(freia_data2d *o, freia_data2d *i)
+{
+   freia_data2d *t0 = freia_common_create_data(16, 128, 128);
+   freia_data2d *t1 = freia_common_create_data(16, 128, 128);
+   freia_data2d *t2 = freia_common_create_data(16, 128, 128);
+   freia_data2d *t3 = freia_common_create_data(16, 128, 128);
+   freia_data2d *t4 = freia_common_create_data(16, 128, 128);
+   freia_data2d *t5 = freia_common_create_data(16, 128, 128);
+   
+   // useless copies
+   // t0 = i
+   // t1 = t0
+   // t2 = t1
+   // o = t2
+   // t3 = t1
+   // t4 = t0
+   // t5 = o
+   freia_aipo_copy(t0, i);                                              /*0021*/
+   freia_aipo_copy(t1, t0);                                             /*0022*/
+   freia_aipo_copy(t2, t1);                                             /*0023*/
+   freia_aipo_copy(o, t2);                                              /*0024*/
+   freia_aipo_copy(t3, t1);                                             /*0025*/
+   freia_aipo_copy(t4, t0);                                             /*0026*/
+   freia_aipo_copy(t5, o);                                              /*0027*/
+
+   freia_common_destruct_data(t0);                                      /*0029*/
+   freia_common_destruct_data(t1);                                      /*0030*/
+   freia_common_destruct_data(t2);                                      /*0031*/
+   freia_common_destruct_data(t3);                                      /*0032*/
+   freia_common_destruct_data(t4);                                      /*0033*/
+   freia_common_destruct_data(t5);                                      /*0034*/
+
+   return FREIA_OK;                                                     /*0036*/
+}
+
+! accelerated function
+
+// graph for dag "dag_0" of module "freia_17" in dot format
+digraph "dag_0" {
+  // inputs
+  "i" [shape=box];
+
+  // outputs
+  "0`t3" [shape=box];
+  "0`t4" [shape=box];
+  "0`t5" [shape=box];
+
+  // computation vertices
+  "27 copy" [shape=circle];
+  "27 copy" -> "0`t5";
+  "26 copy" [shape=circle];
+  "26 copy" -> "0`t4";
+  "25 copy" [shape=circle];
+  "25 copy" -> "0`t3";
+  "24 copy" [shape=circle];
+  "24 copy" -> "27 copy";
+  "23 copy" [shape=circle];
+  "23 copy" -> "24 copy";
+  "22 copy" [shape=circle];
+  "22 copy" -> "25 copy";
+  "22 copy" -> "23 copy";
+  "21 copy" [shape=circle];
+  "21 copy" -> "26 copy";
+  "21 copy" -> "22 copy";
+  "i" -> "21 copy";
+}
+// graph for dag "freia_17_helper_0" of module "freia_17" in dot format
+digraph "freia_17_helper_0" {
+  // inputs
+  "0`t1" [shape=box];
+
+  // outputs
+  "0`t3" [shape=box];
+  "0`t5" [shape=box];
+
+  // computation vertices
+  "27 copy" [shape=circle];
+  "27 copy" -> "0`t5";
+  "25 copy" [shape=circle];
+  "0`t1" -> "25 copy";
+  "25 copy" -> "0`t3";
+  "24 copy" [shape=circle];
+  "24 copy" -> "27 copy";
+  "23 copy" [shape=circle];
+  "23 copy" -> "24 copy";
+  "0`t1" -> "23 copy";
+}
+// graph for dag "freia_17_helper_1" of module "freia_17" in dot format
+digraph "freia_17_helper_1" {
+  // inputs
+  "i" [shape=box];
+
+  // outputs
+  "0`t1" [shape=box];
+  "0`t4" [shape=box];
+
+  // computation vertices
+  "26 copy" [shape=circle];
+  "26 copy" -> "0`t4";
+  "22 copy" [shape=circle];
+  "22 copy" -> "0`t1";
+  "21 copy" [shape=circle];
+  "21 copy" -> "26 copy";
+  "21 copy" -> "22 copy";
+  "i" -> "21 copy";
+}
+#include <freiaCommon.h>
+#include <freiaCoarseGrain.h>
+#include <spoc.h>
+
+// FREIA-SPoC helper function for module freia_17
+freia_status freia_17_helper_0(freia_data2d * o0, freia_data2d * o1, freia_data2d * i0)
+{
+  spoc_instr si;
+  spoc_param sp;
+  spoc_reduction reduc;
+  freia_microcode mcode;
+  freia_dynamic_param dynparam;
+  freia_reduction_results redres;
+  freia_op_sel op = 0;
+  freia_op_param param;
+  freia_status ret;
+
+  // init pipe to nop
+  spoc_init_pipe(&si, &sp, 16);
+
+
+  // STAGE 0
+  // 0`t1 [0 input 0] -> [0 input 0] 0`t2
+  // nope
+
+  // 0`t2 [0 input 0] -> [0 input 1] o
+  // nope
+
+  // 0`t1 [0 input 0] -> [0 input 0] 0`t3
+  // nope
+
+  // o [0 input 1] -> [0 input 1] 0`t5
+  // nope
+
+
+  // output image 0`t3 on 0 and image 0`t5 on 1
+  // 0`t3 [0 input 0] -> [0 output 0] 0`t3
+  si.mux[0][0].op = SPOC_MUX_IN0;
+  // 0`t5 [0 input 1] -> [0 output 1] 0`t5
+  si.mux[0][3].op = SPOC_MUX_IN1;
+
+  mcode.raw = (freia_ptr) &si;
+  mcode.size = sizeof(spoc_instr);
+
+  dynparam.raw = (freia_ptr) &sp;
+  dynparam.size = sizeof(spoc_param);
+
+  redres.raw = (freia_ptr) &reduc;
+  redres.size = sizeof(spoc_reduction);
+
+  ret = freia_cg_write_microcode(&mcode);
+  ret |= freia_cg_write_dynamic_param(&dynparam);
+
+  // actual call of spoc hardware
+  freia_cg_template_process_2i_2o(op, param, o0, o1, i0, NULL);
+
+  return ret;
+}
+
+// FREIA-SPoC helper function for module freia_17
+freia_status freia_17_helper_1(freia_data2d * o0, freia_data2d * o1, freia_data2d * i0)
+{
+  spoc_instr si;
+  spoc_param sp;
+  spoc_reduction reduc;
+  freia_microcode mcode;
+  freia_dynamic_param dynparam;
+  freia_reduction_results redres;
+  freia_op_sel op = 0;
+  freia_op_param param;
+  freia_status ret;
+
+  // init pipe to nop
+  spoc_init_pipe(&si, &sp, 16);
+
+
+  // STAGE 0
+  // i [0 input 0] -> [0 input 0] 0`t0
+  // nope
+
+  // 0`t0 [0 input 0] -> [0 input 0] 0`t1
+  // nope
+
+  // 0`t0 [0 input 0] -> [0 input 1] 0`t4
+  // nope
+
+
+  // output image 0`t1 on 0 and image 0`t4 on 1
+  // 0`t1 [0 input 0] -> [0 output 0] 0`t1
+  si.mux[0][0].op = SPOC_MUX_IN0;
+  // 0`t4 [0 input 1] -> [0 output 1] 0`t4
+  si.mux[0][3].op = SPOC_MUX_IN1;
+
+  mcode.raw = (freia_ptr) &si;
+  mcode.size = sizeof(spoc_instr);
+
+  dynparam.raw = (freia_ptr) &sp;
+  dynparam.size = sizeof(spoc_param);
+
+  redres.raw = (freia_ptr) &reduc;
+  redres.size = sizeof(spoc_reduction);
+
+  ret = freia_cg_write_microcode(&mcode);
+  ret |= freia_cg_write_dynamic_param(&dynparam);
+
+  // actual call of spoc hardware
+  freia_cg_template_process_2i_2o(op, param, o0, o1, i0, NULL);
+
+  return ret;
+}
+
+! new function
+
+freia_status freia_17(freia_data2d *, freia_data2d *i)
+{
+   freia_data2d *t1 = freia_common_create_data(16, 128, 128);
+   freia_data2d *t3 = freia_common_create_data(16, 128, 128);
+   freia_data2d *t4 = freia_common_create_data(16, 128, 128);
+   freia_data2d *t5 = freia_common_create_data(16, 128, 128);
+   
+   // useless copies
+   // t0 = i
+   // t1 = t0
+   // t2 = t1
+   // o = t2
+   // t3 = t1
+   // t4 = t0
+   // t5 = o
+   freia_17_helper_1(t1, t4, i);                                        /*0026*/
+   freia_17_helper_0(t3, t5, t1);                                       /*0027*/
+
+   freia_common_destruct_data(t1);                                      /*0030*/
+   freia_common_destruct_data(t3);                                      /*0032*/
+   freia_common_destruct_data(t4);                                      /*0033*/
+   freia_common_destruct_data(t5);                                      /*0034*/
+
+   return FREIA_OK;                                                     /*0036*/
+}

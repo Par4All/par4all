@@ -85,14 +85,14 @@ freia_status freia_05_helper_0(freia_data2d * o0, freia_data2d * i0, freia_data2
 
 
   // STAGE 0
-  // i0 [0 none 0] -> [0 alu] o1
+  // i0 [0 input 0] -> [0 alu] o1
   // nope
-  // i1 [0 none 1] -> [0 alu] o1
+  // i1 [0 input 1] -> [0 alu] o1
   // nope
   si.alu[0][0].op = SPOC_ALU_AND_IN0_IN1;
 
 
-  // output one image
+  // output image o1 on 0
   // o1 [0 alu] -> [0 output 0] o1
   si.mux[0][0].op = SPOC_MUX_IN1;
   si.mux[0][2].op = SPOC_MUX_IN0;
@@ -110,10 +110,7 @@ freia_status freia_05_helper_0(freia_data2d * o0, freia_data2d * i0, freia_data2
   ret |= freia_cg_write_dynamic_param(&dynparam);
 
   // actual call of spoc hardware
-  freia_cg_template_process_2i_1o(op, param, o0, i0, i1);
-
-  // get reductions
-  freia_cg_read_reduction_results(&redres);
+  freia_cg_template_process_2i_2o(op, param, o0, NULL, i0, i1);
 
   return ret;
 }
@@ -136,14 +133,14 @@ freia_status freia_05_helper_1(freia_data2d * o0, freia_data2d * i0, freia_data2
 
 
   // STAGE 0
-  // i0 [0 none 0] -> [0 alu] o0
+  // i0 [0 input 0] -> [0 alu] o0
   // nope
-  // i1 [0 none 1] -> [0 alu] o0
+  // i1 [0 input 1] -> [0 alu] o0
   // nope
   si.alu[0][0].op = SPOC_ALU_MUL_IN0_IN1;
 
 
-  // output one image
+  // output image o0 on 0
   // o0 [0 alu] -> [0 output 0] o0
   si.mux[0][0].op = SPOC_MUX_IN1;
   si.mux[0][2].op = SPOC_MUX_IN0;
@@ -161,10 +158,7 @@ freia_status freia_05_helper_1(freia_data2d * o0, freia_data2d * i0, freia_data2
   ret |= freia_cg_write_dynamic_param(&dynparam);
 
   // actual call of spoc hardware
-  freia_cg_template_process_2i_1o(op, param, o0, i0, i1);
-
-  // get reductions
-  freia_cg_read_reduction_results(&redres);
+  freia_cg_template_process_2i_2o(op, param, o0, NULL, i0, i1);
 
   return ret;
 }

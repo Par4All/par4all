@@ -52,7 +52,7 @@ freia_status my_global_vol_helper_0(freia_data2d * i0, int32_t * red0)
 
 
   // STAGE 0
-  // image [0 none 0] -> [0 measure 0] image
+  // image [0 input 0] -> [0 measure 0] image
   si.mux[0][0].op = SPOC_MUX_IN0;
 
 
@@ -71,7 +71,7 @@ freia_status my_global_vol_helper_0(freia_data2d * i0, int32_t * red0)
   ret |= freia_cg_write_dynamic_param(&dynparam);
 
   // actual call of spoc hardware
-  freia_cg_template_process_1i(op, param, i0);
+  freia_cg_template_process_2i_2o(op, param, NULL, NULL, i0, NULL);
 
   // get reductions
   freia_cg_read_reduction_results(&redres);

@@ -73,7 +73,7 @@ freia_status freia_15_helper_0(freia_data2d * o0, freia_data2d * i0, int32_t * r
 
 
   // STAGE 0
-  // i [0 none 0] -> [0 measure 0] i
+  // i [0 input 0] -> [0 measure 0] i
   si.mux[0][0].op = SPOC_MUX_IN0;
 
   // i [0 measure 0] -> [0 measure 0] i
@@ -85,13 +85,13 @@ freia_status freia_15_helper_0(freia_data2d * o0, freia_data2d * i0, int32_t * r
 
   // STAGE 1
   // i [0 measure 0] -> [1 alu] o
-  // i [1 none 0] -> [1 alu] o
+  // i [1 input 0] -> [1 alu] o
   // nope
   si.alu[1][0].op = SPOC_ALU_ADD_IN0_CONST;
   si.alu[1][0].constant = cst3;
 
 
-  // output one image
+  // output image o on 0
   // o [1 alu] -> [1 output 0] o
   si.mux[1][0].op = SPOC_MUX_IN1;
   si.mux[1][2].op = SPOC_MUX_IN0;
@@ -109,7 +109,7 @@ freia_status freia_15_helper_0(freia_data2d * o0, freia_data2d * i0, int32_t * r
   ret |= freia_cg_write_dynamic_param(&dynparam);
 
   // actual call of spoc hardware
-  freia_cg_template_process_1i_1o(op, param, o0, i0);
+  freia_cg_template_process_2i_2o(op, param, o0, NULL, i0, NULL);
 
   // get reductions
   freia_cg_read_reduction_results(&redres);
