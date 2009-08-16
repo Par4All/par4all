@@ -195,8 +195,7 @@ freia_status freia_20_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, int32_t
 
   // STAGE 1
   // 0`t0 [0 poc 0] -> [1 poc 0] 21 erode_6c
-  si.mux[0][0].op = SPOC_MUX_IN1;
-  si.mux[0][2].op = SPOC_MUX_IN0;
+  si.mux[0][0].op = SPOC_MUX_IN0;
   // 0`t0 [1 input 0] -> [1 poc 0] 21 erode_6c
   // nope
   // poc 21 erode_6c stage 1 side 0
@@ -208,8 +207,7 @@ freia_status freia_20_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, int32_t
 
   // STAGE 2
   // 0`t1 [1 poc 0] -> [2 poc 0] 22 dilate_8c
-  si.mux[1][0].op = SPOC_MUX_IN1;
-  si.mux[1][2].op = SPOC_MUX_IN0;
+  si.mux[1][0].op = SPOC_MUX_IN0;
   // 0`t1 [2 input 0] -> [2 poc 0] 22 dilate_8c
   // nope
   // poc 22 dilate_8c stage 2 side 0
@@ -221,8 +219,7 @@ freia_status freia_20_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, int32_t
 
   // STAGE 3
   // 0`t2 [2 poc 0] -> [3 poc 0] 23 dilate_6c
-  si.mux[2][0].op = SPOC_MUX_IN1;
-  si.mux[2][2].op = SPOC_MUX_IN0;
+  si.mux[2][0].op = SPOC_MUX_IN0;
   // 0`t2 [3 input 0] -> [3 poc 0] 23 dilate_6c
   // nope
   // poc 23 dilate_6c stage 3 side 0
@@ -234,8 +231,7 @@ freia_status freia_20_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, int32_t
 
   // STAGE 4
   // 0`t3 [3 poc 0] -> [4 poc 0] 24 erode_8c
-  si.mux[3][0].op = SPOC_MUX_IN1;
-  si.mux[3][2].op = SPOC_MUX_IN0;
+  si.mux[3][0].op = SPOC_MUX_IN0;
   // 0`t3 [4 input 0] -> [4 poc 0] 24 erode_8c
   // nope
   // poc 24 erode_8c stage 4 side 0
@@ -247,8 +243,7 @@ freia_status freia_20_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, int32_t
 
   // STAGE 5
   // 0`t4 [4 poc 0] -> [5 poc 0] 25 erode_6c
-  si.mux[4][0].op = SPOC_MUX_IN1;
-  si.mux[4][2].op = SPOC_MUX_IN0;
+  si.mux[4][0].op = SPOC_MUX_IN0;
   // 0`t4 [5 input 0] -> [5 poc 0] 25 erode_6c
   // nope
   // poc 25 erode_6c stage 5 side 0
@@ -260,8 +255,7 @@ freia_status freia_20_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, int32_t
 
   // STAGE 6
   // 0`t5 [5 poc 0] -> [6 poc 0] 26 dilate_8c
-  si.mux[5][0].op = SPOC_MUX_IN1;
-  si.mux[5][2].op = SPOC_MUX_IN0;
+  si.mux[5][0].op = SPOC_MUX_IN0;
   // 0`t5 [6 input 0] -> [6 poc 0] 26 dilate_8c
   // nope
   // poc 26 dilate_8c stage 6 side 0
@@ -273,8 +267,7 @@ freia_status freia_20_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, int32_t
 
   // STAGE 7
   // 0`t6 [6 poc 0] -> [7 poc 0] 27 dilate_6c
-  si.mux[6][0].op = SPOC_MUX_IN1;
-  si.mux[6][2].op = SPOC_MUX_IN0;
+  si.mux[6][0].op = SPOC_MUX_IN0;
   // 0`t6 [7 input 0] -> [7 poc 0] 27 dilate_6c
   // nope
   // poc 27 dilate_6c stage 7 side 0
@@ -336,8 +329,7 @@ freia_status freia_20_helper_0_0_1(freia_data2d * o0, freia_data2d * i0, int32_t
 
   // STAGE 1
   // 0`t8 [0 poc 0] -> [1 poc 0] 30 erode_6c
-  si.mux[0][0].op = SPOC_MUX_IN1;
-  si.mux[0][2].op = SPOC_MUX_IN0;
+  si.mux[0][0].op = SPOC_MUX_IN0;
   // 0`t8 [1 input 0] -> [1 poc 0] 30 erode_6c
   // nope
   // poc 30 erode_6c stage 1 side 0
@@ -349,8 +341,7 @@ freia_status freia_20_helper_0_0_1(freia_data2d * o0, freia_data2d * i0, int32_t
 
   // STAGE 2
   // 0`t9 [1 poc 0] -> [2 poc 0] 31 dilate_8c
-  si.mux[1][0].op = SPOC_MUX_IN1;
-  si.mux[1][2].op = SPOC_MUX_IN0;
+  si.mux[1][0].op = SPOC_MUX_IN0;
   // 0`t9 [2 input 0] -> [2 poc 0] 31 dilate_8c
   // nope
   // poc 31 dilate_8c stage 2 side 0
@@ -362,8 +353,7 @@ freia_status freia_20_helper_0_0_1(freia_data2d * o0, freia_data2d * i0, int32_t
 
   // STAGE 3
   // 0`ta [2 poc 0] -> [3 poc 0] 32 dilate_6c
-  si.mux[2][0].op = SPOC_MUX_IN1;
-  si.mux[2][2].op = SPOC_MUX_IN0;
+  si.mux[2][0].op = SPOC_MUX_IN0;
   // 0`ta [3 input 0] -> [3 poc 0] 32 dilate_6c
   // nope
   // poc 32 dilate_6c stage 3 side 0
@@ -375,8 +365,7 @@ freia_status freia_20_helper_0_0_1(freia_data2d * o0, freia_data2d * i0, int32_t
 
   // STAGE 4
   // 0`tb [3 poc 0] -> [4 poc 0] 33 erode_8c
-  si.mux[3][0].op = SPOC_MUX_IN1;
-  si.mux[3][2].op = SPOC_MUX_IN0;
+  si.mux[3][0].op = SPOC_MUX_IN0;
   // 0`tb [4 input 0] -> [4 poc 0] 33 erode_8c
   // nope
   // poc 33 erode_8c stage 4 side 0
