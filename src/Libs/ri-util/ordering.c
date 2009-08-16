@@ -130,7 +130,7 @@ static bool add_ordering_of_the_statement(statement stat, hash_table ots)
    @param s is the statement to start with. Typically the module
    statement.
 */
-void rinitialize_ordering_to_statement(hash_table ots, statement s)
+static void rinitialize_ordering_to_statement(hash_table ots, statement s)
 {
   /* Simplify this with a gen_recurse to avoid dealing with all the new
      cases by hand (for-loops...).
