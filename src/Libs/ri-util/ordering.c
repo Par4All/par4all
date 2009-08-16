@@ -114,18 +114,13 @@ ordering_to_statement(int o)
 
 
 /* Add the statement for its ordering, if any, in the hash-map. */
-static bool
-add_ordering_of_the_statement(statement s,
-			      void * a_context) {
-  hash_table ots = (hash_table) a_context;
-  pips_assert("ordering should be defined",
-	      statement_ordering(s) != STATEMENT_ORDERING_UNDEFINED);
-  hash_put(ots, (char *) statement_ordering(s), (char *) s);
-
-  // Go on walking down the RI:
-  return TRUE;
+static bool add_ordering_of_the_statement(statement stat, hash_table ots)
+{
+  pips_assert("ordering is defined",
+	      statement_ordering(stat) != STATEMENT_ORDERING_UNDEFINED);
+  hash_put(ots, (void *) statement_ordering(stat), (void *) stat);
+  return true;
 }
-
 
 /* Initialize the ordering to statement mapping by iterating from a given
    statement
@@ -135,16 +130,15 @@ add_ordering_of_the_statement(statement s,
    @param s is the statement to start with. Typically the module
    statement.
 */
-static void
-rinitialize_ordering_to_statement(hash_table ots, statement s) {
+void rinitialize_ordering_to_statement(hash_table ots, statement s)
+{
   /* Simplify this with a gen_recurse to avoid dealing with all the new
      cases by hand (for-loops...).
 
      Apply a prefix hash-map add to be compatible with previous
      implementation and avoid different hash-map iteration later. */
   gen_context_recurse(s, ots, statement_domain,
-		      add_ordering_of_the_statement,
-		      gen_identity);
+		      add_ordering_of_the_statement, gen_identity);
 }
 
 
