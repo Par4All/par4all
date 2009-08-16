@@ -56,15 +56,12 @@ determinism.
 \domain{pstatement = persistant statement}
 {}
 
-\domain{vtxcontent = optype:int x opid:int x source:pstatement x inputs:entity* x out:entity x inparams:entity* x outparams:entity* x stage:int x inside:bool x outside:bool x outstats:int*}
+\domain{vtxcontent = optype:int x opid:int x source:pstatement x inputs:entity* x out:entity x inparams:entity* x outparams:entity*}
 {}
 
 The operation (\emph{optype}, \emph{opid}) may not be commutative,
 thus the order of input images (\emph{inputs}) is significant, and some
 adjustement may be necessary when mapping onto the hardware.
-
-\emph{outstats} designates the list of measures to be extracted from
-the \emph{out} entity.
 
 There is a lot of information kept here, possibly redundant (?), because
 it is/may be needed for regenerating the code.
@@ -72,7 +69,7 @@ it is/may be needed for regenerating the code.
 Somehow I need in/out effects from within the sequence, or possibly
 use-def chains?
 
-\domain{dagvtx = preds:dagvtx* x succs:dagvtx* x content:vtxcontent}
+\domain{dagvtx = content:vtxcontent x succs:dagvtx*}
 {}
 
 What about the first and last vertices? They can be deduced because

@@ -122,17 +122,12 @@ typedef enum {
 /* ALU operation full description */
 typedef struct {
   spoc_alu_t op;  // operation
+  spoc_alu_t flipped; // flipped call
   string setting; // macro the operation
   bool use_cst;   // whether a constant is needed
   bool use_in0;   // whether first input is used
   bool use_in1;   // whether second input is used
 } spoc_alu_op_t;
-
-/*
-typedef struct {
-  2 ints, 1 bool
-} spoc_th_t;
-*/
 
 typedef enum {
   spoc_poc_unused,
@@ -177,7 +172,22 @@ typedef struct {
   spoc_hw_t spoc;
 } freia_api_t;
 
+typedef enum {
+  // important, in hardware order
+  spoc_type_nop = -1, // used by copy?
+  spoc_type_inp = 0, // used for input
+  spoc_type_poc = 1,
+  spoc_type_alu = 2,
+  spoc_type_thr = 3,
+  spoc_type_mes = 4,
+  spoc_type_out = 5   // output...
+} spoc_hardware_type;
+
 /****************************************************** SPOC CODE GENERATION */
+
+#define AIPO "freia_aipo_"
+
+#define spoc_depth_prop "HWAC_SPOC_DEPTH"
 
 // what about something simpler like "freia-spoc.h"?
 #define FREIA_SPOC_INCLUDES			\
@@ -200,9 +210,11 @@ typedef struct {
   "  freia_op_sel op = 0;\n"					\
   "  freia_op_param param;\n"					\
   "  freia_status ret;\n"					\
+  "  int i;\n"							\
   "\n"								\
   "  // init pipe to nop\n"					\
-  "  spoc_init_pipe(&si, &sp, " FREIA_DEFAULT_BPP ");\n"
+  "  spoc_init_pipe(&si, &sp, " FREIA_DEFAULT_BPP ");\n"	\
+  "\n"
 
 #define FREIA_SPOC_CALL						\
   "\n"								\

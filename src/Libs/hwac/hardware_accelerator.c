@@ -25,7 +25,10 @@
 #include "genC.h"
 #include "linear.h"
 
+// newgen
 #include "ri.h"
+// needs some arg_label & vertex_label types
+// #include "graph.h"
 
 #include "properties.h"
 #include "misc.h"
@@ -34,7 +37,9 @@
 #include "resources.h"
 #include "pipsdbm.h"
 
-#include "hwac.h"
+#include "control.h" // for clean_up_sequences
+// #include "hwac.h"
+extern void freia_spoc_compile(string, statement);
 
 #define HWAC_INPUT "HWAC_INPUT"
 #define HWAC_TARGET "HWAC_TARGET"
@@ -51,9 +56,17 @@ int hardware_accelerator(string module)
 
   // this will be usefull
   statement mod_stat =
-    (statement) db_get_memory_resource(DBR_CODE, module, TRUE);
+    (statement) db_get_memory_resource(DBR_CODE, module, true);
   set_current_module_statement(mod_stat);
   set_current_module_entity(module_name_to_entity(module));
+
+  // proper effects, chains ? summary effects ??
+  /*
+  set_proper_rw_effects((statement_effects)
+	db_get_memory_resource(DBR_PROPER_EFFECTS, module_name,	true));
+
+  graph chains = (graph) db_get_memory_resource(DBR_CHAINS, module_name, true);
+  */
 
   pips_debug(1, "considering module %s\n", module);
 
@@ -78,6 +91,10 @@ int hardware_accelerator(string module)
   // update/release resources
   reset_current_module_statement();
   reset_current_module_entity();
+  /*
+  reset_proper_rw_effects();
+  reset_ordering_to_statement();
+  */
 
   debug_off();
   return true;

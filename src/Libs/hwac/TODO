@@ -1,25 +1,36 @@
 * pre
-- inlining, full_unroll, dead code elim... 
-- image reuse?
-- scalar deps?
+- inlining, full_unroll, dead code elim...
++ image reuse? ok for internal & output
+- scalar deps? use chains??
 - check => ok => deadcode (#define)
+
+* bug
+- input/output image
 
 * input
 - may skip unrelated statements?
 - check/remove more implicit hypothesis
 
+* code
++ cleanup data structures?
+- remove type ctxcontent?
+
 * output
-- compaction and symmetry
-- handle wiring
++ symmetry (flipping)
++ compaction
++ handle wiring
 - tell pipsdbm about generated files and fix callees?
-- pipe overflow
++ pipe overflow
 - add checks in generated code (img size and so)?
 - parametric img size/depth?
-- show DAG!
++ show DAG!
+- select node shape depending on hardware?
++ add more comments to generated code
++ improve generated comments
 
 * post
-- remove malloc/free if not used
-- cleanup declarations
++ remove malloc/free if not used
++ cleanup declarations
 
 * validation
 - check all AIPO
