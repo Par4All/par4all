@@ -38,8 +38,8 @@ digraph "dag_cleaned_0" {
   "i1" -> "5 xor";
   "5 xor" -> "o";
 }
-// graph for dag "my_xor_helper_0" of module "my_xor" in dot format
-digraph "my_xor_helper_0" {
+// graph for dag "my_xor_helper_0_0" of module "my_xor" in dot format
+digraph "my_xor_helper_0_0" {
   // inputs
   "i0" [shape=box];
   "i1" [shape=box];
@@ -58,7 +58,7 @@ digraph "my_xor_helper_0" {
 #include <spoc.h>
 
 // FREIA-SPoC helper function for module my_xor
-freia_status my_xor_helper_0(freia_data2d * o0, freia_data2d * i0, freia_data2d * i1)
+freia_status my_xor_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, freia_data2d * i1)
 {
   spoc_instr si;
   spoc_param sp;
@@ -111,5 +111,5 @@ freia_status my_xor_helper_0(freia_data2d * o0, freia_data2d * i0, freia_data2d 
 
 freia_status my_xor(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 {
-   return my_xor_helper_0(o, i0, i1);                                   /*0005*/
+   return my_xor_helper_0_0_0(o, i0, i1);                               /*0005*/
 }

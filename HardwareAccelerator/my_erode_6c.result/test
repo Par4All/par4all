@@ -34,8 +34,8 @@ digraph "dag_cleaned_0" {
   "i0" -> "5 erode_6c";
   "5 erode_6c" -> "o";
 }
-// graph for dag "my_erode_6c_helper_0" of module "my_erode_6c" in dot format
-digraph "my_erode_6c_helper_0" {
+// graph for dag "my_erode_6c_helper_0_0" of module "my_erode_6c" in dot format
+digraph "my_erode_6c_helper_0_0" {
   // inputs
   "i0" [shape=box];
 
@@ -52,7 +52,7 @@ digraph "my_erode_6c_helper_0" {
 #include <spoc.h>
 
 // FREIA-SPoC helper function for module my_erode_6c
-freia_status my_erode_6c_helper_0(freia_data2d * o0, freia_data2d * i0, int32_t *kern0)
+freia_status my_erode_6c_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, int32_t *kern0)
 {
   spoc_instr si;
   spoc_param sp;
@@ -105,5 +105,5 @@ freia_status my_erode_6c_helper_0(freia_data2d * o0, freia_data2d * i0, int32_t 
 
 freia_status my_erode_6c(freia_data2d *o, freia_data2d *i0, int32_t *p0)
 {
-   return my_erode_6c_helper_0(o, i0, p0);                              /*0005*/
+   return my_erode_6c_helper_0_0_0(o, i0, p0);                          /*0005*/
 }

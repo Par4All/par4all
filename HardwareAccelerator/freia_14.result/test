@@ -42,8 +42,8 @@ digraph "dag_cleaned_0" {
   "9 set_constant" [shape=circle];
   "9 set_constant" -> "10 add";
 }
-// graph for dag "freia_14_helper_0" of module "freia_14" in dot format
-digraph "freia_14_helper_0" {
+// graph for dag "freia_14_helper_0_0" of module "freia_14" in dot format
+digraph "freia_14_helper_0_0" {
   // inputs
 
   // outputs
@@ -60,7 +60,7 @@ digraph "freia_14_helper_0" {
 #include <spoc.h>
 
 // FREIA-SPoC helper function for module freia_14
-freia_status freia_14_helper_0(freia_data2d * o0, , int32_t cst0)
+freia_status freia_14_helper_0_0_0(freia_data2d * o0, , int32_t cst0)
 {
   spoc_instr si;
   spoc_param sp;
@@ -128,7 +128,7 @@ freia_status freia_14(freia_data2d *o, int32_t c)
    // 2 alu to alu paths
    // t = h()
    // o = t + t
-   freia_14_helper_0(o, c);                                             /*0010*/
+   freia_14_helper_0_0_0(o, c);                                         /*0009*/
 
    return FREIA_OK;                                                     /*0013*/
 }

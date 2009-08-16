@@ -30,8 +30,8 @@ digraph "dag_cleaned_0" {
   "4 set_constant" [shape=circle];
   "4 set_constant" -> "o";
 }
-// graph for dag "my_set_constant_helper_0" of module "my_set_constant" in dot format
-digraph "my_set_constant_helper_0" {
+// graph for dag "my_set_constant_helper_0_0" of module "my_set_constant" in dot format
+digraph "my_set_constant_helper_0_0" {
   // inputs
 
   // outputs
@@ -46,7 +46,7 @@ digraph "my_set_constant_helper_0" {
 #include <spoc.h>
 
 // FREIA-SPoC helper function for module my_set_constant
-freia_status my_set_constant_helper_0(freia_data2d * o0, , int32_t cst0)
+freia_status my_set_constant_helper_0_0_0(freia_data2d * o0, , int32_t cst0)
 {
   spoc_instr si;
   spoc_param sp;
@@ -96,5 +96,5 @@ freia_status my_set_constant_helper_0(freia_data2d * o0, , int32_t cst0)
 
 freia_status my_set_constant(freia_data2d *o, int32_t p0)
 {
-   return my_set_constant_helper_0(o, p0);                              /*0004*/
+   return my_set_constant_helper_0_0_0(o, p0);                          /*0004*/
 }

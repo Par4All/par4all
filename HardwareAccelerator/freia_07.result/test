@@ -95,29 +95,8 @@ digraph "dag_cleaned_0" {
   "i0" -> "16 add";
   "i1" -> "16 add";
 }
-// graph for dag "freia_07_helper_0" of module "freia_07" in dot format
-digraph "freia_07_helper_0" {
-  // inputs
-  "i3" [shape=box];
-  "i2" [shape=box];
-
-  // outputs
-  "o1" [shape=box];
-
-  // computation vertices
-  "21 or" [shape=circle];
-  "i3" -> "21 or";
-  "21 or" -> "o1";
-  "19 sup" [shape=circle];
-  "19 sup" -> "21 or";
-  "i3" -> "19 sup";
-  "17 div" [shape=circle];
-  "17 div" -> "19 sup";
-  "i2" -> "17 div";
-  "i3" -> "17 div";
-}
-// graph for dag "freia_07_helper_1" of module "freia_07" in dot format
-digraph "freia_07_helper_1" {
+// graph for dag "freia_07_helper_0_0" of module "freia_07" in dot format
+digraph "freia_07_helper_0_0" {
   // inputs
   "i0" [shape=box];
   "i1" [shape=box];
@@ -137,92 +116,33 @@ digraph "freia_07_helper_1" {
   "i0" -> "16 add";
   "i1" -> "16 add";
 }
+// graph for dag "freia_07_helper_0_1" of module "freia_07" in dot format
+digraph "freia_07_helper_0_1" {
+  // inputs
+  "i3" [shape=box];
+  "i2" [shape=box];
+
+  // outputs
+  "o1" [shape=box];
+
+  // computation vertices
+  "21 or" [shape=circle];
+  "i3" -> "21 or";
+  "21 or" -> "o1";
+  "19 sup" [shape=circle];
+  "19 sup" -> "21 or";
+  "i3" -> "19 sup";
+  "17 div" [shape=circle];
+  "17 div" -> "19 sup";
+  "i2" -> "17 div";
+  "i3" -> "17 div";
+}
 #include <freiaCommon.h>
 #include <freiaCoarseGrain.h>
 #include <spoc.h>
 
 // FREIA-SPoC helper function for module freia_07
-freia_status freia_07_helper_0(freia_data2d * o0, freia_data2d * i0, freia_data2d * i1)
-{
-  spoc_instr si;
-  spoc_param sp;
-  spoc_reduction reduc;
-  freia_microcode mcode;
-  freia_dynamic_param dynparam;
-  freia_reduction_results redres;
-  freia_op_sel op = 0;
-  freia_op_param param;
-  freia_status ret;
-  int i;
-
-  // init pipe to nop
-  spoc_init_pipe(&si, &sp, 16);
-
-
-  // STAGE 0
-  // i3 [0 input 0] -> [0 alu] 17 div
-  // nope
-  // i2 [0 input 1] -> [0 alu] 17 div
-  // nope
-  // alu 17 div stage 0 flipped
-  si.alu[0][0].op = SPOC_ALU_DIV_IN1_IN0;
-
-
-  // STAGE 1
-  // i3 [0 input 0] -> [1 alu] 19 sup
-  si.mux[0][0].op = SPOC_MUX_IN1;
-  si.mux[0][2].op = SPOC_MUX_IN0;
-  // i3 [1 input 0] -> [1 alu] 19 sup
-  // nope
-  // 0`t2 [0 alu] -> [1 alu] 19 sup
-  si.mux[0][1].op = SPOC_MUX_IN0;
-  si.mux[0][3].op = SPOC_MUX_IN0;
-  // 0`t2 [1 input 1] -> [1 alu] 19 sup
-  // nope
-  // alu 19 sup stage 1
-  si.alu[1][0].op = SPOC_ALU_SUP_IN0_IN1;
-
-
-  // STAGE 2
-  // i3 [1 input 0] -> [2 alu] 21 or
-  si.mux[1][0].op = SPOC_MUX_IN1;
-  si.mux[1][2].op = SPOC_MUX_IN0;
-  // i3 [2 input 0] -> [2 alu] 21 or
-  // nope
-  // 0`t3 [1 alu] -> [2 alu] 21 or
-  si.mux[1][1].op = SPOC_MUX_IN0;
-  si.mux[1][3].op = SPOC_MUX_IN0;
-  // 0`t3 [2 input 1] -> [2 alu] 21 or
-  // nope
-  // alu 21 or stage 2
-  si.alu[2][0].op = SPOC_ALU_OR_IN0_IN1;
-
-
-  // output image o1 on 0
-  // o1 [2 alu] -> [2 output 0] 0 null
-  si.mux[2][0].op = SPOC_MUX_IN1;
-  si.mux[2][2].op = SPOC_MUX_IN0;
-
-  mcode.raw = (freia_ptr) &si;
-  mcode.size = sizeof(spoc_instr);
-
-  dynparam.raw = (freia_ptr) &sp;
-  dynparam.size = sizeof(spoc_param);
-
-  redres.raw = (freia_ptr) &reduc;
-  redres.size = sizeof(spoc_reduction);
-
-  ret = freia_cg_write_microcode(&mcode);
-  ret |= freia_cg_write_dynamic_param(&dynparam);
-
-  // actual call of spoc hardware
-  freia_cg_template_process_2i_2o(op, param, o0, NULL, i0, i1);
-
-  return ret;
-}
-
-// FREIA-SPoC helper function for module freia_07
-freia_status freia_07_helper_1(freia_data2d * o0, freia_data2d * i0, freia_data2d * i1)
+freia_status freia_07_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, freia_data2d * i1)
 {
   spoc_instr si;
   spoc_param sp;
@@ -301,6 +221,86 @@ freia_status freia_07_helper_1(freia_data2d * o0, freia_data2d * i0, freia_data2
   return ret;
 }
 
+// FREIA-SPoC helper function for module freia_07
+freia_status freia_07_helper_0_1_0(freia_data2d * o0, freia_data2d * i0, freia_data2d * i1)
+{
+  spoc_instr si;
+  spoc_param sp;
+  spoc_reduction reduc;
+  freia_microcode mcode;
+  freia_dynamic_param dynparam;
+  freia_reduction_results redres;
+  freia_op_sel op = 0;
+  freia_op_param param;
+  freia_status ret;
+  int i;
+
+  // init pipe to nop
+  spoc_init_pipe(&si, &sp, 16);
+
+
+  // STAGE 0
+  // i3 [0 input 0] -> [0 alu] 17 div
+  // nope
+  // i2 [0 input 1] -> [0 alu] 17 div
+  // nope
+  // alu 17 div stage 0 flipped
+  si.alu[0][0].op = SPOC_ALU_DIV_IN1_IN0;
+
+
+  // STAGE 1
+  // i3 [0 input 0] -> [1 alu] 19 sup
+  si.mux[0][0].op = SPOC_MUX_IN1;
+  si.mux[0][2].op = SPOC_MUX_IN0;
+  // i3 [1 input 0] -> [1 alu] 19 sup
+  // nope
+  // 0`t2 [0 alu] -> [1 alu] 19 sup
+  si.mux[0][1].op = SPOC_MUX_IN0;
+  si.mux[0][3].op = SPOC_MUX_IN0;
+  // 0`t2 [1 input 1] -> [1 alu] 19 sup
+  // nope
+  // alu 19 sup stage 1
+  si.alu[1][0].op = SPOC_ALU_SUP_IN0_IN1;
+
+
+  // STAGE 2
+  // i3 [1 input 0] -> [2 alu] 21 or
+  si.mux[1][0].op = SPOC_MUX_IN1;
+  si.mux[1][2].op = SPOC_MUX_IN0;
+  // i3 [2 input 0] -> [2 alu] 21 or
+  // nope
+  // 0`t3 [1 alu] -> [2 alu] 21 or
+  si.mux[1][1].op = SPOC_MUX_IN0;
+  si.mux[1][3].op = SPOC_MUX_IN0;
+  // 0`t3 [2 input 1] -> [2 alu] 21 or
+  // nope
+  // alu 21 or stage 2
+  si.alu[2][0].op = SPOC_ALU_OR_IN0_IN1;
+
+
+  // output image o1 on 0
+  // o1 [2 alu] -> [2 output 0] 0 null
+  si.mux[2][0].op = SPOC_MUX_IN1;
+  si.mux[2][2].op = SPOC_MUX_IN0;
+
+  mcode.raw = (freia_ptr) &si;
+  mcode.size = sizeof(spoc_instr);
+
+  dynparam.raw = (freia_ptr) &sp;
+  dynparam.size = sizeof(spoc_param);
+
+  redres.raw = (freia_ptr) &reduc;
+  redres.size = sizeof(spoc_reduction);
+
+  ret = freia_cg_write_microcode(&mcode);
+  ret |= freia_cg_write_dynamic_param(&dynparam);
+
+  // actual call of spoc hardware
+  freia_cg_template_process_2i_2o(op, param, o0, NULL, i0, i1);
+
+  return ret;
+}
+
 ! new function
 
 freia_status freia_07(freia_data2d *o0, freia_data2d *o1, freia_data2d *i0, freia_data2d *i1, freia_data2d *i2, freia_data2d *i3)
@@ -308,8 +308,8 @@ freia_status freia_07(freia_data2d *o0, freia_data2d *o1, freia_data2d *i0, frei
    
    // o0 = inf(i0 + i1, i0) - i0
    // o1 = sup(i2 / i3, i3) | i3
-   freia_07_helper_1(o0, i0, i1);                                       /*0020*/
-   freia_07_helper_0(o1, i3, i2);                                       /*0021*/
+   freia_07_helper_0_0_0(o0, i0, i1);                                   /*0016*/
+   freia_07_helper_0_1_0(o1, i3, i2);                                   /*0017*/
 
    return FREIA_OK;                                                     /*0028*/
 }

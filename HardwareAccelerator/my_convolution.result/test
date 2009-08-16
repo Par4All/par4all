@@ -8,6 +8,9 @@ freia_status my_convolution(freia_data2d *o, freia_data2d *i0, int32_t *p0, uint
 
 ! accelerated function
 
+#include <freiaCommon.h>
+#include <freiaCoarseGrain.h>
+#include <spoc.h>
 
 ! new function
 

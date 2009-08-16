@@ -51,8 +51,8 @@ digraph "dag_cleaned_0" {
   "i" -> "7 add_const";
   "7 add_const" -> "o";
 }
-// graph for dag "freia_15_helper_0" of module "freia_15" in dot format
-digraph "freia_15_helper_0" {
+// graph for dag "freia_15_helper_0_0" of module "freia_15" in dot format
+digraph "freia_15_helper_0_0" {
   // inputs
   "i" [shape=box];
 
@@ -75,7 +75,7 @@ digraph "freia_15_helper_0" {
 #include <spoc.h>
 
 // FREIA-SPoC helper function for module freia_15
-freia_status freia_15_helper_0(freia_data2d * o0, freia_data2d * i0, int32_t * red0, int32_t * red1, int32_t * red2, int32_t cst3)
+freia_status freia_15_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, int32_t * red0, int32_t * red1, int32_t * red2, int32_t cst3)
 {
   spoc_instr si;
   spoc_param sp;
@@ -152,6 +152,6 @@ freia_status freia_15_helper_0(freia_data2d * o0, freia_data2d * i0, int32_t * r
 freia_status freia_15(freia_data2d *o, freia_data2d *i, int32_t *r0, int32_t *r1, int32_t *r2, int32_t c)
 {
    // test re ordering of mes
-   freia_15_helper_0(o, i, r0, r1, r2, c);                              /*0007*/
+   freia_15_helper_0_0_0(o, i, r0, r1, r2, c);                          /*0007*/
    return FREIA_OK;                                                     /*0011*/
 }

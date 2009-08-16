@@ -8,6 +8,9 @@ freia_status my_fast_correlation(freia_data2d *o, freia_data2d *i0, freia_data2d
 
 ! accelerated function
 
+#include <freiaCommon.h>
+#include <freiaCoarseGrain.h>
+#include <spoc.h>
 
 ! new function
 

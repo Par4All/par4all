@@ -88,21 +88,8 @@ digraph "dag_cleaned_0" {
   "i" -> "25 copy";
   "25 copy" -> "0`t3";
 }
-// graph for dag "freia_17_helper_0" of module "freia_17" in dot format
-digraph "freia_17_helper_0" {
-  // inputs
-  "i" [shape=box];
-
-  // outputs
-  "0`t5" [shape=box];
-
-  // computation vertices
-  "27 copy" [shape=circle];
-  "i" -> "27 copy";
-  "27 copy" -> "0`t5";
-}
-// graph for dag "freia_17_helper_1" of module "freia_17" in dot format
-digraph "freia_17_helper_1" {
+// graph for dag "freia_17_helper_0_0" of module "freia_17" in dot format
+digraph "freia_17_helper_0_0" {
   // inputs
   "i" [shape=box];
 
@@ -118,57 +105,25 @@ digraph "freia_17_helper_1" {
   "i" -> "25 copy";
   "25 copy" -> "0`t3";
 }
+// graph for dag "freia_17_helper_0_1" of module "freia_17" in dot format
+digraph "freia_17_helper_0_1" {
+  // inputs
+  "i" [shape=box];
+
+  // outputs
+  "0`t5" [shape=box];
+
+  // computation vertices
+  "27 copy" [shape=circle];
+  "i" -> "27 copy";
+  "27 copy" -> "0`t5";
+}
 #include <freiaCommon.h>
 #include <freiaCoarseGrain.h>
 #include <spoc.h>
 
 // FREIA-SPoC helper function for module freia_17
-freia_status freia_17_helper_0(freia_data2d * o0, freia_data2d * i0)
-{
-  spoc_instr si;
-  spoc_param sp;
-  spoc_reduction reduc;
-  freia_microcode mcode;
-  freia_dynamic_param dynparam;
-  freia_reduction_results redres;
-  freia_op_sel op = 0;
-  freia_op_param param;
-  freia_status ret;
-  int i;
-
-  // init pipe to nop
-  spoc_init_pipe(&si, &sp, 16);
-
-
-  // STAGE 0
-  // i [0 input 0] -> [0 input 0] 27 copy
-  // nope
-
-
-  // output image 0`t5 on 0
-  // 0`t5 [0 input 0] -> [0 output 0] 0 null
-  si.mux[0][0].op = SPOC_MUX_IN0;
-
-  mcode.raw = (freia_ptr) &si;
-  mcode.size = sizeof(spoc_instr);
-
-  dynparam.raw = (freia_ptr) &sp;
-  dynparam.size = sizeof(spoc_param);
-
-  redres.raw = (freia_ptr) &reduc;
-  redres.size = sizeof(spoc_reduction);
-
-  ret = freia_cg_write_microcode(&mcode);
-  ret |= freia_cg_write_dynamic_param(&dynparam);
-
-  // actual call of spoc hardware
-  freia_cg_template_process_2i_2o(op, param, o0, NULL, i0, NULL);
-
-  return ret;
-}
-
-// FREIA-SPoC helper function for module freia_17
-freia_status freia_17_helper_1(freia_data2d * o0, freia_data2d * o1, freia_data2d * i0)
+freia_status freia_17_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_data2d * i0)
 {
   spoc_instr si;
   spoc_param sp;
@@ -217,6 +172,51 @@ freia_status freia_17_helper_1(freia_data2d * o0, freia_data2d * o1, freia_data2
   return ret;
 }
 
+// FREIA-SPoC helper function for module freia_17
+freia_status freia_17_helper_0_1_0(freia_data2d * o0, freia_data2d * i0)
+{
+  spoc_instr si;
+  spoc_param sp;
+  spoc_reduction reduc;
+  freia_microcode mcode;
+  freia_dynamic_param dynparam;
+  freia_reduction_results redres;
+  freia_op_sel op = 0;
+  freia_op_param param;
+  freia_status ret;
+  int i;
+
+  // init pipe to nop
+  spoc_init_pipe(&si, &sp, 16);
+
+
+  // STAGE 0
+  // i [0 input 0] -> [0 input 0] 27 copy
+  // nope
+
+
+  // output image 0`t5 on 0
+  // 0`t5 [0 input 0] -> [0 output 0] 0 null
+  si.mux[0][0].op = SPOC_MUX_IN0;
+
+  mcode.raw = (freia_ptr) &si;
+  mcode.size = sizeof(spoc_instr);
+
+  dynparam.raw = (freia_ptr) &sp;
+  dynparam.size = sizeof(spoc_param);
+
+  redres.raw = (freia_ptr) &reduc;
+  redres.size = sizeof(spoc_reduction);
+
+  ret = freia_cg_write_microcode(&mcode);
+  ret |= freia_cg_write_dynamic_param(&dynparam);
+
+  // actual call of spoc hardware
+  freia_cg_template_process_2i_2o(op, param, o0, NULL, i0, NULL);
+
+  return ret;
+}
+
 ! new function
 
 freia_status freia_17(freia_data2d *, freia_data2d *i)
@@ -233,8 +233,8 @@ freia_status freia_17(freia_data2d *, freia_data2d *i)
    // t3 = t1
    // t4 = t0
    // t5 = o
-   freia_17_helper_1(t3, t4, i);                                        /*0026*/
-   freia_17_helper_0(t5, i);                                            /*0027*/
+   freia_17_helper_0_0_0(t3, t4, i);                                    /*0025*/
+   freia_17_helper_0_1_0(t5, i);                                        /*0027*/
 
    freia_common_destruct_data(t3);                                      /*0032*/
    freia_common_destruct_data(t4);                                      /*0033*/

@@ -34,8 +34,8 @@ digraph "dag_cleaned_0" {
   "i0" -> "5 mul_const";
   "5 mul_const" -> "o";
 }
-// graph for dag "my_mul_const_helper_0" of module "my_mul_const" in dot format
-digraph "my_mul_const_helper_0" {
+// graph for dag "my_mul_const_helper_0_0" of module "my_mul_const" in dot format
+digraph "my_mul_const_helper_0_0" {
   // inputs
   "i0" [shape=box];
 
@@ -52,7 +52,7 @@ digraph "my_mul_const_helper_0" {
 #include <spoc.h>
 
 // FREIA-SPoC helper function for module my_mul_const
-freia_status my_mul_const_helper_0(freia_data2d * o0, freia_data2d * i0, int32_t cst0)
+freia_status my_mul_const_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, int32_t cst0)
 {
   spoc_instr si;
   spoc_param sp;
@@ -104,5 +104,5 @@ freia_status my_mul_const_helper_0(freia_data2d * o0, freia_data2d * i0, int32_t
 
 freia_status my_mul_const(freia_data2d *o, freia_data2d *i0, int32_t p0)
 {
-   return my_mul_const_helper_0(o, i0, p0);                             /*0005*/
+   return my_mul_const_helper_0_0_0(o, i0, p0);                         /*0005*/
 }

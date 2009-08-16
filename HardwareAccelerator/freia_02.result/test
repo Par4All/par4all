@@ -64,8 +64,8 @@ digraph "dag_cleaned_0" {
   "i1" -> "13 div";
   "i0" -> "13 div";
 }
-// graph for dag "freia_02_helper_0" of module "freia_02" in dot format
-digraph "freia_02_helper_0" {
+// graph for dag "freia_02_helper_0_0" of module "freia_02" in dot format
+digraph "freia_02_helper_0_0" {
   // inputs
   "i0" [shape=box];
   "i1" [shape=box];
@@ -90,7 +90,7 @@ digraph "freia_02_helper_0" {
 #include <spoc.h>
 
 // FREIA-SPoC helper function for module freia_02
-freia_status freia_02_helper_0(freia_data2d * o0, freia_data2d * i0, freia_data2d * i1)
+freia_status freia_02_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, freia_data2d * i1)
 {
   spoc_instr si;
   spoc_param sp;
@@ -178,7 +178,7 @@ freia_status freia_02(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
    // t1 = i1 / i0
    // t2 = t1 + i0
    // o  = t2 ^ i0
-   freia_02_helper_0(o, i0, i1);                                        /*0015*/
+   freia_02_helper_0_0_0(o, i0, i1);                                    /*0013*/
 
    return FREIA_OK;                                                     /*0020*/
 }
