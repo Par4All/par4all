@@ -24,7 +24,7 @@
    efficient modification methods.
 
    The idea here is to speed-up concatenation of strings by keeping a
-   stack of string and delaying the final build-up of the global string up
+   stack of strings and delaying the final build-up of the global string up
    to an explicit call to the string_buffer_to_string() method.
 
    In this way, if we have s strings of c characters, the concatenation
@@ -40,20 +40,19 @@
 /* internally defined structure.
  * the string_buffer pointer type is defined in "newgen_string_buffer.h"
  */
-typedef struct __string_buffer_head
+struct __string_buffer_head
 {
   stack ins;
   boolean dup; // whether to duplicate strings
-}
-  _string_buffer_head;
+};
 
 /* allocate a new string buffer
  * @param dup tell whether to string duplicated appended strings
  * if so, the strings will be freed later.
  */
-string_buffer string_buffer_make (bool dup)
+string_buffer string_buffer_make(bool dup)
 {
-  string_buffer n = (string_buffer) malloc(sizeof(_string_buffer_head));
+  string_buffer n = (string_buffer) malloc(sizeof(struct __string_buffer_head));
   message_assert("allocated", n!=NULL);
   n->ins = stack_make(0, 0, 0);
   n->dup = dup;
@@ -88,14 +87,14 @@ void string_buffer_free(string_buffer *psb)
  */
 void string_buffer_free_all (string_buffer *psb)
 {
-  message_assert("null pointer", (*psb) != NULL);
+  message_assert("not null pointer", (*psb) != NULL);
   (*psb)->dup = true;
   string_buffer_free (psb);
 }
 
 /* return the size of the string in string_buffer sb
  */
-size_t string_buffer_size(string_buffer sb)
+size_t string_buffer_size(const string_buffer sb)
 {
   size_t size = 0;
   STACK_MAP_X(s, string, size+=strlen(s), sb->ins, 0);
@@ -104,18 +103,17 @@ size_t string_buffer_size(string_buffer sb)
 
 /* return whether string_buffer sb is empty.
  */
-bool string_buffer_empty_p(string_buffer sb)
+bool string_buffer_empty_p(const string_buffer sb)
 {
   return string_buffer_size(sb)==0;
 }
 
-/* return malloc'ed string from string buffer sb
+/* convert to a malloced string, maybe in rev-ersed order of the appends
  */
-string string_buffer_to_string(string_buffer sb)
+static string
+  string_buffer_to_string_internal(const string_buffer sb, bool rev)
 {
-  size_t bufsize = string_buffer_size(sb);
-
-  string buf = (string) malloc(bufsize+1);
+  string buf = (string) malloc(string_buffer_size(sb)+1);
   message_assert("allocated", buf!=NULL);
 
   int current = 0;
@@ -128,38 +126,27 @@ string string_buffer_to_string(string_buffer sb)
     current += len;
     buf[current] = '\0';
   },
-	      sb->ins, 0);
+	      sb->ins, rev);
 
   return buf;
+}
+/* return malloc'ed string from string buffer sb
+ */
+string string_buffer_to_string(const string_buffer sb)
+{
+  return string_buffer_to_string_internal(sb, false);
 }
 
 /* return malloc'ed string from string buffer sb going from bottom to top
  */
-string string_buffer_to_string_reverse (string_buffer sb)
+string string_buffer_to_string_reverse (const string_buffer sb)
 {
-  size_t bufsize = string_buffer_size(sb);
-
-  string buf = (string) malloc(bufsize+1);
-  message_assert("allocated", buf!=NULL);
-
-  int current = 0;
-  buf[current] = '\0';
-
-  STACK_MAP_X(s, string,
-  {
-    int len = strlen(s);
-    (void) memcpy(&buf[current], s, len);
-    current += len;
-    buf[current] = '\0';
-  },
-	      sb->ins, 1);
-
-  return buf;
+  return string_buffer_to_string_internal(sb, true);
 }
 
 /* put string buffer into file.
  */
-void string_buffer_to_file(string_buffer sb, FILE * out)
+void string_buffer_to_file(const string_buffer sb, FILE * out)
 {
   STACK_MAP_X(s, string, fputs(s, out), sb->ins, 0);
 }
@@ -167,7 +154,7 @@ void string_buffer_to_file(string_buffer sb, FILE * out)
 /* append string s (if non empty) to string buffer sb, the duplication
  * is done if needed according to the dup field.
  */
-void string_buffer_append(string_buffer sb, string s)
+void string_buffer_append(string_buffer sb, const string s)
 {
   if (*s) stack_push(sb->dup? strdup(s): s, sb->ins);
 }
@@ -177,7 +164,7 @@ void string_buffer_append(string_buffer sb, string s)
  * @param sb, the string buffer where to append the second string buffer
  * @param sb2, the string buffer to append to the fisrt string buffer
  */
-void string_buffer_append_sb(string_buffer sb, string_buffer sb2)
+void string_buffer_append_sb(string_buffer sb, const string_buffer sb2)
 {
   STACK_MAP_X(s, string, string_buffer_append(sb, s), sb2->ins, 0);
 }
@@ -188,23 +175,23 @@ void string_buffer_append_sb(string_buffer sb, string_buffer sb2)
  * @param sb, the string buffer where to append the whole list
  * @param l, the list of string to append to the string buffer
  */
-void string_buffer_append_list(string_buffer sb, list l)
+void string_buffer_append_list(string_buffer sb, const list l)
 {
-  FOREACH (STRING, s, l) {
+  FOREACH (string, s, l)
     string_buffer_append(sb, s);
-  }
 }
 
 #include <stdarg.h>
 
 /* append a NULL terminated list of string to sb.
  * @param sb string buffer to be appended to
- * @param next... appended strings
+ * @param first... appended strings
  */
-void string_buffer_cat(string_buffer sb, string next, ...)
+void string_buffer_cat(string_buffer sb, const string first, ...)
 {
   va_list args;
-  va_start(args, next);
+  va_start(args, first);
+  string next = first;
   while (next)
   {
     string_buffer_append(sb, next);
