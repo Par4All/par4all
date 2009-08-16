@@ -272,8 +272,8 @@ string safe_entity_name(entity e)
  * with the "null" entity which codes the constant. FC 28/11/94.
  * SG: should return a const pointer
  */
-/*const*/ string 
-entity_local_name(entity e)
+/*const*/ string
+entity_local_name(const entity e)
 {
     string null_name = "null";
     pips_assert("entity is defined", !entity_undefined_p(e));
