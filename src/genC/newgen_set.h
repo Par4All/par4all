@@ -129,9 +129,9 @@ extern set set_delfree_element(set, const set, const void *);
 extern void gen_set_closure_iterate(void (*)(void *, set), set, bool);
 extern void gen_set_closure(void (*)(void *, set), set);
 // CONVERSIONS
-extern string set_to_string(string, const set, string(*)(const void *));
-extern void set_fprint(FILE *, string, const set, string(*)(const void *));
-extern list set_to_sorted_list(const set, int (*)(const void *, const void *));
+extern string set_to_string(string, const set, gen_string_func_t);
+extern void set_fprint(FILE *, string, const set, gen_string_func_t);
+extern list set_to_sorted_list(const set, gen_cmp_func_t);
 // no not use set_to_list, the output is not deterministic
 extern list set_to_list(const set);
 

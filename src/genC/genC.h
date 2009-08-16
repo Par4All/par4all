@@ -69,6 +69,8 @@ typedef union gen_chunk {
   union gen_chunk * p;
 } gen_chunk, *gen_chunkp;
 
+typedef void *(gen_extract_func_t)(const gen_chunk);
+
 #define gen_chunk_undefined ((gen_chunk *)(-16))
 #define gen_chunk_undefined_p(c) ((c)==gen_chunk_undefined)
 
@@ -287,7 +289,7 @@ extern void gen_stop_recurse_ancestor_tracking();
 #define NEWGEN_CHECK_TYPE(dom, item)					\
   {									\
     _int __type = dom, __itype;						\
-    void * __item = item;						\
+    void * __item = (void *) item;					\
     message_assert("valid required domaine number",			\
 		   __type>0 && __type<MAX_DOMAIN);			\
     if (Domains[__type].domain &&					\

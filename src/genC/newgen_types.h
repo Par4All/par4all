@@ -84,6 +84,12 @@ typedef int unit ;
 
 typedef struct cons * list;
 
+// functional types
+typedef bool (*gen_filter_func_t)(const void *);
+typedef bool (*gen_filter2_func_t)(const void *, const void *);
+typedef string (*gen_string_func_t)(const void *);
+typedef int (*gen_cmp_func_t)(const void *, const void *);
+
 // obsolete?
 #ifdef __STRICT_ANSI__
 #define GEN_PROTO(x) x

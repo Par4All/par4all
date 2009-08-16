@@ -2780,9 +2780,9 @@ bool gen_false( __attribute__((unused)) gen_chunk * unused)
 }
 
 /** Just return the argument. */
-void * gen_identity(void * x)
+void * gen_identity(const void * x)
 {
-  return x;
+  return (void *) x;
 }
 
 /** Abort when called.
@@ -2790,9 +2790,8 @@ void * gen_identity(void * x)
    Useful in a gen_recurse if we want to be sure a type of object is not
    here for example.
 */
-void gen_core(void * p)
+void gen_core( __attribute__((unused)) void * p)
 {
-  message_assert("argument not used", p==p);
   abort();
 }
 
