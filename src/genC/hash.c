@@ -90,11 +90,11 @@ struct __hash_table {
 /* Private functions
  */
 static void hash_enlarge_table(hash_table htp);
-static hash_entry * hash_find_entry(hash_table htp,
+static hash_entry * hash_find_entry(const hash_table htp,
 				    const void * key,
-				    _uint *prank,
+				    _uint * prank,
 				    _uint * stats);
-static string hash_print_key(hash_key_type, const void*);
+static string hash_print_key(hash_key_type, const void *);
 
 static int hash_int_equal(const int, const int);
 static _uint hash_int_rank(const void*, size_t);
@@ -168,24 +168,24 @@ static size_t get_next_hash_table_size(size_t size)
 
 /* internal variable to know we should warm or not
  */
-static bool should_i_warn_on_redefinition = TRUE;
+static bool should_i_warn_on_redefinition = true;
 
 /* these function set the variable should_i_warn_on_redefinition
    to the value TRUE or FALSE */
 
 void hash_warn_on_redefinition(void)
 {
-    should_i_warn_on_redefinition = TRUE;
+  should_i_warn_on_redefinition = true;
 }
 
 void hash_dont_warn_on_redefinition(void)
 {
-    should_i_warn_on_redefinition = FALSE;
+  should_i_warn_on_redefinition = false;
 }
 
 bool hash_warn_on_redefinition_p(void)
 {
-    return should_i_warn_on_redefinition;
+  return should_i_warn_on_redefinition;
 }
 
 /* this function makes a hash table of size size. if size is less or
@@ -202,70 +202,71 @@ bool hash_warn_on_redefinition_p(void)
 
    No functionality has been used or tested for hash_type==hash_private.
  */
-hash_table hash_table_generic_make(hash_key_type key_type,
-				   size_t size,
-				   hash_equals_t private_equal_p,
-				   hash_rank_t private_rank)
+hash_table
+hash_table_generic_make(hash_key_type key_type,
+			size_t size,
+			hash_equals_t private_equal_p,
+			hash_rank_t private_rank)
 {
-    register size_t i;
-    hash_table htp;
+  size_t i;
+  hash_table htp;
 
-    if (size<HASH_DEFAULT_SIZE) size=HASH_DEFAULT_SIZE - 1;
-    /* get the next prime number in the table */
-    size = get_next_hash_table_size(size);
+  if (size<HASH_DEFAULT_SIZE) size=HASH_DEFAULT_SIZE - 1;
+  // get the next prime number in the table
+  size = get_next_hash_table_size(size);
 
-    htp = (hash_table) alloc(sizeof(struct __hash_table));
-    message_assert("allocated", htp);
+  htp = (hash_table) alloc(sizeof(struct __hash_table));
+  message_assert("allocated", htp);
 
-    htp->type = key_type;
-    htp->size = size;
-    htp->n_entry = 0;
-    htp->limit = hash_size_limit(size);
-    htp->array = (hash_entry*) alloc(size*sizeof(hash_entry));
+  htp->type = key_type;
+  htp->size = size;
+  htp->n_entry = 0;
+  htp->limit = hash_size_limit(size);
+  htp->array = (hash_entry*) alloc(size*sizeof(hash_entry));
 
-    /* initialize statistics */
-    htp->n_free_for_puts = 0;
-    htp->n_put = 0;
-    htp->n_get = 0;
-    htp->n_del = 0;
-    htp->n_upd = 0;
+  // initialize statistics
+  htp->n_free_for_puts = 0;
+  htp->n_put = 0;
+  htp->n_get = 0;
+  htp->n_del = 0;
+  htp->n_upd = 0;
 
-    htp->n_put_iter = 0;
-    htp->n_get_iter = 0;
-    htp->n_del_iter = 0;
-    htp->n_upd_iter = 0;
+  htp->n_put_iter = 0;
+  htp->n_get_iter = 0;
+  htp->n_del_iter = 0;
+  htp->n_upd_iter = 0;
 
-    for (i = 0; i < size; i++)
-	htp->array[i].key = HASH_ENTRY_FREE;
+  for (i = 0; i < size; i++)
+    htp->array[i].key = HASH_ENTRY_FREE;
 
-    switch(key_type)
-    {
-    case hash_string:
-	htp->equals = (int(*)(const void*,const void*)) hash_string_equal;
-	htp->rank = hash_string_rank;
-	break;
-    case hash_int:
-	htp->equals = (int(*)(const void*,const void*)) hash_int_equal;
-	htp->rank = hash_int_rank;
-	break;
-    case hash_chunk:
-	htp->equals = (int(*)(const void*,const void*)) hash_chunk_equal;
-	htp->rank = (_uint (*)(const void*, _uint)) hash_chunk_rank;
-	break;
-    case hash_pointer:
-	htp->equals = hash_pointer_equal;
-	htp->rank = hash_pointer_rank;
-	break;
-    case hash_private:
-	htp->equals = private_equal_p;
-	htp->rank = private_rank;
-	break;
-    default:
-	fprintf(stderr, "[make_hash_table] bad type %d\n", key_type);
-	abort();
-    }
+  switch(key_type)
+  {
+  case hash_string:
+    htp->equals = (int(*)(const void*,const void*)) hash_string_equal;
+    htp->rank = hash_string_rank;
+    break;
+  case hash_int:
+    htp->equals = (int(*)(const void*,const void*)) hash_int_equal;
+    htp->rank = hash_int_rank;
+    break;
+  case hash_chunk:
+    htp->equals = (int(*)(const void*,const void*)) hash_chunk_equal;
+    htp->rank = (_uint (*)(const void*, _uint)) hash_chunk_rank;
+    break;
+  case hash_pointer:
+    htp->equals = hash_pointer_equal;
+    htp->rank = hash_pointer_rank;
+    break;
+  case hash_private:
+    htp->equals = private_equal_p;
+    htp->rank = private_rank;
+    break;
+  default:
+    fprintf(stderr, "[make_hash_table] bad type %d\n", key_type);
+    abort();
+  }
 
-    return htp;
+  return htp;
 }
 
 hash_table hash_table_make(hash_key_type key_type, size_t size)
@@ -281,7 +282,7 @@ static size_t max_size_seen = 0;
 /* Clears all entries of a hash table HTP. [pj] */
 void hash_table_clear(hash_table htp)
 {
-  register hash_entry * p, * end ;
+  hash_entry * p, * end ;
 
   if (htp->size > max_size_seen) {
     max_size_seen = htp->size;
@@ -319,7 +320,7 @@ void hash_table_free(hash_table htp)
    assign HASH_UNDEFINED_VALUE, but they can always perform hash_del()
    to get the same result */
 
-void hash_put(hash_table htp, void * key, void * val)
+void hash_put(hash_table htp, const void * key, const void * val)
 {
   _uint rank;
   hash_entry * hep;
@@ -339,14 +340,14 @@ void hash_put(hash_table htp, void * key, void * val)
       (void) fprintf(stderr, "[hash_put] key redefined: %s\n",
 		     hash_print_key(htp->type, key));
     }
-    hep->val = val;
+    hep->val = (void *) val;
   }
   else {
     if (hep->key == HASH_ENTRY_FREE_FOR_PUT)
       htp->n_free_for_puts--;
     htp->n_entry += 1;
-    hep->key = key;
-    hep->val = val;
+    hep->key = (void *) key;
+    hep->val = (void *) val;
   }
 }
 
@@ -355,7 +356,7 @@ void hash_put(hash_table htp, void * key, void * val)
 void *
 hash_delget(
     hash_table htp,
-    void * key,
+    const void * key,
     void ** pkey)
 {
     hash_entry * hep;
@@ -390,7 +391,7 @@ hash_delget(
    couple whose key is equal to key. nothing is done if no such couple
    exists. ??? should I abort ? (FC)
  */
-void * hash_del(hash_table htp, void * key)
+void * hash_del(hash_table htp, const void * key)
 {
     void * tmp;
     return hash_delget(htp, key, &tmp);
@@ -400,7 +401,7 @@ void * hash_del(hash_table htp, void * key)
    couple whose key is equal to key. the HASH_UNDEFINED_VALUE pointer is
    returned if no such couple exists. otherwise the corresponding value
    is returned. */
-void * hash_get(hash_table htp, const void * key)
+void * hash_get(const hash_table htp, const void * key)
 {
   hash_entry * hep;
   _uint n;
@@ -425,14 +426,14 @@ void * hash_get(hash_table htp, const void * key)
 
 /* TRUE if key has e value in htp.
  */
-bool hash_defined_p(hash_table htp, void * key)
+bool hash_defined_p(const hash_table htp, const void * key)
 {
-    return(hash_get(htp, key)!=HASH_UNDEFINED_VALUE);
+  return hash_get(htp, key)!=HASH_UNDEFINED_VALUE;
 }
 
 /* update key->val in htp, that MUST be pre-existent.
  */
-void hash_update(hash_table htp, void * key, void * val)
+void hash_update(hash_table htp, const void * key, const void * val)
 {
   hash_entry * hep;
   _uint n;
@@ -445,7 +446,7 @@ void hash_update(hash_table htp, void * key, void * val)
 
   message_assert("no previous entry", htp->equals(hep->key, key));
 
-  hep->val = val ;
+  hep->val = (void *) val;
 }
 
 /* this function prints the header of the hash_table pointed to by htp
@@ -805,39 +806,39 @@ int hash_table_own_allocated_memory(hash_table htp)
 /***************************************************************** MAP STUFF */
 /* newgen mapping to newgen hash...
  */
-void * hash_map_get(hash_table h, void * k)
+void * hash_map_get(const hash_table h, const void * k)
 {
   gen_chunk key, * val;
-  key.e = k;
-  val = (gen_chunk*)hash_get(h, &key);
+  key.e = (void *) k;
+  val = (gen_chunk*) hash_get(h, &key);
   if (val==HASH_UNDEFINED_VALUE)
     fatal("no value correspond to key %p", k);
   return val->e;
 }
 
-bool hash_map_defined_p(hash_table h, void * k)
+bool hash_map_defined_p(const hash_table h, const void * k)
 {
   gen_chunk key;
-  key.e = k;
+  key.e = (void *) k;
   return hash_defined_p(h, &key);
 }
 
-void hash_map_put(hash_table h, void * k, void * v)
+void hash_map_put(hash_table h, const void * k, const void * v)
 {
   gen_chunk
     * key = (gen_chunk*) alloc(sizeof(gen_chunk)),
     * val = (gen_chunk*) alloc(sizeof(gen_chunk));
-  key->e = k;
-  val->e = v;
+  key->e = (void *) k;
+  val->e = (void *) v;
   hash_put(h, key, val);
 }
 
-void * hash_map_del(hash_table h, void * k)
+void * hash_map_del(hash_table h, const void * k)
 {
   gen_chunk key, * oldkeychunk, * val;
   void * result;
 
-  key.e = k;
+  key.e = (void *) k;
   val = hash_delget(h, &key, (void**) &oldkeychunk);
   message_assert("defined value (entry to delete must be defined!)",
 		 val!=HASH_UNDEFINED_VALUE);
@@ -852,7 +853,7 @@ void * hash_map_del(hash_table h, void * k)
   return result;
 }
 
-void hash_map_update(hash_table h, void * k, void * v)
+void hash_map_update(hash_table h,  const void * k, const void * v)
 {
   hash_map_del(h, k);
   hash_map_put(h, k, v);

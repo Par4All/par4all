@@ -29,8 +29,8 @@
    pointers and Newgen chunks. The user can provide his/her own
    functions by using hash_private. */
 typedef enum hash_key_type {
-  hash_string, hash_int, hash_pointer, hash_chunk, hash_private } hash_key_type;
-
+  hash_string, hash_int, hash_pointer, hash_chunk, hash_private
+} hash_key_type;
 
 /* Define hash_table structure which is hidden.
  * The only thing we know about it is that the entries are in an array
@@ -42,7 +42,7 @@ typedef enum hash_key_type {
 
 typedef struct __hash_table *hash_table;
 typedef _uint (* hash_rank_t)(const void *, size_t);
-typedef  int (* hash_equals_t)(const void *, const void *);
+typedef int (* hash_equals_t)(const void *, const void *);
 
 /* Value of an undefined hash_table
  */
@@ -69,65 +69,68 @@ typedef  int (* hash_equals_t)(const void *, const void *);
     }									\
   }
 
-/* Let's define a new version of
- * hash_put_or_update() using the warn_on_redefinition
- */
-
+// hash_put_or_update() uses the warn_on_redefinition
 #define hash_put_or_update(h, k, v)			\
-if (hash_warn_on_redefinition_p() == TRUE)		\
-{							\
+  if (hash_warn_on_redefinition_p())			\
+  {							\
     hash_dont_warn_on_redefinition();			\
-    hash_put((hash_table)h, (void*)k, (void*)v);	\
+    hash_put((hash_table) h, (void *) k, (void *) v);	\
     hash_warn_on_redefinition();			\
-} else							\
-    hash_put((hash_table)h, (void*)k, (void*)v);
+  } else						\
+    hash_put((hash_table) h, (void *) k, (void *) v);
 
-/* functions declared in hash.c
- */
-extern void hash_warn_on_redefinition GEN_PROTO((void));
-extern void hash_dont_warn_on_redefinition GEN_PROTO((void));
-extern void * hash_delget GEN_PROTO((hash_table, void *, void **));
-extern void * hash_del GEN_PROTO((hash_table, void *));
-extern void * hash_get GEN_PROTO((hash_table, const void *));
-extern bool hash_defined_p GEN_PROTO((hash_table, void *));
-extern void hash_put GEN_PROTO((hash_table, void *, void *));
-extern void hash_table_clear GEN_PROTO((hash_table));
-extern void hash_table_free GEN_PROTO((hash_table));
-extern hash_table hash_table_make GEN_PROTO((hash_key_type key_type,
-					     size_t size));
-extern hash_table hash_table_generic_make GEN_PROTO((hash_key_type key_type,
-						     size_t size,
-						     hash_equals_t equals_p,
-						     hash_rank_t rank));
-extern void hash_table_print_header GEN_PROTO((hash_table, FILE *));
-extern void hash_table_print GEN_PROTO((hash_table));
-extern void hash_table_fprintf GEN_PROTO((FILE *, char *(*)(),
-					  char *(*)(), hash_table));
-extern void hash_update GEN_PROTO((hash_table, void *, void*));
-extern bool hash_warn_on_redefinition_p GEN_PROTO((void));
+// functions implemented in hash.c
 
-extern int hash_table_entry_count GEN_PROTO((hash_table));
-extern int hash_table_size GEN_PROTO((hash_table));
-extern int hash_table_own_allocated_memory GEN_PROTO((hash_table));
-extern hash_key_type hash_table_type GEN_PROTO((hash_table));
-extern void * hash_table_scan GEN_PROTO((hash_table,
-					 void *,
-					 void **,
-					 void **));
+// MISC
+extern void hash_warn_on_redefinition(void);
+extern void hash_dont_warn_on_redefinition(void);
+extern bool hash_warn_on_redefinition_p(void);
 
-/* map stuff */
-extern void * hash_map_get GEN_PROTO((hash_table, void *));
-extern void hash_map_put GEN_PROTO((hash_table, void *, void *));
-extern void hash_map_update GEN_PROTO((hash_table, void *, void *));
-extern void * hash_map_del GEN_PROTO((hash_table, void *));
-extern bool hash_map_defined_p GEN_PROTO((hash_table, void *));
+// CONSTRUCTORS
+extern hash_table hash_table_generic_make(hash_key_type key_type,
+					  size_t size,
+					  hash_equals_t equals_p,
+					  hash_rank_t rank);
+extern hash_table hash_table_make(hash_key_type key_type, size_t size);
 
-/* These two types could/should be declared and used earlier */
-extern hash_equals_t hash_table_equals_function(hash_table h);
-extern hash_rank_t hash_table_rank_function(hash_table h);
+// DESTRUCTOR
+extern void hash_table_free(hash_table);
+
+// OPERATIONS
+extern void hash_table_clear(hash_table);
+extern void * hash_delget(hash_table, const void *, void **);
+extern void * hash_del(hash_table, const void *);
+extern void * hash_get(const hash_table, const void *);
+extern void hash_put(hash_table, const void *, const void *);
+extern void hash_update(hash_table, const void *, const void *);
+extern bool hash_defined_p(const hash_table, const void *);
+
+// DUMP
+extern void hash_table_print_header(const hash_table, FILE *);
+extern void hash_table_print(const hash_table);
+extern void hash_table_fprintf(FILE *, string(*)(void*),
+			       string(*)(void*), const hash_table);
+
+// OBSERVERS
+extern int hash_table_entry_count(const hash_table);
+extern int hash_table_size(const hash_table);
+extern int hash_table_own_allocated_memory(const hash_table);
+extern hash_key_type hash_table_type(const hash_table);
+extern hash_equals_t hash_table_equals_function(const hash_table);
+extern hash_rank_t hash_table_rank_function(const hash_table);
+extern void * hash_table_scan(const hash_table, void *, void **, void **);
+
+// MAP STUFF (for newgen generated code based on hash tables)
+extern void * hash_map_get(const hash_table, const void *);
+extern void hash_map_put(hash_table, const void *, const void *);
+extern void hash_map_update(hash_table, const void *, const void *);
+extern void * hash_map_del(const hash_table, const void *);
+extern bool hash_map_defined_p(const hash_table, const void *);
+
+// UTILS
 extern _uint hash_string_rank(const void *, size_t);
 
-#endif /* newgen_hash_included */
+#endif // newgen_hash_included
 
 /*  that is all
  */

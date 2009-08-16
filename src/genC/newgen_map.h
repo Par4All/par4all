@@ -27,16 +27,16 @@
  * These are the functions defined in the Newgen map library. 
  */
 
-#define HASH_GET(start,image,h,k)		\
-  hash_map_get((h), (void*)(k))
-#define HASH_BOUND_P(start, image, h, k)	\
-  hash_map_defined_p((h), (void*)(k))
-#define HASH_UPDATE(start,image,h,k,v)		\
-  hash_map_update((h), (void*)(k), (void*)(v))
-#define HASH_EXTEND(start,image,h,k,v)		\
-  hash_map_put((h), (void*)(k), (void*)(v))
+#define HASH_GET(start,image,h,k)				\
+  hash_map_get((const hash_table)(h), (const void *)(k))
+#define HASH_BOUND_P(start, image, h, k)			\
+  hash_map_defined_p((const hash_table)(h), (const void *)(k))
+#define HASH_UPDATE(start,image,h,k,v)				\
+  hash_map_update((h), (const void *)(k), (const void *)(v))
+#define HASH_EXTEND(start,image,h,k,v)				\
+  hash_map_put((h), (const void *)(k), (const void *)(v))
 #define HASH_DELETE(start,image,h,k)		\
-  hash_map_del((h), (void*)(k))
+  hash_map_del((h), (const void *)(k))
 
 #define FUNCTION_MAP(typename, start, image, k, v, code, fun)		\
   {									\
