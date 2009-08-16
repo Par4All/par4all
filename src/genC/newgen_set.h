@@ -99,40 +99,40 @@ typedef enum {
 // CONSTRUCTORS
 extern set set_generic_make(set_type, hash_equals_t, hash_rank_t);
 extern set set_make(set_type);
-extern set set_singleton(set_type, void *);
-extern set set_dup(set);
+extern set set_singleton(set_type, const void *);
+extern set set_dup(const set);
 // DESTRUCTOR
 extern void set_free(set);
 // OBSERVERS
-extern int set_size(set);
-extern int set_own_allocated_memory(set);
-extern set_type set_get_type(set);
+extern int set_size(const set);
+extern int set_own_allocated_memory(const set);
+extern set_type set_get_type(const set);
 // do not call this one, please...
-extern hash_table set_private_get_hash_table(set);
+extern hash_table set_private_get_hash_table(const set);
 // TESTS
-extern bool set_belong_p(set s, void *e);
-extern bool list_in_set_p(list, set);
-extern bool set_equal_p(set, set);
-extern bool set_empty_p(set);
-extern bool set_inclusion_p(set, set);
+extern bool set_belong_p(const set, const void *);
+extern bool list_in_set_p(const list, const set);
+extern bool set_equal_p(const set, const set);
+extern bool set_empty_p(const set);
+extern bool set_inclusion_p(const set, const set);
 // OPERATIONS
 extern set set_clear(set);
-extern set set_assign(set, set);
-extern set set_append_list(set, list);
-extern set set_assign_list(set, list);
-extern set set_add_element(set, set, void *);
-extern set set_union(set, set, set);
-extern set set_intersection(set, set, set);
-extern set set_difference(set, set, set);
-extern set set_del_element(set, set, void *);
-extern set set_delfree_element(set, set, void *);
+extern set set_assign(set, const set);
+extern set set_append_list(set, const list);
+extern set set_assign_list(set, const list);
+extern set set_add_element(set, const set, const void *);
+extern set set_union(set, const set, const set);
+extern set set_intersection(set, const set, const set);
+extern set set_difference(set, const set, const set);
+extern set set_del_element(set, const set, const void *);
+extern set set_delfree_element(set, const set, const void *);
 extern void gen_set_closure_iterate(void (*)(void *, set), set, bool);
 extern void gen_set_closure(void (*)(void *, set), set);
 // CONVERSIONS
-extern string set_to_string(string, set, string(*)(void *));
-extern void set_fprint(FILE *, string, set, string(*)(void *));
-extern list set_to_sorted_list(set, int (*)(const void *, const void *));
+extern string set_to_string(string, const set, string(*)(const void *));
+extern void set_fprint(FILE *, string, const set, string(*)(const void *));
+extern list set_to_sorted_list(const set, int (*)(const void *, const void *));
 // no not use set_to_list, the output is not deterministic
-extern list set_to_list(set);
+extern list set_to_list(const set);
 
 #endif // SET_INCLUDED

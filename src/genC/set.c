@@ -53,14 +53,14 @@ struct _set_chunk {
 
 /* return the internal hash table of set s
  */
-hash_table set_private_get_hash_table(set s)
+hash_table set_private_get_hash_table(const set s)
 {
   return s->table;
 }
 
 /* return the type of set s
  */
-set_type set_get_type(set s)
+set_type set_get_type(const set s)
 {
   return s->type;
 }
@@ -95,13 +95,12 @@ set set_make(set_type typ)
  *
  * use set_add_element() instead for hash_private
  */
-set set_singleton(set_type type, void * p)
+set set_singleton(set_type type, const void * p)
 {
   set s = set_make( type ) ;
   hash_put( s->table, p, p ) ;
   return s;
 }
-
 
 /* Assign a set with the content of another set.
 
@@ -112,7 +111,7 @@ set set_singleton(set_type type, void * p)
 
    @return the target set.
 */
-set set_assign(set s1, set s2)
+set set_assign(set s1, const set s2)
 {
   if (s1 == s2) {
     return s1;
@@ -126,7 +125,7 @@ set set_assign(set s1, set s2)
 
 /* @return duplicated set
  */
-set set_dup(set s)
+set set_dup(const set s)
 {
   set n = set_make(s->type);
   HASH_MAP(k, v, hash_put(n->table, k, v ), s->table);
@@ -135,7 +134,7 @@ set set_dup(set s)
 
 /* @return s1 = s2 u { e }.
  */
-set set_add_element(set s1, set s2, void * e)
+set set_add_element(set s1, const set s2, const void * e)
 {
   if( s1 == s2 ) {
     if (! set_belong_p(s1, e))
@@ -153,16 +152,16 @@ set set_add_element(set s1, set s2, void * e)
 
 /* @return whether e \in s.
  */
-bool set_belong_p(set s, void * e)
+bool set_belong_p(const set s, const void * e)
 {
   return hash_get(s->table, e) != HASH_UNDEFINED_VALUE;
 }
 
 /* @return whether all items in l are in s
  */
-bool list_in_set_p(list l, set s)
+bool list_in_set_p(const list l, const set s)
 {
-  FOREACH(CHUNK, c, l)
+  FOREACH(chunk, c, l)
     if (!set_belong_p(s, c))
       return false;
   return true;
@@ -170,7 +169,7 @@ bool list_in_set_p(list l, set s)
 
 /* @return s1 = s2 u s3.
  */
-set set_union(set s1, set s2, set s3)
+set set_union(set s1, const set s2, const set s3)
 {
   if( s1 != s3 ) {
     set_assign(s1, s2) ;
@@ -184,7 +183,7 @@ set set_union(set s1, set s2, set s3)
 
 /* @return s1 = s2 n s3.
  */
-set set_intersection(set s1, set s2, set s3)
+set set_intersection(set s1, const set s2, const set s3)
 {
   if( s1 != s2 && s1 != s3 ) {
     set_clear( s1 ) ;
@@ -211,7 +210,7 @@ set set_intersection(set s1, set s2, set s3)
 
 /* @return s1 = s2 - s3.
  */
-set set_difference(set s1, set s2, set s3)
+set set_difference(set s1, const set s2, const set s3)
 {
   set_assign(s1, s2);
   HASH_MAP(k, ignore, hash_del(s1->table, k), s3->table);
@@ -220,7 +219,7 @@ set set_difference(set s1, set s2, set s3)
 
 /* @return s1 = s2 - { e }.
  */
-set set_del_element(set s1, set s2, void * e)
+set set_del_element(set s1, const set s2, const void * e)
 {
   set_assign( s1, s2 ) ;
   hash_del( s1->table, e );
@@ -231,7 +230,7 @@ set set_del_element(set s1, set s2, void * e)
  *
  * FI:Confusing for Newgen users because gen_free() is expected?
  */
-set set_delfree_element(set s1, set s2, void * e)
+set set_delfree_element(set s1, const set s2, const void * e)
 {
   void * pe;
   set_assign(s1, s2);
@@ -240,9 +239,9 @@ set set_delfree_element(set s1, set s2, void * e)
   return s1;
 }
 
-/* return whether s1 \in s2
+/* return whether s1 \included s2
  */
-bool set_inclusion_p(set s1, set s2)
+bool set_inclusion_p(const set s1, const set s2)
 {
   if (s1==s2) return true;
   SET_FOREACH(void *, i, s1)
@@ -253,7 +252,7 @@ bool set_inclusion_p(set s1, set s2)
 
 /* returns whether s1 == s2
  */
-bool set_equal_p(set s1, set s2)
+bool set_equal_p(const set s1, const set s2)
 {
   if (s1==s2) return true;
   return set_size(s1)==set_size(s2) &&
@@ -277,7 +276,7 @@ void set_free(set s)
 
 /* returns the number of items in s.
  */
-int set_size(set s)
+int set_size(const set s)
 {
   return hash_table_entry_count(s->table);
 }
@@ -285,7 +284,7 @@ int set_size(set s)
 /* tell whether set s is empty.
  * returnn s=={}
  */
-bool set_empty_p(set s)
+bool set_empty_p(const set s)
 {
   return set_size(s)==0;
 }
@@ -336,13 +335,12 @@ void gen_set_closure_iterate(void (*iterate)(void *, set),
  * that does not go twice in the same object.
  * FC 27/10/95.
  */
-void gen_set_closure(void (*iterate)(void *, set),
-		     set initial)
+void gen_set_closure(void (*iterate)(void *, set), set initial)
 {
   gen_set_closure_iterate(iterate, initial, TRUE);
 }
 
-int set_own_allocated_memory(set s)
+int set_own_allocated_memory(const set s)
 {
   return sizeof(struct _set_chunk)+hash_table_own_allocated_memory(s->table);
 }
@@ -355,7 +353,7 @@ int set_own_allocated_memory(set s)
  *
  * @return an allocated list of elements from s
  */
-list set_to_list(set s)
+list set_to_list(const set s)
 {
   list l =NIL;
   SET_FOREACH(void *, v, s)
@@ -366,7 +364,7 @@ list set_to_list(set s)
 /* @return a sorted list from a set.
  * provide comparison function as gen_sort_list, which calls "qsort".
  */
-list set_to_sorted_list(set s, int (*cmp)(const void *,const void *))
+list set_to_sorted_list(const set s, int (*cmp)(const void *,const void *))
 {
   list l = set_to_list(s);
   gen_sort_list(l, cmp);
@@ -379,9 +377,9 @@ list set_to_sorted_list(set s, int (*cmp)(const void *,const void *))
  * @param s modified set
  * @param l provided list
  */
-set set_append_list(set s, list l)
+set set_append_list(set s, const list l)
 {
-  FOREACH(CHUNK, i, l)
+  FOREACH(chunk, i, l)
     set_add_element(s, s, i);
   return s;
 }
@@ -393,7 +391,7 @@ set set_append_list(set s, list l)
  * @param s set being assigned to.
  * @param l list to turn into a set
  */
-set set_assign_list(set s, list l)
+set set_assign_list(set s, const list l)
 {
   set_clear(s);
   return set_append_list(s, l);
@@ -407,7 +405,7 @@ set set_assign_list(set s, list l)
  * used internally, but may be exported if needed.
  */
 static string_buffer
-set_to_string_buffer(string name, set s, string(*item_name)(void *))
+set_to_string_buffer(string name, const set s, string(*item_name)(const void *))
 {
   string_buffer sb = string_buffer_make(true);
   if (name)
@@ -432,7 +430,8 @@ set_to_string_buffer(string name, set s, string(*item_name)(void *))
  * @param s the set
  * @param item_name user function to build a string for each item
  */
-string set_to_string(string name, set s, string (*item_name)(void *))
+string set_to_string
+  (string name, const set s, string (*item_name)(const void *))
 {
   string_buffer sb = set_to_string_buffer(name, s, item_name);
   string res = string_buffer_to_string(sb);
@@ -442,7 +441,8 @@ string set_to_string(string name, set s, string (*item_name)(void *))
 
 /* print set s to file stream out.
  */
-void set_fprint(FILE * out, string name, set s, string(*item_name)(void *))
+void set_fprint
+  (FILE * out, string name, const set s, string(*item_name)(const void *))
 {
   string_buffer sb = set_to_string_buffer(name, s, item_name);
   string_buffer_to_file(sb, out);
