@@ -32,12 +32,10 @@ digraph "dag_0" {
   "10 or" [shape=circle];
   "10 or" -> "11 addsat";
   "i0" -> "10 or";
-  "10 or" -> "o";
   "9 div" [shape=circle];
   "9 div" -> "10 or";
   "i0" -> "9 div";
   "i1" -> "9 div";
-  "9 div" -> "o";
 }
 // graph for dag "dag_cleaned_0" of module "freia_22" in dot format
 digraph "dag_cleaned_0" {
@@ -55,12 +53,10 @@ digraph "dag_cleaned_0" {
   "10 or" [shape=circle];
   "10 or" -> "11 addsat";
   "i0" -> "10 or";
-  "10 or" -> "o";
   "9 div" [shape=circle];
   "9 div" -> "10 or";
   "i0" -> "9 div";
   "i1" -> "9 div";
-  "9 div" -> "o";
 }
 // graph for dag "freia_22_helper_0_0" of module "freia_22" in dot format
 digraph "freia_22_helper_0_0" {
@@ -78,12 +74,10 @@ digraph "freia_22_helper_0_0" {
   "10 or" [shape=circle];
   "10 or" -> "11 addsat";
   "i0" -> "10 or";
-  "10 or" -> "o";
   "9 div" [shape=circle];
   "9 div" -> "10 or";
   "i0" -> "9 div";
   "i1" -> "9 div";
-  "9 div" -> "o";
 }
 #include <freiaCommon.h>
 #include <freiaCoarseGrain.h>
