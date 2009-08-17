@@ -230,7 +230,7 @@ entity make_temporary_scalar_entity(entity efrom, expression from)
  * calling module inlied_module
  */
 static
-instruction inline_expression_call(expression modified_expression, call callee)
+statement inline_expression_call(expression modified_expression, call callee)
 {
 
     /* only inline the right call */
@@ -269,6 +269,7 @@ instruction inline_expression_call(expression modified_expression, call callee)
      * no need to change all entities in the new statements, because we build a new text ressource latter
      */
     statement expanded = copy_statement(inlined_module_statement);
+    statement declaration_holder = expanded;
     statement_declarations(expanded) = gen_full_copy_list( statement_declarations(expanded) ); // simple copy != deep copy
 
     /* fix block status */
@@ -381,8 +382,7 @@ instruction inline_expression_call(expression modified_expression, call callee)
 
 
             /* add the entity to our list */
-			//AddLocalEntityToDeclarations(new,get_current_module_entity(),expanded);
-			statement_declarations(expanded)=gen_nconc(CONS(ENTITY,new,NIL), statement_declarations(expanded));
+			statement_declarations(declaration_holder)=gen_nconc(CONS(ENTITY,new,NIL), statement_declarations(declaration_holder));
             gen_context_recurse(expanded, new, statement_domain, gen_true, &solve_name_clashes);
             replace_entity(expanded,e,new);
         }
@@ -461,11 +461,7 @@ reget:
      */
     gen_recurse(expanded,statement_domain,gen_true,fix_sequence_statement_attributes_if_sequence);
     gen_recurse(expanded,expression_domain,gen_true,reset_expression_normalized);
-    unstructured u = control_graph(expanded);
-    instruction ins = make_instruction_unstructured(u);
-
-    return ins;
-
+    return expanded;
 }
 
 
@@ -479,10 +475,10 @@ void inline_expression(expression expr, list * new_instructions)
         call callee = syntax_call(expression_syntax(expr));
         if( inline_should_inline( callee ) )
         {
-                instruction i = inline_expression_call( expr, callee );
-                if( !instruction_undefined_p(i) )
+                statement s = inline_expression_call( expr, callee );
+                if( !statement_undefined_p(s) )
                 {
-                    *new_instructions = CONS(STATEMENT, instruction_to_statement(i), *new_instructions);
+                    *new_instructions = CONS(STATEMENT, s, *new_instructions);;
                 }
         }
     }
@@ -581,22 +577,10 @@ inline_calls(char * module)
     /* inline all calls to inlined_module */
     gen_recurse(modified_module_statement, statement_domain, gen_true, &inline_statement_switcher);
 
-    /* perform restructuring and cleaning
-     * SG: this may not be needed ...
-     */
     DB_PUT_MEMORY_RESOURCE(DBR_CODE, module, modified_module_statement);
     DB_PUT_MEMORY_RESOURCE(DBR_CALLEES, module, compute_callees(modified_module_statement));
     reset_current_module_entity();
     reset_current_module_statement();
-
-    /* restucture the generated unstructured statement */
-    if(!restructure_control(module))
-        pips_user_warning("failed to restructure after inlining");
-
-    /* we can try to remove some labels now*/
-    if( get_bool_property("INLINING_PURGE_LABELS"))
-    	if(!remove_useless_label(module))
-        	pips_user_warning("failed to remove useless labels after restructure_control in inlining");
 }
 
 /** 
@@ -644,6 +628,10 @@ bool do_inlining(char * module_name)
    {
        inline_calls( caller_name );
        recompile_module(caller_name);
+       /* we can try to remove some labels now*/
+       if( get_bool_property("INLINING_PURGE_LABELS"))
+           if(!remove_useless_label(caller_name))
+               pips_user_warning("failed to remove useless labels after restructure_control in inlining");
    }
 
    if(use_effects) reset_cumulated_rw_effects();
@@ -759,6 +747,10 @@ bool do_unfolding(char* module_name)
     {
         set_add_element(unfolding_filters, unfolding_filters, filter_name);
         recompile_module(module_name);
+        /* we can try to remove some labels now*/
+        if( get_bool_property("INLINING_PURGE_LABELS"))
+            if(!remove_useless_label(module_name))
+                pips_user_warning("failed to remove useless labels after restructure_control in inlining");
     }
 
     /* parse callee property */
@@ -794,6 +786,10 @@ bool do_unfolding(char* module_name)
         {
             SET_MAP(call_name, run_inlining(module_name,(string)call_name) ,calls_name);
             recompile_module(module_name);
+            /* we can try to remove some labels now*/
+            if( get_bool_property("INLINING_PURGE_LABELS"))
+                if(!remove_useless_label(module_name))
+                    pips_user_warning("failed to remove useless labels after restructure_control in inlining");
         }
         set_free(calls_name);
     } while(statement_has_callee);

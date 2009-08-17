@@ -1122,6 +1122,7 @@ remove_useless_label(char* module_name)
            statement_domain, gen_true, statement_remove_useless_label,
            unstructured_domain, gen_false,gen_null,
            NULL);
+   clean_up_sequences(module_statement);
 
    module_reorder(module_statement);
    DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, module_statement);
