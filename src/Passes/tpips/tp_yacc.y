@@ -35,7 +35,7 @@
 %token TK_CDIR TK_INFO TK_PWD TK_HELP TK_SHOW TK_SOURCE
 %token TK_SHELL TK_ECHO TK_UNKNOWN
 %token TK_QUIT TK_EXIT
-%token TK_LINE TK_CHECKACTIVE TK_VERSION
+%token TK_LINE TK_CHECKACTIVE TK_VERSION TK_TOUCH
 
 %token TK_OWNER_NAME
 %token TK_OWNER_ALL
@@ -60,7 +60,7 @@
 %type <status> i_open i_create i_close i_delete i_module i_make i_pwd i_source
 %type <status> i_apply i_activate i_display i_get i_setenv i_getenv i_cd i_rm
 %type <status> i_info i_shell i_echo i_setprop i_quit i_exit i_help i_capply
-%type <status> i_checkpoint i_show i_unknown i_checkactive
+%type <status> i_checkpoint i_show i_unknown i_checkactive i_touch
 %type <name> rulename filename propname phasename resourcename workspace_name
 %type <array> filename_list
 %type <rn> resource_id rule_id
@@ -211,6 +211,20 @@ static bool remove_a_resource(string rname, string mname)
     else
 	pips_user_warning("no resource %s[%s] to delete.\n", rname, mname);
     return TRUE;
+}
+
+/* tell pipsdbm that the resource is up to date.
+ * may be useful if some transformations are applied
+ * which do not change the results of some analyses.
+ * under the responsability of the user, obviously...
+ */
+static bool touch_a_resource(string rname, string mname)
+{
+  if (db_resource_p(rname, mname))
+    db_touch_resource(rname, mname);
+  else
+    pips_user_warning("no resource %s[%s] to delete.\n", rname, mname);
+  return true;
 }
 
 static bool just_show(string rname, string mname)
@@ -480,6 +494,7 @@ command: TK_ENDOFLINE { /* may be empty! */ }
 	| i_version
 	| i_exit
 	| i_help
+	| i_touch
 	| i_unknown
 	| error {$$ = FALSE;}
 	;
@@ -813,6 +828,13 @@ i_display: TK_DISPLAY resource_id TK_ENDOFLINE
 	{
 	    pips_debug(7,"reduce rule i_display\n");
 	    $$ = perform(display_a_resource, &$2);
+	}
+	;
+
+i_touch: TK_TOUCH resource_id TK_ENDOFLINE
+	{
+	  pips_debug(7, "reduce rule i_touch\n");
+	  $$ = perform(touch_a_resource, &$2);
 	}
 	;
 

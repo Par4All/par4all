@@ -234,22 +234,22 @@ static db_resource get_resource(string rname, db_owned_resources or)
 
 static db_resource get_db_resource(string rname, string oname)
 {
-    db_owned_resources or;
+  db_owned_resources or;
+  or = get_db_owned_resources(oname);
+  if (db_owned_resources_undefined_p(or)) { /* lazy... */
+    pips_debug(1, "creating or for %s...\n", oname);
+    init_owned_resources_if_necessary(oname);
     or = get_db_owned_resources(oname);
-    if (db_owned_resources_undefined_p(or)) { /* lazy... */ 
-	pips_debug(1, "creating or for %s...\n", oname);
-	init_owned_resources_if_necessary(oname);
-	or = get_db_owned_resources(oname);
-    } /* pips_internal_error("no owned resources for %s\n", oname, rname);*/
-    return get_resource(rname, or);
+  } /* pips_internal_error("no owned resources for %s\n", oname, rname);*/
+  return get_resource(rname, or);
 }
 
 static db_resource get_real_db_resource(string rname, string oname)
 {
-    db_resource r = get_db_resource(rname, oname);
-    if (db_resource_undefined_p(r) || db_resource_required_p(r))
-	pips_internal_error("no resource %s of %s\n", rname, oname);
-    return r;
+  db_resource r = get_db_resource(rname, oname);
+  if (db_resource_undefined_p(r) || db_resource_required_p(r))
+    pips_internal_error("no resource %s of %s\n", rname, oname);
+  return r;
 }
 
 static db_resource find_or_create_db_resource(string rname, string oname)
@@ -431,7 +431,7 @@ void db_print_all_required_resources(FILE * file)
 		   get_pips_database());
 
   /* then sort, dump and free */
-  gen_sort_list(lres, tmp_result_cmp);
+  gen_sort_list(lres, (gen_cmp_func_t) tmp_result_cmp);
 
   MAPL(l,
   {
@@ -511,14 +511,25 @@ bool db_resource_is_required_p(string rname, string oname)
 /* TRUE if exists and in loaded or stored state. */
 bool db_resource_p(string rname, string oname)
 {
-  db_resource r; 
-  DB_OK; 
+  db_resource r;
+  DB_OK;
   r = get_db_resource(rname, oname);
   if (db_resource_undefined_p(r))
     return FALSE;
   else
     return db_resource_loaded_p(r) || db_resource_stored_p(r) ||
       db_resource_loaded_and_stored_p(r);
+}
+
+/* touch logical time for resource[owner], possibly behind the back of pipsdbm.
+ */
+bool db_touch_resource(string rname, string oname)
+{
+  db_resource r;
+  DB_OK;
+  r = get_real_db_resource(rname, oname);
+  db_resource_time(r) = db_get_logical_time();
+  return true;
 }
 
 static void db_check_time(string rname, string oname, db_resource r)
@@ -536,14 +547,14 @@ static void db_check_time(string rname, string oname, db_resource r)
 
       /* update time of actual resource if appropriate
        */
-      if ((db_resource_loaded_p(r) || db_resource_loaded_and_stored_p(r)) && 
+      if ((db_resource_loaded_p(r) || db_resource_loaded_and_stored_p(r)) &&
 	  dbll_database_managed_file_p(db_resource_pointer(r)))
       {
-	pips_user_warning("file '%s' for %s[%s] edited (%d -> %d)\n", 
+	pips_user_warning("file '%s' for %s[%s] edited (%d -> %d)\n",
 			  db_resource_pointer(r), rname, oname,
 			  db_resource_file_time(r), its_time);
 	db_resource_file_time(r) = its_time;
-	
+
 	db_inc_logical_time();
 	db_resource_time(r) = db_get_logical_time();
 	db_inc_logical_time();
@@ -583,10 +594,10 @@ int db_time_of_resource(string rname, string oname)
   DB_OK;
 
   r = get_db_resource(rname, oname);
-  
+
   if (db_resource_undefined_p(r) || db_resource_required_p(r))
     return -1;
-  
+
   /* we load the resource if it is a simple file name...
    * the file time stamps are checked here anyway.
    */
@@ -604,7 +615,7 @@ int db_time_of_resource(string rname, string oname)
 static void db_save_resource(string rname, string oname, db_resource r)
 {
     pips_debug(7, "saving %s[%s]\n", rname, oname);
-    pips_assert("resource loaded", 
+    pips_assert("resource loaded",
 		db_resource_loaded_p(r) || db_resource_loaded_and_stored_p(r));
 
     if (!dbll_storable_p(rname))
@@ -625,10 +636,10 @@ static void db_save_resource(string rname, string oname, db_resource r)
 static void db_save_and_free_resource(
     string rname, string oname, db_resource r, bool do_free)
 {
-    pips_debug(7, "saving%s... %s[%s]\n", 
+    pips_debug(7, "saving%s... %s[%s]\n",
 	       do_free? " and freeing": "", rname, oname);
 
-    pips_assert("resource is loaded", 
+    pips_assert("resource is loaded",
 		db_resource_loaded_p(r) || db_resource_loaded_and_stored_p(r));
 
     if (db_resource_loaded_and_stored_p(r))
@@ -640,9 +651,9 @@ static void db_save_and_free_resource(
       }
       return;
     }
-    else if (dbll_storable_p(rname)) 
+    else if (dbll_storable_p(rname))
     {
-      dbll_save_and_free_resource(rname, oname, 
+      dbll_save_and_free_resource(rname, oname,
 				  db_resource_pointer(r), do_free);
       if (do_free)
       {
@@ -654,7 +665,7 @@ static void db_save_and_free_resource(
 	/* ??? manual fix for entities... which are not well integrated. */
 	if (!dbll_very_special_resource_p(rname, oname))
 	{
-	  db_status_tag(db_resource_db_status(r)) = 
+	  db_status_tag(db_resource_db_status(r)) =
 	    is_db_status_loaded_and_stored;
 	}
 	else /* is loaded */
@@ -662,15 +673,15 @@ static void db_save_and_free_resource(
 	  db_status_tag(db_resource_db_status(r)) = is_db_status_loaded;
 	}
       }
-      
+
       db_resource_file_time(r) = dbll_stat_resource_file(rname, oname, TRUE);
-    } 
-    else 
+    }
+    else
     { /* lost.. just delete the resource. */
       if (do_free)
       {
-        dbll_free_resource(rname, oname, db_resource_pointer(r));
-        db_resource_pointer(r) = NULL;
+	dbll_free_resource(rname, oname, db_resource_pointer(r));
+	db_resource_pointer(r) = NULL;
 	db_delete_resource(rname, oname);
       }
     }
@@ -685,18 +696,18 @@ string db_get_resource_id(string rname, string oname)
 
 
 /** Return the pointer to the resource, whatever it is.
- 
+
     @ingroup pipsdbm
- 
+
     Assume that the resource is available.
- 
+
     @param rname is a resource name, such as DBR_CODE for the code of a
     module. The construction of these aliases are DBB_ + the uppercased
     name of a resource defined in pipsmake-rc.tex. They are defined
     automatically in include/resources.h
 
     @param oname is the resource owner name, typically a module name.
-    
+
     @param pure is used to declare the programmer intentions about the
     future of the resource.
 
@@ -741,15 +752,15 @@ string db_get_memory_resource(string rname, string oname, bool pure)
     r = get_db_resource(rname, oname);
     debug_db_resource(9, rname, oname, r);
     if (db_resource_undefined_p(r) || db_resource_required_p(r))
-	pips_internal_error("requested resource %s for %s not available\n", 
-			    rname, oname);
+      pips_internal_error("requested resource %s for %s not available\n",
+			  rname, oname);
     /* else we have something. */
 
     if (db_resource_stored_p(r))
 	db_load_resource(rname, oname, r); /* does it unlink the file? */
 
     result = db_resource_pointer(r);
-    
+
     if (!pure)
     {
       /* Save if possible to hide side effects. */
@@ -764,8 +775,8 @@ string db_get_memory_resource(string rname, string oname, bool pure)
 	db_delete_resource(rname, oname);
     }
 
-    ifdebug(7) 
-      pips_assert("resource is consistent", 
+    ifdebug(7)
+      pips_assert("resource is consistent",
 		  dbll_check_resource(rname, oname, result));
     debug_off();
     return result;
@@ -786,14 +797,14 @@ void db_set_resource_as_required(string rname, string oname)
     /* newly created db_resource... */
     db_resource_db_status(r) = make_db_status(is_db_status_required, UU);
   }
-  else 
+  else
   {
     pips_debug(1, "set %s[%s] as 'required' from '%s' at %d\n",
-	       rname, oname, 
+	       rname, oname,
 	       db_status_string(db_resource_db_status(r)),
 	       db_get_logical_time());
 
-    if ((db_status_loaded_p(s) || db_status_loaded_and_stored_p(s)) && 
+    if ((db_status_loaded_p(s) || db_status_loaded_and_stored_p(s)) &&
 	db_resource_pointer(r))
     {
       dbll_free_resource(rname, oname, db_resource_pointer(r));
@@ -809,14 +820,14 @@ void db_set_resource_as_required(string rname, string oname)
 /** Put a resource into the current workspace database
 
     @ingroup pipsdbm
-    
+
     @param rname is a resource name, such as DBR_CODE for the code of a
     module. The construction of these aliases are DBB_ + the uppercased
     name of a resource defined in pipsmake-rc.tex. They are defined
     automatically in include/resources.h
 
     @param oname is the resource owner name, typically a module name.
-    
+
     @param p is an opaque pointer to the resource to be stored. Methods
     defined in methods.h will know how to deal with.
 
@@ -828,17 +839,15 @@ void db_set_resource_as_required(string rname, string oname)
     - If TRUE, even if a resource is valid and not marked as required,
       this function will succeed to update it.
 */
-void db_put_or_update_memory_resource(string rname,
-				      string oname,
-				      void * p,
-				      bool update_is_ok) {
+void db_put_or_update_memory_resource(string rname, string oname,
+				      void * p, bool update_is_ok) {
   db_resource r;
   /* Check the database coherency: */
   DB_OK;
 
   debug_on("PIPSDBM_DEBUG_LEVEL");
   pips_debug(2, "putting or updating %s[%s]\n", rname, oname);
-  ifdebug(7) pips_assert("resource is consistent", 
+  ifdebug(7) pips_assert("resource is consistent",
 			 dbll_check_resource(rname, oname, p));
 
   /* Get the database resource associated to the given resource: */
@@ -851,9 +860,9 @@ void db_put_or_update_memory_resource(string rname,
     /* The resource already exists... */
     if (!update_is_ok && !db_resource_required_p(r))
       /* If the resource is not required and we do not want to update it: */
-      pips_internal_error("resource %s[%s] already there\n", 
+      pips_internal_error("resource %s[%s] already there\n",
 			  rname, oname);
-  
+
   /* Store data */
   db_resource_pointer(r) = p; /**< ??? memory leak? depends? */
   /* Mark the resource as loaded into memory: */
@@ -888,7 +897,7 @@ void db_unput_resources(string rname)
 	    dbll_unlink_resource_file(rname, db_symbol_name(s), FALSE);
 	}
     },
-        get_pips_database());
+		     get_pips_database());
 }
 
 void db_save_and_free_memory_resource_if_any
@@ -896,12 +905,12 @@ void db_save_and_free_memory_resource_if_any
 {
     db_resource r;
     DB_OK;
-    
-    pips_debug(8, "maybe saving%s... %s[%s]\n", 
+
+    pips_debug(8, "maybe saving%s... %s[%s]\n",
 	       do_free? " and freeing":"", rname, oname);
 
     r = get_db_resource(rname, oname);
-    if (!db_resource_undefined_p(r) && 
+    if (!db_resource_undefined_p(r) &&
 	(db_resource_loaded_p(r) || db_resource_loaded_and_stored_p(r)))
 	db_save_and_free_resource(rname, oname, r, do_free);
 }
@@ -919,7 +928,7 @@ void db_delete_all_resources(void)
 
 /******************************************************************* MODULES */
 
-/* when telling the database about a module name, the module is 
+/* when telling the database about a module name, the module is
  * registered as a db_symbol, and it is added to the database.
  */
 static string current_module_name = NULL;
@@ -929,7 +938,7 @@ bool db_set_current_module_name(string name)
     bool ok = FALSE;
     DB_OK; pips_assert("no current module", !current_module_name);
     if (simple_name_p(name)) {
-	current_module_name = strdup(name); 
+	current_module_name = strdup(name);
 	init_owned_resources_if_necessary(name);
 	ok = TRUE;
     } else /* can be rejected softly */

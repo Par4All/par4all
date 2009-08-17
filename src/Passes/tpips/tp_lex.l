@@ -129,6 +129,7 @@ static char unk[2]; /* one char lines are not implicit shells */
 <KEY>show		{ KEYWORD(TK_SHOW); }
 <KEY>checkactive	{ KEYWORD(TK_CHECKACTIVE); }
 <KEY>version		{ KEYWORD(TK_VERSION); }
+<KEY>touch		{ KEYWORD(TK_TOUCH); }
 
 <KEY>setproperty	{ LITTERAL(TK_SET_PROPERTY); }
 <KEY>set		{ LITTERAL(TK_SET_PROPERTY); }
