@@ -290,12 +290,16 @@ expression MakeFunctionExpression(expression e, list le)
 	pips_debug(6,"Normal function or intrinsics call\n");
 	ok = check_C_function_type(ent, le);
 	exp = make_call_expression(ent,le);
+	/* This cannot be checked unless bootstrap typing is improved
+	   for varargs intrinsics, mostly IOs. */
+	/*
 	if(!ok) {
 	  pips_user_warning("Actual arguments do not fit the declared formal "
 			    "arguments of function \"%s\"\n",
 			    entity_user_name(ent));
 	  CParserError("Type mismatch\n");
 	  }
+	*/
 	break;
       }
     case is_syntax_call:
