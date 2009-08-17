@@ -1,0 +1,47 @@
+delete array_to_pointer02
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+#use the same source as array_to_pointer01.tpips
+create array_to_pointer02 array_to_pointer01.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+echo
+echo Initial code
+echo
+module duck
+
+display PRINTED_FILE
+
+echo
+echo Code after array conversion
+echo
+
+setproperty ARRAY_TO_POINTER_CONVERT_PARAMETERS TRUE
+apply ARRAY_TO_POINTER
+display PRINTED_FILE
+
+echo
+echo Code after partial eval
+echo
+
+apply PARTIAL_EVAL
+display PRINTED_FILE
+
+echo
+echo Unsplit resulting code
+echo
+
+apply UNSPLIT
+shell gcc ${VDIR:-.}/array_to_pointer01.c -o ${VDIR:-.}/array_to_pointer
+shell gcc array_to_pointer02.database/Src/array_to_pointer01.c  -o array_to_pointer02.database/Src/array_to_pointer
+shell if test `array_to_pointer02.database/Src/array_to_pointer` = `${VDIR:-.}/array_to_pointer`; then echo "ok"; else echo "ko" ; fi
+shell rm -rf array_to_pointer02.database/Src/array_to_pointer ${VDIR:-.}/array_to_pointer
+
+close
+delete array_to_pointer02
+quit
+
