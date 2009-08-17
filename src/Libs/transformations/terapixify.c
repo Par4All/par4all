@@ -207,6 +207,16 @@ bool expression_array_to_pointer(expression exp)
             size_t nb_indices =gen_length(reference_indices(ref)); 
             size_t nb_dims =gen_length(variable_dimensions(type_variable(entity_type(reference_variable(ref))))) ; 
 
+            /* if the considered reference is a formal parameter and the property is properly set,
+             * we are allowded to convert formal parameters such as int a[n][12] into int *a
+             */
+            bool force_cast = true;
+            if( get_bool_property("ARRAY_TO_POINTER_CONVERT_PARAMETERS")
+                    && formal_parameter_p(reference_variable(ref)) )
+            {
+                force_cast=false;
+            }
+
             /* create a new reference without subscripts */
             reference ref_without_indices = make_reference(reference_variable(ref),NIL);
             /* get the base type of the reference */
@@ -218,7 +228,7 @@ bool expression_array_to_pointer(expression exp)
             expression address_computation = EXPRESSION(CAR(reference_indices(ref)));
             /* create an expression for the new reference, possibly casted */
             expression base_ref = reference_to_expression(ref_without_indices);
-            if( ! basic_pointer_p( variable_basic(type_variable(entity_type(reference_variable(ref) ) ) ) ) )
+            if( force_cast && ! basic_pointer_p( variable_basic(type_variable(entity_type(reference_variable(ref) ) ) ) ) )
             {
                 base_ref = make_expression(
                         make_syntax_cast(
@@ -238,7 +248,6 @@ bool expression_array_to_pointer(expression exp)
             list indices = reference_indices(ref);
             POP(indices);
             if(!ENDP(dims)) POP(dims); // the first dimension is unused
-            /* SG: we use PLUS_OPERATOR_NAME as long as we d not use pointer arithmetic */
             FOREACH(DIMENSION,dim,dims)
             {
                 expression dimension_size = MakeBinaryCall(
@@ -269,6 +278,7 @@ bool expression_array_to_pointer(expression exp)
                             );
                 }
             }
+
             /* there may be more indices than dimensions */
             FOREACH(EXPRESSION,e,indices)
             {
@@ -352,6 +362,30 @@ bool declaration_array_to_pointer(statement s)
     return true;
 }
 
+static
+void make_pointer_from_variable(variable param)
+{
+    list parameter_dimensions = variable_dimensions(param);
+    if(!ENDP(parameter_dimensions))
+    {
+        gen_full_free_list(parameter_dimensions);
+        variable_dimensions(param)=NIL;
+        basic parameter_basic = variable_basic(param);
+        basic new_parameter_basic = make_basic_pointer(
+                make_type_variable(
+                    make_variable(parameter_basic,NIL,NIL)
+                    )
+                );
+        variable_basic(param)=new_parameter_basic;
+    }
+}
+static
+void make_pointer_entity_from_reference_entity(entity e)
+{
+    variable param = type_variable(entity_type(e));
+    make_pointer_from_variable(param);
+}
+
 bool array_to_pointer(char *module_name)
 {
     /* prelude */
@@ -362,10 +396,31 @@ bool array_to_pointer(char *module_name)
     if(!c_module_p(get_current_module_entity()))
         pips_user_warning("this transformation will have no effect on a fortran module\n");
     else
+    {
         gen_multi_recurse(get_current_module_statement(),
                 expression_domain,expression_array_to_pointer,gen_null,
                 statement_domain,declaration_array_to_pointer,gen_null,
                 NULL);
+        /* if this property is set, we also change the signature of the module
+         * tricky : signature must be change in two places !
+         */
+        if( get_bool_property("ARRAY_TO_POINTER_CONVERT_PARAMETERS") )
+        {
+            FOREACH(ENTITY,e,code_declarations(value_code(entity_initial(get_current_module_entity()))))
+            {
+                if(formal_parameter_p(e))
+                    make_pointer_entity_from_reference_entity(e);
+            }
+            FOREACH(PARAMETER,p,functional_parameters(type_functional(entity_type(get_current_module_entity()))))
+            {
+                dummy d = parameter_dummy(p);
+                if(dummy_identifier_p(d))
+                    make_pointer_entity_from_reference_entity(dummy_identifier(d));
+                type t = parameter_type(p);
+                make_pointer_from_variable(type_variable(t));
+            }
+        }
+    }
 
     /* validate */
     module_reorder(get_current_module_statement());

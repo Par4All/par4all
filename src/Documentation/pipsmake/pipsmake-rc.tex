@@ -6747,9 +6747,17 @@ It is used as a preliminary phase to generate terapix assembly.
 alias array_to_pointer 'Array to pointer'
 
 array_to_pointer > MODULE.code
+		> PROGRAM.entities
 		< PROGRAM.entities
 		< MODULE.code
 \end{PipsMake}
+
+The property \verb+ARRAY_TO_POINTER_CONVERT_PARAMETERS+ can be used to change the signature of the module.
+Module similar to \lstinline|int foo(int a[20][2]);| will be turned into \lstinline|int foo(int *a);|
+
+\begin{PipsProp}
+ARRAY_TO_POINTER_CONVERT_PARAMETERS FALSE
+\end{PipsProp}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% EOLE
 
@@ -7808,7 +7816,7 @@ feature is low.
 Procedures can be cloned to obtain several specialized versions. The
 call sites must be updated to refer to the desired version.
 
-User assisted cloning.See examples in clone vslidation
+User assisted cloning.See examples in clone validation
 suite. \marginpar{RK: terse; to be improved by FC}
 %%!UserManualDocumentation
 \begin{PipsMake}
