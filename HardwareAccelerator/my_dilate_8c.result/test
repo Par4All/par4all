@@ -11,39 +11,39 @@ freia_status my_dilate_8c(freia_data2d *o, freia_data2d *i0, int32_t *p0)
 // graph for dag "dag_0" of module "my_dilate_8c" in dot format
 digraph "dag_0" {
   // inputs
-  "i0" [shape=box];
+  "i0" [shape=circle];
 
   // outputs
-  "o" [shape=box];
+  "o" [shape=circle];
 
   // computation vertices
-  "5 dilate_8c" [shape=circle];
+  "5 dilate_8c" [shape=box];
   "i0" -> "5 dilate_8c";
   "5 dilate_8c" -> "o";
 }
 // graph for dag "dag_cleaned_0" of module "my_dilate_8c" in dot format
 digraph "dag_cleaned_0" {
   // inputs
-  "i0" [shape=box];
+  "i0" [shape=circle];
 
   // outputs
-  "o" [shape=box];
+  "o" [shape=circle];
 
   // computation vertices
-  "5 dilate_8c" [shape=circle];
+  "5 dilate_8c" [shape=box];
   "i0" -> "5 dilate_8c";
   "5 dilate_8c" -> "o";
 }
 // graph for dag "my_dilate_8c_helper_0_0" of module "my_dilate_8c" in dot format
 digraph "my_dilate_8c_helper_0_0" {
   // inputs
-  "i0" [shape=box];
+  "i0" [shape=circle];
 
   // outputs
-  "o" [shape=box];
+  "o" [shape=circle];
 
   // computation vertices
-  "5 dilate_8c" [shape=circle];
+  "5 dilate_8c" [shape=box];
   "i0" -> "5 dilate_8c";
   "5 dilate_8c" -> "o";
 }

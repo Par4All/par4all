@@ -16,54 +16,54 @@ freia_status freia_12(freia_data2d *o0, freia_data2d *o1, freia_data2d *i0, frei
 // graph for dag "dag_0" of module "freia_12" in dot format
 digraph "dag_0" {
   // inputs
-  "i0" [shape=box];
-  "i1" [shape=box];
+  "i0" [shape=circle];
+  "i1" [shape=circle];
 
   // outputs
-  "o0" [shape=box];
-  "o1" [shape=box];
+  "o0" [shape=circle];
+  "o1" [shape=circle];
 
   // computation vertices
-  "11 dilate_8c" [shape=circle];
+  "11 dilate_8c" [shape=box];
   "i1" -> "11 dilate_8c";
   "11 dilate_8c" -> "o1";
-  "10 erode_8c" [shape=circle];
+  "10 erode_8c" [shape=box];
   "i0" -> "10 erode_8c";
   "10 erode_8c" -> "o0";
 }
 // graph for dag "dag_cleaned_0" of module "freia_12" in dot format
 digraph "dag_cleaned_0" {
   // inputs
-  "i0" [shape=box];
-  "i1" [shape=box];
+  "i0" [shape=circle];
+  "i1" [shape=circle];
 
   // outputs
-  "o0" [shape=box];
-  "o1" [shape=box];
+  "o0" [shape=circle];
+  "o1" [shape=circle];
 
   // computation vertices
-  "11 dilate_8c" [shape=circle];
+  "11 dilate_8c" [shape=box];
   "i1" -> "11 dilate_8c";
   "11 dilate_8c" -> "o1";
-  "10 erode_8c" [shape=circle];
+  "10 erode_8c" [shape=box];
   "i0" -> "10 erode_8c";
   "10 erode_8c" -> "o0";
 }
 // graph for dag "freia_12_helper_0_0" of module "freia_12" in dot format
 digraph "freia_12_helper_0_0" {
   // inputs
-  "i0" [shape=box];
-  "i1" [shape=box];
+  "i0" [shape=circle];
+  "i1" [shape=circle];
 
   // outputs
-  "o0" [shape=box];
-  "o1" [shape=box];
+  "o0" [shape=circle];
+  "o1" [shape=circle];
 
   // computation vertices
-  "11 dilate_8c" [shape=circle];
+  "11 dilate_8c" [shape=box];
   "i1" -> "11 dilate_8c";
   "11 dilate_8c" -> "o1";
-  "10 erode_8c" [shape=circle];
+  "10 erode_8c" [shape=box];
   "i0" -> "10 erode_8c";
   "10 erode_8c" -> "o0";
 }

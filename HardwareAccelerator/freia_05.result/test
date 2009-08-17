@@ -16,19 +16,19 @@ freia_status freia_05(freia_data2d *o0, freia_data2d *o1, freia_data2d *i0, frei
 // graph for dag "dag_0" of module "freia_05" in dot format
 digraph "dag_0" {
   // inputs
-  "i0" [shape=box];
-  "i1" [shape=box];
+  "i0" [shape=circle];
+  "i1" [shape=circle];
 
   // outputs
-  "o0" [shape=box];
-  "o1" [shape=box];
+  "o0" [shape=circle];
+  "o1" [shape=circle];
 
   // computation vertices
-  "10 and" [shape=circle];
+  "10 and" [shape=trapezium,orientation=270];
   "i0" -> "10 and";
   "i1" -> "10 and";
   "10 and" -> "o1";
-  "9 mul" [shape=circle];
+  "9 mul" [shape=trapezium,orientation=270];
   "i0" -> "9 mul";
   "i1" -> "9 mul";
   "9 mul" -> "o0";
@@ -36,19 +36,19 @@ digraph "dag_0" {
 // graph for dag "dag_cleaned_0" of module "freia_05" in dot format
 digraph "dag_cleaned_0" {
   // inputs
-  "i0" [shape=box];
-  "i1" [shape=box];
+  "i0" [shape=circle];
+  "i1" [shape=circle];
 
   // outputs
-  "o0" [shape=box];
-  "o1" [shape=box];
+  "o0" [shape=circle];
+  "o1" [shape=circle];
 
   // computation vertices
-  "10 and" [shape=circle];
+  "10 and" [shape=trapezium,orientation=270];
   "i0" -> "10 and";
   "i1" -> "10 and";
   "10 and" -> "o1";
-  "9 mul" [shape=circle];
+  "9 mul" [shape=trapezium,orientation=270];
   "i0" -> "9 mul";
   "i1" -> "9 mul";
   "9 mul" -> "o0";
@@ -56,14 +56,14 @@ digraph "dag_cleaned_0" {
 // graph for dag "freia_05_helper_0_0" of module "freia_05" in dot format
 digraph "freia_05_helper_0_0" {
   // inputs
-  "i0" [shape=box];
-  "i1" [shape=box];
+  "i0" [shape=circle];
+  "i1" [shape=circle];
 
   // outputs
-  "o0" [shape=box];
+  "o0" [shape=circle];
 
   // computation vertices
-  "9 mul" [shape=circle];
+  "9 mul" [shape=trapezium,orientation=270];
   "i0" -> "9 mul";
   "i1" -> "9 mul";
   "9 mul" -> "o0";
@@ -71,14 +71,14 @@ digraph "freia_05_helper_0_0" {
 // graph for dag "freia_05_helper_0_1" of module "freia_05" in dot format
 digraph "freia_05_helper_0_1" {
   // inputs
-  "i0" [shape=box];
-  "i1" [shape=box];
+  "i0" [shape=circle];
+  "i1" [shape=circle];
 
   // outputs
-  "o1" [shape=box];
+  "o1" [shape=circle];
 
   // computation vertices
-  "10 and" [shape=circle];
+  "10 and" [shape=trapezium,orientation=270];
   "i0" -> "10 and";
   "i1" -> "10 and";
   "10 and" -> "o1";

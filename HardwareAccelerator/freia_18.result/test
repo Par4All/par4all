@@ -37,32 +37,32 @@ freia_status freia_18(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 // graph for dag "dag_0" of module "freia_18" in dot format
 digraph "dag_0" {
   // inputs
-  "i0" [shape=box];
-  "i1" [shape=box];
+  "i0" [shape=circle];
+  "i1" [shape=circle];
 
   // outputs
-  "0`u2" [shape=box];
-  "0`u3" [shape=box];
-  "o" [shape=box];
+  "0`u2" [shape=circle];
+  "0`u3" [shape=circle];
+  "o" [shape=circle];
 
   // computation vertices
-  "24 or" [shape=circle];
+  "24 or" [shape=trapezium,orientation=270];
   "i1" -> "24 or";
   "24 or" -> "0`u3";
-  "23 xor" [shape=circle];
+  "23 xor" [shape=trapezium,orientation=270];
   "23 xor" -> "24 or";
   "i1" -> "23 xor";
   "23 xor" -> "o";
-  "22 and" [shape=circle];
+  "22 and" [shape=trapezium,orientation=270];
   "22 and" -> "23 xor";
   "i0" -> "22 and";
   "i1" -> "22 and";
-  "21 sub" [shape=circle];
+  "21 sub" [shape=trapezium,orientation=270];
   "i0" -> "21 sub";
   "21 sub" -> "0`u2";
   "20 copy" [shape=circle];
   "20 copy" -> "21 sub";
-  "19 add" [shape=circle];
+  "19 add" [shape=trapezium,orientation=270];
   "19 add" -> "20 copy";
   "i0" -> "19 add";
   "i1" -> "19 add";
@@ -70,30 +70,30 @@ digraph "dag_0" {
 // graph for dag "dag_cleaned_0" of module "freia_18" in dot format
 digraph "dag_cleaned_0" {
   // inputs
-  "i0" [shape=box];
-  "i1" [shape=box];
+  "i0" [shape=circle];
+  "i1" [shape=circle];
 
   // outputs
-  "0`u2" [shape=box];
-  "0`u3" [shape=box];
-  "o" [shape=box];
+  "0`u2" [shape=circle];
+  "0`u3" [shape=circle];
+  "o" [shape=circle];
 
   // computation vertices
-  "24 or" [shape=circle];
+  "24 or" [shape=trapezium,orientation=270];
   "i1" -> "24 or";
   "24 or" -> "0`u3";
-  "23 xor" [shape=circle];
+  "23 xor" [shape=trapezium,orientation=270];
   "23 xor" -> "24 or";
   "i1" -> "23 xor";
   "23 xor" -> "o";
-  "22 and" [shape=circle];
+  "22 and" [shape=trapezium,orientation=270];
   "22 and" -> "23 xor";
   "i0" -> "22 and";
   "i1" -> "22 and";
-  "21 sub" [shape=circle];
+  "21 sub" [shape=trapezium,orientation=270];
   "i0" -> "21 sub";
   "21 sub" -> "0`u2";
-  "19 add" [shape=circle];
+  "19 add" [shape=trapezium,orientation=270];
   "19 add" -> "21 sub";
   "i0" -> "19 add";
   "i1" -> "19 add";
@@ -101,17 +101,17 @@ digraph "dag_cleaned_0" {
 // graph for dag "freia_18_helper_0_0" of module "freia_18" in dot format
 digraph "freia_18_helper_0_0" {
   // inputs
-  "i0" [shape=box];
-  "i1" [shape=box];
+  "i0" [shape=circle];
+  "i1" [shape=circle];
 
   // outputs
-  "0`u2" [shape=box];
+  "0`u2" [shape=circle];
 
   // computation vertices
-  "21 sub" [shape=circle];
+  "21 sub" [shape=trapezium,orientation=270];
   "i0" -> "21 sub";
   "21 sub" -> "0`u2";
-  "19 add" [shape=circle];
+  "19 add" [shape=trapezium,orientation=270];
   "19 add" -> "21 sub";
   "i0" -> "19 add";
   "i1" -> "19 add";
@@ -119,22 +119,22 @@ digraph "freia_18_helper_0_0" {
 // graph for dag "freia_18_helper_0_1" of module "freia_18" in dot format
 digraph "freia_18_helper_0_1" {
   // inputs
-  "i0" [shape=box];
-  "i1" [shape=box];
+  "i0" [shape=circle];
+  "i1" [shape=circle];
 
   // outputs
-  "0`u3" [shape=box];
-  "o" [shape=box];
+  "0`u3" [shape=circle];
+  "o" [shape=circle];
 
   // computation vertices
-  "24 or" [shape=circle];
+  "24 or" [shape=trapezium,orientation=270];
   "i1" -> "24 or";
   "24 or" -> "0`u3";
-  "23 xor" [shape=circle];
+  "23 xor" [shape=trapezium,orientation=270];
   "23 xor" -> "24 or";
   "i1" -> "23 xor";
   "23 xor" -> "o";
-  "22 and" [shape=circle];
+  "22 and" [shape=trapezium,orientation=270];
   "22 and" -> "23 xor";
   "i0" -> "22 and";
   "i1" -> "22 and";

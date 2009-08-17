@@ -11,10 +11,10 @@ freia_status my_copy(freia_data2d *o, freia_data2d *i0)
 // graph for dag "dag_0" of module "my_copy" in dot format
 digraph "dag_0" {
   // inputs
-  "i0" [shape=box];
+  "i0" [shape=circle];
 
   // outputs
-  "o" [shape=box];
+  "o" [shape=circle];
 
   // computation vertices
   "4 copy" [shape=circle];
@@ -24,10 +24,10 @@ digraph "dag_0" {
 // graph for dag "dag_cleaned_0" of module "my_copy" in dot format
 digraph "dag_cleaned_0" {
   // inputs
-  "i0" [shape=box];
+  "i0" [shape=circle];
 
   // outputs
-  "o" [shape=box];
+  "o" [shape=circle];
 
   // computation vertices
   "4 copy" [shape=circle];
@@ -37,10 +37,10 @@ digraph "dag_cleaned_0" {
 // graph for dag "my_copy_helper_0_0" of module "my_copy" in dot format
 digraph "my_copy_helper_0_0" {
   // inputs
-  "i0" [shape=box];
+  "i0" [shape=circle];
 
   // outputs
-  "o" [shape=box];
+  "o" [shape=circle];
 
   // computation vertices
   "4 copy" [shape=circle];

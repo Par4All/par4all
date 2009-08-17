@@ -13,10 +13,10 @@ digraph "dag_0" {
   // inputs
 
   // outputs
-  "o" [shape=box];
+  "o" [shape=circle];
 
   // computation vertices
-  "4 set_constant" [shape=circle];
+  "4 set_constant" [shape=trapezium,orientation=270];
   "4 set_constant" -> "o";
 }
 // graph for dag "dag_cleaned_0" of module "my_set_constant" in dot format
@@ -24,10 +24,10 @@ digraph "dag_cleaned_0" {
   // inputs
 
   // outputs
-  "o" [shape=box];
+  "o" [shape=circle];
 
   // computation vertices
-  "4 set_constant" [shape=circle];
+  "4 set_constant" [shape=trapezium,orientation=270];
   "4 set_constant" -> "o";
 }
 // graph for dag "my_set_constant_helper_0_0" of module "my_set_constant" in dot format
@@ -35,10 +35,10 @@ digraph "my_set_constant_helper_0_0" {
   // inputs
 
   // outputs
-  "o" [shape=box];
+  "o" [shape=circle];
 
   // computation vertices
-  "4 set_constant" [shape=circle];
+  "4 set_constant" [shape=trapezium,orientation=270];
   "4 set_constant" -> "o";
 }
 

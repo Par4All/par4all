@@ -25,20 +25,20 @@ freia_status freia_02(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 // graph for dag "dag_0" of module "freia_02" in dot format
 digraph "dag_0" {
   // inputs
-  "i0" [shape=box];
-  "i1" [shape=box];
+  "i0" [shape=circle];
+  "i1" [shape=circle];
 
   // outputs
-  "o" [shape=box];
+  "o" [shape=circle];
 
   // computation vertices
-  "15 xor" [shape=circle];
+  "15 xor" [shape=trapezium,orientation=270];
   "i0" -> "15 xor";
   "15 xor" -> "o";
-  "14 add" [shape=circle];
+  "14 add" [shape=trapezium,orientation=270];
   "14 add" -> "15 xor";
   "i0" -> "14 add";
-  "13 div" [shape=circle];
+  "13 div" [shape=trapezium,orientation=270];
   "13 div" -> "14 add";
   "i1" -> "13 div";
   "i0" -> "13 div";
@@ -46,20 +46,20 @@ digraph "dag_0" {
 // graph for dag "dag_cleaned_0" of module "freia_02" in dot format
 digraph "dag_cleaned_0" {
   // inputs
-  "i0" [shape=box];
-  "i1" [shape=box];
+  "i0" [shape=circle];
+  "i1" [shape=circle];
 
   // outputs
-  "o" [shape=box];
+  "o" [shape=circle];
 
   // computation vertices
-  "15 xor" [shape=circle];
+  "15 xor" [shape=trapezium,orientation=270];
   "i0" -> "15 xor";
   "15 xor" -> "o";
-  "14 add" [shape=circle];
+  "14 add" [shape=trapezium,orientation=270];
   "14 add" -> "15 xor";
   "i0" -> "14 add";
-  "13 div" [shape=circle];
+  "13 div" [shape=trapezium,orientation=270];
   "13 div" -> "14 add";
   "i1" -> "13 div";
   "i0" -> "13 div";
@@ -67,20 +67,20 @@ digraph "dag_cleaned_0" {
 // graph for dag "freia_02_helper_0_0" of module "freia_02" in dot format
 digraph "freia_02_helper_0_0" {
   // inputs
-  "i0" [shape=box];
-  "i1" [shape=box];
+  "i0" [shape=circle];
+  "i1" [shape=circle];
 
   // outputs
-  "o" [shape=box];
+  "o" [shape=circle];
 
   // computation vertices
-  "15 xor" [shape=circle];
+  "15 xor" [shape=trapezium,orientation=270];
   "i0" -> "15 xor";
   "15 xor" -> "o";
-  "14 add" [shape=circle];
+  "14 add" [shape=trapezium,orientation=270];
   "14 add" -> "15 xor";
   "i0" -> "14 add";
-  "13 div" [shape=circle];
+  "13 div" [shape=trapezium,orientation=270];
   "13 div" -> "14 add";
   "i1" -> "13 div";
   "i0" -> "13 div";

@@ -41,28 +41,28 @@ freia_status freia_04(freia_data2d *o, freia_data2d *i, int32_t *k, int32_t inf,
 // graph for dag "dag_0" of module "freia_04" in dot format
 digraph "dag_0" {
   // inputs
-  "i" [shape=box];
+  "i" [shape=circle];
 
   // outputs
-  "o" [shape=box];
+  "o" [shape=circle];
 
   // computation vertices
-  "31 add" [shape=circle];
+  "31 add" [shape=trapezium,orientation=270];
   "31 add" -> "o";
-  "30 global_min" [shape=circle];
-  "29 global_vol" [shape=circle];
-  "28 threshold" [shape=circle];
+  "30 global_min" [shape=diamond];
+  "29 global_vol" [shape=diamond];
+  "28 threshold" [shape=parallelogram];
   "28 threshold" -> "31 add";
   "28 threshold" -> "30 global_min";
-  "27 threshold" [shape=circle];
+  "27 threshold" [shape=parallelogram];
   "27 threshold" -> "31 add";
   "27 threshold" -> "29 global_vol";
-  "26 sub" [shape=circle];
+  "26 sub" [shape=trapezium,orientation=270];
   "26 sub" -> "27 threshold";
-  "25 dilate_6c" [shape=circle];
+  "25 dilate_6c" [shape=box];
   "25 dilate_6c" -> "26 sub";
   "i" -> "25 dilate_6c";
-  "24 erode_8c" [shape=circle];
+  "24 erode_8c" [shape=box];
   "24 erode_8c" -> "28 threshold";
   "24 erode_8c" -> "26 sub";
   "i" -> "24 erode_8c";
@@ -70,28 +70,28 @@ digraph "dag_0" {
 // graph for dag "dag_cleaned_0" of module "freia_04" in dot format
 digraph "dag_cleaned_0" {
   // inputs
-  "i" [shape=box];
+  "i" [shape=circle];
 
   // outputs
-  "o" [shape=box];
+  "o" [shape=circle];
 
   // computation vertices
-  "31 add" [shape=circle];
+  "31 add" [shape=trapezium,orientation=270];
   "31 add" -> "o";
-  "30 global_min" [shape=circle];
-  "29 global_vol" [shape=circle];
-  "28 threshold" [shape=circle];
+  "30 global_min" [shape=diamond];
+  "29 global_vol" [shape=diamond];
+  "28 threshold" [shape=parallelogram];
   "28 threshold" -> "31 add";
   "28 threshold" -> "30 global_min";
-  "27 threshold" [shape=circle];
+  "27 threshold" [shape=parallelogram];
   "27 threshold" -> "31 add";
   "27 threshold" -> "29 global_vol";
-  "26 sub" [shape=circle];
+  "26 sub" [shape=trapezium,orientation=270];
   "26 sub" -> "27 threshold";
-  "25 dilate_6c" [shape=circle];
+  "25 dilate_6c" [shape=box];
   "25 dilate_6c" -> "26 sub";
   "i" -> "25 dilate_6c";
-  "24 erode_8c" [shape=circle];
+  "24 erode_8c" [shape=box];
   "24 erode_8c" -> "28 threshold";
   "24 erode_8c" -> "26 sub";
   "i" -> "24 erode_8c";
@@ -99,28 +99,28 @@ digraph "dag_cleaned_0" {
 // graph for dag "freia_04_helper_0_0" of module "freia_04" in dot format
 digraph "freia_04_helper_0_0" {
   // inputs
-  "i" [shape=box];
+  "i" [shape=circle];
 
   // outputs
-  "o" [shape=box];
+  "o" [shape=circle];
 
   // computation vertices
-  "31 add" [shape=circle];
+  "31 add" [shape=trapezium,orientation=270];
   "31 add" -> "o";
-  "30 global_min" [shape=circle];
-  "28 threshold" [shape=circle];
+  "30 global_min" [shape=diamond];
+  "28 threshold" [shape=parallelogram];
   "28 threshold" -> "31 add";
   "28 threshold" -> "30 global_min";
-  "29 global_vol" [shape=circle];
-  "27 threshold" [shape=circle];
+  "29 global_vol" [shape=diamond];
+  "27 threshold" [shape=parallelogram];
   "27 threshold" -> "31 add";
   "27 threshold" -> "29 global_vol";
-  "26 sub" [shape=circle];
+  "26 sub" [shape=trapezium,orientation=270];
   "26 sub" -> "27 threshold";
-  "25 dilate_6c" [shape=circle];
+  "25 dilate_6c" [shape=box];
   "25 dilate_6c" -> "26 sub";
   "i" -> "25 dilate_6c";
-  "24 erode_8c" [shape=circle];
+  "24 erode_8c" [shape=box];
   "24 erode_8c" -> "28 threshold";
   "24 erode_8c" -> "26 sub";
   "i" -> "24 erode_8c";

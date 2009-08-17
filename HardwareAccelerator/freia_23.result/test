@@ -20,21 +20,21 @@ freia_status freia_23(freia_data2d *o, freia_data2d *io, freia_data2d *i1)
 // graph for dag "dag_0" of module "freia_23" in dot format
 digraph "dag_0" {
   // inputs
-  "i1" [shape=box];
-  "io" [shape=box];
+  "i1" [shape=circle];
+  "io" [shape=circle];
 
   // outputs
-  "io" [shape=box];
-  "o" [shape=box];
+  "io" [shape=circle];
+  "o" [shape=circle];
 
   // computation vertices
-  "12 add" [shape=circle];
+  "12 add" [shape=trapezium,orientation=270];
   "12 add" -> "o";
-  "11 sub" [shape=circle];
+  "11 sub" [shape=trapezium,orientation=270];
   "11 sub" -> "12 add";
   "io" -> "11 sub";
   "11 sub" -> "io";
-  "10 xor" [shape=circle];
+  "10 xor" [shape=trapezium,orientation=270];
   "10 xor" -> "12 add";
   "10 xor" -> "11 sub";
   "io" -> "10 xor";
@@ -43,21 +43,21 @@ digraph "dag_0" {
 // graph for dag "dag_cleaned_0" of module "freia_23" in dot format
 digraph "dag_cleaned_0" {
   // inputs
-  "i1" [shape=box];
-  "io" [shape=box];
+  "i1" [shape=circle];
+  "io" [shape=circle];
 
   // outputs
-  "io" [shape=box];
-  "o" [shape=box];
+  "io" [shape=circle];
+  "o" [shape=circle];
 
   // computation vertices
-  "12 add" [shape=circle];
+  "12 add" [shape=trapezium,orientation=270];
   "12 add" -> "o";
-  "11 sub" [shape=circle];
+  "11 sub" [shape=trapezium,orientation=270];
   "11 sub" -> "12 add";
   "io" -> "11 sub";
   "11 sub" -> "io";
-  "10 xor" [shape=circle];
+  "10 xor" [shape=trapezium,orientation=270];
   "10 xor" -> "12 add";
   "10 xor" -> "11 sub";
   "io" -> "10 xor";
@@ -66,21 +66,21 @@ digraph "dag_cleaned_0" {
 // graph for dag "freia_23_helper_0_0" of module "freia_23" in dot format
 digraph "freia_23_helper_0_0" {
   // inputs
-  "i1" [shape=box];
-  "io" [shape=box];
+  "i1" [shape=circle];
+  "io" [shape=circle];
 
   // outputs
-  "io" [shape=box];
-  "o" [shape=box];
+  "io" [shape=circle];
+  "o" [shape=circle];
 
   // computation vertices
-  "12 add" [shape=circle];
+  "12 add" [shape=trapezium,orientation=270];
   "12 add" -> "o";
-  "11 sub" [shape=circle];
+  "11 sub" [shape=trapezium,orientation=270];
   "11 sub" -> "12 add";
   "io" -> "11 sub";
   "11 sub" -> "io";
-  "10 xor" [shape=circle];
+  "10 xor" [shape=trapezium,orientation=270];
   "10 xor" -> "12 add";
   "10 xor" -> "11 sub";
   "io" -> "10 xor";

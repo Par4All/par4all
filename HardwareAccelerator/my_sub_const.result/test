@@ -11,39 +11,39 @@ freia_status my_sub_const(freia_data2d *o, freia_data2d *i0, int32_t p0)
 // graph for dag "dag_0" of module "my_sub_const" in dot format
 digraph "dag_0" {
   // inputs
-  "i0" [shape=box];
+  "i0" [shape=circle];
 
   // outputs
-  "o" [shape=box];
+  "o" [shape=circle];
 
   // computation vertices
-  "5 sub_const" [shape=circle];
+  "5 sub_const" [shape=trapezium,orientation=270];
   "i0" -> "5 sub_const";
   "5 sub_const" -> "o";
 }
 // graph for dag "dag_cleaned_0" of module "my_sub_const" in dot format
 digraph "dag_cleaned_0" {
   // inputs
-  "i0" [shape=box];
+  "i0" [shape=circle];
 
   // outputs
-  "o" [shape=box];
+  "o" [shape=circle];
 
   // computation vertices
-  "5 sub_const" [shape=circle];
+  "5 sub_const" [shape=trapezium,orientation=270];
   "i0" -> "5 sub_const";
   "5 sub_const" -> "o";
 }
 // graph for dag "my_sub_const_helper_0_0" of module "my_sub_const" in dot format
 digraph "my_sub_const_helper_0_0" {
   // inputs
-  "i0" [shape=box];
+  "i0" [shape=circle];
 
   // outputs
-  "o" [shape=box];
+  "o" [shape=circle];
 
   // computation vertices
-  "5 sub_const" [shape=circle];
+  "5 sub_const" [shape=trapezium,orientation=270];
   "i0" -> "5 sub_const";
   "5 sub_const" -> "o";
 }

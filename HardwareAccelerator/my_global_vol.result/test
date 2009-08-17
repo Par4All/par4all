@@ -11,34 +11,34 @@ freia_status my_global_vol(freia_data2d *image, int32_t *vol)
 // graph for dag "dag_0" of module "my_global_vol" in dot format
 digraph "dag_0" {
   // inputs
-  "image" [shape=box];
+  "image" [shape=circle];
 
   // outputs
 
   // computation vertices
-  "4 global_vol" [shape=circle];
+  "4 global_vol" [shape=diamond];
   "image" -> "4 global_vol";
 }
 // graph for dag "dag_cleaned_0" of module "my_global_vol" in dot format
 digraph "dag_cleaned_0" {
   // inputs
-  "image" [shape=box];
+  "image" [shape=circle];
 
   // outputs
 
   // computation vertices
-  "4 global_vol" [shape=circle];
+  "4 global_vol" [shape=diamond];
   "image" -> "4 global_vol";
 }
 // graph for dag "my_global_vol_helper_0_0" of module "my_global_vol" in dot format
 digraph "my_global_vol_helper_0_0" {
   // inputs
-  "image" [shape=box];
+  "image" [shape=circle];
 
   // outputs
 
   // computation vertices
-  "4 global_vol" [shape=circle];
+  "4 global_vol" [shape=diamond];
   "image" -> "4 global_vol";
 }
 

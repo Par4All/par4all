@@ -35,21 +35,21 @@ freia_status freia_08(freia_data2d *o, freia_data2d *i0, freia_data2d *i1, freia
 // graph for dag "dag_0" of module "freia_08" in dot format
 digraph "dag_0" {
   // inputs
-  "0`g0" [shape=box];
-  "0`g1" [shape=box];
-  "0`g2" [shape=box];
+  "0`g0" [shape=circle];
+  "0`g1" [shape=circle];
+  "0`g2" [shape=circle];
 
   // outputs
-  "o" [shape=box];
+  "o" [shape=circle];
 
   // computation vertices
-  "34 inf" [shape=circle];
+  "34 inf" [shape=trapezium,orientation=270];
   "34 inf" -> "o";
-  "33 absdiff" [shape=circle];
+  "33 absdiff" [shape=trapezium,orientation=270];
   "33 absdiff" -> "34 inf";
   "0`g1" -> "33 absdiff";
   "0`g0" -> "33 absdiff";
-  "32 absdiff" [shape=circle];
+  "32 absdiff" [shape=trapezium,orientation=270];
   "32 absdiff" -> "34 inf";
   "0`g2" -> "32 absdiff";
   "0`g1" -> "32 absdiff";
@@ -57,21 +57,21 @@ digraph "dag_0" {
 // graph for dag "dag_cleaned_0" of module "freia_08" in dot format
 digraph "dag_cleaned_0" {
   // inputs
-  "0`g0" [shape=box];
-  "0`g1" [shape=box];
-  "0`g2" [shape=box];
+  "0`g0" [shape=circle];
+  "0`g1" [shape=circle];
+  "0`g2" [shape=circle];
 
   // outputs
-  "o" [shape=box];
+  "o" [shape=circle];
 
   // computation vertices
-  "34 inf" [shape=circle];
+  "34 inf" [shape=trapezium,orientation=270];
   "34 inf" -> "o";
-  "33 absdiff" [shape=circle];
+  "33 absdiff" [shape=trapezium,orientation=270];
   "33 absdiff" -> "34 inf";
   "0`g1" -> "33 absdiff";
   "0`g0" -> "33 absdiff";
-  "32 absdiff" [shape=circle];
+  "32 absdiff" [shape=trapezium,orientation=270];
   "32 absdiff" -> "34 inf";
   "0`g2" -> "32 absdiff";
   "0`g1" -> "32 absdiff";
@@ -79,14 +79,14 @@ digraph "dag_cleaned_0" {
 // graph for dag "freia_08_helper_0_0" of module "freia_08" in dot format
 digraph "freia_08_helper_0_0" {
   // inputs
-  "0`g1" [shape=box];
-  "0`g2" [shape=box];
+  "0`g1" [shape=circle];
+  "0`g2" [shape=circle];
 
   // outputs
-  "0`d1" [shape=box];
+  "0`d1" [shape=circle];
 
   // computation vertices
-  "32 absdiff" [shape=circle];
+  "32 absdiff" [shape=trapezium,orientation=270];
   "0`g2" -> "32 absdiff";
   "0`g1" -> "32 absdiff";
   "32 absdiff" -> "0`d1";
@@ -94,14 +94,14 @@ digraph "freia_08_helper_0_0" {
 // graph for dag "freia_08_helper_0_1" of module "freia_08" in dot format
 digraph "freia_08_helper_0_1" {
   // inputs
-  "0`g0" [shape=box];
-  "0`g1" [shape=box];
+  "0`g0" [shape=circle];
+  "0`g1" [shape=circle];
 
   // outputs
-  "0`d0" [shape=box];
+  "0`d0" [shape=circle];
 
   // computation vertices
-  "33 absdiff" [shape=circle];
+  "33 absdiff" [shape=trapezium,orientation=270];
   "0`g1" -> "33 absdiff";
   "0`g0" -> "33 absdiff";
   "33 absdiff" -> "0`d0";
@@ -109,14 +109,14 @@ digraph "freia_08_helper_0_1" {
 // graph for dag "freia_08_helper_0_2" of module "freia_08" in dot format
 digraph "freia_08_helper_0_2" {
   // inputs
-  "0`d0" [shape=box];
-  "0`d1" [shape=box];
+  "0`d0" [shape=circle];
+  "0`d1" [shape=circle];
 
   // outputs
-  "o" [shape=box];
+  "o" [shape=circle];
 
   // computation vertices
-  "34 inf" [shape=circle];
+  "34 inf" [shape=trapezium,orientation=270];
   "0`d1" -> "34 inf";
   "0`d0" -> "34 inf";
   "34 inf" -> "o";

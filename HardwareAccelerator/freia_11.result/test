@@ -14,13 +14,13 @@ freia_status freia_11(freia_data2d *o, freia_data2d *i)
 // graph for dag "dag_0" of module "freia_11" in dot format
 digraph "dag_0" {
   // inputs
-  "i" [shape=box];
+  "i" [shape=circle];
 
   // outputs
-  "o" [shape=box];
+  "o" [shape=circle];
 
   // computation vertices
-  "7 sub" [shape=circle];
+  "7 sub" [shape=trapezium,orientation=270];
   "i" -> "7 sub";
   "i" -> "7 sub";
   "7 sub" -> "o";
@@ -28,13 +28,13 @@ digraph "dag_0" {
 // graph for dag "dag_cleaned_0" of module "freia_11" in dot format
 digraph "dag_cleaned_0" {
   // inputs
-  "i" [shape=box];
+  "i" [shape=circle];
 
   // outputs
-  "o" [shape=box];
+  "o" [shape=circle];
 
   // computation vertices
-  "7 sub" [shape=circle];
+  "7 sub" [shape=trapezium,orientation=270];
   "i" -> "7 sub";
   "i" -> "7 sub";
   "7 sub" -> "o";
@@ -42,13 +42,13 @@ digraph "dag_cleaned_0" {
 // graph for dag "freia_11_helper_0_0" of module "freia_11" in dot format
 digraph "freia_11_helper_0_0" {
   // inputs
-  "i" [shape=box];
+  "i" [shape=circle];
 
   // outputs
-  "o" [shape=box];
+  "o" [shape=circle];
 
   // computation vertices
-  "7 sub" [shape=circle];
+  "7 sub" [shape=trapezium,orientation=270];
   "i" -> "7 sub";
   "i" -> "7 sub";
   "7 sub" -> "o";

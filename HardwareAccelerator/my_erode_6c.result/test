@@ -11,39 +11,39 @@ freia_status my_erode_6c(freia_data2d *o, freia_data2d *i0, int32_t *p0)
 // graph for dag "dag_0" of module "my_erode_6c" in dot format
 digraph "dag_0" {
   // inputs
-  "i0" [shape=box];
+  "i0" [shape=circle];
 
   // outputs
-  "o" [shape=box];
+  "o" [shape=circle];
 
   // computation vertices
-  "5 erode_6c" [shape=circle];
+  "5 erode_6c" [shape=box];
   "i0" -> "5 erode_6c";
   "5 erode_6c" -> "o";
 }
 // graph for dag "dag_cleaned_0" of module "my_erode_6c" in dot format
 digraph "dag_cleaned_0" {
   // inputs
-  "i0" [shape=box];
+  "i0" [shape=circle];
 
   // outputs
-  "o" [shape=box];
+  "o" [shape=circle];
 
   // computation vertices
-  "5 erode_6c" [shape=circle];
+  "5 erode_6c" [shape=box];
   "i0" -> "5 erode_6c";
   "5 erode_6c" -> "o";
 }
 // graph for dag "my_erode_6c_helper_0_0" of module "my_erode_6c" in dot format
 digraph "my_erode_6c_helper_0_0" {
   // inputs
-  "i0" [shape=box];
+  "i0" [shape=circle];
 
   // outputs
-  "o" [shape=box];
+  "o" [shape=circle];
 
   // computation vertices
-  "5 erode_6c" [shape=circle];
+  "5 erode_6c" [shape=box];
   "i0" -> "5 erode_6c";
   "5 erode_6c" -> "o";
 }

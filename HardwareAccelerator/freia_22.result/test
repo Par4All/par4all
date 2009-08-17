@@ -19,20 +19,20 @@ freia_status freia_22(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 // graph for dag "dag_0" of module "freia_22" in dot format
 digraph "dag_0" {
   // inputs
-  "i0" [shape=box];
-  "i1" [shape=box];
+  "i0" [shape=circle];
+  "i1" [shape=circle];
 
   // outputs
-  "o" [shape=box];
+  "o" [shape=circle];
 
   // computation vertices
-  "11 addsat" [shape=circle];
+  "11 addsat" [shape=trapezium,orientation=270];
   "i0" -> "11 addsat";
   "11 addsat" -> "o";
-  "10 or" [shape=circle];
+  "10 or" [shape=trapezium,orientation=270];
   "10 or" -> "11 addsat";
   "i0" -> "10 or";
-  "9 div" [shape=circle];
+  "9 div" [shape=trapezium,orientation=270];
   "9 div" -> "10 or";
   "i0" -> "9 div";
   "i1" -> "9 div";
@@ -40,20 +40,20 @@ digraph "dag_0" {
 // graph for dag "dag_cleaned_0" of module "freia_22" in dot format
 digraph "dag_cleaned_0" {
   // inputs
-  "i0" [shape=box];
-  "i1" [shape=box];
+  "i0" [shape=circle];
+  "i1" [shape=circle];
 
   // outputs
-  "o" [shape=box];
+  "o" [shape=circle];
 
   // computation vertices
-  "11 addsat" [shape=circle];
+  "11 addsat" [shape=trapezium,orientation=270];
   "i0" -> "11 addsat";
   "11 addsat" -> "o";
-  "10 or" [shape=circle];
+  "10 or" [shape=trapezium,orientation=270];
   "10 or" -> "11 addsat";
   "i0" -> "10 or";
-  "9 div" [shape=circle];
+  "9 div" [shape=trapezium,orientation=270];
   "9 div" -> "10 or";
   "i0" -> "9 div";
   "i1" -> "9 div";
@@ -61,20 +61,20 @@ digraph "dag_cleaned_0" {
 // graph for dag "freia_22_helper_0_0" of module "freia_22" in dot format
 digraph "freia_22_helper_0_0" {
   // inputs
-  "i0" [shape=box];
-  "i1" [shape=box];
+  "i0" [shape=circle];
+  "i1" [shape=circle];
 
   // outputs
-  "o" [shape=box];
+  "o" [shape=circle];
 
   // computation vertices
-  "11 addsat" [shape=circle];
+  "11 addsat" [shape=trapezium,orientation=270];
   "i0" -> "11 addsat";
   "11 addsat" -> "o";
-  "10 or" [shape=circle];
+  "10 or" [shape=trapezium,orientation=270];
   "10 or" -> "11 addsat";
   "i0" -> "10 or";
-  "9 div" [shape=circle];
+  "9 div" [shape=trapezium,orientation=270];
   "9 div" -> "10 or";
   "i0" -> "9 div";
   "i1" -> "9 div";

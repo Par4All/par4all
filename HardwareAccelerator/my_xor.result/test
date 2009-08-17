@@ -11,14 +11,14 @@ freia_status my_xor(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 // graph for dag "dag_0" of module "my_xor" in dot format
 digraph "dag_0" {
   // inputs
-  "i0" [shape=box];
-  "i1" [shape=box];
+  "i0" [shape=circle];
+  "i1" [shape=circle];
 
   // outputs
-  "o" [shape=box];
+  "o" [shape=circle];
 
   // computation vertices
-  "5 xor" [shape=circle];
+  "5 xor" [shape=trapezium,orientation=270];
   "i0" -> "5 xor";
   "i1" -> "5 xor";
   "5 xor" -> "o";
@@ -26,14 +26,14 @@ digraph "dag_0" {
 // graph for dag "dag_cleaned_0" of module "my_xor" in dot format
 digraph "dag_cleaned_0" {
   // inputs
-  "i0" [shape=box];
-  "i1" [shape=box];
+  "i0" [shape=circle];
+  "i1" [shape=circle];
 
   // outputs
-  "o" [shape=box];
+  "o" [shape=circle];
 
   // computation vertices
-  "5 xor" [shape=circle];
+  "5 xor" [shape=trapezium,orientation=270];
   "i0" -> "5 xor";
   "i1" -> "5 xor";
   "5 xor" -> "o";
@@ -41,14 +41,14 @@ digraph "dag_cleaned_0" {
 // graph for dag "my_xor_helper_0_0" of module "my_xor" in dot format
 digraph "my_xor_helper_0_0" {
   // inputs
-  "i0" [shape=box];
-  "i1" [shape=box];
+  "i0" [shape=circle];
+  "i1" [shape=circle];
 
   // outputs
-  "o" [shape=box];
+  "o" [shape=circle];
 
   // computation vertices
-  "5 xor" [shape=circle];
+  "5 xor" [shape=trapezium,orientation=270];
   "i0" -> "5 xor";
   "i1" -> "5 xor";
   "5 xor" -> "o";

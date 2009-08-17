@@ -11,34 +11,34 @@ freia_status my_global_max_coord(freia_data2d *i0, int32_t *p0, int32_t *p1, int
 // graph for dag "dag_0" of module "my_global_max_coord" in dot format
 digraph "dag_0" {
   // inputs
-  "i0" [shape=box];
+  "i0" [shape=circle];
 
   // outputs
 
   // computation vertices
-  "5 global_max_coord" [shape=circle];
+  "5 global_max_coord" [shape=diamond];
   "i0" -> "5 global_max_coord";
 }
 // graph for dag "dag_cleaned_0" of module "my_global_max_coord" in dot format
 digraph "dag_cleaned_0" {
   // inputs
-  "i0" [shape=box];
+  "i0" [shape=circle];
 
   // outputs
 
   // computation vertices
-  "5 global_max_coord" [shape=circle];
+  "5 global_max_coord" [shape=diamond];
   "i0" -> "5 global_max_coord";
 }
 // graph for dag "my_global_max_coord_helper_0_0" of module "my_global_max_coord" in dot format
 digraph "my_global_max_coord_helper_0_0" {
   // inputs
-  "i0" [shape=box];
+  "i0" [shape=circle];
 
   // outputs
 
   // computation vertices
-  "5 global_max_coord" [shape=circle];
+  "5 global_max_coord" [shape=diamond];
   "i0" -> "5 global_max_coord";
 }
 

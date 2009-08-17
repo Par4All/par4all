@@ -21,10 +21,10 @@ freia_status freia_19(freia_data2d *o, freia_data2d *i)
 // graph for dag "dag_0" of module "freia_19" in dot format
 digraph "dag_0" {
   // inputs
-  "i" [shape=box];
+  "i" [shape=circle];
 
   // outputs
-  "o" [shape=box];
+  "o" [shape=circle];
 
   // computation vertices
   "12 copy" [shape=circle];
@@ -36,10 +36,10 @@ digraph "dag_0" {
 // graph for dag "dag_cleaned_0" of module "freia_19" in dot format
 digraph "dag_cleaned_0" {
   // inputs
-  "i" [shape=box];
+  "i" [shape=circle];
 
   // outputs
-  "o" [shape=box];
+  "o" [shape=circle];
 
   // computation vertices
   "12 copy" [shape=circle];
@@ -49,10 +49,10 @@ digraph "dag_cleaned_0" {
 // graph for dag "freia_19_helper_0_0" of module "freia_19" in dot format
 digraph "freia_19_helper_0_0" {
   // inputs
-  "i" [shape=box];
+  "i" [shape=circle];
 
   // outputs
-  "o" [shape=box];
+  "o" [shape=circle];
 
   // computation vertices
   "12 copy" [shape=circle];

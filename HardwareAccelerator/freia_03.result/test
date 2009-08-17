@@ -45,29 +45,29 @@ freia_status freia_03(freia_data2d *o, freia_data2d *i0, freia_data2d *i1, int32
 // graph for dag "dag_0" of module "freia_03" in dot format
 digraph "dag_0" {
   // inputs
-  "i0" [shape=box];
-  "i1" [shape=box];
+  "i0" [shape=circle];
+  "i1" [shape=circle];
 
   // outputs
-  "o" [shape=box];
+  "o" [shape=circle];
 
   // computation vertices
-  "32 mul" [shape=circle];
+  "32 mul" [shape=trapezium,orientation=270];
   "32 mul" -> "o";
-  "31 set_constant" [shape=circle];
+  "31 set_constant" [shape=trapezium,orientation=270];
   "31 set_constant" -> "32 mul";
-  "30 and" [shape=circle];
+  "30 and" [shape=trapezium,orientation=270];
   "30 and" -> "32 mul";
-  "29 div_const" [shape=circle];
+  "29 div_const" [shape=trapezium,orientation=270];
   "29 div_const" -> "30 and";
-  "28 mul_const" [shape=circle];
+  "28 mul_const" [shape=trapezium,orientation=270];
   "28 mul_const" -> "30 and";
-  "27 add" [shape=circle];
+  "27 add" [shape=trapezium,orientation=270];
   "27 add" -> "29 div_const";
-  "26 addsat_const" [shape=circle];
+  "26 addsat_const" [shape=trapezium,orientation=270];
   "26 addsat_const" -> "27 add";
   "i1" -> "26 addsat_const";
-  "25 add_const" [shape=circle];
+  "25 add_const" [shape=trapezium,orientation=270];
   "25 add_const" -> "28 mul_const";
   "25 add_const" -> "27 add";
   "i0" -> "25 add_const";
@@ -75,29 +75,29 @@ digraph "dag_0" {
 // graph for dag "dag_cleaned_0" of module "freia_03" in dot format
 digraph "dag_cleaned_0" {
   // inputs
-  "i0" [shape=box];
-  "i1" [shape=box];
+  "i0" [shape=circle];
+  "i1" [shape=circle];
 
   // outputs
-  "o" [shape=box];
+  "o" [shape=circle];
 
   // computation vertices
-  "32 mul" [shape=circle];
+  "32 mul" [shape=trapezium,orientation=270];
   "32 mul" -> "o";
-  "31 set_constant" [shape=circle];
+  "31 set_constant" [shape=trapezium,orientation=270];
   "31 set_constant" -> "32 mul";
-  "30 and" [shape=circle];
+  "30 and" [shape=trapezium,orientation=270];
   "30 and" -> "32 mul";
-  "29 div_const" [shape=circle];
+  "29 div_const" [shape=trapezium,orientation=270];
   "29 div_const" -> "30 and";
-  "28 mul_const" [shape=circle];
+  "28 mul_const" [shape=trapezium,orientation=270];
   "28 mul_const" -> "30 and";
-  "27 add" [shape=circle];
+  "27 add" [shape=trapezium,orientation=270];
   "27 add" -> "29 div_const";
-  "26 addsat_const" [shape=circle];
+  "26 addsat_const" [shape=trapezium,orientation=270];
   "26 addsat_const" -> "27 add";
   "i1" -> "26 addsat_const";
-  "25 add_const" [shape=circle];
+  "25 add_const" [shape=trapezium,orientation=270];
   "25 add_const" -> "28 mul_const";
   "25 add_const" -> "27 add";
   "i0" -> "25 add_const";
@@ -105,29 +105,29 @@ digraph "dag_cleaned_0" {
 // graph for dag "freia_03_helper_0_0" of module "freia_03" in dot format
 digraph "freia_03_helper_0_0" {
   // inputs
-  "i0" [shape=box];
-  "i1" [shape=box];
+  "i0" [shape=circle];
+  "i1" [shape=circle];
 
   // outputs
-  "o" [shape=box];
+  "o" [shape=circle];
 
   // computation vertices
-  "32 mul" [shape=circle];
+  "32 mul" [shape=trapezium,orientation=270];
   "32 mul" -> "o";
-  "31 set_constant" [shape=circle];
+  "31 set_constant" [shape=trapezium,orientation=270];
   "31 set_constant" -> "32 mul";
-  "30 and" [shape=circle];
+  "30 and" [shape=trapezium,orientation=270];
   "30 and" -> "32 mul";
-  "29 div_const" [shape=circle];
+  "29 div_const" [shape=trapezium,orientation=270];
   "29 div_const" -> "30 and";
-  "28 mul_const" [shape=circle];
+  "28 mul_const" [shape=trapezium,orientation=270];
   "28 mul_const" -> "30 and";
-  "27 add" [shape=circle];
+  "27 add" [shape=trapezium,orientation=270];
   "27 add" -> "29 div_const";
-  "26 addsat_const" [shape=circle];
+  "26 addsat_const" [shape=trapezium,orientation=270];
   "26 addsat_const" -> "27 add";
   "i1" -> "26 addsat_const";
-  "25 add_const" [shape=circle];
+  "25 add_const" [shape=trapezium,orientation=270];
   "25 add_const" -> "28 mul_const";
   "25 add_const" -> "27 add";
   "i0" -> "25 add_const";

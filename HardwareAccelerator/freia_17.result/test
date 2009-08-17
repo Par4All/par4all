@@ -41,13 +41,13 @@ freia_status freia_17(freia_data2d *o, freia_data2d *i)
 // graph for dag "dag_0" of module "freia_17" in dot format
 digraph "dag_0" {
   // inputs
-  "i" [shape=box];
+  "i" [shape=circle];
 
   // outputs
-  "0`t3" [shape=box];
-  "0`t4" [shape=box];
-  "0`t5" [shape=box];
-  "o" [shape=box];
+  "0`t3" [shape=circle];
+  "0`t4" [shape=circle];
+  "0`t5" [shape=circle];
+  "o" [shape=circle];
 
   // computation vertices
   "27 copy" [shape=circle];
@@ -72,13 +72,13 @@ digraph "dag_0" {
 // graph for dag "dag_cleaned_0" of module "freia_17" in dot format
 digraph "dag_cleaned_0" {
   // inputs
-  "i" [shape=box];
+  "i" [shape=circle];
 
   // outputs
-  "0`t3" [shape=box];
-  "0`t4" [shape=box];
-  "0`t5" [shape=box];
-  "o" [shape=box];
+  "0`t3" [shape=circle];
+  "0`t4" [shape=circle];
+  "0`t5" [shape=circle];
+  "o" [shape=circle];
 
   // computation vertices
   "27 copy" [shape=circle];
@@ -97,11 +97,11 @@ digraph "dag_cleaned_0" {
 // graph for dag "freia_17_helper_0_0" of module "freia_17" in dot format
 digraph "freia_17_helper_0_0" {
   // inputs
-  "i" [shape=box];
+  "i" [shape=circle];
 
   // outputs
-  "0`t3" [shape=box];
-  "o" [shape=box];
+  "0`t3" [shape=circle];
+  "o" [shape=circle];
 
   // computation vertices
   "25 copy" [shape=circle];
@@ -114,11 +114,11 @@ digraph "freia_17_helper_0_0" {
 // graph for dag "freia_17_helper_0_1" of module "freia_17" in dot format
 digraph "freia_17_helper_0_1" {
   // inputs
-  "i" [shape=box];
+  "i" [shape=circle];
 
   // outputs
-  "0`t4" [shape=box];
-  "0`t5" [shape=box];
+  "0`t4" [shape=circle];
+  "0`t5" [shape=circle];
 
   // computation vertices
   "27 copy" [shape=circle];

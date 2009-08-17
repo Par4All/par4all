@@ -16,58 +16,58 @@ freia_status freia_15(freia_data2d *o, freia_data2d *i, int32_t *r0, int32_t *r1
 // graph for dag "dag_0" of module "freia_15" in dot format
 digraph "dag_0" {
   // inputs
-  "i" [shape=box];
+  "i" [shape=circle];
 
   // outputs
-  "o" [shape=box];
+  "o" [shape=circle];
 
   // computation vertices
-  "10 global_vol" [shape=circle];
+  "10 global_vol" [shape=diamond];
   "i" -> "10 global_vol";
-  "9 global_max" [shape=circle];
+  "9 global_max" [shape=diamond];
   "i" -> "9 global_max";
-  "8 global_min" [shape=circle];
+  "8 global_min" [shape=diamond];
   "i" -> "8 global_min";
-  "7 add_const" [shape=circle];
+  "7 add_const" [shape=trapezium,orientation=270];
   "i" -> "7 add_const";
   "7 add_const" -> "o";
 }
 // graph for dag "dag_cleaned_0" of module "freia_15" in dot format
 digraph "dag_cleaned_0" {
   // inputs
-  "i" [shape=box];
+  "i" [shape=circle];
 
   // outputs
-  "o" [shape=box];
+  "o" [shape=circle];
 
   // computation vertices
-  "10 global_vol" [shape=circle];
+  "10 global_vol" [shape=diamond];
   "i" -> "10 global_vol";
-  "9 global_max" [shape=circle];
+  "9 global_max" [shape=diamond];
   "i" -> "9 global_max";
-  "8 global_min" [shape=circle];
+  "8 global_min" [shape=diamond];
   "i" -> "8 global_min";
-  "7 add_const" [shape=circle];
+  "7 add_const" [shape=trapezium,orientation=270];
   "i" -> "7 add_const";
   "7 add_const" -> "o";
 }
 // graph for dag "freia_15_helper_0_0" of module "freia_15" in dot format
 digraph "freia_15_helper_0_0" {
   // inputs
-  "i" [shape=box];
+  "i" [shape=circle];
 
   // outputs
-  "o" [shape=box];
+  "o" [shape=circle];
 
   // computation vertices
-  "7 add_const" [shape=circle];
+  "7 add_const" [shape=trapezium,orientation=270];
   "i" -> "7 add_const";
   "7 add_const" -> "o";
-  "10 global_vol" [shape=circle];
+  "10 global_vol" [shape=diamond];
   "i" -> "10 global_vol";
-  "9 global_max" [shape=circle];
+  "9 global_max" [shape=diamond];
   "i" -> "9 global_max";
-  "8 global_min" [shape=circle];
+  "8 global_min" [shape=diamond];
   "i" -> "8 global_min";
 }
 

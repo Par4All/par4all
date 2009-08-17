@@ -25,20 +25,20 @@ freia_status freia_06(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 // graph for dag "dag_0" of module "freia_06" in dot format
 digraph "dag_0" {
   // inputs
-  "i0" [shape=box];
-  "i1" [shape=box];
+  "i0" [shape=circle];
+  "i1" [shape=circle];
 
   // outputs
-  "o" [shape=box];
+  "o" [shape=circle];
 
   // computation vertices
-  "15 or" [shape=circle];
+  "15 or" [shape=trapezium,orientation=270];
   "15 or" -> "o";
-  "14 and" [shape=circle];
+  "14 and" [shape=trapezium,orientation=270];
   "14 and" -> "15 or";
   "i0" -> "14 and";
   "i1" -> "14 and";
-  "13 mul" [shape=circle];
+  "13 mul" [shape=trapezium,orientation=270];
   "13 mul" -> "15 or";
   "i0" -> "13 mul";
   "i1" -> "13 mul";
@@ -46,20 +46,20 @@ digraph "dag_0" {
 // graph for dag "dag_cleaned_0" of module "freia_06" in dot format
 digraph "dag_cleaned_0" {
   // inputs
-  "i0" [shape=box];
-  "i1" [shape=box];
+  "i0" [shape=circle];
+  "i1" [shape=circle];
 
   // outputs
-  "o" [shape=box];
+  "o" [shape=circle];
 
   // computation vertices
-  "15 or" [shape=circle];
+  "15 or" [shape=trapezium,orientation=270];
   "15 or" -> "o";
-  "14 and" [shape=circle];
+  "14 and" [shape=trapezium,orientation=270];
   "14 and" -> "15 or";
   "i0" -> "14 and";
   "i1" -> "14 and";
-  "13 mul" [shape=circle];
+  "13 mul" [shape=trapezium,orientation=270];
   "13 mul" -> "15 or";
   "i0" -> "13 mul";
   "i1" -> "13 mul";
@@ -67,14 +67,14 @@ digraph "dag_cleaned_0" {
 // graph for dag "freia_06_helper_0_0" of module "freia_06" in dot format
 digraph "freia_06_helper_0_0" {
   // inputs
-  "i0" [shape=box];
-  "i1" [shape=box];
+  "i0" [shape=circle];
+  "i1" [shape=circle];
 
   // outputs
-  "0`t1" [shape=box];
+  "0`t1" [shape=circle];
 
   // computation vertices
-  "13 mul" [shape=circle];
+  "13 mul" [shape=trapezium,orientation=270];
   "i0" -> "13 mul";
   "i1" -> "13 mul";
   "13 mul" -> "0`t1";
@@ -82,14 +82,14 @@ digraph "freia_06_helper_0_0" {
 // graph for dag "freia_06_helper_0_1" of module "freia_06" in dot format
 digraph "freia_06_helper_0_1" {
   // inputs
-  "i0" [shape=box];
-  "i1" [shape=box];
+  "i0" [shape=circle];
+  "i1" [shape=circle];
 
   // outputs
-  "0`t2" [shape=box];
+  "0`t2" [shape=circle];
 
   // computation vertices
-  "14 and" [shape=circle];
+  "14 and" [shape=trapezium,orientation=270];
   "i0" -> "14 and";
   "i1" -> "14 and";
   "14 and" -> "0`t2";
@@ -97,14 +97,14 @@ digraph "freia_06_helper_0_1" {
 // graph for dag "freia_06_helper_0_2" of module "freia_06" in dot format
 digraph "freia_06_helper_0_2" {
   // inputs
-  "0`t1" [shape=box];
-  "0`t2" [shape=box];
+  "0`t1" [shape=circle];
+  "0`t2" [shape=circle];
 
   // outputs
-  "o" [shape=box];
+  "o" [shape=circle];
 
   // computation vertices
-  "15 or" [shape=circle];
+  "15 or" [shape=trapezium,orientation=270];
   "0`t1" -> "15 or";
   "0`t2" -> "15 or";
   "15 or" -> "o";
