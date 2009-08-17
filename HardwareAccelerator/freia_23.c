@@ -4,7 +4,6 @@ freia_status
 freia_23(freia_data2d * o, freia_data2d * io, freia_data2d * i1)
 {
   // external input variable reuse
-  // BUG io is not extracted from the pipe
   // o = io ^ i1
   // io' = o - io
   // o = o + io'

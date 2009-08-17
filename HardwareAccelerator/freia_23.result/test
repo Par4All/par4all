@@ -4,15 +4,14 @@
 freia_status freia_23(freia_data2d *o, freia_data2d *io, freia_data2d *i1)
 {
    // external input variable reuse
-   // BUG io is not extracted from the pipe
    // o = io ^ i1
    // io' = o - io
    // o = o + io'
-   freia_aipo_xor(o, io, i1);                                           /*0010*/
-   freia_aipo_sub(io, o, io);                                           /*0011*/
-   freia_aipo_add(o, o, io);                                            /*0012*/
+   freia_aipo_xor(o, io, i1);                                           /*0009*/
+   freia_aipo_sub(io, o, io);                                           /*0010*/
+   freia_aipo_add(o, o, io);                                            /*0011*/
 
-   return FREIA_OK;                                                     /*0014*/
+   return FREIA_OK;                                                     /*0013*/
 }
 
 ! graphs
@@ -28,17 +27,17 @@ digraph "dag_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "12 add" [shape=trapezium,orientation=270];
-  "12 add" -> "o";
-  "11 sub" [shape=trapezium,orientation=270];
-  "11 sub" -> "12 add";
-  "io" -> "11 sub";
-  "11 sub" -> "io";
-  "10 xor" [shape=trapezium,orientation=270];
-  "10 xor" -> "12 add";
-  "10 xor" -> "11 sub";
-  "io" -> "10 xor";
-  "i1" -> "10 xor";
+  "11 add" [shape=trapezium,orientation=270];
+  "11 add" -> "o";
+  "10 sub" [shape=trapezium,orientation=270];
+  "10 sub" -> "11 add";
+  "io" -> "10 sub";
+  "10 sub" -> "io";
+  "9 xor" [shape=trapezium,orientation=270];
+  "9 xor" -> "11 add";
+  "9 xor" -> "10 sub";
+  "io" -> "9 xor";
+  "i1" -> "9 xor";
 }
 // graph for dag "dag_cleaned_0" of module "freia_23" in dot format
 digraph "dag_cleaned_0" {
@@ -51,17 +50,17 @@ digraph "dag_cleaned_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "12 add" [shape=trapezium,orientation=270];
-  "12 add" -> "o";
-  "11 sub" [shape=trapezium,orientation=270];
-  "11 sub" -> "12 add";
-  "io" -> "11 sub";
-  "11 sub" -> "io";
-  "10 xor" [shape=trapezium,orientation=270];
-  "10 xor" -> "12 add";
-  "10 xor" -> "11 sub";
-  "io" -> "10 xor";
-  "i1" -> "10 xor";
+  "11 add" [shape=trapezium,orientation=270];
+  "11 add" -> "o";
+  "10 sub" [shape=trapezium,orientation=270];
+  "10 sub" -> "11 add";
+  "io" -> "10 sub";
+  "10 sub" -> "io";
+  "9 xor" [shape=trapezium,orientation=270];
+  "9 xor" -> "11 add";
+  "9 xor" -> "10 sub";
+  "io" -> "9 xor";
+  "i1" -> "9 xor";
 }
 // graph for dag "freia_23_helper_0_0" of module "freia_23" in dot format
 digraph "freia_23_helper_0_0" {
@@ -74,17 +73,17 @@ digraph "freia_23_helper_0_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "12 add" [shape=trapezium,orientation=270];
-  "12 add" -> "o";
-  "11 sub" [shape=trapezium,orientation=270];
-  "11 sub" -> "12 add";
-  "io" -> "11 sub";
-  "11 sub" -> "io";
-  "10 xor" [shape=trapezium,orientation=270];
-  "10 xor" -> "12 add";
-  "10 xor" -> "11 sub";
-  "io" -> "10 xor";
-  "i1" -> "10 xor";
+  "11 add" [shape=trapezium,orientation=270];
+  "11 add" -> "o";
+  "10 sub" [shape=trapezium,orientation=270];
+  "10 sub" -> "11 add";
+  "io" -> "10 sub";
+  "10 sub" -> "io";
+  "9 xor" [shape=trapezium,orientation=270];
+  "9 xor" -> "11 add";
+  "9 xor" -> "10 sub";
+  "io" -> "9 xor";
+  "i1" -> "9 xor";
 }
 
 ! acceleration function
@@ -112,39 +111,39 @@ freia_status freia_23_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_d
 
 
   // STAGE 0
-  // i1 [0 input 0] -> [0 alu] 10 xor
+  // i1 [0 input 0] -> [0 alu] 9 xor
   // nope
-  // io [0 input 1] -> [0 alu] 10 xor
+  // io [0 input 1] -> [0 alu] 9 xor
   // nope
-  // alu 10 xor stage 0
+  // alu 9 xor stage 0
   si.alu[0][0].op = SPOC_ALU_XOR_IN0_IN1;
 
 
   // STAGE 1
-  // o [0 alu] -> [1 alu] 11 sub
+  // o [0 alu] -> [1 alu] 10 sub
   si.mux[0][0].op = SPOC_MUX_IN1;
   si.mux[0][2].op = SPOC_MUX_IN0;
-  // o [1 input 0] -> [1 alu] 11 sub
+  // o [1 input 0] -> [1 alu] 10 sub
   // nope
-  // io [0 input 1] -> [1 alu] 11 sub
+  // io [0 input 1] -> [1 alu] 10 sub
   si.mux[0][3].op = SPOC_MUX_IN1;
-  // io [1 input 1] -> [1 alu] 11 sub
+  // io [1 input 1] -> [1 alu] 10 sub
   // nope
-  // alu 11 sub stage 1
+  // alu 10 sub stage 1
   si.alu[1][0].op = SPOC_ALU_SUB_IN0_IN1;
 
 
   // STAGE 2
-  // o [1 input 0] -> [2 alu] 12 add
+  // o [1 input 0] -> [2 alu] 11 add
   si.mux[1][0].op = SPOC_MUX_IN0;
-  // o [2 input 0] -> [2 alu] 12 add
+  // o [2 input 0] -> [2 alu] 11 add
   // nope
-  // io [1 alu] -> [2 alu] 12 add
+  // io [1 alu] -> [2 alu] 11 add
   si.mux[1][1].op = SPOC_MUX_IN0;
   si.mux[1][3].op = SPOC_MUX_IN0;
-  // io [2 input 1] -> [2 alu] 12 add
+  // io [2 input 1] -> [2 alu] 11 add
   // nope
-  // alu 12 add stage 2
+  // alu 11 add stage 2
   si.alu[2][0].op = SPOC_ALU_ADD_IN0_IN1;
 
 
@@ -178,11 +177,10 @@ freia_status freia_23_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_d
 freia_status freia_23(freia_data2d *o, freia_data2d *io, freia_data2d *i1)
 {
    // external input variable reuse
-   // BUG io is not extracted from the pipe
    // o = io ^ i1
    // io' = o - io
    // o = o + io'
-   freia_23_helper_0_0_0(io, o, i1, io);                                /*0010*/
+   freia_23_helper_0_0_0(io, o, i1, io);                                /*0009*/
 
-   return FREIA_OK;                                                     /*0014*/
+   return FREIA_OK;                                                     /*0013*/
 }
