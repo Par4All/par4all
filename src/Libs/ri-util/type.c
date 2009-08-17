@@ -3072,10 +3072,17 @@ bool check_C_function_type(entity f, list args)
     }
   }
   else if(gen_length(args)!=gen_length(parms)) {
+    /* Take care of the void case */
     if(gen_length(args)==0 && gen_length(parms)==1) {
       parameter p = PARAMETER(CAR(parms));
       type pt = parameter_type(p);
       ok = type_void_p(pt);
+    }
+    /* Take care of the varargs case*/
+    else if(gen_length(parms) >= 2 && gen_length(args) > gen_length(parms)) {
+      parameter lp = PARAMETER(CAR(gen_last(parms)));
+      type pt = parameter_type(lp);
+      ok = type_varargs_p(pt);
     }
     else
       ok = FALSE;
