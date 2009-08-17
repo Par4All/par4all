@@ -184,7 +184,7 @@ void reset_keyword_typedef_table()
 
 /* This function checks if s is a C keyword/typedef name or not by using
    the hash table keyword_typedef_table.
-   It returns an integer number corresponding to the keyword. 
+   It returns an integer number corresponding to the keyword.
    It returns 0 if s is not a keyword/typedef name */
 _int
 is_c_keyword_typedef(char * s)
@@ -206,7 +206,7 @@ void CParserError(char *msg)
   c_reset_lex();
 
   /* Reset the parser global variables ?*/
-  
+
   pips_debug(4,"Reset current module entity %s\n", mod_name);
 
   /* The error may occur before the current module entity is defined */

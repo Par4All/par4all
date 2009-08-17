@@ -231,13 +231,19 @@ expression MakeBraceExpression(list l)
 
 expression MakeFunctionExpression(expression e, list le)
 {
-  /* There are 2 cases :
-     1. The first argument corresponds to a function name (an entity). 
-        In this case, we create a normal call expression and the corresponding
-	entity is added to the list of callees.
-     2. The first argument can be any expression denoting a called function (a pointer 
-        to a function,... such as (*ctx->Driver.RenderString)() in the benchmark mesa in SPEC2000). 
-	In this case, we create a function application expression.  */
+  /* There are 2 cases:
+
+     1. The first argument corresponds to a function name (an entity).
+
+        In this case, we create a normal call expression and the
+	corresponding entity is added to the list of callees.
+
+     2. The first argument can be any expression denoting a called
+        function (a pointer to a function,... such as
+        (*ctx->Driver.RenderString)() in the benchmark mesa in
+        SPEC2000).  In this case, we create a function application
+        expression.
+  */
   expression exp = expression_undefined;
   syntax s = expression_syntax(e);
   switch (syntax_tag(s))
@@ -284,6 +290,12 @@ expression MakeFunctionExpression(expression e, list le)
 	pips_debug(6,"Normal function or intrinsics call\n");
 	ok = check_C_function_type(ent, le);
 	exp = make_call_expression(ent,le);
+	if(!ok) {
+	  pips_user_warning("Actual arguments do not fit the declared formal "
+			    "arguments of function \"%s\"\n",
+			    entity_user_name(ent));
+	  CParserError("Type mismatch\n");
+	  }
 	break;
       }
     case is_syntax_call:
@@ -294,13 +306,13 @@ expression MakeFunctionExpression(expression e, list le)
 	break;
       }
     case is_syntax_range:
-    case is_syntax_cast: 
+    case is_syntax_cast:
     case is_syntax_sizeofexpression:
     case is_syntax_subscript:
     case is_syntax_application:
       CParserError("This is not a functional expression\n");
       break;
-    default: 
+    default:
       {
 	pips_internal_error("unexpected syntax tag: %d\n", syntax_tag(s));
       }
@@ -561,7 +573,7 @@ expression MakeArrayExpression(expression exp, list lexp)
     }
   case is_syntax_call:
   case is_syntax_range:
-  case is_syntax_cast: 
+  case is_syntax_cast:
   case is_syntax_sizeofexpression:
   case is_syntax_subscript:
   case is_syntax_application:
@@ -572,11 +584,11 @@ expression MakeArrayExpression(expression exp, list lexp)
       e = make_expression(s,normalized_undefined);
       break;
     }
-  default: 
+  default:
     {
       pips_internal_error("unexpected syntax tag: %d\n", syntax_tag(s));
     }
-  } 
+  }
   return e;
 }
 
@@ -592,7 +604,7 @@ entity FindEntityFromLocalName(string name)
   /* Find an entity from its local name.
      We have to look for all possible prefixes, which are:
      blank, STRUCT_PREFIX, UNION_PREFIX, ENUM_PREFIX, TYPEDEF_PREFIX
-     
+
      How about multiple results ? The order of prefixes ?  */
 
   entity ent = entity_undefined;

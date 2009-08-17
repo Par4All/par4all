@@ -262,18 +262,18 @@ list c_actual_argument_to_may_summary_effects(expression real_arg, tag act)
 
 
 /**
- This function translates the list of effects l_sum_eff summarizing the 
- effects of module callee from its name space to the name space of the
- caller, that is to say the current module being analyzed.
- It is generic, which means that it does not depend on the representation
- of effects. There is another similar function for fortran modules.
- 
+ This function translates the list of effects l_sum_eff summarizing
+ the effects of module callee from its name space to the name space of
+ the caller, that is to say the current module being analyzed.  It is
+ generic, which means that it does not depend on the representation of
+ effects. There is another similar function for fortran modules.
+
  @param callee is the called module
  @param real_args is the list of actual arguments
  @param l_sum_eff is the list of summary effects for function func
  @param the current precondition if available
  @return a list of effects in the caller name space
- 
+
 */
 list generic_c_effects_backward_translation(entity callee,
 					    list /* of expression */ real_args,
@@ -301,7 +301,7 @@ list generic_c_effects_backward_translation(entity callee,
   (*effects_translation_init_func)(callee, real_args);
 
   /* first, take care of global effects */
-  
+
   l_current = l_begin;
   l_prec = NIL;
   while(!ENDP(l_current))
@@ -310,23 +310,23 @@ list generic_c_effects_backward_translation(entity callee,
       reference r = effect_any_reference(eff);
       entity v = reference_variable(r);
 
-      if(!formal_parameter_p(v)) 
+      if(!formal_parameter_p(v))
 	{
 	  /* This effect must be a global effect. It does not require
-	     translation in C. However, it may not be in the scope of 
+	     translation in C. However, it may not be in the scope of
 	     the caller. */
-	  /* not generic : for regions we also have to translate the predicate 
+	  /* not generic : for regions we also have to translate the predicate
 	     BC */
 	  l_eff = gen_nconc(l_eff, CONS(EFFECT, copy_effect(eff), NIL));
-	  
+
 	  /* remove the current element from the list */
-	  if (l_begin == l_current) 
+	  if (l_begin == l_current)
 	    {
 	      l_current = CDR(l_current);
 	      CDR(l_begin) = NIL;
 	      gen_free_list(l_begin);
 	      l_begin = l_current;
-	      
+
 	    }
 	  else
 	    {
@@ -341,7 +341,7 @@ list generic_c_effects_backward_translation(entity callee,
 	  l_prec = l_current;
 	  l_current = CDR(l_current);
 	}
-      
+
     } /* while */
 
   ifdebug(5)
@@ -360,7 +360,7 @@ list generic_c_effects_backward_translation(entity callee,
       parameter formal_arg;
       type te;
 
-      pips_debug(5, "current real arg : %s\n", 
+      pips_debug(5, "current real arg : %s\n",
 		 words_to_string(words_expression(real_arg)));
 
       if (!param_varargs_p)
@@ -374,10 +374,10 @@ list generic_c_effects_backward_translation(entity callee,
       if (param_varargs_p)
 	{
 	  pips_debug(5, "vararg case \n");
-	  l_eff = gen_nconc(l_eff, 
-			    c_actual_argument_to_may_summary_effects(real_arg, 
+	  l_eff = gen_nconc(l_eff,
+			    c_actual_argument_to_may_summary_effects(real_arg,
 								     'x'));
-	}  
+	}
       else
 	{
 	  list l_eff_on_current_formal = NIL;
@@ -397,7 +397,7 @@ list generic_c_effects_backward_translation(entity callee,
 
 	      if (ith_parameter_p(callee, eff_ent, arg_num))
 		{
-		  
+
 		  /* Whatever the real_arg may be if there is an effect on 
 		     the sole value of the formal arg, it generates no effect 
 		     on the caller side.
@@ -413,13 +413,13 @@ list generic_c_effects_backward_translation(entity callee,
 		    }
 		  /*   c_summary_effect_to_proper_effects(eff, real_arg));*/
 		  /* remove the current element from the list */
-		  if (l_begin == l_current) 
+		  if (l_begin == l_current)
 		    {
 		      l_current = CDR(l_current);
 		      CDR(l_begin) = NIL;
 		      gen_free_list(l_begin);
 		      l_begin = l_current;
-		      
+
 		    }
 		  else
 		    {
@@ -428,15 +428,15 @@ list generic_c_effects_backward_translation(entity callee,
 		      gen_free_list(l_current);
 		      l_current = CDR(l_prec);
 		    }
-		  
+
 		}
 	      else
 		{
 		  l_prec = l_current;
 		  l_current = CDR(l_current);
-		}	      
+		}
 	    } /* while */
-	  
+
 	  ifdebug(5)
 	    {
 	      pips_debug(5, "effects on current formal argument:\n");
@@ -447,24 +447,24 @@ list generic_c_effects_backward_translation(entity callee,
 	    (l_eff,
 	     (*c_effects_on_formal_parameter_backward_translation_func)
 	     (l_eff_on_current_formal, real_arg, context));
-	  
+
 	  POP(formal_args);
 	} /* else */
-      
+
       /* add the proper effects on the real arg evaluation */
       l_eff = gen_nconc(l_eff, generic_proper_effects_of_expression(real_arg));
     } /* for */
-  
+
   (*effects_translation_end_func)();
-  
+
   ifdebug(5)
     {
       pips_debug(5, "resulting effects :\n");
       (*effects_prettyprint_func)(l_eff);
     }
-  
+
   return (l_eff);
-  
+
 }
 
 /************************************************************ INTERFACE */
@@ -477,13 +477,13 @@ generic_effects_backward_translation(
 				     transformer context)
 {
   list el = list_undefined;
-  
-  
+
+
   if(parameter_passing_by_reference_p(callee))
-    el = generic_fortran_effects_backward_translation(callee, real_args, 
+    el = generic_fortran_effects_backward_translation(callee, real_args,
 						      l_sum_eff, context);
   else
-    el = generic_c_effects_backward_translation(callee, real_args, 
+    el = generic_c_effects_backward_translation(callee, real_args,
 						l_sum_eff, context);
 
 
