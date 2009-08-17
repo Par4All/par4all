@@ -168,12 +168,13 @@ entity
 make_label(string strg)
 {
 
-    entity l = make_entity(strdup(strg), type_undefined, storage_undefined, 
-			value_undefined);
-    entity_type(l) = (type) MakeTypeStatement();
-    entity_storage(l) = (storage) MakeStorageRom();
-    entity_initial(l) = make_value(is_value_constant, 
-				   MakeConstantLitteral());
+    entity l = find_or_create_entity(strg);
+    if( type_undefined_p(entity_type(l)) ) {
+        entity_type(l) = (type) MakeTypeStatement();
+        entity_storage(l) = (storage) MakeStorageRom();
+        entity_initial(l) = make_value(is_value_constant, 
+                MakeConstantLitteral());
+    }
     return l;
 }
 

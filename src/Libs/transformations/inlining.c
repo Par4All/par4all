@@ -226,6 +226,25 @@ entity make_temporary_scalar_entity(entity efrom, expression from)
 	return new;
 }
 
+static
+void inlining_regenerate_labels(statement s, string new_module)
+{
+    entity lbl = statement_label(s);
+    if(!entity_empty_label_p(lbl))
+    {
+        if( !gen_chunk_undefined_p(find_label_entity(new_module,label_local_name(lbl))))
+            statement_label(s)=lbl=make_new_label(new_module);
+        else
+            FindOrCreateEntity(new_module,entity_local_name(lbl));
+        if( statement_loop_p(s) )
+            loop_label(statement_loop(s))=lbl;
+    }
+    else if( statement_loop_p(s) ) {
+        if( !gen_chunk_undefined_p( find_label_entity(new_module,label_local_name(lbl)) ) )
+            loop_label(statement_loop(s))=make_new_label(new_module);
+    }
+}
+
 /* this should inline the call callee
  * calling module inlied_module
  */
@@ -278,6 +297,9 @@ statement inline_expression_call(expression modified_expression, call callee)
         instruction i = make_instruction_sequence( make_sequence( CONS(STATEMENT,expanded,NIL) ) );
         expanded = instruction_to_statement( i );
     }
+
+    /* avoid duplicated label due to copy_statement */
+    gen_context_recurse(expanded,modified_module_name,statement_domain,gen_true,inlining_regenerate_labels);
 
     /* add label at the end of the statement */
     laststmt=make_continue_statement(make_new_label( modified_module_name ) );
