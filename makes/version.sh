@@ -30,8 +30,9 @@ do
 	if [ -d $dir/.svn ]
 	then
 	    cd $dir
-	    LANG=C
-	    repos=$(svn info | sed -n -e 's/URL: //p')
+	    unset LC_MESSAGES
+	    export LANG=C
+	    repos=$(svn info | sed -n -e 's/^URL: //p')
 	    revision=$(svnversion)
 	    committed=$(svnversion -c)
 	    echo "$repos@$revision ($committed)"
