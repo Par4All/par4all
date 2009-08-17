@@ -134,10 +134,11 @@ void dag_dump(FILE * out, string what, dag d)
 
 static void dagvtx_dot(FILE * out, dagvtx vtx)
 {
-  // TODO: set the shape/color depending on the operation?
+  string attribute =
+    what_operation_shape(vtxcontent_optype(dagvtx_content(vtx)));
 
-  fprintf(out, "  \"%" _intFMT " %s\" [shape=circle];\n",
-	  dagvtx_number(vtx), dagvtx_operation(vtx));
+  fprintf(out, "  \"%" _intFMT " %s\" [%s];\n",
+	  dagvtx_number(vtx), dagvtx_operation(vtx), attribute);
 
   FOREACH(dagvtx, succ, dagvtx_succs(vtx))
     fprintf(out, "  \"%" _intFMT " %s\" -> \"%" _intFMT " %s\";\n",
@@ -149,7 +150,7 @@ static void entity_list_dot(FILE * out, string comment, list l)
 {
   if (comment) fprintf(out, "  // %s\n", comment);
   FOREACH(entity, e, l)
-    fprintf(out, "  \"%s\" [shape=box];\n", entity_local_name(e));
+    fprintf(out, "  \"%s\" [shape=circle];\n", entity_local_name(e));
   fprintf(out, "\n");
 }
 

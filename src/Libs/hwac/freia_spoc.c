@@ -448,7 +448,7 @@ where_to_perform_operation
     pips_debug(6, "scheduling (%" _intFMT " %s) %s\n",
 	       dagvtx_number(op), dagvtx_operation(op),
 	       vtxcontent_out(c)==entity_undefined? "":
-	         entity_local_name(vtxcontent_out(c)));
+	       entity_local_name(vtxcontent_out(c)));
     print_op_schedule(stderr, "in0", in0);
     print_op_schedule(stderr, "in1", in1);
   }

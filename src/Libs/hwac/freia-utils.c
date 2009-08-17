@@ -358,6 +358,31 @@ string what_operation(_int type)
   }
 }
 
+/* SPoC: set shape depending on hardware component used by vertex
+ */
+string what_operation_shape(_int type)
+{
+  string shape;
+  switch (type)
+  {
+  case spoc_type_poc:
+    shape = "shape=box"; break;
+  case spoc_type_alu:
+    shape = "shape=trapezium,orientation=270"; break;
+  case spoc_type_thr:
+    shape = "shape=parallelogram"; break;
+  case spoc_type_mes:
+    shape = "shape=diamond"; break;
+    // these should not happen
+  case spoc_type_out:
+  case spoc_type_inp:
+  case spoc_type_nop:
+  default:
+    shape = "shape=circle";
+  }
+  return shape;
+}
+
 /* ??? beurk: I keep the operation as two ints for code regeneration.
  */
 void set_operation(const freia_api_t * api, _int * type, _int * id)
