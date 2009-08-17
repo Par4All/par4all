@@ -364,7 +364,7 @@ list set_to_list(const set s)
 /* @return a sorted list from a set.
  * provide comparison function as gen_sort_list, which calls "qsort".
  */
-list set_to_sorted_list(const set s, int (*cmp)(const void *,const void *))
+list set_to_sorted_list(const set s, gen_cmp_func_t cmp)
 {
   list l = set_to_list(s);
   gen_sort_list(l, cmp);
@@ -405,7 +405,7 @@ set set_assign_list(set s, const list l)
  * used internally, but may be exported if needed.
  */
 static string_buffer
-set_to_string_buffer(string name, const set s, string(*item_name)(const void *))
+set_to_string_buffer(string name, const set s, gen_string_func_t item_name)
 {
   string_buffer sb = string_buffer_make(true);
   if (name)
@@ -430,8 +430,7 @@ set_to_string_buffer(string name, const set s, string(*item_name)(const void *))
  * @param s the set
  * @param item_name user function to build a string for each item
  */
-string set_to_string
-  (string name, const set s, string (*item_name)(const void *))
+string set_to_string(string name, const set s, gen_string_func_t item_name)
 {
   string_buffer sb = set_to_string_buffer(name, s, item_name);
   string res = string_buffer_to_string(sb);
@@ -442,7 +441,7 @@ string set_to_string
 /* print set s to file stream out.
  */
 void set_fprint
-  (FILE * out, string name, const set s, string(*item_name)(const void *))
+  (FILE * out, string name, const set s, gen_string_func_t item_name)
 {
   string_buffer sb = set_to_string_buffer(name, s, item_name);
   string_buffer_to_file(sb, out);
