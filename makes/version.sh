@@ -29,9 +29,11 @@ do
     then
 	if [ -d $dir/.svn ]
 	then
-	    repos=$(svn info $dir | sed -n -e '2s/.*: //p')
-	    revision=$(svnversion $dir)
-	    committed=$(svnversion -c $dir)
+	    cd $dir
+	    LANG=C
+	    repos=$(svn info | sed -n -e 's/URL: //p')
+	    revision=$(svnversion)
+	    committed=$(svnversion -c)
 	    echo "$repos@$revision ($committed)"
 	else
 	    # not a working copy
