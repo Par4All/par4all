@@ -69,7 +69,7 @@
 %{
 #include <stdlib.h>
 #include <stdio.h>
-#include <string.h>     
+#include <string.h>
 #include <sys/param.h>
 #include <unistd.h>
 
@@ -134,7 +134,7 @@ static void try_to_parse_everything_just_in_case(void)
 static bool tp_set_current_module(string name)
 {
   bool ok = lazy_open_module(name);
-  if (!ok) 
+  if (!ok)
   {
     /* This is courageous, but makes debugging harder... */
     try_to_parse_everything_just_in_case();
@@ -144,7 +144,7 @@ static bool tp_set_current_module(string name)
       /* Neglect the return code because lazy_open_module() should fail if
          safe_make fails(). This is a stupid short cut... */
       ok = safe_make(DBR_CODE, name);
-      if (ok) 
+      if (ok)
       {
 	ok = lazy_open_module(name);
 	pips_assert("should be able to open module if code just made...", ok);
@@ -168,7 +168,7 @@ static bool display_a_resource(string rname, string mname)
 
     fname = build_view_file(rname);
 
-    if (!fname) 
+    if (!fname)
     {
 	pips_user_error("Cannot build view file %s\n", rname);
 	free(fname);
@@ -184,10 +184,10 @@ static bool display_a_resource(string rname, string mname)
 
     if (jpips_is_running)
     {
-	/* Should tell about what it is? 
+	/* Should tell about what it is?
 	 * What about special formats, such as graphs and all?
 	 */
-	jpips_tag2("show", fname); 
+	jpips_tag2("show", fname);
     }
     else if (pager)
     {
@@ -221,7 +221,7 @@ static bool just_show(string rname, string mname)
 	pips_user_warning("no resource %s[%s].\n", rname, mname);
 	return FALSE;
     }
-    
+
     if (!displayable_file_p(rname)) {
 	pips_user_warning("resource %s cannot be displayed.\n", rname);
 	return FALSE;
@@ -240,7 +240,7 @@ call it: display, apply. */
 static bool perform(bool (*what)(string, string), res_or_rule * res)
 {
     bool result = TRUE;
-    
+
     if (tpips_execution_mode)
     {
 	string save_current_module_name;
@@ -253,12 +253,12 @@ static bool perform(bool (*what)(string, string), res_or_rule * res)
 	    pips_user_error("Empty action: no argument!\n");
 
 	/* push the current module. */
-	save_current_module_name = 
+	save_current_module_name =
 	    db_get_current_module_name()?
 	    strdup(db_get_current_module_name()): NULL;
-	
-	GEN_ARRAY_MAP(mod_name, 
-        {
+
+	GEN_ARRAY_MAP(mod_name,
+	{
 	    if (mod_name != NULL)
 	    {
 		if (what(res->the_name, mod_name) == FALSE) {
@@ -269,7 +269,7 @@ static bool perform(bool (*what)(string, string), res_or_rule * res)
 	    else
 		pips_user_warning("Select a module first!\n");
 	}, res->the_owners);
-	
+
 	/* restore the initial current module, if there was one */
 	if(save_current_module_name!=NULL) {
 	    if (db_get_current_module_name())
@@ -289,9 +289,9 @@ static void tp_system(string s)
     status = system(s);
     fflush(stdout);
 
-    if (status) 
+    if (status)
     {
-	pips_user_warning("shell returned status (%d.%d)\n", 
+	pips_user_warning("shell returned status (%d.%d)\n",
 			  status/256, status%256);
 
 	/* generate user error if not interactive,
@@ -307,12 +307,12 @@ static bool tp_close_the_workspace(string s)
     bool result = TRUE;
 
     pips_debug(7, "reduce rule i_close\n");
-    
-    if (tpips_execution_mode) 
+
+    if (tpips_execution_mode)
     {
 	string current = db_get_current_workspace_name();
 
-	if (current!=NULL && s!=NULL) 
+	if (current!=NULL && s!=NULL)
 	{
 	    if (same_string_p(s, current))
 	    {
@@ -328,7 +328,7 @@ static bool tp_close_the_workspace(string s)
 	else {
 	    pips_user_error("No workspace to close. Open or create one!\n");
 	    result = FALSE;
-	}	
+	}
 	result = TRUE;
     }
 
@@ -355,13 +355,13 @@ static void tp_some_info(string about)
 	gen_array_t modules = db_get_module_list();
 	int n = gen_array_nitems(modules), i;
 
-	if (jpips_is_running) 
+	if (jpips_is_running)
 	{
 	    jpips_begin_tag("modules");
 	    jpips_add_tag("");
 	}
-	
-	for(i=0; i<n; i++) 
+
+	for(i=0; i<n; i++)
 	{
 	    string m = gen_array_item(modules, i);
 	    if (jpips_is_running) jpips_add_tag(m);
@@ -379,7 +379,7 @@ static void tp_some_info(string about)
 	if (jpips_is_running)
 	    jpips_tag2("directory", (char*) getcwd(pathname, MAXPATHLEN));
     }
-    
+
     fprintf(stdout, "\n");
 }
 
@@ -393,13 +393,13 @@ static gen_array_t get_main(void)
   int number_of_main = 0, nmodules = 0;
   int n = 0;
   string main_name = get_first_main_module();
-  
+
   if (!string_undefined_p(main_name))
   {
     gen_array_append(result, main_name);
     return result;
   }
-  
+
   /* else try something else just in case...
    * well, it looks rather useless, maybe.
    */
@@ -408,29 +408,28 @@ static gen_array_t get_main(void)
     n++;
     modules = db_get_module_list();
     nmodules = gen_array_nitems(modules);
-    
-    if (n==2) 
+
+    if (n==2)
     {
       pips_user_warning("no main directly found, parsing...\n");
       try_to_parse_everything_just_in_case();
     }
 
-    GEN_ARRAY_MAP(on, 
+    GEN_ARRAY_MAP(on,
     {
       entity mod = local_name_to_top_level_entity(on);
-      
-      if (!entity_undefined_p(mod) && 
-	  entity_main_module_p(mod))
+
+      if (!entity_undefined_p(mod) && entity_main_module_p(mod))
       {
 	if (number_of_main)
 	  pips_user_error("More than one main\n");
-	
+
 	number_of_main++;
 	gen_array_dupappend(result, on);
       }
     },
       modules);
-    
+
     gen_array_full_free(modules);
   }
 
@@ -448,14 +447,14 @@ static gen_array_t get_main(void)
 
 %%
 
-commands: commands command { $$ = $1 && $2; } 
+commands: commands command { $$ = $1 && $2; }
 	| command
 	;
 
 command: TK_ENDOFLINE { /* may be empty! */ }
-	| i_open 
+	| i_open
 	| i_create
-  	| i_close
+	| i_close
 	| i_delete
 	| i_checkpoint
 	| i_module
@@ -485,7 +484,7 @@ command: TK_ENDOFLINE { /* may be empty! */ }
 	| error {$$ = FALSE;}
 	;
 
-i_quit: TK_QUIT TK_ENDOFLINE 
+i_quit: TK_QUIT TK_ENDOFLINE
 	{
 	    tpips_close();
 	    exit(0);
@@ -493,7 +492,7 @@ i_quit: TK_QUIT TK_ENDOFLINE
 	;
 
 
-i_exit: TK_EXIT TK_ENDOFLINE 
+i_exit: TK_EXIT TK_ENDOFLINE
 	{
 	    exit(0); /* rather rough! */
 	}
@@ -503,17 +502,17 @@ i_version: TK_VERSION TK_ENDOFLINE
 	{
 	  fprintf(stdout,
 		  // "tpips: (%s)\n"
-      		  "ARCH=" STRINGIFY(SOFT_ARCH) "\n"
-                  "REVS=\n"
-                  "%s"
-                  "DATE=%s\n"
-                  "CC_VERSION=%s\n",
-                  soft_revisions, soft_date, cc_version);
+		  "ARCH=" STRINGIFY(SOFT_ARCH) "\n"
+		  "REVS=\n"
+		  "%s"
+		  "DATE=%s\n"
+		  "CC_VERSION=%s\n",
+		  soft_revisions, soft_date, cc_version);
 	  fflush(stdout);
 	}
 	;
 
-i_help: TK_HELP TK_NAME TK_ENDOFLINE 
+i_help: TK_HELP TK_NAME TK_ENDOFLINE
 	{
 	    tpips_help($2); free($2);
 	}
@@ -532,22 +531,22 @@ i_setprop: TK_SET_PROPERTY TK_LINE TK_ENDOFLINE
 	}
 	;
 
-i_shell: TK_SHELL TK_ENDOFLINE 
+i_shell: TK_SHELL TK_ENDOFLINE
 	{
 	    tp_system("${SHELL:-sh}");
 	}
-	| TK_SHELL TK_LINE TK_ENDOFLINE 
-	{ 
+	| TK_SHELL TK_LINE TK_ENDOFLINE
+	{
 	    tp_system($2); free($2);
 	}
 	;
 
 i_unknown: TK_UNKNOWN TK_ENDOFLINE
-	{ 
+	{
 	    if (tpips_behaves_like_a_shell())
 	    {
 		pips_user_warning("implicit shell command assumed!\n");
-		tp_system($1); 
+		tp_system($1);
 	    }
 	    else
 	    {
@@ -566,7 +565,7 @@ i_unknown: TK_UNKNOWN TK_ENDOFLINE
 i_echo: TK_ECHO TK_LINE TK_ENDOFLINE
 	{
 	    string s = $2;
-	    user_log("echo%s\n", $2); 
+	    user_log("echo%s\n", $2);
 	    skip_blanks(s);
 	    fprintf(stdout,"%s\n",s);
 	    fflush(stdout);
@@ -598,7 +597,7 @@ i_cd: TK_CDIR TK_NAME TK_ENDOFLINE
 i_pwd: TK_PWD TK_ENDOFLINE
 	{
 	    char pathname[MAXPATHLEN];
-	    fprintf(stdout, "current working directory: %s\n", 
+	    fprintf(stdout, "current working directory: %s\n",
 		    (char*) getcwd(pathname, MAXPATHLEN));
 	    fflush(stdout);
 	}
@@ -626,7 +625,7 @@ i_setenv: TK_SET_ENVIRONMENT TK_NAME TK_NAME TK_ENDOFLINE
 
 i_checkpoint: TK_CHECKPOINT TK_ENDOFLINE
 	{
-	    if (tpips_execution_mode) 
+	    if (tpips_execution_mode)
 	    {
 		if (db_get_current_workspace_name())
 		    checkpoint_workspace();
@@ -655,7 +654,7 @@ i_open:	TK_OPEN workspace_name TK_ENDOFLINE
 		if (( $$ = open_workspace ($2)))
 		{
 		    main_module_name = get_first_main_module();
-		    
+
 		    if (!string_undefined_p(main_module_name)) {
 			/* Ok, we got it ! Now we select it: */
 			user_log("Main module PROGRAM \"%s\" selected.\n",
@@ -670,64 +669,63 @@ i_open:	TK_OPEN workspace_name TK_ENDOFLINE
 	;
 
 workspace_name: TK_NAME
-        {
+	{
 	  if(workspace_name_p($1))
 	    $$ = $1;
 	  else
-	    pips_user_error("workspace name %s contains invalid character(s)\n", $1);
+	    pips_user_error("workspace name %s contains invalid char(s)\n",
+			    $1);
 	}
 
-i_create: TK_CREATE workspace_name /* workspace name */ 
+i_create: TK_CREATE workspace_name /* workspace name */
 		filename_list /* source files */ TK_ENDOFLINE
 	{
-	    string main_module_name;
-	    pips_debug(7,"reduce rule i_create\n");
-	    
-	    if (tpips_execution_mode) {
-		if (workspace_exists_p($2))
-		    pips_user_error
-			("Workspace %s already exists. Delete it!\n", $2);
-		else if (db_get_current_workspace_name()) {
-		    pips_user_error("Close current workspace %s before "
-				    "creating another!\n", 
-				    db_get_current_workspace_name());
-		} 
-		else
-		{
-		    if (db_create_workspace($2))
-		    {
-			if (!create_workspace($3))
-			{
-			    db_close_workspace(FALSE);
-			    /* If you need to preserve the workspace
-			       for debugging purposes, use property
-			       ABORT_ON_USER_ERROR */
-			    if(!get_bool_property("ABORT_ON_USER_ERROR")) {
-			      user_log("Deleting workspace...\n");
-			      delete_workspace($2);
-			    }
-			    pips_user_error("Could not create workspace %s\n", 
-					    $2);
-			}
-			
-			main_module_name = get_first_main_module();
-			
-			if (!string_undefined_p(main_module_name)) {
-			    /* Ok, we got it ! Now we select it: */
-			    user_log("Main module PROGRAM \"%s\" selected.\n",
-				     main_module_name);
-			  lazy_open_module(main_module_name);
-			}
-			$$ = TRUE;
-		    }
-		    else {
-			pips_user_error("Cannot create directory for workspace"
-					", check rights!\n");
-		    }
-		}
+	  string main_module_name;
+	  pips_debug(7,"reduce rule i_create\n");
+
+	  if (tpips_execution_mode) {
+	    if (workspace_exists_p($2))
+	      pips_user_error("Workspace %s already exists. Delete it!\n", $2);
+	    else if (db_get_current_workspace_name()) {
+	      pips_user_error("Close current workspace %s before "
+			      "creating another!\n",
+			      db_get_current_workspace_name());
 	    }
-	    free($2);
-	    gen_array_full_free($3);
+	    else
+	    {
+	      if (db_create_workspace($2))
+	      {
+		if (!create_workspace($3))
+		{
+		  db_close_workspace(FALSE);
+		  /* If you need to preserve the workspace
+		     for debugging purposes, use property
+		     ABORT_ON_USER_ERROR */
+		  if(!get_bool_property("ABORT_ON_USER_ERROR")) {
+		    user_log("Deleting workspace...\n");
+		    delete_workspace($2);
+		  }
+		  pips_user_error("Could not create workspace %s\n", $2);
+		}
+
+		main_module_name = get_first_main_module();
+
+		if (!string_undefined_p(main_module_name)) {
+		  /* Ok, we got it ! Now we select it: */
+		  user_log("Main module PROGRAM \"%s\" selected.\n",
+			   main_module_name);
+		  lazy_open_module(main_module_name);
+		}
+		$$ = TRUE;
+	      }
+	      else {
+		pips_user_error("Cannot create directory for workspace"
+				", check rights!\n");
+	      }
+	    }
+	  }
+	  free($2);
+	  gen_array_full_free($3);
 	}
 	;
 
@@ -752,7 +750,7 @@ i_delete: TK_DELETE workspace_name /* workspace name */ TK_ENDOFLINE
 				    "Workspace %s is open\n", wname);
 		    $$ = FALSE;
 		} else {
-		    if(workspace_exists_p($2)) 
+		    if(workspace_exists_p($2))
 		    {
 			if(delete_workspace ($2)) {
 			    /* In case of problem, user_error() has been
@@ -777,7 +775,7 @@ i_delete: TK_DELETE workspace_name /* workspace name */ TK_ENDOFLINE
 i_module: TK_MODULE TK_NAME /* module name */ TK_ENDOFLINE
 	{
 	  pips_debug(7,"reduce rule i_module\n");
-	  
+
 	  if (tpips_execution_mode) {
 	    if (db_get_current_workspace_name()) {
 	      $$ = tp_set_current_module($2 /*strupper($2,$2)*/);
@@ -828,7 +826,7 @@ i_show: TK_SHOW resource_id TK_ENDOFLINE
 i_rm: TK_REMOVE resource_id TK_ENDOFLINE
 	{
 	    pips_debug(7,"reduce rule i_rm\n");
-	    $$ = perform(remove_a_resource, &$2);	    
+	    $$ = perform(remove_a_resource, &$2);
 	}
 	;
 
@@ -839,7 +837,7 @@ i_activate: TK_ACTIVATE rulename TK_ENDOFLINE
 	    {
 		if(!db_get_current_workspace_name())
 		    pips_user_error("Open or create a workspace first!\n");
-		
+
 		user_log("Selecting rule: %s\n", $2);
 		activate ($2);
 		$$ = TRUE;
@@ -865,7 +863,7 @@ i_checkactive: TK_CHECKACTIVE resourcename TK_ENDOFLINE
 i_get: TK_GET_PROPERTY propname TK_ENDOFLINE
 	{
 	    pips_debug(7,"reduce rule i_get (%s)\n", $2);
-	    
+
 	    if (tpips_execution_mode) {
 		fprint_property(stdout, $2);
 		if (jpips_is_running)
@@ -896,7 +894,7 @@ i_source: TK_SOURCE filename_list TK_ENDOFLINE
 	    }
 	    TRY
 	    {
-	      for(; i<n; i++) 
+	      for(; i<n; i++)
 	      {
 		string name = gen_array_item($2, i);
 		FILE * sourced = fopen(name, "r");
@@ -912,7 +910,7 @@ i_source: TK_SOURCE filename_list TK_ENDOFLINE
 		    break;
 		  }
 		}
-		else 
+		else
 		{
 		  tpips_process_a_file(sourced, FALSE);
 		  fclose(sourced);
@@ -930,13 +928,13 @@ rulename: phasename
 
 filename_list: filename_list filename
 	{
-	    gen_array_append($1, $2);
-	    $$ = $1;
+	  gen_array_append($1, $2);
+	  $$ = $1;
 	}
 	| filename
-	{ 
-	    $$ = gen_array_make(0);
-	    gen_array_append($$, $1);
+	{
+	  $$ = gen_array_make(0);
+	  gen_array_append($$, $1);
 	}
 	;
 
@@ -945,168 +943,169 @@ filename: TK_NAME
 
 resource_id: resourcename owner
 	{
-	    pips_debug(7,"reduce rule resource_id (%s)\n",$<name>2);
-	    $$.the_name = $1;
-	    $$.the_owners = $2;
+	  pips_debug(7,"reduce rule resource_id (%s)\n",$<name>2);
+	  $$.the_name = $1;
+	  $$.the_owners = $2;
 	}
 	;
 
 rule_id: phasename owner
 	{
-	    pips_debug(7,"reduce rule rule_id (%s)\n",$1);
-	    $$.the_name = $1;
-	    $$.the_owners = $2;
+	  pips_debug(7,"reduce rule rule_id (%s)\n",$1);
+	  $$.the_name = $1;
+	  $$.the_owners = $2;
 	}
 	;
 
 owner:	TK_OPENPAREN TK_OWNER_ALL TK_CLOSEPAREN
 	{
-	    pips_debug(7,"reduce rule owner (ALL)\n");
-	    if (tpips_execution_mode) 
-	    {
-		if (!db_get_current_workspace_name())
-		    pips_user_error("No current workspace! "
-				    "create or open one!\n");
-		else 
-		    $$ = db_get_module_list();
-	    }
+	  pips_debug(7,"reduce rule owner (ALL)\n");
+	  if (tpips_execution_mode)
+	  {
+	    if (!db_get_current_workspace_name())
+	      pips_user_error("No current workspace! create or open one!\n");
+	    else
+	      $$ = db_get_module_list();
+	  }
 	}
-        | TK_OPENPAREN TK_OWNER_ALLFUNC TK_CLOSEPAREN
+	| TK_OPENPAREN TK_OWNER_ALLFUNC TK_CLOSEPAREN
 	{
-	    pips_debug(7,"reduce rule owner (ALL)\n");
-	    if (tpips_execution_mode) 
-	    {
-		if (!db_get_current_workspace_name())
-		    pips_user_error("No current workspace! "
-				    "create or open one!\n");
-		else 
-		    $$ = db_get_function_list();
-	    }
+	  pips_debug(7,"reduce rule owner (ALL)\n");
+	  if (tpips_execution_mode)
+	  {
+	    if (!db_get_current_workspace_name())
+	      pips_user_error("No current workspace! create or open one!\n");
+	    else
+	      $$ = db_get_function_list();
+	  }
 	}
 	| TK_OPENPAREN TK_OWNER_PROGRAM TK_CLOSEPAREN
 	{
-	    pips_debug(7,"reduce rule owner (PROGRAM)\n");
-	    if (tpips_execution_mode)
-	    {
-		$$ = gen_array_make(0);
-		gen_array_dupappend($$, "");
-	    }
+	  pips_debug(7,"reduce rule owner (PROGRAM)\n");
+	  if (tpips_execution_mode)
+	  {
+	    $$ = gen_array_make(0);
+	    gen_array_dupappend($$, "");
+	  }
 	}
 	| TK_OPENPAREN TK_OWNER_MAIN TK_CLOSEPAREN
 	{
-	    pips_debug(7,"reduce rule owner (MAIN)\n");
+	  pips_debug(7,"reduce rule owner (MAIN)\n");
 
-	    if (tpips_execution_mode) {
-	      if (!db_get_current_workspace_name())
-		pips_user_error("No current workspace! "
-				"create or open one!\n");
-	      else {
-		$$ = get_main();
-	      }
+	  if (tpips_execution_mode) {
+	    if (!db_get_current_workspace_name())
+	      pips_user_error("No current workspace! create or open one!\n");
+	    else {
+	      $$ = get_main();
 	    }
+	  }
 	}
 	| TK_OPENPAREN TK_OWNER_MODULE TK_CLOSEPAREN
 	{
-	    pips_debug(7,"reduce rule owner (MODULE)\n");
-	    if (tpips_execution_mode) {
-		string n = db_get_current_module_name();
-		$$ = gen_array_make(0);
-		if (n) gen_array_dupappend($$, n);
-	    }
+	  pips_debug(7,"reduce rule owner (MODULE)\n");
+	  if (tpips_execution_mode) {
+	    string n = db_get_current_module_name();
+	    $$ = gen_array_make(0);
+	    if (n) gen_array_dupappend($$, n);
+	  }
 	}
 	| TK_OPENPAREN TK_OWNER_CALLEES TK_CLOSEPAREN
 	{
-	    pips_debug(7,"reduce rule owner (CALLEES)\n");
+	  pips_debug(7,"reduce rule owner (CALLEES)\n");
 
-	    if (tpips_execution_mode) 
-	    {
-		callees called_modules;
+	  if (tpips_execution_mode)
+	  {
+	    callees called_modules;
 
-		if (!safe_make(DBR_CALLEES, db_get_current_module_name()))
-		  pips_internal_error("Cannot make callees for %s\n",
-				      db_get_current_module_name());
-		
-		called_modules = (callees) 
-		    db_get_memory_resource(DBR_CALLEES,
-					   db_get_current_module_name(),TRUE);
+	    if (!safe_make(DBR_CALLEES, db_get_current_module_name()))
+	      pips_internal_error("Cannot make callees for %s\n",
+				  db_get_current_module_name());
 
-		$$ = gen_array_from_list(callees_callees(called_modules));
-	    }
+	    called_modules = (callees)
+	      db_get_memory_resource(DBR_CALLEES,
+				     db_get_current_module_name(),TRUE);
+
+	    $$ = gen_array_from_list(callees_callees(called_modules));
+	  }
 	}
 	| TK_OPENPAREN TK_OWNER_CALLERS TK_CLOSEPAREN
 	{
-	    pips_debug(7,"reduce rule owner (CALLERS)\n");
-	    if (tpips_execution_mode) 
-	    {
-		callees caller_modules;
+	  pips_debug(7,"reduce rule owner (CALLERS)\n");
+	  if (tpips_execution_mode)
+	  {
+	    callees caller_modules;
 
-		if (!safe_make(DBR_CALLERS, db_get_current_module_name()))
-		    pips_internal_error("Cannot make callers for %s\n",
-					db_get_current_module_name());
+	    if (!safe_make(DBR_CALLERS, db_get_current_module_name()))
+	      pips_internal_error("Cannot make callers for %s\n",
+				  db_get_current_module_name());
 
-		caller_modules = (callees) 
-		    db_get_memory_resource(DBR_CALLERS,
-					   db_get_current_module_name(),TRUE);
-		
-		$$ = gen_array_from_list(callees_callees(caller_modules));
-	    }
+	    caller_modules = (callees)
+	      db_get_memory_resource(DBR_CALLERS,
+				     db_get_current_module_name(),TRUE);
+
+	    $$ = gen_array_from_list(callees_callees(caller_modules));
+	  }
 	}
 	| TK_OPENPAREN list_of_owner_name TK_CLOSEPAREN
 	{ $$ = $2; }
-        | /* No explicit argument */
+	| /* No explicit argument */
 	{
-	    pips_debug(7,"reduce rule owner (none)\n");
-	    if (tpips_execution_mode) 
-	    {
-		string n = db_get_current_module_name();
-		$$ = gen_array_make(0);
-		if (n) 
-		  gen_array_dupappend($$, n);
-		else {
-		  string wsn = db_get_current_workspace_name();
-		  /* pips_internal_error("No current module name\n"); */
-		  if (wsn==NULL) 
-		    pips_user_error("No current workspace. Open or create one first!\n");
-		  else
-		    pips_user_error("No current module has been defined, explicitly or implictly.\n"
-				    "Please specify a module name as argument or check that"
-				    " the current workspace \"%s\" contains one main module"
-				    " or no more than one module.\n",
-				    wsn);
-		}
+	  pips_debug(7,"reduce rule owner (none)\n");
+	  if (tpips_execution_mode)
+	  {
+	    string n = db_get_current_module_name();
+	    $$ = gen_array_make(0);
+	    if (n)
+	      gen_array_dupappend($$, n);
+	    else {
+	      string wsn = db_get_current_workspace_name();
+	      /* pips_internal_error("No current module name\n"); */
+	      if (wsn==NULL)
+		pips_user_error(
+		    "No current workspace. Open or create one first!\n");
+	      else
+		pips_user_error(
+	       "No current module has been defined, explicitly or implictly.\n"
+	       "Please specify a module name as argument or check that"
+	       " the current workspace \"%s\" contains one main module"
+	       " or no more than one module.\n",
+				wsn);
 	    }
+	  }
 	}
 	;
 
 list_of_owner_name: TK_NAME
-        { $$ = gen_array_make(0); gen_array_append($$, $1 /* strupper($1,$1)*/); }
+	{
+	  $$ = gen_array_make(0); gen_array_append($$, $1);
+	}
 	| list_of_owner_name TK_NAME
-        { gen_array_append($1, $2 /* strupper($2,$2) */); $$ = $1; }
+	{ gen_array_append($1, $2 /* strupper($2,$2) */); $$ = $1; }
 	| list_of_owner_name TK_COMMA TK_NAME
 	{ gen_array_append($1, $3 /* strupper($3,$3) */); $$ = $1; }
 	;
 
 propname: TK_NAME
 	{
-	    if (!property_name_p($1)) 
-		yyerror("expecting a property name\n");
-	    $$ = $1;
+	  if (!property_name_p($1))
+	    yyerror("expecting a property name\n");
+	  $$ = $1;
 	}
 	;
 
 phasename: TK_NAME
 	{
-	    if (!phase_name_p($1)) 
-		yyerror("expecting a phase name\n");
-	    $$ = $1;
+	  if (!phase_name_p($1))
+	    yyerror("expecting a phase name\n");
+	  $$ = $1;
 	}
 	;
 
 resourcename: TK_NAME
 	{
-	    if (!resource_name_p($1)) 
-		yyerror("expecting a resource name\n");
-	    $$ = $1;
+	  if (!resource_name_p($1))
+	    yyerror("expecting a resource name\n");
+	  $$ = $1;
 	}
 	;
 

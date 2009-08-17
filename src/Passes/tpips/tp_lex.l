@@ -43,11 +43,11 @@ void yyrestart(FILE *f){ yyin = f;}
 
 #else
 
-#define YY_INPUT(buf,result,max_size) 			\
-{ 							\
-  int c = tpips_lex_input(); 				\
-  result = (c == '\0') ? YY_NULL : (buf[0] = c, 1); 	\
-}
+#define YY_INPUT(buf,result,max_size)			\
+  {							\
+    int c = tpips_lex_input();				\
+    result = (c == '\0') ? YY_NULL : (buf[0] = c, 1);	\
+  }
 
 #endif
 
@@ -90,10 +90,10 @@ static char unk[2]; /* one char lines are not implicit shells */
 
 #define RETURN(x)  pips_debug(8, "init %d\n", x); return x
 #define KEYWORD(x) pips_debug(8, "key %d\n", x); BEGIN INITIAL; return x
-#define LITTERAL(x) 				\
-	pips_debug(8, "lit %d\n", x); 		\
-	BEGIN LIT; 				\
-	return x
+#define LITTERAL(x)				\
+  pips_debug(8, "lit %d\n", x);			\
+  BEGIN LIT;					\
+  return x
 #define RESTART(x) pips_debug(8, "rst %d\n", x); BEGIN KEY; return x
 
 %}
@@ -113,27 +113,27 @@ static char unk[2]; /* one char lines are not implicit shells */
 <KEY>make		{ KEYWORD(TK_MAKE); }
 <KEY>apply		{ KEYWORD(TK_APPLY); }
 <KEY>capply		{ KEYWORD(TK_CAPPLY); }
-<KEY>display 		{ KEYWORD(TK_DISPLAY); }
-<KEY>activate 		{ KEYWORD(TK_ACTIVATE); }
+<KEY>display		{ KEYWORD(TK_DISPLAY); }
+<KEY>activate		{ KEYWORD(TK_ACTIVATE); }
 <KEY>getproperty	{ KEYWORD(TK_GET_PROPERTY); }
 <KEY>get		{ KEYWORD(TK_GET_PROPERTY); }
 <KEY>info		{ KEYWORD(TK_INFO); }
-<KEY>cd 		{ KEYWORD(TK_CDIR); }
-<KEY>pwd 		{ KEYWORD(TK_PWD); }
+<KEY>cd			{ KEYWORD(TK_CDIR); }
+<KEY>pwd		{ KEYWORD(TK_PWD); }
 <KEY>source		{ KEYWORD(TK_SOURCE); }
-<KEY>quit 		{ KEYWORD(TK_QUIT); }
-<KEY>bye 		{ KEYWORD(TK_QUIT); }
-<KEY>exit 		{ KEYWORD(TK_EXIT); }
-<KEY>help 		{ KEYWORD(TK_HELP); }
-<KEY>remove 		{ KEYWORD(TK_REMOVE); }
-<KEY>show 		{ KEYWORD(TK_SHOW); }
+<KEY>quit		{ KEYWORD(TK_QUIT); }
+<KEY>bye		{ KEYWORD(TK_QUIT); }
+<KEY>exit		{ KEYWORD(TK_EXIT); }
+<KEY>help		{ KEYWORD(TK_HELP); }
+<KEY>remove		{ KEYWORD(TK_REMOVE); }
+<KEY>show		{ KEYWORD(TK_SHOW); }
 <KEY>checkactive	{ KEYWORD(TK_CHECKACTIVE); }
 <KEY>version		{ KEYWORD(TK_VERSION); }
 
 <KEY>setproperty	{ LITTERAL(TK_SET_PROPERTY); }
 <KEY>set		{ LITTERAL(TK_SET_PROPERTY); }
-<KEY>echo 		{ LITTERAL(TK_ECHO); }
-<KEY>shell 		{ LITTERAL(TK_SHELL); }
+<KEY>echo		{ LITTERAL(TK_ECHO); }
+<KEY>shell		{ LITTERAL(TK_SHELL); }
 <KEY>!			{ LITTERAL(TK_SHELL); }
 
 <KEY,INITIAL>[ \t]+	/* skip blanks... */
@@ -141,7 +141,7 @@ static char unk[2]; /* one char lines are not implicit shells */
 <UNK>[^\r\n]*		{ yylval.name = strdup(concatenate(unk, yytext, NULL));
 			  KEYWORD(TK_UNKNOWN); }
 
-<LIT>[^\r\n]* 		{ yylval.name = strdup(yytext); RETURN(TK_LINE); }
+<LIT>[^\r\n]*		{ yylval.name = strdup(yytext); RETURN(TK_LINE); }
 <INITIAL,KEY>#[^\r\n]*	{ BEGIN INITIAL;
 			  /* skip comments... (not for echo, shell set). */}
 <KEY>.			{ unk[0]=yytext[0]; unk[1]='\0'; BEGIN UNK; }
@@ -153,15 +153,15 @@ static char unk[2]; /* one char lines are not implicit shells */
 <INITIAL>\]		{ RETURN(TK_CLOSEPAREN); }
 
 <INITIAL>\,		{ RETURN(TK_COMMA); }
-<INITIAL>= 		{ RETURN(TK_EQUAL); }
+<INITIAL>=		{ RETURN(TK_EQUAL); }
 
 <LIT,INITIAL>(\n|\r|\r\n|;)	{ RESTART(TK_ENDOFLINE); }
 <LIT,INITIAL><<EOF>>	{ RESTART(TK_ENDOFLINE); }
 
 <STR>[^\"]*\"		{ /* " */ yylval.name = strdup(yytext);
 			  yylval.name[strlen(yytext)-1] = '\0';
-		  	  BEGIN INITIAL; RETURN(TK_A_STRING);}
-<INITIAL>\"		{ /* " */ BEGIN STR;} 
+			  BEGIN INITIAL; RETURN(TK_A_STRING);}
+<INITIAL>\"		{ /* " */ BEGIN STR;}
 
 <INITIAL>"$ALL"		{ RETURN(TK_OWNER_ALL); }
 <INITIAL>"$ALLFUNC"	{ RETURN(TK_OWNER_ALLFUNC); }
@@ -179,7 +179,10 @@ static char unk[2]; /* one char lines are not implicit shells */
 <INITIAL>"%CALLERS"	{ RETURN(TK_OWNER_CALLERS); }
 <INITIAL>"%CALLEES"	{ RETURN(TK_OWNER_CALLEES); }
 
-<INITIAL>[/\.0-9A-Za-z_:-][!/\.0-9A-Za-z_:-]* 	{ yylval.name=strdup(yytext); RETURN(TK_NAME);}
+<INITIAL>[/\.0-9A-Za-z_:-][!/\.0-9A-Za-z_:-]*	{
+			  yylval.name=strdup(yytext);
+			  RETURN(TK_NAME);
+			}
 
 .			{ pips_user_error("unexpected char %c\n", *yytext); }
 
