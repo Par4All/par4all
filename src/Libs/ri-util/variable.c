@@ -21,7 +21,7 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
-/* Handling of entity as program variables 
+/* Handling of entity as program variables
  * (see also entity.c for generic entities)
  */
 
@@ -165,17 +165,17 @@ basic base;
 
   pips_debug(8, "name %s\n", full_name);
 
-  message_assert("not already defined", 
+  message_assert("not already defined",
 		 gen_find_tabulated(full_name, entity_domain)==entity_undefined);
 
-  e = make_entity(full_name, type_undefined, 
+  e = make_entity(full_name, type_undefined,
 		  storage_undefined, value_undefined);
 
   entity_type(e) = (type) MakeTypeVariable(b, NIL);
   f = local_name_to_top_level_entity(module_name);
-  a = global_name_to_entity(module_name, DYNAMIC_AREA_LOCAL_NAME); 
+  a = global_name_to_entity(module_name, DYNAMIC_AREA_LOCAL_NAME);
 
-  entity_storage(e) = 
+  entity_storage(e) =
     make_storage(is_storage_ram,
 		 make_ram(f, a,
 			  (basic_tag(base)!=is_basic_overloaded)?
@@ -219,6 +219,9 @@ reset_unique_variable_numbers()
 #define DEFAULT_COMPLEX_PREFIX	"C_"
 #define DEFAULT_STRING_PREFIX	"S_"
 #define DEFAULT_POINTER_PREFIX	"P_"
+#define DEFAULT_STRUCT_PREFIX	"ST_"
+#define DEFAULT_UNION_PREFIX	"U_"
+#define DEFAULT_ENUM_PREFIX	"E_"
 
 /* Create a new scalar variable of type b in the given module.
 
@@ -278,10 +281,31 @@ make_new_scalar_variable_with_prefix(string prefix,
 	asprintf(&variable_name, format, DEFAULT_POINTER_PREFIX,
 		unique_string_number++);
 	break;
+      case is_basic_derived: {
+	entity de = basic_derived(b);
+	type dt = ultimate_type(entity_type(de));
+
+	if(type_struct_p(dt)) {
+	   asprintf(&variable_name, format, DEFAULT_STRUCT_PREFIX,
+		    unique_string_number++);
+	}
+	else if(type_union_p(dt)) {
+	    asprintf(&variable_name, format, DEFAULT_UNION_PREFIX,
+		     unique_string_number++);
+	}
+	if(type_enum_p(dt)) {
+	   asprintf(&variable_name, format, DEFAULT_ENUM_PREFIX,
+		    unique_string_number++);
+	}
+	else {
+	  pips_internal_error("Not implemented for type tag: %d\n",
+			      type_tag(dt));
+	}
+	break;
+      }
       default:
-	pips_error("make_new_scalar_variable_with_prefix",
-		   "unknown basic tag: %d\n",
-		   basic_tag(ub));
+	pips_internal_error("unknown basic tag: %d\n",
+			    basic_tag(ub));
 	break;
       }
     }
@@ -304,9 +328,7 @@ make_new_scalar_variable_with_prefix(string prefix,
   return e;
 }
 
-entity
-make_new_scalar_variable(entity module,
-                         basic b)
+entity make_new_scalar_variable(entity module, basic b)
 {
   return make_new_scalar_variable_with_prefix("", module, b);
 }
@@ -360,7 +382,7 @@ make_new_module_variable(entity module,int d)
  * entities. Each time such a variable is created, the corresponding
  * counter is incremented.
  *
- * FI: this must be wrong. A function to reset count_tmp and count_aux 
+ * FI: this must be wrong. A function to reset count_tmp and count_aux
  * is needed if tpips or wpips are to work in a consistent way!
  */
 /* gcc complains that they are not used... but they are defined! */
@@ -627,21 +649,17 @@ entity e;
  *
  * The integer type may be signed or unsigned.
  */
-bool 
-entity_integer_scalar_p(e)
-entity e;
+bool entity_integer_scalar_p(entity e)
 {
   return(entity_scalar_p(e) &&
 	 basic_int_p(variable_basic(type_variable(ultimate_type(entity_type(e))))));
 }
 
 /* integer_scalar_entity_p() is obsolete; use entity_integer_scalar_p() */
-bool 
-integer_scalar_entity_p(e)
-entity e;
+bool integer_scalar_entity_p(entity e)
 {
   type ct = ultimate_type(entity_type(e));
-  return type_variable_p(entity_type(e)) && 
+  return type_variable_p(entity_type(e)) &&
     basic_int_p(variable_basic(type_variable(ct))) &&
     variable_dimensions(type_variable(ct)) == NIL;
 }
@@ -679,10 +697,7 @@ bool entity_atomic_reference_p(entity e)
      ri-util (no file reference.c).
  */
 
-dimension 
-entity_ith_dimension(e, i)
-entity e;
-int i;
+dimension entity_ith_dimension(entity e, int i)
 {
   cons *pd;
   type t = entity_type(e);
@@ -693,38 +708,32 @@ int i;
 
   while (pd != NIL && --i > 0)
     pd = CDR(pd);
-    
+
   pips_assert("entity_ith_dimension", pd != NIL);
 
   return(DIMENSION(CAR(pd)));
 }
 
-
-    
 /* boolean entity_unbounded_p(entity e)
  * input    : an array entity
  * output   : TRUE if the last dimension of the array is unbounded (*),
  *            FALSE otherwise.
  * modifies : nothing
- * comment  : 
+ * comment  :
  */
-boolean 
-entity_unbounded_p(e)
-entity e;
+boolean entity_unbounded_p(entity e)
 {
   int nb_dim = NumberOfDimension(e);
-    
-  return(unbounded_dimension_p(entity_ith_dimension(e, nb_dim)));    
+
+  return(unbounded_dimension_p(entity_ith_dimension(e, nb_dim)));
 }
 
-
-    
 /* boolean array_with_numerical_bounds_p(entity a)
  * input    : an array entity
  * output   : TRUE if all bounds of all dimensions are numerical
  *            FALSE otherwise (adjustable arrays, formal parameters).
  * modifies : nothing
- * comment  : 
+ * comment  :
  */
 bool array_with_numerical_bounds_p(entity a)
 {
@@ -749,9 +758,7 @@ bool array_with_numerical_bounds_p(entity a)
 /* variable_entity_dimension(entity v): returns the dimension of variable v;
  * scalar have dimension 0
  */
-int 
-variable_entity_dimension(v)
-entity v;
+int variable_entity_dimension(entity v)
 {
   int d = 0;
 
@@ -766,9 +773,7 @@ entity v;
 }
 
 
-void 
-remove_variable_entity(v)
-entity v;
+void remove_variable_entity(entity v)
 {
   /* FI: this is pretty dangerous as it may leave tons of dangling pointers;
    * I use it to correct early declarations of types functions as variables;
@@ -807,8 +812,7 @@ entity v;
  * make entity for integer constant c
 
  WARNING : the basic integer size is fixed to sizeof(_int) */
-entity 
-make_integer_constant_entity(_int c) {
+entity make_integer_constant_entity(_int c) {
   entity ce;
   /* 64 bits numbers are printed in decimal in 20 digits, so with - and \0
      32 is enough. */
@@ -818,21 +822,21 @@ make_integer_constant_entity(_int c) {
   sprintf(num, "%td", c);
   cn = concatenate(TOP_LEVEL_MODULE_NAME,MODULE_SEP_STRING,num,(char *)NULL);
   ce = gen_find_tabulated(cn,entity_domain);
-  if (ce==entity_undefined) {		/* make entity for the constant c */ 
-    functional cf = 
-      make_functional(NIL, 
-		      make_type(is_type_variable, 
+  if (ce==entity_undefined) {		/* make entity for the constant c */
+    functional cf =
+      make_functional(NIL,
+		      make_type(is_type_variable,
 				make_variable(make_basic(is_basic_int, (void*)sizeof(int)),
 					      NIL,NIL)));
     type ct = make_type(is_type_functional, cf);
     ce = make_entity(strdup(cn), ct, MakeStorageRom(),
-		     make_value(is_value_constant, 
+		     make_value(is_value_constant,
 				make_constant(is_constant_int, (void*)c)));
   }
   return(ce);
 }
-
-/* 
+
+/*
  * These functions compute the current offset of the area a passed as
  * argument. The length of the variable v is also computed and then added
  * to a's offset. The initial offset is returned to the calling function.
@@ -867,7 +871,7 @@ int add_any_variable_to_area(entity a, entity v, bool is_fortran_p)
     if(!SizeOfArray(v, &s)) {
       pips_internal_error("Varying size array \"%s\"\n", entity_name(v));
     }
-  
+
     if(is_fortran_p)
       {
 	area_layout(aa) = gen_nconc(area_layout(aa), CONS(ENTITY, v, NIL));
@@ -882,9 +886,8 @@ int add_any_variable_to_area(entity a, entity v, bool is_fortran_p)
   }
   return(OldOffset);
 }
-
-bool
-formal_parameter_p(entity v)
+
+bool formal_parameter_p(entity v)
 {
     storage s = entity_storage(v);
     bool formal_p = storage_formal_p(s);
@@ -895,8 +898,7 @@ formal_parameter_p(entity v)
 
 /* True if a variable is the pseudo-variable used to store value
    returned by a function: */
-bool
-variable_return_p(entity v)
+bool variable_return_p(entity v)
 {
   storage s = entity_storage(v);
   bool return_p = storage_return_p(s);
@@ -905,9 +907,8 @@ variable_return_p(entity v)
 }
 
 
-bool
-variable_is_a_module_formal_parameter_p(entity a_variable,
-                                        entity a_module)
+bool variable_is_a_module_formal_parameter_p(entity a_variable,
+					     entity a_module)
 {
   MAP(ENTITY, e,
   {
@@ -930,9 +931,7 @@ variable_is_a_module_formal_parameter_p(entity a_variable,
 }
 
 /* true if v is in a common. */
-bool
-variable_in_common_p(
-    entity v)
+bool variable_in_common_p(entity v)
 {
   return type_variable_p(entity_type(v)) &&
     storage_ram_p(entity_storage(v)) &&
@@ -940,15 +939,13 @@ variable_in_common_p(
 }
 
 /* true if v appears in a SAVE statement, or in a DATA statement */
-bool
-variable_static_p(entity v)
+bool variable_static_p(entity v)
 {
   return(type_variable_p(entity_type(v)) &&
 	 storage_ram_p(entity_storage(v)) &&
 	 static_area_p(ram_section(storage_ram(entity_storage(v)))));
 }
-bool
-variable_dynamic_p(entity v)
+bool variable_dynamic_p(entity v)
 {
   return(type_variable_p(entity_type(v)) &&
 	 storage_ram_p(entity_storage(v)) &&
@@ -958,13 +955,12 @@ variable_dynamic_p(entity v)
 /* This test can only be applied to variables, not to functions, subroutines or
  * commons visible from a module.
  */
-bool
-variable_in_module_p(entity v,
-                     entity m)
+bool variable_in_module_p(entity v,
+			  entity m)
 {
-  bool in_module_1 = 
+  bool in_module_1 =
     strcmp(module_local_name(m), entity_module_name(v)) == 0;
-  bool in_module_2 = 
+  bool in_module_2 =
     entity_is_argument_p(v, code_declarations(value_code(entity_initial(m))));
 
   pips_assert ("both coherency",  in_module_1==in_module_2);
@@ -972,10 +968,7 @@ variable_in_module_p(entity v,
   return in_module_1;
 }
 
-bool 
-variable_in_list_p(e, l)
-entity e;
-list l;
+bool variable_in_list_p(entity e, list l)
 {
   bool is_in_list = FALSE;
   for( ; (l != NIL) && (! is_in_list); l = CDR(l))
@@ -989,13 +982,11 @@ list l;
    prettyprinter ignoring the textual declaration and remake all from
    the declarations without touching the corresponding property
    (PRETTYPRINT_ALL_DECLARATIONS). RK, 31/05/1994. */
-void 
-discard_module_declaration_text(a_module)
-entity a_module;
+void discard_module_declaration_text(entity a_module)
 {
   code c = entity_code(a_module);
   string s = code_decls_text(c);
-    
+
   free(s);
   code_decls_text(c) = strdup("");
 }
@@ -1006,12 +997,9 @@ entity a_module;
  *
  * moved to ri-util from hpfc on BC's request. FC 08/09/95
  */
-entity 
-get_ith_dummy(prefix, suffix, i)
-string prefix, suffix;
-int i;
+entity get_ith_dummy(string prefix, string suffix, int i)
 {
-  char buffer[100]; 
+  char buffer[100];
   assert(i>=1 && i<=7);
   (void) sprintf(buffer, "%s%d", suffix, i);
 
@@ -1023,19 +1011,19 @@ expression generate_string_for_alternate_return_argument(string i)
 {
   expression e = expression_undefined;
   char buffer[9];
-  
+
   pips_assert("A label cannot be more than 5 character long", strlen(i)<=5);
   buffer[0]='"';
   buffer[1]='*';
   buffer[2]=0;
 
   strcat(&buffer[0], i);
-  
+
   buffer[strlen(i)+2]='"';
   buffer[strlen(i)+3]=0;
 
   e = MakeCharacterConstantExpression(strdup(buffer));
-  
+
   return e;
 }
 
@@ -1051,9 +1039,9 @@ entity generate_pseudo_formal_variable_for_formal_label(string p, int l)
   char buffer[4];
   string sn = &buffer[0];
   string full_name = string_undefined;
-  
+
   pips_assert("No more than 999 alternate returns", l<999);
-  
+
   sprintf(buffer, "%d", l);
 
   /* Generate a variable of type CHARACTER*(*). See gram.y,
@@ -1091,20 +1079,20 @@ entity generate_pseudo_formal_variable_for_formal_label(string p, int l)
 
   pips_debug(8, "Generated replacement for formal return label: %s\n",
 	     entity_name(fs));
-  
+
   return fs;
 }
 
 bool formal_label_replacement_p(entity fp)
 {
   bool replacement_p = FALSE;
-  
+
   string fpn = entity_local_name(fp);
   string lsp = get_string_property("PARSER_FORMAL_LABEL_SUBSTITUTE_PREFIX");
   /* string lsp = "FORMAL_RETURN_LABEL_"; */
 
   replacement_p = (strstr(fpn, lsp)==fpn);
-  
+
   return replacement_p;
 }
 
@@ -1119,7 +1107,7 @@ bool actual_label_replacement_p(expression eap)
 
       replacement_p = (strlen(ls) >= 4
 		       && *ls=='"' && *(ls+1)=='*' && *(ls+strlen(ls)-1)=='"');
-      
+
       if(replacement_p) {
 	for(p=ls+2; p<ls+strlen(ls)-1; p++) {
 	  if(*p<'0'||*p>'9') {
@@ -1129,7 +1117,7 @@ bool actual_label_replacement_p(expression eap)
 	}
       }
     }
-  
+
   return replacement_p;
 }
 
@@ -1160,7 +1148,7 @@ entity make_new_index_entity(entity old_index, string suffix)
 
   /* add a terminal p till a new name is found. */
   for (asprintf(&new_name, "%s%s", old_name, suffix);
-       gen_find_tabulated(new_name, entity_domain)!=entity_undefined; 
+       gen_find_tabulated(new_name, entity_domain)!=entity_undefined;
 
        old_name = new_name) {
     free(new_name);
