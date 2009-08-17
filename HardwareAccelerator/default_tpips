@@ -9,9 +9,13 @@ echo ! initial function
 echo
 display PRINTED_FILE[${WSPACE}]
 #
-# apply compiler
+# apply compiler and clean unused images
 #
 apply FREIA_SPOC_COMPILER[${WSPACE}]
+setproperty DYNAMIC_ALLOCATION="freia_common_create_data"
+setproperty DYNAMIC_DEALLOCATION="freia_common_destruct_data"
+apply CLEAN_UNUSED_DYNAMIC_VARIABLES[${WSPACE}]
+touch SPOC_FILE[${WSPACE}]
 #
 # show spoc results
 #
@@ -24,11 +28,8 @@ echo ! acceleration function
 echo
 display SPOC_FILE[${WSPACE}]
 #
-# new function code is cleaned and displayed
+# new function code
 #
-setproperty DYNAMIC_ALLOCATION="freia_common_create_data"
-setproperty DYNAMIC_DEALLOCATION="freia_common_destruct_data"
-apply CLEAN_UNUSED_DYNAMIC_VARIABLES[${WSPACE}]
 echo
 echo ! updated function
 echo
