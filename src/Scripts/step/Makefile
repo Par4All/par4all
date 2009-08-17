@@ -41,4 +41,4 @@ STEP.f: STEP.h default/README STEP.F STEP_COM_SUBROUTINES_BODY.f STEP_COM_SUBROU
 clean: local-clean
 
 local-clean:
-	$(RM) *.f
+	$(RM) *.f default/STEP.h
