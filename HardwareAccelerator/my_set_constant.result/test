@@ -6,7 +6,7 @@ freia_status my_set_constant(freia_data2d *o, int32_t p0)
    return freia_aipo_set_constant(o, p0);                               /*0004*/
 }
 
-! accelerated function
+! graphs
 
 // graph for dag "dag_0" of module "my_set_constant" in dot format
 digraph "dag_0" {
@@ -41,6 +41,9 @@ digraph "my_set_constant_helper_0_0" {
   "4 set_constant" [shape=circle];
   "4 set_constant" -> "o";
 }
+
+! acceleration function
+
 #include <freiaCommon.h>
 #include <freiaCoarseGrain.h>
 #include <spoc.h>
@@ -92,7 +95,7 @@ freia_status my_set_constant_helper_0_0_0(freia_data2d * o0, , int32_t cst0)
   return ret;
 }
 
-! new function
+! updated function
 
 freia_status my_set_constant(freia_data2d *o, int32_t p0)
 {

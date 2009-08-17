@@ -6,7 +6,7 @@ freia_status my_copy(freia_data2d *o, freia_data2d *i0)
    return freia_aipo_copy(o, i0);                                       /*0004*/
 }
 
-! accelerated function
+! graphs
 
 // graph for dag "dag_0" of module "my_copy" in dot format
 digraph "dag_0" {
@@ -47,6 +47,9 @@ digraph "my_copy_helper_0_0" {
   "i0" -> "4 copy";
   "4 copy" -> "o";
 }
+
+! acceleration function
+
 #include <freiaCommon.h>
 #include <freiaCoarseGrain.h>
 #include <spoc.h>
@@ -96,7 +99,7 @@ freia_status my_copy_helper_0_0_0(freia_data2d * o0, freia_data2d * i0)
   return ret;
 }
 
-! new function
+! updated function
 
 freia_status my_copy(freia_data2d *o, freia_data2d *i0)
 {

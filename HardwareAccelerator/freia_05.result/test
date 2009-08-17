@@ -11,7 +11,7 @@ freia_status freia_05(freia_data2d *o0, freia_data2d *o1, freia_data2d *i0, frei
    return FREIA_OK;                                                     /*0011*/
 }
 
-! accelerated function
+! graphs
 
 // graph for dag "dag_0" of module "freia_05" in dot format
 digraph "dag_0" {
@@ -83,6 +83,9 @@ digraph "freia_05_helper_0_1" {
   "i1" -> "10 and";
   "10 and" -> "o1";
 }
+
+! acceleration function
+
 #include <freiaCommon.h>
 #include <freiaCoarseGrain.h>
 #include <spoc.h>
@@ -187,7 +190,7 @@ freia_status freia_05_helper_0_1_0(freia_data2d * o0, freia_data2d * i0, freia_d
   return ret;
 }
 
-! new function
+! updated function
 
 freia_status freia_05(freia_data2d *o0, freia_data2d *o1, freia_data2d *i0, freia_data2d *i1)
 {

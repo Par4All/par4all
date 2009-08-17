@@ -6,7 +6,7 @@ freia_status my_inf(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
    return freia_aipo_inf(o, i0, i1);                                    /*0005*/
 }
 
-! accelerated function
+! graphs
 
 // graph for dag "dag_0" of module "my_inf" in dot format
 digraph "dag_0" {
@@ -53,6 +53,9 @@ digraph "my_inf_helper_0_0" {
   "i1" -> "5 inf";
   "5 inf" -> "o";
 }
+
+! acceleration function
+
 #include <freiaCommon.h>
 #include <freiaCoarseGrain.h>
 #include <spoc.h>
@@ -107,7 +110,7 @@ freia_status my_inf_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, freia_dat
   return ret;
 }
 
-! new function
+! updated function
 
 freia_status my_inf(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 {

@@ -14,7 +14,7 @@ freia_status freia_14(freia_data2d *o, int32_t c)
    return FREIA_OK;                                                     /*0013*/
 }
 
-! accelerated function
+! graphs
 
 // graph for dag "dag_0" of module "freia_14" in dot format
 digraph "dag_0" {
@@ -55,6 +55,9 @@ digraph "freia_14_helper_0_0" {
   "9 set_constant" [shape=circle];
   "9 set_constant" -> "10 add";
 }
+
+! acceleration function
+
 #include <freiaCommon.h>
 #include <freiaCoarseGrain.h>
 #include <spoc.h>
@@ -121,7 +124,7 @@ freia_status freia_14_helper_0_0_0(freia_data2d * o0, , int32_t cst0)
   return ret;
 }
 
-! new function
+! updated function
 
 freia_status freia_14(freia_data2d *o, int32_t c)
 {

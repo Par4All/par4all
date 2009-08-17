@@ -48,7 +48,7 @@ freia_status freia_20(freia_data2d *o, freia_data2d *i, int32_t *k)
    return FREIA_OK;                                                     /*0048*/
 }
 
-! accelerated function
+! graphs
 
 // graph for dag "dag_0" of module "freia_20" in dot format
 digraph "dag_0" {
@@ -161,6 +161,9 @@ digraph "freia_20_helper_0_0" {
   "20 erode_8c" -> "21 erode_6c";
   "i" -> "20 erode_8c";
 }
+
+! acceleration function
+
 #include <freiaCommon.h>
 #include <freiaCoarseGrain.h>
 #include <spoc.h>
@@ -397,7 +400,7 @@ freia_status freia_20_helper_0_0_1(freia_data2d * o0, freia_data2d * i0, int32_t
   return ret;
 }
 
-! new function
+! updated function
 
 freia_status freia_20(freia_data2d *o, freia_data2d *i, int32_t *k)
 {

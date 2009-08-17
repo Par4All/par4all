@@ -6,7 +6,7 @@ freia_status my_erode_6c(freia_data2d *o, freia_data2d *i0, int32_t *p0)
    return freia_aipo_erode_6c(o, i0, p0);                               /*0005*/
 }
 
-! accelerated function
+! graphs
 
 // graph for dag "dag_0" of module "my_erode_6c" in dot format
 digraph "dag_0" {
@@ -47,6 +47,9 @@ digraph "my_erode_6c_helper_0_0" {
   "i0" -> "5 erode_6c";
   "5 erode_6c" -> "o";
 }
+
+! acceleration function
+
 #include <freiaCommon.h>
 #include <freiaCoarseGrain.h>
 #include <spoc.h>
@@ -101,7 +104,7 @@ freia_status my_erode_6c_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, int3
   return ret;
 }
 
-! new function
+! updated function
 
 freia_status my_erode_6c(freia_data2d *o, freia_data2d *i0, int32_t *p0)
 {

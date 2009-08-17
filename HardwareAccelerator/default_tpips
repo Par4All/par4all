@@ -8,19 +8,30 @@ echo
 echo ! initial function
 echo
 display PRINTED_FILE[${WSPACE}]
+#
+# apply compiler
+#
+apply FREIA_SPOC_COMPILER[${WSPACE}]
+#
+# show spoc results
+#
 echo
-echo ! accelerated function
+echo ! graphs
 echo
-apply HARDWARE_ACCELERATOR[${WSPACE}]
 shell cat ./${WSPACE}.database/${WSPACE}/*.dot
-shell cat ./${WSPACE}.database/Src/${WSPACE}_helper_functions.c
 echo
-echo ! new function
+echo ! acceleration function
 echo
-#setenv PIPS_CUDV_DEBUG_LEVEL=8
+display SPOC_FILE[${WSPACE}]
+#
+# new function code is cleaned and displayed
+#
 setproperty DYNAMIC_ALLOCATION="freia_common_create_data"
 setproperty DYNAMIC_DEALLOCATION="freia_common_destruct_data"
 apply CLEAN_UNUSED_DYNAMIC_VARIABLES[${WSPACE}]
+echo
+echo ! updated function
+echo
 display PRINTED_FILE[${WSPACE}]
 close
 delete ${WSPACE}
