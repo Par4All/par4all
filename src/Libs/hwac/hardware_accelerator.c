@@ -38,64 +38,52 @@
 #include "pipsdbm.h"
 
 #include "control.h" // for clean_up_sequences
-// #include "hwac.h"
-extern void freia_spoc_compile(string, statement);
 
-#define HWAC_INPUT "HWAC_INPUT"
-#define HWAC_TARGET "HWAC_TARGET"
+extern string freia_spoc_compile(string, statement);
 
-#define FREIA_API "freia"
-#define SPOC_HW "spoc"
+#define SPOC_HW		"spoc"
+#define TERAPIX_HW	"terapix"
 
-int hardware_accelerator(string module)
+static int freia_compiler(string module, string hardware)
 {
-  string input = get_string_property(HWAC_INPUT);
-  string target = get_string_property(HWAC_TARGET);
-
   debug_on("PIPS_HWAC_DEBUG_LEVEL");
+
+  pips_assert("only spoc hardware is implemented",
+	      same_string_p(hardware, SPOC_HW));
 
   // this will be usefull
   statement mod_stat =
     (statement) db_get_memory_resource(DBR_CODE, module, true);
   set_current_module_statement(mod_stat);
   set_current_module_entity(module_name_to_entity(module));
-
   // proper effects, chains ? summary effects ??
-  /*
-  set_proper_rw_effects((statement_effects)
-	db_get_memory_resource(DBR_PROPER_EFFECTS, module_name,	true));
-
-  graph chains = (graph) db_get_memory_resource(DBR_CHAINS, module_name, true);
-  */
 
   pips_debug(1, "considering module %s\n", module);
 
-  if (!same_string_p(input, FREIA_API))
-    pips_internal_error("expecting '%s' input, got '%s'",
-			FREIA_API, input);
+  // accelerated code generation
+  string spoc_file = freia_spoc_compile(module, mod_stat);
 
-  if (!same_string_p(target, SPOC_HW))
-    pips_internal_error("expecting '%s' target hardware, got '%s'",
-			SPOC_HW, target);
-
-  // just call a stupid algorithm for testing purposes...
-  // if (same_string_p(input, FREIA_API) && same_string_p(target, SPOC_HW))
-  freia_spoc_compile(module, mod_stat);
-
-  // some cleanup
+  // some code cleanup
   clean_up_sequences(mod_stat);
 
-  // put new code
+  // put updated code and accelerated helpers
   DB_PUT_MEMORY_RESOURCE(DBR_CODE, module, mod_stat);
+  DB_PUT_NEW_FILE_RESOURCE(DBR_SPOC_FILE, module, spoc_file);
 
   // update/release resources
   reset_current_module_statement();
   reset_current_module_entity();
-  /*
-  reset_proper_rw_effects();
-  reset_ordering_to_statement();
-  */
 
   debug_off();
   return true;
+}
+
+int freia_spoc_compiler(string module)
+{
+  return freia_compiler(module, SPOC_HW);
+}
+
+int freia_terapix_compiler(string module)
+{
+  return freia_compiler(module, TERAPIX_HW);
 }

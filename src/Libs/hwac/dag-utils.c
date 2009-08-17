@@ -69,6 +69,7 @@ string dagvtx_operation(const dagvtx v)
  */
 static dagvtx get_producer(dag d, dagvtx sink, entity e)
 {
+  pips_assert("some image", e!=entity_undefined);
   FOREACH(dagvtx, v, dag_vertices(d))
   {
     vtxcontent c = dagvtx_content(v);
@@ -251,77 +252,92 @@ void dag_append_vertex(dag d, dagvtx nv)
   // ??? what about scalar deps?
 }
 
-/* replace list items specified by hash_table
+/* return target predecessors as a list.
  */
-static void replace_in_list(hash_table replace, list l)
+list dag_vertex_preds(dag d, dagvtx target)
 {
-  while (l) {
-    void * x = CHUNKP(CAR(l));
-    if (hash_defined_p(replace, x))
-      CHUNKP(CAR(l)) = hash_get(replace, x);
-    l = CDR(l);
-  }
+  list preds = NIL;
+  FOREACH(dagvtx, v, dag_vertices(d))
+    if (v!=target && gen_in_list_p(target, dagvtx_succs(v)))
+      preds = CONS(dagvtx, v, preds);
+  return preds;
 }
 
 /* remove AIPO copies detected as useless.
  */
 void dag_remove_useless_copies(dag d)
 {
-  hash_table replace = hash_table_make(hash_pointer, 10);
-  dagvtx remove;
+  set remove = set_make(set_pointer);
 
-  do
+  ifdebug(4) {
+    pips_debug(4, "considering dag:\n");
+    dag_dump(stderr, "input", d);
+  }
+
+  // one pass is needed because we're going backwards
+  FOREACH(dagvtx, v, dag_vertices(d))
   {
-    hash_table_clear(replace);
-    remove = NULL;
-
-    // look for one replacement at a time...
-    FOREACH(dagvtx, v, dag_vertices(d))
+    vtxcontent c = dagvtx_content(v);
+    const freia_api_t * api = get_freia_api(vtxcontent_opid(c));
+    // freia_aipo_copy(out, in) where out is not used...
+    if (same_string_p(AIPO "copy", api->function_name))
     {
-      vtxcontent c = dagvtx_content(v);
       entity target = vtxcontent_out(c);
-      const freia_api_t * api = get_freia_api(vtxcontent_opid(c));
-      // freia_aipo_copy(out, in) where out is not used...
-      if (same_string_p(AIPO "copy", api->function_name) &&
-	  vtxcontent_out(c)!=entity_undefined &&
-	  !gen_in_list_p(vtxcontent_out(c), dag_outputs(d)))
-      {
-	entity source = ENTITY(CAR(vtxcontent_inputs(c)));
-	remove = v;
-	hash_put(replace, target, source);
-	dagvtx prod = get_producer(d, v, source);
-	// if there is no producer, it must be an input image...
-	if (prod) hash_put(replace, v, prod);
-	break;
-      }
-    }
+      pips_assert("one output and one input to copy",
+	  target!=entity_undefined && gen_length(vtxcontent_inputs(c))==1);
 
-    if (remove)
-    {
-      // perform subsitutions in dag? statements??
-      FOREACH(dagvtx, v, dag_vertices(d))
+      // replace by its source everywhere it is used
+      entity source = ENTITY(CAR(vtxcontent_inputs(c)));
+      // may be NULL if source is an input
+      dagvtx prod = get_producer(d, v, source);
+
+      // add v successors as successors of prod
+      // v is kept as a successor in case it is not removed
+      if (prod)
       {
-	if (v!=remove)
-	{
-	  vtxcontent c = dagvtx_content(v);
-	  replace_in_list(replace, vtxcontent_inputs(c));
-	  replace_in_list(replace, dagvtx_succs(v));
+	FOREACH(dagvtx, vs, dagvtx_succs(v))
+	  dagvtx_succs(prod) = gen_once(vs, dagvtx_succs(prod));
+      }
+
+      // replace target image by source image in all v successors
+      FOREACH(dagvtx, succ, dagvtx_succs(v))
+      {
+	vtxcontent sc = dagvtx_content(succ);
+	gen_list_patch(vtxcontent_inputs(sc), target, source);
+      }
+
+      // v has no more successors
+      gen_free_list(dagvtx_succs(v));
+      dagvtx_succs(v) = NIL;
+
+      // whether to actually remove v
+      if (gen_in_list_p(target, dag_outputs(d))) {
+	if (get_producer(d, NULL, target)!=v) {
+	  set_add_element(remove, remove, v);
 	}
+	// else it is kept
       }
-
-      vtxcontent c = dagvtx_content(remove);
-      hwac_kill_statement(pstatement_statement(vtxcontent_source(c)));
-      dag_remove_vertex(d, remove);
-
-      ifdebug(8)
-	gen_context_recurse(d, remove, dagvtx_domain, gen_true, check_removed);
-
-      free_dagvtx(remove);
+      else { // not needed at all
+	set_add_element(remove, remove, v);
+      }
     }
   }
-  while (remove);
 
-  hash_table_free(replace);
+  SET_FOREACH(dagvtx, r, remove)
+  {
+    pips_debug(5, "removing vertex %" _intFMT "\n", dagvtx_number(r));
+
+    vtxcontent c = dagvtx_content(r);
+    hwac_kill_statement(pstatement_statement(vtxcontent_source(c)));
+    dag_remove_vertex(d, r);
+
+    ifdebug(8)
+      gen_context_recurse(d, r, dagvtx_domain, gen_true, check_removed);
+
+    free_dagvtx(r);
+  }
+
+  set_free(remove);
 }
 
 /* (re)compute the list of *GLOBAL* input & output images for this dag
@@ -330,8 +346,8 @@ void dag_remove_useless_copies(dag d)
  */
 void dag_set_inputs_outputs(dag d)
 {
-  list ins = NIL, outs = NIL, lasts = NIL;
-  // vertices are in reverse computation order...
+  set ins = set_make(set_pointer), outs = set_make(set_pointer);
+
   FOREACH(dagvtx, v, dag_vertices(d))
   {
     vtxcontent c = dagvtx_content(v);
@@ -339,39 +355,40 @@ void dag_set_inputs_outputs(dag d)
 
     if (out!=entity_undefined)
     {
-      // all out variables
-      outs = gen_once(out, outs);
+      // keep computations results that are not used afterwards?
+      if (!set_belong_p(ins, out))
+	set_add_element(outs, outs, out);
+      // or that are formal parameters (external image reuse)
+      else if (formal_parameter_p(out))
+	set_add_element(outs, outs, out);
 
-      // if it is not used, then it is a production...
-      if (!gen_in_list_p(out, ins))
-	lasts = gen_once(out, lasts);
-
-      // remove inputs that are produced locally
-      gen_remove(&ins, out);
+      // remove from current inputs as produced locally
+      set_del_element(ins, ins, out);
     }
 
     FOREACH(entity, i, vtxcontent_inputs(c))
-      ins = gen_once(i, ins);
+      set_add_element(ins, ins, i);
   }
-
-  // keep argument order...
-  ins = gen_nreverse(ins);
 
   ifdebug(9)
   {
     dag_dump(stderr, "debug dag_set_inputs_outputs", d);
-    entity_list_dump(stderr, "computed ins", ins);
-    entity_list_dump(stderr, "computed outs", outs);
-    entity_list_dump(stderr, "computed lasts", lasts);
+    set_fprint(stderr, "new computed ins", ins,
+	       (gen_string_func_t) entity_local_name);
+    set_fprint(stderr, "new computed outs", outs,
+	       (gen_string_func_t) entity_local_name);
   }
 
+  // update dag
   gen_free_list(dag_inputs(d));
-  dag_inputs(d) = ins;
+  dag_inputs(d) = set_to_sorted_list(ins, (gen_cmp_func_t) compare_entities);
 
   gen_free_list(dag_outputs(d));
-  dag_outputs(d) = lasts;
+  dag_outputs(d) = set_to_sorted_list(outs, (gen_cmp_func_t) compare_entities);
 
-  gen_free_list(outs);
+  // cleanup
+  set_free(ins);
+  set_free(outs);
 }
 
 /* ??? I'm unsure about what happens to dead code in the pipeline...

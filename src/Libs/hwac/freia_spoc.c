@@ -298,7 +298,7 @@ static void spoc_measure_conf
  */
 static string helper_file_name(string func_name)
 {
-  string src_dir = db_get_directory_name_for_module(WORKSPACE_SRC_SPACE);
+  string src_dir = db_get_directory_name_for_module(func_name);
   string fn = strdup(cat(src_dir, "/", func_name, HELPER FUNC_C, NULL));
   free(src_dir);
   return fn;
@@ -1787,7 +1787,7 @@ static bool sequence_flt(sequence sq, freia_spoc_info * fsip)
   return true;
 }
 
-void freia_spoc_compile(string module, statement mod_stat)
+string freia_spoc_compile(string module, statement mod_stat)
 {
   freia_spoc_info fsi;
   fsi.seqs = NIL;
@@ -1800,6 +1800,9 @@ void freia_spoc_compile(string module, statement mod_stat)
 
   // output file
   string file = helper_file_name(module);
+  if (file_readable_p(file))
+    pips_user_error("file '%s' already here, cannot reapply transformation\n");
+
   pips_debug(1, "generating file '%s'\n", file);
   FILE * helper = safe_fopen(file, "w");
   fprintf(helper, FREIA_SPOC_INCLUDES);
@@ -1815,5 +1818,6 @@ void freia_spoc_compile(string module, statement mod_stat)
   // cleanup
   gen_free_list(fsi.seqs);
   safe_fclose(helper, file);
-  free(file);
+
+  return file;
 }

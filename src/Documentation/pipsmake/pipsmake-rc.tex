@@ -5887,32 +5887,22 @@ tiling_sequence      > MODULE.code
 \subsection{Hardware Accelerator}
 \label{hardware-accelerator}
 
-Generate code for a particular hardware accelerator.
-It looks generic, but it may not be such a good idea if
-different targets require different costly analyses.
-
-FC: I'm unsure about this one. Different hardware accelerators may
-required different analyses, so an \texttt{activate} may be more
-appropriate?
+Generate code from a FREIA application targetting a particular
+hardware accelerator. I could add resources for the module dags?
 
 \begin{PipsMake}
-hardware_accelerator	> MODULE.code
+freia_spoc_compiler	> MODULE.code
+			> MODULE.spoc_file
+        < PROGRAM.entities
+        < MODULE.code
+
+freia_terapix_compiler	> MODULE.code
+			> MODULE.terapix_file
         < PROGRAM.entities
         < MODULE.code
 \end{PipsMake}
 
-The next property describe the input API which is considered for
-acceleration. The freia image manipulation API is the currently considered.
-\begin{PipsProp}
-HWAC_INPUT "freia"
-\end{PipsProp}
-
-The target hardware is:
-\begin{PipsProp}
-HWAC_TARGET "spoc"
-\end{PipsProp}
-
-Depth of the target Spoc accelerator:
+Default depth of the target SPoC accelerator:
 \begin{PipsProp}
 HWAC_SPOC_DEPTH 8
 \end{PipsProp}
