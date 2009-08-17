@@ -1,0 +1,45 @@
+
+Parsed printed file
+
+void generate11()
+{
+   int i;
+   int j;
+
+   func(i, &j);
+}
+
+Printed file
+
+void generate11()
+{
+   int i;
+   int j;
+
+   func(i, &j);
+}
+
+Printed file generate11 with intraprocedural preconditions
+
+
+//  P() {}
+
+void generate11()
+{
+   int i;
+   int j;
+
+//  P() {}
+
+
+   func(i, &j);
+}
+
+Printed file func with intraprocedural preconditions
+
+
+//  P() {}
+
+int func(int f1, int *f2)
+{
+}

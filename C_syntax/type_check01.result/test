@@ -1,0 +1,13 @@
+
+Parsed code for "main"
+
+
+Warnings
+
+C_PARSER[main] (check_C_function_type) Type updated for function "freia_aipo_global_vol"
+C_PARSER[main] (MakeFunctionExpression) Actual arguments do not fit the declared formal arguments of function "freia_aipo_global_min"
+C_PARSER[main] (CParserError) 
+Recovery from C parser failure not (fully) implemented yet.
+C parser is likely to fail later if re-used.
+C_PARSER[main] (set_debug_stack_pointer) debug level stack is set to 2
+unknown[unknown] (safe_do_something) Request aborted under pipsmake: build resource PARSED_PRINTED_FILE for module main.

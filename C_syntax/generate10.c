@@ -1,3 +1,4 @@
+/* Check the varag case */
 void generate10()
 {
   extern int func(int a, ...);
