@@ -848,15 +848,15 @@ i_activate: TK_ACTIVATE rulename TK_ENDOFLINE
 
 i_checkactive: TK_CHECKACTIVE resourcename TK_ENDOFLINE
 	{
-	    string ph = active_phase_for_resource($2);
-	    fprintf(stdout, "resource %s built by phase %s\n", $2, ph);
-	    if (jpips_is_running)
-	    {
-		jpips_begin_tag("result");
-		jpips_add_tag(ph);
-		jpips_end_tag();
-	    }
-	    free($2);
+	  string ph = active_phase_for_resource($2);
+	  fprintf(stdout, "resource %s built by phase %s\n", $2, ph);
+	  if (jpips_is_running)
+	  {
+	    jpips_begin_tag("result");
+	    jpips_add_tag(ph);
+	    jpips_end_tag();
+	  }
+	  free($2);
 	}
 	;
 

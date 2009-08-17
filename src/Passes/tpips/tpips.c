@@ -226,16 +226,16 @@ struct t_completion_scheme
     int first_completion_type;
     int other_completion_type;
 };
-    
+
 static struct t_completion_scheme completion_scheme[] =
 {
 { SHELL_ESCAPE, COMP_FILENAME,   COMP_FILENAME },
 { TPIPS_SOURCE,	COMP_FILENAME,   COMP_FILENAME },
 { CHANGE_DIR,   COMP_FILENAME,   COMP_NONE },
-{ QUIT,         COMP_NONE,       COMP_NONE },
+{ QUIT,		COMP_NONE,       COMP_NONE },
 { "checkpoint", COMP_NONE,       COMP_NONE },
-{ HELP,         COMP_HELP_TOPIC, COMP_NONE },
-{ ECHO,         COMP_NONE,       COMP_NONE },
+{ HELP,		COMP_HELP_TOPIC, COMP_NONE },
+{ ECHO,		COMP_NONE,       COMP_NONE },
 { "open",       COMP_NONE,       COMP_NONE },
 { "create",     COMP_NONE,       COMP_FILENAME },
 { "close",      COMP_NONE,       COMP_NONE },
@@ -248,31 +248,31 @@ static struct t_completion_scheme completion_scheme[] =
 { "display",    COMP_FILE_RSC,   COMP_NONE },
 { "activate",   COMP_RULE,       COMP_NONE },
 { SET_ENV,	COMP_NONE,	 COMP_NONE },
-{ GET_ENV, 	COMP_NONE, 	 COMP_NONE },
+{ GET_ENV,	COMP_NONE,	 COMP_NONE },
 { SET_PROP,     COMP_PROPERTY,   COMP_NONE },
 { GET_PROP,     COMP_PROPERTY,   COMP_NONE },
-{ "info",       COMP_NONE,   	 COMP_NONE },
-{ "show", 	COMP_RESOURCE,	 COMP_NONE },
+{ "info",       COMP_NONE,	 COMP_NONE },
+{ "show",	COMP_RESOURCE,	 COMP_NONE },
 { (char*)NULL,  COMP_FILENAME,   COMP_FILENAME } /* default: files... */
 };
 
-static char *tp_help_topics[] = 
+static char *tp_help_topics[] =
 {
     "readline", "create","close","delete","echo","module","activate",
     "make","apply","capply","display",SET_ENV, SET_PROP,GET_PROP,SHELL_ESCAPE,
     CHANGE_DIR,QUIT,"source", HELP,"rule","resource","owner", "remove",
-    "checkpoint", "info", "show", (char*)NULL
+    "checkpoint", "info", "show", "checkactive", (char*)NULL
 };
 
 /* Generator function for command completion.  STATE lets us know whether
  * to start from scratch; without any state (i.e. STATE == 0), then we
- * start at the top of the list. 
+ * start at the top of the list.
  */
 static char * fun_generator(const char *texte, int state)
 {
     static int list_index, len;
     char *name;
-     
+
     /* If this is a new word to complete, initialize now.  This includes
        saving the length of TEXT for efficiency, and initializing the index
        variable to 0. */
@@ -281,16 +281,16 @@ static char * fun_generator(const char *texte, int state)
 	list_index = 0;
 	len = strlen (texte);
     }
-     
+
     /* Return the next name which partially matches from the command list. */
     while ((name = completion_scheme[list_index].fun_name))
     {
 	list_index++;
-     
+
 	if (strncmp (name, texte, len) == 0)
 	    return (strdup(name));
     }
-     
+
     /* If no names matched, then return NULL. */
     return ((char *)NULL);
 }
@@ -336,7 +336,7 @@ static char * param_generator(const char *texte, int state)
 {
     static int list_index, len;
     char *name;
-     
+
     /* If this is a new word to complete, initialize now.  This includes
        saving the length of TEXT for efficiency, and initializing the index
        variable to 0. */
@@ -347,7 +347,7 @@ static char * param_generator(const char *texte, int state)
 	int current_pos = 0;
 	struct t_completion_scheme * cs = completion_scheme;
 	int completion_type;
- 	matches = (char **)NULL;
+	matches = (char **)NULL;
 
 	pips_debug (9, "completing parameters\n\n");
 
@@ -374,7 +374,6 @@ static char * param_generator(const char *texte, int state)
 	       !prefix_equal_p(rl_line_buffer, cs->fun_name))
 	{
 	    cs++;
-	    
 	    pips_debug (9, "text is '%s', function found is '%s'\n\n",
 			rl_line_buffer,
 			cs->fun_name!=NULL? cs->fun_name : "<none>");
@@ -427,16 +426,16 @@ static char * param_generator(const char *texte, int state)
 	return NULL;
     else if (current_completion_array == RESERVED_FOR_FILENAME)
 	return rl_filename_completion_function(texte,state);
-    
+
     /* Return the next name which partially matches from the command list. */
     while ((name = current_completion_array[list_index]))
     {
 	list_index++;
-     
+
 	if (strncmp (name, texte, len) == 0)
 	    return (strdup(name));
     }
-     
+
     /* If no names matched, then return NULL. */
     return NULL;
 }
@@ -444,15 +443,15 @@ static char * param_generator(const char *texte, int state)
 /* Attempt to complete on the contents of TEXT.  START and END show the
  * region of TEXT that contains the word to complete.  We can use the
  * entire line in case we want to do some simple parsing.  Return the
- * array of matches, or NULL if there aren't any. 
+ * array of matches, or NULL if there aren't any.
  */
 static char ** fun_completion(char *texte, int start, int end)
 {
 
     char **matches;
-     
+
     matches = (char **)NULL;
-     
+
     /* If this word is at the start of the line, then it is a command
        to complete.  Otherwise it is the name of a file in the current
        directory. */
@@ -467,7 +466,7 @@ static char ** fun_completion(char *texte, int start, int end)
 
 /* Tell the GNU Readline library how to complete.  We want to try to complete
  * on command names if this is the first word in the line, or on filenames
- * if not. 
+ * if not.
  */
 static void initialize_readline(void)
 {
@@ -504,7 +503,7 @@ static char * tpips_read_a_line(char * main_prompt)
     int l;
 
     line = get_next_line(main_prompt);
-    
+
     /* handle backslash-style continuations
      */
     while (line && (l=strlen(line), l>1 && line[l-1]==TPIPS_CONTINUATION_CHAR))
@@ -533,11 +532,12 @@ static void tpips_user_log(const char *fmt, va_list args)
     /* It goes to stderr to have only displayed files on stdout.
      */
 
-    /* To be C99 compliant, a va_list can be used only once...  Also to avoid exploding on x86_64: */
+    /* To be C99 compliant, a va_list can be used only once...
+       Also to avoid exploding on x86_64: */
     va_list args_copy;
     va_copy (args_copy, args);
-    
-    vfprintf(stderr, fmt, args); 
+
+    vfprintf(stderr, fmt, args);
     fflush(stderr);
 
     if (!log_file || !get_bool_property("USER_LOG_P"))
@@ -594,7 +594,7 @@ static void tpips_user_error(
     va_list *some_arguments)
 {
    /* print name of function causing error and
-    * print out remainder of message 
+    * print out remainder of message
     */
     fprintf(stderr, "user error in %s: ", calling_function_name);
     vfprintf(stderr, a_message_format, * some_arguments);
@@ -606,9 +606,9 @@ static void tpips_user_error(
       jpips_string((string) a_message_format, some_arguments);
       jpips_tag(END_UE);
     }
-    
+
     /* terminate PIPS request */
-    if (get_bool_property("ABORT_ON_USER_ERROR")) 
+    if (get_bool_property("ABORT_ON_USER_ERROR"))
     {
       pips_user_warning("Abort on user error requested!\n");
       abort();
@@ -625,7 +625,7 @@ static string default_hist_file_name(void)
 {
     string home, hist = getenv(TPIPS_HISTENV);
     if (hist) return strdup(hist);
-    /* else builds the default name. 
+    /* else builds the default name.
      */
     home = getenv("HOME");
     return strdup(concatenate(home? home: "", "/", TPIPS_HISTORY, NULL));
@@ -634,9 +634,7 @@ static string default_hist_file_name(void)
 static void initialize_tpips_history(void)
 {
     string file_name = default_hist_file_name();
-    
-    /* read the history file, then point to the last entry.
-     */
+    // read the history file, then point to the last entry.
     using_history();
     read_history(file_name);
     free(file_name);
@@ -655,13 +653,15 @@ void tpips_help(string line)
 
     printf("\n");
     TP_HELP("readline", "* readline interaction facilities\n",
-	    "\ttry <tab><tab> for automatic completion\n"
-	    "\temacs-tyle editing capabilities (see man readline)\n")
+	  "\ttry <tab><tab> for automatic completion\n"
+	  "\temacs-tyle editing capabilities (see man readline)\n")
     TP_HELP("create", "create   <workspace-name> <file-name>...\n",
 	 "\tcreate a new worspace from a list of fortran files\n"
 	 "\tfirst delete the workspace if it exists\n");
     TP_HELP("open", "open     <workspace-name>\n",
 	 "\topen an existing workspace\n");
+    TP_HELP("checkactive", "checkactive <resourcename>\n",
+	  "\ttell which phase would produce this resource.\n");
     TP_HELP("checkpoint", "checkpoint\n",
 	 "\tcheckpoint the current workspace\n");
     TP_HELP("close", "close\n",
