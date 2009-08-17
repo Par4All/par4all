@@ -1,11 +1,8 @@
 * pre
 - inlining, full_unroll, dead code elim...
-+ image reuse? ok for internal & output
++ image reuse
 - scalar deps? use chains??
 - check => ok => deadcode (#define)
-
-* bug
-- input/output image
 
 * input
 - may skip unrelated statements?
@@ -19,12 +16,13 @@
 + symmetry (flipping)
 + compaction
 + handle wiring
-- tell pipsdbm about generated files and fix callees?
++ tell pipsdbm about generated files
+- the generated code is just a file to pips. ok?
 + pipe overflow
 - add checks in generated code (img size and so)?
-- parametric img size/depth?
+- parametric img size/depth? same as code?
 + show DAG!
-- select node shape depending on hardware?
++ select node shape depending on hardware?
 + add more comments to generated code
 + improve generated comments
 
@@ -34,3 +32,5 @@
 
 * validation
 - check all AIPO
+
+* bugs
