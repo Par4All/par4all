@@ -12,7 +12,7 @@ freia_status
   bool bin = false;
   // break pipeline on scalar dependency
   freia_aipo_add(t1, i0, i1);
-  freia_aipo_global_max(t2, &max);
+  freia_aipo_global_max(t1, &max);
   freia_aipo_erode_8c(t2, t1, k);
   freia_aipo_threshold(o, t2, min, max, bin);
   freia_common_destruct_data(t1);
