@@ -8,6 +8,22 @@ PHI (LOGICAL L, int X1, int X2)
 }
 
 void
+SIMD_PHID(int R[4], LOGICAL L[4], int X1[4], int X2[4])
+{
+    int i;
+    for (i=0;i<4;i++)
+        R[i]=L[i]?X1[i]:X2[i];
+}
+
+void
+SIMD_GTD(int R[4], int X1[4], int X2[4])
+{
+    int i;
+    for (i=0;i<4;i++)
+        R[i]=X1[i]>X2[i];
+}
+
+void
 SIMD_LOAD_V4SF (float VEC[4], float BASE[4])
 {
     VEC[0] = BASE[0];

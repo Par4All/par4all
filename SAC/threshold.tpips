@@ -1,0 +1,34 @@
+delete threshold
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create threshold threshold.c include/SIMD.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
+
+echo
+echo Initial code
+echo
+
+module threshold
+display PRINTED_FILE
+
+source ${VDIR:-.}/include/benchmark.tpips.h
+
+echo
+echo simdized code
+echo
+
+display PRINTED_FILE
+
+shell ${VDIR:-.}/compileC.sh threshold threshold test.c
+shell gcc -O3 -I${VDIR:-.} -march=native -c test.c
+shell rm test.c test.o
+
+close
+delete threshold
+quit
