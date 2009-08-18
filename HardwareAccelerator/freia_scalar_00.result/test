@@ -34,7 +34,7 @@ digraph "dag_0" {
   "i0" -> "10 add";
   "i1" -> "10 add";
   "9 global_max" [shape=diamond];
-  "9 global_max" -> "11 threshold" [ arrowhead = empty ];
+  "9 global_max" -> "11 threshold" [arrowhead=empty];
   "i0" -> "9 global_max";
 }
 // graph for dag "dag_cleaned_0" of module "freia_scalar_00" in dot format
@@ -54,7 +54,7 @@ digraph "dag_cleaned_0" {
   "i0" -> "10 add";
   "i1" -> "10 add";
   "9 global_max" [shape=diamond];
-  "9 global_max" -> "11 threshold" [ arrowhead = empty ];
+  "9 global_max" -> "11 threshold" [arrowhead=empty];
   "i0" -> "9 global_max";
 }
 // graph for dag "freia_scalar_00_helper_0_0" of module "freia_scalar_00" in dot format
