@@ -63,7 +63,7 @@ static bool init_expression_to_index_and_initial_bound(expression init,
 
 	if(ENDP(reference_indices(r)) /* scalar reference */
 	   && type_variable_p(lit)
-	   && basic_int_p(variable_basic(type_variable(lit)))) {
+	   && basic_int_p(variable_basic(type_variable(ultimate_type(lit))))) {
 	  *pli = li;
 	  /* To avoid sharing and intricate free operations */
 	  *plb = copy_expression(EXPRESSION(CAR(CDR(call_arguments(c)))));
