@@ -1,4 +1,4 @@
-#define SIZE 40
+#define SIZE 10
 double get(double f[SIZE],int i)
 {
     return f[i];
