@@ -95,7 +95,7 @@ int patterns_yyerror(char* s);
 "<="		        return LESS_OR_EQUAL_OPERATOR_TOK;
 "<"      		return LESS_THAN_OPERATOR_TOK;
 "=="			return EQUAL_OPERATOR_TOK;
-"SIMD_PHI"		return PHI_TOK;
+"PHI"		return PHI_TOK;
 [0-9.-]+                  { patterns_yylval.iVal = atoi(patterns_yytext); return INTEGER_TOK; }
 [A-Za-z][0-9A-Za-z_]*   { patterns_yylval.strVal = strdup(patterns_yytext); return IDENTIFIER_TOK; }
 [ \t\n]                 ;

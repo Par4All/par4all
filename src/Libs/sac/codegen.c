@@ -239,7 +239,7 @@ entity get_function_entity(string name)
     entity e = local_name_to_top_level_entity(name); 
     if ( entity_undefined_p( e ) )
     {
-        pips_user_warning("entity %s not defined, please load the appropriate definition source file",name);
+        pips_user_error("entity %s not defined, please load the appropriate definition source file\n",name);
     }
 
     return e;
@@ -1020,6 +1020,7 @@ static statementInfo make_simd_statement_info(opcodeClass kind, opcode oc, list*
     /* create the simd vector entities */
     hash_table reference_to_entity = hash_table_make(hash_pointer,HASH_DEFAULT_SIZE);
     int j=nbargs-1;
+    pips_assert("nb parameters match nb dummy parameters",nbargs==gen_length(*args));
     FOREACH(EXPRESSION,exp,*args)
     {
         int basicTag = get_basic_from_opcode(oc, j);

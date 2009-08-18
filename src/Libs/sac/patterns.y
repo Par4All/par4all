@@ -270,6 +270,6 @@ int patterns_yywrap(void)
 
 int patterns_yyerror(char* s)
 {
-   pips_error("patterns parser: %s\n", s);
+   pips_internal_error("patterns parser: %s\n", s);
    return 0;
 }

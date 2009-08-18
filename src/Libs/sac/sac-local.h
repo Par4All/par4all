@@ -50,7 +50,7 @@ void init_dep_graph(graph dg);
 #define ENTITY_FUNCTION_P(f) (type_functional_p(entity_type(f)) && \
 			    (gen_length(functional_parameters(type_functional(entity_type(f)))) != 0))
 
-#define SIMD_PHI_NAME "SIMD_PHI"
+#define SIMD_PHI_NAME "PHI"
 
 /* simd_loop_const_elim.c */
 

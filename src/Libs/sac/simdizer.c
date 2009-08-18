@@ -73,14 +73,13 @@ void init_statement_matches_map(list l)
     init_tree_patterns();
 
     matches = hash_table_make(hash_pointer, 0);
-    MAP(STATEMENT, s,
+    FOREACH(STATEMENT, s,l)
     {
         list match = match_statement(s);
 
         if (match != NIL)
             hash_put(matches, (void *)s, (void *)match);
-    },
-        l);
+    }
 }
 
 /*
