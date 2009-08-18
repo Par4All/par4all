@@ -82,22 +82,18 @@ c SIMD_COMMENT_0
          I_0 = B(LU_IND0+1)*C(LU_IND0+1)
 c SIMD_COMMENT_1
          A(1) = A(1)+I_0                                                0014
-c SIMD_COMMENT_2
 c SIMD_COMMENT_0
          I_0 = B(LU_IND0+2)*C(LU_IND0+2)
 c SIMD_COMMENT_1
          A(1) = A(1)+I_0                                                0014
-c SIMD_COMMENT_2
 c SIMD_COMMENT_0
          I_0 = B(LU_IND0+3)*C(LU_IND0+3)
 c SIMD_COMMENT_1
          A(1) = A(1)+I_0                                                0014
-c SIMD_COMMENT_2
 c SIMD_COMMENT_0
          I_0 = B(LU_IND0+4)*C(LU_IND0+4)
 c SIMD_COMMENT_1
          A(1) = A(1)+I_0                                                0014
-c SIMD_COMMENT_2
 99998    CONTINUE
       I = 10001
 
@@ -123,22 +119,18 @@ c SIMD_COMMENT_0
          I_0 = B(LU_IND0+1)*C(LU_IND0+1)
 c SIMD_COMMENT_1
          RED0(0) = RED0(0)+I_0                                          0014
-c SIMD_COMMENT_2
 c SIMD_COMMENT_0
          I_0 = B(LU_IND0+2)*C(LU_IND0+2)
 c SIMD_COMMENT_1
          RED0(1) = RED0(1)+I_0                                          0014
-c SIMD_COMMENT_2
 c SIMD_COMMENT_0
          I_0 = B(LU_IND0+3)*C(LU_IND0+3)
 c SIMD_COMMENT_1
          RED0(2) = RED0(2)+I_0                                          0014
-c SIMD_COMMENT_2
 c SIMD_COMMENT_0
          I_0 = B(LU_IND0+4)*C(LU_IND0+4)
 c SIMD_COMMENT_1
          RED0(3) = RED0(3)+I_0                                          0014
-c SIMD_COMMENT_2
 99998    CONTINUE
       A(1) = RED0(3)+RED0(2)+RED0(1)+RED0(0)+A(1)
       I = 10001
@@ -162,22 +154,18 @@ c SIMD_COMMENT_0
          I_0 = B(LU_IND0+1)*C(LU_IND0+1)
 c SIMD_COMMENT_1
          RED0(0) = RED0(0)+I_0                                          0014
-c SIMD_COMMENT_2
 c SIMD_COMMENT_0
          I_0 = B(LU_IND0+2)*C(LU_IND0+2)
 c SIMD_COMMENT_1
          RED0(1) = RED0(1)+I_0                                          0014
-c SIMD_COMMENT_2
 c SIMD_COMMENT_0
          I_0 = B(LU_IND0+3)*C(LU_IND0+3)
 c SIMD_COMMENT_1
          RED0(2) = RED0(2)+I_0                                          0014
-c SIMD_COMMENT_2
 c SIMD_COMMENT_0
          I_0 = B(LU_IND0+4)*C(LU_IND0+4)
 c SIMD_COMMENT_1
          RED0(3) = RED0(3)+I_0                                          0014
-c SIMD_COMMENT_2
 99998    CONTINUE
       A(1) = RED0(3)+RED0(2)+RED0(1)+RED0(0)+A(1)
 
@@ -200,22 +188,18 @@ c SIMD_COMMENT_0
          I_03 = B(LU_IND0+1)*C(LU_IND0+1)
 c SIMD_COMMENT_1
          RED0(0) = RED0(0)+I_03                                         0014
-c SIMD_COMMENT_2
 c SIMD_COMMENT_0
          I_02 = B(LU_IND0+2)*C(LU_IND0+2)
 c SIMD_COMMENT_1
          RED0(1) = RED0(1)+I_02                                         0014
-c SIMD_COMMENT_2
 c SIMD_COMMENT_0
          I_01 = B(LU_IND0+3)*C(LU_IND0+3)
 c SIMD_COMMENT_1
          RED0(2) = RED0(2)+I_01                                         0014
-c SIMD_COMMENT_2
 c SIMD_COMMENT_0
          I_00 = B(LU_IND0+4)*C(LU_IND0+4)
 c SIMD_COMMENT_1
          RED0(3) = RED0(3)+I_00                                         0014
-c SIMD_COMMENT_2
 99998    CONTINUE
       A(1) = RED0(3)+RED0(2)+RED0(1)+RED0(0)+A(1)
 
@@ -245,7 +229,6 @@ c SIMD_COMMENT_2
          CALL SIMD_LOAD_V4HI(v4hi_vec3, RED0(0))
          CALL SIMD_ADDW(v4hi_vec3, v4hi_vec3, v4hi_vec0)
          CALL SIMD_SAVE_V4HI(v4hi_vec3, RED0(0))
-c SIMD_COMMENT_2
 99998    CONTINUE
       A(1) = RED0(3)+RED0(2)+RED0(1)+RED0(0)+A(1)
 
@@ -273,7 +256,6 @@ c SIMD_COMMENT_2
          CALL SIMD_LOAD_V4HI(v4hi_vec3, RED0(0))
          CALL SIMD_ADDW(v4hi_vec3, v4hi_vec3, v4hi_vec0)
          CALL SIMD_SAVE_V4HI(v4hi_vec3, RED0(0))
-c SIMD_COMMENT_2
 99998    CONTINUE
       A(1) = RED0(3)+RED0(2)+RED0(1)+RED0(0)+A(1)
 
@@ -300,7 +282,6 @@ c SIMD_COMMENT_2
          CALL SIMD_LOAD_V4HI(v4hi_vec1, B(LU_IND0+1))
          CALL SIMD_MULW(v4hi_vec0, v4hi_vec1, v4hi_vec2)
          CALL SIMD_ADDW(v4hi_vec3, v4hi_vec3, v4hi_vec0)
-c SIMD_COMMENT_2
 99998    CONTINUE
       CALL SIMD_SAVE_V4HI(v4hi_vec3, RED0(0))
       A(1) = RED0(3)+RED0(2)+RED0(1)+RED0(0)+A(1)
@@ -325,7 +306,6 @@ c SIMD_COMMENT_2
          CALL SIMD_LOAD_V4HI(v4hi_vec1, B(LU_IND0+1))
          CALL SIMD_MULW(v4hi_vec0, v4hi_vec1, v4hi_vec2)
          CALL SIMD_ADDW(v4hi_vec3, v4hi_vec3, v4hi_vec0)
-c SIMD_COMMENT_2
 99998    CONTINUE
       CALL SIMD_SAVE_V4HI(v4hi_vec3, RED0(0))
       A(1) = RED0(3)+RED0(2)+RED0(1)+RED0(0)+A(1)
