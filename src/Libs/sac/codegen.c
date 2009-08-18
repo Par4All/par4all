@@ -239,7 +239,7 @@ entity get_function_entity(string name)
     entity e = local_name_to_top_level_entity(name); 
     if ( entity_undefined_p( e ) )
     {
-        pips_user_error("entity %s not defined, please load the appropriate definition source file\n",name);
+        pips_user_warning("entity %s not defined, please load the appropriate definition source file\n",name);
     }
 
     return e;
