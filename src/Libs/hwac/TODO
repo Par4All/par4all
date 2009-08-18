@@ -6,6 +6,9 @@
 
 * input
 - may skip unrelated statements?
+- deal with |= ||= and similars
+- what about full expressions: aipo_x() || aipo_y() || aipo_z()?
+- check that there are references where expected?
 - check/remove more implicit hypothesis
 
 * code
