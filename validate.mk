@@ -12,7 +12,13 @@ F.c	= $(wildcard *.c)
 F.f	= $(wildcard *.f)
 F.F	= $(wildcard *.F)
 
-# result directory
+# all source files
+F.src	= $(F.c) $(F.f) $(F.F)
+
+# all potential result directories
+F.res	= $(F.c:%.c=%.result) $(F.f:%.f=%.result) $(F.F:%.F=%.result)
+
+# actual result directory
 F.result= $(wildcard *.result)
 
 # validation scripts
@@ -86,3 +92,8 @@ DEFTEST	= default_test2
 	| $(FLT) > $@ ; $(OK)
 
 # what about nothing?
+missing:
+	@echo "# checking for missing (?) result directories"
+	@for res in $(F.res) ; do \
+	  test -d $$res || echo "$$res is missing" >&2 ; \
+	done
