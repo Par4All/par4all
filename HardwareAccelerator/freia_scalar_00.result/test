@@ -180,7 +180,7 @@ freia_status freia_scalar_00_helper_0_1_0(freia_data2d * o0, freia_data2d * i0, 
   // 0`t1 [0 input 0] -> [0 threshold 0] 11 threshold
   si.mux[0][0].op = SPOC_MUX_IN0;
   // threshold 11 threshold stage 0 side 0
-  si.th[0][0].op =    (bin2)? SPOC_TH_BINARIZE : SPOC_TH_NO_BINARIZE;
+  si.th[0][0].op = bin2? SPOC_TH_BINARIZE : SPOC_TH_NO_BINARIZE;
   sp.th[0][0].boundmin = inf0;
   sp.th[0][0].boundmax = sup1;
 
