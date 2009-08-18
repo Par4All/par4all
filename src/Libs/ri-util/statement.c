@@ -1091,7 +1091,8 @@ statement
 clear_labels(s)
 statement s;
 {
-    gen_multi_recurse(s, statement_domain, gen_true, clear_label, NULL);
+    gen_recurse(s, statement_domain, gen_true, clear_label);
+    clean_up_sequences(s);
     return s;
 }
 
