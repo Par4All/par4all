@@ -95,5 +95,5 @@ DEFTEST	= default_test2
 missing:
 	@echo "# checking for missing (?) result directories"
 	@for res in $(F.res) ; do \
-	  test -d $$res || echo "$$res is missing" >&2 ; \
+	  test -d $$res || echo "missing: $$res" >&2 ; \
 	done
