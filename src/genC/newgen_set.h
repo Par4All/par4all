@@ -115,6 +115,7 @@ extern bool list_in_set_p(const list, const set);
 extern bool set_equal_p(const set, const set);
 extern bool set_empty_p(const set);
 extern bool set_inclusion_p(const set, const set);
+extern bool set_intersection_p(const set, const set);
 // OPERATIONS
 extern set set_clear(set);
 extern set set_assign(set, const set);

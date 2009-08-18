@@ -239,6 +239,24 @@ set set_delfree_element(set s1, const set s2, const void * e)
   return s1;
 }
 
+/* returns whether s1 n s2 <> 0
+ * complexity of the intersection
+ */
+bool set_intersection_p(const set s1, const set s2)
+{
+  bool non_empty_intersection;
+  if (set_empty_p(s1) || set_empty_p(s2))
+    non_empty_intersection = false;
+  else
+  {
+    set inter = set_make(set_pointer);
+    set_intersection(inter, s1, s2);
+    non_empty_intersection = !set_empty_p(inter);
+    set_free(inter);
+  }
+  return non_empty_intersection;
+}
+
 /* return whether s1 \included s2
  */
 bool set_inclusion_p(const set s1, const set s2)
