@@ -40,8 +40,8 @@ extern freia_status freia_aipo_not(freia_data2d *, freia_data2d *);
 extern freia_status freia_aipo_convolution(freia_data2d *, freia_data2d *, int32_t *, uint32_t, uint32_t);
 extern freia_status freia_aipo_fast_correlation(freia_data2d *, freia_data2d *, freia_data2d *, uint32_t);
 // Measure
-extern freia_status freia_aipo_min(freia_data2d *, int32_t *);
-extern freia_status freia_aipo_max(freia_data2d *, int32_t *);
+extern freia_status freia_aipo_global_min(freia_data2d *, int32_t *);
+extern freia_status freia_aipo_global_max(freia_data2d *, int32_t *);
 extern freia_status freia_aipo_global_min_coord(freia_data2d *, int32_t *, int32_t *, int32_t *);
 extern freia_status freia_aipo_global_max_coord(freia_data2d *, int32_t *, int32_t *, int32_t *);
 extern freia_status freia_aipo_global_vol(freia_data2d *, int32_t *);
