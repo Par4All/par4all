@@ -26,16 +26,16 @@ digraph "dag_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "11 addsat" [shape=trapezium,orientation=270];
-  "i0" -> "11 addsat";
-  "11 addsat" -> "o";
-  "10 or" [shape=trapezium,orientation=270];
-  "10 or" -> "11 addsat";
-  "i0" -> "10 or";
-  "9 div" [shape=trapezium,orientation=270];
-  "9 div" -> "10 or";
-  "i0" -> "9 div";
-  "i1" -> "9 div";
+  "11 +s" [shape=trapezium,orientation=270];
+  "i0" -> "11 +s";
+  "11 +s" -> "o";
+  "10 |" [shape=trapezium,orientation=270];
+  "10 |" -> "11 +s";
+  "i0" -> "10 |";
+  "9 /" [shape=trapezium,orientation=270];
+  "9 /" -> "10 |";
+  "i0" -> "9 /";
+  "i1" -> "9 /";
 }
 // graph for dag "dag_cleaned_0" of module "freia_22" in dot format
 digraph "dag_cleaned_0" {
@@ -47,16 +47,16 @@ digraph "dag_cleaned_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "11 addsat" [shape=trapezium,orientation=270];
-  "i0" -> "11 addsat";
-  "11 addsat" -> "o";
-  "10 or" [shape=trapezium,orientation=270];
-  "10 or" -> "11 addsat";
-  "i0" -> "10 or";
-  "9 div" [shape=trapezium,orientation=270];
-  "9 div" -> "10 or";
-  "i0" -> "9 div";
-  "i1" -> "9 div";
+  "11 +s" [shape=trapezium,orientation=270];
+  "i0" -> "11 +s";
+  "11 +s" -> "o";
+  "10 |" [shape=trapezium,orientation=270];
+  "10 |" -> "11 +s";
+  "i0" -> "10 |";
+  "9 /" [shape=trapezium,orientation=270];
+  "9 /" -> "10 |";
+  "i0" -> "9 /";
+  "i1" -> "9 /";
 }
 // graph for dag "freia_22_helper_0_0" of module "freia_22" in dot format
 digraph "freia_22_helper_0_0" {
@@ -68,16 +68,16 @@ digraph "freia_22_helper_0_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "11 addsat" [shape=trapezium,orientation=270];
-  "i0" -> "11 addsat";
-  "11 addsat" -> "o";
-  "10 or" [shape=trapezium,orientation=270];
-  "10 or" -> "11 addsat";
-  "i0" -> "10 or";
-  "9 div" [shape=trapezium,orientation=270];
-  "9 div" -> "10 or";
-  "i0" -> "9 div";
-  "i1" -> "9 div";
+  "11 +s" [shape=trapezium,orientation=270];
+  "i0" -> "11 +s";
+  "11 +s" -> "o";
+  "10 |" [shape=trapezium,orientation=270];
+  "10 |" -> "11 +s";
+  "i0" -> "10 |";
+  "9 /" [shape=trapezium,orientation=270];
+  "9 /" -> "10 |";
+  "i0" -> "9 /";
+  "i1" -> "9 /";
 }
 
 ! acceleration function

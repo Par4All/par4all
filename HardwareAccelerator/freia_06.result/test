@@ -32,16 +32,16 @@ digraph "dag_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "15 or" [shape=trapezium,orientation=270];
-  "15 or" -> "o";
-  "14 and" [shape=trapezium,orientation=270];
-  "14 and" -> "15 or";
-  "i0" -> "14 and";
-  "i1" -> "14 and";
-  "13 mul" [shape=trapezium,orientation=270];
-  "13 mul" -> "15 or";
-  "i0" -> "13 mul";
-  "i1" -> "13 mul";
+  "15 |" [shape=trapezium,orientation=270];
+  "15 |" -> "o";
+  "14 &" [shape=trapezium,orientation=270];
+  "14 &" -> "15 |";
+  "i0" -> "14 &";
+  "i1" -> "14 &";
+  "13 *" [shape=trapezium,orientation=270];
+  "13 *" -> "15 |";
+  "i0" -> "13 *";
+  "i1" -> "13 *";
 }
 // graph for dag "dag_cleaned_0" of module "freia_06" in dot format
 digraph "dag_cleaned_0" {
@@ -53,16 +53,16 @@ digraph "dag_cleaned_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "15 or" [shape=trapezium,orientation=270];
-  "15 or" -> "o";
-  "14 and" [shape=trapezium,orientation=270];
-  "14 and" -> "15 or";
-  "i0" -> "14 and";
-  "i1" -> "14 and";
-  "13 mul" [shape=trapezium,orientation=270];
-  "13 mul" -> "15 or";
-  "i0" -> "13 mul";
-  "i1" -> "13 mul";
+  "15 |" [shape=trapezium,orientation=270];
+  "15 |" -> "o";
+  "14 &" [shape=trapezium,orientation=270];
+  "14 &" -> "15 |";
+  "i0" -> "14 &";
+  "i1" -> "14 &";
+  "13 *" [shape=trapezium,orientation=270];
+  "13 *" -> "15 |";
+  "i0" -> "13 *";
+  "i1" -> "13 *";
 }
 // graph for dag "freia_06_helper_0_0" of module "freia_06" in dot format
 digraph "freia_06_helper_0_0" {
@@ -74,10 +74,10 @@ digraph "freia_06_helper_0_0" {
   "0`t1" [shape=circle];
 
   // computation vertices
-  "13 mul" [shape=trapezium,orientation=270];
-  "i0" -> "13 mul";
-  "i1" -> "13 mul";
-  "13 mul" -> "0`t1";
+  "13 *" [shape=trapezium,orientation=270];
+  "i0" -> "13 *";
+  "i1" -> "13 *";
+  "13 *" -> "0`t1";
 }
 // graph for dag "freia_06_helper_0_1" of module "freia_06" in dot format
 digraph "freia_06_helper_0_1" {
@@ -89,10 +89,10 @@ digraph "freia_06_helper_0_1" {
   "0`t2" [shape=circle];
 
   // computation vertices
-  "14 and" [shape=trapezium,orientation=270];
-  "i0" -> "14 and";
-  "i1" -> "14 and";
-  "14 and" -> "0`t2";
+  "14 &" [shape=trapezium,orientation=270];
+  "i0" -> "14 &";
+  "i1" -> "14 &";
+  "14 &" -> "0`t2";
 }
 // graph for dag "freia_06_helper_0_2" of module "freia_06" in dot format
 digraph "freia_06_helper_0_2" {
@@ -104,10 +104,10 @@ digraph "freia_06_helper_0_2" {
   "o" [shape=circle];
 
   // computation vertices
-  "15 or" [shape=trapezium,orientation=270];
-  "0`t1" -> "15 or";
-  "0`t2" -> "15 or";
-  "15 or" -> "o";
+  "15 |" [shape=trapezium,orientation=270];
+  "0`t1" -> "15 |";
+  "0`t2" -> "15 |";
+  "15 |" -> "o";
 }
 
 ! acceleration function

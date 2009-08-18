@@ -27,13 +27,13 @@ digraph "dag_0" {
   "o1" [shape=circle];
 
   // computation vertices
-  "13 dilate_8c" [shape=box];
-  "13 dilate_8c" -> "o1";
-  "12 erode_8c" [shape=box];
-  "12 erode_8c" -> "o0";
-  "11 set_constant" [shape=trapezium,orientation=270];
-  "11 set_constant" -> "13 dilate_8c";
-  "11 set_constant" -> "12 erode_8c";
+  "13 D8" [shape=box];
+  "13 D8" -> "o1";
+  "12 E8" [shape=box];
+  "12 E8" -> "o0";
+  "11 C" [shape=trapezium,orientation=270];
+  "11 C" -> "13 D8";
+  "11 C" -> "12 E8";
 }
 // graph for dag "dag_cleaned_0" of module "freia_13" in dot format
 digraph "dag_cleaned_0" {
@@ -44,13 +44,13 @@ digraph "dag_cleaned_0" {
   "o1" [shape=circle];
 
   // computation vertices
-  "13 dilate_8c" [shape=box];
-  "13 dilate_8c" -> "o1";
-  "12 erode_8c" [shape=box];
-  "12 erode_8c" -> "o0";
-  "11 set_constant" [shape=trapezium,orientation=270];
-  "11 set_constant" -> "13 dilate_8c";
-  "11 set_constant" -> "12 erode_8c";
+  "13 D8" [shape=box];
+  "13 D8" -> "o1";
+  "12 E8" [shape=box];
+  "12 E8" -> "o0";
+  "11 C" [shape=trapezium,orientation=270];
+  "11 C" -> "13 D8";
+  "11 C" -> "12 E8";
 }
 // graph for dag "freia_13_helper_0_0" of module "freia_13" in dot format
 digraph "freia_13_helper_0_0" {
@@ -61,13 +61,13 @@ digraph "freia_13_helper_0_0" {
   "o1" [shape=circle];
 
   // computation vertices
-  "13 dilate_8c" [shape=box];
-  "13 dilate_8c" -> "o1";
-  "12 erode_8c" [shape=box];
-  "12 erode_8c" -> "o0";
-  "11 set_constant" [shape=trapezium,orientation=270];
-  "11 set_constant" -> "13 dilate_8c";
-  "11 set_constant" -> "12 erode_8c";
+  "13 D8" [shape=box];
+  "13 D8" -> "o1";
+  "12 E8" [shape=box];
+  "12 E8" -> "o0";
+  "11 C" [shape=trapezium,orientation=270];
+  "11 C" -> "13 D8";
+  "11 C" -> "12 E8";
 }
 
 ! acceleration function

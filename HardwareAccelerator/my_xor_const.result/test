@@ -17,9 +17,9 @@ digraph "dag_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "5 xor_const" [shape=trapezium,orientation=270];
-  "i0" -> "5 xor_const";
-  "5 xor_const" -> "o";
+  "5 ^." [shape=trapezium,orientation=270];
+  "i0" -> "5 ^.";
+  "5 ^." -> "o";
 }
 // graph for dag "dag_cleaned_0" of module "my_xor_const" in dot format
 digraph "dag_cleaned_0" {
@@ -30,9 +30,9 @@ digraph "dag_cleaned_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "5 xor_const" [shape=trapezium,orientation=270];
-  "i0" -> "5 xor_const";
-  "5 xor_const" -> "o";
+  "5 ^." [shape=trapezium,orientation=270];
+  "i0" -> "5 ^.";
+  "5 ^." -> "o";
 }
 // graph for dag "my_xor_const_helper_0_0" of module "my_xor_const" in dot format
 digraph "my_xor_const_helper_0_0" {
@@ -43,9 +43,9 @@ digraph "my_xor_const_helper_0_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "5 xor_const" [shape=trapezium,orientation=270];
-  "i0" -> "5 xor_const";
-  "5 xor_const" -> "o";
+  "5 ^." [shape=trapezium,orientation=270];
+  "i0" -> "5 ^.";
+  "5 ^." -> "o";
 }
 
 ! acceleration function

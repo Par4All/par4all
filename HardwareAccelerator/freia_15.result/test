@@ -22,15 +22,15 @@ digraph "dag_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "10 global_vol" [shape=diamond];
-  "i" -> "10 global_vol";
-  "9 global_max" [shape=diamond];
-  "i" -> "9 global_max";
-  "8 global_min" [shape=diamond];
-  "i" -> "8 global_min";
-  "7 add_const" [shape=trapezium,orientation=270];
-  "i" -> "7 add_const";
-  "7 add_const" -> "o";
+  "10 vol" [shape=diamond];
+  "i" -> "10 vol";
+  "9 max" [shape=diamond];
+  "i" -> "9 max";
+  "8 min" [shape=diamond];
+  "i" -> "8 min";
+  "7 +." [shape=trapezium,orientation=270];
+  "i" -> "7 +.";
+  "7 +." -> "o";
 }
 // graph for dag "dag_cleaned_0" of module "freia_15" in dot format
 digraph "dag_cleaned_0" {
@@ -41,15 +41,15 @@ digraph "dag_cleaned_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "10 global_vol" [shape=diamond];
-  "i" -> "10 global_vol";
-  "9 global_max" [shape=diamond];
-  "i" -> "9 global_max";
-  "8 global_min" [shape=diamond];
-  "i" -> "8 global_min";
-  "7 add_const" [shape=trapezium,orientation=270];
-  "i" -> "7 add_const";
-  "7 add_const" -> "o";
+  "10 vol" [shape=diamond];
+  "i" -> "10 vol";
+  "9 max" [shape=diamond];
+  "i" -> "9 max";
+  "8 min" [shape=diamond];
+  "i" -> "8 min";
+  "7 +." [shape=trapezium,orientation=270];
+  "i" -> "7 +.";
+  "7 +." -> "o";
 }
 // graph for dag "freia_15_helper_0_0" of module "freia_15" in dot format
 digraph "freia_15_helper_0_0" {
@@ -60,15 +60,15 @@ digraph "freia_15_helper_0_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "7 add_const" [shape=trapezium,orientation=270];
-  "i" -> "7 add_const";
-  "7 add_const" -> "o";
-  "10 global_vol" [shape=diamond];
-  "i" -> "10 global_vol";
-  "9 global_max" [shape=diamond];
-  "i" -> "9 global_max";
-  "8 global_min" [shape=diamond];
-  "i" -> "8 global_min";
+  "7 +." [shape=trapezium,orientation=270];
+  "i" -> "7 +.";
+  "7 +." -> "o";
+  "10 vol" [shape=diamond];
+  "i" -> "10 vol";
+  "9 max" [shape=diamond];
+  "i" -> "9 max";
+  "8 min" [shape=diamond];
+  "i" -> "8 min";
 }
 
 ! acceleration function

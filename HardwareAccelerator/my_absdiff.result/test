@@ -18,10 +18,10 @@ digraph "dag_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "5 absdiff" [shape=trapezium,orientation=270];
-  "i0" -> "5 absdiff";
-  "i1" -> "5 absdiff";
-  "5 absdiff" -> "o";
+  "5 -|" [shape=trapezium,orientation=270];
+  "i0" -> "5 -|";
+  "i1" -> "5 -|";
+  "5 -|" -> "o";
 }
 // graph for dag "dag_cleaned_0" of module "my_absdiff" in dot format
 digraph "dag_cleaned_0" {
@@ -33,10 +33,10 @@ digraph "dag_cleaned_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "5 absdiff" [shape=trapezium,orientation=270];
-  "i0" -> "5 absdiff";
-  "i1" -> "5 absdiff";
-  "5 absdiff" -> "o";
+  "5 -|" [shape=trapezium,orientation=270];
+  "i0" -> "5 -|";
+  "i1" -> "5 -|";
+  "5 -|" -> "o";
 }
 // graph for dag "my_absdiff_helper_0_0" of module "my_absdiff" in dot format
 digraph "my_absdiff_helper_0_0" {
@@ -48,10 +48,10 @@ digraph "my_absdiff_helper_0_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "5 absdiff" [shape=trapezium,orientation=270];
-  "i0" -> "5 absdiff";
-  "i1" -> "5 absdiff";
-  "5 absdiff" -> "o";
+  "5 -|" [shape=trapezium,orientation=270];
+  "i0" -> "5 -|";
+  "i1" -> "5 -|";
+  "5 -|" -> "o";
 }
 
 ! acceleration function

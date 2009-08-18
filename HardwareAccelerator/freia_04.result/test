@@ -47,25 +47,25 @@ digraph "dag_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "31 add" [shape=trapezium,orientation=270];
-  "31 add" -> "o";
-  "30 global_min" [shape=diamond];
-  "29 global_vol" [shape=diamond];
-  "28 threshold" [shape=parallelogram];
-  "28 threshold" -> "31 add";
-  "28 threshold" -> "30 global_min";
-  "27 threshold" [shape=parallelogram];
-  "27 threshold" -> "31 add";
-  "27 threshold" -> "29 global_vol";
-  "26 sub" [shape=trapezium,orientation=270];
-  "26 sub" -> "27 threshold";
-  "25 dilate_6c" [shape=box];
-  "25 dilate_6c" -> "26 sub";
-  "i" -> "25 dilate_6c";
-  "24 erode_8c" [shape=box];
-  "24 erode_8c" -> "28 threshold";
-  "24 erode_8c" -> "26 sub";
-  "i" -> "24 erode_8c";
+  "31 +" [shape=trapezium,orientation=270];
+  "31 +" -> "o";
+  "30 min" [shape=diamond];
+  "29 vol" [shape=diamond];
+  "28 thr" [shape=parallelogram];
+  "28 thr" -> "31 +";
+  "28 thr" -> "30 min";
+  "27 thr" [shape=parallelogram];
+  "27 thr" -> "31 +";
+  "27 thr" -> "29 vol";
+  "26 -" [shape=trapezium,orientation=270];
+  "26 -" -> "27 thr";
+  "25 D6" [shape=box];
+  "25 D6" -> "26 -";
+  "i" -> "25 D6";
+  "24 E8" [shape=box];
+  "24 E8" -> "28 thr";
+  "24 E8" -> "26 -";
+  "i" -> "24 E8";
 }
 // graph for dag "dag_cleaned_0" of module "freia_04" in dot format
 digraph "dag_cleaned_0" {
@@ -76,25 +76,25 @@ digraph "dag_cleaned_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "31 add" [shape=trapezium,orientation=270];
-  "31 add" -> "o";
-  "30 global_min" [shape=diamond];
-  "29 global_vol" [shape=diamond];
-  "28 threshold" [shape=parallelogram];
-  "28 threshold" -> "31 add";
-  "28 threshold" -> "30 global_min";
-  "27 threshold" [shape=parallelogram];
-  "27 threshold" -> "31 add";
-  "27 threshold" -> "29 global_vol";
-  "26 sub" [shape=trapezium,orientation=270];
-  "26 sub" -> "27 threshold";
-  "25 dilate_6c" [shape=box];
-  "25 dilate_6c" -> "26 sub";
-  "i" -> "25 dilate_6c";
-  "24 erode_8c" [shape=box];
-  "24 erode_8c" -> "28 threshold";
-  "24 erode_8c" -> "26 sub";
-  "i" -> "24 erode_8c";
+  "31 +" [shape=trapezium,orientation=270];
+  "31 +" -> "o";
+  "30 min" [shape=diamond];
+  "29 vol" [shape=diamond];
+  "28 thr" [shape=parallelogram];
+  "28 thr" -> "31 +";
+  "28 thr" -> "30 min";
+  "27 thr" [shape=parallelogram];
+  "27 thr" -> "31 +";
+  "27 thr" -> "29 vol";
+  "26 -" [shape=trapezium,orientation=270];
+  "26 -" -> "27 thr";
+  "25 D6" [shape=box];
+  "25 D6" -> "26 -";
+  "i" -> "25 D6";
+  "24 E8" [shape=box];
+  "24 E8" -> "28 thr";
+  "24 E8" -> "26 -";
+  "i" -> "24 E8";
 }
 // graph for dag "freia_04_helper_0_0" of module "freia_04" in dot format
 digraph "freia_04_helper_0_0" {
@@ -105,25 +105,25 @@ digraph "freia_04_helper_0_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "31 add" [shape=trapezium,orientation=270];
-  "31 add" -> "o";
-  "30 global_min" [shape=diamond];
-  "28 threshold" [shape=parallelogram];
-  "28 threshold" -> "31 add";
-  "28 threshold" -> "30 global_min";
-  "29 global_vol" [shape=diamond];
-  "27 threshold" [shape=parallelogram];
-  "27 threshold" -> "31 add";
-  "27 threshold" -> "29 global_vol";
-  "26 sub" [shape=trapezium,orientation=270];
-  "26 sub" -> "27 threshold";
-  "25 dilate_6c" [shape=box];
-  "25 dilate_6c" -> "26 sub";
-  "i" -> "25 dilate_6c";
-  "24 erode_8c" [shape=box];
-  "24 erode_8c" -> "28 threshold";
-  "24 erode_8c" -> "26 sub";
-  "i" -> "24 erode_8c";
+  "31 +" [shape=trapezium,orientation=270];
+  "31 +" -> "o";
+  "30 min" [shape=diamond];
+  "28 thr" [shape=parallelogram];
+  "28 thr" -> "31 +";
+  "28 thr" -> "30 min";
+  "29 vol" [shape=diamond];
+  "27 thr" [shape=parallelogram];
+  "27 thr" -> "31 +";
+  "27 thr" -> "29 vol";
+  "26 -" [shape=trapezium,orientation=270];
+  "26 -" -> "27 thr";
+  "25 D6" [shape=box];
+  "25 D6" -> "26 -";
+  "i" -> "25 D6";
+  "24 E8" [shape=box];
+  "24 E8" -> "28 thr";
+  "24 E8" -> "26 -";
+  "i" -> "24 E8";
 }
 
 ! acceleration function

@@ -30,17 +30,17 @@ digraph "dag_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "16 threshold" [shape=parallelogram];
-  "16 threshold" -> "o";
-  "15 erode_8c" [shape=box];
-  "15 erode_8c" -> "16 threshold";
-  "14 global_max" [shape=diamond];
-  "14 global_max" -> "16 threshold" [arrowhead=empty];
-  "13 add" [shape=trapezium,orientation=270];
-  "13 add" -> "15 erode_8c";
-  "13 add" -> "14 global_max";
-  "i0" -> "13 add";
-  "i1" -> "13 add";
+  "16 thr" [shape=parallelogram];
+  "16 thr" -> "o";
+  "15 E8" [shape=box];
+  "15 E8" -> "16 thr";
+  "14 max" [shape=diamond];
+  "14 max" -> "16 thr" [arrowhead=empty];
+  "13 +" [shape=trapezium,orientation=270];
+  "13 +" -> "15 E8";
+  "13 +" -> "14 max";
+  "i0" -> "13 +";
+  "i1" -> "13 +";
 }
 // graph for dag "dag_cleaned_0" of module "freia_scalar_04" in dot format
 digraph "dag_cleaned_0" {
@@ -52,17 +52,17 @@ digraph "dag_cleaned_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "16 threshold" [shape=parallelogram];
-  "16 threshold" -> "o";
-  "15 erode_8c" [shape=box];
-  "15 erode_8c" -> "16 threshold";
-  "14 global_max" [shape=diamond];
-  "14 global_max" -> "16 threshold" [arrowhead=empty];
-  "13 add" [shape=trapezium,orientation=270];
-  "13 add" -> "15 erode_8c";
-  "13 add" -> "14 global_max";
-  "i0" -> "13 add";
-  "i1" -> "13 add";
+  "16 thr" [shape=parallelogram];
+  "16 thr" -> "o";
+  "15 E8" [shape=box];
+  "15 E8" -> "16 thr";
+  "14 max" [shape=diamond];
+  "14 max" -> "16 thr" [arrowhead=empty];
+  "13 +" [shape=trapezium,orientation=270];
+  "13 +" -> "15 E8";
+  "13 +" -> "14 max";
+  "i0" -> "13 +";
+  "i1" -> "13 +";
 }
 // graph for dag "freia_scalar_04_helper_0_0" of module "freia_scalar_04" in dot format
 digraph "freia_scalar_04_helper_0_0" {
@@ -74,14 +74,14 @@ digraph "freia_scalar_04_helper_0_0" {
   "0`t2" [shape=circle];
 
   // computation vertices
-  "15 erode_8c" [shape=box];
-  "15 erode_8c" -> "0`t2";
-  "14 global_max" [shape=diamond];
-  "13 add" [shape=trapezium,orientation=270];
-  "13 add" -> "15 erode_8c";
-  "13 add" -> "14 global_max";
-  "i0" -> "13 add";
-  "i1" -> "13 add";
+  "15 E8" [shape=box];
+  "15 E8" -> "0`t2";
+  "14 max" [shape=diamond];
+  "13 +" [shape=trapezium,orientation=270];
+  "13 +" -> "15 E8";
+  "13 +" -> "14 max";
+  "i0" -> "13 +";
+  "i1" -> "13 +";
 }
 // graph for dag "freia_scalar_04_helper_0_1" of module "freia_scalar_04" in dot format
 digraph "freia_scalar_04_helper_0_1" {
@@ -92,9 +92,9 @@ digraph "freia_scalar_04_helper_0_1" {
   "o" [shape=circle];
 
   // computation vertices
-  "16 threshold" [shape=parallelogram];
-  "0`t2" -> "16 threshold";
-  "16 threshold" -> "o";
+  "16 thr" [shape=parallelogram];
+  "0`t2" -> "16 thr";
+  "16 thr" -> "o";
 }
 
 ! acceleration function

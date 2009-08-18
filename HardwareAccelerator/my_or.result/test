@@ -18,10 +18,10 @@ digraph "dag_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "5 or" [shape=trapezium,orientation=270];
-  "i0" -> "5 or";
-  "i1" -> "5 or";
-  "5 or" -> "o";
+  "5 |" [shape=trapezium,orientation=270];
+  "i0" -> "5 |";
+  "i1" -> "5 |";
+  "5 |" -> "o";
 }
 // graph for dag "dag_cleaned_0" of module "my_or" in dot format
 digraph "dag_cleaned_0" {
@@ -33,10 +33,10 @@ digraph "dag_cleaned_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "5 or" [shape=trapezium,orientation=270];
-  "i0" -> "5 or";
-  "i1" -> "5 or";
-  "5 or" -> "o";
+  "5 |" [shape=trapezium,orientation=270];
+  "i0" -> "5 |";
+  "i1" -> "5 |";
+  "5 |" -> "o";
 }
 // graph for dag "my_or_helper_0_0" of module "my_or" in dot format
 digraph "my_or_helper_0_0" {
@@ -48,10 +48,10 @@ digraph "my_or_helper_0_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "5 or" [shape=trapezium,orientation=270];
-  "i0" -> "5 or";
-  "i1" -> "5 or";
-  "5 or" -> "o";
+  "5 |" [shape=trapezium,orientation=270];
+  "i0" -> "5 |";
+  "i1" -> "5 |";
+  "5 |" -> "o";
 }
 
 ! acceleration function

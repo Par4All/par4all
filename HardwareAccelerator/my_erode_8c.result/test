@@ -17,9 +17,9 @@ digraph "dag_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "5 erode_8c" [shape=box];
-  "i0" -> "5 erode_8c";
-  "5 erode_8c" -> "o";
+  "5 E8" [shape=box];
+  "i0" -> "5 E8";
+  "5 E8" -> "o";
 }
 // graph for dag "dag_cleaned_0" of module "my_erode_8c" in dot format
 digraph "dag_cleaned_0" {
@@ -30,9 +30,9 @@ digraph "dag_cleaned_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "5 erode_8c" [shape=box];
-  "i0" -> "5 erode_8c";
-  "5 erode_8c" -> "o";
+  "5 E8" [shape=box];
+  "i0" -> "5 E8";
+  "5 E8" -> "o";
 }
 // graph for dag "my_erode_8c_helper_0_0" of module "my_erode_8c" in dot format
 digraph "my_erode_8c_helper_0_0" {
@@ -43,9 +43,9 @@ digraph "my_erode_8c_helper_0_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "5 erode_8c" [shape=box];
-  "i0" -> "5 erode_8c";
-  "5 erode_8c" -> "o";
+  "5 E8" [shape=box];
+  "i0" -> "5 E8";
+  "5 E8" -> "o";
 }
 
 ! acceleration function

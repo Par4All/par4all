@@ -27,15 +27,15 @@ digraph "dag_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "11 threshold" [shape=parallelogram];
-  "11 threshold" -> "o";
-  "10 global_max" [shape=diamond];
-  "10 global_max" -> "11 threshold" [arrowhead=empty];
-  "9 add" [shape=trapezium,orientation=270];
-  "9 add" -> "11 threshold";
-  "9 add" -> "10 global_max";
-  "i0" -> "9 add";
-  "i1" -> "9 add";
+  "11 thr" [shape=parallelogram];
+  "11 thr" -> "o";
+  "10 max" [shape=diamond];
+  "10 max" -> "11 thr" [arrowhead=empty];
+  "9 +" [shape=trapezium,orientation=270];
+  "9 +" -> "11 thr";
+  "9 +" -> "10 max";
+  "i0" -> "9 +";
+  "i1" -> "9 +";
 }
 // graph for dag "dag_cleaned_0" of module "freia_scalar_03" in dot format
 digraph "dag_cleaned_0" {
@@ -47,15 +47,15 @@ digraph "dag_cleaned_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "11 threshold" [shape=parallelogram];
-  "11 threshold" -> "o";
-  "10 global_max" [shape=diamond];
-  "10 global_max" -> "11 threshold" [arrowhead=empty];
-  "9 add" [shape=trapezium,orientation=270];
-  "9 add" -> "11 threshold";
-  "9 add" -> "10 global_max";
-  "i0" -> "9 add";
-  "i1" -> "9 add";
+  "11 thr" [shape=parallelogram];
+  "11 thr" -> "o";
+  "10 max" [shape=diamond];
+  "10 max" -> "11 thr" [arrowhead=empty];
+  "9 +" [shape=trapezium,orientation=270];
+  "9 +" -> "11 thr";
+  "9 +" -> "10 max";
+  "i0" -> "9 +";
+  "i1" -> "9 +";
 }
 // graph for dag "freia_scalar_03_helper_0_0" of module "freia_scalar_03" in dot format
 digraph "freia_scalar_03_helper_0_0" {
@@ -67,12 +67,12 @@ digraph "freia_scalar_03_helper_0_0" {
   "0`tmp" [shape=circle];
 
   // computation vertices
-  "10 global_max" [shape=diamond];
-  "9 add" [shape=trapezium,orientation=270];
-  "9 add" -> "10 global_max";
-  "i0" -> "9 add";
-  "i1" -> "9 add";
-  "9 add" -> "0`tmp";
+  "10 max" [shape=diamond];
+  "9 +" [shape=trapezium,orientation=270];
+  "9 +" -> "10 max";
+  "i0" -> "9 +";
+  "i1" -> "9 +";
+  "9 +" -> "0`tmp";
 }
 // graph for dag "freia_scalar_03_helper_0_1" of module "freia_scalar_03" in dot format
 digraph "freia_scalar_03_helper_0_1" {
@@ -83,9 +83,9 @@ digraph "freia_scalar_03_helper_0_1" {
   "o" [shape=circle];
 
   // computation vertices
-  "11 threshold" [shape=parallelogram];
-  "0`tmp" -> "11 threshold";
-  "11 threshold" -> "o";
+  "11 thr" [shape=parallelogram];
+  "0`tmp" -> "11 thr";
+  "11 thr" -> "o";
 }
 
 ! acceleration function

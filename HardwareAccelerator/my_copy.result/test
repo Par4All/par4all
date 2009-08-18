@@ -17,9 +17,9 @@ digraph "dag_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "4 copy" [shape=circle];
-  "i0" -> "4 copy";
-  "4 copy" -> "o";
+  "4 =" [shape=circle];
+  "i0" -> "4 =";
+  "4 =" -> "o";
 }
 // graph for dag "dag_cleaned_0" of module "my_copy" in dot format
 digraph "dag_cleaned_0" {
@@ -30,9 +30,9 @@ digraph "dag_cleaned_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "4 copy" [shape=circle];
-  "i0" -> "4 copy";
-  "4 copy" -> "o";
+  "4 =" [shape=circle];
+  "i0" -> "4 =";
+  "4 =" -> "o";
 }
 // graph for dag "my_copy_helper_0_0" of module "my_copy" in dot format
 digraph "my_copy_helper_0_0" {
@@ -43,9 +43,9 @@ digraph "my_copy_helper_0_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "4 copy" [shape=circle];
-  "i0" -> "4 copy";
-  "4 copy" -> "o";
+  "4 =" [shape=circle];
+  "i0" -> "4 =";
+  "4 =" -> "o";
 }
 
 ! acceleration function

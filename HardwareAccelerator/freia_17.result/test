@@ -50,24 +50,24 @@ digraph "dag_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "27 copy" [shape=circle];
-  "27 copy" -> "0`t5";
-  "26 copy" [shape=circle];
-  "26 copy" -> "0`t4";
-  "25 copy" [shape=circle];
-  "25 copy" -> "0`t3";
-  "24 copy" [shape=circle];
-  "24 copy" -> "27 copy";
-  "24 copy" -> "o";
-  "23 copy" [shape=circle];
-  "23 copy" -> "24 copy";
-  "22 copy" [shape=circle];
-  "22 copy" -> "25 copy";
-  "22 copy" -> "23 copy";
-  "21 copy" [shape=circle];
-  "21 copy" -> "26 copy";
-  "21 copy" -> "22 copy";
-  "i" -> "21 copy";
+  "27 =" [shape=circle];
+  "27 =" -> "0`t5";
+  "26 =" [shape=circle];
+  "26 =" -> "0`t4";
+  "25 =" [shape=circle];
+  "25 =" -> "0`t3";
+  "24 =" [shape=circle];
+  "24 =" -> "27 =";
+  "24 =" -> "o";
+  "23 =" [shape=circle];
+  "23 =" -> "24 =";
+  "22 =" [shape=circle];
+  "22 =" -> "25 =";
+  "22 =" -> "23 =";
+  "21 =" [shape=circle];
+  "21 =" -> "26 =";
+  "21 =" -> "22 =";
+  "i" -> "21 =";
 }
 // graph for dag "dag_cleaned_0" of module "freia_17" in dot format
 digraph "dag_cleaned_0" {
@@ -81,18 +81,18 @@ digraph "dag_cleaned_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "27 copy" [shape=circle];
-  "i" -> "27 copy";
-  "27 copy" -> "0`t5";
-  "26 copy" [shape=circle];
-  "i" -> "26 copy";
-  "26 copy" -> "0`t4";
-  "25 copy" [shape=circle];
-  "i" -> "25 copy";
-  "25 copy" -> "0`t3";
-  "24 copy" [shape=circle];
-  "i" -> "24 copy";
-  "24 copy" -> "o";
+  "27 =" [shape=circle];
+  "i" -> "27 =";
+  "27 =" -> "0`t5";
+  "26 =" [shape=circle];
+  "i" -> "26 =";
+  "26 =" -> "0`t4";
+  "25 =" [shape=circle];
+  "i" -> "25 =";
+  "25 =" -> "0`t3";
+  "24 =" [shape=circle];
+  "i" -> "24 =";
+  "24 =" -> "o";
 }
 // graph for dag "freia_17_helper_0_0" of module "freia_17" in dot format
 digraph "freia_17_helper_0_0" {
@@ -104,12 +104,12 @@ digraph "freia_17_helper_0_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "25 copy" [shape=circle];
-  "i" -> "25 copy";
-  "25 copy" -> "0`t3";
-  "24 copy" [shape=circle];
-  "i" -> "24 copy";
-  "24 copy" -> "o";
+  "25 =" [shape=circle];
+  "i" -> "25 =";
+  "25 =" -> "0`t3";
+  "24 =" [shape=circle];
+  "i" -> "24 =";
+  "24 =" -> "o";
 }
 // graph for dag "freia_17_helper_0_1" of module "freia_17" in dot format
 digraph "freia_17_helper_0_1" {
@@ -121,12 +121,12 @@ digraph "freia_17_helper_0_1" {
   "0`t5" [shape=circle];
 
   // computation vertices
-  "27 copy" [shape=circle];
-  "i" -> "27 copy";
-  "27 copy" -> "0`t5";
-  "26 copy" [shape=circle];
-  "i" -> "26 copy";
-  "26 copy" -> "0`t4";
+  "27 =" [shape=circle];
+  "i" -> "27 =";
+  "27 =" -> "0`t5";
+  "26 =" [shape=circle];
+  "i" -> "26 =";
+  "26 =" -> "0`t4";
 }
 
 ! acceleration function

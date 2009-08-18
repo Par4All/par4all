@@ -18,10 +18,10 @@ digraph "dag_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "5 subsat" [shape=trapezium,orientation=270];
-  "i0" -> "5 subsat";
-  "i1" -> "5 subsat";
-  "5 subsat" -> "o";
+  "5 -s" [shape=trapezium,orientation=270];
+  "i0" -> "5 -s";
+  "i1" -> "5 -s";
+  "5 -s" -> "o";
 }
 // graph for dag "dag_cleaned_0" of module "my_subsat" in dot format
 digraph "dag_cleaned_0" {
@@ -33,10 +33,10 @@ digraph "dag_cleaned_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "5 subsat" [shape=trapezium,orientation=270];
-  "i0" -> "5 subsat";
-  "i1" -> "5 subsat";
-  "5 subsat" -> "o";
+  "5 -s" [shape=trapezium,orientation=270];
+  "i0" -> "5 -s";
+  "i1" -> "5 -s";
+  "5 -s" -> "o";
 }
 // graph for dag "my_subsat_helper_0_0" of module "my_subsat" in dot format
 digraph "my_subsat_helper_0_0" {
@@ -48,10 +48,10 @@ digraph "my_subsat_helper_0_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "5 subsat" [shape=trapezium,orientation=270];
-  "i0" -> "5 subsat";
-  "i1" -> "5 subsat";
-  "5 subsat" -> "o";
+  "5 -s" [shape=trapezium,orientation=270];
+  "i0" -> "5 -s";
+  "i1" -> "5 -s";
+  "5 -s" -> "o";
 }
 
 ! acceleration function

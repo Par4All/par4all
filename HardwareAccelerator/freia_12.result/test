@@ -24,12 +24,12 @@ digraph "dag_0" {
   "o1" [shape=circle];
 
   // computation vertices
-  "11 dilate_8c" [shape=box];
-  "i1" -> "11 dilate_8c";
-  "11 dilate_8c" -> "o1";
-  "10 erode_8c" [shape=box];
-  "i0" -> "10 erode_8c";
-  "10 erode_8c" -> "o0";
+  "11 D8" [shape=box];
+  "i1" -> "11 D8";
+  "11 D8" -> "o1";
+  "10 E8" [shape=box];
+  "i0" -> "10 E8";
+  "10 E8" -> "o0";
 }
 // graph for dag "dag_cleaned_0" of module "freia_12" in dot format
 digraph "dag_cleaned_0" {
@@ -42,12 +42,12 @@ digraph "dag_cleaned_0" {
   "o1" [shape=circle];
 
   // computation vertices
-  "11 dilate_8c" [shape=box];
-  "i1" -> "11 dilate_8c";
-  "11 dilate_8c" -> "o1";
-  "10 erode_8c" [shape=box];
-  "i0" -> "10 erode_8c";
-  "10 erode_8c" -> "o0";
+  "11 D8" [shape=box];
+  "i1" -> "11 D8";
+  "11 D8" -> "o1";
+  "10 E8" [shape=box];
+  "i0" -> "10 E8";
+  "10 E8" -> "o0";
 }
 // graph for dag "freia_12_helper_0_0" of module "freia_12" in dot format
 digraph "freia_12_helper_0_0" {
@@ -60,12 +60,12 @@ digraph "freia_12_helper_0_0" {
   "o1" [shape=circle];
 
   // computation vertices
-  "11 dilate_8c" [shape=box];
-  "i1" -> "11 dilate_8c";
-  "11 dilate_8c" -> "o1";
-  "10 erode_8c" [shape=box];
-  "i0" -> "10 erode_8c";
-  "10 erode_8c" -> "o0";
+  "11 D8" [shape=box];
+  "i1" -> "11 D8";
+  "11 D8" -> "o1";
+  "10 E8" [shape=box];
+  "i0" -> "10 E8";
+  "10 E8" -> "o0";
 }
 
 ! acceleration function

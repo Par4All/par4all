@@ -16,8 +16,8 @@ digraph "dag_0" {
   // outputs
 
   // computation vertices
-  "5 global_max_coord" [shape=diamond];
-  "i0" -> "5 global_max_coord";
+  "5 max!" [shape=diamond];
+  "i0" -> "5 max!";
 }
 // graph for dag "dag_cleaned_0" of module "my_global_max_coord" in dot format
 digraph "dag_cleaned_0" {
@@ -27,8 +27,8 @@ digraph "dag_cleaned_0" {
   // outputs
 
   // computation vertices
-  "5 global_max_coord" [shape=diamond];
-  "i0" -> "5 global_max_coord";
+  "5 max!" [shape=diamond];
+  "i0" -> "5 max!";
 }
 // graph for dag "my_global_max_coord_helper_0_0" of module "my_global_max_coord" in dot format
 digraph "my_global_max_coord_helper_0_0" {
@@ -38,8 +38,8 @@ digraph "my_global_max_coord_helper_0_0" {
   // outputs
 
   // computation vertices
-  "5 global_max_coord" [shape=diamond];
-  "i0" -> "5 global_max_coord";
+  "5 max!" [shape=diamond];
+  "i0" -> "5 max!";
 }
 
 ! acceleration function

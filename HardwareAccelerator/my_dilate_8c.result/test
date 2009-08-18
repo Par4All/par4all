@@ -17,9 +17,9 @@ digraph "dag_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "5 dilate_8c" [shape=box];
-  "i0" -> "5 dilate_8c";
-  "5 dilate_8c" -> "o";
+  "5 D8" [shape=box];
+  "i0" -> "5 D8";
+  "5 D8" -> "o";
 }
 // graph for dag "dag_cleaned_0" of module "my_dilate_8c" in dot format
 digraph "dag_cleaned_0" {
@@ -30,9 +30,9 @@ digraph "dag_cleaned_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "5 dilate_8c" [shape=box];
-  "i0" -> "5 dilate_8c";
-  "5 dilate_8c" -> "o";
+  "5 D8" [shape=box];
+  "i0" -> "5 D8";
+  "5 D8" -> "o";
 }
 // graph for dag "my_dilate_8c_helper_0_0" of module "my_dilate_8c" in dot format
 digraph "my_dilate_8c_helper_0_0" {
@@ -43,9 +43,9 @@ digraph "my_dilate_8c_helper_0_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "5 dilate_8c" [shape=box];
-  "i0" -> "5 dilate_8c";
-  "5 dilate_8c" -> "o";
+  "5 D8" [shape=box];
+  "i0" -> "5 D8";
+  "5 D8" -> "o";
 }
 
 ! acceleration function

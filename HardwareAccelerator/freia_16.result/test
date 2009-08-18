@@ -24,18 +24,18 @@ digraph "dag_0" {
   "o1" [shape=circle];
 
   // computation vertices
-  "11 global_vol" [shape=diamond];
-  "i" -> "11 global_vol";
-  "10 global_max" [shape=diamond];
-  "i" -> "10 global_max";
-  "9 global_min" [shape=diamond];
-  "i" -> "9 global_min";
-  "8 erode_6c" [shape=box];
-  "i" -> "8 erode_6c";
-  "8 erode_6c" -> "o1";
-  "7 add_const" [shape=trapezium,orientation=270];
-  "i" -> "7 add_const";
-  "7 add_const" -> "o0";
+  "11 vol" [shape=diamond];
+  "i" -> "11 vol";
+  "10 max" [shape=diamond];
+  "i" -> "10 max";
+  "9 min" [shape=diamond];
+  "i" -> "9 min";
+  "8 E6" [shape=box];
+  "i" -> "8 E6";
+  "8 E6" -> "o1";
+  "7 +." [shape=trapezium,orientation=270];
+  "i" -> "7 +.";
+  "7 +." -> "o0";
 }
 // graph for dag "dag_cleaned_0" of module "freia_16" in dot format
 digraph "dag_cleaned_0" {
@@ -47,18 +47,18 @@ digraph "dag_cleaned_0" {
   "o1" [shape=circle];
 
   // computation vertices
-  "11 global_vol" [shape=diamond];
-  "i" -> "11 global_vol";
-  "10 global_max" [shape=diamond];
-  "i" -> "10 global_max";
-  "9 global_min" [shape=diamond];
-  "i" -> "9 global_min";
-  "8 erode_6c" [shape=box];
-  "i" -> "8 erode_6c";
-  "8 erode_6c" -> "o1";
-  "7 add_const" [shape=trapezium,orientation=270];
-  "i" -> "7 add_const";
-  "7 add_const" -> "o0";
+  "11 vol" [shape=diamond];
+  "i" -> "11 vol";
+  "10 max" [shape=diamond];
+  "i" -> "10 max";
+  "9 min" [shape=diamond];
+  "i" -> "9 min";
+  "8 E6" [shape=box];
+  "i" -> "8 E6";
+  "8 E6" -> "o1";
+  "7 +." [shape=trapezium,orientation=270];
+  "i" -> "7 +.";
+  "7 +." -> "o0";
 }
 // graph for dag "freia_16_helper_0_0" of module "freia_16" in dot format
 digraph "freia_16_helper_0_0" {
@@ -70,18 +70,18 @@ digraph "freia_16_helper_0_0" {
   "o1" [shape=circle];
 
   // computation vertices
-  "7 add_const" [shape=trapezium,orientation=270];
-  "i" -> "7 add_const";
-  "7 add_const" -> "o0";
-  "8 erode_6c" [shape=box];
-  "i" -> "8 erode_6c";
-  "8 erode_6c" -> "o1";
-  "11 global_vol" [shape=diamond];
-  "i" -> "11 global_vol";
-  "10 global_max" [shape=diamond];
-  "i" -> "10 global_max";
-  "9 global_min" [shape=diamond];
-  "i" -> "9 global_min";
+  "7 +." [shape=trapezium,orientation=270];
+  "i" -> "7 +.";
+  "7 +." -> "o0";
+  "8 E6" [shape=box];
+  "i" -> "8 E6";
+  "8 E6" -> "o1";
+  "11 vol" [shape=diamond];
+  "i" -> "11 vol";
+  "10 max" [shape=diamond];
+  "i" -> "10 max";
+  "9 min" [shape=diamond];
+  "i" -> "9 min";
 }
 
 ! acceleration function

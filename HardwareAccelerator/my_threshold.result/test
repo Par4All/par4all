@@ -17,9 +17,9 @@ digraph "dag_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "5 threshold" [shape=parallelogram];
-  "i0" -> "5 threshold";
-  "5 threshold" -> "o";
+  "5 thr" [shape=parallelogram];
+  "i0" -> "5 thr";
+  "5 thr" -> "o";
 }
 // graph for dag "dag_cleaned_0" of module "my_threshold" in dot format
 digraph "dag_cleaned_0" {
@@ -30,9 +30,9 @@ digraph "dag_cleaned_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "5 threshold" [shape=parallelogram];
-  "i0" -> "5 threshold";
-  "5 threshold" -> "o";
+  "5 thr" [shape=parallelogram];
+  "i0" -> "5 thr";
+  "5 thr" -> "o";
 }
 // graph for dag "my_threshold_helper_0_0" of module "my_threshold" in dot format
 digraph "my_threshold_helper_0_0" {
@@ -43,9 +43,9 @@ digraph "my_threshold_helper_0_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "5 threshold" [shape=parallelogram];
-  "i0" -> "5 threshold";
-  "5 threshold" -> "o";
+  "5 thr" [shape=parallelogram];
+  "i0" -> "5 thr";
+  "5 thr" -> "o";
 }
 
 ! acceleration function

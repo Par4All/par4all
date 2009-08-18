@@ -30,16 +30,16 @@ digraph "dag_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "14 and" [shape=trapezium,orientation=270];
-  "i0" -> "14 and";
-  "14 and" -> "o";
-  "13 sub" [shape=trapezium,orientation=270];
-  "13 sub" -> "14 and";
-  "i0" -> "13 sub";
-  "12 mul" [shape=trapezium,orientation=270];
-  "12 mul" -> "13 sub";
-  "i0" -> "12 mul";
-  "i1" -> "12 mul";
+  "14 &" [shape=trapezium,orientation=270];
+  "i0" -> "14 &";
+  "14 &" -> "o";
+  "13 -" [shape=trapezium,orientation=270];
+  "13 -" -> "14 &";
+  "i0" -> "13 -";
+  "12 *" [shape=trapezium,orientation=270];
+  "12 *" -> "13 -";
+  "i0" -> "12 *";
+  "i1" -> "12 *";
 }
 // graph for dag "dag_cleaned_0" of module "freia_21" in dot format
 digraph "dag_cleaned_0" {
@@ -51,16 +51,16 @@ digraph "dag_cleaned_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "14 and" [shape=trapezium,orientation=270];
-  "i0" -> "14 and";
-  "14 and" -> "o";
-  "13 sub" [shape=trapezium,orientation=270];
-  "13 sub" -> "14 and";
-  "i0" -> "13 sub";
-  "12 mul" [shape=trapezium,orientation=270];
-  "12 mul" -> "13 sub";
-  "i0" -> "12 mul";
-  "i1" -> "12 mul";
+  "14 &" [shape=trapezium,orientation=270];
+  "i0" -> "14 &";
+  "14 &" -> "o";
+  "13 -" [shape=trapezium,orientation=270];
+  "13 -" -> "14 &";
+  "i0" -> "13 -";
+  "12 *" [shape=trapezium,orientation=270];
+  "12 *" -> "13 -";
+  "i0" -> "12 *";
+  "i1" -> "12 *";
 }
 // graph for dag "freia_21_helper_0_0" of module "freia_21" in dot format
 digraph "freia_21_helper_0_0" {
@@ -72,16 +72,16 @@ digraph "freia_21_helper_0_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "14 and" [shape=trapezium,orientation=270];
-  "i0" -> "14 and";
-  "14 and" -> "o";
-  "13 sub" [shape=trapezium,orientation=270];
-  "13 sub" -> "14 and";
-  "i0" -> "13 sub";
-  "12 mul" [shape=trapezium,orientation=270];
-  "12 mul" -> "13 sub";
-  "i0" -> "12 mul";
-  "i1" -> "12 mul";
+  "14 &" [shape=trapezium,orientation=270];
+  "i0" -> "14 &";
+  "14 &" -> "o";
+  "13 -" [shape=trapezium,orientation=270];
+  "13 -" -> "14 &";
+  "i0" -> "13 -";
+  "12 *" [shape=trapezium,orientation=270];
+  "12 *" -> "13 -";
+  "i0" -> "12 *";
+  "i1" -> "12 *";
 }
 
 ! acceleration function

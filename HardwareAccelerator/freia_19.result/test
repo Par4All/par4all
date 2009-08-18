@@ -27,11 +27,11 @@ digraph "dag_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "12 copy" [shape=circle];
-  "12 copy" -> "o";
-  "11 copy" [shape=circle];
-  "11 copy" -> "12 copy";
-  "i" -> "11 copy";
+  "12 =" [shape=circle];
+  "12 =" -> "o";
+  "11 =" [shape=circle];
+  "11 =" -> "12 =";
+  "i" -> "11 =";
 }
 // graph for dag "dag_cleaned_0" of module "freia_19" in dot format
 digraph "dag_cleaned_0" {
@@ -42,9 +42,9 @@ digraph "dag_cleaned_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "12 copy" [shape=circle];
-  "i" -> "12 copy";
-  "12 copy" -> "o";
+  "12 =" [shape=circle];
+  "i" -> "12 =";
+  "12 =" -> "o";
 }
 // graph for dag "freia_19_helper_0_0" of module "freia_19" in dot format
 digraph "freia_19_helper_0_0" {
@@ -55,9 +55,9 @@ digraph "freia_19_helper_0_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "12 copy" [shape=circle];
-  "i" -> "12 copy";
-  "12 copy" -> "o";
+  "12 =" [shape=circle];
+  "i" -> "12 =";
+  "12 =" -> "o";
 }
 
 ! acceleration function

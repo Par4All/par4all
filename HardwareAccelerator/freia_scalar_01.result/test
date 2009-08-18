@@ -20,9 +20,9 @@ digraph "dag_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "7 threshold" [shape=parallelogram];
-  "i" -> "7 threshold";
-  "7 threshold" -> "o";
+  "7 thr" [shape=parallelogram];
+  "i" -> "7 thr";
+  "7 thr" -> "o";
 }
 // graph for dag "dag_cleaned_0" of module "freia_scalar_01" in dot format
 digraph "dag_cleaned_0" {
@@ -33,9 +33,9 @@ digraph "dag_cleaned_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "7 threshold" [shape=parallelogram];
-  "i" -> "7 threshold";
-  "7 threshold" -> "o";
+  "7 thr" [shape=parallelogram];
+  "i" -> "7 thr";
+  "7 thr" -> "o";
 }
 // graph for dag "freia_scalar_01_helper_0_0" of module "freia_scalar_01" in dot format
 digraph "freia_scalar_01_helper_0_0" {
@@ -46,9 +46,9 @@ digraph "freia_scalar_01_helper_0_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "7 threshold" [shape=parallelogram];
-  "i" -> "7 threshold";
-  "7 threshold" -> "o";
+  "7 thr" [shape=parallelogram];
+  "i" -> "7 thr";
+  "7 thr" -> "o";
 }
 
 ! acceleration function

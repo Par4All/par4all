@@ -59,33 +59,33 @@ digraph "dag_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "33 erode_8c" [shape=box];
-  "33 erode_8c" -> "o";
-  "32 dilate_6c" [shape=box];
-  "32 dilate_6c" -> "33 erode_8c";
-  "31 dilate_8c" [shape=box];
-  "31 dilate_8c" -> "32 dilate_6c";
-  "30 erode_6c" [shape=box];
-  "30 erode_6c" -> "31 dilate_8c";
-  "29 erode_8c" [shape=box];
-  "29 erode_8c" -> "30 erode_6c";
-  "27 dilate_6c" [shape=box];
-  "27 dilate_6c" -> "29 erode_8c";
-  "26 dilate_8c" [shape=box];
-  "26 dilate_8c" -> "27 dilate_6c";
-  "25 erode_6c" [shape=box];
-  "25 erode_6c" -> "26 dilate_8c";
-  "24 erode_8c" [shape=box];
-  "24 erode_8c" -> "25 erode_6c";
-  "23 dilate_6c" [shape=box];
-  "23 dilate_6c" -> "24 erode_8c";
-  "22 dilate_8c" [shape=box];
-  "22 dilate_8c" -> "23 dilate_6c";
-  "21 erode_6c" [shape=box];
-  "21 erode_6c" -> "22 dilate_8c";
-  "20 erode_8c" [shape=box];
-  "20 erode_8c" -> "21 erode_6c";
-  "i" -> "20 erode_8c";
+  "33 E8" [shape=box];
+  "33 E8" -> "o";
+  "32 D6" [shape=box];
+  "32 D6" -> "33 E8";
+  "31 D8" [shape=box];
+  "31 D8" -> "32 D6";
+  "30 E6" [shape=box];
+  "30 E6" -> "31 D8";
+  "29 E8" [shape=box];
+  "29 E8" -> "30 E6";
+  "27 D6" [shape=box];
+  "27 D6" -> "29 E8";
+  "26 D8" [shape=box];
+  "26 D8" -> "27 D6";
+  "25 E6" [shape=box];
+  "25 E6" -> "26 D8";
+  "24 E8" [shape=box];
+  "24 E8" -> "25 E6";
+  "23 D6" [shape=box];
+  "23 D6" -> "24 E8";
+  "22 D8" [shape=box];
+  "22 D8" -> "23 D6";
+  "21 E6" [shape=box];
+  "21 E6" -> "22 D8";
+  "20 E8" [shape=box];
+  "20 E8" -> "21 E6";
+  "i" -> "20 E8";
 }
 // graph for dag "dag_cleaned_0" of module "freia_20" in dot format
 digraph "dag_cleaned_0" {
@@ -96,33 +96,33 @@ digraph "dag_cleaned_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "33 erode_8c" [shape=box];
-  "33 erode_8c" -> "o";
-  "32 dilate_6c" [shape=box];
-  "32 dilate_6c" -> "33 erode_8c";
-  "31 dilate_8c" [shape=box];
-  "31 dilate_8c" -> "32 dilate_6c";
-  "30 erode_6c" [shape=box];
-  "30 erode_6c" -> "31 dilate_8c";
-  "29 erode_8c" [shape=box];
-  "29 erode_8c" -> "30 erode_6c";
-  "27 dilate_6c" [shape=box];
-  "27 dilate_6c" -> "29 erode_8c";
-  "26 dilate_8c" [shape=box];
-  "26 dilate_8c" -> "27 dilate_6c";
-  "25 erode_6c" [shape=box];
-  "25 erode_6c" -> "26 dilate_8c";
-  "24 erode_8c" [shape=box];
-  "24 erode_8c" -> "25 erode_6c";
-  "23 dilate_6c" [shape=box];
-  "23 dilate_6c" -> "24 erode_8c";
-  "22 dilate_8c" [shape=box];
-  "22 dilate_8c" -> "23 dilate_6c";
-  "21 erode_6c" [shape=box];
-  "21 erode_6c" -> "22 dilate_8c";
-  "20 erode_8c" [shape=box];
-  "20 erode_8c" -> "21 erode_6c";
-  "i" -> "20 erode_8c";
+  "33 E8" [shape=box];
+  "33 E8" -> "o";
+  "32 D6" [shape=box];
+  "32 D6" -> "33 E8";
+  "31 D8" [shape=box];
+  "31 D8" -> "32 D6";
+  "30 E6" [shape=box];
+  "30 E6" -> "31 D8";
+  "29 E8" [shape=box];
+  "29 E8" -> "30 E6";
+  "27 D6" [shape=box];
+  "27 D6" -> "29 E8";
+  "26 D8" [shape=box];
+  "26 D8" -> "27 D6";
+  "25 E6" [shape=box];
+  "25 E6" -> "26 D8";
+  "24 E8" [shape=box];
+  "24 E8" -> "25 E6";
+  "23 D6" [shape=box];
+  "23 D6" -> "24 E8";
+  "22 D8" [shape=box];
+  "22 D8" -> "23 D6";
+  "21 E6" [shape=box];
+  "21 E6" -> "22 D8";
+  "20 E8" [shape=box];
+  "20 E8" -> "21 E6";
+  "i" -> "20 E8";
 }
 // graph for dag "freia_20_helper_0_0" of module "freia_20" in dot format
 digraph "freia_20_helper_0_0" {
@@ -133,33 +133,33 @@ digraph "freia_20_helper_0_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "33 erode_8c" [shape=box];
-  "33 erode_8c" -> "o";
-  "32 dilate_6c" [shape=box];
-  "32 dilate_6c" -> "33 erode_8c";
-  "31 dilate_8c" [shape=box];
-  "31 dilate_8c" -> "32 dilate_6c";
-  "30 erode_6c" [shape=box];
-  "30 erode_6c" -> "31 dilate_8c";
-  "29 erode_8c" [shape=box];
-  "29 erode_8c" -> "30 erode_6c";
-  "27 dilate_6c" [shape=box];
-  "27 dilate_6c" -> "29 erode_8c";
-  "26 dilate_8c" [shape=box];
-  "26 dilate_8c" -> "27 dilate_6c";
-  "25 erode_6c" [shape=box];
-  "25 erode_6c" -> "26 dilate_8c";
-  "24 erode_8c" [shape=box];
-  "24 erode_8c" -> "25 erode_6c";
-  "23 dilate_6c" [shape=box];
-  "23 dilate_6c" -> "24 erode_8c";
-  "22 dilate_8c" [shape=box];
-  "22 dilate_8c" -> "23 dilate_6c";
-  "21 erode_6c" [shape=box];
-  "21 erode_6c" -> "22 dilate_8c";
-  "20 erode_8c" [shape=box];
-  "20 erode_8c" -> "21 erode_6c";
-  "i" -> "20 erode_8c";
+  "33 E8" [shape=box];
+  "33 E8" -> "o";
+  "32 D6" [shape=box];
+  "32 D6" -> "33 E8";
+  "31 D8" [shape=box];
+  "31 D8" -> "32 D6";
+  "30 E6" [shape=box];
+  "30 E6" -> "31 D8";
+  "29 E8" [shape=box];
+  "29 E8" -> "30 E6";
+  "27 D6" [shape=box];
+  "27 D6" -> "29 E8";
+  "26 D8" [shape=box];
+  "26 D8" -> "27 D6";
+  "25 E6" [shape=box];
+  "25 E6" -> "26 D8";
+  "24 E8" [shape=box];
+  "24 E8" -> "25 E6";
+  "23 D6" [shape=box];
+  "23 D6" -> "24 E8";
+  "22 D8" [shape=box];
+  "22 D8" -> "23 D6";
+  "21 E6" [shape=box];
+  "21 E6" -> "22 D8";
+  "20 E8" [shape=box];
+  "20 E8" -> "21 E6";
+  "i" -> "20 E8";
 }
 
 ! acceleration function
