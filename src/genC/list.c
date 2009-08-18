@@ -687,10 +687,9 @@ list gen_make_list(int domain, const gen_chunk * first, ...)
 
   NEWGEN_CHECK_TYPE(domain, item);
   l = CONS(CHUNK, item, NIL), current = l;
-  while(item) {
+  for(item = va_arg(args, gen_chunk*);item;item = va_arg(args, gen_chunk*)) {
     NEWGEN_CHECK_TYPE(domain, item);
     CDR(current) = CONS(CHUNK, item, NIL), POP(current);
-    item = va_arg(args, gen_chunk*);
   }
   va_end(args);
   return l;
