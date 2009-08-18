@@ -71,6 +71,15 @@ freia_status freia_common_destruct_data(freia_data2d * img)
     return FREIA_OK;						\
   }
 
+#define Fun2P(name)						\
+  freia_status							\
+  name(freia_data2d * o, freia_data2d * i,			\
+       int32_t c1, int32_t c2)					\
+  {								\
+    o->stuff = i->stuff | (c1+c2);				\
+    return FREIA_OK;						\
+  }
+
 #define Fun3P(name)						\
   freia_status							\
   name(freia_data2d * o, freia_data2d * i,			\
@@ -158,3 +167,7 @@ FunK(freia_aipo_erode_8c);
 FunK(freia_aipo_dilate_8c);
 FunK(freia_aipo_erode_6c);
 FunK(freia_aipo_dilate_6c);
+
+// cipo
+Fun2P(freia_cipo_gradient);
+Fun2P(freia_cipo_inner_gradient);
