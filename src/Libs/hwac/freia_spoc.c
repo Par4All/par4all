@@ -195,8 +195,8 @@ static void spoc_th_conf
   // spocparam.th[0][0].boundmax = boundsup;
   comment(body, spoc_type_thr, orig, stage, side, false);
   sb_cat(body,
-    "  si.th[", s_stag, "][", s_side, "].op =",
-    "    (", s_bin, ")? SPOC_TH_BINARIZE : SPOC_TH_NO_BINARIZE;\n",
+    "  si.th[", s_stag, "][", s_side, "].op = ",
+           s_bin, "? SPOC_TH_BINARIZE : SPOC_TH_NO_BINARIZE;\n",
     "  sp.th[", s_stag, "][", s_side, "].boundmin = ", s_inf, ";\n",
     "  sp.th[", s_stag, "][", s_side, "].boundmax = ", s_sup, ";\n",
 		    NULL);
@@ -313,7 +313,8 @@ static call freia_statement_to_call(statement s)
   instruction i = statement_instruction(s);
   pips_assert("is a call", instruction_call_p(i));
   call c = instruction_call(i);
-  if (ENTITY_ASSIGN_P(call_function(c)))
+  entity called = call_function(c);
+  if (freia_assignment_p(called))
   {
     list args = call_arguments(c);
     pips_assert("2 args", gen_length(args) == 2);
@@ -519,16 +520,6 @@ where_to_perform_operation
 	  else
 	    out->side = 1 - notused->side;
 	}
-
-	if (out->side==-1)
-	{
-	  if (check_wiring_output(wiring, used->stage, 0))
-	    out->side = 0;
-	  else if (check_wiring_output(wiring, used->stage, 1))
-	    out->side = 1;
-	  else
-	    pips_internal_error("no available path");
-	}
       }
       break;
     case 2: // ALU
@@ -551,6 +542,18 @@ where_to_perform_operation
   out->level = level;
   if (out->level == spoc_type_alu)
     out->side = -1;
+  else if (out->side==-1)
+  {
+    // must set a size if not already chosen
+    int stage = out->level<spoc_type_alu? out->stage-1: out->stage;
+    if (check_wiring_output(wiring, stage, 0))
+      out->side = 0;
+    else if (check_wiring_output(wiring, stage, 1))
+      out->side = 1;
+    else
+      pips_internal_error("no available path");
+  }
+
   if (vtxcontent_out(c)!=entity_undefined)
   {
     out->image = vtxcontent_out(c);
@@ -1166,9 +1169,13 @@ static bool entity_freia_api_p(entity f)
   return strncmp(entity_local_name(f), AIPO, strlen(AIPO))==0;
 }
 
-static list fs_expression_list_to_entity_list(list /* of expression */ args)
+/* convert the first n items in list args to entities.
+ */
+static list
+fs_expression_list_to_entity_list(list /* of expression */ args, int nargs)
 {
   list /* of entity */ lent = NIL;
+  int n=0;
   FOREACH(expression, ex, args)
   {
     syntax s = expression_syntax(ex);
@@ -1176,6 +1183,7 @@ static list fs_expression_list_to_entity_list(list /* of expression */ args)
     reference r = syntax_reference(s);
     pips_assert("simple ref", reference_indices(r)==NIL);
     lent = CONS(entity, reference_variable(r), lent);
+    if (++n==nargs) break;
   }
   lent = gen_nreverse(lent);
   return lent;
@@ -1201,7 +1209,8 @@ static void dag_append_freia_call(dag d, statement s)
   const freia_api_t * api = hwac_freia_api(entity_local_name(called));
   pips_assert("some api", api!=NULL);
   list /* of entity */ args =
-    fs_expression_list_to_entity_list(call_arguments(c));
+    fs_expression_list_to_entity_list(call_arguments(c),
+				      api->arg_img_in+api->arg_img_out);
 
   // extract arguments
   entity out = entity_undefined;
@@ -1234,7 +1243,7 @@ static int dagvtx_priority(const dagvtx * v1, const dagvtx * v2)
     c1 = dagvtx_content(*v1),
     c2 = dagvtx_content(*v2);
 
-  // prioritize first measures if any
+  // prioritize first measures if there is only one of them
   if (vtxcontent_optype(c1)!=vtxcontent_optype(c2))
   {
     if (vtxcontent_optype(c1)==spoc_type_mes)
@@ -1245,7 +1254,7 @@ static int dagvtx_priority(const dagvtx * v1, const dagvtx * v2)
 
   if (result==0)
   {
-    // other criterions
+    // if not set by previous case, use other criterions
     int
       l1 = (int) gen_length(vtxcontent_inputs(c1)),
       l2 = (int) gen_length(vtxcontent_inputs(c2));
@@ -1271,12 +1280,30 @@ static int dagvtx_priority(const dagvtx * v1, const dagvtx * v2)
 
 /************************************************************ IMPLEMENTATION */
 
+/* returns whether there is a scalar RW dependency from any vs to v
+ */
+static bool any_scalar_dep(dagvtx v, set vs)
+{
+  bool dep = false;
+  statement target = dagvtx_statement(v);
+  SET_FOREACH(dagvtx, source, vs)
+  {
+    if (freia_simple_scalar_rw_dependency(dagvtx_statement(source), target))
+    {
+      dep = true;
+      break;
+    }
+  }
+  return dep;
+}
+
 /* return the vertices which may be computed from the list of
  * available images, excluding vertices in exclude.
  * return a list for determinism.
  */
 static list /* of dagvtx */
-get_computable_vertices(dag d, set exclude, set /* of entity */ avails)
+  get_computable_vertices(dag d, set exclude, set current,
+			  set /* of entity */ avails)
 {
   list computable = NIL;
 
@@ -1288,8 +1315,9 @@ get_computable_vertices(dag d, set exclude, set /* of entity */ avails)
   {
     vtxcontent c = dagvtx_content(v);
 
-    // if all needed inputs are available
-    if (list_in_set_p(vtxcontent_inputs(c), avails) &&
+    if (!any_scalar_dep(v, current) &&
+	// and all needed inputs are available
+	list_in_set_p(vtxcontent_inputs(c), avails) &&
 	!set_belong_p(exclude, v))
       computable = CONS(dagvtx, v, computable);
 
@@ -1408,8 +1436,8 @@ static int number_of_output_arcs(set vs)
 /* return first vertex in the list which is compatible, or NULL if none.
  */
 static dagvtx first_which_may_be_added
-  (set current, // dagvtx
-   list lv,     // dagvtx
+  (set current, // of dagvtx
+   list lv,     // of dagvtx
    set sure,    // image entities
    __attribute__((unused)) set maybe)   // image entities
 {
@@ -1455,12 +1483,13 @@ static string dagvtx_to_string(const dagvtx v)
  * which must be processed in that order (?)
  * side effect: dall is more or less consummed...
  */
-static list /* of dags */ split_dag(dag dall)
+static list /* of dags */ split_dag(dag initial)
 {
-  if (!single_image_assignement_p(dall))
+  if (!single_image_assignement_p(initial))
     // well, it should work most of the time, so only a warning
     pips_user_warning("image reuse may result in subtly wrong code");
 
+  dag dall = copy_dag(initial);
   int nvertices = gen_length(dag_vertices(dall));
   list ld = NIL, lcurrent = NIL;
   set
@@ -1477,7 +1506,7 @@ static list /* of dags */ split_dag(dag dall)
 
   do
   {
-    pips_assert("argh...", count++<100);
+    // pips_assert("argh...", count++<100);
 
     ifdebug(4) {
       pips_debug(4, "round %d:\n", count);
@@ -1491,7 +1520,7 @@ static list /* of dags */ split_dag(dag dall)
       set_fprint(stderr, "sure", sure, (gen_string_func_t) entity_local_name);
     }
 
-    list computables = get_computable_vertices(dall, removed, avails);
+    list computables = get_computable_vertices(dall, removed, current, avails);
     gen_sort_list(computables,
 		  (int(*)(const void*,const void*))dagvtx_priority);
 
@@ -1537,10 +1566,13 @@ static list /* of dags */ split_dag(dag dall)
 	dag_dump(stderr, "pushed dag", nd);
       }
 
+      // update global list of dags to return.
       ld = CONS(dag, nd, ld);
 
+      // cleanup
       gen_free_list(lcurrent), lcurrent = NIL;
       set_clear(current);
+
       // recompute image sets
       set_clear(sure);
       set_clear(maybe);
@@ -1566,11 +1598,13 @@ static list /* of dags */ split_dag(dag dall)
 
   // cleanup
   pips_assert("current empty list", !lcurrent);
+  pips_assert("all vertices were removed", !dag_vertices(dall));
   set_free(current);
   set_free(removed);
   set_free(sure);
   set_free(maybe);
   set_free(avails);
+  free_dag(dall);
 
   pips_debug(5, "returning %d dags\n", (int) gen_length(ld));
   return gen_nreverse(ld);
@@ -1594,11 +1628,13 @@ static bool statement_freia_call_p(statement s)
   instruction i = statement_instruction(s);
   if (instruction_call_p(i)) {
     call c = instruction_call(i);
-    if (entity_freia_api_p(call_function(c)) &&
+    entity called = call_function(c);
+    if (entity_freia_api_p(called) &&
 	// ??? should be take care later?
-	freia_spoc_optimise(call_function(c)))
+	freia_spoc_optimise(called))
       return true;
-    else if (ENTITY_ASSIGN_P(call_function(c))) {
+    else if (freia_assignment_p(called))
+    {
       list la = call_arguments(c);
       pips_assert("2 arguments to assign", gen_length(la));
       syntax op2 = expression_syntax(EXPRESSION(CAR(CDR(la))));
@@ -1607,7 +1643,8 @@ static bool statement_freia_call_p(statement s)
 	  // ??? later?
 	  && freia_spoc_optimise(call_function(syntax_call(op2)));
     }
-    else if (ENTITY_C_RETURN_P(call_function(c))) {
+    else if (ENTITY_C_RETURN_P(called))
+    {
       list la = call_arguments(c);
       if (gen_length(la)==1) {
 	syntax op = expression_syntax(EXPRESSION(CAR(la)));
@@ -1664,7 +1701,9 @@ freia_spoc_compile_calls
 
   // split dag in one-pipe dags.
   list ld = split_dag(fulld);
-  pips_assert("fulld dag is empty", gen_length(dag_vertices(fulld))==0);
+
+  // fix internal ins/outs
+  freia_hack_fix_global_ins_outs(ld);
 
   // globally remaining statements
   set global_remainings = set_make(set_pointer);
@@ -1711,23 +1750,14 @@ freia_spoc_compile_calls
 
 	if (set_belong_p(dones, sc))
 	{
-	  instruction old = statement_instruction(sc);
-	  pips_debug(5, "sustituting...\n");
+	  pips_assert("statement is a call", statement_call_p(sc));
+	  pips_debug(5, "sustituting %" _intFMT"...\n", statement_number(sc));
+
 	  // substitute by call to helper
 	  entity helper = make_empty_subroutine(fname_split); // or function?
 	  call c = make_call(helper, lparams);
-	  if (instruction_call_p(old) &&
-	      ENTITY_C_RETURN_P(call_function(instruction_call(old))))
-	  {
-	    call ret = instruction_call(old);
-	    gen_full_free_list(call_arguments(ret));
-	    call_arguments(ret) = CONS(expression, call_to_expression(c), NIL);
-	  }
-	  else
-	  {
-	    statement_instruction(sc) = call_to_instruction(c);
-	    free_instruction(old);
-	  }
+
+	  hwac_replace_statement(sc, c, false);
 	  break;
 	}
       }
@@ -1761,14 +1791,18 @@ typedef struct {
 static bool sequence_flt(sequence sq, freia_spoc_info * fsip)
 {
   list /* of statements */ ls = NIL;
+
   pips_debug(9, "considering sequence...\n");
   FOREACH(statement, s, sequence_statements(sq))
   {
-    if (statement_freia_call_p(s))
-      // ??? and possibly some other conditions...
+    bool keep_stat = statement_freia_call_p(s);
+    bool break_seq_before_stat = !keep_stat; // could change...
+
+    if (keep_stat)
       ls = CONS(statement, s, ls);
-    else {
-      // something else, interruption of the call sequence
+
+    if (break_seq_before_stat)
+    {
       if (ls!=NIL) {
 	ls = gen_nreverse(ls);
 	fsip->seqs = CONS(list, ls, fsip->seqs);

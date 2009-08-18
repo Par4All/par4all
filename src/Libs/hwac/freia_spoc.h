@@ -158,6 +158,7 @@ typedef struct {
 typedef struct {
   // function name
   string function_name;
+  string compact_name; // something very short for graph nodes
   // expected number of in/out arguments, that we should be able to use...
   int arg_img_out;  // 0 1
   int arg_img_in;   // 0 1 2
@@ -183,6 +184,8 @@ typedef enum {
   spoc_type_out = 5   // output...
 } spoc_hardware_type;
 
+#define FREIA_IMAGE_TYPE "freia_data2d"
+
 /****************************************************** SPOC CODE GENERATION */
 
 #define AIPO "freia_aipo_"
@@ -195,7 +198,7 @@ typedef enum {
   "#include <freiaCoarseGrain.h>\n"		\
   "#include <spoc.h>\n"
 
-#define FREIA_IMAGE "freia_data2d * "
+#define FREIA_IMAGE FREIA_IMAGE_TYPE " * "
 
 // ??? could/should be a property? what about asserts to check inputs?
 #define FREIA_DEFAULT_BPP "16"

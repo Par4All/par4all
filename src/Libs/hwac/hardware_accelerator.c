@@ -38,6 +38,7 @@
 #include "pipsdbm.h"
 
 #include "control.h" // for clean_up_sequences
+#include "effects-generic.h" // {set,reset}_proper_rw_effects
 
 extern string freia_spoc_compile(string, statement);
 
@@ -56,7 +57,9 @@ static int freia_compiler(string module, string hardware)
     (statement) db_get_memory_resource(DBR_CODE, module, true);
   set_current_module_statement(mod_stat);
   set_current_module_entity(module_name_to_entity(module));
-  // proper effects, chains ? summary effects ??
+  // should be pure?
+  set_proper_rw_effects((statement_effects)
+      db_get_memory_resource(DBR_PROPER_EFFECTS, module, false));
 
   pips_debug(1, "considering module %s\n", module);
 
@@ -70,7 +73,11 @@ static int freia_compiler(string module, string hardware)
   DB_PUT_MEMORY_RESOURCE(DBR_CODE, module, mod_stat);
   DB_PUT_NEW_FILE_RESOURCE(DBR_SPOC_FILE, module, spoc_file);
 
-  // update/release resources
+  // release resources
+  // ??? free statement_effects? MEMORY LEAK...
+  // but some statements contents where freed
+  // there may be some sharing between proper effects & statements.
+  reset_proper_rw_effects();
   reset_current_module_statement();
   reset_current_module_entity();
 
@@ -83,6 +90,7 @@ int freia_spoc_compiler(string module)
   return freia_compiler(module, SPOC_HW);
 }
 
+// future work...
 int freia_terapix_compiler(string module)
 {
   return freia_compiler(module, TERAPIX_HW);

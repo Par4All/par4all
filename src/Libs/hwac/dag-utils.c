@@ -39,6 +39,11 @@
 #include "freia_spoc_private.h"
 #include "hwac.h"
 
+statement dagvtx_statement(dagvtx v)
+{
+  return pstatement_statement(vtxcontent_source(dagvtx_content(v)));
+}
+
 #define cat concatenate
 
 static void entity_list_dump(FILE * out, string what, list l)
@@ -62,6 +67,14 @@ string dagvtx_operation(const dagvtx v)
   int index = vtxcontent_opid(dagvtx_content(v));
   const freia_api_t * api = get_freia_api(index);
   return api->function_name + strlen(AIPO);
+}
+
+string dagvtx_compact_operation(const dagvtx v)
+{
+  if (v==NULL) return "null";
+  int index = vtxcontent_opid(dagvtx_content(v));
+  const freia_api_t * api = get_freia_api(index);
+  return api->compact_name;
 }
 
 /* return (last) producer vertex or NULL if none found.
@@ -132,18 +145,32 @@ void dag_dump(FILE * out, string what, dag d)
   fprintf(out, "\n");
 }
 
-static void dagvtx_dot(FILE * out, dagvtx vtx)
+// #define IMG_DEP " [arrowhead=normal]"
+#define IMG_DEP ""
+#define SCL_DEP " [arrowhead=empty]"
+
+static void dagvtx_dot(FILE * out, dag d, dagvtx vtx)
 {
   string attribute =
     what_operation_shape(vtxcontent_optype(dagvtx_content(vtx)));
 
   fprintf(out, "  \"%" _intFMT " %s\" [%s];\n",
-	  dagvtx_number(vtx), dagvtx_operation(vtx), attribute);
+	  dagvtx_number(vtx), dagvtx_compact_operation(vtx), attribute);
 
+  // image dependencies
   FOREACH(dagvtx, succ, dagvtx_succs(vtx))
-    fprintf(out, "  \"%" _intFMT " %s\" -> \"%" _intFMT " %s\";\n",
-	    dagvtx_number(vtx), dagvtx_operation(vtx),
-	    dagvtx_number(succ), dagvtx_operation(succ));
+    fprintf(out, "  \"%" _intFMT " %s\" -> \"%" _intFMT " %s\"" IMG_DEP ";\n",
+	    dagvtx_number(vtx), dagvtx_compact_operation(vtx),
+	    dagvtx_number(succ), dagvtx_compact_operation(succ));
+
+  // scalar dependencies anywhere... hmmm...
+  FOREACH(dagvtx, v, dag_vertices(d))
+    if (vtx!=v && freia_simple_scalar_rw_dependency
+	(dagvtx_statement(vtx), dagvtx_statement(v)))
+      fprintf(out,
+	      "  \"%" _intFMT " %s\" -> \"%" _intFMT " %s\"" SCL_DEP ";\n",
+	      dagvtx_number(vtx), dagvtx_compact_operation(vtx),
+	      dagvtx_number(v), dagvtx_compact_operation(v));
 }
 
 static void entity_list_dot(FILE * out, string comment, list l)
@@ -166,21 +193,23 @@ void dag_dot(FILE * out, string what, dag d)
   fprintf(out, "  // computation vertices\n");
   FOREACH(dagvtx, vx, dag_vertices(d))
   {
-    dagvtx_dot(out, vx);
+    dagvtx_dot(out, d, vx);
     vtxcontent c = dagvtx_content(vx);
 
     // show inputs
     FOREACH(entity, i, vtxcontent_inputs(c))
       if (gen_in_list_p(i, dag_inputs(d)) && get_producer(d, vx, i)==NULL)
 	fprintf(out, "  \"%s\" -> \"%" _intFMT " %s\";\n",
-		entity_local_name(i), dagvtx_number(vx), dagvtx_operation(vx));
+		entity_local_name(i),
+		dagvtx_number(vx), dagvtx_compact_operation(vx));
 
     // and outputs
     entity o = vtxcontent_out(c);
     if (gen_in_list_p(o, dag_outputs(d)) && get_producer(d, NULL, o)==vx)
       // no!
       fprintf(out, "  \"%" _intFMT " %s\" -> \"%s\";\n",
-	      dagvtx_number(vx), dagvtx_operation(vx), entity_local_name(o));
+	      dagvtx_number(vx), dagvtx_compact_operation(vx),
+	      entity_local_name(o));
   }
 
   fprintf(out, "}\n");
@@ -341,6 +370,20 @@ void dag_remove_useless_copies(dag d)
   set_free(remove);
 }
 
+/*
+static bool successors_are_only_measures(dagvtx v)
+{
+  bool only_mes = true;
+  FOREACH(dagvtx, succ, dagvtx_succs(v))
+    if (vtxcontent_opid(dagvtx_content(succ)) != spoc_type_mes)
+    {
+      only_mes = false;
+      break;
+    }
+  return only_mes;
+}
+*/
+
 /* (re)compute the list of *GLOBAL* input & output images for this dag
  * ??? BUG the output is rather an approximation
  * should rely on used defs or out effects for the underlying sequence.
@@ -362,6 +405,9 @@ void dag_set_inputs_outputs(dag d)
       // or that are formal parameters (external image reuse)
       else if (formal_parameter_p(out))
 	set_add_element(outs, outs, out);
+      // ??? hmmm... for "freia_scalar_03"
+      // else if (!successors_are_only_measures(v))
+      // set_add_element(outs, outs, out);
 
       // remove from current inputs as produced locally
       set_del_element(ins, ins, out);
@@ -390,6 +436,56 @@ void dag_set_inputs_outputs(dag d)
   // cleanup
   set_free(ins);
   set_free(outs);
+}
+
+/* return all images (entities) that could be output from d
+ * not just those computed by dag_set_inputs_outputs()...
+ */
+static void assign_all_possible_outputs(set outs, dag d)
+{
+  set_clear(outs);
+  FOREACH(dagvtx, v, dag_vertices(d))
+  {
+    entity out = vtxcontent_out(dagvtx_content(v));
+    if (out!=entity_undefined && get_producer(d, NULL, out)==v)
+      set_add_element(outs, outs, out);
+  }
+}
+
+/* catch some cases of missing outs between splits...
+ * for "freia_scalar_03"...
+ * I'm not that sure about the algorithm.
+ */
+void freia_hack_fix_global_ins_outs(list ld)
+{
+  set
+    forward_ins = set_make(set_pointer),
+    possible_outs = set_make(set_pointer),
+    used = set_make(set_pointer);
+  list revld = gen_nreverse(gen_copy_seq(ld));
+
+  FOREACH(dag, d, revld)
+  {
+    assign_all_possible_outputs(possible_outs, d);
+    set_intersection(used, possible_outs, forward_ins);
+    SET_FOREACH(entity, useful, used)
+    {
+      if (!gen_in_list_p(useful, dag_outputs(d)))
+      {
+	pips_debug(4, "missing '%s' added\n", entity_local_name(useful));
+	dag_outputs(d) = CONS(ENTITY, useful, dag_outputs(d));
+	gen_sort_list(dag_outputs(d), (gen_cmp_func_t) compare_entities);
+      }
+    }
+    set_difference(forward_ins, forward_ins, possible_outs);
+    set_append_list(forward_ins, dag_inputs(d));
+  }
+
+  // cleanup
+  set_free(forward_ins);
+  set_free(possible_outs);
+  set_free(used);
+  gen_free_list(revld);
 }
 
 /* ??? I'm unsure about what happens to dead code in the pipeline...

@@ -1,13 +1,13 @@
 * pre
 - inlining, full_unroll, dead code elim...
 + image reuse
-- scalar deps? use chains??
++ scalar deps with proper effects
 - check => ok => deadcode (#define)
 
 * input
 - may skip unrelated statements?
-- deal with |= ||= and similars
-- what about full expressions: aipo_x() || aipo_y() || aipo_z()?
++ deal with |= ||= and similars
+- what about full expressions: aipo_x() || aipo_y() || aipo_z()? atomizer?
 - check that there are references where expected?
 - check/remove more implicit hypothesis
 
