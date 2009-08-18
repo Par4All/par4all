@@ -1282,6 +1282,13 @@ entity get_ith_##lname##_prime(int i)\
 #define instruction_block_p(i) instruction_sequence_p(i)
 #define instruction_block(i) sequence_statements(instruction_sequence(i))
 
+/* easy list constructor
+ */
+#define make_statement_list( stats... ) \
+    (gen_make_list(statement_domain, ##stats, 0))
+#define make_expression_list( stats... ) \
+    (gen_make_list(expression_domain, ##stats, 0))
+
 /* After the modification in Newgen:  unstructured = entry:control x exit:control
    we have create a macro to transform automatically unstructured_control to unstructured_entry */
 #define unstructured_control unstructured_entry
@@ -1533,6 +1540,7 @@ the variable is unsigned, signed or not */
    if( _cm_list_init == NIL ) \
         list = _cm_list ; \
 }
+
 
 
 /* @} */
