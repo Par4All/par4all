@@ -1118,10 +1118,7 @@ remove_useless_label(char* module_name)
    set_current_module_entity( module );
    set_current_module_statement( module_statement );
 
-   gen_multi_recurse(module_statement,
-           statement_domain, gen_true, statement_remove_useless_label,
-           unstructured_domain, gen_false,gen_null,
-           NULL);
+   gen_recurse(module_statement, statement_domain, gen_true, statement_remove_useless_label);
    clean_up_sequences(module_statement);
 
    module_reorder(module_statement);
