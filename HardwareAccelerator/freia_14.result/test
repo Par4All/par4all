@@ -28,6 +28,7 @@ digraph "dag_0" {
   "10 +" -> "o";
   "9 C" [shape=trapezium,orientation=270];
   "9 C" -> "10 +";
+  "9 C" -> "10 +";
 }
 // graph for dag "dag_cleaned_0" of module "freia_14" in dot format
 digraph "dag_cleaned_0" {
@@ -41,6 +42,7 @@ digraph "dag_cleaned_0" {
   "10 +" -> "o";
   "9 C" [shape=trapezium,orientation=270];
   "9 C" -> "10 +";
+  "9 C" -> "10 +";
 }
 // graph for dag "freia_14_helper_0_0" of module "freia_14" in dot format
 digraph "freia_14_helper_0_0" {
@@ -53,6 +55,7 @@ digraph "freia_14_helper_0_0" {
   "10 +" [shape=trapezium,orientation=270];
   "10 +" -> "o";
   "9 C" [shape=trapezium,orientation=270];
+  "9 C" -> "10 +";
   "9 C" -> "10 +";
 }
 
