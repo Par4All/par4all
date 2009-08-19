@@ -34,7 +34,7 @@ OK	= exit 0
 
 # default target is to clean
 clean:
-	$(RM) *~ *.result/out out err $(F.c:%.c=%.o) a.out *.tmp
+	$(RM) *~ *.o *.tmp *.result/out out err a.out
 	$(RM) -r *.database
 
 # regenerate "test" files: svn diff show the diffs!
