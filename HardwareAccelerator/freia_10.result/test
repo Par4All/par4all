@@ -102,8 +102,6 @@ freia_status freia_10_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, int32_t
   // STAGE 0
   // i [0 input 0] -> [0 poc 0] 11 erode_8c
   // nope
-  // i [0 input 1] -> [0 poc 0] 11 erode_8c
-  // nope
   // poc 11 erode_8c stage 0 side 0
   si.poc[0][0].op = SPOC_POC_ERODE;
   si.poc[0][0].grid = SPOC_POC_8_CONNEX;

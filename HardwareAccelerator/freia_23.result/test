@@ -147,12 +147,13 @@ freia_status freia_23_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_d
   si.alu[2][0].op = SPOC_ALU_ADD_IN0_IN1;
 
 
-  // output image io on 1 and image o on 0
-  // io [2 input 1] -> [2 output 1] 0 null
-  si.mux[2][3].op = SPOC_MUX_IN1;
-  // o [2 alu] -> [2 output 0] 0 null
+  // output image io on 0 and image o on 1
+  // io [2 input 1] -> [2 output 0] 0 null
   si.mux[2][0].op = SPOC_MUX_IN1;
-  si.mux[2][2].op = SPOC_MUX_IN0;
+  si.mux[2][2].op = SPOC_MUX_IN1;
+  // o [2 alu] -> [2 output 1] 0 null
+  si.mux[2][1].op = SPOC_MUX_IN0;
+  si.mux[2][3].op = SPOC_MUX_IN0;
 
   mcode.raw = (freia_ptr) &si;
   mcode.size = sizeof(spoc_instr);
@@ -167,7 +168,7 @@ freia_status freia_23_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_d
   ret |= freia_cg_write_dynamic_param(&dynparam);
 
   // actual call of spoc hardware
-  freia_cg_template_process_2i_2o(op, param, o1, o0, i0, i1);
+  freia_cg_template_process_2i_2o(op, param, o0, o1, i0, i1);
 
   return ret;
 }

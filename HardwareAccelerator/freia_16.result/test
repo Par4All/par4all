@@ -119,29 +119,32 @@ freia_status freia_16_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_d
   // nope
 
 
-  // STAGE 1
-  // i [0 measure 0] -> [1 poc 0] 8 erode_6c
-  // i [1 input 0] -> [1 poc 0] 8 erode_6c
-  // nope
-  // poc 8 erode_6c stage 1 side 0
-  si.poc[1][0].op = SPOC_POC_ERODE;
-  si.poc[1][0].grid = SPOC_POC_6_CONNEX;
-  for(i=0 ; i<9 ; i++)
-    sp.poc[1][0].kernel[i] = kern3[i];
-
-  // i [1 input 0] -> [1 alu] 7 add_const
-  // nope
-  // alu 7 add_const stage 1
-  si.alu[1][0].op = SPOC_ALU_ADD_IN0_CONST;
-  si.alu[1][0].constant = cst4;
-
-
-  // output image o0 on 1 and image o1 on 0
-  // o0 [1 alu] -> [1 output 1] 0 null
-  si.mux[1][1].op = SPOC_MUX_IN0;
-  si.mux[1][3].op = SPOC_MUX_IN0;
-  // o1 [1 poc 0] -> [1 output 0] 0 null
+  // STAGE 2
+  // i [0 measure 0] -> [2 poc 0] 8 erode_6c
+  // i [1 input 0] -> [2 poc 0] 8 erode_6c
   si.mux[1][0].op = SPOC_MUX_IN0;
+  // i [2 input 0] -> [2 poc 0] 8 erode_6c
+  // nope
+  // poc 8 erode_6c stage 2 side 0
+  si.poc[2][0].op = SPOC_POC_ERODE;
+  si.poc[2][0].grid = SPOC_POC_6_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[2][0].kernel[i] = kern3[i];
+
+  // i [2 input 0] -> [2 alu] 7 add_const
+  // nope
+  // alu 7 add_const stage 2
+  si.alu[2][0].op = SPOC_ALU_ADD_IN0_CONST;
+  si.alu[2][0].constant = cst4;
+
+
+  // output image o0 on 0 and image o1 on 1
+  // o0 [2 alu] -> [2 output 0] 0 null
+  si.mux[2][0].op = SPOC_MUX_IN1;
+  si.mux[2][2].op = SPOC_MUX_IN0;
+  // o1 [2 poc 0] -> [2 output 1] 0 null
+  si.mux[2][1].op = SPOC_MUX_IN0;
+  si.mux[2][3].op = SPOC_MUX_IN0;
 
   mcode.raw = (freia_ptr) &si;
   mcode.size = sizeof(spoc_instr);
@@ -156,7 +159,7 @@ freia_status freia_16_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_d
   ret |= freia_cg_write_dynamic_param(&dynparam);
 
   // actual call of spoc hardware
-  freia_cg_template_process_2i_2o(op, param, o1, o0, i0, NULL);
+  freia_cg_template_process_2i_2o(op, param, o0, o1, i0, NULL);
 
   // get reductions
   freia_cg_read_reduction_results(&redres);
