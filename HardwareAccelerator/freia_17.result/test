@@ -51,11 +51,11 @@ digraph "dag_0" {
 
   // computation vertices
   "27 =" [shape=circle];
-  "27 =" -> "0`t5";
+  "27 =" -> "t5";
   "26 =" [shape=circle];
-  "26 =" -> "0`t4";
+  "26 =" -> "t4";
   "25 =" [shape=circle];
-  "25 =" -> "0`t3";
+  "25 =" -> "t3";
   "24 =" [shape=circle];
   "24 =" -> "27 =";
   "24 =" -> "o";
@@ -83,13 +83,13 @@ digraph "dag_cleaned_0" {
   // computation vertices
   "27 =" [shape=circle];
   "i" -> "27 =";
-  "27 =" -> "0`t5";
+  "27 =" -> "t5";
   "26 =" [shape=circle];
   "i" -> "26 =";
-  "26 =" -> "0`t4";
+  "26 =" -> "t4";
   "25 =" [shape=circle];
   "i" -> "25 =";
-  "25 =" -> "0`t3";
+  "25 =" -> "t3";
   "24 =" [shape=circle];
   "i" -> "24 =";
   "24 =" -> "o";
@@ -106,7 +106,7 @@ digraph "freia_17_helper_0_0" {
   // computation vertices
   "25 =" [shape=circle];
   "i" -> "25 =";
-  "25 =" -> "0`t3";
+  "25 =" -> "t3";
   "24 =" [shape=circle];
   "i" -> "24 =";
   "24 =" -> "o";
@@ -123,10 +123,10 @@ digraph "freia_17_helper_0_1" {
   // computation vertices
   "27 =" [shape=circle];
   "i" -> "27 =";
-  "27 =" -> "0`t5";
+  "27 =" -> "t5";
   "26 =" [shape=circle];
   "i" -> "26 =";
-  "26 =" -> "0`t4";
+  "26 =" -> "t4";
 }
 
 ! acceleration function

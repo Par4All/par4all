@@ -72,7 +72,7 @@ digraph "freia_scalar_03_helper_0_0" {
   "9 +" -> "10 max";
   "i0" -> "9 +";
   "i1" -> "9 +";
-  "9 +" -> "0`tmp";
+  "9 +" -> "tmp";
 }
 // graph for dag "freia_scalar_03_helper_0_1" of module "freia_scalar_03" in dot format
 digraph "freia_scalar_03_helper_0_1" {
@@ -84,7 +84,7 @@ digraph "freia_scalar_03_helper_0_1" {
 
   // computation vertices
   "11 thr" [shape=parallelogram];
-  "0`tmp" -> "11 thr";
+  "tmp" -> "11 thr";
   "11 thr" -> "o";
 }
 

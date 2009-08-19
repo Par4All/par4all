@@ -70,7 +70,7 @@ digraph "freia_scalar_00_helper_0_0" {
   "10 +" [shape=trapezium,orientation=270];
   "i0" -> "10 +";
   "i1" -> "10 +";
-  "10 +" -> "0`t1";
+  "10 +" -> "t1";
   "9 max" [shape=diamond];
   "i0" -> "9 max";
 }
@@ -84,7 +84,7 @@ digraph "freia_scalar_00_helper_0_1" {
 
   // computation vertices
   "11 thr" [shape=parallelogram];
-  "0`t1" -> "11 thr";
+  "t1" -> "11 thr";
   "11 thr" -> "o";
 }
 

@@ -48,7 +48,7 @@ digraph "dag_0" {
   // computation vertices
   "24 |" [shape=trapezium,orientation=270];
   "i1" -> "24 |";
-  "24 |" -> "0`u3";
+  "24 |" -> "u3";
   "23 ^" [shape=trapezium,orientation=270];
   "23 ^" -> "24 |";
   "i1" -> "23 ^";
@@ -59,7 +59,7 @@ digraph "dag_0" {
   "i1" -> "22 &";
   "21 -" [shape=trapezium,orientation=270];
   "i0" -> "21 -";
-  "21 -" -> "0`u2";
+  "21 -" -> "u2";
   "20 =" [shape=circle];
   "20 =" -> "21 -";
   "19 +" [shape=trapezium,orientation=270];
@@ -81,7 +81,7 @@ digraph "dag_cleaned_0" {
   // computation vertices
   "24 |" [shape=trapezium,orientation=270];
   "i1" -> "24 |";
-  "24 |" -> "0`u3";
+  "24 |" -> "u3";
   "23 ^" [shape=trapezium,orientation=270];
   "23 ^" -> "24 |";
   "i1" -> "23 ^";
@@ -92,7 +92,7 @@ digraph "dag_cleaned_0" {
   "i1" -> "22 &";
   "21 -" [shape=trapezium,orientation=270];
   "i0" -> "21 -";
-  "21 -" -> "0`u2";
+  "21 -" -> "u2";
   "19 +" [shape=trapezium,orientation=270];
   "19 +" -> "21 -";
   "i0" -> "19 +";
@@ -110,7 +110,7 @@ digraph "freia_18_helper_0_0" {
   // computation vertices
   "21 -" [shape=trapezium,orientation=270];
   "i0" -> "21 -";
-  "21 -" -> "0`u2";
+  "21 -" -> "u2";
   "19 +" [shape=trapezium,orientation=270];
   "19 +" -> "21 -";
   "i0" -> "19 +";
@@ -129,7 +129,7 @@ digraph "freia_18_helper_0_1" {
   // computation vertices
   "24 |" [shape=trapezium,orientation=270];
   "i1" -> "24 |";
-  "24 |" -> "0`u3";
+  "24 |" -> "u3";
   "23 ^" [shape=trapezium,orientation=270];
   "23 ^" -> "24 |";
   "i1" -> "23 ^";

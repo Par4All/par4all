@@ -75,7 +75,7 @@ digraph "freia_scalar_04_helper_0_0" {
 
   // computation vertices
   "15 E8" [shape=box];
-  "15 E8" -> "0`t2";
+  "15 E8" -> "t2";
   "14 max" [shape=diamond];
   "13 +" [shape=trapezium,orientation=270];
   "13 +" -> "15 E8";
@@ -93,7 +93,7 @@ digraph "freia_scalar_04_helper_0_1" {
 
   // computation vertices
   "16 thr" [shape=parallelogram];
-  "0`t2" -> "16 thr";
+  "t2" -> "16 thr";
   "16 thr" -> "o";
 }
 
