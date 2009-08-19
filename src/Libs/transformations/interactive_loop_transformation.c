@@ -124,3 +124,49 @@ bool interactive_loop_transformation(string module_name,
     
     return return_status;
 }
+
+void
+flag_loop(statement st) {
+    instruction i = statement_instruction(st);
+    if(instruction_loop_p(i))
+    {
+        loop l = instruction_loop(i);
+        if(entity_empty_label_p(loop_label(l)))
+        {
+            if(entity_empty_label_p(statement_label(st)))
+                statement_label(st)=loop_label(l)=make_new_label(get_current_module_name());
+            else
+                loop_label(l)=statement_label(st);
+        }
+        else if(entity_empty_label_p(statement_label(st)))
+            statement_label(st)=loop_label(l);
+        else
+            pips_assert("same label on loop and statement",same_entity_p(statement_label(st),loop_label(l)));
+    }
+}
+
+/** 
+ * put a label on each doloop without label
+ * 
+ * @param module_name 
+ * 
+ * @return 
+ */
+bool
+flag_loops(char *module_name)
+{
+    /* prelude */
+    set_current_module_entity(module_name_to_entity( module_name ));
+    set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, module_name, TRUE) );
+
+    /* run loop labeler */
+    gen_recurse(get_current_module_statement(),statement_domain,gen_true,flag_loop);
+
+    /* validate */
+    DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name,get_current_module_statement());
+
+    /*postlude*/
+    reset_current_module_entity();
+    reset_current_module_statement();
+    return true;
+}

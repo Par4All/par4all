@@ -5563,6 +5563,15 @@ This is done interactively or by setting the following property to the valid lab
 \begin{PipsProp}
 LOOP_LABEL ""
 \end{PipsProp}
+%%@UserManualDocumentation: flag_loops
+Put a label on unlabelled loops for further interactive processing
+%%!UserManualDocumentation
+\begin{PipsMake}
+flag_loops                    > MODULE.code
+        < PROGRAM.entities
+        < MODULE.code
+\end{PipsMake}
+
 
 \subsection{Loop Distribution}
 \label{subsection-loop-distribution}

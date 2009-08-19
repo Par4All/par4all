@@ -1043,6 +1043,8 @@ suppress_dead_code(char * mod_name)
         code after unstructured "if" elimination: */
      unspaghettify(mod_name);
 
+  remove_useless_label(mod_name);
+
   ifdebug(1)
       pips_assert("Statements inconsistants...", 
 		  statement_consistent_p(mod_stmt));
@@ -1083,9 +1085,7 @@ void statement_remove_useless_label(statement s)
 {
     instruction i = statement_instruction(s);
     if(    !instruction_unstructured_p(i)
-        && !( fortran_module_p( get_current_module_entity() ) 
-             && ( instruction_loop_p(i) || instruction_whileloop_p(i) || instruction_forloop_p(i))
-           )
+        && !( instruction_loop_p(i) || instruction_whileloop_p(i) || instruction_forloop_p(i))
     )
     {
         if( !entity_empty_label_p( statement_label(s) ) )
