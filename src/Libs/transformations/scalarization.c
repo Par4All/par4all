@@ -236,7 +236,7 @@ static bool reference_substitute(reference r) {
   if (v == scalarized_array) {
     // Scalarize only if r refers to an array element and not to a slice
     list inds = reference_indices(r);
-    int d = type_depth(ultimate_type(entity_type(v)));
+    size_t d = type_depth(ultimate_type(entity_type(v)));
     if (gen_length(inds) == d) {
       reference_variable(r) = scalarized_replacement_variable;
       reference_indices(r) = NIL; // TODO: add missing gen_full_free_list(reference_indices(r))

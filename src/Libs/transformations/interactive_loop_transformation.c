@@ -100,7 +100,7 @@ bool interactive_loop_transformation(string module_name,
     if(lp_label)
     {
         selected_label = find_label_entity(module_name, lp_label);
-        if (selected_label==entity_undefined) {
+        if (entity_undefined_p(selected_label)) {
             pips_user_error("loop label `%s' does not exist\n", lp_label);
         }
         free(lp_label);

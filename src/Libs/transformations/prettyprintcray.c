@@ -148,7 +148,7 @@ list all_enclosed_scope_variables(statement stmt)
 }
 
 /* lp_stt must be a loop statement */
-text text_microtasked_loop(entity module, int margin, statement lp_stt)
+text text_microtasked_loop(__attribute__((unused)) entity module,__attribute__((unused))  int margin, statement lp_stt)
 {
     text txt;
     unformatted u;
@@ -261,7 +261,7 @@ text text_microtasked_loop(entity module, int margin, statement lp_stt)
 }
 
 /* lp_stt must be a loop statement */
-text text_vectorized_loop(entity module, int margin, statement lp_stt)
+text text_vectorized_loop(__attribute__((unused)) entity module,__attribute__((unused))  int margin,__attribute__((unused))  statement lp_stt)
 {
     text txt;
     unformatted u;

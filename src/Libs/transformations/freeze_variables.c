@@ -159,7 +159,7 @@ static void freeze_variables_in_statement(statement s, entity_lists * el)
 	      e1 = reference_to_expression(make_reference(new_ent, NIL));
 	      e2 = reference_to_expression(copy_reference(r));
 	      c1 = make_call(entity_intrinsic(NON_EQUAL_OPERATOR_NAME),
-			     CONS(EXPRESSION, e1, CONS(EXPRESSION, e2, NIL)));
+                  make_expression_list(e1,e2));
 	      
 	      e3 = make_expression(make_syntax(is_syntax_call, c1), 
 				   normalized_undefined);

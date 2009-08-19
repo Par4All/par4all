@@ -272,9 +272,9 @@ remove_loop_statement(statement s, instruction i, loop l)
 
   index = make_factor_expression(1, loop_index(l));
   statement_instruction(s) =
-    make_instruction_block(CONS(STATEMENT,
-				as = make_assign_statement(index , init_val),
-                                CONS(STATEMENT, loop_body(l), NIL)));
+      make_instruction_block(
+              make_statement_list(as = make_assign_statement(index , init_val),loop_body(l))
+              );
   statement_label(as) = statement_label(s);
   statement_label(s) = entity_empty_label();
   fix_sequence_statement_attributes(s);
@@ -541,9 +541,9 @@ dead_deal_with_test(statement s,
     /* Concatenate an eventual IF expression (if write effects) with
        the false branch: */
     statement_instruction(s) =
-       make_instruction_block(CONS(STATEMENT,
-                                  make_stmt_of_instr(statement_instruction(s)),
-                                  CONS(STATEMENT, st_false, NIL)));
+        make_instruction_block(
+                make_statement_list(make_stmt_of_instr(statement_instruction(s)),st_false)
+                );
     
     /* Go on the recursion on the remaining branch : */
     suppress_dead_code_statement(st_false);
@@ -560,9 +560,9 @@ dead_deal_with_test(statement s,
     /* Concatenate an eventual IF expression (if write effects) with
        the false branch: */
     statement_instruction(s) =
-       make_instruction_block(CONS(STATEMENT,
-                                  make_stmt_of_instr(statement_instruction(s)),
-                                  CONS(STATEMENT, st_true, NIL)));
+       make_instruction_block(
+               make_statement_list(
+                   make_stmt_of_instr(statement_instruction(s)),st_true));
     /* Go on the recursion on the remaining branch : */
     suppress_dead_code_statement(st_true);
     dead_code_if_false_branch_removed++;

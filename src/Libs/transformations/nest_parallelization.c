@@ -117,7 +117,7 @@ static transformation_strategy
 	       };
 
 
-statement loop_preserve(statement s, int c)
+statement loop_preserve(statement s, __attribute__((unused)) int c)
 {
     debug(9, "loop_preserve", "begin\n");
 
@@ -126,7 +126,7 @@ statement loop_preserve(statement s, int c)
     return s;
 }
     
-statement loop_vectorize(statement s, int c)
+statement loop_vectorize(statement s, __attribute__((unused)) int c)
 {
     loop l = statement_loop(s);
 
@@ -139,7 +139,7 @@ statement loop_vectorize(statement s, int c)
     return s;
 }
 
-statement tuned_loop_parallelize(statement s, int c)
+statement tuned_loop_parallelize(statement s, __attribute__((unused)) int c)
 {
     loop l = statement_loop(s);
 
@@ -232,7 +232,7 @@ statement tuned_loop_strip_mine(statement s)
 }
 
 
-static bool always_select_p(loop l)
+static bool always_select_p(__attribute__((unused)) loop l)
 {
     return TRUE;
 }
@@ -264,8 +264,7 @@ bool nest_parallelization(string module_name)
 
     parallel_loop_has_been_selected = FALSE;
 
-    look_for_nested_loop_statements(mod_parallel_stat, parallelization,
-				    always_select_p);
+    look_for_nested_loop_statements(mod_parallel_stat, parallelization,always_select_p);
 
     /* Regenerate statement_ordering for the parallel code */
     reset_ordering_to_statement();
@@ -291,7 +290,7 @@ bool nest_parallelization(string module_name)
     return TRUE;
 }
 
-statement parallelization(list lls, bool (*loop_predicate) (loop))
+statement parallelization(list lls, __attribute__((unused)) bool (*loop_predicate) (loop))
 {
     statement s = statement_undefined;
 
@@ -538,7 +537,7 @@ statement loop_nest_parallelization(list lls)
     return s;
 }
 
-statement mark_loop_as_parallel(list lls, bool (*unused)(loop))
+statement mark_loop_as_parallel(list lls, __attribute__((unused)) bool (*unused)(loop))
 {
     statement ls = STATEMENT(CAR(lls));
     execution_tag(loop_execution(statement_loop(ls))) = is_execution_parallel;
@@ -546,7 +545,7 @@ statement mark_loop_as_parallel(list lls, bool (*unused)(loop))
     return ls;
 }
 
-bool nth_loop_p(loop ls)
+bool nth_loop_p(__attribute__((unused))loop ls)
 {
     /* FI: this is *wrong* but should work for a demo :-( */
     static int count = 0;
@@ -635,7 +634,7 @@ bool contiguous_array_reference_p(reference r)
 
 
 
-bool carried_dependence_p(statement s)
+bool carried_dependence_p(__attribute__((unused))statement s)
 {
     return FALSE;
 }

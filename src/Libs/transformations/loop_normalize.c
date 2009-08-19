@@ -202,7 +202,7 @@ void loop_normalize_statement(statement s)
             statement_extensions(s)=empty_extensions();
             statement_decls_text(s)=NULL;
             /* #3 make s a block instead of a loop */
-            statement_instruction(s) = make_instruction_block(CONS(STATEMENT,new_statement,CONS(STATEMENT,end_stmt,NIL)));
+            statement_instruction(s) = make_instruction_block(make_statement_list(new_statement,end_stmt));
 
             debug( 4, __FUNCTION__, "end LOOP\n");
         }

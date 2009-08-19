@@ -133,9 +133,8 @@ build_statement_for_clone(
 	check_arg_value = make_continue_statement(entity_undefined);
 
     stat = make_block_statement(
-	CONS(STATEMENT, check_arg_value,
-	CONS(STATEMENT, copy_statement(get_current_module_statement()), 
-	     NIL)));
+            make_statement_list(check_arg_value, copy_statement(get_current_module_statement()))
+            );
 
     return stat;
 }

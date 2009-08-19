@@ -232,6 +232,7 @@ bool label_defined_in_current_module_p(entity l)
 bool label_string_defined_in_current_module_p(string ls)
 {
   entity l = find_label_entity(get_current_module_name(), ls);
+  pips_assert("entity defined",!entity_undefined_p(l));
   statement s = get_current_module_statement();
   bool defined_p = label_defined_in_statement_p(l, s);
 

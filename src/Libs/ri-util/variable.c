@@ -616,7 +616,7 @@ char *module_name;
 
   entity_storage(e) = make_storage(is_storage_ram,
 				   (make_ram(f, a,
-					     add_variable_to_area(a, e),
+					     add_any_variable_to_area(a, e,fortran_module_p(f)),
 					     NIL)));
 
   entity_initial(e) = make_value(is_value_constant,

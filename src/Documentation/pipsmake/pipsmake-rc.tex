@@ -4475,6 +4475,7 @@ This vector architecture require the generation of micro-codes (a.k.a ''kernels'
 A microcode is a code portion that will be executed symmetrically on all processors of the machines.
 They only work on parallel loops and can contain inner loops, but no branching.
 This pass basically picks a parallel loop, strip-mines it and apply outlining to the tiled loop.
+It then performs basic validity checks on resulting code to make sure it's a valid microcode.
 %%!UserManualDocumentation
 
 \begin{PipsMake}
@@ -4483,6 +4484,9 @@ terapixify				> MODULE.code
 		! MODULE.localize_declaration
 		! MODULE.clean_declarations
 		! MODULE.outline
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.cumulated_effects
 \end{PipsMake}
 
 The property \verb+OUTLINE_MODULE_NAME+ will be used as microcode name.
@@ -4491,6 +4495,16 @@ The property \verb+OUTLINE_LABEL+ is used to select a statement
 \begin{PipsProp}
 OUTLINE_LABEL ""
 \end{PipsProp}
+
+%%@UserManualDocumentation: normalize_microcode
+work in progress
+%%!UserManualDocumentation
+\begin{PipsMake}
+normalize_microcode				> MODULE.code
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.cumulated_effects
+\end{PipsMake}
 
 \subsection{Parallelization and Vectorization for Cray Multiprocessors}
 \index{Cray}

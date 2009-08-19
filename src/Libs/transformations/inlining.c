@@ -124,7 +124,6 @@ bool inline_should_inline(call callee)
 /* find effects on entity `e' in statement `s'
  * cumulated effects for these statements must have been loaded
  */
-static
 bool find_write_effect_on_entity(statement s, entity e)
 {
 	list cummulated_effects = load_cumulated_rw_effects_list( s );
@@ -232,7 +231,7 @@ void inlining_regenerate_labels(statement s, string new_module)
     entity lbl = statement_label(s);
     if(!entity_empty_label_p(lbl))
     {
-        if( !gen_chunk_undefined_p(find_label_entity(new_module,label_local_name(lbl))))
+        if( !entity_undefined_p(find_label_entity(new_module,label_local_name(lbl))))
             statement_label(s)=lbl=make_new_label(new_module);
         else
             FindOrCreateEntity(new_module,entity_local_name(lbl));
@@ -240,7 +239,7 @@ void inlining_regenerate_labels(statement s, string new_module)
             loop_label(statement_loop(s))=lbl;
     }
     else if( statement_loop_p(s) ) {
-        if( !gen_chunk_undefined_p( find_label_entity(new_module,label_local_name(lbl)) ) )
+        if( !entity_undefined_p( find_label_entity(new_module,label_local_name(lbl)) ) )
             loop_label(statement_loop(s))=make_new_label(new_module);
     }
 }
@@ -275,7 +274,7 @@ statement inline_expression_call(expression modified_expression, call callee)
         if( has_static_declarations )
         {
             pips_user_warning("cannot inline function with static declarations\n");
-            return instruction_undefined;
+            return statement_undefined;
         }
     }
 
@@ -901,12 +900,26 @@ statement outliner(string outline_module_name, list statements_to_outline)
          declared_entities = NIL ;
     set sreferenced_entities = set_make(set_pointer);
 
+    list skip_list = NIL;
+
     FOREACH(STATEMENT, s, statements_to_outline)
     {
         set tmp = statement_get_referenced_entities(s);
         set_union(sreferenced_entities,tmp,sreferenced_entities);
         set_free(tmp);
         declared_entities =gen_nconc(declared_entities, statement_to_declarations(s));
+        /* look for entity to ignore in pragma */
+        list pragmas = extensions_extension(statement_extensions(s));
+        FOREACH(EXTENSION,ext,pragmas) {
+            if(pragma_string_p(extension_pragma(ext))) {
+                string str = pragma_string(extension_pragma(ext));
+                if(strstr(str,OUTLINE_IGNORE)) {
+                    str+=sizeof(OUTLINE_IGNORE);
+                    entity ep= FindEntity(TOP_LEVEL_MODULE_NAME,str);
+                    skip_list=CONS(ENTITY,ep,skip_list);
+                }
+            }
+        }
     }
     /* set to list */
     referenced_entities=set_to_list(sreferenced_entities);
@@ -915,6 +928,8 @@ statement outliner(string outline_module_name, list statements_to_outline)
     /* get the relative complements and create the parameter list*/
     gen_list_and_not(&referenced_entities,declared_entities);
     gen_free_list(declared_entities);
+    gen_list_and_not(&referenced_entities,skip_list);
+    gen_free_list(skip_list);
 
     /* purge the functions from the parameter list, we assume they are declared externally */
     list tmp_list=NIL;
@@ -922,7 +937,7 @@ statement outliner(string outline_module_name, list statements_to_outline)
         if( ! entity_function_p(e) ) tmp_list=CONS(ENTITY,e,tmp_list);
     referenced_entities=tmp_list;
 
-    gen_sort_list(referenced_entities,compare_entities);
+    gen_sort_list(referenced_entities,(int(*)(const void*,const void*))compare_entities);
 
 
     intptr_t i=0;
@@ -1076,6 +1091,8 @@ outline(char* module_name)
         else  {
             string stmt_label=get_string_property("OUTLINE_LABEL");
             entity stmt_label_entity = find_label_entity(module_name,stmt_label);
+            if(entity_undefined_p(stmt_label_entity))
+                pips_user_error("label %s not found\n", stmt_label);
             statements_to_outline = find_statements_with_label(get_current_module_statement(),stmt_label_entity);
         }
     }

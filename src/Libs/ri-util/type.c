@@ -3101,9 +3101,9 @@ bool check_C_function_type(entity f, list args)
 /* Number of steps to access the lowest leave of type t.  Number of
  dimensions for an array. One for a struct or an union field, plus its
  dimension. */
-int type_depth(type t)
+size_t type_depth(type t)
 {
-  int d = 0;
+  size_t d = 0;
 
   if(type_variable_p(t)) {
     variable v = type_variable(t);
@@ -3118,7 +3118,7 @@ int type_depth(type t)
     list fl = type_struct(t);
     d = 0;
     MAP(ENTITY, e, {
-	int i = type_depth(entity_type(e));
+	size_t i = type_depth(entity_type(e));
 	d = d>i?d:i;
       }, fl);
     d++;

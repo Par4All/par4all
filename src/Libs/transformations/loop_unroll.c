@@ -273,8 +273,9 @@ void do_loop_unroll(statement loop_statement, int rate, void (*statement_post_pr
 
         label_entity = make_new_label(get_current_module_name());
         stmt = make_continue_statement(label_entity);
-        body = make_block_statement(CONS(STATEMENT, body,
-                    CONS(STATEMENT, stmt, NIL)));
+        body = make_block_statement(
+                make_statement_list(body,stmt)
+                );
         if(get_debug_level()>=9) {
             pips_assert("loop_unroll", statement_consistent_p(body));
         }

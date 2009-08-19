@@ -291,9 +291,7 @@ bool coarse_grain_parallelization_main(string module_name,
 
        Well, indeed even this does not work. So this phase change the code
        resource... */
-    module_stat = db_get_memory_resource(DBR_CODE,
-					 module_name,
-					 TRUE);
+    module_stat = (statement)db_get_memory_resource(DBR_CODE, module_name, TRUE);
 
     set_current_module_statement(module_stat);
     module = module_name_to_entity(module_name);

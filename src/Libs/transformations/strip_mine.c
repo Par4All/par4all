@@ -161,7 +161,7 @@ statement loop_strip_mine(statement loop_statement, int chunk_size, int chunk_nu
    here. Did the author want to be able to apply
    loop_chunk_size_and_strip_mine() several times on different loops
    with different strip mining parameters? */
-statement loop_chunk_size_and_strip_mine(list lls,bool (*unused)(loop))
+statement loop_chunk_size_and_strip_mine(list lls,__attribute__((unused)) bool (*unused)(loop))
 {
 
     string resp;

@@ -51,7 +51,7 @@
  * #2' flag the kernel with a pragma
  * #3 call index set splitting on this loop to get a first loop with range_count multiple of KERNEL_NBNODES
  * #4 perform strip mining on this loop to make the kernel appear
- * #5 supress the generated loop and replace its index by the appropriate call to KERNEL_ID()
+ * #5 supress the generated loop and replace its index by the appropriate call to KERNEL_ID
  * 
  * @param s statement where the kernel can be found
  * @param loop_label label of the loop to be turned into a kernel
@@ -111,7 +111,7 @@ bool do_kernelize(statement s, entity loop_label)
 
         entity kernel_id = FindEntity(TOP_LEVEL_MODULE_NAME,"KERNEL_ID");
         if(entity_undefined_p(kernel_id))
-            pips_user_error("you should define a 'KERNEL_ID' function\n");
+            pips_user_error("KERNEL_ID not defined !\n");
 
         instruction assign = make_assign_instruction(make_expression_from_entity(outermost_loop_index),
                 MakeBinaryCall(entity_intrinsic(c_module_p(get_current_module_entity())?PLUS_C_OPERATOR_NAME:PLUS_OPERATOR_NAME),
@@ -120,8 +120,8 @@ bool do_kernelize(statement s, entity loop_label)
                 );
         statement_instruction(replaced_loop) = 
             make_instruction_block(
-                    CONS(STATEMENT,make_stmt_of_instr(assign),
-                        CONS(STATEMENT,loop_body(instruction_loop(erased_instruction)),NIL)));
+                    make_statement_list(make_stmt_of_instr(assign),loop_body(instruction_loop(erased_instruction)))
+                    );
 
         /* as the newgen free is recursive, we use a trick to prevent the recursion */
         loop_body(instruction_loop(erased_instruction)) = make_continue_statement(entity_empty_label());
@@ -129,7 +129,10 @@ bool do_kernelize(statement s, entity loop_label)
 
         /* flag the remaining loop to be proceed next*/
         extensions se = statement_extensions(s);
-        extensions_extension(se)=CONS(EXTENSION,make_extension(make_pragma_string(strdup(OUTLINE_PRAGMA))),extensions_extension(se));
+        extensions_extension(se)=
+            CONS(EXTENSION,make_extension(make_pragma_string(strdup(concatenate(OUTLINE_IGNORE," ",entity_user_name(kernel_id))))),
+                CONS(EXTENSION,make_extension(make_pragma_string(strdup(OUTLINE_PRAGMA))),extensions_extension(se))
+            );
 
         /* job done */
         gen_recurse_stop(NULL);
@@ -173,6 +176,105 @@ bool kernelize(char * module_name)
     return true;
 }
 
+static
+bool cannot_terapixify(gen_chunk * elem, bool *can_terapixify)
+{
+    pips_user_warning("found invalid construct of type %d\n",elem->i);
+    return *can_terapixify=false;
+}
+
+static 
+bool can_terapixify_call_p(call c, bool *can_terapixify)
+{
+    if( !value_intrinsic_p(entity_initial(call_function((c)))) && ! call_constant_p(c) )
+    {
+        pips_user_warning("found invalid call to %s\n",entity_user_name(call_function(c)));
+        return *can_terapixify=false;
+    }
+    return true;
+}
+
+struct entity_bool { entity e; bool b; };
+
+static
+void entity_used_in_reference_walker(reference r, struct entity_bool *eb)
+{
+    if(same_entity_p(reference_variable(r),eb->e)) eb->b=true;
+}
+
+static
+void entity_used_in_loop_bound_walker(loop l, struct entity_bool *eb)
+{
+    gen_context_recurse(loop_range(l),eb,reference_domain,gen_true,entity_used_in_reference_walker);
+}
+
+static
+bool  entity_used_in_loop_bound_p(entity e)
+{
+    struct entity_bool eb = { e, false };
+    gen_context_recurse(get_current_module_statement(),&eb,loop_domain,gen_true,entity_used_in_loop_bound_walker);
+    return eb.b;
+}
+
+bool normalize_microcode( char * module_name)
+{
+    bool can_terapixify =true;
+    /* prelude */
+    set_current_module_entity(module_name_to_entity( module_name ));
+    set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, module_name, TRUE) );
+    set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS,module_name,TRUE));
+
+    /* checks */
+
+    /* make sure 
+     * - only do loops remain
+     * - no call to external functions
+     */
+    gen_context_multi_recurse(get_current_module_statement(),&can_terapixify,
+            whileloop_domain,cannot_terapixify,gen_null,
+            forloop_domain,cannot_terapixify,gen_null,
+            call_domain,can_terapixify_call_p,gen_null,
+            NULL);
+
+    /* now, try to guess the goal of the parameters 
+     * - read-only arrays might be mask, but can also be images (depend of their size ?)
+     * - written arrays must be images
+     * - integer are loop parameters
+     * - others are not allowded
+     */
+    FOREACH(ENTITY,e,code_declarations(value_code(entity_initial(get_current_module_entity()))))
+    {
+        if(formal_parameter_p(e))
+        {
+            variable v = type_variable(entity_type(e));
+            if( !ENDP(variable_dimensions(v)) ) /* it's an array */
+            {
+                bool parameter_written = find_write_effect_on_entity(get_current_module_statement(),e);
+                if( parameter_written ) /* it's an image */
+                {
+                }
+                else /* cannot tell if it's a kernel or an image*/
+                {
+                }
+            }
+            else if( entity_used_in_loop_bound_p(e) ) 
+            {
+            }
+            else {
+                pips_user_warning("parameter %s is not valid\n",entity_user_name(e));
+                can_terapixify=false;
+            }
+
+        }
+    }
+
+
+    /*postlude*/
+    reset_current_module_entity();
+    reset_current_module_statement();
+    reset_cumulated_rw_effects();
+    return can_terapixify;
+}
 
 /** 
  * have a look to the pipsmake-rc description
@@ -182,10 +284,9 @@ bool kernelize(char * module_name)
  * 
  * @return true
  */
-bool terapixify(char * module_name)
+bool terapixify(__attribute__((unused)) char * module_name)
 {
-    /* everything is done by pispmake */
-    return true;
+    return true; /* everything is done in pipsmake-rc */
 }
 
 /** 
@@ -304,7 +405,8 @@ bool expression_array_to_pointer(expression exp)
             else {
                 new_syntax = make_syntax_call(
                         make_call(CreateIntrinsic(PLUS_C_OPERATOR_NAME),
-                            CONS(EXPRESSION,base_ref,CONS(EXPRESSION,address_computation,NIL))));
+                            make_expression_list(base_ref,address_computation))
+                        );
             }
 
             /* free stuffs */
@@ -325,16 +427,17 @@ bool expression_array_to_pointer(expression exp)
         pips_assert("non empty subscript",!ENDP(subscript_indices(s)));
         call c = make_call(
                 CreateIntrinsic(PLUS_C_OPERATOR_NAME),
-                CONS(EXPRESSION,copy_expression(subscript_array(s)),
-                    CONS(EXPRESSION,EXPRESSION(CAR(subscript_indices(s))),NIL)));
+                make_expression_list(
+                    copy_expression(subscript_array(s)),
+                    EXPRESSION(CAR(subscript_indices(s)))
+                    ));
         list indices = subscript_indices(s);
         POP(indices);
         FOREACH(EXPRESSION,e,indices)
         {
             c = make_call(
                     CreateIntrinsic(PLUS_OPERATOR_NAME),
-                    CONS(EXPRESSION,call_to_expression(c),
-                        CONS(EXPRESSION,e,NIL)));
+                    make_expression_list(call_to_expression(c),e));
         }
         unnormalize_expression(exp);
         gen_free_list(subscript_indices(s));

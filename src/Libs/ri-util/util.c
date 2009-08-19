@@ -196,7 +196,8 @@ string module_name, label_local_name;
 			      LABEL_PREFIX, label_local_name, NULL);
 
     debug(5, "find_label_entity", "searched entity: %s\n", full);
-    return (entity) gen_find_tabulated(full, entity_domain);
+    void * found = gen_find_tabulated(full, entity_domain);
+    return (entity) (gen_chunk_undefined_p(found) ? entity_undefined : found);
 }
 
 string 

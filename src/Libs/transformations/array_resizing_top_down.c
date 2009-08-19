@@ -527,7 +527,7 @@ bool expression_equal_in_context_p(expression e1, expression e2, transformer con
 }
   
 bool same_dimension_p(entity actual_array, entity dummy_array, 
-		      list l_actual_ref, int i, transformer context)
+		      list l_actual_ref, size_t i, transformer context)
 {
   /* This function returns TRUE if the actual array and the dummy array
    * have the same dimension number i, with respect to the current context 

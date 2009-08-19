@@ -125,15 +125,7 @@ index_set_split_loop(statement original_loop, entity new_loop_bound)
                             index_set_split_before_bound?
                             MINUS_OPERATOR_NAME:
                             PLUS_OPERATOR_NAME),
-                        CONS(
-                            EXPRESSION,
-                            make_expression_from_entity(new_loop_bound),
-                            CONS(
-                                EXPRESSION,
-                                copy_expression(increment),
-                                NIL
-                                )
-                            )
+                        make_expression_list(make_expression_from_entity(new_loop_bound),copy_expression(increment))
                         )
                     ),
                 normalized_undefined
@@ -155,7 +147,7 @@ index_set_split_loop(statement original_loop, entity new_loop_bound)
 
     /* put loops together */
     instruction new_instruction = make_instruction_sequence(
-            make_sequence(CONS(STATEMENT,first_loop_statement, CONS(STATEMENT,second_loop_statement,NIL)))
+            make_sequence(make_statement_list(first_loop_statement,second_loop_statement))
             );
     statement_label(original_loop)=entity_empty_label();
     statement_number(original_loop)=STATEMENT_NUMBER_UNDEFINED;
