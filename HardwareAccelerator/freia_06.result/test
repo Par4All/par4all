@@ -71,7 +71,7 @@ digraph "freia_06_helper_0_0" {
   "i1" [shape=circle];
 
   // outputs
-  "0`t1" [shape=circle];
+  "t1" [shape=circle];
 
   // computation vertices
   "13 *" [shape=trapezium,orientation=270];
@@ -86,7 +86,7 @@ digraph "freia_06_helper_0_1" {
   "i1" [shape=circle];
 
   // outputs
-  "0`t2" [shape=circle];
+  "t2" [shape=circle];
 
   // computation vertices
   "14 &" [shape=trapezium,orientation=270];
@@ -97,8 +97,8 @@ digraph "freia_06_helper_0_1" {
 // graph for dag "freia_06_helper_0_2" of module "freia_06" in dot format
 digraph "freia_06_helper_0_2" {
   // inputs
-  "0`t1" [shape=circle];
-  "0`t2" [shape=circle];
+  "t1" [shape=circle];
+  "t2" [shape=circle];
 
   // outputs
   "o" [shape=circle];

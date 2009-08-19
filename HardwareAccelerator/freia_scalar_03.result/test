@@ -64,7 +64,7 @@ digraph "freia_scalar_03_helper_0_0" {
   "i1" [shape=circle];
 
   // outputs
-  "0`tmp" [shape=circle];
+  "tmp" [shape=circle];
 
   // computation vertices
   "10 max" [shape=diamond];
@@ -77,7 +77,7 @@ digraph "freia_scalar_03_helper_0_0" {
 // graph for dag "freia_scalar_03_helper_0_1" of module "freia_scalar_03" in dot format
 digraph "freia_scalar_03_helper_0_1" {
   // inputs
-  "0`tmp" [shape=circle];
+  "tmp" [shape=circle];
 
   // outputs
   "o" [shape=circle];

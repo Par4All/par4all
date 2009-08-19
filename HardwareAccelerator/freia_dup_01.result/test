@@ -23,7 +23,7 @@ digraph "dag_0" {
   "i1" [shape=circle];
 
   // outputs
-  "0`t" [shape=circle];
+  "t" [shape=circle];
   "o" [shape=circle];
 
   // computation vertices
@@ -43,7 +43,7 @@ digraph "dag_cleaned_0" {
   "i1" [shape=circle];
 
   // outputs
-  "0`t" [shape=circle];
+  "t" [shape=circle];
   "o" [shape=circle];
 
   // computation vertices
@@ -63,7 +63,7 @@ digraph "freia_dup_01_helper_0_0" {
   "i1" [shape=circle];
 
   // outputs
-  "0`t" [shape=circle];
+  "t" [shape=circle];
 
   // computation vertices
   "8 +" [shape=trapezium,orientation=270];

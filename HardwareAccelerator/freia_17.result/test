@@ -44,9 +44,9 @@ digraph "dag_0" {
   "i" [shape=circle];
 
   // outputs
-  "0`t3" [shape=circle];
-  "0`t4" [shape=circle];
-  "0`t5" [shape=circle];
+  "t3" [shape=circle];
+  "t4" [shape=circle];
+  "t5" [shape=circle];
   "o" [shape=circle];
 
   // computation vertices
@@ -75,9 +75,9 @@ digraph "dag_cleaned_0" {
   "i" [shape=circle];
 
   // outputs
-  "0`t3" [shape=circle];
-  "0`t4" [shape=circle];
-  "0`t5" [shape=circle];
+  "t3" [shape=circle];
+  "t4" [shape=circle];
+  "t5" [shape=circle];
   "o" [shape=circle];
 
   // computation vertices
@@ -100,7 +100,7 @@ digraph "freia_17_helper_0_0" {
   "i" [shape=circle];
 
   // outputs
-  "0`t3" [shape=circle];
+  "t3" [shape=circle];
   "o" [shape=circle];
 
   // computation vertices
@@ -117,8 +117,8 @@ digraph "freia_17_helper_0_1" {
   "i" [shape=circle];
 
   // outputs
-  "0`t4" [shape=circle];
-  "0`t5" [shape=circle];
+  "t4" [shape=circle];
+  "t5" [shape=circle];
 
   // computation vertices
   "27 =" [shape=circle];
