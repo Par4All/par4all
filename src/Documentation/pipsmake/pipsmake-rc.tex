@@ -6612,6 +6612,8 @@ Section~\ref{subsubsection-shared-memory-emulation})
 \index{Atomization}
 \index{Three Address Code}
 \index{ATOMIZE\_INDIRECT\_REF\_ONLY}
+\index{Common subexpression elimination}
+\index{CSE}
 
 This transformation only atomizes indirect references of array access
 functions.
@@ -6700,10 +6702,15 @@ old_reductions                      > MODULE.code
 \end{PipsMake}
 
 \subsection{Forward Substitution}
+\index{Common subexpression elimination}
+\index(CSE)
+\index{Forward substitution}
+\index{Invariant code motion}
 
-Scalars can be forward substitute. The effect is to undo already performed
-optimizations such as invariant code motion and common subexpressions, or
-manual atomization. However we hope to do a better job automatically!
+Scalars can be forward substituted. The effect is to undo already
+performed optimizations such as invariant code motion and common
+subexpression elimination, or manual atomization. However we hope to
+do a better job automatically!
 
 \begin{PipsMake}
 alias forward_substitute 'Forward Substitution'
@@ -6718,9 +6725,15 @@ forward_substitute      > MODULE.code
 \subsection{Expression Substitution}
 
 %%@UserManualDocumentation: expression_substitution
-This transformation is quickly developped to fullfill the need of a simple pattern matcher in pips.
-The user provide a module name through \verb|EXPRESSION_SUBSTITUTION_PATTERN| property and all expression similar to those contained in \verb|EXPRESSION_SUBSTITUTION_PATTERN| will be substituted to a call to this module.
-It is  a kind of simple outlining transformations, it proves to be usefull during simdization to recognize some idioms. Note that the pattern must contain only a single return instruction !
+This transformation is quickly developped to fullfill the need of a
+simple pattern matcher in pips.  The user provide a module name
+through \verb|EXPRESSION_SUBSTITUTION_PATTERN| property and all
+expression similar to those contained in
+\verb|EXPRESSION_SUBSTITUTION_PATTERN| will be substituted to a call
+to this module. It is a kind of simple outlining transformations, it
+proves to be usefull during simdization to recognize some idioms. Note
+that the pattern must contain only a single return instruction!
+
 This phase was developped by Serge \textsc{Guelton} during his PhD.
 %%!UserManualDocumentation
 
@@ -6771,6 +6784,9 @@ ARRAY_TO_POINTER_FLATTEN_ONLY FALSE
 
 \subsection{Expression Optimizations}
 \label{subsection-expression-optimizations}
+\index{Common subexpression elimination}
+\index{CSE}
+\index{Invariant code motion}
 \index{Optimization}
 \index{EOLE}
 \index{EOLE\_FLAGS}
