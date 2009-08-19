@@ -1,0 +1,124 @@
+
+Source code with proper effects
+
+int call12(void)
+{
+//               <must be read   >: TOP-LEVEL:j
+//               <must be written>: TOP-LEVEL:j
+   j++;                                                                 /*0004*/
+//               <must be read   >: TOP-LEVEL:j
+
+   return j;                                                            /*0006*/
+}
+
+Source code with cumulated effects
+
+//               <must be read   >: TOP-LEVEL:j
+//               <must be written>: TOP-LEVEL:j
+int call12(void)
+{
+//               <must be read   >: TOP-LEVEL:j
+//               <must be written>: TOP-LEVEL:j
+   j++;                                                                 /*0004*/
+//               <must be read   >: TOP-LEVEL:j
+
+   return j;                                                            /*0006*/
+}
+
+Source code with transformers for "call12"
+
+
+//  T(TOP-LEVEL:j,call12) {TOP-LEVEL:j==call12, TOP-LEVEL:j==j#init+1}
+
+int call12(void)
+{
+
+//  T(TOP-LEVEL:j) {TOP-LEVEL:j==j#init+1}
+
+   j++;                                                                 /*0004*/
+
+//  T(call12) {TOP-LEVEL:j==call12}
+
+
+   return j;                                                            /*0006*/
+}
+
+Source code with transformers for "main"
+
+
+//  T(TOP-LEVEL:j) {TOP-LEVEL:j==j#init+2}
+
+main()
+{
+   int ai = 3;
+
+//  T(TOP-LEVEL:j,ai) {TOP-LEVEL:j==ai, TOP-LEVEL:j==j#init+1}
+
+
+   ai = call12();                                                       /*0016*/
+
+//  T(TOP-LEVEL:j,ai) {TOP-LEVEL:j==ai, TOP-LEVEL:j==j#init+1}
+
+
+   ai = call12();                                                       /*0018*/
+
+//  T(ai) {ai==0}
+
+
+   ai = 0;                                                              /*0020*/
+}
+
+Source code with preconditions for "call12"
+
+
+//  P() {0<=TOP-LEVEL:j, TOP-LEVEL:j<=1}
+
+int call12(void)
+{
+
+//  P() {0<=TOP-LEVEL:j, TOP-LEVEL:j<=1}
+
+   j++;                                                                 /*0004*/
+
+//  P(TOP-LEVEL:j) {TOP-LEVEL:j==j#init+1, 1<=TOP-LEVEL:j,
+//    TOP-LEVEL:j<=2}
+
+
+   return j;                                                            /*0006*/
+}
+
+Source code with preconditions for "main"
+
+
+//  P() {TOP-LEVEL:j==0}
+
+main()
+{
+   int ai = 3;
+
+//  P() {TOP-LEVEL:j==0, ai==3}
+
+
+   ai = call12();                                                       /*0016*/
+
+//  P(TOP-LEVEL:j,ai) {TOP-LEVEL:j==1, ai==1, j#init==0}
+
+
+   ai = call12();                                                       /*0018*/
+
+//  P(TOP-LEVEL:j,ai) {TOP-LEVEL:j==2, ai==2, j#init==0}
+
+
+   ai = 0;                                                              /*0020*/
+}
+
+Warnings
+
+INITIAL_PRECONDITION[call12] (add_or_kill_equivalenced_variables) storage return
+TRANSFORMERS_INTER_FULL[call12] (add_or_kill_equivalenced_variables) storage return
+PRINT_CODE_TRANSFORMERS[call12] (add_or_kill_equivalenced_variables) storage return
+unknown[unknown] (activate) Rule `PRINT_CODE_TRANSFORMERS' already active
+PRECONDITIONS_INTER_FULL[call12] (add_or_kill_equivalenced_variables) storage return
+PRINT_CODE_PRECONDITIONS[call12] (add_or_kill_equivalenced_variables) storage return
+unknown[unknown] (activate) Rule `PRINT_CODE_PRECONDITIONS' already active
+INTERPROCEDURAL_SUMMARY_PRECONDITION[call12!] (ordinary_summary_precondition) empty precondition to call12! because not in call tree from main.

@@ -30,5 +30,6 @@
       integer i
       common /init/ i1, i2, i3, i4, i5
       data i5 /5/
-      BOO = i+i5
+      boo = i+i5
+      boo = boo + 1
       end
