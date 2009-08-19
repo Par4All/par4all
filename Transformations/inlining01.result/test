@@ -23,7 +23,6 @@ int main(int argc, char **argv)
       ;
    else
       printf("%d\n", (2>argc?2:argc));
-
    return d;
 }
 

@@ -4,8 +4,8 @@ Code after scalarization
 int scalarization15(int n)
 {
    // BEGIN BLOCK
-   int __ld__1;
-   int __ld__0;
+   int __scalar__1;
+   int __scalar__0;
    int x[100];
    int y[100][100];
    int t[100];
@@ -14,11 +14,11 @@ int scalarization15(int n)
 
    for(i = 0; i <= 99; i += 1) {
       // BEGIN BLOCK
-      __ld__0 = i;
+      __scalar__0 = i;
       for(j = 0; j <= 99; j += 1) {
          // BEGIN BLOCK
-         __ld__1 = __ld__0;
-         y[i][j] = __ld__0+j;
+         __scalar__1 = __scalar__0;
+         y[i][j] = __scalar__0+j;
          // END BLOCK
       }
       // END BLOCK
