@@ -31,13 +31,13 @@ digraph "dag_0" {
   "11 +" -> "o";
   "10 -" [shape=trapezium,orientation=270];
   "10 -" -> "11 +";
-  "io" -> "10 -";
   "10 -" -> "io";
   "9 ^" [shape=trapezium,orientation=270];
   "9 ^" -> "11 +";
   "9 ^" -> "10 -";
-  "io" -> "9 ^";
   "i1" -> "9 ^";
+  "io" -> "10 -";
+  "io" -> "9 ^";
 }
 // graph for dag "dag_cleaned_0" of module "freia_23" in dot format
 digraph "dag_cleaned_0" {
@@ -54,13 +54,13 @@ digraph "dag_cleaned_0" {
   "11 +" -> "o";
   "10 -" [shape=trapezium,orientation=270];
   "10 -" -> "11 +";
-  "io" -> "10 -";
   "10 -" -> "io";
   "9 ^" [shape=trapezium,orientation=270];
   "9 ^" -> "11 +";
   "9 ^" -> "10 -";
-  "io" -> "9 ^";
   "i1" -> "9 ^";
+  "io" -> "10 -";
+  "io" -> "9 ^";
 }
 // graph for dag "freia_23_helper_0_0" of module "freia_23" in dot format
 digraph "freia_23_helper_0_0" {
@@ -77,13 +77,13 @@ digraph "freia_23_helper_0_0" {
   "11 +" -> "o";
   "10 -" [shape=trapezium,orientation=270];
   "10 -" -> "11 +";
-  "io" -> "10 -";
   "10 -" -> "io";
   "9 ^" [shape=trapezium,orientation=270];
   "9 ^" -> "11 +";
   "9 ^" -> "10 -";
-  "io" -> "9 ^";
   "i1" -> "9 ^";
+  "io" -> "10 -";
+  "io" -> "9 ^";
 }
 
 ! acceleration function

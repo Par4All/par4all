@@ -18,8 +18,8 @@ digraph "dag_0" {
 
   // computation vertices
   "5 D6" [shape=box];
-  "i0" -> "5 D6";
   "5 D6" -> "o";
+  "i0" -> "5 D6";
 }
 // graph for dag "dag_cleaned_0" of module "my_dilate_6c" in dot format
 digraph "dag_cleaned_0" {
@@ -31,8 +31,8 @@ digraph "dag_cleaned_0" {
 
   // computation vertices
   "5 D6" [shape=box];
-  "i0" -> "5 D6";
   "5 D6" -> "o";
+  "i0" -> "5 D6";
 }
 // graph for dag "my_dilate_6c_helper_0_0" of module "my_dilate_6c" in dot format
 digraph "my_dilate_6c_helper_0_0" {
@@ -44,8 +44,8 @@ digraph "my_dilate_6c_helper_0_0" {
 
   // computation vertices
   "5 D6" [shape=box];
-  "i0" -> "5 D6";
   "5 D6" -> "o";
+  "i0" -> "5 D6";
 }
 
 ! acceleration function

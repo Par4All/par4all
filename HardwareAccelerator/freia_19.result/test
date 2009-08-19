@@ -43,8 +43,8 @@ digraph "dag_cleaned_0" {
 
   // computation vertices
   "12 =" [shape=circle];
-  "i" -> "12 =";
   "12 =" -> "o";
+  "i" -> "12 =";
 }
 // graph for dag "freia_19_helper_0_0" of module "freia_19" in dot format
 digraph "freia_19_helper_0_0" {
@@ -56,8 +56,8 @@ digraph "freia_19_helper_0_0" {
 
   // computation vertices
   "12 =" [shape=circle];
-  "i" -> "12 =";
   "12 =" -> "o";
+  "i" -> "12 =";
 }
 
 ! acceleration function

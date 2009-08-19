@@ -24,12 +24,12 @@ digraph "dag_0" {
 
   // computation vertices
   "8 -" [shape=trapezium,orientation=270];
-  "i0" -> "8 -";
   "8 -" -> "o";
   "7 +s" [shape=trapezium,orientation=270];
   "7 +s" -> "8 -";
-  "i0" -> "7 +s";
   "i1" -> "7 +s";
+  "i0" -> "8 -";
+  "i0" -> "7 +s";
 }
 // graph for dag "dag_cleaned_0" of module "freia_ret_00" in dot format
 digraph "dag_cleaned_0" {
@@ -42,12 +42,12 @@ digraph "dag_cleaned_0" {
 
   // computation vertices
   "8 -" [shape=trapezium,orientation=270];
-  "i0" -> "8 -";
   "8 -" -> "o";
   "7 +s" [shape=trapezium,orientation=270];
   "7 +s" -> "8 -";
-  "i0" -> "7 +s";
   "i1" -> "7 +s";
+  "i0" -> "8 -";
+  "i0" -> "7 +s";
 }
 // graph for dag "freia_ret_00_helper_0_0" of module "freia_ret_00" in dot format
 digraph "freia_ret_00_helper_0_0" {
@@ -60,12 +60,12 @@ digraph "freia_ret_00_helper_0_0" {
 
   // computation vertices
   "8 -" [shape=trapezium,orientation=270];
-  "i0" -> "8 -";
   "8 -" -> "o";
   "7 +s" [shape=trapezium,orientation=270];
   "7 +s" -> "8 -";
-  "i0" -> "7 +s";
   "i1" -> "7 +s";
+  "i0" -> "8 -";
+  "i0" -> "7 +s";
 }
 
 ! acceleration function

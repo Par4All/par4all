@@ -19,9 +19,9 @@ digraph "dag_0" {
 
   // computation vertices
   "5 /" [shape=trapezium,orientation=270];
-  "i0" -> "5 /";
-  "i1" -> "5 /";
   "5 /" -> "o";
+  "i1" -> "5 /";
+  "i0" -> "5 /";
 }
 // graph for dag "dag_cleaned_0" of module "my_div" in dot format
 digraph "dag_cleaned_0" {
@@ -34,9 +34,9 @@ digraph "dag_cleaned_0" {
 
   // computation vertices
   "5 /" [shape=trapezium,orientation=270];
-  "i0" -> "5 /";
-  "i1" -> "5 /";
   "5 /" -> "o";
+  "i1" -> "5 /";
+  "i0" -> "5 /";
 }
 // graph for dag "my_div_helper_0_0" of module "my_div" in dot format
 digraph "my_div_helper_0_0" {
@@ -49,9 +49,9 @@ digraph "my_div_helper_0_0" {
 
   // computation vertices
   "5 /" [shape=trapezium,orientation=270];
-  "i0" -> "5 /";
-  "i1" -> "5 /";
   "5 /" -> "o";
+  "i1" -> "5 /";
+  "i0" -> "5 /";
 }
 
 ! acceleration function

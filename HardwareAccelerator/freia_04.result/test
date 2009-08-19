@@ -61,10 +61,10 @@ digraph "dag_0" {
   "26 -" -> "27 thr";
   "25 D6" [shape=box];
   "25 D6" -> "26 -";
-  "i" -> "25 D6";
   "24 E8" [shape=box];
   "24 E8" -> "28 thr";
   "24 E8" -> "26 -";
+  "i" -> "25 D6";
   "i" -> "24 E8";
 }
 // graph for dag "dag_cleaned_0" of module "freia_04" in dot format
@@ -90,10 +90,10 @@ digraph "dag_cleaned_0" {
   "26 -" -> "27 thr";
   "25 D6" [shape=box];
   "25 D6" -> "26 -";
-  "i" -> "25 D6";
   "24 E8" [shape=box];
   "24 E8" -> "28 thr";
   "24 E8" -> "26 -";
+  "i" -> "25 D6";
   "i" -> "24 E8";
 }
 // graph for dag "freia_04_helper_0_0" of module "freia_04" in dot format
@@ -119,10 +119,10 @@ digraph "freia_04_helper_0_0" {
   "26 -" -> "27 thr";
   "25 D6" [shape=box];
   "25 D6" -> "26 -";
-  "i" -> "25 D6";
   "24 E8" [shape=box];
   "24 E8" -> "28 thr";
   "24 E8" -> "26 -";
+  "i" -> "25 D6";
   "i" -> "24 E8";
 }
 

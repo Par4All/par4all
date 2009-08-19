@@ -39,8 +39,8 @@ digraph "dag_0" {
   "13 +" [shape=trapezium,orientation=270];
   "13 +" -> "15 E8";
   "13 +" -> "14 max";
-  "i0" -> "13 +";
   "i1" -> "13 +";
+  "i0" -> "13 +";
 }
 // graph for dag "dag_cleaned_0" of module "freia_scalar_04" in dot format
 digraph "dag_cleaned_0" {
@@ -61,8 +61,8 @@ digraph "dag_cleaned_0" {
   "13 +" [shape=trapezium,orientation=270];
   "13 +" -> "15 E8";
   "13 +" -> "14 max";
-  "i0" -> "13 +";
   "i1" -> "13 +";
+  "i0" -> "13 +";
 }
 // graph for dag "freia_scalar_04_helper_0_0" of module "freia_scalar_04" in dot format
 digraph "freia_scalar_04_helper_0_0" {
@@ -80,8 +80,8 @@ digraph "freia_scalar_04_helper_0_0" {
   "13 +" [shape=trapezium,orientation=270];
   "13 +" -> "15 E8";
   "13 +" -> "14 max";
-  "i0" -> "13 +";
   "i1" -> "13 +";
+  "i0" -> "13 +";
 }
 // graph for dag "freia_scalar_04_helper_0_1" of module "freia_scalar_04" in dot format
 digraph "freia_scalar_04_helper_0_1" {
@@ -93,8 +93,8 @@ digraph "freia_scalar_04_helper_0_1" {
 
   // computation vertices
   "16 thr" [shape=parallelogram];
-  "t2" -> "16 thr";
   "16 thr" -> "o";
+  "t2" -> "16 thr";
 }
 
 ! acceleration function

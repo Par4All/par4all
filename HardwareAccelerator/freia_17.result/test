@@ -44,10 +44,10 @@ digraph "dag_0" {
   "i" [shape=circle];
 
   // outputs
+  "o" [shape=circle];
   "t3" [shape=circle];
   "t4" [shape=circle];
   "t5" [shape=circle];
-  "o" [shape=circle];
 
   // computation vertices
   "27 =" [shape=circle];
@@ -75,24 +75,24 @@ digraph "dag_cleaned_0" {
   "i" [shape=circle];
 
   // outputs
+  "o" [shape=circle];
   "t3" [shape=circle];
   "t4" [shape=circle];
   "t5" [shape=circle];
-  "o" [shape=circle];
 
   // computation vertices
   "27 =" [shape=circle];
-  "i" -> "27 =";
   "27 =" -> "t5";
   "26 =" [shape=circle];
-  "i" -> "26 =";
   "26 =" -> "t4";
   "25 =" [shape=circle];
-  "i" -> "25 =";
   "25 =" -> "t3";
   "24 =" [shape=circle];
-  "i" -> "24 =";
   "24 =" -> "o";
+  "i" -> "26 =";
+  "i" -> "24 =";
+  "i" -> "27 =";
+  "i" -> "25 =";
 }
 // graph for dag "freia_17_helper_0_0" of module "freia_17" in dot format
 digraph "freia_17_helper_0_0" {
@@ -100,16 +100,16 @@ digraph "freia_17_helper_0_0" {
   "i" [shape=circle];
 
   // outputs
-  "t3" [shape=circle];
   "o" [shape=circle];
+  "t3" [shape=circle];
 
   // computation vertices
   "25 =" [shape=circle];
-  "i" -> "25 =";
   "25 =" -> "t3";
   "24 =" [shape=circle];
-  "i" -> "24 =";
   "24 =" -> "o";
+  "i" -> "25 =";
+  "i" -> "24 =";
 }
 // graph for dag "freia_17_helper_0_1" of module "freia_17" in dot format
 digraph "freia_17_helper_0_1" {
@@ -122,11 +122,11 @@ digraph "freia_17_helper_0_1" {
 
   // computation vertices
   "27 =" [shape=circle];
-  "i" -> "27 =";
   "27 =" -> "t5";
   "26 =" [shape=circle];
-  "i" -> "26 =";
   "26 =" -> "t4";
+  "i" -> "27 =";
+  "i" -> "26 =";
 }
 
 ! acceleration function
@@ -161,11 +161,11 @@ freia_status freia_17_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_d
   // nope
 
 
-  // output image 0`t3 on 1 and image o on 0
-  // 0`t3 [0 input 1] -> [0 output 1] 0 null
-  si.mux[0][3].op = SPOC_MUX_IN1;
+  // output image o on 0 and image 0`t3 on 1
   // o [0 input 0] -> [0 output 0] 0 null
   si.mux[0][0].op = SPOC_MUX_IN0;
+  // 0`t3 [0 input 1] -> [0 output 1] 0 null
+  si.mux[0][3].op = SPOC_MUX_IN1;
 
   mcode.raw = (freia_ptr) &si;
   mcode.size = sizeof(spoc_instr);
@@ -180,7 +180,7 @@ freia_status freia_17_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_d
   ret |= freia_cg_write_dynamic_param(&dynparam);
 
   // actual call of spoc hardware
-  freia_cg_template_process_2i_2o(op, param, o1, o0, i0, NULL);
+  freia_cg_template_process_2i_2o(op, param, o0, o1, i0, NULL);
 
   return ret;
 }
@@ -251,7 +251,7 @@ freia_status freia_17(freia_data2d *o, freia_data2d *i)
    // t3 = t1
    // t4 = t0
    // t5 = o
-   freia_17_helper_0_0_0(t3, o, i);                                     /*0024*/
+   freia_17_helper_0_0_0(o, t3, i);                                     /*0024*/
    freia_17_helper_0_1_0(t4, t5, i);                                    /*0026*/
 
    freia_common_destruct_data(t3);                                      /*0032*/

@@ -25,17 +25,17 @@ digraph "dag_0" {
 
   // computation vertices
   "11 vol" [shape=diamond];
-  "i" -> "11 vol";
   "10 max" [shape=diamond];
-  "i" -> "10 max";
   "9 min" [shape=diamond];
-  "i" -> "9 min";
   "8 E6" [shape=box];
-  "i" -> "8 E6";
   "8 E6" -> "o1";
   "7 +." [shape=trapezium,orientation=270];
-  "i" -> "7 +.";
   "7 +." -> "o0";
+  "i" -> "11 vol";
+  "i" -> "10 max";
+  "i" -> "9 min";
+  "i" -> "8 E6";
+  "i" -> "7 +.";
 }
 // graph for dag "dag_cleaned_0" of module "freia_16" in dot format
 digraph "dag_cleaned_0" {
@@ -48,17 +48,17 @@ digraph "dag_cleaned_0" {
 
   // computation vertices
   "11 vol" [shape=diamond];
-  "i" -> "11 vol";
   "10 max" [shape=diamond];
-  "i" -> "10 max";
   "9 min" [shape=diamond];
-  "i" -> "9 min";
   "8 E6" [shape=box];
-  "i" -> "8 E6";
   "8 E6" -> "o1";
   "7 +." [shape=trapezium,orientation=270];
-  "i" -> "7 +.";
   "7 +." -> "o0";
+  "i" -> "11 vol";
+  "i" -> "10 max";
+  "i" -> "9 min";
+  "i" -> "8 E6";
+  "i" -> "7 +.";
 }
 // graph for dag "freia_16_helper_0_0" of module "freia_16" in dot format
 digraph "freia_16_helper_0_0" {
@@ -71,16 +71,16 @@ digraph "freia_16_helper_0_0" {
 
   // computation vertices
   "7 +." [shape=trapezium,orientation=270];
-  "i" -> "7 +.";
   "7 +." -> "o0";
   "8 E6" [shape=box];
-  "i" -> "8 E6";
   "8 E6" -> "o1";
   "11 vol" [shape=diamond];
-  "i" -> "11 vol";
   "10 max" [shape=diamond];
-  "i" -> "10 max";
   "9 min" [shape=diamond];
+  "i" -> "7 +.";
+  "i" -> "8 E6";
+  "i" -> "11 vol";
+  "i" -> "10 max";
   "i" -> "9 min";
 }
 

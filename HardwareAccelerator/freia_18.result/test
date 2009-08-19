@@ -42,30 +42,30 @@ digraph "dag_0" {
 
   // outputs
   "u2" [shape=circle];
-  "u3" [shape=circle];
   "o" [shape=circle];
+  "u3" [shape=circle];
 
   // computation vertices
   "24 |" [shape=trapezium,orientation=270];
-  "i1" -> "24 |";
   "24 |" -> "u3";
   "23 ^" [shape=trapezium,orientation=270];
   "23 ^" -> "24 |";
-  "i1" -> "23 ^";
   "23 ^" -> "o";
   "22 &" [shape=trapezium,orientation=270];
   "22 &" -> "23 ^";
-  "i0" -> "22 &";
-  "i1" -> "22 &";
   "21 -" [shape=trapezium,orientation=270];
-  "i0" -> "21 -";
   "21 -" -> "u2";
   "20 =" [shape=circle];
   "20 =" -> "21 -";
   "19 +" [shape=trapezium,orientation=270];
   "19 +" -> "20 =";
-  "i0" -> "19 +";
+  "i1" -> "24 |";
+  "i1" -> "23 ^";
+  "i1" -> "22 &";
   "i1" -> "19 +";
+  "i0" -> "22 &";
+  "i0" -> "21 -";
+  "i0" -> "19 +";
 }
 // graph for dag "dag_cleaned_0" of module "freia_18" in dot format
 digraph "dag_cleaned_0" {
@@ -75,28 +75,28 @@ digraph "dag_cleaned_0" {
 
   // outputs
   "u2" [shape=circle];
-  "u3" [shape=circle];
   "o" [shape=circle];
+  "u3" [shape=circle];
 
   // computation vertices
   "24 |" [shape=trapezium,orientation=270];
-  "i1" -> "24 |";
   "24 |" -> "u3";
   "23 ^" [shape=trapezium,orientation=270];
   "23 ^" -> "24 |";
-  "i1" -> "23 ^";
   "23 ^" -> "o";
   "22 &" [shape=trapezium,orientation=270];
   "22 &" -> "23 ^";
-  "i0" -> "22 &";
-  "i1" -> "22 &";
   "21 -" [shape=trapezium,orientation=270];
-  "i0" -> "21 -";
   "21 -" -> "u2";
   "19 +" [shape=trapezium,orientation=270];
   "19 +" -> "21 -";
-  "i0" -> "19 +";
+  "i1" -> "24 |";
+  "i1" -> "23 ^";
+  "i1" -> "22 &";
   "i1" -> "19 +";
+  "i0" -> "22 &";
+  "i0" -> "21 -";
+  "i0" -> "19 +";
 }
 // graph for dag "freia_18_helper_0_0" of module "freia_18" in dot format
 digraph "freia_18_helper_0_0" {
@@ -109,12 +109,12 @@ digraph "freia_18_helper_0_0" {
 
   // computation vertices
   "21 -" [shape=trapezium,orientation=270];
-  "i0" -> "21 -";
   "21 -" -> "u2";
   "19 +" [shape=trapezium,orientation=270];
   "19 +" -> "21 -";
-  "i0" -> "19 +";
   "i1" -> "19 +";
+  "i0" -> "21 -";
+  "i0" -> "19 +";
 }
 // graph for dag "freia_18_helper_0_1" of module "freia_18" in dot format
 digraph "freia_18_helper_0_1" {
@@ -123,21 +123,21 @@ digraph "freia_18_helper_0_1" {
   "i1" [shape=circle];
 
   // outputs
-  "u3" [shape=circle];
   "o" [shape=circle];
+  "u3" [shape=circle];
 
   // computation vertices
   "24 |" [shape=trapezium,orientation=270];
-  "i1" -> "24 |";
   "24 |" -> "u3";
   "23 ^" [shape=trapezium,orientation=270];
   "23 ^" -> "24 |";
-  "i1" -> "23 ^";
   "23 ^" -> "o";
   "22 &" [shape=trapezium,orientation=270];
   "22 &" -> "23 ^";
-  "i0" -> "22 &";
+  "i1" -> "24 |";
+  "i1" -> "23 ^";
   "i1" -> "22 &";
+  "i0" -> "22 &";
 }
 
 ! acceleration function
@@ -265,12 +265,12 @@ freia_status freia_18_helper_0_1_0(freia_data2d * o0, freia_data2d * o1, freia_d
   si.alu[2][0].op = SPOC_ALU_OR_IN0_IN1;
 
 
-  // output image 0`u3 on 1 and image o on 0
+  // output image o on 0 and image 0`u3 on 1
+  // o [2 input 0] -> [2 output 0] 0 null
+  si.mux[2][0].op = SPOC_MUX_IN0;
   // 0`u3 [2 alu] -> [2 output 1] 0 null
   si.mux[2][1].op = SPOC_MUX_IN0;
   si.mux[2][3].op = SPOC_MUX_IN0;
-  // o [2 input 0] -> [2 output 0] 0 null
-  si.mux[2][0].op = SPOC_MUX_IN0;
 
   mcode.raw = (freia_ptr) &si;
   mcode.size = sizeof(spoc_instr);
@@ -285,7 +285,7 @@ freia_status freia_18_helper_0_1_0(freia_data2d * o0, freia_data2d * o1, freia_d
   ret |= freia_cg_write_dynamic_param(&dynparam);
 
   // actual call of spoc hardware
-  freia_cg_template_process_2i_2o(op, param, o1, o0, i0, i1);
+  freia_cg_template_process_2i_2o(op, param, o0, o1, i0, i1);
 
   return ret;
 }
@@ -305,7 +305,7 @@ freia_status freia_18(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
    // o = t0 ^ i1
    // u3 = o | i1
    freia_18_helper_0_0_0(u2, i0, i1);                                   /*0019*/
-   freia_18_helper_0_1_0(u3, o, i0, i1);                                /*0022*/
+   freia_18_helper_0_1_0(o, u3, i0, i1);                                /*0022*/
 
    freia_common_destruct_data(u2);                                      /*0028*/
    freia_common_destruct_data(u3);                                      /*0029*/

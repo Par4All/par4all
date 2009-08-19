@@ -18,8 +18,8 @@ digraph "dag_0" {
 
   // computation vertices
   "5 +s." [shape=trapezium,orientation=270];
-  "i0" -> "5 +s.";
   "5 +s." -> "o";
+  "i0" -> "5 +s.";
 }
 // graph for dag "dag_cleaned_0" of module "my_addsat_const" in dot format
 digraph "dag_cleaned_0" {
@@ -31,8 +31,8 @@ digraph "dag_cleaned_0" {
 
   // computation vertices
   "5 +s." [shape=trapezium,orientation=270];
-  "i0" -> "5 +s.";
   "5 +s." -> "o";
+  "i0" -> "5 +s.";
 }
 // graph for dag "my_addsat_const_helper_0_0" of module "my_addsat_const" in dot format
 digraph "my_addsat_const_helper_0_0" {
@@ -44,8 +44,8 @@ digraph "my_addsat_const_helper_0_0" {
 
   // computation vertices
   "5 +s." [shape=trapezium,orientation=270];
-  "i0" -> "5 +s.";
   "5 +s." -> "o";
+  "i0" -> "5 +s.";
 }
 
 ! acceleration function

@@ -21,9 +21,8 @@ digraph "dag_0" {
 
   // computation vertices
   "7 -" [shape=trapezium,orientation=270];
-  "i" -> "7 -";
-  "i" -> "7 -";
   "7 -" -> "o";
+  "i" -> "7 -";
 }
 // graph for dag "dag_cleaned_0" of module "freia_11" in dot format
 digraph "dag_cleaned_0" {
@@ -35,9 +34,8 @@ digraph "dag_cleaned_0" {
 
   // computation vertices
   "7 -" [shape=trapezium,orientation=270];
-  "i" -> "7 -";
-  "i" -> "7 -";
   "7 -" -> "o";
+  "i" -> "7 -";
 }
 // graph for dag "freia_11_helper_0_0" of module "freia_11" in dot format
 digraph "freia_11_helper_0_0" {
@@ -49,9 +47,8 @@ digraph "freia_11_helper_0_0" {
 
   // computation vertices
   "7 -" [shape=trapezium,orientation=270];
-  "i" -> "7 -";
-  "i" -> "7 -";
   "7 -" -> "o";
+  "i" -> "7 -";
 }
 
 ! acceleration function

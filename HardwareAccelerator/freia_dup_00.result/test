@@ -22,8 +22,8 @@ digraph "dag_0" {
 
   // computation vertices
   "7 max" [shape=diamond];
-  "i" -> "7 max";
   "6 max" [shape=diamond];
+  "i" -> "7 max";
   "i" -> "6 max";
 }
 // graph for dag "dag_cleaned_0" of module "freia_dup_00" in dot format
@@ -35,8 +35,8 @@ digraph "dag_cleaned_0" {
 
   // computation vertices
   "7 max" [shape=diamond];
-  "i" -> "7 max";
   "6 max" [shape=diamond];
+  "i" -> "7 max";
   "i" -> "6 max";
 }
 // graph for dag "freia_dup_00_helper_0_0" of module "freia_dup_00" in dot format
@@ -48,8 +48,8 @@ digraph "freia_dup_00_helper_0_0" {
 
   // computation vertices
   "7 max" [shape=diamond];
-  "i" -> "7 max";
   "6 max" [shape=diamond];
+  "i" -> "7 max";
   "i" -> "6 max";
 }
 

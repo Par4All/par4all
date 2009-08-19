@@ -47,12 +47,12 @@ digraph "dag_0" {
   "34 <" -> "o";
   "33 -|" [shape=trapezium,orientation=270];
   "33 -|" -> "34 <";
-  "g1" -> "33 -|";
   "g0" -> "33 -|";
   "32 -|" [shape=trapezium,orientation=270];
   "32 -|" -> "34 <";
-  "g2" -> "32 -|";
+  "g1" -> "33 -|";
   "g1" -> "32 -|";
+  "g2" -> "32 -|";
 }
 // graph for dag "dag_cleaned_0" of module "freia_08" in dot format
 digraph "dag_cleaned_0" {
@@ -69,12 +69,12 @@ digraph "dag_cleaned_0" {
   "34 <" -> "o";
   "33 -|" [shape=trapezium,orientation=270];
   "33 -|" -> "34 <";
-  "g1" -> "33 -|";
   "g0" -> "33 -|";
   "32 -|" [shape=trapezium,orientation=270];
   "32 -|" -> "34 <";
-  "g2" -> "32 -|";
+  "g1" -> "33 -|";
   "g1" -> "32 -|";
+  "g2" -> "32 -|";
 }
 // graph for dag "freia_08_helper_0_0" of module "freia_08" in dot format
 digraph "freia_08_helper_0_0" {
@@ -87,9 +87,9 @@ digraph "freia_08_helper_0_0" {
 
   // computation vertices
   "32 -|" [shape=trapezium,orientation=270];
-  "g2" -> "32 -|";
-  "g1" -> "32 -|";
   "32 -|" -> "d1";
+  "g1" -> "32 -|";
+  "g2" -> "32 -|";
 }
 // graph for dag "freia_08_helper_0_1" of module "freia_08" in dot format
 digraph "freia_08_helper_0_1" {
@@ -102,9 +102,9 @@ digraph "freia_08_helper_0_1" {
 
   // computation vertices
   "33 -|" [shape=trapezium,orientation=270];
-  "g1" -> "33 -|";
-  "g0" -> "33 -|";
   "33 -|" -> "d0";
+  "g0" -> "33 -|";
+  "g1" -> "33 -|";
 }
 // graph for dag "freia_08_helper_0_2" of module "freia_08" in dot format
 digraph "freia_08_helper_0_2" {
@@ -117,9 +117,9 @@ digraph "freia_08_helper_0_2" {
 
   // computation vertices
   "34 <" [shape=trapezium,orientation=270];
-  "d1" -> "34 <";
-  "d0" -> "34 <";
   "34 <" -> "o";
+  "d0" -> "34 <";
+  "d1" -> "34 <";
 }
 
 ! acceleration function
