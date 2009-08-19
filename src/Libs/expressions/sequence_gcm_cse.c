@@ -1817,7 +1817,8 @@ static bool seq_flt(sequence s)
   list *top_of_w_effects;
 
   /* At first, w_effects is empty list BUT not list points to NIL!!!*/
-  w_effects = &CDR(CONS(EXPRESSION, NIL, NIL));
+  /* SG: not valid due to newgen check w_effects = &CDR(CONS(EXPRESSION, NIL, NIL));*/
+  w_effects = &CDR(gen_cons(NIL,NIL));
 
   /* top_of_w_effects points to the top of list, 
    * It is used to free memory later 
