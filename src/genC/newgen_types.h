@@ -88,6 +88,8 @@ typedef struct cons * list;
 typedef bool (*gen_filter_func_t)(const void *);
 typedef bool (*gen_filter2_func_t)(const void *, const void *);
 typedef string (*gen_string_func_t)(const void *);
+// for qsort: void * points to a pointer to the newgen type
+// so it is really "gen_chunk**", i.e. "entity*" or "statement*"
 typedef int (*gen_cmp_func_t)(const void *, const void *);
 
 // obsolete?

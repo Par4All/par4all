@@ -621,7 +621,7 @@ void gen_free_area(void ** p, int size)
  *
  * FC 27/12/94
  */
-void gen_sort_list(list l, int (*compare)(const void *,const void *))
+void gen_sort_list(list l, gen_cmp_func_t compare)
 {
     list c;
     int n = gen_length(l);
