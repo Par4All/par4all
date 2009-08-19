@@ -164,6 +164,9 @@ instruction_format_p(instruction i) {
 
    Some memory leaks. Should not be used. Use the functions from control
    instead.
+
+   This function cannot be used for C code as local declarations are
+   discarded without warnings.
 */
 void flatten_block_if_necessary(instruction i)
 {
