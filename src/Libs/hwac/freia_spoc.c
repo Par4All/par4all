@@ -373,11 +373,12 @@ get_parameters(const freia_api_t * api, list args)
 
 typedef struct {
   entity image;     // output
-  dagvtx producer;  // NULL on input and output
+  dagvtx producer;  // possibly NULL on input and output
   int stage;
   spoc_hardware_type level;  // nope | input < poc < alu < threshold < measure
   int side;  // 0 or 1
   bool flip; // whether alu op is flipped
+  int used; // bitfield to tell which image are used 0 1 2 3
 }  op_schedule;
 
 static void init_op_schedule(op_schedule * op, entity img, int side)
@@ -408,17 +409,23 @@ static int max_stage(const op_schedule * in0, const op_schedule * in1)
       return 0;
 }
 
-static string dagvtx_to_string(const dagvtx);
-
 static bool image_is_needed(entity img, dag d, set todo)
 {
   bool needed = false;
   if (img)
   {
-    needed = gen_in_list_p(img, dag_outputs(d));
+    FOREACH(dagvtx, vo, dag_outputs(d))
+      if (img==vtxcontent_out(dagvtx_content(vo)))
+      {
+	needed = true;
+	break;
+      }
     SET_FOREACH(dagvtx, v, todo)
       if (gen_in_list_p(img, vtxcontent_inputs(dagvtx_content(v))))
+      {
 	needed = true;
+	break;
+      }
     pips_debug(7, "\"%s\" is%s needed\n",
 	       entity_local_name(img), needed? "": " not");
   }
@@ -444,6 +451,7 @@ where_to_perform_operation
 {
   vtxcontent c = dagvtx_content(op);
   out->side = -100;
+  out->used = 0;
 
   ifdebug(6) {
     pips_debug(6, "scheduling (%" _intFMT " %s) %s\n",
@@ -465,6 +473,7 @@ where_to_perform_operation
 		measured==in0->image || measured==in1->image);
     // go to the end of the stage of the image producer, on same side...
     *out = (measured==in0->image)? *in0: *in1;
+    out->used = (measured==in0->image)? 1: 2;
   }
   else
   {
@@ -477,6 +486,7 @@ where_to_perform_operation
       // I must check that the alu is not already used?!
       // So I take a safe bet...
       out->stage = max_stage(in0, in1);
+      out->used = 0;
       if (in0->image && in0->stage == out->stage && in0->level > spoc_type_alu)
 	out->stage++;
       if (in1->image && in1->stage == out->stage && in1->level > spoc_type_alu)
@@ -495,27 +505,63 @@ where_to_perform_operation
 		   entity_local_name(used->image),
 		   used->stage, what_operation(used->level), used->side);
 
-	// default stage and side... should I check?
+	// default stage and side...
 	out->stage = used->stage;
 	out->side = used->side;
+	out->used = in0==used? 1: 2;
 
 	if (level == spoc_type_nop)
 	  // we have a copy... the operation is very light:-)
 	  level = used->level;
-	else
-	  if (level <= used->level) out->stage++;
+	else // maybe skip to the next stage
+	  if (level <= used->level)
+	    out->stage++;
+
+	// ??? check if possible...
+	// ??? not really that? where to put it?
+	// should it be simpler?
+	// I is the right conditions?
+	if (out->stage==used->stage)
+	{
+	  if (!check_wiring_output(wiring, used->stage, out->side))
+	  {
+	    if (check_wiring_output(wiring, used->stage, 1-out->side))
+	      out->side = 1 - out->side;
+	    else
+	    {
+	      out->stage++;
+	      if (!check_wiring_output(wiring, out->stage, out->side))
+		if (check_wiring_output(wiring, out->stage, 1-out->side))
+		  out->side = 1 - out->side;
+		else
+		  pips_internal_error("houston, we have a problem (1)");
+	    }
+	  }
+	}
+	else if (!check_wiring_output(wiring, out->stage, out->side))
+	{
+	  if (check_wiring_output(wiring, out->side, 1-out->stage))
+	    out->side = 1 - out->side;
+	  else
+	    pips_internal_error("houston, we have a problem (2)");
+	}
 
 	// ??? if the input image is still needed, must include a cross
-	if (image_is_needed(used->image, computed, todo) &&
-	    spoc_type_alu < used->level && used->stage==out->stage)
-	  out->stage++;
+	if (image_is_needed(used->image, computed, todo))
+	{
+	  if (spoc_type_alu < used->level && used->stage==out->stage)
+	    out->stage++;
+	  else if (spoc_type_alu < used->level &&
+		   used->stage+1==out->stage && level < spoc_type_alu)
+	    out->stage++;
+	}
 
-	// conflict
+	// ??? conflict with the other one?
 	if (notused->image &&
 	    out->stage==notused->stage &&
-	    out->level==notused->level)
+	    level==notused->level)
 	{
-	  if (out->level==spoc_type_alu)
+	  if (level==spoc_type_alu)
 	    out->stage++;
 	  else
 	    out->side = 1 - notused->side;
@@ -523,11 +569,12 @@ where_to_perform_operation
       }
       break;
     case 2: // ALU
-      // if same image is used as both operands?
+      // what if same image is used as both operands?
       if (!in1->image) *in1 = *in0;
       if (!in0->image) *in0 = *in1;
       pips_assert("alu binary operation", level==spoc_type_alu);
       out->stage = max_stage(in0, in1);
+      out->used = 3;
       if (out->stage==in0->stage && in0->level >= spoc_type_alu)
 	out->stage++;
       if (out->stage==in1->stage && in1->level >= spoc_type_alu)
@@ -692,6 +739,8 @@ static void generate_wiring
     {
       case spoc_type_inp:
       case spoc_type_poc:
+	if (out->level<=spoc_type_poc)
+	  pips_assert("same side if early", in->side==out->side);
 	if (out->level<=spoc_type_alu)
 	  sb_app(code, "  // nope\n");
 	// ELSE thr or mes...
@@ -741,6 +790,7 @@ static void generate_wiring
   {
     // let us do it with a recursion...
     int prefered;
+    op_schedule saved = *in;
     switch (in->level)
     {
     case spoc_type_inp:
@@ -749,13 +799,13 @@ static void generate_wiring
       if (in->level==spoc_type_alu)
 	// try direct, or default to 0
 	prefered = (out->side>=0)? out->side: 0;
-      else // try straight on first...
-	prefered = in->side;
+      else // take the right side as soon as possible?
+	// ??? what if the path is not possible later?
+	prefered = (out->side==-1)? in->side: out->side;
       // try both cases
       if (check_wiring_output(wiring, in->stage, prefered))
       {
 	generate_wiring_stage(code, in->stage, in->side, prefered, wiring);
-	// what if needed twice?
 	in->stage++;
 	in->side = prefered;
 	in->level = spoc_type_inp;
@@ -771,6 +821,12 @@ static void generate_wiring
       }
       else
 	pips_internal_error("no available path...");
+      if (saved.level==spoc_type_alu && out->level==spoc_type_poc)
+	// we may still use the alu result for something else... others?
+      {
+	pips_debug(7, "restoring in schedule...\n");
+	*in = saved;
+      }
       break;
     case spoc_type_thr:
     case spoc_type_mes:
@@ -858,13 +914,19 @@ static void freia_spoc_pipeline
 (string module, string helper, string_buffer code, dag dpipe, list * lparams)
 {
   hash_table wiring = hash_table_make(hash_int, 128);
-  list outs = gen_copy_seq(dag_outputs(dpipe));
+  list outs = NIL;
   bool some_reductions = false;
   int pipeline_depth = get_int_property(spoc_depth_prop);
 
-  pips_debug(3, "running on '%s' for %u functions\n",
-	     module, (unsigned int) gen_length(dag_vertices(dpipe)));
+  pips_debug(3, "running on '%s' for %d operations\n",
+	     module, (int) (gen_length(dag_vertices(dpipe)) -
+			    gen_length(dag_inputs(dpipe))));
   pips_assert("non empty dag", gen_length(dag_vertices(dpipe))>0);
+
+  // build list of output entities from the pipe
+  FOREACH(dagvtx, v, dag_outputs(dpipe))
+    outs = CONS(entity, vtxcontent_out(dagvtx_content(v)), outs);
+  outs = gen_nreverse(outs);
 
   // generate a helper function in some file
   int cst = 0;
@@ -894,7 +956,8 @@ static void freia_spoc_pipeline
   // build input arguments/parameters/arguments
   if (n_im_in>=1)
   {
-    a_in0 = ENTITY(CAR(dag_inputs(dpipe)));
+    dagvtx v_in0 = DAGVTX(CAR(dag_inputs(dpipe)));
+    a_in0 = vtxcontent_out(dagvtx_content(v_in0));
     p_in0 = "i0";
     init_op_schedule(&in0, a_in0, 0);
     limg = CONS(entity, a_in0, NIL);
@@ -910,7 +973,8 @@ static void freia_spoc_pipeline
   }
   else if (n_im_in>=2)
   {
-    a_in1 = ENTITY(CAR(CDR(dag_inputs(dpipe))));
+    dagvtx v_in1 = DAGVTX(CAR(CDR(dag_inputs(dpipe))));
+    a_in1 = vtxcontent_out(dagvtx_content(v_in1));
     p_in1 = "i1";
     init_op_schedule(&in1, a_in1, 1);
     limg = gen_nconc(limg, CONS(entity, a_in1, NIL));
@@ -920,6 +984,9 @@ static void freia_spoc_pipeline
 
   list vertices = gen_nreverse(gen_copy_seq(dag_vertices(dpipe)));
   set todo = set_make(set_pointer);
+  FOREACH(dagvtx, vi, dag_inputs(dpipe))
+    gen_remove(&vertices, vi);
+
   set_assign_list(todo, vertices);
 
   // keep track of current stage for comments, and to detect overflows
@@ -927,7 +994,15 @@ static void freia_spoc_pipeline
 
   FOREACH(dagvtx, v, vertices)
   {
+    // skip inputs
+    if (dagvtx_number(v)==0) break;
+
+    pips_debug(7, "dealing with vertex %" _intFMT ", %d to go\n",
+	       dagvtx_number(v), set_size(todo));
+
     vtxcontent vc = dagvtx_content(v);
+    pips_assert("there is a statement",
+		pstatement_statement_p(vtxcontent_source(vc)));
     statement s = pstatement_statement(vtxcontent_source(vc));
     call c = freia_statement_to_call(s);
     string func = entity_local_name(call_function(c));
@@ -960,11 +1035,11 @@ static void freia_spoc_pipeline
     }
 
     // generate wiring, which may change flip stage on ALU operation
-    // special case if in0==in1 and is needed?
-    if (in0.image && gen_in_list_p(in0.image, vtxcontent_inputs(vc)))
+    // special case if in0==in1 is needed?
+    if (out.used & 1)
       generate_wiring(body, &in0, &out, wiring);
 
-    if (in1.image && gen_in_list_p(in1.image, vtxcontent_inputs(vc)))
+    if (out.used & 2)
       generate_wiring(body, &in1, &out, wiring);
 
     // generate stage
@@ -983,6 +1058,9 @@ static void freia_spoc_pipeline
 	in0 = out;
       else if (out.side==in1.side)
 	in1 = out;
+      else if (out.side==-1)
+	// just chose one!
+	in0 = out;
       else
 	pips_internal_error("should not get there (same image)?");
     }
@@ -1015,12 +1093,13 @@ static void freia_spoc_pipeline
     if (set_belong_p(computed, vr))
     {
       dag_remove_vertex(dpipe, vr);
-      hwac_kill_statement(pstatement_statement
-		     (vtxcontent_source(dagvtx_content(vr))));
+      if (pstatement_statement_p(vtxcontent_source(dagvtx_content(vr))))
+	hwac_kill_statement(pstatement_statement
+			    (vtxcontent_source(dagvtx_content(vr))));
       free_dagvtx(vr);
     }
   }
-  dag_set_inputs_outputs(dpipe);
+  dag_compute_outputs(dpipe);
 
   gen_free_list(vertices), vertices = NIL;
   set_free(computed), computed = NULL;
@@ -1073,8 +1152,17 @@ static void freia_spoc_pipeline
       out = in0, in0 = in1, in1 = out;
     pips_assert("results are available", out0==in0.image && out1==in1.image);
 
-    // the more advanced image in the pipe decides the its output side
-    if (in0.stage<in1.stage || (in0.stage==in1.stage && in0.level<in1.level))
+
+    pips_debug(7, "out0 %s out1 %s in0(%d.%d.%d) %s in1(%d.%d.%d) %s\n",
+	       entity_local_name(out0), entity_local_name(out1),
+	       in0.stage, in0.level, in0.side, entity_local_name(in0.image),
+	       in1.stage, in1.level, in1.side, entity_local_name(in1.image));
+
+    // the more advanced image in the pipe decides its output side
+    bool in0_advanced = in0.stage>in1.stage ||
+      (in0.stage==in1.stage && in0.level>in1.level);
+
+    if (in0_advanced)
     {
       out0_side = in0.side;
       if (out0_side==-1) out0_side = 0; // alu, choose!
@@ -1212,6 +1300,10 @@ static void dag_append_freia_call(dag d, statement s)
     fs_expression_list_to_entity_list(call_arguments(c),
 				      api->arg_img_in+api->arg_img_out);
 
+  pips_debug(5, "adding statement %" _intFMT "\n", statement_number(s));
+
+  // ifdebug(1) pips_assert("dag ok", dag_consistent_p(d));
+
   // extract arguments
   entity out = entity_undefined;
   pips_assert("one out image max for an AIPO", api->arg_img_out<=1);
@@ -1220,14 +1312,16 @@ static void dag_append_freia_call(dag d, statement s)
   list ins = gen_list_head(&args, api->arg_img_in);
   //list outp = gen_list_head(&args, api->arg_misc_out);
   //list inp = gen_list_head(&args, api->arg_misc_in);
-  //pips_assert("no more arguments", gen_length(args)==0);
+  pips_assert("no more arguments", gen_length(args)==0);
 
   vtxcontent cont =
-    make_vtxcontent(-1, 0, make_pstatement(s), ins, out, NIL, NIL);
+    make_vtxcontent(-1, 0, make_pstatement_statement(s), ins, out);
   set_operation(api, &vtxcontent_optype(cont), &vtxcontent_opid(cont));
 
   dagvtx nv = make_dagvtx(cont, NIL);
   dag_append_vertex(d, nv);
+
+  // ifdebug(7) pips_assert("dag d ok", dag_consistent_p(d));
   // ??? TODO update global outs later?
 }
 
@@ -1271,7 +1365,7 @@ static int dagvtx_priority(const dagvtx * v1, const dagvtx * v2)
 
   pips_debug(7, "%" _intFMT " %s %s %" _intFMT " %s (%s)\n",
 	     dagvtx_number(*v1), dagvtx_operation(*v1),
-	     result<0? "<": (result==0? "=": ">"),
+	     result<0? ">": (result==0? "=": "<"),
 	     dagvtx_number(*v2), dagvtx_operation(*v2), why);
 
   pips_assert("total order", v1==v2 || result!=0);
@@ -1302,10 +1396,11 @@ static bool any_scalar_dep(dagvtx v, set vs)
  * return a list for determinism.
  */
 static list /* of dagvtx */
-  get_computable_vertices(dag d, set exclude, set current,
-			  set /* of entity */ avails)
+  get_computable_vertices(dag d, set computed, set maybe, set currents)
 {
   list computable = NIL;
+  set local_currents = set_make(set_pointer);
+  set_assign(local_currents, currents);
 
   // hmmm... should reverse the list to handle implicit dependencies?
   // where, there is an assert() to check that it does not happen.
@@ -1313,20 +1408,33 @@ static list /* of dagvtx */
 
   FOREACH(dagvtx, v, lv)
   {
-    vtxcontent c = dagvtx_content(v);
+    list preds = dag_vertex_preds(d, v);
 
-    if (!any_scalar_dep(v, current) &&
-	// and all needed inputs are available
-	list_in_set_p(vtxcontent_inputs(c), avails) &&
-	!set_belong_p(exclude, v))
+    // pips_debug(7, "%d predecessors to %" _intFMT "\n",
+    // (int) gen_length(preds), dagvtx_number(v));
+
+    if (// skip already computed vertices
+	!set_belong_p(computed, v) &&
+	// no scalar dependencies
+	!any_scalar_dep(v, local_currents) &&
+	// image dependencies (redundant with the avails stuff?
+	// maybe not for inputs?)
+	list_in_set_p(preds, maybe))
+    {
       computable = CONS(dagvtx, v, computable);
+      // we do not want deps with other currents considered!
+      set_add_element(local_currents, local_currents, v);
+    }
 
     // update availables: not needed under assert for no img reuse.
     // if (vtxcontent_out(c)!=entity_undefined)
     //  set_del_element(avails, avails, vtxcontent_out(c));
+
+    gen_free_list(preds), preds = NIL;
   }
 
   // cleanup
+  set_free(local_currents);
   gen_free_list(lv);
   return computable;
 }
@@ -1335,17 +1443,18 @@ static list /* of dagvtx */
  * that is the images that may be output from the pipeline.
  * this is voodoo...
  */
-static void live_update(dagvtx v, set sure, set maybe)
+static void live_update(dag d, dagvtx v, set sure, set maybe)
 {
   vtxcontent c = dagvtx_content(v);
   list ins = vtxcontent_inputs(c);
   int nins = gen_length(ins);
   entity out = vtxcontent_out(c);
   int nout = out!=entity_undefined? 1: 0;
+  list preds = dag_vertex_preds(d, v);
 
   set all = set_make(set_pointer);
   set_union(all, sure, maybe);
-  pips_assert("inputs are available", list_in_set_p(ins, all));
+  pips_assert("inputs are available", list_in_set_p(preds, all));
   set_free(all), all = NULL;
 
   switch (nins)
@@ -1361,20 +1470,20 @@ static void live_update(dagvtx v, set sure, set maybe)
     if (nout)
     {
       // 1 -> 1
-      if (set_size(sure)==1 && !list_in_set_p(ins, sure))
+      if (set_size(sure)==1 && !list_in_set_p(preds, sure))
       {
-	set_assign_list(maybe, ins);
+	set_assign_list(maybe, preds);
 	set_union(maybe, maybe, sure);
       }
       else
       {
-	set_append_list(maybe, ins);
+	set_append_list(maybe, preds);
       }
     }
     break;
   case 2:
     // any of the inputs may be kept
-    set_assign_list(maybe, vtxcontent_inputs(c));
+    set_assign_list(maybe, preds);
     break;
   default:
     pips_internal_error("unpexted number of inputs to vertex: %d", nins);
@@ -1383,10 +1492,13 @@ static void live_update(dagvtx v, set sure, set maybe)
   if (nout==1)
   {
     set_clear(sure);
-    set_add_element(sure, sure, out);
+    set_add_element(sure, sure, v);
   }
   // else sure is kept
   set_difference(maybe, maybe, sure);
+
+  // cleanup
+  gen_free_list(preds), preds = NIL;
 }
 
 /* returns an allocated set of vertices with live outputs.
@@ -1436,9 +1548,10 @@ static int number_of_output_arcs(set vs)
 /* return first vertex in the list which is compatible, or NULL if none.
  */
 static dagvtx first_which_may_be_added
-  (set current, // of dagvtx
+  (dag dall,
+   set current, // of dagvtx
    list lv,     // of dagvtx
-   set sure,    // image entities
+   set sure,    // of dagvtx
    __attribute__((unused)) set maybe)   // image entities
 {
   set inputs = set_make(set_pointer);
@@ -1451,12 +1564,14 @@ static dagvtx first_which_may_be_added
   {
     pips_assert("not yet there", !set_belong_p(current, v));
 
-    // when adding v to current:
-    // the input acts are the one of outputs
-    // plus the ones distinct inputs of v
-    set_assign_list(inputs, vtxcontent_inputs(dagvtx_content(v)));
+    list preds = dag_vertex_preds(dall, v);
+    set_assign_list(inputs, preds);
+    int npreds = gen_length(preds);
+    gen_free_list(preds), preds = NIL;
 
-    if (set_size(inputs)==2 && !set_inclusion_p(sure, inputs))
+    //pips_debug(7, "vertex %"_intFMT": %d preds\n", dagvtx_number(v), npreds);
+
+    if (npreds==2 && !set_inclusion_p(sure, inputs))
       break;
 
     set_add_element(current, current, v);
@@ -1489,40 +1604,44 @@ static list /* of dags */ split_dag(dag initial)
     // well, it should work most of the time, so only a warning
     pips_user_warning("image reuse may result in subtly wrong code");
 
+  // ifdebug(1) pips_assert("initial dag ok", dag_consistent_p(initial));
+
   dag dall = copy_dag(initial);
   int nvertices = gen_length(dag_vertices(dall));
   list ld = NIL, lcurrent = NIL;
   set
     current = set_make(set_pointer),
-    removed = set_make(set_pointer),
+    computed = set_make(set_pointer),
     maybe = set_make(set_pointer),
     sure = set_make(set_pointer),
     avails = set_make(set_pointer);
 
   // well, there are not all available always!
   set_assign_list(maybe, dag_inputs(dall));
-  set_assign(avails, maybe);
+  // set_assign(avails, maybe);
+  set_assign(computed, maybe);
   int count = 0;
 
   do
   {
     // pips_assert("argh...", count++<100);
+    set_union(avails, sure, maybe);
 
     ifdebug(4) {
       pips_debug(4, "round %d:\n", count);
-      set_fprint(stderr, "removed", removed,
+      set_fprint(stderr, "computed", computed,
 		 (gen_string_func_t) dagvtx_to_string);
       set_fprint(stderr, "current", current,
 		 (gen_string_func_t) dagvtx_to_string);
       set_fprint(stderr, "avails", avails,
-		 (gen_string_func_t) entity_local_name);
-      set_fprint(stderr, "maybe", maybe, (gen_string_func_t) entity_local_name);
-      set_fprint(stderr, "sure", sure, (gen_string_func_t) entity_local_name);
+		 (gen_string_func_t) dagvtx_to_string);
+      set_fprint(stderr, "maybe", maybe, (gen_string_func_t) dagvtx_to_string);
+      set_fprint(stderr, "sure", sure, (gen_string_func_t) dagvtx_to_string);
     }
 
-    list computables = get_computable_vertices(dall, removed, current, avails);
+    list computables = get_computable_vertices(dall, computed, avails, current);
     gen_sort_list(computables,
-		  (int(*)(const void*,const void*))dagvtx_priority);
+		  (int(*)(const void*,const void*)) dagvtx_priority);
 
     pips_assert("something must be computable if current is empty",
 		computables || !set_empty_p(current));
@@ -1530,39 +1649,41 @@ static list /* of dags */ split_dag(dag initial)
     pips_debug(4, "%d computable vertices\n", (int) gen_length(computables));
     ifdebug(5) dagvtx_nb_dump(stderr, "computables", computables);
 
-    // take the first one
-    dagvtx vok = first_which_may_be_added(current, computables, sure, maybe);
+    // take the first one possible in the pipe, if any
+    dagvtx vok =
+      first_which_may_be_added(dall, current, computables, sure, maybe);
+
     if (vok)
     {
       pips_debug(5, "extracting %" _intFMT "...\n", dagvtx_number(vok));
       set_add_element(current, current, vok);
       lcurrent = CONS(dagvtx, vok, lcurrent);
-      set_add_element(removed, removed, vok);
-      live_update(vok, sure, maybe);
-      set_union(avails, sure, maybe);
+      set_add_element(computed, computed, vok);
+      live_update(dall, vok, sure, maybe);
+      // set_union(avails, sure, maybe);
     }
 
     // no stuff vertex can be added, or it was the last one
-    if (!vok || set_size(removed)==nvertices)
+    if (!vok || set_size(computed)==nvertices)
     {
       // ifdebug(5)
       // set_fprint(stderr, "closing current", current, )
       pips_debug(5, "closing current...\n");
+      pips_assert("current not empty", !set_empty_p(current));
 
+      // gen_sort_list(lcurrent, (gen_cmp_func_t) dagvtx_ordering);
       lcurrent = gen_nreverse(lcurrent);
       // close current and build a deterministic dag...
       dag nd = make_dag(NIL, NIL, NIL);
       FOREACH(dagvtx, v, lcurrent)
       {
-	// ??? can/should I do that?
-	dag_remove_vertex(dall, v);
-	dag_append_vertex(nd, v);
+	pips_debug(7, "extracting node %" _intFMT "\n", dagvtx_number(v));
+	dag_append_vertex(nd, copy_dagvtx_norec(v));
       }
-      dag_set_inputs_outputs(dall);
-      dag_set_inputs_outputs(nd);
+      dag_compute_outputs(nd);
 
       ifdebug(7) {
-	dag_dump(stderr, "updated dall", dall);
+	// dag_dump(stderr, "updated dall", dall);
 	dag_dump(stderr, "pushed dag", nd);
       }
 
@@ -1572,35 +1693,40 @@ static list /* of dags */ split_dag(dag initial)
       // cleanup
       gen_free_list(lcurrent), lcurrent = NIL;
       set_clear(current);
-
-      // recompute image sets
       set_clear(sure);
-      set_clear(maybe);
+      set_assign(maybe, computed);
+
+      // recompute available image sets
+      // set_clear(sure);
+      // set_clear(maybe);
       // dall
-      set_append_list(maybe, dag_inputs(dall));
+      // set_append_list(maybe, dag_inputs(dall));
       // and already extracted dags
+      /*
       FOREACH(dag, d, ld)
       {
 	FOREACH(dagvtx, v, dag_vertices(d))
 	{
-	  vtxcontent c = dagvtx_content(v);
-	  set_append_list(maybe, vtxcontent_inputs(c));
-	  if (vtxcontent_out(c)!=entity_undefined)
-	    set_add_element(maybe, maybe, vtxcontent_out(c));
+	  list preds = dag_vertex_preds(d, v);
+	  set_append_list(maybe, preds);
+	  gen_free_list(preds), preds = NIL;
+	  if (vtxcontent_out(dagvtx_content(v))!=entity_undefined)
+	    set_add_element(maybe, maybe, v);
 	}
       }
       set_assign(avails, maybe);
+      */
     }
 
     gen_free_list(computables);
   }
-  while (dag_vertices(dall));
+  while (set_size(computed)!=nvertices);
 
   // cleanup
   pips_assert("current empty list", !lcurrent);
-  pips_assert("all vertices were removed", !dag_vertices(dall));
+  pips_assert("all vertices were computed", set_size(computed)==nvertices);
   set_free(current);
-  set_free(removed);
+  set_free(computed);
   set_free(sure);
   set_free(maybe);
   set_free(avails);
@@ -1661,8 +1787,11 @@ static bool statement_freia_call_p(statement s)
 static void set_append_vertex_statements(set s, list lv)
 {
   FOREACH(dagvtx, v, lv)
-    set_add_element(s, s,
-        pstatement_statement(vtxcontent_source(dagvtx_content(v))));
+  {
+    pstatement ps = vtxcontent_source(dagvtx_content(v));
+    if (pstatement_statement_p(ps))
+      set_add_element(s, s, pstatement_statement(ps));
+  }
 }
 
 /* generate helpers for statements in ls of module
@@ -1683,7 +1812,7 @@ freia_spoc_compile_calls
   dag fulld = make_dag(NIL, NIL, NIL);
   FOREACH(statement, s, ls)
     dag_append_freia_call(fulld, s);
-  dag_set_inputs_outputs(fulld);
+  dag_compute_outputs(fulld);
   ifdebug(3) dag_dump(stderr, "fulld", fulld);
 
   string dag_name = strdup(cat("dag_", itoa(number), NULL));
@@ -1703,7 +1832,7 @@ freia_spoc_compile_calls
   list ld = split_dag(fulld);
 
   // fix internal ins/outs
-  freia_hack_fix_global_ins_outs(ld);
+  freia_hack_fix_global_ins_outs(fulld, ld);
 
   // globally remaining statements
   set global_remainings = set_make(set_pointer);
@@ -1714,6 +1843,9 @@ freia_spoc_compile_calls
   {
     set remainings = set_make(set_pointer);
     set_append_vertex_statements(remainings, dag_vertices(d));
+    // remove special inputs nodes
+    // FOREACH(dagvtx, inp, dag_inputs(d))
+    // set_del_element(remainings, remainings, inp);
 
     // generate a new helper function for dag d
     string fname_dag = strdup(cat(fname_fulldag, "_", itoa(n_pipes++), NULL));
@@ -1737,13 +1869,17 @@ freia_spoc_compile_calls
       // statements that are not yet computed in d...
       set not_dones = set_make(set_pointer), dones = set_make(set_pointer);
       FOREACH(dagvtx, vs, dag_vertices(d))
-	set_add_element(not_dones, not_dones,
-		pstatement_statement(vtxcontent_source(dagvtx_content(vs))));
+      {
+	pstatement ps = vtxcontent_source(dagvtx_content(vs));
+	if (pstatement_statement_p(ps))
+	  set_add_element(not_dones, not_dones, pstatement_statement(ps));
+      }
       set_difference(dones, remainings, not_dones);
       set_difference(remainings, remainings, dones);
       set_difference(global_remainings, global_remainings, dones);
 
       // replace first statement of dones in ls (so last in sequence)
+      bool substitution_done = false;
       FOREACH(statement, sc, ls)
       {
 	pips_debug(5, "in statement %" _intFMT "\n", statement_number(sc));
@@ -1758,9 +1894,11 @@ freia_spoc_compile_calls
 	  call c = make_call(helper, lparams);
 
 	  hwac_replace_statement(sc, c, false);
+	  substitution_done = true;
 	  break;
 	}
       }
+      pips_assert("substitution done", substitution_done);
 
       set_free(not_dones), not_dones = NULL;
       set_free(dones), dones = NULL;

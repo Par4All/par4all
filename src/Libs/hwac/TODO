@@ -10,6 +10,7 @@
 - what about full expressions: aipo_x() || aipo_y() || aipo_z()? atomizer?
 - check that there are references where expected?
 - check/remove more implicit hypothesis
+- detect redundant operations?
 
 * code
 + cleanup data structures?
@@ -28,6 +29,8 @@
 + select node shape depending on hardware?
 + add more comments to generated code
 + improve generated comments
+- if only one image is used as input, put it anyway on both sides?
+  may help some schedules if there are multiple successors.
 
 * post
 + remove malloc/free if not used
@@ -35,5 +38,6 @@
 
 * validation
 - check all AIPO
+- add more (elementary) tests?
 
 * bugs

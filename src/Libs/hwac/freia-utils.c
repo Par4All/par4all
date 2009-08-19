@@ -58,6 +58,9 @@
  * ??? conversions between 8/16 bits images are definitely not handled here.
  */
 static const freia_api_t FREIA_AIPO_API[] = {
+  { "undefined", "?", 0, 0, 0, 0, NO_PARAM, NO_PARAM,
+    { 0, NO_POC, alu_unused, NO_MES }
+  },
   {
     // ARITHMETIC
     // binary
@@ -403,11 +406,16 @@ void set_operation(const freia_api_t * api, _int * type, _int * id)
   *id = hwac_freia_api_index(api->function_name);
 }
 
+/* all is well
+ */
 static call freia_ok()
 {
+  // how to build the "FREIA_OK" constant?
   return make_call(local_name_to_top_level_entity("0"), NIL);
 }
 
+/* is it an assignment to ignore
+ */
 bool freia_assignment_p(entity e)
 {
   return ENTITY_ASSIGN_P(e) || ENTITY_BITWISE_OR_UPDATE_P(e);
@@ -498,6 +506,7 @@ static entity get_assigned_variable(statement s)
 #include "effects-generic.h"
 
 /* append simple scalar entities with written/read effects to s
+ * scalars assigned to are ignored (return status)
  */
 static void set_add_scalars(set s, statement stat, bool written)
 {
@@ -517,11 +526,12 @@ static void set_add_scalars(set s, statement stat, bool written)
 
 /* is there a simple scalar (no image) rw dependency from s to t?
  * when the return value is assigned, I have a problem.
+ * WW deps are ignored.
  */
 bool freia_simple_scalar_rw_dependency(statement s, statement t)
 {
   // pips_assert("distinct statements", s!=t);
-  if (s==t) return false;
+  if (s==t || !s || !t) return false;
   // I should really use entity_conflict_p...
   set reads = set_make(set_pointer), writes = set_make(set_pointer);
   set_add_scalars(writes, s, true);

@@ -53,10 +53,10 @@ determinism.
 \domain{Import statement from "ri.newgen"}
 {}
 
-\domain{pstatement = persistant statement}
+\domain{pstatement = persistant statement + empty:unit}
 {}
 
-\domain{vtxcontent = optype:int x opid:int x source:pstatement x inputs:entity* x out:entity x inparams:entity* x outparams:entity*}
+\domain{vtxcontent = optype:int x opid:int x source:pstatement x inputs:entity* x out:entity}
 {}
 
 The operation (\emph{optype}, \emph{opid}) may not be commutative,
@@ -75,15 +75,15 @@ use-def chains?
 What about the first and last vertices? They can be deduced because
 they do not have predecessors or successors?
 
-\domain{dag = inputs:entity* x outputs:entity* x vertices:dagvtx*}
+\domain{dag = inputs:dagvtx* x outputs:dagvtx* x vertices:dagvtx*}
 {}
 
 The order of \emph{vertices} in the list is the inverse of their
 occurence in the sequence, so that the first to produce an image is
 indeed to one that produced it if a variable is reused.
 
-List \emph{inputs} stores the entities of the images used as inputs to
-the DAG. List \emph{outputs} is for the images produced by the DAG, and
-expected outside.
+List \emph{inputs} stores \emph{external} inputs to the DAG.
+List \emph{outputs} is for the nodes of the DAG which produce
+an image expected outside.
 
 \end{document}
