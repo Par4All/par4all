@@ -106,10 +106,10 @@ TRUE                    { return(TTRUE); }
 FALSE			{ return(TFALSE); }
 -?[0-9]+       		{ return(TNUMB); }
 [-_a-zA-Z][-_a-zA-Z0-9]* { return(TIDENT); }
-\"[^\"]*\"		{ /*"*/return(TSTRING); }
+\"[^\"]*\"		{ return(TSTRING); }
 ^[ \t]*#.*$		{ /* comments are skipped. */ }
 [ \t\n]*		{ /* blanks are skipped. */ }
-=			{ /* ignore an = */ }
+=			{ /* ignore =: foo=bla same as foo bla */ }
 .                       { fprintf(stderr, "skipping unexpected char %c (%d)\n",
 				  *yytext, *yytext);
 			}
@@ -120,7 +120,7 @@ FALSE			{ return(TFALSE); }
 int yywrap(void)
 { return 1;}
 
-static bool 
+static bool
 property_equal_p(property p1, property p2)
 {
     bool equal_p = (property_tag(p1)==property_tag(p2));
