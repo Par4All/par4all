@@ -675,15 +675,14 @@ list /* of X */ (*iterate)(/* X, list of X */), initial;
   }
 }
 
-list gen_make_list(int domain, const gen_chunk * first, ...)
+list gen_make_list(int domain, ...)
 {
   list l, current;
-  gen_chunk *item;
+  gen_chunk *item = NULL;
   va_list args;
-  va_start(args, first);
-
-  item = (gen_chunk *) first;
-  if (!item) return NIL;
+  va_start(args, domain);
+  item = va_arg(args, gen_chunk*);
+  if( !item ) return NIL;
 
   NEWGEN_CHECK_TYPE(domain, item);
   l = CONS(CHUNK, item, NIL), current = l;

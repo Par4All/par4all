@@ -284,7 +284,7 @@ extern list gen_concatenate(const list , const list);
 extern list gen_copy_seq(const list);
 extern list gen_nconc(list, list);
 extern list gen_full_copy_list(const list);
-extern list gen_make_list(int, const gen_chunk *, ...);
+extern list gen_make_list(int, ...);
 extern list gen_nreverse(list);
 
 // EXTRACTIONS
