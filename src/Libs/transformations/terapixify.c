@@ -312,7 +312,7 @@ bool expression_array_to_pointer(expression exp)
              * we are allowded to convert formal parameters such as int a[n][12] into int *a
              */
             bool force_cast = true;
-            if( get_bool_property("ARRAY_TO_POINTER_CONVERT_PARAMETERS")
+            if( get_bool_property("ARRAY_TO_POINTER_CONVERT_PARAMETERS") && ! get_bool_property("ARRAY_TO_POINTER_FLATTEN_ONLY") 
                     && formal_parameter_p(reference_variable(ref)) )
             {
                 force_cast=false;
@@ -320,31 +320,37 @@ bool expression_array_to_pointer(expression exp)
 
             /* create a new reference without subscripts */
             reference ref_without_indices = make_reference(reference_variable(ref),NIL);
-            /* get the base type of the reference */
-            type type_without_indices = make_type_variable(make_variable(
-                        copy_basic(variable_basic(type_variable(entity_type(reference_variable(ref))))),
-                        NIL,
-                        gen_full_copy_list(variable_qualifiers(type_variable(entity_type(reference_variable(ref)))))));
 
-            expression address_computation = EXPRESSION(CAR(reference_indices(ref)));
-            /* create an expression for the new reference, possibly casted */
             expression base_ref = reference_to_expression(ref_without_indices);
-            if( force_cast && ! basic_pointer_p( variable_basic(type_variable(entity_type(reference_variable(ref) ) ) ) ) )
+            expression address_computation = EXPRESSION(CAR(reference_indices(ref)));
+            /* create a pointer if needed */
+            if( !get_bool_property("ARRAY_TO_POINTER_FLATTEN_ONLY"))
             {
-                base_ref = make_expression(
-                        make_syntax_cast(
-                            make_cast(
-                                make_type_variable(
-                                    make_variable(
-                                        make_basic_pointer(type_without_indices),NIL,NIL
-                                        )
-                                    ),
-                                base_ref)
-                            ),
-                        normalized_undefined);
+                /* get the base type of the reference */
+                type type_without_indices = make_type_variable(make_variable(
+                            copy_basic(variable_basic(type_variable(entity_type(reference_variable(ref))))),
+                            NIL,
+                            gen_full_copy_list(variable_qualifiers(type_variable(entity_type(reference_variable(ref)))))));
+
+
+                /* create an expression for the new reference, possibly casted */
+                if( force_cast && ! basic_pointer_p( variable_basic(type_variable(entity_type(reference_variable(ref) ) ) ) ) )
+                {
+                    base_ref = make_expression(
+                            make_syntax_cast(
+                                make_cast(
+                                    make_type_variable(
+                                        make_variable(
+                                            make_basic_pointer(type_without_indices),NIL,NIL
+                                            )
+                                        ),
+                                    base_ref)
+                                ),
+                            normalized_undefined);
+                }
             }
 
-            /* iterate on the dimensions & indices to create the pointer expression */
+            /* iterate on the dimensions & indices to create the index expression */
             list dims = variable_dimensions(type_variable(entity_type(reference_variable(ref))));
             list indices = reference_indices(ref);
             POP(indices);
@@ -389,20 +395,28 @@ bool expression_array_to_pointer(expression exp)
                         );
             }
 
-            /* we now add the DEREFERENCING_OPERATOR, if needed */
+            /* we now either add the DEREFERENCING_OPERATOR, or the [] */
             syntax new_syntax = syntax_undefined;
             if(nb_indices == nb_dims || nb_dims == 0 ) {
-                new_syntax=make_syntax_call(
-                        make_call(
-                            CreateIntrinsic(DEREFERENCING_OPERATOR_NAME),
-                            CONS(EXPRESSION,MakeBinaryCall(
-                                    CreateIntrinsic(PLUS_C_OPERATOR_NAME),
-                                    base_ref,
-                                    address_computation), NIL)
-                            )
-                        );
+                if(get_bool_property("ARRAY_TO_POINTER_FLATTEN_ONLY")) {
+                    reference_indices(ref_without_indices)=make_expression_list(address_computation);
+                    new_syntax=make_syntax_reference(ref_without_indices);
+                }
+                else {
+
+                    new_syntax=make_syntax_call(
+                            make_call(
+                                CreateIntrinsic(DEREFERENCING_OPERATOR_NAME),
+                                CONS(EXPRESSION,MakeBinaryCall(
+                                        CreateIntrinsic(PLUS_C_OPERATOR_NAME),
+                                        base_ref,
+                                        address_computation), NIL)
+                                )
+                            );
+                }
             }
-            else {
+            else
+            {
                 new_syntax = make_syntax_call(
                         make_call(CreateIntrinsic(PLUS_C_OPERATOR_NAME),
                             make_expression_list(base_ref,address_computation))

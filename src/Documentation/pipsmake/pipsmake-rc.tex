@@ -6760,9 +6760,11 @@ array_to_pointer > MODULE.code
 
 The property \verb+ARRAY_TO_POINTER_CONVERT_PARAMETERS+ can be used to change the signature of the module.
 Module similar to \lstinline|int foo(int a[20][2]);| will be turned into \lstinline|int foo(int *a);|
+ The property \verb+ARRAY_TO_POINTER_FLATTEN_ONLY+ can be set to true to reduce (<>flatten) the number of dimensions of the arrays to 1, while keeping use of the \verb+[]+ operator.
 
 \begin{PipsProp}
 ARRAY_TO_POINTER_CONVERT_PARAMETERS FALSE
+ARRAY_TO_POINTER_FLATTEN_ONLY FALSE
 \end{PipsProp}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% EOLE
