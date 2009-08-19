@@ -97,3 +97,6 @@ missing:
 	@for res in $(F.res) ; do \
 	  test -d $$res || echo "missing: $$res" >&2 ; \
 	done
+
+count:
+	@echo "number of validations:" `echo $(F.result) | wc -w`
