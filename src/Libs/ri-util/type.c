@@ -356,10 +356,7 @@ type make_scalar_integer_type(_int n)
     return t;
 }
 
-bool 
-area_equal_p(a1, a2)
-area a1;
-area a2;
+bool area_equal_p(area a1, area a2)
 {
     if(a1 == a2)
 	return TRUE;
@@ -373,9 +370,7 @@ area a2;
 }
 
 bool
-dimension_equal_p(
-    dimension d1, 
-    dimension d2)
+dimension_equal_p(dimension d1, dimension d2)
 {
     return /* same values */
 	same_expression_p(dimension_lower(d1), dimension_lower(d2)) &&
@@ -401,7 +396,7 @@ bool variable_equal_p(variable v1, variable v2)
 
       if(ld1==NIL && ld2==NIL)
 	  return TRUE;
-      else 
+      else
       {
 	  /* dimensions should be checked, but it's hard: the only
 	     Fortran requirement is that the space allocated in
@@ -413,7 +408,7 @@ bool variable_equal_p(variable v1, variable v2)
 	     in the parser; 1 February 1994 */
 	  /* FC: I need this in the prettyprinter... */
 	  int l1 = gen_length(ld1), l2 = gen_length(ld2);
-	  if (l1!=l2) 
+	  if (l1!=l2)
 	      return FALSE;
 	  for (; ld1; POP(ld1), POP(ld2))
 	  {
@@ -428,67 +423,73 @@ bool variable_equal_p(variable v1, variable v2)
 
 bool basic_equal_p(basic b1, basic b2)
 {
-    if( basic_typedef_p(b1) )
+  if( basic_typedef_p(b1) )
     {
-        type t1 = ultimate_type( entity_type(basic_typedef(b1)) );
-        b1 = variable_basic(type_variable(t1));
-        
+      type t1 = ultimate_type( entity_type(basic_typedef(b1)) );
+      b1 = variable_basic(type_variable(t1));
     }
-    if( basic_typedef_p(b2) )
+
+  if( basic_typedef_p(b2) )
     {
-        type t2 = ultimate_type( entity_type(basic_typedef(b2)) );
-        b2 = variable_basic(type_variable(t2));
-        
+      type t2 = ultimate_type( entity_type(basic_typedef(b2)) );
+      b2 = variable_basic(type_variable(t2));
     }
-    if(b1 == b2)
-	return TRUE;
-    else if (b1 == basic_undefined && b2 != basic_undefined)
-	return FALSE;
-    else if (b1 != basic_undefined && b2 == basic_undefined)
-	return FALSE;
-    else if (basic_tag(b1) != basic_tag(b2))
-	return FALSE;
 
-    /* assertion: b1 and b2 are defined and have the same tag
-       (see previous tests) */
+  if(b1 == b2)
+    return TRUE;
+  else if (b1 == basic_undefined && b2 != basic_undefined)
+    return FALSE;
+  else if (b1 != basic_undefined && b2 == basic_undefined)
+    return FALSE;
+  else if (basic_tag(b1) != basic_tag(b2))
+    return FALSE;
 
-    switch(basic_tag(b1)) {
-    case is_basic_int:
-	return basic_int(b1) == basic_int(b2);
-    case is_basic_float:
-	return basic_float(b1) == basic_float(b2);
-    case is_basic_logical:
-	return basic_logical(b1) == basic_logical(b2);
-    case is_basic_overloaded:
-	return TRUE;
-    case is_basic_complex:
-	return basic_complex(b1) == basic_complex(b2);
-    case is_basic_pointer:
+  /* assertion: b1 and b2 are defined and have the same tag
+     (see previous tests) */
+
+  switch(basic_tag(b1)) {
+  case is_basic_int:
+    return basic_int(b1) == basic_int(b2);
+  case is_basic_float:
+    return basic_float(b1) == basic_float(b2);
+  case is_basic_logical:
+    return basic_logical(b1) == basic_logical(b2);
+  case is_basic_overloaded:
+    return TRUE;
+  case is_basic_complex:
+    return basic_complex(b1) == basic_complex(b2);
+  case is_basic_pointer:
     {
-	  type t1 = basic_pointer(b1);
-	  type t2 = basic_pointer(b2);
+      type t1 = basic_pointer(b1);
+      type t2 = basic_pointer(b2);
 
-	  return type_variable_p(t1) &&
-          type_variable_p(t2) &&
-          basic_equal_p( variable_basic(type_variable(t1)) , variable_basic(type_variable(t2)) );
+      return type_variable_p(t1) &&
+	type_variable_p(t2) &&
+	basic_equal_p( variable_basic(type_variable(t1)) , variable_basic(type_variable(t2)) );
     }
-    case is_basic_string:
-      /* Do we want string types to be equal only if lengths are equal?
-       * I do not think so
-       */
-      /*
-	pips_error("basic_equal_p",
-		   "string type comparison not implemented\n");
-		   */
-	/* could be a star or an expression; a value_equal_p() is needed! */
-	return TRUE;
-    default: pips_error("basic_equal_p", "unexpected tag %d\n", basic_tag(b1));
+  case is_basic_derived:
+    {
+      entity e1 = basic_derived(b1);
+      entity e2 = basic_derived(b2);
+
+      return e1==e2;
     }
-    return FALSE; /* just to avoid a warning */
+  case is_basic_string:
+    /* Do we want string types to be equal only if lengths are equal?
+     * I do not think so
+     */
+    /*
+      pips_error("basic_equal_p",
+      "string type comparison not implemented\n");
+    */
+    /* could be a star or an expression; a value_equal_p() is needed! */
+    return TRUE;
+  default: pips_error("basic_equal_p", "unexpected tag %d\n", basic_tag(b1));
+  }
+  return FALSE; /* just to avoid a warning */
 }
 
-bool 
-functional_equal_p(functional f1, functional f2)
+bool functional_equal_p(functional f1, functional f2)
 {
     if(f1 == f2)
 	return TRUE;
@@ -515,8 +516,7 @@ functional_equal_p(functional f1, functional f2)
     }
 }
 
-bool 
-parameter_equal_p(parameter p1, parameter p2)
+bool parameter_equal_p(parameter p1, parameter p2)
 {
     if(p1 == p2)
 	return TRUE;
@@ -529,8 +529,7 @@ parameter_equal_p(parameter p1, parameter p2)
 	    && mode_equal_p(parameter_mode(p1), parameter_mode(p2));
 }
 
-bool 
-mode_equal_p(mode m1, mode m2)
+bool mode_equal_p(mode m1, mode m2)
 {
     if(m1 == m2)
 	return TRUE;
@@ -538,12 +537,11 @@ mode_equal_p(mode m1, mode m2)
 	return FALSE;
     else if (m1 != mode_undefined && m2 == mode_undefined)
 	return FALSE;
-    else 
+    else
 	return mode_tag(m1) == mode_tag(m2);
 }
 
-int 
-string_type_size(basic b)
+int string_type_size(basic b)
 {
     int size = -1;
     value v = basic_string(b);
@@ -554,7 +552,7 @@ string_type_size(basic b)
       c = value_constant(v);
       if(constant_int_p(c))
 	size = constant_int(c);
-      else 
+      else
 	pips_internal_error("Non-integer constant to size a string\n");
       break;
     case is_value_unknown:
@@ -570,8 +568,7 @@ string_type_size(basic b)
 }
 
 /* See also SizeOfElements() */
-int 
-basic_type_size(basic b)
+int basic_type_size(basic b)
 {
     int size = -1;
 
@@ -582,12 +579,12 @@ basic_type_size(basic b)
 	break;
     case is_basic_logical: size = basic_logical(b);
 	break;
-    case is_basic_overloaded: 
+    case is_basic_overloaded:
 	pips_error("basic_type_size", "undefined for type overloaded\n");
 	break;
     case is_basic_complex: size = basic_complex(b);
 	break;
-    case is_basic_string: 
+    case is_basic_string:
       /* pips_error("basic_type_size", "undefined for type string\n"); */
       size = string_type_size(b);
 	break;
@@ -607,10 +604,9 @@ basic_type_size(basic b)
  * IO statements contain call to labels of type statement. An
  * undefined_basic is returned for such expressions.
  *
- * WARNING: a pointer to an existing data structure is returned. 
+ * WARNING: a pointer to an existing data structure is returned.
  */
-basic 
-expression_basic(expression expr)
+basic expression_basic(expression expr)
 {
     syntax the_syntax=expression_syntax(expr);
     basic b = basic_undefined;
@@ -626,11 +622,10 @@ expression_basic(expression expr)
 	break;
     case is_syntax_call:
 	/*
-	 * here is a little problem with pips...
-	 * every intrinsics are overloaded, what is not 
-	 * exactly what is desired...
+	 * here is a little problem with pips...  every intrinsics are
+	 * overloaded, what is not exactly what is desired...
 	 */
-      	return(entity_basic(call_function(syntax_call(the_syntax))));
+        return(entity_basic(call_function(syntax_call(the_syntax))));
 	break;
     case is_syntax_cast:
       {
@@ -656,13 +651,12 @@ expression_basic(expression expr)
 }
 
 /* returns an allocated basic.
- */ 
-basic
-please_give_me_a_basic_for_an_expression(expression e)
+ */
+basic please_give_me_a_basic_for_an_expression(expression e)
 {
   basic r = expression_basic(e);
   if(!basic_undefined_p(r)) {
-    if (basic_overloaded_p(r)) 
+    if (basic_overloaded_p(r))
       r = basic_of_expression(e); /* try something else... */
     else
       r = copy_basic(r);
@@ -670,21 +664,19 @@ please_give_me_a_basic_for_an_expression(expression e)
   return r;
 }
 
-dimension 
-dimension_dup(dimension d)
+dimension dimension_dup(dimension d)
 {
     return(make_dimension(copy_expression(dimension_lower(d)),
 			  copy_expression(dimension_upper(d))));
 }
 
-list 
-ldimensions_dup(list l)
+list ldimensions_dup(list l)
 {
     list result = NIL ;
 
     MAPL(cd,
      {
-	 result = CONS(DIMENSION, dimension_dup(DIMENSION(CAR(cd))), 
+	 result = CONS(DIMENSION, dimension_dup(DIMENSION(CAR(cd))),
 		       result);
      },
 	 l);
@@ -692,12 +684,11 @@ ldimensions_dup(list l)
     return(gen_nreverse(result));
 }
 
-dimension 
-FindIthDimension(entity e, int i)
+dimension FindIthDimension(entity e, int i)
 {
     cons * pc;
 
-    if (!type_variable_p(entity_type(e))) 
+    if (!type_variable_p(entity_type(e)))
 	pips_error("FindIthDimension", "not a variable\n");
 
     if (i <= 0)
@@ -708,8 +699,8 @@ FindIthDimension(entity e, int i)
     while (pc != NULL && --i > 0)
 	pc = CDR(pc);
 
-    if (pc == NULL) 
-	pips_error("FindIthDimension", "not enough dimensions\n");
+    if (pc == NULL)
+	pips_internal_error("not enough dimensions\n");
 
     return(DIMENSION(CAR(pc)));
 }
@@ -717,8 +708,7 @@ FindIthDimension(entity e, int i)
 /*
  * returns a string defining a type.
  */
-string 
-type_to_string(type t)
+string type_to_string(type t)
 {
     switch (type_tag(t))
     {
@@ -745,10 +735,9 @@ type_to_string(type t)
     default: break;
     }
 
-    pips_error("type_to_string", 
-	       "unexpected type: 0x%x (tag=%d)",
-	       t,
-	       type_tag(t));
+    pips_internal_error("unexpected type: 0x%x (tag=%d)",
+			t,
+			type_tag(t));
 
     return(string_undefined); /* just to avoid a gcc warning */
 }
@@ -768,9 +757,7 @@ string safe_type_to_string(type t)
 /*
  * returns the string to declare a basic type.
  */
-string 
-basic_to_string(b)
-basic b;
+ string basic_to_string(basic b)
 {
   /* Nga Nguyen, 19/09/2003: To not rewrite the same thing, I use the words_basic() function*/
   return list_to_string(words_basic(b));
@@ -787,8 +774,7 @@ basic b;
  *  PREFER (???) expression_basic
  *
  */
-basic 
-some_basic_of_any_expression(expression exp, bool apply_p, bool ultimate_p)
+basic some_basic_of_any_expression(expression exp, bool apply_p, bool ultimate_p)
 {
   syntax sy = expression_syntax(exp);
   basic b = basic_undefined;
@@ -831,7 +817,7 @@ some_basic_of_any_expression(expression exp, bool apply_p, bool ultimate_p)
 	       (except in a few cases which should be handled in basic_of_call)
 	       to be verified or done
 	    */
-	    
+
 	    for (l_dim = variable_dimensions(type_variable(exp_type)); !ENDP(l_dim); POP(l_dim))
 	      {
 		b = make_basic(is_basic_pointer, make_type(is_type_variable, make_variable(b, NIL, NIL)));
@@ -842,7 +828,7 @@ some_basic_of_any_expression(expression exp, bool apply_p, bool ultimate_p)
 	    /* A reference to a function returns a pointer to a function of the very same time */
 	    b = make_basic(is_basic_pointer, copy_type(exp_type));
 	  }
-	else 
+	else
 	  {
 	    pips_internal_error("Bad reference type tag %d \"%s\"\n",
 				type_tag(exp_type), type_to_string(exp_type));
@@ -868,14 +854,14 @@ some_basic_of_any_expression(expression exp, bool apply_p, bool ultimate_p)
 	}
       break;
     }
-  case is_syntax_call: 
+  case is_syntax_call:
     b = basic_of_call(syntax_call(sy), apply_p, ultimate_p);
     break;
-  case is_syntax_range: 
+  case is_syntax_range:
     /* Well, let's assume range are well formed... */
     b = basic_of_expression(range_lower(syntax_range(sy)));
     break;
-  case is_syntax_cast: 
+  case is_syntax_cast:
     {
       type t = cast_type(syntax_cast(sy));
 
@@ -892,7 +878,7 @@ some_basic_of_any_expression(expression exp, bool apply_p, bool ultimate_p)
 	b = copy_basic(variable_basic(type_variable(t)));
       break;
     }
-  case is_syntax_sizeofexpression: 
+  case is_syntax_sizeofexpression:
     {
       sizeofexpression se = syntax_sizeofexpression(sy);
       if (sizeofexpression_type_p(se))
@@ -908,7 +894,7 @@ some_basic_of_any_expression(expression exp, bool apply_p, bool ultimate_p)
 	}
       break;
     }
-  case is_syntax_subscript: 
+  case is_syntax_subscript:
     {
       b = some_basic_of_any_expression(subscript_array(syntax_subscript(sy)), apply_p, ultimate_p);
       break;
@@ -950,8 +936,7 @@ some_basic_of_any_expression(expression exp, bool apply_p, bool ultimate_p)
 }
 
 
-basic 
-basic_of_any_expression(expression exp, bool apply_p)
+basic basic_of_any_expression(expression exp, bool apply_p)
 {
   return some_basic_of_any_expression(exp, apply_p, TRUE);
 }
@@ -968,8 +953,7 @@ basic_of_any_expression(expression exp, bool apply_p)
  *  PREFER (???) expression_basic
  *
  */
-basic 
-basic_of_expression(expression exp)
+basic basic_of_expression(expression exp)
 {
   return basic_of_any_expression(exp, FALSE);
 }
@@ -983,8 +967,7 @@ basic_of_expression(expression exp)
  *
  * WARNING: a new basic is allocated
  */
-basic 
-basic_of_call(call c, bool apply_p, bool ultimate_p)
+basic basic_of_call(call c, bool apply_p, bool ultimate_p)
 {
     entity e = call_function(c);
     tag t = value_tag(entity_initial(e));
@@ -995,10 +978,10 @@ basic_of_call(call c, bool apply_p, bool ultimate_p)
     case is_value_code:
 	b = copy_basic(basic_of_external(c));
 	break;
-    case is_value_intrinsic: 
+    case is_value_intrinsic:
       b = basic_of_intrinsic(c, apply_p, ultimate_p);
 	break;
-    case is_value_symbolic: 
+    case is_value_symbolic:
 	/* b = make_basic(is_basic_overloaded, UU); */
 	b = copy_basic(basic_of_constant(c));
 	break;
@@ -1024,8 +1007,7 @@ basic_of_call(call c, bool apply_p, bool ultimate_p)
  *
  * WARNING: returns a pointer
  */
-basic 
-basic_of_external(call c)
+basic basic_of_external(call c)
 {
     type return_type = type_undefined;
     entity f = call_function(c);
@@ -1064,8 +1046,7 @@ basic_of_external(call c)
  * replaced by their definitions or not?
  *
  * WARNING: returns a newly allocated basic object */
-basic 
-basic_of_intrinsic(call c, bool apply_p, bool ultimate_p)
+basic basic_of_intrinsic(call c, bool apply_p, bool ultimate_p)
 {
   entity f = call_function(c);
   type rt = functional_result(type_functional(entity_type(f)));
@@ -1201,8 +1182,7 @@ basic_of_intrinsic(call c, bool apply_p, bool ultimate_p)
  *
  * WARNING: returns a pointer towards an existing data structure
  */
-basic 
-basic_of_constant(call c)
+basic basic_of_constant(call c)
 {
     type call_type, return_type;
 
@@ -1231,8 +1211,7 @@ basic_of_constant(call c)
  * WARNING: a new basic data structure is allocated (because you cannot
  * always find a proper data structure to return simply a pointer
  */
-basic 
-basic_union(expression exp1, expression exp2)
+basic basic_union(expression exp1, expression exp2)
 {
   basic b1 = basic_of_expression(exp1);
   basic b2 = basic_of_expression(exp2);
@@ -1256,8 +1235,7 @@ basic_ultimate(basic b)
   return b;
 }
 
-basic 
-basic_maximum(basic fb1, basic fb2)
+basic basic_maximum(basic fb1, basic fb2)
 {
   basic b = basic_undefined;
   basic b1 = basic_ultimate(fb1);
@@ -1364,7 +1342,7 @@ basic_maximum(basic fb1, basic fb2)
       if(basic_complex_p(b2) || basic_float_p(b2)) {
 	_int s1 = SizeOfElements(b1);
 	_int s2 = SizeOfElements(b2);
-	
+
 	b = make_basic(basic_tag(b2), UUINT(s1>s2?s1:s2));
       }
       else if(basic_int_p(b2)) {
@@ -1467,10 +1445,11 @@ basic_maximum(basic fb1, basic fb2)
 /**************************************************** expression_to_type */
 
 /**
-   @return the (newly allocated) type of the result given by call to an 
-   intrinsic function. 
-   This type must be computed with the basic of the arguments of the 
-   intrinsic for overloaded operators. It should be able to accomodate 
+   @return the (newly allocated) type of the result given by call to
+   an intrinsic function.
+
+   This type must be computed with the basic of the arguments of the
+   intrinsic for overloaded operators. It should be able to accomodate
    more than two arguments as for generic min and max operators.
 */
 
@@ -1479,7 +1458,7 @@ type intrinsic_call_to_type(call c)
 
   entity f = call_function(c);
   list args = call_arguments(c);
- 
+
   type rt = functional_result(type_functional(entity_type(f)));
   basic rb = variable_basic(type_variable(rt));
 
@@ -1489,10 +1468,10 @@ type intrinsic_call_to_type(call c)
 	     module_local_name(f),
 	     words_to_string(words_type(rt)));
 
-  if(basic_overloaded_p(rb)) 
+  if(basic_overloaded_p(rb))
     {
-     
-      if (ENDP(args)) 
+
+      if (ENDP(args))
 	{
 	  /* I don't know the type since there is no arguments !
 	     Bug encountered with a FMT=* in a PRINT.
@@ -1500,37 +1479,37 @@ type intrinsic_call_to_type(call c)
 	  /* leave it overloaded */
 	  t = copy_type(rt);
 	}
-      else if(ENTITY_ADDRESS_OF_P(f)) 
-	{	  
+      else if(ENTITY_ADDRESS_OF_P(f))
+	{
 	  expression e = EXPRESSION(CAR(args));
 	  t = expression_to_type(e);
 	  t = make_type(is_type_variable,
 			make_variable( make_basic(is_basic_pointer,t),
 				       NIL, NIL ));
-	  
+
 	}
-      else if(ENTITY_DEREFERENCING_P(f)) 
+      else if(ENTITY_DEREFERENCING_P(f))
 	{
 	  expression e = EXPRESSION(CAR(args));
 	  type ct = expression_to_type(e);
-	  
+
 	  if (type_variable_p(ct))
 	    {
 	      variable cv = type_variable(ct);
 	      basic cb = variable_basic(cv);
 	      list cd = variable_dimensions(cv);
-	      
-	      if(basic_pointer_p(cb)) 
+
+	      if(basic_pointer_p(cb))
 		{
 		  t = copy_type(ultimate_type(basic_pointer(cb)));
-		  pips_assert("The pointed type is consistent", 
+		  pips_assert("The pointed type is consistent",
 			      type_consistent_p(t));
 		  free_type(ct);
 		}
 	      else
 		{
 		  pips_assert("Dereferencing of a non-pointer expression : it must be an array\n", !ENDP(cd));
-		  		   
+
 		  variable_dimensions(cv) = CDR(cd);
 		  cd->cdr = NIL;
 		  gen_full_free_list(cd);
@@ -1542,15 +1521,15 @@ type intrinsic_call_to_type(call c)
 	      pips_internal_error("dereferencing of a non-variable : not handled yet\n");
 	    }
 	}
-      else if(ENTITY_POINT_TO_P(f) || ENTITY_FIELD_P(f)) 
+      else if(ENTITY_POINT_TO_P(f) || ENTITY_FIELD_P(f))
 	{
 	  expression e1 = EXPRESSION(CAR(args));
 	  expression e2 = EXPRESSION(CAR(CDR(args)));
 
-	  pips_assert("Two arguments for POINT_TO or FIELD \n", 
+	  pips_assert("Two arguments for POINT_TO or FIELD \n",
 		      gen_length(args)==2);
 
-	  ifdebug(8) 
+	  ifdebug(8)
 	    {
 	      pips_debug(8, "Point to case, e1 = ");
 	      print_expression(e1);
@@ -1560,28 +1539,28 @@ type intrinsic_call_to_type(call c)
 	    }
 	  t = expression_to_type(e2);
 	}
-      else if(ENTITY_BRACE_INTRINSIC_P(f)) 
+      else if(ENTITY_BRACE_INTRINSIC_P(f))
 	{
 	  /* We should reconstruct a struct type or an array type... */
 	  t = make_type(is_type_variable, make_variable(make_basic_overloaded(),
 						       NIL,NIL));
 	}
-      else if(ENTITY_ASSIGN_P(f)) 
+      else if(ENTITY_ASSIGN_P(f))
 	{
 	  /* returns the type of the left hand side */
 	  t = expression_to_type(EXPRESSION(CAR(args)));
 	}
-      else if(ENTITY_COMMA_P(f)) 
+      else if(ENTITY_COMMA_P(f))
 	{
 	  /* The value returned is the value of the last expression in the list. */
-	  
+
 	  t = expression_to_type(EXPRESSION(CAR(gen_last(args))));
 	}
-      else 
+      else
 	{
-	  
+
 	  type ct = expression_to_type(EXPRESSION(CAR(args)));
-	  
+
 	  MAP(EXPRESSION, arg, {
 	      type nt = expression_to_type(arg);
 	      basic nb = variable_basic(type_variable(nt));
@@ -1593,11 +1572,11 @@ type intrinsic_call_to_type(call c)
 		 of expression_to_type
 	      */
 	      basic b = basic_maximum(cb, nb);
-	      
+
 	      free_type(ct);
 	      free_type(nt);
 	      ct = make_type(is_type_variable, make_variable(b, NIL, NIL));
-	      
+
 	    }, CDR(args));
 	  t = ct;
 	}
@@ -1605,12 +1584,12 @@ type intrinsic_call_to_type(call c)
   else {
     t = copy_type(rt);
   }
-  
+
   pips_debug(7, "Intrinsic call to intrinsic \"%s\" with a posteriori result type \"%s\"\n",
 	     module_local_name(f),
 	     words_to_string(words_type(t)));
-  
-  return t;  
+
+  return t;
 }
 
 
@@ -1626,11 +1605,10 @@ type call_to_type(call c)
 		    make_variable(copy_basic(basic_of_external(c)),
 				  NIL, NIL));
       break;
-    case is_value_intrinsic: 
-      
+    case is_value_intrinsic:
       t = intrinsic_call_to_type(c);
       break;
-    case is_value_symbolic: 
+    case is_value_symbolic:
       /* b = make_basic(is_basic_overloaded, UU); */
       t = make_type(is_type_variable,
 		    make_variable(copy_basic(basic_of_constant(c)),
@@ -1879,8 +1857,7 @@ type expression_to_user_type(expression e)
 
 
 
-bool 
-overloaded_type_p(type t)
+bool overloaded_type_p(type t)
 {
     pips_assert("overloaded_type_p", type_variable_p(t));
 
@@ -1901,7 +1878,7 @@ bool
 is_inferior_basic(b1, b2)
 basic b1, b2;
 {
-    if ( b1 == basic_undefined ) 
+    if ( b1 == basic_undefined )
 	pips_error("is_inferior_basic", "first  basic_undefined\n");
     else if ( b2 == basic_undefined )
 	pips_error("is_inferior_basic", "second basic_undefined\n");
@@ -1960,7 +1937,7 @@ simple_basic_dup(basic b)
 		     "(tag %td) isn't that simple\n", basic_tag(b));
 	if (basic_string_p(b))
 	    fprintf(stderr, "string: value tag = %d\n",
-		             value_tag(basic_string(b)));
+		    value_tag(basic_string(b)));
 	return make_basic(basic_tag(b), UUINT(basic_int(b)));
     }
 }
@@ -1975,8 +1952,8 @@ basic_to_generic_conversion(basic b)
 
     switch (basic_tag(b))
     {
-    case is_basic_int: 
-	/* what about INTEGER*{2,4,8} ? 
+    case is_basic_int:
+	/* what about INTEGER*{2,4,8} ?
 	 */
 	result = entity_intrinsic(INT_GENERIC_CONVERSION_NAME);
 	break;
@@ -2085,8 +2062,8 @@ bool pointer_type_p(type t)
 
 /* Here is the set of mapping functions, from the RI to C language types*/
 
-/* Returns TRUE if t is one of the following types : 
-   void, char, short, int, long, float, double, signed, unsigned, 
+/* Returns TRUE if t is one of the following types :
+   void, char, short, int, long, float, double, signed, unsigned,
    and there is no array dimensions, of course*/
 
 bool basic_type_p(type t)
@@ -2126,12 +2103,14 @@ bool derived_type_p(type t)
 	  && (variable_dimensions(type_variable(t)) == NIL));
 }
 
-/* Returns TRUE if t is a typedefED type. 
-   Example : Myint i;*/
+/* Returns TRUE if t is a typedefED type.
+
+   Example : Myint i;
+*/
 
 bool typedef_type_p(type t)
 {
-  return (type_variable_p(t) && basic_typedef_p(variable_basic(type_variable(t))) 
+  return (type_variable_p(t) && basic_typedef_p(variable_basic(type_variable(t)))
 	  && (variable_dimensions(type_variable(t)) == NIL));
 }
 
@@ -2153,11 +2132,11 @@ type make_standard_integer_type(type t, int size)
 	  pips_debug(8,"Old basic size: %d, new size : %d\n",i,10*(i/10)+size);
 	  return make_type_variable(v);
 	}
-      else 
+      else
 	{
 	  if (bit_type_p(t))
 	    /* If it is int i:5, keep the bit basic type*/
-	    return t; 
+	    return t;
 	  else
 	    user_warning("Parse error", "Standard integer types\n");
 	  return type_undefined;
@@ -2170,22 +2149,22 @@ type make_standard_long_integer_type(type t)
   if (t == type_undefined)
     {
       variable v = make_variable(make_basic_int(DEFAULT_LONG_INTEGER_TYPE_SIZE),NIL,NIL);
-      return make_type_variable(v); 
-    } 
+      return make_type_variable(v);
+    }
   else
     {
       if (signed_type_p(t) || unsigned_type_p(t) || long_type_p(t))
 	{
 	  basic b = variable_basic(type_variable(t));
 	  int i = basic_int(b);
-	  variable v; 
+	  variable v;
 	  if (i%10 == DEFAULT_INTEGER_TYPE_SIZE)
 	    {
 	      /* long */
 	      v = make_variable(make_basic_int(10*(i/10)+DEFAULT_LONG_INTEGER_TYPE_SIZE),NIL,NIL);
 	      pips_debug(8,"Old basic size: %d, new size : %d\n",i,10*(i/10)+DEFAULT_LONG_INTEGER_TYPE_SIZE);
 	    }
-	  else 
+	  else
 	    {
 	      /* long long */
 	      v = make_variable(make_basic_int(10*(i/10)+DEFAULT_LONG_LONG_INTEGER_TYPE_SIZE),NIL,NIL);
@@ -2193,11 +2172,11 @@ type make_standard_long_integer_type(type t)
 	    }
 	  return make_type_variable(v);
 	}
-      else 
+      else
 	{
 	  if (bit_type_p(t))
 	    /* If it is long int i:5, keep the bit basic type*/
-	    return t; 
+	    return t;
 	  else
 	    user_warning("Parse error", "Standard long integer types\n");
 	  return type_undefined;
@@ -2714,8 +2693,8 @@ list type_supporting_entities(list sel, type t)
 
 /* Compute the list of references implied in the definition of a
    type. This list is empty for basic types such as int or char. But
-   it increases rapidly with typedef, struct, union, bit and dimensions
-   which can use enum elements in sizing expressions. 
+   it increases rapidly with typedef, struct, union, bit and
+   dimensions which can use enum elements in sizing expressions.
 
    The supporting entities are gathered in an updated list, sel,
    supporting reference list.

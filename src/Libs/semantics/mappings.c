@@ -21,7 +21,7 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
- /* Variable value mappings package 
+ /* Variable value mappings package
   *
   * Establish mappings between analyzed scalar variable entities and
   * variable value entities for a given module (see transformer/value.c).
@@ -192,7 +192,7 @@ void add_or_kill_equivalenced_variables(entity e, bool readonly)
 {
   storage s = entity_storage(e);
   entity re = e; /* potential canonical representative for all variables equivalenced with e */
- 
+
   pips_debug(8,	"Begin for %s %s\n", entity_name(e),
 	     readonly? "readonly" : "read/write");
 
@@ -302,7 +302,7 @@ void add_or_kill_equivalenced_variables(entity e, bool readonly)
     ;
   else
     pips_internal_error("unproper storage = %d\n", storage_tag(s));
- 
+
   pips_debug(8,	"End for %s\n", entity_name(e));
 }
 
@@ -312,7 +312,7 @@ static void allocate_module_value_mappings(entity m)
        although the hashtable package has enlarging capability;
        its usefulness is limited... but keep at least hash table
        allocations! */
-    
+
   /* FI: not a good estimate for C codes with local delcarations */
     list module_intra_effects = load_module_intraprocedural_effects(m);
     int old_value_number = 0;
@@ -386,7 +386,7 @@ static void allocate_module_value_mappings(entity m)
  *
  * reset_current_module_statement();
  * reset_cumulated_rw_effects();
- * reset_current_module_entity(); 
+ * reset_current_module_entity();
  * free_value_mappings();
  */
 void module_to_value_mappings(entity m)
@@ -402,8 +402,9 @@ void module_to_value_mappings(entity m)
 
     allocate_module_value_mappings(m);
 
-    /* reset local intermediate value counter for 
-       make_local_intermediate_value_entity and make_local_old_value_entity */
+    /* reset local intermediate value counter for
+       make_local_intermediate_value_entity and
+       make_local_old_value_entity */
     reset_value_counters();
     reset_equivalence_equalities();
     reset_temporary_value_counter();
@@ -414,98 +415,115 @@ void module_to_value_mappings(entity m)
 
     /* look for interprocedural write effects on scalar analyzable variables
        and generate proper entries into hash tables */
-    MAPL(cef,
-     {entity e = 
-	  reference_variable(effect_any_reference(EFFECT(CAR(cef))));
-	  action a = effect_action(EFFECT(CAR(cef)));
-	  /* In C, write effects on scalar formal parameter are masked
-	     by the vallue passing mode but the copu may nevertheless
-	     be written inside the function. */
-	  if(analyzable_scalar_entity_p(e)
-	     && (action_write_p(a) || (c_module_p(m) && entity_formal_p(e)))) 
-	      add_interprocedural_value_entities(e);
-      },
-	 module_inter_effects);
+    FOREACH(EFFECT, ef, module_inter_effects) {
+      entity e = reference_variable(effect_any_reference(ef));
+      action a = effect_action(ef);
+      if(analyzable_scalar_entity_p(e)
+	 && (
+	     action_write_p(a)
+	     ||
+	     /* In C, write effects on scalar formal parameter are
+		masked by the vallue passing mode but the copy may
+		nevertheless be written inside the function. */
+	      (c_module_p(m) && entity_formal_p(e))
+	     ||
+	     /* To keep the summary transformer consistent
+		although the return value has no old value */
+	     (c_module_p(m) && storage_return_p(entity_storage(e))
+	      ))
+	 )
+	add_interprocedural_value_entities(e);
+    }
 
     /* look for interprocedural read effects on scalar analyzable variables
        and generate proper entries into hash tables */
-    MAPL(cef,
-     {entity e = 
-	  reference_variable(effect_any_reference(EFFECT(CAR(cef))));
-	  action a = effect_action(EFFECT(CAR(cef)));
-	  if(analyzable_scalar_entity_p(e) && action_read_p(a)) 
-	      add_interprocedural_new_value_entity(e);
-      },
-	 module_inter_effects);
+    FOREACH(EFFECT, ef, module_inter_effects) {
+      entity e = reference_variable(effect_any_reference(ef));
+      action a = effect_action(ef);
+      if(analyzable_scalar_entity_p(e) && action_read_p(a)) {
+	if(c_module_p(m) && storage_return_p(entity_storage(e)))
+	  add_interprocedural_value_entities(e);
+	else
+	  add_interprocedural_new_value_entity(e);
+      }
+    }
 
-    /* module_intra_effects = 
+    /* module_intra_effects =
      * load_statement_cumulated_effects(code_statement(value_code(entity_initial(m))));
      */
 
-    module_intra_effects = 
-	load_module_intraprocedural_effects(m);
+    module_intra_effects = load_module_intraprocedural_effects(m);
 
     /* look for intraprocedural write effects on scalar analyzable variables
        and generate proper entries into hash tables */
-    MAP(EFFECT, ef,
-    {
+    FOREACH(EFFECT, ef, module_intra_effects) {
 	entity e = reference_variable(effect_any_reference(ef));
 	action a = effect_action(ef);
 	if(analyzable_scalar_entity_p(e) && action_write_p(a)) {
-	    if(storage_return_p(entity_storage(e))) {
-		add_interprocedural_value_entities(e);
-	    }
-	    else {
-		add_intraprocedural_value_entities(e);
-	    }
+	  if(storage_return_p(entity_storage(e))) {
+	    add_interprocedural_value_entities(e);
+	  }
+	  else {
+	    add_intraprocedural_value_entities(e);
+	  }
 	}
-    },
-	 module_intra_effects);
-    
+    }
+
     /* look for intraprocedural read effects on scalar analyzable variables
        and generate proper entry into value name hash table if it has
        not been entered before; interprocedural read effects are implicitly
-       dealed with since they are included; 
+       dealed with since they are included;
        most entities are likely to have been encountered before; however
        in parameters and uninitialized variables have to be dealt with */
-    MAP(EFFECT, ef,
-     {
-	 entity e = reference_variable(effect_any_reference(ef));
-	 if(analyzable_scalar_entity_p(e) && !entity_has_values_p(e)) {
-	      /* FI: although it may only be read within this procedure,
-	       * e might be written in another one thru a COMMON;
-	       * this write is not visible from OUT, but only from a caller
-	       * of out; because we have only a local intraprocedural or a 
-	       * global interprocedural view of aliasing, we have to create 
-	       * useless values:-(
-	       *
-	       * add_new_value(e);
-	       *
-	       * Note: this makes the control structure of this procedure 
-	       * obsolete!
-	       */
-	     /* This call is useless because it only is effective if
-	      * entity_has_values_p() is true:
-	      * add_intraprocedural_value_entities(e);
-	      */
-	      add_intraprocedural_value_entities_unconditionally(e);
-	      /* A stronger call to the same subroutine is included in
-	       * the previous call:
-	       * add_or_kill_equivalenced_variables(e, TRUE);
-	       */
-	  }},
-	 module_intra_effects);
+    FOREACH(EFFECT, ef, module_intra_effects) {
+      entity e = reference_variable(effect_any_reference(ef));
+      if(analyzable_scalar_entity_p(e) && !entity_has_values_p(e)) {
+	/* FI: although it may only be read within this procedure, e
+	 * might be written in another one thru a COMMON; this write
+	 * is not visible from OUT, but only from a caller of out;
+	 * because we have only a local intraprocedural or a global
+	 * interprocedural view of aliasing, we have to create useless
+	 * values:-(
+	 *
+	 * add_new_value(e);
+	 *
+	 * Note: this makes the control structure of this procedure
+	 * obsolete!
+	 */
+	/* This call is useless because it only is effective if
+	 * entity_has_values_p() is true:
+	 * add_intraprocedural_value_entities(e);
+	 */
+	add_intraprocedural_value_entities_unconditionally(e);
+	/* A stronger call to the same subroutine is included in
+	 * the previous call:
+	 * add_or_kill_equivalenced_variables(e, TRUE);
+	 */
+      }
+    }
 
     /* scan declarations to make sure that private variables are
        taken into account; assume a read and write effects on these
        variables, although they may not even be used.
 
        Only intraprocedural variables can be privatized (1 Aug. 92) */
-    MAPL(ce,
-     {entity e = ENTITY(CAR(ce));
-	  if(analyzable_scalar_entity_p(e) && !entity_has_values_p(e)) {
-	      add_intraprocedural_value_entities(e);
-	  }}, current_module_declarations());
+    FOREACH(ENTITY, e, current_module_declarations()) {
+      if(analyzable_scalar_entity_p(e) && !entity_has_values_p(e)) {
+	  if(storage_return_p(entity_storage(e))) {
+	    /* This should be useless if return variables are taken
+	       into account by effect analysis. No problem with
+	       Fortran because the return variable really is assigned
+	       a value. Not obvious in C because the assignment is
+	       implicit in the return statement. In C the return
+	       variable is more like a value: it cannot be re-assigned. */
+	    add_interprocedural_value_entities(e);
+	  }
+	  else {
+	    add_intraprocedural_value_entities(e);
+	  }
+      }
+    }
+
     //}}, code_declarations(value_code(entity_initial(m))));
 
     /* for debug, print hash tables */
@@ -519,7 +537,7 @@ void module_to_value_mappings(entity m)
 	       module_local_name(m),
 	       aproximate_number_of_analyzed_variables());
     pips_debug(1, "Number of analyzed values for module %s: %d\n",
- 	       module_local_name(m),
+	       module_local_name(m),
 	       number_of_analyzed_values());
 
     pips_debug(8,"end for module %s\n", module_local_name(m));

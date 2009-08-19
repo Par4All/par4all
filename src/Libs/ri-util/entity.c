@@ -864,14 +864,14 @@ local_name_to_top_level_entity(string n)
       module = gen_find_tabulated(concatenate(cun, MODULE_SEP_STRING, n, NULL),entity_domain);
       free(cun);
     }
-    else 
+    else
       {
 	for(i=0; i<4 && entity_undefined_p(module); i++)
 	  module = gen_find_tabulated(concatenate
 				      (TOP_LEVEL_MODULE_NAME, MODULE_SEP_STRING, prefixes[i], n, NULL),
 				      entity_domain);
       }
-    
+
     return module;
 }
 
@@ -893,15 +893,15 @@ entity module_name_to_entity(string mn)
   return module;
 }
 
-entity 
-global_name_to_entity(string m, string n)
+/* Retrieve an entity from its package/module name "m" and its local
+   name "n". */
+entity global_name_to_entity(string m, string n)
 {
-
-    return gen_find_tabulated(concatenate(m, MODULE_SEP_STRING, n, NULL),
-			      entity_domain);
+  return gen_find_tabulated(concatenate(m, MODULE_SEP_STRING, n, NULL),
+			    entity_domain);
 }
-entity
-FindEntity(string package, string name)
+
+entity FindEntity(string package, string name)
 {
     entity e = gen_find_tabulated(concatenate(package,MODULE_SEP_STRING,name,NULL), entity_domain);
     if( entity_undefined_p(e))

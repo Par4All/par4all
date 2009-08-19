@@ -298,18 +298,27 @@ bool complex_analyzed_p()
 /* The entity is type of one of the analyzed types */
 bool analyzable_basic_p(basic b)
 {
-    if(basic_int_p(b) && analyze_integer_scalar_entities)
-      return TRUE;
-    if(basic_string_p(b) && analyze_string_scalar_entities)
-      return TRUE;
-    if(basic_logical_p(b) && analyze_boolean_scalar_entities)
-      return TRUE;
-    if(basic_float_p(b) && analyze_float_scalar_entities)
-      return TRUE;
-    if(basic_complex_p(b) && analyze_complex_scalar_entities)
-      return TRUE;
-    else
-      return FALSE;
+  bool analyzable_p = FALSE;
+
+  if(basic_int_p(b) && analyze_integer_scalar_entities)
+    analyzable_p = TRUE;
+  else if(basic_string_p(b) && analyze_string_scalar_entities)
+    analyzable_p = TRUE;
+  else if(basic_logical_p(b) && analyze_boolean_scalar_entities)
+    analyzable_p = TRUE;
+  else if(basic_float_p(b) && analyze_float_scalar_entities)
+    analyzable_p = TRUE;
+  else if(basic_complex_p(b) && analyze_complex_scalar_entities)
+    analyzable_p = TRUE;
+  else if(basic_derived_p(b) && analyze_integer_scalar_entities) {
+    entity de = basic_derived(b);
+    type dt = ultimate_type(entity_type(de));
+    analyzable_p = type_enum_p(dt);
+  }
+  else
+    analyzable_p = FALSE;
+
+  return analyzable_p;
 }
 
 /* The entity is type of one of the analyzed types */
@@ -598,11 +607,12 @@ string external_value_name(entity e)
       }
       else {
 	/* This should never occur. Please core dump! */
-	pips_error("external_value_name", "Unexpected value %s for current module %s\n", 
-		   entity_name(e), module_local_name(get_current_module_entity()));
+	pips_internal_error("Unexpected value %s for current module %s\n",
+			    entity_name(e),
+			    module_local_name(get_current_module_entity()));
       }
     }
-	    
+
   pips_assert("var must be bounded", s != HASH_UNDEFINED_VALUE);
 
   if(strcmp(module_local_name(m), module_name(s)) == 0

@@ -524,8 +524,8 @@ transformer call_to_transformer(call c,
   default:
     pips_internal_error("unknown tag %d\n", tt);
   }
-  pips_assert("transformer tf is consistent", 
-	      transformer_consistency_p(tf)); 
+  pips_assert("transformer tf is consistent",
+	      transformer_consistency_p(tf));
 
   pips_debug(8,"Transformer before intersection with precondition, tf=%p\n", tf);
   ifdebug(8) {
@@ -965,6 +965,8 @@ transformer c_user_call_to_transformer(entity f,
   transformer tf = transformer_undefined;
   transformer t_callee = load_summary_transformer(f);
 
+  pips_assert("t_callee is consistent", transformer_weak_consistency_p(t_callee));
+
   /* Compute the call site transformer */
   tf = any_user_call_site_to_transformer(f, pc, pre, ef);
 
@@ -972,7 +974,7 @@ transformer c_user_call_to_transformer(entity f,
   tf = transformer_combine(tf, t_callee);
 
   /* Project the former parameters and the temporary values. */
-  tf = transformer_formal_parameter_projection(tf);
+  tf = transformer_formal_parameter_projection(f, tf);
   tf = transformer_temporary_value_projection(tf);
 
   return tf;
@@ -1272,6 +1274,8 @@ transformer c_return_to_transformer(entity e __attribute__ ((__unused__)),
       /* if(entity_has_values_p(rv)) {*/
       if(analyzable_scalar_entity_p(rv)) {
 	expression expr = EXPRESSION(CAR(pc));
+	entity rvv = entity_to_new_value(rv);
+
 	tf = any_expression_to_transformer(rv, expr, pre, FALSE);
 	if(transformer_undefined_p(tf))
 	  tf = effects_to_transformer(ef);
@@ -1495,7 +1499,7 @@ transformer any_assign_to_transformer(list args, /* arguments for assign */
     reference rlhs = syntax_reference(slhs);
     if(ENDP(reference_indices(rlhs))) {
       entity v = reference_variable(rlhs);
-      tf = any_scalar_assign_to_transformer(v, rhs, ef, pre); 
+      tf = any_scalar_assign_to_transformer(v, rhs, ef, pre);
     }
   }
 
@@ -1572,7 +1576,7 @@ transformer any_basic_update_to_transformer(entity op,
 
       n_rhs = MakeBinaryCall(plus, ve, copy_expression(lhs));
 
-      tf = any_scalar_assign_to_transformer(v, n_rhs, ef, pre); 
+      tf = any_scalar_assign_to_transformer(v, n_rhs, ef, pre);
       free_expression(n_rhs);
     }
   }
@@ -1587,11 +1591,9 @@ transformer any_basic_update_to_transformer(entity op,
   return tf;
 }
 
-static transformer 
-instruction_to_transformer(
-			   instruction i,
-			   transformer pre,
-			   cons * e) /* effects associated to instruction i */
+static transformer instruction_to_transformer(instruction i,
+					      transformer pre,
+					      list e) /* effects associated to instruction i */
 {
   transformer tf = transformer_undefined;
   test t;

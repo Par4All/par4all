@@ -1402,7 +1402,8 @@ transformer update_precondition_with_call_site_preconditions(transformer t,
   return t;
 }
 
-/* With value passing, writes on formal parameters are not effective interprocedurally. 
+/* With value passing, writes on formal parameters are not effective
+ * interprocedurally.
  *
  * All new values corresponding to formal arguments of f must be
  * projected out and removed from the arguments list.
@@ -1431,7 +1432,7 @@ transformer value_passing_summary_transformer(entity f, transformer tf)
     }
   }
 
-  /* The old values cannot be renamed directly fater projection,
+  /* The old values cannot be renamed directly after projection,
      because the transformer projection opearator detects an
      inconsistency. */
 

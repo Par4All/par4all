@@ -734,16 +734,16 @@ bool generic_module_name_to_transformers(char *module_name, bool in_context)
     set_current_module_entity(module_name_to_entity(module_name));
     /* could be a gen_find_tabulated as well... */
     set_current_module_statement(
-	(statement) db_get_memory_resource(DBR_CODE, module_name, TRUE)); 
+	(statement) db_get_memory_resource(DBR_CODE, module_name, TRUE));
     if( get_current_module_statement() == (statement) database_undefined )
 	pips_error("module_name_to_transformers",
 		   "no statement for module %s\n", module_name);
 
     /* Is it really useful? I could not find where it is used. bc. */
-    set_proper_rw_effects((statement_effects) 
+    set_proper_rw_effects((statement_effects)
 	db_get_memory_resource(DBR_PROPER_EFFECTS, module_name, TRUE));
 
-    set_cumulated_rw_effects((statement_effects) 
+    set_cumulated_rw_effects((statement_effects)
 	db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
 
     /* cumulated_effects_map_print();*/
@@ -751,7 +751,7 @@ bool generic_module_name_to_transformers(char *module_name, bool in_context)
     e_inter = effects_to_list( (effects)
 	db_get_memory_resource(DBR_SUMMARY_EFFECTS, module_name, TRUE));
 
-    set_transformer_map( MAKE_STATEMENT_MAPPING() ); 
+    set_transformer_map( MAKE_STATEMENT_MAPPING() );
 
     /* compute the basis related to module m */
     module_to_value_mappings( get_current_module_entity() );
@@ -759,9 +759,9 @@ bool generic_module_name_to_transformers(char *module_name, bool in_context)
     /* In the main module, transformers can be computed in context of the
        initial values */
     if(entity_main_module_p(get_current_module_entity())
-       && get_bool_property("SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT")) 
+       && get_bool_property("SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT"))
     {
-      if (get_bool_property(SEMANTICS_INTERPROCEDURAL)) 
+      if (get_bool_property(SEMANTICS_INTERPROCEDURAL))
       {
 	mod_pre = (transformer)
 	  db_get_memory_resource(DBR_PROGRAM_PRECONDITION, "", FALSE);
@@ -778,7 +778,7 @@ bool generic_module_name_to_transformers(char *module_name, bool in_context)
 	mod_pre = data_to_precondition(get_current_module_entity());
     }
     else if(in_context) {
-      mod_pre = 
+      mod_pre =
 	transformer_dup(load_summary_precondition(get_current_module_entity()));
     }
     else
@@ -787,14 +787,14 @@ bool generic_module_name_to_transformers(char *module_name, bool in_context)
     /* Add declaration information: arrays cannot be empty (Fortran
        standard, Section 5.1.2) */
     if(get_bool_property("SEMANTICS_TRUST_ARRAY_DECLARATIONS")) {
-        transformer_add_declaration_information(mod_pre,
-						get_current_module_entity());
+      transformer_add_declaration_information(mod_pre,
+					      get_current_module_entity());
     }
 
     /* Get the preconditions: they might prove useful within loops where
        transformers cannot propagate enough information. */
     if(in_context) {
-     set_precondition_map( (statement_mapping) 
+     set_precondition_map( (statement_mapping)
 	db_get_memory_resource(DBR_PRECONDITIONS, module_name, TRUE));
    }
 
@@ -802,8 +802,8 @@ bool generic_module_name_to_transformers(char *module_name, bool in_context)
     t_intra = statement_to_transformer(get_current_module_statement(), mod_pre);
     free_transformer(mod_pre);
 
-    DB_PUT_MEMORY_RESOURCE(DBR_TRANSFORMERS, module_name, 
-			   (char*) get_transformer_map() );  
+    DB_PUT_MEMORY_RESOURCE(DBR_TRANSFORMERS, module_name,
+			   (char*) get_transformer_map() );
 
     /* FI: side effect; compute and store the summary transformer, because
        every needed piece of data is available... */
@@ -819,8 +819,8 @@ bool generic_module_name_to_transformers(char *module_name, bool in_context)
 	pips_error("module_name_to_transformers",
 		   "Non-consistent summary transformer\n");
     }
-    DB_PUT_MEMORY_RESOURCE(DBR_SUMMARY_TRANSFORMER, 
-			   module_local_name(get_current_module_entity()), 
+    DB_PUT_MEMORY_RESOURCE(DBR_SUMMARY_TRANSFORMER,
+			   module_local_name(get_current_module_entity()),
 			   (char*) t_inter);
     debug(8,"module_name_to_transformers","t_inter=%x\n", t_inter);
 

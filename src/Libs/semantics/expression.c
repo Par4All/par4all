@@ -2416,7 +2416,8 @@ transformer any_expression_to_transformer(
 
   /* Assume v is a value */
   if( (basic_tag(bv)==basic_tag(be))
-      || (basic_float_p(bv) && basic_int_p(be))) {
+      || (basic_float_p(bv) && basic_int_p(be))
+      || (basic_derived_p(bv) && basic_int_p(be))) {
     switch(basic_tag(be)) {
     case is_basic_int:
       if(integer_analyzed_p()) {
@@ -2636,9 +2637,9 @@ transformer condition_to_transformer(
       transformer tf_minus = transformer_add_sign_information(copy_transformer(tf), tmpv, -1);
 
       ifdebug(8) {
-	fprintf(stderr, "tf_plus:\n");
+	fprintf(stderr, "tf_plus %p:\n", tf_plus);
 	dump_transformer(tf_plus);
-	fprintf(stderr, "tf_minus:\n");
+	fprintf(stderr, "tf_minus %p:\n", tf_minus);
 	dump_transformer(tf_minus);
       }
 

@@ -147,9 +147,15 @@ transformer transformer_add_sign_information(transformer tf,
 {
   Psysteme psyst = predicate_system(transformer_relation(tf));
 
+  ifdebug(1) {
+    pips_assert("Transformer tf is consistent on entrance",
+		transformer_consistency_p(tf));
+  }
+
   pips_assert("v is a value", value_entity_p(v) || local_temporary_value_entity_p(v));
 
   psyst->base = base_add_variable(psyst->base, (Variable) v);
+  psyst->dimension = base_dimension(psyst->base);
 
   if(v_sign!=0) {
     Pvecteur cv;
@@ -174,13 +180,18 @@ transformer transformer_add_sign_information(transformer tf,
     sc_add_egalite(psyst, eq);
   }
 
+  ifdebug(1) {
+    pips_assert("Transformer tf is consistent on exit",
+		transformer_consistency_p(tf));
+  }
+
   return tf;
 }
 
 /* transformer transformer_add_loop_index(transformer t, entity i,
  *                                        Pvecteur incr):
  * add the index incrementation expression incr for loop index i to
- * transformer t. 
+ * transformer t.
  *
  * t = intersection(t, i#new = i#old + incr)
  *
@@ -195,7 +206,7 @@ transformer t;
 entity i;
 Pvecteur incr;
 {
-    /* Psysteme * ps = 
+    /* Psysteme * ps =
        &((Psysteme) predicate_system(transformer_relation(t))); */
     Psysteme psyst = predicate_system(transformer_relation(t));
     entity i_old = entity_to_old_value(i);
@@ -229,24 +240,27 @@ transformer transformer_add_variable_update(transformer t, entity v)
   return t;
 }
 
-/* Add an update of value v to t */
+/* Add an update of variable v to t (a value cannot be updated) */
 transformer transformer_add_value_update(transformer t, entity v)
 {
+  entity nv = entity_to_new_value(v);
+  entity ov = entity_to_old_value(v);
+
   if(!transformer_empty_p(t)) {
     Psysteme psyst = predicate_system(transformer_relation(t));
 
     transformer_arguments(t) = arguments_add_entity(transformer_arguments(t), v);
-    if(!base_contains_variable_p(psyst->base, (Variable) v)) {
-      psyst->base = base_add_variable(psyst->base, (Variable) v);
-      psyst->dimension = vect_size(psyst->base);
-    }
+    if(!base_contains_variable_p(psyst->base, (Variable) nv))
+      psyst->base = base_add_variable(psyst->base, (Variable) nv);
+    if(!base_contains_variable_p(psyst->base, (Variable) ov))
+      psyst->base = base_add_variable(psyst->base, (Variable) ov);
+    psyst->dimension = vect_size(psyst->base);
   }
 
   return t;
 }
 
-transformer 
-transformer_constraint_add(tf, i, equality)
+transformer transformer_constraint_add(tf, i, equality)
 transformer tf;
 Pvecteur i;
 bool equality;
@@ -421,12 +435,12 @@ transformer t;
   return transformer_general_consistency_p(t, TRUE);
 }
 
-bool transformer_general_consistency_p(transformer t, bool is_weak)
+bool transformer_general_consistency_p(transformer tf, bool is_weak)
 {
 #define TRANSFORMER_CONSISTENCY_P_DEBUG_LEVEL 0
-    /* the relation should be consistent 
+    /* the relation should be consistent
      * and any variable corresponding to an old value
-     * should appear in the argument list since 
+     * should appear in the argument list since
      * an old value cannot (should not) be
      * introduced unless the variable is changed and
      * since every changed variable is
@@ -436,18 +450,18 @@ bool transformer_general_consistency_p(transformer t, bool is_weak)
      * does not have to appear in the basis if it is not required by
      * the constraints. This does not seem very safe to me (FI, 13 Nov. 95)
      */
-    Psysteme sc = (Psysteme) predicate_system(transformer_relation(t));
-    list args = transformer_arguments(t);
+    Psysteme sc = (Psysteme) predicate_system(transformer_relation(tf));
+    list args = transformer_arguments(tf);
     bool consistent = TRUE;
 
     /* The NewGen data structure must be fully defined */
     ifdebug(TRANSFORMER_CONSISTENCY_P_DEBUG_LEVEL)
-	consistent = transformer_defined_p(t);
+	consistent = transformer_defined_p(tf);
     else
 	consistent = TRUE;
     if(!consistent)
-	debug(TRANSFORMER_CONSISTENCY_P_DEBUG_LEVEL,
-	      "transformer_consistency_p", "transformer t is not gen_defined\n");
+	pips_debug(TRANSFORMER_CONSISTENCY_P_DEBUG_LEVEL,
+		   "transformer t is not gen_defined\n");
 
     /* The predicate must be weakly consistent. Every variable
      * in the constraints must be in the basis (but not the other
@@ -455,8 +469,8 @@ bool transformer_general_consistency_p(transformer t, bool is_weak)
      */
     consistent = consistent && sc_weak_consistent_p(sc);
     if(!consistent)
-	debug(TRANSFORMER_CONSISTENCY_P_DEBUG_LEVEL,
-	      "transformer_consistency_p", "sc is not weakly consistent\n");
+	pips_debug(TRANSFORMER_CONSISTENCY_P_DEBUG_LEVEL,
+		   "sc is not weakly consistent\n");
 
     /* If an old value appears in the predicate, the corresponding
      * variable should be an argument of the transformer
@@ -470,7 +484,7 @@ bool transformer_general_consistency_p(transformer t, bool is_weak)
 
        /* test aliasing between arguments and relations
           high cost testing */
-	    ifdebug(8) {  
+	    ifdebug(8) {
 		boolean aliasing = FALSE;
 		string emn =entity_module_name(val);
 		string eln =entity_local_name(val);
@@ -479,30 +493,28 @@ bool transformer_general_consistency_p(transformer t, bool is_weak)
 		for (lt =  args; lt && !aliasing ;POP(lt))
 		{
 		    e = ENTITY(CAR(lt));
-		    consistent = consistent && 
-			(same_string_p(entity_local_name(e), eln) ? 
-			 same_string_p(entity_module_name(e),emn) 
+		    consistent = consistent &&
+			(same_string_p(entity_local_name(e), eln) ?
+			 same_string_p(entity_module_name(e),emn)
 			 : TRUE);
 		    aliasing = aliasing && entity_conflict_p(e,val);
 		}
-		
+
 		if(!consistent)
-		    user_warning("transformer_consistency_p", 
-				 "different global variable names in  arguments and basis (%s) \n",
-				 eln);
+		    pips_user_warning("different global variable names in "
+				      "arguments and basis (%s) \n", eln);
 		if (aliasing)
-		    pips_error("transformer_consistency_p", 
-			       "aliasing between  arguments and basis (%s) \n",
-			       entity_name(val));
+		    pips_internal_error("aliasing between  arguments and basis (%s) \n",
+					entity_name(val));
 	    }
-	   
+
 	    /* FI: the next test is not safe because val can be
 	     * a global value not recognized in the current
 	     * context. old_value_entity_p() returns TRUE or FALSE
 	     * or pips_error.
 	     *
-	     * A general version of this routine is needed...
-	     * the return value of a function is not recognized as a 
+	     * A general version of this routine is needed...  The
+	     * return value of a function is not recognized as a
 	     * global value by old_value_entity_p
 	     *
 	     * old_value_entity_p() is likely to core dump on
@@ -513,18 +525,19 @@ bool transformer_general_consistency_p(transformer t, bool is_weak)
 		entity var = value_to_variable(val);
 
 		consistent = entity_is_argument_p(var, args);
-		if(!consistent)
-		    debug(TRANSFORMER_CONSISTENCY_P_DEBUG_LEVEL,
-			  "transformer_consistency_p",
-			  "Old value of % s in sc but not in arguments of transformer %p\n",
-			  entity_name(var), t);
+		if(!consistent) {
+		  dump_transformer(tf);
+		  pips_debug(TRANSFORMER_CONSISTENCY_P_DEBUG_LEVEL,
+			     "Old value of %s in sc but not in arguments of transformer %p\n",
+			     entity_name(var), tf);
+		}
 	    }
 	    /* The constant term should not appear in the basis */
 	    if(consistent) {
 		consistent = consistent && !term_cst(t);
 		if(!consistent)
-		    debug(TRANSFORMER_CONSISTENCY_P_DEBUG_LEVEL,
-			  "transformer_consistency_p", "TCST in sc basis\n");
+		    pips_debug(TRANSFORMER_CONSISTENCY_P_DEBUG_LEVEL,
+			       "TCST in sc basis\n");
 	    }
 	}
     }
@@ -557,16 +570,19 @@ bool transformer_general_consistency_p(transformer t, bool is_weak)
 		    entity_has_values_p(e));
 		    */
 	if(!entity_has_values_p(e)) {
+	  /* Values returned by callees may appear in interprocedural
+	     transformers */
+	  if(!storage_return_p(entity_storage(e))) {
 	    pips_user_warning("No value for argument %s in value mappings\n",
 			      entity_name(e));
 	    if(!is_weak)
 	      consistent = FALSE;
-	
+	    }
 	}
     }
 
     if(consistent && !is_weak)
-      consistent = transformer_argument_consistency_p(t);
+      consistent = transformer_argument_consistency_p(tf);
 
     /* FI: let the user react and print info before core dumping */
     /* pips_assert("transformer_consistency_p", consistent); */

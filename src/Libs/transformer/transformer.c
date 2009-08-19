@@ -212,7 +212,7 @@ relation_to_transformer(entity op, entity e1, entity e2, bool veracity)
  */
 transformer transformer_combine(transformer t1, transformer t2)
 {
-  /* algorithm: 
+  /* algorithm:
      let a1 be t1 arguments, a2 be t2 arguments,
      let ints be the intersection of a1 and a2
      let r1 be t1 relation and r2 be a copy of t2 relation
@@ -298,7 +298,7 @@ transformer transformer_combine(transformer t1, transformer t2)
       sc_fprint(stderr, r1, (char * (*)(Variable)) dump_value_name);
       sc_dump(r1);
     }
-    
+
     /* get rid of intermediate values, if any.
      * ??? guard added to avoid an obscure bug, but I guess it should
      * never get here with en nil base... FC
@@ -319,25 +319,25 @@ transformer transformer_combine(transformer t1, transformer t2)
 	    sc_fprint(stderr, r1,(char * (*)(Variable)) entity_local_name);
 	  }
 	}
-	else {	
-	  CATCH(overflow_error) 
+	else {
+	  CATCH(overflow_error)
 	    {
 	      /* CA */
 	      /*PIER: problem with e_temp that should be volatile because of
-	      * the catch structure. Not easy make it volatile because of 
+	      * the catch structure. Not easy make it volatile because of
 	      * the MAP MACRO */
 	      pips_user_warning("overflow error in projection of %s, "
 				"variable eliminated\n",
-				entity_name(e_temp)); 
+				entity_name(e_temp));
 	      r1 = sc_elim_var(r1, (Variable) e_temp);
 	    }
-	  TRY 
+	  TRY
 	    {
 	      sc_and_base_projection_along_variable_ofl_ctrl
 		(&r1, (Variable) e_temp, NO_OFL_CTRL);
 	      UNCATCH(overflow_error);
 	    }
-		
+
 	  if (! sc_empty_p(r1)) {
 	    r1 = sc_normalize2(r1);
 	    if(SC_EMPTY_P(r1)) {
@@ -377,7 +377,7 @@ transformer transformer_combine(transformer t1, transformer t2)
     predicate_system(transformer_relation(t1)) = r1;
     }
   }
-     
+
   pips_debug(8,"res. t1=%p\n",t1);
   ifdebug(8) dump_transformer(t1);
   pips_debug(8,"end\n");
@@ -399,13 +399,13 @@ transformer transformer_safe_combine_with_warnings(transformer tf1, transformer 
   if(transformer_safe_affect_transformer_p(tf1, tf2)) {
     pips_debug(9, "Side effects of tf2 on tf1\n");
     pips_user_warning("Non standard compliant code: side effect in part\n"
-                      "of an expression affects variable(s) used in a later part\n");
+		      "of an expression affects variable(s) used in a later part\n");
     tf12 = transformer_combine(tf1, tf2);
   }
   else if (transformer_safe_affect_transformer_p(tf2, tf1)){
     pips_debug(9, "Side effects of tf2 on tf1\n");
     pips_user_warning("Non standard compliant code: side effect in part\n"
-                      "of an expression affect variables used in an earlier part\n");
+		      "of an expression affect variables used in an earlier part\n");
     tf12 = transformer_combine(tf1, tf2);
   }
   else {
@@ -595,7 +595,7 @@ transformer transformer_safe_domain_intersection(transformer tf,
       tf = transformer_domain_intersection(tf, pre);
     }
   }
-    
+
   return tf;
 }
 
@@ -716,13 +716,13 @@ static int varval_value_name_is_inferior_p(Pvecteur * pvarval1, Pvecteur * pvarv
     int is_inferior = TRUE;
     string s1 = generic_value_name((entity) vecteur_var(*pvarval1));
     string s2 = generic_value_name((entity) vecteur_var(*pvarval2));
-    
+
     is_inferior = (strcmp(s1, s2) > 0 );
 
-    return is_inferior; 
+    return is_inferior;
 }
 
-/* Eliminate (some) rational or integer redundancy. 
+/* Eliminate (some) rational or integer redundancy.
 
    Remember that integer
    redundancy elimination may degrade results because some transformer
@@ -752,27 +752,27 @@ transformer_normalize(transformer t, int level)
     /* Select one tradeoff between speed and accuracy:
      * enumerated by increasing speeds according to Beatrice
      */
-    
-    CATCH(overflow_error) 
+
+    CATCH(overflow_error)
       {
 	/* CA */
 	pips_user_warning("overflow error in  redundancy elimination\n");
 	sc_rm(r);
 	r = r2;
       }
-    TRY 
+    TRY
       {
 	switch(level) {
-	  
+
 	case 0:
 	  /* Our best choice for accuracy, but damned slow on ocean */
 	  r = sc_safe_elim_redund(r);
 	  break;
-		    
+
 	case 1:
 	  /* Beatrice's best choice: does not deal with minmax2 (only)
 	   * but still requires 74 minutes of real time
-	   * (55 minutes of CPU time) for ocean preconditions, 
+	   * (55 minutes of CPU time) for ocean preconditions,
 	   * when applied to each precondition stored.
 	   *
 	   * Only 64 s for ocean, if preconditions are not normalized.
@@ -784,7 +784,7 @@ transformer_normalize(transformer t, int level)
 	  sc_nredund(&r);
 	  predicate_system(transformer_relation(t)) = r;
 	  break;
-	  
+
 	case 2:
 	  /* Francois' own: does most of the easy stuff.
 	   * Fails on mimax2 and sum_prec, but it is somehow
@@ -797,13 +797,13 @@ transformer_normalize(transformer t, int level)
 	   */
 	  r = sc_strong_normalize(r);
 	  break;
-	  
+
 	case 5:
 	  /* Same plus a good feasibility test
 	   */
 	  r = sc_strong_normalize3(r);
 	  break;
-	  
+
 	case 3:
 	  /* Similar, but variable are actually substituted
 	   * which is sometimes painful when a complex equations
@@ -819,30 +819,30 @@ transformer_normalize(transformer t, int level)
 	   * variable is chosen when equivalent variables are
 	   * available.
 	   */
-	  r = sc_strong_normalize4(r, 
+	  r = sc_strong_normalize4(r,
 				   (char * (*)(Variable)) external_value_name);
 	  break;
-	  
+
 	case 7:
-	  /* Same plus a good feasibility test, plus variable selection 
+	  /* Same plus a good feasibility test, plus variable selection
 	   * for elimination, plus equation selection for elimination
 	   */
-	  r = sc_strong_normalize5(r, 
+	  r = sc_strong_normalize5(r,
 				   (char * (*)(Variable)) external_value_name);
 	  break;
-	  
+
 	case 4:
 	  vect_sort_in_place(&sc_base(r), varval_value_name_is_inferior_p);
 	  r = sc_normalize2(r);
 	  break;
-	  
+
 	case 8:
 	  /* Very expensive: the system is rebuilt by adding constraints
 	   * one by one
 	   */
 	  sc_safe_build_sc_nredund_1pass(&r);
 	  break;
-	  
+
 	default:
 	  pips_internal_error("unknown level %d\n", level);
 	}
@@ -850,13 +850,13 @@ transformer_normalize(transformer t, int level)
 	sc_rm(r2), r2 = NULL;
 	UNCATCH(overflow_error);
       } /* end of TRY */
-			
+
     if (SC_EMPTY_P(r)) {
       r = sc_empty(BASE_NULLE);
     }
-    else 
+    else
       base_rm(b), b=BASE_NULLE;
-    
+
     r->dimension = vect_size(r->base);
 
     if(sc_empty_p(r)) {
@@ -947,21 +947,35 @@ transformer safe_transformer_projection(transformer t, list args)
   return nt;
 }
 
-transformer 
-transformer_formal_parameter_projection(transformer t)
+transformer transformer_formal_parameter_projection(entity f, transformer t)
 {
   Psysteme sc = predicate_system(transformer_relation(t));
   Pbase b = sc_base(sc);
   Pbase cd = BASE_UNDEFINED;
   list fpl = NIL;
 
+  /* Dealing with an interprocedural transformer, weak consistency is
+     not true */
+  /* pips_assert("t is weakly consistent",
+     transformer_weak_consistency_p(t));*/
+  pips_assert("sc is consistent", sc_weak_consistent_p(sc));
+  pips_assert("t is weakly consistent", transformer_weak_consistency_p(t));
+
   for(cd = b; !BASE_NULLE_P(cd); cd = vecteur_succ(cd)) {
     entity val = (entity) vecteur_var(cd);
     entity var = value_to_variable(val);
     storage s = entity_storage(var);
 
-    if(storage_formal_p(s))
+    if(storage_formal_p(s) && formal_function(storage_formal(s))==f)
       fpl = CONS(ENTITY, var, fpl);
+  }
+
+  ifdebug(1) {
+    pips_debug(1, "Transformer before projection:\n");
+    dump_transformer(t);
+    pips_debug(1, "Projected variables:\n");
+    print_entities(fpl);
+    fprintf(stderr, "\n");
   }
 
   t = transformer_projection(t, fpl);
@@ -980,8 +994,7 @@ transformer_formal_parameter_projection(transformer t)
  *
  * args is not modified. t is modified by side effects.
  */
-transformer 
-transformer_projection(transformer t, list args)
+transformer transformer_projection(transformer t, list args)
 {
   /* sc_safe_elim_redund() may increase the rational generating system */
   /* t = transformer_projection_with_redundancy_elimination(t, args,
@@ -999,8 +1012,7 @@ transformer_projection(transformer t, list args)
  *
  * args is not modified. t is modified by side effects.
  */
-transformer 
-transformer_arguments_projection(transformer t)
+transformer transformer_arguments_projection(transformer t)
 {
   list args = NIL;
   Psysteme sc = predicate_system(transformer_relation(t));
@@ -1021,8 +1033,7 @@ transformer_arguments_projection(transformer t)
   return t;
 }
 
-Psysteme 
-no_elim(Psysteme ps)
+Psysteme no_elim(Psysteme ps)
 {
     return ps;
 }
@@ -1032,7 +1043,7 @@ no_elim(Psysteme ps)
    also be projected. If values are projected and the transformer argument
    updated using args, old values should not be left in the basis when a
    new value is projected and its associated variable removed from tthe
-   argument. 
+   argument.
 
    New values are identical to variables which makes it confusing.
 
@@ -1084,8 +1095,9 @@ transformer transformer_projection_with_redundancy_elimination_and_check(
     fprint_transformer(stderr, t, (get_variable_name_t) entity_global_name);
     pips_debug(9, "and entities to be projected: ");
     print_arguments(args);
-    pips_assert("t is weakly consistent", transformer_weak_consistency_p(t));
   }
+
+  pips_assert("t is weakly consistent", transformer_weak_consistency_p(t));
 
   /* A side effect of transformer_empty_p() is to normalize the transformer. */
   if(transformer_empty_p(t)) {
@@ -1104,7 +1116,7 @@ transformer transformer_projection_with_redundancy_elimination_and_check(
 
       pips_debug(9, "Projection of %s\n", entity_name(e));
 
-      CATCH(overflow_error) 
+      CATCH(overflow_error)
 	{
 	  /* FC */
 	  pips_user_warning("overflow error in projection of %s, "
@@ -1153,7 +1165,7 @@ transformer transformer_projection_with_redundancy_elimination_and_check(
 
     /* Step 2: eliminate redundancy only/again once projections have all
      * been performed because redundancy elimination is
-     * expensive and because most variables are exactly 
+     * expensive and because most variables are exactly
      * projected because they appear in at least one equation
      */
     if (!sc_empty_p(r)) {
@@ -1351,18 +1363,15 @@ transformer transformer_safe_inverse_apply(transformer tf, transformer post)
  * formal argument args is not modified. t is updated by side effect.
  *
  * Note: this function is almost equal to transformer_projection();
- * however, entities of args do not all have to appear in t's relation;
- * thus transformer_filter has a larger definition domain than 
- * transformer_projection; on transformer_projection's domain, both
- * functions are equal
+ * however, entities of args do not all have to appear in t's
+ * relation; thus transformer_filter has a larger definition domain
+ * than transformer_projection; on transformer_projection's domain,
+ * both functions are equal
  *
  * transformer_projection is useful to get cores when you know all entities
  * in args should appear in the relation.
  */
-transformer 
-transformer_filter(t, args)
-transformer t;
-cons * args;
+transformer transformer_filter(transformer t, list args)
 {
   cons * new_args = NIL;
   /* Automatic variables read in a CATCH block need to be declared volatile as
@@ -1393,18 +1402,18 @@ cons * args;
 	/*
 	  sc_projection_along_variable_ofl_ctrl(&r, (Variable) e,
 	  NO_OFL_CTRL);  */
-	CATCH(overflow_error) 
-	  {				    
+	CATCH(overflow_error)
+	  {
 				/* CA */
 	    pips_user_warning("overflow error in projection of %s, "
 			      "variable eliminated\n",
-			      entity_name(e)); 
+			      entity_name(e));
 	    r = sc_elim_var(r, (Variable) e);
 	  }
-	TRY 
+	TRY
 	  {
 	    /* sc_projection_along_variable_ofl_ctrl_timeout_ctrl */
- 	    sc_projection_along_variable_ofl_ctrl
+	    sc_projection_along_variable_ofl_ctrl
 	      (&r, (Variable) e, NO_OFL_CTRL);
 	    UNCATCH(overflow_error);
 	  }
@@ -1413,7 +1422,7 @@ cons * args;
 	sc_base_remove_variable(r,(Variable) e);}
     }
     r->dimension = vect_size(r->base);
-	
+
     /* compute new_args */
     /* use functions on arguments instead of in-lining !
        MAPL(ce, { entity e = ENTITY(CAR(ce));
@@ -1436,7 +1445,7 @@ cons * args;
     /* replace the old arguments by the new one */
     free_arguments(transformer_arguments(t));
     transformer_arguments(t) = new_args;
-  } 
+  }
 
   ifdebug(9) {
     pips_debug(9, "Transformer after argument list update\n");
@@ -1459,15 +1468,12 @@ cons * args;
  * returns FALSE if l is invariant w.r.t. tf, i.e. for all state s,
  * eval(l, s) == eval(l, tf(s))
  */
-bool 
-transformer_affect_linear_p(tf, l)
-transformer tf;
-Pvecteur l;
+bool transformer_affect_linear_p(transformer tf, Pvecteur l)
 {
     if (!transformer_undefined_p(tf)){
 	list args = transformer_arguments(tf);
 
-	MAP(ENTITY, e, 
+	MAP(ENTITY, e,
 	{
 	    Value v = vect_coeff((Variable) e, l);
 	    if(value_notzero_p(v)) return TRUE;
@@ -1482,8 +1488,7 @@ Pvecteur l;
    appear in any constraint of tf2. The two transformer do not commute and
    tf1 o tf2 does not equal tf2 o tf1. */
 
-bool 
-transformer_affect_transformer_p(transformer tf1, transformer tf2)
+bool transformer_affect_transformer_p(transformer tf1, transformer tf2)
 {
   bool affect_p = FALSE;
 
@@ -1507,8 +1512,7 @@ transformer_affect_transformer_p(transformer tf1, transformer tf2)
   return affect_p;
 }
 
-bool 
-transformer_safe_affect_transformer_p(transformer tf1, transformer tf2)
+bool transformer_safe_affect_transformer_p(transformer tf1, transformer tf2)
 {
   bool affect_p = FALSE;
 
@@ -1521,16 +1525,14 @@ transformer_safe_affect_transformer_p(transformer tf1, transformer tf2)
 /* Generates a transformer abstracting a totally unknown modification of
  * the values associated to variables in list le.
  */
-transformer 
-args_to_transformer(le)
-list le; /* list of entities */
+transformer args_to_transformer(list le) /* list of entities */
 {
     transformer tf = transformer_identity();
     cons * args = transformer_arguments(tf);
     Pbase b = VECTEUR_NUL;
     Psysteme s = sc_new();
 
-    MAPL(ce, { 
+    MAPL(ce, {
       entity e = ENTITY(CAR(ce));
       entity new_val = entity_to_new_value(e);
 
@@ -1574,11 +1576,11 @@ transformer invariant_wrt_transformer(transformer p, transformer tf)
   {
     fptf = args_to_transformer(transformer_arguments(tf));
   }
-  else 
+  else
   {
     /* if it is expensive, maybe it should not be computed over and over...
      */
-    fptf = transformer_derivative_fix_point(tf); 
+    fptf = transformer_derivative_fix_point(tf);
   }
 
   inv = transformer_apply(fptf, p); /* tf? fptf? */
@@ -1595,19 +1597,18 @@ transformer invariant_wrt_transformer(transformer p, transformer tf)
  *                                         entity e1, entity e2):
  * if e2 does not appear in t initially:
  *    replaces occurences of value e1 by value e2 in transformer t's arguments
- *    and relation fields; 
+ *    and relation fields;
  * else
  *    error
  * fi
  *
- * "e2 must not appear in t initially": this is the general case; 
- * the second case may occur when procedure A calls B and C and when B and C 
- * share a global variable X which is not seen from A. A may contain 
+ * "e2 must not appear in t initially": this is the general case;
+ * the second case may occur when procedure A calls B and C and when B and C
+ * share a global variable X which is not seen from A. A may contain
  * relations between B:X and C:X...
  * See hidden.f in Bugs or Validation...
  */
-transformer 
-transformer_value_substitute(transformer t, entity e1, entity e2)
+transformer transformer_value_substitute(transformer t, entity e1, entity e2)
 {
   /* updates are performed by side effects */
 
@@ -1617,7 +1618,7 @@ transformer_value_substitute(transformer t, entity e1, entity e2)
   pips_assert("e1 and e2 are defined entities",
 	      e1 != entity_undefined && e2 != entity_undefined);
   /*
-    pips_assert("transformer_value_substitute", 
+    pips_assert("transformer_value_substitute",
     !base_contains_variable_p(s->base, (Variable) e2));
   */
 
@@ -1660,8 +1661,9 @@ bool transformer_value_substitutable_p(transformer t, entity e1, entity e2)
   return substitutable_p;
 }
 
-transformer 
-transformer_safe_value_substitute(transformer t, entity e1, entity e2)
+transformer transformer_safe_value_substitute(transformer t,
+					      entity e1,
+					      entity e2)
 {
   if(!transformer_undefined_p(t))
     t = transformer_value_substitute(t, e1, e2);
@@ -1806,8 +1808,7 @@ static bool constant_constraint_check(Pvecteur v, bool is_equation_p)
  * the transformer still might be empty, it all depends on the normalization
  * procedure power. Beware of its execution time!
  */
-static bool 
-parametric_transformer_empty_p(transformer t,
+static bool parametric_transformer_empty_p(transformer t,
 			       Psysteme (*normalize)(Psysteme,
 						     char * (*)(Variable)))
 {
@@ -1862,20 +1863,20 @@ parametric_transformer_empty_p(transformer t,
 	 * specified by the documentation*/
 	Variable volatile var = vecteur_var(b);
 	entity volatile e_var = (entity) var;
- 
+
 	if(!entity_constant_p(e_var)) {
 
 	  pips_debug(9, "Projection of %s\n", entity_name(e_var));
 
-	  CATCH(overflow_error) 
+	  CATCH(overflow_error)
 	    {
 	      /* FC */
 	      pips_user_warning("overflow error in projection of %s, "
 				"variable eliminated\n",
-				entity_name(e_var)); 
+				entity_name(e_var));
 	      new_ps = sc_elim_var(new_ps, var);
 	    }
-	  TRY 
+	  TRY
 	    {
 	      /* sc_projection_along_variable_ofl_ctrl_timeout_ctrl */
 	      sc_projection_along_variable_ofl_ctrl
@@ -1937,8 +1938,7 @@ parametric_transformer_empty_p(transformer t,
  * If FALSE is returned,
  * the transformer still might be empty, but it's not too likely...
  */
-bool 
-transformer_empty_p(transformer t)
+bool transformer_empty_p(transformer t)
 {
     bool empty_p = parametric_transformer_empty_p(t, sc_strong_normalize4);
     return empty_p;
@@ -1948,8 +1948,7 @@ transformer_empty_p(transformer t)
  * If FALSE is returned,
  * the transformer still might be empty, but it's not likely at all...
  */
-bool 
-transformer_strongly_empty_p(transformer t)
+bool transformer_strongly_empty_p(transformer t)
 {
     bool empty_p = parametric_transformer_empty_p(t, sc_strong_normalize5);
     return empty_p;
