@@ -43,6 +43,12 @@ module microcode
 display PRINTED_FILE
 
 echo
+echo Microcode after normalization
+echo
+apply  NORMALIZE_MICROCODE
+display PRINTED_FILE
+
+echo
 echo Microcode after code cleaning
 echo
 
@@ -76,13 +82,6 @@ display PRINTED_FILE
 apply SCALARIZATION
 display PRINTED_FILE
 
-echo
-echo Microcode After atomization
-echo
-
-setproperty SIMD_EXTRAVAGANT_ATOMIZER TRUE
-apply SIMD_ATOMIZER
-display PRINTED_FILE
 
 
 echo
@@ -90,9 +89,18 @@ echo Microcode After array conversion
 echo
 
 setproperty ARRAY_TO_POINTER_CONVERT_PARAMETERS TRUE
+setproperty ARRAY_TO_POINTER_FLATTEN_ONLY TRUE
 apply ARRAY_TO_POINTER[microcode]
 apply PARTIAL_EVAL[microcode]
 display PRINTED_FILE[microcode]
+
+#echo
+#echo Microcode After atomization
+#echo
+#
+#setproperty SIMD_EXTRAVAGANT_ATOMIZER TRUE
+#apply SIMD_ATOMIZER
+#display PRINTED_FILE
 
 close
 delete convol

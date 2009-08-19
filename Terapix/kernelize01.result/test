@@ -37,6 +37,7 @@ int foo(int seed[100])
       a[i] = seed[i];
       b[i] = seed[99-i];
    }
+#pragma outline_ignore KERNEL_ID
 #pragma outline this
    /* compute */
 #pragma omp parallel for private(i)
@@ -69,6 +70,7 @@ int foo(int seed[100])
       a[i] = seed[i];
       b[i] = seed[99-i];
    }
+#pragma outline_ignore KERNEL_ID
 #pragma outline this
    /* compute */
 #pragma omp parallel for private(i)
