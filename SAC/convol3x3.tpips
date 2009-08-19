@@ -15,7 +15,16 @@ echo
 echo Initial code
 echo
 
-module conv_cpu
+module convol
+display PRINTED_FILE
+module main
+display PRINTED_FILE
+
+echo
+echo after unfolding
+echo
+
+apply UNFOLDING
 display PRINTED_FILE
 
 setproperty LOOP_UNROLL_MERGE TRUE

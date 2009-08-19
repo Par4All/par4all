@@ -1,55 +1,73 @@
-        
-#include <stdlib.h>
-#include <stdbool.h>
+//     goal: show effect of cloning, partial evaluation and loop unrolling
+//     and reduction parallelization for a Power architecture
+//     kernel_size must be odd
+#define image_size 512
+#define kernel_size 3
+#define nsteps 20
 
+void convol();
 
-/*
- *  a00 * a[idx-n-1]     a10 * a[idx-1]      a20 * a[idx+n-1]
- *  a01 * a[idx-n]       a11 * a[idx]        a21 * a[idx+n]
- *  a02 * a[idx-n+1]     a12 * a[idx+1]      a22 * a[idx+n+1]
- */
-
-void conv_cpu(float *a, float *c, int n,
-              float a00, float a10, float a20,
-              float a01, float a11, float a21,
-              float a02, float a12, float a22)
+int main() //      program image_processing
 {
-    int i, j;
-    for (i=0; i<n; ++i) {
-        for (j=0; j<n; ++j) {
-            int idx = i * n + j;
+  float image[image_size][image_size];
+  float new_image[image_size][image_size];
+  float kernel[kernel_size][kernel_size];
 
-            bool right = i > 0;
-            bool left = i < n-1;
-            bool top = j > 0;
-            bool bottom = j < n-1;
+  int i, j, n;
 
-            c[idx] = ((right & top) ? a00 * a[idx-n-1] : 0)
-                + (right ? a10 * a[idx-1] : 0)
-                + ((right & bottom) ? a20 * a[idx+n-1] : 0)
-                + (top ? a01 * a[idx-n] : 0)
-
-                + a11 * a[idx]
-                + (bottom ? a21 * a[idx+n] : 0)
-                + ((left & top) ? a02 * a[idx-n+1] : 0)
-                + (left ? a12 * a[idx+1] : 0)
-                + ((left & bottom) ? a22 * a[idx+n+1] : 0);
-        }
+  for( i = 0; i< kernel_size; i++) {
+    for( j = 0; j< kernel_size; j++) {
+      kernel[i][j] = 1;
     }
+  }
+
+  //     read *, image
+  for( i = 0; i< image_size; i++) {
+    for( j = 0; j< image_size; j++)
+      image[i][j] = 1.;
+  }
+
+
+  for( n = 0; n< nsteps; n++) {
+    convol(image_size, image_size, new_image, image,
+	   kernel_size, kernel_size, kernel);
+      }
+
+  for( i = 0; i< image_size; i++) {
+    for( j = 0; j< image_size; j++)
+      printf("%f ",new_image[i][j]);
+  }
+  //     print *, new_image
+  //      print *, new_image (image_size/2, image_size/2)
+
+  return 1; 
 }
 
-int main(int argc, char *argv[])
+void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], 
+	    int ksi, int ksj, float kernel[ksi][ksj])
 {
-    float * in, *out;
-    float convol[3][3] = { {0.1,0.2,0.3},{0.1,0.2,0.3},{0.1,0.2,0.3}};
-    int i,n;
-    n=atoi(argv[1]);
-    in=malloc(sizeof(float)*n);
-    out=malloc(sizeof(float)*n);
-    conv_cpu(in, out, n, convol[0][0], convol[0][1] , convol[0][2],
-             convol[1][0], convol[1][1] , convol[1][2],
-              convol[2][0], convol[2][1] , convol[2][2]);
-    for(i=0;i<n;i++) printf("%f\n",out[i]);
-    return 0;
-}
+  //     The convolution kernel is not applied on the outer part
+  //     of the image
 
+  int i, j, ki, kj;
+ 
+  for(i = 0; i< isi; i++) {
+    for(j = 0; j< isj; j++) {
+      new_image[i][j] = image[i][j];
+    }
+  }
+
+ l400: for(i =  ksi/2; i<isi - ksi/2; i++) {
+  l300: for(j =  ksj/2; j<isj - ksj/2; j++) {
+      new_image[i][j] = 0.;
+    l200: for(ki = 0; ki<ksi; ki++) {
+      l100: for(kj = 0; kj<ksj; kj++) {
+	  new_image[i][j] = new_image[i][j] + 
+	    image[i+ki-ksi/2][j+kj-ksj/2]* 
+	    kernel[ki][kj];
+	}
+      }
+      new_image[i][j] = new_image[i][j]/(ksi*ksj);
+    }
+  }
+}
