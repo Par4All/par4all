@@ -348,6 +348,7 @@ string what_operation(_int type)
 {
   switch (type)
   {
+  case spoc_type_oth: return "other";
   case spoc_type_nop: return "none";
   case spoc_type_inp: return "input";
   case spoc_type_poc: return "poc";
@@ -366,6 +367,8 @@ string what_operation_shape(_int type)
   string shape;
   switch (type)
   {
+  case spoc_type_oth:
+    shape = "shape=none"; break;
   case spoc_type_poc:
     shape = "shape=box"; break;
   case spoc_type_alu:
@@ -451,6 +454,7 @@ void hwac_replace_statement(statement s, call newc, bool kill)
     free_instruction(old);
     if (kill)
     {
+      // ??? in C, it is not a do nothing instruction!
       statement_instruction(s) = make_continue_instruction();
       free_call(newc);
     }
@@ -466,9 +470,9 @@ void hwac_kill_statement(statement s)
   hwac_replace_statement(s, freia_ok(), true);
 }
 
-/* approximative?
+/* rather approximative?
  */
-static bool image_variable_p(entity var)
+bool freia_image_variable_p(entity var)
 {
   bool is_image = false;
   if (entity_variable_p(var) && entity_scalar_p(var))
@@ -503,22 +507,84 @@ static entity get_assigned_variable(statement s)
   return assigned;
 }
 
+/* returns whether the entity is a freia API (AIPO) function.
+ */
+bool entity_freia_api_p(entity f)
+{
+  // very partial...
+  return strncmp(entity_local_name(f), AIPO, strlen(AIPO))==0;
+}
+
+/* @return whether to optimize AIPO call to function for SPoC.
+*/
+static bool freia_spoc_optimise(entity called)
+{
+  string fname = entity_local_name(called);
+  return !same_string_p(fname, "freia_aipo_convolution") &&
+    !same_string_p(fname, "freia_aipo_cast") &&
+    !same_string_p(fname, "freia_aipo_fast_correlation");
+}
+
+/* returns whether the statement is a FREIA call.
+ */
+bool freia_statement_aipo_call_p(statement s)
+{
+  // very partial as well
+  instruction i = statement_instruction(s);
+  if (instruction_call_p(i)) {
+    call c = instruction_call(i);
+    entity called = call_function(c);
+    if (entity_freia_api_p(called) &&
+	// ??? should be take care later?
+	freia_spoc_optimise(called))
+      return true;
+    else if (freia_assignment_p(called))
+    {
+      list la = call_arguments(c);
+      pips_assert("2 arguments to assign", gen_length(la));
+      syntax op2 = expression_syntax(EXPRESSION(CAR(CDR(la))));
+      if (syntax_call_p(op2))
+	return entity_freia_api_p(call_function(syntax_call(op2)))
+	  // ??? later?
+	  && freia_spoc_optimise(call_function(syntax_call(op2)));
+    }
+    else if (ENTITY_C_RETURN_P(called))
+    {
+      list la = call_arguments(c);
+      if (gen_length(la)==1) {
+	syntax op = expression_syntax(EXPRESSION(CAR(la)));
+	if (syntax_call_p(op))
+	  return entity_freia_api_p(call_function(syntax_call(op)))
+	    // ??? later?
+	    && freia_spoc_optimise(call_function(syntax_call(op)));
+      }
+    }
+  }
+  return false;
+}
+
 #include "effects-generic.h"
 
 /* append simple scalar entities with written/read effects to s
- * scalars assigned to are ignored (return status)
+ * scalars assigned to are ignored (return status).
+ * no attempt at managing aliasing or the like...
  */
 static void set_add_scalars(set s, statement stat, bool written)
 {
-  effects efs = load_proper_rw_effects(stat);
-  entity skip = get_assigned_variable(stat);
+  effects efs = load_cumulated_rw_effects(stat);
+  entity skip = NULL;
+
+  // skip assigned variable of AIPO calls
+  if (freia_statement_aipo_call_p(stat))
+    skip = get_assigned_variable(stat);
+
   FOREACH(effect, e, effects_effects(efs))
   {
     if ((written && effect_write_p(e)) || (!written && effect_read_p(e)))
     {
       entity var = reference_variable(effect_any_reference(e));
       if (entity_variable_p(var) && entity_scalar_p(var) &&
-	  !image_variable_p(var) && var!=skip)
+	  !freia_image_variable_p(var) && var!=skip)
 	set_add_element(s, s, var);
     }
   }

@@ -49,8 +49,15 @@ statement dagvtx_statement(dagvtx v)
   return pstatement_statement_p(ps)? pstatement_statement(ps): NULL;
 }
 
+/* a vertex with a non AIPO or image related statement.
+ */
+bool dagvtx_other_stuff_p(dagvtx v)
+{
+  return vtxcontent_optype(dagvtx_content(v))==spoc_type_oth;
+}
+
 /* return the produced image or NULL */
-statement dagvtx_image(dagvtx v)
+entity dagvtx_image(dagvtx v)
 {
   vtxcontent c = dagvtx_content(v);
   return (vtxcontent_out(c) != entity_undefined)? vtxcontent_out(c): NULL;
@@ -171,10 +178,7 @@ void dag_dump(FILE * out, string what, dag d)
 
 static string entity_dot_name(entity e)
 {
-  string name = entity_local_name(e);
-  if (strchr(name, BLOCK_SEP_CHAR))
-    name = strchr(name, BLOCK_SEP_CHAR)+1;
-  return name;
+  return entity_user_name(e);
 }
 
 static void dagvtx_dot(FILE * out, dag d, dagvtx vtx)
@@ -520,20 +524,6 @@ void dag_compute_outputs(dag d)
   set_free(toremove);
 }
 
-/* return all images (entities) that could be output from d
- * not just those computed by dag_compute_outputs()...
- */
-static void assign_all_possible_outputs(set outs, dag d)
-{
-  set_clear(outs);
-  FOREACH(dagvtx, v, dag_vertices(d))
-  {
-    entity out = vtxcontent_out(dagvtx_content(v));
-    if (out!=entity_undefined && get_producer(d, NULL, out)==v)
-      set_add_element(outs, outs, out);
-  }
-}
-
 static dagvtx find_twin_vertex(dag d, dagvtx target)
 {
   pips_debug(7, "target is %"_intFMT"\n", dagvtx_number(target));
@@ -572,6 +562,21 @@ void freia_hack_fix_global_ins_outs(dag dfull, list ld)
 
   // cleanup
   gen_free_list(revld);
+}
+
+/* remove unneeded statements?
+ * you must know they are really un-needed!
+ */
+void dag_cleanup_other_statements(dag d)
+{
+  set toremove = set_make(set_pointer);
+
+  FOREACH(dagvtx, v, dag_vertices(d))
+    if (dagvtx_other_stuff_p(v))
+      set_add_element(toremove, toremove, v);
+
+  SET_FOREACH(dagvtx, vr, toremove)
+    dag_remove_vertex(d, vr);
 }
 
 /* ??? I'm unsure about what happens to dead code in the pipeline...

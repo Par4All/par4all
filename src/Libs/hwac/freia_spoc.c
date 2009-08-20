@@ -435,6 +435,19 @@ static bool image_is_needed(entity img, dag d, set todo)
 static void print_op_schedule(FILE *, string, const op_schedule *);
 static bool check_wiring_output(hash_table, int, int);
 
+/* tell at which stage we may cross the pipeline.
+ */
+static int
+possible_cross_stage(int in_stage, int in_level, int out_level)
+{
+  int cross_stage = in_stage;
+  if (out_level<=in_level)
+    cross_stage++;
+  if (in_level>=spoc_type_thr && out_level<=spoc_type_poc)
+    cross_stage++;
+  return cross_stage;
+}
+
 /* depending on available images (stage %d, level, side 0/1)
  * and vertex operation to perform , tell where to perform it.
  * some voodoo again...
@@ -531,10 +544,12 @@ where_to_perform_operation
 	    {
 	      out->stage++;
 	      if (!check_wiring_output(wiring, out->stage, out->side))
+	      {
 		if (check_wiring_output(wiring, out->stage, 1-out->side))
 		  out->side = 1 - out->side;
 		else
 		  pips_internal_error("houston, we have a problem (1)");
+	      }
 	    }
 	  }
 	}
@@ -939,6 +954,8 @@ static void freia_spoc_pipeline
   int n_im_in = gen_length(dag_inputs(dpipe));
 
   // special case where the first operations use the same image twice
+  // ??? should also be set if there is only one images but it is used
+  // several times...
   int n_args_first_operation =
     gen_length(vtxcontent_inputs(dagvtx_content
 				 (DAGVTX(CAR(dag_vertices(dpipe))))));
@@ -1249,14 +1266,6 @@ print_op_schedule(FILE * out, const string name, const op_schedule * op)
 
 /***************************************************************** MISC UTIL */
 
-/* returns whether the entity is a freia API (AIPO) function.
- */
-static bool entity_freia_api_p(entity f)
-{
-  // very partial...
-  return strncmp(entity_local_name(f), AIPO, strlen(AIPO))==0;
-}
-
 /* convert the first n items in list args to entities.
  */
 static list
@@ -1291,42 +1300,44 @@ static entity extract_fist_item(list * lp)
  */
 static void dag_append_freia_call(dag d, statement s)
 {
-  call c = freia_statement_to_call(s);
-  entity called = call_function(c);
-  pips_assert("FREIA API call", entity_freia_api_p(called));
-  const freia_api_t * api = hwac_freia_api(entity_local_name(called));
-  pips_assert("some api", api!=NULL);
-  list /* of entity */ args =
-    fs_expression_list_to_entity_list(call_arguments(c),
-				      api->arg_img_in+api->arg_img_out);
-
   pips_debug(5, "adding statement %" _intFMT "\n", statement_number(s));
 
-  // ifdebug(1) pips_assert("dag ok", dag_consistent_p(d));
+  call c = freia_statement_to_call(s);
+  entity called = call_function(c);
+  if (entity_freia_api_p(called))
+  {
+    const freia_api_t * api = hwac_freia_api(entity_local_name(called));
+    pips_assert("some api", api!=NULL);
+    list /* of entity */ args =
+      fs_expression_list_to_entity_list(call_arguments(c),
+					api->arg_img_in+api->arg_img_out);
 
-  // extract arguments
-  entity out = entity_undefined;
-  pips_assert("one out image max for an AIPO", api->arg_img_out<=1);
-  if (api->arg_img_out==1)
-    out = extract_fist_item(&args);
-  list ins = gen_list_head(&args, api->arg_img_in);
-  //list outp = gen_list_head(&args, api->arg_misc_out);
-  //list inp = gen_list_head(&args, api->arg_misc_in);
-  pips_assert("no more arguments", gen_length(args)==0);
+    // extract arguments
+    entity out = entity_undefined;
+    pips_assert("one out image max for an AIPO", api->arg_img_out<=1);
+    if (api->arg_img_out==1)
+      out = extract_fist_item(&args);
+    list ins = gen_list_head(&args, api->arg_img_in);
+    pips_assert("no more arguments", gen_length(args)==0);
 
-  vtxcontent cont =
-    make_vtxcontent(-1, 0, make_pstatement_statement(s), ins, out);
-  set_operation(api, &vtxcontent_optype(cont), &vtxcontent_opid(cont));
+    vtxcontent cont =
+      make_vtxcontent(-1, 0, make_pstatement_statement(s), ins, out);
+    set_operation(api, &vtxcontent_optype(cont), &vtxcontent_opid(cont));
 
-  dagvtx nv = make_dagvtx(cont, NIL);
-  dag_append_vertex(d, nv);
-
-  // ifdebug(7) pips_assert("dag d ok", dag_consistent_p(d));
-  // ??? TODO update global outs later?
+    dagvtx nv = make_dagvtx(cont, NIL);
+    dag_append_vertex(d, nv);
+  }
+  else // some other kind of statement that we may keep in the DAG
+  {
+    dagvtx nv =
+      make_dagvtx(make_vtxcontent(spoc_type_oth, 0,
+	  make_pstatement_statement(s), NIL, entity_undefined), NIL);
+    dag_vertices(d) = CONS(dagvtx, nv, dag_vertices(d));
+  }
 }
 
 /* comparison function for sorting dagvtx in qsort,
- * this is voodoo...
+ * this is deep voodoo, because the priority has an impact on correctness.
  * tells v1 < v2 => -1
  */
 static int dagvtx_priority(const dagvtx * v1, const dagvtx * v2)
@@ -1340,7 +1351,13 @@ static int dagvtx_priority(const dagvtx * v1, const dagvtx * v2)
   // prioritize first measures if there is only one of them
   if (vtxcontent_optype(c1)!=vtxcontent_optype(c2))
   {
-    if (vtxcontent_optype(c1)==spoc_type_mes)
+    // scalars operations first
+    if (vtxcontent_optype(c1)==spoc_type_oth)
+      result = -1, why = "scal";
+    else if (vtxcontent_optype(c2)==spoc_type_oth)
+      result = 1, why = "scal";
+    // then measures
+    else if (vtxcontent_optype(c1)==spoc_type_mes)
       result = -1, why = "mes";
     else if (vtxcontent_optype(c2)==spoc_type_mes)
       result = 1, why = "mes";
@@ -1391,9 +1408,37 @@ static bool any_scalar_dep(dagvtx v, set vs)
   return dep;
 }
 
+static bool
+all_previous_stats_with_deps_are_computed(dag d, set computed, dagvtx v)
+{
+  bool okay = true;
+
+  // scan in statement order...
+  list lv = gen_nreverse(gen_copy_seq(dag_vertices(d)));
+  FOREACH(dagvtx, pv, lv)
+  {
+    // all previous have been scanned
+    if (pv==v) break;
+    if (freia_simple_scalar_rw_dependency
+	    (dagvtx_statement(pv), dagvtx_statement(v)) &&
+	!set_belong_p(computed, pv))
+    {
+      okay = false;
+      break;
+    }
+  }
+
+  gen_free_list(lv);
+  return okay;
+}
+
 /* return the vertices which may be computed from the list of
  * available images, excluding vertices in exclude.
  * return a list for determinism.
+ * @param d is the considered full dag
+ * @param computed holds all previously computed vertices
+ * @param currents holds those in the current pipeline
+ * @params maybe holds vertices with live images
  */
 static list /* of dagvtx */
   get_computable_vertices(dag d, set computed, set maybe, set currents)
@@ -1408,29 +1453,42 @@ static list /* of dagvtx */
 
   FOREACH(dagvtx, v, lv)
   {
-    list preds = dag_vertex_preds(d, v);
+    if (set_belong_p(computed, v))
+      continue;
 
-    // pips_debug(7, "%d predecessors to %" _intFMT "\n",
-    // (int) gen_length(preds), dagvtx_number(v));
-
-    if (// skip already computed vertices
-	!set_belong_p(computed, v) &&
-	// no scalar dependencies
-	!any_scalar_dep(v, local_currents) &&
-	// image dependencies (redundant with the avails stuff?
-	// maybe not for inputs?)
-	list_in_set_p(preds, maybe))
+    if (dagvtx_other_stuff_p(v))
     {
-      computable = CONS(dagvtx, v, computable);
-      // we do not want deps with other currents considered!
-      set_add_element(local_currents, local_currents, v);
+      // a vertex with other stuff is assimilated to the pipeline
+      // as soon as its dependences are fullfilled.
+      // I have a problem here... I really need use_defs?
+      if (all_previous_stats_with_deps_are_computed(d, computed, v))
+      {
+	computable = CONS(dagvtx, v, computable);
+	set_add_element(local_currents, local_currents, v);
+      }
+    }
+    else // we have an image computation
+    {
+      list preds = dag_vertex_preds(d, v);
+      pips_debug(7, "%d predecessors to %" _intFMT "\n",
+		 (int) gen_length(preds), dagvtx_number(v));
+
+      if(// no scalar dependencies in the current pipeline
+	 !any_scalar_dep(v, local_currents) &&
+	 // and image dependencies are fulfilled.
+	 list_in_set_p(preds, maybe))
+      {
+	computable = CONS(dagvtx, v, computable);
+	// we do not want deps with other currents considered!
+	set_add_element(local_currents, local_currents, v);
+      }
+
+      gen_free_list(preds), preds = NIL;
     }
 
     // update availables: not needed under assert for no img reuse.
     // if (vtxcontent_out(c)!=entity_undefined)
     //  set_del_element(avails, avails, vtxcontent_out(c));
-
-    gen_free_list(preds), preds = NIL;
   }
 
   // cleanup
@@ -1446,6 +1504,11 @@ static list /* of dagvtx */
 static void live_update(dag d, dagvtx v, set sure, set maybe)
 {
   vtxcontent c = dagvtx_content(v);
+
+  // skip "other" statements
+  if (dagvtx_other_stuff_p(v))
+    return;
+
   list ins = vtxcontent_inputs(c);
   int nins = gen_length(ins);
   entity out = vtxcontent_out(c);
@@ -1681,6 +1744,7 @@ static list /* of dags */ split_dag(dag initial)
 	dag_append_vertex(nd, copy_dagvtx_norec(v));
       }
       dag_compute_outputs(nd);
+      dag_cleanup_other_statements(nd);
 
       ifdebug(7) {
 	// dag_dump(stderr, "updated dall", dall);
@@ -1734,54 +1798,6 @@ static list /* of dags */ split_dag(dag initial)
 
   pips_debug(5, "returning %d dags\n", (int) gen_length(ld));
   return gen_nreverse(ld);
-}
-
-/* @return whether to optimize AIPO call to function for SPoC.
-*/
-static bool freia_spoc_optimise(entity called)
-{
-  string fname = entity_local_name(called);
-  return !same_string_p(fname, "freia_aipo_convolution") &&
-    !same_string_p(fname, "freia_aipo_cast") &&
-    !same_string_p(fname, "freia_aipo_fast_correlation");
-}
-
-/* returns whether the statement is a FREIA call.
- */
-static bool statement_freia_call_p(statement s)
-{
-  // very partial as well
-  instruction i = statement_instruction(s);
-  if (instruction_call_p(i)) {
-    call c = instruction_call(i);
-    entity called = call_function(c);
-    if (entity_freia_api_p(called) &&
-	// ??? should be take care later?
-	freia_spoc_optimise(called))
-      return true;
-    else if (freia_assignment_p(called))
-    {
-      list la = call_arguments(c);
-      pips_assert("2 arguments to assign", gen_length(la));
-      syntax op2 = expression_syntax(EXPRESSION(CAR(CDR(la))));
-      if (syntax_call_p(op2))
-	return entity_freia_api_p(call_function(syntax_call(op2)))
-	  // ??? later?
-	  && freia_spoc_optimise(call_function(syntax_call(op2)));
-    }
-    else if (ENTITY_C_RETURN_P(called))
-    {
-      list la = call_arguments(c);
-      if (gen_length(la)==1) {
-	syntax op = expression_syntax(EXPRESSION(CAR(la)));
-	if (syntax_call_p(op))
-	  return entity_freia_api_p(call_function(syntax_call(op)))
-	    // ??? later?
-	    && freia_spoc_optimise(call_function(syntax_call(op)));
-      }
-    }
-  }
-  return false;
 }
 
 static void set_append_vertex_statements(set s, list lv)
@@ -1921,6 +1937,26 @@ freia_spoc_compile_calls
   gen_free_list(ld);
 }
 
+#include "effects-generic.h"
+
+/* tell whether a statement has no effects on images.
+ * if so, it may be included somehow in the pipeline
+ * and just skipped, provided stat scalar dependencies
+ * are taken care of.
+ */
+static bool some_effects_on_images(statement s)
+{
+  int img_effect = false;
+  list cumu = effects_effects(load_cumulated_rw_effects(s));
+  FOREACH(effect, e, cumu) {
+    if (freia_image_variable_p(effect_variable(e))) {
+      img_effect = true;
+      break;
+    }
+  }
+  return img_effect;
+}
+
 typedef struct {
   list /* of list of statements */ seqs;
 } freia_spoc_info;
@@ -1928,25 +1964,27 @@ typedef struct {
 /** consider a sequence */
 static bool sequence_flt(sequence sq, freia_spoc_info * fsip)
 {
-  list /* of statements */ ls = NIL;
-
   pips_debug(9, "considering sequence...\n");
+
+  list /* of statements */ ls = NIL;
   FOREACH(statement, s, sequence_statements(sq))
   {
-    bool keep_stat = statement_freia_call_p(s);
-    bool break_seq_before_stat = !keep_stat; // could change...
+    // the statement is kept if it is an AIPO call
+    bool keep_stat = freia_statement_aipo_call_p(s) ||
+      // or it has no image effects but there was already some stuff before
+      (ls!=NIL && !some_effects_on_images(s));
+
+    pips_debug(7, "statement %"_intFMT": %skeeped\n",
+	       statement_number(s), keep_stat? "": "not ");
 
     if (keep_stat)
       ls = CONS(statement, s, ls);
-
-    if (break_seq_before_stat)
-    {
+    else
       if (ls!=NIL) {
 	ls = gen_nreverse(ls);
 	fsip->seqs = CONS(list, ls, fsip->seqs);
 	ls = NIL;
       }
-    }
   }
 
   // end of sequence reached

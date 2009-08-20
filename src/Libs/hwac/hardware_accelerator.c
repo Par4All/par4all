@@ -58,6 +58,9 @@ static int freia_compiler(string module, string hardware)
   set_current_module_statement(mod_stat);
   set_current_module_entity(module_name_to_entity(module));
   // should be pure?
+  set_cumulated_rw_effects((statement_effects)
+      db_get_memory_resource(DBR_CUMULATED_EFFECTS, module, false));
+  // useless... but...
   set_proper_rw_effects((statement_effects)
       db_get_memory_resource(DBR_PROPER_EFFECTS, module, false));
 
@@ -76,7 +79,8 @@ static int freia_compiler(string module, string hardware)
   // release resources
   // ??? free statement_effects? MEMORY LEAK...
   // but some statements contents where freed
-  // there may be some sharing between proper effects & statements.
+  // there may be some sharing between * effects & statements?
+  reset_cumulated_rw_effects();
   reset_proper_rw_effects();
   reset_current_module_statement();
   reset_current_module_entity();

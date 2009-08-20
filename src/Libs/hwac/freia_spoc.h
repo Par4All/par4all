@@ -175,6 +175,7 @@ typedef struct {
 
 typedef enum {
   // important, in hardware order
+  spoc_type_oth = -2, // for anything else...
   spoc_type_nop = -1, // used by copy?
   spoc_type_inp = 0, // used for input
   spoc_type_poc = 1,
