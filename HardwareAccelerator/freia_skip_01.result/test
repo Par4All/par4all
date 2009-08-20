@@ -3,7 +3,7 @@
 
 freia_status freia_skip_01(freia_data2d *o, freia_data2d *i)
 {
-   freia_status ret;
+   freia_status ret = FREIA_OK;
    freia_data2d *t = freia_common_create_data(16, 128, 128);
    int32_t max;
    int32_t seuil;
@@ -20,7 +20,7 @@ freia_status freia_skip_01(freia_data2d *o, freia_data2d *i)
 // graph for dag "dag_0" of module "freia_skip_01" in dot format
 digraph "dag_0" {
   // inputs
-  "t" [shape=circle];
+  "i" [shape=circle];
 
   // outputs
   "o" [shape=circle];
@@ -28,27 +28,19 @@ digraph "dag_0" {
   // computation vertices
   "11 thr" [shape=parallelogram];
   "11 thr" -> "o";
-  "t" -> "11 thr";
-}
-// graph for dag "dag_1" of module "freia_skip_01" in dot format
-digraph "dag_1" {
-  // inputs
-  "i" [shape=circle];
-
-  // outputs
-  "t" [shape=circle];
-
-  // computation vertices
+  "10 ?" [shape=none];
+  "10 ?" -> "11 thr" [arrowhead=empty];
   "9 -." [shape=trapezium,orientation=270];
-  "9 -." -> "t";
+  "9 -." -> "11 thr";
   "8 max" [shape=diamond];
+  "8 max" -> "10 ?" [arrowhead=empty];
   "i" -> "9 -.";
   "i" -> "8 max";
 }
 // graph for dag "dag_cleaned_0" of module "freia_skip_01" in dot format
 digraph "dag_cleaned_0" {
   // inputs
-  "t" [shape=circle];
+  "i" [shape=circle];
 
   // outputs
   "o" [shape=circle];
@@ -56,39 +48,18 @@ digraph "dag_cleaned_0" {
   // computation vertices
   "11 thr" [shape=parallelogram];
   "11 thr" -> "o";
-  "t" -> "11 thr";
-}
-// graph for dag "dag_cleaned_1" of module "freia_skip_01" in dot format
-digraph "dag_cleaned_1" {
-  // inputs
-  "i" [shape=circle];
-
-  // outputs
-  "t" [shape=circle];
-
-  // computation vertices
+  "10 ?" [shape=none];
+  "10 ?" -> "11 thr" [arrowhead=empty];
   "9 -." [shape=trapezium,orientation=270];
-  "9 -." -> "t";
+  "9 -." -> "11 thr";
   "8 max" [shape=diamond];
+  "8 max" -> "10 ?" [arrowhead=empty];
   "i" -> "9 -.";
   "i" -> "8 max";
 }
 // graph for dag "freia_skip_01_helper_0_0" of module "freia_skip_01" in dot format
 digraph "freia_skip_01_helper_0_0" {
   // inputs
-  "t" [shape=circle];
-
-  // outputs
-  "o" [shape=circle];
-
-  // computation vertices
-  "11 thr" [shape=parallelogram];
-  "11 thr" -> "o";
-  "t" -> "11 thr";
-}
-// graph for dag "freia_skip_01_helper_1_0" of module "freia_skip_01" in dot format
-digraph "freia_skip_01_helper_1_0" {
-  // inputs
   "i" [shape=circle];
 
   // outputs
@@ -100,6 +71,19 @@ digraph "freia_skip_01_helper_1_0" {
   "8 max" [shape=diamond];
   "i" -> "9 -.";
   "i" -> "8 max";
+}
+// graph for dag "freia_skip_01_helper_0_1" of module "freia_skip_01" in dot format
+digraph "freia_skip_01_helper_0_1" {
+  // inputs
+  "t" [shape=circle];
+
+  // outputs
+  "o" [shape=circle];
+
+  // computation vertices
+  "11 thr" [shape=parallelogram];
+  "11 thr" -> "o";
+  "t" -> "11 thr";
 }
 
 ! acceleration function
@@ -109,56 +93,7 @@ digraph "freia_skip_01_helper_1_0" {
 #include <spoc.h>
 
 // FREIA-SPoC helper function for module freia_skip_01
-freia_status freia_skip_01_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, int32_t inf0, int32_t sup1, bool bin2)
-{
-  spoc_instr si;
-  spoc_param sp;
-  spoc_reduction reduc;
-  freia_microcode mcode;
-  freia_dynamic_param dynparam;
-  freia_reduction_results redres;
-  freia_op_sel op = 0;
-  freia_op_param param;
-  freia_status ret;
-  int i;
-
-  // init pipe to nop
-  spoc_init_pipe(&si, &sp, 16);
-
-
-  // STAGE 0
-  // 0`t [0 input 0] -> [0 threshold 0] 11 threshold
-  si.mux[0][0].op = SPOC_MUX_IN0;
-  // threshold 11 threshold stage 0 side 0
-  si.th[0][0].op = bin2? SPOC_TH_BINARIZE : SPOC_TH_NO_BINARIZE;
-  sp.th[0][0].boundmin = inf0;
-  sp.th[0][0].boundmax = sup1;
-
-
-  // output image o on 0
-  // o [0 threshold 0] -> [0 output 0] 0 null
-  // nope
-
-  mcode.raw = (freia_ptr) &si;
-  mcode.size = sizeof(spoc_instr);
-
-  dynparam.raw = (freia_ptr) &sp;
-  dynparam.size = sizeof(spoc_param);
-
-  redres.raw = (freia_ptr) &reduc;
-  redres.size = sizeof(spoc_reduction);
-
-  ret = freia_cg_write_microcode(&mcode);
-  ret |= freia_cg_write_dynamic_param(&dynparam);
-
-  // actual call of spoc hardware
-  freia_cg_template_process_2i_2o(op, param, o0, NULL, i0, NULL);
-
-  return ret;
-}
-
-// FREIA-SPoC helper function for module freia_skip_01
-freia_status freia_skip_01_helper_1_0_0(freia_data2d * o0, freia_data2d * i0, int32_t * red0, int32_t cst1)
+freia_status freia_skip_01_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, int32_t * red0, int32_t cst1)
 {
   spoc_instr si;
   spoc_param sp;
@@ -218,17 +153,66 @@ freia_status freia_skip_01_helper_1_0_0(freia_data2d * o0, freia_data2d * i0, in
   return ret;
 }
 
+// FREIA-SPoC helper function for module freia_skip_01
+freia_status freia_skip_01_helper_0_1_0(freia_data2d * o0, freia_data2d * i0, int32_t inf0, int32_t sup1, bool bin2)
+{
+  spoc_instr si;
+  spoc_param sp;
+  spoc_reduction reduc;
+  freia_microcode mcode;
+  freia_dynamic_param dynparam;
+  freia_reduction_results redres;
+  freia_op_sel op = 0;
+  freia_op_param param;
+  freia_status ret;
+  int i;
+
+  // init pipe to nop
+  spoc_init_pipe(&si, &sp, 16);
+
+
+  // STAGE 0
+  // 0`t [0 input 0] -> [0 threshold 0] 11 threshold
+  si.mux[0][0].op = SPOC_MUX_IN0;
+  // threshold 11 threshold stage 0 side 0
+  si.th[0][0].op = bin2? SPOC_TH_BINARIZE : SPOC_TH_NO_BINARIZE;
+  sp.th[0][0].boundmin = inf0;
+  sp.th[0][0].boundmax = sup1;
+
+
+  // output image o on 0
+  // o [0 threshold 0] -> [0 output 0] 0 null
+  // nope
+
+  mcode.raw = (freia_ptr) &si;
+  mcode.size = sizeof(spoc_instr);
+
+  dynparam.raw = (freia_ptr) &sp;
+  dynparam.size = sizeof(spoc_param);
+
+  redres.raw = (freia_ptr) &reduc;
+  redres.size = sizeof(spoc_reduction);
+
+  ret = freia_cg_write_microcode(&mcode);
+  ret |= freia_cg_write_dynamic_param(&dynparam);
+
+  // actual call of spoc hardware
+  freia_cg_template_process_2i_2o(op, param, o0, NULL, i0, NULL);
+
+  return ret;
+}
+
 ! updated function
 
 freia_status freia_skip_01(freia_data2d *o, freia_data2d *i)
 {
-   freia_status ret;
+   freia_status ret = FREIA_OK;
    freia_data2d *t = freia_common_create_data(16, 128, 128);
    int32_t max;
    int32_t seuil;
-   freia_skip_01_helper_1_0_0(t, i, &max, 20);                          /*0008*/
+   freia_skip_01_helper_0_0_0(t, i, &max, 20);                          /*0008*/
    seuil = max-10;                                                      /*0010*/
-   freia_skip_01_helper_0_0_0(o, t, 0, seuil, false);                   /*0011*/
+   freia_skip_01_helper_0_1_0(o, t, 0, seuil, false);                   /*0011*/
    freia_common_destruct_data(t);                                       /*0012*/
    return ret;                                                          /*0013*/
 }

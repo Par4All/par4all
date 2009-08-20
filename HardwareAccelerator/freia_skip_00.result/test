@@ -75,14 +75,6 @@ digraph "freia_skip_00_helper_0_0" {
   "i0" -> "9 ^";
   "i0" -> "7 -s";
 }
-// graph for dag "freia_skip_00_helper_0_1" of module "freia_skip_00" in dot format
-digraph "freia_skip_00_helper_0_1" {
-  // inputs
-
-  // outputs
-
-  // computation vertices
-}
 
 ! acceleration function
 
