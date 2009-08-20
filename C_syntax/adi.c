@@ -19,9 +19,9 @@ int jmax,k;
 	double **dmatrix(),*dvector();
 	void free_dmatrix(),free_dvector(),nrerror(),tridag();
 
-	if (jmax > JJ) 
+	if (jmax > JJ)
 	  nrerror("in ADI, increase JJ");
-	if (k > KK-1)  
+	if (k > KK-1)
 	  nrerror("in ADI, increase KK");
 	psi=dmatrix(1,JJ,1,JJ);
 	s=dmatrix(1,NRR,1,KK);

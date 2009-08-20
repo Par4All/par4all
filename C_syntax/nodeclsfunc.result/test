@@ -9,7 +9,9 @@ Variable list:
 	Declared entity "nodecls:*DYNAMIC*" with type "area" with size 0
 	Declared entity "nodecls:*HEAP*" with type "area" with size 0
 	Declared entity "nodecls:*STACK*" with type "area" with size 0
-	Declared entity "nodecls:*STATIC*" with type "area" with size 0
+	Declared entity "nodecls:*STATIC*" with type "area" with size 16
+	Declared entity "nodecls:0`__FUNCTION__" with type "variable" "char"
+	Declared entity "nodecls:0`__function__" with type "variable" "char"
 	Declared entity "nodeclsfunc!:*STATIC*" with type "area" with size 0
 
 * empty extern declaration list *
@@ -33,8 +35,9 @@ Layout for memory area "nodecls:*STACK*" of size 0:
 	* empty area *
 
 
-Layout for memory area "nodecls:*STATIC*" of size 0:
-	* empty area *
+Layout for memory area "nodecls:*STATIC*" of size 16:
+	Variable "nodecls:0`__FUNCTION__"	offset = 0	size = 8
+	Variable "nodecls:0`__function__"	offset = 8	size = 8
 
 
 Layout for memory area "nodeclsfunc!:*STATIC*" of size 0:

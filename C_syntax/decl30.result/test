@@ -23,7 +23,9 @@ Variable list:
 	Declared entity "decl30:*DYNAMIC*" with type "area" with size 12
 	Declared entity "decl30:*HEAP*" with type "area" with size 0
 	Declared entity "decl30:*STACK*" with type "area" with size 0
-	Declared entity "decl30:*STATIC*" with type "area" with size 0
+	Declared entity "decl30:*STATIC*" with type "area" with size 14
+	Declared entity "decl30:0`__FUNCTION__" with type "variable" "char"
+	Declared entity "decl30:0`__function__" with type "variable" "char"
 	Declared entity "decl30:0`foo" with type "functional" "double * -> double"
 	Declared entity "decl30:0`x" with type "variable" "double[] *"
 	Declared entity "decl30:0`z" with type "variable" "double"
@@ -54,8 +56,9 @@ Layout for memory area "decl30:*STACK*" of size 0:
 	* empty area *
 
 
-Layout for memory area "decl30:*STATIC*" of size 0:
-	* empty area *
+Layout for memory area "decl30:*STATIC*" of size 14:
+	Variable "decl30:0`__FUNCTION__"	offset = 0	size = 7
+	Variable "decl30:0`__function__"	offset = 7	size = 7
 
 End of declarations for module decl30
 

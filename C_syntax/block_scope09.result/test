@@ -56,8 +56,10 @@ Variable list:
 	Declared entity "block_scope09:*DYNAMIC*" with type "area" with size 8
 	Declared entity "block_scope09:*HEAP*" with type "area" with size 0
 	Declared entity "block_scope09:*STACK*" with type "area" with size 0
-	Declared entity "block_scope09:*STATIC*" with type "area" with size 0
+	Declared entity "block_scope09:*STATIC*" with type "area" with size 28
 	Declared entity "block_scope09:0`1`x" with type "variable" "int"
+	Declared entity "block_scope09:0`__FUNCTION__" with type "variable" "char"
+	Declared entity "block_scope09:0`__function__" with type "variable" "char"
 	Declared entity "block_scope09:0`k" with type "variable" "int"
 	Declared entity "block_scope09:block_scope09" with type "variable" "int"
 	Declared entity "block_scope09:x" with type "variable" "int"
@@ -97,8 +99,9 @@ Layout for memory area "block_scope09:*STACK*" of size 0:
 	* empty area *
 
 
-Layout for memory area "block_scope09:*STATIC*" of size 0:
-	* empty area *
+Layout for memory area "block_scope09:*STATIC*" of size 28:
+	Variable "block_scope09:0`__FUNCTION__"	offset = 0	size = 14
+	Variable "block_scope09:0`__function__"	offset = 14	size = 14
 
 End of declarations for module block_scope09
 

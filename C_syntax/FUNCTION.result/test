@@ -10,6 +10,6 @@ printed file
 
 main()
 {
-   extern  __FUNCTION__();
+   static char * __FUNCTION__ = "main";
    fprintf(stderr, "%s\n", __FUNCTION__);
 }

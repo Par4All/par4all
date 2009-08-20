@@ -12,7 +12,9 @@ Variable list:
 	Declared entity "allocation09:*DYNAMIC*" with type "area" with size 57
 	Declared entity "allocation09:*HEAP*" with type "area" with size 0
 	Declared entity "allocation09:*STACK*" with type "area" with size 0
-	Declared entity "allocation09:*STATIC*" with type "area" with size 0
+	Declared entity "allocation09:*STATIC*" with type "area" with size 26
+	Declared entity "allocation09:0`__FUNCTION__" with type "variable" "char"
+	Declared entity "allocation09:0`__function__" with type "variable" "char"
 	Declared entity "allocation09:0`a" with type "variable" "char"
 	Declared entity "allocation09:0`b" with type "variable" "short"
 	Declared entity "allocation09:0`c" with type "variable" "int"
@@ -73,8 +75,9 @@ Layout for memory area "allocation09:*STACK*" of size 0:
 	* empty area *
 
 
-Layout for memory area "allocation09:*STATIC*" of size 0:
-	* empty area *
+Layout for memory area "allocation09:*STATIC*" of size 26:
+	Variable "allocation09:0`__FUNCTION__"	offset = 0	size = 13
+	Variable "allocation09:0`__function__"	offset = 13	size = 13
 
 End of declarations for module allocation09
 

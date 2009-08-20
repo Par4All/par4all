@@ -8,7 +8,9 @@ Variable list:
 	Declared entity "fcompat:*DYNAMIC*" with type "area" with size 4
 	Declared entity "fcompat:*HEAP*" with type "area" with size 0
 	Declared entity "fcompat:*STACK*" with type "area" with size 0
-	Declared entity "fcompat:*STATIC*" with type "area" with size 0
+	Declared entity "fcompat:*STATIC*" with type "area" with size 16
+	Declared entity "fcompat:0`__FUNCTION__" with type "variable" "char"
+	Declared entity "fcompat:0`__function__" with type "variable" "char"
 	Declared entity "fcompat:0`a" with type "variable" "int"
 	Declared entity "fcompat:0`c" with type "variable" "int"
 	Declared entity "fcompat:0`p" with type "variable" "int[n+1] *"
@@ -37,8 +39,9 @@ Layout for memory area "fcompat:*STACK*" of size 0:
 	Dynamic Variable "fcompat:0`c"	offset = UNKNOWN, 	size = DYNAMIC
 
 
-Layout for memory area "fcompat:*STATIC*" of size 0:
-	* empty area *
+Layout for memory area "fcompat:*STATIC*" of size 16:
+	Variable "fcompat:0`__FUNCTION__"	offset = 0	size = 8
+	Variable "fcompat:0`__function__"	offset = 8	size = 8
 
 
 Layout for memory area "sizeofArray01!:*STATIC*" of size 0:

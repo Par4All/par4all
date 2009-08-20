@@ -48,7 +48,9 @@ Variable list:
 	Declared entity "decl33:*DYNAMIC*" with type "area" with size 0
 	Declared entity "decl33:*HEAP*" with type "area" with size 0
 	Declared entity "decl33:*STACK*" with type "area" with size 0
-	Declared entity "decl33:*STATIC*" with type "area" with size 0
+	Declared entity "decl33:*STATIC*" with type "area" with size 14
+	Declared entity "decl33:0`__FUNCTION__" with type "variable" "char"
+	Declared entity "decl33:0`__function__" with type "variable" "char"
 	Declared entity "decl33:decl33" with type "variable" "int"
 	Declared entity "decl33:i" with type "variable" "int"
 	Declared entity "decl33:j" with type "variable" "int"
@@ -87,8 +89,9 @@ Layout for memory area "decl33:*STACK*" of size 0:
 	* empty area *
 
 
-Layout for memory area "decl33:*STATIC*" of size 0:
-	* empty area *
+Layout for memory area "decl33:*STATIC*" of size 14:
+	Variable "decl33:0`__FUNCTION__"	offset = 0	size = 7
+	Variable "decl33:0`__function__"	offset = 7	size = 7
 
 End of declarations for module decl33
 

@@ -12,7 +12,9 @@ Variable list:
 	Declared entity "decl20:*DYNAMIC*" with type "area" with size 0
 	Declared entity "decl20:*HEAP*" with type "area" with size 0
 	Declared entity "decl20:*STACK*" with type "area" with size 0
-	Declared entity "decl20:*STATIC*" with type "area" with size 0
+	Declared entity "decl20:*STATIC*" with type "area" with size 14
+	Declared entity "decl20:0`__FUNCTION__" with type "variable" "char"
+	Declared entity "decl20:0`__function__" with type "variable" "char"
 	Declared entity "decl20:dir" with type "variable" "char *"
 
 * empty extern declaration list *
@@ -44,8 +46,9 @@ Layout for memory area "decl20:*STACK*" of size 0:
 	* empty area *
 
 
-Layout for memory area "decl20:*STATIC*" of size 0:
-	* empty area *
+Layout for memory area "decl20:*STATIC*" of size 14:
+	Variable "decl20:0`__FUNCTION__"	offset = 0	size = 7
+	Variable "decl20:0`__function__"	offset = 7	size = 7
 
 End of declarations for module decl20
 

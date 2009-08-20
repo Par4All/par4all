@@ -55,7 +55,9 @@ Variable list:
 	Declared entity "decl17:*DYNAMIC*" with type "area" with size 0
 	Declared entity "decl17:*HEAP*" with type "area" with size 0
 	Declared entity "decl17:*STACK*" with type "area" with size 0
-	Declared entity "decl17:*STATIC*" with type "area" with size 0
+	Declared entity "decl17:*STATIC*" with type "area" with size 14
+	Declared entity "decl17:0`__FUNCTION__" with type "variable" "char"
+	Declared entity "decl17:0`__function__" with type "variable" "char"
 	Declared entity "decl17:iarg" with type "variable" "int"
 
 * empty extern declaration list *
@@ -87,8 +89,9 @@ Layout for memory area "decl17:*STACK*" of size 0:
 	* empty area *
 
 
-Layout for memory area "decl17:*STATIC*" of size 0:
-	* empty area *
+Layout for memory area "decl17:*STATIC*" of size 14:
+	Variable "decl17:0`__FUNCTION__"	offset = 0	size = 7
+	Variable "decl17:0`__function__"	offset = 7	size = 7
 
 End of declarations for module decl17
 

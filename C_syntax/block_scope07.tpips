@@ -4,6 +4,7 @@ create block_scope07 block_scope07.c
 #setenv C_SYNTAX_DEBUG_LEVEL 9
 
 activate C_PARSER
+activate C_SYMBOL_TABLE
 
 setproperty PRETTYPRINT_C_CODE TRUE
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE

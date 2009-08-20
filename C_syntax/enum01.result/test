@@ -56,49 +56,51 @@ main()
 
    ma1 = rose;
 
-//  P() {}
+//  P(ma1) {}
 
    ma2 = marguerite;
 
-//  P() {}
+//  P(ma1,ma2) {}
 
    ma3 = jasmin;
 
-//  P() {}
+//  P(ma1,ma2,ma3) {}
 
    mon1 = carotte;
 
-//  P() {}
+//  P(ma1,ma2,ma3,mon1) {}
 
    mon2 = haricot;
 
-//  P() {}
+//  P(ma1,ma2,ma3,mon1,mon2) {}
 
 
    i = ma1+ma2+ma3+mon1+mon2;
 
-//  P(i) {}
+//  P(i,ma1,ma2,ma3,mon1,mon2) {}
 
 
    a1 = rose;
 
-//  P(a1,i) {a1==1}
+//  P(a1,i,ma1,ma2,ma3,mon1,mon2) {a1==1}
 
    a2 = marguerite;
 
-//  P(a1,a2,i) {a1==1, a2==0}
+//  P(a1,a2,i,ma1,ma2,ma3,mon1,mon2) {a1==1, a2==0}
 
    a3 = jasmin;
 
-//  P(a1,a2,a3,i) {a1==1, a2==0, a3==1}
+//  P(a1,a2,a3,i,ma1,ma2,ma3,mon1,mon2) {a1==1, a2==0, a3==1}
 
    on1 = carotte;
 
-//  P(a1,a2,a3,i,on1) {a1==1, a2==0, a3==1, on1==51}
+//  P(a1,a2,a3,i,ma1,ma2,ma3,mon1,mon2,on1) {a1==1, a2==0, a3==1,
+//    on1==51}
 
    on2 = haricot;
 
-//  P(a1,a2,a3,i,on1,on2) {a1==1, a2==0, a3==1, on1==51, on2==52}
+//  P(a1,a2,a3,i,ma1,ma2,ma3,mon1,mon2,on1,on2) {a1==1, a2==0, a3==1,
+//    on1==51, on2==52}
 
 
    j = a1+a2+a3+on1+on2;

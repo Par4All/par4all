@@ -9,7 +9,9 @@ Variable list:
 	Declared entity "bar:*DYNAMIC*" with type "area" with size 4
 	Declared entity "bar:*HEAP*" with type "area" with size 0
 	Declared entity "bar:*STACK*" with type "area" with size 0
-	Declared entity "bar:*STATIC*" with type "area" with size 0
+	Declared entity "bar:*STATIC*" with type "area" with size 8
+	Declared entity "bar:0`__FUNCTION__" with type "variable" "char"
+	Declared entity "bar:0`__function__" with type "variable" "char"
 	Declared entity "bar:0`bar" with type "variable" "int"
 
 * empty extern declaration list *
@@ -38,8 +40,9 @@ Layout for memory area "bar:*STACK*" of size 0:
 	* empty area *
 
 
-Layout for memory area "bar:*STATIC*" of size 0:
-	* empty area *
+Layout for memory area "bar:*STATIC*" of size 8:
+	Variable "bar:0`__FUNCTION__"	offset = 0	size = 4
+	Variable "bar:0`__function__"	offset = 4	size = 4
 
 End of declarations for module bar
 
@@ -184,7 +187,9 @@ Variable list:
 	Declared entity "main:*DYNAMIC*" with type "area" with size 0
 	Declared entity "main:*HEAP*" with type "area" with size 0
 	Declared entity "main:*STACK*" with type "area" with size 0
-	Declared entity "main:*STATIC*" with type "area" with size 0
+	Declared entity "main:*STATIC*" with type "area" with size 10
+	Declared entity "main:0`__FUNCTION__" with type "variable" "char"
+	Declared entity "main:0`__function__" with type "variable" "char"
 	Declared entity "main:main" with type "variable" "int"
 
 External variable list:
@@ -219,8 +224,9 @@ Layout for memory area "main:*STACK*" of size 0:
 	* empty area *
 
 
-Layout for memory area "main:*STATIC*" of size 0:
-	* empty area *
+Layout for memory area "main:*STATIC*" of size 10:
+	Variable "main:0`__FUNCTION__"	offset = 0	size = 5
+	Variable "main:0`__function__"	offset = 5	size = 5
 
 End of declarations for module main
 

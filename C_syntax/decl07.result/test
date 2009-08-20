@@ -12,7 +12,9 @@ Variable list:
 	Declared entity "decl07:*DYNAMIC*" with type "area" with size 8
 	Declared entity "decl07:*HEAP*" with type "area" with size 0
 	Declared entity "decl07:*STACK*" with type "area" with size 0
-	Declared entity "decl07:*STATIC*" with type "area" with size 0
+	Declared entity "decl07:*STATIC*" with type "area" with size 14
+	Declared entity "decl07:0`__FUNCTION__" with type "variable" "char"
+	Declared entity "decl07:0`__function__" with type "variable" "char"
 	Declared entity "decl07:0`a" with type "variable" "int"
 	Declared entity "decl07:0`f" with type "variable" "(char -> void) *"
 
@@ -42,8 +44,9 @@ Layout for memory area "decl07:*STACK*" of size 0:
 	* empty area *
 
 
-Layout for memory area "decl07:*STATIC*" of size 0:
-	* empty area *
+Layout for memory area "decl07:*STATIC*" of size 14:
+	Variable "decl07:0`__FUNCTION__"	offset = 0	size = 7
+	Variable "decl07:0`__function__"	offset = 7	size = 7
 
 End of declarations for module decl07
 
