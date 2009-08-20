@@ -29,6 +29,7 @@ digraph "dag_0" {
   "9 ^" [shape=trapezium,orientation=270];
   "9 ^" -> "o";
   "8 ?" [shape=none];
+  "8 ?" -> "10 ?" [arrowhead=empty];
   "7 -s" [shape=trapezium,orientation=270];
   "7 -s" -> "9 ^";
   "i1" -> "7 -s";
@@ -49,6 +50,7 @@ digraph "dag_cleaned_0" {
   "9 ^" [shape=trapezium,orientation=270];
   "9 ^" -> "o";
   "8 ?" [shape=none];
+  "8 ?" -> "10 ?" [arrowhead=empty];
   "7 -s" [shape=trapezium,orientation=270];
   "7 -s" -> "9 ^";
   "i1" -> "7 -s";
@@ -72,6 +74,14 @@ digraph "freia_skip_00_helper_0_0" {
   "i1" -> "7 -s";
   "i0" -> "9 ^";
   "i0" -> "7 -s";
+}
+// graph for dag "freia_skip_00_helper_0_1" of module "freia_skip_00" in dot format
+digraph "freia_skip_00_helper_0_1" {
+  // inputs
+
+  // outputs
+
+  // computation vertices
 }
 
 ! acceleration function
