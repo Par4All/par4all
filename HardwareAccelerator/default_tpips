@@ -1,7 +1,9 @@
 delete ${WSPACE}
+setproperty ABORT_ON_USER_ERROR TRUE
 #setenv PIPS_HWAC_DEBUG_LEVEL=5
 #setenv PIPS_HWAC_DEBUG_LEVEL=7
 create ${WSPACE} ${FILE} freia.c
+shell ${PIPS_CC:-gcc} -c ${FILE} -o ${WSPACE}.database/Tmp/${WSPACE}.o
 activate C_PARSER
 setproperty PRETTYPRINT_C_CODE TRUE
 echo
@@ -18,6 +20,7 @@ apply CLEAN_UNUSED_DYNAMIC_VARIABLES[${WSPACE}]
 touch SPOC_FILE[${WSPACE}]
 touch PROPER_EFFECTS[${WSPACE}]
 touch CUMULATED_EFFECTS[${WSPACE}]
+setproperty ABORT_ON_USER_ERROR FALSE
 #
 # show spoc results
 #
