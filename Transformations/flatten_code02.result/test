@@ -1,0 +1,58 @@
+
+Initial code
+
+int flatten_code02()
+{
+   // BEGIN BLOCK
+   int i = 1;
+   int j;
+   i++;
+   {
+      // BEGIN BLOCK
+      int i = 2;
+      int k = 2;
+      i++;
+      j = 1;
+      {
+         // BEGIN BLOCK
+         int k = 2;
+         i++;
+         j = 1;
+         // END BLOCK
+      }
+      // END BLOCK
+   }
+   i = j;
+
+   printf("%d %d\n", i, j);
+   // END BLOCK
+}
+
+Code after flatten_code
+
+int flatten_code02()
+{
+   // BEGIN BLOCK
+   int i = 1;
+   int j;
+   i++;
+   {
+      // BEGIN BLOCK
+      int i = 2;
+      int k = 2;
+      i++;
+      j = 1;
+      {
+         // BEGIN BLOCK
+         int k = 2;
+         i++;
+         j = 1;
+         // END BLOCK
+      }
+      // END BLOCK
+   }
+   i = j;
+
+   printf("%d %d\n", i, j);
+   // END BLOCK
+}
