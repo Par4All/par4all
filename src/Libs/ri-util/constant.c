@@ -170,7 +170,8 @@ name is the name of the constant 12, 123E10, '3I12', 015 (C octal
  Initial and final quotes are included in the names of string
  constants.
 
-basic is the basic type of the constant: int, float, ... 
+basic is the basic type of the constant: int, float, ...
+
 Character constants are typed as int.
 */
 
@@ -187,11 +188,11 @@ Character constants are typed as int.
     functional fe = functional_undefined;
     constant ce = constant_undefined;
     basic be = basic_undefined;
-	
+
     if (bt == is_basic_string) {
       /* Drop the two qotes, but add space for '\0' in C */
-      be = make_basic(bt, (make_value(is_value_constant, 
-				      (make_constant(is_constant_int, 
+      be = make_basic(bt, (make_value(is_value_constant,
+				      (make_constant(is_constant_int,
 						     (void*) (strlen(name)-2+1-is_fortran))))));
     }
     else {

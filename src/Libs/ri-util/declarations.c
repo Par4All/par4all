@@ -231,13 +231,13 @@ words_declaration(
 		  }
 		else
 		  {
-		    MAPL(pd, 
+		    MAPL(pd,
 		    {
 		      pl = CHAIN_SWORD(pl, "[");
 		      pl = gen_nconc(pl, words_dimension(DIMENSION(CAR(pd))));
 		      pl = CHAIN_SWORD(pl, "]");
 		    }, dims);
-		  }      
+		  }
 	    }
 	}
     }
@@ -251,25 +251,25 @@ list words_basic(basic obj)
     list pc = NIL;
     /* 31/07/2003 Nga Nguyen : add more cases for C*/
     switch (basic_tag(obj)) {
-      case is_basic_int: 
+      case is_basic_int:
 	{
 	  if (prettyprint_is_fortran)
 	    {
 	      pc = CHAIN_SWORD(pc,"INTEGER*");
 	      pc = CHAIN_IWORD(pc,basic_int(obj));
 	    }
-	  else 
+	  else
 	    {
 	      switch (basic_int(obj)) {
-		case 1: pc = CHAIN_SWORD(pc,"char"); 
+		case 1: pc = CHAIN_SWORD(pc,"char");
 		  break;
-		case 2: pc = CHAIN_SWORD(pc,"short"); 
+		case 2: pc = CHAIN_SWORD(pc,"short");
 		  break;
-		case 4: pc = CHAIN_SWORD(pc,"int"); 
+		case 4: pc = CHAIN_SWORD(pc,"int");
 		  break;
-		case 6: pc = CHAIN_SWORD(pc,"long"); 
+		case 6: pc = CHAIN_SWORD(pc,"long");
 		  break;
-		case 8: pc = CHAIN_SWORD(pc,"long long"); 
+		case 8: pc = CHAIN_SWORD(pc,"long long");
 		  break;
 		case 11: pc = CHAIN_SWORD(pc,"unsigned char");
 		  break;
@@ -302,7 +302,7 @@ list words_basic(basic obj)
 	      pc = CHAIN_SWORD(pc,"REAL*");
 	      pc = CHAIN_IWORD(pc,basic_float(obj));
 	    }
-	  else 
+	  else
 	    {
 	      switch (basic_float(obj)) {
 		case 4: pc = CHAIN_SWORD(pc,"float");
@@ -320,7 +320,7 @@ list words_basic(basic obj)
 	       pc = CHAIN_SWORD(pc,"LOGICAL*");
 	       pc = CHAIN_IWORD(pc,basic_logical(obj));
 	     }
-	   else 
+	   else
 	     pc = CHAIN_SWORD(pc,"int"); /* FI: Use stdbool.h instead? */
 	   break;
 	}
@@ -336,7 +336,7 @@ list words_basic(basic obj)
 	    pc = CHAIN_SWORD(pc,"COMPLEX*");
 	    pc = CHAIN_IWORD(pc,basic_complex(obj));
 	  }
-	  else 
+	  else
 	    {
 	      switch (basic_complex(obj)) {
 		case 8: pc = CHAIN_SWORD(pc,"_Complex");
@@ -360,7 +360,7 @@ list words_basic(basic obj)
 	      pc = CHAIN_SWORD(pc,"CHARACTER*");
 	      pc = gen_nconc(pc, words_value(basic_string(obj)));
 	    }
-	  else 
+	  else
 	    pc = CHAIN_SWORD(pc,"char");
 	  break;
 	}
@@ -414,8 +414,7 @@ list words_basic(basic obj)
 
 /**************************************************************** SENTENCE */
 
-sentence 
-sentence_variable(entity e)
+sentence sentence_variable(entity e)
 {
     list pc = NIL;
     type te = entity_type(e);
@@ -427,7 +426,7 @@ sentence_variable(entity e)
 
     pc = gen_nconc(pc, words_declaration(e, TRUE));
 
-    return(make_sentence(is_sentence_unformatted, 
+    return(make_sentence(is_sentence_unformatted,
 			 make_unformatted(NULL, 0, 0, pc)));
 }
 
@@ -436,14 +435,13 @@ sentence_variable(entity e)
  * They two have almost the same properties.
  * For the time being, especially for the PUMA project, we have a temporary
  * idea to deal with it: When there's no argument(s), it should be a PROGRAM,
- * otherwise, it should be a SUBROUTINE. 
+ * otherwise, it should be a SUBROUTINE.
  * Lei ZHOU 18/10/91
  *
  * correct PROGRAM and SUBROUTINE distinction added, FC 18/08/94
  * approximate BLOCK DATA / SUBROUTINE distinction also added. FC 09/97
  */
-sentence 
-sentence_head(entity e)
+sentence sentence_head(entity e)
 {
     list pc = NIL;
     type te = entity_type(e);
@@ -455,12 +453,12 @@ sentence_head(entity e)
 
     if (static_module_p(e))
       pc = CHAIN_SWORD(pc,"static ");
-    
+
     fe = type_functional(te);
     tr = functional_result(fe);
-   
+
     switch (type_tag(tr)) {
-    case is_type_void: 
+    case is_type_void:
       {
 	if (prettyprint_is_fortran)
 	  {
@@ -486,15 +484,18 @@ sentence_head(entity e)
       }
     case is_type_unknown:
       {
-	/* For C functions with no return type. 
-	   It can be treated as of type int, but we keep it unknown for 
-	   the moment, to make the differences and to regenerate initial code*/
+	/* For C functions with no return type.
+
+	   It can be treated as of type int, but we keep it unknown
+	   for the moment, to make the differences and to regenerate
+	   initial code
+	*/
 	break;
       }
-    default: 
+    default:
       pips_internal_error("unexpected type for result\n");
     }
-      
+
     pc = CHAIN_SWORD(pc, entity_user_name(e));
 
     if (!ENDP(args)) {
@@ -506,7 +507,7 @@ sentence_head(entity e)
       pc = CHAIN_SWORD(pc, "()");
     }
 
-    return(make_sentence(is_sentence_unformatted, 
+    return(make_sentence(is_sentence_unformatted,
 			 make_unformatted(NULL, 0, 0, pc)));
 }
 
@@ -520,8 +521,7 @@ empty_static_area_p(entity e)
 /*  special management of empty commons added.
  *  this may happen in the hpfc generated code.
  */
-static sentence 
-sentence_area(entity e, entity module, bool pp_dimensions)
+static sentence sentence_area(entity e, entity module, bool pp_dimensions)
 {
     string area_name = module_local_name(e);
     type te = entity_type(e);
@@ -556,26 +556,26 @@ sentence_area(entity e, entity module, bool pp_dimensions)
 	    else
 	    {
 		pc = CHAIN_SWORD(pc, "COMMON ");
-		if (strcmp(area_name, BLANK_COMMON_LOCAL_NAME) != 0) 
+		if (strcmp(area_name, BLANK_COMMON_LOCAL_NAME) != 0)
 		{
 		    pc = CHAIN_SWORD(pc, "/");
 		    pc = CHAIN_SWORD(pc, area_name);
 		    pc = CHAIN_SWORD(pc, "/ ");
 		}
 	    }
-	    
-	    MAP(ENTITY, ee, 
+
+	    MAP(ENTITY, ee,
 	     {
 		 if (comma) pc = CHAIN_SWORD(pc, space_p? ", " : ",");
 		 else comma = TRUE;
-		 pc = gen_nconc(pc, 
+		 pc = gen_nconc(pc,
 			words_declaration(ee, !is_save && pp_dimensions));
 	     },
 		 entities);
 
 	    gen_free_list(entities);
 	}
-	else 
+	else
 	{
 	    pips_user_warning("empty common %s for module %s encountered...\n",
 			      entity_name(e), entity_name(module));
@@ -586,156 +586,150 @@ sentence_area(entity e, entity module, bool pp_dimensions)
 	}
     }
 
-    return make_sentence(is_sentence_unformatted, 
+    return make_sentence(is_sentence_unformatted,
 			 make_unformatted(NULL, 0, 0, pc));
 }
 
-static sentence 
-sentence_basic_declaration(entity e)
+static sentence sentence_basic_declaration(entity e)
 {
-    list decl = NIL;
-    basic b = entity_basic(e);
+  list decl = NIL;
+  basic b = entity_basic(e);
 
-    pips_assert("b is defined", !basic_undefined_p(b));
+  pips_assert("b is defined", !basic_undefined_p(b));
 
-    decl = CHAIN_SWORD(decl, basic_to_string(b));
-    decl = CHAIN_SWORD(decl, " ");
-    decl = CHAIN_SWORD(decl, entity_local_name(e));
+  decl = CHAIN_SWORD(decl, basic_to_string(b));
+  decl = CHAIN_SWORD(decl, " ");
+  decl = CHAIN_SWORD(decl, entity_local_name(e));
 
-    return(make_sentence(is_sentence_unformatted, 
-			 make_unformatted(NULL, 0, 0, decl)));
+  return(make_sentence(is_sentence_unformatted,
+		       make_unformatted(NULL, 0, 0, decl)));
 }
 
-static sentence 
-sentence_external(entity f)
+static sentence sentence_external(entity f)
 {
-    list pc = NIL;
+  list pc = NIL;
 
-    pc = CHAIN_SWORD(pc, "EXTERNAL ");
-    pc = CHAIN_SWORD(pc, entity_local_name(f));
+  pc = CHAIN_SWORD(pc, "EXTERNAL ");
+  pc = CHAIN_SWORD(pc, entity_local_name(f));
 
-    return(make_sentence(is_sentence_unformatted, 
-			 make_unformatted(NULL, 0, 0, pc)));
+  return(make_sentence(is_sentence_unformatted,
+		       make_unformatted(NULL, 0, 0, pc)));
 }
 
-static sentence 
-sentence_symbolic(entity f)
+static sentence sentence_symbolic(entity f)
 {
-    list pc = NIL;
-    value vf = entity_initial(f);
-    expression e = symbolic_expression(value_symbolic(vf));
+  list pc = NIL;
+  value vf = entity_initial(f);
+  expression e = symbolic_expression(value_symbolic(vf));
 
-    pc = CHAIN_SWORD(pc, "PARAMETER (");
-    pc = CHAIN_SWORD(pc, entity_local_name(f));
-    pc = CHAIN_SWORD(pc, " = ");
-    pc = gen_nconc(pc, words_expression(e));
-    pc = CHAIN_SWORD(pc, ")");
+  pc = CHAIN_SWORD(pc, "PARAMETER (");
+  pc = CHAIN_SWORD(pc, entity_local_name(f));
+  pc = CHAIN_SWORD(pc, " = ");
+  pc = gen_nconc(pc, words_expression(e));
+  pc = CHAIN_SWORD(pc, ")");
 
-    return(make_sentence(is_sentence_unformatted, 
-			 make_unformatted(NULL, 0, 0, pc)));
+  return(make_sentence(is_sentence_unformatted,
+		       make_unformatted(NULL, 0, 0, pc)));
 }
 
-/* why is it assumed that the constant is an int ??? 
+/* why is it assumed that the constant is an int ???
  */
-static sentence 
-sentence_data(entity e)
+static sentence sentence_data(entity e)
 {
-    list pc = NIL;
-    constant c;
+  list pc = NIL;
+  constant c;
 
-    if (! value_constant_p(entity_initial(e)))
-	return(sentence_undefined);
+  if (! value_constant_p(entity_initial(e)))
+    return(sentence_undefined);
 
-    c = value_constant(entity_initial(e));
+  c = value_constant(entity_initial(e));
 
-    if (! constant_int_p(c))
-	return(sentence_undefined);
+  if (! constant_int_p(c))
+    return(sentence_undefined);
 
-    pc = CHAIN_SWORD(pc, "DATA ");
-    pc = CHAIN_SWORD(pc, entity_local_name(e));
-    pc = CHAIN_SWORD(pc, " /");
-    pc = CHAIN_IWORD(pc, constant_int(c));
-    pc = CHAIN_SWORD(pc, "/");
+  pc = CHAIN_SWORD(pc, "DATA ");
+  pc = CHAIN_SWORD(pc, entity_local_name(e));
+  pc = CHAIN_SWORD(pc, " /");
+  pc = CHAIN_IWORD(pc, constant_int(c));
+  pc = CHAIN_SWORD(pc, "/");
 
-    return(make_sentence(is_sentence_unformatted, 
-			 make_unformatted(NULL, 0, 0, pc)));
+  return(make_sentence(is_sentence_unformatted,
+		       make_unformatted(NULL, 0, 0, pc)));
 }
 
 /********************************************************************* TEXT */
 
 #define ADD_WORD_LIST_TO_TEXT(t, l)\
   if (!ENDP(l)) ADD_SENTENCE_TO_TEXT(t,\
-	        make_sentence(is_sentence_unformatted, \
-			      make_unformatted(NULL, 0, 0, l)));
+				     make_sentence(is_sentence_unformatted, \
+						   make_unformatted(NULL, 0, 0, l)));
 
 /* if the common is declared similarly in all routines, generate
  * "include 'COMMON.h'", and the file is put in Src. otherwise
  * the full local declarations are generated. That's fun.
  */
 
-static text
-include(string file)
+static text include(string file)
 {
-    return make_text
-	(CONS(SENTENCE, 
-	      make_sentence(is_sentence_formatted,
-		  strdup(concatenate("      include '", file, "'\n", NULL))),
-	      NIL));
+  return make_text
+    (CONS(SENTENCE,
+	  make_sentence(is_sentence_formatted,
+			strdup(concatenate("      include '", file, "'\n", NULL))),
+	  NIL));
 }
 
-static text
-text_area_included(
+static text text_area_included(
     entity common /* the common the declaration of which are of interest */,
     entity module /* hte module dealt with */)
 {
-    string dir, file, local, name;
-    text t;
+  string dir, file, local, name;
+  text t;
 
-    dir = db_get_directory_name_for_module(WORKSPACE_SRC_SPACE);
-    name = module_local_name(common);
-    if (same_string_p(name, BLANK_COMMON_LOCAL_NAME))
-	name = "blank";
-    local = strdup(concatenate(name, ".h", NULL));
-    file = strdup(concatenate(dir, "/", local, NULL));
-    free(dir);
+  dir = db_get_directory_name_for_module(WORKSPACE_SRC_SPACE);
+  name = module_local_name(common);
+  if (same_string_p(name, BLANK_COMMON_LOCAL_NAME))
+    name = "blank";
+  local = strdup(concatenate(name, ".h", NULL));
+  file = strdup(concatenate(dir, "/", local, NULL));
+  free(dir);
 
-    if (file_exists_p(file))
+  if (file_exists_p(file))
     {
-	/* the include was generated once before... */
-	t = include(local);
+      /* the include was generated once before... */
+      t = include(local);
     }
-    else
+  else
     {
-	string nofile =
-	    strdup(concatenate(file, ".sorry_common_not_homogeneous", NULL));
-	t = text_common_declaration(common, module);
-	if (!file_exists_p(nofile))
+      string nofile =
+	strdup(concatenate(file, ".sorry_common_not_homogeneous", NULL));
+      t = text_common_declaration(common, module);
+      if (!file_exists_p(nofile))
 	{
-	    if (check_common_inclusion(common))
+	  if (check_common_inclusion(common))
 	    {
-		/* same declaration, generate the file! */
-		FILE * f = safe_fopen(file, "w");
-		fprintf(f, "!!\n!! pips: include file for common %s\n!!\n",
-			name);
-		print_text(f, t);
-		safe_fclose(f, file);
-		t = include(local);
+	      /* same declaration, generate the file! */
+	      FILE * f = safe_fopen(file, "w");
+	      fprintf(f, "!!\n!! pips: include file for common %s\n!!\n",
+		      name);
+	      print_text(f, t);
+	      safe_fclose(f, file);
+	      t = include(local);
 	    }
-	    else
+	  else
 	    {
-		/* touch the nofile to avoid the inclusion check latter on. */
-		FILE * f = safe_fopen(nofile, "w");
-		fprintf(f,
-			"!!\n!! pips: sorry,  cannot include common %s\n!!\n",
-			name);
-		safe_fclose(f, nofile);
+	      /* touch the nofile to avoid the inclusion check latter on. */
+	      FILE * f = safe_fopen(nofile, "w");
+	      fprintf(f,
+		      "!!\n!! pips: sorry,  cannot include common %s\n!!\n",
+		      name);
+	      safe_fclose(f, nofile);
 	    }
-	    free(nofile);
+	  free(nofile);
 	}
     }
 
-    free(local); free(file);
-    return t;
+  free(local); free(file);
+  return t;
 }
 
 /* We add this function to cope with the declaration
@@ -770,8 +764,8 @@ text_area_included(
 static string default_common_hook(entity __attribute__ ((unused)) module,
 				  entity common)
 {
-    return strdup(concatenate
-        ("common to include: ", entity_local_name(common), "\n", NULL));
+  return strdup(concatenate
+		("common to include: ", entity_local_name(common), "\n", NULL));
 }
 
 static string (*common_hook)(entity, entity) = default_common_hook;
@@ -791,13 +785,13 @@ void reset_prettyprinter_common_hook(void)
 
 static void equiv_class_debug(list l_equiv)
 {
-    if (ENDP(l_equiv))
-	fprintf(stderr, "<none>");
-    MAP(ENTITY, equiv_ent,
-	{
-	    fprintf(stderr, " %s", entity_local_name(equiv_ent));
-	}, l_equiv);
-    fprintf(stderr, "\n");
+  if (ENDP(l_equiv))
+    fprintf(stderr, "<none>");
+  MAP(ENTITY, equiv_ent,
+      {
+	fprintf(stderr, " %s", entity_local_name(equiv_ent));
+      }, l_equiv);
+  fprintf(stderr, "\n");
 }
 
 
@@ -812,221 +806,218 @@ static void equiv_class_debug(list l_equiv)
  * ordering.
  * author: bc.
  */
-static int
-equivalent_entity_compare(entity *ent1, entity *ent2)
+static int equivalent_entity_compare(entity *ent1, entity *ent2)
 {
-    int result;
-    int offset1 = ram_offset(storage_ram(entity_storage(*ent1)));
-    int offset2 = ram_offset(storage_ram(entity_storage(*ent2)));
-    Value size1, size2;
+  int result;
+  int offset1 = ram_offset(storage_ram(entity_storage(*ent1)));
+  int offset2 = ram_offset(storage_ram(entity_storage(*ent2)));
+  Value size1, size2;
 
-    result = offset1 - offset2;
+  result = offset1 - offset2;
 
-    /* pips_debug(1, "entities: %s %s\n", entity_local_name(*ent1),
-	  entity_local_name(*ent2)); */
+  /* pips_debug(1, "entities: %s %s\n", entity_local_name(*ent1),
+     entity_local_name(*ent2)); */
 
-    if (result == 0)
+  if (result == 0)
     {
-	/* pips_debug(1, "same offset\n"); */
-	size1 = ValueSizeOfArray(*ent1);
-	size2 = ValueSizeOfArray(*ent2);
-	result = value_compare(size2,size1);
+      /* pips_debug(1, "same offset\n"); */
+      size1 = ValueSizeOfArray(*ent1);
+      size2 = ValueSizeOfArray(*ent2);
+      result = value_compare(size2,size1);
 
-	if (result == 0)
+      if (result == 0)
 	{
-	    /* pips_debug(1, "same size\n"); */
-	    result = strcmp(entity_local_name(*ent1), entity_local_name(*ent2));
+	  /* pips_debug(1, "same size\n"); */
+	  result = strcmp(entity_local_name(*ent1), entity_local_name(*ent2));
 	}
     }
 
-    return(result);
+  return(result);
 }
 
 /* static text text_equivalence_class(list  l_equiv)
  * input    : a list of entities representing an equivalence class.
  * output   : a text, which is the prettyprint of this class.
  * modifies : sorts l_equiv according to equivalent_entity_compare.
- * comment  : partially associated entities are not handled. 
+ * comment  : partially associated entities are not handled.
  * author   : bc.
  */
-static text
-text_equivalence_class(
-    list /* of entities */ l_equiv)
+static text text_equivalence_class(list /* of entities */ l_equiv)
 {
-    text t_equiv = make_text(NIL);
-    list lw = NIL;
-    list l1, l2;
-    entity ent1, ent2;
-    int offset1, offset2;
-    Value size1, size2, offset_end1;
-    boolean first;
-    bool space_p = get_bool_property("PRETTYPRINT_LISTS_WITH_SPACES");
+  text t_equiv = make_text(NIL);
+  list lw = NIL;
+  list l1, l2;
+  entity ent1, ent2;
+  int offset1, offset2;
+  Value size1, size2, offset_end1;
+  boolean first;
+  bool space_p = get_bool_property("PRETTYPRINT_LISTS_WITH_SPACES");
 
-    if (gen_length(l_equiv)<=1) return t_equiv;
+  if (gen_length(l_equiv)<=1) return t_equiv;
 
-    /* FIRST, sort the list by increasing offset from the beginning of
-       the memory suite. If two variables have the same offset, the longest 
-       one comes first; if they have the same lenght, use a lexicographic
-       ordering */
-    ifdebug(EQUIV_DEBUG)
+  /* FIRST, sort the list by increasing offset from the beginning of
+     the memory suite. If two variables have the same offset, the longest
+     one comes first; if they have the same lenght, use a lexicographic
+     ordering */
+  ifdebug(EQUIV_DEBUG)
+  {
+    pips_debug(1, "equivalence class before sorting:\n");
+    equiv_class_debug(l_equiv);
+  }
+
+  gen_sort_list(l_equiv,
+		(int (*)(const void *,const void *)) equivalent_entity_compare);
+
+  ifdebug(EQUIV_DEBUG)
+  {
+    pips_debug(1, "equivalence class after sorting:\n");
+    equiv_class_debug(l_equiv);
+  }
+
+  /* THEN, prettyprint the sorted list*/
+  pips_debug(EQUIV_DEBUG,"prettyprint of the sorted list\n");
+
+  /* At each step of the next loop, we consider two entities
+   * from the equivalence class. l1 points on the first entity list,
+   * and l2 on the second one. If l2 is associated with l1, we compute
+   * the output string, and l2 becomes the next entity. If l2 is not
+   * associated with l1, l1 becomes the next entity, until it is
+   * associated with l1. In the l_equiv list, l1 is always before l2.
+   */
+
+  /* loop initialization */
+  l1 = l_equiv;
+  ent1 = ENTITY(CAR(l1));
+  offset1 = ram_offset(storage_ram(entity_storage(ent1)));
+  size1 = ValueSizeOfArray(ent1);
+  l2 = CDR(l_equiv);
+  first = TRUE;
+
+  while(!ENDP(l2))
     {
-	pips_debug(1, "equivalence class before sorting:\n");
-	equiv_class_debug(l_equiv);
-    }
+      ent2 = ENTITY(CAR(l2));
+      offset2 = ram_offset(storage_ram(entity_storage(ent2)));
 
-    gen_sort_list(l_equiv,
-		  (int (*)(const void *,const void *)) equivalent_entity_compare);
+      pips_debug(EQUIV_DEBUG, "dealing with: %s %s\n",
+		 entity_local_name(ent1),
+		 entity_local_name(ent2));
 
-    ifdebug(EQUIV_DEBUG)
-    {
-	pips_debug(1, "equivalence class after sorting:\n");
-	equiv_class_debug(l_equiv);
-    }
-
-    /* THEN, prettyprint the sorted list*/
-    pips_debug(EQUIV_DEBUG,"prettyprint of the sorted list\n");
-
-    /* At each step of the next loop, we consider two entities
-     * from the equivalence class. l1 points on the first entity list,
-     * and l2 on the second one. If l2 is associated with l1, we compute
-     * the output string, and l2 becomes the next entity. If l2 is not
-     * associated with l1, l1 becomes the next entity, until it is 
-     * associated with l1. In the l_equiv list, l1 is always before l2.
-     */
-
-    /* loop initialization */
-    l1 = l_equiv;
-    ent1 = ENTITY(CAR(l1));
-    offset1 = ram_offset(storage_ram(entity_storage(ent1)));
-    size1 = ValueSizeOfArray(ent1);
-    l2 = CDR(l_equiv);
-    first = TRUE;
-
-    while(!ENDP(l2))
-    {
-	ent2 = ENTITY(CAR(l2));
-	offset2 = ram_offset(storage_ram(entity_storage(ent2)));
-
-	pips_debug(EQUIV_DEBUG, "dealing with: %s %s\n",
-		   entity_local_name(ent1),
-		   entity_local_name(ent2));
-
-	/* If the two variables have the same offset, their
-	 * first elements are equivalenced. 
-	 */
-	if (offset1 == offset2)
+      /* If the two variables have the same offset, their
+       * first elements are equivalenced.
+       */
+      if (offset1 == offset2)
 	{
-	    pips_debug(EQUIV_DEBUG, "easiest case: offsets are the same\n");
+	  pips_debug(EQUIV_DEBUG, "easiest case: offsets are the same\n");
 
-	    if (first) lw = CHAIN_SWORD(lw, "EQUIVALENCE"), first = FALSE;
-	    else lw = CHAIN_SWORD(lw, space_p? ", " : ",");
+	  if (first) lw = CHAIN_SWORD(lw, "EQUIVALENCE"), first = FALSE;
+	  else lw = CHAIN_SWORD(lw, space_p? ", " : ",");
 
-	    lw = CHAIN_SWORD(lw, " (");
-	    lw = CHAIN_SWORD(lw, entity_local_name(ent1));
-	    lw = CHAIN_SWORD(lw, space_p? ", " : ",");
-	    lw = CHAIN_SWORD(lw, entity_local_name(ent2));
-	    lw = CHAIN_SWORD(lw, ")");
-	    POP(l2);
+	  lw = CHAIN_SWORD(lw, " (");
+	  lw = CHAIN_SWORD(lw, entity_local_name(ent1));
+	  lw = CHAIN_SWORD(lw, space_p? ", " : ",");
+	  lw = CHAIN_SWORD(lw, entity_local_name(ent2));
+	  lw = CHAIN_SWORD(lw, ")");
+	  POP(l2);
 	}
-	/* Else, we first check that there is an overlap */
-	else
+      /* Else, we first check that there is an overlap */
+      else
 	{
-	    pips_assert("the equivalence class has been sorted\n",
-			offset1 < offset2);
+	  pips_assert("the equivalence class has been sorted\n",
+		      offset1 < offset2);
 
-	    size2 = ValueSizeOfArray(ent2);
-	    offset_end1 = value_plus(offset1, size1);
+	  size2 = ValueSizeOfArray(ent2);
+	  offset_end1 = value_plus(offset1, size1);
 
-	    /* If there is no overlap, we change the reference variable */
-	    if (value_le(offset_end1,offset2))
+	  /* If there is no overlap, we change the reference variable */
+	  if (value_le(offset_end1,offset2))
 	    {
-		pips_debug(1, "second case: there is no overlap\n");
-		POP(l1);
-		ent1 = ENTITY(CAR(l1));
-		offset1 = ram_offset(storage_ram(entity_storage(ent1)));
-		size1 = ValueSizeOfArray(ent1);
-		if (l1 == l2) POP(l2);
+	      pips_debug(1, "second case: there is no overlap\n");
+	      POP(l1);
+	      ent1 = ENTITY(CAR(l1));
+	      offset1 = ram_offset(storage_ram(entity_storage(ent1)));
+	      size1 = ValueSizeOfArray(ent1);
+	      if (l1 == l2) POP(l2);
 	    }
 
-	    /* Else, we must compute the coordinates of the element of ent1
-	     * which corresponds to the first element of ent2
-	     */
-	    else
+	  /* Else, we must compute the coordinates of the element of ent1
+	   * which corresponds to the first element of ent2
+	   */
+	  else
 	    {
-		/* ATTENTION: Je n'ai pas considere le cas
-		 * ou il y a association partielle. De ce fait, offset
-		 * est divisiable par size_elt_1. */
-		int offset = offset2 - offset1;
-		int rest;
-		int current_dim;
-		int dim_max = NumberOfDimension(ent1);
-		int size_elt_1 = SizeOfElements(
-		    variable_basic(type_variable(entity_type(ent1))));
-		list l_tmp = variable_dimensions
-		    (type_variable(entity_type(ent1)));
-		normalized nlo;
-		Pvecteur pvlo;
+	      /* ATTENTION: Je n'ai pas considere le cas
+	       * ou il y a association partielle. De ce fait, offset
+	       * est divisiable par size_elt_1. */
+	      int offset = offset2 - offset1;
+	      int rest;
+	      int current_dim;
+	      int dim_max = NumberOfDimension(ent1);
+	      int size_elt_1 = SizeOfElements(
+					      variable_basic(type_variable(entity_type(ent1))));
+	      list l_tmp = variable_dimensions
+		(type_variable(entity_type(ent1)));
+	      normalized nlo;
+	      Pvecteur pvlo;
 
-		pips_debug(EQUIV_DEBUG, "third case\n");
-		pips_debug(EQUIV_DEBUG, 
-			   "offset=%d, dim_max=%d, size_elt_1=%d\n",
-			   offset, dim_max,size_elt_1);
+	      pips_debug(EQUIV_DEBUG, "third case\n");
+	      pips_debug(EQUIV_DEBUG,
+			 "offset=%d, dim_max=%d, size_elt_1=%d\n",
+			 offset, dim_max,size_elt_1);
 
-		if (first) lw = CHAIN_SWORD(lw, "EQUIVALENCE"), first = FALSE;
-		else lw = CHAIN_SWORD(lw, space_p? ", " : ",");
+	      if (first) lw = CHAIN_SWORD(lw, "EQUIVALENCE"), first = FALSE;
+	      else lw = CHAIN_SWORD(lw, space_p? ", " : ",");
 
-		lw = CHAIN_SWORD(lw, " (");
-		lw = CHAIN_SWORD(lw, entity_local_name(ent1));
-		lw = CHAIN_SWORD(lw, "(");
+	      lw = CHAIN_SWORD(lw, " (");
+	      lw = CHAIN_SWORD(lw, entity_local_name(ent1));
+	      lw = CHAIN_SWORD(lw, "(");
 
-		pips_assert("partial association case not implemented:\n"
-			    "offset % size_elt_1 == 0",
-			    (offset % size_elt_1) == 0);
+	      pips_assert("partial association case not implemented:\n"
+			  "offset % size_elt_1 == 0",
+			  (offset % size_elt_1) == 0);
 
-		offset = offset/size_elt_1;
-		current_dim = 1;
+	      offset = offset/size_elt_1;
+	      current_dim = 1;
 
-		while (current_dim <= dim_max)
+	      while (current_dim <= dim_max)
 		{
-		    dimension dim = DIMENSION(CAR(l_tmp));
-		    int new_decl;
-		    int size;
+		  dimension dim = DIMENSION(CAR(l_tmp));
+		  int new_decl;
+		  int size;
 
-		    pips_debug(EQUIV_DEBUG, "prettyprinting dimension %d\n",
-			       current_dim);
-		    size = SizeOfIthDimension(ent1, current_dim);
-		    rest = (offset % size);
-		    offset = offset / size;
-		    nlo = NORMALIZE_EXPRESSION(dimension_lower(dim));
-		    pvlo = normalized_linear(nlo);
+		  pips_debug(EQUIV_DEBUG, "prettyprinting dimension %d\n",
+			     current_dim);
+		  size = SizeOfIthDimension(ent1, current_dim);
+		  rest = (offset % size);
+		  offset = offset / size;
+		  nlo = NORMALIZE_EXPRESSION(dimension_lower(dim));
+		  pvlo = normalized_linear(nlo);
 
-		    pips_assert("sg", vect_constant_p(pvlo));
-		    pips_debug(EQUIV_DEBUG,
-			       "size=%d, rest=%d, offset=%d, lower_bound=%d\n",
-			       size, rest, offset, (int)VALUE_TO_INT(val_of(pvlo)));
+		  pips_assert("sg", vect_constant_p(pvlo));
+		  pips_debug(EQUIV_DEBUG,
+			     "size=%d, rest=%d, offset=%d, lower_bound=%d\n",
+			     size, rest, offset, (int)VALUE_TO_INT(val_of(pvlo)));
 
-		    new_decl = VALUE_TO_INT(val_of(pvlo)) + rest;
-		    lw = CHAIN_SWORD(lw,i2a(new_decl));
-		    if (current_dim < dim_max)
-			lw = CHAIN_SWORD(lw, space_p? ", " : ",");
+		  new_decl = VALUE_TO_INT(val_of(pvlo)) + rest;
+		  lw = CHAIN_SWORD(lw,i2a(new_decl));
+		  if (current_dim < dim_max)
+		    lw = CHAIN_SWORD(lw, space_p? ", " : ",");
 
-		    POP(l_tmp);
-		    current_dim++;
+		  POP(l_tmp);
+		  current_dim++;
 
 		} /* while */
 
-		lw = CHAIN_SWORD(lw, ")");
-		lw = CHAIN_SWORD(lw, space_p? ", " : ",");
-		lw = CHAIN_SWORD(lw, entity_local_name(ent2));
-		lw = CHAIN_SWORD(lw, ")");
-		POP(l2);
+	      lw = CHAIN_SWORD(lw, ")");
+	      lw = CHAIN_SWORD(lw, space_p? ", " : ",");
+	      lw = CHAIN_SWORD(lw, entity_local_name(ent2));
+	      lw = CHAIN_SWORD(lw, ")");
+	      POP(l2);
 	    } /* if-else: there is an overlap */
 	} /* if-else: not same offset */
     } /* while */
-    ADD_WORD_LIST_TO_TEXT(t_equiv, lw);
+  ADD_WORD_LIST_TO_TEXT(t_equiv, lw);
 
-    pips_debug(EQUIV_DEBUG, "end\n");
-    return t_equiv;
+  pips_debug(EQUIV_DEBUG, "end\n");
+  return t_equiv;
 }
 
 
@@ -1035,135 +1026,134 @@ text_equivalence_class(
  * modifies : nothing
  * comment  :
  */
-static text 
-text_equivalences(
-    entity __attribute__ ((unused)) module     /* the module dealt with */, 
-    list ldecl        /* the list of declarations to consider */, 
+static text text_equivalences(
+    entity __attribute__ ((unused)) module     /* the module dealt with */,
+    list ldecl        /* the list of declarations to consider */,
     bool no_commons /* whether to print common equivivalences */)
 {
-    list equiv_classes = NIL, l_tmp;
-    text t_equiv_class;
+  list equiv_classes = NIL, l_tmp;
+  text t_equiv_class;
 
-    pips_debug(1,"begin\n");
+  pips_debug(1,"begin\n");
 
-    /* FIRST BUILD EQUIVALENCE CLASSES */
+  /* FIRST BUILD EQUIVALENCE CLASSES */
 
-    pips_debug(EQUIV_DEBUG, "loop on declarations\n");
-    /* consider each entity in the declaration */
-    MAP(ENTITY, e,
-    {
+  pips_debug(EQUIV_DEBUG, "loop on declarations\n");
+  /* consider each entity in the declaration */
+  MAP(ENTITY, e,
+      {
 	storage s = entity_storage(e);
 	/* but only variables which have a ram storage must be considered
 	 */
 	if (type_variable_p(entity_type(e)) && storage_ram_p(s))
-	{
+	  {
 	    ram r = storage_ram(s);
 	    entity common = ram_section(r);
 	    list l_shared = ram_shared(r);
-	    
+
 	    if (no_commons && !entity_special_area_p(common))
-		break;
+	      break;
 
 	    ifdebug(EQUIV_DEBUG)
 	    {
-		pips_debug(1, "considering entity: %s\n",entity_local_name(e));
-		pips_debug(1, "shared variables:\n");
-		equiv_class_debug(l_shared);
+	      pips_debug(1, "considering entity: %s\n",entity_local_name(e));
+	      pips_debug(1, "shared variables:\n");
+	      equiv_class_debug(l_shared);
 	    }
-	    
+
 	    /* If this variable is statically aliased */
 	    if (!ENDP(l_shared))
-	    {
+	      {
 		bool found = FALSE;
 		list found_equiv_class = NIL;
-		
+
 		/* We first look in already found equivalence classes
 		 * if there is already a class in which one of the
-		 * aliased variables appears 
+		 * aliased variables appears
 		 */
 		MAP(LIST, equiv_class,
-		{
-		    ifdebug(EQUIV_DEBUG)
 		    {
+		      ifdebug(EQUIV_DEBUG)
+		      {
 			pips_debug(1, "considering equivalence class:\n");
 			equiv_class_debug(equiv_class);
-		    }
-		    
-		    MAP(ENTITY, ent,
-		    {
-			if (variable_in_list_p(ent, equiv_class))
-			{
-			    found = TRUE;
-			    found_equiv_class = equiv_class;
-			    break;
-			}
-		    }, l_shared);
-		    
-		    if (found) break;			    
-		},
+		      }
+
+		      MAP(ENTITY, ent,
+			  {
+			    if (variable_in_list_p(ent, equiv_class))
+			      {
+				found = TRUE;
+				found_equiv_class = equiv_class;
+				break;
+			      }
+			  }, l_shared);
+
+		      if (found) break;
+		    },
 		    equiv_classes);
-		
+
 		if (found)
-		{
+		  {
 		    pips_debug(EQUIV_DEBUG, "already there\n");
-		    /* add the entities of shared which are not already in 
+		    /* add the entities of shared which are not already in
 		     * the existing equivalence class. Useful ??
 		     */
 		    MAP(ENTITY, ent,
-		    {
-			if(!variable_in_list_p(ent, found_equiv_class) &&
-			    variable_in_list_p(ent, ldecl)) /* !!! */
+			{
+			  if(!variable_in_list_p(ent, found_equiv_class) &&
+			     variable_in_list_p(ent, ldecl)) /* !!! */
 			    found_equiv_class =
-				CONS(ENTITY, ent, found_equiv_class);
-		    }, l_shared)
-		}
+			      CONS(ENTITY, ent, found_equiv_class);
+			}, l_shared)
+		      }
 		else
-		{
+		  {
 		    list l_tmp = NIL;
 		    pips_debug(EQUIV_DEBUG, "not found\n");
-		    /* add the list of variables in l_shared; necessary 
-		     * because variables may appear several times in 
+		    /* add the list of variables in l_shared; necessary
+		     * because variables may appear several times in
 		     * l_shared. */
 		    MAP(ENTITY, shared_ent,
-		    {
-			if (!variable_in_list_p(shared_ent, l_tmp) &&
-			    variable_in_list_p(shared_ent, ldecl))
+			{
+			  if (!variable_in_list_p(shared_ent, l_tmp) &&
+			      variable_in_list_p(shared_ent, ldecl))
 			    /* !!! restricted to declared... */
 			    l_tmp = CONS(ENTITY, shared_ent, l_tmp);
-		    }, 
+			},
 			l_shared);
 		    equiv_classes = CONS(LIST, l_tmp, equiv_classes);
-		}
-	    }
-	}
-    },
-	ldecl);
-    
-    ifdebug(EQUIV_DEBUG)
-    {
-	pips_debug(1, "final equivalence classes:\n");
-	MAP(LIST, equiv_class, equiv_class_debug(equiv_class), equiv_classes);
-    }
+		  }
+	      }
+	  }
+      },
+      ldecl);
 
-    /* SECOND, PRETTYPRINT THEM */
-    t_equiv_class = make_text(NIL); 
-    MAP(LIST, equiv_class,
-    {
+  ifdebug(EQUIV_DEBUG)
+  {
+    pips_debug(1, "final equivalence classes:\n");
+    MAP(LIST, equiv_class, equiv_class_debug(equiv_class), equiv_classes);
+  }
+
+  /* SECOND, PRETTYPRINT THEM */
+  t_equiv_class = make_text(NIL);
+  MAP(LIST, equiv_class,
+      {
 	MERGE_TEXTS(t_equiv_class, text_equivalence_class(equiv_class));
-    }, equiv_classes);
-    
-    /* AND FREE THEM */    
-    for(l_tmp = equiv_classes; !ENDP(l_tmp); POP(l_tmp))
+      }, equiv_classes);
+
+  /* AND FREE THEM */
+  for(l_tmp = equiv_classes; !ENDP(l_tmp); POP(l_tmp))
     {
-	list equiv_class = LIST(CAR(l_tmp));
-	gen_free_list(equiv_class);
-	LIST(CAR(l_tmp)) = NIL;
+      list equiv_class = LIST(CAR(l_tmp));
+      gen_free_list(equiv_class);
+      LIST(CAR(l_tmp)) = NIL;
     }
-    gen_free_list(equiv_classes);
-    
-    /* THE END */
-    pips_debug(EQUIV_DEBUG, "end\n");
-    return(t_equiv_class);
+  gen_free_list(equiv_classes);
+
+  /* THE END */
+  pips_debug(EQUIV_DEBUG, "end\n");
+  return(t_equiv_class);
 }
 
 /* Prettyprint the initializations field of code */
@@ -1172,7 +1162,7 @@ static sentence sentence_data_statement(statement is)
   unformatted u =
     make_unformatted
     (NULL,
-     STATEMENT_NUMBER_UNDEFINED, 0, 
+     STATEMENT_NUMBER_UNDEFINED, 0,
      CONS(STRING, strdup("DATA "), NIL));
   sentence s = make_sentence(is_sentence_unformatted, u);
   list wl = unformatted_words(u);
@@ -1184,7 +1174,7 @@ static sentence sentence_data_statement(statement is)
   expression rle = expression_undefined; /* reference list expression, i.e. call to DATA LIST */
   entity rlf = entity_undefined; /* DATA LIST entity function */
   bool space_p = get_bool_property("PRETTYPRINT_LISTS_WITH_SPACES");
-  
+
   pips_assert("An initialization instruction is a call", instruction_call_p(ii));
   ife = call_function(ic);
   pips_assert("The static initialization function is called",
@@ -1271,7 +1261,7 @@ text text_initializations(entity m)
   MAP(STATEMENT, is,
       {
 	if(!empty_comments_p(statement_comments(is))) {
-	  ADD_SENTENCE_TO_TEXT(t, make_sentence(is_sentence_formatted, 
+	  ADD_SENTENCE_TO_TEXT(t, make_sentence(is_sentence_formatted,
 						strdup(statement_comments(is))));
 	}
 	ADD_SENTENCE_TO_TEXT(t, sentence_data_statement(is));
@@ -1288,36 +1278,34 @@ text text_initializations(entity m)
 static text __attribute__ ((unused))
 text_data(entity __attribute__ ((unused)) module, list /* of entity */ ldecl)
 {
-    list /* of sentence */ ls = NIL;
+  list /* of sentence */ ls = NIL;
 
-    MAP(ENTITY, e,
-    {
+  MAP(ENTITY, e,
+      {
 	value v = entity_initial(e);
-	if(!value_undefined_p(v) && 
+	if(!value_undefined_p(v) &&
 	   value_constant_p(v) && constant_int_p(value_constant(v)))
-	    ls = CONS(SENTENCE, sentence_data(e), ls);
-    },
-	ldecl);
+	  ls = CONS(SENTENCE, sentence_data(e), ls);
+      },
+      ldecl);
 
-    return make_text(ls);
+  return make_text(ls);
 }
 
 /*************************************************************** PARAMETERS */
 
-static text
-text_of_parameters(
-    list /* of entity that are parameters */ lp)
+static text text_of_parameters(list /* of entity that are parameters */ lp)
 {
-    list /* of sentence */ ls = NIL;
+  list /* of sentence */ ls = NIL;
 
-    /* generate the sentences
-     */
-    MAP(ENTITY, e,
-	ls = CONS(SENTENCE, sentence_basic_declaration(e),
-	     CONS(SENTENCE, sentence_symbolic(e), ls)),
-	lp);
+  /* generate the sentences
+   */
+  MAP(ENTITY, e,
+      ls = CONS(SENTENCE, sentence_basic_declaration(e),
+		CONS(SENTENCE, sentence_symbolic(e), ls)),
+      lp);
 
-    return make_text(ls);
+  return make_text(ls);
 }
 
 void check_fortran_declaration_dependencies(list ldecl)
@@ -1376,25 +1364,25 @@ static text text_entity_declaration(entity module,
     pi1 = NIL, pi2 = NIL, pi4 = NIL, pi8 = NIL,
     ph1 = NIL, ph2 = NIL, ph4 = NIL, ph8 = NIL,
     pf4 = NIL, pf8 = NIL,
-    pl = NIL, 
+    pl = NIL,
     pc8 = NIL, pc16 = NIL, ps = NIL, lparam = NIL;
   list * ppi=NULL;
   list * pph=NULL;
-  text r, t_chars = make_text(NIL), t_area = make_text(NIL); 
+  text r, t_chars = make_text(NIL), t_area = make_text(NIL);
   string pp_var_dim = get_string_property("PRETTYPRINT_VARIABLE_DIMENSIONS");
   bool pp_in_type = FALSE, pp_in_common = FALSE, pp_cinc;
   bool space_p = get_bool_property("PRETTYPRINT_LISTS_WITH_SPACES");
   /* Declarations cannot be sorted out because Fortran standard impose
-  at least an order on parameters. Fortunately here, PARAMETER are
-  mostly integers, defined from other integer parameters... I assume
-  that PIPS would fail with an ENTRY referencing an integer array
-  dimensionned with a real parameter. But real parameters are not
-  really well processed by PIPS anyway... Also we are in trouble if
-  arrays or functions are used dimension other arrays
+     at least an order on parameters. Fortunately here, PARAMETER are
+     mostly integers, defined from other integer parameters... I assume
+     that PIPS would fail with an ENTRY referencing an integer array
+     dimensionned with a real parameter. But real parameters are not
+     really well processed by PIPS anyway... Also we are in trouble if
+     arrays or functions are used dimension other arrays
 
-  list sorted_ldecl = gen_copy_seq(ldecl);
+     list sorted_ldecl = gen_copy_seq(ldecl);
 
-  gen_sort_list(sorted_ldecl, compare_entities); */
+     gen_sort_list(sorted_ldecl, compare_entities); */
 
   check_fortran_declaration_dependencies(ldecl);
 
@@ -1413,7 +1401,7 @@ static text text_entity_declaration(entity module,
   pp_cinc = same_string_p(how_common, "include") && !force_common;
 
   FOREACH(ENTITY, e,ldecl)
-  {
+    {
       type te = entity_type(e);
       bool func =
 	type_functional_p(te) && storage_rom_p(entity_storage(e));
@@ -1443,212 +1431,212 @@ static text text_entity_declaration(entity module,
 	continue;
 
       if (!print_commons && area_p && !entity_special_area_p(e) && !pp_cinc)
-      {
-	area_decl =
-	  CONS(SENTENCE,
-	       make_sentence(is_sentence_formatted,
-			     common_hook(module, e)),
-	       area_decl);
-      }
+	{
+	  area_decl =
+	    CONS(SENTENCE,
+		 make_sentence(is_sentence_formatted,
+			       common_hook(module, e)),
+		 area_decl);
+	}
 
       if (skip_it)
-      {
-	pips_debug(5, "skipping function %s\n", entity_name(e));
-      }
+	{
+	  pips_debug(5, "skipping function %s\n", entity_name(e));
+	}
       else if (!print_commons && (area_p || (var && in_common && pp_cinc)))
-      {
-	pips_debug(5, "skipping entity %s\n", entity_name(e));
-      }
+	{
+	  pips_debug(5, "skipping entity %s\n", entity_name(e));
+	}
       else if (param)
-      {
-	/*        PARAMETER
-	 */
-	pips_debug(7, "considered as a parameter\n");
-	lparam = CONS(ENTITY, e, lparam);
-      }
+	{
+	  /*        PARAMETER
+	   */
+	  pips_debug(7, "considered as a parameter\n");
+	  lparam = CONS(ENTITY, e, lparam);
+	}
       else if (external)
-      {
-	/*        EXTERNAL
-	 */
-	pips_debug(7, "considered as an external\n");
-	before = CONS(SENTENCE, sentence_basic_declaration(e), before);
-	before = CONS(SENTENCE, sentence_external(e), before);
-      }
+	{
+	  /*        EXTERNAL
+	   */
+	  pips_debug(7, "considered as an external\n");
+	  before = CONS(SENTENCE, sentence_basic_declaration(e), before);
+	  before = CONS(SENTENCE, sentence_external(e), before);
+	}
       else if (area_p && !dynamic_area_p(e) && !heap_area_p(e) && !stack_area_p(e) && !empty_static_area_p(e))
-      {
-	/*            AREAS: COMMONS and SAVEs
-	 */
-	pips_debug(7, "considered as a regular common\n");
-	if (pp_cinc && !entity_special_area_p(e))
-	  {
-	    text t = text_area_included(e, module);
-	    MERGE_TEXTS(t_area, t);
-	  }
-	else
-	  area_decl = CONS(SENTENCE,
-			   sentence_area(e, module, pp_in_common),
-			   area_decl);
-      }
-      else if (var && !(in_common && pp_cinc))
-      {
-	basic b = variable_basic(type_variable(te));
-	bool pp_dim = pp_in_type || variable_static_p(e);
-
-	pips_debug(7, "is a variable...\n");
-
-	switch (basic_tag(b))
-	  {
-	  case is_basic_int:
-	    /* simple integers are moved ahead... */
-
-	    pips_debug(7, "is an integer\n");
-	    if (variable_dimensions(type_variable(te)))
-	      {
-		string s = string_undefined;
-		switch (basic_int(b))
-		  {
-		  case 4: ppi = &pi4;
-		    s = "INTEGER ";
-		    break;
-		  case 2: ppi = &pi2;
-		    s = "INTEGER*2 ";
-		    break;
-		  case 8: ppi = &pi8;
-		    s = "INTEGER*8 ";
-		    break;
-		  case 1: ppi = &pi1;
-		    s = "INTEGER*1 ";
-		    break;
-
-		  default: pips_internal_error("Unexpected integer size");
-		  }
-		*ppi = CHAIN_SWORD(*ppi, *ppi==NIL ? s : space_p? ", " : ",");
-		*ppi = gen_nconc(*ppi, words_declaration(e, pp_dim));
-	      }
-	    else
-	      {
-		string s = string_undefined;
-
-		switch (basic_int(b))
-		  {
-		  case 4: pph = &ph4;
-		    s = "INTEGER ";
-		    break;
-		  case 2: pph = &ph2;
-		    s = "INTEGER*2 ";
-		    break;
-		  case 8: pph = &ph8;
-		    s = "INTEGER*8 ";
-		    break;
-		  case 1: pph = &ph1;
-		    s = "INTEGER*1 ";
-		    break;
-		  default: pips_internal_error("Unexpected integer size");
-		  }
-		*pph = CHAIN_SWORD(*pph, *pph==NIL ? s : (space_p? ", " : ","));
-		*pph = gen_nconc(*pph, words_declaration(e, pp_dim));
-	      }
-	    break;
-	  case is_basic_float:
-	    pips_debug(7, "is a float\n");
-	    switch (basic_float(b))
-	      {
-	      case 4:
-		pf4 = CHAIN_SWORD(pf4, pf4==NIL ? "REAL*4 " : (space_p? ", " : ","));
-		pf4 = gen_nconc(pf4, words_declaration(e, pp_dim));
-		break;
-	      case 8:
-	      default:
-		pf8 = CHAIN_SWORD(pf8, pf8==NIL ? "REAL*8 " : (space_p? ", " : ","));
-		pf8 = gen_nconc(pf8, words_declaration(e, pp_dim));
-		break;
-	      }
-	    break;
-	  case is_basic_complex:
-	    pips_debug(7, "is a complex\n");
-	    switch (basic_complex(b))
-	      {
-	      case 8:
-		pc8 = CHAIN_SWORD(pc8, pc8==NIL ? "COMPLEX*8 " : (space_p? ", " : ","));
-		pc8 = gen_nconc(pc8, words_declaration(e, pp_dim));
-		break;
-	      case 16:
-	      default:
-		pc16 = CHAIN_SWORD(pc16, pc16==NIL ? "COMPLEX*16 " : (space_p? ", " : ","));
-		pc16 = gen_nconc(pc16, words_declaration(e, pp_dim));
-		break;
-	      }
-	    break;
-	  case is_basic_logical:
-	    pips_debug(7, "is a logical\n");
-	    pl = CHAIN_SWORD(pl, pl==NIL ? "LOGICAL " : (space_p? ", " : ","));
-	    pl = gen_nconc(pl, words_declaration(e, pp_dim));
-	    break;
-	  case is_basic_overloaded:
-	    /* nothing! some in hpfc I guess...
-	     */
-	    break;
-	  case is_basic_string:
+	{
+	  /*            AREAS: COMMONS and SAVEs
+	   */
+	  pips_debug(7, "considered as a regular common\n");
+	  if (pp_cinc && !entity_special_area_p(e))
 	    {
-	      value v = basic_string(b);
-	      pips_debug(7, "is a string\n");
+	      text t = text_area_included(e, module);
+	      MERGE_TEXTS(t_area, t);
+	    }
+	  else
+	    area_decl = CONS(SENTENCE,
+			     sentence_area(e, module, pp_in_common),
+			     area_decl);
+	}
+      else if (var && !(in_common && pp_cinc))
+	{
+	  basic b = variable_basic(type_variable(te));
+	  bool pp_dim = pp_in_type || variable_static_p(e);
 
-	      if (value_constant_p(v) && constant_int_p(value_constant(v)))
+	  pips_debug(7, "is a variable...\n");
+
+	  switch (basic_tag(b))
+	    {
+	    case is_basic_int:
+	      /* simple integers are moved ahead... */
+
+	      pips_debug(7, "is an integer\n");
+	      if (variable_dimensions(type_variable(te)))
 		{
-		  int i = constant_int(value_constant(v));
-
-		  if (i==1)
+		  string s = string_undefined;
+		  switch (basic_int(b))
 		    {
-		      ps = CHAIN_SWORD(ps, ps==NIL ? "CHARACTER " : (space_p? ", " : ","));
-		      ps = gen_nconc(ps, words_declaration(e, pp_dim));
-		    }
-		  else
-		    {
-		      list chars=NIL;
-		      chars = CHAIN_SWORD(chars, "CHARACTER*");
-		      chars = CHAIN_IWORD(chars, i);
-		      chars = CHAIN_SWORD(chars, " ");
-		      chars = gen_nconc(chars,
-					words_declaration(e, pp_dim));
-		      attach_declaration_size_type_to_words
-			(chars, "CHARACTER", i);
-		      ADD_WORD_LIST_TO_TEXT(t_chars, chars);
-		    }
-		}
-	      else if (value_unknown_p(v))
-		{
-		  list chars=NIL;
-		  chars = CHAIN_SWORD(chars, "CHARACTER*(*) ");
-		  chars = gen_nconc(chars,
-				    words_declaration(e, pp_dim));
-		  attach_declaration_type_to_words
-		    (chars, "CHARACTER*(*)");
-		  ADD_WORD_LIST_TO_TEXT(t_chars, chars);
-		}
-	      else if (value_symbolic_p(v))
-		{
-		  list chars = NIL;
-		  symbolic s = value_symbolic(v);
-		  chars = CHAIN_SWORD(chars, "CHARACTER*(");
-		  chars = gen_nconc(chars,
-				    words_expression(symbolic_expression(s)));
-		  chars = CHAIN_SWORD(chars, ") ");
-		  chars = gen_nconc(chars, words_declaration(e, pp_dim));
+		    case 4: ppi = &pi4;
+		      s = "INTEGER ";
+		      break;
+		    case 2: ppi = &pi2;
+		      s = "INTEGER*2 ";
+		      break;
+		    case 8: ppi = &pi8;
+		      s = "INTEGER*8 ";
+		      break;
+		    case 1: ppi = &pi1;
+		      s = "INTEGER*1 ";
+		      break;
 
-		  attach_declaration_type_to_words
-		    (chars, "CHARACTER*(*)");
-		  ADD_WORD_LIST_TO_TEXT(t_chars, chars);
+		    default: pips_internal_error("Unexpected integer size");
+		    }
+		  *ppi = CHAIN_SWORD(*ppi, *ppi==NIL ? s : space_p? ", " : ",");
+		  *ppi = gen_nconc(*ppi, words_declaration(e, pp_dim));
 		}
 	      else
-		pips_internal_error("unexpected value\n");
+		{
+		  string s = string_undefined;
+
+		  switch (basic_int(b))
+		    {
+		    case 4: pph = &ph4;
+		      s = "INTEGER ";
+		      break;
+		    case 2: pph = &ph2;
+		      s = "INTEGER*2 ";
+		      break;
+		    case 8: pph = &ph8;
+		      s = "INTEGER*8 ";
+		      break;
+		    case 1: pph = &ph1;
+		      s = "INTEGER*1 ";
+		      break;
+		    default: pips_internal_error("Unexpected integer size");
+		    }
+		  *pph = CHAIN_SWORD(*pph, *pph==NIL ? s : (space_p? ", " : ","));
+		  *pph = gen_nconc(*pph, words_declaration(e, pp_dim));
+		}
 	      break;
+	    case is_basic_float:
+	      pips_debug(7, "is a float\n");
+	      switch (basic_float(b))
+		{
+		case 4:
+		  pf4 = CHAIN_SWORD(pf4, pf4==NIL ? "REAL*4 " : (space_p? ", " : ","));
+		  pf4 = gen_nconc(pf4, words_declaration(e, pp_dim));
+		  break;
+		case 8:
+		default:
+		  pf8 = CHAIN_SWORD(pf8, pf8==NIL ? "REAL*8 " : (space_p? ", " : ","));
+		  pf8 = gen_nconc(pf8, words_declaration(e, pp_dim));
+		  break;
+		}
+	      break;
+	    case is_basic_complex:
+	      pips_debug(7, "is a complex\n");
+	      switch (basic_complex(b))
+		{
+		case 8:
+		  pc8 = CHAIN_SWORD(pc8, pc8==NIL ? "COMPLEX*8 " : (space_p? ", " : ","));
+		  pc8 = gen_nconc(pc8, words_declaration(e, pp_dim));
+		  break;
+		case 16:
+		default:
+		  pc16 = CHAIN_SWORD(pc16, pc16==NIL ? "COMPLEX*16 " : (space_p? ", " : ","));
+		  pc16 = gen_nconc(pc16, words_declaration(e, pp_dim));
+		  break;
+		}
+	      break;
+	    case is_basic_logical:
+	      pips_debug(7, "is a logical\n");
+	      pl = CHAIN_SWORD(pl, pl==NIL ? "LOGICAL " : (space_p? ", " : ","));
+	      pl = gen_nconc(pl, words_declaration(e, pp_dim));
+	      break;
+	    case is_basic_overloaded:
+	      /* nothing! some in hpfc I guess...
+	       */
+	      break;
+	    case is_basic_string:
+	      {
+		value v = basic_string(b);
+		pips_debug(7, "is a string\n");
+
+		if (value_constant_p(v) && constant_int_p(value_constant(v)))
+		  {
+		    int i = constant_int(value_constant(v));
+
+		    if (i==1)
+		      {
+			ps = CHAIN_SWORD(ps, ps==NIL ? "CHARACTER " : (space_p? ", " : ","));
+			ps = gen_nconc(ps, words_declaration(e, pp_dim));
+		      }
+		    else
+		      {
+			list chars=NIL;
+			chars = CHAIN_SWORD(chars, "CHARACTER*");
+			chars = CHAIN_IWORD(chars, i);
+			chars = CHAIN_SWORD(chars, " ");
+			chars = gen_nconc(chars,
+					  words_declaration(e, pp_dim));
+			attach_declaration_size_type_to_words
+			  (chars, "CHARACTER", i);
+			ADD_WORD_LIST_TO_TEXT(t_chars, chars);
+		      }
+		  }
+		else if (value_unknown_p(v))
+		  {
+		    list chars=NIL;
+		    chars = CHAIN_SWORD(chars, "CHARACTER*(*) ");
+		    chars = gen_nconc(chars,
+				      words_declaration(e, pp_dim));
+		    attach_declaration_type_to_words
+		      (chars, "CHARACTER*(*)");
+		    ADD_WORD_LIST_TO_TEXT(t_chars, chars);
+		  }
+		else if (value_symbolic_p(v))
+		  {
+		    list chars = NIL;
+		    symbolic s = value_symbolic(v);
+		    chars = CHAIN_SWORD(chars, "CHARACTER*(");
+		    chars = gen_nconc(chars,
+				      words_expression(symbolic_expression(s)));
+		    chars = CHAIN_SWORD(chars, ") ");
+		    chars = gen_nconc(chars, words_declaration(e, pp_dim));
+
+		    attach_declaration_type_to_words
+		      (chars, "CHARACTER*(*)");
+		    ADD_WORD_LIST_TO_TEXT(t_chars, chars);
+		  }
+		else
+		  pips_internal_error("unexpected value\n");
+		break;
+	      }
+	    default:
+	      pips_internal_error("unexpected basic tag (%d)\n",
+				  basic_tag(b));
 	    }
-	  default:
-	    pips_internal_error("unexpected basic tag (%d)\n",
-				basic_tag(b));
-	  }
-      }
-  }
+	}
+    }
 
   /* usually they are sorted in order, and appended backwards,
    * hence the reversion.
@@ -1703,9 +1691,9 @@ static text text_entity_declaration(entity module,
   /* More general way with with call to text_initializations(module) in
      text_named_module() */
   /*
-  if(get_bool_property("PRETTYPRINT_DATA_STATEMENTS")) {
+    if(get_bool_property("PRETTYPRINT_DATA_STATEMENTS")) {
     MERGE_TEXTS(r, text_data(module, ldecl));
-  }
+    }
   */
 
   /* gen_free_list(sorted_ldecl); */
@@ -1987,6 +1975,17 @@ list generic_c_words_entity(type t, list name, bool is_safe, bool add_dummy_para
       pips_debug(9,"Basic type with name = \"%s\"\n", sname);
 
       pc = gen_nconc(pc,words_type(t));
+      if (string_type_p(t)) {
+	value v = basic_string(variable_basic(type_variable(t)));
+	list vw = words_value(v);
+
+	/*
+	pc = CHAIN_SWORD(pc,"[");
+	pc = gen_nconc(pc, vw);
+	pc = CHAIN_SWORD(pc,"]");
+	*/
+	pc = CHAIN_SWORD(pc," *");
+      }
       if(strlen(sname)!=0)
 	pc = CHAIN_SWORD(pc," ");
       if(!bit_type_p(t) || (strstr(sname,DUMMY_MEMBER_PREFIX)==NULL)) {
@@ -2572,31 +2571,58 @@ void fprint_C_environment(FILE *fd, entity m)
 
 void fprint_any_environment(FILE * fd, entity m, bool is_fortran)
 {
-    list decls = gen_copy_seq(code_declarations(value_code(entity_initial(m))));
-    int nth = 0; /* rank of formal parameter */
-    entity rv = entity_undefined; /* return variable */
+  list decls = gen_copy_seq(code_declarations(value_code(entity_initial(m))));
+  int nth = 0; /* rank of formal parameter */
+  entity rv = entity_undefined; /* return variable */
 
-    pips_assert("fprint_environment", entity_module_p(m));
+  pips_assert("fprint_environment", entity_module_p(m));
 
-    /* To simplify validation, at the expense of some information about
-       the parsing process. */
-    gen_sort_list(decls, (int (*)(const void *,const void *)) compare_entities);
+  /* To simplify validation, at the expense of some information about
+     the parsing process. */
+  gen_sort_list(decls, (int (*)(const void *,const void *)) compare_entities);
 
-    (void) fprintf(fd, "\nDeclarations for module %s with type ",
-		   module_local_name(m));
-    fprint_functional(fd, type_functional(entity_type(m)));
-    (void) fprintf(fd, "\n\n");
+  (void) fprintf(fd, "\nDeclarations for module %s with type ",
+		 module_local_name(m));
+  fprint_functional(fd, type_functional(entity_type(m)));
+  (void) fprintf(fd, "\n\n");
 
-    /* In C, no return entity is created (yet). See MakeCurrentModule(). */
-    pips_assert("A module storage is ROM or return",
-		storage_rom_p(entity_storage(m))
-		|| storage_return_p(entity_storage(m)));
+  /* In C, no return entity is created (yet). See MakeCurrentModule(). */
+  pips_assert("A module storage is ROM or return",
+	      storage_rom_p(entity_storage(m))
+	      || storage_return_p(entity_storage(m)));
 
-    /* List of implicitly and explicitly declared variables,
-       functions and areas */
+  /* List of implicitly and explicitly declared variables,
+     functions and areas */
 
-    (void) fprintf(fd, "%s\n", ENDP(decls)?
-		   "* empty declaration list *\n\n": "Variable list:\n\n");
+  (void) fprintf(fd, "%s\n", ENDP(decls)?
+		 "* empty declaration list *\n\n": "Variable list:\n\n");
+
+  MAP(ENTITY, e, {
+      type t = entity_type(e);
+
+      fprintf(fd, "Declared entity %s\twith type %s ", entity_name(e), type_to_string(t));
+
+      if(type_variable_p(t))
+	fprintf(fd, "%s\n", basic_to_string(variable_basic(type_variable(t))));
+      else if(type_functional_p(t)) {
+	fprint_functional(fd, type_functional(t));
+      }
+      else if(type_area_p(t)) {
+	(void) fprintf(fd, "with size %td\n", area_size(type_area(t)));
+      }
+      else
+	(void) fprintf(fd, "\n");
+    },
+    decls);
+
+  if(!is_fortran) {
+    list edecls = gen_copy_seq(code_externs(value_code(entity_initial(m))));
+    /* List of external variables and functions and areas */
+
+    gen_sort_list(edecls, (int (*)(const void *,const void *)) compare_entities);
+
+    (void) fprintf(fd, "%s\n", ENDP(edecls)?
+		   "* empty external declaration list *\n\n": "External variable list:\n\n");
 
     MAP(ENTITY, e, {
 	type t = entity_type(e);
@@ -2604,84 +2630,57 @@ void fprint_any_environment(FILE * fd, entity m, bool is_fortran)
 	fprintf(fd, "Declared entity %s\twith type %s ", entity_name(e), type_to_string(t));
 
 	if(type_variable_p(t))
-	    fprintf(fd, "%s\n", basic_to_string(variable_basic(type_variable(t))));
+	  fprintf(fd, "%s\n", basic_to_string(variable_basic(type_variable(t))));
 	else if(type_functional_p(t)) {
-	    fprint_functional(fd, type_functional(t));
+	  fprint_functional(fd, type_functional(t));
 	}
 	else if(type_area_p(t)) {
-	    (void) fprintf(fd, "with size %td\n", area_size(type_area(t)));
+	  (void) fprintf(fd, "with size %td\n", area_size(type_area(t)));
 	}
 	else
-	    (void) fprintf(fd, "\n");
-	    },
-	decls);
+	  (void) fprintf(fd, "\n");
+      },
+      edecls);
+    gen_free_list(edecls);
+  }
 
-    if(!is_fortran) {
-      list edecls = gen_copy_seq(code_externs(value_code(entity_initial(m))));
-      /* List of external variables and functions and areas */
+  /* Formal parameters */
+  nth = 0;
+  MAP(ENTITY, v, {
+      storage vs = entity_storage(v);
 
-      gen_sort_list(edecls, (int (*)(const void *,const void *)) compare_entities);
+      pips_assert("All storages are defined", !storage_undefined_p(vs));
 
-      (void) fprintf(fd, "%s\n", ENDP(edecls)? 
-		     "* empty external declaration list *\n\n": "External variable list:\n\n");
-
-      MAP(ENTITY, e, {
-	  type t = entity_type(e);
-
-	  fprintf(fd, "Declared entity %s\twith type %s ", entity_name(e), type_to_string(t));
-
-	  if(type_variable_p(t))
-	    fprintf(fd, "%s\n", basic_to_string(variable_basic(type_variable(t))));
-	  else if(type_functional_p(t)) {
-	    fprint_functional(fd, type_functional(t));
-	  }
-	  else if(type_area_p(t)) {
-	    (void) fprintf(fd, "with size %td\n", area_size(type_area(t)));
-	  }
-	  else
-	    (void) fprintf(fd, "\n");
-	},
-	edecls);
-      gen_free_list(edecls);
-    }
-
-    /* Formal parameters */
-    nth = 0;
-    MAP(ENTITY, v, {
-	storage vs = entity_storage(v);
-
-	pips_assert("All storages are defined", !storage_undefined_p(vs));
-
-	if(storage_formal_p(vs)) {
-	    nth++;
-	    if(nth==1) {
-		(void) fprintf(fd, "\nLayouts for formal parameters:\n\n");
-	    }
-	    (void) fprintf(fd,
-			   "\tVariable %s,\toffset = %td\n", 
-			   entity_name(v), formal_offset(storage_formal(vs)));
+      if(storage_formal_p(vs)) {
+	nth++;
+	if(nth==1) {
+	  (void) fprintf(fd, "\nLayouts for formal parameters:\n\n");
 	}
-	else if(storage_return_p(vs)) {
-	    pips_assert("No more than one return variable", entity_undefined_p(rv));
-	    rv = v;
-	}
+	(void) fprintf(fd,
+		       "\tVariable %s,\toffset = %td\n",
+		       entity_name(v), formal_offset(storage_formal(vs)));
+      }
+      else if(storage_return_p(vs)) {
+	pips_assert("No more than one return variable", entity_undefined_p(rv));
+	rv = v;
+      }
     }, decls);
 
-    /* Return variable */
-    if(!entity_undefined_p(rv)) {
-        extern int SafeSizeOfArray(entity a);
+  /* Return variable */
+  if(!entity_undefined_p(rv)) {
+    extern int SafeSizeOfArray(entity a);
 
-	(void) fprintf(fd, "\nLayout for return variable:\n\n");
-	(void) fprintf(fd, "\tVariable %s,\tsize = %d\n", 
-			   entity_name(rv), SafeSizeOfArray(rv));
-    }
+    (void) fprintf(fd, "\nLayout for return variable:\n\n");
+    (void) fprintf(fd, "\tVariable %s,\tsize = %d\n",
+		   entity_name(rv), SafeSizeOfArray(rv));
+  }
 
-    /* Structure of each area/common */
-    if(!ENDP(decls)) {
-	(void) fprintf(fd, "\nLayouts for areas (commons):\n\n");
-    }
+  /* Structure of each area/common */
+  if(!ENDP(decls)) {
+    (void) fprintf(fd, "\nLayouts for areas (commons):\n\n");
+  }
 
-    MAP(ENTITY, e, {
+  MAP(ENTITY, e, {
       void print_common_layout(FILE * fd, entity c, bool debug_p);
       if(type_area_p(entity_type(e))) {
 	if(is_fortran)
@@ -2690,10 +2689,10 @@ void fprint_any_environment(FILE * fd, entity m, bool is_fortran)
 	  print_C_common_layout(fd, e, FALSE);
       }
     },
-	decls);
+    decls);
 
-    (void) fprintf(fd, "End of declarations for module %s\n\n",
-		   module_local_name(m));
+  (void) fprintf(fd, "End of declarations for module %s\n\n",
+		 module_local_name(m));
 
-    gen_free_list(decls);
+  gen_free_list(decls);
 }

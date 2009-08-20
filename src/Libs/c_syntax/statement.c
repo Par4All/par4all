@@ -67,10 +67,14 @@ stack LoopStack = stack_undefined; /* is used for switch statements also, becaus
 
 void MakeCurrentModule(entity e)
 {
-  /* This must be changed later, the storage is of type return and we have to create a new entity*/
+  /* This must be changed later, the storage is of type return and we
+     have to create a new entity*/
   entity_storage(e) = make_storage_rom() /* make_storage_return(e) */;
   if (value_undefined_p(entity_initial(e)))
-    entity_initial(e) = make_value(is_value_code, make_code(NIL,strdup(""), make_sequence(NIL),NIL));
+    entity_initial(e) = make_value(is_value_code,
+				   make_code(NIL,strdup(""),
+					     make_sequence(NIL),
+					     NIL));
   /* code_declaration to be updated : only need formal parameters, because the others are added in
      block statement declaration ? */
   pips_debug(4,"Set current module entity %s\n",entity_user_name(e));
@@ -111,6 +115,7 @@ void MakeCurrentModule(entity e)
 
   set_current_module_entity(e);
   init_c_areas();
+  init_c_implicit_variables(e);
   LabeledStatements = NIL;
   SwitchGotoStack = stack_make(sequence_domain,0,0);
   SwitchControllerStack = stack_make(expression_domain,0,0);

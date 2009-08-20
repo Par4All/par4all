@@ -156,6 +156,37 @@ void init_c_areas()
 }
 
 
+void init_c_implicit_variables(entity m)
+{
+  /* Function name variable __function__ and __FUNCTION__ */
+  string mn = entity_user_name(m);
+  entity func_name1 = FindOrCreateEntity(mn, "0`__function__");
+  entity func_name2 = FindOrCreateEntity(mn, "0`__FUNCTION__");
+  string name = entity_user_name(m);
+  string cn = strdup(concatenate("\"", mn, "\"", NULL));
+  /* cn can probably be freed after this call */
+  entity fn = make_C_constant_entity(cn,
+				     is_basic_string,
+				     strlen(name)+1);
+
+  entity_type(func_name1) = make_char_array_type(strlen(name)+1);
+  entity_storage(func_name1) =
+    make_storage_ram(make_ram(m, StaticArea, UNKNOWN_RAM_OFFSET, NIL));
+  /* It is not clear if the encoding is correct or not. It may also
+     be correct but not supported. This could be checked by computing
+     the preconditions for strings and/or by adding initial values to
+     the symbol table display. */
+  entity_initial(func_name1) = make_value_expression(make_call_expression(fn, NIL));
+  AddEntityToDeclarations(func_name1, m);
+
+  entity_type(func_name2) = make_char_array_type(strlen(name)+1);
+  entity_storage(func_name2) =
+    make_storage_ram(make_ram(m, StaticArea, UNKNOWN_RAM_OFFSET, NIL));
+  entity_initial(func_name2) = make_value_expression(make_call_expression(fn, NIL));
+  AddEntityToDeclarations(func_name2, m);
+  /* Since the declarations are not added to a statement_declarations
+     field, they are not going to be prettyprinted. */
+}
 /******************* COMPILATION UNIT **********************/
 
 entity get_current_compilation_unit_entity()

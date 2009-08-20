@@ -34,38 +34,32 @@
 
 /* generation of types */
 
-basic 
-MakeBasicOverloaded()
+basic MakeBasicOverloaded()
 {
     return(make_basic(is_basic_overloaded, NIL));
 }
 
-mode 
-MakeModeReference()
+mode MakeModeReference()
 {
     return(make_mode(is_mode_reference, NIL));
 }
 
-mode 
-MakeModeValue()
+mode MakeModeValue()
 {
     return(make_mode(is_mode_value, NIL));
 }
 
-type 
-MakeTypeStatement()
+type MakeTypeStatement()
 {
     return(make_type(is_type_statement, NIL));
 }
 
-type 
-MakeTypeUnknown()
+type MakeTypeUnknown()
 {
     return(make_type(is_type_unknown, NIL));
 }
 
-type 
-MakeTypeVoid()
+type MakeTypeVoid()
 {
     return(make_type(is_type_void, NIL));
 }
@@ -75,8 +69,7 @@ MakeTypeVoid()
 /* Lines between BEGIN_EOLE and END_EOLE tags are automatically included
    in the EOLE project (JZ - 11/98) */
 
-type 
-MakeTypeVariable(b, ld)
+type MakeTypeVariable(b, ld)
 basic b;
 cons * ld;
 {
@@ -88,36 +81,35 @@ cons * ld;
 /*
  *
  */
-basic 
-MakeBasic(the_tag)
+basic MakeBasic(the_tag)
 int the_tag;
 {
     switch(the_tag)
     {
-    case is_basic_int: 
+    case is_basic_int:
 	return(make_basic(is_basic_int, UUINT(4)));
 	break;
-    case is_basic_float: 
+    case is_basic_float:
 	return(make_basic(is_basic_float, UUINT(4)));
 	break;
-    case is_basic_logical: 
+    case is_basic_logical:
 	return(make_basic(is_basic_logical, UUINT(4)));
 	break;
-    case is_basic_complex: 
+    case is_basic_complex:
 	return(make_basic(is_basic_complex, UUINT(8)));
 	break;
-    case is_basic_overloaded: 
+    case is_basic_overloaded:
 	return(make_basic(is_basic_overloaded, UU));
 	break;
-    case is_basic_string: 
+    case is_basic_string:
 	return(make_basic(is_basic_string, string_undefined));
 	break;
     default:
 	pips_error("MakeBasic", "unexpected basic tag: %d\n",
-                   the_tag);
+		   the_tag);
 	break;
     }
-    
+
     return(basic_undefined);
 }
 
@@ -2031,6 +2023,17 @@ bool bit_type_p(type t)
   return FALSE;
 }
 
+bool string_type_p(type t)
+{
+  if (!type_undefined_p(t) && type_variable_p(t))
+    {
+      basic b = variable_basic(type_variable(t));
+      if (!basic_undefined_p(b) && basic_string_p(b))
+	return TRUE;
+    }
+  return FALSE;
+}
+
 bool char_type_p(type t)
 {
   bool is_char = FALSE;
@@ -3106,7 +3109,7 @@ size_t type_depth(type t)
     list fl = type_union(t);
     d = 0;
     MAP(ENTITY, e, {
-	int i = type_depth(entity_type(e));
+	size_t i = type_depth(entity_type(e));
 	d = d>i?d:i;
       }, fl);
     d++;
@@ -3430,6 +3433,19 @@ list type_supporting_types(type t)
   stl = recursive_type_supporting_types(stl, vt, t);
   set_free(vt);
   return stl;
+}
+
+type make_char_array_type(int n)
+{
+  /* Two options: a string of n characters or an array of n char,
+     i.e. int. */
+  constant c = make_constant_int(n);
+  value val = make_value_constant(c);
+  basic b = make_basic_string(val);
+  variable var = make_variable(b, NIL, NIL);
+  type t = make_type_variable(var);
+
+  return t;
 }
 /*
  *  that is all

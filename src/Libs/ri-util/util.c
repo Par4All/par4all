@@ -126,9 +126,7 @@ string global_name_to_user_name(string global_name)
 }
 
 /* Does not take care of block scopes and returns a pointer */
-string 
-local_name(s)
-string s;
+string local_name(string s)
 {
     pips_assert("some separator", strchr(s, MODULE_SEP) != NULL);
     return strchr(s, MODULE_SEP)+1;
@@ -136,34 +134,26 @@ string s;
 
 /* END_EOLE */
 
-string 
-make_entity_fullname(module_name, local_name)
-string module_name, local_name;
+string make_entity_fullname(string module_name, string local_name)
 {
-    return(concatenate(module_name, 
-		       MODULE_SEP_STRING, 
-		       local_name, 
+    return(concatenate(module_name,
+		       MODULE_SEP_STRING,
+		       local_name,
 		       (char *) 0));
 }
 
-bool 
 //empty_local_label_name_p(s)
-empty_string_p(s)
-string s;
+bool empty_string_p(string s)
 {
     return(strcmp(s, "") == 0);
 }
 
-bool 
-return_local_label_name_p(s)
-string s;
+bool return_local_label_name_p(string s)
 {
     return(strcmp(s, RETURN_LABEL_NAME) == 0);
 }
 
-bool
-empty_label_p(s)
-string s;
+bool empty_label_p(string s)
 {
   // s must be a local label name
   pips_assert("no separator", strchr(s, MODULE_SEP) == NULL);
@@ -171,38 +161,37 @@ string s;
   return (strcmp(s, EMPTY_LABEL_NAME) == 0);
 }
 
-bool
-empty_global_label_p(gln)
-string gln;
+bool empty_global_label_p(string gln)
 {
   // gln must be a global label name
-  string lln = local_name(gln); 
+  string lln = local_name(gln);
 
   return empty_label_p(lln);
 }
 
-bool 
-return_label_p(s)
-string s;
+bool return_label_p(string s)
 {
     return(return_local_label_name_p(local_name(s)+strlen(LABEL_PREFIX))) ;
 }
 
-entity 
-find_label_entity(module_name, label_local_name)
-string module_name, label_local_name;
+entity find_label_entity(string module_name, string label_local_name)
 {
-    string full = concatenate(module_name, MODULE_SEP_STRING, 
+    string full = concatenate(module_name, MODULE_SEP_STRING,
 			      LABEL_PREFIX, label_local_name, NULL);
 
-    debug(5, "find_label_entity", "searched entity: %s\n", full);
+    pips_debug(5, "searched entity: %s\n", full);
     void * found = gen_find_tabulated(full, entity_domain);
     return (entity) (gen_chunk_undefined_p(found) ? entity_undefined : found);
 }
 
-string 
-module_name(s)
-string s;
+/* Return the module part of an entity name.
+ *
+ * OK, this function name is pretty misleading.
+ *
+ * Maybe, it should be wrapped up in a higher-level function such as
+ * entity_to_module_name().
+ */
+string module_name(string s)
 {
   /* FI: shouldnt'we allocate dynamically "local" since its size is
      smaller than the size of "s"? */
@@ -214,50 +203,41 @@ string s;
 
     strncpy(local, s, MAXIMAL_MODULE_NAME_SIZE);
     local[MAXIMAL_MODULE_NAME_SIZE] = 0;
-    if (((p_sep = strchr(local, MODULE_SEP)) == NULL) /* && ((p_sep = strstr(local, FILE_SEP_STRING)) == NULL ) */ ) 
-      pips_error("module_name", 
+    if (((p_sep = strchr(local, MODULE_SEP)) == NULL) /* && ((p_sep = strstr(local, FILE_SEP_STRING)) == NULL ) */ )
+      pips_error("module_name",
 		   "module name too long, or illegal: \"%s\"\n", s);
     else
 	*p_sep = '\0';
     return(local);
 }
 
-string 
-string_codefilename(s)
-char *s;
+string string_codefilename(char *s)
 {
-    return(concatenate(TOP_LEVEL_MODULE_NAME, MODULE_SEP_STRING, 
+    return(concatenate(TOP_LEVEL_MODULE_NAME, MODULE_SEP_STRING,
 		       s, SEQUENTIAL_CODE_EXT, NULL));
 }
 
 /* generation des noms de fichiers */
-string 
-module_codefilename(e)
+string module_codefilename(e)
 entity e;
 {
     return(string_codefilename(entity_local_name(e)));
 }
 
-string 
-string_par_codefilename(s)
-char *s;
+string string_par_codefilename(string s)
 {
-    return(concatenate(TOP_LEVEL_MODULE_NAME, MODULE_SEP_STRING, 
+    return(concatenate(TOP_LEVEL_MODULE_NAME, MODULE_SEP_STRING,
 		       s, PARALLEL_CODE_EXT, NULL));
 }
 
-string 
-module_par_codefilename(e)
-entity e;
+string module_par_codefilename(entity e)
 {
     return(string_par_codefilename(entity_local_name(e)));
 }
 
-string 
-string_fortranfilename(s)
-char *s;
+string string_fortranfilename(string s)
 {
-    return(concatenate(TOP_LEVEL_MODULE_NAME, MODULE_SEP_STRING, 
+    return(concatenate(TOP_LEVEL_MODULE_NAME, MODULE_SEP_STRING,
 		       s, SEQUENTIAL_FORTRAN_EXT, NULL));
 }
 
@@ -272,91 +252,73 @@ bool string_fortran_filename_p(string s)
   else
     is_fortran = strcmp(SEQUENTIAL_FORTRAN_EXT, s+(fnl-sl))==0;
 
-  return is_fortran; 
+  return is_fortran;
 }
 
-string 
-module_fortranfilename(e)
-entity e;
+string module_fortranfilename(entity e)
 {
     return(string_fortranfilename(entity_local_name(e)));
 }
 
-string 
-string_par_fortranfilename(s)
-char *s;
+string string_par_fortranfilename(string s)
 {
-    return(concatenate(TOP_LEVEL_MODULE_NAME, MODULE_SEP_STRING, 
+    return(concatenate(TOP_LEVEL_MODULE_NAME, MODULE_SEP_STRING,
 		       s, PARALLEL_FORTRAN_EXT, NULL));
 }
 
-string 
-module_par_fortranfilename(e)
-entity e;
+string module_par_fortranfilename(entity e)
 {
     return(string_par_fortranfilename(entity_local_name(e)));
 }
 
-string 
-string_pp_fortranfilename(s)
-char *s;
+string string_pp_fortranfilename(string s)
 {
-    return(concatenate(TOP_LEVEL_MODULE_NAME, MODULE_SEP_STRING, 
+    return(concatenate(TOP_LEVEL_MODULE_NAME, MODULE_SEP_STRING,
 		       s, PRETTYPRINT_FORTRAN_EXT, NULL));
 }
 
-string 
-module_pp_fortranfilename(e)
-entity e;
+string module_pp_fortranfilename(entity e)
 {
     return(string_pp_fortranfilename(entity_local_name(e)));
 }
 
-string 
-string_predicat_fortranfilename(s)
-char *s;
+string string_predicat_fortranfilename(string s)
 {
-    return(concatenate(TOP_LEVEL_MODULE_NAME, MODULE_SEP_STRING, 
+    return(concatenate(TOP_LEVEL_MODULE_NAME, MODULE_SEP_STRING,
 		       s, PREDICAT_FORTRAN_EXT, NULL));
 }
 
-string 
-module_predicat_fortranfilename(e)
-entity e;
+string module_predicat_fortranfilename(entity e)
 {
     return(string_predicat_fortranfilename(entity_local_name(e)));
 }
 
-string 
-string_entitiesfilename(s)
-char *s;
+string string_entitiesfilename(string s)
 {
-    return(concatenate(TOP_LEVEL_MODULE_NAME, MODULE_SEP_STRING, 
+    return(concatenate(TOP_LEVEL_MODULE_NAME, MODULE_SEP_STRING,
 		       s, ENTITIES_EXT, NULL));
 }
 
-string 
-module_entitiesfilename(entity e)
+string module_entitiesfilename(entity e)
 {
     return(string_entitiesfilename(entity_local_name(e)));
 }
 
 /* functions for expressions */
 
-expression 
-make_entity_expression(entity e, cons *inds)
+expression make_entity_expression(entity e, cons *inds)
 {
-    syntax s = syntax_undefined;
-    if( entity_constant_p(e) )
+  syntax s = syntax_undefined;
+  if( entity_constant_p(e) )
     {
-        s = make_syntax_call(make_call(e,NIL));
+      s = make_syntax_call(make_call(e,NIL));
     }
-    else
+  else
     {
-        reference r = make_reference(e, inds);
-        s = make_syntax_reference(r);			    
+      reference r = make_reference(e, inds);
+      s = make_syntax_reference(r);
     }
-    return make_expression(s, normalized_undefined);
+  return make_expression(s, normalized_undefined);
 }
 
 static int init = 100000;
@@ -366,86 +328,79 @@ void reset_label_counter()
   init = 100000;
 }
 
-string 
-new_label_name(entity module)
+string new_label_name(entity module)
 {
-    static char name[ 64 ];
-    char *module_name ;
-    char * format;
+  static char name[ 64 ];
+  char *module_name ;
+  char * format;
 
-    pips_assert( "new_label_name", module != 0 ) ;
+  pips_assert( "new_label_name", module != 0 ) ;
 
-    if( module == entity_undefined ) {
-        module_name = "__GENSYM" ;
-        format = "%s%s%s%d";
-    }
-    else {
-        module_name = module_local_name(module) ;
-        format = c_module_p(module)?"%s%s%sl%d":"%s%s%s%d";
-    }
-    for(sprintf(name, format, module_name, MODULE_SEP_STRING, LABEL_PREFIX,
-		--init);
-	 init >= 0 && 
-	    !entity_undefined_p(gen_find_tabulated(name, entity_domain)) ;
-	sprintf(name, format, module_name, MODULE_SEP_STRING, LABEL_PREFIX,
-		--init)) {
-    /* loop */ 
-    }
-    if(init == 0) {
-	pips_error("new_label_name", "no more available labels");
-    }
-    return(name);
+  if( module == entity_undefined ) {
+    module_name = "__GENSYM" ;
+    format = "%s%s%s%d";
+  }
+  else {
+    module_name = module_local_name(module) ;
+    format = c_module_p(module)?"%s%s%sl%d":"%s%s%s%d";
+  }
+  for(sprintf(name, format, module_name, MODULE_SEP_STRING, LABEL_PREFIX,
+	      --init);
+      init >= 0 &&
+	!entity_undefined_p(gen_find_tabulated(name, entity_domain)) ;
+      sprintf(name, format, module_name, MODULE_SEP_STRING, LABEL_PREFIX,
+	      --init)) {
+    /* loop */
+  }
+  if(init == 0) {
+    pips_error("new_label_name", "no more available labels");
+  }
+  return(name);
 }
-	 
-entity 
-find_ith_parameter(e, i)
-entity e;
-int i;
+
+entity find_ith_parameter(entity e, int i)
 {
-    cons *pv = code_declarations(value_code(entity_initial(e)));
+  cons *pv = code_declarations(value_code(entity_initial(e)));
 
-    if (! entity_module_p(e)) {
-	pips_internal_error( "entity %s is not a module\n", 
-		entity_name(e));
-    }
-    while (pv != NIL) {
-	entity v = ENTITY(CAR(pv));
-	type tv = entity_type(v);
-	storage sv = entity_storage(v);
-
-	if (type_variable_p(tv) && storage_formal_p(sv)) {
-	    if (formal_offset(storage_formal(sv)) == i) {
-		return(v);
-	    }
-	}
-
-	pv = CDR(pv);
-    }
-
-    return(entity_undefined);
-}
-
-/* returns TRUE if v is the ith formal parameter of function f */
-bool 
-ith_parameter_p(f, v, i)
-entity f, v;
-int i;
-{
+  if (! entity_module_p(e)) {
+    pips_internal_error( "entity %s is not a module\n",
+			 entity_name(e));
+  }
+  while (pv != NIL) {
+    entity v = ENTITY(CAR(pv));
     type tv = entity_type(v);
     storage sv = entity_storage(v);
 
-    if (! entity_module_p(f)) {
-	fprintf(stderr, "[ith_parameter_p] %s is not a module\n",
-		entity_name(f));
-	exit(1);
-    }
-
     if (type_variable_p(tv) && storage_formal_p(sv)) {
-	formal fv = storage_formal(sv);
-	return(formal_function(fv) == f && formal_offset(fv) == i);
+      if (formal_offset(storage_formal(sv)) == i) {
+	return(v);
+      }
     }
 
-    return(FALSE);
+    pv = CDR(pv);
+  }
+
+  return(entity_undefined);
+}
+
+/* returns TRUE if v is the ith formal parameter of function f */
+bool ith_parameter_p(entity f, entity v, int i)
+{
+  type tv = entity_type(v);
+  storage sv = entity_storage(v);
+
+  if (! entity_module_p(f)) {
+    fprintf(stderr, "[ith_parameter_p] %s is not a module\n",
+	    entity_name(f));
+    exit(1);
+  }
+
+  if (type_variable_p(tv) && storage_formal_p(sv)) {
+    formal fv = storage_formal(sv);
+    return(formal_function(fv) == f && formal_offset(fv) == i);
+  }
+
+  return(FALSE);
 }
 
 /* functions for effects */
@@ -457,20 +412,17 @@ entity effect_entity(effect e)
 /* functions for references */
 
 /* returns the ith index of an array reference */
-expression 
-reference_ith_index(ref, i)
-reference ref;
-int i;
+expression reference_ith_index(reference ref, int i)
 {
   int count = i;
-    cons *pi = reference_indices(ref);
+  cons *pi = reference_indices(ref);
 
-    while (pi != NIL && --count > 0)
-	pi = CDR(pi);
-    
-    pips_assert("reference_ith_index", pi != NIL);
+  while (pi != NIL && --count > 0)
+    pi = CDR(pi);
 
-    return(EXPRESSION(CAR(pi)));
+  pips_assert("reference_ith_index", pi != NIL);
+
+  return(EXPRESSION(CAR(pi)));
 }
 
 /* functions for areas */
