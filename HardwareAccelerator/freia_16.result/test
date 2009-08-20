@@ -24,6 +24,7 @@ digraph "dag_0" {
   "o1" [shape=circle];
 
   // computation vertices
+  "12 ?" [shape=none];
   "11 vol" [shape=diamond];
   "10 max" [shape=diamond];
   "9 min" [shape=diamond];
@@ -47,6 +48,7 @@ digraph "dag_cleaned_0" {
   "o1" [shape=circle];
 
   // computation vertices
+  "12 ?" [shape=none];
   "11 vol" [shape=diamond];
   "10 max" [shape=diamond];
   "9 min" [shape=diamond];

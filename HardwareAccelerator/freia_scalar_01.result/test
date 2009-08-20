@@ -20,6 +20,7 @@ digraph "dag_0" {
   "o" [shape=circle];
 
   // computation vertices
+  "8 ?" [shape=none];
   "7 thr" [shape=parallelogram];
   "7 thr" -> "o";
   "i" -> "7 thr";
@@ -33,6 +34,7 @@ digraph "dag_cleaned_0" {
   "o" [shape=circle];
 
   // computation vertices
+  "8 ?" [shape=none];
   "7 thr" [shape=parallelogram];
   "7 thr" -> "o";
   "i" -> "7 thr";

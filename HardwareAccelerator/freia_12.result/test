@@ -24,6 +24,7 @@ digraph "dag_0" {
   "o1" [shape=circle];
 
   // computation vertices
+  "12 ?" [shape=none];
   "11 D8" [shape=box];
   "11 D8" -> "o1";
   "i1" -> "11 D8";
@@ -42,6 +43,7 @@ digraph "dag_cleaned_0" {
   "o1" [shape=circle];
 
   // computation vertices
+  "12 ?" [shape=none];
   "11 D8" [shape=box];
   "11 D8" -> "o1";
   "i1" -> "11 D8";

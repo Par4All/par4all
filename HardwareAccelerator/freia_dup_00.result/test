@@ -21,8 +21,11 @@ digraph "dag_0" {
   // outputs
 
   // computation vertices
+  "8 ?" [shape=none];
   "7 max" [shape=diamond];
+  "7 max" -> "8 ?" [arrowhead=empty];
   "6 max" [shape=diamond];
+  "6 max" -> "8 ?" [arrowhead=empty];
   "i" -> "7 max";
   "i" -> "6 max";
 }
@@ -34,8 +37,11 @@ digraph "dag_cleaned_0" {
   // outputs
 
   // computation vertices
+  "8 ?" [shape=none];
   "7 max" [shape=diamond];
+  "7 max" -> "8 ?" [arrowhead=empty];
   "6 max" [shape=diamond];
+  "6 max" -> "8 ?" [arrowhead=empty];
   "i" -> "7 max";
   "i" -> "6 max";
 }
@@ -51,6 +57,14 @@ digraph "freia_dup_00_helper_0_0" {
   "6 max" [shape=diamond];
   "i" -> "7 max";
   "i" -> "6 max";
+}
+// graph for dag "freia_dup_00_helper_0_1" of module "freia_dup_00" in dot format
+digraph "freia_dup_00_helper_0_1" {
+  // inputs
+
+  // outputs
+
+  // computation vertices
 }
 
 ! acceleration function
