@@ -377,14 +377,14 @@ static transformer data_to_prec_for_variables(entity m, list /* of entity */le)
   list ce = list_undefined;
 
   pips_debug(8, "begin for %s\n", module_local_name(m));
- 
+
   /* look for entities with an initial value. */
   for(ce = le; !ENDP(ce); POP(ce)) {
     entity e = ENTITY(CAR(ce));
     value val = entity_initial(e);
 
     pips_debug(8, "begin for variable %s\n", entity_name(e));
- 
+
     if (entity_has_values_p(e) && !linear_hashtable_isin(b, e)) {
       if(value_constant_p(val)) {
 	constant c = value_constant(val);
