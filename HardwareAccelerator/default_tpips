@@ -17,6 +17,7 @@ setproperty DYNAMIC_DEALLOCATION="freia_common_destruct_data"
 apply CLEAN_UNUSED_DYNAMIC_VARIABLES[${WSPACE}]
 touch SPOC_FILE[${WSPACE}]
 touch PROPER_EFFECTS[${WSPACE}]
+touch CUMULATED_EFFECTS[${WSPACE}]
 #
 # show spoc results
 #
