@@ -299,8 +299,8 @@ string get_symbol_table(entity m, bool isfortran)
   dump_functional(type_functional(entity_type(m)), result);
   string_buffer_append(result, "\"" NL);
 
-  /* List of implicitly and explicitly declared variables, 
-     functions and areas */
+  /* List of implicitly and explicitly declared variables, functions
+     and areas */
   if(ENDP(decls))
     string_buffer_append(result, concatenate("\n* empty declaration list *",NL,NL,NULL));
   else
