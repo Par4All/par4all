@@ -1,17 +1,25 @@
 
 Initial code
 
-int flatten_code01()
+int flatten_code05()
 {
    // BEGIN BLOCK
    int i = 1;
    int j;
-   i++;
+   j++;
    {
       // BEGIN BLOCK
-      int i = 2;
+      int i = j;
+      int k = 2;
       i++;
       j = 1;
+      {
+         // BEGIN BLOCK
+         int k = 2;
+         i++;
+         j = 1;
+         // END BLOCK
+      }
       // END BLOCK
    }
    i = j;
@@ -22,14 +30,20 @@ int flatten_code01()
 
 Code after flatten_code
 
-int flatten_code01()
+int flatten_code05()
 {
    // BEGIN BLOCK
    int i = 1;
    int j;
    int i_0;
-   i++;
-   i_0 = 2;
+   int k_0;
+   int k_1;
+   j++;
+   i_0 = j;
+   k_0 = 2;
+   i_0++;
+   j = 1;
+   k_1 = 2;
    i_0++;
    j = 1;
    i = j;

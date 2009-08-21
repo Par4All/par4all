@@ -1,17 +1,24 @@
 
 Initial code
 
-int flatten_code01()
+int flatten_code04()
 {
    // BEGIN BLOCK
    int i = 1;
    int j;
    i++;
-   {
+   if (1) {
       // BEGIN BLOCK
       int i = 2;
       i++;
-      j = 1;
+      j += i;
+      {
+         // BEGIN BLOCK
+         int i = 3;
+         i++;
+         j += i;
+         // END BLOCK
+      }
       // END BLOCK
    }
    i = j;
@@ -22,16 +29,24 @@ int flatten_code01()
 
 Code after flatten_code
 
-int flatten_code01()
+int flatten_code04()
 {
    // BEGIN BLOCK
    int i = 1;
    int j;
    int i_0;
+   int i_1;
    i++;
-   i_0 = 2;
-   i_0++;
-   j = 1;
+   if (1) {
+      // BEGIN BLOCK
+      i_0 = 2;
+      i_0++;
+      j += i_0;
+      i_1 = 3;
+      i_1++;
+      j += i_1;
+      // END BLOCK
+   }
    i = j;
 
    printf("%d %d\n", i, j);
