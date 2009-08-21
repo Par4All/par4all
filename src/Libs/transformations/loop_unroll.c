@@ -461,10 +461,26 @@ loop_unroll(statement loop_statement, int rate)
     do_loop_unroll(loop_statement, rate, NULL);
 }
 
+bool loop_fully_unrollable_p(loop l)
+{
+  bool unroll_p = FALSE;
+  range lr = loop_range(l);
+  expression lb = range_lower(lr);
+  expression ub = range_upper(lr);
+  expression inc = range_increment(lr);
+  int lbval, ubval, incval;
 
-/* get rid of the loop by body duplication; 
- * the loop body is duplicated as many times
- * as there were iterations
+  pips_debug(2, "begin\n");
+
+  unroll_p = expression_integer_value(lb, &lbval)
+    && expression_integer_value(ub, &ubval)
+    && expression_integer_value(inc, &incval);
+
+  return unroll_p;
+}
+/* get rid of the loop by body duplication;
+ *
+ * the loop body is duplicated as many times as there were iterations
  *
  * FI: could be improved to handle symbolic lower bounds (18 January 1993)
  */
@@ -474,16 +490,16 @@ void full_loop_unroll(statement loop_statement)
     range lr = loop_range(il);
     entity ind = loop_index(il);
     entity flbl = entity_undefined; /* final loop body label */
-    expression lb = range_lower(lr),
-               ub = range_upper(lr),
-               inc = range_increment(lr);
+    expression lb = range_lower(lr);
+    expression ub = range_upper(lr);
+    expression inc = range_increment(lr);
     expression rhs_expr, expr;
     statement stmt;
     instruction block;
     int lbval, ubval, incval;
     int iter;
 
-    debug(2, "full_loop_unroll", "begin\n");
+    pips_debug(2, "begin\n");
 
     ifdebug(7) {
 	/* Start debug in Newgen */
@@ -492,15 +508,14 @@ void full_loop_unroll(statement loop_statement)
     /* Validity of transformation should be checked */
     /* ie.: - pas d'effets de bords dans les expressions duplique'es */
 
-    if (expression_integer_value(lb, &lbval) 
-	&& expression_integer_value(ub, &ubval) 
+    if (expression_integer_value(lb, &lbval)
+	&& expression_integer_value(ub, &ubval)
 	&& expression_integer_value(inc, &incval)) {
 	pips_assert("full_loop_unroll", incval != 0);
     }
     else {
-	user_error("full_loop_unroll", 
-		   "loop range for loop %s must be numerically known\n",
-		   label_local_name(loop_label(il)));
+	pips_user_error("loop range for loop %s must be numerically known\n",
+			label_local_name(loop_label(il)));
     }
 
     /* Instruction block is created and will contain everything */
