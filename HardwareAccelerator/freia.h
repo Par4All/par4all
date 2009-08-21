@@ -18,6 +18,14 @@ typedef struct {
 extern freia_data2d * freia_common_create_data(uint32_t, uint32_t, uint32_t);
 extern freia_status freia_common_destruct_data(freia_data2d *);
 
+// IO
+extern freia_status freia_common_open_input(freia_dataio *, uint32_t);
+extern freia_status freia_common_open_output(freia_dataio *, uint32_t, uint32_t, uint32_t, uint32_t);
+extern freia_status freia_common_rx_image(freia_data2d *, freia_dataio *);
+extern freia_status freia_common_tx_image(freia_data2d *, freia_dataio *);
+extern freia_status freia_common_close_input(freia_data2d *);
+extern freia_status freia_common_close_output(freia_data2d *);
+
 // 2 CIPO functions
 extern freia_status freia_cipo_gradient(freia_data2d *, freia_data2d *, int32_t, uint32_t);
 extern freia_status freia_cipo_inner_gradient(freia_data2d *, freia_data2d *, int32_t, uint32_t);

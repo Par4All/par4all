@@ -17,6 +17,39 @@ freia_status freia_common_destruct_data(freia_data2d * img)
   return FREIA_OK;
 }
 
+freia_status freia_common_open_input(freia_dataio * in, uint32_t n)
+{
+  return FREIA_OK;
+}
+
+freia_status freia_common_open_output(freia_dataio *out,
+   uint32_t n, uint32_t x, uint32_t y, uint32_t z)
+{
+  return FREIA_OK;
+}
+
+freia_status freia_common_rx_image(freia_data2d * img, freia_dataio * in)
+{
+  img->stuff = in;
+  return FREIA_OK;
+}
+
+freia_status freia_common_tx_image(freia_data2d * img, freia_dataio * out)
+{
+  out = img->stuff;
+  return FREIA_OK;
+}
+
+freia_status freia_common_close_input(freia_data2d * n)
+{
+  return FREIA_OK;
+}
+
+freia_status freia_common_close_output(freia_data2d * n)
+{
+  return FREIA_OK;
+}
+
 #define Fbin(name)						\
   freia_status							\
   name(freia_data2d * o, freia_data2d * i0, freia_data2d * i1)	\
