@@ -762,18 +762,18 @@ dead_statement_rewrite(statement s)
           end of the function: */
        break;
 
-   case is_instruction_loop:   
+   case is_instruction_loop:
    case is_instruction_whileloop:
        break;
-    
-   case is_instruction_test: 
+
+   case is_instruction_test:
    {
        statement st_true, st_false;
        test te;
 
        pips_debug(2, "is_instruction_test\n\n");
        stdebug(9, "dead_statement_rewrite: test", s);
-    
+
        te = instruction_test(i);
        st_true = test_true(te);
        st_false = test_false(te);
@@ -783,7 +783,7 @@ dead_statement_rewrite(statement s)
 	    an unstructured. */
 	 pips_debug(2, "test deletion\n");
 	 stdebug(9, "dead_statement_rewrite: ", s);
-	 
+
 	 remove_if_statement_according_to_write_effects
 	   (s, FALSE /* structured if */);
        }
@@ -791,11 +791,14 @@ dead_statement_rewrite(statement s)
    }
 
    case is_instruction_unstructured:
-       /* Rely on the unspaghettify() at end: */
-       break;
+     /* Rely on the unspaghettify() at end: */
+     break;
 
    case is_instruction_call:
-       break;
+     break;
+
+   case is_instruction_expression:
+     break;
 
    default:
        pips_error("", "Unexpected instruction tag %d\n", t);
@@ -804,7 +807,7 @@ dead_statement_rewrite(statement s)
 
    /* If we have now a sequence, clean it up: */
    clean_up_sequences_internal(s);
-   
+
    pips_debug(2, "End for statement %d (%d, %d)\n",
 	      statement_number(s),
 	      ORDERING_NUMBER(statement_ordering(s)),
