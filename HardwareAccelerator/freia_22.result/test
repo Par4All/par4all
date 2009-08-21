@@ -130,7 +130,7 @@ freia_status freia_22_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, freia_d
 
 
   // STAGE 2
-  // i0 [1 input 0] -> [2 alu] 11 addsat
+  // i0 [1 poc 0] -> [2 alu] 11 addsat
   si.mux[1][0].op = SPOC_MUX_IN0;
   // i0 [2 input 0] -> [2 alu] 11 addsat
   // nope
