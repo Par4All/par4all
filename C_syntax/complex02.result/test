@@ -14,7 +14,7 @@ Variable list:
 	Declared entity "complex02:*STACK*" with type "area" with size 0
 	Declared entity "complex02:*STATIC*" with type "area" with size 0
 	Declared entity "complex02:0`__FUNCTION__" with type "variable" "char"
-	Declared entity "complex02:0`__function__" with type "variable" "char"
+	Declared entity "complex02:0`__func__" with type "variable" "char"
 	Declared entity "complex02:0`x1" with type "variable" "_Complex"
 	Declared entity "complex02:0`x2" with type "variable" "float _Complex"
 	Declared entity "complex02:0`x3" with type "variable" "double _Complex"
@@ -38,8 +38,8 @@ Layout for memory area "complex02:*DYNAMIC*" of size 68:
 	Variable "complex02:0`x2"	offset = 28	size = 8
 	Variable "complex02:0`x3"	offset = 36	size = 16
 	Variable "complex02:0`x4"	offset = 52	size = 16
-	Variable "complex02:0`__FUNCTION__"	offset = 0	size = 10
-	Variable "complex02:0`__function__"	offset = 10	size = 10
+	Variable "complex02:0`__func__"	offset = 0	size = 10
+	Variable "complex02:0`__FUNCTION__"	offset = 10	size = 10
 
 
 Layout for memory area "complex02:*HEAP*" of size 0:

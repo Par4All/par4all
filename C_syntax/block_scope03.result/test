@@ -15,7 +15,7 @@ Variable list:
 	Declared entity "main:*STATIC*" with type "area" with size 0
 	Declared entity "main:0`1`x" with type "variable" "int"
 	Declared entity "main:0`__FUNCTION__" with type "variable" "char"
-	Declared entity "main:0`__function__" with type "variable" "char"
+	Declared entity "main:0`__func__" with type "variable" "char"
 	Declared entity "main:0`x" with type "variable" "int"
 	Declared entity "main:0`z" with type "variable" "int"
 	Declared entity "main:main" with type "variable" "int"
@@ -41,8 +41,8 @@ Layout for memory area "main:*DYNAMIC*" of size 22:
 	Variable "main:0`x"	offset = 10	size = 4
 	Variable "main:0`z"	offset = 14	size = 4
 	Variable "main:0`1`x"	offset = 18	size = 4
-	Variable "main:0`__FUNCTION__"	offset = 0	size = 5
-	Variable "main:0`__function__"	offset = 5	size = 5
+	Variable "main:0`__func__"	offset = 0	size = 5
+	Variable "main:0`__FUNCTION__"	offset = 5	size = 5
 
 
 Layout for memory area "main:*HEAP*" of size 0:

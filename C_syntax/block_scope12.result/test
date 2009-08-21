@@ -18,7 +18,7 @@ Variable list:
 	Declared entity "block_scope12!block_scope12:0`x" with type "variable" "int"
 	Declared entity "block_scope12!block_scope12:block_scope12!block_scope12" with type "variable" "int"
 	Declared entity "block_scope12:0`__FUNCTION__" with type "variable" "char"
-	Declared entity "block_scope12:0`__function__" with type "variable" "char"
+	Declared entity "block_scope12:0`__func__" with type "variable" "char"
 
 * empty extern declaration list *
 
@@ -47,8 +47,8 @@ Layout for memory area "block_scope12!:*STATIC*" of size 0:
 Layout for memory area "block_scope12!block_scope12:*DYNAMIC*" of size 36:
 	Variable "block_scope12!block_scope12:0`x"	offset = 28	size = 4
 	Variable "block_scope12!block_scope12:0`1`x"	offset = 32	size = 4
-	Variable "block_scope12:0`__FUNCTION__"	offset = 0	size = 14
-	Variable "block_scope12:0`__function__"	offset = 14	size = 14
+	Variable "block_scope12:0`__func__"	offset = 0	size = 14
+	Variable "block_scope12:0`__FUNCTION__"	offset = 14	size = 14
 
 
 Layout for memory area "block_scope12!block_scope12:*HEAP*" of size 0:

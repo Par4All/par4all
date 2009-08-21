@@ -11,7 +11,7 @@ Variable list:
 	Declared entity "nodecls:*STACK*" with type "area" with size 0
 	Declared entity "nodecls:*STATIC*" with type "area" with size 0
 	Declared entity "nodecls:0`__FUNCTION__" with type "variable" "char"
-	Declared entity "nodecls:0`__function__" with type "variable" "char"
+	Declared entity "nodecls:0`__func__" with type "variable" "char"
 	Declared entity "nodeclsfunc!:*STATIC*" with type "area" with size 0
 
 * empty extern declaration list *
@@ -24,8 +24,8 @@ Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
 
 
 Layout for memory area "nodecls:*DYNAMIC*" of size 16:
-	Variable "nodecls:0`__FUNCTION__"	offset = 0	size = 8
-	Variable "nodecls:0`__function__"	offset = 8	size = 8
+	Variable "nodecls:0`__func__"	offset = 0	size = 8
+	Variable "nodecls:0`__FUNCTION__"	offset = 8	size = 8
 
 
 Layout for memory area "nodecls:*HEAP*" of size 0:

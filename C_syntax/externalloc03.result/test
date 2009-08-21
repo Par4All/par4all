@@ -12,7 +12,7 @@ Variable list:
 	Declared entity "main:*STACK*" with type "area" with size 0
 	Declared entity "main:*STATIC*" with type "area" with size 0
 	Declared entity "main:0`__FUNCTION__" with type "variable" "char"
-	Declared entity "main:0`__function__" with type "variable" "char"
+	Declared entity "main:0`__func__" with type "variable" "char"
 	Declared entity "main:0`i" with type "variable" "int"
 	Declared entity "main:argc" with type "variable" "int"
 	Declared entity "main:argv" with type "variable" "char *"
@@ -43,8 +43,8 @@ Layout for memory area "externalloc03!:*STATIC*" of size 0:
 
 Layout for memory area "main:*DYNAMIC*" of size 14:
 	Variable "main:0`i"	offset = 10	size = 4
-	Variable "main:0`__FUNCTION__"	offset = 0	size = 5
-	Variable "main:0`__function__"	offset = 5	size = 5
+	Variable "main:0`__func__"	offset = 0	size = 5
+	Variable "main:0`__FUNCTION__"	offset = 5	size = 5
 
 
 Layout for memory area "main:*HEAP*" of size 0:

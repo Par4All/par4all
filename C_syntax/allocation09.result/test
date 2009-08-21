@@ -14,7 +14,7 @@ Variable list:
 	Declared entity "allocation09:*STACK*" with type "area" with size 0
 	Declared entity "allocation09:*STATIC*" with type "area" with size 0
 	Declared entity "allocation09:0`__FUNCTION__" with type "variable" "char"
-	Declared entity "allocation09:0`__function__" with type "variable" "char"
+	Declared entity "allocation09:0`__func__" with type "variable" "char"
 	Declared entity "allocation09:0`a" with type "variable" "char"
 	Declared entity "allocation09:0`b" with type "variable" "short"
 	Declared entity "allocation09:0`c" with type "variable" "int"
@@ -65,8 +65,8 @@ Layout for memory area "allocation09:*DYNAMIC*" of size 83:
 	Variable "allocation09:0`sc"	offset = 67	size = 4
 	Variable "allocation09:0`sd"	offset = 71	size = 4
 	Variable "allocation09:0`se"	offset = 75	size = 8
-	Variable "allocation09:0`__FUNCTION__"	offset = 0	size = 13
-	Variable "allocation09:0`__function__"	offset = 13	size = 13
+	Variable "allocation09:0`__func__"	offset = 0	size = 13
+	Variable "allocation09:0`__FUNCTION__"	offset = 13	size = 13
 
 
 Layout for memory area "allocation09:*HEAP*" of size 0:

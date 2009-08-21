@@ -75,7 +75,7 @@ Variable list:
 
 	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
 	Declared entity "foo:0`__FUNCTION__" with type "variable" "char"
-	Declared entity "foo:0`__function__" with type "variable" "char"
+	Declared entity "foo:0`__func__" with type "variable" "char"
 	Declared entity "static_function!:*STATIC*" with type "area" with size 0
 	Declared entity "static_function!foo:*DYNAMIC*" with type "area" with size 12
 	Declared entity "static_function!foo:*HEAP*" with type "area" with size 0
@@ -103,8 +103,8 @@ Layout for memory area "static_function!:*STATIC*" of size 0:
 
 Layout for memory area "static_function!foo:*DYNAMIC*" of size 12:
 	Variable "static_function!foo:0`i"	offset = 8	size = 4
-	Variable "foo:0`__FUNCTION__"	offset = 0	size = 4
-	Variable "foo:0`__function__"	offset = 4	size = 4
+	Variable "foo:0`__func__"	offset = 0	size = 4
+	Variable "foo:0`__FUNCTION__"	offset = 4	size = 4
 
 
 Layout for memory area "static_function!foo:*HEAP*" of size 0:

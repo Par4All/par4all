@@ -69,7 +69,7 @@ Variable list:
 	Declared entity "generate08:*STACK*" with type "area" with size 0
 	Declared entity "generate08:*STATIC*" with type "area" with size 0
 	Declared entity "generate08:0`__FUNCTION__" with type "variable" "char"
-	Declared entity "generate08:0`__function__" with type "variable" "char"
+	Declared entity "generate08:0`__func__" with type "variable" "char"
 	Declared entity "generate08:0`t" with type "variable" "sem_t"
 
 * empty extern declaration list *
@@ -87,8 +87,8 @@ Layout for memory area "generate08!:*STATIC*" of size 0:
 
 Layout for memory area "generate08:*DYNAMIC*" of size 35:
 	Variable "generate08:0`t"	offset = 22	size = 13
-	Variable "generate08:0`__FUNCTION__"	offset = 0	size = 11
-	Variable "generate08:0`__function__"	offset = 11	size = 11
+	Variable "generate08:0`__func__"	offset = 0	size = 11
+	Variable "generate08:0`__FUNCTION__"	offset = 11	size = 11
 
 
 Layout for memory area "generate08:*HEAP*" of size 0:

@@ -15,7 +15,7 @@ Variable list:
 	Declared entity "decl01:*STATIC*" with type "area" with size 0
 	Declared entity "decl01:0`#c" with type "struct" 
 	Declared entity "decl01:0`__FUNCTION__" with type "variable" "char"
-	Declared entity "decl01:0`__function__" with type "variable" "char"
+	Declared entity "decl01:0`__func__" with type "variable" "char"
 	Declared entity "decl01:0`x" with type "variable" "struct c "
 	Declared entity "decl01:0`y" with type "variable" "struct c  *"
 	Declared entity "decl01:dir" with type "variable" "char *"
@@ -40,8 +40,8 @@ Layout for memory area "decl01!:*STATIC*" of size 0:
 Layout for memory area "decl01:*DYNAMIC*" of size 30:
 	Variable "decl01:0`y"	offset = 14	size = 4
 	Variable "decl01:0`x"	offset = 18	size = 12
-	Variable "decl01:0`__FUNCTION__"	offset = 0	size = 7
-	Variable "decl01:0`__function__"	offset = 7	size = 7
+	Variable "decl01:0`__func__"	offset = 0	size = 7
+	Variable "decl01:0`__FUNCTION__"	offset = 7	size = 7
 
 
 Layout for memory area "decl01:*HEAP*" of size 0:
