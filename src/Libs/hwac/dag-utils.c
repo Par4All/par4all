@@ -174,7 +174,7 @@ void dag_dump(FILE * out, string what, dag d)
 
 // #define IMG_DEP " [arrowhead=normal]"
 #define IMG_DEP ""
-#define SCL_DEP " [arrowhead=empty]"
+#define SCL_DEP "arrowhead=empty"
 
 static string entity_dot_name(entity e)
 {
@@ -207,12 +207,27 @@ static void dagvtx_dot(FILE * out, dag d, dagvtx vtx)
 
     // scalar dependencies anywhere... hmmm...
     FOREACH(dagvtx, v, dag_vertices(d))
-      if (vtx!=v && freia_simple_scalar_rw_dependency
-	  (dagvtx_statement(vtx), dagvtx_statement(v)))
+    {
+      list vars = NIL;
+      if (vtx!=v && freia_scalar_rw_dep(dagvtx_statement(vtx),
+					dagvtx_statement(v), &vars))
+      {
 	fprintf(out,
-		"  \"%" _intFMT " %s\" -> \"%" _intFMT " %s\"" SCL_DEP ";\n",
+		"  \"%" _intFMT " %s\" -> \"%" _intFMT " %s\" [" SCL_DEP,
 		dagvtx_number(vtx), dagvtx_compact_operation(vtx),
 		dagvtx_number(v), dagvtx_compact_operation(v));
+	if (vars && show_arcs)
+	{
+	  int count = 0;
+	  fprintf(out, ",label=\"");
+	  FOREACH(entity, var, vars)
+	    fprintf(out, "%s%s", count++? " ": "", entity_dot_name(var));
+	  fprintf(out, "\"");
+	}
+	fprintf(out, "];\n");
+      }
+      gen_free_list(vars), vars = NIL;
+    }
   }
   else
   {
@@ -247,7 +262,7 @@ void dag_dot(FILE * out, string what, dag d)
     dagvtx_dot(out, d, vx);
     vtxcontent c = dagvtx_content(vx);
 
-    // outputs arcs
+    // outputs arcs for vx
     if (gen_in_list_p(vx, dag_outputs(d)))
       fprintf(out, "  \"%" _intFMT " %s\" -> \"%s\";\n",
 	      dagvtx_number(vx), dagvtx_compact_operation(vx),

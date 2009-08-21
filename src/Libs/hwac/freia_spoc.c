@@ -378,7 +378,7 @@ typedef struct {
   spoc_hardware_type level;  // nope | input < poc < alu < threshold < measure
   int side;  // 0 or 1
   bool flip; // whether alu op is flipped
-  int used; // bitfield to tell which image are used 0 1 2 3
+  bool used; // whether the image has been used by an output
 }  op_schedule;
 
 static void init_op_schedule(op_schedule * op, entity img, int side)
@@ -389,6 +389,7 @@ static void init_op_schedule(op_schedule * op, entity img, int side)
   op->level = spoc_type_inp;
   op->side = side;
   op->flip = false;
+  op->used = false;
 }
 
 static int max_stage(const op_schedule * in0, const op_schedule * in1)
@@ -432,21 +433,30 @@ static bool image_is_needed(entity img, dag d, set todo)
   return needed;
 }
 
-static void print_op_schedule(FILE *, string, const op_schedule *);
+// debug
+static void
+print_op_schedule(FILE * out, const string name, const op_schedule * op)
+{
+  fprintf(out, "sched '%s' = %s (%" _intFMT " %s) %d %s %d %s %sused\n",
+	  name,
+	  op->image? entity_local_name(op->image): "NULL",
+	  dagvtx_number(op->producer),
+	  dagvtx_operation(op->producer),
+	  op->stage, what_operation(op->level), op->side,
+	  (op->level==spoc_type_alu)? (op->flip? "/": "."): "",
+	  op->used? "": "not ");
+}
+
 static bool check_wiring_output(hash_table, int, int);
 
 /* tell at which stage we may cross the pipeline.
  */
-static int
-possible_cross_stage(int in_stage, int in_level, int out_level)
+/*
+static int possible_cross_stage(int in_stage, int in_level)
 {
-  int cross_stage = in_stage;
-  if (out_level<=in_level)
-    cross_stage++;
-  if (in_level>=spoc_type_thr && out_level<=spoc_type_poc)
-    cross_stage++;
-  return cross_stage;
+  return (in_level <= spoc_type_alu)? in_stage: in_stage+1;
 }
+*/
 
 /* depending on available images (stage %d, level, side 0/1)
  * and vertex operation to perform , tell where to perform it.
@@ -464,7 +474,7 @@ where_to_perform_operation
 {
   vtxcontent c = dagvtx_content(op);
   out->side = -100;
-  out->used = 0;
+  out->used = false;
 
   ifdebug(6) {
     pips_debug(6, "scheduling (%" _intFMT " %s) %s\n",
@@ -484,9 +494,23 @@ where_to_perform_operation
     entity measured = ENTITY(CAR(vtxcontent_inputs(c)));
     pips_assert("input image available",
 		measured==in0->image || measured==in1->image);
-    // go to the end of the stage of the image producer, on same side...
-    *out = (measured==in0->image)? *in0: *in1;
-    out->used = (measured==in0->image)? 1: 2;
+    // go to the end of the stage of the image producer,
+    // on same side...
+    if (in0->image == in1->image)
+    {
+      // we have the same image, chose closest to mes, and prefer in0
+      if (in0->level>=in1->level)
+	*out = *in0, in0->used = (in0->level!=spoc_type_mes), in1->used = false;
+      else
+	*out = *in1, in1->used = (in0->level!=spoc_type_mes), in0->used = false;
+    }
+    else // take the available one, whatever
+    {
+      if (measured==in0->image)
+	*out = *in0, in0->used = (in0->level!=spoc_type_mes), in1->used = false;
+      else
+	*out = *in1, in1->used = (in0->level!=spoc_type_mes), in0->used = false;
+    }
   }
   else
   {
@@ -499,20 +523,44 @@ where_to_perform_operation
       // I must check that the alu is not already used?!
       // So I take a safe bet...
       out->stage = max_stage(in0, in1);
-      out->used = 0;
       if (in0->image && in0->stage == out->stage && in0->level > spoc_type_alu)
 	out->stage++;
       if (in1->image && in1->stage == out->stage && in1->level > spoc_type_alu)
 	out->stage++;
+      in0->used = false, in1->used = false;
       break;
     case 1: // ANYTHING, may have to chose a side.
       {
 	entity dep = ENTITY(CAR(vtxcontent_inputs(c)));
 	pips_assert("dependence is available",
 		    dep==in0->image || dep==in1->image);
-	const op_schedule
-	  * used = dep==in0->image? in0: in1,
-	  * notused = used==in0? in1: in0;
+	op_schedule * used, * notused;
+
+	if (in0->image == in1->image)
+	{
+	  // if the same image is available,
+	  // chose the not already used one
+	  if (in0->used)
+	    used = in1, notused = in0;
+	  else if (in0->used)
+	    used = in0, notused = in1;
+	  // or the one which is already engaged on a side?
+	  else if (in0->level >= spoc_type_thr && level <= spoc_type_alu)
+	    used = in0, notused = in1;
+	  else if (in1->level >= spoc_type_thr && level <= spoc_type_alu)
+	    used = in1, notused = in0;
+	  // or the earliest one, or in0 by default
+	  else if (in1->stage<in0->stage ||
+		   (in1->stage==in0->stage && in1->level < in0->level))
+	    used = in1, notused = in0;
+	  else
+	    used = in0, notused = in1;
+	}
+	else // just take the right one
+	{
+	  used = dep==in0->image? in0: in1;
+	  notused = dep==in0->image? in1: in0;
+	}
 
 	pips_debug(7, "using %s (%d %s %d)\n",
 		   entity_local_name(used->image),
@@ -521,17 +569,42 @@ where_to_perform_operation
 	// default stage and side...
 	out->stage = used->stage;
 	out->side = used->side;
-	out->used = in0==used? 1: 2;
 
-	if (level == spoc_type_nop)
-	  // we have a copy... the operation is very light:-)
-	  level = used->level;
-	else // maybe skip to the next stage
-	  if (level <= used->level)
+	if (level != spoc_type_nop && level <= used->level)
+	  // skip to next stage if required by stage and not a copy
+	  out->stage++;
+
+	// ??? if the input image is/was needed, must include a cross
+	// because it is needed twice?
+	// but it is not needed if the other (notused) image is the same.
+	if (used->image!=notused->image &&
+	    (used->used || image_is_needed(used->image, computed, todo)))
+	{
+	  if ((used->level <= spoc_type_alu &&
+	       used->stage==out->stage && level <= spoc_type_alu) ||
+	      (used->level > spoc_type_alu &&
+	       used->stage+1==out->stage && level <= spoc_type_alu))
+	      out->stage++;
+	}
+
+	// fix output level for copy
+	if (level==spoc_type_nop)
+	  level = (used->stage==out->stage)? used->level: spoc_type_inp;
+
+	// ??? handle conflict with the other one?
+	if (notused->image &&
+	    out->stage==notused->stage &&
+	    level==notused->level)
+	{
+	  if (level==spoc_type_alu)
 	    out->stage++;
+	  else
+	    out->side = 1 - notused->side;
+	}
 
 	// ??? check if possible...
 	// ??? not really that? where to put it?
+	// should not be nessary of previous stuff worked correctly?
 	// should it be simpler?
 	// I is the right conditions?
 	if (out->stage==used->stage)
@@ -561,26 +634,9 @@ where_to_perform_operation
 	    pips_internal_error("houston, we have a problem (2)");
 	}
 
-	// ??? if the input image is still needed, must include a cross
-	if (image_is_needed(used->image, computed, todo))
-	{
-	  if (spoc_type_alu < used->level && used->stage==out->stage)
-	    out->stage++;
-	  else if (spoc_type_alu < used->level &&
-		   used->stage+1==out->stage && level < spoc_type_alu)
-	    out->stage++;
-	}
-
-	// ??? conflict with the other one?
-	if (notused->image &&
-	    out->stage==notused->stage &&
-	    level==notused->level)
-	{
-	  if (level==spoc_type_alu)
-	    out->stage++;
-	  else
-	    out->side = 1 - notused->side;
-	}
+	// tell which image was used by out
+	used->used = true;
+	notused->used = false;
       }
       break;
     case 2: // ALU
@@ -589,7 +645,8 @@ where_to_perform_operation
       if (!in0->image) *in0 = *in1;
       pips_assert("alu binary operation", level==spoc_type_alu);
       out->stage = max_stage(in0, in1);
-      out->used = 3;
+      in0->used = true;
+      in1->used = true;
       if (out->stage==in0->stage && in0->level >= spoc_type_alu)
 	out->stage++;
       if (out->stage==in1->stage && in1->level >= spoc_type_alu)
@@ -760,7 +817,11 @@ static void generate_wiring
 	  sb_app(code, "  // nope\n");
 	// ELSE thr or mes...
 	else
+	{
 	  generate_wiring_stage(code, in->stage, in->side, out->side, wiring);
+	  if (in->level == spoc_type_inp)
+	    in->level = spoc_type_poc; // the poc was passed by wiring...
+	}
 	break;
       case spoc_type_alu:
 	// out->level is after thr, so there is a side
@@ -836,12 +897,14 @@ static void generate_wiring
       }
       else
 	pips_internal_error("no available path...");
-      if (saved.level==spoc_type_alu && out->level==spoc_type_poc)
-	// we may still use the alu result for something else... others?
+      if (saved.level<=spoc_type_alu && out->level<=spoc_type_poc)
+	// we may still use the result for something else... others?
       {
 	pips_debug(7, "restoring in schedule...\n");
 	*in = saved;
       }
+      if (in->level == spoc_type_inp)
+	in->level = spoc_type_poc; // the poc was passed by wiring
       break;
     case spoc_type_thr:
     case spoc_type_mes:
@@ -1045,7 +1108,8 @@ static void freia_spoc_pipeline
     some_reductions |= vtxcontent_optype(vc)==spoc_type_mes;
 
     // there may be regressions if it is a little bit out of order...
-    if (out.stage>stage)
+    // add a comment each time a new stage is started.
+    if (out.stage!=stage)
     {
       stage = out.stage;
       sb_cat(body, "\n  // STAGE ", itoa(stage), "\n", NULL);
@@ -1053,30 +1117,63 @@ static void freia_spoc_pipeline
 
     // generate wiring, which may change flip stage on ALU operation
     // special case if in0==in1 is needed?
-    if (out.used & 1)
+    if (in0.used)
       generate_wiring(body, &in0, &out, wiring);
 
-    if (out.used & 2)
+    if (in1.used)
       generate_wiring(body, &in1, &out, wiring);
 
     // generate stage
     basic_spoc_conf(head, body, tail,
 		    out.stage, out.side, out.flip, &cst, &(api->spoc), v);
 
+
     // update status of live images
-    if (!image_is_needed(in0.image, dpipe, todo) || out.image==in0.image)
+    bool
+      in0_needed = image_is_needed(in0.image, dpipe, todo),
+      in1_needed = image_is_needed(in1.image, dpipe, todo);
+
+    // first, keep where it is...
+    if (in0.stage==out.stage && in0.level==out.level && in0.side==out.side)
       in0 = out;
-    else if (!image_is_needed(in1.image, dpipe, todo) || out.image==in1.image)
+    else if (in1.stage==out.stage && in1.level==out.level && in1.side==out.side)
       in1 = out;
+    // else overwrite not needed used image
+    else if (!in0_needed && in0.used)
+      in0 = out;
+    else if (!in1_needed && in1.used)
+      in1 = out;
+    // else, overwrite same image if not needed
+    else if (!in0_needed || out.image==in0.image)
+    {
+      if (in1.image)
+	in0 = out;
+      else
+	in1 = out; // rather keep it the available slot?
+    }
+    else if (!in1_needed || out.image==in1.image)
+    {
+      if (in0.image)
+	in1 = out;
+      else
+	in0 = out; // idem
+    }
+    // the image is available twice which is needed
     else if (in0.image && in0.image == in1.image)
     {
-      // we have the same image...
-      if (out.side==in0.side)
+      // we have the same image, overwrite the used one
+      if (in0.used)
 	in0 = out;
-      else if (out.side==in1.side)
+      else if (in1.used)
+	in1 = out;
+      // if none where used, overwrite the one on the current side
+      // ??? in0.side == -1 && in1.side==-1 ?
+      else if (in0.side == out.side)
+	in0 = out;
+      else if (in1.side == out.side)
 	in1 = out;
       else if (out.side==-1)
-	// just chose one!
+	// just choose one?
 	in0 = out;
       else
 	pips_internal_error("should not get there (same image)?");
@@ -1169,7 +1266,6 @@ static void freia_spoc_pipeline
       out = in0, in0 = in1, in1 = out;
     pips_assert("results are available", out0==in0.image && out1==in1.image);
 
-
     pips_debug(7, "out0 %s out1 %s in0(%d.%d.%d) %s in1(%d.%d.%d) %s\n",
 	       entity_local_name(out0), entity_local_name(out1),
 	       in0.stage, in0.level, in0.side, entity_local_name(in0.image),
@@ -1221,7 +1317,7 @@ static void freia_spoc_pipeline
     out.producer = NULL;
     out.level = spoc_type_out;
     out.side = out1_side;
-    out.stage = stage;
+    out.stage = out_stage;
     generate_wiring(body, &in1, &out, wiring);
   }
   else
@@ -1247,21 +1343,6 @@ static void freia_spoc_pipeline
   string_buffer_free(&head);
   string_buffer_free(&body);
   string_buffer_free(&tail);
-}
-
-/************************************************************** DAG BUILDING */
-
-// debug
-static void
-print_op_schedule(FILE * out, const string name, const op_schedule * op)
-{
-  fprintf(out, "sched '%s' = %s (%" _intFMT " %s) %d %s %d %s\n",
-	  name,
-	  op->image? entity_local_name(op->image): "NULL",
-	  dagvtx_number(op->producer),
-	  dagvtx_operation(op->producer),
-	  op->stage, what_operation(op->level), op->side,
-	  (op->level==spoc_type_alu)? (op->flip? "/": "."): "");
 }
 
 /***************************************************************** MISC UTIL */
@@ -1302,10 +1383,11 @@ static void dag_append_freia_call(dag d, statement s)
 {
   pips_debug(5, "adding statement %" _intFMT "\n", statement_number(s));
 
-  call c = freia_statement_to_call(s);
-  entity called = call_function(c);
-  if (entity_freia_api_p(called))
+  if (statement_call_p(s) &&
+      entity_freia_api_p(call_function(freia_statement_to_call(s))))
   {
+    call c = freia_statement_to_call(s);
+    entity called = call_function(c);
     const freia_api_t * api = hwac_freia_api(entity_local_name(called));
     pips_assert("some api", api!=NULL);
     list /* of entity */ args =
@@ -1399,7 +1481,7 @@ static bool any_scalar_dep(dagvtx v, set vs)
   statement target = dagvtx_statement(v);
   SET_FOREACH(dagvtx, source, vs)
   {
-    if (freia_simple_scalar_rw_dependency(dagvtx_statement(source), target))
+    if (freia_scalar_rw_dep(dagvtx_statement(source), target, NULL))
     {
       dep = true;
       break;
@@ -1419,8 +1501,7 @@ all_previous_stats_with_deps_are_computed(dag d, set computed, dagvtx v)
   {
     // all previous have been scanned
     if (pv==v) break;
-    if (freia_simple_scalar_rw_dependency
-	    (dagvtx_statement(pv), dagvtx_statement(v)) &&
+    if (freia_scalar_rw_dep(dagvtx_statement(pv), dagvtx_statement(v), NULL) &&
 	!set_belong_p(computed, pv))
     {
       okay = false;
@@ -1613,12 +1694,13 @@ static int number_of_output_arcs(set vs)
 static dagvtx first_which_may_be_added
   (dag dall,
    set current, // of dagvtx
-   list lv,     // of dagvtx
+   list lv,     // of candidate dagvtx
    set sure,    // of dagvtx
    __attribute__((unused)) set maybe)   // image entities
 {
   set inputs = set_make(set_pointer);
-  pips_assert("should be okay at first!", number_of_output_arcs(current)<=2);
+  int n_outputs = number_of_output_arcs(current);
+  pips_assert("should be okay at first!", n_outputs<=2);
 
   // output arcs from this subset
   // set outputs = output_arcs(current);
@@ -1634,8 +1716,15 @@ static dagvtx first_which_may_be_added
 
     //pips_debug(7, "vertex %"_intFMT": %d preds\n", dagvtx_number(v), npreds);
 
-    if (npreds==2 && !set_inclusion_p(sure, inputs))
-      break;
+    if (npreds==2) // binary alu operations...
+    {
+      if (!set_inclusion_p(sure, inputs))
+	continue;
+      // two lives, but the var reuse will break the pipe by hidding
+      // the other live which is not used by the computation of v.
+      if (n_outputs==2 && set_size(inputs)==1)
+	continue;
+    }
 
     set_add_element(current, current, v);
     if (number_of_output_arcs(current) <= 2)

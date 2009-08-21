@@ -591,10 +591,12 @@ static void set_add_scalars(set s, statement stat, bool written)
 }
 
 /* is there a simple scalar (no image) rw dependency from s to t?
- * when the return value is assigned, I have a problem.
- * WW deps are ignored.
+ * WW deps are ignored... should be okay of computed in order?
+ * @param s source statement
+ * @param t target statement
+ * @param vars if set, return list of scalars which hold the dependencies
  */
-bool freia_simple_scalar_rw_dependency(statement s, statement t)
+bool freia_scalar_rw_dep(statement s, statement t, list * vars)
 {
   // pips_assert("distinct statements", s!=t);
   if (s==t || !s || !t) return false;
@@ -602,9 +604,14 @@ bool freia_simple_scalar_rw_dependency(statement s, statement t)
   set reads = set_make(set_pointer), writes = set_make(set_pointer);
   set_add_scalars(writes, s, true);
   set_add_scalars(reads, t, false);
-  bool rw_dep = set_intersection_p(writes, reads);
+  set inter = set_make(set_pointer);
+  set_intersection(inter, reads, writes);
+  bool rw_dep = !set_empty_p(inter);
+  if (vars)
+    *vars = set_to_sorted_list(inter, (gen_cmp_func_t) compare_entities);
   set_free(reads);
   set_free(writes);
+  set_free(inter);
   pips_debug(8, "%" _intFMT " %sdependent from %" _intFMT "\n",
 	     statement_number(t), rw_dep? "": "in", statement_number(s));
   return rw_dep;
