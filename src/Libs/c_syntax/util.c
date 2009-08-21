@@ -160,9 +160,13 @@ void init_c_implicit_variables(entity m)
 {
   /* Function name variable __function__ and __FUNCTION__ */
   string mn = entity_user_name(m);
-  /* Should use IMPLICIT_VARIABLE_NAME_1 and IMPLICIT_VARIABLE_NAME_2 */
-  entity func_name1 = FindOrCreateEntity(mn, "0`__function__");
-  entity func_name2 = FindOrCreateEntity(mn, "0`__FUNCTION__");
+  string bs = "0`"; // first local scope in a module: should be
+		    // returned by a function to stay consistent in
+		    // case of change
+  string fn1 = strdup(concatenate(bs, IMPLICIT_VARIABLE_NAME_1, NULL));
+  string fn2 = strdup(concatenate(bs, IMPLICIT_VARIABLE_NAME_2, NULL));
+  entity func_name1 = FindOrCreateEntity(mn, fn1);
+  entity func_name2 = FindOrCreateEntity(mn, fn2);
   string name = entity_user_name(m);
   string cn = strdup(concatenate("\"", mn, "\"", NULL));
   /* cn can probably be freed after this call */
@@ -189,6 +193,9 @@ void init_c_implicit_variables(entity m)
   AddEntityToDeclarations(func_name2, m);
   /* Since the declarations are not added to a statement_declarations
      field, they are not going to be prettyprinted. */
+
+  free(fn1);
+  free(fn2);
 }
 /******************* COMPILATION UNIT **********************/
 
