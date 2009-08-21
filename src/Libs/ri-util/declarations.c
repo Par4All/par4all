@@ -2196,7 +2196,8 @@ text c_text_entities(entity module, list ldecl, int margin)
     if(!type_area_p(t)
        && ! type_statement_p(t)
        && !type_unknown_p(t)
-       && !storage_formal_p(entity_storage(e))) {
+       && !storage_formal_p(entity_storage(e))
+       && !implicit_c_variable_p(e)) {
       string n = entity_name(e);
 
       /* Dummy enum must be printed sometimes because their members

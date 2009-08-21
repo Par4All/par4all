@@ -1364,6 +1364,11 @@ the variable is unsigned, signed or not */
 #define STDERR_FILENO (2)
 #endif
 
+/* Implicit variable names for C */
+
+#define IMPLICIT_VARIABLE_NAME_1 "__FUNCTION__"
+#define IMPLICIT_VARIABLE_NAME_2 "__function__"
+
 /* Empty comments (i.e. default comments) */
 #define empty_comments string_undefined
 

@@ -160,6 +160,7 @@ void init_c_implicit_variables(entity m)
 {
   /* Function name variable __function__ and __FUNCTION__ */
   string mn = entity_user_name(m);
+  /* Should use IMPLICIT_VARIABLE_NAME_1 and IMPLICIT_VARIABLE_NAME_2 */
   entity func_name1 = FindOrCreateEntity(mn, "0`__function__");
   entity func_name2 = FindOrCreateEntity(mn, "0`__FUNCTION__");
   string name = entity_user_name(m);
@@ -168,10 +169,12 @@ void init_c_implicit_variables(entity m)
   entity fn = make_C_constant_entity(cn,
 				     is_basic_string,
 				     strlen(name)+1);
+  area a = DynamicArea; /* Should be static, but not compatible with
+			   FREIA inlining. */
 
   entity_type(func_name1) = make_char_array_type(strlen(name)+1);
   entity_storage(func_name1) =
-    make_storage_ram(make_ram(m, StaticArea, UNKNOWN_RAM_OFFSET, NIL));
+    make_storage_ram(make_ram(m, a, UNKNOWN_RAM_OFFSET, NIL));
   /* It is not clear if the encoding is correct or not. It may also
      be correct but not supported. This could be checked by computing
      the preconditions for strings and/or by adding initial values to
@@ -181,7 +184,7 @@ void init_c_implicit_variables(entity m)
 
   entity_type(func_name2) = make_char_array_type(strlen(name)+1);
   entity_storage(func_name2) =
-    make_storage_ram(make_ram(m, StaticArea, UNKNOWN_RAM_OFFSET, NIL));
+    make_storage_ram(make_ram(m, a, UNKNOWN_RAM_OFFSET, NIL));
   entity_initial(func_name2) = make_value_expression(make_call_expression(fn, NIL));
   AddEntityToDeclarations(func_name2, m);
   /* Since the declarations are not added to a statement_declarations

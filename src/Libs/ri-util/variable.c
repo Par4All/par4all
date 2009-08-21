@@ -1163,3 +1163,16 @@ entity make_new_index_entity(entity old_index, string suffix)
   AddEntityToCurrentModule(new_index);
   return(new_index);
 }
+
+bool implicit_c_variable_p(entity v)
+{
+  string vn = entity_user_name(v);
+
+
+  //  return string_equal_p(vn, IMPLICIT_VARIABLE_NAME_1)
+  //|| string_equal_p(vn, IMPLICIT_VARIABLE_NAME_2);
+
+  return strcmp(vn, IMPLICIT_VARIABLE_NAME_1) == 0
+    || strcmp(vn, IMPLICIT_VARIABLE_NAME_2) == 0;
+
+}
