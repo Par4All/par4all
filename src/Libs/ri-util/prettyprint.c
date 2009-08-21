@@ -659,7 +659,7 @@ words_assign_op(call obj,
   else if (strcmp(fun,BITWISE_XOR_UPDATE_OPERATOR_NAME) == 0)
     fun = "^=";
 
-  /* FI: space_p could be used here to cotnrol spacing around assignment */
+  /* FI: space_p could be used here to control spacing around assignment */
   pc = CHAIN_SWORD(pc," ");
   pc = CHAIN_SWORD(pc, fun);
   pc = CHAIN_SWORD(pc," ");
@@ -677,8 +677,21 @@ words_assign_op(call obj,
     else
       pc = gen_nconc(pc, words_subexpression(EXPRESSION(CAR(CDR(args))), prec, TRUE));
   }
-  else
-    pc = gen_nconc(pc, words_subexpression(EXPRESSION(CAR(CDR(args))), prec, TRUE));
+  else { /* C code */
+    /* Brace expressions are not allowed in standard assignments */
+      expression exp = EXPRESSION(CAR(CDR(args)));
+
+    if(ENTITY_ASSIGN_P(call_function(obj))) {
+      if (brace_expression_p(exp))
+	//pc = gen_nconc(pc,words_brace_expression(exp));
+	pips_user_error("Brace expressions are not allowed in assignments\n");
+      else
+	pc = gen_nconc(pc,words_expression(exp));
+    }
+    else {
+      pc = gen_nconc(pc, words_subexpression(exp, prec, TRUE));
+    }
+  }
 
   if(prec < precedence ||  (!precedence_p && precedence>0)) {
     pc = CONS(STRING, MAKE_SWORD("("), pc);
@@ -1630,7 +1643,7 @@ static struct intrinsic_handler {
     /* {"--", words_unary_minus, 19}, */
 
     {INVERSE_OPERATOR_NAME, words_inverse_op, 21},
-  
+
     {PLUS_OPERATOR_NAME, words_infix_binary_op, 20},
     {MINUS_OPERATOR_NAME, words_infix_binary_op, 20},
 
@@ -1742,7 +1755,7 @@ multiply-add operators ( JZ - sept 98) */
     {BITWISE_OR_OPERATOR_NAME, words_infix_binary_op, 11},
 
     {C_AND_OPERATOR_NAME, words_infix_binary_op, 8},
-    {C_OR_OPERATOR_NAME, words_infix_binary_op, 6},  
+    {C_OR_OPERATOR_NAME, words_infix_binary_op, 6},
 
     {MULTIPLY_UPDATE_OPERATOR_NAME, words_assign_op, 1},
     {DIVIDE_UPDATE_OPERATOR_NAME, words_assign_op, 1},
@@ -2821,12 +2834,12 @@ text_test(
 	
 	if(prettyprint_is_fortran)
 	  ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"ENDIF"));
-	
+
 	/* r = text_block_if(module, label, margin, obj, n); */
     }
-    else { 
+    else {
 	syntax c = expression_syntax(test_condition(obj));
-	
+
 	if (syntax_reference_p(c)
 	    && io_entity_p(reference_variable(syntax_reference(c)))
 	    &&  !get_bool_property("PRETTYPRINT_CHECK_IO_STATEMENTS"))
@@ -2919,11 +2932,11 @@ text_instruction(
       // local variable need to be inserted before diging the
       // unstructured graph.
       r = insert_locals (r);
-    
+
       text tmp = text_undefined;
       tmp = text_unstructured(module, label, margin,
 			      instruction_unstructured(obj), n);
-    
+
       // append the unstructured to the current text if it exists
       if ((r != text_undefined) && (r != NULL)) {
 	MERGE_TEXTS (r, tmp);
@@ -3205,7 +3218,7 @@ text text_statement_enclosed(
 	 temp = text_instruction(module, label, nmargin, i,
 				 statement_number(stmt));
       else
- 	temp = make_text(NIL);
+	temp = make_text(NIL);
    }
 
   // append local variables  that might

@@ -68,7 +68,7 @@ void print_statements(list sl)
 
 /* gen_multi_recurse callback on exiting a variable reference:
 
-   if var present in renamings, 
+   if var present in renamings,
  */
 static void rename_reference(reference r, hash_table renamings)
 {
@@ -132,7 +132,7 @@ static void rename_statement_declarations(statement s, hash_table renamings)
       if (!value_unknown_p(entity_initial(var))) {
 	expression ie = variable_initial_expression(var);
 	entity nvar = (entity)hash_get(renamings, var);
-	statement is = make_assign_statement(entity_to_expression(nvar), ie);      
+	statement is = make_assign_statement(entity_to_expression(nvar), ie);
 	// for those with an initialization X = expression
 	// create an assignement statement "X = expression" -> is
 	// append it to a list "inits"
@@ -201,6 +201,8 @@ entity make_entity_copy_with_new_name(entity e, string global_new_name)
   }
   while(gen_find_tabulated(variable_name, entity_domain)
     != entity_undefined);
+
+  //extended_integer_constant_expression_p(e)
 
   ne = make_entity(variable_name,
 		   copy_type(entity_type(e)),

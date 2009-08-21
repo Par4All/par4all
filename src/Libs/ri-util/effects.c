@@ -538,16 +538,16 @@ effect effect_interference(effect eff1, effect eff2)
 	reference r1 = effect_any_reference(eff1);
 	list ind1 = reference_indices(r1);
 	list cind1 = list_undefined;
-	
+
 	/* FI: should be very similar to reference_with_store_independent_indices()? */
-	
+
 	/* Does the write impact some indices of the read? */
 	for(cind1 = ind1; !ENDP(ind1); POP(ind1)) {
 	  expression s = EXPRESSION(CAR(cind1));
 	  list rl = NIL;
 	  list crl = list_undefined;
 	  bool interfere_p = FALSE;
-	  
+
 	  rl = expression_to_reference_list(s, rl);
 	  for(crl=rl; !ENDP(rl); POP(rl)) {
 	    reference r = REFERENCE(CAR(crl));

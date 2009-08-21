@@ -1812,7 +1812,7 @@ list words_type(type obj)
   return pc;
 }
 
-static bool brace_expression_p(expression e)
+bool c_brace_expression_p(expression e)
 {
   if (expression_call_p(e))
     {
@@ -1824,7 +1824,7 @@ static bool brace_expression_p(expression e)
 }
 
 
-static list words_brace_expression(expression exp)
+list words_brace_expression(expression exp)
 {
   list pc = NIL;
   list args = call_arguments(syntax_call(expression_syntax(exp)));
@@ -1836,7 +1836,7 @@ static list words_brace_expression(expression exp)
   {
     if (!first)
       pc = CHAIN_SWORD(pc, space_p? ", " : ",");
-    if (brace_expression_p(e))
+    if (c_brace_expression_p(e))
       pc = gen_nconc(pc,words_brace_expression(e));
     else
       pc = gen_nconc(pc,words_expression(e));

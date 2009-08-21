@@ -594,13 +594,12 @@ double float_constant_to_double(entity c)
 /* whether the given function is a constant expression, whatever the type.
  * FI -> JZ: unsigned numerical constant expression?
  */
-bool 
-expression_is_constant_p(expression e)
+bool expression_is_constant_p(expression e)
 {
     syntax s = expression_syntax(e);
 
-    return syntax_call_p(s) ? 
+    return syntax_call_p(s) ?
 	entity_constant_p(call_function(syntax_call(s))) : FALSE ;
-    
+
 }
 /* END_EOLE */
