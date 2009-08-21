@@ -480,7 +480,7 @@ reget:
      * we (may have) generated goto so unstructured is mandatory
      * because of the unstructuration, we must purge statement number
      */
-    gen_recurse(expanded,statement_domain,gen_true,fix_sequence_statement_attributes_if_sequence);
+    gen_recurse(expanded,statement_domain,gen_true,fix_statement_attributes_if_sequence);
     gen_recurse(expanded,expression_domain,gen_true,reset_expression_normalized);
     return expanded;
 }

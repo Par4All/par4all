@@ -45,6 +45,11 @@ static bool init_expression_to_index_and_initial_bound(expression init,
 						       expression * plb)
 {
   bool success = FALSE;
+  if (expression_undefined_p(init))
+    /* If the initialization part of the for is empty, useless to go
+       on... */
+    return FALSE;
+
   syntax init_s = expression_syntax(init);
 
   pips_debug(5, "Begin\n");
@@ -418,7 +423,6 @@ sequence for_to_while_loop_conversion(expression init,
 
     wlseq = make_sequence(CONS(STATEMENT, init_st,
 			       CONS(STATEMENT, wl_st, NIL)));
-
     /* Clean-up: only cond is reused */
 
     /* They cannot be freed because a debugging statement at the end of
@@ -438,6 +442,11 @@ sequence for_to_while_loop_conversion(expression init,
 				     make_instruction(is_instruction_sequence,
 						      wlseq),
 				     NIL,NULL,empty_extensions ());
+    /* Since we have replaced a statement that may have comments and
+       labels by a sequence, do not forget to forward them where they can
+       be: */
+    fix_sequence_statement_attributes(d_st);
+
 
     pips_debug(5, "End with statement:\n");
     print_statement(d_st);

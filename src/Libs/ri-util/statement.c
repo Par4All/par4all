@@ -1503,7 +1503,7 @@ insert_comments_to_statement(statement s,
  * if any from the statement to the CONTINUE, if label there is.
  */
 void
-fix_sequence_statement_attributes(statement s) 
+fix_sequence_statement_attributes(statement s)
 {
     pips_assert("Should be an instruction block...",
 		instruction_block_p(statement_instruction(s)));
@@ -1518,17 +1518,17 @@ fix_sequence_statement_attributes(statement s)
 	   CONTINUE to keep them: */
 	list instructions;
 	statement continue_s;
-	string label_name = 
+	string label_name =
 	    entity_local_name(statement_label(s)) + strlen(LABEL_PREFIX);
-   
+
 	instructions = instruction_block(statement_instruction(s));
 
 	if (strcmp(label_name, RETURN_LABEL_NAME) == 0)
 	    /* This the label of a RETURN, do not forward it: */
-	    continue_s = make_continue_statement(entity_empty_label()); 
+	    continue_s = make_continue_statement(entity_empty_label());
 	else
 	    continue_s = make_continue_statement(statement_label(s));
-	
+
 	statement_label(s) = entity_empty_label();
 	statement_comments(continue_s) = statement_comments(s);
 	statement_comments(s) = empty_comments;
@@ -1544,7 +1544,7 @@ fix_sequence_statement_attributes(statement s)
 /* Apply fix_sequence_statement_attributes() on the statement only if
    it really a sequence. */
 void
-fix_sequence_statement_attributes_if_sequence(statement s)
+fix_statement_attributes_if_sequence(statement s)
 {
     instruction i = statement_instruction(s);
     if (!instruction_undefined_p(i)) {

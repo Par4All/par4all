@@ -938,17 +938,23 @@ hash_table used_labels;
     gen_remove(&control_predecessors(c_body), c_res);
     gen_remove(&control_predecessors(c_res), c_body);
 
+    statement d_st = make_statement(statement_label(st),
+				    (!instruction_sequence_p(ni))
+				    ?statement_number(st):STATEMENT_NUMBER_UNDEFINED,
+				    STATEMENT_ORDERING_UNDEFINED,
+				    (!instruction_sequence_p(ni))
+				    ?statement_comments(st):empty_comments,
+				    ni,
+				    statement_declarations(st),
+				    statement_decls_text(st),
+				    statement_extensions(st));
+    /* Since we may have replaced a statement that may have comments and
+       labels by a sequence, do not forget to forward them where they can
+       be: */
+    fix_statement_attributes_if_sequence(d_st);
+
     UPDATE_CONTROL(c_res,
-		   make_statement(statement_label(st),
-				  (!instruction_sequence_p(ni))
-				  ?statement_number(st):STATEMENT_NUMBER_UNDEFINED,
-				  STATEMENT_ORDERING_UNDEFINED,
-				  (!instruction_sequence_p(ni))
-				  ?statement_comments(st):empty_comments,
-				  ni,
-				  statement_declarations(st),
-				  statement_decls_text(st),
-				  statement_extensions(st)),
+		   d_st,
 		   ADD_PRED(pred, c_res),
 		   ADD_SUCC(succ, c_res )) ;
     controlized = FALSE;

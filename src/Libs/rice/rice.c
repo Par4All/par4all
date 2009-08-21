@@ -212,7 +212,7 @@ statement rice_loop(statement stat,
   statement_comments(nstat) = statement_comments(stat);
   /* Do not forget to move forbidden information associated with
      block: */
-  fix_sequence_statement_attributes_if_sequence(nstat);
+  fix_statement_attributes_if_sequence(nstat);
   ifdebug(1) {
     fprintf(stderr, "final nest of loops:\n\n");
     print_parallel_statement(nstat);
