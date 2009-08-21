@@ -7225,6 +7225,19 @@ scalarization  > MODULE.code
 \end{PipsMake}
 
 
+\subsection{Flatten Code}
+
+Currently being developed by Laurent DAVERIO.
+
+\begin{PipsMake}
+alias flatten_code 'Flatten Code'
+flatten_code > MODULE.code
+        < PROGRAM.entities
+        < MODULE.code
+
+\end{PipsMake}
+
+
 %-----------End of Declaration Transformations -------------------------
 
 \section{Array Bound Checking}

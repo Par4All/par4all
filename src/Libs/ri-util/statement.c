@@ -2299,6 +2299,16 @@ list statement_to_declarations(statement s)
   return statement_to_all_included_declarations;
 }
 
+/* Get a list of all variables declared recursively within an instruction */
+list instruction_to_declarations(instruction i)
+{
+  list statement_to_all_included_declarations = NIL;
+
+  gen_context_recurse(i,&statement_to_all_included_declarations, statement_domain, add_statement_declarations, gen_null);
+
+  return statement_to_all_included_declarations;
+}
+
 static bool add_statement_referenced_entities(reference r,list *statement_to_all_included_referenced_entities)
 {
   /* Sometimes, a function may be referenced, for instance in a

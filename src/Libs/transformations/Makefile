@@ -54,6 +54,7 @@ LIB_CFILES =	\
 		for_loop_recovering.c \
 		generate_pragma.c \
 		scalarization.c \
+		flatten_code.c \
 		terapixify.c
 
 INC_TARGET =    $(TARGET).h
