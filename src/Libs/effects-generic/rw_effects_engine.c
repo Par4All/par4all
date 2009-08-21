@@ -486,12 +486,19 @@ static void rw_effects_of_expression_instruction(instruction i)
 			"pointers in data structures are ignored for the time being\n");
       rw_effects_of_application(a);
     }
+    else if (syntax_reference_p(is)) {
+      // someone typed "i;" in the code... it is allowed.
+      // let us ignore this dead code for today
+      // shoud generate a read effect on the reference?
+      // can it be safely ignored?
+      store_rw_effects_list(current_stat, NIL);
+    }
     else {
       pips_internal_error("Instruction expression case not implemented\n");
     }
 
     pips_debug(2, "Effects for expression instruction in statement%03zd\n",
-	       statement_ordering(current_stat)); 
+	       statement_ordering(current_stat));
 
   }
 }

@@ -1251,18 +1251,18 @@ proper_effects_of_call(call c)
     if (instruction_call_p(inst) && (instruction_call(inst) == c))
     {
       pips_debug(2, "Effects for statement %03zd:\n",
-		   statement_ordering(current_stat)); 
+		   statement_ordering(current_stat));
 
 	l_proper = generic_r_proper_effects_of_call(c);
 
 	l_proper = gen_nconc(l_proper, effects_dup(l_cumu_range));
-		
+
 	if (contract_p)
 	    l_proper = proper_effects_contract(l_proper);
 
 	ifdebug(2) {
 	  pips_debug(2, "Proper effects for statement %03zd:\n",
-		     statement_ordering(current_stat));  
+		     statement_ordering(current_stat));
 	  (*effects_prettyprint_func)(l_proper);
 	  pips_debug(2, "end\n");
 	}
@@ -1285,10 +1285,10 @@ static void proper_effects_of_expression_instruction(instruction i)
     syntax is = expression_syntax(ie);
     call c = call_undefined;
 
-    switch (syntax_tag(is)) 
+    switch (syntax_tag(is))
+    {
+    case is_syntax_cast :
       {
-      case is_syntax_cast :
-	{
 	expression ce = cast_expression(syntax_cast(is));
 	syntax sc = expression_syntax(ce);
 
@@ -1299,23 +1299,22 @@ static void proper_effects_of_expression_instruction(instruction i)
 	else {
 	  pips_internal_error("Cast case not implemented\n");
 	}
-	
 	break;
-	}
-      case is_syntax_call :
-	{
-	  /* This may happen when a loop is unstructured by the controlizer */
-	  c = syntax_call(is);
-	  l_proper = generic_r_proper_effects_of_call(c);
-	  break;
-	}
-      case is_syntax_application :
-	{
+      }
+    case is_syntax_call :
+      {
+	/* This may happen when a loop is unstructured by the controlizer */
+	c = syntax_call(is);
+	l_proper = generic_r_proper_effects_of_call(c);
+	break;
+      }
+    case is_syntax_application :
+      {
 	  /* This may happen when a structure field contains a pointer to
 	     a function. We do not know which function is is... */
 	  application a = syntax_application(is);
 	  expression fe = application_function(a);
-	  
+
 	  /* Effect to find which function it it */
 	  l_proper = generic_proper_effects_of_expression(fe);
 	  /* More effects should be added to take the call site into account */
@@ -1326,16 +1325,28 @@ static void proper_effects_of_expression_instruction(instruction i)
 	  pips_user_warning("Effects of call site using a function pointer in "
 			    "a structure are ignored for the time being\n");
 	  break;
-	}
-      default :
-	pips_internal_error("Instruction expression case not implemented\n");
+      }
+    case is_syntax_reference:
+      {
+	// someone typed "i;" in the code... it is allowed.
+	// let us ignore this dead code for today
+	// shoud generate a read effect on the reference?
+	store_proper_rw_effects_list(current_stat, NIL);
+	break;
+      }
+    case is_syntax_range:
+    case is_syntax_sizeofexpression:
+    case is_syntax_subscript:
+    default :
+      pips_internal_error("Instruction expression case %d not implemented\n",
+			  syntax_tag(is));
     }
-     
+
     pips_debug(2, "Effects for expression instruction in statement%03zd:\n",
-	       statement_ordering(current_stat)); 
+	       statement_ordering(current_stat));
 
     l_proper = gen_nconc(l_proper, effects_dup(l_cumu_range));
-		
+
     if (contract_p)
       l_proper = proper_effects_contract(l_proper);
     ifdebug(2) {
