@@ -98,5 +98,9 @@ missing:
 	  test -d $$res || echo "missing: $$res" >&2 ; \
 	done
 
+missing-svn:
+	@echo "# result directories not under svn"
+	@svn status | grep '\.result'
+
 count:
 	@echo "number of validations:" `echo $(F.result) | wc -w`
