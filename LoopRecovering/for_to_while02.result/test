@@ -1,0 +1,85 @@
+Select some options to deal with the C Language:
+Parse as C:
+Prettyprint the source as C, of course
+Do not display original number lines as comment:
+If possible, transform simple for-loops into do-loop à la Fortran, simpler to analyze:
+Desugaring other for-loops into plain while-loops fot the time we improve semantics ameliorations in PIPS:
+Select the most precise analysis:
+Compute the intraprocedural preconditions at the same time as
+transformers and use them to improve the accuracy of expression
+and statement transformers:
+Try to restructure the code for more precision:
+Privatize scalar variables on all the modules of the program:
+Ask for some statistics about the job to be done:
+Ask for the parallelization of all the modules of the program with OpenMP output:
+main(int argc, char *argv[])
+{
+   // BEGIN BLOCK
+   int l;
+   int m;
+   int a;
+
+#pragma omp parallel for private(a,m)
+   for(l = 0; l <= 63; l += 1) {
+      // BEGIN BLOCK
+compute:      ;
+      m = 0;
+      /* Since this for loop is desugared in a while() with an
+             initialization before, it is a sequence, thus the label which
+             cannor be associated on a sequence is put on a ";" inside the
+             sequence and this is the ";" which is outlined instead of the
+             for-loop... */
+      while (m<M) {
+         // BEGIN BLOCK
+         a = 0;
+         m = 2*m;
+         // END BLOCK
+      }
+      // END BLOCK
+   }
+   // END BLOCK
+}
+Regenerate the sources from the PIPS transformed code:
+/*
+ * file for compute.c
+ */
+void compute();
+void compute()
+{
+   // BEGIN BLOCK
+   // BEGIN BLOCK
+compute:   ;
+   // END BLOCK
+}
+/*
+ * file for for_to_while02.c
+ */
+enum {M=64};
+extern  main(int argc, char *argv[]);
+main(int argc, char *argv[])
+{
+   // BEGIN BLOCK
+   int l;
+   int m;
+   int a;
+
+#pragma omp parallel for private(a,m)
+   for(l = 0; l <= 63; l += 1) {
+      // BEGIN BLOCK
+compute:      compute();
+      m = 0;
+      /* Since this for loop is desugared in a while() with an
+             initialization before, it is a sequence, thus the label which
+             cannor be associated on a sequence is put on a ";" inside the
+             sequence and this is the ";" which is outlined instead of the
+             for-loop... */
+      while (m<M) {
+         // BEGIN BLOCK
+         a = 0;
+         m = 2*m;
+         // END BLOCK
+      }
+      // END BLOCK
+   }
+   // END BLOCK
+}
