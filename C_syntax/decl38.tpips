@@ -1,0 +1,10 @@
+delete decl38
+create decl38 decl38.c
+setproperty ABORT_ON_USER_ERROR TRUE
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
+activate C_PARSER
+display PRINTED_FILE[%ALL]
+close
+delete decl38
+quit
