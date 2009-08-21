@@ -23,9 +23,9 @@ digraph "dag_0" {
   // computation vertices
   "8 ?" [shape=none];
   "7 max" [shape=diamond];
-  "7 max" -> "8 ?" [arrowhead=empty];
+  "7 max" -> "8 ?" [arrowhead=empty,label="max2"];
   "6 max" [shape=diamond];
-  "6 max" -> "8 ?" [arrowhead=empty];
+  "6 max" -> "8 ?" [arrowhead=empty,label="max1"];
   "i" -> "7 max";
   "i" -> "6 max";
 }
@@ -39,9 +39,9 @@ digraph "dag_cleaned_0" {
   // computation vertices
   "8 ?" [shape=none];
   "7 max" [shape=diamond];
-  "7 max" -> "8 ?" [arrowhead=empty];
+  "7 max" -> "8 ?" [arrowhead=empty,label="max2"];
   "6 max" [shape=diamond];
-  "6 max" -> "8 ?" [arrowhead=empty];
+  "6 max" -> "8 ?" [arrowhead=empty,label="max1"];
   "i" -> "7 max";
   "i" -> "6 max";
 }

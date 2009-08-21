@@ -46,10 +46,10 @@ digraph "dag_0" {
   "34 <" [shape=trapezium,orientation=270];
   "34 <" -> "o";
   "33 -|" [shape=trapezium,orientation=270];
-  "33 -|" -> "34 <";
+  "33 -|" -> "34 <" [label="d0"];
   "g0" -> "33 -|";
   "32 -|" [shape=trapezium,orientation=270];
-  "32 -|" -> "34 <";
+  "32 -|" -> "34 <" [label="d1"];
   "g1" -> "33 -|";
   "g1" -> "32 -|";
   "g2" -> "32 -|";
@@ -68,10 +68,10 @@ digraph "dag_cleaned_0" {
   "34 <" [shape=trapezium,orientation=270];
   "34 <" -> "o";
   "33 -|" [shape=trapezium,orientation=270];
-  "33 -|" -> "34 <";
+  "33 -|" -> "34 <" [label="d0"];
   "g0" -> "33 -|";
   "32 -|" [shape=trapezium,orientation=270];
-  "32 -|" -> "34 <";
+  "32 -|" -> "34 <" [label="d1"];
   "g1" -> "33 -|";
   "g1" -> "32 -|";
   "g2" -> "32 -|";

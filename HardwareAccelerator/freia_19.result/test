@@ -30,7 +30,7 @@ digraph "dag_0" {
   "12 =" [shape=circle];
   "12 =" -> "o";
   "11 =" [shape=circle];
-  "11 =" -> "12 =";
+  "11 =" -> "12 =" [label="t"];
   "i" -> "11 =";
 }
 // graph for dag "dag_cleaned_0" of module "freia_19" in dot format

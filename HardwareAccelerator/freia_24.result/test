@@ -45,23 +45,23 @@ digraph "dag_0" {
   "22 +" [shape=trapezium,orientation=270];
   "22 +" -> "o";
   "21 thr" [shape=parallelogram];
-  "21 thr" -> "22 +";
+  "21 thr" -> "22 +" [label="tD"];
   "20 vol" [shape=diamond];
-  "20 vol" -> "21 thr" [arrowhead=empty];
+  "20 vol" -> "21 thr" [arrowhead=empty,label="sC"];
   "19 D8" [shape=box];
-  "19 D8" -> "21 thr";
-  "19 D8" -> "20 vol";
+  "19 D8" -> "21 thr" [label="X1"];
+  "19 D8" -> "20 vol" [label="X1"];
   "18 thr" [shape=parallelogram];
-  "18 thr" -> "22 +";
+  "18 thr" -> "22 +" [label="tC"];
   "17 min" [shape=diamond];
-  "17 min" -> "18 thr" [arrowhead=empty];
+  "17 min" -> "18 thr" [arrowhead=empty,label="sB"];
   "16 E8" [shape=box];
-  "16 E8" -> "18 thr";
-  "16 E8" -> "17 min";
+  "16 E8" -> "18 thr" [label="X0"];
+  "16 E8" -> "17 min" [label="X0"];
   "15 thr" [shape=parallelogram];
-  "15 thr" -> "19 D8";
+  "15 thr" -> "19 D8" [label="tB"];
   "14 max" [shape=diamond];
-  "14 max" -> "15 thr" [arrowhead=empty];
+  "14 max" -> "15 thr" [arrowhead=empty,label="sA"];
   "i" -> "16 E8";
   "i" -> "15 thr";
   "i" -> "14 max";
@@ -78,23 +78,23 @@ digraph "dag_cleaned_0" {
   "22 +" [shape=trapezium,orientation=270];
   "22 +" -> "o";
   "21 thr" [shape=parallelogram];
-  "21 thr" -> "22 +";
+  "21 thr" -> "22 +" [label="tD"];
   "20 vol" [shape=diamond];
-  "20 vol" -> "21 thr" [arrowhead=empty];
+  "20 vol" -> "21 thr" [arrowhead=empty,label="sC"];
   "19 D8" [shape=box];
-  "19 D8" -> "21 thr";
-  "19 D8" -> "20 vol";
+  "19 D8" -> "21 thr" [label="X1"];
+  "19 D8" -> "20 vol" [label="X1"];
   "18 thr" [shape=parallelogram];
-  "18 thr" -> "22 +";
+  "18 thr" -> "22 +" [label="tC"];
   "17 min" [shape=diamond];
-  "17 min" -> "18 thr" [arrowhead=empty];
+  "17 min" -> "18 thr" [arrowhead=empty,label="sB"];
   "16 E8" [shape=box];
-  "16 E8" -> "18 thr";
-  "16 E8" -> "17 min";
+  "16 E8" -> "18 thr" [label="X0"];
+  "16 E8" -> "17 min" [label="X0"];
   "15 thr" [shape=parallelogram];
-  "15 thr" -> "19 D8";
+  "15 thr" -> "19 D8" [label="tB"];
   "14 max" [shape=diamond];
-  "14 max" -> "15 thr" [arrowhead=empty];
+  "14 max" -> "15 thr" [arrowhead=empty,label="sA"];
   "i" -> "16 E8";
   "i" -> "15 thr";
   "i" -> "14 max";
@@ -110,7 +110,7 @@ digraph "freia_24_helper_0_0" {
   // computation vertices
   "17 min" [shape=diamond];
   "16 E8" [shape=box];
-  "16 E8" -> "17 min";
+  "16 E8" -> "17 min" [label="X0"];
   "16 E8" -> "X0";
   "14 max" [shape=diamond];
   "i" -> "16 E8";
@@ -132,10 +132,10 @@ digraph "freia_24_helper_0_1" {
   "X0" -> "18 thr";
   "20 vol" [shape=diamond];
   "19 D8" [shape=box];
-  "19 D8" -> "20 vol";
+  "19 D8" -> "20 vol" [label="X1"];
   "19 D8" -> "X1";
   "15 thr" [shape=parallelogram];
-  "15 thr" -> "19 D8";
+  "15 thr" -> "19 D8" [label="tB"];
   "i" -> "15 thr";
 }
 // graph for dag "freia_24_helper_0_2" of module "freia_24" in dot format
@@ -152,7 +152,7 @@ digraph "freia_24_helper_0_2" {
   "22 +" -> "o";
   "tC" -> "22 +";
   "21 thr" [shape=parallelogram];
-  "21 thr" -> "22 +";
+  "21 thr" -> "22 +" [label="tD"];
   "X1" -> "21 thr";
 }
 

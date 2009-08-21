@@ -55,21 +55,21 @@ digraph "dag_0" {
   "32 *" [shape=trapezium,orientation=270];
   "32 *" -> "o";
   "31 C" [shape=trapezium,orientation=270];
-  "31 C" -> "32 *";
+  "31 C" -> "32 *" [label="t7"];
   "30 &" [shape=trapezium,orientation=270];
-  "30 &" -> "32 *";
+  "30 &" -> "32 *" [label="t6"];
   "29 /." [shape=trapezium,orientation=270];
-  "29 /." -> "30 &";
+  "29 /." -> "30 &" [label="t5"];
   "28 *." [shape=trapezium,orientation=270];
-  "28 *." -> "30 &";
+  "28 *." -> "30 &" [label="t4"];
   "27 +" [shape=trapezium,orientation=270];
-  "27 +" -> "29 /.";
+  "27 +" -> "29 /." [label="t3"];
   "26 +s." [shape=trapezium,orientation=270];
-  "26 +s." -> "27 +";
+  "26 +s." -> "27 +" [label="t2"];
   "i1" -> "26 +s.";
   "25 +." [shape=trapezium,orientation=270];
-  "25 +." -> "28 *.";
-  "25 +." -> "27 +";
+  "25 +." -> "28 *." [label="t1"];
+  "25 +." -> "27 +" [label="t1"];
   "i0" -> "25 +.";
 }
 // graph for dag "dag_cleaned_0" of module "freia_03" in dot format
@@ -85,21 +85,21 @@ digraph "dag_cleaned_0" {
   "32 *" [shape=trapezium,orientation=270];
   "32 *" -> "o";
   "31 C" [shape=trapezium,orientation=270];
-  "31 C" -> "32 *";
+  "31 C" -> "32 *" [label="t7"];
   "30 &" [shape=trapezium,orientation=270];
-  "30 &" -> "32 *";
+  "30 &" -> "32 *" [label="t6"];
   "29 /." [shape=trapezium,orientation=270];
-  "29 /." -> "30 &";
+  "29 /." -> "30 &" [label="t5"];
   "28 *." [shape=trapezium,orientation=270];
-  "28 *." -> "30 &";
+  "28 *." -> "30 &" [label="t4"];
   "27 +" [shape=trapezium,orientation=270];
-  "27 +" -> "29 /.";
+  "27 +" -> "29 /." [label="t3"];
   "26 +s." [shape=trapezium,orientation=270];
-  "26 +s." -> "27 +";
+  "26 +s." -> "27 +" [label="t2"];
   "i1" -> "26 +s.";
   "25 +." [shape=trapezium,orientation=270];
-  "25 +." -> "28 *.";
-  "25 +." -> "27 +";
+  "25 +." -> "28 *." [label="t1"];
+  "25 +." -> "27 +" [label="t1"];
   "i0" -> "25 +.";
 }
 // graph for dag "freia_03_helper_0_0" of module "freia_03" in dot format
@@ -115,21 +115,21 @@ digraph "freia_03_helper_0_0" {
   "32 *" [shape=trapezium,orientation=270];
   "32 *" -> "o";
   "31 C" [shape=trapezium,orientation=270];
-  "31 C" -> "32 *";
+  "31 C" -> "32 *" [label="t7"];
   "30 &" [shape=trapezium,orientation=270];
-  "30 &" -> "32 *";
+  "30 &" -> "32 *" [label="t6"];
   "29 /." [shape=trapezium,orientation=270];
-  "29 /." -> "30 &";
+  "29 /." -> "30 &" [label="t5"];
   "28 *." [shape=trapezium,orientation=270];
-  "28 *." -> "30 &";
+  "28 *." -> "30 &" [label="t4"];
   "27 +" [shape=trapezium,orientation=270];
-  "27 +" -> "29 /.";
+  "27 +" -> "29 /." [label="t3"];
   "26 +s." [shape=trapezium,orientation=270];
-  "26 +s." -> "27 +";
+  "26 +s." -> "27 +" [label="t2"];
   "i1" -> "26 +s.";
   "25 +." [shape=trapezium,orientation=270];
-  "25 +." -> "28 *.";
-  "25 +." -> "27 +";
+  "25 +." -> "28 *." [label="t1"];
+  "25 +." -> "27 +" [label="t1"];
   "i0" -> "25 +.";
 }
 

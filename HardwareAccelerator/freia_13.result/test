@@ -32,8 +32,8 @@ digraph "dag_0" {
   "12 E8" [shape=box];
   "12 E8" -> "o0";
   "11 C" [shape=trapezium,orientation=270];
-  "11 C" -> "13 D8";
-  "11 C" -> "12 E8";
+  "11 C" -> "13 D8" [label="t"];
+  "11 C" -> "12 E8" [label="t"];
 }
 // graph for dag "dag_cleaned_0" of module "freia_13" in dot format
 digraph "dag_cleaned_0" {
@@ -49,8 +49,8 @@ digraph "dag_cleaned_0" {
   "12 E8" [shape=box];
   "12 E8" -> "o0";
   "11 C" [shape=trapezium,orientation=270];
-  "11 C" -> "13 D8";
-  "11 C" -> "12 E8";
+  "11 C" -> "13 D8" [label="t"];
+  "11 C" -> "12 E8" [label="t"];
 }
 // graph for dag "freia_13_helper_0_0" of module "freia_13" in dot format
 digraph "freia_13_helper_0_0" {
@@ -66,8 +66,8 @@ digraph "freia_13_helper_0_0" {
   "12 E8" [shape=box];
   "12 E8" -> "o0";
   "11 C" [shape=trapezium,orientation=270];
-  "11 C" -> "13 D8";
-  "11 C" -> "12 E8";
+  "11 C" -> "13 D8" [label="t"];
+  "11 C" -> "12 E8" [label="t"];
 }
 
 ! acceleration function

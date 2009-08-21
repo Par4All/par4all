@@ -32,13 +32,13 @@ digraph "dag_0" {
   "13 thr" [shape=parallelogram];
   "13 thr" -> "o";
   "12 /." [shape=trapezium,orientation=270];
-  "12 /." -> "13 thr";
+  "12 /." -> "13 thr" [label="t1"];
   "11 ?" [shape=none];
-  "11 ?" -> "13 thr" [arrowhead=empty];
+  "11 ?" -> "13 thr" [arrowhead=empty,label="seuil"];
   "10 &." [shape=trapezium,orientation=270];
-  "10 &." -> "12 /.";
+  "10 &." -> "12 /." [label="t0"];
   "9 min" [shape=diamond];
-  "9 min" -> "11 ?" [arrowhead=empty];
+  "9 min" -> "11 ?" [arrowhead=empty,label="min"];
   "i" -> "10 &.";
   "i" -> "9 min";
 }
@@ -54,13 +54,13 @@ digraph "dag_cleaned_0" {
   "13 thr" [shape=parallelogram];
   "13 thr" -> "o";
   "12 /." [shape=trapezium,orientation=270];
-  "12 /." -> "13 thr";
+  "12 /." -> "13 thr" [label="t1"];
   "11 ?" [shape=none];
-  "11 ?" -> "13 thr" [arrowhead=empty];
+  "11 ?" -> "13 thr" [arrowhead=empty,label="seuil"];
   "10 &." [shape=trapezium,orientation=270];
-  "10 &." -> "12 /.";
+  "10 &." -> "12 /." [label="t0"];
   "9 min" [shape=diamond];
-  "9 min" -> "11 ?" [arrowhead=empty];
+  "9 min" -> "11 ?" [arrowhead=empty,label="min"];
   "i" -> "10 &.";
   "i" -> "9 min";
 }
@@ -76,7 +76,7 @@ digraph "freia_skip_02_helper_0_0" {
   "12 /." [shape=trapezium,orientation=270];
   "12 /." -> "t1";
   "10 &." [shape=trapezium,orientation=270];
-  "10 &." -> "12 /.";
+  "10 &." -> "12 /." [label="t0"];
   "9 min" [shape=diamond];
   "i" -> "10 &.";
   "i" -> "9 min";

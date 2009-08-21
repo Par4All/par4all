@@ -34,15 +34,15 @@ digraph "dag_0" {
   "14 thr" [shape=parallelogram];
   "14 thr" -> "o";
   "13 ?" [shape=none];
-  "13 ?" -> "14 thr" [arrowhead=empty];
+  "13 ?" -> "14 thr" [arrowhead=empty,label="seuil"];
   "12 +." [shape=trapezium,orientation=270];
-  "12 +." -> "14 thr";
+  "12 +." -> "14 thr" [label="t1"];
   "11 ?" [shape=none];
-  "11 ?" -> "13 ?" [arrowhead=empty];
+  "11 ?" -> "13 ?" [arrowhead=empty,label="mvol"];
   "10 -." [shape=trapezium,orientation=270];
-  "10 -." -> "12 +.";
+  "10 -." -> "12 +." [label="t0"];
   "9 vol" [shape=diamond];
-  "9 vol" -> "11 ?" [arrowhead=empty];
+  "9 vol" -> "11 ?" [arrowhead=empty,label="vol"];
   "i" -> "10 -.";
   "i" -> "9 vol";
 }
@@ -58,15 +58,15 @@ digraph "dag_cleaned_0" {
   "14 thr" [shape=parallelogram];
   "14 thr" -> "o";
   "13 ?" [shape=none];
-  "13 ?" -> "14 thr" [arrowhead=empty];
+  "13 ?" -> "14 thr" [arrowhead=empty,label="seuil"];
   "12 +." [shape=trapezium,orientation=270];
-  "12 +." -> "14 thr";
+  "12 +." -> "14 thr" [label="t1"];
   "11 ?" [shape=none];
-  "11 ?" -> "13 ?" [arrowhead=empty];
+  "11 ?" -> "13 ?" [arrowhead=empty,label="mvol"];
   "10 -." [shape=trapezium,orientation=270];
-  "10 -." -> "12 +.";
+  "10 -." -> "12 +." [label="t0"];
   "9 vol" [shape=diamond];
-  "9 vol" -> "11 ?" [arrowhead=empty];
+  "9 vol" -> "11 ?" [arrowhead=empty,label="vol"];
   "i" -> "10 -.";
   "i" -> "9 vol";
 }
@@ -82,7 +82,7 @@ digraph "freia_skip_03_helper_0_0" {
   "12 +." [shape=trapezium,orientation=270];
   "12 +." -> "t1";
   "10 -." [shape=trapezium,orientation=270];
-  "10 -." -> "12 +.";
+  "10 -." -> "12 +." [label="t0"];
   "9 vol" [shape=diamond];
   "i" -> "10 -.";
   "i" -> "9 vol";

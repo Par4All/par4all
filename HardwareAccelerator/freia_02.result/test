@@ -35,9 +35,9 @@ digraph "dag_0" {
   "15 ^" [shape=trapezium,orientation=270];
   "15 ^" -> "o";
   "14 +" [shape=trapezium,orientation=270];
-  "14 +" -> "15 ^";
+  "14 +" -> "15 ^" [label="t2"];
   "13 /" [shape=trapezium,orientation=270];
-  "13 /" -> "14 +";
+  "13 /" -> "14 +" [label="t1"];
   "i0" -> "15 ^";
   "i0" -> "14 +";
   "i0" -> "13 /";
@@ -56,9 +56,9 @@ digraph "dag_cleaned_0" {
   "15 ^" [shape=trapezium,orientation=270];
   "15 ^" -> "o";
   "14 +" [shape=trapezium,orientation=270];
-  "14 +" -> "15 ^";
+  "14 +" -> "15 ^" [label="t2"];
   "13 /" [shape=trapezium,orientation=270];
-  "13 /" -> "14 +";
+  "13 /" -> "14 +" [label="t1"];
   "i0" -> "15 ^";
   "i0" -> "14 +";
   "i0" -> "13 /";
@@ -77,9 +77,9 @@ digraph "freia_02_helper_0_0" {
   "15 ^" [shape=trapezium,orientation=270];
   "15 ^" -> "o";
   "14 +" [shape=trapezium,orientation=270];
-  "14 +" -> "15 ^";
+  "14 +" -> "15 ^" [label="t2"];
   "13 /" [shape=trapezium,orientation=270];
-  "13 /" -> "14 +";
+  "13 /" -> "14 +" [label="t1"];
   "i0" -> "15 ^";
   "i0" -> "14 +";
   "i0" -> "13 /";

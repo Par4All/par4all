@@ -30,9 +30,9 @@ digraph "dag_0" {
   "11 +s" [shape=trapezium,orientation=270];
   "11 +s" -> "o";
   "10 |" [shape=trapezium,orientation=270];
-  "10 |" -> "11 +s";
+  "10 |" -> "11 +s" [label="o"];
   "9 /" [shape=trapezium,orientation=270];
-  "9 /" -> "10 |";
+  "9 /" -> "10 |" [label="o"];
   "i1" -> "9 /";
   "i0" -> "11 +s";
   "i0" -> "10 |";
@@ -52,9 +52,9 @@ digraph "dag_cleaned_0" {
   "11 +s" [shape=trapezium,orientation=270];
   "11 +s" -> "o";
   "10 |" [shape=trapezium,orientation=270];
-  "10 |" -> "11 +s";
+  "10 |" -> "11 +s" [label="o"];
   "9 /" [shape=trapezium,orientation=270];
-  "9 /" -> "10 |";
+  "9 /" -> "10 |" [label="o"];
   "i1" -> "9 /";
   "i0" -> "11 +s";
   "i0" -> "10 |";
@@ -73,9 +73,9 @@ digraph "freia_22_helper_0_0" {
   "11 +s" [shape=trapezium,orientation=270];
   "11 +s" -> "o";
   "10 |" [shape=trapezium,orientation=270];
-  "10 |" -> "11 +s";
+  "10 |" -> "11 +s" [label="o"];
   "9 /" [shape=trapezium,orientation=270];
-  "9 /" -> "10 |";
+  "9 /" -> "10 |" [label="o"];
   "i1" -> "9 /";
   "i0" -> "11 +s";
   "i0" -> "10 |";

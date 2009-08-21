@@ -30,10 +30,10 @@ digraph "dag_0" {
   "11 thr" [shape=parallelogram];
   "11 thr" -> "o";
   "10 max" [shape=diamond];
-  "10 max" -> "11 thr" [arrowhead=empty];
+  "10 max" -> "11 thr" [arrowhead=empty,label="max"];
   "9 +" [shape=trapezium,orientation=270];
-  "9 +" -> "11 thr";
-  "9 +" -> "10 max";
+  "9 +" -> "11 thr" [label="tmp"];
+  "9 +" -> "10 max" [label="tmp"];
   "i1" -> "9 +";
   "i0" -> "9 +";
 }
@@ -50,10 +50,10 @@ digraph "dag_cleaned_0" {
   "11 thr" [shape=parallelogram];
   "11 thr" -> "o";
   "10 max" [shape=diamond];
-  "10 max" -> "11 thr" [arrowhead=empty];
+  "10 max" -> "11 thr" [arrowhead=empty,label="max"];
   "9 +" [shape=trapezium,orientation=270];
-  "9 +" -> "11 thr";
-  "9 +" -> "10 max";
+  "9 +" -> "11 thr" [label="tmp"];
+  "9 +" -> "10 max" [label="tmp"];
   "i1" -> "9 +";
   "i0" -> "9 +";
 }
@@ -69,7 +69,7 @@ digraph "freia_scalar_03_helper_0_0" {
   // computation vertices
   "10 max" [shape=diamond];
   "9 +" [shape=trapezium,orientation=270];
-  "9 +" -> "10 max";
+  "9 +" -> "10 max" [label="tmp"];
   "9 +" -> "tmp";
   "i1" -> "9 +";
   "i0" -> "9 +";

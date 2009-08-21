@@ -29,11 +29,11 @@ digraph "dag_0" {
   "11 thr" [shape=parallelogram];
   "11 thr" -> "o";
   "10 ?" [shape=none];
-  "10 ?" -> "11 thr" [arrowhead=empty];
+  "10 ?" -> "11 thr" [arrowhead=empty,label="seuil"];
   "9 -." [shape=trapezium,orientation=270];
-  "9 -." -> "11 thr";
+  "9 -." -> "11 thr" [label="t"];
   "8 max" [shape=diamond];
-  "8 max" -> "10 ?" [arrowhead=empty];
+  "8 max" -> "10 ?" [arrowhead=empty,label="max"];
   "i" -> "9 -.";
   "i" -> "8 max";
 }
@@ -49,11 +49,11 @@ digraph "dag_cleaned_0" {
   "11 thr" [shape=parallelogram];
   "11 thr" -> "o";
   "10 ?" [shape=none];
-  "10 ?" -> "11 thr" [arrowhead=empty];
+  "10 ?" -> "11 thr" [arrowhead=empty,label="seuil"];
   "9 -." [shape=trapezium,orientation=270];
-  "9 -." -> "11 thr";
+  "9 -." -> "11 thr" [label="t"];
   "8 max" [shape=diamond];
-  "8 max" -> "10 ?" [arrowhead=empty];
+  "8 max" -> "10 ?" [arrowhead=empty,label="max"];
   "i" -> "9 -.";
   "i" -> "8 max";
 }

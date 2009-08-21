@@ -33,12 +33,12 @@ digraph "dag_0" {
   "16 thr" [shape=parallelogram];
   "16 thr" -> "o";
   "15 E8" [shape=box];
-  "15 E8" -> "16 thr";
+  "15 E8" -> "16 thr" [label="t2"];
   "14 max" [shape=diamond];
-  "14 max" -> "16 thr" [arrowhead=empty];
+  "14 max" -> "16 thr" [arrowhead=empty,label="max"];
   "13 +" [shape=trapezium,orientation=270];
-  "13 +" -> "15 E8";
-  "13 +" -> "14 max";
+  "13 +" -> "15 E8" [label="t1"];
+  "13 +" -> "14 max" [label="t1"];
   "i1" -> "13 +";
   "i0" -> "13 +";
 }
@@ -55,12 +55,12 @@ digraph "dag_cleaned_0" {
   "16 thr" [shape=parallelogram];
   "16 thr" -> "o";
   "15 E8" [shape=box];
-  "15 E8" -> "16 thr";
+  "15 E8" -> "16 thr" [label="t2"];
   "14 max" [shape=diamond];
-  "14 max" -> "16 thr" [arrowhead=empty];
+  "14 max" -> "16 thr" [arrowhead=empty,label="max"];
   "13 +" [shape=trapezium,orientation=270];
-  "13 +" -> "15 E8";
-  "13 +" -> "14 max";
+  "13 +" -> "15 E8" [label="t1"];
+  "13 +" -> "14 max" [label="t1"];
   "i1" -> "13 +";
   "i0" -> "13 +";
 }
@@ -78,8 +78,8 @@ digraph "freia_scalar_04_helper_0_0" {
   "15 E8" -> "t2";
   "14 max" [shape=diamond];
   "13 +" [shape=trapezium,orientation=270];
-  "13 +" -> "15 E8";
-  "13 +" -> "14 max";
+  "13 +" -> "15 E8" [label="t1"];
+  "13 +" -> "14 max" [label="t1"];
   "i1" -> "13 +";
   "i0" -> "13 +";
 }
