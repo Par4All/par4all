@@ -15,6 +15,8 @@ typedef struct {
 } freia_dataio;
 
 static const int32_t freia_morpho_kernel_8c[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+static const int32_t freia_morpho_kernel_6c[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1};
+static const int32_t freia_morpho_kernel_4c[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0};
 
 // FREIA image allocation & deallocation
 extern freia_data2d * freia_common_create_data(uint32_t, uint32_t, uint32_t);
