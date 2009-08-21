@@ -3,10 +3,6 @@
 #include <stdlib.h>
 #include "freia.h"
 
-struct __freia_data2d {
-  int32_t stuff;
-};
-
 // COMMON
 freia_data2d * freia_common_create_data(uint32_t x , uint32_t y , uint32_t z)
 {

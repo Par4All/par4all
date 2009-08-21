@@ -5,9 +5,6 @@
 // bit per pixel i->pbb
 #define BPP   (16)
 
-extern freia_status
-freia_cipo_inner_gradient(freia_data2d *, freia_data2d *, int32_t, uint32_t);
-
 freia_status
 freia_09(freia_data2d * o,
 	 freia_data2d * i0,

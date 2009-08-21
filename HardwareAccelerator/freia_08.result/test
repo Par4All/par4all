@@ -14,20 +14,20 @@ freia_status freia_08(freia_data2d *o, freia_data2d *i0, freia_data2d *i1, freia
    // T-rex motion detection
    // i0, i1, i2 are successive input images
    // the could be a loop with a pipeline
-   freia_cipo_gradient(g0, i0, connexity, size);                        /*0029*/
-   freia_cipo_gradient(g1, i1, connexity, size);                        /*0030*/
-   freia_cipo_gradient(g2, i2, connexity, size);                        /*0031*/
-   freia_aipo_absdiff(d1, g2, g1);                                      /*0032*/
-   freia_aipo_absdiff(d0, g1, g0);                                      /*0033*/
-   freia_aipo_inf(o, d1, d0);                                           /*0034*/
+   freia_cipo_gradient(g0, i0, connexity, size);                        /*0020*/
+   freia_cipo_gradient(g1, i1, connexity, size);                        /*0021*/
+   freia_cipo_gradient(g2, i2, connexity, size);                        /*0022*/
+   freia_aipo_absdiff(d1, g2, g1);                                      /*0023*/
+   freia_aipo_absdiff(d0, g1, g0);                                      /*0024*/
+   freia_aipo_inf(o, d1, d0);                                           /*0025*/
 
-   freia_common_destruct_data(g0);                                      /*0036*/
-   freia_common_destruct_data(g1);                                      /*0037*/
-   freia_common_destruct_data(g2);                                      /*0038*/
-   freia_common_destruct_data(d0);                                      /*0039*/
-   freia_common_destruct_data(d1);                                      /*0040*/
+   freia_common_destruct_data(g0);                                      /*0027*/
+   freia_common_destruct_data(g1);                                      /*0028*/
+   freia_common_destruct_data(g2);                                      /*0029*/
+   freia_common_destruct_data(d0);                                      /*0030*/
+   freia_common_destruct_data(d1);                                      /*0031*/
 
-   return FREIA_OK;                                                     /*0042*/
+   return FREIA_OK;                                                     /*0033*/
 }
 
 ! graphs
@@ -43,16 +43,16 @@ digraph "dag_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "34 <" [shape=trapezium,orientation=270];
-  "34 <" -> "o";
-  "33 -|" [shape=trapezium,orientation=270];
-  "33 -|" -> "34 <" [label="d0"];
-  "g0" -> "33 -|";
-  "32 -|" [shape=trapezium,orientation=270];
-  "32 -|" -> "34 <" [label="d1"];
-  "g1" -> "33 -|";
-  "g1" -> "32 -|";
-  "g2" -> "32 -|";
+  "25 <" [shape=trapezium,orientation=270];
+  "25 <" -> "o";
+  "24 -|" [shape=trapezium,orientation=270];
+  "24 -|" -> "25 <" [label="d0"];
+  "g0" -> "24 -|";
+  "23 -|" [shape=trapezium,orientation=270];
+  "23 -|" -> "25 <" [label="d1"];
+  "g1" -> "24 -|";
+  "g1" -> "23 -|";
+  "g2" -> "23 -|";
 }
 // graph for dag "dag_cleaned_0" of module "freia_08" in dot format
 digraph "dag_cleaned_0" {
@@ -65,16 +65,16 @@ digraph "dag_cleaned_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "34 <" [shape=trapezium,orientation=270];
-  "34 <" -> "o";
-  "33 -|" [shape=trapezium,orientation=270];
-  "33 -|" -> "34 <" [label="d0"];
-  "g0" -> "33 -|";
-  "32 -|" [shape=trapezium,orientation=270];
-  "32 -|" -> "34 <" [label="d1"];
-  "g1" -> "33 -|";
-  "g1" -> "32 -|";
-  "g2" -> "32 -|";
+  "25 <" [shape=trapezium,orientation=270];
+  "25 <" -> "o";
+  "24 -|" [shape=trapezium,orientation=270];
+  "24 -|" -> "25 <" [label="d0"];
+  "g0" -> "24 -|";
+  "23 -|" [shape=trapezium,orientation=270];
+  "23 -|" -> "25 <" [label="d1"];
+  "g1" -> "24 -|";
+  "g1" -> "23 -|";
+  "g2" -> "23 -|";
 }
 // graph for dag "freia_08_helper_0_0" of module "freia_08" in dot format
 digraph "freia_08_helper_0_0" {
@@ -86,10 +86,10 @@ digraph "freia_08_helper_0_0" {
   "d1" [shape=circle];
 
   // computation vertices
-  "32 -|" [shape=trapezium,orientation=270];
-  "32 -|" -> "d1";
-  "g1" -> "32 -|";
-  "g2" -> "32 -|";
+  "23 -|" [shape=trapezium,orientation=270];
+  "23 -|" -> "d1";
+  "g1" -> "23 -|";
+  "g2" -> "23 -|";
 }
 // graph for dag "freia_08_helper_0_1" of module "freia_08" in dot format
 digraph "freia_08_helper_0_1" {
@@ -101,10 +101,10 @@ digraph "freia_08_helper_0_1" {
   "d0" [shape=circle];
 
   // computation vertices
-  "33 -|" [shape=trapezium,orientation=270];
-  "33 -|" -> "d0";
-  "g0" -> "33 -|";
-  "g1" -> "33 -|";
+  "24 -|" [shape=trapezium,orientation=270];
+  "24 -|" -> "d0";
+  "g0" -> "24 -|";
+  "g1" -> "24 -|";
 }
 // graph for dag "freia_08_helper_0_2" of module "freia_08" in dot format
 digraph "freia_08_helper_0_2" {
@@ -116,10 +116,10 @@ digraph "freia_08_helper_0_2" {
   "o" [shape=circle];
 
   // computation vertices
-  "34 <" [shape=trapezium,orientation=270];
-  "34 <" -> "o";
-  "d0" -> "34 <";
-  "d1" -> "34 <";
+  "25 <" [shape=trapezium,orientation=270];
+  "25 <" -> "o";
+  "d0" -> "25 <";
+  "d1" -> "25 <";
 }
 
 ! acceleration function
@@ -147,11 +147,11 @@ freia_status freia_08_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, freia_d
 
 
   // STAGE 0
-  // 0`g1 [0 input 0] -> [0 alu] 32 absdiff
+  // 0`g1 [0 input 0] -> [0 alu] 23 absdiff
   // nope
-  // 0`g2 [0 input 1] -> [0 alu] 32 absdiff
+  // 0`g2 [0 input 1] -> [0 alu] 23 absdiff
   // nope
-  // alu 32 absdiff stage 0 flipped
+  // alu 23 absdiff stage 0 flipped
   si.alu[0][0].op = SPOC_ALU_ABSSUB_IN1_IN0;
 
 
@@ -197,11 +197,11 @@ freia_status freia_08_helper_0_1_0(freia_data2d * o0, freia_data2d * i0, freia_d
 
 
   // STAGE 0
-  // 0`g0 [0 input 0] -> [0 alu] 33 absdiff
+  // 0`g0 [0 input 0] -> [0 alu] 24 absdiff
   // nope
-  // 0`g1 [0 input 1] -> [0 alu] 33 absdiff
+  // 0`g1 [0 input 1] -> [0 alu] 24 absdiff
   // nope
-  // alu 33 absdiff stage 0 flipped
+  // alu 24 absdiff stage 0 flipped
   si.alu[0][0].op = SPOC_ALU_ABSSUB_IN1_IN0;
 
 
@@ -247,11 +247,11 @@ freia_status freia_08_helper_0_2_0(freia_data2d * o0, freia_data2d * i0, freia_d
 
 
   // STAGE 0
-  // 0`d0 [0 input 0] -> [0 alu] 34 inf
+  // 0`d0 [0 input 0] -> [0 alu] 25 inf
   // nope
-  // 0`d1 [0 input 1] -> [0 alu] 34 inf
+  // 0`d1 [0 input 1] -> [0 alu] 25 inf
   // nope
-  // alu 34 inf stage 0
+  // alu 25 inf stage 0
   si.alu[0][0].op = SPOC_ALU_INF_IN0_IN1;
 
 
@@ -293,18 +293,18 @@ freia_status freia_08(freia_data2d *o, freia_data2d *i0, freia_data2d *i1, freia
    // T-rex motion detection
    // i0, i1, i2 are successive input images
    // the could be a loop with a pipeline
-   freia_cipo_gradient(g0, i0, connexity, size);                        /*0029*/
-   freia_cipo_gradient(g1, i1, connexity, size);                        /*0030*/
-   freia_cipo_gradient(g2, i2, connexity, size);                        /*0031*/
-   freia_08_helper_0_0_0(d1, g1, g2);                                   /*0032*/
-   freia_08_helper_0_1_0(d0, g0, g1);                                   /*0033*/
-   freia_08_helper_0_2_0(o, d0, d1);                                    /*0034*/
+   freia_cipo_gradient(g0, i0, connexity, size);                        /*0020*/
+   freia_cipo_gradient(g1, i1, connexity, size);                        /*0021*/
+   freia_cipo_gradient(g2, i2, connexity, size);                        /*0022*/
+   freia_08_helper_0_0_0(d1, g1, g2);                                   /*0023*/
+   freia_08_helper_0_1_0(d0, g0, g1);                                   /*0024*/
+   freia_08_helper_0_2_0(o, d0, d1);                                    /*0025*/
 
-   freia_common_destruct_data(g0);                                      /*0036*/
-   freia_common_destruct_data(g1);                                      /*0037*/
-   freia_common_destruct_data(g2);                                      /*0038*/
-   freia_common_destruct_data(d0);                                      /*0039*/
-   freia_common_destruct_data(d1);                                      /*0040*/
+   freia_common_destruct_data(g0);                                      /*0027*/
+   freia_common_destruct_data(g1);                                      /*0028*/
+   freia_common_destruct_data(g2);                                      /*0029*/
+   freia_common_destruct_data(d0);                                      /*0030*/
+   freia_common_destruct_data(d1);                                      /*0031*/
 
-   return FREIA_OK;                                                     /*0042*/
+   return FREIA_OK;                                                     /*0033*/
 }
