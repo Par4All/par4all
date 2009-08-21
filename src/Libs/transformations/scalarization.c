@@ -506,75 +506,75 @@ static void statement_out(statement s)
 
 bool scalarization (char * module_name)
 {
-    entity module;
-    statement module_stat;
+  entity module;
+  statement module_stat;
 
-    set_current_module_entity(module_name_to_entity(module_name));
-    module = get_current_module_entity();
+  set_current_module_entity(module_name_to_entity(module_name));
+  module = get_current_module_entity();
  
-    set_current_module_statement( (statement)
-	     db_get_memory_resource(DBR_CODE, module_name, TRUE) );
-    module_stat = get_current_module_statement();
+  set_current_module_statement( (statement)
+				db_get_memory_resource(DBR_CODE, module_name, TRUE) );
+  module_stat = get_current_module_statement();
 
-    set_proper_rw_effects((statement_effects) 			  
-			  db_get_memory_resource(DBR_PROPER_EFFECTS, module_name, TRUE));
+  set_proper_rw_effects((statement_effects) 			  
+			db_get_memory_resource(DBR_PROPER_EFFECTS, module_name, TRUE));
 
-    set_cumulated_rw_effects((statement_effects) 
-			     db_get_memory_resource(DBR_REGIONS, module_name, TRUE));
-    //    set_cumulated_rw_effects((statement_effects) 
-    //			     db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
+  set_cumulated_rw_effects((statement_effects) 
+			   db_get_memory_resource(DBR_REGIONS, module_name, TRUE));
+  //    set_cumulated_rw_effects((statement_effects) 
+  //			     db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
 
-    module_to_value_mappings(module);
+  module_to_value_mappings(module);
   
-    set_precondition_map((statement_mapping) 
-			 db_get_memory_resource(DBR_PRECONDITIONS, module_name, TRUE));
-    set_in_effects((statement_effects)
-		   db_get_memory_resource(DBR_IN_REGIONS, module_name, TRUE));
-    set_out_effects((statement_effects)
-		    db_get_memory_resource(DBR_OUT_REGIONS, module_name, TRUE));
-    set_private_effects((statement_effects)
-			db_get_memory_resource(DBR_PRIVATIZED_REGIONS, module_name, TRUE));
-    set_copy_out_effects((statement_effects)
-			 db_get_memory_resource(DBR_COPY_OUT_REGIONS, module_name, TRUE));      
+  set_precondition_map((statement_mapping) 
+		       db_get_memory_resource(DBR_PRECONDITIONS, module_name, TRUE));
+  set_in_effects((statement_effects)
+		 db_get_memory_resource(DBR_IN_REGIONS, module_name, TRUE));
+  set_out_effects((statement_effects)
+		  db_get_memory_resource(DBR_OUT_REGIONS, module_name, TRUE));
+  set_private_effects((statement_effects)
+		      db_get_memory_resource(DBR_PRIVATIZED_REGIONS, module_name, TRUE));
+  set_copy_out_effects((statement_effects)
+		       db_get_memory_resource(DBR_COPY_OUT_REGIONS, module_name, TRUE));      
 
-    debug_on("SCALARIZATION_DEBUG_LEVEL");
-    pips_debug(1, "begin\n");
+  debug_on("SCALARIZATION_DEBUG_LEVEL");
+  pips_debug(1, "begin\n");
 
-    // ifdebug(1) print_statement(module_stat);
+  // ifdebug(1) print_statement(module_stat);
 
-    /* We now traverse our module's statements. */
-    loop_indices_b = BASE_NULLE;
-    scalarized_variables = NIL;
-    gen_recurse(module_stat, statement_domain, statement_in, statement_out);
-    scalarized_variables = list_undefined;
+  /* We now traverse our module's statements. */
+  loop_indices_b = BASE_NULLE;
+  scalarized_variables = NIL;
+  gen_recurse(module_stat, statement_domain, statement_in, statement_out);
+  scalarized_variables = list_undefined;
 
-    pips_debug(1, "end\n");
-    debug_off();
+  pips_debug(1, "end\n");
+  debug_off();
 
-    /* Save modified code to database */
-	module_reorder(module_stat);
-    DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(module_name), module_stat);
+  /* Save modified code to database */
+  module_reorder(module_stat);
+  DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(module_name), module_stat);
 
-    /* TODO: Cleanup after scalarization */
-    pips_assert("Loop index Pbase is empty", BASE_NULLE_P(loop_indices_b));
+  /* TODO: Cleanup after scalarization */
+  pips_assert("Loop index Pbase is empty", BASE_NULLE_P(loop_indices_b));
 
-    reset_current_module_entity();
-    reset_current_module_statement();
+  reset_current_module_entity();
+  reset_current_module_statement();
 
-    reset_proper_rw_effects();
-    reset_cumulated_rw_effects();
+  reset_proper_rw_effects();
+  reset_cumulated_rw_effects();
 
-    reset_precondition_map();
-    reset_in_effects();
-    reset_out_effects();
-    reset_private_effects();
-    reset_copy_out_effects();
+  reset_precondition_map();
+  reset_in_effects();
+  reset_out_effects();
+  reset_private_effects();
+  reset_copy_out_effects();
     
-    free_value_mappings();
+  free_value_mappings();
 
-    /* Return value */
-    bool good_result_p = TRUE;
+  /* Return value */
+  bool good_result_p = TRUE;
 
-    return (good_result_p);
+  return (good_result_p);
 
 }
