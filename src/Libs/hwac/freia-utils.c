@@ -247,7 +247,7 @@ static const freia_api_t FREIA_AIPO_API[] = {
 
 /* returns the index of the description of an AIPO function
  */
-static int hwac_freia_api_index(string function)
+int hwac_freia_api_index(string function)
 {
   const freia_api_t * api;
   for (api = FREIA_AIPO_API; api->function_name; api++)

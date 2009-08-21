@@ -81,6 +81,16 @@ _int dagvtx_number(const dagvtx v)
     return 0;
 }
 
+_int dagvtx_optype(const dagvtx v)
+{
+  return vtxcontent_optype(dagvtx_content(v));
+}
+
+_int dagvtx_opid(const dagvtx v)
+{
+  return vtxcontent_opid(dagvtx_content(v));
+}
+
 string dagvtx_operation(const dagvtx v)
 {
   if (v==NULL) return "null";
@@ -386,31 +396,160 @@ void dag_append_vertex(dag d, dagvtx nv)
 
 /* return target predecessors as a list.
  * the same predecessor appears twice in b = a+a
+ * build them in call order!
  */
 list dag_vertex_preds(dag d, dagvtx target)
 {
-  list preds = NIL;
   list inputs = vtxcontent_inputs(dagvtx_content(target));
+  int nins = (int) gen_length(inputs);
+  entity first_img = NULL, second_img = NULL;
+  if (nins>=1) first_img = ENTITY(CAR(inputs));
+  if (nins==2) second_img = ENTITY(CAR(CDR(inputs)));
+  dagvtx first_v = NULL, second_v = NULL;
+
   FOREACH(dagvtx, v, dag_vertices(d))
+  {
     if (v!=target && gen_in_list_p(target, dagvtx_succs(v)))
     {
-      preds = CONS(dagvtx, v, preds);
-      entity var = dagvtx_image(v);
-      if (gen_occurences(var, inputs)==2)
-	preds = CONS(dagvtx, v, preds);
+      if (dagvtx_image(v)==first_img)
+	first_v = v;
+      if (dagvtx_image(v)==second_img)
+	second_v = v;
     }
+  }
+
+  list preds = NIL;
+  if (second_v) preds = CONS(dagvtx, second_v, NIL);
+  if (first_v) preds = CONS(dagvtx, first_v, preds);
   return preds;
 }
 
-/* remove AIPO copies detected as useless.
+static bool gen_list_equals_p(const list l1, const list l2)
+{
+  bool equal = true;
+  list p1 = (list) l1, p2 = (list) l2;
+  while (equal && p1 && p2) {
+    if (CHUNK(CAR(p1))!=CHUNK(CAR(p2)))
+      equal = false;
+    p1 = CDR(p1), p2 = CDR(p2);
+  }
+  equal &= (!p1 && !p2);
+  return equal;
+}
+
+static bool same_constant_parameters(dagvtx v1, dagvtx v2)
+{
+  // ??? hmmmm...
+  return true;
+}
+
+/* replace target vertex by a copy of source results...
  */
-void dag_remove_useless_copies(dag d)
+static void
+switch_vertex_to_a_copy(dagvtx target, dagvtx source, list tpreds)
+{
+  pips_debug(5, "replacing %"_intFMT" by %"_intFMT"\n",
+	     dagvtx_number(target), dagvtx_number(source));
+
+  ifdebug(9) {
+    dagvtx_dump(stderr, "in source", source);
+    dagvtx_dump(stderr, "in target", target);
+  }
+
+  entity src_img = dagvtx_image(source);
+  // fix contents
+  vtxcontent cot = dagvtx_content(target);
+  vtxcontent_optype(cot) = spoc_type_nop;
+  vtxcontent_opid(cot) = hwac_freia_api_index("freia_aipo_copy");
+  gen_free_list(vtxcontent_inputs(cot));
+  vtxcontent_inputs(cot) = CONS(entity, src_img, NIL);
+
+  // fix vertices
+
+  FOREACH(dagvtx, v, tpreds)
+    gen_remove(&dagvtx_succs(v), target);
+
+  FOREACH(dagvtx, s, dagvtx_succs(target))
+    gen_list_patch(vtxcontent_inputs(dagvtx_content(s)),
+		   dagvtx_image(target), src_img);
+  dagvtx_succs(source) = gen_once(target, dagvtx_succs(source));
+  dagvtx_succs(source) = gen_nconc(dagvtx_succs(target), dagvtx_succs(source));
+  dagvtx_succs(target) = NIL;
+
+  // should I kill the statement? no, done by the copy removal stuff
+
+  ifdebug(9) {
+    dagvtx_dump(stderr, "out source", source);
+    dagvtx_dump(stderr, "out target", target);
+  }
+}
+
+/* remove AIPO copies detected as useless.
+ * remove identical operations...
+ */
+void dag_optimize(dag d)
 {
   set remove = set_make(set_pointer);
 
   ifdebug(4) {
     pips_debug(4, "considering dag:\n");
     dag_dump(stderr, "input", d);
+  }
+
+  // first, look for identical image operations (same inputs, same params)
+  // (that produce image, we do not care about measures)
+  // the second one is replaced by a copy.
+  // could also handle symmetries?
+
+  if (get_bool_property("FREIA_REMOVE_DUPLICATE_OPERATIONS"))
+  {
+    list vertices = gen_nreverse(gen_copy_seq(dag_vertices(d)));
+    hash_table previous = hash_table_make(hash_pointer, 10);
+
+    FOREACH(dagvtx, vr, vertices)
+    {
+      pips_debug(7, "at vertex %"_intFMT"\n", dagvtx_number(vr));
+      // skip no-operations
+      int op = (int) vtxcontent_optype(dagvtx_content(vr));
+      if (op<spoc_type_poc || op>spoc_type_thr) continue;
+
+      list preds = dag_vertex_preds(d, vr);
+      bool switched = false;
+      HASH_MAP(pp, lp,
+      {
+	dagvtx p = (dagvtx) pp;
+
+	pips_debug(6, "comparing %"_intFMT" and %"_intFMT"\n",
+		   dagvtx_number(vr), dagvtx_number(p));
+
+	// ??? maybe I should not remove all duplicates, because
+	// recomputing them may be chip?
+	if (dagvtx_optype(vr) == dagvtx_optype(p) &&
+	    dagvtx_opid(vr) == dagvtx_opid(p) &&
+	    gen_list_equals_p(preds, (list) lp) &&
+	    same_constant_parameters(vr, p))
+	{
+	  switch_vertex_to_a_copy(vr, p, preds);
+	  switched = true;
+	  break;
+	}
+      },  previous);
+
+      if (switched)
+	gen_free_list(preds);
+      else
+	hash_put(previous, vr, preds);
+    }
+
+    ifdebug(8) {
+      pips_debug(4, "after pass 1, dag:\n");
+      dag_dump(stderr, "optim 1", d);
+    }
+
+    // cleanup
+    HASH_MAP(k, v, if (v) gen_free_list(v), previous);
+    hash_table_free(previous), previous = NULL;
+    gen_free_list(vertices), vertices = NULL;
   }
 
   // only one pass is needed because we're going backwards

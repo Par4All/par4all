@@ -1926,7 +1926,7 @@ freia_spoc_compile_calls
   free(dag_name), dag_name = NULL;
 
   // remove copies if possible...
-  dag_remove_useless_copies(fulld);
+  dag_optimize(fulld);
 
   dag_name = strdup(cat("dag_cleaned_", itoa(number), NULL));
   dag_dot_dump(module, dag_name, fulld);
