@@ -26,6 +26,7 @@ freia_scalar_05(freia_data2d * o, freia_data2d * i, uint32_t * k)
   freia_common_destruct_data(X);
   freia_common_destruct_data(tB);
   freia_common_destruct_data(tC);
+  freia_common_destruct_data(tC2);
   freia_common_destruct_data(tD);
   return FREIA_OK;
 }
