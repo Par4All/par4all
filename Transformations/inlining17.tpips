@@ -100,6 +100,13 @@ apply INLINING[freia_cipo_outer_gradient]
 display PRINTED_FILE[main]
 
 echo
+echo Code after flattening of "freia_cipo_outer_gradient"
+echo
+
+apply FLATTEN_CODE[main]
+display PRINTED_FILE[main]
+
+echo
 echo Unsplit resulting code
 echo
 
