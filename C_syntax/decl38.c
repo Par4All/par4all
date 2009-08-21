@@ -3,6 +3,7 @@ void decl38 (int size)
   int i;
   int j;
   int k;
+  float x;
 
   for(i=1 ; i<size ; i++)
     ;
@@ -16,4 +17,5 @@ void decl38 (int size)
 
   for (k=1; k<size; k++)
     ;
+  x = 0;
 }
