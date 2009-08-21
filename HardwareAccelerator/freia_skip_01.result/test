@@ -111,7 +111,7 @@ freia_status freia_skip_01_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, in
 
 
   // STAGE 0
-  // i [0 input 0] -> [0 measure 0] 0 null
+  // i [0 input 0] -> [0 measure 0] 0 
   si.mux[0][0].op = SPOC_MUX_IN0;
 
 

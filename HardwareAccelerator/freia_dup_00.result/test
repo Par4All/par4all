@@ -84,10 +84,10 @@ freia_status freia_dup_00_helper_0_0_0(freia_data2d * i0, int32_t * red0, int32_
 
 
   // STAGE 0
-  // i [0 input 0] -> [0 measure 0] 0 null
+  // i [0 input 0] -> [0 measure 0] 0 
   si.mux[0][0].op = SPOC_MUX_IN0;
 
-  // i [0 measure 0] -> [0 measure 0] 0 null
+  // i [0 measure 0] -> [0 measure 0] 0 
   // nope
 
 

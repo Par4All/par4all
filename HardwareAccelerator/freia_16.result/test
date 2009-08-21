@@ -111,13 +111,13 @@ freia_status freia_16_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_d
 
 
   // STAGE 0
-  // i [0 input 0] -> [0 measure 0] 0 null
+  // i [0 input 0] -> [0 measure 0] 0 
   si.mux[0][0].op = SPOC_MUX_IN0;
 
-  // i [0 measure 0] -> [0 measure 0] 0 null
+  // i [0 measure 0] -> [0 measure 0] 0 
   // nope
 
-  // i [0 measure 0] -> [0 measure 0] 0 null
+  // i [0 measure 0] -> [0 measure 0] 0 
   // nope
 
 

@@ -1,4 +1,7 @@
 // Minimal self contained types for these headers
+#ifndef NULL
+#define NULL ((void*)0)
+#endif // NULL
 typedef enum { false, true } bool;
 typedef int int32_t;
 typedef unsigned int uint32_t; // ??? for convolution & correlation
