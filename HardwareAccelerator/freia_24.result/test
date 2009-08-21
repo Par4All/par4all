@@ -200,8 +200,7 @@ freia_status freia_24_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, int32_t
 
 
   // output image 0`X0 on 0
-  // 0`X0 [1 measure 0] -> [1 output 0] 0 null
-  // nope
+  // 0`X0 [1 poc 0] -> [1 output 0] 0 null
 
   mcode.raw = (freia_ptr) &si;
   mcode.size = sizeof(spoc_instr);
@@ -216,7 +215,7 @@ freia_status freia_24_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, int32_t
   ret |= freia_cg_write_dynamic_param(&dynparam);
 
   // actual call of spoc hardware
-  freia_cg_template_process_2i_2o(op, param, o0, NULL, i0, NULL);
+  freia_cg_template_process_2i_2o(op, param, o0, NULL, i0, i0);
 
   // get reductions
   freia_cg_read_reduction_results(&redres);

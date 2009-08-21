@@ -20,7 +20,6 @@ digraph "dag_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "8 ?" [shape=none];
   "7 -" [shape=trapezium,orientation=270];
   "7 -" -> "o";
   "i" -> "7 -";
@@ -35,7 +34,6 @@ digraph "dag_cleaned_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "8 ?" [shape=none];
   "7 -" [shape=trapezium,orientation=270];
   "7 -" -> "o";
   "i" -> "7 -";

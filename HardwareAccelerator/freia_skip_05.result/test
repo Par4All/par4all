@@ -25,7 +25,6 @@ digraph "dag_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "11 ?" [shape=none];
   "10 thr" [shape=parallelogram];
   "10 thr" -> "o";
   "9 ^." [shape=trapezium,orientation=270];
@@ -47,7 +46,6 @@ digraph "dag_cleaned_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "11 ?" [shape=none];
   "10 thr" [shape=parallelogram];
   "10 thr" -> "o";
   "9 ^." [shape=trapezium,orientation=270];
@@ -107,10 +105,10 @@ freia_status freia_skip_05_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, fr
   // STAGE 0
   // i [0 input 0] -> [0 alu] 7 sub
   // nope
-  // i [0 input 0] -> [0 alu] 7 sub
+  // i [0 input 1] -> [0 alu] 7 sub
   // nope
-  // alu 7 sub stage 0
-  si.alu[0][0].op = SPOC_ALU_SUB_IN0_IN1;
+  // alu 7 sub stage 0 flipped
+  si.alu[0][0].op = SPOC_ALU_SUB_IN1_IN0;
 
 
   // STAGE 1
@@ -152,7 +150,7 @@ freia_status freia_skip_05_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, fr
   ret |= freia_cg_write_dynamic_param(&dynparam);
 
   // actual call of spoc hardware
-  freia_cg_template_process_2i_2o(op, param, o1, o0, i0, NULL);
+  freia_cg_template_process_2i_2o(op, param, o1, o0, i0, i0);
 
   return ret;
 }

@@ -24,7 +24,6 @@ digraph "dag_0" {
   "o1" [shape=circle];
 
   // computation vertices
-  "11 ?" [shape=none];
   "9 thr" [shape=parallelogram];
   "9 thr" -> "o1";
   "8 ^" [shape=trapezium,orientation=270];
@@ -43,7 +42,6 @@ digraph "dag_cleaned_0" {
   "o1" [shape=circle];
 
   // computation vertices
-  "11 ?" [shape=none];
   "9 thr" [shape=parallelogram];
   "9 thr" -> "o1";
   "8 ^" [shape=trapezium,orientation=270];
@@ -98,24 +96,24 @@ freia_status freia_31_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_d
   // STAGE 0
   // i [0 input 0] -> [0 alu] 8 xor
   // nope
-  // i [0 input 0] -> [0 alu] 8 xor
+  // i [0 input 1] -> [0 alu] 8 xor
   // nope
   // alu 8 xor stage 0
   si.alu[0][0].op = SPOC_ALU_XOR_IN0_IN1;
 
-  // i [0 input 0] -> [0 threshold 0] 9 threshold
-  si.mux[0][0].op = SPOC_MUX_IN0;
-  // threshold 9 threshold stage 0 side 0
-  si.th[0][0].op = bin2? SPOC_TH_BINARIZE : SPOC_TH_NO_BINARIZE;
-  sp.th[0][0].boundmin = inf0;
-  sp.th[0][0].boundmax = sup1;
+  // i [0 input 1] -> [0 threshold 1] 9 threshold
+  si.mux[0][3].op = SPOC_MUX_IN1;
+  // threshold 9 threshold stage 0 side 1
+  si.th[0][1].op = bin2? SPOC_TH_BINARIZE : SPOC_TH_NO_BINARIZE;
+  sp.th[0][1].boundmin = inf0;
+  sp.th[0][1].boundmax = sup1;
 
 
-  // output image o0 on 1 and image o1 on 0
-  // o0 [0 alu] -> [0 output 1] 0 null
-  si.mux[0][1].op = SPOC_MUX_IN0;
-  si.mux[0][3].op = SPOC_MUX_IN0;
-  // o1 [0 threshold 0] -> [0 output 0] 0 null
+  // output image o0 on 0 and image o1 on 1
+  // o0 [0 alu] -> [0 output 0] 0 null
+  si.mux[0][0].op = SPOC_MUX_IN1;
+  si.mux[0][2].op = SPOC_MUX_IN0;
+  // o1 [0 threshold 1] -> [0 output 1] 0 null
   // nope
 
   mcode.raw = (freia_ptr) &si;
@@ -131,7 +129,7 @@ freia_status freia_31_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_d
   ret |= freia_cg_write_dynamic_param(&dynparam);
 
   // actual call of spoc hardware
-  freia_cg_template_process_2i_2o(op, param, o1, o0, i0, NULL);
+  freia_cg_template_process_2i_2o(op, param, o0, o1, i0, i0);
 
   return ret;
 }

@@ -22,7 +22,6 @@ digraph "dag_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "11 ?" [shape=none];
   "10 vol" [shape=diamond];
   "9 max" [shape=diamond];
   "8 min" [shape=diamond];
@@ -42,7 +41,6 @@ digraph "dag_cleaned_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "11 ?" [shape=none];
   "10 vol" [shape=diamond];
   "9 max" [shape=diamond];
   "8 min" [shape=diamond];
@@ -101,11 +99,7 @@ freia_status freia_15_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, int32_t
   // i [0 input 0] -> [0 measure 0] 0 
   si.mux[0][0].op = SPOC_MUX_IN0;
 
-  // i [0 measure 0] -> [0 measure 0] 0 
-  // nope
 
-  // i [0 measure 0] -> [0 measure 0] 0 
-  // nope
 
 
   // STAGE 1
@@ -135,7 +129,7 @@ freia_status freia_15_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, int32_t
   ret |= freia_cg_write_dynamic_param(&dynparam);
 
   // actual call of spoc hardware
-  freia_cg_template_process_2i_2o(op, param, o0, NULL, i0, NULL);
+  freia_cg_template_process_2i_2o(op, param, o0, NULL, i0, i0);
 
   // get reductions
   freia_cg_read_reduction_results(&redres);

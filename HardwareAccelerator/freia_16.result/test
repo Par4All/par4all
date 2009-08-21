@@ -24,7 +24,6 @@ digraph "dag_0" {
   "o1" [shape=circle];
 
   // computation vertices
-  "12 ?" [shape=none];
   "11 vol" [shape=diamond];
   "10 max" [shape=diamond];
   "9 min" [shape=diamond];
@@ -48,7 +47,6 @@ digraph "dag_cleaned_0" {
   "o1" [shape=circle];
 
   // computation vertices
-  "12 ?" [shape=none];
   "11 vol" [shape=diamond];
   "10 max" [shape=diamond];
   "9 min" [shape=diamond];
@@ -114,11 +112,7 @@ freia_status freia_16_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_d
   // i [0 input 0] -> [0 measure 0] 0 
   si.mux[0][0].op = SPOC_MUX_IN0;
 
-  // i [0 measure 0] -> [0 measure 0] 0 
-  // nope
 
-  // i [0 measure 0] -> [0 measure 0] 0 
-  // nope
 
 
   // STAGE 1
@@ -133,10 +127,10 @@ freia_status freia_16_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_d
 
 
   // STAGE 0
-  // i [0 poc 0] -> [0 alu] 7 add_const
+  // i [0 input 1] -> [0 alu] 7 add_const
   // nope
-  // alu 7 add_const stage 0
-  si.alu[0][0].op = SPOC_ALU_ADD_IN0_CONST;
+  // alu 7 add_const stage 0 flipped
+  si.alu[0][0].op = SPOC_ALU_ADD_IN1_CONST;
   si.alu[0][0].constant = cst4;
 
 
@@ -162,7 +156,7 @@ freia_status freia_16_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_d
   ret |= freia_cg_write_dynamic_param(&dynparam);
 
   // actual call of spoc hardware
-  freia_cg_template_process_2i_2o(op, param, o1, o0, i0, NULL);
+  freia_cg_template_process_2i_2o(op, param, o1, o0, i0, i0);
 
   // get reductions
   freia_cg_read_reduction_results(&redres);

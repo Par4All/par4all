@@ -21,11 +21,8 @@ digraph "dag_0" {
   // outputs
 
   // computation vertices
-  "8 ?" [shape=none];
   "7 max" [shape=diamond];
-  "7 max" -> "8 ?" [arrowhead=empty,label="max2"];
   "6 max" [shape=diamond];
-  "6 max" -> "8 ?" [arrowhead=empty,label="max1"];
   "i" -> "7 max";
   "i" -> "6 max";
 }
@@ -37,11 +34,8 @@ digraph "dag_cleaned_0" {
   // outputs
 
   // computation vertices
-  "8 ?" [shape=none];
   "7 max" [shape=diamond];
-  "7 max" -> "8 ?" [arrowhead=empty,label="max2"];
   "6 max" [shape=diamond];
-  "6 max" -> "8 ?" [arrowhead=empty,label="max1"];
   "i" -> "7 max";
   "i" -> "6 max";
 }
@@ -87,8 +81,6 @@ freia_status freia_dup_00_helper_0_0_0(freia_data2d * i0, int32_t * red0, int32_
   // i [0 input 0] -> [0 measure 0] 0 
   si.mux[0][0].op = SPOC_MUX_IN0;
 
-  // i [0 measure 0] -> [0 measure 0] 0 
-  // nope
 
 
   // no output image
@@ -106,7 +98,7 @@ freia_status freia_dup_00_helper_0_0_0(freia_data2d * i0, int32_t * red0, int32_
   ret |= freia_cg_write_dynamic_param(&dynparam);
 
   // actual call of spoc hardware
-  freia_cg_template_process_2i_2o(op, param, NULL, NULL, i0, NULL);
+  freia_cg_template_process_2i_2o(op, param, NULL, NULL, i0, i0);
 
   // get reductions
   freia_cg_read_reduction_results(&redres);

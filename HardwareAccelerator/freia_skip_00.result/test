@@ -25,11 +25,9 @@ digraph "dag_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "10 ?" [shape=none];
   "9 ^" [shape=trapezium,orientation=270];
   "9 ^" -> "o";
   "8 ?" [shape=none];
-  "8 ?" -> "10 ?" [arrowhead=empty,label="ret"];
   "7 -s" [shape=trapezium,orientation=270];
   "7 -s" -> "9 ^" [label="t"];
   "i1" -> "7 -s";
@@ -46,11 +44,9 @@ digraph "dag_cleaned_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "10 ?" [shape=none];
   "9 ^" [shape=trapezium,orientation=270];
   "9 ^" -> "o";
   "8 ?" [shape=none];
-  "8 ?" -> "10 ?" [arrowhead=empty,label="ret"];
   "7 -s" [shape=trapezium,orientation=270];
   "7 -s" -> "9 ^" [label="t"];
   "i1" -> "7 -s";
