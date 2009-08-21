@@ -1,0 +1,11 @@
+delete inlining18
+create inlining18 inlining18.c
+setproperty ABORT_ON_USER_ERROR TRUE
+setproperty PRETTYPRINT_C_CODE TRUE
+activate C_PARSER
+display PRINTED_FILE[%ALL]
+apply INLINING[foo]
+display PRINTED_FILE[main]
+close
+delete inlining18
+quit
