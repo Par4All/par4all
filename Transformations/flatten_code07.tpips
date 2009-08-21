@@ -26,6 +26,6 @@ activate PRINT_CODE
 display PRINTED_FILE[flatten_code07]
 
 close
-delete flatten_code06
+delete flatten_code07
 quit
 
