@@ -1777,7 +1777,6 @@ words_intrinsic_call(call obj, int precedence, bool leftmost)
     struct intrinsic_handler *p = tab_intrinsic_handler;
     char *n = entity_local_name(call_function(obj));
 
-  
     while (p->name != NULL) {
 	if (strcmp(p->name, n) == 0) {
 	  return((*(p->f))(obj, precedence, leftmost));

@@ -129,14 +129,19 @@ instruction_continue_p(instruction i) {
 }
 
 
-/* Test if an instruction is a "return"
+/* Test if an instruction is a C or Fortran "return"
    Note that this function is not named "instruction_return_p" since
    it would mean return is a field of instruction ... which used to be the case :)
 */
-bool
-return_instruction_p(instruction i) {
+bool return_instruction_p(instruction i)
+{
   return native_instruction_p(i, RETURN_FUNCTION_NAME)
     || native_instruction_p(i, C_RETURN_FUNCTION_NAME);
+}
+
+bool fortran_return_instruction_p(instruction i)
+{
+  return native_instruction_p(i, RETURN_FUNCTION_NAME);
 }
 
 

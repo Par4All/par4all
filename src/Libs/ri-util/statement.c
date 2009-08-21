@@ -164,10 +164,16 @@ assignment_statement_p(statement s) {
 }
 
 
-/* Test if a statement is a "return" */
+/* Test if a statement is a C or Fortran "return" */
 bool return_statement_p(statement s) {
   instruction i = statement_instruction(s);
   return return_instruction_p(i);
+}
+
+/* Test if a statement is a Fortran "return" */
+bool fortran_return_statement_p(statement s) {
+  instruction i = statement_instruction(s);
+  return fortran_return_instruction_p(i);
 }
 
 

@@ -2424,6 +2424,10 @@ transformer any_expression_to_transformer(
 	if(basic_int_p(bv)) {
 	  tf = integer_expression_to_transformer(v, expr, pre, is_internal);
 	}
+	else if(basic_derived_p(bv)) {
+	  /* If we are here, it should be an enum type... */
+	  tf = integer_expression_to_transformer(v, expr, pre, is_internal);
+	}
 	else {
 	  pips_user_warning("Integer expression assigned to float value\n"
 			    "Apply PIPS type checker for better results\n");

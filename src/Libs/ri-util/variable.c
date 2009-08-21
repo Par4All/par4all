@@ -233,10 +233,9 @@ reset_unique_variable_numbers()
 
    @return the variable entity.
 */
-entity
-make_new_scalar_variable_with_prefix(string prefix,
-				     entity module,
-				     basic b)
+entity make_new_scalar_variable_with_prefix(string prefix,
+					    entity module,
+					    basic b)
 {
   string module_name = module_local_name(module);
   entity e;
