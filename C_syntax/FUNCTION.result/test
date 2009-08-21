@@ -10,6 +10,5 @@ printed file
 
 main()
 {
-   static char * __FUNCTION__ = "main";
    fprintf(stderr, "%s\n", __FUNCTION__);
 }

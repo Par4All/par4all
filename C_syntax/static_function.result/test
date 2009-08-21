@@ -77,10 +77,10 @@ Variable list:
 	Declared entity "foo:0`__FUNCTION__" with type "variable" "char"
 	Declared entity "foo:0`__function__" with type "variable" "char"
 	Declared entity "static_function!:*STATIC*" with type "area" with size 0
-	Declared entity "static_function!foo:*DYNAMIC*" with type "area" with size 4
+	Declared entity "static_function!foo:*DYNAMIC*" with type "area" with size 12
 	Declared entity "static_function!foo:*HEAP*" with type "area" with size 0
 	Declared entity "static_function!foo:*STACK*" with type "area" with size 0
-	Declared entity "static_function!foo:*STATIC*" with type "area" with size 8
+	Declared entity "static_function!foo:*STATIC*" with type "area" with size 0
 	Declared entity "static_function!foo:0`i" with type "variable" "float"
 	Declared entity "static_function!foo:x" with type "variable" "int"
 
@@ -101,8 +101,10 @@ Layout for memory area "static_function!:*STATIC*" of size 0:
 	* empty area *
 
 
-Layout for memory area "static_function!foo:*DYNAMIC*" of size 4:
-	Variable "static_function!foo:0`i"	offset = 0	size = 4
+Layout for memory area "static_function!foo:*DYNAMIC*" of size 12:
+	Variable "static_function!foo:0`i"	offset = 8	size = 4
+	Variable "foo:0`__FUNCTION__"	offset = 0	size = 4
+	Variable "foo:0`__function__"	offset = 4	size = 4
 
 
 Layout for memory area "static_function!foo:*HEAP*" of size 0:
@@ -113,9 +115,8 @@ Layout for memory area "static_function!foo:*STACK*" of size 0:
 	* empty area *
 
 
-Layout for memory area "static_function!foo:*STATIC*" of size 8:
-	Variable "foo:0`__FUNCTION__"	offset = 0	size = 4
-	Variable "foo:0`__function__"	offset = 4	size = 4
+Layout for memory area "static_function!foo:*STATIC*" of size 0:
+	* empty area *
 
 End of declarations for module static_function!foo
 

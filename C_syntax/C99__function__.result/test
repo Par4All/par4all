@@ -6,10 +6,10 @@ Variable list:
 
 	Declared entity "C99__function__!:*STATIC*" with type "area" with size 0
 	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
-	Declared entity "foo:*DYNAMIC*" with type "area" with size 4
+	Declared entity "foo:*DYNAMIC*" with type "area" with size 12
 	Declared entity "foo:*HEAP*" with type "area" with size 0
 	Declared entity "foo:*STACK*" with type "area" with size 0
-	Declared entity "foo:*STATIC*" with type "area" with size 8
+	Declared entity "foo:*STATIC*" with type "area" with size 0
 	Declared entity "foo:0`__FUNCTION__" with type "variable" "char"
 	Declared entity "foo:0`__function__" with type "variable" "char"
 	Declared entity "foo:0`p" with type "variable" "char *"
@@ -32,8 +32,10 @@ Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
 	* empty area *
 
 
-Layout for memory area "foo:*DYNAMIC*" of size 4:
-	Variable "foo:0`p"	offset = 0	size = 4
+Layout for memory area "foo:*DYNAMIC*" of size 12:
+	Variable "foo:0`p"	offset = 8	size = 4
+	Variable "foo:0`__FUNCTION__"	offset = 0	size = 4
+	Variable "foo:0`__function__"	offset = 4	size = 4
 
 
 Layout for memory area "foo:*HEAP*" of size 0:
@@ -44,9 +46,8 @@ Layout for memory area "foo:*STACK*" of size 0:
 	* empty area *
 
 
-Layout for memory area "foo:*STATIC*" of size 8:
-	Variable "foo:0`__FUNCTION__"	offset = 0	size = 4
-	Variable "foo:0`__function__"	offset = 4	size = 4
+Layout for memory area "foo:*STATIC*" of size 0:
+	* empty area *
 
 End of declarations for module foo
 
@@ -64,10 +65,10 @@ Variable list:
 
 	Declared entity "C99__function__!:*STATIC*" with type "area" with size 0
 	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
-	Declared entity "main:*DYNAMIC*" with type "area" with size 10
+	Declared entity "main:*DYNAMIC*" with type "area" with size 20
 	Declared entity "main:*HEAP*" with type "area" with size 0
 	Declared entity "main:*STACK*" with type "area" with size 0
-	Declared entity "main:*STATIC*" with type "area" with size 10
+	Declared entity "main:*STATIC*" with type "area" with size 0
 	Declared entity "main:0`__FUNCTION__" with type "variable" "char"
 	Declared entity "main:0`__function__" with type "variable" "char"
 	Declared entity "main:0`a" with type "variable" "char"
@@ -86,9 +87,11 @@ Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
 	* empty area *
 
 
-Layout for memory area "main:*DYNAMIC*" of size 10:
-	Variable "main:0`p"	offset = 0	size = 4
-	Variable "main:0`a"	offset = 4	size = 6
+Layout for memory area "main:*DYNAMIC*" of size 20:
+	Variable "main:0`p"	offset = 10	size = 4
+	Variable "main:0`a"	offset = 14	size = 6
+	Variable "main:0`__FUNCTION__"	offset = 0	size = 5
+	Variable "main:0`__function__"	offset = 5	size = 5
 
 
 Layout for memory area "main:*HEAP*" of size 0:
@@ -99,9 +102,8 @@ Layout for memory area "main:*STACK*" of size 0:
 	* empty area *
 
 
-Layout for memory area "main:*STATIC*" of size 10:
-	Variable "main:0`__FUNCTION__"	offset = 0	size = 5
-	Variable "main:0`__function__"	offset = 5	size = 5
+Layout for memory area "main:*STATIC*" of size 0:
+	* empty area *
 
 End of declarations for module main
 

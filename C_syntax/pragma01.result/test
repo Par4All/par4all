@@ -9,10 +9,10 @@ Variable list:
 
 	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
 	Declared entity "pragma01!:*STATIC*" with type "area" with size 0
-	Declared entity "pragma01:*DYNAMIC*" with type "area" with size 8
+	Declared entity "pragma01:*DYNAMIC*" with type "area" with size 26
 	Declared entity "pragma01:*HEAP*" with type "area" with size 0
 	Declared entity "pragma01:*STACK*" with type "area" with size 0
-	Declared entity "pragma01:*STATIC*" with type "area" with size 18
+	Declared entity "pragma01:*STATIC*" with type "area" with size 0
 	Declared entity "pragma01:0`1`j" with type "variable" "int"
 	Declared entity "pragma01:0`__FUNCTION__" with type "variable" "char"
 	Declared entity "pragma01:0`__function__" with type "variable" "char"
@@ -31,9 +31,11 @@ Layout for memory area "pragma01!:*STATIC*" of size 0:
 	* empty area *
 
 
-Layout for memory area "pragma01:*DYNAMIC*" of size 8:
-	Variable "pragma01:0`i"	offset = 0	size = 4
-	Variable "pragma01:0`1`j"	offset = 4	size = 4
+Layout for memory area "pragma01:*DYNAMIC*" of size 26:
+	Variable "pragma01:0`i"	offset = 18	size = 4
+	Variable "pragma01:0`1`j"	offset = 22	size = 4
+	Variable "pragma01:0`__FUNCTION__"	offset = 0	size = 9
+	Variable "pragma01:0`__function__"	offset = 9	size = 9
 
 
 Layout for memory area "pragma01:*HEAP*" of size 0:
@@ -44,9 +46,8 @@ Layout for memory area "pragma01:*STACK*" of size 0:
 	* empty area *
 
 
-Layout for memory area "pragma01:*STATIC*" of size 18:
-	Variable "pragma01:0`__FUNCTION__"	offset = 0	size = 9
-	Variable "pragma01:0`__function__"	offset = 9	size = 9
+Layout for memory area "pragma01:*STATIC*" of size 0:
+	* empty area *
 
 End of declarations for module pragma01
 

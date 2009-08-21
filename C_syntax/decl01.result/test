@@ -9,10 +9,10 @@ Variable list:
 
 	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
 	Declared entity "decl01!:*STATIC*" with type "area" with size 0
-	Declared entity "decl01:*DYNAMIC*" with type "area" with size 16
+	Declared entity "decl01:*DYNAMIC*" with type "area" with size 30
 	Declared entity "decl01:*HEAP*" with type "area" with size 0
 	Declared entity "decl01:*STACK*" with type "area" with size 0
-	Declared entity "decl01:*STATIC*" with type "area" with size 14
+	Declared entity "decl01:*STATIC*" with type "area" with size 0
 	Declared entity "decl01:0`#c" with type "struct" 
 	Declared entity "decl01:0`__FUNCTION__" with type "variable" "char"
 	Declared entity "decl01:0`__function__" with type "variable" "char"
@@ -37,9 +37,11 @@ Layout for memory area "decl01!:*STATIC*" of size 0:
 	* empty area *
 
 
-Layout for memory area "decl01:*DYNAMIC*" of size 16:
-	Variable "decl01:0`y"	offset = 0	size = 4
-	Variable "decl01:0`x"	offset = 4	size = 12
+Layout for memory area "decl01:*DYNAMIC*" of size 30:
+	Variable "decl01:0`y"	offset = 14	size = 4
+	Variable "decl01:0`x"	offset = 18	size = 12
+	Variable "decl01:0`__FUNCTION__"	offset = 0	size = 7
+	Variable "decl01:0`__function__"	offset = 7	size = 7
 
 
 Layout for memory area "decl01:*HEAP*" of size 0:
@@ -50,9 +52,8 @@ Layout for memory area "decl01:*STACK*" of size 0:
 	* empty area *
 
 
-Layout for memory area "decl01:*STATIC*" of size 14:
-	Variable "decl01:0`__FUNCTION__"	offset = 0	size = 7
-	Variable "decl01:0`__function__"	offset = 7	size = 7
+Layout for memory area "decl01:*STATIC*" of size 0:
+	* empty area *
 
 End of declarations for module decl01
 

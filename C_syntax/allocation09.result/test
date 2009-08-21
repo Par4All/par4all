@@ -9,10 +9,10 @@ Variable list:
 
 	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
 	Declared entity "allocation09!:*STATIC*" with type "area" with size 0
-	Declared entity "allocation09:*DYNAMIC*" with type "area" with size 57
+	Declared entity "allocation09:*DYNAMIC*" with type "area" with size 83
 	Declared entity "allocation09:*HEAP*" with type "area" with size 0
 	Declared entity "allocation09:*STACK*" with type "area" with size 0
-	Declared entity "allocation09:*STATIC*" with type "area" with size 26
+	Declared entity "allocation09:*STATIC*" with type "area" with size 0
 	Declared entity "allocation09:0`__FUNCTION__" with type "variable" "char"
 	Declared entity "allocation09:0`__function__" with type "variable" "char"
 	Declared entity "allocation09:0`a" with type "variable" "char"
@@ -49,22 +49,24 @@ Layout for memory area "allocation09!:*STATIC*" of size 0:
 	* empty area *
 
 
-Layout for memory area "allocation09:*DYNAMIC*" of size 57:
-	Variable "allocation09:0`a"	offset = 0	size = 1
-	Variable "allocation09:0`b"	offset = 1	size = 2
-	Variable "allocation09:0`c"	offset = 3	size = 4
-	Variable "allocation09:0`d"	offset = 7	size = 4
-	Variable "allocation09:0`e"	offset = 11	size = 8
-	Variable "allocation09:0`ua"	offset = 19	size = 1
-	Variable "allocation09:0`ub"	offset = 20	size = 2
-	Variable "allocation09:0`uc"	offset = 22	size = 4
-	Variable "allocation09:0`ud"	offset = 26	size = 4
-	Variable "allocation09:0`ue"	offset = 30	size = 8
-	Variable "allocation09:0`sa"	offset = 38	size = 1
-	Variable "allocation09:0`sb"	offset = 39	size = 2
-	Variable "allocation09:0`sc"	offset = 41	size = 4
-	Variable "allocation09:0`sd"	offset = 45	size = 4
-	Variable "allocation09:0`se"	offset = 49	size = 8
+Layout for memory area "allocation09:*DYNAMIC*" of size 83:
+	Variable "allocation09:0`a"	offset = 26	size = 1
+	Variable "allocation09:0`b"	offset = 27	size = 2
+	Variable "allocation09:0`c"	offset = 29	size = 4
+	Variable "allocation09:0`d"	offset = 33	size = 4
+	Variable "allocation09:0`e"	offset = 37	size = 8
+	Variable "allocation09:0`ua"	offset = 45	size = 1
+	Variable "allocation09:0`ub"	offset = 46	size = 2
+	Variable "allocation09:0`uc"	offset = 48	size = 4
+	Variable "allocation09:0`ud"	offset = 52	size = 4
+	Variable "allocation09:0`ue"	offset = 56	size = 8
+	Variable "allocation09:0`sa"	offset = 64	size = 1
+	Variable "allocation09:0`sb"	offset = 65	size = 2
+	Variable "allocation09:0`sc"	offset = 67	size = 4
+	Variable "allocation09:0`sd"	offset = 71	size = 4
+	Variable "allocation09:0`se"	offset = 75	size = 8
+	Variable "allocation09:0`__FUNCTION__"	offset = 0	size = 13
+	Variable "allocation09:0`__function__"	offset = 13	size = 13
 
 
 Layout for memory area "allocation09:*HEAP*" of size 0:
@@ -75,9 +77,8 @@ Layout for memory area "allocation09:*STACK*" of size 0:
 	* empty area *
 
 
-Layout for memory area "allocation09:*STATIC*" of size 26:
-	Variable "allocation09:0`__FUNCTION__"	offset = 0	size = 13
-	Variable "allocation09:0`__function__"	offset = 13	size = 13
+Layout for memory area "allocation09:*STATIC*" of size 0:
+	* empty area *
 
 End of declarations for module allocation09
 

@@ -36,23 +36,24 @@ main()
 
    ma1 = rose;
 
-//  P(ma1) {}
+//  P(ma1) {ma1==1}
 
    ma2 = marguerite;
 
-//  P(ma1,ma2) {}
+//  P(ma1,ma2) {ma1==1, ma2==0}
 
    ma3 = jasmin;
 
-//  P(ma1,ma2,ma3) {}
+//  P(ma1,ma2,ma3) {ma1==1, ma2==0, ma3==1}
 
    mon1 = carotte;
 
-//  P(ma1,ma2,ma3,mon1) {}
+//  P(ma1,ma2,ma3,mon1) {ma1==1, ma2==0, ma3==1, mon1==51}
 
    mon2 = haricot;
 
-//  P(ma1,ma2,ma3,mon1,mon2) {}
+//  P(ma1,ma2,ma3,mon1,mon2) {ma1==1, ma2==0, ma3==1, mon1==51,
+//    mon2==52}
 
 
    i = ma1+ma2+ma3+mon1+mon2;

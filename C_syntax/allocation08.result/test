@@ -9,10 +9,10 @@ Variable list:
 
 	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
 	Declared entity "allocation08!:*STATIC*" with type "area" with size 0
-	Declared entity "allocation08:*DYNAMIC*" with type "area" with size 290
+	Declared entity "allocation08:*DYNAMIC*" with type "area" with size 316
 	Declared entity "allocation08:*HEAP*" with type "area" with size 0
 	Declared entity "allocation08:*STACK*" with type "area" with size 0
-	Declared entity "allocation08:*STATIC*" with type "area" with size 26
+	Declared entity "allocation08:*STATIC*" with type "area" with size 0
 	Declared entity "allocation08:0`__FUNCTION__" with type "variable" "char"
 	Declared entity "allocation08:0`__function__" with type "variable" "char"
 	Declared entity "allocation08:0`x" with type "variable" "ac"
@@ -36,9 +36,11 @@ Layout for memory area "allocation08!:*STATIC*" of size 0:
 	* empty area *
 
 
-Layout for memory area "allocation08:*DYNAMIC*" of size 290:
-	Variable "allocation08:0`x"	offset = 0	size = 210
-	Variable "allocation08:0`y"	offset = 210	size = 80
+Layout for memory area "allocation08:*DYNAMIC*" of size 316:
+	Variable "allocation08:0`x"	offset = 26	size = 210
+	Variable "allocation08:0`y"	offset = 236	size = 80
+	Variable "allocation08:0`__FUNCTION__"	offset = 0	size = 13
+	Variable "allocation08:0`__function__"	offset = 13	size = 13
 
 
 Layout for memory area "allocation08:*HEAP*" of size 0:
@@ -49,9 +51,8 @@ Layout for memory area "allocation08:*STACK*" of size 0:
 	* empty area *
 
 
-Layout for memory area "allocation08:*STATIC*" of size 26:
-	Variable "allocation08:0`__FUNCTION__"	offset = 0	size = 13
-	Variable "allocation08:0`__function__"	offset = 13	size = 13
+Layout for memory area "allocation08:*STATIC*" of size 0:
+	* empty area *
 
 End of declarations for module allocation08
 
