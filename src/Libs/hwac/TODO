@@ -1,16 +1,16 @@
 * pre
-- inlining, full_unroll, dead code elim...
+- inlining, full_unroll, dead code elim, flatten_code
 + image reuse
 + scalar deps with proper effects
 - check => ok => deadcode (#define)
 
 * input
-- may skip unrelated statements?
++ may skip unrelated statements?
 + deal with |= ||= and similars
 - what about full expressions: aipo_x() || aipo_y() || aipo_z()? atomizer?
 - check that there are references where expected?
 - check/remove more implicit hypothesis
-- detect redundant operations?
+- detect redundant operations? replace them with copies?
 
 * code
 + cleanup data structures?
@@ -22,7 +22,7 @@
 + compaction
 + handle wiring
 + tell pipsdbm about generated files
-- the generated code is just a file to pips. ok?
+- the generated code is just a file to pips. ok???
 + pipe overflow
 - add checks in generated code (img size and so)?
 - parametric img size/depth? same as code?

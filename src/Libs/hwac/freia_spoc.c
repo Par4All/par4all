@@ -305,30 +305,26 @@ static string helper_file_name(string func_name)
 }
 
 /* return the actual function call from a statement,
- * dealing with assign and return.
+ * dealing with assign and returns... return NULL if not a call.
  */
 static call freia_statement_to_call(statement s)
 {
   // sanity check, somehow redundant
   instruction i = statement_instruction(s);
-  pips_assert("is a call", instruction_call_p(i));
-  call c = instruction_call(i);
-  entity called = call_function(c);
-  if (freia_assignment_p(called))
+  call c = instruction_call_p(i)? instruction_call(i): NULL;
+  if (c && freia_assignment_p(call_function(c)))
   {
     list args = call_arguments(c);
     pips_assert("2 args", gen_length(args) == 2);
     syntax sy = expression_syntax(EXPRESSION(CAR(CDR(args))));
-    pips_assert("expr is a call", syntax_call_p(sy));
-    c = syntax_call(sy);
+    c = syntax_call_p(sy)? syntax_call(sy): NULL;
   }
-  else if (ENTITY_C_RETURN_P(call_function(c)))
+  else if (c && ENTITY_C_RETURN_P(call_function(c)))
   {
     list args = call_arguments(c);
     pips_assert("one arg", gen_length(args)==1);
     syntax sy = expression_syntax(EXPRESSION(CAR(args)));
-    pips_assert("expr is a call", syntax_call_p(sy));
-    c = syntax_call(sy);
+    c = syntax_call_p(sy)? syntax_call(sy): NULL;
   }
   return c;
 }
@@ -381,10 +377,10 @@ typedef struct {
   bool used; // whether the image has been used by an output
 }  op_schedule;
 
-static void init_op_schedule(op_schedule * op, entity img, int side)
+static void init_op_schedule(op_schedule * op, dagvtx v, int side)
 {
-  op->image = img; // may be NULL?
-  op->producer = NULL;
+  op->image = v? dagvtx_image(v): NULL;
+  op->producer = v;
   op->stage = 0;
   op->level = spoc_type_inp;
   op->side = side;
@@ -410,25 +406,28 @@ static int max_stage(const op_schedule * in0, const op_schedule * in1)
       return 0;
 }
 
-static bool image_is_needed(entity img, dag d, set todo)
+/* is image needed?
+ */
+static bool image_is_needed(dagvtx prod, dag d, set todo)
 {
   bool needed = false;
-  if (img)
+  if (prod)
   {
-    FOREACH(dagvtx, vo, dag_outputs(d))
-      if (img==vtxcontent_out(dagvtx_content(vo)))
+    if (gen_in_list_p(prod, dag_outputs(d)))
+      needed = true;
+    else
+    {
+      SET_FOREACH(dagvtx, v, todo)
       {
-	needed = true;
-	break;
+	list preds = dag_vertex_preds(d, v);
+	needed = gen_in_list_p(prod, preds);
+	gen_free_list(preds), preds = NIL;
+	if (needed)
+	  break;
       }
-    SET_FOREACH(dagvtx, v, todo)
-      if (gen_in_list_p(img, vtxcontent_inputs(dagvtx_content(v))))
-      {
-	needed = true;
-	break;
-      }
-    pips_debug(7, "\"%s\" is%s needed\n",
-	       entity_local_name(img), needed? "": " not");
+    }
+    pips_debug(7, "\"%"_intFMT"\" is%s needed\n",
+	       dagvtx_number(prod), needed? "": " not");
   }
   return needed;
 }
@@ -578,7 +577,7 @@ where_to_perform_operation
 	// because it is needed twice?
 	// but it is not needed if the other (notused) image is the same.
 	if (used->image!=notused->image &&
-	    (used->used || image_is_needed(used->image, computed, todo)))
+	    (used->used || image_is_needed(used->producer, computed, todo)))
 	{
 	  if ((used->level <= spoc_type_alu &&
 	       used->stage==out->stage && level <= spoc_type_alu) ||
@@ -1016,19 +1015,13 @@ static void freia_spoc_pipeline
   // first arguments are out & in images
   int n_im_in = gen_length(dag_inputs(dpipe));
 
-  // special case where the first operations use the same image twice
-  // ??? should also be set if there is only one images but it is used
-  // several times...
-  int n_args_first_operation =
-    gen_length(vtxcontent_inputs(dagvtx_content
-				 (DAGVTX(CAR(dag_vertices(dpipe))))));
-
   pips_assert("0, 1, 2 input images", n_im_in>=0 && n_im_in<=2);
 
   // piped images in helper
   string p_in0 = "NULL", p_in1 = "NULL", p_out0 = "NULL", p_out1 = "NULL";
   // piped images in function
   entity a_in0 = NULL, a_in1 = NULL;
+  dagvtx v_in0 = NULL;
 
   op_schedule in0, in1, out;
   list /* of entity */ limg = NIL;
@@ -1036,19 +1029,19 @@ static void freia_spoc_pipeline
   // build input arguments/parameters/arguments
   if (n_im_in>=1)
   {
-    dagvtx v_in0 = DAGVTX(CAR(dag_inputs(dpipe)));
+    v_in0 = DAGVTX(CAR(dag_inputs(dpipe)));
     a_in0 = vtxcontent_out(dagvtx_content(v_in0));
     p_in0 = "i0";
-    init_op_schedule(&in0, a_in0, 0);
+    init_op_schedule(&in0, v_in0, 0);
     limg = CONS(entity, a_in0, NIL);
   }
   else
     init_op_schedule(&in0, NULL, 0);
 
-  if (n_args_first_operation==2 && n_im_in==1)
+  if (n_im_in==1 && gen_length(dagvtx_succs(v_in0))>1)
   {
-    // special case alu(i,i)...
-    init_op_schedule(&in1, a_in0, 1);
+    // help scheduling by providing the first input twice.
+    init_op_schedule(&in1, v_in0, 1);
     p_in1 = "i0";
   }
   else if (n_im_in>=2)
@@ -1056,7 +1049,7 @@ static void freia_spoc_pipeline
     dagvtx v_in1 = DAGVTX(CAR(CDR(dag_inputs(dpipe))));
     a_in1 = vtxcontent_out(dagvtx_content(v_in1));
     p_in1 = "i1";
-    init_op_schedule(&in1, a_in1, 1);
+    init_op_schedule(&in1, v_in1, 1);
     limg = gen_nconc(limg, CONS(entity, a_in1, NIL));
   }
   else
@@ -1130,8 +1123,8 @@ static void freia_spoc_pipeline
 
     // update status of live images
     bool
-      in0_needed = image_is_needed(in0.image, dpipe, todo),
-      in1_needed = image_is_needed(in1.image, dpipe, todo);
+      in0_needed = image_is_needed(in0.producer, dpipe, todo),
+      in1_needed = image_is_needed(in1.producer, dpipe, todo);
 
     // first, keep where it is...
     if (in0.stage==out.stage && in0.level==out.level && in0.side==out.side)
@@ -1180,6 +1173,14 @@ static void freia_spoc_pipeline
     }
     else
       pips_internal_error("should not get there (3 live images)...");
+
+    // anyway, we must clean unuseful variables, because
+    // the scheduling still relies on image entities to check deps
+    if (!in0_needed && in0.producer!=out.producer)
+      init_op_schedule(&in0, NULL, 0);
+
+    if (!in1_needed && in1.producer!=out.producer)
+      init_op_schedule(&in1, NULL, 0);
   }
 
   set computed = set_make(set_pointer);
@@ -1191,9 +1192,9 @@ static void freia_spoc_pipeline
   {
     // what are the effective outputs in the middle of the pipeline
     list new_outs = NIL;
-    if (image_is_needed(in1.image, dpipe, todo))
+    if (image_is_needed(in1.producer, dpipe, todo))
       new_outs = CONS(entity, in1.image, new_outs);
-    if (image_is_needed(in0.image, dpipe, todo))
+    if (image_is_needed(in0.producer, dpipe, todo))
       new_outs = CONS(entity, in0.image, new_outs);
 
     // gen_free_list(dag_outputs(dpipe));
@@ -1383,10 +1384,10 @@ static void dag_append_freia_call(dag d, statement s)
 {
   pips_debug(5, "adding statement %" _intFMT "\n", statement_number(s));
 
-  if (statement_call_p(s) &&
-      entity_freia_api_p(call_function(freia_statement_to_call(s))))
+  call c = freia_statement_to_call(s);
+
+  if (c && entity_freia_api_p(call_function(c)))
   {
-    call c = freia_statement_to_call(s);
     entity called = call_function(c);
     const freia_api_t * api = hwac_freia_api(entity_local_name(called));
     pips_assert("some api", api!=NULL);
@@ -2026,6 +2027,14 @@ freia_spoc_compile_calls
   gen_free_list(ld);
 }
 
+static bool freia_image_allocation_p(statement s)
+{
+  call c = freia_statement_to_call(s);
+  string called = c? entity_user_name(call_function(c)): "";
+  return same_string_p(called, "freia_common_create_data")
+    ||   same_string_p(called, "freia_common_destruct_data");
+}
+
 #include "effects-generic.h"
 
 /* tell whether a statement has no effects on images.
@@ -2055,19 +2064,31 @@ static bool sequence_flt(sequence sq, freia_spoc_info * fsip)
 {
   pips_debug(9, "considering sequence...\n");
 
-  list /* of statements */ ls = NIL;
+  list /* of statements */ ls = NIL, ltail = NIL;
   FOREACH(statement, s, sequence_statements(sq))
   {
     // the statement is kept if it is an AIPO call
-    bool keep_stat = freia_statement_aipo_call_p(s) ||
-      // or it has no image effects but there was already some stuff before
-      (ls!=NIL && !some_effects_on_images(s));
+    bool freia_api = freia_statement_aipo_call_p(s);
+    bool keep_stat = freia_api ||
+      // ??? it is an image allocation in the middle of the code...
+      // or it has no image effects
+      (ls && (freia_image_allocation_p(s) || !some_effects_on_images(s)));
 
     pips_debug(7, "statement %"_intFMT": %skeeped\n",
 	       statement_number(s), keep_stat? "": "not ");
 
     if (keep_stat)
-      ls = CONS(statement, s, ls);
+    {
+      if (freia_api)
+      {
+	ls = gen_nconc(ltail, ls), ltail = NIL;
+	ls = CONS(statement, s, ls);
+      }
+      else // else accumulate in the "other list" waiting for something...
+      {
+	ltail = CONS(statement, s, ltail);
+      }
+    }
     else
       if (ls!=NIL) {
 	ls = gen_nreverse(ls);
@@ -2082,6 +2103,8 @@ static bool sequence_flt(sequence sq, freia_spoc_info * fsip)
     fsip->seqs = CONS(list, ls, fsip->seqs);
     ls = NIL;
   }
+
+  if (ltail) gen_free_list(ltail);
 
   return true;
 }
