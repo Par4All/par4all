@@ -4,7 +4,19 @@ setproperty ABORT_ON_USER_ERROR TRUE
 setproperty PRETTYPRINT_C_CODE TRUE
 setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
 activate C_PARSER
-display PRINTED_FILE[%ALL]
+
+echo
+echo Parsed printed file for "decl38"
+echo
+
+display PARSED_PRINTED_FILE[decl38]
+
+echo
+echo Printed file for "decl38"
+echo
+
+display PRINTED_FILE[decl38]
+
 close
 delete decl38
 quit
