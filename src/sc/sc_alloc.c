@@ -41,7 +41,7 @@
 /* Psysteme sc_new():
  * alloue un systeme vide, initialise tous les champs avec des
  * valeurs nulles, puis retourne ce systeme en resultat.
- * 
+ *
  * Attention, sc_new ne fabrique pas un systeme coherent comportant
  * une base. Un tel systeme s'obtient par appel a la fonction sc_creer_base,
  * apres avoir ajoute des equations et des inequations au systeme. La base
@@ -58,7 +58,7 @@ Psysteme sc_new(void)
     p->nb_eq = 0;
     p->nb_ineq = 0;
     p->dimension = 0;
-	
+
     p->egalites = (Pcontrainte) NULL;
     p->inegalites = (Pcontrainte) NULL;
     p->base = BASE_NULLE;
@@ -89,7 +89,7 @@ Pbase sc_to_minimal_basis(Psysteme ps)
       if (var!=TCST && !linear_hashtable_isin(seen, var)) {
 	linear_hashtable_put_once(seen, var, var);
 	b = vect_chain(b, var, VALUE_ONE);
-      }	
+      }
     }
   }
 
@@ -99,12 +99,12 @@ Pbase sc_to_minimal_basis(Psysteme ps)
       if (var!=TCST && !linear_hashtable_isin(seen, var)) {
 	linear_hashtable_put_once(seen, var, var);
 	b = vect_chain(b, var, VALUE_ONE);
-      }	
+      }
     }
   }
 
   linear_hashtable_free(seen);
-  
+
   return b;
 }
 
@@ -119,7 +119,7 @@ Pbase sc_to_minimal_basis(Psysteme ps)
  *
  * dimension : nombre de variables du systeme (i.e. differentes de TCST, le
  *          terme constant)
- *       
+ *
  * Modifications:
  *  - passage de num_var a base (FI, 13/12/89)
  */
@@ -179,19 +179,19 @@ Psysteme sc_dup(Psysteme ps)
   if (!SC_UNDEFINED_P(ps)) {
     Pcontrainte eq, eq_cp;
     cp = sc_new();
-    
+
     for (eq = ps->egalites; eq != NULL; eq = eq->succ) {
       eq_cp = contrainte_new();
       contrainte_vecteur(eq_cp) = vect_dup(contrainte_vecteur(eq));
       sc_add_egalite(cp, eq_cp);
     }
-    
+
     for(eq=ps->inegalites;eq!=NULL;eq=eq->succ) {
       eq_cp = contrainte_new();
       contrainte_vecteur(eq_cp) = vect_dup(contrainte_vecteur(eq));
       sc_add_inegalite(cp, eq_cp);
     }
-    
+
     if(ps->dimension==0) {
       assert(VECTEUR_UNDEFINED_P(ps->base));
       cp->dimension = 0;
@@ -208,17 +208,21 @@ Psysteme sc_dup(Psysteme ps)
   */
 }
 
-/* Psysteme sc_copy(Psysteme ps): duplication d'un systeme 
- * (allocation et copie complete des champs sans sharing)
+/* Psysteme sc_copy(Psysteme ps): duplication d'un systeme (allocation
+ * et copie complete des champs sans sharing)
+ *
  * replace sc_dup(ps), which now becomes a link
  *
  * Ancien nom (obsolete): cp_sc()
  *
- * Modification: L'ordre des egalites, inegalites, la base et des variables dans 
- * le syteme est recopie egalement. (CA, 28/08/91),(DN,24/6/02)
- * We can use contrainte_copy, contraintes_copy here
- * If we test the size of system here for debugging purposes, il may cost more time ...
- * 
+ * Modification: L'ordre des egalites, inegalites, la base et des
+ * variables dans le syteme est recopie egalement. (CA,
+ * 28/08/91),(DN,24/6/02)
+ *
+ * We can use contrainte_copy, contraintes_copy here If we test the
+ * size of system here for debugging purposes, il may cost more time
+ * ...
+ *
  */
 Psysteme sc_copy(Psysteme ps)
 {
@@ -229,15 +233,15 @@ Psysteme sc_copy(Psysteme ps)
     Pcontrainte eq, eq_cp;
     cp = sc_new();
 
-    for (j=ps->nb_eq;j>0;j--) {      
+    for (j=ps->nb_eq;j>0;j--) {
       for (eq = ps->egalites,i=1;i<j; eq = eq->succ,i++) {/**/}
       eq_cp = contrainte_new();
       contrainte_vecteur(eq_cp) = vect_copy(contrainte_vecteur(eq));
       sc_add_egalite(cp, eq_cp);
     }
 
-    for (j=ps->nb_ineq;j>0;j--) {      
-      for (eq = ps->inegalites,i=1;i<j; eq = eq->succ,i++) {/**/}    
+    for (j=ps->nb_ineq;j>0;j--) {
+      for (eq = ps->inegalites,i=1;i<j; eq = eq->succ,i++) {/**/}
       eq_cp = contrainte_new();
       contrainte_vecteur(eq_cp) = vect_copy(contrainte_vecteur(eq));
       sc_add_inegalite(cp, eq_cp);
@@ -255,17 +259,17 @@ Psysteme sc_copy(Psysteme ps)
 
   return cp;
 }
-/* void sc_rm(Psysteme ps): liberation de l'espace memoire occupe par le
- * systeme de contraintes ps;
- * 
+/* void sc_rm(Psysteme ps): liberation de l'espace memoire occupe par
+ * le systeme de contraintes ps;
+ *
  * utilisation standard:
  *    sc_rm(s);
  *    s = NULL;
- * 
+ *
  * comme toujours, les champs pointeurs sont remis a NULL avant la
- * desallocation pour detecter au plus tot les erreurs dues a l'allocation
- * dynamique de memoire
- * 
+ * desallocation pour detecter au plus tot les erreurs dues a
+ * l'allocation dynamique de memoire
+ *
  */
 void sc_rm(ps)
 Psysteme ps;
@@ -290,8 +294,8 @@ Psysteme ps;
     }
 }
 
-/* This function returns a new empty system which has been initialized with 
- * the same dimension and base than sc.
+/* This function returns a new empty system which has been initialized
+ * with the same dimension and base than sc.
  */
 Psysteme sc_init_with_sc(sc)
 Psysteme sc;
@@ -299,13 +303,13 @@ Psysteme sc;
 
     Psysteme sc1= sc_new();
     sc1->dimension = sc->dimension;
-    sc1->base = base_copy(sc->base); 
+    sc1->base = base_copy(sc->base);
     return(sc1);
-} 
+}
 
-/* Psysteme sc_empty(Pbase b): build a Psysteme with one unfeasible constraint to
- * define the empty subspace in a space  R^n, where
- * n is b's dimension. b is shared by sc.
+/* Psysteme sc_empty(Pbase b): build a Psysteme with one unfeasible
+ * constraint to define the empty subspace in a space R^n, where n is
+ * b's dimension. b is shared by sc.
  *
  * The unfeasible constraint is the equations 0 == 1
  */
@@ -323,8 +327,8 @@ Pbase b;
     return sc;
 }
 
-/* Psysteme sc_rn(Pbase b): build a Psysteme without constraints to define R^n, where
- * n is b's dimension. b is shared by sc.
+/* Psysteme sc_rn(Pbase b): build a Psysteme without constraints to
+ * define R^n, where n is b's dimension. b is shared by sc.
  */
 Psysteme sc_rn(b)
 Pbase b;
@@ -336,9 +340,9 @@ Pbase b;
 
     return sc;
 }
-/* boolean sc_empty_p(Psysteme sc): check if the set associated to sc is the constant 
- * sc_empty or not. More expensive tests like sc_faisabilite() are necessary to handle 
- * the general case.
+/* boolean sc_empty_p(Psysteme sc): check if the set associated to sc
+ * is the constant sc_empty or not. More expensive tests like
+ * sc_faisabilite() are necessary to handle the general case.
  */
 boolean sc_empty_p(sc)
 Psysteme sc;
@@ -356,7 +360,8 @@ Psysteme sc;
     return empty;
 }
 
-/* boolean sc_rn_p(Psysteme sc): check if the set associated to sc is the whole space, rn
+/* boolean sc_rn_p(Psysteme sc): check if the set associated to sc is
+   the whole space, rn
  */
 boolean sc_rn_p(sc)
 Psysteme sc;
@@ -383,8 +388,8 @@ void sc_add_egalite(Psysteme p, Pcontrainte e)
   assert(p && e && !e->succ);
 
   e->succ = p->egalites;
-  p->egalites = e; 
-  p->nb_eq++; 
+  p->egalites = e;
+  p->nb_eq++;
 }
 
 /* void sc_add_inegalite(Psysteme p, Pcontrainte i): macro ajoutant une
@@ -396,10 +401,10 @@ void sc_add_egalite(Psysteme p, Pcontrainte e)
  * pour l'explication des differences
  */
 void sc_add_inegalite(Psysteme p, Pcontrainte i)
-{ 
+{
   assert(p && i && !i->succ);
 
   i->succ = p->inegalites;
-  p->inegalites = i; 
-  p->nb_ineq++; 
+  p->inegalites = i;
+  p->nb_ineq++;
 }
