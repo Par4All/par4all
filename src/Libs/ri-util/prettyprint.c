@@ -1959,9 +1959,9 @@ static text text_block (entity module, string label, int margin, list objs,
   }
 
   if(!empty_string_p(label)) {
-    pips_internal_error("Illegal label \"%s\". "
-			"Blocks cannot carry a label\n",
-			label);
+    pips_user_warning("Illegal label \"%s\". "
+		      "Blocks cannot carry a label\n",
+		      label);
   }
 
   unformatted bm_beg = NULL;
@@ -2437,7 +2437,7 @@ text_whileloop(
 	pc = CHAIN_SWORD(NIL,"while (");
 	pc = gen_nconc(pc, words_expression(whileloop_condition(obj)));
 	pc = CHAIN_SWORD(pc, ");");
-	u = make_unformatted(strdup(label), n, margin, pc) ;
+	u = make_unformatted(NULL, n, margin, pc) ;
 	ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_unformatted, u));
       }
   
