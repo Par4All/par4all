@@ -5390,27 +5390,6 @@ phrase_distributor_control_code          > MODULE.code
 \end{PipsMake}
 
 
-\subsubsection{PHRASE ComEngine properties}
-
-This property is set to TRUE if we want to synthesize only one
-process on the HRE.
-\begin{PipsProp}
-COMENGINE_CONTROL_IN_HRE TRUE
-\end{PipsProp}
-
-\begin{PipsProp}
-COMENGINE_BUFFER_HRE_INTERFACE TRUE
-\end{PipsProp}
-
-This property holds the fifo size of the ComEngine.
-\begin{PipsProp}
-COMENGINE_SIZE_OF_FIFO 128
-\end{PipsProp}
-
-This property holds the number of fifos in the ComEngine.
-\begin{PipsProp}
-COMENGINE_NUMBER_OF_FIFO 100
-\end{PipsProp}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SAFESCALE
 
@@ -5500,6 +5479,29 @@ phrase_comEngine_distributor                       > MODULE.code
         < MODULE.dg
         < MODULE.summary_complexity
 \end{PipsMake}
+
+\subsubsection{PHRASE ComEngine properties}
+
+This property is set to TRUE if we want to synthesize only one
+process on the HRE.
+\begin{PipsProp}
+COMENGINE_CONTROL_IN_HRE TRUE
+\end{PipsProp}
+
+\begin{PipsProp}
+COMENGINE_BUFFER_HRE_INTERFACE TRUE
+\end{PipsProp}
+
+This property holds the fifo size of the ComEngine.
+\begin{PipsProp}
+COMENGINE_SIZE_OF_FIFO 128
+\end{PipsProp}
+
+This property holds the number of fifos in the ComEngine.
+\begin{PipsProp}
+COMENGINE_NUMBER_OF_FIFO 100
+\end{PipsProp}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% TRANSFORMATIONS
 
@@ -6887,7 +6889,7 @@ Inlining is a well known technique.  Basically, it replaces a function
 call by the function body. The current implementation does not work if
 the function has static declarations, access global variables \dots.
 Actually it (seems to) work(s) for pure, non-recursive functions \dots
-and not for any kind of call. 
+and not for any kind of call.
 
 Property \lstinline|INLINING_CALLERS| can be set to define the list of
 functions where the call sites have to be inlined. By default, all
@@ -7383,7 +7385,7 @@ PIPS_CODE_ARRAY_BOUND_CHECK_INSTRUMENTATION FALSE
 
 In practice, bound violations may often occur with arrays in a common block. The
 standard is violated, but programmers think that they are not dangerous
-because the allocated size of the common is not depassed. 
+because the allocated size of the common is not reached.
 The following property deals with this kind of bad programming practice. If the
 array is a common variable, it checks if the reference goes beyond the
 size of the common block or not.
@@ -7443,7 +7445,7 @@ occur due to pointers in languages like LISP, C, C++ or Fortran 90,
 union construct in C or \verb+EQUIVALENCE+ in Fortran. Interprocedural aliases
 are generally created by parameter passing and by access to global
 variables, which propagates intraprocedural aliases  across procedures and
-introduces new aliases.    
+introduces new aliases.
 
 The basic idea for computing interprocedural aliases is to follow all the
 possible chains of argument-parameters and nonlocal variable-parameter
@@ -7534,13 +7536,13 @@ works as follows: if we have a MUST IN region at the module statement, the
 corresponding variable must be used before
 being defined, a STOP is inserted. Else, we insert an initialization
 function and go down, insert a verification function before each MUST IN
-at each sub-statements.  
+at each sub-statements.
 
 This is a top-down analysis that process a procedure before all its
 callees. Information given by callers is used to verify if we have to
 check for the formal parameters in the current module or not. In addition,
 we produce information in the resource MODULE.ubs to tell if the formal
-parameters of the called procedures have to be checked or not. 
+parameters of the called procedures have to be checked or not.
 
 This verification is implemented by Thi Viet Nga \textsc{Nguyen}.
 %%!UserManualDocumentation
@@ -8138,7 +8140,7 @@ print_source_continuation_conditions   > MODULE.parsed_printed_file
         < MODULE.must_continuation
         < MODULE.may_continuation
         < MODULE.must_summary_continuation
-        < MODULE.may_summary_continuation       
+        < MODULE.may_summary_continuation
         < MODULE.cumulated_effects
 \end{PipsMake}
 
@@ -8723,7 +8725,7 @@ replaced ...
 
 When prettyprinting semantic information (preconditions, transformers and
 regions), add a line before and after each piece of information if set to
-\verb+TRUE+. The resulting code is more readable, but is larger. 
+\verb+TRUE+. The resulting code is more readable, but is larger.
 
 \begin{PipsProp}
 PRETTYPRINT_LOOSE TRUE
@@ -10563,7 +10565,7 @@ print_xml_application      > MODULE.xml_printed_file
     < MODULE.proper_effects
     < MODULE.cumulated_effects
     < MODULE.summary_effects
-    < MODULE.regions      
+    < MODULE.regions
     < CALLEES.summary_effects
 \end{PipsMake}
 
@@ -10986,12 +10988,11 @@ Rapport interne EMP-CRI-E129, septembre 1990
 Performance Fortran}},
 Rapport interne EMP-CRI-A238, juin 1993
 
- 
   \bibitem{C96} Béatrice Creusillet {\em
-Analyses de régions de tableaux et applications}, 
+Analyses de régions de tableaux et applications},
 Thèse de doctorat de l'Ecolde des Mines de Paris,
 Décembre 1996 (available as A/295/CRI).
- 
+
   \bibitem{CI95} Béatrice Creusillet, François Irigoin, {\em
 Interprocedural Array Region Analyses}, Workshop on Languages and
 Compilers for Parallel Computing, LCPC'95, Colombus, OHIO, USA, 10-12
@@ -11090,7 +11091,7 @@ on-line and regularly updated.
 \bibitem{Much97} Steven S. Muchnick,
   {\it Advanced Compiler Design Implementation}
   Morgan Kaufmann Publishers, 1997
- 
+
 \bibitem{Ost83} L.~J.~Osterweil, TOOLPACK - An Experimental Software
     Development Environment Research Project,
 {\em IEEE TOSE}, Vol. 9, No. 6, pp.673-685 (1983).
