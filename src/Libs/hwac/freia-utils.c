@@ -409,6 +409,17 @@ void set_operation(const freia_api_t * api, _int * type, _int * id)
   *id = hwac_freia_api_index(api->function_name);
 }
 
+/* returns an allocated expression list of the parameters only
+ * (i.e. do not include the input & output images).
+ */
+list /* of expression*/ freia_extract_parameters(int napi, list args)
+{
+  const freia_api_t * api = get_freia_api(napi);
+  int skip = api->arg_img_in + api->arg_img_out;
+  while (skip--) args = CDR(args);
+  return gen_full_copy_list(args);
+}
+
 /* all is well
  */
 static call freia_ok()
@@ -615,4 +626,62 @@ bool freia_scalar_rw_dep(statement s, statement t, list * vars)
   pips_debug(8, "%" _intFMT " %sdependent from %" _intFMT "\n",
 	     statement_number(t), rw_dep? "": "in", statement_number(s));
   return rw_dep;
+}
+
+static bool lexpression_equal_p(const list l1, const list l2)
+{
+  bool equal = true;
+  int n1 = gen_length(l1), n2 = gen_length(l2);
+  if (n1==n2) {
+    list p1 = (list) l1, p2 = (list) l2;
+    while (equal && p1 && p2) {
+      if (!expression_equal_p(EXPRESSION(CAR(p1)), EXPRESSION(CAR(p2))))
+	equal = false;
+      p1 = CDR(p1), p2 = CDR(p2);
+    }
+  }
+  else
+    equal = false;
+  return equal;
+}
+
+/* return the actual function call from a statement,
+ * dealing with assign and returns... return NULL if not a call.
+ */
+call freia_statement_to_call(statement s)
+{
+  // sanity check, somehow redundant
+  instruction i = statement_instruction(s);
+  call c = instruction_call_p(i)? instruction_call(i): NULL;
+  if (c && freia_assignment_p(call_function(c)))
+  {
+    list args = call_arguments(c);
+    pips_assert("2 args", gen_length(args) == 2);
+    syntax sy = expression_syntax(EXPRESSION(CAR(CDR(args))));
+    c = syntax_call_p(sy)? syntax_call(sy): NULL;
+  }
+  else if (c && ENTITY_C_RETURN_P(call_function(c)))
+  {
+    list args = call_arguments(c);
+    pips_assert("one arg", gen_length(args)==1);
+    syntax sy = expression_syntax(EXPRESSION(CAR(args)));
+    c = syntax_call_p(sy)? syntax_call(sy): NULL;
+  }
+  return c;
+}
+
+#include "freia_spoc_private.h"
+#include "hwac.h"
+
+bool same_constant_parameters(dagvtx v1, dagvtx v2)
+{
+  call
+    c1 = freia_statement_to_call(dagvtx_statement(v1)),
+    c2 = freia_statement_to_call(dagvtx_statement(v2));
+  list
+    lp1 = freia_extract_parameters(dagvtx_opid(v1), call_arguments(c1)),
+    lp2 = freia_extract_parameters(dagvtx_opid(v1), call_arguments(c2));
+  bool same = lexpression_equal_p(lp1, lp2);
+  // should also check that there is no w effects on parameters in between
+  return same;
 }

@@ -191,29 +191,41 @@ static string entity_dot_name(entity e)
   return entity_user_name(e);
 }
 
+static void dagvtx_dot_node(FILE * out, string prefix, dagvtx v)
+{
+  fprintf(out, "%s\"%"_intFMT" %s\"", prefix? prefix: "",
+	  dagvtx_number(v), dagvtx_compact_operation(v));
+}
+
 static void dagvtx_dot(FILE * out, dag d, dagvtx vtx)
 {
+  bool label_nodes = get_bool_property("FREIA_LABEL_NODES");
+  bool show_arcs = get_bool_property("FREIA_LABEL_ARCS");
+
   vtxcontent co = dagvtx_content(vtx);
   string vname = NULL;
   if (vtxcontent_out(co)!=entity_undefined)
     vname = entity_dot_name(vtxcontent_out(co));
+
   if (dagvtx_number(vtx)!=0)
   {
     string attribute = what_operation_shape(vtxcontent_optype(co));
-    bool show_arcs = get_bool_property("FREIA_LABEL_ARCS");
 
-    fprintf(out, "  \"%" _intFMT " %s\" [%s];\n",
-	    dagvtx_number(vtx), dagvtx_compact_operation(vtx), attribute);
+    dagvtx_dot_node(out, "  ", vtx);
+    fprintf(out, " [%s", attribute);
+    if (!label_nodes)
+      // show a short label with only the operation
+      fprintf(out, ",label=\"%s\"", dagvtx_compact_operation(vtx));
+    fprintf(out, "];\n");
 
     // image dependencies
     FOREACH(dagvtx, succ, dagvtx_succs(vtx))
-      fprintf(out,
-	      "  \"%" _intFMT " %s\" -> \"%" _intFMT " %s\"%s%s%s;\n",
-	      dagvtx_number(vtx), dagvtx_compact_operation(vtx),
-	      dagvtx_number(succ), dagvtx_compact_operation(succ),
-	      show_arcs? " [label=\"": "",
-	      show_arcs? vname: "",
-	      show_arcs? "\"]": "");
+    {
+      dagvtx_dot_node(out, "  ", vtx);
+      dagvtx_dot_node(out, " -> ", succ);
+      fprintf(out, "%s%s%s;\n", show_arcs? " [label=\"": "",
+	      show_arcs? vname: "", show_arcs? "\"]": "");
+    }
 
     // scalar dependencies anywhere... hmmm...
     FOREACH(dagvtx, v, dag_vertices(d))
@@ -222,10 +234,10 @@ static void dagvtx_dot(FILE * out, dag d, dagvtx vtx)
       if (vtx!=v && freia_scalar_rw_dep(dagvtx_statement(vtx),
 					dagvtx_statement(v), &vars))
       {
-	fprintf(out,
-		"  \"%" _intFMT " %s\" -> \"%" _intFMT " %s\" [" SCL_DEP,
-		dagvtx_number(vtx), dagvtx_compact_operation(vtx),
-		dagvtx_number(v), dagvtx_compact_operation(v));
+	dagvtx_dot_node(out, "  ", vtx);
+	dagvtx_dot_node(out, " -> ", v);
+	fprintf(out, " [" SCL_DEP);
+
 	if (vars && show_arcs)
 	{
 	  int count = 0;
@@ -243,8 +255,11 @@ static void dagvtx_dot(FILE * out, dag d, dagvtx vtx)
   {
     // input image...
     FOREACH(dagvtx, succ, dagvtx_succs(vtx))
-      fprintf(out, "  \"%s\" -> \"%" _intFMT " %s\";\n",
-	      vname, dagvtx_number(succ), dagvtx_compact_operation(succ));
+    {
+      fprintf(out, "  \"%s\"", vname);
+      dagvtx_dot_node(out, " -> ", succ);
+      fprintf(out, ";\n");
+    }
   }
 }
 
@@ -274,9 +289,10 @@ void dag_dot(FILE * out, string what, dag d)
 
     // outputs arcs for vx
     if (gen_in_list_p(vx, dag_outputs(d)))
-      fprintf(out, "  \"%" _intFMT " %s\" -> \"%s\";\n",
-	      dagvtx_number(vx), dagvtx_compact_operation(vx),
-	      entity_dot_name(vtxcontent_out(c)));
+    {
+      dagvtx_dot_node(out, "  ", vx);
+      fprintf(out, " -> \"%s\";\n", entity_dot_name(vtxcontent_out(c)));
+    }
   }
 
   fprintf(out, "}\n");
@@ -435,12 +451,6 @@ static bool gen_list_equals_p(const list l1, const list l2)
   }
   equal &= (!p1 && !p2);
   return equal;
-}
-
-static bool same_constant_parameters(dagvtx v1, dagvtx v2)
-{
-  // ??? hmmmm...
-  return true;
 }
 
 /* replace target vertex by a copy of source results...
@@ -680,7 +690,7 @@ void dag_compute_outputs(dag d)
 
 static dagvtx find_twin_vertex(dag d, dagvtx target)
 {
-  pips_debug(7, "target is %"_intFMT"\n", dagvtx_number(target));
+  // pips_debug(9, "target is %"_intFMT"\n", dagvtx_number(target));
   FOREACH(dagvtx, v, dag_vertices(d))
     if (dagvtx_number(target)==dagvtx_number(v))
       return v;
