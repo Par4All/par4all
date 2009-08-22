@@ -102,7 +102,7 @@ static void spoc_alu_conf
       sb_cat(head, ", int32_t ", s_var, NULL);
       // res += "spocinstr.alu[%stage][0].constant = " + var + ";\n";
       sb_cat(body,
-	"  si.alu[", s_stage, "][0].constant = ", s_var, ";\n", NULL);
+	"  sp.alu[", s_stage, "][0].constant = ", s_var, ";\n", NULL);
       free(s_var);
     }
 
@@ -730,7 +730,7 @@ static void generate_wiring_stage
   {
   case -1:
     if (out_side) {
-      set_wiring(code, stage, 1, 0, wiring);
+      set_wiring(code, stage, 1, 1, wiring);
       set_wiring(code, stage, 3, 0, wiring);
     }
     else {
@@ -1872,27 +1872,6 @@ static list /* of dags */ split_dag(dag initial)
       set_clear(current);
       set_clear(sure);
       set_assign(maybe, computed);
-
-      // recompute available image sets
-      // set_clear(sure);
-      // set_clear(maybe);
-      // dall
-      // set_append_list(maybe, dag_inputs(dall));
-      // and already extracted dags
-      /*
-      FOREACH(dag, d, ld)
-      {
-	FOREACH(dagvtx, v, dag_vertices(d))
-	{
-	  list preds = dag_vertex_preds(d, v);
-	  set_append_list(maybe, preds);
-	  gen_free_list(preds), preds = NIL;
-	  if (vtxcontent_out(dagvtx_content(v))!=entity_undefined)
-	    set_add_element(maybe, maybe, v);
-	}
-      }
-      set_assign(avails, maybe);
-      */
     }
 
     gen_free_list(computables);
@@ -1960,8 +1939,8 @@ freia_spoc_compile_calls
   // split dag in one-pipe dags.
   list ld = split_dag(fulld);
 
-  // fix internal ins/outs
-  freia_hack_fix_global_ins_outs(fulld, ld);
+  FOREACH(dag, dfix, ld)
+    freia_hack_fix_global_ins_outs(fulld, dfix);
 
   // globally remaining statements
   set global_remainings = set_make(set_pointer);
@@ -1987,6 +1966,14 @@ freia_spoc_compile_calls
     int split = 0;
     while (dag_vertices(d))
     {
+      // fix internal ins/outs, that are tempered with by split & overflows
+      freia_hack_fix_global_ins_outs(fulld, d);
+
+      ifdebug(6) {
+	pips_debug(4, "dag for split %d\n", split);
+	dag_dump(stderr, "d", d);
+      }
+
       string fname_split = strdup(cat(fname_dag, "_", itoa(split++), NULL));
       list /* of expression */ lparams = NIL;
 

@@ -630,6 +630,22 @@ void dag_optimize(dag d)
   }
 }
 
+/* return whether all vertices in list are mesures...
+ */
+static bool all_mesures_p(list lv)
+{
+  bool only_mes = true;
+  FOREACH(dagvtx, v, lv)
+  {
+    if (dagvtx_optype(v)!=spoc_type_mes)
+    {
+      only_mes = false;
+      break;
+    }
+  }
+  return only_mes;
+}
+
 /* (re)compute the list of *GLOBAL* input & output images for this dag
  * ??? BUG the output is rather an approximation
  * should rely on used defs or out effects for the underlying
@@ -653,6 +669,8 @@ void dag_compute_outputs(dag d)
       if (out!=entity_undefined &&
 	  // no successors
 	  (!dagvtx_succs(v) ||
+	   // all successors are mesures?
+	   all_mesures_p(dagvtx_succs(v)) ||
 	   // new parameter not yet an output
 	   (formal_parameter_p(out) && !set_belong_p(outvars, out))))
       {
@@ -705,27 +723,21 @@ static dagvtx find_twin_vertex(dag d, dagvtx target)
  * @param dfull full dag
  * @param ld list of sub dags of d
  */
-void freia_hack_fix_global_ins_outs(dag dfull, list ld)
+void freia_hack_fix_global_ins_outs(dag dfull, dag d)
 {
-  list revld = gen_nreverse(gen_copy_seq(ld));
-
-  FOREACH(dag, d, revld)
+  FOREACH(dagvtx, v, dag_vertices(d))
   {
-    FOREACH(dagvtx, v, dag_vertices(d))
+    if (dagvtx_number(v)!=0 &&
+	// the vertex was an output node in the full dag
+	(gen_in_list_p(find_twin_vertex(dfull, v), dag_outputs(dfull)) ||
+	 // OR there were more successors in the full dag
+	 gen_length(dagvtx_succs(v))!=
+	 gen_length(dagvtx_succs(find_twin_vertex(dfull, v)))))
     {
-      if (dagvtx_number(v)!=0 &&
-	  // there were more successors in the full dag
-	  gen_length(dagvtx_succs(v))!=
-	  gen_length(dagvtx_succs(find_twin_vertex(dfull, v))))
-      {
-	pips_debug(4, "adding %" _intFMT " as output\n", dagvtx_number(v));
-	dag_outputs(d) = gen_once(v, dag_outputs(d));
-      }
+      pips_debug(4, "adding %" _intFMT " as output\n", dagvtx_number(v));
+      dag_outputs(d) = gen_once(v, dag_outputs(d));
     }
   }
-
-  // cleanup
-  gen_free_list(revld);
 }
 
 /* remove unneeded statements?
