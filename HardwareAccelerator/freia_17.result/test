@@ -156,10 +156,8 @@ freia_status freia_17_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_d
   // STAGE 0
   // i [0 input 0] -> [0 input 0] 24 copy
   // nope
-
   // i [0 input 1] -> [0 input 1] 25 copy
   // nope
-
 
   // output image o on 0 and image 0`t3 on 1
   // o [0 input 0] -> [0 output 0] 0 null
@@ -206,10 +204,8 @@ freia_status freia_17_helper_0_1_0(freia_data2d * o0, freia_data2d * o1, freia_d
   // STAGE 0
   // i [0 input 0] -> [0 input 0] 26 copy
   // nope
-
   // i [0 input 1] -> [0 input 1] 27 copy
   // nope
-
 
   // output image 0`t4 on 0 and image 0`t5 on 1
   // 0`t4 [0 input 0] -> [0 output 0] 0 null

@@ -88,7 +88,6 @@ freia_status freia_19_helper_0_0_0(freia_data2d * o0, freia_data2d * i0)
   // i [0 input 0] -> [0 input 0] 12 copy
   // nope
 
-
   // output image o on 0
   // o [0 input 0] -> [0 output 0] 0 null
   si.mux[0][0].op = SPOC_MUX_IN0;

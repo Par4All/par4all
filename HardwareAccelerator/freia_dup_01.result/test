@@ -106,9 +106,6 @@ freia_status freia_dup_01_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, fre
   si.alu[0][0].op = SPOC_ALU_ADD_IN0_IN1;
 
   // 0`t [0 alu] -> [0 alu] 11 copy
-  // alu 11 copy stage 0
-  si.alu[0][0].op = SPOC_ALU_ADD_IN0_IN1;
-
 
   // output image o on 0
   // o [0 alu] -> [0 output 0] 0 null
@@ -139,7 +136,7 @@ freia_status freia_dup_01(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 {
    // same operation performed twice
    // t = i0 + i1
-   freia_dup_01_helper_0_0_0(o, i0, i1);                                /*0008*/
+   freia_dup_01_helper_0_0_0(o, i0, i1, i1);                            /*0008*/
    // o = i0 + i1
    // could be replaced by o = t
    return FREIA_OK;                                                     /*0013*/
