@@ -658,7 +658,7 @@ freia_status anr999_helper_0_0_1(freia_data2d * o0, freia_data2d * o1, freia_dat
   // 0`od [2 poc 0] -> [2 output 0] 0 null
   si.mux[2][0].op = SPOC_MUX_IN0;
   // 0`og [2 alu] -> [2 output 1] 0 null
-  si.mux[2][1].op = SPOC_MUX_IN0;
+  si.mux[2][1].op = SPOC_MUX_IN1;
   si.mux[2][3].op = SPOC_MUX_IN0;
 
   mcode.raw = (freia_ptr) &si;
