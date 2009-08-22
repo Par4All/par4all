@@ -139,7 +139,7 @@ freia_status freia_23_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_d
   // o [2 input 0] -> [2 alu] 11 add
   // nope
   // io [1 alu] -> [2 alu] 11 add
-  si.mux[1][1].op = SPOC_MUX_IN0;
+  si.mux[1][1].op = SPOC_MUX_IN1;
   si.mux[1][3].op = SPOC_MUX_IN0;
   // io [2 input 1] -> [2 alu] 11 add
   // nope
@@ -152,7 +152,7 @@ freia_status freia_23_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_d
   si.mux[2][0].op = SPOC_MUX_IN1;
   si.mux[2][2].op = SPOC_MUX_IN1;
   // o [2 alu] -> [2 output 1] 0 null
-  si.mux[2][1].op = SPOC_MUX_IN0;
+  si.mux[2][1].op = SPOC_MUX_IN1;
   si.mux[2][3].op = SPOC_MUX_IN0;
 
   mcode.raw = (freia_ptr) &si;
