@@ -903,6 +903,7 @@ hash_table used_labels;
 	  /* The loop label field is unused in C, but it is used
 	     internally to locate loops for applying PIPS transformations. */
 	  loop_label(new_l) = statement_label(st);
+	  //statement_label(st) = entity_undefined;
 	}
     }
 
@@ -939,11 +940,9 @@ hash_table used_labels;
     gen_remove(&control_predecessors(c_res), c_body);
 
     statement d_st = make_statement(statement_label(st),
-				    (!instruction_sequence_p(ni))
-				    ?statement_number(st):STATEMENT_NUMBER_UNDEFINED,
+				    statement_number(st),
 				    STATEMENT_ORDERING_UNDEFINED,
-				    (!instruction_sequence_p(ni))
-				    ?statement_comments(st):empty_comments,
+				    statement_comments(st),
 				    ni,
 				    statement_declarations(st),
 				    statement_decls_text(st),
@@ -956,11 +955,11 @@ hash_table used_labels;
     UPDATE_CONTROL(c_res,
 		   d_st,
 		   ADD_PRED(pred, c_res),
-		   ADD_SUCC(succ, c_res )) ;
+		   ADD_SUCC(succ, c_res));
     controlized = FALSE;
     control_predecessors(succ) = ADD_PRED(c_res, succ);
   }
-  else /* The foor loop cannot be preserved as a control structure*/
+  else /* The for loop cannot be preserved as a control structure*/
     {
       /* NN : I do not know how to deal with this, the following code does not always work
 
