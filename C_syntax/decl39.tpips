@@ -1,7 +1,8 @@
-delete decl38
-create decl38 decl38.c
+delete decl39
+create decl39 decl39.c
 setproperty ABORT_ON_USER_ERROR TRUE
 setproperty PRETTYPRINT_C_CODE TRUE
+#setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER FALSE
 setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
 setproperty PRETTYPRINT_BLOCKS TRUE
 setproperty PRETTYPRINT_ALL_EFFECTS TRUE
@@ -13,24 +14,17 @@ setproperty PRETTYPRINT_ALL_PRIVATE_VARIABLES TRUE
 setproperty PRETTYPRINT_CHEK_IO_STATEMENTS TRUE
 setproperty PRETTYPRINT_INTERNAL_RETURN TRUE
 setproperty PRETTYPRINT_FINAL_RETURN TRUE
-setproperty PRETTYPRINT_BLOCK_IF_ONLY TRUE
+#setproperty PRETTYPRINT_BLOCK_IF_ONLY TRUE
 setproperty PRETTYPRINT_WITH_COMMON_NAMES TRUE
 setproperty PRETTYPRINT_ALL_PARENTHESES TRUE
-setproperty UNSPAGHETTIFY_IN_CONTROLIZER FALSE
+#setproperty UNSPAGHETTIFY_IN_CONTROLIZER FALSE
 activate C_PARSER
 
-echo
-echo Parsed printed file for "decl38"
-echo
+display PARSED_PRINTED_FILE[decl39]
 
-display PARSED_PRINTED_FILE[decl38]
-
-echo
-echo Printed file for "decl38"
-echo
-
-display PRINTED_FILE[decl38]
-
+display PRINTED_FILE[decl39]
+#apply FOR_LOOP_TO_DO_LOOP
+#display PRINTED_FILE[decl39]
 close
-delete decl38
+delete decl39
 quit
