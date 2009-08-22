@@ -136,7 +136,7 @@ freia_status freia_skip_03_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, in
   // nope
   // alu 10 sub_const stage 1
   si.alu[1][0].op = SPOC_ALU_SUB_IN0_CONST;
-  si.alu[1][0].constant = cst1;
+  sp.alu[1][0].constant = cst1;
 
 
   // STAGE 2
@@ -147,7 +147,7 @@ freia_status freia_skip_03_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, in
   // nope
   // alu 12 add_const stage 2
   si.alu[2][0].op = SPOC_ALU_ADD_IN0_CONST;
-  si.alu[2][0].constant = cst2;
+  sp.alu[2][0].constant = cst2;
 
 
   // output image 0`t1 on 0

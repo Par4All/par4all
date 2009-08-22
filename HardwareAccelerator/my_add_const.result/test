@@ -77,7 +77,7 @@ freia_status my_add_const_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, int
   // nope
   // alu 5 add_const stage 0
   si.alu[0][0].op = SPOC_ALU_ADD_IN0_CONST;
-  si.alu[0][0].constant = cst0;
+  sp.alu[0][0].constant = cst0;
 
 
   // output image o on 0

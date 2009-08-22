@@ -131,7 +131,7 @@ freia_status freia_16_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_d
   // nope
   // alu 7 add_const stage 0 flipped
   si.alu[0][0].op = SPOC_ALU_ADD_IN1_CONST;
-  si.alu[0][0].constant = cst4;
+  sp.alu[0][0].constant = cst4;
 
 
   // output image o0 on 1 and image o1 on 0

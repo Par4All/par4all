@@ -162,7 +162,7 @@ freia_status freia_03_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, freia_d
   // nope
   // alu 25 add_const stage 0
   si.alu[0][0].op = SPOC_ALU_ADD_IN0_CONST;
-  si.alu[0][0].constant = cst0;
+  sp.alu[0][0].constant = cst0;
 
 
   // STAGE 1
@@ -172,7 +172,7 @@ freia_status freia_03_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, freia_d
   // nope
   // alu 26 addsat_const stage 1 flipped
   si.alu[1][0].op = SPOC_ALU_ADDSAT_IN1_CONST;
-  si.alu[1][0].constant = cst1;
+  sp.alu[1][0].constant = cst1;
 
 
   // STAGE 2
@@ -199,7 +199,7 @@ freia_status freia_03_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, freia_d
   // nope
   // alu 28 mul_const stage 3
   si.alu[3][0].op = SPOC_ALU_MUL_IN0_CONST;
-  si.alu[3][0].constant = cst2;
+  sp.alu[3][0].constant = cst2;
 
 
   // STAGE 4
@@ -212,7 +212,7 @@ freia_status freia_03_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, freia_d
   // nope
   // alu 29 div_const stage 4 flipped
   si.alu[4][0].op = SPOC_ALU_DIV_IN1_CONST;
-  si.alu[4][0].constant = cst3;
+  sp.alu[4][0].constant = cst3;
 
 
   // STAGE 5
@@ -233,7 +233,7 @@ freia_status freia_03_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, freia_d
 
   // alu 31 set_constant stage 5
   si.alu[5][0].op = SPOC_ALU_COPY_CONST;
-  si.alu[5][0].constant = cst4;
+  sp.alu[5][0].constant = cst4;
 
 
   // STAGE 6

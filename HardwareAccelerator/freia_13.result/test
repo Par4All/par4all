@@ -97,7 +97,7 @@ freia_status freia_13_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, , int32
   // STAGE 0
   // alu 11 set_constant stage 0
   si.alu[0][0].op = SPOC_ALU_COPY_CONST;
-  si.alu[0][0].constant = cst0;
+  sp.alu[0][0].constant = cst0;
 
 
   // STAGE 1
