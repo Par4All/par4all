@@ -62,6 +62,7 @@ digraph "freia_dup_01_helper_0_0" {
   "i1" [shape=circle];
 
   // outputs
+  "t" [shape=circle];
   "o" [shape=circle];
 
   // computation vertices
@@ -69,6 +70,7 @@ digraph "freia_dup_01_helper_0_0" {
   "11 =" -> "o";
   "8 +" [shape=trapezium,orientation=270];
   "8 +" -> "11 =" [label="t"];
+  "8 +" -> "t";
   "i1" -> "8 +";
   "i0" -> "8 +";
 }
@@ -80,7 +82,7 @@ digraph "freia_dup_01_helper_0_0" {
 #include <spoc.h>
 
 // FREIA-SPoC helper function for module freia_dup_01
-freia_status freia_dup_01_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, freia_data2d * i1)
+freia_status freia_dup_01_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_data2d * i0, freia_data2d * i1)
 {
   spoc_instr si;
   spoc_param sp;
@@ -105,12 +107,22 @@ freia_status freia_dup_01_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, fre
   // alu 8 add stage 0
   si.alu[0][0].op = SPOC_ALU_ADD_IN0_IN1;
 
-  // 0`t [0 alu] -> [0 alu] 11 copy
 
-  // output image o on 0
-  // o [0 alu] -> [0 output 0] 0 null
+  // STAGE 1
+  // 0`t [0 alu] -> [1 input 0] 11 copy
   si.mux[0][0].op = SPOC_MUX_IN1;
   si.mux[0][2].op = SPOC_MUX_IN0;
+  // 0`t [1 input 0] -> [1 input 0] 11 copy
+  // nope
+
+  // output image 0`t on 1 and image o on 0
+  // 0`t [0 alu] -> [1 output 1] 0 null
+  si.mux[0][1].op = SPOC_MUX_IN0;
+  si.mux[0][3].op = SPOC_MUX_IN0;
+  // 0`t [1 input 1] -> [1 output 1] 0 null
+  si.mux[1][3].op = SPOC_MUX_IN1;
+  // o [1 input 0] -> [1 output 0] 0 null
+  si.mux[1][0].op = SPOC_MUX_IN0;
 
   mcode.raw = (freia_ptr) &si;
   mcode.size = sizeof(spoc_instr);
@@ -125,7 +137,7 @@ freia_status freia_dup_01_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, fre
   ret |= freia_cg_write_dynamic_param(&dynparam);
 
   // actual call of spoc hardware
-  freia_cg_template_process_2i_2o(op, param, o0, NULL, i0, i1);
+  freia_cg_template_process_2i_2o(op, param, o1, o0, i0, i1);
 
   return ret;
 }
@@ -134,10 +146,12 @@ freia_status freia_dup_01_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, fre
 
 freia_status freia_dup_01(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 {
+   freia_data2d *t = freia_common_create_data(16, 128, 128);
    // same operation performed twice
    // t = i0 + i1
-   freia_dup_01_helper_0_0_0(o, i0, i1, i1);                            /*0008*/
+   freia_dup_01_helper_0_0_0(t, o, i0, i1, i1);                         /*0008*/
    // o = i0 + i1
    // could be replaced by o = t
+   freia_common_destruct_data(t);                                       /*0012*/
    return FREIA_OK;                                                     /*0013*/
 }

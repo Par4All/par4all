@@ -108,6 +108,7 @@ digraph "anr999_helper_0_0" {
   "in" [shape=circle];
 
   // outputs
+  "od" [shape=circle];
   "og" [shape=circle];
 
   // computation vertices
@@ -135,6 +136,7 @@ digraph "anr999_helper_0_0" {
   "73 E8" -> "74 E8" [label="og"];
   "50 D8" [shape=box];
   "50 D8" -> "87 -" [label="od"];
+  "50 D8" -> "od";
   "49 D8" [shape=box];
   "49 D8" -> "50 D8" [label="od"];
   "48 D8" [shape=box];
