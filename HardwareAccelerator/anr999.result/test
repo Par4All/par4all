@@ -570,7 +570,7 @@ freia_status anr999_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_dat
 }
 
 // FREIA-SPoC helper function for module anr999
-freia_status anr999_helper_0_0_1(freia_data2d * o0, freia_data2d * i0, freia_data2d * i1, int32_t *kern0, int32_t *kern1, int32_t *kern2, int32_t *kern3, int32_t *kern4)
+freia_status anr999_helper_0_0_1(freia_data2d * o0, freia_data2d * o1, freia_data2d * i0, freia_data2d * i1, int32_t *kern0, int32_t *kern1, int32_t *kern2, int32_t *kern3, int32_t *kern4)
 {
   spoc_instr si;
   spoc_param sp;
@@ -654,10 +654,12 @@ freia_status anr999_helper_0_0_1(freia_data2d * o0, freia_data2d * i0, freia_dat
   si.alu[2][0].op = SPOC_ALU_SUB_IN0_IN1;
 
 
-  // output image 0`og on 0
-  // 0`og [2 alu] -> [2 output 0] 0 null
-  si.mux[2][0].op = SPOC_MUX_IN1;
-  si.mux[2][2].op = SPOC_MUX_IN0;
+  // output image 0`od on 0 and image 0`og on 1
+  // 0`od [2 poc 0] -> [2 output 0] 0 null
+  si.mux[2][0].op = SPOC_MUX_IN0;
+  // 0`og [2 alu] -> [2 output 1] 0 null
+  si.mux[2][1].op = SPOC_MUX_IN0;
+  si.mux[2][3].op = SPOC_MUX_IN0;
 
   mcode.raw = (freia_ptr) &si;
   mcode.size = sizeof(spoc_instr);
@@ -672,7 +674,7 @@ freia_status anr999_helper_0_0_1(freia_data2d * o0, freia_data2d * i0, freia_dat
   ret |= freia_cg_write_dynamic_param(&dynparam);
 
   // actual call of spoc hardware
-  freia_cg_template_process_2i_2o(op, param, o0, NULL, i0, i1);
+  freia_cg_template_process_2i_2o(op, param, o0, o1, i0, i1);
 
   return ret;
 }
@@ -708,7 +710,7 @@ int anr999(void)
 
    anr999_helper_0_0_0(od, og, in, &measure_min, &measure_vol, freia_morpho_kernel_8c, freia_morpho_kernel_8c, freia_morpho_kernel_8c, freia_morpho_kernel_8c, freia_morpho_kernel_8c, freia_morpho_kernel_8c, freia_morpho_kernel_8c, freia_morpho_kernel_8c, freia_morpho_kernel_8c, freia_morpho_kernel_8c, freia_morpho_kernel_8c, freia_morpho_kernel_8c, freia_morpho_kernel_8c, freia_morpho_kernel_8c, freia_morpho_kernel_8c);         /*0038*/
 
-   anr999_helper_0_0_1(og, od, og, freia_morpho_kernel_8c, freia_morpho_kernel_8c, freia_morpho_kernel_8c, freia_morpho_kernel_8c, freia_morpho_kernel_8c);       /*0048*/
+   anr999_helper_0_0_1(od, og, od, og, freia_morpho_kernel_8c, freia_morpho_kernel_8c, freia_morpho_kernel_8c, freia_morpho_kernel_8c, freia_morpho_kernel_8c);   /*0048*/
    i_0 = 10;                                                            /*0051*/
 
    I_6 = 0;                                                             /*0053*/
