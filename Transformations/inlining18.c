@@ -1,5 +1,3 @@
-#include <stdio.h>
-
 char * foo(void)
 {
   const char * foo_fun = __FUNCTION__;
@@ -8,8 +6,9 @@ char * foo(void)
 
 int main(void)
 {
-  char * fun = foo();
-  fprintf(stdout, "fun: %s\n", fun);
-  fprintf(stdout, "function: %s\n", __FUNCTION__);
+  const char * fun, * fun2, * fun3;
+  fun = foo();
+  fun2 = __FUNCTION__;
+  fun3 = __func__;
   return 0;
 }
