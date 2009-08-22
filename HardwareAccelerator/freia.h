@@ -29,8 +29,8 @@ extern freia_status freia_common_destruct_data(freia_data2d *);
 // IO
 extern freia_status freia_common_open_input(freia_dataio *, uint32_t);
 extern freia_status freia_common_open_output(freia_dataio *, uint32_t, uint32_t, uint32_t, uint32_t);
-extern freia_status freia_common_rx_image(const freia_data2d *, freia_dataio *);
-extern freia_status freia_common_tx_image(freia_data2d *, freia_dataio *);
+extern freia_status freia_common_rx_image(freia_data2d *, freia_dataio *);
+extern freia_status freia_common_tx_image(const freia_data2d *, freia_dataio *);
 extern freia_status freia_common_close_input(freia_dataio *);
 extern freia_status freia_common_close_output(freia_dataio *);
 
@@ -66,7 +66,7 @@ extern freia_status freia_aipo_xor(freia_data2d *, const freia_data2d *, const f
 extern freia_status freia_aipo_xor_const(freia_data2d *, const freia_data2d *, int32_t);
 extern freia_status freia_aipo_not(freia_data2d *, const freia_data2d *);
 // Linear
-extern freia_status freia_aipo_convolution(freia_data2d *, const freia_data2d *, int32_t *, uint32_t, uint32_t);
+extern freia_status freia_aipo_convolution(freia_data2d *, const freia_data2d *, const int32_t *, uint32_t, uint32_t);
 extern freia_status freia_aipo_fast_correlation(freia_data2d *, const freia_data2d *, const freia_data2d *, uint32_t);
 // Measure
 extern freia_status freia_aipo_global_min(const freia_data2d *, int32_t *);

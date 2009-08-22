@@ -30,29 +30,30 @@ freia_status freia_common_open_output(freia_dataio *out,
 
 freia_status freia_common_rx_image(freia_data2d * img, freia_dataio * in)
 {
-  img->stuff = in;
+  img->stuff = (int) in;
   return FREIA_OK;
 }
 
-freia_status freia_common_tx_image(freia_data2d * img, freia_dataio * out)
+freia_status freia_common_tx_image(const freia_data2d * img, freia_dataio * out)
 {
-  out = img->stuff;
+  out = (void *) img->stuff;
   return FREIA_OK;
 }
 
-freia_status freia_common_close_input(freia_data2d * n)
+freia_status freia_common_close_input(freia_dataio * n)
 {
   return FREIA_OK;
 }
 
-freia_status freia_common_close_output(freia_data2d * n)
+freia_status freia_common_close_output(freia_dataio * n)
 {
   return FREIA_OK;
 }
 
 #define Fbin(name)						\
   freia_status							\
-  name(freia_data2d * o, freia_data2d * i0, freia_data2d * i1)	\
+  name(freia_data2d * o,					\
+       const freia_data2d * i0, const freia_data2d * i1)	\
   {								\
     o->stuff = i0->stuff | i1->stuff;				\
     return FREIA_OK;						\
@@ -61,7 +62,8 @@ freia_status freia_common_close_output(freia_data2d * n)
 #define FbinP(name)						\
   freia_status							\
   name(freia_data2d * o,					\
-       freia_data2d * i0, freia_data2d * i1, uint32_t c)	\
+       const freia_data2d * i0, const freia_data2d * i1,	\
+       uint32_t c)						\
   {								\
     o->stuff = i0->stuff | i1->stuff | (int32_t) c;		\
     return FREIA_OK;						\
@@ -69,7 +71,7 @@ freia_status freia_common_close_output(freia_data2d * n)
 
 #define Fun(name)						\
   freia_status							\
-  name(freia_data2d * o, freia_data2d * i)			\
+  name(freia_data2d * o, const freia_data2d * i)		\
   {								\
     o->stuff = i->stuff;					\
     return FREIA_OK;						\
@@ -77,71 +79,73 @@ freia_status freia_common_close_output(freia_data2d * n)
 
 #define FunP(name)						\
   freia_status							\
-  name(freia_data2d * o, freia_data2d * i, int32_t c)		\
+  name(freia_data2d * o, const freia_data2d * i, int32_t c)	\
   {								\
     o->stuff = i->stuff | c;					\
     return FREIA_OK;						\
   }
 
-#define FunK(name)						\
-  freia_status							\
-  name(freia_data2d * o, freia_data2d * i, int32_t * k)		\
-  {								\
-    o->stuff = i->stuff | *k;					\
-    return FREIA_OK;						\
+#define FunK(name)					\
+  freia_status						\
+  name(freia_data2d * o,				\
+       const freia_data2d * i, const int32_t * k)	\
+  {							\
+    o->stuff = i->stuff | *k;				\
+    return FREIA_OK;					\
   }
 
-#define FunK2P(name)						\
-  freia_status							\
-  name(freia_data2d * o, freia_data2d * i,			\
-       int32_t * k, uint32_t c0, uint32_t c1)			\
-  {								\
-    o->stuff = i->stuff | *k | (c0 & c1);			\
-    return FREIA_OK;						\
+#define FunK2P(name)					\
+  freia_status						\
+  name(freia_data2d * o, const freia_data2d * i,	\
+       const int32_t * k, uint32_t c0, uint32_t c1)	\
+  {							\
+    o->stuff = i->stuff | *k | (c0 & c1);		\
+    return FREIA_OK;					\
   }
 
-#define Fun2P(name)						\
-  freia_status							\
-  name(freia_data2d * o, freia_data2d * i,			\
-       int32_t c1, int32_t c2)					\
-  {								\
-    o->stuff = i->stuff | (c1+c2);				\
-    return FREIA_OK;						\
+#define Fun2P(name)					\
+  freia_status						\
+  name(freia_data2d * o, const freia_data2d * i,	\
+       int32_t c1, uint32_t c2)				\
+  {							\
+    o->stuff = i->stuff | (c1+c2);			\
+    return FREIA_OK;					\
   }
 
-#define Fun3P(name)						\
-  freia_status							\
-  name(freia_data2d * o, freia_data2d * i,			\
-       int32_t c1, int32_t c2, bool b)				\
-  {								\
-    o->stuff = i->stuff | b? c1: c2;				\
-    return FREIA_OK;						\
+#define Fun3P(name)					\
+  freia_status						\
+  name(freia_data2d * o, const freia_data2d * i,	\
+       int32_t c1, int32_t c2, bool b)			\
+  {							\
+    o->stuff = i->stuff | b? c1: c2;			\
+    return FREIA_OK;					\
   }
 
-#define FnuP(name)						\
-  freia_status							\
-  name(freia_data2d * o, int32_t c)				\
-  {								\
-    o->stuff = c;						\
-    return FREIA_OK;						\
+#define FnuP(name)					\
+  freia_status						\
+  name(freia_data2d * o, int32_t c)			\
+  {							\
+    o->stuff = c;					\
+    return FREIA_OK;					\
   }
 
 #define Fred1(name)					\
   freia_status						\
-  name(freia_data2d * i, int32_t * r)			\
+  name(const freia_data2d * i, int32_t * r)		\
   {							\
     *r = i->stuff;					\
     return FREIA_OK;					\
   }
 
-#define Fred3(name)							\
-  freia_status								\
-  name(freia_data2d * i, int32_t * r0, int32_t * r1, int32_t * r2)	\
-  {									\
-    *r0 = i->stuff;							\
-    *r1 = i->stuff;							\
-    *r2 = i->stuff;							\
-    return FREIA_OK;							\
+#define Fred3(name)					\
+  freia_status						\
+  name(const freia_data2d * i,				\
+       int32_t * r0, int32_t * r1, int32_t * r2)	\
+  {							\
+    *r0 = i->stuff;					\
+    *r1 = i->stuff;					\
+    *r2 = i->stuff;					\
+    return FREIA_OK;					\
   }
 
 // AIPO function definitions
