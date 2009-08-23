@@ -1,0 +1,12 @@
+void foo(void)
+{
+   int i;
+   int s = 0;
+   for (i = 0;i<3;i++)                                                  /*0006*/
+      s += kernel[i];                                                   /*0007*/
+}
+void inlining19(void)
+{
+   foo();                                                               /*0004*/
+   foo();                                                               /*0005*/
+}
