@@ -1,0 +1,249 @@
+
+! initial function
+
+void freia_skip_06(freia_data2d *o, freia_data2d *i)
+{
+   freia_data2d *t0;
+   freia_data2d *t1;
+   // live allocation in an intermediate statement
+   freia_aipo_add(i, i, i);                                             /*0006*/
+   t0 = freia_common_create_data(16, 128, 128);                         /*0007*/
+   t1 = freia_common_create_data(16, 128, 128);                         /*0008*/
+   freia_aipo_and_const(t0, i, 111);                                    /*0009*/
+   freia_aipo_xor_const(t1, i, 111);                                    /*0010*/
+   freia_aipo_addsat(o, t0, t1);                                        /*0011*/
+   freia_common_destruct_data(t0);                                      /*0012*/
+   freia_common_destruct_data(t1);                                      /*0013*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "freia_skip_06" in dot format
+digraph "dag_0" {
+  // inputs
+  "i" [shape=circle];
+
+  // outputs
+  "i" [shape=circle];
+  "o" [shape=circle];
+
+  // computation vertices
+  "11 +s" [shape=trapezium,orientation=270];
+  "11 +s" -> "o";
+  "10 ^." [shape=trapezium,orientation=270];
+  "10 ^." -> "11 +s" [label="t1"];
+  "9 &." [shape=trapezium,orientation=270];
+  "9 &." -> "11 +s" [label="t0"];
+  "8 ?" [shape=none];
+  "7 ?" [shape=none];
+  "6 +" [shape=trapezium,orientation=270];
+  "6 +" -> "10 ^." [label="i"];
+  "6 +" -> "9 &." [label="i"];
+  "6 +" -> "i";
+  "i" -> "6 +";
+  "i" -> "6 +";
+}
+// graph for dag "dag_cleaned_0" of module "freia_skip_06" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "i" [shape=circle];
+
+  // outputs
+  "i" [shape=circle];
+  "o" [shape=circle];
+
+  // computation vertices
+  "11 +s" [shape=trapezium,orientation=270];
+  "11 +s" -> "o";
+  "10 ^." [shape=trapezium,orientation=270];
+  "10 ^." -> "11 +s" [label="t1"];
+  "9 &." [shape=trapezium,orientation=270];
+  "9 &." -> "11 +s" [label="t0"];
+  "8 ?" [shape=none];
+  "7 ?" [shape=none];
+  "6 +" [shape=trapezium,orientation=270];
+  "6 +" -> "10 ^." [label="i"];
+  "6 +" -> "9 &." [label="i"];
+  "6 +" -> "i";
+  "i" -> "6 +";
+  "i" -> "6 +";
+}
+// graph for dag "freia_skip_06_helper_0_0" of module "freia_skip_06" in dot format
+digraph "freia_skip_06_helper_0_0" {
+  // inputs
+  "i" [shape=circle];
+
+  // outputs
+  "i" [shape=circle];
+  "t0" [shape=circle];
+
+  // computation vertices
+  "9 &." [shape=trapezium,orientation=270];
+  "9 &." -> "t0";
+  "6 +" [shape=trapezium,orientation=270];
+  "6 +" -> "9 &." [label="i"];
+  "6 +" -> "i";
+  "i" -> "6 +";
+  "i" -> "6 +";
+}
+// graph for dag "freia_skip_06_helper_0_1" of module "freia_skip_06" in dot format
+digraph "freia_skip_06_helper_0_1" {
+  // inputs
+  "t0" [shape=circle];
+  "i" [shape=circle];
+
+  // outputs
+  "o" [shape=circle];
+
+  // computation vertices
+  "11 +s" [shape=trapezium,orientation=270];
+  "11 +s" -> "o";
+  "t0" -> "11 +s";
+  "10 ^." [shape=trapezium,orientation=270];
+  "10 ^." -> "11 +s" [label="t1"];
+  "i" -> "10 ^.";
+}
+
+! acceleration function
+
+#include <freiaCommon.h>
+#include <freiaCoarseGrain.h>
+#include <spoc.h>
+
+// FREIA-SPoC helper function for module freia_skip_06
+freia_status freia_skip_06_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_data2d * i0, int32_t cst0)
+{
+  spoc_instr si;
+  spoc_param sp;
+  spoc_reduction reduc;
+  freia_microcode mcode;
+  freia_dynamic_param dynparam;
+  freia_reduction_results redres;
+  freia_op_sel op = 0;
+  freia_op_param param;
+  freia_status ret;
+  int i;
+
+  // init pipe to nop
+  spoc_init_pipe(&si, &sp, 16);
+
+
+  // STAGE 0
+  // i [0 input 0] -> [0 alu] 6 add
+  // nope
+  // i [0 input 1] -> [0 alu] 6 add
+  // nope
+  // alu 6 add stage 0
+  si.alu[0][0].op = SPOC_ALU_ADD_IN0_IN1;
+
+
+  // STAGE 1
+  // i [0 alu] -> [1 alu] 9 and_const
+  si.mux[0][0].op = SPOC_MUX_IN1;
+  si.mux[0][2].op = SPOC_MUX_IN0;
+  // i [1 input 0] -> [1 alu] 9 and_const
+  // nope
+  // alu 9 and_const stage 1
+  si.alu[1][0].op = SPOC_ALU_AND_IN0_CONST;
+  sp.alu[1][0].constant = cst0;
+
+
+  // output image i on 0 and image 0`t0 on 1
+  // i [1 poc 0] -> [1 output 0] 0 null
+  si.mux[1][0].op = SPOC_MUX_IN0;
+  // 0`t0 [1 alu] -> [1 output 1] 0 null
+  si.mux[1][1].op = SPOC_MUX_IN1;
+  si.mux[1][3].op = SPOC_MUX_IN0;
+
+  mcode.raw = (freia_ptr) &si;
+  mcode.size = sizeof(spoc_instr);
+
+  dynparam.raw = (freia_ptr) &sp;
+  dynparam.size = sizeof(spoc_param);
+
+  redres.raw = (freia_ptr) &reduc;
+  redres.size = sizeof(spoc_reduction);
+
+  ret = freia_cg_write_microcode(&mcode);
+  ret |= freia_cg_write_dynamic_param(&dynparam);
+
+  // actual call of spoc hardware
+  freia_cg_template_process_2i_2o(op, param, o0, o1, i0, i0);
+
+  return ret;
+}
+
+// FREIA-SPoC helper function for module freia_skip_06
+freia_status freia_skip_06_helper_0_1_0(freia_data2d * o0, freia_data2d * i0, freia_data2d * i1, int32_t cst0)
+{
+  spoc_instr si;
+  spoc_param sp;
+  spoc_reduction reduc;
+  freia_microcode mcode;
+  freia_dynamic_param dynparam;
+  freia_reduction_results redres;
+  freia_op_sel op = 0;
+  freia_op_param param;
+  freia_status ret;
+  int i;
+
+  // init pipe to nop
+  spoc_init_pipe(&si, &sp, 16);
+
+
+  // STAGE 0
+  // i [0 input 1] -> [0 alu] 10 xor_const
+  // nope
+  // alu 10 xor_const stage 0 flipped
+  si.alu[0][0].op = SPOC_ALU_XOR_IN1_CONST;
+  sp.alu[0][0].constant = cst0;
+
+
+  // STAGE 1
+  // 0`t0 [0 input 0] -> [1 alu] 11 addsat
+  si.mux[0][0].op = SPOC_MUX_IN0;
+  // 0`t0 [1 input 0] -> [1 alu] 11 addsat
+  // nope
+  // 0`t1 [0 alu] -> [1 alu] 11 addsat
+  si.mux[0][1].op = SPOC_MUX_IN1;
+  si.mux[0][3].op = SPOC_MUX_IN0;
+  // 0`t1 [1 input 1] -> [1 alu] 11 addsat
+  // nope
+  // alu 11 addsat stage 1
+  si.alu[1][0].op = SPOC_ALU_ADDSAT_IN0_IN1;
+
+
+  // output image o on 0
+  // o [1 alu] -> [1 output 0] 0 null
+  si.mux[1][0].op = SPOC_MUX_IN1;
+  si.mux[1][2].op = SPOC_MUX_IN0;
+
+  mcode.raw = (freia_ptr) &si;
+  mcode.size = sizeof(spoc_instr);
+
+  dynparam.raw = (freia_ptr) &sp;
+  dynparam.size = sizeof(spoc_param);
+
+  redres.raw = (freia_ptr) &reduc;
+  redres.size = sizeof(spoc_reduction);
+
+  ret = freia_cg_write_microcode(&mcode);
+  ret |= freia_cg_write_dynamic_param(&dynparam);
+
+  // actual call of spoc hardware
+  freia_cg_template_process_2i_2o(op, param, o0, NULL, i0, i1);
+
+  return ret;
+}
+
+! updated function
+
+void freia_skip_06(freia_data2d *o, freia_data2d *i)
+{
+   freia_data2d *t0;
+   // live allocation in an intermediate statement
+   freia_skip_06_helper_0_0_0(i, t0, i, 111);                           /*0006*/
+   t0 = freia_common_create_data(16, 128, 128);                         /*0007*/
+   freia_skip_06_helper_0_1_0(o, t0, i, 111);                           /*0010*/
+   freia_common_destruct_data(t0);                                      /*0012*/
+}
