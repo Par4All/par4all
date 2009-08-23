@@ -1,0 +1,12 @@
+delete freia
+create freia freia.c
+setproperty ABORT_ON_USER_ERROR TRUE
+shell ${PIPS_CC:-gcc} -c freia.c -o freia.database/Tmp/freia.o
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+activate PRINT_CODE
+display PRINTED_FILE[%ALLFUNC]
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[%ALLFUNC]
+close
+delete freia
