@@ -1,0 +1,23 @@
+ main
+     foo
+         bla
+int foo(void)
+{
+   bla(kernel);                                                         /*0004*/
+   return 0;                                                            /*0005*/
+}
+int main(void)
+{
+   foo();                                                               /*0003*/
+   return 0;                                                            /*0004*/
+}
+int main(void)
+{
+   int I_0;
+   extern  kernel();
+   bla(kernel);                                                         /*0005*/
+   /*0004*/
+   I_0 = 0;                                                             /*0006*/
+   I_0;                                                                 /*0009*/
+   return 0;                                                            /*0010*/
+}
