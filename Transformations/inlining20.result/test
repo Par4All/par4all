@@ -1,0 +1,42 @@
+void foo(int i)
+{
+   i = i+1;                                                             /*0004*/
+   return;                                                              /*0005*/
+}
+void inlining20(int j)
+{
+   foo(2);                                                              /*0004*/
+   foo(j);                                                              /*0005*/
+}
+void inlining20(int j)
+{
+   {
+      int i_ = 2;
+      i_ = i_+1;                                                        /*0005*/
+      /*0004*/
+      return;                                                           /*0006*/
+      /*0005*/
+   }
+   {
+      int i_ = j;
+      i_ = i_+1;                                                        /*0011*/
+      /*0004*/
+      return;                                                           /*0012*/
+      /*0005*/
+   }
+}
+void inlining20(int j)
+{
+   extern int i__0;
+   extern int i__1;
+   i__0 = 2;
+   i__0 = i__0+1;                                                       /*0005*/
+   /*0004*/
+   return;                                                              /*0006*/
+   /*0005*/
+   i__1 = j;
+   i__1 = i__1+1;                                                       /*0011*/
+   /*0004*/
+   return;                                                              /*0012*/
+   /*0005*/
+}

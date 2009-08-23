@@ -1,0 +1,13 @@
+delete inlining20
+create inlining20 inlining20.c
+setproperty ABORT_ON_USER_ERROR TRUE
+setproperty PRETTYPRINT_C_CODE TRUE
+activate C_PARSER
+display PRINTED_FILE[%ALLFUNC]
+apply INLINING[foo]
+display PRINTED_FILE[inlining20]
+apply FLATTEN_CODE[inlining20]
+display PRINTED_FILE[inlining20]
+close
+delete inlining20
+quit
