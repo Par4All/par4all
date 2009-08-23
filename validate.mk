@@ -94,9 +94,14 @@ DEFTEST	= default_test2
 # what about nothing?
 missing:
 	@echo "# checking for missing (?) result directories"
-	@for res in $(F.res) ; do \
-	  test -d $$res || echo "missing: $$res" >&2 ; \
-	done
+	@ n=0; \
+	for res in $(F.res) ; do \
+	  if [ ! -d $$res ] ; then \
+	     echo "missing: $$res" ; \
+	     let n++; \
+	  fi ; \
+	done ; \
+	echo "# $$n missing result(s)"
 
 missing-svn:
 	@echo "# result directories not under svn"
