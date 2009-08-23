@@ -501,7 +501,7 @@ void dag_optimize(dag d)
 {
   set remove = set_make(set_pointer);
 
-  ifdebug(4) {
+  ifdebug(6) {
     pips_debug(4, "considering dag:\n");
     dag_dump(stderr, "input", d);
   }
@@ -518,7 +518,7 @@ void dag_optimize(dag d)
 
     FOREACH(dagvtx, vr, vertices)
     {
-      pips_debug(7, "at vertex %"_intFMT"\n", dagvtx_number(vr));
+      pips_debug(8, "at vertex %"_intFMT"\n", dagvtx_number(vr));
       // skip no-operations
       int op = (int) vtxcontent_optype(dagvtx_content(vr));
       if (op<spoc_type_poc || op>spoc_type_thr) continue;
@@ -529,7 +529,7 @@ void dag_optimize(dag d)
       {
 	dagvtx p = (dagvtx) pp;
 
-	pips_debug(6, "comparing %"_intFMT" and %"_intFMT"\n",
+	pips_debug(8, "comparing %"_intFMT" and %"_intFMT"\n",
 		   dagvtx_number(vr), dagvtx_number(p));
 
 	// ??? maybe I should not remove all duplicates, because
@@ -609,7 +609,7 @@ void dag_optimize(dag d)
 
   SET_FOREACH(dagvtx, r, remove)
   {
-    pips_debug(5, "removing vertex %" _intFMT "\n", dagvtx_number(r));
+    pips_debug(7, "removing vertex %" _intFMT "\n", dagvtx_number(r));
 
     vtxcontent c = dagvtx_content(r);
     if (pstatement_statement_p(vtxcontent_source(c)))
@@ -624,7 +624,7 @@ void dag_optimize(dag d)
 
   set_free(remove);
 
-  ifdebug(4) {
+  ifdebug(6) {
     pips_debug(4, "resulting dag:\n");
     dag_dump(stderr, "cleaned", d);
   }

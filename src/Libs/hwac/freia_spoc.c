@@ -1671,7 +1671,7 @@ static void live_update(dag d, dagvtx v, set sure, set maybe)
 
 /* returns an allocated set of vertices with live outputs.
  */
-static set output_arcs(set vs)
+static set output_arcs(dag d, set vs)
 {
   set out_nodes = set_make(set_pointer);
   // direct output nodes
@@ -1684,17 +1684,16 @@ static set output_arcs(set vs)
 
       // it is needed if...
       list succs = dagvtx_succs(v);
-      if (succs)
+      if (gen_in_list_p(v, dag_outputs(d)))
+	  is_needed = true;
+      else if (succs)
       {
 	// some succs are not yet computed...
 	FOREACH(dagvtx, vsucc, succs)
 	  if (!set_belong_p(vs, vsucc))
 	    is_needed = true;
       }
-      else
-	// or if there is no successor!?
-	// ??? this is how outs are computed right now...
-	is_needed = true;
+      // else there is no successor!?
 
       if (is_needed)
 	set_add_element(out_nodes, out_nodes, v);
@@ -1705,9 +1704,9 @@ static set output_arcs(set vs)
 
 /* how many output arcs from this set of vertices ?
  */
-static int number_of_output_arcs(set vs)
+static int number_of_output_arcs(dag d, set vs)
 {
-  set out_nodes = output_arcs(vs);
+  set out_nodes = output_arcs(d, vs);
   int n_arcs = set_size(out_nodes);
   set_free(out_nodes);
   return n_arcs;
@@ -1722,8 +1721,9 @@ static dagvtx first_which_may_be_added
    set sure,    // of dagvtx
    __attribute__((unused)) set maybe)   // image entities
 {
+  dagvtx chosen = NULL;
   set inputs = set_make(set_pointer);
-  int n_outputs = number_of_output_arcs(current);
+  int n_outputs = number_of_output_arcs(dall, current);
   pips_assert("should be okay at first!", n_outputs<=2);
 
   // output arcs from this subset
@@ -1732,6 +1732,21 @@ static dagvtx first_which_may_be_added
   FOREACH(dagvtx, v, lv)
   {
     pips_assert("not yet there", !set_belong_p(current, v));
+
+    // some intermediate stuff
+    if (dagvtx_optype(v)==spoc_type_oth)
+    {
+      chosen = v;
+      break;
+    }
+
+    // no image is produce, so no image output is added...
+    if (!dagvtx_image(v))
+    {
+      pips_assert("is a mesure", dagvtx_optype(v)==spoc_type_mes);
+      chosen = v;
+      break;
+    }
 
     list preds = dag_vertex_preds(dall, v);
     set_assign_list(inputs, preds);
@@ -1751,17 +1766,18 @@ static dagvtx first_which_may_be_added
     }
 
     set_add_element(current, current, v);
-    if (number_of_output_arcs(current) <= 2)
-    {
-      set_del_element(current, current, v);
-      set_free(inputs);
-      return v;
-    }
+    int narcs_with_v = number_of_output_arcs(dall, current);
     set_del_element(current, current, v);
+
+    if (narcs_with_v <= 2)
+    {
+      chosen = v;
+      break;
+    }
   }
   // none found
   set_free(inputs);
-  return NULL;
+  return chosen;
 }
 
 // DEBUG...
