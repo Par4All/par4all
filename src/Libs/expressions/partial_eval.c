@@ -1439,9 +1439,14 @@ void partial_eval_statement(statement stmt)
 				       stmt_prec(stmt),
 				       stmt_to_fx(stmt,fx_map));
     } break;
-  case is_instruction_goto :
+  case is_instruction_goto:
     break;
-  case is_instruction_unstructured :
+  case is_instruction_unstructured:
+    break;
+  case is_instruction_expression:
+    partial_eval_expression_and_regenerate(&instruction_expression(inst),
+					   stmt_prec(stmt),
+					   stmt_to_fx(stmt,fx_map));
     break;
   default :
     pips_internal_error("Bad instruction tag %d", instruction_tag(inst));
