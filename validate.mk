@@ -78,7 +78,7 @@ DFTPIPS	= default_tpips
 
 # default_test relies on FILE WSPACE NAME
 # Semantics & Regions create local "properties.rc":-(
-DEFTEST	= default_test2
+DEFTEST	= default_test
 %.result/$(TEST): %.c $(DEFTEST)
 	WSPACE=$* FILE=$(here)/$< sh $(DEFTEST) \
 	| $(FLT) > $@ ; $(OK)
