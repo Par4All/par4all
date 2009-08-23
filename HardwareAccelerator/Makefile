@@ -1,1 +1,3 @@
-../validate.mk
+# $Id$
+
+include ../validate.mk
