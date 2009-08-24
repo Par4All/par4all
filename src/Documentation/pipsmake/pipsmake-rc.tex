@@ -6845,6 +6845,11 @@ this phase.
 The current implementation is still shaky and does not handle well
 expressions of mixed types such as \verb|X+1| where \verb|1| is implictly
 promoted from integer to real.
+
+\textbf{Warning}: this phase relies on an external (and unavailable) binary.
+To make it work, you can set \verb+EOLE_OPTIMIZATION_STRATEGY+ to \verb+"CSE"+.
+This will ony activate common subexpressions elimination.
+
 %%!UserManualDocumentation
 
 \begin{PipsMake}
