@@ -274,7 +274,7 @@ extern void *gen_identity(const void *);
 extern void *gen_find_tabulated(string, int);
 extern list gen_filter_tabulated(bool(*)(gen_chunk*), int);
 extern void gen_free_area(void**, int);
-extern void gen_mapc_tabulated GEN_PROTO(( void (*)(), int )) ;
+extern void gen_mapc_tabulated(void (*)(), int);
 
 // Functions in list.c
 
@@ -310,10 +310,10 @@ extern gen_chunk gen_nth(int, const list);
 extern list gen_nthcdr(int, const list);
 
 // MAP
-extern void gen_map(void (*)(), const list);
-extern void gen_mapl(void (*)(), const list);
+extern void gen_map(gen_iter_func_t, const list);
+extern void gen_mapl(gen_iter_func_t, const list);
 
-extern char *gen_reduce(char *, char *(*)(), const list);
+extern void * gen_reduce(void *, void *(*)(void*, const list), const list);
 
 extern void gen_remove(list *, const void *);
 extern void gen_remove_once(list *, const void *);

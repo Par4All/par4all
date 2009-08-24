@@ -159,14 +159,14 @@ size_t list_own_allocated_memory(const list l)
 
 /*   MAP
  */
-void gen_mapl(void (*fp)(), const list l)
+void gen_mapl(gen_iter_func_t fp, const list l)
 {
   list cp = (list) l;
   for (; cp != NIL ; cp = cp->cdr)
     (*fp)(cp);
 }
 
-void gen_map(void (*fp)(), const list l)
+void gen_map(gen_iter_func_t fp, const list l)
 {
   list cp = (list) l;
   for (; !ENDP(cp); cp=CDR(cp))
@@ -174,7 +174,7 @@ void gen_map(void (*fp)(), const list l)
 }
 
 // should be void * ?
-char * gen_reduce(char * r, char *(*fp)(), const list l)
+void * gen_reduce(void * r, void *(*fp)(void *, const list), const list l)
 {
   list cp = (list) l;
   for( ; cp != NIL ; cp = cp->cdr ) {
