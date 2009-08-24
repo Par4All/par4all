@@ -7243,14 +7243,41 @@ scalarization  > MODULE.code
 
 \subsection{Flatten Code}
 
-Currently being developed by Laurent DAVERIO.
+The goal of this program transformation is to enlarge basic blocks as
+much as possible to increase the opportunities for optimization.
+
+This transformation has been developped in PIPS for heterogeneous computing
+and is combined with inlining to increase the size of the code
+executed by an external accelerator while reducing the
+externalization overhead\footnote{FREIA project}. Other
+transformations, such as partial evaluation and dead code elimination
+(including use-def elimination) can be applied to streamline the
+resulting code further.
+
+The transformation \verb/flatten_code/ firstly moves declarations up
+in the abstract syntax tree, secondly remove useless braces and
+thirdly fully unroll loops when there iteration counts are known.
+
+Inlining(s), which must be performed explictly by the user with tpips
+or another PIPS interface, can be used first to create lots of
+opportunities. The basic block size increase is first due to brace
+removals made possible when declarations have been moved up, and
+then to loop unrollings. Finally, partial evaluation, dead code elimination
+and use-def based elimination can also straighten-out the code and
+enlarge basic blocks by removing useless tests or assignments.
+
+The code externalization and adpatation for a given hardware
+accelerator is performed by another phase, see for instance
+Section~\ref{hardware-accelerator}.
+
+Initially developed in August 2009 by Laurent DAVERIO, with help from
+Fabein Coelhp and Francois Irigoin.
 
 \begin{PipsMake}
 alias flatten_code 'Flatten Code'
 flatten_code > MODULE.code
         < PROGRAM.entities
         < MODULE.code
-
 \end{PipsMake}
 
 

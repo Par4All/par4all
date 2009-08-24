@@ -142,8 +142,12 @@ expression variable_initial_expression(entity v)
   return exp;
 }
 
-/* gen_multi_recurse callback on exiting a statement:
- */
+/* gen_multi_recurse callback on exiting a statement:recompute the
+   declaration list for statement s and transform initializations into
+   assignments when required according to the renaming map
+   "renamings". Renaming may be neutral to handle external
+   variables. The initial values are used to specify if an assignment
+   must be created or not. */
 static void rename_statement_declarations(statement s, hash_table renamings)
 {
   if (statement_block_p(s)) {
@@ -211,21 +215,23 @@ static void rename_statement_declarations(statement s, hash_table renamings)
 
 
 /* Create a copy of an entity, with (almost) identical type, storage
-   and initial value, but a slightly different name as entities are
-   uniquely known by their names, and a different offset if the
-   storage is ram.
+   and initial value if move_initialization_p is FALSE, but with a slightly
+   different name as entities are uniquely known by their names, and a
+   different offset if the storage is ram (still to be done).
 
    Entity e must be defined or the function core dumps.
 
    Depending on its storage, the new entity might have to be inserted
-   in code_declarations and the memory allocation recomputed.
+   in code_declarations (done) and the memory allocation recomputed (not done).
 
    Depending on the language, the new entity might have to be inserted
    in statement declarations. This is left up to the user of this function.
 
    @return the new entity.
 */
-entity make_entity_copy_with_new_name(entity e, string global_new_name, bool move_initialization_p)
+entity make_entity_copy_with_new_name(entity e,
+				      string global_new_name,
+				      bool move_initialization_p)
 {
   entity ne = entity_undefined;
   char * variable_name = strdup(global_new_name);
@@ -269,7 +275,21 @@ entity make_entity_copy_with_new_name(entity e, string global_new_name, bool mov
   return ne;
 }
 
-/* To generate the new variables, we need to know if there is an enclosing control cycle*/
+/* To generate the new variables, we need to know:
+ *
+ *  - if there is an enclosing control cycle
+ *
+ *  - what is the (current) statement to be used for declaration
+ *
+ *  - the current scope corresponding to that statement
+ *
+ *  - the current module name (get_current_module_name() could be used
+ *  instead)
+ *
+ *  - and the renaming map
+ *
+ * This data structure is private to flatten_code.c
+ */
 
 typedef struct redeclaration_context {
   int cycle_depth;
@@ -279,6 +299,10 @@ typedef struct redeclaration_context {
   hash_table renamings;
 } redeclaration_context_t;
 
+/* This function makes the key decision about the renaming: should
+   the variable be renamed? Is the renaming and declaration move
+   compatible with its initialization expression and its control
+   context? */
 static bool redeclaration_enter_statement(statement s, redeclaration_context_t * rdcp)
 {
   instruction i = statement_instruction(s);
@@ -320,7 +344,7 @@ static bool redeclaration_enter_statement(statement s, redeclaration_context_t *
 	}
 	else if(rdcp->cycle_depth>0) {
 	  /* We are in a control cycle. The initial value must be
-	     reassigned where the declaration were. */
+	     reassigned where the declaration was. */
 	  if(expression_is_C_rhs_p(ie)) {
 	    redeclare_p = TRUE;
 	    move_initialization_p = FALSE;
@@ -351,6 +375,7 @@ static bool redeclaration_enter_statement(statement s, redeclaration_context_t *
 	}
 
 	if(redeclare_p) {
+	  /* Build the new variable */
 	  string eun = entity_user_name(v);
 
 	  string negn = strdup(concatenate(mn, MODULE_SEP_STRING, rdcp->scope, eun, NULL));
@@ -369,6 +394,7 @@ static bool redeclaration_enter_statement(statement s, redeclaration_context_t *
   return TRUE;
 }
 
+/* Keep track of cycle exit in the hierarchical control flow graph */
 static bool redeclaration_exit_statement(statement s,
 				  redeclaration_context_t * rdcp)
 {
@@ -400,32 +426,33 @@ static void compute_renamings(statement s, string sc, string mn, hash_table rena
 
 /*
   This functions locates all variable declarations in embedded blocks,
-  and moves them to the top-level block, renaming them in case of conflicts.
+  and moves them to the top-level block when possible, renaming them
+  in case of conflicts.
 
   First, we are going to loop through each declaration in the
-  statement and its sub-blocks, and build two collections :
+  statement instruction (no in the statement itself) and its
+  sub-blocks, and build a renaming map: an (entity-> new entity) hash
+  of pointers to keep track of renamed variables
 
-  - variables: a set to keep track of the variable declarations
-    already encountered
+  Not all variable declarations can be moved and/or renamed. Not all
+  initializations can be transformed into assignments. And some
+  variables declared locally are not variables local to the block.
 
-  - renamings: an (entity-> new entity) hash of pointers to keep track
-    of renamed variables
+  If a variable with the name we would like for the renamed variable
+  is already in the symbol table, we have a naming conflict. In that case, we
+  create a new entity sharing the same properties as the conflicting
+  one, but with a derived name (original name + numerical suffix), and
+  we update the hashtable with the new entity
 
-  If a variable was already encountered (i.e. already in the set), we
-  probably have a naming conflict. In that case, we create a new
-  entity sharing the same properties as the conflicting one, but with
-  a derived name (original name + numerical suffix), and we update the
-  set and the hashtable with the new entity. In the absence of a
-  conflict, though, we just add the variable name to the set.
-
-  When the loop is done, we can then use these collections to update
+  When the renaming map is computed, we can then use it to update
   the statement via a gen_multi_recurse. Specifically, we need to:
 
   - rename variable references
+
   - rename loop indexes
+
   - replace declaration statements
 */
-
 void statement_flatten_declarations(statement s)
 {
   /* For the time being, we handle only blocks with declarations */
@@ -451,7 +478,14 @@ void statement_flatten_declarations(statement s)
 
     if(renaming_p) {
       ifdebug(1)
-	hash_table_fprintf(stderr, entity_local_name, entity_local_name, renamings);
+	hash_table_fprintf(stderr,
+			   // The warning will disappear when Fabien
+			   // updates Newgen
+			   //(char * (*)(void *)) entity_local_name,
+			   //(char * (*)(void *)) entity_local_name,
+			   (gen_string_func_t) entity_local_name,
+			   (gen_string_func_t) entity_local_name,
+			   renamings);
 
       //char *(*key_to_string)(void*),
       //char *(*value_to_string)(void*),
@@ -493,9 +527,23 @@ static bool unroll_loops_in_statement(statement s) {
 }
 
 
-/* This function is/will be composed of several steps:
+/* This function is be composed of several steps:
 
-   - flatten declarations inside statement
+   - flatten declarations inside statement: declarations are moved as
+     high as possible in the control structure
+
+   - clean_up_sequences: remove useless braces when they are nested
+
+   - unroll looops with statically known iteration number
+
+   The first two steps have been merged.
+
+   It is assumed that the function main statement will contain at
+   least one local variable. This is used to preserve the scoping
+   mechanism used by the parser. Thus, "void foo(void){{{}}}" cannot
+   be flatten. Note that clean_up_sequences could be used first to
+   avoid such cases. Funcion "void foo(void){{{extern int i;}}}"
+   cannot be flatten either, but clean_up_sequences might help.
 
  */
 bool flatten_code(string module_name)
@@ -514,16 +562,16 @@ bool flatten_code(string module_name)
   debug_on("FLATTEN_CODE_DEBUG_LEVEL");
   pips_debug(1, "begin\n");
 
-  /* Step 1: flatten declarations */
+  /* Step 1: flatten declarations and clean-up sequences */
   statement_flatten_declarations(module_stat);
 
   /* Step 2: unroll loops */
   gen_recurse( module_stat,
 	       statement_domain, gen_true, unroll_loops_in_statement
 	       );
-  clean_up_sequences(module_stat);
+  clean_up_sequences(module_stat); // again
 
-  // This might not really be necessaty
+  // This might not really be necessary, probably thanks to clean_up_seequences
   module_reorder(module_stat);
 
   pips_debug(1, "end\n");
