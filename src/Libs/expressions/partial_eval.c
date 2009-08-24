@@ -1334,7 +1334,7 @@ expression generate_monome(int coef, expression expr)
 /**
  * apply partial eval on each statement
  * we cannot recurse on something other than a statement
- * beacuase we use the effects & preco nditions attached to the statement
+ * because we use the effects & preconditions attached to the statement
  * @param stmt statement to partial_eval
  */
 void partial_eval_statement(statement stmt)
@@ -1348,7 +1348,7 @@ void partial_eval_statement(statement stmt)
   case is_instruction_block :
     {
       FOREACH(ENTITY,e,statement_declarations(stmt)) {
-	value v =entity_initial(e);
+	value v = entity_initial(e);
 	if(value_expression_p(v))
 	  partial_eval_expression_and_regenerate(&value_expression(v),stmt_prec(stmt),stmt_to_fx(stmt,fx_map));
       }
@@ -1430,7 +1430,7 @@ void partial_eval_statement(statement stmt)
 
       if(get_debug_level()>=9) {
 	print_text(stderr, text_statement(entity_undefined, 0, stmt));
-	pips_assert(__func__, statement_consistent_p(stmt));
+	pips_assert("stmt is consistent", statement_consistent_p(stmt));
       }
     } break;
   case is_instruction_call :
@@ -1449,7 +1449,7 @@ void partial_eval_statement(statement stmt)
 					   stmt_to_fx(stmt,fx_map));
     break;
   default :
-    pips_internal_error("Bad instruction tag %d", instruction_tag(inst));
+    pips_internal_error("Bad instruction tag %d\n", instruction_tag(inst));
   }
 }
 
