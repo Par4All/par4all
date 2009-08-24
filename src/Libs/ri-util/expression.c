@@ -604,8 +604,7 @@ expression e ;
 }
 
 /* More extensive than next function */
-bool extended_integer_constant_expression_p(e)
-expression e;
+bool extended_integer_constant_expression_p(expression e)
 {
   value v = EvalExpression(e);
   bool ice_p = FALSE;
@@ -661,8 +660,7 @@ expression e;
   return ice;
 }
 
-bool signed_integer_constant_expression_p(e)
-expression e;
+bool signed_integer_constant_expression_p(expression e)
 {
   if(!integer_constant_expression_p(e)) {
     syntax s = expression_syntax(e);
@@ -1898,10 +1896,10 @@ int expression_to_int(expression exp)
 	       "expression is not an integer constant");
   return(rv);
 }
-
+
 /*=================================================================*/
 /* bool expression_constant_p(expression exp)
- * Returns TRUE if "exp" contains an integer constant value.
+ * Returns TRUE if "exp" contains an (integer) constant value.
  *
  * Note : A negative constant can be represented with a call to the unary
  *        minus intrinsic function upon a positive value.
@@ -1924,6 +1922,116 @@ bool expression_constant_p(expression exp)
 	}
     }
     return(FALSE);
+}
+
+/* Returns true if the value of the expression does not depend
+   syntactically on the current store. Returns FALSE when this has not
+   been proved. */
+bool extended_expression_constant_p(expression exp)
+{
+  syntax s = expression_syntax(exp);
+  bool constant_p = FALSE;
+
+  switch(syntax_tag(s)) {
+  case is_syntax_reference: {
+    /* The only constant references in PIPS internal representation
+       are references to functions. */
+    reference r = syntax_reference(s);
+    entity v = reference_variable(r);
+    type t = ultimate_type(entity_type(v));
+
+    constant_p = type_functional_p(t);
+    break;
+  }
+  case is_syntax_range: {
+    range r = syntax_range(s);
+    expression lb = range_lower(r);
+    expression ub = range_upper(r);
+    expression inc = range_increment(r);
+
+    constant_p = extended_expression_constant_p(lb)
+      && extended_expression_constant_p(ub)
+      && extended_expression_constant_p(inc);
+    break;
+  }
+  case is_syntax_call: {
+    call c = syntax_call(s);
+    entity f = call_function(c);
+    value v = entity_initial(f);
+    switch(value_tag(v)) {
+    case is_value_constant:
+      constant_p = TRUE;
+      break;
+    case is_value_intrinsic: {
+      /* Check that all arguments are constant */
+      list args = call_arguments(c);
+      constant_p = TRUE;
+      FOREACH(EXPRESSION, sub_exp, args) {
+	constant_p = constant_p && extended_expression_constant_p(sub_exp);
+      }
+      break;
+    }
+    case is_value_symbolic:
+      /* Certainly TRUE for Fortran. Quid for C? */
+      constant_p = TRUE;
+      break;
+    case is_value_expression: {
+      /* does not make much sense... for a function! */
+      expression sub_exp = value_expression(v);
+      constant_p = extended_expression_constant_p(sub_exp);
+      break;
+    }
+    case is_value_unknown:
+    case is_value_code:
+    default:
+      /* Let's be conservative */
+      constant_p = FALSE;
+    }
+    break;
+  }
+  case is_syntax_cast: {
+    /* There might be another case of constant expressions: all that
+       are casted to void... Usage? */
+    cast c = syntax_cast(s);
+    expression sub_exp = cast_expression(c);
+    constant_p = extended_expression_constant_p(sub_exp);
+    break;
+  }
+  case is_syntax_sizeofexpression:
+    break;
+  case is_syntax_subscript:
+    break;
+  case is_syntax_application:
+    break;
+  case is_syntax_va_arg:
+    break;
+  default:
+    pips_internal_error("Unexpected syntax tag %d", syntax_tag(s));
+  }
+  return constant_p;
+}
+
+/* Not all expressions can be used as right-hand side (rhs) in C
+   assignments.
+
+   PIPS expressions used to encode initializations such as
+
+   "{ 1, 2, 3}"
+
+   in
+
+   "int k[] = { 1, 2, 3 };" cannot be used as rhs.
+
+   There are probably many more cases, especially with
+   Fortran-specific expressions, e.g. IO expressions.
+ */
+bool expression_is_C_rhs_p(expression exp)
+{
+  bool is_rhs_p = FALSE;
+
+  is_rhs_p = !brace_expression_p(exp);
+
+  return is_rhs_p;
 }
 
 bool expression_one_p(expression exp)

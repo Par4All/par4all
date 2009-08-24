@@ -269,7 +269,7 @@ typedef struct redeclaration_context {
   hash_table renamings;
 } redeclaration_context_t;
 
-bool redeclaration_enter_statement(statement s, redeclaration_context_t * rdcp)
+static bool redeclaration_enter_statement(statement s, redeclaration_context_t * rdcp)
 {
   instruction i = statement_instruction(s);
 
@@ -344,7 +344,7 @@ bool redeclaration_enter_statement(statement s, redeclaration_context_t * rdcp)
   return TRUE;
 }
 
-bool redeclaration_exit_statement(statement s,
+static bool redeclaration_exit_statement(statement s,
 				  redeclaration_context_t * rdcp)
 {
   instruction i = statement_instruction(s);
@@ -357,6 +357,19 @@ bool redeclaration_exit_statement(statement s,
     rdcp->cycle_depth--;
 
   return TRUE;
+}
+
+/* FI: added to wrap up the use of redeclaration context... */
+static void compute_renamings(statement s, string sc, string mn, hash_table renamings)
+{
+  redeclaration_context_t rdc = { 0, s, sc, mn, renamings};
+
+  gen_context_recurse(statement_instruction(s),
+		      &rdc,
+		      statement_domain,
+		      redeclaration_enter_statement,
+		      redeclaration_exit_statement);
+
 }
 
 /*
@@ -401,7 +414,8 @@ void statement_flatten_declarations(statement s)
     string seln = entity_local_name(se);
     string cs   = local_name_to_scope(seln); /* current scope for s */
     string mn   = module_name(sen);
-    redeclaration_context_t rdc = { 0, s, cs, mn, renamings};
+
+    compute_renamings(s, cs, mn, renamings);
 
     /*
     FOREACH(ENTITY, e, declarations) {
@@ -417,12 +431,6 @@ void statement_flatten_declarations(statement s)
 
     }
     */
-
-    gen_context_recurse(statement_instruction(s),
-			&rdc,
-			statement_domain,
-			redeclaration_enter_statement,
-			redeclaration_exit_statement);
 
     ifdebug(1)
       hash_table_fprintf(stderr, entity_local_name, entity_local_name, renamings);
