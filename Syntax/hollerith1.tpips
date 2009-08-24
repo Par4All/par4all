@@ -1,0 +1,11 @@
+delete hollerith1
+
+create hollerith1 hollerith1.f
+
+display PRINTED_FILE(TEST1)
+
+close
+
+delete hollerith1
+quit
+# EOF
