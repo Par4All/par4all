@@ -1,19 +1,30 @@
 int main(void)
 {
-   return foo(-5, 12);
+   int j;
+
+   j = foo(-5, 12);
+
+   return j;
 }
 
 Transformers for "main"
 
 
-//  T(main) {}
+//  T(main) {main==7}
 
 int main(void)
 {
+   int j;
 
-//  T(main) {}
+//  T(j) {j==7}
 
-   return foo(-5, 12);
+
+   j = foo(-5, 12);
+
+//  T(main) {j==main}
+
+
+   return j;
 }
 
 Transformers for "foo"
@@ -36,18 +47,25 @@ Preconditions for "main"
 
 int main(void)
 {
+   int j;
 
 //  P() {}
 
-   return foo(-5, 12);
+
+   j = foo(-5, 12);
+
+//  P(j) {j==7}
+
+
+   return j;
 }
 
-//  P() {i==-5,u==12}
+//  P() {i==-5, u==12}
 
 int foo(int i, unsigned int u)
 {
 
-//  P() {i==-5,u==12}
+//  P() {i==-5, u==12}
 
    return i+u;
 }
@@ -55,14 +73,21 @@ int foo(int i, unsigned int u)
 Transformers for "main" after transformer refining
 
 
-//  T(main) {}
+//  T(main) {main==7}
 
 int main(void)
 {
+   int j;
 
-//  T(main) {}
+//  T(j) {j==7}
 
-   return foo(-5, 12);
+
+   j = foo(-5, 12);
+
+//  T(main) {j==7, main==7}
+
+
+   return j;
 }
 
 Preconditions for "main" after transformer refining
@@ -72,8 +97,15 @@ Preconditions for "main" after transformer refining
 
 int main(void)
 {
+   int j;
 
 //  P() {}
 
-   return foo(-5, 12);
+
+   j = foo(-5, 12);
+
+//  P(j) {j==7}
+
+
+   return j;
 }

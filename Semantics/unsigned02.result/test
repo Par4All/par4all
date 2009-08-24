@@ -3,12 +3,82 @@ main()
    unsigned int i = 2;
    int j = 4;
    int k = 6;
+   int l;
 
    i++;
    i += j;
    i = foo(k);
+   k = bar(i);
+   l = foo(k)*bar(i);
    return;
 }
+
+Transformers for "main"
+
+
+//  T() {}
+
+main()
+{
+   unsigned int i = 2;
+   int j = 4;
+   int k = 6;
+   int l;
+
+//  T(i) {i==i#init+1}
+
+
+   i++;
+
+//  T(i) {i#init+j==i}
+
+   i += j;
+
+//  T(i) {i==k}
+
+   i = foo(k);
+
+//  T(k) {2i==k}
+
+   k = bar(i);
+
+//  T(l) {}
+
+   l = foo(k)*bar(i);
+
+//  T() {}
+
+   return;
+}
+
+Transformers for "foo"
+
+
+//  T(foo) {foo==k}
+
+unsigned int foo(int k)
+{
+
+//  T(foo) {foo==k}
+
+   return k;
+}
+
+Transformers for "bar"
+
+
+//  T(bar) {bar==2k}
+
+int bar(unsigned int k)
+{
+
+//  T(bar) {bar==2k}
+
+   return 2*k;
+}
+
+Preconditions for "main"
+
 
 //  P() {}
 
@@ -17,6 +87,7 @@ main()
    unsigned int i = 2;
    int j = 4;
    int k = 6;
+   int l;
 
 //  P() {i==2, j==4, k==6}
 
@@ -32,6 +103,90 @@ main()
    i = foo(k);
 
 //  P(i) {i==6, j==4, k==6}
+
+   k = bar(i);
+
+//  P(i,k) {i==6, j==4, k==12}
+
+   l = foo(k)*bar(i);
+
+//  P(i,k,l) {i==6, j==4, k==12}
+
+   return;
+}
+
+Transformers for "main" after transformer refining
+
+
+//  T() {}
+
+main()
+{
+   unsigned int i = 2;
+   int j = 4;
+   int k = 6;
+   int l;
+
+//  T(i) {i==3, i#init==2, j==4, k==6}
+
+
+   i++;
+
+//  T(i) {i==7, i#init==3, j==4, k==6}
+
+   i += j;
+
+//  T(i) {i==6, i#init==7, j==4, k==6}
+
+   i = foo(k);
+
+//  T(k) {i==6, j==4, k==12, k#init==6}
+
+   k = bar(i);
+
+//  T(l) {i==6, j==4, k==12}
+
+   l = foo(k)*bar(i);
+
+//  T() {i==6, j==4, k==12}
+
+   return;
+}
+
+Preconditions for "main" after transformer refining
+
+
+//  P() {}
+
+main()
+{
+   unsigned int i = 2;
+   int j = 4;
+   int k = 6;
+   int l;
+
+//  P() {i==2, j==4, k==6}
+
+
+   i++;
+
+//  P(i) {i==3, j==4, k==6}
+
+   i += j;
+
+//  P(i) {i==7, j==4, k==6}
+
+   i = foo(k);
+
+//  P(i) {i==6, j==4, k==6}
+
+   k = bar(i);
+
+//  P(i,k) {i==6, j==4, k==12}
+
+   l = foo(k)*bar(i);
+
+//  P(i,k,l) {i==6, j==4, k==12}
 
    return;
 }

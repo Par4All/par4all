@@ -5,5 +5,9 @@ int foo(int i, unsigned int u)
 
 int main(void)
 {
-  return foo(-5, 12);
+  int j;
+
+  j = foo(-5, 12);
+
+  return j;
 }

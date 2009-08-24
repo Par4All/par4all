@@ -9,6 +9,7 @@
       COMMON /INIT/ I1, I2, I3, I4, I5
       DATA I5 /5/
       BOO = I+I5                                                        0006
+      BOO = BOO+1                                                       0007
       END
 
 ! next line modified by fsplit() in pips
@@ -51,6 +52,26 @@ C  P() {}
 
 C  P() {I1==1}
 
+
+Transformers for function "BOO"
+
+
+C  T(BOO) {I+I5==BOO-1}
+
+
+      INTEGER FUNCTION BOO(I)
+      INTEGER I
+      COMMON /INIT/ I1, I2, I3, I4, I5
+      DATA I5 /5/
+
+C  T(BOO) {I+I5==BOO}
+
+      BOO = I+I5                                                        0006
+
+C  T(BOO) {BOO==BOO#init+1}
+
+      BOO = BOO+1                                                       0007
+      END
 
 Preconditions with initial precondition for program INITIAL2
 
