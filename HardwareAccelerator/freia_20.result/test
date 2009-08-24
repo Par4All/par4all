@@ -284,6 +284,10 @@ freia_status freia_20_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, int32_t
   // 0`t7 [7 poc 0] -> [7 output 0] 0 null
   si.mux[7][0].op = SPOC_MUX_IN0;
 
+  // fill in to the end...
+  // 0`t7 [7 output 0] -> [7 output 0] 0 null
+  // nope
+
   mcode.raw = (freia_ptr) &si;
   mcode.size = sizeof(spoc_instr);
 
@@ -381,6 +385,15 @@ freia_status freia_20_helper_0_0_1(freia_data2d * o0, freia_data2d * i0, int32_t
   // output image o on 0
   // o [4 poc 0] -> [4 output 0] 0 null
   si.mux[4][0].op = SPOC_MUX_IN0;
+
+  // fill in to the end...
+  // o [4 output 0] -> [7 output 0] 0 null
+  // o [5 input 0] -> [7 output 0] 0 null
+  si.mux[5][0].op = SPOC_MUX_IN0;
+  // o [6 input 0] -> [7 output 0] 0 null
+  si.mux[6][0].op = SPOC_MUX_IN0;
+  // o [7 input 0] -> [7 output 0] 0 null
+  si.mux[7][0].op = SPOC_MUX_IN0;
 
   mcode.raw = (freia_ptr) &si;
   mcode.size = sizeof(spoc_instr);

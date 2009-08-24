@@ -256,6 +256,11 @@ freia_status freia_03_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, freia_d
   si.mux[6][0].op = SPOC_MUX_IN1;
   si.mux[6][2].op = SPOC_MUX_IN0;
 
+  // fill in to the end...
+  // o [6 output 0] -> [7 output 0] 0 null
+  // o [7 input 0] -> [7 output 0] 0 null
+  si.mux[7][0].op = SPOC_MUX_IN0;
+
   mcode.raw = (freia_ptr) &si;
   mcode.size = sizeof(spoc_instr);
 
