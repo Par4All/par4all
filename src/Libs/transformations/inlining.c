@@ -278,17 +278,25 @@ statement inline_expression_call(expression modified_expression, call callee)
         }
     }
 
-    /* should add them to modified_module's*/
-    list inlined_extern_declaration = code_externs(inlined_code);
-    pips_assert("no external declaration",inlined_extern_declaration == NIL);
-
-
     /* create the new instruction sequence
      * no need to change all entities in the new statements, because we build a new text ressource latter
      */
     statement expanded = copy_statement(inlined_module_statement);
     statement declaration_holder = expanded;
     statement_declarations(expanded) = gen_full_copy_list( statement_declarations(expanded) ); // simple copy != deep copy
+
+    /* should add them to modified_module's*/
+    set inlined_referenced_entities = statement_get_referenced_entities(inlined_module_statement);
+    list new_externs = NIL;
+    SET_FOREACH(entity,ref_ent,inlined_referenced_entities)
+    {
+        if(! same_string_p(entity_module_name(ref_ent),module_local_name(inlined_module)) )
+            new_externs=CONS(ENTITY,ref_ent,new_externs);
+    }
+    gen_sort_list(new_externs,(int(*)(const void*,const void*))compare_entities);
+    gen_nconc(statement_declarations(expanded),new_externs);
+    set_free(inlined_referenced_entities);
+
 
     /* fix block status */
     if( ! statement_block_p( expanded ) )
