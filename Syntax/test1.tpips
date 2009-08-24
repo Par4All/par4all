@@ -1,0 +1,11 @@
+delete test1
+
+create test1 test1.f
+
+display PRINTED_FILE(TEST1)
+
+close
+
+delete test1
+quit
+# EOF
