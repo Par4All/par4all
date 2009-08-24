@@ -53,21 +53,22 @@
 
 static int current_margin;
 
-#define st_DO	 	prettyprint_fortran_icfg_p ? "do " : "for "
-#define st_ENDDO 	prettyprint_fortran_icfg_p ? "enddo" : "}"
-#define st_FOR	 	"for "
-#define st_ENDFOR 	"}"
+#define st_DO		prettyprint_fortran_icfg_p ? "do " : "for "
+#define st_ENDDO	prettyprint_fortran_icfg_p ? "enddo" : "}"
+#define st_FOR		"for "
+#define st_ENDFOR	"}"
 #define st_DOWHILE	prettyprint_fortran_icfg_p ? "do while " : "while "
 #define st_ENDDOWHILE	prettyprint_fortran_icfg_p ? "enddo" : "}"
 #define st_REPEAT	prettyprint_fortran_icfg_p ? "repeat " : "do "
 #define st_UNTIL	prettyprint_fortran_icfg_p ? "until" : "while ();"
-#define st_IF	 	prettyprint_fortran_icfg_p ? "if" : "if () {"
-#define st_THEN	 	prettyprint_fortran_icfg_p ? "then" : "{"
-#define st_ELSE	 	prettyprint_fortran_icfg_p ? "else" : "} else {"
-#define st_ENDIF 	prettyprint_fortran_icfg_p ? "endif" : "}"
+#define st_IF		prettyprint_fortran_icfg_p ? "if" : "if ()"
+#define st_THEN		prettyprint_fortran_icfg_p ? "then" : "{"
+//#define st_ELIF	prettyprint_fortran_icfg_p ? "else if" : "else if ()"
+#define st_ELSE		prettyprint_fortran_icfg_p ? "else" : "} else {"
+#define st_ENDIF	prettyprint_fortran_icfg_p ? "endif" : "}"
 /* These last two strings are used for unstructured */
-#define st_WHILE 	"while"
-#define st_ENDWHILE 	"endwhile"
+#define st_WHILE	"while"
+#define st_ENDWHILE	"endwhile"
 
 #define some_text_p(t) (t!=text_undefined && text_sentences(t)!=NIL)
 
