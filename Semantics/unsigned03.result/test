@@ -1,0 +1,79 @@
+int main(void)
+{
+   return foo(-5, 12);
+}
+
+Transformers for "main"
+
+
+//  T(main) {}
+
+int main(void)
+{
+
+//  T(main) {}
+
+   return foo(-5, 12);
+}
+
+Transformers for "foo"
+
+
+//  T(foo) {i+u==foo}
+
+int foo(int i, unsigned int u)
+{
+
+//  T(foo) {i+u==foo}
+
+   return i+u;
+}
+
+Preconditions for "main"
+
+
+//  P() {}
+
+int main(void)
+{
+
+//  P() {}
+
+   return foo(-5, 12);
+}
+
+//  P() {i==-5,u==12}
+
+int foo(int i, unsigned int u)
+{
+
+//  P() {i==-5,u==12}
+
+   return i+u;
+}
+
+Transformers for "main" after transformer refining
+
+
+//  T(main) {}
+
+int main(void)
+{
+
+//  T(main) {}
+
+   return foo(-5, 12);
+}
+
+Preconditions for "main" after transformer refining
+
+
+//  P() {}
+
+int main(void)
+{
+
+//  P() {}
+
+   return foo(-5, 12);
+}
