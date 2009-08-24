@@ -91,6 +91,7 @@ typedef string (*gen_string_func_t)(const void *);
 // for qsort: void * points to a pointer to the newgen type
 // so it is really "gen_chunk**", i.e. "entity*" or "statement*"
 typedef int (*gen_cmp_func_t)(const void *, const void *);
+typedef void (*gen_iter_func_t)(void *);
 
 // obsolete?
 #ifdef __STRICT_ANSI__

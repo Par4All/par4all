@@ -37,7 +37,6 @@
 #include <stdio.h>
 #include "genC.h"
 #include "newgen_include.h"
-/* #include "newgen_assert.h" #include "newgen_stack.h" */
 
 /*   STACK STRUCTURES
  */
@@ -130,7 +129,7 @@ static void update_iterator_upward(stack_iterator i)
     i->index++; UPDATE_ITERATOR_UPWARD(i);	\
   }
 
-stack_iterator stack_iterator_init(stack s, int down)
+stack_iterator stack_iterator_init(const stack s, int down)
 {
   stack_iterator i = (stack_iterator) malloc(sizeof(_stack_iterator));
 
@@ -248,7 +247,7 @@ stack stack_make(int type, int bucket_size, int policy)
 
 /* duplicate a stack with its contents.
  */
-stack stack_copy(stack s)
+stack stack_copy(const stack s)
 {
   stack n = stack_make(s->type, s->bucket_size, s->policy);
   STACK_MAP_X(i, void*, stack_push(i, n), s, 0);
@@ -284,7 +283,7 @@ void stack_free(stack * ps)
 /*    STACK MISCELLANEOUS
  */
 #define STACK_OBSERVER(name, what)				\
-  int stack_##name(stack s) { STACK_CHECK(s); return(what); }
+  int stack_##name(const stack s) { STACK_CHECK(s); return(what); }
 
 STACK_OBSERVER(size, s->size)
 STACK_OBSERVER(bsize, s->bucket_size)
@@ -292,7 +291,7 @@ STACK_OBSERVER(policy, s->policy)
 STACK_OBSERVER(max_extent, s->max_extent)
 STACK_OBSERVER(consistent_p, 1) /* well, it is not implemented */
 
-bool stack_empty_p(stack s)
+bool stack_empty_p(const stack s)
 {
   STACK_CHECK(s);
   return s->size==0;
@@ -302,7 +301,7 @@ bool stack_empty_p(stack s)
 
 /*   APPLY f to all items of stack s;
  */
-void stack_map(stack s, void (*f)())
+void stack_map(const stack s, gen_iter_func_t f)
 {
   _stack_ptr x;
   int i;
@@ -321,7 +320,7 @@ static int number_of_buckets(_stack_ptr x)
   return n;
 }
 
-void stack_info(FILE * f, stack s)
+void stack_info(FILE * f, const stack s)
 {
   fprintf(f, "stack_info about stack %p\n", s);
 
@@ -399,7 +398,7 @@ void *stack_pop(stack s)
 
 /* returns the item on top of stack s
  */
-void *stack_head(stack s)
+void *stack_head(const stack s)
 {
   _stack_ptr x = s->stack;
   if (x->n_item==0) x = x->succ;

@@ -62,28 +62,28 @@ typedef struct __stack_iterator *stack_iterator;
  */
 extern stack stack_make (int, int, int); /* type, bucket_size, policy */
 extern void stack_free (stack*);
-extern stack stack_copy (stack);
+extern stack stack_copy (const stack);
 
 /*   observers
  */
-extern int stack_size(stack);
-extern int stack_type(stack);
-extern int stack_bsize(stack);
-extern int stack_policy(stack);
-extern int stack_max_extent(stack);
+extern int stack_size(const stack);
+extern int stack_type(const stack);
+extern int stack_bsize(const stack);
+extern int stack_policy(const stack);
+extern int stack_max_extent(const stack);
 
 /*   miscellaneous
  */
-extern int stack_consistent_p(stack);
-extern bool stack_empty_p(stack);
-extern void stack_info(FILE*, stack);
-extern void stack_map(stack, void(*)());
+extern int stack_consistent_p(const stack);
+extern bool stack_empty_p(const stack);
+extern void stack_info(FILE*, const stack);
+extern void stack_map(const stack, gen_iter_func_t);
 
 /*   stack use
  */
 extern void stack_push(void*, stack);
 extern void *stack_pop(stack);
-extern void *stack_head(stack);
+extern void *stack_head(const stack);
 extern void *stack_replace(void*, stack);
 
 /*   stack iterator
@@ -92,7 +92,7 @@ extern void *stack_replace(void*, stack);
  *   it is not very efficient, due to the many function calls.
  *   Consider gen_map first which has a very small overhead.
  */
-extern stack_iterator stack_iterator_init(stack, int); /* X-ward */
+extern stack_iterator stack_iterator_init(const stack, int); /* X-ward */
 extern int stack_iterator_next_and_go(stack_iterator, void**);
 extern void stack_iterator_end(stack_iterator*);
 extern int stack_iterator_end_p(stack_iterator); /* not needed */
