@@ -903,6 +903,8 @@ transformer any_user_call_site_to_transformer(entity f,
        parameter cannot be updated in C because of the value passing
        mode.
     */
+    basic ab = variable_basic(type_variable(apt));
+    basic fb = variable_basic(type_variable(fpt));
     basic b = basic_of_expression(e);
     transformer ctf = transformer_undefined;
 
@@ -915,18 +917,28 @@ transformer any_user_call_site_to_transformer(entity f,
 	  //safe_any_expression_to_transformer(fpv, e, cpre, TRUE);
 	  safe_any_expression_to_transformer(fpv, e, cpre, FALSE);
       }
+      else if(basic_int_p(ab) && basic_int_p(fb)) {
+	int as = basic_int(ab);
+	int fs = basic_int(fb);
+
+	if(as-fs==10 || fs-as==10)
+	  pips_user_warning("Signed/unsigned integer type conversion.\n");
+	else
+	  pips_user_warning("Integer type conversion: actual %d and formal %d\n", as, fs);
+	fpvl = CONS(ENTITY, fpv, fpvl);
+	ctf = safe_any_expression_to_transformer(fpv, e, cpre, FALSE);
+      }
       else {
 	/* Should be an error or a warning? */
 	list el = expression_to_proper_effects(e);
-	basic fb = variable_basic(type_variable(fpt));
-	basic ab = variable_basic(type_variable(apt));
 	/*
 	pips_user_error("Type incompatibility between call site and declaration"
 			" for %d argument of function %s\n", n, entity_user_name(f));
 	*/
 	pips_user_warning("Type incompatibility between call site and declaration"
-			" for argument %s (rank %d) of function %s called from function %s: %s/%s\n",
-			  entity_user_name(fpv), n, entity_user_name(f), 
+			" for argument \"%s\" (rank %d\) of function \"%s\" "
+			  "called from function \"%s\": %s/%s\n",
+			  entity_user_name(fpv), n, entity_user_name(f),
 			  entity_user_name(get_current_module_entity()),
 			  basic_to_string(fb), basic_to_string(ab));
 

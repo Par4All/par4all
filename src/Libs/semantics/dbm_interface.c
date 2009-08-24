@@ -398,15 +398,14 @@ bool old_summary_precondition(char * module_name)
     t = transformer_identity();
   }
 
-  DB_PUT_MEMORY_RESOURCE(DBR_SUMMARY_PRECONDITION, 
+  DB_PUT_MEMORY_RESOURCE(DBR_SUMMARY_PRECONDITION,
 			 module_name, (char * )t);
 
   ifdebug(8) {
-    debug(8, "summary_precondition", 
-	  "initial summary precondition %x for %s:\n",
-	  t, module_name);
+    pips_debug(8, "initial summary precondition %x for %s:\n",
+	       t, module_name);
     dump_transformer(t);
-    debug(8, "summary_precondition", "end\n");
+    pips_debug(8, "end\n");
   }
 
   debug_off();
