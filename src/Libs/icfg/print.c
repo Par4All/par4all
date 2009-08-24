@@ -48,112 +48,119 @@
  */
 static bool print_any_icfg(string module_name, int decor_type)
 {
-    set_bool_property(ICFG_IFs, FALSE);
-    set_bool_property(ICFG_DOs, FALSE);
-    set_int_property(ICFG_DECOR, decor_type);
-    return generic_print_icfg(module_name);
+  set_bool_property(ICFG_IFs, FALSE);
+  set_bool_property(ICFG_DOs, FALSE);
+  set_int_property(ICFG_DECOR, decor_type);
+  return generic_print_icfg(module_name);
 }
 
 /*
- * This function prints out a graph that contains DO's 
+ * This function prints out a graph that contains DO's
  */
 static bool print_any_icfg_with_loops(string module_name, int decor_type)
 {
-    set_bool_property(ICFG_DOs, TRUE);
-    set_bool_property(ICFG_IFs, FALSE);
-    set_int_property(ICFG_DECOR, decor_type);
-    return generic_print_icfg(module_name);
+  set_bool_property(ICFG_DOs, TRUE);
+  set_bool_property(ICFG_IFs, FALSE);
+  set_int_property(ICFG_DECOR, decor_type);
+  return generic_print_icfg(module_name);
 }
 
-/* 
- * This function prints out a graph that contains both IF's and DO's 
+/*
+ * This function prints out a graph that contains both IF's and DO's
  */
 static bool print_any_icfg_with_control(string module_name, int decor_type)
 {
-    set_bool_property(ICFG_IFs, TRUE);
-    set_bool_property(ICFG_DOs, TRUE);
-    set_int_property(ICFG_DECOR, decor_type);
-    return generic_print_icfg(module_name);
+  set_bool_property(ICFG_IFs, TRUE);
+  set_bool_property(ICFG_DOs, TRUE);
+  set_int_property(ICFG_DECOR, decor_type);
+  return generic_print_icfg(module_name);
 }
 
-bool generic_print_icfg(module_name)
-string module_name;
+/* Shared throughout the icfg library*/
+bool prettyprint_fortran_icfg_p = TRUE;
+bool prettyprint_C_icfg_p = FALSE;
+
+bool generic_print_icfg(string module_name)
 {
-    entity mod = local_name_to_top_level_entity(module_name);
+  entity mod = local_name_to_top_level_entity(module_name);
 
-    debug_on(ICFG_DEBUG_LEVEL);
-    pips_debug(1,"===%s===\n===%s===\n",module_name,entity_name(mod));
+  /* select the language */
+  prettyprint_fortran_icfg_p = fortran_module_p(mod);
+  prettyprint_C_icfg_p = c_module_p(mod);
 
-    print_module_icfg(mod);
+  debug_on(ICFG_DEBUG_LEVEL);
+  pips_debug(1,"===%s===\n===%s===\n",module_name,entity_name(mod));
 
-    debug_off();
+  print_module_icfg(mod);
 
-    return TRUE;
+  debug_off();
+
+  return TRUE;
 }
 
-/* I would have prefered something like that... FC 
- * or even no properties at all? 
+/* I would have prefered something like that... FC
+ *
+ * or even no properties at all?
  */
-bool 
-parametrized_print_icfg(
+bool parametrized_print_icfg(
     string module_name,
     bool print_ifs,
     bool print_dos,
     text (*deco)(string))
 {
-    entity module = local_name_to_top_level_entity(module_name);
+  entity module = local_name_to_top_level_entity(module_name);
 
-    set_bool_property(ICFG_IFs, print_ifs);
-    set_bool_property(ICFG_DOs, print_dos);
-    print_module_icfg_with_decoration(module, deco);
+  set_bool_property(ICFG_IFs, print_ifs);
+  set_bool_property(ICFG_DOs, print_dos);
+  print_module_icfg_with_decoration(module, deco);
 
-    return TRUE;
+  return TRUE;
 }
 
 bool print_icfg(string module_name)
 {
-    return print_any_icfg(module_name,ICFG_DECOR_NONE);
+  return print_any_icfg(module_name,ICFG_DECOR_NONE);
 }
 
 bool print_icfg_with_complexities(string module_name)
 {
-    return print_any_icfg(module_name,ICFG_DECOR_COMPLEXITIES);
+  return print_any_icfg(module_name,ICFG_DECOR_COMPLEXITIES);
 }
 
 bool print_icfg_with_preconditions(string module_name)
 {
-    return print_any_icfg(module_name,ICFG_DECOR_PRECONDITIONS);
+  return print_any_icfg(module_name,ICFG_DECOR_PRECONDITIONS);
 }
 
 bool print_icfg_with_total_preconditions(string module_name)
 {
-    return print_any_icfg(module_name,ICFG_DECOR_TOTAL_PRECONDITIONS);
+  return print_any_icfg(module_name,ICFG_DECOR_TOTAL_PRECONDITIONS);
 }
 
 bool print_icfg_with_transformers(string module_name)
 {
-    return print_any_icfg(module_name,ICFG_DECOR_TRANSFORMERS);
+  return print_any_icfg(module_name,ICFG_DECOR_TRANSFORMERS);
 }
 
 bool print_icfg_with_proper_effects(string module_name)
 {
-    return print_any_icfg(module_name,ICFG_DECOR_PROPER_EFFECTS);
+  return print_any_icfg(module_name,ICFG_DECOR_PROPER_EFFECTS);
 }
 
 bool print_icfg_with_filtered_proper_effects(string module_name) 
 {
-    return print_any_icfg(module_name, ICFG_DECOR_FILTERED_PROPER_EFFECTS);
+  return print_any_icfg(module_name, ICFG_DECOR_FILTERED_PROPER_EFFECTS);
 }
 
 bool print_dvicfg_with_filtered_proper_effects(string module_name)
 {
-    set_bool_property(ICFG_DV, TRUE);
-    return print_any_icfg(module_name, ICFG_DECOR_FILTERED_PROPER_EFFECTS);
+  set_bool_property(ICFG_DV, TRUE);
+  return print_any_icfg(module_name, ICFG_DECOR_FILTERED_PROPER_EFFECTS);
 }
 
 bool print_icfg_with_cumulated_effects(string module_name)
 {
-    return print_any_icfg(module_name,ICFG_DECOR_CUMULATED_EFFECTS);
+  return print_any_icfg(module_name,ICFG_DECOR_CUMULATED_EFFECTS);
 }
 
 bool print_icfg_with_regions(string module_name)
@@ -171,22 +178,22 @@ bool print_icfg_with_out_regions(string module_name)
 
 bool print_icfg_with_loops(string module_name)
 {
-    return print_any_icfg_with_loops(module_name,ICFG_DECOR_NONE);
+  return print_any_icfg_with_loops(module_name,ICFG_DECOR_NONE);
 }
 
 bool print_icfg_with_loops_complexities(string module_name)
 {
-    return print_any_icfg_with_loops(module_name,ICFG_DECOR_COMPLEXITIES);
+  return print_any_icfg_with_loops(module_name,ICFG_DECOR_COMPLEXITIES);
 }
 
 bool print_icfg_with_loops_preconditions(string module_name)
 {
-    return print_any_icfg_with_loops(module_name,ICFG_DECOR_PRECONDITIONS);
+  return print_any_icfg_with_loops(module_name,ICFG_DECOR_PRECONDITIONS);
 }
 
 bool print_icfg_with_loops_total_preconditions(string module_name)
 {
-    return print_any_icfg_with_loops(module_name,ICFG_DECOR_TOTAL_PRECONDITIONS);
+  return print_any_icfg_with_loops(module_name,ICFG_DECOR_TOTAL_PRECONDITIONS);
 }
 
 bool print_icfg_with_loops_transformers(string module_name)
@@ -196,7 +203,7 @@ bool print_icfg_with_loops_transformers(string module_name)
 
 bool print_icfg_with_loops_proper_effects(string module_name)
 {
-    return print_any_icfg_with_loops(module_name,ICFG_DECOR_PROPER_EFFECTS);
+  return print_any_icfg_with_loops(module_name,ICFG_DECOR_PROPER_EFFECTS);
 }
 
 bool print_icfg_with_loops_cumulated_effects(string module_name)
@@ -211,28 +218,28 @@ bool print_icfg_with_loops_in_regions(string module_name)
 bool print_icfg_with_loops_out_regions(string module_name)
 { return print_any_icfg_with_loops(module_name,ICFG_DECOR_OUT_REGIONS);}
 
-/* 
+/*
  * ICFGs with controls
  */
 
 bool print_icfg_with_control(string module_name)
 {
-    return print_any_icfg_with_control(module_name,ICFG_DECOR_NONE);
+  return print_any_icfg_with_control(module_name,ICFG_DECOR_NONE);
 }
 
 bool print_icfg_with_control_complexities(string module_name)
 {
-    return print_any_icfg_with_control(module_name,ICFG_DECOR_COMPLEXITIES);
+  return print_any_icfg_with_control(module_name,ICFG_DECOR_COMPLEXITIES);
 }
 
 bool print_icfg_with_control_preconditions(string module_name)
 {
-    return print_any_icfg_with_control(module_name,ICFG_DECOR_PRECONDITIONS);
+  return print_any_icfg_with_control(module_name,ICFG_DECOR_PRECONDITIONS);
 }
 
 bool print_icfg_with_control_total_preconditions(string module_name)
 {
-    return print_any_icfg_with_control(module_name,ICFG_DECOR_TOTAL_PRECONDITIONS);
+  return print_any_icfg_with_control(module_name,ICFG_DECOR_TOTAL_PRECONDITIONS);
 }
 
 bool print_icfg_with_control_transformers(string module_name)
@@ -252,7 +259,3 @@ bool print_icfg_with_control_in_regions(string module_name)
 
 bool print_icfg_with_control_out_regions(string module_name)
 { return print_any_icfg_with_control(module_name,ICFG_DECOR_OUT_REGIONS);}
-
-
-
-
