@@ -291,7 +291,8 @@ statement inline_expression_call(expression modified_expression, call callee)
     list new_externs = NIL;
     SET_FOREACH(entity,ref_ent,inlined_referenced_entities)
     {
-        if(! same_string_p(entity_module_name(ref_ent),module_local_name(inlined_module)) )
+        if(!entity_enum_member_p(ref_ent) &&
+                ! same_string_p(entity_module_name(ref_ent),module_local_name(inlined_module)) )
             new_externs=CONS(ENTITY,ref_ent,new_externs);
     }
     gen_sort_list(new_externs,(int(*)(const void*,const void*))compare_entities);
