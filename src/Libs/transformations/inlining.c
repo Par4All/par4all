@@ -171,21 +171,22 @@ solve_name_clashes(statement s, entity new)
     }
 }
 static
-bool inline_has_static_declaration(list iter)
+bool inline_has_static_declaration(entity module,list iter)
 {
     FOREACH(ENTITY, e ,iter)
     {
         storage s = entity_storage(e);
-        if ( storage_ram_p(s) && ENTITY_NAME_P( ram_section(storage_ram(s)), STATIC_AREA_LOCAL_NAME) )
+        if ( same_string_p(module_local_name(module),entity_module_name(e)) && storage_ram_p(s) && ENTITY_NAME_P( ram_section(storage_ram(s)), STATIC_AREA_LOCAL_NAME) )
             return true;
     }
     return false;
 }
 
+struct swsd { bool has_static_declaration; entity module; };
 static
-void statement_with_static_declarations_p(statement s,bool* has_static_declaration)
+void statement_with_static_declarations_p(statement s,struct swsd *p )
 {
-    *has_static_declaration|=inline_has_static_declaration( statement_declarations(s) );
+    p->has_static_declaration|=inline_has_static_declaration(p->module,statement_declarations(s) );
 }
 
 static
@@ -262,16 +263,16 @@ statement inline_expression_call(expression modified_expression, call callee)
 
     /* stop if the function has static declaration */
     {
-        bool has_static_declarations = false;
+        struct swsd p = { false, inlined_module };
         if( c_module_p(inlined_module) )
         {
-            gen_context_recurse(inlined_module_statement,&has_static_declarations, statement_domain, gen_true, statement_with_static_declarations_p);
+            gen_context_recurse(inlined_module_statement,&p, statement_domain, gen_true, statement_with_static_declarations_p);
         }
         else
         {
-            has_static_declarations = inline_has_static_declaration( code_declarations(inlined_code) );
+            p.has_static_declaration = inline_has_static_declaration( p.module, code_declarations(inlined_code) );
         }
-        if( has_static_declarations )
+        if( p.has_static_declaration )
         {
             pips_user_warning("cannot inline function with static declarations\n");
             return statement_undefined;
