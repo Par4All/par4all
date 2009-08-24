@@ -147,6 +147,24 @@ AddEntityToCurrentModule(entity e) {
   AddLocalEntityToDeclarations(e, module_e, module_s);
 }
 
+entity make_global_entity_from_local(entity local) {
+    string seed = entity_local_name(local);
+    int counter=0;
+    entity new = entity_undefined;
+    string eln= strdup(seed);
+    while(!entity_undefined_p(FindEntity(TOP_LEVEL_MODULE_NAME,eln))) {
+        asprintf(&eln,"%s%d",seed,counter++);
+    }
+    new = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,eln);
+    free(eln);
+    entity_type(new)=copy_type(entity_type(local));
+    entity_initial(new)=copy_value(entity_initial(local));
+    entity a = global_name_to_entity(TOP_LEVEL_MODULE_NAME,DYNAMIC_AREA_LOCAL_NAME);
+    entity f = local_name_to_top_level_entity(TOP_LEVEL_MODULE_NAME);
+    entity_storage(new)=make_storage_ram(make_ram(f,a,add_any_variable_to_area(a,new,fortran_module_p(local)),NIL));
+    return new;
+}
+
 
 /* entity make_scalar_entity(name, module_name, base)
  */

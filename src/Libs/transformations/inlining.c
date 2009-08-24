@@ -291,9 +291,20 @@ statement inline_expression_call(expression modified_expression, call callee)
     list new_externs = NIL;
     SET_FOREACH(entity,ref_ent,inlined_referenced_entities)
     {
-        if(!entity_enum_member_p(ref_ent) &&
-                ! same_string_p(entity_module_name(ref_ent),module_local_name(inlined_module)) )
-            new_externs=CONS(ENTITY,ref_ent,new_externs);
+        if(!entity_enum_member_p(ref_ent)){
+            string emn = entity_module_name(ref_ent);
+            string mln = module_local_name(inlined_module);
+            if(! same_string_p(emn,mln) ) /* we should add ref_ent to the declarations */
+            {
+                entity add = ref_ent;
+                if(!top_level_entity_p(ref_ent)) /* make it global instead of static ...*/
+                {
+                    pips_user_warning("replacing static variable by a global one, this may lead to incorrect code\n");
+                    add = make_global_entity_from_local(ref_ent);
+                }
+                new_externs=CONS(ENTITY,add,new_externs);
+            }
+        }
     }
     gen_sort_list(new_externs,(int(*)(const void*,const void*))compare_entities);
     gen_nconc(statement_declarations(expanded),new_externs);
