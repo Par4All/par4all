@@ -27,7 +27,7 @@
    Francois Irigoin, Fabien Coelho, Laurent Daverio.
 
  */
-
+#define _GNU_SOURCE
 #include <stdlib.h>
 #include <stdio.h>
 
