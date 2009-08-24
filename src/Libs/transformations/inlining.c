@@ -707,26 +707,6 @@ bool inlining_simple(char *module_name)
  * @{ */
 
 /** 
- * put c into calls_name if c is not an intrinsic
- * 
- * @param c call to check
- * @param calls_name set containing registered entity names
- */
-static void
-call_selector(call c, set calls_name)
-{
-    entity e = call_function(c);
-    if( !entity_constant_p(e) && !intrinsic_entity_p(e) && !entity_symbolic_p(e) )
-    {
-        string name = entity_local_name(e);
-        set_add_element(calls_name,calls_name,name);
-    }
-
-}
-
-static bool statement_has_callee = false; ///< set to true when a call is found
-
-/** 
  * get ressources for the call to inline and call
  * apropriate inlining function
  * 
@@ -736,7 +716,6 @@ static bool statement_has_callee = false; ///< set to true when a call is found
 static void
 run_inlining(string caller_name, string module_name)
 {
-    statement_has_callee = true;
     /* Get the module ressource */
     inlined_module = module_name_to_entity( module_name );
     inlined_module_statement =
@@ -794,13 +773,17 @@ bool do_unfolding(char* module_name)
     }
 
     /* gather all referenced calls as long as there are some */
+    bool statement_has_callee = false;
     do {
         statement_has_callee = false;
         statement unfolded_module_statement =
             (statement) db_get_memory_resource(DBR_CODE, module_name, TRUE);
         /* gather all referenced calls */
+        callees cc =compute_callees(unfolded_module_statement);
         set calls_name = set_make(set_string);
-        gen_context_recurse(unfolded_module_statement, calls_name, call_domain, gen_true, &call_selector);
+        set_assign_list(calls_name,callees_callees(cc));
+        statement_has_callee=set_empty_p(calls_name);
+
 
         /* maybe the user put a restriction on the calls to inline ?*/
         if(!set_empty_p(unfolding_callees))
@@ -814,7 +797,9 @@ bool do_unfolding(char* module_name)
         /* there is something to inline */
         if( !set_empty_p(calls_name) )
         {
-            SET_MAP(call_name, run_inlining(module_name,(string)call_name) ,calls_name);
+            SET_FOREACH(string,call_name,calls_name) {
+                run_inlining(module_name,(string)call_name);
+            }
             recompile_module(module_name);
             /* we can try to remove some labels now*/
             if( get_bool_property("INLINING_PURGE_LABELS"))
@@ -822,6 +807,7 @@ bool do_unfolding(char* module_name)
                     pips_user_warning("failed to remove useless labels after restructure_control in inlining");
         }
         set_free(calls_name);
+        free_callees(cc);
     } while(statement_has_callee);
 
     set_free(unfolding_filters);
