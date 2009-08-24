@@ -108,8 +108,8 @@ extern bool hash_defined_p(const hash_table, const void *);
 // DUMP
 extern void hash_table_print_header(const hash_table, FILE *);
 extern void hash_table_print(const hash_table);
-extern void hash_table_fprintf(FILE *, string(*)(void*),
-			       string(*)(void*), const hash_table);
+extern void hash_table_fprintf(FILE *, gen_string_func_t, gen_string_func_t,
+			       const hash_table);
 
 // OBSERVERS
 extern int hash_table_entry_count(const hash_table);

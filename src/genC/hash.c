@@ -490,11 +490,8 @@ void hash_table_print(hash_table htp)
 on file descriptor f, using functions key_to_string and value_to string
 to display the mapping. it is mostly useful when debugging programs. */
 
-void hash_table_fprintf(
-    FILE * f,
-    char *(*key_to_string)(void*),
-    char *(*value_to_string)(void*),
-    hash_table htp)
+void hash_table_fprintf(FILE * f, gen_string_func_t key_to_string,
+		gen_string_func_t value_to_string, const hash_table htp)
 {
     size_t i;
 
