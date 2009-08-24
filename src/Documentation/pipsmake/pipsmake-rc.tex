@@ -7984,9 +7984,12 @@ transformation_test    > MODULE.code
 \subsection {OpenMP Pragma}
 \label{subsection-open_mp_pragma}
 %%@UserManualDocumentation: OMP Pragma
-This transformation will transform a parallel code into a sequential code
-(cf Section~\ref{sec:cons-parall-code} for details) while generating
-OpenMP pragma as an extension to statements.
+This transformation reads the sequential code and generates OpenMP pragma as
+an extension to statements. The pragmas produced are based on the information
+previously computed by differents phases and already stores in the pips internal
+representation of the sequential code. It might be interesting to use the phase
+internalize\_parallel\_code (see \S~\ref{sec:cons-parall-code}) before to apply
+ompify\_code in order to maximize the number of parallel information available.
 %%!UserManualDocumentation
 
 \begin{PipsMake}
