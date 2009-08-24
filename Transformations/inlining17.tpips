@@ -59,20 +59,20 @@ display PRINTED_FILE[freia_cipo_dilate]
 apply SUPPRESS_DEAD_CODE[freia_cipo_outer_gradient]
 display PRINTED_FILE[freia_cipo_outer_gradient]
 
-echo
-echo Code after full loop unrolling
-echo
-
+#echo
+#echo Code after full loop unrolling
+#echo
+#
 # The main implies connectivity 8
-
+#
 # apply FULL_UNROLL[freia_cipo_outer_gradient]
 # l4
 # apply FULL_UNROLL[freia_cipo_outer_gradient]
 # l6
 # apply FULL_UNROLL[freia_cipo_outer_gradient]
 # l8
-apply FULL_UNROLL[freia_cipo_dilate]
-l8
+#apply FULL_UNROLL[freia_cipo_dilate]
+#l8
 
 # display PRINTED_FILE[freia_cipo_outer_gradient]
 display PRINTED_FILE[freia_cipo_dilate]
@@ -107,11 +107,12 @@ apply FLATTEN_CODE[main]
 display PRINTED_FILE[main]
 
 echo
-echo Unsplit resulting code
+echo Unsplit and compile resulting code
 echo
 
 apply UNSPLIT
 shell gcc -c inlining17.database/Src/inlining17.c
+shell rm inlining17.o
 
 close
 # delete inlining17

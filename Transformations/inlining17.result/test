@@ -525,21 +525,18 @@ int main()
    uint32_t size = 4;
    int I_0_0;
    freia_error ret_0;
-   int kernel_8c_0[9];
-   int kernel_6c_0[9];
-   int kernel_4c_0[9];
+   int kernel_8c_0[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+   int kernel_6c_0[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1};
+   int kernel_4c_0[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0};
    int i_0;
    freia_error ret_1;
    int I_0_1;
    freia_error ret_2;
-   int kernel_8c_1[9];
-   int kernel_6c_1[9];
-   int kernel_4c_1[9];
+   int kernel_8c_1[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+   int kernel_6c_1[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1};
+   int kernel_4c_1[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0};
    int i_1;
    freia_error ret_3;
-   kernel_8c_0 = BRACE_INTRINSIC(1, 1, 1, 1, 1, 1, 1, 1, 1);
-   kernel_6c_0 = BRACE_INTRINSIC(0, 1, 1, 1, 1, 1, 0, 1, 1);
-   kernel_4c_0 = BRACE_INTRINSIC(0, 1, 0, 1, 1, 1, 0, 1, 0);
    if (freia_common_check_image_bpp_compat(imout, imin, (void *) 0)!=1) {
 
       fprintf(stderr, "bpp of images are not compatibles\n""ERROR: file %s, line %d, function %s: ", "./freia.src/cipo/src/freiaComplexOpMorpho.c", 90, "freia_cipo_dilate");
@@ -568,9 +565,6 @@ int main()
 
    I_0_0 = ret_0;
    (void) I_0;
-   kernel_8c_1 = BRACE_INTRINSIC(1, 1, 1, 1, 1, 1, 1, 1, 1);
-   kernel_6c_1 = BRACE_INTRINSIC(0, 1, 1, 1, 1, 1, 0, 1, 1);
-   kernel_4c_1 = BRACE_INTRINSIC(0, 1, 0, 1, 1, 1, 0, 1, 0);
    if (freia_common_check_image_bpp_compat(imout, imin, (void *) 0)!=1) {
 
       fprintf(stderr, "bpp of images are not compatibles\n""ERROR: file %s, line %d, function %s: ", "./freia.src/cipo/src/freiaComplexOpMorpho.c", 90, "freia_cipo_dilate");

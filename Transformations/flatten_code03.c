@@ -1,3 +1,8 @@
+/* The conflicting declarations are not nested, but placed side by side.
+
+   Initializations are constant and not in a control cycle.
+*/
+
 #include <stdio.h>
 
 int flatten_code03()
@@ -8,14 +13,14 @@ int flatten_code03()
   {
     int i = 2;
     i++;
-    j=1;
+    j = 1;
   }
   {
-    int i = 2;
+    int i = 3;
     i++;
-    j=1;
+    j = 1;
   }
-  i=j;
+  i = j;
 
   printf("%d %d\n", i, j);
 }

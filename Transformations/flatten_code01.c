@@ -1,5 +1,8 @@
 /* Basic test case: the second "i" declaration ("int i = 2") conflicts
    with the first one, it will need to be rewritten.
+
+   Its initialization is constant: it can be left in the new
+   declaration. Not statememnt "i = 2;" is inserted.
  */
 
 #include <stdio.h>

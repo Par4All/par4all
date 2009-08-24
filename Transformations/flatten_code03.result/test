@@ -16,7 +16,7 @@ int flatten_code03()
    }
    {
       // BEGIN BLOCK
-      int i = 2;
+      int i = 3;
       i++;
       j = 1;
       // END BLOCK
@@ -34,13 +34,11 @@ int flatten_code03()
    // BEGIN BLOCK
    int i = 1;
    int j;
-   int i_0;
-   int i_1;
+   int i_0 = 2;
+   int i_1 = 3;
    i++;
-   i_0 = 2;
    i_0++;
    j = 1;
-   i_1 = 2;
    i_1++;
    j = 1;
    i = j;

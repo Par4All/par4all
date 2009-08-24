@@ -5,13 +5,13 @@ void flatten_code07(void)
 {
 // (0,1)
    // BEGIN BLOCK
-   int *k = {1, 2, 3};
+   int k[] = {1, 2, 3};
    {
-      int *k = {1, 2, 3};
+      int k[] = {1, 2, 3};
    }
 // (0,3)
    if (1) {                                                             /*0008*/
-      int *k = {1, 2, 3};
+      int k[] = {1, 2, 3};
    }
    // END BLOCK
 }
@@ -22,14 +22,11 @@ void flatten_code07(void)
 {
 // (0,1)
    // BEGIN BLOCK
-   int *k = {1, 2, 3};
-   int *k_0;
-   int *k_1;
+   int k[] = {1, 2, 3};
+   int k_0[] = {1, 2, 3};
+   int k_1[] = {1, 2, 3};
 // (0,2)
-   k_0 = {1, 2, 3};
-// (0,3)
    if (1)                                                               /*0008*/
-// (0,4)
-      k_1 = {1, 2, 3};
+      ;
    // END BLOCK
 }

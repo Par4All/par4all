@@ -35,7 +35,7 @@ echo Code after inlining of "freia_cipo_dilate"
 echo
 
 # to keep loop labels ...
-setproperty INLINING_PURGE_LABELS FALSE
+# setproperty INLINING_PURGE_LABELS FALSE: this is no longer useful
 apply INLINING[freia_cipo_dilate]
 display PRINTED_FILE[freia_cipo_outer_gradient]
 
@@ -106,6 +106,7 @@ echo
 
 apply UNSPLIT
 shell gcc -c inlining16.database/Src/inlining16.c
+shell rm inlining16.o
 
 close
 # delete inlining16

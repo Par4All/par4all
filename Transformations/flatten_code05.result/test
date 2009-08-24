@@ -9,7 +9,7 @@ int flatten_code05()
    j++;
    {
       // BEGIN BLOCK
-      int i = j;
+      int i = j+1;
       int k = 2;
       i++;
       j = 1;
@@ -36,14 +36,12 @@ int flatten_code05()
    int i = 1;
    int j;
    int i_0;
-   int k_0;
-   int k_1;
+   int k_0 = 2;
+   int k_1 = 2;
    j++;
-   i_0 = j;
-   k_0 = 2;
+   i_0 = j+1;
    i_0++;
    j = 1;
-   k_1 = 2;
    i_0++;
    j = 1;
    i = j;

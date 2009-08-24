@@ -36,6 +36,7 @@ echo
 
 apply UNSPLIT
 shell gcc -c inlining13.database/Src/inlining13.c
+shell rm inlining13.o
 
 close
 delete inlining13

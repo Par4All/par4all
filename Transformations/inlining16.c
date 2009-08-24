@@ -59,17 +59,17 @@ freia_error freia_cipo_dilate(freia_data2d *imout,
   else {
     if(connexity==4) {
       freia_aipo_dilate_8c(imout,imin,kernel_4c);
-    l4:      for(i=1 ; i<size ; i++) freia_aipo_dilate_8c(imout,imout,kernel_4c);
+      for(i=1 ; i<size ; i++) freia_aipo_dilate_8c(imout,imout,kernel_4c);
       ret = FREIA_OK;
     }
     else if(connexity == 6) {
       freia_aipo_dilate_6c(imout,imin,kernel_6c);
-    l6:      for(i=1 ; i<size ; i++) freia_aipo_dilate_6c(imout,imout,kernel_6c);
+      for(i=1 ; i<size ; i++) freia_aipo_dilate_6c(imout,imout,kernel_6c);
       ret = FREIA_OK;
     }
     else if(connexity == 8) {
       freia_aipo_dilate_8c(imout,imin,kernel_8c);
-    l8:      for(i=1 ; i<size ; i++) freia_aipo_dilate_8c(imout,imout,kernel_8c);
+      for(i=1 ; i<size ; i++) freia_aipo_dilate_8c(imout,imout,kernel_8c);
       ret = FREIA_OK;
     }
     else

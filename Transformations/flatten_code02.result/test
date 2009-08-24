@@ -12,12 +12,12 @@ int flatten_code02()
       int i = 2;
       int k = 2;
       i++;
-      j = 1;
+      j = k;
       {
          // BEGIN BLOCK
-         int k = 2;
+         int k = 3;
          i++;
-         j = 1;
+         j = k;
          // END BLOCK
       }
       // END BLOCK
@@ -35,17 +35,14 @@ int flatten_code02()
    // BEGIN BLOCK
    int i = 1;
    int j;
-   int i_0;
-   int k_0;
-   int k_1;
+   int i_0 = 2;
+   int k_0 = 2;
+   int k_1 = 3;
    i++;
-   i_0 = 2;
-   k_0 = 2;
    i_0++;
-   j = 1;
-   k_1 = 2;
+   j = k_0;
    i_0++;
-   j = 1;
+   j = k_1;
    i = j;
 
    printf("%d %d\n", i, j);

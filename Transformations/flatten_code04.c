@@ -1,5 +1,7 @@
 /* Basic test case: the second "i" declaration ("int i = 2") conflicts
    with the first one, it will need to be rewritten.
+
+   Note: constant initializations are used;
  */
 
 #include <stdio.h>

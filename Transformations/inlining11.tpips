@@ -35,8 +35,9 @@ echo Unsplit resulting code
 echo
 
 apply UNSPLIT
-shell cat inlining11.database/Src/inlining11.c
+#shell cat inlining11.database/Src/inlining11.c
 shell gcc -c inlining11.database/Src/inlining11.c
+shell rm inlining11.o
 
 close
 delete inlining11

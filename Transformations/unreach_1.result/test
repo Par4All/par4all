@@ -186,8 +186,8 @@ C     END BLOCK
       SUBROUTINE NOEND
 C     BEGIN BLOCK
 C     BEGIN UNSTRUCTURED
-1     CONTINUE                                                          0003
-      GOTO 1
+99999 CONTINUE
+      GOTO 99999
 C     END UNSTRUCTURED
 C     END BLOCK
       END
@@ -208,9 +208,8 @@ C     BEGIN BLOCK
       IF (X.GT.0.0) THEN                                                0006
 C        BEGIN UNSTRUCTURED
 C        BEGIN BLOCK
-10       PRINT *, 'live'                                                0007
+         PRINT *, 'live'                                                0007
          STOP                                                           0008
-20       CONTINUE                                                       0012
 C        END BLOCK
 C        END UNSTRUCTURED
       ENDIF

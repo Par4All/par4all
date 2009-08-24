@@ -1,5 +1,11 @@
 /* Basic test case: the second "i" declaration ("int i = 2") conflicts
    with the first one, it will need to be rewritten.
+
+   Also the initialization of the second i is constant, an
+   initialization statement must be added because it is located in a
+   control flow cycle, namely a for loop.
+
+   Finaly, the loop is unrollable.
  */
 
 #include <stdio.h>
