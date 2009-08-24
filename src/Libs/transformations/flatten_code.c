@@ -95,7 +95,9 @@ static void rename_loop_index(loop l, hash_table renamings)
   }
 }
 
-expression variable_initial_expression(entity v) {
+/* Should be moved into ri-util/variable.c */
+expression variable_initial_expression(entity v)
+{
   value val = entity_initial(v);
   expression exp = expression_undefined;
 
@@ -111,8 +113,26 @@ expression variable_initial_expression(entity v) {
       pips_internal_error("Not Yet Implemented.\n");
     }
   }
+  else if(value_code_p(val)) {
+    if(pointer_type_p(ultimate_type(entity_type(v)))) {
+      list il = sequence_statements(code_initializations(value_code(val)));
+
+      if(!ENDP(il)) {
+	statement is = STATEMENT(CAR(il));
+	instruction ii = statement_instruction(is);
+
+	pips_assert("A pointer initialization is made of one instruction expression",
+		    gen_length(il)==1 && instruction_expression(ii));
+
+	exp = copy_expression(instruction_expression(ii));
+      }
+    }
+  }
+  else if(value_unknown_p(val)) {
+    exp = expression_undefined;
+  }
   else {
-    pips_internal_error("Unexpected value.\n");
+    pips_internal_error("Unexpected value tag %d.\n", value_tag(val));
   }
 
   return exp;
@@ -127,25 +147,35 @@ static void rename_statement_declarations(statement s, hash_table renamings)
     list inits = NIL;
     list decls = statement_declarations(s); // Non-recursive
     instruction old = statement_instruction(s);
+    list ndecls = NIL;
 
     FOREACH(ENTITY, var, decls) {
-      if (!value_unknown_p(entity_initial(var))) {
-	expression ie = variable_initial_expression(var);
-	entity nvar = (entity)hash_get(renamings, var);
-	statement is = make_assign_statement(entity_to_expression(nvar), ie);
-	// for those with an initialization X = expression
-	// create an assignement statement "X = expression" -> is
-	// append it to a list "inits"
-	inits = gen_nconc(inits, CONS(statement, is, NIL));
+      entity nvar = (entity)hash_get(renamings, var);
 
-	pips_debug(1, "Initialize var %s with initial value of var %s: ",
-		   entity_local_name(nvar), entity_local_name(var)
-		   );
-	ifdebug(1){
-	  print_expression(ie);
-	  fprintf(stderr, "\n");
-	}
+      if(entity_undefined_p(nvar)) {
+	pips_debug(1, "Local variable %s is preserved because its initial value "
+		   "is not assignable\n", entity_local_name(var));
+	ndecls = gen_nconc(ndecls, CONS(ENTITY, var, NIL));
       }
+      else 
+	/* If the new variable declaration does not contain the initial
+	   value of the variable declaration, an initialization
+	   statement must be inserted */
+	if (!value_unknown_p(entity_initial(var))
+	    && value_unknown_p(entity_initial(nvar))) {
+	  expression ie = variable_initial_expression(var);
+	  statement is = make_assign_statement(entity_to_expression(nvar), ie);
+
+	  inits = gen_nconc(inits, CONS(statement, is, NIL));
+
+	  pips_debug(1, "Initialize var %s with initial value of var %s: ",
+		     entity_local_name(nvar), entity_local_name(var)
+		     );
+	  ifdebug(1){
+	    print_expression(ie);
+	    fprintf(stderr, "\n");
+	  }
+	}
     }
 
     ifdebug(1)
@@ -162,8 +192,8 @@ static void rename_statement_declarations(statement s, hash_table renamings)
 
     //gen_free_list(statement_declarations(s));
 
-    statement_declarations(s) = NIL;
-    pips_debug(1, "Local declarations suppressed.\n");
+    statement_declarations(s) = ndecls;
+    pips_debug(1, "Local declarations replaced.\n");
 
   }
 }
@@ -185,7 +215,7 @@ static void rename_statement_declarations(statement s, hash_table renamings)
 
    @return the new entity.
 */
-entity make_entity_copy_with_new_name(entity e, string global_new_name)
+entity make_entity_copy_with_new_name(entity e, string global_new_name, bool move_initialization_p)
 {
   entity ne = entity_undefined;
   char * variable_name = strdup(global_new_name);
@@ -207,7 +237,7 @@ entity make_entity_copy_with_new_name(entity e, string global_new_name)
   ne = make_entity(variable_name,
 		   copy_type(entity_type(e)),
 		   copy_storage(entity_storage(e)),
-		   //copy_value(entity_initial(e))
+		   move_initialization_p? copy_value(entity_initial(e)) :
 		   make_value_unknown()
 		   );
 
@@ -229,6 +259,105 @@ entity make_entity_copy_with_new_name(entity e, string global_new_name)
   return ne;
 }
 
+/* To generate the new variables, we need to know if there is an enclosing control cycle*/
+
+typedef struct redeclaration_context {
+  int cycle_depth;
+  statement declaration_statement;
+  string scope;
+  string module_name;
+  hash_table renamings;
+} redeclaration_context_t;
+
+bool redeclaration_enter_statement(statement s, redeclaration_context_t * rdcp)
+{
+  instruction i = statement_instruction(s);
+
+  /* Are we entering a (potential) cycle? Do we have a function to
+     detect unstructured with no cycles? */
+  if(instruction_loop_p(i)
+     || instruction_whileloop_p(i)
+     || instruction_forloop_p(i)
+     || instruction_unstructured_p(i))
+    rdcp->cycle_depth++;
+  else if(instruction_sequence_p(i) && !ENDP(statement_declarations(s))) {
+    FOREACH(ENTITY, v, statement_declarations(s)) {
+      expression ie = variable_initial_expression(v);
+      bool redeclare_p = FALSE;
+      bool move_initialization_p = FALSE;
+
+      /* Can we move or transform the initialization? */
+      if(expression_undefined_p(ie)) {
+	/* No initialization issue, let's move the declaration */
+	redeclare_p = TRUE;
+	move_initialization_p = TRUE;
+      }
+      else if(rdcp->cycle_depth>0) {
+	/* We are in a control cycle. The initial value must be
+	   reassigned where the declaration were. */
+	if(expression_is_C_rhs_p(ie)) {
+	  redeclare_p = TRUE;
+	  move_initialization_p = FALSE;
+	}
+	else {
+	  redeclare_p = FALSE;
+	  move_initialization_p = FALSE;
+	}
+      }
+      else {
+	/* We are not in a control cycle. The initial value
+	   expression, if constant, can be moved with the
+	   new declaration. This avoids problem with non-assignale
+	   expressions such as brace expressions used in
+	   initializations at declaration. */
+	if(extended_expression_constant_p(ie)) {
+	  redeclare_p = TRUE;
+	  move_initialization_p = TRUE;
+	}
+	else if(expression_is_C_rhs_p(ie)) {
+	  redeclare_p = TRUE;
+	  move_initialization_p = FALSE;
+	}
+	else {
+	  redeclare_p = FALSE;
+	  move_initialization_p = FALSE;
+	}
+      }
+
+      if(redeclare_p) {
+	string eun = entity_user_name(v);
+	string mn = rdcp->module_name;
+
+	string negn = strdup(concatenate(mn, MODULE_SEP_STRING, rdcp->scope, eun, NULL));
+	entity nv = make_entity_copy_with_new_name(v, negn, move_initialization_p);
+
+	statement_declarations(rdcp->declaration_statement) =
+	  gen_nconc(statement_declarations(rdcp->declaration_statement),
+		    CONS(ENTITY, nv, NIL));
+	hash_put(rdcp->renamings, v, nv);
+	pips_debug(1, "Variable %s renamed as %s\n", entity_name(v), entity_name(nv));
+      }
+
+    }
+  }
+
+  return TRUE;
+}
+
+bool redeclaration_exit_statement(statement s,
+				  redeclaration_context_t * rdcp)
+{
+  instruction i = statement_instruction(s);
+
+  /* Are entering a (potential) cycle? */
+  if(instruction_loop_p(i)
+     || instruction_whileloop_p(i)
+     || instruction_forloop_p(i)
+     || instruction_unstructured_p(i))
+    rdcp->cycle_depth--;
+
+  return TRUE;
+}
 
 /*
   This functions locates all variable declarations in embedded blocks,
@@ -260,7 +389,7 @@ entity make_entity_copy_with_new_name(entity e, string global_new_name)
 
 void statement_flatten_declarations(statement s)
 {
-  /* For the time being, we handle only blocks */
+  /* For the time being, we handle only blocks with declarations */
   if (statement_block_p(s) && !ENDP(statement_declarations(s))) {
 
     list declarations = instruction_to_declarations(statement_instruction(s)); // Recursive
@@ -270,9 +399,11 @@ void statement_flatten_declarations(statement s)
     entity se   = ENTITY(CAR(statement_declarations(s)));
     string sen  = entity_name(se);
     string seln = entity_local_name(se);
-    string cs   = local_name_to_scope(seln);
+    string cs   = local_name_to_scope(seln); /* current scope for s */
     string mn   = module_name(sen);
+    redeclaration_context_t rdc = { 0, s, cs, mn, renamings};
 
+    /*
     FOREACH(ENTITY, e, declarations) {
 
       string eun = entity_user_name(e);
@@ -285,6 +416,13 @@ void statement_flatten_declarations(statement s)
       pips_debug(1, "Variable %s renamed as %s\n", entity_name(e), entity_name(ne));
 
     }
+    */
+
+    gen_context_recurse(statement_instruction(s),
+			&rdc,
+			statement_domain,
+			redeclaration_enter_statement,
+			redeclaration_exit_statement);
 
     ifdebug(1)
       hash_table_fprintf(stderr, entity_local_name, entity_local_name, renamings);
@@ -334,7 +472,7 @@ bool flatten_code(string module_name)
   entity module;
   statement module_stat;
 
-  bool res;
+  //bool res;
 
   set_current_module_entity(module_name_to_entity(module_name));
   module = get_current_module_entity();
