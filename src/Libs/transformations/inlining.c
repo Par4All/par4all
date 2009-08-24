@@ -73,9 +73,9 @@ static void reset_expression_normalized(expression e)
 /* replace return instruction by a goto
  */
 static
-void inline_return_remover(instruction ins,instruction tail_ins)
+void inline_return_remover(instruction ins)
 {
-    if( return_instruction_p( ins ) && ins !=tail_ins )
+    if( return_instruction_p( ins ) )
     {
         free_call(instruction_call(ins));
         instruction_tag(ins)=is_instruction_goto;
@@ -342,7 +342,7 @@ statement inline_expression_call(expression modified_expression, call callee)
         type treturn = ultimate_type(functional_result(type_functional(entity_type(inlined_module))));
         if( type_void_p(treturn) ) /* only replace return statement by gotos */
         {
-            gen_context_recurse(expanded, tail_ins, instruction_domain, gen_true, &inline_return_remover);
+            gen_recurse(expanded, instruction_domain, gen_true, &inline_return_remover);
         }
         else /* replace by affectation + goto */
         {
