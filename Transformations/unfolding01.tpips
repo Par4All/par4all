@@ -20,17 +20,25 @@ echo End of property settings
 # quit
 
 echo
-echo before inling
+echo before unfolding
 echo
 
 display PRINTED_FILE[flgr1d_arith_add_fgINT32]
 
 echo
-echo after inling
+echo after unfolding
 echo
 
 apply UNFOLDING[flgr1d_arith_add_fgINT32]
 display PRINTED_FILE[flgr1d_arith_add_fgINT32]
+
+echo
+echo Unsplit resulting code
+echo
+
+apply UNSPLIT
+shell gcc -c unfolding01.database/Src/unfolding01.c
+shell rm -f unfolding01.o
 
 close
 delete unfolding01

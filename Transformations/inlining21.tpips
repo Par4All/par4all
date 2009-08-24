@@ -15,11 +15,28 @@ setproperty PREPROCESSOR_MISSING_FILE_HANDLING "generate"
 display CALLGRAPH_FILE[main]
 
 activate PRINT_CODE
+
+echo
+echo before inlining
+echo
+
 display PRINTED_FILE[foo]
 display PRINTED_FILE[main]
 
+echo
+echo after inlining
+echo
+
 apply INLINING[foo]
 display PRINTED_FILE[main]
+
+echo
+echo Unsplit resulting code
+echo
+
+apply UNSPLIT
+shell gcc -c inlining21.database/Src/inlining21.c inlining21.database/Src/inlining21-foo.c
+shell rm -f inlining21.o inlining21-foo.o
 
 close
 delete inlining21

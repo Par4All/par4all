@@ -1,6 +1,6 @@
 End of property settings
 
-before inling
+before unfolding
 
 void flgr1d_arith_add_fgINT32(FLGR_Data1D *datdest, FLGR_Data1D *data1, FLGR_Data1D *data2)
 {
@@ -22,12 +22,10 @@ void flgr1d_arith_add_fgINT32(FLGR_Data1D *datdest, FLGR_Data1D *data1, FLGR_Dat
    return;
 }
 
-after inling
+after unfolding
 
 void flgr1d_arith_add_fgINT32(FLGR_Data1D *datdest, FLGR_Data1D *data1, FLGR_Data1D *data2)
 {
-   int I_4;
-   int I_3;
    int I_2;
    int I_1;
    int I_0;
@@ -41,15 +39,25 @@ void flgr1d_arith_add_fgINT32(FLGR_Data1D *datdest, FLGR_Data1D *data1, FLGR_Dat
    int spp = datdest->spp;
    int length = datdest->length*spp;
    for(j = 0; j <= length-1; j += 1) {
-      I_3 = psrc1[j];
-      I_0 = I_3;
+      {
+         fgINT32 flgr_get_array_fgINT32(fgINT32 *array, int pos);
+         I_0 = flgr_get_array_fgINT32(psrc1, j);
+      }
       v1 = I_0;
-      I_4 = psrc2[j];
-      I_1 = I_4;
+      {
+         fgINT32 flgr_get_array_fgINT32(fgINT32 *array, int pos);
+         I_1 = flgr_get_array_fgINT32(psrc2, j);
+      }
       v2 = I_1;
       I_2 = v1+v2;
       result = I_2;
-      pdest[j] = result;
+      {
+         void flgr_set_array_fgINT32(fgINT32 *array, int pos, fgINT32 value);
+         flgr_set_array_fgINT32(pdest, j, result);
+      }
    }
    return;
 }
+
+Unsplit resulting code
+

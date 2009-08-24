@@ -1,5 +1,3 @@
-delete inlining17
-
 setproperty ABORT_ON_USER_ERROR TRUE
 
 create inlining17 inlining17.c
@@ -115,6 +113,6 @@ shell gcc -c inlining17.database/Src/inlining17.c
 shell rm inlining17.o
 
 close
-# delete inlining17
+delete inlining17
 quit
 

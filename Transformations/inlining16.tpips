@@ -1,5 +1,3 @@
-delete inlining16
-
 setproperty ABORT_ON_USER_ERROR TRUE
 
 create inlining16 inlining16.c
@@ -39,52 +37,48 @@ echo
 apply INLINING[freia_cipo_dilate]
 display PRINTED_FILE[freia_cipo_outer_gradient]
 
-#echo
-#echo Preconditions after inlining and after partial eval
-#echo
-#
-#activate PRINT_CODE_PRECONDITIONS
-#display PRINTED_FILE[main]
-#display PRINTED_FILE[freia_cipo_outer_gradient]
-#
-#echo
-#echo Code after partial eval
-#echo
-#
-#activate PRINT_CODE
-#apply PARTIAL_EVAL[freia_cipo_outer_gradient]
-#display PRINTED_FILE[freia_cipo_outer_gradient]
-#
-#echo
-#echo Code after dead code elimination
-#echo
-#
-#activate PRINT_CODE
-#apply SUPPRESS_DEAD_CODE[freia_cipo_outer_gradient]
-#display PRINTED_FILE[freia_cipo_outer_gradient]
-#
-#echo
-#echo Code after full loop unrolling
-#echo
-#
-## The main implies connectivity 8
-#
-## apply FULL_UNROLL[freia_cipo_outer_gradient]
-## l4
-## apply FULL_UNROLL[freia_cipo_outer_gradient]
-## l6
-#apply FULL_UNROLL[freia_cipo_outer_gradient]
-#l8
-#
-#display PRINTED_FILE[freia_cipo_outer_gradient]
-#
-## echo
-## echo Code after use-def elimination: bad results due to synthetic code, among other things
-## echo
-## 
-## activate PRINT_CODE
-## apply USE_DEF_ELIMINATION[freia_cipo_outer_gradient]
-## display PRINTED_FILE[freia_cipo_outer_gradient]
+echo
+echo Preconditions after inlining and after partial eval
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[main]
+display PRINTED_FILE[freia_cipo_outer_gradient]
+
+echo
+echo Code after partial eval
+echo
+
+activate PRINT_CODE
+apply PARTIAL_EVAL[freia_cipo_outer_gradient]
+display PRINTED_FILE[freia_cipo_outer_gradient]
+
+echo
+echo Code after dead code elimination
+echo
+
+activate PRINT_CODE
+apply SUPPRESS_DEAD_CODE[freia_cipo_outer_gradient]
+display PRINTED_FILE[freia_cipo_outer_gradient]
+
+echo
+echo Code after full loop unrolling
+echo
+
+# The main implies connectivity 8
+
+apply FULL_UNROLL[freia_cipo_outer_gradient]
+l8
+
+display PRINTED_FILE[freia_cipo_outer_gradient]
+
+# echo
+# echo Code after use-def elimination: bad results due to synthetic code, among other things
+# echo
+# 
+# activate PRINT_CODE
+# apply USE_DEF_ELIMINATION[freia_cipo_outer_gradient]
+# display PRINTED_FILE[freia_cipo_outer_gradient]
 
 echo
 echo Code after inlining of "freia_cipo_outer_gradient"
@@ -109,6 +103,6 @@ shell gcc -c inlining16.database/Src/inlining16.c
 shell rm inlining16.o
 
 close
-# delete inlining16
+delete inlining16
 quit
 
