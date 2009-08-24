@@ -1296,6 +1296,13 @@ static void proper_effects_of_expression_instruction(instruction i)
 	  c = syntax_call(sc);
 	  l_proper = generic_r_proper_effects_of_call(c);
 	}
+	else if(syntax_reference_p(sc)) {
+	  /* FI: I guess you do not end up here if the cast appears in
+	     the lhs, assuming this is till compatible with the
+	     standard. */
+	  reference r = syntax_reference(sc);
+	  l_proper = generic_proper_effects_of_read_reference(r);
+	}
 	else {
 	  pips_internal_error("Cast case not implemented\n");
 	}
