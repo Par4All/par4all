@@ -273,7 +273,7 @@ recompile_module(char* module)
         list p = NIL;
         FOREACH(ENTITY, e, entity_declarations(modified_module))
         {
-            if(! entity_area_p(e) )
+            if( same_string_p(entity_module_name(e),module) && !entity_area_p(e) )
                 gen_clear_tabulated_element((gen_chunk*)e);
 
             else
