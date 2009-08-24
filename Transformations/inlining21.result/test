@@ -1,6 +1,9 @@
  main
      foo
          bla
+
+before inlining
+
 int foo(void)
 {
    bla(kernel);                                                         /*0004*/
@@ -11,13 +14,22 @@ int main(void)
    foo();                                                               /*0003*/
    return 0;                                                            /*0004*/
 }
+
+after inlining
+
 int main(void)
 {
    int I_0;
-   extern  kernel();
-   bla(kernel);                                                         /*0005*/
-   /*0004*/
-   I_0 = 0;                                                             /*0006*/
-   I_0;                                                                 /*0009*/
-   return 0;                                                            /*0010*/
+   {
+      extern void bla(int *f1);
+      extern const  int kernel[3];
+      bla(kernel);                                                      /*0007*/
+      /*0004*/
+      I_0 = 0;                                                          /*0008*/
+   }
+   I_0;                                                                 /*0011*/
+   return 0;                                                            /*0012*/
 }
+
+Unsplit resulting code
+

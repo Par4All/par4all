@@ -5,17 +5,28 @@ char * foo(void)
 }
 int main(void)
 {
-   char *fun = foo();
-   fprintf(stdout, "fun: %s\n", fun);                                   /*0005*/
-   fprintf(stdout, "function: %s\n", __FUNCTION__);                     /*0006*/
-   return 0;                                                            /*0007*/
+   const char *fun;
+   const char *fun2;
+   const char *fun3;
+   fun = foo();                                                         /*0005*/
+   fun2 = __FUNCTION__;                                                 /*0006*/
+   fun3 = __func__;                                                     /*0007*/
+   return 0;                                                            /*0008*/
 }
 int main(void)
 {
-   char *fun = foo();
-   fprintf(stdout, "fun: %s\n", fun);                                   /*0004*/
-   /*0005*/
-   fprintf(stdout, "function: %s\n", __FUNCTION__);                     /*0005*/
+   char *P_0;
+   const char *fun;
+   const char *fun2;
+   const char *fun3;
+   {
+      const char *foo_fun = __FUNCTION__;
+      P_0 = (char *) foo_fun;                                           /*0009*/
+   }
+   fun = P_0;                                                           /*0012*/
+   fun2 = __FUNCTION__;                                                 /*0013*/
    /*0006*/
-   return 0;                                                            /*0006*/
+   fun3 = __func__;                                                     /*0014*/
+   /*0007*/
+   return 0;                                                            /*0015*/
 }
