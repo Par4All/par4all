@@ -1137,7 +1137,6 @@
   storage_rom_p(entity_storage(e)) && value_constant_p(entity_initial(e)))
 
 /* building instruction and statements... */
-
 #define instruction_to_statement(i) \
    make_statement(entity_empty_label(),\
                   STATEMENT_NUMBER_UNDEFINED, STATEMENT_ORDERING_UNDEFINED,\

@@ -33,7 +33,7 @@
 #include "ri-util.h"
 
 /* polymorhism thanks to newgen ! */
-#define INSTANCE_OF(type,value)  ( (unit)((gen_chunk*)(value)->u) == ((unit)(type##_domain)) )
+#define INSTANCE_OF(type,value) ( (_int)((value)->u) == (_int)(type##_domain) )
 
 /* forward declarations */
 static expression do_clone_expression(expression e, clone_context cc, hash_table ht);
