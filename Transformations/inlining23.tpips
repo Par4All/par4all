@@ -1,0 +1,28 @@
+setenv WSPACE inlining23
+delete ${WSPACE}
+setenv MAIN $WSPACE.database/main
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create ${WSPACE} inlining23.c
+
+activate C_PARSER
+activate C_SYMBOL_TABLE
+
+setproperty PRETTYPRINT_C_CODE TRUE
+
+display CALLGRAPH_FILE[main]
+
+activate PRINT_CODE
+display PRINTED_FILE[%ALLFUNC]
+
+apply INLINING[foo]
+display PRINTED_FILE[main]
+display PRINTED_FILE[bla]
+
+apply INLINING[bla]
+display PRINTED_FILE[main]
+
+close
+delete ${WSPACE}
+quit
