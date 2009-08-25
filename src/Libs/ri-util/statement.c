@@ -2673,12 +2673,15 @@ void entity_get_referenced_entities(entity e, set re)
             call_domain,gen_true,statement_clean_declarations_call_walker,
             NULL
             );
-    gen_context_multi_recurse(entity_initial(e),re,
-            call_domain,gen_true,statement_clean_declarations_call_walker,
-            reference_domain,gen_true,statement_clean_declarations_reference_walker,
-            area_domain,gen_true,statement_clean_declarations_area_walker,
-            ram_domain,gen_true,statement_clean_declarations_ram_walker,
-            NULL);
+    /* SG: I am unsure wether it is valid or not to find an entity with undefined initial ... */
+    if( !value_undefined_p(entity_initial(e) ) ) {
+        gen_context_multi_recurse(entity_initial(e),re,
+                call_domain,gen_true,statement_clean_declarations_call_walker,
+                reference_domain,gen_true,statement_clean_declarations_reference_walker,
+                area_domain,gen_true,statement_clean_declarations_area_walker,
+                ram_domain,gen_true,statement_clean_declarations_ram_walker,
+                NULL);
+    }
 }
 
 /** 
