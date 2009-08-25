@@ -58,55 +58,73 @@
  * @name inlining
  * @{ */
 
-struct inlined {
-    entity inlined_module;
-    statement inlined_module_statement;
-};
-struct inlined_and_stat {
-    struct inlined i;
-    list new_statements;
-};
-
-static statement    laststmt;
-static entity       returned_entity;
-static bool 		use_effects;
-
-static void reset_expression_normalized(expression e)
-{
-    if(!normalized_undefined_p(expression_normalized(e)))
-        free_normalized(expression_normalized(e));
-    expression_normalized(e)=normalized_undefined;
+/** 
+ * structure containing all the parameters needed by inlining.
+ * It avoids using globals
+ * newgen like macros are defined
+ */
+typedef struct {
+    entity _inlined_module_;
+    statement _inlined_module_statement_;
+    list _new_statements_;
+    bool _has_static_declaration_;
+    bool _has_inlinable_calls_;
+    statement _laststmt_;
+    instruction _tail_ins_;
+    entity _returned_entity_;
+    bool _use_effects_;
+} iparam, * inlining_parameters;
+#define IPARAM_INIT { \
+    ._inlined_module_=entity_undefined,\
+    ._inlined_module_statement_=statement_undefined,\
+    ._new_statements_=NIL,\
+    ._has_static_declaration_=false,\
+    ._has_inlinable_calls_=false,\
+    ._laststmt_=statement_undefined,\
+    ._tail_ins_=instruction_undefined,\
+    ._returned_entity_=entity_undefined,\
+    ._use_effects_=true\
 }
+#define inlined_module(p)           (p)->_inlined_module_
+#define inlined_module_statement(p) (p)->_inlined_module_statement_
+#define new_statements(p)           (p)->_new_statements_
+#define has_static_declaration(p)   (p)->_has_static_declaration_
+#define has_inlinable_calls(p)      (p)->_has_inlinable_calls_
+#define laststmt(p)                 (p)->_laststmt_
+#define tail_ins(p)                 (p)->_tail_ins_
+#define returned_entity(p)          (p)->_returned_entity_
+#define use_effects(p)              (p)->_use_effects_
+
 
 /* replace return instruction by a goto
  */
 static
-void inline_return_remover(instruction ins)
+void inline_return_remover(instruction ins,inlining_parameters p)
 {
     if( return_instruction_p( ins ) )
     {
         free_call(instruction_call(ins));
         instruction_tag(ins)=is_instruction_goto;
-        instruction_goto(ins)=copy_statement(laststmt);
+        instruction_goto(ins)=copy_statement(laststmt(p));
     }
 }
 
 /* replace return instruction by an assignment and a goto
  */
 static
-void inline_return_switcher(instruction ins,instruction tail_ins)
+void inline_return_switcher(instruction ins,inlining_parameters p)
 {
     if( return_instruction_p( ins ) )
     {
         // create the goto
-        list l= (ins == tail_ins ) ? NIL : CONS( STATEMENT, instruction_to_statement( make_instruction_goto( copy_statement(laststmt) ) ) , NIL ) ;
+        list l= (ins == tail_ins(p)) ? NIL : CONS( STATEMENT, instruction_to_statement( make_instruction_goto( copy_statement(laststmt(p)) ) ) , NIL ) ;
         // create the assign and push it if needed
         call ic = instruction_call(ins);
         if( !ENDP(call_arguments(ic)) )
         {
             pips_assert("return is called with one argument",ENDP(CDR(call_arguments(ic))));
             statement assign = make_assign_statement(
-                    entity_to_expression( returned_entity ),
+                    entity_to_expression( returned_entity(p) ),
                     copy_expression(EXPRESSION(CAR(call_arguments(ic)))));
             l = CONS( STATEMENT, assign , l );
         }
@@ -186,11 +204,10 @@ bool inline_has_static_declaration(entity module,list iter)
     return false;
 }
 
-struct swsd {  entity module; bool has_static_declaration;};
 static
-void statement_with_static_declarations_p(statement s,struct swsd *p )
+void statement_with_static_declarations_p(statement s,inlining_parameters p )
 {
-    p->has_static_declaration|=inline_has_static_declaration(p->module,statement_declarations(s) );
+    has_static_declaration(p)|=inline_has_static_declaration(inlined_module(p),statement_declarations(s) );
 }
 
 static
@@ -250,36 +267,33 @@ void inlining_regenerate_labels(statement s, string new_module)
 }
 
 /* this should inline the call callee
- * calling module inlied_module
+ * calling module inlined_module
  */
 static
-statement inline_expression_call(struct inlined *p, expression modified_expression, call callee)
+statement inline_expression_call(inlining_parameters p, expression modified_expression, call callee)
 {
 
     /* only inline the right call */
-    pips_assert("inline the right call",inline_should_inline(p->inlined_module,callee));
+    pips_assert("inline the right call",inline_should_inline(inlined_module(p),callee));
 
     string modified_module_name = entity_local_name(get_current_module_entity());
 
-    value inlined_value = entity_initial(p->inlined_module);
+    value inlined_value = entity_initial(inlined_module(p));
     pips_assert("is a code", value_code_p(inlined_value));
     code inlined_code = value_code(inlined_value);
 
     /* stop if the function has static declaration */
     {
-        struct swsd pp = {
-            .has_static_declaration=false,
-            .module=p->inlined_module
-        };
-        if( c_module_p(p->inlined_module) )
+        has_static_declaration(p)=false;
+        if( c_module_p(inlined_module(p)) )
         {
-            gen_context_recurse(p->inlined_module_statement,&pp, statement_domain, gen_true, statement_with_static_declarations_p);
+            gen_context_recurse(inlined_module_statement(p),p, statement_domain, gen_true, statement_with_static_declarations_p);
         }
         else
         {
-            pp.has_static_declaration = inline_has_static_declaration( pp.module, code_declarations(inlined_code) );
+            has_static_declaration(p)= inline_has_static_declaration( inlined_module(p), code_declarations(inlined_code) );
         }
-        if( pp.has_static_declaration )
+        if( has_static_declaration(p))
         {
             pips_user_warning("cannot inline function with static declarations\n");
             return statement_undefined;
@@ -289,18 +303,18 @@ statement inline_expression_call(struct inlined *p, expression modified_expressi
     /* create the new instruction sequence
      * no need to change all entities in the new statements, because we build a new text ressource latter
      */
-    statement expanded = copy_statement(p->inlined_module_statement);
+    statement expanded = copy_statement(inlined_module_statement(p));
     statement declaration_holder = expanded;
     statement_declarations(expanded) = gen_full_copy_list( statement_declarations(expanded) ); // simple copy != deep copy
 
     /* should add them to modified_module's*/
-    set inlined_referenced_entities = get_referenced_entities(p->inlined_module_statement);
+    set inlined_referenced_entities = get_referenced_entities(inlined_module_statement(p));
     list new_externs = NIL;
     SET_FOREACH(entity,ref_ent,inlined_referenced_entities)
     {
         if(!entity_enum_member_p(ref_ent)){
             string emn = entity_module_name(ref_ent);
-            string mln = module_local_name(p->inlined_module);
+            string mln = module_local_name(inlined_module(p));
             if(! same_string_p(emn,mln) ) /* we should add ref_ent to the declarations */
             {
                 entity add = ref_ent;
@@ -329,8 +343,8 @@ statement inline_expression_call(struct inlined *p, expression modified_expressi
     gen_context_recurse(expanded,modified_module_name,statement_domain,gen_true,inlining_regenerate_labels);
 
     /* add label at the end of the statement */
-    laststmt=make_continue_statement(make_new_label( modified_module_name ) );
-    gen_nconc( sequence_statements(instruction_sequence(statement_instruction(expanded))), CONS( STATEMENT, laststmt, NIL) );
+    laststmt(p)=make_continue_statement(make_new_label( modified_module_name ) );
+    gen_nconc( sequence_statements(instruction_sequence(statement_instruction(expanded))), CONS( STATEMENT, laststmt(p), NIL) );
 
     /* fix `return' calls
      * in case a goto is immediatly followed by its targeted label
@@ -344,49 +358,48 @@ statement inline_expression_call(struct inlined *p, expression modified_expressi
     else
     {
         while( CDR(CDR(tail)) != NIL ) POP(tail);
-        instruction tail_ins = statement_instruction(STATEMENT(CAR(tail)));
+        tail_ins(p)= statement_instruction(STATEMENT(CAR(tail)));
 
-        type treturn = ultimate_type(functional_result(type_functional(entity_type(p->inlined_module))));
+        type treturn = ultimate_type(functional_result(type_functional(entity_type(inlined_module(p)))));
         if( type_void_p(treturn) ) /* only replace return statement by gotos */
         {
-            gen_recurse(expanded, instruction_domain, gen_true, &inline_return_remover);
+            gen_context_recurse(expanded, p,instruction_domain, gen_true, &inline_return_remover);
         }
         else /* replace by affectation + goto */
         {
             pips_assert("returned value is a variable", type_variable_p(treturn));
-            returned_entity=entity_undefined;
             do {
                 /* create new variable to receive computation result */
-                returned_entity = make_new_scalar_variable_with_prefix(
+                returned_entity(p)= make_new_scalar_variable_with_prefix(
                         "_return",
                         get_current_module_entity(),
                         copy_basic(variable_basic(type_variable(treturn)))
                         );
                 /* make_new_scalar_variable does not ensure the entity is not defined in enclosing statement, we check this */
-                FOREACH(ENTITY,ent,statement_declarations(p->inlined_module_statement))
+                FOREACH(ENTITY,ent,statement_declarations(inlined_module_statement(p)))
                 {
-                    if(same_string_p(entity_user_name(ent),entity_user_name(returned_entity)))
+                    if(same_string_p(entity_user_name(ent),entity_user_name(returned_entity(p))))
                     {
-                        returned_entity=entity_undefined;
+                        returned_entity(p)=entity_undefined;
                         break;
                     } 
                 }
-            } while(entity_undefined_p(returned_entity));
+            } while(entity_undefined_p(returned_entity(p)));
 
-            AddLocalEntityToDeclarations(returned_entity, get_current_module_entity(),
+            AddLocalEntityToDeclarations(returned_entity(p), get_current_module_entity(),
                     c_module_p(get_current_module_entity())?get_current_module_statement():statement_undefined);
 
-            gen_context_recurse(expanded, tail_ins, instruction_domain, gen_true, &inline_return_switcher);
+            gen_context_recurse(expanded, p, instruction_domain, gen_true, &inline_return_switcher);
         }
         if( !type_void_p(treturn) )
         {
-            if( entity_constant_p(returned_entity) )
+            if( entity_constant_p(returned_entity(p)) )
             {
-                expression_syntax(modified_expression) = make_syntax_call(make_call(returned_entity,NIL));
+                expression_syntax(modified_expression) = make_syntax_call(make_call(returned_entity(p),NIL));
             }
             else
             {
-                reference r = make_reference( returned_entity, NIL);
+                reference r = make_reference( returned_entity(p), NIL);
                 expression_syntax(modified_expression) = make_syntax_reference(r);
             }
         }
@@ -410,7 +423,7 @@ statement inline_expression_call(struct inlined *p, expression modified_expressi
         expression from = EXPRESSION(CAR(c_iter));
 
         /* check if there is a write effect on this parameter */
-        bool need_copy = (!use_effects) || find_write_effect_on_entity(p->inlined_module_statement,e);
+        bool need_copy = (!use_effects(p)) || find_write_effect_on_entity(inlined_module_statement(p),e);
 
         /* generate a copy for this parameter */
         entity new = entity_undefined;
@@ -523,7 +536,7 @@ reget:
      * because of the unstructuration, we must purge statement number
      */
     gen_recurse(expanded,statement_domain,gen_true,fix_statement_attributes_if_sequence);
-    gen_recurse(expanded,expression_domain,gen_true,reset_expression_normalized);
+    unnormalize_expression(expanded);
     return expanded;
 }
 
@@ -531,40 +544,35 @@ reget:
 /* recursievly inline an expression if needed
  */
 static
-void inline_expression(expression expr, struct inlined_and_stat * p)
+void inline_expression(expression expr, inlining_parameters  p)
 {
     if( expression_call_p(expr) )
     {
         call callee = syntax_call(expression_syntax(expr));
-        if( inline_should_inline( p->i.inlined_module, callee ) )
+        if( inline_should_inline( inlined_module(p), callee ) )
         {
-                statement s = inline_expression_call(&p->i, expr, callee );
+                statement s = inline_expression_call(p, expr, callee );
                 if( !statement_undefined_p(s) )
                 {
-                    p->new_statements = CONS(STATEMENT, s, p->new_statements);;
+                    new_statements(p)= CONS(STATEMENT, s, new_statements(p));;
                 }
         }
     }
 }
 
-struct ihic {
-    entity inlined_module;
-    bool has_inlinable_calls;
-};
-
 /* check if a call has inlinable calls
  */
 static
-void inline_has_inlinable_calls_crawler(call callee,struct ihic *p)
+void inline_has_inlinable_calls_crawler(call callee,inlining_parameters p)
 {
-    if( p->has_inlinable_calls|=inline_should_inline(p->inlined_module,callee) ) gen_recurse_stop(0);
+    if( has_inlinable_calls(p)|=inline_should_inline(inlined_module(p),callee) ) gen_recurse_stop(0);
 }
 static
 bool inline_has_inlinable_calls(entity inlined_module,void* elem)
 {
-    struct ihic p = { .inlined_module=inlined_module,.has_inlinable_calls=false};
+    iparam p = { ._inlined_module_=inlined_module,._has_inlinable_calls_=false};
     gen_context_recurse(elem, &p, call_domain, gen_true,&inline_has_inlinable_calls_crawler);
-    return p.has_inlinable_calls;
+    return has_inlinable_calls(&p);
 }
 
 
@@ -572,7 +580,7 @@ bool inline_has_inlinable_calls(entity inlined_module,void* elem)
  * only apply if this instruction does not contain other instructions
  */
 static
-void inline_statement_switcher(statement stmt, struct inlined *p)
+void inline_statement_switcher(statement stmt, inlining_parameters p)
 {
     instruction *ins=&statement_instruction(stmt);
     switch( instruction_tag(*ins) )
@@ -581,7 +589,7 @@ void inline_statement_switcher(statement stmt, struct inlined *p)
         case is_instruction_call:
             {
                 call callee =instruction_call(*ins);
-                if( inline_has_inlinable_calls(p->inlined_module, callee ) )
+                if( inline_has_inlinable_calls(inlined_module(p), callee ) )
                 {
                     instruction_tag(*ins) = is_instruction_expression;
                     instruction_expression(*ins)=call_to_expression(callee);
@@ -591,11 +599,11 @@ void inline_statement_switcher(statement stmt, struct inlined *p)
         /* handle those with a gen_recurse */
         case is_instruction_expression:
             {
-                struct inlined_and_stat pp = { *p, NIL };
-                gen_context_recurse(*ins,&pp,expression_domain,gen_true,&inline_expression);
-                if( !ENDP(pp.new_statements) ) /* something happens on the way to heaven */
+                new_statements(p)=NIL;
+                gen_context_recurse(*ins,p,expression_domain,gen_true,&inline_expression);
+                if( !ENDP(new_statements(p)) ) /* something happens on the way to heaven */
                 {
-                    type t= functional_result(type_functional(entity_type(p->inlined_module)));
+                    type t= functional_result(type_functional(entity_type(inlined_module(p))));
                     if( ! type_void_p(t) )
                     {
                         instruction tmp = instruction_undefined;
@@ -609,13 +617,13 @@ void inline_statement_switcher(statement stmt, struct inlined *p)
                         {
                             tmp = copy_instruction(*ins);
                         }
-                        pp.new_statements=CONS(STATEMENT,
+                        new_statements(p)=CONS(STATEMENT,
                                 instruction_to_statement(tmp),
-                                pp.new_statements
+                                new_statements(p)
                         );
                     }
                     //free_instruction(*ins);
-                    *ins=make_instruction_sequence( make_sequence( gen_nreverse(pp.new_statements) ) );
+                    *ins=make_instruction_sequence( make_sequence( gen_nreverse(new_statements(p)) ) );
                     statement_number(stmt)=STATEMENT_NUMBER_UNDEFINED;
 					if(!empty_comments_p(statement_comments(stmt))) free(statement_comments(stmt));
                     statement_comments(stmt)=empty_comments;
@@ -667,7 +675,7 @@ void inline_split_declarations(statement s, entity inlined_module)
  * by the expansion of `inlined'
  */
 static void
-inline_calls(struct inlined *p ,char * module)
+inline_calls(inlining_parameters p ,char * module)
 {
     entity modified_module = module_name_to_entity(module);
     /* get target module's ressources */
@@ -679,7 +687,7 @@ inline_calls(struct inlined *p ,char * module)
     set_current_module_statement( modified_module_statement );
 
     /* first pass : convert some declaration with assignment to declarations + statements, if needed */
-    gen_context_recurse(modified_module_statement, p->inlined_module, statement_domain, gen_true, inline_split_declarations);
+    gen_context_recurse(modified_module_statement, inlined_module(p), statement_domain, gen_true, inline_split_declarations);
     /* inline all calls to inlined_module */
     gen_context_recurse(modified_module_statement, p, statement_domain, gen_true, &inline_statement_switcher);
 
@@ -698,55 +706,53 @@ inline_calls(struct inlined *p ,char * module)
  * @return true if we did something
  */
 static
-bool do_inlining(char * module_name)
+bool do_inlining(inlining_parameters p,char *module_name)
 {
-   /* Get the module ressource */
-    struct inlined p = {
-        .inlined_module = module_name_to_entity( module_name ),
-        .inlined_module_statement = (statement) db_get_memory_resource(DBR_CODE, module_name, TRUE)
-    };
+    /* Get the module ressource */
+    inlined_module (p)= module_name_to_entity( module_name );
+    inlined_module_statement (p)= (statement) db_get_memory_resource(DBR_CODE, module_name, TRUE);
 
-   if(use_effects) set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS,module_name,TRUE));
+    if(use_effects(p)) set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS,module_name,TRUE));
 
-   /* check them */
-   pips_assert("is a functionnal",entity_function_p(p.inlined_module) || entity_subroutine_p(p.inlined_module) );
-   pips_assert("statements found", !statement_undefined_p(p.inlined_module_statement) );
-   debug_on("INLINING_DEBUG_LEVEL");
+    /* check them */
+    pips_assert("is a functionnal",entity_function_p(inlined_module(p)) || entity_subroutine_p(inlined_module(p)) );
+    pips_assert("statements found", !statement_undefined_p(inlined_module_statement(p)) );
+    debug_on("INLINING_DEBUG_LEVEL");
 
 
-   /* parse filter property */
-   string inlining_callers_name = strdup(get_string_property("INLINING_CALLERS"));
-   list callers_l = NIL;
+    /* parse filter property */
+    string inlining_callers_name = strdup(get_string_property("INLINING_CALLERS"));
+    list callers_l = NIL;
 
-   string c_name= NULL;
-   for(c_name = strtok(inlining_callers_name," ") ; c_name ; c_name=strtok(NULL," ") )
-   {
-       callers_l = CONS(STRING, c_name, callers_l);
-   }
-   /*  or get module's callers */
-   if(ENDP(callers_l))
-   {
-       callees callers = (callees)db_get_memory_resource(DBR_CALLERS, module_name, TRUE);
-       callers_l = callees_callees(callers);
-   }
+    string c_name= NULL;
+    for(c_name = strtok(inlining_callers_name," ") ; c_name ; c_name=strtok(NULL," ") )
+    {
+        callers_l = CONS(STRING, c_name, callers_l);
+    }
+    /*  or get module's callers */
+    if(ENDP(callers_l))
+    {
+        callees callers = (callees)db_get_memory_resource(DBR_CALLERS, module_name, TRUE);
+        callers_l = callees_callees(callers);
+    }
 
-   /* inline call in each caller */
-   FOREACH(STRING, caller_name,callers_l)
-   {
-       inline_calls(&p, caller_name );
-       recompile_module(caller_name);
-       /* we can try to remove some labels now*/
-       if( get_bool_property("INLINING_PURGE_LABELS"))
-           if(!remove_useless_label(caller_name))
-               pips_user_warning("failed to remove useless labels after restructure_control in inlining");
-   }
+    /* inline call in each caller */
+    FOREACH(STRING, caller_name,callers_l)
+    {
+        inline_calls(p, caller_name );
+        recompile_module(caller_name);
+        /* we can try to remove some labels now*/
+        if( get_bool_property("INLINING_PURGE_LABELS"))
+            if(!remove_useless_label(caller_name))
+                pips_user_warning("failed to remove useless labels after restructure_control in inlining");
+    }
 
-   if(use_effects) reset_cumulated_rw_effects();
+    if(use_effects(p)) reset_cumulated_rw_effects();
 
-   pips_debug(2, "inlining done for %s\n", module_name);
-   debug_off();
-   /* Should have worked: */
-   return TRUE;
+    pips_debug(2, "inlining done for %s\n", module_name);
+    debug_off();
+    /* Should have worked: */
+    return TRUE;
 }
 
 /** 
@@ -758,8 +764,9 @@ bool do_inlining(char * module_name)
  */
 bool inlining(char *module_name)
 {
-	use_effects=true;
-	return do_inlining(module_name);
+    iparam p =IPARAM_INIT;
+    use_effects(&p)=true;
+	return do_inlining(&p,module_name);
 }
 
 /** 
@@ -771,8 +778,9 @@ bool inlining(char *module_name)
  */
 bool inlining_simple(char *module_name)
 {
-	use_effects=false;
-	return do_inlining(module_name);
+    iparam p =IPARAM_INIT;
+    use_effects(&p)=false;
+	return do_inlining(&p,module_name);
 }
 
 /**  @} */
@@ -789,22 +797,21 @@ bool inlining_simple(char *module_name)
  * @param module_name called module name
  */
 static void
-run_inlining(string caller_name, string module_name)
+run_inlining(string caller_name, string module_name, inlining_parameters p)
 {
     /* Get the module ressource */
-    struct inlined p = {
-        .inlined_module = module_name_to_entity( module_name ),
-        .inlined_module_statement = (statement) db_get_memory_resource(DBR_CODE, module_name, TRUE)
-    };
-    if(use_effects) set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS,module_name,TRUE));
+    inlined_module (p)= module_name_to_entity( module_name );
+    inlined_module_statement (p)= (statement) db_get_memory_resource(DBR_CODE, module_name, TRUE);
+
+    if(use_effects(p)) set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS,module_name,TRUE));
 
     /* check them */
-    pips_assert("is a functionnal",entity_function_p(p.inlined_module) || entity_subroutine_p(p.inlined_module) );
-    pips_assert("statements found", !statement_undefined_p(p.inlined_module_statement) );
+    pips_assert("is a functionnal",entity_function_p(inlined_module(p)) || entity_subroutine_p(inlined_module(p)) );
+    pips_assert("statements found", !statement_undefined_p(inlined_module_statement(p)) );
 
     /* inline call */
-    inline_calls( &p, caller_name );
-    if(use_effects) reset_cumulated_rw_effects();
+    inline_calls( p, caller_name );
+    if(use_effects(p)) reset_cumulated_rw_effects();
 }
 
 /** 
@@ -817,7 +824,7 @@ run_inlining(string caller_name, string module_name)
  * @return true if we did something
  */
 static
-bool do_unfolding(char* module_name)
+bool do_unfolding(inlining_parameters p, char* module_name)
 {
     debug_on("UNFOLDING_DEBUG_LEVEL");
 
@@ -872,7 +879,7 @@ bool do_unfolding(char* module_name)
         if( !set_empty_p(calls_name) )
         {
             SET_FOREACH(string,call_name,calls_name) {
-                run_inlining(module_name,(string)call_name);
+                run_inlining(module_name,call_name,p);
             }
             recompile_module(module_name);
             /* we can try to remove some labels now*/
@@ -903,8 +910,9 @@ bool do_unfolding(char* module_name)
  */
 bool unfolding(char* module_name)
 {
-	use_effects=true;
-	return do_unfolding(module_name);
+    iparam p = IPARAM_INIT;
+    use_effects(&p)=true;
+	return do_unfolding(&p,module_name);
 }
 
 /** 
@@ -916,8 +924,9 @@ bool unfolding(char* module_name)
  */
 bool unfolding_simple(char* module_name)
 {
-	use_effects=false;
-	return do_unfolding(module_name);
+    iparam p = IPARAM_INIT;
+    use_effects(&p)=false;
+	return do_unfolding(&p,module_name);
 }
 /**  @} */
 
