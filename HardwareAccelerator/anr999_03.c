@@ -9,22 +9,12 @@
 
 int anr999_03(void)
 {
-   int I_13;
-   int I_6;
    freia_dataio fdin;
    freia_dataio fdout;
    freia_data2d *imin;
    freia_data2d *imout_gradient;
    freia_data2d *imout_dilate;
-   int32_t measure_min;
-   int32_t measure_vol;
-   int i_0;
-   int I_10_0;
-   int I_3_0;
-   freia_status ret_0;
    freia_data2d *imtmp_0;
-   int i_1;
-   int i_2;
 
    freia_common_open_input(&fdin, 0);
    freia_common_open_output(&fdout, 0, fdin.framewidth, fdin.frameheight, fdin.framebpp);
@@ -42,9 +32,6 @@ int anr999_03(void)
    freia_aipo_dilate_8c(imtmp_0, imin, freia_morpho_kernel_8c);
    freia_aipo_erode_8c(imout_gradient, imin, freia_morpho_kernel_8c);
    freia_aipo_sub(imout_gradient, imtmp_0, imout_gradient);
-
-   printf("input global min = %d\n", measure_min);
-   printf("input global volume = %d\n", measure_vol);
 
    freia_common_tx_image(imin, &fdout);
    freia_common_tx_image(imout_dilate, &fdout);
