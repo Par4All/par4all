@@ -2696,17 +2696,17 @@ void statement_clean_declarations_statement_walker(statement s, set re)
 
 
 /** 
- * retrieves the set of entites used in s
+ * retrieves the set of entites used in elem
  * 
- * @param s  statement to check
+ * @param elem  element to check (any gen_recursifiable type is allowded)
  * 
  * @return set of referenced entities
  */
-set statement_get_referenced_entities(statement s)
+set get_referenced_entities(void* elem)
 {
     /* gather entities from s*/
     set referenced_entities = set_make(set_pointer);
-    gen_context_multi_recurse(s,referenced_entities,
+    gen_context_multi_recurse(elem,referenced_entities,
             loop_domain,gen_true,statement_clean_declarations_loop_walker,
             reference_domain,gen_true,statement_clean_declarations_reference_walker,
             call_domain,gen_true,statement_clean_declarations_call_walker,
@@ -2716,9 +2716,10 @@ set statement_get_referenced_entities(statement s)
 
     /* gather all entities referenced by referenced entities */
     set other_referenced_entities = set_make(set_pointer);
-    SET_MAP(e,{
-        entity_get_referenced_entities((entity)e,other_referenced_entities);
-    },referenced_entities);
+    SET_FOREACH(entity,e,referenced_entities)
+    {
+        entity_get_referenced_entities(e,other_referenced_entities);
+    }
 
     /* merge results */
     set_union(referenced_entities,other_referenced_entities,referenced_entities);
@@ -2741,7 +2742,7 @@ static
 list statement_clean_declarations_helper(list declarations, statement stmt)
 {
     list new_declarations = NIL;
-    set referenced_entities = statement_get_referenced_entities(stmt);
+    set referenced_entities = get_referenced_entities(stmt);
 
     declarations=gen_nreverse(declarations);
 
@@ -2793,20 +2794,22 @@ static
 void entity_generate_missing_declarations(entity module, statement s)
 {
     /* gather referenced entities */
-    set referenced_entities = statement_get_referenced_entities(s);
+    set referenced_entities = get_referenced_entities(s);
     set ref_tmp = set_make(set_pointer);
     /* gather all entities referenced by referenced entities */
-    SET_MAP(e0,{entity_get_referenced_entities((entity)e0,ref_tmp);},referenced_entities);
+    SET_FOREACH(entity,e0,referenced_entities) {
+        entity_get_referenced_entities(e0,ref_tmp);
+    }
 
     referenced_entities=set_union(referenced_entities,ref_tmp,referenced_entities);
     set_free(ref_tmp);
 
     /* fill the declarations with missing entities (ohhhhh a nice 0(n²) algorithm*/
     list new = NIL;
-    SET_MAP(e1,{
+    SET_FOREACH(entity,e1,referenced_entities) {
             if(gen_chunk_undefined_p(gen_find_eq(e1,entity_declarations(module))))
                 new=CONS(ENTITY,e1,new);
-    }, referenced_entities);
+    }
 
     set_free(referenced_entities);
     sort_list_of_entities(new);

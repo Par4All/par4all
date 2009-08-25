@@ -327,7 +327,7 @@ entity make_new_scalar_variable_with_prefix(string prefix,
       }
     }
     else
-      asprintf(&variable_name, "%s%d", prefix, number++);
+      asprintf(&variable_name, format, prefix, number++);
   }
   while(gen_find_tabulated(concatenate(module_name,
 				       MODULE_SEP_STRING,
