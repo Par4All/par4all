@@ -26,7 +26,7 @@ after inling
 
 void flgr1d_arith_add_fgINT32(FLGR_Data1D *datdest, FLGR_Data1D *data1, FLGR_Data1D *data2)
 {
-   int I_0;
+   int _return0;
    int j;
    fgINT32 *psrc1 = (fgINT32 *) data1->array;
    fgINT32 *psrc2 = (fgINT32 *) data2->array;
@@ -39,8 +39,8 @@ void flgr1d_arith_add_fgINT32(FLGR_Data1D *datdest, FLGR_Data1D *data1, FLGR_Dat
    for(j = 0; j <= length-1; j += 1) {
       v1 = flgr1d_get_data_array_fgINT32(psrc1, j);
       v2 = flgr1d_get_data_array_fgINT32(psrc2, j);
-      I_0 = v1+v2;
-      result = I_0;
+      _return0 = v1+v2;
+      result = _return0;
       flgr1d_set_data_array_fgINT32(pdest, j, result);
    }
    return;

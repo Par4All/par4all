@@ -54,7 +54,6 @@ void alphablending(size_t n, float src1[n], float src2[n], float result[n], floa
       F_1 = 1-alpha;
       F_2 = F_1*src2[LU_IND0];
       result[LU_IND0] = F_0+F_2;
-l99999:      ;
    }
    for(LU_IND0 = LU_IB0; LU_IND0 <= LU_NUB0-1; LU_IND0 += 4) {
       //c SIMD_COMMENT_0
@@ -105,7 +104,6 @@ l99999:      ;
       //c SIMD_COMMENT_3
 
       result[LU_IND0+3] = F_0+F_2;
-l99998:      ;
    }
    i = MAX0(LU_NUB0, 0);
    ;
@@ -126,7 +124,6 @@ void alphablending(size_t n, float src1[n], float src2[n], float result[n], floa
       F_1 = 1-alpha;
       F_2 = F_1*src2[LU_IND0];
       result[LU_IND0] = F_0+F_2;
-l99999:      ;
    }
    for(LU_IND0 = LU_IB0; LU_IND0 <= LU_NUB0-1; LU_IND0 += 4) {
       //c SIMD_COMMENT_0
@@ -177,7 +174,6 @@ l99999:      ;
       //c SIMD_COMMENT_3
 
       result[LU_IND0+3] = F_0+F_2;
-l99998:      ;
    }
    i = MAX0(LU_NUB0, 0);
    ;
@@ -213,7 +209,6 @@ void alphablending(size_t n, float src1[n], float src2[n], float result[n], floa
       F_14 = 1-alpha;
       F_24 = F_14*src2[LU_IND0];
       result[LU_IND0] = F_04+F_24;
-l99999:      ;
    }
    for(LU_IND0 = LU_IB0; LU_IND0 <= LU_NUB0-1; LU_IND0 += 4) {
       //c SIMD_COMMENT_0
@@ -264,7 +259,6 @@ l99999:      ;
       //c SIMD_COMMENT_3
 
       result[LU_IND0+3] = F_00+F_20;
-l99998:      ;
    }
    i = MAX0(LU_NUB0, 0);
    ;
@@ -321,7 +315,6 @@ void alphablending(size_t n, float src1[n], float src2[n], float result[n], floa
       F_14 = 1-alpha;
       F_24 = F_14*src2[LU_IND0];
       result[LU_IND0] = F_04+F_24;
-l99999:      ;
    }
    for(LU_IND0 = LU_IB0; LU_IND0 <= LU_NUB0-1; LU_IND0 += 4) {
       SIMD_LOAD_V4SF(v4sf_vec2, &src1[LU_IND0]);
@@ -336,7 +329,6 @@ l99999:      ;
       SIMD_SAVE_GENERIC_V4SF(v4sf_vec6, &F_23, &F_22, &F_21, &F_20);
       SIMD_ADDPS(v4sf_vec9, v4sf_vec0, v4sf_vec6);
       SIMD_SAVE_V4SF(v4sf_vec9, &result[LU_IND0]);
-l99998:      ;
    }
    i = MAX0(LU_NUB0, 0);
    ;

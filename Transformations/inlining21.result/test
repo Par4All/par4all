@@ -19,15 +19,15 @@ after inlining
 
 int main(void)
 {
-   int I_0;
+   int _return0;
    {
       extern void bla(int *f1);
       extern const  int kernel[3];
       bla(kernel);                                                      /*0007*/
       /*0004*/
-      I_0 = 0;                                                          /*0008*/
+      _return0 = 0;                                                     /*0008*/
    }
-   I_0;                                                                 /*0011*/
+   _return0;                                                            /*0011*/
    return 0;                                                            /*0012*/
 }
 

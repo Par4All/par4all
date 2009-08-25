@@ -16,19 +16,19 @@ Code after inlining
 
 int main(int argc, char **argv)
 {
-   int I_1;
-   int I_0;
+   int _return1;
+   int _return0;
    {
       int c = (1>2?1:2);
       printf("%d\n", c);
-      I_0 = c;
+      _return0 = c;
    }
    {
       int c = (2>3?2:3);
       printf("%d\n", c);
-      I_1 = c;
+      _return1 = c;
    }
-   return I_0+I_1;
+   return _return0+_return1;
 }
 
 Unsplit resulting code

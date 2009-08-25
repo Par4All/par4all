@@ -18,14 +18,14 @@ Code after inlining
 
 int main(int argc, char **argv)
 {
-   int I_0;
+   int _return0;
    int c;
    {
       int c = (2>argc?2:argc);
       printf("%d\n", c);
-      I_0 = c;
+      _return0 = c;
    }
-   c = I_0;
+   c = _return0;
    return 0;
 }
 

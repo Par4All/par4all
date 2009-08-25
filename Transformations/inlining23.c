@@ -15,5 +15,6 @@ int main(void)
 {
   int f = foo();
   int b = bla();
+  printf("%d-%d\n",f,b);
   return 0;
 }

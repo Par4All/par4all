@@ -22,7 +22,7 @@ Code after inlining
 
 int foo(int argc, char **argv)
 {
-   int I_0;
+   int _return0;
    int c;
    {
       int n;
@@ -31,9 +31,9 @@ int foo(int argc, char **argv)
          int c = argc;
          j += 2*c;
       }
-      I_0 = j;
+      _return0 = j;
    }
-   c = I_0;
+   c = _return0;
    return 0;
 }
 

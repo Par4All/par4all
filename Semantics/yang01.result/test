@@ -160,8 +160,8 @@ After inlining/unfolding of "bar"
 int bar()
 {
    // BEGIN BLOCK
-   int I_1;
-   int I_0;
+   int _return1;
+   int _return0;
    int x = 3;
    int y = x-3;
 
@@ -177,11 +177,13 @@ int bar()
             t -= 3;
          else
             t--;
+         // BEGIN BLOCK
 
-         I_0 = t;
+         _return0 = t;
+         // END BLOCK
          // END BLOCK
       }
-      x = I_0;
+      x = _return0;
       // END BLOCK
    }
    {
@@ -192,11 +194,14 @@ int bar()
          t -= 3;
       else
          t--;
+      // BEGIN BLOCK
 
-      I_1 = t;
+      _return1 = t;
+      // END BLOCK
       // END BLOCK
    }
-   y = I_1;
+   y = _return1;
+   // END BLOCK
 
    return y;
    // END BLOCK
@@ -207,8 +212,8 @@ After unspahettify of "bar"
 int bar()
 {
    // BEGIN BLOCK
-   int I_1;
-   int I_0;
+   int _return1;
+   int _return0;
    int x = 3;
    int y = x-3;
 
@@ -224,11 +229,13 @@ int bar()
             t -= 3;
          else
             t--;
+         // BEGIN BLOCK
 
-         I_0 = t;
+         _return0 = t;
+         // END BLOCK
          // END BLOCK
       }
-      x = I_0;
+      x = _return0;
       // END BLOCK
    }
    {
@@ -239,11 +246,14 @@ int bar()
          t -= 3;
       else
          t--;
+      // BEGIN BLOCK
 
-      I_1 = t;
+      _return1 = t;
+      // END BLOCK
       // END BLOCK
    }
-   y = I_1;
+   y = _return1;
+   // END BLOCK
 
    return y;
    // END BLOCK
@@ -260,8 +270,8 @@ int bar()
 //  P() {}
 
    // BEGIN BLOCK
-   int I_1;
-   int I_0;
+   int _return1;
+   int _return0;
    int x = 3;
    int y = x-3;
 
@@ -270,17 +280,17 @@ int bar()
 
    while (x<=4) {
 
-//  P(I_0,x,y) {x==y+3, 3<=x, x<=4}
+//  P(_return0,x,y) {x==y+3, 3<=x, x<=4}
 
       // BEGIN BLOCK
 
-//  P(I_0,x,y) {x==y+3, 3<=x, x<=4}
+//  P(_return0,x,y) {x==y+3, 3<=x, x<=4}
 
       // BEGIN BLOCK
       y++;
       {
 
-//  P(I_0,x,y) {x==y+2, 3<=x, x<=4}
+//  P(_return0,x,y) {x==y+2, 3<=x, x<=4}
 
          // BEGIN BLOCK
          int t = x+2;
@@ -301,20 +311,22 @@ int bar()
 
 //  P() {0==-1}
 
+         // BEGIN BLOCK
 
-         I_0 = t;
+         _return0 = t;
+         // END BLOCK
          // END BLOCK
       }
 
 //  P() {0==-1}
 
-      x = I_0;
+      x = _return0;
       // END BLOCK
    }
    {
 
-//  P(I_0,x,y) {I_0==x, 5<=I_0, I_0<=9, y+3<=I_0, I_0<=5y+3, 1<=y,
-//    y<=2}
+//  P(_return0,x,y) {_return0==x, 5<=_return0, _return0<=9,
+//    y+3<=_return0, _return0<=5y+3, 1<=y, y<=2}
 
       // BEGIN BLOCK
       int t = y+2;
@@ -335,17 +347,20 @@ int bar()
 
 //  P() {0==-1}
 
+      // BEGIN BLOCK
 
-      I_1 = t;
+      _return1 = t;
+      // END BLOCK
       // END BLOCK
    }
 
 //  P() {0==-1}
 
-   y = I_1;
+   y = _return1;
 
 //  P() {0==-1}
 
+   // END BLOCK
 
    return y;
    // END BLOCK
@@ -362,8 +377,8 @@ int bar()
 //  P() {}
 
    // BEGIN BLOCK
-   int I_1;
-   int I_0;
+   int _return1;
+   int _return0;
    int x = 3;
    int y = x-3;
 
@@ -386,7 +401,8 @@ int bar()
 
          // BEGIN BLOCK
          int t = x+2;
-
+         // BEGIN BLOCK
+         // END BLOCK
          // END BLOCK
       }
       // END BLOCK
@@ -397,10 +413,11 @@ int bar()
 
       // BEGIN BLOCK
       int t = y+2;
-
+      // BEGIN BLOCK
+      // END BLOCK
       // END BLOCK
    }
+   // END BLOCK
 
-   ;
    // END BLOCK
 }

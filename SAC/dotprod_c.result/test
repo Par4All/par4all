@@ -55,7 +55,6 @@ float dotprod(float b[1000000], float c[1000000])
    LU_NUB0 = 1000000;
    LU_IB0 = 0;
    LU_IND0 = 0;
-l99999:   ;
    for(LU_IND0 = 0; LU_IND0 <= 999999; LU_IND0 += 4) {
       //c SIMD_COMMENT_0
 
@@ -81,7 +80,6 @@ l99999:   ;
       //c SIMD_COMMENT_1
 
       a = a+F_0;
-l99998:      ;
    }
    i = 1000000;
    return a;
@@ -98,7 +96,6 @@ float dotprod(float b[1000000], float c[1000000])
    LU_NUB0 = 1000000;
    LU_IB0 = 0;
    LU_IND0 = 0;
-l99999:   ;
    RED0[0] = 0.000000;
    RED0[1] = 0.000000;
    RED0[2] = 0.000000;
@@ -128,7 +125,6 @@ l99999:   ;
       //c SIMD_COMMENT_1
 
       RED0[3] = RED0[3]+F_0;
-l99998:      ;
    }
    a = RED0[3]+RED0[2]+RED0[1]+RED0[0]+a;
    i = 1000000;
@@ -150,7 +146,6 @@ float dotprod(float b[1000000], float c[1000000])
    LU_NUB0 = 1000000;
    LU_IB0 = 0;
    LU_IND0 = 0;
-l99999:   ;
    RED0[0] = 0.000000;
    RED0[1] = 0.000000;
    RED0[2] = 0.000000;
@@ -180,7 +175,6 @@ l99999:   ;
       //c SIMD_COMMENT_1
 
       RED0[3] = RED0[3]+F_00;
-l99998:      ;
    }
    a = RED0[3]+RED0[2]+RED0[1]+RED0[0]+a;
    i = 1000000;
@@ -210,7 +204,6 @@ float dotprod(float b[1000000], float c[1000000])
    LU_NUB0 = 1000000;
    LU_IB0 = 0;
    LU_IND0 = 0;
-l99999:   ;
    RED0[0] = 0.000000;
    RED0[1] = 0.000000;
    RED0[2] = 0.000000;
@@ -223,7 +216,6 @@ l99999:   ;
       SIMD_LOAD_V4SF(v4sf_vec3, &RED0[0]);
       SIMD_ADDPS(v4sf_vec3, v4sf_vec3, v4sf_vec0);
       SIMD_SAVE_V4SF(v4sf_vec3, &RED0[0]);
-l99998:      ;
    }
    a = RED0[3]+RED0[2]+RED0[1]+RED0[0]+a;
    i = 1000000;
@@ -253,7 +245,6 @@ float dotprod(float b[1000000], float c[1000000])
    LU_NUB0 = 1000000;
    LU_IB0 = 0;
    LU_IND0 = 0;
-l99999:   ;
    RED0[0] = 0.000000;
    RED0[1] = 0.000000;
    RED0[2] = 0.000000;
@@ -290,7 +281,6 @@ float dotprod(float b[1000000], float c[1000000])
    LU_NUB0 = 1000000;
    LU_IB0 = 0;
    LU_IND0 = 0;
-l99999:   ;
    RED0[0] = 0.000000;
    RED0[1] = 0.000000;
    RED0[2] = 0.000000;
@@ -330,7 +320,6 @@ float dotprod(float b[1000000], float c[1000000])
    LU_NUB0 = 1000000;
    LU_IB0 = 0;
    LU_IND0 = 0;
-l99999:   ;
    RED0[0] = 0.000000;
    RED0[1] = 0.000000;
    RED0[2] = 0.000000;

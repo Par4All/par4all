@@ -26,9 +26,9 @@ after unfolding
 
 void flgr1d_arith_add_fgINT32(FLGR_Data1D *datdest, FLGR_Data1D *data1, FLGR_Data1D *data2)
 {
-   int I_2;
-   int I_1;
-   int I_0;
+   int _return2;
+   int _return1;
+   int _return0;
    int j;
    fgINT32 *psrc1 = (fgINT32 *) data1->array;
    fgINT32 *psrc2 = (fgINT32 *) data2->array;
@@ -41,16 +41,16 @@ void flgr1d_arith_add_fgINT32(FLGR_Data1D *datdest, FLGR_Data1D *data1, FLGR_Dat
    for(j = 0; j <= length-1; j += 1) {
       {
          fgINT32 flgr_get_array_fgINT32(fgINT32 *array, int pos);
-         I_0 = flgr_get_array_fgINT32(psrc1, j);
+         _return0 = flgr_get_array_fgINT32(psrc1, j);
       }
-      v1 = I_0;
+      v1 = _return0;
       {
          fgINT32 flgr_get_array_fgINT32(fgINT32 *array, int pos);
-         I_1 = flgr_get_array_fgINT32(psrc2, j);
+         _return1 = flgr_get_array_fgINT32(psrc2, j);
       }
-      v2 = I_1;
-      I_2 = v1+v2;
-      result = I_2;
+      v2 = _return1;
+      _return2 = v1+v2;
+      result = _return2;
       {
          void flgr_set_array_fgINT32(fgINT32 *array, int pos, fgINT32 value);
          flgr_set_array_fgINT32(pdest, j, result);

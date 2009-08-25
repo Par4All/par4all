@@ -73,7 +73,7 @@ Code after inlining of "freia_cipo_dilate"
 
 freia_error freia_cipo_outer_gradient(freia_data2d *imout, freia_data2d *imin, int32_t connexity, uint32_t size)
 {
-   int I_0;
+   int _return0;
    freia_error ret;
    {
       int kernel_8c[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
@@ -125,9 +125,9 @@ freia_error freia_cipo_outer_gradient(freia_data2d *imout, freia_data2d *imin, i
       else
          ret = 2;
 
-      I_0 = ret;
+      _return0 = ret;
    }
-   ret = I_0;
+   ret = _return0;
    ret |= freia_aipo_sub(imout, imout, imin);
 
    return ret;
@@ -164,7 +164,7 @@ int main()
 
 freia_error freia_cipo_outer_gradient(freia_data2d *imout, freia_data2d *imin, int32_t connexity, uint32_t size)
 {
-   int I_0;
+   int _return0;
    freia_error ret;
    {
       int kernel_8c[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
@@ -285,19 +285,20 @@ freia_error freia_cipo_outer_gradient(freia_data2d *imout, freia_data2d *imin, i
 //  P(0`1`ret,i) {connexity==8, size==4, 0<=0`1`ret, 0`1`ret<=1}
 
 
-      I_0 = ret;
+      _return0 = ret;
    }
 
-//  P(I_0) {connexity==8, size==4, 0<=I_0, I_0<=1}
+//  P(_return0) {connexity==8, size==4, 0<=_return0, _return0<=1}
 
-   ret = I_0;
+   ret = _return0;
 
-//  P(0`ret,I_0) {0`ret==I_0, connexity==8, size==4, 0<=0`ret,
-//    0`ret<=1}
+//  P(0`ret,_return0) {0`ret==_return0, connexity==8, size==4,
+//    0<=0`ret, 0`ret<=1}
 
    ret |= freia_aipo_sub(imout, imout, imin);
 
-//  P(0`ret,I_0) {connexity==8, size==4, 0<=I_0, I_0<=1}
+//  P(0`ret,_return0) {connexity==8, size==4, 0<=_return0,
+//    _return0<=1}
 
 
    return ret;
@@ -307,7 +308,7 @@ Code after partial eval
 
 freia_error freia_cipo_outer_gradient(freia_data2d *imout, freia_data2d *imin, int32_t connexity, uint32_t size)
 {
-   int I_0;
+   int _return0;
    freia_error ret;
    {
       int kernel_8c[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
@@ -359,9 +360,9 @@ freia_error freia_cipo_outer_gradient(freia_data2d *imout, freia_data2d *imin, i
       else
          ret = 2;
 
-      I_0 = ret;
+      _return0 = ret;
    }
-   ret = I_0;
+   ret = _return0;
    ret |= freia_aipo_sub(imout, imout, imin);
 
    return ret;
@@ -371,7 +372,7 @@ Code after dead code elimination
 
 freia_error freia_cipo_outer_gradient(freia_data2d *imout, freia_data2d *imin, int32_t connexity, uint32_t size)
 {
-   int I_0;
+   int _return0;
    freia_error ret;
    {
       int kernel_8c[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
@@ -405,9 +406,9 @@ freia_error freia_cipo_outer_gradient(freia_data2d *imout, freia_data2d *imin, i
          ret = 0;
       }
 
-      I_0 = ret;
+      _return0 = ret;
    }
-   ret = I_0;
+   ret = _return0;
    ret |= freia_aipo_sub(imout, imout, imin);
 
    return ret;
@@ -417,7 +418,7 @@ Code after full loop unrolling
 
 freia_error freia_cipo_outer_gradient(freia_data2d *imout, freia_data2d *imin, int32_t connexity, uint32_t size)
 {
-   int I_0;
+   int _return0;
    freia_error ret;
    {
       int kernel_8c[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
@@ -453,9 +454,9 @@ freia_error freia_cipo_outer_gradient(freia_data2d *imout, freia_data2d *imin, i
          ret = 0;
       }
 
-      I_0 = ret;
+      _return0 = ret;
    }
-   ret = I_0;
+   ret = _return0;
    ret |= freia_aipo_sub(imout, imout, imin);
 
    return ret;
@@ -465,14 +466,15 @@ Code after inlining of "freia_cipo_outer_gradient"
 
 int main()
 {
-   int I_1;
-   int I_0;
+   int _return2;
+   int _return1;
+   int _return0;
    freia_data2d *imout;
    freia_data2d *imin;
    int32_t connexity = 8;
    uint32_t size = 4;
    {
-      int I_0;
+      int _return0;
       freia_error ret;
       extern int freia_aipo_dilate_8c(freia_data2d *f1, freia_data2d *f2, int *f3);
       extern int freia_aipo_sub(freia_data2d *f1, freia_data2d *f2, freia_data2d *f3);
@@ -513,16 +515,16 @@ int main()
             ret = 0;
          }
 
-         I_0 = ret;
+         _return0 = ret;
       }
-      ret = I_0;
+      ret = _return0;
       ret |= freia_aipo_sub(imout, imout, imin);
 
-      I_0 = ret;
+      _return1 = ret;
    }
-   (void) I_0;
+   (void) _return1;
    {
-      int I_0;
+      int _return0;
       freia_error ret;
       extern int freia_aipo_dilate_8c(freia_data2d *f1, freia_data2d *f2, int *f3);
       extern int freia_aipo_sub(freia_data2d *f1, freia_data2d *f2, freia_data2d *f3);
@@ -563,27 +565,28 @@ int main()
             ret = 0;
          }
 
-         I_0 = ret;
+         _return0 = ret;
       }
-      ret = I_0;
+      ret = _return0;
       ret |= freia_aipo_sub(imout, imout, imin);
 
-      I_1 = ret;
+      _return2 = ret;
    }
-   (void) I_1;
+   (void) _return2;
 }
 
 Code after flattening of "freia_cipo_outer_gradient"
 
 int main()
 {
-   int I_1;
-   int I_0;
+   int _return2;
+   int _return1;
+   int _return0;
    freia_data2d *imout;
    freia_data2d *imin;
    int32_t connexity = 8;
    uint32_t size = 4;
-   int I_0_0;
+   int _return0_0;
    freia_error ret_0;
    extern int freia_aipo_dilate_8c(freia_data2d *f1, freia_data2d *f2, int *f3);
    extern int freia_aipo_sub(freia_data2d *f1, freia_data2d *f2, freia_data2d *f3);
@@ -601,7 +604,7 @@ int main()
    extern int freia_common_check_image_bpp_compat(freia_data2d *f1, freia_data2d *f2, void *f3);
    extern int freia_common_print_backtrace();
    extern struct _IO_FILE *stderr;
-   int I_0_1;
+   int _return0_1;
    freia_error ret_2;
    extern int freia_aipo_dilate_8c(freia_data2d *f1, freia_data2d *f2, int *f3);
    extern int freia_aipo_sub(freia_data2d *f1, freia_data2d *f2, freia_data2d *f3);
@@ -641,12 +644,12 @@ int main()
       ret_1 = 0;
    }
 
-   I_0_0 = ret_1;
-   ret_0 = I_0_0;
+   _return0_0 = ret_1;
+   ret_0 = _return0_0;
    ret_0 |= freia_aipo_sub(imout, imout, imin);
 
-   I_0_0 = ret_0;
-   (void) I_0;
+   _return1 = ret_0;
+   (void) _return1;
    if (freia_common_check_image_bpp_compat(imout, imin, (void *) 0)!=1) {
 
       fprintf(stderr, "bpp of images are not compatibles\n""ERROR: file %s, line %d, function %s: ", "./freia.src/cipo/src/freiaComplexOpMorpho.c", 90, "freia_cipo_dilate");
@@ -669,12 +672,12 @@ int main()
       ret_3 = 0;
    }
 
-   I_0_1 = ret_3;
-   ret_2 = I_0_1;
+   _return0_1 = ret_3;
+   ret_2 = _return0_1;
    ret_2 |= freia_aipo_sub(imout, imout, imin);
 
-   I_1 = ret_2;
-   (void) I_1;
+   _return2 = ret_2;
+   (void) _return2;
 }
 
 Unsplit resulting code

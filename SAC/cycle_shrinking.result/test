@@ -56,7 +56,6 @@ void shrink(float a[100+4], float b[100+4], float c[100+4])
    LU_NUB0 = 100;
    LU_IB0 = 0;
    LU_IND0 = 0;
-l99999:   ;
    for(LU_IND0 = 0; LU_IND0 <= 99; LU_IND0 += 4) {
       //c SIMD_COMMENT_0
 
@@ -82,7 +81,6 @@ l99999:   ;
       //c SIMD_COMMENT_1
 
       b[LU_IND0+7] = a[LU_IND0+3]+c[LU_IND0+3];
-l99998:      ;
    }
    i = 100;
    ;
@@ -97,7 +95,6 @@ void shrink(float a[100+4], float b[100+4], float c[100+4])
    LU_NUB0 = 100;
    LU_IB0 = 0;
    LU_IND0 = 0;
-l99999:   ;
    for(LU_IND0 = 0; LU_IND0 <= 99; LU_IND0 += 4) {
       //c SIMD_COMMENT_0
 
@@ -123,7 +120,6 @@ l99999:   ;
       //c SIMD_COMMENT_1
 
       b[LU_IND0+7] = a[LU_IND0+3]+c[LU_IND0+3];
-l99998:      ;
    }
    i = 100;
    ;
@@ -138,7 +134,6 @@ void shrink(float a[100+4], float b[100+4], float c[100+4])
    LU_NUB0 = 100;
    LU_IB0 = 0;
    LU_IND0 = 0;
-l99999:   ;
    for(LU_IND0 = 0; LU_IND0 <= 99; LU_IND0 += 4) {
       //c SIMD_COMMENT_0
 
@@ -164,7 +159,6 @@ l99999:   ;
       //c SIMD_COMMENT_1
 
       b[LU_IND0+7] = a[LU_IND0+3]+c[LU_IND0+3];
-l99998:      ;
    }
    i = 100;
    ;
@@ -188,7 +182,6 @@ void shrink(float a[100+4], float b[100+4], float c[100+4])
    LU_NUB0 = 100;
    LU_IB0 = 0;
    LU_IND0 = 0;
-l99999:   ;
    for(LU_IND0 = 0; LU_IND0 <= 99; LU_IND0 += 4) {
       SIMD_LOAD_CONSTANT_V4SF(v4sf_vec2, 1, 1, 1, 1);
       SIMD_LOAD_V4SF(v4sf_vec1, &b[LU_IND0]);
@@ -198,7 +191,6 @@ l99999:   ;
       SIMD_LOAD_V4SF(v4sf_vec4, &a[LU_IND0]);
       SIMD_ADDPS(v4sf_vec3, v4sf_vec4, v4sf_vec5);
       SIMD_SAVE_V4SF(v4sf_vec3, &b[LU_IND0+4]);
-l99998:      ;
    }
    i = 100;
    ;
@@ -222,7 +214,6 @@ void shrink(float a[100+4], float b[100+4], float c[100+4])
    LU_NUB0 = 100;
    LU_IB0 = 0;
    LU_IND0 = 0;
-l99999:   ;
    SIMD_LOAD_CONSTANT_V4SF(v4sf_vec2, 1, 1, 1, 1);
    for(LU_IND0 = 0; LU_IND0 <= 99; LU_IND0 += 4) {
       SIMD_LOAD_V4SF(v4sf_vec1, &b[LU_IND0]);
@@ -252,7 +243,6 @@ void shrink(float a[100+4], float b[100+4], float c[100+4])
    LU_NUB0 = 100;
    LU_IB0 = 0;
    LU_IND0 = 0;
-l99999:   ;
    SIMD_LOAD_CONSTANT_V4SF(v4sf_vec2, 1, 1, 1, 1);
    for(LU_IND0 = 0; LU_IND0 <= 99; LU_IND0 += 4) {
       SIMD_LOAD_V4SF(v4sf_vec1, &b[LU_IND0]);
@@ -285,7 +275,6 @@ void shrink(float a[100+4], float b[100+4], float c[100+4])
    LU_NUB0 = 100;
    LU_IB0 = 0;
    LU_IND0 = 0;
-l99999:   ;
    SIMD_LOAD_CONSTANT_V4SF(v4sf_vec2, 1, 1, 1, 1);
    for(LU_IND0 = 0; LU_IND0 <= 99; LU_IND0 += 4) {
       SIMD_LOAD_V4SF(v4sf_vec1, &b[LU_IND0]);
