@@ -508,14 +508,14 @@ int anr999_01(void)
 
    freia_common_rx_image(in, &fdin);                                    /*0036*/
 
+   t = freia_common_create_data(og->bpp, og->widthWa, og->heightWa);    /*0048*/
+
    anr999_01_helper_0_0_0(od, t, in, &measure_min, &measure_vol, freia_morpho_kernel_8c, freia_morpho_kernel_8c, freia_morpho_kernel_8c, freia_morpho_kernel_8c);                /*0038*/
 
    i_0 = 10;                                                            /*0043*/
 
    I_6 = 0;                                                             /*0045*/
    I_6;                                                                 /*0046*/
-
-   t = freia_common_create_data(og->bpp, og->widthWa, og->heightWa);    /*0048*/
 
    i_1 = 10;                                                            /*0054*/
 
