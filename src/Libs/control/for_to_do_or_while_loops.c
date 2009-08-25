@@ -468,9 +468,7 @@ sequence for_to_while_loop_conversion(expression init,
   pips_debug(5, "Begin\n");
 
   statement init_st = make_expression_statement(init);
-  syntax s_init = expression_syntax(init);
   statement incr_st = make_expression_statement(incr);
-  syntax s_incr = expression_syntax(incr);
   sequence wlseq = sequence_undefined;
 
   /* Build the loop body of the while with { body; incr_st; } : */
@@ -496,35 +494,6 @@ sequence for_to_while_loop_conversion(expression init,
 
   wlseq = make_sequence(CONS(STATEMENT, init_st,
 			     CONS(STATEMENT, wl_st, NIL)));
-  /* Clean-up: only cond is reused */
-
-  /* They cannot be freed because a debugging statement at the end of
-     controlize does print the initial statement */
-
-  syntax_call(s_init) = call_undefined;
-  syntax_call(s_incr) = call_undefined;
-  free_expression(init);
-  free_expression(incr);
-
-  ifdebug(5) {
-    statement d_st =  make_statement(entity_empty_label(),
-				     STATEMENT_NUMBER_UNDEFINED,
-				     STATEMENT_ORDERING_UNDEFINED,
-				     string_undefined,
-				     make_instruction(is_instruction_sequence,
-						      wlseq),
-				     NIL, NULL, empty_extensions ());
-    /* Since we have replaced a statement that may have comments and
-       labels by a sequence, do not forget to forward them where they can
-       be: */
-    fix_sequence_statement_attributes(d_st);
-
-    pips_debug(5, "End with statement:\n");
-    print_statement(d_st);
-    statement_instruction(d_st) = instruction_undefined;
-    free_statement(d_st);
-  }
-
   return wlseq;
 }
 
@@ -538,6 +507,8 @@ sequence for_to_while_loop_conversion(expression init,
  */
 void
 transform_a_for_loop_into_a_while_loop(forloop f) {
+  pips_debug(5, "Begin\n");
+
   /* Get the instruction owning the forloop: */
   instruction i = INSTRUCTION(gen_get_recurse_ancestor(f));
   /* Get the statement owning instruction owning the forloop: */
@@ -550,18 +521,36 @@ transform_a_for_loop_into_a_while_loop(forloop f) {
 					      forloop_body(f),
 					      statement_comments(st));
 
-  /* These three fields have been re-used or freed by the previous call */
+  /* These fields have been re-used, so protect them from memory
+     recycling: */
   forloop_initialization(f) = expression_undefined;
   forloop_condition(f) = expression_undefined;
   forloop_increment(f) = expression_undefined;
-  free_instruction(i);
+  forloop_body(f) = statement_undefined;
 
-  /* Replace the previous for-loop by the new sequence with a
-     while-loop: */
-  statement_instruction(st) = make_instruction_sequence(wls);
+  /* We need to replace the for-loop instruction by the sequence
+     instruction. The cleaner way should be to delete the first one and
+     make the other one, but since we are in a gen_recurse() and we
+     iterate on the first one, it is dangerous. Well, I've tried and it
+     works, but valgrind complains a bit. :-)
+
+     So change the type of the instruction on the fly instead: */
+  instruction_tag(i) = is_instruction_sequence;
+  instruction_sequence(i) = wls;
+  /* And discard the old for: */
+  free_forloop(f);
+
+  /* Since we have replaced a statement that may have comments and labels
+     by a sequence, do not forget to forward them where they can be: */
+  fix_sequence_statement_attributes(st);
 
   /* Removed useless instructions that may remain: */
   clean_up_sequences(st);
+
+  ifdebug(5) {
+    print_statement(st);
+    pips_debug(5, "Exiting with statement\n");
+  }
 }
 
 
