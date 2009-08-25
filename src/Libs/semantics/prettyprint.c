@@ -22,12 +22,8 @@
 
 */
 /*
- * package semantics - prettyprint interface 
+ * package semantics - prettyprint interface
  */
-
-#ifndef lint
-char vcid_semantics_prettyprint[] = "$Id$";
-#endif /* lint */
 
 #include <stdlib.h>
 #include <stdio.h>
