@@ -66,13 +66,12 @@ static bool is_total_precondition;
 static bool is_user_view;
 static bool is_transformer_filtered;
 static hash_table nts = hash_table_undefined;
+static string non_feasible_system;
 
 static bool print_code_semantics();
 static text get_semantic_text();
 
-bool 
-print_code_transformers(module_name)
-char *module_name;
+bool print_code_transformers(string module_name)
 {
   is_user_view = FALSE;
   is_transformer = TRUE;
@@ -81,34 +80,30 @@ char *module_name;
   return print_code_semantics(module_name);
 }
 
-bool 
-print_code_preconditions(module_name)
-char *module_name;
+bool print_code_preconditions(string module_name)
 {
   is_user_view = FALSE;
   is_transformer = FALSE;
   is_total_precondition = FALSE;
-  is_transformer_filtered = get_bool_property("SEMANTICS_FILTERED_PRECONDITIONS");
+  is_transformer_filtered =
+    get_bool_property("SEMANTICS_FILTERED_PRECONDITIONS");
   return print_code_semantics(module_name);
 }
 
-bool 
-print_code_total_preconditions(module_name)
-char *module_name;
+bool print_code_total_preconditions(string module_name)
 {
   bool success;
 
   is_user_view = FALSE;
   is_transformer = FALSE;
   is_total_precondition = TRUE;
-  is_transformer_filtered = get_bool_property("SEMANTICS_FILTERED_PRECONDITIONS");
+  is_transformer_filtered =
+    get_bool_property("SEMANTICS_FILTERED_PRECONDITIONS");
   success = print_code_semantics(module_name);
   return success;
 }
 
-bool 
-print_source_transformers(module_name)
-char *module_name;
+bool print_source_transformers(string module_name)
 {
   is_user_view = TRUE;
   is_transformer = TRUE;
@@ -117,31 +112,27 @@ char *module_name;
   return print_code_semantics(module_name);
 }
 
-bool 
-print_source_preconditions(module_name)
-char *module_name;
+bool print_source_preconditions(string module_name)
 {
   is_user_view = TRUE;
   is_transformer = FALSE;
   is_total_precondition = FALSE;
-  is_transformer_filtered = get_bool_property("SEMANTICS_FILTERED_PRECONDITIONS");
+  is_transformer_filtered =
+    get_bool_property("SEMANTICS_FILTERED_PRECONDITIONS");
   return print_code_semantics(module_name);
 }
 
-bool 
-print_source_total_preconditions(module_name)
-char *module_name;
+bool print_source_total_preconditions(string module_name)
 {
   is_user_view = TRUE;
   is_transformer = FALSE;
   is_total_precondition = TRUE;
-  is_transformer_filtered = get_bool_property("SEMANTICS_FILTERED_PRECONDITIONS");
+  is_transformer_filtered =
+    get_bool_property("SEMANTICS_FILTERED_PRECONDITIONS");
   return print_code_semantics(module_name);
 }
 
-text 
-get_text_transformers(module_name)
-char *module_name;
+text get_text_transformers(string module_name)
 {
   is_user_view = FALSE;
   is_transformer = TRUE;
@@ -150,30 +141,27 @@ char *module_name;
   return get_semantic_text(module_name,FALSE);
 }
 
-text 
-get_text_preconditions(module_name)
-char *module_name;
+text get_text_preconditions(string module_name)
 {
   is_user_view = FALSE;
   is_transformer = FALSE;
   is_total_precondition = FALSE;
-  is_transformer_filtered = get_bool_property("SEMANTICS_FILTERED_PRECONDITIONS");
+  is_transformer_filtered =
+    get_bool_property("SEMANTICS_FILTERED_PRECONDITIONS");
   return get_semantic_text(module_name,FALSE);
 }
 
-text 
-get_text_total_preconditions(module_name)
-char *module_name;
+text get_text_total_preconditions(string module_name)
 {
   is_user_view = FALSE;
   is_transformer = FALSE;
   is_total_precondition = TRUE;
-  is_transformer_filtered = get_bool_property("SEMANTICS_FILTERED_PRECONDITIONS");
+  is_transformer_filtered =
+    get_bool_property("SEMANTICS_FILTERED_PRECONDITIONS");
   return get_semantic_text(module_name,FALSE);
 }
 
-static bool 
-print_code_semantics(string module_name)
+static bool print_code_semantics(string module_name)
 {
     bool success = TRUE;
     text t;
@@ -181,7 +169,7 @@ print_code_semantics(string module_name)
     char * file_ext = strdup(concatenate(is_transformer?
 		     (is_user_view? USER_TRANSFORMER_SUFFIX :
 		      SEQUENTIAL_TRANSFORMER_SUFFIX )
-                     :
+		     :
 		     (is_total_precondition?
 		     (is_user_view? USER_TOTAL_PRECONDITION_SUFFIX :
 		      SEQUENTIAL_TOTAL_PRECONDITION_SUFFIX) :
@@ -210,10 +198,7 @@ print_code_semantics(string module_name)
     return success;
 }
 
-static text 
-get_semantic_text(
-    string module_name,
-    bool give_code_p)
+static text get_semantic_text(string module_name, bool give_code_p)
 {
   text r = make_text(NIL), txt_summary;
   entity mod;
@@ -248,17 +233,16 @@ get_semantic_text(
   }
 
   set_semantic_map((statement_mapping)
-		   db_get_memory_resource(
-					  is_transformer? DBR_TRANSFORMERS: 
-					  (is_total_precondition? DBR_TOTAL_PRECONDITIONS : DBR_PRECONDITIONS),
-					  module_name, TRUE));
+      db_get_memory_resource(is_transformer? DBR_TRANSFORMERS:
+			     (is_total_precondition?
+			      DBR_TOTAL_PRECONDITIONS : DBR_PRECONDITIONS),
+			     module_name, TRUE));
 
   summary = (transformer)
-    db_get_memory_resource(is_transformer? DBR_SUMMARY_TRANSFORMER
-			   : (is_total_precondition? DBR_SUMMARY_TOTAL_PRECONDITION
-			      : DBR_SUMMARY_PRECONDITION),
-			   module_name,
-			   TRUE);
+      db_get_memory_resource(is_transformer? DBR_SUMMARY_TRANSFORMER:
+			     (is_total_precondition?
+		    DBR_SUMMARY_TOTAL_PRECONDITION: DBR_SUMMARY_PRECONDITION),
+			     module_name, TRUE);
   /* The summary precondition may be in another module's frame */
   translate_global_values(mod, summary);
 
@@ -272,9 +256,9 @@ get_semantic_text(
   ifdebug(7){
     dump_text(txt_summary);
     pips_debug(7, "summary text consistent? %s\n",
-	       text_consistent_p(txt_summary)? "YES":"NO"); 
+	       text_consistent_p(txt_summary)? "YES":"NO");
   }
-  MERGE_TEXTS(r,txt_summary ); 
+  MERGE_TEXTS(r,txt_summary );
   attach_decoration_to_text(r);
   if (is_transformer) {
     attach_transformers_decoration_to_text(r);
@@ -285,7 +269,7 @@ get_semantic_text(
   else {
     attach_preconditions_decoration_to_text(r);
   }
- 
+
   if (give_code_p == TRUE) {
     MERGE_TEXTS(r, text_module(mod, is_user_view? user_stat:mod_stat));
   }
@@ -310,11 +294,10 @@ get_semantic_text(
 }
 
 /* this function name is VERY misleading - it should be changed, sometime FI */
-text 
-semantic_to_text(
-    entity module,
-    int margin,
-    statement stmt)
+text semantic_to_text(
+  entity module,
+  int margin,
+  statement stmt)
 {
     transformer t;
     text txt;
@@ -333,7 +316,7 @@ semantic_to_text(
     else
 	t = load_statement_semantic(stmt);
 
-    if(is_transformer_filtered && !transformer_undefined_p(t) 
+    if(is_transformer_filtered && !transformer_undefined_p(t)
 	&& t != (transformer) HASH_UNDEFINED_VALUE) {
 	list ef = load_cumulated_rw_effects_list(stmt);
 	t = filter_transformer(t, ef);
@@ -347,12 +330,12 @@ semantic_to_text(
 	attach_total_preconditions_decoration_to_text(txt);
     else
 	attach_preconditions_decoration_to_text(txt);
-	
-    return txt; 
+
+    return txt;
 }
 
 /* The strange argument type is required by qsort(), deep down in the calls */
-static int 
+static int
 is_inferior_pvarval(Pvecteur * pvarval1, Pvecteur * pvarval2)
 {
     /* The constant term is given the highest weight to push constant
@@ -364,7 +347,7 @@ is_inferior_pvarval(Pvecteur * pvarval1, Pvecteur * pvarval2)
        Either I define two comparison functions, or I cheat somewhere else.
        Let's cheat? */
     int is_equal = 0;
-    
+
     if (term_cst(*pvarval1) && !term_cst(*pvarval2))
 	is_equal = 1;
     else if (term_cst(*pvarval1) && term_cst(*pvarval2))
@@ -372,33 +355,34 @@ is_inferior_pvarval(Pvecteur * pvarval1, Pvecteur * pvarval2)
     else if(term_cst(*pvarval2))
 	is_equal = -1;
     else
-	is_equal = 
+	is_equal =
 	    strcmp(pips_user_value_name((entity) vecteur_var(*pvarval1)),
 		   pips_user_value_name((entity) vecteur_var(*pvarval2)));
 
-    return is_equal; 
+    return is_equal;
 }
 
 #define append(s) add_to_current_line(crt_line, s, str_prefix, txt)
 
-static bool __attribute__ ((unused)) value_is_inferior_pvarval(Pvecteur * pvarval1, Pvecteur * pvarval2)
+static bool __attribute__ ((unused))
+value_is_inferior_pvarval(Pvecteur * pvarval1, Pvecteur * pvarval2)
 {
-    bool is_inferior = TRUE;
-    
-    if (term_cst(*pvarval1))
-	is_inferior = FALSE;
-    else if(term_cst(*pvarval2))
-	is_inferior = TRUE;
-    else
-	is_inferior = (strcmp(external_value_name((entity) vecteur_var(*pvarval1)), 
-			      external_value_name((entity) vecteur_var(*pvarval2)))
-		       > 0 );
+  bool is_inferior = TRUE;
 
-    return is_inferior; 
+  if (term_cst(*pvarval1))
+    is_inferior = FALSE;
+  else if(term_cst(*pvarval2))
+    is_inferior = TRUE;
+  else
+    is_inferior = (strcmp(external_value_name((entity) vecteur_var(*pvarval1)),
+			  external_value_name((entity) vecteur_var(*pvarval2)))
+		   > 0 );
+
+    return is_inferior;
 }
 
-/* text text_transformer(transformer tran) 
- * input    : a transformer representing a transformer or a precondition 
+/* text text_transformer(transformer tran)
+ * input    : a transformer representing a transformer or a precondition
  * output   : a text containing commentaries representing the transformer
  * modifies : nothing.
  *
@@ -422,17 +406,15 @@ text text_transformer(transformer tran)
     ADD_SENTENCE_TO_TEXT(txt, make_sentence(is_sentence_formatted,
 					    strdup("\n")));
 
-  str_prefix = foresys? 
-    FORESYS_CONTINUATION_PREFIX: PIPS_COMMENT_CONTINUATION;
-    
+  str_prefix = foresys? FORESYS_CONTINUATION_PREFIX: PIPS_COMMENT_CONTINUATION;
   crt_line[0] = '\0';
-    
+
   if (foresys)
     append(is_transformer? TRAN_FORESYS_PREFIX: PREC_FORESYS_PREFIX);
   else
     append(PIPS_COMMENT_PREFIX);
 
-  if(tran != (transformer) HASH_UNDEFINED_VALUE && 
+  if(tran != (transformer) HASH_UNDEFINED_VALUE &&
      tran != (transformer) list_undefined) {
     if(tran==transformer_undefined) {
       if (is_transformer)
@@ -448,39 +430,39 @@ text text_transformer(transformer tran)
 
       append(is_transformer? "  T(": (is_total_precondition? " TP(" : "  P("));
 
-      entity_list_text_format(crt_line, str_prefix, txt, 
+      entity_list_text_format(crt_line, str_prefix, txt,
 			      args, entity_minimal_name);
 
       append(")");
       if (foresys) append(",");
       append(" ");
-	  
+
       ps = predicate_system(transformer_relation(tran));
-      sc_lexicographic_sort(ps, is_inferior_pvarval);              
+      sc_lexicographic_sort(ps, is_inferior_pvarval);
 
       ifdebug(7) {
 	pips_debug(7, "sys %p\n", ps);
 	sc_syst_debug(ps);
       }
-	  
-      system_text_format(crt_line, str_prefix, txt, ps, 
+
+      system_text_format(crt_line, str_prefix, txt, ps,
 			 (char * (*)(Variable)) pips_user_value_name, foresys);
 
     }
-      
+
     close_current_line(crt_line, txt, str_prefix);
   }
-    
+
   if (!get_bool_property("PRETTYPRINT_ADD_EMACS_PROPERTIES"))
     ADD_SENTENCE_TO_TEXT(txt, make_sentence(is_sentence_formatted,
-					    strdup("\n")));  
+					    strdup("\n")));
 
   ifdebug(7){
     pips_debug(7, "final txt: \n");
     dump_text(txt);
-  }  
+  }
 
-  return txt; 
+  return txt;
 }
 
 /* call this one from outside.
@@ -508,15 +490,14 @@ text text_for_a_transformer(transformer tran, bool is_a_transformer)
 #define MAX_PRED_COMMENTARY_STRLEN 70
 
 
-/* text string_predicate_to_commentary(string str_pred, string comment_prefix) 
+/* text string_predicate_to_commentary(string str_pred, string comment_prefix)
  * input    : a string, part of which represents a predicate.
  * output   : a text consisting of several lines of commentaries,
- *            containing the string str_pred, and beginning with 
+ *            containing the string str_pred, and beginning with
  *            comment_prefix.
  * modifies : str_pred;
  */
-text 
-string_predicate_to_commentary(str_pred, comment_prefix)
+text string_predicate_to_commentary(str_pred, comment_prefix)
 string str_pred;
 string comment_prefix;
 {
@@ -529,36 +510,33 @@ string comment_prefix;
   boolean foresys = get_bool_property("PRETTYPRINT_FOR_FORESYS");
   longueur_max = MAX_PRED_COMMENTARY_STRLEN - strlen(str_prefix) - 2;
 
-  /* if str_pred is too long, it must be splitted in several lines; 
+  /* if str_pred is too long, it must be splitted in several lines;
    * the hyphenation must be done only between the constraints of the
    * predicate, when there is a "," or a ")". A space is added at the beginning
    * of extra lines, for indentation. */
   while((len = strlen(str_pred)) > 0) {
     if (len > longueur_max) {
 
-      /* search the maximal substring which length 
+      /* search the maximal substring which length
        * is less than longueur_max */
       str_tmp[0] = '\0';
       (void) strncat(str_tmp, str_pred, longueur_max);
 
-      switch (foresys) {
-      case FALSE : 
-	str_suiv = strrchr(str_tmp, ',');
-	break;
-      case TRUE : 
+      if (foresys)
 	str_suiv = strrchr(str_tmp, ')');
-	break;
-      }
+      else
+	str_suiv = strrchr(str_tmp, ',');
+
       new_str_pred_len = (strlen(str_tmp) - strlen(str_suiv)) + 1;
       str_suiv = strdup(&(str_pred[new_str_pred_len]));
 
       str_tmp[0] = '\0';
       if (!premiere_ligne)
-	(void) strcat(str_tmp, " "); 
+	(void) strcat(str_tmp, " ");
       (void) strncat(str_tmp, str_pred, new_str_pred_len);
 
       /* add it to the text */
-      ADD_SENTENCE_TO_TEXT(t_pred, 
+      ADD_SENTENCE_TO_TEXT(t_pred,
 			   make_pred_commentary_sentence(strdup(str_tmp),
 							 str_prefix));
       str_pred =  str_suiv;
@@ -567,15 +545,15 @@ string comment_prefix;
       /* if the remaining string fits in one line */
       str_tmp[0] = '\0';
       if (!premiere_ligne)
-	(void) strcat(str_tmp, " "); 
+	(void) strcat(str_tmp, " ");
       (void) strcat(str_tmp, str_pred);
 
-      ADD_SENTENCE_TO_TEXT(t_pred, 
+      ADD_SENTENCE_TO_TEXT(t_pred,
 			   make_pred_commentary_sentence(str_tmp,
 							 str_prefix));
       str_pred[0] = '\0';
     }
-	
+
     if (premiere_ligne) {
       premiere_ligne = FALSE;
       longueur_max = longueur_max - 1;
@@ -592,20 +570,17 @@ string comment_prefix;
       }
     }
   }
-    
+
   return(t_pred);
 }
-    
-
 
 /* text words_predicate_to_commentary(list w_pred, string comment_prefix)
  * input    : a list of strings, one of them representing a predicate.
- * output   : a text of several lines of commentaries containing 
+ * output   : a text of several lines of commentaries containing
  *            this list of strings, and beginning with comment_prefix.
  * modifies : nothing.
  */
-text 
-words_predicate_to_commentary(w_pred, comment_prefix)
+text words_predicate_to_commentary(w_pred, comment_prefix)
 list w_pred;
 string comment_prefix;
 {
@@ -622,13 +597,14 @@ string comment_prefix;
 }
 
 
-/* sentence make_pred_commentary_sentence(string str_pred, string comment_prefix) 
+/* sentence make_pred_commentary_sentence(string str_pred,
+ *                                        string comment_prefix)
  * input    : a substring formatted to be a commentary
  * output   : a sentence, containing the commentary form of this string,
  *            beginning with the comment_prefix.
  * modifies : nothing
  */
-sentence 
+sentence
 make_pred_commentary_sentence(str_pred, comment_prefix)
 string str_pred;
 string comment_prefix;
@@ -637,13 +613,11 @@ string comment_prefix;
   sentence sent_pred;
 
   str_tmp[0] = '\0';
-  (void) strcat(str_tmp, comment_prefix); 
+  (void) strcat(str_tmp, comment_prefix);
   (void) strcat(str_tmp, "  ");
   (void) strcat(str_tmp, str_pred);
-  (void) strcat(str_tmp, "\n"); 
+  (void) strcat(str_tmp, "\n");
 
   sent_pred = make_sentence(is_sentence_formatted, strdup(str_tmp));
   return(sent_pred);
 }
-
-
