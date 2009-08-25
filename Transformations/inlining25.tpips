@@ -15,10 +15,13 @@ activate PRINT_CODE
 make PRINTED_FILE[%ALLFUNC]
 
 make CALLGRAPH_FILE[main]
+display PRINTED_FILE[bla]
+display PRINTED_FILE[main]
 
 setproperty INLINING_CALLERS "main"
 apply INLINING[bla]
 
 make PRINTED_FILE[main]
+display PRINTED_FILE[main]
 close
 quit
