@@ -723,11 +723,20 @@ Valid settings: \verb|error generate query|.
 PREPROCESSOR_MISSING_FILE_HANDLING "error"
 \end{PipsProp}
 
-\item[C Preprocessor:] if the file suffix is \verb|.F|, the file is
-  processed by \verb|cpp|. This is the standard suffix for Fortran compilers.
-  The cpp and options used can be modified with the \verb|PIPS_CPP| and
-  \verb|PIPS_CPP_FLAGS| variables, which default to \verb|cpp| and
-  \verb|-P -C -D__PIPS__ -D__HPFC__| respectively.
+\item[File Preprocessing:] if the file suffix is \verb|.F| or ,\verb|.c| then
+  the file is preprocessed. By default pips uses \verb|gfortran -E| for fortran
+  files and \verb|cpp -C| for C files. These preprocessors can be changed by
+  setting the following environment variables:
+  \begin{itemize}
+  \item \verb|PIPS_FPP| for \verb|.F| files,
+  \item \verb|PIPS_CPP| for \verb|.c| files.
+  \end{itemize}
+  Moreover the preprocessing options used can be extended with the following
+  environment variables:
+  \begin{itemize}
+  \item \verb|PIPS_FPP_FLAGS| variable, default to \verb|-P -D__PIPS__ -D__HPFC__|,
+  \item \verb|PIPS_CPP_FLAGS| variable, default to \verb|-D__PIPS__ -D__HPFC__ -U__GNUC__|.
+  \end{itemize}
 
   The Shell variable \verb|PIPS_CPP_FLAGS| may be used to locate the include
   files. Directories to search are specified with the \verb/-I/ option.
@@ -8022,6 +8031,7 @@ The argument is specified thru integer property
 \verb|TRANSFORMATION_CLONE_ON_ARGUMENT|. If set to $0$, a user request is
 performed.
 %%!UserManualDocumentation
+
 
 \begin{PipsMake}
 alias clone_on_argument 'Clone On Argument'
