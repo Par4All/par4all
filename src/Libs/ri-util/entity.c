@@ -1703,3 +1703,64 @@ entity make_entity_copy(entity e)
 
   return ne;
 }
+
+/* Create a copy of an entity, with (almost) identical type, storage
+   and initial value if move_initialization_p is FALSE, but with a slightly
+   different name as entities are uniquely known by their names, and a
+   different offset if the storage is ram (still to be done).
+
+   Entity e must be defined or the function core dumps.
+
+   Depending on its storage, the new entity might have to be inserted
+   in code_declarations (done) and the memory allocation recomputed (not done).
+
+   Depending on the language, the new entity might have to be inserted
+   in statement declarations. This is left up to the user of this function.
+
+   @return the new entity.
+*/
+entity make_entity_copy_with_new_name(entity e,
+				      string global_new_name,
+				      bool move_initialization_p)
+{
+  entity ne = entity_undefined;
+  char * variable_name = strdup(global_new_name);
+  int number = 0;
+
+  /* Find the first matching non-already existent variable name: */
+  do {
+    if (variable_name != NULL)
+      /* Free the already allocated name in the previous iteration that
+	 was conflicting: */
+      free(variable_name);
+    asprintf(&variable_name, "%s_%d", global_new_name, number++);
+  }
+  while(gen_find_tabulated(variable_name, entity_domain)
+    != entity_undefined);
+
+  //extended_integer_constant_expression_p(e)
+
+  ne = make_entity(variable_name,
+		   copy_type(entity_type(e)),
+		   copy_storage(entity_storage(e)),
+		   move_initialization_p? copy_value(entity_initial(e)) :
+		   make_value_unknown()
+		   );
+
+  if(storage_ram_p(entity_storage(ne))) {
+    /* We are in trouble. Up to now, we have created a static alias of
+     * the variable e (it's a variable entity because of its
+     * storage). Note that static aliases do not exist in C.
+     */
+    ram r = storage_ram(entity_storage(ne));
+    entity m = ram_function(r);
+
+    /* FI: It would be better to perorm the memory allocation right
+       away, instead of waiting for a later core dump in chains or
+       ricedg, but I'm in a hurry. */
+    ram_offset(r) = UNKNOWN_RAM_OFFSET;
+
+    AddEntityToDeclarations(ne, m);
+  }
+  return ne;
+}

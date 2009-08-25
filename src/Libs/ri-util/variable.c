@@ -1194,3 +1194,50 @@ bool implicit_c_variable_p(entity v)
     || strcmp(vn, IMPLICIT_VARIABLE_NAME_2) == 0;
 
 }
+
+
+/* Returns initial expression of variable v. If v's inital value is a
+   constants or a code block, it is converted to the corresponding
+   exception.
+*/
+expression variable_initial_expression(entity v)
+{
+  value val = entity_initial(v);
+  expression exp = expression_undefined;
+
+  if (value_expression_p(val)) {
+    exp = copy_expression(value_expression(val));
+  }
+  else if(value_constant_p(val)) {
+    constant c = value_constant(val);
+    if (constant_int_p(c)) {
+      exp = int_to_expression(constant_int(c));
+    }
+    else {
+      pips_internal_error("Not Yet Implemented.\n");
+    }
+  }
+  else if(value_code_p(val)) {
+    if(pointer_type_p(ultimate_type(entity_type(v)))) {
+      list il = sequence_statements(code_initializations(value_code(val)));
+
+      if(!ENDP(il)) {
+	statement is = STATEMENT(CAR(il));
+	instruction ii = statement_instruction(is);
+
+	pips_assert("A pointer initialization is made of one instruction expression",
+		    gen_length(il)==1 && instruction_expression(ii));
+
+	exp = copy_expression(instruction_expression(ii));
+      }
+    }
+  }
+  else if(value_unknown_p(val)) {
+    exp = expression_undefined;
+  }
+  else {
+    pips_internal_error("Unexpected value tag %d.\n", value_tag(val));
+  }
+
+  return exp;
+}

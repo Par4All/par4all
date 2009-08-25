@@ -56,19 +56,9 @@
 #include "prettyprint.h"
 #include "transformations.h"
 
-// This function will move to ri-util/statement.c
-void print_statements(list sl)
-{
-  FOREACH(STATEMENT, s, sl) {
-    print_statement(s);
-  }
-}
-
-
 
 /* gen_multi_recurse callback on exiting a variable reference:
-
-   if var present in renamings,
+   if var needs renaming, rename this reference.
  */
 static void rename_reference(reference r, hash_table renamings)
 {
@@ -83,8 +73,8 @@ static void rename_reference(reference r, hash_table renamings)
   }
 }
 
-/* gen_multi_recurse callback on exiting a loop: rename loop index if
-   appropriate.
+/* gen_multi_recurse callback on exiting a loop:
+   if loop index needs renaming, rename this occurrence.
  */
 static void rename_loop_index(loop l, hash_table renamings)
 {
@@ -97,49 +87,6 @@ static void rename_loop_index(loop l, hash_table renamings)
       loop_index(l) = nvar;
     }
   }
-}
-
-/* Should be moved into ri-util/variable.c */
-expression variable_initial_expression(entity v)
-{
-  value val = entity_initial(v);
-  expression exp = expression_undefined;
-
-  if (value_expression_p(val)) {
-    exp = copy_expression(value_expression(val));
-  }
-  else if(value_constant_p(val)) {
-    constant c = value_constant(val);
-    if (constant_int_p(c)) {
-      exp = int_to_expression(constant_int(c));
-    }
-    else {
-      pips_internal_error("Not Yet Implemented.\n");
-    }
-  }
-  else if(value_code_p(val)) {
-    if(pointer_type_p(ultimate_type(entity_type(v)))) {
-      list il = sequence_statements(code_initializations(value_code(val)));
-
-      if(!ENDP(il)) {
-	statement is = STATEMENT(CAR(il));
-	instruction ii = statement_instruction(is);
-
-	pips_assert("A pointer initialization is made of one instruction expression",
-		    gen_length(il)==1 && instruction_expression(ii));
-
-	exp = copy_expression(instruction_expression(ii));
-      }
-    }
-  }
-  else if(value_unknown_p(val)) {
-    exp = expression_undefined;
-  }
-  else {
-    pips_internal_error("Unexpected value tag %d.\n", value_tag(val));
-  }
-
-  return exp;
 }
 
 /* gen_multi_recurse callback on exiting a statement:recompute the
@@ -166,9 +113,9 @@ static void rename_statement_declarations(statement s, hash_table renamings)
 	ndecls = gen_nconc(ndecls, CONS(ENTITY, var, NIL));
       }
       else if(var!=nvar) {
-	/* If the new variable declaration does not contain the initial
-	   value of the variable declaration, an initialization
-	   statement must be inserted */
+	/* If the new variable declaration does not contain the
+	   initial value of the variable declaration, an
+	   initialization statement must be inserted */
 	if (!value_unknown_p(entity_initial(var))
 	    && value_unknown_p(entity_initial(nvar))) {
 	  expression ie = variable_initial_expression(var);
@@ -192,87 +139,19 @@ static void rename_statement_declarations(statement s, hash_table renamings)
       }
     }
 
-    ifdebug(1)
-      print_statements(inits);
-
-    // insert list of initialisation statements at the beginning of s
+    /* Insert the list of initialisation statements as a sequence at
+       the beginning of s.
+    */
     inits = gen_nconc(inits, CONS(statement, instruction_to_statement(old), NIL));
-
     ifdebug(1)
       print_statements(inits);
-
-    // insere une sequence
     statement_instruction(s) = make_instruction_sequence(make_sequence(inits));
 
     //gen_free_list(statement_declarations(s));
 
     statement_declarations(s) = ndecls;
     pips_debug(1, "Local declarations replaced.\n");
-
   }
-}
-
-
-
-/* Create a copy of an entity, with (almost) identical type, storage
-   and initial value if move_initialization_p is FALSE, but with a slightly
-   different name as entities are uniquely known by their names, and a
-   different offset if the storage is ram (still to be done).
-
-   Entity e must be defined or the function core dumps.
-
-   Depending on its storage, the new entity might have to be inserted
-   in code_declarations (done) and the memory allocation recomputed (not done).
-
-   Depending on the language, the new entity might have to be inserted
-   in statement declarations. This is left up to the user of this function.
-
-   @return the new entity.
-*/
-entity make_entity_copy_with_new_name(entity e,
-				      string global_new_name,
-				      bool move_initialization_p)
-{
-  entity ne = entity_undefined;
-  char * variable_name = strdup(global_new_name);
-  int number = 0;
-
-  /* Find the first matching non-already existent variable name: */
-  do {
-    if (variable_name != NULL)
-      /* Free the already allocated name in the previous iteration that
-	 was conflicting: */
-      free(variable_name);
-    asprintf(&variable_name, "%s_%d", global_new_name, number++);
-  }
-  while(gen_find_tabulated(variable_name, entity_domain)
-    != entity_undefined);
-
-  //extended_integer_constant_expression_p(e)
-
-  ne = make_entity(variable_name,
-		   copy_type(entity_type(e)),
-		   copy_storage(entity_storage(e)),
-		   move_initialization_p? copy_value(entity_initial(e)) :
-		   make_value_unknown()
-		   );
-
-  if(storage_ram_p(entity_storage(ne))) {
-    /* We are in trouble. Up to now, we have created a static alias of
-     * the variable e (it's a variable entity because of its
-     * storage). Note that static aliases do not exist in C.
-     */
-    ram r = storage_ram(entity_storage(ne));
-    entity m = ram_function(r);
-
-    /* FI: It would be better to perorm the memory allocation right
-       away, instead of waiting for a later core dump in chains or
-       ricedg, but I'm in a hurry. */
-    ram_offset(r) = UNKNOWN_RAM_OFFSET;
-
-    AddEntityToDeclarations(ne, m);
-  }
-  return ne;
 }
 
 /* To generate the new variables, we need to know:
@@ -290,7 +169,6 @@ entity make_entity_copy_with_new_name(entity e,
  *
  * This data structure is private to flatten_code.c
  */
-
 typedef struct redeclaration_context {
   int cycle_depth;
   statement declaration_statement;
@@ -571,7 +449,7 @@ bool flatten_code(string module_name)
 	       );
   clean_up_sequences(module_stat); // again
 
-  // This might not really be necessary, probably thanks to clean_up_seequences
+  // This might not really be necessary, probably thanks to clean_up_sequences
   module_reorder(module_stat);
 
   pips_debug(1, "end\n");

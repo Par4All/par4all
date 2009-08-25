@@ -996,6 +996,13 @@ void print_statement(statement s)
   debug_off();
 }
 
+void print_statements(list sl)
+{
+  FOREACH(STATEMENT, s, sl) {
+    print_statement(s);
+  }
+}
+
 void print_statement_of_module(statement s, string mn)
 {
   if(entity_undefined_p(get_current_module_entity())) {
