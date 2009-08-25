@@ -196,7 +196,7 @@ static void spoc_th_conf
   comment(body, spoc_type_thr, orig, stage, side, false);
   sb_cat(body,
     "  si.th[", s_stag, "][", s_side, "].op = ",
-           s_bin, "? SPOC_TH_BINARIZE : SPOC_TH_NO_BINARIZE;\n",
+		s_bin, "? SPOC_TH_BINARIZE : SPOC_TH_NO_BINARIZE;\n",
     "  sp.th[", s_stag, "][", s_side, "].boundmin = ", s_inf, ";\n",
     "  sp.th[", s_stag, "][", s_side, "].boundmax = ", s_sup, ";\n",
 		    NULL);
@@ -257,25 +257,23 @@ static void spoc_measure_conf
   case measure_min_coord:
     sb_cat(head, ", int32_t * ", v_1, NULL);
     sb_cat(tail, "  *", v_1, " = (int32_t) ", reduc,
-		      measure==measure_min||measure==measure_min_coord?
-		      "minimum": "maximum", ";\n", NULL);
+	   measure==measure_min||measure==measure_min_coord?
+	   "minimum": "maximum", ";\n", NULL);
     if (n>1)
     {
       sb_cat(head, ", uint32_t * ", v_2, ", uint32_t * ", v_3, NULL);
-      sb_cat(tail,
-			"  *", v_2, " = (uint32_t) ", reduc,
-			measure==measure_min||measure==measure_min_coord?
-			"min": "max", "_coord_x;\n",
-			"  *", v_3, " = (uint32_t) ", reduc,
-			measure==measure_min||measure==measure_min_coord?
-			"min": "max", "_coord_y;\n",
-			NULL);
+      sb_cat(tail, "  *", v_2, " = (uint32_t) ", reduc,
+	     measure==measure_min||measure==measure_min_coord?
+	     "min": "max", "_coord_x;\n",
+	     "  *", v_3, " = (uint32_t) ", reduc,
+	     measure==measure_min||measure==measure_min_coord?
+	     "min": "max", "_coord_y;\n",
+	     NULL);
     }
     break;
   case measure_vol:
     sb_cat(head, ", int32_t * ", v_1, NULL);
-    sb_cat(tail,
-		      "  *", v_1, " = (int32_t) ", reduc, "volume;\n", NULL);
+    sb_cat(tail, "  *", v_1, " = (int32_t) ", reduc, "volume;\n", NULL);
     break;
   default:
     pips_internal_error("unexpected measure %d", measure);
@@ -425,15 +423,6 @@ print_op_schedule(FILE * out, const string name, const op_schedule * op)
 }
 
 static bool check_wiring_output(hash_table, int, int);
-
-/* tell at which stage we may cross the pipeline.
- */
-/*
-static int possible_cross_stage(int in_stage, int in_level)
-{
-  return (in_level <= spoc_type_alu)? in_stage: in_stage+1;
-}
-*/
 
 /* depending on available images (stage %d, level, side 0/1)
  * and vertex operation to perform , tell where to perform it.
@@ -684,6 +673,13 @@ check_wiring_output(hash_table wiring, int stage, int side)
   return !hash_defined_p(wiring, (void *) index);
 }
 
+/* generate wiring code for mux if necessary.
+ * @param code generated
+ * @param stage stage under consideration
+ * @param mux multiplexer to set
+ * @param value status for the multiplexer
+ * @param wiring already performed wiring to check for double settings.
+ */
 static void
 set_wiring(string_buffer code,
 	   int stage, // 0 ..
@@ -1103,6 +1099,7 @@ static void freia_spoc_pipeline
     // schedule...
     where_to_perform_operation(v, &in0, &in1, dpipe, todo, &out, wiring);
 
+    // detect pipeline overflow
     if (out.stage >= pipeline_depth)
     {
       // pipeline is full, vi was not computed:
@@ -1151,7 +1148,7 @@ static void freia_spoc_pipeline
       if (in0.stage==out.stage && in0.level==out.level && in0.side==out.side)
 	in0 = out;
       else
-        if (in1.stage==out.stage && in1.level==out.level && in1.side==out.side)
+	if (in1.stage==out.stage && in1.level==out.level && in1.side==out.side)
 	  in1 = out;
       // else overwrite not needed used image
       else if (!in0_needed && in0.used)
@@ -1197,7 +1194,7 @@ static void freia_spoc_pipeline
 	pips_internal_error("should not get there (3 live images)...");
 
       // anyway, we must clean unuseful variables, because
-      // the scheduling still relies on image entities to check deps
+      // the scheduling  on image entities to check deps (still ?)
       if (!in0_needed && in0.producer!=out.producer)
 	init_op_schedule(&in0, NULL, 0);
       if (!in1_needed && in1.producer!=out.producer)
@@ -1270,6 +1267,12 @@ static void freia_spoc_pipeline
 	   " on ", itoa(out.side), "\n", NULL);
     generate_wiring(body, &in0, &out, wiring);
 
+    // do not trust the default initialisation of the paths
+    in0 = out;
+    out.stage = pipeline_depth-1;
+    sb_app(body, "\n  // fill in to the end...\n");
+    generate_wiring(body, &in0, &out, wiring);
+
     if (out.side)
       p_out1 = "o0";
     else
@@ -1283,6 +1286,8 @@ static void freia_spoc_pipeline
       out0 = ENTITY(CAR(outs)),
       out1 = ENTITY(CAR(CDR(outs)));
     int out0_side, out1_side;
+
+    pips_assert("output two results in two variables", out0!=out1);
 
     // make out0 match in0 and out1 match in1
     if (out0 != in0.image)
@@ -1336,11 +1341,23 @@ static void freia_spoc_pipeline
     out.stage = out_stage;
     generate_wiring(body, &in0, &out, wiring);
 
+    // do not trust the default initialisation of the pipeline
+    in0 = out;
+    out.stage = pipeline_depth-1;
+    sb_app(body, "\n  // fill in to the end...\n");
+    generate_wiring(body, &in0, &out, wiring);
+
     out.image = out1;
     out.producer = NULL;
     out.level = spoc_type_out;
     out.side = out1_side;
     out.stage = out_stage;
+    generate_wiring(body, &in1, &out, wiring);
+
+    // do not trust the default initialisation of the pipeline
+    in1 = out;
+    out.stage = pipeline_depth-1;
+    sb_app(body, "\n  // fill in to the end...\n");
     generate_wiring(body, &in1, &out, wiring);
   }
   else
@@ -1443,7 +1460,9 @@ static void dag_append_freia_call(dag d, statement s)
 }
 
 /* comparison function for sorting dagvtx in qsort,
- * this is deep voodoo, because the priority has an impact on correctness.
+ * this is deep voodoo, because the priority has an impact on
+ * correctness? that should not be the case as only computations
+ * allowed by dependencies are schedule.
  * tells v1 < v2 => -1
  */
 static int dagvtx_priority(const dagvtx * v1, const dagvtx * v2)
@@ -1454,10 +1473,10 @@ static int dagvtx_priority(const dagvtx * v1, const dagvtx * v2)
     c1 = dagvtx_content(*v1),
     c2 = dagvtx_content(*v2);
 
-  // prioritize first measures if there is only one of them
+  // prioritize first scalar ops & measures if there is only one of them
   if (vtxcontent_optype(c1)!=vtxcontent_optype(c2))
   {
-    // scalars operations first
+    // scalars operations first to remove (scalar) dependences
     if (vtxcontent_optype(c1)==spoc_type_oth)
       result = -1, why = "scal";
     else if (vtxcontent_optype(c2)==spoc_type_oth)
@@ -1475,14 +1494,36 @@ static int dagvtx_priority(const dagvtx * v1, const dagvtx * v2)
     int
       l1 = (int) gen_length(vtxcontent_inputs(c1)),
       l2 = (int) gen_length(vtxcontent_inputs(c2));
-    if (l1!=l2)
-      // the more images are needed, the earlier
+
+    // count non mesure successors:
+    int nms1 = 0, nms2 = 0;
+
+    FOREACH(dagvtx, vs1, dagvtx_succs(*v1))
+      if (dagvtx_optype(vs1)!=spoc_type_mes) nms1++;
+
+    FOREACH(dagvtx, vs2, dagvtx_succs(*v2))
+      if (dagvtx_optype(vs2)!=spoc_type_mes) nms2++;
+
+    if (l1!=l2 && (l1==0 || l2==0))
+      // put image generators at the end, after any other computation
       result = l2-l1, why = "args";
+    else if (nms1!=nms2 && l1==1 && l2==1)
+      // the less successors the better? the rational is:
+      // - mesures are handled before and do not have successors anyway,
+      // - so this is about whether a result of an unary op is reused by
+      //   two nodes, in which case it will just jam the pipeline, so
+      //   try to put other computations before it. Note that mes
+      //   successors do not really count, as the image is not lost.
+      result = nms1 - nms2, why = "succs";
+    else if (l1!=l2)
+      // else ??? no effect on my validation.
+      result = l2-l1, why = "args2";
     else if (vtxcontent_optype(c1)!=vtxcontent_optype(c2))
       // otherwise use the op types, which are somehow ordered
+      // so that if all is well the pipe is filled in order.
       result = vtxcontent_optype(c1) - vtxcontent_optype(c2), why = "ops";
     else
-      // rely on statements
+      // if all else fails, rely on statement numbers.
       result = dagvtx_number(*v1) - dagvtx_number(*v2), why = "stats";
   }
 
@@ -1514,12 +1555,14 @@ static bool any_scalar_dep(dagvtx v, set vs)
   return dep;
 }
 
+/* check scalar dependency from computed to v.
+ */
 static bool
 all_previous_stats_with_deps_are_computed(dag d, set computed, dagvtx v)
 {
   bool okay = true;
 
-  // scan in statement order...
+  // scan in statement order... does it matter?
   list lv = gen_nreverse(gen_copy_seq(dag_vertices(d)));
   FOREACH(dagvtx, pv, lv)
   {
@@ -1780,7 +1823,7 @@ static dagvtx first_which_may_be_added
   return chosen;
 }
 
-// DEBUG...
+// dirty debug helper...
 static string dagvtx_to_string(const dagvtx v)
 {
   return itoa(dagvtx_number(v));
@@ -1794,7 +1837,7 @@ static list /* of dags */ split_dag(dag initial)
 {
   if (!single_image_assignement_p(initial))
     // well, it should work most of the time, so only a warning
-    pips_user_warning("image reuse may result in subtly wrong code");
+    pips_user_warning("image reuse may result in subtly wrong code...\n");
 
   // ifdebug(1) pips_assert("initial dag ok", dag_consistent_p(initial));
 
@@ -2053,12 +2096,81 @@ freia_spoc_compile_calls
   gen_free_list(ld);
 }
 
-static bool freia_image_allocation_p(statement s)
+static bool freia_skip_op_p(const statement s)
 {
   call c = freia_statement_to_call(s);
   string called = c? entity_user_name(call_function(c)): "";
+  // ??? what about freia_common_check* ?
   return same_string_p(called, "freia_common_create_data")
     ||   same_string_p(called, "freia_common_destruct_data");
+}
+
+static bool is_alloc(const statement s)
+{
+  call c = freia_statement_to_call(s);
+  string called = c? entity_user_name(call_function(c)): "";
+  return same_string_p(called, "freia_common_create_data");
+}
+
+static bool is_dealloc(const statement s)
+{
+  call c = freia_statement_to_call(s);
+  string called = c? entity_user_name(call_function(c)): "";
+  return same_string_p(called, "freia_common_destruct_data");
+}
+
+/* I reorder a little bit statements, so that allocs & deallocs are up
+ * front or in the back.
+ */
+static set cmp_subset = NULL;
+/* order two statements for qsort.
+ * s1 before s2 => -1
+ */
+static int freia_cmp_statement(const statement * s1, const statement * s2)
+{
+  pips_assert("some subset of statements to reorder...", cmp_subset);
+  if (!set_belong_p(cmp_subset, *s1) || !set_belong_p(cmp_subset, *s2))
+    return statement_number(*s1) - statement_number(*s2);
+
+  // else we have to do something
+  const call
+    c1 = statement_call_p(*s1)?
+      instruction_call(statement_instruction((statement) *s1)): NULL,
+    c2 = statement_call_p(*s2)?
+      instruction_call(statement_instruction((statement) *s2)): NULL;
+  bool
+    s1r = c1? ENTITY_C_RETURN_P(call_function(c1)): false,
+    s2r = c2? ENTITY_C_RETURN_P(call_function(c2)): false,
+    s1a = is_alloc(*s1), s2a = is_alloc(*s2),
+    s1d = is_dealloc(*s1), s2d = is_dealloc(*s2);
+  if (s1r || s2r) pips_assert("one return in sequence", s1r ^ s2r);
+
+  pips_debug(9, "%"_intFMT" %s is %d %d %d\n", statement_number(*s1),
+	     c1? entity_name(call_function(c1)): "", s1r, s1a, s1d);
+  pips_debug(9, "%"_intFMT" %s is %d %d %d\n", statement_number(*s2),
+	     c2? entity_name(call_function(c2)): "", s2r, s2a, s2d);
+
+  int order = 0;
+  string why = "";
+
+  // return at the back, obviously...
+  if (s1r) order = 1, why = "return1";
+  else if (s2r) order = -1, why = "return2";
+  // allocs at the front (there may be in initialisations, which up front)
+  else if (s1a && !s2a) order = -1, why = "alloc1";
+  else if (s2a && !s1a) order = 1, why = "alloc2";
+  // deallocs at the back
+  else if (s1d && !s2d) order = 1, why = "free1";
+  else if (s2d && !s1d) order = -1, why = "free2";
+  // else keep statement initial order
+  else order = statement_number(*s1)-statement_number(*s2), why = "stat";
+
+  pips_assert("total order", order!=0);
+
+  pips_debug(7, "%"_intFMT" %s %"_intFMT" (%s)\n", statement_number(*s1),
+	     order==-1? "<": ">", statement_number(*s2), why);
+
+  return order;
 }
 
 #include "effects-generic.h"
@@ -2089,6 +2201,7 @@ typedef struct {
 static bool sequence_flt(sequence sq, freia_spoc_info * fsip)
 {
   pips_debug(9, "considering sequence...\n");
+  cmp_subset = set_make(set_pointer);
 
   list /* of statements */ ls = NIL, ltail = NIL;
   FOREACH(statement, s, sequence_statements(sq))
@@ -2098,7 +2211,7 @@ static bool sequence_flt(sequence sq, freia_spoc_info * fsip)
     bool keep_stat = freia_api ||
       // ??? it is an image allocation in the middle of the code...
       // or it has no image effects
-      (ls && (freia_image_allocation_p(s) || !some_effects_on_images(s)));
+      (ls && (freia_skip_op_p(s) || !some_effects_on_images(s)));
 
     pips_debug(7, "statement %"_intFMT": %skeeped\n",
 	       statement_number(s), keep_stat? "": "not ");
@@ -2117,6 +2230,9 @@ static bool sequence_flt(sequence sq, freia_spoc_info * fsip)
     }
     else
       if (ls!=NIL) {
+	set_assign_list(cmp_subset, ls);
+	gen_sort_list(sequence_statements(sq),
+		      (gen_cmp_func_t) freia_cmp_statement);
 	ls = gen_nreverse(ls);
 	fsip->seqs = CONS(list, ls, fsip->seqs);
 	ls = NIL;
@@ -2125,13 +2241,16 @@ static bool sequence_flt(sequence sq, freia_spoc_info * fsip)
 
   // end of sequence reached
   if (ls!=NIL) {
+    set_assign_list(cmp_subset, ls);
+    gen_sort_list(sequence_statements(sq),
+		  (gen_cmp_func_t) freia_cmp_statement);
     ls = gen_nreverse(ls);
     fsip->seqs = CONS(list, ls, fsip->seqs);
     ls = NIL;
   }
 
   if (ltail) gen_free_list(ltail);
-
+  set_free(cmp_subset), cmp_subset = NULL;
   return true;
 }
 

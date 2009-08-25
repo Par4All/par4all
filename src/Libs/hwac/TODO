@@ -10,7 +10,7 @@
 - what about full expressions: aipo_x() || aipo_y() || aipo_z()? atomizer?
 - check that there are references where expected?
 - check/remove more implicit hypothesis
-- detect redundant operations? replace them with copies?
++ detect redundant operations? replace them with copies?
 
 * code
 + cleanup data structures?
@@ -42,3 +42,5 @@
 - add more (elementary) tests?
 
 * bugs
+- reuse of images in some cases
+- allocs may be in the middle of the calls
