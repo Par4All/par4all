@@ -1103,6 +1103,13 @@ bool same_expression_p(expression e1, expression e2)
     return expression_equal_p(e1, e2);
 }
 
+bool cast_equal_p(cast c1, cast c2)
+{
+  return
+    type_equal_p(cast_type(c1), cast_type(c2)) &&
+    expression_equal_p(cast_expression(c1), cast_expression(c2));
+}
+
 bool syntax_equal_p(syntax s1, syntax s2)
 {
   tag t1 = syntax_tag(s1);
@@ -1121,11 +1128,18 @@ bool syntax_equal_p(syntax s1, syntax s2)
   case is_syntax_call:
     return call_equal_p(syntax_call(s1), syntax_call(s2));
     break;
+  case is_syntax_cast:
+    return cast_equal_p(syntax_cast(s1), syntax_cast(s2));
+    break;
+  case is_syntax_sizeofexpression:
+  case is_syntax_subscript:
+  case is_syntax_application:
+  case is_syntax_va_arg:
   default:
     break;
   }
 
-  pips_error("syntax_equal_p", "ill. tag\n");
+  pips_internal_error("illegal. syntax tag %d\n", t1);
   return FALSE;
 }
 
