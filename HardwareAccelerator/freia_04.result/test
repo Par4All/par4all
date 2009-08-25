@@ -117,13 +117,13 @@ digraph "freia_04_helper_0_0" {
   "27 thr" -> "29 vol" [label="t3"];
   "26 -" [shape=trapezium,orientation=270];
   "26 -" -> "27 thr" [label="t2"];
-  "25 D6" [shape=box];
-  "25 D6" -> "26 -" [label="t1"];
   "24 E8" [shape=box];
   "24 E8" -> "28 thr" [label="t0"];
   "24 E8" -> "26 -" [label="t0"];
-  "i" -> "25 D6";
+  "25 D6" [shape=box];
+  "25 D6" -> "26 -" [label="t1"];
   "i" -> "24 E8";
+  "i" -> "25 D6";
 }
 
 ! acceleration function
@@ -151,28 +151,28 @@ freia_status freia_04_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, int32_t
 
 
   // STAGE 0
-  // i [0 input 0] -> [0 poc 0] 24 erode_8c
+  // i [0 input 0] -> [0 poc 0] 25 dilate_6c
   // nope
-  // poc 24 erode_8c stage 0 side 0
-  si.poc[0][0].op = SPOC_POC_ERODE;
-  si.poc[0][0].grid = SPOC_POC_8_CONNEX;
+  // poc 25 dilate_6c stage 0 side 0
+  si.poc[0][0].op = SPOC_POC_DILATE;
+  si.poc[0][0].grid = SPOC_POC_6_CONNEX;
   for(i=0 ; i<9 ; i++)
     sp.poc[0][0].kernel[i] = kern0[i];
 
-  // i [0 input 1] -> [0 poc 1] 25 dilate_6c
+  // i [0 input 1] -> [0 poc 1] 24 erode_8c
   // nope
-  // poc 25 dilate_6c stage 0 side 1
-  si.poc[0][1].op = SPOC_POC_DILATE;
-  si.poc[0][1].grid = SPOC_POC_6_CONNEX;
+  // poc 24 erode_8c stage 0 side 1
+  si.poc[0][1].op = SPOC_POC_ERODE;
+  si.poc[0][1].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
     sp.poc[0][1].kernel[i] = kern1[i];
 
-  // 0`t0 [0 poc 0] -> [0 alu] 26 sub
+  // 0`t1 [0 poc 0] -> [0 alu] 26 sub
   // nope
-  // 0`t1 [0 poc 1] -> [0 alu] 26 sub
+  // 0`t0 [0 poc 1] -> [0 alu] 26 sub
   // nope
-  // alu 26 sub stage 0 flipped
-  si.alu[0][0].op = SPOC_ALU_SUB_IN1_IN0;
+  // alu 26 sub stage 0
+  si.alu[0][0].op = SPOC_ALU_SUB_IN0_IN1;
 
   // 0`t2 [0 alu] -> [0 threshold 0] 27 threshold
   si.mux[0][0].op = SPOC_MUX_IN1;
@@ -185,24 +185,21 @@ freia_status freia_04_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, int32_t
   // 0`t3 [0 threshold 0] -> [0 measure 0] 27 threshold
   // nope
 
-  // 0`t0 [0 poc 0] -> [0 threshold 1] 28 threshold
-  si.mux[0][1].op = SPOC_MUX_IN0;
-  si.mux[0][3].op = SPOC_MUX_IN0;
+  // 0`t0 [0 poc 1] -> [0 threshold 1] 28 threshold
+  si.mux[0][3].op = SPOC_MUX_IN1;
   // threshold 28 threshold stage 0 side 1
   si.th[0][1].op = bin8? SPOC_TH_BINARIZE : SPOC_TH_NO_BINARIZE;
   sp.th[0][1].boundmin = inf6;
   sp.th[0][1].boundmax = sup7;
 
-  // 0`t4 [0 threshold 1] -> [0 measure 1] 28 threshold
-  // nope
 
 
   // STAGE 1
-  // 0`t4 [0 measure 1] -> [1 alu] 31 add
-  // 0`t4 [1 input 1] -> [1 alu] 31 add
-  // nope
   // 0`t3 [0 measure 0] -> [1 alu] 31 add
   // 0`t3 [1 input 0] -> [1 alu] 31 add
+  // nope
+  // 0`t4 [0 measure 1] -> [1 alu] 31 add
+  // 0`t4 [1 input 1] -> [1 alu] 31 add
   // nope
   // alu 31 add stage 1
   si.alu[1][0].op = SPOC_ALU_ADD_IN0_IN1;

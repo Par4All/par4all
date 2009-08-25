@@ -124,13 +124,13 @@ digraph "freia_03_helper_0_0" {
   "28 *." -> "30 &" [label="t4"];
   "27 +" [shape=trapezium,orientation=270];
   "27 +" -> "29 /." [label="t3"];
-  "26 +s." [shape=trapezium,orientation=270];
-  "26 +s." -> "27 +" [label="t2"];
-  "i1" -> "26 +s.";
   "25 +." [shape=trapezium,orientation=270];
   "25 +." -> "28 *." [label="t1"];
   "25 +." -> "27 +" [label="t1"];
   "i0" -> "25 +.";
+  "26 +s." [shape=trapezium,orientation=270];
+  "26 +s." -> "27 +" [label="t2"];
+  "i1" -> "26 +s.";
 }
 
 ! acceleration function
@@ -158,34 +158,34 @@ freia_status freia_03_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, freia_d
 
 
   // STAGE 0
-  // i0 [0 input 0] -> [0 alu] 25 add_const
+  // i1 [0 input 1] -> [0 alu] 26 addsat_const
   // nope
-  // alu 25 add_const stage 0
-  si.alu[0][0].op = SPOC_ALU_ADD_IN0_CONST;
+  // alu 26 addsat_const stage 0 flipped
+  si.alu[0][0].op = SPOC_ALU_ADDSAT_IN1_CONST;
   sp.alu[0][0].constant = cst0;
 
 
   // STAGE 1
-  // i1 [0 input 1] -> [1 alu] 26 addsat_const
-  si.mux[0][3].op = SPOC_MUX_IN1;
-  // i1 [1 input 1] -> [1 alu] 26 addsat_const
+  // i0 [0 input 0] -> [1 alu] 25 add_const
+  si.mux[0][0].op = SPOC_MUX_IN0;
+  // i0 [1 input 0] -> [1 alu] 25 add_const
   // nope
-  // alu 26 addsat_const stage 1 flipped
-  si.alu[1][0].op = SPOC_ALU_ADDSAT_IN1_CONST;
+  // alu 25 add_const stage 1
+  si.alu[1][0].op = SPOC_ALU_ADD_IN0_CONST;
   sp.alu[1][0].constant = cst1;
 
 
   // STAGE 2
-  // 0`t1 [0 alu] -> [2 alu] 27 add
-  si.mux[0][0].op = SPOC_MUX_IN1;
-  si.mux[0][2].op = SPOC_MUX_IN0;
-  // 0`t1 [1 input 0] -> [2 alu] 27 add
-  si.mux[1][0].op = SPOC_MUX_IN0;
+  // 0`t1 [1 alu] -> [2 alu] 27 add
+  si.mux[1][0].op = SPOC_MUX_IN1;
+  si.mux[1][2].op = SPOC_MUX_IN0;
   // 0`t1 [2 input 0] -> [2 alu] 27 add
   // nope
-  // 0`t2 [1 alu] -> [2 alu] 27 add
-  si.mux[1][1].op = SPOC_MUX_IN1;
-  si.mux[1][3].op = SPOC_MUX_IN0;
+  // 0`t2 [0 alu] -> [2 alu] 27 add
+  si.mux[0][1].op = SPOC_MUX_IN1;
+  si.mux[0][3].op = SPOC_MUX_IN0;
+  // 0`t2 [1 input 1] -> [2 alu] 27 add
+  si.mux[1][3].op = SPOC_MUX_IN1;
   // 0`t2 [2 input 1] -> [2 alu] 27 add
   // nope
   // alu 27 add stage 2
@@ -293,7 +293,7 @@ freia_status freia_03(freia_data2d *o, freia_data2d *i0, freia_data2d *i1, int32
    // t6 = t4 & t5
    // t7 = m()
    // o  = t6 * t7
-   freia_03_helper_0_0_0(o, i0, i1, c1, c2, c3, c4, c5);                /*0025*/
+   freia_03_helper_0_0_0(o, i0, i1, c2, c1, c3, c4, c5);                /*0025*/
 
    return FREIA_OK;                                                     /*0042*/
 }
