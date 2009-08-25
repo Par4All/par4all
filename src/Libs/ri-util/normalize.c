@@ -369,10 +369,16 @@ expression e;
     }
 }
 
-/* FI: any chunk* can be passed; 
+/* void unnormalize_expression(expression exp): puts all the normalized
+ * field of expressions in "st" to undefined and does the unnormalization recursively
+ *
+ * This is very useful when you combine expressions. It prohibits
+ * unnormalized expressions with normalized sub-expressions.
+ *
+ * FI: any chunk* can be passed; 
  * this function could be applied to an expression
  */
-void recursive_free_normalized(void * st)
+void unnormalize_expression(void * st)
 {
     gen_multi_recurse(st, 
 		      expression_domain,

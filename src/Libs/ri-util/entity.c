@@ -546,9 +546,11 @@ bool entity_enum_p(entity e)
 bool entity_enum_member_p(entity e)
 {
   value ev = entity_initial(e);
-
-  pips_assert("Value of e is defined", !value_undefined_p(ev));
-  return value_symbolic_p(ev);
+  /* SG: not all entities seem to have this field defined
+   * if not defined, assume it's not an enum, although i am unsure of the validity of this
+   * pips_assert("Value of e is defined", !value_undefined_p(ev));
+   */
+  return !value_undefined_p(ev) && value_symbolic_p(ev);
 }
 
 bool entity_struct_p(entity e)

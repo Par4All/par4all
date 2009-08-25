@@ -1827,38 +1827,6 @@ expression make_lin_op_exp(entity op_ent, expression exp1, expression exp2)
   return(Pvecteur_to_expression(newV));
 }
 
-/*=================================================================*/
-/* void unnormalize_expression(expression exp): puts the normalized
- * field of "exp" to undefined and does the unnormalization recursively
- * if this expression is a call to an intrinsic function.
- *
- * This is very useful when you combine expressions. It prohibits
- * unnormalized expressions with normalized sub-expressions.
- */
-void unnormalize_expression(expression exp)
-{
-  syntax sy;
-
-  debug( 9, "unnormalize_expression", "doing\n");
-  /* FI: memory leak... */
-  expression_normalized(exp) = normalized_undefined;
-  sy = expression_syntax(exp);
-
-  if(syntax_tag(sy) == is_syntax_call)
-    {
-      call c = syntax_call(sy);
-      value v = entity_initial(call_function(c));
-
-      /* We unnormalize the arguments of the intrinsic functions. */
-      if(value_tag(v) == is_value_intrinsic)
-	{
-	  list la = call_arguments(c);
-	  for(; la != NIL; la = CDR(la))
-	    unnormalize_expression(EXPRESSION(CAR(la)));
-	}
-    }
-}
-
 
 /*=================================================================*/
 /* int expression_to_int(expression exp): returns the integer value of "exp".
