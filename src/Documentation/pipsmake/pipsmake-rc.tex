@@ -9422,6 +9422,7 @@ print_code_as_a_graph_cumulated_effects    > MODULE.graph_printed_file
 \index{ICFG\_CALLEES\_TOPO\_SORT}
 \index{ICFG\_DECOR}
 \index{ICFG\_DRAW}
+\index{ICFG\_INDENTATION}
 \index{ICFG\_DEBUG}
 
 This prettyprinter is NOT a call graph prettyprinter (see
@@ -9463,6 +9464,11 @@ ICFG_DECOR 0
 
 \begin{PipsProp}
 ICFG_DRAW TRUE
+\end{PipsProp}
+
+ICFG default indentation when going into a function or a structure.
+\begin{PipsProp}
+ICFG_INDENTATION 4
 \end{PipsProp}
 
 Debugging level (should be \verb+ICFG_DEBUG_LEVEL+ and numeric instead

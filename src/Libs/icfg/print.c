@@ -88,14 +88,17 @@ bool generic_print_icfg(string module_name)
   prettyprint_fortran_icfg_p = fortran_module_p(mod);
   prettyprint_C_icfg_p = c_module_p(mod);
 
+  icfg_set_indentation(get_int_property("ICFG_INDENTATION"));
+
   debug_on(ICFG_DEBUG_LEVEL);
   pips_debug(1,"===%s===\n===%s===\n",module_name,entity_name(mod));
 
   print_module_icfg(mod);
 
   debug_off();
+  icfg_reset_indentation();
 
-  return TRUE;
+  return true;
 }
 
 /* I would have prefered something like that... FC

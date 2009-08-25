@@ -26,6 +26,7 @@
    module_to_icfg(0, mod) recursively to_icfgs module "mod" and its callees
    and writes its icfg in indented form
 */
+#define _GNU_SOURCE // for asprintf used here...
 #include <stdio.h>
 #include <string.h>
 
@@ -53,27 +54,43 @@
 
 static int current_margin;
 
+// loops
 #define st_DO		prettyprint_fortran_icfg_p ? "do " : "for "
 #define st_ENDDO	prettyprint_fortran_icfg_p ? "enddo" : "}"
 #define st_FOR		"for "
 #define st_ENDFOR	"}"
 #define st_DOWHILE	prettyprint_fortran_icfg_p ? "do while " : "while "
 #define st_ENDDOWHILE	prettyprint_fortran_icfg_p ? "enddo" : "}"
-#define st_REPEAT	prettyprint_fortran_icfg_p ? "repeat " : "do "
-#define st_UNTIL	prettyprint_fortran_icfg_p ? "until" : "while ();"
-#define st_IF		prettyprint_fortran_icfg_p ? "if" : "if ()"
-#define st_THEN		prettyprint_fortran_icfg_p ? "then" : "{"
-//#define st_ELIF	prettyprint_fortran_icfg_p ? "else if" : "else if ()"
+#define st_REPEAT	prettyprint_fortran_icfg_p ? "repeat " : "do {"
+#define st_UNTIL	prettyprint_fortran_icfg_p ? "until" : "} while ();"
+// conditions
+#define st_IF		prettyprint_fortran_icfg_p ? "if" : "if () {"
+#define st_THEN		prettyprint_fortran_icfg_p ? "then" : ""
+#define st_ELIF	       prettyprint_fortran_icfg_p ? "else if" : "} else if () {"
 #define st_ELSE		prettyprint_fortran_icfg_p ? "else" : "} else {"
 #define st_ENDIF	prettyprint_fortran_icfg_p ? "endif" : "}"
 /* These last two strings are used for unstructured */
-#define st_WHILE	"while"
-#define st_ENDWHILE	"endwhile"
+#define st_WHILE	prettyprint_fortran_icfg_p? "while": "while () {"
+#define st_ENDWHILE	prettyprint_fortran_icfg_p? "endwhile": "}"
 
 #define some_text_p(t) (t!=text_undefined && text_sentences(t)!=NIL)
 
 /* We want to keep track of the current statement inside the recurse */
 DEFINE_LOCAL_STACK(current_stmt, statement)
+
+// indentation
+#define ICFG_DEFAULT_INDENTATION (4)
+static int icfg_indent = ICFG_DEFAULT_INDENTATION;
+
+void icfg_set_indentation(int indent)
+{
+  icfg_indent = indent;
+}
+
+void icfg_reset_indentation(void)
+{
+  icfg_indent = ICFG_DEFAULT_INDENTATION;
+}
 
 void icfg_error_handler()
 {
@@ -294,7 +311,7 @@ static void call_flt(call c)
 static bool loop_flt (loop __attribute__ ((unused)) l)
 {
   pips_debug (5, "Loop begin\n");
-  if (print_do_loops) current_margin += ICFG_SCAN_INDENT;
+  if (print_do_loops) current_margin += icfg_indent;
   return TRUE;
 }
 
@@ -311,7 +328,7 @@ static void anyloop_rwt(
 
   pips_debug (5,"Loop end\n");
 
-  if (print_do_loops) current_margin -= ICFG_SCAN_INDENT;
+  if (print_do_loops) current_margin -= icfg_indent;
 
   inside_the_do = (text) load_statement_icfg (current_stmt_head());
   text_in_do_p = some_text_p(inside_the_do);
@@ -389,7 +406,7 @@ static bool instruction_flt (instruction i)
   if(instruction_unstructured_p(i)
      && unstructured_while_p(instruction_unstructured(i))) {
     pips_debug (5, "While begin\n");
-    if (print_do_loops) current_margin += ICFG_SCAN_INDENT;
+    if (print_do_loops) current_margin += icfg_indent;
   }
   return TRUE;
 }
@@ -400,7 +417,7 @@ static void instruction_rwt (instruction i)
   bool text_in_unstructured_p = FALSE;
 
   pips_debug (5,"going up\n");
-  pips_debug (9,"instruction tag = %td\n", instruction_tag (i));
+  pips_debug (9,"instruction tag = %d\n", instruction_tag (i));
 
   switch (instruction_tag (i)) {
   case is_instruction_block:
@@ -444,7 +461,7 @@ static void instruction_rwt (instruction i)
       /* Print the WHILE
        */
       if(print_do_loops && while_p) {
-	current_margin -= ICFG_SCAN_INDENT;
+	current_margin -= icfg_indent;
 	if(text_in_unstructured_p) {
 	  append_marged_text(t, current_margin, st_WHILE, "");
 	}
@@ -481,7 +498,7 @@ static bool range_flt(range __attribute__ ((unused)) r)
     statement s = current_stmt_head();
 
     if (statement_loop_p(s) && loop_range(statement_loop(s)) && print_do_loops)
-       current_margin -= ICFG_SCAN_INDENT;
+       current_margin -= icfg_indent;
     return TRUE;
 }
 
@@ -490,7 +507,7 @@ static void range_rwt(range __attribute__ ((unused)) r)
   statement s = current_stmt_head();
 
   if (statement_loop_p(s) && loop_range(statement_loop(s)) && print_do_loops)
-    current_margin += ICFG_SCAN_INDENT;
+    current_margin += icfg_indent;
 }
 
 /* TEST
@@ -498,7 +515,7 @@ static void range_rwt(range __attribute__ ((unused)) r)
 static bool test_flt (test __attribute__ ((unused)) t)
 {
   pips_debug (5, "Test begin\n");
-  if (print_ifs) current_margin += ICFG_SCAN_INDENT;
+  if (print_ifs) current_margin += icfg_indent;
   return TRUE;
 }
 
@@ -520,7 +537,7 @@ static void test_rwt (test l)
 			some_text_p(inside_then) ||
 			some_text_p(inside_if));
 
-  if (print_ifs) current_margin -= ICFG_SCAN_INDENT;
+  if (print_ifs) current_margin -= icfg_indent;
 
   /* Print the IF */
   if (something_to_print && print_ifs) {
@@ -534,7 +551,7 @@ static void test_rwt (test l)
   /* print then statements */
   if (some_text_p(inside_then)) {
     /* Print the THEN */
-    if (something_to_print && print_ifs) {
+    if (something_to_print && print_ifs && strlen(st_THEN)>0) {
       append_marged_text(t, current_margin, st_THEN, "");
     }
     MERGE_TEXTS (t, inside_then);
@@ -574,7 +591,7 @@ void print_module_icfg(entity module)
   make_icfg_map();
   make_current_stmt_stack();
 
-  current_margin = ICFG_SCAN_INDENT;
+  current_margin = icfg_indent;
 
   print_do_loops = get_bool_property(ICFG_DOs);
   print_ifs = get_bool_property(ICFG_IFs);
