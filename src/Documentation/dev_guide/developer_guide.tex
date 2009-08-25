@@ -792,6 +792,11 @@ git svn clone http://svn.cri.ensmp.fr/svn/validation
 git svn clone http://svn.cri.ensmp.fr/svn/pips
 \end{verbatim}
 
+To have GIT ignoring the same files than SVN, you should try in each GIT
+top-directory a
+\begin{verbatim}
+git svn show-ignore >> .git/info/exclude
+\end{verbatim}
 
 How to organize this? For example Ronan \texttt{Keryell} uses this
 hierarchy in a \texttt{PIPS} directory:

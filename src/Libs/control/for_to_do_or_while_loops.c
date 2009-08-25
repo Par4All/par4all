@@ -294,12 +294,14 @@ static bool incrementation_expression_to_increment(expression incr,
 
    @return the do-loop if the transformation worked or loop_undefined if
    it failed.
- */
+
+   The API is a little weird to comply with the controlizer
+   implementation...
+*/
 loop for_to_do_loop_conversion(expression init,
 			       expression cond,
 			       expression incr,
-			       statement body)
-{
+			       statement body) {
   loop l = loop_undefined;
   range lr = range_undefined; ///< loop bound and increment expressions
   expression increment = expression_undefined;
@@ -358,111 +360,10 @@ loop for_to_do_loop_conversion(expression init,
   return l;
 }
 
-sequence for_to_while_loop_conversion(expression init,
-				      expression cond,
-				      expression incr,
-				      statement body,
-				      string comments) {
-  syntax s_init = expression_syntax(init);
-  syntax s_cond = expression_syntax(cond);
-  syntax s_incr = expression_syntax(incr);
-  sequence wlseq = sequence_undefined;
-
-  pips_debug(5, "Begin\n");
-
-  if(!syntax_call_p(s_init)
-     || !(syntax_call_p(s_cond)||syntax_reference_p(s_cond))
-     || !syntax_call_p(s_incr)) {
-    pips_internal_error("expression arguments must be calls "
-			"(in C, the condition may be a reference)\n");
-  }
-  else {
-    statement init_st = make_statement(entity_empty_label(),
-				       STATEMENT_NUMBER_UNDEFINED,
-				       STATEMENT_ORDERING_UNDEFINED,
-				       empty_comments,
-				       make_instruction(is_instruction_call,
-							syntax_call(s_init)),
-				       NIL,NULL,empty_extensions ());
-    statement incr_st =  make_statement(entity_empty_label(),
-					STATEMENT_NUMBER_UNDEFINED,
-					STATEMENT_ORDERING_UNDEFINED,
-					empty_comments,
-					make_instruction(is_instruction_call,
-							 syntax_call(s_incr)),
-					NIL,NULL,empty_extensions ());
-    sequence body_seq = make_sequence(CONS(STATEMENT, body,
-					CONS(STATEMENT, incr_st, NIL)));
-    statement n_body = make_statement(entity_empty_label(),
-				      STATEMENT_NUMBER_UNDEFINED,
-				      STATEMENT_ORDERING_UNDEFINED,
-				      empty_comments,
-				      make_instruction(is_instruction_sequence,
-						       body_seq),
-				     NIL,NULL,empty_extensions ());
-    whileloop wl_i = make_whileloop(cond, n_body, entity_empty_label(),
-				    make_evaluation_before() );
-    statement wl_st =  make_statement(entity_empty_label(),
-				     STATEMENT_NUMBER_UNDEFINED,
-				     STATEMENT_ORDERING_UNDEFINED,
-				     comments,
-				     make_instruction(is_instruction_whileloop,
-						      wl_i),
-				     NIL,NULL,empty_extensions ());
-
-    ifdebug(5) {
-      pips_debug(5, "Initialization statement:\n");
-      print_statement(init_st);
-      pips_debug(5, "Incrementation statement:\n");
-      print_statement(incr_st);
-      pips_debug(5, "New body statement with incrementation:\n");
-      print_statement(n_body);
-      pips_debug(5, "New whileloop statement:\n");
-      print_statement(wl_st);
-    }
-
-    wlseq = make_sequence(CONS(STATEMENT, init_st,
-			       CONS(STATEMENT, wl_st, NIL)));
-    /* Clean-up: only cond is reused */
-
-    /* They cannot be freed because a debugging statement at the end of
-       controlize does print the initial statement */
-
-    syntax_call(s_init) = call_undefined;
-    syntax_call(s_incr) = call_undefined;
-    free_expression(init);
-    free_expression(incr);
-  }
-
-  ifdebug(5) {
-    statement d_st =  make_statement(entity_empty_label(),
-				     STATEMENT_NUMBER_UNDEFINED,
-				     STATEMENT_ORDERING_UNDEFINED,
-				     string_undefined,
-				     make_instruction(is_instruction_sequence,
-						      wlseq),
-				     NIL,NULL,empty_extensions ());
-    /* Since we have replaced a statement that may have comments and
-       labels by a sequence, do not forget to forward them where they can
-       be: */
-    fix_sequence_statement_attributes(d_st);
-
-
-    pips_debug(5, "End with statement:\n");
-    print_statement(d_st);
-    statement_instruction(d_st) = instruction_undefined;
-    free_statement(d_st);
-  }
-
-  return wlseq;
-}
-
-
-
 
 /* Try to to transform the C-like for-loops into Fortran-like do-loops.
 
-   Assume we are in a gen_recurse since we use gen_get_recurse_ancestor(wl).
+   Assume we are in a gen_recurse since we use gen_get_recurse_ancestor(f).
  */
 void
 try_to_transform_a_for_loop_into_a_do_loop(forloop f) {
@@ -492,9 +393,21 @@ try_to_transform_a_for_loop_into_a_do_loop(forloop f) {
 
 /* For-loop to do-loop transformation phase.
 
+   This transformation transform for example a
+\begin{lstlisting}
+for (i = lb; i < ub; i += stride)
+  body;
+\end{lstlisting}
+   into a
+\begin{lstlisting}[language=fortran]
+do i = lb, ub - 1, stride
+  body
+end do
+\end{lstlisting}
+
    Now use pure local analysis on the code but we could imagine further
    use of semantics analysis some day...
- */
+*/
 bool
 for_loop_to_do_loop(char * module_name) {
   statement module_statement;
@@ -521,6 +434,181 @@ for_loop_to_do_loop(char * module_name) {
 		 a bottom-up way, : */
 	      gen_true,
 	      try_to_transform_a_for_loop_into_a_do_loop);
+  gen_stop_recurse_ancestor_tracking();
+
+  pips_assert("Statement should be OK after...", statement_consistent_p(module_statement));
+
+  pips_debug(2, "done\n");
+
+  debug_off();
+
+  /* Reorder the module, because some statements have been replaced. */
+  module_reorder(module_statement);
+
+  DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, module_statement);
+
+  reset_current_module_statement();
+  reset_current_module_entity();
+
+  /* Should have worked: */
+  return TRUE;
+}
+
+
+/** Build a sequence with a while-loop from for-loop parameters.
+
+    The API is a little weird to comply with the controlizer
+    implementation...
+*/
+sequence for_to_while_loop_conversion(expression init,
+				      expression cond,
+				      expression incr,
+				      statement body,
+				      string comments) {
+  pips_debug(5, "Begin\n");
+
+  statement init_st = make_expression_statement(init);
+  syntax s_init = expression_syntax(init);
+  statement incr_st = make_expression_statement(incr);
+  syntax s_incr = expression_syntax(incr);
+  sequence wlseq = sequence_undefined;
+
+  /* Build the loop body of the while with { body; incr_st; } : */
+  statement n_body = make_statement_from_statement_varargs_list(body,
+								incr_st,
+								NULL);
+  /* Build the while(cond) { n_body } statement: */
+  statement wl_st =  make_whileloop_statement(cond,
+					      n_body,
+					      STATEMENT_NUMBER_UNDEFINED,
+					      TRUE);
+
+  ifdebug(5) {
+    pips_debug(5, "Initialization statement:\n");
+    print_statement(init_st);
+    pips_debug(5, "Incrementation statement:\n");
+    print_statement(incr_st);
+    pips_debug(5, "New body statement with incrementation:\n");
+    print_statement(n_body);
+    pips_debug(5, "New whileloop statement:\n");
+    print_statement(wl_st);
+  }
+
+  wlseq = make_sequence(CONS(STATEMENT, init_st,
+			     CONS(STATEMENT, wl_st, NIL)));
+  /* Clean-up: only cond is reused */
+
+  /* They cannot be freed because a debugging statement at the end of
+     controlize does print the initial statement */
+
+  syntax_call(s_init) = call_undefined;
+  syntax_call(s_incr) = call_undefined;
+  free_expression(init);
+  free_expression(incr);
+
+  ifdebug(5) {
+    statement d_st =  make_statement(entity_empty_label(),
+				     STATEMENT_NUMBER_UNDEFINED,
+				     STATEMENT_ORDERING_UNDEFINED,
+				     string_undefined,
+				     make_instruction(is_instruction_sequence,
+						      wlseq),
+				     NIL, NULL, empty_extensions ());
+    /* Since we have replaced a statement that may have comments and
+       labels by a sequence, do not forget to forward them where they can
+       be: */
+    fix_sequence_statement_attributes(d_st);
+
+    pips_debug(5, "End with statement:\n");
+    print_statement(d_st);
+    statement_instruction(d_st) = instruction_undefined;
+    free_statement(d_st);
+  }
+
+  return wlseq;
+}
+
+
+/* Try to to transform the C-like for-loops into Fortran-like do-loops.
+
+   Assume we are in a gen_recurse since we use gen_get_recurse_ancestor(f).
+
+   The forloop is freed and replaced by a while loop in the statement
+   owning the for-loop
+ */
+void
+transform_a_for_loop_into_a_while_loop(forloop f) {
+  /* Get the instruction owning the forloop: */
+  instruction i = INSTRUCTION(gen_get_recurse_ancestor(f));
+  /* Get the statement owning instruction owning the forloop: */
+  statement st = STATEMENT(gen_get_recurse_ancestor(i));
+
+  /* Get a sequence with a while-loop instead: */
+  sequence wls = for_to_while_loop_conversion(forloop_initialization(f),
+					      forloop_condition(f),
+					      forloop_increment(f),
+					      forloop_body(f),
+					      statement_comments(st));
+
+  /* These three fields have been re-used or freed by the previous call */
+  forloop_initialization(f) = expression_undefined;
+  forloop_condition(f) = expression_undefined;
+  forloop_increment(f) = expression_undefined;
+  free_instruction(i);
+
+  /* Replace the previous for-loop by the new sequence with a
+     while-loop: */
+  statement_instruction(st) = make_instruction_sequence(wls);
+
+  /* Removed useless instructions that may remain: */
+  clean_up_sequences(st);
+}
+
+
+/* For-loop to while-loop transformation phase.
+
+   This transformation transforms a
+\begin{lstlisting}
+for (init; cond; update)
+  body;
+\end{lstlisting}
+    into a
+\begin{lstlisting}
+{
+  init;
+  while(cond) {
+    body;
+    update;
+  }
+}
+\end{lstlisting}
+*/
+bool
+for_loop_to_while_loop(char * module_name) {
+  statement module_statement;
+
+  /* Get the true ressource, not a copy, since we modify it in place. */
+  module_statement =
+    (statement) db_get_memory_resource(DBR_CODE, module_name, TRUE);
+
+  set_current_module_statement(module_statement);
+  entity mod = module_name_to_entity(module_name);
+  set_current_module_entity(mod);
+
+  debug_on("FOR_LOOP_TO_WHILE_LOOP_DEBUG_LEVEL");
+  pips_assert("Statement should be OK before...", statement_consistent_p(module_statement));
+
+  /* We need to access to the instruction containing the current
+     for-loops, so ask NewGen gen_recurse to keep this informations for
+     us: */
+  gen_start_recurse_ancestor_tracking();
+  /* Iterate on all the for-loops: */
+  gen_recurse(module_statement,
+	      forloop_domain,
+              /* Since for-loop statements can be nested, only restructure in
+		 a bottom-up way, : */
+	      gen_true,
+	      transform_a_for_loop_into_a_while_loop);
   gen_stop_recurse_ancestor_tracking();
 
   pips_assert("Statement should be OK after...", statement_consistent_p(module_statement));

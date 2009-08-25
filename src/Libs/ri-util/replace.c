@@ -76,23 +76,22 @@ static void replace_entity_loop_walker(loop l, struct entity_pair* thecouple)
 
 }
 
-/** 
- * @brief recursievly substitute new to old in s
- * 
+/**
+ * @brief Recursievly substitute an entity to an old one in a statement
+ *
  * @param s newgen type where the substitution must be done
  * @param old old entity
  * @param new new entity
  */
 void
-replace_entity(void* s, entity old, entity new)
-{
-    struct entity_pair thecouple = { old, new };
+replace_entity(void* s, entity old, entity new) {
+  struct entity_pair thecouple = { old, new };
 
-    gen_context_multi_recurse( s, &thecouple, expression_domain, gen_true, replace_entity_expression_walker,
-            statement_domain,gen_true, replace_entity_declaration_walker,
-			loop_domain,gen_true, replace_entity_loop_walker,
-			NULL);
-
+  gen_context_multi_recurse(s, &thecouple,
+			    expression_domain, gen_true, replace_entity_expression_walker,
+			    statement_domain, gen_true, replace_entity_declaration_walker,
+			    loop_domain, gen_true, replace_entity_loop_walker,
+			    NULL);
 }
 
 void
@@ -101,18 +100,22 @@ replace_entities(void* s, hash_table ht)
     HASH_MAP(k, v, replace_entity(s,(entity)k,(entity)v);, ht);
 }
 
+/** Replace an old reference by a reference to a new entity in a statement
+ */
 void
-replace_reference(void* s, reference old, entity new)
-{
-    /* if the reference is a scalar, it's similar to replace_entity, otherwise, it's replace_entity_by_expression */
-    if( ENDP(reference_indices(old)) )
-        replace_entity(s,reference_variable(old),new);
-    else {
-        expression e = make_expression(make_syntax_reference(copy_reference(old)),normalized_undefined);
-        replace_entity_by_expression(s,e,new);
-        free_expression(e);
-    }
+replace_reference(void* s, reference old, entity new) {
+  /* If the reference is a scalar, it's similar to replace_entity,
+     otherwise, it's replace_entity_by_expression */
+  if (ENDP(reference_indices(old)))
+    replace_entity(s, reference_variable(old), new);
+  else {
+    expression e = make_expression(make_syntax_reference(copy_reference(old)),
+				   normalized_undefined);
+    replace_entity_by_expression(s, e, new);
+    free_expression(e);
+  }
 }
+
 
 struct param { entity ent; expression exp; };
 static

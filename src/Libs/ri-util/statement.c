@@ -21,7 +21,7 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
- /* 
+ /*
     Function for statement, and its subtypes:
      - instruction
 
@@ -33,6 +33,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <malloc.h>
+#include <stdarg.h>
 
 #include "linear.h"
 
@@ -48,15 +49,24 @@
 #include "properties.h"
 #include "effects-simple.h"
 #include "preprocessor.h"
+#include "control.h"
 
+
+/** @defgroup statement_util Methods dealing with statements
+    @{
+*/
 
 /******************************************************* EMPTY STATEMENT */
 /* detects a statement with no special effect...
- */ 
+ */
 
 /* Define the static buffer size */
 #define STATIC_BUFFER_SZ 100
 
+
+/** @defgroup statement_predicate Statement predicate methods
+    @{
+*/
 
 static bool cannot_be_empty(bool *statement_is_empty)
 {
@@ -94,52 +104,6 @@ empty_code_list_p(list l)
     return true;
 }
 
-/*************************************************************** COUNT LOOPS */
-
-static int nseq, npar;
-static void loop_rwt(loop l)
-{
-    if (execution_parallel_p(loop_execution(l)))
-	npar++;
-    else
-	nseq++;
-}
-
-void number_of_sequential_and_parallel_loops(
-    statement stat,
-    int * pseq,
-    int * ppar)
-{
-    nseq=0, npar=0;
-    gen_multi_recurse(stat, loop_domain, gen_true, loop_rwt, NULL);
-    *pseq=nseq, *ppar=npar;
-}
-
-void print_number_of_loop_statistics(
-    FILE * out,
-    string msg,
-    statement s)
-{
-    int seq, par;
-    number_of_sequential_and_parallel_loops(s, &seq, &par);
-    fprintf(out, "%s: %d seq loops, %d par loops\n", msg, seq, par);
-}
-
-/* print out the number of sequential versus parallel loops.
- */
-void print_parallelization_statistics(
-    string module, /* the module name */
-    string msg,    /* an additional message */
-    statement s    /* the module statement to consider */)
-{
-    if (get_bool_property("PARALLELIZATION_STATISTICS"))
-    {
-	fprintf(stderr, "%s %s parallelization statistics", module, msg);
-	print_number_of_loop_statistics(stderr, "", s);
-    }
-}
-
-/****************************************************************************/
 
 bool
 empty_comments_p(string s)
@@ -251,14 +215,14 @@ statement st1, st2;
 	return( ORDERING_STATEMENT(o1) < ORDERING_STATEMENT(o2));
 }
 
-/* Statement classes induced from instruction type 
+/* Statement classes induced from instruction type
  *
  * Naming conflict between English, block_statement_p(), and NewGen convention
  * isntruction_loop_p()
  */
 
 /* See also macro statement_block_p() */
-bool 
+bool
 block_statement_p(statement s)
 {
     instruction i = statement_instruction(s);
@@ -420,7 +384,7 @@ empty_statement_or_continue_without_comment_p(statement st)
       return FALSE;
    if (continue_statement_p(st))
       return TRUE;
-   
+
    i = statement_instruction(st);
    if (instruction_block_p(i)) {
        MAP(STATEMENT, s,
@@ -511,44 +475,71 @@ statement stat;
 
 /** @} */
 
+/*************************************************************** COUNT LOOPS */
+
+static int nseq, npar;
+static void loop_rwt(loop l)
+{
+    if (execution_parallel_p(loop_execution(l)))
+	npar++;
+    else
+	nseq++;
+}
+
+void number_of_sequential_and_parallel_loops(
+    statement stat,
+    int * pseq,
+    int * ppar)
+{
+    nseq=0, npar=0;
+    gen_multi_recurse(stat, loop_domain, gen_true, loop_rwt, NULL);
+    *pseq=nseq, *ppar=npar;
+}
+
+void print_number_of_loop_statistics(
+    FILE * out,
+    string msg,
+    statement s)
+{
+    int seq, par;
+    number_of_sequential_and_parallel_loops(s, &seq, &par);
+    fprintf(out, "%s: %d seq loops, %d par loops\n", msg, seq, par);
+}
+
+/* print out the number of sequential versus parallel loops.
+ */
+void print_parallelization_statistics(
+    string module, /* the module name */
+    string msg,    /* an additional message */
+    statement s    /* the module statement to consider */)
+{
+    if (get_bool_property("PARALLELIZATION_STATISTICS"))
+    {
+	fprintf(stderr, "%s %s parallelization statistics", module, msg);
+	print_number_of_loop_statistics(stderr, "", s);
+    }
+}
+
+/****************************************************************************/
+
+
 
 /* functions to generate statements */
 
-statement make_empty_statement_with_declarations_and_comments(list d, string dt, string c)
-{
-    return(make_statement(entity_empty_label(),
-			  STATEMENT_NUMBER_UNDEFINED,
-			  STATEMENT_ORDERING_UNDEFINED,
-			  c,
-			  make_instruction_block(NIL),
-			  d,
-			  dt,
-			  empty_extensions () ));
-}
+/** Build a statement from a give instruction
 
-statement make_empty_statement()
-{
-    return(make_statement(entity_empty_label(),
-			  STATEMENT_NUMBER_UNDEFINED,
-			  STATEMENT_ORDERING_UNDEFINED,
-			  empty_comments,
-			  make_instruction_block(NIL),NIL,NULL,
-			  empty_extensions ()));
-}
-
-/* to be compared with instruction_to_statement() which is a macro (thanks to FC?) ! */
-
+    There is also a macro instruction_to_statement() that does the same job.
+*/
 statement
-make_stmt_of_instr(instr)
-instruction instr;
-{
-    return(make_statement(entity_empty_label(), 
-			  STATEMENT_NUMBER_UNDEFINED,
-			  STATEMENT_ORDERING_UNDEFINED, 
-			  empty_comments,
-			  instr,NIL,NULL,
-			  empty_extensions ()));
+make_stmt_of_instr(instruction instr) {
+  return(make_statement(entity_empty_label(),
+			STATEMENT_NUMBER_UNDEFINED,
+			STATEMENT_ORDERING_UNDEFINED,
+			empty_comments,
+			instr,NIL,NULL,
+			empty_extensions ()));
 }
+
 
 instruction
 make_assign_instruction(expression l,
@@ -574,45 +565,120 @@ statement make_assign_statement(expression l,
 }
 
 
-statement make_nop_statement()
-{
-    /* Attention: this function and the next one produce the same result,
-     * but they are not semantically equivalent. An empty block may be
-     * defined to be filled in, not to be used as a NOP statement.
-     */
-    statement s = make_empty_block_statement();
+/** @defgroup block_statement_constructors Block/sequence statement constructors
+    @{
+ */
 
-    return s;
-}
-
-statement make_empty_block_statement()
-{
-    statement b;
-
-    b = make_block_statement(NIL);
-
-    return b;
-}
-
-statement make_block_statement(list body)
-{
-    statement b;
-
-    b = make_statement(entity_empty_label(),
-			  STATEMENT_NUMBER_UNDEFINED,
-			  STATEMENT_ORDERING_UNDEFINED,
-			  empty_comments,
-			  make_instruction_block(body),NIL,NULL,
-			  empty_extensions ());
-
-    return b;
+/** Build an instruction block from a list of statements
+ */
+instruction make_instruction_block(list statements) {
+  return make_instruction_sequence(make_sequence(statements));
 }
 
 
-instruction make_instruction_block(list statements)
-{
-    return make_instruction_sequence(make_sequence(statements));
+/** Make a block statement from a list of statement
+ */
+statement make_block_statement(list body) {
+  statement b;
+
+  b = make_stmt_of_instr(make_instruction_block(body));
+  return b;
 }
+
+
+/** Build an empty statement (block/sequence)*/
+statement make_empty_block_statement() {
+  statement b = make_block_statement(NIL);
+  return b;
+}
+
+
+/** Build an empty statement with declaration text and comment */
+statement make_empty_statement_with_declarations_and_comments(list d,
+							      string dt,
+							      string c) {
+  statement s = make_block_statement(NIL);
+  statement_decls_text(s) = dt;
+  statement_comments(s) = dt;
+  return s;
+}
+
+
+/** Build a statement sequence from a statement list
+
+    @return :
+    - statement_undefined if the statement list is NIL
+    - the statement of a list with one statement, after discarding the list
+    - a statement block with the statement list else.
+*/
+statement
+make_statement_from_statement_list(list l) {
+  switch (gen_length(l)) {
+  case 0:
+    return statement_undefined;
+  case 1:
+    {
+      statement stat = STATEMENT(CAR(l));
+      gen_free_list(l);
+      return stat;
+    }
+  default:
+    return make_block_statement(l);
+  }
+}
+
+
+/** Build a statement sequence from a statement NULL-terminated varargs list
+
+    It is called with
+    make_statement_from_statement_varargs_list(s1, s2,..., sn, NULL)
+
+    @return a statement block with the statement list
+*/
+statement
+make_statement_from_statement_varargs_list(statement s, ...) {
+  va_list args;
+  /* The statement list */
+  list sl = NIL;
+
+  /* Analyze in args the variadic arguments that may be after s: */
+  va_start(args, s);
+  /* Since a variadic function in C must have at least 1 non variadic
+     argument (here the s), just skew the varargs analysis: */
+  for(;;) {
+    if (s == NULL)
+      /* No more statement */
+      break;
+    /* Use an O(n2) algorithm that would be enough to concatenate few
+       statements */
+    sl = gen_nconc(sl, CONS(STATEMENT, s, NIL));
+    /* Get the next argument: */
+    s = va_arg(args, statement);
+  }
+  /* Release the variadic analyzis: */
+  va_end(args);
+
+  /* Build a statement block from a normal list: */
+  return make_block_statement(sl);
+}
+
+
+/** Build a statement block from a statement if not already a statement
+    block.
+
+    @return the new block statement or the old statement
+ */
+statement
+make_block_with_stmt_if_not_already(statement stmt) {
+  if (block_statement_p(stmt))
+    /* It is already a block statement */
+    return stmt;
+  else
+    return make_block_statement(CONS(STATEMENT, stmt, NIL));
+}
+
+/** @} */
+
 
 statement make_return_statement(entity module)
 {
@@ -632,7 +698,7 @@ statement make_return_statement(entity module)
 
 statement make_stop_statement(string message)
 {
-     list args=NIL; 
+     list args=NIL;
      expression e;
 
      e = make_call_expression(MakeConstant(message,is_basic_string),NIL);
@@ -742,6 +808,9 @@ string c; /* comments, default empty_comments (was: "" (was: string_undefined)) 
   return cs;
 }
 
+
+/** Build a statement from a given expression
+ */
 statement make_expression_statement(expression e)
 {
   instruction i = make_instruction_expression(e);
@@ -749,7 +818,8 @@ statement make_expression_statement(expression e)
 
   return s;
 }
-
+
+
 /* Extract the body of a perfectly nested loop body.
  */
 statement
@@ -1087,22 +1157,23 @@ allocate_number_to_statement()
 
     return nts;
 }
-
-/* get rid of all labels in controlized code before duplication: all
- * labels have become useless and they cannot be freely duplicated.
- *
- * One caveat: FORMAT statements!
- */
-statement 
-clear_labels(s)
-statement s;
-{
-    gen_recurse(s, statement_domain, gen_true, clear_label);
-    clean_up_sequences(s);
-    return s;
+
+
+/** Get rid of all labels in controlized code before duplication
+
+    All labels have become useless and they cannot be freely duplicated.
+
+    One caveat: FORMAT statements!
+*/
+statement
+clear_labels(statement s) {
+  gen_recurse(s, statement_domain, gen_true, clear_label);
+  clean_up_sequences(s);
+  return s;
 }
 
-void 
+
+void
 clear_label(s)
 statement s;
 {
@@ -1118,38 +1189,15 @@ statement s;
 	    entity_empty_label();
 }
 
-/* Build a statement sequence from a statement list if there are more than
- * one statement or return the statement itself after discarding the list.
- */
+
 statement
-list_to_statement(l)
-list l;
-{
-    switch (gen_length(l))
-    {
-    case 0:
-	return(statement_undefined);
-    case 1:
-    {
-	statement stat=STATEMENT(CAR(l));
-	gen_free_list(l);
-	return(stat);
-    }
-    default:
-	return(make_block_statement(l));
-    }
-
-    return(statement_undefined);
-}
-
-statement 
 st_make_nice_test(condition, ltrue, lfalse)
 expression condition;
 list ltrue,lfalse;
 {
     statement
-	stattrue = list_to_statement(ltrue),
-	statfalse = list_to_statement(lfalse);
+	stattrue = make_statement_from_statement_list(ltrue),
+	statfalse = make_statement_from_statement_list(lfalse);
     bool
 	notrue=(stattrue==statement_undefined),
 	nofalse=(statfalse==statement_undefined);
@@ -1223,31 +1271,6 @@ statement makeloopbody(loop l, statement s_old, bool inner_p)
     return(l_body);
 }
 
-
-/* statement make_block_with_stmt(statement stmt): makes sure that the given
- * statement "stmt" is a block of instructions. If it is not the case, this
- * function returns a new statement with a block of one statement. This
- * statement is "stmt".
- * If "stmt" is already a block, it is returned unmodified.
- */
-statement 
-make_block_with_stmt(stmt)
-statement stmt;
-{
-    if (instruction_tag(statement_instruction(stmt)) != is_instruction_block)
-    {
-	/* We create a new statement with an empty block of instructions.
-	 * "make_empty_statement()" is defined in Lib/ri-util, it creates a statement
-	 * with a NIL instruction block. */
-	statement block_stmt = make_empty_statement();
-
-	/* Then, we put the statement "stmt" in the block. */
-	instruction_block(statement_instruction(block_stmt)) = CONS(STATEMENT,
-								    stmt, NIL);
-	return (block_stmt);
-    }
-    return (stmt);
-}
 
 /* Does work neither with undefined statements nor with defined
    statements with undefined instructions. Returns a statement
@@ -2958,3 +2981,5 @@ list find_statements_with_pragma(statement s, string begin)
 
 
 /* That's all folks */
+
+/** @} */

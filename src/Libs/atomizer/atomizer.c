@@ -566,11 +566,11 @@ Block *cb;
      * resulting block contains only one statement !!).
      */
     debug(2, "atomizer_of_test", "begin TEST IF\n");
-    test_true(t) = make_block_with_stmt(test_true(t));
+    test_true(t) = make_block_with_stmt_if_not_already(test_true(t));
     atomizer_of_statement(test_true(t), cb);
 
     debug(2, "atomizer_of_test", "begin TEST ELSE\n");
-    test_false(t) = make_block_with_stmt(test_false(t));
+    test_false(t) = make_block_with_stmt_if_not_already(test_false(t));
     atomizer_of_statement(test_false(t), cb);
 
     debug(2, "atomizer_of_test", "end   TEST\n");
@@ -629,7 +629,7 @@ Block *cb;
      * statement is not a block of statements, then it is put inside one (the
      * resulting block contains only one statement !!).
      */
-    loop_body(l) = make_block_with_stmt(loop_body(l));
+    loop_body(l) = make_block_with_stmt_if_not_already(loop_body(l));
     atomizer_of_statement(loop_body(l), cb);
 
     debug(2, "atomizer_of_loop", "end LOOP\n");

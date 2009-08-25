@@ -6265,6 +6265,22 @@ Since in PIPS some transformations and analysis are more precise for
 Fortran code, this is a transformation than try to transform the C-like
 for-loops into Fortran-like do-loops. Don't worry about the C-code output:
 the prettyprinter output do-loop as for-loop if the C-output is selected.
+The do-loop construct is interesting since the iteration set is computed
+at the loop entry (for example it is not sensible to the index
+modification from the inside of the loop) and this simplify abstract
+interpretation a lot.
+
+This transformation transform for example a
+\begin{lstlisting}
+for (i = lb; i < ub; i += stride)
+  body;
+\end{lstlisting}
+into a
+\begin{lstlisting}[language=fortran]
+do i = lb, ub - 1, stride
+  body
+end do
+\end{lstlisting}
 
 \begin{PipsMake}
 alias for_loop_to_do_loop 'For-loop to do-loop transformation'
@@ -6274,10 +6290,67 @@ for_loop_to_do_loop          > MODULE.code
         < MODULE.code
 \end{PipsMake}
 
+
+\subsubsection{For-loop to while-loop transformation}
+\label{sec:loop-while-loop}
+
+Since in PIPS some transformations and analysis may not be implemented for
+C for-loop but may be implemented for while-loop, it is interesting to
+have this for-loop to while-loop desugaring transformation.
+
+This transformation transforms a
+\begin{lstlisting}
+for (init; cond; update)
+  body;
+\end{lstlisting}
+into a
+\begin{lstlisting}
+{
+  init;
+  while(cond) {
+    body;
+    update;
+  }
+}
+\end{lstlisting}
+
+Since analysis are more precise on do-loops, you should apply a
+\verb|for_loop_to_do_loop| transformation first
+(\S\ref{sec:loop-do-loop}), and only after, apply this
+\verb|for_loop_to_while_loop| transformation that will transform the
+remaining for-loops into while loops.
+
+\begin{PipsMake}
+alias for_loop_to_while_loop 'For-loop to while-loop transformation'
+
+for_loop_to_while_loop          > MODULE.code
+        < PROGRAM.entities
+        < MODULE.code
+\end{PipsMake}
+
+
 \subsubsection{Do-while to while-loop transformation}
 \label{sec:do-while to while-loop}
 
-Some transformations only work on while loops \dots{}
+Some transformations only work on while loops, thus it is useful to have
+this transformation that transforms a
+\begin{lstlisting}
+do {
+  body;
+} while (cond);
+\end{listing}
+into a
+\begin{lstlisting}
+{
+  body;
+}
+while (cond) {
+  body;
+}
+\end{listing}
+
+It is a transformation useful before while-loop to for-loop recovering for
+example (see \S~\ref{sec:loop-recovering}).
 
 \begin{PipsMake}
 alias dowhile_to_while 'Do-while to while-loop transformation'
@@ -6286,6 +6359,7 @@ dowhile_to_while          > MODULE.code
         < PROGRAM.entities
         < MODULE.code
 \end{PipsMake}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SPAGHETTIFY
 
@@ -7345,9 +7419,9 @@ This second implementation is based on the array region analyses phase which ben
 
 If none of these two properties are satisfied, we consider the
 approximation of region. In case of MUST region, if the exact bound checks
-can be generated, they will be inserted before the block of code. If not, like in
-case of MAY region, we continue to go down to the children nodes in the
-control flow graph.   
+can be generated, they will be inserted before the block of code. If not,
+like in case of MAY region, we continue to go down to the children nodes
+in the control flow graph.
 
  The main advantage
 of this algorithm is that it permits to detect the sure bound violations

@@ -1371,6 +1371,13 @@ the variable is unsigned, signed or not */
 /* Empty comments (i.e. default comments) */
 #define empty_comments string_undefined
 
+/** An alias for make_empty_block_statement */
+#define make_empty_statement make_empty_block_statement
+
+/** An alias for make_empty_block_statement */
+#define make_nop_statement make_empty_block_statement
+
+
 /* \addtogroup control_visitors */
 
 /* @{ */
@@ -1548,6 +1555,7 @@ the variable is unsigned, signed or not */
 
 
 /* @} */
+
 
 /* that is all for ri-util-local.h
  */

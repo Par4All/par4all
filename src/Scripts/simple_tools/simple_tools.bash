@@ -50,9 +50,9 @@ setproperty PRETTYPRINT_C_CODE TRUE
 echo Do not display original number lines as comment:
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 echo If possible, transform simple for-loops into do-loop à la Fortran, simpler to analyze:
-setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+apply FOR_LOOP_TO_DO_LOOP[%ALLFUNC]
 echo Desugaring other for-loops into plain while-loops fot the time we improve semantics ameliorations in PIPS:
-setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
+apply FOR_LOOP_TO_WHILE_LOOP[%ALLFUNC]
 
 EOF
 }
