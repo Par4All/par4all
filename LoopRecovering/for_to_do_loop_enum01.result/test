@@ -1,0 +1,37 @@
+int main()
+{
+   int a[100];
+   int i;
+   int j;
+   
+   // A do loop ! Should be parallel
+   for (i = LB;i<UB;i += INC)                                           /*0007*/
+      a[i] = 2;                                                         /*0008*/
+
+   return 0;                                                            /*0010*/
+}
+int main()
+{
+   int a[100];
+   int i;
+   int j;
+   
+   // A do loop ! Should be parallel
+   for(i = LB; i <= 99; i += INC)                                       /*0007*/
+      a[i] = 2;                                                         /*0008*/
+
+   return 0;                                                            /*0010*/
+}
+int main()
+{
+   int a[100];
+   int i;
+   int j;
+   
+   // A do loop ! Should be parallel
+#pragma omp parallel for 
+   for(i = LB; i <= 99; i += INC)                                       /*0007*/
+      a[i] = 2;                                                         /*0008*/
+
+   return 0;                                                            /*0010*/
+}
