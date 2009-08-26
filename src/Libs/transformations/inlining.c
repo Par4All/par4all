@@ -308,17 +308,21 @@ statement inline_expression_call(inlining_parameters p, expression modified_expr
     statement_declarations(expanded) = gen_full_copy_list( statement_declarations(expanded) ); // simple copy != deep copy
 
     /* should add them to modified_module's*/
+    string cu_name = compilation_unit_of_module(get_current_module_name());
+    string mln = module_local_name(inlined_module(p));
     set inlined_referenced_entities = get_referenced_entities(inlined_module_statement(p));
     list new_externs = NIL;
     SET_FOREACH(entity,ref_ent,inlined_referenced_entities)
     {
-        if(!entity_enum_member_p(ref_ent)){
+        if(!entity_enum_member_p(ref_ent))
+        {
             string emn = entity_module_name(ref_ent);
-            string mln = module_local_name(inlined_module(p));
-            if(! same_string_p(emn,mln) ) /* we should add ref_ent to the declarations */
+            if(! same_string_p(emn,mln) &&
+                !same_string_p(emn,cu_name) )
             {
                 entity add = ref_ent;
-                if(entity_variable_p(ref_ent) && !top_level_entity_p(ref_ent)) /* make it global instead of static ...*/
+                if(entity_variable_p(ref_ent) && 
+                        !top_level_entity_p(ref_ent)) /* make it global instead of static ...*/
                 {
                     pips_user_warning("replacing static variable by a global one, this may lead to incorrect code\n");
                     add = make_global_entity_from_local(ref_ent);
@@ -668,7 +672,7 @@ void inline_split_declarations(statement s, entity inlined_module)
             instruction_block(statement_instruction(s))=gen_nconc(gen_nreverse(prelude),statement_block(s));
     }
     else if(!ENDP(statement_declarations(s)))
-        pips_internal_error("only blocks should have declarations");
+        pips_user_warning("only blocks should have declarations\n");
 }
 
 /* this should replace all call to `inlined' in `module'
