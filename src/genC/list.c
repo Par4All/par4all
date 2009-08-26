@@ -582,6 +582,8 @@ int gen_occurences(const void * vo, const list l)
   return n;
 }
 
+/* FC: ARGH...O(n^2)!
+*/
 bool gen_once_p(list l)
 {
     list c;
