@@ -5973,6 +5973,7 @@ FREIA_REMOVE_DUPLICATE_OPERATIONS TRUE
 This is a test to implement a loop-invariant code motion.
 
 A side effect of this transformation is that the code is parallelized too.
+If you don't want this side effect, you can check \ref{subsection-expression-optimizations} which does a pretty nice job too.
 %%!UserManualDocumentation
 
 \begin{PipsMake}
@@ -6932,8 +6933,8 @@ expressions of mixed types such as \verb|X+1| where \verb|1| is implictly
 promoted from integer to real.
 
 \textbf{Warning}: this phase relies on an external (and unavailable) binary.
-To make it work, you can set \verb+EOLE_OPTIMIZATION_STRATEGY+ to \verb+"CSE"+.
-This will only activate common subexpressions elimination.
+To make it work, you can set \verb+EOLE_OPTIMIZATION_STRATEGY+ to \verb+"CSE"+ or \verb+"ICM"+
+This will only activate common subexpressions eliminationor invariant code motion.
 
 %%!UserManualDocumentation
 
