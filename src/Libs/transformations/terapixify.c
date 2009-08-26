@@ -229,6 +229,7 @@ bool normalize_microcode( char * module_name)
     /* make sure 
      * - only do loops remain
      * - no call to external functions
+     * - no float / double etc (TODO)
      */
     gen_context_multi_recurse(get_current_module_statement(),&can_terapixify,
             whileloop_domain,cannot_terapixify,gen_null,
@@ -237,6 +238,7 @@ bool normalize_microcode( char * module_name)
             NULL);
 
     /* now, try to guess the goal of the parameters 
+     * - parameters are 16 bits signed integers (TODO)
      * - read-only arrays might be mask, but can also be images (depend of their size ?)
      * - written arrays must be images
      * - integer are loop parameters
