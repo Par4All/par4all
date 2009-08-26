@@ -1,0 +1,33 @@
+
+Initial code
+
+void flatten_code10(void)
+{
+// (0,1)
+   // BEGIN BLOCK
+   int i = 2;
+   {
+// (0,2)
+      // BEGIN BLOCK
+      extern int foo;
+// (0,3)
+
+      fprintf(stderr, "Hello world!\n");                                /*0009*/
+      // END BLOCK
+   }
+   // END BLOCK
+}
+
+Code after flatten_code
+
+void flatten_code10(void)
+{
+// (0,1)
+   // BEGIN BLOCK
+   int i = 2;
+   extern int foo;
+// (0,2)
+
+   fprintf(stderr, "Hello world!\n");                                   /*0009*/
+   // END BLOCK
+}

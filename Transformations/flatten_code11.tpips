@@ -1,0 +1,60 @@
+delete flatten_code11
+
+setproperty ABORT_ON_USER_ERROR TRUE
+setproperty PRETTYPRINT_BLOCKS TRUE
+
+create flatten_code11 flatten_code11.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER   FALSE
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER  TRUE
+
+setproperty PRETTYPRINT_STATEMENT_ORDERING TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER   TRUE
+
+echo
+echo Execute initial code
+echo
+
+shell gcc flatten_code11.c
+shell ./a.out
+
+echo
+echo Initial code
+echo
+display PRINTED_FILE[flatten_code11]
+
+echo
+echo Code with preconditions
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[flatten_code11]
+
+echo
+echo Code after code flattening
+echo
+
+apply FLATTEN_CODE[flatten_code11]
+activate PRINT_CODE
+display PRINTED_FILE[flatten_code11]
+
+echo
+echo Unsplit and compile resulting code
+echo
+
+apply UNSPLIT
+# shell cat flatten_code11.database/Src/flatten_code11.c
+shell gcc flatten_code11.database/Src/flatten_code11.c
+
+echo
+echo Execute resulting code
+echo
+
+shell ./a.out
+
+close
+delete flatten_code11
+quit
+
