@@ -222,8 +222,13 @@ static bool redeclaration_enter_statement(statement s, redeclaration_context_t *
 	}
 	else if(rdcp->cycle_depth>0) {
 	  /* We are in a control cycle. The initial value must be
-	     reassigned where the declaration was. */
-	  if(expression_is_C_rhs_p(ie)) {
+	     reassigned where the declaration was, if the variable is
+	     not static. */
+	  if(variable_static_p(v)) {
+	    redeclare_p = TRUE;
+	    move_initialization_p = TRUE;
+	  }
+	  else if(expression_is_C_rhs_p(ie)) {
 	    redeclare_p = TRUE;
 	    move_initialization_p = FALSE;
 	  }
