@@ -286,10 +286,29 @@ recompile_module(char* module)
     reset_current_module_entity();
     reset_current_module_statement();
 
+    /* the ugliest glue ever produced by SG 
+     * needed to get all the declarations etc right : we must call unsplit before
+     * unfortunetly we do it without calling pipsmake, so handle it by hand
+     * signed: SG
+     */
+    string cu = compilation_unit_of_module(module);
+    {
+        gen_array_t modules = db_get_module_list_initial_order();
+        int n = gen_array_nitems(modules), i;
+        for (i=0; i<n; i++)
+        {
+            string m = gen_array_item(modules, i);
+            if(!db_resource_required_or_available_p(DBR_CODE,m))
+                controlizer(m);
+            if(!db_resource_required_or_available_p(DBR_PRINTED_FILE,m))
+                print_code(m);
+        }
+        unsplit(cu);
+    }
+
     bool parsing_ok =(fortran_module_p(modified_module)) ? parser(module) : c_parser(module);
     if(!parsing_ok)
         pips_user_error("failed to recompile module");
     if(!controlizer(module))
         pips_user_warning("failed to apply controlizer after recompilation");
-
 }
