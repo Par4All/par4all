@@ -1928,7 +1928,8 @@ list generic_c_words_entity(type t, list name, bool is_safe, bool add_dummy_para
 
 	if(add_dummy_parameter_name_p
 	   && string_undefined_p(pn)
-	   && !type_varargs_p(t1)) {
+	   && !type_varargs_p(t1)
+	   && !type_void_p(t1)) {
 	  /* RK wants us to use another better function than itoa, but
 	     its name is not documented next to itoa() source code and
 	     here the string is going to be strduped, which makes
