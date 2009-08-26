@@ -153,7 +153,7 @@ set s ;
 {
     fprintf( stderr, "\t%s ", msg ) ;
     SET_MAP( st, {
-	fprintf(stderr, ",%p (%td) ", 
+	fprintf(stderr, ",%p (%td) ",
 		st, statement_number( (statement)st ));
     }, s ) ;
     fprintf( stderr, "\n" );
@@ -199,8 +199,7 @@ hash_table defs_table()
 /* VERTEX_STATEMENT returns the vertex associated to the statement ST in the
    dependence graph DG. */
 
-static vertex vertex_statement( st ) 
-statement st ;
+static vertex vertex_statement(statement st)
 {
     vertex v = (vertex)hash_get(Vertex_statement,(char *)st) ;
 
@@ -508,10 +507,10 @@ static void genkill_whileloop(whileloop l, statement st)
     list locals = statement_declarations(st);
 
     genkill_statement( b ) ;
-    
+
     set_union( gen, gen,  GEN( b )) ;
     set_union( ref, ref, REF( b )) ;
-   
+
     if( get_bool_property( "CHAINS_MASK_EFFECTS" )) {
 	mask_effects( gen, locals ) ;
 	mask_effects( ref, locals ) ;
@@ -528,7 +527,7 @@ cons *sts ;
 statement st ;
 {
     statement one ;
-    
+
     if( !ENDP( sts )) {
 	set diff = MAKE_STATEMENT_SET() ;
 	set gen = MAKE_STATEMENT_SET() ;
@@ -536,7 +535,7 @@ statement st ;
 	set kill_st = KILL( st ) ;
 	set gen_st = GEN( st ) ;
 	set ref_st = REF( st ) ;
-	
+
 	genkill_block( CDR( sts ), st ) ;
 	genkill_statement( one = STATEMENT( CAR( sts ))) ;
 	set_difference( diff, GEN( one ), kill_st) ;
@@ -630,11 +629,11 @@ statement st ;
 	genkill_unstructured( instruction_unstructured( i ), st ) ;
 	break ;
     case is_instruction_call:
+    case is_instruction_expression:
     case is_instruction_goto:
 	break ;
     default:
-	pips_error( "genkill_instruction",
-		    "unexpected tag %d\n", instruction_tag(i));
+	pips_internal_error("unexpected tag %d\n", instruction_tag(i));
     }
 }
 
@@ -776,7 +775,8 @@ static void inout_forloop(statement st, forloop fl)
     set_union( REF_OUT( st ), REF_OUT( flb ), REF_IN( st )) ;
 }
 
-static void inout_call(statement st, call c)
+static void inout_call(statement st,
+		       call __attribute__ ((unused)) c)
 {
     set diff = MAKE_STATEMENT_SET() ;
 
@@ -850,7 +850,7 @@ static void inout_statement(statement st)
     */
 
     ifdebug(2) {
-	fprintf( stderr, "%*s> Computing DEF_IN and OUT of statement %p (%td):\n", 
+	fprintf( stderr, "%*s> Computing DEF_IN and OUT of statement %p (%td):\n",
 		 indent++, "", st, statement_number( st )) ;
 	local_print_statement_set( "DEF_IN", DEF_IN( st )) ;
 	local_print_statement_set( "DEF_OUT", DEF_OUT( st )) ;
@@ -881,6 +881,10 @@ static void inout_statement(statement st)
     case is_instruction_call:
 	inout_call( st, instruction_call( i )) ;
 	break ;
+    case is_instruction_expression:
+      /* The second argument is not used */
+      inout_call( st, (call) instruction_expression( i )) ;
+	break ;
     case is_instruction_goto:
 	pips_error( "inout_statement", "Unexpected tag %d\n", i ) ;
 	break ;
@@ -888,10 +892,10 @@ static void inout_statement(statement st)
 	inout_unstructured( st, instruction_unstructured( i )) ;
 	break ;
     default:
-	pips_error( "inout_statement", "Unknown tag %d\n", i ) ;
+      pips_internal_error("Unknown tag %d\n", instruction_tag(i) ) ;
     }
     ifdebug(2) {
-	fprintf( stderr, "%*s> Statement %p (%td):\n", 
+	fprintf( stderr, "%*s> Statement %p (%td):\n",
 		 indent--, "", st, statement_number( st )) ;
 	local_print_statement_set( "DEF_IN", DEF_IN( st )) ;
 	local_print_statement_set( "DEF_OUT", DEF_OUT( st )) ;
@@ -929,7 +933,7 @@ control ct ;
     }
 
     ifdebug(2) {
-	fprintf(stderr, "Computing DEF_IN and OUT of control %p entering", 
+	fprintf(stderr, "Computing DEF_IN and OUT of control %p entering",
 		ct ) ;
 	local_print_statement_set( "", DEF_IN( control_statement( ct ))) ;
     }
@@ -952,11 +956,11 @@ control ct ;
 
     for( change = TRUE ; change ; ) {
 	ifdebug(3) {
- 	    fprintf( stderr, "Iterating on %p ...\n", ct ) ;
+	  fprintf( stderr, "Iterating on %p ...\n", ct ) ;
 	}
 	change = FALSE ;
 
-	CONTROL_MAP( b, 
+	CONTROL_MAP( b,
 	    {statement st = control_statement( b ) ;
 
 	     set_clear( d_out ) ;
@@ -970,7 +974,7 @@ control ct ;
 	     set_union( DEF_IN( st ), DEF_IN( st ), d_out ) ;
 	     set_union( REF_IN( st ), REF_IN( st ), r_out ) ;
 	     set_assign( d_oldout, DEF_OUT( st )) ;
-	     set_union( DEF_OUT( st ), GEN( st ), 
+	     set_union( DEF_OUT( st ), GEN( st ),
 		       set_difference( diff, DEF_IN( st ), KILL( st ))) ;
 	     set_assign( r_oldout, REF_OUT( st )) ;
 	     set_union( REF_OUT( st ), REF( st ), REF_IN( st )) ;
@@ -1022,7 +1026,7 @@ cons *cfs ;
     */
     c = make_conflict( fin, fout, cone_undefined) ;
     ifdebug(2) {
-	fprintf( stderr, "Adding %s->%s\n", 
+	fprintf( stderr, "Adding %s->%s\n",
 		entity_name( effect_entity( fin )),
 		entity_name( effect_entity( fout ))) ;
     }
@@ -1198,7 +1202,8 @@ statement st ;
 	usedef_statement( forloop_body( instruction_forloop( i ))) ;
 	break ;
     case is_instruction_call:
-    case is_instruction_goto:
+    case is_instruction_expression:
+    case is_instruction_goto: // should lead to a core dump
 	break ;
     case is_instruction_unstructured:
 	usedef_control( unstructured_control( instruction_unstructured( i ))) ;
@@ -1324,6 +1329,12 @@ static list load_statement_effects(statement st)
 	    le = gen_append(l_in,l_out);
 	    break;
 	}
+	/* else, flow thru! */
+    case is_instruction_expression:
+      /* FI: I wonder about iorgch; I would expect the same kind of
+	 stuff for the case expression, which may also hide a call to
+	 a user defined function, for instance via a for loop
+	 construct. */
     case is_instruction_block:
     case is_instruction_test:
     case is_instruction_loop:

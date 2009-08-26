@@ -40,7 +40,7 @@ void clean_enclosing_loops(void)
     /* warning: there are shared lists...
      */
     hash_table seen = hash_table_make(hash_pointer, 0);
-    
+
     STATEMENT_MAPPING_MAP(s, l, 
     {
 	if (l && !hash_defined_p(seen, l))
@@ -57,14 +57,13 @@ void clean_enclosing_loops(void)
 
 static void rloops_mapping_of_statement();
 
-static void 
-rloops_mapping_of_unstructured(
+static void rloops_mapping_of_unstructured(
     statement_mapping m,
     list loops,
     unstructured u)
 {
     list blocs = NIL ;
-	  
+
     CONTROL_MAP(c, rloops_mapping_of_statement(m, loops, control_statement(c)),
 		unstructured_control(u), blocs) ;
 
@@ -72,10 +71,9 @@ rloops_mapping_of_unstructured(
 }
 
 static void
-rloops_mapping_of_statement(
-    statement_mapping m,
-    list loops,
-    statement s)
+rloops_mapping_of_statement(statement_mapping m,
+			    list loops,
+			    statement s)
 {
     instruction i = statement_instruction(s);
 
@@ -88,7 +86,7 @@ rloops_mapping_of_statement(
 	    instruction_block(i));
 	break;
 
-      case is_instruction_loop: 
+      case is_instruction_loop:
       {
 	  list nl = gen_nconc(gen_copy_seq(loops), CONS(STATEMENT, s, NIL));
 	  Nbrdo++;
@@ -107,6 +105,8 @@ rloops_mapping_of_statement(
 	break;
 
       case is_instruction_call:
+	break;
+      case is_instruction_expression:
 	break;
       case is_instruction_goto:
 	pips_internal_error("Go to instruction in CODE internal representation\n");

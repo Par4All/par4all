@@ -104,7 +104,7 @@ static void scan_statement(statement s, list loops)
     case is_instruction_loop: {
 	loop l = instruction_loop(i);
 	statement b = loop_body(l);
-	list new_loops = 
+	list new_loops =
 		gen_nconc(gen_copy_seq(loops), CONS(STATEMENT, s, NIL)) ;
 	list locals = NIL ;
 
@@ -128,7 +128,7 @@ static void scan_statement(statement s, list loops)
 	test t = instruction_test( i ) ;
 
 	scan_statement( test_true( t ), loops ) ;
-	scan_statement( test_false( t ), loops ) ;	
+	scan_statement( test_false( t ), loops ) ;
 	break ;
     }
     case is_instruction_whileloop: {
@@ -143,10 +143,11 @@ static void scan_statement(statement s, list loops)
 	scan_statement(b, loops ) ;
 	break;
     }
-   case is_instruction_unstructured: 
+   case is_instruction_unstructured:
 	scan_unstructured( instruction_unstructured( i ), loops ) ;
 	break ;
     case is_instruction_call:
+    case is_instruction_expression:
     case is_instruction_goto:
 	break ;
     default:
