@@ -21,6 +21,6 @@ int main(void)
       /*0004*/
       _return0 = 0;                                                     /*0009*/
    }
-   _return0;                                                            /*0012*/
-   return 0;                                                            /*0013*/
+   _return0;                                                            /*0013*/
+   return 0;                                                            /*0014*/
 }

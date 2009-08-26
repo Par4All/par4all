@@ -23,10 +23,10 @@ int main(void)
       const char *foo_fun = __FUNCTION__;
       _return0 = (char *) foo_fun;                                      /*0009*/
    }
-   fun = _return0;                                                      /*0012*/
-   fun2 = __FUNCTION__;                                                 /*0013*/
+   fun = _return0;                                                      /*0013*/
+   fun2 = __FUNCTION__;                                                 /*0014*/
    /*0006*/
-   fun3 = __func__;                                                     /*0014*/
+   fun3 = __func__;                                                     /*0015*/
    /*0007*/
-   return 0;                                                            /*0015*/
+   return 0;                                                            /*0016*/
 }

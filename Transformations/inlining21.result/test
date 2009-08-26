@@ -27,8 +27,8 @@ int main(void)
       /*0004*/
       _return0 = 0;                                                     /*0008*/
    }
-   _return0;                                                            /*0011*/
-   return 0;                                                            /*0012*/
+   _return0;                                                            /*0012*/
+   return 0;                                                            /*0013*/
 }
 
 Unsplit resulting code
