@@ -1,0 +1,48 @@
+
+Parsed printed file
+
+void generate12()
+{
+   int i;
+   int j;
+   extern void func(void);
+
+   func();
+}
+
+Printed file
+
+void generate12()
+{
+   int i;
+   int j;
+   extern void func(void);
+
+   func();
+}
+
+Printed file generate12 with intraprocedural preconditions
+
+
+//  P() {}
+
+void generate12()
+{
+   int i;
+   int j;
+   extern void func(void);
+
+//  P() {}
+
+
+   func();
+}
+
+Printed file func with intraprocedural preconditions
+
+
+//  P() {}
+
+void func(void)
+{
+}
