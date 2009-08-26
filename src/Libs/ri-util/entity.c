@@ -1717,6 +1717,9 @@ entity make_entity_copy(entity e)
    Depending on the language, the new entity might have to be inserted
    in statement declarations. This is left up to the user of this function.
 
+   For C, name collisions with the compilation unit are not checked
+   here. They are unlikely, but should be checked by the caller.
+
    @return the new entity.
 */
 entity make_entity_copy_with_new_name(entity e,
