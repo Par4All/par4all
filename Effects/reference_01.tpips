@@ -1,0 +1,12 @@
+delete reference_01
+create reference_01 reference_01.c
+setproperty PRETTYPRINT_C_CODE TRUE
+activate C_PARSER
+display PRINTED_FILE[reference_01]
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[reference_01]
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[reference_01]
+close
+delete reference_01
+quit
