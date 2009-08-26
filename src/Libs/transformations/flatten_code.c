@@ -200,10 +200,13 @@ static bool redeclaration_enter_statement(statement s, redeclaration_context_t *
 
       if(strcmp(mn, vmn)!=0) {
 	/* This is not a local variable. Its declaration can be
-	   moved. */
-	statement_declarations(rdcp->declaration_statement) =
-	  gen_nconc(statement_declarations(rdcp->declaration_statement),
-		    CONS(ENTITY, v, NIL));
+	   moved if not already there. */
+	statement ds = rdcp->declaration_statement;
+	list dv = statement_declarations(ds);
+
+	if(!entity_is_argument_p(v, dv)) {
+	  statement_declarations(ds) = gen_nconc(dv, CONS(ENTITY, v, NIL));
+	}
 	hash_put(rdcp->renamings, v, v);
       }
       else { /* This is a block local stack allocated or static
