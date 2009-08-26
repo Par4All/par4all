@@ -1,0 +1,39 @@
+int dilate(void)
+{
+   int i;
+   if (0)
+      ;
+   else
+      return 1;
+
+   return 0;
+}
+int erode(void)
+{
+   return 0;
+}
+int gradient(void)
+{
+   dilate();
+   erode();
+   return 0;
+}
+int gradient(void)
+{
+   int _return1;
+   int _return0;
+   {
+      int i;
+      if (0) goto l99999;
+      _return0 = 1;
+      goto l99995;
+l99999:      ;
+
+      _return0 = 0;
+l99995:      ;
+   }
+   _return0;
+   _return1 = 0;
+   _return1;
+   return 0;
+}

@@ -1,0 +1,26 @@
+int bla(foo *i)
+{
+   foo *j;
+   j = allo(i->bpp);                                                    /*0004*/
+   return 0;                                                            /*0005*/
+}
+int main(void)
+{
+   foo *m;
+   bla(m);                                                              /*0015*/
+   return 0;                                                            /*0016*/
+}
+int main(void)
+{
+   int _return0;
+   foo *m;
+   {
+      foo *j;
+      extern foo *allo(int f1);
+      j = allo(m->bpp);                                                 /*0008*/
+      /*0004*/
+      _return0 = 0;                                                     /*0009*/
+   }
+   _return0;                                                            /*0012*/
+   return 0;                                                            /*0013*/
+}
