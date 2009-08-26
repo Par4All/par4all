@@ -182,7 +182,7 @@ interference_on(entity var, list /* of effect */ les)
   MAP(EFFECT, ef, 
   {
       if (effect_write_p(ef) &&
-	  entity_conflict_p(var, reference_variable(effect_reference(ef))))
+	  entity_conflict_p(var, reference_variable(effect_any_reference(ef))))
       {
 	return TRUE;
       }
@@ -198,7 +198,7 @@ moveable_to(list /* of effects */ le, statement s)
 {
   list les = load_cumulated_rw_effects_list(s);
   MAP(EFFECT, ef,
-      if (interference_on(reference_variable(effect_reference(ef)), les))
+      if (interference_on(reference_variable(effect_any_reference(ef)), les))
         return FALSE,
       le);
   return TRUE;
