@@ -2005,7 +2005,17 @@ bool extended_expression_constant_p(expression exp)
    "int k[] = { 1, 2, 3 };" cannot be used as rhs.
 
    There are probably many more cases, especially with
-   Fortran-specific expressions, e.g. IO expressions.
+   Fortran-specific expressions, e.g. IO expressions. But we do not
+   have a way to know if an intrinsic is a Fortran or a C or a shared
+   intrinsic. The information is not carried by PIPS internal
+   representation and hence not initialized in bootstrap.
+
+   Note: this test is too restrictive as the condition depends on the
+   type of the lhs. A struct can be assigned a brace expression. So a
+   type argument should be passed to make such decisions.
+
+   "s = { 1, 2, 3};" is ok if s is a struct with three integer
+   compatible fields.
  */
 bool expression_is_C_rhs_p(expression exp)
 {
