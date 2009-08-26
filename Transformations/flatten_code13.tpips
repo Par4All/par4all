@@ -1,0 +1,58 @@
+setenv WSPC flatten_code13
+delete $WSPC
+
+setproperty ABORT_ON_USER_ERROR TRUE
+setproperty PRETTYPRINT_BLOCKS TRUE
+
+create $WSPC $WSPC.c
+
+activate C_PARSER
+activate PRINT_CODE
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_ORDERING TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER   TRUE
+setproperty PREPROCESSOR_MISSING_FILE_HANDLING "generate"
+
+echo
+echo Compile initial code
+echo
+
+shell gcc -c $WSPC.c
+#shell ./a.out
+
+echo
+echo Initial code
+echo
+
+display PRINTED_FILE[%ALLFUNC]
+display CALLGRAPH_FILE[$WSPC]
+
+# inline
+apply INLINING[foo1]
+apply INLINING[foo2]
+display PRINTED_FILE[$WSPC]
+
+# flatten
+apply FLATTEN_CODE[$WSPC]
+display PRINTED_FILE[$WSPC]
+
+apply UNSPLIT[$WSPC]
+close
+
+# reentry of generated code
+shell gcc -c -Wall $WSPC.database/Src/$WSPC.c
+create ${WSPC}_2 $WSPC.database/Src/$WSPC.c 
+
+activate C_PARSER
+activate PRINT_CODE
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_ORDERING TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER   TRUE
+setproperty PREPROCESSOR_MISSING_FILE_HANDLING "generate"
+
+display PRINTED_FILE[$WSPC]
+close
+delete $WSPC
+delete ${WSPC}_2
+quit
+
