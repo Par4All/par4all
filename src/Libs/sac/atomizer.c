@@ -107,7 +107,7 @@ statement simd_atomize_this_expression(entity (*create)(entity, basic),
      * the C syntax expect 2 is an int
      * set the property to false if you want to override this behavior
      */
-    if( get_bool_property("SIMD_OVERRIDE_CONSTANT_TYPE_INFERANCE") )
+    if( get_bool_property("SIMD_OVERRIDE_CONSTANT_TYPE_INFERENCE") )
     {
         expression etemp = copy_expression(e);
         bool patch_all=true;
