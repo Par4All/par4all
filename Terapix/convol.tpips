@@ -57,6 +57,23 @@ apply LOOP_NORMALIZE
 apply SUPPRESS_DEAD_CODE
 display PRINTED_FILE
 
+
+#echo
+#echo Microcode After atomization
+#echo
+#
+#setproperty SIMD_EXTRAVAGANT_ATOMIZER TRUE
+#apply SIMD_ATOMIZER
+#display PRINTED_FILE
+
+
+echo
+echo Microcode after scalarization
+echo
+
+apply SCALARIZATION
+display PRINTED_FILE
+
 echo
 echo Microcode After array conversion
 echo
@@ -67,31 +84,21 @@ apply ARRAY_TO_POINTER
 apply PARTIAL_EVAL
 display PRINTED_FILE
 
-
 #echo
-#echo Microcode After atomization
+#echo Microcode After ICM
 #echo
 #
-#setproperty SIMD_EXTRAVAGANT_ATOMIZER TRUE
-#apply SIMD_ATOMIZER
+#apply INVARIANT_CODE_MOTION
 #display PRINTED_FILE
-
-echo
-echo Microcode After ICM
-echo
-
-apply INVARIANT_CODE_MOTION
-apply FLAG_LOOPS
-display PRINTED_FILE
 
 echo
 echo Microcode after double unrolling
 echo
 
 setproperty LOOP_UNROLL_MERGE TRUE
-setproperty LOOP_LABEL "l99999"
+setproperty LOOP_LABEL "l100"
 apply FULL_UNROLL
-setproperty LOOP_LABEL "l99998"
+setproperty LOOP_LABEL "l200"
 apply FULL_UNROLL
 display PRINTED_FILE
 
@@ -114,13 +121,13 @@ apply OPTIMIZE_EXPRESSIONS
 apply CLEAN_DECLARATIONS
 display PRINTED_FILE
 
-
 echo
-echo Microcode After ICM
+echo Microcode after ICM
 echo
 
-apply INVARIANT_CODE_MOTION
-apply FLAG_LOOPS
+setproperty EOLE_OPTIMIZATION_STRATEGY "ICM"
+apply OPTIMIZE_EXPRESSIONS
+apply CLEAN_DECLARATIONS
 display PRINTED_FILE
 
 echo
@@ -132,12 +139,13 @@ apply SUPPRESS_DEAD_CODE
 apply CLEAN_DECLARATIONS
 display PRINTED_FILE
 
-echo
-echo Microcode after scalarization
-echo
-
-apply SCALARIZATION
-display PRINTED_FILE
+#echo
+#echo Microcode After atomization
+#echo
+#
+#setproperty SIMD_EXTRAVAGANT_ATOMIZER TRUE
+#apply SIMD_ATOMIZER
+#display PRINTED_FILE
 
 close
 delete convol
