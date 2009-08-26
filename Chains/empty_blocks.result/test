@@ -1,0 +1,66 @@
+
+Source code after privatization
+
+int main(int argc, char **argv)
+{
+   int i;
+   int j = 100;
+   i = 0;
+   while (i<100) {
+      i++;
+   }
+   i = 0;
+   while (i<100) {
+      i++;
+   }
+   //on attends qqch différent de "inconnu"
+   j = i;                                                               /*0011*/
+   return 0;                                                            /*0012*/
+}
+
+Preconditions after privatization
+
+
+//  P() {j==100}
+
+int main(int argc, char **argv)
+{
+   int i;
+   int j = 100;
+
+//  P() {j==100}
+
+   i = 0;
+
+//  P(i) {i==0, j==100}
+
+   while (i<100) {
+
+//  P(i) {j==100, i<=99}
+
+      i++;
+   }
+
+//  P(i) {i==100, j==100}
+
+   i = 0;
+
+//  P(i) {i==0, j==100}
+
+   while (i<100) {
+
+//  P(i) {j==100, i<=99}
+
+      i++;
+   }
+
+//  P(i) {i==100, j==100}
+
+   //on attends qqch différent de "inconnu"
+   j = i;                                                               /*0011*/
+
+//  P(i,j) {i==100, j==100}
+
+   return 0;                                                            /*0012*/
+}
+
