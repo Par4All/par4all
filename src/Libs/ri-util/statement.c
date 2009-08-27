@@ -2310,12 +2310,9 @@ statement add_comment_and_line_number(statement s, string sc, int sn)
 
 static bool add_statement_declarations(statement s, list *statement_to_all_included_declarations)
 {
-  list dl = statement_declarations(s);
-  if(!ENDP(dl)) {
-    *statement_to_all_included_declarations
-      = gen_nconc(*statement_to_all_included_declarations,
-		  gen_copy_seq(dl));
-  }
+    /* naive version with O(n^2) complexity)*/
+  FOREACH(ENTITY,e,statement_declarations(s))
+      *statement_to_all_included_declarations=gen_once(e,*statement_to_all_included_declarations);
   return true;
 }
 
