@@ -46,6 +46,10 @@ validate:
 validate-out:
 	$(MAKE) TEST=out validate
 
+# validate depending on prefix
+validate-%:
+	$(MAKE) F.result="$(wildcard $**.result)" validate
+
 # generate missing "test" files
 test: $(F.valid)
 
