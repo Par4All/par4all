@@ -422,7 +422,6 @@ gen_trav_leaf(struct gen_binding * bp, gen_chunk * obj, struct driver * dr)
 /* GEN_TRAV_SIMPLE traverses a simple OBJ (which is a (CONS *) for a list
    or points to the first element of an array) of type DP according to the
    driver DR. */
-
 static void
 gen_trav_simple(
     union domain * dp,
@@ -431,7 +430,7 @@ gen_trav_simple(
 {
     if (gen_trav_stop_recursion) return;
 
-    CHECK_NULL(obj, (struct gen_binding *)NULL, dr);
+    CHECK_NULL(obj, (struct gen_binding *) NULL, dr);
 
     if( gen_debug & GEN_DBG_TRAV_SIMPLE )
     {
@@ -450,31 +449,27 @@ gen_trav_simple(
 	    break ;
 	case LIST_DT:
 	{
-	    cons *p ;
-
-	    for (p = obj->l ; p != NULL ; p = p->cdr)
-		gen_trav_leaf( dp->li.element, &p->car, dr ) ;
-	    break ;
+	  cons *p ;
+	  for (p = obj->l ; p != NULL ; p = p->cdr)
+	    gen_trav_leaf( dp->li.element, &p->car, dr ) ;
+	  break ;
 	}
 	case SET_DT:
-	    SET_MAP(elt,
-		{
-		    gen_trav_leaf(dp->se.element, (gen_chunk *)&elt, dr);
-		},
-		    obj->t) ;
-	    break ;
+	  SET_MAP(elt,
+	  {
+	    gen_trav_leaf(dp->se.element, (gen_chunk *)&elt, dr);
+	  },
+		  obj->t) ;
+	  break ;
 	case ARRAY_DT:
 	{
-	    int i ;
-	    int size = array_size(dp->ar.dimensions) ;
-
-	    for (i=0 ; i<size; i++)
-		(*dr->array_leaf)(dp->ar.element, i, obj->p+i, dr);
-
-	    break ;
+	  int i, size = array_size(dp->ar.dimensions);
+	  for (i=0 ; i<size; i++)
+	    (*dr->array_leaf)(dp->ar.element, i, obj->p+i, dr);
+	  break ;
 	}
 	default:
-	    fatal( "gen_trav_simple: Unknown type %s\n", itoa( dp->ba.type )) ;
+	  fatal("gen_trav_simple: Unknown type %s\n", itoa( dp->ba.type ));
 	}
 
 	if (gen_trav_stop_recursion) {
@@ -504,132 +499,129 @@ gen_array_leaf(
 
 
 /* GEN_TRAV_OBJ (the root function) traverses the object OBJ according to
-   the driver DR. */
-
+   the driver DR.
+ */
 static void
 gen_trav_obj_constructed(
     gen_chunk *obj,
-    struct gen_binding *bp,
+    __attribute__((unused)) struct gen_binding *bp,
     union domain *dp,
     int data,
     struct driver *dr)
 {
-    struct domainlist *dlp;
+  struct domainlist *dlp;
 
-    message_assert("argument not used", bp==bp);
-
-    if (gen_trav_stop_recursion) return;
-    dlp = dp->co.components ;
-    switch(dp->co.op)
+  if (gen_trav_stop_recursion) return;
+  dlp = dp->co.components ;
+  switch(dp->co.op)
+  {
+  case AND_OP:
+  {
+    gen_chunk *cp ;
+    for(cp = obj+data ; dlp != NULL ; cp++, dlp = dlp->cdr)
     {
-    case AND_OP:
+      gen_trav_simple(dlp->domain, cp, dr) ;
+      if (gen_trav_stop_recursion) return;
+    }
+    break ;
+  }
+  case OR_OP:
+  {
+    int which = (obj+data)->i - dp->co.first ;
+    for(; dlp!=NULL && which; which--,dlp=dlp->cdr)
+      ;
+    if(dlp == NULL)
+      fatal( "gen_trav_obj: Unknown tag %s\n", itoa( (obj+data)->i )) ;
+    gen_trav_simple(dlp->domain, obj+data+1, dr);
+    break ;
+  }
+  case ARROW_OP:
+  {
+    union domain
+      *dkeyp=dlp->domain,
+      *dvalp=dlp->cdr->domain;
+
+    HASH_MAP(k, v,
     {
-	gen_chunk *cp ;
-
-	for(cp = obj+data ; dlp != NULL ; cp++, dlp = dlp->cdr)
-	{
-	    gen_trav_simple(dlp->domain, cp, dr) ;
-	    if (gen_trav_stop_recursion) return;
-	}
-	break ;
-    }
-    case OR_OP:
-    {
-	int which = (obj+data)->i - dp->co.first ;
-
-	for(; dlp!=NULL && which; which--,dlp=dlp->cdr)
-	    ;
-
-	if(dlp == NULL)
-	    fatal( "gen_trav_obj: Unknown tag %s\n", itoa( (obj+data)->i )) ;
-
-	gen_trav_simple(dlp->domain, obj+data+1, dr);
-	break ;
-    }
-    case ARROW_OP:
-    {
-	union domain
-	    *dkeyp=dlp->domain,
-	    *dvalp=dlp->cdr->domain;
-
-	HASH_MAP(k, v,
-	     {
-		 /* fprintf(stderr, "%p (%s) -> %p (%s)\n",
-			 ((gen_chunk *) k)->p,
-			 Domains[((gen_chunk *) k)->p->i].name,
-			 ((gen_chunk *) v)->p,
-			 Domains[((gen_chunk *) v)->p->i].name); */
-		 /* what if: persistent sg -> */
-		 gen_trav_simple(dkeyp, (gen_chunk *) k, dr) ;
-		 if (gen_trav_stop_recursion) return;
-		 gen_trav_simple(dvalp, (gen_chunk *) v, dr) ;
-		 if (gen_trav_stop_recursion) return;
-	     },
-		 (obj+data)->h ) ;
-	break ;
-    }
-    default:
-	fatal( "gen_trav_obj: Unknown op %s\n", itoa(dp->co.op)) ;
-    }
+      // what if? persistent sg ->
+      // the source & target must be simple newgen objects, not sets/lists...
+      gen_trav_simple(dkeyp, (gen_chunk *) k, dr) ;
+      if (gen_trav_stop_recursion) return;
+      gen_trav_simple(dvalp, (gen_chunk *) v, dr) ;
+      if (gen_trav_stop_recursion) return;
+    },
+	     (obj+data)->h ) ;
+    break ;
+  }
+  default:
+    fatal( "gen_trav_obj: Unknown op %s\n", itoa(dp->co.op)) ;
+  }
 }
 
+/* "driver" driven recursion in newgen data structures.
+ * note that we do not know the expected type of the object...
+ */
 static void
 gen_trav_obj(
     gen_chunk * obj,
     struct driver * dr)
 {
+  if (gen_trav_stop_recursion) return;
+
+  if (obj == NULL)
+    fatal("unexpected NULL value encountered\n");
+
+  // this detects undefined values:
+  CHECK_NULL(obj, (struct gen_binding *) NULL, dr);
+
+  /* Keep track of the current object before filtering in or out: */
+  if (gen_record_tracking_p) {
+    // fprintf(stderr, "[gen_trav_obj] set heritage %p -> %p\n",
+    //         gen_previous_object.p, obj);
+    /* Since an object can have multiple ancestors (for example think in
+       PIPS unstructured where we can have multible goto towards the
+       same node), just pick the first ancestor found to avoid heritage
+       flapping. So do not store again an ancestor if already one: */
+    if (! hash_defined_p(ancestor_tracking, obj))
+      hash_put(ancestor_tracking, obj, gen_previous_object.p);
+  }
+  gen_previous_object.p = obj;
+
+  if ((*dr->obj_in)(obj, dr))
+  {
+    struct gen_binding *bp = &Domains[quick_domain_index(obj)] ;
+    union domain *dp = bp->domain ;
+    int data = 1+IS_TABULATED( bp ) ;
+
     if (gen_trav_stop_recursion) return;
 
-    CHECK_NULL(obj, (struct gen_binding *)NULL, dr);
-
-    /* Keep track of the current object before filtering in or out: */
-    if (gen_record_tracking_p) {
-      // fprintf(stderr, "[gen_trav_obj] set heritage %p -> %p\n",
-      //         gen_previous_object.p, obj);
-      /* Since an object can have multiple ancestors (for example think in
-	 PIPS unstructured where we can have multible goto towards the
-	 same node), just pick the first ancestor found to avoid heritage
-	 flapping. So do not store again an ancestor if already one: */
-      if (! hash_defined_p(ancestor_tracking, obj))
-	hash_put(ancestor_tracking, obj, gen_previous_object.p);
-    }
-    gen_previous_object.p = obj;
-
-    if ((*dr->obj_in)(obj, dr))
+    if( gen_debug & GEN_DBG_TRAV_OBJECT )
     {
-	struct gen_binding *bp = &Domains[quick_domain_index(obj)] ;
-	union domain *dp = bp->domain ;
-	int data = 1+IS_TABULATED( bp ) ;
-
-	if (gen_trav_stop_recursion) return;
-
-	if( gen_debug & GEN_DBG_TRAV_OBJECT )
-	{
-	    fprintf_spaces( stderr, gen_debug_indent++ ) ;
-	    (void) fprintf( stderr, "trav_obj (%p) ", obj) ;
-	    print_domain( stderr, dp ) ;
-	    (void) fprintf( stderr, "\n" ) ;
-	}
-
-	switch( dp->ba.type )
-	{
-	case LIST_DT:
-	case SET_DT:
-	case ARRAY_DT:
-	    gen_trav_simple(dp, obj+data, dr);
-	    break ;
-	case CONSTRUCTED_DT:
-	    gen_trav_obj_constructed(obj, bp, dp, data, dr);
-	    break ;
-	default:
-	    fatal( "gen_trav_obj: Unknown type %s\n", itoa(dp->ba.type));
-	}
-
-	if (gen_trav_stop_recursion) return;
-
-	(*dr->obj_out)(obj, bp, dr);
+      fprintf_spaces( stderr, gen_debug_indent++ ) ;
+      (void) fprintf( stderr, "trav_obj (%p) ", obj) ;
+      print_domain( stderr, dp ) ;
+      (void) fprintf( stderr, "\n" ) ;
     }
-    if( gen_debug & GEN_DBG_TRAV_OBJECT ) gen_debug_indent--;
+
+    switch( dp->ba.type )
+    {
+    case LIST_DT:
+    case SET_DT:
+    case ARRAY_DT:
+      gen_trav_simple(dp, obj+data, dr);
+      break ;
+    case CONSTRUCTED_DT:
+      gen_trav_obj_constructed(obj, bp, dp, data, dr);
+      break ;
+    default:
+      fatal( "gen_trav_obj: Unknown type %s\n", itoa(dp->ba.type));
+    }
+
+    if (gen_trav_stop_recursion) return;
+
+    (*dr->obj_out)(obj, bp, dr);
+  }
+  if( gen_debug & GEN_DBG_TRAV_OBJECT ) gen_debug_indent--;
 }
 
 static int
@@ -1099,11 +1091,9 @@ copy_hput(
 */
 
 static int
-copy_obj_in(gen_chunk * obj, struct driver * dr)
+copy_obj_in(gen_chunk * obj, __attribute__((unused)) struct driver * dr)
 {
   struct gen_binding *bp = &Domains[quick_domain_index( obj ) ] ;
-
-  message_assert("argument not used", dr==dr);
 
   /* if (shared_obj( obj, gen_null, gen_null )) return 0;*/
 
@@ -2707,14 +2697,14 @@ gen_allocated_memory(
 
     /* build driver for gen_trav...
      */
-    dr.null 		= gen_null,
-    dr.leaf_in 		= allocated_memory_leaf_in,
-    dr.leaf_out  	= gen_null,
-    dr.simple_in 	= allocated_memory_simple_in,
-    dr.array_leaf 	= gen_array_leaf,
-    dr.simple_out 	= gen_null,
-    dr.obj_in 		= allocated_memory_obj_in,
-    dr.obj_out 		= gen_null;
+    dr.null		= gen_null,
+    dr.leaf_in		= allocated_memory_leaf_in,
+    dr.leaf_out		= gen_null,
+    dr.simple_in	= allocated_memory_simple_in,
+    dr.array_leaf	= gen_array_leaf,
+    dr.simple_out	= gen_null,
+    dr.obj_in		= allocated_memory_obj_in,
+    dr.obj_out		= gen_null;
 
     /* recursion from obj
      */
@@ -3175,7 +3165,7 @@ quick_multi_recurse_simple_in(gen_chunk * obj, union domain * dp)
 /** @{ */
 
 /** Tells the recursion not to go in this object
-    
+
     This may be interesting when the recursion modifies
     the visited data structure.
     if obj is NULL, the whole recursion is stopped !
@@ -3190,7 +3180,7 @@ gen_recurse_stop(void * obj)
 }
 
 /**  Multi recursion generic visitor function
- 
+
      It is more intended for internal use, but may be useful instead of
      gen_context_multi_recurse() to give iteration parameters as a va_list.
 
@@ -3244,24 +3234,24 @@ gen_internal_context_multi_recurse(void * o, void * context, va_list pvar)
     new_mrc.rewrites  = &new_rewrite_table,
     new_mrc.context   = context;
 
-    dr.null 		= gen_null,
-    dr.leaf_in 		= tabulated_leaf_in,
-    dr.leaf_out  	= gen_null,
-    dr.simple_in 	= quick_multi_recurse_simple_in,
-    dr.array_leaf 	= gen_array_leaf,
-    dr.simple_out 	= gen_null,
-    dr.obj_in 		= quick_multi_recurse_obj_in,
-    dr.obj_out 		= quick_multi_recurse_obj_out;
+    dr.null		= gen_null,
+    dr.leaf_in		= tabulated_leaf_in,
+    dr.leaf_out		= gen_null,
+    dr.simple_in	= quick_multi_recurse_simple_in,
+    dr.array_leaf	= gen_array_leaf,
+    dr.simple_out	= gen_null,
+    dr.obj_in		= quick_multi_recurse_obj_in,
+    dr.obj_out		= quick_multi_recurse_obj_out;
 
-    /*    push the current context
+    /* push the current context
      */
     saved_mrc = current_mrc, current_mrc = &new_mrc;
 
-    /*  recurse!
+    /* recurse!
      */
-    gen_trav_stop_recursion = FALSE;
+    gen_trav_stop_recursion = false;
     gen_trav_obj(obj, &dr);
-    gen_trav_stop_recursion = FALSE;
+    gen_trav_stop_recursion = false;
 
     /*  restore the previous context
      */
@@ -3270,18 +3260,18 @@ gen_internal_context_multi_recurse(void * o, void * context, va_list pvar)
 }
 
 /** Multi-recursion with context function visitor
- 
+
     gen_context_multi_recurse(obj, context,
                               [domain, filter, rewrite,]*
                               NULL);
- 
+
     recurse from object obj (in a top-down way), applies filter_i on
     encountered domain_i objects with the context, if true, recurses
     down from the domain_i object, and applies rewrite_i on exit from
     the object (in a bottom-up way).
- 
+
     Newgen persistant fields are not visited.
- 
+
     Bug : you can't visit domain number 0 if any... The good news is that
     there is no NewGen object of domain number 0, since it seems that to
     start at 7 for user domains...
@@ -3295,11 +3285,11 @@ void gen_context_multi_recurse(void * o, void * context, ...)
 }
 
 /** Multi recursion visitor function
- 
+
     gen_context_multi_recurse(obj, context,
                               [domain, filter, rewrite,]*
                               NULL);
- 
+
     recurse from object obj (in a top-down way),
     applies filter_i on encountered domain_i objects with the context,
     if true, recurses down from the domain_i object,
@@ -3307,7 +3297,7 @@ void gen_context_multi_recurse(void * o, void * context, ...)
     way).
 
     Newgen persistant fields are not visited.
- 
+
     Bug : you can't visit domain number 0 if any... The good news is that
     there is no NewGen object of domain number 0, since it seems that to
     start at 7 for user domains...
@@ -3357,7 +3347,7 @@ void gen_recurse(
     @param obj the object to start visiting
 
     @param domain the type of objects we want to visit
-    
+
     @param context is a pointer that is given to the filter and rewrite
     methods too. It is quite useful when one wants side effects on other
     objects without having to rely on (dirty) global variables.
