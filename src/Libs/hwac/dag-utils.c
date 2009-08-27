@@ -96,7 +96,8 @@ string dagvtx_operation(const dagvtx v)
   if (v==NULL) return "null";
   int index = vtxcontent_opid(dagvtx_content(v));
   const freia_api_t * api = get_freia_api(index);
-  return api->function_name + strlen(AIPO);
+  return strncmp(api->function_name, AIPO, strlen(AIPO))==0?
+    api->function_name + strlen(AIPO): api->function_name;
 }
 
 string dagvtx_compact_operation(const dagvtx v)
