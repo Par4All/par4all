@@ -179,6 +179,7 @@ freia_status freia_17_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_d
   si.mux[6][0].op = SPOC_MUX_IN0;
   // o [7 input 0] -> [7 output 0] 0 null
   si.mux[7][0].op = SPOC_MUX_IN0;
+
   // 0`t3 [0 input 1] -> [0 output 1] 0 null
   si.mux[0][3].op = SPOC_MUX_IN1;
 
@@ -261,6 +262,7 @@ freia_status freia_17_helper_0_1_0(freia_data2d * o0, freia_data2d * o1, freia_d
   si.mux[6][0].op = SPOC_MUX_IN0;
   // 0`t4 [7 input 0] -> [7 output 0] 0 null
   si.mux[7][0].op = SPOC_MUX_IN0;
+
   // 0`t5 [0 input 1] -> [0 output 1] 0 null
   si.mux[0][3].op = SPOC_MUX_IN1;
 

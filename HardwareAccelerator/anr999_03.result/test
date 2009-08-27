@@ -192,6 +192,7 @@ freia_status anr999_03_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_
   si.mux[6][3].op = SPOC_MUX_IN1;
   // 0`od [7 input 1] -> [7 output 1] 0 null
   si.mux[7][3].op = SPOC_MUX_IN1;
+
   // 0`og [0 alu] -> [1 output 0] 0 null
   si.mux[0][0].op = SPOC_MUX_IN1;
   si.mux[0][2].op = SPOC_MUX_IN0;

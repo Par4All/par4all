@@ -149,6 +149,7 @@ freia_status freia_skip_05_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, fr
   si.mux[6][3].op = SPOC_MUX_IN1;
   // i [7 input 1] -> [7 output 1] 0 null
   si.mux[7][3].op = SPOC_MUX_IN1;
+
   // o [1 threshold 0] -> [1 output 0] 0 null
   // nope
 

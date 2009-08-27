@@ -125,6 +125,7 @@ freia_status freia_dup_03_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, fre
   si.mux[6][3].op = SPOC_MUX_IN1;
   // o0 [7 input 1] -> [7 output 1] 0 null
   si.mux[7][3].op = SPOC_MUX_IN1;
+
   // o1 [1 input 0] -> [1 output 0] 0 null
   si.mux[1][0].op = SPOC_MUX_IN0;
 

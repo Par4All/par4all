@@ -267,7 +267,7 @@ freia_status anr999_02_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_
 
 
   // STAGE 0
-  // 0`in [0 input 0] -> [0 measure 0] 0 
+  // 0`in [0 input 0] -> [0 measure 0] 0 undefined
   si.mux[0][0].op = SPOC_MUX_IN0;
 
 
@@ -406,6 +406,7 @@ freia_status anr999_02_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_
   // 0`od [6 output 0] -> [7 output 0] 0 null
   // 0`od [7 input 0] -> [7 output 0] 0 null
   si.mux[7][0].op = SPOC_MUX_IN0;
+
   // 0`og [4 alu] -> [6 output 1] 0 null
   si.mux[4][1].op = SPOC_MUX_IN1;
   si.mux[4][3].op = SPOC_MUX_IN0;

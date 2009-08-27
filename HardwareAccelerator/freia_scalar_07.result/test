@@ -231,7 +231,7 @@ freia_status freia_scalar_07_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, 
 
 
   // STAGE 0
-  // i [0 input 0] -> [0 measure 0] 0 
+  // i [0 input 0] -> [0 measure 0] 0 undefined
   si.mux[0][0].op = SPOC_MUX_IN0;
 
 
@@ -442,6 +442,7 @@ freia_status freia_scalar_07_helper_0_2_0(freia_data2d * o0, freia_data2d * o1, 
   si.mux[6][3].op = SPOC_MUX_IN1;
   // 0`tC [7 input 1] -> [7 output 1] 0 null
   si.mux[7][3].op = SPOC_MUX_IN1;
+
   // 0`tD [0 threshold 0] -> [0 output 0] 0 null
   // nope
 
@@ -630,10 +631,6 @@ freia_status freia_scalar_07(freia_data2d *o, freia_data2d *i, uint32_t *k)
    // A
    freia_scalar_07_helper_0_0_0(X, i, &sA, k, &sB);                     /*0016*/
    // B
-
-!!! X is overwritten here before its expected used in 24...
-??? three pipe calls should be enough?
-
    freia_scalar_07_helper_0_1_0(X, i, sA-10, sA-1, false, k, &sC);      /*0018*/
    // A// A// C with X from A
    freia_scalar_07_helper_0_2_0(tC, tD, X, sC-10, sC-1, false, sB-10, sB-1, false);    /*0024*/
