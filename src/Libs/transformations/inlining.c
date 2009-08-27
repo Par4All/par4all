@@ -346,7 +346,7 @@ statement inline_expression_call(inlining_parameters p, expression modified_expr
                 string emn = entity_module_name(ref_ent);
                 if(! same_string_p(emn,mln) &&
                         !same_string_p(emn,cu_name) &&
-                        !gen_find_eq(ref_ent,statement_declarations(expanded)) )
+                        gen_chunk_undefined_p(gen_find_eq(ref_ent,statement_declarations(expanded))) )
                 {
                     entity add = ref_ent;
                     if(entity_variable_p(ref_ent) && 
