@@ -373,7 +373,7 @@ void atomize_as_required(
     while_atomize_decision = while_decide;
     create_new_variable = new;
     
-    atomize_object(stat);
+    atomize_object((gen_chunkp)stat);
 
     ref_atomize_decision = NULL;
     call_atomize_decision = NULL;

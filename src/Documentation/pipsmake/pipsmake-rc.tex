@@ -6956,6 +6956,8 @@ alias optimize_expressions 'Optimize Expressions'
 
 optimize_expressions    > MODULE.code
         < PROGRAM.entities
+        < MODULE.proper_effects
+        < MODULE.cumulated_effects
         < MODULE.code
 
 alias instruction_selection 'Select Instructions'

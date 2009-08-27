@@ -55,7 +55,7 @@ inst_sel_ctx;
  * if not, NIL is returned.
  */
 static list /* of expression */ 
-is_this_op(expression e, entity op, int len)
+is_this_op(expression e, entity op, size_t len)
 {
 	if (expression_call_p(e))
 	{

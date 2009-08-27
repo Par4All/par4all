@@ -539,7 +539,7 @@ eformat_t partial_eval_call(expression exp, Psysteme ps, effects fx)
 	  */
 	  //expression expr = EXPRESSION(CAR(le));
 
-	  partial_eval_expression_and_regenerate(&EXPRESSION_(CAR(le)), ps, fx);
+	  partial_eval_expression_and_regenerate((expression*)&EXPRESSION_(CAR(le)), ps, fx);
 	}, call_arguments(ec) );
       ef = eformat_undefined;
     }

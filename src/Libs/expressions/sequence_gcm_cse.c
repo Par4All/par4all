@@ -56,8 +56,6 @@
 
 #include "eole_private.h"
 
-extern char * itoa(int); /* somewhere in newgen */
-
 /******************************************************************* FLATTEN */
 
 static void 
@@ -533,6 +531,7 @@ group_expr_by_level(int nlevels, list le)
   return result;
 }
 
+#if 0
 static void 
 print_group_expr(gen_array_t /* array of group of expressions */ g
 		 , int nombre_grp)
@@ -553,6 +552,7 @@ print_group_expr(gen_array_t /* array of group of expressions */ g
     }
   }
 }
+#endif
 
 /* Atomize sub expressions with 
    - lower level
@@ -942,7 +942,7 @@ cse_expression_flt(expression e, list* inserted)
 /* Avoid  visit the left side of assign statement
  */
 static bool
-cse_call_flt(call c, list* inserted)
+cse_call_flt(call c, __attribute__((unused))list* inserted)
 {
   if(ENTITY_ASSIGN_P(call_function(c)))
   {
@@ -998,6 +998,9 @@ static void insert_rwt(statement s)
 		      NIL));
     
     statement_instruction(s) = i;
+    if( !empty_comments_p(statement_comments(s)))
+        free(statement_comments(s));
+    statement_comments(s)=empty_comments;
   }
 }
 
@@ -1176,6 +1179,7 @@ static bool expr_cse_flt(expression e)
 #define NO_SIMILARITY (0)
 #define MAX_SIMILARITY (1000)
 
+#if 0
 /* return the entity stored by this function.
    should be a scalar reference or a constant...
    or a call to an inverse operator.
@@ -1212,6 +1216,7 @@ static entity entity_of_expression(expression e, bool * inverted, entity inv)
   }
   return NULL;
 }
+#endif
 
 static bool 
 expression_in_list_p(expression e, list seen)
@@ -1326,7 +1331,7 @@ similarity(expression e, available_scalar_pt aspt)
       list com = common_expressions(list_diff(call_arguments(c), 
 					      *(aspt->w_effects)),
 				    aspt->available_contents);
-      int n = gen_length(com);
+      size_t n = gen_length(com);
       gen_free_list(com);
       if (n<=1) return NO_SIMILARITY;
       return (n == gen_length(call_arguments(ca)) &&
@@ -1836,7 +1841,7 @@ static bool seq_flt(sequence s)
   return TRUE;
 }
 
-void perform_ac_cse(string name, statement s)
+void perform_ac_cse(__attribute__((unused)) string name, statement s)
 {
   /* they have to be recomputed, because if ICM before. */
 

@@ -635,6 +635,7 @@ static void optimize_simplify_nary_patterns(statement s)
 
 /*********************************************************** EXPRESSION COST */
 
+#if 0
 /* computes the expression weight.
  */
 static double expression_weight(expression e)
@@ -666,6 +667,7 @@ static double expression_depth(expression e)
   }
   return cost;
 }
+#endif
 
 /* WG */
 static double expression_gravity_rc(expression e, double depth)
