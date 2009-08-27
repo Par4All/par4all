@@ -488,8 +488,21 @@ checking. See Newgen documentation\cite{JT89}\cite{JT90}.
 
 \subsection{C3 Linear Library}
 \index{C3 Linear Library}
+\index{SYSTEM\_NULL}
+\index{SYSTEM\_UNDEFINED}
+\index{SYSTEM\_NOT\_FEASIBLE}
 
 This library is external and offers an independent debugging system.
+
+The following property drives how null, undefined or non feasible
+systems are displayed by Pips when generating a prettyprint.
+
+\begin{PipsProp}
+SYSTEM_NULL	    "<null system>"
+SYSTEM_UNDEFINED    "<undefined system>"
+SYSTEM_NOT_FEASIBLE "{0==-1}"
+\end{PipsProp}
+
 
 \subsection{PipsMake}
 \index{Pipsmake}
