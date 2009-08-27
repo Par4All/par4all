@@ -24,4 +24,5 @@ apply INLINING[erode]
 
 display PRINTED_FILE[gradient]
 close
+delete inlining26
 quit

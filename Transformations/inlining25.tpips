@@ -24,4 +24,5 @@ apply INLINING[bla]
 make PRINTED_FILE[main]
 display PRINTED_FILE[main]
 close
+delete inlining25
 quit

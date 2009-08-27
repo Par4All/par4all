@@ -147,5 +147,5 @@ shell cc -c inlining24.database/Src/inlining24.c
 shell rm inlining24.o
 
 close
-# delete inlining24
+delete inlining24
 quit
