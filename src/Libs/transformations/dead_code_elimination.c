@@ -24,13 +24,12 @@
 /*
   Dead loop elimination.
   Ronan Keryell, 12/1993 -> 1995.
-
   one trip loops fixed, FC 08/01/1998
 */
 
-#include <stdio.h> 
-#include <stdlib.h> 
-#include <string.h> 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include "genC.h"
 #include "linear.h"
@@ -147,17 +146,17 @@ static void stdebug(int dl, string msg, statement s)
 
 /* Give an information on the liveness of the 2 if's branches: */
 static dead_test
-dead_test_filter(statement true, statement false)
+dead_test_filter(statement st_true, statement st_false)
 {
   pips_debug(5, "Begin\n");
 
-  stdebug(9, "dead_test_filter: then branch", true);
-  stdebug(9, "dead_test_filter: else branch", false);
+  stdebug(9, "dead_test_filter: then branch", st_true);
+  stdebug(9, "dead_test_filter: else branch", st_false);
 
   ifdebug(8)
     {
-      transformer pretrue = load_statement_precondition(true);
-      transformer prefalse = load_statement_precondition(false);
+      transformer pretrue = load_statement_precondition(st_true);
+      transformer prefalse = load_statement_precondition(st_false);
       fprintf(stderr,"NN true and false branches");
       sc_fprint(stderr,
 		predicate_system(transformer_relation(pretrue)),
@@ -167,16 +166,16 @@ dead_test_filter(statement true, statement false)
 		(char* (*)(Variable)) entity_local_name);
     }
 
-  if (!statement_strongly_feasible_p(true)) {
+  if (!statement_strongly_feasible_p(st_true)) {
     pips_debug(5, "End: then_is_dead\n");
     return then_is_dead;
   }
-  
-  if (!statement_strongly_feasible_p(false)) {
+
+  if (!statement_strongly_feasible_p(st_false)) {
     pips_debug(5, "End: else_is_dead\n");
     return else_is_dead;
   }
-  
+
   pips_debug(5, "End: nothing_about_test\n");
   return nothing_about_test;
 }
@@ -232,7 +231,7 @@ discard_statement_and_save_label_and_comment(statement s)
       /* Since the RI need to have no label on instruction block: */
       fix_sequence_statement_attributes(s); 
     }
-   return FALSE;
+   return false;
 }
 
 
@@ -285,7 +284,7 @@ remove_loop_statement(statement s, instruction i, loop l)
   free_instruction(i);
 }
 
-/* TRUE if do i = x, x or equivalent.
+/* true if do i = x, x or equivalent.
  */
 static bool loop_executed_once_p(statement s, loop l)
 {
@@ -302,7 +301,7 @@ static bool loop_executed_once_p(statement s, loop l)
    * specified by the documentation*/
   Psysteme volatile ps;
 
-  retour = FALSE;
+  retour = false;
   ind = loop_index(l);
   rg = loop_range(l);
   m1 = range_lower(rg);
@@ -312,7 +311,7 @@ static bool loop_executed_once_p(statement s, loop l)
    */
   /* Not necessarily true with side effects: DO i = inc(n), inc(n) */
   if (expression_equal_p(m1, m2))
-    return TRUE;
+    return true;
 
   pre = load_statement_precondition(s);
   precondition_ps = predicate_system(transformer_relation(pre));
@@ -330,11 +329,11 @@ static bool loop_executed_once_p(statement s, loop l)
 						    normalized_linear(n_m2)));
 
     if (eq_redund_with_sc_p(precondition_ps, eq))
-      retour = TRUE;
+      retour = true;
     
     contrainte_free(eq);
 
-    if (retour) return TRUE;
+    if (retour) return true;
   }
   if (normalized_linear_p(n_m3)) { 
     /* Teste le signe de l'incrément en fonction des préconditions : */
@@ -344,12 +343,12 @@ static bool loop_executed_once_p(statement s, loop l)
     sc_add_ineg(ps, pc3);
     CATCH(overflow_error) {
       sc_rm(ps);
-      return FALSE;
+      return false;
     }
     TRY {
-      m3_negatif = sc_rational_feasibility_ofl_ctrl(ps,FWD_OFL_CTRL,TRUE); 
+      m3_negatif = sc_rational_feasibility_ofl_ctrl(ps,FWD_OFL_CTRL,true); 
       (void) vect_chg_sgn(pv3);
-      m3_positif = sc_rational_feasibility_ofl_ctrl(ps,FWD_OFL_CTRL,TRUE);
+      m3_positif = sc_rational_feasibility_ofl_ctrl(ps,FWD_OFL_CTRL,true);
       UNCATCH(overflow_error);
     }
     pips_debug(2, "loop_increment_value positif = %d, negatif = %d\n",
@@ -392,7 +391,7 @@ static bool loop_executed_once_p(statement s, loop l)
     ca = contrainte_make(pvx);
     cb = contrainte_make(pv);
 
-    /* ??? on overflows, should assume FALSE...
+    /* ??? on overflows, should assume false...
      */
     retour = ineq_redund_with_sc_p(precondition_ps, ca) &&
              ineq_redund_with_sc_p(precondition_ps, cb);
@@ -476,7 +475,7 @@ static bool remove_dead_loop(statement s, instruction i, loop l)
   stdebug(9, "remove_dead_loop: New value of statement", s);
 
   free_instruction(i);
-  return FALSE;
+  return false;
 }
 
 
@@ -484,7 +483,7 @@ static bool remove_dead_loop(statement s, instruction i, loop l)
    has no write proper effect. If x has a write effect, replace s with a
    statement as bool_var = x: (he', a french joke !)
    this_test_is_unstructured_p is a hint for the statistics.
-   TRUE means that you assert that the test is unstructured.
+   true means that you assert that the test is unstructured.
  */
 void remove_if_statement_according_to_write_effects
 (statement s, bool this_test_is_unstructured_p)
@@ -537,7 +536,7 @@ dead_deal_with_test(statement s,
     test_false(t) = statement_undefined;
     test_true(t) = statement_undefined;
     remove_if_statement_according_to_write_effects(s,
-						   FALSE /* structured if */);
+						   false /* structured if */);
     /* Concatenate an eventual IF expression (if write effects) with
        the false branch: */
     statement_instruction(s) =
@@ -548,7 +547,7 @@ dead_deal_with_test(statement s,
     /* Go on the recursion on the remaining branch : */
     suppress_dead_code_statement(st_false);
     dead_code_if_true_branch_removed++;
-    return FALSE;
+    return false;
     break;
 
   case else_is_dead :
@@ -556,7 +555,7 @@ dead_deal_with_test(statement s,
     test_false(t) = statement_undefined;
     test_true(t) = statement_undefined;
     remove_if_statement_according_to_write_effects(s,
-						   FALSE /* structured if */);
+						   false /* structured if */);
     /* Concatenate an eventual IF expression (if write effects) with
        the false branch: */
     statement_instruction(s) =
@@ -566,7 +565,7 @@ dead_deal_with_test(statement s,
     /* Go on the recursion on the remaining branch : */
     suppress_dead_code_statement(st_true);
     dead_code_if_false_branch_removed++;
-    return FALSE;
+    return false;
     break;
 
   case nothing_about_test :
@@ -574,9 +573,9 @@ dead_deal_with_test(statement s,
 
   default :
     pips_assert("dead_deal_with_test does not understand dead_test_filter()",
-                TRUE);
+                true);
   }
-  return TRUE;
+  return true;
 }
 
 
@@ -608,7 +607,7 @@ dead_unstructured_test_filter(statement st)
 	precondition_add_condition_information(transformer_dup(pre),
 					       cond,
 					       transformer_undefined,
-					       TRUE);
+					       true);
     ifdebug(6)
 	sc_fprint(stderr,
 		  predicate_system(transformer_relation(pre_true)),
@@ -618,7 +617,7 @@ dead_unstructured_test_filter(statement st)
 	precondition_add_condition_information(transformer_dup(pre),
 					       cond,
 					       transformer_undefined,
-					       FALSE);
+					       false);
     ifdebug(6)
 	sc_fprint(stderr,
 		  predicate_system(transformer_relation(pre_false)),
@@ -683,9 +682,9 @@ dead_recurse_unstructured(unstructured u)
 	      gen_remove_once(&control_predecessors(true_control), c);
 	      /* Replace the IF with nothing or its expression: */
 	      remove_if_statement_according_to_write_effects
-		(control_statement(c), TRUE /* unstructured if */);
+		(control_statement(c), true /* unstructured if */);
 	      
-	      some_unstructured_ifs_have_been_changed = TRUE;
+	      some_unstructured_ifs_have_been_changed = true;
 	      dead_code_unstructured_if_true_branch_removed++;
 	      break;
                          
@@ -698,9 +697,9 @@ dead_recurse_unstructured(unstructured u)
 	      gen_remove_once(&control_predecessors(false_control), c);
 	      /* Replace the IF with nothing or its expression: */
 	      remove_if_statement_according_to_write_effects
-		(control_statement(c), TRUE /* unstructured if */);
+		(control_statement(c), true /* unstructured if */);
 	      
-	      some_unstructured_ifs_have_been_changed = TRUE;
+	      some_unstructured_ifs_have_been_changed = true;
 	      dead_code_unstructured_if_false_branch_removed++;
 	      break;
 	      
@@ -716,9 +715,9 @@ dead_recurse_unstructured(unstructured u)
 		gen_remove_once(&control_predecessors(false_control), c);
 		/* Replace the IF with nothing or its expression: */
 		remove_if_statement_according_to_write_effects
-		  (control_statement(c), TRUE /* unstructured if */);
+		  (control_statement(c), true /* unstructured if */);
 	      
-		some_unstructured_ifs_have_been_changed = TRUE;
+		some_unstructured_ifs_have_been_changed = true;
 		dead_code_unstructured_if_false_branch_removed++;
 	      }
 	      break;
@@ -785,7 +784,7 @@ dead_statement_rewrite(statement s)
 	 stdebug(9, "dead_statement_rewrite: ", s);
 
 	 remove_if_statement_according_to_write_effects
-	   (s, FALSE /* structured if */);
+	   (s, false /* structured if */);
        }
        break;
    }
@@ -842,7 +841,7 @@ dead_statement_filter(statement s)
 	   /* Well, it is likely some unreachable code that should be
               removed later by an unspaghettify: */
 	 pips_debug(2, "This statement is likely unreachable. Skip...\n");
-	 retour = FALSE;
+	 retour = false;
 	 break;
        }
 
@@ -913,12 +912,12 @@ dead_statement_filter(statement s)
 	     stdebug(9, "dead_statement_filter: out remove_loop_statement", s);
 
 	     suppress_dead_code_statement(body);
-	     retour = FALSE;
+	     retour = false;
 	     break;
 	 }
 	 else {
 	     /* Standard loop, proceed downwards */
-	     retour = TRUE;
+	     retour = true;
 	     break;
 	 }
      }
@@ -936,16 +935,16 @@ dead_statement_filter(statement s)
          /* Stop going down since it has just been done in
 	  * dead_recurse_unstructured():
 	  */
-         retour = FALSE;
+         retour = false;
          break;
       }
 
       /* Well, else we are going on the inspection... */
-      retour = TRUE;
+      retour = true;
       break;
    }
 
-   if (retour == FALSE) {
+   if (retour == false) {
        /* Try to rewrite the code underneath. Useful for tests with
 	* two empty branches
 	*/
@@ -966,56 +965,50 @@ dead_statement_filter(statement s)
 void
 suppress_dead_code_statement(statement mod_stmt)
 {
-    dead_statement_filter(mod_stmt);
-    gen_recurse(mod_stmt, statement_domain,
-		dead_statement_filter, dead_statement_rewrite);
-    dead_statement_rewrite(mod_stmt);	
-
+  dead_statement_filter(mod_stmt);
+  gen_recurse(mod_stmt, statement_domain,
+	      dead_statement_filter, dead_statement_rewrite);
+  dead_statement_rewrite(mod_stmt);
 }
 
-
 /*
- * Dead code elimination     
+ * Dead code elimination
  * mod_name : MODule NAME, nom du programme Fortran
  * mod_stmt : MODule STateMenT
  */
-
-bool
-suppress_dead_code(char * mod_name)  
+bool suppress_dead_code(string mod_name)
 {
   statement mod_stmt;
 
   /* Get the true ressource, not a copy. */
-  mod_stmt = (statement) db_get_memory_resource(DBR_CODE, mod_name, TRUE);
+  mod_stmt = (statement) db_get_memory_resource(DBR_CODE, mod_name, true);
   set_current_module_statement(mod_stmt);
 
   set_current_module_entity(module_name_to_entity(mod_name));
 
-  /* FI: RK used a FALSE for db_get, i.e. an impur db_get...
+  /* FI: RK used a false for db_get, i.e. an impur db_get...
    * I do not know why
    */
   set_proper_rw_effects((statement_effects)
-			db_get_memory_resource(DBR_PROPER_EFFECTS,
-					       mod_name,
-					       TRUE));
+      db_get_memory_resource(DBR_PROPER_EFFECTS, mod_name, true));
 
   set_precondition_map((statement_mapping)
-		       db_get_memory_resource(DBR_PRECONDITIONS,
-					      mod_name,
-					      TRUE));
+      db_get_memory_resource(DBR_PRECONDITIONS, mod_name, true));
+
+  set_cumulated_rw_effects((statement_effects)
+      db_get_memory_resource(DBR_CUMULATED_EFFECTS, mod_name, true));
 
   debug_on("DEAD_CODE_DEBUG_LEVEL");
 
   ifdebug(1) {
     pips_debug(1, "Begin for %s\n", mod_name);
-      pips_assert("Statements inconsistants...", statement_consistent_p(mod_stmt));
+      pips_assert("Statements inconsistants...",
+		  statement_consistent_p(mod_stmt));
   }
-  
-  set_cumulated_rw_effects((statement_effects)
-			   db_get_memory_resource(DBR_CUMULATED_EFFECTS, mod_name, TRUE));
+
   module_to_value_mappings(get_current_module_entity());
   initialize_dead_code_statistics();
-  some_unstructured_ifs_have_been_changed = FALSE;
+  some_unstructured_ifs_have_been_changed = false;
   suppress_dead_code_statement(mod_stmt);
   insure_return_as_last_statement(get_current_module_entity(), &mod_stmt);
   display_dead_code_statistics();
@@ -1030,7 +1023,7 @@ suppress_dead_code(char * mod_name)
   DB_PUT_MEMORY_RESOURCE(DBR_CODE, mod_name, mod_stmt);
   DB_PUT_MEMORY_RESOURCE(DBR_CALLEES, mod_name,
 			 (char *) compute_callees(mod_stmt));
-  
+
   reset_current_module_statement();
   reset_current_module_entity();
   reset_precondition_map();
@@ -1040,7 +1033,7 @@ suppress_dead_code(char * mod_name)
   }
 
   pips_debug(1, "End for %s\n", mod_name);
-  
+
   if (some_unstructured_ifs_have_been_changed)
      /* Now call the unspaghettify() function to remove some unreachable
         code after unstructured "if" elimination: */
@@ -1049,34 +1042,30 @@ suppress_dead_code(char * mod_name)
   remove_useless_label(mod_name);
 
   ifdebug(1)
-      pips_assert("Statements inconsistants...", 
-		  statement_consistent_p(mod_stmt));
-  
-  return TRUE;
+    pips_assert("statement is still consistent...",
+		statement_consistent_p(mod_stmt));
+
+  return true;
 }
 
 
 /* Return true if a statement has at least one write effect in the
    effects list. */
-bool
-statement_write_effect_p(statement s)
+bool statement_write_effect_p(statement s)
 {
-   bool write_effect_found = FALSE;
-   list effects_list = load_proper_rw_effects_list(s);
+  bool write_effect_found = false;
+  list effects_list = load_proper_rw_effects_list(s);
 
-   MAP(EFFECT, an_effect,
-       {
-          if (action_write_p(effect_action(an_effect))) {
-             write_effect_found = TRUE;
-             break;
-          }
-       },
-       effects_list);
+  FOREACH(effect, an_effect, effects_list)
+  {
+    if (action_write_p(effect_action(an_effect))) {
+      write_effect_found = true;
+      break;
+    }
+  };
 
-   return write_effect_found;
+  return write_effect_found;
 }
-
-
 
 /**
  * @brief remove the label of a statement if the statement is not
@@ -1105,7 +1094,7 @@ void statement_remove_useless_label(statement s)
   }
 }
 
-/** 
+/**
  * recursievly remove all labels from a module
  * only labels in unstructured are kept
  * @param module_name module considered
@@ -1118,7 +1107,7 @@ remove_useless_label(char* module_name)
    /* Get the module ressource */
    entity module = module_name_to_entity( module_name );
    statement module_statement = 
-       (statement) db_get_memory_resource(DBR_CODE, module_name, TRUE);
+       (statement) db_get_memory_resource(DBR_CODE, module_name, true);
 
    set_current_module_entity( module );
    set_current_module_statement( module_statement );
