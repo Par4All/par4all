@@ -28,7 +28,7 @@ echo
 
 apply UNSPLIT
 # shell $(PIPS_CC) -c inlining07.database/Src/inlining07.c
-shell gcc -c inlining07.database/Src/inlining07.c
+shell cc -c inlining07.database/Src/inlining07.c
 
 close
 delete inlining07

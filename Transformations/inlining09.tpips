@@ -27,7 +27,7 @@ echo Unsplit resulting code
 echo
 
 apply UNSPLIT
-shell gcc -c inlining09.database/Src/inlining09.c
+shell cc -c inlining09.database/Src/inlining09.c
 
 close
 delete inlining09

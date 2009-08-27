@@ -27,7 +27,7 @@ echo
 
 apply UNSPLIT
 # shell $(PIPS_CC) -c cleandec01.database/Src/cleandec01.c
-shell gcc -c cleandec01.database/Src/cleandec01.c
+shell cc -c cleandec01.database/Src/cleandec01.c
 
 close
 delete cleandec01

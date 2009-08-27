@@ -28,8 +28,8 @@ echo Unsplit resulting code
 echo
 
 apply UNSPLIT
-shell gcc  ${VDIR:-.}/variable_expansion01.c -o  ${VDIR:-.}/ve
-shell gcc  variable_expansion01.database/Src/variable_expansion01.c -o variable_expansion01.database/Src/ve
+shell cc  ${VDIR:-.}/variable_expansion01.c -o  ${VDIR:-.}/ve
+shell cc  variable_expansion01.database/Src/variable_expansion01.c -o variable_expansion01.database/Src/ve
 shell if test `variable_expansion01.database/Src/ve` = `${VDIR:-.}/ve` ; then echo "ok"; else echo "ko" ; fi
 shell rm -f variable_expansion01.database/Src/ve ${VDIR:-.}/ve
 

@@ -109,7 +109,7 @@ echo Unsplit and compile resulting code
 echo
 
 apply UNSPLIT
-shell gcc -c inlining17.database/Src/inlining17.c
+shell cc -c inlining17.database/Src/inlining17.c
 shell rm inlining17.o
 
 close

@@ -17,7 +17,7 @@ echo
 echo Execute initial code
 echo
 
-shell gcc flatten_code11.c
+shell cc flatten_code11.c
 shell ./a.out
 
 echo
@@ -46,7 +46,7 @@ echo
 
 apply UNSPLIT
 # shell cat flatten_code11.database/Src/flatten_code11.c
-shell gcc flatten_code11.database/Src/flatten_code11.c
+shell cc flatten_code11.database/Src/flatten_code11.c
 
 echo
 echo Execute resulting code

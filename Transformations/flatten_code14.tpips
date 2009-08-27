@@ -18,7 +18,7 @@ echo
 echo Compile initial code
 echo
 
-shell gcc -c $WSPC.c
+shell cc -c $WSPC.c
 #shell ./a.out
 
 echo
@@ -41,7 +41,7 @@ apply UNSPLIT[$WSPC]
 close
 
 # reentry
-shell gcc -c -Wall $WSPC.database/Src/$WSPC.c
+shell cc -c -Wall $WSPC.database/Src/$WSPC.c
 create ${WSPC}_2 $WSPC.database/Src/$WSPC.c 
 
 activate C_PARSER

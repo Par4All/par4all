@@ -69,8 +69,8 @@ display PRINTED_FILE
 
 # check result
 apply UNSPLIT
-shell gcc ${VDIR:-.}/carto.c -lm -o ${VDIR:-.}/carto
-shell gcc carto.database/Src/carto.c -lm -o  carto.database/Src/carto
+shell cc ${VDIR:-.}/carto.c -lm -o ${VDIR:-.}/carto
+shell cc carto.database/Src/carto.c -lm -o  carto.database/Src/carto
 shell if test `./carto.database/Src/carto` = `${VDIR:-.}/carto` ; then echo "ok" ; else echo "ko" ; fi
 shell rm -f carto.database/Src/carto ${VDIR:-.}/carto
 

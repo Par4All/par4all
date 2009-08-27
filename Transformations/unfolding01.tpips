@@ -37,7 +37,7 @@ echo Unsplit resulting code
 echo
 
 apply UNSPLIT
-shell gcc -c unfolding01.database/Src/unfolding01.c
+shell cc -c unfolding01.database/Src/unfolding01.c
 shell rm -f unfolding01.o
 
 close

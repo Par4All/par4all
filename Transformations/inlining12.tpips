@@ -35,7 +35,7 @@ echo Unsplit resulting code
 echo
 
 apply UNSPLIT
-shell gcc -c inlining12.database/Src/inlining12.c
+shell cc -c inlining12.database/Src/inlining12.c
 shell rm inlining12.o
 
 close

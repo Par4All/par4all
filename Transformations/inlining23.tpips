@@ -28,8 +28,8 @@ echo Unsplit resulting code
 echo
 
 apply UNSPLIT
-shell gcc ${WSPACE}.database/Src/inlining23.c -o ${WSPACE}.database/Src/inlining
-shell gcc ${VDIR:-.}/inlining23.c -o ${VDIR:-.}/inlining
+shell cc ${WSPACE}.database/Src/inlining23.c -o ${WSPACE}.database/Src/inlining
+shell cc ${VDIR:-.}/inlining23.c -o ${VDIR:-.}/inlining
 shell if test `${WSPACE}.database/Src/inlining` = `${VDIR:-.}/inlining`; then echo "ok"; else echo "ko" ; fi
 shell rm -f ${VDIR:-.}/inlining ${WSPACE}.database/Src/inlining
 

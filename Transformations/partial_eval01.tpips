@@ -33,8 +33,8 @@ echo Unsplit resulting code
 echo
 
 apply UNSPLIT
-shell gcc ${VDIR:-.}/partial_eval01.c -o ${VDIR:-.}/partial_eval
-shell gcc partial_eval01.database/Src/partial_eval01.c  -o partial_eval01.database/Src/partial_eval
+shell cc ${VDIR:-.}/partial_eval01.c -o ${VDIR:-.}/partial_eval
+shell cc partial_eval01.database/Src/partial_eval01.c  -o partial_eval01.database/Src/partial_eval
 shell if test `partial_eval01.database/Src/partial_eval` = `${VDIR:-.}/partial_eval`; then echo "ok"; else echo "ko" ; fi
 shell rm -rf partial_eval01.database/Src/partial_eval ${VDIR:-.}/partial_eval
 

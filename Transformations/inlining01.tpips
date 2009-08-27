@@ -31,7 +31,7 @@ echo
 
 apply UNSPLIT
 # shell $(PIPS_CC) -c inlining01.database/Src/inlining01.c
-shell gcc -c inlining01.database/Src/inlining01.c
+shell cc -c inlining01.database/Src/inlining01.c
 shell rm -f inlining01.o
 
 close

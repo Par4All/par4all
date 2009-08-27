@@ -32,7 +32,7 @@ echo Unsplit resulting code
 echo
 
 apply UNSPLIT
-shell gcc -c inlining19.database/Src/inlining19.c inlining19.database/Src/inlining19-foo.c
+shell cc -c inlining19.database/Src/inlining19.c inlining19.database/Src/inlining19-foo.c
 shell rm -f inlining19.o inlining19-foo.o
 
 close

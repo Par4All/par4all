@@ -37,7 +37,7 @@ echo Unsplit resulting code
 echo
 apply UNSPLIT
 
-shell gcc -c c_unroll1.database/Src/c_unroll1.c
+shell cc -c c_unroll1.database/Src/c_unroll1.c
 shell rm -f c_unroll1.o
 
 close

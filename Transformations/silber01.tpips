@@ -27,7 +27,7 @@ echo
 
 apply UNSPLIT
 # shell $(PIPS_CC) -c silber01.database/Src/silber01.c
-shell gcc -c silber01.database/Src/silber01.c
+shell cc -c silber01.database/Src/silber01.c
 
 close
 #delete silber01

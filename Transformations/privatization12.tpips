@@ -46,9 +46,9 @@ echo
 echo Run code
 echo
 
-shell gcc ${VDIR:-.}/privatization12.c
+shell cc ${VDIR:-.}/privatization12.c
 shell ./a.out 
-shell gcc privatization12.database/Src/privatization12.c
+shell cc privatization12.database/Src/privatization12.c
 shell ./a.out 
 shell rm -f a.out
 
