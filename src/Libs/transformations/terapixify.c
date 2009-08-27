@@ -82,29 +82,34 @@ bool do_kernelize(statement s, entity loop_label)
             pips_user_error("you tried to kernelize a sequential loop\n");
 
         /* perform index set splitting to get the good loop range */
-        int count;
-        if(!range_count(loop_range(l),&count))
-            pips_user_error("unable to count the number of iterations in given loop\n");
-        int increment_val;
-        expression_integer_value(range_increment(loop_range(l)),&increment_val);
-        int split_index = increment_val*(count - count%nb_nodes) ;
-        entity split_index_entity = 
-            make_C_or_Fortran_constant_entity(
-                    itoa(split_index),
-                    is_basic_int,
-                    DEFAULT_INTEGER_TYPE_SIZE,
-                    fortran_module_p(get_current_module_entity())
-                    );
-        index_set_split_loop(s,split_index_entity);
-        /* now s is a block with two loops, we are interested in the first one */
+#if 0
+        {
+            int count;
+            if(!range_count(loop_range(l),&count))
+                pips_user_error("unable to count the number of iterations in given loop\n");
+            int increment_val;
+            expression_integer_value(range_increment(loop_range(l)),&increment_val);
+            int split_index = increment_val*(count - count%nb_nodes) ;
+            entity split_index_entity = 
+                make_C_or_Fortran_constant_entity(
+                        itoa(split_index),
+                        is_basic_int,
+                        DEFAULT_INTEGER_TYPE_SIZE,
+                        fortran_module_p(get_current_module_entity())
+                        );
+            index_set_split_loop(s,split_index_entity);
+            /* now s is a block with two loops, we are interested in the first one */
 
-        s= STATEMENT(CAR(statement_block(s)));
+            s= STATEMENT(CAR(statement_block(s)));
+        }
+#endif
 
         /* we can strip mine the loop */
         loop_strip_mine(s,nb_nodes,-1);
         l = statement_loop(s);
 
         /* it's safe to skip the second level loop, because of the index set splitting */
+
         statement replaced_loop = loop_body(l);
         instruction erased_instruction = statement_instruction(replaced_loop);
         entity outermost_loop_index = loop_index(instruction_loop(erased_instruction));
@@ -194,6 +199,24 @@ bool can_terapixify_call_p(call c, bool *can_terapixify)
     return true;
 }
 
+static
+bool can_terapixify_expression_p(expression e, bool *can_terapixify)
+{
+    basic b = expression_basic(e);
+    if(!basic_int_p(b) && ! basic_overloaded_p(b) )
+    {
+        list ewords = words_expression(e);
+        string estring = words_to_string(ewords);
+        string bstring = basic_to_string(b);
+        pips_user_warning("found invalid expression %s of basic %s\n",estring, bstring);
+        free(bstring);
+        free(estring);
+        gen_free_list(ewords);
+        return *can_terapixify=false;
+    }
+    return true;
+}
+
 struct entity_bool { entity e; bool b; };
 
 static
@@ -235,6 +258,7 @@ bool normalize_microcode( char * module_name)
             whileloop_domain,cannot_terapixify,gen_null,
             forloop_domain,cannot_terapixify,gen_null,
             call_domain,can_terapixify_call_p,gen_null,
+            expression_domain,can_terapixify_expression_p,gen_null,
             NULL);
 
     /* now, try to guess the goal of the parameters 
