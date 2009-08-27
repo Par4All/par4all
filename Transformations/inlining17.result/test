@@ -377,6 +377,10 @@ freia_error freia_cipo_outer_gradient(freia_data2d *imout, freia_data2d *imin, i
       int kernel_4c[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0};
       int i;
       freia_error ret;
+      extern int freia_aipo_dilate_8c(freia_data2d *f1, freia_data2d *f2, int *f3);
+      extern int freia_common_check_image_bpp_compat(freia_data2d *f1, freia_data2d *f2, void *f3);
+      extern int freia_common_print_backtrace();
+      extern struct _IO_FILE *stderr;
       if (freia_common_check_image_bpp_compat(imout, imin, (void *) 0)!=1) {
 
          fprintf(stderr, "ERROR: file %s, line %d, function %s: ""bpp of images are not compatibles\n", "./freia.src/cipo/src/freiaComplexOpMorpho.c", 90, "freia_cipo_dilate");
@@ -419,12 +423,21 @@ int main()
    {
       int _return0;
       freia_error ret;
+      extern int freia_aipo_dilate_8c(freia_data2d *f1, freia_data2d *f2, int *f3);
+      extern int freia_aipo_sub(freia_data2d *f1, freia_data2d *f2, freia_data2d *f3);
+      extern int freia_common_check_image_bpp_compat(freia_data2d *f1, freia_data2d *f2, void *f3);
+      extern int freia_common_print_backtrace();
+      extern struct _IO_FILE *stderr;
       {
          int kernel_8c[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
          int kernel_6c[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1};
          int kernel_4c[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0};
          int i;
          freia_error ret;
+         extern int freia_aipo_dilate_8c(freia_data2d *f1, freia_data2d *f2, int *f3);
+         extern int freia_common_check_image_bpp_compat(freia_data2d *f1, freia_data2d *f2, void *f3);
+         extern int freia_common_print_backtrace();
+         extern struct _IO_FILE *stderr;
          if (freia_common_check_image_bpp_compat(imout, imin, (void *) 0)!=1) {
 
             fprintf(stderr, "bpp of images are not compatibles\n""ERROR: file %s, line %d, function %s: ", "./freia.src/cipo/src/freiaComplexOpMorpho.c", 90, "freia_cipo_dilate");
@@ -456,12 +469,21 @@ int main()
    {
       int _return0;
       freia_error ret;
+      extern int freia_aipo_dilate_8c(freia_data2d *f1, freia_data2d *f2, int *f3);
+      extern int freia_aipo_sub(freia_data2d *f1, freia_data2d *f2, freia_data2d *f3);
+      extern int freia_common_check_image_bpp_compat(freia_data2d *f1, freia_data2d *f2, void *f3);
+      extern int freia_common_print_backtrace();
+      extern struct _IO_FILE *stderr;
       {
          int kernel_8c[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
          int kernel_6c[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1};
          int kernel_4c[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0};
          int i;
          freia_error ret;
+         extern int freia_aipo_dilate_8c(freia_data2d *f1, freia_data2d *f2, int *f3);
+         extern int freia_common_check_image_bpp_compat(freia_data2d *f1, freia_data2d *f2, void *f3);
+         extern int freia_common_print_backtrace();
+         extern struct _IO_FILE *stderr;
          if (freia_common_check_image_bpp_compat(imout, imin, (void *) 0)!=1) {
 
             fprintf(stderr, "bpp of images are not compatibles\n""ERROR: file %s, line %d, function %s: ", "./freia.src/cipo/src/freiaComplexOpMorpho.c", 90, "freia_cipo_dilate");
@@ -505,6 +527,11 @@ int main()
    uint32_t size = 4;
    int _return0_0;
    freia_error ret_0;
+   extern int freia_aipo_dilate_8c(freia_data2d *f1, freia_data2d *f2, int *f3);
+   extern int freia_aipo_sub(freia_data2d *f1, freia_data2d *f2, freia_data2d *f3);
+   extern int freia_common_check_image_bpp_compat(freia_data2d *f1, freia_data2d *f2, void *f3);
+   extern int freia_common_print_backtrace();
+   extern struct _IO_FILE *stderr;
    int kernel_8c_0[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
    int kernel_6c_0[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1};
    int kernel_4c_0[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0};
