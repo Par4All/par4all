@@ -846,7 +846,7 @@ static void generate_wiring
 	  out->flip = (in->image == ENTITY(CAR(lins)));
 	break;
       case 1:
-	out->flip = in->side==1;
+	out->flip = (in->side==1);
 	break;
       default:
       case 0:
@@ -1333,7 +1333,7 @@ static void freia_spoc_pipeline
     sb_cat(body, " and image ", entity_local_name(out1),
 	   " on ", itoa(out1_side), "\n", NULL);
 
-    // know extract them.
+    // extract the first one.
     out.image = out0;
     out.producer = NULL;
     out.level = spoc_type_out;
@@ -1347,6 +1347,8 @@ static void freia_spoc_pipeline
     sb_app(body, "\n  // fill in to the end...\n");
     generate_wiring(body, &in0, &out, wiring);
 
+    // extract the seconde one
+    sb_app(body, "\n");
     out.image = out1;
     out.producer = NULL;
     out.level = spoc_type_out;
