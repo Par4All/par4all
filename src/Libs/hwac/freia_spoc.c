@@ -136,8 +136,7 @@ static void spoc_poc_conf
 
     // spocinstr.poc[0][0].op = SPOC_POC_ERODE;
     comment(body, spoc_type_poc, orig, stage, side, false);
-    sb_cat(body,
-      "  si.poc[", s_stag, "][", s_side, "].op = ", NULL);
+    sb_cat(body, "  si.poc[", s_stag, "][", s_side, "].op = ", NULL);
     if (poc.op==spoc_poc_erode)
       sb_app(body, "SPOC_POC_ERODE;\n");
     else if (poc.op==spoc_poc_dilate)
@@ -146,8 +145,7 @@ static void spoc_poc_conf
       pips_internal_error("unexpected poc operation %d", poc.op);
 
     // spocinstr.poc[0][0].grid = SPOC_POC_8_CONNEX;
-    sb_cat(body,
-      "  si.poc[", s_stag, "][", s_side, "].grid = ", NULL);
+    sb_cat(body, "  si.poc[", s_stag, "][", s_side, "].grid = ", NULL);
     if (poc.connectivity==6)
       sb_app(body, "SPOC_POC_6_CONNEX;\n");
     else if (poc.connectivity==8)
@@ -785,8 +783,7 @@ static void generate_wiring
 	 " [", in_stage, " ", what_operation(in->level), NULL);
   if (in->level!=spoc_type_alu)
     sb_cat(code, " ", in_side, NULL);
-  sb_cat(code,
-	 "] -> [", out_stage, " ", what_operation(out->level), NULL);
+  sb_cat(code, "] -> [", out_stage, " ", what_operation(out->level), NULL);
   if (out->level!=spoc_type_alu)
     sb_cat(code, " ", out_side, NULL);
   sb_cat(code, "] ", itoa(dagvtx_number(out->producer)), " ",
