@@ -16,11 +16,10 @@ int main(void)
    foo *m;
    {
       foo *j;
-      extern foo *allo(int f1);
-      j = allo(m->bpp);                                                 /*0008*/
+      j = allo(m->bpp);                                                 /*0007*/
       /*0004*/
-      _return0 = 0;                                                     /*0009*/
+      _return0 = 0;                                                     /*0008*/
    }
-   _return0;                                                            /*0013*/
-   return 0;                                                            /*0014*/
+   _return0;                                                            /*0012*/
+   return 0;                                                            /*0013*/
 }

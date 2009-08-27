@@ -1,0 +1,41 @@
+delete outline01
+
+setproperty ABORT_ON_USER_ERROR TRUE
+create outline01 outline01.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+echo
+echo Initial code
+echo
+
+display PRINTED_FILE[%ALL]
+
+
+echo
+echo Code after outlining
+echo
+
+apply LOCALIZE_DECLARATION[foo]
+apply CLEAN_DECLARATIONS[foo]
+
+setproperty OUTLINE_MODULE_NAME "kernel"
+apply OUTLINE[foo]
+n
+n
+n
+y
+
+display PRINTED_FILE[%ALL]
+
+echo
+echo unsplit
+echo
+
+apply UNSPLIT[%ALL]
+
+close
+delete outline01
+quit

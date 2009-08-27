@@ -1,0 +1,45 @@
+delete array_to_pointer04
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create array_to_pointer04 array_to_pointer04.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+echo
+echo Initial code
+echo
+module vector_product
+
+display PRINTED_FILE
+
+echo
+echo Code after array conversion
+echo
+
+setproperty ARRAY_TO_POINTER_FLATTEN_ONLY FALSE
+setproperty ARRAY_TO_POINTER_CONVERT_PARAMETERS TRUE
+apply ARRAY_TO_POINTER
+display PRINTED_FILE
+
+echo
+echo Code after partial eval
+echo
+
+apply PARTIAL_EVAL
+display PRINTED_FILE
+
+echo
+echo Unsplit resulting code
+echo
+
+apply UNSPLIT
+shell gcc -c array_to_pointer04.database/Src/array_to_pointer04.c  -o array_to_pointer04.o
+shell rm -rf array_to_pointer04.o
+
+close
+delete array_to_pointer04
+quit
+
