@@ -34,5 +34,5 @@ shell if test `${WSPACE}.database/Src/inlining` = `${VDIR:-.}/inlining`; then ec
 shell rm -f ${VDIR:-.}/inlining ${WSPACE}.database/Src/inlining
 
 close
-#delete ${WSPACE}
+delete ${WSPACE}
 quit

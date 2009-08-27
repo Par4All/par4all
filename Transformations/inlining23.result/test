@@ -1,0 +1,85 @@
+ main
+     foo
+     bla
+         foo
+int bla(void)
+{
+   int f = foo();
+   int bla_int = f+2;
+   return bla_int;                                                      /*0006*/
+}
+int foo(void)
+{
+   int foo_int = 1;
+   return foo_int;                                                      /*0005*/
+}
+int main(void)
+{
+   int f = foo();
+   int b = bla();
+   printf("%d-%d\n", f, b);                                             /*0018*/
+   return 0;                                                            /*0019*/
+}
+int main(void)
+{
+   int _return0;
+   int f;
+   int b;
+   {
+      int foo_int = 1;
+      _return0 = foo_int;                                               /*0008*/
+   }
+   f = _return0;                                                        /*0012*/
+   b = bla();                                                           /*0013*/
+   printf("%d-%d\n", f, b);                                             /*0014*/
+   /*0018*/
+   return 0;                                                            /*0015*/
+}
+int bla(void)
+{
+   int _return0;
+   int f;
+   int bla_int;
+   {
+      int foo_int = 1;
+      _return0 = foo_int;                                               /*0008*/
+   }
+   f = _return0;                                                        /*0012*/
+   bla_int = f+2;                                                       /*0013*/
+   return bla_int;                                                      /*0014*/
+}
+int main(void)
+{
+   int _return1;
+   int _return0;
+   int f;
+   int b;
+   {
+      int foo_int = 1;
+      _return0 = foo_int;                                               /*0009*/
+   }
+   f = _return0;                                                        /*0011*/
+   {
+      int _return0;
+      int f;
+      int bla_int;
+      {
+         int foo_int = 1;
+         _return0 = foo_int;                                            /*0018*/
+      }
+      f = _return0;                                                     /*0020*/
+      /*0012*/
+      bla_int = f+2;                                                    /*0021*/
+      /*0013*/
+      _return1 = bla_int;                                               /*0022*/
+   }
+   b = _return1;                                                        /*0026*/
+   printf("%d-%d\n", f, b);                                             /*0027*/
+   /*0014*/
+   /*0018*/
+   return 0;                                                            /*0029*/
+}
+
+Unsplit resulting code
+
+ok
