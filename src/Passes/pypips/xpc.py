@@ -151,7 +151,7 @@ class change:
 		c=w[self.modname]
 		for t in self.changes:
 			t.run(self.modname)
-		wdir=self.modname+"/"+self.foutname
+		wdir=self.modname+os.sep+self.foutname
 		w.save(indir=wdir)
 		if compile: #and self.execution_time==0:
 			cflags=os.environ["PIPS_CPP_FLAGS"]+" -I. -O0 -march=native -fopenmp "

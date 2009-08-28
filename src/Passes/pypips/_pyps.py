@@ -62,6 +62,10 @@ class workspace:
 	def __init__(self,*sources2):
 		self.initialize(sources2)
 
+	def __iter__(self):
+		return self.modules.itervalues()
+
+
 	def __getitem__(self,i):
 		return self.modules[i]
 
@@ -95,13 +99,13 @@ class workspace:
 				os.makedirs(indir)
 			if not os.path.isdir(indir): raise ValueError("'" + indir + "' is not a directory") 
 			for s in os.listdir(self.dir()+"Src"):
-				cp=indir+"/"+s
-				shutil.copy(self.dir()+"Src/"+s,cp)
+				cp=indir+os.sep+s
+				shutil.copy(self.dir()+"Src"+os.sep+s,cp)
 				saved+=[cp]
 		else:
 			for s in os.listdir(self.dir()+"Src"):
 				cp=with_prefix+s
-				shutil.copy(self.dir()+"Src/"+s,cp)
+				shutil.copy(self.dir()+"Src"+os.sep+s,cp)
 				saved+=[cp]
 		return saved
 

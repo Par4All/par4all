@@ -1,0 +1,59 @@
+#!/usr/bin/env python
+import pyps
+import sys
+import os
+import string
+import tempfile
+
+#
+##
+#
+
+def pipscc():
+	"""run pips as if it was cc: .c -> pips -> .c -> cc -> .o"""
+	# filters out CPP flags
+	CPPFLAGS=os.getenv("CPPFLAGS","")
+	for opt in sys.argv[1:]:
+		if opt[0:2] == "-D" or opt[0:2] == "-I" :
+			CPPFLAGS+=' "' + opt + '"'
+			sys.argv.remove(opt)
+	print "# CPPFLAGS: ", CPPFLAGS
+
+	# working repository
+	tmpDir=tempfile.mkdtemp("pipscc")
+	print "# intermediate files generated in", tmpDir
+
+	# filters out files
+	INPUT_FILES=[]
+	for opt in sys.argv[1:]:
+		if opt[0] != '-':
+			index=sys.argv.index(opt)
+			INPUT_FILES+=[opt]
+			sys.argv[index] = tmpDir+os.sep+os.path.basename(opt)
+	print "# input files: ", reduce(lambda x,y:x+" "+y,INPUT_FILES,"")
+
+	# run pips with this informations
+	print "# running pips"
+	ws = pyps.workspace(INPUT_FILES)
+	# add extra operations there 
+	for m in ws:
+		m.suppress_dead_code()
+
+	# commit changes
+	ws.save(indir=tmpDir)
+	# the end for pips
+	ws.quit()
+
+	# now run the compiler
+	CC=os.getenv("CC","gcc")
+	cmd=reduce(lambda x,y:x+" "+y,sys.argv[1:],CC)
+	print "# running", cmd
+	os.system(cmd)
+
+
+#
+##
+#
+
+if __name__ == "__main__":
+	pipscc()
