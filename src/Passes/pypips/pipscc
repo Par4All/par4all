@@ -4,6 +4,7 @@ import sys
 import os
 import string
 import tempfile
+from pyps import module
 
 #
 ##
@@ -36,8 +37,7 @@ def pipscc():
 	print "# running pips"
 	ws = pyps.workspace(INPUT_FILES)
 	# add extra operations there 
-	for m in ws:
-		m.suppress_dead_code()
+	map(module.suppress_dead_code,ws)
 
 	# commit changes
 	ws.save(indir=tmpDir)
