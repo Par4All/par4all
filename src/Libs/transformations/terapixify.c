@@ -278,9 +278,28 @@ bool normalize_microcode( char * module_name)
                 bool parameter_written = find_write_effect_on_entity(get_current_module_statement(),e);
                 if( parameter_written ) /* it's an image */
                 {
+                    pips_user_warning("%s seems an image\n",entity_user_name(e));
                 }
                 else /* cannot tell if it's a kernel or an image*/
                 {
+                    int array_size=1;
+                    FOREACH(DIMENSION,d,variable_dimensions(v))
+                    {
+                        int d_size;
+                        if(SizeOfDimension(d,&d_size)) {
+                            array_size*=d_size;
+                        }
+                        else {
+                            array_size=-1;
+                            break;
+                        }
+                    }
+                    if( array_size > 0 && 56 >= array_size ) {
+                        pips_user_warning("%s seems a kernel\n",entity_user_name(e));
+                    }
+                    else {
+                        pips_user_warning("%s seems an image\n",entity_user_name(e));
+                    }
                 }
             }
             else if( entity_used_in_loop_bound_p(e) ) 
