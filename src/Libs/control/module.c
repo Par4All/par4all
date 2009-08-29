@@ -74,7 +74,8 @@ static statement update_unstructured_declarations(statement module_stat)
       statement_declarations(module_stat)
 	= gen_nconc(statement_declarations(module_stat), udl);
     else if(statement_unstructured_p(module_stat)) {
-      /* might be OK... */
+      // might be OK...
+      // should only done on blocks?
       statement_declarations(module_stat)
 	= gen_nconc(statement_declarations(module_stat), udl);
     }
