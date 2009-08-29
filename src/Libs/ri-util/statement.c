@@ -2321,7 +2321,8 @@ list statement_to_declarations(statement s)
 {
   list statement_to_all_included_declarations = NIL;
 
-  gen_context_recurse(s,&statement_to_all_included_declarations, statement_domain, add_statement_declarations, gen_null);
+  gen_context_recurse(s, &statement_to_all_included_declarations,
+		      statement_domain, add_statement_declarations, gen_null);
 
   return statement_to_all_included_declarations;
 }
@@ -2331,50 +2332,121 @@ list instruction_to_declarations(instruction i)
 {
   list statement_to_all_included_declarations = NIL;
 
-  gen_context_recurse(i,&statement_to_all_included_declarations, statement_domain, add_statement_declarations, gen_null);
+  gen_context_recurse(i,&statement_to_all_included_declarations,
+		      statement_domain, add_statement_declarations, gen_null);
 
   return statement_to_all_included_declarations;
 }
 
-static bool add_statement_referenced_entities(reference r,list *statement_to_all_included_referenced_entities)
-{
-  /* Sometimes, a function may be referenced, for instance in a
-     function pointer assignment. */
-  entity v = reference_variable(r);
+/************************************************************ STAT VARIABLES */
 
-  *statement_to_all_included_referenced_entities
-    = CONS(ENTITY, v,*statement_to_all_included_referenced_entities);
-  return TRUE;
+// local struct
+typedef struct {
+  list lents;
+  set sents;
+} entities_t;
+
+static bool add_stat_referenced_entities(reference r, entities_t * vars)
+{
+  // a function may be referenced, eg in a function pointer assignment.
+  entity var = reference_variable(r);
+  if (!set_belong_p(vars->sents, var))
+  {
+    vars->lents = CONS(entity, var, vars->lents);
+    set_add_element(vars->sents, vars->sents, var);
+  }
+  return true;
 }
 
-/* Get a list of all variables referenced recursively within a statement */
+static bool add_loop_index_entity(loop l, entities_t * vars)
+{
+  entity idx = loop_index(l);
+  if (!set_belong_p(vars->sents, idx))
+  {
+    vars->lents = CONS(entity, idx, vars->lents);
+    set_add_element(vars->sents, vars->sents, idx);
+  }
+  return true;
+}
+
+static bool add_ref_entities_in_init(statement s, entities_t * vars)
+{
+  FOREACH(entity, var, statement_declarations(s))
+  {
+    value init = entity_initial(var);
+    if (value_expression_p(init))
+      // only references down there
+      gen_context_recurse(value_expression(init), vars,
+	  reference_domain, add_stat_referenced_entities, gen_null);
+  }
+  return true;
+}
+
+/* Get a list of all variables referenced recursively within a statement:
+ * - as reference in expressions in the code
+ * - as loop indexes, which may not be used anywhere else
+ * - as references in initilializations
+ */
 list statement_to_referenced_entities(statement s)
 {
-  list statement_to_all_included_referenced_entities = NIL;
+  entities_t vars;
+  vars.lents = NIL;
+  vars.sents = set_make(set_pointer);
 
-  gen_context_recurse(s,&statement_to_all_included_referenced_entities, reference_domain, add_statement_referenced_entities, gen_null);
+  gen_context_multi_recurse
+    (s, &vars,
+     reference_domain, add_stat_referenced_entities, gen_null,
+     loop_domain, add_loop_index_entity, gen_null,
+     statement_domain, add_ref_entities_in_init, gen_null,
+     NULL);
 
-  return gen_nreverse(statement_to_all_included_referenced_entities);
+  set_free(vars.sents), vars.sents = NULL;
+  return gen_nreverse(vars.lents);
 }
 
-static bool add_statement_called_user_entities(call c,list *statement_to_all_included_called_user_entities)
+/***************************************************** USER FUNCTIONS CALLED */
+
+static bool add_stat_called_user_entities(call c, entities_t * funcs)
 {
   entity f = call_function(c);
-
-  if(!intrinsic_entity_p(f)) {
-      *statement_to_all_included_called_user_entities=CONS(ENTITY,f,*statement_to_all_included_called_user_entities);
+  if(!intrinsic_entity_p(f) && !set_belong_p(funcs->sents, f))
+  {
+    funcs->lents = CONS(entity, f, funcs->lents);
+    set_add_element(funcs->sents, funcs->sents, f);
   }
-  return TRUE;
+  return true;
 }
 
-/* Get a list of all user function called recursively within a statement */
+static bool add_stat_called_ents_in_inits(statement s, entities_t * funcs)
+{
+  FOREACH(entity, var, statement_declarations(s))
+  {
+    value init = entity_initial(var);
+    if (value_expression_p(init))
+      gen_context_recurse(value_expression(init), funcs,
+		  call_domain, add_stat_called_ents_in_inits, gen_null);
+  }
+  return true;
+}
+
+/* Get a list of all user function called recursively within a statement:
+ * - in the code
+ * - in initialisations
+ */
 list statement_to_called_user_entities(statement s)
 {
-  list statement_to_all_included_called_user_entities = NIL;
+  entities_t funcs;
+  funcs.lents = NIL;
+  funcs.sents = set_make(set_pointer);
 
-  gen_context_recurse(s,&statement_to_all_included_called_user_entities, statement_domain, add_statement_called_user_entities, gen_null);
+  gen_context_multi_recurse
+     (s, &funcs,
+      call_domain, add_stat_called_user_entities, gen_null,
+      statement_domain, add_stat_called_ents_in_inits, gen_null,
+      NULL);
 
-  return gen_nreverse(statement_to_all_included_called_user_entities);
+  set_free(funcs.sents), funcs.sents = NULL;
+  return gen_nreverse(funcs.lents);
 }
 
 /* Return first reference found */
