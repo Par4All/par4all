@@ -1,0 +1,11 @@
+setenv WSPC constant00
+delete $WSPC
+setproperty ABORT_ON_USER_ERROR TRUE
+create $WSPC $WSPC.c
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+activate PRINT_CODE
+display PRINTED_FILE[$WSPC]
+close
+delete $WSPC
+quit
