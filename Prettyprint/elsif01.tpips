@@ -1,0 +1,7 @@
+setenv WSPC elsif01
+delete $WSPC
+create $WSPC $WSPC.f
+display PRINTED_FILE
+close
+delete $WSPC
+quit
