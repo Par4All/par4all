@@ -2409,7 +2409,7 @@ list statement_to_referenced_entities(statement s)
 static bool add_stat_called_user_entities(call c, entities_t * funcs)
 {
   entity f = call_function(c);
-  if(!intrinsic_entity_p(f) && !set_belong_p(funcs->sents, f))
+  if(!set_belong_p(funcs->sents, f) && !intrinsic_entity_p(f))
   {
     funcs->lents = CONS(entity, f, funcs->lents);
     set_add_element(funcs->sents, funcs->sents, f);
@@ -2417,14 +2417,14 @@ static bool add_stat_called_user_entities(call c, entities_t * funcs)
   return true;
 }
 
-static bool add_stat_called_ents_in_inits(statement s, entities_t * funcs)
+static bool add_stat_called_in_inits(statement s, entities_t * funcs)
 {
   FOREACH(entity, var, statement_declarations(s))
   {
     value init = entity_initial(var);
     if (value_expression_p(init))
       gen_context_recurse(value_expression(init), funcs,
-		  call_domain, add_stat_called_ents_in_inits, gen_null);
+		  call_domain, add_stat_called_user_entities, gen_null);
   }
   return true;
 }
@@ -2435,6 +2435,8 @@ static bool add_stat_called_ents_in_inits(statement s, entities_t * funcs)
  */
 list statement_to_called_user_entities(statement s)
 {
+  return NIL;
+
   entities_t funcs;
   funcs.lents = NIL;
   funcs.sents = set_make(set_pointer);
@@ -2442,7 +2444,7 @@ list statement_to_called_user_entities(statement s)
   gen_context_multi_recurse
      (s, &funcs,
       call_domain, add_stat_called_user_entities, gen_null,
-      statement_domain, add_stat_called_ents_in_inits, gen_null,
+      statement_domain, add_stat_called_in_inits, gen_null,
       NULL);
 
   set_free(funcs.sents), funcs.sents = NULL;
