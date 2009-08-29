@@ -17,51 +17,51 @@ C     Derived from POSCAL, but simplified
       LOGICAL         IMPTES, LTESTM                                            
       CHARACTER *  80 FINCAL, NAMECA, NAMECB                                    
       CHARACTER * 132 TITREC                                                    
-C (unreachable)
+C (statement ordering unavailable)
 C     BEGIN BLOCK
-C (unreachable)
+C (statement ordering unavailable)
 C     BEGIN BLOCK
-C (unreachable)
+C (statement ordering unavailable)
 
 c     5             if the next line is commented out, the controlizer bug disappears...
 C     Same thing if the other READ is commented out
       READ (UNIT=NFICAL,FMT='(A)',END=9999) TXLIGN(NFICAL)              0020
-C (unreachable)
+C (statement ordering unavailable)
       IF (END_LUNS(NFICAL)) THEN
-C (unreachable)
+C (statement ordering unavailable)
          GOTO 9999
       ELSE
-C (unreachable)
+C (statement ordering unavailable)
 C        BEGIN BLOCK
 C        END BLOCK
       ENDIF
 C     END BLOCK
-C (unreachable)
+C (statement ordering unavailable)
       DO WHILE (TXLIGN(NFICAL)(1:1).EQ.'('.OR.TXLIGN(NFICAL)(1:1).EQ.   0021
      &'*')                                                              0021
-C (unreachable)
+C (statement ordering unavailable)
 C        BEGIN BLOCK
-C (unreachable)
+C (statement ordering unavailable)
 C        BEGIN BLOCK
-C (unreachable)
+C (statement ordering unavailable)
          READ (UNIT=NFICAL,FMT='(A)',END=9999) TXLIGN(NFICAL)           0023
-C (unreachable)
+C (statement ordering unavailable)
          IF (END_LUNS(NFICAL)) THEN
-C (unreachable)
+C (statement ordering unavailable)
             GOTO 9999
          ELSE
-C (unreachable)
+C (statement ordering unavailable)
 C           BEGIN BLOCK
 C           END BLOCK
          ENDIF
 C        END BLOCK
-C (unreachable)
+C (statement ordering unavailable)
          CONTINUE                                                       0024
 C        END BLOCK
       ENDDO
-C (unreachable)
+C (statement ordering unavailable)
 9999  IRETOU = 1                                                        0025
-C (unreachable)
+C (statement ordering unavailable)
       RETURN
 C     END BLOCK
       END
