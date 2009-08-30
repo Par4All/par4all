@@ -1,5 +1,5 @@
 * pre
-- inlining, full_unroll, dead code elim, flatten_code
++ inlining, full_unroll, dead code elim, flatten_code
 + image reuse
 + scalar deps with proper effects
 - check => ok => deadcode (#define)
@@ -7,10 +7,11 @@
 * input
 + may skip unrelated statements?
 + deal with |= ||= and similars
++ detect redundant operations? replace them with copies?
 - what about full expressions: aipo_x() || aipo_y() || aipo_z()? atomizer?
 - check that there are references where expected?
+- handle different type of images (e.g. distinct BPP)
 - check/remove more implicit hypothesis
-+ detect redundant operations? replace them with copies?
 
 * code
 + cleanup data structures?
@@ -22,16 +23,16 @@
 + compaction
 + handle wiring
 + tell pipsdbm about generated files
-- the generated code is just a file to pips. ok???
 + pipe overflow
-- add checks in generated code (img size and so)?
-- parametric img size/depth? same as code?
 + show DAG!
 + select node shape depending on hardware?
 + add more comments to generated code
 + improve generated comments
-- if only one image is used as input, put it anyway on both sides?
++ if only one image is used as input, put it anyway on both sides?
   may help some schedules if there are multiple successors.
+- add checks in generated code (img size and so)?
+- parametric img size/depth? same as code?
+- the generated code is just a file to pips. ok???
 
 * post
 + remove malloc/free if not used
@@ -42,5 +43,5 @@
 - add more (elementary) tests?
 
 * bugs
++ allocs may be in the middle of the calls
 - reuse of images in some cases
-- allocs may be in the middle of the calls
