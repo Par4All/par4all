@@ -17,6 +17,8 @@
 + cleanup data structures?
 - record scalar deps in dag...
 - remove type ctxcontent?
+- should make elementary ops absdiff(x,y) = abs(diff(x, y))
+- and then match back of necessary to available low level ops.
 
 * output
 + symmetry (flipping)
