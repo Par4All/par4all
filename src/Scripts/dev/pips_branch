@@ -53,8 +53,9 @@ function usage()
     "  -h: help!\n" \
     "  -v: increase verbosity\n" \
     "  -V: show script revision ($rev)\n" \
-    "  -d: dry run (it is the default)\n" \
-    "  -D: do run!\n" \
+    "  -d: dry run (this is the default)\n" \
+    "  -D: do run! do a dry run once before doint it\n" \
+    "  -b: do bundle (this is the default)\n" \
     "  -n: no bundle\n" \
     "  -r url: root url of repositories, ($root)\n" \
     "  -s svn: svn binary to use ($svn)\n" \
@@ -67,8 +68,9 @@ function usage()
     "  name: must be unique among tags or branches for the bundle\n" \
     "        it may include a subdirectory: 'fabien/test'\n" \
     "Examples:\n" \
-    "  $script trunk branches 1.0.x\n" \
-    "  $script branches/1.0.x tags 1.0.1\n" >&2
+    "  dry run: $script trunk branches 1.0.x\n" \
+    "  then do; $script -D trunk branches 1.0.x\n" \
+    "  subdirs: $script -D branches/1.0.x tags 1.0.1\n" >&2
   exit $code
 }
 
@@ -83,6 +85,7 @@ function verb()
   fi >&2
 }
 
+# default is not to run...
 run=:
 function doit()
 {
@@ -103,6 +106,7 @@ while [[ $1 == -* ]] ; do
     # what to do
     -d|--dry-run) run=: ;;
     -D|--do-run) run= ;;
+    -b|--do-bundle) do_bundle=1 ;;
     -n|--no-bundle) do_bundle= ;;
     # control revisions
     -R|--revision) revs+=" $1 " ; shift ;;
@@ -124,7 +128,7 @@ while [[ $1 == -* ]] ; do
   esac
 done
 
-# arguments
+# check and get arguments
 [[ $# -eq 3 ]] || usage 2 "expecting 3 arguments, got $#"
 
 src=$1 type=$2 name=$3
@@ -133,6 +137,7 @@ shift 3
 [[ $type = 'branches' || $type = 'tags' ]] || \
   usage 3 "type argument must be 'branches' or 'tags'"
 
+# should it always be trunk?
 [[ $src == trunk || $src == branches/* ]] || \
   usage 4 "source argument must be 'trunk' or 'branches/...'"
 
