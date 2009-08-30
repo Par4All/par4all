@@ -651,7 +651,8 @@ Why not switch all this stuff to \texttt{git}, which is so
 \emph{cool}? There are several reasons:
 \begin{description}
 \item[system] we already use subversion extensively at CRI for many
-  projects, which are backed-up regularly.
+  projects, which are backed-up regularly (hourly \texttt{svnsync},
+  daily night on tape backup).
 \item[change management] subversion is hard enough, and learning a new
   tool with a different model is a significant investment, which can
   only be justified with a clear added value.
@@ -677,7 +678,7 @@ view from CRI are rather out-of-focus...
 
 In order to access pips logs at anytime, you may consider keeping
 a local copy of pips repositories anywhere you want, including on a
-laptop, with the \texttt{svnsync} command. 
+laptop, with the \texttt{svnsync} command.
 The operation is mostly network bound: it takes under 15~minutes
 to copy the whole history of the 5~repositories from the CRI LAN.
 Beware that this copy must only be used read-only.
@@ -721,7 +722,7 @@ SVN repository. Beware of the limitations:
 \item cloning the pips tree does take a long time;
 \item it does not know about branch management in subversion (since 1.5),
   so merging an svn branch from git and pushing back the result breaks
-  svn branch management; 
+  svn branch management;
 \item commit messages pushed from \texttt{git-svn} may be quite unhelpful;
 \end{itemize}
 So just use \texttt{git-svn} to manage an already created branch which
@@ -808,7 +809,7 @@ hierarchy in a \texttt{PIPS} directory:
   \item \texttt{newgen}
   \item \texttt{nlpmake}
   \item \texttt{pips}
-  \item \texttt{validation} 
+  \item \texttt{validation}
   \end{itemize}
 \item[\texttt{git-svn-work}:] stores the PIPS working copies he uses to
   work in with the \texttt{trunk}/\texttt{branches}/\texttt{tags}
@@ -857,7 +858,9 @@ There are also PIPS specific instructions to \verb|pips_git|:
 
 Many environment variables may be used by PIPS executables and utilities.
 They mainly describe PIPS directory hierarchy, compilation options, helper
-programs, and so on.
+programs, and so on. PIPS should compile and may be launched without
+any such variables, as defaults are provided and computed at run time
+depending on the driver or executable path.
 
 These variables should be initialized by sourcing the \texttt{pipsrc.sh}
 file for \texttt{sh ksh bash} shells, or \texttt{pipsrc.csh} file for
@@ -866,7 +869,6 @@ the setup script, and can be customized as desired.
 
 Two variables are of special interest: \texttt{\$PIPS\_ROOT} which stores
 the root of PIPS current version, and \texttt{\$PIPS\_ARCH}.
-
 
 \subsection{PIPS architecture (\texttt{PIPS\_ARCH})}
 
