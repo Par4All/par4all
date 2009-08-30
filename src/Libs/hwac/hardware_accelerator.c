@@ -40,7 +40,7 @@
 #include "control.h" // for clean_up_sequences
 #include "effects-generic.h" // {set,reset}_proper_rw_effects
 
-extern string freia_spoc_compile(string, statement);
+extern string freia_compile(string, statement);
 
 #define SPOC_HW		"spoc"
 #define TERAPIX_HW	"terapix"
@@ -67,7 +67,7 @@ static int freia_compiler(string module, string hardware)
   pips_debug(1, "considering module %s\n", module);
 
   // accelerated code generation
-  string spoc_file = freia_spoc_compile(module, mod_stat);
+  string spoc_file = freia_compile(module, mod_stat);
 
   // some code cleanup
   clean_up_sequences(mod_stat);

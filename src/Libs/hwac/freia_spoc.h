@@ -29,6 +29,8 @@
 #ifndef   HWAC_FREIA_SPOC_H_
 # define  HWAC_FREIA_SPOC_H_
 
+#define HELPER "_helper_"
+
 /* all SPoC hardware parts as a bitfield */
 typedef enum {
   spoc_nothing = 0x00000000,
