@@ -18,5 +18,5 @@ echo
 display PRINTED_FILE[control02]
 
 close
-#delete control02
+delete control02
 quit

@@ -7,7 +7,7 @@ int control02(int *in, int *val)
       goto break_1;
 break_1:   ;
    if (val)
-       *val =  *in;
+      *val = *in;
    return 0;
 }
 
@@ -20,6 +20,6 @@ int control02(int *in, int *val)
    }
 break_1:   ;
    if (val) 
-       *val =  *in;
+      *val = *in;
    return 0;
 }
