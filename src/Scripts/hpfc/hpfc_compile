@@ -44,13 +44,20 @@ unset MODULE WORKSPACE DUMPFILES NOINSTALL STDOUT STDERR \
 
 rm -f $TMP.*
 
-#
+# auto set PIPS_ROOT and PIPS_ARCH
+[ "$PIPS_ROOT" ] || {
+  bin=`dirname $0`
+  export PIPS_ROOT=`dirname $bin`
+}
+
+[ "$PIPS_ARCH" ] || {
+  export PIPS_ARCH=`$PIPS_ROOT/makes/arch.sh`
+}
+
 # PATH fixed
+PATH=./${PIPS_ARCH}:.:${PIPS_ROOT}/bin/${PIPS_ARCH}:${PATH}
 
-PATH=./${PIPS_ARCH}:.:${PIPS_ROOT}/Bin/${PIPS_ARCH}:${PATH}
-
-#
-# functions
+# some functions
 
 verb()
 {
