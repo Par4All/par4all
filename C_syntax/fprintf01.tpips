@@ -11,19 +11,6 @@ echo parsed printed fileSymbol table for "fprintf01!"
 echo
 
 display SYMBOL_TABLE_FILE[fprintf01!]
-quit
-echo
-echo parsed printed file
-echo
-
-display PARSED_PRINTED_FILE[fprintf01]
-
-echo
-echo printed file
-echo
-
-display PRINTED_FILE[fprintf01]
-
 close
 delete fprintf01
 quit
