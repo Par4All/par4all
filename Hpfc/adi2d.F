@@ -11,23 +11,6 @@
 !
 ! $Id: adi2d.F,v 1.5 1997/05/03 16:23:44 coelho Exp $
 !
-! $Log: adi2d.F,v $
-! Revision 1.5  1997/05/03 16:23:44  coelho
-! updated performances (B higher in cache?) after improvements.
-!
-! Revision 1.4  1997/05/03 16:15:47  coelho
-! more comments, explicit casts, B/U{,h} init inverted.
-!
-! Revision 1.3  1997/05/03 14:56:26  coelho
-! perf report corrected, more comments...
-!
-! Revision 1.2  1997/05/03 13:27:17  coelho
-! local directive added to U initialization.
-!
-! Revision 1.1  1997/05/03 13:23:23  coelho
-! Initial revision
-!
-!
 ! note about (sequential) performances: 
 !  - many divisions that are really expensive... (6 cycles?)
 !  - the __HPFC__ versions performs better than the initial version.
