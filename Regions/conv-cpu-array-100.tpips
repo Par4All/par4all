@@ -1,6 +1,6 @@
-delete pips_c2openmp30081
-
-create pips_c2openmp30081 conv-cpu-array-100.c
+delete conv-cpu-array-100
+create conv-cpu-array-100 conv-cpu-array-100.c
+setproperty ABORT_ON_USER_ERROR TRUE
 module main
 echo Select some options to deal with the C Language:
 echo Parse as C:
@@ -29,5 +29,6 @@ setproperty UNSPAGHETTIFY_TEST_RESTRUCTURING=TRUE
 setproperty UNSPAGHETTIFY_RECURSIVE_DECOMPOSITION=TRUE
 echo Privatize scalar variables on all the modules of the program:
 apply PRIVATIZE_MODULE[conv_cpu]
+delete conv-cpu-array-100 
 quit
 # EOF
