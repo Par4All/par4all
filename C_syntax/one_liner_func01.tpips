@@ -8,6 +8,7 @@ setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
 display PARSED_PRINTED_FILE[%ALL]
 display PRINTED_FILE[%ALL]
 
-shell cat one_liner_func02.database/*/*.c | sed -e '/^# 1[^0-9][^0-9]*/d'
 
+close
+delete one_liner_func01
 quit
