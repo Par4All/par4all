@@ -4,6 +4,7 @@
 main()
 {
   int tmp;
+  tmp = INDICE (+1,-1);
   tmp = INDICE (-1,+1);
   return tmp;
 }
