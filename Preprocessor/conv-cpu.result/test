@@ -6,6 +6,7 @@
 
 
 
+
 /* Copyright (C) 1991-2003,2004,2005,2006,2007 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
@@ -27,6 +28,7 @@
 /*
  *	ISO C99 Standard: 7.20 General utilities	<stdlib.h>
  */
+
 
 
 
@@ -171,27 +173,9 @@
 /* If none of the ANSI/POSIX macros are defined, use POSIX.1 and POSIX.2
    (and IEEE Std 1003.1b-1993 unless _XOPEN_SOURCE is defined).  */
 # 295 "/usr/include/features.h" 3 4
-/* Define __STDC_IEC_559__ and other similar macros.  */
-/* Copyright (C) 2005 Free Software Foundation, Inc.
-   This file is part of the GNU C Library.
-
-   The GNU C Library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Lesser General Public
-   License as published by the Free Software Foundation; either
-   version 2.1 of the License, or (at your option) any later version.
-
-   The GNU C Library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Lesser General Public License for more details.
-
-   You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, write to the Free
-   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-   02111-1307 USA.  */
-# 26 "/usr/include/bits/predefs.h" 3 4
 /* We do support the IEC 559 math functionality, real and complex.  */
-# 297 "/usr/include/features.h" 2 3 4
+
+
 
 /* wchar_t uses ISO 10646-1 (2nd ed., published 2000-09-15) / Unicode 3.1.  */
 
@@ -222,6 +206,7 @@
 
 
 /* This is here only because every header file already includes this one.  */
+
 
 
 /* Copyright (C) 1992-2001, 2002, 2004, 2005, 2006, 2007
@@ -427,9 +412,10 @@
 
 
 
+
 /* Determine the wordsize from the preprocessor defines.  */
 # 349 "/usr/include/sys/cdefs.h" 2 3 4
-# 330 "/usr/include/features.h" 2 3 4
+# 331 "/usr/include/features.h" 2 3 4
 
 
 /* If we don't have __REDIRECT, prototypes will be missing if
@@ -448,24 +434,19 @@
 
 
 
-/* There are some functions that must be declared 'extern inline' even with
-   -Os when building LIBC, or they'll end up undefined.  */
-
-
-
-
-
-
 
 /* This is here only because every header file already includes this one.
    Get the definitions of all the appropriate `__stub_FUNCTION' symbols.
    <gnu/stubs.h> contains `#define __stub_FUNCTION' when FUNCTION is a stub
    that will always return failure (and set errno to ENOSYS).  */
+
 /* This file selects the right generated file of `__stub_FUNCTION' macros
    based on the architecture being compiled for.  */
 
+
 /* Determine the wordsize from the preprocessor defines.  */
 # 5 "/usr/include/gnu/stubs.h" 2 3 4
+
 
 
 
@@ -475,10 +456,11 @@
    in the C library which is a stub, meaning it will fail
    every time called, usually setting errno to ENOSYS.  */
 # 10 "/usr/include/gnu/stubs.h" 2 3 4
-# 362 "/usr/include/features.h" 2 3 4
+# 355 "/usr/include/features.h" 2 3 4
 # 26 "/usr/include/stdlib.h" 2 3 4
 
 /* Get size_t, wchar_t and NULL from <stddef.h>.  */
+
 
 
 
@@ -603,8 +585,6 @@ typedef int wchar_t;
 # 395 "/usr/lib/gcc/x86_64-linux-gnu/4.3.3/include/stddef.h" 3 4
 /* A null pointer constant.  */
 # 34 "/usr/include/stdlib.h" 2 3 4
-
-
 # 96 "/usr/include/stdlib.h" 3 4
 
 /* Returned by `div'.  */
@@ -621,9 +601,6 @@ typedef struct
     long int quot; /* Quotient.  */
     long int rem; /* Remainder.  */
   } ldiv_t;
-
-
-
 # 128 "/usr/include/stdlib.h" 3 4
 /* The largest number rand will return (same as INT_MAX).  */
 
@@ -650,14 +627,12 @@ extern int atoi (const char *__nptr)
 /* Convert a string to a long integer.  */
 extern long int atol (const char *__nptr)
      ;
-
 # 163 "/usr/include/stdlib.h" 3 4
 
 /* Convert a string to a floating-point number.  */
 extern double strtod (const char * __nptr,
         char ** __endptr)
      ;
-
 # 182 "/usr/include/stdlib.h" 3 4
 
 /* Convert a string to a long integer.  */
@@ -668,7 +643,6 @@ extern long int strtol (const char * __nptr,
 extern unsigned long int strtoul (const char * __nptr,
       char ** __endptr, int __base)
      ;
-
 # 308 "/usr/include/stdlib.h" 3 4
 /* Convert N to base 64 using the digits "./0-9A-Za-z", least-significant
    digit first.  Returns a pointer to static storage overwritten by the
@@ -678,6 +652,7 @@ extern char *l64a (long int __n) ;
 /* Read a number from a string S in base 64 as above.  */
 extern long int a64l (const char *__s)
      ;
+
 
 
 
@@ -708,6 +683,7 @@ extern long int a64l (const char *__s)
 
 
 
+
 /* Copyright (C) 1991,1992,1993,1995-2006,2007 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
@@ -726,6 +702,7 @@ extern long int a64l (const char *__s)
    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
    02111-1307 USA.  */
 # 28 "/usr/include/sys/types.h" 2 3 4
+
 
 
 
@@ -755,6 +732,7 @@ extern long int a64l (const char *__s)
 
 
 
+
 /* Copyright (C) 1991,1992,1993,1995-2006,2007 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
@@ -773,6 +751,7 @@ extern long int a64l (const char *__s)
    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
    02111-1307 USA.  */
 # 28 "/usr/include/bits/types.h" 2 3 4
+
 /* Determine the wordsize from the preprocessor defines.  */
 # 29 "/usr/include/bits/types.h" 2 3 4
 
@@ -832,6 +811,7 @@ typedef unsigned long int __u_quad_t;
    and int is always 32 bits.  */
 # 126 "/usr/include/bits/types.h" 3 4
 /* No need to mark the typedef with __extension__.   */
+
 
 
 
@@ -995,6 +975,7 @@ typedef __caddr_t caddr_t;
 
 typedef __key_t key_t;
 # 133 "/usr/include/sys/types.h" 3 4
+
 /* Copyright (C) 1991-1999,2000,2001,2002,2003,2006
 	Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -1018,6 +999,7 @@ typedef __key_t key_t;
  *	ISO C99 Standard: 7.23 Date and time	<time.h>
  */
 # 73 "/usr/include/time.h" 3 4
+
 /* bits/types.h -- definitions of __*_t types underlying *_t types.
    Copyright (C) 2002, 2003, 2004, 2005, 2007 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -1045,10 +1027,8 @@ typedef __key_t key_t;
 
 /* Returned by `time'.  */
 typedef __time_t time_t;
-
-
-
 # 90 "/usr/include/time.h" 3 4
+
 /* bits/types.h -- definitions of __*_t types underlying *_t types.
    Copyright (C) 2002, 2003, 2004, 2005, 2007 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -1076,6 +1056,7 @@ typedef __time_t time_t;
 /* Clock ID used in clock and timer functions.  */
 typedef __clockid_t clockid_t;
 # 102 "/usr/include/time.h" 3 4
+
 /* bits/types.h -- definitions of __*_t types underlying *_t types.
    Copyright (C) 2002, 2003, 2004, 2005, 2007 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -1104,6 +1085,7 @@ typedef __clockid_t clockid_t;
 typedef __timer_t timer_t;
 # 134 "/usr/include/sys/types.h" 2 3 4
 # 147 "/usr/include/sys/types.h" 3 4
+
 /* Copyright (C) 1989, 1997, 1998, 1999, 2000, 2002, 2004
    Free Software Foundation, Inc.
 
@@ -1242,6 +1224,7 @@ typedef unsigned long int u_int64_t;
 typedef int register_t;
 # 216 "/usr/include/sys/types.h" 3 4
 /* In BSD <sys/types.h> is expected to define BYTE_ORDER.  */
+
 /* Copyright (C) 1992, 1996, 1997, 2000, 2008 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
@@ -1259,6 +1242,7 @@ typedef int register_t;
    License along with the GNU C Library; if not, write to the Free
    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
    02111-1307 USA.  */
+
 
 
 
@@ -1295,6 +1279,7 @@ typedef int register_t;
 
 
 /* This file defines `__BYTE_ORDER' for the particular machine.  */
+
 /* x86_64 is little-endian.  */
 # 38 "/usr/include/endian.h" 2 3 4
 
@@ -1302,6 +1287,7 @@ typedef int register_t;
    values.  */
 # 60 "/usr/include/endian.h" 3 4
 /* Conversion interfaces.  */
+
 /* Macros to swap the order of bytes in integer values.
    Copyright (C) 1997, 1998, 2000, 2002, 2003, 2007, 2008
    Free Software Foundation, Inc.
@@ -1322,6 +1308,7 @@ typedef int register_t;
    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
    02111-1307 USA.  */
 # 28 "/usr/include/bits/byteswap.h" 3 4
+
 /* Determine the wordsize from the preprocessor defines.  */
 # 29 "/usr/include/bits/byteswap.h" 2 3 4
 
@@ -1339,6 +1326,7 @@ typedef int register_t;
 # 218 "/usr/include/sys/types.h" 2 3 4
 
 /* It also defines `fd_set' and the FD_* macros for `select'.  */
+
 /* `fd_set' type and related macros, and `select'/`pselect' declarations.
    Copyright (C) 1996,97,98,99,2000,01,02,2003 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -1363,6 +1351,7 @@ typedef int register_t;
 
 
 
+
 /* Copyright (C) 1991,1992,1993,1995-2006,2007 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
@@ -1383,6 +1372,7 @@ typedef int register_t;
 # 26 "/usr/include/sys/select.h" 2 3 4
 
 /* Get definition of needed basic types.  */
+
 /* bits/types.h -- definitions of __*_t types underlying *_t types.
    Copyright (C) 2002, 2003, 2004, 2005, 2007 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -1408,6 +1398,7 @@ typedef int register_t;
 # 29 "/usr/include/sys/select.h" 2 3 4
 
 /* Get __FD_* definitions.  */
+
 /* Copyright (C) 1997, 1998, 2001 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
@@ -1436,6 +1427,7 @@ typedef int register_t;
 # 32 "/usr/include/sys/select.h" 2 3 4
 
 /* Get __sigset_t.  */
+
 /* __sig_atomic_t, __sigset_t, and related definitions.  Linux version.
    Copyright (C) 1991, 1992, 1994, 1996, 1997, 2007
    Free Software Foundation, Inc.
@@ -1487,6 +1479,7 @@ typedef __sigset_t sigset_t;
 /* Get definition of timer specification structures.  */
 
 
+
 /* Copyright (C) 1991-1999,2000,2001,2002,2003,2006
 	Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -1510,6 +1503,7 @@ typedef __sigset_t sigset_t;
  *	ISO C99 Standard: 7.23 Date and time	<time.h>
  */
 # 117 "/usr/include/time.h" 3 4
+
 /* bits/types.h -- definitions of __*_t types underlying *_t types.
    Copyright (C) 2002, 2003, 2004, 2005, 2007 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -1543,6 +1537,7 @@ struct timespec
   };
 # 45 "/usr/include/sys/select.h" 2 3 4
 
+
 /* System-dependent timing definitions.  Generic version.
    Copyright (C) 1996,1997,1999-2002,2003 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -1566,6 +1561,7 @@ struct timespec
  * Never include this file directly; use <time.h> instead.
  */
 # 65 "/usr/include/bits/time.h" 3 4
+
 /* bits/types.h -- definitions of __*_t types underlying *_t types.
    Copyright (C) 2002, 2003, 2004, 2005, 2007 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -1644,14 +1640,7 @@ typedef __fd_mask fd_mask;
 
 
 /* Access macros for `fd_set'.  */
-
-
-
-
-
-
-
-
+# 101 "/usr/include/sys/select.h" 3 4
 /* Check the first NFDS descriptors each in READFDS (if not NULL) for read
    readiness, in WRITEFDS (if not NULL) for write readiness, and in EXCEPTFDS
    (if not NULL) for exceptional conditions.  If TIMEOUT is not NULL, time out
@@ -1677,12 +1666,10 @@ extern int pselect (int __nfds, fd_set * __readfds,
       fd_set * __exceptfds,
       const struct timespec * __timeout,
       const __sigset_t * __sigmask);
-
-
-
 # 221 "/usr/include/sys/types.h" 2 3 4
 
 /* BSD defines these symbols, so we follow.  */
+
 /* Definitions of macros to access `dev_t' values.
    Copyright (C) 1996, 1997, 1999, 2003, 2004, 2007
    Free Software Foundation, Inc.
@@ -1702,6 +1689,7 @@ extern int pselect (int __nfds, fd_set * __readfds,
    License along with the GNU C Library; if not, write to the Free
    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
    02111-1307 USA.  */
+
 
 
 
@@ -1745,6 +1733,7 @@ typedef __fsfilcnt_t fsfilcnt_t; /* Type to count file system inodes.  */
 # 268 "/usr/include/sys/types.h" 3 4
 /* Now add the thread types.  */
 
+
 /* Copyright (C) 2002,2003,2004,2005,2006,2007 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Ulrich Drepper <drepper@redhat.com>, 2002.
@@ -1763,6 +1752,7 @@ typedef __fsfilcnt_t fsfilcnt_t; /* Type to count file system inodes.  */
    License along with the GNU C Library; if not, write to the Free
    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
    02111-1307 USA.  */
+
 
 
 
@@ -1908,9 +1898,6 @@ typedef union
   int __align;
 } pthread_barrierattr_t;
 # 271 "/usr/include/sys/types.h" 2 3 4
-
-
-
 # 321 "/usr/include/stdlib.h" 2 3 4
 
 /* These are the functions that actually do things.  The `random', `srandom',
@@ -2053,14 +2040,7 @@ extern int seed48_r (unsigned short int __seed16v[3],
 extern int lcong48_r (unsigned short int __param[7],
         struct drand48_data *__buffer)
      ;
-
-
-
-
-
-
-
-
+# 470 "/usr/include/stdlib.h" 3 4
 /* Allocate SIZE bytes of memory.  */
 extern void *malloc (size_t __size) ;
 /* Allocate NMEMB elements of SIZE bytes each, all initialized to 0.  */
@@ -2088,6 +2068,7 @@ extern void cfree (void *__ptr) ;
 
 
 
+
 /* Copyright (C) 1992, 1996, 1997, 1998, 1999 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
@@ -2105,6 +2086,7 @@ extern void cfree (void *__ptr) ;
    License along with the GNU C Library; if not, write to the Free
    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
    02111-1307 USA.  */
+
 
 
 
@@ -2127,6 +2109,7 @@ extern void cfree (void *__ptr) ;
    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
    02111-1307 USA.  */
 # 23 "/usr/include/alloca.h" 2 3 4
+
 
 
 /* Copyright (C) 1989, 1997, 1998, 1999, 2000, 2002, 2004
@@ -2237,12 +2220,6 @@ Boston, MA 02110-1301, USA.  */
 
 /* Allocate a block that will be freed when the calling function exits.  */
 extern void *alloca (size_t __size) ;
-
-
-
-
-
-
 # 498 "/usr/include/stdlib.h" 2 3 4
 
 
@@ -2278,7 +2255,6 @@ extern int on_exit (void (*__func) (int __status, void *__arg), void *__arg)
    in the reverse of the order in which they were registered
    perform stdio cleanup, and terminate program execution with STATUS.  */
 extern void exit (int __status) ;
-
 # 543 "/usr/include/stdlib.h" 3 4
 
 /* Return the value of envariable NAME, or NULL if it doesn't exist.  */
@@ -2346,7 +2322,6 @@ extern char *mkdtemp (char *__template) ;
    This function is a cancellation point and therefore not marked with
    __THROW.  */
 extern int system (const char *__command) ;
-
 # 657 "/usr/include/stdlib.h" 3 4
 /* Return the canonical absolute name of file NAME.  If RESOLVED is
    null, the result is malloc'd; otherwise, if the canonical name is
@@ -2384,15 +2359,7 @@ extern void qsort (void *__base, size_t __nmemb, size_t __size,
 /* Return the absolute value of X.  */
 extern int abs (int __x) ;
 extern long int labs (long int __x) ;
-
-
-
-
-
-
-
-
-
+# 710 "/usr/include/stdlib.h" 3 4
 /* Return the `div_t', `ldiv_t' or `lldiv_t' representation
    of the value of NUMER over DENOM. */
 /* GCC may have built-ins for these someday.  */
@@ -2400,7 +2367,6 @@ extern div_t div (int __numer, int __denom)
      ;
 extern ldiv_t ldiv (long int __numer, long int __denom)
      ;
-
 # 729 "/usr/include/stdlib.h" 3 4
 /* Convert floating point numbers to strings.  The returned values are
    valid only until another call to the same function.  */
@@ -2503,8 +2469,7 @@ extern int getloadavg (double __loadavg[], int __nelem)
 
 /* Define some macros helping to catch buffer overflows.  */
 # 891 "/usr/include/stdlib.h" 3 4
-
-# 10 "$VDIR/conv-cpu.c" 2
+# 10 "./Preprocessor/conv-cpu.c" 2
 
 
 /*
@@ -2604,6 +2569,7 @@ int main(int argc, char* argv[])
 
 
 
+
 /* Copyright (C) 1991-2003,2004,2005,2006,2007 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
@@ -2625,6 +2591,7 @@ int main(int argc, char* argv[])
 /*
  *	ISO C99 Standard: 7.20 General utilities	<stdlib.h>
  */
+
 
 
 
@@ -2769,27 +2736,9 @@ int main(int argc, char* argv[])
 /* If none of the ANSI/POSIX macros are defined, use POSIX.1 and POSIX.2
    (and IEEE Std 1003.1b-1993 unless _XOPEN_SOURCE is defined).  */
 # 295 "/usr/include/features.h" 3 4
-/* Define __STDC_IEC_559__ and other similar macros.  */
-/* Copyright (C) 2005 Free Software Foundation, Inc.
-   This file is part of the GNU C Library.
-
-   The GNU C Library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Lesser General Public
-   License as published by the Free Software Foundation; either
-   version 2.1 of the License, or (at your option) any later version.
-
-   The GNU C Library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Lesser General Public License for more details.
-
-   You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, write to the Free
-   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-   02111-1307 USA.  */
-# 26 "/usr/include/bits/predefs.h" 3 4
 /* We do support the IEC 559 math functionality, real and complex.  */
-# 297 "/usr/include/features.h" 2 3 4
+
+
 
 /* wchar_t uses ISO 10646-1 (2nd ed., published 2000-09-15) / Unicode 3.1.  */
 
@@ -2820,6 +2769,7 @@ int main(int argc, char* argv[])
 
 
 /* This is here only because every header file already includes this one.  */
+
 
 
 /* Copyright (C) 1992-2001, 2002, 2004, 2005, 2006, 2007
@@ -3025,9 +2975,10 @@ int main(int argc, char* argv[])
 
 
 
+
 /* Determine the wordsize from the preprocessor defines.  */
 # 349 "/usr/include/sys/cdefs.h" 2 3 4
-# 330 "/usr/include/features.h" 2 3 4
+# 331 "/usr/include/features.h" 2 3 4
 
 
 /* If we don't have __REDIRECT, prototypes will be missing if
@@ -3046,24 +2997,19 @@ int main(int argc, char* argv[])
 
 
 
-/* There are some functions that must be declared 'extern inline' even with
-   -Os when building LIBC, or they'll end up undefined.  */
-
-
-
-
-
-
 
 /* This is here only because every header file already includes this one.
    Get the definitions of all the appropriate `__stub_FUNCTION' symbols.
    <gnu/stubs.h> contains `#define __stub_FUNCTION' when FUNCTION is a stub
    that will always return failure (and set errno to ENOSYS).  */
+
 /* This file selects the right generated file of `__stub_FUNCTION' macros
    based on the architecture being compiled for.  */
 
+
 /* Determine the wordsize from the preprocessor defines.  */
 # 5 "/usr/include/gnu/stubs.h" 2 3 4
+
 
 
 
@@ -3073,10 +3019,11 @@ int main(int argc, char* argv[])
    in the C library which is a stub, meaning it will fail
    every time called, usually setting errno to ENOSYS.  */
 # 10 "/usr/include/gnu/stubs.h" 2 3 4
-# 362 "/usr/include/features.h" 2 3 4
+# 355 "/usr/include/features.h" 2 3 4
 # 26 "/usr/include/stdlib.h" 2 3 4
 
 /* Get size_t, wchar_t and NULL from <stddef.h>.  */
+
 
 
 
@@ -3201,8 +3148,6 @@ typedef int wchar_t;
 # 395 "/usr/lib/gcc/x86_64-linux-gnu/4.3.3/include/stddef.h" 3 4
 /* A null pointer constant.  */
 # 34 "/usr/include/stdlib.h" 2 3 4
-
-
 # 96 "/usr/include/stdlib.h" 3 4
 
 /* Returned by `div'.  */
@@ -3219,9 +3164,6 @@ typedef struct
     long int quot; /* Quotient.  */
     long int rem; /* Remainder.  */
   } ldiv_t;
-
-
-
 # 128 "/usr/include/stdlib.h" 3 4
 /* The largest number rand will return (same as INT_MAX).  */
 
@@ -3248,14 +3190,12 @@ extern int atoi (const char *__nptr)
 /* Convert a string to a long integer.  */
 extern long int atol (const char *__nptr)
      ;
-
 # 163 "/usr/include/stdlib.h" 3 4
 
 /* Convert a string to a floating-point number.  */
 extern double strtod (const char * __nptr,
         char ** __endptr)
      ;
-
 # 182 "/usr/include/stdlib.h" 3 4
 
 /* Convert a string to a long integer.  */
@@ -3266,7 +3206,6 @@ extern long int strtol (const char * __nptr,
 extern unsigned long int strtoul (const char * __nptr,
       char ** __endptr, int __base)
      ;
-
 # 308 "/usr/include/stdlib.h" 3 4
 /* Convert N to base 64 using the digits "./0-9A-Za-z", least-significant
    digit first.  Returns a pointer to static storage overwritten by the
@@ -3276,6 +3215,7 @@ extern char *l64a (long int __n) ;
 /* Read a number from a string S in base 64 as above.  */
 extern long int a64l (const char *__s)
      ;
+
 
 
 
@@ -3306,6 +3246,7 @@ extern long int a64l (const char *__s)
 
 
 
+
 /* Copyright (C) 1991,1992,1993,1995-2006,2007 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
@@ -3324,6 +3265,7 @@ extern long int a64l (const char *__s)
    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
    02111-1307 USA.  */
 # 28 "/usr/include/sys/types.h" 2 3 4
+
 
 
 
@@ -3353,6 +3295,7 @@ extern long int a64l (const char *__s)
 
 
 
+
 /* Copyright (C) 1991,1992,1993,1995-2006,2007 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
@@ -3371,6 +3314,7 @@ extern long int a64l (const char *__s)
    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
    02111-1307 USA.  */
 # 28 "/usr/include/bits/types.h" 2 3 4
+
 /* Determine the wordsize from the preprocessor defines.  */
 # 29 "/usr/include/bits/types.h" 2 3 4
 
@@ -3430,6 +3374,7 @@ typedef unsigned long int __u_quad_t;
    and int is always 32 bits.  */
 # 126 "/usr/include/bits/types.h" 3 4
 /* No need to mark the typedef with __extension__.   */
+
 
 
 
@@ -3593,6 +3538,7 @@ typedef __caddr_t caddr_t;
 
 typedef __key_t key_t;
 # 133 "/usr/include/sys/types.h" 3 4
+
 /* Copyright (C) 1991-1999,2000,2001,2002,2003,2006
 	Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -3616,6 +3562,7 @@ typedef __key_t key_t;
  *	ISO C99 Standard: 7.23 Date and time	<time.h>
  */
 # 73 "/usr/include/time.h" 3 4
+
 /* bits/types.h -- definitions of __*_t types underlying *_t types.
    Copyright (C) 2002, 2003, 2004, 2005, 2007 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -3643,10 +3590,8 @@ typedef __key_t key_t;
 
 /* Returned by `time'.  */
 typedef __time_t time_t;
-
-
-
 # 90 "/usr/include/time.h" 3 4
+
 /* bits/types.h -- definitions of __*_t types underlying *_t types.
    Copyright (C) 2002, 2003, 2004, 2005, 2007 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -3674,6 +3619,7 @@ typedef __time_t time_t;
 /* Clock ID used in clock and timer functions.  */
 typedef __clockid_t clockid_t;
 # 102 "/usr/include/time.h" 3 4
+
 /* bits/types.h -- definitions of __*_t types underlying *_t types.
    Copyright (C) 2002, 2003, 2004, 2005, 2007 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -3702,6 +3648,7 @@ typedef __clockid_t clockid_t;
 typedef __timer_t timer_t;
 # 134 "/usr/include/sys/types.h" 2 3 4
 # 147 "/usr/include/sys/types.h" 3 4
+
 /* Copyright (C) 1989, 1997, 1998, 1999, 2000, 2002, 2004
    Free Software Foundation, Inc.
 
@@ -3840,6 +3787,7 @@ typedef unsigned long int u_int64_t;
 typedef int register_t;
 # 216 "/usr/include/sys/types.h" 3 4
 /* In BSD <sys/types.h> is expected to define BYTE_ORDER.  */
+
 /* Copyright (C) 1992, 1996, 1997, 2000, 2008 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
@@ -3857,6 +3805,7 @@ typedef int register_t;
    License along with the GNU C Library; if not, write to the Free
    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
    02111-1307 USA.  */
+
 
 
 
@@ -3893,6 +3842,7 @@ typedef int register_t;
 
 
 /* This file defines `__BYTE_ORDER' for the particular machine.  */
+
 /* x86_64 is little-endian.  */
 # 38 "/usr/include/endian.h" 2 3 4
 
@@ -3900,6 +3850,7 @@ typedef int register_t;
    values.  */
 # 60 "/usr/include/endian.h" 3 4
 /* Conversion interfaces.  */
+
 /* Macros to swap the order of bytes in integer values.
    Copyright (C) 1997, 1998, 2000, 2002, 2003, 2007, 2008
    Free Software Foundation, Inc.
@@ -3920,6 +3871,7 @@ typedef int register_t;
    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
    02111-1307 USA.  */
 # 28 "/usr/include/bits/byteswap.h" 3 4
+
 /* Determine the wordsize from the preprocessor defines.  */
 # 29 "/usr/include/bits/byteswap.h" 2 3 4
 
@@ -3937,6 +3889,7 @@ typedef int register_t;
 # 218 "/usr/include/sys/types.h" 2 3 4
 
 /* It also defines `fd_set' and the FD_* macros for `select'.  */
+
 /* `fd_set' type and related macros, and `select'/`pselect' declarations.
    Copyright (C) 1996,97,98,99,2000,01,02,2003 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -3961,6 +3914,7 @@ typedef int register_t;
 
 
 
+
 /* Copyright (C) 1991,1992,1993,1995-2006,2007 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
@@ -3981,6 +3935,7 @@ typedef int register_t;
 # 26 "/usr/include/sys/select.h" 2 3 4
 
 /* Get definition of needed basic types.  */
+
 /* bits/types.h -- definitions of __*_t types underlying *_t types.
    Copyright (C) 2002, 2003, 2004, 2005, 2007 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -4006,6 +3961,7 @@ typedef int register_t;
 # 29 "/usr/include/sys/select.h" 2 3 4
 
 /* Get __FD_* definitions.  */
+
 /* Copyright (C) 1997, 1998, 2001 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
@@ -4034,6 +3990,7 @@ typedef int register_t;
 # 32 "/usr/include/sys/select.h" 2 3 4
 
 /* Get __sigset_t.  */
+
 /* __sig_atomic_t, __sigset_t, and related definitions.  Linux version.
    Copyright (C) 1991, 1992, 1994, 1996, 1997, 2007
    Free Software Foundation, Inc.
@@ -4085,6 +4042,7 @@ typedef __sigset_t sigset_t;
 /* Get definition of timer specification structures.  */
 
 
+
 /* Copyright (C) 1991-1999,2000,2001,2002,2003,2006
 	Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -4108,6 +4066,7 @@ typedef __sigset_t sigset_t;
  *	ISO C99 Standard: 7.23 Date and time	<time.h>
  */
 # 117 "/usr/include/time.h" 3 4
+
 /* bits/types.h -- definitions of __*_t types underlying *_t types.
    Copyright (C) 2002, 2003, 2004, 2005, 2007 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -4141,6 +4100,7 @@ struct timespec
   };
 # 45 "/usr/include/sys/select.h" 2 3 4
 
+
 /* System-dependent timing definitions.  Generic version.
    Copyright (C) 1996,1997,1999-2002,2003 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -4164,6 +4124,7 @@ struct timespec
  * Never include this file directly; use <time.h> instead.
  */
 # 65 "/usr/include/bits/time.h" 3 4
+
 /* bits/types.h -- definitions of __*_t types underlying *_t types.
    Copyright (C) 2002, 2003, 2004, 2005, 2007 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -4242,14 +4203,7 @@ typedef __fd_mask fd_mask;
 
 
 /* Access macros for `fd_set'.  */
-
-
-
-
-
-
-
-
+# 101 "/usr/include/sys/select.h" 3 4
 /* Check the first NFDS descriptors each in READFDS (if not NULL) for read
    readiness, in WRITEFDS (if not NULL) for write readiness, and in EXCEPTFDS
    (if not NULL) for exceptional conditions.  If TIMEOUT is not NULL, time out
@@ -4275,12 +4229,10 @@ extern int pselect (int __nfds, fd_set * __readfds,
       fd_set * __exceptfds,
       const struct timespec * __timeout,
       const __sigset_t * __sigmask);
-
-
-
 # 221 "/usr/include/sys/types.h" 2 3 4
 
 /* BSD defines these symbols, so we follow.  */
+
 /* Definitions of macros to access `dev_t' values.
    Copyright (C) 1996, 1997, 1999, 2003, 2004, 2007
    Free Software Foundation, Inc.
@@ -4300,6 +4252,7 @@ extern int pselect (int __nfds, fd_set * __readfds,
    License along with the GNU C Library; if not, write to the Free
    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
    02111-1307 USA.  */
+
 
 
 
@@ -4343,6 +4296,7 @@ typedef __fsfilcnt_t fsfilcnt_t; /* Type to count file system inodes.  */
 # 268 "/usr/include/sys/types.h" 3 4
 /* Now add the thread types.  */
 
+
 /* Copyright (C) 2002,2003,2004,2005,2006,2007 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Ulrich Drepper <drepper@redhat.com>, 2002.
@@ -4361,6 +4315,7 @@ typedef __fsfilcnt_t fsfilcnt_t; /* Type to count file system inodes.  */
    License along with the GNU C Library; if not, write to the Free
    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
    02111-1307 USA.  */
+
 
 
 
@@ -4506,9 +4461,6 @@ typedef union
   int __align;
 } pthread_barrierattr_t;
 # 271 "/usr/include/sys/types.h" 2 3 4
-
-
-
 # 321 "/usr/include/stdlib.h" 2 3 4
 
 /* These are the functions that actually do things.  The `random', `srandom',
@@ -4651,14 +4603,7 @@ extern int seed48_r (unsigned short int __seed16v[3],
 extern int lcong48_r (unsigned short int __param[7],
         struct drand48_data *__buffer)
      ;
-
-
-
-
-
-
-
-
+# 470 "/usr/include/stdlib.h" 3 4
 /* Allocate SIZE bytes of memory.  */
 extern void *malloc (size_t __size) ;
 /* Allocate NMEMB elements of SIZE bytes each, all initialized to 0.  */
@@ -4686,6 +4631,7 @@ extern void cfree (void *__ptr) ;
 
 
 
+
 /* Copyright (C) 1992, 1996, 1997, 1998, 1999 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
@@ -4703,6 +4649,7 @@ extern void cfree (void *__ptr) ;
    License along with the GNU C Library; if not, write to the Free
    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
    02111-1307 USA.  */
+
 
 
 
@@ -4725,6 +4672,7 @@ extern void cfree (void *__ptr) ;
    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
    02111-1307 USA.  */
 # 23 "/usr/include/alloca.h" 2 3 4
+
 
 
 /* Copyright (C) 1989, 1997, 1998, 1999, 2000, 2002, 2004
@@ -4835,12 +4783,6 @@ Boston, MA 02110-1301, USA.  */
 
 /* Allocate a block that will be freed when the calling function exits.  */
 extern void *alloca (size_t __size) ;
-
-
-
-
-
-
 # 498 "/usr/include/stdlib.h" 2 3 4
 
 
@@ -4876,7 +4818,6 @@ extern int on_exit (void (*__func) (int __status, void *__arg), void *__arg)
    in the reverse of the order in which they were registered
    perform stdio cleanup, and terminate program execution with STATUS.  */
 extern void exit (int __status) ;
-
 # 543 "/usr/include/stdlib.h" 3 4
 
 /* Return the value of envariable NAME, or NULL if it doesn't exist.  */
@@ -4944,7 +4885,6 @@ extern char *mkdtemp (char *__template) ;
    This function is a cancellation point and therefore not marked with
    __THROW.  */
 extern int system (const char *__command) ;
-
 # 657 "/usr/include/stdlib.h" 3 4
 /* Return the canonical absolute name of file NAME.  If RESOLVED is
    null, the result is malloc'd; otherwise, if the canonical name is
@@ -4982,15 +4922,7 @@ extern void qsort (void *__base, size_t __nmemb, size_t __size,
 /* Return the absolute value of X.  */
 extern int abs (int __x) ;
 extern long int labs (long int __x) ;
-
-
-
-
-
-
-
-
-
+# 710 "/usr/include/stdlib.h" 3 4
 /* Return the `div_t', `ldiv_t' or `lldiv_t' representation
    of the value of NUMER over DENOM. */
 /* GCC may have built-ins for these someday.  */
@@ -4998,7 +4930,6 @@ extern div_t div (int __numer, int __denom)
      ;
 extern ldiv_t ldiv (long int __numer, long int __denom)
      ;
-
 # 729 "/usr/include/stdlib.h" 3 4
 /* Convert floating point numbers to strings.  The returned values are
    valid only until another call to the same function.  */
@@ -5101,8 +5032,7 @@ extern int getloadavg (double __loadavg[], int __nelem)
 
 /* Define some macros helping to catch buffer overflows.  */
 # 891 "/usr/include/stdlib.h" 3 4
-
-# 10 "$VDIR/conv-cpu.c" 2
+# 10 "./Preprocessor/conv-cpu.c" 2
 
 
 /*
