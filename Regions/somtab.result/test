@@ -1,4 +1,18 @@
---- Regions for SOMTAB
+C
+      PROGRAM SOMP
+C
+      IMPLICIT REAL*8 (A-H,O-Z)
+      DIMENSION AA(5, 5)
+      DIMENSION BB(5,5)
+
+C  <AA(PHI1,PHI2)-R-MAY-{PHI1==PHI2, 1<=PHI1, PHI1<=3}>
+C  <BB(PHI1,PHI2)-W-EXACT-{PHI1==1, PHI2==1}>
+
+C      
+
+      CALL SOMTAB(AA, BB)                                               0009
+C
+      END
 
 C  <A(PHI1,PHI2)-R-MAY-{PHI1==PHI2, 1<=PHI1, PHI1<=3}>
 C  <B(PHI1,PHI2)-W-EXACT-{PHI1==1, PHI2==1}>

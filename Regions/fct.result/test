@@ -10,7 +10,7 @@ C     Reason : preconditions have loop exit conditions but transformers do not.
       DIMENSION UTRA(MP,NP)
       DIMENSION B(NP),A(MP)
 
-C  <B(PHI1)-IN-MAY-{1<=PHI1, PHI1<=NQ, MQ<=0}>
+C  <B(PHI1)-IN-EXACT-{1<=PHI1, PHI1<=NQ, 1<=MQ, 1<=MQ}>
 
 C     BEGIN BLOCK
 

@@ -1,4 +1,15 @@
---- Regions for ESSBOU
+C
+      PROGRAM ESSBOP
+C
+      INTEGER AA(25)
+
+C  <AA(PHI1)-W-MAY-{1<=PHI1, PHI1<=25}>
+
+C      
+
+      CALL ESSBOU(AA)                                                   0007
+C
+      END
 
 C  <A(PHI1)-W-MAY-{}>
 

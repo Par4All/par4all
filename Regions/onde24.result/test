@@ -1,4 +1,11 @@
---- Regions for ONDE24
+
+
+      FUNCTION GETIME (X)
+C     REND LE TEMPS CPU INSTANTANE, EN SECONDES.
+          EXTERNAL TIME
+          INTEGER TIME
+      GETIME = REAL(TIME())                                             0007
+      END
 
 C  <__IO_EFFECTS:LUNS(PHI1)-R-MAY-{0<=PHI1, PHI1<=4}>
 C  <__IO_EFFECTS:LUNS(PHI1)-W-MAY-{0<=PHI1, PHI1<=4}>
@@ -1605,4 +1612,52 @@ C/////////////////////////////////////////////////////////////////////
      &                 ',/,1X,'                                         
      &    ',/,1X,'*********************************************'//)     0729
 
+      END
+
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{1<=PHI1, PHI1<=4}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{1<=PHI1, PHI1<=4}>
+
+
+C
+C     OUVERTURE DES FICHIERS
+C     ----------------------
+
+      SUBROUTINE OPENFILE
+
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==4}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==4}>
+
+
+      OPEN (UNIT=4,FILE='MODELES/param2.dat')                           0008
+
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==3}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==3}>
+
+
+      OPEN (UNIT=3,FILE='MODELES/modele2.dat')                          0010
+
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==1}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==1}>
+
+
+      OPEN (UNIT=1,FILE='SORTIES/stat2')                                0012
+
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==2}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==2}>
+
+
+      OPEN (UNIT=2,FILE='SORTIES/sismo2')                               0014
+
+      END
+
+C
+C     GESTION DU TIMER
+C     ----------------
+
+      SUBROUTINE STIMER (X)
+C     INITIALISE LE TIMER - INUTILE SUR DE NOMBREUSES MACHINES
+      END
+
+      INTEGER FUNCTION TIME
+      TIME = 0.                                                         0003
       END

@@ -1,4 +1,3 @@
---- Regions for NOSUBS
 
 C  <A(PHI1)-W-MAY-{0<=PHI1}>
 C  <B(PHI1)-W-EXACT-{PHI1==5}>

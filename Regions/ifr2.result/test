@@ -1,4 +1,3 @@
---- Regions for IFR2
 
 C  <A(PHI1)-R-EXACT-{1<=PHI1, PHI1<=5}>
 C  <A(PHI1)-W-MAY-{1<=PHI1, PHI1<=5}>
@@ -40,5 +39,36 @@ C  <B(PHI1)-R-EXACT-{PHI1==I, 1<=I, I<=5}>
             A(I) = B(I)+1                                               0013
          ENDIF
       ENDDO
+C
+      END
+C
+      PROGRAM IFR2P
+C
+      IMPLICIT REAL*8 (A-H,O-Z)
+      DIMENSION AA(5)
+      DIMENSION BB(5)
+
+C  <AA(PHI1)-W-EXACT-{1<=PHI1, PHI1<=5}>
+C  <BB(PHI1)-W-EXACT-{1<=PHI1, PHI1<=5}>
+
+C     
+      DO I = 1, 5                                                       0008
+
+C  <AA(PHI1)-W-EXACT-{PHI1==I, 1<=I, I<=5}>
+
+         AA(I) = I                                                      0009
+
+C  <BB(PHI1)-W-EXACT-{PHI1==I, 1<=I, I<=5}>
+
+         BB(I) = 0                                                      0010
+      ENDDO
+
+C  <AA(PHI1)-R-EXACT-{1<=PHI1, PHI1<=5, I==6}>
+C  <AA(PHI1)-W-MAY-{1<=PHI1, PHI1<=5, I==6}>
+C  <BB(PHI1)-R-MAY-{1<=PHI1, PHI1<=5, I==6}>
+C  <BB(PHI1)-W-MAY-{1<=PHI1, PHI1<=5, I==6}>
+
+
+      CALL IFR2(AA, BB)                                                 0013
 C
       END

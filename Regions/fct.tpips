@@ -31,4 +31,5 @@ display PRINTED_FILE
 apply UNSPLIT 
 
 close
-
+delete fct
+quit
