@@ -13,3 +13,14 @@ void foo(void)
    a[i];
    i+3;
 }
+void bla(void)
+{
+   foo();
+   ;
+}
+void foo(void)
+{
+   float a[3];
+   int i = 1;
+   ;
+}
