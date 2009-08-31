@@ -231,11 +231,15 @@ static bool redeclaration_enter_statement(statement s, redeclaration_context_t *
 	    redeclare_p = TRUE;
 	    move_initialization_p = TRUE;
 	  }
-	  else if(expression_is_C_rhs_p(ie)) {
+	  else if(expression_is_C_rhs_p(ie)) { // This function is not yet precise enough
 	    redeclare_p = TRUE;
 	    move_initialization_p = FALSE;
 	  }
 	  else {
+	    /* It could be redeclared if a small function was
+	       synthesized to perform the assignment
+	       dynamically. Basically, a loop nest over the array
+	       dimensions. */
 	    redeclare_p = FALSE;
 	    move_initialization_p = FALSE;
 	  }
@@ -391,9 +395,6 @@ void statement_flatten_declarations(statement s)
       pips_user_warning("Code flattening fails because the statement does"
 			" not contain any local declaration\n");
     }
-    // call sequence flattening as some declarations may have been
-    // moved up
-    clean_up_sequences(s);
   }
 
   else
@@ -415,14 +416,14 @@ static bool unroll_loops_in_statement(statement s) {
 
 /* This function is be composed of several steps:
 
-   - flatten declarations inside statement: declarations are moved as
+   1 flatten declarations inside statement: declarations are moved as
      high as possible in the control structure
 
-   - clean_up_sequences: remove useless braces when they are nested
+   2 clean_up_sequences: remove useless braces when they are nested
 
-   - unroll looops with statically known iteration number
+   3 unroll looops with statically known iteration number
 
-   The first two steps have been merged.
+   4 clean_up_sequences: remove useless braces when they are nested
 
    It is assumed that the function main statement will contain at
    least one local variable. This is used to preserve the scoping
@@ -448,10 +449,13 @@ bool flatten_code(string module_name)
   debug_on("FLATTEN_CODE_DEBUG_LEVEL");
   pips_debug(1, "begin\n");
 
-  /* Step 1: flatten declarations and clean-up sequences */
+  /* Step 1 and 2: flatten declarations and clean up sequences */
   statement_flatten_declarations(module_stat);
+    // call sequence flattening as some declarations may have been
+    // moved up
+  clean_up_sequences(module_stat);
 
-  /* Step 2: unroll loops */
+  /* Step 3 and 4: unroll loops and clean up sequences */
   gen_recurse( module_stat,
 	       statement_domain, gen_true, unroll_loops_in_statement
 	       );
