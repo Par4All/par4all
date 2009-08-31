@@ -675,6 +675,11 @@ bool intrinsic_entity_p(entity e)
   return (!value_undefined_p(entity_initial(e)) && value_intrinsic_p(entity_initial(e)));
 }
 
+bool symbolic_entity_p(entity e)
+{
+  return (!value_undefined_p(entity_initial(e)) && value_symbolic_p(entity_initial(e)));
+}
+
 /* FI: I do not understand this function name (see next one!). It seems to me
  * that any common or user function or user subroutine would
  * be returned.

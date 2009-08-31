@@ -2414,8 +2414,12 @@ list statement_to_referenced_entities(statement s)
 
 static bool add_stat_called_user_entities(call c, entities_t * funcs)
 {
+  /* FI: I do not know what should be done for pointers to function,
+     assuming they can be called. */
   entity f = call_function(c);
-  if(!set_belong_p(funcs->sents, f) && !intrinsic_entity_p(f))
+  value fv = entity_initial(f);
+
+  if(!set_belong_p(funcs->sents, f) && value_code_p(fv))
   {
     funcs->lents = CONS(entity, f, funcs->lents);
     set_add_element(funcs->sents, funcs->sents, f);
@@ -2441,8 +2445,6 @@ static bool add_stat_called_in_inits(statement s, entities_t * funcs)
  */
 list statement_to_called_user_entities(statement s)
 {
-  return NIL;
-
   entities_t funcs;
   funcs.lents = NIL;
   funcs.sents = set_make(set_pointer);
