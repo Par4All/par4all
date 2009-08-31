@@ -40,5 +40,5 @@ display PRINTED_FILE[control01]
 #display GRAPH_PRINTED_FILE[control01]
 
 close
-#delete control01
+delete control01
 quit
