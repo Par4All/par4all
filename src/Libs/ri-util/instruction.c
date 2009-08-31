@@ -144,6 +144,11 @@ bool fortran_return_instruction_p(instruction i)
   return native_instruction_p(i, RETURN_FUNCTION_NAME);
 }
 
+bool C_return_instruction_p(instruction i)
+{
+  return native_instruction_p(i, C_RETURN_FUNCTION_NAME);
+}
+
 
 /* Test if an instruction is a Fortran STOP.
 */

@@ -140,6 +140,12 @@ bool fortran_return_statement_p(statement s) {
   return fortran_return_instruction_p(i);
 }
 
+/* Test if a statement is a C "return" */
+bool C_return_statement_p(statement s) {
+  instruction i = statement_instruction(s);
+  return C_return_instruction_p(i);
+}
+
 
 /* Test if a statement is a CONTINUE, that is the FORTRAN nop, the ";" in
    C or the "pass" in Python... according to the language.
@@ -3059,6 +3065,63 @@ list find_statements_with_pragma(statement s, string begin)
     struct fswp p = { NIL, begin };
     gen_context_recurse(s,&p,statement_domain,find_statements_with_pragma_walker,gen_null);
     return gen_nreverse(p.l);
+}
+
+static bool look_for_user_call(call c, bool * user_call_p)
+{
+  entity f = call_function(c);
+  bool go_on_p = TRUE;
+
+  if(value_code_p(entity_initial(f))) {
+    * user_call_p = TRUE;
+    go_on_p = FALSE;
+  }
+  return go_on_p;
+}
+
+/* Check if a statement s contains a call to a user-defined
+   function. This may be useful because PIPS does not contain a
+   control effect analysis and because a user-defined function can
+   hide a control effect such as exit(), abort() or STOP. */
+bool statement_contains_user_call_p(statement s)
+{
+  bool user_call_p = FALSE;
+  gen_context_recurse(s, &user_call_p, call_domain, look_for_user_call, gen_null);
+  return user_call_p;
+}
+
+static bool look_for_control_effects(call c, bool * control_effect_p)
+{
+  entity f = call_function(c);
+  bool go_on_p = TRUE;
+  value fv = entity_initial(f);
+
+  if(value_code_p(fv)) {
+    * control_effect_p = TRUE;
+    go_on_p = FALSE;
+  }
+  else if(value_intrinsic_p(fv)) {
+    if(ENTITY_EXIT_SYSTEM_P(f)
+       || ENTITY_ABORT_SYSTEM_P(f)
+       || ENTITY_C_RETURN_P(f)
+       || ENTITY_RETURN_P(f)) {
+      * control_effect_p = TRUE;
+      go_on_p = FALSE;
+    }
+  }
+  return go_on_p;
+}
+
+/* Check if a statement s contains a call to a user-defined function
+   or to an intrinsic with control effects. This may be useful because
+   PIPS does not contain a control effect analysis and because a
+   user-defined function can hide a control effect such as exit(),
+   abort() or STOP. */
+bool statement_may_have_control_effects_p(statement s)
+{
+  bool control_effect_p = FALSE;
+  gen_context_recurse(s, &control_effect_p, call_domain, look_for_control_effects, gen_null);
+  return control_effect_p;
 }
 
 /**  @} */

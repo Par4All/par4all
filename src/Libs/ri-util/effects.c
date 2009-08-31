@@ -635,3 +635,18 @@ bool effects_read_variable_p(list el, entity v)
   }
   return result;
 }
+
+/* Check that all effects in el are read effects */
+bool effects_all_read_p(list el)
+{
+  bool result = TRUE;
+  FOREACH(EFFECT, e, el) {
+    action a  = effect_action(e);
+    entity ev = effect_entity(e);
+    if (action_write_p(a)) {
+      result = FALSE;
+      break;
+    }
+  }
+  return result;
+}

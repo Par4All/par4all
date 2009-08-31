@@ -908,12 +908,14 @@ entity find_or_create_entity(string full_name)
 
   if ((e = gen_find_tabulated(full_name, entity_domain))
       != entity_undefined) {
-    return e;
+    pips_debug(8, "Entity \"%s\" is found\n", full_name);
   }
-
-  return make_entity(strdup(full_name),
-		     type_undefined, storage_undefined, value_undefined);
-
+  else {
+    pips_debug(8, "Entity \"%s\" is created\n", full_name);
+    e = make_entity(strdup(full_name),
+		    type_undefined, storage_undefined, value_undefined);
+  }
+  return e;
 }
 
 
