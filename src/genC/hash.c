@@ -47,7 +47,6 @@
 
 /* Some predefined values for the key
  */
-
 #define HASH_ENTRY_FREE ((void *) 0)
 #define HASH_ENTRY_FREE_FOR_PUT ((void *) -1)
 
@@ -56,14 +55,20 @@ typedef struct {
   void * val;
 } hash_entry;
 
-struct __hash_table {
-  hash_key_type type;                  /* the type of keys... */
-  size_t size;                         /* size of actual array */
-  size_t n_entry;                      /* number of associations stored */
-  hash_rank_t rank;                    /* how to compute rank for key */
-  hash_equals_t equals;                /* how to compare keys */
-  hash_entry *array;                   /* actual array */
-  size_t limit;                        /* max entries before reallocation */
+typedef void * (*hash_key_func_t)(const void *);
+typedef void (*hash_free_func_t)(void *);
+
+struct __hash_table
+{
+  hash_key_type type;		// the type of keys...
+  size_t size;			// size of actual array
+  size_t n_entry;		// number of associations stored
+  hash_rank_t rank;		// how to compute rank for key
+  hash_equals_t equals;		// how to compare keys
+  hash_key_func_t store_key;	// possibly duplicate the key when storing
+  hash_free_func_t delete_key;	// possibly free the memory for the key...
+  hash_entry *array;		// actual array
+  size_t limit;			// max entries before reallocation
 
   /* keep statistics on the life time of the hash table... FC 04/06/2003 */
   size_t n_free_for_puts,
@@ -188,6 +193,16 @@ bool hash_warn_on_redefinition_p(void)
   return should_i_warn_on_redefinition;
 }
 
+static void * hash_store_string(const void * s)
+{
+  return strdup((char*) s);
+}
+
+static void hash_free_string(void * s)
+{
+  free(s);
+}
+
 /* this function makes a hash table of size size. if size is less or
    equal to zero a default size is used. the type of keys is given by
    key_type (see hash.txt for further details; where is hash.txt?).
@@ -239,11 +254,16 @@ hash_table_generic_make(hash_key_type key_type,
   for (i = 0; i < size; i++)
     htp->array[i].key = HASH_ENTRY_FREE;
 
+  htp->store_key = NULL;
+  htp->delete_key = NULL;
+
   switch(key_type)
   {
   case hash_string:
     htp->equals = (int(*)(const void*,const void*)) hash_string_equal;
     htp->rank = hash_string_rank;
+    htp->store_key = hash_store_string;
+    htp->delete_key = hash_free_string;
     break;
   case hash_int:
     htp->equals = (int(*)(const void*,const void*)) hash_int_equal;
@@ -304,6 +324,15 @@ void hash_table_clear(hash_table htp)
 
 void hash_table_free(hash_table htp)
 {
+  // free allocated keys if necessary
+  if (htp->delete_key)
+  {
+    size_t i;
+    for (i=0; i<htp->size; i++)
+      if (htp->array[i].key != HASH_ENTRY_FREE &&
+	  htp->array[i].key != HASH_ENTRY_FREE_FOR_PUT)
+	htp->delete_key(htp->array[i].key);
+  }
   gen_free_area((void**) htp->array, htp->size*sizeof(hash_entry));
   gen_free_area((void**) htp, sizeof(struct __hash_table));
 }
@@ -346,7 +375,7 @@ void hash_put(hash_table htp, const void * key, const void * val)
     if (hep->key == HASH_ENTRY_FREE_FOR_PUT)
       htp->n_free_for_puts--;
     htp->n_entry += 1;
-    hep->key = (void *) key;
+    hep->key = htp->store_key? htp->store_key(key): (void*) key;
     hep->val = (void *) val;
   }
 }
@@ -374,8 +403,12 @@ hash_delget(
     hep = hash_find_entry(htp, key, &rank, &htp->n_del_iter);
 
     if (hep->key != HASH_ENTRY_FREE && hep->key != HASH_ENTRY_FREE_FOR_PUT) {
+	// argh... was hep->key... cannot return it!
+	if (htp->delete_key)
+	  htp->delete_key(hep->key), *pkey = NULL;
+	else
+	  *pkey = hep->key;
 	val = hep->val;
-	*pkey = hep->key;
 	htp->array[rank].key = HASH_ENTRY_FREE_FOR_PUT;
 	htp->array[rank].val = NULL;
 	htp->n_entry -= 1;
