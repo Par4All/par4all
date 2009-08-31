@@ -7479,9 +7479,10 @@ flatten_code > MODULE.code
 
 \subsection{Split Initializations}
 
-This very simple transformation is a subset of the flatten_code
-transformation. It recurses through all variable declarations, and
-splits them in two if they specify an initial value.
+This very simple transformation recurses through all variable
+declarations, and splits them in two statements if they specify an
+initial value: a declaration without initialization, and an assignment
+of the initial value.
 
 \begin{PipsMake}
 alias split_initializations 'Split Initializations'
