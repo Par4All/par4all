@@ -1,0 +1,6 @@
+int foo(void)
+{
+   extern int bla(void);
+   extern int bla(void);
+   bla();                                                               /*0007*/
+}
