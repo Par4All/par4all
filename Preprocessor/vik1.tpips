@@ -2,7 +2,9 @@
 # Contest Winning entries, 2004
 
 delete vik1
+
 setproperty ABORT_ON_USER_ERROR TRUE
+
 create vik1 vik1.c
 
 activate C_PARSER

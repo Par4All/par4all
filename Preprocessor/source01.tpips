@@ -1,5 +1,9 @@
 delete source01
-create source01 source01.src/*.f
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+# create source01 source01.src/*.f
+create source01 source01.src/module01.f source01.src/module02.f
 
 display PRINTED_FILE[%ALL]
 
