@@ -7477,6 +7477,20 @@ flatten_code > MODULE.code
 \end{PipsMake}
 
 
+\subsection{Split Initializations}
+
+This very simple transformation is a subset of the flatten_code
+transformation. It recurses through all variable declarations, and
+splits them in two if they specify an initial value.
+
+\begin{PipsMake}
+alias split_initializations 'Split Initializations'
+split_initializations > MODULE.code
+        < PROGRAM.entities
+        < MODULE.code
+\end{PipsMake}
+
+
 %-----------End of Declaration Transformations -------------------------
 
 \section{Array Bound Checking}

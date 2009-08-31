@@ -97,8 +97,8 @@ static void rename_loop_index(loop l, hash_table renamings)
    must be created or not. */
 static void rename_statement_declarations(statement s, hash_table renamings)
 {
-  if (statement_block_p(s)) {
 
+  if (statement_block_p(s)) {
     list inits = NIL;
     list decls = statement_declarations(s); // Non-recursive
     instruction old = statement_instruction(s);
@@ -465,6 +465,80 @@ bool flatten_code(string module_name)
 
   // This might not really be necessary, probably thanks to clean_up_sequences
   module_reorder(module_stat);
+
+  pips_debug(1, "end\n");
+  debug_off();
+
+  /* Save modified code to database */
+  module_reorder(module_stat);
+  DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(module_name), module_stat);
+
+  reset_current_module_entity();
+  reset_current_module_statement();
+
+  return (good_result_p);
+}
+
+/* This phase applies a subset of the transformations effected by
+   flatten_code, that is split initializations. Common code could
+   possibly be factorized. */ 
+
+static void split_initializations_in_statement(statement s)
+{
+  if (statement_block_p(s)) {      
+    
+    list inits = NIL;
+    list decls = statement_declarations(s); // Non-recursive
+    instruction old = statement_instruction(s);
+
+    FOREACH(ENTITY, var, decls) {
+      string ln = entity_local_name(var);
+      string cs = local_name_to_scope(ln); /* current scope */
+      if ( strcmp(cs, "") !=0 // This test might probably move one level up
+	   && !value_unknown_p(entity_initial(var))
+	   ) {
+	expression ie = variable_initial_expression(var);
+	statement  is = make_assign_statement(entity_to_expression(var), ie);	
+	inits = gen_nconc(inits, CONS(statement, is, NIL));
+	entity_initial(var) = make_value_unknown();
+      }
+    }
+    /* Insert the list of initialisation statements as a sequence at
+       the beginning of s. */
+    inits = gen_nconc(inits, CONS(statement, instruction_to_statement(old), NIL));
+    statement_instruction(s) = make_instruction_sequence(make_sequence(inits));
+  }
+  else {
+    /* Do nothing ? */
+  }
+}
+
+bool split_initializations(string module_name)
+{
+  entity module;
+  statement module_stat;
+  bool good_result_p = TRUE;
+
+  set_current_module_entity(module_name_to_entity(module_name));
+  module = get_current_module_entity();
+
+  set_current_module_statement( (statement)
+				db_get_memory_resource(DBR_CODE, module_name, TRUE) );
+  module_stat = get_current_module_statement();
+
+  debug_on("SPLIT_INITIALIZATIONS_DEBUG_LEVEL");
+  pips_debug(1, "begin\n");
+
+  /* Recurse through the statements of s and split local declarations.
+     For the time being, we handle only blocks with declarations
+  */
+  if ( statement_block_p(module_stat)
+       && !ENDP(statement_declarations(module_stat))) {
+    gen_recurse(module_stat, statement_domain, gen_true, split_initializations_in_statement);    
+    clean_up_sequences(module_stat);
+  }
+  else
+    pips_internal_error("Input assumptions not met: not a block statement.\n");
 
   pips_debug(1, "end\n");
   debug_off();
