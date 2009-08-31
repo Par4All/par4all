@@ -1,5 +1,16 @@
-#include <math.h>
-#include "complex.h"
+//#include <math.h>
+//#include "complex.h"
+typedef struct {float r; float i;} fcomplex;
+
+extern fcomplex Complex(float, float);
+extern fcomplex Cdiv(fcomplex, fcomplex);
+extern fcomplex Csub(fcomplex, fcomplex);
+extern fcomplex Cadd(fcomplex, fcomplex);
+extern fcomplex Cmul(fcomplex, fcomplex);
+extern fcomplex RCmul(float, fcomplex);
+extern fcomplex Conjg(fcomplex);
+extern fcomplex Csqrt(fcomplex);
+extern float Cabs(fcomplex);
 
 #define EPSS 6.e-8
 #define MAXIT 100
@@ -12,7 +23,7 @@ float eps;
 	int j,iter;
 	float err,dxold,cdx,abx;
 	fcomplex sq,h,gp,gm,g2,g,b,d,dx,f,x1;
-	void nrerror();
+	void nrerror(char *);
 
 	dxold=Cabs(*x);
 	for (iter=1;iter<=MAXIT;iter++) {

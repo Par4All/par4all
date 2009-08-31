@@ -1,5 +1,5 @@
-#include <math.h>
-#include "complex.h"
+// #include <math.h>
+// #include "complex.h"
 
 #define NPMAX 100
 #define ZERO Complex(0.0,0.0)
@@ -9,6 +9,13 @@ void fixrts(d,npoles)
 float d[];
 int npoles;
 {
+  typedef struct {float r; float i;} fcomplex;
+  extern fcomplex Complex(float, float);
+  extern fcomplex Cdiv(fcomplex, fcomplex);
+  extern fcomplex Csub(fcomplex, fcomplex);
+  extern fcomplex Cmul(fcomplex, fcomplex);
+  extern fcomplex Conjg(fcomplex);
+  extern float Cabs(fcomplex);
 	int i,j,polish;
 	fcomplex a[NPMAX],roots[NPMAX];
 	void zroots();

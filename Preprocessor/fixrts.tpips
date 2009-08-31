@@ -1,24 +1,27 @@
 delete fixrts
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
 create fixrts fixrts.c
 
-# This file cannot be preprocessed because "complex.h" is not available
+# This file cannot be preprocessed as such because its specific "complex.h" is not available
+# Fixed with a few declarations
 
-shell echo `gcc -C -E fixrts.c`
-
-quit
+shell cc -C -E fixrts.c
 
 # echo cat fixrts.database/[a-z_]*[a-z_]/*.c
 display C_SOURCE_FILE[%ALL]
 
-close
+# close
 # delete fixrts
-quit
 
 # How can you guess whether it is a C file or a Fortran file?
 activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 
-display PRINTED_FILE
+display PRINTED_FILE[fixrts]
 
 close
-delete fixrts
+# delete fixrts
 quit
