@@ -17,21 +17,6 @@ echo Symbol table for "decl05!"
 echo
 
 display SYMBOL_TABLE_FILE[decl05!]
-quit
-echo
-echo Parsed printed file
-echo
-
-display PARSED_PRINTED_FILE[decl05!]
-
-echo
-echo Printed file
-echo
-
-display PRINTED_FILE[decl05!]
-
-
 close
 delete decl05
-
 quit
