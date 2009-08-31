@@ -659,10 +659,8 @@ freia_data2d * freia_common_create_data(uint32_t x, uint32_t y, uint32_t z)
 //               <must be read   >: img
    return img;                                                          /*0006*/
 }
-//               <must be read   >: img
 freia_status freia_common_destruct_data(freia_data2d *img)
 {
-//               <must be read   >: img
    free(img);                                                           /*0016*/
    return FREIA_OK;                                                     /*0017*/
 }
