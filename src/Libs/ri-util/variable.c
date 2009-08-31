@@ -651,14 +651,14 @@ char *module_name;
    Note: variable e may appear indexed somewhere in the PIPS internal
    representation if this is linked to some semantics.
 */
-bool entity_scalar_p(e)
-entity e;
+bool entity_scalar_p(entity e)
 {
   type t = ultimate_type(entity_type(e));
 
+  // hmmm... some hpfc validations end here:-(
   pips_assert("e is a variable", type_variable_p(t));
 
-  return(ENDP(variable_dimensions(type_variable(t))));
+  return ENDP(variable_dimensions(type_variable(t)));
 }
 
 /* for variables (like I), not constants (like 1)!
