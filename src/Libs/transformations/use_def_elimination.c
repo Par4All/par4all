@@ -381,6 +381,7 @@ use_def_deal_if_useful(statement s)
    bool this_statement_writes_a_procedure_argument;
    bool this_statement_is_a_format;
    bool this_statement_is_an_unstructured_test = FALSE;
+   bool this_statement_is_a_c_return;
 
    if (get_debug_level() >= 5) {
       fprintf(stderr, "use_def_deal_if_useful: statement %p (%#x)\n",
@@ -389,7 +390,7 @@ use_def_deal_if_useful(statement s)
    }
 
    if (statement_ordering(s) == STATEMENT_ORDERING_UNDEFINED) {
-      user_warning("use_def_deal_if_useful", "exited since it found a statement without ordering: statement %p (%#x)\n", s, statement_ordering(s));
+      pips_user_warning("exited since it found a statement without ordering: statement %p (%#x)\n", s, statement_ordering(s));
       return;
    }
    
@@ -418,6 +419,8 @@ use_def_deal_if_useful(statement s)
 	   this_statement_is_an_unstructured_test = TRUE;
    }
 
+   this_statement_is_a_c_return = return_statement_p(s);
+
    if (get_debug_level() >= 6) {
       if (this_statement_has_an_io_effect)
          fprintf(stderr, "Statement %p has an io effect.\n", s);
@@ -428,12 +431,15 @@ use_def_deal_if_useful(statement s)
          fprintf(stderr, "Statement %p is a FORMAT.\n", s);
       if (this_statement_is_an_unstructured_test)
          fprintf(stderr, "Statement %p is an unstructured test.\n", s);
+      if (this_statement_is_a_c_return)
+         fprintf(stderr, "Statement %p is a C return.\n", s);
    }
    
    if (this_statement_has_an_io_effect
        || this_statement_writes_a_procedure_argument
        || this_statement_is_a_format
-       || this_statement_is_an_unstructured_test)
+       || this_statement_is_an_unstructured_test
+       || this_statement_is_a_c_return)
       /* Mark this statement as useful: */
       set_add_element(the_useful_statements, the_useful_statements, (char *) s);
 
