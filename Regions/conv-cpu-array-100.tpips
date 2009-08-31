@@ -29,6 +29,7 @@ setproperty UNSPAGHETTIFY_TEST_RESTRUCTURING=TRUE
 setproperty UNSPAGHETTIFY_RECURSIVE_DECOMPOSITION=TRUE
 echo Privatize scalar variables on all the modules of the program:
 apply PRIVATIZE_MODULE[conv_cpu]
+close
 delete conv-cpu-array-100 
 quit
 # EOF
