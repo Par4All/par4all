@@ -1,6 +1,12 @@
 delete csplit13
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
 setenv PIPS_SRCPATH "${VDIR:-.}/csplit13.include:$PIPS_SRCPATH"
-create csplit13 csplit13.src/*.c
+
+# Does not work any more: any recent change by Fabien?
+create csplit13 ${VDIR:-.}/csplit13.src/*.c
+# create csplit13 csplit13.src/csplit13.c
 
 #quit
 
