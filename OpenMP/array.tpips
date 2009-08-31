@@ -1,5 +1,8 @@
 #
 delete array
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
 create array array.c
 
 #activate some debug mode

@@ -1,4 +1,7 @@
 delete split_pragma2
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
 create split_pragma2 split_pragma2.f
 
 #activate some debug mode

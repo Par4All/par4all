@@ -1,4 +1,7 @@
 delete parallel_do2
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
 create parallel_do2 parallel_do.f
 
 #activate some debug mode

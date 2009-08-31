@@ -1,4 +1,7 @@
 delete dot_product
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
 create dot_product dot_product.f
 
 #activate some debug mode

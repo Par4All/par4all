@@ -1,5 +1,8 @@
 #
 delete nested_c
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
 create nested_c nested_c.c
 
 #activate some debug mode

@@ -1,4 +1,7 @@
 delete parallel_do
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
 create parallel_do parallel_do.f
 
 #activate some debug mode

@@ -1,4 +1,7 @@
 delete mix4
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
 create mix4 mix.c
 
 #activate some debug mode
