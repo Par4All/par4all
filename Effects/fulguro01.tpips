@@ -93,7 +93,8 @@ display PRINTED_FILE[flgr2d_arith_add]
 activate PRINT_CODE_CUMULATED_EFFECTS
 display PRINTED_FILE[flgr2d_arith_add]
 
-
+close
+delete fulguro01
 quit
 activate TRANSFORMERS_INTER_FULL
 activate PRECONDITIONS_INTER_FULL
@@ -119,5 +120,5 @@ display PARALLELPRINTED_FILE[%ALL]
 #display XML_PRINTED_FILE[main]
 
 close
-# delete fulguro01
+delete fulguro01
 quit

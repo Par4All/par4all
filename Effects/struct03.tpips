@@ -64,5 +64,5 @@ activate PRINT_PARALLELIZEDOMP_CODE
 display PARALLELPRINTED_FILE[struct03]
 
 close
-#delete struct03
+delete struct03
 quit

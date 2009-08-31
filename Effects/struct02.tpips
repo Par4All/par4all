@@ -72,5 +72,5 @@ apply COARSE_GRAIN_PARALLELIZATION[struct02]
 display PRINTED_FILE[struct02]
 
 close
-# delete struct02
+delete struct02
 quit

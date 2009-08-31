@@ -20,6 +20,10 @@ echo
 
 activate PRINT_CODE_PROPER_EFFECTS
 display PRINTED_FILE[struct04]
+
+
+close
+delete struct04
 quit
 echo
 echo Cumulated effetcs for "struct04"

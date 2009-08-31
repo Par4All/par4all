@@ -13,12 +13,6 @@ display PRINTED_FILE
 
 activate PRINT_CODE_CUMULATED_EFFECTS
 display PRINTED_FILE[main]
-quit
-activate TRANSFORMERS_INTER_FULL
-activate PRECONDITIONS_INTER_FULL
-activate PRINT_CODE_TRANSFORMERS
-display PRINTED_FILE[main]
-
 close
 delete fread02
 quit
