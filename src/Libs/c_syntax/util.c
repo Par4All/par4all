@@ -2237,9 +2237,13 @@ void AddToExterns(entity e, entity mod)
     pips_assert("le is an entity list", entity_list_p(le));
   }
 }
+
+/* FI: check the difference with AddEntityToDeclarations() */
 void AddToDeclarations(entity e, entity mod)
 {
-  if (!gen_in_list_p(e,code_declarations(value_code(entity_initial(mod)))))
+  list dl = code_declarations(value_code(entity_initial(mod)));
+
+  if (!gen_in_list_p(e,dl))
     {
       pips_debug(5,"Add entity \"%s\" (\"%s\") to module %s\n",
 		 entity_user_name(e),
@@ -2250,6 +2254,7 @@ void AddToDeclarations(entity e, entity mod)
 		    CONS(ENTITY,e,NIL));
     }
 }
+
 /************************* STRUCT/UNION ENTITY*********************/
 
 void UpdateDerivedEntity(list ld, entity e, stack ContextStack)
@@ -2867,4 +2872,28 @@ void set_entity_initial(entity v, expression nie)
 
   if(value_undefined_p(entity_initial(v)))
     entity_initial(v) = make_value_expression(nie);
+}
+
+/* This is designed for standard C functions, not for compilation units. */
+bool check_declaration_uniqueness_p(statement s)
+{
+  list dl = statement_declarations(s);
+  bool failure_p = FALSE;
+
+  FOREACH(ENTITY, e, dl) {
+    int n = gen_occurences(e, dl);
+    if(n>1) {
+      /* e must be a function: they can be declared several times */
+      type t = ultimate_type(entity_type(e));
+
+      if(!type_functional_p(t)) {
+	pips_debug(0, "Entity \"%s\" declared %d times.\n", n);
+	failure_p = TRUE;
+      }
+    }
+  }
+  if(failure_p)
+    pips_internal_error("Module declarations are not unique");
+
+  return !failure_p;
 }

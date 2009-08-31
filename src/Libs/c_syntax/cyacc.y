@@ -2262,12 +2262,17 @@ direct_decl: /* (* ISO 6.7.5 *) */
 			     within the same scope, but this is not
 			     checked yet. */
 			  entity e = FindOrCreateCurrentEntity($1,ContextStack,FormalStack,FunctionStack,is_external);
-			  /* Initialize the type stack and push the type of found/created entity to the stack.
-			     It can be undefined if the entity has not been parsed, or a given type which is
-			     used later to check if the declarations are the same for one entity.
-			     This stack is put temporarily in the storage of the entity, not a global variable
-			     for each declarator to avoid being erased by recursion
-			     (FI: this last sentence seems to be wrong) */
+			  /* Initialize the type stack and push the
+			     type of found/created entity to the
+			     stack.  It can be undefined if the entity
+			     has not been parsed, or a given type
+			     which is used later to check if the
+			     declarations are the same for one entity.
+			     This stack is put temporarily in the
+			     storage of the entity, not a global
+			     variable for each declarator to avoid
+			     being erased by recursion (FI: this last
+			     sentence seems to be wrong) */
 			  stack s = get_from_entity_type_stack_table(e);
 			  if(stack_undefined_p(s)) {
 			    s = stack_make(type_domain,0,0);
@@ -2276,7 +2281,7 @@ direct_decl: /* (* ISO 6.7.5 *) */
 			  }
 			  else { 
 			    /* e has already been defined since a type
-			       stack is associated to it. At least, it
+			       stack is associated to it. At least, if
 			       the mapping from entity to type stack
 			       is well managed. Since entities are
 			       sometimes destroyed, a new entity might
@@ -2670,9 +2675,12 @@ function_def:  /* (* ISO 6.9.1 *) */
     block
                         {
 			  /* Make value_code for current module here */
+			  list dl = statement_declarations($3);
 			  ModuleStatement = $3;
-			  pips_assert("Module statement is consistent",statement_consistent_p(ModuleStatement));
-			  pips_assert("Module declarations are unique", gen_once_p(statement_declarations(ModuleStatement)));
+			  pips_assert("Module statement is consistent",
+				      statement_consistent_p(ModuleStatement));
+			  pips_assert("No illegal redundant declarations",
+				      check_declaration_uniqueness_p(ModuleStatement));
 			  /* Let's delay this? ResetCurrentModule(); */
 			  is_external = TRUE;
 			}

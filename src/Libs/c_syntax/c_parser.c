@@ -448,9 +448,16 @@ static bool actual_c_parser(string module_name,
 
 	pips_debug(2,"and declarations: ");
 	print_entities(statement_declarations(ModuleStatement));
-	if(!compilation_unit_p(module_name))
+	if(!compilation_unit_p(module_name)) {
+	  /* Even if you are not in a compilation unit, external
+	     functions may be declared many times within one scope. */
 	  pips_assert("Variables are declared once",
-		      gen_once_p(statement_declarations(ModuleStatement)));
+		      check_declaration_uniqueness_p(ModuleStatement));
+	}
+	else {
+	  /* Variables allocated within the compilation unit should be declared only once, no? */
+	  ; // no check yet
+	}
 	printf("\nList of callees:\n");
 	MAP(STRING,s,
 	{
