@@ -1,0 +1,19 @@
+delete enum_include
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create enum_include enum_include.c
+
+#SELECT C LANGUAGE
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+display PRINTED_FILE(main)
+
+apply UNSPLIT(%ALL)
+
+close
+#delete enum_include
+quit
+# EOF
