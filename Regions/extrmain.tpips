@@ -30,4 +30,5 @@ apply PRIVATIZE_MODULE[EXTR]
 activate REGION_CHAINS
 display PARALLELPRINTED_FILE[EXTR]
 close
+delete extrmain
 quit

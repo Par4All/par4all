@@ -1,4 +1,6 @@
+delete renpar6
 create renpar6 renpar6.f
+setproperty ABORT_ON_USER_ERROR TRUE
 module RENPAR6
 activate TRANSFORMERS_INTER_FULL
 activate PRECONDITIONS_INTER_FAST
@@ -10,4 +12,5 @@ display PRINTED_FILE[RENPAR6]
 activate PRINT_CODE_OUT_REGIONS
 display PRINTED_FILE[RENPAR6]
 close
+delete renpar6
 quit

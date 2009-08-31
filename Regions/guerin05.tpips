@@ -2,6 +2,7 @@ delete guerin05
 # setproperty PRETTYPRINT_ALL_DECLARATIONS TRUE
 # setproperty PREPROCESSOR_MISSING_FILE_HANDLING "query"
 create guerin05 guerin05.f
+setproperty ABORT_ON_USER_ERROR TRUE
 
 #activate PRINT_CODE_CUMULATED_EFFECTS
 #display PRINTED_FILE
@@ -48,6 +49,8 @@ display PRINTED_FILE
 activate PRINT_CODE_OUT_REGIONS
 display PRINTED_FILE
 
+close
+delete guerin05
 quit
 
 #apply PHRASE_DISTRIBUTOR_INIT

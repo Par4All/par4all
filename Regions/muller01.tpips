@@ -3,8 +3,8 @@
 # initial value is bound to the fucntion entrance
 
 delete muller01
-
 create muller01 muller01.f
+setproperty ABORT_ON_USER_ERROR TRUE
 
 activate MUST_REGIONS
 activate TRANSFORMERS_INTER_FULL
@@ -32,4 +32,6 @@ echo
 activate PRINT_CODE_OUT_REGIONS
 display PRINTED_FILE[SUB]
 
+close
+delete muller01
 quit

@@ -2,6 +2,7 @@ delete guerin09
 # setproperty PRETTYPRINT_ALL_DECLARATIONS TRUE
 # setproperty PREPROCESSOR_MISSING_FILE_HANDLING "query"
 create guerin09 guerin09.f
+setproperty ABORT_ON_USER_ERROR TRUE
 
 #activate PRINT_CODE_CUMULATED_EFFECTS
 #display PRINTED_FILE
@@ -34,6 +35,7 @@ setproperty	PRETTYPRINT_ALL_EFFECTS TRUE
 setproperty	PRETTYPRINT_EMPTY_BLOCKS TRUE
 setproperty	PRETTYPRINT_SCALAR_REGIONS TRUE
 
+# what is the point?
 setenv EFFECTS_OPERATORS_DEBUG_LEVEL 9
 setenv IN_EFFECTS_DEBUG_LEVEL 9
 setenv OUT_EFFECTS_DEBUG_LEVEL 9
@@ -44,7 +46,10 @@ display PRINTED_FILE
 # quit
 activate PRINT_CODE_IN_REGIONS
 display PRINTED_FILE
+close
+delete guerin09
 quit
+
 activate PRINT_CODE_OUT_REGIONS
 display PRINTED_FILE
 
