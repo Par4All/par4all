@@ -12,7 +12,6 @@ setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
 setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
 
-
 module main
 
 activate PRINT_CODE_PROPER_EFFECTS
@@ -20,3 +19,4 @@ display PRINTED_FILE
 
 close
 delete io_intrinsics
+quit

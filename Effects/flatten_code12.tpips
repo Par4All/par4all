@@ -54,7 +54,7 @@ echo
 
 apply UNSPLIT
 # shell cat flatten_code12.database/Src/flatten_code12.c
-shell gcc flatten_code12.database/Src/flatten_code12.c
+shell cc -o flatten_code12.out flatten_code12.database/Src/flatten_code12.c
 
 echo
 echo Execute resulting code

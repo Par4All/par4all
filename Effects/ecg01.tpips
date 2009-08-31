@@ -14,21 +14,6 @@ echo
 
 activate PRINT_CODE_CUMULATED_EFFECTS
 display PRINTED_FILE(FFT1)
-quit
-echo
-echo Proper effects for "PROCESS"
-echo
-
-activate PRINT_CODE_PROPER_EFFECTS
-display PRINTED_FILE(PROCESS)
-
-echo
-echo Cumulated effects for "PROCESS"
-echo
-
-activate PRINT_CODE_CUMULATED_EFFECTS
-display PRINTED_FILE(PROCESS)
-
 close
-#delete ecg01
+delete ecg01
 quit

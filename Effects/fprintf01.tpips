@@ -22,14 +22,6 @@ echo
 
 activate PRINT_CODE_PROPER_EFFECTS
 display PRINTED_FILE[main]
-quit
-
-echo
-echo Code with cumulated effects for "fprintf01"
-echo
-
-activate PRINT_CODE_CUMULATED_EFFECTS
-display PRINTED_FILE[main]
 close
 delete fprintf01
 quit
