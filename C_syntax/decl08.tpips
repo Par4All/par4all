@@ -23,15 +23,7 @@ echo Parsed printed file
 echo
 
 display PARSED_PRINTED_FILE[decl08!]
-quit
-echo
-echo Printed file
-echo
-
-display PRINTED_FILE[decl08!]
-
 
 close
 delete decl08
-
 quit
