@@ -52,22 +52,6 @@ echo
 
 activate PRINT_CODE_CUMULATED_EFFECTS
 display PRINTED_FILE[main]
-quit
-echo
-echo Regions for "call11"
-echo
-
-activate PRINT_CODE_REGIONS
-display PRINTED_FILE[call11]
-
-echo
-echo Regions for "main"
-echo
-
-setproperty PRETTYPRINT_SCALAR_REGIONS TRUE
-activate PRINT_CODE_REGIONS
-display PRINTED_FILE[main]
-
 close
-#delete call11
+delete call11
 quit

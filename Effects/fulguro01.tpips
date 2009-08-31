@@ -82,6 +82,9 @@ activate PRINT_CODE_PROPER_EFFECTS
 display PRINTED_FILE[flgr1d_arith_add_fgINT32]
 activate PRINT_CODE_CUMULATED_EFFECTS
 display PRINTED_FILE[flgr1d_arith_add_fgINT32]
+
+close
+delete fulguro01
 quit
 activate PRINT_CODE_PROPER_EFFECTS
 display PRINTED_FILE[flgr2d_arith_add_fgINT32]
@@ -93,8 +96,6 @@ display PRINTED_FILE[flgr2d_arith_add]
 activate PRINT_CODE_CUMULATED_EFFECTS
 display PRINTED_FILE[flgr2d_arith_add]
 
-close
-delete fulguro01
 quit
 activate TRANSFORMERS_INTER_FULL
 activate PRECONDITIONS_INTER_FULL

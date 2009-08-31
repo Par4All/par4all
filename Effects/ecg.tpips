@@ -30,5 +30,5 @@ activate PRINT_CODE_CUMULATED_REFERENCES
 display PRINTED_FILE(PROCESS)
 
 close
-#delete ecg
+delete ecg
 quit

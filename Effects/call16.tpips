@@ -51,22 +51,6 @@ echo
 
 activate PRINT_CODE_PROPER_EFFECTS
 display PRINTED_FILE[dotprod]
-quit
-
-echo
-echo Cumulated effects for "dotprod"
-echo
-
-activate PRINT_CODE_CUMULATED_EFFECTS
-display PRINTED_FILE[dotprod ]
-quit
-echo
-echo Regions for "call16"
-echo
-
-activate PRINT_CODE_REGIONS
-display PRINTED_FILE[call16]
-
 close
 delete call16
 quit
