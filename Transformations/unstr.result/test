@@ -100,10 +100,6 @@ C  P(J) {J==2}
 C  P(J) {J==2}
 
 
-      CONTINUE
-
-C  P(J) {J==2}
-
       PRINT *, J                                                        0011
 
 C  P(J) {J==2}

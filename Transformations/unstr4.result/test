@@ -167,14 +167,6 @@ C  P(J) {J==3}
 C  P(J) {J==3}
 
 
-      CONTINUE
-
-C  P(J) {J==3}
-
-
-      CONTINUE
-
-C  P(J) {J==3}
 
       PRINT *, J                                                        0020
 

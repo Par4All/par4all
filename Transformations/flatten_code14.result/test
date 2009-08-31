@@ -53,37 +53,35 @@ int flatten_code14(void)
 // (0,2)
       // BEGIN BLOCK
       extern int bla(int f1);
-      extern int bla(int f1);
 // (0,3)
       // (0,3)
       // (0,2)
       // BEGIN BLOCK
-      _return0 = bla(3);                                                /*0017*/
+      _return0 = bla(3);                                                /*0016*/
       // END BLOCK
    }
 // (0,4)
    // (0,5)
-   i1 = _return0;                                                       /*0022*/
+   i1 = _return0;                                                       /*0021*/
    {
 // (0,5)
       // BEGIN BLOCK
       extern int bla(int f1);
-      extern int bla(int f1);
 // (0,6)
       // (0,2)
       // BEGIN BLOCK
-      _return1 = bla(7);                                                /*0032*/
+      _return1 = bla(7);                                                /*0030*/
       // END BLOCK
       // END BLOCK
    }
 // (0,8)
-   i2 = _return1;                                                       /*0038*/
+   i2 = _return1;                                                       /*0036*/
 // (0,9)
    // END BLOCK
    // (0,7)
    /*0017*/
    // (0,4)
-   return i1+i2;                                                        /*0043*/
+   return i1+i2;                                                        /*0041*/
    // END BLOCK
 }
 int flatten_code14(void)
@@ -99,23 +97,23 @@ int flatten_code14(void)
    // (0,3)
    // (0,2)
    // BEGIN BLOCK
-   _return0 = bla(3);                                                   /*0017*/
+   _return0 = bla(3);                                                   /*0016*/
 // (0,3)
    // (0,5)
-   i1 = _return0;                                                       /*0022*/
+   i1 = _return0;                                                       /*0021*/
 // (0,4)
    // (0,2)
    // BEGIN BLOCK
-   _return1 = bla(7);                                                   /*0032*/
+   _return1 = bla(7);                                                   /*0030*/
 // (0,5)
    // END BLOCK
-   i2 = _return1;                                                       /*0038*/
+   i2 = _return1;                                                       /*0036*/
 // (0,6)
    // END BLOCK
    // (0,7)
    /*0017*/
    // (0,4)
-   return i1+i2;                                                        /*0043*/
+   return i1+i2;                                                        /*0041*/
    // END BLOCK
 }
 int flatten_code14(void)
@@ -134,23 +132,23 @@ int flatten_code14(void)
    // BEGIN BLOCK
    _return0 = bla(3);                                                   /*0038*/
 // (0,3)
-   /*0017*/
+   /*0016*/
    // (0,3)
    // (0,5)
    i1 = _return0;                                                       /*0041*/
 // (0,4)
-   /*0022*/
+   /*0021*/
    // (0,4)
    // (0,2)
    // BEGIN BLOCK
    _return1 = bla(7);                                                   /*0045*/
 // (0,5)
-   /*0032*/
+   /*0030*/
    // (0,5)
    // END BLOCK
    i2 = _return1;                                                       /*0048*/
 // (0,6)
-   /*0038*/
+   /*0036*/
    // (0,6)
    // END BLOCK
    // (0,7)

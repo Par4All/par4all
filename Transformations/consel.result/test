@@ -135,10 +135,7 @@ C (0,9)
 C        END BLOCK
       ENDDO
 C (0,10)
-C     BEGIN BLOCK
-C (0,11)
 
-      CONTINUE                                                          0017
-C     END BLOCK
+      RETURN
 C     END BLOCK
       END

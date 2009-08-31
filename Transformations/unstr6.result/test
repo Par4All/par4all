@@ -299,10 +299,6 @@ c     de'pendance sur ce qui pre'ce`de :
 c     doit e^tre re'e'crit :
 c     k = 1
 c     goto 100
-      CONTINUE
-
-C  P(A,I,J) {A==9, I==4, J==8}
-
       K = 3                                                             0041
 
 C  P(A,I,J,K) {A==9, I==4, J==8, K==3}

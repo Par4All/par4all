@@ -1,0 +1,10 @@
+void use_def_elim(int *x)
+{
+   int *y = x;
+   y[0] = 1;
+}
+void use_def_elim(int *x)
+{
+   int *y = x;
+   y[0] = 1;
+}

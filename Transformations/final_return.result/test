@@ -22,5 +22,5 @@ c     Should not fade away the final return
       SUBROUTINE FOO
       PRINT *, 'live'                                                   0003
       STOP                                                              0004
-      CONTINUE
+      RETURN
       END

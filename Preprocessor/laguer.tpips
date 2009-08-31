@@ -6,7 +6,7 @@ create laguer laguer.c
 
 # This file cannot be preprocessed because "complex.h" is not available
 
-shell cc -C -E laguer.c
+shell cc -C -E laguer.database/Tmp/laguer.cpp_processed.c
 
 # echo cat laguer.database/[a-z_]*[a-z_]/*.c
 display C_SOURCE_FILE[%ALL]
