@@ -762,6 +762,7 @@ dead_statement_rewrite(statement s)
        break;
 
    case is_instruction_loop:
+   case is_instruction_forloop:
    case is_instruction_whileloop:
        break;
 

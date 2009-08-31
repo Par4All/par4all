@@ -184,7 +184,7 @@ bool kernelize(char * module_name)
 static
 bool cannot_terapixify(gen_chunk * elem, bool *can_terapixify)
 {
-    pips_user_warning("found invalid construct of type %d\n",elem->i);
+    printf("found invalid construct of type %d\n",elem->i);
     return *can_terapixify=false;
 }
 
@@ -193,7 +193,7 @@ bool can_terapixify_call_p(call c, bool *can_terapixify)
 {
     if( !value_intrinsic_p(entity_initial(call_function((c)))) && ! call_constant_p(c) )
     {
-        pips_user_warning("found invalid call to %s\n",entity_user_name(call_function(c)));
+        printf("found invalid call to %s\n",entity_user_name(call_function(c)));
         return *can_terapixify=false;
     }
     return true;
@@ -208,7 +208,7 @@ bool can_terapixify_expression_p(expression e, bool *can_terapixify)
         list ewords = words_expression(e);
         string estring = words_to_string(ewords);
         string bstring = basic_to_string(b);
-        pips_user_warning("found invalid expression %s of basic %s\n",estring, bstring);
+        printf("found invalid expression %s of basic %s\n",estring, bstring);
         free(bstring);
         free(estring);
         gen_free_list(ewords);
@@ -278,7 +278,7 @@ bool normalize_microcode( char * module_name)
                 bool parameter_written = find_write_effect_on_entity(get_current_module_statement(),e);
                 if( parameter_written ) /* it's an image */
                 {
-                    pips_user_warning("%s seems an image\n",entity_user_name(e));
+                    printf("%s seems an image\n",entity_user_name(e));
                 }
                 else /* cannot tell if it's a kernel or an image*/
                 {
@@ -295,10 +295,10 @@ bool normalize_microcode( char * module_name)
                         }
                     }
                     if( array_size > 0 && 56 >= array_size ) {
-                        pips_user_warning("%s seems a kernel\n",entity_user_name(e));
+                        printf("%s seems a kernel\n",entity_user_name(e));
                     }
                     else {
-                        pips_user_warning("%s seems an image\n",entity_user_name(e));
+                        printf("%s seems an image\n",entity_user_name(e));
                     }
                 }
             }
@@ -306,7 +306,7 @@ bool normalize_microcode( char * module_name)
             {
             }
             else {
-                pips_user_warning("parameter %s is not valid\n",entity_user_name(e));
+                printf("parameter %s is not valid\n",entity_user_name(e));
                 can_terapixify=false;
             }
 

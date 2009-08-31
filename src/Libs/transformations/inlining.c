@@ -292,6 +292,13 @@ void inlining_regenerate_labels(statement s, string new_module)
     }
 }
 
+static
+bool find_entity_with_same_name(entity e, list l) {
+    FOREACH(ENTITY,ent,l)
+        if(same_entity_name_p(e,ent)) return true;
+    return false;
+}
+
 /* this should inline the call callee
  * calling module inlined_module
  */
@@ -346,7 +353,7 @@ statement inline_expression_call(inlining_parameters p, expression modified_expr
                 string emn = entity_module_name(ref_ent);
                 if(! same_string_p(emn,mln) &&
                         !same_string_p(emn,cu_name) &&
-                        gen_chunk_undefined_p(gen_find_eq(ref_ent,statement_declarations(expanded))) )
+                        !find_entity_with_same_name(ref_ent,statement_declarations(expanded)) )
                 {
                     entity add = ref_ent;
                     if(entity_variable_p(ref_ent) && 
@@ -354,13 +361,15 @@ statement inline_expression_call(inlining_parameters p, expression modified_expr
                     {
                         pips_user_warning("replacing static variable by a global one, this may lead to incorrect code\n");
                         add = make_global_entity_from_local(ref_ent);
+                        replace_entity(expanded,ref_ent,add);
+                        replace_entity(inlined_module_statement(p),ref_ent,add);
                     }
                     new_externs=CONS(ENTITY,add,new_externs);
                 }
             }
         }
         gen_sort_list(new_externs,(int(*)(const void*,const void*))compare_entities);
-        gen_nconc(statement_declarations(expanded),new_externs);
+        statement_declarations(expanded)=gen_nconc(statement_declarations(expanded),new_externs);
         set_free(inlined_referenced_entities);
     }
 
@@ -968,6 +977,24 @@ void patch_outlined_reference(expression x, entity e)
 
 }
 
+static
+void patch_outlined_reference_in_declarations(statement s, entity e)
+{
+    FOREACH(ENTITY, ent, statement_declarations(s))
+    {
+        value v = entity_initial(ent);
+        if(!value_undefined_p(v) && value_expression_p(v))
+            gen_context_recurse(value_expression(v),e,expression_domain,gen_true,patch_outlined_reference);
+    }
+}
+
+static
+void bug_in_patch_outlined_reference(loop l , entity e)
+{
+    if( same_entity_p(loop_index(l), e))
+        pips_user_warning("not changing loop index %s, generated code may be wrong\n",entity_user_name(e));
+}
+
 /** 
  * outline the statements in statements_to_outline into a module named outline_module_name
  * the outlined statements are replaced by a call to the newly generated module
@@ -1015,6 +1042,12 @@ statement outliner(string outline_module_name, list statements_to_outline)
     /* get the relative complements and create the parameter list*/
     gen_list_and_not(&referenced_entities,declared_entities);
     gen_free_list(declared_entities);
+    /** 
+     * 
+     * 
+     * @param &referenced_entities 
+     * @param skip_list 
+     */
     gen_list_and_not(&referenced_entities,skip_list);
     gen_free_list(skip_list);
 
@@ -1095,7 +1128,11 @@ statement outliner(string outline_module_name, list statements_to_outline)
                     syntax s = expression_syntax(x);
                     expression X = make_expression(s,normalized_undefined);
                     expression_syntax(x)=make_syntax_call(make_call(CreateIntrinsic(ADDRESS_OF_OPERATOR_NAME),CONS(EXPRESSION,X,NIL)));
-                    gen_context_recurse(body,ex,expression_domain,gen_true,patch_outlined_reference);
+                    gen_context_multi_recurse(body,ex,
+                            statement_domain,gen_true,patch_outlined_reference_in_declarations,
+                            loop_domain,gen_true,bug_in_patch_outlined_reference,
+                            expression_domain,gen_true,patch_outlined_reference,
+                            0);
                 }
             }
 			POP(iter);
@@ -1181,6 +1218,13 @@ outline(char* module_name)
             if(entity_undefined_p(stmt_label_entity))
                 pips_user_error("label %s not found\n", stmt_label);
             statements_to_outline = find_statements_with_label(get_current_module_statement(),stmt_label_entity);
+            if(gen_length(statements_to_outline) == 1 &&
+                    statement_loop_p(STATEMENT(CAR(statements_to_outline))) &&
+                    get_bool_property("OUTLINE_LOOP_STATEMENT"))
+            {
+                statement ss = STATEMENT(CAR(statements_to_outline));
+                gen_list_patch(statements_to_outline,ss,loop_body(statement_loop(ss)));
+            }
         }
     }
 

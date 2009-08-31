@@ -4515,9 +4515,11 @@ terapixify				> MODULE.code
 
 The property \verb+OUTLINE_MODULE_NAME+ will be used as microcode name.
 If not set, it will be asked for interactively.
-The property \verb+OUTLINE_LABEL+ is used to select a statement
+The property \verb+OUTLINE_LABEL+ is used to select a statement.
+If \verb+OUTLINE_LOOP_STATEMENT+ is set to \verb+TRUE+ and \verb+OUTLINE_LABEL+ is a loop, the loop body is selected instead of the loop itself.
 \begin{PipsProp}
 OUTLINE_LABEL ""
+OUTLINE_LOOP_STATEMENT FALSE
 \end{PipsProp}
 
 %%@UserManualDocumentation: normalize_microcode
