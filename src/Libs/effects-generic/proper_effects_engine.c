@@ -476,7 +476,7 @@ list generic_proper_effects_of_complex_address_expression(expression add_exp, ef
 		/* This might be tractable if e1 is a reference to a
 		   pointer. For instance, *(p+q-r) can be converted to p[q-r] */
 		expression e1 = EXPRESSION(CAR(s_args));
-		syntax s1 = expression_syntax(e1);
+		//syntax s1 = expression_syntax(e1);
 		expression e2 = EXPRESSION(CAR(CDR(s_args)));
 		
 		pips_debug(8,"*(p+q) case, with p = %s and q = %s\n",
@@ -1267,6 +1267,21 @@ proper_effects_of_call(call c)
 	  pips_debug(2, "end\n");
 	}
 
+	if(!ENDP(l_proper)
+	   && effects_all_read_p(l_proper)
+	   && !statement_may_have_control_effects_p(current_stat)) {
+	  /* The current statement should be ignored as it does not
+	     impact the store, nor the control. Examples in C; "0;" or
+	     "i;" or "(void) i". Because PIPS is interprocedural, it
+	     could ignore some more statements than gcc, but control
+	     effects are not analyzed. Such statements can be created
+	     by program transformations. */
+	  pips_user_warning("Statement %d is ignored because it does not "
+			    "modify the store.\n", statement_number(current_stat));
+	  gen_full_free_list(l_proper);
+	  l_proper = NIL;
+	}
+
 	store_proper_rw_effects_list(current_stat, l_proper);
     }
 }
@@ -1335,10 +1350,11 @@ static void proper_effects_of_expression_instruction(instruction i)
       }
     case is_syntax_reference:
       {
-	// someone typed "i;" in the code... it is allowed.
-	// let us ignore this dead code for today
-	// shoud generate a read effect on the reference?
-	store_proper_rw_effects_list(current_stat, NIL);
+	// someone typed "i;" in the code... or "a[i++];". It is
+	//allowed and may happen in automatic code transformations such as
+	//inlining.
+	reference r = syntax_reference(is);
+	l_proper = generic_proper_effects_of_read_reference(r);
 	break;
       }
     case is_syntax_range:
@@ -1363,6 +1379,17 @@ static void proper_effects_of_expression_instruction(instruction i)
       pips_debug(2, "end\n");
     }
 
+    if(!ENDP(l_proper) && effects_all_read_p(l_proper)) {
+      /* The current statement should be ignored as it does not impact
+	 the store. Examples in C; "0;" or "i;" or "(void) i". Because
+	 PIPS is interprocedural, it may ignore some more statements
+	 than gcc. Such statements can be created by program
+	 transformations. */
+      pips_user_warning("Statement %d is ignored because it does not "
+			"modify the store.\n", statement_number(current_stat));
+      gen_full_free_list(l_proper);
+      l_proper = NIL;
+    }
     store_proper_rw_effects_list(current_stat, l_proper);
   }
 }
@@ -1558,7 +1585,7 @@ void proper_effects_of_module_statement(statement module_stat)
     make_effects_private_current_context_stack();
     make_current_downward_cumulated_range_effects_stack();
     pips_debug(1,"begin\n");
-    
+
     gen_multi_recurse
 	(module_stat, 
 	 statement_domain, stmt_filter, proper_effects_of_statement,

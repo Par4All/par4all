@@ -638,29 +638,33 @@ statement_io_effect_p(statement s)
 }
 
 /* Return TRUE if the statement has a write effect on at least one of
-   the argument (formal parameter) of the module. Note that the return
-   variable of a function is also considered here as a formal
-   parameter. */
-bool
-statement_has_a_formal_argument_write_effect_p(statement s)
+   the argument (formal parameter) of the module and if the argument
+   passing mode is by reference. Note that the return variable of a
+   function is also considered here as a formal parameter. */
+bool statement_has_a_formal_argument_write_effect_p(statement s)
 {
    bool write_effect_on_a_module_argument_found = FALSE;
    entity module = get_current_module_entity();
    list effects_list = load_proper_rw_effects_list(s);
+   /* it might be better to check the parameter passing mode itself,
+      via the module type */
+   bool fortran_p = fortran_module_p(module);
 
-   MAP(EFFECT, an_effect,
-       {
-          entity a_variable = reference_variable(effect_any_reference(an_effect));
-          
-          if (action_write_p(effect_action(an_effect))
-              && (variable_return_p(a_variable)
-		  || variable_is_a_module_formal_parameter_p(a_variable,
-							     module))) {
-	      write_effect_on_a_module_argument_found = TRUE;
-             break;
-          }
-       },
-       effects_list);
+   FOREACH(EFFECT, an_effect, effects_list) {
+     entity a_variable = reference_variable(effect_any_reference(an_effect));
+     bool formal_p = variable_is_a_module_formal_parameter_p(a_variable,
+							module);
+     bool return_variable_p = variable_return_p(a_variable);
+
+     if (action_write_p(effect_action(an_effect))
+	 && (return_variable_p
+	     || (formal_p && fortran_p)
+	     )
+	 ) {
+       write_effect_on_a_module_argument_found = TRUE;
+       break;
+     }
+   }       ;
 
    return write_effect_on_a_module_argument_found;
 
