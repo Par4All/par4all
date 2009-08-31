@@ -130,10 +130,9 @@ free_cumu_range_effects()
  * input    : a loop range (bounds and stride) and the context.
  * output   : the corresponding list of effects.
  * modifies : nothing.
- * comment  :	
+ * comment  :
  */
-list 
-generic_proper_effects_of_range(range r)
+list generic_proper_effects_of_range(range r)
 {
     list le;
     expression el = range_lower(r);
@@ -1269,13 +1268,15 @@ proper_effects_of_call(call c)
 
 	if(!ENDP(l_proper)
 	   && effects_all_read_p(l_proper)
-	   && !statement_may_have_control_effects_p(current_stat)) {
+	   && !statement_may_have_control_effects_p(current_stat)
+	   && !format_statement_p(current_stat)) {
 	  /* The current statement should be ignored as it does not
-	     impact the store, nor the control. Examples in C; "0;" or
-	     "i;" or "(void) i". Because PIPS is interprocedural, it
-	     could ignore some more statements than gcc, but control
-	     effects are not analyzed. Such statements can be created
-	     by program transformations. */
+	     impact the store, nor the control, nor the
+	     formatting. Examples in C; "0;" or "i;" or "(void)
+	     i". Because PIPS is interprocedural, it could ignore some
+	     more statements than gcc, but control effects are not
+	     analyzed. Such statements can be created by program
+	     transformations. */
 	  pips_user_warning("Statement %d is ignored because it does not "
 			    "modify the store.\n", statement_number(current_stat));
 	  gen_full_free_list(l_proper);
@@ -1520,7 +1521,7 @@ static void proper_effects_of_forloop(forloop l)
 static void proper_effects_of_while(whileloop w)
 {
     statement current_stat = effects_private_current_stmt_head();
-    list /* of effect */ l_proper = 
+    list /* of effect */ l_proper =
 	generic_proper_effects_of_expression(whileloop_condition(w));
     store_proper_rw_effects_list(current_stat, l_proper);
 }
@@ -1532,16 +1533,16 @@ static void proper_effects_of_test(test t)
     list l_cumu_range = cumu_range_effects();
 
     pips_debug(2, "Effects for statement%03zd:\n",
-	       statement_ordering(current_stat)); 
+	       statement_ordering(current_stat));
 
     /* effects of the condition */
     l_proper = generic_proper_effects_of_expression(test_condition(t));
     l_proper = gen_nconc(l_proper, effects_dup(l_cumu_range));
-    
+
     ifdebug(2)
     {
 	pips_debug(2, "Proper effects for statement%03zd:\n",
-		   statement_ordering(current_stat));  
+		   statement_ordering(current_stat));
 	(*effects_prettyprint_func)(l_proper);
 	pips_debug(2, "end\n");
     }
@@ -1553,7 +1554,7 @@ static void proper_effects_of_test(test t)
 
 static void proper_effects_of_sequence(sequence block __attribute__((__unused__)))
 {
-    statement current_stat = effects_private_current_stmt_head();   
+    statement current_stat = effects_private_current_stmt_head();
     store_proper_rw_effects_list(current_stat, NIL);
 }
 
@@ -1567,20 +1568,20 @@ static bool stmt_filter(statement s)
 
 static void proper_effects_of_statement(statement s)
 {
-    if (!bound_proper_rw_effects_p(s)) 
-     { 
- 	pips_debug(2, "Warning, proper effects undefined, set to NIL\n"); 
- 	store_proper_rw_effects_list(s,NIL);	 
-     } 
+    if (!bound_proper_rw_effects_p(s))
+     {
+       pips_debug(2, "Warning, proper effects undefined, set to NIL\n");
+       store_proper_rw_effects_list(s,NIL);
+     }
     effects_private_current_stmt_pop();
     effects_private_current_context_pop();
 
     pips_debug(1, "End statement%03zd :\n", statement_ordering(s));
-  
+
 }
 
 void proper_effects_of_module_statement(statement module_stat)
-{    
+{
     make_effects_private_current_stmt_stack();
     make_effects_private_current_context_stack();
     make_current_downward_cumulated_range_effects_stack();
