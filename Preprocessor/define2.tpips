@@ -1,8 +1,8 @@
-delete enum_include
+delete define2
 
 setproperty ABORT_ON_USER_ERROR TRUE
 
-create enum_include enum_include.c
+create define2 define2.c
 
 #SELECT C LANGUAGE
 activate C_PARSER
@@ -14,6 +14,6 @@ display PRINTED_FILE(main)
 apply UNSPLIT(%ALL)
 
 close
-#delete enum_include
+delete define2
 quit
 # EOF
