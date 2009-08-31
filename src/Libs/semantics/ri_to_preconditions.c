@@ -341,8 +341,14 @@ call_to_postcondition(
 	break;
       case is_value_symbolic:
       case is_value_constant:
-	pips_internal_error("call to symbolic or constant %s\n", 
-			    entity_name(e));
+	/* This cannot occur in Fortran, but is possible in C. */
+	if(c_module_p(get_current_module_entity())) {
+	  post = transformer_apply(tf, pre);
+	}
+	else {
+	  pips_internal_error("call to symbolic or constant %s\n", 
+			      entity_name(e));
+	}
 	break;
       case is_value_unknown:
 	pips_internal_error("unknown function %s\n", entity_name(e));
