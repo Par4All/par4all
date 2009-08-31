@@ -25,5 +25,5 @@ echo
 display PRINTED_FILE[fprintf01]
 
 close
-#delete fprintf01
+delete fprintf01
 quit
