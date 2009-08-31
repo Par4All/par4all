@@ -850,7 +850,8 @@ dead_statement_filter(statement s)
 
        /* If a statement has no write effects on the store and if it
 	  cannot hides a control effect in a user-defined function*/
-       if (ENDP(crwl) && !statement_may_have_control_effects_p(s)) {
+       if (ENDP(crwl) && !statement_may_have_control_effects_p(s)
+	   && !format_statement_p(s)) {
 	pips_debug(2, "Ignored statement %d (%d, %d)\n",
 		   statement_number(s),
 		   ORDERING_NUMBER(statement_ordering(s)),

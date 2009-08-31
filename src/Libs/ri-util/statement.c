@@ -3122,7 +3122,14 @@ static bool look_for_control_effects(call c, bool * control_effect_p)
 bool statement_may_have_control_effects_p(statement s)
 {
   bool control_effect_p = FALSE;
-  gen_context_recurse(s, &control_effect_p, call_domain, look_for_control_effects, gen_null);
+
+  /* Preserve branch targets, without checking if they are useful or
+     not because it can be done by another pass */
+  control_effect_p = !entity_empty_label_p(statement_label(s));
+
+  if(!control_effect_p)
+    gen_context_recurse(s, &control_effect_p, call_domain, look_for_control_effects, gen_null);
+
   return control_effect_p;
 }
 
