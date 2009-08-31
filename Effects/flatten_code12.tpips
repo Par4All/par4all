@@ -17,8 +17,9 @@ echo
 echo Execute initial code
 echo
 
-shell gcc flatten_code12.c
-shell ./a.out
+shell cc flatten_code12.database/Tmp/flatten_code12.cpp_processed.c -o flatten_code12.out
+shell ./flatten_code12.out
+shell rm flatten_code12.out
 
 echo
 echo Initial code
@@ -59,7 +60,8 @@ echo
 echo Execute resulting code
 echo
 
-shell ./a.out
+shell ./flatten_code12.out
+shell rm flatten_code12.out
 
 close
 delete flatten_code12
