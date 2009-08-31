@@ -1,5 +1,6 @@
 setenv WSPC flatten_code13
 delete $WSPC
+delete ${WSPC}_2
 
 setproperty ABORT_ON_USER_ERROR TRUE
 setproperty PRETTYPRINT_BLOCKS TRUE
@@ -17,8 +18,10 @@ echo
 echo Compile initial code
 echo
 
-shell cc -c $WSPC.c
+#shell cc -c $WSPC.c
 #shell ./a.out
+
+shell cc -c flatten_code13.database/Tmp/flatten_code13.cpp_processed.c
 
 echo
 echo Initial code
@@ -55,4 +58,3 @@ close
 delete $WSPC
 delete ${WSPC}_2
 quit
-

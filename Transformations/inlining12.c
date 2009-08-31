@@ -14,6 +14,12 @@ typedef int freia_data2d;
 typedef int int32_t;
 typedef unsigned int uint32_t;
 
+extern int freia_common_check_image_bpp_compat(freia_data2d *, freia_data2d *, void *);
+extern int freia_common_print_backtrace();
+extern int freia_aipo_copy(freia_data2d *, freia_data2d *);
+extern int freia_aipo_dilate_8c(freia_data2d *, freia_data2d *, int *);
+extern int freia_aipo_dilate_6c(freia_data2d *, freia_data2d *, int *);
+
 freia_error freia_cipo_dilate(freia_data2d *imout, freia_data2d *imin, int32_t connexity, uint32_t size) {
   int kernel_8c[9] = {1,1,1,
         1,1,1,
