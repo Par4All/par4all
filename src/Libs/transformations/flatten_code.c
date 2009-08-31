@@ -479,10 +479,12 @@ bool flatten_code(string module_name)
   return (good_result_p);
 }
 
-/* This phase applies a subset of the transformations effected by
-   flatten_code, that is split initializations. Common code could
-   possibly be factorized. */ 
+/* gen_recurse callback on exiting statements. For a declaration to be split:
 
+   - it must be a local declaration
+   
+   - initial value must be a rhs expression
+ */ 
 static void split_initializations_in_statement(statement s)
 {
   if (statement_block_p(s)) {      
@@ -492,15 +494,17 @@ static void split_initializations_in_statement(statement s)
     instruction old = statement_instruction(s);
 
     FOREACH(ENTITY, var, decls) {
-      string ln = entity_local_name(var);
-      string cs = local_name_to_scope(ln); /* current scope */
-      if ( strcmp(cs, "") !=0 // This test might probably move one level up
+      string mn  = module_name(entity_name(var));
+      string cmn = entity_user_name(get_current_module_entity());
+      if ( strcmp(mn,cmn) == 0
 	   && !value_unknown_p(entity_initial(var))
 	   ) {
 	expression ie = variable_initial_expression(var);
-	statement  is = make_assign_statement(entity_to_expression(var), ie);	
-	inits = gen_nconc(inits, CONS(statement, is, NIL));
-	entity_initial(var) = make_value_unknown();
+	if (expression_is_C_rhs_p(ie)) {
+	  statement is = make_assign_statement(entity_to_expression(var), ie);	
+	  inits = gen_nconc(inits, CONS(statement, is, NIL));
+	  entity_initial(var) = make_value_unknown();
+	}
       }
     }
     /* Insert the list of initialisation statements as a sequence at
@@ -512,7 +516,27 @@ static void split_initializations_in_statement(statement s)
     /* Do nothing ? */
   }
 }
+  
+/* Recurse through the statements of s and split local declarations.
+   For the time being, we handle only blocks with declarations.
 
+   NOTE: Statement s is modified in-place.
+
+   This function can be called from another module to apply
+   transformation directly.
+*/
+void statement_split_initializations(statement s) 
+{
+  if (statement_block_p(s)) {
+    gen_recurse(s, statement_domain, gen_true, split_initializations_in_statement);    
+    clean_up_sequences(s);
+  }
+  else
+    pips_internal_error("Input assumptions not met: not a block statement.\n");
+}
+
+/* Main function for the split_initializations phase
+ */
 bool split_initializations(string module_name)
 {
   entity module;
@@ -521,7 +545,6 @@ bool split_initializations(string module_name)
 
   set_current_module_entity(module_name_to_entity(module_name));
   module = get_current_module_entity();
-
   set_current_module_statement( (statement)
 				db_get_memory_resource(DBR_CODE, module_name, TRUE) );
   module_stat = get_current_module_statement();
@@ -529,16 +552,8 @@ bool split_initializations(string module_name)
   debug_on("SPLIT_INITIALIZATIONS_DEBUG_LEVEL");
   pips_debug(1, "begin\n");
 
-  /* Recurse through the statements of s and split local declarations.
-     For the time being, we handle only blocks with declarations
-  */
-  if ( statement_block_p(module_stat)
-       && !ENDP(statement_declarations(module_stat))) {
-    gen_recurse(module_stat, statement_domain, gen_true, split_initializations_in_statement);    
-    clean_up_sequences(module_stat);
-  }
-  else
-    pips_internal_error("Input assumptions not met: not a block statement.\n");
+  // Do split !
+  statement_split_initializations(module_stat);
 
   pips_debug(1, "end\n");
   debug_off();
