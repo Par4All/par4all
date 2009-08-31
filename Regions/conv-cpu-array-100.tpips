@@ -9,7 +9,7 @@ echo Prettyprint the source as C, of course
 setproperty PRETTYPRINT_C_CODE TRUE
 echo Do not display original number lines as comment:
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
-echo If possible, transform simple for-loops into do-loop à la Fortran, simpler to analyze:
+echo If possible, transform simple for-loops into do-loop a la Fortran, simpler to analyze:
 setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
 echo Desugaring other for-loops into plain while-loops fot the time we improve semantics ameliorations in PIPS:
 setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
@@ -29,6 +29,7 @@ setproperty UNSPAGHETTIFY_TEST_RESTRUCTURING=TRUE
 setproperty UNSPAGHETTIFY_RECURSIVE_DECOMPOSITION=TRUE
 echo Privatize scalar variables on all the modules of the program:
 apply PRIVATIZE_MODULE[conv_cpu]
+display PRINTED_FILE[conv_cpu]
 close
 delete conv-cpu-array-100 
 quit
