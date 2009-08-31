@@ -1,0 +1,48 @@
+
+Proper effects for "main"
+
+int main()
+{
+   int t[100][10][3];
+   int (*p)[3];
+   int *pu;
+   int (*q)[10][3];
+   int (*qu)[3];
+   int (*r)[100][10][3];
+   int (*ru)[10][3];
+//               <must be read   >: __IO_EFFECTS:LUNS[1]
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+
+   printf("sizeof(t) = %zd\n", sizeof(t));                              /*0014*/
+//               <must be read   >: __IO_EFFECTS:LUNS[1]
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+   printf("sizeof(t[1]) = %zd\n", sizeof(t[1]));                        /*0015*/
+//               <must be read   >: __IO_EFFECTS:LUNS[1]
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+   printf("sizeof(t[1][2]) = %zd\n", sizeof(t[1][2]));                  /*0016*/
+//               <must be read   >: __IO_EFFECTS:LUNS[1]
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+   printf("sizeof(t[1][2][3]) = %zd\n", sizeof(t[1][2][3]));            /*0017*/
+//               <must be written>: p
+
+   p = &t[1][2];                                                        /*0019*/
+//               <must be written>: pu
+   pu = t[1][2];                                                        /*0020*/
+//               <must be written>: pu
+   pu = &t[1][2][0];                                                    /*0021*/
+//               <must be written>: q
+
+   q = &t[1];                                                           /*0023*/
+//               <must be written>: qu
+   qu = t[1];                                                           /*0024*/
+//               <must be written>: qu
+   qu = &t[1][0];                                                       /*0025*/
+//               <must be written>: r
+
+   r = &t;                                                              /*0027*/
+//               <must be written>: ru
+   ru = t;                                                              /*0028*/
+//               <must be written>: ru
+   ru = &t[0];                                                          /*0029*/
+   return 0;                                                            /*0030*/
+}
