@@ -42,6 +42,10 @@ TIME=
 unset MODULE WORKSPACE DUMPFILES NOINSTALL STDOUT STDERR \
 	REDIRECT FILES HPFFILES
 
+# ??? fix sort order
+unset LANG
+setenv LC_ALL=C
+
 rm -f $TMP.*
 
 # auto set PIPS_ROOT and PIPS_ARCH
