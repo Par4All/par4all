@@ -738,7 +738,7 @@ dead_recurse_unstructured(unstructured u)
 
 
 
-/* Essaye de faire le me'nage des blocs vides re'cursivement.
+/* Essaye de faire le menage des blocs vides recursivement.
    En particulier, si les 2 branches d'un test sont vides on peut supprimer
    le test, si le corps d'une boucle est vide on peut supprimer la boucle.
 */
@@ -819,6 +819,8 @@ dead_statement_filter(statement s)
 {
    instruction i;
    bool retour;
+   effects crwe = load_cumulated_rw_effects(s);
+   list crwl = effects_effects(crwe);
 
    i = statement_instruction(s);
    pips_debug(2, "Begin for statement %d (%d, %d)\n",
@@ -845,7 +847,19 @@ dead_statement_filter(statement s)
 	 break;
        }
 
-      /* Vire de'ja` (presque) tout statement dont la pre'condition est
+       /* If a statement has no write effects on the store and if it
+	  cannot hides a control effect in a user-defined function*/
+       if (ENDP(crwl) && !statement_may_have_control_effects_p(s)) {
+	pips_debug(2, "Ignored statement %d (%d, %d)\n",
+		   statement_number(s),
+		   ORDERING_NUMBER(statement_ordering(s)),
+		   ORDERING_STATEMENT(statement_ordering(s)));
+	  retour = discard_statement_and_save_label_and_comment(s);
+	  dead_code_statement_removed++;
+	  break;
+      }
+
+      /* Vire deja (presque) tout statement dont la precondition est
          fausse : */
        /* FI: This (very CPU expensive) test must be useless
 	* because the control sequence
