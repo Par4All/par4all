@@ -995,6 +995,20 @@ void bug_in_patch_outlined_reference(loop l , entity e)
         pips_user_warning("not changing loop index %s, generated code may be wrong\n",entity_user_name(e));
 }
 
+static
+void get_private_entities_walker(loop l, set s)
+{
+    set_append_list(s,loop_locals(l));
+}
+
+static
+set get_private_entities(void *s)
+{
+    set tmp = set_make(set_pointer);
+    gen_context_recurse(s,tmp,loop_domain,gen_true,get_private_entities_walker);
+    return tmp;
+}
+
 /** 
  * outline the statements in statements_to_outline into a module named outline_module_name
  * the outlined statements are replaced by a call to the newly generated module
@@ -1008,33 +1022,37 @@ void bug_in_patch_outlined_reference(loop l , entity e)
 statement outliner(string outline_module_name, list statements_to_outline)
 {
     pips_assert("there are some statements to outline",!ENDP(statements_to_outline));
+    entity new_fun = make_empty_subroutine(outline_module_name);
+    statement body = instruction_to_statement(make_instruction_sequence(make_sequence(statements_to_outline)));
 
     /* retreive referenced and declared entities */
     list referenced_entities = NIL,
-         declared_entities = NIL ;
+         declared_entities = NIL;
     set sreferenced_entities = set_make(set_pointer);
-
-    list skip_list = NIL;
 
     FOREACH(STATEMENT, s, statements_to_outline)
     {
         set tmp = get_referenced_entities(s);
         set_union(sreferenced_entities,tmp,sreferenced_entities);
         set_free(tmp);
-        declared_entities =gen_nconc(declared_entities, statement_to_declarations(s));
-        /* look for entity to ignore in pragma */
-        list pragmas = extensions_extension(statement_extensions(s));
-        FOREACH(EXTENSION,ext,pragmas) {
-            if(pragma_string_p(extension_pragma(ext))) {
-                string str = pragma_string(extension_pragma(ext));
-                if(strstr(str,OUTLINE_IGNORE)) {
-                    str+=sizeof(OUTLINE_IGNORE);
-                    entity ep= FindEntity(TOP_LEVEL_MODULE_NAME,str);
-                    skip_list=CONS(ENTITY,ep,skip_list);
+        list sd = statement_to_declarations(s);
+        declared_entities =gen_nconc(declared_entities, sd);
+        if(statement_loop_p(s)) { /* this test should minimize bad side effects */
+            set tmp = get_private_entities(s);
+            list private_entities = set_to_list(tmp);
+            gen_sort_list(private_entities,(gen_cmp_func_t)compare_entities);
+            FOREACH(ENTITY,e,private_entities)
+            {
+                if(!entity_is_argument_p(e,sd)) {
+                    AddLocalEntityToDeclarations(e,new_fun,body);
+                    declared_entities =gen_nconc(declared_entities, CONS(ENTITY,e,NIL));
                 }
             }
+            set_free(tmp);
+            gen_free_list(private_entities);
         }
     }
+
     /* set to list */
     referenced_entities=set_to_list(sreferenced_entities);
     set_free(sreferenced_entities);
@@ -1042,14 +1060,6 @@ statement outliner(string outline_module_name, list statements_to_outline)
     /* get the relative complements and create the parameter list*/
     gen_list_and_not(&referenced_entities,declared_entities);
     gen_free_list(declared_entities);
-    /** 
-     * 
-     * 
-     * @param &referenced_entities 
-     * @param skip_list 
-     */
-    gen_list_and_not(&referenced_entities,skip_list);
-    gen_free_list(skip_list);
 
     /* purge the functions from the parameter list, we assume they are declared externally */
     list tmp_list=NIL;
@@ -1061,8 +1071,6 @@ statement outliner(string outline_module_name, list statements_to_outline)
 
 
     intptr_t i=0;
-    entity new_fun = make_empty_subroutine(outline_module_name);
-    statement body = instruction_to_statement(make_instruction_sequence(make_sequence(statements_to_outline)));
 
 	/* all variables are promoted parameters */
     list effective_parameters = NIL;

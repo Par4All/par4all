@@ -73,7 +73,16 @@ static void replace_entity_loop_walker(loop l, struct entity_pair* thecouple)
 	{
 		loop_index(l) = thecouple->new;
 	}
-
+    list ll=NIL;
+    FOREACH(ENTITY,e,loop_locals(l))
+    {
+      if(same_entity_p(e,thecouple->old))
+        ll=CONS(ENTITY,thecouple->new,ll);
+      else
+        ll=CONS(ENTITY,e,ll);
+    }
+    gen_free_list(loop_locals(l));
+    loop_locals(l)=gen_nreverse(ll);
 }
 
 /**
@@ -111,7 +120,7 @@ replace_reference(void* s, reference old, entity new) {
   else {
     expression e = make_expression(make_syntax_reference(copy_reference(old)),
 				   normalized_undefined);
-    replace_entity_by_expression(s, e, new);
+    replace_entity_by_expression(s, new, e);
     free_expression(e);
   }
 }

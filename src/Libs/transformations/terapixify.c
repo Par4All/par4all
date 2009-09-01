@@ -37,6 +37,7 @@
 #include "misc.h"
 #include "control.h"
 #include "effects-generic.h"
+#include "effects-simple.h"
 #include "preprocessor.h"
 #include "text-util.h"
 #include "transformations.h"
@@ -47,11 +48,9 @@
 /** 
  * create a statement eligible for outlining into a kernel
  * #1 find the loop flagged with loop_label
- * #2 make sure we know thebound of the loop
- * #2' flag the kernel with a pragma
- * #3 call index set splitting on this loop to get a first loop with range_count multiple of KERNEL_NBNODES
- * #4 perform strip mining on this loop to make the kernel appear
- * #5 supress the generated loop and replace its index by the appropriate call to KERNEL_ID
+ * #2 make sure the loop is // with local index
+ * #3 perform strip mining on this loop to make the kernel appear
+ * #4 perform two outlining to separate kernel from host
  * 
  * @param s statement where the kernel can be found
  * @param loop_label label of the loop to be turned into a kernel
@@ -70,7 +69,7 @@ bool do_kernelize(statement s, entity loop_label)
         loop l = instruction_loop(statement_instruction(s));
 
         /* gather and check parameters */
-        int nb_nodes = get_int_property("KERNEL_NBNODES");
+        int nb_nodes = get_int_property("KERNELIZE_NBNODES");
         while(!nb_nodes)
         {
             string ur = user_request("number of nodes for your kernel?\n");
@@ -80,34 +79,56 @@ bool do_kernelize(statement s, entity loop_label)
         /* verify the loop is parallel */
         if( execution_sequential_p(loop_execution(l)) )
             pips_user_error("you tried to kernelize a sequential loop\n");
-
-        /* perform index set splitting to get the good loop range */
-#if 0
-        {
-            int count;
-            if(!range_count(loop_range(l),&count))
-                pips_user_error("unable to count the number of iterations in given loop\n");
-            int increment_val;
-            expression_integer_value(range_increment(loop_range(l)),&increment_val);
-            int split_index = increment_val*(count - count%nb_nodes) ;
-            entity split_index_entity = 
-                make_C_or_Fortran_constant_entity(
-                        itoa(split_index),
-                        is_basic_int,
-                        DEFAULT_INTEGER_TYPE_SIZE,
-                        fortran_module_p(get_current_module_entity())
-                        );
-            index_set_split_loop(s,split_index_entity);
-            /* now s is a block with two loops, we are interested in the first one */
-
-            s= STATEMENT(CAR(statement_block(s)));
-        }
-#endif
+        if( !entity_is_argument_p(loop_index(statement_loop(s)),loop_locals(statement_loop(s))) )
+            pips_user_error("you tried to kernelize a loop whose index is not private\n");
 
         /* we can strip mine the loop */
         loop_strip_mine(s,nb_nodes,-1);
-        l = statement_loop(s);
+        /* unfortunetly, the strip mining does not exactly does what we want, fix it here 
+         * it is legal beacause we now the loop index is private, otherwise the end value of the loop index may be used incorrectly
+         */
+        {
+            statement s2 = loop_body(statement_loop(s));
+            entity outer_index = loop_index(statement_loop(s));
+            entity inner_index = loop_index(statement_loop(s2));
+            replace_entity(s2,inner_index,outer_index);
+            loop_index(statement_loop(s2))=outer_index;
+            replace_entity(loop_range(statement_loop(s2)),outer_index,inner_index);
+            if(!ENDP(loop_locals(statement_loop(s2)))) replace_entity(loop_locals(statement_loop(s2)),outer_index,inner_index);
+            loop_index(statement_loop(s))=inner_index;
+            replace_entity(loop_range(statement_loop(s)),outer_index,inner_index);
+            gen_remove_once(&entity_declarations(get_current_module_entity()),outer_index);
+            gen_remove_once(&statement_declarations(get_current_module_statement()),outer_index);
+            loop_body(statement_loop(s))=make_block_statement(make_statement_list(s2));
+            AddLocalEntityToDeclarations(outer_index,get_current_module_entity(),loop_body(statement_loop(s)));
+            l = statement_loop(s);
+        }
 
+        /* validate changes */
+        entity cme = get_current_module_entity();
+        statement cms = get_current_module_statement();
+        module_reorder(get_current_module_statement());
+        DB_PUT_MEMORY_RESOURCE(DBR_CODE, get_current_module_name(),get_current_module_statement());
+        DB_PUT_MEMORY_RESOURCE(DBR_CALLEES, get_current_module_name(), compute_callees(get_current_module_statement()));
+        reset_current_module_entity();
+        reset_current_module_statement();
+
+        /* recompute effects */
+        proper_effects(module_local_name(cme));
+        cumulated_effects(module_local_name(cme));
+        set_current_module_entity(cme);
+        set_current_module_statement(cms);
+        set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_PROPER_EFFECTS, get_current_module_name(), TRUE));
+        /* outline the work and kernel parts*/
+        string kernel_name=get_string_property_or_ask("KERNELIZE_KERNEL_NAME","name of the kernel ?");
+        string host_call_name=get_string_property_or_ask("KERNELIZE_HOST_CALL_NAME","name of the fucntion to call the kernel ?");
+        outliner(kernel_name,make_statement_list(loop_body(l)));
+        outliner(host_call_name,make_statement_list(s));
+        reset_cumulated_rw_effects();
+
+
+
+#if 0
         /* it's safe to skip the second level loop, because of the index set splitting */
 
         statement replaced_loop = loop_body(l);
@@ -138,6 +159,7 @@ bool do_kernelize(statement s, entity loop_label)
             CONS(EXTENSION,make_extension(make_pragma_string(strdup(concatenate(OUTLINE_IGNORE," ",entity_user_name(kernel_id))))),
                 CONS(EXTENSION,make_extension(make_pragma_string(strdup(OUTLINE_PRAGMA))),extensions_extension(se))
             );
+#endif
 
         /* job done */
         gen_recurse_stop(NULL);
