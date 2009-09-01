@@ -1,5 +1,3 @@
---- Hpfc Validation for $VDIR/pure_1.f
-
       real function cube(x)
 cfcd$ pure
       real x
