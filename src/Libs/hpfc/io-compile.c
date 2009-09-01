@@ -954,10 +954,13 @@ void io_efficient_compile(
   FOREACH(effect, e, entities)
   {
     entity array = reference_variable(effect_reference(e));
+    pips_debug(3, "variable %s\n", entity_name(array));
+
+    if (io_effect_entity_p(array)) // skip LUNS
+      continue;
+
     action act = effect_action(e);
     approximation apr = effect_approximation(e);
-
-    pips_debug(3, "variable %s\n", entity_name(array));
 
     pips_assert("avoid replicated array I/O", /* not implemented */
 		!(array_distributed_p(array) && replicated_p(array)));
