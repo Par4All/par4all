@@ -46,8 +46,8 @@ void malloc02()
 //               <must be written>: i
 
    for(i = 0; i <= 9; i += 1) {
-//               <must be read   >: i
-//               <must be written>: p[i]
+//               <must be read   >: _MALLOC_ i
+//               <must be written>: _MALLOC_ p[i]
       p[i] = malloc(sizeof(int));
 //               <must be read   >: i
 //               <must be written>: p[i]
@@ -61,13 +61,14 @@ void malloc02()
 {
    int *p[10];
    int i;
-//               <may be read    >: i
-//               <may be written >: p[*]
+//               <may be read    >: _MALLOC_ i
+//               <may be written >: _MALLOC_ p[*]
 //               <must be written>: i
 
    for(i = 0; i <= 9; i += 1) {
 //               <may be written >: p[*]
-//               <must be read   >: i
+//               <must be read   >: _MALLOC_ i
+//               <must be written>: _MALLOC_
       p[i] = malloc(sizeof(int));
 //               <may be written >: p[*]
 //               <must be read   >: i
@@ -101,6 +102,12 @@ void malloc02()
 
 	08 --> 09 with conflicts
 		from <p[i]-W-MUST> to <p[i]-W-MUST> at levels  2
+	08 --> 08 with conflicts
+		from <_MALLOC_-R-MUST> to <_MALLOC_-W-MUST> at levels  1
+	08 --> 08 with conflicts
+		from <_MALLOC_-W-MUST> to <_MALLOC_-W-MUST> at levels  1
+	08 --> 08 with conflicts
+		from <_MALLOC_-W-MUST> to <_MALLOC_-R-MUST> at levels  1
 
 ****************** End of Dependence Graph ******************
 
@@ -111,7 +118,6 @@ void malloc02()
    int *p[10];
    int i;
 
-#pragma omp parallel for 
    for(i = 0; i <= 9; i += 1)
       p[i] = malloc(sizeof(int));
 #pragma omp parallel for 
