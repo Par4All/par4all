@@ -7,21 +7,24 @@ int main()
    int k;
    int l;
    int m;
-   float x = 2.12;
+   float x;
+   x = 2.12;
 
 #pragma omp parallel for private(j)
    for(i = 0; i <= 9; i += 1)                                           /*0007*/
 #pragma omp parallel for private(k)
       for(j = 0; j <= 9; j += 1) {                                      /*0008*/
-         float z = 0.0;
+         float z;
+         z = 0.0;
 #pragma omp parallel for private(l,z)
          for(k = 0; k <= 9; k += 1) {                                   /*0011*/
             z = k*2.0;                                                  /*0012*/
 #pragma omp parallel for private(m)
             for(l = 0; l <= 9; l += 1)                                  /*0013*/
-#pragma omp parallel for
+#pragma omp parallel for 
                for(m = 0; m <= 9; m += 1) {                             /*0014*/
-                  float y = 2.0;
+                  float y;
+                  y = 2.0;
                   // comments 4
                   y = 3.5+x+z;                                          /*0018*/
                   a[i][j][k][l][m] = x*y;                               /*0019*/

@@ -2,8 +2,10 @@
 int main()
 {
    int b[size];
-   int i = 0;
-   int j = 0;
+   int i;
+   int j;
+   i = 0;
+   j = 0;
 
 #pragma omp parallel for 
    for(i = 0; i <= size-1; i += 1)                                      /*0007*/
@@ -24,8 +26,10 @@ int main()
 int main()
 {
    int b[size];
-   int i = 0;
-   int j = 0;
+   int i;
+   int j;
+   i = 0;
+   j = 0;
 
 #pragma omp parallel for 
    for(i = 0; i <= size-1; i += 1)                                      /*0007*/
