@@ -9000,8 +9000,18 @@ Add statement effects as comments in output; not implemented (that way) yet.
 PRETTYPRINT_EFFECTS FALSE
 \end{PipsProp}
 
-Add statement IO-effects as comments in output; They are simulated by
-a read/write action to the array TOP-LEVEL:LUNS()
+The next property, \verb/PRETTYPRINT_IO_EFFECTS/, is used to control
+the computation of implicit statement IO effects and display them as
+comments in output. The implicit effects on the logical unit are
+simulated by a read/write action to an element of the array
+\verb/TOP-LEVEL:LUNS()/, or to the whole array when the element is not
+known at compile time. This is the standard behavior for PIPS. Some
+phases, e.g. hpfc, may turn this option off, but it is much more risky
+than to filter out abstract effects. Furthermore, the filtering is
+better because it takes into account all abstract effects, not only IO
+effects on logical units. PIPS users should definitely not turn off
+this property as the semantic equivalence between the inout and the
+output program is no longer guaranteed.
 
 \begin{PipsProp}
 PRETTYPRINT_IO_EFFECTS TRUE

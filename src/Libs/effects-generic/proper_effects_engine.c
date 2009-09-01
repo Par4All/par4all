@@ -1266,10 +1266,16 @@ proper_effects_of_call(call c)
 	  pips_debug(2, "end\n");
 	}
 
+	/* This change is not compatible with previous Fortran
+	   oriented phases such as hpfc. We can either forbid this
+	   feature for all Fortran codes, or add a new property to
+	   control this effect elimination, specific to C but with an
+	   impact on CONTINUE, for instance, in Fortran. */
 	if(!ENDP(l_proper)
 	   && effects_all_read_p(l_proper)
 	   && !statement_may_have_control_effects_p(current_stat)
-	   && !format_statement_p(current_stat)) {
+	   && !format_statement_p(current_stat)
+	   && !fortran_module_p(get_current_module_entity())) {
 	  /* The current statement should be ignored as it does not
 	     impact the store, nor the control, nor the
 	     formatting. Examples in C; "0;" or "i;" or "(void)
