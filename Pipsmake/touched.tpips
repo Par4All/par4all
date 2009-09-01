@@ -1,11 +1,10 @@
-shell rm touched.f ; echo "      end" > touched.f
-delete t
-create t touched.f
+delete touched
+create touched touched.f
 display PRINTED_FILE
 shell sleep 1 ; touch touched.f
 display PRINTED_FILE
-shell sleep 1 ; touch t.database/MAIN000/MAIN000.f_initial
+shell sleep 1 ; touch touched.database/MAIN000/MAIN000.f_initial
 display PRINTED_FILE
 close
-delete t
-shell rm touched.f
+delete touched
+quit
