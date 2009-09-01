@@ -85,6 +85,7 @@ static list unix_io_effects(entity e,list args);
 static list any_rgs_effects(entity e,list args, bool init_p);
 static list rgs_effects(entity e,list args);
 static list rgsi_effects(entity e,list args);
+static list any_heap_effects(entity e,list args);
 
 /* the following data structure indicates wether an io element generates
 a read effects or a write effect. the kind of effect depends on the
@@ -167,22 +168,22 @@ static IoElementDescriptor IoElementDescriptorTable[] = {
 
   /* The field IoElementName is used to describe the function's pattern
      defined according to the standard ISO/IEC 9899 (BC, july 2009) :
-     n      when there is only the read effect on the value of the actual 
+     n      when there is only the read effect on the value of the actual
             argument.
      r,w,x  for read, write, or read and write effects on the object
-            pointed to by the actual argument.         
+            pointed to by the actual argument.
      *      means that the last effect is repeated for the last arguments
             (varargs).
      s      for a FILE * argument ("s" stands for "stream").
-     f      for an integer file descriptor (unix io system calls). 
+     f      for an integer file descriptor (unix io system calls).
      v      for a va_list argument (this could be enhanced in the future
             to distinguish between read and write effects on the components
             of the va_list).
 
-     The tag fields are not relevant. 
-     
+     The tag fields are not relevant.
+
   */
-  
+
   {PRINTF_FUNCTION_NAME,        "rn*",     is_action_read, is_approximation_must},
   {FPRINTF_FUNCTION_NAME,       "srn*",    is_action_read, is_approximation_must},
   {SCANF_FUNCTION_NAME,         "rw*",     is_action_read, is_approximation_must},
@@ -752,13 +753,13 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
   {CALLOC_FUNCTION_NAME,                           no_write_effects},
   {DIV_FUNCTION_NAME,                              no_write_effects},
   {EXIT_FUNCTION_NAME,                             no_write_effects},
-  {FREE_FUNCTION_NAME,                             no_write_effects},
+  {FREE_FUNCTION_NAME,                             any_heap_effects},
 
   /*  {char *getenv(const char *, 0, 0},
       {long int labs(long, 0, 0},
       {ldiv_t ldiv(long, long, 0, 0},*/
 
-  {MALLOC_FUNCTION_NAME, no_write_effects},
+  {MALLOC_FUNCTION_NAME, any_heap_effects},
 
   /*#include <string.h>*/
 
@@ -1259,7 +1260,8 @@ static list generic_io_effects(entity e, list args, bool system_p)
   IoElementDescriptor *p;
   int lenght=0;
   int i=0;
-  bool file_p = TRUE; /* it really is an IO, not a string operation */
+  /* it really is an IO, not a string operation */
+  //bool file_p = TRUE;
 
   expression unit = expression_undefined;
 
@@ -1272,7 +1274,7 @@ static list generic_io_effects(entity e, list args, bool system_p)
     {
       //if we have * as last argument, we repeat the effect of the
       //penultimate argument for the rest of the arguments
-      
+
       if(p->IoElementName[lenght-1]=='*' && i>=lenght-1)
 	lep = effects_of_C_ioelem(arg, p->IoElementName[lenght-2]);
       else
@@ -1383,7 +1385,7 @@ static list c_io_effects(entity e, list args)
 {
   return generic_io_effects(e, args, FALSE);
 }
-
+
 /* To handle the effects of random functions. Amira Mensi*/
 static list any_rgs_effects(entity e __attribute__ ((__unused__)), list args, bool init_p)
 {
@@ -1437,6 +1439,44 @@ static list rgs_effects(entity e, list args)
   return any_rgs_effects( e, args, FALSE);
 }
 
+/* To handle the effects of heap related functions. */
+static list any_heap_effects(entity e, list args)
+{
+  list le = NIL;
+  list lep = NIL;
+  entity malloc_entity = entity_undefined;
+  reference ref;
+
+  pips_debug(5, "begin for function \"%s\"\n", entity_user_name(e));
+
+  MAP(EXPRESSION,exp,{
+    lep = generic_proper_effects_of_expression(exp);
+    le = gen_nconc(le, lep);
+    //ifdebug(8) print_effects(le);
+    //ifdebug(8) print_effects(lep);
+  }, args);
+
+  malloc_entity = global_name_to_entity
+    (get_current_module_name(),
+     MALLOC_EFFECTS_NAME);
+
+  pips_assert("malloc entity pre-exists", !entity_undefined_p(malloc_entity));
+
+  ref = make_reference(malloc_entity, NIL);
+
+  ifdebug(8) print_reference(ref);
+
+  /* Read first. */
+    le = gen_nconc(le, generic_proper_effects_of_read_reference(ref));
+
+  /* Write back. */
+  le = gen_nconc(le, generic_proper_effects_of_written_reference(ref));
+
+  pips_debug(5, "end\n");
+
+  return(le);
+}
+
 static entity dummy_c_io_ptr = entity_undefined;
 
 /* Intrinsics do not have formal parameters. This function returns a
@@ -1446,7 +1486,7 @@ static entity make_dummy_io_ptr()
   if(entity_undefined_p(dummy_c_io_ptr)) {
     type pt = make_scalar_integer_type(1); /* char */
     type t = make_type_variable(make_variable(make_basic_pointer(pt), NIL, NIL));
- 
+
    dummy_c_io_ptr =
       make_entity(AddPackageToName(IO_EFFECTS_PACKAGE_NAME,
 				   IO_EFFECTS_PTR_NAME),

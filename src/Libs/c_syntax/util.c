@@ -127,6 +127,20 @@ void init_c_areas()
   entity_initial(HeapArea) = MakeValueUnknown();
   AddEntityToDeclarations(HeapArea, get_current_module_entity());
 
+  /* Create hidden pointer in the heap area to modelize malloc and
+     free effects */
+  make_entity(AddPackageToName(get_current_module_name(),
+			       MALLOC_EFFECTS_NAME),
+	      make_scalar_integer_type(DEFAULT_INTEGER_TYPE_SIZE),
+	      /* make_storage(is_storage_ram,
+                 make_ram(entity_undefined, DynamicArea, 0, NIL))
+              */
+	      make_storage(is_storage_ram,
+			   make_ram(get_current_module_entity(),
+				    HeapArea,
+				    0, NIL)),
+	      make_value(is_value_unknown, UU));
+
   // Dynamic variables whose size are not known are stored in Stack area
   StackArea = FindOrCreateEntity(get_current_module_name(), STACK_AREA_LOCAL_NAME);
   entity_type(StackArea) = make_type(is_type_area, make_area(0, NIL));
@@ -173,7 +187,7 @@ void init_c_implicit_variables(entity m)
   entity fn = make_C_constant_entity(cn,
 				     is_basic_string,
 				     strlen(name)+1);
-  area a = DynamicArea; /* Should be static, but not compatible with
+  entity a = DynamicArea; /* Should be static, but not compatible with
 			   FREIA inlining. */
 
   entity_type(func_name1) = make_char_array_type(strlen(name)+1);
@@ -2887,13 +2901,13 @@ bool check_declaration_uniqueness_p(statement s)
       type t = ultimate_type(entity_type(e));
 
       if(!type_functional_p(t)) {
-	pips_debug(0, "Entity \"%s\" declared %d times.\n", n);
+	pips_debug(0, "Entity \"%s\" declared %d times.\n", entity_name(e), n);
 	failure_p = TRUE;
       }
     }
   }
   if(failure_p)
-    pips_internal_error("Module declarations are not unique");
+    pips_internal_error("Module declarations are not unique\n");
 
   return !failure_p;
 }

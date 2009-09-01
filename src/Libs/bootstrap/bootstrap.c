@@ -83,7 +83,7 @@ extern expression
 insert_cast(basic cast, basic from, expression exp, type_context_p);
 extern expression
 cast_constant(expression exp_constant, basic to_basic,
-              type_context_p context);
+	      type_context_p context);
 extern bool
 check_loop_range(range, hash_table);
 extern void
@@ -94,17 +94,17 @@ void
 CreateAreas()
 {
   make_entity(AddPackageToName(TOP_LEVEL_MODULE_NAME,
-                               DYNAMIC_AREA_LOCAL_NAME),
-              make_type(is_type_area, make_area(0, NIL)),
-              make_storage(is_storage_rom, UU),
-              make_value(is_value_unknown, UU));
+			       DYNAMIC_AREA_LOCAL_NAME),
+	      make_type(is_type_area, make_area(0, NIL)),
+	      make_storage(is_storage_rom, UU),
+	      make_value(is_value_unknown, UU));
 
 
   make_entity(AddPackageToName(TOP_LEVEL_MODULE_NAME,
-                               STATIC_AREA_LOCAL_NAME),
-              make_type(is_type_area, make_area(0, NIL)),
-              make_storage(is_storage_rom, UU),
-              make_value(is_value_unknown, UU));
+			       STATIC_AREA_LOCAL_NAME),
+	      make_type(is_type_area, make_area(0, NIL)),
+	      make_storage(is_storage_rom, UU),
+	      make_value(is_value_unknown, UU));
 }
 
 static void CreateLogicalUnits()
@@ -225,26 +225,26 @@ static void CreateRandomSeed()
   code_initializations(c) = s;
 
   ent = make_entity(AddPackageToName(TOP_LEVEL_MODULE_NAME,
-                                    RAND_EFFECTS_PACKAGE_NAME),
-                    make_type(is_type_functional,
-                              make_functional(NIL,make_type(is_type_void,
-                                                            NIL))),
-                    make_storage(is_storage_rom, UU),
-                    make_value(is_value_code, c));
+				     RAND_EFFECTS_PACKAGE_NAME),
+		    make_type(is_type_functional,
+			      make_functional(NIL,make_type(is_type_void,
+							    NIL))),
+		    make_storage(is_storage_rom, UU),
+		    make_value(is_value_code, c));
 
   set_current_module_entity(ent);
 
   make_entity(AddPackageToName(RAND_EFFECTS_PACKAGE_NAME,
-                               STATIC_AREA_LOCAL_NAME),
-              make_type(is_type_area, make_area(0, NIL)),
-              make_storage(is_storage_rom, UU),
-              make_value(is_value_unknown, UU));
+			       STATIC_AREA_LOCAL_NAME),
+	      make_type(is_type_area, make_area(0, NIL)),
+	      make_storage(is_storage_rom, UU),
+	      make_value(is_value_unknown, UU));
 
-  /* GO: entity for io logical units: It is an unsigned int*/
+  /* entity for random seed: It is an unsigned int*/
   make_entity(AddPackageToName(RAND_EFFECTS_PACKAGE_NAME,
-                               RAND_GEN_EFFECTS_NAME),
+			       RAND_GEN_EFFECTS_NAME),
 	      make_scalar_integer_type(DEFAULT_INTEGER_TYPE_SIZE),
-              /* make_storage(is_storage_ram,
+	      /* make_storage(is_storage_ram,
                  make_ram(entity_undefined, DynamicArea, 0, NIL))
               */
               make_storage(is_storage_ram,
