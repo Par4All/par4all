@@ -79,10 +79,11 @@ list convex_regions_precondition_compose(list l_reg, transformer context)
       Psysteme reg_sc = descriptor_convex_p(reg_d)? descriptor_convex(reg_d) : NULL;
 
       pips_assert("sc_context is weakly consistent", sc_weak_consistent_p(sc_context));
-      pips_assert("reg_sc is weakly consistent", sc_weak_consistent_p(reg_sc));
+      pips_assert("reg_sc is weakly consistent (1)", sc_weak_consistent_p(reg_sc));
       region_sc_append(reg, sc_context, FALSE);
+      reg_sc = region_system(reg);
       pips_assert("sc_context is weakly consistent", sc_weak_consistent_p(sc_context));
-      pips_assert("reg_sc is weakly consistent", sc_weak_consistent_p(reg_sc));
+      pips_assert("reg_sc is weakly consistent (2)", sc_weak_consistent_p(reg_sc));
     }
     if (!region_empty_p(reg))
       l_res = CONS(EFFECT, reg, l_res);
