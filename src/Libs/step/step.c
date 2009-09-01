@@ -67,7 +67,7 @@ bool step_init(string program_name)
   pips_debug(1, "program_name = %s\n", program_name);
   
   set_bool_property("PARSER_WARN_FOR_COLUMNS_73_80", FALSE);
-  set_bool_property("PRETTYPRINT_IO_EFFECTS", FALSE);
+  // set_bool_property("PRETTYPRINT_IO_EFFECTS", FALSE);
   
   step_init_status();
   step_save_status();
