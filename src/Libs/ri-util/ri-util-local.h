@@ -650,6 +650,9 @@
 #define QFCONVERT_OPERATOR_NAME "qfconvert"
 #define QGCONVERT_OPERATOR_NAME "qgconvert"
 
+/*#include<time.h> */
+#define TIME_FUNCTION_NAME            "time"
+
 /* netdb.h */
 #define __H_ERRNO_LOCATION_OPERATOR_NAME "__h_erno_location"
 

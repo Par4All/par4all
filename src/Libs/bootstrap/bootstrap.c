@@ -4428,6 +4428,8 @@ static IntrinsicDescriptor IntrinsicTypeDescriptorTable[] =
 
   /*#include <tgmath.h>*/
   /*#include <time.h>*/
+  {TIME_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+
   /*#include <wchar.h>*/
   /*#include <wctype.h>*/
 

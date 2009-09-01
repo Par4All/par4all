@@ -761,6 +761,9 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
 
   {MALLOC_FUNCTION_NAME, any_heap_effects},
 
+  /*#include <time.h>*/
+  {TIME_FUNCTION_NAME,                           no_write_effects},
+
   /*#include <string.h>*/
 
   {STRCMP_FUNCTION_NAME,                           no_write_effects},

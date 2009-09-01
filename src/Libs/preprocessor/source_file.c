@@ -781,7 +781,7 @@ static string process_thru_fortran_pp(string name)
 
     status = safe_system_no_abort(concatenate(fpp? fpp: FPP_CPP,
 				 FPP_CPPFLAGS, fpp_options? fpp_options: "",
-				 name, " > ", new_name, " 2> ", fpp_err,
+				 " ", name, " > ", new_name, " 2> ", fpp_err,
 				 " && cat ", fpp_err,
          			 " && test ! -s ", fpp_err,
 			         " && rm -f ", fpp_err, NULL));
