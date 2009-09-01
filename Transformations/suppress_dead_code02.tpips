@@ -1,0 +1,41 @@
+delete suppress_dead_code02
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create suppress_dead_code02 suppress_dead_code02.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+echo
+echo Initial code for "suppress_dead_code02"
+echo
+
+display PRINTED_FILE[suppress_dead_code02]
+
+echo
+echo Initial code for "suppress_dead_code02" with proper effects
+echo
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[suppress_dead_code02]
+
+echo
+echo Initial code for "suppress_dead_code02" with cumulated effects
+echo
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[suppress_dead_code02]
+
+echo
+echo Code for "suppress_dead_code02" after dead code elimination
+echo
+
+activate PRINT_CODE
+apply SUPPRESS_DEAD_CODE[suppress_dead_code02]
+display PRINTED_FILE[suppress_dead_code02]
+close
+delete suppress_dead_code02
+quit
+
