@@ -1169,7 +1169,7 @@ words_io_inst(call obj,
 
   if(!prettyprint_is_fortran)
     pc = CHAIN_SWORD(pc, ") ");
-	 
+
   return(pc) ;
 }
 
@@ -1207,11 +1207,16 @@ words_prefix_unary_op(call obj,
 
 	 But we do not want this in a lhs and espcially with a double dereferencing. */
     fun = "*";
-  else if (strcmp(fun,UNARY_PLUS_OPERATOR_NAME) == 0)
-    fun = "+";
   else if(!prettyprint_is_fortran){
 	if(strcasecmp(fun, NOT_OPERATOR_NAME)==0)
 	  fun="!";
+	if(strcasecmp(fun, UNARY_PLUS_OPERATOR_NAME)==0) {
+	  /* You do not want to transform +1 + +1 into +1++ 1 */
+	  /* Maybe the precedence could be useful to avoid adding a
+	     useless SPACE, but unary plus is rare enough to reduce
+	     the ROI of such anoptimization to zero. */
+	  fun=" +";
+	}
       }
 
   pc = CHAIN_SWORD(pc,fun);
