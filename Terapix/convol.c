@@ -44,28 +44,34 @@ int main() //      program image_processing
 void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj],
         float kernel[kernel_size][kernel_size])
 {
-  //     The convolution kernel is not applied on the outer part
-  //     of the image
+    //     The convolution kernel is not applied on the outer part
+    //     of the image
 
-  int i, j, ki, kj;
- 
-  for(i = 0; i< isi; i++) {
-    for(j = 0; j< isj; j++) {
-      new_image[i][j] = image[i][j];
-    }
-  }
+    int i, j;
 
- l400: for(i =  kernel_size/2; i<isi - kernel_size/2; i++) {
-  l300: for(j =  kernel_size/2; j<isj - kernel_size/2; j++) {
-      new_image[i][j] = 0.;
-    l200: for(ki = 0; ki<kernel_size; ki++) {
-      l100: for(kj = 0; kj<kernel_size; kj++) {
-	  new_image[i][j] = new_image[i][j] + 
-	    image[i+ki-kernel_size/2][j+kj-kernel_size/2]* 
-	    kernel[ki][kj];
-	}
-      }
-      new_image[i][j] = new_image[i][j]/(kernel_size*kernel_size);
+    for(i = 0; i< isi; i++) {
+        for(j = 0; j< isj; j++) {
+            new_image[i][j] = image[i][j];
+        }
     }
-  }
+
+    for(i =  kernel_size/2; i<isi - kernel_size/2; i++) {
+        for(j =  kernel_size/2; j<isj - kernel_size/2; j++) {
+            run_kernel(i,j,isi,isj,new_image,image,kernel);
+        }
+    }
+}
+
+void run_kernel(int i, int j, int isi, int isj,float new_image[isi][isj], float image[isi][isj], float kernel[kernel_size][kernel_size])
+{
+    int ki,kj;
+    new_image[i][j] = 0.;
+    for(ki = 0; ki<kernel_size; ki++) {
+        for(kj = 0; kj<kernel_size; kj++) {
+            new_image[i][j] = new_image[i][j] + 
+                image[i+ki-kernel_size/2][j+kj-kernel_size/2]* 
+                kernel[ki][kj];
+        }
+    }
+    new_image[i][j] = new_image[i][j]/(kernel_size*kernel_size);
 }

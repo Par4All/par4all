@@ -22,9 +22,13 @@ echo Code after kernelization
 echo
 
 setproperty LOOP_LABEL "kernel"
-setproperty KERNEL_NBNODES 10
+setproperty KERNELIZE_NBNODES 10
+setproperty KERNELIZE_KERNEL_NAME "kernel"
+setproperty KERNELIZE_HOST_CALL_NAME "run_kernel"
 apply KERNELIZE
-display PRINTED_FILE
+display PRINTED_FILE[foo]
+display PRINTED_FILE[run_kernel]
+display PRINTED_FILE[kernel]
 
 echo
 echo Code after cleanup

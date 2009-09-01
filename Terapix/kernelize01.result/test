@@ -26,7 +26,6 @@ Code after kernelization
 
 int foo(int seed[100])
 {
-   int i_1;
    int a[100];
    int b[100];
    int c[100];
@@ -37,29 +36,33 @@ int foo(int seed[100])
       a[i] = seed[i];
       b[i] = seed[99-i];
    }
-#pragma outline_ignore KERNEL_ID
-#pragma outline this
    /* compute */
-#pragma omp parallel for private(i)
-kernel:
-   for(i_1 = 0; i_1 <= 100; i_1 += 10) {
-      i = KERNEL_ID()+i_1;
-      c[i] = a[i]+b[i];
-   }
-l99999:
-   for(i = 100+1; i <= 99; i += 1)
-      c[i] = a[i]+b[i];
+kernel:   run_kernel(a, b, c);
    /* print result */
    for(i = 0; i <= 99; i += 1)
       printf("%d ", c[i]);
    printf("\n");
+}
+void run_kernel(int a[100], int b[100], int c[100])
+{
+   int i;
+   extern void kernel(int i, int c[100], int b[100], int a[100]);
+   /* compute */
+kernel:
+   for(i = 0; i <= 99; i += 10)
+      kernel(a, b, c, i);
+}
+void kernel(int a[100], int b[100], int c[100], int i)
+{
+   int i_1;
+   for(i_1 = i; i_1 <= MIN(i+9, 99); i_1 += 1)
+      c[i_1] = a[i_1]+b[i_1];
 }
 
 Code after cleanup
 
 int foo(int seed[100])
 {
-   int i_1;
    int a[100];
    int b[100];
    int c[100];
@@ -70,16 +73,8 @@ int foo(int seed[100])
       a[i] = seed[i];
       b[i] = seed[99-i];
    }
-#pragma outline_ignore KERNEL_ID
-#pragma outline this
    /* compute */
-#pragma omp parallel for private(i)
-kernel:
-   for(i_1 = 0; i_1 <= 100; i_1 += 10) {
-      i = KERNEL_ID()+i_1;
-      c[i] = a[i]+b[i];
-   }
-   i = 100+1;
+   run_kernel(a, b, c);
    /* print result */
    for(i = 0; i <= 99; i += 1)
       printf("%d ", c[i]);

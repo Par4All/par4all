@@ -29,7 +29,7 @@ echo
 display PRINTED_FILE[strip_mining01]
 
 echo
-echo Source code after loop interchange
+echo Source code after strip mining
 echo
 
 apply STRIP_MINE
