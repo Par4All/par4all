@@ -56,10 +56,10 @@ Generated source files : md/src
      &MAX_NB_LOOPSLICES), STEP_I_LOOPSLICES(IDX_SLICE_LOW:
      &IDX_SLICE_UP, 1:MAX_NB_LOOPSLICES), STEP_REQUESTS(1:
      &MAX_NB_REQUEST)
-      REAL*8 STEP_POT_REDUC, STEP_KIN_REDUC, F(1:ND, 1:NP), BOX(1:ND)
+      REAL*8 STEP_KIN_REDUC, STEP_POT_REDUC, F(1:ND, 1:NP), BOX(1:ND)
      &, POS(1:ND, 1:NP), RIJ(1:ND), D, POT, PI2, KIN, VEL(1:ND, 1:NP)
-      CALL STEP_INITREDUCTION_R8(KIN, STEP_KIN_REDUC, STEP_SUM)         0101
-      CALL STEP_INITREDUCTION_R8(POT, STEP_POT_REDUC, STEP_SUM)         0102
+      CALL STEP_INITREDUCTION_R8(POT, STEP_POT_REDUC, STEP_SUM)         0101
+      CALL STEP_INITREDUCTION_R8(KIN, STEP_KIN_REDUC, STEP_SUM)         0102
 
       CALL STEP_COMPUTELOOPSLICES(I_L, I_U, 1, STEP_SIZE,               0104
      &MAX_NB_LOOPSLICES, STEP_I_LOOPSLICES)                             0104
@@ -102,8 +102,8 @@ C     A nonblocking algo increment STEP_Nb_Request.
      &)                                                                 0139
 C     If STEP_Nb_Request equals 0, STEP_WAITALL does nothing
       CALL STEP_WAITALL(STEP_NBREQUEST, STEP_REQUESTS)                  0144
-      CALL STEP_REDUCTION_R8(KIN, STEP_KIN_REDUC, STEP_SUM)             0145
-      CALL STEP_REDUCTION_R8(POT, STEP_POT_REDUC, STEP_SUM)             0146
+      CALL STEP_REDUCTION_R8(POT, STEP_POT_REDUC, STEP_SUM)             0145
+      CALL STEP_REDUCTION_R8(KIN, STEP_KIN_REDUC, STEP_SUM)             0146
       END
 ###################### md/src/COMPUTE_PARDO1_OMP.f ######################
 !!
@@ -116,7 +116,7 @@ C     If STEP_Nb_Request equals 0, STEP_WAITALL does nothing
       INTEGER I, I_L, I_U, L, ND, NP, J, K
       REAL*8 F(1:ND, 1:NP), BOX(1:ND), POS(1:ND, 1:NP), RIJ(1:ND), D
      &, POT, PI2, KIN, VEL(1:ND, 1:NP)
-!$OMP parallel do reduction(+ : KIN) reduction(+ : POT) private(D, RIJ, 
+!$OMP parallel do reduction(+ : POT) reduction(+ : KIN) private(D, RIJ, 
 !$OMP&K, J, I)
 
       DO I = I_L, I_U                                                   0011
