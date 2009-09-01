@@ -1941,7 +1941,7 @@ bool
 format_inside_statement_p(statement s)
 {
     bool format_inside_statement_has_been_found = false;
-    
+
     gen_context_recurse(s,&format_inside_statement_has_been_found,
             instruction_domain,	figure_out_if_it_is_a_format, gen_null);
 
@@ -3037,7 +3037,7 @@ list find_statements_interactively(statement s)
     return gen_nreverse(l);
 }
 
-/** 
+/**
  * used to pass parameters to find_statements_with_comment_walker
  */
 struct fswp {
@@ -3127,8 +3127,15 @@ bool statement_may_have_control_effects_p(statement s)
      not because it can be done by another pass */
   control_effect_p = !entity_empty_label_p(statement_label(s));
 
-  if(!control_effect_p)
-    gen_context_recurse(s, &control_effect_p, call_domain, look_for_control_effects, gen_null);
+  if(!control_effect_p) {
+    /* This statements may hide a non-terminating loop. I assume that
+       do loops always terminate. They also always have a memory
+       write effect for the index, which may not be true for the
+       other kinds of loops. */
+    control_effect_p = statement_whileloop_p(s) || statement_forloop_p(s);
+    if(!control_effect_p)
+      gen_context_recurse(s, &control_effect_p, call_domain, look_for_control_effects, gen_null);
+  }
 
   return control_effect_p;
 }
