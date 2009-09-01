@@ -129,17 +129,19 @@ void init_c_areas()
 
   /* Create hidden pointer in the heap area to modelize malloc and
      free effects */
-  make_entity(AddPackageToName(get_current_module_name(),
-			       MALLOC_EFFECTS_NAME),
-	      make_scalar_integer_type(DEFAULT_INTEGER_TYPE_SIZE),
-	      /* make_storage(is_storage_ram,
-                 make_ram(entity_undefined, DynamicArea, 0, NIL))
-              */
-	      make_storage(is_storage_ram,
-			   make_ram(get_current_module_entity(),
-				    HeapArea,
-				    0, NIL)),
-	      make_value(is_value_unknown, UU));
+  if(!compilation_unit_entity_p(get_current_module_entity())) {
+    make_entity(AddPackageToName(get_current_module_name(),
+				 MALLOC_EFFECTS_NAME),
+		make_scalar_integer_type(DEFAULT_INTEGER_TYPE_SIZE),
+		/* make_storage(is_storage_ram,
+		   make_ram(entity_undefined, DynamicArea, 0, NIL))
+		*/
+		make_storage(is_storage_ram,
+			     make_ram(get_current_module_entity(),
+				      HeapArea,
+				      0, NIL)),
+		make_value(is_value_unknown, UU));
+  }
 
   // Dynamic variables whose size are not known are stored in Stack area
   StackArea = FindOrCreateEntity(get_current_module_name(), STACK_AREA_LOCAL_NAME);

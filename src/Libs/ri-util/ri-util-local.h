@@ -1342,6 +1342,8 @@ the variable is unsigned, signed or not */
 #define RAND_EFFECTS_PACKAGE_NAME "_RANDOM_EFFECTS"
 /* variable name for random unit */
 #define RAND_GEN_EFFECTS_NAME "GEN_SEED"
+/* variable name for heap effects */
+#define MALLOC_EFFECTS_NAME "GEN_SEED"
 /* array of Logical UNits; it is more or less handled as the current file pointer */
 #define IO_EFFECTS_ARRAY_NAME "LUNS"
 /* To express C IO intrinsics effects */
