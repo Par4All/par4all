@@ -1,13 +1,3 @@
-#!/bin/sh
-
-tpips=${tpips_version:-tpips}
-
-# Initialization:
-# rm -f fabien.result/test
-# tpips >fabien.result/test <<EOF
-
-$tpips <<EOF
-
 set ABORT_ON_USER_ERROR TRUE
 
 # Check evaluation of constant expressions for parameters (eval.c),
@@ -18,7 +8,7 @@ echo
 echo Check that parameters are well evaluated
 echo ----------------------------------------
 
-shell sed 's/cfirst//' $PIPS_VALIDDIR/Transformations/fabien.f >fabien1.f
+shell sed 's/cfirst//' ${VDIR:-.}/fabien.f > fabien1.f
 
 echo
 echo Preconditions when using Fortran parameters
@@ -48,7 +38,7 @@ echo
 echo Check that variables are well evaluated
 echo ----------------------------------------
 
-shell sed 's/csecond//' $PIPS_VALIDDIR/Transformations/fabien.f >fabien2.f
+shell sed 's/csecond//' ${VDIR:-.}/fabien.f > fabien2.f
 
 echo
 echo Preconditions when using Fortran variables
@@ -78,5 +68,3 @@ delete fabien
 shell rm -f fabien2.f
 
 quit
-EOF
-
