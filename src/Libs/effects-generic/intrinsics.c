@@ -662,6 +662,7 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
   {VSPRINTF_FUNCTION_NAME,                 c_io_effects},
   {VSNPRINTF_FUNCTION_NAME,                c_io_effects},
   {SNPRINTF_FUNCTION_NAME,                 c_io_effects},
+  {VSSCANF_FUNCTION_NAME,                  c_io_effects},
   {VSCANF_FUNCTION_NAME,                   c_io_effects},
   {FGETC_FUNCTION_NAME,                    c_io_effects},
   {FGETS_FUNCTION_NAME,                    c_io_effects},
