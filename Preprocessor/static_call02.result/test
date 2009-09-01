@@ -68,6 +68,8 @@ static void foo(int i)
 }
 int main()
 {
+   extern void foo(int i);
+   extern void bar(int i);
    foo(3);
    bar(3);
 }

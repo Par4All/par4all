@@ -1,4 +1,3 @@
---- Proper effects for IO_EFFECTS
       PROGRAM IO_EFFECTS
 C               <must be read   >: __IO_EFFECTS:LUNS(5)
 C               <must be written>: N __IO_EFFECTS:LUNS(5)
@@ -8,5 +7,13 @@ C               <may be read    >: __IO_EFFECTS:LUNS(*)
 C               <may be written >: __IO_EFFECTS:LUNS(*)
 C               <must be read   >: N
       CALL OUTPUT(N)                                                    0004
+
+      END
+
+      SUBROUTINE OUTPUT(I)
+C               <must be read   >: I __IO_EFFECTS:LUNS(I)
+C               <must be written>: __IO_EFFECTS:LUNS(I)
+
+      WRITE (I, *) 'Hello!'                                             0004
 
       END

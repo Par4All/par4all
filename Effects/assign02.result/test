@@ -22,7 +22,8 @@ s_t make_s(int i, float x)
 {
    s_t *p;
    extern char *malloc(int);
-//               <must be written>: p
+//               <must be read   >: _MALLOC_
+//               <must be written>: _MALLOC_ p
 
    p = (s_t *) malloc(sizeof(s_t));
 //               <must be read   >: i p
@@ -44,7 +45,8 @@ s_t make_s(int i, float x)
 {
    s_t *p;
    extern char *malloc(int);
-//               <must be written>: p
+//               <must be read   >: _MALLOC_
+//               <must be written>: _MALLOC_ p
 
    p = (s_t *) malloc(sizeof(s_t));
 //               <must be read   >: i p

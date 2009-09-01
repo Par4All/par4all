@@ -7,6 +7,8 @@ byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
    FILE *file;
    char *buffer;
    int i;
+   extern int nrerror(char *);
+   extern int bmatrix(int, int, int, int);
 
    buffer = (char *) calloc(80, sizeof(char));
    file = fopen(filename, "rb");
@@ -78,6 +80,8 @@ byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
    FILE *file;
    char *buffer;
    int i;
+   extern int nrerror(char *f1);
+   extern int bmatrix(int f1, int f2, int f3, int f4);
 //               <must be written>: buffer
 
    buffer = (char *) calloc(80, sizeof(char));
@@ -130,7 +134,8 @@ byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
 //               <must be read   >: file
 
    fclose(file);
-//               <must be read   >: buffer
+//               <must be read   >: _MALLOC_ buffer
+//               <must be written>: _MALLOC_
    free(buffer);
 //               <must be read   >: m
 
@@ -155,6 +160,8 @@ byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
    FILE *file;
    char *buffer;
    int i;
+   extern int nrerror(char *f1);
+   extern int bmatrix(int f1, int f2, int f3, int f4);
 //               <must be written>: buffer
 
    buffer = (char *) calloc(80, sizeof(char));
@@ -211,7 +218,8 @@ byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
 //               <must be read   >: file
 
    fclose(file);
-//               <must be read   >: buffer
+//               <must be read   >: _MALLOC_ buffer
+//               <must be written>: _MALLOC_
    free(buffer);
 //               <must be read   >: m
 

@@ -17,6 +17,7 @@ void generate01()
 {
    int i = 0;
    double x = 1.;
+   extern int func(int, double);
    
    // use an undeclared function without source code, which returns
    // implictly an int
@@ -32,6 +33,7 @@ void generate01()
 {
    int i = 0;
    double x = 1.;
+   extern int func(int f1, double f2);
 
 //  P() {i==0}
 

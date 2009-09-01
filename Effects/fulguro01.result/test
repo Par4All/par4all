@@ -24,6 +24,16 @@ void flgr1d_arith_add_fgINT32(FLGR_Data1D *datdest, FLGR_Data1D *data1, FLGR_Dat
 FLGR_Ret flgr2d_arith_add(FLGR_Data2D *datdest, FLGR_Data2D *data1, FLGR_Data2D *data2)
 {
    FLGR_Ret ret;
+   extern int flgr2d_is_data_same_attributes(FLGR_Data2D *, FLGR_Data2D *);
+   extern int flgr2d_arith_add_fgBIT(FLGR_Data2D *, FLGR_Data2D *, FLGR_Data2D *);
+   extern int flgr2d_arith_add_fgUINT8(FLGR_Data2D *, FLGR_Data2D *, FLGR_Data2D *);
+   extern int flgr2d_arith_add_fgUINT16(FLGR_Data2D *, FLGR_Data2D *, FLGR_Data2D *);
+   extern int flgr2d_arith_add_fgUINT32(FLGR_Data2D *, FLGR_Data2D *, FLGR_Data2D *);
+   extern int flgr2d_arith_add_fgINT8(FLGR_Data2D *, FLGR_Data2D *, FLGR_Data2D *);
+   extern int flgr2d_arith_add_fgINT16(FLGR_Data2D *, FLGR_Data2D *, FLGR_Data2D *);
+   extern int flgr2d_arith_add_fgFLOAT32(FLGR_Data2D *, FLGR_Data2D *, FLGR_Data2D *);
+   extern int flgr2d_arith_add_fgFLOAT64(FLGR_Data2D *, FLGR_Data2D *, FLGR_Data2D *);
+   extern int flgr_get_type_string(enum FLGR_TYPE );
    if (datdest==(void *) 0||data1==(void *) 0||data2==(void *) 0) {
       fprintf(stderr, "ERROR: File %s, Line %d, Function : ""Null objects!\n", "fulguro-2-1-1.src/arith/flgrArith.c", 5102);
       return FLGR_RET_NULL_OBJECT;

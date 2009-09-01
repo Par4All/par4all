@@ -15,6 +15,7 @@ void generate11()
 {
    int i;
    int j;
+   extern int func(int, int *);
 
    func(i, &j);
 }
@@ -28,6 +29,7 @@ void generate11()
 {
    int i;
    int j;
+   extern int func(int f1, int *f2);
 
 //  P() {}
 

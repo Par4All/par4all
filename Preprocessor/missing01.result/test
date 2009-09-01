@@ -1,5 +1,6 @@
 int main(int argc, char *argv[])
 {
+   extern int inC1(int);
    return inC1(argc);                                                   /*0003*/
 }
 extern int main(int argc, char *argv[]);
