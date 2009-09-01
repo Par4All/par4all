@@ -1,8 +1,8 @@
-delete define2
+delete define3
 
 setproperty ABORT_ON_USER_ERROR TRUE
 
-create define2 define2.c
+create define3 define3.c
 
 #SELECT C LANGUAGE
 activate C_PARSER
@@ -14,7 +14,7 @@ display PRINTED_FILE(main)
 apply UNSPLIT(%ALL)
 
 close
-shell cc define2.database/Src/define2.c
+shell cc define3.database/Src/define3.c
 
-delete define2
+delete define3
 quit

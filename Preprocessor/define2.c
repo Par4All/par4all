@@ -1,3 +1,5 @@
+/* Prettyprint issue with unary plus next to binary plus: do not make
+   it an increment operator. */
 
 #define INDICE(x,y) (x+y)
 #define INDICE2(x,y) ((x)+(y))

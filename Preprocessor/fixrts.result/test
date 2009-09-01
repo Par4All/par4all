@@ -1,7 +1,11 @@
-# 1 "fixrts.c"
+# 1 "fixrts.database/Tmp/fixrts.cpp_processed.c"
 # 1 "<built-in>"
 # 1 "<command-line>"
-# 1 "fixrts.c"
+# 1 "fixrts.database/Tmp/fixrts.cpp_processed.c"
+# 1 "$VDIR/fixrts.c"
+# 1 "<built-in>"
+# 1 "<command-line>"
+# 1 "$VDIR/fixrts.c"
 // #include <math.h>
 // #include "complex.h"
 
@@ -78,10 +82,10 @@ int npoles;
  for (j=0;j<=npoles-1;j++)
   d[npoles-j] = -a[j].r;
 }
-# 1 "./fixrts.c"
+# 1 "$VDIR/fixrts.c"
 # 1 "<built-in>"
 # 1 "<command-line>"
-# 1 "./fixrts.c"
+# 1 "$VDIR/fixrts.c"
 // #include <math.h>
 // #include "complex.h"
 
