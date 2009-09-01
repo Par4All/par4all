@@ -1,0 +1,32 @@
+
+Initial code for "suppress_dead_code01"
+
+void suppress_dead_code01(int *x)
+{
+   char *p;
+   
+   /* Not dead code because of control effect */
+   while (1) 
+      ;
+   
+   /* Not dead code because of memory read-write effects, even if
+        masked because the implementation is thread-safe. */
+   p = malloc(10);
+   free(p);
+}
+
+Code for "suppress_dead_code01" after dead code elimination
+
+void suppress_dead_code01(int *x)
+{
+   char *p;
+   
+   /* Not dead code because of control effect */
+   while (1) 
+      ;
+   
+   /* Not dead code because of memory read-write effects, even if
+        masked because the implementation is thread-safe. */
+   p = malloc(10);
+   free(p);
+}
