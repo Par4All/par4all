@@ -36,8 +36,8 @@ Generated source files : do_reduction/src
      &MAX_NB_REQUEST)
       REAL*4 STEP_C_REDUC, C
       REAL*8 STEP_B_REDUC, B
-      CALL STEP_INITREDUCTION_R8(B, STEP_B_REDUC, STEP_PROD)            0100
-      CALL STEP_INITREDUCTION_R4(C, STEP_C_REDUC, STEP_SUM)             0101
+      CALL STEP_INITREDUCTION_R4(C, STEP_C_REDUC, STEP_SUM)             0100
+      CALL STEP_INITREDUCTION_R8(B, STEP_B_REDUC, STEP_PROD)            0101
       CALL STEP_INITREDUCTION_I4(A, STEP_A_REDUC, STEP_SUM)             0102
 
       CALL STEP_COMPUTELOOPSLICES(I_L, I_U, 1, STEP_SIZE,               0104
@@ -76,8 +76,8 @@ C     A nonblocking algo increment STEP_Nb_Request.
      &)                                                                 0134
 C     If STEP_Nb_Request equals 0, STEP_WAITALL does nothing
       CALL STEP_WAITALL(STEP_NBREQUEST, STEP_REQUESTS)                  0139
-      CALL STEP_REDUCTION_R8(B, STEP_B_REDUC, STEP_PROD)                0140
-      CALL STEP_REDUCTION_R4(C, STEP_C_REDUC, STEP_SUM)                 0141
+      CALL STEP_REDUCTION_R4(C, STEP_C_REDUC, STEP_SUM)                 0140
+      CALL STEP_REDUCTION_R8(B, STEP_B_REDUC, STEP_PROD)                0141
       CALL STEP_REDUCTION_I4(A, STEP_A_REDUC, STEP_SUM)                 0142
       END
 ###################### do_reduction/src/DO_REDUCTION_PARDO10_OMP.f ######################
@@ -89,7 +89,7 @@ C     If STEP_Nb_Request equals 0, STEP_WAITALL does nothing
       INTEGER D(1:N)
       REAL*4 C
       REAL*8 B
-!$OMP parallel do reduction(* : B) reduction(+ : C) reduction(+ : A)
+!$OMP parallel do reduction(+ : C) reduction(* : B) reduction(+ : A)
 
       DO 10 I = I_L, I_U                                                0008
          D(I) = I                                                       0009
