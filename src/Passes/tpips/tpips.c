@@ -738,6 +738,7 @@ void tpips_help(string line)
 	 "\tList of available owners:\n"
 	 "\t\t%%MODULE\n"
 	 "\t\t%%ALL\n"
+	 "\t\t%%ALLFUNC\n"
 	 "\t\t%%PROGRAM\n"
 	 "\t\t%%CALLEES\n"
 	 "\t\t%%CALLERS\n"
