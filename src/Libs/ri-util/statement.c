@@ -3128,11 +3128,13 @@ bool statement_may_have_control_effects_p(statement s)
   control_effect_p = !entity_empty_label_p(statement_label(s));
 
   if(!control_effect_p) {
-    /* This statements may hide a non-terminating loop. I assume that
+    /* These statements may hide a non-terminating loop. I assume that
        do loops always terminate. They also always have a memory
        write effect for the index, which may not be true for the
-       other kinds of loops. */
-    control_effect_p = statement_whileloop_p(s) || statement_forloop_p(s);
+       other kinds of loops. Unstructured could be tested to see if
+       they have a syntactical control cycle or not. */
+    control_effect_p = statement_whileloop_p(s) || statement_forloop_p(s)
+      || statement_unstructured_p(s);
     if(!control_effect_p)
       gen_context_recurse(s, &control_effect_p, call_domain, look_for_control_effects, gen_null);
   }
