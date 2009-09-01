@@ -518,6 +518,11 @@
 #define STROULL_FUNCTION_NAME           "strtoull"
 #define ULLOSTR_FUNCTION_NAME           "ulltostr"
 
+/* include<assert.h> */
+
+#define ASSERT_FUNCTION_NAME            "__assert"
+#define ASSERT_FAIL_FUNCTION_NAME       "__assert_fail"
+
 /* include <string.h> */
 
 #define STRCMP_FUNCTION_NAME            "strcmp"
@@ -981,6 +986,11 @@
 #define ENTITY_STROLL_SYSTEM_P(e)        ENTITY_NAME_P(e, "strtoll")
 #define ENTITY_STROULL_SYSTEM_P(e)       ENTITY_NAME_P(e, "strtoull")
 #define ENTITY_ULLOSTR_SYSTEM_P(e)       ENTITY_NAME_P(e, "ulltostr")
+
+/* include <assert.h> */
+
+#define ENTITY_ASSERT_SYSTEM_P(e)        ENTITY_NAME_P(e, ASSERT_FUNCTION_NAME)
+#define ENTITY_ASSERT_FAIL_SYSTEM_P(e)   ENTITY_NAME_P(e, ASSERT_FAIL_FUNCTION_NAME)
 
 /* include <string.h> */
 

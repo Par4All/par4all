@@ -2054,7 +2054,7 @@ statement_to_line_number(statement s)
 }
 
 /* insert statement s1 before or after statement s
- *  
+ *
  * If statement s is a sequence, simply insert s1 at the begining
  * or at the end of the sequence s.
  *
@@ -2070,41 +2070,41 @@ statement_to_line_number(statement s)
 void insert_statement(statement s,
 		      statement s1,
 		      bool before)
-{  
+{
   list ls;
   instruction i = statement_instruction(s);
   if (instruction_sequence_p(i))
     {
       ls = instruction_block(i);
-      if (before)	
+      if (before)
 	ls = CONS(STATEMENT,s1,ls);
       else
-	ls = gen_nconc(ls,CONS(STATEMENT,s1,NIL));    
+	ls = gen_nconc(ls,CONS(STATEMENT,s1,NIL));
       instruction_block(i) = ls;
     }
   else
     {
-      statement s2 = copy_statement(s);   
-      if (before)  
+      statement s2 = copy_statement(s);
+      if (before)
 	ls = CONS(STATEMENT,s1,CONS(STATEMENT,s2,NIL));
       else
-	ls = CONS(STATEMENT,s2,CONS(STATEMENT,s1,NIL));	
-      
+	ls = CONS(STATEMENT,s2,CONS(STATEMENT,s1,NIL));
+
       statement_comments(s) = empty_comments;
       statement_label(s)= entity_empty_label();
       statement_number(s) = STATEMENT_NUMBER_UNDEFINED;
       statement_ordering(s) = STATEMENT_ORDERING_UNDEFINED;
-      
+
       /* free_instruction(statement_instruction(s));*/
       statement_instruction(s) = make_instruction(is_instruction_sequence,
 						  make_sequence(ls));
-    } 
+    }
 }
 
 
 /* Replace the instruction in statement s by instruction i.
  *
- * Free the old instruction. 
+ * Free the old instruction.
  *
  * If the new instruction is a sequence,
  * add a CONTINUE to carry the label and/or the comments. The
@@ -3106,7 +3106,9 @@ static bool look_for_control_effects(call c, bool * control_effect_p)
     if(ENTITY_EXIT_SYSTEM_P(f)
        || ENTITY_ABORT_SYSTEM_P(f)
        || ENTITY_C_RETURN_P(f)
-       || ENTITY_RETURN_P(f)) {
+       || ENTITY_RETURN_P(f)
+       || ENTITY_ASSERT_SYSTEM_P(f)
+       || ENTITY_ASSERT_FAIL_SYSTEM_P(f)) {
       * control_effect_p = TRUE;
       go_on_p = FALSE;
     }

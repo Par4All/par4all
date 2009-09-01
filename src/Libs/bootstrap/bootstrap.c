@@ -4081,8 +4081,8 @@ static IntrinsicDescriptor IntrinsicTypeDescriptorTable[] =
   {BRACE_INTRINSIC, (INT_MAX) , default_intrinsic_type, no_typing, 0},
 
   /* #include <assert.h> */
-  {"__assert", 3, overloaded_to_void_type,0,0},
-  {"__assert_fail", 4, overloaded_to_void_type,0,0}, /* does not return */
+  {ASSERT_FUNCTION_NAME, 3, overloaded_to_void_type,0,0},
+  {ASSERT_FAIL_FUNCTION_NAME, 4, overloaded_to_void_type,0,0}, /* does not return */
 
   /* #include <complex.h>*/
 
