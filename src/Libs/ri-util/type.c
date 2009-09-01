@@ -348,6 +348,13 @@ type make_scalar_integer_type(_int n)
     return t;
 }
 
+type make_scalar_complex_type(_int n)
+{
+    type t = make_type(is_type_variable,
+		       make_variable(make_basic(is_basic_complex, UUINT(n)), NIL,NIL));
+    return t;
+}
+
 bool area_equal_p(area a1, area a2)
 {
     if(a1 == a2)

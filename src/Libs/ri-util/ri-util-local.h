@@ -1343,7 +1343,7 @@ the variable is unsigned, signed or not */
 /* variable name for random unit */
 #define RAND_GEN_EFFECTS_NAME "GEN_SEED"
 /* variable name for heap effects */
-#define MALLOC_EFFECTS_NAME "GEN_SEED"
+#define MALLOC_EFFECTS_NAME "_MALLOC_"
 /* array of Logical UNits; it is more or less handled as the current file pointer */
 #define IO_EFFECTS_ARRAY_NAME "LUNS"
 /* To express C IO intrinsics effects */

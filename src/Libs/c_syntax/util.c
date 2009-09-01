@@ -127,12 +127,17 @@ void init_c_areas()
   entity_initial(HeapArea) = MakeValueUnknown();
   AddEntityToDeclarations(HeapArea, get_current_module_entity());
 
-  /* Create hidden pointer in the heap area to modelize malloc and
-     free effects */
+  /* Create a hidden pointer in the heap area to modelize malloc and
+     free effects and to keep track of the corresponding abstract
+     state. */
   if(!compilation_unit_entity_p(get_current_module_entity())) {
+    /* FI: I use a complex type to avoid seeing this variable in the
+       transformers and preconditions... OK, it's not a clean way to
+       do it. Should we create another area to allocate this abstract
+       heap state? */
     make_entity(AddPackageToName(get_current_module_name(),
 				 MALLOC_EFFECTS_NAME),
-		make_scalar_integer_type(DEFAULT_INTEGER_TYPE_SIZE),
+		make_scalar_complex_type(DEFAULT_COMPLEX_TYPE_SIZE),
 		/* make_storage(is_storage_ram,
 		   make_ram(entity_undefined, DynamicArea, 0, NIL))
 		*/
