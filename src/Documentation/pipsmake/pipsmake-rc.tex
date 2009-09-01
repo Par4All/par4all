@@ -7484,6 +7484,17 @@ declarations, and splits them in two statements if they specify an
 initial value: a declaration without initialization, and an assignment
 of the initial value.
 
+The purpose of this transformation is to obtain correct use-def chains
+and dependence graphs, because PIPS does not (yet) take into account
+memory effects linked to declarations. This transformation transfers
+these effects into usual executable statements.
+
+This transformation can be used, for instance, to improve reduction
+detection (see TRAC ticket 181).
+
+Note that C array initializations cannot be converted into
+assignments. In such cases, the initial declaration is left untouched.
+
 \begin{PipsMake}
 alias split_initializations 'Split Initializations'
 split_initializations > MODULE.code
