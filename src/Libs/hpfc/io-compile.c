@@ -924,11 +924,10 @@ add_declaration_to_host_and_link(
 
 /*   compile an io statement
  */
-void 
-io_efficient_compile(
+void io_efficient_compile(
     statement stat, /* statement to compile */
     statement *hp,  /* returned Host code */
-    statement *np)  /* returned Node code */ 
+    statement *np)  /* returned Node code */
 {
     list
 	/* of effect */ entities = load_statement_local_regions(stat),
@@ -938,12 +937,11 @@ io_efficient_compile(
 
     debug_on("HPFC_IO_DEBUG_LEVEL");
     pips_debug(1, "compiling!\n");
-    pips_debug(2, "statement %p, %d arrays\n", stat, 
-	       gen_length(entities));
+    pips_debug(2, "statement %" _intFMT " (%p), %d arrays\n",
+	       statement_number(stat), stat, gen_length(entities));
 
     /* quicker for continue and so...
      */
-    
     if (empty_code_p(stat))   /* Empty statement */
     {
 	pips_debug(3, "empty statement\n");
@@ -959,48 +957,48 @@ io_efficient_compile(
 	entity array = reference_variable(effect_reference(e));
 	action act = effect_action(e);
 	approximation apr = effect_approximation(e);
-	
+
 	pips_debug(3, "array %s\n", entity_name(array));
-	
+
 	pips_assert("avoid replicated array I/O", /* not implemented */
 		    !(array_distributed_p(array) && replicated_p(array)));
-	
-	if ((!array_distributed_p(array)) && action_read_p(act)) 
+
+	if ((!array_distributed_p(array)) && action_read_p(act))
 	{
-	    pips_debug(7, "skipping array %s movements - none needed\n", 
+	    pips_debug(7, "skipping array %s movements - none needed\n",
 		       entity_name(array));
 	    continue;
 	}
-	
+
 	/* add array declaration on host if necessary
 	 */
 	if (array_distributed_p(array) && !bound_new_host_p(array))
 	    add_declaration_to_host_and_link(array);
-	
+
 	/* collect data if necessary
 	 */
 	if (array_distributed_p(array) &&
 	    current_entity_is_updated_before_p(stat,array) &&
-	    (action_read_p(act) || 
-	     (action_write_p(act) && 
-	      approximation_may_p(apr) && 
+	    (action_read_p(act) ||
+	     (action_write_p(act) &&
+	      approximation_may_p(apr) &&
 	      !get_bool_property("HPFC_IGNORE_MAY_IN_IO"))))
 	{
-	    generate_io_collect_or_update(array, stat, 
-					  is_movement_collect, 
+	    generate_io_collect_or_update(array, stat,
+					  is_movement_collect,
 					  action_tag(act), &sh, &sn);
 	    lh_collect = CONS(STATEMENT, sh, lh_collect);
 	    ln_collect = CONS(STATEMENT, sn, ln_collect);
 	}
-	
+
 	/* update data if necessary
-	   action = write and data may be used later (out regions) 
+	   action = write and data may be used later (out regions)
 	 */
-	if (action_write_p(act) && 
+	if (action_write_p(act) &&
 	    current_entity_is_used_later_p(stat,array))
 	{
-	    generate_io_collect_or_update(array, stat, 
-					  is_movement_update, 
+	    generate_io_collect_or_update(array, stat,
+					  is_movement_update,
 					   action_tag(act), &sh, &sn);
 	    lh_update = CONS(STATEMENT, sh, lh_update);
 	    ln_update = CONS(STATEMENT, sn, ln_update);
@@ -1009,13 +1007,13 @@ io_efficient_compile(
 	entities);
 
     lh_io =  CONS(STATEMENT, copy_statement(stat), NIL);
-    
+
     if (get_bool_property("HPFC_SYNCHRONIZE_IO"))
     {
 	/* could do it only for write statements
 	 */
 	entity synchro = hpfc_name_to_entity(SYNCHRO);
-	
+
 	lh_io = CONS(STATEMENT, hpfc_make_call_statement(synchro, NIL), lh_io);
 	ln_io = CONS(STATEMENT, hpfc_make_call_statement(synchro, NIL), ln_io);
     }
