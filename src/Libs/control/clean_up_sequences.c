@@ -371,11 +371,19 @@ void
 clean_up_sequences_internal(statement s)
 {
     debug_on("CLEAN_UP_SEQUENCES_DEBUG_LEVEL");
+    ifdebug(1) {
+      pips_debug(1, "Statement at entry:\n");
+      print_statement(s);
+    }
     compute_statement_to_goto_table(s);
     gen_recurse(s, statement_domain,
 		gen_true,
 		clean_up_sequences_rewrite);
     discard_statement_to_goto_table();
+    ifdebug(1) {
+      pips_debug(1, "Statement at exit:\n");
+      print_statement(s);
+    }
     debug_off();
 }
 
@@ -387,16 +395,8 @@ void
 clean_up_sequences(statement s)
 {
   debug_on("CLEAN_UP_SEQUENCES_DEBUG_LEVEL");
-  ifdebug(8) {
-    pips_debug(5, "Statement at entry:\n");
-    print_statement(s);
-  }
   initialize_clean_up_sequences_statistics();
   clean_up_sequences_internal(s);
   display_clean_up_sequences_statistics();
-  ifdebug(8) {
-    pips_debug(5, "Statement at exit:\n");
-    print_statement(s);
-  }
   debug_off();
 }

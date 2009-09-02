@@ -143,11 +143,15 @@ bool language_module_p(entity m, string lid)
   return c_p;
 }
 
+
+/** Test if a module is in C */
 bool c_module_p(entity m)
 {
   return language_module_p(m, PP_C_ED);
 }
 
+
+/** Test if a module is in Fortran */
 bool fortran_module_p(entity m)
 {
   return language_module_p(m, FORTRAN_FILE_SUFFIX);

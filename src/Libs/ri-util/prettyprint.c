@@ -107,16 +107,27 @@ char lib_ri_util_prettyprint_c_rcsid[] = "$Id$";
 bool prettyprint_is_fortran = TRUE;
 
 /* To track accesses from other libraries */
+
+
+/** Get the status of the Fortran prettyprint flag */
 bool get_prettyprint_is_fortran()
 {
   return prettyprint_is_fortran;
 }
 
+/** Select if the prettyprint is done in Fortran or not */
+void set_prettyprint_is_fortran_p(bool is_fortran_p)
+{
+  prettyprint_is_fortran = is_fortran_p;
+}
+
+/** Select Fortran prettyprint */
 void set_prettyprint_is_fortran()
 {
   prettyprint_is_fortran = TRUE;
 }
 
+/** Deselect Fortran prettyprint */
 void reset_prettyprint_is_fortran()
 {
   prettyprint_is_fortran = FALSE;
@@ -2495,20 +2506,14 @@ init_text_statement(
 
 	if (!(instruction_block_p(statement_instruction(obj)) &&
 	      (! get_bool_property("PRETTYPRINT_BLOCKS")))) {
-
-	    if (so != STATEMENT_ORDERING_UNDEFINED) {
-	      asprintf(&buffer, "%s (%d,%d)\n", PIPS_COMMENT_SENTINEL,
-			ORDERING_NUMBER(so), ORDERING_STATEMENT(so)) ;
-		ADD_SENTENCE_TO_TEXT(r,
-				     make_sentence(is_sentence_formatted,
-						   buffer)) ;
-	    }
-	    else {
-		if(user_view_p())
-	      ADD_SENTENCE_TO_TEXT(r,
-				   make_sentence(is_sentence_formatted,
-						 strdup("C (unreachable)\n")));
-	    }
+	  if (so != STATEMENT_ORDERING_UNDEFINED)
+	    asprintf(&buffer, "%s (%d,%d)\n", PIPS_COMMENT_SENTINEL,
+		     ORDERING_NUMBER(so), ORDERING_STATEMENT(so));
+	  else
+	    asprintf(&buffer, "%s (statement ordering unavailable)\n",
+		     PIPS_COMMENT_SENTINEL);
+	  ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted,
+						buffer));
 	}
     }
     return( r ) ;

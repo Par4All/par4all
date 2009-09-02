@@ -969,8 +969,9 @@ statement s;
     }
     return FALSE;
 }
-
-void 
+
+
+void
 print_statement_set(fd, r)
 FILE *fd;
 set r;
@@ -984,23 +985,33 @@ set r;
     fprintf(fd, "\n");
 }
 
-/* (the text is not freed, massive memory leak:-) 
- *
- * See text_named_module() for improvements.
- */ 
+
+/** Print a statement on stdout
+
+    Print the statement according to the current PRETTYPRINT_C_CODE
+    property
+
+    See text_named_module() for improvements.
+*/
 void print_statement(statement s)
 {
   debug_on("TEXT_DEBUG_LEVEL");
   set_alternate_return_set();
   reset_label_counter();
   push_current_module_statement(s);
+  bool previous_is_fortran_p = get_prettyprint_is_fortran();
+  /* Prettyprint in the correct language: */
+  set_prettyprint_is_fortran_p(!get_bool_property("PRETTYPRINT_C_CODE"));
   text txt = text_statement(entity_undefined, 0, s);
   print_text(stderr, txt);
   free_text(txt);
+  /* Put back the previous prettyprint language: */
+  set_prettyprint_is_fortran_p(previous_is_fortran_p);
   pop_current_module_statement();
   reset_alternate_return_set();
   debug_off();
 }
+
 
 void print_statements(list sl)
 {
@@ -1008,6 +1019,7 @@ void print_statements(list sl)
     print_statement(s);
   }
 }
+
 
 void print_statement_of_module(statement s, string mn)
 {

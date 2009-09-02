@@ -1723,7 +1723,7 @@ statement st;
 
     u = simplified_unstructured(top, bottom, result);
 
-    if( get_debug_level() > 5) {
+    ifdebug(5) {
 	pips_debug(1,
 	  "Nodes in unstructured %p (entry %p, exit %p) from entry:\n",
 		   u, unstructured_control(u), unstructured_exit(u));

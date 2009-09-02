@@ -1,4 +1,4 @@
-%%
+%
 %% $Id$
 %%
 %% Copyright 1989-2009 MINES ParisTech
@@ -4818,7 +4818,8 @@ simple algorithm).
 SAC_SIMD_REGISTER_WIDTH 64
 \end{PipsProp}
 
-\subsubsection*{Auto-Unroll}
+
+\paragraph{Auto-Unroll}
 
 This property is used to control how the auto unroll phase computes
 the unroll factor. By default, the minimum unroll factor is used. It
@@ -4841,7 +4842,7 @@ which takes into account the actual SIMD instructions.
 SIMD_AUTO_UNROLL_SIMPLE_CALCULATION TRUE
 \end{PipsProp}
 
-\subsubsection*{Memory Organisation}
+\paragraph{Memory Organisation}
 
 This property is used by the sac library to know which elements of
 multi-dimensional array are consecutive in memory. Let us consider the
@@ -4858,7 +4859,7 @@ but \lstinline|a(i,j,k)| and \lstinline|a(i+1,j,k)| are not.
 SIMD_FORTRAN_MEM_ORGANISATION TRUE
 \end{PipsProp}
 
-\subsubsection*{Pattern file}
+\paragraph{Pattern file}
 
 This property is used by the sac library to know the path of the pattern definition file.
 If the file is not found, the execution fails.
@@ -4867,7 +4868,7 @@ If the file is not found, the execution fails.
 SIMD_PATTERN_FILE "patterns.def"
 \end{PipsProp}
 
-\subsubsection*{Constant type inference}
+\paragraph{Constant type inference}
 
 This property is used by the sac library to know if it must override C constant type inference.
 In \texttt{C}, an integer constant always as the minimum size needed to hold its value, starting from an \lstinline|int|. In sac we may want to have it converted to a smaller size, in situation like \lstinline|char b;/*...*/;char a = 2 + b;|. Otherwise the result of \lstinline|2+b| is considered as an \lstinline|int|.
@@ -4877,7 +4878,7 @@ if \verb|SIMD_OVERRIDE_CONSTANT_TYPE_INFERENCE| is set to \texttt{TRUE}, the res
 SIMD_OVERRIDE_CONSTANT_TYPE_INFERENCE FALSE
 \end{PipsProp}
 
-\subsubsection*{Extravagant SIMD atomizer}
+\paragraph{Extravagant SIMD atomizer}
 Use this property to make the SIMD Atomizer go wild: unlike other atomizer, it will break
 expressions such as \lstinline|a=b[2]+2| into \lstinline|i=b[2];a=i+2|.
 \begin{PipsProp}
@@ -5198,12 +5199,12 @@ HPFC_REDUNDANT_SYSTEMS_FOR_REMAPS FALSE
 \subsection{STEP: MPI code generation from OpenMP programs}
 \label{sec:step:-mpi-code}
 
-\marginpar{RK: IT SudParis : include your work here}
+\marginpar{RK: IT SudParis : insert your documentation here}
 
 \begin{PipsMake}
 outlining_init              > PROGRAM.outlined
 \end{PipsMake}
-    
+
 \begin{PipsMake}
 step_outlining                   > PROGRAM.outlined
                             > MODULE.code
@@ -5469,7 +5470,7 @@ safescale_distributor                  > MODULE.code
 \subsection{CoMap: code generation for accelerators with DMA}
 \label{sec:comap:-code}
 
-\paragraph{Phrase Remove Dependences}
+\subsubsection{Phrase Remove Dependences}
 \index{Phrase Remove Dependences}
 
 \begin{PipsMake}
@@ -5486,7 +5487,7 @@ phrase_remove_dependences                      > MODULE.code
 \end{PipsMake}
 
 
-\paragraph{Phrase comEngine Distributor}
+\subsubsection{Phrase comEngine Distributor}
 \index{Phrase comEngine Distributor}
 
 %%@UserManualDocumentation:  phrase_distributor
@@ -6793,7 +6794,7 @@ Comments from Nga \textsc{Nguyen}: According to~\cite{Aho86} and~\cite{Much97}, 
 name of this optimization should be Constant-Expression Evaluation or
 Constant Folding for integer values. This transformation produces well
 error message at compile time indicating potential error such as division
-by zero. 
+by zero.
 %%!UserManualDocumentation
 
 \begin{PipsMake}
@@ -6808,6 +6809,7 @@ partial_eval                    > MODULE.code
 
 This function was implemented initially by Bruno \textsc{Baron}.
 
+
 \subsection{Reduction Detection}
 \label{subsection-reduction-detection}
 \index{Reduction Detection}
@@ -6820,7 +6822,8 @@ NewGen data structures were language-neutral. Thus it by-passes some of
 
 This phase is now obsolete, although reduction detection is critical for
 code restructuring and optimization... A new reduction detection phase was
-implemented by Fabien \textsc{Coelho}. It does not include a code transformation.
+implemented by Fabien \textsc{Coelho}. Have a look at \S~\ref{sec:reductions}
+but it does not include a code transformation.
 Its result could be prettyprinted in an HPF style (FC: implementation?).
 
 \begin{PipsMake}
@@ -6829,6 +6832,7 @@ old_reductions                      > MODULE.code
         < MODULE.code
         < MODULE.cumulated_effects
 \end{PipsMake}
+
 
 \subsection{Forward Substitution}
 \index{Common subexpression elimination}
@@ -7285,7 +7289,7 @@ logfile, you have to use the script
 \$PIPS\_ROOT/Src/Script/misc/array\_resizing\_instrumentation.pl to replace the unnormalized
 declarations and add new assignments in the source code.
 
-\subsubsection{ Top Down Array Resizing}
+\subsubsection{Top Down Array Resizing}
 %%@UserManualDocumentation: array_resizing_top_down
 
 The  method uses the relationship between actual and formal arguments from parameter-passing
@@ -7469,8 +7473,8 @@ The code externalization and adaptation for a given hardware
 accelerator is performed by another phase, see for instance
 Section~\ref{hardware-accelerator}.
 
-Initially developed in August 2009 by Laurent Daverio, with help from
-Fabien Coelho and Francois Irigoin.
+Initially developed in August 2009 by Laurent \textsc{Daverio}, with help from
+Fabien \textsc{Coelho} and François \textsc{Irigoin}.
 
 \begin{PipsMake}
 alias flatten_code 'Flatten Code'
@@ -7815,7 +7819,7 @@ used_before_set   > MODULE.ubs
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% MISC
 
-\section{Miscellanous Transformations}
+\section{Miscellaneous transformations}
 
 The following warning paragraphs should not be located here, but the
 whole introduction has to be updated to take into account the merger

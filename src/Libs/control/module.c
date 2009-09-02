@@ -46,18 +46,21 @@
    unstructured building by controlizer. */
 static statement update_unstructured_declarations(statement module_stat)
 {
+  /* Get all the declarations found (recursively) in the module */
   list dl = statement_to_declarations(module_stat);
+  /* Get all the entities referenced in the module */
   list vl = statement_to_referenced_entities(module_stat);
   list fl = statement_to_called_user_entities(module_stat);
   /* To preserve the order, it would be better to collect variables
      and functions at the same time with a
-     statement_to_referenced_or_called-entities()*/
+     statement_to_referenced_or_called_entities()*/
   list vfl = gen_nconc(vl, fl);
   list udl = NIL;
   entity m = get_current_module_entity();
   entity cu = module_entity_to_compilation_unit_entity(m);
   list cudl = code_declarations(value_code(entity_initial(cu)));
 
+  /* Build a list of entities that are not declared anywhere: */
   MAP(ENTITY, e, {
     if(!gen_in_list_p(e, dl) && !gen_in_list_p(e, cudl)
        && !gen_in_list_p(e, udl) && !formal_parameter_p(e)

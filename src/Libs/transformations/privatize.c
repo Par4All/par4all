@@ -196,7 +196,7 @@ static void update_locals(list prefix, list ls, entity e)
       ifdebug(1) {
 	pips_debug(1, "Removing %s from locals of ", entity_name( e )) ;
 	FOREACH(STATEMENT, st, ls) {
-	  pips_debug(1, "%d ", statement_number( st )) ;
+	  pips_debug(1, "%td ", statement_number( st )) ;
 	}
 	pips_debug(1, "\n" ) ;
       }
@@ -205,7 +205,7 @@ static void update_locals(list prefix, list ls, entity e)
 
 	pips_assert( "instruction i is a loop", instruction_loop_p( i )) ;
 	gen_remove( &loop_locals( instruction_loop( i )), e );
-	pips_debug(1, "Variable %s is removed from locals of statement %d\n",
+	pips_debug(1, "Variable %s is removed from locals of statement %td\n",
 		   entity_name(e), statement_number(st));
       }
     }
@@ -319,12 +319,12 @@ static void try_privatize(vertex v, statement st, effect f, entity e)
 
   ifdebug(1) {
     if(statement_loop_p(st)) {
-      pips_debug(1, "Trying to privatize %s in loop statement %d with local(s) ",
+      pips_debug(1, "Trying to privatize %s in loop statement %td with local(s) ",
 		 entity_local_name( e ), statement_number( st )) ;
       print_arguments(loop_locals(statement_loop(st)));
     }
     else {
-      pips_debug(1, "Trying to privatize %s in statement %d\n",
+      pips_debug(1, "Trying to privatize %s in statement %td\n",
 		 entity_local_name( e ), statement_number( st )) ;
     }
   }
@@ -391,7 +391,7 @@ static void try_privatize(vertex v, statement st, effect f, entity e)
 	  is_implied_do_index( e, succ_i))) {
 	continue ;
       }
-      pips_debug(5,"Conflict for %s between statements %d and %d\n",
+      pips_debug(5,"Conflict for %s between statements %td and %td\n",
 		 entity_local_name(e), statement_number(st), statement_number(succ_st));
 
       if (v==succ_v) {
@@ -551,62 +551,78 @@ bool localize_declaration_walker(statement s)
 }
 
 
-/** 
- * @brief walks through all statements and create statement_blocks where needed to hold further declarations
- * 
- * @param s concenrned statement
- */
-static
-void prepare_localize_declaration_walker(statement s)
-{
-	if( statement_loop_p(s) )
-	{
-		instruction i = statement_instruction(s);
-		loop l = instruction_loop(i);
+/**
+   @brief Create a statement block around the statement if it is a do-loop with local/private variable
 
-		/* create a new statement to hold the future private declaration
-         * SG: as a side effect, pragmas on the loop are moved to the enclosing block
-         * __this_is_usefull__ at least to me ^^
-         */
-		if( !ENDP(loop_locals(l)))
-        {
-            statement new_statement = make_stmt_of_instr(i);
-            instruction iblock = make_instruction_block(CONS(STATEMENT,new_statement,NIL));
-            statement_instruction(s)=iblock;
-            statement_comments(new_statement) = statement_comments(s);
-            statement_comments(s)=empty_comments;
-            statement_label(new_statement) = statement_label(s);
-            statement_label(s)=entity_empty_label();
-        }
-	}
+   It creates statement_blocks where needed to hold further declarations later
+
+   @param s concerned statement */
+static
+void prepare_localize_declaration_walker(statement s) {
+  if(statement_loop_p(s)) {
+    instruction i = statement_instruction(s);
+    loop l = instruction_loop(i);
+
+    /* create a new statement to hold the future private declaration SG:
+       as a side effect, pragmas on the loop are moved to the enclosing
+       block __this_is_usefull__ at least to me ^^
+    */
+    if(!ENDP(loop_locals(l))) {
+      /* Put the loop in a new statement block if there are loop-private variable(s): */
+      statement new_statement = make_stmt_of_instr(i);
+      instruction iblock = make_instruction_block(CONS(STATEMENT,new_statement,NIL));
+      statement_instruction(s) = iblock;
+      /* Since this is illegal to have comments and label on a block,
+	 moved them downward: */
+      fix_sequence_statement_attributes(s);
+    }
+  }
 }
 
-/** 
- * @brief make loop local variables declared in the innermost statement
- * 
- * @param mod_name name of the module being processed
- * 
- * @return 
+
+/**
+   @brief make loop local variables declared in the innermost statement
+
+   @param mod_name name of the module being processed
+
+   @return
  */
 bool
 localize_declaration(char *mod_name)
 {
 	/* prelude */
 	debug_on("LOCALIZE_DEBUG_LEVEL");
-	pips_debug(1,"begin localize_declaration ...");
+	pips_debug(1,"begin localize_declaration ...\n");
 	set_current_module_entity(module_name_to_entity(mod_name) );
 	set_current_module_statement( (statement) db_get_memory_resource(DBR_CODE, mod_name, TRUE) );
 
-	/* propagate local informations to loop statements */ 
+	/* Propagate local informations to loop statements */
 
-	old_entity_to_new=hash_table_make(hash_pointer,HASH_DEFAULT_SIZE); // used to keep track of what has been done 
-	pips_debug(1,"create block statement");
-	gen_recurse(get_current_module_statement(),statement_domain,gen_true,prepare_localize_declaration_walker); // create the statement_block where needed
-	pips_debug(2,"convert loop_locals to local declrations");
-	gen_recurse(get_current_module_statement(),statement_domain,localize_declaration_walker,gen_null); // use loop_locals data to fill local declarations
+	// To keep track of what has been done:
+	old_entity_to_new=hash_table_make(hash_pointer,HASH_DEFAULT_SIZE);
+	ifdebug(1) {
+	  pips_debug(1,"The statement before we create block statement:\n");
+	  print_statement(get_current_module_statement());
+	}
+	// Create the statement_block where needed:
+	clean_up_sequences(get_current_module_statement());
+	gen_recurse(get_current_module_statement(),statement_domain,gen_true,prepare_localize_declaration_walker);
+	ifdebug(1) {
+	  pips_debug(1,"The statement before we convert loop_locals to local declarations:\n");
+	  print_statement(get_current_module_statement());
+	}
+	// Use loop_locals data to fill local declarations:
+	clean_up_sequences(get_current_module_statement());
+	gen_recurse(get_current_module_statement(),
+		    statement_domain, localize_declaration_walker, gen_null);
 	hash_table_free(old_entity_to_new);
 
-	/* validate */
+	ifdebug(1) {
+	  pips_debug(1,"The statement after conversion:\n");
+	  print_statement(get_current_module_statement());
+	}
+	clean_up_sequences(get_current_module_statement());
+	/* Renumber the statement with a new ordering */
 	module_reorder(get_current_module_statement());
 	DB_PUT_MEMORY_RESOURCE(DBR_CODE, mod_name, get_current_module_statement());
 
@@ -614,7 +630,7 @@ localize_declaration(char *mod_name)
 	debug_off();
 	reset_current_module_entity();
 	reset_current_module_statement();
-	pips_debug(1,"end localize_declaration");
+	pips_debug(1,"end localize_declaration\n");
 	return true;
 }
 
