@@ -443,13 +443,12 @@ sh> svn commit my-branch-name
 
 \item Develop, test, commit within your branch\ldots
 
-  \textbf{CAUTION!}
-  When testing, check that the \verb.PIPS_ROOT. environment variable
-  points to your development branch instead of the trunk.
-  You may also check for the right settings for
-  \verb.EXTERN_ROOT. \verb.NEWGEN_ROOT. and
-  \verb.LINEAR_ROOT. variables, as well as your \verb.PATH. to
-  ensure that the right executable is used.
+  \textbf{CAUTION!}  When testing, check that the
+  \verb.PIPS_ROOT. environment variable points to your development branch
+  instead of the trunk.  You may also check for the right settings for
+  \verb.EXTERN_ROOT. \verb.NEWGEN_ROOT. and \verb.LINEAR_ROOT. variables,
+  as well as your \verb.PATH. to ensure that the right executable is
+  used. Have a look to \S~\ref{sec:shell} for more information.
 
 \item To merge into your branch on-going developments by other people from
   trunk, first you need to have already committed your branch and then:
@@ -836,7 +835,8 @@ action is to do the equivalent of a \texttt{svn update}, that is a
 \begin{verbatim}
 pips_git
 \end{verbatim}
-because it is the most used command.
+because it is the most used command: it fetches new versions from the SVN
+repository and rebase your current work according to these last versions.
 
 For example to get the status of all your GIT
 repositories, use:
@@ -914,6 +914,67 @@ Here are examples of pips architectures:
   integers.
 \item[OSF1]: for DEC Alpha machines under OSF1. 
 \end{description}
+
+
+\subsection{ROOT variables}
+\label{sec:root-variables}
+
+Several variables are used to explain where to build PIPS components and
+from where the components are picked. It is useful when working with
+several working copy and branches at the same time.
+
+
+\begin{description}
+\item[\texttt{EXTERN\_ROOT}] precises where external stuff like the Polylib
+  is looked for;
+\item[\texttt{NEWGEN\_ROOT}] is used to select where to look for the
+  NewGen tools and libraries;
+\item[\texttt{LINEAR\_ROOT}] gives the location of the Linear library to use;
+\item[\texttt{PIPS\_ROOT}] select the main PIPS directory used to pick
+  runtime configuration files, scripts...
+\end{description}
+
+There is also a \texttt{ROOT} variable that can be set to precise the
+target main directory for the compilation.
+
+For example, if you want to compile an experimental version of NewGen and
+compile it and install into the main directory of the NewGen installation
+(selected by \texttt{NEWGEN\_ROOT}) to compile a global PIPS version
+without changing its compilation recipe.
+\begin{itemize}
+\item In a terminal in a
+  \texttt{PIPS/git-svn-total/newgen/branches/gall/doom-branch} you run:
+\begin{verbatim}
+make ROOT=$NEWGEN_ROOT compile
+\end{verbatim}%$
+  to compile the local version into the standard NewGen directory.
+\item To compile PIPS, in another terminal with a shell in the
+  \verb|PIPS_ROOT| directory, use a classical
+\begin{verbatim}
+make compile
+\end{verbatim}
+\end{itemize}
+It avoids changing around \texttt{NEWGEN\_ROOT} when recompiling PIPS with
+various versions of NewGen, Linear or even part of PISP (libraries in Libs...).
+
+Another way to achieve the same behaviour could be done with:
+\begin{itemize}
+\item In a terminal in a
+  \texttt{PIPS/git-svn-total/newgen/branches/gall/doom-branch} you run:
+\begin{verbatim}
+make compile
+\end{verbatim}
+  to compile the local version into the local directory.
+\item To compile PIPS, in another terminal with a shell in the
+  \texttt{PIPS\_ROOT} directory, instruct PIPS to look at the alternate
+  NewGen version with a:
+\begin{verbatim}
+make NEWGEN_ROOT=...PIPS/git-svn-total/newgen/branches/gall/doom-branch compile
+\end{verbatim}
+\end{itemize}
+
+You just need to keep track of what you are doing, especially when working
+with various versions and validating...
 
 
 \section{PIPS Project directories}
@@ -2385,7 +2446,45 @@ in a bottom-up fashion (postfix-order).
 
 
 
-\newpage
+\section{NewGen}
+\label{sec:newgen-1}
+
+NewGen is the tool used in PIPS to describe the objects which PIPS deals
+with. NewGen generate data structures and methods to relief the programmer
+from gory details in a portable way.
+
+There are many interesting features coming with NewGen:
+\begin{itemize}
+\item automatic generation of generic methods: constructors, destructors,
+  accessors, setters...
+\item language independence: since objects are described in a declarative
+  way, NewGen generators can generate methods for any language. Right now
+  there is support for C and Common Lisp but one can easily add generic
+  support through SWIG for example;
+\item add object oriented featured to non-object-oriented languages such
+  as C that is heavily used in PIPS;
+\item add automatic persistence to objects with a private or XML backend;
+\item add XML DOM and XPath support to the object to ease programming and
+  to help integration with other projects;
+\item add various library functions for common data type such as lists,
+  set, mappings, generic functions, strings, arrays...
+\end{itemize}
+
+
+\subsection{XML DOOM backend}
+\label{sec:xml-backend}
+
+The XML backend is called DOoM in NewGen because it implements many parts
+of the DOM (Document Object Model) in XML.
+
+XML support is included in NewGen if it is compiled with the
+\verb|USE_NEWGEN_DOOM| macro-constant defined. Then, the XML support is
+used if the \verb|NEWGEN_DOOM_WRITE_XML| environment variable is set to
+\texttt{1}.
+
+
+
+ \newpage
 \noindent
 {\huge MAY BE OBSOLETE DOWN FROM HERE\ldots}
 
