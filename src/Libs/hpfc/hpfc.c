@@ -640,57 +640,54 @@ bool hpfc_filter(string name)
  */
 static bool hpfc_directives_handler(string name, bool dyn)
 {
-    entity module = module_name_to_entity(name);
+  entity module = module_name_to_entity(name);
 
-    debug_on("HPFC_DEBUG_LEVEL");
-    pips_debug(1, "considering module %s\n", name);
-    debug_on("HPFC_DIRECTIVES_DEBUG_LEVEL");
+  debug_on("HPFC_DEBUG_LEVEL");
+  pips_debug(1, "considering module %s\n", name);
+  debug_on("HPFC_DIRECTIVES_DEBUG_LEVEL");
 
-    if (!hpfc_entity_reduction_p(module) &&
-	!hpf_directive_entity_p(module) &&
-	!fortran_library_entity_p(module))
-    {
-	statement s;
-	s = (statement) db_get_memory_resource(DBR_CODE, name, TRUE);
+  if (!hpfc_entity_reduction_p(module) &&
+      !hpf_directive_entity_p(module) &&
+      !fortran_library_entity_p(module))
+  {
+    statement s = (statement) db_get_memory_resource(DBR_CODE, name, true);
 
-	if (dyn)
-	    set_proper_rw_effects((statement_effects)
-		db_get_memory_resource(DBR_PROPER_EFFECTS, name, TRUE));
+    if (dyn)
+      set_proper_rw_effects((statement_effects)
+	  db_get_memory_resource(DBR_PROPER_EFFECTS, name, true));
 
-	set_current_module_entity(module);
-	set_current_module_statement(s);
-	load_hpfc_status();
-	make_update_common_map();
-	hpfc_init_run_time_entities();
+    set_current_module_entity(module);
+    set_current_module_statement(s);
+    load_hpfc_status();
+    make_update_common_map();
+    hpfc_init_run_time_entities();
 
-	if (!dyn) NormalizeCommonVariables(module, s);
-	handle_hpf_directives(s, dyn); /* do the job... */
+    if (!dyn) NormalizeCommonVariables(module, s);
+    handle_hpf_directives(s, dyn); // do the job...
 
-	free_update_common_map();
-	save_hpfc_status();
-	reset_current_module_statement();
-	reset_current_module_entity();
+    free_update_common_map();
+    save_hpfc_status();
+    reset_current_module_statement();
+    reset_current_module_entity();
 
-	if (dyn) reset_proper_rw_effects();
+    if (dyn) reset_proper_rw_effects();
 
-	DB_PUT_MEMORY_RESOURCE(DBR_CODE, name, s);
-    }
+    DB_PUT_MEMORY_RESOURCE(DBR_CODE, name, s);
+  }
 
-    debug_off();
-    debug_off();
-    return TRUE;
+  debug_off();
+  debug_off();
+  return true;
 }
 
 bool hpfc_static_directives(string name)
 {
-    hpfc_directives_handler(name, FALSE);
-    return TRUE;
+  return hpfc_directives_handler(name, false);
 }
 
 bool hpfc_dynamic_directives(string name)
 {
-    hpfc_directives_handler(name, TRUE);
-    return TRUE;
+  return hpfc_directives_handler(name, true);
 }
 
 
