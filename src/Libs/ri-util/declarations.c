@@ -1335,10 +1335,16 @@ void check_fortran_declaration_dependencies(list ldecl)
 	  ;
 	}
 	else if(dr>=r) {
-	  if(entity_scalar_p(dv))
-	    pips_user_warning("Fortran declaration order may be violated. Variable \"%s\" "
-			    "depends on variable \"%s\" but is declared first.\n",
-			    entity_user_name(v), entity_user_name(dv));
+	  if(entity_symbolic_p(dv))
+	    pips_user_warning("Fortran declaration order may be violated. "
+			      "Variable \"%s\" depends on parameter \"%s\""
+			      " but is, at least partly, declared first.\n",
+			      entity_user_name(v), entity_user_name(dv));
+	  else if(entity_scalar_p(dv))
+	    pips_user_warning("Fortran declaration order may be violated. "
+			      "Variable \"%s\" depends on variable \"%s\" "
+			      "but is, at least partly, declared first.\n",
+			      entity_user_name(v), entity_user_name(dv));
 	  else
 	    /* Should be a ParserError() when called from ProcessEntries()... */
 	    pips_user_error("Fortran declaration order violated. Variable \"%s\" "
