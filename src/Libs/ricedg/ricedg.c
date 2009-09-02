@@ -1997,6 +1997,7 @@ gcd_and_constant_dependence_test(
      */
     pc1 = reference_indices(r1);
     pc2 = reference_indices(r2);
+
     while (pc1 != NIL && pc2 != NIL)
     {
 	expression ex1, ex2;
@@ -2066,7 +2067,17 @@ gcd_and_constant_dependence_test(
 
 
     if (pc1 != NIL || pc2 != NIL) {
+      /* Part of preprocessor.h, unfortunately */
+      extern bool fortran_module_p(entity);
+      if(fortran_module_p(get_current_module_entity())) {
 	pips_internal_error("numbers of subscript expressions differ\n");
+      }
+      else {
+	/* C assumed */
+	pips_user_warning("dependence tested between two memory access paths"
+			  " of different lengths for variable \"%s\".\n",
+			  entity_user_name(reference_variable(r1)));
+      }
     }
 
     return(FALSE);
