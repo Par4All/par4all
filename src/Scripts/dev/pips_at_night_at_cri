@@ -40,6 +40,7 @@ target=~/PIPS
 test -f $target/pipsrc.sh && source $target/pipsrc.sh
 
 start=$(date)
+arch=$(uname -m)
 
 # use a copy of the 'pips_at_night' script:
 # the script may be removed by 'unbuild'
@@ -62,9 +63,10 @@ mv err.$$ $target/err
 end=$(date)
 
 {
+  echo "script=$0"
   echo "target=$target"
   echo "host=$(hostname)"
-  echo "arch=$PIPS_ARCH"
+  echo "arch=$PIPS_ARCH ($arch)"
   echo "out=$target/out"
   echo "err=$target/err"
   echo "email=$email"
@@ -78,4 +80,4 @@ end=$(date)
   echo "linear: $(svnversion -c $target/prod/linear)"
   echo "nlpmake: $(svnversion -c $target/prod/pips/makes)"
   echo "validation: $(svnversion -c $target/validation)"
-} | ${PIPS_MAIL:-Mail} -s "[pips] cri night job $result" $email
+} | ${PIPS_MAIL:-Mail} -s "[pips] $arch night job $result" $email

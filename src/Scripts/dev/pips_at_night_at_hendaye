@@ -26,20 +26,21 @@
 umask 0077
 
 expected='hendaye'
-hostname=$(hostname)
+host=$(hostname)
 
-[[ "$hostname" = "$expected" ]] || {
-  echo "script must run on '$expected', not '$hostname'" >&2
+[[ "$host" = "$expected" ]] || {
+  echo "script must run on '$expected', not '$host'" >&2
   exit 1
 }
 
-email=irigoin@cri.ensmp.fr
+email=pips-validation@cri.ensmp.fr
 target=/home/local/irigoin/NIGHTY
 
 # set environment...
 test -f $target/pipsrc.sh && source $target/pipsrc.sh
 
 start=$(date)
+arch=$(uname -m)
 
 # use a copy of the 'pips_at_night' script:
 # the script may be removed by 'unbuild'
@@ -47,7 +48,8 @@ pips_at_night=$target/pan
 cp $target/prod/pips/src/Scripts/dev/pips_at_night $pips_at_night
 chmod a+rx $pips_at_night
 
-$pips_at_night -t $target -m $email -u -b -v -T 1800 -av private "$@" > out.$$ 2> err.$$
+$pips_at_night -t $target -m $email -u -b -v -T 1800 -av private "$@" \
+    > out.$$ 2> err.$$
 status=$?
 
 if [ $status -ne 0 ] ; then
@@ -62,9 +64,10 @@ mv err.$$ $target/err
 end=$(date)
 
 {
+  echo "script=$0"
   echo "target=$target"
-  echo "host=$hostname"
-  echo "arch=$PIPS_ARCH"
+  echo "host=$host"
+  echo "arch=$PIPS_ARCH ($arch)"
   echo "out=$target/out"
   echo "err=$target/err"
   echo "email=$email"
@@ -79,4 +82,4 @@ end=$(date)
   echo "nlpmake: $(svnversion -c $target/prod/pips/makes)"
   echo "validation: $(svnversion -c $target/validation)"
   echo "private: $(svnversion -c $target/private)"
-} | ${PIPS_MAIL:-Mail} -s "[pips] hendaye night job $result" $email
+} | ${PIPS_MAIL:-Mail} -s "[pips] $arch night job $result" $email
