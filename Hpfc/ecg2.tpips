@@ -1,0 +1,15 @@
+setenv WSPACE ecg2
+setenv FILE $WSPACE.f
+delete $WSPACE
+create $WSPACE $FILE
+setproperty ABORT_ON_USER_LEVEL TRUE
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[%ALLFUNC]
+echo
+echo after hpfc static directives
+echo
+apply HPFC_STATIC_DIRECTIVES[ECG]
+display PRINTED_FILE[ECG]
+close
+delete $WSPACE
+quit
