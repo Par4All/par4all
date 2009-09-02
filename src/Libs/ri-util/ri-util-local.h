@@ -1571,7 +1571,69 @@ the variable is unsigned, signed or not */
 
 
 
-/* @} */
+/** @} */
+
+
+/** @defgroup phase_definition Functions used to define phases
+
+    It defines macros for simple transformation phases that use (at least)
+    the CODE of a module and write back a (possibly) new version of the
+    CODE.
+
+    @{
+*/
+
+
+/** Start a phase that use a module CODE
+
+ @param module_name is a string with the name of the module the phase is
+ applied to
+
+ @param debug_env_var is a string with the name of the environment variable used to get the debug level to use inside the phase
+
+ @return the statement of the module
+*/
+#define PIPS_PHASE_PRELUDE(module_name, debug_env_var)			\
+  /* Get the CODE resource of the module: */				\
+  (statement) db_get_memory_resource(DBR_CODE, module_name, TRUE);	\
+	      /* Define this module as the current one: */		\
+	      set_current_module_statement(module_statement);		\
+	      entity PIPS_PHASE_PRELUDE_mod = module_name_to_entity(module_name); \
+	      set_current_module_entity(PIPS_PHASE_PRELUDE_mod);	\
+	      								\
+	      /* The debug is now controled by this environment variable name: */ \
+	      debug_on(debug_env_var);					\
+	      pips_debug(1, "Entering...\n");				\
+	      pips_assert("Statement should be OK before...",		\
+			  statement_consistent_p(module_statement));
+
+
+/** End a transformation phase by putting back into PIPS the (possibly)
+    modified statement */
+#define PIPS_PHASE_POSTLUDE(new_module_statement)			\
+  pips_assert("Statement should be OK after...",			\
+	      statement_consistent_p(new_module_statement));		\
+  pips_debug(1, "done\n");						\
+  /* Exit current debug context */					\
+  debug_off();								\
+  									\
+  /* Reorder the module, because some statements have been replaced. */	\
+  module_reorder(new_module_statement);					\
+									\
+  /* Put the new CODE ressource into PIPS: */				\
+  DB_PUT_MEMORY_RESOURCE(DBR_CODE,					\
+			 get_current_module_name(),			\
+			 new_module_statement);				\
+									\
+  /* There is no longer a current module: */				\
+  reset_current_module_statement();					\
+  reset_current_module_entity();					\
+  									\
+  /* Assume it should have worked by returning TRUE... */		\
+  return TRUE;
+
+
+/** @} */
 
 
 /* that is all for ri-util-local.h
