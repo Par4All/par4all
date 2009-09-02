@@ -22,7 +22,7 @@
 #
 
 # if [ `uname -s -r` -eq "SunOS 5.8" ]
-# then	
+# then
 #   echo "SunOS 5.8"
 #   PIPS_TR=/usr/xpg4/bin/tr
 # else
@@ -35,9 +35,9 @@ pips_prgm=${pips_prgm:-.pipsprogram}
 
 unset OPT_PGM SOURCE_FILES SELECT_RULES OPT_MOD USING_RULE BUILD_RES
 
-check () 
-{ 
-  FOO=	
+check ()
+{
+  FOO=
   #foo $1
 }
 
@@ -50,10 +50,10 @@ foo ()
   echo MOD=$MOD
   echo USING_RULE=$USING_RULE
   echo BUILD_RES=$BUILD_RES
-  echo 
+  echo
 }
 
-usage () 
+usage ()
 {
   echo "Usage: Pips -q [-w wspace] [-f source_file[,source_file]...]"
   echo "                          [-s selected_rule[,selected_rule]...]"
@@ -62,7 +62,7 @@ usage ()
 }
 
 if [ $# -eq 0 ]
-then	
+then
   usage >&2
   exit 1
 fi
@@ -91,12 +91,25 @@ then
   exit 1
 fi
 
+################################################ SET OR CHECK PIPS ENVIRONMENT
 
-# Check environment
 if [ -z "$PIPS_ROOT" ]
 then
-  echo PIPS environment not set. >&2
+  bin=`dirname $0`
+  PIPS_ROOT=`dirname $bin`
+  export PIPS_ROOT
+fi
+
+if [ ! -d "$PIPS_ROOT" ]
+then
+  echo "no such directory: $PIPS_ROOT" >&2
   exit 1
+fi
+
+if [ ! "$PIPS_ARCH" ]
+then
+  PIPS_ARCH=`$PIPS_ROOT/makes/arch.sh`
+  export PIPS_ARCH
 fi
 
 # Get PGM
@@ -110,10 +123,10 @@ then
     exit 1
   else	PGM=$OPT_PGM
   fi
-else	
+else
   . ./$pips_prgm
   if [ "$OPT_PGM" ]
-  then	
+  then
     if [ "$OPT_PGM" != "$PGM" ]
     then
       MOD=""
@@ -122,7 +135,7 @@ else
   else
     echo Workspace $PGM \(default\)
     if [ -z "$OPT_MOD" ]
-    then 
+    then
       echo Module $MOD \(default\)
     fi
   fi
@@ -142,7 +155,7 @@ then
     echo $BAD_WORKSPACE \`$PGM\' >&2
     exit 1
   fi
-  
+
   # check that each source file is a readable file
   TMP_IFS=$IFS
   IFS=","
@@ -160,17 +173,17 @@ then
     fi
   done
 else
-  
+
   # check owner
   #  if [ -z "`find . -name $PGM.database -user \`logname\` -prune -print`" ]
   #
-  # gnu test would allow [ ! -O $PGM.database ] 
+  # gnu test would allow [ ! -O $PGM.database ]
   #
   if [ ! "`find $PGM.database -prune -user \`whoami\` -print`" ]
   then
     echo WARNING: You are working on workspace \`$PGM\', created by another user. >&2
   fi
-  
+
   if [ "$SOURCE_FILES" ]
   then
     echo Workspace $PGM already exists. Use \`Delete\' before creating a new one. >&2
@@ -182,7 +195,7 @@ check 10
 #
 # Manage aliases
 #
-rename () 
+rename ()
 {
   echo "$1" | sed -e " \
         s/^PPF$/ParallelPrinted_File/; \
@@ -231,11 +244,11 @@ rename ()
         s/^priv$/PRIVatize_module/; \
         s/^prv$/PRIVatizer/; \
 	s/^red$/REDuctions/; \
-        s/^hpfc$/HPFCompile/;" 
+        s/^hpfc$/HPFCompile/;"
 }
 
 
-uppercase () 
+uppercase ()
 {
   echo "$*" | tr '[a-z]' '[A-Z]'
 }
@@ -261,9 +274,9 @@ then
     RULE=`uppercase $RULE`
     if [ \( $RULE != "DISTRIBUTER" \) \
       -a \( $RULE != "PRIVATIZER" \) ]
-    then 
+    then
       SELECT_RULES="$SELECT_RULES -s $RULE"
-    else	
+    else
       echo $RULE canNOT be selected. >&2
       exit 1
     fi
@@ -279,7 +292,7 @@ then
     echo One module must be specified. >&2
     exit 1
   elif [ -f $PGM.database/modules ]
-  then	
+  then
     if test ! "`grep \"^$MOD\$\" $PGM.database/modules`"
     then
       echo Module $MOD does not exist in workspace $PGM >&2
@@ -309,7 +322,7 @@ check 60
 #
 # Call PIPS
 #
-error () 
+error ()
 {
   echo "Exit code for pips: $?; exiting Pips"
   exit 1;
