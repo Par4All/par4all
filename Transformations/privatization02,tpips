@@ -1,9 +1,0 @@
-delete privatization02
-create privatization02 privatization02.f
-apply PRIVATIZE_MODULE[PRIVATIZATION02]
-activate RICE_SEMANTICS_DEPENDENCE_GRAPH
-activate PRINT_PARALLELIZED77_CODE
-display PARALLELPRINTED_FILE[PRIVATIZATION02]
-close
-delete privatization02
-quit
