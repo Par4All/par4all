@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include <stdlib.h>
 
 const int N=10;
@@ -7,25 +6,19 @@ int **Matrix;
 char* filename;
 
 int main (void) {
-    int i,j;
-    FILE *fp ;
-    fp = fopen(filename,"r");
-    if (fp == NULL)
-    {
-      printf(" 2 open the file");
-      exit(1);
-    }
+  int i,j;
 
-    Matrix = (int **)malloc(N*sizeof(int *));
-    for ( i = 0; i< N; i++)
+  Matrix = (int **)malloc(N*sizeof(int *));
+  for ( i = 0; i< N; i++)
     {
-     	Matrix[i] = (int *)malloc(Z*sizeof(int));
-       	for ( j = 0; j < Z; j++)
+      Matrix[i] = (int *)malloc(Z*sizeof(int));
+      for ( j = 0; j < Z; j++)
         {
-         	fscanf(fp,"%d",&Matrix[i][j]);
+	  Matrix[i][j] = i * j;
+
         }
 
     }
-    return 0;
+  return 0;
 }
 
