@@ -65,12 +65,12 @@ static void clean_statement(statement s)
     {
 	list /* of renamings */  lr = load_renamings(s),
 	     /* of statements */ block = NIL;
-	
+
 	MAP(RENAMING, r,
 	{
 	    entity o = renaming_old(r);
 	    entity n = renaming_new(r);
-	    
+
 	    block = CONS(STATEMENT, generate_copy_loop_nest(o, n), block);
 	},
 	    lr);
@@ -82,13 +82,13 @@ static void clean_statement(statement s)
 	fix_sequence_statement_attributes(s);
     }
     else
-	instruction_call(i) =
-	    make_call(entity_intrinsic(CONTINUE_FUNCTION_NAME), NIL);
+      instruction_call(i) =
+	make_call(entity_intrinsic(CONTINUE_FUNCTION_NAME), NIL);
 }
 
 static void add_statement_to_clean(statement s)
 {
-    to_be_cleaned = CONS(STATEMENT, s, to_be_cleaned);
+  to_be_cleaned = CONS(STATEMENT, s, to_be_cleaned);
 }
 
 /* local primary dynamics
@@ -97,29 +97,29 @@ GENERIC_STATIC_STATUS(extern, the_dynamics, list, NIL, gen_free_list)
 
 void add_a_dynamic(entity c)
 {
-    the_dynamics_object = gen_once(c, the_dynamics_object);
+  the_dynamics_object = gen_once(c, the_dynamics_object);
 }
 
-/*  the local stack is used to retrieve the current statement while 
+/*  the local stack is used to retrieve the current statement while
  *  scanning the AST with gen_recurse.
  */
 DEFINE_LOCAL_STACK(current_stmt, statement)
 
 void hpfc_directives_error_handler()
 {
-    error_reset_current_stmt_stack();
+  error_reset_current_stmt_stack();
 }
 
 /* management of PROCESSORS and TEMPLATE directives.
  *
- * just changes the basic type to overloaded and 
+ * just changes the basic type to overloaded and
  * stores the entity as a processor or a template.
  */
 static void switch_basic_type_to_overloaded(entity e)
 {
-    basic b = entity_basic(e);
-    pips_assert("basic defined", b!=basic_undefined);
-    basic_tag(b)=is_basic_overloaded;
+  basic b = entity_basic(e);
+  pips_assert("basic defined", b!=basic_undefined);
+  basic_tag(b)=is_basic_overloaded;
 }
 
 static void new_processor(expression e)
@@ -151,17 +151,17 @@ static void new_dynamic(expression e)
 
 static void new_io_function(expression e)
 {
-    add_an_io_function(expression_to_entity(e)); 
+  add_an_io_function(expression_to_entity(e));
 }
 
 static void new_fake_function(expression e)
 {
-    add_a_fake_function(expression_to_entity(e)); 
+  add_a_fake_function(expression_to_entity(e));
 }
 
 static void new_pure_function(expression e)
 {
-    add_a_pure(expression_to_entity(e)); 
+  add_a_pure(expression_to_entity(e));
 }
 
 /* array is to be seen as a template. aligned to itself...
@@ -186,7 +186,7 @@ static void array_as_template(entity array)
  * retrieve the alignment from references array and template
  */
 /*  TRUE if the template dimension subscript is an alignment.
- *  FALSE if the dimension is replicated. 
+ *  FALSE if the dimension is replicated.
  */
 static bool
 alignment_p(list /* of expressions */ align_src,
@@ -228,10 +228,10 @@ alignment_p(list /* of expressions */ align_src,
 
 	    pips_user_assert("simple index",
 			     vect_size(v_src)==1 && var_of(v_src)!=TCST);
-	    
+
 	    *prate = vect_coeff(var_of(v_src), v);
 
-	    if (*prate!=0) 
+	    if (*prate!=0)
 	    {
 		*padim = array_dim;
 		return TRUE;   /* alignment ok */
@@ -248,7 +248,7 @@ alignment_p(list /* of expressions */ align_src,
 /*  builds an align from the alignee and template references.
  *  used by both align and realign management.
  */
-static align 
+static align
 extract_the_align(
     reference alignee,
     reference temp,
@@ -257,7 +257,7 @@ extract_the_align(
     list/* of alignments  */ aligns    = NIL,
 	/* of expressions */ align_src = reference_indices(alignee),
 	                     align_sub = reference_indices(temp);
-    entity template = reference_variable(temp), 
+    entity template = reference_variable(temp),
            array = reference_variable(alignee);
     int array_dim, template_dim, tndim, andim;
     Value rate, shift;
@@ -272,7 +272,7 @@ extract_the_align(
 
     tndim = NumberOfDimension(template);
     andim = NumberOfDimension(array);
-    
+
     /*  each array dimension is looked for a possible alignment
      */
 
@@ -287,9 +287,9 @@ extract_the_align(
 	{
 	    get_entity_dimensions(template, dim, &tlower, &unused);
 	    get_entity_dimensions(array, dim, &alower, &unused);
-	      
+
 	    aligns = CONS(ALIGNMENT,
-			  make_alignment(dim, dim, 
+			  make_alignment(dim, dim,
 					 int_to_expression(1),
 					 int_to_expression(-alower+tlower)),
 			  aligns);
@@ -306,7 +306,7 @@ extract_the_align(
 	{
 	    if (alignment_p(align_src, EXPRESSION(CAR(align_sub)),
 			    &array_dim, &rate, &shift))
-		aligns = CONS(ALIGNMENT, 
+		aligns = CONS(ALIGNMENT,
 			      make_alignment(array_dim,
 					     template_dim,
 					     Value_to_expression(rate),
@@ -350,7 +350,7 @@ static void initial_alignment(statement s)
 /* handle a simple (re)align directive.
  * store the mappings in internal data structures.
  */
-static void 
+static void
 one_align_directive(
     reference alignee,/* the array */
     reference temp,   /* the template */
@@ -360,7 +360,7 @@ one_align_directive(
     entity template = reference_variable(temp),
 	   array    = reference_variable(alignee);
     align a;
-    
+
     pips_debug(3, "%s %saligned with %s\n", entity_name(array),
 	       dynamic ? "re" : "", entity_name(template));
 
@@ -379,13 +379,13 @@ one_align_directive(
 
 	new_array = array_synonym_aligned_as(array, a);
 	propagate_synonym(current, array, new_array, TRUE);
-	update_renamings(current, 
+	update_renamings(current,
 			 CONS(RENAMING, make_renaming(array, new_array),
 			      load_renamings(current)));
     }
     else
     {
-	if (!array_distributed_p(array)) 
+	if (!array_distributed_p(array))
 	{
 	    set_array_as_distributed(array);
 	    store_hpf_alignment(array, a);
@@ -397,21 +397,20 @@ one_align_directive(
 	     */
 	    pips_assert("some alignment", bound_hpf_alignment_p(array));
 	}
-    }       
+    }
 }
 
 /* hack, the common indices of a free form align is stored in a BLOCK()
  */
-static bool 
-align_indices_p(entity f)
+static bool align_indices_p(entity f)
 {
     return same_string_p(entity_local_name(f), HPF_PREFIX BLOCK_SUFFIX);
 }
 
-/* handle a full (re)align directive. 
+/* handle a full (re)align directive.
  * just decompose into simple alignments...
  */
-static void 
+static void
 handle_align_and_realign_directive(entity f,
 				   list /* of expressions */ args,
 				   bool dynamic)
@@ -438,8 +437,8 @@ handle_align_and_realign_directive(entity f,
     }
 
     for(; args!=last; POP(args))
-	one_align_directive(expression_to_reference(EXPRESSION(CAR(args))), 
-			    template, lopt, dynamic);
+      one_align_directive(expression_to_reference(EXPRESSION(CAR(args))),
+			  template, lopt, dynamic);
 }
 
 /* one DISTRIBUTE directive management
@@ -688,7 +687,7 @@ HANDLER_PROTOTYPE(reduction)
     statement s;
 
     init_ctrl_graph_travel(current_stmt_head(), gen_true);
-    
+
     while(next_ctrl_graph_travel(&s))
     {
 	if (instruction_loop_p(statement_instruction(s)))
@@ -710,7 +709,7 @@ HANDLER_PROTOTYPE(reduction)
 }
 
 /* ??? I wait for the next statements in a particular order, what
- * should not be necessary. Means I should deal with independent 
+ * should not be necessary. Means I should deal with independent
  * directives on the PARSED_CODE rather than after the CONTROLIZED.
  */
 HANDLER_PROTOTYPE(independent)
@@ -720,15 +719,15 @@ HANDLER_PROTOTYPE(independent)
 
     pips_debug(2, "%d index(es)\n", gen_length(l));
 
-    /*  travels thru the full control graph to find the loops 
+    /*  travels thru the full control graph to find the loops
      *  and tag them as parallel.
      */
     init_ctrl_graph_travel(current_stmt_head(), gen_true);
-    
+
     while(next_ctrl_graph_travel(&s))
     {
 	instruction i = statement_instruction(s);
-	
+
 	if (instruction_loop_p(i))  /* what we're looking for */
 	{
 	    loop o = instruction_loop(i);
@@ -759,7 +758,7 @@ HANDLER_PROTOTYPE(independent)
 	    }
 	}
     }
-    
+
     close_ctrl_graph_travel();
     pips_user_error("some loop not found!\n");
 }
@@ -778,7 +777,7 @@ HANDLER_PROTOTYPE(dynamic)
     gen_map(new_dynamic, args); /* see new_dynamic */
 }
 
-/*   may be used to declare functions as pure. 
+/*   may be used to declare functions as pure.
  *   ??? it is not a directive in HPF, but I put it this way in F77.
  *   ??? pure declarations are not yet used by HPFC.
  */
@@ -852,7 +851,7 @@ HANDLER_PROTOTYPE(set)
 	expression arg1, arg2;
 	string property;
 	int val, i;
-	
+
 	pips_user_assert("two args", gen_length(args)==2);
 	arg1 = EXPRESSION(CAR(args));
 	arg2 = EXPRESSION(CAR(CDR(args)));
@@ -878,7 +877,7 @@ HANDLER_PROTOTYPE(set)
 
 	free(property);
     }
-    
+
     add_statement_to_clean(current_stmt_head());
 }
 
@@ -926,7 +925,7 @@ HANDLER_PROTOTYPE(nothing)
  * unexpected because they cannot appear after the chpf$...
  * Ok, they are not directives, but I put them here as if.
  */
-struct DirectiveHandler 
+struct DirectiveHandler
 {
   string name;                   /* all names must start with the HPF_PREFIX */
   int phase;                     /* which pass should consider the directive */
@@ -934,13 +933,13 @@ struct DirectiveHandler
 };
 
 static struct DirectiveHandler handlers[] =
-{ 
+{
     /* special functions for HPF keywords are not expected at this level
      */
     {HPF_PREFIX BLOCK_SUFFIX,		0,	HANDLER(unexpected), },
     {HPF_PREFIX CYCLIC_SUFFIX,		0,	HANDLER(unexpected) },
     {HPF_PREFIX STAR_SUFFIX,		0,	HANDLER(unexpected) },
-    
+
     /* FC (== Fabien Coelho:-) directives
      */
     {HPF_PREFIX SYNCHRO_SUFFIX,		1,	HANDLER(synchro) },
@@ -965,16 +964,15 @@ static struct DirectiveHandler handlers[] =
     {HPF_PREFIX REDISTRIBUTE_SUFFIX,	3,	HANDLER(redistribute) },
     {HPF_PREFIX INDEPENDENT_SUFFIX,	3,	HANDLER(independent) },
     {HPF_PREFIX NEW_SUFFIX,		3,	HANDLER(new) },
-    {HPF_PREFIX REDUCTION_SUFFIX,	3,	HANDLER(reduction) }, 
+    {HPF_PREFIX REDUCTION_SUFFIX,	3,	HANDLER(reduction) },
     {HPF_PREFIX DEAD_SUFFIX,		3,	HANDLER(kill) },
-    
-    /* remappings before/after a call. internal management. 
-     */
+
+    // remappings before/after a call. internal management.
+
     {HPF_PREFIX RENAME_SUFFIX,		3,	HANDLER(prescriptive) },
     {HPF_PREFIX TELL_SUFFIX,		1, 	HANDLER(nothing) },
-	 
-    /* default issues an error
-     */
+
+    // default issues an error
     {(string) NULL,			0,	HANDLER(unexpected) }
 };
 
@@ -985,7 +983,7 @@ static void (*directive_handler(string name))(entity, list)
 {
     struct DirectiveHandler *x=handlers;
     while (x->name && strcmp(name, x->name)) x++;
-    return (!x->phase || x->phase==analysis_phase)? 
+    return (!x->phase || x->phase==analysis_phase)?
 	x->handler: HANDLER(nothing);
 }
 
@@ -998,32 +996,29 @@ static bool directive_managed_now_p(string name)
  */
 static bool directive_filter(call c)
 {
-    entity f = call_function(c);
-    
-    /* DIRECTIVES 
-     */
-    if (hpf_directive_entity_p(f))
-    {
-	string name = entity_local_name(f);
-	pips_debug(8, "hpfc entity is %s\n", entity_name(f));
+  entity f = call_function(c);
 
-	/* call the appropriate handler for the directive.
-	 */
-	(directive_handler(name))(f, call_arguments(c));
-	
-	/* the current statement will have to be cleaned.
-	 */
-	if (directive_managed_now_p(name) && !keep_directive_in_code_p(name))
-	    add_statement_to_clean(current_stmt_head());
-    }
-    
-    return FALSE; /* no instructions within a call! */
+  // DIRECTIVES
+  if (hpf_directive_entity_p(f))
+  {
+    string name = entity_local_name(f);
+    pips_debug(8, "hpfc entity is %s\n", entity_name(f));
+
+    // call the appropriate handler for the directive.
+    (directive_handler(name))(f, call_arguments(c));
+
+    // the current statement will have to be cleaned.
+    if (directive_managed_now_p(name) && !keep_directive_in_code_p(name))
+      add_statement_to_clean(current_stmt_head());
+  }
+
+  return false; // no instructions within a call!
 }
 
 static bool prescription_filter(call c)
 {
     entity f = call_function(c);
-    
+
     if (hpfc_call_with_distributed_args_p(c))
     {
 	pips_debug(5, "distributed call to %s\n", entity_name(f));
@@ -1065,7 +1060,7 @@ void handle_hpf_directives(statement s, bool dyn)
     pips_debug(1, "starting phase 1\n");
     analysis_phase = 1;
     gen_multi_recurse(s,
-        statement_domain,  current_stmt_filter, current_stmt_rewrite, 
+        statement_domain,  current_stmt_filter, current_stmt_rewrite,
 	expression_domain, gen_false,           gen_null,
 	call_domain,       directive_filter,    gen_null,
 		      NULL);

@@ -649,29 +649,29 @@ static bool hpfc_directives_handler(string name, bool dyn)
 	s = (statement) db_get_memory_resource(DBR_CODE, name, TRUE);
 
 	if (dyn)
-	    set_proper_rw_effects((statement_effects) 
+	    set_proper_rw_effects((statement_effects)
 		db_get_memory_resource(DBR_PROPER_EFFECTS, name, TRUE));
 
 	set_current_module_entity(module);
 	set_current_module_statement(s);
 	load_hpfc_status();
-	make_update_common_map(); 
+	make_update_common_map();
 	hpfc_init_run_time_entities();
 
 	if (!dyn) NormalizeCommonVariables(module, s);
 	handle_hpf_directives(s, dyn); /* do the job... */
 
-	free_update_common_map(); 
+	free_update_common_map();
 	save_hpfc_status();
 	reset_current_module_statement();
 	reset_current_module_entity();
 
 	if (dyn) reset_proper_rw_effects();
-	
+
 	DB_PUT_MEMORY_RESOURCE(DBR_CODE, name, s);
     }
 
-    debug_off(); 
+    debug_off();
     debug_off();
     return TRUE;
 }
