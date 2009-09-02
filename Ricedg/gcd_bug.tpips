@@ -1,3 +1,10 @@
+# Variable Matrix appears with 0, 1 or 2 subscripts and this is not
+# dealt properly by the use-def chain computation nor by the dependence test 
+
+# This test case is pushing the envelop a lot for Amira, Beatrice and Francois
+
+# A ticket is open for this: 232
+
 delete gcd_bug
 
 setproperty ABORT_ON_USER_ERROR TRUE
@@ -25,18 +32,51 @@ setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
 #setproperty PRETTYPRINT_BLOCKS TRUE
 
 setproperty PRAGMA_TYPE "expr"
-apply PRIVATIZE_MODULE(%ALL)
+
+echo
+echo Privatize scalar variables
+echo
+
+apply PRIVATIZE_MODULE(%ALLFUNC)
+
+echo
+echo Privatize scalar variables
+echo
+
+display DG_FILE[main]
+
+echo
 echo // OMP style
+echo
+
 activate PRINT_PARALLELIZEDOMP_CODE
+display PARALLELPRINTED_FILE(%ALLFUNC)
+
+echo
+echo Internalize parallel code
+echo
+
 display PARALLELPRINTED_FILE(main)
 apply INTERNALIZE_PARALLEL_CODE(%ALLFUNC)
-apply OMPIFY_CODE(%ALL)
+
+echo
+echo Ompify code
+echo
+
+apply OMPIFY_CODE(%ALLFUNC)
 
 setproperty PRETTYPRINT_SEQUENTIAL_STYLE    "do"
+
 display PRINTED_FILE(main)
+
+echo
+echo Unsplit code
+echo
+
 apply UNSPLIT(%ALL)
+
+# Well, you should compile ith with openmp options...
 
 close
 #delete gcd_bug
 quit
-# EOF

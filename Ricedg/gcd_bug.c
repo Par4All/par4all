@@ -2,8 +2,9 @@
 
 const int N=10;
 const int Z=10;
+
 int **Matrix;
-char* filename;
+//char* filename;
 
 int main (void) {
   int i,j;
@@ -13,11 +14,9 @@ int main (void) {
     {
       Matrix[i] = (int *)malloc(Z*sizeof(int));
       for ( j = 0; j < Z; j++)
-        {
+	{
 	  Matrix[i][j] = i * j;
-
-        }
-
+	}
     }
   return 0;
 }
