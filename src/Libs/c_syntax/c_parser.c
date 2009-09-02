@@ -47,12 +47,12 @@
 
 extern bool prettyprint_is_fortran;
 
-string compilation_unit_name; 
+string compilation_unit_name;
 
-list CalledModules = NIL; 
+list CalledModules = NIL;
 
 statement ModuleStatement = statement_undefined;
-  
+
 stack ContextStack = stack_undefined;
 stack FunctionStack = stack_undefined;
 stack FormalStack = stack_undefined;
@@ -60,8 +60,8 @@ stack OffsetStack = stack_undefined;
 stack StructNameStack = stack_undefined;
 
 /* Global counter */
-int loop_counter = 1; 
-int derived_counter = 1; 
+int loop_counter = 1;
+int derived_counter = 1;
  
 // to store the mapping between the entity and its type stack
 
@@ -270,19 +270,20 @@ void CParserError(char *msg)
   debug_off();
 }
 
-static bool actual_c_parser(string module_name, 
-			    string dbr_file, 
+static bool actual_c_parser(string module_name,
+			    string dbr_file,
 			    bool is_compilation_unit_parser)
 {
     string dir = db_get_current_workspace_directory();
-    string file_name = 
-      strdup(concatenate(dir, "/", 
+    string file_name =
+      strdup(concatenate(dir, "/",
 		     db_get_file_resource(dbr_file,module_name,TRUE), NULL));
     entity built_in_va_list = entity_undefined;
     entity built_in_bool = entity_undefined;
     entity built_in_complex = entity_undefined;
     entity built_in_va_start = entity_undefined;
     entity built_in_va_end = entity_undefined;
+    entity built_in_va_copy = entity_undefined;
 
     free(dir);
 
@@ -294,9 +295,9 @@ static bool actual_c_parser(string module_name,
     else
       {
 	compilation_unit_name = compilation_unit_of_module(module_name);
-	keyword_typedef_table = 
+	keyword_typedef_table =
 	  (hash_table) db_get_memory_resource(DBR_DECLARATIONS,
-					      compilation_unit_name,TRUE); 
+					      compilation_unit_name,TRUE);
       }
 
     ContextStack = stack_make(c_parser_context_domain,0,0);
@@ -305,16 +306,15 @@ static bool actual_c_parser(string module_name,
     FormalStack = stack_make(basic_domain,0,0);
     OffsetStack = stack_make(basic_domain,0,0);
     StructNameStack = stack_make(code_domain,0,0);
-    
-    loop_counter = 1; 
+
+    loop_counter = 1;
     derived_counter = 1;
     CalledModules = NIL;
-    
+
     debug_on("C_SYNTAX_DEBUG_LEVEL");
     pips_debug(1,"Module name: %s\n", module_name);
     pips_debug(1,"Compilation unit name: %s\n", compilation_unit_name);
 
- 
     /* FI: not clean, but useful for debugging statement */
     ifdebug(1)
     {
@@ -322,7 +322,7 @@ static bool actual_c_parser(string module_name,
     }
 
     /* Predefined type(s): __builtin_va_list */
-    built_in_va_list = 
+    built_in_va_list =
       find_or_create_entity(strdup(concatenate(compilation_unit_name,
 					       MODULE_SEP_STRING,
 					       TYPEDEF_PREFIX,
@@ -331,14 +331,14 @@ static bool actual_c_parser(string module_name,
     if(storage_undefined_p(entity_storage(built_in_va_list))) {
       entity_storage(built_in_va_list) = make_storage_rom();
       /* Let's lie about the real type */
-      entity_type(built_in_va_list) = 
+      entity_type(built_in_va_list) =
 	make_type(is_type_variable,
 		  make_variable(make_basic_int(DEFAULT_INTEGER_TYPE_SIZE),
-				NIL, 
+				NIL,
 				NIL));
       entity_initial(built_in_va_list) = make_value_unknown();
     }
-    built_in_bool = 
+    built_in_bool =
       find_or_create_entity(strdup(concatenate(compilation_unit_name,
 					       MODULE_SEP_STRING,
 					       TYPEDEF_PREFIX,
@@ -352,7 +352,7 @@ static bool actual_c_parser(string module_name,
 				NIL, NIL));
       entity_initial(built_in_bool) = make_value_unknown();
     }
-    built_in_complex = 
+    built_in_complex =
       find_or_create_entity(strdup(concatenate(compilation_unit_name,
 					       MODULE_SEP_STRING,
 					       TYPEDEF_PREFIX,
@@ -367,18 +367,18 @@ static bool actual_c_parser(string module_name,
       entity_initial(built_in_complex) = make_value_unknown();
     }
 
-    /* Predefined functions(s): __builtin_va_end (va_arg() is parser directly) */
-    built_in_va_start = 
+    /* Predefined functions(s): __builtin_va_end (va_arg() is parsed directly) */
+    built_in_va_start =
       find_or_create_entity(strdup(concatenate(compilation_unit_name,
 					       MODULE_SEP_STRING,
 					       BUILTIN_VA_START,
 					       NULL)));
     if(storage_undefined_p(entity_storage(built_in_va_start))) {
       basic va_list_b = make_basic(is_basic_typedef, built_in_va_list);
-      type va_list_t = 
+      type va_list_t =
 	make_type(is_type_variable, make_variable(va_list_b, NIL, NIL));
       basic void_star_b = make_basic(is_basic_pointer, make_type_void());
-      type void_start_t = 
+      type void_start_t =
 	make_type(is_type_variable, make_variable(void_star_b, NIL, NIL));
       entity_storage(built_in_va_start) = make_storage_rom();
       /* Let's lie about the real type... */
@@ -386,7 +386,7 @@ static bool actual_c_parser(string module_name,
 	make_type(is_type_functional,
 		  make_functional(CONS(PARAMETER,
 				       make_parameter(va_list_t,
-						      make_mode(is_mode_value, 
+						      make_mode(is_mode_value,
 								UU),
 						      make_dummy_unknown()),
 				       CONS(PARAMETER,
@@ -404,7 +404,7 @@ static bool actual_c_parser(string module_name,
 							    NULL)));
     if(storage_undefined_p(entity_storage(built_in_va_end))) {
       basic va_list_b = make_basic(is_basic_typedef, built_in_va_list);
-      type va_list_t = 
+      type va_list_t =
 	make_type(is_type_variable, make_variable(va_list_b, NIL, NIL));
       entity_storage(built_in_va_end) = make_storage_rom();
       /* Let's lie about the real type */
@@ -419,12 +419,36 @@ static bool actual_c_parser(string module_name,
       entity_initial(built_in_va_end) = make_value_intrinsic();
     }
 
+    built_in_va_copy = find_or_create_entity(strdup(concatenate(compilation_unit_name,
+							    MODULE_SEP_STRING,
+							    BUILTIN_VA_COPY,
+							    NULL)));
+    if(storage_undefined_p(entity_storage(built_in_va_copy))) {
+      basic va_list_b = make_basic(is_basic_typedef, built_in_va_list);
+      type va_list_t =
+	make_type(is_type_variable, make_variable(va_list_b, NIL, NIL));
+      parameter va_list_p = make_parameter(va_list_t,
+					   make_mode_value(),
+					   make_dummy_unknown());
+      entity_storage(built_in_va_copy) = make_storage_rom();
+      /* Let's lie about the real type */
+      entity_type(built_in_va_copy) =
+	make_type(is_type_functional,
+		  make_functional(CONS(PARAMETER,
+				       va_list_p,
+				       CONS(PARAMETER,
+					    copy_parameter(va_list_p),
+					    NIL)),
+				  make_type(is_type_void,UU)));
+      entity_initial(built_in_va_copy) = make_value_intrinsic();
+    }
+
     if (compilation_unit_p(module_name))
       {
 	/* Special case, set the compilation unit as the current module */
 	MakeCurrentCompilationUnitEntity(module_name);
 	/* I do not know to put this where to avoid repeated creations*/
-	MakeTopLevelEntity(); 
+	MakeTopLevelEntity();
       }
 
     /* discard_C_comment(); */
@@ -436,7 +460,7 @@ static bool actual_c_parser(string module_name,
 
     init_entity_type_storage_table();
     c_parse();
-        
+
     safe_fclose(c_in, file_name);
 
     pips_assert("Module statement is consistent",statement_consistent_p(ModuleStatement));
@@ -463,17 +487,17 @@ static bool actual_c_parser(string module_name,
 	{
 	  printf("\t%s\n",s);
 	},CalledModules);
-      }  
-       
+      }
+
     if (compilation_unit_p(module_name))
       {
-	ResetCurrentCompilationUnitEntity(is_compilation_unit_parser);	
+	ResetCurrentCompilationUnitEntity(is_compilation_unit_parser);
       }
-  
+
     if (is_compilation_unit_parser)
       {
 	/* Beware : the rule in pipsmake-rc.tex for compilation_unit_parser
-	   does not include the production of parsed_code and callees. 
+	   does not include the production of parsed_code and callees.
 	   This is not very clean, and is done to work around the way pipsmake
 	   handles compilation units and modules. 
 	   There was no simple solution... BC. 

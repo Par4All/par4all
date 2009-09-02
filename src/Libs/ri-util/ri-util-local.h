@@ -551,9 +551,11 @@
 
 #define MOD_INTRINSIC_NAME              "MOD"
 
-/* vararg stuff */
+/* vararg stuff. va_args is a special construct because its second
+   parameter is a type, not an expression. */
 #define BUILTIN_VA_END                  "__builtin_va_end"
 #define BUILTIN_VA_START                "__builtin_va_start"
+#define BUILTIN_VA_COPY                "__builtin_va_copy"
 
 /* #include <ctype.h> */
 
