@@ -45,7 +45,7 @@ extern.libs	= polylib
 # prgm_mapping scheduling reindexing array_dfg paf-util static_controlize pip
 
 pipslibs.libs	= \
-	top-level pipsmake wp65 hpfc hyperplane \
+	top-level pipsmake wp65 hpfc hyperplane to_begin_with \
 	instrumentation statistics expressions transformations hwac \
 	movements bootstrap callgraph icfg chains complexity \
 	conversion prettyprint atomizer syntax c_syntax \
