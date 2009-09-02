@@ -296,7 +296,6 @@ function validate_file()
   # fix path to help more or less relative validation?
   export PIPS_VALIDDIR=$vdir # re-export...
   export PIPS_SRCPATH=$dir # set path for tpips?
-  export VDIR=$dir # set path for validation
 
   # updir='/some/path/to'
   local updir=${dir%/*}
