@@ -41,8 +41,6 @@
  
 #define PROPERTIES_RC "properties.rc"
  
-#define MODEL_RC "model.rc"
- 
 /* filename extensions
  */
 #define SEQUENTIAL_CODE_EXT ".code"
