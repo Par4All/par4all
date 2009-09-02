@@ -1,0 +1,14 @@
+
+Source code
+
+      PROGRAM MULLER06
+      INTEGER*4 N
+      PARAMETER (N = 1)
+      CHARACTER*3 HEAD(1:N)
+      COMMON /CONSTN/ HEAD
+
+      END
+
+Warnings
+
+PRINT_CODE[MULLER06] (check_fortran_declaration_dependencies) Fortran declaration order may be violated. Variable "HEAD" depends on parameter "N" but is, at least partly, declared first.
