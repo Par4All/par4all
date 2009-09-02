@@ -1,4 +1,4 @@
-#! /bin/bash
+#!/bin/bash
 #
 # $Id$
 #
@@ -28,7 +28,6 @@ rev=${rev/*: /}
 rev=${rev/ */}
 
 # To be sure that extended globing is available:
-
 shopt -s extglob
 
 # find pips root (to find scripts arch.sh & version.sh), see pips.sh
@@ -68,7 +67,7 @@ fi
 vdir=${PIPS_VALIDDIR:-$root/../../validation}
 
 # default running directory
-rdir=.
+rdir=$PWD
 recurse=
 
 # get default architecture and tpips/pips
@@ -200,6 +199,7 @@ type timeout > /dev/null 2>&1 || timeout=''
 
 # result directory
 [[ $odir ]] || odir=$rdir/validation_results.$$
+[[ $odir != /* ]] && odir=$PWD/$odir
 [[ -d $odir ]] && usage 5 "output directory already exists: $odir"
 mkdir $odir || usage 6 "error on mkdir $odir"
 
@@ -289,6 +289,9 @@ function validate_file()
   # dir='/some/path/to/directory'
   local dir=${full_name%/*}
   [[ -d $dir ]] || usage 13 "no such 'dir' directory: $dir"
+
+  # go to this directory
+  pushd $dir > /dev/null || usage 13 "cannot cd to $dir"
 
   # fix path to help more or less relative validation?
   export PIPS_VALIDDIR=$vdir # re-export...
@@ -432,6 +435,7 @@ function validate_file()
       echo "failed: $rel_file" >> $summary
   fi
 
+  popd > /dev/null
   return $status
 }
 
