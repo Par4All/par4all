@@ -79,7 +79,7 @@ function report()
       test -f err && {
         echo
         echo err:
-        tail -10 err
+        tail -15 err
       }
 
       test -f out && {
