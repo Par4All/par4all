@@ -1391,7 +1391,7 @@ Three validation scripts are available:
   directories.  See \texttt{pips\_validate -h} for help and a list of
   options.
 
-  Tests are organized more or less on a library basis in \texttt{valid}.
+  Tests are organized more or less on a library basis in \texttt{validation}.
   Non-regression tests are characterized by one or more source
   programs which must have a known result.
 
@@ -1404,11 +1404,8 @@ Three validation scripts are available:
   These validation scripts \textbf{must not} rely on absolute path,
   otherwise moving the validation around is impossible.
   %%
-  If you really need to rely on the directory containing the scripts, use
-  the \texttt{\$VDIR} environment variable that is initialized by the
-  validation infrastructure, or better \texttt{\$\{VDIR:-.\}} to default
-  to the current directory to test your scripts outside of the validation
-  infrastructure.
+  As the tests are run in the validation directory which contains the
+  source, relative paths always work.
 
   The scripts looks for validation scripts in the following order:
   \begin{enumerate}
@@ -1416,8 +1413,7 @@ Three validation scripts are available:
     executes it. If th file is not \textbf{executable}, this validation
     test is marked as \textbf{failed};
 
-  \item a \texttt{.tpips} file which is executed as a
-    tpips script;
+  \item a \texttt{.tpips} file which is executed as a tpips script;
 
   \item a corresponding \texttt{.tpips2} file which is executed as a
     tpips script, with the error stream redirect;
@@ -1453,7 +1449,7 @@ Three validation scripts are available:
   test is to be applied. As a second choice, the \texttt{.tpips} script is
   encouraged. It is very important not to validate \texttt{stderr} output
   and pips with some level of debugging on, because these outputs are not
-  very stable from one architecture to another.  
+  very stable from one architecture to another.
 
   This script is also used by the various nightly validations such as
   \verb|pips_at_night|.
