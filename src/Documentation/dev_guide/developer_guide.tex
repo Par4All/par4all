@@ -1488,6 +1488,99 @@ PIPS_GRAPHICAL_DIFF=pips_emacs_diff pips_manual_accept --new
   A filter has to be a shell script getting an input file as its first
   parameter and printing the filtered file to the standard output.
 
+\subsubsection{Writing test cases and their validation scripts}
+\label{sec:writing-a-validation-script}
+
+Several issues have been encountered in the past with validation
+scripts.
+
+First of all, validation scripts and related test cases are defined by
+the developper, not by the maintainer. The developper knows what the
+test case is about, and he/she fails to document the goal either in
+the source code or in the script.. because he/she is in a
+hurry. Sometimes, the name of the test case can help the maintenance,
+but this is largely untrue for large librairies like
+\verb/Transformations/. So, please, comment the goals of your test
+cases.
+
+Secondly, most test cases are not supposed to contain user errors. So,
+please, set the property \verb/PIPS_ABORT_ON_USER_ERROR/ to TRUE.
+
+Thirdly, should test cases be restricted to test the output of the
+corresponding library or should they also test the outcome of the
+local results on other libraries? It is tempting to be strict and to
+select the first option, but, most of the time, some of the internal
+output will not appear in a text form after some prettyprinting. The
+consequences are only visible in the output of a later phase or
+transformation. So it is allowed to use any output in any of the
+library validation suites. For instance, the validation of a parser is
+not restricted to the display of \verb/PARSED_CODE/.
+
+As a consequence, multiple outputs may be combined in the resulting
+\verb/test/ file. In case of regression bug, it is necessary to know
+what the components of the \verb/test/ file are. So, please, use
+\verb/echo/ liberally in your validation scripts to comment the
+output. This way, the maintainer will spot quickly which phase fails
+or generates a different output.
+
+Fourthly, in the same way, when a transformation or an analysis is
+built on top of other transformations and/or analyses, it is useful to
+keep track of the intermediary results, each of them being duly
+commented. The origin of a change can be located much faster that way.
+
+Fifthly, to ensure portability, do not create dependences on
+\verb|/usr/include| as it varies from compiler and system version to
+version. If header files are necessary and if the must show in the
+output, please use a preprocessed version of your source code as input
+code. It can easily be retrived from he database in directory
+\verb/Tmp/. Use \verb/%ALLFUNC/ rather than \verb/%FUNC/.
+
+Finally, the input source code and the output source code should be
+compiled and executed whenever it is possible. Care must be taken to
+use only files in the database, i.e. compile the input after the
+\verb/create/ command. Use \verb/unsplit/ to produce the output source
+and compile it in directory \verb/Src/. Do not forget to remove the
+executable and the object files.
+
+PIPS is developped to handle legal source code only. It must
+nevertheless detect all kinds of errors and issue warnings. To
+validate PIPS behavior when errors occur is tricky because errors are
+printed out on \verb/stderr/ together with system and version and time
+dependent information. Probably, an error log file should be used
+instead, but this is not implemented yet. Meanwhile, use the suffix
+\verb/.test/ to keep all PIPS output for the non-regression test. The
+case with warnings is easier because PIPS provides a \verb/Warnings/
+file in the database. Do not forget to close the database and to
+explain what you are doing before you display this file.
+
+Some test cases may become obsolete, but we do not have resources to
+maintain them properly.
+
+Test cases can be factorized using \verb/default_tpips/ and/or
+\verb/default_test/, but the same rules should be applied. Of course,
+it is less flexible to show information about a specific function
+among hundreds.
+
+Scripting used to be shell based wen PIPS was started. It is now
+mostly \verb/tpips/ based. Such scripts should end with a close, a
+delete of the current workspace\footnote{}, and a quit.
+
+When multiple source files are used, it is better to keep them in a
+subdirectory. The maintenance of the validation library is easier and
+the output of the validation process is not clobbered with information
+about skipped files.
+
+Scripts can sometimes look stupid because a \verb/quit/ appears in the
+middle. Do not forget that they are used to track bug and that
+additional information may be useful. For the same reason, the
+\verb/delete/ are often commented out. The cleaning is then performed
+by the higher-level validation process.
+
+With the wide availability of multicore chips, the validation process
+could be parallelized. This implies that scripts remains as
+independent as possible of each other. They shoud not use file names
+such as \verb/a.out/.
+
 \section{Debugging: NewGen, macros, debug levels,...}
 \label{sec:newgen}
 
