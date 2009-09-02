@@ -522,7 +522,12 @@ bool hpfc_init(string name)
     set_bool_property("PRETTYPRINT_HPFC", TRUE); /* vars local to commons */
     set_bool_property("HPFC_FILTER_CALLEES", TRUE); /* drop hpfc specials */
     set_bool_property("GLOBAL_EFFECTS_TRANSLATION", FALSE);
-    set_bool_property("WARNING_ON_STAT_ERROR", FALSE); /* for my fake files */
+    set_bool_property("WARNING_ON_STAT_ERROR", FALSE); // for fake files
+
+    // should not be there. if true, obscure coredump in proper
+    // effects on a preference which has been cleanup up...
+    // see validation/Hpfc/io_4.tpips that triggers the issue
+    set_bool_property("PRETTYPRINT_IO_EFFECTS", FALSE); // ??????
 
     /* too verbose... */
     set_bool_property("UNSPAGHETTIFY_DISPLAY_STATISTICS", FALSE);
