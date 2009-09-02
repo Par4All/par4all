@@ -1627,6 +1627,28 @@ FUSE_CONTROL_NODES_WITH_COMMENTS_OR_LABEL FALSE
 \end{PipsProp}
 
 
+\chapter{Pedagogical phases}
+\label{cha:pedagogical-phases}
+
+Although this phases should be spread elsewhere in this manual, we have
+put some pedagogical phases useful to jump into PIPS first.
+
+
+\section{Using XML backend}
+\label{sec:using-xml-backend}
+
+A phase that displays, in debug mode, statements matching an XPath
+expression on the internal representation:
+
+\begin{PipsMake}
+alias simple_xpath_test 'Output debug information about XPath matching'
+
+simple_xpath_test > MODULE.code
+  < PROGRAM.entities
+  < MODULE.code
+\end{PipsMake}
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% ANALYSES
 
 \chapter{Analyses}
@@ -6369,7 +6391,7 @@ this transformation that transforms a
 do {
   body;
 } while (cond);
-\end{listing}
+\end{lstlisting}
 into a
 \begin{lstlisting}
 {
