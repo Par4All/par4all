@@ -37,7 +37,7 @@ echo
 apply UNSPLIT
 shell gcc array_to_pointer01.c -o array_to_pointer
 shell gcc array_to_pointer03.database/Src/array_to_pointer01.c  -o array_to_pointer03.database/Src/array_to_pointer
-shell if test `array_to_pointer03.database/Src/array_to_pointer` = `array_to_pointer`; then echo "ok"; else echo "ko" ; fi
+shell if test `array_to_pointer03.database/Src/array_to_pointer` = `./array_to_pointer`; then echo "ok"; else echo "ko" ; fi
 shell rm -rf array_to_pointer03.database/Src/array_to_pointer array_to_pointer
 
 close
