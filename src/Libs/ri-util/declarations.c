@@ -215,13 +215,13 @@ words_declaration(
 	if (prettyprint_common_variable_dimensions_p || 
 	    !(variable_in_common_p(e) || variable_static_p(e)))
 	{
-	    if (variable_dimensions(type_variable(entity_type(e))) != NIL) 
+	    if (variable_dimensions(type_variable(entity_type(e))) != NIL)
 	    {
 		list dims = variable_dimensions(type_variable(entity_type(e)));
-	
+
 		if (prettyprint_is_fortran)
 		  {
-		    pl = CHAIN_SWORD(pl, "(");		    
+		    pl = CHAIN_SWORD(pl, "(");
 		    MAPL(pd, 
 		    {
 		      pl = gen_nconc(pl, words_dimension(DIMENSION(CAR(pd))));
@@ -248,168 +248,175 @@ words_declaration(
 /* what about simple DOUBLE PRECISION, REAL, INTEGER... */
 list words_basic(basic obj)
 {
-    list pc = NIL;
+  list pc = NIL;
+
+  if(basic_undefined_p(obj)) {
+    /* This may happen in debugging statements */
+    pc = CHAIN_SWORD(pc,"undefined");
+  }
+  else {
     /* 31/07/2003 Nga Nguyen : add more cases for C*/
     switch (basic_tag(obj)) {
-      case is_basic_int:
-	{
-	  if (prettyprint_is_fortran)
-	    {
-	      pc = CHAIN_SWORD(pc,"INTEGER*");
-	      pc = CHAIN_IWORD(pc,basic_int(obj));
-	    }
-	  else
-	    {
-	      switch (basic_int(obj)) {
-		case 1: pc = CHAIN_SWORD(pc,"char");
-		  break;
-		case 2: pc = CHAIN_SWORD(pc,"short");
-		  break;
-		case 4: pc = CHAIN_SWORD(pc,"int");
-		  break;
-		case 6: pc = CHAIN_SWORD(pc,"long");
-		  break;
-		case 8: pc = CHAIN_SWORD(pc,"long long");
-		  break;
-		case 11: pc = CHAIN_SWORD(pc,"unsigned char");
-		  break;
-		case 12: pc = CHAIN_SWORD(pc,"unsigned short");
-		  break;
-		case 14: pc = CHAIN_SWORD(pc,"unsigned int");
-		  break;
-		case 16: pc = CHAIN_SWORD(pc,"unsigned long");
-		  break;
-		case 18: pc = CHAIN_SWORD(pc,"unsigned long long");
-		  break;
-		case 21: pc = CHAIN_SWORD(pc,"signed char");
-		  break;
-		case 22: pc = CHAIN_SWORD(pc,"signed short");
-		  break;
-		case 24: pc = CHAIN_SWORD(pc,"signed int");
-		  break;
-		case 26: pc = CHAIN_SWORD(pc,"signed long");
-		  break;
-		case 28: pc = CHAIN_SWORD(pc,"signed long long");
-		  break;
-		}
-	    }
-	  break;
-	}
-      case is_basic_float:
-	{
-	  if (prettyprint_is_fortran)
-	    {
-	      pc = CHAIN_SWORD(pc,"REAL*");
-	      pc = CHAIN_IWORD(pc,basic_float(obj));
-	    }
-	  else
-	    {
-	      switch (basic_float(obj)) {
-		case 4: pc = CHAIN_SWORD(pc,"float");
-		  break;
-		case 8: pc = CHAIN_SWORD(pc,"double");
-		  break;
-		}
-	    }
-	  break;
-	}
-      case is_basic_logical:
-	{
-	   if (prettyprint_is_fortran)
-	     {
-	       pc = CHAIN_SWORD(pc,"LOGICAL*");
-	       pc = CHAIN_IWORD(pc,basic_logical(obj));
-	     }
-	   else
-	     pc = CHAIN_SWORD(pc,"int"); /* FI: Use stdbool.h instead? */
-	   break;
-	}
-      case is_basic_overloaded:
-	{
-	  /* should be a user error ? */
-	  pc = CHAIN_SWORD(pc,prettyprint_is_fortran?"OVERLOADED":"overloaded");
-	  break;
-	}
-      case is_basic_complex:
-	{
-	  if(prettyprint_is_fortran) {
-	    pc = CHAIN_SWORD(pc,"COMPLEX*");
-	    pc = CHAIN_IWORD(pc,basic_complex(obj));
+    case is_basic_int:
+      {
+	if (prettyprint_is_fortran)
+	  {
+	    pc = CHAIN_SWORD(pc,"INTEGER*");
+	    pc = CHAIN_IWORD(pc,basic_int(obj));
 	  }
-	  else
-	    {
-	      switch (basic_complex(obj)) {
-		case 8: pc = CHAIN_SWORD(pc,"_Complex");
-		  break;
-		case 9: pc = CHAIN_SWORD(pc,"float _Complex");
-		  break;
-		case 16: pc = CHAIN_SWORD(pc,"double _Complex");
-		  break;
-		case 32: pc = CHAIN_SWORD(pc,"long double _Complex");
-		  break;
-	      default:
-		pips_internal_error("Unexpected complex size");
-		}
+	else
+	  {
+	    switch (basic_int(obj)) {
+	    case 1: pc = CHAIN_SWORD(pc,"char");
+	      break;
+	    case 2: pc = CHAIN_SWORD(pc,"short");
+	      break;
+	    case 4: pc = CHAIN_SWORD(pc,"int");
+	      break;
+	    case 6: pc = CHAIN_SWORD(pc,"long");
+	      break;
+	    case 8: pc = CHAIN_SWORD(pc,"long long");
+	      break;
+	    case 11: pc = CHAIN_SWORD(pc,"unsigned char");
+	      break;
+	    case 12: pc = CHAIN_SWORD(pc,"unsigned short");
+	      break;
+	    case 14: pc = CHAIN_SWORD(pc,"unsigned int");
+	      break;
+	    case 16: pc = CHAIN_SWORD(pc,"unsigned long");
+	      break;
+	    case 18: pc = CHAIN_SWORD(pc,"unsigned long long");
+	      break;
+	    case 21: pc = CHAIN_SWORD(pc,"signed char");
+	      break;
+	    case 22: pc = CHAIN_SWORD(pc,"signed short");
+	      break;
+	    case 24: pc = CHAIN_SWORD(pc,"signed int");
+	      break;
+	    case 26: pc = CHAIN_SWORD(pc,"signed long");
+	      break;
+	    case 28: pc = CHAIN_SWORD(pc,"signed long long");
+	      break;
 	    }
-	  break;
-	}
-      case is_basic_string:
-	{
-	  if (prettyprint_is_fortran)
-	    {
-	      pc = CHAIN_SWORD(pc,"CHARACTER*");
-	      pc = gen_nconc(pc, words_value(basic_string(obj)));
+	  }
+	break;
+      }
+    case is_basic_float:
+      {
+	if (prettyprint_is_fortran)
+	  {
+	    pc = CHAIN_SWORD(pc,"REAL*");
+	    pc = CHAIN_IWORD(pc,basic_float(obj));
+	  }
+	else
+	  {
+	    switch (basic_float(obj)) {
+	    case 4: pc = CHAIN_SWORD(pc,"float");
+	      break;
+	    case 8: pc = CHAIN_SWORD(pc,"double");
+	      break;
 	    }
-	  else
-	    pc = CHAIN_SWORD(pc,"char");
-	  break;
+	  }
+	break;
+      }
+    case is_basic_logical:
+      {
+	if (prettyprint_is_fortran)
+	  {
+	    pc = CHAIN_SWORD(pc,"LOGICAL*");
+	    pc = CHAIN_IWORD(pc,basic_logical(obj));
+	  }
+	else
+	  pc = CHAIN_SWORD(pc,"int"); /* FI: Use stdbool.h instead? */
+	break;
+      }
+    case is_basic_overloaded:
+      {
+	/* should be a user error ? */
+	pc = CHAIN_SWORD(pc,prettyprint_is_fortran?"OVERLOADED":"overloaded");
+	break;
+      }
+    case is_basic_complex:
+      {
+	if(prettyprint_is_fortran) {
+	  pc = CHAIN_SWORD(pc,"COMPLEX*");
+	  pc = CHAIN_IWORD(pc,basic_complex(obj));
 	}
-      case is_basic_bit:
-	{
-	  symbolic bs = basic_bit(obj);
-	  int i = constant_int(symbolic_constant(bs));
-	  pips_debug(7,"Bit field basic: %d\n",i);
-	  pc = CHAIN_SWORD(pc,"int"); /* ignore if it is signed or unsigned */
-	  break;
-	}
-	/* The following code maybe redundant, because of tests in c_words_entity*/
-      case is_basic_pointer:
-	{
-	  type t = basic_pointer(obj);
-	  pips_debug(7,"Basic pointer\n");
-	  pc = gen_nconc(pc,words_type(t));
-	  pc = CHAIN_SWORD(pc," *");
-	  break;
-	}
-      case is_basic_derived:
-	{
-	  entity ent = basic_derived(obj);
-	  string name = entity_user_name(ent);
-	  type t = entity_type(ent);
+	else
+	  {
+	    switch (basic_complex(obj)) {
+	    case 8: pc = CHAIN_SWORD(pc,"_Complex");
+	      break;
+	    case 9: pc = CHAIN_SWORD(pc,"float _Complex");
+	      break;
+	    case 16: pc = CHAIN_SWORD(pc,"double _Complex");
+	      break;
+	    case 32: pc = CHAIN_SWORD(pc,"long double _Complex");
+	      break;
+	    default:
+	      pips_internal_error("Unexpected complex size");
+	    }
+	  }
+	break;
+      }
+    case is_basic_string:
+      {
+	if (prettyprint_is_fortran)
+	  {
+	    pc = CHAIN_SWORD(pc,"CHARACTER*");
+	    pc = gen_nconc(pc, words_value(basic_string(obj)));
+	  }
+	else
+	  pc = CHAIN_SWORD(pc,"char");
+	break;
+      }
+    case is_basic_bit:
+      {
+	symbolic bs = basic_bit(obj);
+	int i = constant_int(symbolic_constant(bs));
+	pips_debug(7,"Bit field basic: %d\n",i);
+	pc = CHAIN_SWORD(pc,"int"); /* ignore if it is signed or unsigned */
+	break;
+      }
+      /* The following code maybe redundant, because of tests in c_words_entity*/
+    case is_basic_pointer:
+      {
+	type t = basic_pointer(obj);
+	pips_debug(7,"Basic pointer\n");
+	pc = gen_nconc(pc,words_type(t));
+	pc = CHAIN_SWORD(pc," *");
+	break;
+      }
+    case is_basic_derived:
+      {
+	entity ent = basic_derived(obj);
+	string name = entity_user_name(ent);
+	type t = entity_type(ent);
 
-	  if(strstr(name,DUMMY_STRUCT_PREFIX)==NULL
-	     && strstr(name,DUMMY_UNION_PREFIX)==NULL
-	     && strstr(name,DUMMY_ENUM_PREFIX)==NULL) {
-	    pc = gen_nconc(pc,words_type(t));
-	    pc = CHAIN_SWORD(pc," ");
-	    pc = CHAIN_SWORD(pc,name);
-	    pc = CHAIN_SWORD(pc," "); /* FI: This space may not be always useful */
-	  }
-	  else {
-	    pc = gen_nconc(pc, c_words_entity(t, NIL));
-	  }
-	  break;
+	if(strstr(name,DUMMY_STRUCT_PREFIX)==NULL
+	   && strstr(name,DUMMY_UNION_PREFIX)==NULL
+	   && strstr(name,DUMMY_ENUM_PREFIX)==NULL) {
+	  pc = gen_nconc(pc,words_type(t));
+	  pc = CHAIN_SWORD(pc," ");
+	  pc = CHAIN_SWORD(pc,name);
+	  pc = CHAIN_SWORD(pc," "); /* FI: This space may not be always useful */
 	}
-      case is_basic_typedef:
-	{
-	  entity ent = basic_typedef(obj);
-	  pc = CHAIN_SWORD(pc,entity_user_name(ent));
-	  break;
+	else {
+	  pc = gen_nconc(pc, c_words_entity(t, NIL));
 	}
-      default:
-	pips_error("words_basic", "unexpected tag");
+	break;
+      }
+    case is_basic_typedef:
+      {
+	entity ent = basic_typedef(obj);
+	pc = CHAIN_SWORD(pc,entity_user_name(ent));
+	break;
+      }
+    default:
+      pips_internal_error("unexpected basic tag %d", basic_tag(obj));
     }
-    return(pc);
+  }
+  return(pc);
 }
 
 /**************************************************************** SENTENCE */

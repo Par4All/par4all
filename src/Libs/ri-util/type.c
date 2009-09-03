@@ -788,69 +788,77 @@ basic some_basic_of_any_expression(expression exp, bool apply_p, bool ultimate_p
   case is_syntax_reference:
     {
       entity v = reference_variable(syntax_reference(sy));
-      type exp_type = ultimate_p? ultimate_type(entity_type(v)) : copy_type(entity_type(v));
-      bool finished = false;
-      list l_ind=NIL, l_dim = NIL;
+      type vt = entity_type(v);
 
-      if(apply_p) {
-	if(!type_functional_p(exp_type))
-	  pips_internal_error("Bad reference type tag %d \"%s\"\n",
-			      type_tag(exp_type));
-	else {
-	  type rt = functional_result(type_functional(exp_type));
-	  type urt = ultimate_p? ultimate_type(rt):copy_type(rt);
+      /* When called from the parser, the entity type may not yet be
+	 stored in the field type. This happens when
+	 simplify_C_expression is called for initialization
+	 expressions which are grouped in one statement. */
+      if(!type_undefined_p(vt)) {
+	type exp_type = ultimate_p? ultimate_type(vt) : copy_type(entity_type(v));
+	bool finished = false;
+	list l_ind=NIL, l_dim = NIL;
 
-	  if(type_variable_p(urt))
-	    b = copy_basic(variable_basic(type_variable(urt)));
-	  else
-	    pips_internal_error("Unexpected type tag %s\n", type_to_string(urt));
+	if(apply_p) {
+	  if(!type_functional_p(exp_type))
+	    pips_internal_error("Bad reference type tag %d \"%s\"\n",
+				type_tag(exp_type));
+	  else {
+	    type rt = functional_result(type_functional(exp_type));
+	    type urt = ultimate_p? ultimate_type(rt):copy_type(rt);
+
+	    if(type_variable_p(urt))
+	      b = copy_basic(variable_basic(type_variable(urt)));
+	    else
+	      pips_internal_error("Unexpected type tag %s\n", type_to_string(urt));
+	  }
 	}
-      }
-      else {
-	if(type_variable_p(exp_type))
+	else {
+	  if(type_variable_p(exp_type))
+	    {
+	      b = copy_basic(variable_basic(type_variable(exp_type)));
+
+	      /* BC : if the variable has dimensions, then it's an array name which is converted
+		 into a pointer itself. And each dimension is converted into a pointer on the next one.
+		 (except in a few cases which should be handled in basic_of_call)
+		 to be verified or done
+	      */
+
+	      for (l_dim = variable_dimensions(type_variable(exp_type)); !ENDP(l_dim); POP(l_dim))
+		{
+		  b = make_basic(is_basic_pointer, make_type(is_type_variable, make_variable(b, NIL, NIL)));
+		}
+	    }
+	  else if(type_functional_p(exp_type))
+	    {
+	      /* A reference to a function returns a pointer to a function of the very same time */
+	      b = make_basic(is_basic_pointer, copy_type(exp_type));
+	    }
+	  else
+	    {
+	      pips_internal_error("Bad reference type tag %d \"%s\"\n",
+				  type_tag(exp_type), type_to_string(exp_type));
+	    }
+	}
+	/* SG: added so that the basic of a dereferenced pointer is the basic of the dereferenced value
+	   BC : modified because it was assumed that each dimension was of pointer type which is not
+	   true when tab is declared int ** tab[10] and the expression is tab[3][4][5].
+	*/
+	for(l_ind = reference_indices(syntax_reference(sy)) ; !ENDP(l_ind) && !finished ; POP(l_ind) )
 	  {
-	    b = copy_basic(variable_basic(type_variable(exp_type)));
-
-	    /* BC : if the variable has dimensions, then it's an array name which is converted
-	       into a pointer itself. And each dimension is converted into a pointer on the next one.
-	       (except in a few cases which should be handled in basic_of_call)
-	       to be verified or done
-	    */
-
-	    for (l_dim = variable_dimensions(type_variable(exp_type)); !ENDP(l_dim); POP(l_dim))
+	    if(basic_pointer_p(b))
 	      {
-		b = make_basic(is_basic_pointer, make_type(is_type_variable, make_variable(b, NIL, NIL)));
+		basic bt = copy_basic(variable_basic(type_variable(basic_pointer(b))));
+		free_basic(b);
+		b=bt;
+	      }
+	    else
+	      {
+		/* the basic type is reached. Should I add pips_assert("basic reached, it should be the last index\n", ENDP(CAR(l_ind)))? */
+		finished = true;
 	      }
 	  }
-	else if(type_functional_p(exp_type))
-	  {
-	    /* A reference to a function returns a pointer to a function of the very same time */
-	    b = make_basic(is_basic_pointer, copy_type(exp_type));
-	  }
-	else
-	  {
-	    pips_internal_error("Bad reference type tag %d \"%s\"\n",
-				type_tag(exp_type), type_to_string(exp_type));
-	  }
       }
-      /* SG: added so that the basic of a dereferenced pointer is the basic of the dereferenced value
-	 BC : modified because it was assumed that each dimension was of pointer type which is not
-	 true when tab is declared int ** tab[10] and the expression is tab[3][4][5].
-      */
-      for(l_ind = reference_indices(syntax_reference(sy)) ; !ENDP(l_ind) && !finished ; POP(l_ind) )
-	{
-	  if(basic_pointer_p(b))
-	    {
-	      basic bt = copy_basic(variable_basic(type_variable(basic_pointer(b))));
-	      free_basic(b);
-	      b=bt;
-	    }
-	  else
-	    {
-	      /* the basic type is reached. Should I add pips_assert("basic reached, it should be the last index\n", ENDP(CAR(l_ind)))? */
-	      finished = true;
-	    }
-	}
       break;
     }
   case is_syntax_call:
@@ -2196,16 +2204,20 @@ type make_standard_long_integer_type(type t)
 
 /* FI: there are different notions of "ultimate" types in C.
 
-We may need to reduce a type to basic concrete types, removing all
-typedefs wherever they are.
+   We may need to reduce a type to basic concrete types, removing all
+   typedefs wherever they are.
 
-We may also need to know if the type is compatible with a function
-call: we need to chase down the pointers as well as the typedefs. See
-call_compatible_type_p().
+   We may also need to know if the type is compatible with a function
+   call: we need to chase down the pointers as well as the typedefs. See
+   call_compatible_type_p().
 
-Finally, we may need to know how much memory should be allocated to
-hold an object of this type. This is what was needed first, hence the
-semantics of the function below.
+   Finally, we may need to know how much memory should be allocated to
+   hold an object of this type. This is what was needed first, hence the
+   semantics of the function below.
+
+   Shoud this function be extended to return a type_undefined whe nthe
+   argument is type_undefined or simply core dump to signal an issue
+   as soon as possible? The second alternative is chosen.
  */
 
 /* What type should be used to perform memory allocation? No
