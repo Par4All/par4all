@@ -3374,14 +3374,23 @@ void gen_context_recurse(
     gen_context_multi_recurse(obj, context, domain, filter, rewrite, NULL);
 }
 
+
+
 /** @defgroup gen_recurse_heritage NewGen inheritance tracking during visiting object
 
-   Methods to get parent information constructed during recursion. */
+   Methods to get parent information constructed during recursion.
 
-/** @{ */
+   To have example of usage, have a look at the caller-graph in the
+   Doxygen documentation of its functions, for example
+   gen_get_recurse_ancestor(), that will point you to phases such as
+   try_to_recover_for_loop_in_a_while().
+
+   @{
+*/
+
 
 /* Get the previous visited object during the recursion.  If we are in a
-   filter called from a gen_recurse, it interestingly the parent object.
+   filter called from a gen_recurse, it is interestingly the parent object.
 
    @return the parent object. If it fails to do it, it returns:
 
@@ -3398,7 +3407,7 @@ gen_get_recurse_previous_visited_object() {
    given object.
 
    The heritage relation is built during the top-down phase (the
-   filter-down phase), so if the objects are rewiten durin the top-down
+   filter-down phase), so if the objects are rewriten during the top-down
    rewriting phase, the heritage relation are not up-to-date for these
    objects.
 
@@ -3415,7 +3424,7 @@ gen_get_recurse_ancestor(void * object) {
 
 /* Start gen_recurse function heritage tracking.
 
-   It reset the previous computed ancestor relations.
+   It resets the previous computed ancestor relations.
  */
 void
 gen_start_recurse_ancestor_tracking() {
