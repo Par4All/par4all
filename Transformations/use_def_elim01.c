@@ -1,4 +1,4 @@
-void use_def_elim(int *x)
+void use_def_elim01(int *x)
 {
     /* check aliases */
     int *y = x;
