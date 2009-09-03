@@ -1124,7 +1124,7 @@ statement outliner(string outline_module_name, list statements_to_outline)
     FOREACH(ENTITY,e,referenced_entities)
     {
         if( (!entity_function_p(e) ) &&
-                !( entity_formal_p(e) && (same_string_p(entity_module_name(e),get_current_module_name()))) )
+                !( entity_formal_p(e) && (!same_string_p(entity_module_name(e),get_current_module_name()))) )
             tmp_list=CONS(ENTITY,e,tmp_list);
     }
     referenced_entities=tmp_list;
