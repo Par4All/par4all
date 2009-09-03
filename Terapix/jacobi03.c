@@ -4,7 +4,6 @@ typedef float float_t;
 #define SIZE 64
 #define T 64
 
-/* They are initialized to 0, so useless to initialize them: */
 float_t space[SIZE][SIZE];
 // For the dataparallel semantics:
 float_t save[SIZE][SIZE];
@@ -75,10 +74,13 @@ void write_data(char filename[]) {
 void compute() {
   int i, j;
 
+  /* Use 2 array in flip-flop to have dataparallel forall semantics. I
+     could use also a flip-flop dimension instead... */
+ kernel1:
   for(i = 1;i < SIZE - 1; i++)
     for(j = 1;j < SIZE - 1; j++) {
       save[i][j] = 0.25*(space[i - 1][j] + space[i + 1][j]
-			  + space[i][j - 1] + space[i][j + 1]);
+			 + space[i][j - 1] + space[i][j + 1]);
     }
   for(i = 1;i < SIZE - 1; i++)
     for(j = 1;j < SIZE - 1; j++) {
@@ -91,7 +93,13 @@ void compute() {
 int main(int argc, char *argv[]) {
   int t;
 
-  get_data("input.pgm");
+  if (argc != 2) {
+    fprintf(stderr,
+	    "%s needs only one argument that is the PGM image input file\n",
+	    argv[0]);
+    exit(0);
+  }
+  get_data(argv[1]);
 
   for(t = 0; t < T; t++)
     compute();
