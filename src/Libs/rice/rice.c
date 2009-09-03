@@ -121,6 +121,7 @@ statement rice_statement(statement stat,
 	pips_internal_error("Unexpected go to instruction in parsed code\n");
 	break;
       case is_instruction_call:
+      case is_instruction_expression:
 	break;
       case is_instruction_unstructured: {
 	  unstructured obj_unstructured = instruction_unstructured(istat);
@@ -128,7 +129,8 @@ statement rice_statement(statement stat,
 	  break;
       }
       default:
-	pips_internal_error("default case reached\n");
+	pips_internal_error("default case reached with tag %d\n",
+			    instruction_tag(istat));
     }
 
     return(new_stat);

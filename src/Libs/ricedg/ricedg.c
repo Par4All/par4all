@@ -437,6 +437,7 @@ static void rdg_statement(statement stat)
 	break;
       case is_instruction_goto:
       case is_instruction_call:
+      case is_instruction_expression:
 	break;
 
       case is_instruction_unstructured:
@@ -444,7 +445,8 @@ static void rdg_statement(statement stat)
 	break;
 
       default:
-	pips_error("rdg_statement", "case default reached\n");
+	pips_internal_error("case default reached with tag %d\n",
+			    instruction_tag(istat));
 	break;
     }
 }
