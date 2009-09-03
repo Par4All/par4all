@@ -255,10 +255,11 @@ extern void gen_context_multi_recurse GEN_PROTO((void *, void *,...));
 #define gen_context_recurse(s,c,d,f,r) \
         gen_context_multi_recurse(s,c,d,f,r,NULL)
 
-extern gen_chunk gen_get_recurse_previous_visited_object();
-extern gen_chunk gen_get_recurse_ancestor(void * object);
-extern void gen_start_recurse_ancestor_tracking();
-extern void gen_stop_recurse_ancestor_tracking();
+extern gen_chunk * gen_get_recurse_previous_visited_object(void);
+extern gen_chunk gen_get_recurse_ancestor(const void *);
+extern gen_chunk * gen_get_ancestor_type(int, const void *);
+extern void gen_start_recurse_ancestor_tracking(void);
+extern void gen_stop_recurse_ancestor_tracking(void);
 
 
 /* Since C is not-orthogonal (chunk1 == chunk2 is prohibited),

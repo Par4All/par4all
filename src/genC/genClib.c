@@ -361,13 +361,12 @@ struct driver {
 
 /* Store the last object visited, that is the parent of the current
    object: */
-static gen_chunk gen_previous_object = { .p = NULL };
+static gen_chunk * gen_previous_object = NULL;
 /* If we record the parent object relation during the current recursion: */
-bool gen_record_tracking_p = FALSE;
+static bool gen_record_tracking_p = false;
 /* The hash map that stores the parent associated to an object visited
    during the recursion: */
-hash_table ancestor_tracking = NULL;
-
+static hash_table ancestor_tracking = NULL;
 
 /* To be called on any object pointer.
  */
@@ -577,15 +576,15 @@ gen_trav_obj(
   /* Keep track of the current object before filtering in or out: */
   if (gen_record_tracking_p) {
     // fprintf(stderr, "[gen_trav_obj] set heritage %p -> %p\n",
-    //         gen_previous_object.p, obj);
+    //         gen_previous_object, obj);
     /* Since an object can have multiple ancestors (for example think in
        PIPS unstructured where we can have multible goto towards the
        same node), just pick the first ancestor found to avoid heritage
        flapping. So do not store again an ancestor if already one: */
     if (! hash_defined_p(ancestor_tracking, obj))
-      hash_put(ancestor_tracking, obj, gen_previous_object.p);
+      hash_put(ancestor_tracking, obj, gen_previous_object);
   }
-  gen_previous_object.p = obj;
+  gen_previous_object = obj;
 
   if ((*dr->obj_in)(obj, dr))
   {
@@ -3397,7 +3396,7 @@ void gen_context_recurse(
      - NULL if the current object is the root of the recursion (since it
        does not have any parent inside the reduction scope)
 */
-gen_chunk
+gen_chunk *
 gen_get_recurse_previous_visited_object() {
   return gen_previous_object;
 }
@@ -3416,11 +3415,32 @@ gen_get_recurse_previous_visited_object() {
      - NULL if the current object is the root of the recursion (so no parent)
      - HASH_UNDEFINED_VALUE if the current object does not have any ancestor.
 */
-gen_chunk
-gen_get_recurse_ancestor(void * object) {
+gen_chunk gen_get_recurse_ancestor(const void * object)
+{
   return (gen_chunk) hash_get(ancestor_tracking, object);
 }
 
+/* return the first ancestor object found of the given type.
+
+   @param type newgen domain of the ancestor looked for.
+   @param object we want the ancestor of.
+   @return NULL for the root, gen_chunk_undefined if no ancestor (?).
+ */
+gen_chunk *
+gen_get_ancestor_type(int type, const void * obj)
+{
+  while (true)
+  {
+    gen_chunk * prev = (gen_chunk*) hash_get(ancestor_tracking, obj);
+    if (prev==NULL)
+      return NULL;
+    else if (prev==HASH_UNDEFINED_VALUE)
+      return gen_chunk_undefined;
+    else if (prev->i == type)
+      return prev;
+    obj = prev;
+  }
+}
 
 /* Start gen_recurse function heritage tracking.
 
@@ -3433,7 +3453,7 @@ gen_start_recurse_ancestor_tracking() {
     hash_table_free(ancestor_tracking);
   ancestor_tracking = hash_table_make(hash_pointer, 0);
   // There is no previous node visited:
-  gen_previous_object.p = NULL;
+  gen_previous_object = NULL;
   gen_record_tracking_p = TRUE;
 }
 
@@ -3445,7 +3465,7 @@ gen_start_recurse_ancestor_tracking() {
 */
 void
 gen_stop_recurse_ancestor_tracking() {
-  gen_record_tracking_p = FALSE;
+  gen_record_tracking_p = false;
 }
 
 /** @} */
