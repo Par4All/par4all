@@ -355,7 +355,12 @@ function validate_file()
       done < $name.database/modules
       $timeout Delete $name 2> /dev/null 1>&2 # ignore delete failure...
     } 2> $out.err
-  fi > $out.out
+  fi > $out.tmp
+
+  # filter out absolute path anyway, there may be some because of
+  # cpp or other stuff run by pips, even if relative path names are used.
+  sed "s|$PWD/\./|./|g;s|$PWD/|./|g" < $out.tmp > $out.out
+  rm $out.tmp
 
   verb 4 "Status = $status"
 
