@@ -1,5 +1,6 @@
 user warning in tp_parse: sfrov: No such workspace
 Registering file sfrov.f
+Splitting file    ./sfrov.f
   Module         SFROV
 Workspace sfrov created and opened.
 Module SFROV selected

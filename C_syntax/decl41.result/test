@@ -1,0 +1,25 @@
+
+//  <TOP-LEVEL:tab[PHI1][PHI2]-W-EXACT-{1<=PHI1, PHI1<=62, 1<=PHI2,
+//    PHI2<=62}>
+
+void compute()
+{
+   int i;
+   int j;
+
+//  <TOP-LEVEL:tab[PHI1][PHI2]-W-EXACT-{1<=PHI1, PHI1<=62, 1<=PHI2,
+//    PHI2<=62}>
+
+
+   for(i = 1; i <= 62; i += 1)
+
+//  <TOP-LEVEL:tab[PHI1][PHI2]-W-EXACT-{PHI1==i, 1<=PHI2, PHI2<=62,
+//    1<=i, i<=62}>
+
+      for(j = 1; j <= 62; j += 1)
+
+//  <TOP-LEVEL:tab[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==j, 1<=i, i<=62,
+//    1<=j, j<=62}>
+
+         tab[i][j] = i*j;
+}

@@ -1,5 +1,6 @@
 user warning in tp_parse: capture02: No such workspace
 Registering file capture02.f
+Splitting file    ./capture02.f
   Module         CAPTURE02
 Workspace capture02 created and opened.
 Module CAPTURE02 selected

@@ -1,6 +1,6 @@
 user warning in tp_parse: bughexa: No such workspace
 Registering file bughexa.f
-Splitting file    $VDIR/bughexa.f
+Splitting file    ./bughexa.f
   Module         BUGHEXA
 Workspace bughexa created and opened.
 Module BUGHEXA selected

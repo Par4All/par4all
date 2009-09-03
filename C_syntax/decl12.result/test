@@ -1,6 +1,6 @@
 user warning in tp_parse: decl12: No such workspace
 Registering file decl12.c
-Preprocessing file $VDIR/decl12.c
+Preprocessing file ./decl12.c
 Splitting file    ./decl12.database/Tmp/decl12.cpp_processed.c
   Module         decl12!
 Workspace decl12 created and opened.

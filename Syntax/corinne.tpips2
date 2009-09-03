@@ -8,7 +8,7 @@ echo
 echo First try: detect extra ENDDO
 echo
 
-shell sed /cfirst/s/cfirst// ${VDIR:-.}/corinne.f >corinne1.f
+shell sed /cfirst/s/cfirst// corinne.f >corinne1.f
 shell sleep 1
 
 delete corinne
@@ -22,7 +22,7 @@ echo
 echo Second try: detect wrong lhs
 echo
 
-shell sed /csecond/s/csecond// ${VDIR:-.}/corinne.f >corinne2.f
+shell sed /csecond/s/csecond// corinne.f >corinne2.f
 shell sleep 1
 
 create corinne corinne2.f
@@ -35,7 +35,7 @@ echo
 echo Third try: detect extra ENDDIF
 echo
 
-shell sed /cthird/s/cthird// ${VDIR:-.}/corinne.f >corinne3.f
+shell sed /cthird/s/cthird// corinne.f >corinne3.f
 shell sleep 1
 
 create corinne corinne3.f

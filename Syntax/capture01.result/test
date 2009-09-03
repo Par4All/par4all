@@ -1,6 +1,6 @@
 user warning in tp_parse: capture01: No such workspace
 Registering file capture01.f
-Splitting file    $VDIR/capture01.f
+Splitting file    ./capture01.f
   Module         CAPTURE01
 Workspace capture01 created and opened.
 Module CAPTURE01 selected

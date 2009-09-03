@@ -1,5 +1,6 @@
 user warning in tp_parse: entry18: No such workspace
 Registering file entry18.f
+Splitting file    ./entry18.f
   Module         ENTRY18
   Module         INCREMENT1
   Module         INCREMENT2

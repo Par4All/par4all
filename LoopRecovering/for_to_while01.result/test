@@ -63,8 +63,8 @@ int main()
 
    for(i = 2; i <= 50; i += 1) {
       // BEGIN BLOCK
-      j = 2;
       /* A comment */
+      j = 2;
       while (j<100) {
          // BEGIN BLOCK
          a[j] = 2;
@@ -89,9 +89,9 @@ a_label:      ;
 
    for(i = 2; i <= 50; i += 1) {
       // BEGIN BLOCK
+      /* A comment */
 a_label_before_comment:      ;
       j = 2;
-      /* A comment */
       while (j<100) {
          // BEGIN BLOCK
          a[j] = 2;
@@ -103,9 +103,9 @@ a_label_before_comment:      ;
 
    for(i = 2; i <= 50; i += 1) {
       // BEGIN BLOCK
+      /* A comment */
 a_label_after_comment:      ;
       j = 2;
-      /* A comment */
       while (j<100) {
          // BEGIN BLOCK
          a[j] = 2;
@@ -117,9 +117,9 @@ a_label_after_comment:      ;
 
    for(i = 2; i <= 50; i += 1) {
       // BEGIN BLOCK
+      /* A comment *//* Another comment */
 a_label_between:      ;
       j = 2;
-      /* A comment *//* Another comment */
       while (j<100) {
          // BEGIN BLOCK
          a[j] = 2;

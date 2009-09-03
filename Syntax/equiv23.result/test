@@ -1,5 +1,6 @@
 user warning in tp_parse: equiv23: No such workspace
 Registering file equiv23.f
+Splitting file    ./equiv23.f
   Module         EQUIV23
 Workspace equiv23 created and opened.
 Module EQUIV23 selected

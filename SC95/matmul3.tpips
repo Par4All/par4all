@@ -2,7 +2,8 @@
 # get the model
 delete foo
 shell rm -f model.rc
-shell cp ${VDIR}/model3.rc model.rc
+# ??? NO.... shoud be a property or something
+shell cp model3.rc model.rc
 #
 # compile
 create foo matmul3.f 

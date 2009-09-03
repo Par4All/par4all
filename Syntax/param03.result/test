@@ -1,5 +1,6 @@
 user warning in tp_parse: param03: No such workspace
 Registering file param03.f
+Splitting file    ./param03.f
   Module         PARAM03
 Workspace param03 created and opened.
 Module PARAM03 selected

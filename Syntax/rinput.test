@@ -1,7 +1,7 @@
 #!/bin/sh
 # test pips on rinput.f
 #
-if Pips -f ${VDIR:-.}/rinput.f -w rinput -m rinput -b PF >&2
+if Pips -f rinput.f -w rinput -m rinput -b PF >&2
 then 
 	Display -l code
 	Delete rinput >&2

@@ -1759,7 +1759,7 @@ extern void _IO_free_backup_area (_IO_FILE *) ;
 
 
 typedef _G_fpos_t fpos_t;
-# 1770 "$VDIR/scrsho.c"
+# 1770 "./scrsho.c"
 /* The possibilities for the third argument to `setvbuf'.  */
 
 

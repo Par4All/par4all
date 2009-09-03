@@ -2120,7 +2120,7 @@ extern void _IO_free_backup_area (_IO_FILE *) ;
 
 
 typedef _G_fpos_t fpos_t;
-# 2057 "$VDIR/sfroid.c"
+# 2057 "./sfroid.c"
 /* The possibilities for the third argument to `setvbuf'.  */
 
 
@@ -2635,7 +2635,7 @@ extern int ftrylockfile (FILE *__stream) ;
 extern void funlockfile (FILE *__stream) ;
 /* If we are compiling with optimizing read this file.  It contains
    several optimizing inline functions and macros.  */
-# 2581 "$VDIR/sfroid.c"
+# 2581 "./sfroid.c"
 /* Declarations for math functions.
    Copyright (C) 1991-1993,1995-1999,2001,2002 Free Software Foundation, Inc.
    This file is part of the GNU C Library.

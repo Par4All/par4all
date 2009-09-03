@@ -1,5 +1,6 @@
 user warning in tp_parse: user_error02: No such workspace
 Registering file user_error02.f
+Splitting file    ./user_error02.f
   Module         B
   Module         USER_ERROR02
 Workspace user_error02 created and opened.

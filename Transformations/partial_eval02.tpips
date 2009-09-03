@@ -46,10 +46,10 @@ echo Unsplit resulting code
 echo
 
 apply UNSPLIT
-shell cc ${VDIR:-.}/partial_eval02.c -o ${VDIR:-.}/partial_eval
+shell cc partial_eval02.c -o partial_eval
 shell cc partial_eval02.database/Src/partial_eval02.c  -o partial_eval02.database/Src/partial_eval
-shell if test `partial_eval02.database/Src/partial_eval` = `${VDIR:-.}/partial_eval`; then echo "ok"; else echo "ko" ; fi
-shell rm -rf partial_eval02.database/Src/partial_eval ${VDIR:-.}/partial_eval
+shell if test `partial_eval02.database/Src/partial_eval` = `./partial_eval`; then echo "ok"; else echo "ko" ; fi
+shell rm -rf partial_eval02.database/Src/partial_eval partial_eval
 
 close
 # delete partial_eval02

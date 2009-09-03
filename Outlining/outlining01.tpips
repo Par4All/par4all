@@ -38,10 +38,10 @@ echo Unsplit resulting code
 echo
 
 apply UNSPLIT
-shell gcc ${VDIR:-.}/outlining01.c -o ${VDIR:-.}/outlining
+shell gcc outlining01.c -o outlining
 shell gcc outlining01.database/Src/outlining01.c outlining01.database/Src/outlined.c -o outlining01.database/Src/outlining
-shell if test `outlining01.database/Src/outlining` = `${VDIR:-.}/outlining`; then echo "ok"; else echo "ko" ; fi
-shell rm -rf outlining01.database/Src/outlining ${VDIR:-.}/outlining
+shell if test `outlining01.database/Src/outlining` = `outlining`; then echo "ok"; else echo "ko" ; fi
+shell rm -rf outlining01.database/Src/outlining outlining
 
 close
 delete outlining01

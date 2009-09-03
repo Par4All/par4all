@@ -1,7 +1,7 @@
 #!/bin/sh
 # test pips on oa118.f (Proprietary code from ONERA)
 #
-# if Pips -f $PIPS_VALIDDIR/Ricedg/oa118.f -w oa118 -m oa118 -s rfulldg -b PPF >&2
+# if Pips -f oa118.f -w oa118 -m oa118 -s rfulldg -b PPF >&2
 # then 
 # 	Display -l para77
 # 	Delete oa118>&2

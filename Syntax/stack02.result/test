@@ -1,5 +1,6 @@
 user warning in tp_parse: stack02: No such workspace
 Registering file stack02.f
+Splitting file    ./stack02.f
   Module         STACK02
 Workspace stack02 created and opened.
 Module STACK02 selected

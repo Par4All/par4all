@@ -1,5 +1,6 @@
 user warning in tp_parse: hyper02: No such workspace
 Registering file hyper02.f
+Splitting file    ./hyper02.f
   Module         HYPER02
 Workspace hyper02 created and opened.
 Module HYPER02 selected

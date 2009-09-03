@@ -3,7 +3,7 @@
 
 modules="COMM1 COMM1B COMM2 COMM2B COMM3 COMM3B COMM"
 
-Pips -f $PIPS_ROOT/Validation/RegionTranslation/comm.f \
+Pips -f comm.f \
 	-w comm \
 	-m COMM \
 	-s pcinter -s tfinter -s mustreg -s prcr \

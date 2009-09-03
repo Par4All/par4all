@@ -2,7 +2,8 @@
 #
 # test pips on test7.f
 #
-if Init -f $PIPS_VALIDDIR/Rice/test7.f test7>&2
+Delete test7
+if Init -f test7.f test7 >&2
 then
 	Select -w test7 rfulldg>&2
 	if Display -w test7 -m test7

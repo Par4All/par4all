@@ -1,5 +1,6 @@
 user warning in tp_parse: format01: No such workspace
 Registering file format01.f
+Splitting file    ./format01.f
   Module         FORMAT01
 Workspace format01 created and opened.
 Module FORMAT01 selected

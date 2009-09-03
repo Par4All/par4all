@@ -1,5 +1,6 @@
 user warning in tp_parse: data09: No such workspace
 Registering file data09.f
+Splitting file    ./data09.f
   Module         INIT2
   Module         INIT1
   Module         DATA09
@@ -112,6 +113,7 @@ Workspace data09 closed.
 
 Workspace data09 deleted.
 Registering file data09.f
+Splitting file    ./data09.f
   Module         INIT2
   Module         INIT1
   Module         DATA09

@@ -8,7 +8,7 @@ echo
 echo Execution with initial code:
 echo
 
-shell ${PIPS_F77:-f77} ${VDIR:-.}/data13.f
+shell ${PIPS_F77:-f77} data13.f
 shell ./a.out
 
 echo

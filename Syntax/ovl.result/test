@@ -2,6 +2,7 @@ user warning in tp_parse: ovl: No such workspace
 setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
 user warning, property PARSER_DUMP_SYMBOL_TABLE redefined
 Registering file ovl.f
+Splitting file    ./ovl.f
   Module         OVL
 Workspace ovl created and opened.
 Module OVL selected

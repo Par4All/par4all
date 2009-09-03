@@ -1,5 +1,6 @@
 user warning in tp_parse: stack03: No such workspace
 Registering file stack03.f
+Splitting file    ./stack03.f
   Module         STACK03
 Workspace stack03 created and opened.
 Module STACK03 selected

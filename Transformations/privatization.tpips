@@ -39,7 +39,7 @@ echo
 echo Run code
 echo
 
-shell cc ${VDIR:-.}/privatization.c
+shell cc privatization.c
 shell ./a.out 
 shell cc privatization.database/Src/privatization.c
 shell ./a.out 

@@ -1531,7 +1531,7 @@ typedef __fd_mask fd_mask;
 
 
 /* Access macros for `fd_set'.  */
-# 1542 "$VDIR/ran0.c"
+# 1542 "./ran0.c"
 /* Check the first NFDS descriptors each in READFDS (if not NULL) for read
    readiness, in WRITEFDS (if not NULL) for write readiness, and in EXCEPTFDS
    (if not NULL) for exceptional conditions.  If TIMEOUT is not NULL, time out
@@ -1738,7 +1738,7 @@ typedef struct
 typedef int pthread_once_t;
 /* Thread identifiers */
 typedef unsigned long int pthread_t;
-# 1756 "$VDIR/ran0.c"
+# 1756 "./ran0.c"
 /* These are the functions that actually do things.  The `random', `srandom',
    `initstate' and `setstate' functions are those from BSD Unices.
    The `rand' and `srand' functions are required by the ANSI standard.
@@ -1868,7 +1868,7 @@ extern int seed48_r (unsigned short int __seed16v[3],
 
 extern int lcong48_r (unsigned short int __param[7],
                       struct drand48_data *__buffer) ;
-# 1893 "$VDIR/ran0.c"
+# 1893 "./ran0.c"
 /* Allocate SIZE bytes of memory.  */
 extern void *malloc (size_t __size) ;
 /* Allocate NMEMB elements of SIZE bytes each, all initialized to 0.  */
@@ -2030,7 +2030,7 @@ Boston, MA 02111-1307, USA.  */
 
 /* Allocate a block that will be freed when the calling function exits.  */
 extern void *alloca (size_t __size) ;
-# 2065 "$VDIR/ran0.c"
+# 2065 "./ran0.c"
 /* Allocate SIZE bytes on a page boundary.  The storage cannot be freed.  */
 extern void *valloc (size_t __size) ;
 
@@ -2158,7 +2158,7 @@ extern void qsort (void *__base, size_t __nmemb, size_t __size,
 /* Return the absolute value of X.  */
 extern int abs (int __x) ;
 extern long int labs (long int __x) ;
-# 2201 "$VDIR/ran0.c"
+# 2201 "./ran0.c"
 /* Return the `div_t', `ldiv_t' or `lldiv_t' representation
    of the value of NUMER over DENOM. */
 /* GCC may have built-ins for these someday.  */
@@ -2250,7 +2250,7 @@ extern int rpmatch (const char *__response) ;
    NELEM elements of LOADAVG.  Return the number written (never more than
    three, but may be less than NELEM), or -1 if an error occurred.  */
 extern int getloadavg (double __loadavg[], int __nelem) ;
-# 2301 "$VDIR/ran0.c"
+# 2301 "./ran0.c"
 /* Declarations for math functions.
    Copyright (C) 1991-1993,1995-1999,2001,2002 Free Software Foundation, Inc.
    This file is part of the GNU C Library.

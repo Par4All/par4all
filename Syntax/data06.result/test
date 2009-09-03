@@ -1,5 +1,6 @@
 user warning in tp_parse: data06: No such workspace
 Registering file data06.f
+Splitting file    ./data06.f
   Module         DATA06
 Workspace data06 created and opened.
 Module DATA06 selected

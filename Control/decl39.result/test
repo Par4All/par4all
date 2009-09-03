@@ -1,37 +1,37 @@
 void decl39(int size)
 {
-C (unreachable)
+// (statement ordering unavailable)
    // BEGIN BLOCK
    int i;
    int x;
-C (unreachable)
+// (statement ordering unavailable)
    for (i = 1;(i<size);i++)                                             /*0006*/
-C (unreachable)
+// (statement ordering unavailable)
       ;
-C (unreachable)
+// (statement ordering unavailable)
    // BEGIN BLOCK
-C (unreachable)
+// (statement ordering unavailable)
    
    
    // if the switch is removed, the loop index declarations reappears
    ;                                                                    /*0010*/
-C (unreachable)
+// (statement ordering unavailable)
    // BEGIN BLOCK
-C (unreachable)
+// (statement ordering unavailable)
    if ((0==0))
-C (unreachable)
+// (statement ordering unavailable)
       goto switch_2_case_0;                                             /*0011*/
    else
-C (unreachable)
+// (statement ordering unavailable)
       ;
-C (unreachable)
+// (statement ordering unavailable)
    goto break_2;                                                        /*0013*/
    // END BLOCK
-C (unreachable)
+// (statement ordering unavailable)
 switch_2_case_0:   ;
-C (unreachable)
+// (statement ordering unavailable)
    x = 1;                                                               /*0012*/
-C (unreachable)
+// (statement ordering unavailable)
 break_2:   ;
    // END BLOCK
    // END BLOCK

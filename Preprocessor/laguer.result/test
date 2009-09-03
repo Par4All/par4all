@@ -2,10 +2,10 @@
 # 1 "<built-in>"
 # 1 "<command-line>"
 # 1 "laguer.database/Tmp/laguer.cpp_processed.c"
-# 1 "$VDIR/laguer.c"
+# 1 "./laguer.c"
 # 1 "<built-in>"
 # 1 "<command-line>"
-# 1 "$VDIR/laguer.c"
+# 1 "./laguer.c"
 //#include <math.h>
 //#include "complex.h"
 typedef struct {float r; float i;} fcomplex;
@@ -110,10 +110,10 @@ float eps;
  }
  nrerror("Too many iterations in routine LAGUER");
 }
-# 1 "$VDIR/laguer.c"
+# 1 "./laguer.c"
 # 1 "<built-in>"
 # 1 "<command-line>"
-# 1 "$VDIR/laguer.c"
+# 1 "./laguer.c"
 //#include <math.h>
 //#include "complex.h"
 typedef struct {float r; float i;} fcomplex;

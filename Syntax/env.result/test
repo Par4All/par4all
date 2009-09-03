@@ -6,7 +6,7 @@ echo when finding the common name
 when finding the common name
 echo
 
-shell sed /program/s/c// ${VDIR:-.}/env.f >env1.f
+shell sed /program/s/c// env.f >env1.f
 user warning in tp_parse: env: No such workspace
 Registering file env1.f
 Splitting file    ./env1.f
@@ -56,7 +56,7 @@ echo when finding the common name
 when finding the common name
 echo
 
-shell sed /subroutine/s/c// ${VDIR:-.}/env.f >env2.f
+shell sed /subroutine/s/c// env.f >env2.f
 Registering file env2.f
 Splitting file    ./env2.f
   Module         BAR
@@ -103,7 +103,7 @@ echo when parsing the program
 when parsing the program
 echo
 
-shell sed /program/s/c// ${VDIR:-.}/env.f >env3.f
+shell sed /program/s/c// env.f >env3.f
 Registering file env3.f
 Splitting file    ./env3.f
   Module         BAR
@@ -241,7 +241,7 @@ echo Fourth try: conflict between a common and a subroutine name
 Fourth try: conflict between a common and a subroutine name
 echo
 
-shell sed /program/s/c// ${VDIR:-.}/env.f >env4.f
+shell sed /program/s/c// env.f >env4.f
 Registering file env4.f
 Splitting file    ./env4.f
   Module         BAR
@@ -307,7 +307,7 @@ echo Fifth try: conflict between a subroutine and a common name
 Fifth try: conflict between a subroutine and a common name
 echo
 
-shell sed /program/s/c// ${VDIR:-.}/env.f >env5.f
+shell sed /program/s/c// env.f >env5.f
 Registering file env5.f
 Splitting file    ./env5.f
   Module         BAR

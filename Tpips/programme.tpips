@@ -1,8 +1,6 @@
 delete programme
-
 setproperty ABORT_ON_USER_ERROR TRUE
-
-create programme ${PIPS_ROOT}/Validation/Tpips/programme.f
+create programme programme.f
 display PRINTED_FILE
 close
 delete programme

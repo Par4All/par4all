@@ -1,4 +1,6 @@
- *some* pips -f  *some* unknownrule.f unknownrule
+ *some* pips -f unknownrule.f unknownrule
+Registering file unknownrule.f
+Splitting file    ./unknownrule.f
   Module         UNKNOWNRULE
 Workspace unknownrule created and opened.
 Module UNKNOWNRULE selected
@@ -40,7 +42,7 @@ Display of file unknownrule.database/UNKNOWNRULE/UNKNOWNRULE.pref
 C     See what happens when Perform is called with an unexistant
 C     rule name.
 
-      I = 1                                                             0001
+      I = 1                                                             0006
 
       END
 Workspace unknownrule (default)

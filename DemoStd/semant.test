@@ -12,7 +12,7 @@ fi
 
 echo "PRETTYPRINT_BLOCK_IF_ONLY TRUE" >properties.rc
 
-Pips -f $PIPS_VALIDDIR/DemoStd/semant.f -w semant -m semant -s pcinter -s tfinter -p prcp >&2
+Pips -f semant.f -w semant -m semant -s pcinter -s tfinter -p prcp >&2
 exit_code=$?
 echo "--- Preconditions for module SEMANT"
 Display -l prec

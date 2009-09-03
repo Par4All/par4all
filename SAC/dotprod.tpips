@@ -6,7 +6,7 @@ module DOTPROD
 
 display PRINTED_FILE
 
-source ${VDIR:-.}/include/fortran.tpips
+source include/fortran.tpips
 
 #apply PRINT_C_CODE[DOTPROD]
 #apply PRINT_C_CODE[DOTPRODREF]

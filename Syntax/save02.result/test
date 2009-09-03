@@ -1,5 +1,6 @@
 user warning in tp_parse: save02: No such workspace
 Registering file save02.f
+Splitting file    ./save02.f
   Module         SAVE02
 Workspace save02 created and opened.
 Module SAVE02 selected

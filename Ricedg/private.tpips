@@ -2,7 +2,7 @@ delete private
 create private private.f
 
 set PRETTYPRINT_ALL_PRIVATE_VARIABLES TRUE
-create private ${PIPS_VALIDDIR}/Ricedg/private.f
+create private private.f
 activate PRECONDITIONS_INTRA_FULL
 activate TRANSFORMERS_INTRA_FULL
 activate MUST_REGIONS

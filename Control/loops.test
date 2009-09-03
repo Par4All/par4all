@@ -1,4 +1,4 @@
 #! /bin/sh
-Init -f ${VDIR:-.}/loops.f loops >&2
+Init -f loops.f loops >&2
 Display -m BAR
 Delete loops

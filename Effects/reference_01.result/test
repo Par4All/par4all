@@ -11,10 +11,8 @@ int reference_01(void)
 {
    int i = 0;
    int j = 1;
-//               None
    // effects on empty references...
    j/i;                                                                 /*0007*/
-//               None
    (void) j/i;                                                          /*0008*/
 //               <must be read   >: i j
    return i/j;                                                          /*0009*/
@@ -23,10 +21,8 @@ int reference_01(void)
 {
    int i = 0;
    int j = 1;
-//               None
    // effects on empty references...
    j/i;                                                                 /*0007*/
-//               None
    (void) j/i;                                                          /*0008*/
 //               <must be read   >: i j
    return i/j;                                                          /*0009*/

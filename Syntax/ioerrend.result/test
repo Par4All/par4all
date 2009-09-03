@@ -1,6 +1,6 @@
 user warning in tp_parse: ioerrend: No such workspace
 Registering file ioerrend.f
-Splitting file    $VDIR/ioerrend.f
+Splitting file    ./ioerrend.f
   Module         IOERREND
 Workspace ioerrend created and opened.
 Module IOERREND selected

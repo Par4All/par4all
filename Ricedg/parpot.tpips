@@ -1,12 +1,5 @@
-#!/bin/sh
-#
-
-tpips=${tpips_version:-tpips}
-
-
-$tpips <<EOF
 delete parpot
-create parpot ${PIPS_VALIDDIR}/Ricedg/parpot.f
+create parpot parpot.f
 set PRINT_DEPENDENCE_GRAPH TRUE
 module PARPOT
 activate PRECONDITIONS_INTER_FULL 
@@ -18,5 +11,4 @@ display DG_FILE
 display PARALLELPRINTED_FILE 
 close
 delete parpot
-EOF
-#
+quit

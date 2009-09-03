@@ -17,7 +17,7 @@ echo
 module threshold
 display PRINTED_FILE
 
-source ${VDIR:-.}/include/benchmark.tpips.h
+source include/benchmark.tpips.h
 
 echo
 echo simdized code
@@ -25,8 +25,8 @@ echo
 
 display PRINTED_FILE
 
-shell ${VDIR:-.}/compileC.sh threshold threshold test.c
-shell gcc -O3 -I${VDIR:-.} -march=native -c test.c
+shell compileC.sh threshold threshold test.c
+shell gcc -O3 -I. -march=native -c test.c
 shell rm test.c test.o
 
 close

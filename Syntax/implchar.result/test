@@ -1,5 +1,6 @@
 user warning in tp_parse: implchar: No such workspace
 Registering file implchar.f
+Splitting file    ./implchar.f
   Module         DANCE
   Module         DUMMY
   Module         IMPLCHAR

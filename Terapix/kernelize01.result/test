@@ -46,7 +46,7 @@ kernel:   run_kernel(a, b, c);
 void run_kernel(int a[100], int b[100], int c[100])
 {
    int i;
-   extern void kernel(int i, int c[100], int b[100], int a[100]);
+   extern void kernel(int a[100], int b[100], int c[100], int i);
    /* compute */
 kernel:
    for(i = 0; i <= 99; i += 10)

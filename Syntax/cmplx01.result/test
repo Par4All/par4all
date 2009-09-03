@@ -1,5 +1,6 @@
 user warning in tp_parse: cmplx01: No such workspace
 Registering file cmplx01.f
+Splitting file    ./cmplx01.f
   Module         FOO
   Module         CMPLX01
 Workspace cmplx01 created and opened.

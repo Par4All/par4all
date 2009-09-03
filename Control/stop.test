@@ -1,5 +1,5 @@
 #! /bin/sh
-Init -d -f ${VDIR:-.}/stop.f stop  >&2
+Init -d -f stop.f stop  >&2
 Pips -w stop -m st -p PRINT_CODE_CUMULATED_EFFECTS >&2
 Display -m st cumu
 Delete stop

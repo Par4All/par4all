@@ -18,6 +18,7 @@ echo Execute initial code
 echo
 
 shell cc flatten_code12.database/Tmp/flatten_code12.cpp_processed.c -o flatten_code12.out
+shell ./flatten_code12.out > flatten_code12.database/Tmp/initial_output
 shell ./flatten_code12.out
 shell rm flatten_code12.out
 
@@ -62,10 +63,14 @@ echo
 echo Execute resulting code
 echo
 
+shell ./flatten_code12.out > flatten_code12.database/Tmp/final_output
 shell ./flatten_code12.out
 shell rm flatten_code12.out
+
+shell diff flatten_code12.database/Tmp/initial_output \
+ flatten_code12.database/Tmp/final_output
+
 
 close
 delete flatten_code12
 quit
-

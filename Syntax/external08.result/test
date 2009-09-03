@@ -1,5 +1,6 @@
 user warning in tp_parse: external08: No such workspace
 Registering file external08.f
+Splitting file    ./external08.f
   Module         EXTERNAL08
 Workspace external08 created and opened.
 Module EXTERNAL08 selected

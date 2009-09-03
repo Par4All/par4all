@@ -1,8 +1,6 @@
 #!/bin/sh
 
-tpips=${tpips_version:-tpips}
-
-$tpips $PIPS_ROOT/Validation/Tpips/tpips_filter.tpips
+tpips tpips_filter.tpips
 
 Delete tpips_filter
 

@@ -8,7 +8,7 @@ echo
 echo Check that parameters are well evaluated
 echo ----------------------------------------
 
-shell sed 's/cfirst//' ${VDIR:-.}/fabien.f > fabien1.f
+shell sed 's/cfirst//' fabien.f > fabien1.f
 
 echo
 echo Preconditions when using Fortran parameters
@@ -38,7 +38,7 @@ echo
 echo Check that variables are well evaluated
 echo ----------------------------------------
 
-shell sed 's/csecond//' ${VDIR:-.}/fabien.f > fabien2.f
+shell sed 's/csecond//' fabien.f > fabien2.f
 
 echo
 echo Preconditions when using Fortran variables

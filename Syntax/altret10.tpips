@@ -7,7 +7,7 @@ setproperty PARSER_SUBSTITUTE_ALTERNATE_RETURNS "STOP"
 # setproperty PRETTYPRINT_ALL_DECLARATIONS TRUE
 setproperty PRETTYPRINT_REGENERATE_ALTERNATE_RETURNS TRUE
 
-shell ${PIPS_F77:-f77} ${VDIR:-.}/altret10.f
+shell ${PIPS_F77:-f77} altret10.f
 
 echo
 echo Execute initial code

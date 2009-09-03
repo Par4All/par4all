@@ -1,6 +1,9 @@
 delete inlining19
-create inlining19 inlining19.c inlining19-foo.c
+
 setproperty ABORT_ON_USER_ERROR TRUE
+
+create inlining19 inlining19.src/inlining19.c inlining19.src/inlining19-foo.c
+
 setproperty PRETTYPRINT_C_CODE TRUE
 activate C_PARSER
 

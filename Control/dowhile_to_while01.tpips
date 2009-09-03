@@ -31,7 +31,7 @@ echo
 echo Run code
 echo
 
-shell gcc ${VDIR:-.}/dowhile_to_while01.c
+shell gcc dowhile_to_while01.c
 shell ./a.out 
 shell gcc dw2w01.database/Src/dowhile_to_while01.c
 shell ./a.out 

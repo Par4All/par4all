@@ -45,4 +45,3 @@ C            38K+L<=38I+J, 8K+L<=8I+J+30, K<=I, 1<=J, 1<=K, L<=K, 1<=L}
 C      P() {MORB==NDIM, MORB==NUM, 10<=MORB, MORB<=40}
     
      OLDA
-

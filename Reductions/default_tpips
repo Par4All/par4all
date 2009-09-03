@@ -1,4 +1,7 @@
 delete ${WSPACE}
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
 create ${WSPACE} ${FILE}
 
 echo
@@ -6,14 +9,14 @@ echo Print code with proper reductions
 echo
 
 activate PRINT_CODE_PROPER_REDUCTIONS
-display PRINTED_FILE[%ALL]
+display PRINTED_FILE[%ALLFUNC]
 
 echo
 echo Print code with cumulated reductions
 echo
 
 activate PRINT_CODE_CUMULATED_REDUCTIONS
-display PRINTED_FILE[%ALL]
+display PRINTED_FILE[%ALLFUNC]
 
 close
 delete ${WSPACE}

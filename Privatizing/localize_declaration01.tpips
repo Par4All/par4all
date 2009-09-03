@@ -1,6 +1,7 @@
-
-delete localize_declaration01
-create localize_declaration01 localize_declaration01.c
+setenv WKS localize_declaration01
+delete $WKS
+create $WKS $WKS.c
+setproperty ABORT_ON_USER_ERROR TRUE
 activate C_PARSER
 setproperty PRETTYPRINT_C_CODE TRUE
 activate MUST_REGIONS
@@ -19,9 +20,13 @@ apply FOR_LOOP_TO_DO_LOOP[%ALLFUNC]
 apply FOR_LOOP_TO_WHILE_LOOP[%ALLFUNC]
 display PRINTED_FILE[%ALLFUNC]
 apply LOCALIZE_DECLARATION[%ALLFUNC]
-#apply CLEAN_UNUSED_DYNAMIC_VARIABLES[%ALLFUNC]
-#apply CLEAN_DECLARATIONS[%ALLFUNC]
+display PRINTED_FILE[%ALLFUNC]
+apply CLEAN_UNUSED_DYNAMIC_VARIABLES[%ALLFUNC]
+display PRINTED_FILE[%ALLFUNC]
+apply CLEAN_DECLARATIONS[%ALLFUNC]
 display PRINTED_FILE[%ALLFUNC]
 
 close
+delete $WKS
+
 quit

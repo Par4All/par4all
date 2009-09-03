@@ -1,5 +1,6 @@
 user warning in tp_parse: io03: No such workspace
 Registering file io03.f
+Splitting file    ./io03.f
   Module         IO03
 Workspace io03 created and opened.
 Module IO03 selected

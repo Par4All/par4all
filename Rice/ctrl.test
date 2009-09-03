@@ -2,10 +2,10 @@
 #
 # test pips on ctrl.f
 #
-#if Pips -f $PIPS_VALIDDIR/Rice/ctrl.f -w ctrl -m ctrl -s rfulldg -p priv -b PPF >&2
+#if Pips -f ctrl.f -w ctrl -m ctrl -s rfulldg -p priv -b PPF >&2
 #then 
 #	Delete ctrl>&2
-if Init -f $PIPS_VALIDDIR/Rice/ctrl.f ctrl>&2
+if Init -f ctrl.f ctrl >&2
 then
 	Select -w ctrl rfulldg>&2
 	Perform -m ctrl priv>&2

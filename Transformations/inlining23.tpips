@@ -29,9 +29,9 @@ echo
 
 apply UNSPLIT
 shell cc ${WSPACE}.database/Src/inlining23.c -o ${WSPACE}.database/Src/inlining
-shell cc ${VDIR:-.}/inlining23.c -o ${VDIR:-.}/inlining
-shell if test `${WSPACE}.database/Src/inlining` = `${VDIR:-.}/inlining`; then echo "ok"; else echo "ko" ; fi
-shell rm -f ${VDIR:-.}/inlining ${WSPACE}.database/Src/inlining
+shell cc inlining23.c -o inlining
+shell if test `${WSPACE}.database/Src/inlining` = `./inlining`; then echo "ok"; else echo "ko" ; fi
+shell rm -f inlining ${WSPACE}.database/Src/inlining
 
 close
 delete ${WSPACE}

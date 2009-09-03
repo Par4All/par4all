@@ -1,20 +1,20 @@
 -- test with the property
 Registering file syntax_errors.f
-Checking Fortran syntax of ${VDIR}/syntax_errors.f
-${VDIR}/syntax_errors.f:2.15:
+Checking Fortran syntax of ./syntax_errors.f
+./syntax_errors.f:2.15:
 
       integer 'hello'                                                   
-               1
+              1
 Error: Invalid character in name at (1)
-${VDIR}/syntax_errors.f:3.6:
+./syntax_errors.f:3.6:
 
       prin *, 'foo'                                                     
-      1
+     1
 Error: Unclassifiable statement at (1)
-user warning in safe_system_no_abort: Failed (ret: 1, sig: 0) for 'gfortran -c  ${VDIR}/syntax_errors.f -o ${VDIR}/syntax_errors.f.pips.o ; test -f ${VDIR}/syntax_errors.f.pips.o && rm ${VDIR}/syntax_errors.f.pips.o'
+user warning in safe_system_no_abort: Failed (ret: 1, sig: 0) for 'gfortran -c  ./syntax_errors.f -o ./syntax_errors.f.pips.o ; test -f ./syntax_errors.f.pips.o && rm ./syntax_errors.f.pips.o'
 user warning in check_fortran_syntax_before_pips: 
 
-	Fortran syntax errors in file ${VDIR}/syntax_errors.f!
+	Fortran syntax errors in file ./syntax_errors.f!
 
 Deletion of obsolete resources:
 none destroyed.
@@ -25,24 +25,24 @@ Workspace syntax_error closed.
 
 user warning in close_processed_include_cache: no 'processed include cache' to close, skipping...
 pips error in reset_entity_to_size: hash table should have been allocated
-${VDIR}/syntax_errors.test: line 17: 26739 Aborted                 ${pips_version:-pips} -1 CHECK_FORTRAN_SYNTAX_BEFORE_PIPS -f syntax_errors.f syntax_error
+Aborted
 -- test from the environment
 Registering file syntax_errors.f
-Checking Fortran syntax of ${VDIR}/syntax_errors.f
-${VDIR}/syntax_errors.f:2.15:
+Checking Fortran syntax of ./syntax_errors.f
+./syntax_errors.f:2.15:
 
       integer 'hello'                                                   
-               1
+              1
 Error: Invalid character in name at (1)
-${VDIR}/syntax_errors.f:3.6:
+./syntax_errors.f:3.6:
 
       prin *, 'foo'                                                     
-      1
+     1
 Error: Unclassifiable statement at (1)
-user warning in safe_system_no_abort: Failed (ret: 1, sig: 0) for 'gfortran -c  ${VDIR}/syntax_errors.f -o ${VDIR}/syntax_errors.f.pips.o ; test -f ${VDIR}/syntax_errors.f.pips.o && rm ${VDIR}/syntax_errors.f.pips.o'
+user warning in safe_system_no_abort: Failed (ret: 1, sig: 0) for 'gfortran -c  ./syntax_errors.f -o ./syntax_errors.f.pips.o ; test -f ./syntax_errors.f.pips.o && rm ./syntax_errors.f.pips.o'
 user warning in check_fortran_syntax_before_pips: 
 
-	Fortran syntax errors in file ${VDIR}/syntax_errors.f!
+	Fortran syntax errors in file ./syntax_errors.f!
 
 Deletion of obsolete resources:
 none destroyed.
@@ -53,4 +53,4 @@ Workspace syntax_error closed.
 
 user warning in close_processed_include_cache: no 'processed include cache' to close, skipping...
 pips error in reset_entity_to_size: hash table should have been allocated
-${VDIR}/syntax_errors.test: line 17: 26744 Aborted                 ${pips_version:-pips} -f syntax_errors.f syntax_error
+Aborted

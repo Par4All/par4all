@@ -1,35 +1,35 @@
       PROGRAM MINI1
       INTEGER  NIRR
-C (unreachable)
+C (statement ordering unavailable)
 C     BEGIN BLOCK
-C (unreachable)
+C (statement ordering unavailable)
       REWIND (NIRR)                                                     0003
-C (unreachable)
+C (statement ordering unavailable)
       IF (INIRR.NE.1) THEN                                              0004
-C (unreachable)
+C (statement ordering unavailable)
 C        BEGIN BLOCK
-C (unreachable)
+C (statement ordering unavailable)
 C        BEGIN BLOCK
-C (unreachable)
+C (statement ordering unavailable)
 1        READ (UNIT=NIRR,FMT=1000,END=2)                                0005
-C (unreachable)
+C (statement ordering unavailable)
          GOTO 99999
          
-C (unreachable)
+C (statement ordering unavailable)
          GOTO 2
 99999    CONTINUE
 C        END BLOCK
-C (unreachable)
+C (statement ordering unavailable)
          GOTO 1
 C        END BLOCK
       ELSE
-C (unreachable)
+C (statement ordering unavailable)
 C        BEGIN BLOCK
 C        END BLOCK
       ENDIF
-C (unreachable)
+C (statement ordering unavailable)
       INIRR = 0                                                         0008
-C (unreachable)
+C (statement ordering unavailable)
 2     CONTINUE                                                          0009
 C     END BLOCK
       END

@@ -1,5 +1,7 @@
 #! /bin/sh
 
+# NOT PORTABLE AT ALL, DEPENDS ON THE FORTRAN COMPILER
+
 {
 echo "-- test with the property"
 ${pips_version:-pips} \
@@ -13,7 +15,6 @@ export PIPS_CHECK_FORTRAN
 ${pips_version:-pips} \
 	-f syntax_errors.f \
  	syntax_error 
-} 2>&1 | 
-sed "s,${VDIR},\${VDIR},g"
+} 2>&1
 
 Delete syntax_error

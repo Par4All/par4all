@@ -1,5 +1,6 @@
 user warning in tp_parse: formals: No such workspace
 Registering file formals.f
+Splitting file    ./formals.f
   Module         EXTEND
   Module         EXTINT
   Module         FPTRAK

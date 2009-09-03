@@ -1,5 +1,5 @@
 echo 'initial exec'
-shell ${PIPS_F77:-f77} ${VDIR:-.}/chaine02.f && ./a.out
+shell ${PIPS_F77:-f77} chaine02.f && ./a.out
 shell rm a.out
 
 delete chaine02

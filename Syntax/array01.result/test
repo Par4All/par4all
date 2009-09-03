@@ -1,6 +1,6 @@
 user warning in tp_parse: array01: No such workspace
 Registering file array01.f
-Splitting file    $VDIR/array01.f
+Splitting file    ./array01.f
   Module         ARRAY01
 Workspace array01 created and opened.
 Module ARRAY01 selected

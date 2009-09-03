@@ -1,6 +1,6 @@
 user warning in tp_parse: complexe05: No such workspace
 Registering file complexe05.f
-Splitting file    $VDIR/complexe05.f
+Splitting file    ./complexe05.f
   Module         COMPLEXE05
 Workspace complexe05 created and opened.
 Module COMPLEXE05 selected

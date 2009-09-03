@@ -1,5 +1,6 @@
 user warning in tp_parse: entry23: No such workspace
 Registering file entry23.f
+Splitting file    ./entry23.f
   Module         ENTRY23
   Module         INIBND
 Workspace entry23 created and opened.

@@ -46,6 +46,8 @@ ex3 with:argc with:args
 "Automatically generated with PIPS"
 
 "FSM2_STATE,int "
+"0`__func__,char "
+"0`__FUNCTION__,char "
 "result,int "
 "0`x,int , 1 dimension"
 "0`u,int , 1 dimension"
@@ -55,9 +57,12 @@ ex3 with:argc with:args
 "0`r,int "
 "0`t,int "
 
-|FSM2_STATE result 0`x 0`u 0`z 0`y 0`k 0`r 0`t |
+|FSM2_STATE 0`__func__ 0`__FUNCTION__ result 0`x 0`u 0`z 0`y 0`k 0`r 0`t |
 
 
+FSM2_STATE 0`__func__ 0`__FUNCTION__ result 0`x 0`u 0`z 0`y 0`k 0`r 0`t .
+FSM2_STATE 0`__func__ 0`__FUNCTION__ result 0`x 0`u 0`z 0`y 0`k 0`r 0`t .
+.
 0`x := Array new: 100.
 0`u := Array new: 100.
 0`z := Array new: 100.
@@ -70,7 +75,6 @@ ex3 with:argc with:args
 0`k.
 0`r.
 0`t.
-@.
 FSM2_STATE := 1.
 [FSM2_STATE != 0] whileTrue: [
 (FSM2_STATE == 1)

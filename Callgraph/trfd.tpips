@@ -1,12 +1,5 @@
-#!/bin/sh
-#
-
-tpips=${tpips_version:-tpips}
-
-
-$tpips <<EOF
 delete trfd
-create trfd ${PIPS_VALIDDIR}/Callgraph/trfd.f
+create trfd trfd.f
 module TRFD
 
 echo
@@ -18,7 +11,7 @@ display CALLGRAPH_FILE
 close
 delete trfd
 
-create trfd ${PIPS_VALIDDIR}/Callgraph/trfd.f
+create trfd trfd.f
 module TRFD
 
 echo
@@ -32,5 +25,4 @@ activate PRINT_CALL_GRAPH_WITH_PRECONDITIONS
 display CALLGRAPH_FILE
 close
 delete trfd
-EOF
-#
+quit

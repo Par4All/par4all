@@ -1,5 +1,5 @@
 echo 'initial exec'
-shell ${PIPS_F77:-f77} ${VDIR:-.}/type20.f && ./a.out
+shell ${PIPS_F77:-f77} type20.f && ./a.out
 shell rm a.out
 
 delete type20

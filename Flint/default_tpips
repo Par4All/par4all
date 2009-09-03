@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# if Pips -f $PIPS_VALIDDIR/Flint/tested_file.f -m tested_file -p flinter -w tested_file >/dev/null
+# if Pips -f tested_file.f -m tested_file -p flinter -w tested_file >/dev/null
 # then
 # 	cat tested_file.database/TESTED_FILE/TESTED_FILE.flinted
 # 	exit_status=0

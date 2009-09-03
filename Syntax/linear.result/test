@@ -1,5 +1,6 @@
 user warning in tp_parse: linear: No such workspace
 Registering file linear.f
+Splitting file    ./linear.f
   Module         RELAX
   Module         PRMAT
   Module         MEAN2

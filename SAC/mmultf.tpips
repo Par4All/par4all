@@ -48,7 +48,7 @@ apply USE_DEF_ELIM
 #apply SIMDIZER
 
 
-#source ${VDIR:-.}/include/benchmark.tpips.h
+#source include/benchmark.tpips.h
 
 echo
 echo simdized code

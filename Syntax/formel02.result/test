@@ -1,6 +1,6 @@
 user warning in tp_parse: formel02: No such workspace
 Registering file formel02.f
-Splitting file    $VDIR/formel02.f
+Splitting file    ./formel02.f
   Module         Q
   Module         FOO
   Module         FORMEL02

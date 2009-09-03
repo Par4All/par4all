@@ -4,7 +4,7 @@
 #
 rm -f properties.rc
 echo "COMPLEXITY_EARLY_EVALUATION TRUE" >properties.rc
-Pips -f $PIPS_VALIDDIR/DemoStd/q.f -w q -m sub -p prcc >&2
+Pips -f q.f -w q -m sub -p prcc >&2
 exit_code=$?
 echo "--- Complexity for module SUB"
 Display -m sub -l comp

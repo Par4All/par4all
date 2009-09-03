@@ -1,5 +1,6 @@
 user warning in tp_parse: save03: No such workspace
 Registering file save03.f
+Splitting file    ./save03.f
   Module         FOO
   Module         SAVE03
 Workspace save03 created and opened.

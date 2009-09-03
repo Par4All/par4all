@@ -12,7 +12,7 @@ echo
 echo The message should be: workspace protected_workspace: Permission denied
 echo
 
-create protected_workspace ${VDIR:-.}/protected_workspace.f
+create protected_workspace protected_workspace.f
 display PRINTED_FILE
 close
 shell chmod u-rwx protected_workspace.database

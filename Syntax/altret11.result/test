@@ -1,6 +1,6 @@
 user warning in tp_parse: altret11: No such workspace
 Registering file altret11.f
-Splitting file    $VDIR/altret11.f
+Splitting file    ./altret11.f
   Module         ALTRET11
 Workspace altret11 created and opened.
 Module ALTRET11 selected

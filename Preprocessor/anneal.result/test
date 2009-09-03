@@ -1759,7 +1759,7 @@ extern void _IO_free_backup_area (_IO_FILE *) ;
 
 
 typedef _G_fpos_t fpos_t;
-# 1770 "$VDIR/anneal.c"
+# 1770 "./anneal.c"
 /* The possibilities for the third argument to `setvbuf'.  */
 
 
@@ -2274,7 +2274,7 @@ extern int ftrylockfile (FILE *__stream) ;
 extern void funlockfile (FILE *__stream) ;
 /* If we are compiling with optimizing read this file.  It contains
    several optimizing inline functions and macros.  */
-# 2294 "$VDIR/anneal.c"
+# 2294 "./anneal.c"
 /* Declarations for math functions.
    Copyright (C) 1991-1993,1995-1999,2001,2002 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -3217,7 +3217,7 @@ extern int matherr (struct exception *__exc);
 
 
 /* Get machine-dependent inline versions (if there are any).  */
-# 3244 "$VDIR/anneal.c"
+# 3244 "./anneal.c"
 extern void anneal();
 
 extern float revcst();

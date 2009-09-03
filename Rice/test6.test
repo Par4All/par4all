@@ -2,10 +2,8 @@
 #
 # test pips on test6.f
 #
-#if Pips -f $PIPS_VALIDDIR/Rice/test6.f -w test6 -m test6 -s rfulldg -b PPF >&2
-#then 
-#	Delete test6>&2
-if Init -f $PIPS_VALIDDIR/Rice/test6.f test6>&2
+Delete test6>&2
+if Init -f test6.f test6 >&2
 then
 	Select -w test6 rfulldg>&2
 	if Display -m test6

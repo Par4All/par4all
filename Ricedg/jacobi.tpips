@@ -13,10 +13,11 @@ activate PRINT_PARALLELIZEDOMP_CODE
 
 setproperty PARALLELIZATION_STATISTICS TRUE
 
-apply PRIVATIZE_MODULE(jacobi)
+apply PRIVATIZE_MODULE[jacobi]
 
 display PARALLELPRINTED_FILE[jacobi]
 
 
 close
 delete jacobi
+quit

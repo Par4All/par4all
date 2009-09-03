@@ -1,5 +1,6 @@
 user warning in tp_parse: checktype: No such workspace
 Registering file checktype.f
+Splitting file    ./checktype.f
   Module         CHECKTYPE
 Workspace checktype created and opened.
 Module CHECKTYPE selected

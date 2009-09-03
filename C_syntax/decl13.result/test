@@ -1,6 +1,6 @@
 user warning in tp_parse: decl13: No such workspace
 Registering file decl13.c
-Preprocessing file $VDIR/decl13.c
+Preprocessing file ./decl13.c
 Splitting file    ./decl13.database/Tmp/decl13.cpp_processed.c
   Module         decl13
   Module         decl13!

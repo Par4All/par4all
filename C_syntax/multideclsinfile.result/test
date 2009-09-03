@@ -1,6 +1,6 @@
 user warning in tp_parse: multideclsinfile: No such workspace
 Registering file multideclsinfile.c
-Preprocessing file $VDIR/multideclsinfile.c
+Preprocessing file ./multideclsinfile.c
 Splitting file    ./multideclsinfile.database/Tmp/multideclsinfile.cpp_processed.c
   Module         multideclsinfile!
 Workspace multideclsinfile created and opened.

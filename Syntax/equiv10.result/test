@@ -1,5 +1,6 @@
 user warning in tp_parse: equiv10: No such workspace
 Registering file equiv10.f
+Splitting file    ./equiv10.f
   Module         EQUIV10
 Workspace equiv10 created and opened.
 Module EQUIV10 selected

@@ -1,14 +1,5 @@
-#!/bin/sh
-
-tpips=${tpips_version:-tpips}
-
-# Initialization:
-# rm -f hook.result/test
-# tpips >hook.result/test <<EOF
-
-$tpips <<EOF
 delete hook
-create hook $PIPS_VALIDDIR/Prettyprint/hook.f
+create hook hook.f
 
 module HOOK
 activate PRINT_CODE_PRECONDITIONS
@@ -32,4 +23,3 @@ display PRINTED_FILE
 close
 delete hook
 quit
-EOF

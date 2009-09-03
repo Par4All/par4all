@@ -21,10 +21,10 @@ apply CLEAN_UNUSED_DYNAMIC_VARIABLES[${WSPACE}]
 touch SPOC_FILE[${WSPACE}]
 touch PROPER_EFFECTS[${WSPACE}]
 touch CUMULATED_EFFECTS[${WSPACE}]
-setproperty ABORT_ON_USER_ERROR FALSE
 #
 # show spoc results
 #
+setproperty ABORT_ON_USER_ERROR FALSE
 echo
 echo ! graphs
 echo

@@ -1,14 +1,8 @@
 #!/bin/sh
 
-
-tpips=${tpips_version:-tpips}
-PIPS_VALIDDIR=${PIPS_VALIDDIR:-$PIPS_ROOT/Validation}
-
-# echo tpips="$tpips"
-
 echo "testing tpips -n option"
 
-$tpips -n <<EOF
+tpips -n <<EOF
 
 # Try to get errors on user_errors ...
 # so we MUST go on !
@@ -19,12 +13,12 @@ set ABORT_ON_USER_ERROR FALSE
 
 delete tpips_noexe
 delete tpips_noexe
-create tpips_noexe $PIPS_VALIDDIR/Tpips/tpips_noexe.f
+create tpips_noexe tpips_noexe.f
 delete tpips_noexe
 close
 delete tpips_noexe
-create tpips_noexe $PIPS_VALIDDIR/Tpips/tpips_noexe.f
-create tpips_noexe $PIPS_VALIDDIR/Tpips/tpips_noexe.f
+create tpips_noexe tpips_noexe.f
+create tpips_noexe tpips_noexe.f
 module STF
 close
 close

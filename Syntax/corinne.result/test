@@ -5,7 +5,7 @@ echo First try: detect extra ENDDO
 First try: detect extra ENDDO
 echo
 
-shell sed /cfirst/s/cfirst// ${VDIR:-.}/corinne.f >corinne1.f
+shell sed /cfirst/s/cfirst// corinne.f >corinne1.f
 shell sleep 1
 user warning in tp_parse: corinne: No such workspace
 Registering file corinne1.f
@@ -46,7 +46,7 @@ echo Second try: detect wrong lhs
 Second try: detect wrong lhs
 echo
 
-shell sed /csecond/s/csecond// ${VDIR:-.}/corinne.f >corinne2.f
+shell sed /csecond/s/csecond// corinne.f >corinne2.f
 shell sleep 1
 Registering file corinne2.f
 Splitting file    ./corinne2.f
@@ -86,7 +86,7 @@ echo Third try: detect extra ENDDIF
 Third try: detect extra ENDDIF
 echo
 
-shell sed /cthird/s/cthird// ${VDIR:-.}/corinne.f >corinne3.f
+shell sed /cthird/s/cthird// corinne.f >corinne3.f
 shell sleep 1
 Registering file corinne3.f
 Splitting file    ./corinne3.f
@@ -127,7 +127,7 @@ Fourth try: detect IF/ENDDO pair
 echo
 
 Registering file corinne.f
-Splitting file    $VDIR/corinne.f
+Splitting file    ./corinne.f
   Module         IFENDDO
   Module         DOENDIF
   Module         CORINNE
@@ -165,7 +165,7 @@ Fifth try: detect DO/ENDIF pair
 echo
 
 Registering file corinne.f
-Splitting file    $VDIR/corinne.f
+Splitting file    ./corinne.f
   Module         IFENDDO
   Module         DOENDIF
   Module         CORINNE

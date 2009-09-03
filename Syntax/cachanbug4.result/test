@@ -1,6 +1,6 @@
 user warning in tp_parse: cachanbug4: No such workspace
 Registering file cachanbug4.f
-Splitting file    $VDIR/cachanbug4.f
+Splitting file    ./cachanbug4.f
   Module         CACHANBUG4C
   Module         CACHANBUG4B
   Module         CACHANBUG4

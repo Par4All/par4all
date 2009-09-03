@@ -8,11 +8,13 @@ int main()
    for (i = 2;i<100;i += 1)                                             /*0007*/
       a[i] = 2;                                                         /*0008*/
    
+   /* The following code should not prevent the previous loop to be
+        parallel: */
    // Should not be a do loop because j is not the expected index !
-   for (i = 2;i<=50;j += 1)                                             /*0011*/
-      a[i] = 2;                                                         /*0012*/
+   for (i = 2;i<=50;j += 1)                                             /*0013*/
+      a[i] = 2;                                                         /*0014*/
 
-   return 0;                                                            /*0014*/
+   return 0;                                                            /*0016*/
 }
 int main()
 {
@@ -24,11 +26,13 @@ int main()
    for(i = 2; i <= 99; i += 1)                                          /*0007*/
       a[i] = 2;                                                         /*0008*/
    
+   /* The following code should not prevent the previous loop to be
+        parallel: */
    // Should not be a do loop because j is not the expected index !
-   for (i = 2;i<=50;j += 1)                                             /*0011*/
-      a[i] = 2;                                                         /*0012*/
+   for (i = 2;i<=50;j += 1)                                             /*0013*/
+      a[i] = 2;                                                         /*0014*/
 
-   return 0;                                                            /*0014*/
+   return 0;                                                            /*0016*/
 }
 int main()
 {
@@ -40,9 +44,11 @@ int main()
    for(i = 2; i <= 99; i += 1)                                          /*0007*/
       a[i] = 2;                                                         /*0008*/
    
+   /* The following code should not prevent the previous loop to be
+        parallel: */
    // Should not be a do loop because j is not the expected index !
-   for (i = 2;i<=50;j += 1)                                             /*0011*/
-      a[i] = 2;                                                         /*0012*/
+   for (i = 2;i<=50;j += 1)                                             /*0013*/
+      a[i] = 2;                                                         /*0014*/
 
-   return 0;                                                            /*0014*/
+   return 0;                                                            /*0016*/
 }

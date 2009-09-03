@@ -1,4 +1,4 @@
-if Init -d -f $PIPS_VALIDDIR/Ricedg/inc_noncons.f inc_noncons>&2
+if Init -d -f inc_noncons.f inc_noncons>&2
 then
 	Select -w inc_noncons rfulldg>&2
 	if Display -m inc

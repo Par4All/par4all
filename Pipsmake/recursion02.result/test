@@ -1,5 +1,6 @@
 user warning in tp_parse: recursion02: No such workspace
 Registering file recursion02.f
+Splitting file    ./recursion02.f
   Module         FOO05
   Module         FOO04
   Module         FOO03

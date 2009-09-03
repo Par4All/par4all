@@ -13,7 +13,7 @@ l1:
    return 0;
 }
 
-Source code after loop interchange
+Source code after strip mining
 
 int strip_mining01(int *in, int *val)
 {

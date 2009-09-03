@@ -1259,7 +1259,7 @@ extern int matherr (struct exception *__exc);
 
 
 /* Get machine-dependent inline versions (if there are any).  */
-# 1270 "$VDIR/gcf.c"
+# 1270 "./gcf.c"
 extern void gcf();
 # 1270
 void gcf(gammcf,a,x,gln)

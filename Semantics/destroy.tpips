@@ -22,7 +22,7 @@ shell echo Second version: array and real variable interference in module BAR
 shell echo
 
 shell rm -f destroy2.f
-shell sed s/cfirst// ${VDIR:-.}/destroy.f >destroy2.f
+shell sed s/cfirst// destroy.f >destroy2.f
 
 create destroy2 destroy2.f
 

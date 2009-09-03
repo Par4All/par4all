@@ -1,5 +1,5 @@
 delete convol
-create convol convol.c
+create convol convol.c 
 setproperty ABORT_ON_USER_ERROR TRUE
 
 setproperty PRETTYPRINT_C_CODE TRUE
@@ -33,121 +33,122 @@ echo
 apply UNFOLDING
 display PRINTED_FILE
 
+#echo
+#echo After tiling
+#echo
+#
+#apply FLAG_LOOPS
+#apply LOOP_INTERCHANGE
+#l99993
+#display PRINTED_FILE
+#apply LOOP_TILING
+#l99993
+#128 0
+#0 5
+#apply FLAG_LOOPS
+#display PRINTED_FILE
+
 echo
-echo After tiling
+echo after Kernelize
 echo
 
 apply FLAG_LOOPS
-apply LOOP_INTERCHANGE
-l99993
-display PRINTED_FILE
-apply LOOP_TILING
-l99993
-128 0
-0 5
-apply FLAG_LOOPS
+setproperty LOOP_LABEL "l99993"
+setproperty KERNELIZE_NBNODES 128
+setproperty KERNELIZE_KERNEL_NAME "microcode"
+setproperty KERNELIZE_HOST_CALL_NAME "work"
+apply KERNELIZE
+display PRINTED_FILE[convol]
+display PRINTED_FILE[work]
+display PRINTED_FILE[microcode]
+
+module microcode
+
+module microcode
+apply PARTIAL_EVAL
+apply LOOP_NORMALIZE
+apply SUPPRESS_DEAD_CODE
 display PRINTED_FILE
 
-#
-#
-#echo
-#echo after terapixify
-#echo
-#
-#setproperty LOOP_LABEL "l400"
-#setproperty OUTLINE_MODULE_NAME "microcode"
-#apply TERAPIXIFY
-#
+echo
+echo Microcode after normalization
+echo
+apply  NORMALIZE_MICROCODE
 #display PRINTED_FILE
-#module microcode
-#apply PARTIAL_EVAL
-#apply LOOP_NORMALIZE
-#apply SUPPRESS_DEAD_CODE
-#display PRINTED_FILE
-#
-#echo
-#echo Microcode after normalization
-#echo
-#apply  NORMALIZE_MICROCODE
-##display PRINTED_FILE
-#
-##echo
-##echo Microcode After atomization
-##echo
-##
-##setproperty SIMD_EXTRAVAGANT_ATOMIZER TRUE
-##apply SIMD_ATOMIZER
-##display PRINTED_FILE
-#
-#
-#echo
-#echo Microcode after scalarization
-#echo
-#
-#apply SCALARIZATION
-#display PRINTED_FILE
-#
-#echo
-#echo Microcode After array conversion
-#echo
-#
-#setproperty ARRAY_TO_POINTER_CONVERT_PARAMETERS TRUE
-#setproperty ARRAY_TO_POINTER_FLATTEN_ONLY TRUE
-#apply ARRAY_TO_POINTER
-#apply PARTIAL_EVAL
-#display PRINTED_FILE
-#
-##echo
-##echo Microcode After ICM
-##echo
-##
-##apply INVARIANT_CODE_MOTION
-##display PRINTED_FILE
-#
-#echo
-#echo Microcode after double unrolling
-#echo
-#
-#setproperty LOOP_UNROLL_MERGE TRUE
-#setproperty LOOP_LABEL "l100"
-#apply FULL_UNROLL
-#setproperty LOOP_LABEL "l200"
-#apply FULL_UNROLL
-#apply PARTIAL_EVAL
-#apply SUPPRESS_DEAD_CODE
-#apply CLEAN_DECLARATIONS
-#display PRINTED_FILE
-#
-#
-#echo
-#echo Microcode after CSE
-#echo
-#
-#setproperty EOLE_OPTIMIZATION_STRATEGY "CSE"
-#apply OPTIMIZE_EXPRESSIONS
-#apply CLEAN_DECLARATIONS
-#display PRINTED_FILE
-#
-#echo
-#echo Microcode after ICM
-#echo
-#
-#setproperty EOLE_OPTIMIZATION_STRATEGY "ICM"
-#apply OPTIMIZE_EXPRESSIONS
-#apply PARTIAL_EVAL
-#apply SUPPRESS_DEAD_CODE
-#apply CLEAN_DECLARATIONS
-#display PRINTED_FILE
-#
-##echo
-##echo Microcode After atomization
-##echo
-##
-##setproperty SIMD_EXTRAVAGANT_ATOMIZER TRUE
-##apply SIMD_ATOMIZER
-##display PRINTED_FILE
-#
 
-#close
-#delete convol
-#quit
+#echo
+#echo Microcode After atomization
+#echo
+#
+#setproperty SIMD_EXTRAVAGANT_ATOMIZER TRUE
+#apply SIMD_ATOMIZER
+#display PRINTED_FILE
+
+
+echo
+echo Microcode after scalarization
+echo
+
+apply SCALARIZATION
+display PRINTED_FILE
+
+echo
+echo Microcode After array conversion
+echo
+
+setproperty ARRAY_TO_POINTER_CONVERT_PARAMETERS TRUE
+setproperty ARRAY_TO_POINTER_FLATTEN_ONLY TRUE
+apply ARRAY_TO_POINTER
+apply PARTIAL_EVAL
+display PRINTED_FILE
+
+#echo
+#echo Microcode After ICM
+#echo
+#
+#apply INVARIANT_CODE_MOTION
+#display PRINTED_FILE
+
+echo
+echo Microcode after flattening
+echo
+
+apply FLATTEN_CODE
+apply PARTIAL_EVAL
+apply USE_DEF_ELIMINATION
+apply SUPPRESS_DEAD_CODE
+apply CLEAN_DECLARATIONS
+display PRINTED_FILE
+
+
+echo
+echo Microcode after CSE
+echo
+
+setproperty EOLE_OPTIMIZATION_STRATEGY "CSE"
+apply OPTIMIZE_EXPRESSIONS
+apply CLEAN_DECLARATIONS
+display PRINTED_FILE
+
+echo
+echo Microcode after ICM
+echo
+
+setproperty EOLE_OPTIMIZATION_STRATEGY "ICM"
+apply OPTIMIZE_EXPRESSIONS
+apply PARTIAL_EVAL
+apply SUPPRESS_DEAD_CODE
+apply CLEAN_DECLARATIONS
+display PRINTED_FILE
+
+echo
+echo Microcode After atomization
+echo
+
+apply SIMD_ATOMIZER
+display PRINTED_FILE
+
+
+close
+delete convol
+quit

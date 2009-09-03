@@ -1,6 +1,6 @@
 user warning in tp_parse: ioilldef: No such workspace
 Registering file ioilldef.f
-Splitting file    $VDIR/ioilldef.f
+Splitting file    ./ioilldef.f
   Module         IOILLDEF
 Workspace ioilldef created and opened.
 Module IOILLDEF selected

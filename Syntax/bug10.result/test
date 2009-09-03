@@ -1,7 +1,7 @@
 user warning in tp_parse: bug10a: No such workspace
 user warning in tp_parse: bug10b: No such workspace
 Registering file bug10.src/test1.f
-Splitting file    $VDIR/bug10.src/test1.f
+Splitting file    ./bug10.src/test1.f
   Module         COURC4
 Workspace bug10a created and opened.
 Module COURC4 selected
@@ -30,7 +30,7 @@ Closing workspace.
 Workspace bug10a closed.
 
 Registering file bug10.src/test.f
-Splitting file    $VDIR/bug10.src/test.f
+Splitting file    ./bug10.src/test.f
   Module         COURC4
 Workspace bug10b created and opened.
 Module COURC4 selected

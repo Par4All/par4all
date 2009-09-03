@@ -1,6 +1,6 @@
 #!/bin/sh
 
-if Pips -f $PIPS_VALIDDIR/Flint/wtype2.f -m wtype2 -p flinter -w wtype2 >/dev/null
+if Pips -f wtype2.f -m wtype2 -p flinter -w wtype2 >/dev/null
 then
 	cat wtype2.database/WTYPE2/WTYPE2.flinted
 	exit_status=0

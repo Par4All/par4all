@@ -20,7 +20,7 @@ setproperty 47239 nbf48yfhcnw4w c492jfkjldu48329xmdri[cxn2rc 8950cmc[m "
 #
 # now with a workspace
 #
-create property ${PIPS_ROOT}/Validation/Tpips/property.f
+create property property.f
 #
 # more syntax errors.
 #

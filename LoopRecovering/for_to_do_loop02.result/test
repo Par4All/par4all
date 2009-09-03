@@ -8,14 +8,16 @@ int main()
    for (i = 2;i<=50;i = i+1)                                            /*0007*/
       a[i] = 2;                                                         /*0008*/
    
+   /* The following code should not prevent the previous loop to be
+        parallel: */
    // Should be parallel but for->do here not implemented yet...
-   for (j = 60;j>10;j = j-3)                                            /*0011*/
-      a[j] = 2;                                                         /*0012*/
+   for (j = 60;j>10;j = j-3)                                            /*0013*/
+      a[j] = 2;                                                         /*0014*/
 
-   for (i = 2;i<=50;i = 2+1)                                            /*0014*/
-      a[i] = 2;                                                         /*0015*/
+   for (i = 2;i<=50;i = 2*i)                                            /*0016*/
+      a[i] = 2;                                                         /*0017*/
 
-   return 0;                                                            /*0017*/
+   return 0;                                                            /*0019*/
 }
 int main()
 {
@@ -27,12 +29,35 @@ int main()
    for(i = 2; i <= 50; i += 1)                                          /*0007*/
       a[i] = 2;                                                         /*0008*/
    
+   /* The following code should not prevent the previous loop to be
+        parallel: */
    // Should be parallel but for->do here not implemented yet...
-   for (j = 60;j>10;j = j-3)                                            /*0011*/
-      a[j] = 2;                                                         /*0012*/
+   for (j = 60;j>10;j = j-3)                                            /*0013*/
+      a[j] = 2;                                                         /*0014*/
 
-   for (i = 2;i<=50;i = 2+1)                                            /*0014*/
-      a[i] = 2;                                                         /*0015*/
+   for (i = 2;i<=50;i = 2*i)                                            /*0016*/
+      a[i] = 2;                                                         /*0017*/
 
-   return 0;                                                            /*0017*/
+   return 0;                                                            /*0019*/
+}
+int main()
+{
+   int a[100];
+   int i;
+   int j;
+   
+   // A do loop ! Should be parallel
+   for(i = 2; i <= 50; i += 1)                                          /*0007*/
+      a[i] = 2;                                                         /*0008*/
+   
+   /* The following code should not prevent the previous loop to be
+        parallel: */
+   // Should be parallel but for->do here not implemented yet...
+   for (j = 60;j>10;j = j-3)                                            /*0013*/
+      a[j] = 2;                                                         /*0014*/
+
+   for (i = 2;i<=50;i = 2*i)                                            /*0016*/
+      a[i] = 2;                                                         /*0017*/
+
+   return 0;                                                            /*0019*/
 }

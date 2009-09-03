@@ -42,7 +42,7 @@ apply SIMD_ATOMIZER
 apply SINGLE_ASSIGNMENT
 apply SIMDIZER
 
-#source ${VDIR:-.}/include/benchmark.tpips.h
+#source include/benchmark.tpips.h
 
 echo
 echo simdized code

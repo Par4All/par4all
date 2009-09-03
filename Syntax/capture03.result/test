@@ -1,5 +1,6 @@
 user warning in tp_parse: capture03: No such workspace
 Registering file capture03.f
+Splitting file    ./capture03.f
   Module         MIN
   Module         FOO
   Module         CAPTURE03

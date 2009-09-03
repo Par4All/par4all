@@ -6,7 +6,7 @@
 # comments2.f comes from the PerfectClub SPICE code.
 #
 
-Init -d -f ${VDIR:-.}/comments2.f comments2 >/dev/null 2>/dev/null
+Init -d -f comments2.f comments2 >/dev/null 2>/dev/null
 Display -v -m rffti code
 exit_code=$?
 Delete comments2 2>/dev/null

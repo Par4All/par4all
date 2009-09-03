@@ -1,5 +1,6 @@
 user warning in tp_parse: param01: No such workspace
 Registering file param01.f
+Splitting file    ./param01.f
   Module         PARAM01
 Workspace param01 created and opened.
 Module PARAM01 selected

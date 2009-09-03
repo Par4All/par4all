@@ -79,15 +79,20 @@ ex2 with:argc with:args
 "DO2_END,int "
 "DO2_BEGIN,int "
 "DO2_INDEX,int "
+"0`__func__,char "
+"0`__FUNCTION__,char "
 "result,int "
 "0`U,int , 2 dimensions"
 "0`V,int , 2 dimensions"
 "0`i,int "
 "0`j,int "
 
-|FSM196611_STATE FSM2_STATE DO3_INCREMENT DO3_END DO3_BEGIN DO3_INDEX DO2_INCREMENT DO2_END DO2_BEGIN DO2_INDEX result 0`U 0`V 0`i 0`j |
+|FSM196611_STATE FSM2_STATE DO3_INCREMENT DO3_END DO3_BEGIN DO3_INDEX DO2_INCREMENT DO2_END DO2_BEGIN DO2_INDEX 0`__func__ 0`__FUNCTION__ result 0`U 0`V 0`i 0`j |
 
 
+FSM196611_STATE FSM2_STATE DO3_INCREMENT DO3_END DO3_BEGIN DO3_INDEX DO2_INCREMENT DO2_END DO2_BEGIN DO2_INDEX 0`__func__ 0`__FUNCTION__ result 0`U 0`V 0`i 0`j .
+FSM196611_STATE FSM2_STATE DO3_INCREMENT DO3_END DO3_BEGIN DO3_INDEX DO2_INCREMENT DO2_END DO2_BEGIN DO2_INDEX 0`__func__ 0`__FUNCTION__ result 0`U 0`V 0`i 0`j .
+.
 0`U := Array2D width: 101 height: 101.
 0`V := Array2D width: 101 height: 101.
 
@@ -95,7 +100,6 @@ ex2 with:argc with:args
 0`V.
 0`i.
 0`j.
-@.
 FSM2_STATE := 1.
 [FSM2_STATE != 0] whileTrue: [
 (FSM2_STATE == 1)

@@ -4,7 +4,7 @@ setenv MAIN $WSPACE.database/main
 
 setproperty ABORT_ON_USER_ERROR TRUE
 
-create ${WSPACE} inlining22.c inlining22-foo.c
+create ${WSPACE} inlining22.src/inlining22.c inlining22.src/inlining22-foo.c
 
 activate C_PARSER
 activate C_SYMBOL_TABLE

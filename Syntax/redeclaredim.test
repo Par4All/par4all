@@ -1,6 +1,6 @@
 #!/bin/sh
 
-if Pips -f  ${VDIR:-.}/redeclaredim.f -w redeclaredim -m redeclaredim -b CODE >&2
+if Pips -f  redeclaredim.f -w redeclaredim -m redeclaredim -b CODE >&2
 then
     echo Parser failed to fail for dimension redeclaration in redeclaredim.f
     exit 1

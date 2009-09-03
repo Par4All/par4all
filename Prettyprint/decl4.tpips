@@ -1,5 +1,4 @@
 delete d
-# setenv PIPS_SRCPATH=${PIPS_ROOT}/Validation/Prettyprint
 create d decl4.f
 
 echo # Usual declarations

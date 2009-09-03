@@ -1,14 +1,14 @@
 delete srcpath
 #
 echo ! looking for one file in one dir
-setenv PIPS_SRCPATH ${VDIR:-.}
+setenv PIPS_SRCPATH .
 create srcpath srcpath.f
 display PRINTED_FILE
 close
 delete srcpath
 #
 echo ! looking in two dirs...
-setenv PIPS_SRCPATH ${VDIR:-.}:${VDIR:-.}/srcpath.src
+setenv PIPS_SRCPATH .:srcpath.src
 # echo ! PIPS_SRCPATH=$PIPS_SRCPATH
 create srcpath srcpath.f sub1.f sub2.f
 display PRINTED_FILE[%ALL]

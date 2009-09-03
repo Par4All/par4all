@@ -1,5 +1,6 @@
 user warning in tp_parse: external10: No such workspace
 Registering file external10.f
+Splitting file    ./external10.f
   Module         F
   Module         EXTERNAL10
 Workspace external10 created and opened.

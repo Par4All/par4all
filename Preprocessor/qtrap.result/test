@@ -1259,7 +1259,7 @@ extern int matherr (struct exception *__exc);
 
 
 /* Get machine-dependent inline versions (if there are any).  */
-# 1270 "$VDIR/qtrap.c"
+# 1270 "./qtrap.c"
 extern float qtrap();
 # 1270
 float qtrap(func,a,b)

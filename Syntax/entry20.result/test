@@ -1,5 +1,6 @@
 user warning in tp_parse: entry20: No such workspace
 Registering file entry20.f
+Splitting file    ./entry20.f
   Module         ENTRY20
   Module         INCREMENT
 Workspace entry20 created and opened.

@@ -5,7 +5,7 @@ echo First version: masking
 echo
 
 shell rm -f mask1.f
-shell sed s/cfirst// ${VDIR:-.}/mask.f >mask1.f
+shell sed s/cfirst// mask.f >mask1.f
 
 delete mask
 create mask mask1.f
@@ -26,7 +26,7 @@ echo Second version: no masking
 echo
 
 shell rm -f mask2.f
-shell sed s/csecond// ${VDIR:-.}/mask.f >mask2.f
+shell sed s/csecond// mask.f >mask2.f
 
 create mask mask2.f
 

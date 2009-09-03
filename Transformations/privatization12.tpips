@@ -46,7 +46,7 @@ echo
 echo Run code
 echo
 
-shell cc ${VDIR:-.}/privatization12.c
+shell cc privatization12.c
 shell ./a.out 
 shell cc privatization12.database/Src/privatization12.c
 shell ./a.out 

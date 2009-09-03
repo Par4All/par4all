@@ -24,7 +24,7 @@ module average_packed
 
 
 
-source ${VDIR:-.}/include/c2h.tpips.h
+source include/c2h.tpips.h
 
 echo
 echo simdized code
