@@ -746,7 +746,7 @@ int compare_entities(const entity *pe1, const entity *pe2)
  */
 void sort_list_of_entities(list l)
 {
-  gen_sort_list(l, (int(*)(const void*,const void*)) compare_entities);
+  gen_sort_list(l, (gen_cmp_func_t)compare_entities);
 }
 
 /*   TRUE if var1 <= var2
@@ -780,7 +780,7 @@ basic entity_basic(entity e)
 }
 
 /* return TRUE if the basic associated with entity e matchs the passed tag */
-bool entity_basic_p(entity e,_int basictag)
+bool entity_basic_p(entity e,enum basic_utype basictag)
 {
   return basic_tag(entity_basic(e)) == basictag;
 }

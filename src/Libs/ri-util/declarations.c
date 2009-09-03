@@ -1990,8 +1990,8 @@ list generic_c_words_entity(type t, list name, bool is_safe, bool add_dummy_para
 
       pc = gen_nconc(pc,words_type(t));
       if (string_type_p(t)) {
-	value v = basic_string(variable_basic(type_variable(t)));
-	list vw = words_value(v);
+	//value v = basic_string(variable_basic(type_variable(t)));
+	//list vw = words_value(v);
 
 	/*
 	pc = CHAIN_SWORD(pc,"[");
@@ -2594,7 +2594,7 @@ void fprint_any_environment(FILE * fd, entity m, bool is_fortran)
 
   /* To simplify validation, at the expense of some information about
      the parsing process. */
-  gen_sort_list(decls, (int (*)(const void *,const void *)) compare_entities);
+  gen_sort_list(decls,(gen_cmp_func_t)compare_entities);
 
   (void) fprintf(fd, "\nDeclarations for module %s with type ",
 		 module_local_name(m));
@@ -2634,7 +2634,7 @@ void fprint_any_environment(FILE * fd, entity m, bool is_fortran)
     list edecls = gen_copy_seq(code_externs(value_code(entity_initial(m))));
     /* List of external variables and functions and areas */
 
-    gen_sort_list(edecls, (int (*)(const void *,const void *)) compare_entities);
+    gen_sort_list(edecls, (gen_cmp_func_t)compare_entities);
 
     (void) fprintf(fd, "%s\n", ENDP(edecls)?
 		   "* empty external declaration list *\n\n": "External variable list:\n\n");

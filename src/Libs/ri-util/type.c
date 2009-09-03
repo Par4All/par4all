@@ -2418,11 +2418,25 @@ list recursive_functional_type_supporting_entities(list sel, set vt, functional 
     fprintf(stderr, "\n\n");
   }
 
-  MAP(PARAMETER, p,
-      sel = recursive_type_supporting_entities(sel, vt, parameter_type(p)),
-      functional_parameters(f));
+  set params = set_make(set_string);
+  FOREACH(PARAMETER, p,functional_parameters(f))
+  {
+      sel = recursive_type_supporting_entities(sel, vt, parameter_type(p));
+      dummy d = parameter_dummy(p);
+      if(dummy_identifier_p(d))
+          set_add_element(params,params,entity_user_name(dummy_identifier(d)));
+  }
 
   sel = recursive_type_supporting_entities(sel, vt, functional_result(f));
+  list tmp =NIL;
+
+  FOREACH(ENTITY,e,sel)
+  {
+      if(!set_belong_p(params,entity_user_name(e)))
+          tmp=CONS(ENTITY,e,tmp);
+  }
+  gen_free_list(sel);
+  sel=gen_nreverse(tmp);
 
   ifdebug(8) {
     pips_debug(8, "End: ");

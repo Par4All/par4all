@@ -642,7 +642,7 @@ bool effects_all_read_p(list el)
   bool result = TRUE;
   FOREACH(EFFECT, e, el) {
     action a  = effect_action(e);
-    entity ev = effect_entity(e);
+    //entity ev = effect_entity(e);
     if (action_write_p(a)) {
       result = FALSE;
       break;

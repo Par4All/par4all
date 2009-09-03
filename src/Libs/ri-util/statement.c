@@ -604,8 +604,9 @@ statement make_empty_statement_with_declarations_and_comments(list d,
 							      string dt,
 							      string c) {
   statement s = make_block_statement(NIL);
+  statement_declarations(s)=d;
   statement_decls_text(s) = dt;
-  statement_comments(s) = dt;
+  statement_comments(s) = c;
   return s;
 }
 
@@ -2546,7 +2547,7 @@ static bool count_element_references_to_v_p(reference r)
   entity rv = reference_variable(r);
   if (rv == variable_searched) {
     list inds = reference_indices(r);
-    int d = type_depth(ultimate_type(entity_type(rv)));
+    size_t d = type_depth(ultimate_type(entity_type(rv)));
     if (gen_length(inds) == d) {
       /* 10: arbitrary value for references nested in at least one loop */
       reference_count += (loop_depth > 0 ? 10 : 1 );
@@ -2763,22 +2764,23 @@ void statement_clean_declarations_area_walker(area a, set re)
  * @param re set to fill
  * 
  */
-static
 void entity_get_referenced_entities(entity e, set re)
 {
-    gen_context_multi_recurse(entity_type(e),re,
-            reference_domain,gen_true,statement_clean_declarations_reference_walker,
-            call_domain,gen_true,statement_clean_declarations_call_walker,
-            NULL
-            );
-    /* SG: I am unsure wether it is valid or not to find an entity with undefined initial ... */
-    if( !value_undefined_p(entity_initial(e) ) ) {
-        gen_context_multi_recurse(entity_initial(e),re,
-                call_domain,gen_true,statement_clean_declarations_call_walker,
+    /*if(entity_variable_p(e))*/ {
+        gen_context_multi_recurse(entity_type(e),re,
                 reference_domain,gen_true,statement_clean_declarations_reference_walker,
-                area_domain,gen_true,statement_clean_declarations_area_walker,
-                ram_domain,gen_true,statement_clean_declarations_ram_walker,
-                NULL);
+                call_domain,gen_true,statement_clean_declarations_call_walker,
+                NULL
+                );
+        /* SG: I am unsure wether it is valid or not to find an entity with undefined initial ... */
+        if( !value_undefined_p(entity_initial(e) ) ) {
+            gen_context_multi_recurse(entity_initial(e),re,
+                    call_domain,gen_true,statement_clean_declarations_call_walker,
+                    reference_domain,gen_true,statement_clean_declarations_reference_walker,
+                    area_domain,gen_true,statement_clean_declarations_area_walker,
+                    ram_domain,gen_true,statement_clean_declarations_ram_walker,
+                    NULL);
+        }
     }
 }
 

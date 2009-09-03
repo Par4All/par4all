@@ -120,19 +120,6 @@ static string st_entity_local_name(entity var)
   return strdup(name);
 }
 
-/**
- * Return boolean indicating if expression e is a brace expression
- */
-bool brace_expression_p(expression e)
-{
-  if (expression_call_p(e))
-    {
-      entity f = call_function(syntax_call(expression_syntax(e)));
-      if (ENTITY_BRACE_INTRINSIC_P(f))
-	return TRUE;
-    }
-  return FALSE;
-}
 
 /**
  * Return string representing expression enclosed by parenthesis

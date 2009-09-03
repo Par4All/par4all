@@ -376,17 +376,6 @@ static string c_qualifier_string(list l)
     return strdup(result);
 }
 
-static bool brace_expression_p(expression e)
-{
-    if (expression_call_p(e))
-    {
-        entity f = call_function(syntax_call(expression_syntax(e)));
-        if (ENTITY_BRACE_INTRINSIC_P(f))
-            return TRUE;
-    }
-    return FALSE;
-}
-
 static string c_brace_expression_string(expression exp)
 {
     string result = "{";

@@ -293,7 +293,7 @@ void inlining_regenerate_labels(statement s, string new_module)
 }
 
 static
-bool find_entity_with_same_name(entity e, list l) {
+bool has_entity_with_same_name(entity e, list l) {
     FOREACH(ENTITY,ent,l)
         if(same_entity_name_p(e,ent)) return true;
     return false;
@@ -353,7 +353,7 @@ statement inline_expression_call(inlining_parameters p, expression modified_expr
                 string emn = entity_module_name(ref_ent);
                 if(! same_string_p(emn,mln) &&
                         !same_string_p(emn,cu_name) &&
-                        !find_entity_with_same_name(ref_ent,statement_declarations(expanded)) )
+                        !has_entity_with_same_name(ref_ent,statement_declarations(expanded)) )
                 {
                     entity add = ref_ent;
                     if(entity_variable_p(ref_ent) && 
@@ -368,7 +368,7 @@ statement inline_expression_call(inlining_parameters p, expression modified_expr
                 }
             }
         }
-        gen_sort_list(new_externs,(int(*)(const void*,const void*))compare_entities);
+        gen_sort_list(new_externs,(gen_cmp_func_t)compare_entities);
         statement_declarations(expanded)=gen_nconc(statement_declarations(expanded),new_externs);
         set_free(inlined_referenced_entities);
     }
@@ -1009,6 +1009,64 @@ set get_private_entities(void *s)
     return tmp;
 }
 
+static
+int compare_entities_with_dep(const entity *e1, const entity *e2)
+{
+    set s1 = set_make(set_pointer);
+    entity_get_referenced_entities(*e1,s1);
+    if( set_belong_p(s1,*e2) ) {
+        set_free(s1);
+        return +1;
+    }
+    set s2 = set_make(set_pointer);
+    entity_get_referenced_entities(*e2,s2);
+    if( set_belong_p(s2,*e1) ) {
+        set_free(s2);
+        return -1;
+    }
+    return compare_entities(e1,e2);
+}
+
+struct cpv {
+    entity e;
+    bool rm;
+};
+
+static 
+void check_private_variables_call_walker(call c,struct cpv * p)
+{
+    set s = get_referenced_entities(c);
+    if(set_belong_p(s,p->e)){
+        p->rm=true;
+        gen_recurse_stop(0);
+    }
+    set_free(s);
+}
+static
+bool check_private_variables_loop_walker(loop l, struct cpv * p)
+{
+    return !has_entity_with_same_name(p->e,loop_locals(l));
+}
+
+static
+list private_variables(statement stat)
+{
+    set s = get_private_entities(stat);
+    list l =NIL;
+    SET_FOREACH(entity,e,s) {
+        struct cpv p = { .e=e, .rm=false };
+        gen_context_multi_recurse(stat,&p,
+                call_domain,gen_true,check_private_variables_call_walker,
+                loop_domain,check_private_variables_loop_walker,gen_null,
+                0);
+        if(!p.rm)
+            l=CONS(ENTITY,e,l);
+    }
+    set_free(s);
+
+    return l;
+}
+
 /** 
  * outline the statements in statements_to_outline into a module named outline_module_name
  * the outlined statements are replaced by a call to the newly generated module
@@ -1037,20 +1095,18 @@ statement outliner(string outline_module_name, list statements_to_outline)
         set_free(tmp);
         list sd = statement_to_declarations(s);
         declared_entities =gen_nconc(declared_entities, sd);
-        if(statement_loop_p(s)) { /* this test should minimize bad side effects */
-            set tmp = get_private_entities(s);
-            list private_entities = set_to_list(tmp);
-            gen_sort_list(private_entities,(gen_cmp_func_t)compare_entities);
-            FOREACH(ENTITY,e,private_entities)
-            {
-                if(!entity_is_argument_p(e,sd)) {
-                    AddLocalEntityToDeclarations(e,new_fun,body);
-                    declared_entities =gen_nconc(declared_entities, CONS(ENTITY,e,NIL));
-                }
+        /* we want to declare private variable as locals, but it may 
+           not be valid*/
+        list private_ents = private_variables(s);
+        gen_sort_list(private_ents,(gen_cmp_func_t)compare_entities);
+        FOREACH(ENTITY,e,private_ents)
+        {
+            if(!has_entity_with_same_name(e,sd)) {
+                AddLocalEntityToDeclarations(e,new_fun,body);
+                declared_entities =gen_nconc(declared_entities, CONS(ENTITY,e,NIL));
             }
-            set_free(tmp);
-            gen_free_list(private_entities);
         }
+        gen_free_list(private_ents);
     }
 
     /* set to list */
@@ -1061,13 +1117,19 @@ statement outliner(string outline_module_name, list statements_to_outline)
     gen_list_and_not(&referenced_entities,declared_entities);
     gen_free_list(declared_entities);
 
-    /* purge the functions from the parameter list, we assume they are declared externally */
+    /* purge the functions from the parameter list, we assume they are declared externally
+     * also purge the formal parameters from other modules, gathered by get_referenced_entities but wrong here
+     */
     list tmp_list=NIL;
     FOREACH(ENTITY,e,referenced_entities)
-        if( ! entity_function_p(e) ) tmp_list=CONS(ENTITY,e,tmp_list);
+    {
+        if( (!entity_function_p(e) ) &&
+                !( entity_formal_p(e) && (same_string_p(entity_module_name(e),get_current_module_name()))) )
+            tmp_list=CONS(ENTITY,e,tmp_list);
+    }
     referenced_entities=tmp_list;
 
-    gen_sort_list(referenced_entities,(int(*)(const void*,const void*))compare_entities);
+    gen_sort_list(referenced_entities,(gen_cmp_func_t)compare_entities_with_dep);
 
 
     intptr_t i=0;
@@ -1097,6 +1159,8 @@ statement outliner(string outline_module_name, list statements_to_outline)
             effective_parameters=CONS(EXPRESSION,entity_to_expression(e),effective_parameters);
         }
     }
+    formal_parameters=gen_nreverse(formal_parameters);
+    effective_parameters=gen_nreverse(effective_parameters);
 
 
     /* we need to patch parameters , effective parameters and body in C
@@ -1171,7 +1235,7 @@ statement outliner(string outline_module_name, list statements_to_outline)
 
 
     /* and return the replacement statement */
-    instruction new_inst =  make_instruction_call(make_call(new_fun,gen_nreverse(effective_parameters)));
+    instruction new_inst =  make_instruction_call(make_call(new_fun,effective_parameters));
     statement new_stmt = statement_undefined;
 
     /* perform substitution :
