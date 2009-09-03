@@ -355,19 +355,9 @@ function validate_file()
       done < $name.database/modules
       $timeout Delete $name 2> /dev/null 1>&2 # ignore delete failure...
     } 2> $out.err
-  fi > $out.tmp
+  fi > $out.out
 
   verb 4 "Status = $status"
-
-  # not very beautiful, but necessary as some output contains
-  # the full path of some files... so filter out validation directory path
-  # for all output... the if/fi output above cannot be piped directly because
-  # it would hide the "status" variable setting in a subshell.
-  # escape VDIR for sed
-  local vdiresc=$VDIR
-  vdiresc=${vdiresc//\//\\/}
-  vdiresc=${vdiresc//./\\.}
-  sed -e "s/$vdiresc/\$VDIR/g" $out.tmp > $out.out && rm -f $out.tmp
 
   [[ -f core ]] && rm -f core # cleanup
 
