@@ -24,7 +24,7 @@ echo
 
 display PRINTED_FILE
 
-shell compileC.sh alphablending_c alphablending test.c
+shell ./compileC.sh alphablending_c alphablending test.c
 shell gcc -O3 -I$. -march=native -c test.c
 shell rm test.c test.o
 

@@ -24,7 +24,7 @@ echo
 
 display PRINTED_FILE[dotprod]
 
-shell compileC.sh DOTPROD_C dotprod test.c
+shell ./compileC.sh DOTPROD_C dotprod test.c
 shell gcc -O3 -I. -march=native -c test.c
 shell rm test.c test.o
 
