@@ -1554,11 +1554,20 @@ scripts.
 First of all, validation scripts and related test cases are defined by
 the developper, not by the maintainer. The developper knows what the
 test case is about, and he/she fails to document the goal either in
-the source code or in the script.. because he/she is in a
+the source code or in the script... because he/she is in a
 hurry. Sometimes, the name of the test case can help the maintenance,
 but this is largely untrue for large librairies like
-\verb/Transformations/. So, please, comment the goals of your test
+\verb/Transformations/. So, please, comment the goal(s) of your test
 cases.
+
+By the way, is it a good idea to have many goals for one test case?
+It's attractive for the deelopper when many different cases and
+combination of cases must be tested. But it's a nightmare for the
+maintainer when one difference shows up or when PIPS core dumps if no
+unit test cases also exist because he will have to isolate the buggy
+part from the whole test case. So unit test cases are much eaasier to
+maintain, even though larger test cases are also very useful to check
+interactions and robustness.
 
 Secondly, most test cases are not supposed to contain user errors. So,
 please, set the property \verb/PIPS_ABORT_ON_USER_ERROR/ to TRUE.
