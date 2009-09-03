@@ -1,3 +1,6 @@
+# Make sure that efects in initializations are taken into account one
+# way or another
+
 delete flatten_code12
 
 setproperty ABORT_ON_USER_ERROR TRUE
@@ -34,6 +37,13 @@ activate PRINT_CODE_CUMULATED_EFFECTS
 display PRINTED_FILE[flatten_code12]
 
 echo
+echo Code with transformers
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[flatten_code12]
+
+echo
 echo Code with preconditions
 echo
 
@@ -64,6 +74,6 @@ shell ./flatten_code12.out
 shell rm flatten_code12.out
 
 close
-delete flatten_code12
+# delete flatten_code12
 quit
 

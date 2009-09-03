@@ -1,12 +1,46 @@
 delete reference_01
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
 create reference_01 reference_01.c
+
 setproperty PRETTYPRINT_C_CODE TRUE
 activate C_PARSER
+
+echo
+echo Code for "reference01"
+echo
+
 display PRINTED_FILE[reference_01]
+
+echo
+echo Code for "reference01"
+echo
+
 activate PRINT_CODE_PROPER_EFFECTS
 display PRINTED_FILE[reference_01]
+
+echo
+echo Code with cumulated effects for "reference01"
+echo
+
 activate PRINT_CODE_CUMULATED_EFFECTS
 display PRINTED_FILE[reference_01]
+
+echo
+echo Code with transformers for "reference01"
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[reference_01]
+
+echo
+echo Code with preconditions for "reference01"
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[reference_01]
+
 close
 delete reference_01
 quit

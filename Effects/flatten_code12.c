@@ -1,4 +1,6 @@
-/* Make sure that variables are properly renamed */
+/* Make sure that initialization effects are taken into account. Here
+   "foo_0" is read, but this does not show in proper or cumulated
+   effects. */
 
 #include <stdio.h>
 
