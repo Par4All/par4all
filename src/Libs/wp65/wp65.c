@@ -138,6 +138,7 @@ wp65(string input_module_name)
 
     s = (statement) db_get_memory_resource(DBR_CODE, input_module_name,TRUE);
     dg = (graph) db_get_memory_resource(DBR_DG, input_module_name, TRUE);
+    set_ordering_to_statement(s);
     debug_on("WP65_DEBUG_LEVEL");
     debug(8, "wp65", "begin\n");
 
@@ -185,6 +186,7 @@ wp65(string input_module_name)
     debug(8, "wp65", "end\n");
 
     /* reset_current_module_statement(); */
+    reset_ordering_to_statement();
     reset_current_module_entity();
     set_string_property(PRETTYPRINT_PARALLEL, ppp); free(ppp);
     debug_off();
