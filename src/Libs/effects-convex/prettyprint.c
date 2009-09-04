@@ -213,7 +213,7 @@ text_array_regions(list l_reg, string ifread, string ifwrite)
 	{
 	    entity ent = effect_entity(reg);
 	    if ( get_bool_property("PRETTYPRINT_SCALAR_REGIONS") ||
-		! entity_atomic_reference_p(ent))
+		! entity_non_pointer_scalar_p(ent))
 	    {
 		if (loose_p && !one_p )
 		{

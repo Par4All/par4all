@@ -175,7 +175,7 @@ list generic_p_proper_effect_of_reference(reference ref,
   list l_inds = reference_indices(ref);
   list l_inds_tmp = l_inds;
 
-  type t = ultimate_type(entity_type(ent));
+  type t = basic_concrete_type(entity_type(ent));
 
   *pme = effect_undefined;
 
@@ -293,9 +293,12 @@ list generic_p_proper_effect_of_reference(reference ref,
 
   ifdebug(4)
     {
-      pips_debug(4, "ending with effects : \n");
+      pips_debug(4, "ending with main effect : \n");
+      print_effect(*pme);
+      pips_debug(4, "and intermediate read effects : \n");
       (*effects_prettyprint_func)(le);
     }
+  free_type(t);
 
   return le;
 }

@@ -705,6 +705,35 @@ bool entity_atomic_reference_p(entity e)
   return atomic_p;
 }
 
+/**
+
+   @return TRUE if the entity is a scalar but not a pointer, FALSE otherwise.
+           (takes care of typedefs).
+ */
+bool entity_non_pointer_scalar_p(entity e)
+{
+  type ct = basic_concrete_type(entity_type(e));
+  variable vt = type_variable(ct);
+  bool atomic_p = FALSE;
+
+  pips_assert("entity e is a variable", type_variable_p(ct));
+
+  if(ENDP(variable_dimensions(vt))) 
+    {
+      /* The property is not true for overloaded, string, derived
+       */
+      basic bt = variable_basic(vt);
+      atomic_p = basic_int_p(bt) || basic_float_p(bt) || basic_logical_p(bt)
+	|| basic_complex_p(bt) || basic_bit_p(bt);
+    }
+  
+  free_type(ct);
+  return atomic_p;
+}
+
+
+
+
   /* Another semantics would be: is this reference r to e a kill for
      e? In general, this cannot be answered at the entity level only
      (see previous function) and the reference itself must be passed

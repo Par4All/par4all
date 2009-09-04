@@ -2205,7 +2205,8 @@ type make_standard_long_integer_type(type t)
 /* FI: there are different notions of "ultimate" types in C.
 
    We may need to reduce a type to basic concrete types, removing all
-   typedefs wherever they are.
+   typedefs wherever they are. This is done by type_to_basic_concrete_type, 
+   see below.
 
    We may also need to know if the type is compatible with a function
    call: we need to chase down the pointers as well as the typedefs. See
@@ -2256,6 +2257,85 @@ type ultimate_type(type t)
     }
   }
 
+  pips_assert("nt is not a typedef",
+	      type_variable_p(nt)? !basic_typedef_p(variable_basic(type_variable(nt))) : TRUE);
+
+  return nt;
+}
+
+
+
+/**
+   
+ @param t is a type
+
+ @return : a new type in which typedefs have been expanded to reach a basic
+           concrete type, except for struct, union, and enum because 
+	   the inner types of the fields cannot be changed (they are entities).
+
+*/
+type basic_concrete_type(type t)
+{
+  type nt;
+
+  pips_debug(8, "Begin with type \"%s\"\n", type_to_string(t));
+
+  switch (type_tag(t))
+    {
+    case is_type_variable:
+      {
+	variable vt = type_variable(t);
+	basic bt = variable_basic(vt);
+	list lt = variable_dimensions(vt);
+	
+	pips_debug(8, "of basic \"%s\"and number of dimensions %d.\n", 
+		   basic_to_string(bt),
+		   (int) gen_length(lt));
+	
+	if(basic_typedef_p(bt)) 
+	  {
+	    entity e = basic_typedef(bt);
+	    type st = entity_type(e);
+	    
+	    nt = basic_concrete_type(st);
+	    variable_dimensions(type_variable(nt)) = 
+	      gen_nconc(gen_full_copy_list(lt), 
+			variable_dimensions(type_variable(nt)));
+	    
+	  }
+	else if(basic_pointer_p(bt))
+	  {
+	    type npt = basic_concrete_type(basic_pointer(bt));
+	    
+	    nt = make_type_variable
+	      (make_variable(make_basic_pointer(npt),
+			     gen_full_copy_list(lt),
+			     gen_full_copy_list(variable_qualifiers(vt))));
+	    
+	  }
+	else
+	  nt = copy_type(t);
+      }
+      break;
+    
+    default:
+      nt = copy_type(t);
+    }
+
+  pips_debug(8, "Ends with type \"%s\"\n", type_to_string(nt));
+  ifdebug(8) 
+    {
+    if(type_variable_p(nt)) 
+      {
+	variable nvt = type_variable(nt);
+	basic nbt = variable_basic(nvt);
+	list nlt = variable_dimensions(nvt);
+	pips_debug(8, "of basic \"%s\"and number of dimensions %d.\n", 
+		 basic_to_string(nbt),
+		 (int) gen_length(nlt));
+      }
+    }
+  
   pips_assert("nt is not a typedef",
 	      type_variable_p(nt)? !basic_typedef_p(variable_basic(type_variable(nt))) : TRUE);
 

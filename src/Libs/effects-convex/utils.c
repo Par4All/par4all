@@ -1057,7 +1057,7 @@ reference make_regions_reference(entity ent)
 static Psysteme make_whole_array_predicate(entity e)
 {
     Psysteme ps = sc_new();
-    type t = ultimate_type(entity_type(e));
+    type t = basic_concrete_type(entity_type(e));
     int d = type_depth(t);
 
     /* Let's deal with scalar pointers at least */
@@ -1087,6 +1087,7 @@ static Psysteme make_whole_array_predicate(entity e)
 	    ps = sc_safe_append(ps,
 				sc_safe_normalize(entity_declaration_sc(e)));
     }
+    free_type(t);
 
     return ps;
 }

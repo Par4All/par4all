@@ -98,7 +98,7 @@ effect reference_to_simple_effect(reference ref, action ac)
       
       list ind = reference_indices(ref);
       type t = entity_type(reference_variable(ref));
-      type ut = ultimate_type(t);
+      type ut = basic_concrete_type(t);
       
       
       if(type_variable_p(ut)) 
@@ -119,7 +119,7 @@ effect reference_to_simple_effect(reference ref, action ac)
 	  
 	  if (is_array_p)
 	    {
-	      if((int) gen_length(ind) == type_depth(t))
+	      if(gen_length(ind) == type_depth(t))
 		{
 		  /* The dimensionalities of the index and type are the same: */
 		  /* cell cell_ref = make_cell_reference(copy_reference(ref)); */
@@ -184,6 +184,8 @@ effect reference_to_simple_effect(reference ref, action ac)
 	  approximation ap = make_approximation_must();
 	  eff = make_effect(cell_ref, ac, ap, make_descriptor_none()); 
 	}
+      free_type(ut);
+
     }
   
   ifdebug(8)
@@ -262,7 +264,6 @@ void simple_effect_add_expression_dimension(effect eff, expression exp)
 
   cell eff_c = effect_cell(eff);
   reference ref;
-  normalized nexp = NORMALIZE_EXPRESSION(exp);
   
   ifdebug(8)
     {
