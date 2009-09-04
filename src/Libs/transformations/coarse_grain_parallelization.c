@@ -83,10 +83,11 @@ static bool local_use_reductions_p;
     @return TRUE to ask the calling NewGen iterator to go on recursion on
     further loops in this loop.
  */
-static bool whole_loop_parallelize(loop l) {
+static bool whole_loop_parallelize(loop l)
+{
   statement inner_stat = loop_body(l);
   /* Get the statement owning this loop: */
-  statement loop_stat = STATEMENT(gen_get_recurse_ancestor(INSTRUCTION(gen_get_recurse_ancestor(l))));
+  statement loop_stat = (statement) gen_get_ancestor(statement_domain, l);
   /* ...needed by TestCoupleOfReferences(): */
   list l_enclosing_loops = CONS(STATEMENT, loop_stat, NIL);
 

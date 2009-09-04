@@ -94,8 +94,7 @@ static void pragma_expr_for (loop l, statement stmt) {
 /// @param l, the loop to decorate with pragma
 static void generate_expr_omp_pragma_loop (loop l) {
 
-  instruction i  = INSTRUCTION (gen_get_recurse_ancestor(l));
-  statement stmt = STATEMENT   (gen_get_recurse_ancestor(i));
+  statement stmt = (statement) gen_get_ancestor(statement_domain, l);
 
   pragma_expr_for (l, stmt);
   pragma_expr_for_reduction (l, stmt);
@@ -157,8 +156,7 @@ static void pragma_str_for (loop l, statement stmt) {
 /// @param l, the loop to decorate with pragma
 static void generate_str_omp_pragma_loop (loop l) {
 
-  instruction i  = INSTRUCTION (gen_get_recurse_ancestor(l));
-  statement stmt = STATEMENT   (gen_get_recurse_ancestor(i));
+  statement stmt = (statement) gen_get_ancestor(statement_domain, l);
 
   pragma_str_for (l, stmt);
   pragma_str_for_reduction (l, stmt);

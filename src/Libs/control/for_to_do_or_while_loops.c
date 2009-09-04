@@ -376,7 +376,7 @@ try_to_transform_a_for_loop_into_a_do_loop(forloop f) {
 
     /* Get the englobing statement of the "for" assuming we are called
        from a gen_recurse()-like function: */
-    instruction i = INSTRUCTION(gen_get_recurse_ancestor(f));
+    instruction i = (instruction) gen_get_recurse_ancestor(f);
     /* Modify the enclosing instruction to be a do-loop instead. It works
        even if we are in a gen_recurse because we are in the bottom-up
        phase of the recursion. */
@@ -510,9 +510,9 @@ transform_a_for_loop_into_a_while_loop(forloop f) {
   pips_debug(5, "Begin\n");
 
   /* Get the instruction owning the forloop: */
-  instruction i = INSTRUCTION(gen_get_recurse_ancestor(f));
+  instruction i = (instruction) gen_get_recurse_ancestor(f);
   /* Get the statement owning instruction owning the forloop: */
-  statement st = STATEMENT(gen_get_recurse_ancestor(i));
+  statement st = (statement) gen_get_recurse_ancestor(i);
 
   /* Get a sequence with a while-loop instead: */
   sequence wls = for_to_while_loop_conversion(forloop_initialization(f),

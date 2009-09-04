@@ -216,12 +216,14 @@ void
 try_to_recover_for_loop_in_a_while(whileloop wl) {
   /* Get the englobing statement of the "while" assuming we are called
      from a gen_recurse()-like function: */
-  instruction i = INSTRUCTION(gen_get_recurse_ancestor(wl));
-  statement wls = STATEMENT(gen_get_recurse_ancestor(i));
+  instruction i = (instruction) gen_get_recurse_ancestor(wl);
+  statement wls = (statement) gen_get_recurse_ancestor(i);
 
-  pips_debug(9, "While-loop %p, parent (instruction): %p, whileloop of the instruction: %p\n", wl, i, instruction_whileloop(i));
+  pips_debug(9, "While-loop %p, parent (instruction): %p, "
+	     "whileloop of the instruction: %p\n", wl, i,
+	     instruction_whileloop(i));
   if ((statement_instruction(wls) != i) || (instruction_whileloop(i) != wl))
-    pips_internal_error("Cannet get the enclosing statement of the while-loop.\n");
+    pips_internal_error("Cannot get the enclosing statement of the while-loop.\n");
 
   /* If it is a "do { } while()" do nothing: */
   if (evaluation_after_p(whileloop_evaluation(wl)))
