@@ -580,7 +580,10 @@ gen_trav_obj(
     /* Since an object can have multiple ancestors (for example think in
        PIPS unstructured where we can have multible goto towards the
        same node), just pick the first ancestor found to avoid heritage
-       flapping. So do not store again an ancestor if already one: */
+       flapping. So do not store again an ancestor if already one:
+       FC: I do not understand how this may work. there should be a
+       stack? Why would the "previous" object be the ancestor?
+    */
     if (! hash_defined_p(ancestor_tracking, obj))
       hash_put(ancestor_tracking, obj, gen_previous_object);
   }
