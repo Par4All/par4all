@@ -129,8 +129,7 @@ Variable v_new;
     Pcontrainte e, i;
 
     /* v_new MUST NOT already be in the base. */
-    if(vect_coeff(v_new, s->base)!=VALUE_ZERO)
-      assert(vect_coeff(v_new, s->base)==VALUE_ZERO);
+    assert(vect_coeff(v_new, s->base)==VALUE_ZERO);
 
     if(!SC_UNDEFINED_P(s)) 
     {
