@@ -3389,9 +3389,11 @@ void gen_context_recurse(
 
 
 /* Get the previous visited object during the recursion.  If we are in a
-   filter called from a gen_recurse, it is interestingly the parent object.
+   filter called from a gen_recurse, and we're only dealing with
+   structures, it is the parent object. If there is a list, array,
+   set, map... it is whatever was visited just before.
 
-   @return the parent object. If it fails to do it, it returns:
+   @return the previously visited object. If it fails to do it, it returns:
 
      - NULL if the current object is the root of the recursion (since it
        does not have any parent inside the reduction scope)
@@ -3407,17 +3409,18 @@ gen_get_recurse_previous_visited_object() {
 
    The heritage relation is built during the top-down phase (the
    filter-down phase), so if the objects are rewriten during the top-down
-   rewriting phase, the heritage relation are not up-to-date for these
-   objects.
+   rewriting phase (that should never happend, rewrite should be
+   performed on the bottom-up pass, when the "rewrite" function is
+   called), the heritage relation are not up-to-date for these objects.
 
    @p is the object we want the ancestor
    @return the object parent. If it fails, it returns:
      - NULL if the current object is the root of the recursion (so no parent)
      - HASH_UNDEFINED_VALUE if the current object does not have any ancestor.
 */
-gen_chunk gen_get_recurse_ancestor(const void * object)
+gen_chunk * gen_get_recurse_ancestor(const void * object)
 {
-  return (gen_chunk) hash_get(ancestor_tracking, object);
+  return (gen_chunk *) hash_get(ancestor_tracking, object);
 }
 
 /* return the first ancestor object found of the given type.
@@ -3426,15 +3429,15 @@ gen_chunk gen_get_recurse_ancestor(const void * object)
    @param object we want the ancestor of.
    @return NULL for the root, gen_chunk_undefined if no ancestor (?).
  */
-gen_chunk *
-gen_get_ancestor_type(int type, const void * obj)
+gen_chunk * gen_get_ancestor(int type, const void * obj)
 {
   while (true)
   {
-    gen_chunk * prev = (gen_chunk*) hash_get(ancestor_tracking, obj);
+    gen_chunk * prev = (gen_chunk *) hash_get(ancestor_tracking, obj);
     if (prev==NULL)
       return NULL;
     else if (prev==HASH_UNDEFINED_VALUE)
+      // I'm not sure that it is possible... should it be an abort?
       return gen_chunk_undefined;
     else if (prev->i == type)
       return prev;

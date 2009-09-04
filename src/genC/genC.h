@@ -256,8 +256,9 @@ extern void gen_context_multi_recurse GEN_PROTO((void *, void *,...));
         gen_context_multi_recurse(s,c,d,f,r,NULL)
 
 extern gen_chunk * gen_get_recurse_previous_visited_object(void);
-extern gen_chunk gen_get_recurse_ancestor(const void *);
-extern gen_chunk * gen_get_ancestor_type(int, const void *);
+extern gen_chunk * gen_get_recurse_ancestor(const void *);
+extern gen_chunk * gen_get_ancestor(int, const void *);
+#define gen_get_ancestor_type(i,o) gen_get_ancestor(i,o)
 extern void gen_start_recurse_ancestor_tracking(void);
 extern void gen_stop_recurse_ancestor_tracking(void);
 
