@@ -4,6 +4,7 @@ c square matrix multiplication
       parameter (n=1000)
       integer a(n,n), b(n,n), c(n,n), x
       integer i, j, k
+      logical flg
 C initialize the square matrices with ones
       do j=1, n
          do i=1, n
@@ -22,14 +23,16 @@ C multiply the two square matrices of ones
          enddo
       enddo
 C The result should be a square matrice of n
+      flg = .TRUE.
       do j=1, n
          do i=1, n
-            if (c(i,j) .NE. n) then
-              print *, ("CHECK FAILED")
-              goto 100
-           endif
+            flg = flg .AND. (c(i,j) .EQ. n)
          enddo
       enddo
-      print *, ("CHECK SUCCEED")
- 100  end
+      if (flg .EQV. .FALSE.) then
+         print *, ("CHECK FAILED")
+      else
+         print *, ("CHECK SUCCEED")
+      endif
+      end
 

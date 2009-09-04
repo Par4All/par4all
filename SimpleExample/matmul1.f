@@ -4,12 +4,15 @@ c square matrix multiplication
       parameter (n=1000)
       integer a(n,n), b(n,n), c(n,n), x
       integer i, j, k
+      logical flg
+C initialize the square matrices with ones
       do j=1, n
          do i=1, n
             a(i,j) = 1
             b(i,j) = 1
          enddo
       enddo
+C multiply the two square matrices of ones
       do j=1, n
          do i=1, n
             c(i,j) = 0
@@ -18,5 +21,17 @@ c square matrix multiplication
             enddo
          enddo
       enddo
-      print *, ((c(i,j), i=1, n), j=1, n)
+C The result should be a square matrice of n
+      flg = .TRUE.
+      do j=1, n
+         do i=1, n
+            flg = flg .AND. (c(i,j) .EQ. n)
+         enddo
+      enddo
+      if (flg .EQV. .FALSE.) then
+         print *, ("CHECK FAILED")
+      else
+         print *, ("CHECK SUCCEED")
+      endif
       end
+
