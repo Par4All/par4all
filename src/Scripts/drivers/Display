@@ -28,7 +28,7 @@
 #
 
 # Modifications
-# - uses less instead of more to avoid extra-characters 
+# - uses less instead of more to avoid extra-characters
 #   when Display is run in background
 
 USAGE="Usage: Display [-h] [-w wspace] [-m module] [-v] [-l] [pretty-print]"
@@ -50,7 +50,7 @@ display()
     test -f ${file} && show ${file}
     file="${1}/${2}${3}"
     test -f ${file} && show ${file}
-    file="${1}/${2}/${2}${3}" 
+    file="${1}/${2}/${2}${3}"
     test -f ${file} && show ${file}
 }
 
@@ -90,163 +90,109 @@ ASSOC_RES=""
 
 case $PRETTY_P in
         adfg)   SELECT=PRINT_ARRAY_DFG
-                EXT=.adfg_file
                 RESOURCE=ADFG_FILE;;
         bdt)    SELECT=PRINT_BDT
-                EXT=.bdt_file
                 RESOURCE=BDT_FILE;;
         plc)    SELECT=PRINT_PLC
-                EXT=.plc_file
                 RESOURCE=PLC_FILE;;
 	code)	SELECT=PRINT_CODE
-		EXT=.pref
 		RESOURCE=PRINTED_FILE;;
 	tran)	SELECT=PRINT_CODE_TRANSFORMERS
-		EXT=.tran
 		RESOURCE=PRINTED_FILE;;
 	prec)	SELECT=PRINT_CODE_PRECONDITIONS
-		EXT=.prec
 		RESOURCE=PRINTED_FILE;;
 	usour)	SELECT=PRINT_SOURCE
-		EXT=.ppf
 		RESOURCE=PARSED_PRINTED_FILE;;
 	utran)	SELECT=PRINT_SOURCE_TRANSFORMERS
-		EXT=.utran
 		RESOURCE=PARSED_PRINTED_FILE;;
 	uprec)	SELECT=PRINT_SOURCE_PRECONDITIONS
-		EXT=.uprec
 		RESOURCE=PARSED_PRINTED_FILE;;
 	ureg)	SELECT=PRINT_SOURCE_REGIONS
-		EXT=.ureg
 		RESOURCE=PARSED_PRINTED_FILE;;
 	ucomp)	SELECT=PRINT_SOURCE_COMPLEXITIES
-		EXT=.ucomp
 		RESOURCE=PARSED_PRINTED_FILE;;
 	uprop)	SELECT=PRINT_SOURCE_PROPER_EFFECTS
-		EXT=.uprop
 		RESOURCE=PARSED_PRINTED_FILE;;
 	ucumu)	SELECT=PRINT_SOURCE_CUMULATED_EFFECTS
-		EXT=.ucumu
 		RESOURCE=PARSED_PRINTED_FILE;;
 	comp)	SELECT=PRINT_CODE_COMPLEXITIES
-		EXT=.comp
 		RESOURCE=PRINTED_FILE;;
 	regi)	SELECT=PRINT_CODE_REGIONS
-		EXT=.reg
 		RESOURCE=PRINTED_FILE;;
 	inreg)  SELECT=PRINT_CODE_IN_REGIONS
-		EXT=.inreg
 		RESOURCE=PRINTED_FILE;;
 	outreg) SELECT=PRINT_CODE_OUT_REGIONS
-		EXT=.outreg
 		RESOURCE=PRINTED_FILE;;
 	prop)	SELECT=PRINT_CODE_PROPER_EFFECTS
-		EXT=.prop
 		RESOURCE=PRINTED_FILE;;
 	cumu)	SELECT=PRINT_CODE_CUMULATED_EFFECTS
-		EXT=.cumu
 		RESOURCE=PRINTED_FILE;;
-#	para)	SELECT=PRINT_PARALLELIZED77_CODE
-#		EXT=.parf
-#		RESOURCE=PARALLELPRINTED_FILE;;
 	para77)	SELECT=PRINT_PARALLELIZED77_CODE
-		EXT=.parf
 		RESOURCE=PARALLELPRINTED_FILE;;
 	para90)	SELECT=PRINT_PARALLELIZED90_CODE
-		EXT=.parf
 		RESOURCE=PARALLELPRINTED_FILE;;
 	cray)	SELECT=PRINT_PARALLELIZEDCRAY_CODE
-		EXT=.parf
 		RESOURCE=PARALLELPRINTED_FILE;;
         cmf)    SELECT=PRINT_PARALLELIZEDCMF_CODE
-                EXT=.fcm
                 RESOURCE=PARALLELPRINTED_FILE;;
         craft)  SELECT=PRINT_PARALLELIZEDCRAFT_CODE
-                EXT=.craft
                 RESOURCE=PARALLELPRINTED_FILE;;
 	cg)	SELECT=PRINT_CALL_GRAPH
-		EXT=.cg
 		RESOURCE=CALLGRAPH_FILE;;
 	cgcomp)	SELECT=PRINT_CALL_GRAPH_WITH_COMPLEXITIES
-		EXT=.cg
 		RESOURCE=CALLGRAPH_FILE;;
 	cgprec)	SELECT=PRINT_CALL_GRAPH_WITH_PRECONDITIONS
-		EXT=.cg
 		RESOURCE=CALLGRAPH_FILE;;
 	cgtran)	SELECT=PRINT_CALL_GRAPH_WITH_TRANSFORMERS
-		EXT=.cg
 		RESOURCE=CALLGRAPH_FILE;;
 	cgprop)	SELECT=PRINT_CALL_GRAPH_WITH_PROPER_EFFECTS
-		EXT=.cg
 		RESOURCE=CALLGRAPH_FILE;;
 	cgcumu)	SELECT=PRINT_CALL_GRAPH_WITH_CUMULATED_EFFECTS
-		EXT=.cg
 		RESOURCE=CALLGRAPH_FILE;;
 	cgreg)	SELECT=PRINT_CALL_GRAPH_WITH_REGIONS
-		EXT=.cg
 		RESOURCE=CALLGRAPH_FILE;;
 	cgin)	SELECT=PRINT_CALL_GRAPH_WITH_IN_REGIONS
-		EXT=.cg
 		RESOURCE=CALLGRAPH_FILE;;
 	cgout)	SELECT=PRINT_CALL_GRAPH_WITH_OUT_REGIONS
-		EXT=.cg
 		RESOURCE=CALLGRAPH_FILE;;
 	icfg)	SELECT=PRINT_ICFG
-		EXT=.icfg
 		RESOURCE=ICFG_FILE;;
-	icfgprec)	SELECT=PRINT_ICFG_WITH_PRECONDITIONS
-		EXT=.icfg
+	icfgprec) SELECT=PRINT_ICFG_WITH_PRECONDITIONS
 		RESOURCE=ICFG_FILE;;
-	icfgcomp)	SELECT=PRINT_ICFG_WITH_COMPLEXITIES
-		EXT=.icfg
+	icfgcomp) SELECT=PRINT_ICFG_WITH_COMPLEXITIES
 		RESOURCE=ICFG_FILE;;
 	icfgl)	SELECT=PRINT_ICFG_WITH_LOOPS
-		EXT=.icfgl
 		RESOURCE=ICFG_FILE;;
-	icfglprec)	SELECT=PRINT_ICFG_WITH_LOOPS_PRECONDITIONS
-		EXT=.icfgl
+	icfglprec) SELECT=PRINT_ICFG_WITH_LOOPS_PRECONDITIONS
 		RESOURCE=ICFG_FILE;;
-	icfglcomp)	SELECT=PRINT_ICFG_WITH_LOOPS_COMPLEXITIES
-		EXT=.icfgl
+	icfglcomp) SELECT=PRINT_ICFG_WITH_LOOPS_COMPLEXITIES
 		RESOURCE=ICFG_FILE;;
 	icfgc)	SELECT=PRINT_ICFG_WITH_CONTROL
-		EXT=.icfgc
 		RESOURCE=ICFG_FILE;;
-	icfgcprec)	SELECT=PRINT_ICFG_WITH_CONTROL_PRECONDITIONS
-		EXT=.icfgc
+	icfgcprec) SELECT=PRINT_ICFG_WITH_CONTROL_PRECONDITIONS
 		RESOURCE=ICFG_FILE;;
-	icfgccomp)	SELECT=PRINT_ICFG_WITH_CONTROL_COMPLEXITIES
-		EXT=.icfgc
+	icfgccomp) SELECT=PRINT_ICFG_WITH_CONTROL_COMPLEXITIES
 		RESOURCE=ICFG_FILE;;
 	dg)     SELECT=PRINT_WHOLE_DEPENDENCE_GRAPH
-	        EXT=.dg
                 RESOURCE=DG_FILE;;
-	edg)     SELECT=PRINT_EFFECTIVE_DEPENDENCE_GRAPH
-	        EXT=.dg
+	edg)    SELECT=PRINT_EFFECTIVE_DEPENDENCE_GRAPH
                 RESOURCE=DG_FILE;;
-	lcdg)     SELECT=PRINT_LOOP_CARRIED_DEPENDENCE_GRAPH
-	        EXT=.dg
+	lcdg)   SELECT=PRINT_LOOP_CARRIED_DEPENDENCE_GRAPH
                 RESOURCE=DG_FILE;;
-	wdg)     SELECT=PRINT_WHOLE_DEPENDENCE_GRAPH
-	        EXT=.dg
+	wdg)    SELECT=PRINT_WHOLE_DEPENDENCE_GRAPH
                 RESOURCE=DG_FILE;;
 	wp65)	SELECT=RICE_FULL_DEPENDENCE_GRAPH
 		PERFORM=PRIVATIZER
-		EXT=.wp65
 		ASSOC_EXT=.bank
 		RESOURCE=WP65_COMPUTE_FILE
 		ASSOC_RES=WP65_BANK_FILE;;
 	bank)	SELECT=
-		EXT=.bank
 		RESOURCE=BANK_FILE;;
-	flint)	EXT=.flinted
-		RESOURCE=FLINTED;;
+	flint)	RESOURCE=FLINTED;;
         stco)   SELECT=PRINT_CODE_STATIC_CONTROL
-                EXT=.stco
                 RESOURCE=PRINTED_FILE;;
 	dead)	SELECT=PRINT_CODE
 		PERFORM=SUPPRESS_DEAD_CODE
-		EXT=.pref
 		RESOURCE=PRINTED_FILE;;
 	*)	echo Unknown Pretty-print $PRETTY_P\; $AVAILABLE_PRETTY_P >&2
 		exit 1;;
@@ -257,33 +203,35 @@ esac
 
 if [ -z "$LAST" ]
 then
-if [ -z "$VERBOSE" ]
-then
+  if [ -z "$VERBOSE" ]
+  then
     Pips -w "$OPT_PGM" -m "$OPT_MOD" \
 	 $SELECT $PERFORM -b $RESOURCE 1>/dev/null || exit 1;
-else
+  else
     Pips -w "$OPT_PGM" -m "$OPT_MOD" \
 	 $SELECT $PERFORM -b $RESOURCE 1>&2 || exit 1;
-fi
+  fi
 fi
 
+# Argh!!! this is incompatible with any parallel run of scripts
+# in the same directory, say for the validation...
 . ./${PIPS_CURRENT_PROGRAM:-.pipsprogram}
 
 uppercase()
 {
-  echo "$*" | tr a-z A-Z 
+  echo "$*" | tr a-z A-Z
 }
 
 if [ -n "$LAST" ]
 then
-if [ -n "$OPT_PGM" ]
-then
-	PGM=$OPT_PGM
-fi
-if [ -n "$OPT_MOD" ]
-then
-	MOD=`uppercase $OPT_MOD`
-fi
+  if [ -n "$OPT_PGM" ]
+  then
+    PGM=$OPT_PGM
+  fi
+  if [ -n "$OPT_MOD" ]
+  then
+    MOD=`uppercase $OPT_MOD`
+  fi
 fi
 
 # The extensions are now language sensitive, while Display has no hint
@@ -300,4 +248,3 @@ display $PGM.database $MOD $EXT
 [ "$ASSOC_EXT" ] && display $PGM.database $MOD $ASSOC_EXT
 
 exit 0
-
