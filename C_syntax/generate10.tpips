@@ -34,5 +34,5 @@ echo
 display PRINTED_FILE[func]
 
 close
-#delete generate10
+delete generate10
 quit

@@ -17,9 +17,7 @@ echo
 
 apply UNSPLIT[%PROGRAM]
 # shell $(PIPS_CC) -c one_liner_04.database/Src/one_liner_04.c ?!?
-shell gcc -c one_liner_04.database/Src/one_liner_04.c
+shell cc -c one_liner_04.database/Src/one_liner_04.c
 close
-
-#delete one_liner_04 
-
+delete one_liner_04 
 quit

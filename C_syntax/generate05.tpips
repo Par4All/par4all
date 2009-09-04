@@ -32,11 +32,13 @@ echo
 echo Compile the generated code
 echo
 
-shell cat generate05.database/func\!/func\!.c generate05.database/func/func.c >foo.c
-shell cat foo.c
-shell gcc -c foo.c
-shell rm foo.c
+setenv DB generate05.database
+shell cat $DB/func!/func!.c $DB/func/func.c > $DB/func.c
+shell cat $DB/func.c
+shell cc -c $DB/func.c -o $DB/func.o
 
+close
+delete generate05
 quit
 
 echo
