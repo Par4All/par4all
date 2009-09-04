@@ -1003,7 +1003,8 @@ control ct ;
 }
 
 /* PUSHNEW_CONFLICT adds the conflict FIN->FOUT in the list CS (if it's
-   not already there. */
+   not already there, and apparently even if it's already there for
+   performance reason...). */
 
 static cons *pushnew_conflict( fin, fout, cfs )
 effect fin, fout ;
@@ -1088,10 +1089,10 @@ static void add_conflicts(statement stin,
      the use-def chains */
   ifdebug(1) {
     if(!gen_once_p(effect_ins)) {
-      pips_error("add_conflicts", "effect_ins are redundant\n");
+      pips_internal_error("effect_ins are redundant\n");
     }
     if(!gen_once_p(effect_outs)) {
-      pips_error("add_conflicts", "effect_outs are redundant\n");
+      pips_internal_error("effect_outs are redundant\n");
     }
   }
 
@@ -1109,6 +1110,8 @@ static void add_conflicts(statement stin,
 	if(pointer_type_p(tin) && pointer_type_p(tout)) {
 	  reference rin = effect_any_reference(fin);
 	  reference rout = effect_any_reference(fout);
+	  int din = gen_length(reference_indices(rin));
+	  int dout = gen_length(reference_indices(rout));
 
 	  /* In case we are dealing with pointers, three
 	   * possibilities:
@@ -1130,8 +1133,28 @@ static void add_conflicts(statement stin,
 	   * Beatrice to handle references such as p[i] and p[i][j]
 	   * and made safer with aliasing information from Amira.
 	   */
-	  add_conflict_p = !((gen_length(reference_indices(rin))==0)
+	  /*
+	    add_conflict_p = !((din==0)
 			     ^ (gen_length(reference_indices(rout))==0));
+	  */
+	  /* Second version due to accuracy improvements in effect
+	     computation */
+	  if(din==dout) {
+	    /* This is the standard case */
+	    add_conflict_p = TRUE;
+	  }
+	  else if(din < dout) {
+	    /* a write on the shorter memory access path conflicts
+	       with the longer one. If a[i] is written, then a[i][j]
+	       depends on it. If a[i] is read, no conflict */
+	    action ain = effect_action(fin);
+	    add_conflict_p = action_write_p(ain);
+	  }
+	  else /* dout < din */ {
+	    /* same explanation as above */
+	    action aout = effect_action(fout);
+	    add_conflict_p = action_write_p(aout);
+	  }
 	}
 
 	if(add_conflict_p) {
