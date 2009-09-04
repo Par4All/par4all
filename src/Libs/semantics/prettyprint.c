@@ -164,23 +164,27 @@ text get_text_total_preconditions(string module_name)
 static bool print_code_semantics(string module_name)
 {
     bool success = TRUE;
-    text t;
+    text t = text_undefined;
 
-    char * file_ext = strdup(concatenate(is_transformer?
-		     (is_user_view? USER_TRANSFORMER_SUFFIX :
-		      SEQUENTIAL_TRANSFORMER_SUFFIX )
+    char * file_ext =
+      strdup(concatenate(is_transformer?
+			 (is_user_view? USER_TRANSFORMER_SUFFIX :
+			  SEQUENTIAL_TRANSFORMER_SUFFIX )
 		     :
-		     (is_total_precondition?
-		     (is_user_view? USER_TOTAL_PRECONDITION_SUFFIX :
-		      SEQUENTIAL_TOTAL_PRECONDITION_SUFFIX) :
-		     (is_user_view? USER_PRECONDITION_SUFFIX :
-		      SEQUENTIAL_PRECONDITION_SUFFIX)),
+			 (is_total_precondition?
+			  (is_user_view? USER_TOTAL_PRECONDITION_SUFFIX :
+			   SEQUENTIAL_TOTAL_PRECONDITION_SUFFIX) :
+			  (is_user_view? USER_PRECONDITION_SUFFIX :
+			   SEQUENTIAL_PRECONDITION_SUFFIX)),
 
-		     get_bool_property
-		     ("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH") ?
-		     GRAPH_FILE_EXT : "",
+			 get_bool_property
+			 ("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH") ?
+			 GRAPH_FILE_EXT : "",
 
-		     NULL));
+			 /* To exploit the language sensitive prettyprint ability of the display */
+			 c_module_p(module_name_to_entity(module_name))? ".c" : ".f",
+
+			 NULL));
 
     char * resource_name =
 	get_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH") ?

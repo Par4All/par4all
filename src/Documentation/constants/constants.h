@@ -48,10 +48,10 @@
  
 #define SEQUENTIAL_FORTRAN_EXT ".f"
 #define SEQUENTIAL_C_EXT ".c"
-#define PARALLEL_FORTRAN_EXT ".parf"
-#define PARALLEL_C_EXT ".parc"
-#define PREDICAT_FORTRAN_EXT ".pref"
-#define PRETTYPRINT_FORTRAN_EXT ".ppf"
+#define PARALLEL_FORTRAN_EXT ".par.f"
+#define PARALLEL_C_EXT ".par.c"
+#define PREDICAT_FORTRAN_EXT ".pre.f"
+#define PRETTYPRINT_FORTRAN_EXT ".pp.f"
  
 #define WP65_BANK_EXT ".bank"
 #define WP65_COMPUTE_EXT ".wp65"

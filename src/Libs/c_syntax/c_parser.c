@@ -69,7 +69,7 @@ static hash_table entity_to_type_stack_table = hash_table_undefined;
 
 void init_entity_type_storage_table()
 {
-  entity_to_type_stack_table = hash_table_make(hash_pointer,0);
+  entity_to_type_stack_table = hash_table_make(hash_string,0);
   //put_stack_storage_table("test","T");
 }
 
@@ -77,12 +77,12 @@ void put_to_entity_type_stack_table(entity key, stack value)
 {
   if(stack_undefined_p(value))
     pips_internal_error("The stack must be defined");
-  hash_put(entity_to_type_stack_table,(char *) key,(void *) value);
+  hash_put(entity_to_type_stack_table, entity_name(key),(void *) value);
 }
 
 stack get_from_entity_type_stack_table(entity key)
 {
-  void * p = hash_get(entity_to_type_stack_table, key);
+  void * p = hash_get(entity_to_type_stack_table, entity_name(key));
 
   if(p==HASH_UNDEFINED_VALUE)
     return stack_undefined;
@@ -97,7 +97,7 @@ void remove_entity_type_stacks(list el)
   for(ce=el; !ENDP(ce); POP(ce)) {
     entity e = ENTITY(CAR(ce));
     //entity te = entity_undefined;
-    void * p = hash_get(entity_to_type_stack_table, (void *) e);
+    void * p = hash_get(entity_to_type_stack_table, (void *) entity_name(e));
     //void * p = hash_delget(entity_to_type_stack_table, (void *) e, (void **) &te);
 
     pips_debug(8, "Remove type stack for \"%s\":", entity_name(e));
@@ -110,7 +110,7 @@ void remove_entity_type_stacks(list el)
     else {
       stack es = (stack) p;
 
-      (void) hash_del(entity_to_type_stack_table, (void *) e);
+      (void) hash_del(entity_to_type_stack_table, (void *) entity_name(e));
       if(!stack_undefined_p(es))
 	stack_free(&es);
       ifdebug(8) fprintf(stderr, "done\n");

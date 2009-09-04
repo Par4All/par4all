@@ -21,7 +21,7 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
-/* package generic effects :  Be'atrice Creusillet 5/97
+/* package generic effects :  Beatrice Creusillet 5/97
  *
  * File: prettyprint.c
  * ~~~~~~~~~~~~~~~~~~~
@@ -364,11 +364,16 @@ print_source_or_code_effects_engine(
 
     prettyprint_is_fortran = !get_bool_property("PRETTYPRINT_C_CODE");
 
-    file_name = strdup(concatenate(file_suffix,
-                                  get_bool_property
-				  ("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH") ? 
-				  GRAPH_FILE_EXT : "",
-                                  NULL));
+    file_name =
+      strdup(concatenate(file_suffix,
+			 get_bool_property
+			 ("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH") ? 
+			 GRAPH_FILE_EXT : "",
+
+			 /* To exploit the language sensitive prettyprint ability of the display */
+			 c_module_p(module_name_to_entity(module_name))? ".c" : ".f",
+
+			 NULL));
     file_resource_name = 
 	get_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH") ?
 	DBR_GRAPH_PRINTED_FILE : 
