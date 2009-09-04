@@ -3391,7 +3391,7 @@ void gen_context_recurse(
 /* Get the previous visited object during the recursion.  If we are in a
    filter called from a gen_recurse, and we're only dealing with
    structures, it is the parent object. If there is a list, array,
-   set, map... it is whatever was visited just before.
+   set, map... it is whatever was visited just before. Is it?
 
    @return the previously visited object. If it fails to do it, it returns:
 
