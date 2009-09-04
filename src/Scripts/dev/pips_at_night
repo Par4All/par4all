@@ -56,7 +56,7 @@ do
   esac
 
   case $opt in
-    -m|--mail) vopt="$vopt -m $1" ; shift ;;
+    -m|--mail) vopt="$vopt -m '$1'" ; shift ;;
     # what to do
     -d|--download) download=1 ;;
     -nd|--no-download) download= ;;
