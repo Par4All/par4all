@@ -1,0 +1,68 @@
+int main()
+{
+   int b = 0;
+   int i = 0;
+#pragma omp parallel do reduction(+:b)
+
+   for(i = 0; i <= 99; i += 1)
+      b = b+i;
+#pragma omp parallel do reduction(*:b)
+   for(i = 0; i <= 99; i += 1)
+      b = b*i;
+#pragma omp parallel do reduction(+:b)
+   for(i = 0; i <= 99; i += 1)
+      b = b-i;
+#pragma omp parallel do reduction(*:b)
+   for(i = 0; i <= 99; i += 1)
+      b = b/i;
+#pragma omp parallel do reduction(&:b)
+   for(i = 0; i <= 99; i += 1)
+      b = b&i;
+#pragma omp parallel do reduction(^:b)
+   for(i = 0; i <= 99; i += 1)
+      b = b^i;
+#pragma omp parallel do reduction(|:b)
+   for(i = 0; i <= 99; i += 1)
+      b = b|i;
+#pragma omp parallel do reduction(+:b)
+   for(i = 0; i <= 99; i += 1)
+      b += i;
+#pragma omp parallel do reduction(*:b)
+   for(i = 0; i <= 99; i += 1)
+      b *= i;
+#pragma omp parallel do reduction(+:b)
+   for(i = 0; i <= 99; i += 1)
+      b -= i;
+#pragma omp parallel do reduction(*:b)
+   for(i = 0; i <= 99; i += 1)
+      b /= i;
+#pragma omp parallel do reduction(&:b)
+   for(i = 0; i <= 99; i += 1)
+      b &= i;
+#pragma omp parallel do reduction(^:b)
+   for(i = 0; i <= 99; i += 1)
+      b ^= i;
+#pragma omp parallel do reduction(|:b)
+   for(i = 0; i <= 99; i += 1)
+      b |= i;
+#pragma omp parallel do reduction(+:b)
+   for(i = 0; i <= 99; i += 1)
+      b++;
+#pragma omp parallel do reduction(+:b)
+   for(i = 0; i <= 99; i += 1)
+      b--;
+#pragma omp parallel do reduction(+:b)
+   for(i = 0; i <= 99; i += 1)
+      ++b;
+#pragma omp parallel do reduction(+:b)
+   for(i = 0; i <= 99; i += 1)
+      --b;
+#pragma omp parallel do reduction(&&:b)
+   for(i = 0; i <= 99; i += 1)
+      b = b&&i==i;
+#pragma omp parallel do reduction(||:b)
+   for(i = 0; i <= 99; i += 1)
+      b = b||i==i;
+
+   return 0;
+}
