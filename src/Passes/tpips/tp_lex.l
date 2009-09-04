@@ -132,9 +132,11 @@ static char unk[2]; /* one char lines are not implicit shells */
 <KEY>touch		{ KEYWORD(TK_TOUCH); }
 
 <KEY>setproperty	{ LITTERAL(TK_SET_PROPERTY); }
+<KEY>setprop		{ LITTERAL(TK_SET_PROPERTY); }
 <KEY>set		{ LITTERAL(TK_SET_PROPERTY); }
 <KEY>echo		{ LITTERAL(TK_ECHO); }
 <KEY>shell		{ LITTERAL(TK_SHELL); }
+<KEY>sh			{ LITTERAL(TK_SHELL); }
 <KEY>!			{ LITTERAL(TK_SHELL); }
 
 <KEY,INITIAL>[ \t]+	/* skip blanks... */
