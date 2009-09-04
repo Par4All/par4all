@@ -1,5 +1,5 @@
-delete decl41
-create decl41 decl41.c
+delete typedef01
+create typedef01 typedef01.c
 module main
 activate C_PARSER
 setproperty PRETTYPRINT_C_CODE TRUE
@@ -18,8 +18,8 @@ setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
 setproperty UNSPAGHETTIFY_TEST_RESTRUCTURING=TRUE
 setproperty UNSPAGHETTIFY_RECURSIVE_DECOMPOSITION=TRUE
 
-
 module compute
+#setenv PROPER_EFFECTS_DEBUG_LEVEL 9
 activate PRINT_CODE_REGIONS
 display PRINTED_FILE
 
