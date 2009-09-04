@@ -27,7 +27,7 @@ echo Initial code
 echo
 display PRINTED_FILE[flatten_code12]
 
-Let's skip the bug in the effects libraryy
+# Let's skip the bug in the effects library
 
 # echo
 # echo Code with cumulated effects
@@ -56,7 +56,8 @@ echo Unsplit and compile resulting code
 echo
 
 apply UNSPLIT
-shell cat flatten_code12.database/Src/flatten_code12.c
+# please do not show system dependent includes...
+#shell cat flatten_code12.database/Src/flatten_code12.c
 shell cc -Wall flatten_code12.database/Src/flatten_code12.c -o flatten_code12.out
 
 echo
@@ -67,9 +68,11 @@ shell ./flatten_code12.out > flatten_code12.database/Tmp/final_output
 shell ./flatten_code12.out
 shell rm flatten_code12.out
 
+echo
+echo Show diffs, must be empty
+echo
 shell diff flatten_code12.database/Tmp/initial_output \
  flatten_code12.database/Tmp/final_output
-
 
 close
 delete flatten_code12
