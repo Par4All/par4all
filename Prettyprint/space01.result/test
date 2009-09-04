@@ -15,7 +15,7 @@ main()
    int **pp = &p;
 
    **pp = 0;
-   **p = space01(1, j, 3.);
+   *p = space01(1, j, 3.);
 }
 
 Parsed printed file for "space01" and "main" with minimal spacing
@@ -34,5 +34,5 @@ main()
    int **pp = &p;
 
    **pp = 0;
-   **p = space01(1,j,3.);
+   *p = space01(1,j,3.);
 }
