@@ -123,7 +123,7 @@ main()
 //                                  pt_in[*][*][1] pt_in[*][*][2]
 //               <may be written >: _RANDOM_EFFECTS:GEN_SEED 
 //                                  pt_out[*][*][1] pt_out[*][*][2]
-//               <must be read   >: Sigma2 nx ny pt_in pt_out
+//               <must be read   >: Sigma2 nx ny
 
    AddNoise(ny, nx, pt_in, Sigma2, pt_out);
 }

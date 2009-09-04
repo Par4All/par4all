@@ -1,3 +1,21 @@
+//               <may be written >: TOP-LEVEL:tab[*][*]
+void compute()
+{
+   int i;
+   int j;
+//               <may be read    >: i j
+//               <may be written >: TOP-LEVEL:tab[*][*] j
+//               <must be written>: i
+
+   for(i = 1; i <= 62; i += 1)
+//               <may be read    >: i j
+//               <may be written >: TOP-LEVEL:tab[*][*]
+//               <must be written>: j
+      for(j = 1; j <= 62; j += 1)
+//               <may be written >: TOP-LEVEL:tab[*][*]
+//               <must be read   >: i j
+         tab[i][j] = i*j;
+}
 
 //  <TOP-LEVEL:tab[PHI1][PHI2]-W-EXACT-{1<=PHI1, PHI1<=62, 1<=PHI2,
 //    PHI2<=62}>
