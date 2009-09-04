@@ -46,6 +46,8 @@ show()
 # display workspace module extension
 display()
 {
+    file="${1}/${3}"
+    test -f ${file} && show ${file}
     file="${1}/${2}${3}"
     test -f ${file} && show ${file}
     file="${1}/${2}/${2}${3}" 
@@ -283,6 +285,16 @@ then
 	MOD=`uppercase $OPT_MOD`
 fi
 fi
+
+# The extensions are now language sensitive, while Display has no hint
+# about the source languages used.
+#
+# This change makes Display less sensitive to constant modifications
+# in Documentation/constants/constants.h and elsewhere in the
+# prettyprinter, but I have no idea if some functionalities are
+# lost. Display is in its obsolesnce phase. Use tpips instead.
+
+EXT=`cat $PGM.database/$MOD/$RESOURCE`
 
 display $PGM.database $MOD $EXT
 [ "$ASSOC_EXT" ] && display $PGM.database $MOD $ASSOC_EXT
