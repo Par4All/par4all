@@ -270,7 +270,7 @@ void close_processed_include_cache(void)
 	return;
     }
     pips_assert("defined cache", !hash_table_undefined_p(processed_cache));
-    HASH_MAP(k, v, { unlink(v); free(v); free(k); }, processed_cache);
+    HASH_MAP(k, v, { unlink(v); free(v); }, processed_cache);
     hash_table_free(processed_cache);
     processed_cache = hash_table_undefined;
 }
@@ -378,10 +378,11 @@ static bool handle_include_file(FILE * out, char * file_name)
 	}
 
 	/* if ok put in the cache, otherwise drop it. */
-	if (ok) hash_put(processed_cache, strdup(file_name), cached);
+	if (ok)
+	  hash_put(processed_cache, file_name, cached);
 	else {
-	    safe_unlink(cached);
-	    free(cached), cached = NULL;
+	  safe_unlink(cached);
+	  free(cached), cached = NULL;
 	}
     }
 
