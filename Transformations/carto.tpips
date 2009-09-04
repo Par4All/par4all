@@ -69,10 +69,16 @@ display PRINTED_FILE
 
 # check result
 apply UNSPLIT
-shell cc carto.c -lm -o carto
-shell cc carto.database/Src/carto.c -lm -o  carto.database/Src/carto
-shell if test `./carto.database/Src/carto` = `./carto` ; then echo "ok" ; else echo "ko" ; fi
-shell rm -f carto.database/Src/carto carto
+setenv DB=carto.database
+shell cc carto.c -lm -o $DB/carto_init
+shell ./$DB/carto_init > $DB/carto_init.out
+shell cc $DB/Src/carto.c -lm -o  $DB/carto_new
+shell ./$DB/carto_new > $DB/carto_new.out
+
+echo
+echo Diff, must be empty
+echo
+shell diff $DB/carto_init.out $DB/carto_new.out
 
 close
 delete carto
