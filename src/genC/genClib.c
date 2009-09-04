@@ -583,6 +583,9 @@ gen_trav_obj(
        flapping. So do not store again an ancestor if already one:
        FC: I do not understand how this may work. there should be a
        stack? Why would the "previous" object be the ancestor?
+       If a -> b x c x d, then when visiting b, "a" was the previous
+       object, but once on "c" which may get "b" or whatever is under
+       "b" and was last visited by the recursion??
     */
     if (! hash_defined_p(ancestor_tracking, obj))
       hash_put(ancestor_tracking, obj, gen_previous_object);
