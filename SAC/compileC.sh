@@ -20,7 +20,8 @@ if test -n "$3"; then
     OUTFILE="$3"
 fi
 
-TARGET=$PROJECT_NAME.database/$MODULE_NAME/$MODULE_NAME.pref
+# ??? should not hard code file suffix
+TARGET=$PROJECT_NAME.database/$MODULE_NAME/$MODULE_NAME.pre.f
 
 {
     cat $RCDIR/include/sse.h
