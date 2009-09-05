@@ -38,28 +38,33 @@
 #define WPIPS_RC "wpips.rc"
 
 #define XV_HELP_RC "pips_help.txt"
- 
+
 #define PROPERTIES_RC "properties.rc"
- 
+
 /* filename extensions
  */
 #define SEQUENTIAL_CODE_EXT ".code"
 #define PARALLEL_CODE_EXT ".parcode"
- 
+
 #define SEQUENTIAL_FORTRAN_EXT ".f"
 #define SEQUENTIAL_C_EXT ".c"
 #define PARALLEL_FORTRAN_EXT ".par.f"
 #define PARALLEL_C_EXT ".par.c"
+
+/* Suffixes for code and parsed_code. No idea why the word PREDICAT
+   is used for code. Old misusage? */
 #define PREDICAT_FORTRAN_EXT ".pre.f"
 #define PRETTYPRINT_FORTRAN_EXT ".pp.f"
- 
+#define PREDICAT_C_EXT ".pre.c"
+#define PRETTYPRINT_C_EXT ".pp.c"
+
 #define WP65_BANK_EXT ".bank"
 #define WP65_COMPUTE_EXT ".wp65"
- 
+
 #define ENTITIES_EXT ".entities"
- 
+
 #define EMACS_FILE_EXT "-emacs"
- 
+
 #define GRAPH_FILE_EXT "-graph"
 
 

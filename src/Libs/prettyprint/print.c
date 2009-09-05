@@ -114,12 +114,7 @@ print_code_or_source(string mod_name)
 	(get_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH") ?
 	    DBR_GRAPH_PRINTED_FILE
 		: (is_user_view ? DBR_PARSED_PRINTED_FILE : DBR_PRINTED_FILE));
-    string file_ext =
-	strdup(concatenate
-	       (is_user_view? PRETTYPRINT_FORTRAN_EXT : PREDICAT_FORTRAN_EXT,
-		get_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH") ?
-		GRAPH_FILE_EXT : "",
-		NULL));
+    string file_ext = string_undefined;
 
     /* FI: This test could be moved up in pipsmake? */
     if(entity_undefined_p(module = module_name_to_entity(mod_name))) {
@@ -128,6 +123,25 @@ print_code_or_source(string mod_name)
       pips_user_error("Module \"\%s\"\n not found", mod_name);
       return false;
     }
+
+    if(fortran_module_p(module)) {
+      file_ext =
+	strdup(concatenate
+	       (is_user_view? PRETTYPRINT_FORTRAN_EXT : PREDICAT_FORTRAN_EXT,
+		get_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH") ?
+		GRAPH_FILE_EXT : "",
+		NULL));
+    }
+    else if(c_module_p(module)) {
+      file_ext =
+	strdup(concatenate
+	       (is_user_view? PRETTYPRINT_C_EXT : PREDICAT_C_EXT,
+		get_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH") ?
+		GRAPH_FILE_EXT : "",
+		NULL));
+    }
+    else
+      pips_internal_error("Unknown source language\n");
 
     set_current_module_entity(module);
 
