@@ -1,0 +1,5 @@
+setproperty HWAC_SPOC_DEPTH 8
+setenv WSPACE anr999_8
+setenv FILE $WSPACE.c
+setenv NAME anr999
+source default_tpips
