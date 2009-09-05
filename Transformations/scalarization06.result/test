@@ -39,27 +39,60 @@ int main(int argc, char **argv)
    int *y;
    int *t;
 
+//  <x-W-EXACT-{}>
+
+
    x = (int *) malloc(sizeof(int));
+
+//  <y-W-EXACT-{}>
+
    y = (int *) malloc(sizeof(int));
+
+//  <t-W-EXACT-{}>
+
    t = (int *) malloc(sizeof(int));
 
    for(i = 0; i <= n-1; i += 1)
 
 //  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==0}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==0}>
+//  <x[PHI1]-W-MAY-{n==100, 0<=i, i<=99}>
+//  <y[PHI1]-W-MAY-{n==100, 0<=i, i<=99}>
 
       scanf("%d %d", &x[i], &y[i]);
 
    for(i = 0; i <= n-1; i += 1) {
       // BEGIN BLOCK
+
+//  <t-R-EXACT-{}>
+//  <t[PHI1]-W-EXACT-{PHI1==i, n==100, 0<=i, i<=99}>
+//  <x-R-EXACT-{}>
+//  <x[PHI1]-R-EXACT-{PHI1==i, n==100, 0<=i, i<=99}>
+
       t[i] = x[i];
+
+//  <x-R-EXACT-{}>
+//  <x[PHI1]-W-EXACT-{PHI1==i, n==100, 0<=i, i<=99}>
+//  <y-R-EXACT-{}>
+//  <y[PHI1]-R-EXACT-{PHI1==i, n==100, 0<=i, i<=99}>
+
       x[i] = y[i];
+
+//  <t-R-EXACT-{}>
+//  <t[PHI1]-R-EXACT-{PHI1==i, n==100, 0<=i, i<=99}>
+//  <y-R-EXACT-{}>
+//  <y[PHI1]-W-EXACT-{PHI1==i, n==100, 0<=i, i<=99}>
+
       y[i] = t[i];
       // END BLOCK
    }
 
 //  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+//  <x-R-EXACT-{}>
+//  <x[PHI1]-R-EXACT-{PHI1==n, i==100, n==100}>
+//  <y-R-EXACT-{}>
+//  <y[PHI1]-R-EXACT-{PHI1==n, i==100, n==100}>
 
    printf("%d %d", x[n], y[n]);
    // END BLOCK
