@@ -32,6 +32,10 @@ int inC1(int);
 missing01.database/Tmp/inC1.cpp_processed.c
 missing01.database/Tmp/missing01.cpp_processed.c
 missing01.database/inC1!/inC1!.c
+missing01.database/inC1!/inC1!.pre.c
 missing01.database/inC1/inC1.c
+missing01.database/inC1/inC1.pre.c
 missing01.database/main/main.c
+missing01.database/main/main.pre.c
 missing01.database/missing01!/missing01!.c
+missing01.database/missing01!/missing01!.pre.c

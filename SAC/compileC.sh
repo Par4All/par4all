@@ -21,7 +21,7 @@ if test -n "$3"; then
 fi
 
 # ??? should not hard code file suffix
-TARGET=$PROJECT_NAME.database/$MODULE_NAME/$MODULE_NAME.pre.f
+TARGET=$PROJECT_NAME.database/$MODULE_NAME/$MODULE_NAME.pre.c
 
 {
     cat $RCDIR/include/sse.h

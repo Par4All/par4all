@@ -49,13 +49,44 @@ double zz;
 /* The end! */
 # 1
 int a(char * b){ fputs(b); }
+int a(char *b)
+{
+   fputs(b);                                                            /*0002*/
+}
+int a(char *b)
+{
+   fputs(b);                                                            /*0002*/
+}
 # 1
 float b(double c) {
   return b;}
+float b(double c)
+{
+   return b;                                                            /*0003*/
+}
+float b(double c)
+{
+   float b;
+   return b;                                                            /*0003*/
+}
 # 2
 float c(int d){return i+d;}
+float c(int d)
+{
+   return i+d;                                                          /*0002*/
+}
+float c(int d)
+{
+   return i+d;                                                          /*0002*/
+}
 # 1
 /* Oh one f */void f (void) {}
+void f(void)
+{
+}
+void f(void)
+{
+}
 extern void f(void);
  /* and a a */ 
 extern int a(char *b);
@@ -67,3 +98,15 @@ extern float c(int d);
 double zz;
 
 /* The end! */
+extern void f(void);
+extern int a(char *b);
+extern float b(double c);
+int i = 9;
+extern float c(int d);
+double zz;
+extern void f(void);
+extern int a(char *b);
+extern float b(double c);
+int i = 9;
+extern float c(int d);
+double zz;
