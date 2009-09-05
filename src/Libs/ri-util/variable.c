@@ -683,23 +683,36 @@ bool integer_scalar_entity_p(entity e)
 
 /* Any reference r such that reference_variable(r)==e accesses all
    bytes (or bits) allocated to variable e. In other words, any write
-   of e is a kill.
+   of e is a kill. At least, if the reference indices are NIL in the
+   case of pointers.
 
-   The Newgen type of e must be "variable". */
+   The Newgen type of e must be "variable".
+
+   FI: This function is much too naive because array dimensions may be
+   hidden anywhere in a chain of typdef types. It might be much better
+   to use type_depth() or to write a more specific function. Well, for
+   some unknown reason, type_depth is not the answer.
+ */
 bool entity_atomic_reference_p(entity e)
 {
-  type ct = ultimate_type(entity_type(e));
-  variable vt = type_variable(ct);
+  type t = entity_type(e);
+  variable vt = type_variable(t);
+  type ut = ultimate_type(entity_type(e));
+  variable uvt = type_variable(ut);
   bool atomic_p = FALSE;
 
-  pips_assert("entity e is a variable", type_variable_p(ct));
+  pips_assert("entity e is a variable", type_variable_p(ut));
 
-  if(ENDP(variable_dimensions(vt))) {
+  /* Kludge to work in case the dimension is part of the typedef or
+     part of the type. */
+  /* if(ENDP(variable_dimensions(uvt)) &&
+     ENDP(variable_dimensions(vt))) {*/
+  if(type_depth(t)==0) {
     /* The property is not true for overloaded, string, derived
        (typedef is impossible here) */
-    basic bt = variable_basic(vt);
-    atomic_p = basic_int_p(bt) || basic_float_p(bt) || basic_logical_p(bt)
-      || basic_complex_p(bt) || basic_bit_p(bt) || basic_pointer_p(bt);
+    basic ubt = variable_basic(uvt);
+    atomic_p = basic_int_p(ubt) || basic_float_p(ubt) || basic_logical_p(ubt)
+      || basic_complex_p(ubt) || basic_bit_p(ubt) || basic_pointer_p(ubt);
   }
 
   return atomic_p;
