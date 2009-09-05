@@ -2,7 +2,7 @@
 # test pips on test7.f
 #
 Delete test7
-if Init -f Ricedg/test7.f test7 >&2
+if Init -f test7.f test7 >&2
 then
 	Select -w test7 rfulldg>&2
 	if Display -m test7
@@ -18,8 +18,4 @@ else
 	Delete test7>&2	
 	exit 1
 fi
-
-
-
-
  
