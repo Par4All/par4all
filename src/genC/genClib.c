@@ -357,16 +357,8 @@ struct driver {
   void (*simple_out)() ;
   int (*obj_in)() ;
   void (*obj_out)() ;
+  //  void * context;
 } ;
-
-/* Store the last object visited, that is the parent of the current
-   object: */
-static gen_chunk * gen_previous_object = NULL;
-/* If we record the parent object relation during the current recursion: */
-static bool gen_record_tracking_p = false;
-/* The hash map that stores the parent associated to an object visited
-   during the recursion: */
-static hash_table ancestor_tracking = NULL;
 
 /* To be called on any object pointer.
  */
@@ -572,25 +564,6 @@ gen_trav_obj(
 
   // this detects undefined values:
   CHECK_NULL(obj, (struct gen_binding *) NULL, dr);
-
-  /* Keep track of the current object before filtering in or out: */
-  if (gen_record_tracking_p) {
-    // fprintf(stderr, "[gen_trav_obj] set heritage %p -> %p\n",
-    //         gen_previous_object, obj);
-    /* Since an object can have multiple ancestors (for example think in
-       PIPS unstructured where we can have multible goto towards the
-       same node), just pick the first ancestor found to avoid heritage
-       flapping. So do not store again an ancestor if already one:
-       FC: I do not understand how this may work. there should be a
-       stack? Why would the "previous" object be the ancestor?
-       If a -> b x c x d, then when visiting b, "a" was the previous
-       object, but once on "c" which may get "b" or whatever is under
-       "b" and was last visited by the recursion??
-    */
-    if (! hash_defined_p(ancestor_tracking, obj))
-      hash_put(ancestor_tracking, obj, gen_previous_object);
-  }
-  gen_previous_object = obj;
 
   if ((*dr->obj_in)(obj, dr))
   {
@@ -3066,102 +3039,118 @@ typedef GenRewriteType GenRewriteTableType[MAX_DOMAIN];
  */
 struct multi_recurse
 {
-    hash_table             seen;
-    GenDecisionTableType * domains;
-    GenDecisionTableType * decisions;
-    GenFilterTableType   * filters;
-    GenRewriteTableType  * rewrites;
-    void                 * context;
+  // what objects where already visited, with a record of their "ancestor"
+  hash_table             seen;
+  // domain to be visited
+  GenDecisionTableType * domains;
+  // possibly intelligent decision tables, domains to recurse in
+  GenDecisionTableType * decisions;
+  // filter and rewrite functions for the visited domains
+  GenFilterTableType   * filters;
+  GenRewriteTableType  * rewrites;
+  // common context passed to everybody
+  void                 * context;
+  // keep track of the first ancestor of each object
+  stack                upwards;
+  // previously visited object, if someone wants it...
+  gen_chunk            * previous;
 };
 
 /* the current multi recurse driver.
  * it is cleaner than the gen_recurse version since I added
  * the decisions table without modifying Pierre code, while here
- * I redefined a current status struct that stores everything
- * needed.
+ * I redefined a current status struct that stores everything needed.
  */
-static struct multi_recurse
-    *current_mrc = (struct multi_recurse *) NULL;
+static struct multi_recurse * current_mrc = (struct multi_recurse *) NULL;
 
-/* MULTI RECURSE FUNCTIONS
- */
+//****************************************************  MULTI RECURSE FUNCTIONS
 
-/*  true if obj was already seen in this recursion, and put it at TRUE
+/* true if obj was already seen in this recursion.
+ * also record ancestor on the fly.
  */
-static bool
-quick_multi_already_seen_p(obj)
-gen_chunk * obj;
+static bool quick_multi_already_seen_p(gen_chunk * obj)
 {
-    if (hash_get(current_mrc->seen, (char *)obj)==(char*)TRUE)
-	return(TRUE);
+  if (hash_defined_p(current_mrc->seen, obj))
+    return true;
 
-    hash_put(current_mrc->seen, (char *)obj, (char *) TRUE);
-    return(FALSE);
+  hash_put(current_mrc->seen, obj, stack_head(current_mrc->upwards));
+  return false;
 }
 
 static int
-quick_multi_recurse_obj_in(gen_chunk * obj, struct driver * dr)
+quick_multi_recurse_obj_in(gen_chunk * obj,
+			   __attribute__((unused)) struct driver * dr)
 {
-  int dom = obj->i;
+  int dom = obj->i, go = !GO;
   check_domain(dom);
 
-  message_assert("argument not used", dr==dr);
-
-  /* don't walk twice thru the same object:
-   */
-  if (quick_multi_already_seen_p(obj) ||
-      /*
-       * temporarily, tabulated objects are not walked thru.
-       * the decision could be managed by the table, or *after* the
-       * filtering: the current status implied that you cannot enumerate
-       * tabulated elements for instance.
-       *
-       * these features/bugs/limitations are compatible with gen_slow_recurse.
-       *
-       * FI told me that only persistant edges shouldn't be followed.
-       * it may mean that tabulated elements are always persistent?
-       */
-      IS_TABULATED(&Domains[quick_domain_index(obj)]))
+  // don't walk twice thru the same object:
+  if (quick_multi_already_seen_p(obj))
     return !GO;
 
-  /* filter case
-   */
-  if ((*(current_mrc->domains))[dom])
-    return((*((*(current_mrc->filters))[dom]))(obj, current_mrc->context));
+  // tabulated objects are not walked thru.
+  // the decision could be managed by the table, or *after* the
+  // filtering: the current status implied that you cannot enumerate
+  // tabulated elements for instance.
+  //
+  // these features/bugs/limitations are compatible with gen_slow_recurse.
+  //
+  // FI told me that only persistant edges shouldn't be followed.
+  // it may mean that tabulated elements are always persistent?
+  if (IS_TABULATED(&Domains[quick_domain_index(obj)]))
+    return !GO;
 
-  /* else, here is the *maybe* intelligent decision to be made.
-   */
-  return((*(current_mrc->decisions))[dom]);
+  // filter case, tell whether to apply rewrite
+  // it should be different from recurring down...
+  if ((*(current_mrc->domains))[dom])
+    go = (*((*(current_mrc->filters))[dom]))(obj, current_mrc->context);
+  else
+    // else, here is the *maybe* intelligent decision to be made.
+    go = (*(current_mrc->decisions))[dom];
+
+  // else push current object before continuing the recursion downwards
+  if (go) stack_push(obj, current_mrc->upwards);
+
+  // we have just visited this one (downwards)
+  current_mrc->previous = obj;
+
+  return go;
 }
 
 static void
 quick_multi_recurse_obj_out(gen_chunk * obj,
-			    struct gen_binding * bp,
-			    struct driver * dr)
+			    __attribute__((unused)) struct gen_binding * bp,
+			    __attribute__((unused)) struct driver * dr)
 {
   int dom = obj->i;
   check_domain(dom);
 
-  message_assert("arguments not used", bp==bp && dr==dr);
+  // pop before calling rewrite function, so that the current ancestor
+  // should is the right one, not the current object
+  gen_chunk * popped = stack_pop(current_mrc->upwards);
+  message_assert("pop myself", popped==obj);
 
+  // now call the rewrite function
   if ((*(current_mrc->domains))[dom])
     (*((*(current_mrc->rewrites))[dom]))(obj, current_mrc->context);
+
+  // we have just visited this one (upwards)
+  current_mrc->previous = obj;
 }
 
 static int
 quick_multi_recurse_simple_in(gen_chunk * obj, union domain * dp)
 {
   int t;
-
-  return(((*(current_mrc->decisions))[dp->se.element-Domains] ||
+  return ((*(current_mrc->decisions))[dp->se.element-Domains] ||
 	  (*(current_mrc->domains))[dp->se.element-Domains]) &&
-	 (!dp->se.persistant) &&               /* stay at a given level */
-	 ((t=dp->ba.type)==BASIS_DT ? TRUE :
+         (!dp->se.persistant) &&               // stay at a given level
+	 ((t=dp->ba.type)==BASIS_DT ? true :
 	  t==LIST_DT               ? obj->l != list_undefined :
 	  t==SET_DT                ? obj->t != set_undefined :
 	  t==ARRAY_DT              ? obj->p != array_undefined :
 	  (fatal("persistant_simple_in: unknown type %s\n",
-		 itoa(dp->ba.type)), FALSE)));
+		 itoa(dp->ba.type)), false));
 }
 
 
@@ -3175,13 +3164,12 @@ quick_multi_recurse_simple_in(gen_chunk * obj, union domain * dp)
     the visited data structure.
     if obj is NULL, the whole recursion is stopped !
 */
-void
-gen_recurse_stop(void * obj)
+void gen_recurse_stop(void * obj)
 {
-    if (obj)
-	hash_put(current_mrc->seen, (char *)obj, (char *)TRUE);
-    else
-	gen_trav_stop_recursion = TRUE;
+  if (obj)
+    hash_put(current_mrc->seen, obj, obj);
+  else
+    gen_trav_stop_recursion = true;
 }
 
 /**  Multi recursion generic visitor function
@@ -3189,79 +3177,89 @@ gen_recurse_stop(void * obj)
      It is more intended for internal use, but may be useful instead of
      gen_context_multi_recurse() to give iteration parameters as a va_list.
 
-     Refer to the documentation of gen_context_multi_recurse()
+     Refer to the documentation of gen_context_multi_recurse().
+
+     Beware that the function is reentrant.
 */
 static void
 gen_internal_context_multi_recurse(void * o, void * context, va_list pvar)
 {
-    gen_chunk * obj = (gen_chunk*) o;
-    int i, domain;
-    GenFilterTableType new_filter_table;
-    GenRewriteTableType new_rewrite_table;
-    GenDecisionTableType new_decision_table, new_domain_table, *p_table;
-    struct multi_recurse *saved_mrc, new_mrc;
-    struct driver dr;
+  gen_chunk * obj = (gen_chunk*) o;
+  int i, domain;
+  GenFilterTableType new_filter_table;
+  GenRewriteTableType new_rewrite_table;
+  GenDecisionTableType new_decision_table, new_domain_table, *p_table;
+  struct multi_recurse *saved_mrc, new_mrc;
+  struct driver dr;
 
-    check_read_spec_performed();
+  check_read_spec_performed();
 
-    /*  the object must be a valid newgen object
-     */
-    message_assert("null or undefined object to visit",
-		   obj!=(gen_chunk*)NULL && obj!=gen_chunk_undefined);
+  // the object must be a valid newgen object
+  message_assert("not null and defined object to visit",
+		 obj!=(gen_chunk*)NULL && obj!=gen_chunk_undefined);
 
-    /*    initialize the new tables
-     */
-    for(i=0; i<MAX_DOMAIN; i++)
-	new_domain_table[i]=FALSE,
-	new_decision_table[i]=FALSE,
-	new_filter_table[i]=NULL,
-	new_rewrite_table[i]=NULL;
+  // initialize the new tables
+  for(i=0; i<MAX_DOMAIN; i++)
+  {
+    new_domain_table[i]   = false;
+    new_decision_table[i] = false;
+    new_filter_table[i]   = NULL;
+    new_rewrite_table[i]  = NULL;
+  }
 
-    /*    read the arguments
-     */
-    while((domain=va_arg(pvar, int)) != 0)
-    {
-	message_assert("domain specified more than once",
-		       !new_domain_table[domain]);
+  //  read the arguments
+  while((domain=va_arg(pvar, int)) != 0)
+  {
+    message_assert("domain specified once", !new_domain_table[domain]);
 
-	new_domain_table[domain]  = TRUE;
-	new_filter_table[domain]  = va_arg(pvar, GenFilterType);
-	new_rewrite_table[domain] = va_arg(pvar, GenRewriteType);
+    new_domain_table[domain]  = true;
+    new_filter_table[domain]  = va_arg(pvar, GenFilterType);
+    new_rewrite_table[domain] = va_arg(pvar, GenRewriteType);
 
-	for(i=0, p_table=get_decision_table(domain); i<number_of_domains; i++)
-	    new_decision_table[i] |= (*p_table)[i];
-    }
+    for(i=0, p_table=get_decision_table(domain); i<number_of_domains; i++)
+      new_decision_table[i] |= (*p_table)[i];
+  }
 
-    new_mrc.seen      = hash_table_make(hash_pointer, 0),
-    new_mrc.domains   = &new_domain_table,
-    new_mrc.decisions = &new_decision_table,
-    new_mrc.filters   = &new_filter_table,
-    new_mrc.rewrites  = &new_rewrite_table,
-    new_mrc.context   = context;
+  // initialize multi recurse stuff
+  new_mrc.seen      = hash_table_make(hash_pointer, 0),
+  new_mrc.domains   = &new_domain_table,
+  new_mrc.decisions = &new_decision_table,
+  new_mrc.filters   = &new_filter_table,
+  new_mrc.rewrites  = &new_rewrite_table,
+  new_mrc.context   = context;
+  new_mrc.upwards   = stack_make(0, 20, 0);
+  new_mrc.previous  = NULL;
 
-    dr.null		= gen_null,
-    dr.leaf_in		= tabulated_leaf_in,
-    dr.leaf_out		= gen_null,
-    dr.simple_in	= quick_multi_recurse_simple_in,
-    dr.array_leaf	= gen_array_leaf,
-    dr.simple_out	= gen_null,
-    dr.obj_in		= quick_multi_recurse_obj_in,
-    dr.obj_out		= quick_multi_recurse_obj_out;
+  // initialize recursion driver
+  // (should contains a pointer to previous one to pass the context,
+  // instead of relying on a global variable...)
+  dr.null	= gen_null,
+  dr.leaf_in	= tabulated_leaf_in,
+  dr.leaf_out	= gen_null,
+  dr.simple_in	= quick_multi_recurse_simple_in,
+  dr.array_leaf	= gen_array_leaf,
+  dr.simple_out	= gen_null,
+  dr.obj_in	= quick_multi_recurse_obj_in,
+  dr.obj_out	= quick_multi_recurse_obj_out;
 
-    /* push the current context
-     */
-    saved_mrc = current_mrc, current_mrc = &new_mrc;
+  // push the current context
+  saved_mrc = current_mrc, current_mrc = &new_mrc;
 
-    /* recurse!
-     */
-    gen_trav_stop_recursion = false;
-    gen_trav_obj(obj, &dr);
-    gen_trav_stop_recursion = false;
+  // recurse!
+  gen_trav_stop_recursion = false;
+  stack_push(NULL, new_mrc.upwards); // root is conventionaly set to NULL
+  gen_trav_obj(obj, &dr);
+  // if there was no interruption, the stack must be back to the root
+  if (!gen_trav_stop_recursion)
+    message_assert("back to root",
+		   stack_size(current_mrc->upwards) == 1 &&
+		   stack_pop(current_mrc->upwards)==NULL);
+  gen_trav_stop_recursion = false;
 
-    /*  restore the previous context
-     */
-    hash_table_free(new_mrc.seen);
-    current_mrc = saved_mrc;
+  // cleanup, and restore the previous context
+  hash_table_free(new_mrc.seen);
+  stack_free(&new_mrc.upwards);
+  current_mrc = saved_mrc;
 }
 
 /** Multi-recursion with context function visitor
@@ -3393,20 +3391,29 @@ void gen_context_recurse(
    @{
 */
 
+/* Get the previously visited object.
 
-/* Get the previous visited object during the recursion.  If we are in a
-   filter called from a gen_recurse, and we're only dealing with
-   structures, it is the parent object. If there is a list, array,
-   set, map... it is whatever was visited just before. Is it?
+   @return the previously visited object
 
-   @return the previously visited object. If it fails to do it, it returns:
+   It may be a sibling, a parent, or an child.
+ */
+gen_chunk * gen_get_recurse_previous_visited_object(void)
+{
+  message_assert("in a recursion", current_mrc!=NULL);
+  return current_mrc->previous;
+}
+
+/* Get the ancestor of the current object.
+
+   @return the ancestor of the current object. If it fails to do it, it returns:
 
      - NULL if the current object is the root of the recursion (since it
        does not have any parent inside the reduction scope)
 */
-gen_chunk *
-gen_get_recurse_previous_visited_object() {
-  return gen_previous_object;
+gen_chunk * gen_get_recurse_current_ancestor(void)
+{
+  message_assert("in a recursion", current_mrc!=NULL);
+  return stack_head(current_mrc->upwards);
 }
 
 
@@ -3426,55 +3433,29 @@ gen_get_recurse_previous_visited_object() {
 */
 gen_chunk * gen_get_recurse_ancestor(const void * object)
 {
-  return (gen_chunk *) hash_get(ancestor_tracking, object);
+  message_assert("in a recursion", current_mrc!=NULL);
+  return (gen_chunk *) hash_get(current_mrc->seen, object);
 }
 
 /* return the first ancestor object found of the given type.
 
    @param type newgen domain of the ancestor looked for.
    @param object we want the ancestor of.
-   @return NULL for the root, gen_chunk_undefined if no ancestor (?).
+   @return NULL if the root is reached without finding the said type
  */
 gen_chunk * gen_get_ancestor(int type, const void * obj)
 {
+  message_assert("in a recursion", current_mrc!=NULL);
   while (true)
   {
-    gen_chunk * prev = (gen_chunk *) hash_get(ancestor_tracking, obj);
+    gen_chunk * prev = hash_get(current_mrc->seen, obj);
+    message_assert("some ancestor or NULL", prev!=HASH_UNDEFINED_VALUE);
     if (prev==NULL)
       return NULL;
-    else if (prev==HASH_UNDEFINED_VALUE)
-      // I'm not sure that it is possible... should it be an abort?
-      return gen_chunk_undefined;
     else if (prev->i == type)
       return prev;
     obj = prev;
   }
-}
-
-/* Start gen_recurse function heritage tracking.
-
-   It resets the previous computed ancestor relations.
- */
-void
-gen_start_recurse_ancestor_tracking() {
-  // Deallocate the hash-map if already set:
-  if (ancestor_tracking != NULL)
-    hash_table_free(ancestor_tracking);
-  ancestor_tracking = hash_table_make(hash_pointer, 0);
-  // There is no previous node visited:
-  gen_previous_object = NULL;
-  gen_record_tracking_p = TRUE;
-}
-
-
-/* Stop gen_recurse function tracking heritage.
-
-   Do not remove the hash-map so that we can continue to have this
-   information afterwards.
-*/
-void
-gen_stop_recurse_ancestor_tracking() {
-  gen_record_tracking_p = false;
 }
 
 /** @} */

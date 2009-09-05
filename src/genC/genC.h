@@ -256,12 +256,16 @@ extern void gen_context_multi_recurse GEN_PROTO((void *, void *,...));
         gen_context_multi_recurse(s,c,d,f,r,NULL)
 
 extern gen_chunk * gen_get_recurse_previous_visited_object(void);
+extern gen_chunk * gen_get_recurse_current_ancestor(void);
 extern gen_chunk * gen_get_recurse_ancestor(const void *);
 extern gen_chunk * gen_get_ancestor(int, const void *);
-#define gen_get_ancestor_type(i,o) gen_get_ancestor(i,o)
-extern void gen_start_recurse_ancestor_tracking(void);
-extern void gen_stop_recurse_ancestor_tracking(void);
 
+// compatibility with previous version:
+#define gen_get_ancestor_type(i,o) gen_get_ancestor(i,o)
+
+// temporary fix on removed functions with empty macros
+#define gen_start_recurse_ancestor_tracking() /* NOPE */
+#define gen_stop_recurse_ancestor_tracking() /* NOPE */
 
 /* Since C is not-orthogonal (chunk1 == chunk2 is prohibited),
  * this one is needed.
