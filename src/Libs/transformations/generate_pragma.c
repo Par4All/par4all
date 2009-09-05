@@ -188,7 +188,6 @@ bool ompify_code (char mod_name[]) {
   // generate omp pragma for parallel loops
   // We need to access to the statement containing the current loop, forloop
   // so ask NewGen gen_recurse to keep this informations for us
-  gen_start_recurse_ancestor_tracking();
   // Iterate on all the loop
   if (strcmp (type, "str") == 0)
     gen_recurse(mod_stmt, loop_domain, gen_true,
@@ -197,7 +196,6 @@ bool ompify_code (char mod_name[]) {
     gen_recurse(mod_stmt, loop_domain, gen_true,
 		generate_expr_omp_pragma_loop);
   else pips_assert ("not expected property", FALSE);
-  gen_stop_recurse_ancestor_tracking();
 
   // Restore the previous PRETTYPRINT_PARALLEL property for the next
   set_string_property("PRETTYPRINT_PARALLEL", previous);

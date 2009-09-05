@@ -426,15 +426,11 @@ for_loop_to_do_loop(char * module_name) {
   /* We need to access to the instruction containing the current
      for-loops, so ask NewGen gen_recurse to keep this informations for
      us: */
-  gen_start_recurse_ancestor_tracking();
   /* Iterate on all the for-loops: */
   gen_recurse(module_statement,
-	      forloop_domain,
-              /* Since for-loop statements can be nested, only restructure in
-		 a bottom-up way, : */
-	      gen_true,
-	      try_to_transform_a_for_loop_into_a_do_loop);
-  gen_stop_recurse_ancestor_tracking();
+              // Since for-loop statements can be nested, only restructure in
+	      // a bottom-up way, : 
+	      forloop_domain, gen_true, try_to_transform_a_for_loop_into_a_do_loop);
 
   pips_assert("Statement should be OK after...", statement_consistent_p(module_statement));
 
@@ -590,15 +586,11 @@ for_loop_to_while_loop(char * module_name) {
   /* We need to access to the instruction containing the current
      for-loops, so ask NewGen gen_recurse to keep this informations for
      us: */
-  gen_start_recurse_ancestor_tracking();
   /* Iterate on all the for-loops: */
   gen_recurse(module_statement,
-	      forloop_domain,
-              /* Since for-loop statements can be nested, only restructure in
-		 a bottom-up way, : */
-	      gen_true,
-	      transform_a_for_loop_into_a_while_loop);
-  gen_stop_recurse_ancestor_tracking();
+              // Since for-loop statements can be nested, only restructure in
+	      // a bottom-up way, :
+	      forloop_domain, gen_true, transform_a_for_loop_into_a_while_loop);
 
   pips_assert("Statement should be OK after...", statement_consistent_p(module_statement));
 

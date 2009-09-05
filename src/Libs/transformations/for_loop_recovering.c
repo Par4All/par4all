@@ -311,16 +311,12 @@ recover_for_loop_in_statement(statement s) {
   /* We need to access to the statement containing the current
      while-loops, so ask NewGen gen_recurse to keep this informations for
      us: */
-  gen_start_recurse_ancestor_tracking();
   /* Iterate on all the while-loops: */
   //gen_debug = -1;
   gen_recurse(s,
-	      whileloop_domain,
               /* Since loop statements can be nested, only restructure in
                   a bottom-up way, : */
-	      gen_true,
-	      try_to_recover_for_loop_in_a_while);
-  gen_stop_recurse_ancestor_tracking();
+	      whileloop_domain, gen_true, try_to_recover_for_loop_in_a_while);
   //gen_debug = 0;
 }
 

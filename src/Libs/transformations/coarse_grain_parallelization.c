@@ -257,11 +257,8 @@ static void coarse_grain_loop_parallelization(statement module_stat)
 {
   pips_debug(1,"begin\n");
 
-  /* We need ancestor tracking to get the loop-owner statements: */
-  gen_start_recurse_ancestor_tracking();
-  /* Iterate on the loops to try parallelizing them: */
+  // Iterate on the loops to try parallelizing them:
   gen_recurse(module_stat, loop_domain, whole_loop_parallelize, gen_null);
-  gen_stop_recurse_ancestor_tracking();
 
   pips_debug(1,"end\n");
 }
