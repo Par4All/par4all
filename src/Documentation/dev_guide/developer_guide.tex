@@ -1596,17 +1596,22 @@ commented. The origin of a change can be located much faster that way.
 
 Fifthly, to ensure portability, do not create dependences on
 \verb|/usr/include| as it varies from compiler and system version to
-version. If header files are necessary and if the must show in the
+version. If header files are necessary and if they must show in the
 output, please use a preprocessed version of your source code as input
 code. It can easily be retrived from he database in directory
-\verb/Tmp/. Use \verb/%ALLFUNC/ rather than \verb/%FUNC/.
+\verb/Tmp/. Use \verb/%ALLFUNC/ rather than \verb/%FUNC/ to avoid
+unwelcome output. Note: using and displaying fixed header files is not
+compatible with executing the resulting code as this may cause
+portability problems.
 
 Finally, the input source code and the output source code should be
 compiled and executed whenever it is possible. Care must be taken to
 use only files in the database, i.e. compile the input after the
 \verb/create/ command. Use \verb/unsplit/ to produce the output source
 and compile it in directory \verb/Src/. Do not forget to remove the
-executable and the object files.
+executable and the object files. Executable and object files should
+have unique names in the validation directory to let the validation
+process run in parallel when multicore machines are available.
 
 PIPS is developped to handle legal source code only. It must
 nevertheless detect all kinds of errors and issue warnings. To
@@ -1627,7 +1632,7 @@ Test cases can be factorized using \verb/default_tpips/ and/or
 it is less flexible to show information about a specific function
 among hundreds.
 
-Scripting used to be shell based wen PIPS was started. It is now
+Scripting used to be shell based when PIPS was started. It is now
 mostly \verb/tpips/ based. Such scripts should end with a close, a
 delete of the current workspace\footnote{}, and a quit.
 
