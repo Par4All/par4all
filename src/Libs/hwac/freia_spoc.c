@@ -1243,9 +1243,12 @@ static void freia_spoc_pipeline
   {
     // what are the effective outputs in the middle of the pipeline
     list new_outs = NIL;
-    if (image_is_needed(in1.producer, dpipe, todo))
+    if (image_is_needed(in1.producer, dpipe, todo) &&
+	!gen_in_list_p(in1.producer, dag_inputs(dpipe)))
       new_outs = CONS(entity, in1.image, new_outs);
-    if (image_is_needed(in0.producer, dpipe, todo))
+    if (image_is_needed(in0.producer, dpipe, todo) &&
+	!gen_in_list_p(in0.producer, dag_inputs(dpipe)))
+      // should also check that in0!=in1?
       new_outs = CONS(entity, in0.image, new_outs);
 
     // gen_free_list(dag_outputs(dpipe));
