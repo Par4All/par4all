@@ -140,7 +140,7 @@ digraph "freia_03_helper_0_0" {
 #include <spoc.h>
 
 // FREIA-SPoC helper function for module freia_03
-freia_status freia_03_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, freia_data2d * i1, int32_t cst0, int32_t cst1, int32_t cst2, int32_t cst3, int32_t cst4)
+freia_status freia_03_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_data2d * i0, freia_data2d * i1, int32_t cst0, int32_t cst1, int32_t cst2, int32_t cst3)
 {
   spoc_instr si;
   spoc_param sp;
@@ -215,54 +215,104 @@ freia_status freia_03_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, freia_d
   sp.alu[4][0].constant = cst3;
 
 
-  // STAGE 5
-  // 0`t4 [3 alu] -> [5 alu] 30 and
+  // output image 0`t4 on 0 and image 0`t5 on 1
+  // 0`t4 [3 alu] -> [4 output 0] 0 null
   si.mux[3][0].op = SPOC_MUX_IN1;
   si.mux[3][2].op = SPOC_MUX_IN0;
-  // 0`t4 [4 input 0] -> [5 alu] 30 and
+  // 0`t4 [4 input 0] -> [4 output 0] 0 null
   si.mux[4][0].op = SPOC_MUX_IN0;
-  // 0`t4 [5 input 0] -> [5 alu] 30 and
+
+  // fill in to the end...
+  // 0`t4 [4 output 0] -> [4 output 0] 0 null
   // nope
-  // 0`t5 [4 alu] -> [5 alu] 30 and
+
+  // 0`t5 [4 alu] -> [4 output 1] 0 null
   si.mux[4][1].op = SPOC_MUX_IN1;
   si.mux[4][3].op = SPOC_MUX_IN0;
-  // 0`t5 [5 input 1] -> [5 alu] 30 and
+
+  // fill in to the end...
+  // 0`t5 [4 output 1] -> [4 output 1] 0 null
   // nope
-  // alu 30 and stage 5
-  si.alu[5][0].op = SPOC_ALU_AND_IN0_IN1;
+
+  mcode.raw = (freia_ptr) &si;
+  mcode.size = sizeof(spoc_instr);
+
+  dynparam.raw = (freia_ptr) &sp;
+  dynparam.size = sizeof(spoc_param);
+
+  redres.raw = (freia_ptr) &reduc;
+  redres.size = sizeof(spoc_reduction);
+
+  ret = freia_cg_write_microcode(&mcode);
+  ret |= freia_cg_write_dynamic_param(&dynparam);
+
+  // actual call of spoc hardware
+  freia_cg_template_process_2i_2o(op, param, o0, o1, i0, i1);
+
+  return ret;
+}
+
+// FREIA-SPoC helper function for module freia_03
+freia_status freia_03_helper_0_0_1(freia_data2d * o0, freia_data2d * i0, freia_data2d * i1, int32_t cst0)
+{
+  spoc_instr si;
+  spoc_param sp;
+  spoc_reduction reduc;
+  freia_microcode mcode;
+  freia_dynamic_param dynparam;
+  freia_reduction_results redres;
+  freia_op_sel op = 0;
+  freia_op_param param;
+  freia_status ret;
+  int i;
+
+  // init pipe to nop
+  spoc_init_pipe(&si, &sp, 16);
 
 
-  // STAGE 6
-  // alu 31 set_constant stage 6
-  si.alu[6][0].op = SPOC_ALU_COPY_CONST;
-  sp.alu[6][0].constant = cst4;
-
-
-  // STAGE 7
-  // 0`t6 [5 alu] -> [7 alu] 32 mul
-  si.mux[5][0].op = SPOC_MUX_IN1;
-  si.mux[5][2].op = SPOC_MUX_IN0;
-  // 0`t6 [6 input 0] -> [7 alu] 32 mul
-  si.mux[6][0].op = SPOC_MUX_IN0;
-  // 0`t6 [7 input 0] -> [7 alu] 32 mul
+  // STAGE 0
+  // 0`t4 [0 input 0] -> [0 alu] 30 and
   // nope
-  // 0`t7 [6 alu] -> [7 alu] 32 mul
-  si.mux[6][1].op = SPOC_MUX_IN1;
-  si.mux[6][3].op = SPOC_MUX_IN0;
-  // 0`t7 [7 input 1] -> [7 alu] 32 mul
+  // 0`t5 [0 input 1] -> [0 alu] 30 and
   // nope
-  // alu 32 mul stage 7
-  si.alu[7][0].op = SPOC_ALU_MUL_IN0_IN1;
+  // alu 30 and stage 0
+  si.alu[0][0].op = SPOC_ALU_AND_IN0_IN1;
+
+
+  // STAGE 1
+  // alu 31 set_constant stage 1
+  si.alu[1][0].op = SPOC_ALU_COPY_CONST;
+  sp.alu[1][0].constant = cst0;
+
+
+  // STAGE 2
+  // 0`t6 [0 alu] -> [2 alu] 32 mul
+  si.mux[0][0].op = SPOC_MUX_IN1;
+  si.mux[0][2].op = SPOC_MUX_IN0;
+  // 0`t6 [1 input 0] -> [2 alu] 32 mul
+  si.mux[1][0].op = SPOC_MUX_IN0;
+  // 0`t6 [2 input 0] -> [2 alu] 32 mul
+  // nope
+  // 0`t7 [1 alu] -> [2 alu] 32 mul
+  si.mux[1][1].op = SPOC_MUX_IN1;
+  si.mux[1][3].op = SPOC_MUX_IN0;
+  // 0`t7 [2 input 1] -> [2 alu] 32 mul
+  // nope
+  // alu 32 mul stage 2
+  si.alu[2][0].op = SPOC_ALU_MUL_IN0_IN1;
 
 
   // output image o on 0
-  // o [7 alu] -> [7 output 0] 0 null
-  si.mux[7][0].op = SPOC_MUX_IN1;
-  si.mux[7][2].op = SPOC_MUX_IN0;
+  // o [2 alu] -> [2 output 0] 0 null
+  si.mux[2][0].op = SPOC_MUX_IN1;
+  si.mux[2][2].op = SPOC_MUX_IN0;
 
   // fill in to the end...
-  // o [7 output 0] -> [7 output 0] 0 null
-  // nope
+  // o [2 output 0] -> [4 output 0] 0 null
+  // o [3 input 0] -> [4 output 0] 0 null
+  si.mux[3][0].op = SPOC_MUX_IN0;
+  // o [4 input 0] -> [4 output 0] 0 null
+  si.mux[4][0].op = SPOC_MUX_IN0;
 
   mcode.raw = (freia_ptr) &si;
   mcode.size = sizeof(spoc_instr);
@@ -286,6 +336,8 @@ freia_status freia_03_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, freia_d
 
 freia_status freia_03(freia_data2d *o, freia_data2d *i0, freia_data2d *i1, int32_t c1, int32_t c2, int32_t c3, int32_t c4, int32_t c5)
 {
+   freia_data2d *t4 = freia_common_create_data(16, 128, 128);
+   freia_data2d *t5 = freia_common_create_data(16, 128, 128);
    
    // 1 pipeline call is enough
    // t1 = f(i0)
@@ -296,7 +348,11 @@ freia_status freia_03(freia_data2d *o, freia_data2d *i0, freia_data2d *i1, int32
    // t6 = t4 & t5
    // t7 = m()
    // o  = t6 * t7
-   freia_03_helper_0_0_0(o, i0, i1, c2, c1, c3, c4, c5);                /*0025*/
+   freia_03_helper_0_0_0(t4, t5, i0, i1, c2, c1, c3, c4);               /*0025*/
+   freia_03_helper_0_0_1(o, t4, t5, c5);                                /*0030*/
+
+   freia_common_destruct_data(t4);                                      /*0037*/
+   freia_common_destruct_data(t5);                                      /*0038*/
 
    return FREIA_OK;                                                     /*0042*/
 }
