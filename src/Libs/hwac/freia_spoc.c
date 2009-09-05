@@ -472,9 +472,9 @@ where_to_perform_operation
       // I must check that the alu is not already used?!
       // So I take a safe bet...
       out->stage = max_stage(in0, in1);
-      if (in0->image && in0->stage == out->stage && in0->level > spoc_type_alu)
+      if (in0->image && in0->stage == out->stage && in0->level >= spoc_type_alu)
 	out->stage++;
-      if (in1->image && in1->stage == out->stage && in1->level > spoc_type_alu)
+      if (in1->image && in1->stage == out->stage && in1->level >= spoc_type_alu)
 	out->stage++;
       in0->used = false, in1->used = false;
       break;
@@ -950,6 +950,35 @@ static void freia_spoc_code_buildup
   sb_app(code, "\n  return ret;\n}\n");
 }
 
+/* tell whether the image produced by prod is definitely consummed by v
+ * given the global dag d and the set of vertex still to be computed todo.
+ */
+static bool is_consummed_by_vertex(dagvtx prod, dagvtx v, dag d, set todo)
+{
+  bool consummed;
+  // no producer, no problem
+  if (!prod)
+    consummed = true;
+  // the image is a global output, it must be kept
+  else if (gen_in_list_p(prod, dag_outputs(d)))
+    consummed = false;
+  // the image is consummed by v
+  else if (gen_in_list_p(v, dagvtx_succs(prod)))
+  {
+    set succs = set_make(set_pointer);
+    set_assign_list(succs, dagvtx_succs(prod));
+    set_del_element(succs, succs, v);
+    // other todos expect this image?
+    consummed = !set_intersection_p(succs, todo);
+    set_free(succs);
+  }
+  else
+    consummed = false;
+  pips_debug(7, "%"_intFMT" is %sconsummed by %"_intFMT"\n",
+	     dagvtx_number(prod), consummed? "": "not ", dagvtx_number(v));
+  return consummed;
+}
+
 /* generate a SPoC pipeline from a single DAG for module.
  *
  * @param module current
@@ -989,7 +1018,6 @@ static void freia_spoc_pipeline
 
   // first arguments are out & in images
   int n_im_in = gen_length(dag_inputs(dpipe));
-
   pips_assert("0, 1, 2 input images", n_im_in>=0 && n_im_in<=2);
 
   // piped images in helper
@@ -1001,6 +1029,8 @@ static void freia_spoc_pipeline
   op_schedule in0, in1, out;
   list /* of entity */ limg = NIL;
 
+  int live_images = 0;
+
   // build input arguments/parameters/arguments
   if (n_im_in>=1)
   {
@@ -1009,6 +1039,7 @@ static void freia_spoc_pipeline
     p_in0 = "i0";
     init_op_schedule(&in0, v_in0, 0);
     limg = CONS(entity, a_in0, NIL);
+    live_images++;
   }
   else
     init_op_schedule(&in0, NULL, 0);
@@ -1018,6 +1049,7 @@ static void freia_spoc_pipeline
     // help scheduling by providing the first input twice.
     init_op_schedule(&in1, v_in0, 1);
     p_in1 = "i0";
+    live_images++;
   }
   else if (n_im_in>=2)
   {
@@ -1026,6 +1058,7 @@ static void freia_spoc_pipeline
     p_in1 = "i1";
     init_op_schedule(&in1, v_in1, 1);
     limg = gen_nconc(limg, CONS(entity, a_in1, NIL));
+    live_images++;
   }
   else
     init_op_schedule(&in1, NULL, 1);
@@ -1046,24 +1079,37 @@ static void freia_spoc_pipeline
     // skip inputs
     if (dagvtx_number(v)==0) break;
 
-    // check for dependencies on skipped vertices...
-    bool toskip = false;
-    SET_FOREACH(dagvtx, sk, skipped)
+    // on overflow...
+    if (!set_empty_p(skipped))
     {
-      if (gen_in_list_p(v, dagvtx_succs(sk))) {
-	pips_debug(7, "skipping %"_intFMT" because of %"_intFMT"\n",
-		   dagvtx_number(v), dagvtx_number(sk));
+      // check for dependencies on skipped vertices...
+      bool toskip = false;
+      SET_FOREACH(dagvtx, sk, skipped)
+      {
+	// skip because of missing deps
+	if (gen_in_list_p(v, dagvtx_succs(sk))) {
+	  pips_debug(7, "skipping %"_intFMT", deps on %"_intFMT"\n",
+		     dagvtx_number(v), dagvtx_number(sk));
+	  toskip = true;
+	  break;
+	}
+      }
+      // or no available output path, none created by consumming an image
+      if (!toskip && dagvtx_succs(v) && live_images==2 &&
+	  !(is_consummed_by_vertex(in0.producer, v, dpipe, todo) ||
+	    is_consummed_by_vertex(in1.producer, v, dpipe, todo)))
+      {
+	pips_debug(7, "skipping %"_intFMT", no path\n",  dagvtx_number(v));
 	toskip = true;
-	break;
+      }
+      if (toskip) {
+	set_add_element(skipped, skipped, v);
+	continue;
       }
     }
-    if (toskip) {
-      set_add_element(skipped, skipped, v);
-      continue;
-    }
 
-    pips_debug(7, "dealing with vertex %" _intFMT ", %d to go\n",
-	       dagvtx_number(v), set_size(todo));
+    pips_debug(7, "dealing with vertex %" _intFMT ", %d to go, %d path\n",
+	       dagvtx_number(v), set_size(todo), live_images);
 
     vtxcontent vc = dagvtx_content(v);
     pips_assert("there is a statement",
@@ -1121,7 +1167,6 @@ static void freia_spoc_pipeline
       basic_spoc_conf(optype, head, body, tail,
 		      out.stage, out.side, out.flip, &cst, &(api->spoc), v);
 
-      // update status of live images
       bool
 	in0_needed = image_is_needed(in0.producer, dpipe, todo),
 	in1_needed = image_is_needed(in1.producer, dpipe, todo);
@@ -1181,6 +1226,11 @@ static void freia_spoc_pipeline
 	init_op_schedule(&in0, NULL, 0);
       if (!in1_needed && in1.producer!=out.producer)
 	init_op_schedule(&in1, NULL, 0);
+
+      // update count of live images for overflow mode
+      live_images = 0;
+      if (image_is_needed(in0.producer, dpipe, todo)) live_images++;
+      if (image_is_needed(in1.producer, dpipe, todo)) live_images++;
     }
   }
 
