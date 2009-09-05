@@ -13,9 +13,51 @@ activate PRINT_PARALLELIZEDOMP_CODE
 
 setproperty PARALLELIZATION_STATISTICS TRUE
 
+echo
+echo Privatization of function "jacobi" and "main"
+echo
+
 apply PRIVATIZE_MODULE[jacobi]
+apply PRIVATIZE_MODULE[main]
+
+echo
+echo Cumulated effects for function "jacobi"
+echo
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[jacobi]
+
+echo
+echo Cumulated effects for function "main"
+echo
+
+display PRINTED_FILE[main]
+
+activate PRINT_CODE
+
+echo
+echo Dependence graph for function "jacobi"
+echo
+
+display DG_FILE[jacobi]
+
+echo
+echo Dependence graph for function "main"
+echo
+
+display DG_FILE[main]
+
+echo
+echo Parallel code for function "jacobi"
+echo
 
 display PARALLELPRINTED_FILE[jacobi]
+
+echo
+echo Parallel code for function "main"
+echo
+
+display PARALLELPRINTED_FILE[main]
 
 
 close

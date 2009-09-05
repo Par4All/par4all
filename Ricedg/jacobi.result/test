@@ -1,22 +1,165 @@
-int jacobi2(int nb, int** a, int** b)
+
+Privatization of function "jacobi" and "main"
+
+
+Cumulated effects for function "jacobi"
+
+//               <may be read    >: a a[*] b b[*] b[*][*]
+//               <may be written >: a[*][*]
+//               <must be read   >: nb
+int jacobi(int nb, int **a, int **b)
 {
    int indice_i;
    int indice_j;
-   indice_i = 0;                                                        /*0004*/
-   indice_j = 0;                                                        /*0005*/
+//               <may be read    >: a a[*] b b[*] b[*][*]
+//               <may be written >: a[*][*]
+//               <must be read   >: nb
+//               <must be written>: indice_i
 
-#pragma omp parallel for private(indice_j)
-   for(indice_i = 1; indice_i <= nb-1-1; indice_i += 1)                 /*0007*/
-#pragma omp parallel for 
-      for(indice_j = 1; indice_j <= nb-1-1; indice_j += 1)              /*0008*/
+   for(indice_i = 1; indice_i <= nb-1-1; indice_i += 1)                 /*0005*/
+//               <may be read    >: a a[*] b b[*][*] b[*] indice_i
+//               <may be written >: a[*][*]
+//               <must be read   >: nb
+//               <must be written>: indice_j
+      for(indice_j = 1; indice_j <= nb-1-1; indice_j += 1)              /*0006*/
+//               <may be read    >: a[*] b[*] b[*][*]
+//               <may be written >: a[*][*]
+//               <must be read   >: a b indice_i indice_j nb
          
          
          
          
 
-         a[indice_i][indice_j] = (b[indice_i-1][indice_j]+b[indice_i+1][indice_j]+b[indice_i][indice_j-1]+b[indice_i][indice_j+1])/4;              /*0014*/
+         a[indice_i][indice_j] = (b[indice_i-1][indice_j]+b[indice_i+1][indice_j]+b[indice_i][indice_j-1]+b[indice_i][indice_j+1])/4;              /*0012*/
    
 
-   return 0;                                                            /*0019*/
+   return 0;                                                            /*0017*/
 }
 
+Cumulated effects for function "main"
+
+//               <may be read    >: TOP-LEVEL:*MEMORY*
+//               <may be written >: TOP-LEVEL:*MEMORY*
+//               <must be read   >: argc
+int main(int argc, char *argv[])
+{
+   int **a;
+   int **b;
+   int indice_i;
+//               <may be read    >: _MALLOC_ a a[*] b b[*][*] b[*] nb
+//               <may be written >: _MALLOC_ a a[*] a[*][*] b b[*] 
+//                                  indice_i
+//               <must be read   >: argc
+   if (argc>1) {                                                        /*0031*/
+      int nb = atol(argv[1]);
+//               <must be read   >: _MALLOC_ nb
+//               <must be written>: _MALLOC_ b
+      b = malloc(sizeof(int *)*(nb+1));                                 /*0033*/
+//               <must be read   >: _MALLOC_ nb
+//               <must be written>: _MALLOC_ a
+      a = malloc(sizeof(int *)*(nb+1));                                 /*0034*/
+//               <may be read    >: _MALLOC_ a b
+//               <may be written >: _MALLOC_ a[*] b[*]
+//               <must be read   >: nb
+//               <must be written>: indice_i
+
+      for(indice_i = 0; indice_i <= nb; indice_i += 1) {                /*0036*/
+//               <may be written >: a[*]
+//               <must be read   >: _MALLOC_ a indice_i nb
+//               <must be written>: _MALLOC_
+         a[indice_i] = malloc(sizeof(int)*(nb+1));                      /*0037*/
+//               <may be written >: b[*]
+//               <must be read   >: _MALLOC_ b indice_i nb
+//               <must be written>: _MALLOC_
+         b[indice_i] = malloc(sizeof(int)*(nb+1));                      /*0038*/
+      }
+//               <may be read    >: a[*] b[*] b[*][*]
+//               <may be written >: a[*][*]
+//               <must be read   >: a b nb
+      return jacobi(nb, a, b);                                          /*0040*/
+   }
+   return 0;                                                            /*0042*/
+}
+
+Dependence graph for function "jacobi"
+
+
+ **************** Effective Dependence Graph ****************
+
+
+****************** End of Dependence Graph ******************
+
+Dependence graph for function "main"
+
+
+ **************** Effective Dependence Graph ****************
+
+	38 --> 38 with conflicts
+		from <_MALLOC_-R-MUST> to <_MALLOC_-W-MUST> at levels  1
+	38 --> 38 with conflicts
+		from <_MALLOC_-W-MUST> to <_MALLOC_-W-MUST> at levels  1
+	38 --> 38 with conflicts
+		from <_MALLOC_-W-MUST> to <_MALLOC_-R-MUST> at levels  1
+	38 --> 37 with conflicts
+		from <_MALLOC_-R-MUST> to <_MALLOC_-W-MUST> at levels  1
+	38 --> 37 with conflicts
+		from <_MALLOC_-W-MUST> to <_MALLOC_-W-MUST> at levels  1
+	38 --> 37 with conflicts
+		from <_MALLOC_-W-MUST> to <_MALLOC_-R-MUST> at levels  1
+	37 --> 38 with conflicts
+		from <_MALLOC_-R-MUST> to <_MALLOC_-W-MUST> at levels  1 2
+	37 --> 38 with conflicts
+		from <_MALLOC_-W-MUST> to <_MALLOC_-W-MUST> at levels  1 2
+	37 --> 38 with conflicts
+		from <_MALLOC_-W-MUST> to <_MALLOC_-R-MUST> at levels  1 2
+	37 --> 37 with conflicts
+		from <_MALLOC_-R-MUST> to <_MALLOC_-W-MUST> at levels  1
+	37 --> 37 with conflicts
+		from <_MALLOC_-W-MUST> to <_MALLOC_-W-MUST> at levels  1
+	37 --> 37 with conflicts
+		from <_MALLOC_-W-MUST> to <_MALLOC_-R-MUST> at levels  1
+
+****************** End of Dependence Graph ******************
+
+Parallel code for function "jacobi"
+
+int jacobi(int nb, int **a, int **b)
+{
+   int indice_i;
+   int indice_j;
+
+#pragma omp parallel for private(indice_j)
+   for(indice_i = 1; indice_i <= nb-1-1; indice_i += 1)                 /*0005*/
+#pragma omp parallel for 
+      for(indice_j = 1; indice_j <= nb-1-1; indice_j += 1)              /*0006*/
+         
+         
+         
+         
+
+         a[indice_i][indice_j] = (b[indice_i-1][indice_j]+b[indice_i+1][indice_j]+b[indice_i][indice_j-1]+b[indice_i][indice_j+1])/4;              /*0012*/
+   
+
+   return 0;                                                            /*0017*/
+}
+
+Parallel code for function "main"
+
+int main(int argc, char *argv[])
+{
+   int **a;
+   int **b;
+   int indice_i;
+   if (argc>1) {                                                        /*0031*/
+      int nb = atol(argv[1]);
+      b = malloc(sizeof(int *)*(nb+1));                                 /*0033*/
+      a = malloc(sizeof(int *)*(nb+1));                                 /*0034*/
+
+      for(indice_i = 0; indice_i <= nb; indice_i += 1) {                /*0036*/
+         a[indice_i] = malloc(sizeof(int)*(nb+1));                      /*0037*/
+         b[indice_i] = malloc(sizeof(int)*(nb+1));                      /*0038*/
+      }
+      return jacobi(nb, a, b);                                          /*0040*/
+   }
+   return 0;                                                            /*0042*/
+}

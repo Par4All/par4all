@@ -7,10 +7,6 @@ Privatize scalar variables
 
  **************** Effective Dependence Graph ****************
 
-	11 --> 11 with conflicts
-		from <TOP-LEVEL:Matrix(i)-R-MUST> to <TOP-LEVEL:Matrix(i,j)-W-MUST> at levels  2
-	11 --> 11 with conflicts
-		from <TOP-LEVEL:Matrix(i,j)-W-MUST> to <TOP-LEVEL:Matrix(i)-R-MUST> at levels  2
 	08 --> 11 with conflicts
 		from <TOP-LEVEL:Matrix(i)-W-MUST> to <TOP-LEVEL:Matrix(i,j)-W-MUST> at levels  2
 	08 --> 11 with conflicts
@@ -36,6 +32,7 @@ int main(void)
       Matrix[i] = (int *) malloc(Z*sizeof(int));                        /*0008*/
 #pragma omp parallel for private(j)
    for(i = 0; i <= N-1; i += 1)                                         /*0006*/
+#pragma omp parallel for 
       for(j = 0; j <= Z-1; j += 1)                                      /*0009*/
          Matrix[i][j] = i*j;                                            /*0011*/
    return 0;                                                            /*0014*/
@@ -53,6 +50,7 @@ int main(void)
       Matrix[i] = (int *) malloc(Z*sizeof(int));                        /*0008*/
 #pragma omp parallel for private(j)
    for(i = 0; i <= N-1; i += 1)                                         /*0006*/
+#pragma omp parallel for 
       for(j = 0; j <= Z-1; j += 1)                                      /*0009*/
          Matrix[i][j] = i*j;                                            /*0011*/
    return 0;                                                            /*0014*/
@@ -70,6 +68,7 @@ int main(void)
       Matrix[i] = (int *) malloc(Z*sizeof(int));                        /*0008*/
 #pragma omp parallel for private(j)
    for(i = 0; i <= N-1; i += 1)                                         /*0006*/
+#pragma omp parallel for
       for(j = 0; j <= Z-1; j += 1)                                      /*0009*/
          Matrix[i][j] = i*j;                                            /*0011*/
    return 0;                                                            /*0014*/
