@@ -33,7 +33,9 @@ FLT	= sed -e 's,$(here),$$VDIR,g'
 OK	= exit 0
 
 # default target is to clean
-clean:
+clean: clean-validate
+
+clean-validate:
 	$(RM) *~ *.o *.tmp *.result/out out err a.out
 	$(RM) -r *.database
 
