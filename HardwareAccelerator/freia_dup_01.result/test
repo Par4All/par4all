@@ -109,11 +109,6 @@ freia_status freia_dup_01_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, fre
 
 
   // STAGE 1
-  // 0`t [0 alu] -> [1 input 0] 11 copy
-  si.mux[0][0].op = SPOC_MUX_IN1;
-  si.mux[0][2].op = SPOC_MUX_IN0;
-  // 0`t [1 input 0] -> [1 input 0] 11 copy
-  // nope
 
   // output image 0`t on 1 and image o on 0
   // 0`t [0 alu] -> [1 output 1] 0 null
@@ -137,7 +132,7 @@ freia_status freia_dup_01_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, fre
   // 0`t [7 input 1] -> [7 output 1] 0 null
   si.mux[7][3].op = SPOC_MUX_IN1;
 
-  // o [1 input 0] -> [1 output 0] 0 null
+  // o [1 poc 0] -> [1 output 0] 0 null
   si.mux[1][0].op = SPOC_MUX_IN0;
 
   // fill in to the end...
