@@ -21,11 +21,10 @@
 # along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-# what to do at night from the pips account at cri.
+# what to do at night from the pips account at cri on canapville
 #
 # TODO
 # - ulimit?
-# - 64bits validation?
 
 umask 022
 
@@ -34,7 +33,7 @@ email=pips-validation@cri.ensmp.fr
   email="$1"
   shift
 }
-target=~/PIPS
+target=/home/local/pips/PIPS
 
 # set environment...
 test -f $target/pipsrc.sh && source $target/pipsrc.sh
