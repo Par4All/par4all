@@ -3,4 +3,4 @@
 # pips@verone> setup_pips.sh ~/PIPS
 # fix ~/PIPS/pipsrc.sh
 # must fix PIPS_F77 and PIPS_FLINT, g77 package is needed
-03 01 * * * /users/soft/pips/PIPS/prod/pips/utils/pips_at_night_at_verone
+03 03 * * * /users/soft/pips/PIPS/prod/pips/utils/pips_at_night_at_verone
