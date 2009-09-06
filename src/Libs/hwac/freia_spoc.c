@@ -538,7 +538,7 @@ where_to_perform_operation
 	case spoc_type_thr:
 	case spoc_type_mes:
 	  level = spoc_type_poc;
-	  out->level++;
+	  out->stage++;
 	  break;
 	default:
 	  pips_internal_error("houston, we have a copy problem (0)");
