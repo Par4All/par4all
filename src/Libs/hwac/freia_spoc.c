@@ -520,8 +520,68 @@ where_to_perform_operation
       out->stage = used->stage;
       out->side = used->side;
 
-      if (level != spoc_type_nop && level <= used->level)
-	// skip to next stage if required by stage and not a copy
+      // handle copy... if it is still there, it must be needed,
+      // so just put it where it is available for later use.
+      // ??? output copies should not be handled by the pipeline!
+      if (level == spoc_type_nop)
+      {
+	// go to the end of the local path
+	switch (used->level)
+	{
+	case spoc_type_inp:
+	case spoc_type_poc:
+	  level = spoc_type_poc;
+	  break;
+	case spoc_type_alu:
+	  level = spoc_type_alu;
+	  break;
+	case spoc_type_thr:
+	case spoc_type_mes:
+	  level = spoc_type_poc;
+	  out->level++;
+	  break;
+	default:
+	  pips_internal_error("houston, we have a copy problem (0)");
+	}
+
+	// we need to put some space to extract the other image on another path
+	if (image_is_needed(used->producer, computed, todo))
+	{
+	  if (level==spoc_type_poc)
+	  {
+	    // switch side if straight path is not available?
+	    if (!check_wiring_output(wiring, out->stage, out->side))
+	      out->side = 1 - out->side;
+	    pips_assert("available path",
+			check_wiring_output(wiring, out->stage, out->side));
+	    out->stage++;
+	  }
+	  else if (level==spoc_type_alu)
+	  {
+	    // choose one side, prefer 0
+	    if (check_wiring_output(wiring, out->stage, 0))
+	      out->side = 0;
+	    else if (check_wiring_output(wiring, out->stage, 1))
+	      out->side = 1;
+	    else
+	      pips_internal_error("no available path for copy of needed image");
+	    out->stage++;
+	    level = spoc_type_poc;
+	  }
+	  else
+	    pips_internal_error("should not get there");
+	}
+	else
+	  pips_debug(7, "copied image %s is not needed further\n",
+		     entity_local_name(used->image));
+
+	break;
+      }
+
+      pips_assert("not a copy", level!=spoc_type_nop);
+
+      // skip to next stage if required by stage
+      if (level <= used->level)
 	out->stage++;
 
       // ??? if the input image is/was needed, must include a cross
@@ -548,10 +608,6 @@ where_to_perform_operation
 	  // end of stage
 	  out->stage++;
       }
-
-      // fix output level for copy
-      if (level==spoc_type_nop)
-	level = (used->stage==out->stage)? used->level: spoc_type_inp;
 
       // ??? handle conflict with the other one?
       if (notused->image &&
