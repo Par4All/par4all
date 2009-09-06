@@ -27,9 +27,15 @@ sub genop($$$$$)
     # threshold level
     when ('8') { $call = "threshold($out, $in0, $n+1, 123, 0)" }
     when ('9') { $call = "threshold($out, $in1, $n+2, 123, 1)" }
-    # measurement level
-    when ('a') { $call = "global_min($in0, x)" }
-    when ('b') { $call = "global_max($in1, y)" }
+    # measurement level, special handling
+    when ('a') {
+      return
+        "  freia_aipo_global_min($in0, x);\n  freia_aipo_copy($out, $in0);\n";
+    }
+    when ('b') {
+      return
+	"  freia_aipo_global_max($in1, y);\n  freia_aipo_copy($out, $in1);\n";
+    }
     default { die "unexpected op=$op" }
   }
   return "  freia_aipo_$call;\n";
