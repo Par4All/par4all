@@ -611,8 +611,8 @@ where_to_perform_operation
 
       // ??? handle conflict with the other one?
       if (notused->image &&
-	  out->stage==notused->stage &&
-	  level==notused->level)
+	  out->stage == notused->stage &&
+	  level == notused->level)
       {
 	if (level==spoc_type_alu)
 	  out->stage++;
@@ -625,8 +625,8 @@ where_to_perform_operation
       // should not be nessary of previous stuff worked correctly?
       // should it be simpler?
       // I is the right conditions?
-      // if we have a copy...
-      if (out->stage==used->stage)
+      if (out->stage==used->stage && level > spoc_type_alu &&
+	  used->level < spoc_type_alu)
       {
 	pips_debug(7, "checking wiring in: %d %d...\n", out->stage, out->side);
 	if (!check_wiring_output(wiring, used->stage, out->side))
@@ -647,7 +647,9 @@ where_to_perform_operation
 	}
 	pips_debug(7, "checking wiring out: %d %d...\n", out->stage, out->side);
       }
-      else if (!check_wiring_output(wiring, out->stage, out->side))
+      else if (out->stage>used->stage &&
+	       // ???
+	       !check_wiring_output(wiring, out->stage, out->side))
       {
 	if (check_wiring_output(wiring, out->side, 1-out->stage))
 	  out->side = 1 - out->side;
