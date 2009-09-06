@@ -1,2 +1,3 @@
 Combinatorial tests of freia spoc scheduler and wiring.
-1924 cases are considered, reduced from many more thanks to symmetries.
+1005 cases are considered, reduced from 6912 thanks to
+symmetries and the constraint that temporaries are used.

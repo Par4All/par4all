@@ -7,6 +7,13 @@
 use strict;
 use feature 'switch';
 
+my $symmetry = 1;
+my $usetemps = 1;
+use Getopt::Long;
+GetOptions("symmetry!" => \$symmetry,
+	   "usetemps!" => \$usetemps)
+    or die "unexpected option ($!)";
+
 # generate op kind of call for output out, with inputs in0 in1, nth case.
 sub genop($$$$$)
 {
@@ -28,13 +35,13 @@ sub genop($$$$$)
     when ('8') { $call = "threshold($out, $in0, $n+1, 123, 0)" }
     when ('9') { $call = "threshold($out, $in1, $n+2, 123, 1)" }
     # measurement level, special handling
-    when ('a') {
-      return
-        "  freia_aipo_global_min($in0, x);\n  freia_aipo_copy($out, $in0);\n";
+    when ('a') { # ??? hmmm, ignore WW deps...
+      return "  freia_aipo_global_min($in0, x);\n" .
+	     "  freia_aipo_copy($out, $in0);\n";
     }
-    when ('b') {
-      return
-	"  freia_aipo_global_max($in1, y);\n  freia_aipo_copy($out, $in1);\n";
+    when ('b') { # ??? idem
+      return "  freia_aipo_global_max($in1, y);\n" .
+	     "  freia_aipo_copy($out, $in1);\n";
     }
     default { die "unexpected op=$op" }
   }
@@ -65,24 +72,33 @@ sub genfunc($$$$)
   close FILE or die "cannot close file: $!";
 }
 
-# 1924 cases
+# possible cases per operation
+my @all_cases = ('0' ... '9', 'a', 'b');
+my @right_cases = @all_cases;
+@right_cases = ('0', '2', '4', '5', '7', '8', 'a') if $symmetry;
+
+# 1005 cases
 my $count = 0;
 # left operation
-for my $left ('0' ... '9', 'a', 'b')
+for my $left (@all_cases)
 {
   # right operation, skip 1369b because of same/different symmetry
-  for my $right ('0', '2', '4', '5', '7', '8', 'a')
+  for my $right (@right_cases)
   {
     # skip left/right symmetry
-    next if $right lt $left;
+    next if $symmetry and $right lt $left;
     # whether left/right computations are temporaries or outputs
     for my $temp (0 .. 3)
     {
       # last operation
-      for my $last ('0' .. '9', 'a', 'b')
+      for my $last (@all_cases)
       {
 	# skip source symmetry
-	next if $left eq $right and $last =~ /^[1369b]$/;
+	next if $symmetry and $left eq $right and $last =~ /^[1369b]$/;
+	# skip unused left temporary
+	next if $usetemps and $temp & 1 and $last =~ /^[13469b]$/;
+	# skip unused right temporary
+	next if $usetemps and $temp & 2 and $last =~ /^[02458a]$/;
 	print STDERR "generating $left$right$temp$last\n";
 	genfunc($left, $right, $temp, $last);
 	$count++;
