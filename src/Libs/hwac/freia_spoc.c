@@ -1566,7 +1566,8 @@ static int dagvtx_priority(const dagvtx * v1, const dagvtx * v2)
     c1 = dagvtx_content(*v1),
     c2 = dagvtx_content(*v2);
 
-  // prioritize first scalar ops & measures if there is only one of them
+  // prioritize first scalar ops, measures and last copies
+  // if there is only one of them
   if (vtxcontent_optype(c1)!=vtxcontent_optype(c2))
   {
     // scalars operations first to remove (scalar) dependences
@@ -1574,11 +1575,16 @@ static int dagvtx_priority(const dagvtx * v1, const dagvtx * v2)
       result = -1, why = "scal";
     else if (vtxcontent_optype(c2)==spoc_type_oth)
       result = 1, why = "scal";
-    // then measures
+    // then measurements are put first
     else if (vtxcontent_optype(c1)==spoc_type_mes)
       result = -1, why = "mes";
     else if (vtxcontent_optype(c2)==spoc_type_mes)
       result = 1, why = "mes";
+    // the copies are performed last...
+    else if (vtxcontent_optype(c1)==spoc_type_nop)
+      result = 1, why = "copy";
+    else if (vtxcontent_optype(c2)==spoc_type_nop)
+      result = -1, why = "copy";
   }
 
   if (result==0)
