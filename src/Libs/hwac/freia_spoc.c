@@ -405,7 +405,145 @@ print_op_schedule(FILE * out, const string name, const op_schedule * op)
 	  op->used? "": "not ");
 }
 
-static bool check_wiring_output(hash_table, int, int);
+static bool check_mux_availibity(hash_table wiring, int stage, int mux)
+{
+  _int index = 2 * (stage*4+mux) + 1; // odds
+  return !hash_defined_p(wiring, (void *) index);
+}
+
+static void set_mux(hash_table wiring, int stage, int mux)
+{
+  _int index = 2 * (stage*4+mux) + 1; // odds
+  hash_put(wiring, (void *) index, (void *) index);
+}
+
+/* can I get out of stage on this side?
+ */
+static bool check_wiring_output(hash_table wiring, int stage, int side)
+{
+  return check_mux_availibity(wiring, stage, side? 3: 0);
+}
+
+static _int component_index(int stage, int level, int side)
+{
+  pips_assert("spoc component", level>=spoc_type_poc && level<= spoc_type_mes);
+  if (level==spoc_type_alu) side=0;
+  return 2 * (2 * (stage*4+level) + side) + 2; // even
+}
+
+static void set_component(hash_table wiring, int stage, int level, int side)
+{
+  _int index = component_index(stage, level, side);
+  hash_put(wiring, (void *) index, (void *) index);
+  // scratch everything on the path before the used component
+  if (stage>0 && level==spoc_type_poc)
+    set_component(wiring, stage-1, spoc_type_mes, side);
+  if (level==spoc_type_mes)
+    set_component(wiring, stage, spoc_type_thr, side);
+}
+
+static bool available_component
+  (hash_table wiring, int stage, int level, int side)
+{
+  _int index = component_index(stage, level, side);
+  return !hash_defined_p(wiring, (void *) index);
+}
+
+/* return the first stage after stage/level with both paths available
+ */
+static int find_first_crossing(hash_table wiring, int stage, int level)
+{
+  if (level>spoc_type_alu)
+    stage++;
+  while (!(check_wiring_output(wiring, stage, 0) &&
+	   check_wiring_output(wiring, stage, 1)))
+    stage++;
+  return stage;
+}
+
+static void find_first_available_component
+  (hash_table wiring,
+   int start_stage, int level, int side, // starting point
+   int target_level,
+   bool crossing, // whether to include a crossing on the path...
+   int * pstage, int * pside)
+{
+  int stage = start_stage;
+  int preferred, other;
+  if (side>=0) preferred = side, other = 1 - side;
+  // side==-1, alu...
+  else preferred = 0, other = 1;
+  if (target_level==spoc_type_alu)
+    preferred=0, other=0;
+
+  if (target_level<=level)
+    stage++;
+
+  if (crossing)
+  {
+    stage = find_first_crossing(wiring, stage, level);
+    if (target_level<spoc_type_alu)
+      stage++;
+  }
+
+  bool pok,
+    skip_first_other =
+    (stage==start_stage && target_level<spoc_type_alu) ||
+    (stage==start_stage+1 && target_level<spoc_type_alu && level>spoc_type_alu);
+
+  while (!(pok=available_component(wiring, stage, target_level, preferred)) &&
+	 (skip_first_other ||
+	  !available_component(wiring, stage, target_level, other)))
+  {
+    stage++;
+    skip_first_other = false;
+  }
+
+  // hmmm...
+  if (pok && level<=spoc_type_alu &&
+      stage==start_stage+1 && target_level<spoc_type_alu)
+  {
+    if (!check_wiring_output(wiring, start_stage, preferred))
+    {
+      pips_assert("symmetric component must be available",
+		  available_component(wiring, stage, target_level, other));
+      pok = false;
+    }
+  }
+
+  // return result
+  *pstage = stage;
+  *pside = pok? preferred: other;
+}
+
+/* generate wiring code for mux if necessary.
+ * @param code generated
+ * @param stage stage under consideration
+ * @param mux multiplexer to set
+ * @param value status for the multiplexer
+ * @param wiring already performed wiring to check for double settings.
+ */
+static void
+set_wiring(string_buffer code,
+	   int stage, // 0 ..
+	   int mux,   // 0 to 3
+	   _int value, // 0 1
+	   hash_table wiring)
+{
+  pips_debug(8, "%d %d %"_intFMT"\n", stage, mux, value);
+
+  pips_assert("mux is available", check_mux_availibity(wiring, stage, mux));
+
+  // code
+  string s_stage = strdup(itoa(stage)), s_mux = strdup(itoa(mux));
+  sb_cat(code, "  si.mux[", s_stage, "][", s_mux, "].op = "
+	 "SPOC_MUX_IN", value? "1": "0", ";\n", NULL);
+  free(s_stage);
+  free(s_mux);
+
+  // record
+  set_mux(wiring, stage, mux);
+}
 
 /* depending on available images (stage %d, level, side 0/1)
  * and vertex operation to perform , tell where to perform it.
@@ -436,9 +574,9 @@ where_to_perform_operation
 
   spoc_hardware_type level = (spoc_hardware_type) vtxcontent_optype(c);
 
+  // measurements is special case, because the image is not consummed...
   if (level == spoc_type_mes)
   {
-    // special case, because the image is not really consummed...
     pips_assert("one input image", gen_length(vtxcontent_inputs(c))==1);
     entity measured = ENTITY(CAR(vtxcontent_inputs(c)));
     pips_assert("input image available",
@@ -471,11 +609,29 @@ where_to_perform_operation
       pips_assert("alu const image generation", level==spoc_type_alu);
       // I must check that the alu is not already used?!
       // So I take a safe bet...
+      // ??? argh... the image may have been cleaned of not used any more...
       out->stage = max_stage(in0, in1);
+
+      // hmmm... I should also check that the component is not already used...
       if (in0->image && in0->stage == out->stage && in0->level >= spoc_type_alu)
 	out->stage++;
       if (in1->image && in1->stage == out->stage && in1->level >= spoc_type_alu)
 	out->stage++;
+
+      // ensure there is at least one path for the output
+      while (!(check_wiring_output(wiring, out->stage, 0) ||
+	       check_wiring_output(wiring, out->stage, 1)))
+	out->stage++;
+
+      // two paths are required if one of the other image is still needed.
+      if ((in0->image && image_is_needed(in0->producer, computed, todo)) ||
+	  (in1->image && image_is_needed(in1->producer, computed, todo)))
+      {
+	while (! (check_wiring_output(wiring, out->stage, 0) &&
+		  check_wiring_output(wiring, out->stage, 1)))
+	  out->stage++;
+      }
+
       in0->used = false, in1->used = false;
       break;
     case 1: // ANYTHING, may have to chose a side.
@@ -520,6 +676,9 @@ where_to_perform_operation
       out->stage = used->stage;
       out->side = used->side;
 
+      bool used_image_still_needed =
+	image_is_needed(used->producer, computed, todo);
+
       // handle copy... if it is still there, it must be needed,
       // so just put it where it is available for later use.
       // ??? output copies should not be handled by the pipeline!
@@ -541,11 +700,11 @@ where_to_perform_operation
 	  out->stage++;
 	  break;
 	default:
-	  pips_internal_error("houston, we have a copy problem (0)");
+	  pips_internal_error("unexpected spoc type %d", used->level);
 	}
 
 	// we need to put some space to extract the other image on another path
-	if (image_is_needed(used->producer, computed, todo))
+	if (used_image_still_needed)
 	{
 	  if (level==spoc_type_poc)
 	  {
@@ -572,92 +731,19 @@ where_to_perform_operation
 	    pips_internal_error("should not get there");
 	}
 	else
-	  pips_debug(7, "copied image %s is not needed further\n",
+	  pips_debug(8, "copied image %s is not needed further\n",
 		     entity_local_name(used->image));
-
 	break;
       }
 
       pips_assert("not a copy", level!=spoc_type_nop);
 
-      // skip to next stage if required by stage
-      if (level <= used->level)
-	out->stage++;
+      find_first_available_component
+	(wiring, used->stage, used->level, used->side,
+	 level, used_image_still_needed && used->image!=notused->image,
+	 &out->stage, &out->side);
 
-      // ??? if the input image is/was needed, must include a cross
-      // because it is needed twice?
-      // but it is not needed if the other (notused) image is the same.
-      if (used->image!=notused->image &&
-	  // used by previous computation, or by a later one
-	  (used->used || image_is_needed(used->producer, computed, todo)))
-      {
-	if (used->level <= spoc_type_alu &&
-	    used->stage==out->stage && level <= spoc_type_alu)
-	  // beginning of stage
-	  out->stage++;
-	else if (used->level > spoc_type_alu &&
-		 used->stage==out->stage && level == spoc_type_nop)
-	{
-	  // copy from threshold
-	  // if the copy is there, it mean that it is needed
-	  out->stage++;
-	  level = spoc_type_poc; // it is available
-	}
-	else if (used->level > spoc_type_alu &&
-		 used->stage+1==out->stage && level <= spoc_type_alu)
-	  // end of stage
-	  out->stage++;
-      }
-
-      // ??? handle conflict with the other one?
-      if (notused->image &&
-	  out->stage == notused->stage &&
-	  level == notused->level)
-      {
-	if (level==spoc_type_alu)
-	  out->stage++;
-	else
-	  out->side = 1 - notused->side;
-      }
-
-      // ??? check if possible...
-      // ??? not really that? where to put it?
-      // should not be nessary of previous stuff worked correctly?
-      // should it be simpler?
-      // I is the right conditions?
-      if (out->stage==used->stage && level > spoc_type_alu &&
-	  used->level < spoc_type_alu)
-      {
-	pips_debug(7, "checking wiring in: %d %d...\n", out->stage, out->side);
-	if (!check_wiring_output(wiring, used->stage, out->side))
-	{
-	  if (check_wiring_output(wiring, used->stage, 1-out->side))
-	    out->side = 1 - out->side;
-	  else
-	  {
-	    out->stage++;
-	    if (!check_wiring_output(wiring, out->stage, out->side))
-	    {
-	      if (check_wiring_output(wiring, out->stage, 1-out->side))
-		out->side = 1 - out->side;
-	      else
-		pips_internal_error("houston, we have a problem (1)");
-	    }
-	  }
-	}
-	pips_debug(7, "checking wiring out: %d %d...\n", out->stage, out->side);
-      }
-      else if (out->stage>used->stage &&
-	       // ???
-	       !check_wiring_output(wiring, out->stage, out->side))
-      {
-	if (check_wiring_output(wiring, out->side, 1-out->stage))
-	  out->side = 1 - out->side;
-	else
-	  pips_internal_error("houston, we have a problem (2)");
-      }
-
-      // tell what images where used
+      // tell which image was used
       used->used = true;
       notused->used = false;
       break;
@@ -703,52 +789,6 @@ where_to_perform_operation
   }
   // else it is a measure, don't change...
   ifdebug(6) print_op_schedule(stderr, "out", out);
-}
-
-// can I get out of stage on this side?
-static bool
-check_wiring_output(hash_table wiring, int stage, int side)
-{
-  int mux = side? 3: 0;
-  _int index = stage*4+mux + 1;
-  return !hash_defined_p(wiring, (void *) index);
-}
-
-/* generate wiring code for mux if necessary.
- * @param code generated
- * @param stage stage under consideration
- * @param mux multiplexer to set
- * @param value status for the multiplexer
- * @param wiring already performed wiring to check for double settings.
- */
-static void
-set_wiring(string_buffer code,
-	   int stage, // 0 ..
-	   int mux,   // 0 to 3
-	   _int value, // 0 1
-	   hash_table wiring)
-{
-  // must not use 0 & -1
-  _int index = stage*4+mux + 1;
-  if (hash_defined_p(wiring, (void *) index))
-  {
-    _int old = (_int) hash_get(wiring, (void *) index);
-    if (old!=value)
-    {
-      string_buffer_to_file(code, stderr);
-      pips_internal_error("stage %d mux %d: %" _intFMT " vs %" _intFMT "\n",
-			  stage, mux, old, value);
-    }
-  }
-  else
-  {
-    hash_put(wiring, (void *) index, (void *) value);
-    string s_stage = strdup(itoa(stage)), s_mux = strdup(itoa(mux));
-    sb_cat(code, "  si.mux[", s_stage, "][", s_mux, "].op = "
-	   "SPOC_MUX_IN", value? "1": "0", ";\n", NULL);
-    free(s_stage);
-    free(s_mux);
-  }
 }
 
 /* all possible wirings at one stage
@@ -849,7 +889,11 @@ static void generate_wiring
 	{
 	  generate_wiring_stage(code, in->stage, in->side, out->side, wiring);
 	  if (in->level == spoc_type_inp)
-	    in->level = spoc_type_poc; // the poc was passed by wiring...
+	  {
+	    // the poc was passed by wiring...
+	    in->level = spoc_type_poc;
+	    set_component(wiring, in->stage, in->level, in->side);
+	  }
 	}
 	break;
       case spoc_type_alu:
@@ -903,17 +947,21 @@ static void generate_wiring
     {
     case spoc_type_inp:
     case spoc_type_poc:
+      set_component(wiring, in->stage, spoc_type_poc, in->side);
     case spoc_type_alu:
+      // chose prefered side
       if (in->level==spoc_type_alu)
 	// try direct, or default to 0
 	prefered = (out->side>=0)? out->side: 0;
       else // take the right side as soon as possible?
 	// ??? what if the path is not possible later?
 	prefered = (out->side==-1)? in->side: out->side;
+
       // try both cases
       if (check_wiring_output(wiring, in->stage, prefered))
       {
 	generate_wiring_stage(code, in->stage, in->side, prefered, wiring);
+	set_component(wiring, in->stage, spoc_type_mes, prefered);
 	in->stage++;
 	in->side = prefered;
 	in->level = spoc_type_inp;
@@ -922,6 +970,7 @@ static void generate_wiring
       else if (check_wiring_output(wiring, in->stage, 1 - prefered))
       {
 	generate_wiring_stage(code, in->stage, in->side, 1 - prefered, wiring);
+	set_component(wiring, in->stage, spoc_type_mes, 1 - prefered);
 	in->stage++;
 	in->side = 1 - prefered;
 	in->level = spoc_type_inp;
@@ -929,10 +978,13 @@ static void generate_wiring
       }
       else
 	pips_internal_error("no available path...");
-      if (saved.level<=spoc_type_alu && out->level<=spoc_type_poc)
-	// we may still use the result for something else... others?
+
+      // we may still use the result for something else... others?
+      if (saved.level<=spoc_type_alu && out->level<=spoc_type_poc &&
+	  // restore to the previous stage
+	  saved.stage==out->stage-1)
       {
-	pips_debug(7, "restoring in schedule...\n");
+	pips_debug(7, "restoring previous schedule...\n");
 	*in = saved;
       }
       if (in->level == spoc_type_inp)
@@ -1199,6 +1251,9 @@ static void freia_spoc_pipeline
     }
     else // the vertex is added to the pipeline...
     {
+      // record
+      set_component(wiring, out.stage, out.level, out.side);
+
       // get needed parameters if any
       *lparams = gen_nconc(*lparams,
 			   freia_extract_parameters(opid, call_arguments(c)));
@@ -1344,10 +1399,20 @@ static void freia_spoc_pipeline
     entity imout = ENTITY(CAR(outs));
 
     // put producer in in0
-    if (in1.image==imout && in0.image!=imout)
+    if (in1.image==in0.image)
+    {
+      pips_assert("image found", in0.image==imout);
+      // choose the latest
+      if (in1.stage>in0.stage || (in1.stage==in0.stage && in1.level>in0.level))
+	out = in0, in0 = in1, in1 = out;
+    }
+    // else just take the right one
+    else if (in1.image==imout && in0.image!=imout)
       out = in0, in0 = in1, in1 = out;
-    else if (in0.image==imout); // ok
-    else pips_internal_error("result image is not alive");
+    else if (in0.image==imout)
+      ; // ok
+    else
+      pips_internal_error("result image is not alive");
 
     out.image = imout;
     out.producer = NULL;
