@@ -126,7 +126,8 @@ freia_status freia_scalar_03_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, 
 
 
   // output image 0`tmp on 0
-  // 0`tmp [0 alu] -> [0 output 0] 0 null
+  // 0`tmp [0 measure 0] -> [0 output 0] 0 null
+  // nope
 
   // fill in to the end...
   // 0`tmp [0 output 0] -> [7 output 0] 0 null

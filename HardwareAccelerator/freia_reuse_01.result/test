@@ -141,29 +141,29 @@ freia_status freia_reuse_01_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, f
     sp.poc[0][0].kernel[i] = kern0[i];
 
 
-  // STAGE 1
-  // o0 [0 poc 0] -> [1 poc 0] 10 erode_6c
+  // STAGE 2
+  // o0 [0 poc 0] -> [2 poc 0] 10 erode_6c
   si.mux[0][0].op = SPOC_MUX_IN0;
-  // o0 [1 input 0] -> [1 poc 0] 10 erode_6c
+  // o0 [1 input 0] -> [2 poc 0] 10 erode_6c
+  si.mux[1][0].op = SPOC_MUX_IN0;
+  // o0 [2 input 0] -> [2 poc 0] 10 erode_6c
   // nope
-  // poc 10 erode_6c stage 1 side 0
-  si.poc[1][0].op = SPOC_POC_ERODE;
-  si.poc[1][0].grid = SPOC_POC_6_CONNEX;
+  // poc 10 erode_6c stage 2 side 0
+  si.poc[2][0].op = SPOC_POC_ERODE;
+  si.poc[2][0].grid = SPOC_POC_6_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[1][0].kernel[i] = kern1[i];
+    sp.poc[2][0].kernel[i] = kern1[i];
 
 
   // output image o0 on 1 and image 0`t on 0
-  // o0 [0 poc 0] -> [1 output 1] 0 null
-  si.mux[0][1].op = SPOC_MUX_IN0;
-  si.mux[0][3].op = SPOC_MUX_IN0;
-  // o0 [1 input 1] -> [1 output 1] 0 null
-  si.mux[1][3].op = SPOC_MUX_IN1;
+  // o0 [1 poc 0] -> [2 output 1] 0 null
+  si.mux[1][1].op = SPOC_MUX_IN0;
+  si.mux[1][3].op = SPOC_MUX_IN0;
+  // o0 [2 input 1] -> [2 output 1] 0 null
+  si.mux[2][3].op = SPOC_MUX_IN1;
 
   // fill in to the end...
-  // o0 [1 output 1] -> [7 output 1] 0 null
-  // o0 [2 input 1] -> [7 output 1] 0 null
-  si.mux[2][3].op = SPOC_MUX_IN1;
+  // o0 [2 output 1] -> [7 output 1] 0 null
   // o0 [3 input 1] -> [7 output 1] 0 null
   si.mux[3][3].op = SPOC_MUX_IN1;
   // o0 [4 input 1] -> [7 output 1] 0 null
@@ -175,13 +175,11 @@ freia_status freia_reuse_01_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, f
   // o0 [7 input 1] -> [7 output 1] 0 null
   si.mux[7][3].op = SPOC_MUX_IN1;
 
-  // 0`t [1 poc 0] -> [1 output 0] 0 null
-  si.mux[1][0].op = SPOC_MUX_IN0;
+  // 0`t [2 poc 0] -> [2 output 0] 0 null
+  si.mux[2][0].op = SPOC_MUX_IN0;
 
   // fill in to the end...
-  // 0`t [1 output 0] -> [7 output 0] 0 null
-  // 0`t [2 input 0] -> [7 output 0] 0 null
-  si.mux[2][0].op = SPOC_MUX_IN0;
+  // 0`t [2 output 0] -> [7 output 0] 0 null
   // 0`t [3 input 0] -> [7 output 0] 0 null
   si.mux[3][0].op = SPOC_MUX_IN0;
   // 0`t [4 input 0] -> [7 output 0] 0 null

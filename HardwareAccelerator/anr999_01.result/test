@@ -287,55 +287,53 @@ freia_status anr999_01_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_
     sp.poc[2][0].kernel[i] = kern3[i];
 
 
-  // STAGE 3
-  // 0`od [2 poc 0] -> [3 poc 0] 52 dilate_8c
-  si.mux[2][0].op = SPOC_MUX_IN0;
-  // 0`od [3 input 0] -> [3 poc 0] 52 dilate_8c
-  // nope
-  // poc 52 dilate_8c stage 3 side 0
-  si.poc[3][0].op = SPOC_POC_DILATE;
-  si.poc[3][0].grid = SPOC_POC_8_CONNEX;
-  for(i=0 ; i<9 ; i++)
-    sp.poc[3][0].kernel[i] = kern4[i];
-
-
   // STAGE 4
-  // 0`t [3 poc 0] -> [4 poc 0] 53 dilate_8c
+  // 0`od [2 poc 0] -> [4 poc 0] 52 dilate_8c
+  si.mux[2][0].op = SPOC_MUX_IN0;
+  // 0`od [3 input 0] -> [4 poc 0] 52 dilate_8c
   si.mux[3][0].op = SPOC_MUX_IN0;
-  // 0`t [4 input 0] -> [4 poc 0] 53 dilate_8c
+  // 0`od [4 input 0] -> [4 poc 0] 52 dilate_8c
   // nope
-  // poc 53 dilate_8c stage 4 side 0
+  // poc 52 dilate_8c stage 4 side 0
   si.poc[4][0].op = SPOC_POC_DILATE;
   si.poc[4][0].grid = SPOC_POC_8_CONNEX;
   for(i=0 ; i<9 ; i++)
-    sp.poc[4][0].kernel[i] = kern5[i];
+    sp.poc[4][0].kernel[i] = kern4[i];
+
+
+  // STAGE 5
+  // 0`t [4 poc 0] -> [5 poc 0] 53 dilate_8c
+  si.mux[4][0].op = SPOC_MUX_IN0;
+  // 0`t [5 input 0] -> [5 poc 0] 53 dilate_8c
+  // nope
+  // poc 53 dilate_8c stage 5 side 0
+  si.poc[5][0].op = SPOC_POC_DILATE;
+  si.poc[5][0].grid = SPOC_POC_8_CONNEX;
+  for(i=0 ; i<9 ; i++)
+    sp.poc[5][0].kernel[i] = kern5[i];
 
 
   // output image 0`od on 1 and image 0`t on 0
-  // 0`od [2 poc 0] -> [4 output 1] 0 null
-  si.mux[2][1].op = SPOC_MUX_IN0;
-  si.mux[2][3].op = SPOC_MUX_IN0;
-  // 0`od [3 input 1] -> [4 output 1] 0 null
-  si.mux[3][3].op = SPOC_MUX_IN1;
-  // 0`od [4 input 1] -> [4 output 1] 0 null
+  // 0`od [3 poc 0] -> [5 output 1] 0 null
+  si.mux[3][1].op = SPOC_MUX_IN0;
+  si.mux[3][3].op = SPOC_MUX_IN0;
+  // 0`od [4 input 1] -> [5 output 1] 0 null
   si.mux[4][3].op = SPOC_MUX_IN1;
+  // 0`od [5 input 1] -> [5 output 1] 0 null
+  si.mux[5][3].op = SPOC_MUX_IN1;
 
   // fill in to the end...
-  // 0`od [4 output 1] -> [7 output 1] 0 null
-  // 0`od [5 input 1] -> [7 output 1] 0 null
-  si.mux[5][3].op = SPOC_MUX_IN1;
+  // 0`od [5 output 1] -> [7 output 1] 0 null
   // 0`od [6 input 1] -> [7 output 1] 0 null
   si.mux[6][3].op = SPOC_MUX_IN1;
   // 0`od [7 input 1] -> [7 output 1] 0 null
   si.mux[7][3].op = SPOC_MUX_IN1;
 
-  // 0`t [4 poc 0] -> [4 output 0] 0 null
-  si.mux[4][0].op = SPOC_MUX_IN0;
+  // 0`t [5 poc 0] -> [5 output 0] 0 null
+  si.mux[5][0].op = SPOC_MUX_IN0;
 
   // fill in to the end...
-  // 0`t [4 output 0] -> [7 output 0] 0 null
-  // 0`t [5 input 0] -> [7 output 0] 0 null
-  si.mux[5][0].op = SPOC_MUX_IN0;
+  // 0`t [5 output 0] -> [7 output 0] 0 null
   // 0`t [6 input 0] -> [7 output 0] 0 null
   si.mux[6][0].op = SPOC_MUX_IN0;
   // 0`t [7 input 0] -> [7 output 0] 0 null

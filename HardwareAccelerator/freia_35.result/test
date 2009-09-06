@@ -127,7 +127,8 @@ freia_status freia_35_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, freia_d
 
 
   // output image o on 0
-  // o [1 alu] -> [1 output 0] 0 null
+  // o [1 measure 0] -> [1 output 0] 0 null
+  // nope
 
   // fill in to the end...
   // o [1 output 0] -> [7 output 0] 0 null

@@ -222,7 +222,8 @@ freia_status freia_28_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, int32_t
 
 
   // output image 0`X0 on 0
-  // 0`X0 [1 poc 0] -> [1 output 0] 0 null
+  // 0`X0 [1 measure 0] -> [1 output 0] 0 null
+  // nope
 
   // fill in to the end...
   // 0`X0 [1 output 0] -> [7 output 0] 0 null
