@@ -771,6 +771,48 @@ words_assign_substring_op(call obj,
     return(pc);
 }
 
+/**
+ * @return the external string representation of the operator
+ * @param name, the pips internal representation of the operator
+ */
+static string renamed_op_handling (string name) {
+  string result = name;
+
+  if ( strcmp(result,PLUS_C_OPERATOR_NAME) == 0 )
+    result = "+";
+  else  if ( strcmp(result, MINUS_C_OPERATOR_NAME) == 0 )
+    result = "-";
+  else  if ( strcmp(result,BITWISE_AND_OPERATOR_NAME) == 0 )
+    result = "&";
+  else  if ( strcmp(result,BITWISE_XOR_OPERATOR_NAME) == 0 )
+    result = "^";
+  else  if ( strcmp(result,C_AND_OPERATOR_NAME) == 0 )
+    result = "&&";
+  else  if ( strcmp(result,C_NON_EQUAL_OPERATOR_NAME) == 0 )
+    result = "!=";
+  else  if ( strcmp(result,C_MODULO_OPERATOR_NAME) == 0 )
+    result = "%";
+  else if (!prettyprint_is_fortran){
+    if(strcasecmp(result, GREATER_THAN_OPERATOR_NAME)==0)
+      result=C_GREATER_THAN_OPERATOR_NAME;
+    else if(strcasecmp(result, LESS_THAN_OPERATOR_NAME)==0)
+      result=C_LESS_THAN_OPERATOR_NAME;
+    else if(strcasecmp(result,GREATER_OR_EQUAL_OPERATOR_NAME)==0)
+      result=C_GREATER_OR_EQUAL_OPERATOR_NAME;
+    else if(strcasecmp(result,LESS_OR_EQUAL_OPERATOR_NAME)==0)
+      result=C_LESS_OR_EQUAL_OPERATOR_NAME;
+    else if(strcasecmp(result, EQUAL_OPERATOR_NAME) ==0)
+      result=C_EQUAL_OPERATOR_NAME;
+    else if(strcasecmp(result,NON_EQUAL_OPERATOR_NAME)==0)
+      result= "!=";
+    else if(strcasecmp(result,AND_OPERATOR_NAME)==0)
+      result="&&";
+    else if(strcasecmp(result, OR_OPERATOR_NAME)==0)
+      result=C_OR_OPERATOR_NAME;
+  }
+  return result;
+}
+
 /** @return a list of string with the prettyprint of a omp reduction clause
  */
 static list
@@ -787,9 +829,20 @@ words_omp_red(call obj,
   pips_assert ("no arguments for reduction clause", args != NIL);
   int nb_arg = 0;
   FOREACH (EXPRESSION, arg, args) {
-    if (nb_arg != 0)
+    if (nb_arg == 0) {
+      // the first argument is an operator and need to be handle separately
+      // because of the intenal management of operator
+      string op;
+      syntax syn = expression_syntax (arg);
+      pips_assert ("should be a reference", syntax_tag (syn) == is_syntax_reference);
+      op = entity_local_name (reference_variable (syntax_reference (syn)));
+      op = renamed_op_handling (op);
+      CHAIN_SWORD(result, op);
+    }
+    else { // (nb_arg != 0)
       result = (nb_arg == 1)? CHAIN_SWORD(result,":") : CHAIN_SWORD(result,",");
-    result = gen_nconc (result, words_expression (arg));
+      result = gen_nconc (result, words_expression (arg));
+    }
     nb_arg++;
   }
   pips_assert ("reduction clause has at least two arguments", nb_arg > 1);
@@ -1494,7 +1547,6 @@ words_infix_nary_op(call obj, int precedence, bool leftmost)
   return(pc);
 }
 
-
 /*
  * If the infix operator is either "-" or "/", I prefer not to delete
  * the parentheses of the second expression.
@@ -1514,38 +1566,7 @@ words_infix_binary_op(call obj, int precedence, bool leftmost)
   string fun = entity_local_name(call_function(obj));
 
   /* handling of internally renamed operators */
-  if ( strcmp(fun,PLUS_C_OPERATOR_NAME) == 0 )
-    fun = "+";
-  else  if ( strcmp(fun, MINUS_C_OPERATOR_NAME) == 0 )
-    fun = "-";
-  else  if ( strcmp(fun,BITWISE_AND_OPERATOR_NAME) == 0 )
-    fun = "&";
-  else  if ( strcmp(fun,BITWISE_XOR_OPERATOR_NAME) == 0 )
-    fun = "^";
-  else  if ( strcmp(fun,C_AND_OPERATOR_NAME) == 0 )
-    fun = "&&";
-  else  if ( strcmp(fun,C_NON_EQUAL_OPERATOR_NAME) == 0 )
-    fun = "!=";
-  else  if ( strcmp(fun,C_MODULO_OPERATOR_NAME) == 0 )
-    fun = "%";
-  else if (!prettyprint_is_fortran){
-    if(strcasecmp(fun, GREATER_THAN_OPERATOR_NAME)==0)
-      fun=C_GREATER_THAN_OPERATOR_NAME;
-    else if(strcasecmp(fun, LESS_THAN_OPERATOR_NAME)==0)
-      fun=C_LESS_THAN_OPERATOR_NAME;
-    else if(strcasecmp(fun,GREATER_OR_EQUAL_OPERATOR_NAME)==0)
-      fun=C_GREATER_OR_EQUAL_OPERATOR_NAME;
-    else if(strcasecmp(fun,LESS_OR_EQUAL_OPERATOR_NAME)==0)
-      fun=C_LESS_OR_EQUAL_OPERATOR_NAME;
-    else if(strcasecmp(fun, EQUAL_OPERATOR_NAME) ==0)
-      fun=C_EQUAL_OPERATOR_NAME;
-    else if(strcasecmp(fun,NON_EQUAL_OPERATOR_NAME)==0)
-      fun= "!=";
-    else if(strcasecmp(fun,AND_OPERATOR_NAME)==0)
-      fun="&&";
-    else if(strcasecmp(fun, OR_OPERATOR_NAME)==0)
-      fun=C_OR_OPERATOR_NAME;
-  }
+  fun = renamed_op_handling (fun);
 
   if(strcmp(fun, DIVIDE_OPERATOR_NAME) == 0) {
     /* Do we want to add a space in case we2 starts with a dereferencing operator "*"?

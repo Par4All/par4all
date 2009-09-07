@@ -185,6 +185,8 @@ bool ompify_code (char mod_name[]) {
   // Get the code and tell PIPS_DBM we do want to modify it
   mod_stmt = (statement) db_get_memory_resource(DBR_CODE, mod_name, TRUE);
 
+  // generate pragma string or expression using the correct language:
+  set_prettyprint_is_fortran_p(!get_bool_property("PRETTYPRINT_C_CODE"));
   // generate omp pragma for parallel loops
   // We need to access to the statement containing the current loop, forloop
   // so ask NewGen gen_recurse to keep this informations for us

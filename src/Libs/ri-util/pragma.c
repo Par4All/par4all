@@ -42,6 +42,7 @@
 #include "outlining_private.h"
 #include "step_private.h"
 #include "step.h"
+#include "properties.h"
 
 //***********************************************************Local constant
 static const string C_PRAGMA_HEADER = "#pragma";
@@ -273,6 +274,9 @@ extension_to_string(extension e) {
 string
 extensions_to_string(extensions es, bool nl) {
   string s = string_undefined;
+
+  /* Prettyprint in the correct language: */
+  set_prettyprint_is_fortran_p(!get_bool_property("PRETTYPRINT_C_CODE"));
 
   if (empty_extensions_p (es) == FALSE) {
     /* Use a string_buffer for efficient string concatenation: */

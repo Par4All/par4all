@@ -64,34 +64,46 @@ static entity omp_operator_entity (reduction_operator o) {
     pips_internal_error("unexpected none reduction operator tag!");
     break;
   case is_reduction_operator_sum:
-    result = CreateIntrinsic("+");
+    result = CreateIntrinsic(PLUS_OPERATOR_NAME);
     break;
   case is_reduction_operator_csum:
-    result = CreateIntrinsic("+");
+    result = CreateIntrinsic(PLUS_C_OPERATOR_NAME);
     break;
   case is_reduction_operator_prod:
-    result = CreateIntrinsic("*");
+    result = CreateIntrinsic(MULTIPLY_OPERATOR_NAME);
     break;
   case is_reduction_operator_min:
-    result = CreateIntrinsic("MIN");
+    result = CreateIntrinsic(MIN_OPERATOR_NAME);
     break;
   case is_reduction_operator_max:
-    result = CreateIntrinsic("MAX");
+    result = CreateIntrinsic(MAX_OPERATOR_NAME);
     break;
   case is_reduction_operator_and:
-    result = CreateIntrinsic("&&");
+    result = (get_prettyprint_is_fortran () == TRUE) ?
+                      CreateIntrinsic(AND_OPERATOR_NAME) :
+                      CreateIntrinsic(C_AND_OPERATOR_NAME);
     break;
   case is_reduction_operator_or:
-    result = CreateIntrinsic("||");
+    result = (get_prettyprint_is_fortran () == TRUE) ?
+                      CreateIntrinsic(OR_OPERATOR_NAME) :
+                      CreateIntrinsic(C_OR_OPERATOR_NAME);
     break;
   case is_reduction_operator_bitwise_or:
-    result = CreateIntrinsic("|");
+    result = CreateIntrinsic(BITWISE_OR_OPERATOR_NAME);
     break;
   case is_reduction_operator_bitwise_xor:
-    result = CreateIntrinsic("^");
+    result = CreateIntrinsic(BITWISE_XOR_OPERATOR_NAME);
     break;
   case is_reduction_operator_bitwise_and:
-    result = CreateIntrinsic("&");
+    result = CreateIntrinsic(BITWISE_AND_OPERATOR_NAME);
+    break;
+  case is_reduction_operator_eqv:
+    pips_assert ("not a C reduction operator", get_prettyprint_is_fortran () == TRUE);
+    result = CreateIntrinsic(EQUIV_OPERATOR_NAME);
+    break;
+  case is_reduction_operator_neqv:
+    pips_assert ("not a C reduction operator", get_prettyprint_is_fortran () == TRUE);
+    result = CreateIntrinsic(NON_EQUIV_OPERATOR_NAME);
     break;
   default:
     pips_internal_error("unexpected reduction operator tag!");
@@ -161,10 +173,10 @@ static string omp_operator_str (reduction_operator o) {
     result = "MAX";
     break;
   case is_reduction_operator_and:
-    result = "&&";
+    result = (get_prettyprint_is_fortran () == TRUE) ? ".AND." : "&&";
     break;
   case is_reduction_operator_or:
-    result = "||";
+    result = (get_prettyprint_is_fortran () == TRUE) ? ".OR." :"||";
     break;
   case is_reduction_operator_bitwise_or:
     result = "|";
@@ -174,6 +186,14 @@ static string omp_operator_str (reduction_operator o) {
     break;
   case is_reduction_operator_bitwise_and:
     result = "&";
+    break;
+  case is_reduction_operator_eqv:
+    pips_assert ("not a C reduction operator", get_prettyprint_is_fortran () == TRUE);
+    result = ".EQV.";
+    break;
+  case is_reduction_operator_neqv:
+    pips_assert ("not a C reduction operator", get_prettyprint_is_fortran () == TRUE);
+    result = ".NEQV.";
     break;
   default:
     pips_internal_error("unexpected reduction operator tag!");
