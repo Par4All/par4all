@@ -100,6 +100,9 @@ static bool whole_loop_parallelize(loop l)
   /* To keep track of a current conflict disabling the parallelization: */
   bool may_conflicts_p = FALSE;
 
+  /* Can we discard conflicts due to thread-safe variables? */
+  bool thread_safe_p = get_bool_property("PARALLELIZATION_IGNORE_THREAD_SAFE_VARIABLES");
+
   pips_debug(1,"begin\n");
 
   pips_debug(1,"building conflicts\n");
@@ -111,8 +114,10 @@ static bool whole_loop_parallelize(loop l)
   /* First, builds list of conflicts: */
   FOREACH(EFFECT, reg, l_reg) {
     entity e = region_entity(reg);
+    reference r = effect_any_reference(reg);
+    int d = gen_length(reference_indices(r));
 
-    if (region_write_p(reg)) {
+    if (region_write_p(reg) && !(thread_safe_p && thread_safe_variable_p(e))) {
       conflict conf = conflict_undefined;
 
       /* Add a write-write conflict to the list: */
@@ -121,7 +126,18 @@ static bool whole_loop_parallelize(loop l)
 
       /* Search for a write-read/read-write conflict */
       FOREACH(EFFECT, reg2, l_reg) {
-	if (same_entity_p(e,region_entity(reg2)) && region_read_p(reg2)) {
+	reference r2 = effect_any_reference(reg2);
+	int d2 = gen_length(reference_indices(r2));
+
+	/* FI->RK: Careful, you are replicating code of chains.c,
+	   add_conflicts(). Why cannot you use region_chains? 
+
+	   The test below must evolve with Beatrice's work on memory
+	   access paths. d<=d2 is a very preliminary test for memory
+	   access paths.
+	*/
+
+	if (same_entity_p(e,region_entity(reg2)) && region_read_p(reg2) && d<=d2) {
 	  /* Add a write-read conflict */
 	  conf = make_conflict(reg, reg2, cone_undefined);
 	  l_conflicts = gen_nconc(l_conflicts, CONS(CONFLICT, conf, NIL));
