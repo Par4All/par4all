@@ -908,6 +908,13 @@ transformer any_user_call_site_to_transformer(entity f,
     basic b = basic_of_expression(e);
     transformer ctf = transformer_undefined;
 
+    if(entity_undefined_p(fpv)) {
+      pips_user_error("Cannot find formal parameter %d for function \"%s\"."
+		      " Mismatch between functon declaration and call site."
+		      " Check the source code with gcc.\n",
+		      n, entity_user_name(f));
+    }
+
     if(analyzable_scalar_entity_p(fpv)) {
       if(type_equal_p(fpt, apt)) {
 	/* Keep track of fpv to project it later */
