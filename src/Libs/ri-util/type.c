@@ -3194,8 +3194,10 @@ bool check_C_function_type(entity f, list args)
 }
 
 /* Number of steps to access the lowest leave of type t.  Number of
- dimensions for an array. One for a struct or an union field, plus its
- dimension. */
+ dimensions for an array. One for a struct or an union field, plus its own
+ dimension(s). This does not take into account longer memory access paths
+ due to pointers. Hence, recursive data structures do not end up with
+ MAX_INT as type depth. */
 size_t type_depth(type t)
 {
   size_t d = 0;

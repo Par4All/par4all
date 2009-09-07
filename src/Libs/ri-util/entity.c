@@ -1774,3 +1774,74 @@ entity make_entity_copy_with_new_name(entity e,
   }
   return ne;
 }
+
+/* FI: it is assumed that thread safe entities are invariant with
+   respect to workspaces. Another mechanism will be needed if user
+   variables updated within a critical section also are added to the
+   thread safe variable set. 
+
+   Thread safe entities are supposed to be updated within critical
+   sections. Hence their dependence arcs may be ignored during
+   parallelization. There is not gaurantee that the semantics is
+   unchanged, for isntance pointer values are likely to differ, but
+   havoc should be avoided and the semantics of programs that are not
+   dependent on pointer values should be preserved.
+
+   For the time begin, the set is implemented as a list because very
+   few libc hidden variables are added.
+*/
+static list thread_safe_entities = NIL;
+
+void add_thread_safe_variable(entity v)
+{
+  if(gen_in_list_p(v, thread_safe_entities)) {
+    /* This might happen when a workspace is closed and another one
+       open or created within one session. */
+    //pips_internal_error("Thread-safe entity \"%s\" redeclared\n", entity_name(v));
+    ;
+  }
+  else {
+    /* The package name of v could be checked... especially if package names are unified. */
+    thread_safe_entities = gen_nconc(thread_safe_entities, CONS(ENTITY, v, NIL));
+  }
+}
+
+bool thread_safe_variable_p(entity v)
+{
+  bool thread_safe_p = gen_in_list_p(v, thread_safe_entities);
+
+  return thread_safe_p;
+}
+
+/* FI: hidden variables added to take into account the side effects in
+   the libc. Without them, dead code elimination would remove calls to
+   rand or malloc. However, there is no useful information to be
+   computed about them. Except perhard, the number of frees wrt the
+   number of malloc. Hence, they are not taken into account by the
+   semantics analysis. 
+
+   This set may not be a superset of the set of thread-safe variables.
+*/
+static list abstract_state_entities = NIL;
+
+
+void add_abstract_state_variable(entity v)
+{
+  if(gen_in_list_p(v, abstract_state_entities)) {
+    /* This might happen when a workspace is closed and another one
+       open or created within one session. */
+    //pips_internal_error("Thread-safe entity \"%s\" redeclared\n", entity_name(v));
+    ;
+  }
+  else {
+    /* The package name of v could be checked... especially if package names are unified. */
+    abstract_state_entities = gen_nconc(abstract_state_entities, CONS(ENTITY, v, NIL));
+  }
+}
+
+bool abstract_state_variable_p(entity v)
+{
+  bool abstract_state_p = gen_in_list_p(v, abstract_state_entities);
+
+  return abstract_state_p;
+}

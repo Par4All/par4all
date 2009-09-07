@@ -1357,6 +1357,8 @@ the variable is unsigned, signed or not */
 #define RAND_EFFECTS_PACKAGE_NAME "_RANDOM_EFFECTS"
 /* variable name for random unit */
 #define RAND_GEN_EFFECTS_NAME "GEN_SEED"
+/* package name for malloc routines (could be libc package) */
+#define MALLOC_EFFECTS_PACKAGE_NAME "_MALLOC_EFFECTS"
 /* variable name for heap effects */
 #define MALLOC_EFFECTS_NAME "_MALLOC_"
 /* array of Logical UNits; it is more or less handled as the current file pointer */
