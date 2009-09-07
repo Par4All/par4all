@@ -2297,6 +2297,8 @@ type basic_concrete_type(type t)
 	    entity e = basic_typedef(bt);
 	    type st = entity_type(e);
 	    
+
+	    pips_debug(8, "typedef \n");
 	    nt = basic_concrete_type(st);
 	    variable_dimensions(type_variable(nt)) = 
 	      gen_nconc(gen_full_copy_list(lt), 
@@ -2307,6 +2309,7 @@ type basic_concrete_type(type t)
 	  {
 	    type npt = basic_concrete_type(basic_pointer(bt));
 	    
+	     pips_debug(8, "pointer \n");
 	    nt = make_type_variable
 	      (make_variable(make_basic_pointer(npt),
 			     gen_full_copy_list(lt),
@@ -2314,7 +2317,10 @@ type basic_concrete_type(type t)
 	    
 	  }
 	else
-	  nt = copy_type(t);
+	  {
+	    pips_debug(8, "other  variable case \n");
+	     nt = copy_type(t);
+	  }
       }
       break;
     

@@ -226,7 +226,7 @@ list generic_p_proper_effect_of_reference(reference ref,
 		{
 		  reference_indices(read_ref)=
 		    gen_nconc(reference_indices(read_ref),
-			      CONS(EXPRESSION, EXPRESSION(CAR(l_inds_tmp)),
+			      CONS(EXPRESSION, copy_expression(EXPRESSION(CAR(l_inds_tmp))),
 				   NIL));
 		  POP(l_dim_tmp);
 		  POP(l_inds_tmp);
