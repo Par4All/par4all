@@ -7,8 +7,11 @@
 use strict;
 use feature 'switch';
 
-my $symmetry = 1;
-my $usetemps = 1;
+# defaults to full generation
+my $symmetry = 0;
+my $usetemps = 0;
+
+# handle options
 use Getopt::Long;
 GetOptions("symmetry!" => \$symmetry,
 	   "usetemps!" => \$usetemps)
@@ -77,7 +80,8 @@ my @all_cases = ('0' ... '9', 'a', 'b');
 my @right_cases = @all_cases;
 @right_cases = ('0', '2', '4', '5', '7', '8', 'a') if $symmetry;
 
-# 1005 cases
+# Full: 6912 tests
+# Reduced: 1005 tests
 my $count = 0;
 # left operation
 for my $left (@all_cases)
