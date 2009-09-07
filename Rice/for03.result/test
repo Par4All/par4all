@@ -1,0 +1,126 @@
+Select some options to deal with the C Language:
+Parse as C:
+Prettyprint the source as C, of course
+Do not display original number lines as comment:
+If possible, transform simple for-loops into do-loop à la Fortran, simpler to analyze:
+Select the most precise analyses:
+Compute the intraprocedural preconditions at the same time as
+transformers and use them to improve the accuracy of expression
+and statement transformers:
+Try to restructure the code for more precision:
+
+Check the proper effects
+
+void for03(int n)
+{
+   int j;
+   al_t e1;
+   al_t e2;
+   float t;
+   float delta_t;
+   float t_max;
+//               <must be written>: e1[2]
+
+   e1.next = &e2;
+//               <must be written>: j
+
+   for(j = 0; j <= 99; j += 1) {
+//               <must be read   >: j
+//               <must be written>: e1[1][j]
+      (e1.x)[j] = 0.;
+//               <must be read   >: e1[2] j
+//               <must be written>: e1[2][0][1][j]
+      (e1.next->x)[j] = 1.;
+   }
+}
+
+Check the regions
+
+void for03(int n)
+{
+   int j;
+   al_t e1;
+   al_t e2;
+   float t;
+   float delta_t;
+   float t_max;
+
+//  <e1[PHI1]-W-EXACT-{PHI1==2}>
+
+
+   e1.next = &e2;
+
+//  <e1[PHI1]-R-EXACT-{PHI1==2}>
+//  <e1[PHI1][PHI2]-W-EXACT-{PHI1==1, 0<=PHI2, PHI2<=99}>
+//  <e1[PHI1][PHI2][PHI3][PHI4]-W-EXACT-{PHI1==2, PHI2==0, PHI3==1,
+//    0<=PHI4, PHI4<=99}>
+
+
+   for(j = 0; j <= 99; j += 1) {
+
+//  <e1[PHI1][PHI2]-W-EXACT-{PHI1==1, PHI2==j, 0<=j, j<=99}>
+
+      (e1.x)[j] = 0.;
+
+//  <e1[PHI1]-R-EXACT-{PHI1==2, 0<=j, j<=99}>
+//  <e1[PHI1][PHI2][PHI3][PHI4]-W-EXACT-{PHI1==2, PHI2==0, PHI3==1,
+//    PHI4==j, 0<=j, j<=99}>
+
+      (e1.next->x)[j] = 1.;
+   }
+}
+
+Chains
+
+
+ *********************** Use-Def Chains *********************
+
+	29 --> 29 with conflicts
+		from <e1[PHI1][PHI2][PHI3][PHI4]-W-MUST> to <e1[PHI1][PHI2][PHI3][PHI4]-W-MUST>
+	29 --> 28 with conflicts
+		from <e1[PHI1][PHI2][PHI3][PHI4]-W-MUST> to <e1[PHI1][PHI2]-W-MUST>
+	28 --> 29 with conflicts
+		from <e1[PHI1][PHI2]-W-MUST> to <e1[PHI1][PHI2][PHI3][PHI4]-W-MUST>
+	28 --> 28 with conflicts
+		from <e1[PHI1][PHI2]-W-MUST> to <e1[PHI1][PHI2]-W-MUST>
+	25 --> 29 with conflicts
+		from <e1[PHI1]-W-MUST> to <e1[PHI1]-R-MUST>
+		from <e1[PHI1]-W-MUST> to <e1[PHI1][PHI2][PHI3][PHI4]-W-MUST>
+	25 --> 28 with conflicts
+		from <e1[PHI1]-W-MUST> to <e1[PHI1][PHI2]-W-MUST>
+
+****************** End of Dependence Graph ******************
+
+Privatize scalar variables
+
+
+Dependence graph
+
+
+ **************** Effective Dependence Graph ****************
+
+
+****************** End of Dependence Graph ******************
+
+Ask for some statistics about the job to be done:
+
+
+Ask for the parallelization of "for03"
+
+void for03(int n)
+{
+   int j;
+   al_t e1;
+   al_t e2;
+   float t;
+   float delta_t;
+   float t_max;
+
+   e1.next = &e2;
+
+#pragma omp parallel for 
+   for(j = 0; j <= 99; j += 1) {
+      (e1.x)[j] = 0.;
+      (e1.next->x)[j] = 1.;
+   }
+}
