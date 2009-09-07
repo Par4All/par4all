@@ -1,8 +1,8 @@
 #this is the validation script to test omp reduction pragma prettyprinting in
-#C when handling pragma as string as set by the PRAGMA_TYPE property
+#C when handling pragma as expression as set by the PRAGMA_TYPE property
 
-delete reduction_op_c
-create reduction_op_c reduction_op_c.c
+delete reduction_op_c2
+create reduction_op_c2 reduction_op_c.c
 
 #activate some debug mode
 #setenv TEXT_DEBUG_LEVEL 9
@@ -28,11 +28,11 @@ setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
 activate C_SYMBOL_TABLE
 
 apply PRIVATIZE_MODULE(main)
-setproperty PRAGMA_TYPE "str"
+setproperty PRAGMA_TYPE "expr"
 apply OMPIFY_CODE(main)
 display PRINTED_FILE(main)
 
 close
-delete reduction_op_c
+delete reduction_op_c2
 quit
 # EOF
