@@ -5,8 +5,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 typedef float float_t;
-#define SIZE 64
-#define T 64
+#define SIZE 501
+#define T 400
 
 float_t space[SIZE][SIZE];
 // For the dataparallel semantics:
@@ -42,11 +42,18 @@ void get_data(char filename[]) {
   fgetc(fp);
   printf("Input image  : x=%d y=%d grey=%d\n", nx, ny, i);
 
+  /* Erase the memory, in case the image is not big enough: */
+  for(i = 0; i < SIZE; i++)
+    for(j = 0; j < SIZE; j++)
+      space[i][j] = 0;
 
-  for(i = 0;i < SIZE; i++)
-    for(j = 0;j < SIZE; j++) {
+  /* Read the pixel grey value: */
+  for(j = 0; j < ny; j++)
+    for(i = 0; i < nx; i++) {
       c = fgetc(fp);
-      space[i][j] = c;
+      /* Truncate the image if too big: */
+      if (i < SIZE && j < SIZE)
+	space[i][j] = c;
     }
 
   fclose(fp);
@@ -66,9 +73,9 @@ void write_data(char filename[]) {
   /* Write the PGM header: */
   fprintf(fp,"P5\n%d %d\n255\n", SIZE, SIZE);
 
-  for(i = 0;i < SIZE; i++)
-    for(j = 0;j < SIZE; j++) {
-      c = save[i][j];
+  for(j = 0; j < SIZE; j++)
+    for(i = 0; i < SIZE; i++) {
+      c = space[i][j];
       fputc(c, fp);
     }
   fclose(fp);
@@ -134,6 +141,11 @@ int main(int argc, char *argv[]) {
     exit(0);
   }
   get_data(argv[1]);
+
+  /* Initialize the border of the destination image, since it is used but
+     never written to: */
+  for(i = 0; i < SIZE; i++)
+    save[i][0] = save[0][i] = save[i][SIZE - 1] = save[SIZE - 1][i] = 0;
 
   for(t = 0; t < T; t++)
     compute();
