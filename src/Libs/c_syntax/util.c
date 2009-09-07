@@ -130,23 +130,30 @@ void init_c_areas()
   /* Create a hidden pointer in the heap area to modelize malloc and
      free effects and to keep track of the corresponding abstract
      state. */
-  if(!compilation_unit_entity_p(get_current_module_entity())) {
     /* FI: I use a complex type to avoid seeing this variable in the
        transformers and preconditions... OK, it's not a clean way to
        do it. Should we create another area to allocate this abstract
        heap state? */
+  /* FI: I keep the code below, because it may turn useful again if
+     context-insensitive address values must be generated. */
+  /*
+  if(!compilation_unit_entity_p(get_current_module_entity())) {
     make_entity(AddPackageToName(get_current_module_name(),
 				 MALLOC_EFFECTS_NAME),
 		make_scalar_complex_type(DEFAULT_COMPLEX_TYPE_SIZE),
-		/* make_storage(is_storage_ram,
-		   make_ram(entity_undefined, DynamicArea, 0, NIL))
-		*/
+
+		Chose a storage... Maybe in MALLOC_EFFECTS_PACKAGE_NAME?
+
+		make_storage(is_storage_ram,
+		make_ram(entity_undefined, DynamicArea, 0, NIL))
+		
 		make_storage(is_storage_ram,
 			     make_ram(get_current_module_entity(),
 				      HeapArea,
 				      0, NIL)),
 		make_value(is_value_unknown, UU));
   }
+  */
 
   // Dynamic variables whose size are not known are stored in Stack area
   StackArea = FindOrCreateEntity(get_current_module_name(), STACK_AREA_LOCAL_NAME);
