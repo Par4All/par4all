@@ -706,8 +706,6 @@ void print_module_icfg(entity module)
   print_do_loops = get_bool_property(ICFG_DOs);
   print_ifs = get_bool_property(ICFG_IFs);
 
-  gen_start_recurse_ancestor_tracking();
-
   gen_multi_recurse
     (s,
      statement_domain, statement_flt, statement_rwt,
@@ -719,8 +717,6 @@ void print_module_icfg(entity module)
      forloop_domain, loop_flt       , forloop_rwt,
      range_domain    , range_flt    , range_rwt,
      NULL);
-
-  gen_stop_recurse_ancestor_tracking();
 
   pips_assert("stack is empty", current_stmt_empty_p());
 
