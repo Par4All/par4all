@@ -3,10 +3,9 @@ Combinatorial tests of freia spoc scheduler and wiring.
 symmetries and the constraint that temporaries are used.
 
 To run this validation:
-  sh> ./schedule_combi.pl --usetemps --symmetry
+
+  sh> make generate
   # generate 1005 files
-  sh> for f in freia_*.c ; do mkdir ${f/.c/.result} ; done
   sh> make validate
   # there should be no coredumps, i.e. no remaining databases
-  sh> rm -rf freia_*.result
-  sh> rm -f freia_*.c
+  sh> make full-clean   
