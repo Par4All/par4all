@@ -2200,20 +2200,21 @@ DFG.
 
 There are several ways to compute a dependence graph. Some of them are
 fast (\textsc{Banerjee}'s one for instance) but provide poor results, others
-might be slower (Rémi's one for instance) but produce better
+might be slower (Rémi Triolet's one for instance) but produce better
 results.
 
 Three different dependence tests are available, all based on
-\textsc{Fourier}-\textsc{Motzkin} elimination improved with a heuristics for the integer
-domain. The \verb+fast+ version uses subscript expressions only (unless regions
-were used to compute use-def chains, in which case regions are used
-instead). The \verb+full+ version uses subscript expressions and loop
-bounds. The \verb+semantics+ version uses subscript expressions and
-preconditions (see~\ref{subsection-semantics-analysis}).
+\textsc{Fourier}-\textsc{Motzkin} elimination improved with a
+heuristics for the integer domain. The \verb+fast+ version uses
+subscript expressions only (unless regions were used to compute
+use-def chains, in which case regions are used instead). The
+\verb+full+ version uses subscript expressions and loop bounds. The
+\verb+semantics+ version uses subscript expressions and preconditions
+(see~\ref{subsection-semantics-analysis}).
 
-Note that for interprocedural parallelization precise array regions only
-are used by the fast dependence test if the proper kind of use-def
-chains has been previously selected (see
+Note that for interprocedural parallelization precise array regions
+only are used by the fast dependence test if the proper kind of
+use-def chains has been previously selected (see
 Section~\ref{subsubsection-read-write-region-based-chains}).
 
 There are several kinds of dependence graphs. Most of them share the
@@ -2230,19 +2231,27 @@ both implemented in \PIPS{}. DDV's are not computed. Currently, only
 dependence levels are exploited by parallelization algorithms.
 
 The dependence graph can be printed with or without filters (see
-Section~\ref{subsection-dependence-graph-file}). The standard dependence
-graph includes all arcs taken into account by the parallelization
-process (\textsc{Allen} \& \textsc{Kennedy}~\cite{AK87}), except those that are due to scalar private
-variables and that impact the distribution process only. The loop
-carried dependence graph does not include intra-iteration dependences
-and is a good basis for iteration scheduling. The whole graph includes
-all arcs, but input dependence arcs.
+Section~\ref{subsection-dependence-graph-file}). The standard
+dependence graph includes all arcs taken into account by the
+parallelization process (\textsc{Allen} \&
+\textsc{Kennedy}~\cite{AK87}), except those that are due to scalar
+private variables and that impact the distribution process only. The
+loop carried dependence graph does not include intra-iteration
+dependences and is a good basis for iteration scheduling. The whole
+graph includes all arcs, but input dependence arcs.
 
 It is possible to gather some statistics about dependences by turning
 on property \verb/RICEDG_PROVIDE_STATISTICS/ (more details in the
 \PROPERTIES{}). A Shell script from \PIPS{} utilities,
 \verb/print-dg-statistics/, can be used in combination to extract the
 most relevant information for a whole program.
+
+During the parallelization phases, is is possible to ignore arcs
+related to states of the libc, such as the heap memory management,
+because thread-safe libraries do perform the updates within critical
+sections. But these arcs are part of the use-def chains and of the
+dependence graph. If they were removed instead of being ignored,
+use-def elimination would remove all \verb/free/ statements.
 
 The main contributors for the design and development of dependence
 analysis are Rémi \textsc{Triolet}, François \textsc{Irigoin} and Yi-qing
@@ -4373,6 +4382,7 @@ There are few properties that control the parallelization behaviour.
 \index{Allen\&Kennedy}
 \index{GENERATE\_NESTED\_PARALLEL\_LOOPS}
 \index{PARALLELIZATION\_STATISTICS}
+\index{Thread-safe library}
 
 TRUE to make all possible parallel loops, FALSE to generate real (vector,
 innermost parallel?) code:
@@ -4395,6 +4405,22 @@ The motivation is when applying \emph{à la} Rice parallelizing to improve
 some sequential code, we may not want loop distribution on already
 parallel code to preserve cache resources.
 
+Thread-safe libraries are protected by critical sections. Their
+functions can be called safely from different execution threads. For
+instance, a loop whose body contains calls to \verb/malloc/ can be
+parallelized. The underlying state changes do no hinder
+parallelization, at least if the code is not sensitive to pointer
+values.
+
+\begin{PipsProp}
+PARALLELIZATION_IGNORE_THREAD_SAFE_VARIABLES FALSE
+\end{PipsProp}
+
+Since this property is used to mask arcs in the dependence graph, it
+must be exploited by each parallelization phase independently. It is
+not used to derived a simplified version of the use-def chains or of
+the dependence graph to avoid wrong result with use-def elimination,
+which is based on the same graph.
 
 \subsection{Menu for Parallelization Algorithm Selection}
 
