@@ -1460,7 +1460,7 @@ static list any_heap_effects(entity e, list args)
   }, args);
 
   malloc_entity = global_name_to_entity
-    (get_current_module_name(),
+    (MALLOC_EFFECTS_PACKAGE_NAME,
      MALLOC_EFFECTS_NAME);
 
   pips_assert("malloc entity pre-exists", !entity_undefined_p(malloc_entity));
