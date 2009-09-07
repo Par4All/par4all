@@ -1,5 +1,5 @@
-delete typedef01
-create typedef01 typedef01.c
+delete typedef02
+create typedef02 typedef02.c
 module main
 activate C_PARSER
 setproperty PRETTYPRINT_C_CODE TRUE
@@ -27,6 +27,7 @@ activate PRINT_CODE_REGIONS
 display PRINTED_FILE
 
 close 
+delete typedef02
 quit
 
 # EOF
