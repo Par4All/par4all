@@ -74,6 +74,7 @@ recurse=
 arch=${PIPS_ARCH:-$($root/makes/arch.sh)}
 tpips=$(type -p tpips)
 pips=$(type -p pips)
+sysarch=$(uname -m)
 
 # by default, do not create a missing .result directory:
 auto_result_create=""
@@ -233,18 +234,18 @@ if [[ $keep_archive && -f $last_summary ]]; then
 fi
 
 echo "validation for $@
-in directory ${vdir}/
+host: $(hostname)
+directory: ${vdir}/
   $($root/makes/version.sh $vdir)
-for $arch architecture
-output in directory ${odir}/
-with pips=$pips
+arch: $arch ($sysarch)
+pips: $pips
 $(${pips} -v)
-and tpips=$tpips
+tpips: $tpips
 $(${tpips} -v)
-running in directory ${rdir}/
-on $(hostname)
-by $(whoami)
-at $(date)
+output directory: ${odir}/
+running directory: ${rdir}/
+user: $(whoami)
+date: $(date)
 " >> $summary
 
 # set default directories if necessary
@@ -537,7 +538,7 @@ if [[ $mail ]] ; then
   {
     [[ $display_diff ]] && do_diff
     cat $summary
-  } | ${PIPS_MAIL:-Mail} -s "validation $msg" $mail
+  } | ${PIPS_MAIL:-Mail} -s "validation $sysarch $msg" $mail
 fi
 
 # ensure okay to make
