@@ -85,20 +85,39 @@ vertex v;
 
 
 /*
-this function checks if a successoressor su of a vertex should be ignored,
-i.e.  if it is linked through an arc whose level is less than 'level' or
-if it does not belong to region
+this function checks if a successoressor su of a vertex should be
+ignored, i.e.  if it is linked through an arc whose level is less than
+'level' or if it does not belong to region
 */
-static bool AK_ignore_this_successor(v, region, su, level)
-vertex v;
-set region;
-successor su;
-int level;
+static bool AK_ignore_this_successor(vertex __attribute__ ((unused)) v,
+				     set region,
+				     successor su,
+				     int level)
 {
-    if (AK_ignore_this_vertex(region, successor_vertex(su)))
-	return(TRUE);
+  dg_arc_label al = (dg_arc_label) successor_arc_label(su);
 
-    return(AK_ignore_this_level((dg_arc_label) successor_arc_label(su), level));
+  bool ignore_p = AK_ignore_this_vertex(region, successor_vertex(su));
+
+  if (!ignore_p)
+    ignore_p = AK_ignore_this_level(al, level);
+
+  if (!ignore_p && get_bool_property("PARALLELIZATION_IGNORE_THREAD_SAFE_VARIABLES")) {
+    list cl = dg_arc_label_conflicts(al);
+    bool thread_safe_p = TRUE;
+
+    FOREACH(CONFLICT, c, cl) {
+      effect e = conflict_source(c);
+      reference r = effect_any_reference(e);
+      entity v = reference_variable(r);
+
+      if(!thread_safe_variable_p(v)) {
+	thread_safe_p = FALSE;
+	break;
+      }
+    }
+    ignore_p = thread_safe_p;
+  }
+  return ignore_p;
 }
 
 

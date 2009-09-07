@@ -40,6 +40,14 @@
  *   parallelization.
  */
 
+/* FI: I want misc.h and I end up with the other ones as well? */
+#include "linear.h"
+
+#include "genC.h"
+#include "ri.h"
+
+#include "misc.h"
+
 #include "local.h"
 
 /* the dependence graph of the current loop nest */
@@ -152,10 +160,10 @@ statement rice_loop(statement stat,
   instruction istat = statement_instruction(stat);
   loop lstat = instruction_loop(istat);
   set region;
-  statement b = statement_undefined;
+  //statement b = statement_undefined;
 
   ifdebug(1) {
-    debug(1, "rice_loop", "original nest of loops:\n\n");
+    pips_debug(1, "original nest of loops:\n\n");
     print_statement(stat);
   }
 
@@ -314,7 +322,7 @@ do_it(
 
     ifdebug(7)
     {
-	pips_debug(7, "\nparallelized code for module %s:",mod_name);
+	pips_debug(7, "\nparallelized code for module %s:", mod_name);
 	if (statement_consistent_p(mod_parallel_stat))
 	    fprintf(stderr," gen consistent\n");
 	print_parallel_statement(mod_parallel_stat);
