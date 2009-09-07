@@ -6,7 +6,7 @@
 
 int main(int argc, char *argv[]) {
   int i, j;
-  int * a[N];
+  float * a[N];
 
   for(i=0;i<N;i++) {
     a[i] = malloc(N*4/*sizeof(float)*/);

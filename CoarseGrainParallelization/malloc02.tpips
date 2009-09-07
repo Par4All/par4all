@@ -1,0 +1,30 @@
+# Used to check the behavior of property PARALLELIZATION_IGNORE_THREAD_SAFE_VARIABLES
+
+delete malloc02
+create malloc02 malloc02.c
+echo Select some options to deal with the C Language:
+echo Parse as C:
+activate C_PARSER
+echo If possible, transform simple for-loops into do-loop à la Fortran, simpler to analyze:
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+echo Prettyprint the source as C, of course
+setproperty PRETTYPRINT_C_CODE TRUE
+
+echo Select the most precise analysis:
+activate MUST_REGIONS
+activate TRANSFORMERS_INTER_FULL
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate PRECONDITIONS_INTER_FULL
+#activate REGION_CHAINS
+
+setproperty PARALLELIZATION_IGNORE_THREAD_SAFE_VARIABLES TRUE
+
+display PARSED_PRINTED_FILE[main]
+display PRINTED_FILE[main]
+apply PRIVATIZE_MODULE[main]
+apply COARSE_GRAIN_PARALLELIZATION[main]
+display PRINTED_FILE[main]
+activate PRINT_PARALLELIZEDOMP_CODE
+display PARALLELPRINTED_FILE[main]
+close
+quit
