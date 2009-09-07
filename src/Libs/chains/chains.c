@@ -1098,9 +1098,15 @@ static void add_conflicts(statement stin,
 
   FOREACH(EFFECT, fin, effect_ins) {
     entity ein = effect_entity( fin ) ;
+    reference rin = effect_any_reference(fin);
+    int din = gen_length(reference_indices(rin));
+    action ain = effect_action(fin);
 
     FOREACH(EFFECT, fout, effect_outs) {
       entity eout = effect_entity( fout ) ;
+      reference rout = effect_any_reference(fout);
+      int dout = gen_length(reference_indices(rout));
+      action aout = effect_action(fout);
 
       if( entity_conflict_p( ein, eout ) && (*which)( fin, fout )) {
 	type tin = ultimate_type(entity_type(ein));
@@ -1108,35 +1114,7 @@ static void add_conflicts(statement stin,
 	bool add_conflict_p = TRUE;
 
 	if(pointer_type_p(tin) && pointer_type_p(tout)) {
-	  reference rin = effect_any_reference(fin);
-	  reference rout = effect_any_reference(fout);
-	  int din = gen_length(reference_indices(rin));
-	  int dout = gen_length(reference_indices(rout));
 
-	  /* In case we are dealing with pointers, three
-	   * possibilities:
-	   *
-	   * 1. references are p and q and are dealt the standard way
-	   *
-	   * 2. references are p[i][...] and q[k][] and are dealt
-	   * later by an improved dependence test taking into account
-	   * access paths of different length.
-	   *
-	   * 3. references are p or q and q[i][...] or p[j...] and
-	   * they do not create conflicts if the user hasn't created
-	   * any strange sharing. This should be validated by a
-	   * property and/or by type checking: if the types of the two
-	   * references are different and if no strange casting is
-	   * used... For the time being, let's experiment.
-	   *
-	   * FI: This is a first cut and should be refined with
-	   * Beatrice to handle references such as p[i] and p[i][j]
-	   * and made safer with aliasing information from Amira.
-	   */
-	  /*
-	    add_conflict_p = !((din==0)
-			     ^ (gen_length(reference_indices(rout))==0));
-	  */
 	  /* Second version due to accuracy improvements in effect
 	     computation */
 	  if(din==dout) {
@@ -1147,12 +1125,27 @@ static void add_conflicts(statement stin,
 	    /* a write on the shorter memory access path conflicts
 	       with the longer one. If a[i] is written, then a[i][j]
 	       depends on it. If a[i] is read, no conflict */
-	    action ain = effect_action(fin);
 	    add_conflict_p = action_write_p(ain);
 	  }
 	  else /* dout < din */ {
 	    /* same explanation as above */
-	    action aout = effect_action(fout);
+	    add_conflict_p = action_write_p(aout);
+	  }
+	}
+	else {
+	  /* Why should we limit this test to pointers? Structures,
+	     structures of arrays and arrays of sturctures with
+	     pointers embedded somewhere must behave in the very same
+	     way. Why not unify the two cases? Because we have not
+	     spent enough time thinking about memory access paths. */
+	  if(din < dout) {
+	    /* a write on the shorter memory access path conflicts
+	       with the longer one. If a[i] is written, then a[i][j]
+	       depends on it. If a[i] is read, no conflict */
+	    add_conflict_p = action_write_p(ain);
+	  }
+	  else if(dout < din) {
+	    /* same explanation as above */
 	    add_conflict_p = action_write_p(aout);
 	  }
 	}
