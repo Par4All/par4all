@@ -511,11 +511,89 @@ static void range_rwt(range __attribute__ ((unused)) r)
 }
 
 /* TEST
+   functions to deal with the indentation of ELSIFs.
  */
-static bool test_flt (test __attribute__ ((unused)) t)
+
+/* This function tests if t is the exact content of and ELSE clause.
+ */
+static bool is_elsif_test_p(test t) {
+
+  bool elsif_p = FALSE;
+
+  /*
+  gen_chunk p1 = gen_get_recurse_ancestor((void *)t);
+  gen_chunk * pp1 = &p1;
+  int * pi = pp1;
+  int i = *pi;
+  if (i != ((int)(HASH_UNDEFINED_VALUE)))
+    if ( i != ((int)(NULL)))
+      pips_debug(1, "Type of p1 %d\n", gen_type(i));
+  */
+
+  /* Determine if t is inside another test */
+  test pt = (test)gen_get_ancestor_type(test_domain, (void *)t);
+  if (pt != (test)HASH_UNDEFINED_VALUE && pt != (test)(NULL)) {
+    // Get the "ELSE Clause" statement of the parent test
+    statement ptf = test_false(pt);
+    ifdebug(4) {
+      pips_debug(4, "Parent test_false is:\n");
+      print_statement(ptf);
+      fprintf(stderr, "\n");
+    }
+
+    // Get the statement corresponding to t
+    statement ts = (statement)gen_get_ancestor_type(statement_domain, (void *)t);
+    if (ts != (statement)HASH_UNDEFINED_VALUE && ts != (statement)(NULL)) {
+      ifdebug(4) {
+	pips_debug(4, "My test statement is:\n");
+	print_statement(ts);
+	fprintf(stderr, "\n");
+      }
+      // If these two statements are the same, then we are in an ELSIF clause.
+      elsif_p = (ptf == ts);
+    }
+  }
+  return elsif_p;
+}
+
+/* This function tests if the ELSE clause of t is an ELIF.
+ */
+static bool has_elsif_test_p(test t) {
+
+  bool has_elsif_p = FALSE;
+
+  pips_debug (3, ">>>has_elsif_test_p begins for test=%p\n", t);
+
+  statement   tfs = test_false(t);
+  instruction tfi = statement_instruction(tfs);
+  
+  has_elsif_p = instruction_test_p(tfi);
+
+  pips_debug (3, "has_elsif_p = %d\n", has_elsif_p);
+  pips_debug (3, ">>>has_elsif_test_p ends for test=%p\n", t);
+
+  return (has_elsif_p);
+}
+
+
+static bool test_flt (test t)
 {
-  pips_debug (5, "Test begin\n");
-  if (print_ifs) current_margin += icfg_indent;
+  bool is_elsif_p = FALSE;
+
+  pips_debug (3, ">>>Test_flt begins for test=%p\n", t);
+
+  is_elsif_p = is_elsif_test_p(t);
+  int offset = (is_elsif_p ? 0 : icfg_indent);
+
+  if (print_ifs) {
+    current_margin += offset;
+    pips_debug( 4, "is_elsif_p = %d\n", is_elsif_p);
+    pips_debug( 4, "current_margin increased: %d -> %d\n",
+		current_margin - offset, current_margin
+		);
+  }
+  pips_debug (3, ">>>Test_flt ends for test=%p\n", t);
+
   return TRUE;
 }
 
@@ -527,9 +605,18 @@ static void test_rwt (test l)
   text t = make_text (NIL);
   bool something_to_print;
 
-  pips_debug (5,"Test end\n");
+  bool is_elsif_p  = FALSE;
+  bool has_elsif_p = FALSE;
+  int  offset;
+  int  else_margin  = current_margin;
 
-  inside_if = copy_text((text) load_statement_icfg (current_stmt_head ()));
+  pips_debug (3, ">>>Test_rwt begins for test=%p\n", l);
+
+  is_elsif_p  = is_elsif_test_p(l);
+  has_elsif_p = has_elsif_test_p(l);
+  offset      = (is_elsif_p ? 0 : icfg_indent);
+
+  inside_if   = copy_text((text) load_statement_icfg (current_stmt_head ()));
   inside_then = copy_text((text) load_statement_icfg (test_true (l)));
   inside_else = copy_text((text) load_statement_icfg (test_false (l)));
 
@@ -537,12 +624,20 @@ static void test_rwt (test l)
 			some_text_p(inside_then) ||
 			some_text_p(inside_if));
 
-  if (print_ifs) current_margin -= icfg_indent;
-
-  /* Print the IF */
-  if (something_to_print && print_ifs) {
-    append_marged_text(t, current_margin, st_IF, "");
+  if (print_ifs) {
+    current_margin -= offset;
+    pips_debug( 4, "is_elsif_p = %d\n", is_elsif_p);
+    pips_debug( 4, "current_margin decreased: %d -> %d\n",
+		current_margin + offset, current_margin
+		);
   }
+
+  /* Print the IF.
+     
+     If this is the IF of an ELIF, don't print it.
+   */
+  if (something_to_print && print_ifs && !is_elsif_p)
+    append_marged_text(t, current_margin, st_IF, "");
 
   /* print things in the if expression*/
   if (some_text_p(inside_if))
@@ -557,22 +652,37 @@ static void test_rwt (test l)
     MERGE_TEXTS (t, inside_then);
   }
 
-  /* print then statements */
+  /* print else/elif statements */
   if (some_text_p(inside_else)){
-    /* Print the ELSE */
+    /* Print the ELSE / ELIF */
     if (something_to_print && print_ifs) {
-      append_marged_text(t, current_margin, st_ELSE, "");
+
+      // Margin correction
+      else_margin -= (is_elsif_p  ? icfg_indent : 0);
+      else_margin -= (has_elsif_p && !is_elsif_p ? icfg_indent : 0);
+
+      //else_margin += (has_elsif_p ? icfg_indent : 0);
+      if (has_elsif_p)
+	append_marged_text(t, else_margin, st_ELIF, "");
+      else {
+	append_marged_text(t, else_margin, st_ELSE, "");
+      }
     }
     MERGE_TEXTS (t, inside_else);
   }
 
-  /* Print the ENDIF */
-  if (something_to_print && print_ifs) {
+  /* Print the ENDIF.
+
+     If this is the ENDIF of an ELIF, don't print it
+   */
+  if (something_to_print && print_ifs && !is_elsif_p) {
     append_marged_text(t, current_margin, st_ENDIF, "");
   }
 
   /* store it to the statement mapping */
   update_statement_icfg (current_stmt_head(), t);
+
+  pips_debug (3, ">>>Test_rwt ends for test=%p\n", l);
 
   return;
 }
@@ -596,6 +706,8 @@ void print_module_icfg(entity module)
   print_do_loops = get_bool_property(ICFG_DOs);
   print_ifs = get_bool_property(ICFG_IFs);
 
+  gen_start_recurse_ancestor_tracking();
+
   gen_multi_recurse
     (s,
      statement_domain, statement_flt, statement_rwt,
@@ -607,6 +719,8 @@ void print_module_icfg(entity module)
      forloop_domain, loop_flt       , forloop_rwt,
      range_domain    , range_flt    , range_rwt,
      NULL);
+
+  gen_stop_recurse_ancestor_tracking();
 
   pips_assert("stack is empty", current_stmt_empty_p());
 
