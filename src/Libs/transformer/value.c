@@ -340,14 +340,17 @@ bool analyzable_type_p(type t)
 bool analyzable_scalar_entity_p(entity e)
 {
   bool result = FALSE;
-  type ut = ultimate_type(entity_type(e));
 
-  /* entity_scalar_p(e) is information provided by the type. It should
-     be checked by type_variable_p() but I'm not sure of the dimension
-     information carried by ultimate_type() whose purpose was quite
-     different for the C scanner, providing the proper basic. */
-  if(type_variable_p(ut) && entity_scalar_p(e)) {
-    result = analyzable_type_p(ut);
+  if(!abstract_state_variable_p(e)) {
+    type ut = ultimate_type(entity_type(e));
+
+    /* entity_scalar_p(e) is information provided by the type. It should
+       be checked by type_variable_p() but I'm not sure of the dimension
+       information carried by ultimate_type() whose purpose was quite
+       different for the C scanner, providing the proper basic. */
+    if(type_variable_p(ut) && entity_scalar_p(e)) {
+      result = analyzable_type_p(ut);
+    }
   }
   return result;
 }
