@@ -90,8 +90,7 @@ extern void
 type_loop_range(basic, range, type_context_p);
 
 
-void
-CreateAreas()
+void CreateAreas()
 {
   make_entity(AddPackageToName(TOP_LEVEL_MODULE_NAME,
 			       DYNAMIC_AREA_LOCAL_NAME),
@@ -114,7 +113,8 @@ static void CreateLogicalUnits()
      - make an unbounded dimension for this entity
   */
 
-  entity ent;
+  entity ent = entity_undefined;
+  entity luns = entity_undefined;
   sequence s = make_sequence(NIL);
   code c = make_code(NIL, strdup(""), s, NIL);
 
@@ -185,47 +185,52 @@ static void CreateLogicalUnits()
               make_value(is_value_unknown, UU));
 
   /* GO: entity for io logical units: It is an array which*/
-  make_entity(AddPackageToName(IO_EFFECTS_PACKAGE_NAME,
-                               IO_ERROR_ARRAY_NAME),
-        MakeTypeArray(make_basic_logical(IO_EFFECTS_UNIT_SPECIFIER_LENGTH),
-                      CONS(DIMENSION,
-                           make_dimension
-                           (MakeIntegerConstantExpression("0"),
-                            /*
-                              MakeNullaryCall
-                              (CreateIntrinsic(UNBOUNDED_DIMENSION_NAME))
-                            */
-                            MakeIntegerConstantExpression("2000")
-                            ),
-                           NIL)),
-              /* make_storage(is_storage_ram,
-                 make_ram(entity_undefined, DynamicArea, 0, NIL))
-              */
-              make_storage(is_storage_ram,
-                           make_ram(ent,
-                           global_name_to_entity(IO_EFFECTS_PACKAGE_NAME,
-                                                 STATIC_AREA_LOCAL_NAME),
-                                    0, NIL)),
-              make_value(is_value_unknown, UU));
+  luns = make_entity(AddPackageToName(IO_EFFECTS_PACKAGE_NAME,
+				      IO_ERROR_ARRAY_NAME),
+		     MakeTypeArray(make_basic_logical(IO_EFFECTS_UNIT_SPECIFIER_LENGTH),
+				   CONS(DIMENSION,
+					make_dimension
+					(MakeIntegerConstantExpression("0"),
+					 /*
+					   MakeNullaryCall
+					   (CreateIntrinsic(UNBOUNDED_DIMENSION_NAME))
+					 */
+					 MakeIntegerConstantExpression("2000")
+					 ),
+					NIL)),
+		     /* make_storage(is_storage_ram,
+			make_ram(entity_undefined, DynamicArea, 0, NIL))
+		     */
+		     make_storage(is_storage_ram,
+				  make_ram(ent,
+					   global_name_to_entity(IO_EFFECTS_PACKAGE_NAME,
+								 STATIC_AREA_LOCAL_NAME),
+					   0, NIL)),
+		     make_value(is_value_unknown, UU));
 
   reset_current_module_entity();
+  add_abstract_state_variable(luns);
 }
-// added to handle xxxrandxxx functions.Amira Mensi
-static void CreateRandomSeed()
+
+/* added to handle xxxrandxxx functions.Amira Mensi and then
+   generalized for other hidden libc variables
+*/
+static entity CreateAbstractStateVariable(string pn, string vn)
 {
   /* First a dummy function - close to C one "crt0()" - in order to
      - link the next entity to its ram
      - make an unbounded dimension for this entity
   */
 
-  entity ent;
+  entity ent = entity_undefined;
+  entity as = entity_undefined;
   sequence s = make_sequence(NIL);
   code c = make_code(NIL, strdup(""), s, NIL);
 
   code_initializations(c) = s;
 
   ent = make_entity(AddPackageToName(TOP_LEVEL_MODULE_NAME,
-				     RAND_EFFECTS_PACKAGE_NAME),
+				     pn),
 		    make_type(is_type_functional,
 			      make_functional(NIL,make_type(is_type_void,
 							    NIL))),
@@ -234,31 +239,48 @@ static void CreateRandomSeed()
 
   set_current_module_entity(ent);
 
-  make_entity(AddPackageToName(RAND_EFFECTS_PACKAGE_NAME,
+  make_entity(AddPackageToName(pn,
 			       STATIC_AREA_LOCAL_NAME),
 	      make_type(is_type_area, make_area(0, NIL)),
 	      make_storage(is_storage_rom, UU),
 	      make_value(is_value_unknown, UU));
 
-  /* entity for random seed: It is an unsigned int*/
-  make_entity(AddPackageToName(RAND_EFFECTS_PACKAGE_NAME,
-			       RAND_GEN_EFFECTS_NAME),
-	      make_scalar_integer_type(DEFAULT_INTEGER_TYPE_SIZE),
-	      /* make_storage(is_storage_ram,
-                 make_ram(entity_undefined, DynamicArea, 0, NIL))
-              */
-              make_storage(is_storage_ram,
-                           make_ram(ent,
-                           global_name_to_entity(RAND_EFFECTS_PACKAGE_NAME,
-                                                 STATIC_AREA_LOCAL_NAME),
-                                    0, NIL)),
-              make_value(is_value_unknown, UU));
-
-
+  /* entity for random seed or other abstract states like heap: It is
+     an unsigned int. */
+  as = make_entity(AddPackageToName(pn, vn),
+		   make_scalar_integer_type(DEFAULT_INTEGER_TYPE_SIZE),
+		   /* make_storage(is_storage_ram,
+		      make_ram(entity_undefined, DynamicArea, 0, NIL))
+		   */
+		   make_storage(is_storage_ram,
+				make_ram(ent,
+					 global_name_to_entity(pn,
+							       STATIC_AREA_LOCAL_NAME),
+					 0, NIL)),
+		   make_value(is_value_unknown, UU));
 
   reset_current_module_entity();
+  return as;
 }
 
+// added to handle xxxrandxxx functions.Amira Mensi
+static void CreateRandomSeed()
+{
+  entity as =
+    CreateAbstractStateVariable(RAND_EFFECTS_PACKAGE_NAME, RAND_GEN_EFFECTS_NAME);
+  //add_thread_safe_variable(as);
+  add_abstract_state_variable(as);
+}
+
+static void CreateHeapAbstractState()
+{
+  entity as =
+    CreateAbstractStateVariable(MALLOC_EFFECTS_PACKAGE_NAME, MALLOC_EFFECTS_NAME);
+
+  add_thread_safe_variable(as);
+  add_abstract_state_variable(as);
+}
+
 static list
 make_parameter_list(int n, parameter (* mkprm)(void))
 {
@@ -4564,8 +4586,15 @@ bootstrap(string workspace)
    * which is used to create the logical unit array for IO effects
    */
   CreateLogicalUnits();
-  /* create seed for random function package*/
+
+  /* create hidden variables to modelize the abstract states defined by the libc:
+
+     seed for random function package
+
+     heap bastract state
+  */
   CreateRandomSeed();
+  CreateHeapAbstractState();
 
   /* Create the empty label */
   (void) make_entity(strdup(concatenate(TOP_LEVEL_MODULE_NAME,
