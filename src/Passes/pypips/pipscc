@@ -2,53 +2,121 @@
 import pyps
 import sys
 import os
+import shutil
 import string
 import tempfile
+import pickle
+import subprocess
 from pyps import module
+
+class object_code:
+	def __init__(self,sourcefile,cppflags,cflags):
+		self.cflags=cflags
+		CPP=os.getenv("CPP","cpp")
+		cmd=string.join([CPP,cppflags,sourcefile]," ")
+		out=os.popen(cmd,"r")
+		self.code=out.read()
+		out.close()
+		self.cname=sourcefile.replace(os.sep,"__")
 
 #
 ##
 #
 
 def pipscc():
+	WDIR="/tmp/pipscc"
 	"""run pips as if it was cc: .c -> pips -> .c -> cc -> .o"""
-	# filters out CPP flags
-	CPPFLAGS=os.getenv("CPPFLAGS","")
+	# look compilation mode
+	compilation_mode="link"
+	for opt in sys.argv[1:]:
+		if opt == "-c" :compilation_mode="compile"
+	
+	# filters out CPPFLAGS
+	CPPFLAGS=""
 	for opt in sys.argv[1:]:
 		if opt[0:2] == "-D" or opt[0:2] == "-I" :
 			CPPFLAGS+=' "' + opt + '"'
 			sys.argv.remove(opt)
 	print "# CPPFLAGS: ", CPPFLAGS
 
-	# working repository
-	tmpDir=tempfile.mkdtemp("pipscc")
-	print "# intermediate files generated in", tmpDir
+	if compilation_mode == "compile":
+		OUTFILE=""
+		for opt in sys.argv[1:]:
+			if opt[0] == '-o':
+				index=sys.argv.index(opt)
+				OUTFILE=sys.argv[index+1]
+				break
 
-	# filters out files
-	INPUT_FILES=[]
-	for opt in sys.argv[1:]:
-		if opt[0] != '-':
-			index=sys.argv.index(opt)
-			INPUT_FILES+=[opt]
-			sys.argv[index] = tmpDir+os.sep+os.path.basename(opt)
-	print "# input files: ", reduce(lambda x,y:x+" "+y,INPUT_FILES,"")
+		INPUT_FILE=""
+		for opt in sys.argv[1:]:
+			if opt[0] != '-':
+				if not OUTFILE:
+					OUTFILE=opt
+					OUTFILE=OUTFILE[0:-1]+"o"
+				index=sys.argv.index(opt)
+				o=object_code(opt,CPPFLAGS,sys.argv[1:])
+				sys.argv[index] = WDIR+os.sep+os.path.basename(opt)
+				newobj=file(OUTFILE,"w")
+				pickle.dump(o,newobj)
+				newobj.close()
+				print "# OBJ written: ", OUTFILE
+	else:
+		# working repository
+		#tmpDir=tempfile.mkdtemp("/tmp/pipscc")
+		if os.path.exists(WDIR): 
+			shutil.rmtree(WDIR)
+		os.mkdir(WDIR)
 
-	# run pips with this informations
-	print "# running pips"
-	ws = pyps.workspace(INPUT_FILES)
-	# add extra operations there 
-	map(module.suppress_dead_code,ws)
 
-	# commit changes
-	ws.save(indir=tmpDir)
-	# the end for pips
-	ws.quit()
+		print "# intermediate files generated in", WDIR
 
-	# now run the compiler
-	CC=os.getenv("CC","gcc")
-	cmd=reduce(lambda x,y:x+" "+y,sys.argv[1:],CC)
-	print "# running", cmd
-	os.system(cmd)
+		# filters in files
+		INPUT_FILES=[]
+		O_FILES=[]
+		for opt in sys.argv[1:]:
+			if opt[0] != '-' and opt[-2:]==".o":
+				o=pickle.load(file(opt,"r"))
+				index=sys.argv.index(opt)
+				o.cname=WDIR+os.sep+o.cname
+				o.oname=sys.argv[index]
+				ifile=file(o.cname,"w")
+				ifile.write(o.code)
+				ifile.close()
+				INPUT_FILES+=[o.cname]
+				O_FILES+=[o]
+				for op in o.cflags:
+					if op == "-c":
+						i=o.cflags.index(op)
+						o.cflags[i+1]=o.cname
+						break
+
+		print "# input files: ", reduce(lambda x,y:x+" "+y,INPUT_FILES,"")
+
+		# run pips with this informations
+		print "# running pips"
+		ws = pyps.workspace(INPUT_FILES)
+		# add extra operations there 
+		#map(module.suppress_dead_code,ws)
+
+		# commit changes
+		ws.save(indir=WDIR)
+		# the end for pips
+		ws.quit()
+
+		# now run the compiler
+		CC=os.getenv("CC","gcc")
+		for obj in O_FILES:
+			cmd=[CC]+obj.cflags+["-o",obj.oname]
+			print "# running", cmd
+			sp=subprocess.Popen(cmd)
+			sp.wait()
+
+		cmd=reduce(lambda x,y:x+" "+y,sys.argv[1:],CC)
+		print "# running", cmd
+		res=os.system(cmd)
+		exitcode= (res >>8)& 0xFF
+		if exitcode:
+			shutil.rmtree(WDIR)
 
 
 #
