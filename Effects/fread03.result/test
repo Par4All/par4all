@@ -134,8 +134,8 @@ byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
 //               <must be read   >: file
 
    fclose(file);
-//               <must be read   >: _MALLOC_ buffer
-//               <must be written>: _MALLOC_
+//               <must be read   >: buffer _MALLOC_EFFECTS:_MALLOC_
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_
    free(buffer);
 //               <must be read   >: m
 
@@ -149,8 +149,10 @@ Cumulated effects for "LoadPGM_bmatrix"
 //               <may be written >: TOP-LEVEL:*MEMORY* 
 //                                  __IO_EFFECTS:LUNS[*]
 //               <must be read   >: filename nch nch[0] ncl ncl[0] nrh
-//                                  nrh[0] nrl nrl[0]
-//               <must be written>: nch[0] ncl[0] nrh[0] nrl[0]
+//                                  nrh[0] nrl nrl[0] 
+//                                  _MALLOC_EFFECTS:_MALLOC_
+//               <must be written>: nch[0] ncl[0] nrh[0] nrl[0] 
+//                                  _MALLOC_EFFECTS:_MALLOC_
 byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
 {
    int height;
@@ -218,8 +220,8 @@ byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
 //               <must be read   >: file
 
    fclose(file);
-//               <must be read   >: _MALLOC_ buffer
-//               <must be written>: _MALLOC_
+//               <must be read   >: buffer _MALLOC_EFFECTS:_MALLOC_
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_
    free(buffer);
 //               <must be read   >: m
 

@@ -34,5 +34,5 @@ activate PRINT_CODE_REGIONS
 display PRINTED_FILE[main]
 
 close
-delete rand01
+# delete rand01
 quit
