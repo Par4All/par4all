@@ -696,7 +696,7 @@ bool integer_scalar_entity_p(entity e)
 bool entity_atomic_reference_p(entity e)
 {
   type t = entity_type(e);
-  variable vt = type_variable(t);
+  //variable vt = type_variable(t);
   type ut = ultimate_type(entity_type(e));
   variable uvt = type_variable(ut);
   bool atomic_p = FALSE;
@@ -731,7 +731,7 @@ bool entity_non_pointer_scalar_p(entity e)
 
   pips_assert("entity e is a variable", type_variable_p(ct));
 
-  if(ENDP(variable_dimensions(vt))) 
+  if(ENDP(variable_dimensions(vt)))
     {
       /* The property is not true for overloaded, string, derived
        */
@@ -739,7 +739,7 @@ bool entity_non_pointer_scalar_p(entity e)
       atomic_p = basic_int_p(bt) || basic_float_p(bt) || basic_logical_p(bt)
 	|| basic_complex_p(bt) || basic_bit_p(bt);
     }
-  
+
   free_type(ct);
   return atomic_p;
 }
@@ -1238,9 +1238,9 @@ bool implicit_c_variable_p(entity v)
 }
 
 
-/* Returns initial expression of variable v. If v's inital value is a
-   constants or a code block, it is converted to the corresponding
-   exception.
+/* Returns a copy of the initial expression of variable v. If v's
+   inital value is a constants or a code block, it is converted to the
+   corresponding expression.
 */
 expression variable_initial_expression(entity v)
 {
@@ -1282,4 +1282,30 @@ expression variable_initial_expression(entity v)
   }
 
   return exp;
+}
+
+/* Check if a variable is initialized by itself as "int a = a;" is
+   legal C code according to gcc. */
+bool self_initialization_p(entity v)
+{
+  bool self_p = FALSE;
+
+  expression e = variable_initial_expression(v);
+
+  if(expression_undefined_p(e))
+    self_p = FALSE;
+  else {
+    /* sd v referenced in e? */
+    list lr = expression_to_reference_list(e, NIL);
+
+    FOREACH(REFERENCE, r, lr) {
+      entity rv = reference_variable(r);
+      if(v==rv) {
+	self_p = TRUE;
+	break;
+      }
+    }
+    gen_free_list(lr);
+  }
+  return self_p;
 }

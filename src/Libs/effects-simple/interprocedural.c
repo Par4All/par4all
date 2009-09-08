@@ -158,7 +158,8 @@ list effects_dynamic_elim(list l_eff)
     boolean ignore_this_effect = FALSE;
 
     ifdebug(4) {
-      pips_debug(4, "current effect for entity \"\%s\":\n",entity_name(eff_ent));
+      pips_debug(4, "current effect for entity \"\%s\":\n",
+		 entity_name(eff_ent));
       print_effect(eff);
     }
 
@@ -189,7 +190,7 @@ list effects_dynamic_elim(list l_eff)
 		   results with Effects/fulguro01.c */
 		value v = entity_initial(eff_ent);
 
-		if(/*FALSE && */value_expression_p(v)) {
+		if(value_expression_p(v) && !self_initialization_p(eff_ent)) {
 		  expression ae = value_expression(v);
 		  /* Save the action before the effect may be changed */
 		  list nel, fel;
@@ -205,10 +206,11 @@ list effects_dynamic_elim(list l_eff)
 		  }
 		  else
 		    {
-		      /* c_summary_to_proper_effects can return several
-			 effects, but initially it was designed to return
-			 a single effect. I have to rebuild effects_dynamic_elim
-			 to take that into account. BC.
+		      /* c_summary_to_proper_effects can return
+			 several effects, but initially it was
+			 designed to return a single effect. I have to
+			 rebuild effects_dynamic_elim to take that
+			 into account. BC.
 		      */
 		      eff= EFFECT(CAR(fel));
 		    }

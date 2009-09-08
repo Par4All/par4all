@@ -928,7 +928,7 @@ expression Value_to_expression(Value v)
 {
     return(int_to_expression(VALUE_TO_INT(v)));
 }
-
+
 /* conversion of an expression into a list of references; references are
    appended to list lr as they are encountered; array references are
    added before their index expressions are scanned;
@@ -967,6 +967,50 @@ list syntax_to_reference_list(syntax s, list lr)
 	    },
 	     call_arguments(syntax_call(s)));
 	break;
+    case is_syntax_cast: {
+      cast c = syntax_cast(s);
+      expression e = cast_expression(c);
+      lr = expression_to_reference_list(e, lr);
+      break;
+    }
+    case is_syntax_sizeofexpression: {
+      sizeofexpression soe = syntax_sizeofexpression(s);
+      if(sizeofexpression_expression_p(soe)) {
+	expression e = sizeofexpression_expression(soe);
+	lr = expression_to_reference_list(e, lr);
+      }
+      break;
+    }
+    case is_syntax_subscript: {
+      subscript sub = syntax_subscript(s);
+      expression e = subscript_array(sub);
+      list il = subscript_indices(sub);
+      lr = expression_to_reference_list(e, lr);
+      FOREACH(EXPRESSION, i,il) {
+      lr = expression_to_reference_list(i, lr);
+      }
+      break;
+    }
+    case is_syntax_application: {
+      application app = syntax_application(s);
+      expression f = application_function(app);
+      list al = application_arguments(app);
+      lr = expression_to_reference_list(f, lr);
+      FOREACH(EXPRESSION, a,al) {
+      lr = expression_to_reference_list(a, lr);
+      }
+      break;
+    }
+    case is_syntax_va_arg: {
+      list two = syntax_va_arg(s);
+      FOREACH(SIZEOFEXPRESSION, soe, two) {
+	if(sizeofexpression_expression_p(soe)) {
+	  expression e = sizeofexpression_expression(soe);
+	  lr = expression_to_reference_list(e, lr);
+	}
+      }
+      break;
+    }
     default:
 	pips_error("syntax_to_reference_list","illegal tag %d\n",
 		   syntax_tag(s));
