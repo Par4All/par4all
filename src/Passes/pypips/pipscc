@@ -14,10 +14,10 @@ class object_code:
 	def __init__(self,sourcefile,cppflags,cflags):
 		self.cflags=cflags
 		CPP=os.getenv("CPP","cpp")
-		cmd=string.join([CPP,cppflags,sourcefile]," ")
-		out=os.popen(cmd,"r")
-		self.code=out.read()
-		out.close()
+		cmd=[CPP]+cppflags+[sourcefile]
+		sp=subprocess.Popen(cmd,stdout=subprocess.PIPE)
+		sp.wait()
+		self.code=sp.stdout.read()
 		self.cname=sourcefile.replace(os.sep,"__")
 	def set_cname(self,cname):
 		self.cname=cname
@@ -40,10 +40,10 @@ def ofile():
 	return ""
 
 def cppflags():
-	flags=""
+	flags=[]
 	for opt in sys.argv[1:]:
 		if opt[0:2] == "-D" or opt[0:2] == "-I" :
-			flags+=' "' + opt + '"'
+			flags+=[opt]
 			sys.argv.remove(opt)
 	return flags
 
