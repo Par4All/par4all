@@ -166,6 +166,14 @@ bool find_write_effect_on_entity(statement s, entity e)
 	return false;
 }
 
+bool has_similar_entity(entity e,set se)
+{
+    SET_FOREACH(entity,ee,se)
+        if( same_string_p(entity_user_name(e),entity_user_name(ee)))
+            return true;
+    return false;
+}
+
 
 
 /* look for entity locally named has `new' in statements `s'
@@ -175,6 +183,7 @@ static void
 solve_name_clashes(statement s, entity new)
 {
     list l = statement_declarations(s);
+    set re = get_referenced_entities(s);
     for(;!ENDP(l);POP(l))
     {
         entity decl_ent = ENTITY(CAR(l));
@@ -187,12 +196,13 @@ solve_name_clashes(statement s, entity new)
                 string tmp =strdup( concatenate( ename, "_" , NULL ) );
                 free(ename);
                 ename=tmp;
-            } while( !entity_undefined_p(gen_find_tabulated( ename, entity_domain))  );
-            entity_name(solve_clash)=ename;
+                entity_name(solve_clash)=ename;
+            } while( has_similar_entity(solve_clash,re));
             CAR(l).p = (void*)solve_clash;
             replace_entity(s,decl_ent,solve_clash);
         }
     }
+    set_free(re);
 }
 
 /* return true if an entity declared in `iter' is static to `module'
