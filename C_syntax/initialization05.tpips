@@ -1,0 +1,40 @@
+delete initialization05
+
+setproperty ABORT_ON_USER_ERROR
+
+create initialization05 initialization05.c
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+activate C_PARSER
+
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate TRANSFORMERS_INTER_FULL
+activate PRECONDITIONS_INTER_FULL
+setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
+
+echo
+echo Printed file for "initialization05"
+echo
+
+display PRINTED_FILE[initialization05]
+
+echo
+echo Transformers for "initialization05"
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[initialization05]
+
+echo
+echo Preconditions for "initialization05"
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[initialization05]
+
+close
+delete initialization05
+
+quit
