@@ -33,3 +33,37 @@ int main(int argc, char *argv[])
 
    return 0;                                                            /*0013*/
 }
+int main(int argc, char *argv[])
+{
+   int i;
+   int j;
+   int *a[64];
+
+#pragma omp parallel for private(j)
+   for(i = 0; i <= 63; i += 1) {                                        /*0006*/
+      /*sizeof(float)*/
+      a[i] = malloc(64*4);                                              /*0007*/
+#pragma omp parallel for 
+      for(j = 0; j <= 63; j += 1)                                       /*0008*/
+         a[i][j] = 0.;                                                  /*0009*/
+   }
+
+   return 0;                                                            /*0013*/
+}
+int main(int argc, char *argv[])
+{
+   int i;
+   int j;
+   int *a[64];
+
+#pragma omp parallel for private(j)
+   for(i = 0; i <= 63; i += 1) {                                        /*0006*/
+      /*sizeof(float)*/
+      a[i] = malloc(64*4);                                              /*0007*/
+#pragma omp parallel for 
+      for(j = 0; j <= 63; j += 1)                                       /*0008*/
+         a[i][j] = 0.;                                                  /*0009*/
+   }
+
+   return 0;                                                            /*0013*/
+}
