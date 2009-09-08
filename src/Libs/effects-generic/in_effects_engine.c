@@ -283,6 +283,26 @@ in_effects_of_test(test t)
     debug_consistent(l_in);
 }
 
+/* Rin[for (c) s] = Rr[for (c) s] * may
+ */
+static void in_effects_of_forloop(forloop f)
+{
+  statement current;
+  list /* of effect */ lin;
+
+  pips_debug(9, "considering for loop 0x%p\n", (void *) f);
+
+  current = effects_private_current_stmt_head();
+  lin = load_rw_effects_list(current);
+  lin = effects_read_effects_dup(lin);
+  /* switch to MAY... */
+  MAP(EFFECT, e, 
+      approximation_tag(effect_approximation(e)) = is_approximation_may,
+      lin);
+  store_in_effects_list(current, lin);
+  store_invariant_in_effects_list(current, NIL);
+}
+
 /* Rin[while (c) s] = Rr[while (c) s] * may
  */
 static void in_effects_of_whileloop(whileloop w)
@@ -315,7 +335,7 @@ static void in_effects_of_loop(loop l)
     
     range r;
     statement b;
-    entity i, i_prime, new_i = entity_undefined;
+    entity i, i_prime = entity_undefined, new_i = entity_undefined;
     
     list lbody_in; /* in regions of the loop body */
     list global_in, global_in_read_only;/* in regions of non local variables */
@@ -730,7 +750,8 @@ in_effects_of_module_statement(statement module_stat)
 	call_domain, gen_true, in_effects_of_call,
 	loop_domain, gen_true, in_effects_of_loop,
 	whileloop_domain, gen_true, in_effects_of_whileloop,
-	unstructured_domain, gen_true, in_effects_of_unstructured,
+	forloop_domain, gen_true, in_effects_of_forloop,
+	 unstructured_domain, gen_true, in_effects_of_unstructured,
 	expression_domain, gen_false, gen_null, /* NOT THESE CALLS */
 	NULL);     
 

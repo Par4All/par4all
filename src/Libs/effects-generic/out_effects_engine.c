@@ -326,7 +326,7 @@ out_effects_from_loop_to_body(loop l)
     range r = loop_range(l);
     descriptor range_descriptor = descriptor_undefined;
     transformer loop_trans = (*load_transformer_func)(loop_stat);
-    transformer loop_proper_context;
+    transformer loop_proper_context = transformer_undefined;
 
     pips_debug(1, "begin\n");
     pips_debug(1, "loop index %s.\n", entity_minimal_name(i));
@@ -557,6 +557,23 @@ out_effects_from_test_to_branches(test t)
     return(TRUE);
 }
 
+/* Rout[s in for(c)s] = Rw[s] * MAY ?
+ */
+static bool out_effects_from_for_to_body(forloop f)
+{
+  statement body;
+  list /* of effect */ lout;
+
+  body = forloop_body(f);
+  lout = effects_write_effects_dup(load_rw_effects_list(body));
+  MAP(EFFECT, e,
+      approximation_tag(effect_approximation(e)) = is_approximation_may,
+      lout);
+  store_out_effects_list(body, lout);
+
+  return TRUE;
+}
+
 /* Rout[s in while(c)s] = Rw[s] * MAY ?
  */
 static bool out_effects_from_while_to_body(whileloop w)
@@ -743,7 +760,8 @@ out_effects_of_module_statement(statement module_stat)
       test_domain, out_effects_from_test_to_branches, gen_null,
       loop_domain, out_effects_from_loop_to_body, gen_null,
       whileloop_domain, out_effects_from_while_to_body, gen_null,
-      unstructured_domain, out_effects_from_unstructured_to_nodes, gen_null,
+      forloop_domain, out_effects_from_for_to_body, gen_null,
+       unstructured_domain, out_effects_from_unstructured_to_nodes, gen_null,
       call_domain, gen_false, gen_null, /* calls are treated in another phase*/
       NULL);     
 
