@@ -39,12 +39,12 @@ void flgr1d_arith_add_fgINT32(FLGR_Data1D *datdest, FLGR_Data1D *data1, FLGR_Dat
    int spp = datdest->spp;
    int length = datdest->length*spp;
    for(j = 0; j <= length-1; j += 1) {
-      _return1 = flgr_get_array_fgINT32(psrc1, j);
-      v1 = _return1;
-      _return2 = flgr_get_array_fgINT32(psrc2, j);
-      v2 = _return2;
-      _return0 = v1+v2;
-      result = _return0;
+      _return0 = flgr_get_array_fgINT32(psrc1, j);
+      v1 = _return0;
+      _return1 = flgr_get_array_fgINT32(psrc2, j);
+      v2 = _return1;
+      _return2 = v1+v2;
+      result = _return2;
       flgr_set_array_fgINT32(pdest, j, result);
    }
    return;
