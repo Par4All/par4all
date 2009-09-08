@@ -1,0 +1,38 @@
+
+Initial code
+
+void foo(int bar[256][256])
+{
+   int i;
+   int j;
+   for(i = 0; i <= 255; i += 1)
+kernel:
+      for(j = 0; j <= 255; j += 1)
+         bar[i][j] = K*i*j;
+}
+int K = 12;
+extern void foo(int bar[256][256]);
+
+Code after outlining
+
+void foo(int bar[256][256])
+{
+   int i;
+   int j;
+   for(i = 0; i <= 255; i += 1)
+kernel:      kernel(i, bar);
+}
+void kernel(int i, int bar[256][256])
+{
+   int j;
+   extern int K;
+kernel:
+   for(j = 0; j <= 255; j += 1)
+      bar[i][j] = K*i*j;
+}
+void kernel(int i, int bar[256][256]);
+int K = 12;
+extern void foo(int bar[256][256]);
+
+unsplit
+
