@@ -1117,6 +1117,7 @@ statement outliner(string outline_module_name, list statements_to_outline)
     gen_list_and_not(&referenced_entities,declared_entities);
     gen_free_list(declared_entities);
 
+
     /* purge the functions from the parameter list, we assume they are declared externally
      * also purge the formal parameters from other modules, gathered by get_referenced_entities but wrong here
      */
@@ -1127,7 +1128,23 @@ statement outliner(string outline_module_name, list statements_to_outline)
                 !( entity_formal_p(e) && (!same_string_p(entity_module_name(e),get_current_module_name()))) )
             tmp_list=CONS(ENTITY,e,tmp_list);
     }
+    gen_free_list(referenced_entities);
     referenced_entities=tmp_list;
+
+    /* remove global variables if needed */
+    if(get_bool_property("OUTLINE_ALLOW_GLOBALS"))
+    {
+        tmp_list=NIL;
+        FOREACH(ENTITY,e,referenced_entities)
+        {
+            if(!top_level_entity_p(e))
+                tmp_list=CONS(ENTITY,e,tmp_list);
+            else
+                statement_declarations(body)=gen_nconc(statement_declarations(body),CONS(ENTITY,e,NIL));
+        }
+        gen_free_list(referenced_entities);
+        referenced_entities=tmp_list;
+    }
 
     gen_sort_list(referenced_entities,(gen_cmp_func_t)compare_entities_with_dep);
 
