@@ -182,7 +182,8 @@ list effects_dynamic_elim(list l_eff)
 
 	    if(pointer_type_p(ut))
 	      if(!ENDP(sl)) {
-		/* Can we convert this effect using the pointer initial value? */
+		/* Can we convert this effect using the pointer
+		   initial value? */
 		/* FI: this should rather be done after a constant
 		   pointer analysis but I'd like to improve quickly
 		   results with Effects/fulguro01.c */
@@ -205,9 +206,9 @@ list effects_dynamic_elim(list l_eff)
 		  else
 		    {
 		      /* c_summary_to_proper_effects can return several
-			 effects, but initially it was designed to return 
+			 effects, but initially it was designed to return
 			 a single effect. I have to rebuild effects_dynamic_elim
-			 to take that inot account. BC.
+			 to take that into account. BC.
 		      */
 		      eff= EFFECT(CAR(fel));
 		    }
@@ -217,7 +218,7 @@ list effects_dynamic_elim(list l_eff)
 		}
 		else {
 		  action ac = effect_action(eff);
-		  pips_debug(5, "Local pointer \"%s\" is not initialized!\n", 
+		  pips_debug(5, "Local pointer \"%s\" is not initialized!\n",
 			     entity_name(eff_ent));
 		  if(action_write_p(ac))
 		    add_anywhere_write_effect_p = TRUE;
@@ -227,12 +228,12 @@ list effects_dynamic_elim(list l_eff)
 		}
 	      }
 	      else {
-		pips_debug(5, "Local pointer \"%s\" can be ignored\n", 
+		pips_debug(5, "Local pointer \"%s\" can be ignored\n",
 			   entity_name(eff_ent));
 		ignore_this_effect = TRUE;
 	      }
-	    else { 
-	      pips_debug(5, "dynamic or pointed var ignored (%s)\n", 
+	    else {
+	      pips_debug(5, "dynamic or pointed var ignored (%s)\n",
 			 entity_name(eff_ent));
 	      ignore_this_effect = TRUE;
 	    }
@@ -252,26 +253,26 @@ list effects_dynamic_elim(list l_eff)
 	if(!entity_special_area_p(eff_ent) && !anywhere_effect_p(eff))
 	  ignore_this_effect = TRUE;
 	break;
-	/*  pips_internal_error("bad tag for %s (rom)\n", 
+	/*  pips_internal_error("bad tag for %s (rom)\n",
 	    entity_name(eff_ent));*/
       default:
 	pips_internal_error("case default reached\n");
       }
     }
-	
+
     if (! ignore_this_effect)  /* Eliminate dynamic variables. */ {
       /* FI: this macro is not flexible enough */
       /* effect eff_res = make_sdfi_effect(eff); */
       effect eff_res = translate_effect_to_sdfi_effect(eff);
       ifdebug(4) {
-	pips_debug(4, "effect preserved for variable \"\%s\": \n", 
+	pips_debug(4, "effect preserved for variable \"\%s\": \n",
 		   entity_name(effect_variable(eff_res)));
 	print_effect(eff_res);
       }
       l_res = CONS(EFFECT, eff_res, l_res);
     }
     else ifdebug(4) {
-	pips_debug(4, "effect removed for variable \"\%s\": \n\t %s\n", 
+	pips_debug(4, "effect removed for variable \"\%s\": \n\t %s\n",
 		   entity_name(effect_variable(eff)),
 		   words_to_string(words_effect(eff)));
       }
@@ -285,9 +286,9 @@ list effects_dynamic_elim(list l_eff)
 }
 
 
-/* 
-  returns a linear expression giving the size of the n dimension sub-array 
-  of array a 
+/*
+  returns a linear expression giving the size of the n dimension sub-array
+  of array a
   returns NULL if size of array a is not a linear expression.
 */
 static Pvecteur 
