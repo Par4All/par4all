@@ -1109,11 +1109,12 @@ effect make_reference_region(reference ref, tag tac)
 {
   entity e = reference_variable(ref);
   type t = entity_type(e);
-  int d = type_depth(t), dim;
   effect reg;
   boolean linear_p = TRUE;
   Psysteme sc;
-  bool pointer_p = pointer_type_p(ultimate_type(t));
+  type  bct = basic_concrete_type(t);
+  int d = effect_type_depth(bct), dim;
+  bool pointer_p = pointer_type_p(bct);
   list reg_ref_inds = NIL;
 
   /* first make the predicate according to ref */
@@ -1123,7 +1124,7 @@ effect make_reference_region(reference ref, tag tac)
       pips_debug(3, "Reference : \"%s\"",
 		 words_to_string(words_reference(ref)));
       fprintf(stderr, "(it's %s a pointer)\n", pointer_p?"":"not");
-      pips_debug(3,"type depth is %d\n", d);
+      pips_debug(3,"effect type depth is %d\n", d);
     }
 
   /* FI: If t is a pointer type, then d should depend on the type_depth
@@ -1139,8 +1140,8 @@ effect make_reference_region(reference ref, tag tac)
 
       pips_debug(8, "pointer or array case \n");
 
-      pips_assert("The number of indices is less or equal to the type depth, "
-		  "unless we are dealing with a pointer",
+      pips_assert("The number of indices is less or equal to the possible "
+		  "effect type depth, unless we are dealing with a pointer.\n",
 		  (int) gen_length(ind) <= d || pointer_p);
 
       if (fortran_module_p(get_current_module_entity())
@@ -1229,6 +1230,8 @@ effect make_reference_region(reference ref, tag tac)
 		     UU),
 		    sc);
   debug_region_consistency(reg);
+
+  free_type(bct);
 
   ifdebug(3)
     {
@@ -1414,7 +1417,7 @@ list region_to_store_independent_region_list(effect reg,
 					     bool __attribute__ ((unused)) force_may_p)
 {
     reference ref =  effect_any_reference(reg);
-    effect eff = reference_whole_region(ref, region_action_tag(eff));
+    effect eff = reference_whole_region(ref, region_action_tag(reg));
     return(CONS(EFFECT,eff,NIL));
 }
 
