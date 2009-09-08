@@ -18,15 +18,11 @@ echo
 echo Code after outlining
 echo
 
-apply LOCALIZE_DECLARATION[foo]
-apply CLEAN_DECLARATIONS[foo]
 
 setproperty OUTLINE_MODULE_NAME "kernel"
+setproperty OUTLINE_LABEL "kernel"
 apply OUTLINE[foo]
-n
-n
-n
-y
+apply CLEAN_DECLARATIONS[foo]
 
 display PRINTED_FILE[%ALL]
 

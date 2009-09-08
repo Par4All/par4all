@@ -7,7 +7,7 @@ void foo(int bar[256][256])
    int j;
    for (i = 0;i<256;i++)
       for (j = 0;j<256;j++)
-         bar[i][j] = i*j;
+kernel:         bar[i][j] = i*j;
 }
 extern void foo(int bar[256][256]);
 
@@ -19,11 +19,11 @@ void foo(int bar[256][256])
    int j;
    for (i = 0;i<256;i++)
       for (j = 0;j<256;j++)
-         kernel(i, j, bar);
+kernel:         kernel(i, j, bar);
 }
 void kernel(int i, int j, int bar[256][256])
 {
-   bar[i][j] = i*j;
+kernel:   bar[i][j] = i*j;
 }
 void kernel(int i, int j, int bar[256][256]);
 extern void foo(int bar[256][256]);
