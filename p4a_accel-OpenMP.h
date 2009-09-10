@@ -30,8 +30,8 @@ double P4A_ACCEL_TIMER_STOP_AND_FLOAT_MEASURE(execution_time) {
   double run_time;
   gettimeofday(&p4a_time_end, NULL);
   /* Take care of the non-associativity in floating point :-) */
-  run_time = (p4a_time_end.tv_sec - p4a_time_begin.tv_sec)*1000
-    + (p4a_time_end.tv_usec - p4a_time_begin.tv_usec)/1e3;
+  run_time = (p4a_time_end.tv_sec - p4a_time_begin.tv_sec)
+    + (p4a_time_end.tv_usec - p4a_time_begin.tv_usec)*1e-6;
   return run_time;
 }
 

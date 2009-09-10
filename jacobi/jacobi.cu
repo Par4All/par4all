@@ -1,6 +1,6 @@
 /* Adapted from Terapix PIPS output */
 
-//#define P4A_DEBUG
+#define P4A_DEBUG
 #define P4A_ACCEL_CUDA
 #include <p4a_accel.h>
 
@@ -236,9 +236,9 @@ int main(int argc, char *argv[]) {
     compute(*p4a_var_space, *p4a_var_save);
 
   double execution_time = P4A_ACCEL_TIMER_STOP_AND_FLOAT_MEASURE();
-  fprintf(stderr, "Temps d'exécution : %f ms\n", execution_time);
+  fprintf(stderr, "Temps d'exécution : %f s\n", execution_time);
   fprintf(stderr, "GFLOPS : %f\n",
-	  4e-9/(execution_time/1000)*T*(SIZE - 1)*(SIZE - 1));
+	  4e-9/execution_time*T*(SIZE - 1)*(SIZE - 1));
 
   P4A_COPY_FROM_ACCEL(space, p4a_var_space, sizeof(space));
 

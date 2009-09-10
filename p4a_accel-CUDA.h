@@ -33,8 +33,11 @@ enum {
   //P4A_THREAD_PER_BLOCK_IN_1D = 5,
 
   /** The thread layout size per block in 2D organization */
-  P4A_THREAD_X_PER_BLOCK_IN_2D = 32,
-  P4A_THREAD_Y_PER_BLOCK_IN_2D = 16,
+  //P4A_THREAD_X_PER_BLOCK_IN_2D = 32,
+  //P4A_THREAD_Y_PER_BLOCK_IN_2D = 16,
+  // Better if the memory accesses are rather according to the X axis
+  P4A_THREAD_X_PER_BLOCK_IN_2D = 512,
+  P4A_THREAD_Y_PER_BLOCK_IN_2D = 1,
 
   /** The thread layout size per block in 3D organization */
   P4A_THREAD_X_PER_BLOCK_IN_3D = 8,
@@ -56,15 +59,17 @@ cudaEvent_t p4a_start_event, p4a_stop_event;
 /** Start a timer on the accelerator */
 #define P4A_ACCEL_TIMER_START cutilSafeCall(cudaEventRecord(p4a_start_event, 0))
 
-/** Stop a timer on the accelerator and get float ms time */
+/** Stop a timer on the accelerator and get float time in second */
 float P4A_ACCEL_TIMER_STOP_AND_FLOAT_MEASURE() {
   float execution_time;
   cutilSafeCall(cudaEventRecord(p4a_stop_event, 0));
   cutilSafeCall(cudaEventSynchronize(p4a_stop_event));
+  /* Get the time in ms: */
   cutilSafeCall(cudaEventElapsedTime(&execution_time,
 				     p4a_start_event,
 				     p4a_stop_event));
-  return execution_time;
+  /* Return the time in second: */
+  return execution_time*1e-3;
 }
 
 /** @} */
