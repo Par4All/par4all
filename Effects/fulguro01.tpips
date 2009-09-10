@@ -9,7 +9,6 @@ setenv PIPS_CPP_FLAGS=" -D__u64='unsigned long long' -D__s64='long long' -D__sig
 
 create fulguro01 fulguro01.c
 activate C_PARSER
-# activate PRINT_XML_APPLICATION
 activate C_SYMBOL_TABLE
 
 setproperty PRETTYPRINT_C_CODE TRUE
