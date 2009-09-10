@@ -370,7 +370,7 @@ module_to_declaration_length(entity func)
 	    }
 	}
 	else {
-	    pips_internal_error("Entity %s is not a module", 
+	    pips_internal_error("Entity %s is not a module",
 				entity_name(func));
 	}
     }
@@ -393,9 +393,9 @@ list declaration_supporting_references(list dl)
   {
     if( ! entity_special_area_p(v))
     {
-        type t = entity_type(v);
-        /* FI: we should also look up the initial values */
-        srl = type_supporting_references(srl, t);
+      type t = entity_type(v);
+      /* FI: we should also look up the initial values */
+      srl = type_supporting_references(srl, t);
     }
   }
 

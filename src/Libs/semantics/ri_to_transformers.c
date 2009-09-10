@@ -877,15 +877,36 @@ transformer any_user_call_site_to_transformer(entity f,
   list pl = functional_parameters(fft);
   list cpl = pl; // to simplify debugging
   int n = 1; /* Formal parameters are counted 1, 2, 3,...*/
+  int mn = 1000 /*MAX_INT*/; /* Maximal numer of actual arguments that can be
+		       used. */
   list fpvl = NIL; // list of formal parameter values
 
   if(gen_length(pl)!= gen_length(pc)) {
     /* This may happen with a void declaration */
     if(!(gen_length(pl)==1 && gen_length(pc)==0
-	 && type_void_p(parameter_type(PARAMETER(CAR(pl))))))
-      pips_user_error("Different numbers of actual and formal parameters"
+	 && type_void_p(parameter_type(PARAMETER(CAR(pl)))))) {
+      /* This may happen with a varargs: the number of actual
+	 arguments is strictly greater than the number of formal
+	 parameters */
+      if(gen_length(pl)< gen_length(pc)) {
+	parameter lp = PARAMETER(CAR(gen_last(pl)));
+	type lpt = ultimate_type(parameter_type(lp));
+	if(type_varargs_p(lpt)) {
+	  /* The first actual arguments can be used */
+	  mn = gen_length(pl)-1;
+	}
+	else {
+	  pips_user_error("Different numbers of actual and formal parameters"
+			  "(%d and %d) for function \"%s\"\n",
+			  gen_length(pl), gen_length(pc), entity_user_name(f));
+	}
+      }
+      else {
+	pips_user_error("Different numbers of actual and formal parameters"
 		      "(%d and %d) for function \"%s\"\n",
 		      gen_length(pl), gen_length(pc), entity_user_name(f));
+      }
+    }
   }
 
   /* Evaluate actual arguments from left to right linking it to a
@@ -943,7 +964,7 @@ transformer any_user_call_site_to_transformer(entity f,
 			" for %d argument of function %s\n", n, entity_user_name(f));
 	*/
 	pips_user_warning("Type incompatibility between call site and declaration"
-			" for argument \"%s\" (rank %d\) of function \"%s\" "
+			  " for argument \"%s\" (rank %d\) of function \"%s\" "
 			  "called from function \"%s\": %s/%s\n",
 			  entity_user_name(fpv), n, entity_user_name(f),
 			  entity_user_name(get_current_module_entity()),
@@ -969,6 +990,9 @@ transformer any_user_call_site_to_transformer(entity f,
     n++;
     free_type(apt);
     free_basic(b);
+    /* Can we still use the next actual parameter? Maybe not because
+       of a vararg. */
+    if(n>mn) break;
   }
 
   gen_free_list(fpvl);
@@ -993,8 +1017,8 @@ transformer c_user_call_to_transformer(entity f,
   tf = transformer_combine(tf, t_callee);
 
   /* Project the former parameters and the temporary values. */
-  tf = transformer_formal_parameter_projection(f, tf);
   tf = transformer_temporary_value_projection(tf);
+  tf = transformer_formal_parameter_projection(f, tf);
 
   return tf;
 }
@@ -1157,22 +1181,21 @@ transformer fortran_user_call_to_transformer(entity f,
 
   pips_debug(8, "Before formal new values left over are eliminated\n");
   ifdebug(8)   dump_transformer(t_caller);
-	
 
   /* formal new and old values left over are eliminated */
   MAPL(ce,{entity e = ENTITY(CAR(ce));
-      entity e_new = external_entity_to_new_value(e); 
+      entity e_new = external_entity_to_new_value(e);
       formals_new = CONS(ENTITY, e_new, formals_new);
       /* test to insure that entity_to_old_value exists */
-      if(entity_is_argument_p(e_new, 
+      if(entity_is_argument_p(e_new,
 			      transformer_arguments(t_caller))) {
 	entity e_old = external_entity_to_old_value(e);
 	formals_new = CONS(ENTITY, e_old, formals_new);
       }},
     formals);
-		 
+
   t_caller = transformer_filter(t_caller, formals_new);
-		 
+
   free_arguments(formals_new);
   free_arguments(formals);
 
@@ -1188,7 +1211,7 @@ transformer fortran_user_call_to_transformer(entity f,
   caller = get_current_module_entity();
   translate_global_values(caller, t_caller);
 
-  /* FI: are invisible variables taken care of by translate_global_values()? 
+  /* FI: are invisible variables taken care of by translate_global_values()?
    * Yes, now...
    * A variable may be invisible because its location is reached
    * thru an array or thru a non-integer scalar variable in the
@@ -1229,7 +1252,7 @@ transformer fortran_user_call_to_transformer(entity f,
 		      module_local_name(f),
 		      module_local_name(f));
   }
-    
+
   ifdebug(8) {
     pips_debug(8,
 	       "End: after taking all scalar effects in consideration %p\n",
@@ -1293,7 +1316,7 @@ transformer c_return_to_transformer(entity e __attribute__ ((__unused__)),
       /* if(entity_has_values_p(rv)) {*/
       if(analyzable_scalar_entity_p(rv)) {
 	expression expr = EXPRESSION(CAR(pc));
-	entity rvv = entity_to_new_value(rv);
+	//entity rvv = entity_to_new_value(rv);
 
 	tf = any_expression_to_transformer(rv, expr, pre, FALSE);
 	if(transformer_undefined_p(tf))
@@ -1384,14 +1407,14 @@ transformer integer_assign_to_transformer(expression lhs,
 {
   /* algorithm: if lhs and rhs are linear expressions on scalar integer
      variables, build the corresponding equation; else, use effects ef
-       
+
      should be extended to cope with constant integer division as in
      N2 = N/2
      because it is used in real program; inequalities should be
      generated in that case 2*N2 <= N <= 2*N2+1
-       
+
      same remark for MOD operator
-       
+
      implementation: part of this function should be moved into
      transformer.c
   */
@@ -1741,7 +1764,7 @@ transformer statement_to_transformer(
   transformer pre = transformer_undefined;
 
   pips_debug(8,"begin for statement %03td (%td,%td) with precondition %p:\n",
-	     statement_number(s), ORDERING_NUMBER(statement_ordering(s)), 
+	     statement_number(s), ORDERING_NUMBER(statement_ordering(s)),
 	     ORDERING_STATEMENT(statement_ordering(s)), spre);
   ifdebug(8) {
     pips_assert("The statement and its substatements are fully defined",
@@ -1753,14 +1776,14 @@ transformer statement_to_transformer(
 	      transformer_consistent_p(spre));
 
   if(get_bool_property("SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT")) {
-    pre = transformer_undefined_p(spre)? transformer_identity() : 
+    pre = transformer_undefined_p(spre)? transformer_identity() :
       transformer_range(spre);
     if(refine_transformers_p) {
       /* Transformation REFINE_TRANSFORMERS is being executed: add
          information available from the statement precondition */
       transformer srpre = load_statement_precondition(s);
       transformer srpre_r = transformer_range(srpre);
-      
+
       pre = transformer_domain_intersection(pre, srpre_r);
       free_transformer(srpre_r);
     }
@@ -1790,7 +1813,8 @@ transformer statement_to_transformer(
     if(!ENDP(statement_declarations(s)) && !statement_block_p(s)) {
       // FI: Just to gain some time before dealing with controlizer and declarations updates
       //pips_internal_error("Statement %p carries declarations\n");
-      pips_user_warning("Statement %p carries declarations\n");
+      pips_user_warning("Statement %d (%p) carries declarations\n",
+			statement_number(s), s);
     }
 
     if(!ENDP(dl)) {

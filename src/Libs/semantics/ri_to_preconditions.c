@@ -274,92 +274,93 @@ expression_to_postcondition(
   return post;
 }
 
-static transformer 
-call_to_postcondition(
-    transformer pre,
-    call c,
-    transformer tf)
+static transformer call_to_postcondition(transformer pre,
+					 call c,
+					 transformer tf)
 {
-    transformer post = transformer_undefined;
-    entity e = call_function(c);
-    tag tt;
+  transformer post = transformer_undefined;
+  entity e = call_function(c);
+  tag tt;
 
-    pips_debug(8,"begin\n");
+  pips_debug(8,"begin\n");
 
-    switch (tt = value_tag(entity_initial(e))) {
-      case is_value_intrinsic:
-	/* there is room for improvement because assign is now the only 
-	   well handled intrinsic */
-	pips_debug(5, "intrinsic function %s\n",
-	      entity_name(e));
-	if(get_bool_property("SEMANTICS_RECOMPUTE_EXPRESSION_TRANSFORMERS")
-	   && ENTITY_ASSIGN_P(call_function(c))) {
-	  entity f = call_function(c);
-	  list args = call_arguments(c);
-	  /* impredance problem: build an expression from call c */
-	  expression expr = make_expression(make_syntax(is_syntax_call, c),
-					    normalized_undefined);
-	  list ef = expression_to_proper_effects(expr);
-	  transformer pre_r = transformer_range(pre);
-	  transformer new_tf = intrinsic_to_transformer(f, args, pre_r, ef);
+  switch (tt = value_tag(entity_initial(e))) {
+  case is_value_intrinsic:
+    /* there is room for improvement because assign is now the
+       only well handled intrinsic */
+    pips_debug(5, "intrinsic function %s\n",
+	       entity_name(e));
+    if(get_bool_property("SEMANTICS_RECOMPUTE_EXPRESSION_TRANSFORMERS")
+       && ENTITY_ASSIGN_P(call_function(c))) {
+      entity f = call_function(c);
+      list args = call_arguments(c);
+      /* impredance problem: build an expression from call c */
+      expression expr = make_expression(make_syntax(is_syntax_call, c),
+					normalized_undefined);
+      list ef = expression_to_proper_effects(expr);
+      transformer pre_r = transformer_range(pre);
+      transformer new_tf = intrinsic_to_transformer(f, args, pre_r, ef);
 
-	  post = transformer_apply(new_tf, pre);
-	  syntax_call(expression_syntax(expr)) = call_undefined;
-	  free_expression(expr);
-	  free_transformer(new_tf);
-	  free_transformer(pre_r);
-	}
-	else {
-	  post = transformer_apply(tf, pre);
-	}
-	/* propagate precondition pre as summary precondition 
-	   of user functions */
-	/* FI: don't! Summary preconditions are computed independently*/
-	/*
-	   if(get_bool_property(SEMANTICS_INTERPROCEDURAL)) {
-	   list args = call_arguments(c);
-	   expressions_to_summary_precondition(pre, args);
-	   }
-	   */
-	break;
-      case is_value_code:
-	pips_debug(5, "external function %s\n", entity_name(e));
-	if(get_bool_property(SEMANTICS_INTERPROCEDURAL)) {
-	    /*
-	      list args = call_arguments(c);
-
-	    transformer pre_callee = transformer_dup(pre);
-	    pre_callee = 
-		add_formal_to_actual_bindings(c, pre_callee);
-	    add_module_call_site_precondition(e, pre_callee);
-	    */
-	    /*
-	    expressions_to_summary_precondition(pre, args);
-	    */
-	}
-	post = transformer_apply(tf, pre);
-	break;
-      case is_value_symbolic:
-      case is_value_constant:
-	/* This cannot occur in Fortran, but is possible in C. */
-	if(c_module_p(get_current_module_entity())) {
-	  post = transformer_apply(tf, pre);
-	}
-	else {
-	  pips_internal_error("call to symbolic or constant %s\n", 
-			      entity_name(e));
-	}
-	break;
-      case is_value_unknown:
-	pips_internal_error("unknown function %s\n", entity_name(e));
-	break;
-      default:
-	pips_internal_error("unknown tag %d\n", tt);
+      post = transformer_apply(new_tf, pre);
+      syntax_call(expression_syntax(expr)) = call_undefined;
+      free_expression(expr);
+      free_transformer(new_tf);
+      free_transformer(pre_r);
     }
+    else {
+      post = transformer_apply(tf, pre);
+    }
+    /* propagate precondition pre as summary precondition
+       of user functions */
+    /* FI: don't! Summary preconditions are computed independently*/
+    /*
+      if(get_bool_property(SEMANTICS_INTERPROCEDURAL)) {
+      list args = call_arguments(c);
+      expressions_to_summary_precondition(pre, args);
+      }
+    */
+    break;
+  case is_value_code:
+    pips_debug(5, "external function %s\n", entity_name(e));
+    if(get_bool_property(SEMANTICS_INTERPROCEDURAL)) {
+      /*
+	list args = call_arguments(c);
 
-    pips_debug(8,"end\n");
+	transformer pre_callee = transformer_dup(pre);
+	pre_callee =
+	add_formal_to_actual_bindings(c, pre_callee);
+	add_module_call_site_precondition(e, pre_callee);
+      */
+      /*
+	expressions_to_summary_precondition(pre, args);
+      */
+    }
+    post = transformer_apply(tf, pre);
+    break;
+  case is_value_symbolic:
+  case is_value_constant: {
+    /* Declared in preprocessor.h */
+    extern bool c_module_p(entity);
+    /* This cannot occur in Fortran, but is possible in C. */
+    if(c_module_p(get_current_module_entity())) {
+      post = transformer_apply(tf, pre);
+    }
+    else {
+      pips_internal_error("call to symbolic or constant %s\n",
+			  entity_name(e));
+    }
+    break;
+  }
+  case is_value_unknown:
+    pips_internal_error("unknown function %s\n", entity_name(e));
+    break;
+  default:
+    pips_internal_error("unknown tag %d\n", tt);
+  }
 
-    return post;
+  pips_debug(8,"end\n");
+
+  return post;
 }
 
 /******************************************************** DATA PRECONDITIONS */
@@ -375,18 +376,17 @@ call_to_postcondition(
  * exploited.
  *
  */
-static transformer data_to_prec_for_variables(entity m, list /* of entity */le) 
+static transformer data_to_prec_for_variables(entity m, list /* of entity */le)
 {
   transformer pre = transformer_identity();
   transformer pre_r = transformer_undefined; // range of pre
   linear_hashtable_pt b = linear_hashtable_make(); /* already seen */
-  list ce = list_undefined;
+  //list ce = list_undefined;
 
   pips_debug(8, "begin for %s\n", module_local_name(m));
 
   /* look for entities with an initial value. */
-  for(ce = le; !ENDP(ce); POP(ce)) {
-    entity e = ENTITY(CAR(ce));
+  FOREACH(ENTITY, e, le) {
     value val = entity_initial(e);
 
     pips_debug(8, "begin for variable %s\n", entity_name(e));
@@ -425,23 +425,24 @@ static transformer data_to_prec_for_variables(entity m, list /* of entity */le)
 	transformer npre = safe_any_expression_to_transformer(e, expr, pre, FALSE);
 
 	pre = transformer_combine(pre, npre);
+	pre = transformer_safe_normalize(pre, 2);
 	free_transformer(npre);
       }
     }
   }
-      
+
   pre = transformer_temporary_value_projection(pre);
   pre_r = transformer_range(pre);
   free_transformer(pre);
 
   linear_hashtable_free(b);
   pips_assert("some transformer", pre_r != transformer_undefined);
-  
+
   ifdebug(8) {
     dump_transformer(pre_r);
     pips_debug(8, "end for %s\n", module_local_name(m));
   }
-  
+
   return pre_r;
 }
 
@@ -451,7 +452,7 @@ static transformer data_to_prec_for_variables(entity m, list /* of entity */le)
 list effects_to_entity_list(list lef)
 {
   list le = NIL;
-  MAP(EFFECT, e, 
+  MAP(EFFECT, e,
       le = CONS(ENTITY, reference_variable(effect_any_reference(e)), le),
       lef);
   return gen_nreverse(le);
@@ -685,7 +686,9 @@ transformer statement_to_postcondition(
 	if(!ENDP(statement_declarations(s)) && !statement_block_p(s)) {
 	  // FI: Just to gain some time before dealing with controlizer and declarations updates
 	  //pips_internal_error("Statement %p carries declarations\n");
-	  pips_user_warning("Statement %p carries declarations\n");
+	  pips_user_warning("Statement %p with instruction \"%s\" "
+			    "carries declarations\n",
+			    instruction_identification(statement_instruction(s)));
 	}
 
 	MAPL(cv,

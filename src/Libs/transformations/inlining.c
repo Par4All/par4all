@@ -21,7 +21,7 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
-/** 
+/**
  * @file inlining.c
  * @brief add inlining support to pips, with two flavors
  *  - inlining(char* module) to inline all calls to a module
@@ -346,9 +346,14 @@ statement inline_expression_call(inlining_parameters p, expression modified_expr
     statement declaration_holder = expanded;
     statement_declarations(expanded) = gen_full_copy_list( statement_declarations(expanded) ); // simple copy != deep copy
 
-    /* add external declartions for all extern referenced entities
-     * it is needed because inlined module and current module may not share the same
-     * compilation unit
+    /* add external declartions for all extern referenced entities it
+     * is needed because inlined module and current module may not
+     * share the same compilation unit.
+     *
+     * FI: However, it would be nice to check first if the entity is not
+     * already in the scope for the function or in the scope of its
+     * compilation unit (OK, the later is difficult because the order
+     * of declarations has to be taken into account).
      */
     {
         extern string compilation_unit_of_module(string);
@@ -366,14 +371,21 @@ statement inline_expression_call(inlining_parameters p, expression modified_expr
                         !has_entity_with_same_name(ref_ent,statement_declarations(expanded)) )
                 {
                     entity add = ref_ent;
-                    if(entity_variable_p(ref_ent) && 
+                    if(entity_variable_p(ref_ent) &&
                             !top_level_entity_p(ref_ent)) /* make it global instead of static ...*/
                     {
-                        pips_user_warning("replacing static variable by a global one, this may lead to incorrect code\n");
-                        add = make_global_entity_from_local(ref_ent);
-                        replace_entity(expanded,ref_ent,add);
-                        replace_entity(inlined_module_statement(p),ref_ent,add);
-                    }
+		      if(variable_static_p(ref_ent)) {
+			pips_user_warning("replacing static variable \"%s\" by a global one, this may lead to incorrect code\n", entity_user_name(ref_ent));
+			add = make_global_entity_from_local(ref_ent);
+			replace_entity(expanded,ref_ent,add);
+			replace_entity(inlined_module_statement(p),ref_ent,add);
+		      }
+		      else {
+			/* FI: with some FREIA code, I end up here with a formal
+			   parameter... */
+			pips_internal_error("error about variable storage of entity \"%s\"\n", entity_name(ref_ent));
+		      }
+		    }
                     new_externs=CONS(ENTITY,add,new_externs);
                 }
             }
@@ -788,7 +800,7 @@ bool do_inlining(inlining_parameters p,char *module_name)
  * 
  * @param module_name name of the module to inline
  * 
- * @return 
+ * @return
  */
 bool inlining(char *module_name)
 {
@@ -797,12 +809,12 @@ bool inlining(char *module_name)
 	return do_inlining(&p,module_name);
 }
 
-/** 
+/**
  * perform inlining without using effects
- * 
+ *
  * @param module_name name of the module to inline
- * 
- * @return 
+ *
+ * @return
  */
 bool inlining_simple(char *module_name)
 {
@@ -813,14 +825,14 @@ bool inlining_simple(char *module_name)
 
 /**  @} */
 
-/** 
+/**
  * @name unfolding
  * @{ */
 
-/** 
+/**
  * get ressources for the call to inline and call
  * apropriate inlining function
- * 
+ *
  * @param caller_name calling module name
  * @param module_name called module name
  */

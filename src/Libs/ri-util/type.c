@@ -2760,8 +2760,13 @@ list recursive_type_supporting_entities(list sel, set vt, type t)
       sel = recursive_functional_type_supporting_entities(sel, vt, type_functional(t));
     else if(type_variable_p(t))
       sel = variable_type_supporting_entities(sel, vt, type_variable(t));
-    else if(type_varargs_p(t))
-      pips_user_warning("varargs case not implemented yet\n"); /* do nothing? */
+    else if(type_varargs_p(t)) {
+      /* varargs do not depend on any other entities */
+      //pips_user_warning("varargs case not implemented yet\n"); /* do nothing? */
+      type vart = type_varargs(t);
+      sel = recursive_type_supporting_entities(sel, vt, vart);
+      ;
+    }
     else if(type_void_p(t))
       ;
     else if(type_struct_p(t)) {
@@ -3054,7 +3059,11 @@ list fortran_type_supporting_entities(list srl, type t)
 
 /* This is not Fortran compatible as enum members and symbolic
    constant appear the same but cannot be dealt with in the same
-   way. */
+   way.
+
+   What should be done with the tyoe unknown? Return a empty list or
+   generate a pips_internal_error()?
+ */
 static list recursive_type_supporting_references(list srl, type t)
 {
   /* Do not recurse if this type has already been visited. */
@@ -3070,8 +3079,12 @@ static list recursive_type_supporting_references(list srl, type t)
       srl = functional_type_supporting_references(srl, type_functional(t));
     else if(type_variable_p(t))
       srl = variable_type_supporting_references(srl, type_variable(t));
-    else if(type_varargs_p(t))
-      pips_user_warning("varargs case not implemented yet\n"); /* do nothing? */
+    else if(type_varargs_p(t)) {
+      /* No references are involved in C... */
+      //pips_user_warning("varargs case not implemented yet\n");
+      type vt = type_varargs(t);
+      srl = recursive_type_supporting_references(srl, vt);
+    }
     else if(type_void_p(t))
       ;
     else if(type_struct_p(t)) {
@@ -3094,6 +3107,9 @@ static list recursive_type_supporting_references(list srl, type t)
       MAP(ENTITY, se, {
 	  srl = recursive_type_supporting_references(srl, entity_type(se));
 	}, ese);
+    }
+    else if(type_unknown_p(t)) {
+      pips_internal_error("unknown type left in a declaration\n");
     }
     else
       pips_internal_error("Unexpected type with tag %d\n", type_tag(t));
@@ -3501,8 +3517,14 @@ static list recursive_type_supporting_types(list stl, set vt, type t)
       stl = recursive_functional_type_supporting_types(stl, vt, type_functional(t));
     else if(type_variable_p(t))
       stl = variable_type_supporting_types(stl, vt, type_variable(t));
-    else if(type_varargs_p(t))
-      pips_user_warning("varargs case not implemented yet\n"); /* do nothing? */
+    else if(type_varargs_p(t)) {
+      /* varargs case is self contained: no supporting type is
+	 required. */
+      //pips_user_warning("varargs case not implemented yet\n"); /* do nothing? */
+      type vart = type_varargs(t);
+      stl = recursive_type_supporting_types(stl, vt, vart);
+      ;
+    }
     else if(type_void_p(t))
       ;
     else if(type_struct_p(t)) {

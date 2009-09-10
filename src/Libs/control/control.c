@@ -392,6 +392,8 @@ bool controlize(
 	/* If st carries local declarations, so should the statement associated to c_res. */
 	if(controlized && !ENDP(statement_declarations(st))
 	   && ENDP(statement_declarations(control_statement(c_res)))) {
+	  fprintf(stderr, "potentially lost declarations:\n");
+	  print_arguments(statement_declarations(st));
 	  pips_user_warning("Some local declarations may have been lost\n");
 	}
       }
@@ -1004,9 +1006,8 @@ hash_table used_labels;
    In fact this procedure could be replaced by
    fuse_sequences_in_unstructured()... RK.
    */
-static control
-compact_list(list ctls,
-	     control c_end)
+static control compact_list(list ctls,
+			    control c_end)
 {
     control c_res;
     set processed_nodes;
@@ -1050,6 +1051,8 @@ compact_list(list ctls,
 	}
 
 	st = control_statement(c_res) ;
+	pips_assert("st is a block or st carries no delarations",
+		    statement_block_p(st) || ENDP(statement_declarations(st)));
 	/* Ok, succ is defined. RK */
 	succ_st = control_statement(succ);
 	set_add_element(processed_nodes, processed_nodes, (char *) succ);
@@ -1072,7 +1075,9 @@ compact_list(list ctls,
 	  }
 	  else {
 	    if(!ENDP(statement_declarations(st))) {
-	      pips_user_warning("Declarations carried by a statement which is not a block!\n");
+	      pips_user_warning("Declarations carried by a statement \"%s\""
+				" which is not a block!\n",
+				statement_identification(st));
 	    }
 	    if(!instruction_block_p(i=statement_instruction(st))) {
 		i = make_instruction_block(CONS(STATEMENT, st, NIL));
@@ -1233,9 +1238,9 @@ hash_table used_labels __attribute__((__unused__));
 	display_linked_control_nodes(pred);
 	pips_debug(8, "\n");
       }
-	check_control_coherency(pred);
-	check_control_coherency(succ);
-	check_control_coherency(c_res);
+      check_control_coherency(pred);
+      check_control_coherency(succ);
+      check_control_coherency(c_res);
     }
 
     if(ENDP(sts)) {
@@ -1300,6 +1305,8 @@ hash_table used_labels __attribute__((__unused__));
 
 	  /* PJ: fragile attempt at keeping local declarations and their scope */
 	  if(!ENDP(statement_declarations(st))) {
+	    pips_assert("the declarations are carried by a block",
+			statement_block_p(st));
 	    ifdebug(8) {
 	      pips_debug(8, "Block declarations to copy: ");
 	      print_entities(statement_declarations(st));
@@ -1318,9 +1325,11 @@ hash_table used_labels __attribute__((__unused__));
 	    }
 	    else {
 	      new_st = make_block_statement(CONS(STATEMENT, new_st, NIL));
- 	      statement_declarations(new_st) =
+	      statement_declarations(new_st) =
 		gen_copy_seq(statement_declarations(st));
 	    }
+	    /* FI: Can't we remove the declarations in st? Why are
+	       they gen_copy_seq? */
 	  }
 
 	  control_statement(c_block) = statement_undefined;
@@ -1338,14 +1347,38 @@ hash_table used_labels __attribute__((__unused__));
 		check_control_coherency(unstructured_control(u));
 		check_control_coherency(unstructured_exit(u));
 	    }
-	    new_st = make_statement(entity_empty_label(),
-				    statement_number(st),
-				    STATEMENT_ORDERING_UNDEFINED,
-				    statement_comments(st),
-				    i,
+	    /* FI: So here you are putting declarations in an
+	       unstructured? No surprise we end up in trouble
+	       later. */
+	    if(ENDP(statement_declarations(st))) {
+	      new_st = make_statement(entity_empty_label(),
+				      statement_number(st),
+				      STATEMENT_ORDERING_UNDEFINED,
+				      statement_comments(st),
+				      i,
+				      statement_declarations(st),
+				      statement_decls_text(st),
+				      statement_extensions(st));
+	    }
+	    else {
+	      statement us =
+		make_statement(entity_empty_label(),
+			       statement_number(st),
+			       STATEMENT_ORDERING_UNDEFINED,
+			       statement_comments(st),
+			       i,
+			       NIL,
+			       NULL,
+			       empty_extensions());
+	      new_st =
+		make_empty_statement_with_declarations_and_comments(
 				    statement_declarations(st),
 				    statement_decls_text(st),
-				    statement_extensions(st));
+				    empty_comments);
+	      statement_extensions(new_st) = statement_extensions(st);
+	      statement_instruction(new_st) =
+		make_instruction_block(CONS(STATEMENT, us, NIL));
+	    }
 	}
 
 	/* Not a good idea from mine to add this free... RK
@@ -1354,7 +1387,7 @@ hash_table used_labels __attribute__((__unused__));
 	control_statement(c_res) = new_st;
 
 	/* FI: when going down controlize list, these two nodes are
-	   already linked, and the are relinked uncondiotionnally by
+	   already linked, and they are relinked unconditionnally by
 	   link_2_control_nodes() which does not check that its input
 	   assumption is met. */
 	unlink_2_control_nodes(pred, c_res);

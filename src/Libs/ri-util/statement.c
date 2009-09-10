@@ -97,8 +97,7 @@ empty_code_p(statement s)
     return statement_is_empty;
 }
 
-bool 
-empty_code_list_p(list l)
+bool empty_code_list_p(list l)
 {
     MAP(STATEMENT, s, if (!empty_code_p(s)) return FALSE, l);
     return true;
@@ -1303,8 +1302,7 @@ statement makeloopbody(loop l, statement s_old, bool inner_p)
    identity, its number and the breakdown of its ordering, as well as
    information about the instruction. */
 
-string 
-external_statement_identification(statement s)
+string external_statement_identification(statement s)
 {
     static char buffer[STATIC_BUFFER_SZ];
     instruction i = statement_instruction(s);
@@ -1331,8 +1329,7 @@ external_statement_identification(statement s)
 
 /* Like external_statement_identification(), but with internal
    information, the hexadecimal address of the statement */
-string 
-statement_identification(statement s)
+string statement_identification(statement s)
 {
     static char buffer[STATIC_BUFFER_SZ];
     instruction i = statement_instruction(s);

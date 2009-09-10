@@ -89,7 +89,7 @@ static void rename_loop_index(loop l, hash_table renamings)
   }
 }
 
-/* gen_multi_recurse callback on exiting a statement:recompute the
+/* gen_multi_recurse callback on exiting a statement: recompute the
    declaration list for statement s and transform initializations into
    assignments when required according to the renaming map
    "renamings". Renaming may be neutral to handle external
@@ -108,6 +108,8 @@ static void rename_statement_declarations(statement s, hash_table renamings)
       entity nvar = (entity)hash_get(renamings, var);
 
       if(entity_undefined_p(nvar)) {
+	/* Well, we could synthesize a new function to perform the
+	   initialization. */
 	pips_debug(1, "Local variable %s is preserved because its initial value "
 		   "is not assignable\n", entity_local_name(var));
 	ndecls = gen_nconc(ndecls, CONS(ENTITY, var, NIL));
@@ -482,13 +484,13 @@ bool flatten_code(string module_name)
 /* gen_recurse callback on exiting statements. For a declaration to be split:
 
    - it must be a local declaration
-   
+
    - initial value must be a rhs expression
- */ 
+ */
 static void split_initializations_in_statement(statement s)
 {
-  if (statement_block_p(s)) {      
-    
+  if (statement_block_p(s)) {
+
     list inits = NIL;
     list decls = statement_declarations(s); // Non-recursive
     instruction old = statement_instruction(s);
@@ -501,7 +503,7 @@ static void split_initializations_in_statement(statement s)
 	   ) {
 	expression ie = variable_initial_expression(var);
 	if (expression_is_C_rhs_p(ie)) {
-	  statement is = make_assign_statement(entity_to_expression(var), ie);	
+	  statement is = make_assign_statement(entity_to_expression(var), ie);
 	  inits = gen_nconc(inits, CONS(statement, is, NIL));
 	  entity_initial(var) = make_value_unknown();
 	}
@@ -509,14 +511,15 @@ static void split_initializations_in_statement(statement s)
     }
     /* Insert the list of initialisation statements as a sequence at
        the beginning of s. */
-    inits = gen_nconc(inits, CONS(statement, instruction_to_statement(old), NIL));
+    inits = gen_nconc(inits,
+		      CONS(statement, instruction_to_statement(old), NIL));
     statement_instruction(s) = make_instruction_sequence(make_sequence(inits));
   }
   else {
     /* Do nothing ? */
   }
 }
-  
+
 /* Recurse through the statements of s and split local declarations.
    For the time being, we handle only blocks with declarations.
 

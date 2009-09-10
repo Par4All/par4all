@@ -697,8 +697,7 @@ static transformer transformer_add_ored_conditions_updown(
   return newpre;
 }
 
-static transformer 
-transformer_add_call_condition_information_updown(
+static transformer transformer_add_call_condition_information_updown(
     transformer pre,
     entity op,
     list args,
@@ -768,8 +767,7 @@ transformer_add_call_condition_information_updown(
  * freed and newpre allocated. In other words, argument "pre" should not be used
  * after a call to this function.
  */
-static transformer 
-transformer_add_condition_information_updown(
+static transformer transformer_add_condition_information_updown(
     transformer pre,
     expression c,
     transformer context,
@@ -782,7 +780,7 @@ transformer_add_condition_information_updown(
 
   ifdebug(DEBUG_TRANSFORMER_ADD_CONDITION_INFORMATION_UPDOWN) {
     pips_debug(DEBUG_TRANSFORMER_ADD_CONDITION_INFORMATION_UPDOWN,
-	  "begin upwards=%s veracity=%s c=", 
+	  "begin upwards=%s veracity=%s c=",
 	  bool_to_string(upwards), bool_to_string(veracity));
     print_expression(c);
     (void) fprintf(stderr,"pre=%p\n", pre);
@@ -792,7 +790,7 @@ transformer_add_condition_information_updown(
   }
 
   switch(syntax_tag(s)){
-  case is_syntax_call: 
+  case is_syntax_call:
     {
       entity f = call_function(syntax_call(s));
       list args = call_arguments(syntax_call(s));
@@ -850,15 +848,15 @@ transformer_add_condition_information_updown(
   return newpre;
 }
 
-transformer 
-transformer_add_condition_information(
+transformer transformer_add_condition_information(
     transformer pre,
     expression c,
     transformer context,
     bool veracity)
 {
-    transformer post = 
-	transformer_add_condition_information_updown(pre, c, context, veracity, TRUE);
+    transformer post =
+	transformer_add_condition_information_updown(pre, c, context,
+						     veracity, TRUE);
 
     post = transformer_temporary_value_projection(post);
     reset_temporary_value_counter();
@@ -2507,6 +2505,12 @@ transformer safe_any_expression_to_transformer(
 
   if(transformer_undefined_p(tf))
     tf = effects_to_transformer(el);
+
+  /*
+  pips_assert("effect references are protected by persistant",
+  effect_list_can_be_safely_full_freed_p(el));*/
+
+  (void) effect_list_can_be_safely_full_freed_p(el);
 
   gen_full_free_list(el);
   free_transformer(npre);

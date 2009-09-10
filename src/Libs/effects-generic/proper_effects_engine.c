@@ -153,10 +153,10 @@ list generic_proper_effects_of_range(range r)
  @param ref a reference.
  @param *pme : a pointer on the main effect corresponding to the reference.
                if there is no effect (partially subscripted array for instance)
-	       then *pme is set to effect undefined. If the main effect 
+	       then *pme is set to effect undefined. If the main effect
                could not be computed, *pme is set to a new anywhere effect.
  @param write_p : true if the main effect is write, false otherwise.
- @param allow_read_on_pme : true if we want to allow the generation of 
+ @param allow_read_on_pme : true if we want to allow the generation of
                 read effects on reference even if it's a partially subscripted
 		array. The default value should be false, but it is useful
                 to set it to true when recusrsively building pme).
@@ -164,8 +164,8 @@ list generic_proper_effects_of_range(range r)
            performed to access the main memory location.
 
 */
-list generic_p_proper_effect_of_reference(reference ref, 
-					  effect *pme, 
+list generic_p_proper_effect_of_reference(reference ref,
+					  effect *pme,
 					  bool write_p,
 					  bool allow_partials_on_pme)
 {
@@ -293,8 +293,14 @@ list generic_p_proper_effect_of_reference(reference ref,
 
   ifdebug(4)
     {
-      pips_debug(4, "ending with main effect : \n");
-      print_effect(*pme);
+      if(effect_undefined_p(*pme)) {
+	pips_debug(4, "ending no main effect "
+		   "(e.g. a non-subscribed reference to an array)\n");
+      }
+      else {
+	pips_debug(4, "ending with main effect : \n");
+	print_effect(*pme);
+      }
       pips_debug(4, "and intermediate read effects : \n");
       (*effects_prettyprint_func)(le);
     }

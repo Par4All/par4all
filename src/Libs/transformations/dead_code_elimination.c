@@ -140,8 +140,12 @@ static void stdebug(int dl, string msg, statement s)
 {
   ifdebug(dl) {
     pips_debug(dl, "statement %p: %s\n", s, msg);
-    if (s) print_statement(s);
+    if (s) {
+      print_statement(s);
+    }
   }
+  pips_assert("The statement is consistent",
+	      statement_consistent_p(s));
 }
 
 /* Give an information on the liveness of the 2 if's branches: */
@@ -186,23 +190,24 @@ bool
 discard_statement_and_save_label_and_comment(statement s)
 {
 
-  /* NN -> Bug found : if we have two loops with the same label 
-     such as : 
+  /* NN -> Bug found : if we have two loops with the same label
+     such as :
+
      DO 100 I=1,N
         DO 100 J=1,M
      ......
-     
-     100 CONTINUE    
-     and the inner loop is a dead statement, there is an error when 
-     compiling the generated file Fortran. 
-     Because the label of the last statement in the inner loop 
-     might be used by an outer loop and, in doubt, should be preserved.
+
+     100 CONTINUE
+
+     and the inner loop is a dead statement, there is an error when
+     compiling the generated file Fortran.  Because the label of the
+     last statement in the inner loop might be used by an outer loop
+     and, in doubt, should be preserved.
 
      SOLUTION : like in full_loop_unroll()*/
 
-  
   if (instruction_loop_p(statement_instruction(s)))
-    { 
+    {
       entity flbl = find_final_statement_label(loop_body(instruction_loop(statement_instruction(s))));
 
       if(!entity_empty_label_p(flbl)) {
@@ -410,13 +415,13 @@ static bool remove_dead_loop(statement s, instruction i, loop l)
   range lr;
   statement as;
   expression init_val;
-  instruction block =  make_instruction_block(NIL); 
+  instruction block =  make_instruction_block(NIL);
   entity flbl;
 
   /* On va remplacer la boucle par l'initialisation de l'indice a`
      sa valeur initiale seulement. */
 
-  init_val = copy_expression(rl = range_lower(lr = loop_range(l))); 
+  init_val = copy_expression(rl = range_lower(lr = loop_range(l)));
   /*pips_assert("remove_dead_loop", gen_defined_p(init_val));*/
   /*expression init_val = copy_expression(range_lower(loop_range(l)));*/
 
@@ -425,17 +430,19 @@ static bool remove_dead_loop(statement s, instruction i, loop l)
 
   index = make_factor_expression(1, loop_index(l));
 
-  /* NN -> Bug found : if we have two loops with the same label 
-     such as : 
+  /* NN -> Bug found : if we have two loops with the same label
+     such as :
+
      DO 100 I=1,N
         DO 100 J=1,M
      ......
-     
-     100 CONTINUE    
-     and the inner loop is a dead statement, there is an error when 
-     compiling the generated file Fortran. 
-     Because the label of the last statement in the inner loop 
-     might be used by an outer loop and, in doubt, should be preserved.
+
+     100 CONTINUE
+
+     and the inner loop is a dead statement, there is an error when
+     compiling the generated file Fortran.  Because the label of the
+     last statement in the inner loop might be used by an outer loop
+     and, in doubt, should be preserved.
 
      SOLUTION : like in full_loop_unroll()*/
 
@@ -446,32 +453,32 @@ static bool remove_dead_loop(statement s, instruction i, loop l)
       NIL));
       statement_label(as) = statement_label(s);
       statement_label(s) = entity_empty_label();
-      
+
       fix_sequence_statement_attributes(s);*/
 
   /*  *****NEW CODE***************/
 
-    
-  instruction_block(block)= 
+
+  instruction_block(block)=
     gen_nconc(instruction_block(block),
 	      CONS(STATEMENT,
 		   as = make_assign_statement(index , init_val),
 		   NIL ));
 
   flbl = find_final_statement_label(loop_body(l));
-  
+
   if(!entity_empty_label_p(flbl)) {
-    statement stmt = make_continue_statement(flbl);   
+    statement stmt = make_continue_statement(flbl);
     instruction_block(block)= gen_nconc(instruction_block(block),
-					CONS(STATEMENT, stmt, NIL ));  
+					CONS(STATEMENT, stmt, NIL ));
   }
- 
-  statement_instruction(s) = block;      
+
+  statement_instruction(s) = block;
   /* Since the RI need to have no label on instruction block: */
   statement_label(as) = statement_label(s);
   statement_label(s) = entity_empty_label();
   fix_sequence_statement_attributes(s);
-  
+
   stdebug(9, "remove_dead_loop: New value of statement", s);
 
   free_instruction(i);
@@ -488,51 +495,71 @@ static bool remove_dead_loop(statement s, instruction i, loop l)
 void remove_if_statement_according_to_write_effects
 (statement s, bool this_test_is_unstructured_p)
 {
-   instruction i = statement_instruction(s);
+  instruction i = statement_instruction(s);
 
-   if (statement_write_effect_p(s)) {
-      /* There is a write effect, so we cannot discard the IF
-         expression. Keep it in a temporarily variable: */
-      entity temp_var = make_new_scalar_variable(get_current_module_entity(),
-                                                 MakeBasic(is_basic_logical));
-      /* Create the bool_var = x: */
-      statement_instruction(s) =
-         make_assign_instruction(entity_to_expression(temp_var),
-                                 test_condition(instruction_test(i)));
-      test_condition(instruction_test(i)) = expression_undefined;
-      
-      if (this_test_is_unstructured_p)
-	  dead_code_unstructured_if_replaced_by_its_effect++;
-      else
-	  dead_code_if_replaced_by_its_effect++;
-   }
-   else {
-      /* There is no write effect, the statement can be discarded: */
-      statement_instruction(s) = make_instruction_block(NIL);
-      fix_sequence_statement_attributes(s);
-      
-      if (this_test_is_unstructured_p)
-	  dead_code_unstructured_if_removed++;
-      else
-	  dead_code_if_removed++;
-   }
+  pips_assert("statement is consistent at entry", s);
 
-   /* Discard the IF: */
-   free_instruction(i);
+  if (statement_write_effect_p(s)) {
+    /* There is a write effect, so we cannot discard the IF
+       expression. Keep it in a temporarily variable: */
+    entity temp_var =
+      make_new_scalar_variable(get_current_module_entity(),
+			       MakeBasic(is_basic_logical));
+    /* Create the bool_var = x: */
+    statement_instruction(s) =
+      make_assign_instruction(entity_to_expression(temp_var),
+			      test_condition(instruction_test(i)));
+    test_condition(instruction_test(i)) = expression_undefined;
+
+    if (this_test_is_unstructured_p)
+      dead_code_unstructured_if_replaced_by_its_effect++;
+    else
+      dead_code_if_replaced_by_its_effect++;
+
+    pips_assert("statement is consistent after partial dead code removeal", s);
+  }
+  else {
+    /* There is no write effect, the statement can be discarded: */
+    statement_instruction(s) = make_instruction_block(NIL);
+    fix_sequence_statement_attributes(s);
+
+    if (this_test_is_unstructured_p)
+      dead_code_unstructured_if_removed++;
+    else
+      dead_code_if_removed++;
+
+  pips_debug(8, "let's use some heap\n");
+    pips_assert("statement is consistent after dead code removal", s);
+  }
+
+  pips_debug(8, "let's use some heap\n");
+
+  pips_assert("statement is consistent at exit", s);
+
+  /* Discard the IF: */
+  /* FI: I do not understand why, but this free breaks the
+     unstructured containing s (case "no write effect". */
+  /* For unknown reasons, the preconditions for the true and false
+     branches are recomputed... because they are not reachable from
+     the controls... however, statements are reachable from controls
+     and statements are linked to preconditions... */
+  // free_instruction(i);
+
+  pips_debug(8, "let's use some heap\n");
+  pips_assert("statement is consistent at exit", s);
 }
 
 
-static bool
-dead_deal_with_test(statement s,
-                    test t) 
-{  
+static bool dead_deal_with_test(statement s,
+				test t)
+{
   statement st_true = test_true(t);
   statement st_false = test_false(t);
 
   switch (dead_test_filter(st_true, st_false)) {
-    
+
   case then_is_dead :
-    /* Delete the test and the useless true : */ 
+    /* Delete the test and the useless true : */
     test_false(t) = statement_undefined;
     test_true(t) = statement_undefined;
     remove_if_statement_according_to_write_effects(s,
@@ -540,10 +567,10 @@ dead_deal_with_test(statement s,
     /* Concatenate an eventual IF expression (if write effects) with
        the false branch: */
     statement_instruction(s) =
-        make_instruction_block(
-                make_statement_list(make_stmt_of_instr(statement_instruction(s)),st_false)
-                );
-    
+      make_instruction_block(
+			     make_statement_list(make_stmt_of_instr(statement_instruction(s)),st_false)
+			     );
+
     /* Go on the recursion on the remaining branch : */
     suppress_dead_code_statement(st_false);
     dead_code_if_true_branch_removed++;
@@ -551,7 +578,7 @@ dead_deal_with_test(statement s,
     break;
 
   case else_is_dead :
-    /* Delete the test and the useless false : */ 
+    /* Delete the test and the useless false : */
     test_false(t) = statement_undefined;
     test_true(t) = statement_undefined;
     remove_if_statement_according_to_write_effects(s,
@@ -560,8 +587,8 @@ dead_deal_with_test(statement s,
        the false branch: */
     statement_instruction(s) =
        make_instruction_block(
-               make_statement_list(
-                   make_stmt_of_instr(statement_instruction(s)),st_true));
+			      make_statement_list(
+						  make_stmt_of_instr(statement_instruction(s)),st_true));
     /* Go on the recursion on the remaining branch : */
     suppress_dead_code_statement(st_true);
     dead_code_if_false_branch_removed++;
@@ -573,7 +600,7 @@ dead_deal_with_test(statement s,
 
   default :
     pips_assert("dead_deal_with_test does not understand dead_test_filter()",
-                true);
+		true);
   }
   return true;
 }
@@ -581,8 +608,7 @@ dead_deal_with_test(statement s,
 
 /* Give an information on the liveness of the 2 unstructured if's
    branches. Accept the statement that contains the if: */
-static dead_test
-dead_unstructured_test_filter(statement st)
+static dead_test dead_unstructured_test_filter(statement st)
 {
     /* In an unstructured test, we need to remove the dead control
        link according to preconditions. Unfortunately, preconditions
@@ -593,15 +619,21 @@ dead_unstructured_test_filter(statement st)
     test t = instruction_test(statement_instruction(st));
     transformer pre = load_statement_precondition(st);
     expression cond = test_condition(t);
-    
+
     pips_assert("Preconditions are defined for all statements",
 		!transformer_undefined_p(pre));
+
+    pips_assert("The statement is consistent",
+		statement_consistent_p(st));
 
     ifdebug(6)
 	sc_fprint(stderr,
 		  predicate_system(transformer_relation(pre)),
 		  (char* (*)(Variable)) entity_local_name);
 
+    /* FI: this is the piece of code which may explain why the
+       instruction cannot be freed in
+       remove_if_statement_according_to_write_effects(). */
     /* Compute the precondition for each branch: */
     pre_true =
 	precondition_add_condition_information(transformer_dup(pre),
@@ -639,100 +671,133 @@ dead_unstructured_test_filter(statement st)
     free_transformer(pre_true);
     free_transformer(pre_false);
 
+    pips_assert("The statement is consistent",
+		statement_consistent_p(st));
+
     return test_status;
 }
 
-static void
-dead_recurse_unstructured(unstructured u)
+static void dead_recurse_unstructured(unstructured u)
 {
-    statement st = statement_undefined;
-    list blocs = NIL;
-  
-    CONTROL_MAP(c, {
-	int number_of_successors = gen_length(control_successors(c));
-                  
-	pips_debug(3, "(gen_length(control_successors(c)) = %d)\n",
-		   number_of_successors);     
-	st = control_statement(c);
-                  
-	if (number_of_successors == 0 || number_of_successors == 1) {
-	    /* Ok, the statement is no an unstructured if, that
-	       means that we can apply a standard elimination if
-	       necessary: */
-	    suppress_dead_code_statement(st);
-	}
-	else if (number_of_successors == 2
-		 && instruction_test_p(statement_instruction(st))) {
-	    /* In an unstructured test, we need to remove the
-	       dead control link according to
-	       preconditions. Unfortunately, preconditions
-	       are attached to statements and not to control
-	       vertice. Hence we need to recompute a
-	       precondition on these vertice: */
-	    control true_control = CONTROL(CAR(control_successors(c)));
-	    control false_control = CONTROL(CAR(CDR(control_successors(c))));
+  statement st = statement_undefined;
+  //list blocs = NIL;
+  list nodes = NIL;
 
-	    switch (dead_unstructured_test_filter(st)) {
-	    case then_is_dead :
-	      pips_debug(3, "\"Then\" is dead...");
-	      /* Remove the link to the THEN control
-		 node. Rely on unspaghettify() to remove
-		 down this path later: */
-	      gen_remove_once(&control_successors(c), true_control);
-	      gen_remove_once(&control_predecessors(true_control), c);
-	      /* Replace the IF with nothing or its expression: */
-	      remove_if_statement_according_to_write_effects
-		(control_statement(c), true /* unstructured if */);
-	      
-	      some_unstructured_ifs_have_been_changed = true;
-	      dead_code_unstructured_if_true_branch_removed++;
-	      break;
-                         
-	    case else_is_dead :
-	      pips_debug(3, "\"Else\" is dead...");
-	      /* Remove the link to the ELSE control
-		 node. Rely on unspaghettify() to remove
-		 down this path later: */
-	      gen_remove_once(&control_successors(c), false_control);
-	      gen_remove_once(&control_predecessors(false_control), c);
-	      /* Replace the IF with nothing or its expression: */
-	      remove_if_statement_according_to_write_effects
-		(control_statement(c), true /* unstructured if */);
-	      
-	      some_unstructured_ifs_have_been_changed = true;
-	      dead_code_unstructured_if_false_branch_removed++;
-	      break;
-	      
-	    case nothing_about_test :
-	      pips_debug(3, "Nothing about this test...");
+  control_map_get_blocs(unstructured_control(u),&nodes);
 
-	      /* same successor in both branches... remove one!
-	       * maybe unspaghettify should also be okay? it seems not.
-	       */
-	      if (true_control==false_control) 
-	      {
-		gen_remove_once(&control_successors(c), false_control);
-		gen_remove_once(&control_predecessors(false_control), c);
-		/* Replace the IF with nothing or its expression: */
-		remove_if_statement_according_to_write_effects
-		  (control_statement(c), true /* unstructured if */);
-	      
-		some_unstructured_ifs_have_been_changed = true;
-		dead_code_unstructured_if_false_branch_removed++;
-	      }
-	      break;
-	      
-	    default :
-	      pips_internal_error("does not understand dead_test_filter()");
-	    }
-	}
-	else
-	    pips_error("dead_deal_with_test",
-		       "Unknown unstructured type");
-    },
-		unstructured_control(u),
-		blocs);
-    gen_free_list(blocs);
+  pips_assert("unstructured is consistent at the beginning",
+	      unstructured_consistent_p(u));
+
+  nodes = gen_nreverse(nodes);
+
+  /* CONTROL_MAP removed for debugging */
+  FOREACH(CONTROL, c, nodes) {
+    int number_of_successors = gen_length(control_successors(c));
+
+    pips_debug(3, "(gen_length(control_successors(c)) = %d)\n",
+	       number_of_successors);
+    st = control_statement(c);
+
+    if (number_of_successors == 0 || number_of_successors == 1) {
+      /* Ok, the statement is not an unstructured if, that
+	 means that we can apply a standard elimination if
+	 necessary. The statement is consistent on return. */
+      suppress_dead_code_statement(st);
+    }
+    else if (number_of_successors == 2
+	     && instruction_test_p(statement_instruction(st))) {
+      /* In an unstructured test, we need to remove the
+	 dead control link according to
+	 preconditions. Unfortunately, preconditions
+	 are attached to statements and not to control
+	 vertice. Hence we need to recompute a
+	 precondition on these vertice: */
+      control true_control = CONTROL(CAR(control_successors(c)));
+      control false_control = CONTROL(CAR(CDR(control_successors(c))));
+
+      switch (dead_unstructured_test_filter(st)) {
+      case then_is_dead :
+
+	pips_assert("unstructured is consistent before then is dead",
+	      unstructured_consistent_p(u));
+	pips_debug(3, "\"Then\" is dead...\n");
+	/* Remove the link to the THEN control
+	   node. Rely on unspaghettify() to remove
+	   down this path later: */
+	gen_remove_once(&control_successors(c), true_control);
+	gen_remove_once(&control_predecessors(true_control), c);
+
+	pips_assert("unstructured is consistent after then_is_dead",
+	      unstructured_consistent_p(u));
+	/* Replace the IF with nothing or its expression: */
+	remove_if_statement_according_to_write_effects
+	  (control_statement(c), true /* unstructured if */);
+
+	pips_assert("unstructured is consistent after then_is_dead",
+	      unstructured_consistent_p(u));
+
+	some_unstructured_ifs_have_been_changed = true;
+	dead_code_unstructured_if_true_branch_removed++;
+
+	pips_assert("unstructured is consistent after then_is_dead",
+	      unstructured_consistent_p(u));
+	break;
+
+      case else_is_dead :
+
+  pips_assert("unstructured is consistent before else_is_dead",
+	      unstructured_consistent_p(u));
+	pips_debug(3, "\"Else\" is dead...\n");
+	/* Remove the link to the ELSE control
+	   node. Rely on unspaghettify() to remove
+	   down this path later: */
+	gen_remove_once(&control_successors(c), false_control);
+	gen_remove_once(&control_predecessors(false_control), c);
+	/* Replace the IF with nothing or its expression: */
+	remove_if_statement_according_to_write_effects
+	  (control_statement(c), true /* unstructured if */);
+
+	some_unstructured_ifs_have_been_changed = true;
+	dead_code_unstructured_if_false_branch_removed++;
+
+  pips_assert("unstructured is consistent after else_is_dead",
+	      unstructured_consistent_p(u));
+	break;
+
+      case nothing_about_test :
+	pips_debug(3, "Nothing about this test...");
+
+	/* same successor in both branches... remove one!
+	 * maybe unspaghettify should also be okay? it seems not.
+	 */
+	if (true_control==false_control)
+	  {
+	    gen_remove_once(&control_successors(c), false_control);
+	    gen_remove_once(&control_predecessors(false_control), c);
+	    /* Replace the IF with nothing or its expression: */
+	    remove_if_statement_according_to_write_effects
+	      (control_statement(c), true /* unstructured if */);
+
+	    some_unstructured_ifs_have_been_changed = true;
+	    dead_code_unstructured_if_false_branch_removed++;
+	  }
+	break;
+
+      default :
+	pips_internal_error("does not understand dead_test_filter()");
+      }
+    }
+    else
+      pips_internal_error("Unknown unstructured type");
+
+    /* Let's hope the unstructured is still consistent */
+    pips_assert("unstructured is consistent after some iterations",
+		unstructured_consistent_p(u));
+  }
+  gen_free_list(nodes);
+
+  pips_assert("unstructured is consistent at the end",
+	      unstructured_consistent_p(u));
 }
 
 
@@ -815,176 +880,190 @@ dead_statement_rewrite(statement s)
 }
 
 
-static bool
-dead_statement_filter(statement s)
+static bool dead_statement_filter(statement s)
 {
-   instruction i;
-   bool retour;
-   effects crwe = load_cumulated_rw_effects(s);
-   list crwl = effects_effects(crwe);
+  instruction i;
+  bool retour;
+  effects crwe = load_cumulated_rw_effects(s);
+  list crwl = effects_effects(crwe);
 
-   i = statement_instruction(s);
-   pips_debug(2, "Begin for statement %d (%d, %d)\n",
-	      statement_number(s),
-	      ORDERING_NUMBER(statement_ordering(s)),
-	      ORDERING_STATEMENT(statement_ordering(s)));
-   ifdebug(8)
-     {
-       transformer pre = load_statement_precondition(s);
-       sc_fprint(stderr,
-		 predicate_system(transformer_relation(pre)),
-		 (char* (*)(Variable)) entity_local_name);
-     }
+  pips_assert("statement s is consistent", statement_consistent_p(s));
 
-   stdebug(9, "dead_statement_filter: The current statement", s);
+  i = statement_instruction(s);
+  pips_debug(2, "Begin for statement %d (%d, %d)\n",
+	     statement_number(s),
+	     ORDERING_NUMBER(statement_ordering(s)),
+	     ORDERING_STATEMENT(statement_ordering(s)));
+  ifdebug(8)
+    {
+      transformer pre = load_statement_precondition(s);
+      sc_fprint(stderr,
+		predicate_system(transformer_relation(pre)),
+		(char* (*)(Variable)) entity_local_name);
+    }
 
-   /* Pour permettre un affichage du code de retour simple : */
-   for(;;) {
-       if (statement_ordering(s) == STATEMENT_ORDERING_UNDEFINED) {
-	   /* Well, it is likely some unreachable code that should be
-              removed later by an unspaghettify: */
-	 pips_debug(2, "This statement is likely unreachable. Skip...\n");
-	 retour = false;
-	 break;
-       }
+  stdebug(9, "dead_statement_filter: The current statement", s);
 
-       /* If a statement has no write effects on the store and if it
-	  cannot hides a control effect in a user-defined function*/
-       if (ENDP(crwl) && !statement_may_have_control_effects_p(s)
-	   && !format_statement_p(s)) {
-	pips_debug(2, "Ignored statement %d (%d, %d)\n",
-		   statement_number(s),
-		   ORDERING_NUMBER(statement_ordering(s)),
-		   ORDERING_STATEMENT(statement_ordering(s)));
-	  retour = discard_statement_and_save_label_and_comment(s);
-	  dead_code_statement_removed++;
-	  break;
-      }
+  pips_assert("statement s is consistent", statement_consistent_p(s));
 
-      /* Vire deja (presque) tout statement dont la precondition est
-         fausse : */
-       /* FI: This (very CPU expensive) test must be useless
-	* because the control sequence
-	* can only be broken by a test or by a loop or by a test in
-	* an unstructured. These cases already are tested elsewhere.
-	*
-	* Furthermore, feasible statements take longer to test than
-	* dead statement. And they are the majority in a normal piece
-	* of code.
-	*
-	* But STOP statements can also introduce discontinuities...
-	* Well, to please Ronan let's put a fast accurate enough
-	* test for that last case.
-	*/
-      if (!statement_weakly_feasible_p(s)) {
-	pips_debug(2, "Dead statement %d (%d, %d)\n",
-		   statement_number(s),
-		   ORDERING_NUMBER(statement_ordering(s)),
-		   ORDERING_STATEMENT(statement_ordering(s)));
-	  retour = discard_statement_and_save_label_and_comment(s);
-	  dead_code_statement_removed++;
-	  break;
-      }
-
-      if (instruction_sequence_p(i) && !statement_feasible_p(s)) {
-	pips_debug(2, "Dead sequence statement %d (%d, %d)\n",
-		   statement_number(s),
-		   ORDERING_NUMBER(statement_ordering(s)),
-		   ORDERING_STATEMENT(statement_ordering(s)));
-	  retour = discard_statement_and_save_label_and_comment(s);
-	  dead_code_statement_removed++;
-	  break;
-      }
-
-      if (instruction_loop_p(i)) {
-         loop l = instruction_loop(i);
-         if (dead_loop_p(l)) {
-	   pips_debug(2, "Dead loop %s at statement %d (%d, %d)\n",
-		      label_local_name(loop_label(l)),
-		      statement_number(s),
-		      ORDERING_NUMBER(statement_ordering(s)),
-		      ORDERING_STATEMENT(statement_ordering(s)));
-	     
-	     retour = remove_dead_loop(s, i, l);
-	     dead_code_loop_removed++;
-            break;
-         }
-         else if (loop_executed_once_p(s, l)) {
-	     /* This piece of code is not ready yet */
-	     statement body = loop_body(l);
-	     ifdebug(2) {
-	       pips_debug(2, 
-		"loop %s at %d (%d, %d) executed once and only once\n",
-		label_local_name(loop_label(l)),
-		statement_number(s),
-		ORDERING_NUMBER(statement_ordering(s)),
-		ORDERING_STATEMENT(statement_ordering(s)));
-
-	       stdebug(9, "dead_statement_filter", s);
-	     }
-
-	     remove_loop_statement(s, i, l);
-	     dead_code_loop_executed_once++;
-	     stdebug(9, "dead_statement_filter: out remove_loop_statement", s);
-
-	     suppress_dead_code_statement(body);
-	     retour = false;
-	     break;
-	 }
-	 else {
-	     /* Standard loop, proceed downwards */
-	     retour = true;
-	     break;
-	 }
-     }
-
-      if (instruction_test_p(i)) {
-         test t = instruction_test(i);
-         retour = dead_deal_with_test(s, t);
-         break;
-      }
-
-      if (instruction_unstructured_p(i)) {
-         /* Special case for unstructured: */
-         dead_recurse_unstructured(instruction_unstructured(i));
-         
-         /* Stop going down since it has just been done in
-	  * dead_recurse_unstructured():
-	  */
-         retour = false;
-         break;
-      }
-
-      /* Well, else we are going on the inspection... */
-      retour = true;
+  /* Pour permettre un affichage du code de retour simple : */
+  for(;;) {
+    if (statement_ordering(s) == STATEMENT_ORDERING_UNDEFINED) {
+      /* Well, it is likely some unreachable code that should be
+	 removed later by an unspaghettify: */
+      pips_debug(2, "This statement is likely unreachable. Skip...\n");
+      retour = false;
       break;
-   }
+    }
 
-   if (retour == false) {
-       /* Try to rewrite the code underneath. Useful for tests with
-	* two empty branches
-	*/
-      dead_statement_rewrite(s);
+    /* If a statement has no write effects on the store and if it
+       cannot hides a control effect in a user-defined function*/
+    if (ENDP(crwl) && !statement_may_have_control_effects_p(s)
+	&& !format_statement_p(s)) {
+      pips_debug(2, "Ignored statement %d (%d, %d)\n",
+		 statement_number(s),
+		 ORDERING_NUMBER(statement_ordering(s)),
+		 ORDERING_STATEMENT(statement_ordering(s)));
+      retour = discard_statement_and_save_label_and_comment(s);
+      dead_code_statement_removed++;
+      break;
+    }
+
+    /* Vire deja (presque) tout statement dont la precondition est
+       fausse : */
+    /* FI: This (very CPU expensive) test must be useless
+     * because the control sequence
+     * can only be broken by a test or by a loop or by a test in
+     * an unstructured. These cases already are tested elsewhere.
+     *
+     * Furthermore, feasible statements take longer to test than
+     * dead statement. And they are the majority in a normal piece
+     * of code.
+     *
+     * But STOP statements can also introduce discontinuities...
+     * Well, to please Ronan let's put a fast accurate enough
+     * test for that last case.
+     */
+    if (!statement_weakly_feasible_p(s)) {
+      pips_debug(2, "Dead statement %d (%d, %d)\n",
+		 statement_number(s),
+		 ORDERING_NUMBER(statement_ordering(s)),
+		 ORDERING_STATEMENT(statement_ordering(s)));
+      retour = discard_statement_and_save_label_and_comment(s);
+      dead_code_statement_removed++;
+      break;
+    }
+
+    if (instruction_sequence_p(i) && !statement_feasible_p(s)) {
+      pips_debug(2, "Dead sequence statement %d (%d, %d)\n",
+		 statement_number(s),
+		 ORDERING_NUMBER(statement_ordering(s)),
+		 ORDERING_STATEMENT(statement_ordering(s)));
+      retour = discard_statement_and_save_label_and_comment(s);
+      dead_code_statement_removed++;
+      break;
+    }
+
+    if (instruction_loop_p(i)) {
+      loop l = instruction_loop(i);
+      if (dead_loop_p(l)) {
+	pips_debug(2, "Dead loop %s at statement %d (%d, %d)\n",
+		   label_local_name(loop_label(l)),
+		   statement_number(s),
+		   ORDERING_NUMBER(statement_ordering(s)),
+		   ORDERING_STATEMENT(statement_ordering(s)));
+
+	retour = remove_dead_loop(s, i, l);
+	dead_code_loop_removed++;
+	break;
+      }
+      else if (loop_executed_once_p(s, l)) {
+	/* This piece of code is not ready yet */
+	statement body = loop_body(l);
+	ifdebug(2) {
+	  pips_debug(2,
+		     "loop %s at %d (%d, %d) executed once and only once\n",
+		     label_local_name(loop_label(l)),
+		     statement_number(s),
+		     ORDERING_NUMBER(statement_ordering(s)),
+		     ORDERING_STATEMENT(statement_ordering(s)));
+
+	  stdebug(9, "dead_statement_filter", s);
+	}
+
+	remove_loop_statement(s, i, l);
+	dead_code_loop_executed_once++;
+	stdebug(9, "dead_statement_filter: out remove_loop_statement", s);
+
+	suppress_dead_code_statement(body);
+	retour = false;
+	break;
+      }
+      else {
+	/* Standard loop, proceed downwards */
+	retour = true;
+	break;
+      }
+    }
+
+    if (instruction_test_p(i)) {
+      test t = instruction_test(i);
+      retour = dead_deal_with_test(s, t);
+      break;
+    }
+
+    if (instruction_unstructured_p(i)) {
+      /* Special case for unstructured: */
+      pips_assert("the instruction is consistent", instruction_consistent_p(i));
+      dead_recurse_unstructured(instruction_unstructured(i));
+      pips_assert("the instruction is consistent", instruction_consistent_p(i));
+
+      /* Stop going down since it has just been done in
+       * dead_recurse_unstructured():
+       */
+      retour = false;
+      break;
+    }
+
+    /* Well, else we are going on the inspection... */
+    retour = true;
+    break;
   }
 
-   pips_debug(2, "End for statement %d (%d, %d): %s going down\n",
-	 statement_number(s),
-	 ORDERING_NUMBER(statement_ordering(s)),
-	 ORDERING_STATEMENT(statement_ordering(s)),
-	 retour? "" : "not");
+  pips_assert("statement s is consistent before rewrite",
+	      statement_consistent_p(s));
 
-   return retour;
+  if (retour == false) {
+    /* Try to rewrite the code underneath. Useful for tests with
+     * two empty branches
+     */
+    dead_statement_rewrite(s);
+  }
+
+  pips_debug(2, "End for statement %d (%d, %d): %s going down\n",
+	     statement_number(s),
+	     ORDERING_NUMBER(statement_ordering(s)),
+	     ORDERING_STATEMENT(statement_ordering(s)),
+	     retour? "" : "not");
+
+  pips_assert("statement s is consistent at the end",
+	      statement_consistent_p(s));
+
+  return retour;
 }
 
 
 /* Suppress the dead code of the given module: */
-void
-suppress_dead_code_statement(statement mod_stmt)
+void suppress_dead_code_statement(statement mod_stmt)
 {
+  pips_assert("statement d is consistent", statement_consistent_p(mod_stmt));
+
   dead_statement_filter(mod_stmt);
   gen_recurse(mod_stmt, statement_domain,
 	      dead_statement_filter, dead_statement_rewrite);
   dead_statement_rewrite(mod_stmt);
+
+  pips_assert("statement d is consistent", statement_consistent_p(mod_stmt));
 }
 
 /*

@@ -54,8 +54,7 @@ instruction make_call_instruction(entity e, list l) {
 
    @param f is the function entity to call
  */
-instruction
-MakeNullaryCallInst(entity f) {
+instruction MakeNullaryCallInst(entity f) {
   return make_call_instruction(f, NIL);
 }
 
@@ -65,9 +64,8 @@ MakeNullaryCallInst(entity f) {
    @param f is the function entity to call
    @param e is the argument expression given to the function to call
  */
-instruction
-MakeUnaryCallInst(entity f,
-		  expression e) {
+instruction MakeUnaryCallInst(entity f,
+			      expression e) {
     return make_call_instruction(f, CONS(EXPRESSION, e, NIL));
 }
 
@@ -75,8 +73,7 @@ MakeUnaryCallInst(entity f,
 /* Creates a CONTINUE instruction, that is the FORTRAN nop, the ";" in C
    or the "pass" in Python for example.
 */
-instruction
-make_continue_instruction() {
+instruction make_continue_instruction() {
   entity called_function;
   called_function = entity_intrinsic(CONTINUE_FUNCTION_NAME);
   return MakeNullaryCallInst(called_function);
@@ -97,9 +94,9 @@ make_continue_instruction() {
    @param s is the name of the native instruction to investigate
    @return true if the instruction is a native instruction of the language
  */
-bool
-native_instruction_p(instruction i,
-		     string s) {
+bool native_instruction_p(instruction i,
+			  string s)
+{
   bool call_s_p = FALSE;
 
   if (instruction_call_p(i)) {
@@ -114,8 +111,8 @@ native_instruction_p(instruction i,
 }
 
 /* Test if an instruction is an assignment. */
-bool
-instruction_assign_p(instruction i) {
+bool instruction_assign_p(instruction i)
+{
     return native_instruction_p(i, ASSIGN_OPERATOR_NAME);
 }
 
@@ -123,15 +120,17 @@ instruction_assign_p(instruction i) {
 /* Test if an instruction is a CONTINUE, that is the FORTRAN nop, the ";" in C
    or the "pass" in Python... according to the language.
 */
-bool
-instruction_continue_p(instruction i) {
+bool instruction_continue_p(instruction i)
+{
   return native_instruction_p(i, CONTINUE_FUNCTION_NAME);
 }
 
 
 /* Test if an instruction is a C or Fortran "return"
+
    Note that this function is not named "instruction_return_p" since
-   it would mean return is a field of instruction ... which used to be the case :)
+   it would mean return is a field of instruction ... which used to be
+   the case :)
 */
 bool return_instruction_p(instruction i)
 {
@@ -183,14 +182,13 @@ void flatten_block_if_necessary(instruction i)
   if (instruction_block_p(i))
   {
     list ls = NIL;
-    MAP(STATEMENT, s, {
+    FOREACH(STATEMENT, s, instruction_block(i)) {
       instruction ib = statement_instruction(s);
       if (instruction_block_p(ib))
 	ls = gen_nconc(ls, instruction_block(ib));
       else
 	ls = gen_nconc(ls, CONS(STATEMENT, s, NIL));
-    },
-      instruction_block(i));
+    }
     gen_free_list(instruction_block(i));
     instruction_block(i) = ls;
   }
@@ -200,20 +198,19 @@ void flatten_block_if_necessary(instruction i)
 /* Checks if an instruction block is a list of assignments, possibly
    followed by a continue.
 */
-bool
-assignment_block_p(i)
-instruction i;
+bool assignment_block_p(instruction i)
 {
-    MAPL(cs,
-     {
+  /* FOREACH cannot be used in this case */
+  MAPL(cs,
+       {
 	 statement s = STATEMENT(CAR(cs));
 
 	 if(!assignment_statement_p(s))
-	     if(!(continue_statement_p(s) && ENDP(CDR(cs)) ))
-		 return FALSE;
-     },
-	 instruction_block(i));
-    return TRUE;
+	   if(!(continue_statement_p(s) && ENDP(CDR(cs)) ))
+	     return FALSE;
+       },
+       instruction_block(i));
+  return TRUE;
 }
 
 
@@ -224,47 +221,46 @@ instruction i;
    @return a constant string such as "WHILE LOOP" for a "while()" or "do
    while()" loop and so on.
 */
-string
-instruction_identification(instruction i)
+string instruction_identification(instruction i)
 {
-    string instrstring = NULL;
+  string instrstring = NULL;
 
-    switch (instruction_tag(i))
+  switch (instruction_tag(i))
     {
     case is_instruction_loop:
-	instrstring="DO LOOP";
-	break;
+      instrstring="DO LOOP";
+      break;
     case is_instruction_whileloop:
-	instrstring="WHILE LOOP";
-	break;
+      instrstring="WHILE LOOP";
+      break;
     case is_instruction_test:
-	instrstring="TEST";
-	break;
+      instrstring="TEST";
+      break;
     case is_instruction_goto:
-	instrstring="GOTO";
-	break;
+      instrstring="GOTO";
+      break;
     case is_instruction_call:
       {if (instruction_continue_p(i))
-	instrstring="CONTINUE";
-    else if (return_instruction_p(i))
-	instrstring="RETURN";
-    else if (instruction_stop_p(i))
-	instrstring="STOP";
-    else if (instruction_format_p(i))
-	instrstring="FORMAT";
-    else if (instruction_assign_p(i))
-	instrstring="ASSIGN";
-    else {
-	instrstring="CALL";
-    }
-    break;
-    }
+	  instrstring="CONTINUE";
+	else if (return_instruction_p(i))
+	  instrstring="RETURN";
+	else if (instruction_stop_p(i))
+	  instrstring="STOP";
+	else if (instruction_format_p(i))
+	  instrstring="FORMAT";
+	else if (instruction_assign_p(i))
+	  instrstring="ASSIGN";
+	else {
+	  instrstring="CALL";
+	}
+	break;
+      }
     case is_instruction_block:
-	instrstring="BLOCK";
-	break;
+      instrstring="BLOCK";
+      break;
     case is_instruction_unstructured:
-	instrstring="UNSTRUCTURED";
-	break;
+      instrstring="UNSTRUCTURED";
+      break;
     case is_instruction_forloop:
       instrstring="FOR LOOP";
       break;
@@ -276,5 +272,5 @@ instruction_identification(instruction i)
 			instruction_tag(i));
     }
 
-    return instrstring;
+  return instrstring;
 }

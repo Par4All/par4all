@@ -60,10 +60,7 @@ char vcid_ri_util_control[] = "$Id$";
    initialized to the list of nodes to skip. To visit all the nodes from
    c, just give a list variable initialized to NIL
 */
-void
-control_map_get_blocs( c, l )
-control c ;
-cons **l ;
+void control_map_get_blocs(control c, list *l)
 {
     MAPL( cs,
     {if( CONTROL( CAR( cs )) == c ) return ;},
