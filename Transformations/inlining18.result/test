@@ -15,10 +15,10 @@ int main(void)
 }
 int main(void)
 {
-   char *_return0;
    const char *fun;
    const char *fun2;
    const char *fun3;
+   char *_return0;
    {
       const char *foo_fun = __FUNCTION__;
       _return0 = (char *) foo_fun;                                      /*0009*/

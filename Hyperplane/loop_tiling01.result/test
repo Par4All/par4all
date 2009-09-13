@@ -18,11 +18,11 @@ Source code after loop tiling
 
 void loop_tiling01(int ni, int nj)
 {
-   int j_t;
-   int i_t;
    float x[n][n];
    int i;
    int j;
+   int i_t;
+   int j_t;
 
 l1:
    for(i_t = 0; i_t <= (-1+ni)/10; i_t += 1)

@@ -17,9 +17,9 @@ Source code after strip mining
 
 int strip_mining01(int *in, int *val)
 {
-   int i_1;
    int x[512];
    int i;
+   int i_1;
 
 l1:
    for(i_1 = 0; i_1 <= 511; i_1 += 128)
@@ -36,9 +36,9 @@ Check preconditions on strip-mined loop
 
 int strip_mining01(int *in, int *val)
 {
-   int i_1;
    int x[512];
    int i;
+   int i_1;
 
 //  P() {}
 

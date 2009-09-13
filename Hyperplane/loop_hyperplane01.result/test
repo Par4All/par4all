@@ -18,11 +18,11 @@ Source code after loop hyperplane
 
 void loop_hyperplane01(int n, int ni, int nj)
 {
-   int jp;
-   int ip;
    float x[n][n];
    int i;
    int j;
+   int ip;
+   int jp;
 
 l1:
    for(ip = 0; ip <= -2+ni+nj; ip += 1)

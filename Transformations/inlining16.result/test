@@ -74,9 +74,9 @@ Code after inlining of "freia_cipo_dilate"
 
 freia_error freia_cipo_outer_gradient(freia_data2d *imout, freia_data2d *imin, int32_t connexity, uint32_t size)
 {
-   int _return0;
    freia_error ret;
    extern int freia_aipo_sub(freia_data2d *f1, freia_data2d *f2, freia_data2d *f3);
+   int _return0;
    {
       int kernel_8c[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
       int kernel_6c[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1};
@@ -166,9 +166,9 @@ int main()
 
 freia_error freia_cipo_outer_gradient(freia_data2d *imout, freia_data2d *imin, int32_t connexity, uint32_t size)
 {
-   int _return0;
    freia_error ret;
    extern int freia_aipo_sub(freia_data2d *f1, freia_data2d *f2, freia_data2d *f3);
+   int _return0;
    {
       int kernel_8c[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
       int kernel_6c[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1};
@@ -311,9 +311,9 @@ Code after partial eval
 
 freia_error freia_cipo_outer_gradient(freia_data2d *imout, freia_data2d *imin, int32_t connexity, uint32_t size)
 {
-   int _return0;
    freia_error ret;
    extern int freia_aipo_sub(freia_data2d *f1, freia_data2d *f2, freia_data2d *f3);
+   int _return0;
    {
       int kernel_8c[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
       int kernel_6c[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1};
@@ -376,9 +376,9 @@ Code after dead code elimination
 
 freia_error freia_cipo_outer_gradient(freia_data2d *imout, freia_data2d *imin, int32_t connexity, uint32_t size)
 {
-   int _return0;
    freia_error ret;
    extern int freia_aipo_sub(freia_data2d *f1, freia_data2d *f2, freia_data2d *f3);
+   int _return0;
    {
       int kernel_8c[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
       int kernel_6c[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1};
@@ -423,9 +423,9 @@ Code after full loop unrolling
 
 freia_error freia_cipo_outer_gradient(freia_data2d *imout, freia_data2d *imin, int32_t connexity, uint32_t size)
 {
-   int _return0;
    freia_error ret;
    extern int freia_aipo_sub(freia_data2d *f1, freia_data2d *f2, freia_data2d *f3);
+   int _return0;
    {
       int kernel_8c[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
       int kernel_6c[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1};
@@ -472,17 +472,17 @@ Code after inlining of "freia_cipo_outer_gradient"
 
 int main()
 {
-   int _return2;
-   int _return1;
-   int _return0;
    freia_data2d *imout;
    freia_data2d *imin;
    int32_t connexity = 8;
    uint32_t size = 4;
+   int _return0;
+   int _return1;
+   int _return2;
    {
-      int _return0;
       freia_error ret;
       extern int freia_aipo_sub(freia_data2d *f1, freia_data2d *f2, freia_data2d *f3);
+      int _return0;
       extern int freia_aipo_dilate_8c(freia_data2d *f1, freia_data2d *f2, int *f3);
       extern int freia_common_check_image_bpp_compat(freia_data2d *f1, freia_data2d *f2, void *f3);
       extern int freia_common_print_backtrace();
@@ -530,9 +530,9 @@ int main()
    }
    (void) _return1;
    {
-      int _return0;
       freia_error ret;
       extern int freia_aipo_sub(freia_data2d *f1, freia_data2d *f2, freia_data2d *f3);
+      int _return0;
       extern int freia_aipo_dilate_8c(freia_data2d *f1, freia_data2d *f2, int *f3);
       extern int freia_common_check_image_bpp_compat(freia_data2d *f1, freia_data2d *f2, void *f3);
       extern int freia_common_print_backtrace();
@@ -585,16 +585,16 @@ Code after flattening of "freia_cipo_outer_gradient"
 
 int main()
 {
-   int _return2;
-   int _return1;
-   int _return0;
    freia_data2d *imout;
    freia_data2d *imin;
    int32_t connexity = 8;
    uint32_t size = 4;
-   int _return0_0;
+   int _return0;
+   int _return1;
+   int _return2;
    freia_error ret_0;
    extern int freia_aipo_sub(freia_data2d *f1, freia_data2d *f2, freia_data2d *f3);
+   int _return0_0;
    extern int freia_aipo_dilate_8c(freia_data2d *f1, freia_data2d *f2, int *f3);
    extern int freia_common_check_image_bpp_compat(freia_data2d *f1, freia_data2d *f2, void *f3);
    extern int freia_common_print_backtrace();
@@ -606,8 +606,8 @@ int main()
    freia_error ret_1;
    extern int freia_aipo_copy(freia_data2d *f1, freia_data2d *f2);
    extern int freia_aipo_dilate_6c(freia_data2d *f1, freia_data2d *f2, int *f3);
-   int _return0_1;
    freia_error ret_2;
+   int _return0_1;
    int kernel_8c_1[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
    int kernel_6c_1[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1};
    int kernel_4c_1[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0};

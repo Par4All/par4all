@@ -22,9 +22,9 @@ int main(void)
 }
 int main(void)
 {
-   int _return0;
    int f;
    int b;
+   int _return0;
    {
       int foo_int = 1;
       _return0 = foo_int;                                               /*0008*/
@@ -37,9 +37,9 @@ int main(void)
 }
 int bla(void)
 {
-   int _return0;
    int f;
    int bla_int;
+   int _return0;
    {
       int foo_int = 1;
       _return0 = foo_int;                                               /*0008*/
@@ -50,19 +50,19 @@ int bla(void)
 }
 int main(void)
 {
-   int _return1;
-   int _return0;
    int f;
    int b;
+   int _return0;
+   int _return1;
    {
       int foo_int = 1;
       _return0 = foo_int;                                               /*0009*/
    }
    f = _return0;                                                        /*0011*/
    {
-      int _return0;
       int f;
       int bla_int;
+      int _return0;
       {
          int foo_int = 1;
          _return0 = foo_int;                                            /*0018*/

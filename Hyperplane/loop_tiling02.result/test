@@ -21,12 +21,12 @@ Source code after loop tiling
 
 void loop_tiling02(int ni, int nj, int nk)
 {
-   int k_t;
-   int j_t;
    float x[n][n][n];
    int i;
    int j;
    int k;
+   int j_t;
+   int k_t;
 
 l1:
    for(i = 0; i <= ni-1; i += 1)

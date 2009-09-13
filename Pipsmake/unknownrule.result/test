@@ -36,7 +36,7 @@ Closing program.
 Closing workspace.
 Workspace unknownrule closed.
 
-Display of file unknownrule.database/UNKNOWNRULE/UNKNOWNRULE.pref
+Display of file unknownrule.database/UNKNOWNRULE/UNKNOWNRULE.pre.f
       PROGRAM UNKNOWNRULE
 
 C     See what happens when Perform is called with an unexistant

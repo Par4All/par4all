@@ -17,8 +17,8 @@ Code after inlining
 
 int main(int argc, char **argv)
 {
-   int _return0;
    int c;
+   int _return0;
    {
       int argc_ = (2>argc?2:argc);
       _return0 = argc_;

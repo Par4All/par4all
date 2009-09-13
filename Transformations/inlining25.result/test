@@ -12,8 +12,8 @@ int main(void)
 }
 int main(void)
 {
-   int _return0;
    foo *m;
+   int _return0;
    {
       foo *j;
       extern foo *allo(int f1);

@@ -1,0 +1,55 @@
+delete terasm01
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create terasm01 terasm01.c include/terasm.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+module microcode
+
+echo
+echo Initial code
+echo
+
+display PRINTED_FILE
+
+echo
+echo Code after expression substitution
+echo
+
+setproperty EXPRESSION_SUBSTITUTION_PATTERN "addf"
+apply EXPRESSION_SUBSTITUTION
+setproperty EXPRESSION_SUBSTITUTION_PATTERN "subf"
+apply EXPRESSION_SUBSTITUTION
+setproperty EXPRESSION_SUBSTITUTION_PATTERN "mulf"
+apply EXPRESSION_SUBSTITUTION
+setproperty EXPRESSION_SUBSTITUTION_PATTERN "setf"
+apply EXPRESSION_SUBSTITUTION
+setproperty EXPRESSION_SUBSTITUTION_PATTERN "paddf"
+apply EXPRESSION_SUBSTITUTION
+setproperty EXPRESSION_SUBSTITUTION_PATTERN "addi"
+apply EXPRESSION_SUBSTITUTION
+setproperty EXPRESSION_SUBSTITUTION_PATTERN "subi"
+apply EXPRESSION_SUBSTITUTION
+setproperty EXPRESSION_SUBSTITUTION_PATTERN "muli"
+apply EXPRESSION_SUBSTITUTION
+setproperty EXPRESSION_SUBSTITUTION_PATTERN "seti"
+apply EXPRESSION_SUBSTITUTION
+display PRINTED_FILE
+
+
+echo
+echo Unsplit resulting code
+echo
+
+apply UNSPLIT
+shell gcc -c terasm01.database/Src/terasm01.c  -o terasm01.database/Src/terasm.o
+shell rm -rf terasm01.database/Src/terasm.o
+
+close
+delete terasm01
+quit
+

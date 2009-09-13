@@ -18,8 +18,8 @@ Code after conversion
 
 int main(int argc, char *argv[])
 {
-   int I_0;
    int i = 0;
+   int I_0;
    {
       int I_0;
       I_0 = 0;

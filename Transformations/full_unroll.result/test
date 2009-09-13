@@ -17,9 +17,9 @@ after unfolding and unrolling
 
 void foo(double A[10], double B[10][10])
 {
-   double _return0;
    int i;
    int j;
+   double _return0;
 l0:   ;
    _return0 = A[0];
    A[0] = B[0][0]+_return0;

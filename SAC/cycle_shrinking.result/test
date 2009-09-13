@@ -48,10 +48,10 @@ void shrink(float a[100+4], float b[100+4], float c[100+4])
 }
 void shrink(float a[100+4], float b[100+4], float c[100+4])
 {
-   int LU_IND0;
-   int LU_IB0;
-   int LU_NUB0;
    int i;
+   int LU_NUB0;
+   int LU_IB0;
+   int LU_IND0;
    // icc cannot vectorize this
    LU_NUB0 = 100;
    LU_IB0 = 0;
@@ -87,10 +87,10 @@ void shrink(float a[100+4], float b[100+4], float c[100+4])
 }
 void shrink(float a[100+4], float b[100+4], float c[100+4])
 {
-   int LU_IND0;
-   int LU_IB0;
-   int LU_NUB0;
    int i;
+   int LU_NUB0;
+   int LU_IB0;
+   int LU_IND0;
    // icc cannot vectorize this
    LU_NUB0 = 100;
    LU_IB0 = 0;
@@ -126,10 +126,10 @@ void shrink(float a[100+4], float b[100+4], float c[100+4])
 }
 void shrink(float a[100+4], float b[100+4], float c[100+4])
 {
-   int LU_IND0;
-   int LU_IB0;
-   int LU_NUB0;
    int i;
+   int LU_NUB0;
+   int LU_IB0;
+   int LU_IND0;
    // icc cannot vectorize this
    LU_NUB0 = 100;
    LU_IB0 = 0;
@@ -165,19 +165,19 @@ void shrink(float a[100+4], float b[100+4], float c[100+4])
 }
 void shrink(float a[100+4], float b[100+4], float c[100+4])
 {
-   float v4sf_vec8[3+1];
-   float v4sf_vec7[3+1];
-   float v4sf_vec6[3+1];
-   float v4sf_vec5[3+1];
-   float v4sf_vec4[3+1];
-   float v4sf_vec3[3+1];
-   float v4sf_vec2[3+1];
-   float v4sf_vec1[3+1];
+   int i;
+   int LU_NUB0;
+   int LU_IB0;
+   int LU_IND0;
    float v4sf_vec0[3+1];
-   int LU_IND0;
-   int LU_IB0;
-   int LU_NUB0;
-   int i;
+   float v4sf_vec1[3+1];
+   float v4sf_vec2[3+1];
+   float v4sf_vec3[3+1];
+   float v4sf_vec4[3+1];
+   float v4sf_vec5[3+1];
+   float v4sf_vec6[3+1];
+   float v4sf_vec7[3+1];
+   float v4sf_vec8[3+1];
    // icc cannot vectorize this
    LU_NUB0 = 100;
    LU_IB0 = 0;
@@ -197,19 +197,19 @@ void shrink(float a[100+4], float b[100+4], float c[100+4])
 }
 void shrink(float a[100+4], float b[100+4], float c[100+4])
 {
-   float v4sf_vec8[3+1];
-   float v4sf_vec7[3+1];
-   float v4sf_vec6[3+1];
-   float v4sf_vec5[3+1];
-   float v4sf_vec4[3+1];
-   float v4sf_vec3[3+1];
-   float v4sf_vec2[3+1];
-   float v4sf_vec1[3+1];
-   float v4sf_vec0[3+1];
-   int LU_IND0;
-   int LU_IB0;
-   int LU_NUB0;
    int i;
+   int LU_NUB0;
+   int LU_IB0;
+   int LU_IND0;
+   float v4sf_vec0[3+1];
+   float v4sf_vec1[3+1];
+   float v4sf_vec2[3+1];
+   float v4sf_vec3[3+1];
+   float v4sf_vec4[3+1];
+   float v4sf_vec5[3+1];
+   float v4sf_vec6[3+1];
+   float v4sf_vec7[3+1];
+   float v4sf_vec8[3+1];
    // icc cannot vectorize this
    LU_NUB0 = 100;
    LU_IB0 = 0;
@@ -229,16 +229,16 @@ void shrink(float a[100+4], float b[100+4], float c[100+4])
 }
 void shrink(float a[100+4], float b[100+4], float c[100+4])
 {
-   float v4sf_vec5[3+1];
-   float v4sf_vec4[3+1];
-   float v4sf_vec3[3+1];
-   float v4sf_vec2[3+1];
-   float v4sf_vec1[3+1];
-   float v4sf_vec0[3+1];
-   int LU_IND0;
-   int LU_IB0;
-   int LU_NUB0;
    int i;
+   int LU_NUB0;
+   int LU_IB0;
+   int LU_IND0;
+   float v4sf_vec0[3+1];
+   float v4sf_vec1[3+1];
+   float v4sf_vec2[3+1];
+   float v4sf_vec3[3+1];
+   float v4sf_vec4[3+1];
+   float v4sf_vec5[3+1];
    // icc cannot vectorize this
    LU_NUB0 = 100;
    LU_IB0 = 0;
@@ -261,16 +261,16 @@ simdized code
 
 void shrink(float a[100+4], float b[100+4], float c[100+4])
 {
-   float v4sf_vec5[3+1];
-   float v4sf_vec4[3+1];
-   float v4sf_vec3[3+1];
-   float v4sf_vec2[3+1];
-   float v4sf_vec1[3+1];
-   float v4sf_vec0[3+1];
-   int LU_IND0;
-   int LU_IB0;
-   int LU_NUB0;
    int i;
+   int LU_NUB0;
+   int LU_IB0;
+   int LU_IND0;
+   float v4sf_vec0[3+1];
+   float v4sf_vec1[3+1];
+   float v4sf_vec2[3+1];
+   float v4sf_vec3[3+1];
+   float v4sf_vec4[3+1];
+   float v4sf_vec5[3+1];
    // icc cannot vectorize this
    LU_NUB0 = 100;
    LU_IB0 = 0;

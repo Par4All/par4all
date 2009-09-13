@@ -15,11 +15,11 @@ Code after unrolling
 
 int main(int argc, char *argv[])
 {
-   int LU_IND0;
-   int LU_IB0;
-   int LU_NUB0;
    int i;
    int j = 1;
+   int LU_NUB0;
+   int LU_IB0;
+   int LU_IND0;
 loop:   LU_NUB0 = 100;
    LU_IB0 = 0;
    for(LU_IND0 = 0; LU_IND0 <= LU_IB0-1; LU_IND0 += 1) {
@@ -41,11 +41,11 @@ Code after dead code elimination
 
 int main(int argc, char *argv[])
 {
-   int LU_IND0;
-   int LU_IB0;
-   int LU_NUB0;
    int i;
    int j = 1;
+   int LU_NUB0;
+   int LU_IB0;
+   int LU_IND0;
    LU_NUB0 = 100;
    LU_IB0 = 0;
    LU_IND0 = 0;

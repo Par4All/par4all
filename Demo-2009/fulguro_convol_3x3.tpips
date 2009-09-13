@@ -2,7 +2,7 @@ delete fulguro-convol-3x3
 
 setenv PIPS_CPP_FLAGS=" -D__u64='unsigned long long' -D__s64='long long' -D__signed__=signed -DFLGR_PROC_NUMBER=1 -D__GLIBC_HAVE_LONG_LONG -I/home/serge/sources/fulguro/fulguro/trunk/include "
 
-create fulguro-convol-3x3 fulguro_convol_3x3.c fulguro-included.h
+create fulguro-convol-3x3 fulguro_convol_3x3.c
 
 setproperty ABORT_ON_USER_ERROR TRUE
 
@@ -14,20 +14,46 @@ setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
 activate C_PARSER
 
 display PRINTED_FILE[main]
-display PRINTED_FILE[flgr2d_convolution]
-apply INLINING_SIMPLE[flgr2d_convolution_fgUINT16]
-display PRINTED_FILE[flgr2d_convolution]
+module flgr2d_convolution
+display PRINTED_FILE
+#apply INLINING[flgr2d_convolution_fgUINT16] 
+#apply INLINING_SIMPLE[flgr2d_convolution_fgUINT16]
+#display PRINTED_FILE
+#apply INLINING_SIMPLE[flgr2d_raster_slide_window_fgUINT16]
+#display PRINTED_FILE
+#apply INLINING_SIMPLE[flgr2d_get_neighborhood_fgUINT16]
+#display PRINTED_FILE
 
 #set PREPROCESSOR_MISSING_FILE_HANDLING "generate"
-apply UNFOLDING[flgr_get_array_fgUINT16]
-apply INLINING[flgr_set_data_array_vector_fgUINT16]
-apply INLINING[flgr_get_array_fgUINT16]
-apply INLINING[flgr_set_array_fgUINT16]
-apply INLINING_SIMPLE[flgr2d_get_neighborhood_fgUINT16]
-apply INLINING[flgr2d_get_data_array_fgUINT16]
-apply INLINING_SIMPLE[flgr_get_data_array_vector_fgUINT16]
-display PRINTED_FILE[flgr2d_raster_slide_window_fgUINT16]
-display PRINTED_FILE[flgr2d_get_nhb_convolution_fgUINT16]
+
+module flgr_get_data_array_vector_fgUINT16
+display PRINTED_FILE
+apply UNFOLDING
+display PRINTED_FILE
+apply INLINING 
+
+module flgr_set_data_array_vector_fgUINT16
+display PRINTED_FILE
+apply UNFOLDING
+display PRINTED_FILE
+apply INLINING 
+
+
+module flgr2d_apply_raster_scan_method_fgUINT16
+display PRINTED_FILE
+apply UNFOLDING
+display PRINTED_FILE
+
+
+
+#apply INLINING[flgr_set_data_array_vector_fgUINT16]
+#apply INLINING[flgr_get_array_fgUINT16]
+#apply INLINING[flgr_set_array_fgUINT16]
+#apply INLINING_SIMPLE[flgr2d_get_neighborhood_fgUINT16]
+#apply INLINING[flgr2d_get_data_array_fgUINT16]
+#apply INLINING_SIMPLE[flgr_get_data_array_vector_fgUINT16]
+#display PRINTED_FILE[flgr2d_raster_slide_window_fgUINT16]
+#display PRINTED_FILE[flgr2d_get_nhb_convolution_fgUINT16]
 
 #apply INLINING_SIMPLE[flgr2d_raster_slide_window_fgUINT16]
 #display PRINTED_FILE[flgr2d_convolution]

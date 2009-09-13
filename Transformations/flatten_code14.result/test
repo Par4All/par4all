@@ -45,10 +45,10 @@ int flatten_code14(void)
 {
 // (0,1)
    // BEGIN BLOCK
-   int _return1;
-   int _return0;
    int i1;
    int i2;
+   int _return0;
+   int _return1;
    {
 // (0,2)
       // BEGIN BLOCK
@@ -93,10 +93,10 @@ int flatten_code14(void)
 {
 // (0,1)
    // BEGIN BLOCK
-   int _return1;
-   int _return0;
    int i1;
    int i2;
+   int _return0;
+   int _return1;
    extern int bla(int f1);
 // (0,2)
    // (0,3)
@@ -129,10 +129,10 @@ int flatten_code14(void)
 {
 // (0,1)
    // BEGIN BLOCK
-   int _return1;
-   int _return0;
    int i1;
    int i2;
+   int _return0;
+   int _return1;
    extern int bla(int f1);
 // (0,2)
    // (0,2)

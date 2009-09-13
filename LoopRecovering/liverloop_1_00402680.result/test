@@ -1,9 +1,9 @@
 void sub_00402680()
 {
+   int var1;
+   int var2;
    int var3;
    int var4;
-   int var2;
-   int var1;
    
    
 
@@ -77,10 +77,10 @@ loc_4026E9:   endloop(1);
 }
 void sub_00402680()
 {
+   int var1;
+   int var2;
    int var3;
    int var4;
-   int var2;
-   int var1;
    
    
 

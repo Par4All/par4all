@@ -21,13 +21,13 @@ Source code after loop tiling
 
 void loop_tiling03(int ni, int nj, int nk)
 {
-   int k_t;
-   int j_t;
-   int i_t;
    float x[n][n][n];
    int i;
    int j;
    int k;
+   int i_t;
+   int j_t;
+   int k_t;
 
 l1:
    for(i_t = 0; i_t <= (-1+ni)/10; i_t += 1)

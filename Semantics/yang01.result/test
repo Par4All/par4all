@@ -160,10 +160,10 @@ After inlining/unfolding of "bar"
 int bar()
 {
    // BEGIN BLOCK
-   int _return1;
-   int _return0;
    int x = 3;
    int y = x-3;
+   int _return0;
+   int _return1;
 
    while (x<=4) {
       // BEGIN BLOCK
@@ -212,10 +212,10 @@ After unspahettify of "bar"
 int bar()
 {
    // BEGIN BLOCK
-   int _return1;
-   int _return0;
    int x = 3;
    int y = x-3;
+   int _return0;
+   int _return1;
 
    while (x<=4) {
       // BEGIN BLOCK
@@ -270,10 +270,10 @@ int bar()
 //  P() {}
 
    // BEGIN BLOCK
-   int _return1;
-   int _return0;
    int x = 3;
    int y = x-3;
+   int _return0;
+   int _return1;
 
 //  P() {x==3, y==0}
 
@@ -377,10 +377,10 @@ int bar()
 //  P() {}
 
    // BEGIN BLOCK
-   int _return1;
-   int _return0;
    int x = 3;
    int y = x-3;
+   int _return0;
+   int _return1;
 
 //  P() {x==3, y==0}
 

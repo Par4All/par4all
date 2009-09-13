@@ -70,9 +70,9 @@ Code after scalarization
 void scalarization21(double A[SIZE][SIZE], double B[SIZE][SIZE])
 {
    // BEGIN BLOCK
-   double __scalar__0;
    int i;
    int j;
+   double __scalar__0;
    for(i = 0; i <= SIZE-1; i += 1)
       for(j = 0; j <= SIZE-1; j += 1) {
          // BEGIN BLOCK

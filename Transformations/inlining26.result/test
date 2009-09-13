@@ -20,8 +20,8 @@ int gradient(void)
 }
 int gradient(void)
 {
-   int _return1;
    int _return0;
+   int _return1;
    {
       int i;
       if (0) goto l99999;

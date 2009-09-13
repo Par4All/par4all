@@ -12,9 +12,9 @@ loop:
 }
 void filtre(float x[100], float y[100], float h[4])
 {
-   float F_0;
    int i;
    int k;
+   float F_0;
    for(i = 4-1; i <= 99; i += 1)
 loop:
       for(k = 0; k <= 3; k += 1) {
@@ -24,14 +24,14 @@ loop:
 }
 void filtre(float x[100], float y[100], float h[4])
 {
-   float RED1[3+1];
-   float RED0[0+1];
-   int LU_IND0;
-   int LU_IB0;
-   int LU_NUB0;
-   float F_0;
    int i;
    int k;
+   float F_0;
+   int LU_NUB0;
+   int LU_IB0;
+   int LU_IND0;
+   float RED0[0+1];
+   float RED1[3+1];
    for(i = 4-1; i <= 99; i += 1) {
 loop:      LU_NUB0 = 4;
       LU_IB0 = 0;
@@ -79,14 +79,14 @@ l99998:         ;
 }
 void filtre(float x[100], float y[100], float h[4])
 {
-   float RED1[3+1];
-   float RED0[0+1];
-   int LU_IND0;
-   int LU_IB0;
-   int LU_NUB0;
-   float F_0;
    int i;
    int k;
+   float F_0;
+   int LU_NUB0;
+   int LU_IB0;
+   int LU_IND0;
+   float RED0[0+1];
+   float RED1[3+1];
    for(i = 4-1; i <= 99; i += 1) {
 loop:      LU_NUB0 = 4;
       LU_IB0 = 0;
@@ -134,19 +134,19 @@ l99998:         ;
 }
 void filtre(float x[100], float y[100], float h[4])
 {
-   float F_04;
-   float F_03;
-   float F_02;
-   float F_01;
-   float F_00;
-   float RED1[3+1];
-   float RED0[0+1];
-   int LU_IND0;
-   int LU_IB0;
-   int LU_NUB0;
-   float F_0;
    int i;
    int k;
+   float F_0;
+   int LU_NUB0;
+   int LU_IB0;
+   int LU_IND0;
+   float RED0[0+1];
+   float RED1[3+1];
+   float F_00;
+   float F_01;
+   float F_02;
+   float F_03;
+   float F_04;
    for(i = 3; i <= 99; i += 1) {
       LU_NUB0 = 4;
       LU_IB0 = 0;
@@ -189,19 +189,19 @@ void filtre(float x[100], float y[100], float h[4])
 }
 void filtre(float x[100], float y[100], float h[4])
 {
-   float F_04;
-   float F_03;
-   float F_02;
-   float F_01;
-   float F_00;
-   float RED1[3+1];
-   float RED0[0+1];
-   int LU_IND0;
-   int LU_IB0;
-   int LU_NUB0;
-   float F_0;
    int i;
    int k;
+   float F_0;
+   int LU_NUB0;
+   int LU_IB0;
+   int LU_IND0;
+   float RED0[0+1];
+   float RED1[3+1];
+   float F_00;
+   float F_01;
+   float F_02;
+   float F_03;
+   float F_04;
    for(i = 3; i <= 99; i += 1) {
       LU_NUB0 = 4;
       LU_IB0 = 0;
@@ -244,27 +244,27 @@ void filtre(float x[100], float y[100], float h[4])
 }
 void filtre(float x[100], float y[100], float h[4])
 {
-   float v4sf_vec7[3+1];
-   float v4sf_vec6[3+1];
-   float v4sf_vec5[3+1];
-   float v4sf_vec4[3+1];
-   float v4sf_vec3[3+1];
-   float v4sf_vec2[3+1];
-   float v4sf_vec1[3+1];
+   int i;
+   int k;
+   float F_0;
+   int LU_NUB0;
+   int LU_IB0;
+   int LU_IND0;
+   float RED0[0+1];
+   float RED1[3+1];
+   float F_00;
+   float F_01;
+   float F_02;
+   float F_03;
+   float F_04;
    float v4sf_vec0[3+1];
-   float F_04;
-   float F_03;
-   float F_02;
-   float F_01;
-   float F_00;
-   float RED1[3+1];
-   float RED0[0+1];
-   int LU_IND0;
-   int LU_IB0;
-   int LU_NUB0;
-   float F_0;
-   int i;
-   int k;
+   float v4sf_vec1[3+1];
+   float v4sf_vec2[3+1];
+   float v4sf_vec3[3+1];
+   float v4sf_vec4[3+1];
+   float v4sf_vec5[3+1];
+   float v4sf_vec6[3+1];
+   float v4sf_vec7[3+1];
    for(i = 3; i <= 99; i += 1) {
       LU_NUB0 = 4;
       LU_IB0 = 0;
@@ -290,27 +290,27 @@ void filtre(float x[100], float y[100], float h[4])
 }
 void filtre(float x[100], float y[100], float h[4])
 {
-   float v4sf_vec7[3+1];
-   float v4sf_vec6[3+1];
-   float v4sf_vec5[3+1];
-   float v4sf_vec4[3+1];
-   float v4sf_vec3[3+1];
-   float v4sf_vec2[3+1];
-   float v4sf_vec1[3+1];
-   float v4sf_vec0[3+1];
-   float F_04;
-   float F_03;
-   float F_02;
-   float F_01;
-   float F_00;
-   float RED1[3+1];
-   float RED0[0+1];
-   int LU_IND0;
-   int LU_IB0;
-   int LU_NUB0;
-   float F_0;
    int i;
    int k;
+   float F_0;
+   int LU_NUB0;
+   int LU_IB0;
+   int LU_IND0;
+   float RED0[0+1];
+   float RED1[3+1];
+   float F_00;
+   float F_01;
+   float F_02;
+   float F_03;
+   float F_04;
+   float v4sf_vec0[3+1];
+   float v4sf_vec1[3+1];
+   float v4sf_vec2[3+1];
+   float v4sf_vec3[3+1];
+   float v4sf_vec4[3+1];
+   float v4sf_vec5[3+1];
+   float v4sf_vec6[3+1];
+   float v4sf_vec7[3+1];
    SIMD_LOAD_V4SF(v4sf_vec3, &RED1[0]);
    for(i = 3; i <= 99; i += 1) {
       LU_NUB0 = 4;
@@ -336,21 +336,21 @@ void filtre(float x[100], float y[100], float h[4])
 }
 void filtre(float x[100], float y[100], float h[4])
 {
-   float v4sf_vec3[3+1];
-   float v4sf_vec2[3+1];
-   float v4sf_vec1[3+1];
-   float v4sf_vec0[3+1];
-   float F_03;
-   float F_02;
-   float F_01;
-   float F_00;
-   float RED1[3+1];
-   float RED0[0+1];
-   int LU_IND0;
-   int LU_IB0;
-   int LU_NUB0;
    int i;
    int k;
+   int LU_NUB0;
+   int LU_IB0;
+   int LU_IND0;
+   float RED0[0+1];
+   float RED1[3+1];
+   float F_00;
+   float F_01;
+   float F_02;
+   float F_03;
+   float v4sf_vec0[3+1];
+   float v4sf_vec1[3+1];
+   float v4sf_vec2[3+1];
+   float v4sf_vec3[3+1];
    SIMD_LOAD_V4SF(v4sf_vec3, &RED1[0]);
    for(i = 3; i <= 99; i += 1) {
       LU_NUB0 = 4;
@@ -379,21 +379,21 @@ simdized code
 
 void filtre(float x[100], float y[100], float h[4])
 {
-   float v4sf_vec3[3+1];
-   float v4sf_vec2[3+1];
-   float v4sf_vec1[3+1];
-   float v4sf_vec0[3+1];
-   float F_03;
-   float F_02;
-   float F_01;
-   float F_00;
-   float RED1[3+1];
-   float RED0[0+1];
-   int LU_IND0;
-   int LU_IB0;
-   int LU_NUB0;
    int i;
    int k;
+   int LU_NUB0;
+   int LU_IB0;
+   int LU_IND0;
+   float RED0[0+1];
+   float RED1[3+1];
+   float F_00;
+   float F_01;
+   float F_02;
+   float F_03;
+   float v4sf_vec0[3+1];
+   float v4sf_vec1[3+1];
+   float v4sf_vec2[3+1];
+   float v4sf_vec3[3+1];
    SIMD_LOAD_V4SF(v4sf_vec3, &RED1[0]);
    for(i = 3; i <= 99; i += 1) {
       LU_NUB0 = 4;
