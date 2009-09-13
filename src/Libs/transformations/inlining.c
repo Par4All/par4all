@@ -523,7 +523,7 @@ statement inline_expression_call(inlining_parameters p, expression modified_expr
 
 
                 /* add the entity to our list */
-                statement_declarations(declaration_holder)=gen_nconc(statement_declarations(declaration_holder),CONS(ENTITY,new,NIL));
+                statement_declarations(declaration_holder)=CONS(ENTITY,new,statement_declarations(declaration_holder));
                 gen_context_recurse(expanded, new, statement_domain, gen_true, &solve_name_clashes);
                 replace_entity(expanded,e,new);
             }
