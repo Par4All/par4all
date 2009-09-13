@@ -1791,28 +1791,33 @@ type expression_to_type(expression exp)
 	pips_debug(6, "subscript case \n");
 
 	while (!ENDP(l_inds))
-	  {
-	    if(!ENDP(cd))
-	      {
-		POP(cd);
-		POP(l_inds);
-	      }
-	    else
-	      {
-		pips_assert("reference has too many indices : pointer expected\n", basic_pointer_p(cb));
-		ct= basic_pointer(cb);
-		cb = variable_basic(type_variable(ct));
-		cd = variable_dimensions(type_variable(ct));
-	      }
-	  }
+    {
+        if(!ENDP(cd))
+        {
+            POP(cd);
+            POP(l_inds);
+        }
+        else
+        {
+            pips_assert("reference has too many indices : pointer expected\n", basic_pointer_p(cb));
+            ct= basic_pointer(cb);
+            if( type_variable_p(ct) ) {
+                cb = variable_basic(type_variable(ct));
+                cd = variable_dimensions(type_variable(ct));
+            }
+            else {
+                pips_internal_error("unhandled case\n");
+            }
+        }
+    }
 
 	/* Warning : qualifiers are set to NIL, because I do not see
 	   the need for something else for the moment. BC.
 	*/
-	t = make_type(is_type_variable,
-		      make_variable(copy_basic(cb),
-				    gen_full_copy_list(cd),
-				    NIL));
+    t = make_type(is_type_variable,
+            make_variable(copy_basic(cb),
+                gen_full_copy_list(cd),
+                NIL));
 	break;
       }
     case is_syntax_application:
