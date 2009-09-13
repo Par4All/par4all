@@ -25,7 +25,7 @@ setproperty PREPROCESSOR_MISSING_FILE_HANDLING "generate"
 echo End of property settings
 
 make CUMULATED_EFFECTS[%ALL]
-module flgr1d_arith_add_fgINT32
+module flgr2d_arith_add_fgINT32
 display PRINTED_FILE
 apply UNFOLDING
 display PRINTED_FILE
