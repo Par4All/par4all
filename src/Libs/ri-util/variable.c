@@ -109,7 +109,7 @@ AddEntityToDeclarations(entity e, entity module) {
 void
 AddLocalEntityToDeclarations(entity e, entity module, statement s) {
 	/* SG: fix the entity storage if undefined
-	 * it basically recompute the offset of a sclar variable
+	 * it basically recompute the offset of a scalar variable
 	 * I have not found how to do it for a variable size array, so I just dropped the case
 	 */
 	if( storage_undefined_p(entity_storage(e)) && entity_variable_p(e) && entity_scalar_p(e) )
@@ -131,7 +131,7 @@ AddLocalEntityToDeclarations(entity e, entity module, statement s) {
 		pips_assert("Calling AddLocalEntityToDeclarations from c_module with valid statement", !statement_undefined_p(s) );
 		list l = statement_declarations(s);
 		if (gen_chunk_undefined_p(gen_find_eq(e,l)))
-			statement_declarations(s) = CONS(ENTITY,e,l);
+			statement_declarations(s) = gen_nconc(l,CONS(ENTITY,e,NIL));
 	}
 }
 
