@@ -1,0 +1,15 @@
+delete fulguro03
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create fulguro03 fulguro03.c
+activate C_PARSER
+
+setproperty PRETTYPRINT_C_CODE TRUE
+
+make SUMMARY_EFFECTS[%ALL]
+
+
+close
+delete fulguro03
+quit
