@@ -1055,140 +1055,142 @@ basic basic_of_external(call c)
  * WARNING: returns a newly allocated basic object */
 basic basic_of_intrinsic(call c, bool apply_p, bool ultimate_p)
 {
-  entity f = call_function(c);
-  type rt = functional_result(type_functional(entity_type(f)));
-  basic rb = copy_basic(variable_basic(type_variable(rt)));
+    entity f = call_function(c);
+    type rt = functional_result(type_functional(entity_type(f)));
+    basic rb = copy_basic(variable_basic(type_variable(rt)));
 
-  pips_debug(7, "Intrinsic call to intrinsic \"%s\" with a priori result type \"%s\"\n",
-	     module_local_name(f),
-	     basic_to_string(rb));
+    pips_debug(7, "Intrinsic call to intrinsic \"%s\" with a priori result type \"%s\"\n",
+            module_local_name(f),
+            basic_to_string(rb));
 
-  if(basic_overloaded_p(rb)) {
-    list args = call_arguments(c);
+    if(basic_overloaded_p(rb)) {
+        list args = call_arguments(c);
 
-    if (ENDP(args)) {
-      /* I don't know the type since there is no arguments !
-	 Bug encountered with a FMT=* in a PRINT.
-	 RK, 21/02/1994 : */
-      /* leave it overloaded */
-      ;
-    }
-    else if(ENTITY_ADDRESS_OF_P(f)) {
-      //string s = entity_user_name(f);
-      //bool b = ENTITY_ADDRESS_OF_P(f);
-      expression e = EXPRESSION(CAR(args));
-      basic eb = some_basic_of_any_expression(e, FALSE, ultimate_p);
-      // Forget multidimensional types
-      type et = make_type(is_type_variable,
-			  make_variable(eb, NIL, NIL));
+        if (ENDP(args)) {
+            /* I don't know the type since there is no arguments !
+               Bug encountered with a FMT=* in a PRINT.
+               RK, 21/02/1994 : */
+            /* leave it overloaded */
+            ;
+        }
+        else if(ENTITY_ADDRESS_OF_P(f)) {
+            //string s = entity_user_name(f);
+            //bool b = ENTITY_ADDRESS_OF_P(f);
+            expression e = EXPRESSION(CAR(args));
+            basic eb = some_basic_of_any_expression(e, FALSE, ultimate_p);
+            // Forget multidimensional types
+            type et = make_type(is_type_variable,
+                    make_variable(eb, NIL, NIL));
 
-      //fprintf(stderr, "b=%d, s=%s\n", b, s);
-      free_basic(rb);
-      rb = make_basic(is_basic_pointer, et);
-    }
-    else if(ENTITY_DEREFERENCING_P(f)) {
-      expression e = EXPRESSION(CAR(args));
-      free_basic(rb);
-      rb = basic_of_expression(e);
-      if(basic_pointer_p(rb)) {
-	type pt = type_undefined;
+            //fprintf(stderr, "b=%d, s=%s\n", b, s);
+            free_basic(rb);
+            rb = make_basic(is_basic_pointer, et);
+        }
+        else if(ENTITY_DEREFERENCING_P(f)) {
+            expression e = EXPRESSION(CAR(args));
+            free_basic(rb);
+            rb = basic_of_expression(e);
+            if(basic_pointer_p(rb)) {
+                type pt = type_undefined;
 
-	if(ultimate_p)
-	  pt = copy_type(ultimate_type(basic_pointer(rb)));
-	else
-	  pt = copy_type(basic_pointer(rb));
+                if(ultimate_p)
+                    pt = copy_type(ultimate_type(basic_pointer(rb)));
+                else
+                    pt = copy_type(basic_pointer(rb));
 
-	free_basic(rb);
-	pips_assert("The pointed type is consistent", type_consistent_p(pt));
-	if(type_variable_p(pt) && !apply_p)
-	  rb = copy_basic(variable_basic(type_variable(pt)));
-    else if(type_functional_p(pt)) {
-        if( apply_p) { /* get basic of fucntion result */
-            type rt = ultimate_type(functional_result(type_functional(pt)));
-            if(type_variable_p(rt))
-                rb = copy_basic(variable_basic(type_variable(rt)));
+                pips_assert("The pointed type is consistent", type_consistent_p(pt));
+                if(type_variable_p(pt) && !apply_p) {
+                    free_basic(rb);
+                    rb = copy_basic(variable_basic(type_variable(pt)));
+                }
+                else if(type_functional_p(pt)) {
+                    if(apply_p) {
+                        free_basic(rb);
+                        type rt = ultimate_type(functional_result(type_functional(pt)));
+                        if(type_variable_p(rt))
+                            rb = copy_basic(variable_basic(type_variable(rt)));
+                        else {
+                            /* Too bad for "void"... */
+                            pips_internal_error("result type of a functional type must be a variable type\n");
+                        }
+                    }
+                    else {
+                        return rb;
+                    }
+                }
+                else {
+                    pips_internal_error("unhandled case\n");
+                }
+            }
             else {
-                /* Too bad for "void"... */
-                pips_internal_error("result type of a functional type must be a variable type\n");
+                /* This can also be a user error, but if the function is
+                   called from the parser, a CParserError() should be called:
+                   how to guess what to do? */
+                pips_internal_error("Dereferencing of a non-pointer expression\n"
+                        "Please use gcc to check that your source code is legal\n");
             }
         }
-        else {
-            pips_internal_error("unhandled case\n");
+        else if(ENTITY_POINT_TO_P(f)) {
+            //pips_internal_error("Point to case not implemented yet\n");
+            expression e1 = EXPRESSION(CAR(args));
+            expression e2 = EXPRESSION(CAR(CDR(args)));
+            free_basic(rb);
+            pips_assert("Two arguments for ENTITY_POINT_TO", gen_length(args)==2);
+            ifdebug(8) {
+                pips_debug(8, "Point to case, e1 = ");
+                print_expression(e1);
+                pips_debug(8, " and e2 = ");
+                print_expression(e1);
+                pips_debug(8, "\n");
+            }
+            rb = basic_of_expression(e2);
         }
-    }
-    else {
-        pips_internal_error("unhandled case\n");
-    }
-      }
-      else {
-	/* This can also be a user error, but if the function is
-	   called from the parser, a CParserError() should be called:
-	   how to guess what to do? */
-	pips_internal_error("Dereferencing of a non-pointer expression\n"
-			    "Please use gcc to check that your source code is legal\n");
-      }
-    }
-    else if(ENTITY_POINT_TO_P(f)) {
-      //pips_internal_error("Point to case not implemented yet\n");
-      expression e1 = EXPRESSION(CAR(args));
-      expression e2 = EXPRESSION(CAR(CDR(args)));
-      free_basic(rb);
-      pips_assert("Two arguments for ENTITY_POINT_TO", gen_length(args)==2);
-      ifdebug(8) {
-	pips_debug(8, "Point to case, e1 = ");
-	print_expression(e1);
-	pips_debug(8, " and e2 = ");
-	print_expression(e1);
-	pips_debug(8, "\n");
-      }
-      rb = basic_of_expression(e2);
-    }
-    else if(ENTITY_BRACE_INTRINSIC_P(f)) {
-      /* We should reconstruct a struct type or an array type... */
-      rb = make_basic_overloaded();
-    }
-    else if(ENTITY_ASSIGN_P(f)) {
-      /* returns the type of the left hand side */
-      rb = basic_of_expression(EXPRESSION(CAR(args)));
-    }
-    else if(ENTITY_FIELD_P(f)) {
-      free_basic(rb);
-      rb = basic_of_expression(EXPRESSION(CAR(CDR(args))));
-    }
-    else if(ENTITY_COMMA_P(f)) {
-      /* The value returned is the value of the last expression in the list. */
-      free_basic(rb);
-      rb = basic_of_expression(EXPRESSION(CAR(gen_last(args))));
-    }
-    else if(ENTITY_CONDITIONAL_P(f)) {
-      /* The value returned is the value of the first expression in
-	 the list after the condition. The second expression is
-	 assumed to have the same value because the code is assumed
-	 correct. */
-      free_basic(rb);
-      rb = basic_of_expression(EXPRESSION(CAR(CDR(args))));
-    }
-    else {
-      free_basic(rb);
-      rb = basic_of_expression(EXPRESSION(CAR(args)));
+        else if(ENTITY_BRACE_INTRINSIC_P(f)) {
+            /* We should reconstruct a struct type or an array type... */
+            rb = make_basic_overloaded();
+        }
+        else if(ENTITY_ASSIGN_P(f)) {
+            /* returns the type of the left hand side */
+            rb = basic_of_expression(EXPRESSION(CAR(args)));
+        }
+        else if(ENTITY_FIELD_P(f)) {
+            free_basic(rb);
+            rb = basic_of_expression(EXPRESSION(CAR(CDR(args))));
+        }
+        else if(ENTITY_COMMA_P(f)) {
+            /* The value returned is the value of the last expression in the list. */
+            free_basic(rb);
+            rb = basic_of_expression(EXPRESSION(CAR(gen_last(args))));
+        }
+        else if(ENTITY_CONDITIONAL_P(f)) {
+            /* The value returned is the value of the first expression in
+               the list after the condition. The second expression is
+               assumed to have the same value because the code is assumed
+               correct. */
+            free_basic(rb);
+            rb = basic_of_expression(EXPRESSION(CAR(CDR(args))));
+        }
+        else {
+            free_basic(rb);
+            rb = basic_of_expression(EXPRESSION(CAR(args)));
 
-      MAP(EXPRESSION, arg, {
-	basic b = basic_of_expression(arg);
-	basic new_rb = basic_maximum(rb, b);
+            MAP(EXPRESSION, arg, {
+                    basic b = basic_of_expression(arg);
+                    basic new_rb = basic_maximum(rb, b);
 
-	free_basic(rb);
-	free_basic(b);
-	rb = new_rb;
-      }, CDR(args));
+                    free_basic(rb);
+                    free_basic(b);
+                    rb = new_rb;
+                    }, CDR(args));
+        }
+
     }
 
-  }
+    pips_debug(7, "Intrinsic call to intrinsic \"%s\" with a posteriori result type \"%s\"\n",
+            module_local_name(f),
+            basic_to_string(rb));
 
-  pips_debug(7, "Intrinsic call to intrinsic \"%s\" with a posteriori result type \"%s\"\n",
-	     module_local_name(f),
-	     basic_to_string(rb));
-
-  return rb;
+    return rb;
 }
 
 /* basic basic_of_constant(call c): returns the basic of the call to a
