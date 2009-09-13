@@ -374,18 +374,18 @@ statement inline_expression_call(inlining_parameters p, expression modified_expr
                     if(entity_variable_p(ref_ent) &&
                             !top_level_entity_p(ref_ent)) /* make it global instead of static ...*/
                     {
-		      if(variable_static_p(ref_ent)) {
-			pips_user_warning("replacing static variable \"%s\" by a global one, this may lead to incorrect code\n", entity_user_name(ref_ent));
-			add = make_global_entity_from_local(ref_ent);
-			replace_entity(expanded,ref_ent,add);
-			replace_entity(inlined_module_statement(p),ref_ent,add);
-		      }
-		      else {
-			/* FI: with some FREIA code, I end up here with a formal
-			   parameter... */
-			pips_internal_error("error about variable storage of entity \"%s\"\n", entity_name(ref_ent));
-		      }
-		    }
+                        if(variable_static_p(ref_ent)) {
+                            pips_user_warning("replacing static variable \"%s\" by a global one, this may lead to incorrect code\n", entity_user_name(ref_ent));
+                            add = make_global_entity_from_local(ref_ent);
+                            replace_entity(expanded,ref_ent,add);
+                            replace_entity(inlined_module_statement(p),ref_ent,add);
+                        }
+                        else {
+                            /* FI: with some FREIA code, I end up here with a formal
+                               parameter... */
+                            pips_internal_error("error about variable storage of entity \"%s\"\n", entity_name(ref_ent));
+                        }
+                    }
                     new_externs=CONS(ENTITY,add,new_externs);
                 }
             }
@@ -523,7 +523,7 @@ statement inline_expression_call(inlining_parameters p, expression modified_expr
 
 
                 /* add the entity to our list */
-                statement_declarations(declaration_holder)=gen_nconc(CONS(ENTITY,new,NIL), statement_declarations(declaration_holder));
+                statement_declarations(declaration_holder)=gen_nconc(statement_declarations(declaration_holder),CONS(ENTITY,new,NIL));
                 gen_context_recurse(expanded, new, statement_domain, gen_true, &solve_name_clashes);
                 replace_entity(expanded,e,new);
             }
