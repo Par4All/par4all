@@ -1102,16 +1102,23 @@ basic basic_of_intrinsic(call c, bool apply_p, bool ultimate_p)
 	pips_assert("The pointed type is consistent", type_consistent_p(pt));
 	if(type_variable_p(pt) && !apply_p)
 	  rb = copy_basic(variable_basic(type_variable(pt)));
-	else if(type_functional_p(pt) && apply_p) {
-	  type rt = ultimate_type(functional_result(type_functional(pt)));
-
-	  if(type_variable_p(rt))
-	    rb = copy_basic(variable_basic(type_variable(rt)));
-	  else {
-	    /* Too bad for "void"... */
-	    pips_internal_error("result type of a functional type must be a variable type\n");
-	  }
-	}
+    else if(type_functional_p(pt)) {
+        if( apply_p) { /* get basic of fucntion result */
+            type rt = ultimate_type(functional_result(type_functional(pt)));
+            if(type_variable_p(rt))
+                rb = copy_basic(variable_basic(type_variable(rt)));
+            else {
+                /* Too bad for "void"... */
+                pips_internal_error("result type of a functional type must be a variable type\n");
+            }
+        }
+        else {
+            pips_internal_error("unhandled case\n");
+        }
+    }
+    else {
+        pips_internal_error("unhandled case\n");
+    }
       }
       else {
 	/* This can also be a user error, but if the function is

@@ -903,7 +903,6 @@ bool do_unfolding(inlining_parameters p, char* module_name)
         callees cc =compute_callees(unfolded_module_statement);
         set calls_name = set_make(set_string);
         set_assign_list(calls_name,callees_callees(cc));
-        statement_has_callee=set_empty_p(calls_name);
 
 
         /* maybe the user put a restriction on the calls to inline ?*/
@@ -916,7 +915,7 @@ bool do_unfolding(inlining_parameters p, char* module_name)
 
 
         /* there is something to inline */
-        if( !set_empty_p(calls_name) )
+        if( (statement_has_callee=!set_empty_p(calls_name)) )
         {
             SET_FOREACH(string,call_name,calls_name) {
                 run_inlining(module_name,call_name,p);

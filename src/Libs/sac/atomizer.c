@@ -103,7 +103,7 @@ statement simd_atomize_this_expression(entity (*create)(entity, basic),
     if (syntax_range_p(expression_syntax(e))) return NULL;
 
     /* SG: in case of expression similar to (a+2), if a is a short (or a char ...),
-     * the user may expect the result is a short two 
+     * the user may expect the result is a short too 
      * the C syntax expect 2 is an int
      * set the property to false if you want to override this behavior
      */
@@ -297,6 +297,10 @@ void simd_do_atomize(expression ce, statement cs)
 		}
 	}
 }
+static bool reference_filter(expression exp, __attribute__((unused)) statement cs)
+{
+    return !(expression_reference_p(exp));
+}
 
 /* This function is called for each call statement and atomize it
 */
@@ -314,7 +318,7 @@ static void atomize_call_statement(statement cs)
 		if( expression_call_p(rhs) )
 		{
 			FOREACH(EXPRESSION, arg,call_arguments(expression_call(rhs)))
-				gen_context_recurse(arg,cs,expression_domain,gen_true,simd_do_atomize);
+				gen_context_recurse(arg,cs,expression_domain,reference_filter,simd_do_atomize);
 		}
 	}
 }
