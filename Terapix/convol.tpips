@@ -61,6 +61,8 @@ apply KERNELIZE
 display PRINTED_FILE[convol]
 display PRINTED_FILE[work]
 display PRINTED_FILE[microcode]
+#apply KERNEL_LOAD_STORE[convol]
+#display PRINTED_FILE[convol]
 
 module microcode
 
@@ -115,7 +117,7 @@ echo
 
 apply FLATTEN_CODE
 apply PARTIAL_EVAL
-apply USE_DEF_ELIMINATION
+#apply USE_DEF_ELIMINATION
 apply SUPPRESS_DEAD_CODE
 apply CLEAN_DECLARATIONS
 display PRINTED_FILE

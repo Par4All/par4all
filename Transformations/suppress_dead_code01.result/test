@@ -26,58 +26,60 @@ Initial code for "suppress_dead_code01" with proper effects
 void suppress_dead_code01(int *x)
 {
    char *p;
-//               <must be read   >: _MALLOC_
-//               <must be written>: _MALLOC_ p
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ p
    
    /* Not dead code because of memory read-write effects, even if
         masked because the implementation is thread-safe. */
    p = malloc(10);
-//               <must be read   >: _MALLOC_ p
-//               <must be written>: _MALLOC_
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_ p
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_
    free(p);
    
    /* Not dead code because of control effect */
    while (1) 
       ;
-//               <must be read   >: _MALLOC_
-//               <must be written>: _MALLOC_ p
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ p
    
    /* Not dead code because of memory read-write effects, even if
         masked because the implementation is thread-safe, but dead
         because the previous loop never terminates. */
    p = malloc(10);
-//               <must be read   >: _MALLOC_ p
-//               <must be written>: _MALLOC_
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_ p
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_
    free(p);
 }
 
 Initial code for "suppress_dead_code01" with cumulated effects
 
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_
 void suppress_dead_code01(int *x)
 {
    char *p;
-//               <must be read   >: _MALLOC_
-//               <must be written>: _MALLOC_ p
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ p
    
    /* Not dead code because of memory read-write effects, even if
         masked because the implementation is thread-safe. */
    p = malloc(10);
-//               <must be read   >: _MALLOC_ p
-//               <must be written>: _MALLOC_
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_ p
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_
    free(p);
    
    /* Not dead code because of control effect */
    while (1) 
       ;
-//               <must be read   >: _MALLOC_
-//               <must be written>: _MALLOC_ p
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ p
    
    /* Not dead code because of memory read-write effects, even if
         masked because the implementation is thread-safe, but dead
         because the previous loop never terminates. */
    p = malloc(10);
-//               <must be read   >: _MALLOC_ p
-//               <must be written>: _MALLOC_
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_ p
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_
    free(p);
 }
 

@@ -21,6 +21,8 @@ setproperty KERNELIZE_HOST_CALL_NAME "launch_kernel1"
 apply KERNELIZE[compute]
 
 display PRINTED_FILE[%ALLFUNC]
+apply KERNEL_LOAD_STORE[compute]
+display PRINTED_FILE[compute]
 
 echo
 echo Code after cleanup

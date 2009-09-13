@@ -335,6 +335,7 @@ void alphablending(size_t n, float src1[n], float src2[n], float result[n], floa
 }
 void alphablending(size_t n, float src1[n], float src2[n], float result[n], float alpha)
 {
+   float F_3;
    float v4sf_vec20[3+1];
    float v4sf_vec19[3+1];
    float v4sf_vec18[3+1];
@@ -380,8 +381,9 @@ void alphablending(size_t n, float src1[n], float src2[n], float result[n], floa
    size_t i;
    LU_NUB0 = n;
    LU_IB0 = MOD(LU_NUB0, 4);
+   F_3 = 1-alpha;
    LU_IND0 = MAX(INT(LU_IB0), 0);
-   F_14 = 1-alpha;
+   F_14 = F_3;
    for(LU_IND0 = 0; LU_IND0 <= LU_IB0-1; LU_IND0 += 1) {
       F_04 = alpha*src1[LU_IND0];
       F_24 = F_14*src2[LU_IND0];
@@ -407,6 +409,7 @@ void alphablending(size_t n, float src1[n], float src2[n], float result[n], floa
 }
 void alphablending(size_t n, float src1[n], float src2[n], float result[n], float alpha)
 {
+   float F_3;
    float v4sf_vec9[3+1];
    float v4sf_vec8[3+1];
    float v4sf_vec6[3+1];
@@ -436,8 +439,9 @@ void alphablending(size_t n, float src1[n], float src2[n], float result[n], floa
    size_t i;
    LU_NUB0 = n;
    LU_IB0 = MOD(LU_NUB0, 4);
+   F_3 = 1-alpha;
    LU_IND0 = MAX(INT(LU_IB0), 0);
-   F_14 = 1-alpha;
+   F_14 = F_3;
    for(LU_IND0 = 0; LU_IND0 <= LU_IB0-1; LU_IND0 += 1) {
       F_04 = alpha*src1[LU_IND0];
       F_24 = F_14*src2[LU_IND0];
@@ -466,6 +470,7 @@ simdized code
 
 void alphablending(size_t n, float src1[n], float src2[n], float result[n], float alpha)
 {
+   float F_3;
    float v4sf_vec9[3+1];
    float v4sf_vec8[3+1];
    float v4sf_vec6[3+1];
@@ -495,8 +500,9 @@ void alphablending(size_t n, float src1[n], float src2[n], float result[n], floa
    size_t i;
    LU_NUB0 = n;
    LU_IB0 = MOD(LU_NUB0, 4);
+   F_3 = 1-alpha;
    LU_IND0 = MAX(INT(LU_IB0), 0);
-   F_14 = 1-alpha;
+   F_14 = F_3;
    for(LU_IND0 = 0; LU_IND0 <= LU_IB0-1; LU_IND0 += 1) {
       F_04 = alpha*src1[LU_IND0];
       F_24 = F_14*src2[LU_IND0];

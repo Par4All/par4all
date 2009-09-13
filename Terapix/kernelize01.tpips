@@ -8,6 +8,7 @@ activate C_PARSER
 setproperty PRETTYPRINT_C_CODE TRUE
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
+#activate PRINT_CODE_REGIONS
 
 module foo
 
@@ -29,6 +30,8 @@ apply KERNELIZE
 display PRINTED_FILE[foo]
 display PRINTED_FILE[run_kernel]
 display PRINTED_FILE[kernel]
+
+apply KERNEL_LOAD_STORE[foo]
 
 echo
 echo Code after cleanup
