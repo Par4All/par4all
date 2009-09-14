@@ -1124,17 +1124,21 @@ basic basic_of_intrinsic(call c, bool apply_p, bool ultimate_p)
             }
             else {
                 type et = call_to_type(c);
-                if(ultimate_p) et=ultimate_type(et);
+                if(ultimate_p) et=basic_concrete_type(et);
                 if( type_variable_p(et) )
                 {
                     free_basic(rb);
                     rb=copy_basic(variable_basic(type_variable(et)));
                 }
-                /* This can also be a user error, but if the function is
-                   called from the parser, a CParserError() should be called:
-                   how to guess what to do? */
-                pips_internal_error("Dereferencing of a non-pointer expression\n"
-                        "Please use gcc to check that your source code is legal\n");
+                if( !type_variable_p(et) ) {
+
+                    /* This can also be a user error, but if the function is
+                       called from the parser, a CParserError() should be called:
+                       how to guess what to do? */
+                    pips_internal_error("Dereferencing of a non-pointer, non array expression\n"
+                            "Please use gcc to check that your source code is legal\n");
+                }
+                if(ultimate_p) free_type(et);
             }
         }
         else if(ENTITY_POINT_TO_P(f)) {
@@ -1680,7 +1684,7 @@ type expression_to_type(expression exp)
     case is_syntax_reference:
       {
 	reference ref = syntax_reference(s_exp);
-	type exp_type = ultimate_type(entity_type(reference_variable(ref)));
+	type exp_type = basic_concrete_type(entity_type(reference_variable(ref)));
 
 	pips_debug(6, "reference case \n");
 
@@ -1745,6 +1749,7 @@ type expression_to_type(expression exp)
 	    pips_internal_error("Bad reference type tag %d \"%s\"\n",
 				type_tag(exp_type), type_to_string(exp_type));
 	  }
+    free_type(exp_type);
 
 	break;
       }
@@ -2261,6 +2266,7 @@ type ultimate_type(type t)
       type st = entity_type(e);
 
       nt = ultimate_type(st);
+#if 0
       if( !ENDP(variable_dimensions(vt) ) ) /* without this test, we would erase the dimension ... */
       {
           /* what should we do ? allocate a new type ... but this breaks the semantic of the function
@@ -2272,6 +2278,7 @@ type ultimate_type(type t)
           variable_dimensions(type_variable(nt))=gen_nconc(gen_copy_seq(variable_dimensions(vt)),variable_dimensions(type_variable(nt)));
 
       }
+#endif
     }
     else
       nt = t;
