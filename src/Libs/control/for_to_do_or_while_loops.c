@@ -125,15 +125,16 @@ static bool condition_expression_to_final_bound(expression cond,
     call c = syntax_call(cond_s);
     entity op = call_function(c);
 
-    /* Four operators are accepted */
+    /* Five operators are accepted */
     if (ENTITY_LESS_THAN_P(op) || ENTITY_LESS_OR_EQUAL_P(op)
-	|| ENTITY_GREATER_THAN_P(op) || ENTITY_GREATER_OR_EQUAL_P(op)) {
+	|| ENTITY_GREATER_THAN_P(op) || ENTITY_GREATER_OR_EQUAL_P(op)
+    || ENTITY_NON_EQUAL_P(op) ) {
       expression e1 = EXPRESSION(CAR(call_arguments(c)));
       expression e2 = EXPRESSION(CAR(CDR(call_arguments(c))));
       syntax e1_s = expression_syntax(e1);
       syntax e2_s = expression_syntax(e2);
 
-      strict_p = ENTITY_LESS_THAN_P(op) || ENTITY_GREATER_THAN_P(op);
+      strict_p = ENTITY_LESS_THAN_P(op) || ENTITY_GREATER_THAN_P(op) || ENTITY_NON_EQUAL_P(op);
 
       if (syntax_reference_p(e1_s)
 	  && reference_variable(syntax_reference(e1_s)) == li ) {
