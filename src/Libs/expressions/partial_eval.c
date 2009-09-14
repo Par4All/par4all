@@ -562,9 +562,17 @@ eformat_t partial_eval_call(expression exp, Psysteme ps, effects fx)
     else ef = eformat_undefined;
     break;
   case is_value_code:
-    /* FI: The actual aruments are not partially evaluated? */
-    ef = eformat_undefined;
-    break;
+    {
+        /* FI: The actual aruments are not partially evaluated?
+         * SG: no it's not, I fixed this
+         */
+        FOREACH(EXPRESSION,eparam,call_arguments(ec))
+        {
+            partial_eval_expression(eparam,ps,fx);
+        }
+
+        ef = eformat_undefined;
+    } break;
   default:
     pips_error("partial_eval_call", "case default\n");
   }
