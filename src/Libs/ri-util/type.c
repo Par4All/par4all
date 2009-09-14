@@ -1123,6 +1123,13 @@ basic basic_of_intrinsic(call c, bool apply_p, bool ultimate_p)
                 }
             }
             else {
+                type et = call_to_type(c);
+                if(ultimate_p) et=ultimate_type(et);
+                if( type_variable_p(et) )
+                {
+                    free_basic(rb);
+                    rb=copy_basic(variable_basic(type_variable(et)));
+                }
                 /* This can also be a user error, but if the function is
                    called from the parser, a CParserError() should be called:
                    how to guess what to do? */
@@ -2254,6 +2261,17 @@ type ultimate_type(type t)
       type st = entity_type(e);
 
       nt = ultimate_type(st);
+      if( !ENDP(variable_dimensions(vt) ) ) /* without this test, we would erase the dimension ... */
+      {
+          /* what should we do ? allocate a new type ... but this breaks the semantic of the function
+           * we still create a leak for this case, which does not appear to often
+           * a warning is printed out, so that we don't forget it
+           */
+          pips_user_warning("leaking some memory\n");
+          nt=copy_type(nt);
+          variable_dimensions(type_variable(nt))=gen_nconc(gen_copy_seq(variable_dimensions(vt)),variable_dimensions(type_variable(nt)));
+
+      }
     }
     else
       nt = t;
