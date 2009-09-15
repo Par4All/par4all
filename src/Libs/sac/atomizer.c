@@ -299,7 +299,7 @@ void simd_do_atomize(expression ce, statement cs)
 }
 static bool reference_filter(expression exp, __attribute__((unused)) statement cs)
 {
-    return !(expression_reference_p(exp));
+    return get_bool_property("SIMD_ATOMIZER_ATOMIZE_REFERENCE") || !(expression_reference_p(exp));
 }
 
 /* This function is called for each call statement and atomize it
@@ -320,6 +320,11 @@ static void atomize_call_statement(statement cs)
 			FOREACH(EXPRESSION, arg,call_arguments(expression_call(rhs)))
 				gen_context_recurse(arg,cs,expression_domain,reference_filter,simd_do_atomize);
 		}
+        if(get_bool_property("SIMD_ATOMIZER_ATOMIZE_LHS"))
+        {
+            expression lhs = EXPRESSION(CAR(call_arguments(c)));
+            gen_context_recurse(lhs,cs,expression_domain,reference_filter,simd_do_atomize);
+        }
 	}
 }
 
