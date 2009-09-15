@@ -20,6 +20,10 @@ TYPE OP(mul,SUFF)(TYPE lhs, TYPE rhs)
 {
     return lhs=lhs*rhs;
 }
+TYPE OP(div,SUFF)(TYPE lhs, TYPE rhs)
+{
+    return lhs=lhs/rhs;
+}
 TYPE OP(set,SUFF)(TYPE lhs, TYPE rhs)
 {
     return lhs=rhs;

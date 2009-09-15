@@ -1,0 +1,1595 @@
+
+Initial code
+
+void microcode(int i, int isi, int isj, float *image, float *kernel, float *new_image)
+{
+   float F_17;
+   float F_16;
+   float F_15;
+   int I_22;
+   int I_21;
+   float F_14;
+   float F_13;
+   float F_12;
+   int I_20;
+   float F_11;
+   float F_10;
+   float F_9;
+   int I_19;
+   int I_18;
+   int I_17;
+   int I_14;
+   int I_9;
+   int I_5;
+   float __scalar__0;
+   int j;
+   int i_1_0;
+   int ki_0;
+   int kj_0;
+   I_17 = isj-2;
+   for (i_1_0 = i;i_1_0<=MIN(i+127, isi-2);i_1_0 += 1)
+l99994:      for (j = 1;j<=I_17;j += 1) {
+         __scalar__0 = 0.;
+         I_18 = i_1_0-1;
+         I_19 = isj*I_18;
+         I_5 = j+I_19;
+         F_9 = image[I_5-1]*kernel[0];
+         __scalar__0 = __scalar__0+F_9;
+         F_10 = image[I_5]*kernel[1];
+         __scalar__0 = __scalar__0+F_10;
+         F_11 = image[I_5+1]*kernel[2];
+         __scalar__0 = __scalar__0+F_11;
+         kj_0 = 3;
+         I_20 = isj*i_1_0;
+         I_9 = j+I_20;
+         F_12 = image[I_9-1]*kernel[3];
+         __scalar__0 = __scalar__0+F_12;
+         F_13 = image[I_9]*kernel[4];
+         __scalar__0 = __scalar__0+F_13;
+         F_14 = image[I_9+1]*kernel[5];
+         __scalar__0 = __scalar__0+F_14;
+         kj_0 = 3;
+         I_21 = i_1_0+1;
+         I_22 = isj*I_21;
+         I_14 = j+I_22;
+         F_15 = image[I_14-1]*kernel[6];
+         __scalar__0 = __scalar__0+F_15;
+         F_16 = image[I_14]*kernel[7];
+         __scalar__0 = __scalar__0+F_16;
+         F_17 = image[I_14+1]*kernel[8];
+         __scalar__0 = __scalar__0+F_17;
+         kj_0 = 3;
+         ki_0 = 3;
+         __scalar__0 = __scalar__0/9;
+         new_image[j+isj*i_1_0] = __scalar__0;
+      }
+}
+
+Atomized code
+
+void microcode(int i, int isi, int isj, float *image, float *kernel, float *new_image)
+{
+   float F_17;
+   float F_16;
+   float F_15;
+   int I_22;
+   int I_21;
+   float F_14;
+   float F_13;
+   float F_12;
+   int I_20;
+   float F_11;
+   float F_10;
+   float F_9;
+   int I_19;
+   int I_18;
+   int I_17;
+   int I_14;
+   int I_9;
+   int I_5;
+   float __scalar__0;
+   int j;
+   int i_1_0;
+   int ki_0;
+   int kj_0;
+   int I_0;
+   int I_1;
+   int I_2;
+   int I_3;
+   int I_4;
+   int I_6;
+   int I_7;
+   int I_8;
+   I_17 = isj-2;
+   for (i_1_0 = i;i_1_0<=MIN(i+127, isi-2);i_1_0 += 1)
+l99994:      for (j = 1;j<=I_17;j += 1) {
+         __scalar__0 = 0.;
+         I_18 = i_1_0-1;
+         I_19 = isj*I_18;
+         I_5 = j+I_19;
+         I_0 = I_5-1;
+         F_9 = image[I_0]*kernel[0];
+         __scalar__0 = __scalar__0+F_9;
+         F_10 = image[I_5]*kernel[1];
+         __scalar__0 = __scalar__0+F_10;
+         I_1 = I_5+1;
+         F_11 = image[I_1]*kernel[2];
+         __scalar__0 = __scalar__0+F_11;
+         kj_0 = 3;
+         I_20 = isj*i_1_0;
+         I_9 = j+I_20;
+         I_2 = I_9-1;
+         F_12 = image[I_2]*kernel[3];
+         __scalar__0 = __scalar__0+F_12;
+         F_13 = image[I_9]*kernel[4];
+         __scalar__0 = __scalar__0+F_13;
+         I_3 = I_9+1;
+         F_14 = image[I_3]*kernel[5];
+         __scalar__0 = __scalar__0+F_14;
+         kj_0 = 3;
+         I_21 = i_1_0+1;
+         I_22 = isj*I_21;
+         I_14 = j+I_22;
+         I_4 = I_14-1;
+         F_15 = image[I_4]*kernel[6];
+         __scalar__0 = __scalar__0+F_15;
+         F_16 = image[I_14]*kernel[7];
+         __scalar__0 = __scalar__0+F_16;
+         I_6 = I_14+1;
+         F_17 = image[I_6]*kernel[8];
+         __scalar__0 = __scalar__0+F_17;
+         kj_0 = 3;
+         ki_0 = 3;
+         __scalar__0 = __scalar__0/9;
+         I_7 = isj*i_1_0;
+         I_8 = j+I_7;
+         new_image[I_8] = __scalar__0;
+      }
+}
+
+Tidy code
+
+void microcode(int i, int isi, int isj, float *image, float *kernel, float *new_image)
+{
+   float F_17;
+   float F_16;
+   float F_15;
+   int I_22;
+   int I_21;
+   float F_14;
+   float F_13;
+   float F_12;
+   int I_20;
+   float F_11;
+   float F_10;
+   float F_9;
+   int I_19;
+   int I_18;
+   int I_17;
+   int I_14;
+   int I_9;
+   int I_5;
+   float __scalar__0;
+   int j;
+   int i_1_0;
+   int ki_0;
+   int kj_0;
+   int I_0;
+   int I_1;
+   int I_2;
+   int I_3;
+   int I_4;
+   int I_6;
+   int I_7;
+   int I_8;
+   int I_10;
+   int I_11;
+   int I_12;
+   int I_13;
+   int I_15;
+   int I_16;
+   int I_23;
+   int I_24;
+   int I_25;
+   int I_26;
+   int I_27;
+   float *P_0;
+   float *P_1;
+   float F_0;
+   float F_1;
+   float *P_2;
+   float *P_3;
+   float F_2;
+   float F_3;
+   int I_28;
+   float *P_4;
+   float *P_5;
+   float F_4;
+   float F_5;
+   int I_29;
+   int I_30;
+   int I_31;
+   float *P_6;
+   float *P_7;
+   float F_6;
+   float F_7;
+   float *P_8;
+   float *P_9;
+   float F_8;
+   float F_18;
+   int I_32;
+   float *P_10;
+   float *P_11;
+   float F_19;
+   float F_20;
+   int I_33;
+   int I_34;
+   int I_35;
+   int I_36;
+   float *P_12;
+   float *P_13;
+   float F_21;
+   float F_22;
+   float *P_14;
+   float *P_15;
+   float F_23;
+   float F_24;
+   int I_37;
+   float *P_16;
+   float *P_17;
+   float F_25;
+   float F_26;
+   float F_27;
+   int I_38;
+   I_17 = isj-2;
+   I_29 = isj*i_1_0;
+   for (i_1_0 = i;i_1_0<=MIN(i+127, isi-2);i_1_0 += 1)
+l99994:      for (j = 1;j<=I_17;j += 1) {
+         __scalar__0 = 0.;
+         I_18 = i_1_0-1;
+         I_19 = isj*I_18;
+         I_5 = j+I_19;
+         I_0 = I_5-1;
+         F_9 = image[I_0]*kernel[0];
+         __scalar__0 = __scalar__0+F_9;
+         F_10 = image[I_5]*kernel[1];
+         __scalar__0 = __scalar__0+F_10;
+         I_1 = I_5+1;
+         F_11 = image[I_1]*kernel[2];
+         __scalar__0 = __scalar__0+F_11;
+         kj_0 = 3;
+         I_20 = I_29;
+         I_9 = j+I_20;
+         I_2 = I_9-1;
+         F_12 = image[I_2]*kernel[3];
+         __scalar__0 = __scalar__0+F_12;
+         F_13 = image[I_9]*kernel[4];
+         __scalar__0 = __scalar__0+F_13;
+         I_3 = I_9+1;
+         F_14 = image[I_3]*kernel[5];
+         __scalar__0 = __scalar__0+F_14;
+         kj_0 = 3;
+         I_21 = i_1_0+1;
+         I_22 = isj*I_21;
+         I_14 = j+I_22;
+         I_4 = I_14-1;
+         F_15 = image[I_4]*kernel[6];
+         __scalar__0 = __scalar__0+F_15;
+         F_16 = image[I_14]*kernel[7];
+         __scalar__0 = __scalar__0+F_16;
+         I_6 = I_14+1;
+         F_17 = image[I_6]*kernel[8];
+         __scalar__0 = __scalar__0+F_17;
+         kj_0 = 3;
+         ki_0 = 3;
+         __scalar__0 = __scalar__0/9;
+         I_7 = I_29;
+         I_8 = j+I_7;
+         new_image[I_8] = __scalar__0;
+      }
+}
+
+Code in a two adress fashion
+
+void microcode(int i, int isi, int isj, float *image, float *kernel, float *new_image)
+{
+   float F_17;
+   float F_16;
+   float F_15;
+   int I_22;
+   int I_21;
+   float F_14;
+   float F_13;
+   float F_12;
+   int I_20;
+   float F_11;
+   float F_10;
+   float F_9;
+   int I_19;
+   int I_18;
+   int I_17;
+   int I_14;
+   int I_9;
+   int I_5;
+   float __scalar__0;
+   int j;
+   int i_1_0;
+   int ki_0;
+   int kj_0;
+   int I_0;
+   int I_1;
+   int I_2;
+   int I_3;
+   int I_4;
+   int I_6;
+   int I_7;
+   int I_8;
+   int I_10;
+   int I_11;
+   int I_12;
+   int I_13;
+   int I_15;
+   int I_16;
+   int I_23;
+   int I_24;
+   int I_25;
+   int I_26;
+   int I_27;
+   float *P_0;
+   float *P_1;
+   float F_0;
+   float F_1;
+   float *P_2;
+   float *P_3;
+   float F_2;
+   float F_3;
+   int I_28;
+   float *P_4;
+   float *P_5;
+   float F_4;
+   float F_5;
+   int I_29;
+   int I_30;
+   int I_31;
+   float *P_6;
+   float *P_7;
+   float F_6;
+   float F_7;
+   float *P_8;
+   float *P_9;
+   float F_8;
+   float F_18;
+   int I_32;
+   float *P_10;
+   float *P_11;
+   float F_19;
+   float F_20;
+   int I_33;
+   int I_34;
+   int I_35;
+   int I_36;
+   float *P_12;
+   float *P_13;
+   float F_21;
+   float F_22;
+   float *P_14;
+   float *P_15;
+   float F_23;
+   float F_24;
+   int I_37;
+   float *P_16;
+   float *P_17;
+   float F_25;
+   float F_26;
+   float F_27;
+   int I_38;
+   int I_39 = isj;
+   int I_40 = isj;
+   int I_41 = i_1_0;
+   int I_42 = isj;
+   int I_43 = j;
+   int I_44 = I_5;
+   float F_28 = image[I_0];
+   float F_29 = image[I_5];
+   int I_45 = I_5;
+   float F_30 = image[I_1];
+   int I_46 = j;
+   int I_47 = I_9;
+   float F_31 = image[I_2];
+   float F_32 = image[I_9];
+   int I_48 = I_9;
+   float F_33 = image[I_3];
+   int I_49 = i_1_0;
+   int I_50 = isj;
+   int I_51 = j;
+   int I_52 = I_14;
+   float F_34 = image[I_4];
+   float F_35 = image[I_14];
+   int I_53 = I_14;
+   float F_36 = image[I_6];
+   int I_54 = j;
+   {
+      int I_39 = isj;
+      isj = isj-2;
+      I_17 = isj;
+      isj = I_39;
+   }
+   {
+      int I_40 = isj;
+      isj = isj*i_1_0;
+      I_29 = isj;
+      isj = I_40;
+   }
+   for (i_1_0 = i;i_1_0<=MIN(i+127, isi-2);i_1_0 += 1)
+l99994:      for (j = 1;j<=I_17;j += 1) {
+         __scalar__0 = 0.;
+         {
+            int I_41 = i_1_0;
+            i_1_0 = i_1_0-1;
+            I_18 = i_1_0;
+            i_1_0 = I_41;
+         }
+         {
+            int I_42 = isj;
+            isj = isj*I_18;
+            I_19 = isj;
+            isj = I_42;
+         }
+         {
+            int I_43 = j;
+            j = j+I_19;
+            I_5 = j;
+            j = I_43;
+         }
+         {
+            int I_44 = I_5;
+            I_5 = I_5-1;
+            I_0 = I_5;
+            I_5 = I_44;
+         }
+         {
+            float F_28 = image[I_0];
+            image[I_0] = image[I_0]*kernel[0];
+            F_9 = image[I_0];
+            image[I_0] = F_28;
+         }
+         __scalar__0 = __scalar__0+F_9;
+         {
+            float F_29 = image[I_5];
+            image[I_5] = image[I_5]*kernel[1];
+            F_10 = image[I_5];
+            image[I_5] = F_29;
+         }
+         __scalar__0 = __scalar__0+F_10;
+         {
+            int I_45 = I_5;
+            I_5 = I_5+1;
+            I_1 = I_5;
+            I_5 = I_45;
+         }
+         {
+            float F_30 = image[I_1];
+            image[I_1] = image[I_1]*kernel[2];
+            F_11 = image[I_1];
+            image[I_1] = F_30;
+         }
+         __scalar__0 = __scalar__0+F_11;
+         kj_0 = 3;
+         I_20 = I_29;
+         {
+            int I_46 = j;
+            j = j+I_20;
+            I_9 = j;
+            j = I_46;
+         }
+         {
+            int I_47 = I_9;
+            I_9 = I_9-1;
+            I_2 = I_9;
+            I_9 = I_47;
+         }
+         {
+            float F_31 = image[I_2];
+            image[I_2] = image[I_2]*kernel[3];
+            F_12 = image[I_2];
+            image[I_2] = F_31;
+         }
+         __scalar__0 = __scalar__0+F_12;
+         {
+            float F_32 = image[I_9];
+            image[I_9] = image[I_9]*kernel[4];
+            F_13 = image[I_9];
+            image[I_9] = F_32;
+         }
+         __scalar__0 = __scalar__0+F_13;
+         {
+            int I_48 = I_9;
+            I_9 = I_9+1;
+            I_3 = I_9;
+            I_9 = I_48;
+         }
+         {
+            float F_33 = image[I_3];
+            image[I_3] = image[I_3]*kernel[5];
+            F_14 = image[I_3];
+            image[I_3] = F_33;
+         }
+         __scalar__0 = __scalar__0+F_14;
+         kj_0 = 3;
+         {
+            int I_49 = i_1_0;
+            i_1_0 = i_1_0+1;
+            I_21 = i_1_0;
+            i_1_0 = I_49;
+         }
+         {
+            int I_50 = isj;
+            isj = isj*I_21;
+            I_22 = isj;
+            isj = I_50;
+         }
+         {
+            int I_51 = j;
+            j = j+I_22;
+            I_14 = j;
+            j = I_51;
+         }
+         {
+            int I_52 = I_14;
+            I_14 = I_14-1;
+            I_4 = I_14;
+            I_14 = I_52;
+         }
+         {
+            float F_34 = image[I_4];
+            image[I_4] = image[I_4]*kernel[6];
+            F_15 = image[I_4];
+            image[I_4] = F_34;
+         }
+         __scalar__0 = __scalar__0+F_15;
+         {
+            float F_35 = image[I_14];
+            image[I_14] = image[I_14]*kernel[7];
+            F_16 = image[I_14];
+            image[I_14] = F_35;
+         }
+         __scalar__0 = __scalar__0+F_16;
+         {
+            int I_53 = I_14;
+            I_14 = I_14+1;
+            I_6 = I_14;
+            I_14 = I_53;
+         }
+         {
+            float F_36 = image[I_6];
+            image[I_6] = image[I_6]*kernel[8];
+            F_17 = image[I_6];
+            image[I_6] = F_36;
+         }
+         __scalar__0 = __scalar__0+F_17;
+         kj_0 = 3;
+         ki_0 = 3;
+         __scalar__0 = __scalar__0/9;
+         I_7 = I_29;
+         {
+            int I_54 = j;
+            j = j+I_7;
+            I_8 = j;
+            j = I_54;
+         }
+         new_image[I_8] = __scalar__0;
+      }
+}
+
+Code after expression substitution
+
+void microcode(int i, int isi, int isj, float *image, float *kernel, float *new_image)
+{
+   float F_17;
+   float F_16;
+   float F_15;
+   int I_22;
+   int I_21;
+   float F_14;
+   float F_13;
+   float F_12;
+   int I_20;
+   float F_11;
+   float F_10;
+   float F_9;
+   int I_19;
+   int I_18;
+   int I_17;
+   int I_14;
+   int I_9;
+   int I_5;
+   float __scalar__0;
+   int j;
+   int i_1_0;
+   int ki_0;
+   int kj_0;
+   int I_0;
+   int I_1;
+   int I_2;
+   int I_3;
+   int I_4;
+   int I_6;
+   int I_7;
+   int I_8;
+   int I_10;
+   int I_11;
+   int I_12;
+   int I_13;
+   int I_15;
+   int I_16;
+   int I_23;
+   int I_24;
+   int I_25;
+   int I_26;
+   int I_27;
+   float *P_0;
+   float *P_1;
+   float F_0;
+   float F_1;
+   float *P_2;
+   float *P_3;
+   float F_2;
+   float F_3;
+   int I_28;
+   float *P_4;
+   float *P_5;
+   float F_4;
+   float F_5;
+   int I_29;
+   int I_30;
+   int I_31;
+   float *P_6;
+   float *P_7;
+   float F_6;
+   float F_7;
+   float *P_8;
+   float *P_9;
+   float F_8;
+   float F_18;
+   int I_32;
+   float *P_10;
+   float *P_11;
+   float F_19;
+   float F_20;
+   int I_33;
+   int I_34;
+   int I_35;
+   int I_36;
+   float *P_12;
+   float *P_13;
+   float F_21;
+   float F_22;
+   float *P_14;
+   float *P_15;
+   float F_23;
+   float F_24;
+   int I_37;
+   float *P_16;
+   float *P_17;
+   float F_25;
+   float F_26;
+   float F_27;
+   int I_38;
+   int I_39 = isj;
+   int I_40 = isj;
+   int I_41 = i_1_0;
+   int I_42 = isj;
+   int I_43 = j;
+   int I_44 = I_5;
+   float F_28 = image[I_0];
+   float F_29 = image[I_5];
+   int I_45 = I_5;
+   float F_30 = image[I_1];
+   int I_46 = j;
+   int I_47 = I_9;
+   float F_31 = image[I_2];
+   float F_32 = image[I_9];
+   int I_48 = I_9;
+   float F_33 = image[I_3];
+   int I_49 = i_1_0;
+   int I_50 = isj;
+   int I_51 = j;
+   int I_52 = I_14;
+   float F_34 = image[I_4];
+   float F_35 = image[I_14];
+   int I_53 = I_14;
+   float F_36 = image[I_6];
+   int I_54 = j;
+   {
+      int I_39 = isj;
+      subf(isj, 2);
+      I_17 = isj;
+      isj = I_39;
+   }
+   {
+      int I_40 = isj;
+      mulf(isj, i_1_0);
+      I_29 = isj;
+      isj = I_40;
+   }
+   for (i_1_0 = i;i_1_0<=MIN(i+127, isi-2);i_1_0 += 1)
+l99994:      for (j = 1;j<=I_17;j += 1) {
+         __scalar__0 = 0.;
+         {
+            int I_41 = i_1_0;
+            subf(i_1_0, 1);
+            I_18 = i_1_0;
+            i_1_0 = I_41;
+         }
+         {
+            int I_42 = isj;
+            mulf(isj, I_18);
+            I_19 = isj;
+            isj = I_42;
+         }
+         {
+            int I_43 = j;
+            addf(j, I_19);
+            I_5 = j;
+            j = I_43;
+         }
+         {
+            int I_44 = I_5;
+            subf(I_5, 1);
+            I_0 = I_5;
+            I_5 = I_44;
+         }
+         {
+            float F_28 = image[I_0];
+            mulf(image[I_0], kernel[0]);
+            F_9 = image[I_0];
+            image[I_0] = F_28;
+         }
+         addf(__scalar__0, F_9);
+         {
+            float F_29 = image[I_5];
+            mulf(image[I_5], kernel[1]);
+            F_10 = image[I_5];
+            image[I_5] = F_29;
+         }
+         addf(__scalar__0, F_10);
+         {
+            int I_45 = I_5;
+            addf(I_5, 1);
+            I_1 = I_5;
+            I_5 = I_45;
+         }
+         {
+            float F_30 = image[I_1];
+            mulf(image[I_1], kernel[2]);
+            F_11 = image[I_1];
+            image[I_1] = F_30;
+         }
+         addf(__scalar__0, F_11);
+         kj_0 = 3;
+         I_20 = I_29;
+         {
+            int I_46 = j;
+            addf(j, I_20);
+            I_9 = j;
+            j = I_46;
+         }
+         {
+            int I_47 = I_9;
+            subf(I_9, 1);
+            I_2 = I_9;
+            I_9 = I_47;
+         }
+         {
+            float F_31 = image[I_2];
+            mulf(image[I_2], kernel[3]);
+            F_12 = image[I_2];
+            image[I_2] = F_31;
+         }
+         addf(__scalar__0, F_12);
+         {
+            float F_32 = image[I_9];
+            mulf(image[I_9], kernel[4]);
+            F_13 = image[I_9];
+            image[I_9] = F_32;
+         }
+         addf(__scalar__0, F_13);
+         {
+            int I_48 = I_9;
+            addf(I_9, 1);
+            I_3 = I_9;
+            I_9 = I_48;
+         }
+         {
+            float F_33 = image[I_3];
+            mulf(image[I_3], kernel[5]);
+            F_14 = image[I_3];
+            image[I_3] = F_33;
+         }
+         addf(__scalar__0, F_14);
+         kj_0 = 3;
+         {
+            int I_49 = i_1_0;
+            addf(i_1_0, 1);
+            I_21 = i_1_0;
+            i_1_0 = I_49;
+         }
+         {
+            int I_50 = isj;
+            mulf(isj, I_21);
+            I_22 = isj;
+            isj = I_50;
+         }
+         {
+            int I_51 = j;
+            addf(j, I_22);
+            I_14 = j;
+            j = I_51;
+         }
+         {
+            int I_52 = I_14;
+            subf(I_14, 1);
+            I_4 = I_14;
+            I_14 = I_52;
+         }
+         {
+            float F_34 = image[I_4];
+            mulf(image[I_4], kernel[6]);
+            F_15 = image[I_4];
+            image[I_4] = F_34;
+         }
+         addf(__scalar__0, F_15);
+         {
+            float F_35 = image[I_14];
+            mulf(image[I_14], kernel[7]);
+            F_16 = image[I_14];
+            image[I_14] = F_35;
+         }
+         addf(__scalar__0, F_16);
+         {
+            int I_53 = I_14;
+            addf(I_14, 1);
+            I_6 = I_14;
+            I_14 = I_53;
+         }
+         {
+            float F_36 = image[I_6];
+            mulf(image[I_6], kernel[8]);
+            F_17 = image[I_6];
+            image[I_6] = F_36;
+         }
+         addf(__scalar__0, F_17);
+         kj_0 = 3;
+         ki_0 = 3;
+         divf(__scalar__0, 9);
+         I_7 = I_29;
+         {
+            int I_54 = j;
+            addf(j, I_7);
+            I_8 = j;
+            j = I_54;
+         }
+         new_image[I_8] = __scalar__0;
+      }
+}
+
+Code after flattening
+
+void microcode(int i, int isi, int isj, float *image, float *kernel, float *new_image)
+{
+   float F_17;
+   float F_16;
+   float F_15;
+   int I_22;
+   int I_21;
+   float F_14;
+   float F_13;
+   float F_12;
+   int I_20;
+   float F_11;
+   float F_10;
+   float F_9;
+   int I_19;
+   int I_18;
+   int I_17;
+   int I_14;
+   int I_9;
+   int I_5;
+   float __scalar__0;
+   int j;
+   int i_1_0;
+   int ki_0;
+   int kj_0;
+   int I_0;
+   int I_1;
+   int I_2;
+   int I_3;
+   int I_4;
+   int I_6;
+   int I_7;
+   int I_8;
+   int I_10;
+   int I_11;
+   int I_12;
+   int I_13;
+   int I_15;
+   int I_16;
+   int I_23;
+   int I_24;
+   int I_25;
+   int I_26;
+   int I_27;
+   float *P_0;
+   float *P_1;
+   float F_0;
+   float F_1;
+   float *P_2;
+   float *P_3;
+   float F_2;
+   float F_3;
+   int I_28;
+   float *P_4;
+   float *P_5;
+   float F_4;
+   float F_5;
+   int I_29;
+   int I_30;
+   int I_31;
+   float *P_6;
+   float *P_7;
+   float F_6;
+   float F_7;
+   float *P_8;
+   float *P_9;
+   float F_8;
+   float F_18;
+   int I_32;
+   float *P_10;
+   float *P_11;
+   float F_19;
+   float F_20;
+   int I_33;
+   int I_34;
+   int I_35;
+   int I_36;
+   float *P_12;
+   float *P_13;
+   float F_21;
+   float F_22;
+   float *P_14;
+   float *P_15;
+   float F_23;
+   float F_24;
+   int I_37;
+   float *P_16;
+   float *P_17;
+   float F_25;
+   float F_26;
+   float F_27;
+   int I_38;
+   int I_39 = isj;
+   int I_40 = isj;
+   int I_41 = i_1_0;
+   int I_42 = isj;
+   int I_43 = j;
+   int I_44 = I_5;
+   float F_28 = image[I_0];
+   float F_29 = image[I_5];
+   int I_45 = I_5;
+   float F_30 = image[I_1];
+   int I_46 = j;
+   int I_47 = I_9;
+   float F_31 = image[I_2];
+   float F_32 = image[I_9];
+   int I_48 = I_9;
+   float F_33 = image[I_3];
+   int I_49 = i_1_0;
+   int I_50 = isj;
+   int I_51 = j;
+   int I_52 = I_14;
+   float F_34 = image[I_4];
+   float F_35 = image[I_14];
+   int I_53 = I_14;
+   float F_36 = image[I_6];
+   int I_54 = j;
+   int I_39_0;
+   int I_40_0;
+   int I_41_0;
+   int I_42_0;
+   int I_43_0;
+   int I_44_0;
+   float F_28_0;
+   float F_29_0;
+   int I_45_0;
+   float F_30_0;
+   int I_46_0;
+   int I_47_0;
+   float F_31_0;
+   float F_32_0;
+   int I_48_0;
+   float F_33_0;
+   int I_49_0;
+   int I_50_0;
+   int I_51_0;
+   int I_52_0;
+   float F_34_0;
+   float F_35_0;
+   int I_53_0;
+   float F_36_0;
+   int I_54_0;
+   I_39_0 = isj;
+   subf(isj, 2);
+   I_17 = isj;
+   isj = I_39_0;
+   I_40_0 = isj;
+   mulf(isj, i_1_0);
+   I_29 = isj;
+   isj = I_40_0;
+   for (i_1_0 = i;i_1_0<=MIN(i+127, isi-2);i_1_0 += 1)
+l99994:      for (j = 1;j<=I_17;j += 1) {
+         __scalar__0 = 0.;
+         I_41_0 = i_1_0;
+         subf(i_1_0, 1);
+         I_18 = i_1_0;
+         i_1_0 = I_41_0;
+         I_42_0 = isj;
+         mulf(isj, I_18);
+         I_19 = isj;
+         isj = I_42_0;
+         I_43_0 = j;
+         addf(j, I_19);
+         I_5 = j;
+         j = I_43_0;
+         I_44_0 = I_5;
+         subf(I_5, 1);
+         I_0 = I_5;
+         I_5 = I_44_0;
+         F_28_0 = image[I_0];
+         mulf(image[I_0], kernel[0]);
+         F_9 = image[I_0];
+         image[I_0] = F_28_0;
+         addf(__scalar__0, F_9);
+         F_29_0 = image[I_5];
+         mulf(image[I_5], kernel[1]);
+         F_10 = image[I_5];
+         image[I_5] = F_29_0;
+         addf(__scalar__0, F_10);
+         I_45_0 = I_5;
+         addf(I_5, 1);
+         I_1 = I_5;
+         I_5 = I_45_0;
+         F_30_0 = image[I_1];
+         mulf(image[I_1], kernel[2]);
+         F_11 = image[I_1];
+         image[I_1] = F_30_0;
+         addf(__scalar__0, F_11);
+         kj_0 = 3;
+         I_20 = I_29;
+         I_46_0 = j;
+         addf(j, I_20);
+         I_9 = j;
+         j = I_46_0;
+         I_47_0 = I_9;
+         subf(I_9, 1);
+         I_2 = I_9;
+         I_9 = I_47_0;
+         F_31_0 = image[I_2];
+         mulf(image[I_2], kernel[3]);
+         F_12 = image[I_2];
+         image[I_2] = F_31_0;
+         addf(__scalar__0, F_12);
+         F_32_0 = image[I_9];
+         mulf(image[I_9], kernel[4]);
+         F_13 = image[I_9];
+         image[I_9] = F_32_0;
+         addf(__scalar__0, F_13);
+         I_48_0 = I_9;
+         addf(I_9, 1);
+         I_3 = I_9;
+         I_9 = I_48_0;
+         F_33_0 = image[I_3];
+         mulf(image[I_3], kernel[5]);
+         F_14 = image[I_3];
+         image[I_3] = F_33_0;
+         addf(__scalar__0, F_14);
+         kj_0 = 3;
+         I_49_0 = i_1_0;
+         addf(i_1_0, 1);
+         I_21 = i_1_0;
+         i_1_0 = I_49_0;
+         I_50_0 = isj;
+         mulf(isj, I_21);
+         I_22 = isj;
+         isj = I_50_0;
+         I_51_0 = j;
+         addf(j, I_22);
+         I_14 = j;
+         j = I_51_0;
+         I_52_0 = I_14;
+         subf(I_14, 1);
+         I_4 = I_14;
+         I_14 = I_52_0;
+         F_34_0 = image[I_4];
+         mulf(image[I_4], kernel[6]);
+         F_15 = image[I_4];
+         image[I_4] = F_34_0;
+         addf(__scalar__0, F_15);
+         F_35_0 = image[I_14];
+         mulf(image[I_14], kernel[7]);
+         F_16 = image[I_14];
+         image[I_14] = F_35_0;
+         addf(__scalar__0, F_16);
+         I_53_0 = I_14;
+         addf(I_14, 1);
+         I_6 = I_14;
+         I_14 = I_53_0;
+         F_36_0 = image[I_6];
+         mulf(image[I_6], kernel[8]);
+         F_17 = image[I_6];
+         image[I_6] = F_36_0;
+         addf(__scalar__0, F_17);
+         kj_0 = 3;
+         ki_0 = 3;
+         divf(__scalar__0, 9);
+         I_7 = I_29;
+         I_54_0 = j;
+         addf(j, I_7);
+         I_8 = j;
+         j = I_54_0;
+         new_image[I_8] = __scalar__0;
+      }
+}
+
+Code after more expression substitution
+
+void microcode(int i, int isi, int isj, float *image, float *kernel, float *new_image)
+{
+   float F_17;
+   float F_16;
+   float F_15;
+   int I_22;
+   int I_21;
+   float F_14;
+   float F_13;
+   float F_12;
+   int I_20;
+   float F_11;
+   float F_10;
+   float F_9;
+   int I_19;
+   int I_18;
+   int I_17;
+   int I_14;
+   int I_9;
+   int I_5;
+   float __scalar__0;
+   int j;
+   int i_1_0;
+   int ki_0;
+   int kj_0;
+   int I_0;
+   int I_1;
+   int I_2;
+   int I_3;
+   int I_4;
+   int I_6;
+   int I_7;
+   int I_8;
+   int I_10;
+   int I_11;
+   int I_12;
+   int I_13;
+   int I_15;
+   int I_16;
+   int I_23;
+   int I_24;
+   int I_25;
+   int I_26;
+   int I_27;
+   float *P_0;
+   float *P_1;
+   float F_0;
+   float F_1;
+   float *P_2;
+   float *P_3;
+   float F_2;
+   float F_3;
+   int I_28;
+   float *P_4;
+   float *P_5;
+   float F_4;
+   float F_5;
+   int I_29;
+   int I_30;
+   int I_31;
+   float *P_6;
+   float *P_7;
+   float F_6;
+   float F_7;
+   float *P_8;
+   float *P_9;
+   float F_8;
+   float F_18;
+   int I_32;
+   float *P_10;
+   float *P_11;
+   float F_19;
+   float F_20;
+   int I_33;
+   int I_34;
+   int I_35;
+   int I_36;
+   float *P_12;
+   float *P_13;
+   float F_21;
+   float F_22;
+   float *P_14;
+   float *P_15;
+   float F_23;
+   float F_24;
+   int I_37;
+   float *P_16;
+   float *P_17;
+   float F_25;
+   float F_26;
+   float F_27;
+   int I_38;
+   int I_39 = isj;
+   int I_40 = isj;
+   int I_41 = i_1_0;
+   int I_42 = isj;
+   int I_43 = j;
+   int I_44 = I_5;
+   float F_28 = image[I_0];
+   float F_29 = image[I_5];
+   int I_45 = I_5;
+   float F_30 = image[I_1];
+   int I_46 = j;
+   int I_47 = I_9;
+   float F_31 = image[I_2];
+   float F_32 = image[I_9];
+   int I_48 = I_9;
+   float F_33 = image[I_3];
+   int I_49 = i_1_0;
+   int I_50 = isj;
+   int I_51 = j;
+   int I_52 = I_14;
+   float F_34 = image[I_4];
+   float F_35 = image[I_14];
+   int I_53 = I_14;
+   float F_36 = image[I_6];
+   int I_54 = j;
+   int I_39_0;
+   int I_40_0;
+   int I_41_0;
+   int I_42_0;
+   int I_43_0;
+   int I_44_0;
+   float F_28_0;
+   float F_29_0;
+   int I_45_0;
+   float F_30_0;
+   int I_46_0;
+   int I_47_0;
+   float F_31_0;
+   float F_32_0;
+   int I_48_0;
+   float F_33_0;
+   int I_49_0;
+   int I_50_0;
+   int I_51_0;
+   int I_52_0;
+   float F_34_0;
+   float F_35_0;
+   int I_53_0;
+   float F_36_0;
+   int I_54_0;
+   seti(I_39_0, isj);
+   subf(isj, 2);
+   seti(I_17, isj);
+   seti(isj, I_39_0);
+   seti(I_40_0, isj);
+   mulf(isj, i_1_0);
+   seti(I_29, isj);
+   seti(isj, I_40_0);
+   for (seti(i_1_0, i);i_1_0<=MIN(i+127, isi-2);i_1_0 += 1)
+l99994:      for (seti(j, 1);j<=I_17;j += 1) {
+         seti(__scalar__0, 0.);
+         seti(I_41_0, i_1_0);
+         subf(i_1_0, 1);
+         seti(I_18, i_1_0);
+         seti(i_1_0, I_41_0);
+         seti(I_42_0, isj);
+         mulf(isj, I_18);
+         seti(I_19, isj);
+         seti(isj, I_42_0);
+         seti(I_43_0, j);
+         addf(j, I_19);
+         seti(I_5, j);
+         seti(j, I_43_0);
+         seti(I_44_0, I_5);
+         subf(I_5, 1);
+         seti(I_0, I_5);
+         seti(I_5, I_44_0);
+         seti(F_28_0, image[I_0]);
+         mulf(image[I_0], kernel[0]);
+         seti(F_9, image[I_0]);
+         seti(image[I_0], F_28_0);
+         addf(__scalar__0, F_9);
+         seti(F_29_0, image[I_5]);
+         mulf(image[I_5], kernel[1]);
+         seti(F_10, image[I_5]);
+         seti(image[I_5], F_29_0);
+         addf(__scalar__0, F_10);
+         seti(I_45_0, I_5);
+         addf(I_5, 1);
+         seti(I_1, I_5);
+         seti(I_5, I_45_0);
+         seti(F_30_0, image[I_1]);
+         mulf(image[I_1], kernel[2]);
+         seti(F_11, image[I_1]);
+         seti(image[I_1], F_30_0);
+         addf(__scalar__0, F_11);
+         seti(kj_0, 3);
+         seti(I_20, I_29);
+         seti(I_46_0, j);
+         addf(j, I_20);
+         seti(I_9, j);
+         seti(j, I_46_0);
+         seti(I_47_0, I_9);
+         subf(I_9, 1);
+         seti(I_2, I_9);
+         seti(I_9, I_47_0);
+         seti(F_31_0, image[I_2]);
+         mulf(image[I_2], kernel[3]);
+         seti(F_12, image[I_2]);
+         seti(image[I_2], F_31_0);
+         addf(__scalar__0, F_12);
+         seti(F_32_0, image[I_9]);
+         mulf(image[I_9], kernel[4]);
+         seti(F_13, image[I_9]);
+         seti(image[I_9], F_32_0);
+         addf(__scalar__0, F_13);
+         seti(I_48_0, I_9);
+         addf(I_9, 1);
+         seti(I_3, I_9);
+         seti(I_9, I_48_0);
+         seti(F_33_0, image[I_3]);
+         mulf(image[I_3], kernel[5]);
+         seti(F_14, image[I_3]);
+         seti(image[I_3], F_33_0);
+         addf(__scalar__0, F_14);
+         seti(kj_0, 3);
+         seti(I_49_0, i_1_0);
+         addf(i_1_0, 1);
+         seti(I_21, i_1_0);
+         seti(i_1_0, I_49_0);
+         seti(I_50_0, isj);
+         mulf(isj, I_21);
+         seti(I_22, isj);
+         seti(isj, I_50_0);
+         seti(I_51_0, j);
+         addf(j, I_22);
+         seti(I_14, j);
+         seti(j, I_51_0);
+         seti(I_52_0, I_14);
+         subf(I_14, 1);
+         seti(I_4, I_14);
+         seti(I_14, I_52_0);
+         seti(F_34_0, image[I_4]);
+         mulf(image[I_4], kernel[6]);
+         seti(F_15, image[I_4]);
+         seti(image[I_4], F_34_0);
+         addf(__scalar__0, F_15);
+         seti(F_35_0, image[I_14]);
+         mulf(image[I_14], kernel[7]);
+         seti(F_16, image[I_14]);
+         seti(image[I_14], F_35_0);
+         addf(__scalar__0, F_16);
+         seti(I_53_0, I_14);
+         addf(I_14, 1);
+         seti(I_6, I_14);
+         seti(I_14, I_53_0);
+         seti(F_36_0, image[I_6]);
+         mulf(image[I_6], kernel[8]);
+         seti(F_17, image[I_6]);
+         seti(image[I_6], F_36_0);
+         addf(__scalar__0, F_17);
+         seti(kj_0, 3);
+         seti(ki_0, 3);
+         divf(__scalar__0, 9);
+         seti(I_7, I_29);
+         seti(I_54_0, j);
+         addf(j, I_7);
+         seti(I_8, j);
+         seti(j, I_54_0);
+         seti(new_image[I_8], __scalar__0);
+      }
+}
+
+Code after some cleaning
+
+void microcode(int i, int isi, int isj, float *image, float *kernel, float *new_image)
+{
+   float F_17;
+   float F_16;
+   float F_15;
+   int I_22;
+   int I_21;
+   float F_14;
+   float F_13;
+   float F_12;
+   int I_20;
+   float F_11;
+   float F_10;
+   float F_9;
+   int I_19;
+   int I_18;
+   int I_17;
+   int I_14;
+   int I_9;
+   int I_5;
+   float __scalar__0;
+   int j;
+   int i_1_0;
+   int ki_0;
+   int kj_0;
+   int I_0;
+   int I_1;
+   int I_2;
+   int I_3;
+   int I_4;
+   int I_6;
+   int I_7;
+   int I_8;
+   int I_29;
+   int I_39_0;
+   int I_40_0;
+   int I_41_0;
+   int I_42_0;
+   int I_43_0;
+   int I_44_0;
+   float F_28_0;
+   float F_29_0;
+   int I_45_0;
+   float F_30_0;
+   int I_46_0;
+   int I_47_0;
+   float F_31_0;
+   float F_32_0;
+   int I_48_0;
+   float F_33_0;
+   int I_49_0;
+   int I_50_0;
+   int I_51_0;
+   int I_52_0;
+   float F_34_0;
+   float F_35_0;
+   int I_53_0;
+   float F_36_0;
+   int I_54_0;
+   seti(I_39_0, isj);
+   subf(isj, 2);
+   seti(I_17, isj);
+   seti(isj, I_39_0);
+   seti(I_40_0, isj);
+   mulf(isj, i_1_0);
+   seti(I_29, isj);
+   seti(isj, I_40_0);
+   for (seti(i_1_0, i);i_1_0<=MIN(i+127, isi-2);i_1_0 += 1)
+l99994:      for (seti(j, 1);j<=I_17;j += 1) {
+         seti(__scalar__0, 0.);
+         seti(I_41_0, i_1_0);
+         subf(i_1_0, 1);
+         seti(I_18, i_1_0);
+         seti(i_1_0, I_41_0);
+         seti(I_42_0, isj);
+         mulf(isj, I_18);
+         seti(I_19, isj);
+         seti(isj, I_42_0);
+         seti(I_43_0, j);
+         addf(j, I_19);
+         seti(I_5, j);
+         seti(j, I_43_0);
+         seti(I_44_0, I_5);
+         subf(I_5, 1);
+         seti(I_0, I_5);
+         seti(I_5, I_44_0);
+         seti(F_28_0, image[I_0]);
+         mulf(image[I_0], kernel[0]);
+         seti(F_9, image[I_0]);
+         seti(image[I_0], F_28_0);
+         addf(__scalar__0, F_9);
+         seti(F_29_0, image[I_5]);
+         mulf(image[I_5], kernel[1]);
+         seti(F_10, image[I_5]);
+         seti(image[I_5], F_29_0);
+         addf(__scalar__0, F_10);
+         seti(I_45_0, I_5);
+         addf(I_5, 1);
+         seti(I_1, I_5);
+         seti(I_5, I_45_0);
+         seti(F_30_0, image[I_1]);
+         mulf(image[I_1], kernel[2]);
+         seti(F_11, image[I_1]);
+         seti(image[I_1], F_30_0);
+         addf(__scalar__0, F_11);
+         seti(kj_0, 3);
+         seti(I_20, I_29);
+         seti(I_46_0, j);
+         addf(j, I_20);
+         seti(I_9, j);
+         seti(j, I_46_0);
+         seti(I_47_0, I_9);
+         subf(I_9, 1);
+         seti(I_2, I_9);
+         seti(I_9, I_47_0);
+         seti(F_31_0, image[I_2]);
+         mulf(image[I_2], kernel[3]);
+         seti(F_12, image[I_2]);
+         seti(image[I_2], F_31_0);
+         addf(__scalar__0, F_12);
+         seti(F_32_0, image[I_9]);
+         mulf(image[I_9], kernel[4]);
+         seti(F_13, image[I_9]);
+         seti(image[I_9], F_32_0);
+         addf(__scalar__0, F_13);
+         seti(I_48_0, I_9);
+         addf(I_9, 1);
+         seti(I_3, I_9);
+         seti(I_9, I_48_0);
+         seti(F_33_0, image[I_3]);
+         mulf(image[I_3], kernel[5]);
+         seti(F_14, image[I_3]);
+         seti(image[I_3], F_33_0);
+         addf(__scalar__0, F_14);
+         seti(kj_0, 3);
+         seti(I_49_0, i_1_0);
+         addf(i_1_0, 1);
+         seti(I_21, i_1_0);
+         seti(i_1_0, I_49_0);
+         seti(I_50_0, isj);
+         mulf(isj, I_21);
+         seti(I_22, isj);
+         seti(isj, I_50_0);
+         seti(I_51_0, j);
+         addf(j, I_22);
+         seti(I_14, j);
+         seti(j, I_51_0);
+         seti(I_52_0, I_14);
+         subf(I_14, 1);
+         seti(I_4, I_14);
+         seti(I_14, I_52_0);
+         seti(F_34_0, image[I_4]);
+         mulf(image[I_4], kernel[6]);
+         seti(F_15, image[I_4]);
+         seti(image[I_4], F_34_0);
+         addf(__scalar__0, F_15);
+         seti(F_35_0, image[I_14]);
+         mulf(image[I_14], kernel[7]);
+         seti(F_16, image[I_14]);
+         seti(image[I_14], F_35_0);
+         addf(__scalar__0, F_16);
+         seti(I_53_0, I_14);
+         addf(I_14, 1);
+         seti(I_6, I_14);
+         seti(I_14, I_53_0);
+         seti(F_36_0, image[I_6]);
+         mulf(image[I_6], kernel[8]);
+         seti(F_17, image[I_6]);
+         seti(image[I_6], F_36_0);
+         addf(__scalar__0, F_17);
+         seti(kj_0, 3);
+         seti(ki_0, 3);
+         divf(__scalar__0, 9);
+         seti(I_7, I_29);
+         seti(I_54_0, j);
+         addf(j, I_7);
+         seti(I_8, j);
+         seti(j, I_54_0);
+         seti(new_image[I_8], __scalar__0);
+      }
+}
+
+Unsplit resulting code
+

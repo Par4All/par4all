@@ -31,7 +31,7 @@ display PRINTED_FILE[foo]
 display PRINTED_FILE[run_kernel]
 display PRINTED_FILE[kernel]
 
-apply KERNEL_LOAD_STORE[foo]
+#apply KERNEL_LOAD_STORE[foo]
 
 echo
 echo Code after cleanup
