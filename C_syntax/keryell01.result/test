@@ -1,0 +1,139 @@
+
+PARSED PRINTED FILE for keryell01
+
+int keryell01(void)
+{
+   static int i;
+   static int state = 0;
+   if (state==0)
+      goto switch_1_case_0;
+   if (state==1)
+      goto switch_2_case_1;
+   goto break_1;
+switch_1_case_0:   ;
+   /* start of function */
+   for (i = 0;i<10;i++) {
+      state = 1;
+      /* so we will come back to "case 1" */
+      return i;
+switch_2_case_1:      ;
+      ;
+   }
+break_1:   ;
+}
+
+PRINTED FILE for keryell01
+
+int keryell01(void)
+{
+   static int i;
+   static int state = 0;
+   if (state==0) goto switch_1_case_0;
+   if (state==1) {
+   }
+   else {
+      goto break_1;
+   }
+switch_2_case_1:   ;
+   i++;
+l99999:   ;
+/* start of function */   if (!(i<10)) goto break_1;
+   state = 1;
+   /* so we will come back to "case 1" */
+   return i;
+switch_1_case_0:   ;
+   i = 0;
+   goto l99999;
+break_1:   ;
+}
+
+PRINTED FILE with effects for keryell01
+
+int keryell01(void)
+{
+   static int i;
+   static int state = 0;
+//               <must be read   >: state
+   if (state==0) goto switch_1_case_0;
+//               <must be read   >: state
+   if (state==1) {
+   }
+   else {
+      goto break_1;
+   }
+switch_2_case_1:   ;
+//               <must be read   >: i
+//               <must be written>: i
+   i++;
+l99999:   ;
+//               <must be read   >: i
+/* start of function */   if (!(i<10)) goto break_1;
+//               <must be written>: state
+   state = 1;
+//               <must be read   >: i
+   /* so we will come back to "case 1" */
+   return i;
+switch_1_case_0:   ;
+//               <must be written>: i
+   i = 0;
+   goto l99999;
+break_1:   ;
+}
+
+PRINTED FILE with transformers for keryell01
+
+
+//  T(i,keryell01,state) {}
+
+int keryell01(void)
+{
+   static int i;
+   static int state = 0;
+
+//  T() {}
+
+   if (state==0) goto switch_1_case_0;
+
+//  T() {}
+
+   if (state==1) {
+   }
+   else {
+      goto break_1;
+   }
+
+//  T() {}
+
+switch_2_case_1:   ;
+
+//  T(i) {i==i#init+1}
+
+   i++;
+l99999:   ;
+
+//  T() {}
+
+/* start of function */   if (!(i<10)) goto break_1;
+
+//  T(state) {state==1}
+
+   state = 1;
+
+//  T(keryell01) {i==keryell01}
+
+   /* so we will come back to "case 1" */
+   return i;
+
+//  T() {}
+
+switch_1_case_0:   ;
+
+//  T(i) {i==0}
+
+   i = 0;
+   goto l99999;
+
+//  T() {}
+
+break_1:   ;
+}
