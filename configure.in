@@ -30,7 +30,7 @@ dnl	Makefile in this directory.
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT(polylib, 5.22.3)
+AC_INIT(polylib, 5.22.4)
 AM_INIT_AUTOMAKE
 AC_CONFIG_SRCDIR(include/polylib/polylib.h.in)
 AC_CONFIG_MACRO_DIR([m4])
@@ -38,7 +38,7 @@ AC_CONFIG_MACRO_DIR([m4])
 AC_PREREQ(2.60)
 
 AC_SUBST(versioninfo)
-versioninfo=9:0:0
+versioninfo=9:0:1
 
 if test "x$prefix" != "xNONE"; then
     prefix_wd=`cd $prefix && pwd`
