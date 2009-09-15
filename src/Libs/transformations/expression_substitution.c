@@ -79,7 +79,7 @@ bool set_pattern()
 }
 
 static 
-void replace_expression_similar_to_pattern(expression e)
+bool replace_expression_similar_to_pattern(expression e)
 {
     hash_table symbols; // contains the symbols gathered during the matching
     // match e against pattern and stocks symbols in hash_table
@@ -112,7 +112,25 @@ void replace_expression_similar_to_pattern(expression e)
                 make_call(pattern_entity,gen_nreverse(args))
         );
         hash_table_free(symbols);
+        return false;
     }
+    return true;
+}
+static
+bool replace_instruction_similar_to_pattern(instruction i)
+{
+    if(instruction_call_p(i))
+    {
+        expression exp = call_to_expression(instruction_call(i));
+        if( !replace_expression_similar_to_pattern(exp) ) /* replacement successfull */
+        {
+            instruction_call(i)=expression_call(exp);
+            expression_syntax(exp)=syntax_undefined;
+            free_expression(exp);
+            return false;
+        }
+    }
+    return true;
 }
 
 /* simple pass that performs substitution of expression by module call
@@ -127,11 +145,11 @@ bool expression_substitution(string module_name)
     bool pattern_set_p = set_pattern();
     if( pattern_set_p )
     {
-        gen_recurse(
+        gen_multi_recurse(
             get_current_module_statement(),
-            expression_domain,
-            gen_true,
-            &replace_expression_similar_to_pattern
+            expression_domain, replace_expression_similar_to_pattern, gen_null,
+            instruction_domain, replace_instruction_similar_to_pattern, gen_null,
+            0
         );
     }
 
