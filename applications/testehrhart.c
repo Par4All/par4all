@@ -19,6 +19,8 @@
 #include <polylib/homogenization.h>
 #include "config.h"
 
+#define EP_EVALUATION
+
 #ifndef HAVE_GETOPT_H
 #define getopt_long(a,b,c,d,e) getopt(a,b,c)
 #else
