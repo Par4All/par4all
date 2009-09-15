@@ -10,15 +10,15 @@
 #else
 TYPE OP(add,SUFF)(TYPE lhs, TYPE rhs)
 {
-    return lhs+rhs;
+    return lhs=lhs+rhs;
 }
 TYPE OP(sub,SUFF)(TYPE lhs, TYPE rhs)
 {
-    return lhs-rhs;
+    return lhs=lhs-rhs;
 }
 TYPE OP(mul,SUFF)(TYPE lhs, TYPE rhs)
 {
-    return lhs*rhs;
+    return lhs=lhs*rhs;
 }
 TYPE OP(set,SUFF)(TYPE lhs, TYPE rhs)
 {
@@ -26,6 +26,6 @@ TYPE OP(set,SUFF)(TYPE lhs, TYPE rhs)
 }
 TYPE OP(padd,SUFF)(TYPE *lhs, int rhs)
 {
-    return lhs[rhs];
+    return lhs=lhs[rhs];
 }
 #endif
