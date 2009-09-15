@@ -653,7 +653,13 @@ void two_addresses_code_generator(statement s)
                     CAR(args).p=(gen_chunkp)copy_expression(rhs);
                     instruction_block(theblock)=make_statement_list(thecall,copy_lhs,copy_tmp);
                     statement_comments(thecall)=statement_comments(s);
+                    statement_label(thecall)=statement_label(s);
+                    statement_number(thecall)=STATEMENT_NUMBER_UNDEFINED;
+
                     statement_comments(s)=empty_comments;
+                    statement_ordering(s)=STATEMENT_ORDERING_UNDEFINED;
+                    statement_label(s)=entity_empty_label();
+                    statement_number(s)=STATEMENT_NUMBER_UNDEFINED;
                 }
             }
         }
