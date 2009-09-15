@@ -6813,6 +6813,16 @@ ATOMIZE_ARRAY_ACCESSES_WITH_OFFSETS TRUE
 The purpose of the default option is to maximise common subexpression
 elimination.
 
+%%@UserManualDocumentation:  new_atomizer
+Once a code has been atomized, you can use this transformation to generate two address code only
+It can be useful for asm generation
+%%!UserManualDocumentation
+\begin{PipsMake}
+generate_two_addresses_code > MODULE.code
+			< MODULE.code
+			< PROGRAM.entities
+\end{PipsMake}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% PARTIAL EVAL
 
 \subsection{Partial Evaluation}

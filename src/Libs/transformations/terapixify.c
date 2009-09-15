@@ -616,3 +616,67 @@ bool array_to_pointer(char *module_name)
     return true;
 }
 
+static
+void two_addresses_code_generator(statement s)
+{
+    if(statement_call_p(s))
+    {
+        call c = statement_call(s);
+        if(ENTITY_ASSIGN_P(call_function(c)))
+        {
+            list args = call_arguments(c);
+            expression lhs = EXPRESSION(CAR(args));
+            expression rhs = EXPRESSION(CAR(CDR(args)));
+            if(expression_reference_p(lhs) && expression_call_p(rhs) && !expression_constant_p(rhs)) {
+                do {
+                    rhs=EXPRESSION(CAR(call_arguments(expression_call(rhs))));
+                } while(expression_call_p(rhs) && !expression_constant_p(rhs));
+                if(! expression_equal_p(lhs,rhs) )
+                {
+                    /* a=b+c; -> tmp=b;b=b+c;a=b;b=tmp; */
+                    statement thecall/*2*/= make_stmt_of_instr(statement_instruction(s));
+                    instruction theblock = make_instruction_block(NIL);
+                    statement_instruction(s)=theblock;
+
+                    if(expression_constant_p(rhs))
+                    {
+                        entity tmp = make_new_scalar_variable(get_current_module_entity(),copy_basic(basic_of_expression(rhs)));
+                        entity_initial(tmp)=make_value_expression(rhs);
+                        AddLocalEntityToDeclarations(tmp,get_current_module_entity(),s);
+                        rhs=entity_to_expression(tmp);
+                    }
+                    entity tmp = make_new_scalar_variable(get_current_module_entity(),copy_basic(basic_of_expression(rhs)));
+                    AddLocalEntityToDeclarations(tmp,get_current_module_entity(),s);
+                    entity_initial(tmp)=make_value_expression(copy_expression(rhs));
+                    statement copy_lhs/*3*/ = make_assign_statement(lhs,copy_expression(rhs));
+                    statement copy_tmp/*4*/ = make_assign_statement(copy_expression(rhs),entity_to_expression(tmp));
+                    CAR(args).p=(gen_chunkp)copy_expression(rhs);
+                    instruction_block(theblock)=make_statement_list(thecall,copy_lhs,copy_tmp);
+                    statement_comments(thecall)=statement_comments(s);
+                    statement_comments(s)=empty_comments;
+                }
+            }
+        }
+    }
+}
+
+bool
+generate_two_addresses_code(char *module_name)
+{
+    /* prelude */
+    set_current_module_entity(module_name_to_entity( module_name ));
+    set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, module_name, TRUE) );
+
+    gen_recurse(get_current_module_statement(),statement_domain,gen_true,two_addresses_code_generator);
+
+    /* validate */
+    module_reorder(get_current_module_statement());
+    DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name,get_current_module_statement());
+
+    /*postlude*/
+    reset_current_module_entity();
+    reset_current_module_statement();
+    return true;
+    return true;
+}
+
