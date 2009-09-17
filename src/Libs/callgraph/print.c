@@ -50,6 +50,16 @@
 #include "resources.h"
 #include "callgraph.h"
 
+/** Print callees for debugging purpose */
+void print_callees(callees c)
+{
+  list l = callees_callees(c);
+
+  MAP(STRING, mn, {
+    printf("%s\n", mn);
+  }, l);
+}
+
 
 /*
  * This function prints out any graph that contains callees only

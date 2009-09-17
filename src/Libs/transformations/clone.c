@@ -21,7 +21,7 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
-/* 
+/*
  * Cloning of a subroutine.
  * debug: CLONE_DEBUG_LEVEL
  */
@@ -49,41 +49,6 @@
 #define STAT_ORDER "PRETTYPRINT_STATEMENT_NUMBER"
 #define undefined_number_p(n) ((n)==STATEMENT_NUMBER_UNDEFINED)
 
-
-/************************************************************ UPDATE CALLEES */
-
-
-void 
-callees_rwt(call c, callees *current_callees)
-{
-    entity called = call_function(c);
-    pips_assert("defined entity", !entity_undefined_p(called));
-
-    if (type_functional_p(entity_type(called)) &&
-	storage_rom_p(entity_storage(called)) &&
-	(value_code_p(entity_initial(called)) ||
-	 value_unknown_p(entity_initial(called)))) 
-    {
-	string name = entity_local_name(called);
-	MAP(STRING, s, 
-	    if (same_string_p(name, s)) return, 
-	    callees_callees(*current_callees));
-	callees_callees(*current_callees) = 
-	    CONS(STRING, strdup(name), callees_callees(*current_callees));
-    }
-}
-
-callees
-compute_callees(statement stat)
-{
-
-  callees result;
-  callees current_callees = make_callees(NIL);
-  gen_context_recurse(stat, &current_callees, call_domain, gen_true, callees_rwt);
-  result = current_callees;
-  current_callees = callees_undefined;
-  return result;
-}
 
 
 /************************************************** BUILD THE CLONE VERSIONS */

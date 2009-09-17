@@ -23,7 +23,6 @@ TARGET	= pipsmake
 YOPT	= -d
 INC_CFILES =	pipsmake.c \
 		activate.c \
-		callgraph.c \
 		openclose.c \
 		callback.c \
 		unsplit.c \
@@ -32,7 +31,7 @@ INC_CFILES =	pipsmake.c \
 DERIVED_HEADERS = pipsmake_yacc.h
 DERIVED_CFILES = pipsmake_yacc.c pipsmake_lex.c
 
-LIB_CFILES =	$(DERIVED_CFILES)  $(INC_CFILES) 
+LIB_CFILES =	$(DERIVED_CFILES)  $(INC_CFILES)
 INC_TARGET = $(TARGET).h
 LIB_TARGET = lib$(TARGET).a
 
@@ -53,7 +52,7 @@ $(TARGET).h: $(DERIVED_CFILES)
 
 YY2PM	= sed -e '/^FILE \*yyin/s/=[^,;]*//g;s/YY/PIPSMAKE_/g;s/yy/pipsmake_/g'
 
-pipsmake_lex.c: readmakefile.l 
+pipsmake_lex.c: readmakefile.l
 	$(SCAN) readmakefile.l | $(YY2PM) > $@
 
 pipsmake_yacc.c: readmakefile.y
