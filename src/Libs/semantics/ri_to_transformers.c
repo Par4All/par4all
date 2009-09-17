@@ -912,7 +912,7 @@ transformer any_user_call_site_to_transformer(entity f,
   /* Evaluate actual arguments from left to right linking it to a
      functional parameter when possible */
   FOREACH(EXPRESSION,e, pc) {
-    type fpt = parameter_type(PARAMETER(CAR(cpl)));  // formal parameter type
+    type fpt = ultimate_type(parameter_type(PARAMETER(CAR(cpl))));  // formal parameter type
     type apt = expression_to_type(e); // actual parameter type
     entity fpv = find_ith_parameter(f, n); // formal parameter variable (and value)
     /* Because we are using the caller's framework, we cannot use the
