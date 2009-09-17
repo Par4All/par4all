@@ -53,7 +53,7 @@ pipslibs.libs	= \
 	comp_sections semantics control continuation rice ricedg \
 	pipsdbm transformer preprocessor ri-util step properties \
 	text-util misc properties reductions flint sac safescale phrase \
-	gpu newgen
+	newgen
 
 pips.libs	= \
 	$(pipslibs.libs) $(newgen.libs) $(linear.libs) \
