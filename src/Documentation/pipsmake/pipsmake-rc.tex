@@ -4521,7 +4521,9 @@ rice_data_dependence            > MODULE.parallelized_code
 \index{Terapix}
 
 %%@UserManualDocumentation: kernelize
-Split a parallel loop with local index into three parts : a host side part, a kernelk part and an intermediate part.
+Split a parallel loop with a local index into three parts: a host side
+part, a kernel part and an intermediate part.
+
 The intermediate part simulates the parallel code to the kernel from the host
 %%!UserManualDocumentation
 \begin{PipsMake}
@@ -4574,7 +4576,8 @@ OUTLINE_LOOP_STATEMENT FALSE
 \end{PipsProp}
 
 %%@UserManualDocumentation: normalize_microcode
-perform various checks on a terapix microcode to make sure it can be synthesized.
+Perform various checks on a Terapix microcode to make sure it can be
+synthesized.
 %%!UserManualDocumentation
 \begin{PipsMake}
 normalize_microcode				> MODULE.code
