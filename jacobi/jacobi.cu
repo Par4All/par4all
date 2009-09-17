@@ -89,8 +89,10 @@ void write_data(char filename[]) {
  * file for kernel1.c
  */
 
-P4A_ACCEL_KERNEL void kernel1(float_t space[SIZE][SIZE], float_t save[SIZE][SIZE], int i, int j)
-{
+P4A_ACCEL_KERNEL void kernel1(float_t space[SIZE][SIZE],
+			      float_t save[SIZE][SIZE],
+			      int i,
+			      int j) {
    //int j;
    {
       //int i_1;
@@ -106,8 +108,8 @@ P4A_ACCEL_KERNEL void kernel1(float_t space[SIZE][SIZE], float_t save[SIZE][SIZE
 /*
  * file for launch_kernel1.c
  */
-P4A_ACCEL_KERNEL_WRAPPER void kernel1_wrapper(float_t space[SIZE][SIZE], float_t save[SIZE][SIZE])
-{
+P4A_ACCEL_KERNEL_WRAPPER void kernel1_wrapper(float_t space[SIZE][SIZE],
+					      float_t save[SIZE][SIZE]) {
   int j;
   int i;
    /* Use 2 array in flip-flop to have dataparallel forall semantics. I
@@ -129,8 +131,7 @@ kernel1:
 /*
  * file for launch_kernel1.c
  */
-void launch_kernel1(float_t space[SIZE][SIZE], float_t save[SIZE][SIZE])
-{
+void launch_kernel1(float_t space[SIZE][SIZE], float_t save[SIZE][SIZE]) {
   // int j;
   // int i;
    /* Use 2 array in flip-flop to have dataparallel forall semantics. I
