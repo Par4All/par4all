@@ -1,0 +1,60 @@
+int main()
+{
+   int i;
+   int j;
+
+   i = (j = 1, 2);
+   i = 3, j = 4;
+}
+int main()
+{
+   int i;
+   int j;
+
+   i = (j = 1, 2);
+   i = 3, j = 4;
+}
+int main()
+{
+   int i;
+   int j;
+//               <must be written>: i j
+
+   i = (j = 1, 2);
+//               <must be written>: i j
+   i = 3, j = 4;
+}
+
+//  T() {0==-1}
+
+int main()
+{
+   int i;
+   int j;
+
+//  T(i,j) {i==2, j==1}
+
+
+   i = (j = 1, 2);
+
+//  T() {0==-1}
+
+   i = 3, j = 4;
+}
+
+//  P() {}
+
+int main()
+{
+   int i;
+   int j;
+
+//  P() {}
+
+
+   i = (j = 1, 2);
+
+//  P(i,j) {i==2, j==1}
+
+   i = 3, j = 4;
+}
