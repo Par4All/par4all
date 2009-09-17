@@ -19,20 +19,54 @@ activate C_PARSER
 activate TRANSFORMERS_INTER_FULL
 activate PRECONDITIONS_INTER_FULL
 
+echo
+echo Parsed printed file for "main"
+echo
+
 display PARSED_PRINTED_FILE[main]
+
+echo
+echo Code for "main"
+echo
 
 display PRINTED_FILE[main]
 
 # quit
 
+echo
+echo Proper effects for "main"
+echo
+
 activate PRINT_CODE_PROPER_EFFECTS
 display PRINTED_FILE[main]
+
+echo
+echo Transformers for "foo"
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[foo]
+
+echo
+echo Transformers for "main"
+echo
 
 activate PRINT_CODE_TRANSFORMERS
 display PRINTED_FILE[main]
 
+echo
+echo Preconditions for "main"
+echo
+
 activate PRINT_CODE_PRECONDITIONS
 display PRINTED_FILE[main]
+
+echo
+echo Preconditions for "foo"
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[foo]
 
 close
 

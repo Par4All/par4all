@@ -5,7 +5,6 @@ void CONTINUE_TEST()
    int L3;
    int L4;
    float X;
-   
 
    _f77_intrinsics_read_(X) ;
    if (X>0.)
@@ -14,7 +13,5 @@ void CONTINUE_TEST()
       ;
    else
       //c        x=x+1
-
-   
 
 }

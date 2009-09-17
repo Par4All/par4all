@@ -90,7 +90,7 @@ void adi(double **a, double **b, double **c, double **d, double **e, double **f,
    nits = 100/nr;
    for (kits = 1;kits<=nits;kits++) {
       for (n = 1;n<=nr;n++) {
-         next = (n==nr?1:n+1);
+         next = n==nr?1:n+1;
          rfact = r[n]+r[next];
          for (l = 2;l<=jmax-1;l++) {
             for (j = 2;j<=jmax-1;j++) {
