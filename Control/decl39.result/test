@@ -50,7 +50,8 @@ void decl39(int size)
 // (1,1)
 
 
-// if the switch is removed, the loop index declarations reappears   if ((0==0)) {
+// if the switch is removed, the loop index declarations reappears
+   if ((0==0)) {
    }
    else {
       goto break_2;
