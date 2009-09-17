@@ -363,32 +363,34 @@ statement inline_expression_call(inlining_parameters p, expression modified_expr
         list new_externs = NIL;
         SET_FOREACH(entity,ref_ent,inlined_referenced_entities)
         {
-            if(!entity_enum_member_p(ref_ent))
+            if( entity_field_p(ref_ent) ) /* special hook for struct member : consider their structure instead of the field */
+            {
+                ref_ent=entity_field_to_entity_struct(ref_ent);
+            }
+
+            if(!entity_enum_member_p(ref_ent) && /* enum member cannot be added to declarations */
+                    !entity_formal_p(ref_ent) ) /* formal parameters are not considered */
             {
                 string emn = entity_module_name(ref_ent);
-                if(! same_string_p(emn,mln) &&
-                        !same_string_p(emn,cu_name) &&
-                        !has_entity_with_same_name(ref_ent,statement_declarations(expanded)) )
+                if(! same_string_p(emn,mln) && /* this checks if the entity is local to current module */
+                        !same_string_p(emn,cu_name) && /* this checks if the entity is static to current compilation unit */
+                        !has_entity_with_same_name(ref_ent,statement_declarations(expanded)) ) /* this checks if the entity is already declared in expanded */
                 {
                     entity add = ref_ent;
                     if(entity_variable_p(ref_ent) &&
-                            !top_level_entity_p(ref_ent)) /* make it global instead of static ...*/
+                            !top_level_entity_p(ref_ent)) /* make it global instead of static to the compilation unit ...*/
                     {
-                        if(variable_static_p(ref_ent)) {
-                            pips_user_warning("replacing static variable \"%s\" by a global one, this may lead to incorrect code\n", entity_user_name(ref_ent));
-                            add = make_global_entity_from_local(ref_ent);
-                            replace_entity(expanded,ref_ent,add);
-                            replace_entity(inlined_module_statement(p),ref_ent,add);
-                        }
-                        else {
-                            /* FI: with some FREIA code, I end up here with a formal
-                               parameter... */
-			  //pips_internal_error("error about variable storage of entity \"%s\"\n", entity_name(ref_ent));
-			  /* do nothing */
-			  ;
-                        }
+                        pips_user_warning("replacing static variable \"%s\" by a global one, this may lead to incorrect code\n", entity_user_name(ref_ent));
+                        add = make_global_entity_from_local(ref_ent);
+                        replace_entity(expanded,ref_ent,add);
+                        replace_entity(inlined_module_statement(p),ref_ent,add);
                     }
-                    new_externs=CONS(ENTITY,add,new_externs);
+                    if( entity_variable_p(add) ) {
+                        new_externs=CONS(ENTITY,add,new_externs);
+                    }
+                    else {
+                        AddEntityToModuleCompilationUnit(add,get_current_module_entity());
+                    }
                 }
             }
         }

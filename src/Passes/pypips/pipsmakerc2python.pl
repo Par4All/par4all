@@ -44,7 +44,7 @@ foreach(@doc_strings)
 #print "\"it's a megablast\"])\n";
 my @properties=($rc=~/\\begin{PipsProp}\s*\n(?:\n*([^ ]+)[^\n]+\n)+?\\end{PipsProp}/gms);
 print "\tall_properties=frozenset([";
-foreach(@properties) { print "\"$_\","; }
+foreach(@properties) { print "\'$_\',"; }
 print "\"it's a megablast\"])\n";
 
 

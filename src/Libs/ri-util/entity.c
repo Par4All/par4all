@@ -450,6 +450,7 @@ bool entity_field_p(entity e)
  * it would have been better to keep the struct prefix in the field
  * name.
  */
+static
 entity entity_field_to_entity(entity f, char prefix)
 {
   entity s = entity_undefined;

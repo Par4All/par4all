@@ -44,6 +44,7 @@
 
 #include "parser_private.h"
 #include "syntax.h"
+#include "resources.h"
 bool
 variable_entity_p(entity e)
 {
@@ -126,7 +127,7 @@ AddLocalEntityToDeclarations(entity e, entity module, statement s) {
 
 	if (c_module_p(module)
 			/* A compilation does not have statements */
-			&& !compilation_unit_entity_p(module)) {
+/*			&& !compilation_unit_entity_p(module)*/) {
 		/* In C the variable are local to a statement, so add : */
 		pips_assert("Calling AddLocalEntityToDeclarations from c_module with valid statement", !statement_undefined_p(s) );
 		list l = statement_declarations(s);
@@ -146,6 +147,7 @@ AddEntityToCurrentModule(entity e) {
 
   AddLocalEntityToDeclarations(e, module_e, module_s);
 }
+
 
 entity make_global_entity_from_local(entity local) {
     string seed = entity_local_name(local);

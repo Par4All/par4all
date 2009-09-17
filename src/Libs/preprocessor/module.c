@@ -249,6 +249,46 @@ entity_minimal_name(entity e)
   return emn;
 }
 
+/* Add an entity to the current's module compilation unit declarations
+ * we have to generate its statement if none cerated before
+ * due to limitation of pipsmake, it is not always possible to make sure from pipsmake
+ * that this ressource is created
+ * for example in INLINING (!) we would like to tell pipsmake
+ * we need the CODE resource from all module callers
+ */
+void
+AddEntityToCompilationUnit(entity e, entity cu)
+{
+    statement s = statement_undefined;
+    string cum = module_local_name(cu);
+    if( c_module_p(cu) ) {
+        if(!db_resource_required_or_available_p(DBR_CODE,cum))
+        {
+            entity tmp = get_current_module_entity();
+            statement stmt = get_current_module_statement();
+            reset_current_module_entity();
+            reset_current_module_statement();
+            controlizer(cum);
+            if(!entity_undefined_p(tmp))
+                set_current_module_entity(tmp);
+            if(!statement_undefined_p(stmt))
+                set_current_module_statement(stmt);
+        }
+        s=(statement)db_get_memory_resource(DBR_CODE,cum,TRUE);
+    }
+    AddLocalEntityToDeclarations(e,cu,s);
+    if( c_module_p(cu) ) {
+        db_put_or_update_memory_resource(DBR_CODE,cum,s,TRUE);
+        db_touch_resource(DBR_CODE,cum);
+    }
+}
+void
+AddEntityToModuleCompilationUnit(entity e, entity module)
+{
+    entity cu = module_entity_to_compilation_unit_entity(module);
+    AddEntityToCompilationUnit(e,cu);
+}
+
 /* build a textual representation of the modified module and update db
  */
 void

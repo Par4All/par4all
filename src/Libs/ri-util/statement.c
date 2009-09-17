@@ -2592,7 +2592,9 @@ static void statement_clean_declarations_statement_walker(statement s, set re)
 
 /**
  * retrieves the set of entites used in elem
- *
+ * beware that this entites may be formal parameters, functions etc
+ * so please filter this set depending on your need
+ * 
  * @param elem  element to check (any gen_recursifiable type is allowded)
  *
  * @return set of referenced entities

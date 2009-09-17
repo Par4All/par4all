@@ -14,7 +14,8 @@ class object_code:
 	def __init__(self,sourcefile,cppflags,cflags):
 		self.cflags=cflags
 		CPP=os.getenv("CPP","cpp")
-		cmd=[CPP]+cppflags+[sourcefile]
+		cmd=[CPP,"-U__GNUC__"]+cppflags+[sourcefile]
+		print "# running",cmd
 		sp=subprocess.Popen(cmd,stdout=subprocess.PIPE)
 		sp.wait()
 		self.code=sp.stdout.read()
@@ -93,6 +94,8 @@ def pipsld():
 	print "# running pips"
 	ws = pyps.workspace(C_FILES)
 	# add extra operations there 
+	ws["farray_get"].inlining()
+	ws["farray_set"].inlining()
 	#map(module.suppress_dead_code,ws)
 	
 	# commit changes
