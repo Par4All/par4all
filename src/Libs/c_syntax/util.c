@@ -1908,6 +1908,10 @@ void UpdateEntity(entity e, stack ContextStack, stack FormalStack, stack Functio
       t1 = stack_pop(s);
       t2 = UpdateType(t1,t2);
     }
+  if(type_undefined_p(t2)) {
+    /* The default type is int, or a function returning an int */
+    t2 = make_scalar_integer_type(DEFAULT_INTEGER_TYPE_SIZE);
+  }
   entity_type(e) = t2;
 
 

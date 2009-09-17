@@ -109,7 +109,7 @@ empty_comments_p(string s)
 {
   /* Could be replaced by a macro. See macro empty_comments */
   pips_assert("comments cannot be NULL", s!=NULL);
-  return (s == NULL || string_undefined_p(s));
+  return (s == NULL || string_undefined_p(s) || strcmp(s,"")==0);
 }
 
 /** @defgroup statements_p Predicates on statements
@@ -149,8 +149,7 @@ bool C_return_statement_p(statement s) {
 /* Test if a statement is a CONTINUE, that is the FORTRAN nop, the ";" in
    C or the "pass" in Python... according to the language.
 */
-bool
-continue_statement_p(statement s) {
+bool continue_statement_p(statement s) {
   instruction i = statement_instruction(s);
 
   return instruction_continue_p(i);
@@ -159,8 +158,8 @@ continue_statement_p(statement s) {
 
 /* Test if a statement is a Fortran STOP.
 */
-bool
-stop_statement_p(statement s) {
+bool stop_statement_p(statement s)
+{
   instruction i = statement_instruction(s);
 
   return instruction_stop_p(i);
@@ -169,55 +168,49 @@ stop_statement_p(statement s) {
 
 /* Test if a statement is a Fortran FORMAT.
 */
-bool
-format_statement_p(statement s) {
+bool format_statement_p(statement s)
+{
   instruction i = statement_instruction(s);
 
   return instruction_format_p(i);
 }
 
 
-bool
-write_statement_p(s)
-statement s;
+bool write_statement_p(statement s)
 {
-    instruction i = statement_instruction(s);
+  instruction i = statement_instruction(s);
 
-    return (native_instruction_p(i, WRITE_FUNCTION_NAME));
+  return (native_instruction_p(i, WRITE_FUNCTION_NAME));
 }
 
-bool 
-statement_less_p(st1, st2)
-statement st1, st2;
+bool statement_less_p(statement st1, statement st2)
 {
-    int o1 = statement_ordering( st1 ) ;
-    int o2 = statement_ordering( st2 ) ;
+  int o1 = statement_ordering( st1 ) ;
+  int o2 = statement_ordering( st2 ) ;
 
-    if (ORDERING_NUMBER( o1 ) != ORDERING_NUMBER( o2 )) {
-	fprintf(stderr, "cannot compare %td (%d,%d) and %td (%d,%d)\n",
-		statement_number(st1), 
-		ORDERING_NUMBER( o1 ), ORDERING_STATEMENT( o1 ),
-		statement_number(st2), 
-		ORDERING_NUMBER( o2 ), ORDERING_STATEMENT( o2 ));
+  if (ORDERING_NUMBER( o1 ) != ORDERING_NUMBER( o2 )) {
+    fprintf(stderr, "cannot compare %td (%d,%d) and %td (%d,%d)\n",
+	    statement_number(st1),
+	    ORDERING_NUMBER( o1 ), ORDERING_STATEMENT( o1 ),
+	    statement_number(st2),
+	    ORDERING_NUMBER( o2 ), ORDERING_STATEMENT( o2 ));
 
-	abort();
-    }
+    abort();
+  }
 
-    return( ORDERING_STATEMENT(o1) < ORDERING_STATEMENT(o2)) ;
+  return( ORDERING_STATEMENT(o1) < ORDERING_STATEMENT(o2)) ;
 }
 
-bool 
-statement_possible_less_p(st1, st2)
-statement st1, st2;
+bool statement_possible_less_p(statement st1, statement st2)
 {
-    int o1 = statement_ordering( st1 ) ;
-    int o2 = statement_ordering( st2 ) ;
+  int o1 = statement_ordering( st1 ) ;
+  int o2 = statement_ordering( st2 ) ;
 
-    if (ORDERING_NUMBER( o1 ) != ORDERING_NUMBER( o2 )) {
-	return(TRUE);
-    }
-    else
-	return( ORDERING_STATEMENT(o1) < ORDERING_STATEMENT(o2));
+  if (ORDERING_NUMBER( o1 ) != ORDERING_NUMBER( o2 )) {
+    return(TRUE);
+  }
+  else
+    return( ORDERING_STATEMENT(o1) < ORDERING_STATEMENT(o2));
 }
 
 /* Statement classes induced from instruction type
@@ -227,94 +220,81 @@ statement st1, st2;
  */
 
 /* See also macro statement_block_p() */
-bool
-block_statement_p(statement s)
+bool block_statement_p(statement s)
 {
-    instruction i = statement_instruction(s);
-    bool r = instruction_sequence_p(i);
+  instruction i = statement_instruction(s);
+  bool r = instruction_sequence_p(i);
 
-    return r;
+  return r;
 }
 
-bool 
-statement_test_p(statement s)
+bool statement_test_p(statement s)
 {
-    return(instruction_test_p(statement_instruction(s)));
+  return(instruction_test_p(statement_instruction(s)));
 }
 
-bool 
-statement_loop_p(s)
-statement s;
+bool statement_loop_p(statement s)
 {
-    return(instruction_loop_p(statement_instruction(s)));
+  return(instruction_loop_p(statement_instruction(s)));
 }
 
-bool 
-statement_whileloop_p(s)
-statement s;
+bool statement_whileloop_p(statement s)
 {
-    return(instruction_whileloop_p(statement_instruction(s)));
+  return(instruction_whileloop_p(statement_instruction(s)));
 }
 
-bool 
-statement_forloop_p(s)
-statement s;
+bool statement_forloop_p(statement s)
 {
-    return(instruction_forloop_p(statement_instruction(s)));
+  return(instruction_forloop_p(statement_instruction(s)));
 }
 
-bool 
-unstructured_statement_p(statement s)
+bool unstructured_statement_p(statement s)
 {
-    return(instruction_unstructured_p(statement_instruction(s)));
+  return(instruction_unstructured_p(statement_instruction(s)));
 }
 
 /* Test if a statement is empty. */
-bool
-empty_statement_p(st)
-statement st;
+bool empty_statement_p(statement st)
 {
-    instruction i;
+  instruction i;
 
-    return(entity_empty_label_p(statement_label(st)) &&
-	   instruction_block_p(i=statement_instruction(st)) &&
-	   ENDP(instruction_block(i)) &&
-	   ENDP(statement_declarations(st)));
+  return(entity_empty_label_p(statement_label(st)) &&
+	 instruction_block_p(i=statement_instruction(st)) &&
+	 ENDP(instruction_block(i)) &&
+	 ENDP(statement_declarations(st)));
 }
 
 
-bool
-unlabelled_statement_p(st)
-statement st;
+bool unlabelled_statement_p(statement st)
 {
-    return(entity_empty_label_p(statement_label(st)));
+  return(entity_empty_label_p(statement_label(st)));
 }
 
-bool
-nop_statement_p(statement s)
+bool nop_statement_p(statement s)
 {
-    /* NOP statements are useful to fill in empty test branches.
-     * The definition of NOP in PIPS has changed over the years.
-     * A NOP statement is an empty block. Like blocks, it cannot be
-     * labelled nor commented. It has no statement number because it
-     * is invisible to users.
-     *
-     * Dangling comments, like labels, are attached to CONTINUE statements.
-     *
-     * Note 1: blocks are now called "sequences"
-     * Note 2: see also empty_statement_p()
-     */
-    bool nop = FALSE;
-    instruction i = statement_instruction(s);
+  /* NOP statements are useful to fill in empty test branches.
+   * The definition of NOP in PIPS has changed over the years.
+   * A NOP statement is an empty block. Like blocks, it cannot be
+   * labelled nor commented. It has no statement number because it
+   * is invisible to users.
+   *
+   * Dangling comments, like labels, are attached to CONTINUE statements.
+   *
+   * Note 1: blocks are now called "sequences"
+   * Note 2: see also empty_statement_p()
+   */
+  bool nop = FALSE;
+  instruction i = statement_instruction(s);
 
-    if(instruction_block_p(i) && ENDP(instruction_block(i))) {
-	pips_assert("No label!", entity_empty_label_p(statement_label(s)));
-	pips_assert("No comments", empty_comments_p(statement_comments(s)));
-	pips_assert("No statement number", statement_number(s) == STATEMENT_NUMBER_UNDEFINED);
-	nop = TRUE;
-    }
+  if(instruction_block_p(i) && ENDP(instruction_block(i))) {
+    pips_assert("No label!", entity_empty_label_p(statement_label(s)));
+    pips_assert("No comments", empty_comments_p(statement_comments(s)));
+    pips_assert("No statement number",
+		statement_number(s) == STATEMENT_NUMBER_UNDEFINED);
+    nop = TRUE;
+  }
 
-    return nop;
+  return nop;
 }
 
 /* Return true if the statement is an empty instruction block without
@@ -324,99 +304,93 @@ nop_statement_p(statement s)
    FI: I add a check on declarations. With their initializations, they
    have side effects. See C_syntax/block01.c.
  */
-bool
-empty_statement_or_labelless_continue_p(statement st)
+bool empty_statement_or_labelless_continue_p(statement st)
 {
-   instruction i;
+  instruction i;
 
-   if (!entity_empty_label_p(statement_label(st)))
-      return FALSE;
-   if (continue_statement_p(st))
-      return TRUE;
-   i = statement_instruction(st);
-   if (instruction_block_p(i) && ENDP(statement_declarations(st))) {
-       MAP(STATEMENT, s,
-           {
-	       if (!empty_statement_or_labelless_continue_p(s))
-		   /* Well there is at least one possibly usefull thing... */
-		   return FALSE;
-           },
-	   instruction_block(i));
-       return TRUE;
-   }
-   return FALSE;
+  if (!entity_empty_label_p(statement_label(st)))
+    return FALSE;
+  if (continue_statement_p(st))
+    return TRUE;
+  i = statement_instruction(st);
+  if (instruction_block_p(i) && ENDP(statement_declarations(st))) {
+    MAP(STATEMENT, s,
+	{
+	  if (!empty_statement_or_labelless_continue_p(s))
+	    /* Well there is at least one possibly usefull thing... */
+	    return FALSE;
+	},
+	instruction_block(i));
+    return TRUE;
+  }
+  return FALSE;
 }
 
 
 /* Return true if the statement is an empty instruction block or a
    continue or a recursive combination of above. */
-bool
-empty_statement_or_continue_p(statement st)
+bool empty_statement_or_continue_p(statement st)
 {
-   instruction i;
+  instruction i;
 
-   if (continue_statement_p(st))
-      return TRUE;
-   i = statement_instruction(st);
-   if (instruction_block_p(i)) {
-       MAP(STATEMENT, s,
-           {
-	       if (!empty_statement_or_continue_p(s))
-		   /* Well there is at least one possibly usefull thing... */
-		   return FALSE;
-           },
-              instruction_block(i));
-       return TRUE;
-   }
-   return FALSE;
+  if (continue_statement_p(st))
+    return TRUE;
+  i = statement_instruction(st);
+  if (instruction_block_p(i)) {
+    MAP(STATEMENT, s,
+	{
+	  if (!empty_statement_or_continue_p(s))
+	    /* Well there is at least one possibly usefull thing... */
+	    return FALSE;
+	},
+	instruction_block(i));
+    return TRUE;
+  }
+  return FALSE;
 }
 
 
 /* Return true if the statement is an empty instruction block or a
    continue without comments or without LABEL or a recursive
    combination of above. */
-bool
-empty_statement_or_continue_without_comment_p(statement st)
+bool empty_statement_or_continue_without_comment_p(statement st)
 {
-   instruction i;
-   string the_comments = statement_comments(st);
+  instruction i;
+  string the_comments = statement_comments(st);
 
-   /* The very last condition should be sufficient */
-   if (!empty_comments_p(the_comments))
-       return FALSE;
+  /* The very last condition should be sufficient */
+  if (!empty_comments_p(the_comments))
+    return FALSE;
 
-   if (!entity_empty_label_p(statement_label(st)))
-      return FALSE;
-   if (continue_statement_p(st))
-      return TRUE;
+  if (!entity_empty_label_p(statement_label(st)))
+    return FALSE;
+  if (continue_statement_p(st))
+    return TRUE;
 
-   i = statement_instruction(st);
-   if (instruction_block_p(i)) {
-       MAP(STATEMENT, s,
-	   {
-	       if (!empty_statement_or_continue_without_comment_p(s))
-		   return FALSE;
-	   },
-	   instruction_block(i));
-       /* Everything in the block are commentless continue or empty
-          statements: */
-       return TRUE;
-   }
-   /* Everything else useful: */
-   return FALSE;
+  i = statement_instruction(st);
+  if (instruction_block_p(i)) {
+    MAP(STATEMENT, s,
+	{
+	  if (!empty_statement_or_continue_without_comment_p(s))
+	    return FALSE;
+	},
+	instruction_block(i));
+    /* Everything in the block are commentless continue or empty
+       statements: */
+    return TRUE;
+  }
+  /* Everything else useful: */
+  return FALSE;
 }
 
 
-bool 
-statement_call_p(s)
-statement s;
+bool statement_call_p(statement s)
 {
-    return(instruction_call_p(statement_instruction(s)));
+  return(instruction_call_p(statement_instruction(s)));
 }
 
 
-bool 
-check_io_statement_p(statement s)
+bool check_io_statement_p(statement s)
 {
   bool check_io = FALSE;
   instruction i = statement_instruction(s);
@@ -503,7 +477,8 @@ statement make_empty_block_statement() {
 }
 
 
-/** Build an empty statement with declaration text and comment */
+/** Build an empty statement with declaration list, declaration text
+    and comment. Shouldn't we also update the extensions field? */
 statement make_empty_statement_with_declarations_and_comments(list d,
 							      string dt,
 							      string c) {
@@ -770,9 +745,7 @@ statement s;
 }
 
 
-bool 
-assignment_block_or_statement_p(s)
-statement s;
+bool assignment_block_or_statement_p(statement s)
 {
     instruction i = statement_instruction(s);
 
@@ -2412,7 +2385,7 @@ int count_references_to_variable_element(statement s, entity v)
   variable_searched = entity_undefined;
   return reference_count;
 }
-/** 
+/**
  * @name get_statement_depth and its auxilary functions
  * @{ */
 
@@ -2425,352 +2398,344 @@ bool statement_substatement_walker(statement some, statement s)
 	return  !is_substatement;
 }
 
-/** 
+/**
  * @brief search a statement inside a statement
- * 
- * @param s searched statement 
+ *
+ * @param s searched statement
  * @param root where to start searching from
- * 
+ *
  * @return true if found
  */
 bool statement_substatement_p(statement s, statement root)
 {
-	is_substatement= false;
-	//printf("searching::::::::::::::\n");
-	//print_statement(s);
-	//printf("inside::::::::::::\n");
-	//print_statement(root);
-	gen_context_recurse(root,s,statement_domain,statement_substatement_walker,gen_null);
-	//if(is_substatement) printf(":::::::::found !\n");
-	//else printf("::::::::not found !\n");
-	return is_substatement;
+  is_substatement= false;
+  //printf("searching::::::::::::::\n");
+  //print_statement(s);
+  //printf("inside::::::::::::\n");
+  //print_statement(root);
+  gen_context_recurse(root,s,statement_domain,statement_substatement_walker,gen_null);
+  //if(is_substatement) printf(":::::::::found !\n");
+  //else printf("::::::::not found !\n");
+  return is_substatement;
 }
 
-/** 
+/**
  * @brief computes the block-depth of a statement
  * usefull to generate entity declared at particular block level
- * 
+ *
  * @param s statement we compute the depth of
- * @param root outer statement containing s 
- * 
+ * @param root outer statement containing s
+ *
  * @return positive integer
  */
 int get_statement_depth(statement s, statement root)
 {
-	if( s == root )
-		return 0;
-	else {
-		instruction i = statement_instruction(root);
-		switch(instruction_tag(i))
-		{
-			case is_instruction_sequence:
-				{
-					FOREACH(STATEMENT,stmt,instruction_block(i))
-					{
-						if(statement_substatement_p(s,stmt))
-							return 1+get_statement_depth(s,stmt);
-					}
-					pips_internal_error("you should never reach this point");
-                    return -1;
-				} 
-			case is_instruction_test:
-				return 
-					statement_substatement_p(s,test_true(instruction_test(i))) ?
-					get_statement_depth(s,test_true(instruction_test(i))):
-					get_statement_depth(s,test_false(instruction_test(i)));
-			case is_instruction_loop:
-				return get_statement_depth(s,loop_body(instruction_loop(i)));
-			case is_instruction_whileloop:
-				return get_statement_depth(s,whileloop_body(instruction_whileloop(i)));
-			case is_instruction_forloop:
-				return get_statement_depth(s,forloop_body(instruction_forloop(i)));
-			case is_instruction_unstructured:
-				pips_internal_error("not implemented for unstructured");
-                return -1;
-			default:
-				pips_internal_error("you should never reach this point");
-                return -1;
-		};
+  if( s == root )
+    return 0;
+  else {
+    instruction i = statement_instruction(root);
+    switch(instruction_tag(i))
+      {
+      case is_instruction_sequence:
+	{
+	  FOREACH(STATEMENT,stmt,instruction_block(i))
+	    {
+	      if(statement_substatement_p(s,stmt))
+		return 1+get_statement_depth(s,stmt);
+	    }
+	  pips_internal_error("you should never reach this point");
+	  return -1;
 	}
+      case is_instruction_test:
+	return
+	  statement_substatement_p(s,test_true(instruction_test(i))) ?
+	  get_statement_depth(s,test_true(instruction_test(i))):
+	get_statement_depth(s,test_false(instruction_test(i)));
+      case is_instruction_loop:
+	return get_statement_depth(s,loop_body(instruction_loop(i)));
+      case is_instruction_whileloop:
+	return get_statement_depth(s,whileloop_body(instruction_whileloop(i)));
+      case is_instruction_forloop:
+	return get_statement_depth(s,forloop_body(instruction_forloop(i)));
+      case is_instruction_unstructured:
+	pips_internal_error("not implemented for unstructured");
+	return -1;
+      default:
+	pips_internal_error("you should never reach this point");
+	return -1;
+      };
+  }
 
 }
 
 /**  @} */
 
-/** 
+/**
  * @name declarations updater
  * @{ */
 
-/** 
+/**
  * helper looking in a reference for referenced entities
- * 
+ *
  * @param r reference to check
  * @param re set to fill
  */
-static
-void statement_clean_declarations_reference_walker(reference r, set re)
+static void statement_clean_declarations_reference_walker(reference r, set re)
 {
-    entity e = reference_variable(r);
-    if( !entity_constant_p(e) && ! intrinsic_entity_p(e) )
-        set_add_element(re,re,e);
+  entity e = reference_variable(r);
+  if( !entity_constant_p(e) && ! intrinsic_entity_p(e) )
+    set_add_element(re,re,e);
 }
 
-/** 
+/**
  * helper looking in a call for referenced entities
- * 
+ *
  * @param c call to check
  * @param re set to fill
  */
-static
-void statement_clean_declarations_call_walker(call c, set re)
+static void statement_clean_declarations_call_walker(call c, set re)
 {
-    entity e = call_function(c);
-    if( !entity_constant_p(e) && ! intrinsic_entity_p(e) )
-        set_add_element(re,re,e);
+  entity e = call_function(c);
+  if( !entity_constant_p(e) && ! intrinsic_entity_p(e) )
+    set_add_element(re,re,e);
 }
 
-/** 
+/**
  * helper looking in a loop for referenced entities
- * 
+ *
  * @param l loop to check
  * @param re set to fill
  */
-static
-void statement_clean_declarations_loop_walker(loop l, set re)
+static void statement_clean_declarations_loop_walker(loop l, set re)
 {
-    entity e = loop_index(l);
-    if( !entity_constant_p(e) && ! intrinsic_entity_p(e) )
-        set_add_element(re,re,e);
+  entity e = loop_index(l);
+  if( !entity_constant_p(e) && ! intrinsic_entity_p(e) )
+    set_add_element(re,re,e);
 }
 
 
-/** 
+/**
  * helper looking in a list for referenced entities
- * 
+ *
  * @param l list to check
  * @param re set to fill
  */
 static
 void statement_clean_declarations_list_walker(list l, set re)
 {
-    FOREACH(ENTITY,e,l)
-        if( !entity_constant_p(e) && ! intrinsic_entity_p(e) )
-            set_add_element(re,re,e);
+  FOREACH(ENTITY,e,l)
+    if( !entity_constant_p(e) && ! intrinsic_entity_p(e) )
+      set_add_element(re,re,e);
 }
 
-/** 
+/**
  * helper looking in a ram for referenced entities
- * 
+ *
  * @param r ram to check
  * @param re set to fill
  */
-static
-void statement_clean_declarations_ram_walker(ram r, set re)
+static void statement_clean_declarations_ram_walker(ram r, set re)
 {
-    statement_clean_declarations_list_walker(ram_shared(r),re);
+  statement_clean_declarations_list_walker(ram_shared(r),re);
 }
 
-/** 
+/**
  * helper looking in an area for referenced entities
- * 
+ *
  * @param a area to check
  * @param re set to fill
  */
-static
-void statement_clean_declarations_area_walker(area a, set re)
+static void statement_clean_declarations_area_walker(area a, set re)
 {
     statement_clean_declarations_list_walker(area_layout(a),re);
 }
 
-/** 
+/**
  * helper diving into an entity to find referenced entities
- * 
+ *
  * @param e entity to dive into
  * @param re set to fill
- * 
+ *
  */
 void entity_get_referenced_entities(entity e, set re)
 {
-    /*if(entity_variable_p(e))*/ {
-        gen_context_multi_recurse(entity_type(e),re,
-                reference_domain,gen_true,statement_clean_declarations_reference_walker,
-                call_domain,gen_true,statement_clean_declarations_call_walker,
-                NULL
-                );
-        /* SG: I am unsure wether it is valid or not to find an entity with undefined initial ... */
-        if( !value_undefined_p(entity_initial(e) ) ) {
-            gen_context_multi_recurse(entity_initial(e),re,
-                    call_domain,gen_true,statement_clean_declarations_call_walker,
-                    reference_domain,gen_true,statement_clean_declarations_reference_walker,
-                    area_domain,gen_true,statement_clean_declarations_area_walker,
-                    ram_domain,gen_true,statement_clean_declarations_ram_walker,
-                    NULL);
-        }
+  /*if(entity_variable_p(e))*/ {
+    gen_context_multi_recurse(entity_type(e),re,
+			      reference_domain,gen_true,statement_clean_declarations_reference_walker,
+			      call_domain,gen_true,statement_clean_declarations_call_walker,
+			      NULL
+			      );
+    /* SG: I am unsure wether it is valid or not to find an entity with undefined initial ... */
+    if( !value_undefined_p(entity_initial(e) ) ) {
+      gen_context_multi_recurse(entity_initial(e),re,
+				call_domain,gen_true,statement_clean_declarations_call_walker,
+				reference_domain,gen_true,statement_clean_declarations_reference_walker,
+				area_domain,gen_true,statement_clean_declarations_area_walker,
+				ram_domain,gen_true,statement_clean_declarations_ram_walker,
+				NULL);
     }
+  }
 }
 
-/** 
+/**
  * helper iterating over statement declaration to find referenced entities
- * 
+ *
  * @param s statement to check
  * @param re set to fill
  */
-static
-void statement_clean_declarations_statement_walker(statement s, set re)
+static void statement_clean_declarations_statement_walker(statement s, set re)
 {
-    FOREACH(ENTITY,e,statement_declarations(s))
-        entity_get_referenced_entities(e,re);
+  FOREACH(ENTITY,e,statement_declarations(s))
+    entity_get_referenced_entities(e,re);
 }
 
 
-/** 
+/**
  * retrieves the set of entites used in elem
- * 
+ *
  * @param elem  element to check (any gen_recursifiable type is allowded)
- * 
+ *
  * @return set of referenced entities
  */
 set get_referenced_entities(void* elem)
 {
-    /* gather entities from s*/
-    set referenced_entities = set_make(set_pointer);
-    gen_context_multi_recurse(elem,referenced_entities,
-            loop_domain,gen_true,statement_clean_declarations_loop_walker,
-            reference_domain,gen_true,statement_clean_declarations_reference_walker,
-            call_domain,gen_true,statement_clean_declarations_call_walker,
-            statement_domain,gen_true,statement_clean_declarations_statement_walker,
-            ram_domain,gen_true,statement_clean_declarations_ram_walker,
-            NULL);
+  /* gather entities from s*/
+  set referenced_entities = set_make(set_pointer);
+  gen_context_multi_recurse(elem,referenced_entities,
+			    loop_domain,gen_true,statement_clean_declarations_loop_walker,
+			    reference_domain,gen_true,statement_clean_declarations_reference_walker,
+			    call_domain,gen_true,statement_clean_declarations_call_walker,
+			    statement_domain,gen_true,statement_clean_declarations_statement_walker,
+			    ram_domain,gen_true,statement_clean_declarations_ram_walker,
+			    NULL);
 
-    /* gather all entities referenced by referenced entities */
-    set other_referenced_entities = set_make(set_pointer);
-    SET_FOREACH(entity,e,referenced_entities)
+  /* gather all entities referenced by referenced entities */
+  set other_referenced_entities = set_make(set_pointer);
+  SET_FOREACH(entity,e,referenced_entities)
     {
-        entity_get_referenced_entities(e,other_referenced_entities);
+      entity_get_referenced_entities(e,other_referenced_entities);
     }
 
-    /* merge results */
-    set_union(referenced_entities,other_referenced_entities,referenced_entities);
-    set_free(other_referenced_entities);
+  /* merge results */
+  set_union(referenced_entities,other_referenced_entities,referenced_entities);
+  set_free(other_referenced_entities);
 
-    return referenced_entities;
+  return referenced_entities;
 }
 
-/** 
+/**
  * remove useless entities from declarations
  * an entity is flagged useless when no reference is found in stmt
  * and when it is not used by an entity found in stmt
- * 
+ *
  * @param declarations list of entity to purge
  * @param stmt statement where entities are used
- * 
+ *
  * @return a list of used declarations
  */
-static
-list statement_clean_declarations_helper(list declarations, statement stmt)
+static list statement_clean_declarations_helper(list declarations, statement stmt)
 {
-    list new_declarations = NIL;
-    set referenced_entities = get_referenced_entities(stmt);
+  list new_declarations = NIL;
+  set referenced_entities = get_referenced_entities(stmt);
 
-    declarations=gen_nreverse(declarations);
+  declarations=gen_nreverse(declarations);
 
-    /* look for entity that are used in the statement */
-    FOREACH(ENTITY,e,declarations)
+  /* look for entity that are used in the statement */
+  FOREACH(ENTITY,e,declarations)
     {
-        bool add_entity_to_declaration_p = true;
-        /* area and parameters are always used */
-        if( ! formal_parameter_p(e) && ! entity_area_p(e) )
-        {
-            /* entities whose declaration has a side effect are always used too */
-            bool has_side_effects_p = false;
-            value v = entity_initial(e);
-            if( value_expression_p(v) )
-            {
-                list effects = expression_to_proper_effects(value_expression(v));
-                FOREACH(EFFECT, eff, effects)
-                {
-                    if( action_write_p(effect_action(eff)) ) has_side_effects_p = true;
-                }
-                gen_full_free_list(effects);
-            }
+      bool add_entity_to_declaration_p = true;
+      /* area and parameters are always used */
+      if( ! formal_parameter_p(e) && ! entity_area_p(e) )
+	{
+	  /* entities whose declaration has a side effect are always used too */
+	  bool has_side_effects_p = false;
+	  value v = entity_initial(e);
+	  if( value_expression_p(v) )
+	    {
+	      list effects = expression_to_proper_effects(value_expression(v));
+	      FOREACH(EFFECT, eff, effects)
+		{
+		  if( action_write_p(effect_action(eff)) ) has_side_effects_p = true;
+		}
+	      gen_full_free_list(effects);
+	    }
 
-            if( ! has_side_effects_p )
-            {
-                add_entity_to_declaration_p=set_belong_p(referenced_entities,e);
-            }
-        }
+	  if( ! has_side_effects_p )
+	    {
+	      add_entity_to_declaration_p=set_belong_p(referenced_entities,e);
+	    }
+	}
 
-        /* if we found some usefulness , add it */
-        if(add_entity_to_declaration_p) {
-            new_declarations=CONS(ENTITY,e,new_declarations);
-        }
+      /* if we found some usefulness , add it */
+      if(add_entity_to_declaration_p) {
+	new_declarations=CONS(ENTITY,e,new_declarations);
+      }
     }
 
 
-    set_free(referenced_entities);
+  set_free(referenced_entities);
 
-    return new_declarations;
+  return new_declarations;
 }
 
-/** 
+/**
  * check if all entities used in s and module are declared in module
  * does not work as well as expected on c module because it does not fill the statement declaration
  * @param module module to check
  * @param s statement where reference can be found
  */
-static
-void entity_generate_missing_declarations(entity module, statement s)
+static void entity_generate_missing_declarations(entity module, statement s)
 {
-    /* gather referenced entities */
-    set referenced_entities = get_referenced_entities(s);
-    set ref_tmp = set_make(set_pointer);
-    /* gather all entities referenced by referenced entities */
-    SET_FOREACH(entity,e0,referenced_entities) {
-        entity_get_referenced_entities(e0,ref_tmp);
-    }
+  /* gather referenced entities */
+  set referenced_entities = get_referenced_entities(s);
+  set ref_tmp = set_make(set_pointer);
+  /* gather all entities referenced by referenced entities */
+  SET_FOREACH(entity,e0,referenced_entities) {
+    entity_get_referenced_entities(e0,ref_tmp);
+  }
 
-    referenced_entities=set_union(referenced_entities,ref_tmp,referenced_entities);
-    set_free(ref_tmp);
+  referenced_entities=set_union(referenced_entities,ref_tmp,referenced_entities);
+  set_free(ref_tmp);
 
-    /* fill the declarations with missing entities (ohhhhh a nice 0(n²) algorithm*/
-    list new = NIL;
-    SET_FOREACH(entity,e1,referenced_entities) {
-            if(gen_chunk_undefined_p(gen_find_eq(e1,entity_declarations(module))))
-                new=CONS(ENTITY,e1,new);
-    }
+  /* fill the declarations with missing entities (ohhhhh a nice 0(n²) algorithm*/
+  list new = NIL;
+  SET_FOREACH(entity,e1,referenced_entities) {
+    if(gen_chunk_undefined_p(gen_find_eq(e1,entity_declarations(module))))
+      new=CONS(ENTITY,e1,new);
+  }
 
-    set_free(referenced_entities);
-    sort_list_of_entities(new);
-    entity_declarations(module)=gen_nconc(new,entity_declarations(module));
+  set_free(referenced_entities);
+  sort_list_of_entities(new);
+  entity_declarations(module)=gen_nconc(new,entity_declarations(module));
 }
 
 
-/** 
+/**
  * remove all the entity declared in s but never referenced
  * it's a lower version of use-def-elim !
- * 
+ *
  * @param s statement to check
  */
 void statement_clean_declarations(statement s)
 {
-    list l = statement_declarations(s);
-    statement_declarations(s)=statement_clean_declarations_helper(l,s);
-    gen_free_list(l);
+  list l = statement_declarations(s);
+  statement_declarations(s)=statement_clean_declarations_helper(l,s);
+  gen_free_list(l);
 }
 
-/** 
+/**
  * remove all entities declared in module but never used in s
- * 
+ *
  * @param module module to check
  * @param s statement where entites may be used
  */
 void entity_clean_declarations(entity module,statement s)
 {
-    list l=entity_declarations(module);
-    entity_declarations(module)=statement_clean_declarations_helper(l,s);
-    gen_free_list(l);
-    if(fortran_module_p(module)) /* to keep backward compatibility with hpfc*/
-        entity_generate_missing_declarations(module,s);
+  list l=entity_declarations(module);
+  entity_declarations(module)=statement_clean_declarations_helper(l,s);
+  gen_free_list(l);
+  if(fortran_module_p(module)) /* to keep backward compatibility with hpfc*/
+    entity_generate_missing_declarations(module,s);
 }
 
 /**  @} */
@@ -2778,12 +2743,12 @@ void entity_clean_declarations(entity module,statement s)
 
 
 
-/** 
+/**
  * @name statement finders
  * find statements with particular constraints
  * @{ */
 
-/** 
+/**
  * structure used by find_statements_with_label_walker
  */
 struct fswl {
@@ -2791,89 +2756,87 @@ struct fswl {
     entity key; ///< used for the condition
 };
 
-/** 
+/**
  * helper to find statement with a particular label
  * as label should be unique, the function stops once a statement is found
- * 
+ *
  * @param s statement to inspect
  * @param p struct containing the list to fill and the label to search
- * 
- * @return 
+ *
+ * @return
  */
-static
-bool find_statements_with_label_walker(statement s, struct fswl *p)
+static bool find_statements_with_label_walker(statement s, struct fswl *p)
 {
-    if( same_entity_p(statement_label(s),p->key) ||
-            (statement_loop_p(s)&& same_entity_p(loop_label(statement_loop(s)),p->key)) )
+  if( same_entity_p(statement_label(s),p->key) ||
+      (statement_loop_p(s)&& same_entity_p(loop_label(statement_loop(s)),p->key)) )
     {
-        p->l=CONS(STATEMENT,s,p->l);
-        gen_recurse_stop(NULL);
+      p->l=CONS(STATEMENT,s,p->l);
+      gen_recurse_stop(NULL);
     }
-    return true;
+  return true;
 }
 
-/** 
+/**
  * find a statement in s with entity label
- * 
+ *
  * @param s statement to search into
  * @param label label of the searched statement
- * 
+ *
  * @return list containing a unique element
  * a list is returned for coherence with the other find_satements functions
  */
 list find_statements_with_label(statement s, entity label)
 {
-    struct fswl p = {  NIL, label };
-    gen_context_recurse(s,&p,statement_domain,find_statements_with_label_walker,gen_null);
-    return p.l;
+  struct fswl p = {  NIL, label };
+  gen_context_recurse(s,&p,statement_domain,find_statements_with_label_walker,gen_null);
+  return p.l;
 }
 
-static
-bool find_statements_interactively_walker(statement s, list *l)
+static bool find_statements_interactively_walker(statement s, list *l)
 {
-    string answer = string_undefined;
-    do {
-        while( string_undefined_p(answer) || empty_string_p(answer)  )
-        {
-			user_log("Do you want to pick the following statement ?\n"
-                "*********************************************\n");
-			print_statement(s);
+  string answer = string_undefined;
+  do {
+    while( string_undefined_p(answer) || empty_string_p(answer)  )
+      {
+	user_log("Do you want to pick the following statement ?\n"
+		 "*********************************************\n");
+	print_statement(s);
 
-            answer = user_request(
-                "*********************************************\n"
-                "[y/n] ?"
-            );
-            if( !answer ) pips_user_error("you did not answer !\n");
-        }
-        if( answer[0]!='y' && answer[0]!='n' )
-        {
-            pips_user_warning("answer by 'y' or 'n' !\n");
-            free(answer);
-            answer=string_undefined;
-        }
-    } while(string_undefined_p(answer));
-    bool pick = answer[0]=='y';
-    if(pick) {
-        *l=CONS(STATEMENT,s,*l);
-        return false;
-    }
-    else if( !ENDP(*l) )
-        gen_recurse_stop(NULL);
-    return true;
+	answer = user_request(
+			      "*********************************************\n"
+			      "[y/n] ?"
+			      );
+	if( !answer ) pips_user_error("you did not answer !\n");
+      }
+    if( answer[0]!='y' && answer[0]!='n' )
+      {
+	pips_user_warning("answer by 'y' or 'n' !\n");
+	free(answer);
+	answer=string_undefined;
+      }
+  } while(string_undefined_p(answer));
+  bool pick = answer[0]=='y';
+  if(pick) {
+    *l=CONS(STATEMENT,s,*l);
+    return false;
+  }
+  else if( !ENDP(*l) )
+    gen_recurse_stop(NULL);
+  return true;
 }
 
-/** 
+/**
  * prompt the user to select contiguous statement in s
- * 
+ *
  * @param s statement to search into
- * 
+ *
  * @return list of selected statement
  */
 list find_statements_interactively(statement s)
 {
-    list l =NIL;
-    gen_context_recurse(s,&l,statement_domain,find_statements_interactively_walker,gen_null);
-    return gen_nreverse(l);
+  list l =NIL;
+  gen_context_recurse(s,&l,statement_domain,find_statements_interactively_walker,gen_null);
+  return gen_nreverse(l);
 }
 
 /**
@@ -2884,28 +2847,27 @@ struct fswp {
     string begin;
 };
 
-static
-bool find_statements_with_pragma_walker(statement s, struct fswp *p)
+static bool find_statements_with_pragma_walker(statement s, struct fswp *p)
 {
-    list exs = extensions_extension(statement_extensions(s));
-    FOREACH(EXTENSION,ex,exs)
+  list exs = extensions_extension(statement_extensions(s));
+  FOREACH(EXTENSION,ex,exs)
     {
-        pragma pr = extension_pragma(ex);
-        if(pragma_string_p(pr) && strstr(pragma_string(pr),p->begin))
-        {
-            p->l=CONS(STATEMENT,s,p->l);
-            gen_recurse_stop(NULL);
-        }
+      pragma pr = extension_pragma(ex);
+      if(pragma_string_p(pr) && strstr(pragma_string(pr),p->begin))
+	{
+	  p->l=CONS(STATEMENT,s,p->l);
+	  gen_recurse_stop(NULL);
+	}
     }
-    return true;
+  return true;
 }
 
 
 list find_statements_with_pragma(statement s, string begin)
 {
-    struct fswp p = { NIL, begin };
-    gen_context_recurse(s,&p,statement_domain,find_statements_with_pragma_walker,gen_null);
-    return gen_nreverse(p.l);
+  struct fswp p = { NIL, begin };
+  gen_context_recurse(s,&p,statement_domain,find_statements_with_pragma_walker,gen_null);
+  return gen_nreverse(p.l);
 }
 
 static bool look_for_user_call(call c, bool * user_call_p)
@@ -2982,7 +2944,20 @@ bool statement_may_have_control_effects_p(statement s)
 
   return control_effect_p;
 }
-
+
+/* Make (a bit more) sure that s is gen_defined_p in spite of poor
+   decision for empty fields and that strdup can be used on the string
+   fields. */
+statement normalize_statement(statement s)
+{
+  if(string_undefined_p(statement_decls_text(s))
+     || statement_decls_text(s)==NULL)
+    statement_decls_text(s) = strdup("");
+  if(empty_comments_p(statement_comments(s))
+    || statement_comments(s)==NULL)
+	      statement_comments(s) = strdup("");
+  return s;
+}
 /**  @} */
 
 

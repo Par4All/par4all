@@ -546,7 +546,6 @@ words_regular_call(call obj, bool is_a_subroutine)
       if(prettyprint_is_fortran) /* to avoid this warning for C*/
 	pips_user_warning("subroutine '%s' used as a function.\n",
 			  entity_name(f));
-    
   }
   else if(is_a_subroutine) {
     if(prettyprint_is_fortran) /* to avoid this warning for C*/
@@ -607,8 +606,12 @@ words_regular_call(call obj, bool is_a_subroutine)
 	  }
 	}
       }
-      else
-	pc = gen_nconc(pc, words_expression(EXPRESSION(CAR(pa))));
+      else {
+	/* words_expression cannot be called because of the comma
+	   operator which require surrounding parentheses in this
+	   context. */
+	pc = gen_nconc(pc, words_subexpression(EXPRESSION(CAR(pa)), 1, FALSE));
+      }
       if (CDR(pa) != NIL)
 	pc = CHAIN_SWORD(pc, space_p? ", ": ",");
     }
@@ -625,8 +628,7 @@ words_regular_call(call obj, bool is_a_subroutine)
 
 
 /* To deal with attachment on user module usage. */
-static list
-words_genuine_regular_call(call obj, bool is_a_subroutine)
+static list words_genuine_regular_call(call obj, bool is_a_subroutine)
 {
   list pc = words_regular_call(obj, is_a_subroutine);
 
@@ -696,8 +698,11 @@ words_assign_op(call obj,
       if (brace_expression_p(exp))
 	//pc = gen_nconc(pc,words_brace_expression(exp));
 	pips_user_error("Brace expressions are not allowed in assignments\n");
-      else
-	pc = gen_nconc(pc,words_expression(exp));
+      else {
+	/* Be careful with expression lists, they may require
+	   surrounding parentheses. */
+	pc = gen_nconc(pc,words_subexpression(exp, prec, TRUE));
+      }
     }
     else {
       pc = gen_nconc(pc, words_subexpression(exp, prec, TRUE));
@@ -1612,22 +1617,23 @@ words_infix_binary_op(call obj, int precedence, bool leftmost)
   pc = gen_nconc(pc, we2);
   if(prec < precedence || !precedence_p)
     pc = CHAIN_SWORD(pc, ")");
-  
+
   return(pc);
 }
 
-/* Nga Nguyen : this case is added for comma expression in C, but I am not sure about its precedence
-   => to look more carefully */
+/* Nga Nguyen : this case is added for comma expression in C, but I am
+   not sure about its precedence => to be looked at more carefully */
 
 static list words_comma_op(call obj,
-			   int __attribute__ ((unused)) precedence,
+			   int precedence,
 			   bool __attribute__ ((unused)) leftmost)
 {
   list pc = NIL, args = call_arguments(obj);
   int prec = words_intrinsic_precedence(obj);
   bool space_p = get_bool_property("PRETTYPRINT_LISTS_WITH_SPACES");
 
-  pc = CHAIN_SWORD(pc,"(");
+  if(prec < precedence || !precedence_p)
+    pc = CHAIN_SWORD(pc,"(");
   pc = gen_nconc(pc, words_subexpression(EXPRESSION(CAR(args)), prec, TRUE));
   while (!ENDP(CDR(args)))
   {
@@ -1635,7 +1641,8 @@ static list words_comma_op(call obj,
     pc = gen_nconc(pc, words_subexpression(EXPRESSION(CAR(CDR(args))), prec, TRUE));
     args = CDR(args);
   }
-  pc = CHAIN_SWORD(pc,")");
+  if(prec < precedence || !precedence_p)
+    pc = CHAIN_SWORD(pc,")");
   return(pc);
 }
 
@@ -1935,9 +1942,8 @@ words_syntax(syntax obj)
     return(pc);
 }
 
-/* this one is exported. */
-list /* of string */
-words_expression(expression obj)
+/* This one is exported. Outer parentheses are never useful. */
+list /* of string */ words_expression(expression obj)
 {
     return words_syntax(expression_syntax(obj));
 }
@@ -2430,7 +2436,7 @@ text_whileloop(
 	    /* LOOP prologue.
 	     */
 	    pc = CHAIN_SWORD(NIL, "DO " );
-	
+
 	    if(!structured_do && !do_enddo_p) {
 	      pc = CHAIN_SWORD(pc, concatenate(do_label, " ", NULL));
 	    }
@@ -2440,11 +2446,11 @@ text_whileloop(
 	    u = make_unformatted(strdup(label), n, margin, pc) ;
 	    ADD_SENTENCE_TO_TEXT(r, first_sentence =
 				 make_sentence(is_sentence_unformatted, u));
-	  
+
 	    /* loop BODY
 	     */
 	    MERGE_TEXTS(r, text_statement(module, margin+INDENTATION, body));
-	  
+
 	    /* LOOP postlogue
 	     */
 	    if (structured_do) {
@@ -2452,14 +2458,14 @@ text_whileloop(
 	    }
 	  }
 	else if(one_liner_p(body))
-	  {  
+	  {
 	    pc = CHAIN_SWORD(NIL,"while (");
 	    pc = gen_nconc(pc, words_expression(whileloop_condition(obj)));
 	    pc = CHAIN_SWORD(pc,") ");
 	    u = make_unformatted(strdup(label), n, margin, pc) ;
 	    ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_unformatted, u));
 	    MERGE_TEXTS(r, text_statement_enclosed(module, margin+INDENTATION, body,!one_liner_p(body)));
-	 
+
 	    //if (structured_do)
 	    //ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"}"));
 	  }
@@ -2473,10 +2479,9 @@ text_whileloop(
 	    MERGE_TEXTS(r, text_statement(module, margin+INDENTATION, body));
 	    if (structured_do)
 	    ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"}"));
-	  
 	  }
       }
-    else 
+    else
       {
 	/* C do { s; } while (cond); loop*/
 	pc = CHAIN_SWORD(NIL,"do {");
@@ -2490,7 +2495,7 @@ text_whileloop(
 	u = make_unformatted(NULL, n, margin, pc) ;
 	ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_unformatted, u));
       }
-  
+
     /* attach_loop_to_sentence_up_to_end_of_text(first_sentence, r, obj); */
     return r;
 }
@@ -2693,18 +2698,17 @@ text_io_block_if(
 
 
 
-    
-    
+
       ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_unformatted,
 					    make_unformatted(strdup(strglab), n, margin,
 							     CONS(STRING,
 								  strdup(prettyprint_is_fortran?"CONTINUE":";"), NIL))));
     }
-  
+
     if (!empty_statement_p(test_false(obj)))
       MERGE_TEXTS(r, text_statement(module, margin,
 				    test_false(obj)));
-  
+
     return(r);
 }
 
@@ -2741,7 +2745,7 @@ text_block_else(
     int margin,
     statement stmt,
     int __attribute__ ((unused)) n)
-{  
+{
   text r = make_text(NIL);
 
   if (!statement_with_empty_comment_p(stmt)
@@ -3068,13 +3072,18 @@ bool  C_comment_p(string c){
 
 /* In case comments are not formatted according to C rules, e.g. when
    prettyprinting Fortran code as C code, add // at beginning of lines   */
-text C_any_comment_to_text(int margin, string c)
+text C_any_comment_to_text(int r_margin, string c)
 {
   string lb = c; /* line beginning */
   string le = c; /* line end */
   string cp = c; /* current position, pointer in comments */
   text ct = make_text(NIL);
   bool is_C_comment = C_comment_p(c);
+  int e_margin = r_margin;
+
+  /* We do not need spaces before a line feed */
+  if(strcmp(c, "\n")==0)
+    e_margin = 0;
 
   if(strlen(c)>0) {
     for(;*cp!='\0';cp++) {
@@ -3083,20 +3092,20 @@ text C_any_comment_to_text(int margin, string c)
 	  string cl = gen_strndup0(lb, le-lb);
 	  sentence s = sentence_undefined;
 	  if(is_C_comment)
-	    s = MAKE_ONE_WORD_SENTENCE(margin, cl);
+	    s = MAKE_ONE_WORD_SENTENCE(e_margin, cl);
 	  else if(strlen(cl)>0){
 	    list pc = CHAIN_SWORD(NIL, cl); // cl is uselessly duplicated
 	    pc = CONS(STRING, MAKE_SWORD("//"), pc);
 	    s= make_sentence(is_sentence_unformatted,
-			     make_unformatted((char *) NULL, 0, margin, pc));
+			     make_unformatted((char *) NULL, 0, e_margin, pc));
 	  }
 	  else {
 	    s = MAKE_ONE_WORD_SENTENCE(0, cl);
 	  }
 	  ADD_SENTENCE_TO_TEXT(ct, s);
-      free(cl);
+	  free(cl);
 	}
-       	lb = cp+1;
+	lb = cp+1;
 	le = cp+1;
       }
       else
@@ -3105,14 +3114,16 @@ text C_any_comment_to_text(int margin, string c)
     // Final \n has been removed in the parser presumably by Ronan
     if(lb<cp){
       string s = gen_strndup0(lb,le-lb);
-      ADD_SENTENCE_TO_TEXT(ct,MAKE_ONE_WORD_SENTENCE(margin,s));
+      ADD_SENTENCE_TO_TEXT(ct,MAKE_ONE_WORD_SENTENCE(e_margin,s));
       free(s);
     } else{
-      ADD_SENTENCE_TO_TEXT(ct,MAKE_ONE_WORD_SENTENCE(0,""));
+      //ADD_SENTENCE_TO_TEXT(ct,MAKE_ONE_WORD_SENTENCE(0,""));
+      ;
     }
   }
   else{// Final \n has been removed by Ronan
-    ADD_SENTENCE_TO_TEXT(ct,MAKE_ONE_WORD_SENTENCE(0,""));
+    //ADD_SENTENCE_TO_TEXT(ct,MAKE_ONE_WORD_SENTENCE(0,""));
+    ;
   }
 
   return ct;
@@ -3261,13 +3272,15 @@ text text_statement_enclosed(
    */
   if(!ENDP(text_sentences(temp))) {
     MERGE_TEXTS(r, init_text_statement(module, nmargin, stmt));
-    if (! string_undefined_p(comments)) {
+    if (! empty_comments_p(comments)) {
       if(prettyprint_is_fortran) {
 	ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted,
 					      strdup(comments)));
       }
       else {
-	text ct = C_comment_to_text(nmargin, comments);
+	text ct = text_undefined;
+
+	ct = C_comment_to_text(nmargin, comments);
 	MERGE_TEXTS(r, ct);
       }
     }
@@ -3275,7 +3288,7 @@ text text_statement_enclosed(
   }
   else {
     /* Preserve comments and empty C instruction */
-    if (! string_undefined_p(comments)) {
+    if (! empty_comments_p(comments)) {
       if(prettyprint_is_fortran) {
 	ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted,
 					      strdup(comments)));
@@ -3773,7 +3786,7 @@ static text text_forloop(entity module,
     text r = make_text(NIL);
     statement body = forloop_body(obj) ;
     //instruction i = statement_instruction(body);
- 
+
     pc = CHAIN_SWORD(pc,"for (");
     if (!expression_undefined_p(forloop_initialization(obj)))
       pc = gen_nconc(pc, words_expression(forloop_initialization(obj)));

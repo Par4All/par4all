@@ -216,7 +216,7 @@ bool assignment_block_p(instruction i)
 
 /* Return a constant string representing symbolically the instruction type.
 
-   Does not work for undefined instructions.
+   Does not work for undefined instructions: core dump.
 
    @return a constant string such as "WHILE LOOP" for a "while()" or "do
    while()" loop and so on.
@@ -272,5 +272,15 @@ string instruction_identification(instruction i)
 			instruction_tag(i));
     }
 
+  return instrstring;
+}
+
+string safe_instruction_identification(instruction i)
+{
+  string instrstring = string_undefined;
+  if(instruction_undefined_p(i))
+    instrstring = "UNDEFINED INSTRUCTION";
+  else
+    instrstring = instruction_identification(i);
   return instrstring;
 }

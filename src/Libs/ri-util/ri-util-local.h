@@ -1388,6 +1388,9 @@ the variable is unsigned, signed or not */
 #define IMPLICIT_VARIABLE_NAME_2 "__func__"
 
 /* Empty comments (i.e. default comments) */
+/* FI: this is a poor choice as the statements won't be gen_defined_p
+   and as strdup() won't be usable without an extra test. Would it be
+   so bad to use strdup(""); as empty_comments? */
 #define empty_comments string_undefined
 
 /** An alias for make_empty_block_statement */

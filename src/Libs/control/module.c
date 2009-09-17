@@ -110,6 +110,10 @@ bool controlizer(string module_name)
   set_current_module_statement(module_stat);
 
   debug_on("CONTROL_DEBUG_LEVEL");
+  ifdebug(1){
+    statement_consistent_p(parsed_mod_stat);
+    statement_consistent_p(module_stat);
+  }
 
   /* *module_stat can be re-used because control_graph reallocates
      statements; do not show that to any student!
@@ -126,6 +130,10 @@ bool controlizer(string module_name)
 
      So now correct the label and the comment: */
 
+  pips_assert("the module statement is consistent "
+	      "before the controlizer is called",
+	      statement_consistent_p(module_stat));
+
   module_stat = make_statement(entity_empty_label(),
 			       STATEMENT_NUMBER_UNDEFINED,
 			       MAKE_ORDERING(0,1),
@@ -135,6 +143,10 @@ bool controlizer(string module_name)
 			       NIL /* gen_copy_seq(statement_declarations(parsed_mod_stat))*/,
 			       NULL,
 			       empty_extensions ());
+
+  pips_assert("the module statement is consistent "
+	      "after the controlizer call",
+	      statement_consistent_p(module_stat));
 
   /* By setting this property, we try to unspaghettify the control graph
      of the module: */

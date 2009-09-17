@@ -360,6 +360,8 @@ check_control_coherency(control c)
     int i1, i2;
     set stmts = set_make(set_pointer);
 
+    control_consistent_p(c);
+
     CONTROL_MAP(ctl, {
 
 	/* Test the coherency of the successors */
@@ -403,6 +405,9 @@ check_control_coherency(control c)
 		    pips_assert("Control is correct", consistent_p);
 	    }
 	}, control_predecessors(ctl));
+
+	/* Check that the statement are consistent */
+	statement_consistent_p(control_statement(ctl));
 
 	/* Check that two nodes do not point towards the same
 	   statement as this makes label resolution ambiguous */

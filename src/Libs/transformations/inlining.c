@@ -383,7 +383,9 @@ statement inline_expression_call(inlining_parameters p, expression modified_expr
                         else {
                             /* FI: with some FREIA code, I end up here with a formal
                                parameter... */
-                            pips_internal_error("error about variable storage of entity \"%s\"\n", entity_name(ref_ent));
+			  //pips_internal_error("error about variable storage of entity \"%s\"\n", entity_name(ref_ent));
+			  /* do nothing */
+			  ;
                         }
                     }
                     new_externs=CONS(ENTITY,add,new_externs);
