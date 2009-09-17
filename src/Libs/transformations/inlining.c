@@ -1145,11 +1145,12 @@ statement outliner(string outline_module_name, list statements_to_outline)
 
     /* purge the functions from the parameter list, we assume they are declared externally
      * also purge the formal parameters from other modules, gathered by get_referenced_entities but wrong here
+     * also purge memebers, not relevant
      */
     list tmp_list=NIL;
     FOREACH(ENTITY,e,referenced_entities)
     {
-        if( (!entity_function_p(e) ) &&
+        if( (!entity_function_p(e) ) && (!entity_field_p(e)) &&
                 !( entity_formal_p(e) && (!same_string_p(entity_module_name(e),get_current_module_name()))) )
             tmp_list=CONS(ENTITY,e,tmp_list);
     }
