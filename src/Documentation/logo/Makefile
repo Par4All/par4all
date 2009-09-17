@@ -37,6 +37,8 @@ phase5: $(F.png)
 %.eps: %.pnm
 	pnmtops $< > $@
 
+# todo: use inkscape to derive files
+
 clean: local-clean
 local-clean:
 	$(RM) *.png *.pnm *.eps *~
