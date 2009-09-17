@@ -2360,8 +2360,10 @@ text c_text_entity(entity module, entity e, int margin)
 	  pc = CHAIN_SWORD(pc," = ");
 	  if (brace_expression_p(exp))
 	    pc = gen_nconc(pc,words_brace_expression(exp));
-	  else
-	    pc = gen_nconc(pc,words_expression(exp));
+	  else {
+	    /* */
+	    pc = gen_nconc(pc,words_subexpression(exp, ASSIGN_OPERATOR_PRECEDENCE, FALSE));
+	  }
 	}
 	else if(value_code_p(val)) {
 	  if(type_variable_p(t)) {

@@ -607,10 +607,12 @@ words_regular_call(call obj, bool is_a_subroutine)
 	}
       }
       else {
-	/* words_expression cannot be called because of the comma
+	/* words_expression cannot be called because of the C comma
 	   operator which require surrounding parentheses in this
-	   context. */
-	pc = gen_nconc(pc, words_subexpression(EXPRESSION(CAR(pa)), 1, FALSE));
+	   context. Be careful with unary minus. */
+	pc = gen_nconc(pc, words_subexpression(EXPRESSION(CAR(pa)),
+					       ASSIGN_OPERATOR_PRECEDENCE,
+					       TRUE/*FALSE*/));
       }
       if (CDR(pa) != NIL)
 	pc = CHAIN_SWORD(pc, space_p? ", ": ",");
@@ -1334,11 +1336,11 @@ words_unary_minus(call obj, int precedence, bool leftmost)
     expression e = EXPRESSION(CAR(call_arguments(obj)));
     int prec = words_intrinsic_precedence(obj);
 
-    if ( prec < precedence || !leftmost)
+    if ( prec < precedence || !leftmost ||  !precedence_p)
 	pc = CHAIN_SWORD(pc, "(");
     pc = CHAIN_SWORD(pc, "-");
     pc = gen_nconc(pc, words_subexpression(e, prec, FALSE));
-    if ( prec < precedence || !leftmost)
+    if ( prec < precedence || !leftmost ||  !precedence_p)
 	pc = CHAIN_SWORD(pc, ")");
 
     return(pc);
@@ -1647,18 +1649,21 @@ static list words_comma_op(call obj,
 }
 
 static list words_conditional_op(call obj,
-				 int __attribute__ ((unused)) precedence,
+				 int precedence,
 				 bool __attribute__ ((unused)) leftmost)
 {
   list pc = NIL, args = call_arguments(obj);
   int prec = words_intrinsic_precedence(obj);
-  pc = CHAIN_SWORD(pc,"(");
+
+  if(prec < precedence || !precedence_p)
+    pc = CHAIN_SWORD(pc,"(");
   pc = gen_nconc(pc, words_subexpression(EXPRESSION(CAR(args)), prec, TRUE));
   pc = CHAIN_SWORD(pc,"?");
   pc = gen_nconc(pc, words_subexpression(EXPRESSION(CAR(CDR(args))), prec, TRUE));
   pc = CHAIN_SWORD(pc,":");
   pc = gen_nconc(pc, words_subexpression(EXPRESSION(CAR(CDR(CDR(args)))), prec, TRUE));
-  pc = CHAIN_SWORD(pc,")");
+  if(prec < precedence || !precedence_p)
+    pc = CHAIN_SWORD(pc,")");
   return(pc);
 }
 
@@ -1711,7 +1716,7 @@ static struct intrinsic_handler {
     {EQUIV_OPERATOR_NAME, words_infix_binary_op, 3},
     {NON_EQUIV_OPERATOR_NAME, words_infix_binary_op, 3},
 
-    {ASSIGN_OPERATOR_NAME, words_assign_op, 1},
+    {ASSIGN_OPERATOR_NAME, words_assign_op, ASSIGN_OPERATOR_PRECEDENCE},
 
     {WRITE_FUNCTION_NAME, words_io_inst, 0},
     {READ_FUNCTION_NAME, words_io_inst, 0},
@@ -1801,21 +1806,22 @@ multiply-add operators ( JZ - sept 98) */
     {C_AND_OPERATOR_NAME, words_infix_binary_op, 8},
     {C_OR_OPERATOR_NAME, words_infix_binary_op, 6},
 
-    {MULTIPLY_UPDATE_OPERATOR_NAME, words_assign_op, 1},
-    {DIVIDE_UPDATE_OPERATOR_NAME, words_assign_op, 1},
-    {MODULO_UPDATE_OPERATOR_NAME, words_assign_op, 1},
-    {PLUS_UPDATE_OPERATOR_NAME, words_assign_op, 1},
-    {MINUS_UPDATE_OPERATOR_NAME, words_assign_op, 1},
-    {LEFT_SHIFT_UPDATE_OPERATOR_NAME, words_assign_op, 1},
-    {RIGHT_SHIFT_UPDATE_OPERATOR_NAME, words_assign_op, 1},
-    {BITWISE_AND_UPDATE_OPERATOR_NAME, words_assign_op, 1},
-    {BITWISE_XOR_UPDATE_OPERATOR_NAME, words_assign_op, 1},
-    {BITWISE_OR_UPDATE_OPERATOR_NAME, words_assign_op, 1},
+    {MULTIPLY_UPDATE_OPERATOR_NAME, words_assign_op, ASSIGN_OPERATOR_PRECEDENCE},
+    {DIVIDE_UPDATE_OPERATOR_NAME, words_assign_op, ASSIGN_OPERATOR_PRECEDENCE},
+    {MODULO_UPDATE_OPERATOR_NAME, words_assign_op, ASSIGN_OPERATOR_PRECEDENCE},
+    {PLUS_UPDATE_OPERATOR_NAME, words_assign_op, ASSIGN_OPERATOR_PRECEDENCE},
+    {MINUS_UPDATE_OPERATOR_NAME, words_assign_op, ASSIGN_OPERATOR_PRECEDENCE},
+    {LEFT_SHIFT_UPDATE_OPERATOR_NAME, words_assign_op, ASSIGN_OPERATOR_PRECEDENCE},
+    {RIGHT_SHIFT_UPDATE_OPERATOR_NAME, words_assign_op, ASSIGN_OPERATOR_PRECEDENCE},
+    {BITWISE_AND_UPDATE_OPERATOR_NAME, words_assign_op, ASSIGN_OPERATOR_PRECEDENCE},
+    {BITWISE_XOR_UPDATE_OPERATOR_NAME, words_assign_op, ASSIGN_OPERATOR_PRECEDENCE},
+    {BITWISE_OR_UPDATE_OPERATOR_NAME, words_assign_op, ASSIGN_OPERATOR_PRECEDENCE},
 
-    /* which precedence ?*/
-    {CONDITIONAL_OPERATOR_NAME, words_conditional_op, 0},
+    /* which precedence ? You are safe within an assignment. */
+    {CONDITIONAL_OPERATOR_NAME, words_conditional_op, ASSIGN_OPERATOR_PRECEDENCE+1},
 
-    {COMMA_OPERATOR_NAME, words_comma_op, 0},
+    /* which precedence ? You need parentheses within an assignment. */
+    {COMMA_OPERATOR_NAME, words_comma_op, ASSIGN_OPERATOR_PRECEDENCE-1},
 
     /* OMP pragma function part */
     {OMP_OMP_FUNCTION_NAME,       words_nullary_op, 0},
@@ -3177,11 +3183,10 @@ text C_comment_to_text(int margin, string comment)
   return ct;
 }
 
-text text_statement_enclosed(
-    entity module,
-    int imargin,
-    statement stmt,
-    bool braces_p)
+text text_statement_enclosed(entity module,
+			     int imargin,
+			     statement stmt,
+			     bool braces_p)
 {
   instruction i = statement_instruction(stmt);
   text r= make_text(NIL);
@@ -3329,9 +3334,8 @@ text text_statement_enclosed(
 		 statement_identification(stmt),
 		 statement_number(stmt), label_local_name(statement_label(stmt)),
 		 statement_comments(stmt));
-	pips_error("text_statement", "This block statement should be labelless, numberless"
-
-		   " and commentless.\n");
+	pips_internal_error("This block statement should be labelless,"
+			    " numberless and commentless.\n");
       }
     }
   }

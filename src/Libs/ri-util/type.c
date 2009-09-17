@@ -1093,13 +1093,18 @@ basic basic_of_intrinsic(call c, bool apply_p, bool ultimate_p)
             if(basic_pointer_p(rb)) {
                 type pt = type_undefined;
 
-                if(ultimate_p)
+		if(ultimate_p && !type_undefined_p(basic_pointer(rb)))
                     pt = copy_type(ultimate_type(basic_pointer(rb)));
                 else
                     pt = copy_type(basic_pointer(rb));
 
                 pips_assert("The pointed type is consistent", type_consistent_p(pt));
-                if(type_variable_p(pt) && !apply_p) {
+		if(type_undefined_p(pt)) {
+		  /* Too bad, this may happen in the parser */
+		  free_basic(rb);
+		  rb = basic_undefined;
+		}
+		else if(type_variable_p(pt) && !apply_p) {
                     free_basic(rb);
                     rb = copy_basic(variable_basic(type_variable(pt)));
                 }

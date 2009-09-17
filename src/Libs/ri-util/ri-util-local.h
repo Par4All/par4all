@@ -119,6 +119,7 @@
 #define DEREFERENCING_OPERATOR_NAME     "*indirection"
 
 #define ASSIGN_OPERATOR_NAME            "="
+#define ASSIGN_OPERATOR_PRECEDENCE      (2)
 #define POST_INCREMENT_OPERATOR_NAME    "post++"
 #define POST_DECREMENT_OPERATOR_NAME    "post--"
 #define PRE_INCREMENT_OPERATOR_NAME     "++pre"
