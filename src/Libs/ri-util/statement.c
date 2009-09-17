@@ -431,104 +431,9 @@ check_io_statement_p(statement s)
 
   return check_io;
 }
-
-bool 
-perfectly_nested_loop_p(stat)
-statement stat;
-{
-    instruction ins = statement_instruction(stat);
-    tag t = instruction_tag(ins);
-
-    switch( t ) {
-    case is_instruction_block: {
-	list lb = instruction_block(ins);
-
-	if ( lb != NIL && (lb->cdr) != NIL && (lb->cdr)->cdr == NIL 
-	    && ( continue_statement_p(STATEMENT(CAR(lb->cdr))) ) ) {
-	    if ( assignment_statement_p(STATEMENT(CAR(lb))) )
-		return TRUE;
-	    else
-		return(perfectly_nested_loop_p(STATEMENT(CAR(lb))));
-	}
-	else if ( lb != NIL && (lb->cdr) == NIL )
-	    return(perfectly_nested_loop_p(STATEMENT(CAR(lb))));
-	else if ( lb != NIL ) {
-	    /* biased for WP65 */
-	    return assignment_block_p(ins);
-	}
-	else
-	    /* extreme case: empty loop nest */
-	    return TRUE;
-	break;
-    }
-    case is_instruction_loop: {
-	loop lo = instruction_loop(ins);
-	statement sbody = loop_body(lo);
-	    
-	if ( assignment_statement_p(sbody) ) 
-	    return TRUE;
-	else
-	    return(perfectly_nested_loop_p(sbody));
-	break;
-    }
-    default:
-	break;
-    }
-
-    return FALSE;
-}
 
 /** @} */
 
-/*************************************************************** COUNT LOOPS */
-
-static int nseq, npar;
-static void loop_rwt(loop l)
-{
-    if (execution_parallel_p(loop_execution(l)))
-	npar++;
-    else
-	nseq++;
-}
-
-void number_of_sequential_and_parallel_loops(
-    statement stat,
-    int * pseq,
-    int * ppar)
-{
-    nseq=0, npar=0;
-    gen_multi_recurse(stat, loop_domain, gen_true, loop_rwt, NULL);
-    *pseq=nseq, *ppar=npar;
-}
-
-void print_number_of_loop_statistics(
-    FILE * out,
-    string msg,
-    statement s)
-{
-    int seq, par;
-    number_of_sequential_and_parallel_loops(s, &seq, &par);
-    fprintf(out, "%s: %d seq loops, %d par loops\n", msg, seq, par);
-}
-
-/* print out the number of sequential versus parallel loops.
- */
-void print_parallelization_statistics(
-    string module, /* the module name */
-    string msg,    /* an additional message */
-    statement s    /* the module statement to consider */)
-{
-    if (get_bool_property("PARALLELIZATION_STATISTICS"))
-    {
-	fprintf(stderr, "%s %s parallelization statistics", module, msg);
-	print_number_of_loop_statistics(stderr, "", s);
-    }
-}
-
-/****************************************************************************/
-
-
-
 /* functions to generate statements */
 
 /** Build a statement from a give instruction
@@ -826,57 +731,6 @@ statement make_expression_statement(expression e)
 }
 
 
-/* Extract the body of a perfectly nested loop body.
- */
-statement
-perfectly_nested_loop_to_body(loop_nest)
-statement loop_nest;
-{
-    instruction ins = statement_instruction(loop_nest);
-
-    switch(instruction_tag(ins)) {
-
-    case is_instruction_call:
-    case is_instruction_whileloop:
-    case is_instruction_test:
-      /* By hypothesis we are in a perfectly nested loop and since it is
-	 not a loop, we've reached the loop body: */
-        return loop_nest;
-
-    case is_instruction_block: {
-	list lb = instruction_block(ins);
-	if (lb == NIL)
-	  /* The loop body is an empty block, such as { } in C: */
-	  return loop_nest;
-	statement first_s = STATEMENT(CAR(lb));
-	instruction first_i = statement_instruction(first_s);
-
-	if(instruction_call_p(first_i))
-	    return loop_nest;
-	else {
-	    if(instruction_block_p(first_i))
-		return perfectly_nested_loop_to_body(STATEMENT(CAR(instruction_block(first_i))));
-	    else {
-		pips_assert("perfectly_nested_loop_to_body",
-			    instruction_loop_p(first_i));
-		return perfectly_nested_loop_to_body( first_s);
-	    }
-	}
-	break;
-    }
-    case is_instruction_loop: {
-      /* It is another loop: dig into it to reach the loop body: */
-	statement sbody = loop_body(instruction_loop(ins));
-	return (perfectly_nested_loop_to_body(sbody));
-	break;
-    }
-    default:
-	pips_error("perfectly_nested_loop_to_body","illegal tag\n");
-	break;
-    }
-    return(statement_undefined); /* just to avoid a warning */
-}
-
 /* Direct accesses to second level fields */
 
 loop
@@ -897,7 +751,7 @@ statement s;
     return(instruction_test(statement_instruction(s)));
 }
 
-call 
+call
 statement_call(s)
 statement s;
 {
@@ -906,7 +760,7 @@ statement s;
     return(instruction_call(statement_instruction(s)));
 }
 
-list 
+list
 statement_block(s)
 statement s;
 {
@@ -915,32 +769,6 @@ statement s;
     return(instruction_block(statement_instruction(s)));
 }
 
-
-/*
-  returns the numerical value of loop l increment expression.
-  aborts if this expression is not an integral constant expression.
-  modification : returns the zero value when it isn't constant
-  Y.Q. 19/05/92
-*/
-
-int 
-loop_increment_value(l)
-loop l;
-{
-    range r = loop_range(l);
-    expression ic = range_increment(r);
-    normalized ni;
-    int inc;
-
-    ni = NORMALIZE_EXPRESSION(ic);
-
-    if (! EvalNormalized(ni, &inc)){
-	/*user_error("loop_increment_value", "increment is not constant");*/
-	debug(8,"loop_increment_value", "increment is not constant");
-	return(0);
-    }
-    return(inc);
-}
 
 bool 
 assignment_block_or_statement_p(s)

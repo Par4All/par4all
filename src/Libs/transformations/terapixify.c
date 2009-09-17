@@ -19,7 +19,7 @@
 
 */
 
-/** 
+/**
  * @file terapixify.c
  * apply transformations required to generate terapix microcode
  * @author Serge Guelton <serge.guelton@enst-bretagne.fr>
@@ -45,20 +45,20 @@
 #include "syntax.h"
 #include "c_syntax.h"
 
-/** 
+/**
  * create a statement eligible for outlining into a kernel
  * #1 find the loop flagged with loop_label
  * #2 make sure the loop is // with local index
  * #3 perform strip mining on this loop to make the kernel appear
  * #4 perform two outlining to separate kernel from host
- * 
+ *
  * @param s statement where the kernel can be found
  * @param loop_label label of the loop to be turned into a kernel
- * 
+ *
  * @return true as long as the kernel is not found
  */
 static
-bool do_kernelize(statement s, entity loop_label) 
+bool do_kernelize(statement s, entity loop_label)
 {
     if( same_entity_p(statement_label(s),loop_label) ||
             (statement_loop_p(s) && same_entity_p(loop_label(statement_loop(s)),loop_label)))
@@ -84,9 +84,13 @@ bool do_kernelize(statement s, entity loop_label)
 
         /* we can strip mine the loop */
         loop_strip_mine(s,nb_nodes,-1);
-        /* unfortunetly, the strip mining does not exactly does what we want, fix it here 
-         * it is legal beacause we now the loop index is private, otherwise the end value of the loop index may be used incorrectly
-         */
+        /* unfortunetly, the strip mining does not exactly does what we
+	   want, fix it here
+
+	   it is legal because we know the loop index is private,
+	   otherwise the end value of the loop index may be used
+	   incorrectly...
+	*/
         {
             statement s2 = loop_body(statement_loop(s));
             entity outer_index = loop_index(statement_loop(s));
@@ -144,7 +148,7 @@ bool do_kernelize(statement s, entity loop_label)
                     MakeNullaryCall(kernel_id),make_expression_from_entity(loop_index(l))
                 )
                 );
-        statement_instruction(replaced_loop) = 
+        statement_instruction(replaced_loop) =
             make_instruction_block(
                     make_statement_list(make_stmt_of_instr(assign),loop_body(instruction_loop(erased_instruction)))
                     );
@@ -169,11 +173,11 @@ bool do_kernelize(statement s, entity loop_label)
 }
 
 
-/** 
+/**
  * turn a loop flagged with LOOP_LABEL into a kernel (GPU, terapix ...)
- * 
+ *
  * @param module_name name of the module
- * 
+ *
  * @return true
  */
 bool kernelize(char * module_name)
@@ -210,7 +214,7 @@ bool cannot_terapixify(gen_chunk * elem, bool *can_terapixify)
     return *can_terapixify=false;
 }
 
-static 
+static
 bool can_terapixify_call_p(call c, bool *can_terapixify)
 {
     if( !value_intrinsic_p(entity_initial(call_function((c)))) && ! call_constant_p(c) )
@@ -271,7 +275,7 @@ bool normalize_microcode( char * module_name)
 
     /* checks */
 
-    /* make sure 
+    /* make sure
      * - only do loops remain
      * - no call to external functions
      * - no float / double etc (TODO)
@@ -283,7 +287,7 @@ bool normalize_microcode( char * module_name)
             expression_domain,can_terapixify_expression_p,gen_null,
             NULL);
 
-    /* now, try to guess the goal of the parameters 
+    /* now, try to guess the goal of the parameters
      * - parameters are 16 bits signed integers (TODO)
      * - read-only arrays might be mask, but can also be images (depend of their size ?)
      * - written arrays must be images
@@ -324,7 +328,7 @@ bool normalize_microcode( char * module_name)
                     }
                 }
             }
-            else if( entity_used_in_loop_bound_p(e) ) 
+            else if( entity_used_in_loop_bound_p(e) )
             {
             }
             else {
@@ -343,12 +347,12 @@ bool normalize_microcode( char * module_name)
     return can_terapixify;
 }
 
-/** 
+/**
  * have a look to the pipsmake-rc description
  * basically call kernelize then outlining
- * 
+ *
  * @param module_name name of the module
- * 
+ *
  * @return true
  */
 bool terapixify(__attribute__((unused)) char * module_name)
@@ -356,12 +360,12 @@ bool terapixify(__attribute__((unused)) char * module_name)
     return true; /* everything is done in pipsmake-rc */
 }
 
-/** 
+/**
  * transform each subscript in expression @a exp into the equivalent pointer arithmetic expression
- * 
+ *
  * @param exp expression to inspect
- * 
- * @return true 
+ *
+ * @return true
  */
 static
 bool expression_array_to_pointer(expression exp)
@@ -372,14 +376,14 @@ bool expression_array_to_pointer(expression exp)
         if( ! ENDP(reference_indices(ref) ) )
         {
             /* we need to check if we know the dimension of this reference */
-            size_t nb_indices =gen_length(reference_indices(ref)); 
-            size_t nb_dims =gen_length(variable_dimensions(type_variable(entity_type(reference_variable(ref))))) ; 
+            size_t nb_indices =gen_length(reference_indices(ref));
+            size_t nb_dims =gen_length(variable_dimensions(type_variable(entity_type(reference_variable(ref))))) ;
 
             /* if the considered reference is a formal parameter and the property is properly set,
              * we are allowded to convert formal parameters such as int a[n][12] into int *a
              */
             bool force_cast = true;
-            if( get_bool_property("ARRAY_TO_POINTER_CONVERT_PARAMETERS") && ! get_bool_property("ARRAY_TO_POINTER_FLATTEN_ONLY") 
+            if( get_bool_property("ARRAY_TO_POINTER_CONVERT_PARAMETERS") && ! get_bool_property("ARRAY_TO_POINTER_FLATTEN_ONLY")
                     && formal_parameter_p(reference_variable(ref)) )
             {
                 force_cast=false;
@@ -531,11 +535,11 @@ bool expression_array_to_pointer(expression exp)
     return true;
 }
 
-/** 
+/**
  * call expression_array_to_pointer on each entity declared in statement @s
- * 
+ *
  * @param s statement to inspect
- * 
+ *
  * @return true
  */
 static

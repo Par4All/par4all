@@ -41,7 +41,7 @@ void clean_enclosing_loops(void)
      */
     hash_table seen = hash_table_make(hash_pointer, 0);
 
-    STATEMENT_MAPPING_MAP(s, l, 
+    STATEMENT_MAPPING_MAP(s, l,
     {
 	if (l && !hash_defined_p(seen, l))
 	{
@@ -152,27 +152,27 @@ loops_mapping_of_statement(statement stat)
     return(loops_map);
 }
 
-static bool 
+static bool
 distributable_statement_p(statement stat, set region)
 {
     instruction i = statement_instruction(stat);
 
-    switch(instruction_tag(i)) 
+    switch(instruction_tag(i))
     {
     case is_instruction_block:
 	MAPL(ps, {
-	    if (distributable_statement_p(STATEMENT(CAR(ps)), 
+	    if (distributable_statement_p(STATEMENT(CAR(ps)),
 					  region) == FALSE) {
 		return(FALSE);
 	    }
 	}, instruction_block(i));
 	return(TRUE);
-	
+
     case is_instruction_loop:
 	region = set_add_element(region, region, (char *) stat);
-	return(distributable_statement_p(loop_body(instruction_loop(i)), 
+	return(distributable_statement_p(loop_body(instruction_loop(i)),
 					 region));
-	
+
     case is_instruction_call:
 	region = set_add_element(region, region, (char *) stat);
 	return(TRUE);
@@ -183,7 +183,7 @@ distributable_statement_p(statement stat, set region)
     case is_instruction_test:
 	return(FALSE);
     default:
-	pips_error("distributable_statement_p", 
+	pips_error("distributable_statement_p",
 		   "unexpected tag %d\n", instruction_tag(i));
     }
 
@@ -223,7 +223,7 @@ loop lo;
 	pips_error("index_private_p", "Loop undefined\n");
     }
 
-    return((entity) gen_find_eq(loop_index(lo), loop_locals(lo)) != 
+    return((entity) gen_find_eq(loop_index(lo), loop_locals(lo)) !=
 	   entity_undefined);
 }
 
@@ -245,8 +245,8 @@ void region_of_statement(stat, region)
 statement stat;
 set region;
 {
-  instruction i = statement_instruction(stat);  
-    
+  instruction i = statement_instruction(stat);
+
   switch(instruction_tag(i)) {
 
   case is_instruction_block:
@@ -264,11 +264,11 @@ set region;
   case is_instruction_call:
       region = set_add_element(region, region, (char *) stat);
       break;
-      
+
   case is_instruction_goto:
       region = set_add_element(region, region, (char *) stat);
       break;
-    
+
   case is_instruction_test:
       /* The next statement is added by Y.Q. 12/9.*/
       region = set_add_element(region, region, (char *) stat);
@@ -283,39 +283,45 @@ set region;
       CONTROL_MAP(c, {
 	  region_of_statement(control_statement(c), region);
       }, unstructured_control(u), blocs) ;
-      
+
       gen_free_list(blocs) ;
       break;
   }
 
   default:
-      pips_error("region_of_statement", 
-		 "unexpected tag %d\n", instruction_tag(i));    
-      
+      pips_error("region_of_statement",
+		 "unexpected tag %d\n", instruction_tag(i));
   }
 }
 
-/* @return a list of entities that are private in the current
- * context. The function can also remove from that list all the
- * variables that are localy declared in the loop body and the loop
- * indices using the apropriate flags.
- * @param obj, the loop to look at.
- * @param local, set to TRUE to remove the  the variables that
- * are localy declared.
- * @param indice, set to TRUE to remove the loop indice variable
- */
-list loop_private_variables_as_entites (loop obj, bool local, bool indice) {
-  // list of entity that are private to the loop according to the previous
+
+/** Get the variables local or private to a loop
+
+    The function can also remove from that list all the variables that are
+    localy declared in the loop statement body and the loop index using
+    the apropriate flags.
+
+    @param obj, the loop to look at.
+
+    @param local, set to TRUE to remove the the variables that are localy
+    declared.
+
+    @param index, set to TRUE to remove the loop index variable
+
+    @return a list of entities that are private in the current * context.
+*/
+list loop_private_variables_as_entites (loop obj, bool local, bool index) {
+  // List of entities that are private to the loop according to the previous
   // phases. For historical reasons private variables are stored in the
   // locals field of the loop.
   list result = gen_copy_seq (loop_locals(obj));
 
   if (local == TRUE) {
-    // list of localy declared entity that are stored in loop body
+    // List of localy declared entities that are stored in loop body
     list decl_var = statement_declarations (loop_body (obj));
     gen_list_and_not (&result, decl_var);
   }
-  if (indice == TRUE) {
+  if (index == TRUE) {
     gen_remove (&result, loop_index(obj));
   }
 
@@ -326,7 +332,7 @@ list loop_private_variables_as_entites (loop obj, bool local, bool indice) {
 
 /************************************** SORT ALL LOCALS AFTER PRIVATIZATION */
 
-static void loop_rwt(loop l)
+static void loop_sort_locals(loop l)
 {
     list /* of entity */ le = loop_locals(l);
     if (le) sort_list_of_entities(le);
@@ -334,7 +340,7 @@ static void loop_rwt(loop l)
 
 void sort_all_loop_locals(statement s)
 {
-    gen_multi_recurse(s, loop_domain, gen_true, loop_rwt, NULL);
+    gen_multi_recurse(s, loop_domain, gen_true, loop_sort_locals, NULL);
 }
 
 
@@ -354,4 +360,198 @@ bool parallel_loop_statement_p(statement s) {
   loop l = instruction_loop(i);
 
   return execution_parallel_p(loop_execution(l));
+}
+
+
+/** Test if a statement is a perfect loop-nest
+
+    @param stat is the statement to test
+
+    @return TRUE if the statement is a perfect loop-nest
+*/
+bool
+perfectly_nested_loop_p(statement stat) {
+  instruction ins = statement_instruction(stat);
+  tag t = instruction_tag(ins);
+
+  switch( t ) {
+  case is_instruction_block: {
+    list lb = instruction_block(ins);
+
+    if ( lb != NIL && (lb->cdr) != NIL && (lb->cdr)->cdr == NIL
+	 && ( continue_statement_p(STATEMENT(CAR(lb->cdr))) ) ) {
+      if ( assignment_statement_p(STATEMENT(CAR(lb))) )
+	return TRUE;
+      else
+	return(perfectly_nested_loop_p(STATEMENT(CAR(lb))));
+    }
+    else if ( lb != NIL && (lb->cdr) == NIL )
+      return(perfectly_nested_loop_p(STATEMENT(CAR(lb))));
+    else if ( lb != NIL ) {
+      /* biased for WP65 */
+      return assignment_block_p(ins);
+    }
+    else
+      /* extreme case: empty loop nest */
+      return TRUE;
+    break;
+  }
+  case is_instruction_loop: {
+    loop lo = instruction_loop(ins);
+    statement sbody = loop_body(lo);
+
+    if ( assignment_statement_p(sbody) )
+      return TRUE;
+    else
+      return(perfectly_nested_loop_p(sbody));
+    break;
+  }
+  default:
+    break;
+  }
+
+  return FALSE;
+}
+
+
+/* Extract the body of a perfectly nested loop body.
+ */
+statement
+perfectly_nested_loop_to_body(statement loop_nest) {
+  instruction ins = statement_instruction(loop_nest);
+
+  switch(instruction_tag(ins)) {
+
+  case is_instruction_call:
+  case is_instruction_whileloop:
+  case is_instruction_test:
+    /* By hypothesis we are in a perfectly nested loop and since it is
+       not a loop, we've reached the loop body: */
+    return loop_nest;
+
+  case is_instruction_block: {
+    list lb = instruction_block(ins);
+    if (lb == NIL)
+      /* The loop body is an empty block, such as { } in C: */
+      return loop_nest;
+    statement first_s = STATEMENT(CAR(lb));
+    instruction first_i = statement_instruction(first_s);
+
+    if(instruction_call_p(first_i))
+      return loop_nest;
+    else {
+      if(instruction_block_p(first_i))
+	return perfectly_nested_loop_to_body(STATEMENT(CAR(instruction_block(first_i))));
+      else {
+	pips_assert("perfectly_nested_loop_to_body",
+		    instruction_loop_p(first_i));
+	return perfectly_nested_loop_to_body( first_s);
+      }
+    }
+    break;
+  }
+  case is_instruction_loop: {
+    /* It is another loop: dig into it to reach the loop body: */
+    statement sbody = loop_body(instruction_loop(ins));
+    return (perfectly_nested_loop_to_body(sbody));
+    break;
+  }
+  default:
+    pips_error("perfectly_nested_loop_to_body","illegal tag\n");
+    break;
+  }
+  return(statement_undefined); /* just to avoid a warning */
+}
+
+
+/*
+  returns the numerical value of loop l increment expression.
+  aborts if this expression is not an integral constant expression.
+  modification : returns the zero value when it isn't constant
+  Y.Q. 19/05/92
+*/
+int
+loop_increment_value(loop l) {
+  range r = loop_range(l);
+  expression ic = range_increment(r);
+  normalized ni;
+  int inc;
+
+  ni = NORMALIZE_EXPRESSION(ic);
+
+  if (! EvalNormalized(ni, &inc)){
+    /*user_error("loop_increment_value", "increment is not constant");*/
+    debug(8,"loop_increment_value", "increment is not constant");
+    return(0);
+  }
+  return(inc);
+}
+
+
+/*************************************************************** COUNT LOOPS */
+
+/** To store the number of sequential and parallel loops */
+static int nseq, npar;
+
+
+static void loop_update_statistics(loop l)
+{
+    if (execution_parallel_p(loop_execution(l)))
+	npar++;
+    else
+	nseq++;
+}
+
+
+/**
+   Compute the number of parallel and sequential loops found in a
+   statement and update given variables
+
+   @param stat is the statement to dig into
+
+   @param pseq point to the variable to update with the number of
+   sequential loops found
+
+   @param ppr point to the variable to update with the number of parallel
+   loops found
+ */
+void number_of_sequential_and_parallel_loops(statement stat,
+					     int * pseq,
+					     int * ppar) {
+  nseq=0, npar=0;
+  gen_recurse(stat, loop_domain, gen_true, loop_update_statistics);
+  *pseq=nseq, *ppar=npar;
+}
+
+
+/**
+   Compute the number of parallel and sequential loops found in a
+   statement and output them on a stream with a message before
+
+   @param out is the stream to send the information to
+
+   @param msg is the message to prepend
+
+   @param s is the statement to dig into
+ */
+void print_number_of_loop_statistics(FILE * out,
+				     string msg,
+				     statement s) {
+  int seq, par;
+  number_of_sequential_and_parallel_loops(s, &seq, &par);
+  fprintf(out, "%s: %d seq loops, %d par loops\n", msg, seq, par);
+}
+
+
+/* Print out the number of sequential versus parallel loops.
+ */
+void print_parallelization_statistics(
+    string module, /**< the module name */
+    string msg,    /**< an additional message */
+    statement s    /**< the module statement to consider */) {
+  if (get_bool_property("PARALLELIZATION_STATISTICS"))
+    {
+      fprintf(stderr, "%s %s parallelization statistics", module, msg);
+      print_number_of_loop_statistics(stderr, "", s);
+    }
 }
