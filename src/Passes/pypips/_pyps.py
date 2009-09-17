@@ -8,27 +8,35 @@ import shutil
 
 
 class module:
+	"""a module represents a function, it is the basic element of pyps
+		you can select modules from the workspace and apply transformations to them"""
+
 	def __init__(self,ws,name,source=""):
+		"""[[internal]] bind a module to its workspace"""
 		self.name=name
 		self.source=source
 		self.ws=ws
 
 	def show(self,rc):
+		"""returns the name of resource rc"""
 		return split(pypips.show(upper(rc),self.name))[-1]
 
 	def apply(self,phase):
+		"""apply transformation phase"""
 		pypips.apply(upper(phase),self.name)
 
 	def display(self,rc="printed_file"):
+		"""display a given resource rc"""
 		return pypips.display(upper(rc),self.name)
 
 	def code(self):
+		"""return module code as a string"""
 		self.apply("print_code")
 		rcfile=self.show("printed_file")
 		return file(self.ws.dir()+rcfile).readlines()
 
 	def __update_props(self,passe,props):
-		""" change a property dictionnay by appending the passe name to the property when needed """
+		"""[[internal]] change a property dictionnary by appending the passe name to the property when needed """
 		for name,val in props.iteritems():
 			if upper(name) not in self.all_properties:
 				del props[upper(name)]
@@ -39,8 +47,12 @@ class module:
 ### helpers /!\ do not touch this line /!\
 
 class workspace:
+	"""top level element of the pyps hierarchy,
+		it represents a set of source files and provides methods
+		to manipulate them"""
 
 	def initialize(self,sources2):
+		"""[[internal]] init the workspace from a list of sources"""
 		workspace=os.path.basename(os.tempnam("","PYPS"))
 		def helper(x,y):
 			if type(y).__name__ == 'list':return x+y
@@ -60,24 +72,32 @@ class workspace:
 		self.cleared=False
 
 	def __init__(self,*sources2):
+		"""init a workspace from a list of sources"""
 		self.initialize(sources2)
 
 	def __iter__(self):
+		"""provide an iterator on workspace's module, so that you can write
+			map(do_something,my_workspace)"""
 		return self.modules.itervalues()
 
 
-	def __getitem__(self,i):
-		return self.modules[i]
+	def __getitem__(self,module_name):
+		"""retreive a module of the module from its name"""
+		return self.modules[module_name]
 
 	def __setitem__(self,i):
+		"""change a module of the module from its name"""
 		return self.modules[i]
 
 	def info(self,topic):
 		return split(pypips.info(topic))
 
-	def dir(self):return self.name+".database/"
+	def dir(self):
+		"""retreive workspace datadir"""
+		return self.name+".database/"
 
 	def _set_property(self,props):
+		"""[internal] set properties based on the dictionnary props"""
 		for prop,value in props.iteritems():
 			if type(value) is bool:
 				val=upper(str(value))
@@ -89,9 +109,11 @@ class workspace:
 			pypips.set_property(upper(prop),val)
 
 	def set_property(self,**props):
+		"""set multpiple properties at once"""
 		self._set_property(props)
 
 	def save(self,indir="",with_prefix=""):
+		"""save worksapce back into source aither in directory indir or with the prefix with_prefix"""
 		pypips.apply("UNSPLIT","%ALL")
 		saved=[]
 		if indir:
@@ -110,6 +132,7 @@ class workspace:
 		return saved
 
 	def compile(self,CC="gcc",CFLAGS="-O2 -g", LDFLAGS="", link=True, outdir=".", outfile="",extrafiles=[]):
+		"""try to compile current workspace, some extrafiles can be given with extrafiles list"""
 		if not os.path.isdir(outdir): raise ValueError("'" + indir + "' is not a directory") 
 		otmpfiles=self.save(indir=outdir)+extrafiles
 		command=[CC,CFLAGS]
@@ -128,10 +151,12 @@ class workspace:
 		return outfile
 
 	def activate(self,phase):
+		"""activate a given phase"""
 		pypips.activate(phase)
 
 
 	def quit(self):
+		"""force cleaning and deletion of the workspace"""
 		self.cleared=True
 		pypips.quit()
 		pypips.delete_workspace(self.name)
