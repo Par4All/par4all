@@ -153,8 +153,8 @@ init_kernel:
 
 void init_kernel(float imagein_re[64][64])
 {
-   int j;
    int i;
+   int j;
 
 init_kernel:
    for(i = 0; i <= 63; i += 1)                                          /*0007*/
@@ -210,8 +210,8 @@ The loop nest of init_kernel should be parallel:
 
 void init_kernel(float imagein_re[64][64])
 {
-   int j;
    int i;
+   int j;
 
 #pragma omp parallel for private(j)
 init_kernel:
@@ -264,8 +264,8 @@ float imagein_im[64][64];
 extern int main(int argc, char *argv[]);
 void init_kernel(float imagein_re[64][64])
 {
-   int j;
    int i;
+   int j;
 
 init_kernel:
    forall(i = 0; i <= 63; i += 1)                                       /*0007*/

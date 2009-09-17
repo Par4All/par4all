@@ -81,7 +81,8 @@ void flatten_code11(void)
    int i;
    static int foo_0 = 0;
 // (0,2)
-
+   
+   
    foo_0++;                                                             /*0009*/
 // (0,3)
 

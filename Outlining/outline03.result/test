@@ -89,8 +89,8 @@ extern int main(int argc, char *argv[]);
 The kernels should be parallel. Unfotunately, current OUTLINE version relies on reparsing the code, so parallelism information is lost...
 void compute_kernel(float imagein_im[64][64], float imagein_re[64][64])
 {
-   int j;
    int i;
+   int j;
 
 compute_kernel:
    for(i = 0; i <= 63; i += 1)                                          /*0007*/
@@ -100,8 +100,8 @@ compute_kernel:
 void compute_kernel(float imagein_im[64][64], float imagein_re[64][64]);
 void init_kernel(float imagein_im[64][64], float imagein_re[64][64])
 {
-   int j;
    int i;
+   int j;
 
 init_kernel:
    for(i = 0; i <= 63; i += 1)                                          /*0007*/
@@ -135,8 +135,8 @@ extern int main(int argc, char *argv[]);
 All the kernel loops should be //
 void compute_kernel(float imagein_im[64][64], float imagein_re[64][64])
 {
-   int j;
    int i;
+   int j;
 
 #pragma omp parallel for private(j)
 compute_kernel:
@@ -148,8 +148,8 @@ compute_kernel:
 void compute_kernel(float imagein_im[64][64], float imagein_re[64][64]);
 void init_kernel(float imagein_im[64][64], float imagein_re[64][64])
 {
-   int j;
    int i;
+   int j;
 
 #pragma omp parallel for private(j)
 init_kernel:
