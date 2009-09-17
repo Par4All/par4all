@@ -41,7 +41,7 @@ extern.libs	= polylib
 
 ################################################################### PIPS COMMON
 
-# old stuff: 
+# old stuff:
 # prgm_mapping scheduling reindexing array_dfg paf-util static_controlize pip
 
 pipslibs.libs	= \
@@ -51,7 +51,7 @@ pipslibs.libs	= \
 	conversion prettyprint atomizer syntax c_syntax \
 	effects-simple effects-convex effects-generic alias-classes \
 	comp_sections semantics control continuation rice ricedg \
-	pipsdbm transformer preprocessor ri-util step properties \
+	pipsdbm transformer preprocessor ri-util step to_begin_with properties \
 	text-util misc properties reductions flint sac safescale phrase newgen
 
 pips.libs	= \
