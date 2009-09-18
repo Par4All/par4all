@@ -220,7 +220,7 @@ bool one_liner_p(statement s)
       else
 	yes = ENDP(statement_declarations(s));
     }
-    else 
+    else
       yes = (sc < 1) && ENDP(statement_declarations(s));
   }
 
@@ -403,12 +403,12 @@ words_reference(reference obj)
 {
   list pc = NIL;
   string begin_attachment;
-  
+
   entity e = reference_variable(obj);
 
   pc = CHAIN_SWORD(pc, entity_user_name(e));
   begin_attachment = STRING(CAR(pc));
-  
+
   if (reference_indices(obj) != NIL) {
     if (prettyprint_is_fortran)
       {
@@ -416,14 +416,14 @@ words_reference(reference obj)
 	MAPL(pi, {
 	  expression subscript = EXPRESSION(CAR(pi));
 	  syntax ssubscript = expression_syntax(subscript);
-	
+
 	  if(syntax_range_p(ssubscript)) {
 	    pc = gen_nconc(pc, words_subscript_range(syntax_range(ssubscript)));
 	  }
 	  else {
 	    pc = gen_nconc(pc, words_subexpression(subscript, 0, TRUE));
 	  }
-	
+
 	  if (CDR(pi) != NIL)
 	    pc = CHAIN_SWORD(pc,",");
 	}, reference_indices(obj));
@@ -766,7 +766,7 @@ words_assign_substring_op(call obj,
     list pc = NIL;
     expression e = expression_undefined;
     int prec = words_intrinsic_precedence(obj);
- 
+
     pips_assert("words_substring_op", gen_length(call_arguments(obj)) == 4);
 
     e = EXPRESSION(CAR(CDR(CDR(CDR(call_arguments(obj))))));
@@ -1016,7 +1016,7 @@ words_io_control(list *iol,
 
 	if (pc != NIL)
 	    pc = CHAIN_SWORD(pc, ",");
-	
+
 	pc = CHAIN_SWORD(pc, entity_local_name(call_function(c)));
 	pc = gen_nconc(pc, words_expression(EXPRESSION(CAR(CDR(pio)))));
 
@@ -1108,7 +1108,7 @@ words_io_inst(call obj,
   expression unit_arg = expression_undefined;
   string called = entity_local_name(call_function(obj));
   bool space_p = get_bool_property("PRETTYPRINT_LISTS_WITH_SPACES");
-  
+
   /* AP: I try to convert WRITE to PRINT. Three conditions must be
      fullfilled. The first, and obvious, one, is that the function has
      to be WRITE. Secondly, "FMT" has to be equal to "*". Finally,
@@ -1177,13 +1177,13 @@ words_io_inst(call obj,
 	{
 	  pc = CHAIN_SWORD(pc, "PRINT * ");
 	}
-     
+
       pcio = pio_write;
     }
   else if (good_fmt && good_unit && same_string_p(called, "READ"))
     {
       /* READ (*,*) -> READ * */
-	
+
       if (pio_write != NIL )	/* READ (*,*) pio -> READ *, pio */
 	{
 	  if(!prettyprint_is_fortran)
@@ -1196,14 +1196,14 @@ words_io_inst(call obj,
 	  pc = CHAIN_SWORD(pc, "READ * ");
 	}
       pcio = pio_write;
-    }	
+    }
   else if (!complex_io_control_list) {
     list unit_words = words_expression(unit_arg);
     pips_assert("A unit must be defined", !ENDP(unit_words));
     pc = CHAIN_SWORD(pc, entity_local_name(call_function(obj)));
     pc = CHAIN_SWORD(pc, " (");
     pc = gen_nconc(pc, unit_words);
-	
+
     if (!expression_undefined_p(fmt_arg)) {
       /* There is a FORMAT: */
       pc = CHAIN_SWORD(pc, space_p? ", " : ",");
@@ -1517,8 +1517,7 @@ words_infix_nary_op(call obj, int precedence, bool leftmost)
 
   for(; args; args=CDR(args)) { /* for all args */
     exp2 = EXPRESSION(CAR(args));
-  
-  
+
     /*
      * If the infix operator is either "-" or "/", I prefer not to delete
      * the parentheses of the second expression.
@@ -2005,7 +2004,7 @@ sentence_goto(
     int n)
 {
     string tlabel = entity_local_name(statement_label(obj)) +
-	           strlen(LABEL_PREFIX);
+      strlen(LABEL_PREFIX);
     pips_assert("Legal label required", strlen(tlabel)!=0);
     return sentence_goto_label(module, label, margin, tlabel, n);
 }
@@ -2051,7 +2050,7 @@ static text text_block (entity module, string label, int margin, list objs,
   for (; objs != NIL; objs = CDR(objs)) {
     statement s = STATEMENT(CAR(objs));
 
-    text t = text_statement_enclosed(module, margin, s, FALSE);
+    text t = text_statement_enclosed(module, margin, s, FALSE, TRUE);
     text_sentences(r) = gen_nconc(text_sentences(r), text_sentences(t));
     text_sentences(t) = NIL;
     free_text(t);
@@ -2320,13 +2319,19 @@ text_loop_default(
 	}
 
 	if (lp)
-	  ADD_SENTENCE_TO_TEXT( local_var, make_sentence(is_sentence_unformatted,
-	        make_unformatted(NULL, 0, margin+INDENTATION, lp)));
+	  ADD_SENTENCE_TO_TEXT
+	    ( local_var,
+	      make_sentence(is_sentence_unformatted,
+			    make_unformatted(NULL, 0, margin+INDENTATION, lp)));
     }
 
     /* loop BODY
      */
-    MERGE_TEXTS(r, text_statement_enclosed(module, margin+INDENTATION, body, !one_liner_p(body)));
+    MERGE_TEXTS(r, text_statement_enclosed(module,
+					   margin+INDENTATION,
+					   body,
+					   !one_liner_p(body),
+					   !one_liner_p(body)));
 
     /* LOOP postlogue
      */
@@ -2347,66 +2352,64 @@ text_loop_default(
 }
 
 /* exported for conversion/look_for_nested_loops.c */
-text
-text_loop(
+text text_loop(
     entity module,
     string label,
     int margin,
     loop obj,
     int n)
 {
-    text r = make_text(NIL);
-    statement body = loop_body( obj ) ;
-    entity the_label = loop_label(obj);
-    string do_label = entity_local_name(the_label)+strlen(LABEL_PREFIX) ;
-    bool structured_do = entity_empty_label_p(the_label);
-    bool do_enddo_p = get_bool_property("PRETTYPRINT_DO_LABEL_AS_COMMENT");
+  text r = make_text(NIL);
+  statement body = loop_body( obj ) ;
+  entity the_label = loop_label(obj);
+  string do_label = entity_local_name(the_label)+strlen(LABEL_PREFIX) ;
+  bool structured_do = entity_empty_label_p(the_label);
+  bool do_enddo_p = get_bool_property("PRETTYPRINT_DO_LABEL_AS_COMMENT");
 
-    /* small hack to show the initial label of the loop to name it...
-     */
-    if(!structured_do && do_enddo_p)
+  /* small hack to show the initial label of the loop to name it...
+   */
+  if(!structured_do && do_enddo_p)
     {
-	ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted,
-	  strdup(concatenate("!     INITIALLY: DO ", do_label, "\n", NULL))));
+      ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted,
+					    strdup(concatenate("!     INITIALLY: DO ", do_label, "\n", NULL))));
     }
 
-    /* quite ugly management of other prettyprints...
-     */
-    switch(execution_tag(loop_execution(obj)) ) {
-    case is_execution_sequential:
-	    MERGE_TEXTS(r, text_loop_default(module, label, margin, obj, n));
-	break ;
-    case is_execution_parallel:
-        if (pp_cmf_style_p()) {
-          text aux_r;
-          if((aux_r = text_loop_cmf(module, label, margin, obj, n, NIL, NIL))
-             != text_undefined) {
-	      MERGE_TEXTS(r, aux_r);
-          }
-        }
-        else if (pp_craft_style_p()) {
-          text aux_r;
-          if((aux_r = text_loop_craft(module, label, margin, obj, n, NIL, NIL))
-             != text_undefined) {
-            MERGE_TEXTS(r, aux_r);
-          }
-        }
-	else if (pp_f90_style_p() &&
-	    instruction_assign_p(statement_instruction(body)) ) {
-	    MERGE_TEXTS(r, text_loop_90(module, label, margin, obj, n));
-	}
-	else {
-	    MERGE_TEXTS(r, text_loop_default(module, label, margin, obj, n));
-	}
-	break ;
-	default:
-	pips_internal_error("Unknown tag\n") ;
+  /* quite ugly management of other prettyprints...
+   */
+  switch(execution_tag(loop_execution(obj)) ) {
+  case is_execution_sequential:
+    MERGE_TEXTS(r, text_loop_default(module, label, margin, obj, n));
+    break ;
+  case is_execution_parallel:
+    if (pp_cmf_style_p()) {
+      text aux_r;
+      if((aux_r = text_loop_cmf(module, label, margin, obj, n, NIL, NIL))
+	 != text_undefined) {
+	MERGE_TEXTS(r, aux_r);
+      }
     }
-    return r;
+    else if (pp_craft_style_p()) {
+      text aux_r;
+      if((aux_r = text_loop_craft(module, label, margin, obj, n, NIL, NIL))
+	 != text_undefined) {
+	MERGE_TEXTS(r, aux_r);
+      }
+    }
+    else if (pp_f90_style_p() &&
+	     instruction_assign_p(statement_instruction(body)) ) {
+      MERGE_TEXTS(r, text_loop_90(module, label, margin, obj, n));
+    }
+    else {
+      MERGE_TEXTS(r, text_loop_default(module, label, margin, obj, n));
+    }
+    break ;
+  default:
+    pips_internal_error("Unknown tag\n") ;
+  }
+  return r;
 }
 
-static text
-text_whileloop(
+static text text_whileloop(
     entity module,
     string label,
     int margin,
@@ -2470,7 +2473,11 @@ text_whileloop(
 	    pc = CHAIN_SWORD(pc,") ");
 	    u = make_unformatted(strdup(label), n, margin, pc) ;
 	    ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_unformatted, u));
-	    MERGE_TEXTS(r, text_statement_enclosed(module, margin+INDENTATION, body,!one_liner_p(body)));
+	    MERGE_TEXTS(r, text_statement_enclosed(module,
+						   margin+INDENTATION,
+						   body,
+						   !one_liner_p(body),
+						   !one_liner_p(body)));
 
 	    //if (structured_do)
 	    //ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"}"));
@@ -2622,8 +2629,11 @@ text_block_if(
 			 make_sentence(is_sentence_unformatted,
 				       make_unformatted(strdup(label), n,
 							margin, pc)));
-    MERGE_TEXTS(r, text_statement_enclosed(module, margin+INDENTATION,
-				  test_true(obj), !one_liner_true_statement));
+    MERGE_TEXTS(r, text_statement_enclosed(module,
+					   margin+INDENTATION,
+					   test_true(obj),
+					   !one_liner_true_statement,
+					   !one_liner_true_statement));
 
     test_false_obj = test_false(obj);
     if(statement_undefined_p(test_false_obj)){
@@ -2640,7 +2650,7 @@ text_block_if(
 	(continue_statement_p(test_false_obj)
 	 && (get_bool_property("PRETTYPRINT_ALL_LABELS"))))
       {
-        else_branch_p = TRUE;
+	else_branch_p = TRUE;
 	if (prettyprint_is_fortran)
 	  {
 	    ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"ELSE"));
@@ -2659,10 +2669,11 @@ text_block_if(
 	MERGE_TEXTS(r, text_statement(module, margin+INDENTATION,
 				      test_false_obj));
       }
-  
+
     if(prettyprint_is_fortran)
       ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,strdup("ENDIF")))
-    else if((!else_branch_p && !one_liner_true_statement) || (else_branch_p && !one_liner_false_statement))
+    else if((!else_branch_p && !one_liner_true_statement)
+	    || (else_branch_p && !one_liner_false_statement))
       ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,strdup("}")))
 
     ifdebug(8){
@@ -2670,7 +2681,7 @@ text_block_if(
       print_text(stderr,r);
       fprintf(stderr,"==============================\n");
     }
-	
+
     return(r);
 }
 
@@ -2687,12 +2698,12 @@ text_io_block_if(
     string strglab= local_name(new_label_name(module))+1;
 
     if (!empty_statement_p(test_true(obj))) {
-    
+
       r = make_text(CONS(SENTENCE,
 			 sentence_goto_label(module, label, margin,
 					     strglab, n),
 			 NIL));
-    
+
       ADD_SENTENCE_TO_TEXT(r,
 			   make_sentence(is_sentence_unformatted,
 					 make_unformatted(strdup(label), n,
@@ -2738,19 +2749,21 @@ text_block_ifthen(
 			 make_sentence(is_sentence_unformatted,
 				       make_unformatted(strdup(label), n,
 							margin, pc)));
-    MERGE_TEXTS(r, text_statement_enclosed(module, margin+INDENTATION, tb, !one_liner_p(tb)));
+    MERGE_TEXTS(r, text_statement_enclosed(module,
+					   margin+INDENTATION,
+					   tb,
+					   !one_liner_p(tb),
+					   !one_liner_p(tb)));
     if (!prettyprint_is_fortran && !one_liner_p(tb))
       ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"}"));
     return(r);
 }
 
-static text
-text_block_else(
-    entity module,
-    string __attribute__ ((unused)) label,
-    int margin,
-    statement stmt,
-    int __attribute__ ((unused)) n)
+static text text_block_else(entity module,
+			    string __attribute__ ((unused)) label,
+			    int margin,
+			    statement stmt,
+			    int __attribute__ ((unused)) n)
 {
   text r = make_text(NIL);
 
@@ -2773,7 +2786,11 @@ text_block_else(
       else { //C assumed
 	if (one_liner_p(stmt)){
 	  ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"else"));
-	  MERGE_TEXTS(r, text_statement_enclosed(module, margin+INDENTATION, stmt, FALSE));
+	  MERGE_TEXTS(r, text_statement_enclosed(module,
+						 margin+INDENTATION,
+						 stmt,
+						 FALSE,
+						 FALSE));
 	}
 	else {
 	  ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin, "else {"));
@@ -2782,12 +2799,7 @@ text_block_else(
 	}
       }
     }
-  /*original code
-    ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,prettyprint_is_fortran?"ELSE":(one_liner_p(stmt)?"else":"else {")));
-    MERGE_TEXTS(r, text_statement(module, margin+INDENTATION, stmt));
-    if (!prettyprint_is_fortran && !one_liner_p(stmt))
-    ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"}"));*/
-        	 
+
   return r;
 }
 
@@ -2811,8 +2823,12 @@ text_block_elseif(
 		       make_sentence(is_sentence_unformatted,
 				     make_unformatted(strdup(label), n,
 						      margin, pc)));
-  
-  MERGE_TEXTS(r, text_statement_enclosed(module, margin+INDENTATION, tb,!one_liner_p(tb)));
+
+  MERGE_TEXTS(r, text_statement_enclosed(module,
+					 margin+INDENTATION,
+					 tb,
+					 !one_liner_p(tb),
+					 !one_liner_p(tb)));
 
   if (!prettyprint_is_fortran && !one_liner_p(tb)) {
     ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin, strdup("}")));
@@ -2825,7 +2841,7 @@ text_block_elseif(
 				     label_local_name(statement_label(fb)),
 				     margin,
 				     statement_test(fb), n));
-  
+
   } else {
     MERGE_TEXTS(r, text_block_else(module, label, margin, fb, n));
   }
@@ -2872,7 +2888,7 @@ text_test(
 		    (module,
 		     label_local_name(statement_label(fb)),
 		     margin, statement_test(fb), n));
-	
+
 	if(prettyprint_is_fortran)
 	  ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"ENDIF"));
 
@@ -3186,7 +3202,8 @@ text C_comment_to_text(int margin, string comment)
 text text_statement_enclosed(entity module,
 			     int imargin,
 			     statement stmt,
-			     bool braces_p)
+			     bool braces_p,
+			     bool drop_continue_p)
 {
   instruction i = statement_instruction(stmt);
   text r= make_text(NIL);
@@ -3261,12 +3278,35 @@ text text_statement_enclosed(entity module,
       entity m = entity_undefined_p(module)?
 	get_current_module_entity()
 	: module;
-      if(!compilation_unit_p(entity_name(m)))
-	 temp = text_instruction(module, label, nmargin, i,
-				 statement_number(stmt));
+      if(!compilation_unit_p(entity_name(m))) {
+	/* Do we need to print this CONTINUE statement in C? */
+	string cs = statement_comments(stmt);
+	entity l = statement_label(stmt);
+
+	if(!get_prettyprint_is_fortran()
+	   && (braces_p || drop_continue_p)
+	   && empty_label_p(entity_local_name(l))
+	   && instruction_continue_p(i)) {
+	  if(string_undefined_p(cs) || cs == NULL || strcmp(cs, "")==0) {
+	    sentence s = MAKE_ONE_WORD_SENTENCE(0, "");
+	    temp = make_text(CONS(SENTENCE, s ,NIL));
+	    //temp = make_text(NIL);
+	  }
+	  else if(strcmp(cs, "\n")==0) {
+	    sentence s = MAKE_ONE_WORD_SENTENCE(0, "\n");
+	    temp = make_text(CONS(SENTENCE, s ,NIL));
+	  }
+	  else
+	    temp = text_instruction(module, label, nmargin, i,
+				    statement_number(stmt));
+	}
+	else
+	  temp = text_instruction(module, label, nmargin, i,
+				  statement_number(stmt));
+      }
       else
 	temp = make_text(NIL);
-   }
+    }
 
   // append local variables  that might
   // have not been inserted previously
@@ -3358,7 +3398,7 @@ text text_statement(
     int margin,
     statement stmt)
 {
-  return text_statement_enclosed(module, margin, stmt, TRUE);
+  return text_statement_enclosed(module, margin, stmt, TRUE, TRUE);
 }
 
 /* Keep track of the last statement to decide if a final return can be omitted
@@ -3576,126 +3616,123 @@ add_control_node_identifier_to_text(text r, control c) {
 				    ORDERING_STATEMENT(so));
 }
 
-void
-output_a_graph_view_of_the_unstructured_successors(text r,
-                                                   entity module,
-                                                   int margin,
-                                                   control c)
+void output_a_graph_view_of_the_unstructured_successors(text r,
+							entity module,
+							int margin,
+							control c)
 {
-   _int so = statement_ordering(control_statement(c));
-   add_one_unformated_printf_to_text(r, "%s ",
-                                     PRETTYPRINT_UNSTRUCTURED_ITEM_MARKER);
-   add_control_node_identifier_to_text(r, c);
-   add_one_unformated_printf_to_text(r, "\n");
+  _int so = statement_ordering(control_statement(c));
+  add_one_unformated_printf_to_text(r, "%s ",
+				    PRETTYPRINT_UNSTRUCTURED_ITEM_MARKER);
+  add_control_node_identifier_to_text(r, c);
+  add_one_unformated_printf_to_text(r, "\n");
 
-   if (get_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH_VERBOSE")) {
-      add_one_unformated_printf_to_text(r, "C Unstructured node %p ->", c);
-      MAP(CONTROL, a_successor,
-	  so = statement_ordering(control_statement(a_successor));
-	  add_one_unformated_printf_to_text(r, " %p", a_successor),
-	  control_successors(c));
-      add_one_unformated_printf_to_text(r,"\n");
-   }
+  if (get_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH_VERBOSE")) {
+    add_one_unformated_printf_to_text(r, "C Unstructured node %p ->", c);
+    MAP(CONTROL, a_successor,
+	so = statement_ordering(control_statement(a_successor));
+	add_one_unformated_printf_to_text(r, " %p", a_successor),
+	control_successors(c));
+    add_one_unformated_printf_to_text(r,"\n");
+  }
 
-   MERGE_TEXTS(r, text_statement(module,
-                                 margin,
-                                 control_statement(c)));
+  MERGE_TEXTS(r, text_statement(module,
+				margin,
+				control_statement(c)));
 
-   add_one_unformated_printf_to_text(r,
-                                     PRETTYPRINT_UNSTRUCTURED_SUCC_MARKER);
-   MAP(CONTROL, a_successor,
-       {
-          add_one_unformated_printf_to_text(r, " ");
-	  add_control_node_identifier_to_text(r, a_successor);
+  add_one_unformated_printf_to_text(r,
+				    PRETTYPRINT_UNSTRUCTURED_SUCC_MARKER);
+  MAP(CONTROL, a_successor,
+      {
+	add_one_unformated_printf_to_text(r, " ");
+	add_control_node_identifier_to_text(r, a_successor);
       },
-          control_successors(c));
-   add_one_unformated_printf_to_text(r,"\n");
+      control_successors(c));
+  add_one_unformated_printf_to_text(r,"\n");
 }
 
 
-bool
-output_a_graph_view_of_the_unstructured_from_a_control(text r,
-                                                       entity module,
-                                                       int margin,
-                                                       control begin_control,
-                                                       control exit_control)
+bool output_a_graph_view_of_the_unstructured_from_a_control(text r,
+							    entity module,
+							    int margin,
+							    control begin_control,
+							    control exit_control)
 {
-   bool exit_node_has_been_displayed = FALSE;
-   list blocs = NIL;
+  bool exit_node_has_been_displayed = FALSE;
+  list blocs = NIL;
 
-   CONTROL_MAP(c,
-               {
-                  /* Display the statements of each node followed by
-                     the list of its successors if any: */
-                  output_a_graph_view_of_the_unstructured_successors(r,
-                                                                     module,
-                                                                     margin,
-                                                                     c);
-                  if (c == exit_control)
-                     exit_node_has_been_displayed = TRUE;
-               },
-                  begin_control,
-                  blocs);
-   gen_free_list(blocs);
+  CONTROL_MAP(c,
+	      {
+		/* Display the statements of each node followed by
+		   the list of its successors if any: */
+		output_a_graph_view_of_the_unstructured_successors(r,
+								   module,
+								   margin,
+								   c);
+		if (c == exit_control)
+		  exit_node_has_been_displayed = TRUE;
+	      },
+	      begin_control,
+	      blocs);
+  gen_free_list(blocs);
 
-   return exit_node_has_been_displayed;
+  return exit_node_has_been_displayed;
 }
 
-void
-output_a_graph_view_of_the_unstructured(text r,
-                                        entity module,
-                                        string __attribute__ ((unused)) label,
-                                        int margin,
-                                        unstructured u,
-                                        int __attribute__ ((unused)) num)
+void output_a_graph_view_of_the_unstructured(text r,
+					     entity module,
+					     string __attribute__ ((unused)) label,
+					     int margin,
+					     unstructured u,
+					     int __attribute__ ((unused)) num)
 {
-   bool exit_node_has_been_displayed = FALSE;
-   control begin_control = unstructured_control(u);
-   control end_control = unstructured_exit(u);
+  bool exit_node_has_been_displayed = FALSE;
+  control begin_control = unstructured_control(u);
+  control end_control = unstructured_exit(u);
 
-   add_one_unformated_printf_to_text(r, "%s ",
-                                     PRETTYPRINT_UNSTRUCTURED_BEGIN_MARKER);
-   add_control_node_identifier_to_text(r, begin_control);
-   add_one_unformated_printf_to_text(r, " end: ");
-   add_control_node_identifier_to_text(r, end_control);
-   add_one_unformated_printf_to_text(r, "\n");
+  add_one_unformated_printf_to_text(r, "%s ",
+				    PRETTYPRINT_UNSTRUCTURED_BEGIN_MARKER);
+  add_control_node_identifier_to_text(r, begin_control);
+  add_one_unformated_printf_to_text(r, " end: ");
+  add_control_node_identifier_to_text(r, end_control);
+  add_one_unformated_printf_to_text(r, "\n");
 
-   exit_node_has_been_displayed =
-      output_a_graph_view_of_the_unstructured_from_a_control(r,
-                                                             module,
-                                                             margin,
-                                                             begin_control,
-                                                             end_control);
+  exit_node_has_been_displayed =
+    output_a_graph_view_of_the_unstructured_from_a_control(r,
+							   module,
+							   margin,
+							   begin_control,
+							   end_control);
 
-   /* If we have not displayed the exit node, that mean that it is not
-      connex with the entry node and so the code is
-      unreachable. Anyway, it has to be displayed as for the classical
-      Sequential View: */
-   if (! exit_node_has_been_displayed) {
-      /* Note that since the controlizer adds a dummy successor to the
-         exit node, use
-         output_a_graph_view_of_the_unstructured_from_a_control()
-         instead of
-         output_a_graph_view_of_the_unstructured_successors(): */
-      output_a_graph_view_of_the_unstructured_from_a_control(r,
-                                                             module,
-                                                             margin,
-                                                             end_control,
-                                                             end_control);
-      /* Even if the code is unreachable, add the fact that the
-         control above is semantically related to the entry node. Add
-         a dash arrow from the entry node to the exit node in daVinci,
-         for example: */
-      add_one_unformated_printf_to_text(r, "%s ",
-                                        PRETTYPRINT_UNREACHABLE_EXIT_MARKER);
-      add_control_node_identifier_to_text(r, begin_control);
-      add_one_unformated_printf_to_text(r, " -> ");
-      add_control_node_identifier_to_text(r, end_control);
-      add_one_unformated_printf_to_text(r, "\n");
-      if (get_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH_VERBOSE"))
-	add_one_unformated_printf_to_text(r, "C Unreachable exit node (%p -> %p)\n",
-					  begin_control,
-					  end_control);
+  /* If we have not displayed the exit node, that mean that it is not
+     connex with the entry node and so the code is
+     unreachable. Anyway, it has to be displayed as for the classical
+     Sequential View: */
+  if (! exit_node_has_been_displayed) {
+    /* Note that since the controlizer adds a dummy successor to the
+       exit node, use
+       output_a_graph_view_of_the_unstructured_from_a_control()
+       instead of
+       output_a_graph_view_of_the_unstructured_successors(): */
+    output_a_graph_view_of_the_unstructured_from_a_control(r,
+							   module,
+							   margin,
+							   end_control,
+							   end_control);
+    /* Even if the code is unreachable, add the fact that the
+       control above is semantically related to the entry node. Add
+       a dash arrow from the entry node to the exit node in daVinci,
+       for example: */
+    add_one_unformated_printf_to_text(r, "%s ",
+				      PRETTYPRINT_UNREACHABLE_EXIT_MARKER);
+    add_control_node_identifier_to_text(r, begin_control);
+    add_one_unformated_printf_to_text(r, " -> ");
+    add_control_node_identifier_to_text(r, end_control);
+    add_one_unformated_printf_to_text(r, "\n");
+    if (get_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH_VERBOSE"))
+      add_one_unformated_printf_to_text(r, "C Unreachable exit node (%p -> %p)\n",
+					begin_control,
+					end_control);
   }
 
   add_one_unformated_printf_to_text(r, "%s ",
@@ -3809,7 +3846,11 @@ static text text_forloop(entity module,
     ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_unformatted, u));
 
     if(one_liner_p(body)) {
-      MERGE_TEXTS(r, text_statement_enclosed(module, margin+INDENTATION, body,!one_liner_p(body)));
+      MERGE_TEXTS(r, text_statement_enclosed(module,
+					     margin+INDENTATION,
+					     body,
+					     !one_liner_p(body),
+					     !one_liner_p(body)));
     }
     else {
       // ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"{"));
@@ -3819,4 +3860,3 @@ static text text_forloop(entity module,
 
     return r;
 }
-

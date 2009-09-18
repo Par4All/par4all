@@ -2362,7 +2362,7 @@ text c_text_entity(entity module, entity e, int margin)
 	    pc = gen_nconc(pc,words_brace_expression(exp));
 	  else {
 	    /* */
-	    pc = gen_nconc(pc,words_subexpression(exp, ASSIGN_OPERATOR_PRECEDENCE, FALSE));
+	    pc = gen_nconc(pc,words_subexpression(exp, ASSIGN_OPERATOR_PRECEDENCE, TRUE));
 	  }
 	}
 	else if(value_code_p(val)) {

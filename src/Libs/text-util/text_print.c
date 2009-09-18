@@ -271,13 +271,13 @@ print_sentence(FILE * fd,
 	} else {
 	  /* C case */
 	  column_start = C_STATEMENT_LINE_COLUMN;
-	  while (column_start <= col) 
+	  while (column_start <= col)
 	    column_start += C_STATEMENT_LINE_STEP;
 	}
 	/* Output the statement line number on the right end of the
            line: */
 	if (n > 0 && get_bool_property("PRETTYPRINT_STATEMENT_NUMBER")) {
-	    for (i = col; i <= column_start; i++) 
+	    for (i = col; i <= column_start; i++)
 		putc_sentence(' ', fd);
 	    fprintf_sentence(fd,  prettyprint_is_fortran? "%04d" : "/*%04d*/", n);
 	}
@@ -285,31 +285,27 @@ print_sentence(FILE * fd,
     }
 }
 
-void
-print_text(FILE *fd, text t)
+void print_text(FILE *fd, text t)
 {
     print_sentence_init();
     MAP(SENTENCE, s, print_sentence(fd, s), text_sentences(t));
 }
 
-void 
-dump_sentence(sentence s)
+void dump_sentence(sentence s)
 {
     print_sentence(stderr, s);
 }
 
 /* FI: print_text() should be fprint_text() and dump_text(), print_text() */
 
-void 
-dump_text(text t)
+void dump_text(text t)
 {
     print_text(stderr, t);
 }
 
 /* Convert a word list into a string and translate the position of
    eventual attachment accordingly: */
-string 
-words_to_string(list ls)
+string words_to_string(list ls)
 {
     int size = 1; /* 1 for null termination. */
     string buffer, p;

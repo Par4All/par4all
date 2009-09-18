@@ -88,14 +88,14 @@ instruction make_continue_instruction() {
 */
 
 
-/* Test if an instruction is the native instruction of the language
+/* Test if an instruction is a native instruction of the language
 
    @param i is the instruction to investigate
    @param s is the name of the native instruction to investigate
    @return true if the instruction is a native instruction of the language
  */
 bool native_instruction_p(instruction i,
-			  string s)
+			  string op_name)
 {
   bool call_s_p = FALSE;
 
@@ -103,8 +103,17 @@ bool native_instruction_p(instruction i,
     call c = instruction_call(i);
     entity f = call_function(c);
 
-    if (strcmp(entity_user_name(f), s) == 0)
+    if (strcmp(entity_user_name(f), op_name) == 0)
       call_s_p = TRUE;
+  }
+  else if(instruction_expression_p(i)) {
+    syntax s = expression_syntax(instruction_expression(i));
+    if(syntax_call_p(s)) {
+      entity f = call_function(syntax_call(s));
+
+      if (strcmp(entity_user_name(f), op_name) == 0)
+	call_s_p = TRUE;
+    }
   }
 
   return call_s_p;
@@ -122,7 +131,7 @@ bool instruction_assign_p(instruction i)
 */
 bool instruction_continue_p(instruction i)
 {
-  return native_instruction_p(i, CONTINUE_FUNCTION_NAME);
+    return native_instruction_p(i, CONTINUE_FUNCTION_NAME);
 }
 
 
