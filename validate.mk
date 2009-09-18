@@ -44,6 +44,10 @@ validate:
 	$(RM) $(F.valid)
 	$(MAKE) $(F.valid)
 
+# restore all initial "test" result files if you are unhappy with a validate
+unvalidate:
+	svn revert $(F.valid)
+
 # generate "out" files
 validate-out:
 	$(MAKE) TEST=out validate
