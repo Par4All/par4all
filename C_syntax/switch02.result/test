@@ -4,6 +4,7 @@ Parsed Printed file for "switch02"
 int switch02(int predicate)
 {
    int x = 0;
+
    if (predicate==0)
       goto switch_1_case_0;
    if (predicate==1)
@@ -47,7 +48,7 @@ int main()
    // 333
    id = switch02(4);
    // 222
-
+   
    fprintf(stderr, "i0=%d (111), i1=%d (4), i2=%d (3), i3=%d (333), id=%d (222)\n", i0, i1, i2, i3, id);
 }
 

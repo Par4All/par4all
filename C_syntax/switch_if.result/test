@@ -4,6 +4,7 @@ PARSED PRINTED FILE
 void pretty()
 {
    char *p;
+
    if (n==1)
       goto switch_1_case_1;
    if (n==2)

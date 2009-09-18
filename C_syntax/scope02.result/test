@@ -12,7 +12,7 @@ Printed file for scope02_a
 
 extern int i;
 void foo();
-extern main();
+extern int main();
 main()
 {
    // printf("%d\n",i);
@@ -35,7 +35,7 @@ Unsplit the application
  */
 extern int i;
 void foo();
-extern main();
+extern int main();
 main()
 {
    // printf("%d\n",i);

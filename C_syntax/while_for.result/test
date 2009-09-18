@@ -10,6 +10,7 @@ l99998:   ;
 break_2:   ;
    goto l99998;
 l99999:   ;
+
 }
 Try more aggressive restructuring:
 
@@ -25,5 +26,6 @@ break_2:   if (!(c>0)) goto l99999;
       ;
    goto break_2;
 l99999:   ;
+
 }
 

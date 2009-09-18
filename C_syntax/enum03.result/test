@@ -1,5 +1,5 @@
 enum {a=sizeof(int), b};
-extern  main();
+extern int main();
 
 Preconditions derived from enum
 
@@ -7,7 +7,7 @@ Preconditions derived from enum
 //  P() {}
 
 enum {a=sizeof(int), b};
-extern  main();
+extern int main();
 
 
 //  P() {}

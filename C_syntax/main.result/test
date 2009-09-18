@@ -71,7 +71,7 @@ Variable list:
 	Declared entity "TOP-LEVEL:getchar_unlocked" with type "functional" "void -> int"
 	Declared entity "TOP-LEVEL:gets" with type "functional" "char * -> char *"
 	Declared entity "TOP-LEVEL:getw" with type "functional" "FILE * -> int"
-	Declared entity "TOP-LEVEL:main" with type "functional" "() -> unknown"
+	Declared entity "TOP-LEVEL:main" with type "functional" "() -> int"
 	Declared entity "TOP-LEVEL:pclose" with type "functional" "FILE * -> int"
 	Declared entity "TOP-LEVEL:perror" with type "functional" "char * -> void"
 	Declared entity "TOP-LEVEL:popen" with type "functional" "char * x char * -> FILE *"
@@ -220,7 +220,7 @@ External variable list:
 	Declared external entity "TOP-LEVEL:flockfile"	with type "functional" "FILE * -> void"
 	Declared external entity "TOP-LEVEL:ftrylockfile"	with type "functional" "FILE * -> int"
 	Declared external entity "TOP-LEVEL:funlockfile"	with type "functional" "FILE * -> void"
-	Declared external entity "TOP-LEVEL:main"	with type "functional" "() -> unknown"
+	Declared external entity "TOP-LEVEL:main"	with type "functional" "() -> int"
 
 Layouts for memory areas:
 

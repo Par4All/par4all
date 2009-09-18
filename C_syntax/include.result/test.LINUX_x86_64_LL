@@ -251,7 +251,7 @@ extern char *ctermid(char *__s);
 extern void flockfile(FILE *__stream);
 extern int ftrylockfile(FILE *__stream);
 extern void funlockfile(FILE *__stream);
-extern  main();
+extern int main();
 main()
 {
    int i = printf("\n")+4.2;

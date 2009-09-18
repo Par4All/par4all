@@ -4,6 +4,7 @@ Parsed printed file for main
 main()
 {
    int i = 1;
+
    if (i==1)
       goto switch_1_case_1;
    if (i==2)

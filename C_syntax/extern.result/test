@@ -9,11 +9,11 @@ extern int (*potentials[10])();
 extern int (*forces[10])();
 extern int nused;
 extern int foo();
-foo()
+int foo()
 {
    extern int i;
-   extern  foo();
-   extern  (*p)();
-   extern  (*f)();
+   extern int foo();
+   extern int (*p)();
+   extern int (*f)();
    extern int b[20];
 }

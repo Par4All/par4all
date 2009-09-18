@@ -4,9 +4,9 @@
 
 void if02()
 {
+  int j = -1;
   int n = 2;
   int i = 0;
-  int j = -1;
 
   if(n)
     printf("n == true\n"); /* yes */

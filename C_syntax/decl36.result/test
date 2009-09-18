@@ -10,5 +10,5 @@ PRINTED FILE for "decl36!"
 
 extern void decl36(int i);
 extern void decl36(int i);
-extern  main();
+extern int main();
 extern void decl36(int i);
