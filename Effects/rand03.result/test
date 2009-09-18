@@ -136,9 +136,9 @@ PRINT REGIONS for AddNoise
 //  <Sigma2-R-EXACT-{}>
 //  <nx-R-EXACT-{}>
 //  <ny-R-EXACT-{}>
-//  <pt_in[PHI1][PHI2][PHI3]-R-MAY-{0<=PHI1, PHI1+1<=ny, 0<=PHI2,
+//  <pt_in[PHI1][PHI2][PHI3]-R-EXACT-{0<=PHI1, PHI1+1<=ny, 0<=PHI2,
 //    PHI2+1<=nx, 1<=PHI3, PHI3<=2}>
-//  <pt_out[PHI1][PHI2][PHI3]-W-MAY-{0<=PHI1, PHI1+1<=ny, 0<=PHI2,
+//  <pt_out[PHI1][PHI2][PHI3]-W-EXACT-{0<=PHI1, PHI1+1<=ny, 0<=PHI2,
 //    PHI2+1<=nx, 1<=PHI3, PHI3<=2}>
 
 void AddNoise(int ny, int nx, Cplfloat pt_in[ny][nx], float Sigma2, Cplfloat pt_out[ny][nx])
@@ -169,9 +169,9 @@ void AddNoise(int ny, int nx, Cplfloat pt_in[ny][nx], float Sigma2, Cplfloat pt_
 //  <iy-W-EXACT-{}>
 //  <nx-R-EXACT-{}>
 //  <ny-R-EXACT-{}>
-//  <pt_in[PHI1][PHI2][PHI3]-R-MAY-{0<=PHI1, PHI1+1<=ny, 0<=PHI2,
+//  <pt_in[PHI1][PHI2][PHI3]-R-EXACT-{0<=PHI1, PHI1+1<=ny, 0<=PHI2,
 //    PHI2+1<=nx, 1<=PHI3, PHI3<=2}>
-//  <pt_out[PHI1][PHI2][PHI3]-W-MAY-{0<=PHI1, PHI1+1<=ny, 0<=PHI2,
+//  <pt_out[PHI1][PHI2][PHI3]-W-EXACT-{0<=PHI1, PHI1+1<=ny, 0<=PHI2,
 //    PHI2+1<=nx, 1<=PHI3, PHI3<=2}>
 //  <u-R-EXACT-{}>
 //  <u-R-EXACT-{}>
@@ -193,9 +193,9 @@ void AddNoise(int ny, int nx, Cplfloat pt_in[ny][nx], float Sigma2, Cplfloat pt_
 //  <iy-R-EXACT-{}>
 //  <nx-R-EXACT-{}>
 //  <ny-R-EXACT-{}>
-//  <pt_in[PHI1][PHI2][PHI3]-R-MAY-{PHI1==iy, 0<=PHI2, PHI2+1<=nx,
+//  <pt_in[PHI1][PHI2][PHI3]-R-EXACT-{PHI1==iy, 0<=PHI2, PHI2+1<=nx,
 //    1<=PHI3, PHI3<=2, 0<=iy, 1+iy<=ny}>
-//  <pt_out[PHI1][PHI2][PHI3]-W-MAY-{PHI1==iy, 0<=PHI2, PHI2+1<=nx,
+//  <pt_out[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==iy, 0<=PHI2, PHI2+1<=nx,
 //    1<=PHI3, PHI3<=2, 0<=iy, 1+iy<=ny}>
 //  <u-R-EXACT-{}>
 //  <u-R-EXACT-{}>
@@ -320,8 +320,10 @@ main()
 //  <Sigma2-R-EXACT-{}>
 //  <nx-R-EXACT-{}>
 //  <ny-R-EXACT-{}>
-//  <pt_in-R-MAY-{}>
-//  <pt_out-W-MAY-{}>
+//  <pt_in[PHI1][PHI2][PHI3]-R-EXACT-{0<=PHI1, PHI1+1<=ny, 0<=PHI2,
+//    PHI2+1<=nx, 1<=PHI3, PHI3<=2}>
+//  <pt_out[PHI1][PHI2][PHI3]-W-EXACT-{0<=PHI1, PHI1+1<=ny, 0<=PHI2,
+//    PHI2+1<=nx, 1<=PHI3, PHI3<=2}>
 
 
    AddNoise(ny, nx, pt_in, Sigma2, pt_out);

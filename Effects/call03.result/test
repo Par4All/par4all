@@ -69,3 +69,64 @@ main()
 //                                  TOP-LEVEL:q[0][2][4]
    call03();
 }
+
+Regions for "call03"
+
+
+//  <TOP-LEVEL:pi-R-EXACT-{}>
+//  <TOP-LEVEL:pi[PHI1]-W-EXACT-{PHI1==0}>
+//  <TOP-LEVEL:pi-W-EXACT-{}>
+//  <TOP-LEVEL:q-R-EXACT-{}>
+//  <TOP-LEVEL:q[PHI1][PHI2]-W-EXACT-{PHI1==0, PHI2==1}>
+//  <TOP-LEVEL:q[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==0, PHI2==2,
+//    PHI3==4}>
+
+void call03()
+{
+
+//  <TOP-LEVEL:pi-R-EXACT-{}>
+//  <TOP-LEVEL:pi[PHI1]-W-EXACT-{PHI1==0}>
+
+   *pi = 1;
+
+//  <TOP-LEVEL:pi-R-EXACT-{}>
+//  <TOP-LEVEL:pi-W-EXACT-{}>
+
+   pi++;
+
+//  <TOP-LEVEL:q-R-EXACT-{}>
+//  <TOP-LEVEL:q[PHI1][PHI2]-W-EXACT-{PHI1==0, PHI2==1}>
+
+   q->one = 1;
+
+//  <TOP-LEVEL:q-R-EXACT-{}>
+//  <TOP-LEVEL:q[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==0, PHI2==2,
+//    PHI3==4}>
+
+   (q->two)[4] = 2;
+}
+
+Regions for "main"
+
+
+//  <TOP-LEVEL:pi-R-EXACT-{}>
+//  <TOP-LEVEL:pi-W-EXACT-{}>
+//  <TOP-LEVEL:pi[PHI1]-W-EXACT-{PHI1==0}>
+//  <TOP-LEVEL:q-R-EXACT-{}>
+//  <TOP-LEVEL:q[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==0, PHI2==2,
+//    PHI3==4}>
+//  <TOP-LEVEL:q[PHI1][PHI2]-W-EXACT-{PHI1==0, PHI2==1}>
+
+main()
+{
+
+//  <TOP-LEVEL:pi-R-EXACT-{}>
+//  <TOP-LEVEL:pi-W-EXACT-{}>
+//  <TOP-LEVEL:pi[PHI1]-W-EXACT-{PHI1==0}>
+//  <TOP-LEVEL:q-R-EXACT-{}>
+//  <TOP-LEVEL:q[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==0, PHI2==2,
+//    PHI3==4}>
+//  <TOP-LEVEL:q[PHI1][PHI2]-W-EXACT-{PHI1==0, PHI2==1}>
+
+   call03();
+}

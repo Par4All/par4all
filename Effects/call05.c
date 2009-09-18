@@ -1,4 +1,4 @@
-/* #include<stdio.h> */
+#include<stdio.h> 
 
 void call05(int r, int m, int *x)
 {

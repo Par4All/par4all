@@ -110,13 +110,13 @@ main()
    tf_t *sp = &s;
 
 //  <a-R-EXACT-{}>
-//  <a-W-EXACT-{}>
-//  <ap[PHI1]-R-MAY-{b==PHI1-1, 0<=PHI1, PHI1<=9}>
-//  <ap[PHI1]-W-MAY-{b==PHI1-1, 0<=PHI1, PHI1<=9}>
+//  <ap[PHI1]-R-EXACT-{PHI1==b+1}>
+//  <ap[PHI1][PHI2]-W-EXACT-{PHI1==b+1, PHI2==0}>
 //  <b-R-EXACT-{}>
 //  <sp-R-EXACT-{}>
-//  <sp-W-MAY-{}>
-//  <x[PHI1]-W-MAY-{b==PHI1-1, 0<=PHI1, PHI1<=9}>
+//  <sp[PHI1][PHI2]-W-EXACT-{PHI1==0, PHI2==1}>
+//  <sp[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==0, PHI2==2, b==PHI3}>
+//  <x[PHI1]-W-EXACT-{PHI1==b+1}>
 
 
    call02(a, b, x, ap, sp);
@@ -129,11 +129,11 @@ Regions for "call02"
 //  <i-W-EXACT-{}>
 //  <j-R-EXACT-{}>
 //  <p-R-EXACT-{}>
-//  <p[PHI1][PHI2]-W-MAY-{PHI1==0, PHI2==1}>
-//  <p[PHI1][PHI2][PHI3]-W-MAY-{PHI1==0, PHI2==2, PHI3==j}>
-//  <q[PHI1]-R-MAY-{PHI1==j+1}>
-//  <q[PHI1][PHI2]-W-MAY-{PHI1==j+1, PHI2==0}>
-//  <y[PHI1]-W-MAY-{PHI1==j+1}>
+//  <p[PHI1][PHI2]-W-EXACT-{PHI1==0, PHI2==1}>
+//  <p[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==0, PHI2==2, PHI3==j}>
+//  <q[PHI1]-R-EXACT-{PHI1==j+1}>
+//  <q[PHI1][PHI2]-W-EXACT-{PHI1==j+1, PHI2==0}>
+//  <y[PHI1]-W-EXACT-{PHI1==j+1}>
 
 void call02(int i, int j, int y[10], int *q[10], tf_t *p)
 {

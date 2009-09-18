@@ -1,0 +1,60 @@
+setenv WKS array02
+delete $WKS
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create $WKS $WKS.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
+
+display PRINTED_FILE[%ALLFUNC]
+
+setenv PROPER_EFFECTS_DEBUG_LEVEL 0
+
+echo Select the most precise analysis:
+activate MUST_REGIONS
+activate TRANSFORMERS_INTER_FULL
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate PRECONDITIONS_INTER_FULL
+
+setproperty PRETTYPRINT_BLOCKS TRUE
+
+module compute
+activate PRINT_CODE_REGIONS
+display PRINTED_FILE
+
+
+module main
+activate PRINT_CODE_REGIONS
+display PRINTED_FILE
+
+module compute
+activate PRINT_CODE_IN_REGIONS
+display PRINTED_FILE
+
+module main
+activate PRINT_CODE_IN_REGIONS
+display PRINTED_FILE
+activate PRINT_CODE_OUT_REGIONS
+display PRINTED_FILE
+
+
+module compute
+activate PRINT_CODE_OUT_REGIONS
+display PRINTED_FILE
+
+close
+delete $WKS
+quit
+
+activate PRINT_CODE_IN_REGIONS
+display PRINTED_FILE
+activate PRINT_CODE_OUT_REGIONS
+display PRINTED_FILE
+
+close
+delete $WKS
+quit

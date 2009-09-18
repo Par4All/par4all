@@ -72,6 +72,18 @@ void call10(int i, int x[10], int j, int y[10])
       y[i] = 0;
 }
 
+Proper effects for "main"
+
+main()
+{
+   tf_t s;
+   tf_t *sp = &s;
+//               <may be written >: s[2][*] sp[0][2][*]
+//               <must be read   >: s[1] sp sp[0][1]
+
+   call10(s.one, s.two, sp->one, sp->two);
+}
+
 Cumulated effects for "main"
 
 main()
@@ -79,7 +91,53 @@ main()
    tf_t s;
    tf_t *sp = &s;
 //               <may be written >: s[2][*] sp[0][2][*]
-//               <must be read   >: s[1] s[2] sp sp[0][1] sp[0][2]
+//               <must be read   >: s[1] sp sp[0][1]
+
+   call10(s.one, s.two, sp->one, sp->two);
+}
+
+Regions for "call10"
+
+
+//  <x[PHI1]-W-EXACT-{PHI1==i, 1<=i}>
+//  <y[PHI1]-W-EXACT-{PHI1==i, 1<=j}>
+
+void call10(int i, int x[10], int j, int y[10])
+{
+   int k;
+   int l;
+
+//  <x[PHI1]-W-EXACT-{PHI1==i, 1<=i}>
+
+
+   for(k = 0; k <= i-1; k += 1)
+
+//  <x[PHI1]-W-EXACT-{PHI1==i, 1+k<=i, 0<=k}>
+
+      x[i] = 0;
+
+//  <y[PHI1]-W-EXACT-{PHI1==i, i<=k, 1<=j, 0<=k}>
+
+   for(l = 0; l <= j-1; l += 1)
+
+//  <y[PHI1]-W-EXACT-{PHI1==i, i<=k, 1+l<=j, 0<=k, 0<=l}>
+
+      y[i] = 0;
+}
+
+Regions for "main"
+
+main()
+{
+   tf_t s;
+   tf_t *sp = &s;
+
+//  <s[PHI1]-R-EXACT-{PHI1==1}>
+//  <s[PHI1][PHI2]-W-MAY-{PHI1==2, 1<=PHI2}>
+//  <sp[PHI1][PHI2]-R-EXACT-{PHI1==0, PHI2==1}>
+//  <sp-R-EXACT-{}>
+//  <sp[PHI1][PHI2][PHI3]-W-MAY-{PHI1==0, PHI2==2}>
+
 
    call10(s.one, s.two, sp->one, sp->two);
 }

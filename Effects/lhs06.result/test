@@ -37,6 +37,7 @@ int lhs06(const char *fmt, void (*my_fputc)(const char c, void *_stream), void *
    nbout = 0;
 //               <may be written >: TOP-LEVEL:*MEMORY*
 //               <must be read   >: col
+//               <must be written>: pa
 
    *va_arg(pa, int *) = col;
 }
@@ -62,6 +63,7 @@ int lhs06(const char *fmt, void (*my_fputc)(const char c, void *_stream), void *
    nbout = 0;
 //               <may be written >: TOP-LEVEL:*MEMORY*
 //               <must be read   >: col
+//               <must be written>: pa
 
    *va_arg(pa, int *) = col;
 }

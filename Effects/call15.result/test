@@ -51,3 +51,39 @@ main()
 
    call15(&i, &s);
 }
+
+Regions for "call15"
+
+
+//  <pi-R-EXACT-{}>
+//  <pi[PHI1]-W-EXACT-{PHI1==0}>
+//  <q-R-EXACT-{}>
+//  <q[PHI1][PHI2]-W-EXACT-{PHI1==0, PHI2==1}>
+
+void call15(int *pi, tf_t *q)
+{
+
+//  <pi-R-EXACT-{}>
+//  <pi[PHI1]-W-EXACT-{PHI1==0}>
+
+   *pi = 1;
+
+//  <q-R-EXACT-{}>
+//  <q[PHI1][PHI2]-W-EXACT-{PHI1==0, PHI2==1}>
+
+   q->one = 1;
+}
+
+Regions for "main"
+
+main()
+{
+   int i;
+   tf_t s;
+
+//  <i-W-EXACT-{}>
+//  <s[PHI1]-W-EXACT-{PHI1==1}>
+
+
+   call15(&i, &s);
+}

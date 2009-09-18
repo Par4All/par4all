@@ -186,3 +186,107 @@ void call13(int nrec, int nsa, int ntt, Cplfloat ptrin[nrec][nsa], Cplfloat ptro
                   ptrout[i][j1][j2][k1][k2].im = I;
                }
 }
+
+Regions for "call13"
+
+
+//  <ptrin[PHI1][PHI2][PHI3]-R-MAY-{0<=PHI1, PHI1+1<=nrec, 0<=PHI2,
+//    PHI2+1<=nsa, 1<=PHI3, PHI3<=2, ntt<=nrec, 1<=ntt}>
+//  <ptrout[PHI1][PHI2][PHI3][PHI4][PHI5][PHI6]-W-EXACT-{0<=PHI1,
+//    PHI1+ntt<=nrec, 0<=PHI2, PHI2+1<=ntt, 0<=PHI3, PHI3+1<=nsa,
+//    0<=PHI4, PHI4+1<=ntt, 0<=PHI5, PHI5+1<=nsa, 1<=PHI6, PHI6<=2}>
+
+void call13(int nrec, int nsa, int ntt, Cplfloat ptrin[nrec][nsa], Cplfloat ptrout[nrec-ntt+1][ntt][nsa][ntt][nsa])
+{
+   int i;
+   int j1;
+   int j2;
+   int k1;
+   int k2;
+   float R;
+   float I;
+
+   R = 0.0;
+   I = 0.0;
+
+//  <ptrin[PHI1][PHI2][PHI3]-R-MAY-{0<=PHI1, PHI1+1<=nrec, 0<=PHI2,
+//    PHI2+1<=nsa, 1<=PHI3, PHI3<=2, ntt<=nrec, 1<=ntt}>
+//  <ptrout[PHI1][PHI2][PHI3][PHI4][PHI5][PHI6]-W-EXACT-{0<=PHI1,
+//    PHI1+ntt<=nrec, 0<=PHI2, PHI2+1<=ntt, 0<=PHI3, PHI3+1<=nsa,
+//    0<=PHI4, PHI4+1<=ntt, 0<=PHI5, PHI5+1<=nsa, 1<=PHI6, PHI6<=2}>
+
+
+   for(i = 0; i <= nrec-ntt+1-1; i += 1)
+
+//  <ptrin[PHI1][PHI2][PHI3]-R-MAY-{i<=PHI1, PHI1+1<=i+ntt, 0<=PHI2,
+//    PHI2+1<=nsa, 1<=PHI3, PHI3<=2, 0<=i, i+ntt<=nrec}>
+//  <ptrout[PHI1][PHI2][PHI3][PHI4][PHI5][PHI6]-W-EXACT-{PHI1==i,
+//    0<=PHI2, PHI2+1<=ntt, 0<=PHI3, PHI3+1<=nsa, 0<=PHI4,
+//    PHI4+1<=ntt, 0<=PHI5, PHI5+1<=nsa, 1<=PHI6, PHI6<=2, 0<=i,
+//    i+ntt<=nrec}>
+
+      //    MOTIF     
+      for(j1 = 0; j1 <= ntt-1; j1 += 1)
+
+//  <ptrin[PHI1][PHI2][PHI3]-R-MAY-{i<=PHI1, PHI1+1<=i+ntt, 0<=PHI2,
+//    PHI2+1<=nsa, 1<=PHI3, PHI3<=2, 0<=i, i+ntt<=nrec, 0<=j1,
+//    1+j1<=ntt}>
+//  <ptrout[PHI1][PHI2][PHI3][PHI4][PHI5][PHI6]-W-EXACT-{PHI1==i,
+//    PHI2==j1, 0<=PHI3, PHI3+1<=nsa, 0<=PHI4, PHI4+1<=ntt, 0<=PHI5,
+//    PHI5+1<=nsa, 1<=PHI6, PHI6<=2, 0<=i, i+ntt<=nrec, 0<=j1,
+//    1+j1<=ntt}>
+
+         for(j2 = 0; j2 <= nsa-1; j2 += 1)
+
+//  <ptrin[PHI1][PHI2][PHI3]-R-MAY-{i<=PHI1, PHI1+1<=i+ntt, 0<=PHI2,
+//    PHI2+1<=nsa, 1<=PHI3, PHI3<=2, 0<=i, i+ntt<=nrec, 0<=j1,
+//    1+j1<=ntt, 0<=j2, 1+j2<=nsa}>
+//  <ptrout[PHI1][PHI2][PHI3][PHI4][PHI5][PHI6]-W-EXACT-{PHI1==i,
+//    PHI2==j1, PHI3==j2, 0<=PHI4, PHI4+1<=ntt, 0<=PHI5, PHI5+1<=nsa,
+//    1<=PHI6, PHI6<=2, 0<=i, i+ntt<=nrec, 0<=j1, 1+j1<=ntt, 0<=j2,
+//    1+j2<=nsa}>
+
+            for(k1 = 0; k1 <= ntt-1; k1 += 1)
+
+//  <ptrin[PHI1][PHI2][PHI3]-R-MAY-{1+i+j1+k1<=PHI1+ntt, i<=PHI1,
+//    PHI1<=i+j1+k1, PHI1+1<=i+ntt, 0<=PHI2, PHI2+1<=nsa, 1<=PHI3,
+//    PHI3<=2, 0<=i, i+ntt<=nrec, 0<=j1, 1+j1<=ntt, 0<=j2, 1+j2<=nsa,
+//    0<=k1, 1+k1<=ntt}>
+//  <ptrout[PHI1][PHI2][PHI3][PHI4][PHI5][PHI6]-W-EXACT-{PHI1==i,
+//    PHI2==j1, PHI3==j2, PHI4==k1, 0<=PHI5, PHI5+1<=nsa, 1<=PHI6,
+//    PHI6<=2, 0<=i, i+ntt<=nrec, 0<=j1, 1+j1<=ntt, 0<=j2, 1+j2<=nsa,
+//    0<=k1, 1+k1<=ntt}>
+
+               for(k2 = 0; k2 <= nsa-1; k2 += 1) {
+
+//  <ptrin[PHI1][PHI2][PHI3]-R-MAY-{1+i+j1+k1<=PHI1+ntt, i<=PHI1,
+//    PHI1<=i+j1+k1, PHI1+1<=i+ntt, 1+j2+k2<=PHI2+nsa, 0<=PHI2,
+//    PHI2<=j2+k2, PHI2+1<=nsa, 1<=PHI3, PHI3<=2, 0<=i, i+ntt<=nrec,
+//    0<=j1, 1+j1<=ntt, 0<=j2, 1+j2<=nsa, 0<=k1, 1+k1<=ntt, 0<=k2,
+//    1+k2<=nsa}>
+
+                  R = ptrin[i+j1][j2].re*ptrin[i+k1][k2].re+ptrin[i+j1][j2].im*ptrin[i+k1][k2].im;
+
+//  <ptrin[PHI1][PHI2][PHI3]-R-MAY-{1+i+j1+k1<=PHI1+ntt, i<=PHI1,
+//    PHI1<=i+j1+k1, PHI1+1<=i+ntt, 1+j2+k2<=PHI2+nsa, 0<=PHI2,
+//    PHI2<=j2+k2, PHI2+1<=nsa, 1<=PHI3, PHI3<=2, 0<=i, i+ntt<=nrec,
+//    0<=j1, 1+j1<=ntt, 0<=j2, 1+j2<=nsa, 0<=k1, 1+k1<=ntt, 0<=k2,
+//    1+k2<=nsa}>
+
+                  I = -(ptrin[i+j1][j2].re*ptrin[i+k1][k2].im)+ptrin[i+j1][j2].im*ptrin[i+k1][k2].re;
+
+//  <ptrout[PHI1][PHI2][PHI3][PHI4][PHI5][PHI6]-W-EXACT-{PHI1==i,
+//    PHI2==j1, PHI3==j2, PHI4==k1, PHI5==k2, PHI6==1, 0<=i,
+//    i+ntt<=nrec, 0<=j1, 1+j1<=ntt, 0<=j2, 1+j2<=nsa, 0<=k1,
+//    1+k1<=ntt, 0<=k2, 1+k2<=nsa}>
+
+                  ptrout[i][j1][j2][k1][k2].re = R;
+
+//  <ptrout[PHI1][PHI2][PHI3][PHI4][PHI5][PHI6]-W-EXACT-{PHI1==i,
+//    PHI2==j1, PHI3==j2, PHI4==k1, PHI5==k2, PHI6==2, 0<=i,
+//    i+ntt<=nrec, 0<=j1, 1+j1<=ntt, 0<=j2, 1+j2<=nsa, 0<=k1,
+//    1+k1<=ntt, 0<=k2, 1+k2<=nsa}>
+
+                  ptrout[i][j1][j2][k1][k2].im = I;
+               }
+}

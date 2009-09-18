@@ -11,6 +11,7 @@ setproperty PRETTYPRINT_C_CODE TRUE
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
 setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
+activate MUST_REGIONS
 
 # setproperty PRETTYPRINT_SCALAR_REGIONS TRUE
 
@@ -51,6 +52,23 @@ echo
 
 activate PRINT_CODE_PROPER_EFFECTS
 display PRINTED_FILE[main]
+
+echo
+echo Regions for "call03"
+echo
+
+activate PRINT_CODE_REGIONS
+display PRINTED_FILE[call03]
+
+echo
+echo Regions for "main"
+echo
+
+activate PRINT_CODE_REGIONS
+display PRINTED_FILE[main]
+
+
+
 
 close
 delete call03

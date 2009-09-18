@@ -75,3 +75,65 @@ main()
 
    call01(&i, &s);
 }
+
+Cumulated effects for "main"
+
+main()
+{
+   int i;
+   tf_t s;
+//               <must be written>: i s[1] s[2][4]
+
+   call01(&i, &s);
+}
+
+Regions for "call01"
+
+
+//  <pi-R-EXACT-{}>
+//  <pi[PHI1]-W-EXACT-{PHI1==0}>
+//  <pi-W-EXACT-{}>
+//  <q-R-EXACT-{}>
+//  <q[PHI1][PHI2]-W-EXACT-{PHI1==0, PHI2==1}>
+//  <q[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==0, PHI2==2, PHI3==4}>
+
+void call01(int *pi, tf_t *q)
+{
+
+//  <pi-R-EXACT-{}>
+//  <pi[PHI1]-W-EXACT-{PHI1==0}>
+
+   *pi = 1;
+
+//  <pi-R-EXACT-{}>
+//  <pi-W-EXACT-{}>
+
+   /* pi is passed by value: pi++ does not generate a summary effect
+        for call01 */
+   pi++;
+
+//  <q-R-EXACT-{}>
+//  <q[PHI1][PHI2]-W-EXACT-{PHI1==0, PHI2==1}>
+
+   q->one = 1;
+
+//  <q-R-EXACT-{}>
+//  <q[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==0, PHI2==2, PHI3==4}>
+
+   (q->two)[4] = 2;
+}
+
+Regions for "main"
+
+main()
+{
+   int i;
+   tf_t s;
+
+//  <i-W-EXACT-{}>
+//  <s[PHI1][PHI2]-W-EXACT-{PHI1==2, PHI2==4}>
+//  <s[PHI1]-W-EXACT-{PHI1==1}>
+
+
+   call01(&i, &s);
+}
