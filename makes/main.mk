@@ -54,37 +54,18 @@ recompile:
 	$(MAKE) clean
 	$(MAKE) compile
 
-########################################################################## ROOT
+################################################################### ROOT & ARCH
+
+MAKE.d	= $(ROOT)/makes
+
+include $(MAKE.d)/root.mk
+include $(MAKE.d)/arch.mk
+
+###################################################### INSTALLATION DIRECTORIES
 
 ifndef INSTALL_DIR
 INSTALL_DIR	= $(ROOT)
 endif # INSTALL_DIR
-
-# is this one really needed?
-ifndef PIPS_ROOT
-PIPS_ROOT	= $(ROOT)/../pips
-endif # PIPS_ROOT
-
-ifndef NEWGEN_ROOT
-NEWGEN_ROOT	= $(ROOT)/../newgen
-endif # NEWGEN_ROOT
-
-ifndef LINEAR_ROOT
-LINEAR_ROOT	= $(ROOT)/../linear
-endif # LINEAR_ROOT
-
-ifndef EXTERN_ROOT
-EXTERN_ROOT	= $(ROOT)/../extern
-endif # EXTERN_ROOT
-
-# where are make files
-MAKE.d	= $(ROOT)/makes
-
-########################################################################## ARCH
-
-include $(MAKE.d)/arch.mk
-
-###################################################### INSTALLATION DIRECTORIES
 
 # where to install stuff
 BIN.d	= $(INSTALL_DIR)/bin/$(ARCH)
