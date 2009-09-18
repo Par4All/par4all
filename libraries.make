@@ -1,4 +1,4 @@
-# $Id: define_libraries.mk 994 2009-09-17 12:29:55Z coelho $
+# $Id$
 #
 # Copyright 1989-2009 MINES ParisTech
 #
