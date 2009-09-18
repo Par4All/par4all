@@ -2693,12 +2693,14 @@ transformer expressions_to_transformer(list expl,
     /* el is an over-appoximation; should be replaced by a
        safe_expression_to_transformer() taking care of computing the
        precise effects of exp instead of using the effects of expl. */
-    transformer ctf = safe_expression_to_transformer(exp, cpre);
+    transformer cpre_r = transformer_range(cpre);
+    transformer ctf = safe_expression_to_transformer(exp, cpre_r);
     transformer npre = transformer_undefined;
 
     tf = transformer_combine(tf, ctf);
     npre = transformer_apply(ctf, cpre);
     free_transformer(cpre);
+    free_transformer(cpre_r);
     cpre = npre;
   }
   free_transformer(cpre);
