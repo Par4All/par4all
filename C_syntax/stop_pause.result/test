@@ -29,6 +29,5 @@ void STOP_PAUSE()
 l1:      ;
    else if (L3&&L4)
       X = X+1.;
-   
 
 }

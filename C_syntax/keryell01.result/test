@@ -5,6 +5,7 @@ int keryell01(void)
 {
    static int i;
    static int state = 0;
+   ;
    if (state==0)
       goto switch_1_case_0;
    if (state==1)
@@ -37,7 +38,8 @@ int keryell01(void)
 switch_2_case_1:   ;
    i++;
 l99999:   ;
-/* start of function */   if (!(i<10)) goto break_1;
+/* start of function */
+   if (!(i<10)) goto break_1;
    state = 1;
    /* so we will come back to "case 1" */
    return i;
@@ -67,7 +69,8 @@ switch_2_case_1:   ;
    i++;
 l99999:   ;
 //               <must be read   >: i
-/* start of function */   if (!(i<10)) goto break_1;
+/* start of function */
+   if (!(i<10)) goto break_1;
 //               <must be written>: state
    state = 1;
 //               <must be read   >: i
@@ -113,7 +116,8 @@ l99999:   ;
 
 //  T() {}
 
-/* start of function */   if (!(i<10)) goto break_1;
+/* start of function */
+   if (!(i<10)) goto break_1;
 
 //  T(state) {state==1}
 

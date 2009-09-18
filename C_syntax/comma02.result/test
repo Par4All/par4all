@@ -1,3 +1,6 @@
+
+Parsed printed file for "main"
+
 int main()
 {
    int i;
@@ -5,7 +8,12 @@ int main()
 
    i = (j = 1, 2);
    i = 3, j = 4;
+
+   i = foo(-5, -6);
 }
+
+Code for "main"
+
 int main()
 {
    int i;
@@ -13,7 +21,12 @@ int main()
 
    i = (j = 1, 2);
    i = 3, j = 4;
+
+   i = foo(-5, -6);
 }
+
+Proper effects for "main"
+
 int main()
 {
    int i;
@@ -23,7 +36,26 @@ int main()
    i = (j = 1, 2);
 //               <must be written>: i j
    i = 3, j = 4;
+//               <must be written>: i
+
+   i = foo(-5, -6);
 }
+
+Transformers for "foo"
+
+
+//  T(foo) {i+j==foo}
+
+int foo(int i, int j)
+{
+
+//  T(foo) {i+j==foo}
+
+   return i+j;
+}
+
+Transformers for "main"
+
 
 //  T() {0==-1}
 
@@ -40,7 +72,15 @@ int main()
 //  T() {0==-1}
 
    i = 3, j = 4;
+
+//  T() {0==-1}
+
+
+   i = foo(-5, -6);
 }
+
+Preconditions for "main"
+
 
 //  P() {}
 
@@ -57,4 +97,22 @@ int main()
 //  P(i,j) {i==2, j==1}
 
    i = 3, j = 4;
+
+//  P() {0==-1}
+
+
+   i = foo(-5, -6);
+}
+
+Preconditions for "foo"
+
+
+//  P() {}
+
+int foo(int i, int j)
+{
+
+//  P() {}
+
+   return i+j;
 }
