@@ -55,7 +55,7 @@ class workspace:
 		"""[[internal]] init the workspace from a list of sources"""
 		workspace=os.path.basename(os.tempnam("","PYPS"))
 		def helper(x,y):
-			if type(y).__name__ == 'list':return x+y
+			if isinstance(y,list):return x+y
 			else: return x+[y]
 		sources=reduce(helper,sources2,[])
 		pypips.create(workspace, sources)
@@ -121,13 +121,13 @@ class workspace:
 				os.makedirs(indir)
 			if not os.path.isdir(indir): raise ValueError("'" + indir + "' is not a directory") 
 			for s in os.listdir(self.dir()+"Src"):
-				cp=indir+os.sep+s
-				shutil.copy(self.dir()+"Src"+os.sep+s,cp)
+				cp=os.path.join(indir,s)
+				shutil.copy(os.path.join(self.dir(),"Src",s),cp)
 				saved+=[cp]
 		else:
 			for s in os.listdir(self.dir()+"Src"):
 				cp=with_prefix+s
-				shutil.copy(self.dir()+"Src"+os.sep+s,cp)
+				shutil.copy(os.path.join(self.dir(),"Src",s),cp)
 				saved+=[cp]
 		return saved
 

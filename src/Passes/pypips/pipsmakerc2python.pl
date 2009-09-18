@@ -17,8 +17,14 @@ close INPUT;
 sub print_python_method {
     my $name=$_[0];
     my $doc = $_[1];
-    $doc =~s/\n+//m;
-    $name =~s/\s/_/;
+    $doc =~s/(\\begin{.*?})|(\\end{.*?})|(\\label{.*?})//gms;
+    $doc =~s/\\_/_/gms;
+	$doc =~s/~/ /gms;
+    $doc =~s/\\verb\+(.*?)\+/$1/gms;
+	$doc =~s/\\verb\|(.*?)\|/$1/gms;
+	$doc =~s/\\verb\/(.*?)\//$1/gms;
+	$doc =~s/\\PIPS{}/PIPS/gms;
+    $name =~s/\s/_/g;
     print <<EOF
 
 	def $name(self,**props):
