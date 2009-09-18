@@ -12,7 +12,7 @@ void assign02()
   int k;
   int n;
 
-  n++; 
+  n++;
   j = k = 2;
   /* i is assigned before k, left-to-right evaluation */
   i = j, k = i;

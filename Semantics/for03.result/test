@@ -7,11 +7,11 @@ int for03()
    int i;
    int j;
 
-   for ((i = 0, j = 0);i<500;(i += 128, j++))
+   for (i = 0, j = 0;i<500;i += 128, j++)
       x[i] = 0;
    
    //printf("%d, %d\n", i, j);
-
+   
    return 0;
 }
 
@@ -29,7 +29,7 @@ int for03()
 //  T(i,j) {i==128j, 0<=j, j<=3}
 
 
-   for ((i = 0, j = 0);i<500;(i += 128, j++))
+   for (i = 0, j = 0;i<500;i += 128, j++)
 
 //  T() {i==128j, 0<=j, j<=3}
 
@@ -39,6 +39,6 @@ int for03()
 
    
    //printf("%d, %d\n", i, j);
-
+   
    return 0;
 }

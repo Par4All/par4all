@@ -30,7 +30,7 @@ echo
 apply UNSPLIT
 shell cc  variable_expansion02.c -o  ve
 shell cc  variable_expansion02.database/Src/variable_expansion02.c -o variable_expansion02.database/Src/ve
-shell if test `variable_expansion02.database/Src/ve` = `ve` ; then echo "ok"; else echo "ko" ; fi
+shell if test `variable_expansion02.database/Src/ve` = `./ve` ; then echo "ok"; else echo "ko" ; fi
 shell rm -f variable_expansion02.database/Src/ve ve
 
 close

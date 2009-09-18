@@ -3,7 +3,7 @@ Parsed code for "extern03!"
 
 float delta = 1.;
 float delta2 = delta+2.;
-extern  main();
+extern int main();
 
 Cumulated effects for "main"
 

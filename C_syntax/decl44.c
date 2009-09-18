@@ -1,5 +1,4 @@
-/* Check implicit declarations */
-
+/* Check implicit type declarations */
 
 void decl44()
 {

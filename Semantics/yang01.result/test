@@ -178,7 +178,7 @@ int bar()
          else
             t--;
          // BEGIN BLOCK
-
+         
          _return0 = t;
          // END BLOCK
          // END BLOCK
@@ -195,14 +195,14 @@ int bar()
       else
          t--;
       // BEGIN BLOCK
-
+      
       _return1 = t;
       // END BLOCK
       // END BLOCK
    }
    y = _return1;
    // END BLOCK
-
+   
    return y;
    // END BLOCK
 }
@@ -230,7 +230,7 @@ int bar()
          else
             t--;
          // BEGIN BLOCK
-
+         
          _return0 = t;
          // END BLOCK
          // END BLOCK
@@ -247,14 +247,14 @@ int bar()
       else
          t--;
       // BEGIN BLOCK
-
+      
       _return1 = t;
       // END BLOCK
       // END BLOCK
    }
    y = _return1;
    // END BLOCK
-
+   
    return y;
    // END BLOCK
 }
@@ -312,7 +312,7 @@ int bar()
 //  P() {0==-1}
 
          // BEGIN BLOCK
-
+         
          _return0 = t;
          // END BLOCK
          // END BLOCK
@@ -348,7 +348,7 @@ int bar()
 //  P() {0==-1}
 
       // BEGIN BLOCK
-
+      
       _return1 = t;
       // END BLOCK
       // END BLOCK
@@ -361,7 +361,7 @@ int bar()
 //  P() {0==-1}
 
    // END BLOCK
-
+   
    return y;
    // END BLOCK
 }
@@ -401,7 +401,9 @@ int bar()
 
          // BEGIN BLOCK
          int t = x+2;
+         
          // BEGIN BLOCK
+         
          // END BLOCK
          // END BLOCK
       }
@@ -413,11 +415,13 @@ int bar()
 
       // BEGIN BLOCK
       int t = y+2;
+      
       // BEGIN BLOCK
+      
       // END BLOCK
       // END BLOCK
    }
    // END BLOCK
-
+   
    // END BLOCK
 }

@@ -15,16 +15,16 @@ void assign02()
    j = k = 2;                                                           /*0010*/
 //               <must be read   >: i j
 //               <must be written>: i k
-   (i = j, k = i);
+   i = j, k = i;
 //               <must be read   >: i j
 //               <must be written>: i j
-   (j = 2*i, i = j+1);
+   j = 2*i, i = j+1;
 //               <must be read   >: i
    /* i is assigned before k, left-to-right evaluation */
    
    
    
-
+   
    foo(i);                                                              /*0016*/
 }
 
@@ -44,16 +44,16 @@ void assign02()
    j = k = 2;                                                           /*0010*/
 //               <must be read   >: i j
 //               <must be written>: i k
-   (i = j, k = i);
+   i = j, k = i;
 //               <must be read   >: i j
 //               <must be written>: i j
-   (j = 2*i, i = j+1);
+   j = 2*i, i = j+1;
 //               <must be read   >: i
    /* i is assigned before k, left-to-right evaluation */
    
    
    
-
+   
    foo(i);                                                              /*0016*/
 }
 
@@ -80,11 +80,11 @@ void assign02()
 
 //  T(i,k) {i==j, i==k}
 
-   (i = j, k = i);
+   i = j, k = i;
 
 //  T(i,j) {i==2i#init+1, 2i#init==j}
 
-   (j = 2*i, i = j+1);
+   j = 2*i, i = j+1;
 
 //  T() {}
 
@@ -92,7 +92,7 @@ void assign02()
    
    
    
-
+   
    foo(i);                                                              /*0016*/
 }
 
@@ -119,11 +119,11 @@ void assign02()
 
 //  P(j,k,n) {i==1, j==2, k==2}
 
-   (i = j, k = i);
+   i = j, k = i;
 
 //  P(i,j,k,n) {i==2, j==2, k==2}
 
-   (j = 2*i, i = j+1);
+   j = 2*i, i = j+1;
 
 //  P(i,j,k,n) {i==5, j==4, k==2}
 
@@ -131,7 +131,7 @@ void assign02()
    
    
    
-
+   
    foo(i);                                                              /*0016*/
 }
 
