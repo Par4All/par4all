@@ -1,0 +1,13 @@
+setenv WSPC decl44
+setenv MAIN $WSPC.c
+delete $WSPC
+create $WSPC $MAIN
+activate C_PARSER
+activate C_SYMBOL_TABLE
+activate PRINT_CODE
+setproperty PRETTYPRINT_C_CODE TRUE
+display SYMBOL_TABLE_FILE[decl44]
+display PRINTED_FILE[decl44]
+close
+delete $WSPC
+quit
