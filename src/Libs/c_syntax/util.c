@@ -1379,6 +1379,13 @@ type UpdateType(type t1, type t2)
     else
       return t2;
   }
+
+  if(type_undefined_p(t2)) {
+    /* This may happen when a type is implicitly declared as in
+       "extern m[3];" */
+    t2 = make_scalar_integer_type(DEFAULT_INTEGER_TYPE_SIZE);
+  }
+
   switch (type_tag(t1))
     {
     case is_type_variable:
