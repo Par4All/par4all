@@ -290,7 +290,7 @@ static void in_effects_of_forloop(forloop f)
   statement current;
   list /* of effect */ lin;
 
-  pips_debug(9, "considering for loop 0x%p\n", (void *) f);
+  pips_debug(1, "considering for loop 0x%p\n", (void *) f);
 
   current = effects_private_current_stmt_head();
   lin = load_rw_effects_list(current);
@@ -310,7 +310,7 @@ static void in_effects_of_whileloop(whileloop w)
   statement current;
   list /* of effect */ lin;
 
-  pips_debug(9, "considering while loop 0x%p\n", (void *) w);
+  pips_debug(1, "considering while loop 0x%p\n", (void *) w);
 
   current = effects_private_current_stmt_head();
   lin = load_rw_effects_list(current);

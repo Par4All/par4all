@@ -2105,37 +2105,54 @@ region reg;
  */
 static void region_translation_of_predicate(region reg, entity to_func)
 {
-    pips_debug(8, "region before translation: \n%s\n", region_to_string(reg));
-
-    if (!entity_scalar_p(reference_variable(region_any_reference(reg)))) 
-    {
-	/* we add the system representing the association between 
-	 * actual and formal parameters to the region */
-	region_sc_append_and_normalize(reg, get_translation_context_sc(),2);
-
-	/* then, we eliminate all the scalar variables that appear in the formal 
-	 * parameters */
-	ifdebug(8)
-	{
-	    pips_debug(8, "variables to eliminate: \n");
-	    print_arguments(get_arguments_to_eliminate());
-	}
-	if (must_regions_p()) 	  
-	    region_exact_projection_along_parameters
-		(reg, get_arguments_to_eliminate());
-	else 
-	    region_non_exact_projection_along_parameters
-		(reg, get_arguments_to_eliminate());
-	
-	pips_debug(8, "region after translation of arguments: \n%s\n", 
-		   region_to_string(reg));
-	debug_region_consistency(reg);
-    }
-    
+  convex_region_descriptor_translation(reg);
     region_translate_global_values(to_func, reg);
     debug_region_consistency(reg);
     
-    pips_debug(8, "region after translation of globals : \n%s\n", 
-		   region_to_string(reg));
+    ifdebug(8)
+      {	
+	pips_debug(8, "region after translation of globals: \n");
+	print_region(reg);
+      }    
 }
 
+void convex_region_descriptor_translation(effect eff)
+{
+  ifdebug(8)
+    {
+      pips_debug(8, "region before translation: \n");
+      print_region(eff);
+    }
+
+  if (!sc_rn_p(region_system(eff))) 
+    {
+      /* we add the system representing the association between 
+       * actual and formal parameters to the region */
+      region_sc_append_and_normalize(eff, get_translation_context_sc(),2);
+      
+      /* then, we eliminate all the scalar variables that appear in the formal 
+       * parameters */
+      ifdebug(8)
+	{
+	  pips_debug(8, "variables to eliminate: \n");
+	  print_arguments(get_arguments_to_eliminate());
+	}
+      if (must_regions_p()) 	  
+	region_exact_projection_along_parameters
+	  (eff, get_arguments_to_eliminate());
+      else 
+	region_non_exact_projection_along_parameters
+	  (eff, get_arguments_to_eliminate());
+      
+      
+      debug_region_consistency(eff);
+    }
+  
+  ifdebug(8)
+    {	
+      pips_debug(8, "region after translation of arguments: \n");
+      print_region(eff);
+    }   
+  
+  
+}

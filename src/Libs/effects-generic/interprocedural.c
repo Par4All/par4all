@@ -51,6 +51,8 @@
 #define max(a,b) (((a)>(b))?(a):(b))
 
 
+
+
 /**************************************************** FORTRAN */
 
 /**
@@ -295,7 +297,7 @@ list generic_c_effects_backward_translation(entity callee,
       pips_debug(2, "with actual arguments :\n");
       print_expressions(real_args);
       pips_debug(2, "and effects :\n");
-      print_effects(l_sum_eff);
+      (*effects_prettyprint_func)(l_sum_eff);
     }
 
   (*effects_translation_init_func)(callee, real_args);
@@ -315,9 +317,9 @@ list generic_c_effects_backward_translation(entity callee,
 	  /* This effect must be a global effect. It does not require
 	     translation in C. However, it may not be in the scope of
 	     the caller. */
-	  /* not generic : for regions we also have to translate the predicate
-	     BC */
-	  l_eff = gen_nconc(l_eff, CONS(EFFECT, copy_effect(eff), NIL));
+	  eff = copy_effect(eff);
+	  (*effect_descriptor_interprocedural_translation_op)(eff);	   
+	  l_eff = gen_nconc(l_eff,CONS(EFFECT, copy_effect(eff), NIL));
 
 	  /* remove the current element from the list */
 	  if (l_begin == l_current)
@@ -383,7 +385,7 @@ list generic_c_effects_backward_translation(entity callee,
 	  list l_eff_on_current_formal = NIL;
 
 
-	  pips_debug(5, "corresponding formal argument :%s",
+	  pips_debug(5, "corresponding formal argument :%s\n",
 		     entity_name(dummy_identifier(parameter_dummy(formal_arg)))
 		     );
 	  /* first build the list of effects on the current formal argument */

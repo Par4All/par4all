@@ -1588,6 +1588,14 @@ type intrinsic_call_to_type(call c)
 
 	  t = expression_to_type(EXPRESSION(CAR(gen_last(args))));
 	}
+      else if( ENTITY_CONDITIONAL_P(f))
+	{
+	  /* let us assume that the two last arguments have the same
+	   type : basic_maximum does not preserve types enough
+	  (see Effects/lhs01.c, expression *(i>2?&i:&j) ). BC.
+	  */
+	  t = expression_to_type(EXPRESSION(CAR(CDR(args))));
+	}
       else
 	{
 
@@ -1681,7 +1689,7 @@ type expression_to_type(expression exp)
   ifdebug(6){
     pips_debug(6, "begins with expression :");
     print_expression(exp);
-    pips_debug(6, "\n");
+    fprintf(stderr, "\n");
   }
 
   switch(syntax_tag(s_exp))
@@ -1808,26 +1816,26 @@ type expression_to_type(expression exp)
 	pips_debug(6, "subscript case \n");
 
 	while (!ENDP(l_inds))
-    {
-        if(!ENDP(cd))
-        {
-            POP(cd);
-            POP(l_inds);
-        }
-        else
-        {
-            pips_assert("reference has too many indices : pointer expected\n", basic_pointer_p(cb));
-            ct= basic_pointer(cb);
-            if( type_variable_p(ct) ) {
-                cb = variable_basic(type_variable(ct));
-                cd = variable_dimensions(type_variable(ct));
-            }
-            else {
-                pips_internal_error("unhandled case\n");
-            }
-        }
-    }
-
+	  {
+	    if(!ENDP(cd))
+	      {
+		POP(cd);		
+	      }
+	    else
+	      {
+		pips_assert("reference has too many indices : pointer expected\n", basic_pointer_p(cb));
+		ct= basic_pointer(cb);
+		if( type_variable_p(ct) ) {
+		  cb = variable_basic(type_variable(ct));
+		  cd = variable_dimensions(type_variable(ct));
+		}
+		else {
+		  pips_internal_error("unhandled case\n");
+		}
+	      }
+	    POP(l_inds);	
+	  }
+	
 	/* Warning : qualifiers are set to NIL, because I do not see
 	   the need for something else for the moment. BC.
 	*/
@@ -1843,6 +1851,16 @@ type expression_to_type(expression exp)
 	t = expression_to_type(application_function(syntax_application(s_exp)));
 	break;
       }
+    case is_syntax_va_arg:
+      {
+	pips_debug(6, "va_arg case\n");
+	list vararg_list = syntax_va_arg(s_exp);
+	sizeofexpression soe = SIZEOFEXPRESSION(CAR(CDR(vararg_list)));
+
+	t = copy_type(sizeofexpression_type(soe));
+	break;
+      }
+      
     default:
       pips_internal_error("Bad syntax tag %d\n", syntax_tag(s_exp));
       /* Never go there... */
@@ -2342,11 +2360,14 @@ type basic_concrete_type(type t)
 	    type st = entity_type(e);
 	    
 
-	    pips_debug(8, "typedef \n");
+	    pips_debug(8, "typedef  : %s\n", type_to_string(st));
 	    nt = basic_concrete_type(st);
-	    variable_dimensions(type_variable(nt)) = 
-	      gen_nconc(gen_full_copy_list(lt), 
-			variable_dimensions(type_variable(nt)));
+	    if (type_variable_p(nt))
+	      {
+		variable_dimensions(type_variable(nt)) = 
+		  gen_nconc(gen_full_copy_list(lt), 
+			    variable_dimensions(type_variable(nt)));
+	      }
 	    
 	  }
 	else if(basic_pointer_p(bt))
@@ -2354,10 +2375,10 @@ type basic_concrete_type(type t)
 	    type npt = basic_concrete_type(basic_pointer(bt));
 	    
 	     pips_debug(8, "pointer \n");
-	    nt = make_type_variable
-	      (make_variable(make_basic_pointer(npt),
-			     gen_full_copy_list(lt),
-			     gen_full_copy_list(variable_qualifiers(vt))));
+	     nt = make_type_variable
+	       (make_variable(make_basic_pointer(npt),
+			      gen_full_copy_list(lt),
+			      gen_full_copy_list(variable_qualifiers(vt))));
 	    
 	  }
 	else

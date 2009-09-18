@@ -103,6 +103,8 @@ descriptor (*vector_to_descriptor_func)(Pvecteur);
 void (*effects_translation_init_func)(entity /* callee */, 
 				      list /* real_args */);
 void (*effects_translation_end_func)();
+void (*effect_descriptor_interprocedural_translation_op)(effect); 
+
 list (*effects_backward_translation_op)(entity, list, list, transformer);
 list (*fortran_effects_backward_translation_op)(entity, list, list, transformer);
 list (*effects_forward_translation_op)(entity /* callee */, list /* args */,

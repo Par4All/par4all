@@ -54,15 +54,16 @@
 
 void simple_effects_translation_init(entity callee, list real_args )
 {
-    
-
 }
 
 void simple_effects_translation_end()
 {
-    
 }
 
+
+void simple_effect_descriptor_interprocedural_translation(eff)
+{
+}
 
 /************************************************************** INTERFACES  */
 

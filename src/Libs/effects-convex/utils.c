@@ -1532,6 +1532,71 @@ void convex_region_change_ith_dimension_expression(effect reg, expression exp,
   return;
 }
 
+
+
+/**
+ 
+ @param eff1 and eff2 are convex regions.
+ @return eff1 (which is modified) : the reference indices of eff2 
+         (accordingly shifted) are appended to the reference indices of eff1 ;
+	 and the Psystem of eff2 is appended to eff1 after renaming of phi 
+	 variables.
+ */
+effect region_append(effect eff1, effect eff2)
+{
+  list l_ind_1 = reference_indices(effect_any_reference(eff1));
+  int nb_phi_1 = (int) gen_length(l_ind_1);
+  
+  list l_ind_2 = reference_indices(effect_any_reference(eff2));
+  int nb_phi_2 = (int) gen_length(l_ind_2);
+
+  Psysteme sc2 = region_system(eff2);
+  
+  int i;
+
+  ifdebug(8) {
+    pips_debug(8, "begin with regions : \n");
+    print_region(eff1);
+    print_region(eff2);
+    pips_debug(8, "nb_phi1 = %d, nb_phi_2 = %d \n", nb_phi_1, nb_phi_2);
+  }
+
+
+  for(i=1; i<= nb_phi_2; i++)
+    {
+      l_ind_1 = gen_nconc(l_ind_1,
+			  CONS(EXPRESSION,
+			       make_phi_expression(nb_phi_1+i),
+			       NIL));
+      
+    }
+  reference_indices(effect_any_reference(eff1)) = l_ind_1;
+  
+  if(nb_phi_1 >0)
+    {
+      for(i=nb_phi_2; i>=1; i--)
+	{
+	  entity old_phi = make_phi_entity(i);
+	  entity new_phi = make_phi_entity(nb_phi_1+i);
+	  
+	  sc_variable_rename(sc2, old_phi, new_phi);	  
+	}
+    }
+
+  region_sc_append(eff1, sc2, TRUE);
+  
+  effect_approximation_tag(eff1) = 
+    approximation_and(effect_approximation_tag(eff1), 
+		      effect_approximation_tag(eff2));
+
+  ifdebug(8) {
+    pips_debug(8, "returning : \n");
+    print_region(eff1);
+  }
+  return(eff1);
+}
+
+
 
 /************************************************************ PHI ENTITIES */
 

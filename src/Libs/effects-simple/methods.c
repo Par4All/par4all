@@ -105,6 +105,7 @@ set_methods_for_proper_references()
 
     effects_translation_init_func = simple_effects_translation_init;
     effects_translation_end_func = simple_effects_translation_end;
+    effect_descriptor_interprocedural_translation_op = simple_effect_descriptor_interprocedural_translation ;
 
     effects_backward_translation_op = generic_effects_backward_translation;
     fortran_effects_backward_translation_op = simple_effects_backward_translation;
@@ -171,6 +172,7 @@ set_methods_for_cumulated_references()
 
     effects_translation_init_func = simple_effects_translation_init;
     effects_translation_end_func = simple_effects_translation_end;
+    effect_descriptor_interprocedural_translation_op = simple_effect_descriptor_interprocedural_translation ;
 
     effects_backward_translation_op = generic_effects_backward_translation;
     fortran_effects_backward_translation_op = simple_effects_backward_translation;
@@ -235,7 +237,7 @@ set_methods_for_proper_simple_effects()
     effects_sup_difference_op = effects_undefined_binary_operator;
     effects_inf_difference_op = effects_undefined_binary_operator;
     effects_transformer_composition_op =
-	effects_undefined_composition_with_transformer;
+	effects_composition_with_transformer_nop;
     effects_transformer_inverse_composition_op =
 	effects_undefined_composition_with_transformer;
     effects_precondition_composition_op =
@@ -252,6 +254,7 @@ set_methods_for_proper_simple_effects()
 
     effects_translation_init_func = simple_effects_translation_init;
     effects_translation_end_func = simple_effects_translation_end;
+    effect_descriptor_interprocedural_translation_op = simple_effect_descriptor_interprocedural_translation ;
 
     effects_backward_translation_op = generic_effects_backward_translation;
     fortran_effects_backward_translation_op = simple_effects_backward_translation;
@@ -317,6 +320,7 @@ set_methods_for_simple_effects()
 
     effects_translation_init_func = simple_effects_translation_init;
     effects_translation_end_func = simple_effects_translation_end;
+    effect_descriptor_interprocedural_translation_op = simple_effect_descriptor_interprocedural_translation ;
 
     effects_backward_translation_op = simple_effects_backward_translation;
     fortran_effects_backward_translation_op = simple_effects_backward_translation;

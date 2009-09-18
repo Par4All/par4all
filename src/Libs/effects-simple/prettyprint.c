@@ -376,8 +376,13 @@ print_effects( list pc)
 
 void print_effect(effect e)
 {
-  effect_consistent_p(e);
-  fprintf(stderr, "\t");
-  print_words(stderr, words_effect(e));
-  fprintf(stderr, "\n");
+  if(!effect_undefined_p(e))
+    {
+      effect_consistent_p(e);
+      fprintf(stderr, "\t");
+      print_words(stderr, words_effect(e));
+      fprintf(stderr, "\n");
+    }
+  else
+    fprintf(stderr,"\t effect undefined\n");
 }

@@ -281,7 +281,8 @@ list generic_p_proper_effect_of_reference(reference ref,
 
       *pme = (*reference_to_effect_func)
 	(ref, write_p?make_action_write():make_action_read());
-      pips_assert("*pme is wekly consistent", region_weakly_consistent_p(*pme));
+      if(!effect_undefined_p(*pme))
+	pips_assert("*pme is wekly consistent", region_weakly_consistent_p(*pme));
     }
 
   /* we must add the read effects on the indices ; these reads are performed
@@ -586,7 +587,30 @@ list generic_proper_effects_of_complex_address_expression(expression add_exp, ef
 		;
 	      }
 	  }
-	  else 
+	  else if (syntax_va_arg_p(expression_syntax(s_exp)))
+	    {
+	      /* there should be more work here, but va_arg is very poorly handled
+		 everywhere for the moment. BC 
+	      */
+	      /* we generated an effect on the va_list, and that is all */
+	      list vararg_list = syntax_va_arg(expression_syntax(s_exp));
+	      sizeofexpression soe = SIZEOFEXPRESSION(CAR(vararg_list));
+	      
+	      pips_debug(4,"The dereferenced expression is a va_arg\n");
+	      
+	      le = generic_proper_effects_of_complex_address_expression(sizeofexpression_expression(soe), pme, TRUE); 
+	      /* and we must add an anywhere effect because we don't know where
+		 the dereferenced location is. 
+	      */
+	      le = CONS(EFFECT, 
+			make_anywhere_effect
+			(write_p?make_action_write():make_action_read()),
+			le);
+	      result_computed_p = TRUE;
+	      finished_p = TRUE;
+	      
+	    }
+	  else
 	    {
 	      /* This is not a call, go down recursively */
 	      pips_debug(4,"The dereferenced expression is not a call itself : we go down recursively\n");
@@ -878,13 +902,30 @@ list generic_proper_effects_of_address_expression(expression addexp, int write_p
 	if(!effect_undefined_p(e)) 
 	  {
 	    transformer context = effects_private_current_context_head();
-	    le = CONS(EFFECT, e, le);	    
+
+	    type addexp_t = expression_to_type(addexp);
+
+		  
+	    /* we add the read effect if it's not an array name
+	    */
+	    if (type_variable_p(addexp_t) && 
+		ENDP(variable_dimensions(type_variable(addexp_t))))
+	      {
+		pips_debug(8, "adding main read effect \n"); 
+		le = CONS(EFFECT, e, le);
+	      }
+	    else
+	      {
+		pips_debug(8, "main read effect is on array name : discarded\n");
+		free_effect(e);
+	      }
+
 	    (*effects_precondition_composition_op)(le, context);
 	    
 	  }	
 
 	ifdebug(8) {
-	  pips_debug(8, "Effect for a call:\n");
+	  pips_debug(8, "Effect for a call or a subscripted expression:\n");
 	  (*effects_prettyprint_func)(le);
 	}
 	break;
@@ -1148,7 +1189,7 @@ generic_proper_effects_of_external(entity func, list args)
 	list func_eff;
 	transformer context;
 
-        /* Get the in summary effects of "func". */	
+        /* Get the summary effects of "func". */	
 	func_eff = (*db_get_summary_rw_effects_func)(func_name);
 
 	if(!check_sdfi_effects_p(func, func_eff))
@@ -1171,10 +1212,6 @@ generic_proper_effects_of_external(entity func, list args)
  * @return the list of effects found.
  * @param c, a call, which can be a call to a subroutine, but also
  * to an function, or to an intrinsic, or even an assignement.
- * And a pointer that will be the proper effects of the call; NIL,
- * except for an intrinsic (assignment or real FORTRAN intrinsic).
- * modifies : nothing.
- * comment  :	
  */
 list 
 generic_r_proper_effects_of_call(call c)
