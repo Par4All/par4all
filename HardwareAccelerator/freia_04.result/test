@@ -267,6 +267,7 @@ freia_status freia_04(freia_data2d *o, freia_data2d *i, int32_t *k, int32_t inf,
    // m  = min(t4)
    // o  = t4 + t3
    freia_04_helper_0_0_0(o, i, k, k, inf, sup, bin, v, inf, sup, bin, m);              /*0024*/
-
+   
+   
    return FREIA_OK;                                                     /*0039*/
 }

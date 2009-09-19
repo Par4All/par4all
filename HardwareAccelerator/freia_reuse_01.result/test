@@ -14,7 +14,7 @@ freia_status freia_reuse_01(freia_data2d *o0, freia_data2d *o1, freia_data2d *i,
    freia_aipo_sub(o1, o1, t);                                           /*0013*/
    
    //freia_common_destruct_data(t);
-
+   
    return FREIA_OK;                                                     /*0017*/
 }
 
@@ -307,6 +307,6 @@ freia_status freia_reuse_01(freia_data2d *o0, freia_data2d *o1, freia_data2d *i,
    freia_reuse_01_helper_0_1_0(o1, t, i, k, k);                         /*0011*/
    
    //freia_common_destruct_data(t);
-
+   
    return FREIA_OK;                                                     /*0017*/
 }

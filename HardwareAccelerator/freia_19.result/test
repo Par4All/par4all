@@ -134,6 +134,7 @@ freia_status freia_19(freia_data2d *o, freia_data2d *i)
    // t = i
    // o = t
    freia_19_helper_0_0_0(o, i);                                         /*0012*/
-
+   
+   
    return FREIA_OK;                                                     /*0016*/
 }

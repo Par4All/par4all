@@ -297,6 +297,7 @@ freia_status freia_03(freia_data2d *o, freia_data2d *i0, freia_data2d *i1, int32
    // t7 = m()
    // o  = t6 * t7
    freia_03_helper_0_0_0(o, i0, i1, c2, c1, c3, c4, c5);                /*0025*/
-
+   
+   
    return FREIA_OK;                                                     /*0042*/
 }

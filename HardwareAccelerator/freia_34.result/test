@@ -176,6 +176,7 @@ freia_status freia_34(freia_data2d *o, freia_data2d *i, int32_t *k)
    // t2 = g(i)
    // o  = t1 - t2
    freia_34_helper_0_0_0(o, i, k, k);                                   /*0012*/
-
+   
+   
    return FREIA_OK;                                                     /*0019*/
 }

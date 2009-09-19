@@ -1114,7 +1114,8 @@ int anr999(void)
    og = freia_common_create_data(fdin.framebpp, fdin.framewidth, fdin.frameheight);    /*0034*/
 
    freia_common_rx_image(in, &fdin);                                    /*0036*/
-
+   
+   
    anr999_helper_0_0_0(in, &measure_min, &measure_vol);                 /*0038*/
 
    anr999_helper_0_0_1(od, og, in, freia_morpho_kernel_8c, freia_morpho_kernel_8c);    /*0041*/

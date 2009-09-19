@@ -193,6 +193,7 @@ freia_status freia_02(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
    // t2 = t1 + i0
    // o  = t2 ^ i0
    freia_02_helper_0_0_0(o, i0, i1);                                    /*0013*/
-
+   
+   
    return FREIA_OK;                                                     /*0020*/
 }

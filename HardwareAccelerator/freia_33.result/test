@@ -638,10 +638,13 @@ freia_status freia_33(freia_data2d *o, freia_data2d *i, uint32_t *k)
    freia_33_helper_0_0_0(X0, i, &sA, k, &sB);                           /*0017*/
    // B
    freia_33_helper_0_1_0(X1, i, sA-10, sA-1, false, k, &sC);            /*0019*/
-   // A// A// C
+   // A
+   // A
+   // C
    freia_33_helper_0_2_0(tC, tD, X0, X1, sC-10, sC-1, false, sB-10, sB-1, false);      /*0025*/
    freia_33_helper_0_3_0(tC2, tC);                                      /*0026*/
-   // B// D
+   // B
+   // D
    freia_33_helper_0_4_0(o, tC2, tD);                                   /*0033*/
 
    freia_common_destruct_data(X0);                                      /*0035*/

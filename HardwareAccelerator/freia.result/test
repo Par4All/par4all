@@ -189,7 +189,7 @@ freia_status freia_aipo_sup_const(freia_data2d *o, const freia_data2d *i, int32_
 }
 freia_status freia_aipo_threshold(freia_data2d *o, const freia_data2d *i, int32_t c1, int32_t c2, bool b)
 {
-   o->stuff = (i->stuff|b?c1:c2);                                       /*0196*/
+   o->stuff = i->stuff|b?c1:c2;                                         /*0196*/
    return FREIA_OK;                                                     /*0196*/
 }
 freia_status freia_aipo_xor(freia_data2d *o, const freia_data2d *i0, const freia_data2d *i1)
@@ -602,7 +602,7 @@ freia_status freia_aipo_threshold(freia_data2d *o, const freia_data2d *i, int32_
 //               <may be read    >: c1 c2
 //               <must be read   >: b i i[0][4] o
 //               <must be written>: o[0][4]
-   o->stuff = (i->stuff|b?c1:c2);                                       /*0196*/
+   o->stuff = i->stuff|b?c1:c2;                                         /*0196*/
    return FREIA_OK;                                                     /*0196*/
 }
 //               <must be read   >: i0 i0[0][4] i1 i1[0][4] o
