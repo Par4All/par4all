@@ -58,13 +58,13 @@
  * ??? conversions between 8/16 bits images are definitely not handled here.
  */
 static const freia_api_t FREIA_AIPO_API[] = {
-  { "undefined", "?", 0, 0, 0, 0, NO_PARAM, NO_PARAM,
+  { "undefined", "?", NULL, 0, 0, 0, 0, NO_PARAM, NO_PARAM,
     { 0, NO_POC, alu_unused, NO_MES }
   },
   {
     // ARITHMETIC
     // binary
-    AIPO "add", "+", 1, 2, 0, 0, NO_PARAM, NO_PARAM,
+    AIPO "add", "+", AIPO "add", 1, 2, 0, 0, NO_PARAM, NO_PARAM,
     // spoc_hw_t
     {
       // parts used...
@@ -77,151 +77,156 @@ static const freia_api_t FREIA_AIPO_API[] = {
       NO_MES
     }
   },
-  { AIPO "sub", "-", 1, 2, 0, 0, NO_PARAM, NO_PARAM,
+  { AIPO "sub", "-", NULL, 1, 2, 0, 0, NO_PARAM, NO_PARAM,
     { spoc_input_0|spoc_input_1|spoc_output_0|spoc_alu,
       NO_POC, alu_sub_01, NO_MES }
   },
-  { AIPO "mul", "*",  1, 2, 0, 0, NO_PARAM, NO_PARAM,
+  { AIPO "mul", "*",  AIPO "mul", 1, 2, 0, 0, NO_PARAM, NO_PARAM,
     { spoc_input_0|spoc_input_1|spoc_output_0|spoc_alu,
       NO_POC, alu_mul, NO_MES }
   },
-  { AIPO "div", "/", 1, 2, 0, 0, NO_PARAM, NO_PARAM,
+  { AIPO "div", "/", NULL, 1, 2, 0, 0, NO_PARAM, NO_PARAM,
     { spoc_input_0|spoc_input_1|spoc_output_0|spoc_alu,
       NO_POC, alu_div_01, NO_MES }
   },
-  { AIPO "addsat", "+s", 1, 2, 0, 0, NO_PARAM, NO_PARAM,
+  { AIPO "addsat", "+s", AIPO "addsat", 1, 2, 0, 0, NO_PARAM, NO_PARAM,
     { spoc_input_0|spoc_input_1|spoc_output_0|spoc_alu,
       NO_POC, alu_addsat, NO_MES }
   },
-  { AIPO "subsat", "-s", 1, 2, 0, 0, NO_PARAM, NO_PARAM,
+  { AIPO "subsat", "-s", NULL, 1, 2, 0, 0, NO_PARAM, NO_PARAM,
     { spoc_input_0|spoc_input_1|spoc_output_0|spoc_alu,
       NO_POC, alu_subsat_01, NO_MES }
   },
-  { AIPO "absdiff", "-|", 1, 2, 0, 0, NO_PARAM, NO_PARAM,
+  { AIPO "absdiff", "-|", AIPO "absdiff", 1, 2, 0, 0, NO_PARAM, NO_PARAM,
     { spoc_input_0|spoc_input_1|spoc_output_0|spoc_alu,
       NO_POC, alu_abssub_01, NO_MES }
   },
-  { AIPO "inf", "<", 1, 2, 0, 0, NO_PARAM, NO_PARAM,
+  { AIPO "inf", "<", AIPO "sup", 1, 2, 0, 0, NO_PARAM, NO_PARAM,
     { spoc_input_0|spoc_input_1|spoc_output_0|spoc_alu,
       NO_POC, alu_inf_01, NO_MES }
   },
-  { AIPO "sup", ">", 1, 2, 0, 0, NO_PARAM, NO_PARAM,
+  { AIPO "sup", ">", AIPO "inf", 1, 2, 0, 0, NO_PARAM, NO_PARAM,
     { spoc_input_0|spoc_input_1|spoc_output_0|spoc_alu,
       NO_POC, alu_sup_01, NO_MES }
   },
-  { AIPO "and", "&", 1, 2, 0, 0, NO_PARAM, NO_PARAM,
+  { AIPO "and", "&", AIPO "and", 1, 2, 0, 0, NO_PARAM, NO_PARAM,
     { spoc_input_0|spoc_input_1|spoc_output_0|spoc_alu,
       NO_POC, alu_and, NO_MES }
   },
-  { AIPO "or", "|", 1, 2, 0, 0, NO_PARAM, NO_PARAM,
+  { AIPO "or", "|", AIPO "or", 1, 2, 0, 0, NO_PARAM, NO_PARAM,
     { spoc_input_0|spoc_input_1|spoc_output_0|spoc_alu,
       NO_POC, alu_or, NO_MES }
   },
-  { AIPO "xor", "^", 1, 2, 0, 0, NO_PARAM, NO_PARAM,
+  { AIPO "xor", "^", AIPO "xor", 1, 2, 0, 0, NO_PARAM, NO_PARAM,
     { spoc_input_0|spoc_input_1|spoc_output_0|spoc_alu,
       NO_POC, alu_xor, NO_MES }
   },
   // unary
-  { AIPO "not", "!", 1, 1, 0, 0, NO_PARAM, NO_PARAM,
+  { AIPO "not", "!", NULL, 1, 1, 0, 0, NO_PARAM, NO_PARAM,
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_not_0, NO_MES }
   },
-  { AIPO "add_const", "+.", 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
+  { AIPO "add_const", "+.", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_add_0cst, NO_MES }
   },
-  { AIPO "inf_const", "<.", 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
+  { AIPO "inf_const", "<.", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_inf_0cst, NO_MES }
   },
-  { AIPO "sup_const", ">.", 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
+  { AIPO "sup_const", ">.", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_sup_0cst, NO_MES }
   },
-  { AIPO "sub_const", "-.", 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
+  { AIPO "sub_const", "-.", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_sub_0cst, NO_MES }
   },
-  { AIPO "and_const", "&.", 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
+  { AIPO "and_const", "&.", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_and_0cst, NO_MES }
   },
-  { AIPO "or_const", "|.", 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
+  { AIPO "or_const", "|.", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_or_0cst, NO_MES }
   },
-  { AIPO "xor_const", "^.", 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
+  { AIPO "xor_const", "^.", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_xor_0cst, NO_MES }
   },
-  { AIPO "addsat_const", "+s.", 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
+  { AIPO "addsat_const", "+s.", NULL, 1, 1, 0, 1, NO_PARAM,
+    { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_addsat_0cst, NO_MES }
   },
-  { AIPO "subsat_const", "-s.", 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
+  { AIPO "subsat_const", "-s.", NULL, 1, 1, 0, 1, NO_PARAM,
+    { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_subsat_0cst, NO_MES }
   },
-  { AIPO "absdiff_const", "-|.", 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
+  { AIPO "absdiff_const", "-|.", NULL, 1, 1, 0, 1, NO_PARAM,
+    { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_abssub_0cst, NO_MES }
   },
-  { AIPO "mul_const", "*.", 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
+  { AIPO "mul_const", "*.", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_mul_0cst, NO_MES }
   },
-  { AIPO "div_const", "/.", 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
+  { AIPO "div_const", "/.", NULL, 1, 1, 0, 1, NO_PARAM, { TY_INT, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_alu, NO_POC, alu_div_0cst, NO_MES }
   },
   // nullary
-  { AIPO "set_constant", "C", 1, 0, 0, 1, NO_PARAM, { TY_INT, NULL, NULL},
+  { AIPO "set_constant", "C", NULL, 1, 0, 0, 1, NO_PARAM, { TY_INT, NULL, NULL},
     { spoc_output_0|spoc_alu, NO_POC, alu_copy_cst, NO_MES }
   },
   // MISC
   // this one may be ignored?!
-  { AIPO "copy", "=", 1, 1, 0, 0, NO_PARAM, NO_PARAM,
+  { AIPO "copy", "=", NULL, 1, 1, 0, 0, NO_PARAM, NO_PARAM,
     { spoc_input_0|spoc_output_0, NO_POC, alu_unused, NO_MES }
   },
   { // not implemented by SPOC!
-    AIPO "cast", "=()", 1, 1, 0, 0, NO_PARAM, NO_PARAM,
+    AIPO "cast", "=()", NULL, 1, 1, 0, 0, NO_PARAM, NO_PARAM,
     { spoc_nothing, NO_POC, alu_unused, NO_MES }
   },
-  { AIPO "threshold", "thr", 1, 1, 0, 3, NO_PARAM, { TY_INT, TY_INT, TY_INT },
+  { AIPO "threshold", "thr", NULL, 1, 1, 0, 3, NO_PARAM,
+    { TY_INT, TY_INT, TY_INT },
     { spoc_input_0|spoc_output_0|spoc_th_0, NO_POC, alu_unused, NO_MES }
   },
   // MORPHO
-  { AIPO "erode_6c", "E6", 1, 1, 0, 1, NO_PARAM, { TY_PIN, NULL, NULL },
+  { AIPO "erode_6c", "E6", NULL, 1, 1, 0, 1, NO_PARAM, { TY_PIN, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_poc_0,
       { { spoc_poc_erode, 6 }, { spoc_poc_unused, 0 } }, alu_unused, NO_MES
     }
   },
-  { AIPO "dilate_6c", "D6", 1, 1, 0, 1, NO_PARAM, { TY_PIN, NULL, NULL },
+  { AIPO "dilate_6c", "D6", NULL, 1, 1, 0, 1, NO_PARAM, { TY_PIN, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_poc_0,
       { { spoc_poc_dilate, 6 }, { spoc_poc_unused, 0 } }, alu_unused, NO_MES
     }
   },
-  { AIPO "erode_8c", "E8", 1, 1, 0, 1, NO_PARAM, { TY_PIN, NULL, NULL },
+  { AIPO "erode_8c", "E8", NULL, 1, 1, 0, 1, NO_PARAM, { TY_PIN, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_poc_0,
       { { spoc_poc_erode, 8 }, { spoc_poc_unused, 0 } }, alu_unused, NO_MES
     }
   },
-  { AIPO "dilate_8c", "D8", 1, 1, 0, 1,  NO_PARAM, { TY_PIN, NULL, NULL },
+  { AIPO "dilate_8c", "D8", NULL, 1, 1, 0, 1,  NO_PARAM, { TY_PIN, NULL, NULL },
     { spoc_input_0|spoc_output_0|spoc_poc_0,
       { { spoc_poc_dilate, 8 }, { spoc_poc_unused, 0 } }, alu_unused, NO_MES
     }
   },
   // MEASURES
-  { AIPO "global_min", "min", 0, 1, 1, 0, { TY_PIN, NULL, NULL }, NO_PARAM,
+  { AIPO "global_min", "min", NULL, 0, 1, 1, 0,
+    { TY_PIN, NULL, NULL }, NO_PARAM,
     { spoc_input_0 | spoc_measure_0,
       NO_POC, alu_unused, { measure_min, measure_none }
     }
   },
-  { AIPO "global_max", "max", 0, 1, 1, 0, { TY_PIN, NULL, NULL }, NO_PARAM,
-    { spoc_input_0 | spoc_measure_0,
+  { AIPO "global_max", "max", NULL, 0, 1, 1, 0, { TY_PIN, NULL, NULL },
+    NO_PARAM, { spoc_input_0 | spoc_measure_0,
       NO_POC, alu_unused, { measure_max, measure_none }
     }
   },
-  { AIPO "global_min_coord", "min!", 0, 1, 3, 0,
+  { AIPO "global_min_coord", "min!", NULL, 0, 1, 3, 0,
     { TY_PIN, TY_PIN, TY_PIN }, NO_PARAM,
     { spoc_input_0 | spoc_measure_0,
       NO_POC, alu_unused, { measure_min_coord, measure_none }
     }
   },
-  { AIPO "global_max_coord", "max!", 0, 1, 3, 0,
+  { AIPO "global_max_coord", "max!", NULL, 0, 1, 3, 0,
     { TY_PIN, TY_PIN, TY_PIN }, NO_PARAM,
     { spoc_input_0 | spoc_measure_0,
       NO_POC, alu_unused, { measure_max_coord, measure_none }
     }
   },
-  { AIPO "global_vol", "vol", 0, 1, 1, 0,
+  { AIPO "global_vol", "vol", NULL, 0, 1, 1, 0,
     { TY_PIN, NULL, NULL }, NO_PARAM,
     { spoc_input_0 | spoc_measure_0,
       NO_POC, alu_unused, { measure_vol, measure_none }
@@ -229,17 +234,17 @@ static const freia_api_t FREIA_AIPO_API[] = {
   },
   // LINEAR
   // not implemented by SPOC!
-  { AIPO "convolution", "conv", 1, 1, 0, 3,
+  { AIPO "convolution", "conv", NULL, 1, 1, 0, 3,
     NO_PARAM, { TY_PIN, TY_UIN, TY_UIN },
     { spoc_nothing, NO_POC, alu_unused, NO_MES }
   },
   // not implemented by SPOC!
-  { AIPO "fast_correlation", "corr", 1, 2, 0, 1,
+  { AIPO "fast_correlation", "corr", NULL, 1, 2, 0, 1,
     NO_PARAM, { TY_UIN, NULL, NULL },
     { spoc_nothing, NO_POC, alu_unused, NO_MES }
   },
   // last entry
-  { NULL, NULL, 0, 0, 0, 0, NO_PARAM, NO_PARAM,
+  { NULL, NULL, NULL, 0, 0, 0, 0, NO_PARAM, NO_PARAM,
     { 0, NO_POC, alu_unused, NO_MES } }
 };
 
@@ -476,6 +481,8 @@ void hwac_replace_statement(statement s, call newc, bool kill)
   }
 }
 
+/* remove contents of statement s.
+ */
 void hwac_kill_statement(statement s)
 {
   hwac_replace_statement(s, freia_ok(), true);

@@ -32,6 +32,7 @@
 + improve generated comments
 + if only one image is used as input, put it anyway on both sides?
   may help some schedules if there are multiple successors.
++ use commutator to detect more redundancy
 - add checks in generated code (img size and so)?
 - parametric img size/depth? same as code?
 - the generated code is just a file to pips. ok???

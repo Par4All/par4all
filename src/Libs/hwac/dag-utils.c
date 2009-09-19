@@ -495,6 +495,31 @@ switch_vertex_to_a_copy(dagvtx target, dagvtx source, list tpreds)
   }
 }
 
+static bool same_operation_p(dagvtx v1, dagvtx v2)
+{
+  return
+    dagvtx_optype(v1) == dagvtx_optype(v2) &&
+    dagvtx_opid(v1) == dagvtx_opid(v2);
+}
+
+static bool commutative_operation_p(dagvtx v1, dagvtx v2)
+{
+  if (dagvtx_optype(v1) == dagvtx_optype(v2))
+  {
+    int n1 = (int) dagvtx_opid(v1), n2 = (int) dagvtx_opid(v2);
+    const freia_api_t * f1 = get_freia_api(n1);
+    return f1->commutator && hwac_freia_api_index(f1->commutator)==n2;
+  }
+  else return false;
+}
+
+static bool list_commuted_p(list l1, list l2)
+{
+  pips_assert("length 2", gen_length(l1)==2 && gen_length(l2)==2);
+  return CHUNKP(CAR(CDR(l1)))==CHUNKP(CAR(l2)) &&
+    CHUNKP(CAR(l1))==CHUNKP(CAR(CDR(l2)));
+}
+
 /* remove AIPO copies detected as useless.
  * remove identical operations...
  */
@@ -535,10 +560,16 @@ void dag_optimize(dag d)
 
 	// ??? maybe I should not remove all duplicates, because
 	// recomputing them may be chip?
-	if (dagvtx_optype(vr) == dagvtx_optype(p) &&
-	    dagvtx_opid(vr) == dagvtx_opid(p) &&
+	if (same_operation_p(vr, p) &&
 	    gen_list_equals_p(preds, (list) lp) &&
 	    same_constant_parameters(vr, p))
+	{
+	  switch_vertex_to_a_copy(vr, p, preds);
+	  switched = true;
+	  break;
+	}
+	else if (commutative_operation_p(vr, p) &&
+		 list_commuted_p(preds, (list) lp))
 	{
 	  switch_vertex_to_a_copy(vr, p, preds);
 	  switched = true;
