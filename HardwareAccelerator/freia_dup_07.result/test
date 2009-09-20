@@ -4,12 +4,12 @@
 freia_status freia_dup_07(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 {
    freia_data2d *t = freia_common_create_data(16, 128, 128);
-   // same operation performed twice, with commutator
+   // same operation performed twice, with commutation
    // t = inf(i0, i1)
    freia_aipo_inf(t, i0, i1);                                           /*0008*/
-   // o = sup(i1, i0)
+   // o = inf(i1, i0)
    // could be replaced by o = t
-   freia_aipo_sup(o, i1, i0);                                           /*0011*/
+   freia_aipo_inf(o, i1, i0);                                           /*0011*/
    freia_common_destruct_data(t);                                       /*0012*/
    return FREIA_OK;                                                     /*0013*/
 }
@@ -27,13 +27,13 @@ digraph "dag_0" {
   "o" [shape=circle];
 
   // computation vertices
-  "11 >" [shape=trapezium,orientation=270];
-  "11 >" -> "o";
+  "11 <" [shape=trapezium,orientation=270];
+  "11 <" -> "o";
   "8 <" [shape=trapezium,orientation=270];
   "8 <" -> "t";
-  "i1" -> "11 >";
+  "i1" -> "11 <";
   "i1" -> "8 <";
-  "i0" -> "11 >";
+  "i0" -> "11 <";
   "i0" -> "8 <";
 }
 // graph for dag "dag_cleaned_0" of module "freia_dup_07" in dot format
@@ -173,10 +173,10 @@ freia_status freia_dup_07_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, fre
 freia_status freia_dup_07(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 {
    freia_data2d *t = freia_common_create_data(16, 128, 128);
-   // same operation performed twice, with commutator
+   // same operation performed twice, with commutation
    // t = inf(i0, i1)
    freia_dup_07_helper_0_0_0(t, o, i0, i1, i0);                         /*0008*/
-   // o = sup(i1, i0)
+   // o = inf(i1, i0)
    // could be replaced by o = t
    freia_common_destruct_data(t);                                       /*0012*/
    return FREIA_OK;                                                     /*0013*/
