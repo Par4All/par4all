@@ -101,11 +101,11 @@ static const freia_api_t FREIA_AIPO_API[] = {
     { spoc_input_0|spoc_input_1|spoc_output_0|spoc_alu,
       NO_POC, alu_abssub_01, NO_MES }
   },
-  { AIPO "inf", "<", AIPO "sup", 1, 2, 0, 0, NO_PARAM, NO_PARAM,
+  { AIPO "inf", "<", AIPO "inf", 1, 2, 0, 0, NO_PARAM, NO_PARAM,
     { spoc_input_0|spoc_input_1|spoc_output_0|spoc_alu,
       NO_POC, alu_inf_01, NO_MES }
   },
-  { AIPO "sup", ">", AIPO "inf", 1, 2, 0, 0, NO_PARAM, NO_PARAM,
+  { AIPO "sup", ">", AIPO "sup", 1, 2, 0, 0, NO_PARAM, NO_PARAM,
     { spoc_input_0|spoc_input_1|spoc_output_0|spoc_alu,
       NO_POC, alu_sup_01, NO_MES }
   },
