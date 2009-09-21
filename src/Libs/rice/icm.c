@@ -977,8 +977,8 @@ vertex_redundant_p(vertex v,
 		ifdebug(6) { 
 		    debug(6, "vertex_redundant_p", "");
 		    fprintf(stderr, 
-			    "statement %02d is not redundant "
-			    "(dep. of %02d).\n", 
+			    "statement %td is not redundant "
+			    "(dep. of %td).\n", 
 			    statement_number(st),
 			    statement_number(y_st)); 
 		}
@@ -1268,7 +1268,7 @@ static bool icm_loop_rwt(loop l)
     statement head = stmt_head();
 
     ifdebug(5) {
-	fprintf(stderr, "TEST : loop on %s (statement %02d):\n", 
+	fprintf(stderr, "TEST : loop on %s (statement %td):\n",
 		entity_name(loop_index(l)),
 		statement_number(head));
     }
@@ -1304,7 +1304,7 @@ static bool icm_loop_rwt(loop l)
 	statement_label(head) = entity_empty_label();
 
 	ifdebug(5) {
-	    fprintf(stderr, "-> loop on %s removed (statement %02d)\n", 
+	    fprintf(stderr, "-> loop on %s removed (statement %td)\n",
 		    entity_name(loop_index(l)),
 		    statement_number(head));
 	}
@@ -1313,7 +1313,7 @@ static bool icm_loop_rwt(loop l)
     }
     else {
 	ifdebug(5) {
-	    fprintf(stderr, "-> loop on %s NOT removed (statement %02d)\n", 
+	    fprintf(stderr, "-> loop on %s NOT removed (statement %td)\n",
 		    entity_name(loop_index(l)),
 		    statement_number(head));
 	}

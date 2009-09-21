@@ -42,6 +42,7 @@
 #include "preprocessor.h"
 #include "prettyprint.h"
 #include "semantics.h"
+#include "callgraph.h"
 
 
 #define DEBUG_ON   debug_on("CLONE_DEBUG_LEVEL")

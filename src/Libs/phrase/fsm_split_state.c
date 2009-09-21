@@ -39,6 +39,7 @@
 #include "transformations.h"
 
 #include "control.h"
+#include "callgraph.h"
 
 #include "fsm_generation.h"
 

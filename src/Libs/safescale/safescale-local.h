@@ -50,11 +50,12 @@
 #include "transformer.h"
 #include "transformations.h"
 #include "control.h"
+#include "callgraph.h"
 #include "misc.h"
 #include "prettyprint.h"
 
 
-typedef struct 
+typedef struct
 {
   string searched_string;
   list list_of_statements;

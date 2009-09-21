@@ -34,6 +34,7 @@
 #include "ri-util.h"
 #include "pipsdbm.h"
 #include "control.h"
+#include "callgraph.h"
 
 #include "misc.h"
 

@@ -43,6 +43,7 @@ typedef dg_vertex_label vertex_label;
 
 #include "ricedg.h"
 #include "control.h"
+#include "callgraph.h"
 #include "preprocessor.h"
 #include "sac.h"
 

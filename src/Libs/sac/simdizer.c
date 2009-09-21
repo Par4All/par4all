@@ -56,6 +56,7 @@ typedef dg_vertex_label vertex_label;
 #include "semantics.h"
 #include "transformations.h"
 #include "control.h"
+#include "callgraph.h"
 
 #include "effects-convex.h"
 

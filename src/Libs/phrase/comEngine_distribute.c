@@ -54,6 +54,7 @@ typedef dg_vertex_label vertex_label;
 #include "ricedg.h"
 #include "semantics.h"
 #include "control.h"
+#include "callgraph.h"
 
 #include "phrase_tools.h"
 

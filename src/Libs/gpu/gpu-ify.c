@@ -11,6 +11,7 @@
 #include "control.h"
 #include "callgraph.h"
 #include "pipsdbm.h"
+#include "transformations.h"
 #include "resources.h"
 
 /** Store the loop nests found that meet the spec to be executed on a GPU,
@@ -32,7 +33,7 @@ mark_loop_to_outline(const statement s) {
   }
   if (parallel_loop_nest_depth > 0) {
     // Register the loop-nest with its depth:
-    hash_put(loop_nests_to_outline, s, (void *)parallel_loop_nest_depth);
+    hash_put(loop_nests_to_outline, s, (void *)(_int)parallel_loop_nest_depth);
     /* Since we only outline outermost loop-nest, stop digging further in
        this statement: */
     return FALSE;
@@ -47,7 +48,8 @@ gpu_ify_statement(statement s, int depth) {
   ifdebug(1) {
     pips_debug(1, "Parallel loop-nest of dephth %d\n", depth);
     print_statement(s);
-    outliner("kernel", build_new_top_level_module_name(), s);
+    list sl = CONS(STATEMENT, s, NIL);
+    outliner(build_new_top_level_module_name("kernel"), sl);
   }
 }
 

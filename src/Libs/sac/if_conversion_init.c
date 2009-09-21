@@ -57,6 +57,7 @@ typedef dg_vertex_label vertex_label;
 
 #include "expressions.h"
 #include "complexity.h"
+#include "callgraph.h"
 
 #include "sac-local.h"
 

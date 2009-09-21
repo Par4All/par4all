@@ -36,6 +36,7 @@
 #include "properties.h"
 #include "misc.h"
 #include "control.h"
+#include "callgraph.h"
 #include "effects-generic.h"
 #include "effects-simple.h"
 #include "preprocessor.h"
@@ -210,7 +211,7 @@ bool kernelize(char * module_name)
 static
 bool cannot_terapixify(gen_chunk * elem, bool *can_terapixify)
 {
-    printf("found invalid construct of type %d\n",elem->i);
+    printf("found invalid construct of type %td\n",elem->i);
     return *can_terapixify=false;
 }
 

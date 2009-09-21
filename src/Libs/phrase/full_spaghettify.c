@@ -61,6 +61,8 @@
 #include "properties.h"
 
 #include "control.h"
+#include "callgraph.h"
+
 #include "spaghettify.h"
 #include "phrase_tools.h"
 

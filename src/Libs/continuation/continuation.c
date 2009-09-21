@@ -203,7 +203,7 @@ static void statement_continuation_conditions(statement s)
 	break ;
 
     default:
-        pips_debug(1, "unexpected tag %td\n", instruction_tag(i));
+        pips_debug(1, "unexpected tag %d\n", instruction_tag(i));
     }
     current_stmt_pop();
     pips_debug(1,"END: statement %03td\n", statement_number(s));

@@ -89,7 +89,7 @@ add_statement_to_the_statement_to_statement_father_mapping(statement s)
    current_statement_rewrite(s);
 
    ifdebug(4)
-      fprintf(stderr, "add_statement_to_the_statement_to_statement_father_mapping statement %p (%#x), father %p\n",
+      fprintf(stderr, "add_statement_to_the_statement_to_statement_father_mapping statement %p (%#zx), father %p\n",
               s, statement_ordering(s), current_statement_head());
    
    /* First add the current father for this statement: */
@@ -117,7 +117,7 @@ static void
 build_statement_to_statement_father_mapping(statement s)
 {
    ifdebug(4)
-      fprintf(stderr, "build_statement_to_statement_father_mapping statement %p (%#x)\n",
+      fprintf(stderr, "build_statement_to_statement_father_mapping statement %p (%#zx)\n",
               s, statement_ordering(s));
 
    make_current_statement_stack();
@@ -219,7 +219,7 @@ build_statement_to_statement_dependence_mapping(graph dependence_graph)
                                            (char *) def);
 
                            ifdebug(6)
-                              fprintf(stderr, "\tUse: statement %p (%#x). Def: statement %p (%#x).\n",
+                              fprintf(stderr, "\tUse: statement %p (%#zx). Def: statement %p (%#zx).\n",
                                       use, statement_ordering(use),
                                       def, statement_ordering(def));
                         }
@@ -296,7 +296,7 @@ iterate_through_the_predecessor_graph(statement s,
                                       set elements_to_visit)
 {
    ifdebug(6)
-      fprintf(stderr, "iterate_through_the_predecessor_graph, statement %p (%#x).\n",
+      fprintf(stderr, "iterate_through_the_predecessor_graph, statement %p (%#zx).\n",
               s, statement_ordering(s));
 
    /* Mark the current statement as useful: */
@@ -320,7 +320,7 @@ iterate_through_the_predecessor_graph(statement s,
                                     elements_to_visit,
                                     (char *) s2);
                        ifdebug(6)
-                          fprintf(stderr, "\tstatement %p (%#x) useful by use-def.\n",
+                          fprintf(stderr, "\tstatement %p (%#zx) useful by use-def.\n",
                                   s2, statement_ordering(s2));
                  },
                     statements_set);
@@ -332,7 +332,7 @@ iterate_through_the_predecessor_graph(statement s,
       statement father = load_statement_father(s);
       set_add_element(elements_to_visit, elements_to_visit, (char *) father);
       ifdebug(6)
-         fprintf(stderr, "\tstatement %p (%#x) useful as the statement owner.\n",
+         fprintf(stderr, "\tstatement %p (%#zx) useful as the statement owner.\n",
                  father, statement_ordering(father));
    }
 
@@ -350,7 +350,7 @@ iterate_through_the_predecessor_graph(statement s,
                                elements_to_visit,
                                (char *) control_statement(pred));
                ifdebug(6)
-                  fprintf(stderr, "\tstatement unstructed IF %p (%#x) useful by control dependence.\n",
+                  fprintf(stderr, "\tstatement unstructed IF %p (%#zx) useful by control dependence.\n",
                           control_statement(pred), statement_ordering(control_statement(pred)));
             }           
          }, control_father, blocks);
@@ -384,7 +384,7 @@ use_def_deal_if_useful(statement s)
    bool this_statement_is_a_c_return;
 
    if (get_debug_level() >= 5) {
-      fprintf(stderr, "use_def_deal_if_useful: statement %p (%#x)\n",
+      fprintf(stderr, "use_def_deal_if_useful: statement %p (%#zx)\n",
               s, statement_ordering(s));
       print_text(stderr, text_statement(get_current_module_entity(), 0, s));
    }
@@ -457,7 +457,7 @@ remove_this_statement_if_useless(statement s)
       /* Since the RI need to have no label on instruction block: */
       fix_sequence_statement_attributes(s);
       if (get_debug_level() >= 6)
-         fprintf(stderr, "remove_this_statement_if_useless removes statement %p (%#x).\n", s, statement_ordering(s));
+         fprintf(stderr, "remove_this_statement_if_useless removes statement %p (%#zx).\n", s, statement_ordering(s));
    }
 }
 

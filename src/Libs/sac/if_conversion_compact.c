@@ -55,6 +55,7 @@ typedef dg_vertex_label vertex_label;
 #include "atomizer.h"
 
 #include "expressions.h"
+#include "callgraph.h"
 
 #include "sac-local.h"
 

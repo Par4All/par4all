@@ -189,7 +189,7 @@ static bool whole_loop_parallelize(loop l)
       if (!ENDP(levels)) {
 	fprintf(stderr, "\tdependence at levels: ");
 	FOREACH(INT, l, levels)
-	  fprintf(stderr, " %td", l);
+	  fprintf(stderr, " %d", l);
 	fprintf(stderr, "\n");
 
 	if (!SG_UNDEFINED_P(gs)) {
@@ -205,7 +205,7 @@ static bool whole_loop_parallelize(loop l)
       if (!ENDP(levelsop)) {
 	fprintf(stderr, "\topposite dependence at levels: ");
 	FOREACH(INT, l, levelsop)
-	  fprintf(stderr, " %td", l);
+	  fprintf(stderr, " %d", l);
 	fprintf(stderr, "\n");
 
 	if (!SG_UNDEFINED_P(gsop)) {

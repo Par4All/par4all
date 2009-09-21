@@ -51,6 +51,7 @@ typedef dg_vertex_label vertex_label;
 #include "effects-simple.h"
 #include "preprocessor.h"
 #include "statistics.h"
+#include "callgraph.h"
 
 #include "control.h"
 

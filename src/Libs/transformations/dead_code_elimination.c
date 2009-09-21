@@ -48,6 +48,7 @@
 #include "transformer.h"
 #include "semantics.h"
 #include "control.h"
+#include "callgraph.h"
 
 #include "transformations.h"
 
@@ -813,7 +814,7 @@ dead_statement_rewrite(statement s)
    instruction i = statement_instruction(s);
    tag t = instruction_tag(i);
 
-   pips_debug(2, "Begin for statement %d (%d, %d)\n",
+   pips_debug(2, "Begin for statement %td (%td, %td)\n",
 	      statement_number(s),
 	      ORDERING_NUMBER(statement_ordering(s)),
 	      ORDERING_STATEMENT(statement_ordering(s)));
@@ -873,7 +874,7 @@ dead_statement_rewrite(statement s)
    /* If we have now a sequence, clean it up: */
    clean_up_sequences_internal(s);
 
-   pips_debug(2, "End for statement %d (%d, %d)\n",
+   pips_debug(2, "End for statement %td (%td, %td)\n",
 	      statement_number(s),
 	      ORDERING_NUMBER(statement_ordering(s)),
 	      ORDERING_STATEMENT(statement_ordering(s)));
@@ -890,7 +891,7 @@ static bool dead_statement_filter(statement s)
   pips_assert("statement s is consistent", statement_consistent_p(s));
 
   i = statement_instruction(s);
-  pips_debug(2, "Begin for statement %d (%d, %d)\n",
+  pips_debug(2, "Begin for statement %td (%td, %td)\n",
 	     statement_number(s),
 	     ORDERING_NUMBER(statement_ordering(s)),
 	     ORDERING_STATEMENT(statement_ordering(s)));
@@ -920,7 +921,7 @@ static bool dead_statement_filter(statement s)
        cannot hides a control effect in a user-defined function*/
     if (ENDP(crwl) && !statement_may_have_control_effects_p(s)
 	&& !format_statement_p(s)) {
-      pips_debug(2, "Ignored statement %d (%d, %d)\n",
+      pips_debug(2, "Ignored statement %td (%td, %td)\n",
 		 statement_number(s),
 		 ORDERING_NUMBER(statement_ordering(s)),
 		 ORDERING_STATEMENT(statement_ordering(s)));
@@ -945,7 +946,7 @@ static bool dead_statement_filter(statement s)
      * test for that last case.
      */
     if (!statement_weakly_feasible_p(s)) {
-      pips_debug(2, "Dead statement %d (%d, %d)\n",
+      pips_debug(2, "Dead statement %td (%td, %td)\n",
 		 statement_number(s),
 		 ORDERING_NUMBER(statement_ordering(s)),
 		 ORDERING_STATEMENT(statement_ordering(s)));
@@ -955,7 +956,7 @@ static bool dead_statement_filter(statement s)
     }
 
     if (instruction_sequence_p(i) && !statement_feasible_p(s)) {
-      pips_debug(2, "Dead sequence statement %d (%d, %d)\n",
+      pips_debug(2, "Dead sequence statement %td (%td, %td)\n",
 		 statement_number(s),
 		 ORDERING_NUMBER(statement_ordering(s)),
 		 ORDERING_STATEMENT(statement_ordering(s)));
@@ -967,7 +968,7 @@ static bool dead_statement_filter(statement s)
     if (instruction_loop_p(i)) {
       loop l = instruction_loop(i);
       if (dead_loop_p(l)) {
-	pips_debug(2, "Dead loop %s at statement %d (%d, %d)\n",
+	pips_debug(2, "Dead loop %s at statement %td (%td, %td)\n",
 		   label_local_name(loop_label(l)),
 		   statement_number(s),
 		   ORDERING_NUMBER(statement_ordering(s)),
@@ -982,7 +983,7 @@ static bool dead_statement_filter(statement s)
 	statement body = loop_body(l);
 	ifdebug(2) {
 	  pips_debug(2,
-		     "loop %s at %d (%d, %d) executed once and only once\n",
+		     "loop %s at %td (%td, %td) executed once and only once\n",
 		     label_local_name(loop_label(l)),
 		     statement_number(s),
 		     ORDERING_NUMBER(statement_ordering(s)),
@@ -1040,7 +1041,7 @@ static bool dead_statement_filter(statement s)
     dead_statement_rewrite(s);
   }
 
-  pips_debug(2, "End for statement %d (%d, %d): %s going down\n",
+  pips_debug(2, "End for statement %td (%td, %td): %s going down\n",
 	     statement_number(s),
 	     ORDERING_NUMBER(statement_ordering(s)),
 	     ORDERING_STATEMENT(statement_ordering(s)),
