@@ -8,6 +8,8 @@
 #include "ri.h"
 #include "ri-util.h"
 #include "misc.h"
+#include "effects-generic.h"
+#include "effects-simple.h"
 #include "control.h"
 #include "callgraph.h"
 #include "pipsdbm.h"
@@ -59,6 +61,9 @@ bool gpu_ify(const char * module_name) {
   statement module_statement = PIPS_PHASE_PRELUDE(module_name,
 						  "GPU_IFY_DEBUG_LEVEL");
 
+  // Get the effects and use them:
+  set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS,module_name,TRUE));
+
   // Initialize the loop nest set to outline to the empty set yet:
   loop_nests_to_outline = hash_table_make(hash_chunk, 100);
 
@@ -72,6 +77,9 @@ bool gpu_ify(const char * module_name) {
     }, loop_nests_to_outline);
 
   hash_table_free(loop_nests_to_outline);
+
+  // No longer use effects:
+  reset_cumulated_rw_effects();
 
   // We may have outline some code, so recompute the callees:
   DB_PUT_MEMORY_RESOURCE(DBR_CALLEES, module_name,

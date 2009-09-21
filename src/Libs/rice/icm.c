@@ -990,7 +990,7 @@ vertex_redundant_p(vertex v,
     ifdebug(6) {
 	pips_debug(6, "");
 	fprintf(stderr, 
-		"statement %02d is redundant.\n", 
+		"statement %td is redundant.\n", 
 		statement_number(st));
     }
 

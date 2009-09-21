@@ -76,7 +76,7 @@ build_new_top_level_module_name(string prefix) {
 
   for(;;) {
     asprintf(&name, "%s_%x", prefix, version++);
-    if (module_name_to_entity(name) != entity_undefined)
+    if (module_name_to_entity(name) == entity_undefined)
       break;
     free(name);
   }
