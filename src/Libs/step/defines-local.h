@@ -50,6 +50,7 @@ regroupement de la majorité des includes
 #include "parser_private.h"
 #include "syntax.h"
 #include "transformations.h"
+#include "callgraph.h"
 
 /* debug macro
  */

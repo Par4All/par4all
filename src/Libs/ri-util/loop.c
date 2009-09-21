@@ -29,6 +29,7 @@
 #include "ri.h"
 
 #include "misc.h"
+#include "properties.h"
 #include "ri-util.h"
 
 extern int Nbrdo;
@@ -344,22 +345,43 @@ void sort_all_loop_locals(statement s)
 }
 
 
-/* Test if a loop is parallel.
+/* Test if a statement is a parallel loop.
 
    It tests the parallel status of the loop but should test extensions
    such as OpenMP pragma and so on. TODO...
 
-   @param s is the statement that owns the loop. We need this statement to
-   get the pragma for the loop. It assumes the statement is an instruction
-   with a loop in it.
+   @param s is the statement that may own the loop. We need this statement
+   to get the pragma for the loop.
+   instruction with a loop in it.
 
-   @return TRUE if the loop is parallel.
+   @return TRUE if the statement is a parallel loop.
 */
 bool parallel_loop_statement_p(statement s) {
-  instruction i = statement_instruction(s);
-  loop l = instruction_loop(i);
+  if (statement_loop_p(s)) {
+    instruction i = statement_instruction(s);
+    loop l = instruction_loop(i);
 
-  return execution_parallel_p(loop_execution(l));
+    return execution_parallel_p(loop_execution(l));
+  }
+  return FALSE;
+}
+
+
+/** Compute the depth of a parallel perfect loop-nest
+
+    @return the depth of parallel perfect loop-nest found. If there is no
+    loop here, return 0
+ */
+int
+depth_of_parallel_perfect_loop_nest(statement s) {
+  if (parallel_loop_statement_p(s)) {
+    loop l = statement_loop(s);
+    // Count the current one and dig into the statement of the loop:
+    return 1 + depth_of_parallel_perfect_loop_nest(loop_body(l));
+  }
+  else
+    /* No parallel loop found here */
+    return 0;
 }
 
 

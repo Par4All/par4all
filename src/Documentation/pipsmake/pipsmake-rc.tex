@@ -5588,6 +5588,26 @@ COMENGINE_NUMBER_OF_FIFO 100
 \end{PipsProp}
 
 
+\subsubsection{Code distribution on GPU}
+\label{sec:code-distr-gpu}
+
+%%@UserManualDocumentation: gpu_ify
+This phase generate GPU kernels from perfect parallel loop nests.
+%%!UserManualDocumentation
+
+\begin{PipsMake}
+alias gpu_ify 'Distribute // loop nests on GPU'
+gpu_ify                    > MODULE.code
+		> MODULE.callees
+		> PROGRAM.entities
+		< PROGRAM.entities
+		< MODULE.code
+        < MODULE.cumulated_effects
+\end{PipsMake}
+%		! MODULE.privatize_module
+%		! MODULE.coarse_grain_parallelization
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% TRANSFORMATIONS
 
 \chapter{Program Transformations}
