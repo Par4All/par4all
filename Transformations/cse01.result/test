@@ -1,0 +1,33 @@
+
+Initial code
+
+int cse01()
+{
+   // BEGIN BLOCK
+   int i;
+   int j;
+   int k;
+
+   i = 2*(j+2);
+   k = 3*(j+2);
+   // END BLOCK
+}
+
+Code after CSE
+
+int cse01()
+{
+   // BEGIN BLOCK
+   int i;
+   int j;
+   int k;
+   int I_0;
+   // BEGIN BLOCK
+   I_0 = j+2;
+   i = 2*I_0;
+   // END BLOCK
+   // BEGIN BLOCK
+   k = 3*I_0;
+   // END BLOCK
+   // END BLOCK
+}
