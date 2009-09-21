@@ -254,7 +254,7 @@ double P4A_ACCEL_TIMER_STOP_AND_FLOAT_MEASURE() {
     @param ... the following parameters are given to the kernel
 */
 #define P4A_CALL_ACCEL_KERNEL_1D(kernel, size, ...)		\
-  _Pragma("omp parallel for")						\
+  int P4A_index_x;                                              \
   for(int P4A_index_x = 0; P4A_index_x < size; P4A_index_x++) {	\
     const int P4A_index_y = 0;					\
     const int P4A_index_z = 0;					\
@@ -275,9 +275,9 @@ double P4A_ACCEL_TIMER_STOP_AND_FLOAT_MEASURE() {
     @param ... following parameters are given to the kernel
 */
 #define P4A_CALL_ACCEL_KERNEL_2D(kernel, n_x_iter, n_y_iter, ...)	\
-  _Pragma("omp parallel for")						\
-  for(int P4A_index_x = 0; P4A_index_x < n_x_iter; P4A_index_x++) {	        \
-    for(int P4A_index_y = 0; P4A_index_y < n_y_iter; P4A_index_y++) {	\
+  int P4A_index_x,P4A_index_y;                                          \
+  for(P4A_index_x = 0; P4A_index_x < n_x_iter; P4A_index_x++) {	        \
+    for(P4A_index_y = 0; P4A_index_y < n_y_iter; P4A_index_y++) {	\
       const int P4A_index_z = 0;					\
       threadIdx.x = P4A_index_x;					\
       threadIdx.y = P4A_index_y;					\

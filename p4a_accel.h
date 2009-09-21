@@ -27,6 +27,8 @@
 #else
 #ifdef P4A_ACCEL_OPENMP
 #include <p4a_accel-OpenMP.h>
+#else
+#include <p4a_accel-.h>
 #endif
 #endif
 
