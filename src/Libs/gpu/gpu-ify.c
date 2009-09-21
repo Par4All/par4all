@@ -52,6 +52,8 @@ gpu_ify_statement(statement s, int depth) {
     print_statement(s);
     list sl = CONS(STATEMENT, s, NIL);
     outliner(build_new_top_level_module_name("kernel"), sl);
+
+    outliner("kernel", build_new_top_level_module_name(), s);
   }
 }
 
