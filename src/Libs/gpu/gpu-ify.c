@@ -16,9 +16,10 @@
 #include "transformations.h"
 #include "resources.h"
 
-/** Store the loop nests found that meet the spec to be executed on a GPU,
-    with its depth */
-hash_table loop_nests_to_outline;
+/** Store the loop nests found that meet the spec to be executed on a
+    GPU. Use a list and not a set or hash_map to have always the same
+    order */
+list loop_nests_to_outline;
 
 
 static bool
@@ -29,15 +30,17 @@ mark_loop_to_outline(const statement s) {
      informations on the statement itself, such as pragmas
   */
   int parallel_loop_nest_depth = depth_of_parallel_perfect_loop_nest(s);
-  ifdebug(2) {
-    pips_debug(1, "Statement with // depth %d\n", parallel_loop_nest_depth);
+  ifdebug(3) {
+    pips_debug(1, "Statement %td with // depth %d\n", statement_number(s),
+	       parallel_loop_nest_depth);
     print_statement(s);
   }
   if (parallel_loop_nest_depth > 0) {
-    // Register the loop-nest with its depth:
-    hash_put(loop_nests_to_outline, s, (void *)(_int)parallel_loop_nest_depth);
+    // Register the loop-nest (note the list is in the reverse order):
+    loop_nests_to_outline = CONS(STATEMENT, s, loop_nests_to_outline);
     /* Since we only outline outermost loop-nest, stop digging further in
        this statement: */
+    pips_debug(1, "Statement %td marked to be outlined\n", statement_number(s));
     return FALSE;
   }
   // This statement is not a parallel loop, go on digging:
@@ -74,18 +77,21 @@ bool gpu_ify(const char * module_name) {
   set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS,module_name,TRUE));
 
   // Initialize the loop nest set to outline to the empty set yet:
-  loop_nests_to_outline = hash_table_make(hash_chunk, 100);
+  loop_nests_to_outline = NIL;
 
   // Mark interesting loops:
   gen_recurse(module_statement,
 	      statement_domain, mark_loop_to_outline, gen_identity);
 
-  // Outline the previous marked loop nests:
-  HASH_MAP(s, depth, {
-      gpu_ify_statement(s, (_int) depth);
-    }, loop_nests_to_outline);
+  /* Outline the previous marked loop nests.
+     First put the statements to outline in the good order: */
+  loop_nests_to_outline = gen_nreverse(loop_nests_to_outline);
+  FOREACH(STATEMENT, s, loop_nests_to_outline) {
+    // We could have stored the depth, but it complexify the code...
+    gpu_ify_statement(s, depth_of_parallel_perfect_loop_nest(s));
+  }
 
-  hash_table_free(loop_nests_to_outline);
+  gen_free_list(loop_nests_to_outline);
 
   // No longer use effects:
   reset_cumulated_rw_effects();
