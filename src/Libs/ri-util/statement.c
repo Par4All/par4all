@@ -745,6 +745,7 @@ statement s;
 }
 
 
+
 bool assignment_block_or_statement_p(statement s)
 {
     instruction i = statement_instruction(s);
