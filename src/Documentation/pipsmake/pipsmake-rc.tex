@@ -7210,9 +7210,15 @@ outline      > MODULE.code
         < MODULE.code
 \end{PipsMake}
 
-The property \verb+OUTLINE_MODULE_NAME+ is used as new module name, and the user is prompted if not set.
-If set, property \verb+OUTLINE_LABEL+ is used to choose the statement to outline.
-If set, property \verb+OUTLINE_ALLOW_GLOBALS+ is used not to pass globals as parameters.
+The property \verb+OUTLINE_MODULE_NAME+ is used as new module name, and
+the user is prompted if not set.
+
+If set, property \verb+OUTLINE_LABEL+ is used to choose the statement to
+outline.
+
+The property \verb+OUTLINE_ALLOW_GLOBALS+ controls whether global
+variables which initial values are not used are passed as parameters or
+not. Normally, this should be addressed by a previous privatization.
 \begin{PipsProp}
 OUTLINE_MODULE_NAME ""
 OUTLINE_LABEL ""

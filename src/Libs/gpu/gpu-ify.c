@@ -30,7 +30,7 @@ mark_loop_to_outline(const statement s) {
   */
   int parallel_loop_nest_depth = depth_of_parallel_perfect_loop_nest(s);
   ifdebug(2) {
-    pips_debug(1, "Statement with // dephth %d\n", parallel_loop_nest_depth);
+    pips_debug(1, "Statement with // depth %d\n", parallel_loop_nest_depth);
     print_statement(s);
   }
   if (parallel_loop_nest_depth > 0) {
@@ -48,12 +48,19 @@ mark_loop_to_outline(const statement s) {
 static void
 gpu_ify_statement(statement s, int depth) {
   ifdebug(1) {
-    pips_debug(1, "Parallel loop-nest of dephth %d\n", depth);
+    pips_debug(1, "Parallel loop-nest of depth %d\n", depth);
     print_statement(s);
-    list sl = CONS(STATEMENT, s, NIL);
-    outliner(build_new_top_level_module_name("kernel"), sl);
+    /* First outline the innermost code (the kernel itself) to avoid
+       spoiling its memory effects if we start with the outermost code
+       first: */
+    list sk = CONS(STATEMENT,
+		   perfectly_nested_loop_to_body_at_depth(s, depth),
+		   NIL);
+    outliner(build_new_top_level_module_name("kernel_wrapper"), sk);
 
-    outliner("kernel", build_new_top_level_module_name(), s);
+    // Outline the kernel launcher:
+    list sl = CONS(STATEMENT, s, NIL);
+    outliner(build_new_top_level_module_name("kernel_launcher"), sl);
   }
 }
 

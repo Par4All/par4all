@@ -486,6 +486,35 @@ perfectly_nested_loop_to_body(statement loop_nest) {
 }
 
 
+/** Extract the loop-body of a perfect loop-nest at a given depth
+
+    @param s is the loop-nest statement to dig into
+
+    @param depth is the diving depth
+
+    @return the loop-body found at the given depth
+ */
+statement
+perfectly_nested_loop_to_body_at_depth(statement s, int depth) {
+  // To have it working for depth = 0 too:
+  statement body = s;
+  ifdebug(2) {
+    pips_debug(1, "Look at statement at depth 0:\n");
+    print_statement(body);
+  }
+  for(int i = 0; i < depth; i++) {
+    pips_assert("The statement is a loop", statement_loop_p(body));
+    // Dive into one loop:
+    body = loop_body(statement_loop(body));
+    ifdebug(2) {
+      pips_debug(1, "Look at statement at depth %d:\n", i);
+      print_statement(body);
+    }
+  }
+  return body;
+}
+
+
 /*
   returns the numerical value of loop l increment expression.
   aborts if this expression is not an integral constant expression.
