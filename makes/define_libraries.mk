@@ -41,7 +41,7 @@ extern.libs	= polylib
 
 ################################################################### PIPS COMMON
 
-# old stuff: 
+# old stuff:
 # prgm_mapping scheduling reindexing array_dfg paf-util static_controlize pip
 
 pipslibs.libs	= \
@@ -53,7 +53,7 @@ pipslibs.libs	= \
 	comp_sections semantics control continuation rice ricedg \
 	pipsdbm transformer preprocessor ri-util step properties \
 	text-util misc properties reductions flint sac safescale phrase \
-	newgen
+	gpu newgen
 
 pips.libs	= \
 	$(pipslibs.libs) $(newgen.libs) $(linear.libs) \
