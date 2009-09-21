@@ -91,7 +91,7 @@ void flgr2d_arith_add_fgINT32(FLGR_Data2D *datdest, FLGR_Data2D *data1, FLGR_Dat
    i = 0;
    while (i<data1->size_y) {
       flgr1d_arith_add_fgINT32(*pdest, *p1, *p2);
-      (i++, pdest++, p1++, p2++);
+      i++, pdest++, p1++, p2++;
    }
    return;
 }

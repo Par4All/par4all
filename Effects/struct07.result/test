@@ -127,9 +127,13 @@ void struct07()
    float z2;
    float x[256][256];
 
+
+
 #pragma omp parallel for 
    for(k = 0; k <= 255; k += 1)
       imageout[k][1].re = z1;
+
+
 
 #pragma omp parallel for 
    for(i = 0; i <= 255; i += 1)

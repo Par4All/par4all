@@ -10,7 +10,7 @@ void lhs01()
    /* This is a deprecated construct which is accepted by PIPS parser */
    //i>2?i:j=3;
    //(i>2?i:j)=3;
-
+   
    *(i>2?&i:&j) = 3;
    /* printf("i=%d, j=%d\n", i, j); */
    
@@ -18,7 +18,7 @@ void lhs01()
    //i>2?i=3:j=3;
    /* This is OK*/
    i = j = 2;
-   (i>2?i = 3:j = 3);
+   i>2?(i = 3):(j = 3);
 
    i = j = 2;
    if (i>2)
@@ -27,7 +27,7 @@ void lhs01()
       j = 3;
 
    i = j = 2;
-   (i>2?j = 4:j = 3);
+   i>2?(j = 4):(j = 3);
 
    if (i>2)
       j = 4;
@@ -48,7 +48,7 @@ void lhs01()
    /* This is a deprecated construct which is accepted by PIPS parser */
    //i>2?i:j=3;
    //(i>2?i:j)=3;
-
+   
    *(i>2?&i:&j) = 3;
 //               <must be written>: i j
    /* printf("i=%d, j=%d\n", i, j); */
@@ -59,7 +59,7 @@ void lhs01()
    i = j = 2;
 //               <may be written >: i j
 //               <must be read   >: i
-   (i>2?i = 3:j = 3);
+   i>2?(i = 3):(j = 3);
 //               <must be written>: i j
 
    i = j = 2;
@@ -75,7 +75,7 @@ void lhs01()
    i = j = 2;
 //               <must be read   >: i
 //               <must be written>: j
-   (i>2?j = 4:j = 3);
+   i>2?(j = 4):(j = 3);
 //               <must be read   >: i
 
    if (i>2)
@@ -100,7 +100,7 @@ void lhs01()
    /* This is a deprecated construct which is accepted by PIPS parser */
    //i>2?i:j=3;
    //(i>2?i:j)=3;
-
+   
    *(i>2?&i:&j) = 3;
 //               <must be written>: i j
    /* printf("i=%d, j=%d\n", i, j); */
@@ -111,7 +111,7 @@ void lhs01()
    i = j = 2;
 //               <may be written >: i j
 //               <must be read   >: i
-   (i>2?i = 3:j = 3);
+   i>2?(i = 3):(j = 3);
 //               <must be written>: i j
 
    i = j = 2;
@@ -128,7 +128,7 @@ void lhs01()
    i = j = 2;
 //               <must be read   >: i
 //               <must be written>: j
-   (i>2?j = 4:j = 3);
+   i>2?(j = 4):(j = 3);
 //               <must be read   >: i
 //               <must be written>: j
 

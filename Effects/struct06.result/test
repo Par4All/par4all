@@ -87,6 +87,8 @@ int struct06()
    struct four x[10];
    int i = 0;
 
+
+
 #pragma omp parallel for 
    for(i = 0; i <= 9; i += 1)
       x[i].un.first = x[i].deux.second;

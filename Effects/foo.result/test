@@ -1,4 +1,8 @@
---- Proper effects for FOO
+c
+	SUBROUTINE BAR(I)
+C               <must be written>: I
+      I = 3                                                             0003
+      END
 	PROGRAM FOO
 C               <must be written>: I
       CALL BAR(I)                                                       0002
