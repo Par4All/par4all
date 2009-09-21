@@ -7060,6 +7060,22 @@ alias instruction_selection 'Select Instructions'
 instruction_selection > MODULE.code
         < PROGRAM.entities
         < MODULE.code
+
+alias common_subexpression_elimination 'Common Subexpression Elimination'
+
+common_subexpression_elimination > MODULE.code
+        < PROGRAM.entities
+        < MODULE.proper_effects
+        < MODULE.cumulated_effects
+        < MODULE.code
+
+alias invariant_code_motion 'Invariant Code Motion'
+
+invariant_code_motion > MODULE.code
+        < PROGRAM.entities
+        < MODULE.proper_effects
+        < MODULE.cumulated_effects
+        < MODULE.code
 \end{PipsMake}
 
 

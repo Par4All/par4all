@@ -808,13 +808,14 @@ update_number_of_use(entity ent, list lst_stat, int up_down)
       /* Update old value */
       else
       {
+        extern string i2a(int);
 	char *new;
 	int number_use = 0;
 	char* comment = statement_comments(s);
 	sscanf((const char*)comment, "%d", &number_use);
 	
 	number_use += up_down;
-    new=i2a(number_use);
+	new=i2a(number_use);
 	set_comment_of_statement(s, (new));
       }
       return s;
@@ -1869,4 +1870,40 @@ void perform_ac_cse(__attribute__((unused)) string name, statement s)
   close_proper_rw_effects();
   close_rw_effects();
   */
+}
+
+
+/* Pipsmake phase: Common Subexpression Elimination
+ */
+bool common_subexpression_elimination(string module_name)
+{
+  bool   result;
+  string os = get_string_property("EOLE_OPTIMIZATION_STRATEGY");
+
+  // Optimize expressions with "CSE" optimization strategy
+  set_string_property("EOLE_OPTIMIZATION_STRATEGY", "CSE");
+  result = optimize_expressions(module_name);
+
+  // Restore original optimization strategy
+  set_string_property("EOLE_OPTIMIZATION_STRATEGY", os);
+
+  return result;
+}
+
+
+/* Pipsmake phase: Invariant Code Motion
+ */
+bool invariant_code_motion(string module_name)
+{
+  bool   result;
+  string os = get_string_property("EOLE_OPTIMIZATION_STRATEGY");
+
+  // Optimize expressions with "ICM" optimization strategy
+  set_string_property("EOLE_OPTIMIZATION_STRATEGY", "ICM");
+  result = optimize_expressions(module_name);
+
+  // Restore original optimization strategy
+  set_string_property("EOLE_OPTIMIZATION_STRATEGY", os);
+
+  return result;
 }
