@@ -1192,34 +1192,6 @@ list *swfl;
    return( ret_bool );
 }
 
-/*=================================================================*/
-/* bool normalizable_loop_p(loop l)
- * Returns TRUE if "l" has a constant step.
- */
-bool normalizable_loop_p(l)
-loop l;
-{
-debug( 7, "normalizable_loop_p", "doing\n");
-return(expression_constant_p(range_increment(loop_range(l))));
-}
- 
-
-/*=================================================================*/
-/* bool normal_loop_p( loop l ) returns TRUE if "l" 's step is egal to 1
- */
-bool normal_loop_p( l )
-loop l ;
-{
-	expression ri;
-	entity ent;
-
-	debug( 7, "normal_loop_p", "doing\n");
-	ri = range_increment(loop_range(l));
-	if (!expression_constant_p( ri )) return( FALSE );
-	ent = reference_variable(syntax_reference(expression_syntax( ri )));
-	return( strcmp(entity_local_name(ent), "1") == 0 );
-}
-
 
 /*=================================================================*/
 /* expression make_max_exp(entity ent, expression exp1, expression exp2)
@@ -1245,7 +1217,7 @@ expression 	exp1, exp2;
 
 	return rexp ;
 }
-	
+
 
 /*=================================================================*/
 /* entity make_nlc_entity(int *Gcount_nlc):

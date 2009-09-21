@@ -104,6 +104,7 @@ call c;
 	return( sc );	
 }
 
+
 /*==================================================================*/
 /* static_control static_controlize_loop( (loop) l )
  * It computes the loop's static_control.
@@ -111,27 +112,26 @@ call c;
 static_control static_controlize_loop(l)
 loop l;
 {
-	static_control 	sc;  
+  static_control 	sc;
 	expression	low, up;
 
 	debug(3, "static_controlize_loop", "begin LOOP\n");
 
 	low = range_lower( loop_range( l ) );
 	up  = range_upper( loop_range( l ) );
-	ADD_ELEMENT_TO_LIST(Genclosing_loops, LOOP, l); 
+	ADD_ELEMENT_TO_LIST(Genclosing_loops, LOOP, l);
 	sc = static_controlize_statement( loop_body( l ) );
-	if (	   !normalizable_loop_p(l) 
+	if (	   !constant_step_loop_p(l)
 		|| !splc_feautrier_expression_p(low, &Genclosing_loops)
 		|| !splc_feautrier_expression_p(up, &Genclosing_loops)  ) {
 		static_control_yes( sc ) = FALSE;
 	}
 	SET_STATEMENT_MAPPING(Gstatic_control_map, loop_body(l), sc);
-	gen_remove( &Genclosing_loops, l ); 
+	gen_remove( &Genclosing_loops, l );
 
 	debug(3, "static_controlize_loop", "end LOOP\n");
 	return( sc );
 }
-
 
 
 /*==================================================================*/

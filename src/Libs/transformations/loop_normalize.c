@@ -114,12 +114,12 @@
 #include "transformations.h"
 
 
-/** 
+/**
  * statement normalization
  * normalize a statement if it's a loop
- * 
+ *
  * @param s statement to normalize
- * 
+ *
  */
 static
 void loop_normalize_statement(statement s)
@@ -127,8 +127,8 @@ void loop_normalize_statement(statement s)
     if( statement_loop_p(s) )
     {
         loop l = statement_loop(s);
-        debug(4, __FUNCTION__ , "begin loop\n");
-        if( normalizable_loop_p(l) && ! normal_loop_p(l) )
+        pips_debug(4, "begin loop\n");
+        if (constant_step_loop_p(l) && ! normal_loop_p(l))
         {
             entity index = loop_index( l );
             range lr = loop_range( l );

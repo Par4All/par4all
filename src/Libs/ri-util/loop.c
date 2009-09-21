@@ -1,3 +1,8 @@
+/* Some generic methods about loops.
+
+   There are many things elsewher that should be factored out into here
+   (static controlize...).
+
 /*
 
   $Id$
@@ -132,7 +137,6 @@ rloops_mapping_of_statement(statement_mapping m,
 }
 
 
-
 statement_mapping
 loops_mapping_of_statement(statement stat)
 {
@@ -152,6 +156,7 @@ loops_mapping_of_statement(statement stat)
     }
     return(loops_map);
 }
+
 
 static bool
 distributable_statement_p(statement stat, set region)
@@ -191,6 +196,7 @@ distributable_statement_p(statement stat, set region)
     return((bool) NULL); /* just to avoid a gcc warning */
 }
 
+
 /* this functions checks if Kennedy's algorithm can be applied on the
 loop passed as argument. If yes, it returns a set containing all
 statements belonging to this loop including the initial loop itself.
@@ -198,7 +204,6 @@ otherwise, it returns an undefined set.
 
 Our version of Kennedy's algorithm can only be applied on loops
 containing no test, goto or unstructured control structures. */
-
 set distributable_loop(l)
 statement l;
 {
@@ -216,6 +221,7 @@ statement l;
     return(set_undefined);
 }
 
+
 /* returns TRUE if loop lo's index is private for this loop */
 bool index_private_p(lo)
 loop lo;
@@ -228,7 +234,8 @@ loop lo;
 	   entity_undefined);
 }
 
-/* this function returns the set of all statements belonging to the loop given
+
+/* this function returns the set of all statements belonging to the given loop
    even if the loop contains test, goto or unstructured control structures */
 set region_of_loop(l)
 statement l;
@@ -242,6 +249,9 @@ statement l;
     return(r);
 }
 
+
+/* Should be rewritten with a gen_recurse to deal with the recent RI...
+ */
 void region_of_statement(stat, region)
 statement stat;
 set region;
@@ -507,7 +517,7 @@ perfectly_nested_loop_to_body_at_depth(statement s, int depth) {
     // Dive into one loop:
     body = loop_body(statement_loop(body));
     ifdebug(2) {
-      pips_debug(1, "Look at statement at depth %d:\n", i);
+      pips_debug(1, "Look at statement at depth %d:\n", i + 1);
       print_statement(body);
     }
   }
@@ -536,6 +546,32 @@ loop_increment_value(loop l) {
     return(0);
   }
   return(inc);
+}
+
+
+/** Test if a loop has a constant step loop
+ */
+bool constant_step_loop_p(loop l) {
+  pips_debug(7, "doing\n");
+  return(expression_constant_p(range_increment(loop_range(l))));
+}
+
+
+/** Test if a loop does have a 1-increment step
+ */
+bool normal_loop_p(loop l) {
+  expression ri;
+  entity ent;
+
+  pips_debug(7, "doing\n");
+
+  if (!constant_step_loop_p(l))
+    // No way for a non-constant step to be a 1-constant :-)
+    return(FALSE);
+
+  ri = range_increment(loop_range(l));
+  ent = reference_variable(syntax_reference(expression_syntax(ri)));
+  return strcmp(entity_local_name(ent), "1") == 0;
 }
 
 
