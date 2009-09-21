@@ -233,6 +233,7 @@ bool statement_test_p(statement s)
   return(instruction_test_p(statement_instruction(s)));
 }
 
+
 bool statement_loop_p(statement s)
 {
   return(instruction_loop_p(statement_instruction(s)));

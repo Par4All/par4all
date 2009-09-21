@@ -53,22 +53,8 @@
 
 /************************************************** BUILD THE CLONE VERSIONS */
 
-/* returns an allocated new name for a top-level entity.
- */
-static string
-build_new_top_level_entity_name(string prefix)
-{
-    string name = (string) malloc(sizeof(char)*(strlen(prefix)+20));
-    int version = 0;
-
-    do { sprintf(name, "%s_%x", prefix, version++); }
-    while (module_name_to_entity(name)!=entity_undefined);
-
-    return name;
-}
-
 /* build a new clone version. if argn is not null, generate a check.
- */ 
+ */
 static statement
 build_statement_for_clone(
     entity cloned, 
@@ -127,7 +113,7 @@ entity build_a_clone_for(
      */
     new_name = get_string_property("CLONE_NAME");
     new_name = empty_string_p(new_name) ?
-            build_new_top_level_entity_name(name) :
+            build_new_top_level_module_name(name) :
             strdup(new_name);
 
     new_fun = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,new_name);

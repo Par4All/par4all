@@ -230,7 +230,7 @@ callees
 compute_callees(const statement stat) {
   callees result;
   callees current_callees = make_callees(NIL);
-  // 
+  // Visit all the call site of the module:
   gen_context_recurse(stat, &current_callees,
 		      call_domain, gen_true, add_call_to_callees);
   result = current_callees;

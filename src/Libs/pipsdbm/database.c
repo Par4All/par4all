@@ -740,7 +740,7 @@ string db_get_resource_id(string rname, string oname)
 
     @return an opaque pointer to the resource in memory.
  */
-string db_get_memory_resource(string rname, string oname, bool pure)
+string db_get_memory_resource(const string rname, const string oname, bool pure)
 {
     db_resource r;
     void * result;

@@ -21,6 +21,8 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+/* To have asprintf(): */
+#define _GNU_SOURCE
 #include <stdlib.h>
 #include <stdio.h>
 #include <malloc.h>
@@ -57,6 +59,28 @@ bool static_module_name_p(string name)
      but the last one is not the last character of the name string */
   /* FI: I doubt this is true. Maybe if you're sure name is the name of a module? */
   return (!compilation_unit_p(name) && strstr(name, FILE_SEP_STRING) != NULL);
+}
+
+/* Get a new name for a module built from a prefix.
+
+   @param prefix is the prefix string
+
+   @return the first module name (malloc'd string) of the form
+   "<prefix>_<integer>" with integer starting at 0 that do not correspond
+   to an existing module
+ */
+string
+build_new_top_level_module_name(string prefix) {
+  string name;
+  int version = 0;
+
+  for(;;) {
+    asprintf(&name, "%s_%x", prefix, version++);
+    if (module_name_to_entity(name) != entity_undefined)
+      break;
+    free(name);
+  }
+  return name;
 }
 
 

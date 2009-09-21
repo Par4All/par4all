@@ -844,7 +844,7 @@ entity local_name_to_top_level_entity(string n)
   return module;
 }
 
-entity module_name_to_entity(string mn)
+entity module_name_to_entity(const string mn)
 {
   /* Because of static C function, the entity returned is not always a
      top-level entity. */
