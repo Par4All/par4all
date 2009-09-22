@@ -22,6 +22,7 @@
 clean: NO_INCLUDES=1
 export NO_INCLUDES
 
+# ??? hack
 # We need to read the $(ARCH).mk to know if we need to compile jpips or not:
 ifdef PIPS_ROOT
 ROOT    = $(PIPS_ROOT)
@@ -29,6 +30,7 @@ else
 ROOT    = ../..
 endif
 MAKE.d	= $(ROOT)/makes
+include $(MAKE.d)/root.mk
 include $(MAKE.d)/arch.mk
 include $(MAKE.d)/$(ARCH).mk
 
