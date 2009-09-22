@@ -654,9 +654,14 @@ static string c_head(entity module)
         }
 
         svar = c_entity_local_name(module);
-
-        result = strdup(concatenate(head, SPACE, svar,
-                    OPENPAREN, args, CLOSEPAREN, NL, NULL));
+	if (get_bool_property("PRETTYPRINT_C_FUNCTION_NAME_WITH_UNDERSCORE"))
+	  
+	  result = strdup(concatenate(head, SPACE, svar, "_",
+				      OPENPAREN, args, CLOSEPAREN, NL, NULL)); 
+	  
+	else
+	  result = strdup(concatenate(head, SPACE, svar,
+				      OPENPAREN, args, CLOSEPAREN, NL, NULL));
 
         free(svar);
         free(head);

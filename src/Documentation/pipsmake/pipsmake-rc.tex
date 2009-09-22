@@ -10742,6 +10742,15 @@ print_c_code  > MODULE.c_printed_file
               < MODULE.crough
 \end{PipsMake}
 
+\subsection{Prettyprint for C  properties}
+\index{PRETTYPRINT\_C\_FUNCTION\_NAME\_WITH\_UNDERSCORE}
+
+When PRETTYPRINT\_C\_FUNCTION\_NAME\_WITH\_UNDERSCORE is set to TRUE, an underscore is added at the end of the module name. This is needed when translating only some part of a Fortran Program to C. This property must be used with great care, so that only interface function names are changed : the function names in subsequent calls are not modified. 
+
+\begin{PipsProp}
+PRETTYPRINT_C_FUNCTION_NAME_WITH_UNDERSCORE FALSE
+\end{PipsProp}
+
 
 \section{Prettyprinters Smalltalk}
 \label{subsection-prettyprinters-smalltalk}
