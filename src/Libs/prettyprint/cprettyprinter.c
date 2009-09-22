@@ -197,6 +197,8 @@ static string c_type_string(type t)
                 result = "enum" SPACE;
                 break;
             }
+    default:
+      pips_user_warning("case not handled yet \n");
     }
     return strdup(result);
 }
@@ -766,7 +768,7 @@ static struct s_ppt intrinsic_to_c[] =
     { "/", "/", ppt_binary },
     { "*", "*", ppt_binary },
     { "--", "-", ppt_unary },
-    { "**", "**", ppt_binary },
+    { "**", "pow", ppt_call },
     { "=", "=", ppt_binary },
     { ".OR.", "||", ppt_binary },
     { ".AND.", "&&", ppt_binary },
@@ -887,19 +889,53 @@ static string c_call(call c,bool breakable)
     return result;
 }
 
-/* Attention with Fortran: the indexes are reversed. */
+/* Attention with Fortran: the indexes are reversed. 
+   And array dimensions in C always rank from 0. BC.
+*/
 static string c_reference(reference r)
 {
     string result = strdup(EMPTY), old, svar;
+
+    list l_dim = variable_dimensions(type_variable(entity_type(reference_variable(r)))); 
+
     MAP(EXPRESSION, e,
     {
-        string s = c_expression(e,false);
+      expression e_tmp;
+      expression e_lower = dimension_lower(DIMENSION(CAR(l_dim)));
+      string s;
+      int itmp;
 
-        old = result;
-        result = strdup(concatenate(OPENBRACKET, s, CLOSEBRACKET,old, NULL));
-        //free(old);
-        //free(s);
+      if( !expression_equal_integer_p(e_lower, 0)) 
+	e_tmp = 
+	  MakeBinaryCall(entity_intrinsic(MINUS_OPERATOR_NAME),
+			 copy_expression(e), 
+			 copy_expression(e_lower));
+      else
+	e_tmp = copy_expression(e);
+      
+      /* commented out because it leads to non user-friendly prettyprint */
+      /* NORMALIZE_EXPRESSION(e_tmp); */
+/*       if(normalized_linear_p(expression_normalized(e_tmp))) */
+/* 	{ */
+/* 	  expression e_tmp2; */
+/* 	  e_tmp2 = make_vecteur_expression(normalized_linear(expression_normalized(e_tmp))); */
+/* 	  free_expression(e_tmp); */
+/* 	  e_tmp = e_tmp2; */
+/* 	} */
+      
+      if(expression_integer_value(e_tmp, &itmp))
+	s = i2a(itmp);
+      else
+	s = c_expression( e_tmp,false);
+      
+      old = result;
+      result = strdup(concatenate(OPENBRACKET, s, CLOSEBRACKET,old, NULL));
+      //free(old);
+      //free(s);
+      free_expression(e_tmp);
+      POP(l_dim);
     }, reference_indices(r));
+
 
     old = result;
     svar = c_entity_local_name(reference_variable(r));
