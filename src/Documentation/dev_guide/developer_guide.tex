@@ -2104,22 +2104,12 @@ Skip this step if you are using an already existing library.
   Note that the \texttt{cproto} command is used to generate the library
   header file \texttt{mylib.h}. To force this file to be build again, type
   \texttt{make header}.
-  \end{itemize}
 
-
-\subsubsection{In directory \texttt{\$PIPS\_ROOT/makes}}
-\label{sec:direct-makes}
-
-If you have created a new library:
-
-\begin{itemize}
-\item Update file
-  \texttt{define\_libraries.mk}\index{define\_libraries.mk}.  It contains
-  the ordered list of PIPS libraries for linking.  The order in which the
-  libraries are added is important: the new library must be added after
-  the libraries which use its modules, but after the libraries whose
-  modules it uses.\marginpar{RK to FC: I'm not sure it is still true for
-    modern ld.}
+\item Update file \texttt{libraries.make}\index{libraries.make} at
+  the root of the project. It contains the ordered list of PIPS
+  libraries for linking. The order may not be important with modern
+  \texttt{ld}, but if so a library must appear \emph{after} the
+  libraries it uses.
 \end{itemize}
 
 
