@@ -21,7 +21,7 @@
 
 # make stuff specific to the pips project
 
-include $(ROOT)/makes/define_libraries.mk
+include $(ROOT)/libraries.make
 
 # issue about bad header files.
 ifdef INC_TARGET
