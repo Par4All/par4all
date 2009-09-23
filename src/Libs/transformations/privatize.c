@@ -522,8 +522,9 @@ bool localize_declaration_walker(statement s)
 	if( statement_loop_p(s) )
 	{
 		loop l = statement_loop(s);
+        list locals = gen_copy_seq(loop_locals(l));
 
-		FOREACH(ENTITY,e,loop_locals(l))
+		FOREACH(ENTITY,e,locals)
 		{
 			int n = get_statement_depth(parent_statement,get_current_module_statement());
 			string new_entity_local_name = NULL;
@@ -545,6 +546,7 @@ bool localize_declaration_walker(statement s)
 			FOREACH(ENTITY,prev,previous_replacements)
 				replace_entity(s,prev,new_entity);
 		}
+        gen_free_list(locals);
 	}
 	parent_statement=s;
 	return true;
