@@ -276,7 +276,7 @@ double P4A_ACCEL_TIMER_STOP_AND_FLOAT_MEASURE() {
 */
 #define P4A_CALL_ACCEL_KERNEL_2D(kernel, n_x_iter, n_y_iter, ...)	\
   _Pragma("omp parallel for")						\
-  for(int P4A_index_x = 0; P4A_index_x < n_x_iter; P4A_index_x++) {	        \
+  for(int P4A_index_x = 0; P4A_index_x < n_x_iter; P4A_index_x++) {	\
     for(int P4A_index_y = 0; P4A_index_y < n_y_iter; P4A_index_y++) {	\
       const int P4A_index_z = 0;					\
       threadIdx.x = P4A_index_x;					\
