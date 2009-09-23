@@ -1,0 +1,79 @@
+delete flatten_code15
+
+setproperty ABORT_ON_USER_ERROR TRUE
+setproperty PRETTYPRINT_BLOCKS TRUE
+
+create flatten_code15 flatten_code15.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER   FALSE
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER  TRUE
+
+setproperty PRETTYPRINT_STATEMENT_ORDERING TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER   TRUE
+
+echo
+echo Execute initial code
+echo
+
+shell cc flatten_code15.database/Tmp/flatten_code15.cpp_processed.c -o flatten_code15.out
+shell ./flatten_code15.out > flatten_code15.database/Tmp/initial_output
+shell ./flatten_code15.out
+shell rm flatten_code15.out
+
+echo
+echo Initial code
+echo
+display PRINTED_FILE[flatten_code15]
+
+# Let's skip the bug in the effects library
+
+# echo
+# echo Code with cumulated effects
+# echo
+
+# activate PRINT_CODE_CUMULATED_EFFECTS
+# display PRINTED_FILE[flatten_code15]
+
+# echo
+# echo Code with preconditions
+# echo
+
+# activate PRINT_CODE_PRECONDITIONS
+# display PRINTED_FILE[flatten_code15]
+
+echo
+echo Code after code flattening
+echo
+
+apply FLATTEN_CODE[flatten_code15]
+activate PRINT_CODE
+display PRINTED_FILE[flatten_code15]
+
+echo
+echo Unsplit and compile resulting code
+echo
+
+apply UNSPLIT
+# please do not show system dependent includes...
+#shell cat flatten_code15.database/Src/flatten_code15.c
+shell cc -Wall flatten_code15.database/Src/flatten_code15.c -o flatten_code15.out
+
+echo
+echo Execute resulting code
+echo
+
+shell ./flatten_code15.out > flatten_code15.database/Tmp/final_output
+shell ./flatten_code15.out
+shell rm flatten_code15.out
+
+echo
+echo Show diffs, must be empty
+echo
+shell diff flatten_code15.database/Tmp/initial_output \
+ flatten_code15.database/Tmp/final_output
+
+close
+delete flatten_code15
+quit

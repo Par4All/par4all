@@ -1,0 +1,76 @@
+
+Execute initial code
+
+foo=1
+foo=2
+foo=3
+foo=4
+foo_0=4.000000
+
+Initial code
+
+void flatten_code15(int foo)
+{
+// (0,1)
+   // BEGIN BLOCK
+   int i = (int) foo_0;
+// (0,2)
+
+   foo_0 += foo;                                                        /*0018*/
+// (0,3)
+
+   for (;i<7;i++) {                                                     /*0020*/
+// (0,4)
+      // BEGIN BLOCK
+      static int foo = 0;
+// (0,5)
+      foo++;                                                            /*0022*/
+// (0,6)
+      fprintf(stdout, "foo=%d\n", foo);                                 /*0023*/
+      // END BLOCK
+   }
+// (0,7)
+   fprintf(stdout, "foo_0=%f\n", foo_0);                                /*0025*/
+   // END BLOCK
+}
+
+Code after code flattening
+
+void flatten_code15(int foo)
+{
+// (0,1)
+   // BEGIN BLOCK
+   int i = (int) foo_0;
+   static int foo_1 = 0;
+// (0,2)
+
+   foo_0 += foo;                                                        /*0018*/
+// (0,3)
+
+   for (;i<7;i++) {                                                     /*0020*/
+// (0,4)
+      // BEGIN BLOCK
+// (0,5)
+      foo_1++;                                                          /*0022*/
+// (0,6)
+      fprintf(stdout, "foo=%d\n", foo_1);                               /*0023*/
+      // END BLOCK
+   }
+// (0,7)
+   fprintf(stdout, "foo_0=%f\n", foo_0);                                /*0025*/
+   // END BLOCK
+}
+
+Unsplit and compile resulting code
+
+
+Execute resulting code
+
+foo=1
+foo=2
+foo=3
+foo=4
+foo_0=4.000000
+
+Show diffs, must be empty
+
