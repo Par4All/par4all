@@ -31,6 +31,10 @@ def patch_to_use_p4a_methods(file_name):
                      "#include <p4a_accel.h>\n", content)
 
     # Compatibility
+    content = re.sub("// Prepend here P4A_INIT_ACCEL\n",
+                     "P4A_INIT_ACCEL;\n", content)
+
+    # Compatibility
     content = re.sub("P4A_VP_0", "P4A_VP_X", content)
     content = re.sub("P4A_VP_1", "P4A_VP_Y", content)
 
@@ -40,7 +44,11 @@ def patch_to_use_p4a_methods(file_name):
     f = open(file_name, 'w')
     f.write(content)
     f.close()
-
+    # Save a .cu version too just in case :-)
+    file_name = re.sub("\\.c$", ".cu", file_name)
+    f = open(file_name, 'w')
+    f.write(content)
+    f.close()
 
 for name in sys.argv[1:]:
     patch_to_use_p4a_methods(name)
