@@ -125,6 +125,7 @@ in_effects_stmt_filter(statement s)
 {
     pips_debug(1, "Entering statement %03zd :\n", statement_ordering(s));
     effects_private_current_stmt_push(s);
+    effects_private_current_context_push((*load_context_func)(s));
     return TRUE;
 }
 
@@ -134,6 +135,7 @@ in_effects_of_statement(statement s)
     store_invariant_in_effects_list(s, NIL);
     debug_consistent(NIL);
     effects_private_current_stmt_pop();
+    effects_private_current_context_pop();
     pips_debug(1, "End statement %03zd :\n", statement_ordering(s));
 }
 
