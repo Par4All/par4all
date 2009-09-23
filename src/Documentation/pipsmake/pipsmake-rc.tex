@@ -1649,6 +1649,26 @@ simple_xpath_test > MODULE.code
 \end{PipsMake}
 
 
+\section{Prepending a comment}
+\label{sec:prepending-comment}
+
+To prepend a comment to the first statement of a module.
+Useful to apply post-processing after PIPS.
+
+\begin{PipsMake}
+alias prepend_comment 'Prepend a comment to the first statement of a module'
+
+prepend_comment > MODULE.code
+  < PROGRAM.entities
+  < MODULE.code
+\end{PipsMake}
+
+The comment to add is selected by this property:
+\begin{PipsProp}
+PREPEND_COMMENT "/* This comment is added by PREPEND_COMMENT phase */"
+\end{PipsProp}
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% ANALYSES
 
 \chapter{Analyses}
@@ -6003,6 +6023,31 @@ loop_normalize          > MODULE.code
         < PROGRAM.entities
         < MODULE.code
 \end{PipsMake}
+
+If the increment is 1, the loop is considered already normalized. To have
+a 1-increment loop normalized too, set the following property
+\begin{PipsProp}
+LOOP_NORMALIZE_1_INCREMENT FALSE
+\end{PipsProp}
+This is useful to have iteration spaces that begin at 0 for GPU for
+example.
+
+The loop normalization has been defined in some days only Fortran was
+available, so having loops starting at 1 like the default for arrays too
+make sense in Fortran.
+
+Anyway, no we could generalize for C (starting at 0 is more natural) or
+why not from any other value that can be chosen with the following
+property:
+\begin{PipsProp}
+LOOP_NORMALIZE_LOWER_BOUND 1
+\end{PipsProp}
+
+If you are sure the final assignment is useless, you can skip it with the
+following property.
+\begin{PipsProp}
+LOOP_NORMALIZE_SKIP_INDEX_SIDE_EFFECT FALSE
+\end{PipsProp}
 
 
 \subsection{Guard Elimination and Loop Transformations}

@@ -1,6 +1,6 @@
 /*
 
-  $Id$
+  $Id: loop_normalize.c 15427 2009-09-21 15:07:16Z keryell $
 
   Copyright 1989-2009 MINES ParisTech
 
@@ -22,13 +22,13 @@
 
 */
 /* Name     :   loop_normalize.c
- * Package  : 	loop_normalize 
+ * Package  : 	loop_normalize
  * Author   :   Arnauld LESERVOT & Alexis PLATONOFF
  * Date     :	27 04 93
  * Modified :   moved to Lib/transformations, AP, sep 95
  *      strongly modernized by SG
  * Documents:	"Implementation du Data Flow Graph dans Pips"
- * Comments :	
+ * Comments :
  *
  * Functions of normalization of DO loops. Normalization consists in changing
  * the loop index so as to have something like:
@@ -112,6 +112,7 @@
 #include "pipsdbm.h"
 #include "resources.h"
 #include "transformations.h"
+#include "properties.h"
 
 
 /**
@@ -122,106 +123,120 @@
  *
  */
 static
-void loop_normalize_statement(statement s)
-{
-    if( statement_loop_p(s) )
-    {
-        loop l = statement_loop(s);
-        pips_debug(4, "begin loop\n");
-        if (constant_step_loop_p(l) && ! normal_loop_p(l))
-        {
-            entity index = loop_index( l );
-            range lr = loop_range( l );
-            expression rl = range_lower( lr );
-            expression ru = range_upper( lr );
-            expression ri = range_increment( lr );
+void loop_normalize_statement(statement s) {
+  if( statement_loop_p(s) ) {
+    // OK, it's a loop, go on
+    loop l = statement_loop(s);
+    pips_debug(4, "begin loop\n");
+    if (! constant_step_loop_p(l))
+      // Cannot normalize loops with non-constant increment
+      return;
 
-            expression nub =   make_op_exp(DIVIDE_OPERATOR_NAME,
-                    make_op_exp(PLUS_OPERATOR_NAME,
-                        make_op_exp(MINUS_OPERATOR_NAME,ru,rl),
-                        ri),
-                    copy_expression(ri));
-            expression nub2 = copy_expression(nub);
+    /* Do not normalize normal loops (loops with a 1-increment), except if
+       we ask for: */
+    if (normal_loop_p(l) && !get_bool_property("LOOP_NORMALIZE_1_INCREMENT"))
+      return;
 
-            expression nlc_exp = entity_to_expression(index);
-            range_lower( lr ) = make_integer_constant_expression( 1 );
-            range_upper( lr ) = nub2;
-            range_increment( lr ) = make_integer_constant_expression( 1 );
+    // Get the new lower bound of the loop:
+    int new_lb = get_int_property("LOOP_NORMALIZE_LOWER_BOUND");
 
-            expression new_index_exp = make_op_exp(PLUS_OPERATOR_NAME,
-                    make_op_exp(MINUS_OPERATOR_NAME,
-                        make_op_exp(MULTIPLY_OPERATOR_NAME,
-                            copy_expression(ri),
-                            nlc_exp),
-                        copy_expression(ri)),
-                    copy_expression(rl));
+    entity index = loop_index(l);
+    range lr = loop_range(l);
+    // Initial loop range: rl:ru:ri
+    expression rl = range_lower(lr);
+    expression ru = range_upper(lr);
+    expression ri = range_increment(lr);
+
+    // Number of iteration: nub = ((ru-rl)+ri)/ri
+    /* Note that in the following, make_op_exp do make some partial eval
+       for integer values! */
+    expression nub = make_op_exp(DIVIDE_OPERATOR_NAME,
+				 make_op_exp(PLUS_OPERATOR_NAME,
+					     make_op_exp(MINUS_OPERATOR_NAME,
+							 ru,rl),
+					     ri),
+				 copy_expression(ri));
+    expression nub2 = copy_expression(nub);
+
+    expression nlc_exp = entity_to_expression(index);
+    // New range new_lb:(nub2+(new_lb-1)):1
+    range_lower(lr) = make_integer_constant_expression(new_lb);
+    range_upper(lr) =
+      make_op_exp(PLUS_OPERATOR_NAME,
+		  nub2,
+		  make_op_exp(MINUS_OPERATOR_NAME,
+			      make_integer_constant_expression(new_lb),
+			      make_integer_constant_expression(1)));
+    range_increment(lr) = make_integer_constant_expression(1);
+
+    // Base change: (index - new_lb)*ri  + rl
+    expression new_index_exp =
+      make_op_exp(PLUS_OPERATOR_NAME,
+		  copy_expression(rl),
+		  make_op_exp(MULTIPLY_OPERATOR_NAME,
+			      make_op_exp(MINUS_OPERATOR_NAME,
+					  nlc_exp,
+					  make_integer_constant_expression(new_lb)),
+			      copy_expression(ri)));
 
 
-            expression nub3 = copy_expression( nub );
-            expression exp_max = expression_undefined, exp_plus = expression_undefined;
-            if ( expression_constant_p( nub3 )) {
-                int upper = expression_to_int( nub3 );
-                if ( upper > 0 )
-                    exp_max = make_integer_constant_expression( upper );
-            }
-            else {
-                entity max_ent = FindEntity(TOP_LEVEL_MODULE_NAME,MAX_OPERATOR_NAME);
-                exp_max = make_max_exp(max_ent, copy_expression( nub ),
-                        make_integer_constant_expression( 0 ));
-            }
-            if ( expression_undefined_p(exp_max) )
-                exp_plus = copy_expression( rl );
-            else
-                exp_plus = make_op_exp(PLUS_OPERATOR_NAME,
-                        make_op_exp( MULTIPLY_OPERATOR_NAME,
-                            copy_expression( ri ),
-                            exp_max),
-                        copy_expression( rl ));
-            expression index_exp = entity_to_expression( index );
-            statement end_stmt = make_assign_statement( copy_expression(index_exp), exp_plus );
+    /* Commit the changes */
 
-            /* commit the changes */
+    /* Replace all references to index in loop_body(l) by new_index_exp */
+    replace_entity_by_expression(loop_body(l),index,new_index_exp);
 
-            /* #0 replace all references to index in loop_body(l) by new_index_exp */
-            replace_entity_by_expression(loop_body(l),index,new_index_exp);
+    if (!get_bool_property("LOOP_NORMALIZE_SKIP_INDEX_SIDE_EFFECT")) {
+      /* We want to compute the real side effect of the loop on its index:
+      its final value after the loop. */
+      expression nub3 = copy_expression(nub);
 
-            /* #1 copy s into a new statement */
-            statement new_statement = make_empty_statement();
-            statement_label(new_statement)=statement_label(s);
-            statement_comments(new_statement)=statement_comments(s);
-            statement_declarations(new_statement)=statement_declarations(s);
-            statement_extensions(new_statement)=statement_extensions(s);
-            statement_decls_text(new_statement)=statement_decls_text(s);
-            statement_instruction(new_statement)=statement_instruction(s);
-            /* #2 reset the non relevant fields of new_statement */
-            statement_label(s)=entity_empty_label();
-            statement_number(s)=STATEMENT_NUMBER_UNDEFINED;
-            statement_ordering(s)=STATEMENT_ORDERING_UNDEFINED;
-            statement_comments(s)=empty_comments;
-            statement_declarations(s)=NIL;
-            statement_extensions(s)=empty_extensions();
-            statement_decls_text(s)=NULL;
-            /* #3 make s a block instead of a loop */
-            statement_instruction(s) = make_instruction_block(make_statement_list(new_statement,end_stmt));
+      /* Compute the final value of the loop index to have the correct side
+	 effect of the loop on the original index: */
+      expression exp_max = expression_undefined, exp_plus = expression_undefined;
+      if ( expression_constant_p(nub3)) {
+	int upper = expression_to_int(nub3);
+	if (upper > 0)
+	  exp_max = make_integer_constant_expression(upper);
+      }
+      else {
+	entity max_ent = FindEntity(TOP_LEVEL_MODULE_NAME,MAX_OPERATOR_NAME);
+	exp_max = make_max_exp(max_ent, copy_expression(nub),
+			       make_integer_constant_expression(0));
+      }
+      if (expression_undefined_p(exp_max))
+	exp_plus = copy_expression(rl);
+      else
+	exp_plus = make_op_exp(PLUS_OPERATOR_NAME,
+			       make_op_exp(MULTIPLY_OPERATOR_NAME,
+					   copy_expression(ri),
+					   exp_max),
+			       copy_expression(rl));
 
-            debug( 4, __FUNCTION__, "end LOOP\n");
-        }
+      expression index_exp = entity_to_expression(index);
+      /* Add after the loop the initialization of the loop index to the
+	 final value: */
+      statement end_stmt = make_assign_statement(copy_expression(index_exp),
+						 exp_plus);
+      append_a_statement(s, end_stmt);
     }
+    pips_debug( 4, "end LOOP\n");
+  }
 }
 
 
-/** 
- * Apply the loop normalization upon a module
- * 
- * @param mod_name name of the normalized module
- * 
- * @return true
- */
+/** Apply the loop normalization upon a module
+
+    Try to normalize each loop into a loop with a 1-step increment
+
+    @param mod_name name of the normalized module
+
+    @return true
+*/
 bool loop_normalize(char *mod_name)
 {
     /* prelude */
     debug_on("LOOP_NORMALIZE_DEBUG_LEVEL");
-    if (get_debug_level() > 1) user_log("\n\n *** LOOP_NORMALIZE for %s\n", mod_name);
+    pips_debug(1, "\n\n *** LOOP_NORMALIZE for %s\n", mod_name);
 
     set_current_module_entity(module_name_to_entity(mod_name));
     set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, mod_name, TRUE));
@@ -235,7 +250,7 @@ bool loop_normalize(char *mod_name)
     DB_PUT_MEMORY_RESOURCE(DBR_CODE, mod_name, get_current_module_statement());
 
     /* postlude */
-    if (get_debug_level() > 1) user_log("\n\n *** LOOP_NORMALIZE done\n");
+    pips_debug(1, "\n\n *** LOOP_NORMALIZE done\n");
     debug_off();
     reset_current_module_entity();
     reset_current_module_statement();

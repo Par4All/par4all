@@ -22,7 +22,7 @@
 TARGET	= to_begin_with
 
 LIB_CFILES = \
-	xml.c
+	add_stuff_to_module.c xml.c
 
 #INC_TARGET =    $(TARGET).h
 

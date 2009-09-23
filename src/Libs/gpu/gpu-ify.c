@@ -133,7 +133,7 @@ gpu_ify_statement(statement s, int depth) {
   if (get_bool_property("GPU_USE_WRAPPER")) {
     /* Add index initialization from GPU coordinates, in the reverse order
        since we use insert_a_statement() */
-    for(int i = depth - 1; i >= 0; i++) {
+    for(int i = depth - 1; i >= 0; i--) {
       entity index = perfectly_nested_loop_index_at_depth(s, i);
       // Get the iteration coordinate intrinsic, for example P4A_VP_1:
       /*
