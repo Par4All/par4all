@@ -1,0 +1,97 @@
+Try to restructure the code for more precision:
+void getimage(char *filename)
+{
+   double z;
+   double amp;
+   double sum;
+   double squares;
+   int i;
+   int j;
+   int conj;
+   int nx;
+   int ny;
+   unsigned char c;
+   FILE *fp;
+   
+   /* Erase the memory, in case the image is not big enough: */
+   for (i = 0;i<64;i++)                                                 /*0031*/
+      for (j = 0;j<64;j++) {                                            /*0032*/
+         imagein[i][j].re = 0.0;                                        /*0033*/
+         imagein[i][j].im = 0.0;                                        /*0034*/
+      }
+}
+void getimage(char *filename)
+{
+   double z;
+   double amp;
+   double sum;
+   double squares;
+   int i;
+   int j;
+   int conj;
+   int nx;
+   int ny;
+   unsigned char c;
+   FILE *fp;
+   
+   /* Erase the memory, in case the image is not big enough: */
+   for(i = 0; i <= 63; i += 1)                                          /*0031*/
+      for(j = 0; j <= 63; j += 1) {                                     /*0032*/
+         imagein[i][j].re = 0.0;                                        /*0033*/
+         imagein[i][j].im = 0.0;                                        /*0034*/
+      }
+}
+void getimage(char *filename)
+{
+   double z;
+   double amp;
+   double sum;
+   double squares;
+   int i;
+   int j;
+   int conj;
+   int nx;
+   int ny;
+   unsigned char c;
+   FILE *fp;
+   int i0;
+   int j0;
+   {
+      
+      /* Erase the memory, in case the image is not big enough: */
+      for(i0 = 0; i0 <= 63; i0 += 1)
+         for(j01 = 0; j01 <= 63; j01 += 1) {
+      int j01;
+            imagein[i0][j01].re = 0.0;                                  /*0033*/
+            imagein[i0][j01].im = 0.0;                                  /*0034*/
+         }
+   }
+}
+void getimage(char *)
+{
+   int i0;
+   {
+      
+      /* Erase the memory, in case the image is not big enough: */
+      for(i0 = 0; i0 <= 63; i0 += 1)
+         for(j01 = 0; j01 <= 63; j01 += 1) {
+      int j01;
+            imagein[i0][j01].re = 0.0;                                  /*0033*/
+            imagein[i0][j01].im = 0.0;                                  /*0034*/
+         }
+   }
+}
+void getimage(char *)
+{
+   int i0;
+   {
+      
+      /* Erase the memory, in case the image is not big enough: */
+      for(i0 = 0; i0 <= 63; i0 += 1)
+         for(j01 = 0; j01 <= 63; j01 += 1) {
+      int j01;
+            imagein[i0][j01].re = 0.0;                                  /*0033*/
+            imagein[i0][j01].im = 0.0;                                  /*0034*/
+         }
+   }
+}
