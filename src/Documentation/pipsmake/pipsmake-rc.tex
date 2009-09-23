@@ -5604,8 +5604,31 @@ gpu_ify                    > MODULE.code
 		< MODULE.code
         < MODULE.cumulated_effects
 \end{PipsMake}
-%		! MODULE.privatize_module
-%		! MODULE.coarse_grain_parallelization
+
+The launcher, wrapper and kernel prefix names to be used during the generation:
+\begin{PipsProp}
+GPU_LAUNCHER_PREFIX "p4a_kernel_launcher"
+GPU_WRAPPER_PREFIX "p4a_kernel_wrapper"
+GPU_KERNEL_PREFIX "p4a_kernel"
+\end{PipsProp}
+
+According to
+\begin{PipsProp}
+GPU_USE_WRAPPER TRUE
+\end{PipsProp}
+the phase generate a wrapper function to get the iteration coordinate from
+intrinsics functions instead of the initial loop indices. Using this kind
+of wrapper is the normal behaviour but for simulation of an accelerator
+code, not using a wrapper is useful.
+
+The intrinsics function to get an i-th coordinate in the iteration space
+is defined by this GNU \emph{à la} \texttt{printf} format:
+\begin{PipsProp}
+GPU_COORDINATE_INTRINSICS_FORMAT "P4A_VP_%d"
+\end{PipsProp}
+where \verb|%d| is used to get the dimension number.
+
+Please, do not use this feature for buffer-overflow attack...
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% TRANSFORMATIONS

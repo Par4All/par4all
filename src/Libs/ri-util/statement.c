@@ -1213,7 +1213,7 @@ gather_all_comments_of_a_statement(statement s)
 }
 
 
-/* Find the first statement of a statement, if any: */
+/* Find the first comment of a statement, if any: */
 string
 find_first_statement_comment(statement s)
 {
@@ -1237,6 +1237,8 @@ find_first_statement_comment(statement s)
 /* Put a comment on a statement in a safe way. That is it find the
    first non-block statement to attach it or insert a CONTINUE and put
    the statement on it. You should free the old one...
+
+   The comment should have been malloc()'ed before.
 
    Return TRUE on success, FALSE else. */
 bool
@@ -1267,7 +1269,10 @@ try_to_put_a_comment_on_a_statement(statement s,
 
 /* Similar to try_to_put_a_comment_on_a_statement() but insert a
    CONTINUE to put the comment on it if there is only empty
-   sequence(s): */
+   sequence(s)
+
+   The comment should have been malloc()'ed before.
+*/
 void
 put_a_comment_on_a_statement(statement s,
 			     string the_comments)
@@ -1340,6 +1345,76 @@ insert_comments_to_statement(statement s,
     }
 }
 
+
+/* as name indicate, a comment is added.
+ */
+#define ERROR_PREFIX "!ERROR: "
+#define BUFSIZE 1024
+
+void add_one_line_of_comment(statement s, string format, ...)
+{
+  char buffer[BUFSIZE];
+  int error;
+  va_list some_arguments;
+
+  va_start(some_arguments, format);
+  error = vsnprintf(buffer, BUFSIZE, format, some_arguments);
+  if (error<0) {
+      pips_internal_error("buffer too small");
+  }
+  va_end(some_arguments);
+
+  if (s)
+  {
+      if (string_undefined_p(statement_comments(s)) || statement_comments(s)==NULL)
+      {
+	  statement_comments(s) = strdup(concatenate(ERROR_PREFIX, buffer, "\n", NULL));
+      }
+      else
+      {
+	  string newcom =
+	      strdup(concatenate(statement_comments(s), ERROR_PREFIX, buffer, "\n", NULL));
+	  free(statement_comments(s));
+	  statement_comments(s) = newcom;
+      }
+  }
+  else
+  {
+      fprintf(stderr, ERROR_PREFIX "%s\n", buffer);
+  }
+}
+
+
+/* Since block cannot carry comments nor line numbers, they must be
+   moved to an internal continue statement.
+
+   A prettier version could be to make a new block containing the
+   continue and then the old block. Comments might be better located.
+ */
+statement add_comment_and_line_number(statement s, string sc, int sn)
+{
+  string osc = statement_comments(s);
+  statement ns = s;
+
+  if(osc!=NULL && !string_undefined_p(osc)) {
+    free(osc);
+  }
+
+  if(!statement_block_p(s)) {
+    statement_comments(s) = sc;
+    statement_number(s) = sn;
+  }
+  else if(!string_undefined_p(sc)) {
+    /* A continue statement must be inserted as first block statement*/
+    statement nops = make_continue_statement(entity_undefined);
+    list sss = sequence_statements(instruction_sequence(statement_instruction(s)));
+    statement_comments(nops) = sc;
+    statement_number(nops) = sn;
+    sequence_statements(instruction_sequence(statement_instruction(s))) =
+      CONS(STATEMENT, nops, sss);
+  }
+  return ns;
+}
 
 
 /* Since blocks are not represented in Fortran, they cannot
@@ -1579,7 +1654,7 @@ unstructured_does_return(unstructured u)
   FORWARD_CONTROL_MAP(c, {
       returns = returns || (c==exit);
   }, entry, nodes);
-  gen_free_list(nodes);  
+  gen_free_list(nodes);
 
   return returns;
 }
@@ -1599,7 +1674,7 @@ void insert_or_append_a_statement_list(statement target,
     sequence seq = instruction_sequence(statement_instruction(target));
     if (after_p) // append
 	sequence_statements(seq) = gen_nconc(sequence_statements(seq), s_list);
-    else // insert	
+    else // insert
 	sequence_statements(seq) = gen_nconc(s_list, sequence_statements(seq));
   }
   else {
@@ -1698,10 +1773,10 @@ list
 gather_and_remove_all_format_statements(statement s)
 {
     list all_formats = NIL;
-    
+
     gen_context_recurse(s,&all_formats, statement_domain,
 		gen_true, gather_and_remove_all_format_statements_rewrite);
-    
+
     return all_formats = gen_nreverse(all_formats);
 }
 
@@ -1787,7 +1862,7 @@ statement_to_comment_length(statement stmt)
 
 
 /* Poor attempt at associating physical line numbers to statement.
- * 
+ *
  * Lines used for declarations are counted elsewhere: see
  * module_to_declaration_length()
  *
@@ -1836,7 +1911,7 @@ up_counter(statement s)
 	    current_line += 1;
 	}
     }
-    else if(instruction_test_p(i) 
+    else if(instruction_test_p(i)
 	    && statement_number(s) != STATEMENT_NUMBER_UNDEFINED) {
 	/* There must be an ENDIF here */
 	/* I doubt it's a real good way to detect synthetic IFs */
@@ -1978,48 +2053,11 @@ statement update_statement_instruction(statement s,instruction i)
   return s;
 }
 
-/* as name indicate, a comment is added.
- */
-#define ERROR_PREFIX "!ERROR: "
-#define BUFSIZE 1024
 
-void add_one_line_of_comment(statement s, string format, ...)
-{
-  char buffer[BUFSIZE];
-  int error;
-  va_list some_arguments;
-
-  va_start(some_arguments, format);
-  error = vsnprintf(buffer, BUFSIZE, format, some_arguments);
-  if (error<0) {
-      pips_internal_error("buffer too small");
-  }
-  va_end(some_arguments);
-
-  if (s) 
-  {
-      if (string_undefined_p(statement_comments(s)) || statement_comments(s)==NULL) 
-      {
-	  statement_comments(s) = strdup(concatenate(ERROR_PREFIX, buffer, "\n", NULL));
-      }
-      else 
-      {
-	  string newcom = 
-	      strdup(concatenate(statement_comments(s), ERROR_PREFIX, buffer, "\n", NULL));
-	  free(statement_comments(s));
-	  statement_comments(s) = newcom;
-      }
-  }
-  else
-  {
-      fprintf(stderr, ERROR_PREFIX "%s\n", buffer);
-  }
-}
-
 static bool find_implicit_goto(statement s, list * tl)
 {
   bool found = FALSE;
-  
+
   if(statement_call_p(s)) {
     call c = instruction_call(statement_instruction(s));
     entity f = call_function(c);
@@ -2096,36 +2134,6 @@ bool all_statements_defined_p(statement s)
   return !undefined_p;
 }
 
-/* Since block cannot carry comments nor line numbers, they must be
-   moved to an internal continue statement.
-
-   A prettier version could be to make a new block containing the
-   continue and then the old block. Comments might be better located.
- */
-statement add_comment_and_line_number(statement s, string sc, int sn)
-{
-  string osc = statement_comments(s);
-  statement ns = s;
-
-  if(osc!=NULL && !string_undefined_p(osc)) {
-    free(osc);
-  }
-
-  if(!statement_block_p(s)) {
-    statement_comments(s) = sc;
-    statement_number(s) = sn;
-  }
-  else if(!string_undefined_p(sc)) {
-    /* A continue statement must be inserted as first block statement*/
-    statement nops = make_continue_statement(entity_undefined);
-    list sss = sequence_statements(instruction_sequence(statement_instruction(s)));
-    statement_comments(nops) = sc;
-    statement_number(nops) = sn;
-    sequence_statements(instruction_sequence(statement_instruction(s))) =
-      CONS(STATEMENT, nops, sss);
-  }
-  return ns;
-}
 
 static bool add_statement_declarations(statement s, list *statement_to_all_included_declarations)
 {
@@ -2596,7 +2604,7 @@ static void statement_clean_declarations_statement_walker(statement s, set re)
  * retrieves the set of entites used in elem
  * beware that this entites may be formal parameters, functions etc
  * so please filter this set depending on your need
- * 
+ *
  * @param elem  element to check (any gen_recursifiable type is allowded)
  *
  * @return set of referenced entities

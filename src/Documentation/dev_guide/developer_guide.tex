@@ -2112,6 +2112,20 @@ Skip this step if you are using an already existing library.
   libraries it uses.
 \end{itemize}
 
+Since we use \texttt{svn} to deal with the code, it is a good practice to
+add \verb|svn:ignore| properties to ignore considering automatically
+generated files, such as for \texttt{Libs/gpu}:
+\begin{verbatim}
+.build_lib.*
+gpu.h
+.build_inc
+.header
+.build_inc_second_pass
+.build_bootstrap
+.depend.*
+LINUX*
+\end{verbatim}
+
 
 \subsubsection{In directory \texttt{src/Scripts/env}}
 \label{sec:direct-env}

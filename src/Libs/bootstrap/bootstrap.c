@@ -4538,21 +4538,44 @@ switch_name_function get_switch_name_function_for_intrinsic(string name)
    functional type whose result and arguments have an overloaded basic
    type. The number of arguments is given by the IntrinsicTypeDescriptorTable
    data structure. */
-
-void
-MakeIntrinsic(name, n, intrinsic_type)
-     string name;
-     int n;
-     type (*intrinsic_type)(int);
-{
+entity
+MakeIntrinsic(string name, int arity, type (*intrinsic_type)(int)) {
   entity e;
 
   e = make_entity(AddPackageToName(TOP_LEVEL_MODULE_NAME, name),
-                  intrinsic_type(n),
+                  intrinsic_type(arity),
                   make_storage(is_storage_rom, UU),
                   make_value(is_value_intrinsic, NIL));
 
+  return e;
 }
+
+
+/** Create a default intrinsic
+
+    Useful to create on-the-fly intrinsics.
+
+    It creates an intrinsic with a default type, that is with overload
+    parameter and return types.
+
+    @param name is the name of the intrinsic
+
+    @param n is the number of argument
+
+    @return the entity of the intrinsic
+*/
+entity
+FindOrMakeDefaultIntrinsic(string name, int arity) {
+#if 0
+  // Hmmm, it looks like FindEntity create the entity anyway... :-(
+  entity e = FindEntity(TOP_LEVEL_MODULE_NAME, name);
+  if (!entity_undefined_p(e))
+    /* It seems it has been previously created: */
+    return e;
+#endif
+  return MakeIntrinsic(name, arity, default_intrinsic_type);
+}
+
 
 /* This function is called one time (at the very beginning) to create
    all intrinsic functions. */

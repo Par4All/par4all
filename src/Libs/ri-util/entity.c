@@ -930,7 +930,6 @@ entity find_or_create_entity(string full_name)
    parenthesis or CALL keyword in a function or subroutine call.
    See SafeFindOrCreateEntity().
 */
-
 entity FindOrCreateEntity(string package /* package name */,
 			  string name /* entity name */)
 {
@@ -940,6 +939,19 @@ entity FindOrCreateEntity(string package /* package name */,
 
   return e;
 }
+
+
+/* Return a top-level entity
+
+   @param name of the entity to find/construct
+
+   @return the entity
+*/
+entity FindOrCreateTopLevelEntity(string name)
+{
+  return FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, name);
+}
+
 
 /* FIND_MODULE returns entity. Argument is module_name */
 /* This function should be replaced by local_name_to_top_level_entity() */

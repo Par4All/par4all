@@ -172,6 +172,32 @@ expression entity_to_expression(entity e)
     return reference_to_expression(make_reference(e, NIL));
 }
 
+
+expression make_entity_expression(entity e, cons *inds)
+{
+  syntax s = syntax_undefined;
+  if( entity_constant_p(e) )
+    {
+      s = make_syntax_call(make_call(e,NIL));
+    }
+  else
+    {
+      reference r = make_reference(e, inds);
+      s = make_syntax_reference(r);
+    }
+  return make_expression(s, normalized_undefined);
+}
+
+
+/**
+ * This function build and return an expression given
+ * an entity an_entity
+ */
+expression make_expression_from_entity(entity an_entity)
+{
+  return make_entity_expression(an_entity, NIL);
+}
+
 /*
  * remarks: why is the default to normalized_complex~?
  * should be undefined, OR normalized if possible.
@@ -2819,15 +2845,6 @@ bool expression_similar_p(expression target, expression pattern)
   bool similar = _expression_similar_p(target,pattern,symbol_table);
   hash_table_free(symbol_table);
   return similar;
-}
-
-/**
- * This function build and return an expression given
- * an entity an_entity
- */
-expression make_expression_from_entity(entity an_entity)
-{
-  return make_entity_expression(an_entity, NIL);
 }
 
 list /* of expression */

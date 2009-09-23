@@ -3,6 +3,8 @@
    There are many things elsewher that should be factored out into here
    (static controlize...).
 
+*/
+
 /*
 
   $Id$
@@ -522,6 +524,21 @@ perfectly_nested_loop_to_body_at_depth(statement s, int depth) {
     }
   }
   return body;
+}
+
+
+/** Get the index of the loop at a given depth inside a loop-nest
+
+    @param s is the loop-nest statement to dig into
+
+    @param depth is the diving depth
+
+    @return the loop-body found at the given depth
+ */
+entity
+perfectly_nested_loop_index_at_depth(statement s, int depth) {
+  statement loop = perfectly_nested_loop_to_body_at_depth(s, depth);
+  return loop_index(statement_loop(loop));
 }
 
 

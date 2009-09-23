@@ -303,24 +303,8 @@ string module_entitiesfilename(entity e)
 {
     return(string_entitiesfilename(entity_local_name(e)));
 }
-
-/* functions for expressions */
 
-expression make_entity_expression(entity e, cons *inds)
-{
-  syntax s = syntax_undefined;
-  if( entity_constant_p(e) )
-    {
-      s = make_syntax_call(make_call(e,NIL));
-    }
-  else
-    {
-      reference r = make_reference(e, inds);
-      s = make_syntax_reference(r);
-    }
-  return make_expression(s, normalized_undefined);
-}
-
+
 static int init = 100000;
 
 void reset_label_counter()
