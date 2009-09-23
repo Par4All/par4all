@@ -267,11 +267,47 @@ static bool redeclaration_enter_statement(statement s, redeclaration_context_t *
 	}
 
 	if(redeclare_p) {
-	  /* Build the new variable */
-	  string eun = entity_user_name(v);
 
+	  /* Build the new variable */
+	  string eun  = entity_user_name(v);	 
 	  string negn = strdup(concatenate(mn, MODULE_SEP_STRING, rdcp->scope, eun, NULL));
-	  entity nv = make_entity_copy_with_new_name(v, negn, move_initialization_p);
+	  entity nv   = entity_undefined;
+	  //list unused_nvs = NIL;
+
+	  /* When renaming the variable, we must make sure that we are
+	     not creating a user name conflict at source-code
+	     level. For now we will keep regenerating nv and checking
+	     it against the list of all entities used in the
+	     statement, until no conflict remains.
+	  */
+
+	  statement ds = rdcp->declaration_statement;
+	  list dselist = statement_to_referenced_entities(ds);
+	  bool ok_p    = FALSE;	  
+
+	  ifdebug(8) {
+	    pips_debug(8, "Entities found in declaration statement: ");
+	    print_entities(dselist);
+	    fprintf(stderr, "\n");
+	  }
+
+	  /* We iterate over suffixes (_0, _1, _2, ...) and test if we
+	     generate a conflict */
+	  do {
+	    nv = make_entity_copy_with_new_name(v, negn, move_initialization_p);
+	    FOREACH(ENTITY, dv, dselist) {
+	      ok_p = strcmp(entity_user_name(dv), entity_user_name(nv)) != 0;
+	      if (!ok_p) {
+		pips_debug(1, "Proposed variable \"%s\" conflicts with references in declaration statement\n",
+			   entity_name(nv));
+		break;
+	      }
+	    }
+	    if (!ok_p) {
+	      // WARNING: We must remember to free the newly declared nv when it's not used!
+	      //unused_nvs = CONS(ENTITY, nv, unused_nvs);
+	    }	      
+	  } while (!ok_p);
 
 	  statement_declarations(rdcp->declaration_statement) =
 	    gen_nconc(statement_declarations(rdcp->declaration_statement),
@@ -347,14 +383,14 @@ static void compute_renamings(statement s, string sc, string mn, hash_table rena
 */
 void statement_flatten_declarations(statement s)
 {
-    /* For the time being, we handle only blocks with declarations */
-    if (statement_block_p(s)) {
-        if( !ENDP(statement_declarations(s) ) ) {
-            list declarations = instruction_to_declarations(statement_instruction(s)); // Recursive
+  /* For the time being, we handle only blocks with declarations */
+  if (statement_block_p(s)) {
+    if( !ENDP(statement_declarations(s) ) ) {
+      list declarations = instruction_to_declarations(statement_instruction(s)); // Recursive
             hash_table renamings = hash_table_make(hash_pointer, 10);
             bool renaming_p = FALSE;
 
-            /* Can we find out what the local scope os statement s is? */
+            /* Can we find out what the local scope of statement s is? */
             FOREACH(ENTITY, se, statement_declarations(s)) {
                 string sen  = entity_name(se);
                 string seln = entity_local_name(se);
@@ -383,7 +419,7 @@ void statement_flatten_declarations(statement s)
                 //char *(*key_to_string)(void*),
                 //char *(*value_to_string)(void*),
 
-                pips_debug(1, "gen_multi_recurse\n");
+                pips_debug(1, "gen_context_multi_recurse\n");
 
                 gen_context_multi_recurse( statement_instruction(s), renamings,
                         reference_domain, gen_true, rename_reference,
@@ -418,7 +454,9 @@ static bool unroll_loops_in_statement(statement s) {
 }
 
 
-/* This function is be composed of several steps:
+/* Pipsmake 'flatten_code' phase.
+
+   This function is be composed of several steps:
 
    1 flatten declarations inside statement: declarations are moved as
      high as possible in the control structure
@@ -538,7 +576,7 @@ void statement_split_initializations(statement s)
     pips_internal_error("Input assumptions not met: not a block statement.\n");
 }
 
-/* Main function for the split_initializations phase
+/* Pipsmake 'split_initializations' phase
  */
 bool split_initializations(string module_name)
 {
