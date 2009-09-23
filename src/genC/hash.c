@@ -660,7 +660,7 @@ static char * hash_print_key(hash_key_type t, const void * key)
      truncation warnings: */
   else if (t == hash_int)
     sprintf(buffer, "%td", (_int) key);
-  else if (t == hash_pointer)
+  else if (t == hash_pointer || t == hash_private)
     sprintf(buffer, "%p", key);
   else if (t == hash_chunk)
     sprintf(buffer, "%zx", (_uint) ((gen_chunk *)key)->p);
