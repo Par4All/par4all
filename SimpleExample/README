@@ -24,8 +24,9 @@ In this directory you should find the following files:
       same source file. Easy, isn't it?
     7 Now you can evaluate the speed up on your machine using this simple
       formula : sequantial_elapse_time / parallel_sequential_time. As an
-      example on a workstation with 2 Intel Xeon X5440 the scrore of 5.5 is
+      example on a workstation with 2 Intel Xeon X5440 the scrore of 6.6 is
       reached.
+    8 The directory can be clean using the "make clean" command
 
 2 - The Makefile
 
@@ -38,7 +39,7 @@ of the parallel program also include the source file generation by PIPS.
 
 3 - The Matrix Muliplication
 
-The Matrix multiplications basically allocates three square matrices (with 1000
+The Matrix multiplications basically allocates three square matrices (with 2000
 row). Then it inits the matrices with one and do the multiplication. It finally
 checks the result matrix.
 

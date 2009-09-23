@@ -1,7 +1,7 @@
 c square matrix multiplication
       program matmul
       integer n
-      parameter (n=1000)
+      parameter (n=2000)
       integer a(n,n), b(n,n), c(n,n), x
       integer i, j, k
       logical flg
