@@ -1,8 +1,8 @@
-delete matmul1
+delete matmul
 
 setproperty ABORT_ON_USER_ERROR TRUE
 
-create matmul1 matmul1.f
+create matmul matmul.f
 
 setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
 
@@ -11,6 +11,8 @@ echo // OMP style
 activate PRINT_PARALLELIZEDOMP_CODE
 display PARALLELPRINTED_FILE(%ALL)
 apply INTERNALIZE_PARALLEL_CODE(%ALLFUNC)
+setproperty PRETTYPRINT_SEQUENTIAL_STYLE    "do"
+apply OMPIFY_CODE(%ALL)
 apply UNSPLIT(%ALL)
 
 close

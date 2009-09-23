@@ -1,28 +1,23 @@
 FC=gfortran
 PAR_FLAG=-fopenmp
+OPT_FLAG=-O2
 PIPS=tpips
 
 all: parallel sequential
 
-parallel: matmul1_par matmul2_par
+parallel: matmul_par
 
-sequential: matmul1 matmul2
+sequential: matmul
 
-matmul1:
-	$(FC) matmul1.f -o matmul1
+matmul:
+	$(FC) $(OPT_FLAG) matmul.f -o matmul
 
-matmul1_par:
-	$(PIPS) matmul1.tpips
-	$(FC) $(PAR_FLAG) matmul1.database/Src/matmul1.f -o matmul1_par
-
-matmul2:
-	$(FC) matmul2.f -o matmul2
-
-matmul2_par:
-	$(PIPS) matmul2.tpips
-	$(FC) $(PAR_FLAG) matmul2.database/Src/matmul2.f -o matmul2_par
+matmul_par:
+	./PipsCheck.sh
+	$(PIPS) matmul.tpips
+	$(FC) $(PAR_FLAG) $(OPT_FLAG) matmul.database/Src/matmul.f -o $@
 
 clean:
 	rm -rf *.o *.database *~
-	rm -f matmul1 matmul2
-	rm -f matmul1_par matmul2_par
+	rm -f matmul
+	rm -f matmul_par

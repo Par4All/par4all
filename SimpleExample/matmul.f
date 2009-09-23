@@ -1,5 +1,5 @@
 c square matrix multiplication
-      program matmul1
+      program matmul
       integer n
       parameter (n=1000)
       integer a(n,n), b(n,n), c(n,n), x
@@ -15,10 +15,11 @@ C initialize the square matrices with ones
 C multiply the two square matrices of ones
       do j=1, n
          do i=1, n
-            c(i,j) = 0
+            x = 0
             do k=1, n
-               c(i,j) = c(i,j) + a(i,k)*b(k,j)
+               x = x + a(i,k)*b(k,j)
             enddo
+            c(i,j) = x
          enddo
       enddo
 C The result should be a square matrice of n
