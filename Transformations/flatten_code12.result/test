@@ -43,7 +43,7 @@ void flatten_code12(void)
 // (0,1)
    // BEGIN BLOCK
    int i = (int) foo_0;
-   static int foo_0 = 0;
+   static int foo_1 = 0;
 // (0,2)
 
    foo_0++;                                                             /*0006*/
@@ -54,10 +54,10 @@ void flatten_code12(void)
       // BEGIN BLOCK
 // (0,5)
 
-      foo_0++;                                                          /*0011*/
+      foo_1++;                                                          /*0011*/
 // (0,6)
 
-      fprintf(stdout, "foo=%d\n", foo_0);                               /*0013*/
+      fprintf(stdout, "foo=%d\n", foo_1);                               /*0013*/
       // END BLOCK
    }
 // (0,7)
@@ -70,11 +70,11 @@ Unsplit and compile resulting code
 
 Execute resulting code
 
+foo=1
 foo=2
 foo=3
 foo=4
-foo=5
-foo_0=0.000000
+foo_0=4.000000
 
 Show diffs, must be empty
 
