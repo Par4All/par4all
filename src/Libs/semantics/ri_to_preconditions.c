@@ -686,8 +686,7 @@ transformer statement_to_postcondition(
 	if(!ENDP(statement_declarations(s)) && !statement_block_p(s)) {
 	  // FI: Just to gain some time before dealing with controlizer and declarations updates
 	  //pips_internal_error("Statement %p carries declarations\n");
-	  pips_user_warning("Statement %p with instruction \"%s\" "
-			    "carries declarations\n",
+	  pips_user_warning("Statement %p with instruction carries declarations\n",
 			    instruction_identification(statement_instruction(s)));
 	}
 
