@@ -5651,6 +5651,16 @@ where \verb|%d| is used to get the dimension number.
 Please, do not use this feature for buffer-overflow attack...
 
 
+The next phase annotates loop nests with comments and guards for further generation of CUDA calls.
+
+\begin{PipsMake}
+gpu_loop_nest_annotate	        > MODULE.code	
+        < PROGRAM.entities
+        < MODULE.code
+
+\end{PipsMake}
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% TRANSFORMATIONS
 
 \chapter{Program Transformations}
@@ -6120,6 +6130,8 @@ Should be always beneficial to terapix, but it may depend for spoc.
 \begin{PipsProp}
 FREIA_REMOVE_DUPLICATE_OPERATIONS TRUE
 \end{PipsProp}
+
+
 
 
 %-----------End of Loop Transformations -------------------------

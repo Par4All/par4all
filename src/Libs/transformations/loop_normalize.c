@@ -1,6 +1,6 @@
 /*
 
-  $Id: loop_normalize.c 15427 2009-09-21 15:07:16Z keryell $
+  $Id$
 
   Copyright 1989-2009 MINES ParisTech
 

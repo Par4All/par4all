@@ -55,7 +55,7 @@ LIB_CFILES =	\
 		generate_pragma.c \
 		scalarization.c \
 		flatten_code.c \
-		terapixify.c
+		terapixify.c 
 
 INC_TARGET =    $(TARGET).h
 
