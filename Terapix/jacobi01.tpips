@@ -3,7 +3,7 @@ delete $WKS
 
 setproperty ABORT_ON_USER_ERROR TRUE
 
-create $WKS $WKS.c
+create $WKS $WKS.c include/load.c
 
 activate C_PARSER
 setproperty PRETTYPRINT_C_CODE TRUE

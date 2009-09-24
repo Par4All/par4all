@@ -2,14 +2,14 @@ delete kernelize01
 
 setproperty ABORT_ON_USER_ERROR TRUE
 
-create kernelize01 kernelize01.c
+create kernelize01 kernelize01.c include/load.c
 
 activate C_PARSER
 setproperty PRETTYPRINT_C_CODE TRUE
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
-#activate PRINT_CODE_REGIONS
 
+display PRINTED_FILE[memload]
 module foo
 
 echo
@@ -31,7 +31,8 @@ display PRINTED_FILE[foo]
 display PRINTED_FILE[run_kernel]
 display PRINTED_FILE[kernel]
 
-#apply KERNEL_LOAD_STORE[foo]
+apply KERNEL_LOAD_STORE[run_kernel]
+display PRINTED_FILE
 
 echo
 echo Code after cleanup
