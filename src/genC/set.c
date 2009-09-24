@@ -171,6 +171,9 @@ bool list_in_set_p(const list l, const set s)
  */
 set set_union(set s1, const set s2, const set s3)
 {
+  // do not warn on redefinitions when computing an union.
+  bool warning = hash_warn_on_redefinition_p();
+  if (warning) hash_dont_warn_on_redefinition();
   if( s1 != s3 ) {
     set_assign(s1, s2) ;
     HASH_MAP( k, v, hash_put( s1->table, k, v), s3->table ) ;
@@ -178,6 +181,7 @@ set set_union(set s1, const set s2, const set s3)
   else {
     HASH_MAP( k, v, hash_put( s1->table, k, v), s2->table ) ;
   }
+  if (warning) hash_warn_on_redefinition();
   return s1;
 }
 
