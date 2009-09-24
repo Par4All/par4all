@@ -67,8 +67,8 @@ call range_to_dma(expression from,expression to,range r,enum region_to_dma_switc
     return make_call(
             mcpy,
             make_expression_list(
-                MakeUnaryCall(entity_intrinsic(ADDRESS_OF_OPERATOR_NAME),to),
-                from,
+                MakeUnaryCall(entity_intrinsic(ADDRESS_OF_OPERATOR_NAME),(dma_load_p(s)?to:from)),
+                dma_load_p(s)?from:to,
         /*        MakeBinaryCall(
                     entity_intrinsic(MULTIPLY_OPERATOR_NAME),
                     make_expression(
@@ -149,8 +149,13 @@ statement region_to_dma(statement stat, enum region_to_dma_switch s)
 }
 #endif
 
+struct dma_pair {
+    entity new_ent;
+    enum region_to_dma_switch s;
+};
+
 static
-statement effects_to_dma(statement stat, enum region_to_dma_switch s)
+statement effects_to_dma(statement stat, enum region_to_dma_switch s, hash_table e2e)
 {
     list rw_effects= load_cumulated_rw_effects_list(stat);
     list effects = NIL;
@@ -168,22 +173,38 @@ statement effects_to_dma(statement stat, enum region_to_dma_switch s)
     {
         statement the_dma = statement_undefined;
         reference r = effect_any_reference(eff);
-        range the_range = make_range(
-                make_expression_0(),
-                MakeBinaryCall(entity_intrinsic(MINUS_OPERATOR_NAME),
-                    make_expression(make_syntax_sizeofexpression(make_sizeofexpression_type(entity_type(reference_variable(r)))),normalized_undefined),
-                    make_expression_1()),
-                make_expression_1());
-        if(!ENDP(variable_dimensions(type_variable(entity_type(reference_variable(r))))))
+        entity re = reference_variable(r);
+        struct dma_pair * val = (struct dma_pair *) hash_get(e2e, re);
+
+        if( val == HASH_UNDEFINED_VALUE || (val->s != s) )
         {
-            entity re = reference_variable(r);
-            expression from = entity_to_expression(re);
-            entity eto = make_temporary_array_entity(reference_variable(r),expression_undefined);
-            AddEntityToCurrentModule(eto);
-            expression to = reference_to_expression(make_reference(eto,NIL));
-            the_dma = instruction_to_statement(make_instruction_call(range_to_dma(from,to,the_range,s)));
-            statements=CONS(STATEMENT,the_dma,statements);
-            replace_entity(stat,re,eto);
+            if(!ENDP(variable_dimensions(type_variable(entity_type(re)))))
+            {
+                range the_range = make_range(
+                        make_expression_0(),
+                        MakeBinaryCall(entity_intrinsic(MINUS_OPERATOR_NAME),
+                            make_expression(make_syntax_sizeofexpression(make_sizeofexpression_type(entity_type(re))),normalized_undefined),
+                            make_expression_1()),
+                        make_expression_1());
+                expression from = entity_to_expression(re);
+                entity eto;
+                if( val == HASH_UNDEFINED_VALUE ) {
+                    eto = make_temporary_array_entity(re,expression_undefined);
+                    AddEntityToCurrentModule(eto);
+                    replace_entity(stat,re,eto);
+                    val=malloc(sizeof(*val));
+                    val->new_ent=eto;
+                    val->s=s;
+                    hash_put(e2e,re,val);
+                }
+                else {
+                    eto = val->new_ent;
+                    val->s=s;/*to avoid duplicate*/
+                }
+                expression to = reference_to_expression(make_reference(eto,NIL));
+                the_dma = instruction_to_statement(make_instruction_call(range_to_dma(from,to,the_range,s)));
+                statements=CONS(STATEMENT,the_dma,statements);
+            }
         }
     }
     gen_free_list(effects);
@@ -361,8 +382,11 @@ kernel_load_store_generator(statement s, string module_name)
             loads = region_to_dma(s,dma_load);
             stores = region_to_dma(s,dma_store);
 #else
-            loads = effects_to_dma(s,dma_load);
-            stores = effects_to_dma(s,dma_store);
+            hash_table e2e = hash_table_make(hash_pointer,HASH_DEFAULT_SIZE);
+            loads = effects_to_dma(s,dma_load,e2e);
+            stores = effects_to_dma(s,dma_store,e2e);
+            HASH_MAP(k,v,free(v),e2e);
+            hash_table_free(e2e);
 #endif
             /* add the load / stores now */
             {

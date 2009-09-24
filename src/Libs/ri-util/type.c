@@ -1789,6 +1789,7 @@ type expression_to_type(expression exp)
       }
     case is_syntax_sizeofexpression:
       {
+          /*
 	sizeofexpression se = syntax_sizeofexpression(s_exp);
 	pips_debug(6, "size of case \n");
 	if (sizeofexpression_type_p(se))
@@ -1800,7 +1801,8 @@ type expression_to_type(expression exp)
 	else
 	  {
 	    t = expression_to_type(sizeofexpression_expression(se));
-	  }
+	  }*/
+          t = make_type_variable(make_variable(make_basic_int(DEFAULT_POINTER_TYPE_SIZE),NIL,NIL));
 	break;
       }
     case is_syntax_subscript:
