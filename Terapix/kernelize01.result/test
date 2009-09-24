@@ -1,3 +1,15 @@
+void * memload(void **dest, void *src, size_t n)
+{
+   size_t i;
+   void *pdest = *dest = malloc(n);
+
+   if (!pdest) 
+      return (void *) 0;
+
+   for(i = 0; i <= n-1; i += 1)
+      ((char *) pdest)[i] = ((const char *) src)[i];
+   return pdest;
+}
 
 Initial code
 
@@ -58,6 +70,30 @@ void kernel(int a[100], int b[100], int c[100], int i)
    for(i_1 = i; i_1 <= MIN(i+9, 99); i_1 += 1)
       c[i_1] = a[i_1]+b[i_1];
 }
+int foo(int seed[100])
+{
+   int a[100];
+   int b[100];
+   int c[100];
+   int i;
+   int *P_0;
+   int *P_1;
+   int *P_2;
+   /* init */
+#pragma omp parallel for 
+   for(i = 0; i <= 99; i += 1) {
+      a[i] = seed[i];
+      b[i] = seed[99-i];
+   }
+   memload(&P_1, a, sizeof(int[100])-1-0+1);
+   memload(&P_0, b, sizeof(int[100])-1-0+1);
+   run_kernel(P_1, P_0, P_2);
+   memstore(&c, P_2, sizeof(int[100])-1-0+1);
+   /* print result */
+   for(i = 0; i <= 99; i += 1)
+      printf("%d ", c[i]);
+   printf("\n");
+}
 
 Code after cleanup
 
@@ -67,14 +103,19 @@ int foo(int seed[100])
    int b[100];
    int c[100];
    int i;
+   int *P_0;
+   int *P_1;
+   int *P_2;
    /* init */
 #pragma omp parallel for 
    for(i = 0; i <= 99; i += 1) {
       a[i] = seed[i];
       b[i] = seed[99-i];
    }
-   /* compute */
-   run_kernel(a, b, c);
+   memload(&P_1, a, sizeof(int[100])-1-0+1);
+   memload(&P_0, b, sizeof(int[100])-1-0+1);
+   run_kernel(P_1, P_0, P_2);
+   memstore(&c, P_2, sizeof(int[100])-1-0+1);
    /* print result */
    for(i = 0; i <= 99; i += 1)
       printf("%d ", c[i]);
