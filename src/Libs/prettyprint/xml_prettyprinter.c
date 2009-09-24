@@ -1,3 +1,27 @@
+/*
+
+  $Id$
+
+  Copyright 1989-2009 MINES ParisTech
+
+  This file is part of PIPS.
+
+  PIPS is free software: you can redistribute it and/or modify it
+  under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  any later version.
+
+  PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+  WARRANTY; without even the implied warranty of MERCHANTABILITY or
+  FITNESS FOR A PARTICULAR PURPOSE.
+
+  See the GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+
+*/
+
 #define DEBUG_XML 1
 
 #include <stdio.h>
@@ -147,13 +171,6 @@ static string xml_entity_local_name(entity var)
    parameter (n=4) -> #define n 4
  */
 
-static string 
-int_to_string(int i)
-{
-  char buffer[50];
-  sprintf(buffer, "%d", i);
-  return strdup(buffer);
-}
 
 
 /* forward declaration */
@@ -261,24 +278,24 @@ static string xml_dim_string(list ldim, string name)
 	nbdim++;
 	if (expression_integer_value(elow, &low)){
 	  if(nbdim != 1)
-	    origins = strdup(concatenate(origins, COMMA ,int_to_string(low), NULL));
+	    origins = strdup(concatenate(origins, COMMA ,i2a(low), NULL));
 	  else
-	    origins = strdup(concatenate(origins, int_to_string(low), NULL));
+	    origins = strdup(concatenate(origins, i2a(low), NULL));
 	}
 	else pips_user_error("Array origins must be integer\n");
 
 	if (expression_integer_value(eup, &up)){
 	  if(nbdim != 1)
-	    dimensions = strdup(concatenate(dimensions, COMMA ,int_to_string(up-low+1), NULL));
+	    dimensions = strdup(concatenate(dimensions, COMMA ,i2a(up-low+1), NULL));
 	  else
-	    dimensions = strdup(concatenate(dimensions, int_to_string(up-low+1), NULL));
+	    dimensions = strdup(concatenate(dimensions, i2a(up-low+1), NULL));
 	}
 	else pips_user_error("Array dimensions must be integer\n");
       }, ldim);
       *nbdimptr = nbdim;
       gen_array_append(array_dims, nbdimptr);
       gen_array_append(array_names, namep);
-      result = strdup(concatenate(result, int_to_string(nbdim), COMMA, NL, NULL));
+      result = strdup(concatenate(result, i2a(nbdim), COMMA, NL, NULL));
       result = strdup(concatenate(result, TAB, origins, CLOSEPAREN, COMMA, NL, NULL));
       result = strdup(concatenate(result, TAB, dimensions, CLOSEPAREN, COMMA, NL, NULL));
       result = strdup(concatenate(result, TAB, datatype, NL, NL, NULL));
@@ -537,7 +554,7 @@ static string xml_array_in_task(reference r, bool first, int task_number){
       fitting_array[i][j] = "0";
 
   /* XML reference header */
-  result = strdup(concatenate(result, "DATA(name = symbol!(\"", "T_", int_to_string(task_number),
+  result = strdup(concatenate(result, "DATA(name = symbol!(\"", "T_", i2a(task_number),
 			      "\" /+ \"", varname, "\"),", NL, TAB, TAB, NULL));
 
   result = strdup(concatenate(result, "darray = ", varname, "," NL, TAB, TAB, "accessMode = ", (first?"Wmode,":"Rmode,"),
@@ -635,7 +652,7 @@ static string xml_array_in_task(reference r, bool first, int task_number){
   
   /* Definition of the inner loop nest */
   /* FI->IH: if some columns are removed, the effective depth is unkown and must be computed here */
-  /* result = strdup(concatenate(result, "inLoopNest = LOOPNEST(deep = ", int_to_string(MONMAX(gen_array_nitems(intern_indices_array), 1)), ",", NL, TAB, TAB, TAB, NULL)); */
+  /* result = strdup(concatenate(result, "inLoopNest = LOOPNEST(deep = ", i2a(MONMAX(gen_array_nitems(intern_indices_array), 1)), ",", NL, TAB, TAB, TAB, NULL)); */
 
   for (j = 0; j<intern_nb; j++){
     bool is_null_p = TRUE;
@@ -825,7 +842,7 @@ static call xml_loop_from_loop(loop l, string * result, int task_number){
   u = atoi(xml_expression(range_upper(loop_range(l))));
   low = atoi(xml_expression(range_lower(loop_range(l))));
   /*  printf("%i %i\n", u, low); */
-  *up = strdup(int_to_string(u - low+1));
+  *up = strdup(i2a(u - low+1));
 	       //*up = xml_expression(range_upper(loop_range(l)) - range_lower(loop_range(l)) + 1);
   *xml_name = xml_entity_local_name(loop_index(l));
   if( (*xml_name)[0] == 'M'){
@@ -886,7 +903,7 @@ static string xml_loop_from_sequence(loop l, int task_number){
   }
 
 
-  *taskname = strdup(concatenate("T_", int_to_string(task_number), NULL));
+  *taskname = strdup(concatenate("T_", i2a(task_number), NULL));
   result = strdup(concatenate(*taskname, 
 			      " :: TASK(unitSpentTime = vartype!(1),"
 			      NL, TAB, "exLoopNest = LOOPNEST(deep = ", NULL));
@@ -901,7 +918,7 @@ static string xml_loop_from_sequence(loop l, int task_number){
   *name = xml_entity_local_name(loop_index(l));
   u = atoi(xml_expression(range_upper(loop_range(l))));
   low = atoi(xml_expression(range_lower(loop_range(l))));
-  *up = strdup(int_to_string(u - low+1));
+  *up = strdup(i2a(u - low+1));
   //*up = xml_expression(range_upper(loop_range(l)) - range_lower(loop_range(l)) + 1);
 
   if((*name)[0] == 'M'){
@@ -938,7 +955,7 @@ static string xml_loop_from_sequence(loop l, int task_number){
   }
 
   /* External loop nest depth */
-  result = strdup(concatenate(result, int_to_string(gen_array_nitems(extern_upperbounds_array)), ",", NL, TAB, TAB, NULL));
+  result = strdup(concatenate(result, i2a(gen_array_nitems(extern_upperbounds_array)), ",", NL, TAB, TAB, NULL));
 
   /* add external upperbounds */
   result = strdup(concatenate(result, "upperBound = list<VARTYPE>(", NULL));
@@ -1173,13 +1190,13 @@ for(ld = ldecl; !ENDP(ld); ld = CDR(ld)){
  	 printf("inside p, %d",nb_dim);
 	 
 	 string_buffer_append(result,
-			     strdup(concatenate(TAB, OPENANGLE, "array name =", QUOTE, XML_ARRAY_PREFIX,entity_user_name(var),QUOTE, 
+			     concatenate(TAB, OPENANGLE, "array name =", QUOTE, XML_ARRAY_PREFIX,entity_user_name(var),QUOTE, 
 						" dataType = ", QUOTE,
 						"INTEGER", QUOTE,CLOSEANGLE
-						, XML_RL, NULL)));
+						, XML_RL, NULL));
 	 string_buffer_append(result,
-			     strdup(concatenate(OPENANGLE,"dimensions",CLOSEANGLE 
-						, XML_RL,NULL)));
+			     concatenate(OPENANGLE,"dimensions",CLOSEANGLE 
+						, XML_RL,NULL));
 	
 	 for (dim = variable_dimensions(type_variable(entity_type(var))); !ENDP(dim); dim = CDR(dim)) {
 
@@ -1189,19 +1206,19 @@ for(ld = ldecl; !ENDP(ld); ld = CDR(ld)){
 	  expression eup = dimension_upper(DIMENSION(CAR(dim)));
 	  if (expression_integer_value(elow, &low) && expression_integer_value(eup, &up)){
 	    string_buffer_append(result,
-				 strdup(concatenate( TAB,OPENANGLE, "range min =", QUOTE,  i2a(low), QUOTE, NULL)));
+				 concatenate( TAB,OPENANGLE, "range min =", QUOTE,  i2a(low), QUOTE, NULL));
 	    string_buffer_append(result,
-				 strdup(concatenate(" max =", QUOTE,  i2a(up-low+1),QUOTE, SLASH, CLOSEANGLE, XML_RL, NULL)));
+				 concatenate(" max =", QUOTE,  i2a(up-low+1),QUOTE, SLASH, CLOSEANGLE, XML_RL, NULL));
 	  }
 	  else pips_user_error("Array dimensions must be integer\n");
 
 	}	
 
 	string_buffer_append(result,
-			     strdup(concatenate(OPENANGLE, SLASH, "dimensions", CLOSEANGLE,NL ,NULL)));
+			     concatenate(OPENANGLE, SLASH, "dimensions", CLOSEANGLE,NL ,NULL));
 	
 	string_buffer_append(result,
-			     strdup(concatenate(TAB, OPENANGLE, SLASH, "array", CLOSEANGLE, NL, NULL)));	
+			     concatenate(TAB, OPENANGLE, SLASH, "array", CLOSEANGLE, NL, NULL));	
 
       }
   
@@ -1326,9 +1343,9 @@ static expression expression_plusplus(expression e)
 
 static void xml_loop(stack st, string_buffer result)
 {
-  string_buffer_append(result,strdup(concatenate(TAB,SPACE, OPENANGLE, "outLoop", CLOSEANGLE, NL, NULL)));
-  string_buffer_append(result,strdup(concatenate(TAB,SPACE, SPACE, OPENANGLE, "loopNest", CLOSEANGLE, NL, NULL)));
-  string_buffer_append(result,strdup(concatenate(TAB,SPACE, SPACE, SPACE, OPENANGLE, "bounds", CLOSEANGLE, NL, NULL)));
+  string_buffer_append(result,concatenate(TAB,SPACE, OPENANGLE, "outLoop", CLOSEANGLE, NL, NULL));
+  string_buffer_append(result,concatenate(TAB,SPACE, SPACE, OPENANGLE, "loopNest", CLOSEANGLE, NL, NULL));
+  string_buffer_append(result,concatenate(TAB,SPACE, SPACE, SPACE, OPENANGLE, "bounds", CLOSEANGLE, NL, NULL));
 
 STACK_MAP_X(s, statement,
   {
@@ -1338,17 +1355,17 @@ STACK_MAP_X(s, statement,
     expression new_eu= expression_plusplus(eu);
 
   string_buffer_append(result,
-		       strdup(concatenate(TAB,SPACE,SPACE,SPACE,SPACE,OPENANGLE,"bound idx =",QUOTE,entity_user_name(loop_index(l)),QUOTE,NULL)));
+		       concatenate(TAB,SPACE,SPACE,SPACE,SPACE,OPENANGLE,"bound idx =",QUOTE,entity_user_name(loop_index(l)),QUOTE,NULL));
   string_buffer_append(result,
-		       strdup(concatenate(SPACE, "lower =",QUOTE, words_to_string(words_expression(el)),QUOTE,NULL)));
+		       concatenate(SPACE, "lower =",QUOTE, words_to_string(words_expression(el)),QUOTE,NULL));
   string_buffer_append(result,
-		       strdup(concatenate(SPACE, "upper =", QUOTE, words_to_string(words_expression(new_eu)),QUOTE, SLASH, CLOSEANGLE,NL,NULL)));
+		       concatenate(SPACE, "upper =", QUOTE, words_to_string(words_expression(new_eu)),QUOTE, SLASH, CLOSEANGLE,NL,NULL));
   },
 	      st, 0);
 
-  string_buffer_append(result,strdup(concatenate(TAB,SPACE, SPACE, SPACE,  OPENANGLE,SLASH "bounds", CLOSEANGLE, NL, NULL)));
-  string_buffer_append(result,strdup(concatenate(TAB,SPACE, SPACE, OPENANGLE,SLASH, "loopNest", CLOSEANGLE, NL, NULL)));
-  string_buffer_append(result,strdup(concatenate(TAB,SPACE,  OPENANGLE, SLASH, "openLoop", CLOSEANGLE, NL, NULL)));
+  string_buffer_append(result,concatenate(TAB,SPACE, SPACE, SPACE,  OPENANGLE,SLASH "bounds", CLOSEANGLE, NL, NULL));
+  string_buffer_append(result,concatenate(TAB,SPACE, SPACE, OPENANGLE,SLASH, "loopNest", CLOSEANGLE, NL, NULL));
+  string_buffer_append(result,concatenate(TAB,SPACE,  OPENANGLE, SLASH, "openLoop", CLOSEANGLE, NL, NULL));
 }
 
 
@@ -1360,9 +1377,9 @@ static void xml_reference(int taskNumber __attribute__ ((unused)), reference r, 
  string varname = entity_user_name(reference_variable(r));
  string_buffer_append
    (result,
-    strdup(concatenate(SPACE, QUOTE, XML_ARRAY_PREFIX, varname, QUOTE, SPACE, "accessMode =", QUOTE,
+    concatenate(SPACE, QUOTE, XML_ARRAY_PREFIX, varname, QUOTE, SPACE, "accessMode =", QUOTE,
 		       (wmode?"W":"R"),QUOTE, CLOSEANGLE,NL,
-		       NULL)));
+		       NULL));
 }
 
 static void  find_motif(Psysteme ps, Pvecteur nested_indices, int dim, int nb_dim __attribute__ ((unused)), Pcontrainte *bound_inf, Pcontrainte *bound_sup, Pcontrainte *iterator, int *motif_up_bound, int *lowerbound, int *upperbound)
@@ -1550,10 +1567,10 @@ static void xml_tiling(int taskNumber, reference ref,  region reg, stack indices
     find_motif(ps, pi, i,  dim, &bound_inf, &bound_up, &iterator, 
 	       &motif_up_bound, &lowerbound, &upperbound);
     string_buffer_append(buffer_offset,
-			 strdup(concatenate(TAB,TAB,OPENANGLE,"offset val =", QUOTE,  
+			 concatenate(TAB,TAB,OPENANGLE,"offset val =", QUOTE,  
 					    (CONTRAINTE_UNDEFINED_P(bound_inf))? "0" : 
 					    i2a(vect_coeff(TCST,bound_inf->vecteur)),
-					    QUOTE, SLASH, CLOSEANGLE,NL,NULL)));	  
+					    QUOTE, SLASH, CLOSEANGLE,NL,NULL));	  
     if (!CONTRAINTE_UNDEFINED_P(iterator)) {
       for (iterat = pi, j=1; !VECTEUR_NUL_P(iterat); iterat = iterat->succ, j++)   
 	pav_matrix[i][j]= vect_coeff(var_of(iterat),iterator->vecteur);
@@ -1562,80 +1579,88 @@ static void xml_tiling(int taskNumber, reference ref,  region reg, stack indices
       fit_matrix[i][i]= (motif_up_bound >1) ? 1:0;
 
     string_buffer_append(buffer_bound,
-			 strdup(concatenate(TAB,TAB, OPENANGLE, "bound idx=", 
+			 concatenate(TAB,TAB, OPENANGLE, "bound idx=", 
 					    QUOTE, XML_MOTIF_PREFIX, i2a(taskNumber),"_", 
 					    entity_user_name(var), "_",i2a(i),QUOTE, SPACE, 
 					    "lower =" QUOTE,i2a(lowerbound),QUOTE,
 					    SPACE, "upper =", QUOTE, i2a(upperbound), 
 					    QUOTE, SLASH, CLOSEANGLE, 
-					    NL,NULL))); 
+					    NL,NULL)); 
   } 
   
   for (j=1; j<=dim_indices ; j++){
-    string_buffer_append(buffer_paving,strdup(concatenate(TAB,TAB, OPENANGLE,"row",
-							  CLOSEANGLE,NULL)));
+    string_buffer_append(buffer_paving,concatenate(TAB,TAB, OPENANGLE,"row",
+							  CLOSEANGLE,NULL));
     for(i=1; i<=dim ; i++)
       string_buffer_append(buffer_paving,
-			   strdup(concatenate(OPENANGLE, "cell val =", QUOTE,
+			   concatenate(OPENANGLE, "cell val =", QUOTE,
 					      i2a( pav_matrix[i][j]),QUOTE, SLASH,
-					      CLOSEANGLE,NULL)));
+					      CLOSEANGLE,NULL));
     
-    string_buffer_append(buffer_paving,strdup(concatenate(OPENANGLE,SLASH, "row",
-							  CLOSEANGLE,NL,NULL)));	      
+    string_buffer_append(buffer_paving,concatenate(OPENANGLE,SLASH, "row",
+							  CLOSEANGLE,NL,NULL));	      
   }
   for(i=1; i<=dim ; i++) { 
-    string_buffer_append(buffer_fitting,strdup(concatenate(TAB, TAB,OPENANGLE,"row",
-							   CLOSEANGLE,NULL)));    
+    string_buffer_append(buffer_fitting,concatenate(TAB, TAB,OPENANGLE,"row",
+							   CLOSEANGLE,NULL));    
     for(j=1; j<=dim ; j++)
-      string_buffer_append(buffer_fitting, strdup(concatenate(OPENANGLE, "cell val =", QUOTE,
+      string_buffer_append(buffer_fitting, concatenate(OPENANGLE, "cell val =", QUOTE,
 							      i2a( fit_matrix[i][j]),
 							      QUOTE, SLASH,
-							      CLOSEANGLE,NULL)));
+							      CLOSEANGLE,NULL));
 
-    string_buffer_append(buffer_fitting,strdup(concatenate(OPENANGLE,SLASH, "row",
-							   CLOSEANGLE,NL,NULL)));
+    string_buffer_append(buffer_fitting,concatenate(OPENANGLE,SLASH, "row",
+							   CLOSEANGLE,NL,NULL));
     
   }
   
   
-  string_buffer_append(result,strdup(concatenate(TAB,SPACE,SPACE,OPENANGLE,"origin",
-						 CLOSEANGLE,NL,NULL)));
+  string_buffer_append(result,concatenate(TAB,SPACE,SPACE,OPENANGLE,"origin",
+						 CLOSEANGLE,NL,NULL));
   string_offset =string_buffer_to_string(buffer_offset);
   string_buffer_append(result,string_offset);
-  string_buffer_append(result,strdup(concatenate(TAB,SPACE,SPACE,OPENANGLE,SLASH,"origin",
-						 CLOSEANGLE,NL,NULL)));
+  free(string_offset);
+  string_offset=NULL;
+  string_buffer_append(result,concatenate(TAB,SPACE,SPACE,OPENANGLE,SLASH,"origin",
+						 CLOSEANGLE,NL,NULL));
   
-  string_buffer_append(result,strdup(concatenate(TAB,SPACE,SPACE,OPENANGLE,"fitting",
-						 CLOSEANGLE,NL,NULL))); 
+  string_buffer_append(result,concatenate(TAB,SPACE,SPACE,OPENANGLE,"fitting",
+						 CLOSEANGLE,NL,NULL)); 
   string_fitting =string_buffer_to_string(buffer_fitting);
   string_buffer_append(result,string_fitting);
-  string_buffer_append(result,strdup(concatenate(TAB,SPACE,SPACE,OPENANGLE,SLASH,"fitting",
-						 CLOSEANGLE,NL,NULL)));
+  free(string_fitting);
+  string_fitting=NULL;
+  string_buffer_append(result,concatenate(TAB,SPACE,SPACE,OPENANGLE,SLASH,"fitting",
+						 CLOSEANGLE,NL,NULL));
   
-  string_buffer_append(result,strdup(concatenate(TAB,SPACE,SPACE,OPENANGLE,"paving",
-						 CLOSEANGLE,NL,NULL))); 
+  string_buffer_append(result,concatenate(TAB,SPACE,SPACE,OPENANGLE,"paving",
+						 CLOSEANGLE,NL,NULL)); 
   string_paving =string_buffer_to_string(buffer_paving);
   string_buffer_append(result,string_paving);
-  string_buffer_append(result,strdup(concatenate(TAB,SPACE,SPACE,OPENANGLE,SLASH,"paving",
-						 CLOSEANGLE,NL,NULL)));
+  free(string_paving);
+  string_paving=NULL;
+  string_buffer_append(result,concatenate(TAB,SPACE,SPACE,OPENANGLE,SLASH,"paving",
+						 CLOSEANGLE,NL,NULL));
   
-  string_buffer_append(result,strdup(concatenate(TAB,SPACE, OPENANGLE, "inLoop", 
-						 CLOSEANGLE, NL, NULL)));
-  string_buffer_append(result,strdup(concatenate(TAB,SPACE, SPACE, OPENANGLE, "loopNest", 
-						 CLOSEANGLE, NL, NULL)));
-  string_buffer_append(result,strdup(concatenate(TAB,SPACE, SPACE, SPACE, OPENANGLE, "bounds", 
-						 CLOSEANGLE, NL, NULL)));
+  string_buffer_append(result,concatenate(TAB,SPACE, OPENANGLE, "inLoop", 
+						 CLOSEANGLE, NL, NULL));
+  string_buffer_append(result,concatenate(TAB,SPACE, SPACE, OPENANGLE, "loopNest", 
+						 CLOSEANGLE, NL, NULL));
+  string_buffer_append(result,concatenate(TAB,SPACE, SPACE, SPACE, OPENANGLE, "bounds", 
+						 CLOSEANGLE, NL, NULL));
       
   
   string_bound =string_buffer_to_string(buffer_bound); 
   string_buffer_append(result,string_bound);
+  free(string_bound);
+  string_bound=NULL;
 
-  string_buffer_append(result,strdup(concatenate(TAB,SPACE, SPACE, SPACE,OPENANGLE,
-						 SLASH "bounds", CLOSEANGLE, NL, NULL)));
-  string_buffer_append(result,strdup(concatenate(TAB,SPACE, SPACE, OPENANGLE,SLASH, "loopNest", 
-						 CLOSEANGLE, NL, NULL)));
-  string_buffer_append(result,strdup(concatenate(TAB,SPACE,  OPENANGLE, SLASH, "inLoop", 
-						 CLOSEANGLE, NL, NULL)));
+  string_buffer_append(result,concatenate(TAB,SPACE, SPACE, SPACE,OPENANGLE,
+						 SLASH "bounds", CLOSEANGLE, NL, NULL));
+  string_buffer_append(result,concatenate(TAB,SPACE, SPACE, OPENANGLE,SLASH, "loopNest", 
+						 CLOSEANGLE, NL, NULL));
+  string_buffer_append(result,concatenate(TAB,SPACE,  OPENANGLE, SLASH, "inLoop", 
+						 CLOSEANGLE, NL, NULL));
       
 }
 
@@ -1651,14 +1676,14 @@ static void xml_references(int taskNumber, list l_regions, stack indices, string
        reference ref = region_reference(re);
        if (array_reference_p(ref) && region_read_p(re)) {
 	 atleast_one_read_ref = TRUE;
-	 string_buffer_append(result,strdup(concatenate(TAB, SPACE, SPACE, OPENANGLE,  "data darray=",NULL)));
+	 string_buffer_append(result,concatenate(TAB, SPACE, SPACE, OPENANGLE,  "data darray=",NULL));
 	 xml_reference(taskNumber, ref,  region_write_p(re), result);
 	 xml_tiling(taskNumber, ref,re, indices, result);
        } 
       }
    if (!atleast_one_read_ref) 
-     string_buffer_append(result,strdup(concatenate(TAB,SPACE, SPACE, "dummyDATA", 
-						    NL,NULL)));
+     string_buffer_append(result,concatenate(TAB,SPACE, SPACE, "dummyDATA", 
+						    NL,NULL));
    
    for ( lr = l_regions; !ENDP(lr); lr = CDR(lr))
      {
@@ -1666,13 +1691,13 @@ static void xml_references(int taskNumber, list l_regions, stack indices, string
        reference ref = region_reference(re);
        if (array_reference_p(ref) && region_write_p(re)) { 
 	 atleast_one_written_ref = TRUE;
-	 string_buffer_append(result,strdup(concatenate(TAB, SPACE, SPACE, OPENANGLE, "data darray=",NULL)));
+	 string_buffer_append(result,concatenate(TAB, SPACE, SPACE, OPENANGLE, "data darray=",NULL));
 	 xml_reference(taskNumber, ref,  region_write_p(re), result);
    	 xml_tiling(taskNumber, ref,re, indices, result); 
     }  
      }   
    if (!atleast_one_written_ref) 
-     string_buffer_append(result,strdup(concatenate(TAB,SPACE, SPACE,"dummyDATA",NL,NULL)));
+     string_buffer_append(result,concatenate(TAB,SPACE, SPACE,"dummyDATA",NL,NULL));
    
 }
 
@@ -1680,7 +1705,7 @@ static void xml_data(int taskNumber,statement s, stack indices, string_buffer re
 {  
 
   list  l_regions = regions_dup(load_statement_local_regions(s)); 
-  string_buffer_append(result,strdup(concatenate(TAB,SPACE, OPENANGLE, "dataList", CLOSEANGLE, NL,NULL)));
+  string_buffer_append(result,concatenate(TAB,SPACE, OPENANGLE, "dataList", CLOSEANGLE, NL,NULL));
   /* 
   ifdebug(2) {
     fprintf(stderr, "\n list of regions ");    
@@ -1695,7 +1720,7 @@ static void xml_data(int taskNumber,statement s, stack indices, string_buffer re
     xml_tiling();
     xml_motif();
    */
-        string_buffer_append(result,strdup(concatenate(TAB,SPACE,OPENANGLE, SLASH, "dataList", CLOSEANGLE,NL,NULL)));
+        string_buffer_append(result,concatenate(TAB,SPACE,OPENANGLE, SLASH, "dataList", CLOSEANGLE,NL,NULL));
 	regions_free(l_regions);
 }
     
@@ -1718,13 +1743,13 @@ static void xml_task( int taskNumber, nest_context_p nest, string_buffer result)
   stack st = gen_array_item(nest->nested_loops,taskNumber); 
   stack sindices = gen_array_item(nest->nested_loop_indices,taskNumber); 
   
-  string_buffer_append(result, strdup(concatenate(NL,TAB,OPENANGLE,"task name =", QUOTE, XML_TASK_PREFIX,i2a(taskNumber),QUOTE, CLOSEANGLE, NL, NULL)));
-  string_buffer_append(result, strdup(concatenate(TAB, SPACE, OPENANGLE, "unitSpentTime", CLOSEANGLE,task_complexity(s),NULL))); 
-  string_buffer_append(result, strdup(concatenate(OPENANGLE,SLASH,"unitSpentTime",CLOSEANGLE,NL,NULL)));
+  string_buffer_append(result, concatenate(NL,TAB,OPENANGLE,"task name =", QUOTE, XML_TASK_PREFIX,i2a(taskNumber),QUOTE, CLOSEANGLE, NL, NULL));
+  string_buffer_append(result, concatenate(TAB, SPACE, OPENANGLE, "unitSpentTime", CLOSEANGLE,task_complexity(s),NULL)); 
+  string_buffer_append(result, concatenate(OPENANGLE,SLASH,"unitSpentTime",CLOSEANGLE,NL,NULL));
   
   xml_loop(st, result);
   xml_data (taskNumber, s,sindices, result);
-  string_buffer_append(result, strdup(concatenate(TAB,OPENANGLE,SLASH,"task",CLOSEANGLE, NL, NULL)));
+  string_buffer_append(result, concatenate(TAB,OPENANGLE,SLASH,"task",CLOSEANGLE, NL, NULL));
  
 }
 
@@ -1740,7 +1765,7 @@ static void  xml_tasks(statement stat, string_buffer result){
   nest.nested_loop_indices =  gen_array_make(0);
   nest.nested_call=  gen_array_make(0);
   
-  string_buffer_append(result, strdup(concatenate(NL,SPACE,OPENANGLE,"tasks",CLOSEANGLE,NL, NULL)));
+  string_buffer_append(result,concatenate(NL,SPACE,OPENANGLE,"tasks",CLOSEANGLE,NL, NULL));
   
   if(statement_undefined_p(stat)) {
     pips_internal_error("statement error");
@@ -1756,21 +1781,21 @@ static void  xml_tasks(statement stat, string_buffer result){
     xml_task(taskNumber, &nest,result);
   
     
-  string_buffer_append(result, strdup(concatenate(SPACE,OPENANGLE, SLASH, "tasks", CLOSEANGLE, NL,NULL)));
+  string_buffer_append(result,concatenate(SPACE,OPENANGLE, SLASH, "tasks", CLOSEANGLE, NL,NULL));
   string_buffer_append(result,
-		       strdup(concatenate(SPACE, OPENANGLE, 
+		       concatenate(SPACE, OPENANGLE, 
 					  "application name = ", 
 					  QUOTE, module_name, QUOTE, CLOSEANGLE 
-					  NL, NULL)));
+					  NL, NULL));
   
   for(taskNumber = 0; taskNumber<(int) gen_array_nitems(nest.nested_call)-1; taskNumber++)
-   string_buffer_append(result,strdup(concatenate(TAB, OPENANGLE, "taskref ref = ", QUOTE, XML_TASK_PREFIX,
-						  i2a(taskNumber),QUOTE, SLASH,  CLOSEANGLE, NL, NULL)));  
+   string_buffer_append(result,concatenate(TAB, OPENANGLE, "taskref ref = ", QUOTE, XML_TASK_PREFIX,
+						  i2a(taskNumber),QUOTE, SLASH,  CLOSEANGLE, NL, NULL));  
   
-   string_buffer_append(result,strdup(concatenate(TAB, OPENANGLE, "taskref ref = ", QUOTE, XML_TASK_PREFIX,
- 						  i2a(taskNumber),QUOTE, SLASH,  CLOSEANGLE, NL, NULL)));  
+   string_buffer_append(result,concatenate(TAB, OPENANGLE, "taskref ref = ", QUOTE, XML_TASK_PREFIX,
+ 						  i2a(taskNumber),QUOTE, SLASH,  CLOSEANGLE, NL, NULL));  
  
-   string_buffer_append(result,strdup(concatenate(SPACE, OPENANGLE, SLASH, "application",CLOSEANGLE, NL, NULL)));
+   string_buffer_append(result,concatenate(SPACE, OPENANGLE, SLASH, "application",CLOSEANGLE, NL, NULL));
    
   gen_array_free(nest.nested_loops);
   gen_array_free(nest.nested_loop_indices);
@@ -1791,11 +1816,11 @@ static string xml_code(entity module, statement stat)
   string_buffer result=string_buffer_make(true);
   string result2;
 
-  string_buffer_append(result,strdup(concatenate(OPENANGLE, "module name =", QUOTE,get_current_module_name(), QUOTE, CLOSEANGLE, NL, NULL )));
+  string_buffer_append(result,concatenate(OPENANGLE, "module name =", QUOTE,get_current_module_name(), QUOTE, CLOSEANGLE, NL, NULL ));
   xml_declarations(module,result);
   xml_tasks(stat,result);
 
-  string_buffer_append(result,strdup(concatenate(OPENANGLE, SLASH, "module", CLOSEANGLE, NL, NULL )));
+  string_buffer_append(result,concatenate(OPENANGLE, SLASH, "module", CLOSEANGLE, NL, NULL ));
   result2=string_buffer_to_string(result); 
   /*  string_buffer_free(&result,TRUE); */
   /* ifdebug(2)
@@ -1946,35 +1971,35 @@ static void type_and_size_of_var(entity var, char ** datatype, int *size)
 static void add_margin(int gm, string_buffer sb_result) {
   int i; 
   for (i=1;i<=gm;i++) 
-    string_buffer_append(sb_result,strdup(TB1));
+    string_buffer_append(sb_result,TB1);
 }
 
 static void string_buffer_append_word(string str, string_buffer sb_result)
 {
   add_margin(global_margin,sb_result);
   string_buffer_append(sb_result,
-		       strdup(concatenate(OPENANGLE, 
+		       concatenate(OPENANGLE, 
 					  str, 
 					  CLOSEANGLE, 
-					  NL, NULL)));
+					  NL, NULL));
 }
 
 static void string_buffer_append_symbolic(string str, string_buffer sb_result){
   add_margin(global_margin,sb_result);
   string_buffer_append(sb_result,
-		       strdup(concatenate(OPENANGLE,"Symbolic",CLOSEANGLE, 
+		       concatenate(OPENANGLE,"Symbolic",CLOSEANGLE, 
 					  str,
 					  OPENANGLE,"/Symbolic",CLOSEANGLE, 
-					  NL, NULL)));
+					  NL, NULL));
 }
 
 static void string_buffer_append_numeric(string str, string_buffer sb_result){
   add_margin(global_margin,sb_result);
   string_buffer_append(sb_result,
-		       strdup(concatenate(OPENANGLE,"Numeric",CLOSEANGLE, 
+		       concatenate(OPENANGLE,"Numeric",CLOSEANGLE, 
 					  str,
 					  OPENANGLE,"/Numeric",CLOSEANGLE, 
-					  NL, NULL)));
+					  NL, NULL));
 }
 
 
@@ -2307,9 +2332,9 @@ static void xml_Pattern_Paving(region reg,entity var, boolean effet_read, Pvecte
 	      add_margin(global_margin,buffer_pattern);
 	      // A completer - choisir un indice pour le motif ?
 	      string_buffer_append(buffer_pattern,
-				   strdup(concatenate(OPENANGLE, 
+				   concatenate(OPENANGLE, 
 						      "DimPattern Index=",
-						      QUOTE,QUOTE,CLOSEANGLE,NL,NULL)));
+						      QUOTE,QUOTE,CLOSEANGLE,NL,NULL));
 	      global_margin++;
 	      string_buffer_append_word("Offset",buffer_pattern);
 	      string_buffer_append_symbolic(vect_to_string(voffset),
@@ -2342,11 +2367,11 @@ static void xml_Pattern_Paving(region reg,entity var, boolean effet_read, Pvecte
 		  if ((inc = vect_coeff(var_of(iterat),iterator->vecteur)) !=0) {
 		    add_margin(global_margin,buffer_paving);
 		    string_buffer_append(buffer_paving,
-					 strdup(concatenate(OPENANGLE, 
+					 concatenate(OPENANGLE, 
 							    "RefLoopIndex Name=",
 							    QUOTE,entity_user_name(var_of(iterat)),QUOTE, BL, 
 							    "Inc=", QUOTE,
-							    i2a(inc),QUOTE,"/", CLOSEANGLE,NL,NULL)));
+							    i2a(inc),QUOTE,"/", CLOSEANGLE,NL,NULL));
 		  }
 		}
 	      string_buffer_append_word("/DimPavage",buffer_paving);
@@ -2360,7 +2385,11 @@ static void xml_Pattern_Paving(region reg,entity var, boolean effet_read, Pvecte
 	string_pattern = string_buffer_to_string(buffer_pattern);
 	string_paving = string_buffer_to_string(buffer_paving);
 	string_buffer_append(sb_result, string_pattern);
+	free(string_pattern);
+	string_pattern=NULL;
 	string_buffer_append(sb_result, string_paving);
+	free(string_paving);
+	string_paving=NULL;
 	xml_AccessFunction(sb_result);
 	sc_free(ps_reg); 	
 	 }
@@ -2391,7 +2420,7 @@ static void xml_TaskParameter(boolean assign_function,boolean is_not_main_p, Var
       	  effet_read = (region_read_p(reg))? TRUE: FALSE;
       	  add_margin(global_margin,sb_result);
 	  string_buffer_append(sb_result,
-			       strdup(concatenate(OPENANGLE, 
+			       concatenate(OPENANGLE, 
 						  (assign_function)?"AssignParameter":"TaskParameter"," Name=",
 						  QUOTE,entity_user_name(v),QUOTE, BL, 
 						  "Type=", QUOTE,(entity_xml_parameter_p(v))? "CONTROL":"DATA",QUOTE,BL,
@@ -2399,7 +2428,7 @@ static void xml_TaskParameter(boolean assign_function,boolean is_not_main_p, Var
 						  "ArrayP=", QUOTE, (array_entity_p(v))?"TRUE":"FALSE",QUOTE, BL, 
 						  "Kind=", QUOTE,  "VARIABLE",QUOTE,
 						  CLOSEANGLE
-						  NL, NULL))); 
+						  NL, NULL)); 
 	  global_margin++;
 	  xml_Pattern_Paving(reg,v, effet_read, formal_parameters, 
 			     paving_indices,sb_result);
@@ -2438,7 +2467,7 @@ static void xml_TaskParameter(boolean assign_function,boolean is_not_main_p, Var
     }
     add_margin(global_margin,sb_result);
     string_buffer_append(sb_result,
-			 strdup(concatenate(OPENANGLE, 
+			 concatenate(OPENANGLE, 
 					    (assign_function)?"AssignParameter":"TaskParameter"," Name=",
 					    QUOTE,entity_user_name(v),QUOTE, BL, 
 					    "Type=", QUOTE,(entity_xml_parameter_p(v))? "CONTROL":"DATA",QUOTE,BL,
@@ -2446,7 +2475,7 @@ static void xml_TaskParameter(boolean assign_function,boolean is_not_main_p, Var
 					    "ArrayP=", QUOTE, (array_entity_p(v))?"TRUE":"FALSE",QUOTE, BL, 
 					    "Kind=", QUOTE,  "VARIABLE",QUOTE,
 					    CLOSEANGLE
-					    NL, NULL))); 
+					    NL, NULL)); 
     global_margin++;
     xml_Pattern_Paving(reg,v, effet_read, formal_parameters, 
 		       paving_indices, sb_result);	
@@ -2636,7 +2665,7 @@ static void xml_Array(entity var,Psysteme prec,string_buffer sb_result)
 
   add_margin(global_margin,sb_result);
   string_buffer_append(sb_result,
-		       strdup(concatenate(OPENANGLE, 
+		       concatenate(OPENANGLE, 
 					  "Array Name=",
 					  QUOTE,entity_user_name(var),QUOTE, BL, 
 					  "Type=", QUOTE,(entity_xml_parameter_p(var))? "CONTROL":"DATA",QUOTE,BL,
@@ -2646,24 +2675,24 @@ static void xml_Array(entity var,Psysteme prec,string_buffer sb_result)
 					  QUOTE,BL,
 					  "Kind=", QUOTE,   "VARIABLE",QUOTE,
 					  CLOSEANGLE
-					  NL, NULL)));
+					  NL, NULL));
 
   /* Print XML Array DATA TYPE and DATA SIZE */
   type_and_size_of_var(var, &datatype,&size); 
   add_margin(global_margin,sb_result);
   string_buffer_append(sb_result,
-		       strdup(concatenate(OPENANGLE,
+		       concatenate(OPENANGLE,
 					  "DataType Type=",QUOTE,datatype,QUOTE, BL,
 					  "Size=",QUOTE, i2a(size), QUOTE, "/"
 					  CLOSEANGLE, 
-					  NL,NULL)));
+					  NL,NULL));
   /* Print XML Array Memory Location */
   if (spec_location!=NULL) {
     add_margin(global_margin,sb_result);
    string_buffer_append(sb_result,
-			strdup(concatenate(OPENANGLE,"ArrayLocation",CLOSEANGLE,  
+			concatenate(OPENANGLE,"ArrayLocation",CLOSEANGLE,  
 					  spec_location,OPENANGLE, "/ArrayLocation",CLOSEANGLE, 
-					  NL, NULL)));
+					  NL, NULL));
   }
  
 
@@ -2678,20 +2707,20 @@ static void xml_Array(entity var,Psysteme prec,string_buffer sb_result)
       global_margin++;
       add_margin(global_margin,sb_result);
       string_buffer_append(sb_result,
-			   strdup(concatenate(OPENANGLE, 
+			   concatenate(OPENANGLE, 
 					      "Dimension", 
 					      CLOSEANGLE, 
-					      NL, NULL)));
+					      NL, NULL));
       /* Print XML Array Bound */
       global_margin++;
       xml_Bounds(elow,eup,prec,sb_result);
       global_margin--;
       add_margin(global_margin,sb_result);
       string_buffer_append(sb_result,
-			   strdup(concatenate(OPENANGLE, 
+			   concatenate(OPENANGLE, 
 					      "/Dimension", 
 					      CLOSEANGLE, 
-					      NL, NULL)));
+					      NL, NULL));
       global_margin--;
       layout_low[no_dim] = words_to_string(words_syntax(expression_syntax(elow)));
       layout_up[no_dim] = words_to_string(words_syntax(expression_syntax(eup)));
@@ -2710,7 +2739,7 @@ static void xml_Array(entity var,Psysteme prec,string_buffer sb_result)
     string_buffer_append_word("Symbolic",sb_result);
     if (i==no_dim-1) {
       add_margin(global_margin,sb_result);
-      string_buffer_append(sb_result,strdup(concatenate("1",NL,NULL)));
+      string_buffer_append(sb_result,concatenate("1",NL,NULL));
     }
     else { 
       add_margin(global_margin,sb_result);
@@ -2718,13 +2747,13 @@ static void xml_Array(entity var,Psysteme prec,string_buffer sb_result)
 	{ 
 	  if (strcmp(layout_low[j],"0")==0) 
 	    string_buffer_append(sb_result,
-				 strdup(concatenate("(",layout_up[j],"+1)",NULL))); 
+				 concatenate("(",layout_up[j],"+1)",NULL)); 
 	  else
 	    string_buffer_append(sb_result,
-				 strdup(concatenate("(",layout_up[j],"-",
-						    layout_low[j],"+1)",NULL)));   
+				concatenate("(",layout_up[j],"-",
+						    layout_low[j],"+1)",NULL));   
 	  if (j==i+1)
-	    string_buffer_append(sb_result,strdup(NL));
+	    string_buffer_append(sb_result,NL);
 	}
     }
     string_buffer_append_word("/Symbolic",sb_result);
@@ -2818,13 +2847,13 @@ static void xml_Loop(statement s, string_buffer sb_result)
 
   add_margin(global_margin,sb_result);
   string_buffer_append(sb_result,
-		       strdup(concatenate(OPENANGLE,
+		       concatenate(OPENANGLE,
 					  "Loop Index=",QUOTE,
 					  entity_user_name(index),QUOTE, BL,
 					  "ExecutionMode=",QUOTE,
 					  (execution_parallel_p(loop_execution(l)))? "PARALLEL":"SEQUENTIAL", 
 					  QUOTE, 
-					  CLOSEANGLE,NL,NULL)));
+					  CLOSEANGLE,NL,NULL));
   xml_Bounds_and_Stride(el,eu,stride,prec,sb_result);
   string_buffer_append_word("/Loop",sb_result);
   sc_free(prec);
@@ -2941,10 +2970,10 @@ static void  xml_Task(string module_name, int code_tag,string_buffer sb_result)
   global_margin++;
   add_margin(global_margin,sb_result);
   string_buffer_append(sb_result,
-		       strdup(concatenate(OPENANGLE, 
+		       concatenate(OPENANGLE, 
 					  "Task Name=",QUOTE, 
 					  module_name,QUOTE,CLOSEANGLE, 
-					  NL, NULL)));
+					  NL, NULL));
   global_margin++;
 
   find_loops_and_calls_in_box(stat_module,&task_loopnest);
@@ -3042,26 +3071,26 @@ static void xml_Matrix(Pmatrix mat, int n, int m, string_buffer sb_result)
 
   add_margin(global_margin,sb_result);
   string_buffer_append(sb_result,
-		       strdup(concatenate(OPENANGLE, 
+		       concatenate(OPENANGLE, 
 					  "Matrix NbRows=", 
 					  QUOTE,srow,QUOTE,BL,
 					  "NbColumns=", QUOTE, scolumn,QUOTE,
-					  BL,CLOSEANGLE,NL, NULL)));
+					  BL,CLOSEANGLE,NL, NULL));
   for (i=1;i<=n;i++) {
     add_margin(global_margin,sb_result);
     string_buffer_append(sb_result,
-			 strdup(concatenate(OPENANGLE, 
-					    "Row", CLOSEANGLE,BL, NULL)));
+			 concatenate(OPENANGLE, 
+					    "Row", CLOSEANGLE,BL, NULL));
     for (j=1;j<=m;j++) {
       string_buffer_append(sb_result,
-			     strdup(concatenate(OPENANGLE,"c", CLOSEANGLE,
+			     concatenate(OPENANGLE,"c", CLOSEANGLE,
 						itoa(MATRIX_ELEM(mat,i,j)),
 						OPENANGLE, "/c", CLOSEANGLE,
-						BL, NULL)));
+						BL, NULL));
     } 
     string_buffer_append(sb_result,
-			 strdup(concatenate(OPENANGLE, 
-					    "/Row", CLOSEANGLE, NL, NULL)));
+			 concatenate(OPENANGLE, 
+					    "/Row", CLOSEANGLE, NL, NULL));
   }
   string_buffer_append_word("/Matrix",sb_result);
 }
@@ -3209,14 +3238,14 @@ static void  xml_Arguments(statement s, entity function, Pvecteur loop_indices, 
       global_margin++;
       add_margin(global_margin,sb_result);
       string_buffer_append(sb_result,
-			   strdup(concatenate(OPENANGLE, 
+			   concatenate(OPENANGLE, 
 					      "ScalarArgument ActualName=", 
 					      QUOTE,
 					      aan,
 					      QUOTE,BL,
 					      "FormalName=", QUOTE,entity_user_name(FormalArrayName), QUOTE,BL,
 					      "AccessMode=",QUOTE,(rw_ef>=2)? "DEF": "USE", QUOTE,CLOSEANGLE,
-					      NL, NULL)));
+					      NL, NULL));
       
       if (expression_integer_value(exp, &iexp))  
 	string_buffer_append_numeric(i2a(iexp),sb_result);
@@ -3237,7 +3266,7 @@ static void  xml_Arguments(statement s, entity function, Pvecteur loop_indices, 
       global_margin++;
       add_margin(global_margin,sb_result);
       string_buffer_append(sb_result,
-			   strdup(concatenate(OPENANGLE, 
+			   concatenate(OPENANGLE, 
 					      "ArrayArgument ActualName=", 
 					      QUOTE,
 					      entity_user_name(ActualArrayName),QUOTE,BL,
@@ -3245,7 +3274,7 @@ static void  xml_Arguments(statement s, entity function, Pvecteur loop_indices, 
 					      "FormalName=", QUOTE,entity_user_name(FormalArrayName), QUOTE,BL,
 					      "FormalDim=", QUOTE,itoa(FormalArrayDim),QUOTE,BL,
 					      "AccessMode=",QUOTE,(rw_ef>=2)? "DEF":"USE",QUOTE,CLOSEANGLE,
-					      NL, NULL)));
+					      NL, NULL));
       /* Save information to generate Task Graph */
       if (rw_ef>=2)
 	hash_put(hash_entity_def_to_task, (char *)ActualArrayName,(char *)function); 
@@ -3286,13 +3315,13 @@ static void xml_Call(entity module,  int code_tag,int taskNumber, nest_context_p
   
   add_margin(global_margin,sb_result);
   string_buffer_append(sb_result,
-		       strdup(concatenate(OPENANGLE, 
+		       concatenate(OPENANGLE, 
 					  "Call Name=", 
 					  QUOTE,
 					  ENTITY_ASSIGN_P(func) ? 
 					  "LocalAssignment" : entity_user_name(func), 
 					  QUOTE,
- 					  CLOSEANGLE,NL, NULL)));
+ 					  CLOSEANGLE,NL, NULL));
  global_margin++;
  
  pattern_region = regions_dup(load_statement_local_regions(s));
@@ -3334,11 +3363,11 @@ static void xml_BoxGraph(entity module, nest_context_p nest, string_buffer sb_re
  
   add_margin(global_margin,sb_result);
   string_buffer_append(sb_result,
-		       strdup(concatenate(OPENANGLE, 
+		       concatenate(OPENANGLE, 
 					  "BoxGraph Name=", 
 					  QUOTE,entity_user_name(module), 
 					  QUOTE,
-					  CLOSEANGLE,NL, NULL)));
+					  CLOSEANGLE,NL, NULL));
 
   nb_call = (int)gen_array_nitems(nest->nested_call);
   nc = 1;
@@ -3359,10 +3388,10 @@ static void xml_BoxGraph(entity module, nest_context_p nest, string_buffer sb_re
 
       add_margin(global_margin,sb_result);
       string_buffer_append(sb_result,
-			   strdup(concatenate(OPENANGLE, 
+			   concatenate(OPENANGLE, 
 					      "TaskRef Name=", 
 					      QUOTE,n,QUOTE, CLOSEANGLE,NL,
-					      NULL)));
+					      NULL));
       for (pc= effects_list;pc != NIL; pc = CDR(pc)){
 	effect e = EFFECT(CAR(pc));
 	reference r = effect_any_reference(e);
@@ -3376,7 +3405,7 @@ static void xml_BoxGraph(entity module, nest_context_p nest, string_buffer sb_re
 		global_margin++;
 		add_margin(global_margin,buffer_needs);
 		string_buffer_append(buffer_needs,
-				     strdup(concatenate(OPENANGLE, 
+				     concatenate(OPENANGLE, 
 							"Needs ArrayName=", 
 							QUOTE,entity_user_name(v),QUOTE, BL,
 							"DefinedBy=",
@@ -3384,19 +3413,19 @@ static void xml_BoxGraph(entity module, nest_context_p nest, string_buffer sb_re
 							(t!= HASH_UNDEFINED_VALUE) ? entity_local_name(t): "IN_VALUE",
 							QUOTE,"/",
 							CLOSEANGLE,NL,
-							NULL))); 
+							NULL)); 
 		// Temporaire en attendant les effects IN de l'appli
 		if (nc==1) {
 		  add_margin(global_margin,appli_needs);
 		  string_buffer_append(appli_needs,
-				       strdup(concatenate(OPENANGLE, 
+				       concatenate(OPENANGLE, 
 							  "Needs ArrayName=", 
 							  QUOTE,entity_user_name(v),QUOTE, BL,
 							  "DefinedBy=",
 							  QUOTE,(t!= HASH_UNDEFINED_VALUE) ? entity_local_name(t): "IN_VALUE",
 							  QUOTE,"/",
 							  CLOSEANGLE,NL,
-							  NULL))); 
+							  NULL)); 
 		}
 		global_margin--;
 	      }
@@ -3405,22 +3434,23 @@ static void xml_BoxGraph(entity module, nest_context_p nest, string_buffer sb_re
 	      global_margin++;
 	      add_margin(global_margin,sb_result);
 	      string_buffer_append(sb_result,
-				   strdup(concatenate(OPENANGLE,"Computes ArrayName=",
+				   concatenate(OPENANGLE,"Computes ArrayName=",
 						      QUOTE,entity_user_name(v),QUOTE,"/",
 						      CLOSEANGLE,NL,
-						      NULL)));
+						      NULL));
 	      // Temporaire en attendant les effects OUT de l'appli
 	      if (nc==nb_call) {
 		add_margin(global_margin,sb_ac);
 		string_buffer_append(sb_ac,
-				     strdup(concatenate(OPENANGLE, 
+				     concatenate(OPENANGLE, 
 							"Computes ArrayName=",
 							QUOTE,entity_user_name(v),QUOTE,"/",
 							CLOSEANGLE,NL,
-							NULL)));
+							NULL));
 		string_appli_needs =string_buffer_to_string(appli_needs);
 		string_buffer_append(sb_ac,string_appli_needs);
-	  	
+		free(string_appli_needs);
+		string_appli_needs=NULL;
 	      }
 	      global_margin--;
 	    }
@@ -3430,6 +3460,8 @@ static void xml_BoxGraph(entity module, nest_context_p nest, string_buffer sb_re
   
       string_needs =string_buffer_to_string(buffer_needs);
       string_buffer_append(sb_result,string_needs);
+      free(string_needs);
+      string_needs=NULL;
       string_buffer_append_word("/TaskRef",sb_result);	   
     }
     nc++;  
@@ -3464,11 +3496,11 @@ static void xml_Boxes(string module_name, int code_tag,string_buffer sb_result,s
   global_margin++;
   add_margin(global_margin,sb_result);
   string_buffer_append(sb_result,
-		       strdup(concatenate(OPENANGLE, 
+		       concatenate(OPENANGLE, 
 					  "Box Name=", 
 					  QUOTE,module_name, 
 					  QUOTE,
-					  CLOSEANGLE,NL, NULL)));
+					  CLOSEANGLE,NL, NULL));
   global_margin++; 
 
   if (!main_c_program_p(module_name)) {
@@ -3515,14 +3547,16 @@ static void __attribute__ ((unused)) xml_ApplicationGraph(string module_name, st
   string string_sb_ac="";
   add_margin(global_margin,sb_pref_ac);
   string_buffer_append(sb_pref_ac,
-		       strdup(concatenate(OPENANGLE, 
+		       concatenate(OPENANGLE, 
 					  "ApplicationGraph Name=", 
 					  QUOTE,
 					  module_name, 
 					  QUOTE,
-					  CLOSEANGLE,NL, NULL)));
+					  CLOSEANGLE,NL, NULL));
   string_sb_ac =string_buffer_to_string(sb_ac);
   string_buffer_append(sb_pref_ac,string_sb_ac);
+  free(string_sb_ac);
+  string_sb_ac=NULL;
   string_buffer_append_word("/ApplicationGraph",sb_pref_ac); 
   sb_ac=sb_pref_ac;
   
@@ -3542,15 +3576,15 @@ static void xml_Application(string module_name, int code_tag,string_buffer sb_re
   //sc_fprint(stdout,prec,(char * (*)(Variable)) entity_local_name);
  
    string_buffer_append(sb_result,
-		       strdup(concatenate(OPENANGLE, 
+		       concatenate(OPENANGLE, 
 					  "!DOCTYPE Application SYSTEM ",
 					  QUOTE,
 					  "APPLI_TERAOPS_v8.dtd",
 					  QUOTE,
 					  CLOSEANGLE, 
-					  NL, NULL)));
+					  NL, NULL));
   string_buffer_append(sb_result,
-		       strdup(concatenate(OPENANGLE, 
+		       concatenate(OPENANGLE, 
 					  "Application Name=", 
 					  QUOTE,
 					  get_current_module_name(), 
@@ -3563,25 +3597,25 @@ static void xml_Application(string module_name, int code_tag,string_buffer sb_re
 					  (fortran_appli) ? "BYREFERENCE":"BYVALUE",
 					  QUOTE,
 					  CLOSEANGLE, 
-					  NL, NULL)));
+					  NL, NULL));
  xml_ActualArrays(module,prec,sb_result,TRUE);
  global_margin ++;
   add_margin(global_margin,sb_ac);
   string_buffer_append(sb_ac,
-		       strdup(concatenate(OPENANGLE, 
+		       concatenate(OPENANGLE, 
 					  "ApplicationGraph Name=", 
 					  QUOTE,
 					  module_name, 
 					  QUOTE,
-					  CLOSEANGLE,NL, NULL)));
+					  CLOSEANGLE,NL, NULL));
   global_margin ++;
   add_margin(global_margin,sb_ac);
   string_buffer_append(sb_ac,
-		       strdup(concatenate(OPENANGLE, 
+		       concatenate(OPENANGLE, 
 					  "TaskRef Name=", 
 					  QUOTE,entity_user_name(module),
 					  QUOTE,CLOSEANGLE,NL,
-					  NULL)));  
+					  NULL));  
   global_margin -=2;
   xml_Boxes(module_name,code_tag,sb_result,sb_ac);  
   global_margin +=2;
@@ -3594,10 +3628,10 @@ static void xml_Application(string module_name, int code_tag,string_buffer sb_re
  
    add_margin(global_margin,sb_ac);
   string_buffer_append(sb_ac,
-		       strdup(concatenate(OPENANGLE, 
+		       concatenate(OPENANGLE, 
 					  "/Application", 
 					  CLOSEANGLE, 
-					  NL, NULL)));
+					  NL, NULL));
   sr=string_buffer_to_string(sb_ac); 
 
   insert_xml_string(module_name,sr);  
