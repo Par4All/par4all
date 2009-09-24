@@ -317,9 +317,9 @@ print_source_out_regions(string module_name)
 
 /************* INTERFACES TO COMPUTE SIMPLE PROPER EFFECTS FROM OTHER PHASES */
 
-/* list proper_effects_of_expression(expression e)
+/* list regions_of_expression(expression e, transformer context)
  * input    : an expression and the current context
- * output   : the correpsonding list of effects.
+ * output   : the correpsonding list of regions.
  * modifies : nothing.
  * comment  :	
  */

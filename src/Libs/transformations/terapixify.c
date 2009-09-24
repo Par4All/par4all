@@ -26,6 +26,8 @@
  * @date 2009-07-01
  */
 
+#define _GNU_SOURCE
+
 #include "genC.h"
 #include "linear.h"
 #include "ri.h"
@@ -35,16 +37,158 @@
 #include "resources.h"
 #include "properties.h"
 #include "misc.h"
+#include "conversion.h"
 #include "control.h"
 #include "callgraph.h"
 #include "effects-generic.h"
 #include "effects-simple.h"
+#include "effects-convex.h"
 #include "preprocessor.h"
 #include "text-util.h"
 #include "transformations.h"
 #include "parser_private.h"
 #include "syntax.h"
 #include "c_syntax.h"
+
+
+enum region_to_dma_switch { dma_load,dma_store };
+#define dma_load_p(e) ((e) == dma_load )
+#define dma_store_p(e) ((e) == dma_store )
+
+static 
+call range_to_dma(expression from,expression to,range r,enum region_to_dma_switch s)
+{
+    entity mcpy = module_name_to_entity(
+            dma_load_p(s) ?
+            get_string_property("KERNEL_LOAD_STORE_LOAD_FUNCTION"):
+            get_string_property("KERNEL_LOAD_STORE_STORE_FUNCTION")
+            );
+    pips_assert("KERNEL_LOAD_STORE_(LOAD|STORE)_FUNCTION set to a defined entity",!entity_undefined_p(mcpy));
+    return make_call(
+            mcpy,
+            make_expression_list(
+                MakeUnaryCall(entity_intrinsic(ADDRESS_OF_OPERATOR_NAME),to),
+                from,
+        /*        MakeBinaryCall(
+                    entity_intrinsic(MULTIPLY_OPERATOR_NAME),
+                    make_expression(
+                        make_syntax_sizeofexpression(
+                            make_sizeofexpression_expression(
+                                MakeUnaryCall(entity_intrinsic(DEREFERENCING_OPERATOR_NAME),to)
+                                )
+                            ),
+                        normalized_undefined),*/
+                    MakeBinaryCall(entity_intrinsic(PLUS_OPERATOR_NAME),
+                        MakeBinaryCall(entity_intrinsic(MINUS_OPERATOR_NAME),copy_expression(range_upper(r)),copy_expression(range_lower(r))),
+                        make_expression_1())
+                    )
+                /*)*/
+            )
+        ;
+
+}
+
+#if 0
+static
+statement region_to_dma(statement stat, enum region_to_dma_switch s)
+{
+    list effects = dma_load_p(s) ?
+        load_statement_in_regions(stat):
+        load_statement_out_regions(stat);
+
+    list ranges = NIL;
+    list statements = NIL;
+    FOREACH(EFFECT,eff,effects)
+    {
+        statement the_dma = statement_undefined;
+        reference r = effect_any_reference(eff);
+        Psysteme sc = sc_dup(region_system(eff));
+        sc_transform_eg_in_ineg(sc);
+
+        FOREACH(EXPRESSION,index,reference_indices(r))
+        {
+            Variable endex = expression_to_entity(index);
+            Pcontrainte lower,upper;
+            constraints_for_bounds(endex,&sc_inegalites(sc),&lower,&upper);
+            expression lower_bound=expression_undefined, upper_bound=expression_undefined;
+            if(!CONTRAINTE_UNDEFINED_P(lower)) {
+                lower_bound= constraints_to_loop_bound(lower,endex,true,entity_intrinsic(DIVIDE_OPERATOR_NAME));
+            }
+            else
+                pips_internal_error("failed to get lower constraint on %s\n",entity_user_name((entity)endex));
+            if(!CONTRAINTE_UNDEFINED_P(upper)) {
+                upper_bound= constraints_to_loop_bound(upper,endex,false,entity_intrinsic(DIVIDE_OPERATOR_NAME));
+            }
+            else
+                pips_internal_error("failed to get upper constraint on %s\n",entity_user_name((entity)endex));
+
+            ranges=CONS(RANGE, make_range(lower_bound,upper_bound,make_expression_1()), ranges);
+        }
+        if(!ENDP(ranges))
+        {
+
+            expression from = reference_to_expression( make_reference(reference_variable(r),CDR(reference_indices(r))) );
+            entity eto = make_temporary_array_entity(reference_variable(r),expression_undefined);
+            AddEntityToCurrentModule(eto);
+            expression to = reference_to_expression(make_reference(eto,NIL));
+            the_dma = instruction_to_statement(make_instruction_call(range_to_dma(from,to,RANGE(CAR(ranges)),s)));
+            /*FOREACH(RANGE,r,CDR(ranges))
+            {
+                entity loop_index = make_new_scalar_variable(get_current_module_entity(),make_basic_int(DEFAULT_INTEGER_TYPE_SIZE));
+                AddLocalEntityToDeclarations(loop_index,get_current_module_entity(),get_current_module_statement());
+                loop l =make_loop(loop_index,r,the_dma,entity_empty_label(),make_execution_sequential(),NIL);
+                the_dma=instruction_to_statement(make_instruction_loop(l));
+            }*/
+        }
+        else
+            pips_internal_error("is this possible ?\n");
+        statements=CONS(STATEMENT,the_dma,statements);
+    }
+    return make_block_statement(statements);
+
+}
+#endif
+
+static
+statement effects_to_dma(statement stat, enum region_to_dma_switch s)
+{
+    list rw_effects= load_cumulated_rw_effects_list(stat);
+    list effects = NIL;
+
+    FOREACH(EFFECT,e,rw_effects)
+    {
+        if(dma_load_p(s) && action_read_p(effect_action(e)))
+            effects=CONS(EFFECT,e,effects);
+        else if( dma_store_p(s) && action_write_p(effect_action(e)))
+            effects=CONS(EFFECT,e,effects);
+    }
+
+    list statements = NIL;
+    FOREACH(EFFECT,eff,effects)
+    {
+        statement the_dma = statement_undefined;
+        reference r = effect_any_reference(eff);
+        range the_range = make_range(
+                make_expression_0(),
+                MakeBinaryCall(entity_intrinsic(MINUS_OPERATOR_NAME),
+                    make_expression(make_syntax_sizeofexpression(make_sizeofexpression_type(entity_type(reference_variable(r)))),normalized_undefined),
+                    make_expression_1()),
+                make_expression_1());
+        if(!ENDP(variable_dimensions(type_variable(entity_type(reference_variable(r))))))
+        {
+            entity re = reference_variable(r);
+            expression from = entity_to_expression(re);
+            entity eto = make_temporary_array_entity(reference_variable(r),expression_undefined);
+            AddEntityToCurrentModule(eto);
+            expression to = reference_to_expression(make_reference(eto,NIL));
+            the_dma = instruction_to_statement(make_instruction_call(range_to_dma(from,to,the_range,s)));
+            statements=CONS(STATEMENT,the_dma,statements);
+            replace_entity(stat,re,eto);
+        }
+    }
+    gen_free_list(effects);
+    return make_block_statement(statements);
+}
 
 /**
  * create a statement eligible for outlining into a kernel
@@ -66,6 +210,8 @@ bool do_kernelize(statement s, entity loop_label)
     {
         if( !instruction_loop_p(statement_instruction(s)) )
             pips_user_error("you choosed a label of a non-doloop statement\n");
+
+
 
         loop l = instruction_loop(statement_instruction(s));
 
@@ -109,7 +255,14 @@ bool do_kernelize(statement s, entity loop_label)
             l = statement_loop(s);
         }
 
+        string kernel_name=get_string_property_or_ask("KERNELIZE_KERNEL_NAME","name of the kernel ?");
+        string host_call_name=get_string_property_or_ask("KERNELIZE_HOST_CALL_NAME","name of the fucntion to call the kernel ?");
+
         /* validate changes */
+        callees kernels=(callees)db_get_memory_resource(DBR_KERNELS,"",true);
+        callees_callees(kernels)= CONS(STRING,strdup(host_call_name),callees_callees(kernels));
+        DB_PUT_MEMORY_RESOURCE(DBR_KERNELS,"",kernels);
+
         entity cme = get_current_module_entity();
         statement cms = get_current_module_statement();
         module_reorder(get_current_module_statement());
@@ -125,46 +278,12 @@ bool do_kernelize(statement s, entity loop_label)
         set_current_module_statement(cms);
         set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_PROPER_EFFECTS, get_current_module_name(), TRUE));
         /* outline the work and kernel parts*/
-        string kernel_name=get_string_property_or_ask("KERNELIZE_KERNEL_NAME","name of the kernel ?");
-        string host_call_name=get_string_property_or_ask("KERNELIZE_HOST_CALL_NAME","name of the fucntion to call the kernel ?");
         outliner(kernel_name,make_statement_list(loop_body(l)));
-        outliner(host_call_name,make_statement_list(s));
+        s = outliner(host_call_name,make_statement_list(s));
         reset_cumulated_rw_effects();
 
 
 
-#if 0
-        /* it's safe to skip the second level loop, because of the index set splitting */
-
-        statement replaced_loop = loop_body(l);
-        instruction erased_instruction = statement_instruction(replaced_loop);
-        entity outermost_loop_index = loop_index(instruction_loop(erased_instruction));
-
-        entity kernel_id = FindEntity(TOP_LEVEL_MODULE_NAME,"KERNEL_ID");
-        if(entity_undefined_p(kernel_id))
-            pips_user_error("KERNEL_ID not defined !\n");
-
-        instruction assign = make_assign_instruction(make_expression_from_entity(outermost_loop_index),
-                MakeBinaryCall(entity_intrinsic(c_module_p(get_current_module_entity())?PLUS_C_OPERATOR_NAME:PLUS_OPERATOR_NAME),
-                    MakeNullaryCall(kernel_id),make_expression_from_entity(loop_index(l))
-                )
-                );
-        statement_instruction(replaced_loop) =
-            make_instruction_block(
-                    make_statement_list(make_stmt_of_instr(assign),loop_body(instruction_loop(erased_instruction)))
-                    );
-
-        /* as the newgen free is recursive, we use a trick to prevent the recursion */
-        loop_body(instruction_loop(erased_instruction)) = make_continue_statement(entity_empty_label());
-        free_instruction(erased_instruction);
-
-        /* flag the remaining loop to be proceed next*/
-        extensions se = statement_extensions(s);
-        extensions_extension(se)=
-            CONS(EXTENSION,make_extension(make_pragma_string(strdup(concatenate(OUTLINE_IGNORE," ",entity_user_name(kernel_id))))),
-                CONS(EXTENSION,make_extension(make_pragma_string(strdup(OUTLINE_PRAGMA))),extensions_extension(se))
-            );
-#endif
 
         /* job done */
         gen_recurse_stop(NULL);
@@ -205,6 +324,107 @@ bool kernelize(char * module_name)
     /*postlude*/
     reset_current_module_entity();
     reset_current_module_statement();
+    return true;
+}
+
+bool flag_kernel(char * module_name)
+{
+  if (!db_resource_p(DBR_KERNELS, ""))
+    pips_internal_error("kernels not initialized");
+  callees kernels=(callees)db_get_memory_resource(DBR_KERNELS,"",true);
+  callees_callees(kernels)= CONS(STRING,strdup(module_name),callees_callees(kernels));
+  DB_PUT_MEMORY_RESOURCE(DBR_KERNELS,"",kernels);
+  return true;
+}
+
+bool bootstrap_kernels(__attribute__((unused)) char * module_name)
+{
+  if (db_resource_p(DBR_KERNELS, ""))
+    pips_internal_error("kernels already initialized");
+  callees kernels=make_callees(NIL);
+  DB_PUT_MEMORY_RESOURCE(DBR_KERNELS,"",kernels);
+  return true;
+}
+
+
+static void
+kernel_load_store_generator(statement s, string module_name)
+{
+    if(statement_call_p(s))
+    {
+        call c = statement_call(s);
+        if(!call_intrinsic_p(c) &&
+                same_string_p(module_local_name(call_function(c)),module_name))
+        {
+            statement loads,stores;
+#if 0
+            loads = region_to_dma(s,dma_load);
+            stores = region_to_dma(s,dma_store);
+#else
+            loads = effects_to_dma(s,dma_load);
+            stores = effects_to_dma(s,dma_store);
+#endif
+            /* add the load / stores now */
+            {
+                statement new_s = instruction_to_statement(statement_instruction(s));
+                statement_label(new_s)=statement_label(s);
+                statement_label(s)=entity_empty_label();
+                statement_number(new_s)=statement_number(s);
+                statement_number(s)=STATEMENT_NUMBER_UNDEFINED;
+                statement_ordering(new_s)=statement_ordering(s);
+                statement_ordering(s)=STATEMENT_ORDERING_UNDEFINED;
+                statement_comments(new_s)=statement_comments(s);
+                statement_comments(s)=empty_comments;
+
+                statement_instruction(s)=make_instruction_block(
+                        make_statement_list(loads,instruction_to_statement(statement_instruction(s)),stores)
+                        );
+
+            }
+        }
+    }
+}
+
+
+bool kernel_load_store(char *module_name)
+{
+
+
+    /* genereta load stores on each caller */
+    {
+        callees callers = (callees)db_get_memory_resource(DBR_CALLERS,module_name,true);
+        FOREACH(STRING,caller_name,callees_callees(callers))
+        {
+            /* prelude */
+            set_current_module_entity(module_name_to_entity( caller_name ));
+            set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, caller_name, true) );
+            set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS, caller_name, TRUE));
+            /*do the job */
+            gen_context_recurse(get_current_module_statement(),module_name,statement_domain,gen_true,kernel_load_store_generator);
+            /* validate */
+            module_reorder(get_current_module_statement());
+            DB_PUT_MEMORY_RESOURCE(DBR_CODE, caller_name,get_current_module_statement());
+            DB_PUT_MEMORY_RESOURCE(DBR_CALLEES, caller_name, compute_callees(get_current_module_statement()));
+
+            /*postlude*/
+            reset_cumulated_rw_effects();
+            reset_current_module_entity();
+            reset_current_module_statement();
+        }
+    }
+
+    /*flag the module as kernel if not done */
+    {
+        callees kernels = (callees)db_get_memory_resource(DBR_KERNELS,"",true);
+        bool found = false;
+        FOREACH(STRING,kernel_name,callees_callees(kernels))
+            if( (found=(same_string_p(kernel_name,module_name))) ) break;
+        if(!found)
+            callees_callees(kernels)=CONS(STRING,strdup(module_name),callees_callees(kernels));
+        db_put_or_update_memory_resource(DBR_KERNELS,"",kernels,true);
+    }
+
+
     return true;
 }
 

@@ -53,9 +53,6 @@
   ((approximation_may_p(effect_approximation(my_effect))) || \
    (approximation_must_p(effect_approximation(my_effect))) )
 
-#define call_intrinsic_p(C)                       \
-  value_intrinsic_p(entity_initial(call_function(C)))
-
 #define effect_to_name(the_effect)\
   entity_name(reference_variable(effect_reference(the_effect)))
 

@@ -230,7 +230,6 @@ void statement_with_static_declarations_p(statement s,inlining_parameters p )
 
 /* create an array simlar to `efrom' initialized with expression `from'
  */
-static
 entity make_temporary_array_entity(entity efrom, expression from)
 {
 	basic pointers =copy_basic(variable_basic(type_variable(entity_type(efrom))));
@@ -255,7 +254,7 @@ entity make_temporary_array_entity(entity efrom, expression from)
 			pointers
 			);
     /* set its initial */
-	entity_initial(new) = expression_undefined_p(from)?value_undefined:
+	entity_initial(new) = expression_undefined_p(from)?make_value_unknown():
 		make_value_expression(make_expression(make_syntax_cast(make_cast(make_type_variable(make_variable(pointers,NIL,NIL)),from)),normalized_undefined));
     /* add it to decl */
 	AddLocalEntityToDeclarations(new, get_current_module_entity(),

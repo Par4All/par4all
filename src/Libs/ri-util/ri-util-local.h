@@ -1132,6 +1132,10 @@
 #define entity_symbolic_p(e) (type_functional_p(entity_type(e)) && \
   storage_rom_p(entity_storage(e)) && value_symbolic_p(entity_initial(e)))
 
+#define call_intrinsic_p(C)                       \
+  value_intrinsic_p(entity_initial(call_function(C)))
+
+
 #define make_simple_effect(reference,action,approximation)\
     make_effect(make_cell(is_cell_preference, make_preference(reference)),\
 		(action), (approximation),	\

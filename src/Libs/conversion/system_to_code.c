@@ -558,7 +558,7 @@ systeme_to_loop_nest(
     list reverse;
     statement assign, current = body;
     Psysteme s;
-    
+
     if (ENDP(vars)) return body;
 
     s = sc_dup(sc);   /* duplicate sc*/
@@ -568,59 +568,61 @@ systeme_to_loop_nest(
     reverse = gen_nreverse(gen_copy_seq(vars));  /* reverse the list of vars*/
 
     message_assert("no equalities, now", sc_nbre_egalites(s)==0);
-    
-    MAP(ENTITY, e,
-    {
-	Variable var = (Variable) e;
-	
-	pips_debug(5, "variable %s loop\n", entity_name((entity) var));
-	
-	constraints_for_bounds(var, &c, &lower, &upper);
-	
-	if (bounds_equal_p(var, lower, upper))
-	{
-	    /*   VAR = LOWER
-	     *   body
-	     */
-	    assign = 
-		make_assign_statement(entity_to_expression((entity) var),
-				      constraints_to_loop_bound(lower, var, 
-								TRUE, divide));
-	    current = 
-		make_block_statement(CONS(STATEMENT, assign,
-				     CONS(STATEMENT, current,
-					  NIL)));
 
-	}
-	else
-	{
-	    /*   DO VAR = LOWER, UPPER, 1
-	     *     body
-	     *   ENDDO
-	     */
-	    rg = make_range(constraints_to_loop_bound(lower, var, 
-						      TRUE, divide),
-			    constraints_to_loop_bound(upper, var, 
-						      FALSE, divide),
-			    int_to_expression(1));
-	 
-	    current = 
-		make_stmt_of_instr
-		    (make_instruction
-		     (is_instruction_loop,
-		      make_loop((entity) var,
-				rg, 
-				current,
-				entity_empty_label(),
-				make_execution(is_execution_sequential, UU),
-				NIL)));
-	}
-	
-	contraintes_free(lower);
-	contraintes_free(upper);
-    },
-	reverse);
-    
+    FOREACH(ENTITY,e,reverse)
+    {
+        Variable var = (Variable) e;
+
+        pips_debug(5, "variable %s loop\n", entity_name((entity) var));
+
+        constraints_for_bounds(var, &c, &lower, &upper);
+        if( !CONTRAINTE_UNDEFINED_P(lower) && !CONTRAINTE_UNDEFINED_P(upper) )
+        {
+
+            if (bounds_equal_p(var, lower, upper))
+            {
+                /*   VAR = LOWER
+                 *   body
+                 */
+                assign = 
+                    make_assign_statement(entity_to_expression((entity) var),
+                            constraints_to_loop_bound(lower, var, 
+                                TRUE, divide));
+                current = 
+                    make_block_statement(CONS(STATEMENT, assign,
+                                CONS(STATEMENT, current,
+                                    NIL)));
+
+            }
+            else
+            {
+                /*   DO VAR = LOWER, UPPER, 1
+                 *     body
+                 *   ENDDO
+                 */
+                rg = make_range(constraints_to_loop_bound(lower, var, 
+                            TRUE, divide),
+                        constraints_to_loop_bound(upper, var, 
+                            FALSE, divide),
+                        int_to_expression(1));
+
+                current = 
+                    make_stmt_of_instr
+                    (make_instruction
+                     (is_instruction_loop,
+                      make_loop((entity) var,
+                          rg, 
+                          current,
+                          entity_empty_label(),
+                          make_execution(is_execution_sequential, UU),
+                          NIL)));
+            }
+
+            contraintes_free(lower);
+            contraintes_free(upper);
+        }
+    }
+
     gen_free_list(reverse);
     sc_inegalites(s)=c, sc_rm(s);
 

@@ -4540,21 +4540,55 @@ rice_data_dependence            > MODULE.parallelized_code
 \subsection{Parallelization for Terapix architecture}
 \index{Terapix}
 
+\subsubsection{kernelize}
+
+Bootstraps the kernel ressource
+\begin{PipsMake}
+bootstrap_kernels > PROGRAM.kernels
+\end{PipsMake}
+
+%%@UserManualDocumentation: flag_kernel
+Add a kernel to the list of kernels known to pips
+%%!UserManualDocumentation
+\begin{PipsMake}
+flag_kernel	> PROGRAM.kernels
+		< PROGRAM.kernels
+\end{PipsMake}
+
+
+%%@UserManualDocumentation: kernel_load_store
+Generate unoptimized load / store information for each call to the module
+%%!UserManualDocumentation
+\begin{PipsMake}
+kernel_load_store	> CALLERS.code
+		> CALLERS.callees
+		> PROGRAM.kernels
+		< PROGRAM.kernels
+		< CALLERS.code
+   		< CALLERS.cumulated_effects
+\end{PipsMake}
+
+\verb+KERNEL_LOAD_STORE_LOAD_FUNCTION+ and \verb+KERNEL_LOAD_STORE_STORE_FUNCTION+ can be used to customized the load / store function.
+\begin{PipsProp}
+KERNEL_LOAD_STORE_LOAD_FUNCTION "memload"
+KERNEL_LOAD_STORE_STORE_FUNCTION "memstore"
+\end{PipsProp}
+
+
 %%@UserManualDocumentation: kernelize
 Split a parallel loop with a local index into three parts: a host side
 part, a kernel part and an intermediate part.
-
 The intermediate part simulates the parallel code to the kernel from the host
 %%!UserManualDocumentation
 \begin{PipsMake}
 kernelize				> MODULE.code
 		> MODULE.callees
+		> PROGRAM.kernels
 		! MODULE.privatize_module
 		! MODULE.coarse_grain_parallelization
-		> PROGRAM.entities
 		< PROGRAM.entities
 		< MODULE.code
-        < MODULE.cumulated_effects
+		< PROGRAM.kernels
 \end{PipsMake}
 The property \verb+KERNELIZE_NBNODES+ is used to set the number of nodes for this kernel.
 \verb+KERNELIZE_KERNEL_NAME+ is used to set the name of generated kernel.
@@ -7198,7 +7232,6 @@ call sites of the inlined function are inlined.
 \begin{PipsMake}
 
 inlining      > CALLERS.parsed_code
-		> PROGRAM.entities
         < PROGRAM.entities
         < CALLERS.code
         < CALLERS.printed_file

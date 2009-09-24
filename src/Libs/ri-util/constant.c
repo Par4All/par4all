@@ -38,6 +38,18 @@
 #include "text-util.h"
 
 extern string make_entity_fullname();
+entity 
+find_entity_0()
+{
+    entity e_0;
+    string n_0 = make_entity_fullname(TOP_LEVEL_MODULE_NAME, "0");
+
+    e_0 = gen_find_tabulated(n_0, entity_domain);
+
+    pips_assert("find_entity_1", e_0 != entity_undefined);
+
+    return(e_0);
+}
 
 /* 
   returns the top-level entity that represents the integer constant 1.
@@ -55,6 +67,14 @@ find_entity_1()
     pips_assert("find_entity_1", e_1 != entity_undefined);
 
     return(e_1);
+}
+expression 
+make_expression_0()
+{
+    entity e_0 = find_entity_0();
+
+    return(make_expression(make_syntax(is_syntax_call, make_call(e_0, NIL)),
+			   normalized_undefined));
 }
 
 /*
