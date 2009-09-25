@@ -97,7 +97,7 @@ for further generation of CUDA code.
 
 
 static list l_enclosing_loops = NIL;
-static list l_upper_bounds = NIL;
+static list l_number_iter_exp = NIL;
 static int loop_nest_depth = 0;
 static bool inner_reached = FALSE;
 
@@ -131,7 +131,9 @@ static void loop_annotate(loop l)
 	{
 	  entity c_index = loop_index(c_loop);
 	  range c_range = loop_range(c_loop);
+	  expression c_lower = range_lower(c_range);
 	  expression c_upper = range_upper(c_range);
+	  expression c_number_iter_exp = expression_undefined;
 	  expression c_guard;
 	  
 	  c_guard = 
@@ -146,9 +148,16 @@ static void loop_annotate(loop l)
 	    guard_exp = MakeBinaryCall(entity_intrinsic(C_AND_OPERATOR_NAME),
 				       guard_exp, 
 				       c_guard);
-	  /* keep the upper bound for the generation of the outermost comment */
-	  l_upper_bounds = gen_nconc(l_upper_bounds, 
-				     CONS(EXPRESSION, c_upper, NIL));
+	  /* keep the number of iterations for the generation of 
+	     the outermost comment */
+	  c_number_iter_exp =  make_op_exp(MINUS_OPERATOR_NAME, 
+					   c_upper, 
+					   c_lower);
+	  c_number_iter_exp =  make_op_exp(PLUS_OPERATOR_NAME, 
+					   c_number_iter_exp,
+					   make_integer_constant_expression(1));
+	  l_number_iter_exp = gen_nconc(l_number_iter_exp, 
+				     CONS(EXPRESSION, c_number_iter_exp, NIL));
 	}
       
       pips_debug(2, "guard expression : %s\n",
@@ -176,7 +185,7 @@ static void loop_annotate(loop l)
       outer_s = strdup(concatenate(outer_s, i2a(loop_nest_depth),
 			     "D", OPENPAREN,  NULL));
 
-      FOREACH(EXPRESSION, upper_exp, l_upper_bounds)
+      FOREACH(EXPRESSION, upper_exp, l_number_iter_exp)
 	{
 	  outer_s = strdup(concatenate(outer_s, 
 				 words_to_string(words_expression(upper_exp)),
@@ -192,8 +201,8 @@ static void loop_annotate(loop l)
       /* clean up things for another loop nest */
       inner_reached = FALSE;
       loop_nest_depth = 0;
-      gen_free_list(l_upper_bounds);
-      l_upper_bounds = NIL;
+      gen_free_list(l_number_iter_exp);
+      l_number_iter_exp = NIL;
     }
   
   POP(l_enclosing_loops);
@@ -232,8 +241,7 @@ static void stmt_pop(statement s)
  *       if (i<=498&&j<=498)
  *       foo();
  *
- * loop lower bounds are assumed to be equal to zero, and for loops
- * must be have been transformed into loops.
+ * for loops must be have been transformed into loops.
  * 
  * @param mod_name name of the  module
  * 
