@@ -916,17 +916,7 @@ static string c_reference(reference r)
 			 copy_expression(e), 
 			 copy_expression(e_lower));
       else
-	e_tmp = copy_expression(e);
-      
-      /* commented out because it leads to non user-friendly prettyprint */
-      /* NORMALIZE_EXPRESSION(e_tmp); */
-/*       if(normalized_linear_p(expression_normalized(e_tmp))) */
-/* 	{ */
-/* 	  expression e_tmp2; */
-/* 	  e_tmp2 = make_vecteur_expression(normalized_linear(expression_normalized(e_tmp))); */
-/* 	  free_expression(e_tmp); */
-/* 	  e_tmp = e_tmp2; */
-/* 	} */
+	e_tmp = copy_expression(e);      
       
       if(expression_integer_value(e_tmp, &itmp))
 	s = i2a(itmp);
