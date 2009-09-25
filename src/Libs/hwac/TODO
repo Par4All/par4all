@@ -17,7 +17,7 @@
 + cleanup data structures?
 - record scalar deps in dag...
 - remove type ctxcontent?
-- should make elementary ops absdiff(x,y) = abs(diff(x, y))
+- should make elementary ops absdiff(x,y) = abs(diff(x, y)) (no.. unsigned)
 - and then match back of necessary to available low level ops.
 
 * output
@@ -36,6 +36,7 @@
 - add checks in generated code (img size and so)?
 - parametric img size/depth? same as code?
 - the generated code is just a file to pips. ok???
+- must not handle copies through the pipeline... (see freia_17)
 
 * post
 + remove malloc/free if not used
@@ -43,7 +44,7 @@
 
 * validation
 - check all AIPO
-- add more (elementary) tests?
++ add more (elementary) tests?
 
 * bugs
 + allocs may be in the middle of the calls
