@@ -16,23 +16,23 @@ void flatten_code12(void)
    int i = (int) foo_0;
 // (0,2)
 
-   foo_0++;                                                             /*0006*/
+   foo_0++;                                                             /*0017*/
 // (0,3)
 
-   for (;i<7;i++) {                                                     /*0008*/
+   for (;i<7;i++) {                                                     /*0019*/
 // (0,4)
       // BEGIN BLOCK
       static int foo = 0;
 // (0,5)
 
-      foo++;                                                            /*0011*/
+      foo++;                                                            /*0022*/
 // (0,6)
 
-      fprintf(stdout, "foo=%d\n", foo);                                 /*0013*/
+      fprintf(stdout, "foo=%d\n", foo);                                 /*0024*/
       // END BLOCK
    }
 // (0,7)
-   fprintf(stdout, "foo_0=%f\n", foo_0);                                /*0015*/
+   fprintf(stdout, "foo_0=%f\n", foo_0);                                /*0026*/
    // END BLOCK
 }
 
@@ -46,22 +46,22 @@ void flatten_code12(void)
    static int foo_1 = 0;
 // (0,2)
 
-   foo_0++;                                                             /*0006*/
+   foo_0++;                                                             /*0017*/
 // (0,3)
 
-   for (;i<7;i++) {                                                     /*0008*/
+   for (;i<7;i++) {                                                     /*0019*/
 // (0,4)
       // BEGIN BLOCK
 // (0,5)
 
-      foo_1++;                                                          /*0011*/
+      foo_1++;                                                          /*0022*/
 // (0,6)
 
-      fprintf(stdout, "foo=%d\n", foo_1);                               /*0013*/
+      fprintf(stdout, "foo=%d\n", foo_1);                               /*0024*/
       // END BLOCK
    }
 // (0,7)
-   fprintf(stdout, "foo_0=%f\n", foo_0);                                /*0015*/
+   fprintf(stdout, "foo_0=%f\n", foo_0);                                /*0026*/
    // END BLOCK
 }
 
