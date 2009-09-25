@@ -8,7 +8,7 @@ kernel2:
 void p4a_kernel_launcher_1(float_t save[501][501], float_t space[501][501])
 {
    int i;
-   // Loop nest P4A begin,1D(498)
+   // Loop nest P4A begin,1D(499)
 kernel2:
    for(i = 0; i <= 498; i += 1)
       // Loop nest P4A end
