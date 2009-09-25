@@ -283,7 +283,7 @@ static bool redeclaration_enter_statement(statement s, redeclaration_context_t *
 
 	  statement ds = rdcp->declaration_statement;
 	  list dselist = statement_to_referenced_entities(ds);
-	  bool ok_p    = FALSE;	  
+	  bool ok_p    = TRUE;	  
 
 	  ifdebug(8) {
 	    pips_debug(8, "Entities found in declaration statement: ");
