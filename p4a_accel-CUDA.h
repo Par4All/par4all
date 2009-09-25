@@ -1,3 +1,6 @@
+#ifndef P4A_ACCEL-CUDA_H
+#define P4A_ACCEL-CUDA_H
+
 /** @file
 
     API of Par4All C to CUDA
@@ -318,3 +321,5 @@ float P4A_ACCEL_TIMER_STOP_AND_FLOAT_MEASURE();
   } while (0)
 
 /** @} */
+
+#endif //P4A_ACCEL-CUDA_H

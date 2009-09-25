@@ -1,4 +1,3 @@
-#include <p4a_accel.h>
 
 /** Stop a timer on the accelerator and get double ms time
 
@@ -38,6 +37,7 @@ float P4A_ACCEL_TIMER_STOP_AND_FLOAT_MEASURE() {
 }
 
 #else
+#include <p4a_accel.h>
 /** Stop a timer on the accelerator and get double ms time
 
     @addtogroup P4A_OpenMP_time_measure
