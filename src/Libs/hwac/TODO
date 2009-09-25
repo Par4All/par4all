@@ -37,6 +37,7 @@
 - parametric img size/depth? same as code?
 - the generated code is just a file to pips. ok???
 - must not handle copies through the pipeline... (see freia_17)
+- freia_skip_07 should be in 1 pass?
 
 * post
 + remove malloc/free if not used
