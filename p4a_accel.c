@@ -1,21 +1,22 @@
 #include <p4a_accel.h>
 
-#ifdef P4A_ACCEL_OPENMP
-
 /** Stop a timer on the accelerator and get double ms time
 
     @addtogroup P4A_OpenMP_time_measure
  */
+/* #ifdef P4A_ACCEL_OPENMP
+
 double P4A_ACCEL_TIMER_STOP_AND_FLOAT_MEASURE() {
   double run_time;
   gettimeofday(&p4a_time_end, NULL);
-  /* Take care of the non-associativity in floating point :-) */
+  // Take care of the non-associativity in floating point :-) 
   run_time = (p4a_time_end.tv_sec - p4a_time_begin.tv_sec)
     + (p4a_time_end.tv_usec - p4a_time_begin.tv_usec)*1e-6;
   return run_time;
 }
 
 #endif
+*/
 
 
 #ifdef P4A_ACCEL_CUDA
@@ -35,4 +36,20 @@ float P4A_ACCEL_TIMER_STOP_AND_FLOAT_MEASURE() {
   /* Return the time in second: */
   return execution_time*1e-3;
 }
+
+#else
+/** Stop a timer on the accelerator and get double ms time
+
+    @addtogroup P4A_OpenMP_time_measure
+ */
+double P4A_ACCEL_TIMER_STOP_AND_FLOAT_MEASURE() {
+  double run_time;
+  gettimeofday(&p4a_time_end, NULL);
+  /* Take care of the non-associativity in floating point :-) */
+  run_time = (p4a_time_end.tv_sec - p4a_time_begin.tv_sec)
+    + (p4a_time_end.tv_usec - p4a_time_begin.tv_usec)*1e-6;
+  return run_time;
+}
+
+
 #endif

@@ -59,6 +59,7 @@ cudaEvent_t p4a_start_event, p4a_stop_event;
 /** Start a timer on the accelerator */
 #define P4A_ACCEL_TIMER_START cutilSafeCall(cudaEventRecord(p4a_start_event, 0))
 
+float P4A_ACCEL_TIMER_STOP_AND_FLOAT_MEASURE();
 /** @} */
 
 

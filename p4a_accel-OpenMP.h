@@ -34,6 +34,7 @@ struct {
 /** Start a timer on the accelerator */
 #define P4A_ACCEL_TIMER_START gettimeofday(&p4a_time_begin, NULL)
 
+double P4A_ACCEL_TIMER_STOP_AND_FLOAT_MEASURE();
 /** @} */
 
 
@@ -78,13 +79,16 @@ struct {
 /** Get the coordinate of the virtual processor in X (first) dimension */
 //#define P4A_VP_X 0
 #define P4A_VP_X threadIdx.x
+//#define P4A_VP_X(i) threadIdx.x
 
 
 /** Get the coordinate of the virtual processor in Y (second) dimension */
 #define P4A_VP_Y threadIdx.y
+//#define P4A_VP_Y(i) threadIdx.y
 
 /** Get the coordinate of the virtual processor in Z (second) dimension */
 #define P4A_VP_Z threadIdx.z
+//#define P4A_VP_Z(i) threadIdx.z
 
 
 /** @defgroup P4A_memory_allocation_copy Memory allocation and copy

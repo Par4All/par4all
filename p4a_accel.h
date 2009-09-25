@@ -22,6 +22,10 @@
 
 /* License BSD */
 
+#ifndef P4A_ACCEL_H
+#define P4A_ACCEL_H
+
+
 #ifdef P4A_ACCEL_CUDA
 #include <p4a_accel-CUDA.h>
 #else
@@ -56,3 +60,5 @@
     Since it is a macro, beware of side effects...
 */
 #define P4A_MIN(a, b) ((a > b) ? b : a)
+
+#endif //P4A_ACCEL_H
