@@ -104,17 +104,6 @@ static bool inner_reached = FALSE;
 /* Statement stack to walk on control flow representation */
 DEFINE_GLOBAL_STACK(p4a_private_current_stmt, statement)
 
-
-static string 
-int_to_string(int i)
-{
-  char buffer[50];
-  sprintf(buffer, "%d", i);
-  return strdup(buffer);
-}
-
-
-
 static bool loop_push(loop l)
 {
   l_enclosing_loops = gen_nconc(l_enclosing_loops, CONS(LOOP, l, NIL));
@@ -124,16 +113,20 @@ static bool loop_push(loop l)
 
 static void loop_annotate(loop l)
 {
- 
+  /* the first time we enter this function is when we reach the innermost 
+     loop nest level.
+  */
   if (inner_reached == FALSE)
     {
       expression guard_exp = expression_undefined;
       statement guard_s = statement_undefined;
+
       /* We are at the innermost loop nest level */
       inner_reached = TRUE;
 
-      /* first we add a guard to the loop body statement */
-
+      /* first we add a guard to the loop body statement 
+	 using the enclosing loops upperbounds.
+      */
       FOREACH(LOOP, c_loop, l_enclosing_loops)
 	{
 	  entity c_index = loop_index(c_loop);
@@ -164,44 +157,38 @@ static void loop_annotate(loop l)
       guard_s = test_to_statement(make_test(guard_exp,
 					    loop_body(l),
 					    make_empty_block_statement()));
-      /* and the comment : // Loop nest P4A end */
+      /* Then we add the comment : // Loop nest P4A end */
       statement_comments(guard_s) = strdup("// Loop nest P4A end\n");
 
       loop_body(l) = guard_s;
 
     }
   
-  /* we are now on our way back ; we do nothing, unless we are
-     at the uppermost level 
+  /* we are now on our way back in the recusrsion; we do nothing, unless 
+     we are at the uppermost level. Then we add the outermost comment : 
+     // Loop nest P4A begin, xD(upper_bound,..)
   */
   if (gen_length(l_enclosing_loops) == 1)
     {
-
-      /* add the outermost comment : // Loop nest P4A begin, xD(upper_bound,..)
-       */ 
       statement current_stat = p4a_private_current_stmt_head();
-
-      /* build the comment varying part */
       string outer_s = "// Loop nest P4A begin,";      
 
-      outer_s = strdup(concatenate(outer_s, int_to_string(loop_nest_depth),
+      outer_s = strdup(concatenate(outer_s, i2a(loop_nest_depth),
 			     "D", OPENPAREN,  NULL));
 
-      
       FOREACH(EXPRESSION, upper_exp, l_upper_bounds)
 	{
 	  outer_s = strdup(concatenate(outer_s, 
 				 words_to_string(words_expression(upper_exp)),
 				 NULL));
-	  loop_nest_depth --;
-	  
+	  loop_nest_depth --;	  
 	  if (loop_nest_depth > 0)
 	    outer_s = strdup(concatenate(outer_s, COMMA));
-				 
 	}
 
       outer_s = strdup(concatenate(outer_s, CLOSEPAREN, "\n", NULL)); 
       statement_comments(current_stat) = outer_s;
+
       /* clean up things for another loop nest */
       inner_reached = FALSE;
       loop_nest_depth = 0;
@@ -229,9 +216,24 @@ static void stmt_pop(statement s)
 }
 
 
-
 /** 
+ * annotates loop nests in the following way :
  *
+ * for(i=0; i<=498; i++)
+ *    for(j=0; j<=498; j++)
+ *       foo();
+ *
+ * ==>
+ *
+ * // Loop nest P4A begin,2D(498,498)
+ * for(i=0; i<=498; i++)
+ *    for(j=0; j<=498; j++)
+ *       // Loop nest P4A end
+ *       if (i<=498&&j<=498)
+ *       foo();
+ *
+ * loop lower bounds are assumed to be equal to zero, and for loops
+ * must be have been transformed into loops.
  * 
  * @param mod_name name of the  module
  * 
@@ -243,21 +245,21 @@ bool gpu_loop_nest_annotate(char *module_name)
   statement module_statement = 
     PIPS_PHASE_PRELUDE(module_name,
 		       "P4A_LOOP_NEST_ANOTATE_DEBUG_LEVEL");
- 
- 
-    make_p4a_private_current_stmt_stack();
-
-    /* Compute the loops normalization of the module. */
-    gen_multi_recurse(module_statement, 
-		      statement_domain, stmt_push, stmt_pop,
-		      loop_domain, loop_push, loop_annotate,
-		      NULL); 
-    free_p4a_private_current_stmt_stack();
-
-
-    /* postlude */
-    PIPS_PHASE_POSTLUDE(module_statement);
- 
-    return true;
+  
+  
+  make_p4a_private_current_stmt_stack();
+  
+  /* Compute the loops normalization of the module. */
+  gen_multi_recurse(module_statement, 
+		    statement_domain, stmt_push, stmt_pop,
+		    loop_domain, loop_push, loop_annotate,
+		    NULL); 
+  free_p4a_private_current_stmt_stack();
+  
+  
+  /* postlude */
+  PIPS_PHASE_POSTLUDE(module_statement);
+  
+  return true;
 }
 
