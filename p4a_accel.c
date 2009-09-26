@@ -20,6 +20,33 @@ double P4A_ACCEL_TIMER_STOP_AND_FLOAT_MEASURE() {
 
 #ifdef P4A_ACCEL_CUDA
 
+#include <cutil_inline.h>
+
+/** To do basic time measure. Do not nest... */
+
+cudaEvent_t p4a_start_event, p4a_stop_event;;
+
+/** @defgroup P4A_cuda_time_measure Time execution measurement
+
+    @{
+*/
+
+/** Start a timer on the accelerator */
+//#define P4A_ACCEL_TIMER_START cutilSafeCall(cudaEventRecord(p4a_start_event, 0))
+
+void P4A_ACCEL_TIMER_START()
+{
+  cutilSafeCall(cudaEventRecord(p4a_start_event, 0));
+}
+
+void P4A_INIT_ACCEL()
+{
+  do {
+    cutilSafeCall(cudaEventCreate(&p4a_start_event));
+    cutilSafeCall(cudaEventCreate(&p4a_stop_event));
+  } while (0);
+}
+
 /** Stop a timer on the accelerator and get float time in second
 
     @addtogroup P4A_cuda_time_measure
