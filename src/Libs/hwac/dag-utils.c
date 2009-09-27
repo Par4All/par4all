@@ -379,6 +379,15 @@ dagvtx copy_dagvtx_norec(dagvtx v)
   return copy;
 }
 
+/* returns whether the vertex is an image copy operation.
+ */
+static bool dagvtx_is_copy_p(dagvtx d)
+{
+  vtxcontent c = dagvtx_content(d);
+  const freia_api_t * api = get_freia_api(vtxcontent_opid(c));
+  return same_string_p(AIPO "copy", api->function_name);
+}
+
 /* append new vertex nv to dag d.
  */
 void dag_append_vertex(dag d, dagvtx nv)
@@ -533,9 +542,9 @@ void dag_optimize(dag d)
   }
 
   // first, look for identical image operations (same inputs, same params)
-  // (that produce image, we do not care about measures)
+  // (that produce image, we do not care about measures??)
   // the second one is replaced by a copy.
-  // could also handle symmetries?
+  // also handle commutations.
 
   if (get_bool_property("FREIA_REMOVE_DUPLICATE_OPERATIONS"))
   {
@@ -595,16 +604,15 @@ void dag_optimize(dag d)
   }
 
   // only one pass is needed because we're going backwards
+  // op-> X -copy-> Y images copies are replaced by op-> X & Y
   FOREACH(dagvtx, v, dag_vertices(d))
   {
     // skip special input nodes
     if (dagvtx_number(v)==0) break;
 
-    vtxcontent c = dagvtx_content(v);
-    const freia_api_t * api = get_freia_api(vtxcontent_opid(c));
-    // freia_aipo_copy(out, in) where out is not used...
-    if (same_string_p(AIPO "copy", api->function_name))
+    if (dagvtx_is_copy_p(v))
     {
+      vtxcontent c = dagvtx_content(v);
       entity target = vtxcontent_out(c);
       pips_assert("one output and one input to copy",
 	  target!=entity_undefined && gen_length(vtxcontent_inputs(c))==1);
