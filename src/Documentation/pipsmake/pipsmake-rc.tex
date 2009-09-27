@@ -4568,10 +4568,13 @@ kernel_load_store	> CALLERS.code
    		< CALLERS.cumulated_effects
 \end{PipsMake}
 
-\verb+KERNEL_LOAD_STORE_LOAD_FUNCTION+ and \verb+KERNEL_LOAD_STORE_STORE_FUNCTION+ can be used to customized the load / store function.
+The following properties can be used to customized the allocate/load/store
+functions:
 \begin{PipsProp}
-KERNEL_LOAD_STORE_LOAD_FUNCTION "memload"
-KERNEL_LOAD_STORE_STORE_FUNCTION "memstore"
+KERNEL_LOAD_STORE_ALLOCATE_FUNCTION "P4A_ACCEL_MALLOC"
+KERNEL_LOAD_STORE_DEALLOCATE_FUNCTION "P4A_ACCEL_FREE"
+KERNEL_LOAD_STORE_LOAD_FUNCTION "P4A_COPY_TO_ACCEL"
+KERNEL_LOAD_STORE_STORE_FUNCTION "P4A_COPY_FROM_ACCEL"
 \end{PipsProp}
 
 

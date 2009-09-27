@@ -51,24 +51,60 @@
 #include "c_syntax.h"
 
 
-enum region_to_dma_switch { dma_load,dma_store };
+enum region_to_dma_switch { dma_load, dma_store, dma_allocate, dma_deallocate };
+/* Add NewGen-like methods: */
 #define dma_load_p(e) ((e) == dma_load )
 #define dma_store_p(e) ((e) == dma_store )
+#define dma_allocate_p(e) ((e) == dma_allocate )
+#define dma_deallocate_p(e) ((e) == dma_deallocate )
 
 static
-call range_to_dma(expression from,expression to,range r,enum region_to_dma_switch s)
+call range_to_dma(expression from,
+		  expression to,
+		  range r,
+		  enum region_to_dma_switch m)
 {
-  entity mcpy = module_name_to_entity(
-				      dma_load_p(s) ?
-				      get_string_property("KERNEL_LOAD_STORE_LOAD_FUNCTION"):
-				      get_string_property("KERNEL_LOAD_STORE_STORE_FUNCTION")
-				      );
-  pips_assert("KERNEL_LOAD_STORE_(LOAD|STORE)_FUNCTION set to a defined entity",!entity_undefined_p(mcpy));
-  return make_call(
-		   mcpy,
-		   make_expression_list(
-					MakeUnaryCall(entity_intrinsic(ADDRESS_OF_OPERATOR_NAME),(dma_load_p(s)?to:from)),
-					dma_load_p(s)?from:to,
+  expression dest;
+  list args;
+  string function_name =
+    dma_load_p(m) ? get_string_property("KERNEL_LOAD_STORE_LOAD_FUNCTION")
+    : dma_store_p(m) ? get_string_property("KERNEL_LOAD_STORE_STORE_FUNCTION")
+    : dma_allocate_p(m) ?
+    get_string_property("KERNEL_LOAD_STORE_ALLOCATE_FUNCTION")
+    : get_string_property("KERNEL_LOAD_STORE_DEALLOCATE_FUNCTION");
+
+  entity mcpy = module_name_to_entity(function_name);
+  if (entity_undefined_p(mcpy))
+    pips_user_error("Cannot find \"%s\" method. Are you sure you have set\n"
+		    "KERNEL_LOAD_STORE_..._FUNCTION "
+		    "set to a defined entity and added the correct .c file?");
+
+  if (dma_allocate_p(m))
+    /* Need the address for the allocator to modify the pointer itself: */
+    dest = MakeUnaryCall(entity_intrinsic(ADDRESS_OF_OPERATOR_NAME), to);
+  else if (!dma_allocate_p(m))
+    /* Except for the deallocation, the original array is referenced
+       throudh pointer dereferencing: */
+    dest = MakeUnaryCall(entity_intrinsic(DEREFERENCING_OPERATOR_NAME), to);
+
+  if (dma_deallocate_p(m))
+    args = make_expression_list(dest);
+  else {
+    expression transfer_size = make_op_exp(PLUS_OPERATOR_NAME,
+					   copy_expression(range_upper(r)),
+					   make_op_exp(MINUS_OPERATOR_NAME,
+						       make_expression_1(),
+						       copy_expression(range_lower(r))));
+
+    if (dma_load_p(m) || dma_store_p(m)) {
+      expression source = from;
+      args = make_expression_list(source, dest, transfer_size);
+    }
+    else
+      args = make_expression_list(dest, transfer_size);
+  }
+  return make_call(mcpy, args);
+
 					/*        MakeBinaryCall(
 						  entity_intrinsic(MULTIPLY_OPERATOR_NAME),
 						  make_expression(
@@ -78,15 +114,10 @@ call range_to_dma(expression from,expression to,range r,enum region_to_dma_switc
 						  )
 						  ),
 						  normalized_undefined),*/
-					MakeBinaryCall(entity_intrinsic(PLUS_OPERATOR_NAME),
-						       MakeBinaryCall(entity_intrinsic(MINUS_OPERATOR_NAME),copy_expression(range_upper(r)),copy_expression(range_lower(r))),
-						       make_expression_1())
-					)
-		   /*)*/
-		   )
-    ;
 
+		   /*)*/
 }
+
 
 #if 0
 static
@@ -155,64 +186,94 @@ struct dma_pair {
 };
 
 
+/****** To move somewhere else. May be already exist ?
+
+
+	Create an pointer to an array simlar to `efrom' initialized with
+	expression `from'
+ */
+entity make_temporary_pointer_to_array_entity(entity efrom,
+					      expression from) {
+  basic pointee = copy_basic(variable_basic(type_variable(entity_type(efrom))));
+  list dims = gen_copy_seq(variable_dimensions(type_variable(entity_type(efrom))));
+
+  /* Make the pointer type */
+  basic pointer = make_basic_pointer(make_type_variable(make_variable(pointee,
+								      dims,
+								      NIL)));
+  /* Create the variable as a pointer */
+  entity new = make_new_scalar_variable(get_current_module_entity(),
+					pointer);
+  /* Set its initial */
+  entity_initial(new) = expression_undefined_p(from)?make_value_unknown():
+    make_value_expression(make_expression(make_syntax_cast(make_cast(make_type_variable(make_variable(pointer,NIL,NIL)),from)),normalized_undefined));
+  /* Add it to decl */
+  AddLocalEntityToDeclarations(new, get_current_module_entity(),
+			       c_module_p(get_current_module_entity())?get_current_module_statement():statement_undefined);
+  return new;
+}
+
 /* Compute a call to a DMA function from the effects of a statement
 
    @return a statement of the DMA transfers or statement_undefined if
    nothing needed
  */
 static
-statement effects_to_dma(statement stat, enum region_to_dma_switch s, hash_table e2e)
-{
+statement effects_to_dma(statement stat,
+			 enum region_to_dma_switch s,
+			 hash_table e2e) {
   list rw_effects= load_cumulated_rw_effects_list(stat);
   list effects = NIL;
 
-  FOREACH(EFFECT,e,rw_effects)
-    {
-      if(dma_load_p(s) && action_read_p(effect_action(e)))
-	effects=CONS(EFFECT,e,effects);
-      else if( dma_store_p(s) && action_write_p(effect_action(e)))
-	effects=CONS(EFFECT,e,effects);
-    }
+  FOREACH(EFFECT,e,rw_effects) {
+    if ((dma_load_p(s) || dma_allocate_p(s) || dma_deallocate_p(s))
+	&& action_read_p(effect_action(e)))
+      effects=CONS(EFFECT,e,effects);
+    else if ((dma_store_p(s)  || dma_allocate_p(s) || dma_deallocate_p(s))
+	     && action_write_p(effect_action(e)))
+      effects=CONS(EFFECT,e,effects);
+  }
 
   list statements = NIL;
-  FOREACH(EFFECT,eff,effects)
-    {
-      statement the_dma = statement_undefined;
-      reference r = effect_any_reference(eff);
-      entity re = reference_variable(r);
-      struct dma_pair * val = (struct dma_pair *) hash_get(e2e, re);
+  FOREACH(EFFECT,eff,effects) {
+    statement the_dma = statement_undefined;
+    reference r = effect_any_reference(eff);
+    entity re = reference_variable(r);
+    struct dma_pair * val = (struct dma_pair *) hash_get(e2e, re);
 
-      if( val == HASH_UNDEFINED_VALUE || (val->s != s) )
-        {
-	  if(!ENDP(variable_dimensions(type_variable(entity_type(re)))))
-            {
-	      range the_range = make_range(
-					   make_expression_0(),
-					   MakeBinaryCall(entity_intrinsic(MINUS_OPERATOR_NAME),
-							  make_expression(make_syntax_sizeofexpression(make_sizeofexpression_type(entity_type(re))),normalized_undefined),
-							  make_expression_1()),
-					   make_expression_1());
-	      expression from = entity_to_expression(re);
-	      entity eto;
-	      if( val == HASH_UNDEFINED_VALUE ) {
-		eto = make_temporary_array_entity(re,expression_undefined);
-		AddEntityToCurrentModule(eto);
-		replace_entity(stat,re,eto);
-		val=malloc(sizeof(*val));
-		val->new_ent=eto;
-		val->s=s;
-		hash_put(e2e,re,val);
-	      }
-	      else {
-		eto = val->new_ent;
-		val->s=s;/*to avoid duplicate*/
-	      }
-	      expression to = reference_to_expression(make_reference(eto,NIL));
-	      the_dma = instruction_to_statement(make_instruction_call(range_to_dma(from,to,the_range,s)));
-	      statements=CONS(STATEMENT,the_dma,statements);
-            }
-        }
+    if( val == HASH_UNDEFINED_VALUE || (val->s != s) ) {
+      if(!ENDP(variable_dimensions(type_variable(entity_type(re))))) {
+	range the_range = make_range(make_expression_0(),
+				     make_op_exp(MINUS_OPERATOR_NAME,
+						 make_expression(make_syntax_sizeofexpression(make_sizeofexpression_type(entity_type(re))),normalized_undefined),
+						 make_expression_1()),
+				     make_expression_1());
+	expression from = entity_to_expression(re);
+	entity eto;
+	if(val == HASH_UNDEFINED_VALUE) {
+	  /* Replace the reference to the array re to *eto: */
+	  eto = make_temporary_pointer_to_array_entity(re,expression_undefined);
+	  AddEntityToCurrentModule(eto);
+	  expression exp =
+	    MakeUnaryCall(entity_intrinsic(DEREFERENCING_OPERATOR_NAME),
+			  entity_to_expression(eto));
+	  replace_entity_by_expression(stat, re, exp);
+	    //replace_entity(stat,re,eto);
+	  val=malloc(sizeof(*val));
+	  val->new_ent=eto;
+	  val->s=s;
+	  hash_put(e2e,re,val);
+	}
+	else {
+	  eto = val->new_ent;
+	  val->s=s;/*to avoid duplicate*/
+	}
+	expression to = reference_to_expression(make_reference(eto,NIL));
+	the_dma = instruction_to_statement(make_instruction_call(range_to_dma(from,to,the_range,s)));
+	statements=CONS(STATEMENT,the_dma,statements);
+      }
     }
+  }
   gen_free_list(effects);
   if (statements == NIL)
     return statement_undefined;
@@ -387,28 +448,37 @@ kernel_load_store_generator(statement s, string module_name)
       if(!call_intrinsic_p(c) &&
 	 same_string_p(module_local_name(call_function(c)),module_name))
         {
-	  statement loads,stores;
+	  statement allocates, loads, stores, deallocates;
 #if 0
 	  loads = region_to_dma(s,dma_load);
 	  stores = region_to_dma(s,dma_store);
 #else
 	  hash_table e2e = hash_table_make(hash_pointer,HASH_DEFAULT_SIZE);
+	  allocates = effects_to_dma(s,dma_allocate,e2e);
 	  loads = effects_to_dma(s,dma_load,e2e);
 	  stores = effects_to_dma(s,dma_store,e2e);
+	  deallocates = effects_to_dma(s,dma_deallocate,e2e);
 	  HASH_MAP(k,v,free(v),e2e);
 	  hash_table_free(e2e);
 #endif
-	  /* Add the load / stores now if needed: */
+	  /* Add the methods now if needed, in the correct order: */
 	  if (loads != statement_undefined)
 	    insert_a_statement(s, loads);
+	  if (allocates != statement_undefined)
+	    insert_a_statement(s, allocates);
 	  if (stores != statement_undefined)
 	    append_a_statement(s, stores);
+	  if (deallocates != statement_undefined)
+	    append_a_statement(s, deallocates);
         }
     }
 }
 
 
-/** Generate malloc/copy-in/copy-out on the call sites of this module: */
+/** Generate malloc/copy-in/copy-out on the call sites of this module.
+
+    Do not work on global variables.
+ */
 bool kernel_load_store(char *module_name) {
   /* generate a load stores on each caller */
   {
