@@ -1,0 +1,251 @@
+
+! initial function
+
+void freia_dup_09(freia_data2d *in0, int32_t *x)
+{
+   // artificial WW dependencies, could be merged...
+   freia_aipo_global_min(in0, x);                                       /*0005*/
+   freia_aipo_global_min(in0, x);                                       /*0006*/
+   freia_aipo_global_min(in0, x);                                       /*0007*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "freia_dup_09" in dot format
+digraph "dag_0" {
+  // inputs
+  "in0" [shape=circle];
+
+  // outputs
+
+  // computation vertices
+  "7 min" [shape=diamond];
+  "7 min" -> "6 min" [arrowhead=empty,label="x"];
+  "7 min" -> "5 min" [arrowhead=empty,label="x"];
+  "6 min" [shape=diamond];
+  "6 min" -> "7 min" [arrowhead=empty,label="x"];
+  "6 min" -> "5 min" [arrowhead=empty,label="x"];
+  "5 min" [shape=diamond];
+  "5 min" -> "7 min" [arrowhead=empty,label="x"];
+  "5 min" -> "6 min" [arrowhead=empty,label="x"];
+  "in0" -> "7 min";
+  "in0" -> "6 min";
+  "in0" -> "5 min";
+}
+// graph for dag "dag_cleaned_0" of module "freia_dup_09" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "in0" [shape=circle];
+
+  // outputs
+
+  // computation vertices
+  "7 min" [shape=diamond];
+  "7 min" -> "6 min" [arrowhead=empty,label="x"];
+  "7 min" -> "5 min" [arrowhead=empty,label="x"];
+  "6 min" [shape=diamond];
+  "6 min" -> "7 min" [arrowhead=empty,label="x"];
+  "6 min" -> "5 min" [arrowhead=empty,label="x"];
+  "5 min" [shape=diamond];
+  "5 min" -> "7 min" [arrowhead=empty,label="x"];
+  "5 min" -> "6 min" [arrowhead=empty,label="x"];
+  "in0" -> "7 min";
+  "in0" -> "6 min";
+  "in0" -> "5 min";
+}
+// graph for dag "freia_dup_09_helper_0_0" of module "freia_dup_09" in dot format
+digraph "freia_dup_09_helper_0_0" {
+  // inputs
+  "in0" [shape=circle];
+
+  // outputs
+
+  // computation vertices
+  "5 min" [shape=diamond];
+  "in0" -> "5 min";
+}
+// graph for dag "freia_dup_09_helper_0_1" of module "freia_dup_09" in dot format
+digraph "freia_dup_09_helper_0_1" {
+  // inputs
+  "in0" [shape=circle];
+
+  // outputs
+
+  // computation vertices
+  "6 min" [shape=diamond];
+  "in0" -> "6 min";
+}
+// graph for dag "freia_dup_09_helper_0_2" of module "freia_dup_09" in dot format
+digraph "freia_dup_09_helper_0_2" {
+  // inputs
+  "in0" [shape=circle];
+
+  // outputs
+
+  // computation vertices
+  "7 min" [shape=diamond];
+  "in0" -> "7 min";
+}
+
+! acceleration function
+
+#include <freiaCommon.h>
+#include <freiaCoarseGrain.h>
+#include <spoc.h>
+
+// FREIA-SPoC helper function for module freia_dup_09
+freia_status freia_dup_09_helper_0_0_0(freia_data2d * i0, int32_t * red0)
+{
+  spoc_instr si;
+  spoc_param sp;
+  spoc_reduction reduc;
+  freia_microcode mcode;
+  freia_dynamic_param dynparam;
+  freia_reduction_results redres;
+  freia_op_sel op = 0;
+  freia_op_param param;
+  freia_status ret;
+  int i;
+
+  // init pipe to nop
+  spoc_init_pipe(&si, &sp, 16);
+
+
+  // STAGE 0
+  // in0 [0 input 0] -> [0 measure 0] 0 undefined
+  si.mux[0][0].op = SPOC_MUX_IN0;
+
+
+  // no output image
+
+  mcode.raw = (freia_ptr) &si;
+  mcode.size = sizeof(spoc_instr);
+
+  dynparam.raw = (freia_ptr) &sp;
+  dynparam.size = sizeof(spoc_param);
+
+  redres.raw = (freia_ptr) &reduc;
+  redres.size = sizeof(spoc_reduction);
+
+  ret = freia_cg_write_microcode(&mcode);
+  ret |= freia_cg_write_dynamic_param(&dynparam);
+
+  // actual call of spoc hardware
+  freia_cg_template_process_2i_2o(op, param, NULL, NULL, i0, NULL);
+
+  // get reductions
+  freia_cg_read_reduction_results(&redres);
+
+  // measure 5 global_min stage 0 side 0
+  *red0 = (int32_t) reduc.measure[0][0].minimum;
+
+  return ret;
+}
+
+// FREIA-SPoC helper function for module freia_dup_09
+freia_status freia_dup_09_helper_0_1_0(freia_data2d * i0, int32_t * red0)
+{
+  spoc_instr si;
+  spoc_param sp;
+  spoc_reduction reduc;
+  freia_microcode mcode;
+  freia_dynamic_param dynparam;
+  freia_reduction_results redres;
+  freia_op_sel op = 0;
+  freia_op_param param;
+  freia_status ret;
+  int i;
+
+  // init pipe to nop
+  spoc_init_pipe(&si, &sp, 16);
+
+
+  // STAGE 0
+  // in0 [0 input 0] -> [0 measure 0] 0 undefined
+  si.mux[0][0].op = SPOC_MUX_IN0;
+
+
+  // no output image
+
+  mcode.raw = (freia_ptr) &si;
+  mcode.size = sizeof(spoc_instr);
+
+  dynparam.raw = (freia_ptr) &sp;
+  dynparam.size = sizeof(spoc_param);
+
+  redres.raw = (freia_ptr) &reduc;
+  redres.size = sizeof(spoc_reduction);
+
+  ret = freia_cg_write_microcode(&mcode);
+  ret |= freia_cg_write_dynamic_param(&dynparam);
+
+  // actual call of spoc hardware
+  freia_cg_template_process_2i_2o(op, param, NULL, NULL, i0, NULL);
+
+  // get reductions
+  freia_cg_read_reduction_results(&redres);
+
+  // measure 6 global_min stage 0 side 0
+  *red0 = (int32_t) reduc.measure[0][0].minimum;
+
+  return ret;
+}
+
+// FREIA-SPoC helper function for module freia_dup_09
+freia_status freia_dup_09_helper_0_2_0(freia_data2d * i0, int32_t * red0)
+{
+  spoc_instr si;
+  spoc_param sp;
+  spoc_reduction reduc;
+  freia_microcode mcode;
+  freia_dynamic_param dynparam;
+  freia_reduction_results redres;
+  freia_op_sel op = 0;
+  freia_op_param param;
+  freia_status ret;
+  int i;
+
+  // init pipe to nop
+  spoc_init_pipe(&si, &sp, 16);
+
+
+  // STAGE 0
+  // in0 [0 input 0] -> [0 measure 0] 0 undefined
+  si.mux[0][0].op = SPOC_MUX_IN0;
+
+
+  // no output image
+
+  mcode.raw = (freia_ptr) &si;
+  mcode.size = sizeof(spoc_instr);
+
+  dynparam.raw = (freia_ptr) &sp;
+  dynparam.size = sizeof(spoc_param);
+
+  redres.raw = (freia_ptr) &reduc;
+  redres.size = sizeof(spoc_reduction);
+
+  ret = freia_cg_write_microcode(&mcode);
+  ret |= freia_cg_write_dynamic_param(&dynparam);
+
+  // actual call of spoc hardware
+  freia_cg_template_process_2i_2o(op, param, NULL, NULL, i0, NULL);
+
+  // get reductions
+  freia_cg_read_reduction_results(&redres);
+
+  // measure 7 global_min stage 0 side 0
+  *red0 = (int32_t) reduc.measure[0][0].minimum;
+
+  return ret;
+}
+
+! updated function
+
+void freia_dup_09(freia_data2d *in0, int32_t *x)
+{
+   // artificial WW dependencies, could be merged...
+   freia_dup_09_helper_0_0_0(in0, x);                                   /*0005*/
+   freia_dup_09_helper_0_1_0(in0, x);                                   /*0006*/
+   freia_dup_09_helper_0_2_0(in0, x);                                   /*0007*/
+}
