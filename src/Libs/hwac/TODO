@@ -36,8 +36,11 @@
 - add checks in generated code (img size and so)?
 - parametric img size/depth? same as code?
 - the generated code is just a file to pips. ok???
-- must not handle copies through the pipeline... (see freia_17)
+- must not handle copies through the pipeline... (see freia_17 for instance)
 - freia_skip_07 should be in 1 pass?
+- freia_aa0a and freia_aa1a should be 1 pass instead of 3?
+- should also detect "duplicate" measurements with a copy of the scalars
+- should detect "included" measurements (maxcoord includes max)
 
 * post
 + remove malloc/free if not used
