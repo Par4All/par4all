@@ -99,7 +99,11 @@ freia_status freia_15_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, int32_t
   // i [0 input 0] -> [0 measure 0] 0 undefined
   si.mux[0][0].op = SPOC_MUX_IN0;
 
+  // i [0 measure 0] -> [0 measure 0] 0 undefined
+  // nope
 
+  // i [0 measure 0] -> [0 measure 0] 0 undefined
+  // nope
 
 
   // STAGE 1

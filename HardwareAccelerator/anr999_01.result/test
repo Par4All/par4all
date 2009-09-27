@@ -262,6 +262,8 @@ freia_status anr999_01_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_
   // 0`in [0 input 0] -> [0 measure 0] 0 undefined
   si.mux[0][0].op = SPOC_MUX_IN0;
 
+  // 0`in [0 measure 0] -> [0 measure 0] 0 undefined
+  // nope
 
 
   // STAGE 1

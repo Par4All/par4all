@@ -192,6 +192,8 @@ freia_status freia_04_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, int32_t
   sp.th[0][1].boundmin = inf6;
   sp.th[0][1].boundmax = sup7;
 
+  // 0`t4 [0 threshold 1] -> [0 measure 1] 28 threshold
+  // nope
 
 
   // STAGE 1
