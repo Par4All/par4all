@@ -67,12 +67,12 @@ double P4A_ACCEL_TIMER_STOP_AND_FLOAT_MEASURE();
 #define P4A_ACCEL_KERNEL
 
 /** A declaration attribute of a hardware-accelerated kernel called from
-    the host 
+    the host
 
     Nothing by default
 */
 
-#define P4A_ACCEL_KERNEL_WRAPPER 
+#define P4A_ACCEL_KERNEL_WRAPPER
 
 /* Use thread-local storage to pass iteration index ? */
 
@@ -182,7 +182,7 @@ double P4A_ACCEL_TIMER_STOP_AND_FLOAT_MEASURE();
 
     do { pips_accel_1<<<1, pips_accel_dimBlock_1>>> (*accel_imagein_re, *accel_imagein_im); __cutilCheckMsg ("P4A CUDA kernel execution failed", "init.cu", 58); } while (0);
 */
-#define P4A_CALL_ACCEL_KERNEL(context, parameters)			
+#define P4A_CALL_ACCEL_KERNEL(context, parameters)
 
 /* @} */
 
@@ -191,7 +191,7 @@ double P4A_ACCEL_TIMER_STOP_AND_FLOAT_MEASURE();
 
     Generate something like "kernel<<<block_dimension,thread_dimension>>>"
 */
-#define P4A_CALL_ACCEL_KERNEL_CONTEXT(kernel, ...)	
+#define P4A_CALL_ACCEL_KERNEL_CONTEXT(kernel, ...)
 
 
 /** Add CUDA kernel parameters for invocation.
@@ -199,7 +199,7 @@ double P4A_ACCEL_TIMER_STOP_AND_FLOAT_MEASURE();
     Simply add them in parenthesis.  Well, this could be done without
     variadic arguments... Just for fun. :-)
 */
-#define P4A_CALL_ACCEL_KERNEL_PARAMETERS(...)	
+#define P4A_CALL_ACCEL_KERNEL_PARAMETERS(...)
 
 
 /** Creation of block and thread descriptors */
@@ -209,7 +209,7 @@ double P4A_ACCEL_TIMER_STOP_AND_FLOAT_MEASURE();
 */
 #define P4A_CREATE_1D_THREAD_DESCRIPTORS(block_descriptor_name,		\
 					 grid_descriptor_name,		\
-					 size)				
+					 size)
 
 
 /** Allocate the descriptors for a 2D set of thread with a simple
@@ -217,19 +217,19 @@ double P4A_ACCEL_TIMER_STOP_AND_FLOAT_MEASURE();
 */
 #define P4A_CREATE_2D_THREAD_DESCRIPTORS(block_descriptor_name,		\
 					 grid_descriptor_name,		\
-					 n_x_iter, n_y_iter)		
+					 n_x_iter, n_y_iter)
 
 
 /** Dump a CUDA dim3 descriptor with an introduction message */
-#define P4A_DUMP_DESCRIPTOR(message, descriptor_name)			
+#define P4A_DUMP_DESCRIPTOR(message, descriptor_name)
 
 
 /** Dump a CUDA dim3 block descriptor */
-#define P4A_DUMP_BLOCK_DESCRIPTOR(descriptor_name)			
+#define P4A_DUMP_BLOCK_DESCRIPTOR(descriptor_name)
 
 
 /** Dump a CUDA dim3 grid descriptor */
-#define P4A_DUMP_GRID_DESCRIPTOR(descriptor_name)		
+#define P4A_DUMP_GRID_DESCRIPTOR(descriptor_name)
 
 
 /** @addtogroup P4A_cuda_kernel_call

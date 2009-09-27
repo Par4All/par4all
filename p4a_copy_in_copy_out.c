@@ -1,32 +1,34 @@
 #include <stdlib.h>
-void * p4a_copy_in(void **dest, const void *src, size_t n) {
-    size_t i;
-    void *pdest = *dest=malloc(n);
 
-    if( !pdest) return NULL;
+/* Equivalent stubs of Par4All runtime to have PIPS analyze happy */
 
-    for(i=0;i<n;i++)
-        ((char*)pdest)[i]=((const char*)src)[i];
-    return pdest;
-}
-void * p4a_copy_out(void **dest, const void *src, size_t n) {
-    size_t i;
-    void *pdest = *dest=malloc(n);
+void * P4A_COPY_TO_ACCEL(const void * host_address,
+			 void * accel_address,
+			 size_t n) {
+  size_t i;
 
-    if( !pdest) return NULL;
-
-    for(i=0;i<n;i++)
-        ((char*)pdest)[i]=((const char*)src)[i];
-    return pdest;
+  for(i = 0 ; i < n; i++)
+    ((char*)accel_address)[i] = ((const char*)host_address)[i];
+  return accel_address;
 }
 
-void * p4a_allocate(void **dest, const void *src, size_t n) {
-    size_t i;
-    void *pdest = *dest=malloc(n);
 
-    if( !pdest) return NULL;
+void * P4A_COPY_FROM_ACCEL(void * host_address,
+			   const void * accel_address,
+			   size_t n) {
+  size_t i;
 
-    for(i=0;i<n;i++)
-        ((char*)pdest)[i]=((const char*)src)[i];
-    return pdest;
+  for(i=0;i<n;i++)
+    ((char*)host_address)[i] = ((const char*)accel_address)[i];
+  return host_address;
+}
+
+
+void P4A_ACCEL_MALLOC(void **dest,  size_t n) {
+  *dest = malloc(n);
+}
+
+
+void P4A_ACCEL_FREE(void *dest) {
+  free(dest);
 }
