@@ -106,6 +106,9 @@ def patch_to_use_p4a_methods(file_name, dir_name):
     content = re.sub("(?s)(/\\*\n \\* file for [^\n]+\n \\*/\n).*extern int getloadavg\\(double __loadavg\\[], int __nelem\\);",
                      "\\1#include <stdio.h>\n", content)
 
+    content = re.sub("(?s)\ntypedef struct _IO_FILE FILE;\n.*extern int matherr\\(struct exception \\*__exc\\);",
+                     "#include <math.h>\n", content)
+
     content = re.sub("typedef unsigned int size_t;\n",
                      "", content)
 
