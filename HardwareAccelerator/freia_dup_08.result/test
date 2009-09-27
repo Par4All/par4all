@@ -1,0 +1,130 @@
+
+! initial function
+
+int freia_dup_08(freia_data2d *i)
+{
+   int max1;
+   int max2;
+   int x;
+   int y;
+   // same measure performed twice
+   freia_aipo_global_max(i, &max1);                                     /*0006*/
+   freia_aipo_global_max_coord(i, &max2, &x, &y);                       /*0007*/
+   return max1+max2+x+y;                                                /*0008*/
+}
+
+! graphs
+
+// graph for dag "dag_0" of module "freia_dup_08" in dot format
+digraph "dag_0" {
+  // inputs
+  "i" [shape=circle];
+
+  // outputs
+
+  // computation vertices
+  "7 max!" [shape=diamond];
+  "6 max" [shape=diamond];
+  "i" -> "7 max!";
+  "i" -> "6 max";
+}
+// graph for dag "dag_cleaned_0" of module "freia_dup_08" in dot format
+digraph "dag_cleaned_0" {
+  // inputs
+  "i" [shape=circle];
+
+  // outputs
+
+  // computation vertices
+  "7 max!" [shape=diamond];
+  "6 max" [shape=diamond];
+  "i" -> "7 max!";
+  "i" -> "6 max";
+}
+// graph for dag "freia_dup_08_helper_0_0" of module "freia_dup_08" in dot format
+digraph "freia_dup_08_helper_0_0" {
+  // inputs
+  "i" [shape=circle];
+
+  // outputs
+
+  // computation vertices
+  "7 max!" [shape=diamond];
+  "6 max" [shape=diamond];
+  "i" -> "7 max!";
+  "i" -> "6 max";
+}
+
+! acceleration function
+
+#include <freiaCommon.h>
+#include <freiaCoarseGrain.h>
+#include <spoc.h>
+
+// FREIA-SPoC helper function for module freia_dup_08
+freia_status freia_dup_08_helper_0_0_0(freia_data2d * i0, int32_t * red0, int32_t * red1, uint32_t * red2, uint32_t * red3)
+{
+  spoc_instr si;
+  spoc_param sp;
+  spoc_reduction reduc;
+  freia_microcode mcode;
+  freia_dynamic_param dynparam;
+  freia_reduction_results redres;
+  freia_op_sel op = 0;
+  freia_op_param param;
+  freia_status ret;
+  int i;
+
+  // init pipe to nop
+  spoc_init_pipe(&si, &sp, 16);
+
+
+  // STAGE 0
+  // i [0 input 0] -> [0 measure 0] 0 undefined
+  si.mux[0][0].op = SPOC_MUX_IN0;
+
+
+
+  // no output image
+
+  mcode.raw = (freia_ptr) &si;
+  mcode.size = sizeof(spoc_instr);
+
+  dynparam.raw = (freia_ptr) &sp;
+  dynparam.size = sizeof(spoc_param);
+
+  redres.raw = (freia_ptr) &reduc;
+  redres.size = sizeof(spoc_reduction);
+
+  ret = freia_cg_write_microcode(&mcode);
+  ret |= freia_cg_write_dynamic_param(&dynparam);
+
+  // actual call of spoc hardware
+  freia_cg_template_process_2i_2o(op, param, NULL, NULL, i0, i0);
+
+  // get reductions
+  freia_cg_read_reduction_results(&redres);
+
+  // measure 6 global_max stage 0 side 0
+  *red0 = (int32_t) reduc.measure[0][0].maximum;
+
+  // measure 7 global_max_coord stage 0 side 0
+  *red1 = (int32_t) reduc.measure[0][0].maximum;
+  *red2 = (uint32_t) reduc.measure[0][0].max_coord_x;
+  *red3 = (uint32_t) reduc.measure[0][0].max_coord_y;
+
+  return ret;
+}
+
+! updated function
+
+int freia_dup_08(freia_data2d *i)
+{
+   int max1;
+   int max2;
+   int x;
+   int y;
+   // same measure performed twice
+   freia_dup_08_helper_0_0_0(i, &max1, &max2, &x, &y);                  /*0006*/
+   return max1+max2+x+y;                                                /*0008*/
+}
