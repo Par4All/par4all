@@ -381,11 +381,20 @@ dagvtx copy_dagvtx_norec(dagvtx v)
 
 /* returns whether the vertex is an image copy operation.
  */
-static bool dagvtx_is_copy_p(dagvtx d)
+static bool dagvtx_is_copy_p(dagvtx v)
 {
-  vtxcontent c = dagvtx_content(d);
+  vtxcontent c = dagvtx_content(v);
   const freia_api_t * api = get_freia_api(vtxcontent_opid(c));
   return same_string_p(AIPO "copy", api->function_name);
+}
+
+/* returns whether the vertex is an image measurement operation.
+ */
+static bool dagvtx_is_measurement_p(dagvtx v)
+{
+  vtxcontent c = dagvtx_content(v);
+  const freia_api_t * api = get_freia_api(vtxcontent_opid(c));
+  return strncmp(api->function_name, AIPO "global_", strlen(AIPO "global_"))==0;
 }
 
 /* append new vertex nv to dag d.
@@ -418,6 +427,18 @@ void dag_append_vertex(dag d, dagvtx nv)
   dag_vertices(d) = CONS(dagvtx, nv, dag_vertices(d));
 
   // ??? what about scalar deps?
+}
+
+/* return the number of actual operations in dag d.
+ * may be zero if only input vertices remain in the dag after optimizations.
+ */
+int dag_computation_count(dag d)
+{
+  int count = 0;
+  FOREACH(dagvtx, v, dag_vertices(d))
+    if (dagvtx_number(v)!=0)
+      count++;
+  return count;
 }
 
 /* return target predecessors as a list.
@@ -529,11 +550,52 @@ static bool list_commuted_p(list l1, list l2)
     CHUNKP(CAR(l1))==CHUNKP(CAR(CDR(l2)));
 }
 
-/* remove AIPO copies detected as useless.
- * remove identical operations...
+/* "copy" copies "source" image in dag "d".
+ * remove it properly.
  */
-void dag_optimize(dag d)
+static void unlink_copy_vertex(dag d, entity source, dagvtx copy)
 {
+  entity target = vtxcontent_out(dagvtx_content(copy));
+  // may be NULL if source is an input
+  dagvtx prod = get_producer(d, copy, source);
+
+  // add copy successors as successors of prod
+  // it is kept as a successor in case it is not removed
+  if (prod)
+  {
+    FOREACH(dagvtx, vs, dagvtx_succs(copy))
+      dagvtx_succs(prod) = gen_once(vs, dagvtx_succs(prod));
+  }
+
+  // replace target image by source image in all v successors
+  FOREACH(dagvtx, succ, dagvtx_succs(copy))
+  {
+    vtxcontent sc = dagvtx_content(succ);
+    gen_list_patch(vtxcontent_inputs(sc), target, source);
+  }
+
+  // copy has no more successors
+  gen_free_list(dagvtx_succs(copy));
+  dagvtx_succs(copy) = NIL;
+}
+
+/* @return whether all vertices in list "lv" are copies.
+ */
+static bool all_vertices_are_copies_or_measures_p(list lv)
+{
+  FOREACH(dagvtx, v, lv)
+    if (!(dagvtx_is_copy_p(v) || dagvtx_is_measurement_p(v)))
+      return false;
+  return true;
+}
+
+/* remove AIPO copies detected as useless.
+ * remove identical operations.
+ * @return statements to be managed outside...
+ */
+list /* of statements */ dag_optimize(dag d)
+{
+  list lstats = NIL;
   set remove = set_make(set_pointer);
 
   ifdebug(6) {
@@ -619,31 +681,70 @@ void dag_optimize(dag d)
 
       // replace by its source everywhere it is used
       entity source = ENTITY(CAR(vtxcontent_inputs(c)));
-      // may be NULL if source is an input
-      dagvtx prod = get_producer(d, v, source);
 
-      // add v successors as successors of prod
-      // v is kept as a successor in case it is not removed
-      if (prod)
-      {
-	FOREACH(dagvtx, vs, dagvtx_succs(v))
-	  dagvtx_succs(prod) = gen_once(vs, dagvtx_succs(prod));
-      }
-
-      // replace target image by source image in all v successors
-      FOREACH(dagvtx, succ, dagvtx_succs(v))
-      {
-	vtxcontent sc = dagvtx_content(succ);
-	gen_list_patch(vtxcontent_inputs(sc), target, source);
-      }
-
-      // v has no more successors
-      gen_free_list(dagvtx_succs(v));
-      dagvtx_succs(v) = NIL;
+      // remove!
+      unlink_copy_vertex(d, source, v);
 
       // whether to actually remove v
       if (!gen_in_list_p(v, dag_outputs(d)))
-	  set_add_element(remove, remove, v);
+	set_add_element(remove, remove, v);
+    }
+  }
+
+  // what copies are kept in the dag
+  hash_table intra_pipe_copies = hash_table_make(hash_pointer, 10);
+
+  // A-copy->B where A is an input is removed from the dag and managed outside
+  // if A-copy->X and A-copy->Y where A is not an input, the second copy
+  // is replaced by an external X-copy->Y
+  FOREACH(dagvtx, w, dag_vertices(d))
+  {
+    if (set_belong_p(remove, w))
+      continue;
+
+    if (dagvtx_is_copy_p(w))
+    {
+      vtxcontent c = dagvtx_content(w);
+      entity target = vtxcontent_out(c);
+      pips_assert("one output and one input to copy",
+	  target!=entity_undefined && gen_length(vtxcontent_inputs(c))==1);
+
+      entity source = ENTITY(CAR(vtxcontent_inputs(c)));
+      dagvtx prod = get_producer(d, w, source);
+
+      if (source==target)
+      {
+	// ??? this should not happen?
+	set_add_element(remove, remove, w);
+      }
+      else if (dagvtx_number(prod)==0)
+      {
+	// fprintf(stderr, "COPY 1 removing %"_intFMT"\n", dagvtx_number(w));
+	unlink_copy_vertex(d, source, w);
+	set_add_element(remove, remove, w);
+	lstats = CONS(statement, freia_copy_image(source, target), lstats);
+      }
+      else // source is not an input, but the result of a internal computation
+      {
+	if (all_vertices_are_copies_or_measures_p(dagvtx_succs(prod)))
+	{
+	  // ??? hmmm... there is an implicit assumption here that the
+	  // source of the copy will be an output...
+	  unlink_copy_vertex(d, source, w);
+	  set_add_element(remove, remove, w);
+	  lstats = CONS(statement, freia_copy_image(source, target), lstats);
+	}
+	else if (hash_defined_p(intra_pipe_copies, source))
+	{
+	  unlink_copy_vertex(d, source, w);
+	  set_add_element(remove, remove, w);
+	  lstats = CONS(statement,
+		freia_copy_image((entity) hash_get(intra_pipe_copies, source),
+				 target), lstats);
+	}
+	else // keep first copy
+	  hash_put(intra_pipe_copies, source, target);
+      }
     }
   }
 
@@ -663,11 +764,14 @@ void dag_optimize(dag d)
   }
 
   set_free(remove);
+  hash_table_free(intra_pipe_copies);
 
   ifdebug(6) {
     pips_debug(4, "resulting dag:\n");
     dag_dump(stderr, "cleaned", d);
   }
+
+  return lstats;
 }
 
 /* return whether all vertices in list are mesures...

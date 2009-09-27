@@ -334,6 +334,7 @@ typedef struct {
   int side;  // 0 or 1
   bool flip; // whether alu op is flipped
   bool used; // whether the image has been used by an output
+  bool just_used; // idem but at this stage
 }  op_schedule;
 
 static void init_op_schedule(op_schedule * op, dagvtx v, int side)
@@ -345,6 +346,7 @@ static void init_op_schedule(op_schedule * op, dagvtx v, int side)
   op->side = side;
   op->flip = false;
   op->used = false;
+  op->just_used = false;
 }
 
 static int max_stage(const op_schedule * in0, const op_schedule * in1)
@@ -562,6 +564,8 @@ where_to_perform_operation
   vtxcontent c = dagvtx_content(op);
   out->side = -100;
   out->used = false;
+  in0->just_used = false;
+  in1->just_used = false;
 
   ifdebug(6) {
     pips_debug(6, "scheduling (%" _intFMT " %s) %s\n",
@@ -587,16 +591,20 @@ where_to_perform_operation
     {
       // we have the same image, chose closest to mes, and prefer in0
       if (in0->level>=in1->level)
-	*out = *in0, in0->used = (in0->level!=spoc_type_mes), in1->used = false;
+	*out = *in0, in0->used = (in0->level!=spoc_type_mes),
+	  in0->just_used = true, in1->used = false;
       else
-	*out = *in1, in1->used = (in0->level!=spoc_type_mes), in0->used = false;
+	*out = *in1, in1->used = (in0->level!=spoc_type_mes),
+	  in1->just_used = true, in0->used = false;
     }
     else // take the available one, whatever
     {
       if (measured==in0->image)
-	*out = *in0, in0->used = (in0->level!=spoc_type_mes), in1->used = false;
+	*out = *in0, in0->used = (in0->level!=spoc_type_mes),
+	  in0->just_used = true, in1->used = false;
       else
-	*out = *in1, in1->used = (in0->level!=spoc_type_mes), in0->used = false;
+	*out = *in1, in1->used = (in0->level!=spoc_type_mes),
+	  in1->just_used = true, in0->used = false;
     }
   }
   else
@@ -675,6 +683,8 @@ where_to_perform_operation
       // default stage and side...
       out->stage = used->stage;
       out->side = used->side;
+      used->used = true;
+      used->just_used = true;
 
       bool used_image_still_needed =
 	image_is_needed(used->producer, computed, todo);
@@ -754,8 +764,8 @@ where_to_perform_operation
       if (!in0->image) *in0 = *in1;
       pips_assert("alu binary operation", level==spoc_type_alu);
       out->stage = max_stage(in0, in1);
-      in0->used = true;
-      in1->used = true;
+      in0->used = true, in0->just_used = true;
+      in1->used = true, in1->just_used = true;
       if (out->stage==in0->stage && in0->level >= spoc_type_alu)
 	out->stage++;
       if (out->stage==in1->stage && in1->level >= spoc_type_alu)
@@ -1269,11 +1279,11 @@ static void freia_spoc_pipeline
       }
 
       // generate wiring, which may change flip stage on ALU operation
-      // special case if in0==in1 is needed?
-      if (in0.used)
+      // special case if in0==in1 is needed? no, rely on just_used
+      if (in0.just_used)
 	generate_wiring(body, &in0, &out, wiring);
 
-      if (in1.used)
+      if (in1.just_used)
 	generate_wiring(body, &in1, &out, wiring);
 
       // generate stage
@@ -1418,7 +1428,11 @@ static void freia_spoc_pipeline
     out.producer = NULL;
     out.level = spoc_type_out;
     out.stage = in0.stage;
-    out.side = in0.side>=0? in0.side: 0; // choose 0 if alu
+    out.side = in0.side>=0? in0.side: 0; // choose 0 by default if alu
+
+    // switch if side is not available
+    if (in0.side<0 && !check_wiring_output(wiring, out.stage, out.side))
+      out.side = 1 - out.side;
 
     sb_cat(body, "\n"
 	   "  // output image ", entity_local_name(imout),
@@ -2009,6 +2023,8 @@ static list /* of dags */ split_dag(dag initial)
 
   dag dall = copy_dag(initial);
   int nvertices = gen_length(dag_vertices(dall));
+  // if everything was removed by optimizations, there is nothing to do.
+  if (dag_computation_count(initial)==0) return NIL;
   list ld = NIL, lcurrent = NIL;
   set
     current = set_make(set_pointer),
@@ -2128,7 +2144,7 @@ static void set_append_vertex_statements(set s, list lv)
 }
 
 /* generate helpers for statements in ls of module
- * output resulting functions in helper
+ * output resulting functions in helper, which may be empty in some cases.
  * @param module
  * @param ls list of statements for the dag
  * @param helper output file
@@ -2152,7 +2168,7 @@ void freia_spoc_compile_calls
   free(dag_name), dag_name = NULL;
 
   // remove copies if possible...
-  dag_optimize(fulld);
+  list added_stats = dag_optimize(fulld);
 
   dag_name = strdup(cat("dag_cleaned_", itoa(number), NULL));
   dag_dot_dump(module, dag_name, fulld);
@@ -2162,6 +2178,10 @@ void freia_spoc_compile_calls
 
   // split dag in one-pipe dags.
   list ld = split_dag(fulld);
+
+  // nothing to do!
+  // it would have been interesting not to create thehelper file in this case.
+  // if (ld==NIL) return;
 
   FOREACH(dag, dfix, ld)
     freia_hack_fix_global_ins_outs(fulld, dfix);
@@ -2251,6 +2271,36 @@ void freia_spoc_compile_calls
 
   // no, copy statements are not done...
   // pips_assert("all statements done", set_empty_p(global_remainings));
+
+  // hmmm... append added stats to code...
+  if (added_stats)
+  {
+    statement slast = STATEMENT(CAR(ls));
+    fprintf(stderr, "adding stats to %p\n", slast);
+    instruction ilast = statement_instruction(slast);
+    statement newstat = instruction_to_statement(ilast);
+    // transfer comments and some cleanup...
+    statement_comments(newstat) = statement_comments(slast);
+    statement_comments(slast) = string_undefined;
+    statement_number(slast) = STATEMENT_NUMBER_UNDEFINED;
+    // pretty ugly because return must be handled especially...
+    if (instruction_call_p(ilast) &&
+	ENTITY_C_RETURN_P(call_function(instruction_call(ilast))))
+    {
+      call c = instruction_call(ilast);
+      if (!expression_constant_p(EXPRESSION(CAR(call_arguments(c)))))
+      {
+	// must split return...
+	pips_internal_error("return splitting not implemented yet...\n");
+      }
+      else
+	added_stats = gen_nconc(added_stats, CONS(statement, newstat, NIL));
+    }
+    else
+      added_stats = CONS(statement, newstat, added_stats);
+    statement_instruction(slast) =
+      make_instruction_sequence(make_sequence(added_stats));
+  }
 
   // cleanup
   set_free(global_remainings), global_remainings = NULL;

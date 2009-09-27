@@ -440,6 +440,16 @@ bool freia_assignment_p(entity e)
   return ENTITY_ASSIGN_P(e) || ENTITY_BITWISE_OR_UPDATE_P(e);
 }
 
+/* @return "freia_aipo_copy(target, source);"
+ */
+statement freia_copy_image(entity source, entity target)
+{
+  return call_to_statement(
+    make_call(local_name_to_top_level_entity(AIPO "copy"),
+	      CONS(expression, entity_to_expression(target),
+		   CONS(expression, entity_to_expression(source), NIL))));
+}
+
 /* replace statement contents with call to c, or continue if kill
  */
 void hwac_replace_statement(statement s, call newc, bool kill)
