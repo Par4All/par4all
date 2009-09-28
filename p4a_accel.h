@@ -25,6 +25,9 @@
 #ifndef P4A_ACCEL_H
 #define P4A_ACCEL_H
 
+/** Note that in CUDA and OpenCL there is 3 dimensions max: */
+enum { P4A_vp_dim_max = 3 };
+
 
 #ifdef P4A_ACCEL_CUDA
 #include <p4a_accel-CUDA.h>

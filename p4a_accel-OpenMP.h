@@ -9,9 +9,13 @@
     Project project)
 
     "mailto:Ronan.Keryell@hpc-project.com"
+    "mailto:Stephanie.Even@enstb.org"
 */
 
 /* License BSD */
+
+#ifndef P4A_ACCEL_OPENMP_H
+#define P4A_ACCEL_OPENMP_H
 
 #include <stdlib.h>
 #include <string.h>
@@ -19,11 +23,13 @@
 
 struct timeval p4a_time_begin, p4a_time_end;
 
-struct {
-  int x;
-  int y;
-  int z;
-} threadIdx;
+/** This is a global variable used to simulate P4A virtual processor
+    coordinates in OpenMP because we need to pass a local variable to a
+    function without passing it in the arguments.
+
+    Use thead local storage to have it local to each OpenMP thread.
+ */
+extern __thread int P4A_vp_coordinate[P4A_vp_dim_max];
 
 
 /** @defgroup P4A_OpenMP_time_measure Time execution measurement
@@ -51,6 +57,7 @@ double P4A_ACCEL_TIMER_STOP_AND_FLOAT_MEASURE();
 */
 #define P4A_INIT_ACCEL
 
+
 /** Release the hardware accelerator as OpenMP
 
     Nothing to do
@@ -66,29 +73,25 @@ double P4A_ACCEL_TIMER_STOP_AND_FLOAT_MEASURE();
 */
 #define P4A_ACCEL_KERNEL
 
+
 /** A declaration attribute of a hardware-accelerated kernel called from
     the host
 
     Nothing by default
 */
-
 #define P4A_ACCEL_KERNEL_WRAPPER
 
-/* Use thread-local storage to pass iteration index ? */
 
 /** Get the coordinate of the virtual processor in X (first) dimension */
-//#define P4A_VP_X 0
-#define P4A_VP_X threadIdx.x
-//#define P4A_VP_X(i) threadIdx.x
+#define P4A_VP_X P4A_vp_coordinate[0]
 
 
 /** Get the coordinate of the virtual processor in Y (second) dimension */
-#define P4A_VP_Y threadIdx.y
-//#define P4A_VP_Y(i) threadIdx.y
+#define P4A_VP_Y P4A_vp_coordinate[1]
+
 
 /** Get the coordinate of the virtual processor in Z (second) dimension */
-#define P4A_VP_Z threadIdx.z
-//#define P4A_VP_Z(i) threadIdx.z
+#define P4A_VP_Z P4A_vp_coordinate[2]
 
 
 /** @defgroup P4A_memory_allocation_copy Memory allocation and copy
@@ -118,6 +121,7 @@ double P4A_ACCEL_TIMER_STOP_AND_FLOAT_MEASURE();
 */
 #define P4A_ACCEL_FREE(address)			\
   free(address)
+
 
 /** Copy memory from the host to the hardware accelerator
 
@@ -248,10 +252,11 @@ double P4A_ACCEL_TIMER_STOP_AND_FLOAT_MEASURE();
     @param ... the following parameters are given to the kernel
 */
 #define P4A_CALL_ACCEL_KERNEL_1D(kernel, size, ...)		\
-  _Pragma("omp parallel for")						\
+  _Pragma("omp parallel for")					\
   for(int P4A_index_x = 0; P4A_index_x < size; P4A_index_x++) {	\
-    const int P4A_index_y = 0;					\
-    const int P4A_index_z = 0;					\
+    P4A_VP_X = P4A_index_x;					\
+    P4A_VP_Y = 0;						\
+    P4A_VP_Z = 0;						\
     kernel(__VA_ARGS__);					\
   }
 
@@ -272,12 +277,13 @@ double P4A_ACCEL_TIMER_STOP_AND_FLOAT_MEASURE();
   _Pragma("omp parallel for")						\
   for(int P4A_index_x = 0; P4A_index_x < n_x_iter; P4A_index_x++) {	\
     for(int P4A_index_y = 0; P4A_index_y < n_y_iter; P4A_index_y++) {	\
-      const int P4A_index_z = 0;					\
-      threadIdx.x = P4A_index_x;					\
-      threadIdx.y = P4A_index_y;					\
-      threadIdx.z = P4A_index_z;                                        \
+      P4A_VP_X = P4A_index_x;						\
+      P4A_VP_Y = P4A_index_y;						\
+      P4A_VP_Z = 0;							\
      kernel(__VA_ARGS__);						\
     }									\
   }
 
 /** @} */
+
+#endif

@@ -1,21 +1,33 @@
+/** @file
 
-/** Stop a timer on the accelerator and get double ms time
+    API of Par4All C to OpenMP
 
-    @addtogroup P4A_OpenMP_time_measure
+    This file is an implementation of the C to CUDA Par4All API.
+
+    Funded by the FREIA (French ANR), TransMedi\@ (French Pôle de
+    Compétitivité Images and Network) and SCALOPES (Artemis European
+    Project project)
+
+    "mailto:Ronan.Keryell@hpc-project.com"
+    "mailto:Stephanie.Even@enstb.org"
+*/
+
+#include <p4a_accel.h>
+
+#ifdef P4A_ACCEL_OPENMP
+
+/** This is a global variable used to simulate P4A virtual processor
+    coordinates in OpenMP because we need to pass a local variable to a
+    function without passing it in the arguments.
+
+    Use thead local storage to have it local to each OpenMP thread.
+
+    With __thread, it looks like this declaration cannot be repeated in
+    the .h without any extern.
  */
-/* #ifdef P4A_ACCEL_OPENMP
-
-double P4A_ACCEL_TIMER_STOP_AND_FLOAT_MEASURE() {
-  double run_time;
-  gettimeofday(&p4a_time_end, NULL);
-  // Take care of the non-associativity in floating point :-) 
-  run_time = (p4a_time_end.tv_sec - p4a_time_begin.tv_sec)
-    + (p4a_time_end.tv_usec - p4a_time_begin.tv_usec)*1e-6;
-  return run_time;
-}
+__thread int P4A_vp_coordinate[P4A_vp_dim_max];
 
 #endif
-*/
 
 
 #ifdef P4A_ACCEL_CUDA
@@ -64,7 +76,7 @@ float P4A_ACCEL_TIMER_STOP_AND_FLOAT_MEASURE() {
 }
 
 #else
-#include <p4a_accel.h>
+
 /** Stop a timer on the accelerator and get double ms time
 
     @addtogroup P4A_OpenMP_time_measure
@@ -77,6 +89,5 @@ double P4A_ACCEL_TIMER_STOP_AND_FLOAT_MEASURE() {
     + (p4a_time_end.tv_usec - p4a_time_begin.tv_usec)*1e-6;
   return run_time;
 }
-
 
 #endif
