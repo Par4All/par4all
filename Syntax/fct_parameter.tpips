@@ -1,0 +1,13 @@
+delete fct_parameter
+
+create fct_parameter fct_parameter.f
+
+apply PRIVATIZE_MODULE(%ALL)
+echo // OMP style
+setproperty PRETTYPRINT_SEQUENTIAL_STYLE    "do"
+display PRINTED_FILE(%ALL)
+
+close
+delete fct_parameter
+quit
+# EOF
