@@ -17,6 +17,7 @@
     Compétitivité Images and Network) and SCALOPES (Artemis European
     Project project)
 
+    "mailto:Stephanie.Even@enstb.org"
     "mailto:Ronan.Keryell@hpc-project.com"
 */
 
@@ -28,6 +29,11 @@
 /** Note that in CUDA and OpenCL there is 3 dimensions max: */
 enum { P4A_vp_dim_max = 3 };
 
+extern double P4A_ACCEL_TIMER_STOP_AND_FLOAT_MEASURE();
+
+#if defined(P4A_ACCEL_CUDA) && defined(P4A_ACCEL_OPENMP)
+#error "You cannot have both P4A_ACCEL_CUDA and P4A_ACCEL_OPENMP defined, yet"
+#endif
 
 #ifdef P4A_ACCEL_CUDA
 #include <p4a_accel-CUDA.h>
@@ -35,7 +41,7 @@ enum { P4A_vp_dim_max = 3 };
 #ifdef P4A_ACCEL_OPENMP
 #include <p4a_accel-OpenMP.h>
 #else
-#include <p4a_accel-.h>
+#error "You have to define either P4A_ACCEL_CUDA or P4A_ACCEL_OPENMP"
 #endif
 #endif
 

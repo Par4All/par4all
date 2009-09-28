@@ -8,13 +8,27 @@
     Compétitivité Images and Network) and SCALOPES (Artemis European
     Project project)
 
-    "mailto:Ronan.Keryell@hpc-project.com"
     "mailto:Stephanie.Even@enstb.org"
+    "mailto:Ronan.Keryell@hpc-project.com"
 */
 
 #include <p4a_accel.h>
 
 #ifdef P4A_ACCEL_OPENMP
+
+/** Stop a timer on the accelerator and get double ms time
+
+    @addtogroup P4A_OpenMP_time_measure
+ */
+double P4A_ACCEL_TIMER_STOP_AND_FLOAT_MEASURE() {
+  double run_time;
+  gettimeofday(&p4a_time_end, NULL);
+  /* Take care of the non-associativity in floating point :-) */
+  run_time = (p4a_time_end.tv_sec - p4a_time_begin.tv_sec)
+    + (p4a_time_end.tv_usec - p4a_time_begin.tv_usec)*1e-6;
+  return run_time;
+}
+
 
 /** This is a global variable used to simulate P4A virtual processor
     coordinates in OpenMP because we need to pass a local variable to a
@@ -36,34 +50,13 @@ __thread int P4A_vp_coordinate[P4A_vp_dim_max];
 
 /** To do basic time measure. Do not nest... */
 
-cudaEvent_t p4a_start_event, p4a_stop_event;;
-
-/** @defgroup P4A_cuda_time_measure Time execution measurement
-
-    @{
-*/
-
-/** Start a timer on the accelerator */
-//#define P4A_ACCEL_TIMER_START cutilSafeCall(cudaEventRecord(p4a_start_event, 0))
-
-void P4A_ACCEL_TIMER_START()
-{
-  cutilSafeCall(cudaEventRecord(p4a_start_event, 0));
-}
-
-void P4A_INIT_ACCEL()
-{
-  do {
-    cutilSafeCall(cudaEventCreate(&p4a_start_event));
-    cutilSafeCall(cudaEventCreate(&p4a_stop_event));
-  } while (0);
-}
+cudaEvent_t p4a_start_event, p4a_stop_event;
 
 /** Stop a timer on the accelerator and get float time in second
 
     @addtogroup P4A_cuda_time_measure
  */
-float P4A_ACCEL_TIMER_STOP_AND_FLOAT_MEASURE() {
+double P4A_ACCEL_TIMER_STOP_AND_FLOAT_MEASURE() {
   float execution_time;
   cutilSafeCall(cudaEventRecord(p4a_stop_event, 0));
   cutilSafeCall(cudaEventSynchronize(p4a_stop_event));
@@ -73,21 +66,6 @@ float P4A_ACCEL_TIMER_STOP_AND_FLOAT_MEASURE() {
 				     p4a_stop_event));
   /* Return the time in second: */
   return execution_time*1e-3;
-}
-
-#else
-
-/** Stop a timer on the accelerator and get double ms time
-
-    @addtogroup P4A_OpenMP_time_measure
- */
-double P4A_ACCEL_TIMER_STOP_AND_FLOAT_MEASURE() {
-  double run_time;
-  gettimeofday(&p4a_time_end, NULL);
-  /* Take care of the non-associativity in floating point :-) */
-  run_time = (p4a_time_end.tv_sec - p4a_time_begin.tv_sec)
-    + (p4a_time_end.tv_usec - p4a_time_begin.tv_usec)*1e-6;
-  return run_time;
 }
 
 #endif

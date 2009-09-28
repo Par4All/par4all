@@ -11,6 +11,7 @@
     Compétitivité Images and Network) and SCALOPES (Artemis European
     Project project)
 
+    "mailto:Stephanie.Even@enstb.org"
     "mailto:Ronan.Keryell@hpc-project.com"
 */
 
@@ -49,16 +50,49 @@ enum {
 };
 
 
-void P4A_INIT_ACCEL();
-void P4A_ACCEL_TIMER_START();
-float P4A_ACCEL_TIMER_STOP_AND_FLOAT_MEASURE();
+/** @} */
 
-#define P4A_INIT_ACCEL P4A_INIT_ACCEL()
-#define P4A_ACCEL_TIMER_START P4A_ACCEL_TIMER_START()
+/** Events for timing: */
+extern cudaEvent_t p4a_start_event, p4a_stop_event;
 
+
+/** @defgroup P4A_init Initialization of P4A C to CUDA
+
+    @{
+*/
+
+/** Associate the program to the accelerator
+
+    Initialized the use of the hardware accelerator
+
+    Just initialize events for time measure right now.
+*/
+#define P4A_INIT_ACCEL					\
+  do {							\
+    cutilSafeCall(cudaEventCreate(&p4a_start_event));	\
+    cutilSafeCall(cudaEventCreate(&p4a_stop_event));	\
+  } while (0);
+
+
+/** Release the hardware accelerator as OpenMP
+
+    Nothing to do
+ */
 #define P4A_RELEASE_ACCEL
 
 /** @} */
+
+
+/** @defgroup P4A_cuda_time_measure Time execution measurement
+
+    @{
+*/
+
+/** Start a timer on the accelerator */
+#define P4A_ACCEL_TIMER_START cutilSafeCall(cudaEventRecord(p4a_start_event, 0))
+
+/** @} */
+
 
 
 /** A declaration attribute of a hardware-accelerated kernel called from

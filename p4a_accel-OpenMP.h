@@ -8,8 +8,8 @@
     Compétitivité Images and Network) and SCALOPES (Artemis European
     Project project)
 
-    "mailto:Ronan.Keryell@hpc-project.com"
     "mailto:Stephanie.Even@enstb.org"
+    "mailto:Ronan.Keryell@hpc-project.com"
 */
 
 /* License BSD */
@@ -39,10 +39,7 @@ extern __thread int P4A_vp_coordinate[P4A_vp_dim_max];
 
 /** Start a timer on the accelerator */
 #define P4A_ACCEL_TIMER_START gettimeofday(&p4a_time_begin, NULL)
-
-double P4A_ACCEL_TIMER_STOP_AND_FLOAT_MEASURE();
 /** @} */
-
 
 /** @defgroup P4A_init Initialization of P4A C to OpenMP
 
