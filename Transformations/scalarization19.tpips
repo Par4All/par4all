@@ -17,10 +17,17 @@ setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 
 setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
 
-#echo
-#echo Initial code
-#echo
-#display PRINTED_FILE[scalarization19]
+echo
+echo Initial code
+echo
+display PRINTED_FILE[scalarization19]
+
+echo
+echo Initial code with preconditions
+echo
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[scalarization19]
 
 echo
 echo IN regions
