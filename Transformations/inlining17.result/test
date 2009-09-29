@@ -402,7 +402,9 @@ freia_error freia_cipo_outer_gradient(freia_data2d *imout, freia_data2d *imin, i
             freia_aipo_dilate_8c(imout, imout, kernel_8c);
          ret = 0;
       }
-
+      
+      
+      
       _return0 = ret;
    }
    ret = _return0;
@@ -453,12 +455,16 @@ int main()
                freia_aipo_dilate_8c(imout, imout, kernel_8c);
             ret = 0;
          }
-
+         
+         
+         
          _return0 = ret;
       }
       ret = _return0;
       ret |= freia_aipo_sub(imout, imout, imin);
-
+      
+      
+      
       _return1 = ret;
    }
    (void) _return1;
@@ -493,12 +499,16 @@ int main()
                freia_aipo_dilate_8c(imout, imout, kernel_8c);
             ret = 0;
          }
-
+         
+         
+         
          _return0 = ret;
       }
       ret = _return0;
       ret |= freia_aipo_sub(imout, imout, imin);
-
+      
+      
+      
       _return2 = ret;
    }
    (void) _return2;
@@ -552,11 +562,15 @@ int main()
       i_0 = 4;
       ret_1 = 0;
    }
-
+   
+   
+   
    _return0_0 = ret_1;
    ret_0 = _return0_0;
    ret_0 |= freia_aipo_sub(imout, imout, imin);
-
+   
+   
+   
    _return1 = ret_0;
    (void) _return1;
    if (freia_common_check_image_bpp_compat(imout, imin, (void *) 0)!=1) {
@@ -580,11 +594,15 @@ int main()
       i_1 = 4;
       ret_3 = 0;
    }
-
+   
+   
+   
    _return0_1 = ret_3;
    ret_2 = _return0_1;
    ret_2 |= freia_aipo_sub(imout, imout, imin);
-
+   
+   
+   
    _return2 = ret_2;
    (void) _return2;
 }

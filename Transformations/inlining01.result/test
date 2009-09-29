@@ -5,7 +5,7 @@ static void pmax(int a, int b)
 {
    if (a>b) 
       return;
-   printf("%d\n", (a>b?a:b));
+   printf("%d\n", a>b?a:b);
 }
 int main(int argc, char **argv)
 {
@@ -22,7 +22,7 @@ int main(int argc, char **argv)
    if (2>argc)
       ;
    else
-      printf("%d\n", (2>argc?2:argc));
+      printf("%d\n", 2>argc?2:argc);
    return d;
 }
 

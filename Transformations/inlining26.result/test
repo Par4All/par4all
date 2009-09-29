@@ -28,9 +28,12 @@ int gradient(void)
       _return0 = 1;
       goto l99995;
 l99999:      ;
-
+      
+      
+      
       _return0 = 0;
 l99995:      ;
+
    }
    _return0;
    _return1 = 0;

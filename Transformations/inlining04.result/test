@@ -3,7 +3,7 @@ Initial code
 
 static int pmax(int a, int b)
 {
-   int c = (a>b?a:b);
+   int c = a>b?a:b;
    printf("%d\n", c);
    return c;
 }
@@ -19,12 +19,12 @@ int main(int argc, char **argv)
    int _return0;
    int _return1;
    {
-      int c = (1>2?1:2);
+      int c = 1>2?1:2;
       printf("%d\n", c);
       _return0 = c;
    }
    {
-      int c = (2>3?2:3);
+      int c = 2>3?2:3;
       printf("%d\n", c);
       _return1 = c;
    }

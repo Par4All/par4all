@@ -183,8 +183,11 @@ l99998:         ;
             freia_aipo_dilate_8c(imout, imout, kernel_4c);
          ret = 0;
 l99995:         ;
-      }
 
+      }
+      
+      
+      
       _return0 = ret;
    }
    ret = _return0;
@@ -256,13 +259,18 @@ l99989:            ;
                freia_aipo_dilate_8c(imout, imout, kernel_4c);
             ret = 0;
 l99986:            ;
-         }
 
+         }
+         
+         
+         
          _return0 = ret;
       }
       ret = _return0;
       ret |= freia_aipo_sub(imout, imout, imin);
-
+      
+      
+      
       _return1 = ret;
    }
    (void) _return1;
@@ -318,13 +326,18 @@ l99985:            ;
                freia_aipo_dilate_8c(imout, imout, kernel_4c);
             ret = 0;
 l99982:            ;
-         }
 
+         }
+         
+         
+         
          _return0 = ret;
       }
       ret = _return0;
       ret |= freia_aipo_sub(imout, imout, imin);
-
+      
+      
+      
       _return2 = ret;
    }
    (void) _return2;
@@ -397,12 +410,17 @@ l99989:      ;
          freia_aipo_dilate_8c(imout, imout, kernel_4c_0);
       ret_1 = 0;
 l99986:      ;
-   }
 
+   }
+   
+   
+   
    _return0_0 = ret_1;
    ret_0 = _return0_0;
    ret_0 |= freia_aipo_sub(imout, imout, imin);
-
+   
+   
+   
    _return1 = ret_0;
    (void) _return1;
    if (freia_common_check_image_bpp_compat(imout, imin, (void *) 0)!=1) {
@@ -445,12 +463,17 @@ l99985:      ;
          freia_aipo_dilate_8c(imout, imout, kernel_4c_1);
       ret_3 = 0;
 l99982:      ;
-   }
 
+   }
+   
+   
+   
    _return0_1 = ret_3;
    ret_2 = _return0_1;
    ret_2 |= freia_aipo_sub(imout, imout, imin);
-
+   
+   
+   
    _return2 = ret_2;
    (void) _return2;
 }
@@ -597,11 +620,17 @@ l99989:      ;
 
       ret_1 = 0;
 l99986:      ;
+
+//  P(i_0) {connexity==8, size==4, 4<=i_0}
+
+
    }
 
 //  P(i_0,ret_1) {connexity==8, size==4}
 
-
+   
+   
+   
    _return0_0 = ret_1;
 
 //  P(_return0_0,i_0,ret_1) {_return0_0==ret_1, connexity==8, size==4}
@@ -616,7 +645,9 @@ l99986:      ;
 //  P(_return0_0,i_0,ret_0,ret_1) {_return0_0==ret_1, connexity==8,
 //    size==4}
 
-
+   
+   
+   
    _return1 = ret_0;
 
 //  P(_return0_0,_return1,i_0,ret_0,ret_1) {_return0_0==ret_1,
@@ -748,12 +779,19 @@ l99985:      ;
 
       ret_3 = 0;
 l99982:      ;
+
+//  P(_return0_0,_return1,i_0,i_1,ret_0,ret_1) {_return0_0==ret_1,
+//    _return1==ret_0, connexity==8, size==4, 4<=i_1}
+
+
    }
 
 //  P(_return0_0,_return1,i_0,i_1,ret_0,ret_1,ret_3)
 //    {_return0_0==ret_1, _return1==ret_0, connexity==8, size==4}
 
-
+   
+   
+   
    _return0_1 = ret_3;
 
 //  P(_return0_0,_return0_1,_return1,i_0,i_1,ret_0,ret_1,ret_3)
@@ -772,7 +810,9 @@ l99982:      ;
 //    {_return0_0==ret_1, _return0_1==ret_3, _return1==ret_0,
 //    connexity==8, size==4}
 
-
+   
+   
+   
    _return2 = ret_2;
 
 //  P(_return0_0,_return0_1,_return1,_return2,i_0,i_1,ret_0,ret_1,
@@ -849,12 +889,17 @@ l99989:      ;
          freia_aipo_dilate_8c(imout, imout, kernel_4c_0);
       ret_1 = 0;
 l99986:      ;
-   }
 
+   }
+   
+   
+   
    _return0_0 = ret_1;
    ret_0 = _return0_0;
    ret_0 |= freia_aipo_sub(imout, imout, imin);
-
+   
+   
+   
    _return1 = ret_0;
    (void) _return1;
    if (freia_common_check_image_bpp_compat(imout, imin, (void *) 0)!=1) {
@@ -897,12 +942,17 @@ l99985:      ;
          freia_aipo_dilate_8c(imout, imout, kernel_4c_1);
       ret_3 = 0;
 l99982:      ;
-   }
 
+   }
+   
+   
+   
    _return0_1 = ret_3;
    ret_2 = _return0_1;
    ret_2 |= freia_aipo_sub(imout, imout, imin);
-
+   
+   
+   
    _return2 = ret_2;
    (void) _return2;
 }
@@ -952,11 +1002,15 @@ int main()
       for(i_0 = 1; i_0 <= 3; i_0 += 1)
          freia_aipo_dilate_8c(imout, imout, kernel_8c_0);
    }
-
+   
+   
+   
    _return0_0 = ret_1;
    ret_0 = _return0_0;
    ret_0 |= freia_aipo_sub(imout, imout, imin);
-
+   
+   
+   
    _return1 = ret_0;
    if (freia_common_check_image_bpp_compat(imout, imin, (void *) 0)!=1) {
 
@@ -976,11 +1030,15 @@ int main()
       for(i_1 = 1; i_1 <= 3; i_1 += 1)
          freia_aipo_dilate_8c(imout, imout, kernel_8c_1);
    }
-
+   
+   
+   
    _return0_1 = ret_3;
    ret_2 = _return0_1;
    ret_2 |= freia_aipo_sub(imout, imout, imin);
-
+   
+   
+   
    _return2 = ret_2;
    ;
 }
@@ -1032,11 +1090,15 @@ int main()
       freia_aipo_dilate_8c(imout, imout, kernel_8c_0);
       i_0 = 4;
    }
-
+   
+   
+   
    _return0_0 = ret_1;
    ret_0 = _return0_0;
    ret_0 |= freia_aipo_sub(imout, imout, imin);
-
+   
+   
+   
    _return1 = ret_0;
    if (freia_common_check_image_bpp_compat(imout, imin, (void *) 0)!=1) {
 
@@ -1058,11 +1120,15 @@ int main()
       freia_aipo_dilate_8c(imout, imout, kernel_8c_1);
       i_1 = 4;
    }
-
+   
+   
+   
    _return0_1 = ret_3;
    ret_2 = _return0_1;
    ret_2 |= freia_aipo_sub(imout, imout, imin);
-
+   
+   
+   
    _return2 = ret_2;
    ;
 }

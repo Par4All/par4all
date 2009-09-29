@@ -3,7 +3,7 @@ Initial code
 
 static int pmax(int a, int b)
 {
-   int argc = (a>b?a:b);
+   int argc = a>b?a:b;
    return argc;
 }
 int main(int argc, char **argv)
@@ -20,7 +20,7 @@ int main(int argc, char **argv)
    int c;
    int _return0;
    {
-      int argc_ = (2>argc?2:argc);
+      int argc_ = 2>argc?2:argc;
       _return0 = argc_;
    }
    c = _return0;

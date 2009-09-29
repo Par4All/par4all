@@ -103,7 +103,9 @@ l99993:      ;
       for (i = 1;i<size;i++)
          freia_aipo_dilate_8c(imout, imout, kernel_8c);
 l99991:      ;
-
+      
+      
+      
       _return0 = 0;
       goto l99992;
 l99994:      ;
@@ -133,6 +135,7 @@ l99998:      ;
       freia_common_print_backtrace();
       _return0 = 1;
 l99992:      ;
+
    }
    ret = _return0;
    ret |= freia_aipo_sub(imout, imout, imin);
