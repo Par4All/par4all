@@ -48,7 +48,10 @@ function report()
     exit 0
   }
 
-  # no compilation, nothing to report
+  # out if locked (2)
+  [ $current = 'skip-lock' ] && exit 0
+
+  # no compilation, nothing to report...
   [ $current = 'skip' ] && { rmdir LOCK ; exit 0 ; }
 
   # no change, no report
@@ -123,7 +126,7 @@ mkdir LOCK > /dev/null 2>&1 ||
     report 'locked' "working copy '$prod' is already locked..."
     touch LOCK
   else
-    report 'skip' "working copy '$prod' is locked"
+    report 'skip-lock' "working copy '$prod' is locked"
   fi
 }
 
