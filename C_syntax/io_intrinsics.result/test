@@ -23,25 +23,25 @@ int main(char *fmt1, ...)
    n = 200;
    fp = fopen("file.txt", "rb");
    
-
+   
    (void) fread(buf1, 8, 50, fp);
    (void) fscanf(fp, fmt2, i_name, &i);
    (void) fprintf(fp, "%s%d", i_name, i);
 
-   va_start(vl,fmt1);
+   va_start(vl, fmt1);
    (void) vfscanf(fp, fmt1, vl);
    va_end(vl);
-   va_start(vl,fmt1);
+   va_start(vl, fmt1);
    (void) vfprintf(fp, fmt1, vl);
    va_end(vl);
 
    (void) scanf("%s%d", i_name, &i);
    (void) printf(fmt2, i_name, i);
 
-   va_start(vl,fmt1);
+   va_start(vl, fmt1);
    (void) vscanf(fmt1, vl);
    va_end(vl);
-   va_start(vl,fmt1);
+   va_start(vl, fmt1);
    (void) vprintf(fmt1, vl);
    va_end(vl);
 
@@ -49,18 +49,18 @@ int main(char *fmt1, ...)
    (void) sprintf(buf2, fmt2, i_name, i);
    (void) snprintf(buf2, 100, fmt2, i_name, i);
 
-   va_start(vl,fmt1);
+   va_start(vl, fmt1);
    (void) vsscanf(buf1, fmt1, vl);
    va_end(vl);
-   va_start(vl,fmt1);
+   va_start(vl, fmt1);
    (void) vsnprintf(buf2, 100, fmt1, vl);
    va_end(vl);
-   va_start(vl,fmt1);
+   va_start(vl, fmt1);
    (void) vsprintf(buf2, fmt1, vl);
    va_end(vl);
    
    // character IO functions
-
+   
    c = fgetc(fp);
    (void) fgets(buf1, max, fp);
    (void) fputc(c, fp);
@@ -77,7 +77,7 @@ int main(char *fmt1, ...)
    (void) puts(buf1);
    
    // direct IO functions
-
+   
    nr = fread(buf2, sizeof(char), n, fp);
    nr = fwrite(buf2, sizeof(char), n, fp);
    
@@ -93,16 +93,16 @@ int main(char *fmt1, ...)
    rewind(fp);
    
    // error handling functions
-
+   
    clearerr(fp);
    r = feof(fp);
    r = ferror(fp);
    perror(buf1);
    /* should also have an effect on errno */
-
+   
    fclose(fp);
    
-
+   
    fprintf(stderr, "The END\n");
 }
 

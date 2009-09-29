@@ -6,7 +6,7 @@ void call18(int i, ...)
       va_list pa;
       int r;
 
-      va_start(pa,fmt);
+      va_start(pa, fmt);
 
       va_end(pa);
    }

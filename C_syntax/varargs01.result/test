@@ -7,7 +7,7 @@ int varargs01(FILE *stream, const char *fmt, ...)
       va_list pa;
       int r;
 
-      va_start(pa,fmt);
+      va_start(pa, fmt);
       r = vfprintf(stream, fmt, pa);
       va_end(pa);
       return r;
