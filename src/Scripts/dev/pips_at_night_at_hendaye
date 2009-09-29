@@ -33,7 +33,7 @@ host=$(hostname)
   exit 1
 }
 
-email="irigoin@cri.ensmp.fr coelho@cri.ensmp.fr"
+email="irigoin@cri.ensmp.fr coelho@cri.ensmp.fr ancourt@cri.ensmp.fr"
 target=/home/local/irigoin/NIGHTY
 
 # set environment...
