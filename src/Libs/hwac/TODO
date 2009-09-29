@@ -16,6 +16,8 @@
 * code
 + cleanup data structures?
 - record scalar deps in dag...
+- split first on scalar deps, as it is true for any accelerator?
+  not that simple with limited depth?
 - remove type ctxcontent?
 - should make elementary ops absdiff(x,y) = abs(diff(x, y)) (no.. unsigned)
 - and then match back of necessary to available low level ops.
@@ -36,9 +38,7 @@
 - add checks in generated code (img size and so)?
 - parametric img size/depth? same as code?
 - the generated code is just a file to pips. ok???
-- must not handle copies through the pipeline... (see freia_17 for instance)
-- freia_skip_07 should be in 1 pass?
-- freia_aa0a and freia_aa1a should be 1 pass instead of 3?
++ must not handle copies through the pipeline...
 + should also detect "duplicate" measurements with a copy of the scalars
 + should detect "included" measurements (maxcoord includes max)?
   (done indirectly by the code generation, but could be done on the DAG?)
