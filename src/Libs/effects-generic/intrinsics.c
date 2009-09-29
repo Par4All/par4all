@@ -86,6 +86,7 @@ static list any_rgs_effects(entity e,list args, bool init_p);
 static list rgs_effects(entity e,list args);
 static list rgsi_effects(entity e,list args);
 static list any_heap_effects(entity e,list args);
+static list va_list_effects(entity e, list args);
 
 /* the following data structure indicates wether an io element generates
 a read effects or a write effect. the kind of effect depends on the
@@ -484,8 +485,9 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
 
   /* stdarg.h */
 
-  {BUILTIN_VA_START,                       no_write_effects},
-  {BUILTIN_VA_END,                         no_write_effects},
+  {BUILTIN_VA_START,                       va_list_effects},
+  {BUILTIN_VA_END,                         va_list_effects},
+  {BUILTIN_VA_COPY,                        va_list_effects},
   /* va_arg is not a standard call; it is directly represented in PIPS
      internal representation. */
 
@@ -1914,3 +1916,55 @@ effects_of_implied_do(expression exp, tag act)
     return le;
 }
 
+
+/**
+   handling of variable argument list macros (va_end, va_start and va_copy)
+   according to ISO/IEC 9899:1999.
+   va_list parameters are considered as scalar variables. It is unclear
+   for the moment whether we should use a more precise approach to simulate
+   the effects of successive calls to va_arg.
+   va_arg is directly represented in the PIPS internal representation
+   (see domain syntax).
+ */
+static list va_list_effects(entity e, list args)
+{
+  list le = NIL;
+  expression first_arg;
+  pips_debug(5, "begin for function \"%s\"\n", entity_user_name(e));
+ 
+  /* the first argument is always evaluated (read) and we simulate
+     the written effects on the depths of the va_list by a write
+     effect on the va_list itself.
+  */
+  first_arg = EXPRESSION(CAR(args));
+  le = gen_nconc(le, generic_proper_effects_of_expression(first_arg));    
+  le = gen_nconc(le, generic_proper_effects_of_any_lhs(first_arg));
+
+  /* but it is *may* written for va_end */
+  if (ENTITY_VA_END_P(e))
+    {
+       FOREACH(EFFECT, eff, le)
+	{
+	  if (effect_write_p(eff))
+	    effect_approximation_tag(eff) = is_approximation_may;
+	}
+    }
+  
+  if (ENTITY_VA_COPY_P(e))
+    {
+      /* the second argument is only read. In fact, in a more precise
+       approach, we should simulate reads on the depths of the va_list.
+      */
+      expression second_arg = EXPRESSION(CAR(CDR(args)));
+      le = gen_nconc(le, generic_proper_effects_of_expression(second_arg));
+    }
+  
+  ifdebug(5)
+    {
+      pips_debug(5, "resulting effects: \n");
+      (*effects_prettyprint_func)(le);
+      fprintf(stderr, "\n");
+    }
+  pips_debug(5, "end\n");
+  return le;
+}

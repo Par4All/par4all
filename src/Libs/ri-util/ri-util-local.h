@@ -1050,6 +1050,12 @@
 #define ENTITY_DEREFERENCING_P(e) entity_an_operator_p(e, DEREFERENCING)
 /* Defined elsewhere: #define ENTITY_ADDRESS_OF_P(e) entity_an_operator_p(e, ADDRESS_OF) */
 
+/* C varargs stuff */ 
+#define ENTITY_VA_END_P(e)   ENTITY_NAME_P(e, BUILTIN_VA_END)
+#define ENTITY_VA_START_P(e) ENTITY_NAME_P(e, BUILTIN_VA_START)
+#define ENTITY_VA_COPY_P(e)  ENTITY_NAME_P(e, BUILTIN_VA_COPY)
+
+
 #define ENTITY_FOUR_OPERATION_P(e) ( ENTITY_PLUS_P(e) || \
                                      ENTITY_MINUS_P(e) || \
                                      ENTITY_UNARY_MINUS_P(e) || \

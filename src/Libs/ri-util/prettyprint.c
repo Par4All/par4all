@@ -554,9 +554,23 @@ words_regular_call(call obj, bool is_a_subroutine)
     pc = CHAIN_SWORD(pc, prettyprint_is_fortran?"CALL ":"");
   }
 
+  /* special cases for stdarg builtin macros */
+  if (ENTITY_VA_END_P(f))
+    pc = CHAIN_SWORD(pc, "va_end");
+  else if (ENTITY_VA_START_P(f))
+    pc = CHAIN_SWORD(pc, "va_start");
+  else if (ENTITY_VA_COPY_P(f))
+    pc = CHAIN_SWORD(pc, "va_copy");
+
+  /* Special cases for stdio.h */ 
+  /* else if (ENTITY__IO_GETC_P(f)) */
+/*     pc = CHAIN_SWORD(pc, "getc"); */
+/*   else if (ENTITY__IO_PUTC_P(f)) */
+/*     pc = CHAIN_SWORD(pc, "putc"); */
+
   /* the implied complex operator is hidden... [D]CMPLX_(x,y) -> (x,y)
    */
-  if(!ENTITY_IMPLIED_CMPLX_P(f) && !ENTITY_IMPLIED_DCMPLX_P(f))
+  else if(!ENTITY_IMPLIED_CMPLX_P(f) && !ENTITY_IMPLIED_DCMPLX_P(f))
     pc = CHAIN_SWORD(pc, entity_user_name(f));
 
   /* The corresponding formal parameter cannot be checked by
@@ -912,30 +926,12 @@ words_nullary_op_c(call obj,
     else if(same_string_p(fname, PAUSE_FUNCTION_NAME)){
       pc = CHAIN_SWORD(pc, "_f77_intrinsics_pause_");
     }
-    else if(same_string_p(fname, BUILTIN_VA_END)){
-      pc = CHAIN_SWORD(pc, "va_end");
-    }
     else {
       pips_internal_error("unexpected one argument");
     }
     pc = CHAIN_SWORD(pc, parentheses_p?"(":" ");
     pc = gen_nconc(pc, words_subexpression(e, precedence, TRUE));
     pc = CHAIN_SWORD(pc, parentheses_p?")":"");
-  }
-  else if(nargs==2) {
-    expression e1 = EXPRESSION(CAR(args));
-    expression e2 = EXPRESSION(CAR(CDR(args)));
-
-    if(same_string_p(fname,BUILTIN_VA_START)){
-      pc = CHAIN_SWORD(pc, "va_start(");
-      pc = gen_nconc(pc, words_subexpression(e1, precedence, TRUE));
-      pc = CHAIN_SWORD(pc, ",");
-      pc = gen_nconc(pc, words_subexpression(e2, precedence, TRUE));
-      pc = CHAIN_SWORD(pc, ")");
-    }
-    else {
-      pips_internal_error("unexpected two arguments");
-    }
   }
   else {
     pips_internal_error("unexpected arguments");
@@ -1735,8 +1731,6 @@ static struct intrinsic_handler {
     {CONTINUE_FUNCTION_NAME, words_nullary_op,0},
     {END_FUNCTION_NAME, words_nullary_op, 0},
 
-    {BUILTIN_VA_START, words_nullary_op, 0},
-    {BUILTIN_VA_END, words_nullary_op, 0},
 
     {FORMAT_FUNCTION_NAME, words_prefix_unary_op, 0},
     {UNBOUNDED_DIMENSION_NAME, words_unbounded_dimension, 0},

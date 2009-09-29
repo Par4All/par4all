@@ -589,8 +589,8 @@ list generic_proper_effects_of_complex_address_expression(expression add_exp, ef
 	  }
 	  else if (syntax_va_arg_p(expression_syntax(s_exp)))
 	    {
-	      /* there should be more work here, but va_arg is very poorly handled
-		 everywhere for the moment. BC 
+	      /* there could be more work here, but va_arg is very poorly 
+		 handled everywhere for the moment. 
 	      */
 	      /* we generated an effect on the va_list, and that is all */
 	      list vararg_list = syntax_va_arg(expression_syntax(s_exp));
@@ -1079,10 +1079,14 @@ generic_proper_effects_of_expression(expression e)
       break;
     case is_syntax_va_arg: 
       {
+	/* there is first a read of the first argument, and 
+	   subsequent write effects on the va_list depths are simulated
+	   by write effects on the va_list itself.
+	*/
 	list al = syntax_va_arg(s);
-	sizeofexpression ae = SIZEOFEXPRESSION(CAR(al));
-	le = generic_proper_effects_of_expression
-	  (sizeofexpression_expression(ae));
+	expression ae = sizeofexpression_expression(SIZEOFEXPRESSION(CAR(al)));
+	le = generic_proper_effects_of_expression(ae);
+	le = gen_nconc(le, generic_proper_effects_of_any_lhs(ae));
 	break;
       }
     default:
