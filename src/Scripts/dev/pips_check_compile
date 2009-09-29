@@ -25,7 +25,7 @@
 # - check that pips does still compile.
 # - designed to be run from cron.
 # - report is sent by mail if the status changed.
-# - if there is a persistant LOCK, investigate by hand.
+# - if there is a persistant LOCK, investigate by hand...
 
 prod=${1:-.}
 dest=${2:-$LOGNAME@cri.ensmp.fr}
@@ -112,7 +112,20 @@ function report()
 cd $prod || report 'KO:cd-prod' "cannot 'cd $prod'"
 
 # manual locking based on mkdir
-mkdir LOCK > /dev/null 2>&1 || report 'locked' "working copy '$prod' is already locked..."
+mkdir LOCK > /dev/null 2>&1 ||
+{
+  # warn after 1200 seconds (20mn) locking
+  created=$(stat -c %Y LOCK)
+  now=$(date +%s)
+  delay=$(($now - $created))
+  if [ $delay -gt 1200 ]
+  then
+    report 'locked' "working copy '$prod' is already locked..."
+    touch LOCK
+  else
+    report 'skip' "working copy '$prod' is locked"
+  fi
+}
 
 rm -f out err
 nice svn up >> out 2>> err || report 'KO:svn-up' "cannot 'svn up'"
