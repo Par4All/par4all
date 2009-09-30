@@ -2003,11 +2003,6 @@ static void string_buffer_append_numeric(string str, string_buffer sb_result){
 }
 
 
-boolean main_c_program_p(string module_name)
-{
-  return (strstr(module_name,"main")!=NULL);
-}
-
 
 static void
 find_loops_and_calls_in_box(statement stmp, nest_context_p nest)
@@ -2653,7 +2648,7 @@ static string memory_for_array_p(string sa)
 
 static void xml_Array(entity var,Psysteme prec,string_buffer sb_result)
 {
-  string datatype;
+  string datatype ="";;
   list ld, ldim = variable_dimensions(type_variable(entity_type(var)));
   int i,j, size =0;
   int nb_dim = (int) gen_length(ldim);
@@ -3503,7 +3498,7 @@ static void xml_Boxes(string module_name, int code_tag,string_buffer sb_result,s
 					  CLOSEANGLE,NL, NULL));
   global_margin++; 
 
-  if (!main_c_program_p(module_name)) {
+  if (!entity_main_module_p(module)) {
     xml_LocalArrays(module,prec,sb_result);  
     xml_FormalArrays(module,prec,sb_result);
   }
@@ -3657,7 +3652,7 @@ int find_code_status(string module_name)
   gen_recurse(stat, statement_domain, gen_true,box_in_statement);  
   wbox = box_in_statement_p;
   
-  if (main_c_program_p(module_name))
+  if (entity_main_module_p(module_name_to_entity(module_name))) 
     return(code_is_a_main); 
   else {
     if (wmotif && !wbox)
