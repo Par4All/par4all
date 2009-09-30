@@ -1343,28 +1343,27 @@ void UpdateFunctionEntity(entity oe, list la)
 
   if (type_undefined_p(t))
     entity_type(oe) = make_type_functional(make_functional(gen_full_copy_list(la),type_undefined));
-  //  else if(type_variable_p(t) && basic_pointer_p(variable_basic(type_variable(t)))) {
-  //   basic b = variable_basic(type_variable(t));
-  //    type pt = basic_pointer(b);
-  //    if(type_undefined_p(pt))
-  //     basic_pointer(b) = make_type_functional(make_functional(la,type_undefined));
-  //else {
-  //    pips_internal_error("What should be done here?");
-  //  }
-  //}
   else {
     pips_internal_error("What should be done here?");
     CParserError("This entity must have undefined type\n");
   }
 
   pips_debug(3,"Update function entity \"%s\" with type \"\%s\"\n",
-	     entity_name(oe), list_to_string(safe_c_words_entity(entity_type(oe), NIL)));
+	     entity_name(oe),
+	     list_to_string(safe_c_words_entity(entity_type(oe), NIL)));
 }
 
 /* This function replaces the undefined field in t1 by t2.
-   If t1 is an array type and the basic of t1 is undefined, it is replaced by the basic of t2.
-   If t1 is a pointer type, if the pointed type is undefined it is replaced by t2.
-   If t1 is a functional type, if the result type of t1 is undefined, it is replaced by t2.
+
+   If t1 is an array type and the basic of t1 is undefined, it is
+   replaced by the basic of t2.
+
+   If t1 is a pointer type, if the pointed type is undefined it is
+   replaced by t2.
+
+   If t1 is a functional type, if the result type of t1 is undefined,
+   it is replaced by t2.
+
    The function is recursive.
 
    FI: This function used to create sharing between t1 and t2, which
@@ -1383,6 +1382,13 @@ type UpdateType(type t1, type t2)
   if(type_undefined_p(t2)) {
     /* This may happen when a type is implicitly declared as in
        "extern m[3];" */
+    /* We used to use type_unknown when the type was implicit, but
+       type_unknown does not let us store dimension information. We
+       need here a new kind of basic, basic unknown or basic
+       implicit. This would let us be more respectful of the source
+       code, but requires a modification of the internal
+       representation. It is mostly a prettyprint issue. See ticket
+       225. */
     t2 = make_scalar_integer_type(DEFAULT_INTEGER_TYPE_SIZE);
   }
 

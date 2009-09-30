@@ -920,7 +920,7 @@ MakeAssignInst(syntax l, expression e)
 	   }
        }
    }
-   
+
    return i;
 }
 
@@ -932,9 +932,24 @@ update_functional_type_result(entity f, type nt)
   type ft = entity_type(f);
   type rt = type_undefined;
 
-  pips_assert("function type is functional", type_functional_p(ft));
-
-  rt = functional_result(type_functional(ft));
+  //pips_assert("function type is functional", type_functional_p(ft));
+  if(!type_functional_p(ft)) {
+    /* The function is probably a formal parameter, its type is
+       wrong. The return type is either void if it is called by CALL
+       or its current implicit type. */
+    if(storage_formal_p(entity_storage(f))) {
+      pips_user_warning("Variable \"%s\" is a formal functional parameter\n",
+			entity_user_name(f));
+      ParserError(__FUNCTION__,
+		  "Formal functional parameters are not yet supported\n");
+    }
+    else {
+      pips_internal_error("Unexpected case\n");
+    }
+  }
+  else {
+    rt = functional_result(type_functional(ft));
+  }
 
   pips_assert("result type is variable or unkown or void or undefined",
 	      type_undefined_p(rt)
@@ -1091,6 +1106,16 @@ MakeCallInst(
 	    /* ParserError("MakeCallInst",
 			"Formal functional parameters are not supported "
 			"by PIPS.\n"); */
+	    /* FI: Before you can proceed to
+	       update_functional_type_result(), you may have to fix
+	       the type of e. Basically, if its type is not
+	       functional, it should be made functional with result
+	       void. I do not fix the problem in the parser because
+	       tons of other problems are going to appear, at least
+	       one for each PIPS analysis, starting with effects,
+	       proper, cumulated, regions, transformers,
+	       preconditions,... No quick fix, but a special effort
+	       made after an explicit decision. */
 	}
     }
 
