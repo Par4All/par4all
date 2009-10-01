@@ -69,7 +69,7 @@ def patch_to_use_p4a_methods(file_name, dir_name):
     # Insert a
     #include <p4a_accel.h>
     content = re.sub("^",
-                     "#include <p4a_accel.h>\n", content)
+                     "#include <p4a_accel.h>\n#include <math.h>\n", content)
 
     # Compatibility
     content = re.sub("// Prepend here P4A_INIT_ACCEL\n",
