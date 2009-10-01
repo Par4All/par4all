@@ -4356,6 +4356,8 @@ static IntrinsicDescriptor IntrinsicTypeDescriptorTable[] =
 
   /*#include <stdlib.h>*/
 
+  {POSIX_MEMALIGN_FUNCTION_NAME, 3, default_intrinsic_type, 0, 0},
+
   {ABORT_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
   {ABS_FUNCTION_NAME, 1, integer_to_integer_type, 0, 0},
   {ATEXIT_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
@@ -4441,12 +4443,29 @@ static IntrinsicDescriptor IntrinsicTypeDescriptorTable[] =
 
   /*#include <string.h>*/
 
-  {STRCMP_FUNCTION_NAME,2,overloaded_to_integer_type, 0, 0},
+  {MEMCPY_FUNCTION_NAME,3,default_intrinsic_type, 0, 0},
+  {MEMMOVE_FUNCTION_NAME,3,default_intrinsic_type, 0, 0},
   {STRCPY_FUNCTION_NAME,2,default_intrinsic_type, 0, 0},
+  {STRNCPY_FUNCTION_NAME,3,default_intrinsic_type, 0, 0},
   {STRCAT_FUNCTION_NAME,2,default_intrinsic_type, 0, 0},
-  {STRLEN_FUNCTION_NAME,1,default_intrinsic_type, 0, 0},
+  {STRNCAT_FUNCTION_NAME,3,default_intrinsic_type, 0, 0},
+  {MEMCMP_FUNCTION_NAME,3,overloaded_to_integer_type, 0, 0},
+  {STRCMP_FUNCTION_NAME,2,overloaded_to_integer_type, 0, 0},
+  {STRCOLL_FUNCTION_NAME,2,overloaded_to_integer_type, 0, 0},
+  {STRNCMP_FUNCTION_NAME,3,overloaded_to_integer_type, 0, 0},
+  {STRXFRM_FUNCTION_NAME,3,overloaded_to_integer_type, 0, 0},
+  {MEMCHR_FUNCTION_NAME,3,default_intrinsic_type, 0, 0},
+  {STRCHR_FUNCTION_NAME,2,default_intrinsic_type, 0, 0},
+  {STRCSPN_FUNCTION_NAME,2,default_intrinsic_type, 0, 0},
+  {STRPBRK_FUNCTION_NAME,2,default_intrinsic_type, 0, 0},
+  {STRRCHR_FUNCTION_NAME,2,default_intrinsic_type, 0, 0},
+  {STRSPN_FUNCTION_NAME,2,default_intrinsic_type, 0, 0},
+  {STRSTR_FUNCTION_NAME,2,default_intrinsic_type, 0, 0},
+  {STRTOK_FUNCTION_NAME,2,default_intrinsic_type, 0, 0},
+  {MEMSET_FUNCTION_NAME,3,default_intrinsic_type, 0, 0},
   {STRERROR_FUNCTION_NAME,1,integer_to_overloaded_type, 0, 0},
   {STRERROR_R_FUNCTION_NAME,3,default_intrinsic_type, 0, 0},
+  {STRLEN_FUNCTION_NAME,1,default_intrinsic_type, 0, 0},
 
   /*#include <tgmath.h>*/
   /*#include <time.h>*/

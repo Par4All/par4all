@@ -526,14 +526,30 @@
 
 /* include <string.h> */
 
-#define STRCMP_FUNCTION_NAME            "strcmp"
-#define STRNCMP_FUNCTION_NAME           "strncmp"
+#define MEMCPY_FUNCTION_NAME            "memcpy"
+#define MEMMOVE_FUNCTION_NAME           "memmove"
 #define STRCPY_FUNCTION_NAME            "strcpy"
+#define STRNCPY_FUNCTION_NAME           "strncpy"
 #define STRCAT_FUNCTION_NAME            "strcat"
-#define STRLEN_FUNCTION_NAME            "strlen"
+#define STRNCAT_FUNCTION_NAME           "strncat"
+#define MEMCMP_FUNCTION_NAME            "memcmp"
+#define STRCMP_FUNCTION_NAME            "strcmp"
+#define STRCOLL_FUNCTION_NAME           "strcoll"
+#define STRNCMP_FUNCTION_NAME           "strncmp"
+#define STRXFRM_FUNCTION_NAME           "strxfrm"
+#define MEMCHR_FUNCTION_NAME            "memchr"
+#define STRCHR_FUNCTION_NAME            "strchr"
+#define STRCSPN_FUNCTION_NAME           "strcspn"
+#define STRPBRK_FUNCTION_NAME           "strbprk"
+#define STRRCHR_FUNCTION_NAME           "strrchr"
+#define STRSPN_FUNCTION_NAME            "strspn"
+#define STRSTR_FUNCTION_NAME            "strstr"
+#define STRTOK_FUNCTION_NAME            "strtok"
+#define MEMSET_FUNCTION_NAME            "memset"
 //#define FOPEN_FUNCTION_NAME           "fopen"
 #define STRERROR_FUNCTION_NAME          "strerror"
 #define STRERROR_R_FUNCTION_NAME        "strerror_r"
+#define STRLEN_FUNCTION_NAME            "strlen"
 
 /* #include <fcntl.h>*/
 
@@ -544,6 +560,8 @@
 #define CREAT64_FUNCTION_NAME           "creat64"
 
 /* random functions of <stdlib.h> */
+
+#define POSIX_MEMALIGN_FUNCTION_NAME    "posix_memalign"
 
 #define RAND_FUNCTION_NAME              "rand"
 #define SRAND_FUNCTION_NAME             "srand"
