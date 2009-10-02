@@ -566,7 +566,7 @@ list simple_effects_composition_with_effect_transformer(list l_eff,
   
   ifdebug(8) 
     {
-      pips_debug(8, "Begin\n");
+      pips_debug(8, "End\n");
       print_effects(l_res);
     }
   

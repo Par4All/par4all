@@ -40,6 +40,7 @@
 #include "ri.h"
 #include "ri-util.h"
 #include "misc.h"
+#include "text-util.h"
 
 #include "effects-generic.h"
 
@@ -1047,24 +1048,40 @@ list generic_effect_generate_all_accessible_paths_effects(effect eff,
 
 /******************************************************************/
 
+static list type_fields(type t)
+{
+  list l_res = NIL;
+
+  switch (type_tag(t))
+    {
+    case is_type_struct:
+      l_res = type_struct(t);
+      break;
+    case is_type_union:
+      l_res = type_union(t);
+      break;
+    case is_type_enum:
+      l_res = type_enum(t);
+    default:
+      pips_internal_error("type_fields improperly called\n");
+    }
+  return l_res;
+	
+}
+
 /** 
- NOT YET IMPLEMENTED FOR STRUCT, UNION, ENUM, VARARGS AND FUNCTIONAL TYPES.
+ NOT YET IMPLEMENTED FOR VARARGS AND FUNCTIONAL TYPES.
 
  @param eff is an effect
  @return true if the effect reference maybe an access path to a pointer
 */
-bool effect_pointer_type_p(effect eff)
+static bool r_effect_pointer_type_p(effect eff, list l_ind, type ct)
 {
   bool p = false, finished = false;
-  reference ref = effect_any_reference(eff);
-  list l_ind = reference_indices(ref);
-  entity ent = reference_variable(ref);
-  type t = entity_type(ent), ct;
 
-  ct = t;
-  pips_debug(8, "begin with effect reference %s\n",
-	     words_to_string(words_reference(ref)));
-
+  pips_debug(7, "begin with type %s\n and number of indices : %d\n", 
+	     words_to_string(words_type(ct)),
+	     (int) gen_length(l_ind));
   while (!finished)
     {
       switch (type_tag(ct))
@@ -1096,16 +1113,65 @@ bool effect_pointer_type_p(effect eff)
 	      }
 	    else if (ENDP(l_dim)) /* && !ENDP(l_ind) by construction */
 	      {
-		pips_assert("the current basic should be a pointer\n", 
-			    basic_pointer_p(b));	
-		ct = basic_pointer(b);
-		POP(l_ind); /* there is an index for the pointer */
+		pips_assert("the current basic should be a pointer or a derived\n", 
+			    basic_pointer_p(b) || basic_derived_p(b));	
+		
+		if (basic_pointer_p(b))
+		  {
+		    ct = basic_pointer(b);
+		    POP(l_ind);
+		  }
+		else /* b is a derived */ 
+		  {
+		    ct = entity_type(basic_derived(b));	
+		    p = r_effect_pointer_type_p(eff, l_ind, ct);
+		    finished = true;
+		  }
+		 
 	      }	
 	    else /* ENDP(l_ind) but !ENDP(l_dim) */
 	      {
 		finished = true;
 	      }
 	    
+	    break;
+	  }
+	case is_type_struct:
+	case is_type_union:
+	case is_type_enum:
+	  {
+	    list l_ent = type_fields(ct);
+	    expression rank_exp = EXPRESSION(CAR(l_ind));
+	    int rank;
+	    
+	    pips_debug(7, "field case, with rank expression : %s \n",
+		       words_to_string(words_expression(rank_exp)));
+
+	    /* If the field rank is known, we only look at the 
+	       corresponding type.
+	       If not, we have to recursively look at each field 
+	    */ 
+	    if (expression_integer_value(rank_exp, &rank))
+	      {
+		/* the current type becomes the type of the 
+		 *p_rank-th field
+		 */		
+		ct = entity_type(ENTITY(gen_nth(rank - 1, l_ent)));
+		p = r_effect_pointer_type_p(eff, CDR(l_ind), ct);
+		finished = true;
+	      }
+	    else
+	      /* look at each field until a pointer is found*/
+	      {
+		while (!ENDP(l_ent) && p)
+		  {
+		    type new_ct = entity_type(ENTITY(CAR(l_ent)));
+		    p = r_effect_pointer_type_p(eff, CDR(l_ind), 
+						new_ct);
+		    POP(l_ent);
+		  }
+		finished = true;
+	      }	    
 	    break;
 	  }
 	default:
@@ -1119,6 +1185,32 @@ bool effect_pointer_type_p(effect eff)
   return p;
 
 }
+
+
+/** 
+ NOT YET IMPLEMENTED FOR VARARGS AND FUNCTIONAL TYPES.
+
+ @param eff is an effect
+ @return true if the effect reference maybe an access path to a pointer
+*/
+bool effect_pointer_type_p(effect eff)
+{
+  bool p = false;
+  reference ref = effect_any_reference(eff);
+  list l_ind = reference_indices(ref);
+  entity ent = reference_variable(ref);
+  type t = basic_concrete_type(entity_type(ent));
+
+  pips_debug(8, "begin with effect reference %s\n",
+	     words_to_string(words_reference(ref)));
+
+  p = r_effect_pointer_type_p(eff, l_ind, t);
+
+  pips_debug(8, "end with p = %s\n", p== false ? "false" : "true");
+  return p;
+
+}
+
 
 bool regions_weakly_consistent_p(list rl)
 {
@@ -1145,4 +1237,144 @@ bool region_weakly_consistent_p(effect r)
   }
 
   return TRUE;
+}
+
+/**
+   Effects are not copied but a new list is built.
+ */
+list statement_modified_pointers_effects_list(statement s)
+{
+  list l_cumu_eff = load_rw_effects_list(s);
+  list l_res = NIL;
+  bool anywhere_p = false;
+
+  ifdebug(6){
+	 pips_debug(6, " effects before selection: \n");
+	 (*effects_prettyprint_func)(l_cumu_eff);
+       }
+
+  FOREACH(EFFECT, eff, l_cumu_eff)
+    {
+      if (!anywhere_p && effect_write_p(eff))
+	{
+	  if (anywhere_effect_p(eff))
+	    anywhere_p = true;
+	  else if (effect_pointer_type_p(eff))
+	    l_res = gen_nconc(l_res, CONS(EFFECT, eff, NIL));
+	}
+    }
+  if (anywhere_p)
+    {
+      gen_free_list(l_res);
+      l_res = CONS(EFFECT, make_anywhere_effect(make_action_write()), NIL);
+    }
+
+  ifdebug(6){
+	 pips_debug(6, " effects after selection: \n");
+	 (*effects_prettyprint_func)(l_res);
+       }
+
+
+  return l_res;
+}
+
+/******************************************************************/
+
+list generic_effects_store_update(list l_eff, statement s, bool backward_p)
+{
+
+   transformer t; /* transformer of statement s */
+   list l_eff_pointers, l_eff_tmp;
+   list l_res = NIL;
+   bool anywhere_w_p = false;
+   bool anywhere_r_p = false;
+
+   pips_debug(5, "begin\n");
+	
+   t = (*load_transformer_func)(s);    
+
+   if (l_eff !=NIL)    
+     {
+       /* first change the store of the descriptor */
+       if (backward_p)
+	 l_eff = (*effects_transformer_composition_op)(l_eff, t);
+       else
+	 l_eff =  (*effects_transformer_inverse_composition_op)(l_eff, t);
+   
+       ifdebug(5){
+	 pips_debug(5, " effects after composition with transformer: \n");
+	 (*effects_prettyprint_func)(l_eff);
+       }
+
+       if (get_bool_property("EFFECTS_POINTER_MODIFICATION_CHECKING"))
+	 {
+	   /* then change the effects references if some pointer is modified */
+	   /* backward_p is not used here because we lack points_to information
+	      and we thus generate anywhere effects 
+	   */
+	   l_eff_pointers = statement_modified_pointers_effects_list(s);
+	   
+	   while( !ENDP(l_eff) && 
+		  ! (anywhere_w_p && anywhere_r_p))
+	     {
+	       list l_eff_p_tmp = l_eff_pointers;
+	       effect eff = EFFECT(CAR(l_eff));
+	       bool eff_w_p = effect_write_p(eff);
+	       bool found = false;
+	       
+	       
+	       
+	       while( !ENDP(l_eff_p_tmp) &&
+		      !((eff_w_p && anywhere_w_p) || (!eff_w_p && anywhere_r_p)))
+		 {
+		   effect eff_p = EFFECT(CAR(l_eff_p_tmp));
+		   reference eff_ref = effect_any_reference(eff);
+		   reference eff_ref_p = effect_any_reference(eff_p);
+		   effect new_eff = effect_undefined;
+		   
+		   if (same_entity_p(reference_variable(eff_ref), 
+				     reference_variable(eff_ref_p)))
+		     {
+		       /* this is a very rough approximation ! */
+		       if (gen_length(reference_indices(eff_ref_p)) <=
+			   gen_length(reference_indices(eff_ref)))
+			 {
+			   new_eff = make_anywhere_effect
+			     (copy_action(effect_action(eff)));
+			   l_res = gen_nconc(l_res, CONS(EFFECT, new_eff, NIL));
+			   found = true;
+			   if (eff_w_p)
+			     anywhere_w_p = true;
+			   else 
+			     anywhere_r_p = true;
+			   
+			 }
+		     } /* if(same_entity_p()) */
+		   
+		   POP(l_eff_p_tmp);
+		 } /* while( !ENDP(l_eff_p_tmp))*/ 
+	       
+	       /* if we have found no modifiying pointer, we keep the effect */
+	       if (!found)
+		 {
+		   /* is the copy necessary ?*/
+		   l_res = gen_nconc(l_res, CONS(EFFECT,copy_effect(eff) , NIL));
+		   
+		 }
+	       
+	       POP(l_eff);
+	       
+	     } /* while( !ENDP(l_eff)) */
+	   
+	   ifdebug(5){
+	     pips_debug(5, " effects after composition with pointer effects: \n");
+	     (*effects_prettyprint_func)(l_res);
+	   }
+            
+	 } /* if (get_bool_property("EFFECTS_POINTER_MODIFICATION_CHECKING"))*/
+       else
+	 l_res = l_eff;
+     } /* if (l_eff !=NIL) */
+
+   return l_res;
 }
