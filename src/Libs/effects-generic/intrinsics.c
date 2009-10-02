@@ -744,7 +744,7 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
   {LSTAT_FUNCTION_NAME,                            no_write_effects},
 
   /*#include <stdlib.h>*/
-
+  {POSIX_MEMALIGN_FUNCTION_NAME,                   no_write_effects},
   {ABORT_FUNCTION_NAME,                            no_write_effects},
   {ABS_FUNCTION_NAME,                              no_write_effects},
   {ATEXIT_FUNCTION_NAME,                           no_write_effects},
@@ -768,12 +768,30 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
 
   /*#include <string.h>*/
 
+  {MEMCPY_FUNCTION_NAME,                           no_write_effects},
+  {MEMMOVE_FUNCTION_NAME,                          no_write_effects},
+  {MEMCMP_FUNCTION_NAME,                           no_write_effects},
+  {MEMSET_FUNCTION_NAME,                           no_write_effects},
   {STRCMP_FUNCTION_NAME,                           no_write_effects},
   {STRCPY_FUNCTION_NAME,                           no_write_effects},
+  {STRNCPY_FUNCTION_NAME,                          no_write_effects},
   {STRCAT_FUNCTION_NAME,                           no_write_effects},
+  {STRNCAT_FUNCTION_NAME,                          no_write_effects},
   {STRLEN_FUNCTION_NAME,                           no_write_effects},
+  {STRCOLL_FUNCTION_NAME,                          no_write_effects},
+  {STRNCMP_FUNCTION_NAME,                          no_write_effects},
+  {STRXFRM_FUNCTION_NAME,                          no_write_effects},
+  {MEMCHR_FUNCTION_NAME,                           no_write_effects},
+  {STRCHR_FUNCTION_NAME,                           no_write_effects},
+  {STRCSPN_FUNCTION_NAME,                          no_write_effects},
+  {STRPBRK_FUNCTION_NAME,                          no_write_effects},
+  {STRRCHR_FUNCTION_NAME,                          no_write_effects},
+  {STRSPN_FUNCTION_NAME,                           no_write_effects},
+  {STRSTR_FUNCTION_NAME,                           no_write_effects},
+  {STRTOK_FUNCTION_NAME,                           no_write_effects},
   {STRERROR_FUNCTION_NAME,                         no_write_effects},
   {STRERROR_R_FUNCTION_NAME,                       no_write_effects},
+
 
   /* {int mblen(const char *, size_t, 0, 0},
      {size_t mbstowcs(wchar_t *, const char *, size_t, 0, 0},
