@@ -111,7 +111,8 @@ function report()
 }
 
 # check for working copy
-[ -d $prod -a -d $prod/.svn ] || report 'KO:no-wc' "working copy '$prod' not found"
+[ -d $prod ] || report 'KO:no-dir' "working copy directory '$prod' not found"
+[ -d $prod/.svn ] || report 'KO:no-wc' "'$prod' is not a working copy '$prod'"
 cd $prod || report 'KO:cd-prod' "cannot 'cd $prod'"
 
 # manual locking based on mkdir
@@ -131,7 +132,11 @@ mkdir LOCK > /dev/null 2>&1 ||
 }
 
 rm -f out err
-nice svn up >> out 2>> err || report 'KO:svn-up' "cannot 'svn up'"
+nice svn up >> out 2>> err || {
+  # hmmm... try to cleanup after svn up failure
+  svn cleanup
+  report 'KO:svn-up' "cannot 'svn up'"
+}
 
 [ -f CURRENT ] || touch CURRENT
 mv CURRENT PREVIOUS
