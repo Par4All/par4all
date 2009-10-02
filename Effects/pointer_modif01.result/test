@@ -1,0 +1,50 @@
+
+Proper effects for "main"
+
+int main()
+{
+   // BEGIN BLOCK
+   int *p;
+   int *q;
+//               <must be read   >: p
+//               <must be written>: p[0]
+
+   *p = 1;
+//               <must be read   >: p
+//               <must be written>: q
+
+   q = p;
+//               <must be read   >: q
+//               <must be written>: q[0]
+   *q = 2;
+   return 0;
+   // END BLOCK
+}
+
+Cumulated effects for "main"
+
+//               <may be read    >: TOP-LEVEL:*MEMORY*
+//               <may be written >: TOP-LEVEL:*MEMORY*
+int main()
+{
+//               <may be read    >: TOP-LEVEL:*MEMORY*
+//               <may be written >: TOP-LEVEL:*MEMORY*
+//               <must be read   >: p
+//               <must be written>: p[0] q
+   // BEGIN BLOCK
+   int *p;
+   int *q;
+//               <must be read   >: p
+//               <must be written>: p[0]
+
+   *p = 1;
+//               <must be read   >: p
+//               <must be written>: q
+
+   q = p;
+//               <must be read   >: q
+//               <must be written>: q[0]
+   *q = 2;
+   return 0;
+   // END BLOCK
+}
