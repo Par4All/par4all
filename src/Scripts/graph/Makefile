@@ -24,6 +24,7 @@ SCRIPTS = \
 	Fdavinci \
 	Rdavinci \
 	dg2dv.pl \
+	cg2dot.pl \
 	onegraph.pl \
 	display_pips_daVinci \
 	pips_graph2daVinci \
@@ -37,4 +38,3 @@ INSTALL_UTL =	$(SCRIPTS)
 ROOT    = ../../..
 #PROJECT = pips
 include $(ROOT)/makes/main.mk
-
