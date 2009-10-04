@@ -56,12 +56,13 @@ sub show_callees($)
 
   # get module's callees
   my @callees = ();
+  # ??? I should rather parse CALLEES...
   my $cgfile = "$dbdir/$module/$module.cg";
   open CG, "<$cgfile" or die "cannot open $cgfile";
-  # skip first line
-  <CG>;
   while (<CG>)
   {
+    # only keep first level...
+    next unless /^\s{5}\S/;
     s/\s+//g;
     push @callees, $_;
   }
