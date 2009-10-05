@@ -18,7 +18,6 @@
 # You should have received a copy of the GNU General Public License
 # along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 #
-
 FWD_DIRS	= src makes
 
 # default is to "build" (phase 0 to 6)
@@ -48,6 +47,7 @@ full-build: build htdoc
 
 # do not include dependencies for some target
 clean: NO_INCLUDES=1
+unbuild: NO_INCLUDES=1
 export NO_INCLUDES
 
 # Clean up everything below:
@@ -55,9 +55,7 @@ clean:
 	$(MAKE) -C src clean
 
 unbuild: clean tags-clean
-	$(RM) -rf \
-		./bin ./include ./lib ./share ./utils \
-		./doc ./runtime ./etc ./html
+	$(MAKE) -C src unbuild
 
 rebuild:
 	$(MAKE) unbuild
@@ -68,10 +66,9 @@ recompile:
 	$(MAKE) compile
 
 install:
-	@echo "try 'build' target"
+	$(MAKE) -C src install
 
-uninstall:
-	@echo "try 'unbuild' target"
+uninstall:unbuild
 
 # all about tags, with temporary files
 # should it generate tags only for src/?

@@ -70,7 +70,7 @@ endif # INSTALL_DIR
 # where to install stuff
 BIN.d	= $(INSTALL_DIR)/bin/$(ARCH)
 EXE.d	= $(INSTALL_DIR)/bin
-LIB.d	= $(INSTALL_DIR)/lib
+LIB.d	= $(INSTALL_DIR)/lib/$(ARCH)
 INC.d	= $(INSTALL_DIR)/include
 ETC.d	= $(INSTALL_DIR)/etc
 # By default, install the documentation directly into $(DOC.d) but DOC.subd can
@@ -116,7 +116,7 @@ PATH	:= $(PATH):$(NEWGEN_ROOT)/bin:$(NEWGEN_ROOT)/bin/$(ARCH)
 ###################################################################### DO STUFF
 
 UTC_DATE := "$(shell date -u)"
-CPPFLAGS += -DSOFT_ARCH='$(ARCH)' -I$(ROOT)/include
+CPPFLAGS += -DSOFT_ARCH='$(ARCH)' -I$(INC.d)
 
 # {C,CPP,LD,L,Y}OPT macros allow to *add* things from the command line
 # as gmake CPPOPT="-DFOO=bar" ... that will be added to the defaults
@@ -139,7 +139,7 @@ MOVE	= mv
 JAVAC	= javac
 JNI	= javah -jni
 MKDIR	= mkdir -p -m 755
-RMDIR	= rmdir
+RMDIR	= rmdir -p
 INSTALL	= install
 CMP	= cmp -s
 
@@ -216,6 +216,7 @@ depend: $(DERIVED_HEADERS) $(INC_TARGET)
 
 clean: depend-clean
 
+
 depend-clean:; $(RM) .depend.*
 
 endif # need_depend
@@ -233,9 +234,10 @@ ifdef INSTALL_ETC
 $(ETC.d):
 	$(MKDIR) $@
 
+install:etc-install
 # Deal also with directories.
 # By the way, how to install directories with "install" ?
-.build_etc: $(INSTALL_ETC)
+etc-install .build_etc: $(INSTALL_ETC)
 	# no direct dependency on target directory
 	$(MAKE) $(ETC.d)
 	for f in $(INSTALL_ETC) ; do \
@@ -250,9 +252,18 @@ $(ETC.d):
 	      $(INSTALL) -m 644 $$f $(ETC.d) ; \
 	  fi ; \
 	done
-	touch $@
+	`echo $@ | grep -q install` || touch $@
 
 clean: etc-clean
+
+unbuild: etc-unbuild
+
+etc-unbuild:
+	for f in $(INSTALL_ETC) ; do \
+		echo "uninstalling $$f" ; \
+	  	$(RM) -r $(ETC.d)/$$f ;\
+	done
+	test ! -d $(ETC.d) || $(RMDIR) --ignore-fail-on-non-empty $(ETC.d)
 
 etc-clean:
 	$(RM) .build_etc
@@ -315,6 +326,7 @@ clean: header-clean
 header-clean:
 	$(RM) $(INC_TARGET) .header
 
+
 INSTALL_INC	+=   $(INC_TARGET)
 
 endif # INC_TARGET
@@ -325,16 +337,25 @@ phase2: .build_inc
 
 $(INC.d):; $(MKDIR) $(INC.d)
 
-.build_inc: $(INSTALL_INC)
+install:inc-install
+inc-install .build_inc: $(INSTALL_INC)
 	# no dep on target dir
 	$(MAKE) $(INC.d)
 	for f in $(INSTALL_INC) ; do \
 	  $(CMP) $$f $(INC.d)/$$f || \
-	    $(INSTALL) -m 644 $$f $(INC.d) ; \
+	$(INSTALL) -m 644 $$f $(INC.d) ; \
 	done
-	touch $@
+	`echo $@ | grep -q install` || touch $@
 
 clean: inc-clean
+unbuild: inc-unbuild
+
+inc-unbuild:
+	for f in $(INSTALL_INC) ; do \
+		echo "uninstalling $$f" ; \
+	  	$(RM) -r $(INC.d)/$$f ;\
+	done
+	test ! -d $(INC.d) || $(RMDIR) --ignore-fail-on-non-empty $(INC.d)
 
 inc-clean:
 	$(RM) .build_inc
@@ -375,9 +396,9 @@ $(ARCH)/$(LIB_TARGET): $(LIB_OBJECTS)
 $(LIB_OBJECTS): $(ARCH)/.dir
 
 # alias for FI
-lib: $(ARCH)/$(LIB_TARGET)
+lib: $(LIB_TARGET)
 
-INSTALL_LIB	+=   $(addprefix $(ARCH)/,$(LIB_TARGET))
+INSTALL_LIB	+=   $(LIB_TARGET)
 
 endif # LIB_TARGET
 
@@ -393,21 +414,28 @@ $(INSTALL_LIB): $(ARCH)/.dir
 $(LIB.d):
 	$(MKDIR) $@
 
-$(LIB.d)/$(ARCH): $(LIB.d)
-	$(MKDIR) $@
-
-.build_lib.$(ARCH): $(INSTALL_LIB)
+install:lib-install
+lib-install .build_lib.$(ARCH): $(addprefix $(ARCH)/,$(INSTALL_LIB))
 	# no dep on target dir
-	$(MAKE) $(LIB.d)/$(ARCH)
-	for l in $(INSTALL_LIB) ; do \
+	$(MAKE) $(LIB.d)
+	for l in $(addprefix $(ARCH)/,$(INSTALL_LIB)) ; do \
 	  $(CMP) $$l $(LIB.d)/$$l || \
-	    $(INSTALL) -m 644 $$l $(LIB.d)/$(ARCH) ; \
+	    $(INSTALL) -m 644 $$l $(LIB.d) ; \
 	done
-	touch $@
+	`echo $@ | grep -q install` || touch $@
 
 clean: lib-clean
 
 lib-clean:; $(RM) $(ARCH)/$(LIB_TARGET) .build_lib.*
+
+unbuild: lib-unbuild
+
+lib-unbuild:
+	for f in $(INSTALL_LIB) ; do \
+		echo "uninstalling $$f" ; \
+	  	$(RM) -r $(LIB.d)/$$f ;\
+	done
+	test ! -d $(LIB.d) || $(RMDIR) --ignore-fail-on-non-empty $(LIB.d)
 
 endif # INSTALL_LIB
 
@@ -461,16 +489,26 @@ phase2: .build_exe
 $(EXE.d):
 	$(MKDIR) $@
 
-.build_exe: $(INSTALL_EXE)
+install:exe-install
+exe-install .build_exe: $(INSTALL_EXE)
 	# no direct deps on target dir
 	$(MAKE) $(EXE.d)
 	$(INSTALL) -m 755 $(INSTALL_EXE) $(EXE.d)
-	touch $@
+	`echo $@ | grep -q install` || touch $@
 
 clean: exe-clean
 
 exe-clean:
 	$(RM) .build_exe
+
+unbuild: exe-unbuild
+exe-unbuild:
+	for f in $(INSTALL_EXE) ; do \
+		echo "uninstalling $$f" ; \
+	  	$(RM) -r $(EXE.d)/$$f ;\
+	done
+	test ! -d $(EXE.d) || $(RMDIR) --ignore-fail-on-non-empty $(EXE.d)
+
 
 endif # INSTALL_EXE
 
@@ -489,16 +527,31 @@ $(INSTALL_BIN): $(ARCH)/.dir
 $(BIN.d):
 	$(MKDIR) $@
 
-.build_bin.$(ARCH): $(INSTALL_BIN)
+install:bin-install
+bin-install .build_bin.$(ARCH): $(INSTALL_BIN)
 	# no direct deps on target dir
 	$(MAKE) $(BIN.d)
 	$(INSTALL) -m 755 $(INSTALL_BIN) $(BIN.d)
-	touch $@
+	`echo $@ | grep -q install` || touch $@
 
 clean: bin-clean
 
 bin-clean:
 	$(RM) .build_bin.*
+
+unbuild: bin-unbuild
+
+bin-unbuild:
+	BIN="`echo $(BIN.d) | sed -e 's,/$(ARCH),,'`" ;\
+	for f in $(INSTALL_BIN) ; do \
+		echo "uninstalling $$f" ; \
+	  	$(RM) -r $${BIN}/$$f ;\
+		F=`echo $$f | sed -e 's,$(ARCH)/,,'` ;\
+		echo "uninstalling $$F" ; \
+		$(RM) -r $${BIN}/$$F ;\
+	done ;\
+	test ! -d $${BIN}/$(ARCH) || $(RMDIR) --ignore-fail-on-non-empty $${BIN}/$(ARCH) ;\
+	test ! -d $${BIN} || $(RMDIR) --ignore-fail-on-non-empty $${BIN}
 
 endif # INSTALL_BIN
 
@@ -518,16 +571,28 @@ else # no subdir
 DOC.dest	= $(DOC.d)
 endif # DOC.subd
 
-.build_doc: $(INSTALL_DOC)
+install:doc-install
+doc-install .build_doc: $(INSTALL_DOC)
 	# no direct deps on target dir
 	$(MAKE) $(DOC.dest)
 	$(INSTALL) -m 644 $(INSTALL_DOC) $(DOC.dest)
-	touch $@
+	`echo $@ | grep -q install` || touch $@
 
 clean: doc-clean
 
 doc-clean:
 	$(RM) .build_doc
+
+unbuild: doc-unbuild
+
+doc-unbuild:
+	for f in $(INSTALL_DOC) ; do \
+		echo "uninstalling $$f" ; \
+	  	$(RM) -r $(DOC.dest)/$$f ;\
+	done
+	test ! -d $(DOC.dest) || $(RMDIR) --ignore-fail-on-non-empty $(DOC.dest)
+	test ! -d $(DOC.d) || $(RMDIR) --ignore-fail-on-non-empty $(DOC.d)
+	test ! -d $(DOC.d) || $(RMDIR) --ignore-fail-on-non-empty $(DOC.d)
 
 endif # INSTALL_DOC
 
@@ -538,16 +603,26 @@ phase6: .build_man
 
 $(MAN.d):; $(MKDIR) $(MAN.d)
 
-.build_man: $(INSTALL_MAN)
+install:man-install
+man-install .build_man: $(INSTALL_MAN)
 	# no direct deps on target dir
 	$(MAKE) $(MAN.d)
 	$(INSTALL) -m 644 $(INSTALL_MAN) $(MAN.d)
-	touch $@
+	`echo $@ | grep -q install` || touch $@
 
 clean: man-clean
 
 man-clean:
 	$(RM) .build_man
+
+unbuild: man-unbuild
+
+man-unbuild:
+	for f in $(INSTALL_MAN) ; do \
+		echo "uninstalling $$f" ; \
+	  	$(RM) -r $(MAN.d)/$$f ;\
+	done
+	test ! -d $(MAN.d) || $(RMDIR) --ignore-fail-on-non-empty $(MAN.d)
 
 endif # INSTALL_MAN
 
@@ -560,7 +635,8 @@ phase7: .build_htm
 
 $(HTM.d)/$(HTM.subd):; $(MKDIR) -p $(HTM.d)/$(HTM.subd)
 
-.build_htm: $(INSTALL_HTM)
+install:htm-install
+htm-install .build_htm: $(INSTALL_HTM)
 	# no direct deps on target dir
 	$(MAKE) $(HTM.d)/$(HTM.subd)
 	# Deal also with directories.
@@ -574,7 +650,7 @@ $(HTM.d)/$(HTM.subd):; $(MKDIR) -p $(HTM.d)/$(HTM.subd)
 	      $(INSTALL) -m 644 $$f $(HTM.d)/$(HTM.subd) ; \
 	  fi ; \
 	done
-	touch $@
+	`echo $@ | grep -q install` || touch $@
 
 endif # _HAS_HTLATEX_
 
@@ -582,6 +658,16 @@ clean: htm-clean
 
 htm-clean:
 	$(RM) .build_htm
+
+unbuild: htm-unbuild
+
+htm-unbuild:
+	for f in $(INSTALL_HTM) ; do \
+		echo "uninstalling $$f" ; \
+		$(RM) -r $(HTM.d)/$(HTM.subd)/$$f ; \
+	done
+	test ! -d $(HTM.d)/$(HTM.subd) || $(RMDIR) --ignore-fail-on-non-empty $(HTM.d)/$(HTM.subd)
+	test ! -d $(HTM.d) || $(RMDIR) --ignore-fail-on-non-empty $(HTM.d)
 
 endif # INSTALL_HTM
 
@@ -592,16 +678,26 @@ phase2: .build_shr
 
 $(SHR.d):; $(MKDIR) $(SHR.d)
 
-.build_shr: $(INSTALL_SHR)
+install:shr-install
+shr-install .build_shr: $(INSTALL_SHR)
 	# no direct deps on target dir
 	$(MAKE) $(SHR.d)
 	$(INSTALL) -m 644 $(INSTALL_SHR) $(SHR.d)
-	touch $@
+	`echo $@ | grep -q install` || touch $@
 
 clean: shr-clean
 
 shr-clean:
 	$(RM) .build_shr
+
+unbuild: shr-unbuild
+
+shr-unbuild:
+	for f in $(INSTALL_SHR) ; do \
+		echo "uninstalling $$f" ; \
+	  	$(RM) -r $(SHR.d)/$$f ;\
+	done
+	test ! -d $(SHR.d) || $(RMDIR) --ignore-fail-on-non-empty $(SHR.d)
 
 endif # INSTALL_SHR
 
@@ -612,16 +708,26 @@ phase2: .build_utl
 
 $(UTL.d):; $(MKDIR) $(UTL.d)
 
-.build_utl: $(INSTALL_UTL)
+install:utl-install
+utl-install .build_utl: $(INSTALL_UTL)
 	# no direct deps on target dir
 	$(MAKE) $(UTL.d)
 	$(INSTALL) -m 755 $(INSTALL_UTL) $(UTL.d)
-	touch $@
+	`echo $@ | grep -q install` || touch $@
 
 clean: utl-clean
 
 utl-clean:
 	$(RM) .build_utl
+
+unbuild: utl-unbuild
+
+utl-unbuild:
+	for f in $(INSTALL_UTL) ; do \
+		echo "uninstalling $$f" ; \
+	  	$(RM) -r $(UTL.d)/$$f ;\
+	done
+	test ! -d $(UTL.d) || $(RMDIR) --ignore-fail-on-non-empty $(UTL.d)
 
 endif # INSTALL_UTL
 
@@ -631,6 +737,16 @@ clean: main-clean
 
 main-clean:
 	$(RM) *~ *.tmp
+
+unbuild: main-unbuild
+
+main-unbuild:
+	for f in $(INSTALL_RTM) ; do \
+		echo "uninstalling $$f" ; \
+	  	$(RM) -r $(RTM.d)/$$f ;\
+	done
+	test ! -d $(RTM.d) || $(RMDIR) --ignore-fail-on-non-empty $(RTM.d)
+
 
 # Doxygen documentation:
 

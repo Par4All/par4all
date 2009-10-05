@@ -31,15 +31,19 @@ $(ARCH)/tpips:
 	$(LINK) $@ $(TPIPS_LDFLAGS) \
 		$(main.dir)/$(TPIPS_MAIN) -ltpips $(addprefix -l,$(tpips.libs))
 
+ifndef PIPS_NO_WPIPS
 $(ARCH)/wpips:
 	$(MAKE) $(ARCH)
 	$(LINK) $@ $(WPIPS_LDFLAGS) \
 		$(main.dir)/$(WPIPS_MAIN) -lwpips $(addprefix -l,$(wpips.libs))
+endif
 
+ifndef PIPS_NO_GPIPS
 $(ARCH)/gpips:
 	$(MAKE) $(ARCH)
 	$(LINK) $@ $(GPIPS_LDFLAGS) \
 		$(main.dir)/$(GPIPS_MAIN) -lgpips $(addprefix -l,$(gpips.libs))
+endif
 
 $(ARCH)/fpips:
 	$(MAKE) $(ARCH)
@@ -49,7 +53,7 @@ $(ARCH)/fpips:
 # all libraries as installed...
 PIPSLIBS_LIBS	= \
 	$(addsuffix .a, \
-		$(addprefix $(ROOT)/lib/$(ARCH)/lib,$(pipslibs.libs)))
+		$(addprefix $(LIB.d)/lib,$(pipslibs.libs)))
 
 NEWGEN_LIBS	= \
 	$(addsuffix .a, \
