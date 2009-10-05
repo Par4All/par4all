@@ -1280,6 +1280,66 @@ list statement_modified_pointers_effects_list(statement s)
 
 /******************************************************************/
 
+
+static bool effects_reference_indices_may_equal_p(expression ind1, expression ind2)
+{
+  if (unbounded_expression_p(ind1) || unbounded_expression_p(ind2))
+    return true;
+  else
+    return same_expression_p(ind1, ind2);
+}
+
+/**
+   This function should be instanciated differently for simple and convex 
+   effects : much more work should be done for convex effects.
+
+   @return true if the effects have comparable access paths
+               in which case result is set to
+	          0 if the effects paths may be equal
+		  1 if eff1 access path may lead to eff2 access path
+		  -1 if eff2 access path may lead to eff1 access path
+           false otherwise.
+*/
+static bool effects_access_paths_comparable_p(effect eff1, effect eff2, 
+int *result)
+{
+  bool comparable_p = true; /* assume they are compable */
+  reference ref1 = effect_any_reference(eff1);
+  reference ref2 = effect_any_reference(eff2);
+  list linds1 = reference_indices(ref1);
+  list linds2 = reference_indices(ref2);
+  
+  pips_debug(8, "begin\neff1 = %s\n eff2 = %s\n",
+	     words_to_string(words_effect(eff1)),
+	     words_to_string(words_effect(eff2)));
+
+  /* to be comparable, they must have the same entity */
+  comparable_p = same_entity_p(reference_variable(ref1), 
+			       reference_variable(ref2));
+  
+  while( comparable_p && !ENDP(linds1) && !ENDP(linds2))
+    {
+      if (!effects_reference_indices_may_equal_p(EXPRESSION(CAR(linds1)),
+						EXPRESSION(CAR(linds2))))
+	comparable_p = false;
+
+      POP(linds1);
+      POP(linds2);
+    }
+  
+  if (comparable_p)
+    {
+      *result = (int) (gen_length(linds2) - gen_length(linds1)) ;
+      if (*result != 0) *result = *result / abs(*result);
+    }
+ 
+  pips_debug(8, "end with comparable_p = %s and *result = %d",
+	     comparable_p ? "true" : "false", *result);
+
+  return comparable_p;
+}
+
+
 list generic_effects_store_update(list l_eff, statement s, bool backward_p)
 {
 
@@ -1331,25 +1391,21 @@ list generic_effects_store_update(list l_eff, statement s, bool backward_p)
 		   reference eff_ref = effect_any_reference(eff);
 		   reference eff_ref_p = effect_any_reference(eff_p);
 		   effect new_eff = effect_undefined;
+		   int comp_res = 0;
 		   
-		   if (same_entity_p(reference_variable(eff_ref), 
-				     reference_variable(eff_ref_p)))
+		   if(effects_access_paths_comparable_p(eff, eff_p, &comp_res)
+		      && comp_res <=0 )
 		     {
-		       /* this is a very rough approximation ! */
-		       if (gen_length(reference_indices(eff_ref_p)) <=
-			   gen_length(reference_indices(eff_ref)))
-			 {
-			   new_eff = make_anywhere_effect
-			     (copy_action(effect_action(eff)));
-			   l_res = gen_nconc(l_res, CONS(EFFECT, new_eff, NIL));
-			   found = true;
-			   if (eff_w_p)
-			     anywhere_w_p = true;
-			   else 
-			     anywhere_r_p = true;
-			   
-			 }
-		     } /* if(same_entity_p()) */
+		       new_eff = make_anywhere_effect
+			 (copy_action(effect_action(eff)));
+		       l_res = gen_nconc(l_res, CONS(EFFECT, new_eff, NIL));
+		       found = true;
+		       if (eff_w_p)
+			 anywhere_w_p = true;
+		       else 
+			 anywhere_r_p = true;			   
+		
+		     } /*  if(effects_access_paths_comparable_p) */
 		   
 		   POP(l_eff_p_tmp);
 		 } /* while( !ENDP(l_eff_p_tmp))*/ 
