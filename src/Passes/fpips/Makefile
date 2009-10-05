@@ -33,7 +33,7 @@ LIB_TARGET	= lib$(TARGET).a
 
 BIN_TARGET	= $(TARGET)
 
-INSTALL_LIB = 	$(ARCH)/main_fpips.o
+INSTALL_LIB = 	main_fpips.o
 
 # common stuff
 ROOT    = ../../..

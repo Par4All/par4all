@@ -52,6 +52,11 @@ links:
 	for l in $(LINKS) ; do $(RM) $(EXE.d)/$$l ; done
 	for l in $(LINKS) ; do ln -s pips.sh $(EXE.d)/$$l ; done
 
+unbuild:links-unbuild
+links-unbuild:
+	for l in $(LINKS) ; do $(RM) $(EXE.d)/$$l ; done
+	test ! -d $(EXE.d) || $(RMDIR) --ignore-fail-on-non-empty $(EXE.d)
+
 clean: links-clean
 
 links-clean:

@@ -19,6 +19,8 @@
 # along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+ROOT    = ../../..
+
 # unused: dcdg.tex
 
 use_pdflatex	= 1
@@ -98,13 +100,13 @@ specs.h $(F.spec): $(F.newgen)
 	#
 	# building specs.h
 	#
-	newgen -c $(F.newgen) | make_all_specs > specs.h
+	export PATH=$$PATH:$(EXE.d):$(BIN.d) ; newgen -c $(F.newgen) | make_all_specs > specs.h
 
 lisp_internal_representation: $(F.newgen)
 	#
 	# building $@
 	#
-	newgen -lisp $(F.newgen)
+	export PATH=$$PATH:$(EXE.d):$(BIN.d) ; newgen -lisp $(F.newgen)
 	touch $@
 
 clean: local-clean
@@ -119,5 +121,4 @@ local-clean:
 phase1: allhs
 
 # common stuff
-ROOT    = ../../..
 include $(ROOT)/makes/main.mk

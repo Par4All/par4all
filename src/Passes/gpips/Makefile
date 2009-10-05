@@ -61,10 +61,7 @@ BIN_TARGET = $(TARGET)
 
 ###INSTALL_EXE	= gpips-changedir
 
-INSTALL_LIB = $(ARCH)/main_gpips.o
-ifdef AAA
-
-endif
+INSTALL_LIB = main_gpips.o
 
 # common stuff
 ROOT    = ../../..

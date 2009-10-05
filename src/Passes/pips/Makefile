@@ -30,7 +30,7 @@ INC_TARGET =    $(TARGET).h
 LIB_TARGET =    lib$(TARGET).a
 BIN_TARGET =	$(TARGET)
 
-INSTALL_LIB = 	$(ARCH)/main_pips.o
+INSTALL_LIB = 	main_pips.o
 
 # common stuff
 ROOT    = ../../..

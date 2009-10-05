@@ -32,7 +32,7 @@ INC_TARGET	= $(TARGET).h
 LIB_TARGET	= lib$(TARGET).a
 BIN_TARGET	= $(TARGET)
 
-INSTALL_LIB = 	$(ARCH)/main_tpips.o
+INSTALL_LIB = 	main_tpips.o
 
 # common stuff
 ROOT    = ../../..
@@ -67,8 +67,8 @@ tp_yacc.c: tp_yacc.y
 tp_yacc.h: tp_yacc.c
 
 # tpips completion
-completion_list.h :	$(ROOT)/include/resources.h \
-			$(ROOT)/include/phases.h \
-			$(ROOT)/include/printable_resources.h \
+completion_list.h :	$(INC.d)/resources.h \
+			$(INC.d)/phases.h \
+			$(INC.d)/printable_resources.h \
 			$(ETC.d)/properties.rc
 	./build_completion_lists.sh $(ROOT) > $@

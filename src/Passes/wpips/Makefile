@@ -58,7 +58,7 @@ BIN_TARGET	= $(TARGET)
 
 INSTALL_EXE	= wpips-changedir
 
-INSTALL_LIB = 	$(ARCH)/main_wpips.o
+INSTALL_LIB = 	main_wpips.o
 
 # common stuff
 ROOT    = ../../..

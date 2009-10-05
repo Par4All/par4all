@@ -74,7 +74,7 @@ TPIPS_MAIN	= main_tpips.o
 ######################################################################### WPIPS
 
 # The following locations should be parameterized somewhere else
-# or à la autocon
+# or à la autoconf
 X11_ROOT=/usr/X11R6
 OPENWINHOME=$(X11_ROOT)
 
