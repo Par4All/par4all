@@ -17,14 +17,12 @@ void init_s(s_t s, int max)
 
 Cumulated effects for "init_s"
 
-//               <may be written >: TOP-LEVEL:*MEMORY*
 //               <must be read   >: _MALLOC_EFFECTS:_MALLOC_ max
-//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ s[2]
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ s[1] s[2]
 void init_s(s_t s, int max)
 {
-//               <may be written >: TOP-LEVEL:*MEMORY*
 //               <must be read   >: _MALLOC_EFFECTS:_MALLOC_ max
-//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ s[2]
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ s[1] s[2]
    // BEGIN BLOCK
    extern char *malloc(int);
 //               <must be read   >: _MALLOC_EFFECTS:_MALLOC_ max
@@ -44,9 +42,8 @@ int main()
    // BEGIN BLOCK
    s_t s;
    int j;
-//               <may be written >: TOP-LEVEL:*MEMORY*
 //               <must be read   >: _MALLOC_EFFECTS:_MALLOC_ s
-//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ s[2]
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ s[1] s[2]
 
    init_s(s, 10);
 //               <may be written >: s[2][*]
@@ -61,20 +58,21 @@ int main()
 
 Cumulated effects for "main"
 
+//               <may be read    >: TOP-LEVEL:*MEMORY*
 //               <may be written >: TOP-LEVEL:*MEMORY*
 //               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
 //               <must be written>: _MALLOC_EFFECTS:_MALLOC_
 int main()
 {
-//               <may be written >: TOP-LEVEL:*MEMORY* s[2][*]
-//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_ s s[2]
-//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ s[2]
+//               <may be read    >: TOP-LEVEL:*MEMORY*
+//               <may be written >: TOP-LEVEL:*MEMORY*
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_ s
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ s[1] s[2]
    // BEGIN BLOCK
    s_t s;
    int j;
-//               <may be written >: TOP-LEVEL:*MEMORY*
 //               <must be read   >: _MALLOC_EFFECTS:_MALLOC_ s
-//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ s[2]
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ s[1] s[2]
 
    init_s(s, 10);
 //               <may be written >: s[2][*]
