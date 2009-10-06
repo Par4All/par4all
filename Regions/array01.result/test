@@ -151,15 +151,15 @@ int main()
 }
 
 //  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{}>
-//  <TOP-LEVEL:stdout-IN-MAY-{}>
 //  <TOP-LEVEL:stdout[PHI1]-IN-MAY-{}>
+//  <TOP-LEVEL:stdout-IN-EXACT-{}>
 
 int main()
 {
 
 //  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{}>
-//  <TOP-LEVEL:stdout-IN-MAY-{}>
 //  <TOP-LEVEL:stdout[PHI1]-IN-MAY-{}>
+//  <TOP-LEVEL:stdout-IN-EXACT-{}>
 
    // BEGIN BLOCK
    int i;
@@ -170,8 +170,8 @@ int main()
 //  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{}>
 //  <TOP-LEVEL:image[PHI1][PHI2][PHI3]-IN-EXACT-{PHI3==1, 0<=PHI1,
 //    PHI1<=63, 0<=PHI2, PHI2<=63}>
-//  <TOP-LEVEL:stdout-IN-MAY-{}>
 //  <TOP-LEVEL:stdout[PHI1]-IN-MAY-{}>
+//  <TOP-LEVEL:stdout-IN-EXACT-{}>
 
 
    for(i = 0; i <= 63; i += 1)
@@ -179,8 +179,8 @@ int main()
 //  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{}>
 //  <TOP-LEVEL:image[PHI1][PHI2][PHI3]-IN-EXACT-{PHI1==i, PHI3==1,
 //    0<=PHI2, PHI2<=63, 0<=i, i<=63}>
-//  <TOP-LEVEL:stdout-IN-MAY-{}>
 //  <TOP-LEVEL:stdout[PHI1]-IN-MAY-{0<=i, i<=63}>
+//  <TOP-LEVEL:stdout-IN-EXACT-{}>
 
       for(j = 0; j <= 63; j += 1)
 

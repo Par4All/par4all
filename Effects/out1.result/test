@@ -1,7 +1,7 @@
 ! out simple effects...
       PROGRAM OUT1
       INTEGER I, K
-C               <must be exported>: I __IO_EFFECTS:LUNS(5)
+C               <must be exported>: I
       READ *, I, K                                                      0004
 C               <must be exported>: __IO_EFFECTS:LUNS(6)
       PRINT *, I                                                        0005

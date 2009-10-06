@@ -1373,16 +1373,16 @@ void get_data(char filename[])
    p4a_kernel_launcher_2(space);
 
 //  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{}>
-//  <fp-IN-MAY-{1<=nx, 1<=ny}>
 //  <fp[PHI1]-IN-MAY-{1<=nx, 1<=ny}>
+//  <fp-IN-EXACT-{}>
 
    
    /* Read the pixel grey value: */
    for(j = 0; j <= ny-1; j += 1)
 
 //  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{}>
-//  <fp-IN-MAY-{1<=nx}>
 //  <fp[PHI1]-IN-MAY-{0<=j, 1+j<=ny, 1<=nx}>
+//  <fp-IN-EXACT-{}>
 
       for(i = 0; i <= nx-1; i += 1) {
 
