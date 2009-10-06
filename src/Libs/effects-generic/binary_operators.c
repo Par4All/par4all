@@ -39,26 +39,29 @@
 #include "ri-util.h"
 #include "misc.h"
 #include "text.h"
+#include "text-util.h"
 
 #include "effects-generic.h"
 
 
 /************************************************* GENERIC BINARY OPERATORS */
 
-/* list list_of_effects_generic_binary_op(list l1,l2,
- *                         bool (*r1_r2_combinable_p)(),
- *                         list (*r1_r2_binary_op)(),
- *                         list (*r1_unary_op)(),
- *                         list (*r2_unary_op)())
- * input : two lists of effects ; a boolean function that takes two
- *         individual effects as arguments and renders TRUE when they are
- *         considered as combinable ; a binary operator that combines two
- *         individual effects; two unary operators that deal with the
- *         remnants of the two initial lists; these remnants are the effects
- *         that are not combinable with any effect of the other list.
- * output : a list of effects, combination of l1 and l2
- * modifies : l1 and l2, and their effects.
- * comment : ?
+/**
+   beware : modifies l1, l2 and their effects
+
+  @param l1 and l2 are two lists of effects.
+  @param  r1_r2_combinable_p is a boolean function that takes two
+          individual effects as arguments and renders TRUE when they are
+          considered as combinable ; 
+  @param  r1_r2_binary_op is a binary operator that combines two
+          individual effects; 
+  @param  r1_unary_op is a unary operators that deal with the remnants of l1,
+          that is those effects that are not combinable with any effect of l2;
+  @param  r2_unary_op is a unary operators that deal with the remnants of l2,
+          that is those effects that are not combinable with any effect of l1;
+
+  @return a list of effects, combination of l1 and l2.
+
 */
 list
 list_of_effects_generic_binary_op(
@@ -230,7 +233,6 @@ proper_effects_combine(list l_effects, bool scalars_only_p)
   /* entity name -> consp in effect list. */
   hash_table all_read_effects, all_write_effects;
   /* FI: at this level, it's pretty dangerous to combine effects with no constant addresses */
-  extern string words_to_string(list);
 
   ifdebug(6) {
     list refl = NIL;
@@ -382,6 +384,36 @@ proper_effects_combine(list l_effects, bool scalars_only_p)
 
 /******************************************************* BOOL(EAN) FUNCTIONS */
 
+
+/**
+   @param eff1 and eff2 are two effects
+   @ return true if their entities are the same, and if their access path
+            as described by their references are the same.
+	    false otherwise.
+ */
+bool effects_same_access_path_p(effect eff1, effect eff2)
+{
+  bool same_p = false;
+  reference r1 = effect_any_reference(eff1);
+  reference r2 = effect_any_reference(eff2);
+  
+  if (same_entity_p(reference_variable(r1), reference_variable(r2)))
+    {
+      string n1 = words_to_string(effect_words_reference(r1));
+      string n2 = words_to_string(effect_words_reference(r2));
+      
+      same_p = same_string_p(n1,n2);
+      free(n1);
+      free(n2);
+    }
+  else
+    same_p = false;
+  
+  
+  return same_p;
+}
+
+
 /* bool combinable_effects_p(effect eff1, eff2)
  * input    : two effects
  * output   : TRUE if eff1 and eff2 affect the same entity, and, if they
@@ -405,7 +437,6 @@ bool combinable_effects_p(effect eff1, effect eff2)
 bool effects_same_action_p(effect eff1, effect eff2)
 {
   bool same_p = false;
-  extern string words_to_string(list);
 
   if (effect_undefined_p(eff1) || effect_undefined_p(eff2))
     same_p = true;
@@ -414,23 +445,9 @@ bool effects_same_action_p(effect eff1, effect eff2)
       same_p = false;
     }
   else 
-    {
-    reference r1 = effect_any_reference(eff1);
-    reference r2 = effect_any_reference(eff2);
-    
-    if (same_entity_p(reference_variable(r1), reference_variable(r2)))
-      {
-	string n1 = words_to_string(effect_words_reference(r1));
-	string n2 = words_to_string(effect_words_reference(r2));
+    same_p = effects_same_access_path_p(eff1, eff2);
+  
 	
-	same_p = same_string_p(n1,n2);
-	free(n1);
-	free(n2);
-      }
-    else
-      same_p = false;
-	
-  }
   return same_p;
 }
 
@@ -443,7 +460,7 @@ bool effects_same_variable_p(effect eff1, effect eff2)
 
 bool r_r_combinable_p(effect eff1, effect eff2)
 {
-    bool same_var, act_combinable;
+    bool same_access_path, act_combinable;
 
     if (effect_undefined_p(eff1))
 	return(effect_read_p(eff2));
@@ -451,15 +468,15 @@ bool r_r_combinable_p(effect eff1, effect eff2)
     if (effect_undefined_p(eff2))
 	return(effect_read_p(eff1));
 
-    same_var = (effect_entity(eff1) == effect_entity(eff2));
+    same_access_path = effects_same_access_path_p(eff1,eff2);
     act_combinable = (effect_read_p(eff1) && effect_read_p(eff2));
 
-    return(same_var && act_combinable);
+    return(same_access_path && act_combinable);
 }
 
 bool w_w_combinable_p(effect eff1, effect eff2)
 {
-    bool same_var, act_combinable;
+    bool same_access_path, act_combinable;
 
     if (effect_undefined_p(eff1))
 	return(effect_write_p(eff2));
@@ -467,15 +484,15 @@ bool w_w_combinable_p(effect eff1, effect eff2)
     if (effect_undefined_p(eff2))
 	return(effect_write_p(eff1));
 
-    same_var = (effect_entity(eff1) == effect_entity(eff2));
+    same_access_path = effects_same_access_path_p(eff1,eff2);
     act_combinable = (effect_write_p(eff1) && effect_write_p(eff2));
 
-    return(same_var && act_combinable);
+    return(same_access_path && act_combinable);
 }
 
 bool r_w_combinable_p(effect eff1, effect eff2)
 {
-    bool same_var, act_combinable;
+    bool same_access_path, act_combinable;
 
     if (effect_undefined_p(eff1))
 	return(effect_write_p(eff2));
@@ -483,15 +500,15 @@ bool r_w_combinable_p(effect eff1, effect eff2)
     if (effect_undefined_p(eff2))
 	return(effect_read_p(eff1));
 
-    same_var = (effect_entity(eff1) == effect_entity(eff2));
+    same_access_path = effects_same_access_path_p(eff1,eff2);
     act_combinable = (effect_read_p(eff1) && effect_write_p(eff2));
 
-    return(same_var && act_combinable);
+    return(same_access_path && act_combinable);
 }
 
 bool w_r_combinable_p(effect eff1, effect eff2)
 {
-    bool same_var, act_combinable;
+    bool same_access_path, act_combinable;
 
     if (effect_undefined_p(eff1))
 	return(effect_read_p(eff2));
@@ -499,10 +516,10 @@ bool w_r_combinable_p(effect eff1, effect eff2)
     if (effect_undefined_p(eff2))
 	return(effect_write_p(eff1));
 
-    same_var = (effect_entity(eff1) == effect_entity(eff2));
+    same_access_path = effects_same_access_path_p(eff1,eff2);
     act_combinable = (effect_write_p(eff1) && effect_read_p(eff2));
 
-    return(same_var && act_combinable);
+    return(same_access_path && act_combinable);
 }
 
 /***********************************************************************/

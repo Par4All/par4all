@@ -599,7 +599,6 @@ static list r_rw_effects_of_sequence(list l_inst)
 	}
     	if (rb_lrw !=NIL)    
 	  {
-	    /* rb_lrw = (*effects_transformer_composition_op)(rb_lrw, t1);*/
 	    rb_lrw = generic_effects_store_update(rb_lrw, first_statement, true);
 	  }
 	else {
