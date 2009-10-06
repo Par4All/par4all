@@ -2,13 +2,13 @@
 use strict;
 use warnings;
 
-my $usage = "usage: pipsmakerc2python.pl rc-file ...\n";
-if( $#ARGV +1 < 1 ) { die $usage; }
+my $usage = "usage: pipsmakerc2python.pl rc-file.tex properties.rc ...\n";
+if( $#ARGV +1 < 2 ) { die $usage; }
 
-my $rcfile=$ARGV[0];
+my $texfile=$ARGV[0];
 
 # read source file file into a string
-open INPUT ,$rcfile or die "cannot open $rcfile:$!";
+open INPUT ,$texfile or die "cannot open $texfile:$!";
 my @lines=<INPUT>; 
 my $rc = join "", @lines;
 close INPUT;
@@ -44,11 +44,14 @@ foreach(@doc_strings)
 }
 
 # parse the string for properties
-#my @properties=($rc=~/\\begin{PipsProp}\s*\n+([^ ]+).*?\\end{PipsProp}/gms);
-#print "\tall_properties=frozenset([";
-#foreach(@properties) { print "\"$_\","; }
-#print "\"it's a megablast\"])\n";
-my @properties=($rc=~/\\begin{PipsProp}\s*\n(?:\n*([^ ]+)[^\n]+\n)+?\\end{PipsProp}/gms);
+my $rcfile=$ARGV[1];
+
+# read source file file into a string
+open INPUT ,$rcfile or die "cannot open $rcfile:$!";
+@lines=<INPUT>; 
+$rc = join "", @lines;
+close INPUT;
+my @properties=($rc=~/(^[^\s]+)\s/gms);
 print "\tall_properties=frozenset([";
 foreach(@properties) { print "\'$_\',"; }
 print "\"it's a megablast\"])\n";

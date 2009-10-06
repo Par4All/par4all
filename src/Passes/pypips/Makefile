@@ -74,7 +74,7 @@ checkall:xpc.py
 	python ./xpc.py --module=foo --sources=carto.c,get.c --algo=genetic --nbgen=2 --CPPFLAGS=-DSIZE=100
 
 DOCSTRING=%%@UserManualDocumentation:
-pyps.py: ../../Documentation/pipsmake/pipsmake-rc.tex _pyps.py pipsmakerc2python.pl
+pyps.py: pipsmakerc2python.pl ../../Documentation/pipsmake/pipsmake-rc.tex $(ETC.d)/properties.rc _pyps.py 
 	sed -n -e '1,/### helpers/ p' _pyps.py > $@
-	./pipsmakerc2python.pl $< >> $@
+	./$^ >> $@
 	sed -n -e '/### helpers/,$$ p' _pyps.py >> $@
