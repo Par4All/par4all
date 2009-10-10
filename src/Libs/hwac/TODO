@@ -13,6 +13,9 @@
 - handle different type of images (e.g. distinct BPP)
 - check/remove more implicit hypothesis
 
+* optimizations
+- min commutes with dilate & max with erode, or vice-versa ?
+
 * code
 + cleanup data structures?
 - record scalar deps in dag...
@@ -35,13 +38,13 @@
 + if only one image is used as input, put it anyway on both sides?
   may help some schedules if there are multiple successors.
 + use commutator to detect more redundancy
-- add checks in generated code (img size and so)?
-- parametric img size/depth? same as code?
-- the generated code is just a file to pips. ok???
 + must not handle copies through the pipeline...
 + should also detect "duplicate" measurements with a copy of the scalars
 + should detect "included" measurements (maxcoord includes max)?
   (done indirectly by the code generation, but could be done on the DAG?)
+- add checks in generated code (img size and so)?
+- parametric img size/depth? same as code?
+- the generated code is just a file to pips. ok???
 
 * post
 + remove malloc/free if not used
