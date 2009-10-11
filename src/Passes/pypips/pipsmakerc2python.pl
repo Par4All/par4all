@@ -36,10 +36,10 @@ EOF
 }
 
 # parse the string for documentation
-my @doc_strings=($rc=~/%%\@UserManualDocumentation:\s*(.*?)%%!UserManualDocumentation/gms);
+my @doc_strings=($rc=~/\\begin\{PipsPass\}(.*?)\\end\{PipsPass\}/gms);
 foreach(@doc_strings)
 {
-    /([^\n]+)[\n]+(.*)/gms;
+    /\{([^\}]+)\}[\n]+(.*)/gms;
     print_python_method($1,$2)
 }
 

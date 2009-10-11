@@ -55,8 +55,7 @@ class workspace:
 		"""[[internal]] init the workspace from a list of sources"""
 		workspace=os.path.basename(os.tempnam("","PYPS"))
 		def helper(x,y):
-			if isinstance(y,list):return x+y
-			else: return x+[y]
+			return x+y if isinstance(y,list) else x +[y]
 		sources=reduce(helper,sources2,[])
 		pypips.create(workspace, sources)
 		self.modules = {}

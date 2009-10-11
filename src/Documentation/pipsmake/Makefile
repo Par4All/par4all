@@ -110,7 +110,7 @@ builder_map.h: pipsmake.rc
 	./make-builder-map < $< > $@
 
 
-epips_transform_menu_layout.el wpips_transform_menu_layout.h epips_view_menu_layout.el wpips_view_menu_layout.h:  pipsmake-rc.tex
+epips_transform_menu_layout.el wpips_transform_menu_layout.h epips_view_menu_layout.el wpips_view_menu_layout.h:  pipsmake-rc.tex generate_all_menu_documentation
 	#
 	# building menu layout files:
 	#

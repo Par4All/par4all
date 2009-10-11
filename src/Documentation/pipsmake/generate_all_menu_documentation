@@ -66,7 +66,7 @@ while($PipsMakeRc =~ /^(.*)$/mg) {
     # For each line: */
     my($the_text) = $1;
     if ($in_verbatim) {
-	if ( $the_text =~ /^\s*\\end\{verbatim\}/ ) {
+	if ( $the_text =~ /^\s*\\end\{PipsMake\}/ ) {
 	    $in_verbatim = 0;}
 	else {
 	    # Add the verbatim content:
@@ -74,7 +74,7 @@ while($PipsMakeRc =~ /^(.*)$/mg) {
 	}
     }
     else {
-	if ( $the_text =~ /^\s*\\begin\{verbatim\}/ ) {
+	if ( $the_text =~ /^\s*\\begin\{PipsMake\}/ ) {
 	    $in_verbatim = 1;
 	}
     }
@@ -82,11 +82,11 @@ while($PipsMakeRc =~ /^(.*)$/mg) {
 
 
 # Deal with every declaration :
-($rien = $PipsMakeRc) =~ s/%%\@UserManualDeclarations(.*?)%%!UserManualDeclarations/&DealWithDeclarations($1)/eg;
+($rien = $PipsMakeRc) =~ s/\\begin\{PipsPass\}(.*?)\\end\{PipsPass\}/&DealWithDeclarations($1)/egm;
 
 
 # Extract the documentation of the various functions:
-while ($PipsMakeRc =~ /%%\@UserManualDocumentation:\s*(\w*)\s*(.*?)%%!UserManualDocumentation/g) { &StoreFunctionDoc($1,$2) };
+while ($PipsMakeRc =~ /\\begin\{PipsPass\}\{(\w*)\}\s*(.*?)\\end\{PipsPass\}/gm) { &StoreFunctionDoc($1,$2) };
 
 
 # Parse the aliases that link a full name to a function name:
@@ -133,10 +133,12 @@ while (($ressource,$functions) = each %ressource_is_generated_by) {
         if ($debug >= 5) { print "$#$functions\n"; }
         foreach $function (@$functions) {
             if (! defined $full_name_aliases{$function}) {
-                die "Cannot find an alias for function \"$function\".\n";
+                print STDERR "Cannot find an alias for function \"$function\".\n";
             }
-            push @{$option_menu{$full_name_aliases{$ressource}}}, $full_name_aliases{$function};
-            if ($debug >= 5) { print "$ressource($full_name_aliases{$ressource}) -> $function($full_name_aliases{$function})\n" };
+			else {
+				push @{$option_menu{$full_name_aliases{$ressource}}}, $full_name_aliases{$function};
+				if ($debug >= 5) { print "$ressource($full_name_aliases{$ressource}) -> $function($full_name_aliases{$function})\n" };
+			}
         }
     }
 }
