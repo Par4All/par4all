@@ -1424,7 +1424,9 @@ basic basic_maximum(basic fb1, basic fb2)
 	       or 0 or ??? and deal with non comparable type. */
 	    b = basic_maximum(nb1, nb2);
 	  }
-	  else
+	  else if (type_void_p(t1) && type_void_p(t2) )
+          b = copy_basic(b1);
+      else
 	    pips_internal_error("Comparison of two pointer types not meaningful\n");
 	}
 	else if(basic_derived_p(b2))

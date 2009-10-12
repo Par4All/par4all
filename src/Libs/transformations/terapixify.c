@@ -77,7 +77,7 @@ call range_to_dma(expression from,
   if (entity_undefined_p(mcpy))
     pips_user_error("Cannot find \"%s\" method. Are you sure you have set\n"
 		    "KERNEL_LOAD_STORE_..._FUNCTION "
-		    "set to a defined entity and added the correct .c file?");
+		    "set to a defined entity and added the correct .c file?\n",function_name);
 
   if (dma_allocate_p(m))
     /* Need the address for the allocator to modify the pointer itself: */

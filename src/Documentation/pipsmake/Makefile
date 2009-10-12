@@ -31,6 +31,7 @@ INSTALL_ETC=	epips_view_menu_layout.el \
 		epips_transform_menu_layout.el \
 		pipsmake.rc \
 		properties.rc \
+		pipsdep.rc \
 		wpips.rc
 
 DERIVED_INC=	resources.h \
@@ -76,6 +77,12 @@ properties.rc: pipsmake-rc.tex pipsprop.sed
 	# building properties.rc
 	#
 	$(pipsprop.flt) $< > $@
+
+pipsdep.rc: pipspassdep.pl pipsmake-rc.tex
+	#
+	# building pipsdep.rc
+	#
+	./$^ > $@
 
 wpips.rc: pipsmake-rc.tex
 	#

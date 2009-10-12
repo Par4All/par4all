@@ -13,7 +13,7 @@ bar=w["bar"]
 malabar=w["malabar"]
 
 # and apply transformation to modules
-foo.inlining(CALLERS="bar",PURGE_LABELS=False)
+foo.inlining(callers="bar",PURGE_LABELS=False)
 
 #the good old display, default to PRINTED_FILE, but you can give args
 foo.display()
