@@ -19,3 +19,11 @@ void * memstore(void **dest, const void *src, size_t n) {
         ((char*)pdest)[i]=((const char*)src)[i];
     return pdest;
 }
+
+void memalloc(void **ptr, size_t n) {
+    *ptr=malloc(n);
+}
+
+void memfree(void *ptr) {
+    free(ptr);
+}

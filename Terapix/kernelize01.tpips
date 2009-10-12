@@ -31,6 +31,10 @@ display PRINTED_FILE[foo]
 display PRINTED_FILE[run_kernel]
 display PRINTED_FILE[kernel]
 
+setproperty KERNEL_LOAD_STORE_LOAD_FUNCTION "memload"
+setproperty KERNEL_LOAD_STORE_STORE_FUNCTION "memstore"
+setproperty KERNEL_LOAD_STORE_ALLOCATE_FUNCTION "memalloc"
+setproperty KERNEL_LOAD_STORE_DEALLOCATE_FUNCTION "memfree"
 apply KERNEL_LOAD_STORE[run_kernel]
 display PRINTED_FILE
 
