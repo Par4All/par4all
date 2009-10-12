@@ -693,8 +693,6 @@ Section~\ref{subsection-preprocessing-and-splitting}) before submitting them to
 \index{Splitting}
 \index{Include}
 \index{Hollerith}
-\index{CHECK\_FORTRAN\_SYNTAX\_BEFORE\_PIPS}
-\index{PREPROCESSOR\_MISSING\_FILE\_HANDLING}
 \index{Missing file}
 
 The Fortran files specified as input to \PIPS{} by the user are
@@ -1508,9 +1506,6 @@ c_symbol_table      > MODULE.symbol_table_file
 \index{Controlizer}
 \index{CFG}
 \index{Control Flow Graph}
-\index{UNSPAGHETTIFY\_IN\_CONTROLIZER}
-\index{FOR\_TO\_WHILE\_LOOP\_IN\_CONTROLIZER}
-\index{FOR\_TO\_DO\_LOOP\_IN\_CONTROLIZER}
 
 \PIPS{} analyses and transformations take advantage of a hierarchical
 control flow graph, which preserves structured part of code as such, and
@@ -2602,7 +2597,6 @@ COMPUTE_ALL_DEPENDENCES FALSE
 
 \section{Flinter}
 \label{subsection-flinter}
-\index{Flinter}
 
 \begin{PipsPass}{flinter}
 Function \PipsPassRef{flinter} performs some intra and interprocedural checks
@@ -2965,11 +2959,7 @@ clear. Intra-procedural preconditions may be computed with {\em
 inter}-procedural transformers. This is faster that a full
 interprocedural analysis because there is no need for a top-down
 propagation of summary preconditions. This is compatible with code
-transformations like partial evaluation (see
-Section~\ref{sec:partial-evaluation}), dead code elimination
-(see Section~\ref{sec:dead-code-elimination}) and use-def
-based dead code elimination (see
-Section~\ref{sec:dead-code-elimination}).
+transformations like \PipsPassRef{partial_eval}, \PipsPassRef{suppress_dead_code} and \PipsPassRef{use_def_elimination}.
 
 Since these two options for transformer and precondition computations are
 independent and that \PipsPassRef{transformers_inter_full} and
@@ -5765,7 +5755,7 @@ code, not using a wrapper is useful.
 The intrinsics function to get an i-th coordinate in the iteration space
 is defined by this GNU \emph{à la} \texttt{printf} format:
 \begin{PipsProp}
-GPU_COORDINATE_INTRINSICS_FORMAT "P4A_VP_\%d"
+GPU_COORDINATE_INTRINSICS_FORMAT "P4A_VP_%d"
 \end{PipsProp}
 where \verb|%d| is used to get the dimension number.
 
@@ -5921,8 +5911,8 @@ INDEX_SET_SPLITTING_BOUND ""
 \end{PipsProp}
 \end{itemize}
 
-Additionnaly, \lstinline|INDEX_SET_SPLITTING_SPLIT_BEFORE_BOUND| can be used to accurately tell to split the loop before or after the bound given in \lstinline|INDEX_SET_SPLITTING_BOUND|
-\begin{PipsProp}
+Additionnaly, \PipsPropRef{INDEX_SET_SPLITTING_SPLIT_BEFORE_BOUND} can be used to accurately tell to split the loop before or after the bound given in \PipsPropRef{INDEX_SET_SPLITTING_BOUND}
+\begin{PipsProp}{INDEX_SET_SPLITTING_SPLIT_BEFORE_BOUND}
 INDEX_SET_SPLITTING_SPLIT_BEFORE_BOUND FALSE
 \end{PipsProp}
 
@@ -5955,13 +5945,13 @@ unroll                          > MODULE.code
         < MODULE.code
 \end{PipsMake}
 
-Use \lstinline|LOOP_LABEL| and \lstinline|UNROLL_RATE| if you don't want to unroll interactively
-You can also set \lstinline|LOOP_UNROLL_MERGE| to use the same declarations among all the unrolled statement
+Use \PipsPropRef{LOOP_LABEL} and \PipsPropRef{UNROLL_RATE} if you don't want to unroll interactively
+You can also set \PipsPropRef{LOOP_UNROLL_MERGE} to use the same declarations among all the unrolled statement
 (only meaningful in \texttt{C}).
-\begin{PipsProp}
+\begin{PipsProp}{UNROLL_RATE}
 UNROLL_RATE 0
 \end{PipsProp}
-\begin{PipsProp}
+\begin{PipsProp}{LOOP_UNROLL_MERGE}
 LOOP_UNROLL_MERGE FALSE
 \end{PipsProp}
 
@@ -6001,7 +5991,7 @@ must specify the loop label. This default feature can be turned off
 and all loops with constant loop bounds and constant increment are
 fully unrolled.
 
-Use \lstinline|LOOP_LABEL| to pass the desired label if you don't want to give it interactively
+Use \PipsPropRef{LOOP_LABEL} to pass the desired label if you don't want to give it interactively
 
 \begin{PipsProp}
 FULL_UNROLL_INTERACTIVELY TRUE
@@ -7336,7 +7326,7 @@ the function has static declarations, access global variables \dots.
 Actually it (seems to) work(s) for pure, non-recursive functions \dots
 and not for any kind of call.
 
-Property \lstinline|INLINING_CALLERS| can be set to define the list of
+Property \PipsPropRef{INLINING_CALLERS} can be set to define the list of
 functions where the call sites have to be inlined. By default, all
 call sites of the inlined function are inlined.
 \end{PipsPass}
@@ -7365,12 +7355,12 @@ inlining_simple      > CALLERS.parsed_code
 
 
 The default behavior of inlining is to inline the given module in \textbf{all} call sites.
-Use \lstinline|INLINING_CALLERS| property to filter the call sites: only given module names will be considered.
-Use \lstinline|INLINING_PURGE_LABELS| to clean useless labels after inlining.
-\begin{PipsProp}
+Use \PipsPropRef{INLINING_CALLERS} property to filter the call sites: only given module names will be considered.
+Use \PipsPropRef{INLINING_PURGE_LABELS} to clean useless labels after inlining.
+\begin{PipsProp}{INLINING_CALLERS}
 INLINING_CALLERS ""
 \end{PipsProp}
-\begin{PipsProp}
+\begin{PipsProp}{INLINING_PURGE_LABELS}
 INLINING_PURGE_LABELS TRUE
 \end{PipsProp}
 
@@ -7407,17 +7397,15 @@ unfolding_simple      > MODULE.parsed_code
         < CALLERS.code
 \end{PipsMake}
 
-\index{UNFOLDING\_CALLEES}
-Using \lstinline|UNFOLDING_CALLEES|, you can specify which module you want to inline in the unfolded module.
-The unfolding will be performed as long as one of the module in \lstinline|UNFOLDING_CALLEES| is called.
+Using \PipsPropRef{UNFOLDING_CALLEES}, you can specify which module you want to inline in the unfolded module.
+The unfolding will be performed as long as one of the module in \PipsPropRef{UNFOLDING_CALLEES} is called.
 More than one module can be specified, they are separated by blank spaces.
-\begin{PipsProp}
+\begin{PipsProp}{UNFOLDING_CALLEES}
 UNFOLDING_CALLEES ""
 \end{PipsProp}
 
-\index{UNFOLDING\_FILTER}
-The default behavior of unfolding is to recursively inline all callees from given module, as long as a callee remains. Use \lstinline|UNFOLDING_FILTER| to inline all calls not in the space separated module list
-\begin{PipsProp}
+The default behavior of unfolding is to recursively inline all callees from given module, as long as a callee remains. Use \PipsPropRef{UNFOLDING_FILTER} to inline all calls not in the space separated module list
+\begin{PipsProp}{UNFOLDING_FILTER}
 UNFOLDING_FILTER ""
 \end{PipsProp}
 
@@ -7429,7 +7417,7 @@ UNFOLDING_FILTER ""
 This documentation is a work in progress, as well as the documented topic.
 
 
-Outlining is the opposite transformation of inlining~\ref{subsection-inlining}.
+Outlining is the opposite transformation of \PipsPassRef{inlining}.
 It creates a new module based on some statements from an existing module.
 The new module body is similar to the piece of code outlined from the existing modules.
 The old statements are replaced by a call to the new module.
@@ -7536,7 +7524,7 @@ clone_on_argument       > CALLERS.code
 \begin{PipsPass}{clone_only}
 Not use assisted version of cloning
 it just perform the cloning without any substitution
-Use the \lstinline|CLONE_NAME| property if you want a particular clone name.
+Use the \PipsPropRef{CLONE_NAME} property if you want a particular clone name.
 It's up to another phase to perform the substitution.
 \end{PipsPass}
 \begin{PipsMake}
@@ -7557,7 +7545,7 @@ TRANSFORMATION_CLONE_ON_ARGUMENT 0
 
 Clone name can be given using the \lstinline|CLONE_NAME| properties
 Otherwise, a new one is generated
-\begin{PipsProp}
+\begin{PipsProp}{CLONE_NAME}
 CLONE_NAME ""
 \end{PipsProp}
 
@@ -9930,7 +9918,7 @@ To output a code with a hierarchical view of the control graph with
 markers instead of a flat one. It purposes a display with a graph
 browser such as \PdaVinci{}:
 
-\begin{PipsProp}{PRETTYPRINT_UNSTRUCTURED}
+\begin{PipsProp}{PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH}
 PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH FALSE
 \end{PipsProp}
 

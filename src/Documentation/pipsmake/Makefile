@@ -123,6 +123,11 @@ pipsmake-rc.dvi: user-and-source-files.eps
 
 clean: local-clean
 
+check: pispmake-rc.tex
+	@echo "missing properties label:"
+	pdflatex pipsmake-rc.tex 2>&1 | grep 'LaTeX Warning: Reference' | grep -E -o "prop:[^']+" | cut -d ':' -f 2
+
+
 local-clean:
 	$(RM) -r $(DERIVED_FILES) pipsmake-rc.htdoc pipsprop.sed \
 		user-and-source-files.pdf user-and-source-files.eps \
