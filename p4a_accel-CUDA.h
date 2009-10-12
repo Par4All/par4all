@@ -67,7 +67,7 @@ extern cudaEvent_t p4a_start_event, p4a_stop_event;
 
     Just initialize events for time measure right now.
 */
-#define P4A_INIT_ACCEL					\
+#define P4A_init_accel					\
   do {							\
     cutilSafeCall(cudaEventCreate(&p4a_start_event));	\
     cutilSafeCall(cudaEventCreate(&p4a_stop_event));	\
@@ -78,7 +78,7 @@ extern cudaEvent_t p4a_start_event, p4a_stop_event;
 
     Nothing to do
  */
-#define P4A_RELEASE_ACCEL
+#define P4A_release_accel
 
 /** @} */
 
@@ -89,7 +89,7 @@ extern cudaEvent_t p4a_start_event, p4a_stop_event;
 */
 
 /** Start a timer on the accelerator */
-#define P4A_ACCEL_TIMER_START cutilSafeCall(cudaEventRecord(p4a_start_event, 0))
+#define P4A_accel_timer_start cutilSafeCall(cudaEventRecord(p4a_start_event, 0))
 
 /** @} */
 
@@ -97,21 +97,21 @@ extern cudaEvent_t p4a_start_event, p4a_stop_event;
 
 /** A declaration attribute of a hardware-accelerated kernel called from
     the GPU it-self */
-#define P4A_ACCEL_KERNEL __device__
+#define P4A_accel_kernel __device__
 
 /** A declaration attribute of a hardware-accelerated kernel called from
     the host */
-#define P4A_ACCEL_KERNEL_WRAPPER __global__
+#define P4A_accel_kernel_wrapper __global__
 
 
 /** Get the coordinate of the virtual processor in X (first) dimension */
-#define P4A_VP_X (blockIdx.x*blockDim.x + threadIdx.x)
+#define P4A_vp_x (blockIdx.x*blockDim.x + threadIdx.x)
 
 /** Get the coordinate of the virtual processor in Y (second) dimension */
-#define P4A_VP_Y (blockIdx.y*blockDim.y + threadIdx.y)
+#define P4A_vp_y (blockIdx.y*blockDim.y + threadIdx.y)
 
 /** Get the coordinate of the virtual processor in Z (second) dimension */
-#define P4A_VP_Z (blockIdx.z*blockDim.z + threadIdx.z)
+#define P4A_vp_z (blockIdx.z*blockDim.z + threadIdx.z)
 
 
 /** @defgroup P4A_memory_allocation_copy Memory allocation and copy
@@ -126,7 +126,7 @@ extern cudaEvent_t p4a_start_event, p4a_stop_event;
 
     @param[in] size is the size to allocate in bytes
  */
-#define P4A_ACCEL_MALLOC(address, size)			\
+#define P4A_accel_malloc(address, size)			\
   cutilSafeCall(cudaMalloc((void **)address, size))
 
 
@@ -135,7 +135,7 @@ extern cudaEvent_t p4a_start_event, p4a_stop_event;
     @param[in] address is the address of a previously allocated memory zone on
     the hardware accelerator
 */
-#define P4A_ACCEL_FREE(address)			\
+#define P4A_accel_free(address)			\
   cutilSafeCall(cudaFree(address))
 
 
@@ -151,7 +151,7 @@ extern cudaEvent_t p4a_start_event, p4a_stop_event;
 
     @param[in] size is the size in bytes of the memory zone to copy
 */
-#define P4A_COPY_TO_ACCEL(host_address, accel_address, size)	\
+#define P4A_copy_to_accel(host_address, accel_address, size)	\
   cutilSafeCall(cudaMemcpy(accel_address,			\
 			   host_address,			\
 			   size,				\
@@ -170,7 +170,7 @@ extern cudaEvent_t p4a_start_event, p4a_stop_event;
 
     @param[in] size is the size in bytes of the memory zone to copy
 */
-#define P4A_COPY_FROM_ACCEL(host_address, accel_address, size)	\
+#define P4A_copy_from_accel(host_address, accel_address, size)	\
   cutilSafeCall(cudaMemcpy(host_address,			\
 			   accel_address,			\
 			   size,				\
@@ -199,13 +199,13 @@ extern cudaEvent_t p4a_start_event, p4a_stop_event;
 
     do { pips_accel_1<<<1, pips_accel_dimBlock_1>>> (*accel_imagein_re, *accel_imagein_im); __cutilCheckMsg ("P4A CUDA kernel execution failed", "init.cu", 58); } while (0);
 */
-#define P4A_CALL_ACCEL_KERNEL(context, parameters)			\
+#define P4A_call_accel_kernel(context, parameters)			\
   do {									\
-    P4A_SKIP_DEBUG(P4A_DUMP_MESSAGE("Invoking kernel %s with %s\n",	\
+    P4A_SKIP_DEBUG(P4A_dump_message("Invoking kernel %s with %s\n",	\
 				    #context,				\
 				    #parameters));			\
-    P4A_CALL_ACCEL_KERNEL_CONTEXT context				\
-    P4A_CALL_ACCEL_KERNEL_PARAMETERS parameters;			\
+    P4A_call_accel_kernel_context context				\
+    P4A_call_accel_kernel_parameters parameters;			\
     cutilCheckMsg("P4A CUDA kernel execution failed");			\
   } while (0)
 
@@ -216,7 +216,7 @@ extern cudaEvent_t p4a_start_event, p4a_stop_event;
 
     Generate something like "kernel<<<block_dimension,thread_dimension>>>"
 */
-#define P4A_CALL_ACCEL_KERNEL_CONTEXT(kernel, ...)	\
+#define P4A_call_accel_kernel_context(kernel, ...)	\
   kernel<<<__VA_ARGS__>>>
 
 
@@ -225,7 +225,7 @@ extern cudaEvent_t p4a_start_event, p4a_stop_event;
     Simply add them in parenthesis.  Well, this could be done without
     variadic arguments... Just for fun. :-)
 */
-#define P4A_CALL_ACCEL_KERNEL_PARAMETERS(...)	\
+#define P4A_call_accel_kernel_parameters(...)	\
   (__VA_ARGS__)
 
 
@@ -234,7 +234,7 @@ extern cudaEvent_t p4a_start_event, p4a_stop_event;
 /** Allocate the descriptors for a linear set of thread with a
     simple strip-mining
 */
-#define P4A_CREATE_1D_THREAD_DESCRIPTORS(block_descriptor_name,		\
+#define P4A_create_1d_thread_descriptors(block_descriptor_name,		\
 					 grid_descriptor_name,		\
 					 size)				\
   /* Define the number of thread per block: */				\
@@ -242,44 +242,43 @@ extern cudaEvent_t p4a_start_event, p4a_stop_event;
 				     (int)P4A_THREAD_PER_BLOCK_IN_1D));	\
   /* Define the ceil-rounded number of needed blocks of threads: */	\
   dim3 grid_descriptor_name((((int)size) + P4A_THREAD_PER_BLOCK_IN_1D - 1)/P4A_THREAD_PER_BLOCK_IN_1D);	\
-  P4A_SKIP_DEBUG(P4A_DUMP_BLOCK_DESCRIPTOR(block_descriptor_name);)	\
-  P4A_SKIP_DEBUG(P4A_DUMP_GRID_DESCRIPTOR(grid_descriptor_name);)
+  P4A_SKIP_DEBUG(P4A_dump_block_descriptor(block_descriptor_name);)	\
+  P4A_SKIP_DEBUG(P4A_dump_grid_descriptor(grid_descriptor_name);)
 
 
 /** Allocate the descriptors for a 2D set of thread with a simple
     strip-mining in each dimension
 */
-#define P4A_CREATE_2D_THREAD_DESCRIPTORS(block_descriptor_name,		\
+#define P4A_create_2d_thread_descriptors(block_descriptor_name,		\
 					 grid_descriptor_name,		\
 					 n_x_iter, n_y_iter)		\
   /* Define the number of thread per block: */				\
-  dim3 block_descriptor_name(P4A_MIN((int)n_x_iter,			\
+  dim3 block_descriptor_name(P4A_min((int)n_x_iter,			\
 				     (int)P4A_THREAD_X_PER_BLOCK_IN_2D), \
-			     P4A_MIN((int)n_y_iter,			\
+			     P4A_min((int)n_y_iter,			\
 				     (int)P4A_THREAD_Y_PER_BLOCK_IN_2D)); \
   /* Define the ceil-rounded number of needed blocks of threads: */	\
   dim3 grid_descriptor_name((((int)n_x_iter) + P4A_THREAD_X_PER_BLOCK_IN_2D - 1)/P4A_THREAD_X_PER_BLOCK_IN_2D, \
 			    (((int)n_y_iter) + P4A_THREAD_Y_PER_BLOCK_IN_2D - 1)/P4A_THREAD_Y_PER_BLOCK_IN_2D); \
-  P4A_SKIP_DEBUG(P4A_DUMP_BLOCK_DESCRIPTOR(block_descriptor_name);)	\
-  P4A_SKIP_DEBUG(P4A_DUMP_GRID_DESCRIPTOR(grid_descriptor_name);)
+  P4A_SKIP_DEBUG(P4A_dump_block_descriptor(block_descriptor_name);)	\
+  P4A_SKIP_DEBUG(P4A_dump_grid_descriptor(grid_descriptor_name);)
 
 
 /** Dump a CUDA dim3 descriptor with an introduction message */
-#define P4A_DUMP_DESCRIPTOR(message, descriptor_name)			\
-  P4A_DUMP_MESSAGE(message "\""  #descriptor_name "\" of size %dx%dx%d\n", \
+#define P4A_dump_descriptor(message, descriptor_name)			\
+  P4A_dump_message(message "\""  #descriptor_name "\" of size %dx%dx%d\n", \
 		   descriptor_name.x,					\
 		   descriptor_name.y,					\
 		   descriptor_name.z)
 
-
 /** Dump a CUDA dim3 block descriptor */
-#define P4A_DUMP_BLOCK_DESCRIPTOR(descriptor_name)			\
-  P4A_DUMP_DESCRIPTOR("Creating block descriptor ", descriptor_name)
+#define P4A_dump_block_descriptor(descriptor_name)			\
+  P4A_dump_descriptor("Creating block descriptor ", descriptor_name)
 
 
 /** Dump a CUDA dim3 grid descriptor */
-#define P4A_DUMP_GRID_DESCRIPTOR(descriptor_name)		\
-  P4A_DUMP_DESCRIPTOR("Creating grid of block descriptor ",	\
+#define P4A_dump_grid_descriptor(descriptor_name)		\
+  P4A_dump_descriptor("Creating grid of block descriptor ",	\
 		      descriptor_name)
 
 
@@ -296,12 +295,12 @@ extern cudaEvent_t p4a_start_event, p4a_stop_event;
 
     @param ... the following parameters are given to the kernel
 */
-#define P4A_CALL_ACCEL_KERNEL_1D(kernel, size, ...)		\
+#define P4A_call_accel_kernel_1d(kernel, size, ...)		\
   do {								\
-    P4A_CREATE_1D_THREAD_DESCRIPTORS(P4A_block_descriptor,	\
+    P4A_create_1d_thread_descriptors(P4A_block_descriptor,	\
 				     P4A_grid_descriptor,	\
 				     size);			\
-    P4A_CALL_ACCEL_KERNEL((kernel, P4A_block_descriptor, P4A_grid_descriptor), \
+    P4A_call_accel_kernel((kernel, P4A_block_descriptor, P4A_grid_descriptor), \
 			  (__VA_ARGS__));				\
   } while (0)
 
@@ -316,12 +315,12 @@ extern cudaEvent_t p4a_start_event, p4a_stop_event;
 
     @param ... following parameters are given to the kernel
 */
-#define P4A_CALL_ACCEL_KERNEL_2D(kernel, n_x_iter, n_y_iter, ...)	\
+#define P4A_call_accel_kernel_2d(kernel, n_x_iter, n_y_iter, ...)	\
   do {									\
-    P4A_CREATE_2D_THREAD_DESCRIPTORS(P4A_block_descriptor,		\
+    P4A_create_2d_thread_descriptors(P4A_block_descriptor,		\
 				     P4A_grid_descriptor,		\
 				     n_x_iter, n_y_iter);		\
-    P4A_CALL_ACCEL_KERNEL((kernel, P4A_block_descriptor, P4A_grid_descriptor), \
+    P4A_call_accel_kernel((kernel, P4A_block_descriptor, P4A_grid_descriptor), \
 			  (__VA_ARGS__));				\
   } while (0)
 

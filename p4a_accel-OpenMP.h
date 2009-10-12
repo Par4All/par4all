@@ -38,7 +38,7 @@ extern __thread int P4A_vp_coordinate[P4A_vp_dim_max];
 */
 
 /** Start a timer on the accelerator */
-#define P4A_ACCEL_TIMER_START gettimeofday(&p4a_time_begin, NULL)
+#define P4A_accel_timer_start gettimeofday(&p4a_time_begin, NULL)
 /** @} */
 
 /** @defgroup P4A_init Initialization of P4A C to OpenMP
@@ -52,14 +52,14 @@ extern __thread int P4A_vp_coordinate[P4A_vp_dim_max];
 
     Nothing to do
 */
-#define P4A_INIT_ACCEL
+#define P4A_init_accel
 
 
 /** Release the hardware accelerator as OpenMP
 
     Nothing to do
  */
-#define P4A_RELEASE_ACCEL
+#define P4A_release_accel
 
 /** @} */
 
@@ -68,7 +68,7 @@ extern __thread int P4A_vp_coordinate[P4A_vp_dim_max];
 
     Nothing by default
 */
-#define P4A_ACCEL_KERNEL
+#define P4A_accel_kernel
 
 
 /** A declaration attribute of a hardware-accelerated kernel called from
@@ -76,19 +76,19 @@ extern __thread int P4A_vp_coordinate[P4A_vp_dim_max];
 
     Nothing by default
 */
-#define P4A_ACCEL_KERNEL_WRAPPER
+#define P4A_accel_kernel_wrapper
 
 
 /** Get the coordinate of the virtual processor in X (first) dimension */
-#define P4A_VP_X P4A_vp_coordinate[0]
+#define P4A_vp_x P4A_vp_coordinate[0]
 
 
 /** Get the coordinate of the virtual processor in Y (second) dimension */
-#define P4A_VP_Y P4A_vp_coordinate[1]
+#define P4A_vp_y P4A_vp_coordinate[1]
 
 
 /** Get the coordinate of the virtual processor in Z (second) dimension */
-#define P4A_VP_Z P4A_vp_coordinate[2]
+#define P4A_vp_z P4A_vp_coordinate[2]
 
 
 /** @defgroup P4A_memory_allocation_copy Memory allocation and copy
@@ -105,7 +105,7 @@ extern __thread int P4A_vp_coordinate[P4A_vp_dim_max];
 
     @param[in] size is the size to allocate in bytes
 */
-#define P4A_ACCEL_MALLOC(address, size)		\
+#define P4A_accel_malloc(address, size)		\
   *(void **)address = malloc(size)
 
 
@@ -116,7 +116,7 @@ extern __thread int P4A_vp_coordinate[P4A_vp_dim_max];
     @param[in] address is the address of a previously allocated memory zone on
     the hardware accelerator
 */
-#define P4A_ACCEL_FREE(address)			\
+#define P4A_accel_free(address)			\
   free(address)
 
 
@@ -135,7 +135,7 @@ extern __thread int P4A_vp_coordinate[P4A_vp_dim_max];
 
     @param[in] size is the size in bytes of the memory zone to copy
 */
-#define P4A_COPY_TO_ACCEL(host_address, accel_address, size)		\
+#define P4A_copy_to_accel(host_address, accel_address, size)		\
   /* We can use memcpy() since we are sure there is no overlap */	\
   memcpy(accel_address, host_address, size)
 
@@ -156,9 +156,9 @@ extern __thread int P4A_vp_coordinate[P4A_vp_dim_max];
 
     @param[in] size is the size in bytes of the memory zone to copy
 */
-#define P4A_COPY_FROM_ACCEL(host_address, accel_address, size)	\
+#define P4A_copy_from_accel(host_address, accel_address, size)	\
   /* Easy implementation since memcpy is symetrical :-) */	\
-  P4A_COPY_TO_ACCEL(accel_address, host_address, size)
+  P4A_copy_to_accel(accel_address, host_address, size)
 
 
 /* @} */
@@ -183,7 +183,7 @@ extern __thread int P4A_vp_coordinate[P4A_vp_dim_max];
 
     do { pips_accel_1<<<1, pips_accel_dimBlock_1>>> (*accel_imagein_re, *accel_imagein_im); __cutilCheckMsg ("P4A CUDA kernel execution failed", "init.cu", 58); } while (0);
 */
-#define P4A_CALL_ACCEL_KERNEL(context, parameters)
+#define P4A_call_accel_kernel(context, parameters)
 
 /* @} */
 
@@ -192,7 +192,7 @@ extern __thread int P4A_vp_coordinate[P4A_vp_dim_max];
 
     Generate something like "kernel<<<block_dimension,thread_dimension>>>"
 */
-#define P4A_CALL_ACCEL_KERNEL_CONTEXT(kernel, ...)
+#define P4A_call_accel_kernel_context(kernel, ...)
 
 
 /** Add CUDA kernel parameters for invocation.
@@ -200,7 +200,7 @@ extern __thread int P4A_vp_coordinate[P4A_vp_dim_max];
     Simply add them in parenthesis.  Well, this could be done without
     variadic arguments... Just for fun. :-)
 */
-#define P4A_CALL_ACCEL_KERNEL_PARAMETERS(...)
+#define P4A_call_accel_kernel_parameters(...)
 
 
 /** Creation of block and thread descriptors */
@@ -208,7 +208,7 @@ extern __thread int P4A_vp_coordinate[P4A_vp_dim_max];
 /** Allocate the descriptors for a linear set of thread with a
     simple strip-mining
 */
-#define P4A_CREATE_1D_THREAD_DESCRIPTORS(block_descriptor_name,		\
+#define P4A_create_1d_thread_descriptors(block_descriptor_name,		\
 					 grid_descriptor_name,		\
 					 size)
 
@@ -216,21 +216,21 @@ extern __thread int P4A_vp_coordinate[P4A_vp_dim_max];
 /** Allocate the descriptors for a 2D set of thread with a simple
     strip-mining in each dimension
 */
-#define P4A_CREATE_2D_THREAD_DESCRIPTORS(block_descriptor_name,		\
+#define P4A_create_2d_thread_descriptors(block_descriptor_name,		\
 					 grid_descriptor_name,		\
 					 n_x_iter, n_y_iter)
 
 
 /** Dump a CUDA dim3 descriptor with an introduction message */
-#define P4A_DUMP_DESCRIPTOR(message, descriptor_name)
+#define P4A_dump_descriptor(message, descriptor_name)
 
 
 /** Dump a CUDA dim3 block descriptor */
-#define P4A_DUMP_BLOCK_DESCRIPTOR(descriptor_name)
+#define P4A_dump_block_descriptor(descriptor_name)
 
 
 /** Dump a CUDA dim3 grid descriptor */
-#define P4A_DUMP_GRID_DESCRIPTOR(descriptor_name)
+#define P4A_dump_grid_descriptor(descriptor_name)
 
 
 /** @addtogroup P4A_cuda_kernel_call
@@ -248,12 +248,12 @@ extern __thread int P4A_vp_coordinate[P4A_vp_dim_max];
 
     @param ... the following parameters are given to the kernel
 */
-#define P4A_CALL_ACCEL_KERNEL_1D(kernel, size, ...)		\
+#define P4A_call_accel_kernel_1d(kernel, size, ...)		\
   _Pragma("omp parallel for")					\
   for(int P4A_index_x = 0; P4A_index_x < size; P4A_index_x++) {	\
-    P4A_VP_X = P4A_index_x;					\
-    P4A_VP_Y = 0;						\
-    P4A_VP_Z = 0;						\
+    P4A_vp_x = P4A_index_x;					\
+    P4A_vp_y = 0;						\
+    P4A_vp_z = 0;						\
     kernel(__VA_ARGS__);					\
   }
 
@@ -270,13 +270,13 @@ extern __thread int P4A_vp_coordinate[P4A_vp_dim_max];
 
     @param ... following parameters are given to the kernel
 */
-#define P4A_CALL_ACCEL_KERNEL_2D(kernel, n_x_iter, n_y_iter, ...)	\
+#define P4A_call_accel_kernel_2d(kernel, n_x_iter, n_y_iter, ...)	\
   _Pragma("omp parallel for")						\
   for(int P4A_index_x = 0; P4A_index_x < n_x_iter; P4A_index_x++) {	\
     for(int P4A_index_y = 0; P4A_index_y < n_y_iter; P4A_index_y++) {	\
-      P4A_VP_X = P4A_index_x;						\
-      P4A_VP_Y = P4A_index_y;						\
-      P4A_VP_Z = 0;							\
+      P4A_vp_x = P4A_index_x;						\
+      P4A_vp_y = P4A_index_y;						\
+      P4A_vp_z = 0;							\
      kernel(__VA_ARGS__);						\
     }									\
   }

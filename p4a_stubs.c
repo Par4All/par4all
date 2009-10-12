@@ -2,7 +2,7 @@
 
 /* Equivalent stubs of Par4All runtime to have PIPS analyze happy */
 
-void * P4A_COPY_TO_ACCEL(const void * host_address,
+void * P4A_copy_to_accel(const void * host_address,
 			 void * accel_address,
 			 size_t n) {
   size_t i;
@@ -13,7 +13,7 @@ void * P4A_COPY_TO_ACCEL(const void * host_address,
 }
 
 
-void * P4A_COPY_FROM_ACCEL(void * host_address,
+void * P4A_copy_from_accel(void * host_address,
 			   const void * accel_address,
 			   size_t n) {
   size_t i;
@@ -24,11 +24,11 @@ void * P4A_COPY_FROM_ACCEL(void * host_address,
 }
 
 
-void P4A_ACCEL_MALLOC(void **dest,  size_t n) {
+void P4A_accel_malloc(void **dest,  size_t n) {
   *dest = malloc(n);
 }
 
 
-void P4A_ACCEL_FREE(void *dest) {
+void P4A_accel_free(void *dest) {
   free(dest);
 }

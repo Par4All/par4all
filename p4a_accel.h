@@ -29,7 +29,7 @@
 /** Note that in CUDA and OpenCL there is 3 dimensions max: */
 enum { P4A_vp_dim_max = 3 };
 
-extern double P4A_ACCEL_TIMER_STOP_AND_FLOAT_MEASURE();
+extern double P4A_accel_timer_stop_and_float_measure();
 
 #if defined(P4A_ACCEL_CUDA) && defined(P4A_ACCEL_OPENMP)
 #error "You cannot have both P4A_ACCEL_CUDA and P4A_ACCEL_OPENMP defined, yet"
@@ -60,7 +60,7 @@ extern double P4A_ACCEL_TIMER_STOP_AND_FLOAT_MEASURE();
 
 
 /** Output a debug message à la printf */
-#define P4A_DUMP_MESSAGE(...)			\
+#define P4A_dump_message(...)			\
   fprintf(stderr, " P4A: " __VA_ARGS__)
 
 
@@ -68,6 +68,6 @@ extern double P4A_ACCEL_TIMER_STOP_AND_FLOAT_MEASURE();
 
     Since it is a macro, beware of side effects...
 */
-#define P4A_MIN(a, b) ((a > b) ? b : a)
+#define P4A_min(a, b) ((a > b) ? b : a)
 
 #endif //P4A_ACCEL_H
