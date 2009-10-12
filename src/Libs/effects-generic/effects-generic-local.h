@@ -106,6 +106,20 @@ static void db_put_##name(char *m, list l) \
 #define DB_GETNOPUT_LS(name, NAME) DB_GET_LS(name, NAME)DB_NOPUT_LS(name)
 
 
+/* for debug 
+*/
+#define pips_debug_effect(level, message, eff) \
+  ifdebug(level) { pips_debug(level, "%s\n", message); \
+  (*effect_consistent_p_func)(eff); \
+  (*effect_prettyprint_func)(eff);}
+
+#define pips_debug_effects(level, message, l_eff) \
+  ifdebug(level) { pips_debug(level, "%s\n", message); \
+  generic_print_effects(l_eff);}
+
+
+
+
 /* For COMPATIBILITY purpose only - DO NOT USE anymore
  */
 #define effect_variable(e) reference_variable(effect_any_reference(e))

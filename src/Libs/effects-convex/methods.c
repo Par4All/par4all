@@ -73,6 +73,7 @@ DB_GETPUT_LS(convex_summary_out_regions, OUT_SUMMARY_REGIONS)
 void
 set_methods_for_convex_effects()
 {
+  effect_consistent_p_func = region_consistent_p;
     effect_dup_func = region_dup;
     effect_free_func = region_free;
 
@@ -160,8 +161,10 @@ set_methods_for_convex_effects()
 
 void init_convex_rw_prettyprint(string __attribute__ ((unused)) module_name)
 {
-    effects_prettyprint_func = print_rw_regions;
-    effects_to_text_func = text_rw_array_regions;
+  set_action_interpretation(ACTION_READ, ACTION_WRITE);
+  effects_prettyprint_func = print_rw_regions;
+  effect_prettyprint_func = print_region;
+  effects_to_text_func = text_rw_array_regions;
 }
 
 void
@@ -188,8 +191,10 @@ init_convex_rw_regions(string module_name)
 
 void init_convex_inout_prettyprint(string __attribute__ ((unused)) module_name)
 {
-    effects_prettyprint_func = print_inout_regions;
-    effects_to_text_func = text_inout_array_regions;
+  set_action_interpretation(ACTION_IN, ACTION_OUT);
+  effects_prettyprint_func = print_inout_regions;
+  effect_prettyprint_func = print_region;
+  effects_to_text_func = text_inout_array_regions;
 }
 
 void init_convex_in_out_regions(string module_name)
@@ -272,7 +277,9 @@ void init_convex_summary_in_out_regions(string module_name)
 void reset_convex_prettyprint(string __attribute__ ((unused)) module_name)
 {
     effects_prettyprint_func = (generic_prettyprint_function) abort;
+    effect_prettyprint_func = (generic_prettyprint_function) abort;
     effects_to_text_func = (generic_text_function) abort;
+    reset_action_interpretation();
 }
 
 void

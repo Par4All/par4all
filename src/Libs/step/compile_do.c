@@ -8,6 +8,7 @@ License.
 
 
 #include "defines-local.h"
+#include "effects-generic.h"
 #include "effects-convex.h"
 
 // for :  string text_to_string(text t)...
@@ -470,7 +471,7 @@ static statement step_build_compute_region(list loop_data_l, region reg2, entity
       reference_indices(region_reference(reg)));
   
   //ajout de la region en commentaire
-
+  reset_action_interpretation();
   commentaire = text_to_string(text_region(reg));
   call_statmt = make_call_statement(CONTINUE_FUNCTION_NAME, NIL, entity_empty_label(),commentaire);
   insert_statement(body,call_statmt,TRUE);

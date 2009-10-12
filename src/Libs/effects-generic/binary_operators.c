@@ -75,16 +75,21 @@ list_of_effects_generic_binary_op(
     list l_res = NIL;
     list cr1 = list_undefined;
     list cr2 = list_undefined;
+    list l_clean_res = NIL;
 
     debug_on("EFFECTS_OPERATORS_DEBUG_LEVEL");
 
-    ifdebug(1) {
-      pips_debug(1, "Initial effects : \n");
-      fprintf(stderr,"\t l1 :\n");
-      (*effects_prettyprint_func)(l1);
-      fprintf(stderr,"\t l2 :\n");
-      (*effects_prettyprint_func)(l2);
+    pips_debug_effects(1, "Initial effects : \n\t l1 :\n", l1);
+    ifdebug(8) {
+      fprintf(stderr, "Dump of initial effects l1 : \n");
+      dump_effects(l1);
     }
+    pips_debug_effects(1, "\t l2 :\n", l2);
+    ifdebug(8) {
+      fprintf(stderr, "Dump of initial effects l2 : \n");
+      dump_effects(l2);
+    }
+
     
     /* we first deal with the effects of l1 : those that are combinable with 
      * the effects of l2, and the others, which we call the remnants of l1 */
@@ -95,15 +100,18 @@ list_of_effects_generic_binary_op(
       bool combinable = FALSE;
       
       pips_debug(8, "r1: %s\n", entity_name(effect_variable(r1)));
+      ifdebug(8) {
+	fprintf(stderr, "Dump r1 when entering the loop body\n");
+	dump_effect(r1);
+      }
       
       while(!combinable && !ENDP(lr2)) {
 	effect r2 = EFFECT(CAR(lr2));
 	
 	pips_debug(8, "r2: %s\n", entity_name(effect_variable(r2)));
-	ifdebug(8)
-	  pips_assert("r2 is consistent", effect_consistent_p(r2));
 	
 	if ( (*r1_r2_combinable_p)(r1,r2) ) {
+	  pips_debug(8, "combinable\n");
 	  combinable = TRUE;
 	  l_res = gen_nconc((*r1_r2_binary_op)(r1,r2), l_res);
 	  
@@ -124,10 +132,7 @@ list_of_effects_generic_binary_op(
 	}
       }
       
-      ifdebug(9) {
-	  pips_debug(9, "intermediate effects 1:\n");
-	  (*effects_prettyprint_func)(l_res);
-	}
+      pips_debug_effects(9, "intermediate effects 1:\n", l_res);
       
       if(!combinable) {
 	/* r1 belongs to the remnants of l1 : it is combinable 
@@ -137,27 +142,23 @@ list_of_effects_generic_binary_op(
       }
     }
     
-    ifdebug(9) {
-	pips_debug(9, "intermediate effects 2:\n");
-	(*effects_prettyprint_func)(l_res);
-      }
+    pips_debug_effects(9, "intermediate effects 2:\n", l_res);
     
     /* we must then deal with the remnants of l2 */
     for(cr2 = l2; !ENDP(cr2); POP(cr2)) {
       effect r2 = EFFECT(CAR(cr2));
 
-      ifdebug(8)
-	pips_assert("r2 is consistent", effect_consistent_p(r2));
 
       if ( (*r1_r2_combinable_p)(effect_undefined,r2) ) 
 	l_res = gen_nconc((*r2_unary_op)(r2), l_res);
     }
         
-    ifdebug(1)
-      {
-	pips_debug(1, "final effects:\n");
-	(*effects_prettyprint_func)(l_res);
-      }
+    pips_debug_effects(1, "effects before cleaning:\n", l_res);
+ 
+    l_clean_res = clean_anywhere_effects(l_res);
+    gen_full_free_list(l_res);
+
+    pips_debug_effects(1, "final effects:\n", l_clean_res);
     
     /* no memory leaks: l1 and l2 won't be used anymore */
     gen_free_list(l1);
@@ -165,7 +166,7 @@ list_of_effects_generic_binary_op(
     
     debug_off();
     
-    return l_res;
+    return l_clean_res;
 }
 
 list 
@@ -388,16 +389,39 @@ proper_effects_combine(list l_effects, bool scalars_only_p)
 /**
    @param eff1 and eff2 are two effects
    @ return true if their entities are the same, and if their access path
-            as described by their references are the same.
+            as described by their references are the same, or if one of
+	    the effect is an anywhere effect.
 	    false otherwise.
  */
-bool effects_same_access_path_p(effect eff1, effect eff2)
+bool effects_combinable_p(effect eff1, effect eff2)
 {
   bool same_p = false;
   reference r1 = effect_any_reference(eff1);
   reference r2 = effect_any_reference(eff2);
-  
-  if (same_entity_p(reference_variable(r1), reference_variable(r2)))
+
+  if (anywhere_effect_p(eff1))
+    {
+      pips_debug(8, "eff1 is an anywhere effect\n");
+      if (malloc_effect_p(eff2) || io_effect_p(eff2))
+	same_p = false;
+      else 
+	same_p = true;
+      pips_debug(8, "eff2 is %s a malloc or io effect\n",
+		 same_p? "not": "");
+      
+    }
+  else if (anywhere_effect_p(eff2))
+    {
+      pips_debug(8, "eff2 is an anywhere effect\n");
+      
+      if (malloc_effect_p(eff1) || io_effect_p(eff1))
+	same_p = false;
+      else 
+	same_p = true;
+      pips_debug(8, "eff1 is %s a malloc or io effect\n",
+		 same_p? "not": "");
+    } 
+  else if (same_entity_p(reference_variable(r1), reference_variable(r2)))
     {
       string n1 = words_to_string(effect_words_reference(r1));
       string n2 = words_to_string(effect_words_reference(r2));
@@ -414,25 +438,6 @@ bool effects_same_access_path_p(effect eff1, effect eff2)
 }
 
 
-/* bool combinable_effects_p(effect eff1, eff2)
- * input    : two effects
- * output   : TRUE if eff1 and eff2 affect the same entity, and, if they
- *            have the same action on it, FALSE otherwise.
- * modifies : nothing.
- */
-bool combinable_effects_p(effect eff1, effect eff2)
-{
-    bool same_var, same_act;
-
-    if (effect_undefined_p(eff1) || effect_undefined_p(eff2))
-	return(TRUE);
-
-    same_var = (effect_entity(eff1) == effect_entity(eff2));
-    same_act = (effect_action_tag(eff1) == effect_action_tag(eff2));
-
-    return(same_var && same_act);
-}
-
 /* FI: same action, but also same variable and same indexing  */
 bool effects_same_action_p(effect eff1, effect eff2)
 {
@@ -445,7 +450,7 @@ bool effects_same_action_p(effect eff1, effect eff2)
       same_p = false;
     }
   else 
-    same_p = effects_same_access_path_p(eff1, eff2);
+    same_p = effects_combinable_p(eff1, eff2);
   
 	
   return same_p;
@@ -460,7 +465,7 @@ bool effects_same_variable_p(effect eff1, effect eff2)
 
 bool r_r_combinable_p(effect eff1, effect eff2)
 {
-    bool same_access_path, act_combinable;
+    bool combinable_p, act_combinable;
 
     if (effect_undefined_p(eff1))
 	return(effect_read_p(eff2));
@@ -468,15 +473,15 @@ bool r_r_combinable_p(effect eff1, effect eff2)
     if (effect_undefined_p(eff2))
 	return(effect_read_p(eff1));
 
-    same_access_path = effects_same_access_path_p(eff1,eff2);
+    combinable_p = effects_combinable_p(eff1,eff2);
     act_combinable = (effect_read_p(eff1) && effect_read_p(eff2));
 
-    return(same_access_path && act_combinable);
+    return(combinable_p && act_combinable);
 }
 
 bool w_w_combinable_p(effect eff1, effect eff2)
 {
-    bool same_access_path, act_combinable;
+    bool combinable_p, act_combinable;
 
     if (effect_undefined_p(eff1))
 	return(effect_write_p(eff2));
@@ -484,15 +489,15 @@ bool w_w_combinable_p(effect eff1, effect eff2)
     if (effect_undefined_p(eff2))
 	return(effect_write_p(eff1));
 
-    same_access_path = effects_same_access_path_p(eff1,eff2);
+    combinable_p = effects_combinable_p(eff1,eff2);
     act_combinable = (effect_write_p(eff1) && effect_write_p(eff2));
 
-    return(same_access_path && act_combinable);
+    return(combinable_p && act_combinable);
 }
 
 bool r_w_combinable_p(effect eff1, effect eff2)
 {
-    bool same_access_path, act_combinable;
+    bool combinable_p, act_combinable;
 
     if (effect_undefined_p(eff1))
 	return(effect_write_p(eff2));
@@ -500,15 +505,15 @@ bool r_w_combinable_p(effect eff1, effect eff2)
     if (effect_undefined_p(eff2))
 	return(effect_read_p(eff1));
 
-    same_access_path = effects_same_access_path_p(eff1,eff2);
+    combinable_p = effects_combinable_p(eff1,eff2);
     act_combinable = (effect_read_p(eff1) && effect_write_p(eff2));
 
-    return(same_access_path && act_combinable);
+    return(combinable_p && act_combinable);
 }
 
 bool w_r_combinable_p(effect eff1, effect eff2)
 {
-    bool same_access_path, act_combinable;
+    bool combinable_p, act_combinable;
 
     if (effect_undefined_p(eff1))
 	return(effect_read_p(eff2));
@@ -516,10 +521,10 @@ bool w_r_combinable_p(effect eff1, effect eff2)
     if (effect_undefined_p(eff2))
 	return(effect_write_p(eff1));
 
-    same_access_path = effects_same_access_path_p(eff1,eff2);
+    combinable_p = effects_combinable_p(eff1,eff2);
     act_combinable = (effect_write_p(eff1) && effect_read_p(eff2));
 
-    return(same_access_path && act_combinable);
+    return(combinable_p && act_combinable);
 }
 
 /***********************************************************************/

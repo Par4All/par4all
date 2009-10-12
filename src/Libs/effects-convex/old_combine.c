@@ -388,7 +388,10 @@ list region_must_union(region r1, region r2)
     list l_res = NIL;
     effect r_res;
     
-    r_res = regions_must_convex_hull(r1, r2);
+    if (anywhere_effect_p(r1) || anywhere_effect_p(r2))
+      r_res = make_anywhere_effect(copy_action(effect_action(r1)));
+    else
+      r_res = regions_must_convex_hull(r1, r2);
 
     debug_region_consistency(r_res);
 
@@ -406,7 +409,10 @@ list region_may_union(region r1, region r2)
     list l_res = NIL;
     effect r_res;
 
-    r_res = regions_may_convex_hull(r1, r2);
+    if (anywhere_effect_p(r1) || anywhere_effect_p(r2))
+      r_res = make_anywhere_effect(copy_action(effect_action(r1)));
+    else
+      r_res = regions_may_convex_hull(r1, r2);
 
     if (!region_empty_p(r_res))
 	l_res = region_to_list(r_res);
@@ -846,74 +852,90 @@ static Psysteme region_sc_convex_hull(Psysteme ps1, Psysteme ps2)
  *            the action of the resulting regions is the action
  *            of the first region (reg1).
  * modifies : nothing.
- * comment  : not debugged, because not yet used. (funny, FC;-)
+ * comment  : not debugged, because not yet used. (funny, FC;-) (still up_to-date ? BC)
  */
 list /* of region */
 region_intersection(region reg1, region reg2)
 {
     list l_res = NIL;
-
     Psysteme sc1 = region_system(reg1);
     Psysteme sc2 = region_system(reg2);
     tag app1 = region_approximation_tag(reg1);
     tag app2 = region_approximation_tag(reg2);
     tag app_res = approximation_and(app1,app2); 
-
-    /* Automatic variables read in a CATCH block need to be declared volatile as
-     * specified by the documentation*/
-    region volatile reg;
-    boolean feasible = TRUE;
-
-
-    /* if one of the regions is unfeasible, return an empty list */
-    if (sc_empty_p(sc1) || sc_empty_p(sc2))
-    {
-	pips_debug(8, "reg1 or reg 2 sc_empty");
-	return(l_res);
-    }
-
+  
     ifdebug(3){
 	pips_debug(3,"initial regions :\n");
 	print_region(reg1);
 	print_region(reg2);
     }
 
-    /* else return a list containing a region which predicate is the 
-     * intersection of the two initial predicates, and which approximation 
-     * is the "logical" and of the initial approximations.
-     */
-    reg = region_dup(reg1);
-    region_sc_append_and_normalize(reg,sc2,2); /* could be some other level? */
-
-    CATCH(overflow_error)
-    {	
-	pips_debug(3, "overflow error \n");
-	feasible = TRUE;
-	debug_region_consistency(reg);
-    }
-    TRY
-    {    
-	 feasible = sc_integer_feasibility_ofl_ctrl(region_system(reg), 
-						    FWD_OFL_CTRL, TRUE);
-	 UNCATCH(overflow_error);
-    }
-
-    if (feasible)
-    {
+    if (anywhere_effect_p(reg1)) 
+      {
+	region reg = copy_effect(reg2);
+	region_action_tag(reg)= region_action_tag(reg1);
 	region_approximation_tag(reg)= app_res;
 	l_res = region_to_list(reg);
-    }
+      }
+    else if (anywhere_effect_p(reg2)) 
+      {
+	region reg = copy_effect(reg1);
+	region_approximation_tag(reg)= app_res;
+	l_res = region_to_list(reg);
+      }
     else
-    {
-	region_free(reg);
-	l_res = NIL;
-    }
-
+      {
+	
+	/* Automatic variables read in a CATCH block need to be declared volatile as
+	 * specified by the documentation*/
+	region volatile reg;
+	boolean feasible = TRUE;
+	
+	
+	/* if one of the regions is unfeasible, return an empty list */
+	if (sc_empty_p(sc1) || sc_empty_p(sc2))
+	  {
+	    pips_debug(8, "reg1 or reg 2 sc_empty");
+	    return(l_res);
+	  }
+	
+	
+	/* else return a list containing a region which predicate is the 
+	 * intersection of the two initial predicates, and which approximation 
+	 * is the "logical" and of the initial approximations.
+	 */
+	reg = region_dup(reg1);
+	region_sc_append_and_normalize(reg,sc2,2); /* could be some other level? */
+	
+	CATCH(overflow_error)
+	{	
+	  pips_debug(3, "overflow error \n");
+	  feasible = TRUE;
+	  debug_region_consistency(reg);
+	}
+	TRY
+	  {    
+	    feasible = sc_integer_feasibility_ofl_ctrl(region_system(reg), 
+						       FWD_OFL_CTRL, TRUE);
+	    UNCATCH(overflow_error);
+	  }
+	
+	if (feasible)
+	  {
+	    region_approximation_tag(reg)= app_res;
+	    l_res = region_to_list(reg);
+	  }
+	else
+	  {
+	    region_free(reg);
+	    l_res = NIL;
+	  }
+      }
     ifdebug(3)
-    {
+      {
 	pips_debug(3,"final region :\n");
 	print_regions(l_res);
-    }    
+      }    
     return(l_res);
 }
 
@@ -922,11 +944,22 @@ region_intersection(region reg1, region reg2)
  * input    : two regions
  * output   : a mere copy of the first region.
  * modifies : nothing.
- * comment  : We assume that both regions concern the same entity.
+ * comment  : We assume that both regions concern the same entity or that
+              one of them is an anywhere effect.
  */
-list region_entities_intersection(region reg1, region reg2 __attribute__ ((unused)))
+list region_entities_intersection(region r1, region r2)
 {
-    return(CONS(EFFECT, region_dup(reg1), NIL));
+  region reg;
+  
+  if (anywhere_effect_p(r1))
+    {      
+      reg = copy_effect(r2);
+      effect_action_tag(reg) = effect_action_tag(r1);
+    }
+  else 
+    reg = region_dup(r1);
+  
+  return(CONS(EFFECT, reg, NIL));
 }
 
 
@@ -968,113 +1001,127 @@ list region_sup_difference(region reg1, region reg2)
 	fprintf(stderr,"\t reg2 :\n");
 	print_region(reg2);
     }
-
-    /* particular cases first */
-    sc1 = region_system(reg1);
-    sc2 = region_system(reg2);
-
-    /* nothing minus (something or nothing)  = nothing */
-    if (sc_empty_p(sc1)) 
-	return l_reg;
-
-    /*  something minus nothing = something */
-    if (sc_empty_p(sc2))
-    {
-	l_reg = region_to_list(region_dup(reg1));
-	return l_reg;
-    }	
-
-
-    /* everything minus everything 
-     *             = everything (may) for an array and if app2 = may, 
-     *             = nothing otherwise */
-    if (sc_rn_p(sc1) && sc_rn_p(sc2))
-    {
-	if (app2 == is_approximation_may) 
-	    l_reg = region_to_may_region_list(region_dup(reg1));
-	return l_reg;
-    }
-
-    /* something minus everything must = nothing */
-    /* something minus everything may = something may*/    
-    if (sc_rn_p(sc2) )
-    {
-	if (app2 == is_approximation_may) 
-	    l_reg = region_to_may_region_list(region_dup(reg1));
-	return l_reg;
-    }
-   
-
-    /* general case */
-    if (op_statistics_p()) nb_dsup++;
-
-    switch (app2)
-    {
-    case is_approximation_must :
-	if (app1 == is_approximation_must)
-	{
-	    app = is_approximation_must;
-	    if (op_statistics_p()) nb_dsup_pot_must++;
-	}
-	else 
-	    app = is_approximation_may;
-	CATCH (overflow_error)
-	{
-	    pips_debug(1, "overflow error\n");
-	    app = app1;
-	    l_reg = region_to_may_region_list(region_dup(reg1));
-	}
-	TRY
-	{
-	    Pdisjunct disjonction;
-	    disjonction = sc_difference(sc1,sc2);
-	    l_reg = disjunction_to_list_of_regions
-		(disjonction, reg1, app, SUPER);
-	    UNCATCH(overflow_error);
-	}
-
-	if (op_statistics_p() && app == is_approximation_must &&
-	    (approximation_tag(effect_approximation(reg1)) ==  
-	     is_approximation_must))
-	    nb_dsup_must++;
-
-	break;
-
-    case is_approximation_may :
-	CATCH(overflow_error)
-	{
-	    pips_debug(1, "overflow error\n");
-	    app = is_approximation_may;
-	}
-	TRY
-	{
-	    if (app1 == is_approximation_must) 
-	    {
+    
+    if (anywhere_effect_p(reg1))
+      {
+	reg = make_anywhere_effect(copy_action(effect_action(reg1)));
+	l_reg = region_to_list(reg);
+      }
+    else if (anywhere_effect_p(reg2))
+      {
+	reg = copy_effect(reg1);
+	l_reg = region_to_may_region_list(reg);
+       }
+    else
+      {
+	
+	/* particular cases first */
+	sc1 = region_system(reg1);
+	sc2 = region_system(reg2);
+	
+	/* nothing minus (something or nothing)  = nothing */
+	if (sc_empty_p(sc1)) 
+	  return l_reg;
+	
+	/*  something minus nothing = something */
+	if (sc_empty_p(sc2))
+	  {
+	    l_reg = region_to_list(region_dup(reg1));
+	    return l_reg;
+	  }	
+	
+	
+	/* everything minus everything 
+	 *             = everything (may) for an array and if app2 = may, 
+	 *             = nothing otherwise */
+	if (sc_rn_p(sc1) && sc_rn_p(sc2))
+	  {
+	    if (app2 == is_approximation_may) 
+	      l_reg = region_to_may_region_list(region_dup(reg1));
+	    return l_reg;
+	  }
+	
+	/* something minus everything must = nothing */
+	/* something minus everything may = something may*/    
+	if (sc_rn_p(sc2) )
+	  {
+	    if (app2 == is_approximation_may) 
+	      l_reg = region_to_may_region_list(region_dup(reg1));
+	    return l_reg;
+	  }
+	
+	
+	/* general case */
+	if (op_statistics_p()) nb_dsup++;
+	
+	switch (app2)
+	  {
+	  case is_approximation_must :
+	    if (app1 == is_approximation_must)
+	      {
+		app = is_approximation_must;
 		if (op_statistics_p()) nb_dsup_pot_must++;
-		if (sc_intersection_empty_p_ofl(sc1,sc2))
-		{ 
-		    app = is_approximation_must;
-		    if (op_statistics_p()) nb_dsup_must++;
-		}
-		else app = is_approximation_may;
-	    }
+	      }
 	    else 
-		app = is_approximation_may;
-	    UNCATCH(overflow_error);
-	}
-	reg = region_dup(reg1);
-	approximation_tag(effect_approximation(reg)) = app;
-	l_reg = CONS(EFFECT, reg, NIL);
-	break;
-    }
-
+	      app = is_approximation_may;
+	    CATCH (overflow_error)
+	    {
+	      pips_debug(1, "overflow error\n");
+	      app = app1;
+	      l_reg = region_to_may_region_list(region_dup(reg1));
+	    }
+	    TRY
+	      {
+		Pdisjunct disjonction;
+		disjonction = sc_difference(sc1,sc2);
+		l_reg = disjunction_to_list_of_regions
+		  (disjonction, reg1, app, SUPER);
+		UNCATCH(overflow_error);
+	      }
+	    
+	    if (op_statistics_p() && app == is_approximation_must &&
+		(approximation_tag(effect_approximation(reg1)) ==  
+		 is_approximation_must))
+	      nb_dsup_must++;
+	    
+	    break;
+	    
+	  case is_approximation_may :
+	    CATCH(overflow_error)
+	    {
+	      pips_debug(1, "overflow error\n");
+	      app = is_approximation_may;
+	    }
+	    TRY
+	      {
+		if (app1 == is_approximation_must) 
+		  {
+		    if (op_statistics_p()) nb_dsup_pot_must++;
+		    if (sc_intersection_empty_p_ofl(sc1,sc2))
+		      { 
+			app = is_approximation_must;
+			if (op_statistics_p()) nb_dsup_must++;
+		      }
+		    else app = is_approximation_may;
+		  }
+		else 
+		  app = is_approximation_may;
+		UNCATCH(overflow_error);
+	      }
+	    reg = region_dup(reg1);
+	    approximation_tag(effect_approximation(reg)) = app;
+	    l_reg = CONS(EFFECT, reg, NIL);
+	    break;
+	  }
+      }
+    
     ifdebug(6)
-    {
+      {
 	pips_debug(6, "Resulting regions : \n");
 	fprintf(stderr,"\t l_reg :\n");
 	print_regions(l_reg);
-    }
-
+      }
+    
     return l_reg;
 }
 
@@ -1103,6 +1150,9 @@ list region_inf_difference(region reg1, region reg2)
 	fprintf(stderr,"\t reg2 :\n");
 	print_region(reg2);
     }
+
+    if (anywhere_effect_p(reg1) || anywhere_effect_p(reg2))
+      return NIL;
 
     /* particular cases first */
     sc1 = region_system(reg1);

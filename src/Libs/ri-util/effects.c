@@ -173,6 +173,33 @@ effect heap_effect(entity m, action ac)
   return any;
 }
 
+bool heap_effect_p(effect e)
+{
+  bool heap_p;
+  reference r = effect_any_reference(e);
+  entity v = reference_variable(r);
+
+  heap_p = same_string_p(entity_local_name(v), HEAP_AREA_LOCAL_NAME);
+
+  return heap_p;
+}
+
+bool malloc_effect_p(effect e)
+{
+  bool heap_p;
+  reference r = effect_any_reference(e);
+  entity v = reference_variable(r);
+
+  heap_p = same_string_p(entity_local_name(v), MALLOC_EFFECTS_NAME);
+
+  return heap_p;
+}
+
+bool io_effect_p(effect e)
+{
+  return io_effect_entity_p(reference_variable(effect_any_reference(e)));
+}
+
 /* Can we merge these two effects because they are equal or because
    they only differ by their approximations and their descriptors? */
 bool effect_comparable_p(effect e1, effect e2)

@@ -142,7 +142,10 @@ effect effect_may_union(effect eff1, effect eff2)
     tag app1 = effect_approximation_tag(eff1);
     tag app2 = effect_approximation_tag(eff2);
     
-    if (effect_scalar_p(eff1))
+    if (anywhere_effect_p(eff1) || anywhere_effect_p(eff2))
+      eff = make_anywhere_effect(copy_action(effect_action(eff1)));
+    
+    else if (effect_scalar_p(eff1))
     {
 	eff = make_simple_effect(make_reference(effect_entity(eff1), NIL), 
 			  make_action(action_tag(effect_action(eff1)), UU), 
@@ -169,7 +172,9 @@ effect effect_must_union(effect eff1, effect eff2)
     tag app1 = effect_approximation_tag(eff1);
     tag app2 = effect_approximation_tag(eff2);
 	
-    if (effect_scalar_p(eff1))
+    if (anywhere_effect_p(eff1) || anywhere_effect_p(eff2))
+      eff = make_anywhere_effect(copy_action(effect_action(eff1)));
+    else if (effect_scalar_p(eff1))
     {
 	eff = make_simple_effect(make_reference(effect_entity(eff1), NIL), 
 			  make_action(action_tag(effect_action(eff1)), UU), 

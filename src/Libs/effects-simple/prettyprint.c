@@ -358,22 +358,6 @@ list words_effect_without_approximation(effect obj)
   return words_effect_generic(obj, FALSE);
 }
 
-void 
-print_effects( list pc)
-{
-    if (pc != NIL) {
-        while (pc != NIL) {
-            effect e = EFFECT(CAR(pc));
-            fprintf(stderr, "\t");
-            print_words(stderr, words_effect(e));
-            fprintf(stderr, "\n");
-            pc = CDR(pc);
-        }
-    }
-    else 
-	fprintf(stderr, "\t<NONE>\n");
-}
-
 void print_effect(effect e)
 {
   if(!effect_undefined_p(e))
@@ -386,3 +370,17 @@ void print_effect(effect e)
   else
     fprintf(stderr,"\t effect undefined\n");
 }
+
+void 
+print_effects( list pc)
+{
+  if (pc != NIL) {
+    FOREACH(EFFECT, e, pc)
+      {	
+	print_effect(e);
+      }
+  }
+  else 
+    fprintf(stderr, "\t<NONE>\n");
+}
+

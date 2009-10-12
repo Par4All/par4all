@@ -609,12 +609,18 @@ static list r_rw_effects_of_sequence(list l_inst)
 	}
 	ifdebug(5){
 	    pips_debug(5, "R/W effects of remaining sequence "
-		       "after composition: \n");
+		       "after store update: \n");
 	    (*effects_prettyprint_func)(rb_lrw);
 	}
 
 	/* RW(block) = RW(rest_of_block) U RW(S1) */
 	l_rw = (*effects_union_op)(rb_lrw, s1_lrw, effects_same_action_p);
+
+	ifdebug(5){
+	    pips_debug(5, "R/W effects of remaining sequence "
+		       "after union: \n");
+	    (*effects_prettyprint_func)(l_rw);
+	}
     }	
     else 
     {

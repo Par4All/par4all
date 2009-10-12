@@ -68,11 +68,13 @@ DB_GETPUT_LS(simple_summary_out_effects, OUT_SUMMARY_EFFECTS)
 void
 set_methods_for_proper_references()
 {
+
+  effect_consistent_p_func = effect_consistent_p;
     effects_computation_init_func = effects_computation_no_init;
     effects_computation_reset_func = effects_computation_no_reset;
 
-    effect_dup_func = reference_effect_dup;
-    effect_free_func = reference_effect_free;
+    effect_dup_func = copy_effect;
+    effect_free_func = free_effect;
 
     reference_to_effect_func = reference_to_reference_effect;
     effect_to_store_independent_effect_list_func = 
@@ -136,11 +138,12 @@ set_methods_for_proper_references()
 void
 set_methods_for_cumulated_references()
 {
+  effect_consistent_p_func = effect_consistent_p;
     effects_computation_init_func = effects_computation_no_init;
     effects_computation_reset_func = effects_computation_no_reset;
 
-    effect_dup_func = reference_effect_dup;
-    effect_free_func = reference_effect_free;
+    effect_dup_func = copy_effect;
+    effect_free_func = free_effect;
 
     reference_to_effect_func = reference_to_reference_effect;
     effect_to_store_independent_effect_list_func = 
@@ -212,6 +215,7 @@ void
 set_methods_for_proper_simple_effects()
 {
 
+  effect_consistent_p_func = effect_consistent_p;
     effects_computation_init_func = effects_computation_no_init;
     effects_computation_reset_func = effects_computation_no_reset;
 
@@ -283,6 +287,7 @@ set_methods_for_proper_simple_effects()
 void
 set_methods_for_simple_effects()
 {
+  effect_consistent_p_func = effect_consistent_p;
     effects_computation_init_func = effects_computation_no_init;
     effects_computation_reset_func = effects_computation_no_reset;
 
@@ -404,18 +409,24 @@ void reset_methods_for_inout_effects()
 
 void set_methods_for_rw_effects_prettyprint(string module_name __attribute__ ((unused)))
 {
-    effects_prettyprint_func = print_effects;
-    effects_to_text_func = simple_rw_effects_to_text;
+  set_action_interpretation(ACTION_READ, ACTION_WRITE);
+  effects_prettyprint_func = print_effects;
+  effect_prettyprint_func = print_effect;
+  effects_to_text_func = simple_rw_effects_to_text;
 }
 
 void set_methods_for_inout_effects_prettyprint(string module_name __attribute__ ((unused)))
 {
-    effects_prettyprint_func = print_effects;
-    effects_to_text_func = simple_inout_effects_to_text;
+  set_action_interpretation(ACTION_IN, ACTION_OUT);
+  effects_prettyprint_func = print_effects;
+  effect_prettyprint_func = print_effect;
+  effects_to_text_func = simple_inout_effects_to_text;
 }
 
 void reset_methods_for_effects_prettyprint(string module_name __attribute__ ((unused)))
 {
     effects_prettyprint_func = (generic_prettyprint_function) abort;
+    effect_prettyprint_func = (generic_prettyprint_function) abort;
     effects_to_text_func = (generic_text_function) abort;
+    reset_action_interpretation();
 }

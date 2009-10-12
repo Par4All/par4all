@@ -441,7 +441,7 @@ list /* of string */ effect_words_reference(reference obj)
 }
 
 
-/************************************************************ OLD INTERFACES */
+/************************************************************ INTERFACES */
 
 static void 
 push_prettyprints(
@@ -495,3 +495,26 @@ print_source_or_code_with_any_effects_engine(
     reset_generic_prettyprints();
     return ok;
 }
+
+
+void 
+generic_print_effects( list pc)
+{
+  /* Well that should not be done this way BC. */ 
+  extern bool region_consistent_p(effect);  
+  if(effect_consistent_p_func == region_consistent_p &&
+     effects_reference_sharing_p(pc, FALSE)) {
+      pips_internal_error("A list of regions share some references");
+    }
+
+  if (pc != NIL) {
+    FOREACH(EFFECT, e, pc)
+      {	
+	(*effect_consistent_p_func)(e); 
+	(*effect_prettyprint_func)(e);
+      }
+  }
+  else 
+    fprintf(stderr, "\t<NONE>\n");
+}
+

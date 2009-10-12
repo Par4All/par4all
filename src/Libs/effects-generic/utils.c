@@ -50,6 +50,9 @@
 /* GENERIC FUNCTIONS on lists of effects to be instanciated for specific 
    types of effects */
 
+/* consistency checking */
+void (*effect_consistent_p_func)(effect);
+
 /* initialisation and finalization */
 void (*effects_computation_init_func)(string /* module_name */);
 void (*effects_computation_reset_func)(string /* module_name */);
@@ -167,11 +170,9 @@ statement_effects  (*db_get_out_effects_func)(char *);
 void (*db_put_out_effects_func)(char *, statement_effects);
 
 
-/*
- * CAUTION! 3 NEXTS ARE OBSOLETE! just kept for the old engine!
- */
 /* prettyprint function for debug */
-void (*effects_prettyprint_func)(list);
+void (*effects_prettyprint_func)(list); /* should be avoided : use print_effects instead */
+void (*effect_prettyprint_func)(effect);
 
 /* prettyprint function for sequential and user views */
 text (*effects_to_text_func)(list);
@@ -262,6 +263,7 @@ generic_effects_reset_all_methods()
     set_prettyprint_with_attachments(FALSE);
 
     effects_prettyprint_func = (void_function) UNDEF;
+    effect_prettyprint_func = (void_function) UNDEF;
     effects_to_text_func = (text_function) UNDEF;
     attach_effects_decoration_to_text_func = (void_function) UNDEF;
 
@@ -879,6 +881,63 @@ effect make_anywhere_effect(action ac)
   
 }
 
+/**
+   remove duplicate anywhere effects and keep anywhere effects and
+   effects not combinable with anywhere effects.
+   
+   @param l_eff is a list of effects
+   @return a new list with no sharing with the initial effect list.
+   
+ */
+list clean_anywhere_effects(list l_eff)
+{
+  list l_tmp;
+  list l_res;
+  bool anywhere_w_p = false;
+  bool anywhere_r_p = false;
+
+  l_tmp = l_eff;
+  while (!anywhere_w_p && !anywhere_r_p && !ENDP(l_tmp))
+    {
+      effect eff = EFFECT(CAR(l_tmp));
+      if (anywhere_effect_p(eff))
+	{
+	  anywhere_w_p = effect_write_p(eff);
+	  anywhere_r_p = effect_read_p(eff);
+	}
+      
+      POP(l_tmp);
+    }
+
+  l_res = NIL;
+
+  if (anywhere_r_p)
+    l_res = gen_nconc(l_res, 
+		      CONS(EFFECT, make_anywhere_effect(make_action_read()), 
+			   NIL));
+  if (anywhere_w_p)
+    l_res = gen_nconc(l_res, 
+		      CONS(EFFECT, make_anywhere_effect(make_action_write()), 
+			   NIL));
+  
+  
+  l_tmp = l_eff;
+  while (!ENDP(l_tmp))
+    {
+      effect eff = EFFECT(CAR(l_tmp));
+      
+      
+      if (malloc_effect_p(eff) || io_effect_p(eff) ||
+	  (effect_write_p(eff) && !anywhere_w_p) ||
+	  (effect_read_p(eff) && !anywhere_r_p))
+	{
+	  l_res = gen_nconc(l_res, CONS(EFFECT, copy_effect(eff), NIL));
+	}     
+      POP(l_tmp);
+    }
+  
+  return l_res;
+}
 
 /********************** Effects on all accessible paths  ***************/
 
