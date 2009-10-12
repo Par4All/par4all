@@ -25,14 +25,14 @@ Cumulated effects for "make_s"
 
 //               <may be read    >: TOP-LEVEL:*MEMORY*
 //               <may be written >: TOP-LEVEL:*MEMORY*
-//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_ i
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
 //               <must be written>: _MALLOC_EFFECTS:_MALLOC_
 s_t make_s(int i, float x)
 {
 //               <may be read    >: TOP-LEVEL:*MEMORY*
 //               <may be written >: TOP-LEVEL:*MEMORY*
-//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_ i
-//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ p
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_
    // BEGIN BLOCK
    s_t *p;
    extern char *malloc(int);
@@ -88,8 +88,8 @@ int main()
 {
 //               <may be read    >: TOP-LEVEL:*MEMORY*
 //               <may be written >: TOP-LEVEL:*MEMORY*
-//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_ j
-//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ s s[1]
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_
    // BEGIN BLOCK
    s_t s;
    int j;

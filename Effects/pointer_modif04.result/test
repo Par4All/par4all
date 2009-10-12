@@ -66,8 +66,8 @@ int main()
 {
 //               <may be read    >: TOP-LEVEL:*MEMORY*
 //               <may be written >: TOP-LEVEL:*MEMORY*
-//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_ s
-//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ s[1] s[2]
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_
    // BEGIN BLOCK
    s_t s;
    int j;

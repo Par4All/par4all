@@ -29,8 +29,6 @@ int main()
 {
 //               <may be read    >: TOP-LEVEL:*MEMORY*
 //               <may be written >: TOP-LEVEL:*MEMORY*
-//               <must be read   >: p
-//               <must be written>: p[0] q
    // BEGIN BLOCK
    int *p;
    int *q;
