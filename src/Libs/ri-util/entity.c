@@ -1751,15 +1751,15 @@ entity make_entity_copy_with_new_name(entity e,
   int number = 0;
 
   /* Find the first matching non-already existent variable name: */
-  do {
+  while(gen_find_tabulated(variable_name, entity_domain)
+    != entity_undefined)
+  {
     if (variable_name != NULL)
       /* Free the already allocated name in the previous iteration that
 	 was conflicting: */
       free(variable_name);
     asprintf(&variable_name, "%s_%d", global_new_name, number++);
   }
-  while(gen_find_tabulated(variable_name, entity_domain)
-    != entity_undefined);
 
   //extended_integer_constant_expression_p(e)
 
