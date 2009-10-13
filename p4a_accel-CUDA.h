@@ -105,13 +105,13 @@ extern cudaEvent_t p4a_start_event, p4a_stop_event;
 
 
 /** Get the coordinate of the virtual processor in X (first) dimension */
-#define P4A_vp_x (blockIdx.x*blockDim.x + threadIdx.x)
+#define P4A_vp_0 (blockIdx.x*blockDim.x + threadIdx.x)
 
 /** Get the coordinate of the virtual processor in Y (second) dimension */
-#define P4A_vp_y (blockIdx.y*blockDim.y + threadIdx.y)
+#define P4A_vp_1 (blockIdx.y*blockDim.y + threadIdx.y)
 
 /** Get the coordinate of the virtual processor in Z (second) dimension */
-#define P4A_vp_z (blockIdx.z*blockDim.z + threadIdx.z)
+#define P4A_vp_2 (blockIdx.z*blockDim.z + threadIdx.z)
 
 
 /** @defgroup P4A_memory_allocation_copy Memory allocation and copy

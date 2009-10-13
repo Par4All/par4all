@@ -80,15 +80,15 @@ extern __thread int P4A_vp_coordinate[P4A_vp_dim_max];
 
 
 /** Get the coordinate of the virtual processor in X (first) dimension */
-#define P4A_vp_x P4A_vp_coordinate[0]
+#define P4A_vp_0 P4A_vp_coordinate[0]
 
 
 /** Get the coordinate of the virtual processor in Y (second) dimension */
-#define P4A_vp_y P4A_vp_coordinate[1]
+#define P4A_vp_1 P4A_vp_coordinate[1]
 
 
 /** Get the coordinate of the virtual processor in Z (second) dimension */
-#define P4A_vp_z P4A_vp_coordinate[2]
+#define P4A_vp_2 P4A_vp_coordinate[2]
 
 
 /** @defgroup P4A_memory_allocation_copy Memory allocation and copy
@@ -251,9 +251,9 @@ extern __thread int P4A_vp_coordinate[P4A_vp_dim_max];
 #define P4A_call_accel_kernel_1d(kernel, size, ...)		\
   _Pragma("omp parallel for")					\
   for(int P4A_index_x = 0; P4A_index_x < size; P4A_index_x++) {	\
-    P4A_vp_x = P4A_index_x;					\
-    P4A_vp_y = 0;						\
-    P4A_vp_z = 0;						\
+    P4A_vp_0 = P4A_index_x;					\
+    P4A_vp_1 = 0;						\
+    P4A_vp_2 = 0;						\
     kernel(__VA_ARGS__);					\
   }
 
@@ -274,9 +274,9 @@ extern __thread int P4A_vp_coordinate[P4A_vp_dim_max];
   _Pragma("omp parallel for")						\
   for(int P4A_index_x = 0; P4A_index_x < n_x_iter; P4A_index_x++) {	\
     for(int P4A_index_y = 0; P4A_index_y < n_y_iter; P4A_index_y++) {	\
-      P4A_vp_x = P4A_index_x;						\
-      P4A_vp_y = P4A_index_y;						\
-      P4A_vp_z = 0;							\
+      P4A_vp_0 = P4A_index_x;						\
+      P4A_vp_1 = P4A_index_y;						\
+      P4A_vp_2 = 0;							\
      kernel(__VA_ARGS__);						\
     }									\
   }
