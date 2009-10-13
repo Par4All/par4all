@@ -1676,32 +1676,34 @@ static void atom_cse_expression(expression e)
 
       /* create a new atom... */
       atom = atomize_this_expression(hpfc_new_variable, e);
-      /* At fisrt, this statement is set "virtual" */
-      set_comment_of_statement(atom,strdup("1"));
-      insert_before_statement(atom, current_statement, TRUE);
+      if(atom) {
+          /* At fisrt, this statement is set "virtual" */
+          set_comment_of_statement(atom,strdup("1"));
+          insert_before_statement(atom, current_statement, TRUE);
 
-      /* don't visit it later, just in case... */
-      gen_recurse_stop(atom);
-      {
-	entity scalar;
-	call ic;
-	syntax s = expression_syntax(e);
-	instruction i = statement_instruction(atom);
-	pips_assert("it is a reference", syntax_reference_p(s));
-	pips_assert("instruction is an assign", 
-		    instruction_call_p(i)); /* ??? */
-		    
-	scalar = reference_variable(syntax_reference(s));
-	ic = instruction_call(i);
-	
-	/* if there are variants in the expression it cannot be moved,
-	   and it is not available. Otherwise I should move it?
-	 */
-	aspt = make_available_scalar(scalar, 
-				     current_statement,
-				     EXPRESSION(CAR(CDR(call_arguments(ic)))));
-	
-	current_availables = CONS(STRING, (char*)aspt, current_availables);
+          /* don't visit it later, just in case... */
+          gen_recurse_stop(atom);
+          {
+              entity scalar;
+              call ic;
+              syntax s = expression_syntax(e);
+              instruction i = statement_instruction(atom);
+              pips_assert("it is a reference", syntax_reference_p(s));
+              pips_assert("instruction is an assign", 
+                      instruction_call_p(i)); /* ??? */
+
+              scalar = reference_variable(syntax_reference(s));
+              ic = instruction_call(i);
+
+              /* if there are variants in the expression it cannot be moved,
+                 and it is not available. Otherwise I should move it?
+                 */
+              aspt = make_available_scalar(scalar, 
+                      current_statement,
+                      EXPRESSION(CAR(CDR(call_arguments(ic)))));
+
+              current_availables = CONS(STRING, (char*)aspt, current_availables);
+          }
       }
     }
     else /* exp == e == <right expression of assignment> 
