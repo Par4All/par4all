@@ -16,3 +16,10 @@ void microcode(short image[N][N], short kernel[3][3], short new_image[N][N], sho
     }
 
 }
+
+void micromachine(short image[N][N], short kernel[3][3], short new_image[N][N], short N1, short N2 )
+{
+    microcode(image,kernel,new_image,N1,N2);
+    for(N1=0;N1<N;N1++)
+        printf("%d",new_image[N1][N1]);
+}
