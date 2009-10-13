@@ -7,10 +7,14 @@ int main()
    int n = 0;
    int o = 2;
 
+
+
    for(m = 0; m <= 9; m += 1) {                                         /*0009*/
       n = n+1;                                                          /*0010*/
       a[m] = n;                                                         /*0011*/
    }
+
+
 
    for(m = 0; m <= 9; m += 1) {                                         /*0014*/
       o = 2+o;                                                          /*0017*/
@@ -33,10 +37,14 @@ int main()
    int n = 0;
    int o = 2;
 
+
+
    for(m = 0; m <= 9; m += 1) {                                         /*0009*/
       n = n+1;                                                          /*0010*/
       a[m] = n;                                                         /*0011*/
    }
+
+
 
 #pragma omp parallel for reduction(+:o)
    for(m = 0; m <= 9; m += 1) {                                         /*0014*/

@@ -5,11 +5,15 @@ int main(void)
    int i = 0;
    int sum = 0;
 
+
+
    for(k = 0; k <= 99; k += 1) {                                        /*0006*/
       for(i = 0; i <= 99; i += 1)                                       /*0007*/
          sum += i;                                                      /*0008*/
       sum += k;                                                         /*0010*/
    }
+
+
 
    for(i = 0; i <= 99; i += 1)                                          /*0013*/
       sum += i;                                                         /*0014*/
@@ -24,6 +28,8 @@ int main(void)
    int i = 0;
    int sum = 0;
 
+
+
 #pragma omp parallel for reduction(+:sum)
    for(k = 0; k <= 99; k += 1) {                                        /*0006*/
 #pragma omp parallel for reduction(+:sum)
@@ -31,6 +37,8 @@ int main(void)
          sum += i;                                                      /*0008*/
       sum += k;                                                         /*0010*/
    }
+
+
 
 #pragma omp parallel for reduction(+:sum)
    for(i = 0; i <= 99; i += 1)                                          /*0013*/
