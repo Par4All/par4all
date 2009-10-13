@@ -72,11 +72,6 @@ apply LOOP_NORMALIZE
 apply SUPPRESS_DEAD_CODE
 display PRINTED_FILE
 
-echo
-echo Microcode after normalization
-echo
-apply  NORMALIZE_MICROCODE
-#display PRINTED_FILE
 
 #echo
 #echo Microcode After atomization
