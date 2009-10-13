@@ -405,7 +405,7 @@ bool kernelize(char * module_name)
     pips_user_error("label '%s' not found in module '%s' \n",loop_label_name,module_name);
 
 
-  /* run terapixify */
+  /* run kernelize */
   gen_context_recurse(get_current_module_statement(),loop_label_entity,statement_domain,do_kernelize,gen_null);
 
   /* validate */
@@ -540,7 +540,10 @@ static
 bool can_terapixify_expression_p(expression e, bool *can_terapixify)
 {
     basic b = expression_basic(e);
-    if(!basic_int_p(b) && ! basic_overloaded_p(b) )
+    while( basic_pointer_p(b))
+        b = variable_basic(type_variable(ultimate_type(basic_pointer(b))));
+
+    if(!basic_int_p(b) && ! basic_overloaded_p(b))
     {
         list ewords = words_expression(e);
         string estring = words_to_string(ewords);
@@ -605,12 +608,14 @@ bool normalize_microcode( char * module_name)
      * - integer are loop parameters
      * - others are not allowded
      */
+    size_t nb_fifo = 0;
+    size_t nb_ptr = 0;
     FOREACH(ENTITY,e,code_declarations(value_code(entity_initial(get_current_module_entity()))))
     {
         if(formal_parameter_p(e))
         {
             variable v = type_variable(entity_type(e));
-            if( !ENDP(variable_dimensions(v)) ) /* it's an array */
+            if( basic_pointer_p(variable_basic(v)) ) /* it's a pointer */
             {
                 bool parameter_written = find_write_effect_on_entity(get_current_module_statement(),e);
                 if( parameter_written ) /* it's an image */
@@ -637,10 +642,41 @@ bool normalize_microcode( char * module_name)
                     else {
                         printf("%s seems an image\n",entity_user_name(e));
                     }
+                    /* change parameter name and generate an assignment */
+                    {
+                        string new_name;
+                        asprintf(&new_name,"%s" MODULE_SEP_STRING "FIFO%u",entity_module_name(e),nb_fifo++);
+                        entity ne = make_entity_copy_with_new_name(e,new_name,false);
+                        free(new_name);
+
+                        for(list iter = code_declarations(value_code(entity_initial(get_current_module_entity())));
+                                !ENDP(iter);
+                                POP(iter))
+                        {
+                            entity ee = ENTITY(CAR(iter));
+                            if(same_entity_p(e,ee)) {
+                                CAR(iter).p=ne;
+                            }
+                        }
+                        /* we now have FIFOx in ne and will generate an assignment from ne to e 
+                         * we also have to change the storage for e ...*/
+                        free_storage(entity_storage(e)); entity_storage(e) = storage_undefined;
+                        AddEntityToCurrentModule(e);
+                        statement ass = make_assign_statement(entity_to_expression(e),entity_to_expression(ne));
+                        insert_statement(get_current_module_statement(),ass,true);
+
+                        /* to respect terapix asm, we also have to change the name of variable e */
+                        asprintf(&new_name,"%s" MODULE_SEP_STRING "im%u",entity_module_name(e),nb_ptr++);
+                        ne = make_entity_copy_with_new_name(e,new_name,false);
+                        AddEntityToCurrentModule(ne);
+                        free(new_name);
+                        replace_entity(get_current_module_statement(),e,ne);
+                    }
                 }
             }
             else if( entity_used_in_loop_bound_p(e) )
             {
+                printf("%s seems a loop bound\n",entity_user_name(e));
             }
             else {
                 printf("parameter %s is not valid\n",entity_user_name(e));
@@ -650,12 +686,15 @@ bool normalize_microcode( char * module_name)
         }
     }
 
+    /* validate */
+    module_reorder(get_current_module_statement());
+    DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name,get_current_module_statement());
 
     /*postlude*/
     reset_current_module_entity();
     reset_current_module_statement();
     reset_cumulated_rw_effects();
-    return can_terapixify;
+    return true || can_terapixify;
 }
 
 /**
@@ -955,15 +994,15 @@ void two_addresses_code_generator(statement s)
 
                     if(expression_constant_p(rhs))
                     {
-                        entity tmp = make_new_scalar_variable(get_current_module_entity(),copy_basic(basic_of_expression(rhs)));
-                        entity_initial(tmp)=make_value_expression(rhs);
+                        entity tmp = make_new_scalar_variable(get_current_module_entity(),basic_of_expression(rhs));
+                        entity_initial(tmp)=make_value_expression(copy_expression(rhs));
                         AddLocalEntityToDeclarations(tmp,get_current_module_entity(),s);
                         rhs=entity_to_expression(tmp);
                     }
                     entity tmp = make_new_scalar_variable(get_current_module_entity(),copy_basic(basic_of_expression(rhs)));
                     AddLocalEntityToDeclarations(tmp,get_current_module_entity(),s);
                     entity_initial(tmp)=make_value_expression(copy_expression(rhs));
-                    statement copy_lhs/*3*/ = make_assign_statement(lhs,copy_expression(rhs));
+                    statement copy_lhs/*3*/ = make_assign_statement(copy_expression(lhs),copy_expression(rhs));
                     statement copy_tmp/*4*/ = make_assign_statement(copy_expression(rhs),entity_to_expression(tmp));
                     CAR(args).p=(gen_chunkp)copy_expression(rhs);
                     instruction_block(theblock)=make_statement_list(thecall,copy_lhs,copy_tmp);
