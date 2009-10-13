@@ -2074,9 +2074,17 @@ void psi_to_phi_region(region reg)
     }
 
     reg_ref = make_regions_reference(region_entity(reg));
-    reference_variable(effect_reference(reg)) = entity_undefined;
-    free_reference(effect_reference(reg));
-    effect_reference(reg) = reg_ref;
+
+    free_reference(effect_any_reference(reg));
+
+    if(cell_preference_p(effect_cell(reg))) 
+      {
+	preference_reference(cell_preference(effect_cell(reg)))= reg_ref;
+      }
+    else
+      {
+	cell_reference(effect_cell(reg)) = reg_ref;
+      }
 }
 
 /* void phi_to_psi_region(effect reg)
@@ -2099,9 +2107,16 @@ void phi_to_psi_region(region reg)
 			       (Variable) make_psi_entity(i));
     }
     reg_ref = make_regions_psi_reference(region_entity(reg));
-    reference_variable(effect_reference(reg)) = entity_undefined;
-    free_reference(effect_reference(reg));
-    effect_reference(reg) = reg_ref;
+    free_reference(effect_any_reference(reg));
+    if(cell_preference_p(effect_cell(reg))) 
+      {
+	preference_reference(cell_preference(effect_cell(reg)))= reg_ref;
+      }
+    else
+      {
+	cell_reference(effect_cell(reg)) = reg_ref;
+      }
+
 }
 
 

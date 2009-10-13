@@ -131,6 +131,5 @@ void replace_in_sequence_statement_with (statement old_stat,
 
 list references_for_regions (list l_regions);
 
-reference region_reference (effect reg);
 
 #endif

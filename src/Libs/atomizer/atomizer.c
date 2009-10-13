@@ -611,7 +611,7 @@ Block *cb;
     for(lce = cumu_effs; lce != NIL; lce = CDR(lce))
     {
 	effect eff = EFFECT(CAR(lce));
-	entity eff_e = reference_variable(effect_reference(eff));
+	entity eff_e = reference_variable(effect_any_reference(eff));
 	if( entity_scalar_p(eff_e) &&
 	   (action_tag(effect_action(eff)) == is_action_write) )
 	{

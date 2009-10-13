@@ -72,7 +72,7 @@ make_base_phi_variables(region reg)
     pips_debug(4,"begin\n");
     phi_variables = BASE_NULLE;
 
-    indices = reference_indices(region_reference(reg));
+    indices = reference_indices(region_any_reference(reg));
     MAP(EXPRESSION, index,
 	{
 	    entity e;

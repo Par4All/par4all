@@ -1711,7 +1711,7 @@ static void claire_references(int taskNumber, list l_regions, stack indices, str
    for ( lr = l_regions; !ENDP(lr); lr = CDR(lr))
      {
        region re = REGION(CAR(lr));
-       reference ref = region_reference(re);
+       reference ref = effect_any_reference(re);
        if (array_reference_p(ref) && region_read_p(re)) {
 	 atleast_one_read_ref = TRUE;
 	 if (comma) string_buffer_append(result,concatenate(",",CLAIRE_RL,NULL));
@@ -1732,7 +1732,7 @@ static void claire_references(int taskNumber, list l_regions, stack indices, str
    for ( lr = l_regions; !ENDP(lr); lr = CDR(lr))
      {
        region re = REGION(CAR(lr));
-       reference ref = region_reference(re);
+       reference ref = effect_any_reference(re);
        if (array_reference_p(ref) && region_write_p(re)) { 
 	 atleast_one_written_ref = TRUE;
 	 if (comma) string_buffer_append(result, concatenate(",",CLAIRE_RL,NULL));

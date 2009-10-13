@@ -282,7 +282,7 @@ statement build_assigne_region0(int nb,region reg,entity array_region)
 					       copy_expression(dimension_upper(dim_d))),
 			 FALSE);
       },
-      reference_indices(region_reference(reg)));
+      reference_indices(effect_any_reference(reg)));
 
   pips_debug(1, "body = %p\n", body);
   return body;

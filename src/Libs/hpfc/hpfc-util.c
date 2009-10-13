@@ -55,7 +55,7 @@ bool written_effect_p(
 {
     MAP(EFFECT, e,
     {
-	if (reference_variable(effect_reference(e))==var &&
+	if (reference_variable(effect_any_reference(e))==var &&
 	    action_write_p(effect_action(e)))
 	    return TRUE;
     },

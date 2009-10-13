@@ -38,9 +38,14 @@
     make_effect(make_cell(is_cell_preference, make_preference(reference)),\
 		(action), (approximation),	\
 		make_descriptor(is_descriptor_convex,system))
-/* To be avoided. Use region_any_reference() instead */
-#define region_reference(reg) \
+/* To be avoided. Use region_any_reference() instead.
+ I definitely remove this one : it is too dangerous. BC.
+*/
+/* #define region_reference(reg)					\
     preference_reference(cell_preference(effect_cell(reg)))
+*/
+#define region_reference(reg) \
+  pips_error("region_reference is not defined anymore \n")
 #define region_any_reference(reg) \
   (cell_preference_p(effect_cell(reg)) ? preference_reference(cell_preference(effect_cell(reg))) : cell_reference(effect_cell(reg)))
 #define region_action(reg) effect_action(reg)

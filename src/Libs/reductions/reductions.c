@@ -249,12 +249,12 @@ static bool safe_effects_for_reductions(statement s, reductions rs)
 
     MAP(EFFECT, e,
     {
-	if ((effect_write_p(e) && !gen_in_list_p(effect_reference(e), lr)) ||
+	if ((effect_write_p(e) && !gen_in_list_p(effect_any_reference(e), lr)) ||
 	    io_effect_entity_p(effect_variable(e)))
 	{
 	    pips_debug(8, "effect on %s (ref %p) not trusted\n",
 		       entity_name(effect_variable(e)),
-		       effect_reference(e));
+		       effect_any_reference(e));
 
 	    gen_free_list(lr);
 	    return FALSE;

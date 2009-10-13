@@ -177,9 +177,9 @@ static bool whole_loop_parallelize(loop l)
      * regions (they have been composed by the loop transformer).
      */
     levels = TestCoupleOfReferences(l_enclosing_loops, region_system(reg1),
-				    inner_stat, reg1, region_reference(reg1),
+				    inner_stat, reg1, effect_any_reference(reg1),
 				    l_enclosing_loops, region_system(reg2),
-				    inner_stat, reg2, region_reference(reg2),
+				    inner_stat, reg2, effect_any_reference(reg2),
 				    NIL, &gs, &levelsop, &gsop);
     ifdebug(2) {
       fprintf(stderr, "result:\n");

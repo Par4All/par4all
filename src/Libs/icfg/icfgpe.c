@@ -55,7 +55,7 @@ list /* of effect */ effects_filter(list l_effs)
     MAPL(l, {
       effect eff = EFFECT(CAR(l));
       action ac = effect_action(eff);
-      reference ref = effect_reference(eff);
+      reference ref = effect_any_reference(eff);
       entity ent = reference_variable(ref);
       if (entity_conflict_p(e_flt, ent) && !action_read_p(ac))
 	l_flt = CONS(EFFECT, eff, l_flt);

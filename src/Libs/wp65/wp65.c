@@ -109,7 +109,7 @@ static void print_ref(reference r)
 
 static void print_eff(effect e)
 {
-  print_ref(effect_reference(e));
+  print_ref(effect_any_reference(e));
 }
 
 static void debug_refs(gen_chunk *x)

@@ -485,7 +485,7 @@ static region find_union_regions(list l_regions,entity e)
   while (!ENDP(l_regions))
     {
       region re = REGION(CAR(l_regions));
-      reference ref = region_reference(re);
+      reference ref = effect_any_reference(re);
       entity array = reference_variable(ref); 
       if (same_entity_lname_p(array,e))
 	{

@@ -960,7 +960,7 @@ simple_switch_old_to_new(statement s)
     {
 	MAP(EFFECT, e,
         {
-	    entity v = reference_variable(effect_reference(e));
+	    entity v = reference_variable(effect_any_reference(e));
 	    if (same_primary_entity_p(v,new_variable) && effect_write_p(e))
 	    {
 		pips_debug(9, "%s W in %p\n", entity_name(new_variable), s);

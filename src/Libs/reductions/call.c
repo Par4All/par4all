@@ -53,7 +53,7 @@ summary_to_proper_reference(
     lef = summary_effect_to_proper_effect(c, e);
 
     FOREACH (EFFECT, ef, lef) {
-      lref = CONS(REFERENCE, effect_reference(ef), lref);
+      lref = CONS(REFERENCE, effect_any_reference(ef), lref);
     }
 
     gen_map(gen_free, lef);

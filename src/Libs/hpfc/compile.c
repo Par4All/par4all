@@ -788,7 +788,7 @@ static bool loop_flt(loop l)
 
     MAP(EFFECT, e,
     {
-	reference r = effect_reference(e);
+	reference r = effect_any_reference(e);
 	entity v = reference_variable(r);
 
 	if (array_distributed_p(v) && effect_write_p(e))
@@ -929,7 +929,7 @@ void update_common_references_in_regions()
 		   "statement %p (%d effects)\n", 
 		   stat, gen_length((list) lef));
 	     
-	     MAP(EFFECT, e, update_common_rewrite(effect_reference(e)), 
+	     MAP(EFFECT, e, update_common_rewrite(effect_any_reference(e)), 
 		 (list) lef);
 	 },
 	     get_rw_effects());

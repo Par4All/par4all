@@ -423,7 +423,7 @@ statement s;
     
     MAP(EFFECT, e,
      {
-	 if (reference_variable(effect_reference(e)) == var)
+	 if (reference_variable(effect_any_reference(e)) == var)
 	 {
 	     if (!approximation_must_p(effect_approximation(e)) ||
 		 !rectangular_region_p(effect_system(e)))
@@ -638,7 +638,7 @@ Psysteme get_read_effect_area(list le, entity var)
     MAP(EFFECT, e,
      {
 	 if (action_read_p(effect_action(e)) &&
-	     reference_variable(effect_reference(e))==var)
+	     reference_variable(effect_any_reference(e))==var)
 	     return effect_system(e);
      },
 	 le);

@@ -468,7 +468,7 @@ static statement step_build_compute_region(list loop_data_l, region reg2, entity
   MAP(EXPRESSION, exp, {
     _build_compute_region(exp, sys, reg, array_region, slices, &d, &body);
   },
-      reference_indices(region_reference(reg)));
+      reference_indices(effect_any_reference(reg)));
   
   //ajout de la region en commentaire
   reset_action_interpretation();

@@ -953,7 +953,7 @@ void io_efficient_compile(
   // for each effect e on that statement
   FOREACH(effect, e, entities)
   {
-    entity array = reference_variable(effect_reference(e));
+    entity array = reference_variable(effect_any_reference(e));
     pips_debug(3, "variable %s\n", entity_name(array));
 
     if (io_effect_entity_p(array)) // skip LUNS

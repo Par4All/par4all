@@ -81,7 +81,7 @@ static void step_drop_complex_constraints(region reg)
       entity phi=reference_variable(syntax_reference(s));
       phi_l=CONS(ENTITY,phi,phi_l);
     },
-    reference_indices(region_reference(reg)));
+    reference_indices(effect_any_reference(reg)));
 
   sc_base(region_system(reg)) = BASE_NULLE;
 

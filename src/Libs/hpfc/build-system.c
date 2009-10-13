@@ -501,7 +501,7 @@ effect entity_to_region(
     list l = load_statement_local_regions(stat);
 
     MAP(EFFECT, e,
-	if ((reference_variable(effect_reference(e))==ent) &&
+	if ((reference_variable(effect_any_reference(e))==ent) &&
 	    (action_tag(effect_action(e))==act)) return(e),
 	l);
 

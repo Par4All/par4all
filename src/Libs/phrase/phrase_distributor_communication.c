@@ -144,7 +144,7 @@ entity make_start_ru_module (hash_table ht_params,
     /* Processing PARAMS regions */
     MAP (REGION, reg, {
       expression new_param;
-      reference ref = region_reference(reg);
+      reference ref = effect_any_reference(reg);
       entity local_variable
 	= entity_in_module (get_common_param_name(reference_variable(ref), function), start_ru_module);
       list indices = NIL;
@@ -709,7 +709,7 @@ static statement make_array_communication_statement(entity function,
 
   ps_reg = region_system(reg);
 
-  ref = region_reference(reg);
+  ref = effect_any_reference(reg);
   param_inds = gen_copy_seq(reference_indices(ref));
   if (number_of_deployment_units > 1) {
     local_entity_inds = gen_nconc(gen_copy_seq(reference_indices(ref)),CONS(EXPRESSION, make_expression_from_entity(unit_id),NIL));

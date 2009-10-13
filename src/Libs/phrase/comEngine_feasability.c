@@ -769,18 +769,18 @@ static bool check_for_conflict(reference ref)
 	    effect_write_p(sinkEff)))
 	  continue;
 
-	reference readRef = effect_reference(conflict_source(c));
-	reference writeRef = effect_reference(conflict_sink(c));
+	reference readRef = effect_any_reference(conflict_source(c));
+	reference writeRef = effect_any_reference(conflict_sink(c));
 
 	if(effect_read_p(sourceEff))
 	  {
-	    readRef = effect_reference(sourceEff);
-	    writeRef = effect_reference(sinkEff);
+	    readRef = effect_any_reference(sourceEff);
+	    writeRef = effect_any_reference(sinkEff);
 	  }
 	else
 	  {
-	    writeRef = effect_reference(sourceEff);
-	    readRef = effect_reference(sinkEff);
+	    writeRef = effect_any_reference(sourceEff);
+	    readRef = effect_any_reference(sinkEff);
 	  }
 
 	// If this conflict does not involve ref,
@@ -809,8 +809,8 @@ static bool check_for_conflict(reference ref)
 	printf("write\n");
 	print_reference(writeRef);printf("\n");
 	*/
-	//print_reference(effect_reference(sourceEff));printf("\n");
-	//print_reference(effect_reference(sinkEff));printf("\n");
+	//print_reference(effect_any_reference(sourceEff));printf("\n");
+	//print_reference(effect_any_reference(sinkEff));printf("\n");
 
 	// If the conflict cone is not undefined, let us study it.
 	if(conflict_cone(c) != cone_undefined)
@@ -837,7 +837,7 @@ static bool check_for_conflict(reference ref)
 	      {
 		// If the conflict does not prevent the pipeline then continue
 		if(is_good_direction_p(gs, maxLevel,
-				       (readRef == effect_reference(sourceEff))))
+				       (readRef == effect_any_reference(sourceEff))))
 		  {
 		    sg_fprint_as_ddv(stdout, gs);
 		    continue;

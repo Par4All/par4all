@@ -526,7 +526,7 @@ make_global_common_and_initialize (entity main_module,
       l_out = regions_dup(load_statement_out_regions(s));*/
      
     MAP (REGION, reg, {
-      reference ref = region_reference(reg);
+      reference ref = effect_any_reference(reg);
       entity variable = reference_variable(ref);
       entity param_id_variable =
 	create_new_integer_scalar_common_variable
@@ -540,7 +540,7 @@ make_global_common_and_initialize (entity main_module,
     }, l_in);
    
     MAP (REGION, reg, {
-      reference ref = region_reference(reg);
+      reference ref = effect_any_reference(reg);
       entity variable = reference_variable(ref);
       entity param_id_variable =
 	create_new_integer_scalar_common_variable

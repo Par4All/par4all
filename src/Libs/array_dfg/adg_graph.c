@@ -690,7 +690,7 @@ effect reff;
   reference	r1 = NULL, rsink = NULL;
 
   debug( 9, "adg_write_reference_list", "begin\n" );
-  r1 = effect_reference( reff );
+  r1 = effect_any_reference( reff );
   ls = vertex_successors( ver );
 
   for(; !ENDP( ls ); POP( ls ) ) {
@@ -700,7 +700,7 @@ effect reff;
     list         conflist = dg_arc_label_conflicts( dgal );
     
     for(; !ENDP( conflist ); POP( conflist )) {
-      rsink = effect_reference(conflict_sink(  CONFLICT(CAR( conflist )) ));
+      rsink = effect_any_reference(conflict_sink(  CONFLICT(CAR( conflist )) ));
       if (!(reference_equal_p( r1, rsink )) ) continue;
       ADD_ELEMENT_TO_LIST( ret_list, VERTEX, succ_ver );
     }
@@ -724,10 +724,10 @@ effect eff;
   reference 	r1 = NULL;
 
   debug(9, "in_effect_list_p", "begin\n");
-  r1 = effect_reference( eff );
+  r1 = effect_any_reference( eff );
 
   for(; !ENDP(l) && !ret_bo ; POP(l) ) {
-    reference r2 = effect_reference(EFFECT(CAR( l )));
+    reference r2 = effect_any_reference(EFFECT(CAR( l )));
     if ( reference_equal_p( r1, r2 ) ) ret_bo = TRUE;
   }
 
@@ -760,7 +760,7 @@ list	ent_l1, ent_l2;
    */
   for(aux_l = effs; !ENDP(aux_l); POP(aux_l)) {
     eff = EFFECT(CAR(aux_l));
-    ent = reference_variable( effect_reference( eff ) );
+    ent = reference_variable( effect_any_reference( eff ) );
     if ( !action_read_p(effect_action( eff ))) continue;
     if ( is_entity_in_list_p( ent, ent_l1 ))   continue;
     if ( is_entity_in_list_p( ent, ent_l2 ))   continue;

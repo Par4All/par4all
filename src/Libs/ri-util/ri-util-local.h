@@ -1139,9 +1139,13 @@
 
 /* FI: it would be useful to assert cell_preference_p(effect_cell(e)),
    but I do not know how to do it in such a way that it works both for
-   left hand sides and right hand sides using commas */
+   left hand sides and right hand sides using commas 
+   I definitely remove this one : it is too dangerous.
+*/
+/* #define effect_reference(e)					\
+   preference_reference(cell_preference(effect_cell(e))) */
 #define effect_reference(e) \
-         preference_reference(cell_preference(effect_cell(e)))
+  pips_error("effect_reference not defined anymore \n")
 
 /* FI: cannot be used as a left hand side */
 #define effect_any_reference(e) \

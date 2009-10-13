@@ -101,7 +101,7 @@ list  in_l;
       entity	ent = NULL;	/* variable readden by effect eff */
       
       eff = EFFECT(CAR( effs ));
-      ent = reference_variable( effect_reference( eff ) );
+      ent = reference_variable( effect_any_reference( eff ) );
       if (!action_read_p(effect_action( eff ))) continue;
       if (is_entity_in_list_p( ent, ent_l )) continue;
       if (is_entity_in_list_p( ent, in_l )) continue;
@@ -183,7 +183,7 @@ graph in_dg;
       entity	ent = NULL;	/* variable readden by effect eff */
 
       eff = EFFECT(CAR( effs ));
-      ent = reference_variable( effect_reference( eff ) );
+      ent = reference_variable( effect_any_reference( eff ) );
       if (!action_write_p(effect_action( eff ))) continue;
       w_ent = ent;
       break;
@@ -730,7 +730,7 @@ graph                   dup_dg;
 	
 	eff = EFFECT(CAR( sou_effs ));
 	if (!action_read_p(effect_action( eff ))) continue;
-	ent = reference_variable( effect_reference( eff ) );
+	ent = reference_variable( effect_any_reference( eff ) );
 	if ( ent != dest_ent)  continue;
 	if (is_entity_in_list_p( ent, sou_lcl )) continue;
 	ADD_ELEMENT_TO_LIST( sou_read, EFFECT, eff );
@@ -759,7 +759,7 @@ graph                   dup_dg;
 	 * subsitute those new entities in the 
 	 * expressions 
 	 */
-	sou_args = reference_indices(effect_reference(sou_eff));
+	sou_args = reference_indices(effect_any_reference(sou_eff));
 	
 	/* Make corresponding indices equal in source and dest
 	 * F(u) = g(b) and put it in sou_ps.

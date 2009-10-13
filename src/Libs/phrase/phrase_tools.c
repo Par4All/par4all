@@ -616,31 +616,13 @@ list references_for_regions (list l_regions)
   list l_ref = NIL;
  
   MAP (EFFECT, reg, {
-    reference ref = region_reference(reg);
+    reference ref = effect_any_reference(reg);
     l_ref = CONS (REFERENCE, ref, l_ref);
     print_reference(ref);
     pips_debug(4,"Entity: %s\n", entity_local_name(reference_variable(ref)));
   },l_regions);
 
   return l_ref;
-}
-
-/**
- * Return the reference of a region
- */
-reference region_reference (effect reg)
-{
-  reference ref = NULL;
-
-  cell c = effect_cell(reg);
-  if (cell_tag(c) == is_cell_preference) {
-    ref = preference_reference(cell_preference(c));
-  }
-  else if (cell_tag(c) == is_cell_reference) {
-    ref = cell_reference(c);
-  }
-
-  return ref;
 }
 
 

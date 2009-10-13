@@ -166,7 +166,7 @@ graph                   dup_dg;
 
       /* Get the current read_effect of destination */
       dest_read_eff = EFFECT(CAR( dest_readl ));
-      dest_args     = reference_indices(effect_reference(dest_read_eff));
+      dest_args     = reference_indices(effect_any_reference(dest_read_eff));
       if (get_debug_level() > 3) { /* For debug purpose */
 	fprintf(stderr, "\n\n-->  Source of Effect ?  ");
 	print_effects( CONS(EFFECT, dest_read_eff, NIL) );
@@ -191,7 +191,7 @@ graph                   dup_dg;
 	}
 
 	adg_update_dfg( source,
-		       effect_reference( dest_read_eff ),
+		       effect_any_reference( dest_read_eff ),
 		       ret_dest_ver,
 		       pa_full(),
 		       NULL,
@@ -471,7 +471,7 @@ graph                   dup_dg;
       }
 
       adg_update_dfg( source, 
-		     effect_reference( dest_read_eff ),
+		     effect_any_reference( dest_read_eff ),
 		     ret_dest_ver,
 		     pa_full(),
 		     dest_context,

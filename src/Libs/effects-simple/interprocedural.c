@@ -61,7 +61,7 @@ void simple_effects_translation_end()
 }
 
 
-void simple_effect_descriptor_interprocedural_translation(eff)
+void simple_effect_descriptor_interprocedural_translation(effect eff)
 {
 }
 
@@ -838,16 +838,19 @@ summary_effect_to_proper_effect(
       pips_user_warning("not handeled case, need to be implemented\n");
     } else {
       if (storage_formal_p(st)) {
+	effect res;
 	pips_debug (9, "storage formal case\n");
 	/* find the corresponding argument and returns the reference */
-	effect res = (*effect_dup_func)(e);
 	int n = formal_offset(storage_formal(st));
 	expression nth = EXPRESSION(gen_nth(n-1, call_arguments(c)));
 
 	pips_assert("expression is a reference or read effect",
 		    effect_read_p(e) || expression_reference_p(nth));
 	/* FI: a preference is forced here */
-	effect_reference(res) = expression_reference(nth);
+	res = make_effect(make_cell_preference(make_preference(expression_reference(nth))),
+			  copy_action(effect_action(e)), 
+			  copy_approximation(effect_approximation(e)),
+			  copy_descriptor(effect_descriptor(e)));
 
 	le = CONS(EFFECT, res, NIL);
       }

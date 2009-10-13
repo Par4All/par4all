@@ -564,7 +564,7 @@ static list references_for_regions(list l_regions)
   list l_ref = NIL;
   
   MAP(EFFECT, reg, {
-                     reference ref = region_reference(reg);
+                     reference ref = effect_any_reference(reg);
 
                      l_ref = CONS(REFERENCE, ref, l_ref);
                      print_reference(ref);

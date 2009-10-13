@@ -185,7 +185,7 @@ flint_check_uninitialized_variables_in_statement(statement s)
        ordering. I assume that to factorize the prettyprint: */
     MAP(EFFECT, an_effect,
 	{
-	    reference a_reference = effect_reference(an_effect);
+	    reference a_reference = effect_any_reference(an_effect);
 	    entity a_variable = reference_variable(a_reference);
 	    if (action_read_p(effect_action(an_effect))
 		&& flint_variable_uninitialize_elsewhere(s, a_variable)) {

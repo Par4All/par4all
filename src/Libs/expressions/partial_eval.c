@@ -177,8 +177,8 @@ bool entity_written_p(entity ent, effects fx)
 
   MAPL(ftl, {
       effect ft = EFFECT(CAR(ftl));
-      if( ENDP(reference_indices(effect_reference(ft)))
-	  && same_entity_p(ent, reference_variable(effect_reference(ft)))
+      if( ENDP(reference_indices(effect_any_reference(ft)))
+	  && same_entity_p(ent, reference_variable(effect_any_reference(ft)))
 	  && action_write_p(effect_action(ft)) )
 	return(TRUE);
     }, effects_effects(fx));

@@ -382,15 +382,23 @@ simple_effect_dup(effect eff)
 {
   effect new_eff = effect_undefined;
 
-  new_eff = copy_effect(eff);
-
-  if(cell_preference_p(effect_cell(new_eff))) {
-    /* FI: memory leak? we allocate something and put it behind a persistent pointer */
-    effect_reference(new_eff) = copy_reference(effect_reference(new_eff));
-  }
-
+  
+  if(cell_preference_p(effect_cell(eff))) 
+    {
+      /* FI: memory leak? we allocate something and put it behind a persistent pointer */
+      new_eff = make_effect(make_cell_preference(make_preference(copy_reference(effect_any_reference(eff)))),
+			    copy_action(effect_action(eff)), 
+			    copy_approximation(effect_approximation(eff)),
+			    copy_descriptor(effect_descriptor(eff)));
+    }
+  else
+    {
+      new_eff = copy_effect(eff);
+      
+    }
+  
   ifdebug(8) pips_assert("the new effect is consistent", effect_consistent_p(new_eff));
-
+  
   return(new_eff);
 }
 
@@ -398,10 +406,9 @@ simple_effect_dup(effect eff)
 void
 simple_effect_free(effect eff)
 {
+  /* I do not understand this : I think free_effect does exactly what is wanted BC. */
   if(cell_preference_p(effect_cell(eff))) {
-    /*arghhhh : if it is a preference, it is because we want to preserve it ! BC */
-    /* free_reference(effect_reference(eff)); */
-    effect_reference(eff) = reference_undefined;
+    preference_reference(cell_preference(effect_cell(eff)))= reference_undefined;
   }
   else {
     free_reference(effect_any_reference(eff));

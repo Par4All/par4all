@@ -1673,7 +1673,7 @@ static void xml_references(int taskNumber, list l_regions, stack indices, string
    for ( lr = l_regions; !ENDP(lr); lr = CDR(lr))
      {
        region re = REGION(CAR(lr));
-       reference ref = region_reference(re);
+       reference ref = effect_any_reference(re);
        if (array_reference_p(ref) && region_read_p(re)) {
 	 atleast_one_read_ref = TRUE;
 	 string_buffer_append(result,concatenate(TAB, SPACE, SPACE, OPENANGLE,  "data darray=",NULL));
@@ -1688,7 +1688,7 @@ static void xml_references(int taskNumber, list l_regions, stack indices, string
    for ( lr = l_regions; !ENDP(lr); lr = CDR(lr))
      {
        region re = REGION(CAR(lr));
-       reference ref = region_reference(re);
+       reference ref = effect_any_reference(re);
        if (array_reference_p(ref) && region_write_p(re)) { 
 	 atleast_one_written_ref = TRUE;
 	 string_buffer_append(result,concatenate(TAB, SPACE, SPACE, OPENANGLE, "data darray=",NULL));
@@ -2278,7 +2278,7 @@ static void xml_Pattern_Paving(region reg,entity var, boolean effet_read, Pvecte
   Pvecteur voffset, vpattern_up_bound;
 
   if(reg != region_undefined) {
-     reference ref = region_reference(reg);  
+     reference ref = effect_any_reference(reg);  
       entity vreg = reference_variable(ref);
       if (array_reference_p(ref) && same_entity_p(vreg,var) && region_read_p(reg)== effet_read) {
 	Psysteme ps_reg = sc_dup(region_system(reg));
@@ -2408,7 +2408,7 @@ static void xml_TaskParameter(boolean assign_function,boolean is_not_main_p, Var
     for ( lr = pattern_region; !ENDP(lr); lr = CDR(lr))
       { 
 	reg = REGION(CAR(lr));
-	ref = region_reference(reg);  
+	ref = effect_any_reference(reg);  
 	v = reference_variable(ref);
 	
 	if (vect_coeff(v,paving_indices) == 0){
@@ -2439,7 +2439,7 @@ static void xml_TaskParameter(boolean assign_function,boolean is_not_main_p, Var
          // recherche des regions du parametre formel
     for ( lr = pattern_region; !ENDP(lr); lr = CDR(lr)) { 
 	reg = REGION(CAR(lr));
-	ref = region_reference(reg);  
+	ref = effect_any_reference(reg);  
 	v = reference_variable(ref);
 	if (same_entity_p(v,var)) {
 	  if (region_read_p(reg))
@@ -2451,7 +2451,7 @@ static void xml_TaskParameter(boolean assign_function,boolean is_not_main_p, Var
     reg = (rwr != region_undefined)? rwr : rre;
     // La region a ete selectionnee - Impression des informations concernant le parametre formel
     if (reg != region_undefined) {
-      ref = region_reference(reg); 
+      ref = effect_any_reference(reg); 
       v = reference_variable(ref);
       effet_read = (region_read_p(reg))? TRUE: FALSE;
     }

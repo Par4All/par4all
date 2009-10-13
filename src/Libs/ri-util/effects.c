@@ -95,7 +95,7 @@ statement_has_a_module_formal_argument_write_effect_p(statement s,
 
    MAP(EFFECT, an_effect,
        {
-          entity a_variable = reference_variable(effect_reference(an_effect));
+          entity a_variable = reference_variable(effect_any_reference(an_effect));
           
           if (action_write_p(effect_action(an_effect))
               && (variable_return_p(a_variable)

@@ -631,7 +631,7 @@ static bool max_statement_write_flt(statement s)
     action a = effect_action(eff);
     if (action_write_p(a))
       {
-	reference r = effect_reference(eff);
+	reference r = effect_any_reference(eff);
 	entity e = reference_variable(r);
 	ifdebug(4)
 	  {
@@ -677,7 +677,7 @@ static bool min_statement_write_flt(statement s)
     action a = effect_action(eff);
     if (action_write_p(a))
       {
-	reference r = effect_reference(eff);
+	reference r = effect_any_reference(eff);
 	entity e = reference_variable(r);
 	ifdebug(4)
 	  {
@@ -986,7 +986,7 @@ static bool top_down_abc_flt(statement s,top_down_abc_context_p context)
   /*  while (!ENDP(l_copy))
     {
       region re = REGION(CAR(l_copy));
-      reference ref = region_reference(re);
+      reference ref = effect_any_reference(re);
       entity array = reference_variable(ref);  
       if (array_reference_p(ref) && array_need_bound_check_p(array) && region_write_p(re))
 	l_written_arrays = CONS(ENTITY,array,l_written_arrays);
@@ -1006,7 +1006,7 @@ static bool top_down_abc_flt(statement s,top_down_abc_context_p context)
       while (!ENDP(l_copy))
 	{
 	  region re = REGION(CAR(l_copy));
-	  reference ref = region_reference(re);
+	  reference ref = effect_any_reference(re);
 	  entity array = reference_variable(ref); 
 	  if (array_reference_p(ref) && array_need_bound_check_p(array))
 	    top_down_abc_array(array,re,s,context);
@@ -1038,7 +1038,7 @@ static bool top_down_abc_flt(statement s,top_down_abc_context_p context)
 	      while (!ENDP(l_copy))
 		{
 		  region re = REGION(CAR(l_copy));
-		  reference ref = region_reference(re);
+		  reference ref = effect_any_reference(re);
 		  entity array = reference_variable(ref); 
 		  //  if (same_entity_p(array,first_array))
 		  if (strcmp(entity_name(array),entity_name(first_array))==0) 

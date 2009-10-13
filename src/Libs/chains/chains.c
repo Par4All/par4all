@@ -1152,8 +1152,8 @@ static void add_conflicts(statement stin,
 
 	if(add_conflict_p) {
 	  list loops = load_statement_enclosing_loops(stout);
-	  reference rin = effect_reference(fin);
-	  reference rout = effect_reference(fout);
+	  reference rin = effect_any_reference(fin);
+	  reference rout = effect_any_reference(fout);
 	  bool remove_this_conflict_p = disambiguate_constant_subscripts?
 	    references_do_not_conflict_p(rin, rout): FALSE;
 

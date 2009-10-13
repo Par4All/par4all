@@ -174,8 +174,8 @@ static bool write_conf_on_ref(reference ref)
     effect sourceEff = conflict_source(conf);
     effect sinkEff = conflict_sink(conf);
 
-    reference sourceRef = effect_reference(sourceEff);
-    reference sinkRef = effect_reference(sinkEff);
+    reference sourceRef = effect_any_reference(sourceEff);
+    reference sinkRef = effect_any_reference(sinkEff);
 
     if((effect_write_p(sourceEff) &&
 	sourceRef == ref) ||

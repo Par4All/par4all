@@ -107,7 +107,7 @@ text_region_no_action(effect reg)
 
     /* REFERENCE
      */
-    r = effect_reference(reg);
+    r = effect_any_reference(reg);
     ls = foresys? words_reference(r): effect_words_reference(r);
 
     MAP(STRING, s, append(s), ls);

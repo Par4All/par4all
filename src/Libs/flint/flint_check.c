@@ -54,7 +54,7 @@
    (approximation_must_p(effect_approximation(my_effect))) )
 
 #define effect_to_name(the_effect)\
-  entity_name(reference_variable(effect_reference(the_effect)))
+  entity_name(reference_variable(effect_any_reference(the_effect)))
 
 #define entity_is_a_common_p(Ent)               \
   (type_area_p(entity_type(Ent)))

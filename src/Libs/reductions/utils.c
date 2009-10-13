@@ -592,7 +592,7 @@ no_other_effects_on_references (
     pips_debug(7,"entity name: %s\n", entity_name(var));
 
     FOREACH (EFFECT, e, le) {
-      reference r = effect_reference(e);
+      reference r = effect_any_reference(e);
       if (!gen_in_list_p(r, lr) &&
 	  entity_conflict_p(reference_variable(r), var))
 	return FALSE;
