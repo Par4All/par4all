@@ -203,8 +203,7 @@ basic base;
 			  NIL));
 
   /* FI: I would have expected is_value_unknown, especially with a RAM storage! */
-  entity_initial(e) = make_value(is_value_constant,
-				 MakeConstantLitteral());
+  entity_initial(e) = make_value_constant(MakeConstantLitteral());
 
   return(e);
 }

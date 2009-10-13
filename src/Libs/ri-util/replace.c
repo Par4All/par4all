@@ -57,9 +57,7 @@ replace_entity_declaration_walker(statement s, struct entity_pair* thecouple)
 {
     FOREACH(ENTITY,decl_ent,statement_declarations(s))
     {
-        value v = entity_initial(decl_ent);
-        if( !value_undefined_p(v) && value_expression_p( v ) )
-            gen_context_recurse( v, thecouple, expression_domain, gen_true, replace_entity_expression_walker);
+        replace_entity(decl_ent,thecouple->old,thecouple->new);
     }
 }
 
@@ -95,12 +93,19 @@ static void replace_entity_loop_walker(loop l, struct entity_pair* thecouple)
 void
 replace_entity(void* s, entity old, entity new) {
   struct entity_pair thecouple = { old, new };
-
-  gen_context_multi_recurse(s, &thecouple,
-			    expression_domain, gen_true, replace_entity_expression_walker,
-			    statement_domain, gen_true, replace_entity_declaration_walker,
-			    loop_domain, gen_true, replace_entity_loop_walker,
-			    NULL);
+  if( INSTANCE_OF(entity,(gen_chunkp)s) ) {
+      replace_entity(entity_type((entity)s),old,new);
+      value v = entity_initial((entity)s);
+      if( !value_undefined_p(v) && value_expression_p( v ) )
+          replace_entity(v,old,new);
+  }
+  else {
+      gen_context_multi_recurse(s, &thecouple,
+              expression_domain, gen_true, replace_entity_expression_walker,
+              statement_domain, gen_true, replace_entity_declaration_walker,
+              loop_domain, gen_true, replace_entity_loop_walker,
+              NULL);
+  }
 }
 
 void
