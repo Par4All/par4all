@@ -1,0 +1,34 @@
+delete scalarization26
+
+setproperty ABORT_ON_USER_ERROR TRUE
+setproperty PRETTYPRINT_BLOCKS TRUE
+
+setproperty ARRAY_PRIV_FALSE_DEP_ONLY FALSE
+
+create scalarization26 scalarization26.c
+
+## Needed for substracting set approximations
+activate MUST_REGIONS
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
+
+echo
+echo Code before scalarization
+echo
+module microcode
+display PRINTED_FILE
+
+
+echo
+echo Code after scalarization
+echo
+apply SCALARIZATION
+display PRINTED_FILE
+
+close
+delete scalarization26
+quit
