@@ -1002,6 +1002,7 @@ static void insert_rwt(statement s)
     if( !empty_comments_p(statement_comments(s)))
         free(statement_comments(s));
     statement_comments(s)=empty_comments;
+    statement_number(s)=STATEMENT_NUMBER_UNDEFINED;
   }
 }
 
