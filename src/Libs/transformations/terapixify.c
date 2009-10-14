@@ -579,6 +579,50 @@ bool  entity_used_in_loop_bound_p(entity e)
     return eb.b;
 }
 
+#define TERAPIX_PTRARG_PREFIX "FIFO"
+#define TERAPIX_LOOPARG_PREFIX "N"
+#define TERAPIX_IMAGE_PREFIX "im"
+#define TERAPIX_MASK_PREFIX "ma"
+#define TERAPIX_REGISTER_PREFIX "re"
+
+static
+void terapix_argument_handler(entity e, string arg_prefix, size_t *arg_cnt,string ass_prefix, size_t *ass_cnt)
+{
+    /* change parameter name and generate an assignment */
+    if(arg_prefix && (strncmp(arg_prefix,entity_user_name(e),strlen(arg_prefix))) ) {
+        string new_name;
+        asprintf(&new_name,"%s" MODULE_SEP_STRING  "%s%u",entity_module_name(e),arg_prefix,(*arg_cnt)++);
+        entity ne = make_entity_copy_with_new_name(e,new_name,false);
+        free(new_name);
+
+        for(list iter = code_declarations(value_code(entity_initial(get_current_module_entity())));
+                !ENDP(iter);
+                POP(iter))
+        {
+            entity ee = ENTITY(CAR(iter));
+            if(same_entity_p(e,ee)) {
+                CAR(iter).p=(gen_chunkp)ne;
+            }
+        }
+        /* we now have FIFOx in ne and will generate an assignment from ne to e 
+         * we also have to change the storage for e ...*/
+        free_storage(entity_storage(e)); entity_storage(e) = storage_undefined;
+        AddEntityToCurrentModule(e);
+        statement ass = make_assign_statement(entity_to_expression(e),entity_to_expression(ne));
+        insert_statement(get_current_module_statement(),ass,true);
+    }
+
+    /* to respect terapix asm, we also have to change the name of variable e */
+    if(ass_prefix && (strncmp(ass_prefix,entity_user_name(e),strlen(ass_prefix)))) {
+        string new_name;
+        asprintf(&new_name,"%s" MODULE_SEP_STRING "%s%u",entity_module_name(e),ass_prefix,(*ass_cnt)++);
+        entity ne = make_entity_copy_with_new_name(e,new_name,false);
+        AddEntityToCurrentModule(ne);
+        free(new_name);
+        replace_entity(get_current_module_statement(),e,ne);
+    }
+}
+
 bool normalize_microcode( char * module_name)
 {
     bool can_terapixify =true;
@@ -609,7 +653,9 @@ bool normalize_microcode( char * module_name)
      * - others are not allowded
      */
     size_t nb_fifo = 0;
+    size_t nb_lu = 0;
     size_t nb_ptr = 0;
+    size_t nb_re = 0;
     FOREACH(ENTITY,e,code_declarations(value_code(entity_initial(get_current_module_entity()))))
     {
         if(formal_parameter_p(e))
@@ -617,10 +663,12 @@ bool normalize_microcode( char * module_name)
             variable v = type_variable(entity_type(e));
             if( basic_pointer_p(variable_basic(v)) ) /* it's a pointer */
             {
+                string prefix = NULL;
                 bool parameter_written = find_write_effect_on_entity(get_current_module_statement(),e);
                 if( parameter_written ) /* it's an image */
                 {
                     printf("%s seems an image\n",entity_user_name(e));
+                    prefix = TERAPIX_IMAGE_PREFIX;
                 }
                 else /* cannot tell if it's a kernel or an image*/
                 {
@@ -637,52 +685,40 @@ bool normalize_microcode( char * module_name)
                         }
                     }
                     if( array_size > 0 && 56 >= array_size ) {
-                        printf("%s seems a kernel\n",entity_user_name(e));
+                        printf("%s seems a mask\n",entity_user_name(e));
+                        prefix = TERAPIX_MASK_PREFIX;
                     }
                     else {
                         printf("%s seems an image\n",entity_user_name(e));
+                        prefix = TERAPIX_IMAGE_PREFIX;
                     }
-                    /* change parameter name and generate an assignment */
-                    {
-                        string new_name;
-                        asprintf(&new_name,"%s" MODULE_SEP_STRING "FIFO%u",entity_module_name(e),nb_fifo++);
-                        entity ne = make_entity_copy_with_new_name(e,new_name,false);
-                        free(new_name);
-
-                        for(list iter = code_declarations(value_code(entity_initial(get_current_module_entity())));
-                                !ENDP(iter);
-                                POP(iter))
-                        {
-                            entity ee = ENTITY(CAR(iter));
-                            if(same_entity_p(e,ee)) {
-                                CAR(iter).p=ne;
-                            }
-                        }
-                        /* we now have FIFOx in ne and will generate an assignment from ne to e 
-                         * we also have to change the storage for e ...*/
-                        free_storage(entity_storage(e)); entity_storage(e) = storage_undefined;
-                        AddEntityToCurrentModule(e);
-                        statement ass = make_assign_statement(entity_to_expression(e),entity_to_expression(ne));
-                        insert_statement(get_current_module_statement(),ass,true);
-
-                        /* to respect terapix asm, we also have to change the name of variable e */
-                        asprintf(&new_name,"%s" MODULE_SEP_STRING "im%u",entity_module_name(e),nb_ptr++);
-                        ne = make_entity_copy_with_new_name(e,new_name,false);
-                        AddEntityToCurrentModule(ne);
-                        free(new_name);
-                        replace_entity(get_current_module_statement(),e,ne);
-                    }
+                    terapix_argument_handler(e,TERAPIX_PTRARG_PREFIX,&nb_fifo,prefix,&nb_ptr);
                 }
             }
             else if( entity_used_in_loop_bound_p(e) )
             {
                 printf("%s seems a loop bound\n",entity_user_name(e));
+                terapix_argument_handler(e,TERAPIX_LOOPARG_PREFIX,&nb_lu,NULL,NULL);
             }
             else {
                 printf("parameter %s is not valid\n",entity_user_name(e));
                 can_terapixify=false;
             }
+        }
+        else {
+            terapix_argument_handler(e,NULL,NULL,TERAPIX_REGISTER_PREFIX,&nb_re);
+        }
+    }
 
+    FOREACH(ENTITY,e,statement_declarations(get_current_module_statement()))
+    {
+        if(entity_variable_p(e))
+        {
+            variable v = type_variable(entity_type(e));
+            if( basic_pointer_p(variable_basic(v)) ) /* it's a pointer */
+                terapix_argument_handler(e,NULL,NULL,TERAPIX_IMAGE_PREFIX,&nb_ptr);
+            else if( basic_int_p(variable_basic(v))) /* it's an int */
+                terapix_argument_handler(e,NULL,NULL,TERAPIX_REGISTER_PREFIX,&nb_re);
         }
     }
 
