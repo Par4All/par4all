@@ -1687,6 +1687,28 @@ instruction gfc2pips_code2instruction_(gfc_code* c){
 					}
 				}
 			}
+			list_of_arguments = gen_nreverse(list_of_arguments);
+			/*
+			 *
+			 voir comment sont gérées les I/O erreurs ou autre en fortran afin de pouvoir ajouter des statements supplémentaires
+			 case EXEC_TRANSFER:
+      fputs ("TRANSFER ", dumpfile);
+      show_expr (c->expr);
+      break;
+
+    case EXEC_DT_END:
+      fputs ("DT_END", dumpfile);
+      dt = c->ext.dt;
+
+      if (dt->err != NULL)
+	fprintf (dumpfile, " ERR=%d", dt->err->value);
+      if (dt->end != NULL)
+	fprintf (dumpfile, " END=%d", dt->end->value);
+      if (dt->eor != NULL)
+	fprintf (dumpfile, " EOR=%d", dt->eor->value);
+      break;
+			 *
+			 */
 			entity_initial(e) = make_value( is_value_intrinsic, e );
 			entity_type(e) = make_type(is_type_functional,make_functional(NIL, MakeOverloadedResult()));
 			call call_ = make_call(e,list_of_arguments);
@@ -1731,14 +1753,44 @@ io_inst:  io_keyword io_f_u_id
 FROM instruction MakeSimpleIoInst2(int keyword, expression f, list list_of_arguments(io_list)))
 */
 			expression std, format, unite,f;
-			cons * lci;
+			newgen_list lci;
 
+			//creation of the representation of the default channels for IO
 			f = MakeNullaryCall(CreateIntrinsic(LIST_DIRECTED_FORMAT_NAME));
 			//f = make_expression(<syntax(atom)>, normalized_undefined);
 			std = MakeNullaryCall(CreateIntrinsic(LIST_DIRECTED_FORMAT_NAME));
+
+
+			//we check if the chan is standard and if not put the right value
+			//ajouter une property pour que * soit prioritaire sur 5/6 pour les canaux :  GFC_IOSTAR_IS_PRIOTITY
+			if( d->ext.dt ){
+				//if no format it is standard
+				if( d->ext.dt->format_expr ){
+					f = gfc2pips_expr2expression(d->ext.dt->format_expr);
+				}else if( d->ext.dt->format_label && d->ext.dt->format_label->value != -1){
+					f = gfc2pips_int2expression(d->ext.dt->format_label->value);
+				}
+				if(
+					//if GFC_IOSTAR_IS_PRIOTITY = TRUE
+					d->ext.dt->io_unit
+					&& (
+						d->ext.dt->io_unit->expr_type!=EXPR_CONSTANT
+						//if the canal is 6, it is standard
+						|| (d->ext.dt->io_unit->expr_type==EXPR_CONSTANT
+							&& (
+								(d->op==EXEC_READ &&mpz_get_ui(d->ext.dt->io_unit->value.integer)!=5 )
+								|| (d->op==EXEC_WRITE &&mpz_get_ui(d->ext.dt->io_unit->value.integer)!=6 )
+							)
+						)
+					)
+				){
+					std = gfc2pips_expr2expression(d->ext.dt->io_unit);
+				}
+			}
+
 			//balancer la valeur de UNIT et de FMT d'une façon ou d'une autre ?
-			unite = MakeCharacterConstantExpression("UNIT=");
-			format = MakeCharacterConstantExpression("FMT=");
+			unite = MakeCharacterConstantExpression("UNIT=");//mettre une valeur
+			format = MakeCharacterConstantExpression("FMT=");//mettre une valeur
 
 			lci = CONS(EXPRESSION, unite,
 				CONS(EXPRESSION, std,
@@ -1846,13 +1898,65 @@ cons *lio;
 }
 
 **************************************************
+ This function takes a list of io elements (i, j, t(i,j)), and returns
+the same list, with a cons cell pointing to a character constant
+expression 'IOLIST=' before each element of the original list.
+
+(i , j , t(i,j)) becomes ('IOLIST=' , i , 'IOLIST=' , j , 'IOLIST=' , t(i,j))
+
+This IO list is later concatenated to the IO control list to form the
+argument of an IO function. The tagging is necessary because of this
+concatenation.
+
+The IOLIST call used to be shared within one IO list. Since sharing is
+avoided in the PIPS internal representation, they are now duplicated.
+
+cons *
+MakeIoList(l)
+cons *l;
+{
+    cons *pc;
+    cons *lr = NIL;
+
+    pc = l;
+    while (pc != NULL) {
+        expression e = MakeCharacterConstantExpression(IO_LIST_STRING_NAME);
+	cons *p = CONS(EXPRESSION, e, NIL);
+
+	CDR(p) = pc;
+	pc = CDR(pc);
+	CDR(CDR(p)) = NIL;
+
+	lr = gen_nconc(p, lr);
+    }
+
+    return(lr);
+}
+
  */
-		return make_instruction(is_instruction_call,
-			make_call(e,
-				//CreateIntrinsic(d->op==EXEC_WRITE?"PRINT":"READ"),
-				gen_nconc(lci, NULL)
-			)
-		);
+			//we have to have a peer number of elements in the list, so we need to insert an element between each and every elements of our arguments list
+			newgen_list pc,lr;
+			lr = NULL;
+
+			pc = list_of_arguments;
+			while (pc != NULL) {
+				expression e = MakeCharacterConstantExpression(IO_LIST_STRING_NAME);
+				newgen_list p = CONS(EXPRESSION, e, NULL);
+
+				CDR(p) = pc;
+				pc = CDR(pc);
+				CDR(CDR(p)) = NULL;
+
+				lr = gen_nconc(p, lr);
+			}
+
+
+			return make_instruction(is_instruction_call,
+				make_call(e,
+					//CreateIntrinsic(d->op==EXEC_WRITE?"PRINT":"READ"),
+					gen_nconc(lci, lr)
+				)
+			);
 
 	    /*show_dt:
 	      dt = c->ext.dt;
