@@ -136,7 +136,8 @@
     Pipsmake configuration}
 \author{Remi Triolet and Fran\c{c}ois Irigoin\\
   with many other contributors\\
-        Ecole des Mines de Paris \\
+        MINES ParisTech \\
+        Mathématiques et Systèmes \\
         Centre de Recherche en Informatique \\
         77305 Fontainebleau Cedex \\
         France \\}
@@ -176,7 +177,9 @@
 \newcommand{\PELSE}{{\tt ELSE}}
 \newcommand{\PGOTO}{{\tt GOTO}}
 \newcommand{\PIF}{{\tt IF}}
+\newcommand{\Pips}{\tt PIPS}
 \newcommand{\PIPS}{\LINK{\emph{PIPS}}{http://www.cri.ensmp.fr/pips}}
+\newcommand{\Pipsmake}{\tt pipsmake}
 \newcommand{\PIPSMAKE}{\LINK{\emph{pipsmake}}{http://www.cri.ensmp.fr/pips/pipsmake.html}\xspace}
 \newcommand{\PLinear}{\emph{Linear C$^3$}}
 \newcommand{\PNEWGEN}{\LINK{\emph{NewGen}}{http://www.cri.ensmp.fr/pips/newgen-manual/newgen-manual.html}}
@@ -208,7 +211,8 @@
 \newcommand{\PAliasView}{{Alias View}}
 \newcommand{\PViewTheHPFCompilerOutput}{{View the HPF
     Compiler Output}}
-\newcommand{\Pri}{\LINK{\emph{Internal\space{}Representation}}{http://www.cri.ensmp.fr/pips/newgen/ri.htdoc}}
+\newcommand{\Pri}{\LINK{\emph{PIPS Internal\space{}Representation of
+      Fortran and C code}}{http://www.cri.ensmp.fr/pips/newgen/ri.htdoc}}
 \newcommand{\WPsc}{\LINK{\emph{WP65}}{http://www.cri.ensmp.fr/pips/wp65.html}}
 
 %% Now the interface names :
@@ -254,91 +258,93 @@
 
 \chapter{Introduction}
 
-This paper describes high-level objects and functions which are
-potentially user-visible in a \PIPS{}~\cite{IJT91} interactive environment.
-It defines the internal {\em software} interface between a user interface and
-program analyses and transformations. This is clearly not a user guide
-but can be used as a reference guide, the best one before source code...
+This paper describes high-level objects and functions that are
+potentially user-visible in a \PIPS{}~\cite{IJT91} interactive
+environment.  It defines the internal {\em software} interface between
+a user interface and program analyses and transformations. This is
+clearly not a user guide but can be used as a reference guide, the
+best one before source code because {\tt PIPS} user interfaces are very
+closely mapped on this document: some of their features are
+automatically derived from it.
 
-Objects can be viewed and functions activated by one of \PIPS{}
-existing user interfaces: \TPIPS{}, the tty style interface (the preferred
-one to be used),
-\pips{}~\cite{BIJ91}, the old batch interface, improved by many shell
-scripts\footnote{Manual pages are available for \Init{}, \Select{},
-  \Perform{}, \Display{}, and \Delete{}, and \pips{}.}, \WPIPS{} and
-{\tt epips}, the X-Window System interfaces.  The {\tt epips}
-interface is an extension of \WPIPS{} which uses {\tt Emacs} to
-display more information in a more convenient way. Unfortunately, right
-now they are no longer working.
+Objects can be viewed and functions activated by one of \Pips{}
+existing user interfaces: \TPIPS{}, the tty style interface which is
+currently recommended, \pips{}~\cite{BIJ91}, the old batch
+interface, improved by many shell scripts\footnote{Manual pages are
+  available for \Init{}, \Select{}, \Perform{}, \Display{}, and
+  \Delete{}, and \pips{}.}, \WPIPS{} and {\tt epips}, the X-Window
+System interfaces.  The {\tt epips} interface is an extension of
+\WPIPS{} which uses {\tt Emacs} to display more information in a more
+convenient way. Unfortunately, right now these window-based interfaces
+are no longer working and have been replaced by {\tt gpips}.
 
-From a theoretical point of view, the object types and functions available
-in \PIPS{} define an heterogeneous algebra with constructors (e.g. parser),
-extractors (e.g. prettyprinter) and operators (e.g. loop unrolling).  Very
-few combinations of functions make sense, but many functions and object
-types are available. This abundance is confusing for casual and
-experiences users and it was deemed necessary to assist them by providing
-default computation rules and automatic consistency management. The rule
-interpretor is called \PIPSMAKE{} and described in~\cite{B91}.
+From a theoretical point of view, the object types and functions
+available in {\tt PIPS} define an heterogeneous algebra with
+constructors (e.g. parser), extractors (e.g. prettyprinter) and
+operators (e.g. loop unrolling).  Very few combinations of functions
+make sense, but many functions and object types are available. This
+abundance is confusing for casual and experiences users as well, and
+it was deemed necessary to assist them by providing default
+computation rules and automatic consistency management similar to {\tt
+  make}. The rule interpretor is called \PIPSMAKE{} and described
+in~\cite{B91}.
 
 For debugging purposes and for advanced users, the precise choice and
 tuning of an algorithm can be made using \PROPERTIES{}. Default properties
-are installed with \PIPS{} but they can be redefined, partly or entirely,
+are installed with \Pips{} but they can be redefined, partly or entirely,
 by a {\tt properties.rc} file located in the current directory. Properties
 can also be redefined from the user interfaces, for example with the command
-\texttt{setproperty} when the \TPIPS{} interface is used).
+\texttt{setproperty} when the \TPIPS{} interface is used.
 
 As far as their static structures are concerned, most object types are
 described in more details in \Pri. A
 dynamic view is given here. In which order should functions be applied?
 Which object do they produce and vice-versa which function does produce
-such and such objects? How does \PIPS{} cope with bottom-up and top-down
+such and such objects? How does \Pips{} cope with bottom-up and top-down
 interprocedurality?
 
 Resources produced by several rules and their associated rule must be
-given alias names when they should be explicitly computed or activated by an
-interactive interface. This is otherwise not relevant. The alias names are
-used to generate automatically header files and/or test files used by PIPS
-interfaces.
+given alias names when they should be explicitly computed or activated
+by an interactive interface\marginpar{FI: I do not understand.}. This
+is otherwise not relevant. The alias names are used to generate
+automatically header files and/or test files used by PIPS interfaces.
 
 No more than one resource should be produced per line of rule because
 different files are automatically extracted from this one\footnote{See
 the local Makefile: pipsmake-rc, and alias file: wpips-rc.}. Another
-caveat is that \emph{all} resources the name of which is suffixed with
+caveat is that \emph{all} resources whose names are suffixed with
 \verb|_file| are considered printable or displayable, and the others
 are considered binary data.
 
 This \LaTeX{} file is used by several procedures to derive some pieces of C
 code and ASCII files. The useful information is located in the {\em
-  verbatim} areas, a very simple literate programming environment... For
+  PipsMake} areas, a very simple literate programming environment... For
 instance \verb+alias+ information is used to generate automatically menus
-for \verb+wpips+. Object (a.k.a resource) types and functions are renamed
+for window-based interfaces such as \verb+wpips+ or \verb+gpips+. Object (a.k.a resource) types and functions are renamed
 using the alias declaration. The name space of aliases is global. All
 aliases must have different names. Function declarations are used to build
 a mapping table between function names and pointer to C functions,
 \texttt{phases.h}. Object suffixes are used to derive a header file, {\tt
   resources.h}, with all resource names. Parts of this file are also
-extracted to generate on-line information for {\tt wpips}.
+extracted to generate on-line information for {\tt wpips} and
+automatic completion for {\tt tpips}.
 
-Rules and objects are grouped in the first five chapters: input files
-(chapter~\ref{section-abstract-syntax-tree}, syntax analysis and abstract
-syntax tree (chapter~\ref{section-abstract-syntax-tree}), analyses
-(chapter~\ref{section-analyses}), parallelizations
-(chapter~\ref{section-program-transformations-parallelization-distribution}),
-program transformations (chapter~\ref{section-program-transformations})
-and prettyprinters of output files (chapter~\ref{section-output-files}).
-Chapter~\ref{section-feautrier-methods} describes several analyses defined
-by Paul
-\textsc{Feautrier}. Chapter~\ref{section-user-interface-menu-layouts}
-contains a set of menu declarations for the window-based interfaces.
+The behavior of {\tt PIPS} can be slightly tuned by using {\tt
+  properties}. Most properties are linked to a particular phase, for
+instance to prettyprint, but some are linked to {\tt PIPS}
+infrastructure and are presented in
+Chapter~\ref{chapter-global-options}.
 
 \section{Informal syntax}
 \label{sec:informal-syntax}
 
-To understand and to be able to write some rules, few things need to be
-understood.
+To understand and to be able to write new rules for {\tt pipsmake}, a
+few things need to be known.
 
 \subsection{Example}
 \label{sec:example}
+
+The rule:
 
 \begin{alltt}
 proper_references       > MODULE.proper_references
@@ -349,53 +355,65 @@ proper_references       > MODULE.proper_references
 means that the method \verb|proper_references| is used to generate the
 \verb|proper_references| resource of a given \texttt{MODULE}. But to
 generate this resource, the method needs access to the resource holding
-the \texttt{entities} (the variable...) of the \texttt{PROGRAM} currently
+the symbole table, \texttt{entities}, of the \texttt{PROGRAM} currently
 analyzed, the \texttt{code} resource (the instructions) of the given
 \texttt{MODULE} and the \PipsPassRef{summary_effects} resource (the side effects
 on the memory) of the functions and procedures called by the given
 \texttt{MODULE}, the \texttt{CALLEES}.
 
-A property, discussed later, is declared similarly in this file:
+Properties are also declared in this file. For instance
 \begin{alltt}
-ABORT_ON_USER_LOG False
+ABORT_ON_USER_LOG FALSE
 \end{alltt}
+declares a property to stop interpreting user commands when an error
+is made and sets its default value to false, which makes sense most of
+the time for interactive uses of {\tt PIPS}. But for non-regression
+tests, it may be better to turn on this property.
 
-\subsection{Program pieces}
+\subsection{Pipsmake variables}
 \label{sec:program-pieces}
 
 
-The following program pieces are defined:
+The following variables are defined to handle interprocedurality:
 \begin{description}
-\item[\texttt{PROGRAM}:] the whole program currently analyzed;
-\item[\texttt{MODULE}:] the given \texttt{MODULE} (a procedure or
+\item[\texttt{PROGRAM}:] the whole application currently analyzed;
+\item[\texttt{MODULE}:] the current \texttt{MODULE} (a procedure or
   function);
-\item[\texttt{ALL}:] all the \texttt{MODULE} of the \texttt{PROGRAM};
+\item[\texttt{ALL}:] all the \texttt{MODULE}s of the current
+  \texttt{PROGRAM}, functions and compilation units;
+\item[\texttt{ALLFUNC}:] all the \texttt{MODULE}s of the current
+  \texttt{PROGRAM} that are functions;
 \item[\texttt{CALLEES}:] all the \texttt{MODULE}s called in the given
   \texttt{MODULE};
 \item[\texttt{CALLERS}:] all the \texttt{MODULE}s that call the given
   \texttt{MODULE}.
 \end{description}
 
+These variables are used in the rule definitions and instantiated
+before {\tt pipsmake} infers which resources are pre-requisites for a
+rule.
 
 
 \section{Properties}
 
-This paper also describes global variables used to modify or fine tune PIPS
-behavior. Since global variables are useful for some purposes, but
-always dangerous, PIPS programmers are required to declare them
-explicitly as \emph{properties}. Properties have an ASCII name and can
-have boolean, integer or string values.
+This paper also defines and describes global variables used to modify
+or fine tune PIPS behavior. Since global variables are useful for some
+purposes, but always dangerous, PIPS programmers are required to avoid
+them or to declare them explicitly as \emph{properties}. Properties
+have an ASCII name and can have boolean, integer or string values.
 
 % The information here is machine and/or site independent.
 
-Casual users should not use them. Properties are modified for them by
-the user interface and/or the high-level functions.
+Casual users should not use them. Some properties are modified for them by
+the user interface and/or the high-level functions. Some property
+combinations may be meaningless. More experienced users can set their
+values, using their names and a user interface.
 
-Experienced users can modify properties by inserting a file called
-\texttt{properties.rc} in their local directory. Of course, they cannot
-declare new properties, since they would not be recognized by the PIPS
-system. The local property file is read \emph{after} the default property
-file, \verb+$PIPS_ROOT/etc/properties.rc+.
+Experienced users can also modify properties by inserting a file
+called \texttt{properties.rc} in their local directory. Of course,
+they cannot declare new properties, since they would not be recognized
+by the {\tt PIPS} system. The local property file is read \emph{after}
+the default property file, \verb+$PIPS_ROOT/etc/properties.rc+.
 % $ emacs latex environment does not know about \verb
 Some user-specified property
 values may be ignored because they are modified by a PIPS function before
@@ -418,19 +436,39 @@ Another Shell environment variable, \verb+NEWGEN_MAX_TABULATED_ELEMENTS+,
 is useful to analyze large programs. Its default value is 12,000 but it is
 not uncommon to have to set it up to 200,000.
 
-Properties are listed below on a source library basis. The outline is
-close to the outline of \PIPSMAKE{}.  Properties used in more than
-one library are presented first. Section~\ref{section-pips-infrastructure}
-contains information about infrastructure, external and user interface
-libraries. Analyses are grouped in Section~\ref{section-analyses}. Program
-transformations, parallelization and distribution phases are listed in the
-next section. User output produced by different kinds of prettyprinters
-are presented in Section~\ref{section-output-files}.
-Section~\ref{section-feautrier-methods} is dedicated to libraries added by CEA to
-implement Feautrier's method.
+Properties are listed below on a source library basis. Properties used
+in more than one library or used by {\tt PIPS} infrastructure are
+presented first. Section~\ref{section-pips-infrastructure} contains
+information about properties related to infrastructure, external and
+user interface libraries. Properties for analyses are grouped in
+Chapter~\ref{section-analyses}. Properties for program
+transformations, parallelization and distribution phases are listed in
+the next section in Chapters~\ref{section-program-transformations} and
+\ref{section-program-transformations-parallelization-distribution}. User
+output produced by different kinds of prettyprinters are presented in
+Chapter~\ref{section-output-files}.
+Chaper~\ref{section-feautrier-methods} is dedicated to properties of
+the libraries added by CEA to implement Feautrier's method.
+
+\section{Outline}
+
+
+Rule and object declaration are grouped in chapters: input files
+(Chapter~\ref{section-input-files}, syntax analysis and abstract
+syntax tree (Chapter~\ref{section-abstract-syntax-tree}), analyses
+(Chapter~\ref{section-analyses}), parallelizations
+(Chapter~\ref{section-program-transformations-parallelization-distribution}),
+program transformations
+(Chapter~\ref{section-program-transformations}) and prettyprinters of
+output files (Chapter~\ref{section-output-files}).
+Chapter~\ref{section-feautrier-methods} describes several analyses
+defined by Paul
+\textsc{Feautrier}. Chapter~\ref{section-user-interface-menu-layouts}
+contains a set of menu declarations for the window-based interfaces.
 
 Virtually every PIPS programmer contributed some lines in this
-report. Inconsistencies are likely. Please report them to the PIPS team!
+report. Inconsistencies are likely. Please report them to the PIPS
+team\footnote{pips-support@cri.ensmp.fr}!
 
 \tableofcontents
 
@@ -438,17 +476,23 @@ report. Inconsistencies are likely. Please report them to the PIPS team!
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% GLOBALS
 
 \chapter{Global options}
+\label{chapter-global-options}
 
-Skip this chapter on first reading.
-Also skip this chapter on second reading.
+Skip this chapter on first reading.  Also skip this chapter on second
+reading because you are unlikely to need these properties until you
+develop in {\tt PIPS}.
 
+
+\section{Fortran Loops}
 
 Are DO loops bodies executed at least once (F-66 style), or not (Fortran~77)?
 \begin{PipsProp}{ONE_TRIP_DO_FALSE}
 ONE_TRIP_DO FALSE
 \end{PipsProp}
 is useful for use/def and semantics analysis but is not used for
-region analyses. This dangerous property should be set to FALSE.
+region analyses. This dangerous property should be set to FALSE. It is
+not consistently checked by {\tt PIPS} phases, because nobody seems to
+use this obsolete Fortran feature.
 
 \section{Logging}
 \index{Logging}
@@ -458,11 +502,12 @@ With
 LOG_TIMINGS FALSE
 \end{PipsProp}
 it is possible to display the amount of real, cpu and system times
-directly spent in each phase as well as the times spent reading/writing data
-structures from/to PIPS database. The computation of total time used to complete a
-\PIPSMAKE request is broken down into global times, a set of phase times
-which is the accumulation of the times spent in each phase, and a set of
-IO times, also accumulated through phases.
+directly spent in each phase as well as the times spent
+reading/writing data structures from/to {\tt PIPS} database. The computation
+of total time used to complete a \Pipsmake{} request is broken down into
+global times, a set of phase times which is the accumulation of the
+times spent in each phase, and a set of IO times, also accumulated
+through phases.
 
 Note that the IO times are included in the phase times.
 
@@ -472,14 +517,15 @@ LOG_MEMORY_USAGE FALSE
 \end{PipsProp}
 it is possible to log the amount of memory used by each phase and by
 each request. This is mainly useful to check if a computation can be
-performed on a given machine. This memory log can also be used to track memory
+performed on a given machine. This memory log can also be used to
+track memory leaks. {\tt Valgrind} may be more useful to track memory
 leaks.
 
 \section{PIPS Infrastructure}
 \label{section-pips-infrastructure}
 
 \subsection{Newgen}
-\index{NewGen}n
+\index{NewGen}
 \index{Debugging}
 
 Newgen offers some debugging support to check object consistency
@@ -491,7 +537,7 @@ checking. See Newgen documentation\cite{JT89}\cite{JT90}.
 
 This library is external and offers an independent debugging system.
 
-The following property drives how null (
+The following properties specify how null (
 \begin{PipsProp}
 SYSTEM_NULL "<null system>"
 \end{PipsProp}
@@ -505,7 +551,7 @@ systems
 \begin{PipsProp}
 SYSTEM_NOT_FEASIBLE "{0==-1}"
 \end{PipsProp}
-are displayed by Pips when generating a prettyprint.
+are prettyprinted by {\tt PIPS}.
 
 \subsection{PipsMake}
 \index{Pipsmake}
@@ -557,8 +603,8 @@ PIPSDBM_RESOURCES_TO_DELETE "obsolete"
 \end{PipsProp}
 property can be set to to "obsolete" or to "all".
 
-Note that it is not managed from pipsdbm but from pipsmake which knows
-what is obsolete or not.
+Note that it is not managed from {\tt pipsdbm} but from {\tt pipsmake}
+which knows what is obsolete or not.
 
 
 
@@ -583,7 +629,7 @@ controls what to do on user errors: go ahead  or core dump (debug).
 \index{Tpips}
 \index{TPIPS\_IS\_A\_SHELL}
 
-\TPIPS{} is one of PIPS user interfaces.
+{\tt TPIPS} is one of PIPS user interfaces.
 
 \begin{PipsProp}
 TPIPS_NO_EXECUTION_MODE FALSE
@@ -613,7 +659,7 @@ This property is used by library \verb/misc/.
 NO_USER_WARNING FALSE
 \end{PipsProp}
 
-By default, \PIPS{} reports errors generated by system call \verb/stat/
+By default, {\tt PIPS} reports errors generated by system call \verb/stat/
 which is used in library \verb/pipsdbm/ to check the time a resource has
 been written and hence its temporal consistency.
 
@@ -639,32 +685,32 @@ for other directories where they might be found. The first occurrence of
 the file name in the ordered directories is chosen, which is consistent
 with \texttt{PATH} and \texttt{MANPATH} behaviour.
 
-The source files are splitted by \PIPS{} at the
-program initialization phase to produce one \PIPS{}-private source file
+The source files are splitted by \Pips{} at the
+program initialization phase to produce one \Pips{}-private source file
 for each procedure, subroutine or function, and for each block data. A
 function like \verb+fsplit+ is used and the new files are stored in the
 workspace, which simply is a UNIX sub-directory of the current directory.
 These new files have names suffixed by {\tt .f.orig}.
 
-Since \PIPS{} performs interprocedural analyses, it expects to find a
+Since \Pips{} performs interprocedural analyses, it expects to find a
 source code file for each procedure or function called. Missing modules
 can be replaced by stubs, which can be made more or less precise with
 respect to their effects on formal parameters and global variables. A
 stub may be empty. Empty stubs can be automatically generated if the code
 is properly typed (see Section~\ref{subsection-source-file}).
 
-The {\em user} source files should not be edited by the user once \PIPS{}
+The {\em user} source files should not be edited by the user once \Pips{}
 has been started because these editions are not going to be taken into
 account unless a new workspace is created.
 But their preprocessed copies, the
-\PIPS{} source files, safely can be edited while running \PIPS{}. The
+\Pips{} source files, safely can be edited while running \Pips{}. The
 automatic consistency mechanism makes sure that any information
 displayed to the user is consistent with the current state of the
 sources files in the workspace. These source files have names terminated
 by the standard suffix, {\tt .f}.
 
 New user source files should be automatically and completely re-built when the program
-is no longer under \PIPS{} control, i.e. when the
+is no longer under \Pips{} control, i.e. when the
 workspace is closed. An executable application can easily be regenerated
 after code transformations using the \TPIPS{} interface and requesting the
 {\tt PRINTED\_FILE} resources for all modules, including compilation units in C:
@@ -680,11 +726,11 @@ for direct recompilation and compilation units should be included anyway,
 but this is what is done by explicitly requesting the code regeneration as
 described in \S~\ref{sec:regen-user-source}.
 
-Note that \PIPS{} expects proper ANSI Fortran 77 code. Its parser was not
+Note that \Pips{} expects proper ANSI Fortran 77 code. Its parser was not
 designed to locate syntax errors. It is highly recommended to check source
 files with a standard Fortran compiler (see
 Section~\ref{subsection-preprocessing-and-splitting}) before submitting them to
-\PIPS{}.
+\Pips{}.
 
 
 \section{Preprocessing and Splitting}
@@ -695,7 +741,7 @@ Section~\ref{subsection-preprocessing-and-splitting}) before submitting them to
 \index{Hollerith}
 \index{Missing file}
 
-The Fortran files specified as input to \PIPS{} by the user are
+The Fortran files specified as input to \Pips{} by the user are
 preprocessed in various ways.
 
 \begin{description}
@@ -707,7 +753,7 @@ preprocessed in various ways.
 
   In case of failure, a warning is displayed. Note that if the program
   cannot be compiled properly with a Fortran compiler, it is likely that
-  many problems will be encountered within \PIPS{}.
+  many problems will be encountered within \Pips{}.
 
   The next property also triggers this preliminary syntactic verification.
 
@@ -715,7 +761,7 @@ preprocessed in various ways.
 CHECK_FORTRAN_SYNTAX_BEFORE_PIPS FALSE
 \end{PipsProp}
 
-\PIPS{} requires source code for all leaves in its visible call graph. By
+\Pips{} requires source code for all leaves in its visible call graph. By
 default, a user error is raised by Function \verb/initializer/ if a user
 request cannot be satisfied because some source code is missing. It also
 is possible to generate some synthetic code (a.k.a. {\em stubs} or ???)
@@ -790,7 +836,7 @@ Figure~\ref{figure-user-and-source-files}.
 
 \item[Cleaning:] each module source file is then processed by
   \texttt{top-level} to handle Fortran \verb|include| and to comment out
-  \texttt{IMPLICIT NONE} which are not managed by \PIPS{}. Also this phase
+  \texttt{IMPLICIT NONE} which are not managed by \Pips{}. Also this phase
   performs some transformations of complex constants to help the pips
   parser. Files referenced in Fortran \texttt{include} statements are
   looked for from the directory where the Fortran file is.  The Shell
@@ -811,7 +857,7 @@ are created from user source files at program initialization by
 Section~\ref{subsection-preprocessing-and-splitting}).  A
 source file may be updated by the user\footnote{The
   X-window interface, \texttt{wpips} has an \texttt{edit} entry in the
-  transformation menu.}, but not by \PIPS{}. Program
+  transformation menu.}, but not by \Pips{}. Program
 transformations are performed on the internal representation
 (see~\ref{section-abstract-syntax-tree}) and visible in the prettyprinted
 output (see~\ref{section-output-files}).
@@ -863,7 +909,7 @@ initializer                     > MODULE.user_file
 
 Note: the generation of the resource \verb|user_file| here above is mainly
 directed in having the resource concept here. More thought is needed to
-have the concept of user files managed by \PIPSMAKE.
+have the concept of user files managed by \Pipsmake{}.
 
 MUST appear after initializer:
 
@@ -922,7 +968,7 @@ a.k.a. internal representation, is presented in~\cite{IJT92} and in \Pri{}.
 \index{Variable}
 \index{Module}
 
-Program entities are stored in \PIPS{} unique symbol table\footnote{FI:
+Program entities are stored in \Pips{} unique symbol table\footnote{FI:
 retrospectively, having a {\em unique} symbol table for all modules was
 a design mistake. The decision was made to have homogeneous accesses to
 local and global entities. It was also made to match NewGen {\em
@@ -930,7 +976,7 @@ tabulated} type declaration.}, called \verb+entities+. Fortran entities,
 like intrinsics and operators, are created by \verb+bootstrap+ at
 program initialization. The symbol table is updated with user local and
 global variables when modules are parsed or linked together. This side
-effect is not disclosed to \PIPSMAKE.
+effect is not disclosed to \Pipsmake{}.
 
 \begin{PipsMake}
 bootstrap                       > PROGRAM.entities
@@ -967,7 +1013,7 @@ compliant. On the first encountered error, the parser may be able to
 emit a useful message or the non-analyzed part of the source code is
 printed out.
 
-\PIPS{} input language is standard Fortran~77 with few extensions and some
+\Pips{} input language is standard Fortran~77 with few extensions and some
 restrictions. The input character set includes underscore, \verb/_/, and
 varying length variable names, i.e. they are not restricted to 6
 characters.
@@ -978,22 +1024,22 @@ characters.
 
   \item \texttt{ENTRY} statements are not recognized and a user error is
 generated. Very few cases of this obsolete feature were
-encountered in the codes initially used to benchmark \PIPS{}. ENTRY statements have to be replaced manually by \texttt{SUBROUTINE} or
+encountered in the codes initially used to benchmark \Pips{}. ENTRY statements have to be replaced manually by \texttt{SUBROUTINE} or
 \texttt{FUNCTION} and appropriate commons.  If the parser bumps into a
 call to an ENTRY point, it may wrongly diagnose a missing source code
-for this entry, or even generate a useless but \PIPSMAKE{} satisfying stub if the corresponding
+for this entry, or even generate a useless but \Pipsmake{} satisfying stub if the corresponding
 property has been set (see Section~\ref{subsection-source-file}).
 
-  \item Multiple returns are not in \PIPS{} Fortran.
+  \item Multiple returns are not in \Pips{} Fortran.
 
-  \item \texttt{ASSIGN} and assigned \texttt{GOTO} are not in \PIPS{} Fortran.
+  \item \texttt{ASSIGN} and assigned \texttt{GOTO} are not in \Pips{} Fortran.
 
-  \item Computed \texttt{GOTO}s are not in \PIPS{} Fortran.
+  \item Computed \texttt{GOTO}s are not in \Pips{} Fortran.
     They are automatically
     replaced by a \texttt{IF...ELSEIF...ENDIF} construct in the parser.
 
   \item Functional formal parameters are not accepted. This is deeply
-    exploited in \PIPSMAKE.
+    exploited in \Pipsmake{}.
 
   \item Integer PARAMETERs must be initialized with integer constant
     expressions because conversion functions are not implemented.
@@ -1008,7 +1054,7 @@ property has been set (see Section~\ref{subsection-source-file}).
   \item Complex constants, e.g. \texttt{(0.,1.)}, are not directly
     recognized by the
     parser. They must be replaced by a call to intrinsic \texttt{CMPLX}. The
-    \PIPS{} preprocessing replaces them by a call to \texttt{COMPLX\_}.
+    \Pips{} preprocessing replaces them by a call to \texttt{COMPLX\_}.
 
   \item Function formulae are not recognized by the parser. An undeclared
     array and/or an
@@ -1165,7 +1211,7 @@ The PIPS implementation of Allen\&Kennedy algorithm cannot cope with
 labeled DO loops because the loop, and hence its label, may be
 replicated if the loop is distributed. The parser can generate an extra
 \verb/CONTINUE/ statement to carry the label and produce a label-free
-loop. This is not the standard option because \PIPS{} is designed to
+loop. This is not the standard option because \Pips{} is designed to
 output code as close as possible to the user source code.
 
 \begin{PipsProp}{PARSER_SIMPLIFY_LABELLED_LOOPS}
@@ -1350,7 +1396,7 @@ strange results are obtained when executing codes transformed with PIPS,
 his property should be set to false.
 
 A better method would be to represent them somehow a local functions in
-the internal representation, but the implications for \PIPSMAKE{}
+the internal representation, but the implications for \Pipsmake{}
 and other issues are clearly not all foreseen\ldots (Fabien Coelho).
 
 \begin{PipsProp}{PARSER_EXPAND_STATEMENT_FUNCTIONS}
@@ -1366,7 +1412,7 @@ processing as the previous parser. The Fortran file is the result of the
 preprocessing by the \PipsPassRef{hpfc_filter} phase of the original file in
 order to extract the directives and switch them to a Fortran~77 parsable
 form. As another side-effect, this parser hides some callees from
-\PIPSMAKE. This callees are temporary functions used to encode HPF
+\Pipsmake{}. This callees are temporary functions used to encode HPF
 directives. Their call sites are removed from the code before requesting full analyses
 to PIPS. This parser is triggered automatically by the \PipsPassRef{hpfc_close}
 phase when requested. It should never be selected or activated by hand.
@@ -1507,7 +1553,7 @@ c_symbol_table      > MODULE.symbol_table_file
 \index{CFG}
 \index{Control Flow Graph}
 
-\PIPS{} analyses and transformations take advantage of a hierarchical
+\Pips{} analyses and transformations take advantage of a hierarchical
 control flow graph, which preserves structured part of code as such, and
 uses a control flow graph only when no syntactic representation is
 available (see~\cite{IJT91}). The encoding of the relationship between
@@ -1547,7 +1593,7 @@ CONTINUE} statements to preserve as many user comments as possible.
 
 The top statement of a module returned by the \PipsPassRef{controlizer} used to
 contain always an unstructured instruction with only one node. Several phases
-in \PIPS{} assumed that this always is the case, although other program
+in \Pips{} assumed that this always is the case, although other program
 transformations may well return any kind of top statement, most likely a
 \texttt{block}. This is no longer true. The top statement of a module may
 contain any kind of instruction.
@@ -1633,6 +1679,8 @@ FUSE_CONTROL_NODES_WITH_COMMENTS_OR_LABEL FALSE
 \end{PipsProp}
 
 
+%% FI-> ??: why is it located here?
+
 \chapter{Pedagogical phases}
 \label{cha:pedagogical-phases}
 
@@ -1692,7 +1740,7 @@ complementary regions.
 \index{Call Graph}
 
 All lists of callees are needed to build the global lists of callers
-for each module. The callers and callees lists are used by \PIPSMAKE{}
+for each module. The callers and callees lists are used by \Pipsmake{}
 to control top-down and bottom-up analyses. The call graph is
 assumed to be a DAG, i.e. no recursive cycle exists, but it is not
 necessarily connected.
@@ -2040,7 +2088,7 @@ alias in_out_regions_chains 'In-Out Regions'
 
 \begin{PipsPass}{atomic_chains}
 The algorithm used to compute use-def chains is original because it is
-based on \PIPS{} hierarchical control flow graph and not on a unique
+based on \Pips{} hierarchical control flow graph and not on a unique
 control flow graph.
 
 This algorithm generates inexistent dependencies on loop indices. These
@@ -2054,7 +2102,7 @@ because loop indices are not privatized. A prettyprint option,
 must be set to true to see if the loop index is privatized or
 not). The problem disappears when some loop indices are renamed.
 
-The problem is due to the internal representation of DO loops: \PIPS{} has
+The problem is due to the internal representation of DO loops: \Pips{} has
 no way to distinguish between initialization effects and increment
 effects. They have to be merged as proper loop effects. To reduce the
 problem, proper effects of DO loops do not include the index read effect
@@ -2118,7 +2166,7 @@ local in callees, but are exposed to callers because they are
 statically allocated or are formal parameters, are ignored, increasing
 the opportunities to detect parallel loops. But as the program
 transformation which consists in {\em privatizing} variables in
-modules is not yet implemented in \PIPS{}, the code resulting from the
+modules is not yet implemented in \Pips{}, the code resulting from the
 parallelization with \PipsPassRef{in_out_regions_chains} may not be
 equivalent to the original sequential code. 
 
@@ -2138,7 +2186,7 @@ in_out_regions_chains           > MODULE.chains
 
 The following loop in Subroutine \verb+inout+ cannot be parallelized legally
 because Subroutine \verb+foo+ uses a static variable, \verb+y+. However,
-\PIPS{} will display this loop as (potentially) parallel if the
+\Pips{} will display this loop as (potentially) parallel if the
 \verb+in_out+ option is selected for use-def chain computation. Remember
 that IN/OUT regions require MUST regions to obtain interesting results
 (see Section~\ref{subsubsection-in-regions}).
@@ -2237,7 +2285,7 @@ algorithms. A dependence graph is a refinement of use-def chains
 (Section~\ref{subsection-chains}). It is {\em location}-based and not
 {\em value}-based. 
 %See Section~\ref{subsection-array-data-flow-graph}
-%for information about \PIPS{} value-based dependence graph, \textsc{Feautrier}'s
+%for information about \Pips{} value-based dependence graph, \textsc{Feautrier}'s
 %DFG.
 
 There are several ways to compute a dependence graph. Some of them are
@@ -2269,7 +2317,7 @@ occurs). Dependence cones introduced in~\cite{I87,IT87a,IT87b,IT88a}
 are even more precise~\cite{AIY94}.
 
 The computations of dependence level and dependence cone~\cite{Y93} are
-both implemented in \PIPS{}. DDV's are not computed. Currently, only
+both implemented in \Pips{}. DDV's are not computed. Currently, only
 dependence levels are exploited by parallelization algorithms.
 
 The dependence graph can be printed with or without filters (see
@@ -2284,7 +2332,7 @@ graph includes all arcs, but input dependence arcs.
 
 It is possible to gather some statistics about dependences by turning
 on property \PipsPropRef{RICEDG_PROVIDE_STATISTICS} (more details in the
-\PROPERTIES{}). A Shell script from \PIPS{} utilities,
+\PROPERTIES{}). A Shell script from \Pips{} utilities,
 \verb/print-dg-statistics/, can be used in combination to extract the
 most relevant information for a whole program.
 
@@ -2396,7 +2444,7 @@ rice_regions_dependence_graph      > MODULE.dg
 \index{DEPENDENCE\_TEST}
 
 This property seems to be now obsolete. The dependence test choice is
-now controlled directly and only by rules in \PIPSMAKE{}. The procedures
+now controlled directly and only by rules in \Pipsmake{}. The procedures
 called by these rules may use this property. Anyway, it is useless to
 set it manually.
 
@@ -2643,7 +2691,7 @@ loop_statistics > MODULE.stats_file
 \index{Semantics Analysis}
 \index{Analysis (Semantics)}
 
-\PIPS{} semantics analysis targets integer scalar variables. It is a
+\Pips{} semantics analysis targets integer scalar variables. It is a
 two-pass process, with a bottom-up pass computing \PipsPassRef{transformers}, and
 a top-down pass propagating \PipsPassRef{preconditions}. Transformers and
 preconditions are specially powerful case of return and jump
@@ -2652,16 +2700,16 @@ with polyhedra and encompass most standard interprocedural constant
 propagations as well as most interval analyses. It is a powerful {\em
   relational} symbolic analysis.
 
-Unlike~\cite{HC78} their computations are based on \PIPS{}
+Unlike~\cite{HC78} their computations are based on \Pips{}
 Hierarchical Control Flow Graph and on syntactic constructs instead of a
-standard flow graph. The best presentation of this part of \PIPS{} is
+standard flow graph. The best presentation of this part of \Pips{} is
 in~\cite{Ir92}.
 
 A similar analysis is available in Parafrase-2~\cite{}. It handles {\em
 polynomial} equations between scalar integer variables. SUIF~\cite{}
 also performs some kind of semantics analysis.
 
-The semantics analysis part of \PIPS{} was designed and developed by
+The semantics analysis part of \Pips{} was designed and developed by
 François \textsc{Irigoin}.
 
 \subsection{Transformers}
@@ -2732,7 +2780,9 @@ of some variables are numerically known and can be used to simplify
 the initial expression. See properties:
 
 \PipsPropRef{SEMANTICS_RECOMPUTE_EXPRESSION_TRANSFORMERS}
+
 \PipsPropRef{SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT}
+
 \PipsPropRef{SEMANTICS_RECOMPUTE_FIX_POINTS_WITH_PRECONDITIONS}
 
 and phase \PipsPassRef{refine_transformers}.
@@ -3367,8 +3417,8 @@ SEMANTICS_TRUST_ARRAY_REFERENCES FALSE
 \index{SEMANTICS\_ANALYZE\_UNSTRUCTURED}
 
 Perform ``meet'' operations for semantics analysis. This property is
-managed by \PIPSMAKE{} which often sets it to TRUE. See comments in
-\PIPSMAKE{}
+managed by \Pipsmake{} which often sets it to TRUE. See comments in
+\Pipsmake{}
 documentation to turn off convex hull operations for a module or more if
 they last too long.
 
@@ -3954,7 +4004,7 @@ statements, they are equal to the empty list of regions.
 \verb+MAY+ \verb+READ+ and \verb+WRITE+ region analysis was first designed
 by Rémi \textsc{Triolet}~\cite{T84} and then revisited by François
 \textsc{Irigoin}~\cite{TIF86}. Alexis \textsc{Platonoff}~\cite{Pla90}
-implemented the first version of region analysis in \PIPS{}. These
+implemented the first version of region analysis in \Pips{}. These
 regions were computed with respect to the initial stores of the
 modules. François \textsc{Irigoin} and, mainly, Béatrice
 \textsc{Creusillet}~\cite{CI95,CI96,C96}, added new functionalities to
@@ -4037,7 +4087,7 @@ summary_regions                 > MODULE.summary_regions
 \verb+IN+ regions are flow sensitive regions. They are read regions not
 covered (i.e. not previously written) by assignments in the local
 hierarchical control-flow graph. There is no way with the current
-pipsmake-rc and \PIPSMAKE{} to express the fact that \verb+IN+ (and \verb+OUT+)
+pipsmake-rc and \Pipsmake{} to express the fact that \verb+IN+ (and \verb+OUT+)
 regions must be calculated using \PipsPassRef{must_regions} (a new kind of
 resources, \PipsPassRef{must_regions}, should be added). The user must be
 knowledgeable enough to select \PipsPassRef{must_regions} first.
@@ -4316,7 +4366,7 @@ print_alias_classes > MODULE.alias_file
 alias compsec 'Complementary Sections'
 \end{PipsMake}
 
-A new representation of array regions added in \PIPS{} by
+A new representation of array regions added in \Pips{} by
 Manjunathaiah \textsc{Muniyappa}. This anlysis is not maintained
 anymore.
 
@@ -4359,15 +4409,17 @@ summary_complementary_sections > MODULE.summary_compsec
 
 \chapter{Parallelization and Distribution}
 \label{section-program-transformations-parallelization-distribution}
-\index{Transformation}
-\index{Program Transformation}
+%% \index{Transformation}
+%% \index{Program Transformation}
+\index{Parallelization}
+\index{Distribution}
 
 \section{Code Parallelization}
 \label{subsection-parallelization}
 \index{Parallelization}
 
 \begin{PipsPass}{parallelized_code}
-\PIPS{} basic parallelization function, \PipsPassRef{rice_all_dependence},
+\Pips{} basic parallelization function, \PipsPassRef{rice_all_dependence},
 produces a new version of the Module code with DOALL loops exhibited using
 A{\sc llen} \& K{\sc ennedy}'s algorithm. The DOALL syntactic construct is
 non-standard but easy to understand and usual in text book like \cite{Wolfe96}.
@@ -4671,6 +4723,8 @@ normalize_microcode				> MODULE.code
 
 \subsection{Parallelization and Vectorization for Cray Multiprocessors}
 \index{Cray}
+\index{Vectorization}
+\index{Parallelization}
 
 \begin{PipsPass}{rice_cray}
 Function \PipsPassRef{rice_cray} targets Cray vector multiprocessors. It
@@ -4740,18 +4794,23 @@ nest_parallelization                    > MODULE.parallelized_code
 
 
 \subsection{SIMDizer for SIMD multimedia instruction set}
+\index{Superword parallelism}
+\index{Atomizer}
 
 The SAC project aims at generating efficient code for processors with SIMD
 extension instruction set such as VMX, SSE4, etc. For more information,
 see \url{https://info.enstb.org/projets/sac}.
 
 \begin{PipsPass}{simd_atomizer}
-Here is yet another atomizer, based on 'new atomizer'. There are only
-some minor differences with respect to new atomizer, except that it
-does not atomize ``simple'' arguments (that is, arguments that are the
-sum of a reference and a constant). This is needed to be able to
-generate code that would potentially be efficient, whereas the
-original atomizer would most of the time generate unusable code.
+  Here is yet another atomizer, based on {\tt new\_atomizer} (see
+  Section~\ref{subsubsection:limited-atomizer}), used to reduce
+  complex statements to three-address code close to assembly
+  code. There are only some minor differences with respect to {\tt
+    new\_atomizer}, except that it does not break down {\em simple}
+  expressions, that is, expressions that are the sum of a reference
+  and a constant such as {tt i+1}. This is needed to generate code
+  that could potentially be efficient, whereas the original atomizer
+  would most of the time generate inefficient code.
 \end{PipsPass}
 
 \begin{PipsMake}
@@ -5028,7 +5087,7 @@ SIMD_PATTERN_FILE "patterns.def"
 \index{Distribution}
 \index{Automatic Distribution}
 
-Different automatic code distribution techniques are implemented in \PIPS{} for
+Different automatic code distribution techniques are implemented in \Pips{} for
 distributed-memory machines. The first one is based on the emulation of
 a shared-memory. The second one is based on HPF. A third one target
 architectures with hardware coprocessors. Another one is currently
@@ -5047,8 +5106,8 @@ performs the computations, while the other one, \texttt{wp65\_bank\_file},
 emulates a shared memory.
 
 This rule does not have data structure outputs, as the two new program
-generated have computed names. This does not fit the \PIPSMAKE{} framework
-too well, but is OK as long as nobody wishes to apply \PIPS{} on the
+generated have computed names. This does not fit the \Pipsmake{} framework
+too well, but is OK as long as nobody wishes to apply \Pips{} on the
 generated code, e.g. to propagate constant or eliminate dead code.
 
 Note that use-use dependencies are used to allocate temporary arrays in
@@ -5085,9 +5144,9 @@ WP65_MODEL_FILE "model.rc"
 \index{HPFC}
 
 The \HPFcompiler{} is a project by itself, developed by Fabien
-\textsc{Coelho} in the \PIPS{} framework.
+\textsc{Coelho} in the \Pips{} framework.
 
-A whole set of rules is used by the \PIPS{} \HPFcompiler{}, \HPFC{}.  By
+A whole set of rules is used by the \Pips{} \HPFcompiler{}, \HPFC{}.  By
 the way, the whole compiler is just a big hack according to Fabien
 \textsc{Coelho}.
 
@@ -5795,13 +5854,13 @@ analyses, and puts back this modified code as result.
 %% the user manual:
 \begin{PipsPass}{TheTransformationsAtEnd}
 A rule describing a program transformation will never be chosen
-automatically by \PIPSMAKE{} to generate some code since every
+automatically by \Pipsmake{} to generate some code since every
 transformation rule contains a cycle for the \verb+MODULE.code+
 resource. Since the first rule producing code, described in this file,
 is \PipsPassRef{controlizer} and since it is the only non-cyclic rule, the
 internal representation always is initialized with it.
 
-As program transformations produce nothing else, \PIPSMAKE{} cannot guess
+As program transformations produce nothing else, \Pipsmake{} cannot guess
 when to apply these rules automatically. This is exactly what the user
 want most of the time: program transformations are under explicit
 control by the user. Transformations are applied when the user pushes
@@ -5812,12 +5871,12 @@ user interfaces.
 
 Unfortunately, it is sometime nice to be able to chain several
 transformations without any user interaction. No general macro mechanism is
-available in \PIPSMAKE, but it is possible to impose some program
+available in \Pipsmake{}, but it is possible to impose some program
 transformations with the '!' command.
 
 User inputs are not well-integrated although a \verb+user_query+ rule
 and a \verb+string+ resource could easily be added. User interaction
-with a phase are performed directly without notifying \PIPSMAKE{} to be
+with a phase are performed directly without notifying \Pipsmake{} to be
 more flexible and to allow dialogues between a transformation and the user.
 \end{PipsPass}
 
@@ -6451,7 +6510,7 @@ the control graphs of a module. It
 is useful because the controlizer (see
 Section~\ref{subsection-controlized-code}) or some transformation phases
 can generate some {\em spaghetti} code with a lot of useless
-unstructured code which can confuse some other parts of \PIPS{}. Dead code
+unstructured code which can confuse some other parts of \Pips{}. Dead code
 elimination, for example, uses \PipsPassRef{unspaghettify}.
 
 This control restructuring transformation can be automatically applied
@@ -6516,14 +6575,14 @@ UNSPAGHETTIFY_WHILE_RECOVER FALSE
 
 \begin{PipsPass}{restructure_control}
 \PipsPassRef{restructure_control} is a more complete restructuring phase that
-is useful to improve the accuracy of various \PIPS{} phases.
+is useful to improve the accuracy of various \Pips{} phases.
 
 It is implemented by calling \PipsPassRef{unspaghettify}
 (\S~\ref{sec:unspaghettify}) with the properties
 \PipsPropRef{UNSPAGHETTIFY_TEST_RESTRUCTURING} and
 \PipsPropRef{UNSPAGHETTIFY_RECURSIVE_DECOMPOSITION} set to \texttt{TRUE}.
 
-Other restructuring methods are available in \PIPS{} with the TOOLPACK's
+Other restructuring methods are available in \Pips{} with the TOOLPACK's
 restructurer (see
 Section~\ref{subsection-control-structure-normalization-stf}).
 \end{PipsPass}
@@ -6983,7 +7042,7 @@ Atomizer produces, or should produce, three-address like instructions,
 in Fortran. An atomic instructions is an instruction that contains no
 more than three variables, such as {\tt A = B op C}. The result is a
 program in a low-level Fortran on which you are able to use all the
-others passes of \PIPS{}.
+others passes of \Pips{}.
 
 Atomizers are used to simplify the statement encountered by automatic
 distribution phases. For instance, indirect addressing like
@@ -7002,6 +7061,8 @@ atomizer                      > MODULE.code
 \end{PipsMake}
 
 \subsubsection{Limited Atomizer}
+\label{subsubsection:limited-atomizer}
+\index{atomizer}
 
 \begin{PipsPass}{new_atomizer}
 Here is a new version of the atomizer using a small atomizer from
@@ -7108,7 +7169,7 @@ Phase \texttt{Reductions} detects generalized instructions and replaces
 them by calls to a run-time library supporting parallel reductions. It was
 developed by Pierre \textsc{Jouvelot} in CommonLISP, as a prototype, to show than
 NewGen data structures were language-neutral. Thus it by-passes some of
-\PIPSMAKE/dbm facilities.
+\Pipsmake{}/dbm facilities.
 
 This phase is now obsolete, although reduction detection is critical for
 code restructuring and optimization... A new reduction detection phase was
@@ -8439,6 +8500,7 @@ Not implemented yet.
 \subsection{Freeze variables}
 \label{subsection-freeze-variables}
 \index{freeze variables}
+\index{Specialize}
 
 \begin{PipsPass}{freeze_variables}
 Function \PipsPassRef{freeze_variables} produces code where variables
@@ -8447,7 +8509,8 @@ constants. This is useful when the functionality of a code must be
 reduced. For instance, a code designed for N dimensions could be
 reduced to a 3-D code by setting N to 3. This is not obvious when N
 changes within the code. \marginpar{CA? More information? The variable
-names are requested from the PIPS user?}
+names are requested from the PIPS user?} This is useful to specialize
+a code according to specific input data\footnote{See the CHiLL tool.}.
 \end{PipsPass}
 
 \begin{PipsMake}
@@ -8461,16 +8524,18 @@ freeze_variables                   > MODULE.code
 
 \subsection{Manual Editing}
 
-The window interfaces let the user edit the source files. As with
+The window interfaces let the user edit the source files, because it
+is very useful to demonstrate {\tt PIPS}. As with
 \PipsPassRef{stf}, editing is not integrated like other program
 transformations, and previously applied transformations are lost.
 Consistency is however always preserved.
 
-A general edit facility fully integrated in \PIPSMAKE{} is planned
+A general edit facility fully integrated in \Pipsmake{} is planned
 for the (not so) near future. Not so near because user demand for this
 feature is low.
 
-
+Since {\tt tpips} can invoque any Shell command, it is also possible
+to touch and edit source files.
 
 
 
@@ -8478,9 +8543,10 @@ feature is low.
 \label{subsection-transformation_test}
 
 \begin{PipsPass}{transformation_test}
-This is plug to implement quickly a program transformation requested by a
-user. Currently, it is a full loop distribution suggested by Alain \textsc{Darte}
-to compare different implementations, namely Nestor and PIPS.
+  This is plug to implement quickly a program transformation requested
+  by a user. Currently, it is a full loop distribution suggested by
+  Alain \textsc{Darte} to compare different implementations, namely
+  Nestor and PIPS.
 \end{PipsPass}
 \begin{PipsMake}
 alias transformation_test 'Transformation Test'
@@ -8496,6 +8562,8 @@ transformation_test    > MODULE.code
 
 \subsection {OpenMP Pragma}
 \label{subsection-open_mp_pragma}
+\index{OpenMP}
+
 \begin{PipsPass}{OMP Pragma}
 This transformation reads the sequential code and generates OpenMP pragma as
 an extension to statements. The pragmas produced are based on the information
@@ -8526,10 +8594,10 @@ PRAGMA_TYPE "str"
 \label{section-output-files}
 \index{Prettyprinter}
 
-\PIPS{} results for any analysis and/or transformations can be
+\Pips{} results for any analysis and/or transformations can be
 displayed in several different formats. User views are the closest one
 to the initial user source code. Sequential views are obtained by
-prettyprinting the \PIPS{} internal representation of modules. Code
+prettyprinting the \Pips{} internal representation of modules. Code
 can also be displayed graphically or using Emacs facilities (through a
 property). Of course, parallelized versions are available. At the
 program level, call graph and interprocedural control flow graphs,
@@ -10040,7 +10108,7 @@ graph but a tree.} of a module. Of course, the call graph associated
 to the MAIN module is the program call graph.
 
 Each module can be decorated by {\em summary} information computed by
-{\em one} of \PIPS{} analyses.
+{\em one} of \Pips{} analyses.
 
 If one module has different callers, its sub call tree is replicated
 once for each caller\footnote{In the ICFG , the replication would
@@ -10056,7 +10124,7 @@ is a {\em file} resource to be displayed, which cannot be loaded in
 memory by {\em pipsdbm}.
 
 Note that the input resource lists could be reduced to one resource,
-the decoration. \PIPSMAKE{} would deduce the other ones. There is no
+the decoration. \Pipsmake{} would deduce the other ones. There is no
 need for a transitive closure, but some people like it that way to
 make resource usage verification possible...\marginpar{RK:
 explain... FI: no idea; we would like to display any set of resources,
@@ -10294,11 +10362,11 @@ This kind of file contains a more or less precise interprocedural
 control graph. The graph can be restricted to call sites only, to call
 sites and enclosing DO loops or to call sites, enclosing DO loops and
 controlling IF tests. This abstraction option is orthogonal to the set
-of decorations, but \PIPSMAKE does not support this
+of decorations, but \Pipsmake{} does not support this
 orthogonality. All combinations are listed below.
 
 Each call site can be decorated by associated information computed by one
-of \PIPS{} analyses.
+of \Pips{} analyses.
 
 
 
@@ -10831,7 +10899,7 @@ dependence cone and a SRU format which packs all information about one
 arc on one line and which replaces the dependence cone by the
 dependence direction vector (DDV). The line numbers given with this
 format are in fact relative (approximatively...) to the statement line
-in the \PIPS{} output.  The SRU format was defined with researchers at
+in the \Pips{} output.  The SRU format was defined with researchers at
 Slippery Rock University (PA). The property
 \begin{center}
 \PipsPropRef{PRINT_DEPENDENCE_GRAPH_USING_SRU_FORMAT}
@@ -11115,7 +11183,7 @@ print_xml_application      > MODULE.xml_printed_file
 \chapter{Feautrier Methods (a.k.a. Polyhedral Method)}
 \label{section-feautrier-methods}
 
-This part of \PIPS{} was implemented at Centre d'Études Atomiques,
+This part of \Pips{} was implemented at Centre d'Études Atomiques,
 Limeil-Brévannes, by Benoît de \textsc{Dinechin}, Arnauld
 \textsc{Leservot} and Alexis \textsc{Platonoff}.
 
@@ -11355,10 +11423,10 @@ style.
 For presentation issues, it is useful to select only the features that
 are needed by a user and to display them in a comprehensive order. For
 that purpose, a layout description mechanism is used here to pick
-among the \PIPS{} phases described above.
+among the \Pips{} phases described above.
 
 For each menu, the left part before the arrow, \verb|->|, is the menu
-item title and the right part is the \PIPS{} procedure to be called when
+item title and the right part is the \Pips{} procedure to be called when
 the item is selected. For the view menu (section~\ref{sec:view_menu},
 there is two display methods to view resources separated by a comma,
 the first one is the method for \WPIPS, the second one is the one
@@ -11458,16 +11526,16 @@ transformation (s)he wants...
 
 \chapter{Conclusion}
 
-New functionalities can easily be added to \PIPS{}. The new function names
+New functionalities can easily be added to \Pips{}. The new function names
 must be declared somewhere in this file as well as the resources required
 and produced. Then, {\tt make} must be run in the {\tt Documentation}
-directory and the \PIPSMAKE library must be recompiled and \PIPS{}
+directory and the \Pipsmake{} library must be recompiled and \Pips{}
 interfaces (\textsc{pips}, \textsc{tpips}, \textsc{wpips}) linked with the
 new C modules.
 
-It is much more difficult to add a new type of resources, because \PIPS{}
+It is much more difficult to add a new type of resources, because \Pips{}
 database manager, \texttt{pipsdbm}, is not as automatized as
-\PIPSMAKE. This is explained in~\cite{I94}.
+\Pipsmake{}. This is explained in~\cite{I94}.
 
 
 
@@ -11626,6 +11694,11 @@ Workshop CNRS-NSF, Saint-Hilaire du Touvet, Sept. 1992
   \bibitem{I94} F. Irigoin, \& al.,
 {\em Projet PIPS. Environnement de développement},
 Rapport interne EMP-CRI-E146, novembre 1994. This report is available
+on-line and regularly updated.
+
+\bibitem{JT89} P. Jouvelot, R. Triolet,
+	{\em NewGen : A Langage-Independent Program Generator},
+Rapport interne EMP-CRI-E191, July 1989. This report is available
 on-line and regularly updated.
 
 \bibitem{Karr76} M. Karr, Affine Relationships among Variables of a Program,
