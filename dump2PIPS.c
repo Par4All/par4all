@@ -606,7 +606,7 @@ entity gfc2pips_int_const2entity(int n){
 }
 entity gfc2pips_int2label(int n){
 	char str[60];
-	sprintf(str,"%s%s%s%d",TOP_LEVEL_MODULE_NAME,MODULE_SEP_STRING,LABEL_PREFIX,n);fprintf(stdout,"new label: %s %s %s %s %d\n",str,TOP_LEVEL_MODULE_NAME,MODULE_SEP_STRING,LABEL_PREFIX,n);
+	sprintf(str,"%s%s%s%d",TOP_LEVEL_MODULE_NAME,MODULE_SEP_STRING,LABEL_PREFIX,n);//fprintf(stdout,"new label: %s %s %s %s %d\n",str,TOP_LEVEL_MODULE_NAME,MODULE_SEP_STRING,LABEL_PREFIX,n);
 	return make_label(str);
 }
 //on a un grave problème de traduction des valeurs réelles
@@ -676,7 +676,7 @@ type gfc2pips_symbol2type(gfc_symbol *s){
 				ut,
 				(void*) make_value(
 					is_value_constant,
-					//don't use litteral, it is a trap !
+					//don't use litteral, it's a trap !
 					make_constant_int(gfc2pips_symbol2size(s))//it is here we have to specify the length of the character symbol
 				)
 			),
@@ -694,6 +694,7 @@ int gfc2pips_symbol2size(gfc_symbol *s){
 	}
 }
 
+//only for AR_ARRAY references
 newgen_list gfc2pips_array_ref2indices(gfc_array_ref *ar){
 	int i;
 	newgen_list indices=NULL,indices_p=NULL;
@@ -881,14 +882,14 @@ instruction gfc2pips_code2instruction(gfc_code* c, bool force_sequence){
 	//No block, only one instruction
 	if(!c->next && !force_sequence )return gfc2pips_code2instruction_(c);
 
-	//create a sequence and put everithing into it ? is it right ?
+	//create a sequence and put everything into it ? is it right ?
 	newgen_list list_of_instructions,list_of_instructions_p;
 	list_of_instructions= NULL;
 
 	//entity l = gfc2pips_code2get_label(c);
 	list_of_instructions_p = list_of_instructions = CONS(STATEMENT, make_statement(
 		gfc2pips_code2get_label(c),
-		STATEMENT_NUMBER_UNDEFINED,//(instruction_goto_p(i)||instruction_block_p(i))?STATEMENT_NUMBER_UNDEFINED : get_statement_number(),//provient de Syntax :S
+		STATEMENT_NUMBER_UNDEFINED,
 		STATEMENT_ORDERING_UNDEFINED,
 		empty_comments,
 		gfc2pips_code2instruction_(c),
@@ -1245,7 +1246,7 @@ instruction gfc2pips_code2instruction_(gfc_code* c){
 
 	    case EXEC_DO_WHILE:{
 	    	debug(5,"gfc2pips_code2instruction","Translation of DO WHILE\n");
-	    	statement s = instruction_to_statement(gfc2pips_code2instruction(c->block->next,false));//ajouter label ?
+	    	statement s = instruction_to_statement(gfc2pips_code2instruction(c->block->next,false));
 	    	statement_label(s) = gfc2pips_code2get_label(c->block->next);
 	    	whileloop w = make_whileloop(
 	    		gfc2pips_expr2expression(c->expr),
@@ -1254,15 +1255,6 @@ instruction gfc2pips_code2instruction_(gfc_code* c){
 	    		make_evaluation_before()
 	    	);
 	    	return make_instruction_whileloop(w);
-	    	/*
-			show_expr (c->expr);
-			fputc ('\n', dumpfile);
-
-			show_code (level + 1, c->block->next);
-
-			code_indent (level, c->label);
-			fputs ("END DO", dumpfile);*/
-
 	    }break;
 
 /*	    case EXEC_CYCLE:
@@ -1664,15 +1656,205 @@ instruction gfc2pips_code2instruction_(gfc_code* c){
 	      show_expr (c->expr);
 	      goto show_dt_code;
 	      break;
-
+*/
 	    case EXEC_READ:
-	      fputs ("READ", dumpfile);
-	      goto show_dt;
-
 	    case EXEC_WRITE:
-	      fputs ("WRITE", dumpfile);
+	    {
+	    	debug(5,"gfc2pips_code2instruction","Translation of %s\n",c->op==EXEC_WRITE?"PRINT":"READ");
+	    	//yeah ! we've got an intrinsic
+	    	gfc_code *d=c;
+	    	entity e = entity_undefined;
+	    	if(c->op==EXEC_WRITE){
 
-	    show_dt:
+	    		e = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, str2upper(strdup("write")));//print or write ? print is only a particular case of write
+	    	}else{
+	    		e = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, str2upper(strdup("read")));
+	    	}
+
+
+	    	newgen_list list_of_arguments,list_of_arguments_p;
+	    	list_of_arguments = list_of_arguments_p = NULL;
+			for (c = c->block->next; c; c = c->next){
+				if(c->expr){
+					expression ex = gfc2pips_expr2expression(c->expr);
+					if( ex!=entity_undefined && ex!=NULL ){
+						if(list_of_arguments_p){
+							CDR(list_of_arguments_p) = CONS(EXPRESSION,ex,NULL);
+							list_of_arguments_p = CDR(list_of_arguments_p);
+						}else{
+							list_of_arguments = list_of_arguments_p = CONS(EXPRESSION,ex,NULL);
+						}
+					}
+				}
+			}
+			entity_initial(e) = make_value( is_value_intrinsic, e );
+			entity_type(e) = make_type(is_type_functional,make_functional(NIL, MakeOverloadedResult()));
+			call call_ = make_call(e,list_of_arguments);
+			/*return make_instruction_call(call_);*/
+/*
+ * FROM pips parser
+**************************************************
+   char buffer[20];
+		(void) strcpy(buffer, (syn_vsp[(1) - (3)].string));
+		free((syn_vsp[(1) - (3)].string));
+
+		if(strcmp(buffer,"UNIT")!=0 && strcmp(buffer,"FMT")!=0) {
+		  ParserError("parser",
+			  "Illegal default option '*' in IO control list\n");
+		}
+
+		(void) strcat(buffer, "=");
+
+		(syn_val.liste) = CONS(EXPRESSION,
+			  MakeCharacterConstantExpression(buffer),
+			  CONS(EXPRESSION,
+		 MakeNullaryCall(CreateIntrinsic(LIST_DIRECTED_FORMAT_NAME))
+			       , NULL));
+		ici += 2;
+**************************************************
+FROM gram.y
+io_inst:  io_keyword io_f_u_id
+	    {
+                $$ = MakeSimpleIoInst1($1, $2);
+	    }
+        | io_keyword io_f_u_id TK_COMMA opt_lio_elem
+            {
+		$$ = MakeSimpleIoInst2($1, $2, $4);
+	    }
+	| io_keyword TK_LPAR lci TK_RPAR opt_virgule opt_lio_elem
+	    { $$ = MakeIoInstA($1, $3, $6); }
+        | iobuf_keyword TK_LPAR io_f_u_id TK_COMMA io_f_u_id TK_RPAR
+                        TK_LPAR unpar_io_expr TK_COMMA unpar_io_expr TK_RPAR
+	    { $$ = MakeIoInstB($1, $3, $5, $8, $10); }
+
+**************************************************
+FROM instruction MakeSimpleIoInst2(int keyword, expression f, list list_of_arguments(io_list)))
+*/
+			expression std, format, unite,f;
+			cons * lci;
+
+			f = MakeNullaryCall(CreateIntrinsic(LIST_DIRECTED_FORMAT_NAME));
+			//f = make_expression(<syntax(atom)>, normalized_undefined);
+			std = MakeNullaryCall(CreateIntrinsic(LIST_DIRECTED_FORMAT_NAME));
+			//balancer la valeur de UNIT et de FMT d'une façon ou d'une autre ?
+			unite = MakeCharacterConstantExpression("UNIT=");
+			format = MakeCharacterConstantExpression("FMT=");
+
+			lci = CONS(EXPRESSION, unite,
+				CONS(EXPRESSION, std,
+					CONS(EXPRESSION, format,
+						CONS(EXPRESSION, f, NULL)
+					)
+				)
+			);
+/*	inst = MakeIoInstA((keyword==TK_PRINT)?TK_WRITE:TK_READ ,lci, list_of_arguments);
+
+**************************************************
+instruction
+MakeIoInstA(keyword, lci, lio)
+int keyword;
+cons *lci;
+cons *lio;
+{
+  cons *l;
+  instruction io = instruction_undefined;
+  instruction io_call = instruction_undefined;
+  statement io_err = statement_undefined;
+  statement io_end = statement_undefined;
+  expression unit = expression_undefined;
+
+  //on fait une copie et on passe de deux en deux :  attribut1=, valeur1, attribut2=, valeur2
+  for (l = lci; l != NULL; l = CDR(CDR(l))) {
+    syntax s1;
+    entity e1;
+
+    s1 = expression_syntax(EXPRESSION(CAR(l)));
+
+    e1 = call_function(syntax_call(s1));
+
+    if (strcmp(entity_local_name(e1), "UNIT=") == 0) {
+      if( ! expression_undefined_p(unit) )
+	free_expression(unit);
+      unit = copy_expression(EXPRESSION(CAR(CDR(l))));
+    }
+  }
+
+  for (l = lci; l != NULL; l = CDR(CDR(l))) {
+    syntax s1, s2;
+    entity e1, e2;
+
+    s1 = expression_syntax(EXPRESSION(CAR(l)));
+    s2 = expression_syntax(EXPRESSION(CAR(CDR(l))));
+
+    pips_assert("syntax is a call", syntax_call_p(s1));
+    e1 = call_function(syntax_call(s1));
+    pips_assert("value is constant", value_constant_p(entity_initial(e1)));
+    pips_assert("constant is not int (thus litteral or call)",
+		!constant_int_p(value_constant(entity_initial(e1))));
+
+    if (strcmp(entity_local_name(e1), "ERR=") == 0 ||
+	strcmp(entity_local_name(e1), "END=") == 0 ||
+	strcmp(entity_local_name(e1), "FMT=") == 0) {
+      if (syntax_call_p(s2)) {
+	e2 = call_function(syntax_call(s2));
+	if (value_constant_p(entity_initial(e2))) {
+	  if (constant_int_p(value_constant(entity_initial(e2)))) {
+	    call_function(syntax_call(s2)) =
+	      MakeLabel(entity_local_name(e2));
+	  }
+	}
+	e2 = call_function(syntax_call(s2));
+	if (strcmp(entity_local_name(e1), "FMT=") != 0
+	    && expression_undefined_p(unit)) {
+	  unit = int_to_expression(0);
+	}
+	if (strcmp(entity_local_name(e1), "ERR=") == 0) {
+	  io_err = make_check_io_statement(IO_ERROR_ARRAY_NAME, unit, e2);
+	}
+	else if (strcmp(entity_local_name(e1), "END=") == 0) {
+	  io_end = make_check_io_statement(IO_EOF_ARRAY_NAME, unit, e2);
+	}
+	else
+	  ;
+      }
+    }
+  }
+
+  lci = gen_nconc(lci, lio);
+
+  io_call = make_instruction(is_instruction_call,
+			     make_call(CreateIntrinsic(NameOfToken(keyword)),
+				       lci));
+
+  if(statement_undefined_p(io_err) && statement_undefined_p(io_end)) {
+    io = io_call;
+  }
+  else {
+    list ls = NIL;
+    if(!statement_undefined_p(io_err)) {
+      ls = CONS(STATEMENT, io_err, ls);
+    }
+    if(!statement_undefined_p(io_end)) {
+      ls = CONS(STATEMENT, io_end, ls);
+    }
+    ls = CONS(STATEMENT, MakeStatement(entity_empty_label(), io_call), ls);
+    io = make_instruction(is_instruction_sequence, make_sequence(ls));
+    instruction_consistent_p(io);
+  }
+
+  return io;
+}
+
+**************************************************
+ */
+		return make_instruction(is_instruction_call,
+			make_call(e,
+				//CreateIntrinsic(d->op==EXEC_WRITE?"PRINT":"READ"),
+				gen_nconc(lci, NULL)
+			)
+		);
+
+	    /*show_dt:
 	      dt = c->ext.dt;
 	      if (dt->io_unit)
 		{
@@ -1738,7 +1920,9 @@ instruction gfc2pips_code2instruction_(gfc_code* c){
 		}
 	      if (dt->decimal)
 		{
-		  fputs (" DECIMAL=", dumpfile);
+		  fputs (" DECIMAL=", dumpfile);				make_syntax(is_syntax_call,call_),
+								normalized_undefined
+
 		  show_expr (dt->decimal);
 		}
 	      if (dt->delim)
@@ -1766,8 +1950,11 @@ instruction gfc2pips_code2instruction_(gfc_code* c){
 	      fputc ('\n', dumpfile);
 	      for (c = c->block->next; c; c = c->next)
 		show_code_node (level + (c->next != NULL), c);
-	      return;
+	      //return;
+*/
 
+	    }break;
+/*
 	    case EXEC_TRANSFER:
 	      fputs ("TRANSFER ", dumpfile);
 	      show_expr (c->expr);
@@ -1853,10 +2040,8 @@ expression gfc2pips_expr2expression(gfc_expr *expr){
 	//expression => sous_expression | TK_LPAR sous_expression TK_RPAR
 	//MakeFortranBinaryCall(CreateIntrinsic("+"), expression 1, expression 2);
 	expression e = expression_undefined;
-	if(!expr){
-		//fprintf(stdout,"No expr\n");
-		return expression_undefined;
-	}else if(!expr->symtree){
+	message_assert("No expr\n",expr);
+	if(!expr->symtree){
 		//fprintf(stdout,"No symtree\n");
 	}else if(!expr->symtree->n.sym){
 		//fprintf(stdout,"No symbol\n");
@@ -1905,7 +2090,7 @@ expression gfc2pips_expr2expression(gfc_expr *expr){
 				expression e1 = gfc2pips_expr2expression(expr->value.op.op1);
 				expression e2 = gfc2pips_expr2expression(expr->value.op.op2);
 				if(e1 && e2){
-					return MakeFortranBinaryCall(
+					return MakeBinaryCall(
 						CreateIntrinsic(c),
 						e1,
 						e2
@@ -2012,12 +2197,12 @@ expression gfc2pips_expr2expression(gfc_expr *expr){
 				gfc_actual_arglist *act=expr->value.function.actual;
 
 				do{
-					entity e = gfc2pips_expr2expression(act->expr);
+					expression ex = gfc2pips_expr2expression(act->expr);
 
-					if(e!=entity_undefined){
+					if(ex!=entity_undefined){
 
 						if(list_of_arguments_p){
-							CDR(list_of_arguments_p) = CONS(EXPRESSION,e,NIL);
+							CDR(list_of_arguments_p) = CONS(EXPRESSION,ex,NIL);
 							list_of_arguments_p = CDR(list_of_arguments_p);
 						}else{
 							list_of_arguments_p = CONS(EXPRESSION,e,NIL);
