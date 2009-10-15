@@ -11,6 +11,7 @@ w = workspace("test.c")
 foo=w["foo"]
 bar=w["bar"]
 malabar=w["malabar"]
+mb=w["megablast"]
 
 # and apply transformation to modules
 foo.inlining(callers="bar",PURGE_LABELS=False)
@@ -20,6 +21,12 @@ foo.display()
 bar.display()
 malabar.display()
 bar.apply("print_code")
+
+# you can also preform operations on loops
+mb.display("loops_file")
+for l in mb.loops():
+    l.unroll(rate=2)
+mb.display()
 
 # recover a list of all labels in the source code ... without pipsing
 ##

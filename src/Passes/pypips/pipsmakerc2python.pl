@@ -2,10 +2,11 @@
 use strict;
 use warnings;
 
-my $usage = "usage: pipsmakerc2python.pl rc-file.tex properties.rc pipsdep.rc ...\n";
-if( $#ARGV +1 < 3 ) { die $usage; }
+my $usage = "usage: pipsmakerc2python.pl rc-file.tex properties.rc pipsdep.rc ... [-loop|\n";
+if( $#ARGV +1 < 4 ) { die $usage; }
 
 my $texfile=$ARGV[0];
+my $generator=$ARGV[$#ARGV];
 
 
 # read propdep file into a string and convert into a map
@@ -58,17 +59,26 @@ sub print_python_method {
     my $doc = $_[1];
 	my $extraparams= "";
 	my $extraparamssetter = "";
+	my $has_loop_label=0;
 	if( defined @{$pipsdeps{$name}} and scalar(@{$pipsdeps{$name}})>0) {
 		my @props =();
 		foreach my $prop (@{$pipsdeps{$name}}) {
 			my $short_prop = $prop;
-			$short_prop=~s/^$name\_(.*)/\1/;
+			$short_prop=~s/^$name\_(.*)/$1/;
 			my $arg = $short_prop."=".$pipsprops{uc($prop)};
-			push @props, $arg;
-			$extraparamssetter="\t\tself.ws.set_property(".uc($prop)."=$short_prop)\n$extraparamssetter";
+			if( $prop eq "loop_label" ) {
+				$has_loop_label=1;
+				$extraparamssetter="\t\tself.ws.set_property(".uc($prop)."=self.label)\n$extraparamssetter";
+			}
+			else {
+				push @props, $arg;
+				$extraparamssetter="\t\tself.ws.set_property(".uc($prop)."=$short_prop)\n$extraparamssetter";
+			}
 		}
-		$extraparams = join("," , @props);
-		$extraparams="$extraparams,";
+		if( scalar(@props) > 0 ) {
+			$extraparams = join("," , @props);
+			$extraparams="$extraparams,";
+		}
 	}
     $doc =~s/(\\begin\{.*?\})|(\\end\{.*?\})|(\\label\{.*?\})//gms;
     $doc =~s/(\\(.*?)\{.*?\})//gms;
@@ -79,15 +89,21 @@ sub print_python_method {
 	$doc =~s/\\verb\/(.*?)\//$1/gms;
 	$doc =~s/\\PIPS\{\}/PIPS/gms;
     $name =~s/\s/_/g;
-    print <<EOF
+	my $self = "self";
+	if(($has_loop_label == 1)  and ($generator eq "-loop") ) {
+		$self="self.module";
+	}
+	if( (($has_loop_label == 1)  and ($generator eq "-loop") ) or ( ($has_loop_label == 0) and ($generator eq "-all") ) ) {
+    	print <<EOF
 
 	def $name(self,$extraparams **props):
 		"""$doc"""
 $extraparamssetter
-		self.ws._set_property(self.__update_props("$name", props))
-		self.apply("$name")
+		$self.ws._set_property($self._update_props("$name", props))
+		$self.apply("$name")
 
 EOF
+	}
 }
 # parse the string for documentation
 my @doc_strings=($rc=~/\\begin\{PipsPass\}(.*?)\\end\{PipsPass\}/gms);
@@ -97,9 +113,11 @@ foreach(@doc_strings)
     print_python_method($1,$2)
 }
 
-print "\tall_properties=frozenset([";
-foreach(keys %pipsprops) { print "\'$_\',"; }
-print "\"it's a megablast\"])\n";
+if( $generator eq '-all' ) {
+	print "\tall_properties=frozenset([";
+	foreach(keys %pipsprops) { print "\'$_\',"; }
+	print "\"it's a megablast\"])\n";
+}
 
 
 

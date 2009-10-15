@@ -37,6 +37,7 @@
 #include "database.h"
 #include "pipsdbm.h"
 #include "resources.h"
+#include "text-util.h"
 
 #include "control.h"
 #include "conversion.h"
@@ -125,8 +126,8 @@ bool interactive_loop_transformation(string module_name,
     return return_status;
 }
 
-void
-flag_loop(statement st) {
+static
+void flag_loop(statement st, list *loops) {
     instruction i = statement_instruction(st);
     if(instruction_loop_p(i))
     {
@@ -142,7 +143,48 @@ flag_loop(statement st) {
             statement_label(st)=loop_label(l);
         else
             pips_assert("same label on loop and statement",same_entity_p(statement_label(st),loop_label(l)));
+        *loops=CONS(STRING,strdup(entity_user_name(loop_label(l))),*loops);
     }
+    if( !get_bool_property("FLAG_LOOPS_DO_LOOPS_ONLY") && instruction_forloop_p(i))
+    {
+        if(entity_empty_label_p(statement_label(st)))
+            statement_label(st)=make_new_label(get_current_module_name());
+        *loops=CONS(STRING,strdup(entity_user_name(statement_label(st))),*loops);
+    }
+}
+
+
+bool
+print_loops(char *module_name)
+{
+    /* prelude */
+    set_current_module_entity(module_name_to_entity( module_name ));
+    set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, module_name, TRUE) );
+    callees loops = (callees)db_get_memory_resource(DBR_LOOPS, module_name, true);
+
+    /* do the job */
+    {
+        string local = db_build_file_resource_name(DBR_LOOPS_FILE, module_name, ".loops");
+        string dir = db_get_current_workspace_directory();
+        string full = strdup(concatenate(dir,"/",local, NULL));
+        free(dir);
+        FILE * fp = safe_fopen(full,"w");
+        text r = make_text(NIL);
+        FOREACH(STRING,s,callees_callees(loops))
+        {
+            ADD_SENTENCE_TO_TEXT(r,MAKE_ONE_WORD_SENTENCE(0,s));
+        }
+        print_text(fp,r);
+        free_text(r);
+        safe_fclose(fp,full);
+        free(full);
+        DB_PUT_FILE_RESOURCE(DBR_LOOPS_FILE, module_name, local);
+    }
+
+    /*postlude*/
+    reset_current_module_entity();
+    reset_current_module_statement();
+    return true;
 }
 
 /** 
@@ -158,12 +200,14 @@ flag_loops(char *module_name)
     /* prelude */
     set_current_module_entity(module_name_to_entity( module_name ));
     set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, module_name, TRUE) );
+    list loops = NIL;
 
     /* run loop labeler */
-    gen_recurse(get_current_module_statement(),statement_domain,gen_true,flag_loop);
+    gen_context_recurse(get_current_module_statement(),&loops,statement_domain,gen_true,flag_loop);
 
     /* validate */
     DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name,get_current_module_statement());
+    DB_PUT_MEMORY_RESOURCE(DBR_LOOPS, module_name,make_callees(loops));
 
     /*postlude*/
     reset_current_module_entity();

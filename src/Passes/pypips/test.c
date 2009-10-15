@@ -31,3 +31,10 @@ void bar(int *c) {
 void malabar(int *c) {
     *c=foo(3);
 }
+
+void megablast(int n)
+{
+    int i,j;
+    for(i=0;i<n;i++)
+        j=foo(i);
+}

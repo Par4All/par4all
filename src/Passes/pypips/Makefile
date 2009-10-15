@@ -75,6 +75,8 @@ checkall:xpc.py
 
 DOCSTRING=%%@UserManualDocumentation:
 pyps.py: pipsmakerc2python.pl ../../Documentation/pipsmake/pipsmake-rc.tex $(ETC.d)/properties.rc $(ETC.d)/pipsdep.rc _pyps.py 
-	sed -n -e '1,/### helpers/ p' _pyps.py > $@
-	./$^ >> $@
-	sed -n -e '/### helpers/,$$ p' _pyps.py >> $@
+	sed -n -e '1,/### loop_methods/ p' _pyps.py > $@
+	./$^ -loop >> $@
+	sed -n -e '/### loop_methods/,/### module_methods/ p' _pyps.py >> $@
+	./$^ -all >> $@
+	sed -n -e '/### module_methods/,$$ p' _pyps.py >> $@

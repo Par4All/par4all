@@ -5893,15 +5893,28 @@ This is done interactively or by setting the following property to the valid lab
 \begin{PipsProp}{LOOP_LABEL}
 LOOP_LABEL ""
 \end{PipsProp}
+
 \begin{PipsPass}{flag_loops}
-Put a label on unlabelled loops for further interactive processing
+Put a label on unlabelled loops for further interactive processing.
+Unless \PipsPropRef{FLAG_LOOPS_DO_LOOPS_ONLY} is set to false, only do loops are considered.
 \end{PipsPass}
 \begin{PipsMake}
 flag_loops                    > MODULE.code
+		> MODULE.loops
         < PROGRAM.entities
         < MODULE.code
 \end{PipsMake}
+\begin{PipsProp}{FLAG_LOOPS_DO_LOOPS_ONLY}
+FLAG_LOOPS_DO_LOOPS_ONLY TRUE
+\end{PipsProp}
 
+\begin{PipsPass}{print_loops}
+Display label of all modules loops
+\end{PipsPass}
+\begin{PipsMake}
+print_loops	> MODULE.loops_file
+	< MODULE.loops
+\end{PipsMake}
 
 \subsection{Loop Distribution}
 \label{subsection-loop-distribution}

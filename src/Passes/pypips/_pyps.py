@@ -1,10 +1,20 @@
 # coding=iso-8859-15
 import pypips
 import os
+import shutil
 from string import split, upper, join
-import shutil 
 
 
+class loop:
+	"""a loop represent a doloop of  module"""
+
+	def __init__(self,module,label):
+		"""[[internal]] bind a loop to its module"""
+		self.module=module
+		self.label=label
+		self.ws=module.ws
+
+### loop_methods /!\ do not touch this line /!\
 
 
 class module:
@@ -35,7 +45,13 @@ class module:
 		rcfile=self.show("printed_file")
 		return file(self.ws.dir()+rcfile).readlines()
 
-	def __update_props(self,passe,props):
+	def loops(self, label=""):
+		"""return desired loop if label given, an iterator over loops otherwise"""
+		self.apply("print_loops")
+		rcfile=self.show("loops_file")
+		return map(lambda line:loop(self,line[0:-1]), file(self.ws.dir()+rcfile).readlines()) if not label else loop(label)
+
+	def _update_props(self,passe,props):
 		"""[[internal]] change a property dictionnary by appending the passe name to the property when needed """
 		for name,val in props.iteritems():
 			if upper(name) not in self.all_properties:
@@ -44,7 +60,7 @@ class module:
 				#print "warning, changing ", name, "into", passe+"_"+name
 		return props
 
-### helpers /!\ do not touch this line /!\
+### module_methods /!\ do not touch this line /!\
 
 class workspace:
 	"""top level element of the pyps hierarchy,
@@ -62,7 +78,7 @@ class workspace:
 		if os.path.splitext(sources[0])[1] == ".c":
 			self.module_ext=".c"
 			pypips.activate("C_PARSER");
-			self.set_property(PRETTYPRINT_C_CODE=True,PRETTYPRINT_STATEMENT_NUMBER=False)
+			self.set_property(FOR_TO_DO_LOOP_IN_CONTROLIZER=True,PRETTYPRINT_C_CODE=True,PRETTYPRINT_STATEMENT_NUMBER=False)
 		else:
 			self.module_ext=".f"
 		for m in self.info("modules"):
