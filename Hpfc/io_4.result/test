@@ -21,3 +21,9 @@ C               <must be written>: __IO_EFFECTS:LUNS(6)
 
 proper effects
 
+      PROGRAM IO
+      EXTERNAL PRINT_RESULT
+C               <may be read    >: __IO_EFFECTS:LUNS
+C               <may be written >: __IO_EFFECTS:LUNS
+      CALL PRINT_RESULT                                                 0003
+      END
