@@ -53,9 +53,9 @@ extern double P4A_accel_timer_stop_and_float_measure();
     defined
 */
 #ifdef P4A_DEBUG
-#define P4A_SKIP_DEBUG(debug_stuff) debug_stuff
+#define P4A_skip_debug(debug_stuff) debug_stuff
 #else
-#define P4A_SKIP_DEBUG(debug_stuff)
+#define P4A_skip_debug(debug_stuff)
 #endif
 
 

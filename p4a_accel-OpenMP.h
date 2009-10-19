@@ -171,12 +171,12 @@ extern __thread int P4A_vp_coordinate[P4A_vp_dim_max];
 /** Call a CUDA kernel on the accelerator.
 
     An API for full call control. For simpler usage: @see
-    P4A_CALL_ACCEL_KERNEL_1D, @see P4A_CALL_ACCEL_KERNEL_2D, @see
-    P4A_CALL_ACCEL_KERNEL_3D
+    P4A_call_accel_kernel_1d, @see P4A_call_accel_kernel_2d, @see
+    P4A_call_accel_kernel_3d
 
     This transform for example:
 
-    P4A_CALL_ACCEL_KERNEL((pips_accel_1, 1, pips_accel_dimBlock_1),
+    P4A_call_accel_kernel((pips_accel_1, 1, pips_accel_dimBlock_1),
                           (*accel_imagein_re, *accel_imagein_im));
 
     into:

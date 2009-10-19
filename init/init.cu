@@ -13,11 +13,11 @@ float imagein_re[N][N], imageout_re[M][M];
 float imagein_im[N][N], imageout_im[M][M];
 
 
-P4A_ACCEL_KERNEL_WRAPPER void pips_accel_1(float accel_imagein_re[N][N],
-				   float accel_imagein_im[N][N]) {
+P4A_accel_kernel_wrapper void pips_accel_1(float accel_imagein_re[N][N],
+					   float accel_imagein_im[N][N]) {
   /* Get the virtual processor adresses */
-  int i = P4A_VP_X;
-  int j = P4A_VP_Y;
+  int i = P4A_vp_0;
+  int j = P4A_vp_1;
 
   //  for(i=0;i<N;i++)
   // for(j=0;j<N;j++) {
@@ -27,11 +27,11 @@ P4A_ACCEL_KERNEL_WRAPPER void pips_accel_1(float accel_imagein_re[N][N],
 }
 
 
-P4A_ACCEL_KERNEL_WRAPPER void pips_accel_2(float accel_imagein_re[N][N],
-				   float accel_imagein_im[N][N]) {
+P4A_accel_kernel_wrapper void pips_accel_2(float accel_imagein_re[N][N],
+					   float accel_imagein_im[N][N]) {
   /* Get the virtual processor adresses */
-  int i = P4A_VP_X;
-  int j = P4A_VP_Y;
+  int i = P4A_vp_0;
+  int j = P4A_vp_1;
 
   //  for(i=0;i<N;i++)
   // for(j=0;j<N;j++) {
@@ -46,11 +46,11 @@ void getimage() {
   float (*accel_imagein_re)[N][N];
   float (*accel_imagein_im)[N][N];
 
-  P4A_ACCEL_MALLOC(&accel_imagein_re, sizeof(imagein_re));
-  P4A_COPY_TO_ACCEL(imagein_re, accel_imagein_re, sizeof(imagein_re));
+  P4A_accel_malloc(&accel_imagein_re, sizeof(imagein_re));
+  P4A_copy_to_accel(imagein_re, accel_imagein_re, sizeof(imagein_re));
 
-  P4A_ACCEL_MALLOC(&accel_imagein_im, sizeof(imagein_im));
-  P4A_COPY_TO_ACCEL(imagein_im, accel_imagein_im, sizeof(imagein_im));
+  P4A_accel_malloc(&accel_imagein_im, sizeof(imagein_im));
+  P4A_copy_to_accel(imagein_im, accel_imagein_im, sizeof(imagein_im));
 
   /*
     for(i=0;i<N;i++)
@@ -59,11 +59,11 @@ void getimage() {
     imagein_im[i][j]=0.0;
     }
   */
-  P4A_ACCEL_TIMER_START;
+  P4A_accel_timer_start;
   /* Call pips_accel_1 in a N*N parallel nested loop */
-  P4A_CALL_ACCEL_KERNEL_2D(pips_accel_1, N, N,
+  P4A_call_accel_kernel_2d(pips_accel_1, N, N,
 			   *accel_imagein_re, *accel_imagein_im);
-  execution_time = P4A_ACCEL_TIMER_STOP_AND_FLOAT_MEASURE();
+  execution_time = P4A_accel_timer_stop_and_float_measure();
   fprintf(stderr, "Temps d'exécution : %f ms\n", execution_time);
 
   /*
@@ -74,16 +74,16 @@ void getimage() {
     }
   */
   dim3 pips_accel_dimBlock_2(N, N);
-  P4A_ACCEL_TIMER_START;
-  P4A_CALL_ACCEL_KERNEL((pips_accel_2, 1, pips_accel_dimBlock_2),
+  P4A_accel_timer_start;
+  P4A_call_accel_kernel((pips_accel_2, 1, pips_accel_dimBlock_2),
 			(*accel_imagein_re, *accel_imagein_im));
-  execution_time = P4A_ACCEL_TIMER_STOP_AND_FLOAT_MEASURE();
+  execution_time = P4A_accel_timer_stop_and_float_measure();
   fprintf(stderr, "Temps d'exécution : %f ms\n", execution_time);
 
-  P4A_COPY_FROM_ACCEL(imagein_re, accel_imagein_re, sizeof(imagein_re));
-  P4A_ACCEL_FREE(accel_imagein_re);
-  P4A_COPY_FROM_ACCEL(imagein_im, accel_imagein_im, sizeof(imagein_im));
-  P4A_ACCEL_FREE(accel_imagein_im);
+  P4A_copy_from_accel(imagein_re, accel_imagein_re, sizeof(imagein_re));
+  P4A_accel_free(accel_imagein_re);
+  P4A_copy_from_accel(imagein_im, accel_imagein_im, sizeof(imagein_im));
+  P4A_accel_free(accel_imagein_im);
   for( unsigned int i = 0; i < N; ++i) {
     printf("Line %d: ", i);
     for( unsigned int j = 0; j < N; ++j)
@@ -100,7 +100,7 @@ __global__ void
 testKernel( float g_idata[num_threads], float g_odata[num_threads])
 {
   // access thread id
-  const unsigned int tid = P4A_VP_X;
+  const unsigned int tid = P4A_vp_0;
   // access number of threads in this block
   //const unsigned int num_threads = blockDim.x;
 
@@ -108,7 +108,7 @@ testKernel( float g_idata[num_threads], float g_odata[num_threads])
 }
 
 int main() {
-  P4A_INIT_ACCEL;
+  P4A_init_accel;
 
   //unsigned int num_threads = 32;
   unsigned int mem_size = sizeof( float) * num_threads;
@@ -121,9 +121,9 @@ int main() {
 
   // allocate device memory
   float (*d_idata)[mem_size];
-  P4A_ACCEL_MALLOC(&d_idata, sizeof(h_idata));
+  P4A_accel_malloc(&d_idata, sizeof(h_idata));
   // copy host memory to device
-  P4A_COPY_TO_ACCEL(h_idata, *d_idata, sizeof(h_idata));
+  P4A_copy_to_accel(h_idata, *d_idata, sizeof(h_idata));
 
   // allocate device memory for result
   float (*d_odata)[mem_size];
@@ -134,21 +134,21 @@ int main() {
   dim3 threads( num_threads, 1, 1);
 
   // execute the kernel:
-  P4A_CALL_ACCEL_KERNEL((testKernel, grid, threads), ( *d_idata, *d_odata));
+  P4A_call_accel_kernel((testKernel, grid, threads), (*d_idata, *d_odata));
 
   // The same but with a higher level call:
-  P4A_CALL_ACCEL_KERNEL_1D(testKernel, num_threads, *d_idata, *d_odata);
+  P4A_call_accel_kernel_1d(testKernel, num_threads, *d_idata, *d_odata);
 
   // allocate mem for the result on host side
   float h_odata[mem_size];
   // copy result from device to host
-  P4A_COPY_FROM_ACCEL(h_odata, d_odata, sizeof(h_odata));
+  P4A_copy_from_accel(h_odata, d_odata, sizeof(h_odata));
 
   for( unsigned int i = 0; i < num_threads; ++i)
     printf("%f ", h_odata[i]);
   puts("\n");
 
   getimage();
-  P4A_RELEASE_ACCEL;
+  P4A_release_accel;
   return 0;
 }

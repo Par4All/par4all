@@ -89,7 +89,7 @@ void write_data(char filename[]) {
  * file for kernel1.c
  */
 
-P4A_ACCEL_KERNEL void kernel1(float_t space[SIZE][SIZE],
+P4A_accel_kernel void kernel1(float_t space[SIZE][SIZE],
 			      float_t save[SIZE][SIZE],
 			      int i,
 			      int j) {
@@ -108,7 +108,7 @@ P4A_ACCEL_KERNEL void kernel1(float_t space[SIZE][SIZE],
 /*
  * file for launch_kernel1.c
  */
-P4A_ACCEL_KERNEL_WRAPPER void kernel1_wrapper(float_t space[SIZE][SIZE],
+P4A_accel_kernel_wrapper void kernel1_wrapper(float_t space[SIZE][SIZE],
 					      float_t save[SIZE][SIZE]) {
   int j;
   int i;
@@ -118,10 +118,10 @@ kernel1:
    //for(i = 1; i <= 62; i += 10)
   /* We need this wrapper to get the virtual processor coordinates
 
-     The Cuda compiler inline P4A_ACCEL_KERNEL functions by default, so
+     The Cuda compiler inline P4A_accel_kernel functions by default, so
      there is no overhead */
-  i = P4A_VP_X;
-  j = P4A_VP_Y;
+  i = P4A_vp_0;
+  j = P4A_vp_1;
   // Oops. I forgotten a loop normalize since the GPU iterate in [0..SIZE-1]...
   /* We need a phase to generate this clamping too: */
   if (i >= 1 && i <= SIZE - 1 && j >= 1 && j <= SIZE - 1)
@@ -139,10 +139,10 @@ void launch_kernel1(float_t space[SIZE][SIZE], float_t save[SIZE][SIZE]) {
 kernel1:
    //for(i = 1; i <= 62; i += 10)
   // Oops. I forgotten a loop normalize since the GPU iterate in [0..SIZE-1]...
-  P4A_CALL_ACCEL_KERNEL_2D(kernel1_wrapper, SIZE, SIZE, space, save);
+  P4A_call_accel_kernel_2d(kernel1_wrapper, SIZE, SIZE, space, save);
 }
 
-P4A_ACCEL_KERNEL void kernel2(float_t space[SIZE][SIZE], float_t save[SIZE][SIZE], int i, int j)
+P4A_accel_kernel void kernel2(float_t space[SIZE][SIZE], float_t save[SIZE][SIZE], int i, int j)
 {
    //int j;
    {
@@ -159,7 +159,7 @@ P4A_ACCEL_KERNEL void kernel2(float_t space[SIZE][SIZE], float_t save[SIZE][SIZE
 /*
  * file for launch_kernel2.c
  */
-P4A_ACCEL_KERNEL_WRAPPER void kernel2_wrapper(float_t space[SIZE][SIZE], float_t save[SIZE][SIZE])
+P4A_accel_kernel_wrapper void kernel2_wrapper(float_t space[SIZE][SIZE], float_t save[SIZE][SIZE])
 {
   int j;
   int i;
@@ -169,10 +169,10 @@ kernel2:
    //for(i = 1; i <= 62; i += 10)
   /* We need this wrapper to get the virtual processor coordinates
 
-     The Cuda compiler inline P4A_ACCEL_KERNEL functions by default, so
+     The Cuda compiler inline P4A_accel_kernel functions by default, so
      there is no overhead */
-  i = P4A_VP_X;
-  j = P4A_VP_Y;
+  i = P4A_vp_0;
+  j = P4A_vp_1;
   // Oops. I forgotten a loop normalize since the GPU iterate in [0..SIZE-1]...
   /* We need a phase to generate this clamping too: */
   if (i >= 1 && i <= SIZE - 1 && j >= 1 && j <= SIZE - 1)
@@ -189,7 +189,7 @@ void launch_kernel2(float_t space[SIZE][SIZE], float_t save[SIZE][SIZE])
 kernel2:
    //for(i = 1; i <= 62; i += 10)
   // Oops. I forgotten a loop normalize since the GPU iterate in [0..SIZE-1]...
-  P4A_CALL_ACCEL_KERNEL_2D(kernel2_wrapper, SIZE, SIZE, space, save);
+  P4A_call_accel_kernel_2d(kernel2_wrapper, SIZE, SIZE, space, save);
 }
 
 void compute(float_t space[SIZE][SIZE], float_t save[SIZE][SIZE]) {
@@ -205,7 +205,7 @@ kernel2:   launch_kernel2(space, save);
 int main(int argc, char *argv[]) {
   int t, i;
 
-  P4A_INIT_ACCEL;
+  P4A_init_accel;
 
   if (argc != 2) {
     fprintf(stderr,
@@ -224,30 +224,30 @@ int main(int argc, char *argv[]) {
      put at the highest level. It needs the interprocedural PIPS region
      analysis... :-) */
   float_t (*p4a_var_space)[SIZE][SIZE];
-  P4A_ACCEL_MALLOC(&p4a_var_space, sizeof(space));
-  P4A_COPY_TO_ACCEL(space, p4a_var_space, sizeof(space));
+  P4A_accel_malloc(&p4a_var_space, sizeof(space));
+  P4A_copy_to_accel(space, p4a_var_space, sizeof(space));
 
   float_t (*p4a_var_save)[SIZE][SIZE];
-  P4A_ACCEL_MALLOC(&p4a_var_save, sizeof(save));
-  P4A_COPY_TO_ACCEL(save, p4a_var_save, sizeof(save));
+  P4A_accel_malloc(&p4a_var_save, sizeof(save));
+  P4A_copy_to_accel(save, p4a_var_save, sizeof(save));
 
-  P4A_ACCEL_TIMER_START;
+  P4A_accel_timer_start;
 
   for(t = 0; t < T; t++)
     compute(*p4a_var_space, *p4a_var_save);
 
-  double execution_time = P4A_ACCEL_TIMER_STOP_AND_FLOAT_MEASURE();
+  double execution_time = P4A_accel_timer_stop_and_float_measure();
   fprintf(stderr, "Temps d'exécution : %f s\n", execution_time);
   fprintf(stderr, "GFLOPS : %f\n",
 	  4e-9/execution_time*T*(SIZE - 1)*(SIZE - 1));
 
-  P4A_COPY_FROM_ACCEL(space, p4a_var_space, sizeof(space));
+  P4A_copy_from_accel(space, p4a_var_space, sizeof(space));
 
-  P4A_ACCEL_FREE(p4a_var_space);
-  P4A_ACCEL_FREE(p4a_var_save);
+  P4A_accel_free(p4a_var_space);
+  P4A_accel_free(p4a_var_save);
 
   write_data("output.pgm");
 
-  P4A_RELEASE_ACCEL;
+  P4A_release_accel;
   return 0;
 }

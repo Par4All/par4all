@@ -187,12 +187,12 @@ extern cudaEvent_t p4a_start_event, p4a_stop_event;
 /** Call a CUDA kernel on the accelerator.
 
     An API for full call control. For simpler usage: @see
-    P4A_CALL_ACCEL_KERNEL_1D, @see P4A_CALL_ACCEL_KERNEL_2D, @see
-    P4A_CALL_ACCEL_KERNEL_3D
+    P4A_call_accel_kernel_1d, @see P4A_call_accel_kernel_2d, @see
+    P4A_call_accel_kernel_3d
 
     This transform for example:
 
-    P4A_CALL_ACCEL_KERNEL((pips_accel_1, 1, pips_accel_dimBlock_1),
+    P4A_call_accel_kernel((pips_accel_1, 1, pips_accel_dimBlock_1),
                           (*accel_imagein_re, *accel_imagein_im));
 
     into:
@@ -201,7 +201,7 @@ extern cudaEvent_t p4a_start_event, p4a_stop_event;
 */
 #define P4A_call_accel_kernel(context, parameters)			\
   do {									\
-    P4A_SKIP_DEBUG(P4A_dump_message("Invoking kernel %s with %s\n",	\
+    P4A_skip_debug(P4A_dump_message("Invoking kernel %s with %s\n",	\
 				    #context,				\
 				    #parameters));			\
     P4A_call_accel_kernel_context context				\
@@ -238,12 +238,12 @@ extern cudaEvent_t p4a_start_event, p4a_stop_event;
 					 grid_descriptor_name,		\
 					 size)				\
   /* Define the number of thread per block: */				\
-  dim3 block_descriptor_name(P4A_MIN((int)size,				\
+  dim3 block_descriptor_name(P4A_min((int)size,				\
 				     (int)P4A_THREAD_PER_BLOCK_IN_1D));	\
   /* Define the ceil-rounded number of needed blocks of threads: */	\
   dim3 grid_descriptor_name((((int)size) + P4A_THREAD_PER_BLOCK_IN_1D - 1)/P4A_THREAD_PER_BLOCK_IN_1D);	\
-  P4A_SKIP_DEBUG(P4A_dump_block_descriptor(block_descriptor_name);)	\
-  P4A_SKIP_DEBUG(P4A_dump_grid_descriptor(grid_descriptor_name);)
+  P4A_skip_debug(P4A_dump_block_descriptor(block_descriptor_name);)	\
+  P4A_skip_debug(P4A_dump_grid_descriptor(grid_descriptor_name);)
 
 
 /** Allocate the descriptors for a 2D set of thread with a simple
@@ -260,8 +260,8 @@ extern cudaEvent_t p4a_start_event, p4a_stop_event;
   /* Define the ceil-rounded number of needed blocks of threads: */	\
   dim3 grid_descriptor_name((((int)n_x_iter) + P4A_THREAD_X_PER_BLOCK_IN_2D - 1)/P4A_THREAD_X_PER_BLOCK_IN_2D, \
 			    (((int)n_y_iter) + P4A_THREAD_Y_PER_BLOCK_IN_2D - 1)/P4A_THREAD_Y_PER_BLOCK_IN_2D); \
-  P4A_SKIP_DEBUG(P4A_dump_block_descriptor(block_descriptor_name);)	\
-  P4A_SKIP_DEBUG(P4A_dump_grid_descriptor(grid_descriptor_name);)
+  P4A_skip_debug(P4A_dump_block_descriptor(block_descriptor_name);)	\
+  P4A_skip_debug(P4A_dump_grid_descriptor(grid_descriptor_name);)
 
 
 /** Dump a CUDA dim3 descriptor with an introduction message */
