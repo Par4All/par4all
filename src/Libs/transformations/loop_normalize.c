@@ -134,7 +134,7 @@ void loop_normalize_statement(statement s) {
 
     /* Do not normalize normal loops (loops with a 1-increment), except if
        we ask for: */
-    if (normal_loop_p(l) && !get_bool_property("LOOP_NORMALIZE_1_INCREMENT"))
+    if (normal_loop_p(l) && !get_bool_property("LOOP_NORMALIZE_ONE_INCREMENT"))
       return;
 
     // Get the new lower bound of the loop:

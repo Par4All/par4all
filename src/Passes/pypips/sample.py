@@ -5,7 +5,7 @@ from pyps import *
 
 
 # a worspace ID is automagically created ... may be not a good feature
-w = workspace("test.c")
+w = workspace(["test.c"])
 
 # you can get module object from the modules table
 foo=w["foo"]
@@ -27,6 +27,10 @@ mb.display("loops_file")
 for l in mb.loops():
     l.unroll(rate=2)
 mb.display()
+
+# access all functions
+w.all().partial_eval()
+w.all().display()
 
 # recover a list of all labels in the source code ... without pipsing
 ##

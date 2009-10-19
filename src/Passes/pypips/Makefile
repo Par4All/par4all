@@ -78,5 +78,7 @@ pyps.py: pipsmakerc2python.pl ../../Documentation/pipsmake/pipsmake-rc.tex $(ETC
 	sed -n -e '1,/### loop_methods/ p' _pyps.py > $@
 	./$^ -loop >> $@
 	sed -n -e '/### loop_methods/,/### module_methods/ p' _pyps.py >> $@
-	./$^ -all >> $@
-	sed -n -e '/### module_methods/,$$ p' _pyps.py >> $@
+	./$^ -module >> $@
+	sed -n -e '/### module_methods/,/### modules_methods/ p' _pyps.py >> $@
+	./$^ -modules >> $@
+	sed -n -e '/### modules_methods/,$$ p' _pyps.py >> $@

@@ -1706,8 +1706,10 @@ simple_xpath_test > MODULE.code
 \section{Prepending a comment}
 \label{sec:prepending-comment}
 
-To prepend a comment to the first statement of a module.
+\begin{PipsPass}{prepend_comment}
+Prepends a comment to the first statement of a module.
 Useful to apply post-processing after PIPS.
+\end{PipsPass}
 
 \begin{PipsMake}
 alias prepend_comment 'Prepend a comment to the first statement of a module'
@@ -5821,7 +5823,9 @@ where \verb|%d| is used to get the dimension number.
 Please, do not use this feature for buffer-overflow attack...
 
 
-The next phase annotates loop nests with comments and guards for further generation of CUDA calls.
+\begin{PipsPass}{gpu_loop_nest_annotate}
+Annotates loop nests with comments and guards for further generation of CUDA calls.
+\end{PipsPass}
 
 \begin{PipsMake}
 gpu_loop_nest_annotate	        > MODULE.code	
@@ -6186,6 +6190,7 @@ loop_tiling                            > MODULE.code
 The loop normalization consists in transforming all the loops of a given
 module into a normal form. In this normal form, the lower bound and the
 increment are equal to one (1).
+\end{PipsPass}
 
 If we note the initial DO loop as:
 \begin{tabbing}
@@ -6209,7 +6214,6 @@ number. The normalization produces two assignment statements on the
 initial loop index. The first one (at the beginning of the loop body)
 assigns it to its value function of the new index and the second one
 (after the end of the loop) assigns it to its final value.
-\end{PipsPass}
 
 \begin{PipsMake}
 alias loop_normalize 'Loop Normalize'
@@ -6220,8 +6224,8 @@ loop_normalize          > MODULE.code
 
 If the increment is 1, the loop is considered already normalized. To have
 a 1-increment loop normalized too, set the following property
-\begin{PipsProp}
-LOOP_NORMALIZE_1_INCREMENT FALSE
+\begin{PipsProp}{LOOP_NORMALIZE_ONE_INCREMENT}
+LOOP_NORMALIZE_ONE_INCREMENT FALSE
 \end{PipsProp}
 This is useful to have iteration spaces that begin at 0 for GPU for
 example.
@@ -6233,13 +6237,13 @@ make sense in Fortran.
 Anyway, no we could generalize for C (starting at 0 is more natural) or
 why not from any other value that can be chosen with the following
 property:
-\begin{PipsProp}
+\begin{PipsProp}{LOOP_NORMALIZE_LOWER_BOUND}
 LOOP_NORMALIZE_LOWER_BOUND 1
 \end{PipsProp}
 
 If you are sure the final assignment is useless, you can skip it with the
 following property.
-\begin{PipsProp}
+\begin{PipsProp}{LOOP_NORMALIZE_SKIP_INDEX_SIDE_EFFECT}
 LOOP_NORMALIZE_SKIP_INDEX_SIDE_EFFECT FALSE
 \end{PipsProp}
 

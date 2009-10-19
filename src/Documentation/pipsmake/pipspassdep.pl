@@ -19,7 +19,7 @@ my $rc = join "", @lines;
 close INPUT;
 
 # parse the string for pass section
-my @passes=($rc=~/^\\begin\{PipsPass\}(.*?)\\(?:(?:begin\{PipsPass\})|(?:(?:sub)*section)|(?:chapter))/gms);
+my @passes=($rc=~/^\\begin\{PipsPass\}(.*?)\n\\(?:(?:begin\{PipsPass\})|(?:(?:sub)*section)|(?:chapter))/gms);
 foreach(@passes) {
 	/\{(.*?)\}(.*)/gms;
 	my $pass = $1;

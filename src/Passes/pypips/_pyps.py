@@ -35,8 +35,9 @@ class module:
 		"""apply transformation phase"""
 		pypips.apply(upper(phase),self.name)
 
-	def display(self,rc="printed_file"):
+	def display(self,rc="printed_file",With="PRINT_CODE"):
 		"""display a given resource rc"""
+		self.ws.activate(With)
 		return pypips.display(upper(rc),self.name)
 
 	def code(self):
@@ -62,33 +63,50 @@ class module:
 
 ### module_methods /!\ do not touch this line /!\
 
+class modules:
+	"""high level representation of a module set,
+	its only purpose is to dispatch maethod calls on contained modules"""
+	def __init__(self,modules):
+		self.modules=modules
+		self.ws=modules[0].ws
+
+	def display(self,rc="printed_file", With="PRINT_CODE"):
+		"""display all modules"""
+		map(lambda m:m.display(rc, With),self.modules)
+
+	def loops(self):
+		""" return a list of all program loops"""
+		return reduce(lambda l1,l2:l1+l2.loops(), self.modules, [])
+
+### modules_methods /!\ do not touch this line /!\
+
 class workspace:
 	"""top level element of the pyps hierarchy,
 		it represents a set of source files and provides methods
 		to manipulate them"""
 
-	def initialize(self,sources2):
-		"""[[internal]] init the workspace from a list of sources"""
+	def __build_module_list(self):
+		for m in self.info("modules"):
+			self.modules[m]=module(self,m,self.sources[0])
+
+	def __init__(self,sources2,activates=[]):
+		"""init a workspace from a list of sources"""
 		workspace=os.path.basename(os.tempnam("","PYPS"))
 		def helper(x,y):
 			return x+y if isinstance(y,list) else x +[y]
-		sources=reduce(helper,sources2,[])
-		pypips.create(workspace, sources)
+		self.sources=reduce(helper,sources2,[])
+		pypips.create(workspace, self.sources)
 		self.modules = {}
-		if os.path.splitext(sources[0])[1] == ".c":
+		if os.path.splitext(self.sources[0])[1] == ".c":
 			self.module_ext=".c"
 			pypips.activate("C_PARSER");
 			self.set_property(FOR_TO_DO_LOOP_IN_CONTROLIZER=True,PRETTYPRINT_C_CODE=True,PRETTYPRINT_STATEMENT_NUMBER=False)
 		else:
 			self.module_ext=".f"
-		for m in self.info("modules"):
-			self.modules[m]=module(self,m,sources[0])
+		map(lambda x:pypips.activate(x),activates)
+		self.__build_module_list()
 		self.name=self.info("workspace")[0]
 		self.cleared=False
-
-	def __init__(self,*sources2):
-		"""init a workspace from a list of sources"""
-		self.initialize(sources2)
 
 	def __iter__(self):
 		"""provide an iterator on workspace's module, so that you can write
@@ -98,6 +116,7 @@ class workspace:
 
 	def __getitem__(self,module_name):
 		"""retreive a module of the module from its name"""
+		self.__build_module_list()
 		return self.modules[module_name]
 
 	def __setitem__(self,i):
@@ -169,6 +188,12 @@ class workspace:
 		"""activate a given phase"""
 		pypips.activate(phase)
 
+	def all(self,matching=lambda x:True):
+		"""create an object containing current listing of all modules,
+		eventually filterd by the filter argument"""
+		self.__build_module_list()
+		the_modules=[m for m in self.modules.values() if matching(m)]
+		return modules(the_modules)
 
 	def quit(self):
 		"""force cleaning and deletion of the workspace"""

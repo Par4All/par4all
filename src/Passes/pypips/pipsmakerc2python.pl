@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-my $usage = "usage: pipsmakerc2python.pl rc-file.tex properties.rc pipsdep.rc ... [-loop|\n";
+my $usage = "usage: pipsmakerc2python.pl rc-file.tex properties.rc pipsdep.rc ... [-loop|-module|-modules]\n";
 if( $#ARGV +1 < 4 ) { die $usage; }
 
 my $texfile=$ARGV[0];
@@ -93,16 +93,32 @@ sub print_python_method {
 	if(($has_loop_label == 1)  and ($generator eq "-loop") ) {
 		$self="self.module";
 	}
-	if( (($has_loop_label == 1)  and ($generator eq "-loop") ) or ( ($has_loop_label == 0) and ($generator eq "-all") ) ) {
+	if( (($has_loop_label == 1)  and ($generator eq "-loop") ) or ( ($has_loop_label == 0) and (not $generator eq "-loop") ) ) {
     	print <<EOF
 
 	def $name(self,$extraparams **props):
 		"""$doc"""
 $extraparamssetter
+EOF
+	;
+
+		if( not $generator eq "-modules" ) {
+    		print <<EOF
 		$self.ws._set_property($self._update_props("$name", props))
 		$self.apply("$name")
 
 EOF
+			;
+		}
+		else {
+    		print <<EOF
+		for m in self.modules:
+			m.ws._set_property(m._update_props("$name", props))
+			m.apply("$name")
+
+EOF
+			;
+		}
 	}
 }
 # parse the string for documentation
@@ -113,7 +129,7 @@ foreach(@doc_strings)
     print_python_method($1,$2)
 }
 
-if( $generator eq '-all' ) {
+if( $generator eq '-module' ) {
 	print "\tall_properties=frozenset([";
 	foreach(keys %pipsprops) { print "\'$_\',"; }
 	print "\"it's a megablast\"])\n";
