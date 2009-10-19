@@ -181,6 +181,8 @@ static bool privatizer(char *module_name)
     set_out_effects((statement_effects) 
 	db_get_memory_resource(DBR_OUT_REGIONS, module_name, TRUE));
 
+    set_methods_for_convex_effects();
+
     /* predicates defining summary regions from callees have to be 
        translated into variables local to module */
     set_current_module_entity(module_name_to_entity(module_name));
@@ -232,6 +234,7 @@ static bool privatizer(char *module_name)
     reset_in_effects();
     reset_invariant_in_effects();
     reset_out_effects();
+    generic_effects_reset_all_methods();
     if (store_as_regions)
     {
 	reset_private_effects();
@@ -826,7 +829,8 @@ declarations_privatizer(char *mod_name)
 	db_get_memory_resource(DBR_IN_REGIONS, mod_name, TRUE));
     set_out_effects((statement_effects) 
 	db_get_memory_resource(DBR_OUT_REGIONS, mod_name, TRUE));
-   
+    set_methods_for_convex_effects();
+
     l_write = regions_dup
 	(regions_write_regions(load_statement_local_regions(module_stat))); 
     l_in = regions_dup(load_statement_in_regions(module_stat));
@@ -873,6 +877,7 @@ declarations_privatizer(char *mod_name)
     reset_rw_effects();
     reset_in_effects();
     reset_out_effects();
+    generic_effects_reset_all_methods();
     free_value_mappings();
     return( TRUE );
 }

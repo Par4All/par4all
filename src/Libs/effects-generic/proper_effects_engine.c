@@ -506,7 +506,7 @@ list generic_proper_effects_of_complex_address_expression(expression add_exp, ef
 			effect eff_read;
 			pips_debug(4, "It's a pointer; we add a read effect \n");
 			
-			eff_read = copy_effect(*pme);
+			eff_read = (*effect_dup_func)(*pme);
 			effect_action_tag(eff_read) = is_action_read;
 			le = gen_nconc(le, CONS(EFFECT, eff_read, NIL));
 		      }
@@ -746,7 +746,7 @@ list generic_proper_effects_of_complex_address_expression(expression add_exp, ef
 		  /* the pointer is read */
 		  pips_debug(4, "we add a read effect on the pointer. \n");
 		  
-		  eff_read = copy_effect(*pme);
+		  eff_read = (*effect_dup_func)(*pme);
 		  effect_action_tag(eff_read) = is_action_read;
 		  le = gen_nconc(le, CONS(EFFECT, eff_read, NIL));
 
@@ -773,7 +773,7 @@ list generic_proper_effects_of_complex_address_expression(expression add_exp, ef
 		      basic_pointer_p(variable_basic(type_variable(e1t))))
 		    {
 		      pips_debug(8, "adding read effect on argument \n"); 
-		      eff_read = copy_effect(*pme);
+		      eff_read = (*effect_dup_func)(*pme);
 		      effect_action_tag(eff_read) = is_action_read;
 		      le = gen_nconc(le, CONS(EFFECT, eff_read, NIL));
 		    }
@@ -801,7 +801,7 @@ list generic_proper_effects_of_complex_address_expression(expression add_exp, ef
 	      */
 	      if (pointer_type_p (t_s_exp))
 		{
-		  effect eff_read = copy_effect(* pme);
+		  effect eff_read = (*effect_dup_func)(* pme);
 
 		  pips_debug(5, "adding read effect on array expression\n");
 		  effect_action_tag(eff_read) = is_action_read;

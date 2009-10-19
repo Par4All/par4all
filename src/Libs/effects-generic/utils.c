@@ -897,13 +897,13 @@ list clean_anywhere_effects(list l_eff)
   bool anywhere_r_p = false;
 
   l_tmp = l_eff;
-  while (!anywhere_w_p && !anywhere_r_p && !ENDP(l_tmp))
+  while ((!anywhere_w_p || !anywhere_r_p) && !ENDP(l_tmp))
     {
       effect eff = EFFECT(CAR(l_tmp));
       if (anywhere_effect_p(eff))
 	{
-	  anywhere_w_p = effect_write_p(eff);
-	  anywhere_r_p = effect_read_p(eff);
+	  anywhere_w_p = anywhere_w_p || effect_write_p(eff);
+	  anywhere_r_p = anywhere_r_p || effect_read_p(eff);
 	}
       
       POP(l_tmp);
@@ -931,7 +931,7 @@ list clean_anywhere_effects(list l_eff)
 	  (effect_write_p(eff) && !anywhere_w_p) ||
 	  (effect_read_p(eff) && !anywhere_r_p))
 	{
-	  l_res = gen_nconc(l_res, CONS(EFFECT, copy_effect(eff), NIL));
+	  l_res = gen_nconc(l_res, CONS(EFFECT, (*effect_dup_func)(eff), NIL));
 	}     
       POP(l_tmp);
     }
@@ -961,7 +961,7 @@ list effect_to_effects_with_given_tag(effect eff, tag act)
     {      
       eff_write = eff;
       effect_action_tag(eff_write) = is_action_write;
-      eff_read = copy_effect(eff_write);
+      eff_read = (*effect_dup_func)(eff_write);
       effect_action_tag(eff_read) = is_action_read;
     }
   else if (act == 'r')
@@ -1029,7 +1029,7 @@ list generic_effect_generate_all_accessible_paths_effects(effect eff,
 
       /* this may lead to memory leak if no different access path is 
 	 reachable */
-      eff_write = copy_effect(eff);
+      eff_write = (*effect_dup_func)(eff);
       
       ifdebug(6)
 	{
@@ -1076,7 +1076,7 @@ list generic_effect_generate_all_accessible_paths_effects(effect eff,
 	      {
 		pips_debug(8, "pointer case, \n");
 				
-		eff_write = copy_effect(eff_write);
+		eff_write = (*effect_dup_func)(eff_write);
 		(*effect_add_expression_dimension_func)
 		  (eff_write, make_unbounded_expression());
 		
@@ -1473,7 +1473,7 @@ list generic_effects_store_update(list l_eff, statement s, bool backward_p)
 	       if (!found)
 		 {
 		   /* is the copy necessary ?*/
-		   l_res = gen_nconc(l_res, CONS(EFFECT,copy_effect(eff) , NIL));
+		   l_res = gen_nconc(l_res, CONS(EFFECT,(*effect_dup_func)(eff) , NIL));
 		   
 		 }
 	       

@@ -188,17 +188,14 @@ region region_dup(region reg)
     region new_reg;
     debug_region_consistency(reg);
 
+    pips_assert("region cell must be a reference\n", 
+		cell_reference_p(effect_cell(reg)));
+
     new_reg = copy_effect(reg);
 
     pips_assert("The copied region has the same persistent property as sthe input region",
 		cell_tag(effect_cell(new_reg))==cell_tag(effect_cell(new_reg)));
 
-    /* Duplicate the reference in spite of the persistant attribute */
-    if(cell_preference_p(region_cell(new_reg))) {
-      /* work around persistency of effect reference */
-      preference p = cell_preference(region_cell(new_reg));
-      preference_reference(p) = copy_reference(region_any_reference(reg));
-    }
 
     debug_region_consistency(new_reg);
     pips_assert("No sharing of references",
@@ -250,18 +247,11 @@ void regions_free(list l_reg)
 void region_free(region reg)
 {
     debug_region_consistency(reg);
+    
+    pips_assert("region cell must be a reference\n", 
+		cell_reference_p(effect_cell(reg)));
 
-    if(cell_preference_p(region_cell(reg))) {
-      /* work around persistency of effect reference */
-      preference p = cell_preference(region_cell(reg));
-      free_reference(region_any_reference(reg));
-      /* FI: Should be useless with the persistant attribute */
-      preference_reference(p) = reference_undefined;
       free_effect(reg);
-    }
-    else {
-      free_effect(reg);
-    }
 }
 
 
@@ -1369,8 +1359,6 @@ effect reference_whole_region(reference ref, tag tac)
 	sc = sc_new();
       }/* if else */
 
-    /* There was a preference originally : let's try a reference since a new
-       reference is built for each region. BC */
     reg = make_region(
 		      make_reference(reference_variable(ref), reg_ref_inds),
 		      make_action(tac, UU),
@@ -1442,19 +1430,10 @@ void convex_region_add_expression_dimension(effect reg, expression exp)
       pips_debug(8, "begin with region :\n");
       print_region(reg);
     }
+  
+  pips_assert("region cell must be a reference\n", cell_reference_p(reg_c));
 
-  if (cell_preference_p(reg_c))
-    {
-      /* it's a preference : we should not modify it */
-      pips_debug(8, "It's a preference\n");
-      ref = copy_reference(preference_reference(cell_preference(reg_c)));
-      preference_reference(cell_preference(reg_c)) = ref;
-    }
-  else
-    {
-      /* it's a reference : let'us modify it */
-      ref = cell_reference(reg_c);
-    }
+  ref = cell_reference(reg_c);
 
   /* first add a new PHI dimension to the region reference */
   dim = gen_length(reference_indices(ref))+1;
@@ -2077,14 +2056,9 @@ void psi_to_phi_region(region reg)
 
     free_reference(effect_any_reference(reg));
 
-    if(cell_preference_p(effect_cell(reg))) 
-      {
-	preference_reference(cell_preference(effect_cell(reg)))= reg_ref;
-      }
-    else
-      {
-	cell_reference(effect_cell(reg)) = reg_ref;
-      }
+    pips_assert("region cell must be a reference\n",
+		cell_reference_p(effect_cell(reg)));
+    cell_reference(effect_cell(reg)) = reg_ref;
 }
 
 /* void phi_to_psi_region(effect reg)
@@ -2108,15 +2082,9 @@ void phi_to_psi_region(region reg)
     }
     reg_ref = make_regions_psi_reference(region_entity(reg));
     free_reference(effect_any_reference(reg));
-    if(cell_preference_p(effect_cell(reg))) 
-      {
-	preference_reference(cell_preference(effect_cell(reg)))= reg_ref;
-      }
-    else
-      {
-	cell_reference(effect_cell(reg)) = reg_ref;
-      }
-
+    pips_assert("region cell must be a reference\n",
+		cell_reference_p(effect_cell(reg)));
+    cell_reference(effect_cell(reg)) = reg_ref;    
 }
 
 

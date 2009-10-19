@@ -83,7 +83,7 @@ simple_effects_backward_translation(
 /* To replace the make_sdfi_macro() and its call to macro make_simple_effect() */
 effect translate_effect_to_sdfi_effect(effect le)
 {
-  effect ge = copy_effect(le);
+  effect ge = (*effect_dup_func)(le);
   reference ger = effect_any_reference(ge);
   entity v = reference_variable(ger);
   type ut = ultimate_type(entity_type(v));
@@ -1139,7 +1139,7 @@ list c_simple_effects_on_formal_parameter_backward_translation(list l_sum_eff,
 		    (copy_action(effect_action(eff)));
 		else
 		  {
-		    n_eff = copy_effect(eff1);
+		    n_eff = (*effect_dup_func)(eff1);
 		    /* memory leaks ? */
 		    effect_approximation(n_eff) = 
 		      copy_approximation(effect_approximation(eff));
@@ -1243,7 +1243,7 @@ list c_simple_effects_on_formal_parameter_backward_translation(list l_sum_eff,
 		    (copy_action(effect_action(eff)));
 		else
 		  {
-		    n_eff = copy_effect(eff1);
+		    n_eff = (*effect_dup_func)(eff1);
 		    /* memory leaks ? */
 		    effect_approximation(n_eff) = 
 		      copy_approximation(effect_approximation(eff));
@@ -1701,7 +1701,7 @@ list c_summary_to_proper_effects(
 		pel = gen_nconc
 		  (pel, 
 		   (*effect_to_store_independent_effect_list_func)
-		   (effect_dup(eff), force_may_p));
+		   ((*effect_dup_func)(eff), force_may_p));
 	      }
 	  },
 	  func_sdfi);
@@ -1775,7 +1775,7 @@ list c_summary_to_proper_effects(
 	    {
 	      /* This effect must be a global effect. It does not require
 		 translation in C. However, it may not be in the scope of the caller. */
-	      pel = gen_nconc(pel, CONS(EFFECT, copy_effect(eff), NIL));
+	      pel = gen_nconc(pel, CONS(EFFECT, (*effect_dup_func)(eff), NIL));
 	    } /* else */
 	} /* for */
     } /* else */

@@ -1163,6 +1163,15 @@
 #define call_intrinsic_p(C)                       \
   value_intrinsic_p(entity_initial(call_function(C)))
 
+#define make_preference_simple_effect(reference,action,approximation)\
+    make_effect(make_cell(is_cell_preference, make_preference(reference)),\
+		(action), (approximation),	\
+		make_descriptor(is_descriptor_none,UU))
+
+#define make_reference_simple_effect(reference,action,approximation)\
+  make_effect(make_cell(is_cell_reference, (reference)),	    \
+		(action), (approximation),	\
+		make_descriptor(is_descriptor_none,UU))
 
 #define make_simple_effect(reference,action,approximation)\
     make_effect(make_cell(is_cell_preference, make_preference(reference)),\
@@ -1170,7 +1179,7 @@
 		make_descriptor(is_descriptor_none,UU))
 
 #define make_convex_effect(reference,action,approximation,system)\
-    make_effect(make_cell(is_cell_preference, make_preference(reference)),\
+  make_effect(make_cell(is_reference, (reference)),			\
 		(action), (approximation),				\
 		make_descriptor(is_descriptor_convex,system))
 

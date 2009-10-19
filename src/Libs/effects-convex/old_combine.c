@@ -191,13 +191,6 @@ void print_dinf_statistics(char *mod_name, char *prefix)
 
 /*********************************************************** INTERFACES */
 
-/* definition of the generic binary operator for lists of regions */
-static list list_of_regions_generic_binary_op(list l1, 
-					      list l2, 
-					      bool (*r1_r2_combinable_p)(effect, effect),
-					      list (*r1_r2_binary_op)(effect, effect), 
-					      list (*r1_unary_op)(effect), 
-					      list (*r2_unary_op)(effect));
 
 /* list RegionsMayUnion(list l1, list l2, union_combinable_p)
  * input    : two lists of regions
@@ -212,7 +205,7 @@ list RegionsMayUnion(list l1, list l2,
     list lr;
 
     debug(3, "RegionsMayUnion", "begin\n");
-    lr = list_of_regions_generic_binary_op(l1, l2,
+    lr = list_of_effects_generic_binary_op(l1, l2,
 					   union_combinable_p,
 					   region_may_union,
 					   region_to_may_region_list,
@@ -234,7 +227,7 @@ list RegionsMustUnion(list l1, list l2,
     list lr;
 
     debug(3, "RegionsMustUnion", "begin\n");
-    lr = list_of_regions_generic_binary_op(l1, l2,
+    lr = list_of_effects_generic_binary_op(l1, l2,
 					   union_combinable_p,
 					   region_must_union,
 					   region_to_list,
@@ -257,7 +250,7 @@ list RegionsIntersection(list l1, list l2,
     list l_res = NIL;
 
     debug(3, "RegionsIntersection", "begin\n");
-    l_res = list_of_regions_generic_binary_op(l1, l2,
+    l_res = list_of_effects_generic_binary_op(l1, l2,
 					   intersection_combinable_p,
 					   region_intersection,
 					   region_to_nil_list,
@@ -282,7 +275,7 @@ list RegionsEntitiesIntersection(list l1, list l2,
     list l_res = NIL;
 
     pips_debug(3, "begin\n");
-    l_res = list_of_regions_generic_binary_op(l1, l2,
+    l_res = list_of_effects_generic_binary_op(l1, l2,
 					   intersection_combinable_p,
 					   region_entities_intersection,
 					   region_to_nil_list,
@@ -308,7 +301,7 @@ list RegionsSupDifference(list l1, list l2,
     list l_res = NIL;
 
     debug(3, "RegionsSupDifference", "begin\n");
-    l_res = list_of_regions_generic_binary_op(l1, l2,
+    l_res = list_of_effects_generic_binary_op(l1, l2,
 					   difference_combinable_p,
 					   region_sup_difference,
 					   region_to_list,
@@ -333,7 +326,7 @@ list RegionsInfDifference(list l1, list l2,
     list l_res = NIL;
 
     debug(3, "RegionsInfDifference", "begin\n");
-    l_res = list_of_regions_generic_binary_op(l1, l2,
+    l_res = list_of_effects_generic_binary_op(l1, l2,
 					   difference_combinable_p,
 					   region_inf_difference,
 					   region_to_list,
@@ -363,7 +356,7 @@ list RegionsEntitiesInfDifference(
     list l_res = NIL;
 
     debug(3, "RegionsEntitiesInfDifference", "begin\n");
-    l_res = list_of_regions_generic_binary_op(l1, l2,
+    l_res = list_of_effects_generic_binary_op(l1, l2,
 					   difference_combinable_p,
 					   regions_to_nil_list,
 					   region_to_list,
@@ -872,14 +865,14 @@ region_intersection(region reg1, region reg2)
 
     if (anywhere_effect_p(reg1)) 
       {
-	region reg = copy_effect(reg2);
+	region reg = (*effect_dup_func)(reg2);
 	region_action_tag(reg)= region_action_tag(reg1);
 	region_approximation_tag(reg)= app_res;
 	l_res = region_to_list(reg);
       }
     else if (anywhere_effect_p(reg2)) 
       {
-	region reg = copy_effect(reg1);
+	region reg = (*effect_dup_func)(reg1);
 	region_approximation_tag(reg)= app_res;
 	l_res = region_to_list(reg);
       }
@@ -953,7 +946,7 @@ list region_entities_intersection(region r1, region r2)
   
   if (anywhere_effect_p(r1))
     {      
-      reg = copy_effect(r2);
+      reg = (*effect_dup_func)(r2);
       effect_action_tag(reg) = effect_action_tag(r1);
     }
   else 
@@ -1009,7 +1002,7 @@ list region_sup_difference(region reg1, region reg2)
       }
     else if (anywhere_effect_p(reg2))
       {
-	reg = copy_effect(reg1);
+	reg = (*effect_dup_func)(reg1);
 	l_reg = region_to_may_region_list(reg);
        }
     else
@@ -1357,132 +1350,6 @@ boolean regions_same_variable_p(region r1, region r2)
 
 
 
-/******************************************************* GENERIC FUNCTIONS */
-
-/* static list list_of_regions_generic_binary_op(list l1,l2,
- *                         bool (*r1_r2_combinable_p)(),
- *                         list (*r1_r2_binary_op)(),
- *                         list (*r1_unary_op)(),
- *                         list (*r2_unary_op)())
- * input : two lists of regions ; a boolean function that takes two
- *         individual regions as arguments and renders TRUE when they are
- *         considered as combinable ; a binary operator that combines two
- *         individual regions; two unary operators that deal with the
- *         remnants of the two initial lists; these remnants are the regions
- *         that are not combinable with any region of the other list.
- * output : a list of regions, combination of l1 and l2
- * modifies : l1 and l2, and their regions.
- * comment : ?
-*/
-static list list_of_regions_generic_binary_op(
-    list l1, list l2,
-    bool (*r1_r2_combinable_p)(effect,effect),
-    list (*r1_r2_binary_op)(effect,effect),
-    list (*r1_unary_op)(effect),
-    list (*r2_unary_op)(effect))
-{
-  list l_res = NIL;
-  list cr1 = list_undefined;
-
-  debug_on("REGIONS_OPERATORS_DEBUG_LEVEL");
-
-  debug_regions_consistency(l1);
-  ifdebug(1) {
-    if(effects_reference_sharing_p(l1, FALSE)) {
-      pips_internal_error("A list of regions share some references");
-    }
-  }
-  debug_regions_consistency(l2);
-
-  ifdebug(1) {
-    pips_debug(1, "Initial regions : \n");
-    fprintf(stderr,"\t l1 :\n");
-    print_regions(l1);
-    ifdebug(8) {
-      fprintf(stderr, "Dump of initial region l1 : \n");
-      dump_effects(l1);
-    }
-    fprintf(stderr,"\t l2 :\n");
-    print_regions(l2);
-    ifdebug(8) {
-      fprintf(stderr, "Dump of initial region l2 : \n");
-      dump_effects(l2);
-    }
-  }
-    
-  /* we first deal with the regions of l1 : those that are combinable with 
-   * the regions of l2, and the others, which we call the remnants of l1 */
-  for(cr1=l1; !ENDP(cr1); POP(cr1)) {
-    effect r1 = EFFECT(CAR(cr1));
-    list lr2 = l2;
-    list prec_lr2;
-    boolean combinable = FALSE;
-
-    ifdebug(8) {
-      fprintf(stderr, "Dump r1 when entering the loop body\n");
-      dump_effect(r1);
-    }
-
-    prec_lr2 = NIL;
-    while(!combinable && !ENDP(lr2)) {
-      effect r2 = EFFECT(CAR(lr2));
-	     
-      if ( (*r1_r2_combinable_p)(r1,r2) ) {
-	combinable = TRUE;
-	l_res = gen_nconc(l_res, (*r1_r2_binary_op)(r1,r2));
-	/* gen_remove(&l2, EFFECT(CAR(lr2))); */
-	if (prec_lr2 != NIL)
-	  CDR(prec_lr2) = CDR(lr2);		     
-	else
-	  l2 = CDR(lr2);
-
-	free(lr2);
-	lr2 = NIL;
-	region_free(r2);
-	/* This assumes no sharing between effects in lr1 at the reference level */
-	ifdebug(8) {
-	  fprintf(stderr, "Dump r1 just before the free:\n");
-	  dump_effect(r1);
-	}
-	region_free(r1);
-      }
-      else {
-	prec_lr2 = lr2;
-	lr2 = CDR(lr2);
-      }
-    }
-    if(!combinable) {
-      /* r1 belongs to the remnants of l1 : it is combinable 
-       * with no regions of l2 */
-      if ( (*r1_r2_combinable_p)(r1,effect_undefined) ) 
-	l_res = gen_nconc(l_res, (*r1_unary_op)(r1));
-    }
-  }
-
-  /* we must then deal with the remnants of l2 */
-  MAP(EFFECT, r2,
-      {  
-	if ( (*r1_r2_combinable_p)(effect_undefined,r2) ) 
-	  l_res = gen_nconc(l_res, (*r2_unary_op)(r2));
-      },
-      l2);
-
-  debug_regions_consistency(l_res);
-        
-  ifdebug(1)
-    {
-      pips_debug(1, "final regions : \n");
-      print_regions(l_res);
-    }
-
-  /* no memory leaks: l1 and l2 won't be used anymore */
-  gen_free_list(l1);
-  gen_free_list(l2);
-    
-  debug_off();
-    
-  return l_res;
-}
 
 /*************************************** PROPER REGIONS TO SUMMARY REGIONS */
 

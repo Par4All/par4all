@@ -132,25 +132,24 @@ list_of_effects_generic_binary_op(
 	}
       }
       
-      pips_debug_effects(9, "intermediate effects 1:\n", l_res);
+      pips_debug_effects(2, "intermediate effects 1:\n", l_res);
       
       if(!combinable) {
 	/* r1 belongs to the remnants of l1 : it is combinable 
 	 * with no effects of l2 */
 	if ( (*r1_r2_combinable_p)(r1,effect_undefined) ) 
-	  l_res = gen_nconc((*r1_unary_op)(r1), l_res);
+	  l_res = gen_nconc(l_res, (*r1_unary_op)(r1));
       }
     }
     
-    pips_debug_effects(9, "intermediate effects 2:\n", l_res);
+    pips_debug_effects(2, "intermediate effects 2:\n", l_res);
     
     /* we must then deal with the remnants of l2 */
     for(cr2 = l2; !ENDP(cr2); POP(cr2)) {
       effect r2 = EFFECT(CAR(cr2));
 
-
       if ( (*r1_r2_combinable_p)(effect_undefined,r2) ) 
-	l_res = gen_nconc((*r2_unary_op)(r2), l_res);
+	l_res = gen_nconc(l_res, (*r2_unary_op)(r2));
     }
         
     pips_debug_effects(1, "effects before cleaning:\n", l_res);

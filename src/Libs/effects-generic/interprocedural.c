@@ -317,9 +317,10 @@ list generic_c_effects_backward_translation(entity callee,
 	  /* This effect must be a global effect. It does not require
 	     translation in C. However, it may not be in the scope of
 	     the caller. */
-	  eff = copy_effect(eff);
-	  (*effect_descriptor_interprocedural_translation_op)(eff);	   
-	  l_eff = gen_nconc(l_eff,CONS(EFFECT, copy_effect(eff), NIL));
+	  eff = (*effect_dup_func)(eff);
+	  (*effect_descriptor_interprocedural_translation_op)(eff);
+	  /* Memory leak ? I don't understand the second dup */ 
+	  l_eff = gen_nconc(l_eff,CONS(EFFECT, (*effect_dup_func)(eff), NIL));
 
 	  /* remove the current element from the list */
 	  if (l_begin == l_current)

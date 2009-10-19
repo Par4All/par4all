@@ -555,7 +555,7 @@ list c_convex_effects_on_formal_parameter_backward_translation(list l_sum_eff,
 		/* this could easily be made generic BC. */
 		if(!anywhere_effect_p(new_eff))
 		  {
-		    effect init_eff = copy_effect(eff);
+		    effect init_eff = (*effect_dup_func)(eff);
 		    /* we translate the initial region descriptor
 		       into the caller's name space
 		    */
@@ -636,7 +636,7 @@ list c_convex_effects_on_formal_parameter_backward_translation(list l_sum_eff,
 		    l_eff = gen_nconc(l_eff, CONS(EFFECT, n_eff, NIL));
 		  }
 		else {
-		  n_eff = copy_effect(eff_real);
+		  n_eff = (*effect_dup_func)(eff_real);
 		  effect_approximation_tag(n_eff) = 
 		    effect_approximation_tag(eff);
 		  effect_action_tag(n_eff) = effect_action_tag(eff);
@@ -645,7 +645,7 @@ list c_convex_effects_on_formal_parameter_backward_translation(list l_sum_eff,
 
 		  if(!ENDP(eff_ind))
 		    {
-		      effect eff_init = copy_effect(eff);
+		      effect eff_init = (*effect_dup_func)(eff);
 		      Psysteme sc_init ;
 		      Psysteme sc_n_eff = region_system(n_eff);
 		      int i;
@@ -785,7 +785,7 @@ list c_convex_effects_on_formal_parameter_backward_translation(list l_sum_eff,
 
 	     FOREACH(EFFECT, eff, l_sum_eff)
 	      {
-		effect eff_formal = copy_effect(eff);
+		effect eff_formal = (*effect_dup_func)(eff);
 		effect new_eff;
 
 		if (effect_undefined_p(eff_real))
@@ -793,7 +793,7 @@ list c_convex_effects_on_formal_parameter_backward_translation(list l_sum_eff,
 		    (copy_action(effect_action(eff)));
 		else
 		  {
-		    new_eff = copy_effect(eff_real);
+		    new_eff = (*effect_dup_func)(eff_real);
 		    effect_approximation_tag(new_eff) = 
 		      effect_approximation_tag(eff);
 		    effect_action_tag(new_eff) =
@@ -1028,7 +1028,7 @@ transformer context;
 	    /* REVOIR ICI */
 	    list l_exp_reg = regions_of_expression(real_exp, context);
 	    list l_real_exp = 
-		RegionsIntersection(l_exp_reg, regions_dup(l_reg),
+		RegionsIntersection(l_exp_reg, effects_dup(l_reg),
 				    regions_same_action_p);
 
 	    pips_debug(8, "real argument is a complex expression \n" 
@@ -1063,7 +1063,7 @@ transformer context;
      * ve'rifier que c'est compatible avec la norme. Inutile de faire des 
      * choses inutiles. 
      */
-    l_formal = RegionsIntersection(l_formal, regions_dup(l_sum_rw_reg),
+    l_formal = RegionsIntersection(l_formal, effects_dup(l_sum_rw_reg),
 				   regions_same_action_p);
 
     return(l_formal);

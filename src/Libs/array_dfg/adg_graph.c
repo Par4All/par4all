@@ -857,7 +857,7 @@ graph	g;
      to semantically correct effects? I do not understand why
      SC_UNDEFINED was used instead of transformer_undefined in
      contexts for scalar variables (8 August 1992) */
-/*
+
 static effect effect_dup(eff)
 effect eff;
 {
@@ -878,7 +878,7 @@ effect eff;
   }
   return ne;
 }
-*/
+
 
 /*=======================================================================*/
 /* conflict conflict_dup( (conflict) conf ) 			AL 06/07/93

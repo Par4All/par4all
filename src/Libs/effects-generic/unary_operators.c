@@ -202,11 +202,6 @@ effects_dup_without_variables(list l_eff, list l_var)
     return gen_nreverse(l_res);
 }
 
-effect 
-effect_dup(effect eff)
-{
-    return((*effect_dup_func)(eff));
-}
 
 list
 effects_dup(list l_eff)

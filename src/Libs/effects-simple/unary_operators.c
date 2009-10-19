@@ -51,22 +51,6 @@
 
 
 
-/*********************************************************************************/
-/* REFERENCE EFFECTS                                                             */
-/*********************************************************************************/
-
-effect
-reference_effect_dup(effect eff)
-{
-    return (copy_effect(eff));
-}
-
-void
-reference_effect_free(effect eff)
-{
-    free_effect(eff);
-}
-
 /**
  @param ref is a reference
  @param ac is an action
@@ -198,58 +182,7 @@ effect reference_to_simple_effect(reference ref, action ac)
 }
 
 
-/**
-   @param ref is a reference.
-   @param tac is an action tag (read or write)
-   @return a simple effect corresponding to the reference to which 
-           lacking dimensions (according to the type of the entity)
-	   are added (as unbounded dimensions). 
- */
-effect reference_whole_simple_effect(reference ref,  tag tac)
-{
-  effect eff = effect_undefined;
-  entity ent = reference_variable(ref);
-  list l_inds = reference_indices(ref);
-  type t = entity_type(ent);
-
-  eff = reference_to_simple_effect(ref,make_action(tac, UU));
-
-  if(type_variable_p(t))
-    {
-      variable v = type_variable(t);
-      
-      pips_debug(6, "variable case, number of dimensions : %d\n",
-		 (int) gen_length(variable_dimensions(v)));
-      
-      if(gen_length(variable_dimensions(v)) == gen_length(l_inds))
-	{
-	  pips_debug(7, "ref indices matches number of dimensions\n");
-	}
-      else
-	{		  
-	  pips_assert("invalid number of reference indices \n",
-		      gen_length(variable_dimensions(v)) > 
-		      gen_length(l_inds));
-	  
-	  pips_debug(7, "less ref indices than number of dimensions\n");
-	  /* generate effects on whole (sub-)array */
-	  	  
-	  
-	  FOREACH(DIMENSION, c_t_dim, 
-		  gen_nthcdr((int) gen_length(l_inds),
-			     variable_dimensions(v)))
-	    {		      
-	      simple_effect_add_expression_dimension
-		(eff, make_unbounded_expression());		      
-	    } /* FOREACH */
-	  
-	} /* else */
-      
-    } /* if type_variable_p */
-
-  return eff;  
-}
-  
+ 
 
 /* void simple_effect_add_expression_dimension(effect eff, expression exp)
  * input    : a simple effect and an expression
@@ -376,7 +309,12 @@ void simple_effect_change_ith_dimension_expression(effect eff, expression exp,
 /* SIMPLE EFFECTS                                                                */
 /*********************************************************************************/
 
-/* A persistant reference wss forced. */
+/**
+   @param eff is a simple effect
+   @return another effect, whose cell is a reference cell, which is a copy
+           of the initial effect reference, even if it were a preference.
+           Ther is no sharing between the initial effect and the returned one.
+ */
 effect
 simple_effect_dup(effect eff)
 {
@@ -385,8 +323,7 @@ simple_effect_dup(effect eff)
   
   if(cell_preference_p(effect_cell(eff))) 
     {
-      /* FI: memory leak? we allocate something and put it behind a persistent pointer */
-      new_eff = make_effect(make_cell_preference(make_preference(copy_reference(effect_any_reference(eff)))),
+      new_eff = make_effect(make_cell_reference(copy_reference(effect_any_reference(eff))),
 			    copy_action(effect_action(eff)), 
 			    copy_approximation(effect_approximation(eff)),
 			    copy_descriptor(effect_descriptor(eff)));
@@ -402,22 +339,12 @@ simple_effect_dup(effect eff)
   return(new_eff);
 }
 
-/* use free_effect() instead? persistent reference assumed */
-void
-simple_effect_free(effect eff)
-{
-  /* I do not understand this : I think free_effect does exactly what is wanted BC. */
-  if(cell_preference_p(effect_cell(eff))) {
-    preference_reference(cell_preference(effect_cell(eff)))= reference_undefined;
-  }
-  else {
-    free_reference(effect_any_reference(eff));
-    cell_reference(effect_cell(eff)) = reference_undefined;
-  }
-  free_effect(eff);
-}
-
-/* In fact, reference to persistant reference, preference */
+/**
+   @param ref is a program reference
+   @param ac is the action of the returned effect
+   @return an effect whose cell is a preference pointing
+           to the original program reference.
+ */
  effect
  reference_to_reference_effect(reference ref, action ac)
  {

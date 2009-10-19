@@ -220,7 +220,7 @@ set_methods_for_proper_simple_effects()
     effects_computation_reset_func = effects_computation_no_reset;
 
     effect_dup_func = simple_effect_dup;
-    effect_free_func = simple_effect_free;
+    effect_free_func = free_effect;
 
     reference_to_effect_func = reference_to_simple_effect;
     effect_to_store_independent_effect_list_func = 
@@ -292,7 +292,7 @@ set_methods_for_simple_effects()
     effects_computation_reset_func = effects_computation_no_reset;
 
     effect_dup_func = simple_effect_dup;
-    effect_free_func = simple_effect_free;
+    effect_free_func = free_effect;
 
     reference_to_effect_func = reference_to_simple_effect;
     effect_to_store_independent_effect_list_func = 

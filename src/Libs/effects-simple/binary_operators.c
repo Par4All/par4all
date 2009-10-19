@@ -158,7 +158,7 @@ effect effect_may_union(effect eff1, effect eff2)
 			  make_action(action_tag(effect_action(eff1)), UU), 
 			  make_approximation(is_approximation_may, UU));
       */
-      eff = copy_effect(eff1);
+      eff = (*effect_dup_func)(eff1);
       approximation_tag(effect_approximation(eff)) = approximation_and(app1,app2);
     }
     return(eff);
@@ -193,7 +193,7 @@ effect effect_must_union(effect eff1, effect eff2)
 			  make_action(action_tag(effect_action(eff1)), UU), 
 			  make_approximation(is_approximation_may, UU));
 	*/
-	eff = copy_effect(eff1);
+      eff = (*effect_dup_func)(eff1);
 	effect_approximation_tag(eff) = approximation_or(app1,app2);
     }
     return(eff);
@@ -207,7 +207,7 @@ effect_sup_difference(/* const */ effect eff1, /* const */ effect eff2)
     if (effect_must_p(eff2))
 	l_res = NIL;
     else
-	l_res = effect_to_may_effect_list(effect_dup(eff1));
+      l_res = effect_to_may_effect_list((*effect_dup_func)(eff1));
     return(l_res);
 }
 

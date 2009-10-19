@@ -573,7 +573,7 @@ list regions_dynamic_elim(list l_reg)
 	
         if (! ignore_this_region)  /* Eliminate dynamic variables. */
 	{
-	    region r_res = copy_region(reg);
+	    region r_res = region_dup(reg);
 	    region_dynamic_var_elim(r_res);
 	    ifdebug(4)
 	    {
@@ -733,10 +733,9 @@ void region_non_exact_projection_along_parameters(region reg, list l_param)
 	    cell c_tmp = region_cell(reg_tmp);
 
 	    region_system_(reg) = region_system_(reg_tmp);
-	    if(cell_preference_p(c_tmp))
-	      preference_reference(cell_preference(c_tmp)) = reference_undefined;
-	    else
-	      cell_reference(c_tmp) = reference_undefined;
+	    pips_assert("region cell must be a reference\n", 
+			cell_reference_p(c_tmp));
+	    
 	    region_system_(reg_tmp) = newgen_Psysteme(SC_UNDEFINED);
 	    free_effect(reg_tmp);
 	    sc_rm(ps);
@@ -790,11 +789,9 @@ void region_exact_projection_along_parameters(region reg, list l_param)
 						    region_action_tag(reg));
 	    cell c_tmp = region_cell(reg_tmp);
 
+	    pips_assert("region cell must be a reference\n",
+			cell_reference_p(c_tmp));
 	    region_system_(reg) = region_system_(reg_tmp);
-	    if(cell_preference_p(c_tmp))
-	      preference_reference(cell_preference(c_tmp)) = reference_undefined;
-	    else
-	      cell_reference(c_tmp) = reference_undefined;
 	    region_system_(reg_tmp) = newgen_Psysteme(SC_UNDEFINED);
 	    free_effect(reg_tmp);
 	    sc_rm(ps);
@@ -904,12 +901,11 @@ void region_non_exact_projection_along_variables(region reg, list l_var)
 	    region reg_tmp = reference_whole_region(region_any_reference(reg),
 						    region_action_tag(reg));
 	    cell c_tmp = region_cell(reg_tmp);
+	    pips_assert("region cell must be a reference\n", 
+			cell_reference_p(c_tmp));
 
 	    region_system_(reg) = region_system_(reg_tmp);
-	    if(cell_preference_p(c_tmp))
-	      preference_reference(cell_preference(c_tmp)) = reference_undefined;
-	    else
-	      cell_reference(c_tmp) = reference_undefined;
+	    
 	    region_system_(reg_tmp) = newgen_Psysteme(SC_UNDEFINED);
 	    free_effect(reg_tmp);
 	    sc_rm(ps);
@@ -959,12 +955,10 @@ list l_var;
 	    region reg_tmp = reference_whole_region(region_any_reference(reg),
 						    region_action_tag(reg));
 	    cell c_tmp = region_cell(reg_tmp);
-
-	    region_system_(reg) = region_system_(reg_tmp);
-	    if(cell_preference_p(c_tmp))
-	      preference_reference(cell_preference(c_tmp)) = reference_undefined;
-	    else
-	      cell_reference(c_tmp) = reference_undefined;
+	    pips_assert("region call must be a reference\n",
+			cell_reference_p(c_tmp));
+	    
+	    region_system_(reg) = region_system_(reg_tmp);	    
 	    region_system_(reg_tmp) = newgen_Psysteme(SC_UNDEFINED);
 	    free_effect(reg_tmp);
 	    sc_rm(ps);

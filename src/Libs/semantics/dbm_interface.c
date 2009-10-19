@@ -738,12 +738,13 @@ bool generic_module_name_to_transformers(char *module_name, bool in_context)
 	pips_error("module_name_to_transformers",
 		   "no statement for module %s\n", module_name);
 
-    /* Is it really useful? I could not find where it is used. bc. */
     set_proper_rw_effects((statement_effects)
 	db_get_memory_resource(DBR_PROPER_EFFECTS, module_name, TRUE));
 
     set_cumulated_rw_effects((statement_effects)
 	db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
+
+    set_methods_for_simple_effects();
 
     /* cumulated_effects_map_print();*/
 
@@ -828,6 +829,7 @@ bool generic_module_name_to_transformers(char *module_name, bool in_context)
     /* Two auxiliary hash tables allocated by effectsmap_to_listmap() */
     reset_proper_rw_effects();
     reset_cumulated_rw_effects();
+    generic_effects_reset_all_methods();
     reset_transformer_map();
     if(in_context) reset_precondition_map();
 
@@ -894,6 +896,8 @@ bool module_name_to_preconditions(char *module_name)
     /* cumulated effects are used to compute the value mappings */
     set_cumulated_rw_effects((statement_effects) 
 	db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
+
+    set_methods_for_simple_effects();
 
     set_transformer_map( (statement_mapping) 
 	db_get_memory_resource(DBR_TRANSFORMERS, module_name, TRUE));
@@ -967,6 +971,7 @@ bool module_name_to_preconditions(char *module_name)
     reset_precondition_map();
     reset_proper_rw_effects();
     reset_cumulated_rw_effects();
+    generic_effects_reset_all_methods();
 
     free_value_mappings();
 
