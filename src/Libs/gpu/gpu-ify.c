@@ -34,7 +34,7 @@ list loop_nests_to_outline;
    @return the entity of the intrinsics
  */
 static entity get_coordinate_intrinsic(int coordinate) {
-  // Get the iteration coordinate intrinsic, for example P4A_VP_1:
+  // Get the iteration coordinate intrinsic, for example P4A_vp_1:
   string coord_name;
   asprintf(&coord_name,
 	   get_string_property("GPU_COORDINATE_INTRINSICS_FORMAT"),
@@ -100,8 +100,8 @@ mark_loop_to_outline(const statement s) {
 
    void p4a_kernel_wrapper_0(float_t save[501][501], float_t space[501][501], int i, int j)
    {
-     i = P4A_PV_0(i);
-     j = P4A_PV_1(j);
+     i = P4A_pv_0(i);
+     j = P4A_pv_1(j);
      p4a_kernel_0(save, space, i, j);
    }
    void p4a_kernel_0(float_t save[501][501], float_t space[501][501], int
@@ -135,7 +135,7 @@ gpu_ify_statement(statement s, int depth) {
        since we use insert_a_statement() */
     for(int i = depth - 1; i >= 0; i--) {
       entity index = perfectly_nested_loop_index_at_depth(s, i);
-      // Get the iteration coordinate intrinsic, for example P4A_VP_1:
+      // Get the iteration coordinate intrinsic, for example P4A_vp_1:
       /*
 	This code makes a
 resource SUMMARY_EFFECTS[p4a_kernel_launcher_1] is in 'required' status since 149

@@ -4637,16 +4637,16 @@ kernel_load_store	> CALLERS.code
 The following properties can be used to customized the allocate/load/store
 functions:
 \begin{PipsProp}
-KERNEL_LOAD_STORE_ALLOCATE_FUNCTION "P4A_ACCEL_MALLOC"
+KERNEL_LOAD_STORE_ALLOCATE_FUNCTION "P4A_accel_malloc"
 \end{PipsProp}
 \begin{PipsProp}
-KERNEL_LOAD_STORE_DEALLOCATE_FUNCTION "P4A_ACCEL_FREE"
+KERNEL_LOAD_STORE_DEALLOCATE_FUNCTION "P4A_accel_free"
 \end{PipsProp}
 \begin{PipsProp}
-KERNEL_LOAD_STORE_LOAD_FUNCTION "P4A_COPY_TO_ACCEL"
+KERNEL_LOAD_STORE_LOAD_FUNCTION "P4A_copy_to_accel"
 \end{PipsProp}
 \begin{PipsProp}
-KERNEL_LOAD_STORE_STORE_FUNCTION "P4A_COPY_FROM_ACCEL"
+KERNEL_LOAD_STORE_STORE_FUNCTION "P4A_copy_from_accel"
 \end{PipsProp}
 
 
@@ -5814,7 +5814,7 @@ code, not using a wrapper is useful.
 The intrinsics function to get an i-th coordinate in the iteration space
 is defined by this GNU \emph{à la} \texttt{printf} format:
 \begin{PipsProp}
-GPU_COORDINATE_INTRINSICS_FORMAT "P4A_VP_%d"
+GPU_COORDINATE_INTRINSICS_FORMAT "P4A_vp_%d"
 \end{PipsProp}
 where \verb|%d| is used to get the dimension number.
 

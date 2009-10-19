@@ -24,7 +24,7 @@
 
 /* loop nests transformation phase for par4all :
 
-   p4a_loop_nest_annotate takes a module that is of the form :
+   gpu_loop_nest_annotate takes a module that is of the form :
 
 
 typedef float float_t;
