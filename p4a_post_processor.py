@@ -53,18 +53,13 @@ def patch_to_use_p4a_methods(file_name, dir_name):
     f.close()
 
     ## Change
-    ##    // To be replaced with a call to P4A_VP_1
+    ##    // To be replaced with a call to P4A_vp_1
     ##    j = j;
     ## into
-    ##     // Index has been replaced by P4A_VP_1
-    ##    j = P4A_VP_1;
-    content = re.sub("( *)// To be replaced with a call to (P4A_VP_[0-9]+)\n[^=]+= ([^;]+)",
+    ##     // Index has been replaced by P4A_vp_1
+    ##    j = P4A_vp_1;
+    content = re.sub("( *)// To be replaced with a call to (P4A_vp_[0-9]+)\n[^=]+= ([^;]+)",
                      "\\1// Index has been replaced by \\2\n\\1\\3 = \\2", content)
-
-    # Compatibility
-    content = re.sub("P4A_VP_0", "P4A_VP_X", content)
-    content = re.sub("P4A_VP_1", "P4A_VP_Y", content)
-    content = re.sub("P4A_VP_2", "P4A_VP_Z", content)
 
     # Insert a
     #include <p4a_accel.h>
@@ -72,14 +67,14 @@ def patch_to_use_p4a_methods(file_name, dir_name):
                      "#include <p4a_accel.h>\n#include <math.h>\n", content)
 
     # Compatibility
-    content = re.sub("// Prepend here P4A_INIT_ACCEL\n",
-                     "P4A_INIT_ACCEL;\n", content)
+    content = re.sub("// Prepend here P4A_init_accel\n",
+                     "P4A_init_accel;\n", content)
 
     # Add accelerator attributes on accelerated parts:
     content = re.sub("(void p4a_kernel_wrapper_[0-9]+[^\n]+)",
-                     "P4A_ACCEL_KERNEL_WRAPPER \\1", content)
+                     "P4A_accel_kernel_wrapper \\1", content)
     content = re.sub("(void p4a_kernel_[0-9]+[^\n]+)",
-                     "P4A_ACCEL_KERNEL \\1", content)
+                     "P4A_accel_kernel \\1", content)
 
     # Generate accelerated kernel calls:
     ## Replace
@@ -94,7 +89,7 @@ def patch_to_use_p4a_methods(file_name, dir_name):
     ## P4A_CALL_ACCEL_KERNEL_2D(p4a_kernel_wrapper_2, 500, 500, i, j);
 
     content = re.sub("(?s)// Loop nest P4A begin,(\\d+)D\\(([^)]+)\\).*// Loop nest P4A end\n[^\n]+\n +(p4a_kernel_wrapper_\\d+)\\(([^)]*)\\);\n",
-                     "P4A_CALL_ACCEL_KERNEL_\\1D(\\3,\\2,\\4);\n", content)
+                     "P4A_call_accel_kernel_\\1d(\\3,\\2,\\4);\n", content)
 
     # Add missing declarations of the p4a_kernel_launcher (outliner or
     # prettyprinter bug?)
