@@ -1761,6 +1761,8 @@ list of subscript expressions\footnote{The consistency of the array dimension
 and the list length is not checked, but in the parser. That is, there is
 no independent consistency checker.}.
 
+Cells are used in effects to specify memory access paths. See Section~\ref{effects} for more details.
+
 \begin{comment}
 Le domaine \verb/reference/ est utilisé pour représenter une
 référence à un élément de tableau\footnote{Les variables scalaires
@@ -1989,19 +1991,16 @@ either a \verb/reference/ or a persistant\footnote{Persitant is a
   Newgen attribute carried by a type or by a field. It means that
   recursive Newgen procedures must stop there. This impacts especially
   the free and copy functions.} \verb/preference/. Attribute
-\verb/persistant/ is used because the reference objects pointed to may be
-part of program statements. At least for simple effects such as
-effects associated to \verb/x[i]/: if effect references are copied, a
-reference to \verb/i/ is copied twice, once to specify that \verb/i/
-is read and the second one to specify that \verb/x[i]/ is read or
-written.
+\verb/persistant/ is used for so-called \emph{reference} and \emph{simple} 
+effects to keep track of actual program references, that should not be modified or freed. This feature is useful for several program analyses or transformations(see the pipsmake-rc documentation).
+
 
 This persistant attribute is not welcome for more advanced effects,
 such as regions, which use pseudo-references based on \verb/PHI/
 variables. Memory allocation is even more difficult to manage when the
 persistant attribute is declared at the type level and not at the
 object level. This explains why the field \verb/reference/ was moved
-down and accessed now trhu the field \verb/cell/.
+down and accessed now through the field \verb/cell/.
 
 Field \verb/action/ specifies if the memory access is a read or a write,
 for read/write effects, and if the memory value is read from the statement
