@@ -236,8 +236,8 @@ void get_data(char filename[])
 
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
-//  <fp-R-EXACT-{}>
 //  <fp[PHI1]-R-MAY-{}>
+//  <fp-R-EXACT-{}>
 //  <fp[PHI1]-W-MAY-{}>
 
    do {
@@ -367,8 +367,8 @@ void get_data(char filename[])
 
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
-//  <argv[PHI1][PHI2]-R-MAY-{PHI1==1}>
 //  <argv[PHI1]-R-MAY-{0<=PHI1, PHI1<=1}>
+//  <argv[PHI1][PHI2]-R-MAY-{PHI1==1}>
 //  <TOP-LEVEL:save[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=500, 0<=PHI2,
 //    PHI2<=500, 1<=PHI1+PHI2, PHI2<=PHI1+499, PHI1<=PHI2+499,
 //    PHI1+PHI2<=999}>
@@ -921,8 +921,8 @@ void get_data(char filename[])
 
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
-//  <fp-R-EXACT-{}>
 //  <fp[PHI1]-R-MAY-{}>
+//  <fp-R-EXACT-{}>
 //  <fp[PHI1]-W-MAY-{}>
 
    do {
@@ -1321,8 +1321,8 @@ void get_data(char filename[])
    c = fgetc(fp);
 
 //  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{}>
-//  <fp-IN-MAY-{}>
 //  <fp[PHI1]-IN-MAY-{}>
+//  <fp-IN-MAY-{}>
 
    do {
 

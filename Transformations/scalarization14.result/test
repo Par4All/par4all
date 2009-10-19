@@ -14,11 +14,11 @@ int scalarization14(int n)
 
    for(i = 0; i <= 99; i += 1) {
       // BEGIN BLOCK
-      __scalar__1 = i;
+      __scalar__0 = i;
       for(j = 0; j <= 99; j += 1) {
          // BEGIN BLOCK
-         __scalar__0 = __scalar__1;
-         y[i][j] = __scalar__1+j+__scalar__0;
+         __scalar__1 = __scalar__0;
+         y[i][j] = __scalar__0+j+__scalar__1;
          // END BLOCK
       }
       // END BLOCK

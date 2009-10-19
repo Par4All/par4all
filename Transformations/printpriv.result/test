@@ -4,16 +4,16 @@ Cray code for "PRINTPRIV"
       PROGRAM PRINTPRIV
       REAL B(10,10), T
 c
-CMIC$ DO ALL PRIVATE(I,J) SHARED(B) 
+CMIC$ DO ALL PRIVATE(J,I) SHARED(B) 
       DO I = 1, 10                                                      0004
 CDIR$ IVDEP 
          DO J = 1, 10                                                   0005
             B(I,J) = 0.                                                 0006
          ENDDO
       ENDDO
-CMIC$ DO ALL PRIVATE(I,K,T) SHARED(B) 
+CMIC$ DO ALL PRIVATE(K,I,T) SHARED(B) 
       DO I = 1, 10                                                      0004
-CMIC$ DO ALL PRIVATE(K,T) SHARED(B,I) 
+CMIC$ DO ALL PRIVATE(T,K) SHARED(I,B) 
          DO K = 1, 10                                                   0008
             T = K                                                       0009
             B(I,K) = T                                                  0010
