@@ -1,19 +1,8 @@
 # Add source files here
-EXECUTABLE	:= jacobi
+EXECUTABLE = jacobi
 # Cuda source files (compiled with cudacc)
-CUFILES		:= jacobi.cu
-# C/C++ source files (compiled with gcc / c++)
-CCFILES		:=
+OBJFILES = jacobi.o
 
-INCLUDES += -I..
+P4A_ACCEL_DIR = ..
 
-COMMONFLAGS += --ptxas-options=-v  -arch=sm_13
-# --keep
-# --clean
-
-################################################################################
-# Rules and targets
-
-ROOTDIR=$(HOME)/NVIDIA_GPU_Computing_SDK/C/src
-
-include $(ROOTDIR)/../common/common.mk
+include $(P4A_ACCEL_DIR)/p4a_accel.mk
