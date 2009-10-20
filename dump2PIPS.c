@@ -164,6 +164,32 @@ void gfc2pips_namespace(gfc_namespace* ns){
 	}*/
 
 
+	//variables implicites - déjà fait pour PIPS cf. notes
+	/*
+	int i = 0;
+	do{
+		int l = i;
+		while (
+				i < GFC_LETTERS - 1
+				&& gfc_compare_types(
+						&ns->default_type[i+1],
+						&ns->default_type[l])
+				){
+			i++;
+		}
+
+		//il faut dump ici les données correspondant aux variables implicit
+		if (i > l){
+			fprintf (dumpfile, " %c-%c: ", l+'A', i+'A');
+		}else{
+			fprintf (dumpfile, " %c: ", l+'A');
+		}
+		//à quoi cela sert il ?
+		//show_typespec(&ns->default_type[l]);
+		i++;
+	} while (i < GFC_LETTERS);
+	*/
+
 	//we have to add the list of variables declared in the initial value of the main entity
 	entity_initial(gfc2pips_main_entity) = make_value(
 		is_value_code,
@@ -188,17 +214,21 @@ void gfc2pips_namespace(gfc_namespace* ns){
 	//can it be removed ?
 	//InitAreas();//Syntax
 
+	//get symbols with value, data and explicit-save
+	//sym->value is an expression to build the save
+	//create data $var /$val/
+	//save si explicit save, rien sinon
+	instruction data_inst = instruction_undefined;
 
 	//// declare code
 	debug(2, "gfc2pips_namespace", "dumping code ...\n");
-	icf = gfc2pips_code2instruction(ns->code,true);
+	//make a 3rd function code2instruction to have a TOP-LEVEL dumping with each and every data instantiation
+	//data_inst: TK_DATA ldatavar TK_SLASH ldataval TK_SLASH
+	//	MakeDataStatement($2, $4);
+	icf = gfc2pips_code2instruction__TOP(ns,ns->code);
 	message_assert("Dumping instruction failed\n",icf!=instruction_undefined);
-	//we have got another problem with empty modules, we need an instruction for the last statement
 
 
-
-	//can it be removed ?
-	//PushBlock(icf, "INITIAL");//Syntax
 	/*gfc_function_body = make_statement(
 		entity_empty_label(),
 		//ceci merde une fois les character implémentés
@@ -453,6 +483,10 @@ newgen_list gfc2pips_vars_(gfc_namespace *ns,newgen_list variables_p){
 	return variables;
 }
 
+newgen_list gfc2pips_get_data_vars(gfc_namespace *ns){
+	return getSymbolBy(ns,ns->sym_root,gfc2pips_test_data);
+}
+
 
 /*
  * Look for a set of symbol filtered by a predicate function
@@ -488,6 +522,10 @@ bool gfc2pips_test_arg(gfc_namespace* __attribute__ ((__unused__)) ns, gfc_symtr
 	if(!st || !st->n.sym) return false;
 	return st->n.sym->attr.flavor == EXPR_VARIABLE && st->n.sym->attr.dummy;
 }
+bool gfc2pips_test_data(gfc_namespace* __attribute__ ((__unused__)) ns, gfc_symtree *st ){
+	if(!st || !st->n.sym) return false;
+	return st->n.sym->value;
+}
 
 entity gfc2pips_symbol2entity(gfc_symbol* s){
 	entity e = FindOrCreateEntity(CurrentPackage,s->name);
@@ -513,78 +551,6 @@ dimension gfc2pips_int2dimension(int n){
 	return make_dimension(MakeIntegerConstantExpression("1"),gfc2pips_int2expression(n));
 }
 
-/*
- * expression = sous_expression:
-   atom	{
-			$$ = make_expression($1, normalized_undefined);
-		}
- | unsigned_const_simple
-    {
-	    $$ = MakeNullaryCall($1);
-    }
- | signe expression  %prec TK_STAR
-    {
-	    if ($1 == -1)
-		$$ = MakeFortranUnaryCall(CreateIntrinsic("--"), $2);
-	    else
-		$$ = $2;
-    }
- | expression TK_PLUS expression
-    {
-	    $$ = MakeFortranBinaryCall(CreateIntrinsic("+"), $1, $3);
-    }
- | expression TK_MINUS expression
-    {
-	    $$ = MakeFortranBinaryCall(CreateIntrinsic("-"), $1, $3);
-    }
- | expression TK_STAR expression
-    {
-	    $$ = MakeFortranBinaryCall(CreateIntrinsic("*"), $1, $3);
-    }
- | expression TK_SLASH expression
-    {
-	    $$ = MakeFortranBinaryCall(CreateIntrinsic("/"), $1, $3);
-    }
- | expression TK_POWER expression
-    {
-	    $$ = MakeFortranBinaryCall(CreateIntrinsic("**"),$1, $3);
-    }
- | expression oper_rela expression  %prec TK_EQ
-    {
-	    $$ = MakeFortranBinaryCall($2, $1, $3);
-    }
- | expression TK_EQV expression
-    {
-	    $$ = MakeFortranBinaryCall(CreateIntrinsic(".EQV."),$1, $3);
-    }
- | expression TK_NEQV expression
-    {
-	    $$ = MakeFortranBinaryCall(CreateIntrinsic(".NEQV."),$1, $3);
-    }
- | expression TK_OR expression
-    {
-	    $$ = MakeFortranBinaryCall(CreateIntrinsic(".OR."),
-				       fix_if_condition($1),
-				       fix_if_condition($3));
-    }
- | expression TK_AND expression
-    {
-	    $$ = MakeFortranBinaryCall(CreateIntrinsic(".AND."),
-				       fix_if_condition($1),
-				       fix_if_condition($3));
-    }
- | TK_NOT expression
-    {
-	    $$ = MakeFortranUnaryCall(CreateIntrinsic(".NOT."),
-				      fix_if_condition($2));
-    }
- | expression TK_CONCAT expression
-        {
-	    $$ = MakeFortranBinaryCall(CreateIntrinsic("//"),
-				      $1, $3);
-    }
- *
- */
 expression gfc2pips_int2expression(int n){
 	return MakeNullaryCall(gfc2pips_int_const2entity(n));
 }
@@ -593,6 +559,9 @@ expression gfc2pips_real2expression(double r){
 }
 expression gfc2pips_logical2expression(bool b){
 	return MakeNullaryCall(gfc2pips_logical2entity(b));
+}
+expression gfc2pips_string2expression(char* s){
+	return MakeNullaryCall(FindOrCreateEntity(CurrentPackage,s));
 }
 
 
@@ -623,6 +592,36 @@ entity gfc2pips_logical2entity(bool b){
 	return MakeConstant(b?"1":"0",is_basic_logical);
 }
 
+char* gfc2pips_gfc_char_t2string(gfc_char_t *c, int nb){
+	if(nb){
+		gfc_char_t *p=c;
+		while(*p){
+			if(*p=='\'')nb++;
+			p++;
+		}
+		return gfc2pips_gfc_char_t2string_(c, nb);
+	}else{
+		return NULL;
+	}
+}
+//very important question: do we have to put the ' before and after the string ?
+char* gfc2pips_gfc_char_t2string_(gfc_char_t *c, int nb){
+	char *s = malloc(sizeof(char)*(nb+1+2));
+	gfc_char_t *p=c;
+	int i=1;
+	s[0]='\'';
+	while(i<=nb){
+		if(*p=='\''){
+			s[i++]='\'';
+		}
+		s[i++]=*p;
+		p++;
+
+	}
+	s[i++]='\'';
+	s[i]='\0';
+	return s;
+}
 
 
 /*
@@ -641,7 +640,6 @@ entity gfc2pips_logical2entity(bool b){
  */
 type gfc2pips_symbol2type(gfc_symbol *s){
 	//beware the size of strings
-	//type t = gfc2pips_type2type(s->ts.type,s->ts.kind);//make_value(is_value_constant, make_constant(is_constant_int, (void *) CurrentTypeSize))
 
 	enum basic_utype ut;
 	switch(s->ts.type){
@@ -670,7 +668,6 @@ type gfc2pips_symbol2type(gfc_symbol *s){
 		);
 	}else{
 		//fprintf(stdout,"STRING !!! %d\n",s->value);
-		//il faut créer impérativement une "value" contenant un "constant" qui contient un "litteral"
 		return MakeTypeVariable(
 			make_basic(
 				ut,
@@ -769,103 +766,113 @@ newgen_list gfc2pips_array_ref2indices(gfc_array_ref *ar){
 
 /*
  * Declaration of instructions
- *
-instruction:
-	[...]
-        | { check_in_declarations();} inst_spec
-	| { check_first_statement();} inst_exec
-	    {
-		if ($2 != instruction_undefined)
-			LinkInstToCurrentBlock($2, TRUE);
-	    }
-	|  format_inst
-	    {
-		LinkInstToCurrentBlock($1, TRUE);
-	    }
-	;
-
-inst_spec: parameter_inst
-	| implicit_inst
-	| dimension_inst
-	| pointer_inst
-	| equivalence_inst
-	| common_inst {}
-	| type_inst
-	| external_inst
-	| intrinsic_inst
-	| save_inst
-	;
-
-inst_exec: assignment_inst
-	    { $$ = $1; }
-	| goto_inst
-	    { $$ = $1; }
-	| arithmif_inst
-	    { $$ = $1; }
-	| logicalif_inst
-	    { $$ = $1; }
-	| blockif_inst
-	    { $$ = $1; }
-	| elseif_inst
-	    { $$ = $1; }
-	| else_inst
-	    { $$ = instruction_undefined; }
-	| endif_inst
-	    { $$ = instruction_undefined; }
-	| enddo_inst
-	    { $$ = instruction_undefined; }
-	| do_inst
-	    { $$ = instruction_undefined; }
-	| bdo_inst
-	    { $$ = instruction_undefined; }
-	| wdo_inst
-	    { $$ = instruction_undefined; }
-	| continue_inst
-	    { $$ = $1; }
-	| stop_inst
-	    { $$ = $1; }
-	| pause_inst
-	    { $$ = $1; }
-	| call_inst
-	    { $$ = $1; }
-	| return_inst
-	    { $$ = $1; }
-	| io_inst
-	    { $$ = $1; }
-        | entry_inst
-            { $$ = $1; }
-	;
  */
 
+instruction gfc2pips_code2instruction__TOP(gfc_namespace *ns, gfc_code* c){
+	if(!c){
+		fprintf(stdout,"WE HAVE GOT A PROBLEM, SEQUENCE WITHOUT ANYTHING IN IT !\nSegfault soon ...\n");
+		return make_instruction_block(CONS(STATEMENT, make_stmt_of_instr(make_instruction_block(NULL)), NIL));
+	}
 
-/*
- * Assignement of a value, simple case
- * assignment_inst: TK_ASSIGN icon TK_TO atom
-            {
-                if(get_bool_property("PARSER_SUBSTITUTE_ASSIGNED_GOTO")) {
-		    expression e = entity_to_expression($2);
-		    $$ = MakeAssignInst($4, e);
+	//create a sequence and put everything into it ? is it right ?
+	newgen_list list_of_instructions,list_of_instructions_p;
+	list_of_instructions_p = list_of_instructions= NULL;
+
+	instruction i = instruction_undefined;
+	newgen_list list_of_data_symbol,list_of_data_symbol_p;
+	list_of_data_symbol_p = list_of_data_symbol = gfc2pips_get_data_vars(ns);
+
+
+	//dump DATA
+	//create a list of statements and dump them in one go
+	//test for each if there is an explicit save statement
+	if(list_of_data_symbol_p){
+		//int add,min,is,tr,at,e,ur;
+		do{
+			instruction ins = gfc2pips_symbol2data_instruction(
+				( (gfc_symtree*)list_of_data_symbol_p->car.e )->n.sym
+			);
+			if(ins!=instruction_undefined){
+				fprintf(stdout,"Got a data !\n");
+				newgen_list lst = CONS(STATEMENT, make_statement(
+					entity_empty_label(),
+					STATEMENT_NUMBER_UNDEFINED,
+					STATEMENT_ORDERING_UNDEFINED,
+					empty_comments,
+					ins,
+					NULL,
+					NULL,
+					empty_extensions ()
+				), NULL);
+				code mc = entity_code(get_current_module_entity());
+				sequence_statements(code_initializations(mc)) = gen_nconc(sequence_statements(code_initializations(mc)), lst);
+
+				/*if(list_of_instructions){
+					CDR(list_of_instructions) = lst;
+					list_of_instructions = CDR(list_of_instructions);
+				}else{
+					list_of_instructions_p = list_of_instructions = lst;
+				}*/
+			}else{
+				break;
+			}
+			POP(list_of_data_symbol_p);
+		}while( list_of_data_symbol_p );
+	}
+
+	//dump other
+	//we know we have at least one instruction, otherwise we would have return an empty list of statements
+	do{
+		i = gfc2pips_code2instruction_(c);
+		if(i!=instruction_undefined){
+			newgen_list lst = CONS(STATEMENT, make_statement(
+				gfc2pips_code2get_label(c),
+				STATEMENT_NUMBER_UNDEFINED,
+				STATEMENT_ORDERING_UNDEFINED,
+				empty_comments,
+				i,
+				NULL,
+				NULL,
+				empty_extensions ()
+			), NULL);
+			//unlike the classical method, we don't know if we have had a first statement (data inst)
+			if(list_of_instructions){
+				CDR(list_of_instructions) = lst;
+				list_of_instructions = CDR(list_of_instructions);
+			}else{
+				list_of_instructions_p = list_of_instructions = lst;
+			}
 		}
-		else {
-		    ParserError("parser", "ASSIGN statement prohibited by PIPS"
-				" unless property PARSER_SUBSTITUTE_ASSIGNED_GOTO is set\n");
+		c=c->next;
+	}while( i==instruction_undefined && c);
+
+	for( ; c ; c=c->next ){
+		statement s = statement_undefined;
+		i = gfc2pips_code2instruction_(c);
+		if(i!=instruction_undefined){
+			s = make_statement(
+				gfc2pips_code2get_label(c),
+				STATEMENT_NUMBER_UNDEFINED,
+				STATEMENT_ORDERING_UNDEFINED,
+				empty_comments,
+				i,
+				NULL,
+				NULL,
+				empty_extensions ()
+			);
+			//if(s!=statement_undefined){
+				CDR(list_of_instructions) = CONS(STATEMENT, s, NIL);
+				list_of_instructions = CDR(list_of_instructions);
+			//}
 		}
-	    }
-	| atom TK_EQUALS expression
-	    {
-		syntax s = $1;
-		syntax new_s = syntax_undefined;
-
-	        if(expression_implied_do_p($3))
-		  ParserError("Syntax", "Unexpected implied DO\n");
-
-		new_s = CheckLeftHandSide(s);
-
-		$$ = MakeAssignInst(new_s, $3);
-	    }
-	;
- */
-
+	}
+	if(list_of_instructions_p){
+		return make_instruction_block(list_of_instructions_p);//make a sequence <=> make_instruction_sequence(make_sequence(list_of_instructions));
+	}else{
+		fprintf(stdout,"Warning ! no instruction dumped => very bad\n");
+		return make_instruction_block(CONS(STATEMENT, make_stmt_of_instr(make_instruction_block(NULL)), NIL));
+	}
+}
 /*
  * Build an instruction sequence
  */
@@ -887,36 +894,49 @@ instruction gfc2pips_code2instruction(gfc_code* c, bool force_sequence){
 	list_of_instructions= NULL;
 
 	//entity l = gfc2pips_code2get_label(c);
-	list_of_instructions_p = list_of_instructions = CONS(STATEMENT, make_statement(
-		gfc2pips_code2get_label(c),
-		STATEMENT_NUMBER_UNDEFINED,
-		STATEMENT_ORDERING_UNDEFINED,
-		empty_comments,
-		gfc2pips_code2instruction_(c),
-		NIL,
-		NULL,
-		empty_extensions ()
-	), list_of_instructions);
+	instruction i = instruction_undefined;
+	do{
+		i = gfc2pips_code2instruction_(c);
+		if(i!=instruction_undefined){
+			list_of_instructions_p = list_of_instructions = CONS(STATEMENT, make_statement(
+				gfc2pips_code2get_label(c),
+				STATEMENT_NUMBER_UNDEFINED,
+				STATEMENT_ORDERING_UNDEFINED,
+				empty_comments,
+				i,
+				NIL,
+				NULL,
+				empty_extensions ()
+			), list_of_instructions);
+		}
+		c=c->next;
+	}while( i==instruction_undefined && c);
+
 	//statement_label((statement)list_of_instructions->car.e) = gfc2pips_code2get_label(c);
 
-	for( c=c->next ; c ; c=c->next ){
+	for( ; c ; c=c->next ){
 		statement s = statement_undefined;
 		//l = gfc2pips_code2get_label(c);
 		//on lie l'instruction suivante à la courante
 		//fprintf(stdout,"Dump the following instructions\n");
 		//CONS(STATEMENT,instruction_to_statement(gfc2pips_code2instruction_(c)),list_of_instructions);
-		s = make_statement(
-			gfc2pips_code2get_label(c),
-			STATEMENT_NUMBER_UNDEFINED,
-			STATEMENT_ORDERING_UNDEFINED,
-			empty_comments,
-			gfc2pips_code2instruction_(c),
-			NULL,
-			NULL,
-			empty_extensions ()
-		);
-		CDR(list_of_instructions) = CONS(STATEMENT, s, NIL);
-		list_of_instructions = CDR(list_of_instructions);
+		i = gfc2pips_code2instruction_(c);
+		if(i!=instruction_undefined){
+			s = make_statement(
+				gfc2pips_code2get_label(c),
+				STATEMENT_NUMBER_UNDEFINED,
+				STATEMENT_ORDERING_UNDEFINED,
+				empty_comments,
+				i,
+				NULL,
+				NULL,
+				empty_extensions ()
+			);
+			if(s!=statement_undefined){
+				CDR(list_of_instructions) = CONS(STATEMENT, s, NIL);
+				list_of_instructions = CDR(list_of_instructions);
+			}
+		}
 		//statement_label((statement)list_of_instructions->car.e) = gfc2pips_code2get_label(c);
 		/*
 		 * if we have got a label like a
@@ -1040,13 +1060,14 @@ instruction gfc2pips_code2instruction_(gfc_code* c){
 	      show_compcall (c->expr);
 	      break;
 */
-		case EXEC_RETURN:{
+		case EXEC_RETURN:{//we shouldn't even dump that for main entities
 			debug(5,"gfc2pips_code2instruction","Translation of return\n");
+			return instruction_undefined;
 			expression e = expression_undefined;
 			if(c->expr!=NULL){
 				//traitement de la variable de retour
 			}
-			return MakeReturn(e);
+			return MakeReturn(e);//Syntax !
 		}
 
 	    /*case EXEC_PAUSE:
@@ -1298,113 +1319,110 @@ instruction gfc2pips_code2instruction_(gfc_code* c){
 		  fputc (' ', dumpfile);
 		  show_expr (a->expr);
 		}
-
 	      break;
+	    case EXEC_OPEN:{
+			fputs ("OPEN", dumpfile);
+			open = c->ext.open;
 
-	    case EXEC_OPEN:
-	      fputs ("OPEN", dumpfile);
-	      open = c->ext.open;
-
-	      if (open->unit)
-		{
-		  fputs (" UNIT=", dumpfile);
-		  show_expr (open->unit);
-		}
-	      if (open->iomsg)
-		{
-		  fputs (" IOMSG=", dumpfile);
-		  show_expr (open->iomsg);
-		}
-	      if (open->iostat)
-		{
-		  fputs (" IOSTAT=", dumpfile);
-		  show_expr (open->iostat);
-		}
-	      if (open->file)
-		{
-		  fputs (" FILE=", dumpfile);
-		  show_expr (open->file);
-		}
-	      if (open->status)
-		{
-		  fputs (" STATUS=", dumpfile);
-		  show_expr (open->status);
-		}
-	      if (open->access)
-		{
-		  fputs (" ACCESS=", dumpfile);
-		  show_expr (open->access);
-		}
-	      if (open->form)
-		{
-		  fputs (" FORM=", dumpfile);
-		  show_expr (open->form);
-		}
-	      if (open->recl)
-		{
-		  fputs (" RECL=", dumpfile);
-		  show_expr (open->recl);
-		}
-	      if (open->blank)
-		{
-		  fputs (" BLANK=", dumpfile);
-		  show_expr (open->blank);
-		}
-	      if (open->position)
-		{
-		  fputs (" POSITION=", dumpfile);
-		  show_expr (open->position);
-		}
-	      if (open->action)
-		{
-		  fputs (" ACTION=", dumpfile);
-		  show_expr (open->action);
-		}
-	      if (open->delim)
-		{
-		  fputs (" DELIM=", dumpfile);
-		  show_expr (open->delim);
-		}
-	      if (open->pad)
-		{
-		  fputs (" PAD=", dumpfile);
-		  show_expr (open->pad);
-		}
-	      if (open->decimal)
-		{
-		  fputs (" DECIMAL=", dumpfile);
-		  show_expr (open->decimal);
-		}
-	      if (open->encoding)
-		{
-		  fputs (" ENCODING=", dumpfile);
-		  show_expr (open->encoding);
-		}
-	      if (open->round)
-		{
-		  fputs (" ROUND=", dumpfile);
-		  show_expr (open->round);
-		}
-	      if (open->sign)
-		{
-		  fputs (" SIGN=", dumpfile);
-		  show_expr (open->sign);
-		}
-	      if (open->convert)
-		{
-		  fputs (" CONVERT=", dumpfile);
-		  show_expr (open->convert);
-		}
-	      if (open->asynchronous)
-		{
-		  fputs (" ASYNCHRONOUS=", dumpfile);
-		  show_expr (open->asynchronous);
-		}
-	      if (open->err != NULL)
-		fprintf (dumpfile, " ERR=%d", open->err->value);
-
-	      break;
-
+			if (open->unit)
+			{
+				fputs (" UNIT=", dumpfile);
+				show_expr (open->unit);
+			}
+			if (open->iomsg)
+			{
+				fputs (" IOMSG=", dumpfile);
+				show_expr (open->iomsg);
+			}
+			if (open->iostat)
+			{
+				fputs (" IOSTAT=", dumpfile);
+				show_expr (open->iostat);
+			}
+			if (open->file)
+			{
+				fputs (" FILE=", dumpfile);
+				show_expr (open->file);
+			}
+			if (open->status)
+			{
+				fputs (" STATUS=", dumpfile);
+				show_expr (open->status);
+			}
+			if (open->access)
+			{
+				fputs (" ACCESS=", dumpfile);
+				show_expr (open->access);
+			}
+			if (open->form)
+			{
+				fputs (" FORM=", dumpfile);
+				show_expr (open->form);
+			}
+			if (open->recl)
+			{
+				fputs (" RECL=", dumpfile);
+				show_expr (open->recl);
+			}
+			if (open->blank)
+			{
+				fputs (" BLANK=", dumpfile);
+				show_expr (open->blank);
+			}
+			if (open->position)
+			{
+				fputs (" POSITION=", dumpfile);
+				show_expr (open->position);
+			}
+			if (open->action)
+			{
+				fputs (" ACTION=", dumpfile);
+				show_expr (open->action);
+			}
+			if (open->delim)
+			{
+				fputs (" DELIM=", dumpfile);
+				show_expr (open->delim);
+			}
+			if (open->pad)
+			{
+				fputs (" PAD=", dumpfile);
+				show_expr (open->pad);
+			}
+			if (open->decimal)
+			{
+				fputs (" DECIMAL=", dumpfile);
+				show_expr (open->decimal);
+			}
+			if (open->encoding)
+			{
+				fputs (" ENCODING=", dumpfile);
+				show_expr (open->encoding);
+			}
+			if (open->round)
+			{
+				fputs (" ROUND=", dumpfile);
+				show_expr (open->round);
+			}
+			if (open->sign)
+			{
+				fputs (" SIGN=", dumpfile);
+				show_expr (open->sign);
+			}
+			if (open->convert)
+			{
+				fputs (" CONVERT=", dumpfile);
+				show_expr (open->convert);
+			}
+			if (open->asynchronous)
+			{
+				fputs (" ASYNCHRONOUS=", dumpfile);
+				show_expr (open->asynchronous);
+			}
+			if (open->err != NULL)
+				fprintf (dumpfile, " ERR=%d", open->err->value);
+	    }break;
+/*
 	    case EXEC_CLOSE:
 	      fputs ("CLOSE", dumpfile);
 	      close = c->ext.close;
@@ -1688,76 +1706,14 @@ instruction gfc2pips_code2instruction_(gfc_code* c){
 				}
 			}
 			list_of_arguments = gen_nreverse(list_of_arguments);
-			/*
-			 *
-			 voir comment sont gérées les I/O erreurs ou autre en fortran afin de pouvoir ajouter des statements supplémentaires
-			 case EXEC_TRANSFER:
-      fputs ("TRANSFER ", dumpfile);
-      show_expr (c->expr);
-      break;
-
-    case EXEC_DT_END:
-      fputs ("DT_END", dumpfile);
-      dt = c->ext.dt;
-
-      if (dt->err != NULL)
-	fprintf (dumpfile, " ERR=%d", dt->err->value);
-      if (dt->end != NULL)
-	fprintf (dumpfile, " END=%d", dt->end->value);
-      if (dt->eor != NULL)
-	fprintf (dumpfile, " EOR=%d", dt->eor->value);
-      break;
-			 *
-			 */
 			entity_initial(e) = make_value( is_value_intrinsic, e );
 			entity_type(e) = make_type(is_type_functional,make_functional(NIL, MakeOverloadedResult()));
 			call call_ = make_call(e,list_of_arguments);
-			/*return make_instruction_call(call_);*/
-/*
- * FROM pips parser
-**************************************************
-   char buffer[20];
-		(void) strcpy(buffer, (syn_vsp[(1) - (3)].string));
-		free((syn_vsp[(1) - (3)].string));
-
-		if(strcmp(buffer,"UNIT")!=0 && strcmp(buffer,"FMT")!=0) {
-		  ParserError("parser",
-			  "Illegal default option '*' in IO control list\n");
-		}
-
-		(void) strcat(buffer, "=");
-
-		(syn_val.liste) = CONS(EXPRESSION,
-			  MakeCharacterConstantExpression(buffer),
-			  CONS(EXPRESSION,
-		 MakeNullaryCall(CreateIntrinsic(LIST_DIRECTED_FORMAT_NAME))
-			       , NULL));
-		ici += 2;
-**************************************************
-FROM gram.y
-io_inst:  io_keyword io_f_u_id
-	    {
-                $$ = MakeSimpleIoInst1($1, $2);
-	    }
-        | io_keyword io_f_u_id TK_COMMA opt_lio_elem
-            {
-		$$ = MakeSimpleIoInst2($1, $2, $4);
-	    }
-	| io_keyword TK_LPAR lci TK_RPAR opt_virgule opt_lio_elem
-	    { $$ = MakeIoInstA($1, $3, $6); }
-        | iobuf_keyword TK_LPAR io_f_u_id TK_COMMA io_f_u_id TK_RPAR
-                        TK_LPAR unpar_io_expr TK_COMMA unpar_io_expr TK_RPAR
-	    { $$ = MakeIoInstB($1, $3, $5, $8, $10); }
-
-**************************************************
-FROM instruction MakeSimpleIoInst2(int keyword, expression f, list list_of_arguments(io_list)))
-*/
-			expression std, format, unite,f;
+			expression std, format, unite, f;
 			newgen_list lci;
 
 			//creation of the representation of the default channels for IO
 			f = MakeNullaryCall(CreateIntrinsic(LIST_DIRECTED_FORMAT_NAME));
-			//f = make_expression(<syntax(atom)>, normalized_undefined);
 			std = MakeNullaryCall(CreateIntrinsic(LIST_DIRECTED_FORMAT_NAME));
 
 
@@ -1767,8 +1723,18 @@ FROM instruction MakeSimpleIoInst2(int keyword, expression f, list list_of_argum
 				//if no format it is standard
 				if( d->ext.dt->format_expr ){
 					f = gfc2pips_expr2expression(d->ext.dt->format_expr);
-				}else if( d->ext.dt->format_label && d->ext.dt->format_label->value != -1){
-					f = gfc2pips_int2expression(d->ext.dt->format_label->value);
+				}else if(
+					d->ext.dt->format_label
+					&& d->ext.dt->format_label->value != -1
+				){
+					if(d->ext.dt->format_label->format){
+						f = gfc2pips_int2expression(d->ext.dt->format_label->value);
+						//do we have to change the string ? we've got parentheses around the expression for the moment
+						f = gfc2pips_expr2expression(d->ext.dt->format_label->format);
+					}else{
+						//error or warning: we have bad code
+						pips_error("gfc2pips_code2instruction","No format for label\n");
+					}
 				}
 				if(
 					//if GFC_IOSTAR_IS_PRIOTITY = TRUE
@@ -1776,10 +1742,11 @@ FROM instruction MakeSimpleIoInst2(int keyword, expression f, list list_of_argum
 					&& (
 						d->ext.dt->io_unit->expr_type!=EXPR_CONSTANT
 						//if the canal is 6, it is standard
-						|| (d->ext.dt->io_unit->expr_type==EXPR_CONSTANT
+						|| (
+							d->ext.dt->io_unit->expr_type==EXPR_CONSTANT
 							&& (
-								(d->op==EXEC_READ &&mpz_get_ui(d->ext.dt->io_unit->value.integer)!=5 )
-								|| (d->op==EXEC_WRITE &&mpz_get_ui(d->ext.dt->io_unit->value.integer)!=6 )
+								(d->op==EXEC_READ && mpz_get_ui(d->ext.dt->io_unit->value.integer)!=5 )
+								|| (d->op==EXEC_WRITE && mpz_get_ui(d->ext.dt->io_unit->value.integer)!=6 )
 							)
 						)
 					)
@@ -1788,9 +1755,8 @@ FROM instruction MakeSimpleIoInst2(int keyword, expression f, list list_of_argum
 				}
 			}
 
-			//balancer la valeur de UNIT et de FMT d'une façon ou d'une autre ?
-			unite = MakeCharacterConstantExpression("UNIT=");//mettre une valeur
-			format = MakeCharacterConstantExpression("FMT=");//mettre une valeur
+			unite = MakeCharacterConstantExpression("UNIT=");
+			format = MakeCharacterConstantExpression("FMT=");
 
 			lci = CONS(EXPRESSION, unite,
 				CONS(EXPRESSION, std,
@@ -1799,104 +1765,24 @@ FROM instruction MakeSimpleIoInst2(int keyword, expression f, list list_of_argum
 					)
 				)
 			);
-/*	inst = MakeIoInstA((keyword==TK_PRINT)?TK_WRITE:TK_READ ,lci, list_of_arguments);
-
-**************************************************
-instruction
-MakeIoInstA(keyword, lci, lio)
-int keyword;
-cons *lci;
-cons *lio;
-{
-  cons *l;
-  instruction io = instruction_undefined;
-  instruction io_call = instruction_undefined;
-  statement io_err = statement_undefined;
-  statement io_end = statement_undefined;
-  expression unit = expression_undefined;
-
-  //on fait une copie et on passe de deux en deux :  attribut1=, valeur1, attribut2=, valeur2
-  for (l = lci; l != NULL; l = CDR(CDR(l))) {
-    syntax s1;
-    entity e1;
-
-    s1 = expression_syntax(EXPRESSION(CAR(l)));
-
-    e1 = call_function(syntax_call(s1));
-
-    if (strcmp(entity_local_name(e1), "UNIT=") == 0) {
-      if( ! expression_undefined_p(unit) )
-	free_expression(unit);
-      unit = copy_expression(EXPRESSION(CAR(CDR(l))));
-    }
-  }
-
-  for (l = lci; l != NULL; l = CDR(CDR(l))) {
-    syntax s1, s2;
-    entity e1, e2;
-
-    s1 = expression_syntax(EXPRESSION(CAR(l)));
-    s2 = expression_syntax(EXPRESSION(CAR(CDR(l))));
-
-    pips_assert("syntax is a call", syntax_call_p(s1));
-    e1 = call_function(syntax_call(s1));
-    pips_assert("value is constant", value_constant_p(entity_initial(e1)));
-    pips_assert("constant is not int (thus litteral or call)",
-		!constant_int_p(value_constant(entity_initial(e1))));
-
-    if (strcmp(entity_local_name(e1), "ERR=") == 0 ||
-	strcmp(entity_local_name(e1), "END=") == 0 ||
-	strcmp(entity_local_name(e1), "FMT=") == 0) {
-      if (syntax_call_p(s2)) {
-	e2 = call_function(syntax_call(s2));
-	if (value_constant_p(entity_initial(e2))) {
-	  if (constant_int_p(value_constant(entity_initial(e2)))) {
-	    call_function(syntax_call(s2)) =
-	      MakeLabel(entity_local_name(e2));
-	  }
-	}
-	e2 = call_function(syntax_call(s2));
-	if (strcmp(entity_local_name(e1), "FMT=") != 0
-	    && expression_undefined_p(unit)) {
-	  unit = int_to_expression(0);
-	}
-	if (strcmp(entity_local_name(e1), "ERR=") == 0) {
-	  io_err = make_check_io_statement(IO_ERROR_ARRAY_NAME, unit, e2);
-	}
-	else if (strcmp(entity_local_name(e1), "END=") == 0) {
-	  io_end = make_check_io_statement(IO_EOF_ARRAY_NAME, unit, e2);
-	}
-	else
-	  ;
-      }
-    }
-  }
-
-  lci = gen_nconc(lci, lio);
-
-  io_call = make_instruction(is_instruction_call,
-			     make_call(CreateIntrinsic(NameOfToken(keyword)),
-				       lci));
-
-  if(statement_undefined_p(io_err) && statement_undefined_p(io_end)) {
-    io = io_call;
-  }
-  else {
-    list ls = NIL;
-    if(!statement_undefined_p(io_err)) {
-      ls = CONS(STATEMENT, io_err, ls);
-    }
-    if(!statement_undefined_p(io_end)) {
-      ls = CONS(STATEMENT, io_end, ls);
-    }
-    ls = CONS(STATEMENT, MakeStatement(entity_empty_label(), io_call), ls);
-    io = make_instruction(is_instruction_sequence, make_sequence(ls));
-    instruction_consistent_p(io);
-  }
-
-  return io;
-}
-
+			if(d->ext.dt){
+				if(d->ext.dt->err){
+					lci = gen_nconc(lci,CONS(EXPRESSION, MakeCharacterConstantExpression("ERR="),
+						CONS(EXPRESSION, MakeNullaryCall(gfc2pips_int2label(d->ext.dt->err->value)), NULL)
+					));
+				}
+				if(d->ext.dt->end){
+					lci = gen_nconc(lci,CONS(EXPRESSION, MakeCharacterConstantExpression("END="),
+						CONS(EXPRESSION, MakeNullaryCall(gfc2pips_int2label(d->ext.dt->end->value)), NULL)
+					));
+				}
+				if(d->ext.dt->eor){
+					lci = gen_nconc(lci,CONS(EXPRESSION, MakeCharacterConstantExpression("EOR="),
+						CONS(EXPRESSION, MakeNullaryCall(gfc2pips_int2label(d->ext.dt->eor->value)), NULL)
+					));
+				}
+			}
+/*
 **************************************************
  This function takes a list of io elements (i, j, t(i,j)), and returns
 the same list, with a cons cell pointing to a character constant
@@ -2103,6 +1989,85 @@ cons *l;
 	return make_instruction_block(NULL);;
 }
 
+instruction gfc2pips_symbol2data_instruction(gfc_symbol *sym){
+	/*data_inst: TK_DATA ldatavar TK_SLASH ldataval TK_SLASH
+	MakeDataStatement(
+		CONS(
+			EXPRESSION,
+			make_expression(
+				MakeAtom(
+					FindOrCreateEntity(CurrentPackage, name),
+					NULL,
+					expression_undefined,
+					expression_undefined,
+					FALSE
+				),
+				normalized_undefined
+			),
+			NIL
+		),
+		ldataval
+	);
+	*/
+	/*
+	void MakeDataStatement(list ldr, list ldv)
+	{
+	  statement ds = statement_undefined;
+	  code mc = entity_code(get_current_module_entity());
+	  entity dl = global_name_to_entity(TOP_LEVEL_MODULE_NAME, DATA_LIST_FUNCTION_NAME);
+	  expression pldr = expression_undefined;
+
+	  pips_assert("The static initialization pseudo-intrinsic is defined",
+			  !entity_undefined_p(dl));
+
+	  pldr = make_call_expression(dl, ldr);
+	  ds = make_call_statement(STATIC_INITIALIZATION_NAME,
+				   gen_nconc(CONS(EXPRESSION, pldr, NIL), ldv),
+				   entity_undefined,
+				   strdup(PrevComm));
+	  PrevComm[0] = '\0';
+	  iPrevComm = 0;
+
+	  sequence_statements(code_initializations(mc)) = gen_nconc(sequence_statements(code_initializations(mc)), CONS(STATEMENT, ds, NIL));
+	}
+	 *
+	 */
+	/*
+	ds = make_call_statement(
+		STATIC_INITIALIZATION_NAME,
+		gen_nconc(CONS(EXPRESSION, make_call_expression(
+			global_name_to_entity(TOP_LEVEL_MODULE_NAME, DATA_LIST_FUNCTION_NAME),
+			ldr
+		), NIL), ldv),
+		entity_undefined,
+		empty_comments
+	);
+	*/
+	entity e1 = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, DATA_LIST_FUNCTION_NAME);
+
+	/*newgen_list args1 = CONS(EXPRESSION,
+		gfc2pips_string2expression(sym->name),
+		CONS(EXPRESSION,
+			gfc2pips_expr2expression(sym->value),
+			NULL
+		)
+	);/**/
+	newgen_list args1 = CONS(EXPRESSION,
+		gfc2pips_string2expression(sym->name),
+		NULL
+	);/**/
+	newgen_list init = CONS( EXPRESSION, make_call_expression( e1, args1 ), NULL );
+	newgen_list values = CONS( EXPRESSION, gfc2pips_expr2expression(sym->value), NULL );
+
+	entity e2 = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, STATIC_INITIALIZATION_FUNCTION_NAME);
+	newgen_list args2 = gen_nconc(init, values);
+	call call_ = make_call( e2, args2 );
+	return make_instruction(is_instruction_call,call_);
+}
+
+
+
+
 entity gfc2pips_code2get_label(gfc_code *c){
 	debug(9,"gfc2pips_code2get_label",
 		"test label: %d %d %d %d\t"
@@ -2225,11 +2190,14 @@ expression gfc2pips_expr2expression(gfc_expr *expr){
 					[second membre de l'expression]
 				);
 				 */
+				//revoir : pourquoi une boucle ?
 				gfc_ref *r =expr->ref;
 				while(r){
 					fprintf(stdout,"^^^^^^^^^^^^^^^^^^^^^\n");
 					if(r->type==REF_ARRAY){
 						ref = gfc2pips_array_ref2indices(&r->u.ar);
+					}else{
+						fprintf(stdout,"Unable to understand the ref\n");
 					}
 					r=r->next;
 				}
@@ -2244,7 +2212,7 @@ expression gfc2pips_expr2expression(gfc_expr *expr){
 			return e;
 		}break;
 		case EXPR_CONSTANT:
-			debug(5,"gfc2pips_expr2expression","cst %d\n",expr);
+			debug(5,"gfc2pips_expr2expression","cst %d %d\n",expr,expr->ts.type);
 			switch(expr->ts.type){
 				case BT_INTEGER: e = gfc2pips_int2expression(mpz_get_ui(expr->value.integer)); break;
 				case BT_LOGICAL: e = gfc2pips_logical2expression(expr->value.logical); break;
@@ -2266,7 +2234,17 @@ expression gfc2pips_expr2expression(gfc_expr *expr){
 					//convertir le real en qqch de correct au niveau sortie
 					e = gfc2pips_real2expression(mpfr_get_d(expr->value.real,GFC_RND_MODE));
 				break;
-				case BT_CHARACTER: e = MakeCharacterConstantExpression(expr->value.character.string); break;
+				case BT_CHARACTER:{
+					char *char_expr = gfc2pips_gfc_char_t2string(expr->value.character.string,expr->value.character.length);
+					e = MakeCharacterConstantExpression(char_expr);
+					fprintf(
+						stdout,
+						"string(%d) %s\n",
+						strlen(expr->value.character.string),
+						char_expr
+					);
+					//free(char_expr);
+				}break;
 				case BT_COMPLEX:
 					e = MakeComplexConstantExpression(
 						gfc2pips_real2expression(mpfr_get_d(expr->value.complex.r,GFC_RND_MODE)),
@@ -2328,7 +2306,7 @@ expression gfc2pips_expr2expression(gfc_expr *expr){
 				);
 			}
 		break;
-	default:
+		default:
 			fprintf(stdout,"gfc2pips_expr2expression: dump not yet implemented, type of gfc_expr not recognized %d\n",expr->expr_type);
 		break;
 	}
@@ -2365,29 +2343,4 @@ entity gfc2pips_expr2entity(gfc_expr *expr){
 }
 
 
-statement gfc2pips_bloc2statement(gfc_code *c){
-	//entity l, instruction i
-	if(!c){
-		return statement_undefined;
-	}
-	entity l = gfc2pips_code2get_label(c);
-	instruction i = gfc2pips_code2instruction(c,false);
-	if(i==instruction_undefined){
-		fprintf(stderr,"Dumping of instruction failed\n");
-		return statement_undefined;
-	}
-	debug(4,"gfc2pips_bloc2statement","Instruction created\n");
-	statement s = make_statement(
-		l,
-		c->here->where.lb->file->inclusion_line,//(instruction_goto_p(i)||instruction_block_p(i))?STATEMENT_NUMBER_UNDEFINED : get_statement_number(),//provient de Syntax :S
-		STATEMENT_ORDERING_UNDEFINED,
-		empty_comments,
-		i,
-		NIL,
-		NULL,
-		empty_extensions ()
-	);
-	//boucle de dump de chaque instruction
-	return s;
-}
 

@@ -97,6 +97,7 @@ newgen_list getSymbolBy(gfc_namespace* ns, gfc_symtree *st, bool (*func)(gfc_nam
 bool gfc2pips_test_variable(gfc_namespace* ns, gfc_symtree *st);
 bool gfc2pips_test_variable2(gfc_namespace* ns, gfc_symtree *st );
 //bool gfc2pips_test_name(gfc_namespace* ns, gfc_symtree *st, int param);
+bool gfc2pips_test_data(gfc_namespace* __attribute__ ((__unused__)) ns, gfc_symtree *st );
 
 entity gfc2pips_symbol2entity(gfc_symbol* sym);
 
@@ -105,22 +106,27 @@ entity gfc2pips_symbol2entity(gfc_symbol* sym);
  */
 dimension gfc2pips_int2dimension(int n);
 
-expression gfc2pips_int2expression(int n);
+expression gfc2pips_int2expression(int n);//PIPS: expression int_to_expression(_int)
 expression gfc2pips_real2expression(double r);
 expression gfc2pips_logical2expression(bool b);
+expression gfc2pips_string2expression(char* s);
 
 entity gfc2pips_int_const2entity(int n);
 entity gfc2pips_int2label(int n);
 entity gfc2pips_real2entity(double r);
 entity gfc2pips_logical2entity(bool b);
+char* gfc2pips_gfc_char_t2string(gfc_char_t *c,int nb);
+char* gfc2pips_gfc_char_t2string_(gfc_char_t *c,int nb);
 
 value gfc2pips_symbol2value(gfc_symbol *s);
 
 type gfc2pips_symbol2type(gfc_symbol *s);
 int gfc2pips_symbol2size(gfc_symbol *s);
 
+instruction gfc2pips_code2instruction__TOP(gfc_namespace *ns, gfc_code* c);
 instruction gfc2pips_code2instruction(gfc_code* c, bool force_sequence);
 instruction gfc2pips_code2instruction_(gfc_code* c);
+instruction gfc2pips_symbol2data_instruction(gfc_symbol *sym);
 entity gfc2pips_code2get_label(gfc_code *c);
 entity gfc2pips_code2get_label2(gfc_code *c);
 
@@ -128,8 +134,6 @@ expression gfc2pips_expr2expression(gfc_expr *expr);
 bool gfc2pips_exprIsVariable(gfc_expr * expr);
 entity gfc2pips_expr2entity(gfc_expr *expr);
 
-
-statement gfc2pips_bloc2statement(gfc_code *c);
 
 
 #endif /* GFC_2_PIPS */

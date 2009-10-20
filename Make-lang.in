@@ -101,7 +101,7 @@ LIBS_PIPS1 = -lpips -ltop-level -lpipsmake -lwp65 -lhpfc -lhyperplane -lto_begin
 		-lconversion -lprettyprint -latomizer -lsyntax -lc_syntax -leffects-simple -leffects-convex -leffects-generic \
 		-lalias-classes -lcomp_sections -lsemantics -lcontrol -lcontinuation -lrice -lricedg -lpipsdbm -ltransformer \
 		-lpreprocessor -lri-util -lstep -lproperties -ltext-util -lmisc -lproperties -lreductions -lflint -lsac -lsafescale \
-		-lphrase -lnewgen -lgenC -lmatrice -lunion -lpolyedre -lsparse_sc -lsc -lcontrainte -lsg -lsommet -lray_dte -lpolynome \
+		-lphrase -lgpu -lnewgen -lgenC -lmatrice -lunion -lpolyedre -lsparse_sc -lsc -lcontrainte -lsg -lsommet -lray_dte -lpolynome \
 		-lmatrix -lvecteur -larithmetique -lpolylib -lm -lreadline -ltermcap
 #Loop 3 times on its own declarations seems to be enough
 LIBS_PIPS = $(LIBS_PIPS1) $(LIBS_PIPS1) $(LIBS_PIPS1) $(LIBS_PIPS1) 
