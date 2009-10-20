@@ -2175,6 +2175,7 @@ expression gfc2pips_expr2expression(gfc_expr *expr){
 		    //add array recognition (multi-dimension variable)
 		    //créer une liste de tous les indices et la balancer en deuxième arg  gen_nconc($1, CONS(EXPRESSION, $3, NIL))
 			newgen_list ref = NULL;
+			syntax s = syntax_undefined;
 			if(expr->ref){
 				/*//assign statement
 				$$ = MakeAssignInst(
@@ -2196,20 +2197,38 @@ expression gfc2pips_expr2expression(gfc_expr *expr){
 					fprintf(stdout,"^^^^^^^^^^^^^^^^^^^^^\n");
 					if(r->type==REF_ARRAY){
 						ref = gfc2pips_array_ref2indices(&r->u.ar);
+						break;
+					/*}else if(r->type==REF_COMPONENT){
+						fprintf (dumpfile, " %% %s", p->u.c.component->name);
+					*/}else if(r->type==REF_SUBSTRING){
+						entity ent = FindOrCreateEntity(CurrentPackage,expr->symtree->n.sym->name);
+						expression ref = make_expression(
+							make_syntax(is_syntax_reference,
+								make_reference(ent, NULL)
+							),
+						    normalized_undefined
+						);
+
+						entity substr = entity_intrinsic(SUBSTRING_FUNCTION_NAME);
+						newgen_list lexpr = CONS(EXPRESSION, ref,
+							     CONS(EXPRESSION, gfc2pips_expr2expression(r->u.ss.start),
+								  CONS(EXPRESSION, gfc2pips_expr2expression(r->u.ss.end), NULL)));
+						s = make_syntax(is_syntax_call, make_call(substr, lexpr));
+						return make_expression( s, normalized_undefined );
 					}else{
-						fprintf(stdout,"Unable to understand the ref\n");
+						fprintf(stdout,"Unable to understand the ref %d\n",r->type);
 					}
 					r=r->next;
 				}
 			}
-			syntax s =make_syntax_reference(
+			s = make_syntax_reference(
 				make_reference(
 					FindOrCreateEntity(CurrentPackage, expr->symtree->n.sym->name),
 					ref
 				)
 			);
-			e = make_expression( s, normalized_undefined );
-			return e;
+
+			return make_expression( s, normalized_undefined );
 		}break;
 		case EXPR_CONSTANT:
 			debug(5,"gfc2pips_expr2expression","cst %d %d\n",expr,expr->ts.type);
