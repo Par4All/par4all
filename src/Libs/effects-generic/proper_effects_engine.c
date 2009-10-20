@@ -236,7 +236,8 @@ list generic_p_proper_effect_of_reference(reference ref,
 			 words_to_string(words_reference(read_ref)));
 
 	      eff_read = (*reference_to_effect_func)(copy_reference(read_ref),
-						     make_action_read());
+						     is_action_read,
+						     false);
 	      pips_assert("le is weakly consistent", regions_weakly_consistent_p(le));
 	      le = gen_nconc(le, CONS(EFFECT, eff_read, NIL));
 	      pips_assert("le is weakly consistent", regions_weakly_consistent_p(le));
@@ -268,7 +269,7 @@ list generic_p_proper_effect_of_reference(reference ref,
 	   gen_length(variable_dimensions(v)) == gen_length(l_inds))))
 	{
 	  *pme = (*reference_to_effect_func)
-	    (ref, write_p?make_action_write():make_action_read());
+	    (ref, write_p? is_action_write : is_action_read, true);
 	  pips_assert("*pme is wekly consistent", region_weakly_consistent_p(*pme));
 	}
     }
@@ -280,7 +281,7 @@ list generic_p_proper_effect_of_reference(reference ref,
        This should maybe be refined ? */
 
       *pme = (*reference_to_effect_func)
-	(ref, write_p?make_action_write():make_action_read());
+	(ref, write_p? is_action_write : is_action_read, true);
       if(!effect_undefined_p(*pme))
 	pips_assert("*pme is wekly consistent", region_weakly_consistent_p(*pme));
     }
@@ -604,7 +605,7 @@ list generic_proper_effects_of_complex_address_expression(expression add_exp, ef
 	      */
 	      le = CONS(EFFECT, 
 			make_anywhere_effect
-			(write_p?make_action_write():make_action_read()),
+			(write_p? is_action_write : is_action_read),
 			le);
 	      result_computed_p = TRUE;
 	      finished_p = TRUE;
@@ -670,7 +671,7 @@ list generic_proper_effects_of_complex_address_expression(expression add_exp, ef
 	    {
 	      pips_debug(4, "mr is undefined -> anywhere effect\n");
 	      *pme = make_anywhere_effect
-		(write_p?make_action_write():make_action_read());
+		(write_p ? is_action_write : is_action_read);
 	    }
 	  else 
 	    {
@@ -679,9 +680,8 @@ list generic_proper_effects_of_complex_address_expression(expression add_exp, ef
 	      pips_debug(4,"mr is defined\n");
 	      
 	      me = (*reference_to_effect_func)
-		(mr, write_p?make_action_write():make_action_read());
-	      *pme = me;
-	      
+		(mr, write_p? is_action_write : is_action_read, false);
+	      *pme = me;	      
 	    }
 	}
     }
@@ -840,7 +840,7 @@ list generic_proper_effects_of_complex_address_expression(expression add_exp, ef
       /* The sub-effect could not be refined : it's an anywhere effect */
       free_effect(*pme);
       *pme = make_anywhere_effect
-	(write_p?make_action_write():make_action_read());
+	(write_p?is_action_write:is_action_read);
     }
   
   ifdebug(8) 

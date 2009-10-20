@@ -51,7 +51,7 @@
    types of effects */
 
 /* consistency checking */
-void (*effect_consistent_p_func)(effect);
+bool (*effect_consistent_p_func)(effect);
 
 /* initialisation and finalization */
 void (*effects_computation_init_func)(string /* module_name */);
@@ -63,7 +63,8 @@ effect (*effect_dup_func)(effect eff);
 void (*effect_free_func)(effect eff);
 
 /* make functions for effects */
-effect (*reference_to_effect_func)(reference, action);
+effect (*reference_to_effect_func)(reference, tag /* action */, 
+				   bool /* use_preference */);
 list (*effect_to_store_independent_effect_list_func)(effect, bool);
 void (*effect_add_expression_dimension_func)(effect eff, expression exp);
 void (*effect_change_ith_dimension_expression_func)(effect eff, expression exp, 
@@ -686,7 +687,7 @@ list /* of effect */ make_effects_for_array_declarations(list refs)
     
     reference ref = REFERENCE(CAR(l1));
     /* FI: in this context, I assume that eff is never returned undefined */
-     eff = (*reference_to_effect_func)(ref,make_action(is_action_read, UU));
+    eff = (*reference_to_effect_func)(ref, is_action_read, true);
      if(effect_undefined_p(eff)) {
        pips_debug(8, "Reference to \"%s\" ignored\n", entity_name(reference_variable(ref)));
      }
@@ -844,7 +845,7 @@ bool effects_reference_sharing_p(list el, bool persistant_p)
 
 /**
  @return a new anywhere effect.
- @param ac is an action which is directly used in the new effect
+ @param act is an action tag 
 
  Allocate a new anywhere effect using generic function 
  reference_to_effect_func, and the anywhere entity on demand
@@ -858,7 +859,7 @@ bool effects_reference_sharing_p(list el, bool persistant_p)
  
    Action a is integrated in the new effect (aliasing).
  */
-effect make_anywhere_effect(action ac)
+effect make_anywhere_effect(tag act)
 {
  
   entity anywhere_ent = gen_find_tabulated(ALL_MEMORY_ENTITY_NAME, 
@@ -875,7 +876,7 @@ effect make_anywhere_effect(action ac)
   
   anywhere_eff = (*reference_to_effect_func)
     (make_reference(anywhere_ent, NIL),
-     ac);
+     act, false);
   effect_to_may_effect(anywhere_eff);
   return anywhere_eff;
   
@@ -913,11 +914,11 @@ list clean_anywhere_effects(list l_eff)
 
   if (anywhere_r_p)
     l_res = gen_nconc(l_res, 
-		      CONS(EFFECT, make_anywhere_effect(make_action_read()), 
+		      CONS(EFFECT, make_anywhere_effect(is_action_read), 
 			   NIL));
   if (anywhere_w_p)
     l_res = gen_nconc(l_res, 
-		      CONS(EFFECT, make_anywhere_effect(make_action_write()), 
+		      CONS(EFFECT, make_anywhere_effect(is_action_write), 
 			   NIL));
   
   
@@ -1325,7 +1326,7 @@ list statement_modified_pointers_effects_list(statement s)
   if (anywhere_p)
     {
       gen_free_list(l_res);
-      l_res = CONS(EFFECT, make_anywhere_effect(make_action_write()), NIL);
+      l_res = CONS(EFFECT, make_anywhere_effect(is_action_write), NIL);
     }
 
   ifdebug(6){
@@ -1455,8 +1456,7 @@ list generic_effects_store_update(list l_eff, statement s, bool backward_p)
 		   if(effects_access_paths_comparable_p(eff, eff_p, &comp_res)
 		      && comp_res <=0 )
 		     {
-		       new_eff = make_anywhere_effect
-			 (copy_action(effect_action(eff)));
+		       new_eff = make_anywhere_effect(effect_action_tag(eff));
 		       l_res = gen_nconc(l_res, CONS(EFFECT, new_eff, NIL));
 		       found = true;
 		       if (eff_w_p)

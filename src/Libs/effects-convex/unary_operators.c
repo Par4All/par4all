@@ -48,9 +48,10 @@
 
 
 effect
-reference_to_convex_region(reference ref, action ac)
+reference_to_convex_region(reference ref, tag  act /* action tag */ ,
+			   bool __attribute__((unused)) use_preference_p)
 {
-    return make_reference_region(ref, action_tag(ac));
+  return make_reference_region(ref, act);
 }
 
 list

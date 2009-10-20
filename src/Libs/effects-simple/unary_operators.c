@@ -53,7 +53,9 @@
 
 /**
  @param ref is a reference
- @param ac is an action
+ @param act is an action tag
+ @param use_preference_p is a boolean true when the returned effect cell
+        is a preference if possible.
  @return a simple effect representing a memory access.
 
  This function trusts the reference ref : no check is done to know
@@ -61,10 +63,12 @@
  subscripted array). This has to be done at a higher level. (BC)
 
  */
-effect reference_to_simple_effect(reference ref, action ac)
+effect reference_to_simple_effect(reference ref, tag act, 
+				  bool use_preference_p)
 {
   entity ent = reference_variable(ref);
   effect eff = effect_undefined;
+  action ac = make_action(act, UU);
 
   pips_debug(8, "Begins for reference: \"%s\"\n", 
 	     words_to_string(words_reference(ref)));
@@ -89,25 +93,18 @@ effect reference_to_simple_effect(reference ref, action ac)
 	{
 	  variable utv = type_variable(ut);
 	  list utd = variable_dimensions(utv);
-	  //basic utb = variable_basic(utv);
 	  bool is_array_p = !ENDP(utd);
-	  variable tv = type_variable(t);
-	  list td = variable_dimensions(tv);
-	  
-	  /* The dimensions can be hidden in the typedef or 
-	     before the typedef */
-	  if(type_variable_p(t)) 
-	    {
-	      is_array_p = is_array_p || (!ENDP(td));
-	    }
-	  
+	  	  
 	  if (is_array_p)
 	    {
-	      if(gen_length(ind) == type_depth(t))
+	      if(gen_length(ind) == type_depth(ut))
 		{
 		  /* The dimensionalities of the index and type are the same: */
-		  /* cell cell_ref = make_cell_reference(copy_reference(ref)); */
-		  cell cell_ref = make_cell_preference(make_preference(ref));
+		  cell cell_ref;
+		  if (use_preference_p)		    
+		    cell_ref = make_cell_preference(make_preference(ref));
+		  else 
+		    cell_ref = make_cell_reference(ref);
 		  approximation ap = make_approximation_must();
 		  eff = make_effect(cell_ref, ac, ap, make_descriptor_none());
 		}
@@ -117,34 +114,39 @@ effect reference_to_simple_effect(reference ref, action ac)
 		  /* if we are in C we trust the reference */
 		  if (c_module_p(get_current_module_entity()))
 		    {
-		      reference n_ref = copy_reference(ref);
-		      cell cell_ref = make_cell_reference(n_ref);
+		      cell cell_ref;
+		      if (use_preference_p)		    
+			cell_ref = make_cell_preference(make_preference(ref));
+		      else 
+			cell_ref = make_cell_reference(ref);
 		      approximation ap = make_approximation_must();
-		      eff = make_effect(cell_ref, ac, ap, make_descriptor_none());
+		      eff = make_effect(cell_ref, ac, ap, 
+					make_descriptor_none());
 		    }
 		  else
 		    {
 		      /* we are in Fortran. A reference to TAB with no 
 			 index is a reference to the whole array 
 		      */
-		      /* there is a memory leak here if ac has been allocated 
-		       for the sole purpose of this function call 
-		      */ 
-
 		      pips_assert("invalid number of reference indices \n",
-				  gen_length(variable_dimensions(tv)) > 
+				  gen_length(variable_dimensions(utv)) > 
 				  gen_length(ind));
 	  
 		      pips_debug(7, "less ref indices than number of dimensions\n");
 		      /* generate effects on whole (sub-)array */
-	  	  
+	  	      /* it is necessary to copy the reference because
+                         we add dimensions afterwards.
+			 this may lead to memory leaks, but I assume that this 
+			 case only arises when dealing with actual program 
+			 references 
+		      */ 
 		      eff = make_effect
 			(make_cell_reference(copy_reference(ref)),
 			 ac, make_approximation_must(), make_descriptor_none());
 		      
 		      FOREACH(DIMENSION, c_t_dim, 
 			      gen_nthcdr((int) gen_length(ind),
-					 variable_dimensions(tv)))
+					 variable_dimensions(utv)))
 			{		      
 			  simple_effect_add_expression_dimension
 			    (eff, make_unbounded_expression());		      
@@ -156,20 +158,29 @@ effect reference_to_simple_effect(reference ref, action ac)
 	  else
 	    {
 	      /* It is a scalar : keep the actual reference */
-	      cell cell_ref = make_cell_preference(make_preference(ref));
+	      cell cell_ref;
+	      if (use_preference_p)		    
+		cell_ref = make_cell_preference(make_preference(ref));
+	      else 
+		cell_ref = make_cell_reference(ref);
 	      approximation ap = make_approximation_must();
 	      eff = make_effect(cell_ref, ac, ap, make_descriptor_none());
 	    }
 	}
       else
 	{
-	  reference n_ref = copy_reference(ref);
-	  cell cell_ref = make_cell_reference(n_ref);
+	  /* reference n_ref = copy_reference(ref); */
+/* 	  cell cell_ref = make_cell_reference(n_ref); */
+	  cell cell_ref;
+	  if (use_preference_p)		    
+	    cell_ref = make_cell_preference(make_preference(ref));
+	  else 
+	    cell_ref = make_cell_reference(ref);
 	  approximation ap = make_approximation_must();
 	  eff = make_effect(cell_ref, ac, ap, make_descriptor_none()); 
 	}
       free_type(ut);
-
+      
     }
   
   ifdebug(8)
@@ -341,15 +352,17 @@ simple_effect_dup(effect eff)
 
 /**
    @param ref is a program reference
-   @param ac is the action of the returned effect
+   @param act is the action tag of the returned effect
    @return an effect whose cell is a preference pointing
            to the original program reference.
  */
  effect
- reference_to_reference_effect(reference ref, action ac)
+ reference_to_reference_effect(reference ref, tag act,
+			       bool __attribute__((unused)) use_preference_p)
  {
    cell cell_ref = make_cell(is_cell_preference, make_preference(ref));
    approximation ap = make_approximation(is_approximation_must, UU);
+   action ac = make_action(act, UU);
    effect eff;
     
    eff = make_effect(cell_ref, ac, ap, make_descriptor(is_descriptor_none,UU));  

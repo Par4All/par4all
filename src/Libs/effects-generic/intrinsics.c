@@ -1379,8 +1379,8 @@ static list generic_io_effects(entity e, list args, bool system_p)
     /* FI: I would like not to use "preference" isntead of
        "reference", but this causes a bug in cumulated effects and I
        do not have time to chase it. */
-    eff1 = (*reference_to_effect_func)(ref1, make_action_read());
-    eff2 = (*reference_to_effect_func)(ref2, make_action_write());
+    eff1 = (*reference_to_effect_func)(ref1, is_action_read,false);
+    eff2 = (*reference_to_effect_func)(ref2, is_action_write,false);
 
     if(unbounded_expression_p(unit)) 
       {
@@ -1546,7 +1546,7 @@ static list effects_of_any_ioelem(expression exp, tag act, bool is_fortran)
       /* This is not generic! */
       entity ioptr = make_dummy_io_ptr();
       reference r = make_reference(ioptr, CONS(EXPRESSION, make_unbounded_expression(), NIL));
-      effect eff = (*reference_to_effect_func)(r,make_action_write());
+      effect eff = (*reference_to_effect_func)(r, is_action_write,false);
       effect_approximation_tag(eff) = is_approximation_may;
       /* FI: this is really not generic! */
       extern list c_summary_effect_to_proper_effects(effect, expression);
@@ -1689,8 +1689,8 @@ static list effects_of_C_ioelem(expression arg, tag act)
        /* FI: I would like not to use "preference" instead of
 	  "reference", but this causes a bug in cumulated effects and I
 	  do not have time to chase it. */
-       eff1 = (*reference_to_effect_func)(ref1, make_action_read());
-       eff2 = (*reference_to_effect_func)(ref2, make_action_write());
+       eff1 = (*reference_to_effect_func)(ref1, is_action_read,false);
+       eff2 = (*reference_to_effect_func)(ref2, is_action_write,false);
        
        if(!must_p) 
 	 {

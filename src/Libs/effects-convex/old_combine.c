@@ -382,7 +382,7 @@ list region_must_union(region r1, region r2)
     effect r_res;
     
     if (anywhere_effect_p(r1) || anywhere_effect_p(r2))
-      r_res = make_anywhere_effect(copy_action(effect_action(r1)));
+      r_res = make_anywhere_effect(effect_action_tag(r1));
     else
       r_res = regions_must_convex_hull(r1, r2);
 
@@ -403,7 +403,7 @@ list region_may_union(region r1, region r2)
     effect r_res;
 
     if (anywhere_effect_p(r1) || anywhere_effect_p(r2))
-      r_res = make_anywhere_effect(copy_action(effect_action(r1)));
+      r_res = make_anywhere_effect(effect_action_tag(r1));
     else
       r_res = regions_may_convex_hull(r1, r2);
 
@@ -997,7 +997,7 @@ list region_sup_difference(region reg1, region reg2)
     
     if (anywhere_effect_p(reg1))
       {
-	reg = make_anywhere_effect(copy_action(effect_action(reg1)));
+	reg = make_anywhere_effect(effect_action_tag(reg1));
 	l_reg = region_to_list(reg);
       }
     else if (anywhere_effect_p(reg2))

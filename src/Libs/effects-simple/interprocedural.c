@@ -52,7 +52,8 @@
 
 /*********************************************************** INITIALIZATION */
 
-void simple_effects_translation_init(entity callee, list real_args )
+void simple_effects_translation_init(entity __attribute__((unused)) callee, 
+				     list __attribute__((unused)) real_args )
 {
 }
 
@@ -61,7 +62,7 @@ void simple_effects_translation_end()
 }
 
 
-void simple_effect_descriptor_interprocedural_translation(effect eff)
+void simple_effect_descriptor_interprocedural_translation(effect __attribute__((unused))eff)
 {
 }
 
@@ -282,9 +283,9 @@ list effects_dynamic_elim(list l_eff)
   }
 
   if(add_anywhere_write_effect_p)
-    l_res = CONS(EFFECT, make_anywhere_effect(make_action_write()), l_res);
+    l_res = CONS(EFFECT, make_anywhere_effect(is_action_write), l_res);
   if(add_anywhere_read_effect_p)
-    l_res = CONS(EFFECT, make_anywhere_effect(make_action_read()), l_res);
+    l_res = CONS(EFFECT, make_anywhere_effect(is_action_read), l_res);
   return(l_res);
 }
 
@@ -1065,7 +1066,7 @@ list c_simple_effects_on_formal_parameter_backward_translation(list l_sum_eff,
 		pips_debug(8, "effect on the pointed area : \n");
 		new_eff = (* reference_to_effect_func)
 		  (new_ref,
-		   copy_action(effect_action(eff)));
+		   effect_action_tag(eff), false);
 		FOREACH(EXPRESSION, eff_ind_exp, eff_ind)
 		  {
 		    (*effect_add_expression_dimension_func)
@@ -1104,7 +1105,6 @@ list c_simple_effects_on_formal_parameter_backward_translation(list l_sum_eff,
 	    expression arg1 = EXPRESSION(CAR(args));
 	    syntax s1 = expression_syntax(arg1);
 	    reference r1 = syntax_reference(s1);
-	    entity ev1 = reference_variable(r1);
 	    list l_real_arg = NIL;
 	    effect eff1;
 	    
@@ -1135,8 +1135,7 @@ list c_simple_effects_on_formal_parameter_backward_translation(list l_sum_eff,
 		  }
 		
 		if (effect_undefined_p(eff1))
-		  n_eff =  make_anywhere_effect
-		    (copy_action(effect_action(eff)));
+		  n_eff =  make_anywhere_effect(effect_action_tag(eff));
 		else
 		  {
 		    n_eff = (*effect_dup_func)(eff1);
@@ -1239,8 +1238,7 @@ list c_simple_effects_on_formal_parameter_backward_translation(list l_sum_eff,
 		list eff_ind = reference_indices(eff_ref);
 
 		if (effect_undefined_p(eff1))
-		  n_eff =  make_anywhere_effect
-		    (copy_action(effect_action(eff)));
+		  n_eff =  make_anywhere_effect(effect_action_tag(eff));
 		else
 		  {
 		    n_eff = (*effect_dup_func)(eff1);
@@ -1406,7 +1404,7 @@ list c_summary_effect_to_proper_effects(effect eff, expression real_arg)
 		pips_debug(8, "effect on the pointed area : \n");
 		new_eff = (* reference_to_effect_func)
 		  (new_ref,
-		   copy_action(effect_action(eff)));
+		   effect_action_tag(eff),false);
 		FOREACH(EXPRESSION, eff_ind_exp, eff_ind)
 		  {
 		    (*effect_add_expression_dimension_func)
@@ -1455,8 +1453,7 @@ list c_summary_effect_to_proper_effects(effect eff, expression real_arg)
 		l_real_arg = generic_proper_effects_of_complex_address_expression
 		  (arg1, &eff1, effect_write_p(eff));
 		if (effect_undefined_p(eff1))
-		  n_eff =  make_anywhere_effect
-		    (copy_action(effect_action(eff)));
+		  n_eff =  make_anywhere_effect(effect_action_tag(eff));
 		else
 		  {
 		    n_eff = eff1;
@@ -1548,8 +1545,7 @@ list c_summary_effect_to_proper_effects(effect eff, expression real_arg)
 		l_real_arg = generic_proper_effects_of_complex_address_expression
 		  (real_arg, &eff1, effect_write_p(eff));
 		if (effect_undefined_p(eff1))
-		  n_eff =  make_anywhere_effect
-		    (copy_action(effect_action(eff)));
+		  n_eff =  make_anywhere_effect(effect_action_tag(eff));
 		else
 		  {
 		    n_eff = eff1;
@@ -1575,7 +1571,7 @@ list c_summary_effect_to_proper_effects(effect eff, expression real_arg)
 	    }
 	    else {
 	      /* We do not know what to do with the initial value */
-	      n_eff = make_anywhere_effect(copy_action(effect_action(eff)));
+	      n_eff = make_anywhere_effect(effect_action_tag(eff));
 	    }
 
 	    if (n_eff != effect_undefined && l_eff == NIL)

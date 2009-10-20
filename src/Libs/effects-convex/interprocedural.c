@@ -548,9 +548,8 @@ list c_convex_effects_on_formal_parameter_backward_translation(list l_sum_eff,
 		   real argument
 		*/
 		pips_debug(8, "effect on the pointed area : \n");
-		new_eff = (* reference_to_effect_func)
-		  (new_ref,
-		   copy_action(effect_action(eff)));		
+		new_eff = (*reference_to_effect_func)
+		  (new_ref, effect_action_tag(eff), false);		
 
 		/* this could easily be made generic BC. */
 		if(!anywhere_effect_p(new_eff))
@@ -631,8 +630,7 @@ list c_convex_effects_on_formal_parameter_backward_translation(list l_sum_eff,
 		
 		if (effect_undefined_p(eff_real) || anywhere_effect_p(eff_real))
 		  {
-		    n_eff =  make_anywhere_effect
-		      (copy_action(effect_action(eff)));
+		    n_eff =  make_anywhere_effect(effect_action_tag(eff));
 		    l_eff = gen_nconc(l_eff, CONS(EFFECT, n_eff, NIL));
 		  }
 		else {
@@ -789,8 +787,7 @@ list c_convex_effects_on_formal_parameter_backward_translation(list l_sum_eff,
 		effect new_eff;
 
 		if (effect_undefined_p(eff_real))
-		  new_eff =  make_anywhere_effect
-		    (copy_action(effect_action(eff)));
+		  new_eff =  make_anywhere_effect(effect_action_tag(eff));
 		else
 		  {
 		    new_eff = (*effect_dup_func)(eff_real);
