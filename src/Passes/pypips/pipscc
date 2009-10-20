@@ -48,100 +48,102 @@ def cppflags():
 			sys.argv.remove(opt)
 	return flags
 
-def pipscpp():
-	"""simulate the behavior of the c preprocessor"""
-	# parse command line
-	CPPFLAGS=cppflags()
-	OUTFILE=ofile()
-	print "# CPPFLAGS: ", CPPFLAGS
-	# look for input file
-	for opt in sys.argv[1:]:
-		if opt[0] != '-':
-			if not OUTFILE:
-				OUTFILE=opt[0:-1]+"o"
-			# generate internal representation of preprocessed code
-			obj=object_code(opt,CPPFLAGS,sys.argv[1:])
-			# serialize it
-			newobj=file(OUTFILE,"w")
-			pickle.dump(obj,newobj)
-			newobj.close()
-			print "# OBJ written: ", OUTFILE
-	# that's all folks
+class pipscc:
+	"""modular pips compiler front-end"""
+	def __init__(self):
+		"""create a pips compiler instance from sys.argv"""
+		self.is_ld=True
+		for opt in sys.argv[1:]:
+			if opt == "-c":
+				self.is_ld=False
+				break
 
-def pipsld():
-	# working repository
-	WDIR=tempfile.mkdtemp("pipscc")
-	print "# intermediate files generated in", WDIR
-	
-	# gather pickled input files
-	INPUT_FILES=[]
-	for opt in sys.argv[1:]:
-		if opt[0] != '-' and opt[-2:]==".o":
-			INPUT_FILES+=[opt]
-	# load pickled input files
-	C_FILES=[]
-	O_FILES=[]
-	for ifile in INPUT_FILES:
-			obj=pickle.load(file(ifile,"r"))
-			obj.dump_to_c(WDIR)
-			obj.oname=ifile
-			C_FILES+=[obj.cname]
-			O_FILES+=[obj]
+	def run(self):
+		"""run the compilation"""
+		if not self.is_ld:self.pipscpp() 
+		else:self.pipsld() 
 
-	print "# input files: ", reduce(lambda x,y:x+" "+y,C_FILES,"")
+	def pipscpp(self):
+		"""simulate the behavior of the c preprocessor"""
+		# parse command line
+		CPPFLAGS=cppflags()
+		OUTFILE=ofile()
+		print "# CPPFLAGS: ", CPPFLAGS
+		# look for input file
+		for opt in sys.argv[1:]:
+			if opt[0] != '-':
+				if not OUTFILE:
+					OUTFILE=opt[0:-1]+"o"
+				# generate internal representation of preprocessed code
+				obj=object_code(opt,CPPFLAGS,sys.argv[1:])
+				# serialize it
+				newobj=file(OUTFILE,"w")
+				pickle.dump(obj,newobj)
+				newobj.close()
+				print "# OBJ written: ", OUTFILE
+		# that's all folks
+
+	def changes(self,ws):
+		"""apply any change to the workspace, should be overloaded by the user"""
+		map(module.display,ws)
+
+	def pipsld(self):
+		"""simulate c linker, all computation is done at link time"""
+		# working repository
+		WDIR=tempfile.mkdtemp("pipscc")
+		print "# intermediate files generated in", WDIR
+		
+		# gather pickled input files
+		INPUT_FILES=[]
+		for opt in sys.argv[1:]:
+			if opt[0] != '-' and opt[-2:]==".o":
+				INPUT_FILES+=[opt]
+		# load pickled input files
+		C_FILES=[]
+		O_FILES=[]
+		for ifile in INPUT_FILES:
+				obj=pickle.load(file(ifile,"r"))
+				obj.dump_to_c(WDIR)
+				obj.oname=ifile
+				C_FILES+=[obj.cname]
+				O_FILES+=[obj]
 	
-	# run pips with this informations
-	print "# running pips"
-	ws = pyps.workspace(C_FILES)
-	# add extra operations there 
-	ws["farray_get"].inlining()
-	ws["farray_set"].inlining()
-	#map(module.suppress_dead_code,ws)
-	
-	# commit changes
-	ws.save(indir=WDIR)
-	# the end for pips
-	ws.quit()
-	
-	# now run the compiler
-	CC=os.getenv("CC","gcc")
-	for obj in O_FILES:
-		cmd=[CC]+obj.cflags+["-o",obj.oname]
+		print "# input files: ", reduce(lambda x,y:x+" "+y,C_FILES,"")
+		
+		# run pips with this informations
+		print "# running pips"
+		ws = pyps.workspace(C_FILES)
+		# add extra operations 
+		self.changes(ws)
+		# commit changes
+		ws.save(indir=WDIR)
+		# the end for pips
+		ws.quit()
+		
+		# now run the compiler
+		CC=os.getenv("CC","gcc")
+		for obj in O_FILES:
+			cmd=[CC]+obj.cflags+["-o",obj.oname]
+			print "# running", cmd
+			sp=subprocess.Popen(cmd)
+			sp.wait()
+		
+		cmd=reduce(lambda x,y:x+" "+y,sys.argv[1:],CC)
 		print "# running", cmd
-		sp=subprocess.Popen(cmd)
-		sp.wait()
-	
-	cmd=reduce(lambda x,y:x+" "+y,sys.argv[1:],CC)
-	print "# running", cmd
-	res=os.system(cmd)
-	exitcode= (res >>8)& 0xFF
-	if exitcode:
-		shutil.rmtree(WDIR)
-
-def guess_mode():
-	is_ld=True
-	for opt in sys.argv[1:]:
-		if opt == "-c" :
-			is_ld=False
-			break
-	if is_ld:return pipsld
-	else : return pipscpp
+		res=os.system(cmd)
+		exitcode= (res >>8)& 0xFF
+		if exitcode:
+			shutil.rmtree(WDIR)
 
 
 
 
-#
-##
-#
 
-def pipscc():
-	"""run pips as if it was cc: .c -> pips -> .c -> cc -> .o"""
-	runner=guess_mode()
-	runner()
 
 #
 ##
 #
 
 if __name__ == "__main__":
-	pipscc()
+	thecompiler=pipscc()
+	thecompiler.run()
