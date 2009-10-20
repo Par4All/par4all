@@ -738,9 +738,9 @@ void p4a_kernel_wrapper_0(float_t save[501][501], float_t space[501][501], int i
    extern void p4a_kernel_0(float_t save[501][501], float_t space[501][501], int i, int j);
    // BEGIN BLOCK
    // BEGIN BLOCK
-   // To be replaced with a call to P4A_VP_0
+   // To be replaced with a call to P4A_vp_0
    i = i;
-   // To be replaced with a call to P4A_VP_1
+   // To be replaced with a call to P4A_vp_1
    j = j;
 
    p4a_kernel_0(save, space, i, j);
@@ -752,9 +752,9 @@ void p4a_kernel_wrapper_1(float_t save[501][501], float_t space[501][501], int i
    extern void p4a_kernel_1(float_t save[501][501], float_t space[501][501], int i, int j);
    // BEGIN BLOCK
    // BEGIN BLOCK
-   // To be replaced with a call to P4A_VP_0
+   // To be replaced with a call to P4A_vp_0
    i = i;
-   // To be replaced with a call to P4A_VP_1
+   // To be replaced with a call to P4A_vp_1
    j = j;
 
    p4a_kernel_1(save, space, i, j);
@@ -766,9 +766,9 @@ void p4a_kernel_wrapper_2(float_t space[501][501], int i, int j)
    extern void p4a_kernel_2(float_t space[501][501], int i, int j);
    // BEGIN BLOCK
    // BEGIN BLOCK
-   // To be replaced with a call to P4A_VP_0
+   // To be replaced with a call to P4A_vp_0
    i = i;
-   // To be replaced with a call to P4A_VP_1
+   // To be replaced with a call to P4A_vp_1
    j = j;
    p4a_kernel_2(space, i, j);
    // END BLOCK
