@@ -453,7 +453,7 @@ newgen_list gfc2pips_vars_(gfc_namespace *ns,newgen_list variables_p){
 			i=0;j=1;
 			arguments_p = arguments;
 			while(arguments_p){
-				fprintf(stdout,"%s %s\n",entity_local_name((entity)arguments_p->car.e),current_symtree->name);
+				//fprintf(stdout,"%s %s\n",entity_local_name((entity)arguments_p->car.e),current_symtree->name);
 				if(strcmp(str2upper(entity_local_name((entity)arguments_p->car.e)),str2upper(current_symtree->name))==0){
 					i=j;
 					break;
@@ -684,7 +684,11 @@ type gfc2pips_symbol2type(gfc_symbol *s){
 	return type_undefined;
 }
 int gfc2pips_symbol2size(gfc_symbol *s){
-	if(s->ts.type==BT_CHARACTER){
+	if(
+		s->ts.type==BT_CHARACTER
+		&& s->ts.cl
+		&& s->ts.cl->length
+	){
 		return mpz_get_ui(s->ts.cl->length->value.integer);
 	}else{
 		return s->ts.kind;
@@ -770,7 +774,7 @@ newgen_list gfc2pips_array_ref2indices(gfc_array_ref *ar){
 
 instruction gfc2pips_code2instruction__TOP(gfc_namespace *ns, gfc_code* c){
 	if(!c){
-		fprintf(stdout,"WE HAVE GOT A PROBLEM, SEQUENCE WITHOUT ANYTHING IN IT !\nSegfault soon ...\n");
+		//fprintf(stdout,"WE HAVE GOT A PROBLEM, SEQUENCE WITHOUT ANYTHING IN IT !\nSegfault soon ...\n");
 		return make_instruction_block(CONS(STATEMENT, make_stmt_of_instr(make_instruction_block(NULL)), NIL));
 	}
 
@@ -2211,8 +2215,14 @@ expression gfc2pips_expr2expression(gfc_expr *expr){
 
 						entity substr = entity_intrinsic(SUBSTRING_FUNCTION_NAME);
 						newgen_list lexpr = CONS(EXPRESSION, ref,
-							     CONS(EXPRESSION, gfc2pips_expr2expression(r->u.ss.start),
-								  CONS(EXPRESSION, gfc2pips_expr2expression(r->u.ss.end), NULL)));
+							CONS(EXPRESSION,
+								gfc2pips_expr2expression(r->u.ss.start),
+								CONS(EXPRESSION,
+									r->u.ss.end ? gfc2pips_expr2expression(r->u.ss.end) : MakeNullaryCall(CreateIntrinsic(UNBOUNDED_DIMENSION_NAME)),
+									NULL
+								)
+							)
+						);
 						s = make_syntax(is_syntax_call, make_call(substr, lexpr));
 						return make_expression( s, normalized_undefined );
 					}else{
