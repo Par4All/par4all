@@ -3287,7 +3287,8 @@ text text_statement_enclosed(entity module,
 	    //temp = make_text(NIL);
 	  }
 	  else if(strcmp(cs, "\n")==0) {
-	    sentence s = MAKE_ONE_WORD_SENTENCE(0, "\n");
+	    // MAKE_ONE_WORD_SENTENCE already implies a '\n'
+	    sentence s = MAKE_ONE_WORD_SENTENCE(0, "");
 	    temp = make_text(CONS(SENTENCE, s ,NIL));
 	  }
 	  else

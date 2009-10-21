@@ -1871,8 +1871,10 @@ cstr_args_check(statement s)
 
     if (expr == expression_undefined) {
         /* The target languague is unknown: C or Fortran, NL at the
-	   end or not? It will be up to the prettyprinter (FI). */
-        put_a_comment_on_a_statement(s, strdup("CHECK WAS NOT CREATED"));
+	   end or not? It will be up to the prettyprinter (FI).
+	   FI+LD 21-Oct-2009 : added NL, apparently needed in Fortran too.
+	*/
+        put_a_comment_on_a_statement(s, strdup("CHECK WAS NOT CREATED\n"));
         return statement_undefined;
     }
 
