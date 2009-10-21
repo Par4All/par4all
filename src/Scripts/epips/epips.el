@@ -1257,7 +1257,7 @@ such as the preconditions, the regions, etc."
   ;; Load the menu layout:
   (load-file (or (getenv "EPIPS_VIEW_MENU_LAYOUT")
 		 (concat (getenv "PIPS_ROOT")
-			 "/Share/epips_view_menu_layout.el")
+			 "/etc/epips_view_menu_layout.el")
 		 )
 	     )
   (epips-build-menu-from-layout epips-view-menu-layout
@@ -1267,7 +1267,7 @@ such as the preconditions, the regions, etc."
 
   (load-file (or (getenv "EPIPS_TRANSFORM_MENU_LAYOUT")
 		 (concat (getenv "PIPS_ROOT")
-			 "/Share/epips_transform_menu_layout.el")
+			 "/etc/epips_transform_menu_layout.el")
 		 )
 	     )
 )
