@@ -429,7 +429,7 @@ list generic_proper_effects_of_complex_address_expression(expression add_exp, ef
   if(syntax_reference_p(s)) 
     {
       reference ref = syntax_reference(s);
-      le = generic_p_proper_effect_of_reference(copy_reference(ref), pme, 
+      le = generic_p_proper_effect_of_reference(ref, pme, 
 						write_p, true);
 
       finished_p = TRUE;
