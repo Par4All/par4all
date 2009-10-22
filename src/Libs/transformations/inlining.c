@@ -228,6 +228,7 @@ void statement_with_static_declarations_p(statement s,inlining_parameters p )
     has_static_declaration(p)|=inline_has_static_declaration(inlined_module(p),statement_declarations(s) );
 }
 
+#if 0
 /* create an array simlar to `efrom' initialized with expression `from'
  */
 entity make_temporary_array_entity(entity efrom, expression from)
@@ -261,6 +262,7 @@ entity make_temporary_array_entity(entity efrom, expression from)
 			c_module_p(get_current_module_entity())?get_current_module_statement():statement_undefined);
 	return new;
 }
+#endif
 
 /* create a scalar similar to `efrom' initialized with expression `from'
  */
@@ -535,6 +537,8 @@ statement inline_expression_call(inlining_parameters p, expression modified_expr
             else
             {
                 /* get new reference */
+
+                bool add_dereferencment = false;
 reget:
                 switch(syntax_tag(expression_syntax(from)))
                 {
@@ -552,7 +556,8 @@ reget:
                                     new = make_temporary_scalar_entity(e,from);
                                 else
                                 {
-                                    new = make_temporary_array_entity(e,from);
+                                    new = make_temporary_pointer_to_array_entity(e,MakeUnaryCall(entity_intrinsic(ADDRESS_OF_OPERATOR_NAME),from));
+                                    add_dereferencment=true;
                                 }
 
                             }
@@ -593,7 +598,8 @@ reget:
                  * then perform the substitution
                  */
                 gen_context_recurse(expanded, new, statement_domain, gen_true, &solve_name_clashes);
-                replace_entity(expanded,e,new);
+                if(add_dereferencment) replace_entity_by_expression(expanded,e,MakeUnaryCall(entity_intrinsic(DEREFERENCING_OPERATOR_NAME),entity_to_expression(new)));
+                else replace_entity(expanded,e,new);
 
             }
 
