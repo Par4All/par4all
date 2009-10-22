@@ -58,6 +58,43 @@ enum region_to_dma_switch { dma_load, dma_store, dma_allocate, dma_deallocate };
 #define dma_allocate_p(e) ((e) == dma_allocate )
 #define dma_deallocate_p(e) ((e) == dma_deallocate )
 
+
+enum range_to_expression_mode{
+    range_to_distance,
+    range_to_nbiter
+} ;
+#define range_to_distance_p(e) ((e) == range_to_distance)
+#define range_to_nbiter_p(e) ((e) == range_to_nbiter)
+
+/** 
+ * computes the distance between the lower bound and the upper bound of the range
+ * It @a count_iter is set to true, it computes the number of iterations instead 
+ * @param r range to analyse
+ * @param mode wether we compute the distance or count the number of iterations
+ * @return appropriate distance or count
+ */
+static
+expression range_to_expression(range r,enum range_to_expression_mode mode)
+{
+    expression distance =  make_op_exp(PLUS_OPERATOR_NAME,
+            copy_expression(range_upper(r)),
+            make_op_exp(MINUS_OPERATOR_NAME,
+                make_expression_1(),
+                copy_expression(range_lower(r))));
+    if( range_to_nbiter_p(mode) ) distance = make_op_exp(DIVIDE_OPERATOR_NAME,distance,copy_expression(range_increment(r)));
+    return distance;
+}
+
+/** 
+ * converts a loop range to a dma call from a memory @a from to another memory @a to
+ * 
+ * @param from expression giving the adress of the input memory
+ * @param to expression giving the adress of the output memory
+ * @param r range to analyze
+ * @param m kind of call to generate
+ * 
+ * @return 
+ */
 static
 call range_to_dma(expression from,
 		  expression to,
@@ -90,11 +127,7 @@ call range_to_dma(expression from,
   if (dma_deallocate_p(m))
     args = make_expression_list(dest);
   else {
-    expression transfer_size = make_op_exp(PLUS_OPERATOR_NAME,
-					   copy_expression(range_upper(r)),
-					   make_op_exp(MINUS_OPERATOR_NAME,
-						       make_expression_1(),
-						       copy_expression(range_lower(r))));
+    expression transfer_size = range_to_expression(r,range_to_distance);
 
     if (dma_load_p(m) || dma_store_p(m)) {
       expression source = from;
@@ -105,17 +138,6 @@ call range_to_dma(expression from,
   }
   return make_call(mcpy, args);
 
-					/*        MakeBinaryCall(
-						  entity_intrinsic(MULTIPLY_OPERATOR_NAME),
-						  make_expression(
-						  make_syntax_sizeofexpression(
-						  make_sizeofexpression_expression(
-						  MakeUnaryCall(entity_intrinsic(DEREFERENCING_OPERATOR_NAME),to)
-						  )
-						  ),
-						  normalized_undefined),*/
-
-		   /*)*/
 }
 
 
@@ -371,7 +393,7 @@ bool do_kernelize(statement s, entity loop_label)
       set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_PROPER_EFFECTS, get_current_module_name(), TRUE));
       /* outline the work and kernel parts*/
       outliner(kernel_name,make_statement_list(loop_body(l)));
-      s = outliner(host_call_name,make_statement_list(s));
+      (void)outliner(host_call_name,make_statement_list(s));
       reset_cumulated_rw_effects();
 
 
@@ -623,6 +645,78 @@ void terapix_argument_handler(entity e, string arg_prefix, size_t *arg_cnt,strin
     }
 }
 
+static
+bool terapix_suitable_loop_bound_walker(reference r,bool *suitable)
+{
+    return (*suitable) &= formal_parameter_p(reference_variable(r));
+}
+
+static
+bool terapix_suitable_loop_bound_p(expression exp)
+{
+    bool suitable=true;
+    gen_context_recurse(exp,&suitable,reference_domain,terapix_suitable_loop_bound_walker,gen_null);
+    return suitable;
+}
+
+typedef struct {
+    hash_table ht;
+    size_t *cnt;
+} terapix_loop_handler_param;
+
+static void
+terapix_loop_handler(statement sl,terapix_loop_handler_param *p)
+{
+    if(statement_loop_p(sl)){
+        loop l = statement_loop(sl);
+        range r = loop_range(l);
+        expression nb_iter = range_to_expression(r,range_to_nbiter);
+        entity loop_bound = entity_undefined;
+        if(terapix_suitable_loop_bound_p(nb_iter))
+        {
+            /* generate new entity */
+            string new_name;
+            asprintf(&new_name,TERAPIX_LOOPARG_PREFIX "%u",(*p->cnt)++);
+            loop_bound=make_scalar_integer_entity(new_name,get_current_module_name());
+            value v = entity_initial(loop_bound);
+            free_constant(value_constant(v));
+            value_tag(v)=is_value_expression;
+            value_expression(v)=nb_iter;
+            AddEntityToCurrentModule(loop_bound);
+            free(new_name);
+
+            /* patch loop */
+            free_expression(range_lower(loop_range(l)));
+            range_lower(loop_range(l))=make_expression_1();
+            free_expression(range_upper(loop_range(l)));
+            range_upper(loop_range(l))=entity_to_expression(loop_bound);
+
+            /* convert the loop to a while loop */
+            list statements = make_statement_list(
+                    copy_statement(loop_body(l)),
+                    make_assign_statement(entity_to_expression(loop_index(l)),make_op_exp(PLUS_OPERATOR_NAME,entity_to_expression(loop_index(l)),make_expression_1()))
+            );
+            whileloop wl = make_whileloop(
+                    MakeBinaryCall(entity_intrinsic(LESS_OR_EQUAL_OPERATOR_NAME),entity_to_expression(loop_index(l)),entity_to_expression(loop_bound)),
+                    make_block_statement(statements),
+                    entity_empty_label(),
+                    make_evaluation_before());
+            sequence seq = make_sequence(
+                    make_statement_list(
+                        make_assign_statement(entity_to_expression(loop_index(l)),make_expression_1()),
+                        make_stmt_of_instr(make_instruction_whileloop(wl))
+                        )
+                    );
+
+            free_instruction(statement_instruction(sl));
+            statement_instruction(sl)=make_instruction_sequence(seq);
+
+            /* save change for futher processing */
+            hash_put(p->ht,loop_bound,nb_iter);
+        }
+    }
+}
+
 bool normalize_microcode( char * module_name)
 {
     bool can_terapixify =true;
@@ -636,7 +730,7 @@ bool normalize_microcode( char * module_name)
     /* make sure
      * - only do loops remain
      * - no call to external functions
-     * - no float / double etc (TODO)
+     * - no float / double etc
      */
     gen_context_multi_recurse(get_current_module_statement(),&can_terapixify,
             whileloop_domain,cannot_terapixify,gen_null,
@@ -669,6 +763,7 @@ bool normalize_microcode( char * module_name)
                 {
                     printf("%s seems an image\n",entity_user_name(e));
                     prefix = TERAPIX_IMAGE_PREFIX;
+                    terapix_argument_handler(e,TERAPIX_PTRARG_PREFIX,&nb_fifo,prefix,&nb_ptr);
                 }
                 else /* cannot tell if it's a kernel or an image*/
                 {
@@ -697,8 +792,8 @@ bool normalize_microcode( char * module_name)
             }
             else if( entity_used_in_loop_bound_p(e) )
             {
-                printf("%s seems a loop bound\n",entity_user_name(e));
-                terapix_argument_handler(e,TERAPIX_LOOPARG_PREFIX,&nb_lu,NULL,NULL);
+                printf("%s belongs to a loop bound\n",entity_user_name(e));
+                //terapix_argument_handler(e,TERAPIX_LOOPARG_PREFIX,&nb_lu,NULL,NULL);
             }
             else {
                 printf("parameter %s is not valid\n",entity_user_name(e));
@@ -710,6 +805,7 @@ bool normalize_microcode( char * module_name)
         }
     }
 
+    /* rename all declared entities using terasm convention*/
     FOREACH(ENTITY,e,statement_declarations(get_current_module_statement()))
     {
         if(entity_variable_p(e))
@@ -721,6 +817,17 @@ bool normalize_microcode( char * module_name)
                 terapix_argument_handler(e,NULL,NULL,TERAPIX_REGISTER_PREFIX,&nb_re);
         }
     }
+
+    /* loops in terasm iterate over a given parameter, in the form DO I=1:N 
+     * I is hidden to the user and N must be a parameter */
+    {
+        terapix_loop_handler_param p = {
+            .ht = hash_table_make(hash_pointer,HASH_DEFAULT_SIZE),
+            .cnt=&nb_lu
+        };
+        gen_context_recurse(get_current_module_statement(),&p,statement_domain,gen_true,terapix_loop_handler);
+    }
+    
 
     /* validate */
     module_reorder(get_current_module_statement());
@@ -1018,15 +1125,18 @@ void two_addresses_code_generator(statement s)
             expression lhs = EXPRESSION(CAR(args));
             expression rhs = EXPRESSION(CAR(CDR(args)));
             if(expression_reference_p(lhs) && expression_call_p(rhs) && !expression_constant_p(rhs)) {
+                call parent_call = call_undefined;
                 do {
-                    rhs=EXPRESSION(CAR(call_arguments(expression_call(rhs))));
+                    parent_call=expression_call(rhs);
+                    rhs=EXPRESSION(CAR(call_arguments(parent_call)));
                 } while(expression_call_p(rhs) && !expression_constant_p(rhs));
                 if(! expression_equal_p(lhs,rhs) )
                 {
-                    /* a=b+c; -> tmp=b;b=b+c;a=b;b=tmp; */
+                    /* a=b+c; -> (1) a=b; (2) a=a+c; */
+                    statement theassign/*1*/= make_assign_statement(copy_expression(lhs),copy_expression(rhs));
                     statement thecall/*2*/= make_stmt_of_instr(statement_instruction(s));
-                    instruction theblock = make_instruction_block(NIL);
-                    statement_instruction(s)=theblock;
+                    CAR(call_arguments(parent_call)).p=(gen_chunkp)copy_expression(lhs);
+#if 0
 
                     if(expression_constant_p(rhs))
                     {
@@ -1040,8 +1150,10 @@ void two_addresses_code_generator(statement s)
                     entity_initial(tmp)=make_value_expression(copy_expression(rhs));
                     statement copy_lhs/*3*/ = make_assign_statement(copy_expression(lhs),copy_expression(rhs));
                     statement copy_tmp/*4*/ = make_assign_statement(copy_expression(rhs),entity_to_expression(tmp));
-                    CAR(args).p=(gen_chunkp)copy_expression(rhs);
-                    instruction_block(theblock)=make_statement_list(thecall,copy_lhs,copy_tmp);
+#endif
+                    instruction theblock = make_instruction_block(NIL);
+                    statement_instruction(s)=theblock;
+                    instruction_block(theblock)=make_statement_list(theassign,thecall);
                     statement_comments(thecall)=statement_comments(s);
                     statement_label(thecall)=statement_label(s);
                     statement_number(thecall)=STATEMENT_NUMBER_UNDEFINED;
