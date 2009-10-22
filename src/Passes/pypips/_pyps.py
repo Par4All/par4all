@@ -188,12 +188,14 @@ class workspace:
 		"""activate a given phase"""
 		pypips.activate(phase)
 
-	def all(self,matching=lambda x:True):
+	def filter(self,matching=lambda x:True):
 		"""create an object containing current listing of all modules,
-		eventually filterd by the filter argument"""
+		filterd by the filter argument"""
 		self.__build_module_list()
 		the_modules=[m for m in self.modules.values() if matching(m)]
 		return modules(the_modules)
+
+	all=property(filter)
 
 	def quit(self):
 		"""force cleaning and deletion of the workspace"""

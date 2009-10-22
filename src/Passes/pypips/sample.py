@@ -29,8 +29,8 @@ for l in mb.loops():
 mb.display()
 
 # access all functions
-w.all().partial_eval()
-w.all().display()
+w.all.partial_eval()
+w.all.display()
 
 # recover a list of all labels in the source code ... without pipsing
 ##

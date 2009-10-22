@@ -83,46 +83,46 @@ class pipscc:
 				print "# OBJ written: ", OUTFILE
 		# that's all folks
 
-	def changes(self,ws):
-		"""apply any change to the workspace, should be overloaded by the user"""
-		map(module.display,ws)
-
-	def pipsld(self):
-		"""simulate c linker, all computation is done at link time"""
-		# working repository
-		WDIR=tempfile.mkdtemp("pipscc")
-		print "# intermediate files generated in", WDIR
-		
-		# gather pickled input files
+	def gather_object_files(self):
 		INPUT_FILES=[]
 		for opt in sys.argv[1:]:
 			if opt[0] != '-' and opt[-2:]==".o":
 				INPUT_FILES+=[opt]
-		# load pickled input files
-		C_FILES=[]
+		return INPUT_FILES
+
+	def gather_c_files(self):
+		INPUT_FILES=[]
+		for opt in sys.argv[1:]:
+			if opt[0] != '-' and opt[-2:]==".c":
+				INPUT_FILES+=[opt]
+		return INPUT_FILES
+
+	def unpickle(self,WDIR,files):
+		"""generate a list of unpickled object files from files"""
 		O_FILES=[]
-		for ifile in INPUT_FILES:
+		for ifile in files:
 				obj=pickle.load(file(ifile,"r"))
 				obj.dump_to_c(WDIR)
 				obj.oname=ifile
-				C_FILES+=[obj.cname]
 				O_FILES+=[obj]
-	
-		print "# input files: ", reduce(lambda x,y:x+" "+y,C_FILES,"")
-		
-		# run pips with this informations
-		print "# running pips"
-		ws = pyps.workspace(C_FILES)
-		# add extra operations 
-		self.changes(ws)
-		# commit changes
-		ws.save(indir=WDIR)
-		# the end for pips
-		ws.quit()
-		
-		# now run the compiler
+		return O_FILES
+
+	def changes(self,ws):
+		"""apply any change to the workspace, should be overloaded by the user"""
+		map(module.display,ws)
+
+	def get_wd(self):
+		"""selects a working directory for pipscc"""
+		WDIR=tempfile.mkdtemp("pipscc")
+		print "# intermediate files generated in", WDIR
+		return WDIR
+
+	def get_workspace(self,c_files):
+		return pyps.workspace(c_files)
+
+	def compile(self,wdir,o_files):
 		CC=os.getenv("CC","gcc")
-		for obj in O_FILES:
+		for obj in o_files:
 			cmd=[CC]+obj.cflags+["-o",obj.oname]
 			print "# running", cmd
 			sp=subprocess.Popen(cmd)
@@ -133,12 +133,31 @@ class pipscc:
 		res=os.system(cmd)
 		exitcode= (res >>8)& 0xFF
 		if exitcode:
-			shutil.rmtree(WDIR)
+			shutil.rmtree(wdir)
 
-
-
-
-
+	def pipsld(self):
+		"""simulate c linker, all computation is done at link time"""
+		WDIR=self.get_wd()
+		
+		# gather pickled input files
+		INPUT_FILES=self.gather_object_files()
+		# load pickled input files
+		O_FILES=self.unpickle(WDIR,INPUT_FILES)
+		C_FILES=map(lambda o:o.cname,O_FILES)
+		print "# input files: ", reduce(lambda x,y:x+" "+y,C_FILES,"")
+		
+		# run pips with this informations
+		print "# running pips"
+		ws = self.get_workspace(C_FILES)
+		# add extra operations 
+		self.changes(ws)
+		# commit changes
+		ws.save(indir=WDIR)
+		# the end for pips
+		ws.quit()
+		
+		# now run the compiler
+		self.compile(WDIR,O_FILES)
 
 #
 ##
