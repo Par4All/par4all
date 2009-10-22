@@ -110,6 +110,29 @@ echo
 apply GENERATE_TWO_ADDRESSES_CODE
 display PRINTED_FILE
 
+
+
+echo
+echo Code after flattening
+echo
+
+apply FLATTEN_CODE
+display PRINTED_FILE
+
+echo
+echo Code after some cleaning
+echo
+
+apply CLEAN_DECLARATIONS
+display PRINTED_FILE
+
+echo
+echo Microcode after normalization
+echo
+apply NORMALIZE_MICROCODE
+apply CLEAN_DECLARATIONS
+display PRINTED_FILE
+
 echo
 echo Code after expression substitution
 echo
@@ -132,40 +155,11 @@ setproperty EXPRESSION_SUBSTITUTION_PATTERN "muli"
 apply EXPRESSION_SUBSTITUTION
 setproperty EXPRESSION_SUBSTITUTION_PATTERN "divi"
 apply EXPRESSION_SUBSTITUTION
-
-display PRINTED_FILE
-
-
-echo
-echo Code after flattening
-echo
-
-apply FLATTEN_CODE
-display PRINTED_FILE
-
-echo
-echo Code after more expression substitution
-echo
-
 setproperty EXPRESSION_SUBSTITUTION_PATTERN "seti"
 apply EXPRESSION_SUBSTITUTION
 setproperty EXPRESSION_SUBSTITUTION_PATTERN "setf"
 apply EXPRESSION_SUBSTITUTION
-display PRINTED_FILE
 
-
-echo
-echo Code after some cleaning
-echo
-
-apply CLEAN_DECLARATIONS
-display PRINTED_FILE
-
-echo
-echo Microcode after normalization
-echo
-apply NORMALIZE_MICROCODE
-apply CLEAN_DECLARATIONS
 display PRINTED_FILE
 
 echo
