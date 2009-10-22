@@ -1676,10 +1676,88 @@ type call_to_type(call c)
     return t;
 }
 
+type reference_to_type(reference ref)
+{
+  type t = type_undefined;
+  type exp_type = basic_concrete_type(entity_type(reference_variable(ref)));
+  
+  pips_debug(6, "reference case \n");
+  
+  if(type_variable_p(exp_type))
+    {
+      type ct = exp_type; /* current type */
+      basic cb = variable_basic(type_variable(exp_type)); /* current basic */
+      
+      list cd = variable_dimensions(type_variable(exp_type)); /* current dimensions */
+      list l_inds = reference_indices(ref);
+      
+      pips_debug(7, "reference to a variable, "
+		 "we iterate over the indices if any \n");
+            
+      while (!ENDP(l_inds))
+	{
+	  
+	  ifdebug(7) {
+	    pips_debug(7, "new iteration : current type : %s\n",
+		       words_to_string(words_type(ct)));
+	    pips_debug(7, "current list of indices: \n");
+	    print_expressions(l_inds);
+	  }
+	  if(!ENDP(cd))
+	    {
+	      pips_debug(7, "poping one type dimension and one index\n");
+	      POP(cd);
+	      POP(l_inds);
+	    }
+	  else
+	    {
+	      pips_debug(7,"going through pointer dimension. \n");
+	      pips_assert("reference has too many indices :"
+			  " pointer expected\n", basic_pointer_p(cb));
+	      ct= basic_pointer(cb);
+	      cb = variable_basic(type_variable(ct));
+	      cd = variable_dimensions(type_variable(ct));
+	      POP(l_inds);
+	    }
+	}
+      
+      /* Warning : qualifiers are set to NIL, because I do not see
+	 the need for something else for the moment. BC.
+      */
+      t = make_type(is_type_variable,
+		    make_variable(copy_basic(cb),
+				  gen_full_copy_list(cd),
+				  NIL));
+    }
+  else if(type_functional_p(exp_type))
+    {
+      /* A reference to a function returns a pointer to a function
+	 of the very same time */
+      t = make_type(is_type_variable,
+		    make_variable
+		    (make_basic(is_basic_pointer, copy_type(exp_type)),
+		     NIL, NIL));
+    }
+  else
+    {
+      pips_internal_error("Bad reference type tag %d \"%s\"\n",
+			  type_tag(exp_type), type_to_string(exp_type));
+    }
+  free_type(exp_type);
+  
+  return t;
+}
 
 
+/** 
+  For an array declared as int a[10][20], the type returned for a[i] is
+  int [20].
+    
+   @param exp is an expression
+   @return a new allocated type which is the ntype of the expression in which
+           typedef's are replaced by combination of basic types.
 
-/* Replace typedef'ed types by combinations of basic types */
+*/
 type expression_to_type(expression exp)
 {
   /* does not cover references to functions ...*/
@@ -1698,74 +1776,8 @@ type expression_to_type(expression exp)
     {
     case is_syntax_reference:
       {
-	reference ref = syntax_reference(s_exp);
-	type exp_type = basic_concrete_type(entity_type(reference_variable(ref)));
-
 	pips_debug(6, "reference case \n");
-
-	if(type_variable_p(exp_type))
-	  {
-	    type ct = exp_type; /* current type */
-	    basic cb = variable_basic(type_variable(exp_type)); /* current basic */
-
-	    list cd = variable_dimensions(type_variable(exp_type)); /* current dimensions */
-	    list l_inds = reference_indices(ref);
-
-	    pips_debug(7, "reference to a variable, "
-		       "we iterate over the indices if any \n");
-
-
-	    while (!ENDP(l_inds))
-	      {
-
-		ifdebug(7) {
-		  pips_debug(7, "new iteration : current type : %s\n",
-			     words_to_string(words_type(ct)));
-		  pips_debug(7, "current list of indices: \n");
-		  print_expressions(l_inds);
-		}
-		if(!ENDP(cd))
-		  {
-		    pips_debug(7, "poping one type dimension and one index\n");
-		    POP(cd);
-		    POP(l_inds);
-		  }
-		else
-		  {
-		    pips_debug(7,"going through pointer dimension. \n");
-		    pips_assert("reference has too many indices :"
-				" pointer expected\n", basic_pointer_p(cb));
-		    ct= basic_pointer(cb);
-		    cb = variable_basic(type_variable(ct));
-		    cd = variable_dimensions(type_variable(ct));
-		    POP(l_inds);
-		  }
-	      }
-
-	    /* Warning : qualifiers are set to NIL, because I do not see
-	     the need for something else for the moment. BC.
-	    */
-	    t = make_type(is_type_variable,
-			  make_variable(copy_basic(cb),
-					gen_full_copy_list(cd),
-					NIL));
-	  }
-	else if(type_functional_p(exp_type))
-	  {
-	    /* A reference to a function returns a pointer to a function
-	       of the very same time */
-	    t = make_type(is_type_variable,
-			  make_variable
-			  (make_basic(is_basic_pointer, copy_type(exp_type)),
-			   NIL, NIL));
-	  }
-	else
-	  {
-	    pips_internal_error("Bad reference type tag %d \"%s\"\n",
-				type_tag(exp_type), type_to_string(exp_type));
-	  }
-    free_type(exp_type);
-
+	t = reference_to_type(syntax_reference(s_exp));
 	break;
       }
     case is_syntax_call:
