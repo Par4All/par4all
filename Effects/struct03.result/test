@@ -131,7 +131,6 @@ int struct03()
    int i = 0;
 
 
-
 #pragma omp parallel for 
    for(i = 0; i <= 9; i += 1)
       x[i].un.first = 1;
