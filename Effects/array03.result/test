@@ -36,26 +36,28 @@ Proper effects for "foo2"
 int foo2(float b[5][3])
 {
    float c;
+//               <must be read   >: b
 //               <must be written>: b[0][3]
    (*b)[3] = 2.0;                                                       /*0028*/
-//               <must be read   >: b[0][3]
+//               <must be read   >: b b[0][3]
 //               <must be written>: c
    c = (*b)[3];                                                         /*0029*/
+//               <must be read   >: b
 //               <must be written>: b[1][3]
    b[1][3] = 2.0;                                                       /*0030*/
-//               <must be read   >: b[1][3]
+//               <must be read   >: b b[1][3]
 //               <must be written>: c
    c = b[1][3];                                                         /*0031*/
-//               <must be read   >: b[0][3]
+//               <must be read   >: b b[0][3]
 //               <must be written>: b[0][3]
    (*b)[3]++;                                                           /*0033*/
-//               <must be read   >: b[0][3]
+//               <must be read   >: b b[0][3]
 //               <must be written>: b[0][3]
    (*b)[3] += 5.0;                                                      /*0034*/
-//               <must be read   >: b[1][3]
+//               <must be read   >: b b[1][3]
 //               <must be written>: b[1][3]
    b[1][3]++;                                                           /*0035*/
-//               <must be read   >: b[1][3]
+//               <must be read   >: b b[1][3]
 //               <must be written>: b[1][3]
    b[1][3] += 5.0;                                                      /*0036*/
 
@@ -153,39 +155,47 @@ int foo2(float b[5][3])
 {
    float c;
 
+//  <b-R-EXACT-{}>
 //  <b[PHI1][PHI2]-W-EXACT-{PHI1==0, PHI2==3}>
 
    (*b)[3] = 2.0;                                                       /*0028*/
 
+//  <b-R-EXACT-{}>
 //  <b[PHI1][PHI2]-R-EXACT-{PHI1==0, PHI2==3}>
 //  <c-W-EXACT-{}>
 
    c = (*b)[3];                                                         /*0029*/
 
+//  <b-R-EXACT-{}>
 //  <b[PHI1][PHI2]-W-EXACT-{PHI1==1, PHI2==3}>
 
    b[1][3] = 2.0;                                                       /*0030*/
 
+//  <b-R-EXACT-{}>
 //  <b[PHI1][PHI2]-R-EXACT-{PHI1==1, PHI2==3}>
 //  <c-W-EXACT-{}>
 
    c = b[1][3];                                                         /*0031*/
 
+//  <b-R-EXACT-{}>
 //  <b[PHI1][PHI2]-R-EXACT-{PHI1==0, PHI2==3}>
 //  <b[PHI1][PHI2]-W-EXACT-{PHI1==0, PHI2==3}>
 
    (*b)[3]++;                                                           /*0033*/
 
+//  <b-R-EXACT-{}>
 //  <b[PHI1][PHI2]-R-EXACT-{PHI1==0, PHI2==3}>
 //  <b[PHI1][PHI2]-W-EXACT-{PHI1==0, PHI2==3}>
 
    (*b)[3] += 5.0;                                                      /*0034*/
 
+//  <b-R-EXACT-{}>
 //  <b[PHI1][PHI2]-R-EXACT-{PHI1==1, PHI2==3}>
 //  <b[PHI1][PHI2]-W-EXACT-{PHI1==1, PHI2==3}>
 
    b[1][3]++;                                                           /*0035*/
 
+//  <b-R-EXACT-{}>
 //  <b[PHI1][PHI2]-R-EXACT-{PHI1==1, PHI2==3}>
 //  <b[PHI1][PHI2]-W-EXACT-{PHI1==1, PHI2==3}>
 
