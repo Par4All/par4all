@@ -140,8 +140,13 @@ void replace_entity_by_expression_expression_walker(expression e, struct param *
         reference r = expression_reference(e);
         if(same_entity_p(p->ent, reference_variable(r) ))
         {
+            syntax syn = copy_syntax(expression_syntax(p->exp));
+            if(!ENDP(reference_indices(r))) {
+                list indices = gen_full_copy_list(reference_indices(r));
+                syn = make_syntax_subscript(make_subscript(make_expression(syn,normalized_undefined),indices));
+            }
             free_syntax(expression_syntax(e));
-            expression_syntax(e) = copy_syntax(expression_syntax(p->exp));
+            expression_syntax(e) = syn;
             unnormalize_expression(e);
         }
     }
