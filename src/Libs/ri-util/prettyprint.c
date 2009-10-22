@@ -3782,7 +3782,7 @@ static list words_subscript(subscript s)
   MAP(EXPRESSION,exp,
   {
     if (!first)
-      pc = CHAIN_SWORD(pc,",");
+      pc = CHAIN_SWORD(pc,get_prettyprint_is_fortran()?",":"][");
     pc = gen_nconc(pc, words_expression(exp));
     first = FALSE;
   },lexp);
