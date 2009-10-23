@@ -21,10 +21,10 @@
 
 /**
  * @file generate_pragma.c
- * @brief This file holds transformations on code (either parallel or
- * sequential) that generate pragmas according to the information available
+ * @brief This file holds transformations on sequentiel code
+ * that generates pragmas according to the information available
  * in the pips RI.
- * Whatever the input code, the generated code is always sequential to allow
+ * The generated code is sequential in order to allow
  * further pips transformations the user might want to apply later on.
  * The type of pragma generated are:
  * 1- OpenMP pragma: parallel, for and private clauses
@@ -165,10 +165,11 @@ static void generate_str_omp_pragma_loop (loop l) {
 }
 
 //////////////////////////////////////////////////////////////
+// the phase function name
 
 bool ompify_code (char mod_name[]) {
 
-  debug_on("OPMIFY_CODE_DEBUG_LEVEL");
+  debug_on("OMPIFY_CODE_DEBUG_LEVEL");
 
   statement mod_stmt = statement_undefined;
 

@@ -8582,7 +8582,7 @@ transformation_test    > MODULE.code
 \index{OpenMP}
 
 \begin{PipsPass}{OMP Pragma}
-This transformation reads the sequential code and generates OpenMP pragma as
+The following transformation reads the sequential code and generates OpenMP pragma as
 an extension to statements. The pragmas produced are based on the information
 previously computed by differents phases and already stores in the pips internal
 representation of the sequential code. It might be interesting to use the phase
@@ -8602,7 +8602,25 @@ property can be set to \verb|str| or \verb|expr|. Obviously, if the
 property is set to \verb|str| then pragmas would be generated as strings
 otherwise pragmas would be generated as expressions.
 \begin{PipsProp}
-PRAGMA_TYPE "str"
+PRAGMA_TYPE "expr"
+\end{PipsProp}
+
+\begin{PipsPass}{Loop parallel threshold}
+The PIPS phase  OMP\_LOOP\_PARALLEL\_THRESHOLD\_SET allows to add the OpenMP
+\verb|if| clause to all the OpenMP pragmas. Afterwodrs, the number of iteraion
+of the loop will be evaluated dynamically and compared to the defined threshold.
+The loop will be parallelized only if the threshold is reached.
+\end{PipsPass}
+
+\begin{PipsMake}
+omp_loop_parallel_threshold_set             > MODULE.code
+        < MODULE.code
+\end{PipsMake}
+
+The OMP\_LOOP\_PARALLEL\_THRESHOLD\_VALUE property , is used as a parameter by the
+PIPS phase OMP\_LOOP\_PARALLEL\_THRESHOLD\_SET.
+\begin{PipsProp}
+OMP_LOOP_PARALLEL_THRESHOLD_VALUE 0
 \end{PipsProp}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% PRETTYPRINT

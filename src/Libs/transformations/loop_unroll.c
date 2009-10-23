@@ -733,7 +733,7 @@ bool apply_full_loop_unroll(statement s)
 bool
 full_unroll(char * mod_name)
 {
-    statement mod_stmt;
+    statement mod_stmt = statement_undefined;
     char *lp_label = string_undefined;
     entity lb_ent = entity_undefined;
     bool return_status = true;

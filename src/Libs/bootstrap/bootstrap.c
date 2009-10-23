@@ -4482,6 +4482,7 @@ static IntrinsicDescriptor IntrinsicTypeDescriptorTable[] =
   {CREAT64_FUNCTION_NAME, 2, overloaded_to_integer_type, 0, 0},
 
   /* OMP */
+  {OMP_IF_FUNCTION_NAME,               1, default_intrinsic_type, 0, 0},
   {OMP_OMP_FUNCTION_NAME,              0, default_intrinsic_type, 0, 0},
   {OMP_FOR_FUNCTION_NAME,              0, default_intrinsic_type, 0, 0},
   {OMP_PRIVATE_FUNCTION_NAME,  (INT_MAX), default_intrinsic_type, 0, 0},

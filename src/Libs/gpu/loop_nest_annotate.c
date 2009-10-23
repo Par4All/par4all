@@ -225,7 +225,7 @@ static void stmt_pop(statement s)
 }
 
 
-/** 
+/**
  * annotates loop nests in the following way :
  *
  * for(i=0; i<=498; i++)
@@ -241,10 +241,10 @@ static void stmt_pop(statement s)
  *       if (i<=498&&j<=498)
  *       foo();
  *
- * for loops must be have been transformed into loops.
- * 
+ * for loops must have been transformed into loops.
+ *
  * @param mod_name name of the  module
- * 
+ *
  * @return true
  */
 bool gpu_loop_nest_annotate(char *module_name)

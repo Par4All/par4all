@@ -463,7 +463,10 @@ make_constant_boolean_expression(bool b)
 		      is_basic_logical));
 }
 
-expression 
+/// @brief generate an expression from an integer value
+/// @return the integer as an expresion.
+/// @param i the integer value to generate as an expression.
+expression
 int_expr(i)
 int i;
 {

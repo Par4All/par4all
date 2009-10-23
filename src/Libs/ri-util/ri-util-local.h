@@ -339,6 +339,7 @@
 
 /* OMP related function and opertor names */
 
+#define OMP_IF_FUNCTION_NAME            "if"
 #define OMP_OMP_FUNCTION_NAME           "omp"
 #define OMP_FOR_FUNCTION_NAME           "for"
 #define OMP_PRIVATE_FUNCTION_NAME       "private"
@@ -836,6 +837,7 @@
 #define ENTITY_IAND_P(e)                 ENTITY_NAME_P(e, "IAND")
 
 /* OMP entity test */
+#define ENTITY_OMP_IF_P                 ENTITY_NAME_P(e,OMP_IF_FUNCTION_NAME)
 #define ENTITY_OMP_OMP_P                ENTITY_NAME_P(e,OMP_OMP_FUNCTION_NAME)
 #define ENTITY_OMP_FOR_P                ENTITY_NAME_P(e,OMP_FOR_FUNCTION_NAME)
 #define ENTITY_OMP_PRIVATE_P            ENTITY_NAME_P(e,OMP_PRIVATE_FUNCTION_NAME)

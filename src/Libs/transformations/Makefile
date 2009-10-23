@@ -53,9 +53,10 @@ LIB_CFILES =	\
 		index_set_splitting.c \
 		for_loop_recovering.c \
 		generate_pragma.c \
+		manage_pragma.c \
 		scalarization.c \
 		flatten_code.c \
-		terapixify.c 
+		terapixify.c
 
 INC_TARGET =    $(TARGET).h
 

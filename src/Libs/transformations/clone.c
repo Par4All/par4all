@@ -354,7 +354,7 @@ static void
 clone_rwt(call c)
 {
     expression nth_arg;
-    int val;
+    int val = 0;
 
     if (call_function(c)!=module_to_clone) return;
     pips_debug(3, "considering call to %s\n", entity_name(module_to_clone));

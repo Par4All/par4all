@@ -69,11 +69,23 @@ bool empty_extensions_p (extensions es) {
 /***************************************************PRAGMA AS EXPRESSION PART
  */
 
+/** @return "if (cond)" as an expression
+ *  @param arg, the condition to be evaluted by the if clause
+ */
+expression pragma_if_as_expr (expression arg) {
+  entity omp = CreateIntrinsic(OMP_IF_FUNCTION_NAME);
+  list args_expr = gen_expression_cons (arg, NIL);
+  call c = make_call (omp, args_expr);
+  //  syntax s = make_syntax_call (c);
+  expression expr_if = call_to_expression (c);// make_expression (s, normalized_undefined);
+  return expr_if;
+}
+
 /** @return "private (x,y)" as an expression
  *  @param arg, the private variables as a list of entities
  */
 expression pragma_private_as_expr (list args_ent) {
-  // build the privates variavle as a list of expression
+  // build the privates variable as a list of expression
   list args_expr = NIL;
   FOREACH (ENTITY, e, args_ent) {
     reference ref = make_reference (e, NULL);
@@ -338,6 +350,20 @@ add_pragma_expr_to_statement(statement st, list l) {
   extensions_extension(es) = el;
 }
 
+/** @brief  Add an expression to the pragma current expression list.
+ *  @return void
+ *  @param  pr, the pragma to process.
+ *  @param  ex, the expression to add.
+ */
+void
+add_expr_to_pragma_expr_list (pragma pr, expression ex) {
+  pips_assert ("the pragma need to be an expression", pragma_expression_p (pr) == TRUE);
+  /* Add the new pragma to the extension list: */
+  list exprs = pragma_expression (pr);
+  exprs = gen_expression_cons (ex, exprs);
+  pragma_expression (pr) = exprs;
+  return;
+}
 
 void add_pragma_entity_to_statement(statement st, entity en)
 {
