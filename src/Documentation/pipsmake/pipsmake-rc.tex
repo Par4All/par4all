@@ -183,7 +183,10 @@
 \newcommand{\PIPSMAKE}{\LINK{\emph{pipsmake}}{http://www.cri.ensmp.fr/pips/pipsmake.html}\xspace}
 \newcommand{\PLinear}{\emph{Linear C$^3$}}
 \newcommand{\PNEWGEN}{\LINK{\emph{NewGen}}{http://www.cri.ensmp.fr/pips/newgen-manual/newgen-manual.html}}
-\newcommand{\PROPERTIES}{\LINK{\emph{properties}}{http://www.cri.ensmp.fr/pips/properties-rc}}
+%% This link is no longer good: Fabien has merged properties-rc.tex in
+%% the current document
+%% \newcommand{\PROPERTIES}{\LINK{\emph{properties}}{http://www.cri.ensmp.fr/pips/properties-rc}}
+\newcommand{\PROPERTIES}{{\em properties}}
 \newcommand{\PTHEN}{{\tt THEN}}
 \newcommand{\PVM}{{\em PVM}}
 \newcommand{\PCallgraphView}{{Call Tree View}}
@@ -217,14 +220,26 @@
 
 %% Now the interface names :
 \newcommand{\pips}{\LINK{\texttt{pips}}{http://www.cri.ensmp.fr/pips/batch-interface.html}}
-\newcommand{\EPIPS}{\LINK{\texttt{epips}}{http://www.cri.ensmp.fr/pips/wpips-epips-user-manual.htdoc}}
+%% This link ends up with 404
+%%\newcommand{\EPIPS}{\LINK{\texttt{epips}}{http://www.cri.ensmp.fr/pips/wpips-epips-user-manual.htdoc}}
+\newcommand{\EPIPS}{{\em epip}}
 \newcommand{\TPIPS}{\LINK{\texttt{tpips}}{http://www.cri.ensmp.fr/pips/line-interface.html}}
-\newcommand{\WPIPS}{\LINK{\texttt{wpips}}{http://www.cri.ensmp.fr/pips/wpips-epips-user-manual.htdoc}}
-\newcommand{\Init}{\LINK{\texttt{Init}}{http://www.cri.ensmp.fr/pips/Init.html}}
-\newcommand{\Select}{\LINK{\texttt{Select}}{http://www.cri.ensmp.fr/pips/Select.html}}
-\newcommand{\Perform}{\LINK{\texttt{Perform}}{http://www.cri.ensmp.fr/pips/Perform.html}}
-\newcommand{\Display}{\LINK{\texttt{Display}}{http://www.cri.ensmp.fr/pips/Display.html}}
-\newcommand{\Delete}{\LINK{\texttt{Delete}}{http://www.cri.ensmp.fr/pips/Delete.html}}
+\newcommand{\Tpips}{{\em tpips}}
+%% This link ends up with 404
+%% \newcommand{\WPIPS}{\LINK{\texttt{wpips}}{http://www.cri.ensmp.fr/pips/wpips-epips-user-manual.htdoc}}
+\newcommand{\WPIPS}{{\em wpips}}
+
+%% All these links to man pages of PIPS first user interface are corrupted
+%% \newcommand{\Init}{\LINK{\texttt{Init}}{http://www.cri.ensmp.fr/pips/Init.html}}
+\newcommand{\Init}{{\em Init}}
+%% \newcommand{\Select}{\LINK{\texttt{Select}}{http://www.cri.ensmp.fr/pips/Select.html}}
+\newcommand{\Select}{{\em Select}}
+%% \newcommand{\Perform}{\LINK{\texttt{Perform}}{http://www.cri.ensmp.fr/pips/Perform.html}}
+\newcommand{\Perform}{{\em Perform}}
+%% \newcommand{\Display}{\LINK{\texttt{Display}}{http://www.cri.ensmp.fr/pips/Display.html}}
+\newcommand{\Display}{{\em Display}}
+%% \newcommand{\Delete}{\LINK{\texttt{Delete}}{http://www.cri.ensmp.fr/pips/Delete.html}}
+\newcommand{\Delete}{{\em Delete}}
 
 %% Pour Béatrice :
 \newcommand{\exact}[0]{{\tt EXACT}}
@@ -294,7 +309,7 @@ tuning of an algorithm can be made using \PROPERTIES{}. Default properties
 are installed with \Pips{} but they can be redefined, partly or entirely,
 by a {\tt properties.rc} file located in the current directory. Properties
 can also be redefined from the user interfaces, for example with the command
-\texttt{setproperty} when the \TPIPS{} interface is used.
+\texttt{setproperty} when the \Tpips{} interface is used.
 
 As far as their static structures are concerned, most object types are
 described in more details in \Pri. A
@@ -454,7 +469,7 @@ the libraries added by CEA to implement Feautrier's method.
 
 
 Rule and object declaration are grouped in chapters: input files
-(Chapter~\ref{section-input-files}, syntax analysis and abstract
+(Chapter~\ref{section-input-files}), syntax analysis and abstract
 syntax tree (Chapter~\ref{section-abstract-syntax-tree}), analyses
 (Chapter~\ref{section-analyses}), parallelizations
 (Chapter~\ref{section-program-transformations-parallelization-distribution}),
@@ -639,8 +654,7 @@ controls whether we shall execute the instructions of just check the syntax:
 \begin{PipsProp}
 TPIPS_IS_A_SHELL FALSE
 \end{PipsProp}
-controls whether
-\TPIPS{} should behave as an extended shell.
+controls whether \Tpips{} should behave as an extended shell.
 
 
 
