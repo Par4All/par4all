@@ -169,38 +169,9 @@ static void display_alias_check_statistics()
   user_log("\n Number of processed modules: %d\n",number_of_processed_modules); 
 }
 
-/*****************************************************************************
-
-  Make an io statement : PRINT *,"message" following this format :
-
-  (keyword,lci,lio)
-
-  keyword  (READ, WRITE, PRINT...).
-
-  lci is a list of 'control specifications'. its has the following format:
-        ("UNIT=", 6, "FMT=", "*", "RECL=", 80, "ERR=", 20)
-         default : * = LIST_DIRECTED_FORMAT_NAME
-
-  lio is the list of expressions to write or references to read.
-     ("IOLIST=", exp, ...)
-
-*****************************************************************************/
-
-statement make_print_statement(string message)
-{
-  expression fmt = MakeCharacterConstantExpression(LIST_DIRECTED_FORMAT_NAME);
-  expression e1 = MakeCharacterConstantExpression("IOLIST=");
-  expression e2 = MakeCharacterConstantExpression(message);
-  list args = CONS(EXPRESSION,e1,CONS(EXPRESSION,e2,NIL));
-  /*TK_PRINT = 301*/
-  instruction ins = MakeSimpleIoInst2(301,fmt,args);
-  return instruction_to_statement(ins);   
-}
-
-
 static void initialize_dynamic_check_list()
 {
-  list l_decls = code_declarations(entity_code(current_mod)); 
+  list l_decls = code_declarations(entity_code(current_mod));
   list l_formals = NIL;
   list l_commons = NIL;
   /* search for formal parameters in the declaration list */   

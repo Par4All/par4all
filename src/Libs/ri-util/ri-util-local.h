@@ -1417,6 +1417,7 @@ the variable is unsigned, signed or not */
 #define IO_EFFECTS_UNIT_SPECIFIER_LENGTH 4
 /* Standard unit numbers depend on the operating system. Here are UNIX definitions. */
 #define STDERR_LUN (0)
+#define STDERR_NAME "stderr"
 #define STDIN_LUN (5)
 #define STDOUT_LUN (6)
 /*Symbolic constants for the file descriptors belonging to the standard streams: unistd.h */

@@ -577,22 +577,132 @@ statement make_return_statement(entity module)
     return make_call_statement(RETURN_FUNCTION_NAME, NIL, l, empty_comments);
 }
 
-/*----------------------------
+/*****************************************************************************
 
-  This function returns a stop statement with an error message
+  Make a Fortran io statement : PRINT *,"message" following this format :
 
-------------------------------*/
+  (keyword,lci,lio)
 
+  keyword  (READ, WRITE, PRINT...).
+
+  lci is a list of 'control specifications'. its has the following format:
+        ("UNIT=", 6, "FMT=", "*", "RECL=", 80, "ERR=", 20)
+         default : * = LIST_DIRECTED_FORMAT_NAME
+
+  lio is the list of expressions to write or references to read.
+     ("IOLIST=", exp, ...)
+
+*****************************************************************************/
+statement make_print_statement(string message)
+{
+  expression fmt = MakeCharacterConstantExpression(LIST_DIRECTED_FORMAT_NAME);
+  expression e1 = MakeCharacterConstantExpression("IOLIST=");
+  expression e2 = MakeCharacterConstantExpression(message);
+  list args = CONS(EXPRESSION,e1,CONS(EXPRESSION,e2,NIL));
+  /*TK_PRINT = 301*/
+  /* This function has been moved from alias_check.c and uses a
+     function still in the syntax library, hence the 301 argument... */
+  extern instruction MakeSimpleIoInst2(int /*keyword*/, expression /*f*/, list /*io_list*/);
+  instruction ins = MakeSimpleIoInst2(301,fmt,args);
+  return instruction_to_statement(ins);
+}
+
+statement make_C_print_statement(string message)
+{
+  statement s = statement_undefined;
+  list args = NIL;
+  /* MakeConstant() generates a Fortran constant... Does not seem
+     to matter for strings... */
+  expression eb =
+    make_call_expression(MakeConstant(message,is_basic_string),NIL);
+  entity lun = global_name_to_entity(TOP_LEVEL_MODULE_NAME,
+				     STDERR_NAME);
+  expression ea = expression_undefined;
+
+  if(entity_undefined_p(lun)) {
+    /* stderr has not yet been encountered by the parser... Should
+       it be defined by bootstrap.c or by the C parser no matter
+       what? */
+    lun = make_stderr_variable();
+  }
+  ea = entity_to_expression(lun);
+
+  args = CONS(EXPRESSION,ea, CONS(EXPRESSION,eb,NIL));
+  s = make_call_statement(FPRINTF_FUNCTION_NAME,
+			   args,
+			   entity_undefined,
+			   empty_comments);
+  return s;
+}
+
+/* Generate a print of a constant character string on stderr for C or
+   on stdout for Fortran.
+
+   This is not clever as the format of the message is language
+   dependent: simple quotes are used as delimiters in Fortran and
+   double quotes in C. Should message be language independent and the
+   delimiters added in this function instead? I did not do it to avoid
+   yet another strdup() when strdup is used to generate "message", but
+   this is questionable.
+
+   This is not clever as this function could easily be generalized
+   with a vararg to generate more general print statements.
+*/
+statement make_any_print_statement(string message)
+{
+  entity m = get_current_module_entity();
+  statement s = statement_undefined;
+
+  if(fortran_module_p(m))
+    s = make_print_statement(message);
+  else
+    s = make_C_print_statement(message);
+
+  return s;
+}
+
+/* This function returns a Fortran stop statement with an error message
+ */
 statement make_stop_statement(string message)
 {
-     list args=NIL;
-     expression e;
+  list args=NIL;
+  expression e;
 
-     e = make_call_expression(MakeConstant(message,is_basic_string),NIL);
+  e = make_call_expression(MakeConstant(message,is_basic_string),NIL);
 
-     args = CONS(EXPRESSION,e,NIL);
+  args = CONS(EXPRESSION,e,NIL);
 
-     return make_call_statement(STOP_FUNCTION_NAME, args, entity_undefined, empty_comments);
+  return make_call_statement(STOP_FUNCTION_NAME, args, entity_undefined, empty_comments);
+
+}
+
+/* This function returns a statement ending with a C exit statement. A
+   "fprintf(stderr, errmess);" is generated before "exit(n);" if
+   errmess is not empty and a sequence statement ending wih exit() is
+   returned.
+ */
+statement make_exit_statement(int n, string errmess)
+{
+  statement s = statement_undefined;
+  statement s1 = statement_undefined;
+  expression e1 = int_to_expression(n);
+  list args1 = CONS(EXPRESSION,e1,NIL);
+
+  s1 = make_call_statement(EXIT_FUNCTION_NAME,
+			  args1,
+			  entity_undefined,
+			  empty_comments);
+
+  if(strlen(errmess)>0) {
+    statement s2 = make_C_print_statement(errmess);
+    /* There must be a nicer vararg
+       function... make_statement_from_statement_varargs_list(s2, s1, NULL) */
+    s = make_block_statement(CONS(STATEMENT,s2, CONS(STATEMENT,s1,NIL)));
+  }
+  else
+    s = s1;
+
+  return s;
 
 }
 

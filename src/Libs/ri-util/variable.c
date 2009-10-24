@@ -167,6 +167,34 @@ entity make_global_entity_from_local(entity local) {
     return new;
 }
 
+/* If the parser has not (yet) encountered "stderr", a PIPS
+   transformation or instrumentation phase may need "stderr" to
+   generate AST code. This happens with array_bound_check at least. */
+entity make_stderr_variable()
+{
+  /* It's a global variable */
+  entity v = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,
+				STDERR_NAME);
+  /* Unfortunately, I do not have an unknown basic to use... It
+     should be a FILE * pointer... */
+  basic b = make_basic_int(DEFAULT_INTEGER_TYPE_SIZE);
+  entity f = global_name_to_entity(TOP_LEVEL_MODULE_NAME,
+				   TOP_LEVEL_MODULE_NAME);
+  entity a = global_name_to_entity(TOP_LEVEL_MODULE_NAME,
+				   STATIC_AREA_LOCAL_NAME);
+
+  pips_assert("f & a are defined", !entity_undefined_p(f)
+	      && !entity_undefined_p(a));
+
+  /* Its type is variable, scalar, */
+  entity_type(v) = MakeTypeVariable(b, NIL);
+
+  /* its storage must be the static area of top-level */
+  entity_storage(v) = make_storage_ram(make_ram(f, a, UNKNOWN_RAM_OFFSET, NIL));
+
+  /* Its initial value is unknown */
+  entity_initial(v) = make_value_unknown();
+}
 
 /* entity make_scalar_entity(name, module_name, base)
  */
