@@ -42,9 +42,10 @@
 
 void default_update_props() {}
 
-/* default assignment of pips_update_props_handler is default_update_props.
- * Some top-level (eg. wpips) may need a special update_props proceedure; they 
- * should let pips_update_props_handler point toward it.
+/* default assignment of pips_update_props_handler is
+ * default_update_props.  Some top-level (eg. wpips) may need a
+ * special update_props proceedure; they should let
+ * pips_update_props_handler point toward it.
  */
 void (* pips_update_props_handler)() = default_update_props;
 
@@ -68,8 +69,8 @@ static void pop_path(void)
 {
     pips_assert("set", some_saved_path);
     pips_srcpath_set(saved_pips_src_path);
-    free(saved_pips_src_path), 
-      saved_pips_src_path = NULL, 
+    free(saved_pips_src_path),
+      saved_pips_src_path = NULL,
       some_saved_path = FALSE;
 }
 
@@ -90,7 +91,8 @@ bool open_module(string name)
       module_name = name;
     else if(db_module_exists_p(upper_case_name)) {
       module_name = upper_case_name;
-      pips_user_warning("Module %s selected instead of %s which was not found\n",
+      pips_user_warning("Module \"%s\" selected instead of \"%s\""
+			" which was not found\n",
 			module_name, name);
     }
     else
@@ -99,7 +101,7 @@ bool open_module(string name)
     if(module_name) {
       if (db_get_current_module_name()) /* reset if needed */
 	db_reset_current_module_name();
-      
+
       success = db_set_current_module_name(module_name);
     }
 
@@ -143,8 +145,7 @@ bool open_module_if_unique()
  * db_create_workspace() is useful to create the log file between
  * the two calls says RK
  */
-bool 
-create_workspace(gen_array_t files)
+bool create_workspace(gen_array_t files)
 {
     int i, argc = gen_array_nitems(files);
     string name, dir = db_get_current_workspace_directory();
@@ -162,7 +163,7 @@ create_workspace(gen_array_t files)
        are not caught below! */
     push_path();
 
-    for (i = 0; i < argc; i++) 
+    for (i = 0; i < argc; i++)
     {
       /* FI: it would be nice to have a catch here on user_error()! */
 	success = process_user_file(gen_array_item(files, i));
@@ -170,7 +171,7 @@ create_workspace(gen_array_t files)
 	    break;
     }
 
-    if (success) 
+    if (success)
     {
 	(* pips_update_props_handler)();
 	name = db_get_current_workspace_name();
@@ -184,9 +185,9 @@ create_workspace(gen_array_t files)
 	/* FI: in fact, the whole workspace should be deleted!
 	 The file and the directory should be removed, and the current
 	 database become undefined... */
-        /* DB: free the hash_table, otherwise core dump during the next
+	/* DB: free the hash_table, otherwise core dump during the next
          call to create_workspace */
-        reset_entity_to_size();
+	reset_entity_to_size();
 	close_log_file();
 	close_warning_file();
 	/* pop_path() is too strict, let's push anyway */
@@ -197,9 +198,7 @@ create_workspace(gen_array_t files)
 }
 
 /* Do not open a module already opened : */
-bool 
-lazy_open_module(name)
-char *name;
+bool lazy_open_module(string name)
 {
     bool success = TRUE;
 
@@ -219,8 +218,7 @@ char *name;
 }
 
 /* should be: success (cf wpips.h) */
-bool 
-open_workspace(string name)
+bool open_workspace(string name)
 {
     bool success;
 
@@ -249,7 +247,7 @@ open_workspace(string name)
 	user_log("Workspace %s opened.\n", name);
 	success = open_module_if_unique();
 	if (success) init_processed_include_cache();
-	push_path();	
+	push_path();
     }
     return success;
 }
@@ -274,16 +272,14 @@ bool close_workspace(bool is_quit)
     /*clear_props();*/
 }
 
-bool 
-delete_workspace(string wname)
+bool delete_workspace(string wname)
 {
     int success = check_delete_workspace(wname,TRUE);
 
     return success;
 }
 
-bool 
-check_delete_workspace(string wname, bool check)
+bool check_delete_workspace(string wname, bool check)
 {
     int failure;
     string current = db_get_current_workspace_name();
@@ -299,8 +295,8 @@ check_delete_workspace(string wname, bool check)
     }
     else
     {
-	string name = strdup(current); 
-        (void) close_makefile(name);
+	string name = strdup(current);
+	(void) close_makefile(name);
 	free(name);
 	close_log_file();
 	close_processed_include_cache();
