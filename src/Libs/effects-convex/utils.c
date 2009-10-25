@@ -213,19 +213,41 @@ region region_dup(region reg)
 list regions_dup(list l_reg)
 {
     list l_reg_dup = NIL;
-     
+
     FOREACH(EFFECT, eff, l_reg)
       {
 	/* build last to first */
-	l_reg_dup = CONS(EFFECT, (*effect_dup_func)(eff), l_reg_dup);
+	effect n_eff = (*effect_dup_func)(eff);
+	l_reg_dup = CONS(EFFECT, n_eff, l_reg_dup);
       }
-    
+
     /* and the order is reversed */
-    l_reg_dup =  gen_nreverse(l_reg_dup);   
-    
+    l_reg_dup =  gen_nreverse(l_reg_dup);
+
     return l_reg_dup;
 }
 
+/* list regions_dup(list l_reg)
+ * input    : a list of regions.
+ * output   : a new list of regions, in which each region of the
+ *            initial list is duplicated.
+ * modifies : nothing.
+ *
+ * This version of the previous function does not require the convex
+ * effect driver to be initialized. It is used by array_bound_check_top_down()
+ */
+list external_regions_dup(list l_reg)
+{
+  list l_reg_dup = NIL;
+
+  MAP(EFFECT, reg,
+      {
+	effect reg_dup = region_dup(reg);
+	l_reg_dup = region_add_to_regions(reg_dup, l_reg_dup);
+      }, l_reg);
+
+  return l_reg_dup;
+}
 /* (void) regions_free(list l_reg)
  * input    : a list of regions
  * output   : nothing !
