@@ -1,0 +1,44 @@
+delete intro_example03
+create intro_example03 intro_example03.c
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+#setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+
+activate C_PARSER
+
+# FI: It could be useful to show the code before instrumentation
+#display PRINTED_FILE[intro_example03!]
+#display PRINTED_FILE[foo]
+
+apply ARRAY_BOUND_CHECK_BOTTOM_UP[foo]
+display PRINTED_FILE[foo]
+
+
+# ARRAY_BOUND_CHECK_TOP_DOWN
+#activate MUST_REGIONS
+#apply ARRAY_BOUND_CHECK_TOP_DOWN[foo]
+#display PRINTED_FILE[foo]
+
+
+# Get rid of useless continue added (FI: I do not know why they are inserted)
+apply SUPPRESS_DEAD_CODE
+
+# Perform a PIPS partial evaluation to get rid of constant expression
+# introduced for C arrays (a.k.a. constant propagation)
+apply PARTIAL_EVAL[foo]
+
+# FI: Well, I do not remember why partial_redundancy_elimination is
+# performed, but this must the explained in the TOPLAS article
+apply PARTIAL_REDUNDANCY_ELIMINATION[foo]
+display PRINTED_FILE[foo]
+
+# This is always nice to get the new version of the C files
+apply UNSPLIT
+close
+
+#delete intro_example03
+
+quit
+
