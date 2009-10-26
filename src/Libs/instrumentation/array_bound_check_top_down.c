@@ -970,7 +970,7 @@ C  <A(PHI1)-W-EXACT-{PHI1==J, J==11, 1+M<=I, 1<=I}>
 
 static bool top_down_abc_flt(statement s,top_down_abc_context_p context)
 {
-  list l_regions = external_regions_dup(load_statement_local_regions(s));
+  list l_regions = regions_dup(load_statement_local_regions(s));
   list l_copy = gen_full_copy_list(l_regions);
   list l_written_arrays = NIL;
   lexp = NIL;
