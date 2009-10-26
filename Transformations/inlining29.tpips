@@ -1,0 +1,43 @@
+delete inlining29
+setproperty ABORT_ON_USER_ERROR TRUE
+setenv PIPS_CPP_FLAGS=-Iinclude
+
+create inlining29 include/array.c inlining29.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+echo
+echo Initial code
+echo
+
+display PRINTED_FILE[%ALL]
+
+echo
+echo Code after inlining
+echo
+
+apply INLINING[farray_set]
+display PRINTED_FILE[main]
+
+echo
+echo Unsplit resulting code
+echo
+
+apply UNSPLIT
+setenv DB=inlining29.database
+shell cc  -Iinclude include/array.c inlining29.c -lm -o $DB/inlining29
+shell ./$DB/inlining29 10 > $DB/inlining29.out
+shell cc $DB/Src/inlining29.c $DB/Src/array.c -lm -o  $DB/inlining29
+shell ./$DB/inlining29 10 > $DB/inlining29_new.out
+
+echo
+echo Diff, must be empty
+echo
+shell diff $DB/inlining29.out $DB/inlining29_new.out
+
+close
+delete inlining29
+quit
+

@@ -2,7 +2,7 @@ delete expression_subst02
 
 setproperty ABORT_ON_USER_ERROR TRUE
 
-create expression_subst02 expression_subst02.c patterns.c
+create expression_subst02 expression_subst02.c include/patterns.c
 
 activate C_PARSER
 setproperty PRETTYPRINT_C_CODE TRUE

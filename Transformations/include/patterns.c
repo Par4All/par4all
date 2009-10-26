@@ -12,3 +12,8 @@ float selfadd(float a, float b)
 {
     return a=a+b;
 }
+
+float sadd(int a, int b)
+{
+    return (a + b > 255 ) ? 255 : a + b;
+}

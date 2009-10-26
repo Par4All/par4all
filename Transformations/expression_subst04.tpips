@@ -1,17 +1,17 @@
-delete expression_subst01
+delete expression_subst04
 
 setproperty ABORT_ON_USER_ERROR TRUE
 
-create expression_subst01 expression_subst01.c include/patterns.c
+create expression_subst04 expression_subst04.c include/patterns.c
 
 activate C_PARSER
 setproperty PRETTYPRINT_C_CODE TRUE
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 
 display PRINTED_FILE[test]
-setproperty EXPRESSION_SUBSTITUTION_PATTERN "max"
+setproperty EXPRESSION_SUBSTITUTION_PATTERN "sadd"
 apply EXPRESSION_SUBSTITUTION
 display PRINTED_FILE[test]
 
-close expression_subst01
-delete expression_subst01
+close expression_subst04
+delete expression_subst04
