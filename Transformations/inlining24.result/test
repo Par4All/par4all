@@ -187,7 +187,6 @@ l99995:         ;
       }
       
       
-      
       _return0 = ret;
    }
    ret = _return0;
@@ -263,12 +262,10 @@ l99986:            ;
          }
          
          
-         
          _return0 = ret;
       }
       ret = _return0;
       ret |= freia_aipo_sub(imout, imout, imin);
-      
       
       
       _return1 = ret;
@@ -330,12 +327,10 @@ l99982:            ;
          }
          
          
-         
          _return0 = ret;
       }
       ret = _return0;
       ret |= freia_aipo_sub(imout, imout, imin);
-      
       
       
       _return2 = ret;
@@ -414,11 +409,9 @@ l99986:      ;
    }
    
    
-   
    _return0_0 = ret_1;
    ret_0 = _return0_0;
    ret_0 |= freia_aipo_sub(imout, imout, imin);
-   
    
    
    _return1 = ret_0;
@@ -467,11 +460,9 @@ l99982:      ;
    }
    
    
-   
    _return0_1 = ret_3;
    ret_2 = _return0_1;
    ret_2 |= freia_aipo_sub(imout, imout, imin);
-   
    
    
    _return2 = ret_2;
@@ -630,7 +621,6 @@ l99986:      ;
 
    
    
-   
    _return0_0 = ret_1;
 
 //  P(_return0_0,i_0,ret_1) {_return0_0==ret_1, connexity==8, size==4}
@@ -645,7 +635,6 @@ l99986:      ;
 //  P(_return0_0,i_0,ret_0,ret_1) {_return0_0==ret_1, connexity==8,
 //    size==4}
 
-   
    
    
    _return1 = ret_0;
@@ -791,7 +780,6 @@ l99982:      ;
 
    
    
-   
    _return0_1 = ret_3;
 
 //  P(_return0_0,_return0_1,_return1,i_0,i_1,ret_0,ret_1,ret_3)
@@ -810,7 +798,6 @@ l99982:      ;
 //    {_return0_0==ret_1, _return0_1==ret_3, _return1==ret_0,
 //    connexity==8, size==4}
 
-   
    
    
    _return2 = ret_2;
@@ -893,11 +880,9 @@ l99986:      ;
    }
    
    
-   
    _return0_0 = ret_1;
    ret_0 = _return0_0;
    ret_0 |= freia_aipo_sub(imout, imout, imin);
-   
    
    
    _return1 = ret_0;
@@ -946,11 +931,9 @@ l99982:      ;
    }
    
    
-   
    _return0_1 = ret_3;
    ret_2 = _return0_1;
    ret_2 |= freia_aipo_sub(imout, imout, imin);
-   
    
    
    _return2 = ret_2;
@@ -1004,11 +987,9 @@ int main()
    }
    
    
-   
    _return0_0 = ret_1;
    ret_0 = _return0_0;
    ret_0 |= freia_aipo_sub(imout, imout, imin);
-   
    
    
    _return1 = ret_0;
@@ -1032,11 +1013,9 @@ int main()
    }
    
    
-   
    _return0_1 = ret_3;
    ret_2 = _return0_1;
    ret_2 |= freia_aipo_sub(imout, imout, imin);
-   
    
    
    _return2 = ret_2;
@@ -1092,11 +1071,9 @@ int main()
    }
    
    
-   
    _return0_0 = ret_1;
    ret_0 = _return0_0;
    ret_0 |= freia_aipo_sub(imout, imout, imin);
-   
    
    
    _return1 = ret_0;
@@ -1122,11 +1099,9 @@ int main()
    }
    
    
-   
    _return0_1 = ret_3;
    ret_2 = _return0_1;
    ret_2 |= freia_aipo_sub(imout, imout, imin);
-   
    
    
    _return2 = ret_2;

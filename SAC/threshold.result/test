@@ -15,7 +15,6 @@ void threshold(int data[128], int val)
    for(i = 0; i <= 127; i += 1) {
       L0 = data[i]>val;
       //c IF_TO_CONVERT
-
       if (L0) 
          data[i] = val;
    }
@@ -66,22 +65,16 @@ void threshold(int data[128], int val)
    LU_IND0 = 0;
    for(LU_IND0 = 0; LU_IND0 <= 127; LU_IND0 += 2) {
       //c SIMD_COMMENT_0
-
       L0 = data[LU_IND0]>val;
       //c SIMD_COMMENT_1
-
       data0 = val;
       //c SIMD_COMMENT_2
-
       data[LU_IND0] = PHI(L0, data0, data[LU_IND0]);
       //c SIMD_COMMENT_0
-
       L0 = data[LU_IND0+1]>val;
       //c SIMD_COMMENT_1
-
       data0 = val;
       //c SIMD_COMMENT_2
-
       data[LU_IND0+1] = PHI(L0, data0, data[LU_IND0+1]);
    }
    i = 128;
@@ -100,22 +93,16 @@ void threshold(int data[128], int val)
    LU_IND0 = 0;
    for(LU_IND0 = 0; LU_IND0 <= 127; LU_IND0 += 2) {
       //c SIMD_COMMENT_0
-
       L0 = data[LU_IND0]>val;
       //c SIMD_COMMENT_1
-
       data0 = val;
       //c SIMD_COMMENT_2
-
       data[LU_IND0] = PHI(L0, data0, data[LU_IND0]);
       //c SIMD_COMMENT_0
-
       L0 = data[LU_IND0+1]>val;
       //c SIMD_COMMENT_1
-
       data0 = val;
       //c SIMD_COMMENT_2
-
       data[LU_IND0+1] = PHI(L0, data0, data[LU_IND0+1]);
    }
    i = 128;
@@ -138,22 +125,16 @@ void threshold(int data[128], int val)
    LU_IND0 = 0;
    for(LU_IND0 = 0; LU_IND0 <= 127; LU_IND0 += 2) {
       //c SIMD_COMMENT_0
-
       L01 = data[LU_IND0]>val;
       //c SIMD_COMMENT_1
-
       data01 = val;
       //c SIMD_COMMENT_2
-
       data[LU_IND0] = PHI(L01, val, data[LU_IND0]);
       //c SIMD_COMMENT_0
-
       L00 = data[LU_IND0+1]>val;
       //c SIMD_COMMENT_1
-
       data00 = val;
       //c SIMD_COMMENT_2
-
       data[LU_IND0+1] = PHI(L00, val, data[LU_IND0+1]);
    }
    i = 128;
@@ -192,10 +173,8 @@ void threshold(int data[128], int val)
       SIMD_GTD(v2si_vec0, v2si_vec1, v2si_vec2);
       SIMD_SAVE_GENERIC_V2SI(v2si_vec0, &L01, &L00);
       //c SIMD_COMMENT_1
-
       data01 = val;
       //c SIMD_COMMENT_1
-
       data00 = val;
       SIMD_LOAD_V2SI(v2si_vec3, &data[LU_IND0]);
       SIMD_LOAD_GENERIC_V2SI(v2si_vec5, val, val);
@@ -240,10 +219,8 @@ void threshold(int data[128], int val)
       SIMD_LOAD_V2SI(v2si_vec1, &data[LU_IND0]);
       SIMD_GTD(v2si_vec0, v2si_vec1, v2si_vec2);
       //c SIMD_COMMENT_1
-
       data01 = val;
       //c SIMD_COMMENT_1
-
       data00 = val;
       SIMD_LOAD_V2SI(v2si_vec3, &data[LU_IND0]);
       SIMD_PHID(v2si_vec3, v2si_vec4, v2si_vec5, v2si_vec3);
@@ -279,10 +256,8 @@ void threshold(int data[128], int val)
       SIMD_LOAD_V2SI(v2si_vec1, &data[LU_IND0]);
       SIMD_GTD(v2si_vec0, v2si_vec1, v2si_vec2);
       //c SIMD_COMMENT_1
-
       data01 = val;
       //c SIMD_COMMENT_1
-
       data00 = val;
       SIMD_LOAD_V2SI(v2si_vec3, &data[LU_IND0]);
       SIMD_PHID(v2si_vec3, v2si_vec4, v2si_vec5, v2si_vec3);
@@ -321,10 +296,8 @@ void threshold(int data[128], int val)
       SIMD_LOAD_V2SI(v2si_vec1, &data[LU_IND0]);
       SIMD_GTD(v2si_vec0, v2si_vec1, v2si_vec2);
       //c SIMD_COMMENT_1
-
       data01 = val;
       //c SIMD_COMMENT_1
-
       data00 = val;
       SIMD_LOAD_V2SI(v2si_vec3, &data[LU_IND0]);
       SIMD_PHID(v2si_vec3, v2si_vec4, v2si_vec5, v2si_vec3);

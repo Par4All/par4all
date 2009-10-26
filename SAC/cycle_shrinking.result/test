@@ -58,28 +58,20 @@ void shrink(float a[100+4], float b[100+4], float c[100+4])
    LU_IND0 = 0;
    for(LU_IND0 = 0; LU_IND0 <= 99; LU_IND0 += 4) {
       //c SIMD_COMMENT_0
-
       a[LU_IND0+4] = b[LU_IND0];
       //c SIMD_COMMENT_1
-
       b[LU_IND0+4] = a[LU_IND0]+c[LU_IND0];
       //c SIMD_COMMENT_0
-
       a[LU_IND0+5] = b[LU_IND0+1];
       //c SIMD_COMMENT_1
-
       b[LU_IND0+5] = a[LU_IND0+1]+c[LU_IND0+1];
       //c SIMD_COMMENT_0
-
       a[LU_IND0+6] = b[LU_IND0+2];
       //c SIMD_COMMENT_1
-
       b[LU_IND0+6] = a[LU_IND0+2]+c[LU_IND0+2];
       //c SIMD_COMMENT_0
-
       a[LU_IND0+7] = b[LU_IND0+3];
       //c SIMD_COMMENT_1
-
       b[LU_IND0+7] = a[LU_IND0+3]+c[LU_IND0+3];
    }
    i = 100;
@@ -97,28 +89,20 @@ void shrink(float a[100+4], float b[100+4], float c[100+4])
    LU_IND0 = 0;
    for(LU_IND0 = 0; LU_IND0 <= 99; LU_IND0 += 4) {
       //c SIMD_COMMENT_0
-
       a[LU_IND0+4] = b[LU_IND0];
       //c SIMD_COMMENT_1
-
       b[LU_IND0+4] = a[LU_IND0]+c[LU_IND0];
       //c SIMD_COMMENT_0
-
       a[LU_IND0+5] = b[LU_IND0+1];
       //c SIMD_COMMENT_1
-
       b[LU_IND0+5] = a[LU_IND0+1]+c[LU_IND0+1];
       //c SIMD_COMMENT_0
-
       a[LU_IND0+6] = b[LU_IND0+2];
       //c SIMD_COMMENT_1
-
       b[LU_IND0+6] = a[LU_IND0+2]+c[LU_IND0+2];
       //c SIMD_COMMENT_0
-
       a[LU_IND0+7] = b[LU_IND0+3];
       //c SIMD_COMMENT_1
-
       b[LU_IND0+7] = a[LU_IND0+3]+c[LU_IND0+3];
    }
    i = 100;
@@ -136,28 +120,20 @@ void shrink(float a[100+4], float b[100+4], float c[100+4])
    LU_IND0 = 0;
    for(LU_IND0 = 0; LU_IND0 <= 99; LU_IND0 += 4) {
       //c SIMD_COMMENT_0
-
       a[LU_IND0+4] = b[LU_IND0];
       //c SIMD_COMMENT_1
-
       b[LU_IND0+4] = a[LU_IND0]+c[LU_IND0];
       //c SIMD_COMMENT_0
-
       a[LU_IND0+5] = b[LU_IND0+1];
       //c SIMD_COMMENT_1
-
       b[LU_IND0+5] = a[LU_IND0+1]+c[LU_IND0+1];
       //c SIMD_COMMENT_0
-
       a[LU_IND0+6] = b[LU_IND0+2];
       //c SIMD_COMMENT_1
-
       b[LU_IND0+6] = a[LU_IND0+2]+c[LU_IND0+2];
       //c SIMD_COMMENT_0
-
       a[LU_IND0+7] = b[LU_IND0+3];
       //c SIMD_COMMENT_1
-
       b[LU_IND0+7] = a[LU_IND0+3]+c[LU_IND0+3];
    }
    i = 100;

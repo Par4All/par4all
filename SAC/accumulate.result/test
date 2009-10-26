@@ -48,16 +48,12 @@ short accumulate(size_t n, short a[n], short seed)
       seed = seed+a[LU_IND0];
    for(LU_IND0 = LU_IB0; LU_IND0 <= LU_NUB0-1; LU_IND0 += 4) {
       //c SIMD_COMMENT_0
-
       seed = seed+a[LU_IND0];
       //c SIMD_COMMENT_0
-
       seed = seed+a[LU_IND0+1];
       //c SIMD_COMMENT_0
-
       seed = seed+a[LU_IND0+2];
       //c SIMD_COMMENT_0
-
       seed = seed+a[LU_IND0+3];
    }
    i = MAX0(LU_NUB0, 0);
@@ -83,16 +79,12 @@ short accumulate(size_t n, short a[n], short seed)
    RED1[3] = 0;
    for(LU_IND0 = LU_IB0; LU_IND0 <= LU_NUB0-1; LU_IND0 += 4) {
       //c SIMD_COMMENT_0
-
       RED1[0] = RED1[0]+a[LU_IND0];
       //c SIMD_COMMENT_0
-
       RED1[1] = RED1[1]+a[LU_IND0+1];
       //c SIMD_COMMENT_0
-
       RED1[2] = RED1[2]+a[LU_IND0+2];
       //c SIMD_COMMENT_0
-
       RED1[3] = RED1[3]+a[LU_IND0+3];
    }
    seed = RED1[3]+RED1[2]+RED1[1]+RED1[0]+seed;
@@ -120,16 +112,12 @@ short accumulate(size_t n, short a[n], short seed)
    RED1[3] = 0;
    for(LU_IND0 = LU_IB0; LU_IND0 <= LU_NUB0-1; LU_IND0 += 4) {
       //c SIMD_COMMENT_0
-
       RED1[0] = RED1[0]+a[LU_IND0];
       //c SIMD_COMMENT_0
-
       RED1[1] = RED1[1]+a[LU_IND0+1];
       //c SIMD_COMMENT_0
-
       RED1[2] = RED1[2]+a[LU_IND0+2];
       //c SIMD_COMMENT_0
-
       RED1[3] = RED1[3]+a[LU_IND0+3];
    }
    seed = RED1[3]+RED1[2]+RED1[1]+RED1[0]+seed0;

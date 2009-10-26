@@ -123,7 +123,6 @@ freia_error freia_cipo_outer_gradient(freia_data2d *imout, freia_data2d *imin, i
          ret = 2;
       
       
-      
       _return0 = ret;
    }
    ret = _return0;

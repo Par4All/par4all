@@ -30,7 +30,6 @@ int gradient(void)
 l99999:      ;
       
       
-      
       _return0 = 0;
 l99995:      ;
 
