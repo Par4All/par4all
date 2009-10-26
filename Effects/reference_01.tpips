@@ -5,6 +5,7 @@ setproperty ABORT_ON_USER_ERROR TRUE
 create reference_01 reference_01.c
 
 setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
 activate C_PARSER
 
 echo

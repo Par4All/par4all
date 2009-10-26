@@ -7,6 +7,7 @@ create varargs03 varargs03.c
 activate C_PARSER
 
 setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
 
 echo
 echo Proper effects for "main"
