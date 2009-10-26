@@ -1,0 +1,36 @@
+
+Initial code
+
+int volume(int a[256][256])
+{
+   int v = 0;
+   int i;
+   int j;
+volume:
+   for(i = 0; i <= 255; i += 1)
+      for(j = 0; j <= 255; j += 1)
+         v = v+a[i][j];
+   return v;
+}
+
+after removing reductions
+
+int volume(int a[256][256])
+{
+   int v = 0;
+   int i;
+   int j;
+   {
+      int RED[255+1];
+volume:
+      for(i = 0; i <= 255; i += 1)
+         for(j = 0; j <= 255; j += 1)
+            RED[i] = RED[i]+a[i][j];
+      for(i = 0; i <= 255; i += 1)
+         v = v+RED[i];
+   }
+   return v;
+}
+
+Unsplit resulting code
+
