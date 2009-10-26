@@ -1078,11 +1078,11 @@ Section~\ref{sec:shell}.
 
 \subsubsection{The \texttt{etc} subdirectory}
 
-Configuration files, such as properties and pipsmake settings.
+Configuration files, such as pipsmake settings.
 
 Also some configuration files, automatically generated from
 the \LaTeX{} documentation in \texttt{src/Documentation}.
-Important files are \texttt{pipsmake.rc}, \texttt{properties.rc} and
+Important files are \texttt{pipsmake.rc} and
 \texttt{wpips.rc}.
 
 \subsubsection{The \texttt{share} subdirectory}
@@ -2168,18 +2168,43 @@ reconstruct the \texttt{pipsrc.*sh} files.
   \emph{res1} and produces a resource \emph{res2} for the current module,
   the rule and its alias are:
 \begin{verbatim}
+\begin{PipsMake}
 alias myphase 'My Phase'
 
 myphase > MODULE.res2
         < PROGRAM.entities
         < MODULE.res1
+\end{PipsMake}
 \end{verbatim}
+
+  You can document your new phase using the \texttt{PipsPass} environment.
+  It takes the phase name as a mandatory argument.
+  Its body briefly document the phase.
+\begin{verbatim}
+\begin{PipsPass}{myphase}
+A very nice phase !
+\end{PipsMake}
+\end{verbatim}
+
+  If you need to further refer to this phase, use \verb|\PipsPassRef{myphase}|.
+
 
   Note that all phases generally use the program entities, for example
   if you display some code in debug routines..., that is all the
   objects from the current C or Fortran program and from C and Fortran
   run-times that have a name.  This resource, the global symbol table,
   is named \texttt{PROGRAM.entities}.
+
+\item You may want to declare new PIPS global properties to parametrize your new phase,
+	or use previously defined properties.
+	In the first case, simply add a
+\begin{verbatim}
+\begin{PipsProp}{propname}
+propname default_value
+\end{PipsProp}
+\end{verbatim}
+	where \texttt{propname} is the name of your property, \texttt{default\_value} is a boolean, an integer or a string ((\verb/TRUE/|\verb/FALSE/), \verb/[0-9]+/, \verb/"[^"]*"/).
+	In the second case, add a \verb|\PipsPropRef{propname}| reference to the used property.
 
 \item Run the command \texttt{make} to derive the various files
   \texttt{pipsmake.rc}, \texttt{phases.h}, \texttt{resources.h},
