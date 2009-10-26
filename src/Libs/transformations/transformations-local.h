@@ -31,3 +31,19 @@
 /* What is returned by dead_test_filter : */
 enum dead_test { nothing_about_test, then_is_dead, else_is_dead };
 typedef enum dead_test dead_test;
+
+
+enum region_to_dma_switch { dma_load, dma_store, dma_allocate, dma_deallocate };
+/* Add NewGen-like methods: */
+#define dma_load_p(e) ((e) == dma_load )
+#define dma_store_p(e) ((e) == dma_store )
+#define dma_allocate_p(e) ((e) == dma_allocate )
+#define dma_deallocate_p(e) ((e) == dma_deallocate )
+
+
+enum range_to_expression_mode{
+    range_to_distance,
+    range_to_nbiter
+} ;
+#define range_to_distance_p(e) ((e) == range_to_distance)
+#define range_to_nbiter_p(e) ((e) == range_to_nbiter)

@@ -8523,6 +8523,18 @@ variable_expansion                    > MODULE.code
         < MODULE.code
 \end{PipsMake}
 
+\begin{PipsPass}{reduction_variable_expansion}
+Uses \PipsPropRef{LOOP_LABEL} to select a particular loop,
+then finds all reduction in this loop and performs variable expension on all reduction variables.
+\end{PipsPass}
+
+\begin{PipsMake}
+reduction_variable_expansion      > MODULE.code
+        < PROGRAM.entities
+        < MODULE.cumulated_reductions
+        < MODULE.code
+\end{PipsMake}
+
 \subsubsection{Array Expansion}
 \index{Array Expansion}
 

@@ -55,41 +55,6 @@ typedef dg_vertex_label vertex_label;
 
 #include "control.h"
 
-/* START of PIPSMAKE.RC generated aprt */
-
-/*
-   reductionInfo = persistent reduction x count:int x persistent vector:entity
-   */
-typedef struct {
-    reduction _reductionInfo_reduction_;
-    int _reductionInfo_count_;
-    entity _reductionInfo_vector_;
-} _reductionInfo_, * reductionInfo;
-#define REDUCTIONINFO(x) ((reductionInfo)((x).p))
-#define REDUCTIONINFO_TYPE reductionInfo
-#define REDUCTIONINFO_NEWGEN_DOMAIN (-1)
-#define gen_REDUCTIONINFO_cons gen_cons
-#define reductionInfo_reduction(x) (x->_reductionInfo_reduction_)
-#define reductionInfo_count(x) (x->_reductionInfo_count_)
-#define reductionInfo_vector(x) (x->_reductionInfo_vector_)
-
-static reductionInfo make_reductionInfo(reduction r, int c, entity v)
-{
-    reductionInfo ri = (reductionInfo)malloc(sizeof(_reductionInfo_));
-    reductionInfo_reduction(ri) = r;
-    reductionInfo_count(ri) = c;
-    reductionInfo_vector(ri) = v;
-    return ri;
-}
-
-static void free_reductionInfo(reductionInfo ri)
-{
-    free(ri);
-}
-
-/* END of PIPSMAKE.RC generated aprt */
-
-
 #define reduction_basic(x) (get_basic_from_array_ref(reduction_reference(x)))
 
 entity make_float_constant_entity(float c)
@@ -171,12 +136,6 @@ static entity make_reduction_vector_entity(reduction r)
     }
 
     return new_ent;
-}
-
-static reductions get_reductions(statement s)
-{
-    //get the reduction associated with this statement, if any
-    return load_cumulated_reductions(s);
 }
 
 static bool same_reduction_p(reduction r1, reduction r2)
@@ -271,13 +230,13 @@ static bool redInStat(reduction red, statement stat)
     return gRedInStat;
 }
 
-/* This function gets the possible reduction thanks to get_reductions() function. 
+/* This function gets the possible reduction thanks to load_cumulated_reductions() function. 
    Then, for each possible reduction, the function call add_reduction() to know if 
    the reduction is allowed and if it is, the function calls rename_reduction_ref()
    to do the reduction. */
-static void rename_statement_reductions(statement s, list * reds, list lRed)
+static void rename_statement_reductions(statement s, list * reductions_info, list reductions)
 {
-    MAP(REDUCTION, r,
+    FOREACH(REDUCTION, r, reductions)
     {
         bool bContinue = TRUE;
 
@@ -295,12 +254,11 @@ static void rename_statement_reductions(statement s, list * reds, list lRed)
         if(basic_undefined_p(bas))
             continue;
 
-        reductionInfo l = add_reduction(reds, r);
+        reductionInfo l = add_reduction(reductions_info, r);
 
         if(l != NULL)
             rename_reduction_ref(s, l);
-    },
-        lRed);
+    }
 }
 
 /*
@@ -529,10 +487,6 @@ static void reductions_rewrite(statement s)
 {
     instruction i = statement_instruction(s);
     statement body;
-    instruction ibody;
-    list reductions = NIL;
-    list preludes = NIL;
-    list compacts = NIL;
 
     //We are only interested in loops
     switch(instruction_tag(i))
@@ -552,88 +506,88 @@ static void reductions_rewrite(statement s)
         default:
             return;
     }
-
-    //Compute the reductions list for the loop
-    list lRed = reductions_list(get_reductions(s));
-
-    //Lookup the reductions in the loop's body, and change the loop body accordingly
-    ibody = statement_instruction(body);
-    switch(instruction_tag(ibody))
     {
-        case is_instruction_sequence:
-            MAP(STATEMENT, curStat,
-            {
-                rename_statement_reductions(curStat, &reductions, lRed);
-            }, sequence_statements(instruction_sequence(ibody)));
-            break;
 
-        case is_instruction_call:
-            rename_statement_reductions(s, &reductions, lRed);
-            break;
+        list reductions_info = NIL;
+        list preludes = NIL;
+        list compacts = NIL;
 
-        default:
-            return;
+        //Compute the reductions list for the loop
+        list reductions = reductions_list(load_cumulated_reductions(s));
+
+        //Lookup the reductions in the loop's body, and change the loop body accordingly
+        instruction ibody = statement_instruction(body);
+        switch(instruction_tag(ibody))
+        {
+            case is_instruction_sequence:
+                {
+                    FOREACH(STATEMENT, curStat,sequence_statements(instruction_sequence(ibody)))
+                        rename_statement_reductions(curStat, &reductions_info, reductions);
+                } break;
+
+            case is_instruction_call:
+                rename_statement_reductions(s, &reductions_info, reductions);
+                break;
+
+            default:
+                return;
+        }
+
+        //Generate prelude and compact code for each of the reductions
+        FOREACH(REDUCTIONINFO, ri,reductions_info)
+        {
+            statement curStat;
+
+            curStat = generate_prelude(ri);
+            if (curStat != statement_undefined)
+                preludes = CONS(STATEMENT, curStat, preludes);
+
+            curStat = generate_compact(ri);
+            if (curStat != statement_undefined)
+                compacts = CONS(STATEMENT, curStat, compacts);
+        };
+        gen_full_free_list(reductions_info);
+
+        // Replace the old statement instruction by the new one
+        statement_instruction(s) = make_instruction_sequence(make_sequence(
+                    gen_concatenate(preludes, 
+                        CONS(STATEMENT, copy_statement(s),
+                            compacts))));
+
+        statement_label(s) = entity_empty_label();
+        statement_number(s) = STATEMENT_NUMBER_UNDEFINED;
+        statement_ordering(s) = STATEMENT_ORDERING_UNDEFINED;
+        statement_comments(s) = empty_comments;
+        statement_declarations(s) = NIL;
+        statement_decls_text(s) = string_undefined;
     }
-
-    //Generate prelude and compact code for each of the reductions
-    MAP(REDUCTIONINFO, ri,
-    {
-        statement curStat;
-
-        curStat = generate_prelude(ri);
-        if (curStat != statement_undefined)
-            preludes = CONS(STATEMENT, curStat, preludes);
-
-        curStat = generate_compact(ri);
-        if (curStat != statement_undefined)
-            compacts = CONS(STATEMENT, curStat, compacts);
-
-        free_reductionInfo(ri);
-    },
-        reductions);
-    gen_free_list(reductions);
-
-    // Replace the old statement instruction by the new one
-    statement_instruction(s) = make_instruction_sequence(make_sequence(
-                gen_concatenate(preludes, 
-                    CONS(STATEMENT, copy_statement(s),
-                        compacts))));
-
-    statement_label(s) = entity_empty_label();
-    statement_number(s) = STATEMENT_NUMBER_UNDEFINED;
-    statement_ordering(s) = STATEMENT_ORDERING_UNDEFINED;
-    statement_comments(s) = empty_comments;
-    statement_declarations(s) = NIL;
-    statement_decls_text(s) = string_undefined;
 }
 
+/** 
+ * remove reductions by expanding recuced scalar to an array
+ * 
+ * @param mod_name  module to remove reductions from
+ * 
+ * @return true
+ */
 bool simd_remove_reductions(char * mod_name)
 {
 
     /* get the resources */
-    statement mod_stmt = (statement)
-        db_get_memory_resource(DBR_CODE, mod_name, TRUE);
-
-    set_current_module_statement(mod_stmt);
+    set_current_module_statement((statement)db_get_memory_resource(DBR_CODE, mod_name,true));
     set_current_module_entity(module_name_to_entity(mod_name));
-    set_cumulated_reductions((pstatement_reductions)
-            db_get_memory_resource(DBR_CUMULATED_REDUCTIONS,
-                mod_name, TRUE));
+    set_cumulated_reductions((pstatement_reductions) db_get_memory_resource(DBR_CUMULATED_REDUCTIONS, mod_name, true));
 
     debug_on("SIMDREDUCTION_DEBUG_LEVEL");
+
     /* Now do the job */
+    gen_recurse(get_current_module_statement(), statement_domain, gen_true, reductions_rewrite);
 
-    gen_recurse(mod_stmt, statement_domain,
-            gen_true, reductions_rewrite);
-
-    pips_assert("Statement is consistent after remove reductions", 
-            statement_consistent_p(mod_stmt));
+    pips_assert("Statement is consistent after remove reductions", statement_consistent_p(get_current_module_statement()));
 
     /* Reorder the module, because new statements have been added */  
-    module_reorder(mod_stmt);
-    DB_PUT_MEMORY_RESOURCE(DBR_CODE, mod_name, mod_stmt);
-    DB_PUT_MEMORY_RESOURCE(DBR_CALLEES, mod_name, 
-            compute_callees(mod_stmt));
+    module_reorder(get_current_module_statement());
+    DB_PUT_MEMORY_RESOURCE(DBR_CODE, mod_name, get_current_module_statement());
 
     /* update/release resources */
     reset_cumulated_reductions();
@@ -642,6 +596,6 @@ bool simd_remove_reductions(char * mod_name)
 
     debug_off();
 
-    return TRUE;
+    return true;
 }
 

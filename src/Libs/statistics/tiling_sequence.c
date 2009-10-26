@@ -674,11 +674,14 @@ list lis;
   string full_name;
   entity e, f, a;
   basic b = base;
- 
-  full_name =  strdup(concatenate(module_name, MODULE_SEP_STRING, name, NULL));
+  asprintf(&full_name,"%s"MODULE_SEP_STRING"%s",module_name,name);
   pips_debug(8, "name %s\n", full_name);
-  message_assert("not already defined", 
-		 gen_find_tabulated(full_name, entity_domain)==entity_undefined);
+  int n =0;
+  while(!entity_undefined_p(gen_find_tabulated(full_name, entity_domain)))
+  {
+      free(full_name);
+      asprintf(&full_name,"%s"MODULE_SEP_STRING"%s%d",module_name,name,n++);
+  }
   e = make_entity(full_name, type_undefined, storage_undefined, value_undefined);
  
   entity_type(e) = (type) MakeTypeVariable(b, lis);
@@ -699,11 +702,11 @@ list lis;
 /* J'ai ameliore la fonction make_new_scalar_variable_with_prefix  */
 /* afin de l'etendre  a des tableau   */
 
-entity make_new_array_variable_with_prefix(string prefix, entity module,basic b,list lis)
+entity make_new_array_variable_with_prefix(string prefix, entity module,basic b,list dimensions)
 {
   string module_name = module_local_name(module);
   entity e;
-  e = make_array_entity(prefix, module_name, b, lis);
+  e = make_array_entity(prefix, module_name, b, dimensions);
   AddEntityToDeclarations(e, module);
   return e;
 }

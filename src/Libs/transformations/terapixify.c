@@ -51,20 +51,6 @@
 #include "c_syntax.h"
 
 
-enum region_to_dma_switch { dma_load, dma_store, dma_allocate, dma_deallocate };
-/* Add NewGen-like methods: */
-#define dma_load_p(e) ((e) == dma_load )
-#define dma_store_p(e) ((e) == dma_store )
-#define dma_allocate_p(e) ((e) == dma_allocate )
-#define dma_deallocate_p(e) ((e) == dma_deallocate )
-
-
-enum range_to_expression_mode{
-    range_to_distance,
-    range_to_nbiter
-} ;
-#define range_to_distance_p(e) ((e) == range_to_distance)
-#define range_to_nbiter_p(e) ((e) == range_to_nbiter)
 
 /** 
  * computes the distance between the lower bound and the upper bound of the range
@@ -73,7 +59,6 @@ enum range_to_expression_mode{
  * @param mode wether we compute the distance or count the number of iterations
  * @return appropriate distance or count
  */
-static
 expression range_to_expression(range r,enum range_to_expression_mode mode)
 {
     expression distance =  make_op_exp(PLUS_OPERATOR_NAME,
