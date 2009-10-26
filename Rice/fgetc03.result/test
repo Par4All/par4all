@@ -32,7 +32,7 @@ void getimage(void)
          c = foo(fp);
 //               <must be read   >: c i j
 //               <must be written>: TOP-LEVEL:imagein_re[i][j]
-         imagein_re[i][j] = (c==0?0.0:1.0);
+         imagein_re[i][j] = c==0?0.0:1.0;
 //               <must be read   >: i j
 //               <must be written>: TOP-LEVEL:imagein_im[i][j]
          imagein_im[i][j] = 0.0;
@@ -58,7 +58,7 @@ void getimage(void)
 #pragma omp parallel for private(c)
       for(j = 0; j <= 63; j += 1) {
          c = foo(fp);
-         imagein_re[i][j] = (c==0?0.0:1.0);
+         imagein_re[i][j] = c==0?0.0:1.0;
          imagein_im[i][j] = 0.0;
       }
 }

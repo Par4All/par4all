@@ -6,9 +6,9 @@ void malloc02()
    int *p[10];
    int i;
 
-   for(i = 0; i <= 9; i += 1) {
-      p[i] = malloc(sizeof(int));
-      p[i] = i;
+   for(i = 0; i <= 9; i += 1) {                                         /*0007*/
+      p[i] = malloc(sizeof(int));                                       /*0008*/
+      p[i] = i;                                                         /*0009*/
    }
 }
 
@@ -25,15 +25,15 @@ void malloc02()
 //  P() {}
 
 
-   for(i = 0; i <= 9; i += 1) {
+   for(i = 0; i <= 9; i += 1) {                                         /*0007*/
 
 //  P(i) {0<=i, i<=9}
 
-      p[i] = malloc(sizeof(int));
+      p[i] = malloc(sizeof(int));                                       /*0008*/
 
 //  P(i) {0<=i, i<=9}
 
-      p[i] = i;
+      p[i] = i;                                                         /*0009*/
    }
 }
 
@@ -45,34 +45,36 @@ void malloc02()
    int i;
 //               <must be written>: i
 
-   for(i = 0; i <= 9; i += 1) {
-//               <must be read   >: _MALLOC_ i
-//               <must be written>: _MALLOC_ p[i]
-      p[i] = malloc(sizeof(int));
+   for(i = 0; i <= 9; i += 1) {                                         /*0007*/
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_ i
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ p[i]
+      p[i] = malloc(sizeof(int));                                       /*0008*/
 //               <must be read   >: i
 //               <must be written>: p[i]
-      p[i] = i;
+      p[i] = i;                                                         /*0009*/
    }
 }
 
 Cumulated effects
 
+//               <may be read    >: _MALLOC_EFFECTS:_MALLOC_
+//               <may be written >: _MALLOC_EFFECTS:_MALLOC_
 void malloc02()
 {
    int *p[10];
    int i;
-//               <may be read    >: _MALLOC_ i
-//               <may be written >: _MALLOC_ p[*]
+//               <may be read    >: _MALLOC_EFFECTS:_MALLOC_ i
+//               <may be written >: _MALLOC_EFFECTS:_MALLOC_ p[*]
 //               <must be written>: i
 
-   for(i = 0; i <= 9; i += 1) {
+   for(i = 0; i <= 9; i += 1) {                                         /*0007*/
 //               <may be written >: p[*]
-//               <must be read   >: _MALLOC_ i
-//               <must be written>: _MALLOC_
-      p[i] = malloc(sizeof(int));
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_ i
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_
+      p[i] = malloc(sizeof(int));                                       /*0008*/
 //               <may be written >: p[*]
 //               <must be read   >: i
-      p[i] = i;
+      p[i] = i;                                                         /*0009*/
    }
 }
 
@@ -83,18 +85,18 @@ void malloc02()
    int *p[10];
    int i;
 
-//  <p[PHI1]-W-MAY-{0<=PHI1, PHI1<=9}>
+//  <p[PHI1]-W-EXACT-{0<=PHI1, PHI1<=9}>
 
 
-   for(i = 0; i <= 9; i += 1) {
-
-//  <p[PHI1]-W-EXACT-{PHI1==i, 0<=i, i<=9}>
-
-      p[i] = malloc(sizeof(int));
+   for(i = 0; i <= 9; i += 1) {                                         /*0007*/
 
 //  <p[PHI1]-W-EXACT-{PHI1==i, 0<=i, i<=9}>
 
-      p[i] = i;
+      p[i] = malloc(sizeof(int));                                       /*0008*/
+
+//  <p[PHI1]-W-EXACT-{PHI1==i, 0<=i, i<=9}>
+
+      p[i] = i;                                                         /*0009*/
    }
 }
 
@@ -103,11 +105,11 @@ void malloc02()
 	08 --> 09 with conflicts
 		from <p[i]-W-MUST> to <p[i]-W-MUST> at levels  2
 	08 --> 08 with conflicts
-		from <_MALLOC_-R-MUST> to <_MALLOC_-W-MUST> at levels  1
+		from <_MALLOC_EFFECTS:_MALLOC_-R-MUST> to <_MALLOC_EFFECTS:_MALLOC_-W-MUST> at levels  1
 	08 --> 08 with conflicts
-		from <_MALLOC_-W-MUST> to <_MALLOC_-W-MUST> at levels  1
+		from <_MALLOC_EFFECTS:_MALLOC_-W-MUST> to <_MALLOC_EFFECTS:_MALLOC_-W-MUST> at levels  1
 	08 --> 08 with conflicts
-		from <_MALLOC_-W-MUST> to <_MALLOC_-R-MUST> at levels  1
+		from <_MALLOC_EFFECTS:_MALLOC_-W-MUST> to <_MALLOC_EFFECTS:_MALLOC_-R-MUST> at levels  1
 
 ****************** End of Dependence Graph ******************
 
@@ -118,11 +120,12 @@ void malloc02()
    int *p[10];
    int i;
 
-   for(i = 0; i <= 9; i += 1)
-      p[i] = malloc(sizeof(int));
+
+   for(i = 0; i <= 9; i += 1)                                           /*0007*/
+      p[i] = malloc(sizeof(int));                                       /*0008*/
 #pragma omp parallel for 
-   for(i = 0; i <= 9; i += 1)
-      p[i] = i;
+   for(i = 0; i <= 9; i += 1)                                           /*0007*/
+      p[i] = i;                                                         /*0009*/
 }
 
 Parallelization in Fortran (if one of the resources can be made obsolete)
@@ -132,11 +135,11 @@ void malloc02()
    int *p[10];
    int i;
 
+
+   for(i = 0; i <= 9; i += 1)                                           /*0007*/
+      p[i] = malloc(sizeof(int));                                       /*0008*/
 #pragma omp parallel for 
-   for(i = 0; i <= 9; i += 1)
-      p[i] = malloc(sizeof(int));
-#pragma omp parallel for 
-   for(i = 0; i <= 9; i += 1)
-      p[i] = i;
+   for(i = 0; i <= 9; i += 1)                                           /*0007*/
+      p[i] = i;                                                         /*0009*/
 }
 

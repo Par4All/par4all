@@ -11,6 +11,8 @@ echo Select some options to deal with the C Language:
 echo Parse as C:
 
 activate C_PARSER
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER FALSE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER FALSE
 
 echo Prettyprint the source as C, of course
 

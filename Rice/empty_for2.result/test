@@ -20,6 +20,7 @@ void empty_for()
    int i;
    int j;
 
+
 #pragma omp parallel for private(j)
    for(i = 0; i <= 9999; i += 1)
 #pragma omp parallel for 
@@ -30,5 +31,6 @@ void empty_for()
 #pragma omp parallel for 
       for(j = 0; j <= 9999; j += 1)
          h_C[i*10000+j] = 0;
+
 
 }

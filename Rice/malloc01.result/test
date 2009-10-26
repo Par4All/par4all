@@ -94,6 +94,7 @@ void malloc01()
    int *p = malloc(10*sizeof(int));
    int i;
 
+
 #pragma omp parallel for 
    for(i = 0; i <= 9; i += 1)
       p[i] = (double) i;

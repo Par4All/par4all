@@ -14,6 +14,8 @@ activate C_PARSER
 echo Prettyprint the source as C, of course
 
 setproperty PRETTYPRINT_C_CODE TRUE
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER FALSE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   FALSE
 
 echo Do not display original number lines as comment:
 

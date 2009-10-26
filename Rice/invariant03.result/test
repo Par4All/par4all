@@ -34,6 +34,7 @@ void invariant03(int n, int ni, int nj)
    float a;
    // BEGIN BLOCK
 
+
    for(i = 0; i <= ni-1; i += 1)                                        /*0008*/
       // BEGIN BLOCK
       for(j = 0; j <= nj-1; j += 1) {                                   /*0009*/
@@ -58,27 +59,20 @@ void invariant03(int n, int ni, int nj)
    int j;
    float s;
    float a;
-   // BEGIN BLOCK
-
-   // BEGIN BLOCK
-   i = MAX(INT(ni), 0);
-   // BEGIN BLOCK
-   // BEGIN BLOCK                                                       /*0010*/
-   j = MAX(INT(nj), 0);
-   s = a*a;                                                             /*0010*/
-   // END BLOCK                                                         /*0010*/
-   // END BLOCK
-   // END BLOCK
-#pragma omp parallel for 
-   for(i = 0; i <= ni-1; i += 1)                                        /*0008*/
-      // BEGIN BLOCK
-#pragma omp parallel for 
-      for(j = 0; j <= nj-1; j += 1)                                     /*0009*/
+   float F_0;
+   int I_0;
+   F_0 = a*a;
+   I_0 = nj-1;
+   for(i = 0; i <= ni-1; i += 1)
+      for(j = 0; j <= I_0; j += 1) {                                    /*0009*/
+         // BEGIN BLOCK
+         s = F_0;                                                       /*0010*/
          x[i][j] = s;                                                   /*0011*/
-      // END BLOCK
-   // END BLOCK
+         // END BLOCK
+      }
    // END BLOCK
 }
 
 Warnings
 
+unknown[unknown] (activate) Rule `C_PARSER' already active

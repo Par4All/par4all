@@ -28,13 +28,14 @@ void invariant02(int ni, int nj)
    float s;
    float a;
    float b;
-
-   i = MAX(INT(ni), 0);
-   s = a*b;
-#pragma omp parallel for 
-   for(i = 0; i <= ni-1; i += 1)
+   float F_0;
+   F_0 = a*b;
+   for(i = 0; i <= ni-1; i += 1) {
+      s = F_0;
       y[i] = s;
+   }
 }
 
 Warnings
 
+unknown[unknown] (activate) Rule `C_PARSER' already active
