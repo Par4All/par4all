@@ -1391,7 +1391,7 @@ MakeCurrentFunction(
     PushBlock(icf, "INITIAL");
 
     function_body = instruction_to_statement(icf);
-    entity_initial(cf) = make_value(is_value_code, make_code(NIL, NULL, make_sequence(NIL),NIL));
+    entity_initial(cf) = make_value(is_value_code, make_code(NIL, NULL, make_sequence(NIL),NIL, make_language_fortran()));
 
     set_current_module_entity(cf);
 
@@ -1777,7 +1777,7 @@ MakeEntry(
 
     /* This depends on what has been done in LocalToGlobal and SafeLocalToGlobal */
     if(value_undefined_p(entity_initial(fe))) {
-	entity_initial(fe) = make_value(is_value_code, make_code(lefp, strdup(""), make_sequence(NIL),NIL));
+	entity_initial(fe) = make_value(is_value_code, make_code(lefp, strdup(""), make_sequence(NIL),NIL, make_language_fortran()));
     }
     else {
 	value val = entity_initial(fe);
@@ -1786,13 +1786,13 @@ MakeEntry(
 	if(value_unknown_p(val)) {
 	    /* A call site for fe has been encountered in another module */
 	    entity_initial(fe) = make_value(is_value_code,
-					    make_code(lefp, strdup(""), make_sequence(NIL),NIL));
+					    make_code(lefp, strdup(""), make_sequence(NIL),NIL, make_language_fortran()));
 	}
 	else {
 	    pips_assert("value is code", value_code_p(val));
 	    c = value_code(entity_initial(fe));
 	    if(code_undefined_p(c)) {
-		value_code(entity_initial(fe)) = make_code(lefp, strdup(""), make_sequence(NIL),NIL);
+		value_code(entity_initial(fe)) = make_code(lefp, strdup(""), make_sequence(NIL),NIL, make_language_fortran());
 	    }
 	    else if(ENDP(code_declarations(c))) {
 		/* Should now be the normal case... */
@@ -2222,7 +2222,7 @@ SafeLocalToGlobal(entity e, type r)
                  the code is really known? */
 	      /* entity_initial(fe) = make_value(is_value_unknown, UU); */
 		entity_initial(fe) = make_value(is_value_code,
-		make_code(NIL, strdup(""), make_sequence(NIL),NIL));
+		make_code(NIL, strdup(""), make_sequence(NIL),NIL, make_language_fortran()));
 	    }
 
 	    pips_debug(1, "external function %s re-declared as %s\n",

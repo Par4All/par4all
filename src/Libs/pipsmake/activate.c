@@ -44,14 +44,13 @@ static void delete_derived_resources();
 
 static list saved_active_phases = NIL;
 
-void 
-save_active_phases(void)
+void save_active_phases(void)
 {
     makefile current_makefile = parse_makefile();
-    
+
     if (saved_active_phases==NIL)
     {
-	MAP(STRING, s, 
+	MAP(STRING, s,
 	    saved_active_phases = CONS(STRING, strdup(s), saved_active_phases),
 	    makefile_active_phases(current_makefile));
 
@@ -82,12 +81,11 @@ retrieve_active_phases(void)
     }
 }
 
-bool 
-active_phase_p(string phase)
+bool active_phase_p(string phase)
 {
     makefile current_makefile = parse_makefile();
 
-    MAP(STRING, s, 
+    MAP(STRING, s,
 	if (same_string_p(s, phase)) return TRUE,
 	makefile_active_phases(current_makefile));
 
@@ -95,8 +93,7 @@ active_phase_p(string phase)
 }
 
 
-void 
-fprint_activated(FILE *fd)
+void fprint_activated(FILE *fd)
 {
     makefile m = parse_makefile();
     MAP(STRING, s, fprintf(fd, "%s\n", s), makefile_active_phases(m));
@@ -120,7 +117,7 @@ string activate(string phase)
     string status = phase;
 
     debug_on("PIPSMAKE_DEBUG_LEVEL");
-    debug(1, "activate", "%s - requested\n", phase);
+    pips_debug(1, "%s - requested\n", phase);
 
     pips_assert("open_module", db_get_current_workspace_name());
 
@@ -135,7 +132,7 @@ string activate(string phase)
 	if (active_phase_p(phase)) {
 	    user_warning ("activate", "Rule `%s' already active\n", phase);
 	} else if (!gen_length(rule_produced(r))) {
-	    user_error("activate", 
+	    user_error("activate",
 		       "Phase %s produces no resource\n", phase);
 	} else {
 	    /* GO: for many produced resources we loop over them
@@ -155,8 +152,8 @@ string activate(string phase)
 		    /* We do not check callers and callees
 		     * I dropped select also, just in case... FC
 		     */
-		    if ( owner_callers_p(vro) || 
-			 owner_callees_p(vro) || 
+		    if ( owner_callers_p(vro) ||
+			 owner_callees_p(vro) ||
 			 owner_select_p(vro)) {}
 		    else if (same_string_p(vrn, vrn2))
 			require_produced_rule_p = TRUE;
@@ -174,7 +171,7 @@ string activate(string phase)
 		    if (old_phase != NULL) {
 			MAPL(pa, {
 			    string s = STRING(CAR(pa));
-	    
+
 			    if (strcmp(s, old_phase) == 0) {
 				free(STRING(CAR(pa)));
 				STRING(CAR(pa)) = strdup(phase);
@@ -188,8 +185,9 @@ string activate(string phase)
 			delete_derived_resources (res);
 		    else
 			if (db_get_current_workspace_name()) {
-			    /* remove resources with the same name as res 
-			       to maintain consistency in the database */
+			    /* remove resources with the same name as
+			       res to maintain consistency in the
+			       database */
 			    db_unput_resources(vrn);
 			}
 		}
@@ -204,6 +202,43 @@ string activate(string phase)
     }
     debug_off();
     return (status);
+}
+
+/* Choose the right combination of activate and setproperty for a
+   given language.
+
+   This is not really compatible with the litterate programming of
+   pipsmake-rc.tex, where this information should be encoded.
+ */
+void activate_language(language l)
+{
+  if(language_fortran_p(l)) {
+    /* Usual properties for Fortran */
+    set_bool_property("PRETTYPRINT_C_CODE", FALSE);
+    set_bool_property("PRETTYPRINT_STATEMENT_NUMBER", TRUE);
+    set_bool_property("FOR_TO_WHILE_LOOP_IN_CONTROLIZER", FALSE);
+    set_bool_property("FOR_TO_DO_LOOP_IN_CONTROLIZER", FALSE);
+
+    if(!active_phase_p("PARSER"))
+      activate("PARSER");
+    if(!active_phase_p("FORTRAN_SYMBOL_TABLE"))
+      activate("FORTRAN_SYMBOL_TABLE");
+  }
+  else if(language_c_p(l)) {
+    /* Usual properties for C */
+    set_bool_property("PRETTYPRINT_C_CODE", TRUE);
+    set_bool_property("PRETTYPRINT_STATEMENT_NUMBER", FALSE);
+    set_bool_property("FOR_TO_WHILE_LOOP_IN_CONTROLIZER", TRUE);
+    set_bool_property("FOR_TO_DO_LOOP_IN_CONTROLIZER", TRUE);
+
+    if(!active_phase_p("C_PARSER"))
+      activate("C_PARSER");
+    if(!active_phase_p("C_SYMBOL_TABLE"))
+      activate("C_SYMBOL_TABLE");
+  }
+  else {
+    /* The language is unknown*/
+  }
 }
 
 /*
@@ -223,15 +258,13 @@ set set_of_res;
     /* put it into the set  */
     set_add_element (set_of_res, set_of_res, (char *) vrn);
 
-    debug(8, "get_more_derived_resources",
-	  "got %s\n",
-	  vrn);
-	
+    pips_debug(8, "got %s\n", vrn);
+
     /* For all active  phases*/
     MAPL(pa, {
 
 	r = find_rule_by_phase(STRING(CAR(pa)));
-	
+
 	if (rule_use_resource_produced(r) == TRUE)
 	    debug(9, "get_more_derived_resources",
 		  "Don't scan cycling phase %s\n",STRING(CAR(pa)));

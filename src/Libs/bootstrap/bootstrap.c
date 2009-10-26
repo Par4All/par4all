@@ -116,7 +116,7 @@ static void CreateLogicalUnits()
   entity ent = entity_undefined;
   entity luns = entity_undefined;
   sequence s = make_sequence(NIL);
-  code c = make_code(NIL, strdup(""), s, NIL);
+  code c = make_code(NIL, strdup(""), s, NIL, make_language_unknown());
 
   code_initializations(c) = s;
 
@@ -225,7 +225,7 @@ static entity CreateAbstractStateVariable(string pn, string vn)
   entity ent = entity_undefined;
   entity as = entity_undefined;
   sequence s = make_sequence(NIL);
-  code c = make_code(NIL, strdup(""), s, NIL);
+  code c = make_code(NIL, strdup(""), s, NIL, make_language_unknown());
 
   code_initializations(c) = s;
 

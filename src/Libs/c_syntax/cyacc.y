@@ -729,7 +729,7 @@ declaration         { discard_C_comment();}
 			    entity_storage(e) = make_storage_rom();
 			  }
 			  if (value_undefined_p(entity_initial(e)))
-			    entity_initial(e) = make_value(is_value_code,make_code(NIL,strdup(""),make_sequence(NIL),NIL));
+			    entity_initial(e) = make_value(is_value_code,make_code(NIL,strdup(""),make_sequence(NIL),NIL, make_language_c()));
 			  //pips_assert("e is a module", module_name_p(entity_module_name(e)));
 			  PushFunction(e);
 			  stack_push((char *) make_basic_logical(TRUE),FormalStack);
@@ -767,7 +767,7 @@ declaration         { discard_C_comment();}
 			    entity_storage(e) = make_storage_rom();
 			  }
 			  if (value_undefined_p(entity_initial(e)))
-			    entity_initial(e) = make_value(is_value_code,make_code(NIL,strdup(""),make_sequence(NIL),NIL));
+			    entity_initial(e) = make_value(is_value_code,make_code(NIL,strdup(""),make_sequence(NIL),NIL, make_language_c()));
 			  pips_assert("Current function entity is consistent",entity_consistent_p(e));
 			  $$ = NIL;
 			  discard_C_comment();
@@ -1867,7 +1867,7 @@ type_spec:   /* ISO 6.7.2 */
 			}
 |   TK_STRUCT id_or_typename TK_LBRACE
                         {
-			  code c = make_code(NIL,$2,sequence_undefined,NIL);
+			  code c = make_code(NIL,$2,sequence_undefined,NIL, make_language_c());
 			  stack_push((char *) c, StructNameStack);
 			}
     struct_decl_list TK_RBRACE
@@ -1886,7 +1886,7 @@ type_spec:   /* ISO 6.7.2 */
                         {
               string istr = i2a(derived_counter++);
 			  code c = make_code(NIL,strdup(concatenate(DUMMY_STRUCT_PREFIX,
-								    istr,NULL)),sequence_undefined, NIL);
+								    istr,NULL)),sequence_undefined, NIL, make_language_c());
               free(istr);
 			  stack_push((char *) c, StructNameStack);
                         }
@@ -1915,7 +1915,7 @@ type_spec:   /* ISO 6.7.2 */
 			}
 |   TK_UNION id_or_typename TK_LBRACE
                         {
-			  code c = make_code(NIL,$2,sequence_undefined, NIL);
+			  code c = make_code(NIL,$2,sequence_undefined, NIL, make_language_c());
 			  stack_push((char *) c, StructNameStack);
 			}
     struct_decl_list TK_RBRACE
@@ -1934,7 +1934,8 @@ type_spec:   /* ISO 6.7.2 */
 			  code c = make_code(NIL,
 					     strdup(concatenate(DUMMY_UNION_PREFIX,n,NULL)),
 					     sequence_undefined,
-					     NIL);
+					     NIL,
+					     make_language_c());
 			  free(n);
 			  stack_push((char *) c, StructNameStack);
                         }
@@ -2352,7 +2353,7 @@ direct_decl: /* (* ISO 6.7.5 *) */
 			       "code". If the value cannot stay
 			       undefined, it should be made
 			       unknown... */
-			    entity_initial(e) = make_value(is_value_code,make_code(NIL,strdup(""),make_sequence(NIL), NIL));
+			    entity_initial(e) = make_value(is_value_code,make_code(NIL,strdup(""),make_sequence(NIL), NIL, make_language_c()));
 			    //entity_initial(e) = make_value_unknown();
 			  }
 			  //pips_assert("e is a module", module_name_p(entity_module_name(e)));
@@ -2468,7 +2469,7 @@ direct_old_proto_decl:
                         {
 			  entity e = $1; //RenameFunctionEntity($1);
 			  if (value_undefined_p(entity_initial(e)))
-			    entity_initial($1) = make_value(is_value_code,make_code(NIL,strdup(""),make_sequence(NIL),NIL));
+			    entity_initial($1) = make_value(is_value_code,make_code(NIL,strdup(""),make_sequence(NIL),NIL, make_language_c()));
 			  //pips_assert("e is a module", module_name_p(entity_module_name(e)));
 			  PushFunction(e);
 			  stack_push((char *) make_basic_logical(TRUE),FormalStack);
@@ -2631,7 +2632,7 @@ abs_direct_decl: /* (* ISO 6.7.6. We do not support optional declarator for
                         {
 			  entity e = $1; //RenameFunctionEntity($1);
 			  if (value_undefined_p(entity_initial(e)))
-			    entity_initial(e) = make_value(is_value_code,make_code(NIL,strdup(""),make_sequence(NIL),NIL));
+			    entity_initial(e) = make_value(is_value_code,make_code(NIL,strdup(""),make_sequence(NIL),NIL, make_language_c()));
 			  //pips_assert("e is a module", module_name_p(entity_module_name($1)));
 			  PushFunction(e);
 			}

@@ -1022,7 +1022,7 @@ make_common_entity(entity c)
                 make_storage(is_storage_ram, 
                         (make_ram(get_current_module_entity(),
                                   StaticArea, 0, NIL)));
-            entity_initial(c) = make_value_code(make_code(NIL,string_undefined,make_sequence(NIL),NIL));
+	    entity_initial(c) = make_value_code(make_code(NIL,string_undefined,make_sequence(NIL),NIL, make_language_fortran()));
             AddEntityToDeclarations(c, get_current_module_entity());
         }
     }

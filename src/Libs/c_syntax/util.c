@@ -585,7 +585,7 @@ expression IdentifierToExpression(string s)
       //entity_storage(ent) = make_storage_return(ent);
       entity_storage(ent) = make_storage_rom();
       entity_type(ent) = make_type_functional(make_functional(NIL,make_type_unknown()));
-      entity_initial(ent) = make_value(is_value_code,make_code(NIL,strdup(""),make_sequence(NIL),NIL));
+      entity_initial(ent) = make_value(is_value_code,make_code(NIL,strdup(""),make_sequence(NIL),NIL, make_language_c()));
       /* This may be a call or a reference in case a functional pointer is initialized */
       exp = make_expression(make_syntax_reference(make_reference(ent,NIL)),normalized_undefined);
       /*return MakeNullaryCall(ent);*/
@@ -1311,7 +1311,7 @@ entity RenameFunctionEntity(entity oe)
     /* FI I do not understand how formal parameters could be declared before */
     if(value_undefined_p(voe) || value_unknown_p(voe))
       entity_initial(ne) = make_value(is_value_code,
-				      make_code(NIL,strdup(""), make_sequence(NIL),NIL));
+				      make_code(NIL,strdup(""), make_sequence(NIL),NIL, make_language_c()));
     else
       entity_initial(ne) = copy_value(entity_initial(oe));
     put_to_entity_type_stack_table(ne, ns);
@@ -2046,7 +2046,7 @@ void UpdateEntity(entity e, stack ContextStack, stack FormalStack, stack Functio
     //type t = entity_type(e);
     //type ut = ultimate_type(t);
     //if(type_functional(ut) && !typedef_entity_p(e))
-    //  entity_initial(e) = make_value_code(make_code(NIL, strdup(""),make_sequence(NIL),NIL));
+    //  entity_initial(e) = make_value_code(make_code(NIL, strdup(""),make_sequence(NIL),NIL, make_language_c()));
     //else
     //  entity_initial(e) = make_value_unknown();
   }

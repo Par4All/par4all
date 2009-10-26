@@ -121,7 +121,6 @@ bool open_module(string name)
     return success;
 }
 
-
 bool open_module_if_unique()
 {
     bool success = TRUE;
@@ -171,14 +170,16 @@ bool create_workspace(gen_array_t files)
 	    break;
     }
 
-    if (success)
-    {
-	(* pips_update_props_handler)();
-	name = db_get_current_workspace_name();
-	user_log("Workspace %s created and opened.\n", name);
-	success = open_module_if_unique();
-	if (success) init_processed_include_cache();
-	/* push_path(); */
+    if (success) {
+      language l = language_undefined;
+      (* pips_update_props_handler)();
+      name = db_get_current_workspace_name();
+      user_log("Workspace %s created and opened.\n", name);
+      success = open_module_if_unique();
+      if (success) init_processed_include_cache();
+      /* push_path(); */
+      l = workspace_language(files);
+      activate_language(l);
     }
     else
     {

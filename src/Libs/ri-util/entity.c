@@ -76,6 +76,7 @@ list make_unbounded_subscripts(int d)
 }
 
 
+/* The source language is not specified */
 static entity make_empty_module(string full_name,
 				type r)
 {
@@ -99,7 +100,7 @@ static entity make_empty_module(string full_name,
 	       make_functional(NIL, r)),
      MakeStorageRom(),
      make_value(is_value_code,
-		make_code(NIL, strdup(""), make_sequence(NIL),NIL)));
+		make_code(NIL, strdup(""), make_sequence(NIL),NIL, make_language_unknown())));
 
   name = module_local_name(e);
   DynamicArea = FindOrCreateEntity(name, DYNAMIC_AREA_LOCAL_NAME);
@@ -1315,6 +1316,7 @@ bool dummy_parameter_entity_p(entity p)
 }
 
 
+/* This is useful for the C language only */
 entity MakeCompilationUnitEntity(string name)
 {
   entity e = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,name);
@@ -1333,7 +1335,7 @@ entity MakeCompilationUnitEntity(string name)
 
   if(!value_undefined_p(entity_initial(e)))
     free_value(entity_initial(e));
-  entity_initial(e) = make_value(is_value_code, make_code(NIL,strdup(""), make_sequence(NIL),NIL));
+  entity_initial(e) = make_value(is_value_code, make_code(NIL,strdup(""), make_sequence(NIL),NIL, make_language_c()));
 
   return e;
 }

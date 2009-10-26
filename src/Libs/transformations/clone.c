@@ -153,7 +153,7 @@ entity build_a_clone_for(
 
     /* should fix the declarations ...*/
     entity_initial(new_fun)=make_value(is_value_code,
-            make_code(NIL, strdup(""), make_sequence(NIL),NIL));
+				       make_code(NIL, strdup(""), make_sequence(NIL),NIL, make_language_unknown()));
 
     free_statement(stat);
     free(new_name);

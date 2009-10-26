@@ -74,7 +74,8 @@ void MakeCurrentModule(entity e)
     entity_initial(e) = make_value(is_value_code,
 				   make_code(NIL,strdup(""),
 					     make_sequence(NIL),
-					     NIL));
+					     NIL,
+					     make_language_c()));
   /* code_declaration to be updated : only need formal parameters, because the others are added in
      block statement declaration ? */
   pips_debug(4,"Set current module entity %s\n",entity_user_name(e));

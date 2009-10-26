@@ -870,7 +870,7 @@ expression in \verb/symbolic/.
 \label{subsection-code}
 \index{Code}\index{Declarations}\index{Decls text}
 
-\domain{Code = declarations:entity* x decls\_text:string x initializations:sequence x externs:entity*}
+\domain{Code = declarations:entity* x decls\_text:string x initializations:sequence x externs:entity* x language}
 {}
 
 Type \texttt{code} is not used to stored module bodies. The effective
@@ -919,16 +919,19 @@ declarations.
 Member \texttt{externs} contains variables declared within the scope but
 not allocated there. They must be provided by some other module at link time.
 
-It is sometimes useful to regenerate declarations because lazy users
-include every single common in every procedure.
+It is sometimes useful to regenerate declarations because lazy Fortran
+users include every single common in every procedure.
 
-\begin{comment}
-Le sous-domaine \texttt{decls\_text} contient le texte exact de toutes les
-déclarations du module; ce texte est utilisé par défaut par le
-prettyprinter tant qu'il existe. Quand le code a été fortement
-transformé, le prettyprinter régénère des déclarations
-synthétiques.
-\end{comment}
+\subsection{Programming Languages}
+\label{subsection-programming-languages}
+\index{Fortran}
+\index{C}
+
+The source code can be written in two languages, Fortran or C.
+
+%% \domain{Language = fortran:unit + c:unit + unknown:unit }
+\domain{Language = fortran:unit + c:unit + unknown:unit }
+{}
 
 \subsection{Callees}
 \label{subsection-callees}

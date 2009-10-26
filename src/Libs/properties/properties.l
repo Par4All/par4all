@@ -120,8 +120,7 @@ FALSE			{ return(TFALSE); }
 int yywrap(void)
 { return 1;}
 
-static bool
-property_equal_p(property p1, property p2)
+static bool property_equal_p(property p1, property p2)
 {
     bool equal_p = (property_tag(p1)==property_tag(p2));
 
@@ -156,8 +155,7 @@ static string property_tag_to_string(tag t)
 
 static property get_property(string, bool);
 
-static void 
-parse_properties(void)
+static void parse_properties(void)
 {
     int tok;
     property pr = property_undefined, opr;
@@ -240,15 +238,13 @@ parse_properties(void)
     }
 }
 
-static void
-parse_properties_file(FILE * fd)
+static void parse_properties_file(FILE * fd)
 {
     yyrestart(fd);
     parse_properties();
 }
 
-static void 
-read_properties(void)
+static void read_properties(void)
 {
     if (pl != (hash_table) NULL)
     return;
@@ -272,8 +268,7 @@ read_properties(void)
     }
 }
 
-static property
-get_property(const string name, bool cool)
+static property get_property(const string name, bool cool)
 {
     property p;
     if (!pl) read_properties(); /* rather lazy... */
@@ -285,8 +280,7 @@ get_property(const string name, bool cool)
     return p;
 }
 
-bool 
-get_bool_property(const string name)
+bool get_bool_property(const string name)
 {
     property p = get_property(name, FALSE);
     if (! property_bool_p(p))
@@ -294,8 +288,7 @@ get_bool_property(const string name)
     return(property_bool(p));
 }
 
-void 
-set_bool_property(const string name, bool b)
+void set_bool_property(const string name, bool b)
 {
     property p = get_property(name, FALSE);
     if (! property_bool_p(p))
@@ -303,8 +296,7 @@ set_bool_property(const string name, bool b)
     property_bool(p) = b;
 }
 
-string 
-get_string_property(const string name)
+string get_string_property(const string name)
 {
     property p = get_property(name, FALSE);
     if (! property_string_p(p)) 
@@ -313,8 +305,7 @@ get_string_property(const string name)
 }
 
 
-string 
-get_string_property_or_ask(const string name,const char question[]) 
+string get_string_property_or_ask(const string name,const char question[]) 
 { 
     property p = get_property(name, FALSE); 
     if (! property_string_p(p)) 
@@ -326,8 +317,7 @@ get_string_property_or_ask(const string name,const char question[])
     return s; 
 }
 
-void 
-set_string_property(const string name, string s)
+void set_string_property(const string name, string s)
 {
     property p = get_property(name, FALSE);
     if (! property_string_p(p))
@@ -345,8 +335,7 @@ get_int_property(const string name)
     return property_int(p);
 }
 
-void 
-set_int_property(const string name, int i)
+void set_int_property(const string name, int i)
 {
     property p = get_property(name, FALSE);
     if (! property_int_p(p)) 
@@ -376,8 +365,7 @@ void fprint_property_direct(FILE * fd, const string pname)
     
 }
 
-void 
-fprint_property(FILE * fd, const string pname)
+void fprint_property(FILE * fd, const string pname)
 {
     property p = get_property(pname, TRUE);
     if (property_undefined_p(p)) 
@@ -398,8 +386,7 @@ fprint_property(FILE * fd, const string pname)
 	}
 }
 
-void 
-fprint_properties(FILE * fd)
+void fprint_properties(FILE * fd)
 {
     if (pl) 
     { /* dump all sorted properties in fd. */
