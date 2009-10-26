@@ -176,10 +176,10 @@
 \newcommand{\PArrayDataFlowGraphView}{{Array Data Flow Graph View}}
 \newcommand{\PELSE}{{\tt ELSE}}
 \newcommand{\PGOTO}{{\tt GOTO}}
-\newcommand{\PIF}{{\tt IF}}
-\newcommand{\Pips}{\tt PIPS}
+\newcommand{\PIF}{\texttt{IF}}
+\newcommand{\Pips}{\texttt{PIPS}}
 \newcommand{\PIPS}{\LINK{\emph{PIPS}}{http://www.cri.ensmp.fr/pips}}
-\newcommand{\Pipsmake}{\tt pipsmake}
+\newcommand{\Pipsmake}{\texttt{pipsmake}}
 \newcommand{\PIPSMAKE}{\LINK{\emph{pipsmake}}{http://www.cri.ensmp.fr/pips/pipsmake.html}\xspace}
 \newcommand{\PLinear}{\emph{Linear C$^3$}}
 \newcommand{\PNEWGEN}{\LINK{\emph{NewGen}}{http://www.cri.ensmp.fr/pips/newgen-manual/newgen-manual.html}}
@@ -1196,7 +1196,7 @@ PIPS has been developed to parse correct Fortran-77 compliant programs
 only. Array ranges are used to improve readability. They can be generated
 by PIPS prettyprinter. They are not parsed as correct input by default.
 
-\begin{PipsProp}
+\begin{PipsProp}{PARSER_ACCEPT_ARRAY_RANGE_EXTENSION}
 PARSER_ACCEPT_ARRAY_RANGE_EXTENSION FALSE
 \end{PipsProp}
 
@@ -1242,7 +1242,7 @@ PARSER_LINEARIZE_LOOP_BOUNDS FALSE
 
 \subsubsection*{Entry}
 \index{ENTRY}
-index{PARSER\_SUBSTITUTE\_ENTRIES}
+\index{PARSER\_SUBSTITUTE\_ENTRIES}
 
 The entry construct can be seen as an early attempt at object-oriented
 programming. The same object can be processed by several function. The
@@ -1287,8 +1287,8 @@ To produce an executable code, the declarations must be
 regenerated: see property \PipsPropRef{PRETTYPRINT_ALL_DECLARATIONS} in
 Section~\ref{subsubsection-declarations}. This is not necessary with
 option "HRC". Fewer new declarations are needed if variable
-\PipsPropRef{PARSER_RETURN_CODE_VARIABLE} is implicitly integer because its first
-letter is in the I-N range.
+\PipsPropRef{PARSER_RETURN_CODE_VARIABLE} is implicitly integer
+because its first letter is in the I-N range.
 
 With option (2), the code can still be executed if alternate returns are
 used only for errors and if no errors occur. It can also be analyzed to
@@ -1297,10 +1297,10 @@ are more likely to be exact when exceptions and errors are ignored.
 
 Formal and actual label variables are replaced by string variables to
 preserve the parameter ordre and as much source information as possible.
-See \PipsPropRef{PARSER_FORMAL_LABEL_SUBSTITUTE_PREFIX} which is used to generate
-new variable names.
+See \PipsPropRef{PARSER_FORMAL_LABEL_SUBSTITUTE_PREFIX} which is used
+to generate new variable names.
 
-\begin{PipsProp}
+\begin{PipsProp}{PARSER_SUBSTITUTE_ALTERNATE_RETURNS}
 PARSER_SUBSTITUTE_ALTERNATE_RETURNS "NO"
 \end{PipsProp}
 \begin{PipsProp}{PARSER_RETURN_CODE_VARIABLE}
