@@ -5,6 +5,7 @@ int jacobi2(int nb, pint *a, pint *b)
    indice_i = 0;                                                        /*0004*/
    indice_j = 0;                                                        /*0005*/
 
+
 #pragma omp parallel for private(indice_j)
    for(indice_i = 1; indice_i <= nb-1-1; indice_i += 1)                 /*0007*/
 #pragma omp parallel for 
@@ -13,10 +14,10 @@ int jacobi2(int nb, pint *a, pint *b)
          
          
          
-
+         
          a[indice_i][indice_j] = (b[indice_i-1][indice_j]+b[indice_i+1][indice_j]+b[indice_i][indice_j-1]+b[indice_i][indice_j+1])/4;              /*0014*/
    
-
+   
    return 0;                                                            /*0019*/
 }
 

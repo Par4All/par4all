@@ -12,11 +12,11 @@ Privatize scalar variables
 	08 --> 11 with conflicts
 		from <TOP-LEVEL:Matrix(i)-W-MUST> to <TOP-LEVEL:Matrix(i)-R-MUST> at levels  2
 	08 --> 08 with conflicts
-		from <_MALLOC_-R-MUST> to <_MALLOC_-W-MUST> at levels  1
+		from <_MALLOC_EFFECTS:_MALLOC_-R-MUST> to <_MALLOC_EFFECTS:_MALLOC_-W-MUST> at levels  1
 	08 --> 08 with conflicts
-		from <_MALLOC_-W-MUST> to <_MALLOC_-W-MUST> at levels  1
+		from <_MALLOC_EFFECTS:_MALLOC_-W-MUST> to <_MALLOC_EFFECTS:_MALLOC_-W-MUST> at levels  1
 	08 --> 08 with conflicts
-		from <_MALLOC_-W-MUST> to <_MALLOC_-R-MUST> at levels  1
+		from <_MALLOC_EFFECTS:_MALLOC_-W-MUST> to <_MALLOC_EFFECTS:_MALLOC_-R-MUST> at levels  1
 
 ****************** End of Dependence Graph ******************
 
