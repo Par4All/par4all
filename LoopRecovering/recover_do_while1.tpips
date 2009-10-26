@@ -7,7 +7,7 @@ create recover_do_while1 recover_do_while1.c
 activate C_PARSER
 
 setproperty PRETTYPRINT_C_CODE TRUE
-#setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
 ## To investigate with weird control graphs:
 #setproperty UNSPAGHETTIFY_IN_CONTROLIZER FALSE
 

@@ -19,6 +19,7 @@ the_end:   return i;
 }
 int find_while(int i)
 {
+
 begin2:   if (i++<9) {                                                         /*0006*/
    }
    else {
@@ -27,10 +28,12 @@ begin2:   if (i++<9) {                                                         /
    
    // Just verify it works with 2 consecutive labels:
 end2:   ;
+
 begin:   if (i<9) goto l99999;                                                /*0014*/
    i = 8*i;                                                             /*0018*/
    goto begin;
 l99999:   ;
+
    i++;                                                                 /*0015*/
 
 the_end:   return i;
@@ -54,6 +57,7 @@ begin:   if (i<9)                                                             /*
       ;
 ƒUnstructured Successor -> c_4_1 c_5_1
 ‚Unstructured Item c_4_1
+
 ƒUnstructured Successor ->
 ‚Unstructured Item c_5_1
    i = 8*i;                                                             /*0018*/

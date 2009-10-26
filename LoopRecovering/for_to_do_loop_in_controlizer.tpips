@@ -8,8 +8,9 @@ create for_to_do_loop_in_controlizer for_to_do_loop.c
 activate C_PARSER
 
 setproperty PRETTYPRINT_C_CODE TRUE
-#setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
-setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER FALSE
 
 #setenv PRETTYPRINT_DEBUG_LEVEL 7
 

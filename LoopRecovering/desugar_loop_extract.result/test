@@ -2,6 +2,7 @@ int desugar_loop(int i)
 {
    int j = 0;
 l99999:   ;
+
    if (!(j<i)) goto break_1;                                            /*0009*/
    if (j>100) {                                                         /*0007*/
    }
@@ -53,6 +54,7 @@ int desugar_loop(int i)
 {
    int j = 0;
 l99999:   ;
+
    if (!(j<i)) goto break_1;                                            /*0009*/
    if (j>100) {                                                         /*0007*/
    }

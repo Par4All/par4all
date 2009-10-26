@@ -34,7 +34,8 @@ a_label_after_comment:      for (j = 2;j<100;j *= 2)
          a[j] = 2;
 
    for (i = 2;i<=50;i++)
-      /* A comment *//* Another comment */
+      /* A comment */
+      /* Another comment */
 a_label_between:      for (j = 2;j<100;j *= 2)
          a[j] = 2;
 
@@ -117,7 +118,8 @@ a_label_after_comment:      ;
 
    for(i = 2; i <= 50; i += 1) {
       // BEGIN BLOCK
-      /* A comment *//* Another comment */
+      /* A comment */
+      /* Another comment */
 a_label_between:      ;
       j = 2;
       while (j<100) {
