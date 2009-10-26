@@ -10,6 +10,7 @@ activate C_PARSER
 activate C_SYMBOL_TABLE
 
 setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
 
 display CALLGRAPH_FILE[main]
 

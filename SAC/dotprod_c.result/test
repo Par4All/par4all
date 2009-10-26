@@ -57,28 +57,20 @@ float dotprod(float b[1000000], float c[1000000])
    LU_IND0 = 0;
    for(LU_IND0 = 0; LU_IND0 <= 999999; LU_IND0 += 4) {
       //c SIMD_COMMENT_0
-
       F_0 = b[LU_IND0]*c[LU_IND0];
       //c SIMD_COMMENT_1
-
       a = a+F_0;
       //c SIMD_COMMENT_0
-
       F_0 = b[LU_IND0+1]*c[LU_IND0+1];
       //c SIMD_COMMENT_1
-
       a = a+F_0;
       //c SIMD_COMMENT_0
-
       F_0 = b[LU_IND0+2]*c[LU_IND0+2];
       //c SIMD_COMMENT_1
-
       a = a+F_0;
       //c SIMD_COMMENT_0
-
       F_0 = b[LU_IND0+3]*c[LU_IND0+3];
       //c SIMD_COMMENT_1
-
       a = a+F_0;
    }
    i = 1000000;
@@ -102,28 +94,20 @@ float dotprod(float b[1000000], float c[1000000])
    RED0[3] = 0.000000;
    for(LU_IND0 = 0; LU_IND0 <= 999999; LU_IND0 += 4) {
       //c SIMD_COMMENT_0
-
       F_0 = b[LU_IND0]*c[LU_IND0];
       //c SIMD_COMMENT_1
-
       RED0[0] = RED0[0]+F_0;
       //c SIMD_COMMENT_0
-
       F_0 = b[LU_IND0+1]*c[LU_IND0+1];
       //c SIMD_COMMENT_1
-
       RED0[1] = RED0[1]+F_0;
       //c SIMD_COMMENT_0
-
       F_0 = b[LU_IND0+2]*c[LU_IND0+2];
       //c SIMD_COMMENT_1
-
       RED0[2] = RED0[2]+F_0;
       //c SIMD_COMMENT_0
-
       F_0 = b[LU_IND0+3]*c[LU_IND0+3];
       //c SIMD_COMMENT_1
-
       RED0[3] = RED0[3]+F_0;
    }
    a = RED0[3]+RED0[2]+RED0[1]+RED0[0]+a;
@@ -152,28 +136,20 @@ float dotprod(float b[1000000], float c[1000000])
    RED0[3] = 0.000000;
    for(LU_IND0 = 0; LU_IND0 <= 999999; LU_IND0 += 4) {
       //c SIMD_COMMENT_0
-
       F_03 = b[LU_IND0]*c[LU_IND0];
       //c SIMD_COMMENT_1
-
       RED0[0] = RED0[0]+F_03;
       //c SIMD_COMMENT_0
-
       F_02 = b[LU_IND0+1]*c[LU_IND0+1];
       //c SIMD_COMMENT_1
-
       RED0[1] = RED0[1]+F_02;
       //c SIMD_COMMENT_0
-
       F_01 = b[LU_IND0+2]*c[LU_IND0+2];
       //c SIMD_COMMENT_1
-
       RED0[2] = RED0[2]+F_01;
       //c SIMD_COMMENT_0
-
       F_00 = b[LU_IND0+3]*c[LU_IND0+3];
       //c SIMD_COMMENT_1
-
       RED0[3] = RED0[3]+F_00;
    }
    a = RED0[3]+RED0[2]+RED0[1]+RED0[0]+a;

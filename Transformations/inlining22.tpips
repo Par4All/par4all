@@ -10,6 +10,7 @@ activate C_PARSER
 activate C_SYMBOL_TABLE
 
 setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
 setproperty PREPROCESSOR_MISSING_FILE_HANDLING "generate"
 
 display CALLGRAPH_FILE[main]
