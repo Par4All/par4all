@@ -74,6 +74,7 @@ main()
 
 Warnings
 
+unknown[unknown] (activate) Rule `C_PARSER' already active
 INITIAL_PRECONDITION[call05] (add_or_kill_equivalenced_variables) storage return
 TRANSFORMERS_INTER_FULL[call05] (add_or_kill_equivalenced_variables) storage return
 PRINT_CODE_TRANSFORMERS[call05] (add_or_kill_equivalenced_variables) storage return

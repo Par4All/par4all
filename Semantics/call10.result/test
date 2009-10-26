@@ -121,6 +121,7 @@ main()
 
 Warnings
 
+unknown[unknown] (activate) Rule `C_PARSER' already active
 TRANSFORMERS_INTER_FULL[call10] (NormalizeExpression) expression is already normalized
 unknown[unknown] (activate) Rule `PRINT_CODE_TRANSFORMERS' already active
 TRANSFORMERS_INTER_FULL[main] (NormalizeExpression) expression is already normalized

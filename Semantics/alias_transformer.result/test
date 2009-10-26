@@ -1,4 +1,3 @@
-user warning, property PRETTYPRINT_BLOCK_IF_ONLY redefined
 user warning in tp_parse: alias_transformer: No such workspace
 Registering file alias_transformer.f
 Splitting file    ./alias_transformer.f
@@ -12,6 +11,7 @@ user warning, property PRETTYPRINT_BLOCKS redefined
 setproperty PRETTYPRINT_EMPTY_BLOCKS TRUE
 user warning, property PRETTYPRINT_EMPTY_BLOCKS redefined
 setproperty PRETTYPRINT_BLOCK_IF_ONLY TRUE
+user warning, property PRETTYPRINT_BLOCK_IF_ONLY redefined
 setproperty PRETTYPRINT_DO_LABEL_AS_COMMENT TRUE
 user warning, property PRETTYPRINT_DO_LABEL_AS_COMMENT redefined
 setproperty PRETTYPRINT_UNSTRUCTURED TRUE

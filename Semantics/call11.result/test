@@ -107,6 +107,7 @@ main()
 
 Warnings
 
+unknown[unknown] (activate) Rule `C_PARSER' already active
 unknown[unknown] (activate) Rule `PRINT_CODE_TRANSFORMERS' already active
 TRANSFORMERS_INTER_FULL[main] (call_to_transformer) Result of function "call11" ignored.
 unknown[unknown] (activate) Rule `PRINT_CODE_PRECONDITIONS' already active

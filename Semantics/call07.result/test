@@ -76,6 +76,7 @@ main()
 
 Warnings
 
+unknown[unknown] (activate) Rule `C_PARSER' already active
 INITIAL_PRECONDITION[call07] (add_or_kill_equivalenced_variables) storage return
 TRANSFORMERS_INTER_FULL[call07] (add_or_kill_equivalenced_variables) storage return
 TRANSFORMERS_INTER_FULL[call07] (NormalizeExpression) expression is already normalized

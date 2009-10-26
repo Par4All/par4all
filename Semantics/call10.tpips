@@ -6,7 +6,7 @@ create call10 call10.c
 activate C_PARSER
 
 setproperty PRETTYPRINT_C_CODE TRUE
-#setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
 
 # We want here to analyze for loops directly
 # setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
