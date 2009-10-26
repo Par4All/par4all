@@ -6,6 +6,7 @@ create comments comments.c
 activate C_PARSER
 
 setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
 
 shell cat comments.database/*/*.c|sed -e '/^# 1[^0-9][^0-9]*/d'
 

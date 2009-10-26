@@ -8,6 +8,7 @@ create ${WSPACE} ${FILE} freia.c
 shell ${PIPS_CC:-cc} -c ${FILE} -o ${WSPACE}.database/Tmp/${WSPACE}.o
 activate C_PARSER
 setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
 echo
 echo ! initial function
 echo

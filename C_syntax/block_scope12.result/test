@@ -112,5 +112,7 @@ static int block_scope12()
 
 Check warnings
 
+unknown[unknown] (activate) Rule `C_PARSER' already active
+unknown[unknown] (activate) Rule `C_SYMBOL_TABLE' already active
 C_PARSER[block_scope12!block_scope12] (simplify_C_expression) Variable "x" is probably used before it is defined
 C_PARSER[block_scope12!block_scope12] (simplify_C_expression) Variable "x" is probably used before it is defined

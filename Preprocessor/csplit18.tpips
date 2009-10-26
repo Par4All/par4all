@@ -9,6 +9,7 @@ open csplit18
 
 activate C_PARSER
 setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
 
 display PRINTED_FILE[csplit18]
 close

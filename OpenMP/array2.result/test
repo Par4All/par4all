@@ -8,18 +8,15 @@ int main()
    j = 0;                                                               /*0007*/
 
 
-
 #pragma omp parallel for 
    for(i = 0; i <= size-1; i += 1)                                      /*0009*/
       b[i] = 0;                                                         /*0010*/
-
 
 
 #pragma omp parallel for private(i)
    for(j = 0; j <= size-1; j += 1)                                      /*0013*/
       for(i = 0; i <= 99; i += 1)                                       /*0014*/
          b[j] = b[j]+i;                                                 /*0015*/
-
 
 
    for(i = 0; i <= 99; i += 1)                                          /*0019*/
@@ -38,11 +35,9 @@ int main()
    j = 0;                                                               /*0007*/
 
 
-
-#pragma omp parallel for 
+#pragma omp parallel for
    for(i = 0; i <= size-1; i += 1)                                      /*0009*/
       b[i] = 0;                                                         /*0010*/
-
 
 
 #pragma omp parallel for private(i)
@@ -51,9 +46,8 @@ int main()
          b[j] = b[j]+i;                                                 /*0015*/
 
 
-
    for(i = 0; i <= 99; i += 1)                                          /*0019*/
-#pragma omp parallel for 
+#pragma omp parallel for
       for(j = 0; j <= size-1; j += 1)                                   /*0020*/
          b[j] = b[j]+i;                                                 /*0021*/
 

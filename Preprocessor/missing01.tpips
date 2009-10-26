@@ -8,7 +8,8 @@ setproperty PRETTYPRINT_C_CODE TRUE
 create missing01 missing01.c
 
 activate C_PARSER
-# Display result of csplit, including for the compilation unit(s).
+setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
+o# Display result of csplit, including for the compilation unit(s).
 
 # No static functions in validation files using default_tpips?
 

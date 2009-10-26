@@ -6,13 +6,13 @@ Splitting file    ./multideclsinfile.database/Tmp/multideclsinfile.cpp_processed
 Workspace multideclsinfile created and opened.
 Module multideclsinfile! selected
 setproperty PRETTYPRINT_C_CODE TRUE
-user warning, property PRETTYPRINT_C_CODE redefined
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
-user warning, property PRETTYPRINT_STATEMENT_NUMBER redefined
 setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
 user warning, property PARSER_DUMP_SYMBOL_TABLE redefined
 Selecting rule: C_SYMBOL_TABLE
+user warning in activate: Rule `C_SYMBOL_TABLE' already active
 Selecting rule: C_PARSER
+user warning in activate: Rule `C_PARSER' already active
 echo
 
 echo Error duplicate variable declaration for a 

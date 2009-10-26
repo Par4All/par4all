@@ -85,7 +85,7 @@ C     Check that commons have right sizes
       CALL SUBEQUIV08                                                   0016
 
       END
-user warning in open_module: Module SUBEQUIV08 selected instead of subequiv08 which was not found
+user warning in open_module: Module "SUBEQUIV08" selected instead of "subequiv08" which was not found
 Module SUBEQUIV08 selected
 Module SUBEQUIV08 already active.
 Request: build resource PRINTED_FILE for module SUBEQUIV08.

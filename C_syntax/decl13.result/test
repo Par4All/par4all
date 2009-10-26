@@ -6,11 +6,11 @@ Splitting file    ./decl13.database/Tmp/decl13.cpp_processed.c
   Module         decl13!
 Workspace decl13 created and opened.
 Selecting rule: C_PARSER
+user warning in activate: Rule `C_PARSER' already active
 Selecting rule: C_SYMBOL_TABLE
+user warning in activate: Rule `C_SYMBOL_TABLE' already active
 setproperty PRETTYPRINT_C_CODE TRUE
-user warning, property PRETTYPRINT_C_CODE redefined
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
-user warning, property PRETTYPRINT_STATEMENT_NUMBER redefined
 echo
 
 echo Symbol table for "decl13!"

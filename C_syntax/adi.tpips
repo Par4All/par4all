@@ -4,6 +4,8 @@ create adi adi.c
 
 setproperty PRETTYPRINT_C_CODE TRUE
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER FALSE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER FALSE
 
 # Handling of one liner statements guarded by a test:
 setproperty PRETTYPRINT_BLOCK_IF_ONLY TRUE

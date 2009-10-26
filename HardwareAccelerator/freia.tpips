@@ -4,6 +4,7 @@ setproperty ABORT_ON_USER_ERROR TRUE
 shell ${PIPS_CC:-cc} -c freia.c -o freia.database/Tmp/freia.o
 activate C_PARSER
 setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
 activate PRINT_CODE
 display PRINTED_FILE[%ALLFUNC]
 activate PRINT_CODE_CUMULATED_EFFECTS

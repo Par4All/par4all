@@ -6,9 +6,11 @@ void flatten_code11(void)
 {
   int i;
 
+  /* Let's execute this loop four times! */
   for(i=0;i<4;i++) {
     static int foo = 0;
 
+    /* Let's update a static variable! */
     foo++;
 
     fprintf(stdout, "foo=%d\n", foo);

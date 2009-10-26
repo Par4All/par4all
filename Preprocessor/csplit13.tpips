@@ -12,6 +12,7 @@ create csplit13 csplit13.src/*.c
 
 activate C_PARSER
 setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
 
 display PRINTED_FILE[main]
 

@@ -4,7 +4,7 @@ Splitting file    ./parsererror.f
   Module         PARSERERROR2
   Module         PARSERERROR1
 Workspace parsererror created and opened.
-user warning in open_module: Module PARSERERROR1 selected instead of parsererror1 which was not found
+user warning in open_module: Module "PARSERERROR1" selected instead of "parsererror1" which was not found
 Module PARSERERROR1 selected
 Module PARSERERROR1 already active.
 Request: build resource PRINTED_FILE for module PARSERERROR1.
@@ -18,7 +18,7 @@ block if statement badly nested
 user warning in set_debug_stack_pointer: debug level stack is set to 2
 user warning in safe_do_something: Request aborted under pipsmake: build resource PRINTED_FILE for module PARSERERROR1.
 user error in display_a_resource: Cannot build view file PRINTED_FILE
-user warning in open_module: Module PARSERERROR2 selected instead of parsererror2 which was not found
+user warning in open_module: Module "PARSERERROR2" selected instead of "parsererror2" which was not found
 Module PARSERERROR2 selected
 Module PARSERERROR2 already active.
 Request: build resource PRINTED_FILE for module PARSERERROR2.

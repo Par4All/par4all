@@ -5,6 +5,7 @@ int main()
    if ((rand()&1)==0) goto l99999;
    
    /* The a label */
+   
 a:   printf("a\n");
    /* The b label */
    ;
@@ -30,15 +31,16 @@ int main()
 
    if ((rand()&1)==0) goto l99999;
 
-//  P(_RANDOM_EFFECTS:GEN_SEED) {i==5}
+//  P() {i==5}
 
    
    /* The a label */
+   
 a:   printf("a\n");
    /* The b label */
    ;
 
-//  P(_RANDOM_EFFECTS:GEN_SEED) {i==5}
+//  P() {i==5}
 
    /* The b label */
 b:   printf("b\n");
@@ -62,14 +64,15 @@ int main()
 
    if ((rand()&1)==0) goto b;
 
-//  P(_RANDOM_EFFECTS:GEN_SEED) {i==5}
+//  P() {i==5}
 
    
    /* The a label */
+   
 a:   printf("a\n");
    /* The b label */
 
-//  P(_RANDOM_EFFECTS:GEN_SEED) {i==5}
+//  P() {i==5}
 
    /* The b label */
 b:   printf("b\n");
