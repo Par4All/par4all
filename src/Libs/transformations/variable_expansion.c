@@ -248,6 +248,12 @@ bool variable_expansion(char *module_name)
   return scalar_expansion(module_name);
 }
 
+/** 
+ * if @a r entity is the same as  @a oni[0], repalce the entity by @a oni[1] and append the index @a oni[2]
+ * 
+ * @param r reference to check
+ * @param oni [0] old entity to be replaced by [1] with [2] additionnal index
+ */
 static void do_expand_reference(reference r, entity oni[3])
 {
     if(same_entity_p(reference_variable(r),oni[0]))
@@ -257,6 +263,12 @@ static void do_expand_reference(reference r, entity oni[3])
     }
 }
 
+/** 
+ * call do_expand_reference on each entity of @a s declarations
+ * 
+ * @param s statement to check
+ * @param oni forwarded to do_expand_reference
+ */
 static
 void do_expand_reference_in_declarations(statement s, entity oni[3])
 {
@@ -268,17 +280,6 @@ void do_expand_reference_in_declarations(statement s, entity oni[3])
     }
 }
 
-entity reduction_operator_entity(reduction_operator op)
-{
-    string opname = string_undefined;
-    switch( reduction_operator_tag(op) ) {
-        case is_reduction_operator_sum:
-            opname=PLUS_OPERATOR_NAME;break;
-        default:
-            pips_internal_error("switch to be continued :)\n");
-    }
-    return entity_intrinsic(opname);
-}
 
 /**
  * performs scalar_expansion on variables used for reductions
@@ -298,34 +299,47 @@ bool reduction_variable_expansion(char *module_name) {
         pips_user_error("label %s does not exist !\n", slabel);
     else {
         statement theloopstatement = find_loop_from_label(get_current_module_statement(),elabel);
-        loop theloop = statement_loop(theloopstatement);
-        expression loop_nbiters = range_to_expression(loop_range(theloop),range_to_nbiter);
-        dimension thedim = make_dimension(int_to_expression(0),make_op_exp(MINUS_OPERATOR_NAME,loop_nbiters,int_to_expression(1)));
-
         list reductions = reductions_list(load_cumulated_reductions(theloopstatement));
-        set new_entities = set_make(set_pointer);
-        list trailing_statements = NIL;
-        statement thenewblock = make_block_statement(NIL);
+        /* if any reduction found */
+        if(!ENDP(reductions))
+        {
+            /* convert the loop range to an expression */
+            loop theloop = statement_loop(theloopstatement);
+            expression loop_nbiters = range_to_expression(loop_range(theloop),range_to_nbiter);
+            dimension thedim = make_dimension(int_to_expression(0),make_op_exp(MINUS_OPERATOR_NAME,loop_nbiters,int_to_expression(1)));
 
+            /* used to keep track of reference <> expanded reference */
+            hash_table new_entities = hash_table_make(hash_pointer,HASH_DEFAULT_SIZE);
+            list trailing_statements = NIL;
 
-        FOREACH(REDUCTION,red,reductions) {
-            entity red_ent = reference_variable(reduction_reference(red));
-            if(!set_belong_p(new_entities,red_ent))
+            /* each reduction will be expanded into a new entity, then a loop will perform the reduction */
+            FOREACH(REDUCTION,red,reductions)
             {
-                set_add_element(new_entities,new_entities,red_ent);
-                entity new_entity = make_new_array_variable_with_prefix(
-                        "RED",
-                        get_current_module_entity(),
-                        entity_basic(red_ent),
-                        gen_append(gen_full_copy_list(variable_dimensions(type_variable(entity_type(red_ent)))),CONS(DIMENSION,copy_dimension(thedim),NIL))
-                        );
-                AddLocalEntityToDeclarations(new_entity,get_current_module_entity(),thenewblock);
-                entity oni [] = { red_ent, new_entity, loop_index(theloop) };
-                gen_context_multi_recurse(theloop,oni,
-                        reference_domain,gen_true,do_expand_reference,
-                        statement_domain,gen_true,do_expand_reference_in_declarations,
-                        NULL);
+                entity reduction_entity = reference_variable(reduction_reference(red));
+                entity new_entity = entity_undefined;
+                /* check if the reduction entity has already been processed before creating the new entity */
+                if(HASH_UNDEFINED_VALUE == (new_entity = hash_get(new_entities,reduction_entity)) )
+                {
+                    /* the new entity is expanded from the reduction entity */
+                    new_entity = make_new_array_variable_with_prefix(
+                            "RED",
+                            get_current_module_entity(),
+                            entity_basic(reduction_entity),
+                            gen_append(gen_full_copy_list(variable_dimensions(type_variable(entity_type(reduction_entity)))),CONS(DIMENSION,copy_dimension(thedim),NIL))
+                            );
+                    AddEntityToCurrentModule(new_entity);
 
+                    /* perform the expansion */
+                    entity oni [] = { reduction_entity, new_entity, loop_index(theloop) };
+                    gen_context_multi_recurse(theloop,oni,
+                            reference_domain,gen_true,do_expand_reference,
+                            statement_domain,gen_true,do_expand_reference_in_declarations,
+                            NULL);
+                    /* register the entity */
+                    hash_put(new_entities,reduction_entity,new_entity);
+                }
+
+                /* create the loop that performs the reduction */
                 instruction do_the_reduction = make_instruction_loop(
                         make_loop(
                             loop_index(theloop),
@@ -342,21 +356,21 @@ bool reduction_variable_expansion(char *module_name) {
                             make_execution_sequential(),
                             NIL)
                         );
+                /* append it */
                 trailing_statements=CONS(STATEMENT,instruction_to_statement(do_the_reduction),trailing_statements);
             }
+            pips_assert("some entity were created",!hash_table_empty_p(new_entities));
+            pips_assert("new statement were created",!ENDP(trailing_statements));
+            /* create trailing statement and appedn them */
+            statement all_trailining_statements = make_block_statement(trailing_statements);
+            insert_statement(theloopstatement,all_trailining_statements,false);
+
+            hash_table_free(new_entities);
+
+            /* commit changes */
+            module_reorder(get_current_module_statement());
+            DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, get_current_module_statement());
         }
-        set_free(new_entities);
-        if(!ENDP(trailing_statements)) {
-            trailing_statements=CONS(STATEMENT,copy_statement(theloopstatement),trailing_statements);
-            instruction_block(statement_instruction(thenewblock))=trailing_statements;
-            *theloopstatement=*thenewblock;
-        }
-
-
-
-        /* commit changes */
-        module_reorder(get_current_module_statement());
-        DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, get_current_module_statement());
     }
 
     /* postlude */

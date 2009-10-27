@@ -545,7 +545,7 @@ static void cr_unstructured_rwt(unstructured u)
     gen_free_list(ls); gen_free_list(lc);
 }
 
-static void cr_call_rwt(call c)
+static void cr_call_rwt(__attribute__((unused)) call c)
 {
     statement s = crt_stat_head();
     store_cumulated_reductions(s, copy_reductions(load_proper_reductions(s)));
@@ -622,6 +622,47 @@ bool cumulated_reductions(string module_name)
 
     debug_off();
     return TRUE;
+}
+
+/** 
+ * match a reduction operator against operator entity
+ * 
+ * @param op reduction operator
+ * 
+ * @return entity representing corresponding operator
+ */
+entity reduction_operator_entity(reduction_operator op)
+{
+    string opname = string_undefined;
+    switch( reduction_operator_tag(op) ) {
+        case is_reduction_operator_sum:
+            opname=PLUS_OPERATOR_NAME;break;
+        case is_reduction_operator_and:
+            opname=AND_OPERATOR_NAME;break;
+        case is_reduction_operator_bitwise_and:
+            opname=BITWISE_AND_OPERATOR_NAME;break;
+        case is_reduction_operator_bitwise_or:
+            opname=BITWISE_OR_OPERATOR_NAME;break;
+        case is_reduction_operator_bitwise_xor:
+            opname=BITWISE_XOR_OPERATOR_NAME;break;
+        case is_reduction_operator_csum:
+            opname=PLUS_C_OPERATOR_NAME;break;
+        case is_reduction_operator_eqv:
+            opname=EQUIV_OPERATOR_NAME;break;
+        case is_reduction_operator_max:
+            opname=MAX_OPERATOR_NAME;break;
+        case is_reduction_operator_min:
+            opname=MIN_OPERATOR_NAME;break;
+        case is_reduction_operator_neqv:
+            opname=NON_EQUIV_OPERATOR_NAME;break;
+        case is_reduction_operator_or:
+            opname=OR_OPERATOR_NAME;break;
+        case is_reduction_operator_prod:
+            opname=MULTIPLY_OPERATOR_NAME;break;
+        default:
+            pips_internal_error("unhadled case\n");
+    }
+    return entity_intrinsic(opname);
 }
 
 /* end of it!

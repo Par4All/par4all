@@ -1119,34 +1119,9 @@ void two_addresses_code_generator(statement s)
                 {
                     /* a=b+c; -> (1) a=b; (2) a=a+c; */
                     statement theassign/*1*/= make_assign_statement(copy_expression(lhs),copy_expression(rhs));
-                    statement thecall/*2*/= make_stmt_of_instr(statement_instruction(s));
+                    statement thecall/*2*/= s;
                     CAR(call_arguments(parent_call)).p=(gen_chunkp)copy_expression(lhs);
-#if 0
-
-                    if(expression_constant_p(rhs))
-                    {
-                        entity tmp = make_new_scalar_variable(get_current_module_entity(),basic_of_expression(rhs));
-                        entity_initial(tmp)=make_value_expression(copy_expression(rhs));
-                        AddLocalEntityToDeclarations(tmp,get_current_module_entity(),s);
-                        rhs=entity_to_expression(tmp);
-                    }
-                    entity tmp = make_new_scalar_variable(get_current_module_entity(),copy_basic(basic_of_expression(rhs)));
-                    AddLocalEntityToDeclarations(tmp,get_current_module_entity(),s);
-                    entity_initial(tmp)=make_value_expression(copy_expression(rhs));
-                    statement copy_lhs/*3*/ = make_assign_statement(copy_expression(lhs),copy_expression(rhs));
-                    statement copy_tmp/*4*/ = make_assign_statement(copy_expression(rhs),entity_to_expression(tmp));
-#endif
-                    instruction theblock = make_instruction_block(NIL);
-                    statement_instruction(s)=theblock;
-                    instruction_block(theblock)=make_statement_list(theassign,thecall);
-                    statement_comments(thecall)=statement_comments(s);
-                    statement_label(thecall)=statement_label(s);
-                    statement_number(thecall)=STATEMENT_NUMBER_UNDEFINED;
-
-                    statement_comments(s)=empty_comments;
-                    statement_ordering(s)=STATEMENT_ORDERING_UNDEFINED;
-                    statement_label(s)=entity_empty_label();
-                    statement_number(s)=STATEMENT_NUMBER_UNDEFINED;
+                    insert_statement(thecall,theassign,true);
                 }
             }
         }

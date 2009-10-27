@@ -89,84 +89,50 @@ void simple_atomize_error_handler()
 }
 
 /* s is inserted before the current statement. 
- * if it is a block, it is added just before the last statement of the block,
- * else a block statement is created in place of the current statement.
  */
 static void insert_before_current_statement(s)
 statement s;
 {
     statement   cs = current_statement_head();
-    instruction  i = statement_instruction(cs);
     control     cc = current_control_empty_p() ? 
-	control_undefined : current_control_head() ;
+        control_undefined : current_control_head() ;
 
     if (!control_undefined_p(cc) && control_statement(cc)==cs)
     {
-      /* it is in an unstructured, and s is to be inserted properly
-       */
-	bool seen;
-	control newc;
+        /* it is in an unstructured, and s is to be inserted properly
+        */
+        bool seen;
+        control newc;
 
-	pips_debug(8, "unstructured\n");
+        pips_debug(8, "unstructured\n");
 
-	newc = make_control(s, control_predecessors(cc), 
-			    CONS(CONTROL, cc, NIL));
-	control_predecessors(cc) = CONS(CONTROL, newc, NIL);
+        newc = make_control(s, control_predecessors(cc), 
+                CONS(CONTROL, cc, NIL));
+        control_predecessors(cc) = CONS(CONTROL, newc, NIL);
 
-	/*   update the other lists
-	 */
-	MAPL(c1,
-	 {
-	     seen=FALSE;
-	     
-	     MAPL(c2,
-	      {
-		  if (CONTROL(CAR(c2))==cc) 
-		  {
-		      CONTROL_(CAR(c2))=newc;
-		      seen=TRUE;
-		  }
-	      },
-		  control_successors(CONTROL(CAR(c1))));
+        /*   update the other lists
+        */
+        MAPL(c1,{
+            seen=FALSE;
+            MAPL(c2,{
+                if (CONTROL(CAR(c2))==cc) {
+                    CONTROL_(CAR(c2))=newc;
+                    seen=TRUE;
+                }
+            }, control_successors(CONTROL(CAR(c1))));
 
-	     assert(seen);
-	 },
-	     control_predecessors(newc));
+            assert(seen);
+        },control_predecessors(newc));
 
-	/*   new current statement, to avoid other control insertions
-	 */
-	current_statement_replace(s);
-	gen_recurse_stop(newc); 
+        /*   new current statement, to avoid other control insertions
+        */
+        current_statement_replace(s);
+        gen_recurse_stop(newc); 
     }
     else
     {
-	pips_debug(7, "statement\n");
-	
-	if (instruction_block_p(i)) {
-	  list /* of statement */ block = instruction_block(i);
-	  /* insert statement before the last one */
-	  block = gen_insert_before(s, 
-				    STATEMENT(CAR(gen_last(block))), 
-				    block);
-	}
-	else {
-	  statement_instruction(cs) =
-	    make_instruction_block(CONS(STATEMENT, s,
-				   CONS(STATEMENT,
-					make_statement(statement_label(cs), 
-						       statement_number(cs),
-						       statement_ordering(cs),
-						       statement_comments(cs),
-						       statement_instruction(cs),
-						       NIL, NULL,
-						       statement_extensions(cs)),
-					NIL)));
-	  statement_label(cs) = entity_empty_label();
-	  statement_number(cs) = STATEMENT_NUMBER_UNDEFINED;
-	  statement_ordering(cs) = STATEMENT_ORDERING_UNDEFINED;
-	  statement_comments(cs) = empty_comments;
-	  statement_extensions(cs) = empty_extensions ();
-	}
+        pips_debug(7, "statement\n");
+        insert_statement(cs,s,true);
     }
 }
 

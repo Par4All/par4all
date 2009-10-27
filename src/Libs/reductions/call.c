@@ -56,7 +56,7 @@ summary_to_proper_reference(
       lref = CONS(REFERENCE, effect_any_reference(ef), lref);
     }
 
-    gen_map(gen_free, lef);
+    gen_map((gen_iter_func_t)gen_free, lef);
     gen_free_list(lef);
     return lref;
 }
@@ -82,7 +82,7 @@ translate_reduction(call c, reduction external_red) {
     gen_free_list(reduction_dependences(red));
     reduction_dependences(red) = NIL;
 
-    gen_map(gen_free, reduction_trusted(red));
+    gen_map((gen_iter_func_t)gen_free, reduction_trusted(red));
     gen_free_list(reduction_trusted(red));
     reduction_trusted(red) = NIL;
 

@@ -155,7 +155,7 @@ void print_reduction(reduction r)
  * - printed_reductions function
  * -
  */
-static text text_reductions(entity module, int margin, statement s)
+static text text_reductions(__attribute__((unused)) entity module, __attribute__((unused)) int margin, statement s)
 {
     text t;
 

@@ -62,7 +62,7 @@ static void
 flatten_sequence(sequence sq)
 {
   list /* of statement */ nsl = NIL;
-  MAP(STATEMENT, s,
+  FOREACH(STATEMENT, s,sequence_statements(sq))
   {
     instruction i = statement_instruction(s);
     if (instruction_sequence_p(i))
@@ -76,8 +76,7 @@ flatten_sequence(sequence sq)
     {
       nsl = gen_nconc(nsl, CONS(STATEMENT, s, NIL));
     }
-  },
-      sequence_statements(sq));
+  }
   
   gen_free_list(sequence_statements(sq));
   sequence_statements(sq) = nsl;
@@ -177,15 +176,14 @@ side_effects_p(expression e)
 static bool 
 interference_on(entity var, list /* of effect */ les)
 {
-  MAP(EFFECT, ef, 
+  FOREACH(EFFECT, ef, les)
   {
       if (effect_write_p(ef) &&
 	  entity_conflict_p(var, reference_variable(effect_any_reference(ef))))
       {
 	return TRUE;
       }
-  },
-      les);
+  }
   return FALSE;
 }
 
@@ -195,10 +193,9 @@ static bool
 moveable_to(list /* of effects */ le, statement s)
 {
   list les = load_cumulated_rw_effects_list(s);
-  MAP(EFFECT, ef,
+  FOREACH(EFFECT, ef,le)
       if (interference_on(reference_variable(effect_any_reference(ef)), les))
-        return FALSE,
-      le);
+        return FALSE;
   return TRUE;
 }
 
@@ -212,20 +209,18 @@ level_of(list /* of effects */ le)
 {
   list /* of statement */ up_nesting = gen_nreverse(gen_copy_seq(nesting));
   int level = 0;
-  MAP(STATEMENT, s,
+  FOREACH(STATEMENT, s,up_nesting)
   {
       if (moveable_to(le, s))
       {
-	gen_free_list(up_nesting);
-	return level;
+          gen_free_list(up_nesting);
+          return level;
       }
       else
       {
-        level++;
+          level++;
       }
-  },
-      up_nesting);
-  
+  }
   gen_free_list(up_nesting);
   return level;
 }
@@ -315,16 +310,16 @@ entity_as_arguments(entity ent, statement stat)
 	      syntax_call_p(expression_syntax(right_side)));
   right_call = syntax_call(expression_syntax(right_side));
 
-  MAP(EXPRESSION, e,
+  FOREACH(EXPRESSION, e,call_arguments(right_call))
   {
-    syntax s = expression_syntax(e);
-    /* Argument is maybe a call to a constant */
-    if (syntax_reference_p(s) &&
-	ent == reference_variable(syntax_reference(s)))
-    {
-      return TRUE;
-    }
-  }, call_arguments(right_call));
+      syntax s = expression_syntax(e);
+      /* Argument is maybe a call to a constant */
+      if (syntax_reference_p(s) &&
+              ent == reference_variable(syntax_reference(s)))
+      {
+          return TRUE;
+      }
+  }
 
   return FALSE;
 }
@@ -414,7 +409,7 @@ insert_before_statement(statement news, statement s, bool last)
     statement sb = load_inserted(s);
     instruction i = statement_instruction(sb);
     
-    pips_assert("inserted in block", statement_block_p(sb));
+    pips_assert("inserted in block", statement_block_p(sb) && entity_empty_label_p(statement_label(sb)));
     
     /* Statements are stored in reverse order...
        this will have to be fixed latter on. see #1#.
@@ -474,29 +469,28 @@ group_expr_by_level(int nlevels, list le)
     gen_array_addto(result, i, list_undefined);
   
   /* put expressions in chunks. */
-  MAP(EXPRESSION, e,
+  FOREACH(EXPRESSION, e,le)
   {
-    int elevel = expr_level_of(e);
-    list eatlevel;
-    pips_assert("coherent level", elevel>=0 && elevel<=nlevels);
-    
-    if (side_effects_p(e))
-    {
-      elevel = nlevels;
-    }
-    
-    eatlevel = (list) gen_array_item(result, elevel);
-    if (eatlevel == list_undefined)
-    {
-      eatlevel = CONS(EXPRESSION, e, NIL);
-    }
-    else
-    {
-      eatlevel = CONS(EXPRESSION, e, eatlevel);
-    }
-    gen_array_addto(result, elevel, eatlevel);
-  },
-      le);
+      int elevel = expr_level_of(e);
+      list eatlevel;
+      pips_assert("coherent level", elevel>=0 && elevel<=nlevels);
+
+      if (side_effects_p(e))
+      {
+          elevel = nlevels;
+      }
+
+      eatlevel = (list) gen_array_item(result, elevel);
+      if (eatlevel == list_undefined)
+      {
+          eatlevel = CONS(EXPRESSION, e, NIL);
+      }
+      else
+      {
+          eatlevel = CONS(EXPRESSION, e, eatlevel);
+      }
+      gen_array_addto(result, elevel, eatlevel);
+  }
 
   for (i=0; i<=nlevels; i++)
   {
@@ -785,42 +779,42 @@ set_comment_of_statement(statement s, char *new_comment)
 static statement
 update_number_of_use(entity ent, list lst_stat, int up_down)
 {
-  MAP(STATEMENT, s,
+  FOREACH(STATEMENT, s,lst_stat)
   {
-    entity left_side = left_side_of_assign_statement(s);
-    if(ent == left_side) // s defines ent
-    {
-      if (up_down == 0)
+      entity left_side = left_side_of_assign_statement(s);
+      if(ent == left_side) // s defines ent
       {
-	return s;
-      }
+          if (up_down == 0)
+          {
+              return s;
+          }
 
-      /* First time, no value */
-      if (empty_comments_p(statement_comments(s)))
-      {
-	if (up_down == -1)
-	{
-	  pips_internal_error("Number of use of '%s' < 0 !!!\n", 
-			      entity_name(ent));
-	}
-	statement_comments(s) = strdup("1");
+          /* First time, no value */
+          if (empty_comments_p(statement_comments(s)))
+          {
+              if (up_down == -1)
+              {
+                  pips_internal_error("Number of use of '%s' < 0 !!!\n", 
+                          entity_name(ent));
+              }
+              statement_comments(s) = strdup("1");
+          }
+          /* Update old value */
+          else
+          {
+              extern string i2a(int);
+              char *new;
+              int number_use = 0;
+              char* comment = statement_comments(s);
+              sscanf((const char*)comment, "%d", &number_use);
+
+              number_use += up_down;
+              new=i2a(number_use);
+              set_comment_of_statement(s, (new));
+          }
+          return s;
       }
-      /* Update old value */
-      else
-      {
-        extern string i2a(int);
-	char *new;
-	int number_use = 0;
-	char* comment = statement_comments(s);
-	sscanf((const char*)comment, "%d", &number_use);
-	
-	number_use += up_down;
-	new=i2a(number_use);
-	set_comment_of_statement(s, (new));
-      }
-      return s;
-    }
-  }, lst_stat);
+  }
 
   return NULL;
 }
@@ -835,7 +829,7 @@ increase_number_of_use_by_1(entity ent, statement container)
     instruction i = statement_instruction(sblock);
     sequence seq;
     int step;
-    pips_assert("it is a sequence", instruction_sequence_p(i));
+    pips_assert("it is a sequence", instruction_sequence_p(i)&&entity_empty_label_p(statement_label(sblock)));
     
     seq = instruction_sequence(i);
 
@@ -859,7 +853,7 @@ increase_number_of_use_by_1(entity ent, statement container)
       if (syntax_call_p(expression_syntax(exp)))
       {
 	list args = call_arguments(syntax_call(expression_syntax(exp)));
-	MAP(EXPRESSION, arg,
+	FOREACH(EXPRESSION, arg,args)
 	{
 	  syntax syn = expression_syntax(arg);
 	  if(syntax_reference_p(syn))
@@ -867,7 +861,7 @@ increase_number_of_use_by_1(entity ent, statement container)
 	    entity en = reference_variable(syntax_reference(syn));
 	    update_number_of_use(en, sequence_statements(seq), -1);
 	  }
-	}, args);
+	}
       }
     }
   }
@@ -892,49 +886,49 @@ cse_expression_flt(expression e, list* inserted)
   }
 
   scala = reference_variable(syntax_reference(expression_syntax(e)));
-  MAP(STATEMENT, s,
+  FOREACH(STATEMENT, s,*inserted)
   {
-    entity ent = left_side_of_assign_statement(s);
-    if (scala == ent)
-    {
-      if (number_of_use_greater_1(s))
+      entity ent = left_side_of_assign_statement(s);
+      if (scala == ent)
       {
-	/* This statement is a real one. But it maybe contains a variable
-	 * temporal -> Continue remove redundant statement from this one 
-	 */
-	remove_statement_redundant(s, inserted);
+          if (number_of_use_greater_1(s))
+          {
+              /* This statement is a real one. But it maybe contains a variable
+               * temporal -> Continue remove redundant statement from this one 
+               */
+              remove_statement_redundant(s, inserted);
 
-	/* Remove its comment for pretty look: It is visited! Not do again! */
-	set_comment_of_statement(s, string_undefined);
+              /* Remove its comment for pretty look: It is visited! Not do again! */
+              set_comment_of_statement(s, string_undefined);
 
-	/* Go up */
-	return FALSE;
-      }
-      else if (string_undefined_p(statement_comments(s)))
-      {
-	/* This statement is already visited! Not do again! Go up */
-	return FALSE;
-      }
-      else
-      {
-	/* s is a redundant statement. Replace e by the right side of 
-	 * the assign statement s 
-	 */
-	expression exp = right_side_of_assign_statement(s);
-	expression_syntax(e) = expression_syntax(exp);
-	expression_syntax(exp) = NULL;
-	
-	/* Remove s from list
-	 */
-	gen_remove_once(inserted, s);
-	
-	free_statement(s);
+              /* Go up */
+              return FALSE;
+          }
+          else if (string_undefined_p(statement_comments(s)))
+          {
+              /* This statement is already visited! Not do again! Go up */
+              return FALSE;
+          }
+          else
+          {
+              /* s is a redundant statement. Replace e by the right side of 
+               * the assign statement s 
+               */
+              expression exp = right_side_of_assign_statement(s);
+              expression_syntax(e) = expression_syntax(exp);
+              expression_syntax(exp) = NULL;
 
-	/* Continue go down the new expression */
-	return TRUE;
+              /* Remove s from list
+              */
+              gen_remove_once(inserted, s);
+
+              free_statement(s);
+
+              /* Continue go down the new expression */
+              return TRUE;
+          }
       }
-    }
-  }, *inserted);
+  }
 
   /* Nothing is done! Go up */
   return FALSE;  
@@ -977,7 +971,7 @@ static void insert_rwt(statement s)
     instruction i = statement_instruction(sblock);
     sequence seq;
     
-    pips_assert("it is a sequence", instruction_sequence_p(i));
+    pips_assert("it is a sequence", instruction_sequence_p(i)&&entity_empty_label_p(statement_label(sblock)));
     
     /* Reverse list of inserted statements (#1#) */
     seq = instruction_sequence(i);
@@ -1230,10 +1224,9 @@ expression_in_list_p(expression e, list seen)
 static expression 
 find_equal_expression_not_in_list(expression e, list avails, list seen)
 {
-  MAP(EXPRESSION, f,
+  FOREACH(EXPRESSION, f,avails)
       if (expression_equal_p(e, f) && !expression_in_list_p(f, seen))
-        return f,
-      avails);
+        return f;
   return NULL;
 }
 
@@ -1242,12 +1235,11 @@ common_expressions(list args, list avails)
 {
   list already_seen = NIL;
 
-  MAP(EXPRESSION, e, 
+  FOREACH(EXPRESSION, e, args)
   {
     expression n = find_equal_expression_not_in_list(e, avails, already_seen);
     if (n) already_seen = CONS(EXPRESSION, n, already_seen);
-  },
-      args);
+  }
 
   return already_seen;
 }
@@ -1372,9 +1364,9 @@ best_similar_expression(expression e, int * best_quality)
   available_scalar_pt best = NULL;
   (*best_quality) = 0;
 
-  MAPL(caspt,
+  FOREACH(STRING,caspt,current_availables)
   {
-    available_scalar_pt aspt = (available_scalar_pt) STRING(CAR(caspt));
+    available_scalar_pt aspt = (available_scalar_pt) caspt;
     int quality = similarity(e, aspt);
     if (quality==MAX_SIMILARITY) 
     {
@@ -1386,7 +1378,7 @@ best_similar_expression(expression e, int * best_quality)
 	best = aspt;
 	(*best_quality) = quality;
       }
-  }, current_availables);
+  }
 
   return best;
 }
@@ -1428,14 +1420,14 @@ make_available_scalar(entity scalar, statement container, expression contents)
 static bool 
 expression_eq_in_list_p(expression e, list l, expression *f)
 {
-  MAP(EXPRESSION, et,
+  FOREACH(EXPRESSION, et,l)
   {
     if (expression_equal_p(e, et))
     {
       *f = et;
       return TRUE;
     }
-  }, l);
+  }
 
   return FALSE;
 }
@@ -1449,7 +1441,7 @@ list_diff(list l1, list l2)
   list diff = NIL, l2bis = gen_copy_seq(l2);
   expression found;
 
-  MAP(EXPRESSION, e,
+  FOREACH(EXPRESSION, e,l1)
   {
     if (expression_eq_in_list_p(e, l2bis, &found))
     {
@@ -1459,7 +1451,7 @@ list_diff(list l1, list l2)
     {
       diff = CONS(EXPRESSION, e, diff);
     }
-  }, l1);
+  }
 
   if (l2bis) gen_free_list(l2bis);
 
@@ -1834,11 +1826,11 @@ static bool seq_flt(sequence s)
    */
   top_of_w_effects = w_effects;
 
-  MAP(STATEMENT, ss,
+  FOREACH(STATEMENT, ss,sequence_statements(s))
   {
     availables = atomize_cse_this_statement_expressions(ss, availables);
 
-  }, sequence_statements(s));
+  }
 
   /* Free top_of_w_effects and availables */
   gen_full_free_list(*top_of_w_effects);

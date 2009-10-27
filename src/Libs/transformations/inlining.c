@@ -660,7 +660,10 @@ void inline_statement_crawler(statement stmt, inlining_parameters p)
     if( instruction_call_p(sti) && inline_has_inlinable_calls(inlined_module(p),sti) )
     {
         /* the gen_recurse can only handle expressions, so we turn this call into an expression */
-        sti = statement_instruction(stmt) = make_instruction_expression(call_to_expression(instruction_call(sti)));
+        sti = make_instruction_expression(call_to_expression(copy_call(instruction_call(sti))));
+    }
+    else {
+        sti = copy_instruction(sti);
     }
 
     new_statements(p)=NIL;
@@ -676,11 +679,11 @@ void inline_statement_crawler(statement stmt, inlining_parameters p)
                     new_statements(p)
                     );
         }
-        statement_instruction(stmt)=make_instruction_sequence( make_sequence( gen_nreverse(new_statements(p)) ) );
-        statement_number(stmt)=STATEMENT_NUMBER_UNDEFINED;
-        if(!empty_comments_p(statement_comments(stmt))) free(statement_comments(stmt));
-        statement_comments(stmt)=empty_comments;
+        update_statement_instruction(stmt,make_instruction_sequence( make_sequence( gen_nreverse(new_statements(p)) ) ));
         pips_assert("inlining statement generation is ok",statement_consistent_p(stmt));
+    }
+    else {
+        free_instruction(sti);
     }
 }
 
