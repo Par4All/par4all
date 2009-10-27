@@ -76,13 +76,26 @@ list make_unbounded_subscripts(int d)
 }
 
 
-/* The source language is not specified */
+/* The source language is not specified. Might not work with C because
+   of module_local_name. Also, the compilation unit is undefined.
+
+
+   It might be necessary to declare the four areas in
+   code_declarations.
+
+   See also InitAreas() and init_c_areas(), which use global variables
+   and hence cannot be used outside of the parsers. Beware of the
+   consistency between this function and those two.
+
+   See also MakeCurrentFunction(), which is part of the Fortran
+   parser.
+ */
 static entity make_empty_module(string full_name,
 				type r)
 {
   string name = string_undefined;
   entity e = gen_find_tabulated(full_name, entity_domain);
-  entity DynamicArea, StaticArea;
+  entity DynamicArea, StaticArea, StackArea, HeapArea;
 
   /* FC: added to allow reintrance in HPFC */
   if (e!=entity_undefined)
@@ -100,7 +113,8 @@ static entity make_empty_module(string full_name,
 	       make_functional(NIL, r)),
      MakeStorageRom(),
      make_value(is_value_code,
-		make_code(NIL, strdup(""), make_sequence(NIL),NIL, make_language_unknown())));
+		make_code(NIL, strdup(""), make_sequence(NIL),NIL,
+			  make_language_unknown())));
 
   name = module_local_name(e);
   DynamicArea = FindOrCreateEntity(name, DYNAMIC_AREA_LOCAL_NAME);
@@ -114,6 +128,18 @@ static entity make_empty_module(string full_name,
   entity_storage(StaticArea) = MakeStorageRom();
   entity_initial(StaticArea) = MakeValueUnknown();
   AddEntityToDeclarations(StaticArea, e);
+
+  StackArea = FindOrCreateEntity(name, STACK_AREA_LOCAL_NAME);
+  entity_type(StackArea) = make_type_area(make_area(0, NIL));
+  entity_storage(StackArea) = MakeStorageRom();
+  entity_initial(StackArea) = MakeValueUnknown();
+  AddEntityToDeclarations(StackArea, e);
+
+  HeapArea = FindOrCreateEntity(name, HEAP_AREA_LOCAL_NAME);
+  entity_type(HeapArea) = make_type_area(make_area(0, NIL));
+  entity_storage(HeapArea) = MakeStorageRom();
+  entity_initial(HeapArea) = MakeValueUnknown();
+  AddEntityToDeclarations(HeapArea, e);
 
   return(e);
 }
