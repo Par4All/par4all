@@ -143,7 +143,7 @@ static bool list_eq_expression(list args1, list args2, bool allow_addressing)
 }
 
 /* checks if one of the expression in args depends on the loop index
- * this may be rewtitten using a gen_recurse ?
+ * this may be rewritten using a gen_recurse ?
  */
 static bool index_argument_conflict(list args, list l_reg)
 {

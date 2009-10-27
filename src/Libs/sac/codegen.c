@@ -81,11 +81,13 @@ bool simd_vector_p(expression e)
 
 entity vectorElement_vector(vectorElement ve)
 {
+    CHECK_VECTORELEMENT(ve);
     return simdStatementInfo_vectors(vectorElement_statement(ve))[vectorElement_vectorIndex(ve)];
 }
 
 int vectorElement_vectorLength(vectorElement ve)
 {
+    CHECK_VECTORELEMENT(ve);
     return opcode_vectorSize(simdStatementInfo_opcode(vectorElement_statement(ve)));
 }
 
@@ -991,21 +993,26 @@ statementInfo make_nonsimd_statement_info(statement s)
 
 static vectorElement make_vector_element(simdStatementInfo ssi, int i, int j)
 {
-    return make_vectorElement(ssi, i, j);
+    vectorElement ve = make_vectorElement(ssi, i, j);
+    CHECK_VECTORELEMENT(ve);
+    return ve;
 }
 
 static vectorElement copy_vector_element(vectorElement ve)
 {
-    return make_vectorElement(vectorElement_statement(ve),
+    CHECK_VECTORELEMENT(ve);
+    vectorElement vec =  make_vectorElement(vectorElement_statement(ve),
             vectorElement_vectorIndex(ve),
             vectorElement_element(ve));
+    CHECK_VECTORELEMENT(vec);
+    return vec;
 }
 
 static statementInfo make_simd_statement_info(opcodeClass kind, opcode oc, list* args)
 {
     statementInfo si;
     simdStatementInfo ssi;
-    int i, nbargs;
+    size_t nbargs;
 
     /* find out the number of arguments needed */
     nbargs = opcodeClass_nbArgs(kind);
@@ -1046,7 +1053,7 @@ static statementInfo make_simd_statement_info(opcodeClass kind, opcode oc, list*
     hash_table_free(reference_to_entity);
 
     /* Fill the matrix of arguments */
-    for(j=0; j<opcode_vectorSize(oc); j++)
+    for(int j=0; j<opcode_vectorSize(oc); j++)
     {
         argumentInfo ai;
         expression e;
@@ -1054,7 +1061,7 @@ static statementInfo make_simd_statement_info(opcodeClass kind, opcode oc, list*
 
         list l = args[j];
 
-        for(i=nbargs-1; i>=0; i--)
+        for(int i=nbargs-1; i>=0; i--)
         {
             e = EXPRESSION(CAR(l));
 
@@ -1066,7 +1073,7 @@ static statementInfo make_simd_statement_info(opcodeClass kind, opcode oc, list*
         }
 
         //Build the dependance tree
-        for(i=0; i<nbargs-1; i++)
+        for(size_t i=0; i<nbargs-1; i++)
         {
             //we read this variable
             ssa = simdStatementInfo_arguments(ssi)[j + opcode_vectorSize(oc) * i];
@@ -1099,7 +1106,7 @@ static statementInfo make_simd_statement_info(opcodeClass kind, opcode oc, list*
         gen_free_list(argumentInfo_placesAvailable(ai));
         argumentInfo_placesAvailable(ai) = 
             CONS(VECTORELEMENT,
-                    make_vector_element(ssi, i, j),
+                    make_vector_element(ssi, nbargs-1, j),
                     NIL);
     }
 
@@ -1269,7 +1276,6 @@ static statement make_shuffle_statement(entity dest, entity src, int order)
 static statement generate_load_statement(simdStatementInfo si, int line)
 {
     list args = NIL;
-    int i;
     int offset = line * opcode_vectorSize(simdStatementInfo_opcode(si));
     list sourcesCopy = NIL;
     list sourcesShuffle = NIL;
@@ -1277,6 +1283,7 @@ static statement generate_load_statement(simdStatementInfo si, int line)
     //try to see if the arguments have not already been loaded
     FOREACH(VECTORELEMENT, ve,statementArgument_dependances(simdStatementInfo_arguments(si)[offset]))
     {
+        CHECK_VECTORELEMENT(ve);
         if (vectorElement_element(ve) == 0)
             sourcesCopy = CONS(VECTORELEMENT, ve, sourcesCopy);
         /*
@@ -1289,7 +1296,7 @@ static statement generate_load_statement(simdStatementInfo si, int line)
         */
     }
 
-    for(i = 1; 
+    for(int i = 1; 
             (i<opcode_vectorSize(simdStatementInfo_opcode(si))) && 
             ((sourcesShuffle!=NIL) || (sourcesCopy!=NIL)); 
             i++)
@@ -1332,6 +1339,7 @@ static statement generate_load_statement(simdStatementInfo si, int line)
     if ((sourcesCopy != NIL) && bSameSubwordSize)
     {
         vectorElement vec = VECTORELEMENT(CAR(sourcesCopy));
+        CHECK_VECTORELEMENT(vec);
         simdStatementInfo_vectors(si)[line] = vectorElement_vector(vec);
         return statement_undefined;
     }
@@ -1339,6 +1347,7 @@ static statement generate_load_statement(simdStatementInfo si, int line)
     else if ((sourcesShuffle != NIL) && bSameSubwordSize)
     {
         vectorElement ve = VECTORELEMENT(CAR(sourcesShuffle));
+        CHECK_VECTORELEMENT(ve);
         return make_shuffle_statement(simdStatementInfo_vectors(si)[line],
                 vectorElement_vector(ve),
                 vectorElement_element(ve));
@@ -1347,7 +1356,7 @@ static statement generate_load_statement(simdStatementInfo si, int line)
     else
     {
         //Build the arguments list
-        for(i = opcode_vectorSize(simdStatementInfo_opcode(si))-1; 
+        for(int i = opcode_vectorSize(simdStatementInfo_opcode(si))-1; 
                 i >= 0; 
                 i--)
         {

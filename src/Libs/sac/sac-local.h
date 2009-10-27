@@ -75,6 +75,11 @@ list expression_to_proper_effects(expression e);
 #define STATEMENT_INFO_NEWGEN_DOMAIN SIMDSTATEMENTINFO_NEWGEN_DOMAIN
 #define gen_STATEMENT_INFO_cons gen_SIMDSTATEMENTINFO_cons
 
+
+#define CHECK_VECTORELEMENT(ve) do {\
+    pips_assert("vector Index seems legal",vectorElement_vectorIndex(ve) >= 0 && vectorElement_vectorIndex(ve) < simdStatementInfo_nbArgs(vectorElement_statement(ve)));\
+    } while(0)
+
 /* simd_loop_unroll.c */
 
 #define SIMD_COMMENT "SIMD_COMMENT_"
