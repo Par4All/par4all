@@ -185,20 +185,20 @@ c 20   PRINT *, 'bef'
       DO 99998 LU_IND0 = 0, 999, 4
 c SIMD_COMMENT_0
          F_0 = SA*SX(LU_IND0+1)
-         SY(LU_IND0+1) = SY(LU_IND0+1)+F_0                              0046
 c SIMD_COMMENT_1
+         SY(LU_IND0+1) = SY(LU_IND0+1)+F_0                              0046
 c SIMD_COMMENT_0
          F_0 = SA*SX(LU_IND0+2)
-         SY(LU_IND0+2) = SY(LU_IND0+2)+F_0                              0046
 c SIMD_COMMENT_1
+         SY(LU_IND0+2) = SY(LU_IND0+2)+F_0                              0046
 c SIMD_COMMENT_0
          F_0 = SA*SX(LU_IND0+3)
-         SY(LU_IND0+3) = SY(LU_IND0+3)+F_0                              0046
 c SIMD_COMMENT_1
+         SY(LU_IND0+3) = SY(LU_IND0+3)+F_0                              0046
 c SIMD_COMMENT_0
          F_0 = SA*SX(LU_IND0+4)
-         SY(LU_IND0+4) = SY(LU_IND0+4)+F_0                              0046
 c SIMD_COMMENT_1
+         SY(LU_IND0+4) = SY(LU_IND0+4)+F_0                              0046
 99998    CONTINUE
       I = 1001
 c      PRINT *, 'aft'
@@ -232,20 +232,20 @@ c 20   PRINT *, 'bef'
       DO 99998 LU_IND0 = 0, 999, 4
 c SIMD_COMMENT_0
          F_0 = SA*SX(LU_IND0+1)
-         SY(LU_IND0+1) = SY(LU_IND0+1)+F_0                              0046
 c SIMD_COMMENT_1
+         SY(LU_IND0+1) = SY(LU_IND0+1)+F_0                              0046
 c SIMD_COMMENT_0
          F_0 = SA*SX(LU_IND0+2)
-         SY(LU_IND0+2) = SY(LU_IND0+2)+F_0                              0046
 c SIMD_COMMENT_1
+         SY(LU_IND0+2) = SY(LU_IND0+2)+F_0                              0046
 c SIMD_COMMENT_0
          F_0 = SA*SX(LU_IND0+3)
-         SY(LU_IND0+3) = SY(LU_IND0+3)+F_0                              0046
 c SIMD_COMMENT_1
+         SY(LU_IND0+3) = SY(LU_IND0+3)+F_0                              0046
 c SIMD_COMMENT_0
          F_0 = SA*SX(LU_IND0+4)
-         SY(LU_IND0+4) = SY(LU_IND0+4)+F_0                              0046
 c SIMD_COMMENT_1
+         SY(LU_IND0+4) = SY(LU_IND0+4)+F_0                              0046
 99998    CONTINUE
       I = 1001
 c      PRINT *, 'aft'
@@ -280,20 +280,20 @@ c 20   PRINT *, 'bef'
       DO 99998 LU_IND0 = 0, 999, 4
 c SIMD_COMMENT_0
          F_03 = SA*SX(LU_IND0+1)
-         SY(LU_IND0+1) = SY(LU_IND0+1)+F_03                             0046
 c SIMD_COMMENT_1
+         SY(LU_IND0+1) = SY(LU_IND0+1)+F_03                             0046
 c SIMD_COMMENT_0
          F_02 = SA*SX(LU_IND0+2)
-         SY(LU_IND0+2) = SY(LU_IND0+2)+F_02                             0046
 c SIMD_COMMENT_1
+         SY(LU_IND0+2) = SY(LU_IND0+2)+F_02                             0046
 c SIMD_COMMENT_0
          F_01 = SA*SX(LU_IND0+3)
-         SY(LU_IND0+3) = SY(LU_IND0+3)+F_01                             0046
 c SIMD_COMMENT_1
+         SY(LU_IND0+3) = SY(LU_IND0+3)+F_01                             0046
 c SIMD_COMMENT_0
          F_00 = SA*SX(LU_IND0+4)
+c SIMD_COMMENT_1
          SY(LU_IND0+4) = SY(LU_IND0+4)+F_00                             0046
-c SIMD_COMMENT_1
 99998    CONTINUE
       I = 1001
 c      PRINT *, 'aft'
@@ -303,10 +303,10 @@ c      PRINT *, 'aft'
       PARAMETER (SIZE = 1000)
       INTEGER LU_IND1, LU_IB1, LU_NUB1, LU_IND0, LU_IB0, LU_NUB0, I, 
      &INCX, INCY, IX, IY, M, MP1
-      REAL*4 v4sf_vec8(0:3), v4sf_vec7(0:3), v4sf_vec6(0:3), 
-     &v4sf_vec5(0:3), v4sf_vec4(0:3), v4sf_vec3(0:3), v4sf_vec2(0:3)
-     &, v4sf_vec1(0:3), v4sf_vec0(0:3), F_03, F_02, F_01, F_00, F_1, 
-     &F_0, SX(1:SIZE), SY(1:SIZE), SA
+      REAL*4 v4sf_vec7(0:3), v4sf_vec6(0:3), v4sf_vec5(0:3), 
+     &v4sf_vec4(0:3), v4sf_vec3(0:3), v4sf_vec2(0:3), v4sf_vec1(0:3)
+     &, v4sf_vec0(0:3), F_03, F_02, F_01, F_00, F_1, F_0, SX(1:SIZE)
+     &, SY(1:SIZE), SA
 
       SA = 3                                                            0017
       INCX = 1                                                          0018
@@ -328,15 +328,14 @@ c 20   PRINT *, 'bef'
       LU_IND0 = 0
 99999 CONTINUE
       DO 99998 LU_IND0 = 0, 999, 4
-         CALL SIMD_LOAD_V4SF(v4sf_vec3, SX(LU_IND0+1))
-         CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec4, SA, SA, SA, SA)
-         CALL SIMD_MULPS(v4sf_vec5, v4sf_vec4, v4sf_vec3)
-         CALL SIMD_SAVE_GENERIC_V4SF(v4sf_vec5, F_03, F_02, F_01, 
+         CALL SIMD_LOAD_V4SF(v4sf_vec2, SX(LU_IND0+1))
+         CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec1, SA, SA, SA, SA)
+         CALL SIMD_MULPS(v4sf_vec0, v4sf_vec1, v4sf_vec2)
+         CALL SIMD_SAVE_GENERIC_V4SF(v4sf_vec0, F_03, F_02, F_01, 
      &   F_00)
-         CALL SIMD_LOAD_V4SF(v4sf_vec7, SY(LU_IND0+1))
-         CALL SIMD_ADDPS(v4sf_vec8, v4sf_vec7, v4sf_vec5)
-         CALL SIMD_SAVE_V4SF(v4sf_vec8, SY(LU_IND0+1))
-c SIMD_COMMENT_1
+         CALL SIMD_LOAD_V4SF(v4sf_vec3, SY(LU_IND0+1))
+         CALL SIMD_ADDPS(v4sf_vec3, v4sf_vec3, v4sf_vec0)
+         CALL SIMD_SAVE_V4SF(v4sf_vec3, SY(LU_IND0+1))
 99998    CONTINUE
       I = 1001
 c      PRINT *, 'aft'
@@ -346,10 +345,10 @@ c      PRINT *, 'aft'
       PARAMETER (SIZE = 1000)
       INTEGER LU_IND1, LU_IB1, LU_NUB1, LU_IND0, LU_IB0, LU_NUB0, I, 
      &INCX, INCY, IX, IY, M, MP1
-      REAL*4 v4sf_vec8(0:3), v4sf_vec7(0:3), v4sf_vec6(0:3), 
-     &v4sf_vec5(0:3), v4sf_vec4(0:3), v4sf_vec3(0:3), v4sf_vec2(0:3)
-     &, v4sf_vec1(0:3), v4sf_vec0(0:3), F_03, F_02, F_01, F_00, F_1, 
-     &F_0, SX(1:SIZE), SY(1:SIZE), SA
+      REAL*4 v4sf_vec7(0:3), v4sf_vec6(0:3), v4sf_vec5(0:3), 
+     &v4sf_vec4(0:3), v4sf_vec3(0:3), v4sf_vec2(0:3), v4sf_vec1(0:3)
+     &, v4sf_vec0(0:3), F_03, F_02, F_01, F_00, F_1, F_0, SX(1:SIZE)
+     &, SY(1:SIZE), SA
 
       SA = 3                                                            0017
       INCX = 1                                                          0018
@@ -370,16 +369,15 @@ c 20   PRINT *, 'bef'
       LU_IB0 = 0
       LU_IND0 = 0
 99999 CONTINUE
-      CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec4, SA, SA, SA, SA)
+      CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec1, SA, SA, SA, SA)
       DO 99998 LU_IND0 = 0, 999, 4
-         CALL SIMD_LOAD_V4SF(v4sf_vec3, SX(LU_IND0+1))
-         CALL SIMD_MULPS(v4sf_vec5, v4sf_vec4, v4sf_vec3)
-         CALL SIMD_LOAD_V4SF(v4sf_vec7, SY(LU_IND0+1))
-         CALL SIMD_ADDPS(v4sf_vec8, v4sf_vec7, v4sf_vec5)
-         CALL SIMD_SAVE_V4SF(v4sf_vec8, SY(LU_IND0+1))
-c SIMD_COMMENT_1
+         CALL SIMD_LOAD_V4SF(v4sf_vec2, SX(LU_IND0+1))
+         CALL SIMD_MULPS(v4sf_vec0, v4sf_vec1, v4sf_vec2)
+         CALL SIMD_LOAD_V4SF(v4sf_vec3, SY(LU_IND0+1))
+         CALL SIMD_ADDPS(v4sf_vec3, v4sf_vec3, v4sf_vec0)
+         CALL SIMD_SAVE_V4SF(v4sf_vec3, SY(LU_IND0+1))
 99998    CONTINUE
-      CALL SIMD_SAVE_GENERIC_V4SF(v4sf_vec5, F_03, F_02, F_01, F_00)
+      CALL SIMD_SAVE_GENERIC_V4SF(v4sf_vec0, F_03, F_02, F_01, F_00)
       I = 1001
 c      PRINT *, 'aft'
       END
@@ -387,9 +385,9 @@ c      PRINT *, 'aft'
       REAL*4 SIZE
       PARAMETER (SIZE = 1000)
       INTEGER LU_IND0, LU_IB0, LU_NUB0, I, INCX, INCY
-      REAL*4 v4sf_vec8(0:3), v4sf_vec7(0:3), v4sf_vec5(0:3), 
-     &v4sf_vec4(0:3), v4sf_vec3(0:3), F_03, F_02, F_01, F_00, SX(1:
-     &SIZE), SY(1:SIZE), SA
+      REAL*4 v4sf_vec3(0:3), v4sf_vec2(0:3), v4sf_vec1(0:3), 
+     &v4sf_vec0(0:3), F_03, F_02, F_01, F_00, SX(1:SIZE), SY(1:SIZE)
+     &, SA
 
       SA = 3                                                            0017
       INCX = 1                                                          0018
@@ -410,16 +408,15 @@ c 20   PRINT *, 'bef'
       LU_IB0 = 0
       LU_IND0 = 0
 99999 CONTINUE
-      CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec4, SA, SA, SA, SA)
+      CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec1, SA, SA, SA, SA)
       DO 99998 LU_IND0 = 0, 999, 4
-         CALL SIMD_LOAD_V4SF(v4sf_vec3, SX(LU_IND0+1))
-         CALL SIMD_MULPS(v4sf_vec5, v4sf_vec4, v4sf_vec3)
-         CALL SIMD_LOAD_V4SF(v4sf_vec7, SY(LU_IND0+1))
-         CALL SIMD_ADDPS(v4sf_vec8, v4sf_vec7, v4sf_vec5)
-         CALL SIMD_SAVE_V4SF(v4sf_vec8, SY(LU_IND0+1))
-c SIMD_COMMENT_1
+         CALL SIMD_LOAD_V4SF(v4sf_vec2, SX(LU_IND0+1))
+         CALL SIMD_MULPS(v4sf_vec0, v4sf_vec1, v4sf_vec2)
+         CALL SIMD_LOAD_V4SF(v4sf_vec3, SY(LU_IND0+1))
+         CALL SIMD_ADDPS(v4sf_vec3, v4sf_vec3, v4sf_vec0)
+         CALL SIMD_SAVE_V4SF(v4sf_vec3, SY(LU_IND0+1))
 99998    CONTINUE
-      CALL SIMD_SAVE_GENERIC_V4SF(v4sf_vec5, F_03, F_02, F_01, F_00)
+      CALL SIMD_SAVE_GENERIC_V4SF(v4sf_vec0, F_03, F_02, F_01, F_00)
       I = 1001
 c      PRINT *, 'aft'
       END
@@ -497,11 +494,10 @@ nsucc = 0
 void
 saxpy (float sx[1000], float sy[1000])
 {
-  float v4sf_vec8[4];
-  float v4sf_vec7[4];
-  float v4sf_vec5[4];
-  float v4sf_vec4[4];
   float v4sf_vec3[4];
+  float v4sf_vec2[4];
+  float v4sf_vec1[4];
+  float v4sf_vec0[4];
   float f_03;
   float f_02;
   float f_01;
@@ -525,17 +521,17 @@ saxpy (float sx[1000], float sy[1000])
   lu_ib0 = 0;
   lu_ind0 = 0;
   ;
-  simd_load_generic_v4sf (v4sf_vec4, sa, sa, sa, sa);
+  simd_load_generic_v4sf (v4sf_vec1, sa, sa, sa, sa);
   for (lu_ind0 = 0; lu_ind0 <= 999; lu_ind0 += 4)
     {
-      simd_load_v4sf (v4sf_vec3, sx[lu_ind0 + 1]);
-      simd_mulps (v4sf_vec5, v4sf_vec4, v4sf_vec3);
-      simd_load_v4sf (v4sf_vec7, sy[lu_ind0 + 1]);
-      simd_addps (v4sf_vec8, v4sf_vec7, v4sf_vec5);
-      simd_save_v4sf (v4sf_vec8, sy[lu_ind0 + 1]);
+      simd_load_v4sf (v4sf_vec2, sx[(lu_ind0 + 1) - 1]);
+      simd_mulps (v4sf_vec0, v4sf_vec1, v4sf_vec2);
+      simd_load_v4sf (v4sf_vec3, sy[(lu_ind0 + 1) - 1]);
+      simd_addps (v4sf_vec3, v4sf_vec3, v4sf_vec0);
+      simd_save_v4sf (v4sf_vec3, sy[(lu_ind0 + 1) - 1]);
       continue;
     }
-  simd_save_generic_v4sf (v4sf_vec5, f_03, f_02, f_01, f_00);
+  simd_save_generic_v4sf (v4sf_vec0, f_03, f_02, f_01, f_00);
   i = 1001;
   ;
   return;

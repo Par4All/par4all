@@ -70,28 +70,36 @@ c      INCLUDE 'ALPHABLENDING_INC2.f'
       DO 99998 LU_IND0 = 0, 49999, 4
 c SIMD_COMMENT_0
          F_0 = ALPHA*SRC(LU_IND0+1)
-         F_1 = 1-ALPHA
-         F_2 = F_1*DEST(LU_IND0+1)
-         RESULT(LU_IND0+1) = F_0+F_2                                    0016
 c SIMD_COMMENT_1
+         F_1 = 1-ALPHA
+c SIMD_COMMENT_2
+         F_2 = F_1*DEST(LU_IND0+1)
+c SIMD_COMMENT_3
+         RESULT(LU_IND0+1) = F_0+F_2                                    0016
 c SIMD_COMMENT_0
          F_0 = ALPHA*SRC(LU_IND0+2)
-         F_1 = 1-ALPHA
-         F_2 = F_1*DEST(LU_IND0+2)
-         RESULT(LU_IND0+2) = F_0+F_2                                    0016
 c SIMD_COMMENT_1
+         F_1 = 1-ALPHA
+c SIMD_COMMENT_2
+         F_2 = F_1*DEST(LU_IND0+2)
+c SIMD_COMMENT_3
+         RESULT(LU_IND0+2) = F_0+F_2                                    0016
 c SIMD_COMMENT_0
          F_0 = ALPHA*SRC(LU_IND0+3)
-         F_1 = 1-ALPHA
-         F_2 = F_1*DEST(LU_IND0+3)
-         RESULT(LU_IND0+3) = F_0+F_2                                    0016
 c SIMD_COMMENT_1
+         F_1 = 1-ALPHA
+c SIMD_COMMENT_2
+         F_2 = F_1*DEST(LU_IND0+3)
+c SIMD_COMMENT_3
+         RESULT(LU_IND0+3) = F_0+F_2                                    0016
 c SIMD_COMMENT_0
          F_0 = ALPHA*SRC(LU_IND0+4)
-         F_1 = 1-ALPHA
-         F_2 = F_1*DEST(LU_IND0+4)
-         RESULT(LU_IND0+4) = F_0+F_2                                    0016
 c SIMD_COMMENT_1
+         F_1 = 1-ALPHA
+c SIMD_COMMENT_2
+         F_2 = F_1*DEST(LU_IND0+4)
+c SIMD_COMMENT_3
+         RESULT(LU_IND0+4) = F_0+F_2                                    0016
 99998    CONTINUE
       I = 50001
 
@@ -112,28 +120,36 @@ c      INCLUDE 'ALPHABLENDING_INC2.f'
       DO 99998 LU_IND0 = 0, 49999, 4
 c SIMD_COMMENT_0
          F_0 = ALPHA*SRC(LU_IND0+1)
-         F_1 = 1-ALPHA
-         F_2 = F_1*DEST(LU_IND0+1)
-         RESULT(LU_IND0+1) = F_0+F_2                                    0016
 c SIMD_COMMENT_1
+         F_1 = 1-ALPHA
+c SIMD_COMMENT_2
+         F_2 = F_1*DEST(LU_IND0+1)
+c SIMD_COMMENT_3
+         RESULT(LU_IND0+1) = F_0+F_2                                    0016
 c SIMD_COMMENT_0
          F_0 = ALPHA*SRC(LU_IND0+2)
-         F_1 = 1-ALPHA
-         F_2 = F_1*DEST(LU_IND0+2)
-         RESULT(LU_IND0+2) = F_0+F_2                                    0016
 c SIMD_COMMENT_1
+         F_1 = 1-ALPHA
+c SIMD_COMMENT_2
+         F_2 = F_1*DEST(LU_IND0+2)
+c SIMD_COMMENT_3
+         RESULT(LU_IND0+2) = F_0+F_2                                    0016
 c SIMD_COMMENT_0
          F_0 = ALPHA*SRC(LU_IND0+3)
-         F_1 = 1-ALPHA
-         F_2 = F_1*DEST(LU_IND0+3)
-         RESULT(LU_IND0+3) = F_0+F_2                                    0016
 c SIMD_COMMENT_1
+         F_1 = 1-ALPHA
+c SIMD_COMMENT_2
+         F_2 = F_1*DEST(LU_IND0+3)
+c SIMD_COMMENT_3
+         RESULT(LU_IND0+3) = F_0+F_2                                    0016
 c SIMD_COMMENT_0
          F_0 = ALPHA*SRC(LU_IND0+4)
-         F_1 = 1-ALPHA
-         F_2 = F_1*DEST(LU_IND0+4)
-         RESULT(LU_IND0+4) = F_0+F_2                                    0016
 c SIMD_COMMENT_1
+         F_1 = 1-ALPHA
+c SIMD_COMMENT_2
+         F_2 = F_1*DEST(LU_IND0+4)
+c SIMD_COMMENT_3
+         RESULT(LU_IND0+4) = F_0+F_2                                    0016
 99998    CONTINUE
       I = 50001
 
@@ -155,28 +171,36 @@ c      INCLUDE 'ALPHABLENDING_INC2.f'
       DO 99998 LU_IND0 = 0, 49999, 4
 c SIMD_COMMENT_0
          F_03 = ALPHA*SRC(LU_IND0+1)
-         F_13 = 1-ALPHA
-         F_23 = F_13*DEST(LU_IND0+1)
-         RESULT(LU_IND0+1) = F_03+F_23                                  0016
 c SIMD_COMMENT_1
+         F_13 = 1-ALPHA
+c SIMD_COMMENT_2
+         F_23 = F_13*DEST(LU_IND0+1)
+c SIMD_COMMENT_3
+         RESULT(LU_IND0+1) = F_03+F_23                                  0016
 c SIMD_COMMENT_0
          F_02 = ALPHA*SRC(LU_IND0+2)
-         F_12 = 1-ALPHA
-         F_22 = F_12*DEST(LU_IND0+2)
-         RESULT(LU_IND0+2) = F_02+F_22                                  0016
 c SIMD_COMMENT_1
+         F_12 = 1-ALPHA
+c SIMD_COMMENT_2
+         F_22 = F_12*DEST(LU_IND0+2)
+c SIMD_COMMENT_3
+         RESULT(LU_IND0+2) = F_02+F_22                                  0016
 c SIMD_COMMENT_0
          F_01 = ALPHA*SRC(LU_IND0+3)
-         F_11 = 1-ALPHA
-         F_21 = F_11*DEST(LU_IND0+3)
-         RESULT(LU_IND0+3) = F_01+F_21                                  0016
 c SIMD_COMMENT_1
+         F_11 = 1-ALPHA
+c SIMD_COMMENT_2
+         F_21 = F_11*DEST(LU_IND0+3)
+c SIMD_COMMENT_3
+         RESULT(LU_IND0+3) = F_01+F_21                                  0016
 c SIMD_COMMENT_0
          F_00 = ALPHA*SRC(LU_IND0+4)
+c SIMD_COMMENT_1
          F_10 = 1-ALPHA
+c SIMD_COMMENT_2
          F_20 = F_10*DEST(LU_IND0+4)
+c SIMD_COMMENT_3
          RESULT(LU_IND0+4) = F_00+F_20                                  0016
-c SIMD_COMMENT_1
 99998    CONTINUE
       I = 50001
 
@@ -185,13 +209,14 @@ c SIMD_COMMENT_1
       INTEGER*4 SIZE
       PARAMETER (SIZE = 50000)
       INTEGER LU_IND0, LU_IB0, LU_NUB0, I
-      REAL*4 v4sf_vec14(0:3), v4sf_vec13(0:3), v4sf_vec12(0:3), 
-     &v4sf_vec11(0:3), v4sf_vec10(0:3), v4sf_vec9(0:3), v4sf_vec8(0:3
-     &), v4sf_vec7(0:3), v4sf_vec6(0:3), v4sf_vec5(0:3), v4sf_vec4(0:
-     &3), v4sf_vec3(0:3), v4sf_vec2(0:3), v4sf_vec1(0:3), v4sf_vec0(0
-     &:3), F_03, F_13, F_23, F_02, F_12, F_22, F_01, F_11, F_21, F_00
-     &, F_10, F_20, F_2, F_1, F_0, RESULT(1:SIZE), SRC(1:SIZE), DEST(
-     &1:SIZE), ALPHA
+      REAL*4 v4sf_vec20(0:3), v4sf_vec19(0:3), v4sf_vec18(0:3), 
+     &v4sf_vec17(0:3), v4sf_vec16(0:3), v4sf_vec15(0:3), v4sf_vec14(0
+     &:3), v4sf_vec13(0:3), v4sf_vec12(0:3), v4sf_vec11(0:3), 
+     &v4sf_vec10(0:3), v4sf_vec9(0:3), v4sf_vec8(0:3), v4sf_vec7(0:3)
+     &, v4sf_vec6(0:3), v4sf_vec5(0:3), v4sf_vec4(0:3), v4sf_vec3(0:3
+     &), v4sf_vec2(0:3), v4sf_vec1(0:3), v4sf_vec0(0:3), F_03, F_13, 
+     &F_23, F_02, F_12, F_22, F_01, F_11, F_21, F_00, F_10, F_20, F_2
+     &, F_1, F_0, RESULT(1:SIZE), SRC(1:SIZE), DEST(1:SIZE), ALPHA
 
 c      INCLUDE 'ALPHABLENDING_INC2.f'
 
@@ -200,23 +225,22 @@ c      INCLUDE 'ALPHABLENDING_INC2.f'
       LU_IND0 = 0
 99999 CONTINUE
       DO 99998 LU_IND0 = 0, 49999, 4
-         CALL SIMD_LOAD_V4SF(v4sf_vec3, SRC(LU_IND0+1))
-         CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec4, ALPHA, ALPHA, ALPHA, 
+         CALL SIMD_LOAD_V4SF(v4sf_vec2, SRC(LU_IND0+1))
+         CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec1, ALPHA, ALPHA, ALPHA, 
      &   ALPHA)
-         CALL SIMD_MULPS(v4sf_vec5, v4sf_vec4, v4sf_vec3)
-         CALL SIMD_SAVE_GENERIC_V4SF(v4sf_vec5, F_03, F_02, F_01, 
+         CALL SIMD_MULPS(v4sf_vec0, v4sf_vec1, v4sf_vec2)
+         CALL SIMD_SAVE_GENERIC_V4SF(v4sf_vec0, F_03, F_02, F_01, 
      &   F_00)
-         CALL SIMD_LOAD_CONSTANT_V4SF(v4sf_vec7, 1, 1, 1, 1)
-         CALL SIMD_SUBPS(v4sf_vec8, v4sf_vec7, v4sf_vec4)
-         CALL SIMD_SAVE_GENERIC_V4SF(v4sf_vec8, F_13, F_12, F_11, 
+         CALL SIMD_LOAD_CONSTANT_V4SF(v4sf_vec4, 1, 1, 1, 1)
+         CALL SIMD_SUBPS(v4sf_vec3, v4sf_vec4, v4sf_vec1)
+         CALL SIMD_SAVE_GENERIC_V4SF(v4sf_vec3, F_13, F_12, F_11, 
      &   F_10)
-         CALL SIMD_LOAD_V4SF(v4sf_vec9, DEST(LU_IND0+1))
-         CALL SIMD_MULPS(v4sf_vec11, v4sf_vec8, v4sf_vec9)
-         CALL SIMD_SAVE_GENERIC_V4SF(v4sf_vec11, F_23, F_22, F_21, 
+         CALL SIMD_LOAD_V4SF(v4sf_vec8, DEST(LU_IND0+1))
+         CALL SIMD_MULPS(v4sf_vec6, v4sf_vec3, v4sf_vec8)
+         CALL SIMD_SAVE_GENERIC_V4SF(v4sf_vec6, F_23, F_22, F_21, 
      &   F_20)
-         CALL SIMD_ADDPS(v4sf_vec14, v4sf_vec5, v4sf_vec11)
-         CALL SIMD_SAVE_V4SF(v4sf_vec14, RESULT(LU_IND0+1))
-c SIMD_COMMENT_1
+         CALL SIMD_ADDPS(v4sf_vec9, v4sf_vec0, v4sf_vec6)
+         CALL SIMD_SAVE_V4SF(v4sf_vec9, RESULT(LU_IND0+1))
 99998    CONTINUE
       I = 50001
 
@@ -225,13 +249,14 @@ c SIMD_COMMENT_1
       INTEGER*4 SIZE
       PARAMETER (SIZE = 50000)
       INTEGER LU_IND0, LU_IB0, LU_NUB0, I
-      REAL*4 v4sf_vec14(0:3), v4sf_vec13(0:3), v4sf_vec12(0:3), 
-     &v4sf_vec11(0:3), v4sf_vec10(0:3), v4sf_vec9(0:3), v4sf_vec8(0:3
-     &), v4sf_vec7(0:3), v4sf_vec6(0:3), v4sf_vec5(0:3), v4sf_vec4(0:
-     &3), v4sf_vec3(0:3), v4sf_vec2(0:3), v4sf_vec1(0:3), v4sf_vec0(0
-     &:3), F_03, F_13, F_23, F_02, F_12, F_22, F_01, F_11, F_21, F_00
-     &, F_10, F_20, F_2, F_1, F_0, RESULT(1:SIZE), SRC(1:SIZE), DEST(
-     &1:SIZE), ALPHA
+      REAL*4 v4sf_vec20(0:3), v4sf_vec19(0:3), v4sf_vec18(0:3), 
+     &v4sf_vec17(0:3), v4sf_vec16(0:3), v4sf_vec15(0:3), v4sf_vec14(0
+     &:3), v4sf_vec13(0:3), v4sf_vec12(0:3), v4sf_vec11(0:3), 
+     &v4sf_vec10(0:3), v4sf_vec9(0:3), v4sf_vec8(0:3), v4sf_vec7(0:3)
+     &, v4sf_vec6(0:3), v4sf_vec5(0:3), v4sf_vec4(0:3), v4sf_vec3(0:3
+     &), v4sf_vec2(0:3), v4sf_vec1(0:3), v4sf_vec0(0:3), F_03, F_13, 
+     &F_23, F_02, F_12, F_22, F_01, F_11, F_21, F_00, F_10, F_20, F_2
+     &, F_1, F_0, RESULT(1:SIZE), SRC(1:SIZE), DEST(1:SIZE), ALPHA
 
 c      INCLUDE 'ALPHABLENDING_INC2.f'
 
@@ -239,22 +264,21 @@ c      INCLUDE 'ALPHABLENDING_INC2.f'
       LU_IB0 = 0
       LU_IND0 = 0
 99999 CONTINUE
-      CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec4, ALPHA, ALPHA, ALPHA, 
+      CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec1, ALPHA, ALPHA, ALPHA, 
      &ALPHA)
-      CALL SIMD_LOAD_CONSTANT_V4SF(v4sf_vec7, 1, 1, 1, 1)
+      CALL SIMD_LOAD_CONSTANT_V4SF(v4sf_vec4, 1, 1, 1, 1)
       DO 99998 LU_IND0 = 0, 49999, 4
-         CALL SIMD_LOAD_V4SF(v4sf_vec3, SRC(LU_IND0+1))
-         CALL SIMD_MULPS(v4sf_vec5, v4sf_vec4, v4sf_vec3)
-         CALL SIMD_SUBPS(v4sf_vec8, v4sf_vec7, v4sf_vec4)
-         CALL SIMD_LOAD_V4SF(v4sf_vec9, DEST(LU_IND0+1))
-         CALL SIMD_MULPS(v4sf_vec11, v4sf_vec8, v4sf_vec9)
-         CALL SIMD_ADDPS(v4sf_vec14, v4sf_vec5, v4sf_vec11)
-         CALL SIMD_SAVE_V4SF(v4sf_vec14, RESULT(LU_IND0+1))
-c SIMD_COMMENT_1
+         CALL SIMD_LOAD_V4SF(v4sf_vec2, SRC(LU_IND0+1))
+         CALL SIMD_MULPS(v4sf_vec0, v4sf_vec1, v4sf_vec2)
+         CALL SIMD_SUBPS(v4sf_vec3, v4sf_vec4, v4sf_vec1)
+         CALL SIMD_LOAD_V4SF(v4sf_vec8, DEST(LU_IND0+1))
+         CALL SIMD_MULPS(v4sf_vec6, v4sf_vec3, v4sf_vec8)
+         CALL SIMD_ADDPS(v4sf_vec9, v4sf_vec0, v4sf_vec6)
+         CALL SIMD_SAVE_V4SF(v4sf_vec9, RESULT(LU_IND0+1))
 99998    CONTINUE
-      CALL SIMD_SAVE_GENERIC_V4SF(v4sf_vec5, F_03, F_02, F_01, F_00)
-      CALL SIMD_SAVE_GENERIC_V4SF(v4sf_vec8, F_13, F_12, F_11, F_10)
-      CALL SIMD_SAVE_GENERIC_V4SF(v4sf_vec11, F_23, F_22, F_21, F_20)
+      CALL SIMD_SAVE_GENERIC_V4SF(v4sf_vec0, F_03, F_02, F_01, F_00)
+      CALL SIMD_SAVE_GENERIC_V4SF(v4sf_vec3, F_13, F_12, F_11, F_10)
+      CALL SIMD_SAVE_GENERIC_V4SF(v4sf_vec6, F_23, F_22, F_21, F_20)
       I = 50001
 
       END
@@ -262,9 +286,9 @@ c SIMD_COMMENT_1
       INTEGER*4 SIZE
       PARAMETER (SIZE = 50000)
       INTEGER LU_IND0, LU_IB0, LU_NUB0, I
-      REAL*4 v4sf_vec14(0:3), v4sf_vec11(0:3), v4sf_vec9(0:3), 
-     &v4sf_vec8(0:3), v4sf_vec7(0:3), v4sf_vec5(0:3), v4sf_vec4(0:3)
-     &, v4sf_vec3(0:3), F_03, F_13, F_23, F_02, F_12, F_22, F_01, 
+      REAL*4 v4sf_vec9(0:3), v4sf_vec8(0:3), v4sf_vec6(0:3), 
+     &v4sf_vec4(0:3), v4sf_vec3(0:3), v4sf_vec2(0:3), v4sf_vec1(0:3)
+     &, v4sf_vec0(0:3), F_03, F_13, F_23, F_02, F_12, F_22, F_01, 
      &F_11, F_21, F_00, F_10, F_20, RESULT(1:SIZE), SRC(1:SIZE), DEST
      &(1:SIZE), ALPHA
 
@@ -274,22 +298,21 @@ c      INCLUDE 'ALPHABLENDING_INC2.f'
       LU_IB0 = 0
       LU_IND0 = 0
 99999 CONTINUE
-      CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec4, ALPHA, ALPHA, ALPHA, 
+      CALL SIMD_LOAD_GENERIC_V4SF(v4sf_vec1, ALPHA, ALPHA, ALPHA, 
      &ALPHA)
-      CALL SIMD_LOAD_CONSTANT_V4SF(v4sf_vec7, 1, 1, 1, 1)
+      CALL SIMD_LOAD_CONSTANT_V4SF(v4sf_vec4, 1, 1, 1, 1)
       DO 99998 LU_IND0 = 0, 49999, 4
-         CALL SIMD_LOAD_V4SF(v4sf_vec3, SRC(LU_IND0+1))
-         CALL SIMD_MULPS(v4sf_vec5, v4sf_vec4, v4sf_vec3)
-         CALL SIMD_SUBPS(v4sf_vec8, v4sf_vec7, v4sf_vec4)
-         CALL SIMD_LOAD_V4SF(v4sf_vec9, DEST(LU_IND0+1))
-         CALL SIMD_MULPS(v4sf_vec11, v4sf_vec8, v4sf_vec9)
-         CALL SIMD_ADDPS(v4sf_vec14, v4sf_vec5, v4sf_vec11)
-         CALL SIMD_SAVE_V4SF(v4sf_vec14, RESULT(LU_IND0+1))
-c SIMD_COMMENT_1
+         CALL SIMD_LOAD_V4SF(v4sf_vec2, SRC(LU_IND0+1))
+         CALL SIMD_MULPS(v4sf_vec0, v4sf_vec1, v4sf_vec2)
+         CALL SIMD_SUBPS(v4sf_vec3, v4sf_vec4, v4sf_vec1)
+         CALL SIMD_LOAD_V4SF(v4sf_vec8, DEST(LU_IND0+1))
+         CALL SIMD_MULPS(v4sf_vec6, v4sf_vec3, v4sf_vec8)
+         CALL SIMD_ADDPS(v4sf_vec9, v4sf_vec0, v4sf_vec6)
+         CALL SIMD_SAVE_V4SF(v4sf_vec9, RESULT(LU_IND0+1))
 99998    CONTINUE
-      CALL SIMD_SAVE_GENERIC_V4SF(v4sf_vec5, F_03, F_02, F_01, F_00)
-      CALL SIMD_SAVE_GENERIC_V4SF(v4sf_vec8, F_13, F_12, F_11, F_10)
-      CALL SIMD_SAVE_GENERIC_V4SF(v4sf_vec11, F_23, F_22, F_21, F_20)
+      CALL SIMD_SAVE_GENERIC_V4SF(v4sf_vec0, F_03, F_02, F_01, F_00)
+      CALL SIMD_SAVE_GENERIC_V4SF(v4sf_vec3, F_13, F_12, F_11, F_10)
+      CALL SIMD_SAVE_GENERIC_V4SF(v4sf_vec6, F_23, F_22, F_21, F_20)
       I = 50001
 
       END
@@ -300,14 +323,14 @@ void
 alphablending (float result[50000], float src[50000], float dest[50000],
 	       float alpha)
 {
-  float v4sf_vec14[4];
-  float v4sf_vec11[4];
   float v4sf_vec9[4];
   float v4sf_vec8[4];
-  float v4sf_vec7[4];
-  float v4sf_vec5[4];
+  float v4sf_vec6[4];
   float v4sf_vec4[4];
   float v4sf_vec3[4];
+  float v4sf_vec2[4];
+  float v4sf_vec1[4];
+  float v4sf_vec0[4];
   float f_03;
   float f_13;
   float f_23;
@@ -329,22 +352,22 @@ alphablending (float result[50000], float src[50000], float dest[50000],
   lu_ib0 = 0;
   lu_ind0 = 0;
   ;
-  simd_load_generic_v4sf (v4sf_vec4, alpha, alpha, alpha, alpha);
-  simd_load_constant_v4sf (v4sf_vec7, 1, 1, 1, 1);
+  simd_load_generic_v4sf (v4sf_vec1, alpha, alpha, alpha, alpha);
+  simd_load_constant_v4sf (v4sf_vec4, 1, 1, 1, 1);
   for (lu_ind0 = 0; lu_ind0 <= 49999; lu_ind0 += 4)
     {
-      simd_load_v4sf (v4sf_vec3, src[lu_ind0 + 1]);
-      simd_mulps (v4sf_vec5, v4sf_vec4, v4sf_vec3);
-      simd_subps (v4sf_vec8, v4sf_vec7, v4sf_vec4);
-      simd_load_v4sf (v4sf_vec9, dest[lu_ind0 + 1]);
-      simd_mulps (v4sf_vec11, v4sf_vec8, v4sf_vec9);
-      simd_addps (v4sf_vec14, v4sf_vec5, v4sf_vec11);
-      simd_save_v4sf (v4sf_vec14, result[lu_ind0 + 1]);
+      simd_load_v4sf (v4sf_vec2, src[(lu_ind0 + 1) - 1]);
+      simd_mulps (v4sf_vec0, v4sf_vec1, v4sf_vec2);
+      simd_subps (v4sf_vec3, v4sf_vec4, v4sf_vec1);
+      simd_load_v4sf (v4sf_vec8, dest[(lu_ind0 + 1) - 1]);
+      simd_mulps (v4sf_vec6, v4sf_vec3, v4sf_vec8);
+      simd_addps (v4sf_vec9, v4sf_vec0, v4sf_vec6);
+      simd_save_v4sf (v4sf_vec9, result[(lu_ind0 + 1) - 1]);
       continue;
     }
-  simd_save_generic_v4sf (v4sf_vec5, f_03, f_02, f_01, f_00);
-  simd_save_generic_v4sf (v4sf_vec8, f_13, f_12, f_11, f_10);
-  simd_save_generic_v4sf (v4sf_vec11, f_23, f_22, f_21, f_20);
+  simd_save_generic_v4sf (v4sf_vec0, f_03, f_02, f_01, f_00);
+  simd_save_generic_v4sf (v4sf_vec3, f_13, f_12, f_11, f_10);
+  simd_save_generic_v4sf (v4sf_vec6, f_23, f_22, f_21, f_20);
   i = 50001;
   return;
 }
