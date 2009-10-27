@@ -1,0 +1,44 @@
+delete remove02
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create remove02 remove02.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
+
+module main
+
+echo
+echo Initial code
+echo
+
+activate PRINT_CODE_CUMULATED_REDUCTIONS
+display PRINTED_FILE
+
+echo
+echo after removing reductions
+echo
+
+setproperty LOOP_LABEL "l0"
+apply REDUCTION_VARIABLE_EXPANSION
+setproperty LOOP_LABEL "l1"
+apply REDUCTION_VARIABLE_EXPANSION
+activate PRINT_CODE
+display PRINTED_FILE
+
+echo
+echo Unsplit resulting code
+echo
+
+apply UNSPLIT
+shell gcc -c remove02.database/Src/remove02.c  -o remove02.database/Src/v.o
+shell rm -rf remove02.database/Src/v.o
+
+close
+delete remove02
+quit
+
+

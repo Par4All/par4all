@@ -43,23 +43,28 @@ void flgr2d_arith_add_fgINT32(FLGR_Data2D *datdest, FLGR_Data2D *data1, FLGR_Dat
          int length = P_0->length*spp;
          for(j = 0; j <= length-1; j += 1) {                            /*0029*/
             /*0026*/
-            _return3 = psrc1[j];                                        /*0030*/
-            _return0 = _return3;                                        /*0033*/
-            v1 = _return0;                                              /*0034*/
-            /*0030*/
-            _return4 = psrc2[j];                                        /*0035*/
-            _return1 = _return4;                                        /*0038*/
-            v2 = _return1;                                              /*0039*/
-            /*0034*/
-            _return2 = v1+v2;                                           /*0040*/
-            /*0035*/
-            result = _return2;                                          /*0041*/
+            /*0022*/
+            /*0069*/
+            _return3 = psrc1[j];                                        /*0032*/
+            _return0 = _return3;                                        /*0035*/
+            v1 = _return0;                                              /*0036*/
+            /*0031*/
+            /*0070*/
+            _return4 = psrc2[j];                                        /*0038*/
+            _return1 = _return4;                                        /*0041*/
+            v2 = _return1;                                              /*0042*/
+            /*0036*/
+            /*0071*/
+            _return2 = v1+v2;                                           /*0044*/
             /*0038*/
-            pdest[j] = result;                                          /*0042*/
+            result = _return2;                                          /*0045*/
+            /*0041*/
+            /*0072*/
+            pdest[j] = result;                                          /*0047*/
             /*0034*/
          }
       }
       i++, pdest++, p1++, p2++;
    }
-   return;                                                              /*0049*/
+   return;                                                              /*0054*/
 }
