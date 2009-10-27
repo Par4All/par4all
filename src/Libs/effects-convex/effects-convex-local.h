@@ -91,6 +91,7 @@ ifdebug(1){region_consistent_p(reg);}
 
 #define PHI_PREFIX "PHI"
 #define PSI_PREFIX "PSI"
+#define RHO_PREFIX "RHO"
 #define BETA_PREFIX "BETA"
 #define PROPER TRUE
 #define SUMMARY FALSE
@@ -112,6 +113,11 @@ ifdebug(1){region_consistent_p(reg);}
   ((e)!=(entity)NULL && (e)!=entity_undefined && \
     strncmp(entity_name(e), REGIONS_MODULE_NAME, 10)==0 && \
     strstr(entity_name(e), PSI_PREFIX) != NULL)
+
+#define variable_rho_p(e) \
+  ((e)!=(entity)NULL && (e)!=entity_undefined && \
+    strncmp(entity_name(e), REGIONS_MODULE_NAME, 10)==0 && \
+    strstr(entity_name(e), RHO_PREFIX) != NULL)
 
 #define variable_beta_p(e)\
   ((e)!=(entity)NULL && (e)!=entity_undefined && \

@@ -667,7 +667,37 @@ void region_remove_psi_variables(region reg)
 }
 
 
-/* void region_remove_beta_variables(effect reg, int beta_max)
+/* void region_remove_rho_variables(effect reg, int phi_max)
+ * input    : a PHI region in which rho variables must be eliminated.
+ * output   : nothing.
+ * modifies : reg
+ * comment  : if an overflow error occurs, the region becomes a MAY region..
+ */
+void region_remove_rho_variables(region reg)
+{
+    list
+	l_rho = NIL,
+	l_reg = CONS(EFFECT,reg,NIL);
+    
+    ifdebug(8)
+    {
+	pips_debug(8, "region : \n ");
+	print_region(reg);
+    }
+    
+    l_rho = rho_entities_list(1,NB_MAX_ARRAY_DIM);    
+    project_regions_along_variables(l_reg, l_rho);
+    gen_free_list(l_reg);    
+
+    ifdebug(8)
+    {
+	pips_debug(8, "final region : \n ");
+	print_region(reg);
+    }
+}
+
+
+/* void region_remove_variables(effect reg, int beta_max)
  * input    : a PSI region in which beta variables must be eliminated.
  * output   : nothing.
  * modifies : reg

@@ -680,28 +680,33 @@ list c_convex_effects_on_formal_parameter_backward_translation(list l_sum_eff,
 			  
 			  /* preparing the system of n_eff */
 			  entity phi_max_n_eff = make_phi_entity(nb_phi_n_eff);
-			  entity psi_max_n_eff = make_psi_entity(nb_phi_n_eff);
+			  entity rho_max_n_eff = make_rho_entity(nb_phi_n_eff);
 			  
-			  sc_n_eff = sc_variable_rename(sc_n_eff, (Variable) phi_max_n_eff, (Variable) psi_max_n_eff);
+			  sc_n_eff = sc_variable_rename(sc_n_eff, (Variable) phi_max_n_eff, (Variable) rho_max_n_eff);
 			  region_system(n_eff) = sc_n_eff;
+
+			  pips_debug_effect(8, "n_eff after variable renaming: \n", n_eff);
 			  
 			  /* then we append sc_init to sc_n_eff
 			   */
 			  region_sc_append_and_normalize(n_eff, sc_init, TRUE);
 			  
-			  /* then we add the constraint phi_max_n_eff = psi1 + psi_max_n_eff 
-			     and we eliminate psi1 and psi_max_n_eff
+			  pips_debug_effect(8, "n_eff after appending sc_init: \n", n_eff);
+			  
+			  /* then we add the constraint phi_max_n_eff = psi1 + rho_max_n_eff 
+			     and we eliminate psi1 and rho_max_n_eff
 			  */
 			  Pvecteur v_phi_max_n_eff = vect_new((Variable) phi_max_n_eff, VALUE_ONE);
 			  Pvecteur v_psi1 = vect_new((Variable) psi1, VALUE_ONE);
-			  Pvecteur v_psi_max_n_eff = vect_new((Variable) psi_max_n_eff, VALUE_ONE);
+			  Pvecteur v_rho_max_n_eff = vect_new((Variable) rho_max_n_eff, VALUE_ONE);
 			  sc_n_eff = region_system(n_eff);
 			  v_phi_max_n_eff = vect_substract(v_phi_max_n_eff, v_psi1);
-			  v_phi_max_n_eff = vect_substract(v_phi_max_n_eff, v_psi_max_n_eff);
+			  v_phi_max_n_eff = vect_substract(v_phi_max_n_eff, v_rho_max_n_eff);
 			  sc_constraint_add(sc_n_eff, contrainte_make(v_phi_max_n_eff), TRUE);
 			  region_system(n_eff) = sc_n_eff;
 			  			  
 			  region_remove_psi_variables(n_eff);
+			  region_remove_rho_variables(n_eff);
 			  
 			} /*  if (nb_phi_n_eff !=0) */
 		      else

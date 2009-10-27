@@ -148,6 +148,7 @@ list beta_entities_list(int beta_min, int beta_max)
 
 static entity phi[NB_MAX_ARRAY_DIM]; /* phi entities */
 static entity psi[NB_MAX_ARRAY_DIM]; /* psi entities */
+static entity rho[NB_MAX_ARRAY_DIM]; /* rho entities */
 
 #ifndef bool_undefined
 
@@ -2000,6 +2001,101 @@ int base_nb_psi(Pbase b)
 	if (variable_psi_p((entity) var_of(b))) n_psi++;
 
     return(n_psi);
+}
+
+/*********************************************************************************/
+/* RHO ENTITIES                                                                  */
+/*********************************************************************************/
+
+/* entity make_rho_entity(int n)
+ * input    : an integer n giving the range of the RHO entity.
+ * output   : the entity PHI_n.
+ * modifies : rho[] (eventually).
+ * comment  : finds or generates an entity representing a region descriptor
+ *            of indice n.
+ *            A region descriptor representes the value domain of one dimension
+ *            of an array, this dimension is represented by the indice.
+ *            Fortran accepts a maximum of 7 dimensions.
+ *
+ *            Once a region descriptor is created, it is stored into a static array
+ *            (rho[]); thus, each next time a region descriptor entity is needed,
+ *            it is just picked up in rho[].
+ *            If the region descriptor is not in rho[], it may be in the table
+ *            where all entities are stored, because of previous computations.
+ *            At last, if it is not found there, it is created.
+ */
+entity make_rho_entity(int n)
+{
+    pips_assert("psy index between 1 and NB_MAX_ARRAY_DIM\n", 1<=n && n<=NB_MAX_ARRAY_DIM);
+
+    /* rho indices are between 1 to NB_MAX_ARRAY_DIM. Array indices are between 0 to NB_MAX_ARRAY_DIM-1. */
+    if (rho[n-1] == entity_undefined)
+    {
+	entity v;
+	char rho_name[6];
+	char * s;
+
+	pips_assert ("n can't be more than a two digit number", n < 100);
+	pips_assert ("RHO_PREFIX lenght has been changed", strlen (RHO_PREFIX) == 3);
+
+	(void) strcpy(rho_name, RHO_PREFIX);
+	(void) sprintf(rho_name+3,"%d",n);
+	s = strdup(concatenate(REGIONS_MODULE_NAME,
+			       MODULE_SEP_STRING, rho_name, (char *) NULL));
+
+	if ((v = gen_find_tabulated(s, entity_domain)) == entity_undefined) 
+	{
+	    v = make_entity(s,
+			    make_scalar_integer_type(4),
+			    make_storage(is_storage_rom, UU),
+			    value_undefined);
+	}
+
+	rho[n-1] = v;
+    }
+    return (rho[n-1]);
+}
+
+
+list rho_entities_list(int rho_min, int rho_max)
+{
+    list l_rho = NIL;
+    int i;
+
+    for(i=rho_min; i<=rho_max; i++)
+	l_rho = gen_nconc(l_rho, CONS(ENTITY, make_rho_entity(i), NIL));
+
+    return(l_rho);
+}
+
+
+/* expression make_rho_expression(int n)
+ * input    : the range of the PHI entity to create.
+ * output   : an expression made of a PHI variable of range n;
+ * modifies : nothing.
+ */
+expression make_rho_expression(int n)
+{
+    return(make_expression(make_syntax(is_syntax_reference,
+				       make_reference(make_rho_entity(n), NIL)),
+			   normalized_undefined));
+}
+
+
+/* int base_nb_rho(Pbase b)
+ * input    : a base
+ * output   : the number of rho variables in this base.
+ * modifies : nothing.
+ * comment  :
+ */
+int base_nb_rho(Pbase b)
+{
+    int n_rho = 0;
+
+    for(; !VECTEUR_NUL_P(b); b = b->succ)
+	if (variable_rho_p((entity) var_of(b))) n_rho++;
+
+    return(n_rho);
 }
 
 /*********************************************************************************/
