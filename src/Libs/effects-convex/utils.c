@@ -165,6 +165,7 @@ void regions_init()
     {
 	phi[i] = entity_undefined;
 	psi[i] = entity_undefined;
+	rho[i] = entity_undefined;
     }
     for(i=0; i<BETA_MAX; i++)
     {
