@@ -22,7 +22,7 @@ int main()
 //               <must be read   >: x
 //               <must be written>: x[0]
    
-
+   
    foo(x);                                                              /*0027*/
 //               <must be written>: tab[0]
    foo(tab);                                                            /*0028*/
@@ -38,5 +38,143 @@ int main()
    foo(&y);                                                             /*0032*/
 //               <must be written>: tab[1]
    foo(&tab[1]);                                                        /*0033*/
-   return 1;                                                            /*0034*/
+//               <must be read   >: __IO_EFFECTS:LUNS[1] x x[0]
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+
+   printf("%d\n", *x);                                                  /*0035*/
+//               <must be read   >: __IO_EFFECTS:LUNS[1] tab[0]
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+   printf("%d\n", tab[0]);                                              /*0036*/
+//               <must be read   >: __IO_EFFECTS:LUNS[1] tab2[4] 
+//                                  tab2[4][0]
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+   printf("%d\n", tab2[4][0]);                                          /*0037*/
+//               <must be read   >: __IO_EFFECTS:LUNS[1] tab3[5][0]
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+   printf("%d\n", tab3[5][0]);                                          /*0038*/
+//               <must be read   >: __IO_EFFECTS:LUNS[1] tab4 tab4[6] 
+//                                  tab4[6][0]
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+   printf("%d\n", tab4[6][0]);                                          /*0039*/
+//               <must be read   >: __IO_EFFECTS:LUNS[1] y
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+   printf("%d\n", y);                                                   /*0040*/
+//               <must be read   >: __IO_EFFECTS:LUNS[1] tab[1]
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+   printf("%d\n", tab[1]);                                              /*0041*/
+   return 1;                                                            /*0042*/
+}
+
+Regions for "foo"
+
+
+//  <p-R-EXACT-{}>
+//  <p[PHI1]-W-EXACT-{PHI1==0}>
+
+void foo(int *p)
+{
+
+//  <p-R-EXACT-{}>
+//  <p[PHI1]-W-EXACT-{PHI1==0}>
+
+   *p = 4;                                                              /*0004*/
+   return;                                                              /*0005*/
+}
+
+Regions for "main"
+
+
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+
+int main()
+{
+   int *x;
+   int tab[10];
+   int *tab2[10];
+   int tab3[10][10];
+   int **tab4;
+   int y;
+
+//  <x-R-EXACT-{}>
+//  <x[PHI1]-W-EXACT-{PHI1==0}>
+
+   
+   
+   foo(x);                                                              /*0027*/
+
+//  <tab[PHI1]-W-EXACT-{PHI1==0}>
+
+   foo(tab);                                                            /*0028*/
+
+//  <tab2[PHI1]-R-EXACT-{PHI1==4}>
+//  <tab2[PHI1][PHI2]-W-EXACT-{PHI1==4, PHI2==0}>
+
+   foo(tab2[4]);                                                        /*0029*/
+
+//  <tab3[PHI1][PHI2]-W-EXACT-{PHI1==5, PHI2==0}>
+
+   foo(tab3[5]);                                                        /*0030*/
+
+//  <tab4-R-EXACT-{}>
+//  <tab4[PHI1]-R-EXACT-{PHI1==6}>
+//  <tab4[PHI1][PHI2]-W-EXACT-{PHI1==6, PHI2==0}>
+
+   foo(tab4[6]);                                                        /*0031*/
+
+//  <y-W-EXACT-{}>
+
+   foo(&y);                                                             /*0032*/
+
+//  <tab[PHI1]-W-EXACT-{PHI1==1}>
+
+   foo(&tab[1]);                                                        /*0033*/
+
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+//  <x[PHI1]-R-EXACT-{PHI1==0}>
+//  <x-R-EXACT-{}>
+
+
+   printf("%d\n", *x);                                                  /*0035*/
+
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+//  <tab[PHI1]-R-EXACT-{PHI1==0}>
+
+   printf("%d\n", tab[0]);                                              /*0036*/
+
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+//  <tab2[PHI1]-R-EXACT-{PHI1==4}>
+//  <tab2[PHI1][PHI2]-R-EXACT-{PHI1==4, PHI2==0}>
+
+   printf("%d\n", tab2[4][0]);                                          /*0037*/
+
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+//  <tab3[PHI1][PHI2]-R-EXACT-{PHI1==5, PHI2==0}>
+
+   printf("%d\n", tab3[5][0]);                                          /*0038*/
+
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+//  <tab4-R-EXACT-{}>
+//  <tab4[PHI1]-R-EXACT-{PHI1==6}>
+//  <tab4[PHI1][PHI2]-R-EXACT-{PHI1==6, PHI2==0}>
+
+   printf("%d\n", tab4[6][0]);                                          /*0039*/
+
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+//  <y-R-EXACT-{}>
+
+   printf("%d\n", y);                                                   /*0040*/
+
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+//  <tab[PHI1]-R-EXACT-{PHI1==1}>
+
+   printf("%d\n", tab[1]);                                              /*0041*/
+   return 1;                                                            /*0042*/
 }

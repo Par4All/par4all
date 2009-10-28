@@ -30,6 +30,36 @@ echo Proper effects for "main"
 echo
 display PRINTED_FILE[main]
 
+activate PRINT_CODE_REGIONS
+
+echo
+echo Regions for "foo"
+echo
+display PRINTED_FILE[foo]
+
+
+echo
+echo Regions for "main"
+echo
+display PRINTED_FILE[main]
+
+activate PRINT_CODE_OUT_REGIONS
+
+close
+delete inter02
+quit
+
+echo
+echo out regions for "foo"
+echo
+display PRINTED_FILE[foo]
+
+echo
+echo out regions for "main"
+echo
+display PRINTED_FILE[main]
+
+
 
 close
 delete inter02
