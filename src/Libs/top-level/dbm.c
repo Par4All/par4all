@@ -135,6 +135,16 @@ bool open_module_if_unique()
     a = db_get_module_list();
     if (gen_array_nitems(a)==1)
 	success = open_module(gen_array_item(a, 0));
+    else if (gen_array_nitems(a)==2) {
+      /* In C, you cannot have fewer than two modules because of the
+	 compilation units */
+      string mn1 = gen_array_item(a, 0);
+      string mn2 = gen_array_item(a, 1);
+      if(compilation_unit_p(mn1))
+	success = open_module(mn2);
+      else if(compilation_unit_p(mn2))
+	success = open_module(mn1);
+    }
     gen_array_full_free(a);
 
     return success;
