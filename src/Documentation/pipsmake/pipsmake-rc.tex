@@ -123,7 +123,7 @@
 \newcommand{\PipsPropRef}[1]{\texttt{\detokenize{#1}}~\ref{prop:#1}}
 \newcommand{\PipsPassRef}[1]{\texttt{\detokenize{#1}}~\ref{pass:#1}}
 %\newcommand{\PipsProp}[2]{\label{prop:#1}\texttt{\detokenize{#1}} (defaults: \texttt{\detokenize{#2}})}
-\newenvironment{PipsProp}[1]{%
+\newenvironment{PipsProp}[1][]{%
 \makeatletter%
 \ifx \@#1 \message{no label for this property} \else \label{prop:#1} \fi%
 \makeatother%
