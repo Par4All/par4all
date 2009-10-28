@@ -21,7 +21,7 @@ bool prepend_comment(char * module_name) {
   statement module_statement = PIPS_PHASE_PRELUDE(module_name,
 						  "PREPEND_COMMENT_DEBUG_LEVEL");
 
-  // Get the value of the property that content the comment to prepend
+  // Get the value of the property containing the comment to be prepended
   string comment = get_string_property("PREPEND_COMMENT");
 
   insert_comments_to_statement(module_statement, comment);

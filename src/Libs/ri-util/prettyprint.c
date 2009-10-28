@@ -3129,9 +3129,19 @@ text C_any_comment_to_text(int r_margin, string c)
     }
     // Final \n has been removed in the parser presumably by Ronan
     if(lb<cp){
-      string s = gen_strndup0(lb,le-lb);
-      ADD_SENTENCE_TO_TEXT(ct,MAKE_ONE_WORD_SENTENCE(e_margin,s));
-      free(s);
+      sentence s = sentence_undefined;
+      string sl = gen_strndup0(lb,le-lb);
+      if(is_C_comment) {
+	s = MAKE_ONE_WORD_SENTENCE(e_margin,sl);
+      }
+      else {
+	list pc = CHAIN_SWORD(NIL, sl); // sl is uselessly duplicated
+	pc = CONS(STRING, MAKE_SWORD("//"), pc);
+	s = make_sentence(is_sentence_unformatted,
+			  make_unformatted((char *) NULL, 0, e_margin, pc));	
+      }
+      ADD_SENTENCE_TO_TEXT(ct,s);
+      free(sl);
     } else{
       //ADD_SENTENCE_TO_TEXT(ct,MAKE_ONE_WORD_SENTENCE(0,""));
       ;
