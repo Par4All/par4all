@@ -1,0 +1,12 @@
+int temp;
+extern int main(void);
+int main(void)
+{
+   int i;
+   int j;
+   int c;
+   int a[100];
+   c = 2;
+   for(i = 0; i <= 99; i += 1)
+      a[i] = c*a[i]+a[i]-1;
+}
