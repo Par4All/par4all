@@ -1,0 +1,9 @@
+delete create01
+create create01 foofoo.c
+create create01.c
+create create01 create01.c
+display PRINTED_FILE
+close
+shell cat create01.database/Warnings
+# delete create01
+quit
