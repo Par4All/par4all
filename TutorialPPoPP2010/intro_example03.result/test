@@ -1,74 +1,12 @@
-int foo(int n)
-{
-   int i;
-   double t;
-   double s = 0.;
-   double a[100];
-   for(i = 0; i <= n-1; i += 1) {
-      if (i>100-1) {
-         fprintf(stderr, "Bound violation: array "a", 1st dimension, upper bound, ");
-         exit(1);
-      }
-      if (i<0) {
-         fprintf(stderr, "Bound violation: array "a", 1st dimension, lower bound, ");
-         exit(1);
-      }
-      //CHECK WAS NOT CREATED
-      t = a[i];
-      if (i<0) {
-         fprintf(stderr, "Bound violation: array "a", 1st dimension, lower bound, ");
-         exit(1);
-      }
-      if (i>100-1) {
-         fprintf(stderr, "Bound violation: array "a", 1st dimension, upper bound, ");
-         exit(1);
-      }
-      if (i+n>100-1) {
-         fprintf(stderr, "Bound violation: array "a", 1st dimension, upper bound, ");
-         exit(1);
-      }
-      if (i+n<0) {
-         fprintf(stderr, "Bound violation: array "a", 1st dimension, lower bound, ");
-         exit(1);
-      }
-      //CHECK WAS NOT CREATED
-      a[i+n] = t+(a[i]+a[i+n])/2.0;
-      if (i>100-1) {
-         fprintf(stderr, "Bound violation: array "a", 1st dimension, upper bound, ");
-         exit(1);
-      }
-      if (i<0) {
-         fprintf(stderr, "Bound violation: array "a", 1st dimension, lower bound, ");
-         exit(1);
-      }
-      //CHECK WAS NOT CREATED
-      s = s+2*a[i];
-   }
-   //CHECK WAS NOT CREATED
-   return s;
-}
-int foo(int n)
-{
-   int i;
-   double t;
-   double s = 0.;
-   double a[100];
-   for(i = 0; i <= n-1; i += 1) {
-      if (i>99) {
-         fprintf(stderr, "Bound violation: array "a", 1st dimension, upper bound, ");
-         exit(1);
-      }
-      //CHECK WAS NOT CREATED
-      t = a[i];
-      if (i+n>99) {
-         fprintf(stderr, "Bound violation: array "a", 1st dimension, upper bound, ");
-         exit(1);
-      }
-      //CHECK WAS NOT CREATED
-      a[i+n] = t+(a[i]+a[i+n])/2.0;
-      //CHECK WAS NOT CREATED
-      s = s+2*a[i];
-   }
-   //CHECK WAS NOT CREATED
-   return s;
-}
+      REAL FUNCTION SUM(N, A)
+      REAL S, A(100)
+      IF (101.LE.N) STOP 'Bound violation:, READING,  array SUM:A, upper
+     & bound, 1st dimension'
+      IF (0.LE.N) STOP 'Bound violation:, READING,  array SUM:A, lower b
+     &ound, 1st dimension'
+      S = 0.
+      DO I = 0, N
+         S = S+2.*A(I)
+      ENDDO
+      SUM = S
+      END
