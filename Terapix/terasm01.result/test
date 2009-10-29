@@ -27,8 +27,9 @@ void microcode(int i, int isi, int isj, float *image, float *kernel, float *new_
    int ki_0;
    int kj_0;
    I_17 = isj-2;
-   for (i_1_0 = i;i_1_0<=MIN(i+127, isi-2);i_1_0 += 1)
-l99994:      for (j = 1;j<=I_17;j += 1) {
+   for(i_1_0 = i; i_1_0 <= MIN(i+127, isi-2); i_1_0 += 1)
+l99994:
+      for(j = 1; j <= I_17; j += 1) {
          __scalar__0 = 0.;
          I_18 = i_1_0-1;
          I_19 = isj*I_18;
@@ -101,8 +102,9 @@ void microcode(int i, int isi, int isj, float *image, float *kernel, float *new_
    int I_7;
    int I_8;
    I_17 = isj-2;
-   for (i_1_0 = i;i_1_0<=MIN(i+127, isi-2);i_1_0 += 1)
-l99994:      for (j = 1;j<=I_17;j += 1) {
+   for(i_1_0 = i; i_1_0 <= MIN(i+127, isi-2); i_1_0 += 1)
+l99994:
+      for(j = 1; j <= I_17; j += 1) {
          __scalar__0 = 0.;
          I_18 = i_1_0-1;
          I_19 = isj*I_18;
@@ -186,67 +188,48 @@ void microcode(int i, int isi, int isj, float *image, float *kernel, float *new_
    int I_11;
    int I_12;
    int I_13;
-   int I_15;
-   int I_16;
-   int I_23;
-   int I_24;
-   int I_25;
-   int I_26;
-   int I_27;
    float *P_0;
    float *P_1;
    float F_0;
-   float F_1;
    float *P_2;
    float *P_3;
-   float F_2;
-   float F_3;
-   int I_28;
+   int I_15;
    float *P_4;
    float *P_5;
-   float F_4;
-   float F_5;
-   int I_29;
-   int I_30;
-   int I_31;
+   float F_1;
+   int I_16;
    float *P_6;
    float *P_7;
-   float F_6;
-   float F_7;
+   float F_2;
    float *P_8;
    float *P_9;
-   float F_8;
-   float F_18;
-   int I_32;
+   int I_23;
    float *P_10;
    float *P_11;
-   float F_19;
-   float F_20;
-   int I_33;
-   int I_34;
-   int I_35;
-   int I_36;
+   float F_3;
+   int I_24;
    float *P_12;
    float *P_13;
-   float F_21;
-   float F_22;
+   float F_4;
    float *P_14;
    float *P_15;
-   float F_23;
-   float F_24;
-   int I_37;
+   int I_25;
    float *P_16;
    float *P_17;
-   float F_25;
-   float F_26;
-   float F_27;
-   int I_38;
+   float F_5;
+   int I_26;
+   int I_27;
+   int I_28;
+   int I_29;
    I_17 = isj-2;
-   I_29 = isj*i_1_0;
-   for (i_1_0 = i;i_1_0<=MIN(i+127, isi-2);i_1_0 += 1)
-l99994:      for (j = 1;j<=I_17;j += 1) {
+   for(i_1_0 = i; i_1_0 <= MIN(i+127, isi-2); i_1_0 += 1) {
+l99994:      ;
+      I_27 = i_1_0-1;
+      I_28 = isj*i_1_0;
+      I_29 = i_1_0+1;
+      for(j = 1; j <= I_17; j += 1) {
          __scalar__0 = 0.;
-         I_18 = i_1_0-1;
+         I_18 = I_27;
          I_19 = isj*I_18;
          I_5 = j+I_19;
          I_0 = I_5-1;
@@ -258,7 +241,7 @@ l99994:      for (j = 1;j<=I_17;j += 1) {
          F_11 = image[I_1]*kernel[2];
          __scalar__0 = __scalar__0+F_11;
          kj_0 = 3;
-         I_20 = I_29;
+         I_20 = I_28;
          I_9 = j+I_20;
          I_2 = I_9-1;
          F_12 = image[I_2]*kernel[3];
@@ -269,7 +252,7 @@ l99994:      for (j = 1;j<=I_17;j += 1) {
          F_14 = image[I_3]*kernel[5];
          __scalar__0 = __scalar__0+F_14;
          kj_0 = 3;
-         I_21 = i_1_0+1;
+         I_21 = I_29;
          I_22 = isj*I_21;
          I_14 = j+I_22;
          I_4 = I_14-1;
@@ -283,10 +266,11 @@ l99994:      for (j = 1;j<=I_17;j += 1) {
          kj_0 = 3;
          ki_0 = 3;
          __scalar__0 = __scalar__0/9;
-         I_7 = I_29;
+         I_7 = I_20;
          I_8 = j+I_7;
          new_image[I_8] = __scalar__0;
       }
+   }
 }
 
 Code in a two adress fashion
@@ -328,70 +312,52 @@ void microcode(int i, int isi, int isj, float *image, float *kernel, float *new_
    int I_11;
    int I_12;
    int I_13;
-   int I_15;
-   int I_16;
-   int I_23;
-   int I_24;
-   int I_25;
-   int I_26;
-   int I_27;
    float *P_0;
    float *P_1;
    float F_0;
-   float F_1;
    float *P_2;
    float *P_3;
-   float F_2;
-   float F_3;
-   int I_28;
+   int I_15;
    float *P_4;
    float *P_5;
-   float F_4;
-   float F_5;
-   int I_29;
-   int I_30;
-   int I_31;
+   float F_1;
+   int I_16;
    float *P_6;
    float *P_7;
-   float F_6;
-   float F_7;
+   float F_2;
    float *P_8;
    float *P_9;
-   float F_8;
-   float F_18;
-   int I_32;
+   int I_23;
    float *P_10;
    float *P_11;
-   float F_19;
-   float F_20;
-   int I_33;
-   int I_34;
-   int I_35;
-   int I_36;
+   float F_3;
+   int I_24;
    float *P_12;
    float *P_13;
-   float F_21;
-   float F_22;
+   float F_4;
    float *P_14;
    float *P_15;
-   float F_23;
-   float F_24;
-   int I_37;
+   int I_25;
    float *P_16;
    float *P_17;
-   float F_25;
-   float F_26;
-   float F_27;
-   int I_38;
+   float F_5;
+   int I_26;
+   int I_27;
+   int I_28;
+   int I_29;
    I_17 = isj;
    I_17 = I_17-2;
-   I_29 = isj;
-   I_29 = I_29*i_1_0;
-   for (i_1_0 = i;i_1_0<=MIN(i+127, isi-2);i_1_0 += 1)
-l99994:      for (j = 1;j<=I_17;j += 1) {
+   for(i_1_0 = i; i_1_0 <= MIN(i+127, isi-2); i_1_0 += 1) {
+l99994:      ;
+      I_27 = i_1_0;
+      I_27 = I_27-1;
+      I_28 = isj;
+      I_28 = I_28*i_1_0;
+      I_29 = i_1_0;
+      I_29 = I_29+1;
+      for(j = 1; j <= I_17; j += 1) {
          __scalar__0 = 0.;
-         I_18 = i_1_0;
-         I_18 = I_18-1;
+         I_18 = I_27;
          I_19 = isj;
          I_19 = I_19*I_18;
          I_5 = j;
@@ -410,7 +376,7 @@ l99994:      for (j = 1;j<=I_17;j += 1) {
          F_11 = F_11*kernel[2];
          __scalar__0 = __scalar__0+F_11;
          kj_0 = 3;
-         I_20 = I_29;
+         I_20 = I_28;
          I_9 = j;
          I_9 = I_9+I_20;
          I_2 = I_9;
@@ -427,8 +393,7 @@ l99994:      for (j = 1;j<=I_17;j += 1) {
          F_14 = F_14*kernel[5];
          __scalar__0 = __scalar__0+F_14;
          kj_0 = 3;
-         I_21 = i_1_0;
-         I_21 = I_21+1;
+         I_21 = I_29;
          I_22 = isj;
          I_22 = I_22*I_21;
          I_14 = j;
@@ -449,11 +414,12 @@ l99994:      for (j = 1;j<=I_17;j += 1) {
          kj_0 = 3;
          ki_0 = 3;
          __scalar__0 = __scalar__0/9;
-         I_7 = I_29;
+         I_7 = I_20;
          I_8 = j;
          I_8 = I_8+I_7;
          new_image[I_8] = __scalar__0;
       }
+   }
 }
 
 Code after expression substitution
@@ -495,70 +461,52 @@ void microcode(int i, int isi, int isj, float *image, float *kernel, float *new_
    int I_11;
    int I_12;
    int I_13;
-   int I_15;
-   int I_16;
-   int I_23;
-   int I_24;
-   int I_25;
-   int I_26;
-   int I_27;
    float *P_0;
    float *P_1;
    float F_0;
-   float F_1;
    float *P_2;
    float *P_3;
-   float F_2;
-   float F_3;
-   int I_28;
+   int I_15;
    float *P_4;
    float *P_5;
-   float F_4;
-   float F_5;
-   int I_29;
-   int I_30;
-   int I_31;
+   float F_1;
+   int I_16;
    float *P_6;
    float *P_7;
-   float F_6;
-   float F_7;
+   float F_2;
    float *P_8;
    float *P_9;
-   float F_8;
-   float F_18;
-   int I_32;
+   int I_23;
    float *P_10;
    float *P_11;
-   float F_19;
-   float F_20;
-   int I_33;
-   int I_34;
-   int I_35;
-   int I_36;
+   float F_3;
+   int I_24;
    float *P_12;
    float *P_13;
-   float F_21;
-   float F_22;
+   float F_4;
    float *P_14;
    float *P_15;
-   float F_23;
-   float F_24;
-   int I_37;
+   int I_25;
    float *P_16;
    float *P_17;
-   float F_25;
-   float F_26;
-   float F_27;
-   int I_38;
+   float F_5;
+   int I_26;
+   int I_27;
+   int I_28;
+   int I_29;
    I_17 = isj;
    subf(I_17, 2);
-   I_29 = isj;
-   mulf(I_29, i_1_0);
-   for (i_1_0 = i;i_1_0<=MIN(i+127, isi-2);i_1_0 += 1)
-l99994:      for (j = 1;j<=I_17;j += 1) {
+   for(i_1_0 = i; i_1_0 <= MIN(i+127, isi-2); i_1_0 += 1) {
+l99994:      ;
+      I_27 = i_1_0;
+      subf(I_27, 1);
+      I_28 = isj;
+      mulf(I_28, i_1_0);
+      I_29 = i_1_0;
+      addf(I_29, 1);
+      for(j = 1; j <= I_17; j += 1) {
          __scalar__0 = 0.;
-         I_18 = i_1_0;
-         subf(I_18, 1);
+         I_18 = I_27;
          I_19 = isj;
          mulf(I_19, I_18);
          I_5 = j;
@@ -577,7 +525,7 @@ l99994:      for (j = 1;j<=I_17;j += 1) {
          mulf(F_11, kernel[2]);
          addf(__scalar__0, F_11);
          kj_0 = 3;
-         I_20 = I_29;
+         I_20 = I_28;
          I_9 = j;
          addf(I_9, I_20);
          I_2 = I_9;
@@ -594,8 +542,7 @@ l99994:      for (j = 1;j<=I_17;j += 1) {
          mulf(F_14, kernel[5]);
          addf(__scalar__0, F_14);
          kj_0 = 3;
-         I_21 = i_1_0;
-         addf(I_21, 1);
+         I_21 = I_29;
          I_22 = isj;
          mulf(I_22, I_21);
          I_14 = j;
@@ -616,11 +563,12 @@ l99994:      for (j = 1;j<=I_17;j += 1) {
          kj_0 = 3;
          ki_0 = 3;
          divf(__scalar__0, 9);
-         I_7 = I_29;
+         I_7 = I_20;
          I_8 = j;
          addf(I_8, I_7);
          new_image[I_8] = __scalar__0;
       }
+   }
 }
 
 Code after flattening
@@ -662,70 +610,52 @@ void microcode(int i, int isi, int isj, float *image, float *kernel, float *new_
    int I_11;
    int I_12;
    int I_13;
-   int I_15;
-   int I_16;
-   int I_23;
-   int I_24;
-   int I_25;
-   int I_26;
-   int I_27;
    float *P_0;
    float *P_1;
    float F_0;
-   float F_1;
    float *P_2;
    float *P_3;
-   float F_2;
-   float F_3;
-   int I_28;
+   int I_15;
    float *P_4;
    float *P_5;
-   float F_4;
-   float F_5;
-   int I_29;
-   int I_30;
-   int I_31;
+   float F_1;
+   int I_16;
    float *P_6;
    float *P_7;
-   float F_6;
-   float F_7;
+   float F_2;
    float *P_8;
    float *P_9;
-   float F_8;
-   float F_18;
-   int I_32;
+   int I_23;
    float *P_10;
    float *P_11;
-   float F_19;
-   float F_20;
-   int I_33;
-   int I_34;
-   int I_35;
-   int I_36;
+   float F_3;
+   int I_24;
    float *P_12;
    float *P_13;
-   float F_21;
-   float F_22;
+   float F_4;
    float *P_14;
    float *P_15;
-   float F_23;
-   float F_24;
-   int I_37;
+   int I_25;
    float *P_16;
    float *P_17;
-   float F_25;
-   float F_26;
-   float F_27;
-   int I_38;
+   float F_5;
+   int I_26;
+   int I_27;
+   int I_28;
+   int I_29;
    I_17 = isj;
    subf(I_17, 2);
-   I_29 = isj;
-   mulf(I_29, i_1_0);
-   for (i_1_0 = i;i_1_0<=MIN(i+127, isi-2);i_1_0 += 1)
-l99994:      for (j = 1;j<=I_17;j += 1) {
+   for(i_1_0 = i; i_1_0 <= MIN(i+127, isi-2); i_1_0 += 1) {
+l99994:      ;
+      I_27 = i_1_0;
+      subf(I_27, 1);
+      I_28 = isj;
+      mulf(I_28, i_1_0);
+      I_29 = i_1_0;
+      addf(I_29, 1);
+      for(j = 1; j <= I_17; j += 1) {
          __scalar__0 = 0.;
-         I_18 = i_1_0;
-         subf(I_18, 1);
+         I_18 = I_27;
          I_19 = isj;
          mulf(I_19, I_18);
          I_5 = j;
@@ -744,7 +674,7 @@ l99994:      for (j = 1;j<=I_17;j += 1) {
          mulf(F_11, kernel[2]);
          addf(__scalar__0, F_11);
          kj_0 = 3;
-         I_20 = I_29;
+         I_20 = I_28;
          I_9 = j;
          addf(I_9, I_20);
          I_2 = I_9;
@@ -761,8 +691,7 @@ l99994:      for (j = 1;j<=I_17;j += 1) {
          mulf(F_14, kernel[5]);
          addf(__scalar__0, F_14);
          kj_0 = 3;
-         I_21 = i_1_0;
-         addf(I_21, 1);
+         I_21 = I_29;
          I_22 = isj;
          mulf(I_22, I_21);
          I_14 = j;
@@ -783,11 +712,12 @@ l99994:      for (j = 1;j<=I_17;j += 1) {
          kj_0 = 3;
          ki_0 = 3;
          divf(__scalar__0, 9);
-         I_7 = I_29;
+         I_7 = I_20;
          I_8 = j;
          addf(I_8, I_7);
          new_image[I_8] = __scalar__0;
       }
+   }
 }
 
 Code after more expression substitution
@@ -829,70 +759,52 @@ void microcode(int i, int isi, int isj, float *image, float *kernel, float *new_
    int I_11;
    int I_12;
    int I_13;
-   int I_15;
-   int I_16;
-   int I_23;
-   int I_24;
-   int I_25;
-   int I_26;
-   int I_27;
    float *P_0;
    float *P_1;
    float F_0;
-   float F_1;
    float *P_2;
    float *P_3;
-   float F_2;
-   float F_3;
-   int I_28;
+   int I_15;
    float *P_4;
    float *P_5;
-   float F_4;
-   float F_5;
-   int I_29;
-   int I_30;
-   int I_31;
+   float F_1;
+   int I_16;
    float *P_6;
    float *P_7;
-   float F_6;
-   float F_7;
+   float F_2;
    float *P_8;
    float *P_9;
-   float F_8;
-   float F_18;
-   int I_32;
+   int I_23;
    float *P_10;
    float *P_11;
-   float F_19;
-   float F_20;
-   int I_33;
-   int I_34;
-   int I_35;
-   int I_36;
+   float F_3;
+   int I_24;
    float *P_12;
    float *P_13;
-   float F_21;
-   float F_22;
+   float F_4;
    float *P_14;
    float *P_15;
-   float F_23;
-   float F_24;
-   int I_37;
+   int I_25;
    float *P_16;
    float *P_17;
-   float F_25;
-   float F_26;
-   float F_27;
-   int I_38;
+   float F_5;
+   int I_26;
+   int I_27;
+   int I_28;
+   int I_29;
    seti(I_17, isj);
    subf(I_17, 2);
-   seti(I_29, isj);
-   mulf(I_29, i_1_0);
-   for (seti(i_1_0, i);i_1_0<=MIN(i+127, isi-2);i_1_0 += 1)
-l99994:      for (seti(j, 1);j<=I_17;j += 1) {
+   for(i_1_0 = i; i_1_0 <= MIN(i+127, isi-2); i_1_0 += 1) {
+l99994:      ;
+      seti(I_27, i_1_0);
+      subf(I_27, 1);
+      seti(I_28, isj);
+      mulf(I_28, i_1_0);
+      seti(I_29, i_1_0);
+      addf(I_29, 1);
+      for(j = 1; j <= I_17; j += 1) {
          seti(__scalar__0, 0.);
-         seti(I_18, i_1_0);
-         subf(I_18, 1);
+         seti(I_18, I_27);
          seti(I_19, isj);
          mulf(I_19, I_18);
          seti(I_5, j);
@@ -911,7 +823,7 @@ l99994:      for (seti(j, 1);j<=I_17;j += 1) {
          mulf(F_11, kernel[2]);
          addf(__scalar__0, F_11);
          seti(kj_0, 3);
-         seti(I_20, I_29);
+         seti(I_20, I_28);
          seti(I_9, j);
          addf(I_9, I_20);
          seti(I_2, I_9);
@@ -928,8 +840,7 @@ l99994:      for (seti(j, 1);j<=I_17;j += 1) {
          mulf(F_14, kernel[5]);
          addf(__scalar__0, F_14);
          seti(kj_0, 3);
-         seti(I_21, i_1_0);
-         addf(I_21, 1);
+         seti(I_21, I_29);
          seti(I_22, isj);
          mulf(I_22, I_21);
          seti(I_14, j);
@@ -950,11 +861,12 @@ l99994:      for (seti(j, 1);j<=I_17;j += 1) {
          seti(kj_0, 3);
          seti(ki_0, 3);
          divf(__scalar__0, 9);
-         seti(I_7, I_29);
+         seti(I_7, I_20);
          seti(I_8, j);
          addf(I_8, I_7);
          seti(new_image[I_8], __scalar__0);
       }
+   }
 }
 
 Code after some cleaning
@@ -992,16 +904,22 @@ void microcode(int i, int isi, int isj, float *image, float *kernel, float *new_
    int I_6;
    int I_7;
    int I_8;
+   int I_27;
+   int I_28;
    int I_29;
    seti(I_17, isj);
    subf(I_17, 2);
-   seti(I_29, isj);
-   mulf(I_29, i_1_0);
-   for (seti(i_1_0, i);i_1_0<=MIN(i+127, isi-2);i_1_0 += 1)
-l99994:      for (seti(j, 1);j<=I_17;j += 1) {
+   for(i_1_0 = i; i_1_0 <= MIN(i+127, isi-2); i_1_0 += 1) {
+l99994:      ;
+      seti(I_27, i_1_0);
+      subf(I_27, 1);
+      seti(I_28, isj);
+      mulf(I_28, i_1_0);
+      seti(I_29, i_1_0);
+      addf(I_29, 1);
+      for(j = 1; j <= I_17; j += 1) {
          seti(__scalar__0, 0.);
-         seti(I_18, i_1_0);
-         subf(I_18, 1);
+         seti(I_18, I_27);
          seti(I_19, isj);
          mulf(I_19, I_18);
          seti(I_5, j);
@@ -1020,7 +938,7 @@ l99994:      for (seti(j, 1);j<=I_17;j += 1) {
          mulf(F_11, kernel[2]);
          addf(__scalar__0, F_11);
          seti(kj_0, 3);
-         seti(I_20, I_29);
+         seti(I_20, I_28);
          seti(I_9, j);
          addf(I_9, I_20);
          seti(I_2, I_9);
@@ -1037,8 +955,7 @@ l99994:      for (seti(j, 1);j<=I_17;j += 1) {
          mulf(F_14, kernel[5]);
          addf(__scalar__0, F_14);
          seti(kj_0, 3);
-         seti(I_21, i_1_0);
-         addf(I_21, 1);
+         seti(I_21, I_29);
          seti(I_22, isj);
          mulf(I_22, I_21);
          seti(I_14, j);
@@ -1059,11 +976,12 @@ l99994:      for (seti(j, 1);j<=I_17;j += 1) {
          seti(kj_0, 3);
          seti(ki_0, 3);
          divf(__scalar__0, 9);
-         seti(I_7, I_29);
+         seti(I_7, I_20);
          seti(I_8, j);
          addf(I_8, I_7);
          seti(new_image[I_8], __scalar__0);
       }
+   }
 }
 
 Unsplit resulting code
