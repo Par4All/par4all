@@ -1,6 +1,6 @@
 int tmp=0;
 
-float extending01a(int n, float a[n])
+float extending01(int n, float a[n])
 {
   int i;
   float s=0.;
