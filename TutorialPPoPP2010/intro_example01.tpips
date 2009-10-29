@@ -1,20 +1,9 @@
 delete intro_example01
-create intro_example01 intro_example01.c
-
-setproperty PRETTYPRINT_C_CODE TRUE
-setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
-#setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
-
-#setenv C_SYNTAX_DEBUG_LEVEL 7
-activate C_PARSER
-
-display PRINTED_FILE[intro_example01!]
-display PRINTED_FILE[main]
+create intro_example01 \
+    intro_example01.c
 
 apply UNSPLIT
+
 close
-
-#delete intro_example01
-
 quit
 

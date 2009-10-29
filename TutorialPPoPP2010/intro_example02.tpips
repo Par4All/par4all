@@ -1,28 +1,13 @@
 delete intro_example02
 create intro_example02 intro_example02.c
 
-setproperty PRETTYPRINT_C_CODE TRUE
-setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
-#setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
-setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
 setproperty PRETTYPRINT_SEQUENTIAL_STYLE "do"
 
-#activate RICE_FAST_DEPENDENCE_GRAPH
-#activate RICE_FULL_DEPENDENCE_GRAPH
 activate RICE_SEMANTICS_DEPENDENCE_GRAPH
-#activate RICE_REGIONS_DEPENDENCE_GRAPH
-
-
-#setenv C_SYNTAX_DEBUG_LEVEL 7
-activate C_PARSER
 
 echo Privatize module foo
 apply PRIVATIZE_MODULE[foo]
 
-#display PRINTED_FILE[intro_example02!]
-#display PRINTED_FILE[foo]
-
-#activate PRINT_PARALLELIZEDOMP_CODE
 display PARALLELPRINTED_FILE[foo]
 
 apply INTERNALIZE_PARALLEL_CODE
@@ -30,9 +15,7 @@ apply OMPIFY_CODE[foo]
 display PRINTED_FILE[foo]
 
 apply UNSPLIT
+
 close
-
-#delete intro_example02
-
 quit
 
