@@ -965,39 +965,35 @@ static bool insert_reverse_order = TRUE;
  */
 static void insert_rwt(statement s)
 {  
-  if (bound_inserted_p(s))
-  {
-    statement sblock = load_inserted(s);
-    instruction i = statement_instruction(sblock);
-    sequence seq;
-    
-    pips_assert("it is a sequence", instruction_sequence_p(i)&&entity_empty_label_p(statement_label(sblock)));
-    
-    /* Reverse list of inserted statements (#1#) */
-    seq = instruction_sequence(i);
-    
-    /* Remove statements redundant */
-    remove_statement_redundant(s, &sequence_statements(seq));
-
-
-    if (insert_reverse_order)
+    if (bound_inserted_p(s))
     {
-      sequence_statements(seq) = gen_nreverse(sequence_statements(seq));
-    }
+        statement sblock = load_inserted(s);
+        instruction i = statement_instruction(sblock);
+        sequence seq;
 
-      /* insert */
-    sequence_statements(seq) = 
-      gen_append(sequence_statements(seq),
-		 CONS(STATEMENT,
-		      instruction_to_statement(statement_instruction(s)),
-		      NIL));
-    
-    statement_instruction(s) = i;
-    if( !empty_comments_p(statement_comments(s)))
-        free(statement_comments(s));
-    statement_comments(s)=empty_comments;
-    statement_number(s)=STATEMENT_NUMBER_UNDEFINED;
-  }
+        pips_assert("it is a sequence", instruction_sequence_p(i) && entity_empty_label_p(statement_label(sblock)));
+
+        /* Reverse list of inserted statements (#1#) */
+        seq = instruction_sequence(i);
+
+        /* Remove statements redundant */
+        remove_statement_redundant(s, &sequence_statements(seq));
+
+
+        if (insert_reverse_order)
+        {
+            sequence_statements(seq) = gen_nreverse(sequence_statements(seq));
+        }
+
+        /* insert */
+        sequence_statements(seq) = 
+            gen_append(sequence_statements(seq),
+                    CONS(STATEMENT,
+                        instruction_to_statement(copy_instruction(statement_instruction(s))),
+                        NIL));
+
+        update_statement_instruction(s,i);
+    }
 }
 
 /* Perform ICM and association on operators.
