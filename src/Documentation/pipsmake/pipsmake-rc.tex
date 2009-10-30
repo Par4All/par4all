@@ -666,20 +666,24 @@ Property
 \begin{PipsProp}{USER_LOG_P} 
 USER_LOG_P TRUE
 \end{PipsProp}
-controls the printing of a log of the session.
+controls the logging of the session in the database of the current
+workspace. This log can be processed by \Pips{} utility \verb/logfile2tpips/
+to generate automatically a \Tpips{} script which can be used to
+replay the current \Pips{} session, workspace by workspace, regardless
+of the \Pips user interface used.
 
 Property
 \begin{PipsProp}{ABORT_ON_USER_ERROR} 
 ABORT_ON_USER_ERROR FALSE
 \end{PipsProp}
-specifies how user errors are handled after printing the error message
-on \verb/stderr/: return and go ahead, usually when \Pips{} is used
-interactively, or core dump for debugging purposes and for script
+specifies how user errors impact execution once the error message is
+printed on \verb/stderr/: return and go ahead, usually when \Pips{} is
+used interactively, or core dump for debugging purposes and for script
 executions, especially non-regression tests.
 
 Property
 \begin{PipsProp}{ACTIVE_PHASES} 
-ACTIVE_PHASES "PRINT_PARSED_CODE PRINT_CODE PRINT_PARALEL_CODE PRINT_CALLGRAPH PRINT_ICFG TRANSFORMERS_INTRA_FAST INTRAPROCEDURAL_SUMMARY_PRECONDITION PRECONDITIONS_INTRA ATOMIC_CHAINS RICE_FAST_DEPENDENCE_GRAPH MAY_REGIONS"
+ACTIVE_PHASES "PRINT_SOURCE PRINT_CODE PRINT_PARALLELIZED77_CODE PRINT_CALL_GRAPH PRINT_ICFG TRANSFORMERS_INTRA_FAST INTRAPROCEDURAL_SUMMARY_PRECONDITION PRECONDITIONS_INTRA ATOMIC_CHAINS RICE_FAST_DEPENDENCE_GRAPH MAY_REGIONS"
 \end{PipsProp}
 specifies which \Pipsmake{} phases should be used when several phases
 can be used to produce the same resource. This property is used when a
