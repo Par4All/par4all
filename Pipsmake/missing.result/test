@@ -12,7 +12,7 @@ Source code
 
 Warnings
 
-unknown[unknown] (open_module) Module CALLMISSING selected instead of callmissing which was not found
+unknown[unknown] (open_module) Module "CALLMISSING" selected instead of "callmissing" which was not found
 INITIALIZER[MISSING] (set_debug_stack_pointer) debug level stack is set to 2
 unknown[unknown] (safe_do_something) Request aborted in pipsmake: build resource CALLGRAPH_FILE for module CALLMISSING.
 unknown[unknown] (db_clean_all_required_resources) module 'MISSING' to be deleted, no more resources owned.
