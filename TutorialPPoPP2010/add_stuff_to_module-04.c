@@ -1,11 +1,9 @@
-// Insert required headers here
-
 bool prepend_comment(string mn) {
 
   // Use this module name to get the resources we need
-  statement s = ... ;
-
-
+  statement s = PIPS_PHASE_PRELUDE(mn,	
+				   "PREPEND_COMMENT_DEBUG_LEVEL" );
+  
   // Get the value of the property containing the comment to be prepended
   string c = ... ;
 
@@ -14,4 +12,5 @@ bool prepend_comment(string mn) {
   
   // Put back the new statement module
 
+  PIPS_PHASE_POSTLUDE(s);
 }

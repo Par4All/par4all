@@ -3,19 +3,9 @@ create intro_example02 intro_example02.c
 
 setproperty PRETTYPRINT_SEQUENTIAL_STYLE "do"
 
-activate RICE_SEMANTICS_DEPENDENCE_GRAPH
-
-echo Privatize module foo
 apply PRIVATIZE_MODULE[foo]
-
-display PARALLELPRINTED_FILE[foo]
-
 apply INTERNALIZE_PARALLEL_CODE
 apply OMPIFY_CODE[foo]
 display PRINTED_FILE[foo]
 
-apply UNSPLIT
-
-close
 quit
-

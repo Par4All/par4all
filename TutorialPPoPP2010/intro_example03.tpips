@@ -2,19 +2,10 @@ delete intro_example03
 create intro_example03 intro_example03.f
 
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
-
 activate MUST_REGIONS
 
 apply ARRAY_BOUND_CHECK_TOP_DOWN
-
-# Propagate constants
-apply PARTIAL_EVAL
-
-display PRINTED_FILE
-
-# It is always nice to get the new version of the C file
 apply UNSPLIT
 
-close
 quit
 

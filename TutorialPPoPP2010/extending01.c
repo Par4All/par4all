@@ -1,5 +1,3 @@
-int tmp=0;
-
 float extending01(int n, float a[n])
 {
   int i;
