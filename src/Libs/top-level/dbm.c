@@ -49,7 +49,7 @@ void default_update_props() {}
  */
 void (* pips_update_props_handler)() = default_update_props;
 
-/* PIPS SRCPATH before openining the workspace, for restauration.
+/* PIPS SRCPATH before opening the workspace, for restauration.
  * also works if the path was not set.
  */
 static string saved_pips_src_path = NULL;
@@ -123,7 +123,7 @@ bool open_module(string name)
 
 bool open_module_if_unique()
 {
-    bool success = TRUE;
+    bool success;
     gen_array_t a;
 
     pips_assert("some current workspace", db_get_current_workspace_name());
@@ -158,7 +158,7 @@ bool create_workspace(gen_array_t files)
 {
     int i, argc = gen_array_nitems(files);
     string name, dir = db_get_current_workspace_directory();
-    bool success = FALSE;
+    bool success = true;
 
     /* since db_create_workspace() must have been called before... */
     pips_assert("some current workspace", db_get_current_workspace_name());
@@ -168,30 +168,30 @@ bool create_workspace(gen_array_t files)
     free(dir);
     set_entity_to_size();
 
-    /* pop_path() is too strict, let's push anyway since user errors
-       are not caught below! */
+    // pop_path() is too strict,
+    // let's push anyway since user errors are not caught below!
     push_path();
 
-    for (i = 0; i < argc; i++)
-    {
+    for (i = 0; success && i < argc; i++)
       /* FI: it would be nice to have a catch here on user_error()! */
-	success = process_user_file(gen_array_item(files, i));
-	if (success == FALSE)
-	    break;
-    }
+      success = process_user_file(gen_array_item(files, i));
 
-    if (success) {
+    if (success)
+    {
       language l = language_undefined;
       (* pips_update_props_handler)();
       name = db_get_current_workspace_name();
       user_log("Workspace %s created and opened.\n", name);
+
+      // may also fail here...
       success = open_module_if_unique();
       if (success) init_processed_include_cache();
-      /* push_path(); */
+
       l = workspace_language(files);
       activate_language(l);
     }
-    else
+
+    if (!success)
     {
 	/* FI: in fact, the whole workspace should be deleted!
 	 The file and the directory should be removed, and the current
@@ -201,8 +201,7 @@ bool create_workspace(gen_array_t files)
 	reset_entity_to_size();
 	close_log_file();
 	close_warning_file();
-	/* pop_path() is too strict, let's push anyway */
-	/* push_path(); */
+	pop_path();
     }
 
     return success;
@@ -220,7 +219,7 @@ bool lazy_open_module(string name)
 	char * current_name = db_get_current_module_name();
 	if (strcmp(current_name, name) != 0)
 	    success = open_module(name);
-	else 
+	else
 	    user_log ("Module %s already active.\n", name);
     } else
 	success = open_module(name);
