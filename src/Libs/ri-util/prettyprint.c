@@ -3128,6 +3128,8 @@ text C_any_comment_to_text(int r_margin, string c)
 	le++;
     }
     // Final \n has been removed in the parser presumably by Ronan
+    // But this is also useful when non-standard comments are added,
+    // for instance by phase "comment_prepend"
     if(lb<cp){
       sentence s = sentence_undefined;
       string sl = gen_strndup0(lb,le-lb);
@@ -3138,7 +3140,7 @@ text C_any_comment_to_text(int r_margin, string c)
 	list pc = CHAIN_SWORD(NIL, sl); // sl is uselessly duplicated
 	pc = CONS(STRING, MAKE_SWORD("//"), pc);
 	s = make_sentence(is_sentence_unformatted,
-			  make_unformatted((char *) NULL, 0, e_margin, pc));	
+			  make_unformatted((char *) NULL, 0, e_margin, pc));
       }
       ADD_SENTENCE_TO_TEXT(ct,s);
       free(sl);
