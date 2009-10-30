@@ -306,15 +306,14 @@ void add_rule(rule r)
     bool   active_phase = FALSE;
 
     /* Check resources produced by this rule */
-    MAP(VIRTUAL_RESOURCE, vr, 
-    {
+    FOREACH(VIRTUAL_RESOURCE, vr, rule_produced(r)) {
 	string vrn = virtual_resource_name(vr);
 	string phase;
 
 	/* We activated this rule to produce this resource only if
 	 * this resource is not already produced */
 	if ((phase = hash_get(activated, vrn)) == HASH_UNDEFINED_VALUE) {
-	    debug(1, "add_rule", "Default function for %s is %s\n", vrn, pn);
+	    pips_debug(1, "Default function for %s is %s\n", vrn, pn);
 
 	    active_phase = TRUE;
 	    hash_put(activated, vrn, pn);
@@ -323,16 +322,15 @@ void add_rule(rule r)
 		CONS(STRING, strdup(pn), makefile_active_phases(pipsmakefile));
 	}
 	else debug(1, "add_rule", "Function %s not activated\n", pn);
-    }, rule_produced(r));
+    }
 
     /* Check resources required for this rule if it is an active one */
     if (active_phase) {
-	MAP(VIRTUAL_RESOURCE, vr, 
-	{
+	FOREACH(VIRTUAL_RESOURCE, vr, rule_required(r)) {
 	    string vrn = virtual_resource_name(vr);
 	    owner vro = virtual_resource_owner(vr);
 	    string phase;
-	    
+
 	    /* We must use a resource already defined */
 	    if ( owner_callers_p(vro) || owner_callees_p(vro) ) {}
 	    else {
@@ -344,17 +342,17 @@ void add_rule(rule r)
 		}
 		/* If we use a resource, another function should have produced it */
 		else if (strcmp(phase, pn) == 0) {
-		    pips_error("add_rule",
+		    pips_internal_error(
 			       "%s: phase %s cannot be active for the %s resource\n",
 			       PIPSMAKE_RC, phase, vrn);
 		}
-		else debug(1, "add_rule", 
+		else pips_debug(1,
 			   "Required resource %s is checked OK for Function %s\n",
 			   vrn, pn);
 	    }
-	}, rule_required(r));
+	}
     }
-	
+
     makefile_rules(pipsmakefile) = gen_nconc(makefile_rules(pipsmakefile),
 					     CONS(RULE, r, NIL));
 }
