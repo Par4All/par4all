@@ -106,102 +106,130 @@ string active_phase_for_resource(string res)
     return rule_phase(find_rule_by_resource(res));
 }
 
+string activate_phase(string phase)
+{
+  rule r;
+  //virtual_resource res;
+  string vrn;
+  string old_phase;
+  makefile current_makefile = parse_makefile();
+  bool rule_cyclic_p = TRUE;
+  string status = phase;
+
+  debug_on("PIPSMAKE_DEBUG_LEVEL");
+  pips_debug(1, "%s - requested\n", phase);
+
+  pips_assert("a current workspace is defined",
+	      db_get_current_workspace_name());
+
+  /* find rule that describes phase */
+  r = find_rule_by_phase(phase);
+
+  if(r == rule_undefined) {
+    pips_user_warning("Rule `%s' undefined.\n"
+		      "Check spelling and/or ACTIVE_PHASE property.\n",
+		      phase);
+    status = NULL;
+  }
+  else if (active_phase_p(phase)) {
+    pips_user_warning ("Rule `%s' already active\n", phase);
+  }
+  else if (!gen_length(rule_produced(r))) {
+    pips_user_warning("Phase %s produces no resource\n", phase);
+    status = NULL;
+  }
+  else {
+    /* GO: for many produced resources we loop over them
+       with the same 'old' code */
+    /* find resource res that is produced by phase */
+    FOREACH(VIRTUAL_RESOURCE, res, rule_produced(r)) {
+      bool require_produced_rule_p = FALSE;
+
+      vrn = virtual_resource_name(res);
+
+      FOREACH(VIRTUAL_RESOURCE, vr, (list) rule_required(r)) {
+	string vrn2 = virtual_resource_name(vr);
+	owner vro = virtual_resource_owner(vr);
+
+	/* We do not check callers and callees
+	 * I dropped select also, just in case... FC
+	 */
+	if ( owner_callers_p(vro) ||
+	     owner_callees_p(vro) ||
+	     owner_select_p(vro)) {}
+	else if (same_string_p(vrn, vrn2))
+	  require_produced_rule_p = TRUE;
+
+      }
+
+      /* If the current produced resource is not required
+	 by the new rule */
+      if (!require_produced_rule_p) {
+	rule_cyclic_p = FALSE;
+	/* find current active phase old_phase that produces res */
+	old_phase = rule_phase(find_rule_by_resource(vrn));
+
+	/* replace old_phase by phase in active phase list */
+	if (old_phase != NULL) {
+	  MAPL(pa, {
+	      string s = STRING(CAR(pa));
+
+	      if (strcmp(s, old_phase) == 0) {
+		free(STRING(CAR(pa)));
+		STRING(CAR(pa)) = strdup(phase);
+	      }
+	    }, makefile_active_phases(current_makefile));
+	}
+
+	/* this generates many warnings when called from select...
+	 */
+	if (get_bool_property("ACTIVATE_DEL_DERIVED_RES"))
+	  delete_derived_resources (res);
+	else
+	  if (db_get_current_workspace_name()) {
+	    /* remove resources with the same name as
+	       res to maintain consistency in the
+	       database */
+	    db_unput_resources(vrn);
+	  }
+      }
+    }
+
+    if (rule_cyclic_p == TRUE) {
+      pips_user_warning("Phase %s is cyclic\n", phase);
+      status = NULL;
+    }
+  }
+  debug_off();
+  return (status);
+}
+
 string activate(string phase)
 {
-    rule r;
-    virtual_resource res;
-    string vrn;
-    string old_phase;
-    makefile current_makefile = parse_makefile();
-    bool rule_cyclic_p = TRUE;
-    string status = phase;
+  string r = activate_phase(phase);
+  if(!r)
+    pips_user_error("Phase activation error: check the phase names\n");
+  return r;
+}
 
-    debug_on("PIPSMAKE_DEBUG_LEVEL");
-    pips_debug(1, "%s - requested\n", phase);
+/* Use property ACTIVE_PHASES to active the phases required by the
+   user. */
+bool activate_phases(void)
+{
+  string d = " ,\t\n";
+  string ap = get_string_property("ACTIVE_PHASES");
+  string cap = strtok(ap, d);
+  bool result = TRUE;
 
-    pips_assert("open_module", db_get_current_workspace_name());
-
-    /* find rule that describes phase */
-    r = find_rule_by_phase(phase);
-    if(r == rule_undefined) {
-	user_error( "activate", "Rule `%s' undefined\n", phase);
-
-    } else {
-
-	/* complete simple cases */
-	if (active_phase_p(phase)) {
-	    user_warning ("activate", "Rule `%s' already active\n", phase);
-	} else if (!gen_length(rule_produced(r))) {
-	    user_error("activate",
-		       "Phase %s produces no resource\n", phase);
-	} else {
-	    /* GO: for many produced resources we loop over them
-	       with the same 'old' code */
-	    MAPL(pvrp, {
-		bool require_produced_rule_p = FALSE;
-
-		/* find resource res that is produced by phase */
-		res = VIRTUAL_RESOURCE(CAR(pvrp));
-		vrn = virtual_resource_name(res);
-
-		MAPL(pvr, {
-		    virtual_resource vr = VIRTUAL_RESOURCE(CAR(pvr));
-		    string vrn2 = virtual_resource_name(vr);
-		    owner vro = virtual_resource_owner(vr);
-
-		    /* We do not check callers and callees
-		     * I dropped select also, just in case... FC
-		     */
-		    if ( owner_callers_p(vro) ||
-			 owner_callees_p(vro) ||
-			 owner_select_p(vro)) {}
-		    else if (same_string_p(vrn, vrn2))
-			require_produced_rule_p = TRUE;
-
-		}, (list) rule_required( r ) );
-
-		/* If the current produced resource is not required
-		   by the new rule */
-		if (!require_produced_rule_p) {
-		    rule_cyclic_p = FALSE;
-		    /* find current active phase old_phase that produces res */
-		    old_phase = rule_phase(find_rule_by_resource(vrn));
-
-		    /* replace old_phase by phase in active phase list */
-		    if (old_phase != NULL) {
-			MAPL(pa, {
-			    string s = STRING(CAR(pa));
-
-			    if (strcmp(s, old_phase) == 0) {
-				free(STRING(CAR(pa)));
-				STRING(CAR(pa)) = strdup(phase);
-			    }
-			}, makefile_active_phases(current_makefile));
-		    }
-
-		    /* this generates many warnings when called from select...
-		     */
-		    if (get_bool_property("ACTIVATE_DEL_DERIVED_RES"))
-			delete_derived_resources (res);
-		    else
-			if (db_get_current_workspace_name()) {
-			    /* remove resources with the same name as
-			       res to maintain consistency in the
-			       database */
-			    db_unput_resources(vrn);
-			}
-		}
-	    }, rule_produced(r));
-
-	    if (rule_cyclic_p == TRUE) {
-		user_error("activate",
-			   "Phase %s is cyclic\n",
-			   phase);
-	    }
-	}
+  while(cap!=NULL) {
+    pips_debug(1, "Phase to activate: %s\n", cap);
+    if(!active_phase_p(cap)) {
+     string r =  activate_phase(cap);
+     result = r!=NULL;
     }
-    debug_off();
-    return (status);
+    cap = strtok(NULL, d);
+  }
+  return result;
 }
 
 /* Choose the right combination of activate and setproperty for a

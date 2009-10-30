@@ -178,14 +178,25 @@ bool create_workspace(gen_array_t files)
 
     if (success)
     {
-      language l = language_undefined;
       (* pips_update_props_handler)();
+
       name = db_get_current_workspace_name();
+
       user_log("Workspace %s created and opened.\n", name);
 
-      // may also fail here...
+
+      /* If there is only one function, make it the current module */
       success = open_module_if_unique();
+
       if (success) init_processed_include_cache();
+
+      /* set active phases */
+      success = activate_phases();
+    }
+
+    if(success) {
+      /* Try to select the source language*/
+      language l = language_undefined;
 
       l = workspace_language(files);
       activate_language(l);
