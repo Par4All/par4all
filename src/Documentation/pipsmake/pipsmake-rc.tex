@@ -292,7 +292,8 @@ interface, improved by many shell scripts\footnote{Manual pages are
 System interfaces.  The {\tt epips} interface is an extension of
 \WPIPS{} which uses {\tt Emacs} to display more information in a more
 convenient way. Unfortunately, right now these window-based interfaces
-are no longer working and have been replaced by {\tt gpips}.
+are no longer working and have been replaced by {\tt gpips}. It is
+also possible to use \Pips{} through a Python API, pyps.
 
 From a theoretical point of view, the object types and functions
 available in {\tt PIPS} define an heterogeneous algebra with
@@ -303,21 +304,30 @@ abundance is confusing for casual and experiences users as well, and
 it was deemed necessary to assist them by providing default
 computation rules and automatic consistency management similar to {\tt
   make}. The rule interpretor is called \PIPSMAKE{} and described
-in~\cite{B91}.
+in~\cite{B91}. Its key concepts are the {\em phase}, which correspond
+to a \Pips{} function made user-visible, for instance, a parser, the
+{\em resources}, which correspond to objects used or defined by the
+phases, for instance, a source file or an AST (parsed code), and the
+virtual {\em rules}, which define the set of input resources used by a
+phase and the set of output resources defined by the phase. Since
+\Pips{} is an interprocedural tool, some real inpu resources are not
+known until execution. Some variables such as \verb/CALLERS/ or
+\verb/CALLEES/ can be used in virtual rules. They are expanded at
+execution to obtain an effective rule with the precise resources needed.
 
 For debugging purposes and for advanced users, the precise choice and
-tuning of an algorithm can be made using \PROPERTIES{}. Default properties
-are installed with \Pips{} but they can be redefined, partly or entirely,
-by a {\tt properties.rc} file located in the current directory. Properties
-can also be redefined from the user interfaces, for example with the command
-\texttt{setproperty} when the \Tpips{} interface is used.
+tuning of an algorithm can be made using \PROPERTIES{}. Default
+properties are installed with \Pips{} but they can be redefined,
+partly or entirely, by a {\tt properties.rc} file located in the
+current directory. Properties can also be redefined from the user
+interfaces, for example with the command \texttt{setproperty} when the
+\Tpips{} interface is used.
 
 As far as their static structures are concerned, most object types are
-described in more details in \Pri. A
-dynamic view is given here. In which order should functions be applied?
-Which object do they produce and vice-versa which function does produce
-such and such objects? How does \Pips{} cope with bottom-up and top-down
-interprocedurality?
+described in more details in \Pri. A dynamic view is given here. In
+which order should functions be applied?  Which object do they produce
+and vice-versa which function does produce such and such objects? How
+does \Pips{} cope with bottom-up and top-down interprocedurality?
 
 Resources produced by several rules and their associated rule must be
 given alias names when they should be explicitly computed or activated
@@ -330,20 +340,21 @@ different files are automatically extracted from this one\footnote{See
 the local Makefile: pipsmake-rc, and alias file: wpips-rc.}. Another
 caveat is that \emph{all} resources whose names are suffixed with
 \verb|_file| are considered printable or displayable, and the others
-are considered binary data.
+are considered binary data, even though they may be ASCII strings.
 
-This \LaTeX{} file is used by several procedures to derive some pieces of C
-code and ASCII files. The useful information is located in the {\em
-  PipsMake} areas, a very simple literate programming environment... For
-instance \verb+alias+ information is used to generate automatically menus
-for window-based interfaces such as \verb+wpips+ or \verb+gpips+. Object (a.k.a resource) types and functions are renamed
-using the alias declaration. The name space of aliases is global. All
-aliases must have different names. Function declarations are used to build
-a mapping table between function names and pointer to C functions,
-\texttt{phases.h}. Object suffixes are used to derive a header file, {\tt
-  resources.h}, with all resource names. Parts of this file are also
-extracted to generate on-line information for {\tt wpips} and
-automatic completion for {\tt tpips}.
+This \LaTeX{} file is used by several procedures to derive some pieces
+of C code and ASCII files. The useful information is located in the
+{\em PipsMake} areas, a very simple literate programming
+environment... For instance \verb+alias+ information is used to
+generate automatically menus for window-based interfaces such as
+\verb+wpips+ or \verb+gpips+. Object (a.k.a resource) types and
+functions are renamed using the alias declaration. The name space of
+aliases is global. All aliases must have different names. Function
+declarations are used to build a mapping table between function names
+and pointer to C functions, \texttt{phases.h}. Object suffixes are
+used to derive a header file, {\tt resources.h}, with all resource
+names. Parts of this file are also extracted to generate on-line
+information for {\tt wpips} and automatic completion for {\tt tpips}.
 
 The behavior of {\tt PIPS} can be slightly tuned by using {\tt
   properties}. Most properties are linked to a particular phase, for
@@ -491,8 +502,14 @@ team\footnote{pips-support@cri.ensmp.fr}!
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% GLOBALS
 
-\chapter{Global options}
+\chapter{Global Options}
 \label{chapter-global-options}
+
+Options are called {\em properties} in \Pips{}. Most of them are
+related to a specific {\em phase}, for instance the dependence graph
+computation. They are declared next to the corresponding phase
+declaration. But some are related to one library or even to several
+libraries and they are declared in this chapter.
 
 Skip this chapter on first reading.  Also skip this chapter on second
 reading because you are unlikely to need these properties until you
@@ -539,6 +556,18 @@ leaks.
 
 \section{PIPS Infrastructure}
 \label{section-pips-infrastructure}
+
+\Pips{} infrastructure is based on a few external libraries, Newgen
+and Linear, and on three key \PIPS libraries:
+\begin{itemize}
+\item \verb/pipsdbm/ which manages resources such as \verb/code/
+  produced by PIPS and ensures persistance,
+\item \verb/pipsmake/ which ensures consistency within a
+  \verb/workspace/ with respect to the producer-consumer rules
+  declared in this file,
+\item and \verb/top-level/ which defines a common API for all \Pips{}
+  user interfaces, whether human or API.
+\end{itemize}
 
 \subsection{Newgen}
 \index{NewGen}
@@ -629,23 +658,59 @@ which knows what is obsolete or not.
 \index{Logging}
 \index{Abort}
 
+The \verb/top-level/ library is built on top of the \verb/pipsmake/
+and \verb/pipsdbm/ libraries to factorize functions useful to build a
+\Pips{} user interface or API.
+
+Property
 \begin{PipsProp}{USER_LOG_P} 
 USER_LOG_P TRUE
 \end{PipsProp}
 controls the printing of a log of the session.
 
+Property
 \begin{PipsProp}{ABORT_ON_USER_ERROR} 
 ABORT_ON_USER_ERROR FALSE
 \end{PipsProp}
-controls what to do on user errors: go ahead  or core dump (debug).
+specifies how user errors are handled after printing the error message
+on \verb/stderr/: return and go ahead, usually when \Pips{} is used
+interactively, or core dump for debugging purposes and for script
+executions, especially non-regression tests.
 
+Property
+\begin{PipsProp}{ACTIVE_PHASES} 
+ACTIVE_PHASES "PRINT_PARSED_CODE PRINT_CODE PRINT_PARALEL_CODE PRINT_CALLGRAPH PRINT_ICFG TRANSFORMERS_INTRA_FAST INTRAPROCEDURAL_SUMMARY_PRECONDITION PRECONDITIONS_INTRA ATOMIC_CHAINS RICE_FAST_DEPENDENCE_GRAPH MAY_REGIONS"
+\end{PipsProp}
+specifies which \Pipsmake{} phases should be used when several phases
+can be used to produce the same resource. This property is used when a
+workspace is created. A workspace is the database maintained by
+\Pips{} to contain all resources defined for a whole application or
+for the whole set of files used to create it.
 
+Resources that create ambiguities for \Pipsmake{} are:
+\begin{itemize}
+\item parsed\_printed\_file
+\item printed\_file
+\item callgraph\_file
+\item icfg\_file
+\item parsed\_code, because several parsers are available
+\item transformers
+\item summary\_precondition
+\item preconditions
+\item regions
+\item chains
+\item dg
+\end{itemize}
+This list must be updated according to new rules and new resources
+declared in this file. Note that no default parser is usually
+specified in this property, because it is selected automatically
+according to the source file suffixes when possible.
 
 \subsection{Tpips Command Line Interface}
 \index{Tpips}
 \index{TPIPS\_IS\_A\_SHELL}
 
-{\tt TPIPS} is one of PIPS user interfaces.
+\Tpips{} is one of PIPS user interfaces.
 
 \begin{PipsProp}{TPIPS_NO_EXECUTION_MODE} 
 TPIPS_NO_EXECUTION_MODE FALSE
@@ -655,7 +720,9 @@ controls whether we shall execute the instructions of just check the syntax:
 \begin{PipsProp}{TPIPS_IS_A_SHELL} 
 TPIPS_IS_A_SHELL FALSE
 \end{PipsProp}
-controls whether \Tpips{} should behave as an extended shell.
+controls whether \Tpips{} should behave as an extended shell and
+consider any input command that is not a \Tpips{} command a Shell
+command.
 
 
 
