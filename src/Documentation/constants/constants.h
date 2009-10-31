@@ -39,7 +39,12 @@
 
 #define XV_HELP_RC "pips_help.txt"
 
+/* Default name for a property file */
 #define PROPERTIES_RC "properties.rc"
+/* Name of the file that contains the name of an old property file,
+   such as properties-2009-10-31.rc. This is used to keep
+   non-regression tests alive. */
+#define OLD_PROPERTIES_RC "old_properties"
 
 /* filename extensions
  */

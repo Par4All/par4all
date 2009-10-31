@@ -31,6 +31,7 @@ INSTALL_ETC=	epips_view_menu_layout.el \
 		epips_transform_menu_layout.el \
 		pipsmake.rc \
 		properties.rc \
+		properties-2009-10-31.rc \
 		pipsdep.rc \
 		wpips.rc
 

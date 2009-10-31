@@ -682,8 +682,8 @@ used interactively, or core dump for debugging purposes and for script
 executions, especially non-regression tests.
 
 Property
-\begin{PipsProp}{ACTIVE_PHASES} 
-ACTIVE_PHASES "PRINT_SOURCE PRINT_CODE PRINT_PARALLELIZED77_CODE PRINT_CALL_GRAPH PRINT_ICFG TRANSFORMERS_INTRA_FAST INTRAPROCEDURAL_SUMMARY_PRECONDITION PRECONDITIONS_INTRA ATOMIC_CHAINS RICE_FAST_DEPENDENCE_GRAPH MAY_REGIONS"
+\begin{PipsProp}{ACTIVE_PHASES}
+ACTIVE_PHASES "PRINT_SOURCE PRINT_CODE PRINT_PARALLELIZED77_CODE PRINT_CALL_GRAPH PRINT_ICFG TRANSFORMERS_INTER_FULL INTERPROCEDURAL_SUMMARY_PRECONDITION PRECONDITIONS_INTER_FULL ATOMIC_CHAINS RICE_SEMANTICS_DEPENDENCE_GRAPH MAY_REGIONS"
 \end{PipsProp}
 specifies which \Pipsmake{} phases should be used when several phases
 can be used to produce the same resource. This property is used when a
@@ -691,7 +691,7 @@ workspace is created. A workspace is the database maintained by
 \Pips{} to contain all resources defined for a whole application or
 for the whole set of files used to create it.
 
-Resources that create ambiguities for \Pipsmake{} are:
+Resources that create ambiguities for \Pipsmake{} are at least:
 \begin{itemize}
 \item parsed\_printed\_file
 \item printed\_file
@@ -709,6 +709,16 @@ This list must be updated according to new rules and new resources
 declared in this file. Note that no default parser is usually
 specified in this property, because it is selected automatically
 according to the source file suffixes when possible.
+
+Until October 2009, the active phases were:
+\begin{verbatim}
+ACTIVE_PHASES "PRINT_SOURCE PRINT_CODE PRINT_PARALLELIZED77_CODE
+               PRINT_CALL_GRAPH PRINT_ICFG TRANSFORMERS_INTRA_FAST 
+               INTRAPROCEDURAL_SUMMARY_PRECONDITION
+               PRECONDITIONS_INTRA ATOMIC_CHAINS
+               RICE_FAST_DEPENDENCE_GRAPH MAY_REGIONS"
+\end{verbatim}
+They still are used for the old non-regression tests.
 
 \subsection{Tpips Command Line Interface}
 \index{Tpips}
