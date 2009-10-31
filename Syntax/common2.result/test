@@ -1,2 +1,2 @@
-user warning in activate: Rule `PRINT_PARALLELIZED77_CODE' already active
+user warning in activate_phase: Rule `PRINT_PARALLELIZED77_CODE' already active
 user warning in update_common_sizes: inconsistent size (8 and 12) for common /TOTO/ in FOO

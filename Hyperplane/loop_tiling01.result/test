@@ -35,4 +35,4 @@ l1:
 
 Warnings
 
-unknown[unknown] (activate) Rule `C_PARSER' already active
+unknown[unknown] (activate_phase) Rule `C_PARSER' already active

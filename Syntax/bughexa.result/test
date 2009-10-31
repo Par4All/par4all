@@ -1,3 +1,4 @@
+user warning, property ACTIVE_PHASES redefined
 user warning in tp_parse: bughexa: No such workspace
 Registering file bughexa.f
 Splitting file    ./bughexa.f

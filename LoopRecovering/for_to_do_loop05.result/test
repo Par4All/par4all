@@ -130,6 +130,7 @@ void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], 
    int ki;
    int kj;
 
+
 #pragma omp parallel for 
    for(i = 0; i <= isi-1; i += 1)                                       /*0009*/
 #pragma omp parallel for 

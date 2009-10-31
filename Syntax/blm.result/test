@@ -1,3 +1,4 @@
+user warning, property ACTIVE_PHASES redefined
 user warning in tp_parse: blm: No such workspace
 setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
 user warning, property PARSER_DUMP_SYMBOL_TABLE redefined

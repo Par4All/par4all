@@ -114,12 +114,12 @@ main()
 
 Warnings
 
-unknown[unknown] (activate) Rule `C_PARSER' already active
+unknown[unknown] (activate_phase) Rule `C_PARSER' already active
 INITIAL_PRECONDITION[call12] (add_or_kill_equivalenced_variables) storage return
 TRANSFORMERS_INTER_FULL[call12] (add_or_kill_equivalenced_variables) storage return
 PRINT_CODE_TRANSFORMERS[call12] (add_or_kill_equivalenced_variables) storage return
-unknown[unknown] (activate) Rule `PRINT_CODE_TRANSFORMERS' already active
+unknown[unknown] (activate_phase) Rule `PRINT_CODE_TRANSFORMERS' already active
 PRECONDITIONS_INTER_FULL[call12] (add_or_kill_equivalenced_variables) storage return
 PRINT_CODE_PRECONDITIONS[call12] (add_or_kill_equivalenced_variables) storage return
-unknown[unknown] (activate) Rule `PRINT_CODE_PRECONDITIONS' already active
+unknown[unknown] (activate_phase) Rule `PRINT_CODE_PRECONDITIONS' already active
 INTERPROCEDURAL_SUMMARY_PRECONDITION[call12!] (ordinary_summary_precondition) empty precondition to call12! because not in call tree from main.

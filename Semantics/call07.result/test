@@ -76,13 +76,13 @@ main()
 
 Warnings
 
-unknown[unknown] (activate) Rule `C_PARSER' already active
+unknown[unknown] (activate_phase) Rule `C_PARSER' already active
 INITIAL_PRECONDITION[call07] (add_or_kill_equivalenced_variables) storage return
 TRANSFORMERS_INTER_FULL[call07] (add_or_kill_equivalenced_variables) storage return
 TRANSFORMERS_INTER_FULL[call07] (NormalizeExpression) expression is already normalized
 PRINT_CODE_TRANSFORMERS[call07] (add_or_kill_equivalenced_variables) storage return
-unknown[unknown] (activate) Rule `PRINT_CODE_TRANSFORMERS' already active
+unknown[unknown] (activate_phase) Rule `PRINT_CODE_TRANSFORMERS' already active
 PRECONDITIONS_INTER_FULL[call07] (add_or_kill_equivalenced_variables) storage return
 PRINT_CODE_PRECONDITIONS[call07] (add_or_kill_equivalenced_variables) storage return
-unknown[unknown] (activate) Rule `PRINT_CODE_PRECONDITIONS' already active
+unknown[unknown] (activate_phase) Rule `PRINT_CODE_PRECONDITIONS' already active
 INTERPROCEDURAL_SUMMARY_PRECONDITION[call07!] (ordinary_summary_precondition) empty precondition to call07! because not in call tree from main.

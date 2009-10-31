@@ -29,8 +29,11 @@ C     Detect data bug (or ANSI extension...)
 
       END
 Selecting rule: TRANSFORMERS_INTER_FULL
+user warning in activate_phase: Rule `TRANSFORMERS_INTER_FULL' already active
 Selecting rule: INTERPROCEDURAL_SUMMARY_PRECONDITION
+user warning in activate_phase: Rule `INTERPROCEDURAL_SUMMARY_PRECONDITION' already active
 Selecting rule: PRECONDITIONS_INTER_FULL
+user warning in activate_phase: Rule `PRECONDITIONS_INTER_FULL' already active
 Selecting rule: PRINT_CODE_PRECONDITIONS
 Module DATA09 already active.
 Request: build resource PRINTED_FILE for module DATA09.

@@ -45,7 +45,7 @@ echo
 
 Module SYNTHESIS06 already active.
 Selecting rule: PRINT_CALL_GRAPH
-user warning in activate: Rule `PRINT_CALL_GRAPH' already active
+user warning in activate_phase: Rule `PRINT_CALL_GRAPH' already active
 Module SYNTHESIS06 already active.
 Request: build resource CALLGRAPH_FILE for module SYNTHESIS06.
   INITIALIZER                    building   USER_FILE(HIDENH)

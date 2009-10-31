@@ -1,0 +1,19 @@
+
+We should use the old default active phases
+
+ACTIVE_PHASES "PRINT_SOURCE PRINT_CODE PRINT_PARALLELIZED77_CODE PRINT_CALL_GRAPH PRINT_ICFG TRANSFORMERS_INTRA_FAST INTRAPROCEDURAL_SUMMARY_PRECONDITION PRECONDITIONS_INTRA ATOMIC_CHAINS RICE_FAST_DEPENDENCE_GRAPH MAY_REGIONS"
+
+The loop should be distributed but not parallelized
+
+int old_property01(void)
+{
+   int i;
+   double t;
+   double s = 0.;
+   double a[100];
+   for(i = 0; i <= 49; i += 1)
+      a[i+50] = (a[i]+a[i+50])/2.0;
+   for(i = 0; i <= 49; i += 1)
+      s = s+2*a[i];
+   return s;
+}

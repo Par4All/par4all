@@ -19,7 +19,7 @@ Workspace unknownrule opened.
 Module UNKNOWNRULE selected
 Module UNKNOWNRULE selected
 Selecting rule: PRINT_CODE
-user warning in activate: Rule `PRINT_CODE' already active
+user warning in activate_phase: Rule `PRINT_CODE' already active
 Request: build resource PRINTED_FILE for module UNKNOWNRULE.
   BOOTSTRAP                      building   ENTITIES()
   FILTER_FILE                    building   SOURCE_FILE(UNKNOWNRULE)

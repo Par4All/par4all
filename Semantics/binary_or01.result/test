@@ -92,7 +92,7 @@ binary_or01()
 
 Warnings
 
-unknown[unknown] (activate) Rule `C_PARSER' already active
+unknown[unknown] (activate_phase) Rule `C_PARSER' already active
 INITIAL_PRECONDITION[foo] (add_or_kill_equivalenced_variables) storage return
 PROGRAM_PRECONDITION[] (get_main_entity) no main found, returning binary_or01 instead
 TRANSFORMERS_INTER_FULL[foo] (add_or_kill_equivalenced_variables) storage return

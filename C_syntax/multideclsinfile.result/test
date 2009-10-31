@@ -1,3 +1,4 @@
+user warning, property ACTIVE_PHASES redefined
 user warning in tp_parse: multideclsinfile: No such workspace
 Registering file multideclsinfile.c
 Preprocessing file ./multideclsinfile.c
@@ -10,9 +11,9 @@ setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
 user warning, property PARSER_DUMP_SYMBOL_TABLE redefined
 Selecting rule: C_SYMBOL_TABLE
-user warning in activate: Rule `C_SYMBOL_TABLE' already active
+user warning in activate_phase: Rule `C_SYMBOL_TABLE' already active
 Selecting rule: C_PARSER
-user warning in activate: Rule `C_PARSER' already active
+user warning in activate_phase: Rule `C_PARSER' already active
 echo
 
 echo Error duplicate variable declaration for a 

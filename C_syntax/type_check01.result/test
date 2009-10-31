@@ -16,6 +16,6 @@ int main(void)
 
 Warnings
 
-unknown[unknown] (activate) Rule `C_PARSER' already active
-unknown[unknown] (activate) Rule `C_SYMBOL_TABLE' already active
+unknown[unknown] (activate_phase) Rule `C_PARSER' already active
+unknown[unknown] (activate_phase) Rule `C_SYMBOL_TABLE' already active
 C_PARSER[main] (check_C_function_type) Type updated for function "freia_aipo_global_vol"

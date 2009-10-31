@@ -1,3 +1,4 @@
+user warning, property ACTIVE_PHASES redefined
 user warning in tp_parse: inter07: No such workspace
 Registering file inter07.f
 Splitting file    ./inter07.f

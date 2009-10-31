@@ -117,16 +117,16 @@ main()
 
 Warnings
 
-unknown[unknown] (activate) Rule `C_PARSER' already active
+unknown[unknown] (activate_phase) Rule `C_PARSER' already active
 INITIAL_PRECONDITION[call04] (add_or_kill_equivalenced_variables) storage return
 TRANSFORMERS_INTER_FULL[call04] (add_or_kill_equivalenced_variables) storage return
 TRANSFORMERS_INTER_FULL[call04] (NormalizeExpression) expression is already normalized
 PRINT_CODE_TRANSFORMERS[call04] (add_or_kill_equivalenced_variables) storage return
-unknown[unknown] (activate) Rule `PRINT_CODE_TRANSFORMERS' already active
+unknown[unknown] (activate_phase) Rule `PRINT_CODE_TRANSFORMERS' already active
 TRANSFORMERS_INTER_FULL[main] (NormalizeExpression) expression is already normalized
 TRANSFORMERS_INTER_FULL[main] (any_scalar_assign_to_transformer) Variable 0`ai in lhs is uselessly updated by the rhs 'call04(ai++)'
 INTERPROCEDURAL_SUMMARY_PRECONDITION[call04] (NormalizeExpression) expression is already normalized
 PRECONDITIONS_INTER_FULL[call04] (add_or_kill_equivalenced_variables) storage return
 PRINT_CODE_PRECONDITIONS[call04] (add_or_kill_equivalenced_variables) storage return
-unknown[unknown] (activate) Rule `PRINT_CODE_PRECONDITIONS' already active
+unknown[unknown] (activate_phase) Rule `PRINT_CODE_PRECONDITIONS' already active
 INTERPROCEDURAL_SUMMARY_PRECONDITION[call04!] (ordinary_summary_precondition) empty precondition to call04! because not in call tree from main.

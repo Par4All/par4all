@@ -1,3 +1,4 @@
+user warning, property ACTIVE_PHASES redefined
 user warning in tp_parse: formel03: No such workspace
 Registering file formel03.f
 Splitting file    ./formel03.f

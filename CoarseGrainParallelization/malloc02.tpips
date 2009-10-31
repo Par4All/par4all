@@ -7,6 +7,7 @@ echo Parse as C:
 activate C_PARSER
 echo If possible, transform simple for-loops into do-loop à la Fortran, simpler to analyze:
 setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
 echo Prettyprint the source as C, of course
 setproperty PRETTYPRINT_C_CODE TRUE
 

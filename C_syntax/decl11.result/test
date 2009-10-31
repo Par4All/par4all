@@ -1,3 +1,4 @@
+user warning, property ACTIVE_PHASES redefined
 user warning in tp_parse: decl11: No such workspace
 Registering file decl11.c
 Preprocessing file ./decl11.c
@@ -6,9 +7,9 @@ Splitting file    ./decl11.database/Tmp/decl11.cpp_processed.c
 Workspace decl11 created and opened.
 Module decl11! selected
 Selecting rule: C_PARSER
-user warning in activate: Rule `C_PARSER' already active
+user warning in activate_phase: Rule `C_PARSER' already active
 Selecting rule: C_SYMBOL_TABLE
-user warning in activate: Rule `C_SYMBOL_TABLE' already active
+user warning in activate_phase: Rule `C_SYMBOL_TABLE' already active
 setproperty PRETTYPRINT_C_CODE TRUE
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 echo

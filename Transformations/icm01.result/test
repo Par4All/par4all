@@ -28,6 +28,8 @@ int icm01()
    int k;
    int a[10];
    int I_0;
+
+
    I_0 = j*j+1;
    for(i = 0; i <= 9; i += 1) {
       // BEGIN BLOCK

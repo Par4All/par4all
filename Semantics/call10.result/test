@@ -121,11 +121,11 @@ main()
 
 Warnings
 
-unknown[unknown] (activate) Rule `C_PARSER' already active
+unknown[unknown] (activate_phase) Rule `C_PARSER' already active
 TRANSFORMERS_INTER_FULL[call10] (NormalizeExpression) expression is already normalized
-unknown[unknown] (activate) Rule `PRINT_CODE_TRANSFORMERS' already active
+unknown[unknown] (activate_phase) Rule `PRINT_CODE_TRANSFORMERS' already active
 TRANSFORMERS_INTER_FULL[main] (NormalizeExpression) expression is already normalized
 TRANSFORMERS_INTER_FULL[main] (call_to_transformer) Result of function "call10" ignored.
 INTERPROCEDURAL_SUMMARY_PRECONDITION[call10] (NormalizeExpression) expression is already normalized
-unknown[unknown] (activate) Rule `PRINT_CODE_PRECONDITIONS' already active
+unknown[unknown] (activate_phase) Rule `PRINT_CODE_PRECONDITIONS' already active
 INTERPROCEDURAL_SUMMARY_PRECONDITION[call10!] (ordinary_summary_precondition) empty precondition to call10! because not in call tree from main.

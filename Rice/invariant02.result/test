@@ -29,6 +29,8 @@ void invariant02(int ni, int nj)
    float a;
    float b;
    float F_0;
+
+
    F_0 = a*b;
    for(i = 0; i <= ni-1; i += 1) {
       s = F_0;
@@ -38,4 +40,4 @@ void invariant02(int ni, int nj)
 
 Warnings
 
-unknown[unknown] (activate) Rule `C_PARSER' already active
+unknown[unknown] (activate_phase) Rule `C_PARSER' already active

@@ -44,5 +44,5 @@ void call01(int i)
 
 Warnings
 
-unknown[unknown] (activate) Rule `C_PARSER' already active
+unknown[unknown] (activate_phase) Rule `C_PARSER' already active
 PROGRAM_PRECONDITION[] (get_main_entity) no main found, returning call01 instead

@@ -137,5 +137,5 @@ void assign02()
 
 Warnings
 
-unknown[unknown] (activate) Rule `C_PARSER' already active
+unknown[unknown] (activate_phase) Rule `C_PARSER' already active
 PROGRAM_PRECONDITION[] (get_main_entity) no main found, returning assign02 instead

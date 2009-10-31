@@ -1,3 +1,4 @@
+user warning, property ACTIVE_PHASES redefined
 setproperty PRETTYPRINT_BLOCK_IF_ONLY=TRUE
 user warning, property PRETTYPRINT_BLOCK_IF_ONLY redefined
 Registering file nullincr2.f

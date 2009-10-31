@@ -107,8 +107,8 @@ main()
 
 Warnings
 
-unknown[unknown] (activate) Rule `C_PARSER' already active
-unknown[unknown] (activate) Rule `PRINT_CODE_TRANSFORMERS' already active
+unknown[unknown] (activate_phase) Rule `C_PARSER' already active
+unknown[unknown] (activate_phase) Rule `PRINT_CODE_TRANSFORMERS' already active
 TRANSFORMERS_INTER_FULL[main] (call_to_transformer) Result of function "call11" ignored.
-unknown[unknown] (activate) Rule `PRINT_CODE_PRECONDITIONS' already active
+unknown[unknown] (activate_phase) Rule `PRINT_CODE_PRECONDITIONS' already active
 INTERPROCEDURAL_SUMMARY_PRECONDITION[call11!] (ordinary_summary_precondition) empty precondition to call11! because not in call tree from main.
