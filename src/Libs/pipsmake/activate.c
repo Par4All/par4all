@@ -217,7 +217,8 @@ string activate(string phase)
 bool activate_phases(void)
 {
   string d = " ,\t\n";
-  string ap = get_string_property("ACTIVE_PHASES");
+  /* strtok breaks its first argument string */
+  string ap = strdup(get_string_property("ACTIVE_PHASES"));
   string cap = strtok(ap, d);
   bool result = TRUE;
 
@@ -229,6 +230,7 @@ bool activate_phases(void)
     }
     cap = strtok(NULL, d);
   }
+  free(ap);
   return result;
 }
 

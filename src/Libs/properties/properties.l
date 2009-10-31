@@ -246,13 +246,20 @@ static void parse_properties_file(FILE * fd)
 
 static void read_properties(void)
 {
+    FILE * old_prop = NULL;
+
     if (pl != (hash_table) NULL)
     return;
     /* else */
     pl = hash_table_make(hash_string, 0);
     update_property = FALSE;
 
-    /* ${PIPS_ROOT}/etc/properties.rc
+    /* Default properties: 
+     *
+     * if the variable PIPS_PROPERTIESRC is defined in the environment,
+     * it contains the absolute property file name to use; 
+     *
+     * else: ${PIPS_ROOT}/etc/properties.rc
      */
     if( (prop_in = fopen_config(PROPERTIES_RC,NULL,"PIPS_PROPERTIESRC")) )
     {
@@ -260,7 +267,27 @@ static void read_properties(void)
         fclose(prop_in), prop_in = (FILE*) NULL;
     }
 
-    /* ./properties.rc
+    /* An older version of properties.rc might be useful for the current
+     * PIPS execution. This is used to maintain backward compatibility
+     * for old non-regression tests.
+     */
+    string pfn = string_undefined;
+    string sdn = get_script_directory_name();
+    pfn = strdup(concatenate(sdn, "/", OLD_PROPERTIES_RC, NULL));
+    if ((old_prop = fopen(pfn, "r")) != NULL) {
+      char opfn[100];
+      (void) fscanf(old_prop, "%s", opfn);
+
+      if ((prop_in = fopen_config(opfn, NULL, NULL)) != NULL) {
+        parse_properties_file(prop_in);
+        fclose(prop_in), prop_in = (FILE*) NULL;
+      }
+      fclose(old_prop), old_prop = (FILE*) NULL;
+    }
+    free(pfn);
+
+    /* Update the standard properties with a locally defined ./properties.rc
+     * Is . the cwd or the directory where the .tpips script has been found?
      */
     if ((prop_in = fopen(PROPERTIES_RC, "r")) != NULL) {
     parse_properties_file(prop_in);

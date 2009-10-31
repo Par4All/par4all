@@ -52,8 +52,7 @@
  * as the text provided. it should be made clear who is to free the
  * texte structure. currently it looks like a massive memory leak.
  */
-bool
-make_text_resource(
+bool make_text_resource(
     string mod_name, /* module name */
     string res_name, /* resource name [DBR_...] */
     string file_ext, /* file extension */
@@ -61,7 +60,7 @@ make_text_resource(
 {
     string filename, localfilename, dir;
     FILE *fd;
-   
+
     localfilename = db_build_file_resource_name(res_name, mod_name, file_ext);
     dir = db_get_current_workspace_directory();
     filename = strdup(concatenate(dir, "/", localfilename, NULL));
@@ -76,12 +75,11 @@ make_text_resource(
     DB_PUT_FILE_RESOURCE(res_name, mod_name, localfilename);
     write_an_attachment_file(filename);
     free(filename);
-   
+
     return TRUE;
 }
 
-bool
-make_text_resource_and_free(
+bool make_text_resource_and_free(
     string mod_name,
     string res_name,
     string file_ext,
@@ -94,8 +92,7 @@ make_text_resource_and_free(
 
 static bool is_user_view;	/* print_code or print_source */
 
-bool
-user_view_p()
+bool user_view_p()
 {
     return is_user_view;
 }
@@ -103,8 +100,7 @@ user_view_p()
 
 /* Generic function to prettyprint some sequential or parallel code, or
    even user view for the given module. */
-bool
-print_code_or_source(string mod_name)
+bool print_code_or_source(string mod_name)
 {
     bool success = FALSE;
     text r = make_text(NIL);
@@ -188,8 +184,7 @@ print_code_or_source(string mod_name)
 
 /* Build a textual resource for a parallel code using a string optional
    parallel style (dialect such as "f90", "doall", "hpf", "omp" */
-static bool
-print_parallelized_code_common(
+static bool print_parallelized_code_common(
     string mod_name,
     string style)
 {
@@ -218,7 +213,8 @@ print_parallelized_code_common(
     close_prettyprint();
 
     success = make_text_resource (mod_name, DBR_PARALLELPRINTED_FILE,
-				  prettyprint_is_fortran? PARALLEL_FORTRAN_EXT : PARALLEL_C_EXT, r);
+				  prettyprint_is_fortran?
+				  PARALLEL_FORTRAN_EXT : PARALLEL_C_EXT, r);
 
     end_attachment_prettyprint();
 
@@ -234,48 +230,41 @@ print_parallelized_code_common(
 
 /************************************************************ PIPSMAKE HOOKS */
 
-bool
-print_code(string mod_name)
+bool print_code(string mod_name)
 {
   is_user_view = FALSE;
   return print_code_or_source(mod_name);
 }
 
-bool
-print_source(string mod_name)
+bool print_source(string mod_name)
 {
   is_user_view = TRUE;
   return print_code_or_source(mod_name);
 }
 
-bool
-print_parallelized_code(string mod_name)
+bool print_parallelized_code(string mod_name)
 {
     return print_parallelized_code_common(mod_name, NULL);
 }
 
-bool
-print_parallelized90_code(string mod_name)
+bool print_parallelized90_code(string mod_name)
 {
     return print_parallelized_code_common(mod_name, "f90");
 }
 
-bool
-print_parallelized77_code(string mod_name)
+bool print_parallelized77_code(string mod_name)
 {
     return print_parallelized_code_common(mod_name, "doall");
 }
 
-bool
-print_parallelizedHPF_code(string module_name)
+bool print_parallelizedHPF_code(string module_name)
 {
     return print_parallelized_code_common(module_name, "hpf");
 }
 
 #define all_priv "PRETTYPRINT_ALL_PRIVATE_VARIABLES"
 
-bool
-print_parallelizedOMP_code(string mod_name)
+bool print_parallelizedOMP_code(string mod_name)
 {
     if (get_bool_property(all_priv))
 	pips_user_warning("avoid property " all_priv "=TRUE with OMP\n");

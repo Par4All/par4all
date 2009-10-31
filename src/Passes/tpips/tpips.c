@@ -1178,6 +1178,7 @@ static void parse_arguments(int argc, char * argv[])
 	{
 	  /* the tpips dirname is appended to PIPS_SRCPATH */
 	  string dir = pips_dirname(tps);
+	  set_script_directory_name(dir);
 	  saved_srcpath = pips_srcpath_append(dir);
 	  free(dir), dir = NULL;
 

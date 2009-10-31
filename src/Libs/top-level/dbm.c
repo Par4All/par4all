@@ -331,3 +331,25 @@ bool check_delete_workspace(string wname, bool check)
 
     return !failure;
 }
+
+/* Keep track of the script directory. It is used to retrieve
+   information about old properties, mostly in a non-regression
+   setting.
+
+   In case of "source", the auxiliary directory is ignored.
+
+   FI: I do not reset nor free this variable since it is set from
+   beginning to end.
+
+ */
+static string script_directory_name = string_undefined;
+
+void set_script_directory_name(string dn)
+{
+  script_directory_name = strdup(dn);
+}
+
+string get_script_directory_name()
+{
+  return script_directory_name;
+}
