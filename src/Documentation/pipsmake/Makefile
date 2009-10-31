@@ -79,6 +79,12 @@ properties.rc: pipsmake-rc.tex pipsprop.sed
 	#
 	$(pipsprop.flt) $< > $@
 
+properties-2009-10-31.rc: properties-2009-10-31.rc.model
+	#
+	# building properties-2009-10-31.rc
+	#
+	cp properties-2009-10-31.rc.model properties-2009-10-31.rc
+
 pipsdep.rc: pipspassdep.pl pipsmake-rc.tex
 	#
 	# building pipsdep.rc
