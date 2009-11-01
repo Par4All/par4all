@@ -10,6 +10,9 @@ Splitting file    ./li92_1.f
 Workspace li92_1 created and opened.
 Module LI921 selected
 Module LI921 already active.
+Selecting rule: TRANSFORMERS_INTRA_FAST
+Selecting rule: PRECONDITIONS_INTRA
+Selecting rule: INTRAPROCEDURAL_SUMMARY_PRECONDITION
 Selecting rule: PRINT_CODE_PRECONDITIONS
 Module LI921 already active.
 Request: build resource PRINTED_FILE for module LI921.
@@ -86,7 +89,7 @@ Workspace li92_1 opened.
 Module LI921 selected
 Module LI921 already active.
 Selecting rule: PRINT_CODE_PRECONDITIONS
-user warning in activate: Rule `PRINT_CODE_PRECONDITIONS' already active
+user warning in activate_phase: Rule `PRINT_CODE_PRECONDITIONS' already active
 Module LI921 already active.
 Request: build resource PRINTED_FILE for module LI921.
 PRINTED_FILE made for LI921.
@@ -148,7 +151,7 @@ Workspace li92_1 opened.
 Module LI921 selected
 Module LI921 already active.
 Selecting rule: PRINT_CODE_PRECONDITIONS
-user warning in activate: Rule `PRINT_CODE_PRECONDITIONS' already active
+user warning in activate_phase: Rule `PRINT_CODE_PRECONDITIONS' already active
 Module LI921 already active.
 Request: build resource PRINTED_FILE for module LI921.
 PRINTED_FILE made for LI921.

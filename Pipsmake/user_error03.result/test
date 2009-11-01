@@ -6,6 +6,7 @@ Splitting file    ./user_error03.f
 Workspace user_error03 created and opened.
 Main module PROGRAM "USER_ERROR03" selected.
 Module USER_ERROR03 selected
+Selecting rule: RICE_FAST_DEPENDENCE_GRAPH
 Selecting rule: PRINT_CODE_CUMULATED_EFFECTS
 Module USER_ERROR03 already active.
 Request: build resource PRINTED_FILE for module USER_ERROR03.
