@@ -21,12 +21,12 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
-/* 
+/*
    Global code motion and Common subexpression elimination for nested
    sequences (a sort of perfect loop nest).
 */
 
-/* option: 
+/* option:
    - whether to push the procedure statement (default no).
    - whether to do ICM or not directly (default yes).
  */
@@ -58,7 +58,9 @@
 
 /******************************************************************* FLATTEN */
 
-static void 
+/* This function only applies to Fortran code because it does not
+   take local declarations and scope issues into consideration. */
+static void
 flatten_sequence(sequence sq)
 {
   list /* of statement */ nsl = NIL;
@@ -77,7 +79,7 @@ flatten_sequence(sequence sq)
       nsl = gen_nconc(nsl, CONS(STATEMENT, s, NIL));
     }
   }
-  
+
   gen_free_list(sequence_statements(sq));
   sequence_statements(sq) = nsl;
 }
@@ -90,16 +92,15 @@ void flatten_sequences(statement s)
 /***************************************** COMMUTATIVE ASSOCIATIVE OPERATORS */
 
 /* List of Associatif commutatif n-ary operators */
-static char * table_of_AC_operators[] = 
-{ EOLE_SUM_OPERATOR_NAME, 
+static char * table_of_AC_operators[] =
+{ EOLE_SUM_OPERATOR_NAME,
   EOLE_PROD_OPERATOR_NAME,
   MIN_OPERATOR_NAME,
   MAX_OPERATOR_NAME,
   NULL
 };
 
-static bool 
-Is_Associatif_Commutatif(entity e)
+static bool Is_Associatif_Commutatif(entity e)
 {
   string local_name = entity_local_name(e);
   int i = 0;
@@ -107,12 +108,12 @@ Is_Associatif_Commutatif(entity e)
   while (table_of_AC_operators[i])
     {
       if (same_string_p(local_name,table_of_AC_operators[i])){
-	pips_debug(3," %s is Associatif Commutatif \n", local_name); 
-	return TRUE; 
+	pips_debug(3," %s is Associatif Commutatif \n", local_name);
+	return TRUE;
       }
       i++;
     }
-  pips_debug(3," %s is NOT Associatif Commutatif \n", local_name); 
+  pips_debug(3," %s is NOT Associatif Commutatif \n", local_name);
   return FALSE;
 }
 
@@ -139,7 +140,7 @@ GENERIC_LOCAL_FUNCTION(inserted, persistant_statement_to_statement)
 static list current_availables = NIL;
 static statement current_statement = statement_undefined;
 
-/* PDSon: w_effect store all the variables modified 
+/* PDSon: w_effect store all the variables modified
  * in the sequence of statement
  */
 static list *w_effects;
@@ -162,8 +163,7 @@ static void pop_nesting(statement s)
 
 /* There is a side effect if there is a W effect in the expression.
  */
-static bool 
-side_effects_p(expression e)
+static bool side_effects_p(expression e)
 {
   effects ef = load_expr_prw_effects(e);
   list /* of effect */ le = effects_effects(ef);
@@ -173,8 +173,7 @@ side_effects_p(expression e)
 
 /* Some effect in les interfere with var.
  */
-static bool 
-interference_on(entity var, list /* of effect */ les)
+static bool interference_on(entity var, list /* of effect */ les)
 {
   FOREACH(EFFECT, ef, les)
   {
@@ -189,8 +188,7 @@ interference_on(entity var, list /* of effect */ les)
 
 /* Whether sg with effects le can be moved up to s.
  */
-static bool 
-moveable_to(list /* of effects */ le, statement s)
+static bool moveable_to(list /* of effects */ le, statement s)
 {
   list les = load_cumulated_rw_effects_list(s);
   FOREACH(EFFECT, ef,le)
@@ -204,8 +202,7 @@ moveable_to(list /* of effects */ le, statement s)
  * n: outside nth loop.
  * and so on.
  */
-static int 
-level_of(list /* of effects */ le)
+static int level_of(list /* of effects */ le)
 {
   list /* of statement */ up_nesting = gen_nreverse(gen_copy_seq(nesting));
   int level = 0;
@@ -226,8 +223,7 @@ level_of(list /* of effects */ le)
 }
 
 /* The level can be queried for a sub expression. */
-static int 
-expr_level_of(expression e)
+static int expr_level_of(expression e)
 {
   list le;
   if (!bound_expr_prw_effects_p(e)) return -1; /* assigns... */
@@ -253,8 +249,7 @@ static int current_level(void)
 /* Returns the statement of the specified level
    should returns current_statement_head() to avoid ICM directly.
  */
-static statement 
-statement_of_level(int level)
+static statement statement_of_level(int level)
 {
 #if !defined(NO_ICM)
   int n = current_level()-1-level;
@@ -275,8 +270,7 @@ static bool currently_nested_p(void)
 #endif
 }
 
-static expression
-right_side_of_assign_statement(statement stat)
+static expression right_side_of_assign_statement(statement stat)
 {
   instruction i;
   call assign;
@@ -287,26 +281,25 @@ right_side_of_assign_statement(statement stat)
   pips_assert("Instruction is a call", instruction_call_p(i));
   assign = instruction_call(i);
 
-  pips_assert("Call is an assignment!", 
+  pips_assert("Call is an assignment!",
 	      ENTITY_ASSIGN_P(call_function(assign)));
 
   right_side = EXPRESSION(CAR(CDR(call_arguments(assign))));
-  
+
   return right_side;
 }
 
-/* Verify if entity ent is an argument in the right expression 
+/* Verify if entity ent is an argument in the right expression
  * of the assign statement stat
  */
-static bool 
-entity_as_arguments(entity ent, statement stat)
+static bool entity_as_arguments(entity ent, statement stat)
 {
   expression right_side;
   call right_call;
 
   right_side = right_side_of_assign_statement(stat);
 
-  pips_assert("Right expression is a call!", 
+  pips_assert("Right expression is a call!",
 	      syntax_call_p(expression_syntax(right_side)));
   right_call = syntax_call(expression_syntax(right_side));
 
@@ -324,8 +317,7 @@ entity_as_arguments(entity ent, statement stat)
   return FALSE;
 }
 
-static bool
-assign_statement_p(statement s)
+static bool assign_statement_p(statement s)
 {
   instruction i = statement_instruction(s);
   if (instruction_call_p(i))
@@ -339,10 +331,9 @@ assign_statement_p(statement s)
   return FALSE;
 }
 
-/* Return the expression in the left side of an assign statement 
+/* Return the expression in the left side of an assign statement
  */
-static expression
-expr_left_side_of_assign_statement(statement stat)
+static expression expr_left_side_of_assign_statement(statement stat)
 {
   if (assign_statement_p(stat))
   {
@@ -355,14 +346,13 @@ expr_left_side_of_assign_statement(statement stat)
   return NULL;
 }
 
-/* Return the entity in left side of an assign statement 
+/* Return the entity in left side of an assign statement
  */
-static entity 
-left_side_of_assign_statement(statement stat)
+static entity left_side_of_assign_statement(statement stat)
 {
   expression left_side = expr_left_side_of_assign_statement(stat);
 
-  pips_assert("Left side is not a reference!", 
+  pips_assert("Left side is not a reference!",
 	      syntax_reference_p(expression_syntax(left_side)));
 
   return reference_variable(syntax_reference(expression_syntax(left_side)));
@@ -370,8 +360,7 @@ left_side_of_assign_statement(statement stat)
 
 /* Insert statement s in the list of statement l
  */
-static list
-insertion_statement_in_correct_position(statement news, list l)
+static list insertion_statement_in_correct_position(statement news, list l)
 {
   entity ent = left_side_of_assign_statement(news);
   statement s = STATEMENT(CAR(l));
@@ -384,9 +373,8 @@ insertion_statement_in_correct_position(statement news, list l)
 	      insertion_statement_in_correct_position(news, CDR(l)));
 }
 
-/* Just for test 
-static void
-dump_list_of_statement(list l)
+/* Just for test
+static void dump_list_of_statement(list l)
 {
   fprintf(stderr, "\n===== Dump List: \n");
   MAP(STATEMENT, ss,
@@ -397,8 +385,7 @@ dump_list_of_statement(list l)
 }
 */
 
-static void 
-insert_before_statement(statement news, statement s, bool last)
+static void insert_before_statement(statement news, statement s, bool last)
 {
   if (!bound_inserted_p(s))
   {
@@ -408,13 +395,13 @@ insert_before_statement(statement news, statement s, bool last)
   {
     statement sb = load_inserted(s);
     instruction i = statement_instruction(sb);
-    
+
     pips_assert("inserted in block", statement_block_p(sb) && entity_empty_label_p(statement_label(sb)));
-    
+
     /* Statements are stored in reverse order...
        this will have to be fixed latter on. see #1#.
     */
-    
+
     /* Insert in the front of list
      * ===========================
      */
@@ -427,9 +414,9 @@ insert_before_statement(statement news, statement s, bool last)
      */
     else
     {
-       instruction_block(i) = 
+       instruction_block(i) =
 	 insertion_statement_in_correct_position(news, instruction_block(i));
-    }  
+    }
   }
 }
 
@@ -467,7 +454,7 @@ group_expr_by_level(int nlevels, list le)
   /* initialize chunks. */
   for (i=0; i<=nlevels; i++)
     gen_array_addto(result, i, list_undefined);
-  
+
   /* put expressions in chunks. */
   FOREACH(EXPRESSION, e,le)
   {
@@ -521,13 +508,12 @@ group_expr_by_level(int nlevels, list le)
 	first_alone = FALSE;
     }
   }
-  
+
   return result;
 }
 
 #if 0
-static void 
-print_group_expr(gen_array_t /* array of group of expressions */ g
+static void print_group_expr(gen_array_t /* array of group of expressions */ g
 		 , int nombre_grp)
 {
   int i;
@@ -548,17 +534,16 @@ print_group_expr(gen_array_t /* array of group of expressions */ g
 }
 #endif
 
-/* Atomize sub expressions with 
+/* Atomize sub expressions with
    - lower level
    - not simple (references or constants)
    - no side effects.
 */
-static void 
-do_atomize_if_different_level(expression e, int level)
+static void do_atomize_if_different_level(expression e, int level)
 {
   int elevel = expr_level_of(e);
 
-  if (elevel!=-1 && 
+  if (elevel!=-1 &&
       elevel<level &&
       atomizable_sub_expression_p(e) &&
       !side_effects_p(e))
@@ -573,7 +558,7 @@ static void atomize_call(call c, int level)
 {
   list /* of expression */ args;
   int lenargs;
-  
+
   args = call_arguments(c);
   lenargs = gen_length(args);
 
@@ -583,8 +568,7 @@ static void atomize_call(call c, int level)
   }
 }
 
-static void 
-atomize_or_associate_for_level(expression e, int level)
+static void atomize_or_associate_for_level(expression e, int level)
 {
   syntax syn;
   call c;
@@ -596,7 +580,7 @@ atomize_or_associate_for_level(expression e, int level)
    * should be fixed if root statement is pushed?
    */
   if (!currently_nested_p()) return;
-  
+
   /* Only a scalar expression can be atomized.
    */
 
@@ -608,7 +592,7 @@ atomize_or_associate_for_level(expression e, int level)
   if (!syntax_call_p(syn))
     return;
 
-  /* something to icm 
+  /* something to icm
    */
   c = syntax_call(syn);
   func = call_function(c);
@@ -638,7 +622,7 @@ atomize_or_associate_for_level(expression e, int level)
 	  syntax satom = make_syntax(is_syntax_call, make_call(func, lei));
 	  expression eatom = expression_undefined;
 	  statement atom;
-	  
+
 	  /* Insert expression in upward expression, eventually in e!
 	   */
 	  for (j=i+1; j<=nlevels && !satom_inserted; j++)
@@ -657,12 +641,12 @@ atomize_or_associate_for_level(expression e, int level)
 	    expression_syntax(e) = satom;
 	    eatom = e;
 	  }
-	  
+
 	  atom = atomize_this_expression(hpfc_new_variable, eatom);
 	  insert_before_statement(atom, statement_of_level(i), TRUE);
 	}
       }
-      
+
       /* Fix last level if necessary.
        */
       lenl = (list) gen_array_item(groups, nlevels);
@@ -712,7 +696,7 @@ static void atomize_or_associate(expression e)
 static bool loop_flt(loop l)
 {
   statement sofl = current_statement_head();
-  pips_assert("statement of loop", 
+  pips_assert("statement of loop",
 	      instruction_loop(statement_instruction(sofl))==l);
   push_nesting(sofl);
   return TRUE;
@@ -735,12 +719,11 @@ static void loop_rwt(loop l)
   do_atomize_if_different_level(range_increment(bounds), level);
 }
 
-/* PDSon: I use the field 'comments' of statement for counting its number of 
+/* PDSon: I use the field 'comments' of statement for counting its number of
  * use. Raison: The field 'comments' of new statement added is always empty!
  * This function verifies if number of use is greater than 1 or not.
  */
-static bool
-number_of_use_greater_1(statement s)
+static bool number_of_use_greater_1(statement s)
 {
   char* comment = statement_comments(s);
   int number = 0;
@@ -754,10 +737,9 @@ number_of_use_greater_1(statement s)
   return (number > 1);
 }
 
-/* Update the field 'comments' of a statement 
+/* Update the field 'comments' of a statement
  */
-static void
-set_comment_of_statement(statement s, char *new_comment)
+static void set_comment_of_statement(statement s, char *new_comment)
 {
   if (empty_comments_p(statement_comments(s)))
   {
@@ -770,14 +752,13 @@ set_comment_of_statement(statement s, char *new_comment)
   }
 }
 
-/* Update the number of use of statement defining 'ent' which is a member 
+/* Update the number of use of statement defining 'ent' which is a member
  * of list lst_stat with step up_down (up_down = 1 | 0 | -1).
  * If ent is a variable of original code (ex: x, y), not new variable added
  * (ex: F_0, F_1,..), there is not any statement in lst_stat defining ent.
  * Return: statement updated
  */
-static statement
-update_number_of_use(entity ent, list lst_stat, int up_down)
+static statement update_number_of_use(entity ent, list lst_stat, int up_down)
 {
   FOREACH(STATEMENT, s,lst_stat)
   {
@@ -794,7 +775,7 @@ update_number_of_use(entity ent, list lst_stat, int up_down)
           {
               if (up_down == -1)
               {
-                  pips_internal_error("Number of use of '%s' < 0 !!!\n", 
+                  pips_internal_error("Number of use of '%s' < 0 !!!\n",
                           entity_name(ent));
               }
               statement_comments(s) = strdup("1");
@@ -820,8 +801,7 @@ update_number_of_use(entity ent, list lst_stat, int up_down)
 }
 
 /* Increase number of use of variable ent by one */
-static void
-increase_number_of_use_by_1(entity ent, statement container)
+static void increase_number_of_use_by_1(entity ent, statement container)
 {
   if (bound_inserted_p(container))
   {
@@ -830,7 +810,7 @@ increase_number_of_use_by_1(entity ent, statement container)
     sequence seq;
     int step;
     pips_assert("it is a sequence", instruction_sequence_p(i)&&entity_empty_label_p(statement_label(sblock)));
-    
+
     seq = instruction_sequence(i);
 
     step = +1;
@@ -844,7 +824,7 @@ increase_number_of_use_by_1(entity ent, statement container)
 
     if (!(updated = update_number_of_use(ent, sequence_statements(seq), step)))
     {
-      pips_internal_error("No statement defines '%s'\n", entity_name(ent));    
+      pips_internal_error("No statement defines '%s'\n", entity_name(ent));
     }
 
     /* Reduce by 1 number of use of variables contained by statement Updated */
@@ -867,15 +847,13 @@ increase_number_of_use_by_1(entity ent, statement container)
   }
   else
   {
-    pips_internal_error("No statement inserted!");    
+    pips_internal_error("No statement inserted!");
   }
 }
 
-static void
-remove_statement_redundant(statement s, list* inserted);
+static void remove_statement_redundant(statement s, list* inserted);
 
-static bool
-cse_expression_flt(expression e, list* inserted)
+static bool cse_expression_flt(expression e, list* inserted)
 {
   entity scala;
 
@@ -894,7 +872,7 @@ cse_expression_flt(expression e, list* inserted)
           if (number_of_use_greater_1(s))
           {
               /* This statement is a real one. But it maybe contains a variable
-               * temporal -> Continue remove redundant statement from this one 
+               * temporal -> Continue remove redundant statement from this one
                */
               remove_statement_redundant(s, inserted);
 
@@ -911,8 +889,8 @@ cse_expression_flt(expression e, list* inserted)
           }
           else
           {
-              /* s is a redundant statement. Replace e by the right side of 
-               * the assign statement s 
+              /* s is a redundant statement. Replace e by the right side of
+               * the assign statement s
                */
               expression exp = right_side_of_assign_statement(s);
               expression_syntax(e) = expression_syntax(exp);
@@ -931,18 +909,17 @@ cse_expression_flt(expression e, list* inserted)
   }
 
   /* Nothing is done! Go up */
-  return FALSE;  
+  return FALSE;
 }
 
 /* Avoid  visit the left side of assign statement
  */
-static bool
-cse_call_flt(call c, __attribute__((unused))list* inserted)
+static bool cse_call_flt(call c, __attribute__((unused))list* inserted)
 {
   if(ENTITY_ASSIGN_P(call_function(c)))
   {
     expression left = EXPRESSION(CAR(call_arguments(c)));
-    gen_recurse_stop(left);    
+    gen_recurse_stop(left);
   }
   /* Go down! */
   return TRUE;
@@ -950,13 +927,12 @@ cse_call_flt(call c, __attribute__((unused))list* inserted)
 
 /* Remove statement redundant inserted before statement s
  */
-static void
-remove_statement_redundant(statement s, list* inserted)
+static void remove_statement_redundant(statement s, list* inserted)
 {
   gen_context_multi_recurse(s, inserted,
 			    call_domain, cse_call_flt, gen_null,
 			    expression_domain, cse_expression_flt, gen_null,
-			    NULL);  
+			    NULL);
 }
 
 static bool insert_reverse_order = TRUE;
@@ -964,7 +940,7 @@ static bool insert_reverse_order = TRUE;
 /* Insert the new statements created
  */
 static void insert_rwt(statement s)
-{  
+{
     if (bound_inserted_p(s))
     {
         statement sblock = load_inserted(s);
@@ -986,7 +962,7 @@ static void insert_rwt(statement s)
         }
 
         /* insert */
-        sequence_statements(seq) = 
+        sequence_statements(seq) =
             gen_append(sequence_statements(seq),
                     CONS(STATEMENT,
                         instruction_to_statement(copy_instruction(statement_instruction(s))),
@@ -1000,8 +976,7 @@ static void insert_rwt(statement s)
    this is kind of an atomization.
    many side effects: modifies the code, uses simple effects
  */
-void 
-perform_icm_association(string name, /* of the module */
+void perform_icm_association(string name, /* of the module */
 			statement s  /* of the module */)
 {
   pips_assert("clean static structures on entry",
@@ -1021,7 +996,7 @@ perform_icm_association(string name, /* of the module */
    */
   set_cumulated_rw_effects((statement_effects)
 	db_get_memory_resource(DBR_CUMULATED_EFFECTS, name, TRUE));
-  
+
   init_inserted();
   make_current_statement_stack();
 
@@ -1039,7 +1014,7 @@ perform_icm_association(string name, /* of the module */
       whileloop_domain, gen_true, atomize_whileloop,
       /* could also push while loops... */
       expression_domain, gen_true, atomize_or_associate,
-      /* do not atomize index computations at the time... */     
+      /* do not atomize index computations at the time... */
       reference_domain, gen_false, gen_null,
       call_domain, icm_atom_call_flt, gen_null, /* skip IO calls */
 		    NULL);
@@ -1062,10 +1037,13 @@ perform_icm_association(string name, /* of the module */
   reset_cumulated_rw_effects();
 
   close_expr_prw_effects();  /* no memory leaks? */
-  close_proper_rw_effects(); 
+  close_proper_rw_effects();
 
   /* some clean up */
-  flatten_sequences(s);
+  /* This only works in Fortran because of C local declarations. It's
+     easier to let restructure_control() or flatten_code take care of
+     it. */
+  //flatten_sequences(s);
 }
 
 /********************************************************** EXTRACT ENTITIES */
@@ -1094,7 +1072,7 @@ static list get_all_entities(expression e)
 }
 
 /******************************************************************** AC-CSE */
-/* performs 
+/* performs
    Associative-Commutative Common Subexpression Elimination
    on sequences.
 
@@ -1112,12 +1090,12 @@ typedef struct
   list available_contents; /* part of which is available */
 
   /* Added by PDSon:
-     This list stores variables modified. It is used to avoid of creating 
+     This list stores variables modified. It is used to avoid of creating
      expression common containing variable modified.
      It shoud remove membre 'depends'!
      It is a pointer into the global list 'w_effects'
    */
-  list *w_effects; /* list of expression */ 
+  list *w_effects; /* list of expression */
 }
   available_scalar_t, * available_scalar_pt;
 
@@ -1133,10 +1111,10 @@ static void dump_aspt(available_scalar_pt aspt)
   }
 
   s = expression_syntax(aspt->contents);
-  fprintf(stderr, 
+  fprintf(stderr,
 	  "DUMP ASPT\n"
 	  "Scalar: %s \t Operator:[%s] len=%d, avail=%d\n",
-	  entity_name(aspt->scalar), 
+	  entity_name(aspt->scalar),
 	  aspt->operator? entity_name(aspt->operator): "NOP",
 	  syntax_call_p(s)? gen_length(call_arguments(syntax_call(s))): -1,
 	  gen_length(aspt->available_contents));
@@ -1147,7 +1125,7 @@ static void dump_aspt(available_scalar_pt aspt)
   fprintf(stderr, "\n===Available_contents:\n");
   MAP(EXPRESSION, e,
   {
-    print_expression(e);    
+    print_expression(e);
   }, aspt->available_contents);
 }
 */
@@ -1210,15 +1188,13 @@ static entity entity_of_expression(expression e, bool * inverted, entity inv)
 }
 #endif
 
-static bool 
-expression_in_list_p(expression e, list seen)
+static bool expression_in_list_p(expression e, list seen)
 {
   MAP(EXPRESSION, f, if (e==f) return TRUE, seen);
   return FALSE;
 }
 
-static expression 
-find_equal_expression_not_in_list(expression e, list avails, list seen)
+static expression find_equal_expression_not_in_list(expression e, list avails, list seen)
 {
   FOREACH(EXPRESSION, f,avails)
       if (expression_equal_p(e, f) && !expression_in_list_p(f, seen))
@@ -1226,7 +1202,7 @@ find_equal_expression_not_in_list(expression e, list avails, list seen)
   return NULL;
 }
 
-static list /* of expression */ 
+static list /* of expression */
 common_expressions(list args, list avails)
 {
   list already_seen = NIL;
@@ -1241,12 +1217,11 @@ common_expressions(list args, list avails)
 }
 
 /*
-static void 
-dump_list_of_exp(list l)
+static void dump_list_of_exp(list l)
 {
   fprintf(stderr,"\n======\nDUMP LIST OF EXPRESSIONS \n");
   fprintf(stderr,"Length: %d\n", gen_length(l));
-  MAP(EXPRESSION, e, 
+  MAP(EXPRESSION, e,
   {
     print_expression(e);
   },
@@ -1255,8 +1230,7 @@ dump_list_of_exp(list l)
   fprintf(stderr,"\n======\nEND DUMP\n");
 }
 
-static void
-dump_expresison_nary(expression e)
+static void dump_expresison_nary(expression e)
 {
   syntax s = expression_syntax(e);
   fprintf(stderr,"\n===== DUMP EXPRESSION: \n");
@@ -1270,7 +1244,7 @@ dump_expresison_nary(expression e)
 	    entity_local_name(call_function(syntax_call(s))),
 	    gen_length(call_arguments(syntax_call(s))));
   }
-  fprintf(stderr,"\n===== END DUMP EXPRESSION!! \n");  
+  fprintf(stderr,"\n===== END DUMP EXPRESSION!! \n");
 }
 */
 
@@ -1280,11 +1254,10 @@ list_diff(list l1, list l2); /* Define forward */
 static bool  /* Define forward */
 expression_eq_in_list_p(expression e, list l, expression *f);
 
-/* Find the commun sub-expression between e & aspt. 
+/* Find the commun sub-expression between e & aspt.
  * Attention: Commun expression does't contain any expression in w_effects
  */
-static int 
-similarity(expression e, available_scalar_pt aspt)
+static int similarity(expression e, available_scalar_pt aspt)
 {
   syntax s = expression_syntax(e), sa = expression_syntax(aspt->contents);
 
@@ -1295,11 +1268,11 @@ similarity(expression e, available_scalar_pt aspt)
   */
 
   if (syntax_tag(s)!=syntax_tag(sa)) return NO_SIMILARITY;
-  
+
   if (syntax_reference_p(s))
   {
     reference r = syntax_reference(s), ra = syntax_reference(sa);
-    if (reference_equal_p(r, ra)) 
+    if (reference_equal_p(r, ra))
     {
       return MAX_SIMILARITY;
     }
@@ -1310,7 +1283,7 @@ similarity(expression e, available_scalar_pt aspt)
     call c = syntax_call(s), ca = syntax_call(sa);
     entity cf = call_function(c);
     if (cf!=call_function(ca)) return NO_SIMILARITY;
-    
+
     /* same function...
      */
     if (Is_Associatif_Commutatif(cf))
@@ -1318,7 +1291,7 @@ similarity(expression e, available_scalar_pt aspt)
       /* similarity is the number of args in common.
 	 inversion is not tested at the time.
       */
-      list com = common_expressions(list_diff(call_arguments(c), 
+      list com = common_expressions(list_diff(call_arguments(c),
 					      *(aspt->w_effects)),
 				    aspt->available_contents);
       size_t n = gen_length(com);
@@ -1340,7 +1313,7 @@ similarity(expression e, available_scalar_pt aspt)
 	{
 	  return NO_SIMILARITY;
 	}
-	
+
 	if (expression_eq_in_list_p(el, *(aspt->w_effects), &el))
 	{
 	  /* A variable is already modified ! */
@@ -1350,12 +1323,12 @@ similarity(expression e, available_scalar_pt aspt)
       return MAX_SIMILARITY;
     }
   }
-  
+
   return NO_SIMILARITY;
 }
 
-static available_scalar_pt 
-best_similar_expression(expression e, int * best_quality)
+static available_scalar_pt best_similar_expression(expression e,
+						   int * best_quality)
 {
   available_scalar_pt best = NULL;
   (*best_quality) = 0;
@@ -1364,7 +1337,7 @@ best_similar_expression(expression e, int * best_quality)
   {
     available_scalar_pt aspt = (available_scalar_pt) caspt;
     int quality = similarity(e, aspt);
-    if (quality==MAX_SIMILARITY) 
+    if (quality==MAX_SIMILARITY)
     {
       (*best_quality) = quality;
       return aspt;
@@ -1379,12 +1352,13 @@ best_similar_expression(expression e, int * best_quality)
   return best;
 }
 
-static available_scalar_pt 
-make_available_scalar(entity scalar, statement container, expression contents)
+static available_scalar_pt make_available_scalar(entity scalar,
+						 statement container,
+						 expression contents)
 {
   syntax s = expression_syntax(contents);
 
-  available_scalar_pt aspt = 
+  available_scalar_pt aspt =
     (available_scalar_pt) malloc(sizeof(available_scalar_t));
 
   aspt->scalar = scalar;
@@ -1413,8 +1387,7 @@ make_available_scalar(entity scalar, statement container, expression contents)
   return aspt;
 }
 
-static bool 
-expression_eq_in_list_p(expression e, list l, expression *f)
+static bool expression_eq_in_list_p(expression e, list l, expression *f)
 {
   FOREACH(EXPRESSION, et,l)
   {
@@ -1431,7 +1404,7 @@ expression_eq_in_list_p(expression e, list l, expression *f)
 /* returns an allocated l1-l2 with expression_equal_p
    l2 included in l1.
  */
-static list /* of expression */ 
+static list /* of expression */
 list_diff(list l1, list l2)
 {
   list diff = NIL, l2bis = gen_copy_seq(l2);
@@ -1454,15 +1427,13 @@ list_diff(list l1, list l2)
   return diff;
 }
 
-static bool 
-simple_reference_p(expression e)
+static bool simple_reference_p(expression e)
 {
   syntax s = expression_syntax(e);
   return syntax_reference_p(s) && !reference_indices(syntax_reference(s));
 }
 
-static bool
-is_expression_constant_p(expression e)
+static bool is_expression_constant_p(expression e)
 {
   syntax s = expression_syntax(e);
   if(syntax_call_p(s))
@@ -1474,8 +1445,7 @@ is_expression_constant_p(expression e)
   return FALSE;
 }
 
-static bool
-call_unary_minus_p(expression e)
+static bool call_unary_minus_p(expression e)
 {
   syntax s = expression_syntax(e);
   if(syntax_call_p(s))
@@ -1489,7 +1459,7 @@ call_unary_minus_p(expression e)
 /* Remove some inpropriate ones...
 static void clean_current_availables(void)
 {
-  
+
 }
 */
 
@@ -1506,7 +1476,7 @@ static void atom_cse_expression(expression e)
   do { /* extract every possible common subexpression */
     aspt = best_similar_expression(e, &quality);
 
-    if (aspt) /* some common expression found. */ 
+    if (aspt) /* some common expression found. */
     {
       switch (syntax_tag(s))
       {
@@ -1520,13 +1490,13 @@ static void atom_cse_expression(expression e)
 	    /* identicals, just make a reference to the scalar.
 	       whatever the stuff stored inside.
 	    */
-	    
+
 	    syntax_tag(s) = is_syntax_reference;
 	    syntax_reference(s) = make_reference(aspt->scalar, NIL);
-	    
+
 	    /* Set the statement to status REAL */
 	    increase_number_of_use_by_1(aspt->scalar, aspt->container);
-	    
+
 	    return;
 	  }
 	  else /* partial common expression... */
@@ -1538,14 +1508,14 @@ static void atom_cse_expression(expression e)
 	    expression cse, cse2;
 	    statement scse;
 	    list /* of expression */ in_common, linit, lo1, lo2, old;
-	    
-	    pips_assert("AC operator", 
+
+	    pips_assert("AC operator",
 			Is_Associatif_Commutatif(op) && op==aspt->operator);
 	    pips_assert("contents is a call", syntax_call_p(sa));
 	    ca = syntax_call(sa);
-	    
+
 	    linit = call_arguments(ca);
-	    
+
 	    /*
 	      there is a common part to build,
 	      and a CSE to substitute in both...
@@ -1554,7 +1524,7 @@ static void atom_cse_expression(expression e)
 						     *(aspt->w_effects)),
 					   aspt->available_contents);
 
-	    /* Case: in_common == aspt->contents 
+	    /* Case: in_common == aspt->contents
 	     * =================================
 	     */
 	    if (gen_length(linit)==gen_length(in_common))
@@ -1562,31 +1532,31 @@ static void atom_cse_expression(expression e)
 	      /* just substitute lo1, don't build a new aspt. */
 	      lo1 = list_diff(call_arguments(c), in_common);
 	      free_arguments(call_arguments(c));
-	      call_arguments(c) = 
-		gen_nconc(lo1, 
+	      call_arguments(c) =
+		gen_nconc(lo1,
 			  CONS(EXPRESSION,
 			       entity_to_expression(aspt->scalar), NIL));
-	      
+
 	      /* Set the statement to status REAL */
 	      increase_number_of_use_by_1(aspt->scalar, aspt->container);
-	      
+
 	    }
 	    else
 	    {
 	      lo1 = list_diff(call_arguments(c), in_common);
 	      lo2 = list_diff(linit, in_common);
-	      
-	      cse = call_to_expression(make_call(aspt->operator, 
+
+	      cse = call_to_expression(make_call(aspt->operator,
 						 in_common));
 	      scse = atomize_this_expression(hpfc_new_variable, cse);
-	      
+
 	      /* now cse is a reference to the newly created scalar. */
 	      pips_assert("a reference...",
 			  syntax_reference_p(expression_syntax(cse)));
 	      scalar = reference_variable(syntax_reference
 					  (expression_syntax(cse)));
 	      cse2 = copy_expression(cse);
-	      
+
 	      /* update both expressions... */
 	      old = call_arguments(c); /* in code */
 	      if (gen_length(call_arguments(c))==gen_length(in_common))
@@ -1599,31 +1569,31 @@ static void atom_cse_expression(expression e)
 		call_arguments(c) = CONS(EXPRESSION, cse, lo1);
 	      }
 	      gen_free_list(old);
-	      
+
 	      old = call_arguments(ca);
 	      call_arguments(ca) = CONS(EXPRESSION, cse2, lo2);
 	      gen_free_list(old);
-	      
+
 	      set_comment_of_statement(scse, strdup("1"));
 	      insert_before_statement(scse, aspt->container, FALSE);
 	      increase_number_of_use_by_1(scalar, aspt->container);
-	      
+
 	      /* don't visit it later. */
-	      gen_recurse_stop(scse);		  		  
-	      
+	      gen_recurse_stop(scse);
+
 	      /* updates available contents */
 	      aspt->depends = CONS(ENTITY, scalar, aspt->depends);
-	      old = aspt->available_contents; 
+	      old = aspt->available_contents;
 	      aspt->available_contents = CONS(EXPRESSION, cse,
 					      list_diff(old, in_common));
 	      gen_free_list(old);
-	      
+
 	      /* add the new scalar as an available CSE. */
 	      naspt = make_available_scalar(scalar,
 					    aspt->container,
 		   EXPRESSION(CAR(CDR(call_arguments(
 		       instruction_call(statement_instruction(scse)))))));
-	      current_availables = CONS(STRING, (char*)naspt, 
+	      current_availables = CONS(STRING, (char*)naspt,
 					current_availables);
 	    }
 	  }
@@ -1637,12 +1607,12 @@ static void atom_cse_expression(expression e)
     }
   } while(aspt);
 
-  /* PDSon: Do not atomize: 
+  /* PDSon: Do not atomize:
    *   - simple reference (ex: a, x)
    *   - constant (ex: 2.6 , 5)
    *   - Unary minus (ex: -a , -5)
    */
-  if (!simple_reference_p(e) && 
+  if (!simple_reference_p(e) &&
       !is_expression_constant_p(e) &&
       !call_unary_minus_p(e))
   {
@@ -1677,7 +1647,7 @@ static void atom_cse_expression(expression e)
               syntax s = expression_syntax(e);
               instruction i = statement_instruction(atom);
               pips_assert("it is a reference", syntax_reference_p(s));
-              pips_assert("instruction is an assign", 
+              pips_assert("instruction is an assign",
                       instruction_call_p(i)); /* ??? */
 
               scalar = reference_variable(syntax_reference(s));
@@ -1686,7 +1656,7 @@ static void atom_cse_expression(expression e)
               /* if there are variants in the expression it cannot be moved,
                  and it is not available. Otherwise I should move it?
                  */
-              aspt = make_available_scalar(scalar, 
+              aspt = make_available_scalar(scalar,
                       current_statement,
                       EXPRESSION(CAR(CDR(call_arguments(ic)))));
 
@@ -1694,7 +1664,7 @@ static void atom_cse_expression(expression e)
           }
       }
     }
-    else /* exp == e == <right expression of assignment> 
+    else /* exp == e == <right expression of assignment>
 	  * => Atomize this expression without using temporel variable;
 	  *    we use the left side variable of assignment in order to reduce
 	  *    the number of the variable temporel for the comprehensive of
@@ -1705,43 +1675,43 @@ static void atom_cse_expression(expression e)
       expression rhs;
       statement assign;
       syntax ref;
-      
+
       rhs = make_expression(expression_syntax(e), normalized_undefined);
       normalize_all_expressions_of(rhs);
-      
+
       ref = make_syntax(is_syntax_reference, make_reference(scalar, NIL));
-      
-      assign = make_assign_statement(make_expression(copy_syntax(ref), 
-						     normalized_undefined), 
+
+      assign = make_assign_statement(make_expression(copy_syntax(ref),
+						     normalized_undefined),
 				     rhs);
       expression_syntax(e) = ref;
-      
+
       set_comment_of_statement(assign,strdup("1"));
       insert_before_statement(assign, current_statement, TRUE);
 
-      aspt = make_available_scalar(scalar, current_statement, rhs);	
+      aspt = make_available_scalar(scalar, current_statement, rhs);
       current_availables = CONS(STRING, (char*)aspt, current_availables);
     }
   }
 }
 
 static bool loop_stop(loop l)
-{ 
-  gen_recurse_stop(loop_body(l)); 
-  return TRUE; 
+{
+  gen_recurse_stop(loop_body(l));
+  return TRUE;
 }
 
 static bool test_stop(test t)
-{ 
+{
   gen_recurse_stop(test_true(t));
-  gen_recurse_stop(test_false(t)); 
-  return TRUE; 
+  gen_recurse_stop(test_false(t));
+  return TRUE;
 }
 
 static bool while_stop(whileloop wl)
-{ 
-  gen_recurse_stop(whileloop_body(wl)); 
-  return TRUE; 
+{
+  gen_recurse_stop(whileloop_body(wl));
+  return TRUE;
 }
 
 static bool cse_atom_call_flt(call c)
@@ -1763,12 +1733,12 @@ atomize_cse_this_statement_expressions(statement s, list availables)
   current_availables = availables;
   current_statement = s;
 
-  /* scan expressions in s; 
-     atomize/cse them; 
+  /* scan expressions in s;
+     atomize/cse them;
      update availables;
   */
   gen_multi_recurse(s,
-		    /* statement_domain, current_statement_filter, 
+		    /* statement_domain, current_statement_filter,
 		       current_statement_rewrite, */
 
 		    /* don't go inside these... */
@@ -1776,17 +1746,17 @@ atomize_cse_this_statement_expressions(statement s, list availables)
 		    test_domain, test_stop, gen_null,
 		    unstructured_domain, gen_false, gen_null,
 		    whileloop_domain, while_stop, gen_null,
-		    
+
 		    /* . */
 		    call_domain, cse_atom_call_flt, gen_null,
-		    
+
 		    /* do the job on the found expression. */
 		    expression_domain, expr_cse_flt, atom_cse_expression,
 		    NULL);
 
   /* free_current_statement_stack(); */
   availables = current_availables;
-  
+
   current_statement = statement_undefined;
   current_availables = NIL;
 
@@ -1794,7 +1764,7 @@ atomize_cse_this_statement_expressions(statement s, list availables)
   if (assign_statement_p(s))
   {
     /* Update contents */
-    expression var_defined = 
+    expression var_defined =
       copy_expression(expr_left_side_of_assign_statement(s));
     *w_effects = CONS(EXPRESSION, var_defined, NIL);
 
@@ -1817,8 +1787,8 @@ static bool seq_flt(sequence s)
   /* SG: not valid due to newgen check w_effects = &CDR(CONS(EXPRESSION, NIL, NIL));*/
   w_effects = &CDR(gen_cons(NIL,NIL));
 
-  /* top_of_w_effects points to the top of list, 
-   * It is used to free memory later 
+  /* top_of_w_effects points to the top of list,
+   * It is used to free memory later
    */
   top_of_w_effects = w_effects;
 
