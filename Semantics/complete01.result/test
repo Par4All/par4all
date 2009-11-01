@@ -123,6 +123,7 @@ void complete01()
 
 Warnings
 
+unknown[unknown] (activate_phase) Rule `C_PARSER' already active
 CUMULATED_EFFECTS[complete01] (rw_effects_of_forloop) Ongoing implementation! Amira mensi
 PROGRAM_PRECONDITION[] (get_main_entity) no main found, returning complete01 instead
 TRANSFORMERS_INTER_FULL[complete01] (NormalizeExpression) expression is already normalized

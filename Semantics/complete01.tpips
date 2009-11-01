@@ -10,6 +10,7 @@ setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
 
 # We want here to analyze for loops directly
 setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER FALSE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER FALSE
 setproperty PRETTYPRINT_BLOCKS TRUE
 #setproperty PPRETTYPRINT_EMPTY_BLOCKS TRUE
 
