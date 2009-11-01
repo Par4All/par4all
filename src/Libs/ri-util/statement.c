@@ -774,7 +774,8 @@ statement make_whileloop_statement(expression condition,
   return smt;
 }
 
-
+/* This function is limited to intrinsics calls... A full function
+   name or an entity could be passed as first argument. */
 statement make_call_statement(function_name, args, l, c)
 string function_name;
 list args;
