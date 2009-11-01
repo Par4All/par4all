@@ -79,7 +79,7 @@ static char * string_to_parse = (char*) 0; /* shared pointer! */
 
 static void parse_properties(void);
 
-void parse_properties_string(char *s) 
+void parse_properties_string(char *s)
 {
     update_property = TRUE;
     string_to_parse = s;
@@ -150,7 +150,7 @@ static string property_tag_to_string(tag t)
     case is_property_bool: return "bool";
     case is_property_string: return "string";
     default: return "UNKNOW property type";
-    } 
+    }
 }
 
 static property get_property(string, bool);
@@ -159,10 +159,10 @@ static void parse_properties(void)
 {
     int tok;
     property pr = property_undefined, opr;
-    
+
     if (!pl) pl = hash_table_make(hash_string, 0); /* lazy init */
 
-    while ((tok = yylex())) 
+    while ((tok = yylex()))
     {
 	string n;
 	
@@ -180,7 +180,7 @@ static void parse_properties(void)
 	    return;
 	}
 
-	switch (tok = yylex()) 
+	switch (tok = yylex())
 	{
 	case TTRUE:
 	    pr = make_property(is_property_bool, (void*) TRUE);
@@ -192,7 +192,7 @@ static void parse_properties(void)
 	    pr = make_property(is_property_int, (void*) atol(yytext));
  	    break;
 	case TSTRING: {
-	    /* GO: We need to free(s) so the skeep now 
+	    /* GO: We need to free(s) so the skeep now
 	       the quote and do not use s+1 anymore*/
             char *s = strdup(yytext + 1);
             char *q = strrchr(s, '"');
@@ -201,7 +201,7 @@ static void parse_properties(void)
 			"bad string : %s\n", yytext);
 		return;
 	    }
-            *q = '\0';            
+            *q = '\0';
 	    pr = make_property(is_property_string, s);
 	    break;
 	}
@@ -211,8 +211,8 @@ static void parse_properties(void)
 	    return;
 	}
 
-	if ((opr = (property) hash_get(pl, n)) != 
-            (property) HASH_UNDEFINED_VALUE) 
+	if ((opr = (property) hash_get(pl, n)) !=
+            (property) HASH_UNDEFINED_VALUE)
 	{
 	    if (property_tag(opr)!=property_tag(pr))
 	    {
@@ -224,7 +224,7 @@ static void parse_properties(void)
 			n);
 		free_property(pr);
 	    }
-	    else 
+	    else
 	    {
 		if(!property_equal_p(pr, opr))
 		    fprintf(stderr, "user warning, "
@@ -254,10 +254,10 @@ static void read_properties(void)
     pl = hash_table_make(hash_string, 0);
     update_property = FALSE;
 
-    /* Default properties: 
+    /* Default properties:
      *
      * if the variable PIPS_PROPERTIESRC is defined in the environment,
-     * it contains the absolute property file name to use; 
+     * it contains the absolute property file name to use;
      *
      * else: ${PIPS_ROOT}/etc/properties.rc
      */
@@ -326,22 +326,22 @@ void set_bool_property(const string name, bool b)
 string get_string_property(const string name)
 {
     property p = get_property(name, FALSE);
-    if (! property_string_p(p)) 
+    if (! property_string_p(p))
 	error("property %s is not string\n", name);
     return property_string(p);
 }
 
 
-string get_string_property_or_ask(const string name,const char question[]) 
-{ 
-    property p = get_property(name, FALSE); 
-    if (! property_string_p(p)) 
-        error("property %s is not string\n", name); 
-    string s = property_string(p); 
-    while(!s || string_undefined_p(s) || s[0] == '\0' ) 
-        s = user_request(question); 
- 
-    return s; 
+string get_string_property_or_ask(const string name,const char question[])
+{
+    property p = get_property(name, FALSE);
+    if (! property_string_p(p))
+        error("property %s is not string\n", name);
+    string s = property_string(p);
+    while(!s || string_undefined_p(s) || s[0] == '\0' )
+        s = user_request(question);
+
+    return s;
 }
 
 void set_string_property(const string name, string s)
@@ -353,11 +353,11 @@ void set_string_property(const string name, string s)
     property_string(p) = strdup(s);
 }
 
-int 
+int
 get_int_property(const string name)
 {
     property p = get_property(name, FALSE);
-    if (! property_int_p(p)) 
+    if (! property_int_p(p))
 	error("property %s is not int\n", name);
     return property_int(p);
 }
@@ -365,7 +365,7 @@ get_int_property(const string name)
 void set_int_property(const string name, int i)
 {
     property p = get_property(name, FALSE);
-    if (! property_int_p(p)) 
+    if (! property_int_p(p))
 	error("property %s is not int\n", name);
     property_int(p) = i;
 }
@@ -373,11 +373,11 @@ void set_int_property(const string name, int i)
 void fprint_property_direct(FILE * fd, const string pname)
 {
     property p = get_property(pname, TRUE);
-    if (property_undefined_p(p)) 
+    if (property_undefined_p(p))
 	fprintf(fd, "# undefined property %s\n", pname);
     else
 	switch (property_tag(p)) {
-	case is_property_bool: 
+	case is_property_bool:
 	    fprintf(fd, "%s", property_bool(p)? "TRUE": "FALSE");
 	    break;
 	case is_property_int:
@@ -386,20 +386,20 @@ void fprint_property_direct(FILE * fd, const string pname)
 	case is_property_string:
 	    fprintf(fd, "%s", property_string(p));
 	    break;
-	default: 
+	default:
 	    fprintf(fd, "# bad property type for %s\n", pname);
 	}
-    
+
 }
 
 void fprint_property(FILE * fd, const string pname)
 {
     property p = get_property(pname, TRUE);
-    if (property_undefined_p(p)) 
+    if (property_undefined_p(p))
 	fprintf(fd, "# undefined property %s\n", pname);
     else
 	switch (property_tag(p)) {
-	case is_property_bool: 
+	case is_property_bool:
 	    fprintf(fd, "%s %s\n", pname, property_bool(p)? "TRUE": "FALSE");
 	    break;
 	case is_property_int:
@@ -408,14 +408,14 @@ void fprint_property(FILE * fd, const string pname)
 	case is_property_string:
 	    fprintf(fd, "%s \"%s\"\n", pname, property_string(p));
 	    break;
-	default: 
+	default:
 	    fprintf(fd, "# bad property type for %s\n", pname);
 	}
 }
 
 void fprint_properties(FILE * fd)
 {
-    if (pl) 
+    if (pl)
     { /* dump all sorted properties in fd. */
 	gen_array_t array = gen_array_make(0);
 	fprintf(fd, "# PIPS PROPERTIES\n");
