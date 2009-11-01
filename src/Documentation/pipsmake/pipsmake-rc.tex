@@ -1820,6 +1820,30 @@ The comment to add is selected by this property:
 PREPEND_COMMENT "/* This comment is added by PREPEND_COMMENT phase */"
 \end{PipsProp}
 
+\section{Prepending a call}
+\label{sec:prepending-comment}
+
+\begin{PipsPass}{prepend_comment}
+This phase inserts a call to function \verb/MY_TRACK/ just before the first statement of a module.
+Useful as a pedagogical example to explore the internal representation
+and Newgen.
+\end{PipsPass}
+
+\begin{PipsMake}
+alias prepend_call 'Insert a call to MY_TRACK just before the first statement of a module'
+
+prepend_call > MODULE.code
+             > MODULE.callees
+  < PROGRAM.entities
+  < MODULE.code
+\end{PipsMake}
+
+The called function could be defined by this property:
+\begin{PipsProp}{PREPEND_COMMENT} 
+PREPEND_CALL "MY_TRACK" 
+\end{PipsProp}
+but it is not.
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% ANALYSES
 
