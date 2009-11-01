@@ -8,9 +8,14 @@ activate C_PARSER
 setproperty PRETTYPRINT_C_CODE TRUE
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 
-display PRINTED_FILE[use_def_elim]
-apply USE_DEF_ELIMINATION[use_def_elim]
-display PRINTED_FILE[use_def_elim]
+display PRINTED_FILE[use_def_elim01]
+apply USE_DEF_ELIMINATION[use_def_elim01]
+display PRINTED_FILE[use_def_elim01]
+apply SPLIT_INITIALIZATIONS[use_def_elim01]
+apply USE_DEF_ELIMINATION[use_def_elim01]
+display PRINTED_FILE[use_def_elim01]
+apply CLEAN_DECLARATIONS[use_def_elim01]
+display PRINTED_FILE[use_def_elim01]
 close
 delete use_def_elim01
 quit

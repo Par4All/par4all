@@ -18,6 +18,7 @@ echo
 echo Code after CSE
 echo
 apply COMMON_SUBEXPRESSION_ELIMINATION[cse01]
+apply RESTRUCTURE_CONTROL[cse01]
 activate PRINT_CODE
 display PRINTED_FILE[cse01]
 

@@ -39,7 +39,7 @@ echo
 echo Run code
 echo
 
-shell cc privatization.c
+shell cc privatization.database/Tmp/privatization.cpp_processed.c
 shell ./a.out 
 shell cc privatization.database/Src/privatization.c
 shell ./a.out 
