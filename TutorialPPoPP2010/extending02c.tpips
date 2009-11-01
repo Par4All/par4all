@@ -1,0 +1,11 @@
+delete extending02
+create extending02 extending02.c
+
+# setproperty PREPEND_COMMENT "PPoPP 2010"
+set PREPROCESSOR_MISSING_FILE_HANDLING "generate"
+
+apply PREPEND_CALL
+display PRINTED_FILE
+display CALLGRAPH_FILE[extending02]
+close
+quit

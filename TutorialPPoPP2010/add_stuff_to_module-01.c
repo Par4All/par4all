@@ -2,7 +2,7 @@
 
 bool prepend_comment(string mn) {
 
-  // Use this module name to get the resources we need
+  // Use the module name mn to get the resource(s) we need
   statement s = ... ;
 
 
@@ -11,7 +11,7 @@ bool prepend_comment(string mn) {
 
   // Add comment c to the module statement s
   s = ... ;
-  
+
   // Put back the new statement module
 
 }

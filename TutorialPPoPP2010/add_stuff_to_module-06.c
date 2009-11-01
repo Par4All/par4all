@@ -3,7 +3,6 @@
 #include "ri.h"
 #include "ri-util.h"
 #include "misc.h"
-#include "control.h"
 #include "pipsdbm.h"
 #include "resources.h"
 
