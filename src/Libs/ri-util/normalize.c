@@ -522,7 +522,7 @@ normalize_reference(reference r)
 {
     entity var = reference_variable(r);
 
-    pips_assert("normalize_reference", entity_variable_p(var));
+    pips_assert("The entity var is a variable", entity_variable_p(var));
 
     return(entity_integer_scalar_p(var) ? 
 	   make_normalized(is_normalized_linear, vect_new((Variable) var, 1)) :
@@ -559,25 +559,42 @@ normalize_call(call c)
     return(n);
 }
 
-static void 
-norm_all_rewrite(expression e)
+/* Look for affine expressions and encode them as vectors when
+   possible */
+static void norm_all_rewrite(expression e)
 {
-    syntax s = expression_syntax(e);
-    tag t = syntax_tag(s);
+  syntax s = expression_syntax(e);
+  tag t = syntax_tag(s);
 
-    if (!normalized_undefined_p(expression_normalized(e))) return;
+  if (normalized_undefined_p(expression_normalized(e))) {
+    normalized n = normalized_undefined;
 
-    expression_normalized(e) = 
-	t==is_syntax_range ? make_normalized(is_normalized_complex, UU) :
-	t==is_syntax_reference ? normalize_reference(syntax_reference(s)) :
-	t==is_syntax_call ? normalize_call(syntax_call(s)) :
-	    (pips_error("normalize_all_expressions_rewrite",
-			"undefined syntax tag (%d)\n", t), 
-	     normalized_undefined);
+    switch(t) {
+    case is_syntax_range:
+      n = make_normalized(is_normalized_complex, UU);
+      break;
+    case is_syntax_reference:
+      n = normalize_reference(syntax_reference(s));
+      break;
+    case is_syntax_call:
+      n = normalize_call(syntax_call(s));
+      break;
+    case is_syntax_cast:
+    case is_syntax_sizeofexpression:
+    case is_syntax_subscript:
+    case is_syntax_application:
+    case is_syntax_va_arg:
+      n = make_normalized(is_normalized_complex, UU);
+      break;
+    default:
+      (pips_internal_error("undefined syntax tag (%d)\n", t),
+       normalized_undefined);
+    }
+    expression_normalized(e) = n;
+  }
 }
 
-void 
-normalize_all_expressions_of(void * obj)
+void normalize_all_expressions_of(void * obj)
 {
     gen_multi_recurse(obj, expression_domain, gen_true, norm_all_rewrite, 
 		      NULL);
