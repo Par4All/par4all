@@ -1,0 +1,15 @@
+Source: newgen
+Section: devel
+Priority: extra
+Maintainer: serge guelton <serge.guelton@enst-bretagne.fr>
+Build-Depends: debhelper (>= 7)
+Standards-Version: 3.8.3
+Homepage: https://pips.enstb.org
+
+Package: newgen
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: C code generator of abstract type
+ From the high-level specification of user data types, it
+ generates creation, access and modification functions that implement
+ these data types, seen as abstract data types

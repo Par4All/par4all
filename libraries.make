@@ -40,3 +40,5 @@ endif
 
 newgen.libs	= genC $(NEWGEN_DOOM_LIBS)
 
+VERSION=0.1
+
