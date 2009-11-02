@@ -119,3 +119,5 @@ endif
 
 fpips.libs	= pips tpips $(pips.libs) $(fpips_add.libs) $(tpips_add.libs)
 FPIPS_MAIN	= main_fpips.o
+
+VERSION=0.1

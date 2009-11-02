@@ -1,0 +1,14 @@
+Source: pips
+Section: devel
+Priority: extra
+Maintainer: serge guelton <serge.guelton@enst-bretagne.fr>
+Build-Depends: debhelper (>= 7), cproto, flex, bison, libreadline5-dev, texlive-latex-extra, libpolylib-dev, newgen, liblinear-dev
+Standards-Version: 3.8.1
+Homepage: https://pips.enstb.org
+
+Package: pips
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, indent, libreadline5
+Recommends: gfortran
+Description: Parraléliseur Intéractif de Programme Scientifiques
+ Interprocedural, source to source compiler for C and FORTRAN
