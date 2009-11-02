@@ -21,3 +21,5 @@
 
 linear.libs	= matrice union polyedre sparse_sc sc contrainte sg sommet \
 		  ray_dte polynome matrix vecteur arithmetique
+
+VERSION=0.1

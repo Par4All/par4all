@@ -1,0 +1,6 @@
+linear (0.1-1) unstable; urgency=low
+
+  * Initial release (Closes: #nnnn)  <nnnn is the bug number of your ITP>
+
+ -- serge guelton <serge.guelton@enst-bretagne.fr>  Mon, 02 Nov 2009 16:48:37 +0100
+
