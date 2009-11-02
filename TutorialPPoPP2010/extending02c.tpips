@@ -1,7 +1,6 @@
-delete extending02
-create extending02 extending02.c
+delete extending02c
+create extending02c extending02.c
 
-# setproperty PREPEND_COMMENT "PPoPP 2010"
 set PREPROCESSOR_MISSING_FILE_HANDLING "generate"
 
 apply PREPEND_CALL

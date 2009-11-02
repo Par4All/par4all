@@ -1,7 +1,5 @@
-delete extending02
-create extending02 extending02.c
-
-# setproperty PREPEND_COMMENT "PPoPP 2010"
+delete extending02b
+create extending02b extending02.c
 
 apply PREPEND_CALL
 display PRINTED_FILE
