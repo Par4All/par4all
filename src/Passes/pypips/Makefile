@@ -63,12 +63,23 @@ clean:
 	rm -f *.o *.tmp $(TMP_PREFIX)* *.I *.H $(PYTHON_MODULE)_wrap.c *.pyc $(PYTHON_MODULE).h
 
 distclean:clean
-	rm -f $(PYTHON_MODULE).py _$(PYTHON_MODULE).so pyps.py
+	rm -f $(PYTHON_MODULE).py _$(PYTHON_MODULE).so pyps.py pipscc.py
 
-check:sample.py all
+pipscc.py:pipscc
+	ln -s $< $@
+
+check:sample.py all pipscc.py pii.py
 	python -c "import pypips"
 	python -c "import pyps"
+	python -c "import pipscc"
+	python -c "import pii"
 	PAGER=cat ./$<
+	./pipscc -c test.c
+	PAGER=cat ./pipscc test.o -o thetest
+	rm -f thetest test.o
+	python pii.py -c test.c
+	PAGER=cat python pii.py test.o -o thetest
+
 
 checkall:xpc.py
 	python ./xpc.py --module=foo --sources=carto.c,get.c --algo=genetic --nbgen=2 --CPPFLAGS=-DSIZE=100

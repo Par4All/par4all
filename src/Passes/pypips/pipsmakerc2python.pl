@@ -68,11 +68,11 @@ sub print_python_method {
 			my $arg = $short_prop."=".$pipsprops{uc($prop)};
 			if( $prop eq "loop_label" ) {
 				$has_loop_label=1;
-				$extraparamssetter="\t\tself.ws.set_property(".uc($prop)."=self.label)\n$extraparamssetter";
+				$extraparamssetter="\t\tif self.ws:self.ws.set_property(".uc($prop)."=self.label)\n$extraparamssetter";
 			}
 			else {
 				push @props, $arg;
-				$extraparamssetter="\t\tself.ws.set_property(".uc($prop)."=$short_prop)\n$extraparamssetter";
+				$extraparamssetter="\t\tif self.ws:self.ws.set_property(".uc($prop)."=$short_prop)\n$extraparamssetter";
 			}
 		}
 		if( scalar(@props) > 0 ) {

@@ -68,7 +68,7 @@ class modules:
 	its only purpose is to dispatch maethod calls on contained modules"""
 	def __init__(self,modules):
 		self.modules=modules
-		self.ws=modules[0].ws
+		self.ws= modules[0].ws if modules else None
 
 	def display(self,rc="printed_file", With="PRINT_CODE"):
 		"""display all modules"""
