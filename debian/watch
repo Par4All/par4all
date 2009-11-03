@@ -1,0 +1,3 @@
+# uscan version number
+version=3
+http://ridee.enstb.org/pips/linear-(.*)\.tar\.gz
