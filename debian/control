@@ -1,19 +1,19 @@
 Source: linear
 Priority: extra
 Maintainer: serge guelton <serge.guelton@enst-bretagne.fr>
-Build-Depends: debhelper (>= 7), libpolylib-dev
+Build-Depends: debhelper (>= 7), libpolylib-dev, flex, bison, cproto
 Standards-Version: 3.8.3
 Section: libs
 Homepage: http://freia.enstb.org/pips
 
-Package: linear-dev
+Package: liblinear-dev
 Section: libdevel
 Architecture: any
-Depends: linear1 (= ${binary:Version})
+Depends: liblinear0 (= ${binary:Version})
 Description: development headers for linear library
  additional files required to develop using liblinear
 
-Package: linear1
+Package: liblinear0
 Section: libs
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
