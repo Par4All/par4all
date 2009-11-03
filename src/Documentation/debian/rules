@@ -17,6 +17,7 @@ configure: configure-stamp
 configure-stamp:
 	dh_testdir
 	# Add here commands to configure the package.
+	sed -i -e 's,$$(ARCH)/$$(LIB_TARGET),$$(LIB_TARGET),' -e 's,$$(NEWGEN_ROOT)/lib/$$(ARCH),$$(NEWGEN_ROOT)/lib,' -e 's,$$(LINEAR_ROOT)/lib/$$(ARCH),$$(LINEAR_ROOT)/lib,' makes/pips-bin.mk
 
 	touch configure-stamp
 
@@ -29,7 +30,8 @@ build-stamp: configure-stamp
 	# Add here commands to compile the package.
 	$(MAKE) CFLAGS='-g --std=c99' \
 		CONFIG_DIR=/etc \
-		PIPS_NO_TAGS=1 PIPS_NO_EPIPS=1 PIPS_NO_JPIPS=1 PIPS_NO_WPIPS=1 PIPS_NO_WPIPS=1 \
+		PIPS_NO_TAGS=1 PIPS_NO_EPIPS=1 PIPS_NO_JPIPS=1 PIPS_NO_GPIPS=1 PIPS_NO_WPIPS=1 \
+		NEWGEN_ROOT=/usr LINEAR_ROOT=/usr \
 		build
 	#docbook-to-man debian/pips.sgml > pips.1
 
@@ -51,7 +53,9 @@ install: build
 	dh_installdirs
 	$(MAKE) CFLAGS='-g --std=c99' \
 		INSTALL_DIR=$(CURDIR)/debian/tmp/usr ETC.d=$(CURDIR)/debian/tmp/etc BIN.d=$(CURDIR)/debian/tmp/usr/bin  LIB.d=$(CURDIR)/debian/tmp/usr/lib\
-		PIPS_NO_TAGS=1 PIPS_NO_EPIPS=1 PIPS_NO_JPIPS=1 PIPS_NO_WPIPS=1 PIPS_NO_WPIPS=1 \
+		MAN.d=$(CURDIR)/debian/tmp/usr/share/man \
+		PIPS_NO_TAGS=1 PIPS_NO_EPIPS=1 PIPS_NO_JPIPS=1 PIPS_NO_WPIPS=1 PIPS_NO_GPIPS=1 \
+		NEWGEN_ROOT=/usr LINEAR_ROOT=/usr \
 		install
 
 	# Add here commands to install the package into debian/pips.

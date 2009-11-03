@@ -2,7 +2,7 @@ Source: pips
 Section: devel
 Priority: extra
 Maintainer: serge guelton <serge.guelton@enst-bretagne.fr>
-Build-Depends: debhelper (>= 7), cproto, flex, bison, libreadline5-dev, texlive-latex-extra, newgen, liblinear-dev
+Build-Depends: debhelper (>= 7), cproto, flex, bison, libreadline5-dev, texlive-latex-extra, newgen, liblinear-dev, libpolylib-dev, texlive-extra-utils, texlive-latex-recommended, ghostscript
 Standards-Version: 3.8.1
 Homepage: https://pips.enstb.org
 
