@@ -460,7 +460,7 @@ static bool loop_scalarization(loop l)
  * process it. Stack the loop index to build the iteration
  * space. Perform loop scalarization.
  */
-static bool statement_in(statement ls)
+static bool scalarization_statement_in(statement ls)
 {
   bool result = TRUE;
   if (statement_loop_p(ls)) {
@@ -486,7 +486,7 @@ static bool statement_in(statement ls)
  * unstack all variables related to loops internal wrt the current
  * loop to restore the current iteration space.
  */
-static void statement_out(statement s)
+static void scalarization_statement_out(statement s)
 {
   if (statement_loop_p(s)) {
     loop l   = statement_loop(s);
@@ -526,8 +526,6 @@ bool scalarization (char * module_name)
 				db_get_memory_resource(DBR_CODE, module_name, TRUE) );
   module_stat = get_current_module_statement();
 
-  set_proper_rw_effects((statement_effects)
-			db_get_memory_resource(DBR_PROPER_EFFECTS, module_name, TRUE));
 
   set_cumulated_rw_effects((statement_effects)
 			   db_get_memory_resource(DBR_REGIONS, module_name, TRUE));
@@ -540,10 +538,7 @@ bool scalarization (char * module_name)
 		 db_get_memory_resource(DBR_IN_REGIONS, module_name, TRUE));
   set_out_effects((statement_effects)
 		  db_get_memory_resource(DBR_OUT_REGIONS, module_name, TRUE));
-  set_private_effects((statement_effects)
-		      db_get_memory_resource(DBR_PRIVATIZED_REGIONS, module_name, TRUE));
-  set_copy_out_effects((statement_effects)
-		       db_get_memory_resource(DBR_COPY_OUT_REGIONS, module_name, TRUE));
+
 
   debug_on("SCALARIZATION_DEBUG_LEVEL");
   pips_debug(1, "begin\n");
@@ -551,7 +546,8 @@ bool scalarization (char * module_name)
   /* We now traverse our module's statements. */
   loop_indices_b = BASE_NULLE;
   scalarized_variables = NIL;
-  gen_recurse(module_stat, statement_domain, statement_in, statement_out);
+  gen_recurse(module_stat, statement_domain, scalarization_statement_in,
+	      scalarization_statement_out);
   scalarized_variables = list_undefined;
 
   pips_debug(1, "end\n");
@@ -567,14 +563,10 @@ bool scalarization (char * module_name)
   reset_current_module_entity();
   reset_current_module_statement();
 
-  reset_proper_rw_effects();
   reset_cumulated_rw_effects();
-
   reset_precondition_map();
   reset_in_effects();
   reset_out_effects();
-  reset_private_effects();
-  reset_copy_out_effects();
 
   free_value_mappings();
 
