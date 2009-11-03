@@ -36,7 +36,7 @@ build-stamp: configure-stamp
 	dh_testdir
 
 	# Add here commands to compile the package.
-	$(MAKE) CFLAGS='-g --std=c99 -O0'
+	$(MAKE) CFLAGS='-g --std=c99 -O0' PIPS_NO_TAGS=1
 
 	touch $@
 
