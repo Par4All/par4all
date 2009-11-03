@@ -504,63 +504,15 @@ bool privatize_module(char *mod_name)
  * @name localize declaration
  * @{ */
 
-/** 
- * @brief old entity -> new entities list
- */
-static hash_table old_entity_to_new = hash_table_undefined;
-
-/** 
- * @brief walk statements and perform localization based on the locals field
- * of loop statement
- * 
- * @param s statement to examine
- */
-static
-bool localize_declaration_walker(statement s)
-{
-	static statement parent_statement = statement_undefined;
-	if( statement_loop_p(s) )
-	{
-		loop l = statement_loop(s);
-        list locals = gen_copy_seq(loop_locals(l));
-
-		FOREACH(ENTITY,e,locals)
-		{
-			int n = get_statement_depth(parent_statement,get_current_module_statement());
-			string new_entity_local_name = NULL;
-
-
-			asprintf(&new_entity_local_name,"%d" BLOCK_SEP_STRING "%s%d",n,entity_user_name(e),n);
-			entity new_entity = FindOrCreateEntity(get_current_module_name(),new_entity_local_name);
-			free(new_entity_local_name);
-			entity_type(new_entity)=copy_type(entity_type(e));
-            entity_initial(new_entity) = make_value_constant(MakeConstantLitteral());
-
-			AddLocalEntityToDeclarations(new_entity,get_current_module_entity(),parent_statement);
-
-			list previous_replacements = hash_get(old_entity_to_new,e);
-			if( previous_replacements == HASH_UNDEFINED_VALUE )
-				previous_replacements = CONS(ENTITY,new_entity,NIL);
-			previous_replacements=gen_nconc(previous_replacements,CONS(ENTITY,e,NIL));
-			hash_put(old_entity_to_new,e,previous_replacements);
-			FOREACH(ENTITY,prev,previous_replacements)
-				replace_entity(s,prev,new_entity);
-		}
-        gen_free_list(locals);
-	}
-	parent_statement=s;
-	return true;
-}
-
-
 /**
    @brief Create a statement block around the statement if it is a do-loop with local/private variable
 
    It creates statement_blocks where needed to hold further declarations later
+   And then performs localization based on the locals field
 
    @param s concerned statement */
 static
-void prepare_localize_declaration_walker(statement s) {
+void localize_declaration_walker(statement s, hash_table old_entity_to_new) {
   if(statement_loop_p(s)) {
     instruction i = statement_instruction(s);
     loop l = instruction_loop(i);
@@ -570,13 +522,38 @@ void prepare_localize_declaration_walker(statement s) {
        block __this_is_usefull__ at least to me ^^
     */
     if(!ENDP(loop_locals(l))) {
-      /* Put the loop in a new statement block if there are loop-private variable(s): */
-      statement new_statement = make_stmt_of_instr(i);
-      instruction iblock = make_instruction_block(CONS(STATEMENT,new_statement,NIL));
-      statement_instruction(s) = iblock;
-      /* Since this is illegal to have comments and label on a block,
-	 moved them downward: */
-      fix_sequence_statement_attributes(s);
+        /* Put the loop in a new statement block if there are loop-private variable(s): */
+        statement new_statement = make_stmt_of_instr(i);
+        instruction iblock = make_instruction_block(CONS(STATEMENT,new_statement,NIL));
+        statement_instruction(s) = iblock;
+        /* Since this is illegal to have comments and label on a block,
+           moved them downward: */
+        fix_sequence_statement_attributes(s);
+
+        /* now add declarations to the created block */
+        list locals = gen_copy_seq(loop_locals(l));
+        FOREACH(ENTITY,e,locals)
+        {
+            /* create a new name for the local entity */
+            int n = get_statement_depth(s,get_current_module_statement());
+            string new_entity_local_name = NULL;
+            asprintf(&new_entity_local_name,"%d" BLOCK_SEP_STRING "%s%d",n,entity_user_name(e),n);
+            /* get the new entity and initialize it and register it*/
+            entity new_entity = FindOrCreateEntity(get_current_module_name(),new_entity_local_name);
+            free(new_entity_local_name);
+            entity_type(new_entity)=copy_type(entity_type(e));
+            entity_initial(new_entity) = make_value_constant(MakeConstantLitteral());
+            AddLocalEntityToDeclarations(new_entity,get_current_module_entity(),s);
+
+            list previous_replacements = hash_get(old_entity_to_new,e);
+            if( previous_replacements == HASH_UNDEFINED_VALUE )
+                previous_replacements = CONS(ENTITY,new_entity,NIL);
+            previous_replacements=gen_nconc(previous_replacements,CONS(ENTITY,e,NIL));
+            hash_put(old_entity_to_new,e,previous_replacements);
+            FOREACH(ENTITY,prev,previous_replacements)
+                replace_entity(s,prev,new_entity);
+        }
+        gen_free_list(locals);
     }
   }
 }
@@ -601,29 +578,28 @@ localize_declaration(char *mod_name)
 	/* Propagate local informations to loop statements */
 
 	// To keep track of what has been done:
-	old_entity_to_new=hash_table_make(hash_pointer,HASH_DEFAULT_SIZE);
+	hash_table old_entity_to_new=hash_table_make(hash_pointer,HASH_DEFAULT_SIZE);
 	ifdebug(1) {
 	  pips_debug(1,"The statement before we create block statement:\n");
 	  print_statement(get_current_module_statement());
 	}
-	// Create the statement_block where needed:
+
+	// Create the statement_block where needed and perform localization
 	clean_up_sequences(get_current_module_statement());
-	gen_recurse(get_current_module_statement(),statement_domain,gen_true,prepare_localize_declaration_walker);
+	gen_context_recurse(get_current_module_statement(),old_entity_to_new,statement_domain,gen_true,localize_declaration_walker);
 	ifdebug(1) {
 	  pips_debug(1,"The statement before we convert loop_locals to local declarations:\n");
 	  print_statement(get_current_module_statement());
 	}
 	// Use loop_locals data to fill local declarations:
 	clean_up_sequences(get_current_module_statement());
-	gen_recurse(get_current_module_statement(),
-		    statement_domain, localize_declaration_walker, gen_null);
 	hash_table_free(old_entity_to_new);
 
 	ifdebug(1) {
 	  pips_debug(1,"The statement after conversion:\n");
 	  print_statement(get_current_module_statement());
 	}
-	clean_up_sequences(get_current_module_statement());
+
 	/* Renumber the statement with a new ordering */
 	module_reorder(get_current_module_statement());
 	DB_PUT_MEMORY_RESOURCE(DBR_CODE, mod_name, get_current_module_statement());
