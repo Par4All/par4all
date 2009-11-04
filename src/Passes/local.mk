@@ -60,11 +60,11 @@ ifndef PIPS_NO_PYPS
 has_swig := $(shell type swig > /dev/null 2>&1 && echo ok)
 ifeq ($(has_swig),ok)
 
-has_python := $(shell type python2.5 > /dev/null 2>&1 && echo ok)
+has_python := $(shell type python > /dev/null 2>&1 && echo ok)
 ifeq ($(has_python),ok)
 	FWD_DIRS	+= pypips
 else
-$(error pyps compilation requested but python2.5 not found in PATH. pyps can be disabled by setting PIPS_NO_PYPS=1)
+$(error pyps compilation requested but python not found in PATH. pyps can be disabled by setting PIPS_NO_PYPS=1)
 endif
 
 else
