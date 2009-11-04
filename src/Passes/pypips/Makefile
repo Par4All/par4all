@@ -21,9 +21,14 @@
 
 PYTHON_MODULE=pypips
 PYTHON_INCLUDE=/usr/include/python2.5
+TMP_PREFIX=the_
+PYPS_STDOUT=pypsout
 
-LIB_TARGET=_$(PYTHON_MODULE).so
+LD_TARGET=_$(PYTHON_MODULE).so
 PY_TARGET=pyps.py $(PYTHON_MODULE).py 
+
+LD_OBJECTS=$(PYTHON_MODULE)_wrap.o $(TMP_PREFIX)$(PYTHON_MODULE).o
+LDFLAGS=$(addprefix -l,tpips readline termcap $(pips.libs))
 
 
 # common stuff
@@ -31,10 +36,9 @@ ROOT    = ../../..
 PROJECT = pips
 include $(ROOT)/makes/main.mk
 
+
 # swig stuff
 
-TMP_PREFIX=the_
-PYPS_STDOUT=pypsout
 
 $(PYTHON_MODULE).tmp: $(ROOT)/src/Passes/tpips/tp_yacc.y
 	sed -n -e '/%{/,/%}/ p' $< | sed -e '1 d' -e '$$ d' > $@
@@ -53,10 +57,9 @@ $(PYTHON_MODULE).I:$(PYTHON_MODULE).i $(PYTHON_MODULE).h
 $(PYTHON_MODULE)_wrap.c:$(PYTHON_MODULE).I
 	swig -python $<
 
-_$(PYTHON_MODULE).so:$(PYTHON_MODULE)_wrap.o $(TMP_PREFIX)$(PYTHON_MODULE).o
-	$(LD) -shared $^ $(LDFLAGS) $(LDOPT) $(addprefix -l,tpips readline termcap $(pips.libs)) -o $@
 
-$(PYTHON_MODULE).py:_$(PYTHON_MODULE).so
+$(PYTHON_MODULE).py:$(PYTHON_MODULE).I
+	swig -python $<
 
 CPPFLAGS+=-I$(PYTHON_INCLUDE)
 
@@ -71,6 +74,7 @@ distclean:clean
 
 pipscc.py:pipscc
 	ln -s $< $@
+
 
 check:sample.py all pipscc.py pii.py
 	python -c "import pypips"
@@ -87,6 +91,7 @@ check:sample.py all pipscc.py pii.py
 
 checkall:xpc.py
 	python ./xpc.py --module=foo --sources=carto.c,get.c --algo=genetic --nbgen=2 --CPPFLAGS=-DSIZE=100
+
 
 pyps.py: pipsmakerc2python.pl ../../Documentation/pipsmake/pipsmake-rc.tex $(ETC.d)/properties.rc $(ETC.d)/pipsdep.rc _pyps.py 
 	sed -n -e '1,/### loop_methods/ p' _pyps.py > $@
