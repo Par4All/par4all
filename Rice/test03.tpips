@@ -1,11 +1,11 @@
 # Check improper privatization of variable "fp", probably due to
 # interprocedural effects on "fp" due to intrinsics fgtec()
 
-delete test02
+delete test03
 
 setproprety ABORT_ON_USER_ERROR TRUE
 
-create test02 test02.c
+create test03 test03.c
 
 echo Select some options to deal with the C Language:
 echo Parse as C:

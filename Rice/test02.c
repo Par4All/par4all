@@ -8,8 +8,7 @@ int main(int argc, char** argv){
   int i,j;
   double *toto;
 
-  a_d1=5;
-  a_d2=5;
+  a_d1=a_d2=5;
   toto = malloc(sizeof(*toto)*a_d1*a_d2);
 
   for(i=0;i<a_d1;i++){
