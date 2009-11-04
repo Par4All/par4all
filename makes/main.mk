@@ -428,6 +428,7 @@ LIB_OBJECTS = $(addprefix $(ARCH)/,$(LIB_CFILES:%.c=%.o))
 endif # LIB_OBJECTS
 endif # LIB_CFILES
 
+
 ifdef LIB_TARGET
 
 $(ARCH)/$(LIB_TARGET): $(LIB_OBJECTS)
@@ -446,6 +447,17 @@ INSTALL_LIB	+=   $(LIB_TARGET)
 
 endif # LIB_TARGET
 
+ifdef LD_TARGET
+
+$(LD_TARGET):$(LD_OBJECTS)
+	$(LD) -o $@ -shared $(LD_OBJECTS) $(LDFLAGS)
+
+$(ARCH)/$(LD_TARGET):$(LD_TARGET)
+	cp $< $@
+
+INSTALL_LIB	+=   $(LD_TARGET)
+
+endif # LD_TARGET
 
 ifdef INSTALL_LIB
 
