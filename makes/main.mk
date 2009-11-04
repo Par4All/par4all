@@ -73,6 +73,7 @@ EXE.d	= $(INSTALL_DIR)/bin
 LIB.d	= $(INSTALL_DIR)/lib/$(ARCH)
 INC.d	= $(INSTALL_DIR)/include
 ETC.d	= $(INSTALL_DIR)/etc
+PY.d	= $(LIB.d)/python2.5/site-packages
 # By default, install the documentation directly into $(DOC.d) but DOC.subd can
 # be used to specify a subdirectory:
 DOC.d	= $(INSTALL_DIR)/doc
@@ -271,6 +272,49 @@ etc-clean:
 phase1: .build_etc
 
 endif # INSTALL_ETC
+
+########################################################### PYTHON FILES
+
+ifdef PY_TARGET
+
+INSTALL_PY	+= $(PY_TARGET)
+
+endif # PY_TARGET
+
+ifdef INSTALL_PY
+
+$(PY.d):
+	$(MKDIR) $@
+
+install:py-install
+# Deal also with directories.
+# By the way, how to install directories with "install" ?
+py-install .build_py: $(INSTALL_PY)
+	# no direct dependency on target directory
+	$(MAKE) $(PY.d)
+	for f in $(INSTALL_PY) ; do \
+	    $(CMP) $$f $(PY.d)/$$f || \
+	      $(INSTALL) -m 644 $$f $(PY.d) ; \
+	done
+	`echo $@ | grep -q install` || touch $@
+
+clean: py-clean
+
+unbuild: py-unbuild
+
+py-unbuild:
+	for f in $(INSTALL_PY) ; do \
+		echo "uninstalling $$f" ; \
+	  	$(RM) -r $(PY.d)/$$f ;\
+	done
+	test ! -d $(PY.d) || $(RMDIR) --ignore-fail-on-non-empty $(PY.d)
+
+py-clean:
+	$(RM) .build_py
+
+phase1: .build_py
+
+endif # INSTALL_PY
 
 ####################################################################### HEADERS
 
