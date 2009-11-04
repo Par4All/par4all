@@ -64,11 +64,11 @@ has_python := $(shell type python > /dev/null 2>&1 && echo ok)
 ifeq ($(has_python),ok)
 	FWD_DIRS	+= pypips
 else
-$(error pyps compilation requested but python not found in PATH. pyps can be disabled by setting PIPS_NO_PYPS=1)
+$(warning pyps compilation requested but python not found in PATH. pyps can be disabled by setting PIPS_NO_PYPS=1)
 endif
 
 else
-$(error pyps compilation requested but swig not found in PATH. pyps can be disabled by setting PIPS_NO_PYPS=1)
+$(warning pyps compilation requested but swig not found in PATH. pyps can be disabled by setting PIPS_NO_PYPS=1)
 endif
 
 endif
