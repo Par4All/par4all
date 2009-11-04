@@ -21,7 +21,9 @@
 
 PYTHON_MODULE=pypips
 PYTHON_INCLUDE=/usr/include/python2.5
-all:_$(PYTHON_MODULE).so pyps.py
+
+LIB_TARGET=_$(PYTHON_MODULE).so
+PY_TARGET=pyps.py $(PYTHON_MODULE).py 
 
 
 # common stuff
@@ -54,6 +56,8 @@ $(PYTHON_MODULE)_wrap.c:$(PYTHON_MODULE).I
 _$(PYTHON_MODULE).so:$(PYTHON_MODULE)_wrap.o $(TMP_PREFIX)$(PYTHON_MODULE).o
 	$(LD) -shared $^ $(LDFLAGS) $(LDOPT) $(addprefix -l,tpips readline termcap $(pips.libs)) -o $@
 
+$(PYTHON_MODULE).py:_$(PYTHON_MODULE).so
+
 CPPFLAGS+=-I$(PYTHON_INCLUDE)
 
 %.o:%.c
@@ -84,7 +88,6 @@ check:sample.py all pipscc.py pii.py
 checkall:xpc.py
 	python ./xpc.py --module=foo --sources=carto.c,get.c --algo=genetic --nbgen=2 --CPPFLAGS=-DSIZE=100
 
-DOCSTRING=%%@UserManualDocumentation:
 pyps.py: pipsmakerc2python.pl ../../Documentation/pipsmake/pipsmake-rc.tex $(ETC.d)/properties.rc $(ETC.d)/pipsdep.rc _pyps.py 
 	sed -n -e '1,/### loop_methods/ p' _pyps.py > $@
 	./$^ -loop >> $@

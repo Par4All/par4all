@@ -19,6 +19,7 @@
 # along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+
 #debug_output := $(shell echo local.mk  > /dev/tty)
 
 clean: NO_INCLUDES=1
@@ -54,8 +55,22 @@ ifndef PIPS_NO_GPIPS
 endif
 
 # compile pypips only if required
-ifdef PIPS_PYPIPS
+ifndef PIPS_NO_PYPS
+
+has_swig := $(shell type swig > /dev/null 2>&1 && echo ok)
+ifeq ($(has_swig),ok)
+
+has_python := $(shell type python2.5 > /dev/null 2>&1 && echo ok)
+ifeq ($(has_python),ok)
 	FWD_DIRS	+= pypips
+else
+$(error pyps compilation requested but python2.5 not found in PATH. pyps can be disabled by setting PIPS_NO_PYPS=1)
+endif
+
+else
+$(error pyps compilation requested but swig not found in PATH. pyps can be disabled by setting PIPS_NO_PYPS=1)
+endif
+
 endif
 
 # after its dependencies
