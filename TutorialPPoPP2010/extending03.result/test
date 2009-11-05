@@ -1,0 +1,13 @@
+C     Expected result: t(i) scalarized
+
+      SUBROUTINE SCALARIZATION(X,Y,N)
+      REAL X(N,N), Y(N,N)
+      REAL T(100)    
+      DO I = 1, N
+         DO J = 1, N
+            __scalar__0 = X(I,J)
+            X(I,J) = Y(I,J)
+            Y(I,J) = __scalar__0
+         ENDDO
+      ENDDO
+      END

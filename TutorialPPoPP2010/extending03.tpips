@@ -1,0 +1,12 @@
+delete extending03
+create extending03 extending03.f
+
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+apply SCALARIZATION[SCALARIZATION]
+display PRINTED_FILE[SCALARIZATION]
+
+close
+delete extending03
+quit
+
