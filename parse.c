@@ -27,6 +27,10 @@ along with GCC; see the file COPYING3.  If not see
 #include "parse.h"
 #include "debug.h"
 
+#include "dump2PIPS.h"
+gfc2pips_comments gfc2pips_comments_stack;
+gfc2pips_comments gfc2pips_comments_stack_;
+
 /* Current statement label.  Zero means no statement label.  Because new_st
    can get wiped during statement matching, we have to keep it separate.  */
 
@@ -906,6 +910,18 @@ next_statement (void)
 static void
 push_state (gfc_state_data *p, gfc_compile_state new_state, gfc_symbol *sym)
 {
+	/*if(p->head){
+		printf("p->head\n");gfc2pips_set_last_comments_done(p->head);
+	}
+	if(p->tail){
+		printf("p->tail\n");gfc2pips_set_last_comments_done(p->tail);
+	}
+	if(gfc_state_stack->tail){
+		printf("gfc_state_stack->tail\n");gfc2pips_set_last_comments_done(gfc_state_stack->tail);
+	}
+	if(gfc_state_stack->head){
+		printf("gfc_state_stack->head\n");gfc2pips_set_last_comments_done(gfc_state_stack->head);
+	}*/
   p->state = new_state;
   p->previous = gfc_state_stack;
   p->sym = sym;
@@ -920,6 +936,7 @@ static void
 pop_state (void)
 {
   gfc_state_stack = gfc_state_stack->previous;
+  gfc2pips_pop_not_done_comments();
 }
 
 
@@ -964,7 +981,8 @@ add_statement (void)
   p = gfc_get_code ();
   *p = new_st;
 
-  p->loc = gfc_current_locus;
+  //gfc2pips_set_last_comments_done(p);
+   p->loc = gfc_current_locus;
 
   if (gfc_state_stack->head == NULL)
     gfc_state_stack->head = p;
@@ -3744,6 +3762,7 @@ gfc_parse_file (void)
   gfc_statement st;
   locus prog_locus;
 
+  gfc2pips_comments_stack = NULL;
   gfc_start_source_files ();
 
   top.state = COMP_NONE;
@@ -3868,3 +3887,4 @@ duplicate_main:
   gfc_done_2 ();
   return SUCCESS;
 }
+

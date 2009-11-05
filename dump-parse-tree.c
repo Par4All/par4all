@@ -1984,7 +1984,7 @@ show_namespace (gfc_namespace *ns){
 
 	//if (ns->proc_name != NULL) fprintf (dumpfile, "Starting dump ...\nprocedure name = %s\n", ns->proc_name->name);
 	fprintf(stdout,"\n-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+\n+ gfc2pips_namespace done\n- Starting dump display\n+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-\n");
-	fprintf(stdout,"\nIs prettyprint on fortran ? : %s",get_prettyprint_is_fortran()?"yes":"no");
+	fprintf(stdout,"\nIs prettyprint on fortran ? : %s\n",get_prettyprint_is_fortran()?"yes":"no");
 	//return;
 	//on crée une entity qui correspond au namespace
 	fputs ("Namespace:", dumpfile);
@@ -2003,7 +2003,7 @@ show_namespace (gfc_namespace *ns){
 				i++;
 			}
 
-			//on affiche un truc qui correspond à ?
+			//il faut dump ici les données correspondant aux variables implicit
 			if (i > l){
 				fprintf (dumpfile, " %c-%c: ", l+'A', i+'A');
 			}else{
@@ -2077,8 +2077,11 @@ show_namespace (gfc_namespace *ns){
 void
 gfc_dump_parse_tree (gfc_namespace *ns, FILE *file){
 	dumpfile = file;
+	fflush(stdout);fflush(stderr);
 	show_namespace (ns);
+	fflush(stdout);fflush(stderr);
 	gfc2pips_namespace(ns);
+	fflush(stdout);fflush(stderr);
 }
 
 

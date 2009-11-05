@@ -50,6 +50,8 @@ gfc_get_code (void)
 
   c = XCNEW (gfc_code);
   c->loc = gfc_current_locus;
+  gfc2pips_set_last_comments_done(c);
+  gfc2pips_push_last_code(c);
   return c;
 }
 
@@ -217,4 +219,5 @@ gfc_free_statements (gfc_code *p)
       gfc_free (p);
     }
 }
+
 

@@ -48,6 +48,8 @@ along with GCC; see the file COPYING3.  If not see
 #include "debug.h"
 #include "flags.h"
 #include "cpp.h"
+#include "dump2PIPS.h"
+
 
 /* Structure for holding module and include file search path.  */
 typedef struct gfc_directorylist
@@ -806,6 +808,7 @@ skip_fixed_comments (void)
 
       if (c == '!' || c == 'c' || c == 'C' || c == '*')
 	{
+          gfc2pips_push_comment(gfc_current_locus,NULL,NULL);
 	  /* If -fopenmp, we need to handle here 2 things:
 	     1) don't treat !$omp|c$omp|*$omp as comments, but directives
 	     2) handle OpenMP conditional compilation, where

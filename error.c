@@ -32,7 +32,8 @@ along with GCC; see the file COPYING3.  If not see
 
 static int suppress_errors = 0;
 
-static int terminal_width, buffer_flag, errors, warnings;
+static int terminal_width, buffer_flag;
+int errors, warnings;
 
 static gfc_error_buf error_buffer, warning_buffer, *cur_error_buffer;
 
@@ -1041,3 +1042,4 @@ gfc_get_errors (int *w, int *e)
   if (e != NULL)
     *e = errors;
 }
+

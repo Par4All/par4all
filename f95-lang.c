@@ -49,6 +49,7 @@ along with GCC; see the file COPYING3.  If not see
 #include "trans.h"
 #include "trans-types.h"
 #include "trans-const.h"
+#include "dump2PIPS.h"
 
 /* Language-dependent contents of an identifier.  */
 
@@ -225,16 +226,28 @@ gfc_create_decls (void)
   gfc_init_constants ();
 }
 
-
-static void
-gfc_be_parse_file (int set_yydebug ATTRIBUTE_UNUSED)
+extern string db_get_current_workspace_directory(void);
+void gfc_be_parse_file (int set_yydebug ATTRIBUTE_UNUSED)
 {
+	  /*gen_array_t list_of_modules = db_get_module_list();
+	  GEN_ARRAY_MAP(curr,{
+	  gfc_scanner_init_1();
+		gfc_source_file = strdup(
+			concatenate(
+				getcwd(NULL, 0),
+				db_get_current_workspace_directory()+1,
+				"/",
+				curr,"/",curr,".f",
+				NULL
+			)
+		);*/
   int errors;
   int warnings;
 
   gfc_create_decls ();
-  gfc_parse_file ();
-  return;
+	gfc_parse_file();//fonction nécessitant absolument un environnement (fichiers, état d'avancement, ...)
+
+	return;
   gfc_generate_constructors ();
   cgraph_finalize_compilation_unit ();
   cgraph_optimize ();
@@ -245,6 +258,18 @@ gfc_be_parse_file (int set_yydebug ATTRIBUTE_UNUSED)
   warningcount += warnings;
 
   clear_binding_stack ();
+	//save the current module into something
+	//save stacks and Cie
+	/*gfc_init();
+	  //from compile_file
+	  ggc_protect_identifiers = true;
+
+	  init_cgraph ();
+	  init_final (main_input_filename);
+	  coverage_init (aux_base_name);
+	  statistics_init ();
+	  //\\from compile_file*/
+  //}, list_of_modules);
 }
 
 
