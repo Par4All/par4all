@@ -2356,7 +2356,7 @@ type basic_concrete_type(type t)
 {
   type nt;
 
-  pips_debug(8, "Begin with type \"%s\"\n", type_to_string(t));
+  pips_debug(9, "Begin with type \"%s\"\n", type_to_string(t));
 
   switch (type_tag(t))
     {
@@ -2366,7 +2366,7 @@ type basic_concrete_type(type t)
 	basic bt = variable_basic(vt);
 	list lt = variable_dimensions(vt);
 	
-	pips_debug(8, "of basic \"%s\"and number of dimensions %d.\n", 
+	pips_debug(9, "of basic \"%s\"and number of dimensions %d.\n", 
 		   basic_to_string(bt),
 		   (int) gen_length(lt));
 	
@@ -2376,7 +2376,7 @@ type basic_concrete_type(type t)
 	    type st = entity_type(e);
 	    
 
-	    pips_debug(8, "typedef  : %s\n", type_to_string(st));
+	    pips_debug(9, "typedef  : %s\n", type_to_string(st));
 	    nt = basic_concrete_type(st);
 	    if (type_variable_p(nt))
 	      {
@@ -2390,7 +2390,7 @@ type basic_concrete_type(type t)
 	  {
 	    type npt = basic_concrete_type(basic_pointer(bt));
 	    
-	     pips_debug(8, "pointer \n");
+	     pips_debug(9, "pointer \n");
 	     nt = make_type_variable
 	       (make_variable(make_basic_pointer(npt),
 			      gen_full_copy_list(lt),
@@ -2399,7 +2399,7 @@ type basic_concrete_type(type t)
 	  }
 	else
 	  {
-	    pips_debug(8, "other  variable case \n");
+	    pips_debug(9, "other  variable case \n");
 	     nt = copy_type(t);
 	  }
       }
@@ -2409,15 +2409,15 @@ type basic_concrete_type(type t)
       nt = copy_type(t);
     }
 
-  pips_debug(8, "Ends with type \"%s\"\n", type_to_string(nt));
-  ifdebug(8) 
+  pips_debug(9, "Ends with type \"%s\"\n", type_to_string(nt));
+  ifdebug(9) 
     {
     if(type_variable_p(nt)) 
       {
 	variable nvt = type_variable(nt);
 	basic nbt = variable_basic(nvt);
 	list nlt = variable_dimensions(nvt);
-	pips_debug(8, "of basic \"%s\"and number of dimensions %d.\n", 
+	pips_debug(9, "of basic \"%s\"and number of dimensions %d.\n", 
 		 basic_to_string(nbt),
 		 (int) gen_length(nlt));
       }

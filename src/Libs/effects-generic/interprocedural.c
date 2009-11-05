@@ -300,7 +300,7 @@ list generic_c_effects_backward_translation(entity callee,
       (*effects_prettyprint_func)(l_sum_eff);
     }
 
-  (*effects_translation_init_func)(callee, real_args);
+  (*effects_translation_init_func)(callee, real_args, true);
 
   /* first, take care of global effects */
 
@@ -470,6 +470,97 @@ list generic_c_effects_backward_translation(entity callee,
 
 }
 
+list generic_c_effects_forward_translation
+(entity callee, list real_args, list l_eff, transformer context)
+{
+  entity caller = get_current_module_entity();
+  int arg_num;
+  list l_formal = NIL;
+  list l_global = NIL;
+  list l_res = NIL;
+  list r_args = real_args;
+  list l_sum_rw_eff = (*db_get_summary_rw_effects_func)(module_local_name(callee));
+      
+  ifdebug(2)
+    {
+      pips_debug(2, "begin for function %s\n", entity_local_name(callee));
+      pips_debug(2, "with actual arguments :\n");
+      print_expressions(real_args);
+      pips_debug(2, "and effects :\n");
+      (*effects_prettyprint_func)(l_eff);
+    }
+
+  (*effects_translation_init_func)(callee, real_args, false);
+  
+  /* First, global effects : To be done 
+     There is a problem here, since global entities maybe used as
+     actual arguments and at the same time as globals.
+  */
+  FOREACH(EFFECT, eff, l_eff)
+    {
+      storage eff_s = entity_storage(reference_variable(effect_any_reference((eff))));
+      
+      if(storage_ram_p(eff_s) && 
+	    !dynamic_area_p(ram_section(storage_ram(eff_s)))
+	    && !heap_area_p(ram_section(storage_ram(eff_s)))
+	    && !stack_area_p(ram_section(storage_ram(eff_s))))
+	{
+	  /* This effect must be a global effect. It does not require
+	     translation in C. However, it may not be in the scope of
+	     the caller. */
+	  effect eff_tmp = (*effect_dup_func)(eff);
+	  (*effect_descriptor_interprocedural_translation_op)(eff_tmp);
+	  l_global = gen_nconc(l_global, CONS(EFFECT, eff_tmp, NIL));
+	}
+      
+    }
+  
+  /* We should also take care of varargs */
+
+  /* Then formal args */
+  
+  for (arg_num = 1; !ENDP(r_args); r_args = CDR(r_args), arg_num++) 
+    {
+      expression real_exp = EXPRESSION(CAR(r_args));
+      entity formal_ent = find_ith_formal_parameter(callee, arg_num);
+
+      l_formal = gen_nconc
+	    (l_formal,
+	     (*c_effects_on_actual_parameter_forward_translation_func)
+	     (callee, real_exp, formal_ent, l_eff, context));
+    } /* for */
+  
+  pips_debug_effects(2,"Formal effects : \n", l_formal);
+  
+  
+  /* It's necessary to take the intersection with the summary regions of the
+   * callee to avoid problems due to multiple usages of the same actual 
+   * parameter for different formal ones :
+   *
+   *      <a(PHI1)-OUT-MUST-{PHI1==i}
+   *      foo(a, a, i)
+   *     
+   *      <tab1-R-MUST-{PHI1==i}>, <tab2-W-MUST-{PHI1==i}
+   *      void foo(int tab1[], int tab2[], int i)
+   *
+   * Without the intersection, we would obtain : 
+   *  
+   *      <tab1-OUT-MUST-{PHI1==i}>, <tab2-OUT-MUST-{PHI1==i}
+   */
+  pips_debug_effects(2, "R/W effects : \n", l_sum_rw_eff);
+  l_formal = (*effects_intersection_op)(l_formal, effects_dup(l_sum_rw_eff),
+				 effects_same_action_p);
+  pips_debug_effects(2, "l_formal after intersection : \n", l_formal);
+  
+  l_res = gen_nconc(l_global, l_formal);
+  pips_debug_effects(2,"Ending with effects : \n",l_res);
+ (*effects_translation_end_func)();
+  return(l_res);
+}
+
+
+
+
 /************************************************************ INTERFACE */
 
 list /* of effect */
@@ -494,3 +585,22 @@ generic_effects_backward_translation(
 }
 
 
+list generic_effects_forward_translation(entity callee, 
+					 list real_args,
+					 list l_eff,
+					 transformer context)
+{
+  list el = list_undefined;
+
+
+  if(parameter_passing_by_reference_p(callee))
+    el = (*fortran_effects_forward_translation_op)(callee, real_args,
+					   l_eff, context);
+  else
+    el = generic_c_effects_forward_translation(callee, real_args,
+						l_eff, context);
+
+
+  return el;
+
+}

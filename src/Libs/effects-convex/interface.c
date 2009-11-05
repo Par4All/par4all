@@ -66,9 +66,7 @@ bool
 summary_regions(char *module_name)
 {
     bool res;
-    set_methods_for_convex_effects();
-    effects_computation_init_func = init_convex_summary_rw_regions;
-    effects_computation_reset_func = reset_convex_summary_rw_regions;
+    set_methods_for_convex_rw_effects();
     res = summary_rw_effects_engine(module_name);
     generic_effects_reset_all_methods();
     return res;
@@ -87,9 +85,7 @@ may_regions(char *module_name)
 
     set_bool_property("MUST_REGIONS", FALSE);
 
-    set_methods_for_convex_effects();
-    effects_computation_init_func = init_convex_rw_regions;
-    effects_computation_reset_func = reset_convex_rw_regions;
+    set_methods_for_convex_rw_effects();
 
     res1 = proper_effects_engine(module_name);
     res2 = rw_effects_engine(module_name);
@@ -113,15 +109,11 @@ must_regions(char *module_name)
 
     set_bool_property("MUST_REGIONS", TRUE);
 
-    set_methods_for_convex_effects();
-    effects_computation_init_func = init_convex_rw_regions;
-    effects_computation_reset_func = reset_convex_rw_regions;
+    set_methods_for_convex_rw_effects();
     res1 = proper_effects_engine(module_name);
     generic_effects_reset_all_methods();
 
-    set_methods_for_convex_effects();
-    effects_computation_init_func = init_convex_rw_regions;
-    effects_computation_reset_func = reset_convex_rw_regions;
+    set_methods_for_convex_rw_effects();
     res2 = rw_effects_engine(module_name);
     generic_effects_reset_all_methods();
 
@@ -142,10 +134,7 @@ bool
 in_summary_regions(char *module_name)
 {
     bool res;
-    set_methods_for_convex_effects();
-    effects_computation_init_func = init_convex_summary_in_out_regions;
-    effects_computation_reset_func = reset_convex_summary_in_out_regions;
-
+    set_methods_for_convex_in_out_effects();
     res =  summary_in_effects_engine(module_name);
     generic_effects_reset_all_methods();
     return res;
@@ -161,9 +150,7 @@ bool
 in_regions(char *module_name)
 {
     bool res;
-    set_methods_for_convex_effects();
-    effects_computation_init_func = init_convex_in_out_regions;
-    effects_computation_reset_func = reset_convex_in_out_regions;
+    set_methods_for_convex_in_out_effects();
     res = in_effects_engine(module_name);
     generic_effects_reset_all_methods();
     return res;
@@ -177,11 +164,8 @@ out_summary_regions(char * module_name)
 {
     bool res;
 
-    set_methods_for_convex_effects();
+    set_methods_for_convex_in_out_effects();
     init_convex_rw_prettyprint(module_name); // for debugging
-    effects_computation_init_func = init_convex_in_out_regions;
-    effects_computation_reset_func = reset_convex_in_out_regions;
-
     res =  summary_out_effects_engine(module_name);
     generic_effects_reset_all_methods();
 
@@ -192,11 +176,7 @@ bool
 out_regions(char *module_name)
 {
     bool res;
-    set_methods_for_convex_effects();
-    // init_convex_rw_prettyprint(module_name); // FI: added by mistake
-    effects_computation_init_func = init_convex_in_out_regions;
-    effects_computation_reset_func = reset_convex_in_out_regions;
-
+    set_methods_for_convex_in_out_effects();
     res = out_effects_engine(module_name);
     generic_effects_reset_all_methods();
     return res;

@@ -108,7 +108,7 @@ out_effects_from_call_site_to_callee(call c)
     context = (*load_context_func)(current_stmt);
     l_out = load_out_effects_list(current_stmt);
     
-    l_tmp = (*effects_forward_translation_op)(current_callee,
+    l_tmp = generic_effects_forward_translation(current_callee,
 					      call_arguments(c), l_out,
 					      context);
     update_out_summary_effects_list(l_tmp);
@@ -183,10 +183,10 @@ summary_out_effects_engine(char *module_name)
 						       TRUE);
     entity callee = module_name_to_entity(module_name);
 
-    debug_on("OUT_EFFECTS_DEBUG_LEVEL");
 
     set_current_module_entity(callee);
 
+    debug_on("OUT_EFFECTS_DEBUG_LEVEL");
     ifdebug(1)
     {
 	pips_debug(1, "begin for %s with %td callers\n",
@@ -214,9 +214,13 @@ summary_out_effects_engine(char *module_name)
 	
     ifdebug(1) 
     {
+      set_current_module_statement( (statement)
+				    db_get_memory_resource(DBR_CODE, module_local_name(callee), TRUE) );
+
 	pips_debug(1, "summary out_effects for module %s:\n", module_name);
 	(*effects_prettyprint_func)(l_eff);
 	pips_debug(1, "end\n");
+	reset_current_module_statement();
     }
 
     reset_current_module_entity();

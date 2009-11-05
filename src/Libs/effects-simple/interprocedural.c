@@ -53,7 +53,8 @@
 /*********************************************************** INITIALIZATION */
 
 void simple_effects_translation_init(entity __attribute__((unused)) callee, 
-				     list __attribute__((unused)) real_args )
+				     list __attribute__((unused)) real_args,
+				     bool __attribute__((unused)) backward_p)
 {
 }
 
@@ -1918,4 +1919,11 @@ simple_effects_forward_translation(
     lc = common_simple_effects_forward_translation(callee, l_eff);
 
     return gen_nconc(lr, lc);
+}
+
+list c_simple_effects_on_actual_parameter_forward_translation
+(entity callee, expression real_exp, entity formal_ent, list l_eff, transformer context)
+{
+  pips_internal_error("not yet implemented\n");
+  return NIL;
 }

@@ -295,16 +295,13 @@ list generic_p_proper_effect_of_reference(reference ref,
 
   ifdebug(4)
     {
-      if(effect_undefined_p(*pme)) {
+      if(effect_undefined_p(*pme)) 
 	pips_debug(4, "ending no main effect "
 		   "(e.g. a non-subscribed reference to an array)\n");
-      }
-      else {
-	pips_debug(4, "ending with main effect : \n");
-	print_effect(*pme);
-      }
-      pips_debug(4, "and intermediate read effects : \n");
-      (*effects_prettyprint_func)(le);
+      else 
+	pips_debug_effect(4, "ending with main effect : \n", *pme);
+
+      pips_debug_effects(4, "and intermediate read effects : \n",le);
     }
   free_type(t);
 
@@ -416,7 +413,6 @@ list generic_proper_effects_of_complex_address_expression(expression add_exp, ef
   syntax s = expression_syntax(add_exp);
   bool finished_p = FALSE, result_computed_p = FALSE ;
   expression s_exp = expression_undefined;
-  extern void print_effect(effect);
   reference mr = reference_undefined;
 
   pips_debug(3, "begin for expression : %s\n", 
@@ -843,21 +839,11 @@ list generic_proper_effects_of_complex_address_expression(expression add_exp, ef
 	(write_p?is_action_write:is_action_read);
     }
   
-  ifdebug(8) 
-    {
-      pips_debug(8, "End with le=\n");
-      (*effects_prettyprint_func)(le);
-      if(effect_undefined_p(*pme)) {
-	pips_debug(8, "And *pme:\n");
-	fprintf(stderr, "EFFECT UNDEFINED\n");
-      }
-      else 
-	{
-	  pips_debug(8, "And *pme :\n");
-	  print_effect(*pme);
-	}
-
-    }
+  pips_debug_effects(8, "End with le=\n", le);
+  if(effect_undefined_p(*pme)) 
+    pips_debug(8, "And *pme: EFFECT UNDEFINED\n");
+  else 
+    pips_debug_effect(8, "And *pme :\n",*pme);
   
   return le;
 }
@@ -1202,7 +1188,7 @@ generic_proper_effects_of_external(entity func, list args)
 
 	/* Translate them using context information. */
 	context = effects_private_current_context_head();
-	le = (*effects_backward_translation_op)(func, args, func_eff, context);
+	le = generic_effects_backward_translation(func, args, func_eff, context);
 
 	if(!check_sdfi_effects_p(func, func_eff))
 	  pips_internal_error("SDFI effects for \"%s\" have been corrupted by the translation\n",

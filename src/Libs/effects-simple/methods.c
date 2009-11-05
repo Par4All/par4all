@@ -109,12 +109,13 @@ set_methods_for_proper_references()
     effects_translation_end_func = simple_effects_translation_end;
     effect_descriptor_interprocedural_translation_op = simple_effect_descriptor_interprocedural_translation ;
 
-    effects_backward_translation_op = generic_effects_backward_translation;
     fortran_effects_backward_translation_op = simple_effects_backward_translation;
-    effects_forward_translation_op = simple_effects_forward_translation;/*FC*/
+    fortran_effects_forward_translation_op = simple_effects_forward_translation;/*FC*/
     effects_local_to_global_translation_op = effects_dynamic_elim;
     c_effects_on_formal_parameter_backward_translation_func =
       c_simple_effects_on_formal_parameter_backward_translation;
+    c_effects_on_actual_parameter_forward_translation_func =
+      c_simple_effects_on_actual_parameter_forward_translation;
 
     load_context_func = load_undefined_context;
     load_transformer_func = load_undefined_transformer;
@@ -177,12 +178,13 @@ set_methods_for_cumulated_references()
     effects_translation_end_func = simple_effects_translation_end;
     effect_descriptor_interprocedural_translation_op = simple_effect_descriptor_interprocedural_translation ;
 
-    effects_backward_translation_op = generic_effects_backward_translation;
     fortran_effects_backward_translation_op = simple_effects_backward_translation;
-    effects_forward_translation_op = simple_effects_forward_translation;
+    fortran_effects_forward_translation_op = simple_effects_forward_translation;
     effects_local_to_global_translation_op = effects_dynamic_elim;
     c_effects_on_formal_parameter_backward_translation_func =
       c_simple_effects_on_formal_parameter_backward_translation;
+    c_effects_on_actual_parameter_forward_translation_func =
+      c_simple_effects_on_actual_parameter_forward_translation;
 
     load_context_func = load_undefined_context;
     load_transformer_func = load_undefined_transformer;
@@ -260,12 +262,13 @@ set_methods_for_proper_simple_effects()
     effects_translation_end_func = simple_effects_translation_end;
     effect_descriptor_interprocedural_translation_op = simple_effect_descriptor_interprocedural_translation ;
 
-    effects_backward_translation_op = generic_effects_backward_translation;
     fortran_effects_backward_translation_op = simple_effects_backward_translation;
-    effects_forward_translation_op = simple_effects_forward_translation;
+    fortran_effects_forward_translation_op = simple_effects_forward_translation;
     effects_local_to_global_translation_op = effects_dynamic_elim;
     c_effects_on_formal_parameter_backward_translation_func =
       c_simple_effects_on_formal_parameter_backward_translation;
+    c_effects_on_actual_parameter_forward_translation_func =
+      c_simple_effects_on_actual_parameter_forward_translation;
 
     load_context_func = load_undefined_context;
     load_transformer_func = load_undefined_transformer;
@@ -327,11 +330,12 @@ set_methods_for_simple_effects()
     effects_translation_end_func = simple_effects_translation_end;
     effect_descriptor_interprocedural_translation_op = simple_effect_descriptor_interprocedural_translation ;
 
-    effects_backward_translation_op = simple_effects_backward_translation;
     fortran_effects_backward_translation_op = simple_effects_backward_translation;
-    effects_forward_translation_op = simple_effects_forward_translation;
+    fortran_effects_forward_translation_op = simple_effects_forward_translation;
     c_effects_on_formal_parameter_backward_translation_func =
       c_simple_effects_on_formal_parameter_backward_translation;
+    c_effects_on_actual_parameter_forward_translation_func =
+      c_simple_effects_on_actual_parameter_forward_translation;
 
     effects_local_to_global_translation_op = effects_dynamic_elim;
 

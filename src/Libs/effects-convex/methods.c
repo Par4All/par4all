@@ -110,12 +110,13 @@ set_methods_for_convex_effects()
     effects_translation_end_func = convex_regions_translation_end;
     effect_descriptor_interprocedural_translation_op = convex_region_descriptor_translation;
 
-    effects_backward_translation_op = generic_effects_backward_translation;
     fortran_effects_backward_translation_op = convex_regions_backward_translation;
-    effects_forward_translation_op = convex_regions_forward_translation;
+    fortran_effects_forward_translation_op = convex_regions_forward_translation;
     c_effects_on_formal_parameter_backward_translation_func =
       c_convex_effects_on_formal_parameter_backward_translation;
-    effects_local_to_global_translation_op = regions_dynamic_elim;
+    c_effects_on_actual_parameter_forward_translation_func =
+      c_convex_effects_on_actual_parameter_forward_translation;
+  effects_local_to_global_translation_op = regions_dynamic_elim;
 
     load_context_func = load_statement_precondition;
     load_transformer_func = load_statement_transformer;
@@ -157,6 +158,27 @@ set_methods_for_convex_effects()
 
     set_contracted_proper_effects(TRUE);
     set_descriptor_range_p(TRUE);
+}
+
+
+void set_methods_for_convex_rw_effects()
+{
+  set_methods_for_convex_effects();
+  effects_computation_init_func = init_convex_rw_regions;
+  effects_computation_reset_func = reset_convex_rw_regions;
+}
+
+
+void set_methods_for_convex_in_out_effects()
+{
+  set_methods_for_convex_effects();
+  effects_computation_init_func = init_convex_in_out_regions;
+  effects_computation_reset_func = reset_convex_in_out_regions;
+}
+
+bool in_out_methods_p()
+{
+  return (effects_computation_init_func == init_convex_in_out_regions);
 }
 
 void init_convex_rw_prettyprint(string __attribute__ ((unused)) module_name)

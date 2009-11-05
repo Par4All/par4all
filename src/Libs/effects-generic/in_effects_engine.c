@@ -591,7 +591,7 @@ in_effects_of_external(entity func, list real_args)
 	func_eff = (*db_get_summary_in_effects_func)(func_name);
 	/* Translate them using context information. */
 	context = (*load_context_func)(current_stat);
-	le = (*effects_backward_translation_op)
+	le = generic_effects_backward_translation
 	    (func, real_args, func_eff, context);
     }
     return le;

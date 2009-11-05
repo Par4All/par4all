@@ -41,235 +41,10 @@
 #include "ri-util.h"
 #include "misc.h"
 #include "text-util.h"
+#include "properties.h"
+#include "preprocessor.h"
 
 #include "effects-generic.h"
-
-
-/******************************************************** GENERIC FUNCTIONS */
-
-/* GENERIC FUNCTIONS on lists of effects to be instanciated for specific 
-   types of effects */
-
-/* consistency checking */
-bool (*effect_consistent_p_func)(effect);
-
-/* initialisation and finalization */
-void (*effects_computation_init_func)(string /* module_name */);
-void (*effects_computation_reset_func)(string /* module_name */);
-
-/* dup and free - This should be handled by newgen, but there is a problem
- * with the persistency of references - I do not understand what happens. */
-effect (*effect_dup_func)(effect eff);
-void (*effect_free_func)(effect eff);
-
-/* make functions for effects */
-effect (*reference_to_effect_func)(reference, tag /* action */, 
-				   bool /* use_preference */);
-list (*effect_to_store_independent_effect_list_func)(effect, bool);
-void (*effect_add_expression_dimension_func)(effect eff, expression exp);
-void (*effect_change_ith_dimension_expression_func)(effect eff, expression exp, 
-					       int i);
-
-/* union */
-effect (*effect_union_op)(effect, effect);
-list (*effects_union_op)(
-    list, list, bool (*eff1_eff2_combinable_p)(effect, effect));
-list (*effects_test_union_op)(
-    list, list, bool (*eff1_eff2_combinable_p)(effect, effect));
-
-/* intersection */
-list (*effects_intersection_op)(
-    list, list, bool (*eff1_eff2_combinable_p)(effect, effect));
-
-/* difference */
-list (*effects_sup_difference_op)(
-    list, list, bool (*eff1_eff2_combinable_p)(effect, effect));
-list (*effects_inf_difference_op)(
-    list, list, bool (*eff1_eff2_combinable_p)(effect, effect));
-
-/* composition with transformers */
-list (*effects_transformer_composition_op)(list, transformer);
-list (*effects_transformer_inverse_composition_op)(list, transformer);
-
-/* composition with preconditions */
-list (*effects_precondition_composition_op)(list,transformer);
-
-/* union over a range */
-list (*effects_descriptors_variable_change_func)(list, entity, entity);
-descriptor (*loop_descriptor_make_func)(loop);
-list (*effects_loop_normalize_func)(
-    list /* of effects */, entity /* index */, range,
-    entity* /* new loop index */, descriptor /* range descriptor */,
-    bool /* normalize descriptor ? */);
-list (*effects_union_over_range_op)(list, entity, range, descriptor);
-descriptor (*vector_to_descriptor_func)(Pvecteur);
-
-/* interprocedural translation */
-void (*effects_translation_init_func)(entity /* callee */, 
-				      list /* real_args */);
-void (*effects_translation_end_func)();
-void (*effect_descriptor_interprocedural_translation_op)(effect); 
-
-list (*effects_backward_translation_op)(entity, list, list, transformer);
-list (*fortran_effects_backward_translation_op)(entity, list, list, transformer);
-list (*effects_forward_translation_op)(entity /* callee */, list /* args */,
-				       list /* effects */,
-				       transformer /* context */);
-
-list (*c_effects_on_formal_parameter_backward_translation_func)
-(list /* of effects */, 
- expression /* args */, 
- transformer /* context */);
-
-
-/* local to global name space translation */
-list (*effects_local_to_global_translation_op)(list);
-
-
-
-/* functions to provide context and transformer information */
-transformer (*load_context_func)(statement);
-transformer (*load_transformer_func)(statement);
-
-bool (*empty_context_test)(transformer);
-
-/* proper to contracted proper effects or to summary effects functions */
-effect (*proper_to_summary_effect_func)(effect);
-
-/* normalization of descriptors */
-void (*effects_descriptor_normalize_func)(list /* of effects */);
-
-/* getting/putting resources from/to pipsdbm */
-statement_effects (*db_get_proper_rw_effects_func)(char *);
-void (*db_put_proper_rw_effects_func)(char *, statement_effects);
-
-statement_effects (*db_get_invariant_rw_effects_func)(char *);
-void (*db_put_invariant_rw_effects_func)(char *, statement_effects);
-
-statement_effects (*db_get_rw_effects_func)(char *);
-void (*db_put_rw_effects_func)(char *, statement_effects);
-
-list (*db_get_summary_rw_effects_func)(char *);
-void (*db_put_summary_rw_effects_func)(char *, list);
-
-statement_effects (*db_get_in_effects_func)(char *);
-void (*db_put_in_effects_func)(char *, statement_effects);
-
-statement_effects (*db_get_cumulated_in_effects_func)(char *);
-void (*db_put_cumulated_in_effects_func)(char *, statement_effects);
-
-statement_effects (*db_get_invariant_in_effects_func)(char *);
-void (*db_put_invariant_in_effects_func)(char *, statement_effects);
-
-list (*db_get_summary_in_effects_func)(char *);
-void (*db_put_summary_in_effects_func)(char *, list);
-
-list (*db_get_summary_out_effects_func)(char *);
-void (*db_put_summary_out_effects_func)(char *, list);
-
-statement_effects  (*db_get_out_effects_func)(char *);
-void (*db_put_out_effects_func)(char *, statement_effects);
-
-
-/* prettyprint function for debug */
-void (*effects_prettyprint_func)(list); /* should be avoided : use print_effects instead */
-void (*effect_prettyprint_func)(effect);
-
-/* prettyprint function for sequential and user views */
-text (*effects_to_text_func)(list);
-void (*attach_effects_decoration_to_text_func)(text);
-
-
-/* RESET all generic methods... should be called when pips is started...
- */
-
-#define UNDEF abort
-
-typedef void (*void_function)();
-typedef gen_chunk* (*chunks_function)();
-typedef list (*list_function)();
-typedef bool (*bool_function)();
-typedef descriptor (*descriptor_function)();
-typedef effect (*effect_function)();
-typedef transformer (*transformer_function)();
-typedef statement_effects (*statement_effects_function)();
-typedef text (*text_function)();
-
-void 
-generic_effects_reset_all_methods()
-{
-    effects_computation_init_func = (void_function) UNDEF;
-    effects_computation_reset_func = (void_function) UNDEF;
-
-    effect_dup_func = (effect_function) UNDEF;
-    effect_free_func = (void_function) UNDEF;
-
-    effect_union_op = (effect_function) UNDEF;
-    effects_union_op = (list_function) UNDEF;
-    effects_test_union_op = (list_function) UNDEF;
-    effects_intersection_op = (list_function) UNDEF;
-    effects_sup_difference_op = (list_function) UNDEF;
-    effects_inf_difference_op = (list_function) UNDEF;
-    effects_transformer_composition_op = (list_function) UNDEF;
-    effects_transformer_inverse_composition_op = (list_function) UNDEF;
-    effects_precondition_composition_op = (list_function) UNDEF;
-    effects_descriptors_variable_change_func = (list_function) UNDEF;
-
-    effects_loop_normalize_func = (list_function) UNDEF;
-    effects_union_over_range_op = (list_function) UNDEF;
-
-    reference_to_effect_func = (effect_function) UNDEF;
-    loop_descriptor_make_func = (descriptor_function) UNDEF;
-    vector_to_descriptor_func = (descriptor_function) UNDEF;
-
-    effects_backward_translation_op = (list_function) UNDEF;
-    effects_forward_translation_op = (list_function) UNDEF;
-    effects_local_to_global_translation_op = (list_function) UNDEF;
-
-    load_context_func = (transformer_function) UNDEF;
-    load_transformer_func = (transformer_function) UNDEF;
-    empty_context_test = (bool_function) UNDEF;
-    proper_to_summary_effect_func = (effect_function) UNDEF;
-    effects_descriptor_normalize_func = (void_function) UNDEF;
-
-    db_get_proper_rw_effects_func = (statement_effects_function) UNDEF;
-    db_put_proper_rw_effects_func = (void_function) UNDEF;
-    db_get_invariant_rw_effects_func = (statement_effects_function) UNDEF;
-    db_put_invariant_rw_effects_func = (void_function) UNDEF;
-    db_get_rw_effects_func = (statement_effects_function) UNDEF;
-    db_put_rw_effects_func = (void_function) UNDEF;
-    db_get_summary_rw_effects_func = (list_function) UNDEF;
-    db_put_summary_rw_effects_func = (void_function) UNDEF;
-    db_get_in_effects_func = (statement_effects_function) UNDEF;
-    db_put_in_effects_func = (void_function) UNDEF;
-    db_get_cumulated_in_effects_func = (statement_effects_function) UNDEF;
-    db_put_cumulated_in_effects_func = (void_function) UNDEF;
-    db_get_invariant_in_effects_func = (statement_effects_function) UNDEF;
-    db_put_invariant_in_effects_func = (void_function) UNDEF;
-    db_get_summary_in_effects_func = (list_function) UNDEF;
-    db_put_summary_in_effects_func = (void_function) UNDEF;
-    db_get_summary_out_effects_func = (list_function) UNDEF;
-    db_put_summary_out_effects_func = (void_function) UNDEF;
-    db_get_out_effects_func = (statement_effects_function) UNDEF;
-    db_put_out_effects_func = (void_function) UNDEF;
-
-    set_contracted_proper_effects(TRUE);
-    set_contracted_rw_effects(TRUE);
-
-    set_descriptor_range_p(FALSE);
-
-    /* PRETTYPRINT related functions and settings
-     */
-    set_is_user_view_p(FALSE);
-    set_prettyprint_with_attachments(FALSE);
-
-    effects_prettyprint_func = (void_function) UNDEF;
-    effect_prettyprint_func = (void_function) UNDEF;
-    effects_to_text_func = (text_function) UNDEF;
-    attach_effects_decoration_to_text_func = (void_function) UNDEF;
-
-    reset_generic_prettyprints();
-}
 
 
 /********************************************************************* MISC */
@@ -778,7 +553,7 @@ list summary_effects_from_declaration(string module_name __attribute__ ((unused)
 
 void dump_cell(cell c)
 {
-  fprintf(stderr, "Cell %p = (cell_tag=%td, reference=%p)\n", c, cell_tag(c),
+  fprintf(stderr, "Cell %p = (cell_tag=%u, reference=%p)\n", c, cell_tag(c),
 	  cell_preference_p(c)? preference_reference(cell_preference(c)):cell_reference(c));
 }
 
@@ -1271,6 +1046,103 @@ bool effect_pointer_type_p(effect eff)
 
 }
 
+
+
+type simple_effect_reference_type(reference ref)
+{
+  type bct = basic_concrete_type(entity_type(reference_variable(ref)));
+  type ct; /* current_type */
+
+  list l_inds = reference_indices(ref);
+
+  type t = type_undefined; /* result */
+  bool finished = false;
+      
+  pips_debug(8, "beginning with reference : %s\n", words_to_string(words_reference(ref)));
+  
+  ct = bct;
+  while (! finished)
+    {
+      basic cb = variable_basic(type_variable(ct)); /* current basic */     
+      list cd = variable_dimensions(type_variable(ct)); /* current type dimensions */
+      
+      while(!ENDP(cd) && !ENDP(l_inds))
+	{
+	  pips_debug(8, "poping one array dimension \n");
+	  POP(cd);
+	  POP(l_inds);
+	}
+      
+      if(ENDP(l_inds))
+	{
+	  pips_debug(8, "end of reference indices, generating type\n");
+	  t = make_type(is_type_variable,
+			make_variable(copy_basic(cb),
+				      gen_full_copy_list(cd),
+				      NIL));
+	  finished = true;
+	}
+      else /* ENDP (cd) && ! ENDP(l_inds) */
+	{
+	  switch (basic_tag(cb))
+	    {
+	    case is_basic_pointer:
+	      /* in an effect reference there is always an index for a pointer */
+	      pips_debug(8, "poping pointer dimension\n");
+	      POP(l_inds);
+	      ct = basic_pointer(cb);
+	      break;
+	    case is_basic_derived:
+	      {
+		/* we must know which field it is, else return an undefined type */
+		expression exp = EXPRESSION(CAR(l_inds));
+		pips_debug(8, "field dimension : ");
+		if (expression_constant_p(exp))
+		  {
+		    int rank = expression_to_int(exp);
+		    
+		    list fields = type_fields(entity_type(basic_derived(cb)));
+		    entity cf = ENTITY(gen_nth(rank-1, fields));
+		    
+		    pips_debug(8, "constant rank (%d), poping field dimension\n", rank);
+		    
+		    free_type(bct);
+		    bct =  basic_concrete_type(entity_type(cf));
+		    ct = bct;
+		    POP(l_inds);
+		  }
+		else 
+		  {
+		    pips_debug(8, "non constant rank, returning type_undefined\n");
+		    t = type_undefined;
+		    finished = true;
+		  }
+	      }
+	      break;
+	    case is_basic_int:
+	    case is_basic_float:
+	    case is_basic_logical:
+	    case is_basic_complex:
+	    case is_basic_string:
+	    case is_basic_bit:
+	    case is_basic_overloaded:
+	      pips_internal_error("fundamental basic not expected here \n");
+	      break;
+	    case is_basic_typedef:
+	      pips_internal_error("typedef not expected here \n");
+	    } /* switch (basic_tag(cb)) */
+	}
+      
+    } /* while (!finished) */
+
+
+  free_type(bct);
+  pips_debug(6, "returns with %s\n", words_to_string(words_type(t)));
+  return t;
+
+}
+
+
 
 bool regions_weakly_consistent_p(list rl)
 {
@@ -1369,9 +1241,8 @@ int *result)
   list linds1 = reference_indices(ref1);
   list linds2 = reference_indices(ref2);
   
-  pips_debug(8, "begin\neff1 = %s\n eff2 = %s\n",
-	     words_to_string(words_effect(eff1)),
-	     words_to_string(words_effect(eff2)));
+  pips_debug_effect(8, "begin\neff1 = \n", eff1);
+  pips_debug_effect(8, "begin\neff2 = \n", eff2);
 
   /* to be comparable, they must have the same entity */
   comparable_p = same_entity_p(reference_variable(ref1), 
@@ -1404,7 +1275,7 @@ list generic_effects_store_update(list l_eff, statement s, bool backward_p)
 {
 
    transformer t; /* transformer of statement s */
-   list l_eff_pointers, l_eff_tmp;
+   list l_eff_pointers;
    list l_res = NIL;
    bool anywhere_w_p = false;
    bool anywhere_r_p = false;
@@ -1448,8 +1319,6 @@ list generic_effects_store_update(list l_eff, statement s, bool backward_p)
 		      !((eff_w_p && anywhere_w_p) || (!eff_w_p && anywhere_r_p)))
 		 {
 		   effect eff_p = EFFECT(CAR(l_eff_p_tmp));
-		   reference eff_ref = effect_any_reference(eff);
-		   reference eff_ref_p = effect_any_reference(eff_p);
 		   effect new_eff = effect_undefined;
 		   int comp_res = 0;
 		   

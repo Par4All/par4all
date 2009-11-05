@@ -54,6 +54,7 @@
 #include "semantics.h"
 #include "text.h"
 #include "text-util.h"
+#include "preprocessor.h"
 
 #include "sommet.h"
 #include "ray_dte.h"
@@ -69,6 +70,13 @@
 
 #include "effects-generic.h"
 #include "effects-convex.h"
+#include "effects-simple.h"
+
+#define IS_EG TRUE
+#define NOT_EG FALSE
+
+#define PHI_FIRST TRUE
+#define NOT_PHI_FIRST FALSE
 
 #define BACKWARD TRUE
 #define FORWARD FALSE
@@ -83,11 +91,14 @@
 
 /*********************************************************** INITIALIZATION */
 
-void convex_regions_translation_init(entity callee, list real_args )
+void convex_regions_translation_init(entity callee, list real_args, bool backward_p )
 {
 
   set_interprocedural_translation_context_sc(callee, real_args);
-  set_backward_arguments_to_eliminate(callee);
+  if (backward_p)
+    set_backward_arguments_to_eliminate(callee);
+  else
+    set_forward_arguments_to_eliminate();
 }
 
 void convex_regions_translation_end()
@@ -293,8 +304,10 @@ convex_regions_forward_translation(entity callee, list real_args,
 {
     list l_res = NIL;
     
-    l_res = regions_forward_translation(callee, real_args, l_reg, context);
-    
+    if(fortran_module_p(callee) && fortran_module_p(get_current_module_entity()))
+      l_res = regions_forward_translation(callee, real_args, l_reg, context);
+    else if (c_module_p(callee) && c_module_p(get_current_module_entity()))
+      l_res = generic_c_effects_forward_translation(callee, real_args, l_reg, context);
     return l_res;
 }
 
@@ -848,7 +861,7 @@ list c_convex_effects_on_formal_parameter_backward_translation(list l_sum_eff,
       }
     case is_syntax_sizeofexpression :
       {
-	pips_debug(5,"sizeof epxression -> NIL");
+	pips_debug(5,"sizeof expression -> NIL");
 	break;
       }
     case is_syntax_va_arg :
@@ -1104,6 +1117,456 @@ static list common_regions_forward_translation(entity func, list real_regions)
 
     return(func_regions);
 }
+
+list c_convex_effects_on_actual_parameter_forward_translation
+(entity callee, expression real_exp, entity formal_ent, list l_reg, transformer context)
+{
+  syntax real_s = expression_syntax(real_exp);
+  list l_formal = NIL;
+
+  pips_debug_effects(6,"initial regions :\n", l_reg);
+
+
+  switch (syntax_tag(real_s))
+    {
+    case is_syntax_call:
+      {
+	call real_call = syntax_call(real_s);
+	entity real_op = call_function(real_call);
+	list args = call_arguments(real_call);	
+	type uet = ultimate_type(entity_type(real_op));
+	value real_op_v = entity_initial(real_op);
+
+	pips_debug(5, "call case, function %s \n", module_local_name(real_op));
+	if(type_functional_p(uet)) 
+	  {	    
+	    if (value_code_p(real_op_v))
+	      {
+		pips_debug(5, "external function\n");
+		pips_user_warning("Nested function calls are ignored. Consider splitting the code before running PIPS\n");
+		l_formal = NIL;
+		break;
+	      }
+	    else /* it's an intrinsic */
+	      {
+		pips_debug(5, "intrinsic function\n");
+	     
+		if (ENTITY_ASSIGN_P(real_op))
+		  {
+		    pips_debug(5, "assignment case\n");
+		    l_formal = c_convex_effects_on_actual_parameter_forward_translation
+		      (callee, EXPRESSION(CAR(CDR(args))), formal_ent, l_reg, context);
+		    break;
+		  }
+		else if(ENTITY_ADDRESS_OF_P(real_op)) 
+		  {
+		    expression arg1 = EXPRESSION(CAR(args));		    
+		    list l_real_arg = NIL;
+		    effect eff_real;
+		    int nb_phi_real;
+		    Psysteme sc_nb_phi_real;
+		    expression exp_nb_phi_real = expression_undefined;
+		    bool general_case = true;
+		    bool in_out = in_out_methods_p();
+ 
+		    pips_debug(5, "address of case\n");
+		    
+		    /* first we compute a SIMPLE effect on the argument of the address_of operator.
+		       This is to distinguish between the general case and the case where
+                       the operand of the & operator is an array element.
+		       Simple effect indices are easier to retrieve.
+		    */
+		    set_methods_for_proper_simple_effects();
+		    l_real_arg = generic_proper_effects_of_complex_address_expression
+		      (arg1, &eff_real, true);
+		    nb_phi_real = (int) gen_length(reference_indices(effect_any_reference(eff_real)));
+		    gen_full_free_list(l_real_arg);
+
+		    /* there are indices but we don't know if they represent array dimensions, 
+		       struct/union/enum fields, or pointer dimensions.
+		    */
+		    if(nb_phi_real > 0)
+		      {
+			reference eff_real_ref = effect_any_reference(eff_real);
+			list l_inds_real = NIL, l_tmp = NIL; 
+			reference ref_tmp;
+			type t = type_undefined;
+			
+			for(l_inds_real = reference_indices(eff_real_ref); !ENDP(CDR(l_inds_real)); POP(l_inds_real))
+			  {
+			    l_tmp = gen_nconc(l_tmp, CONS(EXPRESSION, copy_expression(EXPRESSION(CAR(l_inds_real))), NIL));
+			  }
+			
+			ref_tmp = make_reference(reference_variable(eff_real_ref), l_tmp);
+			t = simple_effect_reference_type(ref_tmp);
+			free_reference(ref_tmp);
+
+			if (type_undefined_p(t))
+			  pips_internal_error("undefined type not expected \n");
+
+			if(type_variable_p(t) && !ENDP(variable_dimensions(type_variable(t))))
+			  {
+			    pips_debug(5,"array element or sub-array case\n");
+			    general_case = false;
+			    /* we build the constraint PHI_nb_phi_real >= last index of eff_real */
+			    exp_nb_phi_real = EXPRESSION(CAR(l_inds_real));
+			    sc_nb_phi_real = sc_new();
+			    (void) sc_add_phi_equation(&sc_nb_phi_real, 
+						       copy_expression(exp_nb_phi_real), 
+						       nb_phi_real, NOT_EG, NOT_PHI_FIRST);
+			  }
+			else
+			  pips_debug(5, "general case\n");
+		      }
+		    
+		    free_effect(eff_real);
+		    eff_real = effect_undefined;
+		    /* well, not strictly necessary : forward propagation is only for OUT regions */
+		    if (in_out)
+		      set_methods_for_convex_in_out_effects();
+		    else
+		      set_methods_for_convex_rw_effects();
+		    init_convex_inout_prettyprint(module_local_name(get_current_module_entity()));
+		    
+		    /* now we compute a *convex* effect on the argument of the 
+		       address_of operator and modify it's last dimension
+		       according to the fact that there is an addressing operator
+		    */		    
+
+		    l_real_arg = generic_proper_effects_of_complex_address_expression
+		      (arg1, &eff_real, true);
+		    gen_full_free_list(l_real_arg);
+		    
+		    if (!general_case)
+		      {			
+			/* array element operand : we replace the constraint on the last
+			   phi variable with */
+			entity phi_nb_phi_real = make_phi_entity(nb_phi_real);
+			region_exact_projection_along_variable(eff_real, phi_nb_phi_real);
+			region_sc_append_and_normalize(eff_real, sc_nb_phi_real, 1); 
+			(void) sc_free(sc_nb_phi_real);
+		      }
+		    
+		    FOREACH(EFFECT, eff_orig, l_reg)
+		      {
+			int nb_phi_orig = (int) gen_length(reference_indices(effect_any_reference(eff_orig)));
+			
+			/* First we have to test if the eff_real access path leads to the eff_orig access path */
+			
+			/* to do that, if the entities are the same (well in fact we should also 
+			   take care of aliasing), we add the constraints of eff_real to those of eff_orig,
+			   and the system must be feasible.
+			   We should also take care of linearization here.
+			*/ 
+			
+			if(effect_entity(eff_orig) == effect_entity(eff_real)
+			   &&  nb_phi_orig >= nb_phi_real)
+			  {
+			    effect eff_formal = (*effect_dup_func)(eff_orig);
+			    region_sc_append_and_normalize(eff_formal, region_system(eff_real), 1);
+			    
+			    if (sc_empty_p(region_system(eff_formal)))
+			      {
+				pips_debug(5, "the original effect does not correspond to the actual argument \n");
+				free_effect(eff_formal);
+			      }
+			    else
+			      {
+				/* At least part of the original effect corresponds to the actual argument : 
+				   we need to translate it 
+				*/ 
+				Psysteme sc_formal;
+				reference ref_formal = effect_any_reference(eff_formal);
+				reference new_ref;
+				list new_inds = NIL;
+				int i, min_phi, min_i;
+				
+				pips_debug_effect(5, "matching access paths, considered effect is : \n", eff_formal);
+				
+				/* first we translate the predicate in the callee's name space */
+				convex_region_descriptor_translation(eff_formal);		    
+				pips_debug_effect(5, "eff_formal after context translation: \n", eff_formal);
+				
+				/* Then we remove the phi variables common to the two regions
+				   except the last one if we are not in the general case */
+				/* This is only valid when there is no linearization ; in the general case
+				   a translation system should be built
+				*/
+				sc_formal = region_system(eff_formal);
+				for(i = 1; i <= nb_phi_real; i++)
+				  {
+				    entity phi_i = make_phi_entity(i);
+				    entity psi_i = make_psi_entity(i);
+				    
+				    sc_formal = sc_variable_rename(sc_formal, (Variable) phi_i, (Variable) psi_i);			
+				  }
+				/* if not in the general case, we add the constraint 
+				   phi_nb_phi_real == psi_nb_phi_real - exp_nb_phi_real 
+				*/
+				if (!general_case)
+				  {
+				    entity phi = make_phi_entity(nb_phi_real);
+				    Pvecteur v_phi = vect_new((Variable) phi, VALUE_ONE);
+				    entity psi = make_psi_entity(nb_phi_real);
+				    Pvecteur v_psi = vect_new((Variable) psi, VALUE_ONE);
+				    Pvecteur v = vect_substract(v_phi, v_psi);
+				    normalized nexp = NORMALIZE_EXPRESSION(exp_nb_phi_real);
+				    if (normalized_linear_p(nexp)) 
+				      {
+					pips_debug(6, "normalized last index : "
+						   "adding phi_nb_phi_real == psi_nb_phi_real - exp_nb_phi_real \n");
+					Pvecteur v1 = vect_copy(normalized_linear(nexp));
+					Pvecteur v2;
+					v2 = vect_add(v, v1);
+					sc_formal = sc_constraint_add(sc_formal, contrainte_make(v2), true);
+					vect_rm(v1);
+				      }
+				    vect_rm(v_psi);
+				    vect_rm(v);
+				  }
+				region_system(eff_formal) = sc_formal;
+				pips_debug_effect(5, "eff_formal before removing psi variables: \n", eff_formal);
+				region_remove_psi_variables(eff_formal);
+				pips_debug_effect(5, "eff_formal after renaming common dimensions: \n", eff_formal);
+				
+				/* Finally, we must rename remaining phi variables from 2 
+				   add a PHI1==0 constraint in the general case, 
+				   or, in the contrary, rename remaining phi variables from 1.
+				   We must also change the resulting region 
+				   entity for the formal entity in all cases.
+				*/
+				min_phi = general_case? 2:1; 
+				min_i = general_case ? nb_phi_real+1 : nb_phi_real;
+				sc_formal = region_system(eff_formal);
+				
+				
+				for(i = min_i; i <= nb_phi_orig; i++)
+				  {
+				    entity phi_i = make_phi_entity(i);
+				    entity psi_formal = make_psi_entity(i-min_i+min_phi);
+				    
+				    sc_formal = sc_variable_rename(sc_formal, (Variable) phi_i, (Variable) psi_formal);
+				    
+				    new_inds = gen_nconc(new_inds,
+							 CONS(EXPRESSION,
+							      make_phi_expression(i-nb_phi_real+1),
+							      NIL));
+				    
+				  }
+				for(i=min_phi; i<= nb_phi_orig-min_i+min_phi; i++)
+				  {
+				    entity phi_i = make_phi_entity(i);
+				    entity psi_i = make_psi_entity(i);
+				    sc_formal = sc_variable_rename(sc_formal, (Variable) psi_i, (Variable) phi_i);
+				  }
+				region_system(eff_formal) = sc_formal;
+				pips_debug_effect(5, "eff_formal after shifting dimensions: \n", eff_formal);
+
+				if(general_case)
+				  {
+				    /* add PHI1 == 0 */
+				    sc_formal = region_system(eff_formal);
+				    (void) sc_add_phi_equation(&sc_formal, int_to_expression(0), 1, IS_EG, PHI_FIRST);
+				    region_system(eff_formal) = sc_formal;
+				    new_inds = CONS(EXPRESSION, make_phi_expression(1), new_inds);				
+				  }
+
+				free_reference(ref_formal);
+				new_ref = make_reference(formal_ent, new_inds);
+				cell_reference(effect_cell(eff_formal)) = new_ref;
+				pips_debug_effect(5, "final eff_formal : \n", eff_formal);
+				l_formal = RegionsMustUnion(l_formal, CONS(EFFECT, eff_formal, NIL),
+							    regions_same_action_p);
+				pips_debug_effects(6,"l_formal after adding new effect : \n", l_formal);
+				
+			      } /* else of the if (sc_empty_p) */
+			    			    
+			  } /* if(effect_entity(eff_orig) == effect_entity(eff_real) ...)*/
+			
+		      } /* FOREACH */
+
+		    break;
+		  }
+		else
+		  {
+		    pips_debug(5, "Other intrinsic case : entering general case \n");
+		  }
+	      }	    
+	  }
+	else if(type_variable_p(uet)) 
+	  {
+	    pips_user_warning("Effects of call thru functional pointers are ignored\n");
+	    l_formal = NIL;
+	    break;
+	  }
+	/* entering general case which includes general calls*/
+      }
+    case is_syntax_reference:
+    case is_syntax_subscript:
+      {
+	list l_real_arg = NIL;
+	effect eff_real;
+
+	pips_debug(5, "general case\n");
+	
+	/* first we compute an effect on the real_arg */	
+	l_real_arg = generic_proper_effects_of_complex_address_expression
+	  (real_exp, &eff_real, true);
+	gen_full_free_list(l_real_arg);
+
+	FOREACH(EFFECT, eff_orig, l_reg)
+	  {
+	    int nb_phi_orig = (int) gen_length(reference_indices(effect_any_reference(eff_orig)));
+	    int nb_phi_real = (int) gen_length(reference_indices(effect_any_reference(eff_real)));
+	    /* First we have to test if the eff_real access path leads to the eff_orig access path */
+
+	    /* to do that, if the entities are the same (well in fact we should also 
+	       take care of aliasing), we add the constraints of eff_real to those of eff_orig,
+	       and the system must be feasible.
+	    */ 
+
+	    if(effect_entity(eff_orig) == effect_entity(eff_real)
+	       &&  nb_phi_orig >= nb_phi_real)
+	      {
+		effect eff_formal = (*effect_dup_func)(eff_orig);
+		region_sc_append_and_normalize(eff_formal, region_system(eff_real), 1);
+		
+		if (sc_empty_p(region_system(eff_formal)))
+		  {
+		    pips_debug(5, "the original effect does not correspond to the actual argument \n");
+		    free_effect(eff_formal);
+		  }
+		else
+		  {
+		    /* At least part of the original effect corresponds to the actual argument : 
+		       we need to translate it 
+		    */ 
+		    Psysteme sc_formal;
+		    reference ref_formal = effect_any_reference(eff_formal);
+		    reference new_ref;
+		    list new_inds = NIL;
+		    int i;
+
+		    pips_debug_effect(5, "matching access paths, considered effect is : \n", eff_formal);
+
+		    /* first we translate the predicate in the callee's name space */
+		    convex_region_descriptor_translation(eff_formal);		    
+		    pips_debug_effect(5, "eff_formal after context translation: \n", eff_formal);
+
+		    /* Then we remove the phi variables common to the two regions */
+		    /* This is only valid when there is no linearization ; in the general case
+		       a translation system should be built
+		    */
+		    if(nb_phi_real >= 1)
+		      {
+			sc_formal = region_system(eff_formal);
+			for(i = 1; i <= nb_phi_real; i++)
+			  {
+			    entity phi_i = make_phi_entity(i);
+			    entity psi_i = make_psi_entity(i);
+			    
+			    sc_formal = sc_variable_rename(sc_formal, (Variable) phi_i, (Variable) psi_i);			
+			  }
+			region_system(eff_formal) = sc_formal;
+			region_remove_psi_variables(eff_formal);
+			pips_debug_effect(5, "eff_formal after renaming common dimensions: \n", eff_formal);
+		      }
+		    else
+		      pips_debug(8, "nb_phi_real == 0, no need for renaming. \n");
+
+		    /* Finally, we must rename remaining phi variables from 1 
+		       and change the resulting region entity for the formal entity
+		    */
+		    if(nb_phi_real >= 1)
+		      {
+			sc_formal = region_system(eff_formal);
+			for(i = nb_phi_real+1; i <= nb_phi_orig; i++)
+			  {
+			    entity phi_i = make_phi_entity(i);
+			    entity phi_formal = make_phi_entity(i-nb_phi_real);
+			    
+			    sc_formal = sc_variable_rename(sc_formal, (Variable) phi_i, (Variable) phi_formal);
+			    
+			    new_inds = gen_nconc(new_inds,
+						 CONS(EXPRESSION,
+						      make_phi_expression(i-nb_phi_real),
+						      NIL));
+			    
+			  }
+			region_system(eff_formal) = sc_formal;
+		      }
+		    else
+		      {
+			for (i = 1; i<= nb_phi_orig - nb_phi_real; i++)
+			  new_inds = gen_nconc(new_inds,
+					       CONS(EXPRESSION,
+						    make_phi_expression(i),
+						    NIL));  
+		      }
+		    pips_debug_effect(5, "eff_formal after renaming remaining phi variables: \n", eff_formal);
+		    free_reference(ref_formal);
+		    new_ref = make_reference(formal_ent, new_inds);
+		    cell_reference(effect_cell(eff_formal)) = new_ref;
+		    pips_debug_effect(5, "final eff_formal : \n", eff_formal);
+		    l_formal = RegionsMustUnion(l_formal, CONS(EFFECT, eff_formal, NIL),regions_same_action_p);
+		    pips_debug_effects(6, "l_formal after adding new effect : \n", l_formal);
+		  } /* else of the if (sc_empty_p) */
+
+
+	      } /* if(effect_entity(eff_orig) == effect_entity(eff_real) ...)*/
+	      
+
+
+	    /* */
+
+	  } /* FOREACH */
+
+	break;
+      }
+    case is_syntax_application:
+      {
+	pips_internal_error("Application not supported yet\n");
+	break;
+      }
+
+    case is_syntax_cast:
+      {
+	pips_debug(6, "cast expression\n");
+	l_formal = 
+	  c_convex_effects_on_actual_parameter_forward_translation
+	  (callee, cast_expression(syntax_cast(real_s)), 
+	   formal_ent, l_reg, context);
+	break;
+      }
+    case is_syntax_range:
+      {
+	pips_user_error("Illegal effective parameter: range\n");
+	break;
+      }
+      
+    case is_syntax_sizeofexpression:
+      {
+	pips_debug(6, "sizeofexpression : -> NIL");
+	l_formal = NIL;
+	break;
+      }
+    case is_syntax_va_arg:
+      {
+	pips_internal_error("va_arg not supported yet\n");
+	break;
+      }
+    default:
+      pips_internal_error("Illegal kind of syntax\n");
+		
+    } /* switch */
+  
+  
+  pips_debug_effects(6,"resulting regions :\n", l_formal);
+  return(l_formal);
+  
+}
+
+
 
 /********************************************************* COMMON FUNCTIONS */
 
