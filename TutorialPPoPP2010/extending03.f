@@ -1,8 +1,5 @@
-C     Expected result: t(i) scalarized
-
       subroutine scalarization(x,y,n)
-      real x(n,n), y(n,n)
-      real t(100)    
+      real x(n,n), y(n,n), t(100)    
       do i = 1,n
          do j = 1,n
             t(i)   = x(i,j)

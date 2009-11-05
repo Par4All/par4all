@@ -7,6 +7,5 @@ apply SCALARIZATION[SCALARIZATION]
 display PRINTED_FILE[SCALARIZATION]
 
 close
-delete extending03
 quit
 
