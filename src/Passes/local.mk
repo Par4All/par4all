@@ -41,6 +41,7 @@ include $(MAKE.d)/$(ARCH).mk
 # check for gtk2 here, to know whether to forward to gpips or not
 -include $(MAKE.d)/config.mk
 include $(MAKE.d)/has_gtk2.mk
+include $(MAKE.d)/has_swig.mk
 
 FWD_DIRS	= pips tpips
 
@@ -54,24 +55,10 @@ ifndef PIPS_NO_GPIPS
 	FWD_DIRS	+= gpips
 endif
 
-# compile pypips only if required
 ifndef PIPS_NO_PYPS
-
-has_swig := $(shell type swig > /dev/null 2>&1 && echo ok)
-ifeq ($(has_swig),ok)
-
-has_python := $(shell type python > /dev/null 2>&1 && echo ok)
-ifeq ($(has_python),ok)
 	FWD_DIRS	+= pypips
-else
-$(warning pyps compilation requested but python not found in PATH. pyps can be disabled by setting PIPS_NO_PYPS=1)
 endif
 
-else
-$(warning pyps compilation requested but swig not found in PATH. pyps can be disabled by setting PIPS_NO_PYPS=1)
-endif
-
-endif
 
 # after its dependencies
 FWD_DIRS	+= fpips

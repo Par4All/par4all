@@ -19,8 +19,12 @@
 # along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+# common stuff
+ROOT    = ../../..
+include $(ROOT)/makes/has_swig.mk
+
 PYTHON_MODULE=pypips
-PYTHON_INCLUDE=/usr/include/python2.5
+PYTHON_INCLUDE=`$(PYTHON_CONFIG) --cflags`
 TMP_PREFIX=the_
 PYPS_STDOUT=pypsout
 
@@ -32,7 +36,6 @@ LDFLAGS=$(addprefix -l,tpips readline termcap $(pips.libs))
 
 
 # common stuff
-ROOT    = ../../..
 PROJECT = pips
 include $(ROOT)/makes/main.mk
 
