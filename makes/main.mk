@@ -464,6 +464,9 @@ ifdef LD_TARGET
 
 $(LD_TARGET):$(LD_OBJECTS)
 	$(LD) -o $@ -shared $(LD_OBJECTS) $(LDFLAGS)
+	MAJOR_VERSION="`echo '$(VERSION)' | cut -d '.' -f 1`" ;\
+	ln -s $@ $@.$$MAJOR_VERSION
+
 
 $(ARCH)/$(LD_TARGET):$(LD_TARGET)
 	cp $< $@
