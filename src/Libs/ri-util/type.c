@@ -1568,7 +1568,7 @@ type intrinsic_call_to_type(call c)
 	      pips_debug(8, "Point to case, e1 = ");
 	      print_expression(e1);
 	      pips_debug(8, " and e2 = ");
-	      print_expression(e1);
+	      print_expression(e2);
 	      pips_debug(8, "\n");
 	    }
 	  t = expression_to_type(e2);

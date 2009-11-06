@@ -78,6 +78,7 @@ bool summary_rw_effects_engine(string module_name)
     set_current_module_statement( (statement)
 	db_get_memory_resource(DBR_CODE, module_name, TRUE) );
     module_stat = get_current_module_statement();
+    make_effects_private_current_context_stack();
 
     (*effects_computation_init_func)(module_name);
 
@@ -90,6 +91,7 @@ bool summary_rw_effects_engine(string module_name)
 	pips_debug(2, "local regions, before translation to global scope:\n");
 	(*effects_prettyprint_func)(l_loc);
     }
+ 
 
     l_dec = summary_effects_from_declaration(module_name);
     ifdebug(8) {
@@ -135,6 +137,8 @@ bool summary_rw_effects_engine(string module_name)
       }
 
     (*db_put_summary_rw_effects_func)(module_name, l_glob);
+
+    free_effects_private_current_context_stack();
 
     reset_current_module_entity();
     reset_current_module_statement();

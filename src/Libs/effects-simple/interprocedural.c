@@ -83,9 +83,9 @@ simple_effects_backward_translation(
 }
 
 /* To replace the make_sdfi_macro() and its call to macro make_simple_effect() */
-effect translate_effect_to_sdfi_effect(effect le)
+effect translate_effect_to_sdfi_effect(effect eff)
 {
-  effect ge = (*effect_dup_func)(le);
+  effect ge = (*effect_dup_func)(eff);
   reference ger = effect_any_reference(ge);
   entity v = reference_variable(ger);
   type ut = ultimate_type(entity_type(v));
@@ -100,25 +100,12 @@ effect translate_effect_to_sdfi_effect(effect le)
   /*if(reference_indices(ger) != NIL) { */
   /* FI: could be rewritten like the other summarization routines,
      with a check for each subscript expression */
-  if(!reference_with_constant_indices_p(ger) && !reference_with_unbounded_indices_p(ger)) {
-    if(pointer_type_p(ut)) {
-      /* A unique index is sufficient and necessary to distinguish
-	 between the effect on the pointed area and the effect on the
-	 pointer itself */
-      gen_free_list(reference_indices(ger));
-      reference_indices(ger) = CONS(EXPRESSION, make_unbounded_expression(), NIL);
-  
-      free_approximation(effect_approximation(ge));
-      effect_approximation(ge) = make_approximation_may();
+  if(!reference_with_constant_indices_p(ger) && !reference_with_unbounded_indices_p(ger)) 
+    {
+      list le = effect_to_sdfi_list(ge);
+      ge = EFFECT(CAR(le));
     }
-    else {
-      gen_free_list(reference_indices(ger));
-      reference_indices(ger) = NIL;
-  
-      free_approximation(effect_approximation(ge));
-      effect_approximation(ge) = make_approximation_may();
-    }
-  }
+
 
   return ge;
 }
@@ -1424,9 +1411,35 @@ list c_summary_effect_to_proper_effects(effect eff, expression real_arg)
 	  } /* case is_syntax_reference */ 
 	case is_syntax_subscript:
 	  {
-	    pips_internal_error("Subscript not supported yet\n");
-	    break;
+	    /* I guess this case could be merged with other cases (calls other than adress of, and reference case */
+	    effect real_arg_eff; 
+	    list l_real_arg = NIL;
+
+	    /* first we compute an effect on the real argument */
+	    l_real_arg = generic_proper_effects_of_complex_address_expression
+		  (real_arg, &real_arg_eff, effect_write_p(eff));
+	    gen_full_free_list(l_real_arg);
+
+	    if (effect_undefined_p(real_arg_eff))
+	      real_arg_eff =  make_anywhere_effect(effect_action_tag(eff));
+	    
+	    if (!anywhere_effect_p(real_arg_eff))
+	      {
+		effect_approximation_tag(real_arg_eff) = effect_approximation_tag(eff);
+		
+		/* then we add the indices of the original_effect */
+		reference eff_ref = effect_any_reference(eff);
+		list eff_ind = reference_indices(eff_ref);
+		FOREACH(EXPRESSION, eff_ind_exp, eff_ind)
+		  {
+		    (*effect_add_expression_dimension_func)
+		      (real_arg_eff, eff_ind_exp);
+		  }
+	      }
+	    l_eff = gen_nconc(l_eff, CONS(EFFECT, real_arg_eff, NIL));
+	    
 	  }
+	  break;
 	case is_syntax_call:
 	  {
 	    call real_call = syntax_call(real_s);
@@ -1442,7 +1455,7 @@ list c_summary_effect_to_proper_effects(effect eff, expression real_arg)
 	    else if(ENTITY_ADDRESS_OF_P(real_op)) 
 	      {
 		expression arg1 = EXPRESSION(CAR(args));
-        list l_real_arg = NIL;
+		list l_real_arg = NIL;
 		effect eff1;
 
 		/* first we compute an effect on the argument of the 
@@ -1461,7 +1474,7 @@ list c_summary_effect_to_proper_effects(effect eff, expression real_arg)
 		    effect_approximation(n_eff) = 
 		      copy_approximation(effect_approximation(eff));
 		  }
-		gen_free_list(l_real_arg);
+		gen_full_free_list(l_real_arg);
 		
 		/* BC : This must certainely be improved 
 		   only simple cases are handled .*/
