@@ -178,3 +178,86 @@ int main()
    printf("%d\n", tab[1]);                                              /*0041*/
    return 1;                                                            /*0042*/
 }
+
+out regions for "main"
+
+int main()
+{
+   int *x;
+   int tab[10];
+   int *tab2[10];
+   int tab3[10][10];
+   int **tab4;
+   int y;
+
+//  <x[PHI1]-OUT-EXACT-{PHI1==0}>
+
+   
+   
+   foo(x);                                                              /*0027*/
+
+//  <tab[PHI1]-OUT-EXACT-{PHI1==0}>
+
+   foo(tab);                                                            /*0028*/
+
+//  <tab2[PHI1][PHI2]-OUT-EXACT-{PHI1==4, PHI2==0}>
+
+   foo(tab2[4]);                                                        /*0029*/
+
+//  <tab3[PHI1][PHI2]-OUT-EXACT-{PHI1==5, PHI2==0}>
+
+   foo(tab3[5]);                                                        /*0030*/
+
+//  <tab4[PHI1][PHI2]-OUT-EXACT-{PHI1==6, PHI2==0}>
+
+   foo(tab4[6]);                                                        /*0031*/
+
+//  <y-OUT-EXACT-{}>
+
+   foo(&y);                                                             /*0032*/
+
+//  <tab[PHI1]-OUT-EXACT-{PHI1==1}>
+
+   foo(&tab[1]);                                                        /*0033*/
+
+//  <__IO_EFFECTS:LUNS[PHI1]-OUT-EXACT-{PHI1==1}>
+
+
+   printf("%d\n", *x);                                                  /*0035*/
+
+//  <__IO_EFFECTS:LUNS[PHI1]-OUT-EXACT-{PHI1==1}>
+
+   printf("%d\n", tab[0]);                                              /*0036*/
+
+//  <__IO_EFFECTS:LUNS[PHI1]-OUT-EXACT-{PHI1==1}>
+
+   printf("%d\n", tab2[4][0]);                                          /*0037*/
+
+//  <__IO_EFFECTS:LUNS[PHI1]-OUT-EXACT-{PHI1==1}>
+
+   printf("%d\n", tab3[5][0]);                                          /*0038*/
+
+//  <__IO_EFFECTS:LUNS[PHI1]-OUT-EXACT-{PHI1==1}>
+
+   printf("%d\n", tab4[6][0]);                                          /*0039*/
+
+//  <__IO_EFFECTS:LUNS[PHI1]-OUT-EXACT-{PHI1==1}>
+
+   printf("%d\n", y);                                                   /*0040*/
+   printf("%d\n", tab[1]);                                              /*0041*/
+   return 1;                                                            /*0042*/
+}
+
+out regions for "foo"
+
+
+//  <p[PHI1]-OUT-EXACT-{PHI1==0}>
+
+void foo(int *p)
+{
+
+//  <p[PHI1]-OUT-EXACT-{PHI1==0}>
+
+   *p = 4;                                                              /*0004*/
+   return;                                                              /*0005*/
+}
