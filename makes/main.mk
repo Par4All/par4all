@@ -470,6 +470,8 @@ $(LD_TARGET):$(LD_OBJECTS)
 
 $(ARCH)/$(LD_TARGET):$(LD_TARGET)
 	cp $< $@
+	MAJOR_VERSION="`echo '$(VERSION)' | cut -d '.' -f 1`" ;\
+	ln -s $@ $@.$$MAJOR_VERSION
 
 INSTALL_LIB	+=   $(LD_TARGET)
 
