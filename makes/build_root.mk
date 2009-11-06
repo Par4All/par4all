@@ -21,7 +21,7 @@
 FWD_DIRS	= src makes
 
 # needed for PIPS_NO_TAGS
--include config.mk
+-include makes/config.mk
 export CONFIG_DONE=1
 
 # default is to "build" (phase 0 to 6)
