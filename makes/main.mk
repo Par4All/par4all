@@ -235,15 +235,12 @@ endif # ETC_TARGET
 
 ifdef INSTALL_ETC
 
-$(ETC.d):
-	$(MKDIR) $@
-
 install:etc-install
 # Deal also with directories.
 # By the way, how to install directories with "install" ?
 etc-install .build_etc: $(INSTALL_ETC)
 	# no direct dependency on target directory
-	$(MAKE) $(ETC.d)
+	$(INSTALL) -d $(ETC.d)
 	for f in $(INSTALL_ETC) ; do \
 	  if [ -d $$f ] ; then \
 	    find $$f -type d -name '.svn' -prune -o -type f -print | \
@@ -286,15 +283,12 @@ endif # PY_TARGET
 
 ifdef INSTALL_PY
 
-$(PY.d):
-	$(MKDIR) $@
-
 install:py-install
 # Deal also with directories.
 # By the way, how to install directories with "install" ?
 py-install .build_py: $(INSTALL_PY)
 	# no direct dependency on target directory
-	$(MAKE) $(PY.d)
+	$(INSTALL) -d $(PY.d)
 	for f in $(INSTALL_PY) ; do \
 	    $(CMP) $$f $(PY.d)/$$f || \
 	      $(INSTALL) -m 644 $$f $(PY.d) ; \
@@ -382,12 +376,10 @@ ifdef INSTALL_INC
 
 phase2: .build_inc
 
-$(INC.d):; $(MKDIR) $(INC.d)
-
 install:inc-install
 inc-install .build_inc: $(INSTALL_INC)
 	# no dep on target dir
-	$(MAKE) $(INC.d)
+	$(INSTALL) -d $(INC.d)
 	for f in $(INSTALL_INC) ; do \
 	  $(CMP) $$f $(INC.d)/$$f || \
 	$(INSTALL) -m 644 $$f $(INC.d) ; \
@@ -488,13 +480,10 @@ phase4::	.build_lib.$(ARCH)
 
 $(INSTALL_LIB): $(ARCH)/.dir
 
-$(LIB.d):
-	$(MKDIR) $@
-
 install:lib-install
 lib-install .build_lib.$(ARCH): $(addprefix $(ARCH)/,$(INSTALL_LIB))
 	# no dep on target dir
-	$(MAKE) $(LIB.d)
+	$(INSTALL) -d $(LIB.d)
 	for l in $(addprefix $(ARCH)/,$(INSTALL_LIB)) ; do \
 	  $(CMP) $$l $(LIB.d)/$$l || \
 	    $(INSTALL) -m 644 $$l $(LIB.d) ; \
@@ -563,13 +552,10 @@ ifdef INSTALL_EXE
 
 phase2: .build_exe
 
-$(EXE.d):
-	$(MKDIR) $@
-
 install:exe-install
 exe-install .build_exe: $(INSTALL_EXE)
 	# no direct deps on target dir
-	$(MAKE) $(EXE.d)
+	$(INSTALL) -d $(EXE.d)
 	$(INSTALL) -m 755 $(INSTALL_EXE) $(EXE.d)
 	`echo $@ | grep -q install` || touch $@
 
@@ -601,13 +587,10 @@ phase5: .build_bin.$(ARCH)
 
 $(INSTALL_BIN): $(ARCH)/.dir
 
-$(BIN.d):
-	$(MKDIR) $@
-
 install:bin-install
 bin-install .build_bin.$(ARCH): $(INSTALL_BIN)
 	# no direct deps on target dir
-	$(MAKE) $(BIN.d)
+	$(INSTALL) -d $(BIN.d)
 	$(INSTALL) -m 755 $(INSTALL_BIN) $(BIN.d)
 	`echo $@ | grep -q install` || touch $@
 
@@ -637,13 +620,9 @@ ifdef INSTALL_DOC
 
 phase6: .build_doc
 
-$(DOC.d):; $(MKDIR) $(DOC.d)
-
 # There may be, but not necessarily, a subdirectory...
 ifdef DOC.subd
 DOC.dest	= $(DOC.d)/$(DOC.subd)
-$(DOC.dest): $(DOC.d)
-	$(MKDIR) $(DOC.dest)
 else # no subdir
 DOC.dest	= $(DOC.d)
 endif # DOC.subd
@@ -651,7 +630,7 @@ endif # DOC.subd
 install:doc-install
 doc-install .build_doc: $(INSTALL_DOC)
 	# no direct deps on target dir
-	$(MAKE) $(DOC.dest)
+	$(INSTALL) -d $(DOC.dest)
 	$(INSTALL) -m 644 $(INSTALL_DOC) $(DOC.dest)
 	`echo $@ | grep -q install` || touch $@
 
@@ -678,12 +657,10 @@ ifdef INSTALL_MAN
 
 phase6: .build_man
 
-$(MAN.d):; $(MKDIR) $(MAN.d)
-
 install:man-install
 man-install .build_man: $(INSTALL_MAN)
 	# no direct deps on target dir
-	$(MAKE) $(MAN.d)
+	$(INSTALL) -d $(MAN.d)
 	$(INSTALL) -m 644 $(INSTALL_MAN) $(MAN.d)
 	`echo $@ | grep -q install` || touch $@
 
@@ -710,12 +687,10 @@ ifdef _HAS_HTLATEX_
 
 phase7: .build_htm
 
-$(HTM.d)/$(HTM.subd):; $(MKDIR) -p $(HTM.d)/$(HTM.subd)
-
 install:htm-install
 htm-install .build_htm: $(INSTALL_HTM)
 	# no direct deps on target dir
-	$(MAKE) $(HTM.d)/$(HTM.subd)
+	$(INSTALL) -d $(HTM.d)/$(HTM.subd)
 	# Deal also with directories.
 	# By the way, how to install directories with "install" ?
 	# The cp -r*f*. is to overide read-only that may exist in the target
@@ -753,12 +728,10 @@ ifdef INSTALL_SHR
 
 phase2: .build_shr
 
-$(SHR.d):; $(MKDIR) $(SHR.d)
-
 install:shr-install
 shr-install .build_shr: $(INSTALL_SHR)
 	# no direct deps on target dir
-	$(MAKE) $(SHR.d)
+	$(INSTALL) -d $(SHR.d)
 	$(INSTALL) -m 644 $(INSTALL_SHR) $(SHR.d)
 	`echo $@ | grep -q install` || touch $@
 
@@ -783,12 +756,10 @@ ifdef INSTALL_UTL
 
 phase2: .build_utl
 
-$(UTL.d):; $(MKDIR) $(UTL.d)
-
 install:utl-install
 utl-install .build_utl: $(INSTALL_UTL)
 	# no direct deps on target dir
-	$(MAKE) $(UTL.d)
+	$(INSTALL) -d $(UTL.d)
 	$(INSTALL) -m 755 $(INSTALL_UTL) $(UTL.d)
 	`echo $@ | grep -q install` || touch $@
 
