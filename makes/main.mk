@@ -98,7 +98,10 @@ include $(MAKE.d)/$(ARCH).mk
 include $(MAKE.d)/svn.mk
 
 # site specific stuff...
+ifndef CONFIG_DONE
 -include $(MAKE.d)/config.mk
+export CONFIG_DONE=1
+endif
 
 # auto generate config if necessary
 $(MAKE.d)/config.mk:
