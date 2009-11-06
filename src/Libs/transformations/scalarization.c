@@ -365,16 +365,18 @@ static bool loop_scalarization(loop l)
 		)
 	    ) {
 
-	  /* Check that a unique element is used. In other words, the
-	     relationship between the iterations i and the array
-	     element phi is a function, by definition of a function.
+	  /* Check that a unique element of pv is used. In other
+	     words, the relationship between the iterations i and the
+	     array element phi is a function, by definition of a
+	     function.
 
 	     This cannot be checked without auxiliary variables. It is
 	     not possible to create PIPS compatible variables in
 	     Linear. Hence, they are created here.
 
 	     The proof is based on r(i)=phi and r(i)=phi+dphi and r is
-	     a function implies dphi=0.
+	     a function implies dphi=0. If dphi!=0, then r cannot be a
+	     function.
 
 	     But we also want that each iteration uses at least one
 	     element. The function must be a total function. FI: I do
