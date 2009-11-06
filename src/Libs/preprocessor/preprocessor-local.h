@@ -30,7 +30,7 @@
 #define FORTRAN_FILE_SUFFIX ".f"
 #define RATFOR_FILE_SUFFIX ".F"
 #define C_FILE_SUFFIX ".c"
-#define FORTRAN_INITIAL_FILE_SUFFIX ".f_initial"
+#define FORTRAN_INITIAL_FILE_SUFFIX ".initial.f"
 
 /* an issue is that the preprocessor used for .F must be Fortran 77 aware.
  */
