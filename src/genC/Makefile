@@ -85,7 +85,7 @@ genspec_lex.c: token.l genspec.h
 genspec_yacc.c: genread.h
 
 $(ARCH)/newC:	$(ARCH)/new.o $(ARCH)/libgenC.a
-	$(LINK) $@ $(ARCH)/new.o $(ARCH)/libgenC.a
+	$(LINK) $@ $(ARCH)/new.o -lgenC
 
 $(ARCH)/newLisp: $(ARCH)/new.o $(ARCH)/build.o $(ARCH)/genLisp.o
 	$(LINK) $@ $(ARCH)/new.o $(ARCH)/build.o $(ARCH)/genLisp.o
