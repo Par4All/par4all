@@ -48,7 +48,7 @@ LINKS =	pips tpips wpips fpips gpips
 
 links:
 	# no direct dependency, as usual
-	$(MAKE) $(EXE.d)
+	$(INSTALL) -d $(EXE.d)
 	for l in $(LINKS) ; do $(RM) $(EXE.d)/$$l ; done
 	for l in $(LINKS) ; do ln -s pips.sh $(EXE.d)/$$l ; done
 
