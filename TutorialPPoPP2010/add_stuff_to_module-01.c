@@ -12,6 +12,6 @@ bool prepend_comment(string mn) {
   // Add comment c to the module statement s
   s = ... ;
 
-  // Put back the new statement module
+  // Put back the updated statement module as a new resource
 
 }
