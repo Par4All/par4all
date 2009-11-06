@@ -445,7 +445,25 @@ lib: $(LIB_TARGET)
 
 INSTALL_LIB	+=   $(LIB_TARGET)
 
+ifdef WITH_DYNAMIC_LIBRAIRES
+
+ifndef LD_TARGET
+LD_TARGET=$(patsubst %.a,%.so,$(LIB_TARGET))
+endif
+
+ifndef LD_OBJECTS
+LD_OBJECTS=$(LIB_OBJECTS)
+endif
+
+
+endif #WITH_DYNAMIC_LIBRAIRES
+
 endif # LIB_TARGET
+
+ifndef WITH_DYNAMIC_LIBRAIRES
+# to prevent dynamic linking
+#LDFLAGS+=-static
+endif
 
 ifdef LD_TARGET
 
