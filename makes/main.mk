@@ -442,12 +442,13 @@ INSTALL_LIB	+=   $(LIB_TARGET)
 
 ifdef WITH_DYNAMIC_LIBRARIES
 
-ifndef LD_TARGET
-LD_TARGET=$(patsubst %.a,%.so,$(LIB_TARGET))
+ifndef DYNLIB_TARGET
+DYNLIB_TARGET=$(patsubst %.a,%.so,$(LIB_TARGET))
+$(ARCH)/$(LIB_TARGET):$(ARCH)/$(DYNLIB_TARGET)
 endif
 
-ifndef LD_OBJECTS
-LD_OBJECTS=$(LIB_OBJECTS)
+ifndef DYNLIB_OBJECTS
+DYNLIB_OBJECTS=$(LIB_OBJECTS)
 endif
 
 
@@ -460,22 +461,48 @@ ifndef WITH_DYNAMIC_LIBRAIRES
 #LDFLAGS+=-static
 endif
 
-ifdef LD_TARGET
+ifdef DYNLIB_TARGET
 
-$(LD_TARGET):$(LD_OBJECTS)
-	$(LD) -o $@ -shared $(LD_OBJECTS) $(LDFLAGS)
-	MAJOR_VERSION="`echo '$(VERSION)' | cut -d '.' -f 1`" ;\
-	ln -s $@ $@.$$MAJOR_VERSION
+$(ARCH)/$(DYNLIB_TARGET):$(DYNLIB_OBJECTS)
+	        $(LD) -o $@ -shared $(DYNLIB_OBJECTS) $(LDFLAGS) $(LDOPT)
 
+INSTALL_DYNLIB     +=   $(DYNLIB_TARGET) 
 
-$(ARCH)/$(LD_TARGET):$(LD_TARGET)
-	cp $< $@
-	MAJOR_VERSION="`echo '$(VERSION)' | cut -d '.' -f 1`" ;\
-	ln -s $@ $@.$$MAJOR_VERSION
+phase2: $(ARCH)/.dir
 
-INSTALL_LIB	+=   $(LD_TARGET)
+phase4::	.build_dynlib.$(ARCH)
 
-endif # LD_TARGET
+$(INSTALL_DYNLIB): $(ARCH)/.dir
+
+install:dynlib-install
+dynlib-install .build_dynlib.$(ARCH): $(INSTALL_DYNLIB)
+	# no dep on target dir
+	$(INSTALL) -d $(LIB.d)
+	MAJOR_VERSION="`echo '$(VERSION)' | cut -d '.' -f 1`";\
+	for l in $(INSTALL_DYNLIB) ; do \
+	  $(CMP) $$l $(LIB.d)/$$l.$$MAJOR_VERSION || \
+	    $(INSTALL) -m 644 $$l $(LIB.d)/$$l.$$MAJOR_VERSION ; \
+		$(RM) $(LIB.d)/$$l ;\
+		cd $(LIB.d) && ln -s $$l.$$MAJOR_VERSION $$l && cd -;\
+	done
+	`echo $@ | grep -q install` || touch $@
+
+clean: dynlib-clean
+
+dynlib-clean:; $(RM) $(ARCH)/$(DYNLIB_TARGET) .build_dynlib.*
+
+unbuild: dynlib-unbuild
+
+dynlib-unbuild:
+	for f in $(INSTALL_DYNLIB) ; do \
+		echo "uninstalling $$f" ; \
+	  	$(RM)  $(LIB.d)/$$f ;\
+		echo "uninstalling $$f.*" ; \
+	  	$(RM)  $(LIB.d)/$$f.* ;\
+	done
+	test ! -d $(LIB.d) || $(RMDIR) --ignore-fail-on-non-empty $(LIB.d)
+
+endif # DYNLIB_TARGET
 
 ifdef INSTALL_LIB
 
