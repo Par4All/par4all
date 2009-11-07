@@ -28,12 +28,10 @@ PYTHON_INCLUDE=`$(PYTHON_CONFIG) --cflags`
 TMP_PREFIX=the_
 PYPS_STDOUT=pypsout
 
-LD_TARGET=_$(PYTHON_MODULE).so
+DYNLIB_TARGET=_$(PYTHON_MODULE).so
 PY_TARGET=pyps.py $(PYTHON_MODULE).py 
-
-LD_OBJECTS=$(PYTHON_MODULE)_wrap.o $(TMP_PREFIX)$(PYTHON_MODULE).o
 LDFLAGS=$(addprefix -l,tpips readline termcap $(pips.libs))
-
+DYNLIB_OBJECTS=$(PYTHON_MODULE)_wrap.o $(TMP_PREFIX)$(PYTHON_MODULE).o
 
 # common stuff
 PROJECT = pips
