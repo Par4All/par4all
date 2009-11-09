@@ -1,5 +1,6 @@
 #include "dump2PIPS.h"
 
+
 newgen_list gfc2pips_list_of_declared_code = NULL;
 /*
  * Add initialization at the begining and at the end of the dumping
@@ -18,6 +19,12 @@ char * strn2upper(char s[], size_t n){
 	}
 	return s;
 }
+char * strrcpy(char *dest, __const char *src){
+	int i = strlen(src);
+	while(i--) dest[i] = src[i];
+	return dest;
+}
+
 int fcopy(char* old,char* new){
 	if(!old||!new) return 0;
 	FILE * o = fopen(old,"r");
@@ -69,6 +76,7 @@ void gfc2pips_namespace(gfc_namespace* ns){
 	message_assert("No symtree root.",			ns->sym_root);
 	message_assert("No symbol for the root.",	ns->sym_root->n.sym);
 
+	//gfc_get_code();
 	gfc2pips_shift_comments();
 	current = getSymtreeByName( ns->proc_name->name, ns->sym_root );
 	message_assert("No current symtree to match the name of the namespace",current);
@@ -379,13 +387,13 @@ void gfc2pips_namespace(gfc_namespace* ns){
 				fprintf(stdout,"comment: %d ",com);
 				if(com){
 					fprintf(stdout,"linked %s\n",com->done?"yes":"no");
-					current_code_linked_to_comments = com->gfc;
+					current_code_linked_to_comments = com->num;
 					do{
-						fprintf(stdout,"\t %d > %s\n", com->gfc, com->s );
+						fprintf(stdout,"\t %d > %s\n", com->num, com->s );
 						com=gfc2pips_pop_comment();
 					}while(
-						com && com->gfc
-						&& current_code_linked_to_comments == com->gfc
+						com
+						&& current_code_linked_to_comments == com->num
 					);
 
 				}else{
@@ -399,10 +407,12 @@ void gfc2pips_namespace(gfc_namespace* ns){
 		fprintf(stdout,"gfc2pips_list_of_declared_code: %d\n",gfc2pips_list_of_declared_code);
 		while( gfc2pips_list_of_declared_code ){
 			if(gfc2pips_list_of_declared_code->car.e){
-				fprintf(stdout,"gfc_code: %d %d %d\n",
+				fprintf(stdout,"gfc_code: %d %d %d %d %d\n",
 					gfc2pips_list_of_declared_code->car.e,
 					((gfc_code*)gfc2pips_list_of_declared_code->car.e)->loc.nextc,
-					*((gfc_code*)gfc2pips_list_of_declared_code->car.e)->loc.nextc
+					*((gfc_code*)gfc2pips_list_of_declared_code->car.e)->loc.nextc,
+					*((gfc_code*)gfc2pips_list_of_declared_code->car.e)->loc.lb->line,
+					((gfc_code*)gfc2pips_list_of_declared_code->car.e)->loc.lb->location
 				);
 				fprintf(stdout,"%s\n",
 					gfc2pips_gfc_char_t2string2( ((gfc_code*)gfc2pips_list_of_declared_code->car.e)->loc.nextc )
@@ -1143,6 +1153,7 @@ instruction gfc2pips_code2instruction__TOP(gfc_namespace *ns, gfc_code* c){
  * Build an instruction sequence
  */
 instruction gfc2pips_code2instruction(gfc_code* c, bool force_sequence){
+	force_sequence = true;
 	if(!c){
 		if(force_sequence){
 			fprintf(stdout,"WE HAVE GOT A PROBLEM, SEQUENCE WITHOUT ANYTHING IN IT !\nSegfault soon ...\n");
@@ -1423,7 +1434,7 @@ instruction gfc2pips_code2instruction_(gfc_code* c){
 				fprintf(stdout,"No condition ???\n");
 				//we are at the last ELSE statement for an ELSE IF
 				if(d->next){
-					return gfc2pips_code2instruction(d->next,false);
+					return gfc2pips_code2instruction(d->next,true);
 				}else{
 					return make_instruction_block(NULL);
 				}
@@ -2788,11 +2799,11 @@ void gfc2pips_initAreas(){
 
 
 //we need to copy the content of the locus
-void gfc2pips_push_comment(locus l, gfc_code *c, statement s){
+void gfc2pips_push_comment(locus l, unsigned long num, char s){
 	if(gfc2pips_comments_stack){
-		//tester le locus pour savoir si on l'a déjà
-		if(gfc2pips_check_already_done(l)) return;
-
+		if(gfc2pips_check_already_done(l)){
+			return;
+		}
 		gfc2pips_comments_stack->next = malloc(sizeof(struct _gfc2pips_comments_));
 		gfc2pips_comments_stack->next->prev = gfc2pips_comments_stack;
 		gfc2pips_comments_stack->next->next = NULL;
@@ -2802,13 +2813,21 @@ void gfc2pips_push_comment(locus l, gfc_code *c, statement s){
 		gfc2pips_comments_stack = malloc(sizeof(struct _gfc2pips_comments_));
 		gfc2pips_comments_stack->prev = NULL;
 		gfc2pips_comments_stack->next = NULL;
-		gfc2pips_comments_stack_=gfc2pips_comments_stack;
+		gfc2pips_comments_stack_ = gfc2pips_comments_stack;
 	}
+	//fprintf(stdout,"push comments\n");
+
 	gfc2pips_comments_stack->l = l;
+	gfc2pips_comments_stack->num = num;
+	gfc2pips_comments_stack->gfc = NULL;
+	gfc2pips_comments_stack->done = false;
+
+
 	gfc2pips_comments_stack->s = gfc2pips_gfc_char_t2string2(l.nextc);
-	gfc2pips_comments_stack->pips = s;
-	gfc2pips_comments_stack->gfc = c;
-	gfc2pips_comments_stack->done = c?true:false;
+	gfc2pips_comments_stack->s[ strlen(gfc2pips_comments_stack->s)-2 ] = '\0';
+	strrcpy(gfc2pips_comments_stack->s+1,gfc2pips_comments_stack->s);
+	*gfc2pips_comments_stack->s = s;
+
 }
 
 bool gfc2pips_check_already_done(locus l){
@@ -2835,7 +2854,7 @@ string gfc2pips_get_comment_of_code(gfc_code *c){
 						)
 					);
 					strcpy(b,a);
-					strcpy(b+strlen(b),"\nC");
+					strcpy(b+strlen(b),"\n");
 					strcpy(b+strlen(b),retour->s);
 					free(a);
 					a=b;
@@ -2846,8 +2865,7 @@ string gfc2pips_get_comment_of_code(gfc_code *c){
 			}
 			if(a){
 				b = malloc(sizeof(char)*(strlen(a) + 2));
-				strcpy(b,"C");
-				strcpy(b+strlen(b),a);
+				strcpy(b,a);
 				strcpy(b+strlen(b),"\n");
 				free(a);
 				return b;
@@ -2875,7 +2893,66 @@ gfc2pips_comments gfc2pips_pop_comment(){
 	}
 }
 
-void gfc2pips_set_last_comments_done(gfc_code *c){
+//changer en juste un numéro, sans que ce soit "done"
+//puis faire une étape similaire qui assigne un statement à la première plage non "done" et la met à "done"
+void gfc2pips_set_last_comments_done(unsigned long nb){
+	//printf("gfc2pips_set_last_comments_done\n");
+	gfc2pips_comments retour = gfc2pips_comments_stack;
+	while(retour){
+		if(retour->done)return;
+		retour->num = nb;
+		retour->done = true;
+		retour = retour->prev;
+	}
+}
+void gfc2pips_assign_num_to_last_comments(unsigned long nb){
+	gfc2pips_comments retour = gfc2pips_comments_stack;
+	while(retour){
+		if(retour->done||retour->num)return;
+		retour->num = nb;
+		retour = retour->prev;
+	}
+}
+void gfc2pips_assign_gfc_code_to_last_comments(gfc_code *c){
+	gfc2pips_comments retour = gfc2pips_comments_stack_;
+	if(c){
+		while(retour && retour->done ){
+			retour = retour->next;
+		}
+		if(retour){
+			unsigned long num_plage = retour->num;
+			while( retour && retour->num==num_plage ){
+				retour->gfc = c;
+				retour->done = true;
+				retour = retour->next;
+			}
+		}
+	}
+}
+
+void gfc2pips_replace_comments_num(unsigned long old, unsigned long new){
+	gfc2pips_comments retour = gfc2pips_comments_stack;
+	bool if_changed = false;
+	fprintf(stdout,"gfc2pips_replace_comments_num: replace %d by %d\n", old, new );
+	while(retour){
+		if(retour->num==old){
+			if_changed = true;
+			retour->num = new;
+		}
+		retour = retour->prev;
+	}
+	//if(if_changed) gfc2pips_nb_of_statements--;
+}
+bool gfc2pips_comment_num_exists(unsigned long num){
+	gfc2pips_comments retour = gfc2pips_comments_stack;
+	fprintf(stdout,"gfc2pips_comment_num_exists: %d\n", num );
+	while(retour){
+		if(retour->num==num)return true;
+		retour = retour->prev;
+	}
+	return false;
+}
+/*void gfc2pips_set_last_comments_done(gfc_code *c){
 	printf("gfc2pips_set_last_comments_done\n");
 	gfc2pips_comments retour = gfc2pips_comments_stack;
 	while(retour && c){
@@ -2886,28 +2963,27 @@ void gfc2pips_set_last_comments_done(gfc_code *c){
 		printf("\t\t%d\n",retour->gfc);
 		retour = retour->prev;
 	}
-}
+}*/
 
 void gfc2pips_pop_not_done_comments(){
 	while(gfc2pips_comments_stack && gfc2pips_comments_stack->done==false){
 		gfc2pips_pop_comment();
 	}
 }
-
-void gfc2pips_shift_comments(){return;
+void gfc2pips_shift_comments(){
 	gfc2pips_comments retour = gfc2pips_comments_stack;
-	newgen_list l = gfc2pips_list_of_declared_code;
-	while(l){
-		while(retour && l->cdr && l->car.e==retour->gfc){
-			retour->gfc = l->cdr->car.e;
-			retour = retour->prev;
+	newgen_list l = gen_nreverse(gfc2pips_list_of_declared_code);
+	while(retour){
+
+		newgen_list curr = gen_nthcdr(retour->num,l);
+		if(curr){
+			retour->gfc = curr->car.e;
 		}
-		if(retour)retour = retour->prev;
-		POP(l);
+		retour = retour->prev;
 	}
-	if(retour==NULL)return;
-	fprintf(stdout,"too much comments or not enough statements\n");
+	return;
 }
+
 void gfc2pips_push_last_code(gfc_code *c){
 	if(gfc2pips_list_of_declared_code==NULL) gfc2pips_list_of_declared_code = gen_cons(NULL,NULL);
 	//gfc2pips_list_of_declared_code =
@@ -2916,6 +2992,7 @@ void gfc2pips_push_last_code(gfc_code *c){
 
 //ajouter un get_locus_by_locus ou qqch du genre pour savoir si on a déjà mis un commentaire dans la pile
 //créer une fonction qui concatène les commentaires dans les locus qui ne sont pas liés à un code/statement
+
 
 
 

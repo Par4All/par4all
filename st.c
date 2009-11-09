@@ -48,10 +48,13 @@ gfc_get_code (void)
 {
   gfc_code *c;
 
+  static int nb=0;
   c = XCNEW (gfc_code);
   c->loc = gfc_current_locus;
-  gfc2pips_set_last_comments_done(c);
+  //fprintf(stdout,"nb of code: %d\ngfc_code: %d\n",++nb,c);
+  //gfc2pips_set_last_comments_done(c);
   gfc2pips_push_last_code(c);
+  gfc2pips_assign_gfc_code_to_last_comments(c);
   return c;
 }
 

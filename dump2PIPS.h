@@ -59,14 +59,15 @@
 #undef match
 #undef list
 
+extern int gfc2pips_nb_of_statements;
 
 
 typedef struct _gfc2pips_comments_{
 	bool done;
 	locus l;
 	gfc_code *gfc;
-	statement pips;
 	char *s;
+	unsigned long num;
 	struct _gfc2pips_comments_ *prev;
 	struct _gfc2pips_comments_ *next;
 } *gfc2pips_comments;
@@ -86,6 +87,7 @@ statement gfc_function_body;
 
 char * str2upper(char s[]);
 char * strn2upper(char s[], size_t n);
+char * strrcpy(char *dest, __const char *src);
 int fcopy(char* ,char* );
 
 /*
@@ -171,11 +173,16 @@ void gfc2pips_initAreas();
 newgen_list *gfc2pips_list_of_all_modules;
 
 
-void gfc2pips_push_comment(locus l, gfc_code *c, statement s);
+void gfc2pips_push_comment(locus l, unsigned long nb, char s);
 bool gfc2pips_check_already_done(locus l);
 string gfc2pips_get_comment_of_code(gfc_code *c);
 gfc2pips_comments gfc2pips_pop_comment();
-void gfc2pips_set_last_comments_done(gfc_code *c);
+//void gfc2pips_set_last_comments_done(gfc_code *c);
+void gfc2pips_set_last_comments_done(unsigned long nb);
+void gfc2pips_assign_num_to_last_comments(unsigned long nb);
+void gfc2pips_assign_gfc_code_to_last_comments(gfc_code *c);
+void gfc2pips_replace_comments_num(unsigned long old, unsigned long new);
+bool gfc2pips_comment_num_exists(unsigned long num);
 void gfc2pips_pop_not_done_comments();
 
 void gfc2pips_shift_comments();

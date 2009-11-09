@@ -28,6 +28,7 @@ along with GCC; see the file COPYING3.  If not see
 #include "debug.h"
 
 #include "dump2PIPS.h"
+int gfc2pips_nb_of_statements = 0;
 gfc2pips_comments gfc2pips_comments_stack;
 gfc2pips_comments gfc2pips_comments_stack_;
 
@@ -811,6 +812,10 @@ next_statement (void)
   locus old_locus;
   gfc_new_block = NULL;
 
+
+  gfc2pips_set_last_comments_done(gfc2pips_nb_of_statements++);
+
+  //fprintf(stdout,"next_statement\n");
   gfc_current_ns->old_cl_list = gfc_current_ns->cl_list;
   for (;;)
     {
@@ -912,14 +917,11 @@ push_state (gfc_state_data *p, gfc_compile_state new_state, gfc_symbol *sym)
 {
 	/*if(p->head){
 		printf("p->head\n");gfc2pips_set_last_comments_done(p->head);
-	}
-	if(p->tail){
+	}else if(p->tail){
 		printf("p->tail\n");gfc2pips_set_last_comments_done(p->tail);
-	}
-	if(gfc_state_stack->tail){
+	}else if(gfc_state_stack->tail){
 		printf("gfc_state_stack->tail\n");gfc2pips_set_last_comments_done(gfc_state_stack->tail);
-	}
-	if(gfc_state_stack->head){
+	}else if(gfc_state_stack->head){
 		printf("gfc_state_stack->head\n");gfc2pips_set_last_comments_done(gfc_state_stack->head);
 	}*/
   p->state = new_state;
@@ -2640,9 +2642,10 @@ parse_if_block (void)
   gfc_statement st;
   locus else_locus;
   gfc_state_data s;
-  int seen_else;
+  int seen_else,seen_elseif;
+  gfc2pips_nb_of_statements++;
 
-  seen_else = 0;
+  seen_elseif = seen_else = 0;
   accept_statement (ST_IF_BLOCK);
 
   top = gfc_state_stack->tail;
@@ -2654,7 +2657,11 @@ parse_if_block (void)
   d->expr = top->expr;
   top->expr = NULL;
   top->block = d;
-
+  //make appear the first comment of a if block if there are several instructions in the block
+  gfc2pips_replace_comments_num(gfc2pips_nb_of_statements-1,gfc2pips_nb_of_statements);
+  //we still have a problem if there only is one instruction
+  unsigned long current_num = gfc2pips_nb_of_statements;
+  fprintf(stdout,"gfc2pips_nb_of_statements: begin %d\n",gfc2pips_nb_of_statements);
   do
     {
       st = parse_executable (ST_NONE);
@@ -2674,6 +2681,7 @@ parse_if_block (void)
 	      break;
 	    }
 
+	  seen_elseif = 1;
 	  d = new_level (gfc_state_stack->head);
 	  d->op = EXEC_IF;
 	  d->expr = new_st.expr;
@@ -2691,6 +2699,14 @@ parse_if_block (void)
 	      break;
 	    }
 
+	  if(gfc2pips_comment_num_exists(gfc2pips_nb_of_statements-1)){
+		  fprintf(stdout, "current indice of statements: %d\n", gfc2pips_nb_of_statements );
+		  //gfc2pips_replace_comments_num(gfc2pips_nb_of_statements-2,gfc2pips_nb_of_statements-1);
+		  //gfc2pips_replace_comments_num(gfc2pips_nb_of_statements-1,gfc2pips_nb_of_statements-2);
+		  //gfc2pips_replace_comments_num(gfc2pips_nb_of_statements,gfc2pips_nb_of_statements-1);
+		  //gfc2pips_replace_comments_num(gfc2pips_nb_of_statements-1,gfc2pips_nb_of_statements);
+		 // gfc2pips_nb_of_statements-=2;
+	  }
 	  seen_else = 1;
 	  else_locus = gfc_current_locus;
 
@@ -2710,6 +2726,12 @@ parse_if_block (void)
 	}
     }
   while (st != ST_ENDIF);
+
+  fprintf(stdout,"gfc2pips_nb_of_statements: near end %d\n",gfc2pips_nb_of_statements);
+  //see the right combination of seen_else and seen_elseif
+  gfc2pips_nb_of_statements--;
+  if( seen_elseif && seen_else) gfc2pips_nb_of_statements--;
+  fprintf(stdout,"gfc2pips_nb_of_statements: end %d\n",gfc2pips_nb_of_statements);
 
   pop_state ();
   accept_statement (st);
@@ -3203,6 +3225,7 @@ static gfc_statement
 parse_executable (gfc_statement st)
 {
   int close_flag;
+  //gfc2pips_set_last_comments_done(NULL);
 
   if (st == ST_NONE)
     st = next_statement ();
@@ -3855,7 +3878,7 @@ loop:
 
   /* Dump the parse tree if requested.  */
   if (gfc_option.dump_parse_tree)
-    gfc_dump_parse_tree (gfc_current_ns, stdout);
+    gfc_dump_parse_tree (gfc_current_ns, stdout);return SUCCESS;
 
   gfc_get_errors (NULL, &errors);
   if (s.state == COMP_MODULE)

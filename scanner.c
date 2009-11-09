@@ -808,7 +808,7 @@ skip_fixed_comments (void)
 
       if (c == '!' || c == 'c' || c == 'C' || c == '*')
 	{
-          gfc2pips_push_comment(gfc_current_locus,NULL,NULL);
+          gfc2pips_push_comment(gfc_current_locus,gfc2pips_nb_of_statements,c);
 	  /* If -fopenmp, we need to handle here 2 things:
 	     1) don't treat !$omp|c$omp|*$omp as comments, but directives
 	     2) handle OpenMP conditional compilation, where
