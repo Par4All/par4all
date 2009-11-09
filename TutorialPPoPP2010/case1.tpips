@@ -17,6 +17,9 @@ setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
 setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
 setproperty SEMANTICS_ANALYZE_SCALAR_FLOAT_VARIABLES TRUE
 setproperty SEMANTICS_ANALYZE_SCALAR_INT_VARIABLES TRUE
+setproperty PRETTYPRINT_ANALYSES_WITH_LF FALSE
+# Let's repeat if to overcome the property parser weaknesses...
+setproperty PRETTYPRINT_ANALYSES_WITH_LF FALSE
 
 echo
 echo Parsed printed file for "func1"
@@ -69,7 +72,7 @@ echo
 
 activate PRINT_CODE_TRANSFORMERS
 display PRINTED_FILE[func1]
-#quit
+quit
 display PRINTED_FILE[main]
 
 
