@@ -462,10 +462,9 @@ ifndef WITH_DYNAMIC_LIBRAIRES
 endif
 
 ifdef DYNLIB_TARGET
-
 $(ARCH)/$(DYNLIB_TARGET):$(DYNLIB_OBJECTS)
 			MAJOR_VERSION="`echo '$(VERSION)' | cut -d '.' -f 1`";\
-	        $(LD) -o $@ -shared $(DYNLIB_OBJECTS) $(LDFLAGS) $(LDOPT) -Wl,-soname,$(DYNLIB_TARGET).$$MAJOR_VERSION
+	        $(LD) -o $@ -shared $(DYNLIB_OBJECTS) $(LDFLAGS) $(LDOPT) -fPIC -Wl,-soname,$(DYNLIB_TARGET).$$MAJOR_VERSION 
 
 INSTALL_DYNLIB     +=   $(DYNLIB_TARGET) 
 
