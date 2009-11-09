@@ -9469,6 +9469,7 @@ replaced ...
 \index{PRETTYPRINT\_INDENTATION}
 \index{PRETTYPRINT\_LISTS\_WITH\_SPACES}
 \index{Statement number}
+\index{PRETTYPRINT\_ANALYSES\_WITH\_LF}
 
 When prettyprinting semantic information (preconditions, transformers and
 regions), add a line before and after each piece of information if set to
@@ -9520,6 +9521,16 @@ line. The default option is chosen for readability.
 \begin{PipsProp}{PRETTYPRINT_LISTS_WITH_SPACES} 
 PRETTYPRINT_LISTS_WITH_SPACES TRUE
 \end{PipsProp}
+
+Depending on the user goal, it may be better to isolate comments used
+to display results of PIPS analyses from the source code
+statement. This is the default option.
+
+\begin{PipsProp}{PRETTYPRINT_ANALYSES_WITH_LF} 
+PRETTYPRINT_ANALYSES_WITH_LF TRUE
+\end{PipsProp}
+
+This feature only exists for the semantics analyses.
 
 \subsubsection{Target Language Selection}
 \index{HPF}
