@@ -30,7 +30,7 @@ PYPS_STDOUT=pypsout
 
 DYNLIB_TARGET=_$(PYTHON_MODULE).so
 PY_TARGET=pyps.py $(PYTHON_MODULE).py 
-LDFLAGS=$(addprefix -l,tpips readline termcap $(pips.libs))
+LDFLAGS=$(addprefix -l,$(pips.libs))
 DYNLIB_OBJECTS=$(PYTHON_MODULE)_wrap.o $(TMP_PREFIX)$(PYTHON_MODULE).o
 
 # common stuff
@@ -78,20 +78,20 @@ pipscc.py:pipscc
 
 
 check:sample.py all pipscc.py pii.py
-	python -c "import pypips"
-	python -c "import pyps"
-	python -c "import pipscc"
-	python -c "import pii"
-	PAGER=cat ./$<
-	./pipscc -c test.c
-	PAGER=cat ./pipscc test.o -o thetest
+	PYTHONPATH=$(PY.d) python -c "import pypips"
+	PYTHONPATH=$(PY.d) python -c "import pyps"
+	PYTHONPATH=$(PY.d) python -c "import pipscc"
+	PYTHONPATH=$(PY.d) python -c "import pii"
+	PYTHONPATH=$(PY.d) PAGER=cat ./$<
+	PYTHONPATH=$(PY.d) ./pipscc -c test.c
+	PYTHONPATH=$(PY.d) PAGER=cat ./pipscc test.o -o thetest
 	rm -f thetest test.o
-	python pii.py -c test.c
-	PAGER=cat python pii.py test.o -o thetest
+	PYTHONPATH=$(PY.d) python pii.py -c test.c
+	PYTHONPATH=$(PY.d) PAGER=cat python pii.py test.o -o thetest
 
 
 checkall:xpc.py
-	python ./xpc.py --module=foo --sources=carto.c,get.c --algo=genetic --nbgen=2 --CPPFLAGS=-DSIZE=100
+	PYTHONPATH=$(PY.d) python ./xpc.py --module=foo --sources=carto.c,get.c --algo=genetic --nbgen=2 --CPPFLAGS=-DSIZE=100
 
 
 pyps.py: pipsmakerc2python.pl ../../Documentation/pipsmake/pipsmake-rc.tex $(ETC.d)/properties.rc $(ETC.d)/pipsdep.rc _pyps.py 

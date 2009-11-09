@@ -22,22 +22,29 @@
 
 */
 #include <stdlib.h>
+#include <stdio.h>
 
 #define pips_user_error(...) do { fprintf(stderr, __VA_ARGS__); return; } while(0)
 
 #define TEMP_FILE_NAME ".pipsout.XXXXXX"
 
+
+/* this part is not very nice, but how to rember the former value of stdout ?*/
 static void begin_catch_stdout()
 {
     stdout=freopen(TEMP_FILE_NAME,"w+",stdout);
 }
+
 static char* end_catch_stdout()
 {
     long end = ftell(stdout);
     rewind(stdout);
     long start = ftell(stdout);
     char * whole_file=calloc(1+(end-start),sizeof(char));
-    fread(whole_file,end-start,sizeof(char),stdout);
+    if( whole_file == NULL)
+        fprintf(stderr,"not enough memory to catch pips stdout\n");
+    else
+        fread(whole_file,end-start,sizeof(char),stdout);
     stdout=freopen("/dev/tty","w",stdout);
     remove(TEMP_FILE_NAME);
     return whole_file;
@@ -45,8 +52,13 @@ static char* end_catch_stdout()
 
 void create(char* workspace_name, char ** filenames)
 {
-    string main_module_name;
-    tpips_init();
+    /* init various composants */
+    initialize_newgen();
+    initialize_sc((char*(*)(Variable))entity_local_name);
+
+    // SG: should check this !
+    // pips_log_handler = tpips_user_log;
+
     gen_array_t filename_list = gen_array_make(0);
     static bool exception_callback_set = false;
     if(!exception_callback_set)
@@ -88,7 +100,7 @@ void create(char* workspace_name, char ** filenames)
                         workspace_name);
             }
 
-            main_module_name = get_first_main_module();
+            string main_module_name = get_first_main_module();
 
             if (!string_undefined_p(main_module_name)) {
                 /* Ok, we got it ! Now we select it: */
@@ -106,9 +118,7 @@ void create(char* workspace_name, char ** filenames)
 
 void quit()
 {
-    tp_close_the_workspace(db_get_current_workspace_name());
-    tpips_close();
-//    db_close_pips_database();
+    close_workspace(FALSE);
 }
 
 void set_property(char* propname, char* value)
@@ -121,40 +131,101 @@ void set_property(char* propname, char* value)
     parse_properties_string(line);
     free(line);
 }
-char* info(char * topic)
-{
-    begin_catch_stdout();
-    tp_some_info(topic);
-    return end_catch_stdout();
-}
 
-static void init_res_or_rule(res_or_rule* ror,const char *res, const char *rule)
+char* info(char * about)
 {
-    ror->the_name=strdup(rule);
-    ror->the_owners=gen_array_make(1);
-    gen_array_append(ror->the_owners,strdup(res));
+    string sinfo = NULL;
+    if (same_string_p(about, "workspace"))
+    {
+        sinfo = db_get_current_workspace_name();
+        if(sinfo) sinfo=strdup(sinfo);
+    }
+    else if (same_string_p(about, "module"))
+    {
+        sinfo = db_get_current_module_name();
+        if(sinfo) sinfo=strdup(sinfo);
+    }
+    else if (same_string_p(about, "modules") && db_get_current_workspace_name())
+    {
+        gen_array_t modules = db_get_module_list();
+        int n = gen_array_nitems(modules), i;
+
+        size_t sinfo_size=0;
+        for(i=0; i<n; i++)
+        {
+            string m = gen_array_item(modules, i);
+            sinfo_size+=strlen(m)+1;
+        }
+        sinfo=(char*)calloc(sinfo_size,sizeof(char));
+        if(!sinfo) fprintf(stderr,"not enough meory to hold all module names\n");
+        else {
+            for(i=0; i<n; i++)
+            {
+                string m = gen_array_item(modules, i);
+                strcat(sinfo,m); /* suboptimum*/
+                strcat(sinfo," ");
+            }
+        }
+        gen_array_full_free(modules);
+    }
+    else if (same_string_p(about, "directory"))
+    {
+        char pathname[MAXPATHLEN];
+        sinfo=getcwd(pathname, MAXPATHLEN);
+        if(sinfo)
+            sinfo=strdup(sinfo);
+        else
+            fprintf(stderr,"failer to retreive current working directory\n");
+    }
+
+    if(!sinfo)
+        sinfo=strdup("");
+    return sinfo;
 }
 
 void apply(char * phasename, char * target)
 {
-    res_or_rule ror;
-    init_res_or_rule(&ror,target,phasename);
-    perform(safe_apply,&ror);
+    safe_apply(phasename,target);
 }
 
-void display(char *rcname, char *target)
+void display(char *rname, char *mname)
 {
-    res_or_rule ror;
-    init_res_or_rule(&ror,target,rcname);
-    perform(display_a_resource,&ror);
+    string fname = build_view_file(rname);
+
+    if (!fname)
+    {
+        pips_user_error("Cannot build view file %s\n", rname);
+        return;
+    }
+
+    if (!file_exists_p(fname))
+    {
+        pips_user_error("View file \"%s\" not found\n", fname);
+        return;
+    }
+
+    FILE * in = safe_fopen(fname, "r");
+    safe_cat(stdout, in);
+    safe_fclose(in, fname);
+
+    free(fname);
+    return;
 }
 
-char* show(char * rcname, char *target)
+char* show(char * rname, char *mname)
 {
-    begin_catch_stdout();
-    res_or_rule ror;
-    init_res_or_rule(&ror,target,rcname);
-    perform(just_show,&ror);
-    return end_catch_stdout();
+    if (!db_resource_p(rname, mname)) {
+        pips_user_warning("no resource %s[%s].\n", rname, mname);
+        return  strdup("");
+    }
+
+    if (!displayable_file_p(rname)) {
+        pips_user_warning("resource %s cannot be displayed.\n", rname);
+        return strdup("");
+    }
+
+    /* now returns the name of the file.
+    */
+    return strdup(db_get_memory_resource(rname, mname, TRUE));
 }
 
