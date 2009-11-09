@@ -6672,7 +6672,7 @@ unspaghettify          > MODULE.code
 
 To display the statistics about \PipsPassRef{unspaghettify} and control graph
 restructuring \PipsPassRef{restructure_control}.
-\begin{PipsProp}{UNSPAGHETTIFY_DISPLAY_STATISTICS} 
+\begin{PipsProp}{UNSPAGHETTIFY_DISPLAY_STATISTICS}
 UNSPAGHETTIFY_DISPLAY_STATISTICS TRUE
 \end{PipsProp}
 
@@ -6696,7 +6696,7 @@ It implements a recursive decomposition of the control flow graph
 by an interval graph partitioning method.
 
 The restructurer can recover some while loops if this property is set:
-\begin{PipsProp}{UNSPAGHETTIFY_WHILE_RECOVER} 
+\begin{PipsProp}{UNSPAGHETTIFY_WHILE_RECOVER}
 UNSPAGHETTIFY_WHILE_RECOVER FALSE
 \end{PipsProp}
 
@@ -6747,6 +6747,8 @@ recover_for_loop          > MODULE.code
         < MODULE.summary_effects
 \end{PipsMake}
 
+This phase cannot be called from inside the control restructurer since it
+needs many higher-level analysis. This is why it is in a separate phase.
 
 \subsubsection{For-loop to do-loop transformation}
 \label{sec:loop-do-loop}
