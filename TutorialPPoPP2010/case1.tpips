@@ -63,9 +63,13 @@ echo
 echo Transformers for "main"
 echo
 
+#setproperty PRETTYPRINT_ADD_EMACS_PROPERTIES TRUE
+
+#setproperty PRETTYPRINT_ADD_EMACS_PROPERTIES TRUE
 
 activate PRINT_CODE_TRANSFORMERS
 display PRINTED_FILE[func1]
+#quit
 display PRINTED_FILE[main]
 
 

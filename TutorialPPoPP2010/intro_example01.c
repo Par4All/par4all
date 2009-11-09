@@ -1,11 +1,12 @@
-int temp; 
+int temp;
 int
-main (void) 
+main (void)
 {
-  int i,j,c,a[100]; 
-  c = 2; 
-  for (i = 0;i<100;i++) 
+  int i,j,c,a[100];
+  c = 2;
+  /* a simple parallel loop */
+  for (i = 0;i<100;i++)
     {
-      a[i] = c*a[i]+(a[i]-1); 
-    } 
+      a[i] = c*a[i]+(a[i]-1);
+    }
 }
