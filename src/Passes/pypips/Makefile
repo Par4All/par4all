@@ -30,7 +30,7 @@ PYPS_STDOUT=pypsout
 
 DYNLIB_TARGET=_$(PYTHON_MODULE).so
 PY_TARGET=pyps.py $(PYTHON_MODULE).py 
-LDFLAGS=$(addprefix -l,$(pips.libs))
+LDFLAGS=-L$(LIB.d) -L$(LIB.d)/$(ARCH) $(addprefix -l, $(pips.libs))
 DYNLIB_OBJECTS=$(PYTHON_MODULE)_wrap.o $(TMP_PREFIX)$(PYTHON_MODULE).o
 
 # common stuff
