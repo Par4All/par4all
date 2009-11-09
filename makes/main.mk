@@ -73,7 +73,7 @@ EXE.d	= $(INSTALL_DIR)/bin
 LIB.d	= $(INSTALL_DIR)/lib/$(ARCH)
 INC.d	= $(INSTALL_DIR)/include
 ETC.d	= $(INSTALL_DIR)/etc
-PY.d	= $(LIB.d)/python2.5/site-packages
+PY.d	= $(LIB.d)
 # By default, install the documentation directly into $(DOC.d) but DOC.subd can
 # be used to specify a subdirectory:
 DOC.d	= $(INSTALL_DIR)/doc
