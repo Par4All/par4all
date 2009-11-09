@@ -406,7 +406,8 @@ text text_transformer(transformer tran)
   extern string entity_minimal_name(entity);
 
   /* If in EMACS mode, does not add any separator line: */
-  if (!get_bool_property("PRETTYPRINT_ADD_EMACS_PROPERTIES"))
+  if (get_bool_property("PRETTYPRINT_ANALYSES_WITH_LF")
+      && !get_bool_property("PRETTYPRINT_ADD_EMACS_PROPERTIES"))
     ADD_SENTENCE_TO_TEXT(txt, make_sentence(is_sentence_formatted,
 					    strdup("\n")));
 
@@ -457,7 +458,8 @@ text text_transformer(transformer tran)
     close_current_line(crt_line, txt, str_prefix);
   }
 
-  if (!get_bool_property("PRETTYPRINT_ADD_EMACS_PROPERTIES"))
+  if (get_bool_property("PRETTYPRINT_ANALYSES_WITH_LF")
+      && !get_bool_property("PRETTYPRINT_ADD_EMACS_PROPERTIES"))
     ADD_SENTENCE_TO_TEXT(txt, make_sentence(is_sentence_formatted,
 					    strdup("\n")));
 

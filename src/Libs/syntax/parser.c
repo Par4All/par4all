@@ -80,27 +80,23 @@ entity StackArea = entity_undefined;
 int line_b_I, line_e_I, line_b_C, line_e_C;
 char lab_I[6];
 
-void
-reset_current_label_string()
+void reset_current_label_string()
 {
     strcpy(lab_I, "");
 }
 
-string
-get_current_label_string()
+string get_current_label_string()
 {
     return lab_I;
 }
 
-void
-set_current_label_string(string ln)
+void set_current_label_string(string ln)
 {
     pips_assert("Label name is at most 5 characters long", strlen(ln)<=5);
     strcpy(lab_I, ln);
 }
 
-bool
-empty_current_label_string_p()
+bool empty_current_label_string_p()
 {
     bool empty_p = same_string_p(lab_I, "");
 
@@ -115,14 +111,12 @@ extern void syn_reset_lex(void);
 static bool parser_recursive_call = FALSE;
 
 /* Safety for recursive calls of parser required to process entries */
-static void
-reset_parser_recursive_call()
+static void reset_parser_recursive_call()
 {
     parser_recursive_call = FALSE;
 }
 
-static void
-set_parser_recursive_call()
+static void set_parser_recursive_call()
 {
     parser_recursive_call = FALSE;
 }
@@ -131,8 +125,7 @@ set_parser_recursive_call()
 
 bool InParserError = FALSE;
 
-bool
-ParserError(char * f, char * m)
+bool ParserError(char * f, char * m)
 {
     entity mod = get_current_module_entity();
 
@@ -213,19 +206,18 @@ ParserError(char * f, char * m)
  * FI: I do not understand how this works. It has an effect only once
  * during a pips process lifetime. The error handling routine resets
  * CurrentPackage to NULL, as it is when the pips process is started.
- * 
- * Should I: 
+ *
+ * Should I:
  *
  *  A modify the error handling routine to reset CurrentPackage to
- *    TOP_LEVEL_MODULE_NAME? 
+ *    TOP_LEVEL_MODULE_NAME?
  *
  *  B reset CurrentPackage to TOP_LEVEL_MODULE_NAME each time the parser
  *    is entered?
  *
  * I choose A.
  */
-void 
-BeginingOfParsing()
+void BeginingOfParsing()
 {
     static bool called = FALSE;
 
@@ -242,10 +234,8 @@ extern void syn_parse();
 /* parse "module.dbr_file"
  */
 
-static bool 
-the_actual_parser(
-    string module,
-    string dbr_file)
+static bool the_actual_parser(string module,
+			      string dbr_file)
 {
     string dir;
     debug_on("SYNTAX_DEBUG_LEVEL");
@@ -262,7 +252,7 @@ the_actual_parser(
 
     pips_assert("CurrentFN is NULL", CurrentFN==NULL);
     dir = db_get_current_workspace_directory();
-    CurrentFN = 
+    CurrentFN =
 	strdup(concatenate(dir, "/",
 			   db_get_file_resource(dbr_file, module, TRUE), 0));
     free(dir);
@@ -307,26 +297,22 @@ the_actual_parser(
  * just a different input file not to touch the original source file.
  * this parser should be selected/activated automatically.
  */
-bool 
-hpfc_parser(string module)
+bool hpfc_parser(string module)
 {
     return the_actual_parser(module, DBR_HPFC_FILTERED_FILE);
 }
 // pour STEP
-bool
-directive_parser(string module)
+bool directive_parser(string module)
 {
   return the_actual_parser(module, DBR_DIRECTIVE_FILTERED_FILE);
 }
 
-bool 
-parser(string module)
+bool parser(string module)
 {
     return the_actual_parser(module, DBR_SOURCE_FILE);
 }
 
-void 
-init_parser_properties()
+void init_parser_properties()
 {
   init_parser_reader_properties();
 }
