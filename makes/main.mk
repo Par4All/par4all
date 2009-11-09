@@ -475,13 +475,13 @@ phase4::	.build_dynlib.$(ARCH)
 $(INSTALL_DYNLIB): $(ARCH)/.dir
 
 install:dynlib-install
-dynlib-install .build_dynlib.$(ARCH): $(INSTALL_DYNLIB)
+dynlib-install .build_dynlib.$(ARCH): $(ARCH)/$(INSTALL_DYNLIB)
 	# no dep on target dir
 	$(INSTALL) -d $(LIB.d)
 	MAJOR_VERSION="`echo '$(VERSION)' | cut -d '.' -f 1`";\
 	for l in $(INSTALL_DYNLIB) ; do \
-	  $(CMP) $$l $(LIB.d)/$$l.$$MAJOR_VERSION || \
-	    $(INSTALL) -m 644 $$l $(LIB.d)/$$l.$$MAJOR_VERSION ; \
+	  $(CMP) $(ARCH)/$$l $(LIB.d)/$$l.$$MAJOR_VERSION || \
+	    $(INSTALL) -m 644 $(ARCH)/$$l $(LIB.d)/$$l.$$MAJOR_VERSION ; \
 		$(RM) $(LIB.d)/$$l ;\
 		cd $(LIB.d) && ln -s $$l.$$MAJOR_VERSION $$l && cd -;\
 	done
