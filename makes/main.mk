@@ -122,6 +122,10 @@ PATH	:= $(PATH):$(NEWGEN_ROOT)/bin:$(NEWGEN_ROOT)/bin/$(ARCH)
 UTC_DATE := "$(shell date -u)"
 CPPFLAGS += -DSOFT_ARCH='$(ARCH)' -I$(INC.d)
 
+ifdef WITH_DYNAMIC_LIBRARIES
+CFLAGS+=-fPIC
+endif
+
 # {C,CPP,LD,L,Y}OPT macros allow to *add* things from the command line
 # as gmake CPPOPT="-DFOO=bar" ... that will be added to the defaults
 # a typical interesting example is to put -pg in {C,LD}OPT
