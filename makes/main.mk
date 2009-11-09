@@ -464,7 +464,8 @@ endif
 ifdef DYNLIB_TARGET
 
 $(ARCH)/$(DYNLIB_TARGET):$(DYNLIB_OBJECTS)
-	        $(LD) -o $@ -shared $(DYNLIB_OBJECTS) $(LDFLAGS) $(LDOPT)
+			MAJOR_VERSION="`echo '$(VERSION)' | cut -d '.' -f 1`";\
+	        $(LD) -o $@ -shared $(DYNLIB_OBJECTS) $(LDFLAGS) $(LDOPT) -Wl,-soname,$(DYNLIB_TARGET).$$MAJOR_VERSION
 
 INSTALL_DYNLIB     +=   $(DYNLIB_TARGET) 
 
