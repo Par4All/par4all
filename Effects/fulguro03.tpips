@@ -4,10 +4,19 @@ setproperty ABORT_ON_USER_ERROR TRUE
 
 create fulguro03 fulguro03.c
 activate C_PARSER
+activate C_SYMBOL_TABLE
 
 setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
 
-make SUMMARY_EFFECTS[%ALL]
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[flgr2d_set_data_vector_fgUINT16]
+
+setenv SUMMARY_EFFECTS_DEBUG_LEVEL 8
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[flgr2d_set_data_vector_fgUINT16]
 
 
 close
