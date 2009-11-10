@@ -1853,8 +1853,9 @@ bool common_subexpression_elimination(string module_name)
 
 
 /* Pipsmake phase: Invariant Code Motion
+ * beware, invraiant_code_motion phase already exist !
  */
-bool invariant_code_motion(string module_name)
+bool icm(string module_name)
 {
   bool   result;
   string os = get_string_property("EOLE_OPTIMIZATION_STRATEGY");
