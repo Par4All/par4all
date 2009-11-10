@@ -241,6 +241,11 @@ static IoElementDescriptor IoElementDescriptorTable[] = {
   {PSELECT_FUNCTION_NAME,       "nrrrrw",  is_action_read, is_approximation_must},
   {FSTAT_FUNCTION_NAME,         "nw",      is_action_read, is_approximation_must},
 
+  /* wchar.h */
+  {FWSCANF_FUNCTION_NAME, "srw*",is_action_read, is_approximation_must},
+  {SWSCANF_FUNCTION_NAME, "rrw*",is_action_read, is_approximation_must},
+  {WSCANF_FUNCTION_NAME, "rw*",is_action_read, is_approximation_must},
+
   /* Fortran extensions for asynchronous IO's */
 
   {BUFFERIN_FUNCTION_NAME,      "xrwr",    is_action_read, is_approximation_must},
@@ -766,6 +771,11 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
   /*#include <time.h>*/
   {TIME_FUNCTION_NAME,                           no_write_effects},
 
+  /*#include <wchar.h>*/
+  {FWSCANF_FUNCTION_NAME, "srw*",                 c_io_effects},
+  {SWSCANF_FUNCTION_NAME, "rrw*",                 c_io_effects},
+  {WSCANF_FUNCTION_NAME,  "rw*",                   c_io_effects},
+  
   /*#include <string.h>*/
 
   {MEMCPY_FUNCTION_NAME,                           no_write_effects},
