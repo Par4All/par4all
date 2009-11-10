@@ -19,15 +19,15 @@
 # along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-VERSION	= $(MAKE.d)/version.sh
+SVN_VERSION	= $(MAKE.d)/version.sh
 
 .revisions_h:
 	$(RM) revisions.h
 	{ \
-	  echo '#define NEWGEN_REV "$(shell $(VERSION) $(NEWGEN_ROOT))"'; \
-	  echo '#define LINEAR_REV "$(shell $(VERSION) $(LINEAR_ROOT))"'; \
-	  echo '#define PIPS_REV "$(shell $(VERSION) $(ROOT))"'; \
-	  echo '#define NLPMAKE_REV "$(shell $(VERSION) $(ROOT)/makes)"'; \
+	  echo '#define NEWGEN_REV "$(shell $(SVN_VERSION) $(NEWGEN_ROOT))"'; \
+	  echo '#define LINEAR_REV "$(shell $(SVN_VERSION) $(LINEAR_ROOT))"'; \
+	  echo '#define PIPS_REV "$(shell $(SVN_VERSION) $(ROOT))"'; \
+	  echo '#define NLPMAKE_REV "$(shell $(SVN_VERSION) $(ROOT)/makes)"'; \
 	  echo '#define CC_VERSION "$(shell $(CC_VERSION))"'; \
 	} > revisions.h
 
