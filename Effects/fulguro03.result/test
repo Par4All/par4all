@@ -1,0 +1,68 @@
+void flgr2d_set_data_vector_fgUINT16(FLGR_Data2D *dat, int row, int col, FLGR_Vector *vct)
+{
+   fgUINT16 *array_s = (fgUINT16 *) vct->array;
+   fgUINT16 *array_d = (fgUINT16 *) (dat->array)[row];
+   int I_0 = vct->spp;
+   {
+      register fgUINT16 val;
+      register int i;
+      register int k;
+      unsigned short _return0;
+//               <must be read   >: I_0 col
+//               <must be written>: i k
+      k = 0, i = col*I_0;
+//               <must be read   >: I_0 k
+      while (k<I_0) {
+//               <must be read   >: array_s array_s[k] k
+//               <must be written>: _return0
+         _return0 = array_s[k];                                         /*0024*/
+//               <must be read   >: _return0
+//               <must be written>: val
+         val = _return0;                                                /*0025*/
+//               <must be read   >: array_d i val
+//               <must be written>: array_d[i]
+         array_d[i] = val;                                              /*0026*/
+//               <must be read   >: i k
+//               <must be written>: i k
+         k++, i++;
+      }
+   }
+}
+//               <may be read    >: vct[0][3][*]
+//               <may be written >: dat[0][1][*][*]
+//               <must be read   >: col
+void flgr2d_set_data_vector_fgUINT16(FLGR_Data2D *dat, int row, int col, FLGR_Vector *vct)
+{
+   fgUINT16 *array_s = (fgUINT16 *) vct->array;
+   fgUINT16 *array_d = (fgUINT16 *) (dat->array)[row];
+   int I_0 = vct->spp;
+   {
+      register fgUINT16 val;
+      register int i;
+      register int k;
+      unsigned short _return0;
+//               <must be read   >: I_0 col
+//               <must be written>: i k
+      k = 0, i = col*I_0;
+//               <may be read    >: array_s[*]
+//               <may be written >: array_d[*]
+//               <must be read   >: I_0 _return0 array_d array_s i k 
+//                                  val
+//               <must be written>: _return0 i k val
+      while (k<I_0) {
+//               <may be read    >: array_s[*]
+//               <must be read   >: array_s k
+//               <must be written>: _return0
+         _return0 = array_s[k];                                         /*0024*/
+//               <must be read   >: _return0
+//               <must be written>: val
+         val = _return0;                                                /*0025*/
+//               <may be written >: array_d[*]
+//               <must be read   >: array_d i val
+         array_d[i] = val;                                              /*0026*/
+//               <must be read   >: i k
+//               <must be written>: i k
+         k++, i++;
+      }
+   }
+}
