@@ -95,18 +95,10 @@ compare_effect_reference(effect * e1, effect * e2)
     list cind2 = list_undefined;
     int diff = 0;
 
-    if(ENDP(ind1))
-      if(ENDP(ind2))
-	diff = 0;
-      else
-	diff = -1;
-    else
-      if(ENDP(ind2))
-	diff = 1;
-      else
-	diff = 0;
 
-    for(cind1 = ind1, cind2 = ind2; !ENDP(cind1) && !ENDP(cind2) && diff ==0; POP(cind1), POP(cind2)) {
+    for(cind1 = ind1, cind2 = ind2; 
+	!ENDP(cind1) && !ENDP(cind2) && diff ==0; 
+	POP(cind1), POP(cind2)) {
       expression e1 = EXPRESSION(CAR(cind1));
       expression e2 = EXPRESSION(CAR(cind2));
 
@@ -130,6 +122,10 @@ compare_effect_reference(effect * e1, effect * e2)
 	  diff = i1 - i2;
 	}
     }
+    
+    if (diff == 0)
+      diff = (int) gen_length(cind1) - (int) gen_length(cind2);
+
     result = diff==0? 0 : (diff>0?1:-1);
   }
   return result;

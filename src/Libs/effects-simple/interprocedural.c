@@ -274,6 +274,8 @@ list effects_dynamic_elim(list l_eff)
     l_res = CONS(EFFECT, make_anywhere_effect(is_action_write), l_res);
   if(add_anywhere_read_effect_p)
     l_res = CONS(EFFECT, make_anywhere_effect(is_action_read), l_res);
+
+  l_res = gen_nreverse(l_res);
   return(l_res);
 }
 
