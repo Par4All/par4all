@@ -1,0 +1,32 @@
+A description from the press release about Par4All
+
+PARIS, June 11, 2009 -- HPC Project, partnering with the "Centre de Recherche en Informatique" (CRI) of the Ecole des Mines, has announced a new open source platform for automatic parallelisation of computer programs
+
+Named "Par4all," this platform will merge various open source developments. Par4all aims to achieve the migration of software to multicore and other parallel processors. Par4all is based on 20 years of academic research on "InterProcedural Parallelisation of scientific programs." Par4all will be an evolving platform. It aims to aggregate all technologies that easily transform sequential programs into parallel ones. It will offer code execution optimization on multicore and manycore architectures without using any specific programming language.
+
+HPC Project is committed to promote the technology CRI developed by maintaining a dedicated Internet portal, federating contributions and supporting the integration process of the platform's software components. With Par4all, HPC Project will offer the software industry new ways to address more easily intensive computation domains where parallelism is a determining factor.
+
+About CRI
+
+The "Centre de Recherche en Informatique, Mathématiques et systèmes, MINES ParisTech" (http://www.cri.mines-paristech.fr) is the Center for research in computing, mathematics and systems from the Ecole des Mines belonging to the ParisTech group. The CRI studies languages used in computer science such as programming, data description, or query languages. The CRI develops semantic analysis and automatic transformation of these languages to answer industrial needs (performance, development cost and time-to-market) as well as administrative and societal needs (coherent data sharing, data normalization, access to data and heritage protection).
+
+About HPC-Project
+
+HPC Project (http://www.hpc-project.com) was established in December 2007. HPC Project is a pioneer in developing tools and strategies for high performance computing and code optimization. HPC Project goal is to bring the power of supercomputer on the engineer's desk.
+
+
+Par4All is composed right now from the PIPS project.
+
+Directory description:
+
+- packages: contains the Par4All subcomponents (PIPS...)
+
+- src: contains the sources of the Par4All infrastructure by itself
+
+
+Ronan Keryell, 11/11/2009.
+
+%%% Local Variables:
+%%% mode: text
+%%% ispell-local-dictionary: "american"
+%%% End:
