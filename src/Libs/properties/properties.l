@@ -165,7 +165,7 @@ static void parse_properties(void)
     while ((tok = yylex()))
     {
 	string n;
-	
+
 	if (tok != TIDENT) {
 	    fprintf(stderr, "syntax error in parse_properties, "
 		    "ident expected, got %d for -%s-.\n", tok, yytext);
