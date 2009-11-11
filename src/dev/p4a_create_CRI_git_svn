@@ -1,0 +1,30 @@
+#! /bin/bash -vx
+
+# Create git-svn instances of the SVN PIPS-related repositories from Mines
+# ParisTech/CRI
+
+# Where to create this git-svn instances:
+GIT_SVN_DIR=CRI-git-svn
+# Prefix to appear in the remote svn in git
+# For example for refs/remotes/CRI/newgen/git-svn:
+GIT_SVN_PREFIX=CRI/
+# List of repositories
+SVN_REPOSITORIES="linear newgen nlpmake pips validation"
+
+# Create a git-svn instance from an svn trunk.
+# Do not pick the branch and tags since its not clear where they are in
+# PIPS and some branches are not public:
+create_git_svn() {
+  git svn clone --prefix=$GIT_SVN_PREFIX$1/ http://svn.cri.ensmp.fr/svn/$1/trunk $1
+}
+
+
+mkdir -p $GIT_SVN_DIR
+cd $GIT_SVN_DIR
+for i in $SVN_REPOSITORIES; do
+    # It is so slow that we slurp them in parallel...
+    create_git_svn $i &
+done
+
+# Wait for all the git-svn to finish:
+wait
