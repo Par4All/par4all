@@ -71,24 +71,24 @@ fprintf_sentence(FILE * fd,
 {
     va_list some_arguments;
     int number_of_printed_char;
-    
+
     va_start(some_arguments, a_format);
     number_of_printed_char = vfprintf(fd, a_format, some_arguments);
     va_end(some_arguments);
-    
-    position_in_the_output += number_of_printed_char;    
+
+    position_in_the_output += number_of_printed_char;
     return number_of_printed_char;
 }
 
 
 /* print_sentence:
  *
- * FI: I had to change this module to handle string longer than the space 
- * available on one line; 
- * I tried to preserve as much as I could of the previous behavior to
- * avoid pseudo-hyphenation at the wrong place and to avoid extensicve problems
- * with validate; the resulting code is lousy, of course; FI, 15 March 1993
- * 
+ * FI: I had to change this module to handle string longer than the
+ * space available on one line; I tried to preserve as much as I could
+ * of the previous behavior to avoid pseudo-hyphenation at the wrong
+ * place and to avoid extensicve problems with validate; the resulting
+ * code is lousy, of course; FI, 15 March 1993
+ *
  * RK: the print_sentence could print lower case letter according to
  * a property... 17/12/1993.
  */
@@ -104,7 +104,7 @@ print_sentence(FILE * fd,
 {
     if (sentence_formatted_p(s)) {
 	string ps = sentence_formatted(s);
-	
+
 	while (*ps) {
 	    char c = *ps;
 	    putc_sentence(c, fd);
@@ -113,7 +113,7 @@ print_sentence(FILE * fd,
 	    ps++;
 	}
     }
-    else 
+    else
     {
 	/* col: the next column number, starting from 1.
 	 * it means tha columns 1 to col-1 have been output. I guess. FC.
@@ -125,7 +125,7 @@ print_sentence(FILE * fd,
 	int em = unformatted_extra_margin(u);
 	int n = unformatted_number(u);
 	cons *lw = unformatted_words(u);
-	
+
 	/* first 6 columns (0-5)
 	 */
 	/* 05/08/2003 - Nga Nguyen - Add code for C prettyprinter */
@@ -137,7 +137,7 @@ print_sentence(FILE * fd,
 
 	    if (!get_bool_property("PRETTYPRINT_C_CODE"))
 	      fprintf_sentence(fd, "%-5s ", label);
-	    else 
+	    else
 	      {
 		/* C prettyprinter: a label cannot begin with a number so "l" is added for this case*/
 		if (strlen(label)>0)
@@ -147,30 +147,29 @@ print_sentence(FILE * fd,
 	else {
 	  fprintf_sentence(fd,get_bool_property("PRETTYPRINT_C_CODE")?"":"      ");
 	}
-	
+
 	/* FI: do not indent too much (9 June 1995) */
 	em = (em > MAX_START_COLUMN) ? MAX_START_COLUMN : em;
-	
-	for (i = 0; i < em; i++) 
+
+	for (i = 0; i < em; i++)
 	    putc_sentence(' ', fd);
-	
+
 	col = em + (get_bool_property("PRETTYPRINT_C_CODE")? 0 : 7);
-	
+
 	pips_assert("not too many columns", col <= MAX_END_COLUMN);
-	
-	MAP(STRING, w,
-	{
+
+	FOREACH(STRING, w, lw) {
 	  if (get_bool_property("PRETTYPRINT_C_CODE"))
 	    col += fprintf_sentence(fd, "%s", w);
 	  else {
-	    
+
 	    /* if the string fits on the current line: no problem */
 	    if (col + strlen(w) <= 70) {
 		deal_with_attachments_in_this_string(w,
 						     position_in_the_output);
 		col += fprintf_sentence(fd, "%s", w);
 	    }
-	    /* if the string fits on one line: 
+	    /* if the string fits on one line:
 	     * use the 88 algorithm to break as few
 	     * syntactic constructs as possible */
 	    else
@@ -181,11 +180,11 @@ print_sentence(FILE * fd,
 			if (n > 0 &&
 			    get_bool_property("PRETTYPRINT_STATEMENT_NUMBER"))
 			{
-			    for (i = col; i <= MAX_END_COLUMN; i++) 
+			    for (i = col; i <= MAX_END_COLUMN; i++)
 				putc_sentence(' ', fd);
 			    fprintf_sentence(fd, prettyprint_is_fortran? "%04d" : "/*%04d*/", n);
 			}
-			
+
 			/* start a new line with its prefix */
 			putc_sentence('\n', fd);
 
@@ -194,7 +193,7 @@ print_sentence(FILE * fd,
 			       || strcmp(label,"CDIR@")==0
 			       || strcmp(label,"CMIC$")==0)) {
 			    /* Special label for Cray directives */
-			    fprintf_sentence(fd, "%s%d", label, 
+			    fprintf_sentence(fd, "%s%d", label,
 					     (++line_num)%10);
 			}
 			else
@@ -209,7 +208,7 @@ print_sentence(FILE * fd,
 			(w, position_in_the_output);
 		    col += fprintf_sentence(fd, "%s", w);
 		}
-	    /* if the string has to be broken in at least two lines: 
+	    /* if the string has to be broken in at least two lines:
 	     * new algorithmic part
 	     * to avoid line overflow (FI, March 1993) */
 		else {
@@ -223,10 +222,10 @@ print_sentence(FILE * fd,
 		    fprintf_sentence(fd, "%.*s", ncar, line);
 		    line += ncar;
 		    col = MAX_END_COLUMN;
-		    
+
 		    pips_debug(9, "line to print, col=%d\n", col);
 
-		    while(strlen(line)!=0) 
+		    while(strlen(line)!=0)
 		    {
 			ncar = MIN(MAX_END_COLUMN - 7 + 1, strlen(line));
 
@@ -235,7 +234,7 @@ print_sentence(FILE * fd,
 			 */
 			putc_sentence('\n', fd);
 
-			if(label != (char *) NULL 
+			if(label != (char *) NULL
 			   && (strcmp(label,"CDIR$")==0
 			       || strcmp(label,"CDIR@")==0
 			       || strcmp(label,"CMIC$")==0)) {
@@ -255,8 +254,7 @@ print_sentence(FILE * fd,
 		    }
 		}
 	  }
-	},
-	    lw);
+	}
 
 	pips_debug(9, "line completed, col=%d\n", col);
 	if (!get_bool_property("PRETTYPRINT_C_CODE"))
@@ -320,7 +318,7 @@ string words_to_string(list ls)
      */
     buffer[0] = '\0';
     p=buffer;
-    MAP(STRING, s, 
+    MAP(STRING, s,
 	{ strcat_word_and_migrate_attachments(p, s); p+=strlen(s); }, ls);
 
     return buffer;
@@ -348,16 +346,14 @@ string text_to_string(text t)
   return(str);
 }
 
-void 
-print_words(FILE * fd, list lw)
+void print_words(FILE * fd, list lw)
 {
     string s = words_to_string(lw);
     fputs(s, fd);
     free(s);
 }
 
-void 
-dump_words(list lw)
+void dump_words(list lw)
 {
     print_words(stderr, lw);
 }
@@ -365,8 +361,7 @@ dump_words(list lw)
 
 /********************************************************************* DEBUG */
 
-static void 
-debug_word(string w)
+static void debug_word(string w)
 {
     fprintf(stderr, "# string--%s--\n", w? w: "<null>");
 }
@@ -383,40 +378,36 @@ debug_formatted(string s)
     fprintf(stderr, "# formatted\n%s\n# end formatted\n", s);
 }
 
-static void 
-debug_unformatted(unformatted u)
+static void debug_unformatted(unformatted u)
 {
     fprintf(stderr, "# unformatted\n# label %s, %td, %td\n",
-	    unformatted_label(u)? unformatted_label(u): "<null>", 
+	    unformatted_label(u)? unformatted_label(u): "<null>",
 	    unformatted_number(u), unformatted_extra_margin(u));
     debug_words(unformatted_words(u));
     fprintf(stderr, "# end unformatted\n");
 }
 
-void 
-debug_sentence(sentence s)
+void debug_sentence(sentence s)
 {
     fprintf(stderr, "# sentence\n");
     switch (sentence_tag(s))
     {
-    case is_sentence_formatted: 
-	debug_formatted(sentence_formatted(s)); 
+    case is_sentence_formatted:
+	debug_formatted(sentence_formatted(s));
 	break;
-    case is_sentence_unformatted: 
-	debug_unformatted(sentence_unformatted(s)); 
+    case is_sentence_unformatted:
+	debug_unformatted(sentence_unformatted(s));
 	break;
     default:
 	pips_internal_error("unexpected sentence tag %d\n", sentence_tag(s));
     }
-	
+
     fprintf(stderr,"# end sentence\n");
 }
 
-void 
-debug_text(text t)
+void debug_text(text t)
 {
     fprintf(stderr, "# text\n");
     gen_map(debug_sentence, text_sentences(t));
     fprintf(stderr,"# end text\n");
-    
 }
