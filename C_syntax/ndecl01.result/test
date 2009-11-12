@@ -1,0 +1,74 @@
+
+Symbol table for "ndecl01"
+
+ndecl01
+
+Declarations for module "ndecl01" with type "char * -> void"
+
+Variable list:
+
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
+	Declared entity "ndecl01!:*STATIC*" with type "area" with size 0
+	Declared entity "ndecl01:*DYNAMIC*" with type "area" with size 28
+	Declared entity "ndecl01:*HEAP*" with type "area" with size 0
+	Declared entity "ndecl01:*STACK*" with type "area" with size 0
+	Declared entity "ndecl01:*STATIC*" with type "area" with size 0
+	Declared entity "ndecl01:0`__FUNCTION__" with type "variable" "char"
+	Declared entity "ndecl01:0`__func__" with type "variable" "char"
+	Declared entity "ndecl01:0`i" with type "variable" "int"
+	Declared entity "ndecl01:0`j" with type "variable" "int"
+	Declared entity "ndecl01:0`k" with type "variable" "int"
+	Declared entity "ndecl01:dir" with type "variable" "char *"
+
+* empty extern declaration list *
+
+
+Layout for formal parameters:
+
+	Variable ndecl01:dir	offset = 1
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "ndecl01!:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "ndecl01:*DYNAMIC*" of size 28:
+	Variable "ndecl01:0`i"	offset = 16	size = 4
+	Variable "ndecl01:0`j"	offset = 20	size = 4
+	Variable "ndecl01:0`k"	offset = 24	size = 4
+	Variable "ndecl01:0`__func__"	offset = 0	size = 8
+	Variable "ndecl01:0`__FUNCTION__"	offset = 8	size = 8
+
+
+Layout for memory area "ndecl01:*HEAP*" of size 0:
+	* empty area *
+
+
+Layout for memory area "ndecl01:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "ndecl01:*STATIC*" of size 0:
+	* empty area *
+
+End of declarations for module ndecl01
+
+
+Parsed printed file
+
+void ndecl01(char *dir)
+{
+   /* One variable declared alone */
+   int i;                                                               /*0005*/
+   /* Two variables declared together */
+   int j,  k;                                                           /*0007*/
+   /* A C continue statement */
+   ;                                                                    /*0009*/
+   /* An assignment*/
+   i = 1;                                                               /*0011*/
+}

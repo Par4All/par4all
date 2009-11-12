@@ -1,0 +1,11 @@
+
+Parsed printed file
+
+void continue01()
+{
+   ;
+   int i;                                                               /*0004*/
+   /* Continue are preserved by comments */
+   ;                                                                    /*0006*/
+
+}
