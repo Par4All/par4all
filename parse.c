@@ -2729,8 +2729,8 @@ parse_if_block (void)
 
   fprintf(stdout,"gfc2pips_nb_of_statements: near end %d\n",gfc2pips_nb_of_statements);
   //see the right combination of seen_else and seen_elseif
-  gfc2pips_nb_of_statements--;
-  if( seen_elseif && seen_else) gfc2pips_nb_of_statements--;
+  if( seen_elseif || seen_else ) gfc2pips_nb_of_statements--;
+  if( seen_elseif && seen_else ) gfc2pips_nb_of_statements--;
   fprintf(stdout,"gfc2pips_nb_of_statements: end %d\n",gfc2pips_nb_of_statements);
 
   pop_state ();

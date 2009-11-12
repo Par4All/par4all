@@ -110,6 +110,9 @@ gfc_symtree* getSymtreeByName (char* name, gfc_symtree *st);
 newgen_list gfc2pips_vars(gfc_namespace *ns);
 newgen_list gfc2pips_vars_(gfc_namespace *ns,newgen_list variables_p);
 
+newgen_list gfc2pips_get_list_of_dimensions(gfc_symtree *st);
+newgen_list gfc2pips_get_list_of_dimensions2(gfc_symbol *s);
+
 /*
  * Find a list of symbols if they verify the predicate function
  */
@@ -150,6 +153,7 @@ value gfc2pips_symbol2value(gfc_symbol *s);
 
 type gfc2pips_symbol2type(gfc_symbol *s);
 int gfc2pips_symbol2size(gfc_symbol *s);
+int gfc2pips_symbol2sizeArray(gfc_symbol *s);
 
 instruction gfc2pips_code2instruction__TOP(gfc_namespace *ns, gfc_code* c);
 instruction gfc2pips_code2instruction(gfc_code* c, bool force_sequence);
@@ -161,6 +165,7 @@ entity gfc2pips_code2get_label3(gfc_code *c);
 entity gfc2pips_code2get_label4(gfc_code *c);
 
 expression gfc2pips_expr2expression(gfc_expr *expr);
+int gfc2pips_expr2int(gfc_expr *expr);
 bool gfc2pips_exprIsVariable(gfc_expr * expr);
 entity gfc2pips_expr2entity(gfc_expr *expr);
 
@@ -175,6 +180,7 @@ newgen_list *gfc2pips_list_of_all_modules;
 
 void gfc2pips_push_comment(locus l, unsigned long nb, char s);
 bool gfc2pips_check_already_done(locus l);
+unsigned long gfc2pips_get_num_of_gfc_code(gfc_code *c);
 string gfc2pips_get_comment_of_code(gfc_code *c);
 gfc2pips_comments gfc2pips_pop_comment();
 //void gfc2pips_set_last_comments_done(gfc_code *c);
@@ -182,6 +188,7 @@ void gfc2pips_set_last_comments_done(unsigned long nb);
 void gfc2pips_assign_num_to_last_comments(unsigned long nb);
 void gfc2pips_assign_gfc_code_to_last_comments(gfc_code *c);
 void gfc2pips_replace_comments_num(unsigned long old, unsigned long new);
+void gfc2pips_assign_gfc_code_to_num_comments(gfc_code *c, unsigned long num);
 bool gfc2pips_comment_num_exists(unsigned long num);
 void gfc2pips_pop_not_done_comments();
 
