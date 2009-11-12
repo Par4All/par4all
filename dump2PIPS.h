@@ -196,6 +196,11 @@ void gfc2pips_shift_comments();
 
 void gfc2pips_push_last_code(gfc_code *c);
 
+gfc_code* gfc2pips_get_last_loop();
+void gfc2pips_push_loop(gfc_code *c);
+void gfc2pips_pop_loop();
+
+
 
 #endif /* GFC_2_PIPS */
 

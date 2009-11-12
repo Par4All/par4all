@@ -1,7 +1,17 @@
+/*
+ * The naming of functions is based on the following syntax :
+ * - every and each function used to manipulate gfc or pips entities begin with gfc2pips_
+ * - if the function is a translation from one RI to the other it will be:
+ * 		gfc2pips_<type_of_the_source_entity>2<type_of_the_target_entity>(arguments)
+ */
 #include "dump2PIPS.h"
 
 
+
 newgen_list gfc2pips_list_of_declared_code = NULL;
+newgen_list gfc2pips_list_of_loops = NULL;
+static int gfc2pips_last_created_label = 95000;
+
 /*
  * Add initialization at the begining and at the end of the dumping
  * Put information in a table, in the "the_actual_gfc_parser"
@@ -805,7 +815,7 @@ entity gfc2pips_symbol2entity(gfc_symbol* s){
 	return e;
 }
 entity gfc2pips_char2entity(char* package, char* s){
-	entity e = FindOrCreateEntity(package, s);
+	entity e = FindOrCreateEntity(package, str2upper(strdup(s)));
 	if(entity_initial(e)==value_undefined) entity_initial(e) = MakeValueUnknown();
 	if(entity_type(e)==type_undefined) entity_type(e) = make_type_unknown();
 	return e;
@@ -829,7 +839,11 @@ dimension gfc2pips_int2dimension(int n){
 
 expression gfc2pips_int2expression(int n){
 	//return int_expr(n);
-	return entity_to_expression(gfc2pips_int_const2entity(n));
+	if(n<0){
+		return MakeFortranUnaryCall(CreateIntrinsic("--"), gfc2pips_int2expression(-n));
+	}else{
+		return entity_to_expression(gfc2pips_int_const2entity(n));
+	}
 }
 expression gfc2pips_real2expression(double r){
 	return entity_to_expression(gfc2pips_real2entity(r));
@@ -979,6 +993,8 @@ type gfc2pips_symbol2type(gfc_symbol *s){
 		case BT_LOGICAL:	ut = is_basic_logical;	break;
 		case BT_CHARACTER:	ut = is_basic_string;	break;
 		case BT_UNKNOWN:
+			return make_type_unknown();
+		break;
 		case BT_DERIVED:
 		case BT_PROCEDURE:
 		case BT_HOLLERITH:
@@ -1015,14 +1031,15 @@ type gfc2pips_symbol2type(gfc_symbol *s){
 	debug( 5, "gfc2pips_type2type", "WARNING: no type\n" );
 	return type_undefined;
 }
+
 int gfc2pips_symbol2size(gfc_symbol *s){
 	if(
 		s->ts.type==BT_CHARACTER
 		&& s->ts.cl
 		&& s->ts.cl->length
 	){
-		debug(9,"gfc2pips_symbol2size","size of %s: %d\n",s->name,mpz_get_ui(s->ts.cl->length->value.integer));
-		return mpz_get_ui(s->ts.cl->length->value.integer);
+		debug(9,"gfc2pips_symbol2size","size of %s: %d\n",s->name,mpz_get_si(s->ts.cl->length->value.integer));
+		return mpz_get_si(s->ts.cl->length->value.integer);
 	}else{
 		debug(9,"gfc2pips_symbol2size","size of %s: %d\n",s->name,s->ts.kind);
 		return s->ts.kind;
@@ -1118,6 +1135,9 @@ newgen_list gfc2pips_array_ref2indices(gfc_array_ref *ar){
 */
 	return NULL;
 }
+
+//this is to know if we have to add a continue statement just after the loop statement for (exit/break)
+bool gfc2pips_last_statement_is_loop = false;
 
 /*
  * Declaration of instructions
@@ -1304,7 +1324,9 @@ instruction gfc2pips_code2instruction(gfc_code* c, bool force_sequence){
 		//on lie l'instruction suivante à la courante
 		//fprintf(stdout,"Dump the following instructions\n");
 		//CONS(STATEMENT,instruction_to_statement(gfc2pips_code2instruction_(c)),list_of_instructions);
+		int curr_label_num = gfc2pips_last_created_label;
 		i = gfc2pips_code2instruction_(c);
+		//si dernière boucle == c alors on doit ajouter un statement continue sur le label <curr_label_num>
 		if(i!=instruction_undefined){
 			string comments  = gfc2pips_get_comment_of_code(c);//fprintf(stdout,"comment founded")
 			s = make_statement(
@@ -1695,27 +1717,46 @@ instruction gfc2pips_code2instruction_(gfc_code* c){
 */
 	    case EXEC_DO:{
 	    	debug(5,"gfc2pips_code2instruction","Translation of DO\n");
+	    	gfc2pips_push_loop(c);
 	    	statement s = instruction_to_statement(gfc2pips_code2instruction(c->block->next,false));
+
+	    	//add to s a continue statement at the end to make cycle/continue statements
+	    	newgen_list list_of_instructions = sequence_statements(instruction_sequence(statement_instruction(s)));
+	    	list_of_instructions = gen_nreverse(list_of_instructions);
+	    	list_of_instructions = gen_cons(make_continue_statement(gfc2pips_int2label(gfc2pips_last_created_label--)),list_of_instructions);
+	    	list_of_instructions = gen_nreverse(list_of_instructions);
+	    	sequence_statements(instruction_sequence(statement_instruction(s))) = list_of_instructions;
+
 	    	statement_label(s)=gfc2pips_code2get_label(c->block->next);
 	    	pips_loop w = make_loop(
 	    		gfc2pips_expr2entity(c->ext.iterator->var),//variable incremented
 	    		make_range(
     				gfc2pips_expr2expression(c->ext.iterator->start),
     				gfc2pips_expr2expression(c->ext.iterator->end),
-    				gfc2pips_expr2expression(c->ext.iterator->step)
+    				gfc2pips_expr2expression(c->ext.iterator->step)///ajouter des tests afin de pouvoir créer des do avec un incrément négatif
 	    		),//lower, upper, increment
 	    		s,
 	    		gfc2pips_code2get_label2(c),
 	    		make_execution_sequential(),//sequential/parallel //beware gfc parameters to say it is a parallel or a sequential loop
 	    		NULL
 	    	);
+	    	gfc2pips_pop_loop();
 	    	return make_instruction_loop(w);
 
 	    }break;
 
 	    case EXEC_DO_WHILE:{
 	    	debug(5,"gfc2pips_code2instruction","Translation of DO WHILE\n");
+	    	gfc2pips_push_loop(c);
 	    	statement s = instruction_to_statement(gfc2pips_code2instruction(c->block->next,false));
+
+	    	//add to s a continue statement at the end to make cycle/continue statements
+	    	newgen_list list_of_instructions = sequence_statements(instruction_sequence(statement_instruction(s)));
+	    	list_of_instructions = gen_nreverse(list_of_instructions);
+	    	list_of_instructions = gen_cons(make_continue_statement(gfc2pips_int2label(gfc2pips_last_created_label--)),list_of_instructions);
+	    	list_of_instructions = gen_nreverse(list_of_instructions);
+	    	sequence_statements(instruction_sequence(statement_instruction(s))) = list_of_instructions;
+
 	    	statement_label(s) = gfc2pips_code2get_label(c->block->next);
 	    	whileloop w = make_whileloop(
 	    		gfc2pips_expr2expression(c->expr),
@@ -1723,77 +1764,57 @@ instruction gfc2pips_code2instruction_(gfc_code* c){
 	    		gfc2pips_code2get_label2(c),
 	    		make_evaluation_before()
 	    	);
+	    	gfc2pips_pop_loop();
 	    	return make_instruction_whileloop(w);
 	    }break;
 
-/*	    case EXEC_CYCLE:{
-			debug(5,"gfc2pips_code2instruction","Translation of CYCLE\n");
-			entity e_cycle = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, "CYCLE");
-			entity_initial(e_cycle) = make_value(is_value_intrinsic, e_cycle );
-			entity_type(e_cycle) = make_type(is_type_functional,make_functional(NIL, MakeOverloadedResult()));
-			return make_instruction(
-				is_instruction_call,
-				make_call(
-					CreateIntrinsic("CYCLE"),
-					NULL
+	    case EXEC_CYCLE:{
+	    	debug(5,"gfc2pips_code2instruction","Translation of CYCLE\n");
+	    	gfc_code* loop_c = gfc2pips_get_last_loop();
+	    	entity label = entity_undefined;
+	    	if(true){
+	    		//label = gfc2pips_code2get_label2(loop_c->block->next->label);
+	    		label = gfc2pips_int2label(gfc2pips_last_created_label);
+	    	}else{
+				int num = gfc2pips_get_num_of_gfc_code(loop_c->block->next);
+				fprintf(stdout,"%d\n",gen_length(gfc2pips_list_of_loops));
+				string lab;
+				asprintf(&lab,"%s%s%s1%d",CurrentPackage, MODULE_SEP_STRING,LABEL_PREFIX,num);
+				fprintf(stdout,"%s",lab);
+				label = make_label(lab);
+				free(lab);
+	    	}
+			instruction i = make_instruction(is_instruction_goto,
+				make_continue_statement(
+						label
 				)
 			);
-/*fputs ("CYCLE", dumpfile);
-	      if (c->symtree)
-		fprintf (dumpfile, " %s", c->symtree->n.sym->name);
-*/
-	    /*
-	     * statement MakeForloop(expression e1, expression e2, expression e3, statement s)
-{
-  forloop f;
-  statement smt;
-  int i = basic_int((basic) stack_head(LoopStack));
-  string lab1;
-  asprintf(&lab1,"%s%d","loop_end_",i);
-  statement s1 = FindStatementFromLabel(MakeCLabel(lab1));
-  free(lab1);
-  string lab2;
-  asprintf(&lab2,"%s%d","break_",i);
-  statement s2 = FindStatementFromLabel(MakeCLabel(lab2));
-  free(lab2);
-
- if (!statement_undefined_p(s1))
-    {
-       This loop has a continue statement which has been transformed to goto
-	 Add the labeled statement at the end of loop body
-      insert_statement(s,s1,FALSE);
-    }
-  f = make_forloop(e1,e2,e3,s);
-  smt = make_statement(entity_empty_label(),
-		       get_current_C_line_number(),
-		       STATEMENT_ORDERING_UNDEFINED,
-		       string_undefined,
-		       make_instruction_forloop(f),
-		       NIL, string_undefined,
-		       empty_extensions ());
-
-  if (!statement_undefined_p(s2))
-    {
-      This loop has a break statement which has been transformed to goto
-	 Add the labeled statement after the loop
-      insert_statement(smt,s2,FALSE);
-    }
-  pips_assert("For loop is consistent",forloop_consistent_p(f));
-  ifdebug(5)
-    {
-      printf("For loop statement: \n");
-      print_statement(smt);
-    }
-  return smt;
-}
-	     *
-	     */
-
-/*	    }break;
-
-
-	    case EXEC_EXIT:
-	      fputs ("EXIT", dumpfile);
+			return i;
+		}break;
+	    case EXEC_EXIT:{
+	    	debug(5,"gfc2pips_code2instruction","Translation of EXIT\n");
+	    	gfc_code* loop_c = gfc2pips_get_last_loop();
+	    	entity label = entity_undefined;
+	    	if(true){//loop_c->block->next->label){
+	    		//label = gfc2pips_code2get_label2(loop_c->block->next->label);
+	    		label = gfc2pips_int2label(gfc2pips_last_created_label);
+	    	}else{
+				int num = gfc2pips_get_num_of_gfc_code(loop_c->block->next);
+				fprintf(stdout,"%d\n",gen_length(gfc2pips_list_of_loops));
+				string lab;
+				asprintf(&lab,"%s%s%s1%d",CurrentPackage, MODULE_SEP_STRING,LABEL_PREFIX,num);
+				fprintf(stdout,"%s",lab);
+				label = make_label(lab);
+				free(lab);
+	    	}
+			instruction i = make_instruction(is_instruction_goto,
+				make_continue_statement(
+						label
+				)
+			);
+			return i;
+	    }break;
+/*	      fputs ("EXIT", dumpfile);
 	      if (c->symtree)
 		fprintf (dumpfile, " %s", c->symtree->n.sym->name);
 	      break;
@@ -2204,8 +2225,8 @@ instruction gfc2pips_code2instruction_(gfc_code* c){
 						|| (
 							d->ext.dt->io_unit->expr_type==EXPR_CONSTANT
 							&& (
-								(d->op==EXEC_READ && mpz_get_ui(d->ext.dt->io_unit->value.integer)!=5 )
-								|| (d->op==EXEC_WRITE && mpz_get_ui(d->ext.dt->io_unit->value.integer)!=6 )
+								(d->op==EXEC_READ && mpz_get_si(d->ext.dt->io_unit->value.integer)!=5 )
+								|| (d->op==EXEC_WRITE && mpz_get_si(d->ext.dt->io_unit->value.integer)!=6 )
 							)
 						)
 					)
@@ -2680,7 +2701,7 @@ expression gfc2pips_expr2expression(gfc_expr *expr){
 					/*}else if(r->type==REF_COMPONENT){
 						fprintf (dumpfile, " %% %s", p->u.c.component->name);
 					*/}else if(r->type==REF_SUBSTRING){
-						entity ent = FindOrCreateEntity(CurrentPackage,expr->symtree->n.sym->name);
+						entity ent = FindOrCreateEntity(CurrentPackage,str2upper(strdup(expr->symtree->n.sym->name)));
 						entity_type(ent) = gfc2pips_symbol2type(expr->symtree->n.sym);
 						entity_storage(ent) = MakeStorageRom();fprintf(stdout,"expr2expression ROM %s\n",expr->symtree->n.sym->name);
 						entity_initial(ent) = MakeValueUnknown();
@@ -2709,7 +2730,7 @@ expression gfc2pips_expr2expression(gfc_expr *expr){
 					r=r->next;
 				}
 			}
-			entity ent_ref = FindOrCreateEntity(CurrentPackage, expr->symtree->n.sym->name);
+			entity ent_ref = FindOrCreateEntity(CurrentPackage, str2upper(strdup(expr->symtree->n.sym->name)));
 			entity_type(ent_ref) = gfc2pips_symbol2type(expr->symtree->n.sym);
 			if(entity_storage(ent_ref)==storage_undefined){
 				entity_storage(ent_ref) = MakeStorageRom();//fprintf(stdout,"expr2expression ROM %s\n",expr->symtree->n.sym->name);
@@ -2727,7 +2748,7 @@ expression gfc2pips_expr2expression(gfc_expr *expr){
 		case EXPR_CONSTANT:
 			debug(5,"gfc2pips_expr2expression","cst %d %d\n",expr,expr->ts.type);
 			switch(expr->ts.type){
-				case BT_INTEGER: e = gfc2pips_int2expression(mpz_get_ui(expr->value.integer)); break;
+				case BT_INTEGER: e = gfc2pips_int2expression(mpz_get_si(expr->value.integer)); break;
 				case BT_LOGICAL: e = gfc2pips_logical2expression(expr->value.logical); break;
 				case BT_REAL:
 					/*fprintf(stdout,"%f\n",mpfr_get_d(expr->value.real,GFC_RND_MODE));
@@ -2814,7 +2835,7 @@ expression gfc2pips_expr2expression(gfc_expr *expr){
 				}while(act = act->next);
 
 
-				entity e = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, expr->value.function.name);
+				entity e = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, str2upper(strdup(expr->value.function.name)));
 				entity_initial(e) = make_value(is_value_intrinsic, e );
 				//entity_initial(e) = make_value(is_value_constant,make_constant(is_constant_int, (void *) CurrentTypeSize));
 				entity_type(e) = make_type(is_type_functional,make_functional(NIL, MakeOverloadedResult()));
@@ -2848,7 +2869,7 @@ expression gfc2pips_expr2expression(gfc_expr *expr){
  * this function consider everything is all right: i.e. the expression represent an integer
  */
 int gfc2pips_expr2int(gfc_expr *expr){
-	return mpz_get_ui(expr->value.integer);
+	return mpz_get_si(expr->value.integer);
 }
 
 bool gfc2pips_exprIsVariable(gfc_expr * expr){
@@ -2862,7 +2883,7 @@ entity gfc2pips_expr2entity(gfc_expr *expr){
 		message_assert("No symtree in the expression.",expr->symtree);
 		message_assert("No symbol in the expression.",expr->symtree->n.sym);
 		message_assert("No name in the expression.",expr->symtree->n.sym->name);
-		entity e = FindOrCreateEntity(CurrentPackage, expr->symtree->n.sym->name);
+		entity e = FindOrCreateEntity(CurrentPackage, str2upper(strdup(expr->symtree->n.sym->name)));
 		entity_type(e) = gfc2pips_symbol2type(expr->symtree->n.sym);
 		entity_initial(e) = MakeValueUnknown();
 		return e;
@@ -3103,18 +3124,6 @@ bool gfc2pips_comment_num_exists(unsigned long num){
 	}
 	return false;
 }
-/*void gfc2pips_set_last_comments_done(gfc_code *c){
-	printf("gfc2pips_set_last_comments_done\n");
-	gfc2pips_comments retour = gfc2pips_comments_stack;
-	while(retour && c){
-		printf("\t%d\n",retour->gfc);
-		if(retour->done)return;
-		retour->gfc = c;
-		retour->done = true;
-		printf("\t\t%d\n",retour->gfc);
-		retour = retour->prev;
-	}
-}*/
 
 void gfc2pips_pop_not_done_comments(){
 	while(gfc2pips_comments_stack && gfc2pips_comments_stack->done==false){
@@ -3122,6 +3131,9 @@ void gfc2pips_pop_not_done_comments(){
 	}
 }
 void gfc2pips_shift_comments(){
+	/*
+	 * We assign a gfc_code depending to a list of comments if any depending of the number of the statement
+	 */
 	gfc2pips_comments retour = gfc2pips_comments_stack;
 	newgen_list l = gen_nreverse(gfc2pips_list_of_declared_code);
 	while(retour){
@@ -3135,14 +3147,24 @@ void gfc2pips_shift_comments(){
 	return;
 }
 
+
 void gfc2pips_push_last_code(gfc_code *c){
 	if(gfc2pips_list_of_declared_code==NULL) gfc2pips_list_of_declared_code = gen_cons(NULL,NULL);
 	//gfc2pips_list_of_declared_code =
 	gfc2pips_list_of_declared_code = gen_cons(c,gfc2pips_list_of_declared_code);
 }
 
-//ajouter un get_locus_by_locus ou qqch du genre pour savoir si on a déjà mis un commentaire dans la pile
-//créer une fonction qui concatène les commentaires dans les locus qui ne sont pas liés à un code/statement
+
+gfc_code* gfc2pips_get_last_loop(){
+	if(gfc2pips_list_of_loops) return gfc2pips_list_of_loops->car.e;
+	return NULL;
+}
+void gfc2pips_push_loop(gfc_code *c){
+	gfc2pips_list_of_loops = gen_cons(c,gfc2pips_list_of_loops);
+}
+void gfc2pips_pop_loop(){
+	POP(gfc2pips_list_of_loops);
+}
 
 
 
