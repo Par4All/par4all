@@ -51,10 +51,20 @@ $(ARCH)/fpips:
 		$(main.dir)/$(FPIPS_MAIN) -lfpips $(addprefix -l,$(fpips.libs))
 
 # all libraries as installed...
-PIPSLIBS_LIBS	= \
-	$(addsuffix .a, \
-		$(addprefix $(LIB.d)/lib,$(pipslibs.libs)))
 
+
+ifdef WITH_DYNAMIC_LIBRARIES
+NEWGEN_LIBS	= \
+	$(addsuffix .so, \
+		$(addprefix $(NEWGEN_ROOT)/lib/$(ARCH)/lib,$(newgen.libs)))
+
+LINEAR_LIBS	= \
+	$(addsuffix .so, \
+		$(addprefix $(LINEAR_ROOT)/lib/$(ARCH)/lib,$(linear.libs)))
+PIPSLIBS_LIBS	= \
+	$(addsuffix .so, \
+		$(addprefix $(LIB.d)/lib,pipslibs))
+else
 NEWGEN_LIBS	= \
 	$(addsuffix .a, \
 		$(addprefix $(NEWGEN_ROOT)/lib/$(ARCH)/lib,$(newgen.libs)))
@@ -62,6 +72,10 @@ NEWGEN_LIBS	= \
 LINEAR_LIBS	= \
 	$(addsuffix .a, \
 		$(addprefix $(LINEAR_ROOT)/lib/$(ARCH)/lib,$(linear.libs)))
+PIPSLIBS_LIBS	= \
+	$(addsuffix .a, \
+		$(addprefix $(LIB.d)/lib,$(pipslibs.libs)))
+endif
 
 # add other pips dependencies...
 $(ARCH)/pips \

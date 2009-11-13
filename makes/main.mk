@@ -445,31 +445,24 @@ lib: $(LIB_TARGET)
 
 INSTALL_LIB	+=   $(LIB_TARGET)
 
-ifdef WITH_DYNAMIC_LIBRARIES
-
-ifndef DYNLIB_TARGET
-DYNLIB_TARGET=$(patsubst %.a,%.so,$(LIB_TARGET))
-$(ARCH)/$(LIB_TARGET):$(ARCH)/$(DYNLIB_TARGET)
-endif
-
-ifndef DYNLIB_OBJECTS
-DYNLIB_OBJECTS=$(LIB_OBJECTS)
-endif
-
-
-endif #WITH_DYNAMIC_LIBRAIRES
-
 endif # LIB_TARGET
 
-ifndef WITH_DYNAMIC_LIBRAIRES
-# to prevent dynamic linking
-#LDFLAGS+=-static
-endif
-
 ifdef DYNLIB_TARGET
-$(ARCH)/$(DYNLIB_TARGET):$(DYNLIB_OBJECTS)
+
+phase5:.build_dynlib.$(ARCH)
+
+ifdef DYNLIB_OBJECTS
+.build_dynlib.$(ARCH) $(ARCH)/$(DYNLIB_TARGET):$(DYNLIB_OBJECTS)
 			MAJOR_VERSION="`echo '$(VERSION)' | cut -d '.' -f 1`";\
 	        $(LD) -o $@ -shared $(DYNLIB_OBJECTS) $(LDFLAGS) $(LDOPT) -fPIC -Wl,-soname,$(DYNLIB_TARGET).$$MAJOR_VERSION 
+endif
+
+ifdef DYNLIB_ARCHIVES
+.build_dynlib.$(ARCH) $(ARCH)/$(DYNLIB_TARGET):$(DYNLIB_ARCHIVES)
+			MAJOR_VERSION="`echo '$(VERSION)' | cut -d '.' -f 1`";\
+	        $(LD) -o $@ -shared -Wl,--whole-archive $(DYNLIB_ARCHIVES) -Wl,--no-whole-archive $(LDFLAGS) $(LDOPT) -fPIC -Wl,-soname,$(DYNLIB_TARGET).$$MAJOR_VERSION 
+endif
+
 
 INSTALL_DYNLIB     +=   $(DYNLIB_TARGET) 
 
