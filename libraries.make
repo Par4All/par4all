@@ -24,12 +24,20 @@
 ######################################################################## NEWGEN
 
 # newgen.libs definition
+ifdef WITH_DYNAMIC_LIBRARIES
+newgen.libs=newgenlibs
+else
 include $(NEWGEN_ROOT)/libraries.make
+endif
 
 ######################################################################## LINEAR
 
 # linear.libs definition
+ifdef WITH_DYNAMIC_LIBRARIES
+linear.libs=linearlibs
+else
 include $(LINEAR_ROOT)/libraries.make
+endif
 
 ######################################################################## OTHERS
 
@@ -53,7 +61,7 @@ pipslibs.libs	= \
 	effects-simple effects-convex effects-generic alias-classes \
 	comp_sections semantics control continuation rice ricedg \
 	pipsdbm transformer preprocessor ri-util step properties \
-	text-util misc properties reductions flint sac safescale phrase \
+	text-util misc reductions flint sac safescale phrase \
 	gpu newgen
 
 pips.libs	= \

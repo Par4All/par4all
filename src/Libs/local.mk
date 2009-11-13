@@ -37,4 +37,4 @@ FWD_DIRS	= \
 	callgraph icfg ricedg \
 	chains rice hyperplane transformations hwac expressions \
 	statistics instrumentation hpfc atomizer safescale sac phrase wp65 \
-	preprocessor pipsmake step to_begin_with gpu
+	preprocessor pipsmake step to_begin_with gpu pipslibs
