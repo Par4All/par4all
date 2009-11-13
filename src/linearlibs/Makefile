@@ -30,4 +30,6 @@ PROJECT = linear
 include $(ROOT)/makes/main.mk
 
 .build_inc:
-	touch $@
+
+build-header-file:
+
