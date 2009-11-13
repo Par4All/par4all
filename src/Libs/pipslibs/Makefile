@@ -30,4 +30,7 @@ include $(ROOT)/makes/main.mk
 
 # needed but useless
 .build_inc:
-	touch $@
+
+build-header-file:
+
+
