@@ -26,7 +26,8 @@ FWD_DIRS = \
 	polynome \
 	union \
 	polyedre \
-	doxygen
+	doxygen \
+	linearlibs
 
 #	plint \
 #	janusvalue \
