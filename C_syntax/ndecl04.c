@@ -3,6 +3,7 @@
 
 int j, *k, l[10], (*pf)(), foo();
 
+/* This is the famous ndecl04 function! Is this comment preserved? */
 void ndecl04(char *dir)
 {
   int i;
