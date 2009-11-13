@@ -84,8 +84,12 @@ genspec_lex.c: token.l genspec.h
 #
 genspec_yacc.c: genread.h
 
-$(ARCH)/newC:	$(ARCH)/new.o $(ARCH)/libgenC.a
+$(ARCH)/newC:	$(ARCH)/new.o
+ifdef WITH_DYNAMIC_LIBRARIES
+	$(LINK) $@ $(ARCH)/new.o -lnewgenlibs
+else
 	$(LINK) $@ $(ARCH)/new.o -lgenC
+endif
 
 $(ARCH)/newLisp: $(ARCH)/new.o $(ARCH)/build.o $(ARCH)/genLisp.o
 	$(LINK) $@ $(ARCH)/new.o $(ARCH)/build.o $(ARCH)/genLisp.o

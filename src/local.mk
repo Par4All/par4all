@@ -1,2 +1,2 @@
 # $Id$
-FWD_DIRS	= scripts genC doc
+FWD_DIRS	= scripts genC doc newgenlibs
