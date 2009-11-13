@@ -1729,7 +1729,8 @@ instruction gfc2pips_code2instruction_(gfc_code* c){
 	    	//add to s a continue statement at the end to make cycle/continue statements
 	    	newgen_list list_of_instructions = sequence_statements(instruction_sequence(statement_instruction(s)));
 	    	list_of_instructions = gen_nreverse(list_of_instructions);
-	    	list_of_instructions = gen_cons(make_continue_statement(gfc2pips_int2label(gfc2pips_last_created_label-=gfc2pips_last_created_label_step)),list_of_instructions);
+	    	list_of_instructions = gen_cons(make_continue_statement(gfc2pips_int2label(gfc2pips_last_created_label)),list_of_instructions);
+	    	gfc2pips_last_created_label-=gfc2pips_last_created_label_step;
 	    	list_of_instructions = gen_nreverse(list_of_instructions);
 	    	sequence_statements(instruction_sequence(statement_instruction(s))) = list_of_instructions;
 
@@ -1759,7 +1760,8 @@ instruction gfc2pips_code2instruction_(gfc_code* c){
 	    	//add to s a continue statement at the end to make cycle/continue statements
 	    	newgen_list list_of_instructions = sequence_statements(instruction_sequence(statement_instruction(s)));
 	    	list_of_instructions = gen_nreverse(list_of_instructions);
-	    	list_of_instructions = gen_cons(make_continue_statement(gfc2pips_int2label(gfc2pips_last_created_label-=gfc2pips_last_created_label_step)),list_of_instructions);
+	    	list_of_instructions = gen_cons(make_continue_statement(gfc2pips_int2label(gfc2pips_last_created_label)),list_of_instructions);
+	    	gfc2pips_last_created_label-=gfc2pips_last_created_label_step;
 	    	list_of_instructions = gen_nreverse(list_of_instructions);
 	    	sequence_statements(instruction_sequence(statement_instruction(s))) = list_of_instructions;
 
