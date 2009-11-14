@@ -166,8 +166,13 @@ End of declarations for module foo
 
 Parsed printed files
 
+
+
+
 extern int main();
+
 int x = 1;
+
 extern void foo(int x);
 int main()
 {
@@ -179,8 +184,7 @@ int main()
 }
 void foo(int x)
 {
-   int x;
-   int y;
+   int x,  y;
    if (x>1) {
       int x;
    }
@@ -197,8 +201,13 @@ void foo(int x)
 
 Printed files
 
+
+
+
 extern int main();
+
 int x = 1;
+
 extern void foo(int x);
 int main()
 {
@@ -210,8 +219,7 @@ int main()
 }
 void foo(int x)
 {
-   int x;
-   int y;
+   int x,  y;
    if (x>1) {
       int x;
    }

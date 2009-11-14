@@ -1,0 +1,7 @@
+
+Parsed printed file
+
+void ndecl05(char *dir)
+{
+   void foo(int x),  bar(int y);
+}

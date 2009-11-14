@@ -1,8 +1,6 @@
 void adi02()
 {
-   int nr;
-   int i;
-   int k;
+   int nr,  i,  k;
    
    /* for comment */
    for (i = 1;i<=k;i++)

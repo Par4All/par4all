@@ -85,6 +85,11 @@ End of declarations for module allocation09
 
 Parsed printed file for "allocation09"
 
+
+
+
+// Check allocation for int
+
 extern int allocation09();
 int allocation09()
 {
@@ -93,11 +98,13 @@ int allocation09()
    int c;
    long d;
    long long e;
+
    unsigned char ua;
    unsigned short ub;
    unsigned int uc;
    unsigned long ud;
    unsigned long long ue;
+
    signed char sa;
    signed short sb;
    signed int sc;
