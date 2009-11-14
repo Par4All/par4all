@@ -1,0 +1,10 @@
+
+Parsed printed file
+
+void ndecl06(char *dir)
+{
+   struct m {
+      int a;
+      float b;
+   };
+}
