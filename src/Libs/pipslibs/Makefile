@@ -22,6 +22,7 @@ ifdef WITH_DYNAMIC_LIBRARIES
 TARGET=pipslibs
 DYNLIB_TARGET=lib$(TARGET).so
 DYNLIB_ARCHIVES=$(addprefix $(LIB.d)/lib, $(addsuffix .a, $(pipslibs.libs)))
+LDFLAGS+=-llinearlibs -lnewgenlibs
 endif
 
 ROOT    = ../../..
