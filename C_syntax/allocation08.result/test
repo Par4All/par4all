@@ -59,7 +59,13 @@ End of declarations for module allocation08
 
 Parsed printed file for "allocation08"
 
+
+
+
+// Check allocation via typedef
+
 typedef char ac[21];
+
 extern int allocation08();
 int allocation08()
 {

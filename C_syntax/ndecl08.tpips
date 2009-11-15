@@ -1,5 +1,5 @@
-delete ndecl06
-create ndecl06 ndecl06.c
+delete ndecl08
+create ndecl08 ndecl08.c
 
 #setenv C_SYNTAX_DEBUG_LEVEL 1
 
@@ -15,9 +15,9 @@ echo
 echo Parsed printed file
 echo
 
-display PARSED_PRINTED_FILE[ndecl06]
+display PARSED_PRINTED_FILE[ndecl08]
 
 close
-#delete ndecl06
+#delete ndecl08
 
 quit

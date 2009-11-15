@@ -4,44 +4,31 @@ Unsplit adi
 /*
  * file for adi.c
  */
+
+
+
+/*#include <math.h>*/
+
 extern double sqrt(double);
 extern double fabs(double);
+
+
+
+
+
+
+
 extern void adi(double **a, double **b, double **c, double **d, double **e, double **f, double **g, double **u, int jmax, int k, double alpha, double beta, double eps);
+
+/* Double precision version of TRIDAG */
 extern void tridag();
 void adi(double **a, double **b, double **c, double **d, double **e, double **f, double **g, double **u, int jmax, int k, double alpha, double beta, double eps)
 {
-   int i;
-   int nr;
-   int nits;
-   int next;
-   int n;
-   int l;
-   int kits;
-   int k1;
-   int j;
-   int twopwr;
-   double **psi;
-   double rfact;
-   double resid;
-   double disc;
-   double anormg;
-   double anorm;
-   double ab;
-   double *aa;
-   double *bb;
-   double *cc;
-   double *rr;
-   double *uu;
-   double **s;
-   double *r;
-   double *alph;
-   double *bet;
-   double **dmatrix(int, int, int, int);
-   double *dvector(int, int);
-   void free_dmatrix(double **, int, int, int, int);
-   void free_dvector(double *, int, int);
-   void nrerror(char *);
-   void tridag(double *, double *, double *, double *, double *, int);
+   int i,  nr,  nits,  next,  n,  l,  kits,  k1,  j,  twopwr;
+   double **psi,  rfact,  resid,  disc,  anormg,  anorm,  ab;
+   double *aa,  *bb,  *cc,  *rr,  *uu,  **s,  *r,  *alph,  *bet;
+   double **dmatrix(int, int, int, int),  *dvector(int, int);
+   void free_dmatrix(double **, int, int, int, int),  free_dvector(double *, int, int),  nrerror(char *),  tridag(double *, double *, double *, double *, double *, int);
 
    if (jmax>50)
       nrerror("in ADI, increase JJ");
@@ -143,11 +130,8 @@ void adi(double **a, double **b, double **c, double **d, double **e, double **f,
 void tridag(double *a, double *b, double *c, double *r, double *u, int n)
 {
    int j;
-   double bet;
-   double *gam;
-   double *dvector(int, int);
-   void nrerror(char *);
-   void free_dvector(double *, int, int);
+   double bet,  *gam,  *dvector(int, int);
+   void nrerror(char *),  free_dvector(double *, int, int);
 
    gam = dvector(1, n);
    if (b[1]==0.0)

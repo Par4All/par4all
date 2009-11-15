@@ -1,7 +1,5 @@
-delete ndecl06
-create ndecl06 ndecl06.c
-
-#setenv C_SYNTAX_DEBUG_LEVEL 1
+delete ndecl07
+create ndecl07 ndecl07.c
 
 activate C_PARSER
 activate C_SYMBOL_TABLE
@@ -9,15 +7,13 @@ activate C_SYMBOL_TABLE
 setproperty PRETTYPRINT_C_CODE TRUE
 setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
 
-#setenv PRETTYPRINT_DEBUG_LEVEL 5
-
 echo
 echo Parsed printed file
 echo
 
-display PARSED_PRINTED_FILE[ndecl06]
+display PARSED_PRINTED_FILE[ndecl07]
 
 close
-#delete ndecl06
+#delete ndecl07
 
 quit
