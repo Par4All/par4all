@@ -24,31 +24,23 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#define pips_user_error(...) do { fprintf(stderr, __VA_ARGS__); return; } while(0)
+#include "linear.h"
+#include "genC.h"
 
-#define TEMP_FILE_NAME ".pipsout.XXXXXX"
+#include "ri.h"
+#include "database.h"
+#include "makefile.h"
 
+#include "misc.h"
 
-/* this part is not very nice, but how to rember the former value of stdout ?*/
-static void begin_catch_stdout()
-{
-    stdout=freopen(TEMP_FILE_NAME,"w+",stdout);
-}
+#include "ri-util.h" /* ri needed for statement_mapping in pipsdbm... */
+#include "pipsdbm.h"
+#include "resources.h"
+#include "phases.h"
+#include "properties.h"
+#include "pipsmake.h"
 
-static char* end_catch_stdout()
-{
-    long end = ftell(stdout);
-    rewind(stdout);
-    long start = ftell(stdout);
-    char * whole_file=calloc(1+(end-start),sizeof(char));
-    if( whole_file == NULL)
-        fprintf(stderr,"not enough memory to catch pips stdout\n");
-    else
-        fread(whole_file,end-start,sizeof(char),stdout);
-    stdout=freopen("/dev/tty","w",stdout);
-    remove(TEMP_FILE_NAME);
-    return whole_file;
-}
+#include "top-level.h"
 
 void create(char* workspace_name, char ** filenames)
 {

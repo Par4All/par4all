@@ -25,30 +25,19 @@ include $(ROOT)/makes/has_swig.mk
 
 PYTHON_MODULE=pypips
 PYTHON_INCLUDE=`$(PYTHON_CONFIG) --cflags`
-TMP_PREFIX=the_
-PYPS_STDOUT=pypsout
 
 DYNLIB_TARGET=_$(PYTHON_MODULE).so
-PY_TARGET=pyps.py $(PYTHON_MODULE).py 
+PY_TARGET=pyps.py $(PYTHON_MODULE).py $(ARCH)/$(DYNLIB_TARGET)
 
 LDFLAGS+=-L$(LIB.d) -L$(LIB.d)/$(ARCH) $(addprefix -l, $(pips.libs)) `$(PYTHON_CONFIG) --ldflags`
 
-DYNLIB_OBJECTS=$(PYTHON_MODULE)_wrap.o $(TMP_PREFIX)$(PYTHON_MODULE).o
+DYNLIB_OBJECTS=$(PYTHON_MODULE)_wrap.o $(ARCH)/$(PYTHON_MODULE).o
 
 PROJECT = pips
 include $(ROOT)/makes/main.mk
 
 # swig stuff
-
-
-$(PYTHON_MODULE).tmp: $(ROOT)/src/Passes/tpips/tp_yacc.y
-	sed -n -e '/%{/,/%}/ p' $< | sed -e '1 d' -e '$$ d' > $@
-
-$(TMP_PREFIX)$(PYTHON_MODULE).c:$(PYTHON_MODULE).tmp $(PYTHON_MODULE).c
-	cat $^ >> $@
-
-
-$(PYTHON_MODULE).h:$(TMP_PREFIX)$(PYTHON_MODULE).c
+$(PYTHON_MODULE).h:$(PYTHON_MODULE).c
 	$(PROTOIZE) $< > $@
 	echo "extern char *activate(char *phase);" >> $@
 
@@ -64,11 +53,8 @@ $(PYTHON_MODULE).py:$(PYTHON_MODULE).I
 
 CPPFLAGS+=-I$(PYTHON_INCLUDE)
 
-%.o:%.c
-	$(COMPILE) $< -o $@
-
 clean:
-	rm -f *.o *.tmp $(TMP_PREFIX)* *.I *.H $(PYTHON_MODULE)_wrap.c *.pyc $(PYTHON_MODULE).h
+	rm -f *.o *.tmp *.I *.H $(PYTHON_MODULE)_wrap.c *.pyc $(PYTHON_MODULE).h
 
 distclean:clean
 	rm -f $(PYTHON_MODULE).py _$(PYTHON_MODULE).so pyps.py pipscc.py
