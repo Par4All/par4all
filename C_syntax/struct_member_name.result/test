@@ -12,6 +12,7 @@ main()
    struct node {
       float node;
    };
+
    int key;
    int key2;
    int node;

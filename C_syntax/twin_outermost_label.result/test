@@ -22,8 +22,14 @@ gwin:   goto bara;
    // END BLOCK
    // END BLOCK
 }
+// BEGIN BLOCK
+
+
+
 extern void miam(void);
+
 extern void comment(void);
+// END BLOCK
 
 printed file
 
@@ -46,5 +52,11 @@ gwin:   ;
    // END BLOCK
    goto bara;
 }
+// BEGIN BLOCK
+
+
+
 extern void miam(void);
+
 extern void comment(void);
+// END BLOCK

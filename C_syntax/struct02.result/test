@@ -1,7 +1,9 @@
 struct foo {
    int a[4];
 };
+
 struct foo f();
+
 extern int struct02(int index);
 int struct02(int index)
 {

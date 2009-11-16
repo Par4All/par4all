@@ -6,6 +6,6 @@ void ndecl09(char *dir)
   struct m {
     int a;
     float b;
-  } x;
+  } x, *px, foo();
 
 }

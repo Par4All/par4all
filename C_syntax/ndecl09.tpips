@@ -12,6 +12,12 @@ setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
 #setenv PRETTYPRINT_DEBUG_LEVEL 5
 
 echo
+echo Symbol table
+echo
+
+display SYMBOL_TABLE_FILE[ndecl09]
+
+echo
 echo Parsed printed file
 echo
 

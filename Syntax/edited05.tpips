@@ -14,8 +14,8 @@ echo
 echo New version of BAR with x as real[10]
 echo
 
-shell mv edited05.database/BAR/BAR.f_initial foo.f ; sleep 2 ; \
-	sed 's,!%,,' < foo.f > edited05.database/BAR/BAR.f_initial ; rm foo.f
+shell mv edited05.database/BAR/BAR.initial.f foo.f ; sleep 2 ; \
+	sed 's,!%,,' < foo.f > edited05.database/BAR/BAR.initial.f ; rm foo.f
 open edited05
 display PRINTED_FILE[BAR]
 

@@ -6,8 +6,7 @@ int main()
    struct tree {
       struct tree *left;
       struct tree *right;
-   };
-   typedef struct tree TREE;
-   typedef struct tree *TREEPTR;
+   } TREE, *TREEPTR;
+
    TREE t;
 }

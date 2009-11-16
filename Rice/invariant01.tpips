@@ -43,6 +43,8 @@ echo
 
 #activate RICE_FULL_DEPENDENCE_GRAPH
 apply INVARIANT_CODE_MOTION
+# FI: I'd rather use CLEAN_UP_SEQUENCES, if it existed...
+apply RESTRUCTURE_CONTROL
 display PRINTED_FILE[invariant01]
 
 apply UNSPLIT[%PROGRAM]

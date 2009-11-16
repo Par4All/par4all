@@ -99,6 +99,11 @@ End of declarations for module sizeofArray02!
 
 Parsed code
 
+
+
+
+//Checks the memory allocation offsets of non continous arrays of dynamic sizes.
+
 extern void foo(int m, int n);
 void foo(int m, int n)
 {

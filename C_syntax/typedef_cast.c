@@ -1,7 +1,7 @@
 typedef int myint;
 main()
 {
- 
-  int z; 
+
+  int z;
   int x = (myint *)z;
 }

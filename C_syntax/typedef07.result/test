@@ -1,6 +1,18 @@
+
+
+
+/* typedef scope in preprocessor: here "cookie" is not a typedef */
+/* Case used to avoid quick fixes for typedef06.c */
+
 typedef int f(int cookie);
+
 typedef int (*g)(int);
+
 extern int typedef07(int cookie);
+
+/* Not supported by preprocessor */
+/* int typedef07(int cookie) {return cookie;} */
+
 extern int typedef07(int cookie);
 
 int typedef07(int cookie)

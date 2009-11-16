@@ -16,7 +16,16 @@ Request: build resource PARALLELPRINTED_FILE for module EQUIV02.
   PROPER_EFFECTS                 building   PROPER_EFFECTS(EQUIV02)
   ATOMIC_CHAINS                  building   CHAINS(EQUIV02)
   CUMULATED_EFFECTS              building   CUMULATED_EFFECTS(EQUIV02)
-  RICE_FAST_DEPENDENCE_GRAPH     building   DG(EQUIV02)
+  SUMMARY_EFFECTS                building   SUMMARY_EFFECTS(EQUIV02)
+  INITIAL_PRECONDITION           building   INITIAL_PRECONDITION(EQUIV02)
+  PROGRAM_PRECONDITION           building   PROGRAM_PRECONDITION()
+  TRANSFORMERS_INTER_FULL        building   TRANSFORMERS(EQUIV02)
+  CALLGRAPH                      building   CALLERS(EQUIV02)
+                                 building   HEIGHT(EQUIV02)
+                                 building   DEPTH(EQUIV02)
+  INTERPROCEDURAL_SUMMARY_PRECONDITION building   SUMMARY_PRECONDITION(EQUIV02)
+  PRECONDITIONS_INTER_FULL       building   PRECONDITIONS(EQUIV02)
+  RICE_SEMANTICS_DEPENDENCE_GRAPH building   DG(EQUIV02)
 dep 11 (<U(I-1)-R-MUST>) --> 11 (<T(I)-W-MUST>) 
 user warning in TestCoupleOfReferences: Dependence between differents variables: U and T
 Dependence assumed

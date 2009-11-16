@@ -1,6 +1,6 @@
 /* Scalarize an array hidden behind a typedef.
    Expected results:
-   a) t[i] scalarized 
+   a) t[i] scalarized
    b) declaration created for the corresponding scalar
 */
 

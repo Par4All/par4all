@@ -21,8 +21,11 @@ main()
 struct key {
    int node;
 };
+
 extern  main();
+
 extern int foo();
+
 extern int toto();
 int toto()
 {

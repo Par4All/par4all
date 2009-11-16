@@ -1,6 +1,6 @@
       program entry05
 
-C     Goal to check that f_initial really can be parsed
+C     Goal to check that initial.f really can be parsed
 
       real x(10), y(20)
 

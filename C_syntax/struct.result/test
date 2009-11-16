@@ -3,8 +3,8 @@ int main()
    struct x {
       int a;
       int b;
-   };
-   struct x y;
+   } y;
+
    struct x z;
    return 0;
 }

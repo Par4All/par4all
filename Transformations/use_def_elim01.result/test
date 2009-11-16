@@ -1,10 +1,16 @@
-void use_def_elim(int *x)
+void use_def_elim01(int *x)
 {
    int *y = x;
-   y[0] = 1;
+   y[0] = 123;
 }
-void use_def_elim(int *x)
+void use_def_elim01(int *x)
 {
    int *y = x;
-   y[0] = 1;
+}
+void use_def_elim01(int *x)
+{
+   int *y;
+}
+void use_def_elim01(int *x)
+{
 }

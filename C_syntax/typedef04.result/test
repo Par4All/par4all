@@ -3,10 +3,14 @@ Checking that typedef types are properly prettyprinted
 
 Printed file for "typedef04"
 
+
+
+
 typedef double mydouble;
 struct s {
    int dim;
 };
+
 extern void typedef04(int n, struct s d, struct s *pd);
 void typedef04(int n, struct s d, struct s *pd)
 {

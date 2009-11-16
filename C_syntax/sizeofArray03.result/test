@@ -100,10 +100,13 @@ End of declarations for module sizeofArray03!
 
 Parsed code
 
+
+
+
+//Check Memory Allocation offsets of continuous local dynamic variables of dynamic size
 extern int foo(int a);
 int foo(int a)
 {
-   int X[a];
-   int Y[a];
+   int X[a],  Y[a];
    return 0;
 }

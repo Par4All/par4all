@@ -12,6 +12,11 @@ main()
    MYINT m;
    n = 1;
 }
+
+
+
 int g;
+
 extern void foo();
-extern main();
+
+extern  main();
