@@ -25,18 +25,32 @@ include $(ROOT)/makes/has_swig.mk
 
 PYTHON_MODULE=pypips
 PYTHON_INCLUDE=`$(PYTHON_CONFIG) --cflags`
+PYPS_STDOUT=pypsout
 
 DYNLIB_TARGET=_$(PYTHON_MODULE).so
-PY_TARGET=pyps.py $(PYTHON_MODULE).py $(ARCH)/$(DYNLIB_TARGET)
+PY_TARGET=pyps.py $(PYTHON_MODULE).py 
 
 LDFLAGS+=-L$(LIB.d) -L$(LIB.d)/$(ARCH) $(addprefix -l, $(pips.libs)) `$(PYTHON_CONFIG) --ldflags`
 
-DYNLIB_OBJECTS=$(PYTHON_MODULE)_wrap.o $(ARCH)/$(PYTHON_MODULE).o
+DYNLIB_OBJECTS=$(PYTHON_MODULE)_wrap.o $(PYTHON_MODULE).o
+
 
 PROJECT = pips
 include $(ROOT)/makes/main.mk
 
+# install hook
+install:pyps-install
+pyps-install:
+	$(INSTALL) -d $(PY.d)
+	MAJOR_VERSION="`echo '$(VERSION)' | cut -d '.' -f 1`";\
+	  $(CMP) $(ARCH)/$(DYNLIB_TARGET) $(PY.d)/$(DYNLIB_TARGET).$$MAJOR_VERSION || \
+	    $(INSTALL) -m 644 $(ARCH)/$(DYNLIB_TARGET) $(PY.d)/$(DYNLIB_TARGET).$$MAJOR_VERSION ; \
+		$(RM) $(PY.d)/$(DYNLIB_TARGET) ;\
+		cd $(PY.d) && ln -s $(DYNLIB_TARGET).$$MAJOR_VERSION $(DYNLIB_TARGET) && cd -;\
+	done
+
 # swig stuff
+
 $(PYTHON_MODULE).h:$(PYTHON_MODULE).c
 	$(PROTOIZE) $< > $@
 	echo "extern char *activate(char *phase);" >> $@
@@ -52,6 +66,9 @@ $(PYTHON_MODULE).py:$(PYTHON_MODULE).I
 	swig -python $<
 
 CPPFLAGS+=-I$(PYTHON_INCLUDE)
+
+%.o:%.c
+	$(COMPILE) $< -o $@
 
 clean:
 	rm -f *.o *.tmp *.I *.H $(PYTHON_MODULE)_wrap.c *.pyc $(PYTHON_MODULE).h
