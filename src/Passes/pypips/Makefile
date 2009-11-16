@@ -30,11 +30,9 @@ PYPS_STDOUT=pypsout
 
 DYNLIB_TARGET=_$(PYTHON_MODULE).so
 PY_TARGET=pyps.py $(PYTHON_MODULE).py 
-ifdef WITH_DYNAMIC_LIBRARIES
-LDFLAGS+=-L$(LIB.d) -L$(LIB.d)/$(ARCH) $(addprefix -l, newgenlibs pipslibs) `$(PYTHON_CONFIG) --ldflags`
-else
-LDFLAGS+=-L$(LIB.d) -L$(LIB.d)/$(ARCH) $(addprefix -l, $(pips.libs))
-endif
+
+LDFLAGS+=-L$(LIB.d) -L$(LIB.d)/$(ARCH) $(addprefix -l, $(pips.libs)) `$(PYTHON_CONFIG) --ldflags`
+
 DYNLIB_OBJECTS=$(PYTHON_MODULE)_wrap.o $(TMP_PREFIX)$(PYTHON_MODULE).o
 
 PROJECT = pips

@@ -45,8 +45,13 @@ other.libs	= m
 
 ##################################################################### EXTERNALS
 
+ifdef WITH_DYNAMIC_LIBRARIES
+# in fact only needed for linear
+extern.libs	=
+else
 # maybe must create a link to libpolylib64.a
 extern.libs	= polylib
+endif
 
 ################################################################### PIPS COMMON
 
