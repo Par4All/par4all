@@ -2054,7 +2054,7 @@ show_namespace (gfc_namespace *ns){
 		show_equiv (eq);
 	}
 
-	//fputc ('\n', dumpfile);
+	fputc ('\n', dumpfile);
 	//fputc ('\n', dumpfile);
 
 	//on affiche le code contenu dans le module
@@ -2078,7 +2078,8 @@ void
 gfc_dump_parse_tree (gfc_namespace *ns, FILE *file){
 	dumpfile = file;
 	fflush(stdout);fflush(stderr);
-	show_namespace (ns);
+	if(get_bool_property("GFC_DUMP_PARSE_TREE"))
+	  show_namespace (ns);
 	fflush(stdout);fflush(stderr);
 	gfc2pips_namespace(ns);
 	fflush(stdout);fflush(stderr);

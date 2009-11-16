@@ -2661,7 +2661,7 @@ parse_if_block (void)
   gfc2pips_replace_comments_num(gfc2pips_nb_of_statements-1,gfc2pips_nb_of_statements);
   //we still have a problem if there only is one instruction
   unsigned long current_num = gfc2pips_nb_of_statements;
-  fprintf(stdout,"gfc2pips_nb_of_statements: begin %d\n",gfc2pips_nb_of_statements);
+  fprintf(stderr,"gfc2pips_nb_of_statements: begin %d\n",gfc2pips_nb_of_statements);
   do
     {
       st = parse_executable (ST_NONE);
@@ -2700,7 +2700,7 @@ parse_if_block (void)
 	    }
 
 	  if(gfc2pips_comment_num_exists(gfc2pips_nb_of_statements-1)){
-		  fprintf(stdout, "current indice of statements: %d\n", gfc2pips_nb_of_statements );
+		  fprintf(stderr, "current indice of statements: %d\n", gfc2pips_nb_of_statements );
 		  //gfc2pips_replace_comments_num(gfc2pips_nb_of_statements-2,gfc2pips_nb_of_statements-1);
 		  //gfc2pips_replace_comments_num(gfc2pips_nb_of_statements-1,gfc2pips_nb_of_statements-2);
 		  //gfc2pips_replace_comments_num(gfc2pips_nb_of_statements,gfc2pips_nb_of_statements-1);
@@ -2727,11 +2727,11 @@ parse_if_block (void)
     }
   while (st != ST_ENDIF);
 
-  fprintf(stdout,"gfc2pips_nb_of_statements: near end %d\n",gfc2pips_nb_of_statements);
+  fprintf(stderr,"gfc2pips_nb_of_statements: near end %d\n",gfc2pips_nb_of_statements);
   //see the right combination of seen_else and seen_elseif
   if( seen_elseif || seen_else ) gfc2pips_nb_of_statements--;
   if( seen_elseif && seen_else ) gfc2pips_nb_of_statements--;
-  fprintf(stdout,"gfc2pips_nb_of_statements: end %d\n",gfc2pips_nb_of_statements);
+  fprintf(stderr,"gfc2pips_nb_of_statements: end %d\n",gfc2pips_nb_of_statements);
 
   pop_state ();
   accept_statement (st);

@@ -75,6 +75,7 @@ typedef struct _gfc2pips_comments_{
 
 extern gfc2pips_comments gfc2pips_comments_stack;
 extern gfc2pips_comments gfc2pips_comments_stack_;
+extern bool get_bool_property(const string );
 
 extern type CurrentType;
 newgen_list gfc_called_modules;
