@@ -284,6 +284,8 @@ ifdef PY_TARGET
 
 INSTALL_PY	+= $(PY_TARGET)
 
+$(PY_TARGET):$(ARCH)
+
 endif # PY_TARGET
 
 ifdef INSTALL_PY
