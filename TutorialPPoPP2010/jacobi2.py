@@ -25,6 +25,4 @@ launchers.display()
 
 launchers.gpu_loop_nest_annotate()
 launchers.inlining()
-
-outdir="p4a_gen"
-w.save(indir=outdir)
+...

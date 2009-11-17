@@ -2,7 +2,7 @@ from pyps import *
 
 w = workspace(['jacobi.c','p4a_stubs.c'])
 
-w.set_property(loop_normalize_1_increment = True,
+w.set_property(loop_normalize_one_increment = True,
                loop_normalize_lower_bound=0,
                loop_normalize_skip_index_side_effect=True)
 
