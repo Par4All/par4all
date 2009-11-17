@@ -5,10 +5,10 @@ class Pii(pipscc):
 
     def changes(self, ws):
         
-        def filter(module):
+        def thefilter(module):
             return len(module.code()) < 3
 
-        ws.all(filter).inlining()
+        ws.filter(thefilter).inlining()
 
 
 if __name__ == '__main__':
