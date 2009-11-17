@@ -46,8 +46,7 @@ pyps-install:
 	  $(CMP) $(ARCH)/$(DYNLIB_TARGET) $(PY.d)/$(DYNLIB_TARGET).$$MAJOR_VERSION || \
 	    $(INSTALL) -m 644 $(ARCH)/$(DYNLIB_TARGET) $(PY.d)/$(DYNLIB_TARGET).$$MAJOR_VERSION ; \
 		$(RM) $(PY.d)/$(DYNLIB_TARGET) ;\
-		cd $(PY.d) && ln -s $(DYNLIB_TARGET).$$MAJOR_VERSION $(DYNLIB_TARGET) && cd -;\
-	done
+		cd $(PY.d) && ln -s $(DYNLIB_TARGET).$$MAJOR_VERSION $(DYNLIB_TARGET) && cd -
 
 # swig stuff
 
