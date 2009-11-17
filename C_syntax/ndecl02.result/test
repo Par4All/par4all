@@ -68,9 +68,7 @@ Parsed printed file
 
 void ndecl02(char *dir)
 {
-   ;
    int i;
-   ;
    int j,  *k,  l[10],  (*pf)(),  foo();
 
    i = 1;
@@ -80,9 +78,7 @@ Printed file
 
 void ndecl02(char *dir)
 {
-   ;
    int i;
-   ;
    int j,  *k,  l[10],  (*pf)(),  foo();
 
    i = 1;

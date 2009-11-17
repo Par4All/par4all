@@ -41,5 +41,9 @@ Layout for memory area "externalloc07!:*STATIC*" of size 0:
 
 End of declarations for module externalloc07!
 
+
+
+
+//Checks Memory allocation offsets for two continuous global external variable 
 extern int i;
 extern int j;

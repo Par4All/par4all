@@ -45,6 +45,10 @@ Layout for memory area "externalloc08!:*STATIC*" of size 0:
 
 End of declarations for module externalloc08!
 
+
+
+
+//Checks Memory allocation offsets for global non-continuous external variables
 extern int i;
 float a[20];
 extern float j;

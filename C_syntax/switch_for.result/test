@@ -3,8 +3,7 @@ PARSED PRINTED FILE
 
 void gl_enable()
 {
-   int cap;
-   int p;
+   int cap,  p;
 
    if (cap==1)
       goto switch_1_case_1;
@@ -21,8 +20,7 @@ PRINTED FILE
 
 void gl_enable()
 {
-   int cap;
-   int p;
+   int cap,  p;
    if (cap==1) {
    }
    else {
@@ -40,8 +38,7 @@ printed file after RESTRUCTURE_CONTROL
 
 void gl_enable()
 {
-   int cap;
-   int p;
+   int cap,  p;
    if (cap==1) {
 switch_1_case_1:      ;
       p = 0;

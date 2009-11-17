@@ -1,12 +1,9 @@
 int main()
 {
-   int j;
-   int n;
-   int BlockEnd = 3;
+   int j,  n,  BlockEnd = 3;
 
    for (j = 1, n = 0;n<BlockEnd;j++, n++) {
-      int k;
-      int l;
+      int k,  l;
       k = foo((j, n)), l = 1;
       printf("%d\n", k);
    }

@@ -43,8 +43,14 @@ End of declarations for module decl03!
 
 Parsed printed file
 
+
+
+
 int a[] = {1, 2, 3};
 
 Printed file
+
+
+
 
 int a[] = {1, 2, 3};

@@ -3,9 +3,7 @@ PARSED PRINTED FILE FOR MODULE one_liner_06
 
 void one_liner_06()
 {
-   int x;
-   int y;
-   int z;
+   int x,  y,  z;
    /* first high-level test*/
    if (x>0)
       y++;
@@ -27,11 +25,9 @@ void one_liner_06()
       ;
    else if (x>0)
       ;
-   
    /* first for */
    for (x = 0;x<10;x++)
       ;
-
    if (x>0)
       ;
    else
@@ -40,6 +36,7 @@ void one_liner_06()
          x--;
    if (x<0) {
       /* first switch */
+      ;
       goto switch_3_default;
 switch_3_default:      ;
       goto break_3;

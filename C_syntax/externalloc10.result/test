@@ -77,5 +77,14 @@ Layout for memory area "foo!:*STATIC*" of size 0:
 
 End of declarations for module foo!
 
+
+
+
+//Checks the memory allocation offset for extern variables in 2 files
+//bar.c: global extern variable declaration
 extern int i;
+
+
+
+//foo.c global variable declaration
 int i = 2;

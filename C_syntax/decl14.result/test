@@ -47,7 +47,12 @@ Symbol table for "decl14"
 
 Parsed printed file for "decl14!"
 
+
+
+
+/* This is not a double declaration, even with -ansi and -pedantic */
 extern int filter();
+
 extern int filter();
 
 Parsed rinted file for "decl14"

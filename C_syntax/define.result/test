@@ -8,7 +8,12 @@ Unsplit define
 /*
  * file for define.c
  */
-extern main();
+
+
+
+
+
+extern  main();
 main()
 {
    int i = 1;

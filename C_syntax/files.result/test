@@ -1,8 +1,13 @@
 
 Printed files for file1.c
 
+
+
+
+
 int i;
 extern void a();
+
 extern int b();
 void a()
 {
@@ -14,8 +19,12 @@ int b()
 
 Printed files for file2.c
 
+
+
+
 int j;
 extern void c();
+
 extern int d();
 void c()
 {
@@ -39,8 +48,13 @@ Unsplit files
 /*
  * file for file1.c
  */
+
+
+
+
 int i;
 extern void a();
+
 extern int b();
 void a()
 {
@@ -52,8 +66,12 @@ int b()
 /*
  * file for file2.c
  */
+
+
+
 int j;
 extern void c();
+
 extern int d();
 void c()
 {
@@ -65,7 +83,12 @@ int d()
 /*
  * file for file3.c
  */
+
+
+
+
 extern void e();
+
 extern int f();
 void e()
 {

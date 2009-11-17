@@ -3,10 +3,8 @@ parsed printed file
 
 void comment07()
 {
-   int i;
-   int j;
-   int k;
-   
+   int i,  j,  k;
+
    i = 1;
    j = 2;
    k = 3;

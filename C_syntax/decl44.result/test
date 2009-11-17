@@ -50,7 +50,6 @@ End of declarations for module decl44
 
 void decl44()
 {
-   extern int m[3];
-   extern int foo(int *);
+   extern int m[3];                                                     /*0004*/
    foo(m);                                                              /*0005*/
 }

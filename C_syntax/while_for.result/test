@@ -1,7 +1,6 @@
 main()
 {
-   int c;
-   int i;
+   int c,  i;
 l99998:   ;
    if (!(c>0)) goto l99999;
    i = 0;
@@ -18,8 +17,7 @@ printed file after RESTRUCTURE_CONTROL
 
 main()
 {
-   int c;
-   int i;
+   int c,  i;
 break_2:   if (!(c>0)) goto l99999;
    i = 0;
    if (!(i<5))

@@ -1,23 +1,34 @@
 int main(char *fmt1, ...)
 {
    FILE *fp;
-   size_t n;
-   size_t nr;
+   size_t n, size_t nr;
    char buf1[200];
    char *buf2 = malloc(200*sizeof(char));
    char *fmt2;
    char *i_name;
-   int i;
-   int r;
-   int c;
-   int max;
-   fpos_t *fp_pos;
-   fpos_t pos;
+   int i,  r,  c,  max;
+   fpos_t *fp_pos, fpos_t pos;
    long fp_pos_indic;
    va_list vl;
    
+   /* Some versions of <linux/posix_types.h> define these macros.  */
    
-   // formatted IO functions
+   
+   
+   /* It's easier to assume 8-bit bytes than to get CHAR_BIT.  */
+   
+   
+   
+   
+   /* fd_set for select and pselect.  */
+   
+   
+   /* XPG4.2 requires this member name.  Otherwise avoid the name
+          from the global namespace.  */
+   
+   
+   
+   
    fmt2 = "%s%d";
    max = 100;
    n = 200;

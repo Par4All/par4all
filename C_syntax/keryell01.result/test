@@ -3,8 +3,7 @@ PARSED PRINTED FILE for keryell01
 
 int keryell01(void)
 {
-   static int i;
-   static int state = 0;
+   static int i,  state = 0;
 
    if (state==0)
       goto switch_1_case_0;
@@ -27,8 +26,7 @@ PRINTED FILE for keryell01
 
 int keryell01(void)
 {
-   static int i;
-   static int state = 0;
+   static int i,  state = 0;
    if (state==0) goto switch_1_case_0;
    if (state==1) {
    }
@@ -53,8 +51,7 @@ PRINTED FILE with effects for keryell01
 
 int keryell01(void)
 {
-   static int i;
-   static int state = 0;
+   static int i,  state = 0;
 //               <must be read   >: state
    if (state==0) goto switch_1_case_0;
 //               <must be read   >: state
@@ -90,8 +87,7 @@ PRINTED FILE with transformers for keryell01
 
 int keryell01(void)
 {
-   static int i;
-   static int state = 0;
+   static int i,  state = 0;
 
 //  T() {}
 

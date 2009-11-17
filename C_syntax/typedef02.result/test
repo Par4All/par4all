@@ -8,10 +8,9 @@ main()
       int i;
    };
    typedef struct s mystruct;
-   union v {
+   typedef union v {
       int i;
-   };
-   typedef union v myunion;
+   } myunion;
    typedef myunion MYUNION;
    typedef MYUNION toto;
    typedef mystruct MYSTRUCT;

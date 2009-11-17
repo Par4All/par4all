@@ -62,6 +62,9 @@ End of declarations for module block_scope08
 
 Parser output
 
+
+
+
 extern int block_scope08(int x);
 
 int block_scope08(int x)

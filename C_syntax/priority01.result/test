@@ -3,8 +3,6 @@ Parsed printed file for "priority01"
 
 int priority01()
 {
-   char a;
-   char b;
-   char c;
+   char a,  b,  c;
    return (c = a+b)!='\n';
 }

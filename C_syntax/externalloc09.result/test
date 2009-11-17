@@ -130,7 +130,16 @@ Layout for memory area "main:*STATIC*" of size 0:
 
 End of declarations for module main
 
+
+
+
+//Checks memory allocation offsets for extern variables in 2 files:
+// bar.c extern variable declared in a function
 extern int main();
+
+
+
+//foo.c local variable declaration
 int i = 2;
 int main()
 {

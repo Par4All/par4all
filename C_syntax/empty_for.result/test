@@ -5,18 +5,20 @@ Do not display original number lines as comment:
 If possible, transform simple for-loops into do-loop a  la Fortran, simpler to analyze:
 Desugaring other for-loops into plain while-loops fot the time we improve semantics ameliorations in PIPS:
 enum {N=9};
-typedef struct {float re; float im;} complex;
+typedef struct {
+   float re;
+   float im;
+} complex;
+
 complex imagein[N][N];
+
 extern int main(int argc, char *argv[]);
 int main(int argc, char *argv[])
 {
-   int i;
-   int j;
-   int k;
+   int i,  j,  k;
 
    for(i = 0; i <= 8; i += 1)
       for(j = 0; j <= 8; j += 1)
          ;
-
    return 0;
 }

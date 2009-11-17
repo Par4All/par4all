@@ -13,19 +13,22 @@ float c(int d)
 void f(void)
 {
 }
-extern void f(void);
-extern int a(char *b);
-extern float b(double c);
-int i = 9;
-extern float c(int d);
-double zz;
+
+
+
+extern void f(void);                                                    /*0001*/
+extern int a(char *b);                                                  /*0002*/
+extern float b(double c);                                               /*0003*/
+int i = 9;                                                              /*0004*/
+extern float c(int d);                                                  /*0005*/
+
+double zz;                                                              /*0007*/
 int a(char *b)
 {
    fputs(b);                                                            /*0002*/
 }
 float b(double c)
 {
-   float b;
    return b;                                                            /*0003*/
 }
 float c(int d)
@@ -35,9 +38,13 @@ float c(int d)
 void f(void)
 {
 }
-extern void f(void);
-extern int a(char *b);
-extern float b(double c);
-int i = 9;
-extern float c(int d);
-double zz;
+
+
+
+extern void f(void);                                                    /*0001*/
+extern int a(char *b);                                                  /*0002*/
+extern float b(double c);                                               /*0003*/
+int i = 9;                                                              /*0004*/
+extern float c(int d);                                                  /*0005*/
+
+double zz;                                                              /*0007*/

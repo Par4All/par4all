@@ -44,16 +44,34 @@ End of declarations for module decl06!
 
 Parsed printed file
 
+
+
+
+
+
+/*[500]*//* fonction ou est cree le manager */
+/* const char * */
 struct _err_manager {
    char function;
    void (*push)(int function);
 };
+
+
 void ERR_mgr_ctor(const char *file, const char *function);
 
 Printed file
 
+
+
+
+
+
+/*[500]*//* fonction ou est cree le manager */
+/* const char * */
 struct _err_manager {
    char function;
    void (*push)(int function);
 };
+
+
 void ERR_mgr_ctor(const char *file, const char *function);

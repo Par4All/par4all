@@ -61,6 +61,9 @@ End of declarations for module main
 
 Parser output
 
+
+
+
 extern int main();
 int main()
 {
@@ -74,6 +77,9 @@ int main()
 }
 
 Controlizer output
+
+
+
 
 extern int main();
 int main()

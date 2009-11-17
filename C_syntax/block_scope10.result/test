@@ -99,6 +99,9 @@ End of declarations for module block_scope10!block_scope10
 
 Parser output
 
+
+
+
 static int block_scope10();
 
 static int block_scope10()
@@ -111,6 +114,9 @@ static int block_scope10()
 }
 
 Parser output
+
+
+
 
 static int block_scope10();
 

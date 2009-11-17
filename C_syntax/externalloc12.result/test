@@ -79,6 +79,12 @@ Layout for memory area "foo!:*STATIC*" of size 0:
 
 End of declarations for module foo!
 
+
+
+
 int k;
+
+
+
 int i;
 int j;

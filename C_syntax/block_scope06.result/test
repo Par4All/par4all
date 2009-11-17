@@ -3,14 +3,12 @@ Parser output
 
 int main()
 {
-   int k;
-   int m;
+   int k,  m;
    
    /* For loop comment */
    for (k = 1;k<=m;k++) {
-      int i;
-      int j;
-      
+      int i,  j;
+
       i = 1;
       j = 2;
    }
@@ -20,14 +18,12 @@ Controlizer output
 
 int main()
 {
-   int k;
-   int m;
+   int k,  m;
    
    /* For loop comment */
    for (k = 1;k<=m;k++) {
-      int i;
-      int j;
-      
+      int i,  j;
+
       i = 1;
       j = 2;
    }

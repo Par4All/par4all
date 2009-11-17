@@ -7,8 +7,7 @@ int main()
       int d:4;
       int e:5;
       int :6;
-   };
-   struct x y;
+   } y;
 
    return 0;
 }

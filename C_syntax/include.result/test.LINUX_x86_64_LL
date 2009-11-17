@@ -633,9 +633,11 @@ typedef unsigned short __uint16_t;
 typedef signed int __int32_t;
 typedef unsigned int __uint32_t;
 /* quad_t is also 64 bits.  */
-struct {
+typedef struct {
+   long __val[2];
 } __quad_t;
-struct {
+typedef struct {
+   __u_long __val[2];
 } __u_quad_t;
 
 
@@ -719,7 +721,8 @@ typedef long long __off64_t;
 /* Type of file sizes and offsets (LFS).  */
 typedef int __pid_t;
 /* Type of process identifications.  */
-struct {
+typedef struct {
+   int __val[2];
 } __fsid_t;
 /* Type of file system IDs.  */
 typedef long __clock_t;
@@ -958,7 +961,9 @@ Boston, MA 02111-1307, USA.  */
 typedef long wchar_t;
 typedef unsigned int wint_t;
 /* Value so far.  */
-union {
+typedef union {
+   wint_t __wch;
+   char __wchb[4];
 } struct {int __count; union {wint_t __wch; char __wchb[4];} __value;}, __mbstate_t;
 
 
@@ -966,9 +971,13 @@ union {
 
 /* The rest of the file is only used if used if __need_mbstate_t is not
    defined.  */
-struct {
+typedef struct {
+   __off_t __pos;
+   __mbstate_t __state;
 } _G_fpos_t;
-struct {
+typedef struct {
+   __off64_t __pos;
+   __mbstate_t __state;
 } _G_fpos64_t;
 /* Copyright (C) 1997-1999, 2000-2002 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -1387,12 +1396,14 @@ struct __gconv_step_data {
 
 
 /* Combine conversion step description with data.  */
-struct __gconv_info {
+typedef struct __gconv_info {
    size_t __nsteps;
    struct __gconv_step *__steps;
    struct __gconv_step_data __data[1];
 } *__gconv_t;
-struct {
+typedef struct {
+   struct __gconv_info __cd;
+   struct __gconv_step_data __data;
 } union {struct __gconv_info __cd; struct {struct __gconv_info __cd; struct __gconv_step_data __data;} __combined;}, _G_iconv_t;
 
 typedef int _G_int16_t;

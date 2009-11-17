@@ -98,8 +98,15 @@ End of declarations for module decl18
 
 Parsed printed file for "decl18!" and "decl18"
 
+
+
+
+/* This OK with gcc -ansi -pedantic */
+
 extern void decl18(int iarg2);
+
 extern void decl18(int iarg2);
+
 extern void decl18(int iarg2);
 
 void decl18(int iarg2)

@@ -30,7 +30,6 @@ PRINTED FILE
 void pretty()
 {
    char *p;
-   extern  n();
    if (n==1) goto switch_1_case_1;
    if (n==2) goto switch_1_case_2;
    if (n==3) {
@@ -68,7 +67,6 @@ printed file after RESTRUCTURE_CONTROL
 void pretty()
 {
    char *p;
-   extern  n();
    if (n==1) goto switch_1_case_1;
    if (n==2) goto switch_1_case_2;
    if (n==3) {

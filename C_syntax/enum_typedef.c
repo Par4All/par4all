@@ -1,4 +1,4 @@
-/* Example that appear in an application from Holotetrix with:
+/* Example that appear in an application from a company with:
 
 * To have M_PI: *
 #define _GNU_SOURCE

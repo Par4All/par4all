@@ -2,18 +2,9 @@ main()
 {
    enum fleurs {rose=0x0001, marguerite=0, jasmin};
    enum legumes {carotte=rose+50, haricot};
-   enum fleurs ma1;
-   enum fleurs ma2;
-   enum fleurs ma3;
-   enum legumes mon1;
-   enum legumes mon2;
-   int i;
-   int a1;
-   int a2;
-   int a3;
-   int on1;
-   int on2;
-   int j;
+   enum fleurs ma1, ma2, ma3;
+   enum legumes mon1, mon2;
+   int i,  a1,  a2,  a3,  on1,  on2,  j;
 
    ma1 = rose;
    ma2 = marguerite;
@@ -38,18 +29,9 @@ main()
 {
    enum fleurs {rose=0x0001, marguerite=0, jasmin};
    enum legumes {carotte=rose+50, haricot};
-   enum fleurs ma1;
-   enum fleurs ma2;
-   enum fleurs ma3;
-   enum legumes mon1;
-   enum legumes mon2;
-   int i;
-   int a1;
-   int a2;
-   int a3;
-   int on1;
-   int on2;
-   int j;
+   enum fleurs ma1, ma2, ma3;
+   enum legumes mon1, mon2;
+   int i,  a1,  a2,  a3,  on1,  on2,  j;
 
 //  P() {}
 

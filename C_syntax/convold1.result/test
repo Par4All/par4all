@@ -19,11 +19,10 @@ PARSED PRINTED FILE for convold1
 
 int convold1(int X[13][13], int coeff[6], int i, int j)
 {
-   int m;
-   int res;
+   int m,  res;
    
    /* for  (m = 0; m<= 5; m++) */
-
+   
    res = 0;
    for (m = 0;m<=5;m++)
       res = res+coeff[m]*X[i+m][j];
@@ -35,11 +34,10 @@ PRINTED FILE for convold1
 
 int convold1(int X[13][13], int coeff[6], int i, int j)
 {
-   int m;
-   int res;
+   int m,  res;
    
    /* for  (m = 0; m<= 5; m++) */
-
+   
    res = 0;
    for(m = 0; m <= 5; m += 1)
       res = res+coeff[m]*X[i+m][j];
@@ -51,12 +49,11 @@ Effects for convold1
 
 int convold1(int X[13][13], int coeff[6], int i, int j)
 {
-   int m;
-   int res;
+   int m,  res;
 //               <must be written>: res
    
    /* for  (m = 0; m<= 5; m++) */
-
+   
    res = 0;
 //               <must be written>: m
    for(m = 0; m <= 5; m += 1)
@@ -75,14 +72,13 @@ Transformers for convold1
 
 int convold1(int X[13][13], int coeff[6], int i, int j)
 {
-   int m;
-   int res;
+   int m,  res;
 
 //  T(res) {res==0}
 
    
    /* for  (m = 0; m<= 5; m++) */
-
+   
    res = 0;
 
 //  T(m,res) {res#init==0, 0<=m}
@@ -106,14 +102,13 @@ Preconditions for convold1
 
 int convold1(int X[13][13], int coeff[6], int i, int j)
 {
-   int m;
-   int res;
+   int m,  res;
 
 //  P() {}
 
    
    /* for  (m = 0; m<= 5; m++) */
-
+   
    res = 0;
 
 //  P(res) {res==0}
@@ -138,11 +133,10 @@ PRINTED Regions for convold1
 
 int convold1(int X[13][13], int coeff[6], int i, int j)
 {
-   int m;
-   int res;
+   int m,  res;
    
    /* for  (m = 0; m<= 5; m++) */
-
+   
    res = 0;
 
 //  <X[PHI1][PHI2]-R-MAY-{PHI2==j, i<=PHI1, PHI1<=5+i}>

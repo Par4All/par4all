@@ -1,4 +1,4 @@
-void pretty() {
+void pretty(int n) {
   char *p;
   switch (n)
     {

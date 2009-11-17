@@ -1,9 +1,9 @@
 int main()
 {
-   char *s;
-   wchar_t *ws;
-   unsigned char c = '\023';
-   wchar_t wc = '\076';
+   char *s;                                                             /*0003*/
+   wchar_t *ws;                                                         /*0004*/
+   unsigned char c = '\023';                                            /*0005*/
+   wchar_t wc = '\076';                                                 /*0006*/
    c = '\0';                                                            /*0007*/
    c = '\01';                                                           /*0008*/
    c = '\xc';                                                           /*0009*/

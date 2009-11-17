@@ -3,9 +3,7 @@ PARSED PRINTED FILE FOR MODULE one_liner_02
 
 void one_liner_02()
 {
-   int x;
-   int y;
-   int z;
+   int x,  y,  z;
    while (x>0) 
       y++;
    while (x>0) {

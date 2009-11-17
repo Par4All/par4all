@@ -3,9 +3,7 @@ PARSED PRINTED FILE FOR MODULE one_liner_03
 
 void one_liner_03()
 {
-   int x;
-   int y;
-   int z;
+   int x,  y,  z;
    for (;;)
       y++;
    for (;;) {

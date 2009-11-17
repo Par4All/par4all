@@ -3,8 +3,7 @@ Parsed printed file for "main"
 
 int main()
 {
-   int i;
-   int j;
+   int i,  j;
 
    i = (j = 1, 2);
    i = 3, j = 4;
@@ -16,8 +15,7 @@ Code for "main"
 
 int main()
 {
-   int i;
-   int j;
+   int i,  j;
 
    i = (j = 1, 2);
    i = 3, j = 4;
@@ -29,8 +27,7 @@ Proper effects for "main"
 
 int main()
 {
-   int i;
-   int j;
+   int i,  j;
 //               <must be written>: i j
 
    i = (j = 1, 2);
@@ -61,8 +58,7 @@ Transformers for "main"
 
 int main()
 {
-   int i;
-   int j;
+   int i,  j;
 
 //  T(i,j) {i==2, j==1}
 
@@ -86,8 +82,7 @@ Preconditions for "main"
 
 int main()
 {
-   int i;
-   int j;
+   int i,  j;
 
 //  P() {}
 

@@ -14,5 +14,5 @@ int foo()
   extern foo();
   extern (*p)();
   extern (*f)();
-  extern int b[20];  
+  extern int b[20];
 }

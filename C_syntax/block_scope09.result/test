@@ -109,14 +109,20 @@ End of declarations for module block_scope09
 
 Parser output
 
+
+
+
 int x = 1;
 int y = 2;
+
+// The formal parameter hides the global x
 extern int block_scope09(int x);
 
 int block_scope09(int x)
 {
    int k;
    {
+      // This decaration hides the formal parameter
       int x;
 
       x = 2;
@@ -132,6 +138,7 @@ int block_scope09(int x)
 {
    int k;
    {
+      // This decaration hides the formal parameter
       int x;
 
       x = 2;

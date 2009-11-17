@@ -3,14 +3,11 @@ Parser output
 
 main()
 {
-   int i;
-   int j;
-   int k;
-   int l;
+   int i,  j,  k,  l;
    i = 015;
    // octal constant
    j = 0x1ae;
-   // hexadecimal
+   // hexadecimal 
    k = 890L;
    // long constant
    l = i+j+k;
@@ -20,14 +17,11 @@ Controlizer output
 
 main()
 {
-   int i;
-   int j;
-   int k;
-   int l;
+   int i,  j,  k,  l;
    i = 015;
    // octal constant
    j = 0x1ae;
-   // hexadecimal
+   // hexadecimal 
    k = 890L;
    // long constant
    l = i+j+k;
@@ -40,10 +34,7 @@ Preconditions
 
 main()
 {
-   int i;
-   int j;
-   int k;
-   int l;
+   int i,  j,  k,  l;
 
 //  P() {}
 
@@ -56,7 +47,7 @@ main()
 
 //  P(i,j) {i==13, j==430}
 
-   // hexadecimal
+   // hexadecimal 
    k = 890L;
 
 //  P(i,j,k) {i==13, j==430, k==890}

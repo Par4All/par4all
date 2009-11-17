@@ -3,8 +3,7 @@ Parsed printed file
 
 void generate11()
 {
-   int i;
-   int j;
+   int i,  j;
 
    func(i, &j);
 }
@@ -13,9 +12,7 @@ Printed file
 
 void generate11()
 {
-   int i;
-   int j;
-   extern int func(int, int *);
+   int i,  j;
 
    func(i, &j);
 }
@@ -27,9 +24,7 @@ Printed file generate11 with intraprocedural preconditions
 
 void generate11()
 {
-   int i;
-   int j;
-   extern int func(int f1, int *f2);
+   int i,  j;
 
 //  P() {}
 
