@@ -42,11 +42,8 @@ include $(ROOT)/makes/main.mk
 install:pyps-install
 pyps-install:
 	$(INSTALL) -d $(PY.d)
-	MAJOR_VERSION="`echo '$(VERSION)' | cut -d '.' -f 1`";\
-	  $(CMP) $(ARCH)/$(DYNLIB_TARGET) $(PY.d)/$(DYNLIB_TARGET).$$MAJOR_VERSION || \
-	    $(INSTALL) -m 644 $(ARCH)/$(DYNLIB_TARGET) $(PY.d)/$(DYNLIB_TARGET).$$MAJOR_VERSION ; \
-		$(RM) $(PY.d)/$(DYNLIB_TARGET) ;\
-		cd $(PY.d) && ln -s $(DYNLIB_TARGET).$$MAJOR_VERSION $(DYNLIB_TARGET) && cd -
+	  $(CMP) $(ARCH)/$(DYNLIB_TARGET) $(PY.d)/$(DYNLIB_TARGET) || \
+	    $(INSTALL) -m 644 $(ARCH)/$(DYNLIB_TARGET) $(PY.d)/$(DYNLIB_TARGET)
 
 # swig stuff
 
