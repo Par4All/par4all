@@ -1,4 +1,3 @@
-#include <stdlib.h>
 #include "array.h"
 struct farray_t
 {
@@ -18,7 +17,7 @@ farray farray_new(unsigned int n)
         else
             free(a);
     }
-    return NULL;
+    return 0;
 }
 
 void farray_delete(farray a)

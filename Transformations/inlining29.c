@@ -1,6 +1,4 @@
 #include "array.h"
-#include <stdio.h>
-#include <stdlib.h>
 int main(int argc, char*argv[])
 {
     int i,n = atoi(argv[1]);
