@@ -1,3 +1,4 @@
+# ^
 # $Id$
 #
 # Copyright 1989-2009 MINES ParisTech
@@ -30,20 +31,20 @@ PYPS_STDOUT=pypsout
 DYNLIB_TARGET=_$(PYTHON_MODULE).so
 PY_TARGET=pyps.py $(PYTHON_MODULE).py 
 
-LDFLAGS+=-L$(LIB.d) -L$(LIB.d)/$(ARCH) $(addprefix -l, $(pips.libs)) `$(PYTHON_CONFIG) --ldflags`
 
 DYNLIB_OBJECTS=$(PYTHON_MODULE)_wrap.o $(PYTHON_MODULE).o
 
-
 PROJECT = pips
 include $(ROOT)/makes/main.mk
+
+LDFLAGS+=-L$(LIB.d) -L$(LIB.d)/$(ARCH) $(addprefix -l, $(pips.libs)) `$(PYTHON_CONFIG) --ldflags`
 
 # install hook
 install:pyps-install
 pyps-install:
 	$(INSTALL) -d $(PY.d)
 	  $(CMP) $(ARCH)/$(DYNLIB_TARGET) $(PY.d)/$(DYNLIB_TARGET) || \
-	    $(INSTALL) -m 644 $(ARCH)/$(DYNLIB_TARGET) $(PY.d)/$(DYNLIB_TARGET)
+	    $(INSTALL) -m 644 $(ARCH)/$(DYNLIB_TARGET) $(PY.d)/$(DYNLIB_TARGET) 
 
 # swig stuff
 

@@ -69,9 +69,15 @@ pipslibs.libs	= \
 	text-util misc reductions flint sac safescale phrase \
 	gpu newgen
 
+ifdef WITH_DYNAMIC_LIBRARIES
+pips.libs	= \
+	pipslibs $(newgen.libs) $(linear.libs) \
+	$(extern.libs) $(other.libs)
+else
 pips.libs	= \
 	$(pipslibs.libs) $(newgen.libs) $(linear.libs) \
 	$(extern.libs) $(other.libs)
+endif
 
 ########################################################################## PIPS
 
