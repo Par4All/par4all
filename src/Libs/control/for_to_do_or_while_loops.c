@@ -190,102 +190,87 @@ static bool condition_expression_to_final_bound(expression cond,
 static bool incrementation_expression_to_increment(expression incr,
 						   entity li,
 						   bool * is_increasing_p,
-						   expression * pincrement) {
-  bool success = FALSE;
-  syntax incr_s = expression_syntax(incr);
+                           expression * pincrement)
+{
+    bool success = FALSE;
+    syntax incr_s = expression_syntax(incr);
 
-  if (syntax_call_p(incr_s)) {
-    call incr_c = syntax_call(incr_s);
-    entity op = call_function(incr_c);
-    if (! ENDP(call_arguments(incr_c))) {
-      expression e = EXPRESSION(CAR(call_arguments(incr_c)));
+    if (syntax_call_p(incr_s)) {
+        call incr_c = syntax_call(incr_s);
+        entity op = call_function(incr_c);
+        if (! ENDP(call_arguments(incr_c))) {
+            expression e = EXPRESSION(CAR(call_arguments(incr_c)));
 
-      /* The expression should concern the loop index: */
-      if (is_expression_reference_to_entity_p(e,li)) {
-	/* Look for i++ or ++i: */
-	if ((ENTITY_POST_INCREMENT_P(op) || ENTITY_PRE_INCREMENT_P(op))) {
-	  * is_increasing_p = TRUE;
-	  * pincrement = int_to_expression(1);
-	  success = TRUE;
-	  pips_debug(5, "Increment operator found!\n");
-	}
-	/* Look for i-- or --i: */
-	else if ((ENTITY_POST_DECREMENT_P(op) || ENTITY_PRE_DECREMENT_P(op))) {
-	  * is_increasing_p = FALSE;
-	  * pincrement = int_to_expression(-1);
-	  success = TRUE;
-	  pips_debug(5, "Decrement operator found!\n");
-	}
-	else if (! ENDP(CDR(call_arguments(incr_c)))) {
-	  /* Look for stuff like "i += integer". Get the rhs: */
-	  /* This fails with floating point indices as found in
-	     industrial code and with symbolic increments as in
-	     "for(t=0.0; t<t_max; t += delta_t). Floating point
-	     indices should be taken into account. The iteration
-	     direction of the loop should be derived from the bound
-	     expression, using the comparison operator. */
-	  expression inc_v =  EXPRESSION(CAR(CDR(call_arguments(incr_c))));
-	  if (ENTITY_PLUS_UPDATE_P(op)
-              && extended_integer_constant_expression_p(inc_v)) {
-          value val = EvalExpression(inc_v);
-          int v = constant_int(value_constant(val));
-          if (v != 0) {
-              * pincrement = inc_v;
-              success = TRUE;
-              if (v > 0 ) {
-                  * is_increasing_p = TRUE;
-                  pips_debug(5, "Found += with positive increment!\n");
-              }
-              else {
-                  * is_increasing_p = FALSE;
-                  pips_debug(5, "Found += with negative increment!\n");
-              }
-          }
-          free_value(val);
-      }
-	  /* Look for "i -= integer": */
-	  else if(ENTITY_MINUS_UPDATE_P(op)
-		  && extended_integer_constant_expression_p(inc_v)) {
-	    int v = expression_to_int(inc_v);
-	    if (v != 0) {
-	      * pincrement = int_to_expression(-v);
-	      success = TRUE;
-	      if (v < 0 ) {
-		* is_increasing_p = TRUE;
-		pips_debug(5, "Found -= with negative increment!\n");
-	      }
-	      else {
-		* is_increasing_p = FALSE;
-		pips_debug(5, "Found -= with positive increment!\n");
-	      }
-	    }
-	  }
-	  else {
-	    /* Look for "i = i + v" (only for v positive here...)
-	       or "i = v + i": */
-	    expression inc_v = expression_verbose_reduction_p_and_return_increment(incr, add_expression_p);
-	    if (inc_v != expression_undefined
-		&& extended_integer_constant_expression_p(inc_v)) {
-	      int v = expression_to_int(inc_v);
-	      if (v != 0) {
-		* pincrement = inc_v;
-		success = TRUE;
-		if (v > 0 ) {
-		  * is_increasing_p = TRUE;
-		  pips_debug(5, "Found \"i = i + v\" or \"i = v + i\" with positive increment!\n");
-		}
-		else {
-		  * is_increasing_p = FALSE;
-		  pips_debug(5, "Found \"i = i + v\" or \"i = v + i\" with negative increment!\n");
-		}
-	      }
-	    }
-	  }
-	}
-      }
+            /* The expression should concern the loop index: */
+            if (is_expression_reference_to_entity_p(e,li)) {
+                /* Look for i++ or ++i: */
+                if ((ENTITY_POST_INCREMENT_P(op) || ENTITY_PRE_INCREMENT_P(op))) {
+                    * is_increasing_p = TRUE;
+                    * pincrement = int_to_expression(1);
+                    success = TRUE;
+                    pips_debug(5, "Increment operator found!\n");
+                }
+                /* Look for i-- or --i: */
+                else if ((ENTITY_POST_DECREMENT_P(op) || ENTITY_PRE_DECREMENT_P(op))) {
+                    * is_increasing_p = FALSE;
+                    * pincrement = int_to_expression(-1);
+                    success = TRUE;
+                    pips_debug(5, "Decrement operator found!\n");
+                }
+                else if (! ENDP(CDR(call_arguments(incr_c)))) {
+                    /* Look for stuff like "i += integer". Get the rhs: */
+                    /* This fails with floating point indices as found in
+                       industrial code and with symbolic increments as in
+                       "for(t=0.0; t<t_max; t += delta_t). Floating point
+                       indices should be taken into account. The iteration
+                       direction of the loop should be derived from the bound
+                       expression, using the comparison operator. */
+                    expression inc_v =  EXPRESSION(CAR(CDR(call_arguments(incr_c))));
+                    bool entity_plus_update_p = ENTITY_PLUS_UPDATE_P(op);
+                    bool entity_minus_update_p = ENTITY_MINUS_UPDATE_P(op);
+                    if ( (entity_plus_update_p||entity_minus_update_p)
+                            && extended_integer_constant_expression_p(inc_v)) {
+                        int v = expression_to_int(inc_v);
+                        if (v != 0) {
+                            int sign = entity_plus_update_p ? 1 : -1 ;
+                            * pincrement = int_to_expression(sign * v);
+                            success = TRUE;
+                            if (v > 0 ) {
+                                * is_increasing_p = entity_plus_update_p;
+                                pips_debug(5, "Found += with positive increment!\n");
+                            }
+                            else {
+                                * is_increasing_p = entity_minus_update_p;
+                                pips_debug(5, "Found += with negative increment!\n");
+                            }
+                        }
+                    }
+                    else {
+                        /* Look for "i = i + v" (only for v positive here...)
+                           or "i = v + i": */
+                        expression inc_v = expression_verbose_reduction_p_and_return_increment(incr, add_expression_p);
+                        if (inc_v != expression_undefined
+                                && extended_integer_constant_expression_p(inc_v)) {
+                            int v = expression_to_int(inc_v);
+                            if (v != 0) {
+                                * pincrement = inc_v;
+                                success = TRUE;
+                                if (v > 0 ) {
+                                    * is_increasing_p = TRUE;
+                                    pips_debug(5, "Found \"i = i + v\" or \"i = v + i\" with positive increment!\n");
+                                }
+                                else {
+                                    * is_increasing_p = FALSE;
+                                    pips_debug(5, "Found \"i = i + v\" or \"i = v + i\" with negative increment!\n");
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
-  }
-  return success;
+    return success;
 }
 
 
