@@ -21,7 +21,7 @@
 # along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-# creates a coherent branch or tag for all of pips
+# creates a coherent branch/tag/snapshot for all of pips
 #
 # TODO
 # - check svn version, should be at least 1.5
@@ -64,9 +64,9 @@ function usage()
     "  -R rev: set per repository revision\n" \
     "    -R 'nlpmake=941 newgen=964 linear=1272 pips=13589 validation=377'\n" \
     "  source: directory 'trunk', 'branches/something'...\n" \
-    "  type: 'branches' or 'tags'\n" \
+    "  type: 'branches', 'tags' or 'snapshots'\n" \
     "  name: must be unique among tags or branches for the bundle\n" \
-    "        it may include a subdirectory: 'fabien/test'\n" \
+    "        it may include a subdirectory: 'calvin/test'\n" \
     "Examples:\n" \
     "  dry run: $script trunk branches 1.0.x\n" \
     "  then do; $script -D trunk branches 1.0.x\n" \
@@ -134,8 +134,8 @@ done
 src=$1 type=$2 name=$3
 shift 3
 
-[[ $type = 'branches' || $type = 'tags' ]] || \
-  usage 3 "type argument must be 'branches' or 'tags'"
+[[ $type = 'branches' || $type = 'tags' || $type = 'snapshots' ]] || \
+  usage 3 "type argument must be 'branches', 'tags' or 'snapshots'"
 
 # should it always be trunk?
 [[ $src == trunk || $src == branches/* ]] || \
