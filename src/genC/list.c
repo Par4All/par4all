@@ -711,6 +711,8 @@ list gen_cons(const void * item, const list next)
 list gen_typed_cons(_int type, const void * item, const list next)
 {
   NEWGEN_CHECK_TYPE(type, item);
+  // also check consistency with first item in list
+  if (next!=NIL) NEWGEN_CHECK_TYPE(type, next->car.e);
   return gen_cons(item, next);
 }
 
