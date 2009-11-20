@@ -1,7 +1,7 @@
 
 PARSED PRINTED FILE
 
-void pretty()
+void pretty(int n)
 {
    char *p;
 
@@ -27,7 +27,7 @@ break_1:   ;
 
 PRINTED FILE
 
-void pretty()
+void pretty(int n)
 {
    char *p;
    if (n==1) goto switch_1_case_1;
@@ -64,7 +64,7 @@ break_1:   ;
 
 printed file after RESTRUCTURE_CONTROL
 
-void pretty()
+void pretty(int n)
 {
    char *p;
    if (n==1) goto switch_1_case_1;

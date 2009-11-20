@@ -44,5 +44,12 @@ End of declarations for module decl15!
 
 Parsed printed file for "decl15!"
 
+
+
+
 typedef unsigned int wint_t;
-typedef struct {int __count; union {wint_t __wch; char __wchb[4];} __value;} __mbstate_t;
+/* Value so far.  */
+typedef struct {
+   int __count;
+   union {wint_t __wch; char __wchb[4];} __value;
+} __mbstate_t;

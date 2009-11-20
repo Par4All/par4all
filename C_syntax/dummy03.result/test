@@ -4,15 +4,19 @@ Parsed printed file for "dummy03!"
 struct englobing {
    struct {int a; int b;} c;
    int d;
-};
-struct englobing x;
-struct {int e; int f;} foo(void);
+} x;
+struct {
+   int e;
+   int f;
+} foo(void);
 
 Printed file for "dummy03!"
 
 struct englobing {
    struct {int a; int b;} c;
    int d;
-};
-struct englobing x;
-struct {int e; int f;} foo(void);
+} x;
+struct {
+   int e;
+   int f;
+} foo(void);

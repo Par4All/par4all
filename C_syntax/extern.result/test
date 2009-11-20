@@ -1,17 +1,22 @@
+
+
+
 extern void sc_to_matrices();
 extern int a[10];
-struct foo {
+extern struct foo {
    int mem;
-};
-extern struct foo x;
+} x;
+
 extern struct foo y;
-extern int (*potentials[10])();
-extern int (*forces[10])();
-extern int nused;
+
+
+extern int (*potentials[10])(),  (*forces[10])(),  nused;
+
 extern int foo();
 int foo()
 {
    extern int i;
+   /* Yes, a function may be declared inside itself... */
    extern int foo();
    extern int (*p)();
    extern int (*f)();

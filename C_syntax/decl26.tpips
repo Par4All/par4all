@@ -19,6 +19,6 @@ echo
 display PARSED_PRINTED_FILE[decl26!]
 
 close
-delete decl26
+#delete decl26
 
 quit

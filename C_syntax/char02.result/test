@@ -6,10 +6,7 @@ main()
    char c1;
    unsigned char c2;
    signed char c3;
-   int i1;
-   int i2;
-   int i3;
-   int r;
+   int i1,  i2,  i3,  r;
 
    c1 = '\\';
    c2 = '\'';
@@ -32,10 +29,7 @@ main()
    char c1;
    unsigned char c2;
    signed char c3;
-   int i1;
-   int i2;
-   int i3;
-   int r;
+   int i1,  i2,  i3,  r;
 
 //  P() {}
 

@@ -4,7 +4,7 @@ Parsed code for "main"
 int main(void)
 {
    freia_data2d *imin;
-   int32_t measure_min, int32_t measure_vol;
+   int32_t measure_min, measure_vol;
 
    freia_aipo_global_vol(imin, &measure_vol);
 

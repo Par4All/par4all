@@ -961,10 +961,10 @@ Boston, MA 02111-1307, USA.  */
 typedef long wchar_t;
 typedef unsigned int wint_t;
 /* Value so far.  */
-typedef union {
-   wint_t __wch;
-   char __wchb[4];
-} struct {int __count; union {wint_t __wch; char __wchb[4];} __value;}, __mbstate_t;
+typedef struct {
+   int __count;
+   union {wint_t __wch; char __wchb[4];} __value;
+} __mbstate_t;
 
 
 
@@ -1401,10 +1401,10 @@ typedef struct __gconv_info {
    struct __gconv_step *__steps;
    struct __gconv_step_data __data[1];
 } *__gconv_t;
-typedef struct {
+typedef union {
    struct __gconv_info __cd;
-   struct __gconv_step_data __data;
-} union {struct __gconv_info __cd; struct {struct __gconv_info __cd; struct __gconv_step_data __data;} __combined;}, _G_iconv_t;
+   struct {struct __gconv_info __cd; struct __gconv_step_data __data;} __combined;
+} _G_iconv_t;
 
 typedef int _G_int16_t;
 typedef int _G_int32_t;
