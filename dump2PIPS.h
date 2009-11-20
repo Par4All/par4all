@@ -110,6 +110,9 @@ gfc_symtree* getSymtreeByName (char* name, gfc_symtree *st);
 
 newgen_list gfc2pips_vars(gfc_namespace *ns);
 newgen_list gfc2pips_vars_(gfc_namespace *ns,newgen_list variables_p);
+newgen_list gfc2pips_get_extern_entities(gfc_namespace *ns);
+newgen_list gfc2pips_get_data_vars(gfc_namespace *ns);
+newgen_list gfc2pips_get_save(gfc_namespace *ns);
 
 newgen_list gfc2pips_get_list_of_dimensions(gfc_symtree *st);
 newgen_list gfc2pips_get_list_of_dimensions2(gfc_symbol *s);
@@ -124,12 +127,15 @@ newgen_list getSymbolBy(gfc_namespace* ns, gfc_symtree *st, bool (*func)(gfc_nam
  */
 bool gfc2pips_test_variable(gfc_namespace* ns, gfc_symtree *st);
 bool gfc2pips_test_variable2(gfc_namespace* ns, gfc_symtree *st );
+bool gfc2pips_test_extern(gfc_namespace* ns, gfc_symtree *st );
 //bool gfc2pips_test_name(gfc_namespace* ns, gfc_symtree *st, int param);
 bool gfc2pips_test_data(gfc_namespace* __attribute__ ((__unused__)) ns, gfc_symtree *st );
+bool gfc2pips_test_save(gfc_namespace* __attribute__ ((__unused__)) ns, gfc_symtree *st );
 bool gfc2pips_get_commons(gfc_namespace* __attribute__ ((__unused__)) ns, gfc_symtree* __attribute__ ((__unused__)) st );
 bool gfc2pips_test_dimensions(gfc_namespace* __attribute__ ((__unused__)) ns, gfc_symtree* st );
 
 entity gfc2pips_symbol2entity(gfc_symbol* sym);
+entity gfc2pips_symbol2entity2(gfc_symbol* sym);
 entity gfc2pips_char2entity(char*p, char* s);
 
 /*
@@ -173,6 +179,8 @@ entity gfc2pips_expr2entity(gfc_expr *expr);
 //translate an expression or a value of a IO statement
 newgen_list gfc2pips_exprIO(char* s, gfc_expr* e, newgen_list l);
 newgen_list gfc2pips_exprIO2(char* s, int e, newgen_list l);
+
+newgen_list gfc2pips_arglist2arglist(gfc_actual_arglist *act);
 
 void gfc2pips_initAreas();
 

@@ -28,7 +28,7 @@ along with GCC; see the file COPYING3.  If not see
 #include "debug.h"
 
 #include "dump2PIPS.h"
-int gfc2pips_nb_of_statements = 0;
+int gfc2pips_nb_of_statements = 1;
 gfc2pips_comments gfc2pips_comments_stack;
 gfc2pips_comments gfc2pips_comments_stack_;
 
@@ -813,7 +813,7 @@ next_statement (void)
   gfc_new_block = NULL;
 
 
-  gfc2pips_set_last_comments_done(gfc2pips_nb_of_statements++);
+  gfc2pips_set_last_comments_done(gfc2pips_nb_of_statements);
 
   //fprintf(stdout,"next_statement\n");
   gfc_current_ns->old_cl_list = gfc_current_ns->cl_list;
@@ -1463,6 +1463,7 @@ main_program_symbol (gfc_namespace *ns, const char *name)
 static void
 accept_statement (gfc_statement st)
 {
+	gfc2pips_nb_of_statements++;
   switch (st)
     {
     case ST_USE:
@@ -2643,7 +2644,6 @@ parse_if_block (void)
   locus else_locus;
   gfc_state_data s;
   int seen_else,seen_elseif;
-  gfc2pips_nb_of_statements++;
 
   seen_elseif = seen_else = 0;
   accept_statement (ST_IF_BLOCK);
@@ -2659,6 +2659,7 @@ parse_if_block (void)
   top->block = d;
   //make appear the first comment of a if block if there are several instructions in the block
   gfc2pips_replace_comments_num(gfc2pips_nb_of_statements-1,gfc2pips_nb_of_statements);
+  gfc2pips_nb_of_statements++;
   //we still have a problem if there only is one instruction
   unsigned long current_num = gfc2pips_nb_of_statements;
   fprintf(stderr,"gfc2pips_nb_of_statements: begin %d\n",gfc2pips_nb_of_statements);
@@ -2699,14 +2700,14 @@ parse_if_block (void)
 	      break;
 	    }
 
-	  if(gfc2pips_comment_num_exists(gfc2pips_nb_of_statements-1)){
+	  /*if(gfc2pips_comment_num_exists(gfc2pips_nb_of_statements-1)){
 		  fprintf(stderr, "current indice of statements: %d\n", gfc2pips_nb_of_statements );
 		  //gfc2pips_replace_comments_num(gfc2pips_nb_of_statements-2,gfc2pips_nb_of_statements-1);
 		  //gfc2pips_replace_comments_num(gfc2pips_nb_of_statements-1,gfc2pips_nb_of_statements-2);
 		  //gfc2pips_replace_comments_num(gfc2pips_nb_of_statements,gfc2pips_nb_of_statements-1);
 		  //gfc2pips_replace_comments_num(gfc2pips_nb_of_statements-1,gfc2pips_nb_of_statements);
 		 // gfc2pips_nb_of_statements-=2;
-	  }
+	  }*/
 	  seen_else = 1;
 	  else_locus = gfc_current_locus;
 
@@ -2727,11 +2728,12 @@ parse_if_block (void)
     }
   while (st != ST_ENDIF);
 
-  fprintf(stderr,"gfc2pips_nb_of_statements: near end %d\n",gfc2pips_nb_of_statements);
+  //fprintf(stderr,"gfc2pips_nb_of_statements: near end %d\n",gfc2pips_nb_of_statements);
   //see the right combination of seen_else and seen_elseif
-  if( seen_elseif || seen_else ) gfc2pips_nb_of_statements--;
-  if( seen_elseif && seen_else ) gfc2pips_nb_of_statements--;
-  fprintf(stderr,"gfc2pips_nb_of_statements: end %d\n",gfc2pips_nb_of_statements);
+  if( seen_elseif || seen_else ) gfc2pips_nb_of_statements-=2;
+  if( seen_elseif && !seen_else ) gfc2pips_nb_of_statements++;
+  if( !seen_elseif && !seen_else ) gfc2pips_nb_of_statements--;
+  //fprintf(stderr,"gfc2pips_nb_of_statements: end %d\n",gfc2pips_nb_of_statements);
 
   pop_state ();
   accept_statement (st);
@@ -3897,7 +3899,7 @@ loop:
   gfc_done_2 ();
   goto loop;
 
-done:
+done:return SUCCESS;
   gfc_end_source_files ();
   return SUCCESS;
 

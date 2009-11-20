@@ -104,31 +104,30 @@ void gfc2pips_namespace(gfc_namespace* ns){
 	main_entity_type bloc_token = -1;
 	////type returned
 	type bloc_type = make_type(is_type_void, UU);
+	string full_name = concatenate(TOP_LEVEL_MODULE_NAME, MODULE_SEP_STRING, MAIN_PREFIX, ns->proc_name->name, NULL);
+	gfc2pips_main_entity = gen_find_tabulated(full_name, entity_domain);
+	if(gfc2pips_main_entity!=entity_undefined){
+		//we have defined this entity already
+	}
+
 	if( root_sym->attr.is_main_program ){
 		debug(3, "gfc2pips_namespace", "main program founded %s\n",ns->proc_name->name);
-		gfc2pips_main_entity = make_empty_program(
-			str2upper((ns->proc_name->name))
-		);
-		message_assert("Main entity no created ! fuck you !",gfc2pips_main_entity!=entity_undefined);
+		//gfc2pips_main_entity = make_empty_program(str2upper((ns->proc_name->name)));
+		//message_assert("Main entity not created !\n",gfc2pips_main_entity!=entity_undefined);
 		bloc_token=MET_PROG;
 	}else if( root_sym->attr.subroutine ){
 		debug(3, "gfc2pips_namespace", "subroutine founded %s\n",ns->proc_name->name);
-		gfc2pips_main_entity = make_empty_subroutine(
-				str2upper((ns->proc_name->name))
-		);
+		//gfc2pips_main_entity = make_empty_subroutine(str2upper((ns->proc_name->name)));
 		bloc_token = MET_SUB;
 	}else if( root_sym->attr.function ){
 		debug(3, "gfc2pips_namespace", "function founded %s\n",ns->proc_name->name);
-		gfc2pips_main_entity = make_empty_function(
-			str2upper(ns->proc_name->name),
-			gfc2pips_symbol2type(root_sym)
-		);
+		//gfc2pips_main_entity = make_empty_function(str2upper(ns->proc_name->name),gfc2pips_symbol2type(root_sym));
+		//gfc2pips_main_entity = FindOrCreateEntity(CurrentPackage,ns->proc_name->name);
+		bloc_type = gfc2pips_symbol2type(root_sym);
 		bloc_token = MET_FUNC;
 	}else if(root_sym->attr.flavor == FL_BLOCK_DATA){
 		debug(3, "gfc2pips_namespace", "block data founded \n");
-		gfc2pips_main_entity = make_empty_blockdata(
-			str2upper((ns->proc_name->name))
-		);
+		//gfc2pips_main_entity = make_empty_blockdata(str2upper((ns->proc_name->name)));
 		bloc_token = MET_BLOCK;
 	}else{
 		debug(3, "gfc2pips_namespace", "not yet dumpable %s\n",ns->proc_name->name);
@@ -138,6 +137,8 @@ void gfc2pips_namespace(gfc_namespace* ns){
 		//set_current_module_entity(gfc2pips_main_entity);
 		return;
 	}
+	gfc2pips_main_entity = gfc2pips_symbol2entity(root_sym);
+
 	message_assert("Main entity no created !",gfc2pips_main_entity!=entity_undefined);
 	/*struct _newgen_struct_entity_ {
 	  intptr_t _type_;
@@ -159,8 +160,9 @@ void gfc2pips_namespace(gfc_namespace* ns){
 		parameters_name = gen_copy_seq(parameters);//we need a copy of the list of the entities of the parameters
 		while(parameters_p){
 			entity ent = parameters_p->car.e;
-			debug(8,"gfc2pips_namespace", "parameter founded: %s", entity_name(ent));
-			entity_storage(ent) = make_storage(is_storage_formal, make_formal(gfc2pips_main_entity, formal_offset));
+			debug(8,"gfc2pips_namespace", "parameter founded: %s\n", entity_name(ent));
+			//if(entity_storage(ent)==storage_undefined)
+				entity_storage(ent) = make_storage(is_storage_formal, make_formal(gfc2pips_main_entity, formal_offset));
 			/*if(formal_label_replacement_p(ent)){
 				entity_type(ent) = make_type(
 					is_type_variable,
@@ -222,32 +224,32 @@ void gfc2pips_namespace(gfc_namespace* ns){
 
 	//can it be removed ?
 	//common_size_map = hash_table_make(hash_pointer, 0);
-
 	set_current_module_entity(gfc2pips_main_entity);
-	gfc2pips_initAreas();
+	gfc2pips_initAreas();//Even if it is initialized by the defaults functions of PIPS, it is not the way we want it to be
 
 
 	//// declare commons
-	newgen_list commons,commons_p;
-	commons = commons_p = getSymbolBy(ns, ns->common_root,gfc2pips_get_commons);
+	newgen_list commons, commons_p;
+	commons = commons_p = getSymbolBy(ns, ns->common_root, gfc2pips_get_commons);
+	debug(2,"gfc2pips_namespace","%d common(s) founded\n",gen_length(commons));
 	while(commons_p){
 		gfc_symtree *st = (gfc_symtree*)commons_p->car.e;
-		debug(4,"gfc2pips_namespace","common founded: /%s/\n",st->name);
+		debug(3,"gfc2pips_namespace","common founded: /%s/\n",st->name);
 		entity com = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, st->name);
 		//com = make_common_entity(com);
 		entity_type(com) = make_type(is_type_area, make_area(0, NIL));
 		entity_storage(com) = make_storage(
 			is_storage_ram,
-			(make_ram(get_current_module_entity(),StaticArea, 0, NIL))
+			make_ram(get_current_module_entity(),StaticArea, 0, NIL)
 		);
-		entity_initial(com) = make_value_code(make_code(NIL,string_undefined,make_sequence(NIL),NIL));
+		entity_initial(com) = make_value_code(make_code(NIL,string_undefined,make_sequence(NIL),NIL,make_language_fortran()));
 		AddEntityToDeclarations(com, get_current_module_entity());
 		commons_p->car.e = com;
 		gfc_symbol *s = st->n.common->head;
 		int indice_common = stack_offset;
 		while(s){
 			//faire une fonction récursive qui permet de déclarer à l'envers la liste des élements du common ?
-			debug(5,"gfc2pips_namespace","element in common founded: %s\n",s->name);
+			debug(4,"gfc2pips_namespace","element in common founded: %s\n",s->name);
 			entity in_common_entity = gfc2pips_symbol2entity(s);
 			entity_storage(in_common_entity) = make_storage(
 				is_storage_ram,
@@ -265,7 +267,7 @@ void gfc2pips_namespace(gfc_namespace* ns){
 			s = s->common_next;
 		}
 		//area_layout(type_area(entity_type(com))) = gen_nreverse(area_layout(type_area(entity_type(com))));
-		debug(4,"gfc2pips_namespace","nb of elements in the common: %d\n",
+		debug(3,"gfc2pips_namespace","nb of elements in the common: %d\n",
 			gen_length(
 				area_layout(type_area(entity_type(com)))
 			)
@@ -333,16 +335,25 @@ void gfc2pips_namespace(gfc_namespace* ns){
 		//fprintf(stderr,"all entities: %s \n",((entity)CAR(complete_list_of_entities_p).e)->_entity_name_);
 		POP(complete_list_of_entities_p);
 	}
+	complete_list_of_entities = gen_concatenate(complete_list_of_entities,code_declarations(EntityCode(gfc2pips_main_entity)));
 
+
+	newgen_list list_of_extern_entities = gfc2pips_get_extern_entities(ns);
 
 	//we have to add the list of variables declared in the initial value of the main entity
+	//pb there is already some declared objects
+	//fprintf(stderr,"nb of extern: %d\n", gen_length(list_of_extern_entities) );
+	//complete_list_of_entities = gen_concatenate(complete_list_of_entities,list_of_extern_entities);//segfault plus loin
+	debug(3,"gfc2pips_namespace","nb of entities: %d\n",gen_length(complete_list_of_entities));
+
 	entity_initial(gfc2pips_main_entity) = make_value(
 		is_value_code,
 		make_code(
 			complete_list_of_entities,
 			strdup(""),
 			make_sequence(NIL),
-			NULL
+			list_of_extern_entities,
+			make_language_fortran()
 		)
 	);
 	/*struct _newgen_struct_entity_ {
@@ -682,8 +693,23 @@ newgen_list gfc2pips_vars_(gfc_namespace *ns,newgen_list variables_p){
 	return variables;
 }
 
+newgen_list gfc2pips_get_extern_entities(gfc_namespace *ns){
+	newgen_list list_of_extern,list_of_extern_p;
+	list_of_extern_p = list_of_extern = getSymbolBy(ns,ns->sym_root,gfc2pips_test_extern);
+	while(list_of_extern_p){
+		gfc_symtree* curr = list_of_extern_p->car.e;
+		entity e = gfc2pips_symbol2entity(curr->n.sym);
+		//entity_storage(e) = NULL;//on ne touche à rien, cela se mettera à jour automatiquement, en principe -_-
+		list_of_extern_p->car.e = e;
+		POP(list_of_extern_p);
+	}
+	return list_of_extern;
+}
 newgen_list gfc2pips_get_data_vars(gfc_namespace *ns){
 	return getSymbolBy(ns,ns->sym_root,gfc2pips_test_data);
+}
+newgen_list gfc2pips_get_save(gfc_namespace *ns){
+	return getSymbolBy(ns,ns->sym_root,gfc2pips_test_save);
 }
 
 
@@ -702,26 +728,7 @@ newgen_list gfc2pips_get_list_of_dimensions2(gfc_symbol *s){
 		const char *c;
 		debug(4,"gfc2pips_get_list_of_dimensions2","%s is an array\n",s->name);
 		if ( as!=NULL && as->rank != 0){
-
-			/*fprintf(stderr,"toto %d\n",as);
-			fprintf(stderr,"toto %d\n",as->upper);
-			fprintf(stderr,"toto %d\n",as->upper[i]);
-			fprintf(stderr,"toto %d\n",as->upper[i]->value);
-			fprintf(stderr,"toto %d\n",as->upper[i]->value.integer);
-			fprintf(stderr,"toto %d\n",as->upper[i]->value.integer[0]);
-			fprintf(stderr,"toto %d\n",as->upper[i]->value.integer[0]._mp_size);
-			fprintf(stderr,"toto %d\n",as->upper[i]->value.integer[0]._mp_alloc);
-			fprintf(stderr,"toto %d\n",as->upper[i]->value.integer[0]._mp_d);
-			fprintf(stderr,"\n");
-			*/
-			/*
-			 * show_expr (as->upper[i]);
-			 * mpz_out_str (stderr, 10, p->value.integer);
-			 * if (p->ts.kind != gfc_default_integer_kind)
-			 *   fprintf (dumpfile, "_%d", p->ts.kind);
-			 */
-
-			//le switch nous intéresse-t-il ? => oui très important il faut traduire chaque valeur de dimension du tableau en "truc" approprié newgen/PIPS
+			//according to the type of array we create different types of dimensions parameters
 			switch (as->type){
 				case AS_EXPLICIT:
 					c = strdup("AS_EXPLICIT");
@@ -794,12 +801,17 @@ bool gfc2pips_test_variable(gfc_namespace* ns, gfc_symtree *st ){
 			!st->n.sym->attr.implicit_type
 			|| st->n.sym->value//very important
 		)
+		&& !st->n.sym->attr.external
 		//&& !st->n.sym->attr.in_common
-		&& !st->n.sym->attr.pointer ;// && !st->n.sym->attr.dummy;
+		&& !st->n.sym->attr.pointer && !st->n.sym->attr.dummy;
 }
 bool gfc2pips_test_variable2(gfc_namespace* ns, gfc_symtree *st ){
 	if(!st || !st->n.sym) return false;
 	return st->n.sym->attr.flavor == EXPR_VARIABLE && !st->n.sym->attr.dummy;
+}
+bool gfc2pips_test_extern(gfc_namespace* ns, gfc_symtree *st ){
+	if(!st || !st->n.sym) return false;
+	return st->n.sym->attr.external || st->n.sym->attr.proc == PROC_EXTERNAL;
 }
 bool gfc2pips_test_allocatable(gfc_namespace *ns, gfc_symtree *st){
 	if(!st || !st->n.sym) return false;
@@ -813,6 +825,10 @@ bool gfc2pips_test_data(gfc_namespace* __attribute__ ((__unused__)) ns, gfc_symt
 	if(!st || !st->n.sym) return false;
 	return st->n.sym->value && st->n.sym->attr.flavor != FL_PARAMETER;
 }
+bool gfc2pips_test_save(gfc_namespace* __attribute__ ((__unused__)) ns, gfc_symtree *st ){
+	if(!st || !st->n.sym) return false;
+	return st->n.sym->attr.save != SAVE_NONE;
+}
 bool gfc2pips_get_commons(gfc_namespace* __attribute__ ((__unused__)) ns, gfc_symtree* __attribute__ ((__unused__)) st ){
 	return true;
 }
@@ -822,7 +838,44 @@ bool gfc2pips_test_dimensions(gfc_namespace* __attribute__ ((__unused__)) ns, gf
 }
 
 entity gfc2pips_symbol2entity(gfc_symbol* s){
-	entity e = FindOrCreateEntity(CurrentPackage,s->name);
+	entity e = entity_undefined;
+	bool module = false;
+	//string CurrentPackage_backup = CurrentPackage;
+	if( s->attr.flavor==FL_PROGRAM || s->attr.is_main_program ){
+		debug(9, "gfc2pips_symbol2entity", "create main program %s\n",s->name);
+		//CurrentPackage = TOP_LEVEL_MODULE_NAME;
+		e = make_empty_program(str2upper(s->name));
+		//CurrentPackage = CurrentPackage_backup;
+		module = true;
+	}else if(s->attr.function){
+		debug(9, "gfc2pips_symbol2entity", "create function %s\n",s->name);
+		//CurrentPackage = TOP_LEVEL_MODULE_NAME;
+		e = make_empty_function(str2upper(s->name),gfc2pips_symbol2type(s));
+		//CurrentPackage = CurrentPackage_backup;
+		module = true;
+	}else if(s->attr.subroutine){
+		debug(9, "gfc2pips_symbol2entity", "create subroutine %s\n",s->name);
+		//CurrentPackage = TOP_LEVEL_MODULE_NAME;
+		e = make_empty_subroutine(str2upper(s->name));
+		//CurrentPackage = CurrentPackage_backup;
+		module = true;
+	}else{
+		debug(9, "gfc2pips_symbol2entity", "create entity %s\n",s->name);
+		e = FindOrCreateEntity(CurrentPackage,str2upper(s->name));
+		if(entity_initial(e)==value_undefined) entity_initial(e) = MakeValueUnknown();
+		if(entity_type(e)==type_undefined) entity_type(e) = gfc2pips_symbol2type(s);
+		//if(entity_storage(e)==storage_undefined) entity_storage(e) = MakeStorageRom();
+	}
+	if(module){
+		entity_initial(e) = make_value(
+			is_value_code,
+			make_code(NULL,strdup(""),make_sequence(NIL),NULL, make_language_fortran())
+		);
+	}
+	return e;
+}
+entity gfc2pips_symbol2entity2(gfc_symbol* s){
+	entity e = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,str2upper(s->name));
 	if(entity_initial(e)==value_undefined) entity_initial(e) = MakeValueUnknown();
 	if(entity_type(e)==type_undefined) entity_type(e) = gfc2pips_symbol2type(s);
 	//if(entity_storage(e)==storage_undefined) entity_storage(e) = MakeStorageRom();
@@ -896,7 +949,7 @@ entity gfc2pips_real2entity(double r){
 }
 
 entity gfc2pips_logical2entity(bool b){
-	return MakeConstant(b?"1":"0",is_basic_logical);
+	return MakeConstant(b?".TRUE.":".FALSE.",is_basic_logical);
 }
 //escape all ' in the string
 char* gfc2pips_gfc_char_t2string(gfc_char_t *c, int nb){
@@ -1232,6 +1285,35 @@ instruction gfc2pips_code2instruction__TOP(gfc_namespace *ns, gfc_code* c){
 	}*/
 	//StoreEquivChain(<atom>)
 
+	newgen_list list_of_save = gfc2pips_get_save(ns);
+	//save_all_entities();//Syntax !!!
+	//fprintf(stderr,"list_of_save: %d\n",gen_length(list_of_save));
+	while(list_of_save){
+		// ProcessSave(<entity>); <=> MakeVariableStatic(<entity>,true)
+		// => balance le storage dans RAM, ram_section(r) = StaticArea
+		//fprintf(stderr,"%d\n",list_of_save->car.e);
+		//fprintf(stderr,"save %s\n",((gfc_symtree*)list_of_save->car.e)->n.sym->name);
+		entity curr_save = gfc2pips_symbol2entity(((gfc_symtree*)list_of_save->car.e)->n.sym);
+		//entity_type(curr_save) = make_type_area(<area>);
+		//entity g = local_name_to_top_level_entity(entity_local_name(curr_save));
+		if(	entity_storage(curr_save) == storage_undefined ){
+			entity_storage(curr_save) = make_storage(
+				is_storage_ram,
+				make_ram(get_current_module_entity(),StaticArea, UNKNOWN_RAM_OFFSET, NIL)
+			);
+			ProcessSave(curr_save);
+		}else if(
+			storage_ram_p(entity_storage(curr_save))
+			&& ram_section(storage_ram(entity_storage(curr_save))) == DynamicArea
+		){
+			ram_section(storage_ram(entity_storage(curr_save))) = StaticArea;
+			ram_offset(storage_ram(entity_storage(curr_save))) = UNKNOWN_RAM_OFFSET;
+			ProcessSave(curr_save);
+		}else{
+			pips_user_warning("Static entity(%s) not in the correct memory Area\n",entity_name(curr_save));
+		}
+		POP(list_of_save);
+	}
 	if( !c ){
 		//fprintf(stderr,"WE HAVE GOT A PROBLEM, SEQUENCE WITHOUT ANYTHING IN IT !\nSegfault soon ...\n");
 		return make_instruction_block(CONS(STATEMENT, make_stmt_of_instr(make_instruction_block(NULL)), NIL));
@@ -1464,7 +1546,7 @@ instruction gfc2pips_code2instruction_(gfc_code* c){
 
 		case EXEC_CALL:
 		case EXEC_ASSIGN_CALL:{
-			debug(5,"gfc2pips_code2instruction","Translation of CALL\n");
+			debug(5,"gfc2pips_code2instruction","Translation of %s\n",c->op==EXEC_CALL?"CALL":"ASSIGN_CALL");
 			entity called_function = entity_undefined;
 			char * str = NULL;
 			if(c->resolved_sym){
@@ -1478,37 +1560,27 @@ instruction gfc2pips_code2instruction_(gfc_code* c){
 			if(strncmp("_gfortran_",str,strlen("_gfortran_"))==0){
 				str = str2upper(strdup("exit"));
 			}
-			called_function = FindOrCreateEntity(CurrentPackage, str);
-			newgen_list list_of_arguments = NULL,list_of_arguments_p = NULL;
-			gfc_actual_arglist *act=c->ext.actual;
-
-			while(act){
-				expression ex = gfc2pips_expr2expression(act->expr);
-
-				if(ex!=entity_undefined){
-
-					if(list_of_arguments_p){
-						CDR(list_of_arguments_p) = CONS(EXPRESSION,ex,NIL);
-						list_of_arguments_p = CDR(list_of_arguments_p);
-					}else{
-						list_of_arguments_p = CONS(EXPRESSION,ex,NIL);
-					}
-				}
-				if(list_of_arguments==NULL)list_of_arguments = list_of_arguments_p;
-
-				act = act->next;
-			}
+			//called_function = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, str);
+			called_function = gfc2pips_symbol2entity(c->resolved_sym? c->resolved_sym : c->symtree->n.sym);//FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, str);
+			if(entity_storage(called_function) = storage_undefined)
+				entity_storage(called_function) = MakeStorageRom();
+			newgen_list list_of_arguments = gfc2pips_arglist2arglist(c->ext.actual);
+			if(entity_initial(called_function) = entity_undefined)
+			//	entity_initial(called_function) = make_value_unknown();//
 			entity_initial(called_function) = make_value(is_value_intrinsic, called_function );
 			//entity_initial(e) = make_value(is_value_constant,make_constant(is_constant_int, (void *) CurrentTypeSize));
-			entity_type(called_function) = make_type(is_type_functional,make_functional(NIL, MakeOverloadedResult()));
+			if(entity_type(called_function)==type_undefined)
+				entity_type(called_function) = make_type(is_type_functional, make_functional(NIL, MakeOverloadedResult()) );
 			call call_ = make_call(called_function, list_of_arguments);
 
 /*
+		set_alternate_returns();
 	    $$ = MakeCallInst(
 			<entity: called function>,
 			parameters
 		);
 		reset_alternate_returns();
+
  */
 			return make_instruction(is_instruction_call, call_);
 		}break;
@@ -1521,12 +1593,20 @@ instruction gfc2pips_code2instruction_(gfc_code* c){
 
 		show_actual_arglist (c->ext.actual);
 		break;
-
-	    case EXEC_COMPCALL:
-	      fputs ("CALL ", dumpfile);
-	      show_compcall (c->expr);
-	      break;
 */
+	    case EXEC_COMPCALL:{
+	    	//Function (or subroutine) call of a procedure pointer component or type-bound procedure
+	    	debug(5,"gfc2pips_code2instruction","Translation of COMPCALL\n");
+	      /*
+	      fputs ("CALL ", dumpfile);
+	      //show_compcall (c->expr);
+		  fprintf (dumpfile, "%s", p->symtree->n.sym->name);
+		  show_ref (p->ref);
+		  fprintf (dumpfile, "%s", p->value.compcall.name);
+	      show_actual_arglist (p->value.compcall.actual);
+	      */
+	   	    }break;
+
 		case EXEC_RETURN:{//we shouldn't even dump that for main entities
 			debug(5,"gfc2pips_code2instruction","Translation of return\n");
 			return instruction_undefined;
@@ -2216,7 +2296,10 @@ instruction gfc2pips_code2instruction_(gfc_code* c){
 
 	    	newgen_list list_of_arguments,list_of_arguments_p;
 	    	list_of_arguments = list_of_arguments_p = NULL;
-			for (c = c->block->next; c; c = c->next){
+	    	if(c->block->next->expr == NULL){
+	    		//check we have a DO
+	    	}
+			for (c = c->block->next; c && c->expr ; c = c->next){
 				if(c->expr){
 					expression ex = gfc2pips_expr2expression(c->expr);
 					if( ex!=entity_undefined && ex!=NULL ){
@@ -2226,13 +2309,14 @@ instruction gfc2pips_code2instruction_(gfc_code* c){
 						}else{
 							list_of_arguments = list_of_arguments_p = CONS(EXPRESSION,ex,NULL);
 						}
-					}
-				}
+					}//else{fprintf(stderr,"boum1\n");}
+				}//else{fprintf(stderr,"boum2\n");}
+				//fprintf(stderr,"boum3\n");
 			}
 			list_of_arguments = gen_nreverse(list_of_arguments);
 			entity_initial(e) = make_value( is_value_intrinsic, e );
 			entity_type(e) = make_type(is_type_functional, make_functional(NIL, MakeOverloadedResult()) );
-			call call_ = make_call(e, list_of_arguments);
+			//call call_ = make_call(e, list_of_arguments);
 			expression std, format, unite, f;
 			newgen_list lci;
 
@@ -2538,6 +2622,7 @@ instruction gfc2pips_symbol2data_instruction(gfc_symbol *sym){
 		gfc2pips_string2expression(sym->name),
 		NULL
 	);/**/
+	//if(sym->component_access)
 
 	//list of variables used int the data statement
 	newgen_list init = CONS( EXPRESSION, make_call_expression( e1, args1 ), NULL );
@@ -2748,7 +2833,8 @@ expression gfc2pips_expr2expression(gfc_expr *expr){
 					*/}else if(r->type==REF_SUBSTRING){
 						entity ent = FindOrCreateEntity(CurrentPackage,str2upper(strdup(expr->symtree->n.sym->name)));
 						entity_type(ent) = gfc2pips_symbol2type(expr->symtree->n.sym);
-						entity_storage(ent) = MakeStorageRom();fprintf(stderr,"expr2expression ROM %s\n",expr->symtree->n.sym->name);
+						if(entity_storage(ent)==storage_undefined)
+							entity_storage(ent) = MakeStorageRom();fprintf(stderr,"expr2expression ROM %s\n",expr->symtree->n.sym->name);
 						entity_initial(ent) = MakeValueUnknown();
 						expression ref = make_expression(
 							make_syntax(is_syntax_reference,
@@ -2796,32 +2882,12 @@ expression gfc2pips_expr2expression(gfc_expr *expr){
 				case BT_INTEGER: e = gfc2pips_int2expression(mpz_get_si(expr->value.integer)); break;
 				case BT_LOGICAL: e = gfc2pips_logical2expression(expr->value.logical); break;
 				case BT_REAL:
-					/*fprintf(stderr,"%f\n",mpfr_get_d(expr->value.real,GFC_RND_MODE));
-					fprintf(stderr,"expr->where.nextc\t %s\n",expr->where.nextc);
-					fprintf(stderr,"expr->where.lb->dbg_emitted\t %d\n",expr->where.lb->dbg_emitted);
-
-					fprintf(stderr,"expr->where.lb->file->filename\t %s\n",expr->where.lb->file->filename);
-					fprintf(stderr,"expr->where.lb->file->inclusion_line\t %d\n",expr->where.lb->file->inclusion_line);
-					fprintf(stderr,"expr->where.lb->file->line\t %d\n",expr->where.lb->file->line);
-					fprintf(stderr,"expr->ref\t %d\n",expr->ref);
-
-
-					fprintf(stderr,"expr->where.lb->line\t %s\n",expr->where.lb->line);
-					fprintf(stderr,"expr->where.lb->location\t %d\n",expr->where.lb->location);//c'est un chiffre qui dépend de la ligne et de  ??? => trouver comment il est calculé
-					fprintf(stderr,"expr->where.lb->truncated\t %d\n",expr->where.lb->truncated);//établi si la ligne a été coupée lors du parse
-*/
 					//convertir le real en qqch de correct au niveau sortie
 					e = gfc2pips_real2expression(mpfr_get_d(expr->value.real,GFC_RND_MODE));
 				break;
 				case BT_CHARACTER:{
 					char *char_expr = gfc2pips_gfc_char_t2string(expr->value.character.string,expr->value.character.length);
 					e = MakeCharacterConstantExpression(char_expr);
-					/*fprintf(
-						stderr,
-						"string(%d) %s\n",
-						strlen(expr->value.character.string),
-						char_expr
-					);*/
 					//free(char_expr);
 				}break;
 				case BT_COMPLEX:
@@ -2892,7 +2958,7 @@ expression gfc2pips_expr2expression(gfc_expr *expr){
 			}
 		break;
 		case EXPR_ARRAY:
-			debug(5,"gfc2pips_expr2expression","array\n");
+			debug(5,"gfc2pips_expr2expression","\n\narray\n\n");
 
 			//show_constructor (p->value.constructor);
 			//show_ref (p->ref);
@@ -2949,6 +3015,27 @@ entity gfc2pips_expr2entity(gfc_expr *expr){
 	message_assert("No entity to extract from this expression",0);
 }
 
+newgen_list gfc2pips_arglist2arglist(gfc_actual_arglist *act){
+	newgen_list list_of_arguments = NULL,list_of_arguments_p = NULL;
+	while(act){
+		expression ex = gfc2pips_expr2expression(act->expr);
+
+		if(ex!=entity_undefined){
+
+			if(list_of_arguments_p){
+				CDR(list_of_arguments_p) = CONS(EXPRESSION,ex,NIL);
+				list_of_arguments_p = CDR(list_of_arguments_p);
+			}else{
+				list_of_arguments_p = CONS(EXPRESSION,ex,NIL);
+			}
+		}
+		if(list_of_arguments==NULL)list_of_arguments = list_of_arguments_p;
+
+		act = act->next;
+	}
+	return list_of_arguments;
+}
+
 newgen_list gfc2pips_exprIO(char* s, gfc_expr* e, newgen_list l){
 	return CONS(EXPRESSION, MakeCharacterConstantExpression(s),
 		CONS(EXPRESSION, gfc2pips_expr2expression(e), l )
@@ -2961,32 +3048,36 @@ newgen_list gfc2pips_exprIO2(char* s, int e, newgen_list l){
 }
 
 void gfc2pips_initAreas(){
-    DynamicArea = FindOrCreateEntity(CurrentPackage, DYNAMIC_AREA_LOCAL_NAME);
-    entity_type(DynamicArea) = make_type(is_type_area, make_area(0, NIL));
+	DynamicArea = FindOrCreateEntity(CurrentPackage, DYNAMIC_AREA_LOCAL_NAME);
+//	DynamicArea = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, DYNAMIC_AREA_LOCAL_NAME);
+	entity_type(DynamicArea) = make_type(is_type_area, make_area(0, NIL));
     entity_storage(DynamicArea) = MakeStorageRom();
     entity_initial(DynamicArea) = MakeValueUnknown();
-//    AddEntityToDeclarations(DynamicArea, get_current_module_entity());
+    AddEntityToDeclarations(DynamicArea, get_current_module_entity());
 //    set_common_to_size(DynamicArea, 0);
 
     StaticArea = FindOrCreateEntity(CurrentPackage, STATIC_AREA_LOCAL_NAME);
+//    StaticArea = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, STATIC_AREA_LOCAL_NAME);
     entity_type(StaticArea) = make_type(is_type_area, make_area(0, NIL));
     entity_storage(StaticArea) = MakeStorageRom();
     entity_initial(StaticArea) = MakeValueUnknown();
-//    AddEntityToDeclarations(StaticArea, get_current_module_entity());
+    AddEntityToDeclarations(StaticArea, get_current_module_entity());
 //  set_common_to_size(StaticArea, 0);
 
     HeapArea = FindOrCreateEntity(CurrentPackage, HEAP_AREA_LOCAL_NAME);
+//    HeapArea = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, HEAP_AREA_LOCAL_NAME);
     entity_type(HeapArea) = make_type(is_type_area, make_area(0, NIL));
     entity_storage(HeapArea) = MakeStorageRom();
     entity_initial(HeapArea) = MakeValueUnknown();
-//    AddEntityToDeclarations(HeapArea, get_current_module_entity());
+    AddEntityToDeclarations(HeapArea, get_current_module_entity());
 //  set_common_to_size(HeapArea, 0);
 
     StackArea = FindOrCreateEntity(CurrentPackage, STACK_AREA_LOCAL_NAME);
+//    StackArea = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, STACK_AREA_LOCAL_NAME);
     entity_type(StackArea) = make_type(is_type_area, make_area(0, NIL));
     entity_storage(StackArea) = MakeStorageRom();
     entity_initial(StackArea) = MakeValueUnknown();
-//    AddEntityToDeclarations(StackArea, get_current_module_entity());
+    AddEntityToDeclarations(StackArea, get_current_module_entity());
 //    set_common_to_size(StackArea, 0);
 
 }
@@ -3093,7 +3184,7 @@ void gfc2pips_push_comment(locus l, unsigned long num, char s){
 		gfc2pips_comments_stack->next = NULL;
 		gfc2pips_comments_stack_ = gfc2pips_comments_stack;
 	}
-	//fprintf(stderr,"push comments\n");
+	//fprintf(stderr,"push comments %d\n",l.lb->location);
 
 	gfc2pips_comments_stack->l = l;
 	gfc2pips_comments_stack->num = num;
@@ -3224,7 +3315,7 @@ void gfc2pips_assign_gfc_code_to_last_comments(gfc_code *c){
 void gfc2pips_replace_comments_num(unsigned long old, unsigned long new){
 	gfc2pips_comments retour = gfc2pips_comments_stack;
 	bool if_changed = false;
-	fprintf(stderr,"gfc2pips_replace_comments_num: replace %d by %d\n", old, new );
+	//fprintf(stderr,"gfc2pips_replace_comments_num: replace %d by %d\n", old, new );
 	while(retour){
 		if(retour->num==old){
 			if_changed = true;
@@ -3244,7 +3335,7 @@ void gfc2pips_assign_gfc_code_to_num_comments(gfc_code *c, unsigned long num){
 }
 bool gfc2pips_comment_num_exists(unsigned long num){
 	gfc2pips_comments retour = gfc2pips_comments_stack;
-	fprintf(stderr,"gfc2pips_comment_num_exists: %d\n", num );
+	//fprintf(stderr,"gfc2pips_comment_num_exists: %d\n", num );
 	while(retour){
 		if(retour->num==num)return true;
 		retour = retour->prev;
