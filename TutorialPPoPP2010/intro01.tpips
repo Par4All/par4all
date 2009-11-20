@@ -1,0 +1,9 @@
+delete my_ws
+create my_ws \
+    intro01.c
+
+apply UNSPLIT
+
+close
+quit
+
