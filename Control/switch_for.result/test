@@ -1,7 +1,6 @@
 void gl_enable()
 {
-   int cap;
-   int p;
+   int cap,  p;                                                         /*0004*/
    if (cap==1) {
    }
    else {
@@ -9,7 +8,7 @@ void gl_enable()
    }
 switch_1_case_1:   ;
    p = 0;                                                               /*0009*/
-   if (!(p<6)) {                                                               /*0009*/
+   if (!(p<6)) {                                                        /*0009*/
    }
 break_2:   ;
 break_1:   ;

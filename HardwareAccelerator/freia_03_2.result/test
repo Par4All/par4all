@@ -3,13 +3,14 @@
 
 freia_status freia_03(freia_data2d *o, freia_data2d *i0, freia_data2d *i1, int32_t c1, int32_t c2, int32_t c3, int32_t c4, int32_t c5)
 {
-   freia_data2d *t1 = freia_common_create_data(16, 128, 128);
-   freia_data2d *t2 = freia_common_create_data(16, 128, 128);
-   freia_data2d *t3 = freia_common_create_data(16, 128, 128);
-   freia_data2d *t4 = freia_common_create_data(16, 128, 128);
-   freia_data2d *t5 = freia_common_create_data(16, 128, 128);
-   freia_data2d *t6 = freia_common_create_data(16, 128, 128);
-   freia_data2d *t7 = freia_common_create_data(16, 128, 128);
+   
+   
+   
+   
+   
+   
+   
+   freia_data2d *t1 = freia_common_create_data(16, 128, 128), *t2 = freia_common_create_data(16, 128, 128), *t3 = freia_common_create_data(16, 128, 128), *t4 = freia_common_create_data(16, 128, 128), *t5 = freia_common_create_data(16, 128, 128), *t6 = freia_common_create_data(16, 128, 128), *t7 = freia_common_create_data(16, 128, 128);     /*0014*/
    
    // 1 pipeline call is enough
    // t1 = f(i0)
@@ -422,11 +423,14 @@ freia_status freia_03_helper_0_0_3(freia_data2d * o0, freia_data2d * i0, int32_t
 
 freia_status freia_03(freia_data2d *o, freia_data2d *i0, freia_data2d *i1, int32_t c1, int32_t c2, int32_t c3, int32_t c4, int32_t c5)
 {
-   freia_data2d *t1 = freia_common_create_data(16, 128, 128);
-   freia_data2d *t2 = freia_common_create_data(16, 128, 128);
-   freia_data2d *t3 = freia_common_create_data(16, 128, 128);
-   freia_data2d *t4 = freia_common_create_data(16, 128, 128);
-   freia_data2d *t6 = freia_common_create_data(16, 128, 128);
+   
+   
+   
+   
+   
+   
+   
+   freia_data2d *t1 = freia_common_create_data(16, 128, 128), *t2 = freia_common_create_data(16, 128, 128), *t3 = freia_common_create_data(16, 128, 128), *t4 = freia_common_create_data(16, 128, 128), *t6 = freia_common_create_data(16, 128, 128);       /*0014*/
    
    // 1 pipeline call is enough
    // t1 = f(i0)

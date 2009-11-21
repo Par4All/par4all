@@ -3,10 +3,10 @@ Source code with proper effects
 
 void assign02()
 {
-   int i = 1;
-   int j;
-   int k;
-   int n;
+   int i = 1;                                                           /*0004*/
+   int j;                                                               /*0005*/
+   int k;                                                               /*0006*/
+   int n;                                                               /*0007*/
 //               <must be read   >: n
 //               <must be written>: n
 
@@ -32,10 +32,10 @@ Source code with cumulated effects
 
 void assign02()
 {
-   int i = 1;
-   int j;
-   int k;
-   int n;
+   int i = 1;                                                           /*0004*/
+   int j;                                                               /*0005*/
+   int k;                                                               /*0006*/
+   int n;                                                               /*0007*/
 //               <must be read   >: n
 //               <must be written>: n
 
@@ -64,10 +64,10 @@ Source code with transformers
 
 void assign02()
 {
-   int i = 1;
-   int j;
-   int k;
-   int n;
+   int i = 1;                                                           /*0004*/
+   int j;                                                               /*0005*/
+   int k;                                                               /*0006*/
+   int n;                                                               /*0007*/
 
 //  T(n) {n==n#init+1}
 
@@ -103,10 +103,10 @@ Source code with preconditions
 
 void assign02()
 {
-   int i = 1;
-   int j;
-   int k;
-   int n;
+   int i = 1;                                                           /*0004*/
+   int j;                                                               /*0005*/
+   int k;                                                               /*0006*/
+   int n;                                                               /*0007*/
 
 //  P() {i==1}
 

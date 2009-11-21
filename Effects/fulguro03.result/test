@@ -1,13 +1,13 @@
 void flgr2d_set_data_vector_fgUINT16(FLGR_Data2D *dat, int row, int col, FLGR_Vector *vct)
 {
-   fgUINT16 *array_s = (fgUINT16 *) vct->array;
-   fgUINT16 *array_d = (fgUINT16 *) (dat->array)[row];
-   int I_0 = vct->spp;
+   fgUINT16 *array_s = (fgUINT16 *) vct->array;                         /*0015*/
+   fgUINT16 *array_d = (fgUINT16 *) (dat->array)[row];                  /*0016*/
+   int I_0 = vct->spp;                                                  /*0017*/
    {
-      register fgUINT16 val;
-      register int i;
-      register int k;
-      unsigned short _return0;
+      register fgUINT16 val;                                            /*0019*/
+      register int i;                                                   /*0020*/
+      register int k;                                                   /*0021*/
+      unsigned short _return0;                                          /*0022*/
 //               <must be read   >: I_0 col
 //               <must be written>: i k
       k = 0, i = col*I_0;
@@ -33,14 +33,14 @@ void flgr2d_set_data_vector_fgUINT16(FLGR_Data2D *dat, int row, int col, FLGR_Ve
 //               <must be read   >: col
 void flgr2d_set_data_vector_fgUINT16(FLGR_Data2D *dat, int row, int col, FLGR_Vector *vct)
 {
-   fgUINT16 *array_s = (fgUINT16 *) vct->array;
-   fgUINT16 *array_d = (fgUINT16 *) (dat->array)[row];
-   int I_0 = vct->spp;
+   fgUINT16 *array_s = (fgUINT16 *) vct->array;                         /*0015*/
+   fgUINT16 *array_d = (fgUINT16 *) (dat->array)[row];                  /*0016*/
+   int I_0 = vct->spp;                                                  /*0017*/
    {
-      register fgUINT16 val;
-      register int i;
-      register int k;
-      unsigned short _return0;
+      register fgUINT16 val;                                            /*0019*/
+      register int i;                                                   /*0020*/
+      register int k;                                                   /*0021*/
+      unsigned short _return0;                                          /*0022*/
 //               <must be read   >: I_0 col
 //               <must be written>: i k
       k = 0, i = col*I_0;

@@ -3,11 +3,12 @@
 
 freia_status freia_18(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 {
-   freia_data2d *u0 = freia_common_create_data(16, 128, 128);
-   freia_data2d *u1 = freia_common_create_data(16, 128, 128);
-   freia_data2d *u2 = freia_common_create_data(16, 128, 128);
-   freia_data2d *u3 = freia_common_create_data(16, 128, 128);
-   freia_data2d *t0 = freia_common_create_data(16, 128, 128);
+   
+   
+   
+   
+   
+   freia_data2d *u0 = freia_common_create_data(16, 128, 128), *u1 = freia_common_create_data(16, 128, 128), *u2 = freia_common_create_data(16, 128, 128), *u3 = freia_common_create_data(16, 128, 128), *t0 = freia_common_create_data(16, 128, 128);       /*0010*/
    
    // useless computations
    // u0 = i0 + i1
@@ -336,8 +337,12 @@ freia_status freia_18_helper_0_1_0(freia_data2d * o0, freia_data2d * o1, freia_d
 
 freia_status freia_18(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 {
-   freia_data2d *u2 = freia_common_create_data(16, 128, 128);
-   freia_data2d *u3 = freia_common_create_data(16, 128, 128);
+   
+   
+   
+   
+   
+   freia_data2d *u2 = freia_common_create_data(16, 128, 128), *u3 = freia_common_create_data(16, 128, 128);          /*0010*/
    
    // useless computations
    // u0 = i0 + i1

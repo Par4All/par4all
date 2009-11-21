@@ -3,8 +3,7 @@ Parsed code for "call11"
 
 void call11(int n, int m, int x[n][m])
 {
-   int i;
-   int j;
+   int i,  j;
 
    for (i = 0;i<n;i++)
       for (j = 0;j<m;j++)
@@ -15,8 +14,7 @@ Code for "call11"
 
 void call11(int n, int m, int x[n][m])
 {
-   int i;
-   int j;
+   int i,  j;
 
    for(i = 0; i <= n-1; i += 1)
       for(j = 0; j <= m-1; j += 1)
@@ -27,8 +25,7 @@ Proper effects for "call11"
 
 void call11(int n, int m, int x[n][m])
 {
-   int i;
-   int j;
+   int i,  j;
 //               <must be read   >: n
 //               <must be written>: i
 
@@ -47,8 +44,7 @@ Cumulated effects for "call11"
 //               <must be read   >: m n
 void call11(int n, int m, int x[n][m])
 {
-   int i;
-   int j;
+   int i,  j;
 //               <may be read    >: i j m
 //               <may be written >: j x[*][*]
 //               <must be read   >: n
@@ -74,8 +70,7 @@ main()
    int d3 = 10;
    int d4 = 10;
    int y[d1][d2][d3][d4];
-   int i;
-   int j;
+   int i,  j;
 //               <may be read    >: d2 d3 d4 i j
 //               <may be written >: j y[*][*][*][*]
 //               <must be read   >: d1
@@ -99,8 +94,7 @@ Regions for "call11"
 
 void call11(int n, int m, int x[n][m])
 {
-   int i;
-   int j;
+   int i,  j;
 
 //  <x[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1+1<=n, 0<=PHI2, PHI2+1<=m}>
 
@@ -127,8 +121,7 @@ main()
    int d3 = 10;
    int d4 = 10;
    int y[d1][d2][d3][d4];
-   int i;
-   int j;
+   int i,  j;
 
 //  <y[PHI1][PHI2][PHI3]-W-EXACT-{0<=PHI3, PHI3+1<=d3, 0<=PHI4,
 //    PHI4+1<=d4}>

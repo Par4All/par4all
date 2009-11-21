@@ -3,8 +3,9 @@
 
 freia_status freia_10(freia_data2d *o, freia_data2d *i, int32_t *k)
 {
-   freia_data2d *t0 = freia_common_create_data(16, 128, 128);
-   freia_data2d *t1 = freia_common_create_data(16, 128, 128);
+   
+   
+   freia_data2d *t0 = freia_common_create_data(16, 128, 128), *t1 = freia_common_create_data(16, 128, 128);          /*0007*/
    
    // input used twice
    // o = erode(i) - dilate(i)
@@ -168,6 +169,8 @@ freia_status freia_10_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, int32_t
 
 freia_status freia_10(freia_data2d *o, freia_data2d *i, int32_t *k)
 {
+   
+   
    
    // input used twice
    // o = erode(i) - dilate(i)

@@ -50,7 +50,7 @@ Source code with transformers for "main"
 
 main()
 {
-   int ai = 3;
+   int ai = 3;                                                          /*0014*/
 
 //  T(TOP-LEVEL:j,ai) {TOP-LEVEL:j==ai, TOP-LEVEL:j==j#init+1}
 
@@ -94,7 +94,7 @@ Source code with preconditions for "main"
 
 main()
 {
-   int ai = 3;
+   int ai = 3;                                                          /*0014*/
 
 //  P() {TOP-LEVEL:j==0, ai==3}
 

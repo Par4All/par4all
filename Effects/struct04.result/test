@@ -6,8 +6,7 @@ int struct04()
    struct one {
       int first;
       int second;
-   };
-   struct one x;
+   } x;
    int y[10];
 //               <must be read   >: x[2]
 //               <must be written>: x[1]
@@ -16,6 +15,6 @@ int struct04()
    //x.second = 2;
    
    //y[0] = 1;
-
+   
    x.first = x.second+1;
 }

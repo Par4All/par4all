@@ -3,10 +3,29 @@ Proper effects for "init"
 
 void init(mys *m)
 {
-   int i;
+   int i;                                                               /*0014*/
 //               <must be read   >: m
 //               <must be written>: m[0][1]
-   m->num = 5;                                                          /*0015*/
+   
+   /* Some versions of <linux/posix_types.h> define these macros.  */
+   
+   
+   
+   /* It's easier to assume 8-bit bytes than to get CHAR_BIT.  */
+   
+   
+   
+   
+   /* fd_set for select and pselect.  */
+   
+   
+   /* XPG4.2 requires this member name.  Otherwise avoid the name
+          from the global namespace.  */
+   
+   
+   
+   
+   m->num = 5;                                                          /*0075*/
 //               <must be read   >: _MALLOC_EFFECTS:_MALLOC_ m
 //               <must be written>: _MALLOC_EFFECTS:_MALLOC_ m[0][3]
    m->tab2 = malloc(5*sizeof(int));                                     /*0016*/
@@ -31,8 +50,8 @@ Proper effects for "init2"
 
 void init2(mys *n)
 {
-   int i;
-   mys m;
+   int i;                                                               /*0029*/
+   mys m;                                                               /*0030*/
 //               <must be read   >: n n[0]
 //               <must be written>: m
 
@@ -62,7 +81,7 @@ Proper effects for "init3"
 
 void init3(mys **p)
 {
-   int i;
+   int i;                                                               /*0047*/
 //               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
 //               <must be written>: _MALLOC_EFFECTS:_MALLOC_ p
    p = malloc(5*sizeof(mys *));                                         /*0048*/
@@ -106,7 +125,7 @@ Proper effects for "init4"
 
 void init4(mys *p[5])
 {
-   int i;
+   int i;                                                               /*0069*/
 //               <must be written>: i
    for(i = 0; i <= 4; i += 1) {                                         /*0070*/
 //               <must be read   >: _MALLOC_EFFECTS:_MALLOC_ i
@@ -148,12 +167,31 @@ Proper regions for "init"
 
 void init(mys *m)
 {
-   int i;
+   int i;                                                               /*0014*/
 
 //  <m-R-EXACT-{}>
 //  <m[PHI1][PHI2]-W-EXACT-{PHI1==0, PHI2==1}>
 
-   m->num = 5;                                                          /*0015*/
+   
+   /* Some versions of <linux/posix_types.h> define these macros.  */
+   
+   
+   
+   /* It's easier to assume 8-bit bytes than to get CHAR_BIT.  */
+   
+   
+   
+   
+   /* fd_set for select and pselect.  */
+   
+   
+   /* XPG4.2 requires this member name.  Otherwise avoid the name
+          from the global namespace.  */
+   
+   
+   
+   
+   m->num = 5;                                                          /*0075*/
 
 //  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
 //  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
@@ -200,8 +238,8 @@ Proper regions for "init2"
 
 void init2(mys *n)
 {
-   int i;
-   mys m;
+   int i;                                                               /*0029*/
+   mys m;                                                               /*0030*/
 
 //  <m-W-EXACT-{}>
 //  <n[PHI1]-R-EXACT-{PHI1==0}>
@@ -251,7 +289,7 @@ Proper regions for "init3"
 
 void init3(mys **p)
 {
-   int i;
+   int i;                                                               /*0047*/
 
 //  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
 //  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
@@ -344,7 +382,7 @@ Proper regions for "init4"
 
 void init4(mys *p[5])
 {
-   int i;
+   int i;                                                               /*0069*/
 
 //  <i-W-EXACT-{}>
 

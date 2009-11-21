@@ -3,7 +3,7 @@
 
 freia_status freia_scalar_02(freia_data2d *o, freia_data2d *i0, freia_data2d *i1, int32_t *pmax)
 {
-   freia_data2d *tmp = freia_common_create_data(16, 128, 128);
+   freia_data2d *tmp = freia_common_create_data(16, 128, 128);          /*0005*/
    // dependency with a dereferencement
    freia_aipo_add(tmp, i0, i1);                                         /*0007*/
    freia_aipo_global_max(tmp, pmax);                                    /*0008*/
@@ -237,7 +237,7 @@ freia_status freia_scalar_02_helper_0_1_0(freia_data2d * o0, freia_data2d * i0, 
 
 freia_status freia_scalar_02(freia_data2d *o, freia_data2d *i0, freia_data2d *i1, int32_t *pmax)
 {
-   freia_data2d *tmp = freia_common_create_data(16, 128, 128);
+   freia_data2d *tmp = freia_common_create_data(16, 128, 128);          /*0005*/
    // dependency with a dereferencement
    freia_scalar_02_helper_0_0_0(tmp, i0, i1, pmax);                     /*0007*/
    freia_scalar_02_helper_0_1_0(o, tmp, 10, *pmax, false);              /*0009*/

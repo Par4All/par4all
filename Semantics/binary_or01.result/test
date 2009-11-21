@@ -3,7 +3,7 @@ Source code with proper effects
 
 binary_or01()
 {
-   int ret = 1;
+   int ret = 1;                                                         /*0014*/
 //               <may be read    >: TOP-LEVEL:stderr[*] 
 //                                  __IO_EFFECTS:LUNS[*]
 //               <may be written >: TOP-LEVEL:stderr[*] 
@@ -31,7 +31,7 @@ Source code with cumulated effects
 //               <must be read   >: TOP-LEVEL:stderr
 binary_or01()
 {
-   int ret = 1;
+   int ret = 1;                                                         /*0014*/
 //               <may be read    >: TOP-LEVEL:stderr[*] 
 //                                  __IO_EFFECTS:LUNS[*]
 //               <may be written >: TOP-LEVEL:stderr[*] 
@@ -57,7 +57,7 @@ Source code with transformers for "binary_or01"
 
 binary_or01()
 {
-   int ret = 1;
+   int ret = 1;                                                         /*0014*/
 
 //  T(ret) {}
 
@@ -77,7 +77,7 @@ Source code with preconditions for "binary_or01"
 
 binary_or01()
 {
-   int ret = 1;
+   int ret = 1;                                                         /*0014*/
 
 //  P() {ret==1}
 

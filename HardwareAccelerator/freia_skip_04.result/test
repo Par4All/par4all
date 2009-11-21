@@ -3,9 +3,8 @@
 
 void freia_skip_04(freia_data2d *o, freia_data2d *i)
 {
-   int32_t max;
-   int32_t seuil;
-   freia_data2d *t = freia_common_create_data(16, 128, 128);
+   int32_t max, seuil;                                                  /*0004*/
+   freia_data2d *t = freia_common_create_data(16, 128, 128);            /*0005*/
    // use some control in an intermediate statement
    freia_aipo_global_max(i, &max);                                      /*0007*/
    freia_aipo_xor_const(t, i, 111);                                     /*0008*/
@@ -240,9 +239,8 @@ freia_status freia_skip_04_helper_0_1_0(freia_data2d * o0, freia_data2d * i0, in
 
 void freia_skip_04(freia_data2d *o, freia_data2d *i)
 {
-   int32_t max;
-   int32_t seuil;
-   freia_data2d *t = freia_common_create_data(16, 128, 128);
+   int32_t max, seuil;                                                  /*0004*/
+   freia_data2d *t = freia_common_create_data(16, 128, 128);            /*0005*/
    // use some control in an intermediate statement
    freia_skip_04_helper_0_0_0(t, i, &max, 111);                         /*0007*/
    if (max>128)                                                         /*0009*/

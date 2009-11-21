@@ -3,7 +3,7 @@
 
 freia_status freia_reuse_01(freia_data2d *o0, freia_data2d *o1, freia_data2d *i, int32_t *k)
 {
-   freia_data2d *t = freia_common_create_data(16, 128, 128);
+   freia_data2d *t = freia_common_create_data(16, 128, 128);            /*0005*/
    
    // variable reuse & duplicate operations?
    freia_aipo_erode_6c(o0, i, k);                                       /*0008*/
@@ -300,7 +300,7 @@ freia_status freia_reuse_01_helper_0_1_0(freia_data2d * o0, freia_data2d * i0, f
 
 freia_status freia_reuse_01(freia_data2d *o0, freia_data2d *o1, freia_data2d *i, int32_t *k)
 {
-   freia_data2d *t = freia_common_create_data(16, 128, 128);
+   freia_data2d *t = freia_common_create_data(16, 128, 128);            /*0005*/
    
    // variable reuse & duplicate operations?
    freia_reuse_01_helper_0_0_0(o0, t, i, k, k);                         /*0008*/

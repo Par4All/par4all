@@ -3,13 +3,16 @@ Proper effects for "main"
 
 int main()
 {
-   int t[100][10][3];
-   int (*p)[3];
-   int *pu;
-   int (*q)[10][3];
-   int (*qu)[3];
-   int (*r)[100][10][3];
-   int (*ru)[10][3];
+   int t[100][10][3];                                                   /*0003*/
+
+   int (*p)[3];                                                         /*0005*/
+   int *pu;                                                             /*0006*/
+
+   int (*q)[10][3];                                                     /*0008*/
+   int (*qu)[3];                                                        /*0009*/
+
+   int (*r)[100][10][3];                                                /*0011*/
+   int (*ru)[10][3];                                                    /*0012*/
 //               <must be read   >: __IO_EFFECTS:LUNS[1]
 //               <must be written>: __IO_EFFECTS:LUNS[1]
 

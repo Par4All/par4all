@@ -46,7 +46,7 @@ Source code with transformers for "main"
 
 main()
 {
-   int ai;
+   int ai;                                                              /*0004*/
 
 //  T(ai) {ai==3}
 
@@ -78,7 +78,7 @@ Source code with preconditions for "main"
 
 main()
 {
-   int ai;
+   int ai;                                                              /*0004*/
 
 //  P() {}
 

@@ -3,8 +3,7 @@
 
 void freia_skip_06(freia_data2d *o, freia_data2d *i)
 {
-   freia_data2d *t0;
-   freia_data2d *t1;
+   freia_data2d *t0, *t1;                                               /*0004*/
    // live allocation in an intermediate statement
    freia_aipo_add(i, i, i);                                             /*0006*/
    t0 = freia_common_create_data(16, 128, 128);                         /*0007*/
@@ -286,7 +285,7 @@ freia_status freia_skip_06_helper_0_1_0(freia_data2d * o0, freia_data2d * i0, fr
 
 void freia_skip_06(freia_data2d *o, freia_data2d *i)
 {
-   freia_data2d *t0;
+   freia_data2d *t0;                                                    /*0004*/
    t0 = freia_common_create_data(16, 128, 128);                         /*0007*/
    // live allocation in an intermediate statement
    freia_skip_06_helper_0_0_0(i, t0, i, 111);                           /*0006*/

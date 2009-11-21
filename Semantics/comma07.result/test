@@ -3,8 +3,7 @@ Parsed printed file for "comma07"
 
 int comma07()
 {
-   int i;
-   int j;
+   int i,  j;
 
    i = (j = 1, 2);
    i = 3, j = 4;
@@ -16,8 +15,7 @@ Code for "comma07"
 
 int comma07()
 {
-   int i;
-   int j;
+   int i,  j;
 
    i = (j = 1, 2);
    i = 3, j = 4;
@@ -29,8 +27,7 @@ Proper effects for "comma07"
 
 int comma07()
 {
-   int i;
-   int j;
+   int i,  j;
 //               <must be written>: i j
 
    i = (j = 1, 2);
@@ -48,8 +45,7 @@ Transformers for "comma07"
 
 int comma07()
 {
-   int i;
-   int j;
+   int i,  j;
 
 //  T(i,j) {i==2, j==1}
 

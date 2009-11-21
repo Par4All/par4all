@@ -6,9 +6,7 @@ C  T(while02) {1<=while02}
 
 int while02()
 {
-   int i;
-   int j;
-   int n;
+   int i,  j,  n;
 
 //  T(i) {i==0}
 
@@ -45,9 +43,7 @@ Preconditions for "while02"
 
 int while02()
 {
-   int i;
-   int j;
-   int n;
+   int i,  j,  n;
 
 //  P() {}
 

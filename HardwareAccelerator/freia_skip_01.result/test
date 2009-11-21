@@ -3,10 +3,9 @@
 
 freia_status freia_skip_01(freia_data2d *o, freia_data2d *i)
 {
-   freia_status ret = FREIA_OK;
-   freia_data2d *t = freia_common_create_data(16, 128, 128);
-   int32_t max;
-   int32_t seuil;
+   freia_status ret = FREIA_OK;                                         /*0005*/
+   freia_data2d *t = freia_common_create_data(16, 128, 128);            /*0006*/
+   int32_t max, seuil;                                                  /*0007*/
    freia_aipo_global_max(i, &max);                                      /*0008*/
    freia_aipo_sub_const(t, i, 20);                                      /*0009*/
    seuil = max-10;                                                      /*0010*/
@@ -238,10 +237,9 @@ freia_status freia_skip_01_helper_0_1_0(freia_data2d * o0, freia_data2d * i0, in
 
 freia_status freia_skip_01(freia_data2d *o, freia_data2d *i)
 {
-   freia_status ret = FREIA_OK;
-   freia_data2d *t = freia_common_create_data(16, 128, 128);
-   int32_t max;
-   int32_t seuil;
+   freia_status ret = FREIA_OK;                                         /*0005*/
+   freia_data2d *t = freia_common_create_data(16, 128, 128);            /*0006*/
+   int32_t max, seuil;                                                  /*0007*/
    freia_skip_01_helper_0_0_0(t, i, &max, 20);                          /*0008*/
    seuil = max-10;                                                      /*0010*/
    freia_skip_01_helper_0_1_0(o, t, 0, seuil, false);                   /*0011*/

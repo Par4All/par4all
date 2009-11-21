@@ -3,7 +3,7 @@ Source code with proper effects
 
 void assign04()
 {
-   int i;
+   int i;                                                               /*0004*/
 //               <must be written>: i
    
    // This assignment works fine with transformers
@@ -24,7 +24,7 @@ Source code with cumulated effects
 
 void assign04()
 {
-   int i;
+   int i;                                                               /*0004*/
 //               <must be written>: i
    
    // This assignment works fine with transformers
@@ -48,7 +48,7 @@ Source code with transformers
 
 void assign04()
 {
-   int i;
+   int i;                                                               /*0004*/
 
 //  T(i) {i==3}
 

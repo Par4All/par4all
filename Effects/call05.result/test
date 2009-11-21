@@ -59,8 +59,7 @@ main()
    int d1 = 4;
    int d2 = 4;
    int y[d1][d2];
-   int i;
-   int j;
+   int i,  j;
 //               <must be read   >: d1
 //               <must be written>: i
 
@@ -94,8 +93,7 @@ main()
    int d1 = 4;
    int d2 = 4;
    int y[d1][d2];
-   int i;
-   int j;
+   int i,  j;
 //               <may be read    >: d2 i
 //               <may be written >: y[*][*]
 //               <must be read   >: d1
@@ -160,8 +158,7 @@ main()
    int d1 = 4;
    int d2 = 4;
    int y[d1][d2];
-   int i;
-   int j;
+   int i,  j;
 
 //  <y[PHI1][PHI2]-W-EXACT-{0<=PHI2, PHI2+1<=d2}>
 

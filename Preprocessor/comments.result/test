@@ -88,46 +88,52 @@ void d() {
 }
 void a()
 {
-   int *shiftval;
+   int *shiftval;                                                       /*0003*/
    
    /* Check if (shiftx,shifty) already exists */
    /* if yes then increment counter and return*/
-
+   
    shiftval[2] = 1;                                                     /*0008*/
 }
 void b()
 {
-   int *shiftval;
+   int *shiftval;                                                       /*0012*/
    
    /* Check if (shiftx,shifty) already exists */
    /* if yes then increment counter and return*/
-
+   
    shiftval[2] = 1;                                                     /*0017*/
 }
 void c()
 {
-   int *shiftval;
+   int *shiftval;                                                       /*0021*/
    
    /* Check if (shiftx,shifty) already exists */
    /* if yes then increment counter and return*/
-
+   
    shiftval[2] = 1;                                                     /*0026*/
 }
-extern void a();
-extern void b();
-extern void c();
-extern void d();
+
+
+
+/**/
+extern void a();                                                        /*0002*/
+/***/
+extern void b();                                                        /*0004*/
+/****/
+extern void c();                                                        /*0006*/
+extern void d();                                                        /*0007*/
 void d()
 {
-   int i;
+   int i;                                                               /*0029*/
    
    // 1
    i = 1;                                                               /*0032*/
    // \						  2
-
+   
    i = 2;                                                               /*0035*/
    // \						    3
    
-
+   
    i = 3;                                                               /*0039*/
 }

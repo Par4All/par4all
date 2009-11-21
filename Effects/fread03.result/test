@@ -1,14 +1,10 @@
 byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
 {
-   int height;
-   int width;
-   int gris;
+   int height,  width,  gris;
    byte **m;
    FILE *file;
    char *buffer;
    int i;
-   extern int nrerror(char *);
-   extern int bmatrix(int, int, int, int);
 
    buffer = (char *) calloc(80, sizeof(char));
    file = fopen(filename, "rb");
@@ -23,7 +19,7 @@ byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
    //width  = atoi(readitem(file, buffer));
    //height = atoi(readitem(file, buffer));
    //gris   = atoi(readitem(file, buffer));
-
+   
    *nrl = 0;
    *nrh = height-1;
    *ncl = 0;
@@ -73,15 +69,11 @@ Proper effects for "LoadPGM_bmatrix"
 
 byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
 {
-   int height;
-   int width;
-   int gris;
+   int height,  width,  gris;
    byte **m;
    FILE *file;
    char *buffer;
    int i;
-   extern int nrerror(char *f1);
-   extern int bmatrix(int f1, int f2, int f3, int f4);
 //               <must be written>: buffer
 
    buffer = (char *) calloc(80, sizeof(char));
@@ -105,7 +97,7 @@ byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
    //width  = atoi(readitem(file, buffer));
    //height = atoi(readitem(file, buffer));
    //gris   = atoi(readitem(file, buffer));
-
+   
    *nrl = 0;
 //               <must be read   >: height nrh
 //               <must be written>: nrh[0]
@@ -155,15 +147,11 @@ Cumulated effects for "LoadPGM_bmatrix"
 //                                  _MALLOC_EFFECTS:_MALLOC_
 byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
 {
-   int height;
-   int width;
-   int gris;
+   int height,  width,  gris;
    byte **m;
    FILE *file;
    char *buffer;
    int i;
-   extern int nrerror(char *f1);
-   extern int bmatrix(int f1, int f2, int f3, int f4);
 //               <must be written>: buffer
 
    buffer = (char *) calloc(80, sizeof(char));
@@ -187,7 +175,7 @@ byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
    //width  = atoi(readitem(file, buffer));
    //height = atoi(readitem(file, buffer));
    //gris   = atoi(readitem(file, buffer));
-
+   
    *nrl = 0;
 //               <must be read   >: height nrh
 //               <must be written>: nrh[0]

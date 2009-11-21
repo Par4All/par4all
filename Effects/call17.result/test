@@ -1,5 +1,6 @@
 void call17(int *x)
 {
+   /* check aliases */
    int *y = x;
    y[0] = 1;
 }
@@ -8,6 +9,7 @@ Proper effects for "call17"
 
 void call17(int *x)
 {
+   /* check aliases */
    int *y = x;
 //               <must be read   >: y
 //               <must be written>: y[0]
@@ -19,6 +21,7 @@ Cumulated effects for "call17"
 //               <must be written>: x[0]
 void call17(int *x)
 {
+   /* check aliases */
    int *y = x;
 //               <must be read   >: y
 //               <must be written>: y[0]

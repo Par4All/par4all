@@ -3,16 +3,15 @@
 
 freia_status freia_33(freia_data2d *o, freia_data2d *i, uint32_t *k)
 {
-   freia_data2d *X0 = freia_common_create_data(16, 128, 128);
-   freia_data2d *X1 = freia_common_create_data(16, 128, 128);
-   freia_data2d *tB = freia_common_create_data(16, 128, 128);
-   freia_data2d *tB2 = freia_common_create_data(16, 128, 128);
-   freia_data2d *tC = freia_common_create_data(16, 128, 128);
-   freia_data2d *tC2 = freia_common_create_data(16, 128, 128);
-   freia_data2d *tD = freia_common_create_data(16, 128, 128);
-   int sA;
-   int sB;
-   int sC;
+   
+   
+   
+   
+   
+   
+   
+   freia_data2d *X0 = freia_common_create_data(16, 128, 128), *X1 = freia_common_create_data(16, 128, 128), *tB = freia_common_create_data(16, 128, 128), *tB2 = freia_common_create_data(16, 128, 128), *tC = freia_common_create_data(16, 128, 128), *tC2 = freia_common_create_data(16, 128, 128), *tD = freia_common_create_data(16, 128, 128);   /*0012*/
+   int sA,  sB,  sC;                                                    /*0013*/
    
    // complex dag for split
    // A
@@ -624,14 +623,15 @@ freia_status freia_33_helper_0_4_0(freia_data2d * o0, freia_data2d * i0, freia_d
 
 freia_status freia_33(freia_data2d *o, freia_data2d *i, uint32_t *k)
 {
-   freia_data2d *X0 = freia_common_create_data(16, 128, 128);
-   freia_data2d *X1 = freia_common_create_data(16, 128, 128);
-   freia_data2d *tC = freia_common_create_data(16, 128, 128);
-   freia_data2d *tC2 = freia_common_create_data(16, 128, 128);
-   freia_data2d *tD = freia_common_create_data(16, 128, 128);
-   int sA;
-   int sB;
-   int sC;
+   
+   
+   
+   
+   
+   
+   
+   freia_data2d *X0 = freia_common_create_data(16, 128, 128), *X1 = freia_common_create_data(16, 128, 128), *tC = freia_common_create_data(16, 128, 128), *tC2 = freia_common_create_data(16, 128, 128), *tD = freia_common_create_data(16, 128, 128);      /*0012*/
+   int sA,  sB,  sC;                                                    /*0013*/
    
    // complex dag for split
    // A

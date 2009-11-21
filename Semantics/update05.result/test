@@ -8,8 +8,7 @@ void update05()
 {
    int i = 1;
    int j;
-   int k1 = 0;
-   int k2 = 0;
+   int k1 = 0,  k2 = 0;
 
 //  T(i,j) {i==3, i#init==1, j==3, k1==0, k2==0}
 
@@ -74,8 +73,7 @@ void update05()
 {
    int i = 1;
    int j;
-   int k1 = 0;
-   int k2 = 0;
+   int k1 = 0,  k2 = 0;
 
 //  P() {i==1, k1==0, k2==0}
 

@@ -3,14 +3,9 @@ Parsed printed file for "struct07"
 
 void struct07()
 {
-   extern complex imagein[256][256];
-   extern complex imageout[256][256];
-   int i;
-   int j;
-   int k;
-   int l;
-   float z1;
-   float z2;
+   extern complex imagein[256][256], imageout[256][256];
+   int i,  j,  k,  l;
+   float z1,  z2;
    float x[256][256];
 
    for (k = 0;k<256;k++)
@@ -26,14 +21,9 @@ Cumulated effetcs for "struct07"
 //               <may be written >: TOP-LEVEL:imageout[*][1][1]
 void struct07()
 {
-   extern complex imagein[256][256];
-   extern complex imageout[256][256];
-   int i;
-   int j;
-   int k;
-   int l;
-   float z1;
-   float z2;
+   extern complex imagein[256][256], imageout[256][256];
+   int i,  j,  k,  l;
+   float z1,  z2;
    float x[256][256];
 //               <may be read    >: k z1
 //               <may be written >: TOP-LEVEL:imageout[*][1][1]
@@ -65,14 +55,9 @@ Printed files with regions
 
 void struct07()
 {
-   extern complex imagein[256][256];
-   extern complex imageout[256][256];
-   int i;
-   int j;
-   int k;
-   int l;
-   float z1;
-   float z2;
+   extern complex imagein[256][256], imageout[256][256];
+   int i,  j,  k,  l;
+   float z1,  z2;
    float x[256][256];
 
 //  <TOP-LEVEL:imageout[PHI1][PHI2][PHI3]-W-MAY-{PHI2==1, PHI3==1,
@@ -117,14 +102,9 @@ Printed files after parallelization
 
 void struct07()
 {
-   extern complex imagein[256][256];
-   extern complex imageout[256][256];
-   int i;
-   int j;
-   int k;
-   int l;
-   float z1;
-   float z2;
+   extern complex imagein[256][256], imageout[256][256];
+   int i,  j,  k,  l;
+   float z1,  z2;
    float x[256][256];
 
 

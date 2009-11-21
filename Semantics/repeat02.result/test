@@ -10,8 +10,7 @@ int repeat02()
 //  T(repeat02) {repeat02==4}
 
    // BEGIN BLOCK
-   int i;
-   int j;
+   int i,  j;
    int n = 10;
 
 //  T(i) {i==0, n==10}
@@ -60,8 +59,7 @@ int repeat02()
 //  P() {}
 
    // BEGIN BLOCK
-   int i;
-   int j;
+   int i,  j;
    int n = 10;
 
 //  P() {n==10}

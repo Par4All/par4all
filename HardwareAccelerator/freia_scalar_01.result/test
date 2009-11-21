@@ -3,7 +3,7 @@
 
 freia_status freia_scalar_01(freia_data2d *o, freia_data2d *i)
 {
-   int thr = 12;
+   int thr = 12;                                                        /*0005*/
    // expressions and constants as parameters
    freia_aipo_threshold(o, i, thr-10, thr+10, false);                   /*0007*/
    return FREIA_OK;                                                     /*0008*/
@@ -127,7 +127,7 @@ freia_status freia_scalar_01_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, 
 
 freia_status freia_scalar_01(freia_data2d *o, freia_data2d *i)
 {
-   int thr = 12;
+   int thr = 12;                                                        /*0005*/
    // expressions and constants as parameters
    freia_scalar_01_helper_0_0_0(o, i, thr-10, thr+10, false);           /*0007*/
    return FREIA_OK;                                                     /*0008*/

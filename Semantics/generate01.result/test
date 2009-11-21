@@ -8,7 +8,6 @@ int generate01()
 {
    int i = 1;
    float x = 0.5;
-   extern int foo(int f1, float f2);
 
 //  T(generate01) {}
 
@@ -25,7 +24,6 @@ int generate01()
 {
    int i = 1;
    float x = 0.5;
-   extern int foo(int f1, float f2);
 
 //  P() {i==1}
 

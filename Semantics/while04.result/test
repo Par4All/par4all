@@ -10,8 +10,7 @@ int while04(int n)
 //  T(while04) {2n==while04+1, 2<=n}
 
    // BEGIN BLOCK
-   int i;
-   int j;
+   int i,  j;
 
 //  T(i) {i==0}
 
@@ -75,8 +74,7 @@ int while04(int n)
 //  P() {}
 
    // BEGIN BLOCK
-   int i;
-   int j;
+   int i,  j;
 
 //  P() {}
 
@@ -135,8 +133,7 @@ only is used to evaluate the loop condition
 int while04(int n)
 {
    // BEGIN BLOCK
-   int i;
-   int j;
+   int i,  j;
 
    i = 0;
    j = 1;

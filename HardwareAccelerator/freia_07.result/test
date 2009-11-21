@@ -3,10 +3,11 @@
 
 freia_status freia_07(freia_data2d *o0, freia_data2d *o1, freia_data2d *i0, freia_data2d *i1, freia_data2d *i2, freia_data2d *i3)
 {
-   freia_data2d *t0 = freia_common_create_data(16, 128, 128);
-   freia_data2d *t1 = freia_common_create_data(16, 128, 128);
-   freia_data2d *t2 = freia_common_create_data(16, 128, 128);
-   freia_data2d *t3 = freia_common_create_data(16, 128, 128);
+   
+   
+   
+   
+   freia_data2d *t0 = freia_common_create_data(16, 128, 128), *t1 = freia_common_create_data(16, 128, 128), *t2 = freia_common_create_data(16, 128, 128), *t3 = freia_common_create_data(16, 128, 128);        /*0012*/
    
    // o0 = inf(i0 + i1, i0) - i0
    // o1 = sup(i2 / i3, i3) | i3
@@ -330,6 +331,10 @@ freia_status freia_07_helper_0_1_0(freia_data2d * o0, freia_data2d * i0, freia_d
 
 freia_status freia_07(freia_data2d *o0, freia_data2d *o1, freia_data2d *i0, freia_data2d *i1, freia_data2d *i2, freia_data2d *i3)
 {
+   
+   
+   
+   
    
    // o0 = inf(i0 + i1, i0) - i0
    // o1 = sup(i2 / i3, i3) | i3

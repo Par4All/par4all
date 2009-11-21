@@ -8,9 +8,7 @@ void point_to01()
       int b;
       int c;
       int d;
-   };
-   struct s c;
-   struct s *p;
+   } c, *p;
 
    p = &c;
 
@@ -32,9 +30,7 @@ void point_to01()
       int b;
       int c;
       int d;
-   };
-   struct s c;
-   struct s *p;
+   } c, *p;
 //               <must be written>: p
 
    p = &c;
@@ -69,9 +65,7 @@ void point_to01()
       int b;
       int c;
       int d;
-   };
-   struct s c;
-   struct s *p;
+   } c, *p;
 //               <must be written>: p
 
    p = &c;

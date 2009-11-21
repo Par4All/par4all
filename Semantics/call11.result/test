@@ -3,7 +3,7 @@ Source code with proper effects
 
 double call11(void)
 {
-   double x = 3.;
+   double x = 3.;                                                       /*0004*/
 //               <must be read   >: TOP-LEVEL:j
 //               <must be written>: TOP-LEVEL:j
    j++;                                                                 /*0005*/
@@ -18,7 +18,7 @@ Source code with cumulated effects
 //               <must be written>: TOP-LEVEL:j
 double call11(void)
 {
-   double x = 3.;
+   double x = 3.;                                                       /*0004*/
 //               <must be read   >: TOP-LEVEL:j
 //               <must be written>: TOP-LEVEL:j
    j++;                                                                 /*0005*/
@@ -34,7 +34,7 @@ Source code with transformers for "call11"
 
 double call11(void)
 {
-   double x = 3.;
+   double x = 3.;                                                       /*0004*/
 
 //  T(TOP-LEVEL:j) {TOP-LEVEL:j==j#init+1}
 
@@ -53,7 +53,7 @@ Source code with transformers for "main"
 
 main()
 {
-   int ai = 3;
+   int ai = 3;                                                          /*0015*/
 
 //  T(TOP-LEVEL:j) {TOP-LEVEL:j==j#init+1}
 
@@ -73,7 +73,7 @@ Source code with preconditions for "call11"
 
 double call11(void)
 {
-   double x = 3.;
+   double x = 3.;                                                       /*0004*/
 
 //  P() {TOP-LEVEL:j==0}
 
@@ -92,7 +92,7 @@ Source code with preconditions for "main"
 
 main()
 {
-   int ai = 3;
+   int ai = 3;                                                          /*0015*/
 
 //  P() {TOP-LEVEL:j==0, ai==3}
 

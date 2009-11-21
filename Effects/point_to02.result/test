@@ -6,9 +6,7 @@ void point_to02()
    struct s {
       int a;
       int b[10];
-   };
-   struct s c;
-   struct s *p;
+   } c, *p;
 
    p->a = 1;
    (p->b)[2] = 3;
@@ -22,9 +20,7 @@ void point_to02()
    struct s {
       int a;
       int b[10];
-   };
-   struct s c;
-   struct s *p;
+   } c, *p;
 //               <must be read   >: p
 //               <must be written>: p[0][1]
 

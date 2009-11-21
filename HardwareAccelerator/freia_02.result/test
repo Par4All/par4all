@@ -3,8 +3,9 @@
 
 freia_status freia_02(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 {
-   freia_data2d *t1 = freia_common_create_data(16, 128, 128);
-   freia_data2d *t2 = freia_common_create_data(16, 128, 128);
+   
+   
+   freia_data2d *t1 = freia_common_create_data(16, 128, 128), *t2 = freia_common_create_data(16, 128, 128);          /*0007*/
    
    // 1 pipeline call is enough
    // t1 = i1 / i0
@@ -187,6 +188,8 @@ freia_status freia_02_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, freia_d
 
 freia_status freia_02(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 {
+   
+   
    
    // 1 pipeline call is enough
    // t1 = i1 / i0

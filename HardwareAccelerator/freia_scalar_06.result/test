@@ -3,15 +3,14 @@
 
 freia_status freia_scalar_06(freia_data2d *o, freia_data2d *i, uint32_t *k)
 {
-   freia_data2d *X = freia_common_create_data(16, 128, 128);
-   freia_data2d *tB = freia_common_create_data(16, 128, 128);
-   freia_data2d *tC = freia_common_create_data(16, 128, 128);
-   freia_data2d *tC2 = freia_common_create_data(16, 128, 128);
-   freia_data2d *tC3 = freia_common_create_data(16, 128, 128);
-   freia_data2d *tD = freia_common_create_data(16, 128, 128);
-   int32_t sA;
-   int32_t sA2;
-   int32_t sB;
+   
+   
+   
+   
+   
+   
+   freia_data2d *X = freia_common_create_data(16, 128, 128), *tB = freia_common_create_data(16, 128, 128), *tC = freia_common_create_data(16, 128, 128), *tC2 = freia_common_create_data(16, 128, 128), *tC3 = freia_common_create_data(16, 128, 128), *tD = freia_common_create_data(16, 128, 128);     /*0011*/
+   int32_t sA, sA2, sB;                                                 /*0012*/
    
    // look for order issues when reusing a temporary image
    // A
@@ -529,12 +528,14 @@ freia_status freia_scalar_06_helper_0_3_0(freia_data2d * o0, freia_data2d * i0, 
 
 freia_status freia_scalar_06(freia_data2d *o, freia_data2d *i, uint32_t *k)
 {
-   freia_data2d *X = freia_common_create_data(16, 128, 128);
-   freia_data2d *tC = freia_common_create_data(16, 128, 128);
-   freia_data2d *tC3 = freia_common_create_data(16, 128, 128);
-   int32_t sA;
-   int32_t sA2;
-   int32_t sB;
+   
+   
+   
+   
+   
+   
+   freia_data2d *X = freia_common_create_data(16, 128, 128), *tC = freia_common_create_data(16, 128, 128), *tC3 = freia_common_create_data(16, 128, 128);         /*0011*/
+   int32_t sA, sA2, sB;                                                 /*0012*/
    
    // look for order issues when reusing a temporary image
    // A

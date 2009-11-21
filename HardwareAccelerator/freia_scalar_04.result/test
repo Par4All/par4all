@@ -3,11 +3,11 @@
 
 freia_status freia_scalar_04(freia_data2d *o, freia_data2d *i0, freia_data2d *i1, int32_t *k)
 {
-   freia_data2d *t1 = freia_common_create_data(16, 128, 128);
-   freia_data2d *t2 = freia_common_create_data(16, 128, 128);
-   int max;
-   int min = 10;
-   bool bin = false;
+   
+   
+   freia_data2d *t1 = freia_common_create_data(16, 128, 128), *t2 = freia_common_create_data(16, 128, 128);          /*0009*/
+   int max,  min = 10;                                                  /*0010*/
+   bool bin = false;                                                    /*0011*/
    // break pipeline on scalar dependency
    freia_aipo_add(t1, i0, i1);                                          /*0013*/
    freia_aipo_global_max(t1, &max);                                     /*0014*/
@@ -258,10 +258,11 @@ freia_status freia_scalar_04_helper_0_1_0(freia_data2d * o0, freia_data2d * i0, 
 
 freia_status freia_scalar_04(freia_data2d *o, freia_data2d *i0, freia_data2d *i1, int32_t *k)
 {
-   freia_data2d *t2 = freia_common_create_data(16, 128, 128);
-   int max;
-   int min = 10;
-   bool bin = false;
+   
+   
+   freia_data2d *t2 = freia_common_create_data(16, 128, 128);           /*0009*/
+   int max,  min = 10;                                                  /*0010*/
+   bool bin = false;                                                    /*0011*/
    // break pipeline on scalar dependency
    freia_scalar_04_helper_0_0_0(t2, i0, i1, &max, k);                   /*0013*/
    freia_scalar_04_helper_0_1_0(o, t2, min, max, bin);                  /*0016*/

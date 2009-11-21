@@ -1,6 +1,5 @@
 void call18(int i, ...)
 {
-   extern  fmt();
    i++;
    if (i) {
       va_list pa;

@@ -3,12 +3,12 @@
 
 int anr999_03(void)
 {
-   freia_dataio fdin;
-   freia_dataio fdout;
-   freia_data2d *in;
-   freia_data2d *og;
-   freia_data2d *od;
-   freia_data2d *t;
+   freia_dataio fdin;                                                   /*0012*/
+   freia_dataio fdout;                                                  /*0013*/
+   freia_data2d *in;                                                    /*0014*/
+   freia_data2d *og;                                                    /*0015*/
+   freia_data2d *od;                                                    /*0016*/
+   freia_data2d *t;                                                     /*0017*/
 
    freia_common_open_input(&fdin, 0);                                   /*0019*/
    freia_common_open_output(&fdout, 0, fdin.framewidth, fdin.frameheight, fdin.framebpp);             /*0020*/
@@ -236,11 +236,11 @@ freia_status anr999_03_helper_0_0_0(freia_data2d * o0, freia_data2d * o1, freia_
 
 int anr999_03(void)
 {
-   freia_dataio fdin;
-   freia_dataio fdout;
-   freia_data2d *in;
-   freia_data2d *og;
-   freia_data2d *od;
+   freia_dataio fdin;                                                   /*0012*/
+   freia_dataio fdout;                                                  /*0013*/
+   freia_data2d *in;                                                    /*0014*/
+   freia_data2d *og;                                                    /*0015*/
+   freia_data2d *od;                                                    /*0016*/
 
    freia_common_open_input(&fdin, 0);                                   /*0019*/
    freia_common_open_output(&fdout, 0, fdin.framewidth, fdin.frameheight, fdin.framebpp);             /*0020*/

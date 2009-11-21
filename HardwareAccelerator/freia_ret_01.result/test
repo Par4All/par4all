@@ -3,9 +3,8 @@
 
 freia_status freia_ret_01(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 {
-   freia_status ret1;
-   freia_status ret2 = FREIA_OK;
-   freia_data2d *t = freia_common_create_data(16, 128, 128);
+   freia_status ret1, ret2 = FREIA_OK;                                  /*0005*/
+   freia_data2d *t = freia_common_create_data(16, 128, 128);            /*0006*/
    ret1 = freia_aipo_addsat(t, i0, i1);                                 /*0007*/
    ret2 |= freia_aipo_sub(o, i0, t);                                    /*0008*/
    freia_common_destruct_data(t);                                       /*0009*/
@@ -158,8 +157,7 @@ freia_status freia_ret_01_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, fre
 
 freia_status freia_ret_01(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 {
-   freia_status ret1;
-   freia_status ret2 = FREIA_OK;
+   freia_status ret1, ret2 = FREIA_OK;                                  /*0005*/
    ret1 = freia_ret_01_helper_0_0_0(o, i0, i1);                         /*0007*/
    ret2 |= 0;                                                           /*0008*/
    return ret1|ret2;                                                    /*0010*/

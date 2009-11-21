@@ -3,8 +3,9 @@
 
 freia_status freia_34(freia_data2d *o, freia_data2d *i, int32_t *k)
 {
-   freia_data2d *t1 = freia_common_create_data(16, 128, 128);
-   freia_data2d *t2 = freia_common_create_data(16, 128, 128);
+   
+   
+   freia_data2d *t1 = freia_common_create_data(16, 128, 128), *t2 = freia_common_create_data(16, 128, 128);          /*0006*/
    
    // 1 stage pipeline
    // t1 = f(i)
@@ -170,6 +171,8 @@ freia_status freia_34_helper_0_0_0(freia_data2d * o0, freia_data2d * i0, int32_t
 
 freia_status freia_34(freia_data2d *o, freia_data2d *i, int32_t *k)
 {
+   
+   
    
    // 1 stage pipeline
    // t1 = f(i)

@@ -96,18 +96,18 @@ int npoles;
 extern void fixrts();
 void fixrts(float d[], int npoles)
 {
-   typedef struct {float r; float i;} fcomplex;
+   typedef struct {
+      float r;
+      float i;
+   } fcomplex;
    extern fcomplex Complex(float, float);
    extern fcomplex Cdiv(fcomplex, fcomplex);
    extern fcomplex Csub(fcomplex, fcomplex);
    extern fcomplex Cmul(fcomplex, fcomplex);
    extern fcomplex Conjg(fcomplex);
    extern float Cabs(fcomplex);
-   int i;
-   int j;
-   int polish;
-   fcomplex a[100];
-   fcomplex roots[100];
+   int i,  j,  polish;
+   fcomplex a[100], roots[100];
    void zroots(fcomplex *, int, fcomplex *, int);
 
    a[npoles] = Complex(1.0, 0.0);

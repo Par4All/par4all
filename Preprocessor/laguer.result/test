@@ -134,23 +134,9 @@ extern float Cabs(fcomplex);
 extern void laguer();
 void laguer(fcomplex a[], int m, fcomplex *x, float eps, int polish)
 {
-   int j;
-   int iter;
-   float err;
-   float dxold;
-   float cdx;
-   float abx;
-   fcomplex sq;
-   fcomplex h;
-   fcomplex gp;
-   fcomplex gm;
-   fcomplex g2;
-   fcomplex g;
-   fcomplex b;
-   fcomplex d;
-   fcomplex dx;
-   fcomplex f;
-   fcomplex x1;
+   int j,  iter;
+   float err,  dxold,  cdx,  abx;
+   fcomplex sq, h, gp, gm, g2, g, b, d, dx, f, x1;
    void nrerror(char *);
 
    dxold = Cabs(*x);

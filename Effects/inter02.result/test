@@ -5,7 +5,26 @@ void foo(int *p)
 {
 //               <must be read   >: p
 //               <must be written>: p[0]
-   *p = 4;                                                              /*0004*/
+   
+   /* Some versions of <linux/posix_types.h> define these macros.  */
+   
+   
+   
+   /* It's easier to assume 8-bit bytes than to get CHAR_BIT.  */
+   
+   
+   
+   
+   /* fd_set for select and pselect.  */
+   
+   
+   /* XPG4.2 requires this member name.  Otherwise avoid the name
+          from the global namespace.  */
+   
+   
+   
+   
+   *p = 4;                                                              /*0075*/
    return;                                                              /*0005*/
 }
 
@@ -13,12 +32,12 @@ Proper effects for "main"
 
 int main()
 {
-   int *x;
-   int tab[10];
-   int *tab2[10];
-   int tab3[10][10];
-   int **tab4;
-   int y;
+   int *x;                                                              /*0019*/
+   int tab[10];                                                         /*0020*/
+   int *tab2[10];                                                       /*0021*/
+   int tab3[10][10];                                                    /*0022*/
+   int **tab4;                                                          /*0023*/
+   int y;                                                               /*0024*/
 //               <must be read   >: x
 //               <must be written>: x[0]
    
@@ -77,7 +96,26 @@ void foo(int *p)
 //  <p-R-EXACT-{}>
 //  <p[PHI1]-W-EXACT-{PHI1==0}>
 
-   *p = 4;                                                              /*0004*/
+   
+   /* Some versions of <linux/posix_types.h> define these macros.  */
+   
+   
+   
+   /* It's easier to assume 8-bit bytes than to get CHAR_BIT.  */
+   
+   
+   
+   
+   /* fd_set for select and pselect.  */
+   
+   
+   /* XPG4.2 requires this member name.  Otherwise avoid the name
+          from the global namespace.  */
+   
+   
+   
+   
+   *p = 4;                                                              /*0075*/
    return;                                                              /*0005*/
 }
 
@@ -89,12 +127,12 @@ Regions for "main"
 
 int main()
 {
-   int *x;
-   int tab[10];
-   int *tab2[10];
-   int tab3[10][10];
-   int **tab4;
-   int y;
+   int *x;                                                              /*0019*/
+   int tab[10];                                                         /*0020*/
+   int *tab2[10];                                                       /*0021*/
+   int tab3[10][10];                                                    /*0022*/
+   int **tab4;                                                          /*0023*/
+   int y;                                                               /*0024*/
 
 //  <x-R-EXACT-{}>
 //  <x[PHI1]-W-EXACT-{PHI1==0}>
@@ -183,12 +221,12 @@ out regions for "main"
 
 int main()
 {
-   int *x;
-   int tab[10];
-   int *tab2[10];
-   int tab3[10][10];
-   int **tab4;
-   int y;
+   int *x;                                                              /*0019*/
+   int tab[10];                                                         /*0020*/
+   int *tab2[10];                                                       /*0021*/
+   int tab3[10][10];                                                    /*0022*/
+   int **tab4;                                                          /*0023*/
+   int y;                                                               /*0024*/
 
 //  <x[PHI1]-OUT-EXACT-{PHI1==0}>
 
@@ -258,6 +296,25 @@ void foo(int *p)
 
 //  <p[PHI1]-OUT-EXACT-{PHI1==0}>
 
-   *p = 4;                                                              /*0004*/
+   
+   /* Some versions of <linux/posix_types.h> define these macros.  */
+   
+   
+   
+   /* It's easier to assume 8-bit bytes than to get CHAR_BIT.  */
+   
+   
+   
+   
+   /* fd_set for select and pselect.  */
+   
+   
+   /* XPG4.2 requires this member name.  Otherwise avoid the name
+          from the global namespace.  */
+   
+   
+   
+   
+   *p = 4;                                                              /*0075*/
    return;                                                              /*0005*/
 }

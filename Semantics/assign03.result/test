@@ -3,10 +3,10 @@ Source code with proper effects
 
 void assign03()
 {
-   int i;
-   int j;
-   int k;
-   int n;
+   int i;                                                               /*0004*/
+   int j;                                                               /*0005*/
+   int k;                                                               /*0006*/
+   int n;                                                               /*0007*/
 //               <must be written>: j
 
    j = 2;                                                               /*0009*/
@@ -22,10 +22,10 @@ Source code with cumulated effects
 
 void assign03()
 {
-   int i;
-   int j;
-   int k;
-   int n;
+   int i;                                                               /*0004*/
+   int j;                                                               /*0005*/
+   int k;                                                               /*0006*/
+   int n;                                                               /*0007*/
 //               <must be written>: j
 
    j = 2;                                                               /*0009*/
@@ -44,10 +44,10 @@ Source code with transformers
 
 void assign03()
 {
-   int i;
-   int j;
-   int k;
-   int n;
+   int i;                                                               /*0004*/
+   int j;                                                               /*0005*/
+   int k;                                                               /*0006*/
+   int n;                                                               /*0007*/
 
 //  T(j) {j==2}
 

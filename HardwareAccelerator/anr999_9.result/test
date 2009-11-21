@@ -3,22 +3,22 @@
 
 int anr999(void)
 {
-   int I_13;
-   int I_6;
-   freia_dataio fdin;
-   freia_dataio fdout;
-   freia_data2d *in;
-   freia_data2d *og;
-   freia_data2d *od;
-   int32_t measure_min;
-   int32_t measure_vol;
-   int i_0;
-   int I_10_0;
-   int I_3_0;
-   freia_status ret_0;
-   freia_data2d *t;
-   int i_1;
-   int i_2;
+   int I_13;                                                            /*0012*/
+   int I_6;                                                             /*0013*/
+   freia_dataio fdin;                                                   /*0014*/
+   freia_dataio fdout;                                                  /*0015*/
+   freia_data2d *in;                                                    /*0016*/
+   freia_data2d *og;                                                    /*0017*/
+   freia_data2d *od;                                                    /*0018*/
+   int32_t measure_min;                                                 /*0019*/
+   int32_t measure_vol;                                                 /*0020*/
+   int i_0;                                                             /*0021*/
+   int I_10_0;                                                          /*0022*/
+   int I_3_0;                                                           /*0023*/
+   freia_status ret_0;                                                  /*0024*/
+   freia_data2d *t;                                                     /*0025*/
+   int i_1;                                                             /*0026*/
+   int i_2;                                                             /*0027*/
 
    freia_common_open_input(&fdin, 0);                                   /*0029*/
    freia_common_open_output(&fdout, 0, fdin.framewidth, fdin.frameheight, fdin.framebpp);             /*0030*/
@@ -729,21 +729,21 @@ freia_status anr999_helper_0_0_1(freia_data2d * o0, freia_data2d * o1, freia_dat
 
 int anr999(void)
 {
-   int I_13;
-   int I_6;
-   freia_dataio fdin;
-   freia_dataio fdout;
-   freia_data2d *in;
-   freia_data2d *og;
-   freia_data2d *od;
-   int32_t measure_min;
-   int32_t measure_vol;
-   int i_0;
-   int I_10_0;
-   int I_3_0;
-   freia_status ret_0;
-   int i_1;
-   int i_2;
+   int I_13;                                                            /*0012*/
+   int I_6;                                                             /*0013*/
+   freia_dataio fdin;                                                   /*0014*/
+   freia_dataio fdout;                                                  /*0015*/
+   freia_data2d *in;                                                    /*0016*/
+   freia_data2d *og;                                                    /*0017*/
+   freia_data2d *od;                                                    /*0018*/
+   int32_t measure_min;                                                 /*0019*/
+   int32_t measure_vol;                                                 /*0020*/
+   int i_0;                                                             /*0021*/
+   int I_10_0;                                                          /*0022*/
+   int I_3_0;                                                           /*0023*/
+   freia_status ret_0;                                                  /*0024*/
+   int i_1;                                                             /*0026*/
+   int i_2;                                                             /*0027*/
 
    freia_common_open_input(&fdin, 0);                                   /*0029*/
    freia_common_open_output(&fdout, 0, fdin.framewidth, fdin.frameheight, fdin.framebpp);             /*0030*/
