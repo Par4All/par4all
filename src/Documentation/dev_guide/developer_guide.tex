@@ -493,9 +493,11 @@ svn diff http://svn.cri.ensmp.fr/svn/pips/branches/calvin/graph \
   }
 
   \textbf{CAUTION!}
-  Merging must be done at the branch level which must correspond to
-  the \texttt{trunk}. \textbf{DO NOT} merge in a subdirectory as it
-  breaks svn bookkeeping for subsequent merges.
+  Merging must be done at the root of the branch, that is the
+  directory which correspond to the \texttt{trunk}.
+  \textbf{DO NOT} merge in a subdirectory as it breaks svn bookkeeping
+  for subsequent merges, and will result in tree numerous conflicts, which
+  when resolved may be rejected by the pre-commit hook.
 
 \item When you are done with your developments, they are committed into
   your branch, you want to install them back to the pips trunk.
