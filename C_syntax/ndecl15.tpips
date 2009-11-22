@@ -1,0 +1,27 @@
+delete ndecl15
+create ndecl15 ndecl15.c
+
+activate C_PARSER
+activate C_SYMBOL_TABLE
+
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
+
+echo
+echo Parsed printed file
+echo
+
+display PARSED_PRINTED_FILE[ndecl15]
+quit
+echo
+echo Printed file
+echo
+
+display PRINTED_FILE[ndecl15]
+
+
+close
+#delete ndecl15
+
+quit

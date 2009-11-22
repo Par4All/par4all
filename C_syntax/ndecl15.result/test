@@ -1,0 +1,10 @@
+
+Parsed printed file
+
+void ndecl15(char *dir)
+{
+   /* This declaration statement is spread over 5 lines. */
+   int i, *k, l[10], (*pf)(), foo();                                    /*0009*/
+
+   i = 1;                                                               /*0011*/
+}

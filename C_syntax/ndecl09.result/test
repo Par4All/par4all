@@ -1,0 +1,71 @@
+
+Symbol table
+
+ndecl09
+
+Declarations for module "ndecl09" with type "char * -> void"
+
+Variable list:
+
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
+	Declared entity "ndecl09!:*STATIC*" with type "area" with size 0
+	Declared entity "ndecl09:*DYNAMIC*" with type "area" with size 28
+	Declared entity "ndecl09:*HEAP*" with type "area" with size 0
+	Declared entity "ndecl09:*STACK*" with type "area" with size 0
+	Declared entity "ndecl09:*STATIC*" with type "area" with size 0
+	Declared entity "ndecl09:0`#m" with type "struct" 
+	Declared entity "ndecl09:0`__FUNCTION__" with type "variable" "char"
+	Declared entity "ndecl09:0`__func__" with type "variable" "char"
+	Declared entity "ndecl09:dir" with type "variable" "char *"
+	Declared entity "ndecl09:foo" with type "functional" "() -> struct m "
+	Declared entity "ndecl09:px" with type "variable" "struct m  *"
+	Declared entity "ndecl09:x" with type "variable" "struct m "
+
+* empty extern declaration list *
+
+
+Layout for formal parameters:
+
+	Variable ndecl09:dir	offset = 1
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "ndecl09!:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "ndecl09:*DYNAMIC*" of size 28:
+	Variable "ndecl09:x"	offset = 16	size = 8
+	Variable "ndecl09:px"	offset = 24	size = 4
+	Variable "ndecl09:0`__func__"	offset = 0	size = 8
+	Variable "ndecl09:0`__FUNCTION__"	offset = 8	size = 8
+
+
+Layout for memory area "ndecl09:*HEAP*" of size 0:
+	* empty area *
+
+
+Layout for memory area "ndecl09:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "ndecl09:*STATIC*" of size 0:
+	* empty area *
+
+End of declarations for module ndecl09
+
+
+Parsed printed file
+
+void ndecl09(char *dir)
+{
+   /* Well, x is a struct of name m: x declaration disappears... */
+   struct m {                                                           /*0008*/
+      int a;
+      float b;
+   } x, *px, foo();
+}
