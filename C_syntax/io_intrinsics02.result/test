@@ -1,0 +1,38 @@
+int main(char *fmt1, ...)
+{
+   FILE *fp;
+   size_t n, nr;
+   char *fmt2;
+   char *i_name;
+   int i, r, c, max;
+   fpos_t *fp_pos, pos;
+   long fp_pos_indic;
+   va_list vl;
+   
+   /* Some versions of <linux/posix_types.h> define these macros.  */
+   
+   
+   
+   /* It's easier to assume 8-bit bytes than to get CHAR_BIT.  */
+   
+   
+   
+   
+   /* fd_set for select and pselect.  */
+   
+   
+   /* XPG4.2 requires this member name.  Otherwise avoid the name
+          from the global namespace.  */
+   
+   
+   
+   
+   (void) fscanf(fp, fmt2, i_name, &i);
+   va_start(vl, fmt1);
+   (void) vfscanf(fp, fmt1, vl);
+   va_end(vl);
+   va_start(vl, fmt1);
+   (void) vfprintf(fp, fmt1, vl);
+   va_end(vl);
+}
+

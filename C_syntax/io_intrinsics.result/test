@@ -1,13 +1,13 @@
 int main(char *fmt1, ...)
 {
    FILE *fp;
-   size_t n, size_t nr;
+   size_t n, nr;
    char buf1[200];
    char *buf2 = malloc(200*sizeof(char));
    char *fmt2;
    char *i_name;
-   int i,  r,  c,  max;
-   fpos_t *fp_pos, fpos_t pos;
+   int i, r, c, max;
+   fpos_t *fp_pos, pos;
    long fp_pos_indic;
    va_list vl;
    
@@ -50,7 +50,7 @@ int main(char *fmt1, ...)
    (void) printf(fmt2, i_name, i);
 
    va_start(vl, fmt1);
-   (void) vscanf(fmt1, vl);
+   (void) vfscanf(fmt1, vl);
    va_end(vl);
    va_start(vl, fmt1);
    (void) vprintf(fmt1, vl);

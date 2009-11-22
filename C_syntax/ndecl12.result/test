@@ -1,0 +1,78 @@
+
+Symbol table
+
+main
+
+Declarations for module "main" with type "() -> int"
+
+Variable list:
+
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
+	Declared entity "main:*DYNAMIC*" with type "area" with size 30
+	Declared entity "main:*HEAP*" with type "area" with size 0
+	Declared entity "main:*STACK*" with type "area" with size 0
+	Declared entity "main:*STATIC*" with type "area" with size 0
+	Declared entity "main:0`#_PIPS_STRUCT_1" with type "struct" 
+	Declared entity "main:0`#_PIPS_STRUCT_2" with type "struct" 
+	Declared entity "main:0`__FUNCTION__" with type "variable" "char"
+	Declared entity "main:0`__func__" with type "variable" "char"
+	Declared entity "main:0`t" with type "variable" "TREE"
+	Declared entity "main:main" with type "variable" "int"
+	Declared entity "main:tree" with type "variable" "struct {int left; int right;}"
+	Declared entity "main:treeptr" with type "variable" "struct {int left; int right;} *"
+	Declared entity "ndecl12!:*STATIC*" with type "area" with size 0
+
+* empty extern declaration list *
+
+
+Layout for return variable:
+
+	Variable "main:main"	size = 4
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "main:*DYNAMIC*" of size 30:
+	Variable "main:tree"	offset = 10	size = 8
+	Variable "main:treeptr"	offset = 18	size = 4
+	Variable "main:0`t"	offset = 22	size = 8
+	Variable "main:0`__func__"	offset = 0	size = 5
+	Variable "main:0`__FUNCTION__"	offset = 5	size = 5
+
+
+Layout for memory area "main:*HEAP*" of size 0:
+	* empty area *
+
+
+Layout for memory area "main:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "main:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "ndecl12!:*STATIC*" of size 0:
+	* empty area *
+
+End of declarations for module main
+
+
+Parsed printed file
+
+int main()
+{
+   typedef struct {                                                     /*0004*/
+      int left;
+      int right;
+   } TREE, *TREEPTR;
+   struct {                                                             /*0005*/
+      int left;
+      int right;
+   } tree, *treeptr;
+
+   TREE t;                                                              /*0007*/
+}
