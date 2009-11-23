@@ -26,6 +26,10 @@
 # - designed to be run from cron.
 # - report is sent by mail if the status changed.
 # - if there is a persistant LOCK, investigate by hand...
+#
+# TODO
+# - should distinguish infrastructure failures (dns, svn)
+#   and compilation failures
 
 prod=${1:-.}
 dest=${2:-$LOGNAME@cri.ensmp.fr}
