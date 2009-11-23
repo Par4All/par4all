@@ -14,7 +14,7 @@ void flatten_code11(void)
    int i;
    
    /* Let's execute this loop four times! */
-   for(i = 0; i <= 3; i += 1) {                                         /*0007*/
+   for(i = 0; i <= 3; i += 1) {
       // BEGIN BLOCK
       static int foo = 0;
       
@@ -44,7 +44,7 @@ void flatten_code11(void)
 
    
    /* Let's execute this loop four times! */
-   for(i = 0; i <= 3; i += 1) {                                         /*0007*/
+   for(i = 0; i <= 3; i += 1) {
 
 //  P(foo,i) {0<=i, i<=3}
 

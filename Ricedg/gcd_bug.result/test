@@ -28,12 +28,12 @@ int main(void)
    int j;
 
    Matrix = (int **) malloc(N*sizeof(int *));                           /*0005*/
-   for(i = 0; i <= N-1; i += 1)                                         /*0006*/
+   for(i = 0; i <= N-1; i += 1)
       Matrix[i] = (int *) malloc(Z*sizeof(int));                        /*0008*/
 #pragma omp parallel for private(j)
-   for(i = 0; i <= N-1; i += 1)                                         /*0006*/
+   for(i = 0; i <= N-1; i += 1)
 #pragma omp parallel for 
-      for(j = 0; j <= Z-1; j += 1)                                      /*0009*/
+      for(j = 0; j <= Z-1; j += 1)
          Matrix[i][j] = i*j;                                            /*0011*/
    return 0;                                                            /*0014*/
 }
@@ -46,12 +46,12 @@ int main(void)
    int j;
 
    Matrix = (int **) malloc(N*sizeof(int *));                           /*0005*/
-   for(i = 0; i <= N-1; i += 1)                                         /*0006*/
+   for(i = 0; i <= N-1; i += 1)
       Matrix[i] = (int *) malloc(Z*sizeof(int));                        /*0008*/
 #pragma omp parallel for private(j)
-   for(i = 0; i <= N-1; i += 1)                                         /*0006*/
+   for(i = 0; i <= N-1; i += 1)
 #pragma omp parallel for 
-      for(j = 0; j <= Z-1; j += 1)                                      /*0009*/
+      for(j = 0; j <= Z-1; j += 1)
          Matrix[i][j] = i*j;                                            /*0011*/
    return 0;                                                            /*0014*/
 }
@@ -64,12 +64,12 @@ int main(void)
    int j;
 
    Matrix = (int **) malloc(N*sizeof(int *));                           /*0005*/
-   for(i = 0; i <= N-1; i += 1)                                         /*0006*/
+   for(i = 0; i <= N-1; i += 1)
       Matrix[i] = (int *) malloc(Z*sizeof(int));                        /*0008*/
 #pragma omp parallel for private(j)
-   for(i = 0; i <= N-1; i += 1)                                         /*0006*/
+   for(i = 0; i <= N-1; i += 1)
 #pragma omp parallel for
-      for(j = 0; j <= Z-1; j += 1)                                      /*0009*/
+      for(j = 0; j <= Z-1; j += 1)
          Matrix[i][j] = i*j;                                            /*0011*/
    return 0;                                                            /*0014*/
 }

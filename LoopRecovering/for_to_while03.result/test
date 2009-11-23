@@ -19,7 +19,9 @@ main(int argc, char *argv[])
    int m;
    int a;
 
-   for(l = 0; l <= 63; l += 1)
+   l = 0;
+   while (l<M) {
+      // BEGIN BLOCK
 compute:      do {
          // BEGIN BLOCK
          m = 0;
@@ -32,6 +34,9 @@ compute:      do {
          // END BLOCK
       }
       while (0);
+      l++;
+      // END BLOCK
+   }
    // END BLOCK
 }
 Regenerate the sources from the PIPS transformed code:
@@ -72,7 +77,12 @@ main(int argc, char *argv[])
    int m;
    int a;
 
-   for(l = 0; l <= 63; l += 1)
+   l = 0;
+   while (l<M) {
+      // BEGIN BLOCK
 compute:      compute(a, l, m);
+      l++;
+      // END BLOCK
+   }
    // END BLOCK
 }

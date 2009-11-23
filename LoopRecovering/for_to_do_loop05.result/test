@@ -19,8 +19,8 @@ void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], 
    int ki;
    int kj;
 
-   for(i = 0; i <= isi-1; i += 1)                                       /*0009*/
-      for(j = 0; j <= isj-1; j += 1)                                    /*0010*/
+   for(i = 0; i <= isi-1; i += 1)
+      for(j = 0; j <= isj-1; j += 1)
          new_image[i][j] = image[i][j];                                 /*0011*/
 }
 
@@ -35,10 +35,10 @@ void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], 
 //               <must be read   >: isi
 //               <must be written>: i
 
-   for(i = 0; i <= isi-1; i += 1)                                       /*0009*/
+   for(i = 0; i <= isi-1; i += 1)
 //               <must be read   >: isi isj
 //               <must be written>: j
-      for(j = 0; j <= isj-1; j += 1)                                    /*0010*/
+      for(j = 0; j <= isj-1; j += 1)
 //               <must be read   >: i image[i][j] isi isj j
 //               <must be written>: new_image[i][j]
          new_image[i][j] = image[i][j];                                 /*0011*/
@@ -60,12 +60,12 @@ void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], 
 //               <must be read   >: isi
 //               <must be written>: i
 
-   for(i = 0; i <= isi-1; i += 1)                                       /*0009*/
+   for(i = 0; i <= isi-1; i += 1)
 //               <may be read    >: i image[*][*] j
 //               <may be written >: new_image[*][*]
 //               <must be read   >: isi isj
 //               <must be written>: j
-      for(j = 0; j <= isj-1; j += 1)                                    /*0010*/
+      for(j = 0; j <= isj-1; j += 1)
 //               <may be read    >: image[*][*]
 //               <may be written >: new_image[*][*]
 //               <must be read   >: i isi isj j
@@ -87,11 +87,11 @@ void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], 
 //  T(i,j) {0<=i}
 
 
-   for(i = 0; i <= isi-1; i += 1)                                       /*0009*/
+   for(i = 0; i <= isi-1; i += 1)
 
 //  T(j) {0<=i, i+1<=isi, 0<=j}
 
-      for(j = 0; j <= isj-1; j += 1)                                    /*0010*/
+      for(j = 0; j <= isj-1; j += 1)
 
 //  T() {0<=i, i+1<=isi, j+1<=isj, 0<=j}
 
@@ -113,11 +113,11 @@ void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], 
 //  P() {}
 
 
-   for(i = 0; i <= isi-1; i += 1)                                       /*0009*/
+   for(i = 0; i <= isi-1; i += 1)
 
 //  P(i,j) {0<=i, i+1<=isi}
 
-      for(j = 0; j <= isj-1; j += 1)                                    /*0010*/
+      for(j = 0; j <= isj-1; j += 1)
 
 //  P(i,j) {0<=i, i+1<=isi, j+1<=isj, 0<=j}
 
@@ -132,8 +132,8 @@ void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], 
 
 
 #pragma omp parallel for 
-   for(i = 0; i <= isi-1; i += 1)                                       /*0009*/
+   for(i = 0; i <= isi-1; i += 1)
 #pragma omp parallel for 
-      for(j = 0; j <= isj-1; j += 1)                                    /*0010*/
+      for(j = 0; j <= isj-1; j += 1)
          new_image[i][j] = image[i][j];                                 /*0011*/
 }

@@ -8,7 +8,7 @@ int foo(int c[10])
    int k;
    for(i = 0; i <= 9; i += 1) {
       j = i;
-      for (j;j<10;j++) {
+      for(j = j; j <= 9; j += 1) {
          k = k+1;
          c[j] = k;
       }
@@ -36,7 +36,7 @@ int foo(int c[10])
    int k[9+1];
    for(i = 0; i <= 9; i += 1) {
       j[i] = i;
-      for (j[i];j[i]<10;j[i]++) {
+      for (;j[i]<=9;j[i] += 1) {
          k[i] = k[i]+1;
          c[j[i]] = k[i];
       }

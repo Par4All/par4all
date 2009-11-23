@@ -44,8 +44,7 @@ int main()
    
    /* Test with incomplete for: */
    i = 2;
-   ;
-   while (i<=50) {
+   for(i = i; i <= 50; i += 1) {
       // BEGIN BLOCK
       j = 2;
       while (j<100) {
@@ -54,7 +53,6 @@ int main()
          j *= 2;
          // END BLOCK
       }
-      i++;
       // END BLOCK
    }
 
@@ -69,7 +67,6 @@ int main()
          j *= 2;
          // END BLOCK
       }
-      ;
       // END BLOCK
    }
 
@@ -88,7 +85,6 @@ int main()
    }
    
    /* Unreachable from here... */
-   ;
    while (1) {
       // BEGIN BLOCK
       j = 2;
@@ -98,7 +94,6 @@ int main()
          j *= 2;
          // END BLOCK
       }
-      ;
       // END BLOCK
    }
 

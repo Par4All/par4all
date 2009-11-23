@@ -1,0 +1,14 @@
+
+Initial code with converted loop
+
+main()
+{
+   int i;
+   int j;
+   int k;
+   i = 0;
+   while (i<k) {
+      i++;
+      i++, j++;
+   }
+}

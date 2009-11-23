@@ -17,7 +17,7 @@ int main()
    int j;
    
    // A do loop ! Should be parallel
-   for(i = LB; i <= 99; i += INC)                                       /*0007*/
+   for(i = LB; i <= 99; i += INC)
       a[i] = 2;                                                         /*0008*/
 
    return 0;                                                            /*0010*/
@@ -30,7 +30,7 @@ int main()
    
    // A do loop ! Should be parallel
 #pragma omp parallel for 
-   for(i = LB; i <= 99; i += INC)                                       /*0007*/
+   for(i = LB; i <= 99; i += INC)
       a[i] = 2;                                                         /*0008*/
 
    return 0;                                                            /*0010*/

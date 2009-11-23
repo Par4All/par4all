@@ -7,84 +7,84 @@ int main()
    // Test all the combinations of signs, strictness and hand-sideness
    
    // for(j = 10; j > 5; j--)
-   for(j = 10; j >= 6; j += -1)                                         /*0009*/
+   for(j = 10; j >= 6; j += -1)
       a[j] = 2;                                                         /*0010*/
    // for(j = 10; j > -20; j--)
-   for(j = 10; j >= -19; j += -1)                                       /*0012*/
+   for(j = 10; j >= -19; j += -1)
       a[j] = 2;                                                         /*0013*/
    // for(j = -10; j > -20; j--)
-   for(j = -10; j >= -19; j += -1)                                      /*0015*/
+   for(j = -10; j >= -19; j += -1)
       a[j] = 2;                                                         /*0016*/
    
    // for(j = 10; j < 50; j++)
-   for(j = 10; j <= 49; j += 1)                                         /*0019*/
+   for(j = 10; j <= 49; j += 1)
       a[j] = 2;                                                         /*0020*/
    // for(j = -50; j < 20; j++)
-   for(j = -50; j <= 19; j += 1)                                        /*0022*/
+   for(j = -50; j <= 19; j += 1)
       a[j] = 2;                                                         /*0023*/
    // for(j = -50; j < -20; j++)
-   for(j = -50; j <= -21; j += 1)                                       /*0025*/
+   for(j = -50; j <= -21; j += 1)
       a[j] = 2;                                                         /*0026*/
    
    // for(j = 10; j >= 5; j--)
-   for(j = 10; j >= 5; j += -1)                                         /*0029*/
+   for(j = 10; j >= 5; j += -1)
       a[j] = 2;                                                         /*0030*/
    // for(j = 10; j >= -20; j--)
-   for(j = 10; j >= -20; j += -1)                                       /*0032*/
+   for(j = 10; j >= -20; j += -1)
       a[j] = 2;                                                         /*0033*/
    // for(j = -10; j >= -20; j--)
-   for(j = -10; j >= -20; j += -1)                                      /*0035*/
+   for(j = -10; j >= -20; j += -1)
       a[j] = 2;                                                         /*0036*/
    
    // for(j = 10; j <= 50; j++)
-   for(j = 10; j <= 50; j += 1)                                         /*0039*/
+   for(j = 10; j <= 50; j += 1)
       a[j] = 2;                                                         /*0040*/
    // for(j = -50; j <= 20; j++)
-   for(j = -50; j <= 20; j += 1)                                        /*0042*/
+   for(j = -50; j <= 20; j += 1)
       a[j] = 2;                                                         /*0043*/
    // for(j = -50; j <= -20; j++)
-   for(j = -50; j <= -20; j += 1)                                       /*0045*/
+   for(j = -50; j <= -20; j += 1)
       a[j] = 2;                                                         /*0046*/
    
    
    // for(j = 10; 5 < j; j--)
-   for(j = 10; j >= 6; j += -1)                                         /*0050*/
+   for(j = 10; j >= 6; j += -1)
       a[j] = 2;                                                         /*0051*/
    // for(j = 10; -20 < j; j--)
-   for(j = 10; j >= -19; j += -1)                                       /*0053*/
+   for(j = 10; j >= -19; j += -1)
       a[j] = 2;                                                         /*0054*/
    // for(j = -10; -20 < j; j--)
-   for(j = -10; j >= -19; j += -1)                                      /*0056*/
+   for(j = -10; j >= -19; j += -1)
       a[j] = 2;                                                         /*0057*/
    
    // for(j = 10; 50 > j; j++)
-   for(j = 10; j <= 49; j += 1)                                         /*0060*/
+   for(j = 10; j <= 49; j += 1)
       a[j] = 2;                                                         /*0061*/
    // for(j = -50; 20 > j; j++)
-   for(j = -50; j <= 19; j += 1)                                        /*0063*/
+   for(j = -50; j <= 19; j += 1)
       a[j] = 2;                                                         /*0064*/
    // for(j = -50; -20 > j; j++)
-   for(j = -50; j <= -21; j += 1)                                       /*0066*/
+   for(j = -50; j <= -21; j += 1)
       a[j] = 2;                                                         /*0067*/
    
    // for(j = 10; 5 <= j; j--)
-   for(j = 10; j >= 5; j += -1)                                         /*0070*/
+   for(j = 10; j >= 5; j += -1)
       a[j] = 2;                                                         /*0071*/
    // for(j = 10; -20 <= j; j--)
-   for(j = 10; j >= -20; j += -1)                                       /*0073*/
+   for(j = 10; j >= -20; j += -1)
       a[j] = 2;                                                         /*0074*/
    // for(j = -10; -20 <= j; j--)
-   for(j = -10; j >= -20; j += -1)                                      /*0076*/
+   for(j = -10; j >= -20; j += -1)
       a[j] = 2;                                                         /*0077*/
    
    // for(j = 10; 50 >= j; j++)
-   for(j = 10; j <= 50; j += 1)                                         /*0080*/
+   for(j = 10; j <= 50; j += 1)
       a[j] = 2;                                                         /*0081*/
    // for(j = -50; 20 >= j; j++)
-   for(j = -50; j <= 20; j += 1)                                        /*0083*/
+   for(j = -50; j <= 20; j += 1)
       a[j] = 2;                                                         /*0084*/
    // for(j = -50; -20 >= j; j++)
-   for(j = -50; j <= -20; j += 1)                                       /*0086*/
+   for(j = -50; j <= -20; j += 1)
       a[j] = 2;                                                         /*0087*/
 
    return 0;                                                            /*0089*/
@@ -99,107 +99,107 @@ int main()
    
    // for(j = 10; j > 5; j--)
 #pragma omp parallel for 
-   for(j = 10; j >= 6; j += -1)                                         /*0009*/
+   for(j = 10; j >= 6; j += -1)
       a[j] = 2;                                                         /*0010*/
    // for(j = 10; j > -20; j--)
 #pragma omp parallel for 
-   for(j = 10; j >= -19; j += -1)                                       /*0012*/
+   for(j = 10; j >= -19; j += -1)
       a[j] = 2;                                                         /*0013*/
    // for(j = -10; j > -20; j--)
 #pragma omp parallel for 
-   for(j = -10; j >= -19; j += -1)                                      /*0015*/
+   for(j = -10; j >= -19; j += -1)
       a[j] = 2;                                                         /*0016*/
    
    // for(j = 10; j < 50; j++)
 #pragma omp parallel for 
-   for(j = 10; j <= 49; j += 1)                                         /*0019*/
+   for(j = 10; j <= 49; j += 1)
       a[j] = 2;                                                         /*0020*/
    // for(j = -50; j < 20; j++)
 #pragma omp parallel for 
-   for(j = -50; j <= 19; j += 1)                                        /*0022*/
+   for(j = -50; j <= 19; j += 1)
       a[j] = 2;                                                         /*0023*/
    // for(j = -50; j < -20; j++)
 #pragma omp parallel for 
-   for(j = -50; j <= -21; j += 1)                                       /*0025*/
+   for(j = -50; j <= -21; j += 1)
       a[j] = 2;                                                         /*0026*/
    
    // for(j = 10; j >= 5; j--)
 #pragma omp parallel for 
-   for(j = 10; j >= 5; j += -1)                                         /*0029*/
+   for(j = 10; j >= 5; j += -1)
       a[j] = 2;                                                         /*0030*/
    // for(j = 10; j >= -20; j--)
 #pragma omp parallel for 
-   for(j = 10; j >= -20; j += -1)                                       /*0032*/
+   for(j = 10; j >= -20; j += -1)
       a[j] = 2;                                                         /*0033*/
    // for(j = -10; j >= -20; j--)
 #pragma omp parallel for 
-   for(j = -10; j >= -20; j += -1)                                      /*0035*/
+   for(j = -10; j >= -20; j += -1)
       a[j] = 2;                                                         /*0036*/
    
    // for(j = 10; j <= 50; j++)
 #pragma omp parallel for 
-   for(j = 10; j <= 50; j += 1)                                         /*0039*/
+   for(j = 10; j <= 50; j += 1)
       a[j] = 2;                                                         /*0040*/
    // for(j = -50; j <= 20; j++)
 #pragma omp parallel for 
-   for(j = -50; j <= 20; j += 1)                                        /*0042*/
+   for(j = -50; j <= 20; j += 1)
       a[j] = 2;                                                         /*0043*/
    // for(j = -50; j <= -20; j++)
 #pragma omp parallel for 
-   for(j = -50; j <= -20; j += 1)                                       /*0045*/
+   for(j = -50; j <= -20; j += 1)
       a[j] = 2;                                                         /*0046*/
    
    
    // for(j = 10; 5 < j; j--)
 #pragma omp parallel for 
-   for(j = 10; j >= 6; j += -1)                                         /*0050*/
+   for(j = 10; j >= 6; j += -1)
       a[j] = 2;                                                         /*0051*/
    // for(j = 10; -20 < j; j--)
 #pragma omp parallel for 
-   for(j = 10; j >= -19; j += -1)                                       /*0053*/
+   for(j = 10; j >= -19; j += -1)
       a[j] = 2;                                                         /*0054*/
    // for(j = -10; -20 < j; j--)
 #pragma omp parallel for 
-   for(j = -10; j >= -19; j += -1)                                      /*0056*/
+   for(j = -10; j >= -19; j += -1)
       a[j] = 2;                                                         /*0057*/
    
    // for(j = 10; 50 > j; j++)
 #pragma omp parallel for 
-   for(j = 10; j <= 49; j += 1)                                         /*0060*/
+   for(j = 10; j <= 49; j += 1)
       a[j] = 2;                                                         /*0061*/
    // for(j = -50; 20 > j; j++)
 #pragma omp parallel for 
-   for(j = -50; j <= 19; j += 1)                                        /*0063*/
+   for(j = -50; j <= 19; j += 1)
       a[j] = 2;                                                         /*0064*/
    // for(j = -50; -20 > j; j++)
 #pragma omp parallel for 
-   for(j = -50; j <= -21; j += 1)                                       /*0066*/
+   for(j = -50; j <= -21; j += 1)
       a[j] = 2;                                                         /*0067*/
    
    // for(j = 10; 5 <= j; j--)
 #pragma omp parallel for 
-   for(j = 10; j >= 5; j += -1)                                         /*0070*/
+   for(j = 10; j >= 5; j += -1)
       a[j] = 2;                                                         /*0071*/
    // for(j = 10; -20 <= j; j--)
 #pragma omp parallel for 
-   for(j = 10; j >= -20; j += -1)                                       /*0073*/
+   for(j = 10; j >= -20; j += -1)
       a[j] = 2;                                                         /*0074*/
    // for(j = -10; -20 <= j; j--)
 #pragma omp parallel for 
-   for(j = -10; j >= -20; j += -1)                                      /*0076*/
+   for(j = -10; j >= -20; j += -1)
       a[j] = 2;                                                         /*0077*/
    
    // for(j = 10; 50 >= j; j++)
 #pragma omp parallel for 
-   for(j = 10; j <= 50; j += 1)                                         /*0080*/
+   for(j = 10; j <= 50; j += 1)
       a[j] = 2;                                                         /*0081*/
    // for(j = -50; 20 >= j; j++)
 #pragma omp parallel for 
-   for(j = -50; j <= 20; j += 1)                                        /*0083*/
+   for(j = -50; j <= 20; j += 1)
       a[j] = 2;                                                         /*0084*/
    // for(j = -50; -20 >= j; j++)
 #pragma omp parallel for 
-   for(j = -50; j <= -20; j += 1)                                       /*0086*/
+   for(j = -50; j <= -20; j += 1)
       a[j] = 2;                                                         /*0087*/
 
    return 0;                                                            /*0089*/

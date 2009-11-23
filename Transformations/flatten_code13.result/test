@@ -73,7 +73,7 @@ int flatten_code13(void)
       // (0,2)
       // BEGIN BLOCK
       // (statement ordering unavailable)
-      _return1 = bla();                                                 /*0035*/
+      _return1 = bla();                                                 /*0039*/
       // (statement ordering unavailable)
       // END BLOCK
       // (statement ordering unavailable)
@@ -81,13 +81,14 @@ int flatten_code13(void)
    }
 // (0,8)
    // (statement ordering unavailable)
-   i2 = _return1;                                                       /*0044*/
+   i2 = _return1;                                                       /*0048*/
 // (0,9)
+   // END BLOCK
    // END BLOCK
    // (0,7)
    /*0017*/
    // (0,4)
-   return i1+i2;                                                        /*0049*/
+   return i1+i2;                                                        /*0054*/
    // END BLOCK
 }
 int flatten_code13(void)
@@ -113,19 +114,20 @@ int flatten_code13(void)
    // (0,2)
    // BEGIN BLOCK
    // (statement ordering unavailable)
-   _return1 = bla();                                                    /*0035*/
+   _return1 = bla();                                                    /*0039*/
 // (0,5)
    // (statement ordering unavailable)
    // END BLOCK
    // (statement ordering unavailable)
    // (statement ordering unavailable)
-   i2 = _return1;                                                       /*0044*/
+   i2 = _return1;                                                       /*0048*/
 // (0,6)
+   // END BLOCK
    // END BLOCK
    // (0,7)
    /*0017*/
    // (0,4)
-   return i1+i2;                                                        /*0049*/
+   return i1+i2;                                                        /*0054*/
    // END BLOCK
 }
 int flatten_code13(void)
@@ -158,7 +160,7 @@ int flatten_code13(void)
    // (statement ordering unavailable)
    _return1 = bla();                                                    /*0048*/
 // (0,5)
-   /*0035*/
+   /*0039*/
    // (0,5)
    // (statement ordering unavailable)
    // END BLOCK
@@ -166,12 +168,13 @@ int flatten_code13(void)
    // (statement ordering unavailable)
    i2 = _return1;                                                       /*0054*/
 // (0,6)
-   /*0044*/
+   /*0048*/
    // (0,6)
+   // END BLOCK
    // END BLOCK
    // (0,7)
    /*0017*/
    // (0,4)
-   return i1+i2;                                                        /*0060*/
+   return i1+i2;                                                        /*0061*/
    // END BLOCK
 }

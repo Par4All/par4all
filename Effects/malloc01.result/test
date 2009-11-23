@@ -21,9 +21,9 @@ int main(int argc, char *argv[])
    int i,  j;                                                           /*0003*/
    int *a[64];                                                          /*0004*/
 
-   for(i = 0; i <= 63; i += 1) {                                        /*0006*/
+   for(i = 0; i <= 63; i += 1) {
       a[i] = malloc(64*sizeof(float));                                  /*0007*/
-      for(j = 0; j <= 63; j += 1)                                       /*0008*/
+      for(j = 0; j <= 63; j += 1)
          a[i][j] = 0.;                                                  /*0009*/
    }
 
@@ -35,10 +35,10 @@ int main(int argc, char *argv[])
    int *a[64];                                                          /*0004*/
 
 #pragma omp parallel for private(j)
-   for(i = 0; i <= 63; i += 1) {                                        /*0006*/
+   for(i = 0; i <= 63; i += 1) {
       a[i] = malloc(64*sizeof(float));                                  /*0007*/
 #pragma omp parallel for 
-      for(j = 0; j <= 63; j += 1)                                       /*0008*/
+      for(j = 0; j <= 63; j += 1)
          a[i][j] = 0.;                                                  /*0009*/
    }
 
@@ -50,10 +50,10 @@ int main(int argc, char *argv[])
    int *a[64];                                                          /*0004*/
 
 #pragma omp parallel for private(j)
-   for(i = 0; i <= 63; i += 1) {                                        /*0006*/
+   for(i = 0; i <= 63; i += 1) {
       a[i] = malloc(64*sizeof(float));                                  /*0007*/
 #pragma omp parallel for 
-      for(j = 0; j <= 63; j += 1)                                       /*0008*/
+      for(j = 0; j <= 63; j += 1)
          a[i][j] = 0.;                                                  /*0009*/
    }
 

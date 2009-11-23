@@ -7,11 +7,11 @@ void microcode(short image[512][512], short kernel[3][3], short new_image[512][5
    short j;
    short k;
    short l;
-   for(i = 0; i <= iter1-1; i += 1)                                     /*0005*/
-      for(j = 0; j <= iter2-1; j += 1) {                                /*0007*/
+   for(i = 0; i <= iter1-1; i += 1)
+      for(j = 0; j <= iter2-1; j += 1) {
          new_image[i][j] = 0;                                           /*0009*/
-         for(k = 0; k <= 2; k += 1)                                     /*0010*/
-            for(l = 0; l <= 2; l += 1)                                  /*0011*/
+         for(k = 0; k <= 2; k += 1)
+            for(l = 0; l <= 2; l += 1)
                new_image[i][j] = new_image[i][j]+image[i+k][j+l]+kernel[k][l];         /*0012*/
          new_image[i][j] = new_image[i][j]/9;                           /*0013*/
       }
@@ -25,8 +25,8 @@ void microcode(short image[512][512], short kernel[3][3], short new_image[512][5
    short j;
    short k;
    short l;
-   for(i = 0; i <= iter1-1; i += 1)                                     /*0005*/
-      for(j = 0; j <= iter2-1; j += 1) {                                /*0007*/
+   for(i = 0; i <= iter1-1; i += 1)
+      for(j = 0; j <= iter2-1; j += 1) {
          new_image[i][j] = 0;                                           /*0009*/
          new_image[i][j] = new_image[i][j]+image[i+0][j+0]+kernel[0][0];               /*0012*/
          new_image[i][j] = new_image[i][j]+image[i+0][j+1]+kernel[0][1];               /*0012*/
@@ -54,8 +54,8 @@ void microcode(short image[512][512], short kernel[3][3], short new_image[512][5
    short k;
    short l;
    short __scalar__0;
-   for(i = 0; i <= iter1-1; i += 1)                                     /*0005*/
-      for(j = 0; j <= iter2-1; j += 1) {                                /*0007*/
+   for(i = 0; i <= iter1-1; i += 1)
+      for(j = 0; j <= iter2-1; j += 1) {
          __scalar__0 = 0;                                               /*0009*/
          __scalar__0 = __scalar__0+image[i+0][j+0]+kernel[0][0];        /*0012*/
          __scalar__0 = __scalar__0+image[i+0][j+1]+kernel[0][1];        /*0012*/
@@ -84,8 +84,8 @@ void microcode(short *image, short *kernel, short *new_image, short iter1, short
    short k;
    short l;
    short __scalar__0;
-   for(i = 0; i <= iter1-1; i += 1)                                     /*0005*/
-      for(j = 0; j <= iter2-1; j += 1) {                                /*0007*/
+   for(i = 0; i <= iter1-1; i += 1)
+      for(j = 0; j <= iter2-1; j += 1) {
          __scalar__0 = 0;                                               /*0009*/
          __scalar__0 = __scalar__0+image[j+512*i]+kernel[0];            /*0012*/
          __scalar__0 = __scalar__0+image[j+512*i+1]+kernel[1];          /*0012*/
@@ -116,7 +116,7 @@ void microcode(short *image, short *kernel, short *new_image, short iter1, short
    short __scalar__0;
    int I_2;
    for(i = 0; i <= iter1-1; i += 1)
-      for(j = 0; j <= iter2-1; j += 1) {                                /*0007*/
+      for(j = 0; j <= iter2-1; j += 1) {
          __scalar__0 = 0;                                               /*0009*/
          I_2 = j+512*i;
          __scalar__0 = __scalar__0+image[I_2]+kernel[0];

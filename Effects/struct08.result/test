@@ -36,7 +36,7 @@ void init(mys *m)
 //               <must be written>: m[0][3][0]
    (m->tab2)[0] = 20;                                                   /*0018*/
 //               <must be written>: i
-   for(i = 0; i <= 4; i += 1) {                                         /*0019*/
+   for(i = 0; i <= 4; i += 1) {
 //               <must be read   >: i m
 //               <must be written>: m[0][2][i]
       (m->tab1)[i] = 1;                                                 /*0021*/
@@ -67,7 +67,7 @@ void init2(mys *n)
 //               <must be written>: m[3][0]
    (m.tab2)[0] = 20;                                                    /*0036*/
 //               <must be written>: i
-   for(i = 0; i <= 4; i += 1) {                                         /*0037*/
+   for(i = 0; i <= 4; i += 1) {
 //               <must be read   >: i
 //               <must be written>: m[2][i]
       (m.tab1)[i] = 1;                                                  /*0039*/
@@ -86,7 +86,7 @@ void init3(mys **p)
 //               <must be written>: _MALLOC_EFFECTS:_MALLOC_ p
    p = malloc(5*sizeof(mys *));                                         /*0048*/
 //               <must be written>: i
-   for(i = 0; i <= 4; i += 1) {                                         /*0049*/
+   for(i = 0; i <= 4; i += 1) {
 //               <must be read   >: _MALLOC_EFFECTS:_MALLOC_ i p
 //               <must be written>: _MALLOC_EFFECTS:_MALLOC_ p[i]
       p[i] = malloc(sizeof(mys));                                       /*0051*/
@@ -107,7 +107,7 @@ void init3(mys **p)
    (p[0]->tab2)[0] = 30;                                                /*0057*/
 //               <must be written>: i
 
-   for(i = 1; i <= 4; i += 1) {                                         /*0059*/
+   for(i = 1; i <= 4; i += 1) {
 //               <must be read   >: i p p[i]
 //               <must be written>: p[i][0][1]
       p[i]->num = 10;                                                   /*0061*/
@@ -127,7 +127,7 @@ void init4(mys *p[5])
 {
    int i;                                                               /*0069*/
 //               <must be written>: i
-   for(i = 0; i <= 4; i += 1) {                                         /*0070*/
+   for(i = 0; i <= 4; i += 1) {
 //               <must be read   >: _MALLOC_EFFECTS:_MALLOC_ i
 //               <must be written>: _MALLOC_EFFECTS:_MALLOC_ p[i]
       p[i] = malloc(sizeof(mys));                                       /*0072*/
@@ -149,7 +149,7 @@ void init4(mys *p[5])
 //               <must be written>: i
    
    
-   for(i = 1; i <= 4; i += 1) {                                         /*0081*/
+   for(i = 1; i <= 4; i += 1) {
 //               <must be read   >: i p[i]
 //               <must be written>: p[i][0][1]
       p[i]->num = 10;                                                   /*0083*/
@@ -213,7 +213,7 @@ void init(mys *m)
 
 //  <i-W-EXACT-{}>
 
-   for(i = 0; i <= 4; i += 1) {                                         /*0019*/
+   for(i = 0; i <= 4; i += 1) {
 
 //  <i-R-EXACT-{}>
 //  <m-R-EXACT-{}>
@@ -269,7 +269,7 @@ void init2(mys *n)
 
 //  <i-W-EXACT-{}>
 
-   for(i = 0; i <= 4; i += 1) {                                         /*0037*/
+   for(i = 0; i <= 4; i += 1) {
 
 //  <i-R-EXACT-{}>
 //  <m[PHI1][PHI2]-W-EXACT-{PHI1==2, PHI2==i, 0<=i, i<=4}>
@@ -299,7 +299,7 @@ void init3(mys **p)
 
 //  <i-W-EXACT-{}>
 
-   for(i = 0; i <= 4; i += 1) {                                         /*0049*/
+   for(i = 0; i <= 4; i += 1) {
 
 //  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
 //  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
@@ -345,7 +345,7 @@ void init3(mys **p)
 //  <i-W-EXACT-{}>
 
 
-   for(i = 1; i <= 4; i += 1) {                                         /*0059*/
+   for(i = 1; i <= 4; i += 1) {
 
 //  <i-R-EXACT-{}>
 //  <p-R-EXACT-{}>
@@ -386,7 +386,7 @@ void init4(mys *p[5])
 
 //  <i-W-EXACT-{}>
 
-   for(i = 0; i <= 4; i += 1) {                                         /*0070*/
+   for(i = 0; i <= 4; i += 1) {
 
 //  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
 //  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
@@ -428,7 +428,7 @@ void init4(mys *p[5])
 
    
    
-   for(i = 1; i <= 4; i += 1) {                                         /*0081*/
+   for(i = 1; i <= 4; i += 1) {
 
 //  <i-R-EXACT-{}>
 //  <p[PHI1]-R-EXACT-{PHI1==i, 1<=i, i<=4}>

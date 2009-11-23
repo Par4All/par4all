@@ -4,14 +4,14 @@ int main()
    
    //comments 1
 l40:
-   for(m = 0; m <= 9; m += 1) {                                         /*0007*/
+   for(m = 0; m <= 9; m += 1) {
       float y = 2.0;
       y = 3.5;                                                          /*0009*/
    }
    
    //comments 2
 l50:
-   for(m = 0; m <= 9; m += 1) {                                         /*0014*/
+   for(m = 0; m <= 9; m += 1) {
       float z = 2.0;
       z = 3.5;                                                          /*0017*/
    }

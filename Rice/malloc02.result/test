@@ -6,7 +6,7 @@ void malloc02()
    int *p[10];
    int i;
 
-   for(i = 0; i <= 9; i += 1) {                                         /*0007*/
+   for(i = 0; i <= 9; i += 1) {
       p[i] = malloc(sizeof(int));                                       /*0008*/
       p[i] = i;                                                         /*0009*/
    }
@@ -25,7 +25,7 @@ void malloc02()
 //  P() {}
 
 
-   for(i = 0; i <= 9; i += 1) {                                         /*0007*/
+   for(i = 0; i <= 9; i += 1) {
 
 //  P(i) {0<=i, i<=9}
 
@@ -45,7 +45,7 @@ void malloc02()
    int i;
 //               <must be written>: i
 
-   for(i = 0; i <= 9; i += 1) {                                         /*0007*/
+   for(i = 0; i <= 9; i += 1) {
 //               <must be read   >: _MALLOC_EFFECTS:_MALLOC_ i
 //               <must be written>: _MALLOC_EFFECTS:_MALLOC_ p[i]
       p[i] = malloc(sizeof(int));                                       /*0008*/
@@ -67,7 +67,7 @@ void malloc02()
 //               <may be written >: _MALLOC_EFFECTS:_MALLOC_ p[*]
 //               <must be written>: i
 
-   for(i = 0; i <= 9; i += 1) {                                         /*0007*/
+   for(i = 0; i <= 9; i += 1) {
 //               <may be written >: p[*]
 //               <must be read   >: _MALLOC_EFFECTS:_MALLOC_ i
 //               <must be written>: _MALLOC_EFFECTS:_MALLOC_
@@ -88,7 +88,7 @@ void malloc02()
 //  <p[PHI1]-W-EXACT-{0<=PHI1, PHI1<=9}>
 
 
-   for(i = 0; i <= 9; i += 1) {                                         /*0007*/
+   for(i = 0; i <= 9; i += 1) {
 
 //  <p[PHI1]-W-EXACT-{PHI1==i, 0<=i, i<=9}>
 
@@ -121,10 +121,10 @@ void malloc02()
    int i;
 
 
-   for(i = 0; i <= 9; i += 1)                                           /*0007*/
+   for(i = 0; i <= 9; i += 1)
       p[i] = malloc(sizeof(int));                                       /*0008*/
 #pragma omp parallel for 
-   for(i = 0; i <= 9; i += 1)                                           /*0007*/
+   for(i = 0; i <= 9; i += 1)
       p[i] = i;                                                         /*0009*/
 }
 
@@ -136,10 +136,10 @@ void malloc02()
    int i;
 
 
-   for(i = 0; i <= 9; i += 1)                                           /*0007*/
+   for(i = 0; i <= 9; i += 1)
       p[i] = malloc(sizeof(int));                                       /*0008*/
 #pragma omp parallel for 
-   for(i = 0; i <= 9; i += 1)                                           /*0007*/
+   for(i = 0; i <= 9; i += 1)
       p[i] = i;                                                         /*0009*/
 }
 

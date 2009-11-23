@@ -20,7 +20,7 @@ int main()
    int j;
    
    // A do loop ! Should be parallel.
-   for(j = 10; j >= 1; j += -4)                                         /*0007*/
+   for(j = 10; j >= 1; j += -4)
       a[j] = 2;                                                         /*0008*/
 
    return 0;                                                            /*0010*/
@@ -36,7 +36,7 @@ int main()
 //               <must be written>: j
    
    // A do loop ! Should be parallel.
-   for(j = 10; j >= 1; j += -4)                                         /*0007*/
+   for(j = 10; j >= 1; j += -4)
 //               <must be read   >: j
 //               <must be written>: a[j]
       a[j] = 2;                                                         /*0008*/
@@ -56,7 +56,7 @@ int main()
 //               <must be written>: j
    
    // A do loop ! Should be parallel.
-   for(j = 10; j >= 1; j += -4)                                         /*0007*/
+   for(j = 10; j >= 1; j += -4)
 //               <may be written >: a[*]
 //               <must be read   >: j
       a[j] = 2;                                                         /*0008*/
@@ -79,7 +79,7 @@ int main()
 
    
    // A do loop ! Should be parallel.
-   for(j = 10; j >= 1; j += -4)                                         /*0007*/
+   for(j = 10; j >= 1; j += -4)
 
 //  T() {1<=j, j<=10}
 
@@ -106,7 +106,7 @@ int main()
 
    
    // A do loop ! Should be parallel.
-   for(j = 10; j >= 1; j += -4)                                         /*0007*/
+   for(j = 10; j >= 1; j += -4)
 
 //  P(j) {1<=j, j<=10}
 
@@ -125,7 +125,7 @@ int main()
    
    // A do loop ! Should be parallel.
 #pragma omp parallel for 
-   for(j = 10; j >= 1; j += -4)                                         /*0007*/
+   for(j = 10; j >= 1; j += -4)
       a[j] = 2;                                                         /*0008*/
 
    return 0;                                                            /*0010*/

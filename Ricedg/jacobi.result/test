@@ -16,12 +16,12 @@ int jacobi(int nb, int **a, int **b)
 //               <must be read   >: nb
 //               <must be written>: indice_i
 
-   for(indice_i = 1; indice_i <= nb-1-1; indice_i += 1)                 /*0005*/
+   for(indice_i = 1; indice_i <= nb-1-1; indice_i += 1)
 //               <may be read    >: a a[*] b b[*] b[*][*] indice_i
 //               <may be written >: a[*][*]
 //               <must be read   >: nb
 //               <must be written>: indice_j
-      for(indice_j = 1; indice_j <= nb-1-1; indice_j += 1)              /*0006*/
+      for(indice_j = 1; indice_j <= nb-1-1; indice_j += 1)
 //               <may be read    >: a[*] b[*] b[*][*]
 //               <may be written >: a[*][*]
 //               <must be read   >: a b indice_i indice_j nb
@@ -66,7 +66,7 @@ int main(int argc, char *argv[])
 //               <must be read   >: nb
 //               <must be written>: indice_i
 
-      for(indice_i = 0; indice_i <= nb; indice_i += 1) {                /*0036*/
+      for(indice_i = 0; indice_i <= nb; indice_i += 1) {
 //               <may be written >: a[*]
 //               <must be read   >: _MALLOC_EFFECTS:_MALLOC_ a 
 //                                  indice_i nb
@@ -135,9 +135,9 @@ int jacobi(int nb, int **a, int **b)
 
 
 #pragma omp parallel for private(indice_j)
-   for(indice_i = 1; indice_i <= nb-1-1; indice_i += 1)                 /*0005*/
+   for(indice_i = 1; indice_i <= nb-1-1; indice_i += 1)
 #pragma omp parallel for 
-      for(indice_j = 1; indice_j <= nb-1-1; indice_j += 1)              /*0006*/
+      for(indice_j = 1; indice_j <= nb-1-1; indice_j += 1)
          
          
          
@@ -162,7 +162,7 @@ int main(int argc, char *argv[])
       a = malloc(sizeof(int *)*(nb+1));                                 /*0034*/
 
 
-      for(indice_i = 0; indice_i <= nb; indice_i += 1) {                /*0036*/
+      for(indice_i = 0; indice_i <= nb; indice_i += 1) {
          a[indice_i] = malloc(sizeof(int)*(nb+1));                      /*0037*/
          b[indice_i] = malloc(sizeof(int)*(nb+1));                      /*0038*/
       }

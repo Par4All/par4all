@@ -9,7 +9,7 @@ int icm01()
    int k;
    int a[10];
 
-   for(i = 0; i <= 9; i += 1) {                                         /*0009*/
+   for(i = 0; i <= 9; i += 1) {
       // BEGIN BLOCK
       k = j*j+1;                                                        /*0010*/
       a[i] = k;                                                         /*0011*/

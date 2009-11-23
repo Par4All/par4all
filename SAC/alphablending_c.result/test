@@ -334,18 +334,20 @@ void alphablending(size_t n, float src1[n], float src2[n], float result[n], floa
    LU_NUB0 = n;
    LU_IB0 = MOD(LU_NUB0, 4);
    F_3 = 1-alpha;
+   LU_IND0 = MAX(INT(LU_IB0), 0);
+   F_14 = F_3;
    for(LU_IND0 = 0; LU_IND0 <= LU_IB0-1; LU_IND0 += 1) {
       F_04 = alpha*src1[LU_IND0];
-      F_14 = F_3;
       F_24 = F_14*src2[LU_IND0];
       result[LU_IND0] = F_04+F_24;
    }
    SIMD_LOAD_GENERIC_V4SF(v4sf_vec1, alpha, alpha, alpha, alpha);
    SIMD_LOAD_CONSTANT_V4SF(v4sf_vec4, 1, 1, 1, 1);
+   LU_IND0 = LU_IB0+MAX(INT((LU_NUB0-LU_IB0+3)/4), 0)*4;
+   SIMD_SUBPS(v4sf_vec3, v4sf_vec4, v4sf_vec1);
    for(LU_IND0 = LU_IB0; LU_IND0 <= LU_NUB0-1; LU_IND0 += 4) {
       SIMD_LOAD_V4SF(v4sf_vec2, &src1[LU_IND0]);
       SIMD_MULPS(v4sf_vec0, v4sf_vec1, v4sf_vec2);
-      SIMD_SUBPS(v4sf_vec3, v4sf_vec4, v4sf_vec1);
       SIMD_LOAD_V4SF(v4sf_vec8, &src2[LU_IND0]);
       SIMD_MULPS(v4sf_vec6, v4sf_vec3, v4sf_vec8);
       SIMD_ADDPS(v4sf_vec9, v4sf_vec0, v4sf_vec6);
@@ -390,18 +392,20 @@ void alphablending(size_t n, float src1[n], float src2[n], float result[n], floa
    LU_NUB0 = n;
    LU_IB0 = MOD(LU_NUB0, 4);
    F_3 = 1-alpha;
+   LU_IND0 = MAX(INT(LU_IB0), 0);
+   F_14 = F_3;
    for(LU_IND0 = 0; LU_IND0 <= LU_IB0-1; LU_IND0 += 1) {
       F_04 = alpha*src1[LU_IND0];
-      F_14 = F_3;
       F_24 = F_14*src2[LU_IND0];
       result[LU_IND0] = F_04+F_24;
    }
    SIMD_LOAD_GENERIC_V4SF(v4sf_vec1, alpha, alpha, alpha, alpha);
    SIMD_LOAD_CONSTANT_V4SF(v4sf_vec4, 1, 1, 1, 1);
+   LU_IND0 = LU_IB0+MAX(INT((LU_NUB0-LU_IB0+3)/4), 0)*4;
+   SIMD_SUBPS(v4sf_vec3, v4sf_vec4, v4sf_vec1);
    for(LU_IND0 = LU_IB0; LU_IND0 <= LU_NUB0-1; LU_IND0 += 4) {
       SIMD_LOAD_V4SF(v4sf_vec2, &src1[LU_IND0]);
       SIMD_MULPS(v4sf_vec0, v4sf_vec1, v4sf_vec2);
-      SIMD_SUBPS(v4sf_vec3, v4sf_vec4, v4sf_vec1);
       SIMD_LOAD_V4SF(v4sf_vec8, &src2[LU_IND0]);
       SIMD_MULPS(v4sf_vec6, v4sf_vec3, v4sf_vec8);
       SIMD_ADDPS(v4sf_vec9, v4sf_vec0, v4sf_vec6);
@@ -449,18 +453,20 @@ void alphablending(size_t n, float src1[n], float src2[n], float result[n], floa
    LU_NUB0 = n;
    LU_IB0 = MOD(LU_NUB0, 4);
    F_3 = 1-alpha;
+   LU_IND0 = MAX(INT(LU_IB0), 0);
+   F_14 = F_3;
    for(LU_IND0 = 0; LU_IND0 <= LU_IB0-1; LU_IND0 += 1) {
       F_04 = alpha*src1[LU_IND0];
-      F_14 = F_3;
       F_24 = F_14*src2[LU_IND0];
       result[LU_IND0] = F_04+F_24;
    }
    SIMD_LOAD_GENERIC_V4SF(v4sf_vec1, alpha, alpha, alpha, alpha);
    SIMD_LOAD_CONSTANT_V4SF(v4sf_vec4, 1, 1, 1, 1);
+   LU_IND0 = LU_IB0+MAX(INT((LU_NUB0-LU_IB0+3)/4), 0)*4;
+   SIMD_SUBPS(v4sf_vec3, v4sf_vec4, v4sf_vec1);
    for(LU_IND0 = LU_IB0; LU_IND0 <= LU_NUB0-1; LU_IND0 += 4) {
       SIMD_LOAD_V4SF(v4sf_vec2, &src1[LU_IND0]);
       SIMD_MULPS(v4sf_vec0, v4sf_vec1, v4sf_vec2);
-      SIMD_SUBPS(v4sf_vec3, v4sf_vec4, v4sf_vec1);
       SIMD_LOAD_V4SF(v4sf_vec8, &src2[LU_IND0]);
       SIMD_MULPS(v4sf_vec6, v4sf_vec3, v4sf_vec8);
       SIMD_ADDPS(v4sf_vec9, v4sf_vec0, v4sf_vec6);

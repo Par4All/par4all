@@ -22,12 +22,12 @@ void compute()
    int i;
    int j;
 
-   for(i = 1; i <= 62; i += 1)                                          /*0078*/
-      for(j = 1; j <= 62; j += 1)                                       /*0079*/
+   for(i = 1; i <= 62; i += 1)
+      for(j = 1; j <= 62; j += 1)
 
          save[i][j] = 0.25*(space[i-1][j]+space[i+1][j]+space[i][j-1]+space[i][j+1]);  /*0081*/
-   for(i = 1; i <= 62; i += 1)                                          /*0083*/
-      for(j = 1; j <= 62; j += 1)                                       /*0084*/
+   for(i = 1; i <= 62; i += 1)
+      for(j = 1; j <= 62; j += 1)
 
          space[i][j] = 0.25*(save[i-1][j]+save[i+1][j]+save[i][j-1]+save[i][j+1]);     /*0086*/
 }
@@ -41,16 +41,17 @@ void compute()
    int i;
    int j;
 
+
 #pragma omp parallel for private(j)
-   for(i = 1; i <= 62; i += 1)                                          /*0078*/
+   for(i = 1; i <= 62; i += 1)
 #pragma omp parallel for 
-      for(j = 1; j <= 62; j += 1)                                       /*0079*/
+      for(j = 1; j <= 62; j += 1)
 
          save[i][j] = 0.25*(space[i-1][j]+space[i+1][j]+space[i][j-1]+space[i][j+1]);  /*0081*/
 #pragma omp parallel for private(j)
-   for(i = 1; i <= 62; i += 1)                                          /*0083*/
+   for(i = 1; i <= 62; i += 1)
 #pragma omp parallel for 
-      for(j = 1; j <= 62; j += 1)                                       /*0084*/
+      for(j = 1; j <= 62; j += 1)
 
          space[i][j] = 0.25*(save[i-1][j]+save[i+1][j]+save[i][j-1]+save[i][j+1]);     /*0086*/
 }

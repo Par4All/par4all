@@ -12,7 +12,7 @@ int flatten_code06()
 // (0,2)
    i++;                                                                 /*0019*/
 // (0,3)
-   for(k = 0; k <= 2; k += 1) {                                         /*0020*/
+   for(k = 0; k <= 2; k += 1) {
 // (0,4)
       // BEGIN BLOCK
       int i = 2;

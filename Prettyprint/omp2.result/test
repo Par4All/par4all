@@ -17,18 +17,18 @@ int main()
 
 
 #pragma omp parallel for private(j)
-   for(i = 0; i <= 9; i += 1)                                           /*0013*/
+   for(i = 0; i <= 9; i += 1)
 #pragma omp parallel for private(k)
-      for(j = 0; j <= 9; j += 1) {                                      /*0014*/
+      for(j = 0; j <= 9; j += 1) {
          float z;
          z = 0.0;                                                       /*0017*/
 #pragma omp parallel for private(l,z)
-         for(k = 0; k <= 9; k += 1) {                                   /*0018*/
+         for(k = 0; k <= 9; k += 1) {
             z = k*2.0;                                                  /*0019*/
 #pragma omp parallel for private(m)
-            for(l = 0; l <= 9; l += 1)                                  /*0020*/
+            for(l = 0; l <= 9; l += 1)
 #pragma omp parallel for 
-               for(m = 0; m <= 9; m += 1) {                             /*0021*/
+               for(m = 0; m <= 9; m += 1) {
                   float y;
                   y = 2.0;                                              /*0024*/
                   // comments 4

@@ -1,0 +1,13 @@
+
+Initial code with converted loop
+
+main()
+{
+   int i;
+   int j;
+   int k;
+   for(i = i; i <= k+3-1; i += 1) {
+      j += i;
+      j++;
+   }
+}
