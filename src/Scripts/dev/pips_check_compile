@@ -27,6 +27,8 @@
 # - report is sent by mail if the status changed.
 # - if there is a persistant LOCK, investigate by hand...
 
+# this script runs very minutes on canapville under login coelho
+
 prod=${1:-.}
 dest=${2:-$LOGNAME@cri.ensmp.fr}
 
