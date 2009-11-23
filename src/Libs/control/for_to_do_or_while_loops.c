@@ -35,62 +35,6 @@
 #include "resources.h"
 
 
-/* Test if the for-loop initialization is static.
-
-   @return TRUE if yes and a new plb expression of this initialization
-   value and the related index variable pli.
-*/
-static bool init_expression_to_index_and_initial_bound(expression init,
-						       entity * pli,
-						       expression * plb)
-{
-  bool success = FALSE;
-  if (expression_undefined_p(init))
-    /* If the initialization part of the for is empty, useless to go
-       on... */
-    return FALSE;
-
-  syntax init_s = expression_syntax(init);
-
-  pips_debug(5, "Begin\n");
-
-  if(syntax_call_p(init_s)) {
-    call c = syntax_call(init_s);
-    entity op = call_function(c);
-
-    if(ENTITY_ASSIGN_P(op)) {
-      expression lhs = EXPRESSION(CAR(call_arguments(c)));
-      syntax lhs_s = expression_syntax(lhs);
-      if(syntax_reference_p(lhs_s)) {
-	reference r = syntax_reference(lhs_s);
-	entity li = reference_variable(r);
-	type lit = entity_type(li);
-
-	if(ENDP(reference_indices(r)) /* scalar reference */
-	   && type_variable_p(lit)
-	   && basic_int_p(variable_basic(type_variable(ultimate_type(lit))))) {
-	  *pli = li;
-	  /* To avoid sharing and intricate free operations */
-	  *plb = copy_expression(EXPRESSION(CAR(CDR(call_arguments(c)))));
-	  success = TRUE;
-	  pips_debug(5, "Static initialization found.\n");
-	}
-      }
-    }
-  }
-
-  ifdebug(5) {
-    if(success) {
-      pips_debug(5, "End with loop index %s and init expression:\n", entity_local_name(*pli));
-      print_expression(*plb);
-    }
-    else {
-      pips_debug(5, "End: DO conversion failed with initialization expression\n");
-    }
-  }
-
-  return success;
-}
 
 
 /* Test if the final value @param li of a for-loop is static.
@@ -273,77 +217,336 @@ static bool incrementation_expression_to_increment(expression incr,
     return success;
 }
 
+static
+expression guess_loop_increment_walker(expression e, entity loop_index)
+{
+    if(expression_call_p(e))
+    {
+        call c =expression_call(e);
+        list args = call_arguments(c);
+        entity op = call_function(c);
+        if( ENTITY_PRE_INCREMENT_P(op)||ENTITY_POST_INCREMENT_P(op)||
+                ENTITY_PRE_DECREMENT_P(op)||ENTITY_POST_DECREMENT_P(op)||
+                ENTITY_PLUS_UPDATE_P(op)||ENTITY_MINUS_UPDATE_P(op)||
+                ENTITY_ASSIGN_P(op) /* this one needs further processing */ )
+        {
+            expression lhs = EXPRESSION(CAR(args));
+            if(expression_reference_p(lhs) &&
+                    same_entity_p(loop_index,reference_variable(expression_reference(lhs))))
+            {
+                if(!ENTITY_ASSIGN_P(op)) {
+                    return e;
+                }
+                else {
+                    expression rhs = EXPRESSION(CAR(CDR(args)));
+                    if(expression_call_p(rhs))
+                    {
+                        call rhs_c = expression_call(rhs);
+                        entity rhs_op = call_function(rhs_c);
+                        list rhs_args = call_arguments(rhs_c);
+                        if( ENTITY_PLUS_P(rhs_op) || ENTITY_PLUS_C_P(rhs_op) || 
+                                    ENTITY_MINUS_P(rhs_op) || ENTITY_MINUS_C_P(rhs_op) )
+                        {
+                            expression rhs_rhs = EXPRESSION(CAR(rhs_args));
+                            expression rhs_lhs = EXPRESSION(CAR(CDR(rhs_args)));
+                            if( (expression_reference_p(rhs_rhs)&& same_entity_p(loop_index,reference_variable(expression_reference(rhs_rhs)))
+                                    && extended_integer_constant_expression_p(rhs_lhs)) ||
+                                (expression_reference_p(rhs_lhs)&& same_entity_p(loop_index,reference_variable(expression_reference(rhs_lhs)))
+                                    && extended_integer_constant_expression_p(rhs_rhs))
+                              )
+                            {
+                                return e;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return expression_undefined;
+}
+
+/** 
+ * parameter of effect guesser
+ */
+typedef struct {
+    entity target; ///< entity to find effect on
+    bool written;  ///< wheter the entity seems written
+} guesser_param;
+
+/** 
+ * try hard to guess wether the call @param c writes @param p
+ * Note that it is just aguess and may be wwrong
+ * this function only exist because effects are not available in the controlizer
+ * moreover, no aliasing information is available, so the guess **may** be wrong
+ */
+static bool guess_write_effect_on_entity_walker(call c, guesser_param *p)
+{
+    entity op = call_function(c);
+    list args = call_arguments(c);
+    if( ENTITY_ASSIGN_P(op) ||
+            ENTITY_PLUS_UPDATE_P(op)||ENTITY_MINUS_UPDATE_P(op)||
+            ENTITY_BITWISE_AND_UPDATE_P(op)||ENTITY_BITWISE_OR_UPDATE_P(op)||ENTITY_BITWISE_XOR_UPDATE_P(op)||
+            ENTITY_DIVIDE_UPDATE_P(op)||ENTITY_MULTIPLY_UPDATE_P(op)||
+            ENTITY_MODULO_UPDATE_P(op)||
+            ENTITY_LEFT_SHIFT_UPDATE_P(op)||ENTITY_RIGHT_SHIFT_UPDATE_P(op)||
+            ENTITY_ADDRESS_OF_P(op)||
+            ENTITY_PRE_INCREMENT_P(op)||ENTITY_POST_INCREMENT_P(op)||
+            ENTITY_PRE_DECREMENT_P(op)||ENTITY_POST_DECREMENT_P(op)
+      )
+
+    {
+        expression lhs = EXPRESSION(CAR(args));
+        if(expression_reference_p(lhs) &&
+                same_entity_p(p->target,reference_variable(expression_reference(lhs))))
+        {
+            p->written=true;
+            gen_recurse_stop(0);
+        }
+
+    }
+    return true;
+}
+
+/** 
+ * classical statement walker, gen_recurse does not dive into statement declarations
+ */
+static bool guess_write_effect_on_entity_stmt_walker(statement st, guesser_param *p)
+{
+    FOREACH(ENTITY,e,statement_declarations(st))
+        if( !value_undefined_p(entity_initial(e) ) ) {
+            gen_context_recurse(entity_initial(e),p,call_domain, guess_write_effect_on_entity_walker,gen_null);
+        }
+    return true;
+}
+
+/** 
+ * call guess_write_effect_on_entity_walker on each call of @param exp
+ * in order to guess write effect on @param loop_index
+ * 
+ * @return true if we are sure the entity was written, false otherwise, let's be optimistic :)
+ */
+static bool guess_write_effect_on_entity(void* exp, entity loop_index)
+{
+    guesser_param p = { loop_index, false };
+    gen_context_multi_recurse(exp,&p,
+            call_domain,guess_write_effect_on_entity_walker,gen_null,
+            statement_domain, guess_write_effect_on_entity_stmt_walker,gen_null,
+            0);
+    return p.written;
+
+
+}
+
+/** 
+ * iterate over @param incr, a comma separated expression and checks for an (in|de)crement
+ * of @param loop_index
+ * if @param loop_index is written twice in @param incr , the result is expression_undefined
+ * 
+ * @return expression_undefined if no (in|de) crement was found, the *crementing expression otherwise
+ */
+static
+expression 
+guess_loop_increment(expression incr, entity loop_index)
+{
+    if(expression_call_p(incr))
+    {
+        call c =expression_call(incr);
+        list args = call_arguments(c);
+        entity op = call_function(c);
+        if(ENTITY_COMMA_P(op))
+        {
+            expression rhs = EXPRESSION(CAR(args));
+            expression lhs = EXPRESSION(CAR(CDR(args)));
+
+            expression lhs_guessed = guess_loop_increment(lhs,loop_index);
+            if( !expression_undefined_p(lhs_guessed) && !guess_write_effect_on_entity(rhs,loop_index))
+                return lhs_guessed;
+
+            expression rhs_guessed = guess_loop_increment(rhs,loop_index);
+            if( !expression_undefined_p(rhs_guessed) && !guess_write_effect_on_entity(lhs,loop_index))
+                return rhs_guessed;
+        }
+        return guess_loop_increment_walker(incr,loop_index);
+    }
+    return expression_undefined;
+}
+
+/** 
+ * iterate over the comma-separeted expression @param init 
+ * and look for an initialization of @param loop_index
+ * 
+ * @return expression_undefined if none found, the initialization expression otherwise
+ */
+static
+expression
+guess_loop_lower_bound(expression init, entity loop_index)
+{
+    if(expression_call_p(init))
+    {
+        call c =expression_call(init);
+        list args = call_arguments(c);
+        entity op = call_function(c);
+        if(ENTITY_COMMA_P(op))
+        {
+            expression rhs = EXPRESSION(CAR(args));
+            expression lhs = EXPRESSION(CAR(CDR(args)));
+
+            expression guessed = guess_loop_lower_bound(lhs,loop_index);
+            if(expression_undefined_p(guessed))
+                return guess_loop_lower_bound(rhs,loop_index);
+            return guessed;
+        }
+        else if(ENTITY_ASSIGN_P(op))
+        {
+            expression lhs = EXPRESSION(CAR(call_arguments(c)));
+            if(expression_reference_p(lhs) &&
+                    same_entity_p(loop_index,reference_variable(expression_reference(lhs))))
+                return init;
+        }
+    }
+    return expression_undefined;
+}
+
+/** 
+ * given an expression @param seed that can be found in @param comma_list
+ * iterate over @param comma_list and remove @param seed from the list, updating pointers properly
+ * 
+ */
+static
+void
+remove_expression_from_comma_list(expression comma_list,expression seed)
+{
+    if(expression_call_p(comma_list))
+    {
+        call c =expression_call(comma_list);
+        list args = call_arguments(c);
+        entity op = call_function(c);
+        if(ENTITY_COMMA_P(op))
+        {
+            expression rhs = EXPRESSION(CAR(args));
+            expression lhs = EXPRESSION(CAR(CDR(args)));
+            if( lhs == seed ) {
+                expression_syntax(comma_list)=expression_syntax(rhs);
+                expression_normalized(comma_list)=normalized_undefined;
+            }
+            else if(rhs==seed ) {
+                expression_syntax(comma_list)=expression_syntax(lhs);
+                expression_normalized(comma_list)=normalized_undefined;
+            }
+            else {
+                remove_expression_from_comma_list(lhs,seed);
+                remove_expression_from_comma_list(rhs,seed);
+            }
+        }
+    }
+}
 
 /* Try to convert a C-like for-loop into a Fortran-like do-loop.
 
    Assume to match what is done in the prettyprinter C_loop_range().
 
-   @return the do-loop if the transformation worked or loop_undefined if
+   @return a sequence containing the do-loop if the transformation worked or sequence_undefined if
    it failed.
-
-   The API is a little weird to comply with the controlizer
-   implementation...
 */
-loop for_to_do_loop_conversion(expression init,
-			       expression cond,
-			       expression incr,
-			       statement body) {
-  loop l = loop_undefined;
-  range lr = range_undefined; ///< loop bound and increment expressions
-  expression increment = expression_undefined;
+sequence for_to_do_loop_conversion(forloop theloop, statement parent)
+{
 
-  /* Pattern checked:
+    sequence output = sequence_undefined;
+    expression init = forloop_initialization(theloop);
+    expression cond = forloop_condition(theloop);
+    expression incr = forloop_increment(theloop);
+    statement body  = forloop_body(theloop);
 
-   * The init expression is an assignment to an integer scalar (not fully necessary)
-     It failed on the first submitted for loop which had two assignments as
-     initialization step. One of them was the loop index assignment.
-     More work is needed to retrieve all DO loops programmed as for loops.
+    set cond_entities = get_referenced_entities(cond);
+    set incr_entities = get_referenced_entities(incr);
+    set cond_inter_incr_entities = set_make(set_pointer);
+    cond_inter_incr_entities = set_intersection(cond_inter_incr_entities,incr_entities,cond_entities);
 
-   * The condition is a relational operation with the index
+    SET_FOREACH(entity,loop_index,cond_inter_incr_entities)
+    {
+        if(!guess_write_effect_on_entity(body,loop_index))
+        {
+            bool is_upper_p,is_increasing_p;
+            expression upper_bound;
+            if(condition_expression_to_final_bound(cond,loop_index,&is_upper_p, &upper_bound))
+            {
+                set upper_bound_entities = get_referenced_entities(upper_bound);
+                bool upper_bound_entity_written=false;
+                SET_FOREACH(entity,e,upper_bound_entities)
+                {
+                    if(guess_write_effect_on_entity(body,e) || guess_write_effect_on_entity(incr,e))
+                    {
+                        upper_bound_entity_written=true;
+                        break;
+                    }
+                }
+                set_free(upper_bound_entities);
+                if(!upper_bound_entity_written){
+                    /* we got a candidate loop index and final bound, let's check the increment */
+                    expression increment_expression = guess_loop_increment(incr,loop_index);
+                    expression increment;
+                    if( !expression_undefined_p(increment_expression) &&
+                            incrementation_expression_to_increment(increment_expression,loop_index,&is_increasing_p,&increment))
+                    {
+                        /* We have found a do-loop compatible for-loop: */
+                        output=make_sequence(NIL);
+                        if(increment_expression!=incr){
+                            remove_expression_from_comma_list(incr,increment_expression);
+                            insert_statement(body,instruction_to_statement(make_instruction_call(expression_call(incr))),false);
+                        }
 
-   * The incrementation expression does not really matter as long as it
-   * updates the loop index by a constant integer value.
+                        /* guess lower bound */
+                        expression lower_bound = guess_loop_lower_bound(init,loop_index);
+                        if(expression_undefined_p(lower_bound))
+                            lower_bound=entity_to_expression(loop_index);
+                        else {
+                            if( lower_bound!= init) {
+                                remove_expression_from_comma_list(init,lower_bound);
+                                sequence_statements(output)=gen_append(sequence_statements(output),
+                                        CONS(STATEMENT,instruction_to_statement(make_instruction_call(expression_call(init))),NIL));
+                            }
+                            lower_bound=EXPRESSION(CAR(CDR(call_arguments(expression_call(lower_bound)))));
+                        }
 
-   * This algorithme fails with "for(;i<n;i++)" because the initialization
-   * expression plays a key role. We should first look for candidate
-   * indices in all three expressions, init, condition and increment,
-   * and then look for a best candidates. This approache would also
-   * cover cases such as "for(i=0, j=1; i<n, j<=n; i++, j++)".
+                        if (!is_upper_p && is_increasing_p)
+                            pips_user_warning("Loop with lower bound and increasing index %s\n", entity_local_name(loop_index));
+                        if (is_upper_p && !is_increasing_p)
+                            pips_user_warning("Loop with upper bound and decreasing index %s\n", entity_local_name(loop_index));
 
-   */
-  entity li = entity_undefined; ///< loop index
-  expression lb = expression_undefined; ///< initializing expression
+                        range lr = make_range(lower_bound, upper_bound, increment);
+                        loop l = make_loop(loop_index, lr, body, statement_label(parent),make_execution_sequential(),NIL);
 
-  if (init_expression_to_index_and_initial_bound(init, &li, &lb)) {
-    bool is_upper_p;
-    expression ub = expression_undefined; ///< The upper bound
+                        /* try hard to reproduce statement content */
+                        statement sl = make_statement(
+                                statement_label(parent),
+                                STATEMENT_ORDERING_UNDEFINED,
+                                statement_number(parent),
+                                statement_comments(parent),
+                                make_instruction_loop(l),
+                                statement_declarations(parent),
+                                statement_decls_text(parent),
+                                statement_extensions(parent));
 
-    if (condition_expression_to_final_bound(cond, li, &is_upper_p, &ub)) {
-      bool is_increasing_p;
+                        statement_label(parent)=entity_empty_label();
+                        statement_ordering(parent)=STATEMENT_ORDERING_UNDEFINED;
+                        statement_number(parent)=STATEMENT_NUMBER_UNDEFINED;
+                        statement_comments(parent)=empty_comments;
+                        statement_declarations(parent)=NIL;
+                        statement_decls_text(parent)=NULL;
+                        statement_extensions(parent)=empty_extensions();
 
-      if (incrementation_expression_to_increment(incr, li, &is_increasing_p,
-						 &increment)) {
-	/* We have found a do-loop compatible for-loop: */
-	if (!is_upper_p && is_increasing_p)
-	  pips_user_warning("Loop with lower bound and increasing index %s\n",
-			    entity_local_name(li));
-	if (is_upper_p && !is_increasing_p)
-	  pips_user_warning("Loop with upper bound and decreasing index %s\n",
-			    entity_local_name(li));
-	lr = make_range(lb, ub, increment);
-	l = make_loop(li, lr, body, entity_empty_label(),
-		      make_execution(is_execution_sequential, UU), NIL);
-      }
-      else
-	/* Remove the lower bound expression that won't be used: */
-	free_expression(ub);
+                        sequence_statements(output)=gen_append(sequence_statements(output),CONS(STATEMENT,sl,NIL));
+
+                    }
+                }
+            }
+        }
     }
-    else
-      /* Remove the lower bound expression that won't be used: */
-      free_expression(lb);
-  }
-
-  return l;
+    set_free(cond_entities);
+    set_free(incr_entities );
+    set_free( cond_inter_incr_entities);
+    return output;
 }
 
 
@@ -353,27 +556,24 @@ loop for_to_do_loop_conversion(expression init,
  */
 void
 try_to_transform_a_for_loop_into_a_do_loop(forloop f) {
-  loop new_l = for_to_do_loop_conversion(forloop_initialization(f),
-					 forloop_condition(f),
-					 forloop_increment(f),
-					 forloop_body(f));
-  if (!loop_undefined_p(new_l)) {
-    pips_debug(3, "do-loop has been generated.\n");
 
     /* Get the englobing statement of the "for" assuming we are called
        from a gen_recurse()-like function: */
-    instruction i = (instruction) gen_get_recurse_ancestor(f);
-    /* Modify the enclosing instruction to be a do-loop instead. It works
-       even if we are in a gen_recurse because we are in the bottom-up
-       phase of the recursion. */
-    instruction_tag(i) = is_instruction_loop;
-    instruction_loop(i) = new_l;
-    /* Detach informations of the for-loop before freeing it: */
-    forloop_increment(f) = expression_undefined;
-    forloop_body(f) = statement_undefined;
-    forloop_condition(f) = expression_undefined;
-    free_forloop(f);
-  }
+    statement parent=
+        (statement)gen_get_recurse_ancestor(
+                (instruction)gen_get_recurse_ancestor(f));
+
+    sequence new_l = for_to_do_loop_conversion(f,parent);
+
+    if (!sequence_undefined_p(new_l)) {
+        pips_debug(3, "do-loop has been generated.\n");
+        statement_instruction(parent)=make_instruction_sequence(new_l);
+        forloop_body(f)=statement_undefined;
+        forloop_condition(f)=expression_undefined;
+        forloop_increment(f)=expression_undefined;
+        forloop_initialization(f)=expression_undefined;
+        free_forloop(f);
+    }
 }
 
 
@@ -446,7 +646,7 @@ sequence for_to_while_loop_conversion(expression init,
 				      expression cond,
 				      expression incr,
 				      statement body,
-				      string comments) {
+				      __attribute__((unused)) string comments) {
   pips_debug(5, "Begin\n");
 
   statement init_st = make_expression_statement(init);

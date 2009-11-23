@@ -914,46 +914,40 @@ hash_table used_labels;
        that the loop body does not define the loop index, but effects are
        not yet available when the controlizer is run. */
     if(get_bool_property("FOR_TO_DO_LOOP_IN_CONTROLIZER")) {
-	loop new_l = for_to_do_loop_conversion(forloop_initialization(l),
-					       forloop_condition(l),
-					       forloop_increment(l),
-					       control_statement(c_body));
+        forloop_body(l)= control_statement(c_body);
+        sequence new_l = for_to_do_loop_conversion(l,st);
 
-	if(!loop_undefined_p(new_l)) {
-	  ni = make_instruction(is_instruction_loop, new_l);
-	  /* The loop label field is unused in C, but it is used
-	     internally to locate loops for applying PIPS transformations. */
-	  loop_label(new_l) = statement_label(st);
-	  //statement_label(st) = entity_undefined;
-	}
+        if(!sequence_undefined_p(new_l)) {
+            ni = make_instruction_sequence( new_l);
+        }
     }
 
     /* If the DO conversion has failed, the WHILE conversion may be requested */
     if(instruction_undefined_p(ni)) {
-      if(get_bool_property("FOR_TO_WHILE_LOOP_IN_CONTROLIZER")) {
-	/* As a sequence cannot carry comments, the for loop comments
-	   are moved to the while loop */
-	sequence wls = for_to_while_loop_conversion(forloop_initialization(l),
-						    forloop_condition(l),
-						    forloop_increment(l),
-						    control_statement(c_body),
-						    statement_comments(st));
+        if(get_bool_property("FOR_TO_WHILE_LOOP_IN_CONTROLIZER")) {
+            /* As a sequence cannot carry comments, the for loop comments
+               are moved to the while loop */
+            sequence wls = for_to_while_loop_conversion(forloop_initialization(l),
+                    forloop_condition(l),
+                    forloop_increment(l),
+                    control_statement(c_body),
+                    statement_comments(st));
 
-	/* These three fields have been re-used or freed by the previous call */
-	forloop_initialization(l) = expression_undefined;
-	forloop_condition(l) = expression_undefined;
-	forloop_increment(l) = expression_undefined;
+            /* These three fields have been re-used or freed by the previous call */
+            forloop_initialization(l) = expression_undefined;
+            forloop_condition(l) = expression_undefined;
+            forloop_increment(l) = expression_undefined;
 
-	ni = make_instruction(is_instruction_sequence, wls);
-      }
-      else {
-	forloop new_l = make_forloop(forloop_initialization(l),
-				     forloop_condition(l),
-				     forloop_increment(l),
-				     control_statement(c_body));
+            ni = make_instruction_sequence(wls);
+        }
+        else {
+            forloop new_l = make_forloop(forloop_initialization(l),
+                    forloop_condition(l),
+                    forloop_increment(l),
+                    control_statement(c_body));
 
-	ni = make_instruction(is_instruction_forloop, new_l);
-      }
+            ni = make_instruction_forloop(new_l);
+        }
     }
 
     gen_remove(&control_successors(c_body), c_res);
