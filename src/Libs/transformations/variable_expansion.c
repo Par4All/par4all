@@ -95,6 +95,41 @@ static bool perform_reference_expansion(reference r,scalar_expansion_context *ct
 }
 
 static
+void
+perform_reference_expansion_in_loop(instruction i,scalar_expansion_context *ctxt)
+{
+    if(instruction_loop_p(i))
+    {
+        loop l = instruction_loop(i);
+        range r = loop_range(l);
+        if(same_entity_p(loop_index(l),ctxt->expanded_variable) ) 
+        {
+            expression new_ref = make_ref_expr(ctxt->expanded_variable,gen_copy_seq(ctxt->loop_indices));
+            /* we have to convert the do-loop into a for-loop */
+            forloop new_loop = make_forloop(
+                    expression_undefined,
+                    MakeBinaryCall(
+                        entity_intrinsic(LESS_OR_EQUAL_OPERATOR_NAME),
+                        copy_expression(new_ref),
+                        range_upper(r)),
+                    MakeBinaryCall(
+                        entity_intrinsic(PLUS_UPDATE_OPERATOR_NAME),
+                        copy_expression(new_ref),
+                        range_increment(r)),
+                    loop_body(l)
+                    );
+            range_upper(r)=expression_undefined;
+            range_lower(r)=expression_undefined;
+            range_increment(r)=expression_undefined;
+            loop_body(l)=statement_undefined;
+            free_loop(l);
+            instruction_tag(i)=is_instruction_forloop;
+            instruction_forloop(i)=new_loop;
+        }
+    }
+}
+
+static
 bool prepare_expansion(loop l, scalar_expansion_context* ctxt)
 {
     entity i = loop_index(l);
@@ -174,7 +209,9 @@ static void perform_expansion_and_unstack_index_and_dimension(loop l,scalar_expa
 
                     pips_debug(9, "Expand references to %s\n", entity_local_name(lv));
                     ctxt->expanded_variable = lv;
-                    gen_context_recurse(bs,ctxt, reference_domain, perform_reference_expansion, gen_null);
+                    gen_context_multi_recurse(bs,ctxt, reference_domain, perform_reference_expansion, gen_null,
+                            instruction_domain,gen_true,perform_reference_expansion_in_loop,
+                            0);
                     ctxt->expanded_variable = entity_undefined;
                 }
             }
