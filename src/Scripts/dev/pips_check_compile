@@ -26,10 +26,6 @@
 # - designed to be run from cron.
 # - report is sent by mail if the status changed.
 # - if there is a persistant LOCK, investigate by hand...
-#
-# TODO
-# - should distinguish infrastructure failures (dns, svn)
-#   and compilation failures
 
 prod=${1:-.}
 dest=${2:-$LOGNAME@cri.ensmp.fr}
@@ -37,11 +33,18 @@ dest=${2:-$LOGNAME@cri.ensmp.fr}
 # remove pips-related environment variables to use default settings
 unset -v EXTERN_ROOT NEWGEN_ROOT LINEAR_ROOT PIPS_ROOT PIPS_ARCH
 
-# report current-state message
+# report current-state compile message
 # current-state: ok skip locked KO:*
+# compile: ok unknown unchanged unbuild build exe
 function report()
 {
-  local current=$1 msg=$2 previous='unknown' repos
+  [ $# -eq 3 ] || {
+    echo "report() got $# args but expecting 3" >> LOG
+    exit 1
+  }
+
+  # get function arguments
+  local current=$1 compile=$2 msg=$3 previous='unknown' repos
 
   # log report anyway...
   echo "$(date +%Y%m%d%H%M%S): $current ($SECONDS seconds) $msg" >> LOG
@@ -59,7 +62,7 @@ function report()
   [ $current = 'skip' ] && { rmdir LOCK ; exit 0 ; }
 
   # no change, no report
-  test -f STATE && read previous < STATE
+  test -f STATE && read previous prevcomp < STATE
   [ "$previous" -a "$current" = "$previous" ] && { rmdir LOCK ; exit 0 ; }
 
   # generate report
@@ -69,7 +72,9 @@ function report()
 
     # details
     echo previous state: $previous
+    echo previous compile: $prevcomp
     echo new state: $current
+    echo new compile: $compile
     echo message: $msg
 
     # revisions
@@ -106,18 +111,24 @@ function report()
     fi
   } | mailx -s "PIPS compilation status is $current" $dest
 
+  # fix compile with previous state on 'unchanged'
+  [ $compile = 'unchanged' ] && compile=$prevcomp
+
   # record new state
-  echo $current > STATE
+  echo $current $compile > STATE
 
   # good bye! always 0 for cron
   rmdir LOCK
   exit 0
 }
 
-# check for working copy
-[ -d $prod ] || report 'KO:no-dir' "working copy directory '$prod' not found"
-[ -d $prod/.svn ] || report 'KO:no-wc' "'$prod' is not a working copy '$prod'"
-cd $prod || report 'KO:cd-prod' "cannot 'cd $prod'"
+# check for working copy... this should not fail!
+[ -d $prod ] || \
+    report 'KO:no-dir' 'unknown' "working copy directory '$prod' not found"
+[ -d $prod/.svn ] || \
+    report 'KO:no-wc' 'unknown' "'$prod' is not a working copy '$prod'"
+cd $prod || \
+    report 'KO:cd-prod' 'unknown' "cannot 'cd $prod'"
 
 # manual locking based on mkdir
 mkdir LOCK > /dev/null 2>&1 ||
@@ -128,23 +139,25 @@ mkdir LOCK > /dev/null 2>&1 ||
   delay=$(($now - $created))
   if [ $delay -gt 1200 ]
   then
-    report 'locked' "working copy '$prod' is already locked..."
+    report 'locked' 'unknown' "working copy '$prod' is already locked..."
     touch LOCK
   else
-    report 'skip-lock' "working copy '$prod' is locked"
+    report 'skip-lock' 'unknown' "working copy '$prod' is locked"
   fi
 }
 
 rm -f out err
 nice svn up >> out 2>> err || {
+  # possible failures: network dns svn...
   # hmmm... try to cleanup after svn up failure
   svn cleanup >> out 2>> err
-  report 'KO:svn-up' "cannot 'svn up'"
+  report 'KO:svn-up' 'unchanged' 'cannot "svn up"'
 }
 
 [ -f CURRENT ] || touch CURRENT
 mv CURRENT PREVIOUS
 {
+  # this is local, it should not fail
   echo pips: $(svnversion -c pips)
   echo newgen: $(svnversion -c newgen)
   echo linear: $(svnversion -c linear)
@@ -154,14 +167,17 @@ mv CURRENT PREVIOUS
 if ! cmp -s CURRENT PREVIOUS
 then
   # something may have changed, let us recompile
-  nice make unbuild > out 2> err || report 'KO:make-unbuild' "cannot 'make unbuild'"
-  nice make build > out 2> err || report 'KO:make-build' "cannot 'make build'"
-  test -x pips/bin/$(./pips/makes/arch.sh)/tpips || report 6 "no tpips found!"
+  nice make unbuild > out 2> err \
+      || report 'KO:make' 'unbuild' 'cannot "make unbuild"'
+  nice make build > out 2> err \
+      || report 'KO:make' 'build' 'cannot "make build"'
+  test -x pips/bin/$(./pips/makes/arch.sh)/tpips \
+      || report 'KO:make' 'executable' 'no "tpips" executable found!'
 
   # clean up
   rm -f out err
-  report 'ok' "pips is fine"
+  report 'ok' 'ok' 'pips is fine'
 else
   # no updates
-  report 'skip' "no commit since last check"
+  report 'skip' 'unchanged' 'no commit since last check'
 fi
