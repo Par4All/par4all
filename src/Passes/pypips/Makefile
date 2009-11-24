@@ -29,7 +29,7 @@ PYTHON_INCLUDE=`$(PYTHON_CONFIG) --cflags`
 PYPS_STDOUT=pypsout
 
 DYNLIB_TARGET=_$(PYTHON_MODULE).so
-PY_TARGET=pyps.py $(PYTHON_MODULE).py 
+PY_TARGET=pyps.py $(PYTHON_MODULE).py
 
 
 DYNLIB_OBJECTS=$(PYTHON_MODULE)_wrap.o $(PYTHON_MODULE).o
@@ -41,7 +41,7 @@ LDFLAGS+=-L$(LIB.d) -L$(LIB.d)/$(ARCH) $(addprefix -l, $(pips.libs)) `$(PYTHON_C
 
 # install hook
 install:pyps-install
-pyps-install:
+pyps-install:setup.py
 	$(INSTALL) -d $(PY.d)
 	  $(CMP) $(ARCH)/$(DYNLIB_TARGET) $(PY.d)/$(DYNLIB_TARGET) || \
 	    $(INSTALL) -m 644 $(ARCH)/$(DYNLIB_TARGET) $(PY.d)/$(DYNLIB_TARGET) 
@@ -102,3 +102,7 @@ pyps.py: pipsmakerc2python.pl ../../Documentation/pipsmake/pipsmake-rc.tex $(ETC
 	sed -n -e '/### module_methods/,/### modules_methods/ p' _pyps.py >> $@
 	./$^ -modules >> $@
 	sed -n -e '/### modules_methods/,$$ p' _pyps.py >> $@
+
+#no dependency on setup.py.in to regenerate the file every time it is needed
+setup.py:
+	sed -e 's,@CPPFLAGS@,$(CPPFLAGS),' -e 's,@LDFLAGS@,$(LDFLAGS),' $@.in > $@
