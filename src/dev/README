@@ -1,0 +1,15 @@
+This directory contains some script used to build and manage the Par4All
+framework itself.
+
+Some scripts to be used only once:
+
+p4a_create_CRI_git_svn builds a git svn copy of the PIPS svn.
+
+
+
+Ronan Keryell.
+
+%%% Local Variables:
+%%% mode: text
+%%% ispell-local-dictionary: "american"
+%%% End:

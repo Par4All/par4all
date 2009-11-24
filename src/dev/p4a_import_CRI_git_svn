@@ -1,0 +1,65 @@
+#! /bin/bash
+
+# Add remotes for git-svn instances of the SVN PIPS-related repositories
+# from Mines ParisTech/CRI
+
+# Where to get the git-svn instances from:
+GIT_SVN_DIR=/home/keryell/projets/Wild_Systems/Par4All/CRI-git-svn
+# Prefix to appear in the remote svn in git
+# For example for refs/remotes/CRI/newgen:
+REMOTE_BRANCH_PREFIX=CRI/
+# Where to put the files into the local git repository:
+TARGET_LOCAL_DIR=packages/PIPS
+
+# List of repositories:
+SVN_REPOSITORIES="linear newgen nlpmake pips validation"
+
+COMMIT_MESSAGE_FILE=`mktemp`
+#echo $COMMIT_MESSAGE_FILE
+
+# Create the remote/CRI/<repository>
+import_git_svn() {
+  # Add the git svn as remote git repository:
+  git remote add $REMOTE_BRANCH_PREFIX$1 $GIT_SVN_DIR/$1
+
+  # Fetch the history:
+  git fetch $REMOTE_BRANCH_PREFIX$1
+
+  # Extract a copy of the files of the remote repository into the local
+  # repository at packages/PIPS, merge it and update the files in the work
+  # tree:
+  git read-tree --prefix=$TARGET_LOCAL_DIR/$1 -u CRI/$1/master
+
+  # Build the merging message:
+  echo "Merging from git-svn remotes/$REMOTE_BRANCH_PREFIX$1 into $TARGET_LOCAL_DIR that is:" > $COMMIT_MESSAGE_FILE
+
+  # Get the last commit message from the remote to branch from:
+  git log -n 1 remotes/$REMOTE_BRANCH_PREFIX$1/master >> $COMMIT_MESSAGE_FILE
+
+  # Commit with the built merging message:
+  git commit --file=$COMMIT_MESSAGE_FILE
+
+  # Connect the SVN history to this one by fetching it and merging it with
+  # the our strategy (since what we want is what we've just built up above
+  # into packages/PIPS and not at the top level as each individual svn
+  # repository):
+  git pull -s ours CRI/$1 master
+
+  rm $COMMIT_MESSAGE_FILE
+}
+
+for i in $SVN_REPOSITORIES; do
+    # It is so slow that we slurp them in parallel...
+    import_git_svn $i
+done
+
+echo 'Do not forget to use "merge -s subtree" when getting new CRI stuff later'
+echo "For example you can get new upstream versions with:"
+for i in $SVN_REPOSITORIES; do
+    echo "    git merge -s subtree CRI/$i/master"
+done
+
+#%%% Local Variables:
+#%%% mode: text
+#%%% ispell-local-dictionary: "american"
+#%%% End:
