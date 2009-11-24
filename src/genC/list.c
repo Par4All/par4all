@@ -42,7 +42,7 @@
   . GEN_REDUCE successively applies (*FP) on R adn every CRD of CP.
   . GEN_SOME aplies (*FP) to every CDR of CP and returns the first sublist
   whose CAR verifies (*FP).
-  . GEN_INSERT_AFTER inster a new object after a specified boject in the list
+  . GEN_INSERT_AFTER inster a new object after a specified object in the list
   . GEN_MAPC_TABULATED applies (*FP) on every non null element of the
   domain BINDING.
    . GEN_FIND_TABULATED retrieves the object of KEY in the tabulated DOMAIN.
@@ -74,6 +74,7 @@
    . GEN_COPY_STRING_LIST
    . GEN_FREE_STRING_LIST
    . GEN_LAST returns the last cons of a list.
+   . gen_substitute_chunk_by_list
    . GEN_REMOVE updates the list (pointer) CPP by removing (and freeing) any
      ocurrence of the gen_chunk OBJ.
    . GEN_REMOVE_ONCE : Remove the first occurence of obj in list l.
@@ -489,6 +490,52 @@ list gen_last(list l)
     if (ENDP(l)) return l;         /* NIL case */
     while (!ENDP(CDR(l))) l=CDR(l); /* else go to the last */
     return l;
+}
+
+/* substitute item o by list sl in list *pl, which is modified as a
+ * side effect.  The substitution is performed only once when the
+ * first o is found. List sl is physically included in list *pl. If sl
+ * is empty, item o is removed from list *pl. If o is not found in
+ * *pl, *pl is left unmodified.
+ */
+void gen_substitute_chunk_by_list(list * pl, const void * o, list sl)
+{
+  list * pc = pl; // current indirect pointer
+  list  ppc = NULL; // pointer to the previous cons
+
+  if(ENDP(sl))
+    gen_remove_once(pl, o);
+  else
+    while (*pc) {
+      /* If the chunk to substitute is found, substitute it */
+      if ((gen_chunk*) o == CHUNK(CAR(*pc))) {
+	list tmp = *pc;
+	list npc = CDR(*pc);
+
+	/* Insert sl at the beggining of the new list or after ppc */
+	if(ppc==NULL) {
+	  *pl = sl;
+	}
+	else {
+	  CDR(ppc) = sl;
+	}
+
+	/* Add the left over list after sl */
+	CDR(gen_last(sl)) = npc;
+
+	/* Get rid of the useless cons */
+	CAR(tmp).p = NEWGEN_FREED;
+	CDR(tmp) = NEWGEN_FREED;
+	free(tmp);
+
+	break;
+      }
+      else {
+	/* Move down the input list */
+	ppc = *pc;
+	pc = &CDR(*pc);
+      }
+    }
 }
 
 /* remove item o from list *pl which is modified as a side effect.
