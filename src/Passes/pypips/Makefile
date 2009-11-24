@@ -52,14 +52,14 @@ $(PYTHON_MODULE).h:$(PYTHON_MODULE).c
 	$(PROTOIZE) $< > $@
 	echo "extern char *activate(char *phase);" >> $@
 
-$(PYTHON_MODULE).I:$(PYTHON_MODULE).i $(PYTHON_MODULE).h
+$(PYTHON_MODULE).i:$(PYTHON_MODULE).i.in $(PYTHON_MODULE).h
 	sed -e 's/SWIG_MODULE_NAME/$(PYTHON_MODULE)/' $^ > $@
 
-$(PYTHON_MODULE)_wrap.c:$(PYTHON_MODULE).I
+$(PYTHON_MODULE)_wrap.c:$(PYTHON_MODULE).i
 	swig -python $<
 
 
-$(PYTHON_MODULE).py:$(PYTHON_MODULE).I
+$(PYTHON_MODULE).py:$(PYTHON_MODULE).i
 	swig -python $<
 
 CPPFLAGS+=-I$(PYTHON_INCLUDE)
@@ -68,10 +68,11 @@ CPPFLAGS+=-I$(PYTHON_INCLUDE)
 	$(COMPILE) $< -o $@
 
 clean:
-	rm -f *.o *.tmp *.I *.H $(PYTHON_MODULE)_wrap.c *.pyc $(PYTHON_MODULE).h
+	rm -f *.o *.tmp *.H $(PYTHON_MODULE)_wrap.c *.pyc $(PYTHON_MODULE).h
+	rm -rf build
 
 distclean:clean
-	rm -f $(PYTHON_MODULE).py _$(PYTHON_MODULE).so pyps.py pipscc.py
+	rm -f $(PYTHON_MODULE).py _$(PYTHON_MODULE).so pyps.py pipscc.py *.i
 
 pipscc.py:pipscc
 	ln -s $< $@
@@ -105,4 +106,5 @@ pyps.py: pipsmakerc2python.pl ../../Documentation/pipsmake/pipsmake-rc.tex $(ETC
 
 #no dependency on setup.py.in to regenerate the file every time it is needed
 setup.py:
+	$(MAKE) $(PYTHON_MODULE).i
 	sed -e 's,@CPPFLAGS@,$(CPPFLAGS),' -e 's,@LDFLAGS@,$(LDFLAGS),' $@.in > $@
