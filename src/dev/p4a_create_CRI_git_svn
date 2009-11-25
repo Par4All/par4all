@@ -13,9 +13,19 @@ SVN_REPOSITORIES="linear newgen nlpmake pips validation"
 
 # Create a git-svn instance from an svn trunk.
 # Do not pick the branch and tags since its not clear where they are in
-# PIPS and some branches are not public:
+# PIPS and some branches are not public.
+
+# But there is an issue with the nlpmake that was not in a trunk up to
+# version 749 and then had it moved in a trunk, so keep all the repository
+# for it...
 create_git_svn() {
-  git svn clone --prefix=$GIT_SVN_PREFIX$1/ http://svn.cri.ensmp.fr/svn/$1/trunk $1
+  if [[ $1 == nlpmake ]]; then
+      # all the repository for nlpmake
+      TRUNK=
+  else
+      TRUNK=/trunk
+  fi
+  git svn clone --prefix=$GIT_SVN_PREFIX$1/ http://svn.cri.ensmp.fr/svn/$1$TRUNK $1
 }
 
 
