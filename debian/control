@@ -6,17 +6,21 @@ Standards-Version: 3.8.3
 Section: libs
 Homepage: http://freia.enstb.org/pips
 
-Package: liblinear-dev
+Package: liblinearlibs-dev
 Section: libdevel
 Architecture: any
-Depends: liblinear0 (= ${binary:Version})
+Depends: liblinearlibs0 (= ${binary:Version})
+Replaces: liblinear-dev
+Conflicts: liblinear-dev
 Description: development headers for linear library
  additional files required to develop using liblinear
 
-Package: liblinear0
+Package: liblinearlibs0
 Section: libs
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
+Replaces: liblinear0
+Conflicts: liblinear0
 Description: linear algebra library
  a linear algebra library developed in Ecoles des Mines
  de Paris

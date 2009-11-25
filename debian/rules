@@ -36,7 +36,7 @@ build-stamp: configure-stamp
 	dh_testdir
 
 	# Add here commands to compile the package.
-	$(MAKE) CFLAGS='-g --std=c99 -O0' PIPS_NO_TAGS=1
+	$(MAKE) COPT='-g -O0' WITH_DYNAMIC_LIBRARIES=1
 
 	touch $@
 
@@ -55,8 +55,8 @@ install: build
 	dh_testroot
 	dh_clean
 	dh_installdirs
-	$(MAKE) CFLAGS='-g --std=c99' \
-		INSTALL_DIR=$(CURDIR)/debian/tmp/usr ETC.d=$(CURDIR)/debian/tmp/etc BIN.d=$(CURDIR)/debian/tmp/usr/bin LIB.d=$(CURDIR)/debian/tmp/usr/lib\
+	$(MAKE) COPT='-g -O0' WITH_DYNAMIC_LIBRARIES=1 \
+		INSTALL_DIR=$(CURDIR)/debian/tmp/usr ETC.d=$(CURDIR)/debian/tmp/etc \
 		install
 
 
@@ -89,7 +89,7 @@ binary-arch: build install
 	dh_fixperms
 #	dh_perl
 #	dh_python
-#	dh_makeshlibs
+	dh_makeshlibs
 	dh_installdeb
 	dh_shlibdeps
 	dh_gencontrol
