@@ -123,6 +123,9 @@ function report()
   # fix compile with previous state on 'unchanged'
   [ $compile = 'unchanged' ] && compile=$prevcomp
 
+  # hmmm... regenerate previous before network interruption
+  [ $current = 'skip' ] && current=$compile
+
   # record new state
   echo $current $compile > STATE
 
