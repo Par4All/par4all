@@ -41,6 +41,7 @@ unset -v EXTERN_ROOT NEWGEN_ROOT LINEAR_ROOT PIPS_ROOT PIPS_ARCH
 function report()
 {
   [ $# -eq 3 ] || {
+    # internal error
     echo "report() got $# args but expecting 3" >> LOG
     exit 1
   }
@@ -67,7 +68,7 @@ function report()
   test -f STATE && read previous prevcomp < STATE
   [ "$previous" -a "$current" = "$previous" ] && { rmdir LOCK ; exit 0 ; }
 
-  # generate report
+  # else generate report
   {
     # summary
     echo PIPS compilation status has changed to $current
