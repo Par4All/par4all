@@ -47,10 +47,14 @@ function report()
   }
 
   # get function arguments
-  local current=$1 compile=$2 msg=$3 previous='unknown' repos
+  local current=$1 compile=$2 msg=$3
+  local previous='unknown' prevcomp='unknown'
+
+  # get previous state if available
+  test -f STATE && read previous prevcomp < STATE
 
   # log report anyway...
-  echo "$(date +%Y%m%d%H%M%S): $current ($SECONDS seconds) $msg" >> LOG
+  echo "$(date +%Y%m%d%H%M%S): $current $compile ($SECONDS seconds) $msg" >> LOG
 
   # out if locked
   [ $current = 'locked' ] && {
@@ -62,10 +66,11 @@ function report()
   [ $current = 'skip-lock' ] && exit 0
 
   # no compilation, nothing to report...
-  [ $current = 'skip' ] && { rmdir LOCK ; exit 0 ; }
+  # however, if there was a *temporary* KO (network down),
+  # it is nice to report that it is up again...
+  [ $current = 'skip' -a $previous != 'KO:svn-up' ] && { rmdir LOCK ; exit 0 ; }
 
   # no change, no report
-  test -f STATE && read previous prevcomp < STATE
   [ "$previous" -a "$current" = "$previous" ] && { rmdir LOCK ; exit 0 ; }
 
   # else generate report
@@ -106,6 +111,7 @@ function report()
       # show recent commits
       echo
       echo last commits:
+      local repos
       for repos in pips newgen linear pips/makes
       do
         echo $repos:
