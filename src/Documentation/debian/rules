@@ -5,34 +5,35 @@
 # As a special exception, when this file is copied by dh-make into a
 # dh-make output file, you may use that output file without restriction.
 # This special exception was added by Craig Small in version 0.37 of dh-make.
+# http://python-modules.alioth.debian.org/python-central_howto.txt
 
 # Uncomment this to turn on verbose mode.
 #export DH_VERBOSE=1
 
 
-
-
+PYVERS=$(shell pyversions -vr)
 
 configure: configure-stamp
 configure-stamp:
 	dh_testdir
 	# Add here commands to configure the package.
-	sed -i -e 's,$$(ARCH)/$$(LIB_TARGET),$$(LIB_TARGET),' -e 's,$$(NEWGEN_ROOT)/lib/$$(ARCH),$$(NEWGEN_ROOT)/lib,' -e 's,$$(LINEAR_ROOT)/lib/$$(ARCH),$$(LINEAR_ROOT)/lib,' makes/pips-bin.mk
-
 	touch configure-stamp
 
 
-build: build-stamp
+build: build-stamp $(PYVERS:%=build-python%)
 
-build-stamp: configure-stamp  
+build-python%:
+	cd $(CURDIR)/src/Passes/pypips && python$* setup.py build
+	touch $@
+
+
+MAKE_OPT=COPT='-g -O0' WITH_DYNAMIC_LIBRARIES=1 NEWGEN_ROOT=/usr LINEAR_ROOT=/usr
+build-stamp: configure-stamp
 	dh_testdir
 
 	# Add here commands to compile the package.
-	$(MAKE) CFLAGS='-g --std=c99' \
-		CONFIG_DIR=/etc \
-		PIPS_NO_TAGS=1 PIPS_NO_EPIPS=1 PIPS_NO_JPIPS=1 PIPS_NO_GPIPS=1 PIPS_NO_WPIPS=1 \
-		NEWGEN_ROOT=/usr LINEAR_ROOT=/usr \
-		build
+	$(MAKE) $(MAKE_OPT) CONFIG_DIR=/etc build
+	$(MAKE) $(MAKE_OPT) -C $(CURDIR)/src/Passes/pypips setup.py
 	#docbook-to-man debian/pips.sgml > pips.1
 
 	touch $@
@@ -40,26 +41,27 @@ build-stamp: configure-stamp
 clean: 
 	dh_testdir
 	dh_testroot
-	rm -f build-stamp configure-stamp
+	rm -f build-stamp configure-stamp $(CURDIR)/debian/pyps.install $(CURDIR)/debian/pyps.dirs
 
 	$(MAKE) unbuild
 
 	dh_clean 
 
-install: build
+install: build pre-install $(PYVERS:%=install-python%)
+	$(MAKE) $(MAKE_OPT) \
+		INSTALL_DIR=$(CURDIR)/debian/tmp/usr ETC.d=$(CURDIR)/debian/tmp/etc \
+		install
+	# Add here commands to install the package into debian/pips.
+
+pre-install:
 	dh_testdir
 	dh_testroot
 	dh_clean 
 	dh_installdirs
-	$(MAKE) CFLAGS='-g --std=c99' \
-		INSTALL_DIR=$(CURDIR)/debian/tmp/usr ETC.d=$(CURDIR)/debian/tmp/etc BIN.d=$(CURDIR)/debian/tmp/usr/bin  LIB.d=$(CURDIR)/debian/tmp/usr/lib\
-		MAN.d=$(CURDIR)/debian/tmp/usr/share/man \
-		PIPS_NO_TAGS=1 PIPS_NO_EPIPS=1 PIPS_NO_JPIPS=1 PIPS_NO_WPIPS=1 PIPS_NO_GPIPS=1 \
-		NEWGEN_ROOT=/usr LINEAR_ROOT=/usr \
-		install
 
-	# Add here commands to install the package into debian/pips.
 
+install-python%:
+	cd $(CURDIR)/src/Passes/pypips && python$* setup.py install --no-compile --root $(CURDIR)/debian/python-pips
 
 # Build architecture-independent files here.
 binary-indep: build install
@@ -79,7 +81,7 @@ binary-arch: build install
 #	dh_installemacsen
 #	dh_installpam
 #	dh_installmime
-#	dh_python
+	dh_pysupport
 #	dh_installinit
 #	dh_installcron
 #	dh_installinfo
@@ -89,7 +91,7 @@ binary-arch: build install
 	dh_compress
 	dh_fixperms
 #	dh_perl
-#	dh_makeshlibs
+	dh_makeshlibs -X_pypips
 	dh_installdeb
 	dh_shlibdeps
 	dh_gencontrol

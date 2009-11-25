@@ -1,3 +1,4 @@
+usr/lib/lib*.so.*
 usr/bin/Build
 usr/bin/Delete
 usr/bin/Display
@@ -5,17 +6,6 @@ usr/bin/Init
 usr/bin/Perform
 usr/bin/Pips
 usr/bin/Select
-usr/bin/fpips
-usr/bin/hpfc
-usr/bin/hpfc_compile
-usr/bin/hpfc_delete
-usr/bin/hpfc_directives
-usr/bin/hpfc_install
-usr/bin/hpfc_interactive
-usr/bin/pips
-usr/bin/tpips
-usr/bin/pips_c2openmp
-usr/bin/pips_f2openmp
 
 etc/patterns.def
 etc/complexity_cost_tables
@@ -23,4 +13,3 @@ etc/complexity_cost_tables/*
 etc/complexity_cost_tables/*/*
 etc/properties.rc
 etc/pipsmake.rc
-
