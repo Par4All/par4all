@@ -1,63 +1,86 @@
-#! /bin/bash
+#! /bin/bash -vx
 
-# Add remotes for git-svn instances of the SVN PIPS-related repositories
-# from Mines ParisTech/CRI
+# Add remotes for git instances:
+# - the SVN PIPS-related repositories from Mines ParisTech/CRI
+# - the PolyLib library from Strasbourg University/ICPS
 
 # Where to get the git-svn instances from:
-GIT_SVN_DIR=/home/keryell/projets/Wild_Systems/Par4All/CRI-git-svn
-# Prefix to appear in the remote svn in git
-# For example for refs/remotes/CRI/newgen:
-REMOTE_BRANCH_PREFIX=CRI/
-# Where to put the files into the local git repository:
-TARGET_LOCAL_DIR=packages/PIPS
+GIT_SVN_PIPS_DIR=/home/keryell/projets/Wild_Systems/Par4All/CRI-git-svn
 
-# List of repositories:
-SVN_REPOSITORIES="linear newgen nlpmake pips validation"
+# List of PIPS repositories, sorted in appearance of commit order into the
+# target git, so put the most important at end (well very subjective :-)
+# ):
+PIPS_SVN_REPOSITORIES="validation linear newgen nlpmake pips"
 
 COMMIT_MESSAGE_FILE=`mktemp`
 #echo $COMMIT_MESSAGE_FILE
 
 # Create the remote/CRI/<repository>
-import_git_svn() {
-  # Add the git svn as remote git repository:
-  git remote add $REMOTE_BRANCH_PREFIX$1 $GIT_SVN_DIR/$1
+import_git() {
+    # Get the function parameters:
+    REMOTE_NAME=$1
+    REMOTE_GIT_URL=$2
+    TARGET_LOCAL_DIR=$3
 
-  # Fetch the history:
-  git fetch $REMOTE_BRANCH_PREFIX$1
+    # Add the git svn as remote git repository:
+    git remote add $REMOTE_NAME $REMOTE_GIT_URL
 
-  # Extract a copy of the files of the remote repository into the local
-  # repository at packages/PIPS, merge it and update the files in the work
-  # tree:
-  git read-tree --prefix=$TARGET_LOCAL_DIR/$1 -u CRI/$1/master
+    # Fetch the history:
+    git fetch $REMOTE_NAME
 
-  # Build the merging message:
-  echo "Merging from git-svn remotes/$REMOTE_BRANCH_PREFIX$1 into $TARGET_LOCAL_DIR that is:" > $COMMIT_MESSAGE_FILE
+    # Extract a copy of the files of the remote repository into the local
+    # repository at packages/PIPS, merge it and update the files in the work
+    # tree:
+    git read-tree --prefix=$TARGET_LOCAL_DIR -u $REMOTE_NAME/master
 
-  # Get the last commit message from the remote to branch from:
-  git log -n 1 remotes/$REMOTE_BRANCH_PREFIX$1/master >> $COMMIT_MESSAGE_FILE
+    # Build the merging message:
+    echo "Merging from git-svn remotes/$REMOTE_NAME into $TARGET_LOCAL_DIR that is:" > $COMMIT_MESSAGE_FILE
 
-  # Commit with the built merging message:
-  git commit --file=$COMMIT_MESSAGE_FILE
+    # Get the last commit message from the remote to branch from:
+    git log -n 1 remotes/$REMOTE_NAME/master >> $COMMIT_MESSAGE_FILE
 
-  # Connect the SVN history to this one by fetching it and merging it with
-  # the our strategy (since what we want is what we've just built up above
-  # into packages/PIPS and not at the top level as each individual svn
-  # repository):
-  git pull -s ours CRI/$1 master
+    # Commit with the built merging message:
+    git commit --file=$COMMIT_MESSAGE_FILE
 
-  rm $COMMIT_MESSAGE_FILE
+    # Connect the SVN history to this one by fetching it and merging it with
+    # the our strategy (since what we want is what we've just built up above
+    # into packages/PIPS and not at the top level as each individual svn
+    # repository):
+    git pull -s ours $REMOTE_NAME master
+
+    rm $COMMIT_MESSAGE_FILE
 }
 
-for i in $SVN_REPOSITORIES; do
+
+# Create the remote/CRI/<repository> from <repository> given as parameter:
+import_PIPS_git_svn() {
+    # Import from $GIT_SVN_PIPS_DIR/<repository> URL as remote name
+    # CRI/<repository> into packages/PIPS/<repository> local directory
+    import_git CRI/$1 $GIT_SVN_PIPS_DIR/$1 packages/PIPS/$1
+}
+
+
+# Add the PIPS git svn repositories to Par4All:
+for i in $PIPS_SVN_REPOSITORIES; do
     # It is so slow that we slurp them in parallel...
-    import_git_svn $i
+    import_PIPS_git_svn $i
 done
 
+# http://icps.u-strasbg.fr/polylib
+# Add the PolyLib git repository to Par4All in the packages/polylib
+# directory as the polylib remote:
+import_git polylib git://repo.or.cz/polylib.git packages/polylib
+
+
 echo 'Do not forget to use "merge -s subtree" when getting new CRI stuff later'
-echo "For example you can get new upstream versions with:"
+echo "For example you can get the last upstream version with:"
 for i in $SVN_REPOSITORIES; do
+    echo "    git fetch CRI/$i"
     echo "    git merge -s subtree CRI/$i/master"
 done
+echo "    git fetch polylib"
+echo "    git merge -s subtree polylib/master"
+
 
 #%%% Local Variables:
 #%%% mode: text
