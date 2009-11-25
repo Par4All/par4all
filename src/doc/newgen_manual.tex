@@ -314,9 +314,9 @@ Example}: To dispatch on the tag of the period {\tt r}, use {\tt tag rt
 = or\_tag( r ) ; if( rt == is\_period\_morning ) ...}. The C {\tt
 switch} construct can also be used.
 
-For the arrow domain {\tt f = a\verb:->:b}, the function {\tt
-apply\_f} is defined. It takes a function and an object of type {\tt
-a} and returns an object of type {\tt b}.
+For the arrow domains {\tt f = a\verb:->:b}, i.e. for mappings, the
+function {\tt apply\_f} is defined. It takes a function and an object
+of type {\tt a} and returns an object of type {\tt b}.
 
 To access list elements, use the {\tt CAR} and {\tt CDR} macros. You have to
 indicate the type {\tt a} of the element with the macro {\tt A} when you
@@ -403,9 +403,11 @@ assignment.
 {\em Example}: To change the name of the second person, use
 {\tt person\_name( second ) = "new\_name";}.
 
-For arrow types, use {\tt update\_f} for the domain {\tt f}.
+For arrow types, i.e. for mappings, use {\tt update\_f} or {\tt
+  extend\_f} for the domain {\tt f}.
 
-For sets, use {\tt set\_assign} or the triadic operations.
+For sets, use {\tt set\_assign} or the triadic operations defined in
+{\tt set.c}.
 
 \subsection{Destruction function}
 
