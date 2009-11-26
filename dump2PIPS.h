@@ -182,7 +182,10 @@ newgen_list gfc2pips_exprIO2(char* s, int e, newgen_list l);
 
 newgen_list gfc2pips_arglist2arglist(gfc_actual_arglist *act);
 
+//memory related functions
 void gfc2pips_initAreas();
+void gfc2pips_computeAdressesStatic();
+
 
 newgen_list *gfc2pips_list_of_all_modules;
 
@@ -209,7 +212,8 @@ gfc_code* gfc2pips_get_last_loop();
 void gfc2pips_push_loop(gfc_code *c);
 void gfc2pips_pop_loop();
 
-
+newgen_list gen_union(newgen_list a, newgen_list b);
+newgen_list gen_intersection(newgen_list a, newgen_list b);
 
 #endif /* GFC_2_PIPS */
 
