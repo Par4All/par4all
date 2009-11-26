@@ -155,6 +155,28 @@ bool continue_statement_p(statement s) {
   return instruction_continue_p(i);
 }
 
+bool declaration_statement_p(statement s) {
+  instruction i = statement_instruction(s);
+
+  return instruction_continue_p(i) && !ENDP(statement_declarations(s));
+}
+
+/* Check that all statements contained in statement list sl are a
+   continue statements. */
+bool continue_statements_p(list sl)
+{
+  bool continue_p = TRUE;
+
+  FOREACH(STATEMENT, s, sl) {
+    if(!continue_statement_p(s)) {
+      continue_p = FALSE;
+      break;
+    }
+  }
+
+  return continue_p;
+}
+
 
 /* Test if a statement is a Fortran STOP.
 */
@@ -304,6 +326,8 @@ bool nop_statement_p(statement s)
 
    FI: I add a check on declarations. With their initializations, they
    have side effects. See C_syntax/block01.c.
+
+   FI: same issue with CONTINUE.
  */
 bool empty_statement_or_labelless_continue_p(statement st)
 {
@@ -312,7 +336,7 @@ bool empty_statement_or_labelless_continue_p(statement st)
   if (!entity_empty_label_p(statement_label(st)))
     return FALSE;
   if (continue_statement_p(st))
-    return TRUE;
+    return ENDP(statement_declarations(st));
   i = statement_instruction(st);
   if (instruction_block_p(i) && ENDP(statement_declarations(st))) {
     MAP(STATEMENT, s,
@@ -352,8 +376,8 @@ bool empty_statement_or_continue_p(statement st)
 
 
 /* Return true if the statement is an empty instruction block or a
-   continue without comments or without LABEL or a recursive
-   combination of above. */
+   continue without comments or without LABEL or without declarations
+   or a recursive combination of above. */
 bool empty_statement_or_continue_without_comment_p(statement st)
 {
   instruction i;
@@ -365,7 +389,7 @@ bool empty_statement_or_continue_without_comment_p(statement st)
 
   if (!entity_empty_label_p(statement_label(st)))
     return FALSE;
-  if (continue_statement_p(st))
+  if (continue_statement_p(st) && ENDP(statement_declarations(st)))
     return TRUE;
 
   i = statement_instruction(st);
@@ -721,7 +745,7 @@ insure_return_as_last_statement(
 	if (statement_block_p(*ps))
 	{
 	    sequence_statements(instruction_sequence(
-		statement_instruction(*ps))) = 
+		statement_instruction(*ps))) =
 		gen_nconc(sequence_statements(instruction_sequence(
 		    statement_instruction(*ps))),
 			  CONS(STATEMENT, ret, NIL));
@@ -739,6 +763,20 @@ statement make_continue_statement(entity l)
 {
     return make_call_statement(CONTINUE_FUNCTION_NAME, NIL, l,
 			       empty_comments);
+}
+
+/* To preserve declaration lines and comments, declaration statements
+   are used. */
+statement make_declaration_statement(entity v, int sn, string cs)
+{
+  statement ds = make_call_statement(CONTINUE_FUNCTION_NAME,
+				     NIL,
+				     entity_empty_label(),
+				     cs);
+  statement_declarations(ds) = CONS(ENTITY, v, NIL);
+  statement_number(ds) = sn;
+
+  return ds;
 }
 
 /* Build a while loop statement.
@@ -940,7 +978,7 @@ void print_statement_of_module(statement s, string mn)
   if(entity_undefined_p(get_current_module_entity())) {
     entity m = local_name_to_top_level_entity(mn);
     set_current_module_entity(m);
-    reset_label_counter();  
+    reset_label_counter();
     print_statement(s);
     reset_current_module_entity();
   }
@@ -989,7 +1027,7 @@ void print_parallel_statement(statement s)
 }
 
 
-/* Mapping from statement number to statement 
+/* Mapping from statement number to statement
  *
  * Warning: STATEMENT_NUMBER_UNDEFINED may be equal to HASH_ENTRY_FREE_FOR_PUT
  * because integer keys are not well supported by the newgen hash package.
@@ -1012,14 +1050,13 @@ static hash_table number_to_statement = hash_table_undefined;
 /* To keep track of duplicate numbers */
 static set duplicate_numbers = set_undefined;
 
-static void 
-update_number_to_statement(s)
-statement s;
+static void update_number_to_statement(statement s)
 {
     if(statement_number(s)!=STATEMENT_NUMBER_UNDEFINED) {
 	if(hash_get(number_to_statement, (char *) statement_number(s))
 	   != HASH_UNDEFINED_VALUE) {
-	    duplicate_numbers = set_add_element(duplicate_numbers, duplicate_numbers, 
+	    duplicate_numbers = set_add_element(duplicate_numbers,
+						duplicate_numbers,
 						(char *) statement_number(s));
 	}
 	else {
@@ -1074,8 +1111,7 @@ statement s;
     return nts;
 }
 
-void 
-print_number_to_statement(nts)
+void print_number_to_statement(nts)
 hash_table nts;
 {
     HASH_MAP(number, stmt, {
@@ -1084,13 +1120,12 @@ hash_table nts;
     }, nts);
 }
 
-hash_table 
-allocate_number_to_statement()
+hash_table allocate_number_to_statement()
 {
     hash_table nts = hash_table_undefined;
 
-    /* let's assume that 50 statements is a good approximation of a module
-     * size 
+    /* let's assume that 50 statements is a good approximation of a
+     * module size.
      */
     nts = hash_table_make(hash_int, 50);
 
@@ -1714,7 +1749,7 @@ statement_does_return(statement s)
 	     },
 		 sequence_statements(instruction_sequence(i)));
 
-	break;    
+	break;
     case is_instruction_unstructured:
 	returns = unstructured_does_return(instruction_unstructured(i));
 	break;
@@ -2100,6 +2135,54 @@ void insert_statement(statement s,
     }
 }
 
+/* Declarations are not only lists of entities, but also statement to
+   carry the line number, comments,... For the time begin, a
+   declaration statement is a continue statement. */
+statement add_declaration_statement(statement s, entity e)
+{
+  if(statement_block_p(s)) {
+    list sl = statement_block(s); //statement list
+    list cl = list_undefined; // current statement list
+    list pl = NIL; // previous statement list
+    list nsl = list_undefined; // new statement list
+    statement ds = make_declaration_statement(e,
+					      STATEMENT_NUMBER_UNDEFINED,
+					      strdup("PIPS generated variable\n"));
+
+    /* Look for the last declaration: it is pointed to by pl */
+    for(cl=sl; !ENDP(cl); POP(cl)) {
+      statement cs = STATEMENT(CAR(cl));
+      if(declaration_statement_p(cs)) {
+	pl = cl;
+      }
+      else {
+	break;
+      }
+    }
+
+    /* Do we have previous declarations to skip? */
+    if(!ENDP(pl)) {
+      CDR(pl) = NIL; // Truncate sl
+      nsl = gen_nconc(sl, CONS(STATEMENT, ds, cl));
+    }
+    else { // pl == NIL
+      /* The new declaration is inserted before sl*/
+      pips_assert("The above loop was entered at most once", sl==cl);
+      nsl = CONS(STATEMENT, ds, cl);
+    }
+
+    instruction_block(statement_instruction(s)) = nsl;
+  }
+  else
+    pips_internal_error("Declaration statements are only inserted in sequences\n");
+
+  ifdebug(8) {
+    pips_debug(8, "Statement after declaration insertion:\n");
+    print_statement(s);
+  }
+
+  return s;
+}
 
 /* Replace the instruction in statement s by instruction i.
  *
@@ -2164,7 +2247,32 @@ statement update_statement_instruction(statement s,instruction i)
   return s;
 }
 
-
+/* Assume that statement rs appears in statement as and replaced it
+   by a statement list. */
+void statement_replace_with_statement_list(statement as, statement rs, list sl)
+{
+  ifdebug(8) {
+    pips_debug(8, "Ancestor statement before substitution:\n");
+    print_statement(as);
+  }
+  if(statement_block_p(as)) {
+    list asl = statement_block(as);
+    instruction asi = statement_instruction(as);
+    if(asl==NULL) {
+      pips_internal_error("The statement is not part of its ancestor");
+    }
+    gen_substitute_chunk_by_list(&asl, (void *) rs, sl);
+    instruction_block(asi) = asl;
+  }
+  else {
+    pips_internal_error("not implemented yet");
+  }
+  ifdebug(8) {
+    pips_debug(8, "Ancestor statement after substitution:\n");
+    print_statement(as);
+  }
+}
+
 static bool find_implicit_goto(statement s, list * tl)
 {
   bool found = FALSE;
@@ -2274,6 +2382,17 @@ list instruction_to_declarations(instruction i)
 		      statement_domain, add_statement_declarations, gen_null);
 
   return statement_to_all_included_declarations;
+}
+
+/* Returns the declarations contained in a list of statement. */
+list statements_to_declarations(list sl)
+{
+  instruction i = make_instruction_block(sl);
+  list dl = instruction_to_declarations(i);
+  /* The declaration list is reversed by
+     instruction_to_declarations(). */
+  dl = gen_nreverse(dl);
+  return dl;
 }
 
 /************************************************************ STAT VARIABLES */

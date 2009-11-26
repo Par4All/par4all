@@ -804,8 +804,7 @@ add_loop_index_exit_value(
   return post;
 }
 
-bool 
-simple_dead_loop_p(expression lower, expression upper)
+bool simple_dead_loop_p(expression lower, expression upper)
 {
   bool dead_loop_p = FALSE;
   normalized n_lower = NORMALIZE_EXPRESSION(lower);
@@ -814,7 +813,7 @@ simple_dead_loop_p(expression lower, expression upper)
   if(normalized_linear_p(n_upper) && normalized_linear_p(n_lower)) {
     Pvecteur v_lower = normalized_linear(n_lower);
     Pvecteur v_upper = normalized_linear(n_upper);
-	
+
     if(VECTEUR_NUL_P(v_lower)) {
       if (!VECTEUR_NUL_P(v_upper)) {
 	if(term_cst(v_upper)
@@ -834,7 +833,7 @@ simple_dead_loop_p(expression lower, expression upper)
     else if(term_cst(v_upper) && term_cst(v_lower)
 	    && VECTEUR_NUL_P(vecteur_succ(v_upper))
 	    && VECTEUR_NUL_P(vecteur_succ(v_lower))) {
-      dead_loop_p = 
+      dead_loop_p =
 	value_gt(vecteur_val(v_lower),vecteur_val(v_upper));
     }
   }

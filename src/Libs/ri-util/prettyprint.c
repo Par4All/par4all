@@ -496,7 +496,9 @@ text generate_alternate_return_targets()
 	make_unformatted
 	(strdup(label_local_name(le)),
 	 STATEMENT_NUMBER_UNDEFINED, 0,
-	 CONS(STRING, strdup(prettyprint_is_fortran?"CONTINUE":";"), NIL));
+	 CONS(STRING, strdup(prettyprint_is_fortran?
+			     CONTINUE_FUNCTION_NAME
+			     : C_CONTINUE_FUNCTION_NAME), NIL));
 
       s1 = make_sentence(is_sentence_unformatted, u1);
       sl = gen_nconc(sl, CONS(SENTENCE, s1, NIL));
@@ -562,11 +564,24 @@ words_regular_call(call obj, bool is_a_subroutine)
   else if (ENTITY_VA_COPY_P(f))
     pc = CHAIN_SWORD(pc, "va_copy");
 
-  /* Special cases for stdio.h */ 
+  /* Special cases for stdio.h */
   /* else if (ENTITY__IO_GETC_P(f)) */
 /*     pc = CHAIN_SWORD(pc, "getc"); */
 /*   else if (ENTITY__IO_PUTC_P(f)) */
 /*     pc = CHAIN_SWORD(pc, "putc"); */
+  else if (ENTITY_ISOC99_SCANF_P(f))
+    pc = CHAIN_SWORD(pc, ISOC99_SCANF_USER_FUNCTION_NAME);
+  else if (ENTITY_ISOC99_FSCANF_P(f))
+    pc = CHAIN_SWORD(pc, ISOC99_FSCANF_USER_FUNCTION_NAME);
+  else if (ENTITY_ISOC99_SSCANF_P(f))
+    pc = CHAIN_SWORD(pc, ISOC99_SSCANF_USER_FUNCTION_NAME);
+  else if (ENTITY_ISOC99_VFSCANF_P(f))
+    pc = CHAIN_SWORD(pc, ISOC99_VFSCANF_USER_FUNCTION_NAME);
+  else if (ENTITY_ISOC99_VSCANF_P(f))
+    pc = CHAIN_SWORD(pc, ISOC99_VFSCANF_USER_FUNCTION_NAME);
+  else if (ENTITY_ISOC99_VSSCANF_P(f))
+    pc = CHAIN_SWORD(pc, ISOC99_VSSCANF_USER_FUNCTION_NAME);
+
 
   /* the implied complex operator is hidden... [D]CMPLX_(x,y) -> (x,y)
    */
@@ -1383,7 +1398,7 @@ words_goto_label(string tlabel)
       pc = CHAIN_SWORD(pc, strdup(prettyprint_is_fortran?"GOTO ":(isdigit(tlabel[0])?"goto l":"goto ")));
       pc = CHAIN_SWORD(pc, tlabel);
       if (!prettyprint_is_fortran)
-	pc = CHAIN_SWORD(pc, ";");
+	pc = CHAIN_SWORD(pc, C_CONTINUE_FUNCTION_NAME);
     }
     return pc;
 }
@@ -2713,7 +2728,7 @@ text_io_block_if(
       ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_unformatted,
 					    make_unformatted(strdup(strglab), n, margin,
 							     CONS(STRING,
-								  strdup(prettyprint_is_fortran?"CONTINUE":";"), NIL))));
+								  strdup(prettyprint_is_fortran? CONTINUE_FUNCTION_NAME:C_CONTINUE_FUNCTION_NAME), NIL))));
     }
 
     if (!empty_statement_p(test_false(obj)))
@@ -2956,10 +2971,15 @@ text_instruction(
     {
       unformatted u;
       sentence s;
-      if (instruction_continue_p(obj) &&
-	  empty_string_p(label) &&
-	  !get_bool_property("PRETTYPRINT_ALL_LABELS")) {
-	pips_debug(5, "useless CONTINUE not printed\n");
+      /* FI: in C at least, this has already been decided by the
+	 caller, text_statement_enclosed(); but apparently not in
+	 Fortran. Also, the source code may be in Fortran, but the
+	 user wants it prettyprinted as C. */
+      if (get_prettyprint_is_fortran() /* fortran_module_p(module)*/
+	  && instruction_continue_p(obj)
+	  && empty_string_p(label)
+	  && !get_bool_property("PRETTYPRINT_ALL_LABELS")) {
+	pips_debug(5, "useless Fortran CONTINUE not printed\n");
 	r = make_text(NIL);
       }
       else {
@@ -2971,7 +2991,7 @@ text_instruction(
 	  u = make_unformatted(strdup(label), n, margin,
 			     CHAIN_SWORD(words_call(instruction_call(obj),
 						    0, TRUE, TRUE),
-					 strdup(";")));
+					 strdup(C_STATEMENT_END_STRING)));
 	s = make_sentence(is_sentence_unformatted, u);
 	r = make_text(CONS(SENTENCE, s, NIL));
       }
@@ -3007,7 +3027,7 @@ text_instruction(
     {
       list pc = words_expression(instruction_expression(obj));
       unformatted u;
-      pc = CHAIN_SWORD(pc,";");
+      pc = CHAIN_SWORD(pc,C_CONTINUE_FUNCTION_NAME);
       u = make_unformatted(strdup(label), n, margin, pc) ;
       r = make_text(CONS(SENTENCE,make_sentence(is_sentence_unformatted, u),NIL));
       break;
@@ -3216,14 +3236,36 @@ text text_statement_enclosed(entity module,
   text temp;
   string label =
     entity_local_name(statement_label(stmt)) + strlen(LABEL_PREFIX);
-  string comments = statement_comments(stmt);
+  string i_comments = statement_comments(stmt);
+  string comments = string_undefined;
   bool braces_added = FALSE;
   int nmargin = imargin;
 
   // To ease breakpoint setting
   //pips_assert("Blocks have no comments", !instruction_block_p(i)||empty_comments_p(comments));
-  if(instruction_block_p(i) && !empty_comments_p(comments)) {
+  if(instruction_block_p(i) && !empty_comments_p(i_comments)) {
     pips_internal_error("Blocks should have no comments\n");
+  }
+
+  /* Special handling of comments linked to declarations and to the
+     poor job of the lexical analyzer as regards C comments:
+     failure. */
+  if(empty_comments_p(i_comments)) {
+    comments = strdup("");
+  }
+  else if(declaration_statement_p(stmt)) {
+    /* LF interspersed within C struct or union or initialization
+       declarations may damage the user comment. However, there is no
+       way no know if the LF are valid because thay are located
+       between two statements or invalid because they are located
+       within one statement. The information is lost by the lexer and
+       the parser. */
+    //comments = string_strip_final_linefeeds(strdup(i_comments));
+    //comments = string_fuse_final_linefeeds(strdup(i_comments));
+    comments = strdup(i_comments);
+  }
+  else {
+    comments = strdup(i_comments);
   }
 
   // the first thing to do is to print the statement extensions
@@ -3232,23 +3274,40 @@ text text_statement_enclosed(entity module,
     ADD_SENTENCE_TO_TEXT(r,make_sentence(is_sentence_formatted, ext));
   }
 
-  /* 31/07/2003 Nga Nguyen : This code is added for C, because a
-     statement can have its own declarations */
-  list l = statement_declarations(stmt);
+  /* Generate text for local declarations
+   *
+   * 31/07/2003 Nga Nguyen : This code is added for C, because a
+   * statement can have its own declarations
+   */
+  list dl = statement_declarations(stmt);
 
-  if (!ENDP(l) && !prettyprint_is_fortran) {
-    if(!braces_p) {
-      braces_added = TRUE;
-      ADD_SENTENCE_TO_TEXT(r,
-			   MAKE_ONE_WORD_SENTENCE(imargin, "{"));
-      nmargin += INDENTATION;
+  if (!ENDP(dl) && !prettyprint_is_fortran) {
+    if(statement_block_p(stmt)) {
+      if(!braces_p) {
+	braces_added = TRUE;
+	ADD_SENTENCE_TO_TEXT(r,
+			     MAKE_ONE_WORD_SENTENCE(imargin, "{"));
+	nmargin += INDENTATION;
+      }
+    }
+    else {
+      pips_assert("declarations are carried by continue statements",
+		  continue_statement_p(stmt));
     }
     // initialize the local variable text if needed
     if (local_flg == false) {
       local_flg = true;
       local_var =  make_text(NIL);
     }
-    MERGE_TEXTS(local_var, c_text_entities(module,l,nmargin));
+    if(declaration_statement_p(stmt)) {
+      int sn = statement_number(stmt);
+      MERGE_TEXTS(local_var, c_text_related_entities(module,dl,nmargin,sn));
+    }
+    else {
+      //MERGE_TEXTS(local_var, c_text_entities(module,l,nmargin));
+      // Do nothing and rely on CONTINUE statements...
+      ;
+    }
   }
 
   pips_debug(2, "Begin for statement %s with braces_p=%d\n",
@@ -3284,7 +3343,7 @@ text text_statement_enclosed(entity module,
       entity m = entity_undefined_p(module)?
 	get_current_module_entity()
 	: module;
-      if(!compilation_unit_p(entity_name(m))) {
+      if(TRUE || !compilation_unit_p(entity_name(m))) {
 	/* Do we need to print this CONTINUE statement in C? */
 	string cs = statement_comments(stmt);
 	entity l = statement_label(stmt);
@@ -3293,7 +3352,11 @@ text text_statement_enclosed(entity module,
 	   && (braces_p || drop_continue_p)
 	   && empty_label_p(entity_local_name(l))
 	   && instruction_continue_p(i)) {
-	  if(string_undefined_p(cs) || cs == NULL || strcmp(cs, "")==0) {
+	  if(!ENDP(statement_declarations(stmt))) {
+	    /* The declarations will be printed, no need for anything else */
+	    temp = make_text(NIL);
+	  }
+	  else if(string_undefined_p(cs) || cs == NULL || strcmp(cs, "")==0) {
 	    sentence s = MAKE_ONE_WORD_SENTENCE(0, "");
 	    temp = make_text(CONS(SENTENCE, s ,NIL));
 	    //temp = make_text(NIL);
@@ -3315,11 +3378,9 @@ text text_statement_enclosed(entity module,
 	temp = make_text(NIL);
     }
 
-  // append local variables  that might
-  // have not been inserted previously
-  r = insert_locals (r);
-
-  /* note about comments: they are duplicated here, but I'm pretty
+  /* Take care of comments
+   *
+   * Note about comments: they are duplicated here, but I'm pretty
    * sure that the free is NEVER performed as it should. FC.
    */
   if(!ENDP(text_sentences(temp))) {
@@ -3350,15 +3411,20 @@ text text_statement_enclosed(entity module,
 	MERGE_TEXTS(r, ct);
       }
     }
-    else if(!prettyprint_is_fortran && !braces_p && !braces_added) {
+    else if(!prettyprint_is_fortran && !braces_p && !braces_added &&ENDP(dl)) {
       // Because C braces can be eliminated and hence semi-colon
       // may be mandatory in a test branch or in a loop body.
       // A. Mensi
-      sentence s = MAKE_ONE_WORD_SENTENCE(nmargin, strdup(";"));
+      sentence s = MAKE_ONE_WORD_SENTENCE(nmargin,
+					  strdup(C_CONTINUE_FUNCTION_NAME));
       ADD_SENTENCE_TO_TEXT(r, s);
     }
     free_text(temp);
   }
+
+  /* append local variables  that might have not been inserted
+     previously*/
+  r = insert_locals (r);
 
   if (braces_added) {
     ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(imargin, "}"));
@@ -3391,6 +3457,8 @@ text text_statement_enclosed(entity module,
     print_text(stderr,r);
     fprintf(stderr,"==============================\n");
   }
+
+  free(comments);
 
   pips_debug(2, "End for statement %s\n", statement_identification(stmt));
 
@@ -3483,14 +3551,12 @@ set_last_statement(statement s)
     last_statement = ls;
 }
 
-void
-reset_last_statement()
+void reset_last_statement()
 {
     last_statement = statement_undefined;
 }
 
-bool
-last_statement_p(statement s) {
+bool last_statement_p(statement s) {
     pips_assert("statement is defined\n", !statement_undefined_p(s));
     return s == last_statement;
 }
@@ -3500,8 +3566,7 @@ last_statement_p(statement s) {
    The original text of the declarations is used if possible in
    Fortran. Otherwise, the function text_declaration is called.
  */
-text
-text_named_module(
+text text_named_module(
     entity name, /**< the name of the module */
     entity module,
     statement stat)
@@ -3838,14 +3903,14 @@ static text text_forloop(entity module,
     pc = CHAIN_SWORD(pc,"for (");
     if (!expression_undefined_p(forloop_initialization(obj)))
       pc = gen_nconc(pc, words_expression(forloop_initialization(obj)));
-    pc = CHAIN_SWORD(pc,";");
+    pc = CHAIN_SWORD(pc,C_STATEMENT_END_STRING);
     if (!expression_undefined_p(forloop_condition(obj))) {
       /* To restitute for(;;) */
       expression cond = forloop_condition(obj);
       if(!expression_one_p(cond))
 	pc = gen_nconc(pc, words_expression(forloop_condition(obj)));
     }
-    pc = CHAIN_SWORD(pc,";");
+    pc = CHAIN_SWORD(pc,C_STATEMENT_END_STRING);
     if (!expression_undefined_p(forloop_increment(obj)))
       pc = gen_nconc(pc, words_expression(forloop_increment(obj)));
     pc = CHAIN_SWORD(pc,one_liner_p(body)?")":") {");

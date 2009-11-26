@@ -607,7 +607,11 @@ interpret: file TK_EOF
 file: globals
                         {
 			  /* To handle special case: compilation unit module */
-			  list dl = $1;
+			  list dsl = $1;
+			  list dl = statements_to_declarations(dsl);
+
+			  pips_assert("Here, only continue statements are expected",
+				      continue_statements_p(dsl));
 
 			  if (TRUE /* dl != NIL*/) { /* A C file with comments only is OK */
 			    if(!entity_undefined_p(get_current_module_entity())) {
@@ -627,7 +631,7 @@ file: globals
 							       STATEMENT_NUMBER_UNDEFINED,
 							       STATEMENT_ORDERING_UNDEFINED,
 							       string_undefined,
-							       make_instruction_block(NIL),
+							       make_instruction_block(dsl),
 							       dl, NULL, empty_extensions ());
 			      if(ENDP(dl)) {
 				pips_user_warning("ISO C forbids an empty source file\n");
@@ -641,20 +645,22 @@ globals:
     /* empty */         { $$ = NIL; }
 |   {is_external = TRUE; } global globals
                         {
+			  list dsl = $3;
+			  list dl = statements_to_declarations(dsl);
+			  list gdsl = $2;
+			  list gdl = statements_to_declarations(gdsl);
 			  /* Each variable should be declared only
 			     once. Type and initial value conflict
-			     should have been detected earlier. I
-			     would expect $1 and $2 rather than $2 and
-			     $3. */
+			     should have been detected earlier. */
 			  if(!compilation_unit_p(get_current_module_name())) {
-			    pips_assert("Each variable is declared once", gen_once_p($3));
+			    pips_assert("Each variable is declared once", gen_once_p(dl));
 			  }
 			  ifdebug(9) {
-			    fprintf(stderr, "New variables $2 (%p) are declared\n", $2);
-			    print_entities($2);
+			    fprintf(stderr, "New variables $2 (%p) are declared\n", gdl);
+			    print_entities(gdl);
 			    fprintf(stderr, "\n");
-			    fprintf(stderr, "*******Current declarations $3 (%p) are: \n", $3);
-			    print_entities($3);
+			    fprintf(stderr, "*******Current declarations dl (%p) are: \n", dl);
+			    print_entities(dl);
 			    fprintf(stderr, "\n");
 			  }
 
@@ -670,20 +676,22 @@ globals:
 			  */
 			  /* Redeclarations are possible in C as long as they are compatible */
 			  /* It is assumed that compatibility is checked somewhere else... */
-			  $$ = gen_nconc($2, $3);
+			  $$ = gen_nconc(gdsl, dsl);
 
 			  ifdebug(9) {
+			    list udl = statements_to_declarations($$);
 			    fprintf(stderr, "*******Updated $$ declarations (%p) are: \n", $$);
 			    fprintf(stderr, "\n");
 			    if(ENDP($$))
 			      fprintf(stderr, "Empty list\n");
 			    else
-			      print_entities($$);
+			      print_entities(udl);
 			    fprintf(stderr, "\n");
 			  }
 
 			  if(!compilation_unit_p(get_current_module_name())) {
-			    pips_assert("Each variable is declared once", gen_once_p($$));
+			    list udl = statements_to_declarations($$);
+			    pips_assert("Each variable is declared once", gen_once_p(udl));
 			    ResetCurrentModule();
 			  }
 			}
@@ -691,8 +699,9 @@ globals:
                         {
 			  pips_assert("Declarations are unique", gen_once_p($2));
 			  ifdebug(8) {
+			    list udl = statements_to_declarations($2);
 			    fprintf(stderr, "*******Current declarations are: \n");
-			    print_entities($2);
+			    print_entities(udl);
 			    fprintf(stderr, "\n");
 			  }
 			  $$ = $2;
@@ -704,7 +713,7 @@ location:
 
 /*** Global Definition ***/
 global:
-declaration         { discard_C_comment();}
+declaration         {/* discard_C_comment();*/ ;}
 |   function_def        { $$ = NIL; }
 |   TK_ASM TK_LPAREN string_constant TK_RPAREN TK_SEMICOLON
                         {
@@ -734,7 +743,9 @@ declaration         { discard_C_comment();}
 			  PushFunction(e);
 			  stack_push((char *) make_basic_logical(TRUE),FormalStack);
 			  stack_push((char *) make_basic_int(1),OffsetStack);
-			  discard_C_comment();
+			  // FI: commented out while looking for
+			  //declaration comments
+			  //discard_C_comment();
 			}
     old_parameter_list_ne TK_RPAREN old_pardef_list TK_SEMICOLON
                         {
@@ -750,7 +761,9 @@ declaration         { discard_C_comment();}
 			  stack_pop(FormalStack);
 			  StackPop(OffsetStack);
 			  $$ = NIL;
-			  discard_C_comment();
+			  // FI: commented out while trying to
+			  //retrieve all comments
+			  //discard_C_comment();
 			}
 /* Old style function prototype, but without any arguments */
 |   TK_IDENT TK_LPAREN TK_RPAREN TK_SEMICOLON
@@ -770,7 +783,9 @@ declaration         { discard_C_comment();}
 			    entity_initial(e) = make_value(is_value_code,make_code(NIL,strdup(""),make_sequence(NIL),NIL, make_language_c()));
 			  pips_assert("Current function entity is consistent",entity_consistent_p(e));
 			  $$ = NIL;
-			  discard_C_comment();
+			  // FI: commented out while trying to
+			  //retrieve all comments
+			  //discard_C_comment();
 			}
 /* transformer for a toplevel construct */
 |   TK_AT_TRANSFORM TK_LBRACE global TK_RBRACE TK_IDENT /*to*/ TK_LBRACE globals TK_RBRACE
@@ -1296,7 +1311,7 @@ bracket_comma_expression:
 /*** statements ***/
 block: /* ISO 6.8.2 */
     TK_LBRACE
-                        { EnterScope();}
+                        { EnterScope(); discard_C_comment();}
     local_labels block_attrs declaration_list statement_list TK_RBRACE
                         {
 			  $$ = MakeBlock($5,$6);
@@ -1353,12 +1368,20 @@ label:
 
 statement:
     TK_SEMICOLON
-                    	{
+			{
 			  /* Null statement in C is represented as continue statement in Fortran*/
-			  $$ = make_continue_statement(entity_empty_label());
+			  /* FI: the comments should be handled at
+			     another level, so as not to repeat the
+			     same code over and over again? */
+			  string sc = get_current_C_comment();
+			  int sn = get_current_C_line_number();
+			  statement s = make_continue_statement(entity_empty_label());
+			  statement_comments(s) = sc;
+			  statement_number(s) = sn;
+			  $$ = s;
 			}
 |   comma_expression TK_SEMICOLON
-	        	{
+			{
 			  if (gen_length($1)==1)
 			    $$ = ExpressionToStatement(EXPRESSION(CAR($1)));
 			  else
@@ -1570,7 +1593,9 @@ for_clause:
 			}
 |   declaration
                         {
-			  discard_C_comment();
+			  // FI: commented out while trying to
+			  // retrieve all comments
+			  // discard_C_comment();
 			  CParserError("For clause containing declaration not implemented\n");
 			}
 ;
@@ -1578,18 +1603,64 @@ for_clause:
 declaration:                               /* ISO 6.7.*/
     decl_spec_list init_declarator_list TK_SEMICOLON
                         {
-			  list l1 = $1; // To ease debugging
-			  list l2 = $2;
-			  pips_assert("Declaration list are not redundant", gen_once_p(l2));
-			  /* this assertion is wrong: l1 should be an item, not a list */
-			  pips_assert("Variable $1 has not been declared before", !gen_in_list_p(l1, l2));
-			  UpdateEntities($2,ContextStack,FormalStack,FunctionStack,OffsetStack,is_external,TRUE);
+			  /* FI: A declaration statement such as "int
+			     i, j, k;" seems to end up here. But so
+			     does a function declaration as well,
+			     although I do not see the
+			     TK_SEMICOLON. But there is one in the
+			     compilation unit. */
+			  list sl1 = $1; // To ease debugging
+			  list el1 = list_undefined;
+			  list el2 = $2;
+			  //list l12 = gen_nconc(l1,l2);
+			  list el12 = list_undefined;
+			  statement s = statement_undefined;
+			  pips_assert("sl1 is a continue statement list",
+				      continue_statements_p(sl1));
+			  pips_assert("el2 is an entity list", entities_p(el2));
+			  if(ENDP(sl1)) {
+			    string sc = get_current_C_comment();
+			    int sn = get_current_C_line_number();
+			    s =
+			      make_continue_statement(entity_empty_label());
+			    statement_declarations(s) = el2;
+			    s = add_comment_and_line_number(s, sc, sn);
+			    $$ = CONS(STATEMENT,s, NIL);
+			    el12 = el2;
+			    el1 = NIL;
+			    ifdebug(8) {
+			      pips_debug(8, "New continue statement for entities: ");
+			      print_entities(el2);
+			      fprintf(stderr, "\n");
+			    }
+			  }
+			  else if(gen_length(sl1)==1){
+			    s = STATEMENT(CAR(sl1));
+			    el1 = statement_declarations(s);
+			    ifdebug(8) {
+			      pips_debug(8, "Previous continue statement for entities: ");
+			      print_entities(el1);
+			      fprintf(stderr, "\n");
+			      pips_debug(8, "New entities added: ");
+			      print_entities(el2);
+			      fprintf(stderr, "\n");
+			    }
+			    el12 = gen_nconc(statement_declarations(s), el2);
+			    statement_declarations(s) = el12;
+			  }
+			  else {
+			    pips_internal_error("Unexpected case");
+			  }
+			  pips_assert("Declaration list are not redundant", gen_once_p(el2));
+			  /* this assertion is wrong: sl1 should be an item, not a list */
+			  pips_assert("Variable in el1 has not been declared before", !gen_in_list_p(el1, el2));
+			  UpdateEntities(el2,ContextStack,FormalStack,FunctionStack,OffsetStack,is_external,TRUE);
 			  //stack_pop(ContextStack);
 			  PopContext();
-			  $$ = gen_nconc(l1,l2);
 			  /* Remove their type stacks */
-			  remove_entity_type_stacks($$);
-			  CleanUpEntities($$);
+			  remove_entity_type_stacks(el12);
+			  CleanUpEntities(el12);
+			  $$ = CONS(STATEMENT,s,NIL);
 			}
 |   decl_spec_list TK_SEMICOLON
                         {
@@ -1689,6 +1760,7 @@ my_decl_spec_list:                         /* ISO 6.7 */
 			  /* Add TYPEDEF_PREFIX to entity name prefix and make it a rom storage */
 			  c_parser_context_typedef(ycontext) = TRUE;
 			  c_parser_context_storage(ycontext) = make_storage_rom();
+			  pips_assert("CONTINUE for declarations", continue_statements_p($2));
 			  $$ = $2;
 			}
 |   TK_EXTERN decl_spec_list_opt
@@ -1698,16 +1770,19 @@ my_decl_spec_list:                         /* ISO 6.7 */
 			  pips_debug(8, "Scope of context %p forced to TOP_LEVEL_MODULE_NAME", ycontext);
 			  c_parser_context_scope(ycontext) = strdup(concatenate(TOP_LEVEL_MODULE_NAME,
 									       MODULE_SEP_STRING,NULL));
+			  pips_assert("CONTINUE for declarations", continue_statements_p($2));
 			  $$ = $2;
 			}
 |   TK_STATIC decl_spec_list_opt
                         {
 			  c_parser_context_static(ycontext) = TRUE;
+			  pips_assert("CONTINUE for declarations", continue_statements_p($2));
 			  $$ = $2;
 			}
 |   TK_AUTO decl_spec_list_opt
                         {
 			  /* Make dynamic storage for current entity */
+			  pips_assert("CONTINUE for declarations", continue_statements_p($2));
 			  $$ = $2;
 			}
 |   TK_REGISTER decl_spec_list_opt
@@ -1715,22 +1790,85 @@ my_decl_spec_list:                         /* ISO 6.7 */
 			  /* Add to type variable qualifiers */
 			  c_parser_context_qualifiers(ycontext) = gen_nconc(c_parser_context_qualifiers(ycontext),
 									   CONS(QUALIFIER,make_qualifier_register(),NIL));
+			  pips_assert("CONTINUE for declarations", continue_statements_p($2));
 			  $$ = $2;
 			}
                                         /* ISO 6.7.2 */
 |   type_spec decl_spec_list_opt_no_named
                         {
-			  $$ = gen_nconc($1,$2);
+			  list el = $1;
+			  list sl = $2;
+			  list rl = list_undefined;
+			  pips_assert("el contains an entity list", entities_p(el));
+			  //pips_assert("CONTINUE for declarations", continue_statements_p(el));
+			  pips_assert("CONTINUE for declarations", continue_statements_p(sl));
+			  // el contains only hidden internal PIPS
+			  // entities, but some of them at least must
+			  // be seen b the prettyprinter
+			  if(ENDP(el)) {
+			    rl = sl;
+			  }
+			  else if(ENDP(sl)) {
+			    //print_entities(el);
+			    string sc = get_current_C_comment();
+			    int sn = get_current_C_line_number();
+			    statement s =
+			      make_continue_statement(entity_empty_label());
+			    statement_declarations(s) = el;
+			    // The declaration may be spread over
+			    // several lines. This is the last line
+			    // number, which carries the last LF.
+			    statement_number(s) = sn;
+			    // Too many LF may have been added because
+			    // the declaration is spread over several
+			    // lines.
+			    sc = string_remove_trailing_line_feeds(sc);
+			    statement_comments(s) = sc;
+			    rl = CONS(STATEMENT, s, NIL);
+			    // rl = NIL;
+			    ifdebug(8) {
+			      pips_debug(8, "New continue statement for entities:\n");
+			      print_entities(el);
+			      fprintf(stderr, "\n");
+			    }
+			  }
+			  else if(gen_length(sl)==1) {
+			    // FI: I'm not sure it ever happens
+			    statement s = STATEMENT(CAR(sl));
+			    ifdebug(8) {
+			      pips_debug(8, "Previous (unexpected) continue statement for entities: ");
+			      print_entities(statement_declarations(s));
+			      fprintf(stderr, "\n");
+			      pips_debug(8, "New entities added: ");
+			      print_entities(el);
+			      fprintf(stderr, "\n");
+			      rl = sl;
+			    }
+			    statement_declarations(s) =
+			      gen_nconc(el, statement_declarations(s));
+			  }
+			  else {
+			    pips_internal_error("Multiple statements not expected\n");
+			    statement s =
+			      make_continue_statement(entity_empty_label());
+			    statement_declarations(s) = el;
+			    // $$ = gen_nconc($1,$2);
+			    //$$ = $2;
+			    rl = gen_nconc(CONS(STATEMENT, s, NIL),sl);
+			  }
+			  $$ = rl;
 			}
                                         /* ISO 6.7.4 */
 |   TK_INLINE decl_spec_list_opt
                         {
 			  pips_user_warning("Keyword \"inline\" ignored\n");
+			  pips_assert("CONTINUE for declarations", continue_statements_p($2));
 			  $$ = $2;
 			}
 |   attribute decl_spec_list_opt
                         {
 			  c_parser_context_qualifiers(ycontext) = CONS(QUALIFIER,$1,c_parser_context_qualifiers(ycontext));
+			  pips_assert("CONTINUE for declarations", continue_statements_p($2));
 			  $$ = $2;
 			}
 /* specifier pattern variable (must be last in spec list) */
@@ -1894,10 +2032,13 @@ type_spec:   /* ISO 6.7.2 */
                         {
 			  /* Create the struct entity with unique name s */
 			  string s = code_decls_text((code) stack_head(StructNameStack));
-			  entity ent = MakeDerivedEntity(s,$4,is_external,is_type_struct);
+			  list el = $4;
+			  pips_assert("el is an entity list", entities_p(el));
+			  entity ent = MakeDerivedEntity(s,el,is_external,is_type_struct);
 			  variable v = make_variable(make_basic_derived(ent),NIL,NIL);
-			  /* Take from $4 the struct/union entities */
-			  list le = TakeDerivedEntities($4);
+			  pips_assert("el is an entity list", entities_p(el));
+			  /* Take from el the struct/union entities */
+			  list le = TakeDerivedEntities(el);
 			  $$ = gen_nconc(le,CONS(ENTITY,ent,NIL));
 			  c_parser_context_type(ycontext) = make_type_variable(v);
 			  stack_pop(StructNameStack);
@@ -1947,7 +2088,9 @@ type_spec:   /* ISO 6.7.2 */
 			  variable v = make_variable(make_basic_derived(ent),NIL,NIL);
 			  /* Take from $4 the struct/union entities */
 			  list le = TakeDerivedEntities($4);
-			  $$ = gen_nconc(le,CONS(ENTITY,ent,NIL));
+			  //$$ = gen_nconc(le,CONS(ENTITY,ent,NIL));
+			  //$$ = CONS(ENTITY,ent,le);
+			  $$ = CONS(ENTITY,ent,NIL);
 			  c_parser_context_type(ycontext) = make_type_variable(v);
 			  stack_pop(StructNameStack);
 			}
@@ -2019,6 +2162,7 @@ type_spec:   /* ISO 6.7.2 */
 			      c_parser_context_type(ycontext) = make_type_variable(v);
 			      $$ = NIL;
 			    }
+
 			}
 |   TK_TYPEOF TK_LPAREN expression TK_RPAREN
                         {
@@ -2280,7 +2424,7 @@ direct_decl: /* (* ISO 6.7.5 *) */
 			    stack_push((char *) entity_type(e),s);
 			    put_to_entity_type_stack_table(e,s);
 			  }
-			  else { 
+			  else {
 			    /* e has already been defined since a type
 			       stack is associated to it. At least, if
 			       the mapping from entity to type stack
@@ -2311,7 +2455,8 @@ direct_decl: /* (* ISO 6.7.5 *) */
 			  }
 
 			  entity_type(e) = type_undefined;
-			  discard_C_comment();
+			  //discard_C_comment();
+			  //push_current_C_comment();
 			  $$ = e;
 			}
 |   TK_LPAREN attributes declarator TK_RPAREN

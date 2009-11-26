@@ -391,6 +391,10 @@ universal-character-name ({escape}(u{hexdigit}{4}|U{hexdigit}{8}))
                                 update_C_comment(yytext);
                         }
 ^"#"[^\n]*              {
+                                // \n is not part of the pragma
+                                // The line count is correct but empty lines
+                                // seem to be inserted at the beginning of 
+                                // the compilation unit files
                                 pips_debug(9,"Pragma comment %s\n",yytext);
                                 /* Is it a #line pragma? It has to be after preprocessing */
                                 if(strstr(yytext, "#pragma")==yytext) {
@@ -646,12 +650,15 @@ L\"(\\\"|[^\"\\]|\\[^\"])*\"	{
 			}
 "\{"                    {
 				pips_debug(9,"TK_LBRACE %s\n",yytext);
-                                discard_C_comment();
+                                // We do not know what to do for a block,
+                                // but we would like to keep them for struct
+                                // and union declaration
+                                //discard_C_comment();
 				return(TK_LBRACE);
 			}
 "\}"			{
 				pips_debug(9,"TK_RBRACE %s\n",yytext);
-                                discard_C_comment();
+                                //discard_C_comment();
 				return(TK_RBRACE);
 			}
 "["			{

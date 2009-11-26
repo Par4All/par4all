@@ -371,7 +371,11 @@
 #define PRINTF_FUNCTION_NAME            "printf"
 #define FPRINTF_FUNCTION_NAME           "fprintf"
 #define SCANF_FUNCTION_NAME             "scanf"
+#define ISOC99_SCANF_FUNCTION_NAME      "__isoc99_scanf"
+#define ISOC99_SCANF_USER_FUNCTION_NAME "scanf"
 #define FSCANF_FUNCTION_NAME            "fscanf"
+#define ISOC99_FSCANF_FUNCTION_NAME     "__isoc99_fscanf"
+#define ISOC99_FSCANF_USER_FUNCTION_NAME "fscanf"
 #define PUTS_FUNCTION_NAME              "puts"
 #define GETS_FUNCTION_NAME              "gets"
 #define FPUTS_FUNCTION_NAME             "fputs"
@@ -382,16 +386,22 @@
 #define FCLOSE_FUNCTION_NAME            "fclose"
 #define SNPRINTF_FUNCTION_NAME          "snprintf"
 #define SSCANF_FUNCTION_NAME            "sscanf"
+#define ISOC99_SSCANF_FUNCTION_NAME     "__isoc99_sscanf"
+#define ISOC99_SSCANF_USER_FUNCTION_NAME "sscanf"
 #define VFPRINTF_FUNCTION_NAME          "vfprintf"
 #define VFSCANF_FUNCTION_NAME           "vfscanf"
+#define ISOC99_VFSCANF_FUNCTION_NAME    "__isoc99_vfscanf"
+#define ISOC99_VFSCANF_USER_FUNCTION_NAME "vfscanf"
 #define VPRINTF_FUNCTION_NAME           "vprintf"
 #define VSCANF_FUNCTION_NAME            "vscanf"
+#define ISOC99_VSCANF_FUNCTION_NAME    "__isoc99_vscanf"
+#define ISOC99_VSCANF_USER_FUNCTION_NAME "vscanf"
+#define VSSCANF_FUNCTION_NAME           "vsscanf"
+#define ISOC99_VSSCANF_FUNCTION_NAME     "__isoc99_vsscanf"
+#define ISOC99_VSSCANF_USER_FUNCTION_NAME "vsscanf"
 #define VSNPRINTF_FUNCTION_NAME         "vsnprintf"
 #define VSPRINTF_FUNCTION_NAME          "vsprintf"
 #define SPRINTF_FUNCTION_NAME           "sprintf"
-#define VSCANF_FUNCTION_NAME            "vscanf"
-#define VSSCANF_FUNCTION_NAME           "vsscanf"
-#define VFSCANF_FUNCTION_NAME           "vfscanf"
 #define GETC_FUNCTION_NAME              "getc"
 #define _IO_GETC_FUNCTION_NAME          "_IO_getc" /* libio.h */
 #define GETCHAR_FUNCTION_NAME           "getchar"
@@ -914,7 +924,9 @@
 #define ENTITY_PRINTF_P(e)               ENTITY_NAME_P(e, "printf")
 #define ENTITY_FPRINTF_P(e)              ENTITY_NAME_P(e, "fprintf")
 #define ENTITY_SCANF_P(e)                ENTITY_NAME_P(e, "scanf")
+#define ENTITY_ISOC99_SCANF_P(e)         ENTITY_NAME_P(e, ISOC99_SCANF_FUNCTION_NAME)
 #define ENTITY_FSCANF_P(e)               ENTITY_NAME_P(e, "fscanf")
+#define ENTITY_ISOC99_FSCANF_P(e)        ENTITY_NAME_P(e, ISOC99_FSCANF_FUNCTION_NAME)
 #define ENTITY_PUTS_P(e)                 ENTITY_NAME_P(e, "puts")
 #define ENTITY_GETS_P(e)                 ENTITY_NAME_P(e, "gets")
 #define ENTITY_FPUTS_P(e)                ENTITY_NAME_P(e, "fputs")
@@ -925,14 +937,18 @@
 #define ENTITY_FCLOSE_P(e)               ENTITY_NAME_P(e, "fclose")
 #define ENTITY_SNPRINTF_P(e)             ENTITY_NAME_P(e, "snprintf")
 #define ENTITY_SSCANF_P(e)               ENTITY_NAME_P(e, "sscanf")
+#define ENTITY_ISOC99_SSCANF_P(e)        ENTITY_NAME_P(e, ISOC99_SSCANF_FUNCTION_NAME)
 #define ENTITY_VFPRINTF_P(e)             ENTITY_NAME_P(e, "vfprintf")
 #define ENTITY_VFSCANF_P(e)              ENTITY_NAME_P(e, "vfscanf")
+#define ENTITY_ISOC99_VFSCANF_P(e)       ENTITY_NAME_P(e, ISOC99_VFSCANF_FUNCTION_NAME)
 #define ENTITY_VPRINTF_P(e)              ENTITY_NAME_P(e, "vprintf")
 #define ENTITY_VSCANF_P(e)               ENTITY_NAME_P(e, "vscanf")
+#define ENTITY_ISOC99_VSCANF_P(e)        ENTITY_NAME_P(e, ISOC99_VSCANF_FUNCTION_NAME)
 #define ENTITY_VSNPRINTF_P(e)            ENTITY_NAME_P(e, "vsnprintf")
 #define ENTITY_VSPRINTF_P(e)             ENTITY_NAME_P(e, "vsprintf")
 #define ENTITY_SPRINTF_P(e)              ENTITY_NAME_P(e, "sprintf")
 #define ENTITY_VSSCANF_P(e)              ENTITY_NAME_P(e, "vsscanf")
+#define ENTITY_ISOC99_VSSCANF_P(e)       ENTITY_NAME_P(e, ISOC99_VSSCANF_FUNCTION_NAME)
 #define ENTITY_GETC_P(e)                 ENTITY_NAME_P(e, "getc")
 #define ENTITY__IO_GETC_P(e)             ENTITY_NAME_P(e, "_IO_getc")
 #define ENTITY_GETCHAR_P(e)              ENTITY_NAME_P(e, "getchar")

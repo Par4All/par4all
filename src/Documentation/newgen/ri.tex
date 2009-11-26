@@ -987,21 +987,10 @@ points. Note that statements containing a \texttt{block} or
 \texttt{unstructured} instruction should not have a label, as you might find out
 when using the prettyprinter.
 
-\begin{comment}
-Le domaine \verb/statement/ permet de
-repérer les instructions d'un module.  Le sous-domaine \verb/label/
-contient une entité qui définit le label\footnote{Un statement dont
-l'instruction est un \verb/block/ ou un \verb/unstructured/ n'a jamais
-de label.}. Un label spécial est défini pour les RETURN, ce qui permet
-de convertir les appels à RETURN en des branchements à ce label
-spécial. Un autre label spécial, \verb/empty_label/, est utilisé pour
-les statements sans label.
-\end{comment}
-
 Member \texttt{number} contains an external number which is not used by
 PIPS. This number may be used as a statement identifier for debugging
 purposes or for user interaction because PIPS components try to propagate
-it as much as possible when new code derived. For instance, several
+it as much as possible when new code is derived. For instance, several
 parallel loops derived by loop distribution have the same statement
 number, inherited from the initial sequential loop. Desugared statements
 like computed GOTOs generate several simpler statements with a unique number.
@@ -1022,19 +1011,11 @@ numbers may not appear in increasing order, statement number may be
 duplicated, for instance, after loop unrolling, and statement number may
 not exist at all, for instance for fully synthesized statements.
 
-Note that parser messages are labelled by physical line numbers.
+Note that parser messages are labelled by {\em physical} line numbers,
+as defined by the PIPS preprocessor and parser. These numbers may be
+impacted by the language.
 
-\begin{comment}
-Le sous-domaine \verb/number/ contient un numéro permettant de repérer
-le statement pour le debugging ou l'information de l'utilisateur (valeur
-par defaut: \verb+STATEMENT_NUMBER_UNDEFINED+). Ce numéro est défini
-par l'utilisateur ou implicitement par le parser qui prend le numéro de
-la première ligne de l'instruction dans le fichier source. Il n'est (en
-principe) jamais modifié par PIPS. Après déroulage de boucle,
-plusieurs \verb/statement/s peuvent avoir le même numéro.
-\end{comment}
-
-Member \texttt{ordering} is a 32-bit statement internal identifier. It is
+Member \texttt{ordering} is a 32-bit unique statement internal identifier. It is
 made out of two 16-bit fields: the most-significant field is a 
 \texttt{control} number and the least-significant one is a statement number
 within a structured code piece. Two statements are textually comparable
@@ -1051,55 +1032,30 @@ hash tables on disk, to label nodes of the dependence graph with
 statements by reference,... Its default value is
 \verb+STATEMENT_ORDERING_UNDEFINED+.
 
-A special hash table is used for each module to convert \verb/ordering/
-into \verb/statement/. This redundant table is not part of the internal
-representation. It must be recomputed regularly when the code structure
-is changed. It must be reloaded when a different module is analyzed
-because only one copy of this hash-table is available within PIPS.
-
-\begin{comment}
-Le sous-domaine \verb/ordering/ contient un entier caractéristique du
-statement; il est formé de la concaténation du numéro de composante
-dans le graphe de contrôle (numéro du control) et du numéro de
-statement dans dans cette composante; cet entier sert à comparer
-l'ordre lexical des statements et sa valeur par defaut est
-\verb+STATEMENT_ORDERING_UNDEFINED+. Il est automatiquement recalculé
-après chaque transformation de programme. 
-
-Il est aussi utilisé comme nom absolu d'un \verb/statement/ quand des
-structures de données comme les tables de hash-code sont écrites sur
-disque ou relues. Il est aussi utilisé pour établi un lien entre les
-noeuds du graphe de dépendance et les statements. Il est possible de
-créer une table de correspondance entre \verb/ordering/ et
-\verb/statement/, mais elle ne fait pas partie de la représentation
-interne et doit cond être calculée explicitement.
-\end{comment}
+A special hash table is used for each module to convert
+\verb/ordering/ into \verb/statement/. This redundant table is not
+part of the internal representation. It must be recomputed regularly
+when the code structure is changed (see function
+\verb/module_reorder()/). It must be reloaded or recomputed when a
+different module is analyzed because only one copy of this hash-table
+is available within PIPS. It must also updated when the internal
+representation is modified because some statements are added and/or
+removed.
 
 Member \texttt{ordering} is not computed for all statements reachable
 through the NewGen internal representation. Specifically, statements
 which are not reachable forwards or backwards through the control flow
-graph only using the entry point of an unstructured are not ordered. For
-instance, label free statements following a GO~TO statements may have or
-not an ordering. Statements can be walked in two different ways. C macro
+graph only using the entry point of an unstructured are not
+ordered. For instance, label free statements following a GO~TO
+statements may have or not an ordering. Statements can be walked in at
+least two different ways. C macros such as
 \verb/CONTROL_MAP/\index{CONTROL MAP} uses the control flow graph,
 whereas NewGen iterators \verb/gen_recurse/\index{gen\_recurse},
-\verb/gen_multi_recurse/\index{gen\_multi\_recurse}, are systematic,
-using both the entry and exit controls of unstructured. Note that fully
-unreachable statements, which cannot be reached backwards or forwards
-from the entry or the exit control of an unstructured are fully lost by
-the controlizer.
-
-\begin{comment}
-Notons que le champs \verb/ordering/ n'est pas forcément calculé pour
-tous les statements. En particulier, les statements qui ne sont pas
-accessibles d'après le flot de contrôle n'en ont pas. Les statements
-sans étiquette se trouvant derrière un GOTO en sont un exemple. Les
-statements peuvent être parcourus de manière sélective, suivant le
-flot de contrôle, avec la macro \verb/CONTROL_MAP/\index{CONTROL MAP},
-ou de manière systématique avec les fonctions de parcours de NewGen,
-\verb/gen_recurse/\index{gen\_recurse},
-\verb/gen_multi_recurse/\index{gen\_multi\_recurse}\ldots
-\end{comment}
+\verb/gen_multi_recurse/\index{gen\_multi\_recurse}, are more
+systematic, using both the entry and exit controls of
+unstructured. Note that fully unreachable statements, which cannot be
+reached backwards or forwards from the entry or the exit control of an
+unstructured are fully lost by the \verb/controlizer/.
 
 Member \texttt{comments} contains the comments associated to the
 statement in the source program. This string\footnote{To avoid
@@ -1125,32 +1081,39 @@ predicate \verb/empty_comments_p()/. Comments associated to statements
 that may disappear during processing, such as CONTINUE, RETURN and
 GO~TO, may disappear too.
 
-\begin{comment}
-Le sous-domaine \texttt{comments} contient le texte du commentaire associé
-a ce statement dans le programme initial; ce texte est utilisé par le
-prettyprinter. Ce sont les commentaires qui précèdent le statement
-qui s'y trouvent associés. En l'absence de commentaires, ce champ
-prend la valeur \verb/string_undefined/. Les commentaires associés à
-des instructions qui peuvent disparaître au cours des traitements comme
-CONTINUE, RETURN et GOTO, peuvent aussi disparaitre.
-\end{comment}
-
 Member \texttt{instruction} contains the instruction itself.
-
-\begin{comment}
-Le sous-domaine \verb/instruction/ contient
-l'instruction proprement dite.
-\end{comment}
 
 \index{Statement}\index{Instruction}\index{Sequence}%
 \label{Statement/Instruction/Sequence}Note
 that if the instruction of the statement is in fact a \verb|sequence|
-of other statement (see~\ref{subsection-instruction} and
+of other statements (see~\ref{subsection-instruction} and
 \ref{{subsubsection-sequence}}), the \verb|label|, \verb|number|,
 \verb|ordering|, and \verb|comment| should be empty. If some
 information of this kind is needed, it should be attached to the first
-statement of the sequence or on a CONTINUE (for an empty sequence)
+statement of the sequence or to a CONTINUE (for an empty sequence)
 instead.
+
+Member \texttt{declarations} is used to declare local variables. If
+the instruction is a block, the declarations are local to the
+block. If the instruction is a CONTINUE (i.e. the predicate
+\verb/declaration_statement_p/holds true), then the declared variables
+are declared till the end of the current block. The variables declared
+in a CONTINUE statement are also declared at the enclosing block
+level. They are also declared in the symbol table, in the
+\verb/declarations/ field of \verb/code/. The prettyprinter only takes
+into account the CONTINUE statements. So implicitly declared variables
+and functions, such as functions returning an \verb/int/ in C, only
+appear at the block level. Other statements, that are neither a block
+nor a CONTINUE, cannot have declarations.
+
+Note that local variables declared in a loop as \verb/loop_locals/ are
+local to the loop body. This seems redundant with
+\verb/statement_declarations/, but making it obsolete would require a
+refactoring of the use-def chains, dependence graph and
+parallelization algorithms.
+
+Member \texttt{decls\_text} can be used to keep track to the exact text
+used to declare variables. This field is not currently used.
 
 Member \texttt{extensions} is used to add various features such as pragmas
 or future extensions to the statements.

@@ -109,31 +109,50 @@ AddEntityToDeclarations(entity e, entity module) {
  */
 void
 AddLocalEntityToDeclarations(entity e, entity module, statement s) {
-	/* SG: fix the entity storage if undefined
-	 * it basically recompute the offset of a scalar variable
-	 * I have not found how to do it for a variable size array, so I just dropped the case
-	 */
-	if( storage_undefined_p(entity_storage(e)) && entity_variable_p(e) && entity_scalar_p(e) )
-	{
-		entity dynamic_area = global_name_to_entity(module_local_name(module),DYNAMIC_AREA_LOCAL_NAME);
-		entity_storage(e) = make_storage_ram(
-				make_ram(module,
-					dynamic_area,
-					CurrentOffsetOfArea(dynamic_area, e),
-					NIL)
-				);
-	}
-	AddEntityToDeclarations(e, module);
+  /* SG: fix the entity storage if undefined
+   * it basically recompute the offset of a scalar variable
+   * I have not found how to do it for a variable size array, so I just dropped the case
+   */
+  if( storage_undefined_p(entity_storage(e)) && entity_variable_p(e) && entity_scalar_p(e) )
+    {
+      entity dynamic_area = global_name_to_entity(module_local_name(module),
+						  DYNAMIC_AREA_LOCAL_NAME);
+      entity_storage(e) = make_storage_ram(
+					   make_ram(module,
+						    dynamic_area,
+						    CurrentOffsetOfArea(dynamic_area, e),
+						    NIL)
+					   );
+    }
 
-	if (c_module_p(module)
-			/* A compilation does not have statements */
-/*			&& !compilation_unit_entity_p(module)*/) {
-		/* In C the variable are local to a statement, so add : */
-		pips_assert("Calling AddLocalEntityToDeclarations from c_module with valid statement", !statement_undefined_p(s) );
-		list l = statement_declarations(s);
-		if (gen_chunk_undefined_p(gen_find_eq(e,l)))
-			statement_declarations(s) = gen_nconc(l,CONS(ENTITY,e,NIL));
-	}
+  /* Both in C and Fortran, all variables and useful entities are
+     stored in code_declarations, in the symbol table. */
+  AddEntityToDeclarations(e, module);
+
+  /* In C the variables, but the formal parameters, are local to a
+     statement */
+  if (c_module_p(module)) {
+    /* If undeclared in s, variable e is added in the
+       statement_declarations field. */
+    list l = statement_declarations(s);
+    pips_assert("Calling AddLocalEntityToDeclarations from c_module with valid statement", !statement_undefined_p(s) );
+
+    /* The entity may have already been declared... This could be an
+       assert but Serge seems to redeclare several times the same
+       variables when performing inlining */
+    if (gen_chunk_undefined_p(gen_find_eq(e,l))) {
+      statement_declarations(s) = gen_nconc(l,CONS(ENTITY,e,NIL));
+
+      /* The C prettyprinter is not based on code_declarations or
+	 statement_declarations but on declaration statements, which
+	 happen to be continue statment for the time being. */
+      if(!continue_statement_p(s)) {
+	/* To preserve the source layout, declarations are
+	   statements */
+	add_declaration_statement(s, e);
+      }
+    }
+  }
 }
 
 

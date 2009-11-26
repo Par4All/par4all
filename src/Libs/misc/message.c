@@ -448,3 +448,5 @@ user_irrecoverable_error_function(const char * a_message_format, ...)
    exit(1);
    va_end(some_arguments);
 }
+
+bool function_same_string_p(char * s1, char * s2) { return (strcmp(s1, s2) == 0);}

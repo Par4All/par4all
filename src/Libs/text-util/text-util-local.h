@@ -63,6 +63,6 @@ extern bool prettyprint_is_fortran;
   }
 
 /* maximum length of a line when prettyprinting...
- * from 0 to 69, i.e. 70 chars, plus "\n\0" 
+ * from 0 to 69, i.e. 70 chars, plus "\n\0"
  */
 #define MAX_LINE_LENGTH 72

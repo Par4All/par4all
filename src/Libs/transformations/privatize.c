@@ -586,7 +586,8 @@ localize_declaration(char *mod_name)
 
 	// Create the statement_block where needed and perform localization
 	clean_up_sequences(get_current_module_statement());
-	gen_context_recurse(get_current_module_statement(),old_entity_to_new,statement_domain,gen_true,localize_declaration_walker);
+	gen_context_recurse(get_current_module_statement(),old_entity_to_new,
+			    statement_domain,gen_true,localize_declaration_walker);
 	ifdebug(1) {
 	  pips_debug(1,"The statement before we convert loop_locals to local declarations:\n");
 	  print_statement(get_current_module_statement());

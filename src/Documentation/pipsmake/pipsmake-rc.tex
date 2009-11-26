@@ -8009,23 +8009,30 @@ flatten_code > MODULE.code
 \end{PipsMake}
 
 
-\subsection{Split Initializations}
+\subsection{Split Initializations (C code)}
 
-This very simple transformation recurses through all variable
-declarations, and splits them in two statements if they specify an
-initial value: a declaration without initialization, and an assignment
-of the initial value.
+The purpose of this transformation is to separate the initialization
+part from the declaration part in C code in order to make static code
+analyses simpler.
 
-The purpose of this transformation is to obtain correct use-def chains
-and dependence graphs, because PIPS does not (yet) take into account
-memory effects linked to declarations. This transformation transfers
-these effects into usual executable statements.
+This transformation recurses through all variable declarations, and
+creates a new statement each time an initial value is specified in the
+declaration, if the initial value can be assigned. The declarations
+are modified by eliminating the initial value, and a new assignment
+statement with the initial value is added to the source code.
+
+As explained above, the purpose of this transformation is to obtain
+correct use-def chains and dependence graphs, even though PIPS does
+not (yet) take into account memory effects linked to
+declarations. Whenever possible, this transformation transfers these
+effects into usual executable statements.
 
 This transformation can be used, for instance, to improve reduction
 detection (see TRAC ticket 181).
 
-Note that C array initializations cannot be converted into
-assignments. In such cases, the initial declaration is left untouched.
+Note that C array and structure initializations, which use braces,
+cannot be converted into assignments. In such cases, the initial
+declaration is left untouched.
 
 \begin{PipsMake}
 alias split_initializations 'Split Initializations'
@@ -8034,20 +8041,35 @@ split_initializations > MODULE.code
         < MODULE.code
 \end{PipsMake}
 
+Note: this transformation is sensitive to the C declaration internal
+representation. A new version is needed for the new representation.
+
 
 %-----------End of Declaration Transformations -------------------------
 
 \section{Array Bound Checking}
 \label{subsection-array-bound-checking}
+\index{Buffer overflow}
+\index{Array access}
 
 Array bound checking refers to determining whether all array references
 are within their declared range in all of their uses in a program. These
-array  bound checks may be analyses intraprocedurally or
+array  bound checks may be analysed intraprocedurally or
 interprocedurally, depending on the need for accuracy.
 
-There are two versions of intraprocedural array bounds checking:
+There are two versions of intraprocedural array bounds checking: array
+bound check bottom up, array bound check top down. The first approach
+relies on checking every array access and on the elimination of
+redundant tests by advanced dead code elimination based on
+preconditions. The second approach is based on exact convex array
+regions. They are used to prove that all accessed in a compound
+statement are correct.
 
-\subsection{Elimination of Redundant Tests}
+These two dynamic analyses are implemented for Fortran. They are
+described in Nga Nguyen's PhD\marginpar{reference to be added}. They
+may work for C code, but this has not been validated.
+
+\subsection{Elimination of Redundant Tests: Bottom-Up Approach}
 \label{subsection-array-bound-check_bottom_up}
 
 \begin{PipsPass}{array_bound_check_bottom_up}

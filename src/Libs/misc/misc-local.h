@@ -124,7 +124,9 @@ typedef enum {SBRK_MEASURE, NET_MEASURE, GROSS_MEASURE} measurement_type;
 #define pips_exit pips_where(stderr), pips_exit_function
 #endif
 
-#define same_string_p(s1, s2) (strcmp((s1), (s2)) == 0)
+/* FI:need to breakpoint while inlining is available */
+/* #define same_string_p(s1, s2) (strcmp((s1), (s2)) == 0)*/
+#define same_string_p(s1, s2) function_same_string_p(s1,s2)
 
 /* MAXPATHLEN is defined in <sys/param.h> for SunOS... but not for all OS! */
 #ifndef MAXPATHLEN

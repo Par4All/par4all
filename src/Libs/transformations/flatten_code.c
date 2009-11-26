@@ -527,8 +527,7 @@ bool flatten_code(string module_name)
  */
 static void split_initializations_in_statement(statement s)
 {
-  if (statement_block_p(s)) {
-
+  if (FALSE && statement_block_p(s)) { // based on old declaration representation
     list inits = NIL;
     list decls = statement_declarations(s); // Non-recursive
     instruction old = statement_instruction(s);
@@ -553,6 +552,62 @@ static void split_initializations_in_statement(statement s)
 		      CONS(statement, instruction_to_statement(old), NIL));
     statement_instruction(s) = make_instruction_sequence(make_sequence(inits));
   }
+  //else if(declaration_statement_p(s)) {
+  else if(statement_block_p(s)) {
+    list cs = list_undefined;
+    list pcs = NIL;
+    list nsl = statement_block(s); // new statement list
+    for( cs = statement_block(s); !ENDP(cs); ) {
+      statement ls = STATEMENT(CAR(cs));
+      if(declaration_statement_p(ls)) {
+	list inits = NIL;
+	list decls = statement_declarations(ls); // Non-recursive
+	//instruction old = statement_instruction(ls);
+	statement sc = statement_undefined; // statement copy
+	//statement ns = statement_undefined; // new statement
+	//statement as = statement_undefined; // ancestor statement
+
+	FOREACH(ENTITY, var, decls) {
+	  string mn  = module_name(entity_name(var));
+	  string cmn = entity_user_name(get_current_module_entity());
+	  if ( strcmp(mn,cmn) == 0
+	       && !value_unknown_p(entity_initial(var))
+	       ) {
+	    expression ie = variable_initial_expression(var);
+	    if (expression_is_C_rhs_p(ie)) {
+	      statement is = make_assign_statement(entity_to_expression(var), ie);
+	      inits = gen_nconc(inits, CONS(statement, is, NIL));
+	      entity_initial(var) = make_value_unknown();
+	    }
+	  }
+	}
+	/* Insert the list of initialisation statements as a sequence
+	   after statement s. */
+	sc = copy_statement(ls);
+	inits = gen_nconc(CONS(statement, sc, NIL), inits);
+
+	/* Chain the new list within the current statement list */
+	if(ENDP(pcs)) {
+	  nsl = inits;
+	}
+	else {
+	  CDR(pcs) = inits;
+	}
+	/* Move to the next original element and complete nsl */
+	/* Not smart at all! Keep pointers instead of chasing
+	   pointers in lists... */
+	pcs = gen_last(inits);
+	CDR(gen_last(inits)) = CDR(cs);
+	cs = CDR(gen_last(inits));
+      }
+      else {
+	/* Move to the next statement */
+	pcs = cs;
+	POP(cs);
+      }
+    }
+    instruction_block(statement_instruction(s)) = nsl;
+  }
   else {
     /* Do nothing ? */
   }
@@ -566,10 +621,11 @@ static void split_initializations_in_statement(statement s)
    This function can be called from another module to apply
    transformation directly.
 */
-void statement_split_initializations(statement s) 
+void statement_split_initializations(statement s)
 {
   if (statement_block_p(s)) {
-    gen_recurse(s, statement_domain, gen_true, split_initializations_in_statement);    
+    gen_recurse(s, statement_domain, gen_true, split_initializations_in_statement);
+    /* Is it still useful? */
     clean_up_sequences(s);
   }
   else

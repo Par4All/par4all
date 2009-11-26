@@ -1074,8 +1074,10 @@ static control compact_list(list ctls,
 
 	st = control_statement(c_res) ;
 	statement_consistent_p(st);
-	pips_assert("st is a block or st carries no delarations",
-		    statement_block_p(st) || ENDP(statement_declarations(st)));
+	pips_assert("st is a block or a continue or st carries no delarations",
+		    statement_block_p(st)
+		    || continue_statement_p(st)
+		    || ENDP(statement_declarations(st)));
 	/* Ok, succ is defined. RK */
 	succ_st = control_statement(succ);
 	set_add_element(processed_nodes, processed_nodes, (char *) succ);
@@ -1097,9 +1099,10 @@ static control compact_list(list ctls,
 	    ;
 	  }
 	  else {
-	    if(!ENDP(statement_declarations(st))) {
+	    if(!ENDP(statement_declarations(st))
+	       && !continue_statement_p(st)) {
 	      pips_user_warning("Declarations carried by a statement \"%s\""
-				" which is not a block!\n",
+				" which is not a block nor a continue!\n",
 				statement_identification(st));
 	    }
 	    if(!instruction_block_p(i=statement_instruction(st))) {
@@ -1716,7 +1719,8 @@ simplified_unstructured(control top,
 	return(u);
     }
 
-    pips_assert("simplify_control", CONTROL(CAR(succs)) == res);
+    pips_assert("The successor of \"top\" is \"res\"",
+		CONTROL(CAR(succs)) == res);
 
     if(gen_length(control_predecessors(res)) != 1) {
 	/* The second node has more than 1 goto on it: */

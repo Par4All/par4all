@@ -683,7 +683,10 @@ transformer statement_to_postcondition(
 				 get_module_global_arguments());
 	list dl = statement_block_p(s) ? statement_declarations(s) : NIL;
 
-	if(!ENDP(statement_declarations(s)) && !statement_block_p(s)) {
+	/* FI: OK, to be fixed when the declaration representation is
+	   frozen. */
+	if(!ENDP(statement_declarations(s)) && !statement_block_p(s)
+	   && !declaration_statement_p(s)) {
 	  // FI: Just to gain some time before dealing with controlizer and declarations updates
 	  //pips_internal_error("Statement %p carries declarations\n");
 	  pips_user_warning("Statement %p with instruction carries declarations\n",

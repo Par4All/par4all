@@ -2349,22 +2349,31 @@ list TakeDerivedEntities(list le)
     }
 
     FOREACH (ENTITY, e, le) {
-      /* The list is tored there at line 2087 of cyacc.y (5 August
+      /* The list is stored there at line 2087 of cyacc.y (5 August
 	 2009) */
-      list ltmp = (list) entity_initial(e);
+      //list ltmp = (list) entity_initial(e);
+      list sltmp = (list) entity_initial(e);
+      if(!ENDP(sltmp)) {
+	pips_assert("sltmp has only one element", gen_length(sltmp)==1);
+	statement stmp = STATEMENT(CAR(sltmp));
+	list ltmp = statement_declarations(stmp);
 
-      pips_assert("e is an entity", e->_type_==entity_domain);
-      pips_debug(8, "entity e: %s (%p)\n", entity_name(e), e);
+	pips_assert("sltmp is a continue statement list",
+		    continue_statements_p(sltmp));
+	pips_assert("e is an entity",
+		    check_entity(e) /* e->_type_==entity_domain*/ );
+	pips_debug(8, "entity e: %s (%p)\n", entity_name(e), e);
 
-      if (ltmp != NIL) {
-	/* lres = gen_nconc(lres,ltmp);*/
-	FOREACH(ENTITY, de, ltmp) {
+	if (ltmp != NIL) {
+	  /* lres = gen_nconc(lres,ltmp);*/
+	  FOREACH(ENTITY, de, ltmp) {
 
-	  pips_assert("de is an entity", de->_type_==entity_domain);
-	  pips_debug(8, "entity de: %s (%p)\n", entity_name(de), de);
+	    pips_assert("de is an entity", de->_type_==entity_domain);
+	    pips_debug(8, "entity de: %s (%p)\n", entity_name(de), de);
 
-	  if(!gen_in_list_p(de, lres)) {
-	    lres = gen_nconc(lres, CONS(ENTITY, de, NIL));
+	    if(!gen_in_list_p(de, lres)) {
+	      lres = gen_nconc(lres, CONS(ENTITY, de, NIL));
+	    }
 	  }
 	}
       }

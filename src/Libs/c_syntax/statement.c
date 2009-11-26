@@ -146,7 +146,7 @@ void InitializeBlock()
   BlockStack = stack_make(statement_domain,0,0);
 }
 
-statement MakeBlock(list decls, list stms)
+statement MakeBlock(list decls, list stmts)
 {
   /* To please the controlizer, blocks cannot carry line numbers nor comments */
   /* Anyway, it might be much too late to retrieve the comment
@@ -154,13 +154,19 @@ statement MakeBlock(list decls, list stms)
      appears after the last statement of the block. To save it, as is
      done in Fortran, an empty statement should be added at the end of
      the sequence. */
+  /* Because of old C standard, the initial list of declaration
+     statements is separated from the executable statements. However,
+     C99 allows declarations anywhere in the block. So some
+     declaration statements may be located in stms. */
+  list sl = gen_nconc(decls, stmts);
+  list dl = statements_to_declarations(sl);
 
   statement s = make_statement(entity_empty_label(),
 			       STATEMENT_NUMBER_UNDEFINED /* get_current_C_line_number() */,
 			       STATEMENT_ORDERING_UNDEFINED,
 			       empty_comments /* get_current_C_comment() */,
-			       make_instruction_sequence(make_sequence(stms)),
-			       decls, string_undefined, empty_extensions ());
+			       make_instruction_sequence(make_sequence(sl)),
+			       dl, string_undefined, empty_extensions ());
 
   discard_C_comment();
 

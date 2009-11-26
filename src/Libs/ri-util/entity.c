@@ -574,8 +574,10 @@ bool entity_enum_p(entity e)
 bool entity_enum_member_p(entity e)
 {
   value ev = entity_initial(e);
-  /* SG: not all entities seem to have this field defined
-   * if not defined, assume it's not an enum, although i am unsure of the validity of this
+  /* SG: not all entities seem to have this field defined if not
+   * defined, assume it's not an enum, although i am unsure of the
+   * validity of this:
+   *
    * pips_assert("Value of e is defined", !value_undefined_p(ev));
    */
   return !value_undefined_p(ev) && value_symbolic_p(ev);
@@ -585,7 +587,7 @@ bool entity_struct_p(entity e)
 {
   string ln = entity_local_name(e);
   bool struct_p = (*ln==STRUCT_PREFIX_CHAR)
-    || (strstr(entity_name(e),DUMMY_STRUCT_PREFIX)==NULL);
+    || (strstr(entity_name(e),DUMMY_STRUCT_PREFIX)!=NULL);
   return struct_p;
 }
 
@@ -593,7 +595,7 @@ bool entity_union_p(entity e)
 {
   string ln = entity_local_name(e);
   bool union_p = (*ln==UNION_PREFIX_CHAR)
-    || (strstr(entity_name(e),DUMMY_UNION_PREFIX)==NULL);
+    || (strstr(entity_name(e),DUMMY_UNION_PREFIX)!=NULL);
   return union_p;
 }
 
@@ -1885,4 +1887,18 @@ bool abstract_state_variable_p(entity v)
   bool abstract_state_p = gen_in_list_p(v, abstract_state_entities);
 
   return abstract_state_p;
+}
+
+/* Make sure that an list is an homogeneous list of entities */
+bool entities_p(list el)
+{
+  bool success_p = TRUE;
+
+  FOREACH(ENTITY, e, el) {
+    if(!check_entity(e)) {
+      success_p = FALSE;
+      break;
+    }
+  }
+  return success_p;
 }

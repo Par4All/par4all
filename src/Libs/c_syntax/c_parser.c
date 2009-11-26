@@ -62,7 +62,7 @@ stack StructNameStack = stack_undefined;
 /* Global counter */
 int loop_counter = 1;
 int derived_counter = 1;
- 
+
 // to store the mapping between the entity and its type stack
 
 static hash_table entity_to_type_stack_table = hash_table_undefined;
@@ -463,7 +463,8 @@ static bool actual_c_parser(string module_name,
 
     safe_fclose(c_in, file_name);
 
-    pips_assert("Module statement is consistent",statement_consistent_p(ModuleStatement));
+    pips_assert("Module statement is consistent",
+		statement_consistent_p(ModuleStatement));
 
     ifdebug(2)
       {
@@ -499,26 +500,26 @@ static bool actual_c_parser(string module_name,
 	/* Beware : the rule in pipsmake-rc.tex for compilation_unit_parser
 	   does not include the production of parsed_code and callees.
 	   This is not very clean, and is done to work around the way pipsmake
-	   handles compilation units and modules. 
-	   There was no simple solution... BC. 
+	   handles compilation units and modules.
+	   There was no simple solution... BC.
 	*/
 	DB_PUT_MEMORY_RESOURCE(DBR_PARSED_CODE,
 			       module_name,
 			       (char *) ModuleStatement);
-	DB_PUT_MEMORY_RESOURCE(DBR_DECLARATIONS, 
-			       module_name, 
-			       (void *) keyword_typedef_table);   
-	DB_PUT_MEMORY_RESOURCE(DBR_CALLEES, 
-			       module_name, 
+	DB_PUT_MEMORY_RESOURCE(DBR_DECLARATIONS,
+			       module_name,
+			       (void *) keyword_typedef_table);
+	DB_PUT_MEMORY_RESOURCE(DBR_CALLEES,
+			       module_name,
 			       (char *) make_callees(NIL));
       }
-    else 
+    else
       {
-	DB_PUT_MEMORY_RESOURCE(DBR_PARSED_CODE, 
-			       module_name, 
+	DB_PUT_MEMORY_RESOURCE(DBR_PARSED_CODE,
+			       module_name,
 			       (char *) ModuleStatement);
-	DB_PUT_MEMORY_RESOURCE(DBR_CALLEES, 
-			       module_name, 
+	DB_PUT_MEMORY_RESOURCE(DBR_CALLEES,
+			       module_name,
 			       (char *) make_callees(CalledModules));
       }
 

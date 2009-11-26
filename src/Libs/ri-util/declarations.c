@@ -197,11 +197,10 @@ words_dimension(dimension obj)
  * this is the case of g77 used after hpfc. thus I added a
  * flag not to prettyprint again the dimensions of common variables. FC.
  *
- * It is in the standard that dimensions cannot be declared twice in a 
+ * It is in the standard that dimensions cannot be declared twice in a
  * single module. BC.
  */
-list 
-words_declaration(
+list words_declaration(
     entity e,
     bool prettyprint_common_variable_dimensions_p)
 {
@@ -212,7 +211,7 @@ words_declaration(
 
     if (type_variable_p(entity_type(e)))
     {
-	if (prettyprint_common_variable_dimensions_p || 
+	if (prettyprint_common_variable_dimensions_p ||
 	    !(variable_in_common_p(e) || variable_static_p(e)))
 	{
 	    if (variable_dimensions(type_variable(entity_type(e))) != NIL)
@@ -222,7 +221,7 @@ words_declaration(
 		if (prettyprint_is_fortran)
 		  {
 		    pl = CHAIN_SWORD(pl, "(");
-		    MAPL(pd, 
+		    MAPL(pd,
 		    {
 		      pl = gen_nconc(pl, words_dimension(DIMENSION(CAR(pd))));
 		      if (CDR(pd) != NIL) pl = CHAIN_SWORD(pl, space_p? ", " : ",");
@@ -1887,12 +1886,30 @@ list words_dimensions(list dims)
 }
 
 /* This recursive function prints a C variable with its type.
-   It can be a simple variable declaration such as "int a"
-   or complicated one such as "int (* forces[10])()" (an array of
-   10 pointers, each pointer points to a function
-   with no parameter and the return type is int)  */
-
+ * It can be a simple variable declaration such as "int a"
+ * or complicated one such as "int (* forces[10])()" (an array of
+ * 10 pointers, each pointer points to a function
+ * with no parameter and the return type is int).
+ *
+ * Type "t" is recursively traversed and the obtained attribute are
+ * accumulated in the list "name" (name of the type, not name of the
+ * variable).
+ *
+ * Purpose of "is_safe"? Seems to be passed down recursively but never
+ * to be used...
+ *
+ * In C, functional type can be decorated by optional dummy parameter names.
+ */
 list generic_c_words_entity(type t, list name, bool is_safe, bool add_dummy_parameter_name_p)
+{
+  return generic_c_words_simplified_entity(t, name, is_safe, add_dummy_parameter_name_p, TRUE);
+}
+
+/* Same as above, but the boolean is_first is used to skip a type
+ * specifier which is useful when several variables or types are
+ * defined in a unique statement such as "int i, *pi, ai[10],...;"
+ */
+list generic_c_words_simplified_entity(type t, list name, bool is_safe, bool add_dummy_parameter_name_p, bool is_first)
 {
   list pc = NIL;
   bool space_p = get_bool_property("PRETTYPRINT_LISTS_WITH_SPACES");
@@ -1957,15 +1974,15 @@ list generic_c_words_entity(type t, list name, bool is_safe, bool add_dummy_para
 	  pc = gen_nconc(pc,CHAIN_SWORD(NIL, space_p? ", " : ","));
 	/* c_words_entity(t1,NIL) should be replaced by c_words_entity(t1,name_of_corresponding_parameter) */
 	pc = gen_nconc(pc,
-		       generic_c_words_entity(t1,
+		       generic_c_words_simplified_entity(t1,
 					      string_undefined_p(pn)? NIL : CONS(STRING, strdup(pn), NIL),
-					      is_safe, FALSE));
+					      is_safe, FALSE, TRUE));
 	pips_debug(9,"List of parameters \"%s\"\n ",list_to_string(pc));
 	first = FALSE;
       }
 
       pc = CHAIN_SWORD(pc,")");
-      return generic_c_words_entity(t2,pc,is_safe, FALSE);
+      return generic_c_words_simplified_entity(t2,pc,is_safe, FALSE, is_first);
     }
 
   if (pointer_type_p(t))
@@ -1973,11 +1990,11 @@ list generic_c_words_entity(type t, list name, bool is_safe, bool add_dummy_para
       type t1 = basic_pointer(variable_basic(type_variable(t)));
       pips_debug(9,"Pointer type with name = %s\n", list_to_string(name));
 
-      pc = CHAIN_SWORD(NIL,"*");
+      pc = CHAIN_SWORD(NIL, space_p? "*":"*");
       if (variable_qualifiers(type_variable(t)) != NIL)
 	pc = gen_nconc(pc,words_qualifier(variable_qualifiers(type_variable(t))));
       pc = gen_nconc(pc,name);
-      return generic_c_words_entity(t1,pc,is_safe, FALSE);
+      return generic_c_words_simplified_entity(t1,pc,is_safe, FALSE, is_first);
     }
 
   /* Add type qualifiers if there are */
@@ -1988,19 +2005,14 @@ list generic_c_words_entity(type t, list name, bool is_safe, bool add_dummy_para
       string sname = list_to_string(name);
       pips_debug(9,"Basic type with name = \"%s\"\n", sname);
 
-      pc = gen_nconc(pc,words_type(t));
+      if(is_first) {
+	pc = gen_nconc(pc,words_type(t));
+      }
       if (string_type_p(t)) {
-	//value v = basic_string(variable_basic(type_variable(t)));
-	//list vw = words_value(v);
-
-	/*
-	pc = CHAIN_SWORD(pc,"[");
-	pc = gen_nconc(pc, vw);
-	pc = CHAIN_SWORD(pc,"]");
-	*/
 	pc = CHAIN_SWORD(pc," *");
       }
-      if(strlen(sname)!=0)
+      /* FI: left out of the previous declaration internal representation */
+      if(strlen(sname)!=0 && is_first)
 	pc = CHAIN_SWORD(pc," ");
       if(!bit_type_p(t) || (strstr(sname,DUMMY_MEMBER_PREFIX)==NULL)) {
 	pc = gen_nconc(pc,name);
@@ -2039,36 +2051,40 @@ list generic_c_words_entity(type t, list name, bool is_safe, bool add_dummy_para
       pips_debug(8, "Before concatenation, pc=\"\%s\"\n", list_to_string(pc));
       if(pc!=NIL)
 	pc = CHAIN_SWORD(pc, " ");
-      return gen_nconc(pc,generic_c_words_entity(t1,gen_nconc(tmp,words_dimensions(dims)),is_safe, FALSE));
+      return gen_nconc(pc,generic_c_words_simplified_entity(t1,gen_nconc(tmp,words_dimensions(dims)),is_safe, FALSE, is_first));
     }
 
   if (derived_type_p(t))
     {
       entity ent = basic_derived(variable_basic(type_variable(t)));
-      type t1 = entity_type(ent);
-      string n = entity_name(ent);
-      pips_debug(9,"Derived type with name = %s\n", list_to_string(name));
-      if((strstr(n,DUMMY_ENUM_PREFIX)==NULL)
-	 &&(strstr(n,DUMMY_STRUCT_PREFIX)==NULL)
-	 &&(strstr(n,DUMMY_UNION_PREFIX)==NULL)) {
-	pc = gen_nconc(pc,words_type(t1));
+      if(is_first) {
+	type t1 = entity_type(ent);
+	string n = entity_name(ent);
+	pips_debug(9,"Derived type with name = %s\n", list_to_string(name));
+	if((strstr(n,DUMMY_ENUM_PREFIX)==NULL)
+	   &&(strstr(n,DUMMY_STRUCT_PREFIX)==NULL)
+	   &&(strstr(n,DUMMY_UNION_PREFIX)==NULL)) {
+	  pc = gen_nconc(pc,words_type(t1));
+	  pc = CHAIN_SWORD(pc," ");
+	  pc = CHAIN_SWORD(pc,entity_user_name(ent));
+	}
+	else {
+	  //pc = CHAIN_SWORD(pc,"problem!");
+	  pc = c_words_entity(t1, pc);
+	}
 	pc = CHAIN_SWORD(pc," ");
-	pc = CHAIN_SWORD(pc,entity_user_name(ent));
       }
-      else {
-	//pc = CHAIN_SWORD(pc,"problem!");
-	pc = c_words_entity(t1, pc);
-      }
-      pc = CHAIN_SWORD(pc," ");
       return gen_nconc(pc,name);
     }
   if (typedef_type_p(t))
     {
+      if(is_first) {
       entity ent = basic_typedef(variable_basic(type_variable(t)));
       pips_debug(9,"Typedef type with name = \"\%s\"\n", list_to_string(name));
       pc = CHAIN_SWORD(pc,entity_user_name(ent));
       if(name!=NIL)
 	pc = CHAIN_SWORD(pc," ");
+      }
       return gen_nconc(pc,name);
     }
   if (type_varargs_p(t))
@@ -2182,6 +2198,18 @@ list generic_c_words_entity(type t, list name, bool is_safe, bool add_dummy_para
   return NIL;
 }
 
+list c_words_simplified_entity(type t, list name, bool is_first)
+{
+  list pc = generic_c_words_simplified_entity(t, name, FALSE, FALSE, is_first);
+
+  ifdebug(8) {
+    string s = list_to_string(pc);
+    pips_debug(8, "End with \"\%s\"\n", s);
+  }
+
+  return pc;
+}
+
 list c_words_entity(type t, list name)
 {
   list pc = generic_c_words_entity(t, name, FALSE, FALSE);
@@ -2218,8 +2246,10 @@ text c_text_entities(entity module, list ldecl, int margin)
 	 are exposed directly. */
       if(((strstr(n,DUMMY_ENUM_PREFIX)==NULL)
 	  || !type_used_in_type_declarations_p(e, ldecl))
-	 && (strstr(n,DUMMY_STRUCT_PREFIX)==NULL)
-	 && (strstr(n,DUMMY_UNION_PREFIX)==NULL)) {
+	 && (strstr(n,DUMMY_STRUCT_PREFIX)==NULL
+	     ||strstr(n,MEMBER_SEP_STRING)!=NULL)
+	 && (strstr(n,DUMMY_UNION_PREFIX)==NULL
+	     ||strstr(n,MEMBER_SEP_STRING)!=NULL) ) {
 	tmp = c_text_entity(module, e, margin);
 	MERGE_TEXTS(r,tmp);
       }
@@ -2228,19 +2258,171 @@ text c_text_entities(entity module, list ldecl, int margin)
 
   return r;
 }
-
-text c_text_entity(entity module, entity e, int margin)
+
+static list words_struct(string name1, list pc)
 {
-  text r = make_text(NIL);
+  pc = CHAIN_SWORD(pc,"struct ");
+  if(strstr(name1,DUMMY_STRUCT_PREFIX)==NULL) {
+    pc = CHAIN_SWORD(pc,name1);
+    pc = CHAIN_SWORD(pc," ");
+  }
+  pc = CHAIN_SWORD(pc,"{");
+  return pc;
+}
+
+static list words_enum(string name1, list l, bool space_p, list pc)
+{
+  bool first = TRUE;
+  pc = CHAIN_SWORD(pc,"enum ");
+  if(strstr(name1,DUMMY_ENUM_PREFIX)==NULL) {
+    pc = CHAIN_SWORD(pc,name1);
+    pc = CHAIN_SWORD(pc," ");
+  }
+  pc = CHAIN_SWORD(pc,"{");
+  list cl = list_undefined;
+  int cv = 0;
+
+  for(cl = l; !ENDP(cl); POP(cl)) {
+    entity em = ENTITY(CAR(cl));
+    value emv = entity_initial(em);
+    symbolic ems = value_symbolic(emv);
+    expression eme = symbolic_expression(ems);
+    constant emc = symbolic_constant(value_symbolic(emv));
+    int n = constant_int(emc);
+
+    if (!first)
+      pc = CHAIN_SWORD(pc, space_p? ", " : ",");
+    pc = CHAIN_SWORD(pc, entity_user_name(em));
+    if(n!=cv) {
+      pc = CHAIN_SWORD(pc, "=");
+      pc = gen_nconc(pc, words_expression(eme));
+      cv = n;
+    }
+    cv++;
+    first = FALSE;
+  };
+  pc = CHAIN_SWORD(pc,"}");
+  return pc;
+}
+
+static list words_union(string name1, list pc)
+{
+  pc = CHAIN_SWORD(pc,"union ");
+  if(strstr(name1,DUMMY_UNION_PREFIX)==NULL) {
+    pc = CHAIN_SWORD(pc,name1);
+    pc = CHAIN_SWORD(pc," ");
+  }
+  pc = CHAIN_SWORD(pc,"{");
+  return pc;
+}
+
+static list words_variable_or_function(entity module, entity e, bool is_first, list pc)
+{
   string name = entity_user_name(e);
   type t = entity_type(e);
-  storage s = entity_storage(e);
+  //storage s = entity_storage(e);
   value val = entity_initial(e);
+
+  pc = gen_nconc(pc,c_words_simplified_entity(t,CHAIN_SWORD(NIL,name), is_first));
+  /* This part is for declarator initialization if there is.  If
+     the entity is declared extern wrt current module, do not add
+     this initialization*/
+  if (!entity_undefined_p(module)
+      && !extern_entity_p(module,e)
+      && !value_undefined_p(val)) {
+    if (value_expression_p(val)) {
+      expression exp = value_expression(val);
+      pc = CHAIN_SWORD(pc," = ");
+      if (brace_expression_p(exp))
+	pc = gen_nconc(pc,words_brace_expression(exp));
+      else {
+	/* */
+	pc = gen_nconc(pc,words_subexpression(exp, ASSIGN_OPERATOR_PRECEDENCE, TRUE));
+      }
+    }
+    else if(value_code_p(val)) {
+      if(type_variable_p(t)) {
+	/* it must be a pointer to a function. See encoding in
+	   set_entity_initial */
+	list il = sequence_statements(code_initializations(value_code(val)));
+	if(!ENDP(il)) {
+	  statement is = STATEMENT(CAR(il));
+	  expression exp =
+	    instruction_expression(statement_instruction(is));
+	  pc = CHAIN_SWORD(pc," = ");
+	  pc = gen_nconc(pc,words_expression(exp));
+	}
+      }
+    }
+  }
+  return pc;
+}
+
+static list filtered_declaration_list(list del)
+{
+  /* Filter out secondary types */
+  list el = del;
+
+  ifdebug(8) {
+    pips_debug(8, "Input declaration list: ");
+    print_entities(del);
+    fprintf(stderr, "\n");
+  }
+
+  if(gen_length(del)>2) {
+    /* Maybe, some type related entities such as substructure should
+       not be printed out. Only the last one is useful. */
+    entity e_previous = ENTITY(CAR(del));
+
+    if(entity_struct_p(e_previous)
+       ||entity_union_p(e_previous)
+       ||entity_enum_p(e_previous)) {
+      FOREACH(ENTITY, e, CDR(del)) {
+	if(entity_struct_p(e)
+	   ||entity_union_p(e)
+	   ||entity_enum_p(e)) {
+	  POP(el);
+	}
+	else {
+	  break;
+	}
+      }
+    }
+  }
+
+  ifdebug(8) {
+    pips_debug(8, "Output declaration list: ");
+    print_entities(el);
+    fprintf(stderr, "\n");
+  }
+
+  return el;
+}
+
+/* It is assumed that all entities in list el can be declared by an
+ * unique statement, i.e. their types must be closely related.
+ *
+ * In other words, this function prints out a C declaration statement.
+ */
+text c_text_related_entities(entity module, list del, int margin, int sn)
+{
+  list el = filtered_declaration_list(del);
+  text r = make_text(NIL);
+  entity e1 = ENTITY(CAR(el)); // Let's use the first declared entity.
+  entity e_last = ENTITY(CAR(gen_last(el))); // Let's also use the last declared entity.
+  string name1 = entity_user_name(e1);
+  type t1 = entity_type(e1);
+  //storage s1 = entity_storage(e1);
+  storage s_last = entity_storage(e_last);
+  //value val1 = entity_initial(e1);
   list pc = NIL;
   bool space_p = get_bool_property("PRETTYPRINT_LISTS_WITH_SPACES");
+  bool skip_first_comma_p = TRUE;
 
-  pips_debug(5,"Print declaration for entity %s in module %s\n",
-	     entity_name(e),
+  pips_assert("the entity list is not empty", gen_length(el)>0);
+
+  pips_debug(5,"Print declaration for first entity %s in module %s\n",
+	     entity_name(e1),
 	     entity_undefined_p(module)? "UNDEFINED" : entity_name(module));
 
   /* A declaration has two parts: declaration specifiers and declarator (even with initializer)
@@ -2252,95 +2434,56 @@ text c_text_entity(entity module, entity e, int margin)
      - function specifiers : inline */
 
   /* This part is for storage specifiers */
-  if (!entity_undefined_p(module) && extern_entity_p(module, e))
+  if (!entity_undefined_p(module) && extern_entity_p(module, e_last))
     pc = CHAIN_SWORD(pc,"extern ");
 
-  if (strstr(entity_name(e),TYPEDEF_PREFIX) != NULL)
+  if (strstr(entity_name(e_last),TYPEDEF_PREFIX) != NULL)
     pc = CHAIN_SWORD(pc,"typedef ");
 
   /* The global variables stored in static area and in ram but they
      are not static so a condition is needed, which checks if it is not a
      global variable*/
   // entity m = get_current_module_entity();
-  if ((storage_ram_p(s)
-       && static_area_p(ram_section(storage_ram(s)))
-       && !strstr(entity_name(e),TOP_LEVEL_MODULE_NAME))
-      || (entity_module_p(e) && static_module_p(e)))
+  if ((storage_ram_p(s_last)
+       && static_area_p(ram_section(storage_ram(s_last)))
+       && !strstr(entity_name(e_last),TOP_LEVEL_MODULE_NAME))
+      || (entity_module_p(e_last) && static_module_p(e_last)))
     pc = CHAIN_SWORD(pc,"static ");
 
   /* This part is for type specifiers, type qualifiers, function specifiers and declarator
      Three special cases for struct/union/enum definitions are treated here.
-     Variable (scalar, array), pointer, function, variables of type struct/union/enum and typedef 
+     Variable (scalar, array), pointer, function, variables of type struct/union/enum and typedef
      are treated by function c_words_entity */
 
-  switch (type_tag(t)) {
+  switch (type_tag(t1)) {
   case is_type_struct:
     {
-      list l = type_struct(t);
+      list l = type_struct(t1);
       text fields = c_text_entities(module,l,margin+INDENTATION);
-      pc = CHAIN_SWORD(pc,"struct ");
-      if(strstr(name,DUMMY_STRUCT_PREFIX)==NULL) {
-	pc = CHAIN_SWORD(pc,name);
-	pc = CHAIN_SWORD(pc," ");
-      }
-      pc = CHAIN_SWORD(pc,"{");
+      pc = words_struct(name1, pc);
       ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_unformatted,
-					    make_unformatted(NULL,0,margin,pc)));
+					    make_unformatted(NULL,sn,margin,pc)));
       MERGE_TEXTS(r,fields);
-      ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"};"));
+      ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"}"));
       break;
     }
   case is_type_union:
     {
-      list l = type_union(t);
+      list l = type_union(t1);
       text fields = c_text_entities(module,l,margin+INDENTATION);
-      pc = CHAIN_SWORD(pc,"union ");
-      if(strstr(name,DUMMY_UNION_PREFIX)==NULL) {
-	pc = CHAIN_SWORD(pc,name);
-	pc = CHAIN_SWORD(pc," ");
-      }
-      pc = CHAIN_SWORD(pc,"{");
+      pc = words_union(name1, pc);
       ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_unformatted,
-					    make_unformatted(NULL,0,margin,pc)));
+					    make_unformatted(NULL,sn,margin,pc)));
       MERGE_TEXTS(r,fields);
-      ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"};"));
+      ADD_SENTENCE_TO_TEXT(r, MAKE_ONE_WORD_SENTENCE(margin,"}"));
       break;
     }
   case is_type_enum:
     {
-      list l = type_enum(t);
-      bool first = TRUE;
-      pc = CHAIN_SWORD(pc,"enum ");
-      if(strstr(name,DUMMY_ENUM_PREFIX)==NULL) {
-	pc = CHAIN_SWORD(pc,name);
-	pc = CHAIN_SWORD(pc," ");
-      }
-      pc = CHAIN_SWORD(pc,"{");
-      list cl = list_undefined;
-      int cv = 0;
-
-      for(cl = l; !ENDP(cl); POP(cl)) {
-	entity em = ENTITY(CAR(cl));
-	value emv = entity_initial(em);
-	symbolic ems = value_symbolic(emv);
-	expression eme = symbolic_expression(ems);
-	constant emc = symbolic_constant(value_symbolic(emv));
-	int n = constant_int(emc);
-
-	if (!first)
-	  pc = CHAIN_SWORD(pc, space_p? ", " : ",");
-	pc = CHAIN_SWORD(pc, entity_user_name(em));
-	if(n!=cv) {
-	  pc = CHAIN_SWORD(pc, "=");
-	  pc = gen_nconc(pc, words_expression(eme));
-	  cv = n;
-	}
-	cv++;
-	first = FALSE;
-      };
-      pc = CHAIN_SWORD(pc,"};");
+      list l = type_enum(t1);
+      pc = words_enum(name1, l, space_p, pc);
       ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_unformatted,
-					    make_unformatted(NULL,0,margin,pc)));
+					    make_unformatted(NULL,sn,margin,pc)));
       break;
     }
   case is_type_variable:
@@ -2348,41 +2491,10 @@ text c_text_entity(entity module, entity e, int margin)
   case is_type_void:
   case is_type_unknown:
     {
-      pc = gen_nconc(pc,c_words_entity(t,CHAIN_SWORD(NIL,name)));
-      /* This part is for declarator initialization if there is.  If
-	 the entity is declared extern wrt current module, do not add
-	 this initialization*/
-      if (!entity_undefined_p(module)
-	  && !extern_entity_p(module,e)
-	  && !value_undefined_p(val)) {
-	if (value_expression_p(val)) {
-	  expression exp = value_expression(val);
-	  pc = CHAIN_SWORD(pc," = ");
-	  if (brace_expression_p(exp))
-	    pc = gen_nconc(pc,words_brace_expression(exp));
-	  else {
-	    /* */
-	    pc = gen_nconc(pc,words_subexpression(exp, ASSIGN_OPERATOR_PRECEDENCE, TRUE));
-	  }
-	}
-	else if(value_code_p(val)) {
-	  if(type_variable_p(t)) {
-	      /* it must be a pointer to a function. See encoding in
-		 set_entity_initial */
-	    list il = sequence_statements(code_initializations(value_code(val)));
-	    if(!ENDP(il)) {
-	      statement is = STATEMENT(CAR(il));
-	      expression exp =
-		instruction_expression(statement_instruction(is));
-	      pc = CHAIN_SWORD(pc," = ");
-	      pc = gen_nconc(pc,words_expression(exp));
-	    }
-	  }
-	}
-      }
-      pc = CHAIN_SWORD(pc,";");
+      pc = words_variable_or_function(module, e1, TRUE, pc);
       ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_unformatted,
-					    make_unformatted(NULL,0,margin,pc)));
+					    make_unformatted(NULL,sn,margin,pc)));
+      skip_first_comma_p = FALSE;
       break;
     }
   case is_type_varargs:
@@ -2391,7 +2503,36 @@ text c_text_entity(entity module, entity e, int margin)
   default:
     pips_internal_error("unexpected type tag\n");
   }
+
+  /* the word list pc must have been inserted in text r*/
+  pc = NIL;
+
+  /* Add the declared variables or more declared variables. */
+  list oel = CDR(el); // other entities after e1
+  //print_entities(oel);
+  FOREACH(ENTITY, e, oel) {
+    if(skip_first_comma_p) {
+      skip_first_comma_p = FALSE;
+      pc = gen_nconc(pc,CHAIN_SWORD(NIL, " "));
+    }
+    else
+      pc = gen_nconc(pc,CHAIN_SWORD(NIL,space_p? ", " : ","));
+    pc = words_variable_or_function(module, e, FALSE, pc);
+  }
+  pc = CHAIN_SWORD(pc,";");
+
+  /* the word list pc must be added to the last sentence of text r */
+  add_words_to_text(r, pc);
+
   return r;
+}
+
+text c_text_entity(entity module, entity e, int margin)
+{
+  list el = CONS(ENTITY, e, NIL);
+  text t =  c_text_related_entities(module, el, margin, 0);
+
+  return t;
 }
 
 

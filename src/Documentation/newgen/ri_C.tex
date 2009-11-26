@@ -1443,11 +1443,30 @@ So we suggests to modify \verb/statement/ in the following way:
 
 \verb/statement += declarations:entity* x decls_text:string/
 
+instead of creating a new instruction, which could be called
+declaration. When a new instruction is needed, PIPS designers often
+use a new intrinsic rather than a new instruction because fewer PIPS
+source code modifications are necessary.
+
 Member \verb/declarations/ contains a list of entities in the
 statement scope (all kinds of entities such as intrinsics, ... or only
 those that are effectively declared).  Member \verb/decls_text/ could
 be used to regenerate source code (as for module code) if the parser
 initializes it.
+
+This does not specify which statements carry the declarations. A first
+implementation, based on C89, used block statements only to carry
+declarations. All other statements had to have an empty declaration
+list. This is too restrictive with respect to C99, which allow
+declarations to appear anywhere among executable statements, and with
+respect to source-to-source constraints. By putting all declarations
+of a block in one statement, individual comments and line numbers are
+lost.
+
+A second implementation is based on C nop, ";", i.e. Fortran
+CONTINUE. This statement has no effect and can be ignored, but for the
+possible initial values, by PIPS analyses. PIPS transformations must
+preserve it.
 
 \section{Instruction}
 

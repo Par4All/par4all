@@ -21,7 +21,7 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
-/* Pot-pourri of utilities for the internal representation. 
+/* Pot-pourri of utilities for the internal representation.
  * Some functions could be moved to non-generic files such as entity.c.
  */
 #include <stdio.h>
@@ -465,8 +465,9 @@ language workspace_language(gen_array_t files)
       n_fortran++;
     else if(dot_c_file_p(fn))
       n_c++;
-    else
+    else {
       ;
+    }
   }
 
   if(n_fortran>0 && n_c==0)
@@ -477,4 +478,63 @@ language workspace_language(gen_array_t files)
     l = make_language_unknown();
 
   return l;
+}
+
+/* Remove trailing line feeds */
+string string_remove_trailing_line_feeds(string s)
+{
+  int sl = strlen(s);
+  if(sl>0) {
+    string ntl = s+sl-1;
+    while(sl>0 && *ntl=='\n') {
+      *ntl='\000';
+      ntl--;
+      sl--;
+    }
+  }
+  return s;
+}
+
+/* print a list of strings */
+void dump_strings(list sl)
+{
+  dump_words(sl);
+}
+
+/* Get rid of linefeed/newline at the end of a string.
+ *
+ * This is sometimes useful to cleanup comments messed up by the
+ * lexical analyzer.
+ *
+ * Warning: the argument s is updated if it ends up with LF
+ */
+string string_strip_final_linefeeds(string s)
+{
+  int l = strlen(s)-1;
+
+  while(l>=0 && *(s+l)=='\n') {
+    *(s+l) = '\000';
+    l--;
+  }
+
+  return s;
+}
+
+/* Get rid of linefeed/newline at the end of a string.
+ *
+ * This is sometimes useful to cleanup comments messed up by the
+ * lexical analyzer.
+ *
+ * Warning: the argument s is updated if it ends up with LF
+ */
+string string_fuse_final_linefeeds(string s)
+{
+  int l = strlen(s)-1;
+
+  while(l>=1 && *(s+l)=='\n' && *(s+l-1)=='\n') {
+    *(s+l) = '\000';
+    l--;
+  }
+
+  return s;
 }

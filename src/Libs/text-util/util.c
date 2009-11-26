@@ -251,7 +251,7 @@ close_current_line(
 	close_current_line(buffer,txt,continuation);
       }
       else
-	pips_assert("buffer is too large", 
+	pips_assert("buffer is too large",
 		    strlen(buffer)+1<MAX_LINE_LENGTH);
     }
     else {
@@ -263,4 +263,23 @@ close_current_line(
   }
 }
 
+/* Add the word list wl to the end of the last sentence of text t */
+void add_words_to_text(text t,list wl)
+{
+  list sl = text_sentences(t);
 
+  if(ENDP(sl)) {
+    pips_internal_error("what kind of sentence to make?\n");
+  }
+  else {
+    sentence s = SENTENCE(CAR(gen_last(sl)));
+    if(sentence_formatted_p(s)) {
+      pips_internal_error("Not implemented\n");
+    }
+    else {
+      unformatted u = sentence_unformatted(s);
+      unformatted_words(u) = gen_nconc(unformatted_words(u), wl);
+    }
+  }
+  pips_assert("t is consistent", text_consistent_p(t));
+}
