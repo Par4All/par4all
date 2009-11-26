@@ -1,5 +1,3 @@
-int tmp=0;
-
 float extending01a(int n, float a[n])
 {
   int i;
@@ -9,7 +7,6 @@ float extending01a(int n, float a[n])
   }
   return s;
 }
-
 float extending01b(int n, float a[n])
 {
   int i;
