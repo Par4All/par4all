@@ -21,7 +21,6 @@ int cse01()
    int i;
    int j;
    int k;
-   //PIPS generated variable
    int I_0;
 
    I_0 = j+2;

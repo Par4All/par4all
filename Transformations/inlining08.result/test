@@ -23,7 +23,6 @@ Code after inlining
 int foo(int argc, char **argv)
 {
    int c;
-   //PIPS generated variable
    int _return0;
    {
       int n;

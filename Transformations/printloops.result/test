@@ -3,7 +3,8 @@ Initial code
 
 void popop()
 {
-   int i, j;
+   int i;
+   int j;
    for(i = 0; i <= 9; i += 1)
       for (j = 2;j<-2;j /= 4012)
          ;
@@ -14,7 +15,8 @@ loops
 l99999
 void popop()
 {
-   int i, j;
+   int i;
+   int j;
 l99999:
    for(i = 0; i <= 9; i += 1)
       for (j = 2;j<-2;j /= 4012)
@@ -24,7 +26,8 @@ l99999
 l99998
 void popop()
 {
-   int i, j;
+   int i;
+   int j;
 l99999:
    for(i = 0; i <= 9; i += 1)
 l99998:      for (j = 2;j<-2;j /= 4012)

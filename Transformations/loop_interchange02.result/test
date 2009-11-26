@@ -4,7 +4,9 @@ Initial source code
 void loop_interchange02(int n, int ni, int nj, int nk)
 {
    float x[n][n][n];
-   int i, j, k;
+   int i;
+   int j;
+   int k;
 
 l1:
    for(i = 0; i <= ni-1; i += 1)
@@ -20,10 +22,10 @@ Source code after loop interchange
 void loop_interchange02(int n, int ni, int nj, int nk)
 {
    float x[n][n][n];
-   int i, j, k;
-   //PIPS generated variable
+   int i;
+   int j;
+   int k;
    int jp;
-   //PIPS generated variable
    int kp;
 
 l1:

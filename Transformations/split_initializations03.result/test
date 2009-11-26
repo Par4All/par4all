@@ -3,28 +3,24 @@ Initial code
 
 void split_initializations03(void)
 {
-   // BEGIN BLOCK
-   typedef struct foo {
+   struct foo {
       int a;
       int b;
       int c;
-   } three_ints;
-
+   };
+   typedef struct foo three_ints;
    three_ints a = {1, 2, 3};
-   // END BLOCK
 }
 
 Code after split_initializations
 
 void split_initializations03(void)
 {
-   // BEGIN BLOCK
-   typedef struct foo {
+   struct foo {
       int a;
       int b;
       int c;
-   } three_ints;
-
+   };
+   typedef struct foo three_ints;
    three_ints a = {1, 2, 3};
-   // END BLOCK
 }

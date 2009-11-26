@@ -14,7 +14,8 @@ void scalarization17(double A[SIZE], double B[SIZE][SIZE])
 //    PHI2+1<=TOP-LEVEL:SIZE}>
 
    // BEGIN BLOCK
-   int i, j;
+   int i;
+   int j;
 
 //  <A[PHI1]-IN-EXACT-{0<=PHI1, PHI1+1<=TOP-LEVEL:SIZE}>
 //  <B[PHI1][PHI2]-IN-EXACT-{0<=PHI1, PHI1+1<=TOP-LEVEL:SIZE, 0<=PHI2,
@@ -49,7 +50,8 @@ void scalarization17(double A[SIZE], double B[SIZE][SIZE])
 //  <A[PHI1]-OUT-EXACT-{PHI1==0, PHI1+1<=TOP-LEVEL:SIZE}>
 
    // BEGIN BLOCK
-   int i, j;
+   int i;
+   int j;
 
 //  <A[PHI1]-OUT-EXACT-{PHI1==0, PHI1+1<=TOP-LEVEL:SIZE}>
 
@@ -71,8 +73,8 @@ Code after scalarization
 void scalarization17(double A[SIZE], double B[SIZE][SIZE])
 {
    // BEGIN BLOCK
-   int i, j;
-   //PIPS generated variable
+   int i;
+   int j;
    double __scalar__0;
    for(i = 0; i <= SIZE-1; i += 1) {
       // BEGIN BLOCK

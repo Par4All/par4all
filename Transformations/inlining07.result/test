@@ -17,9 +17,7 @@ Code after inlining
 
 int main(int argc, char **argv)
 {
-   //PIPS generated variable
    int _return0;
-   //PIPS generated variable
    int I_0 = 2+3;
    {
       int c = I_0>argc?I_0:argc;

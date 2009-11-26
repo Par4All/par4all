@@ -10,4 +10,4 @@ void c_clean_declarations03(int x)
         x+=(int)r;
     }
     fprintf(stderr, "x=%dn", x);
-}
+} 
