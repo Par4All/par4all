@@ -348,8 +348,19 @@ void gfc2pips_namespace(gfc_namespace* ns){
 	pips_debug(2, "%d extern(s) founded\n",gen_length(list_of_extern_entities));
 
 
-	pips_debug(2, "nb of entities: %d\n",gen_length(gen_intersection(complete_list_of_entities,complete_list_of_entities)));
+	pips_debug(2, "nb of entities: %d\n",gen_length(complete_list_of_entities));
+	//faire un print de toutes les entities dans la liste, histoire de voire les pbs
 
+	ifdebug(9){
+		complete_list_of_entities_p = complete_list_of_entities;
+		entity ent = entity_undefined;
+		while( complete_list_of_entities_p ){
+			ent=complete_list_of_entities_p->car.e;
+			if(ent)
+				fprintf(stderr,"Complete list of entities, element: %s\n",entity_name(ent));
+			POP(complete_list_of_entities_p);
+		}
+	}
 	//do we need to retrieve static(<=>SAVE) variables ?
 
 	entity_initial(gfc2pips_main_entity) = make_value(
@@ -415,10 +426,10 @@ void gfc2pips_namespace(gfc_namespace* ns){
 	//however we have to use it !
 	//we have a conflict in storage
 	//ComputeAddresses();
-	gfc2pips_computeAdressesStatic();
+	gfc2pips_computeAdresses();
 	//SaveChains();//Syntax !! handle equiv in some way, look into it, need to use SetChains(); at the beginning to initiate
-	update_common_sizes();//Syntax !!
-	print_common_layout(stderr,StaticArea,true);
+	//update_common_sizes();//Syntax !!//we have the job done 2 times if debug is at 9, one time if at 8
+	//print_common_layout(stderr,StaticArea,true);
 	pips_debug(2, "dumping done\n");
 
 
@@ -691,7 +702,12 @@ newgen_list gfc2pips_vars_(gfc_namespace *ns,newgen_list variables_p){
 					//set_common_to_size(StaticArea,CurrentOffsetOfArea(StaticArea,(entity)variables->car.e));
 				}else{
 					area = current_symtree->n.sym->value ? DynamicArea:StackArea;
-					pips_debug(9,"Variable \"%s\" put in \"%s\"\n",entity_local_name((entity)variables->car.e),current_symtree->n.sym->value ? DYNAMIC_AREA_LOCAL_NAME:STACK_AREA_LOCAL_NAME);
+					pips_debug(
+						9,
+						"Variable \"%s\" put in \"%s\"\n",
+						entity_local_name((entity)variables->car.e),
+						current_symtree->n.sym->value ? DYNAMIC_AREA_LOCAL_NAME:STACK_AREA_LOCAL_NAME
+					);
 				}
 				ram _r_ = make_ram(
 					get_current_module_entity(),
@@ -3142,35 +3158,79 @@ void gfc2pips_initAreas(){
 }
 
 /**
+ * @brief compute addresses of the stack, heap, dynamic and static areas
+ */
+void gfc2pips_computeAdresses(){
+	gfc2pips_computeAdressesHeap();
+	gfc2pips_computeAdressesStack();
+	gfc2pips_computeAdressesDynamic();
+	gfc2pips_computeAdressesStatic();
+}
+/**
  * @brief compute the addresses of the entities declared in StaticArea
  */
 void gfc2pips_computeAdressesStatic(){
-	//compute each and every adresses of the entities in this area. Doesn't handle equivalences.
+	gfc2pips_computeAdressesOfArea(StaticArea);
+}
+/**
+ * @brief compute the addresses of the entities declared in DynamicArea
+ */
+void gfc2pips_computeAdressesDynamic(){
+	gfc2pips_computeAdressesOfArea(DynamicArea);
+}
+/**
+ * @brief compute the addresses of the entities declared in StaticArea
+ */
+void gfc2pips_computeAdressesHeap(){
+	gfc2pips_computeAdressesOfArea(HeapArea);
+}
+/**
+ * @brief compute the addresses of the entities declared in DynamicArea
+ */
+void gfc2pips_computeAdressesStack(){
+	gfc2pips_computeAdressesOfArea(StackArea);
+}
+
+/**
+ * @brief compute the addresses of the entities declared in the given entity
+ */
+void gfc2pips_computeAdressesOfArea( entity _area ){//pb induit dans cette fonction, on se retrouve au dernier élément si on y refait appel
+	//compute each and every addresses of the entities in this area. Doesn't handle equivalences.
+	if(
+		!_area
+		|| _area==entity_undefined
+		|| entity_type(_area)==type_undefined
+		|| !type_area_p(entity_type(_area))
+	){
+		pips_user_warning("Impossible to compute the given object as an area\n");
+		return;
+	}
 	int offset = 0;
-	newgen_list pcv=code_declarations(EntityCode(get_current_module_entity()));
-	pips_debug(9,"Start\n");
+	newgen_list _pcv=code_declarations(EntityCode(get_current_module_entity()));
+	newgen_list pcv = gen_copy_seq(_pcv);
+	pips_debug(9,"Start \t\t%s %d\n",entity_local_name(_area),gen_length(pcv));
 	for( pcv=gen_nreverse(pcv) ; pcv != NIL; pcv = CDR(pcv) ) {
-		entity e = ENTITY(CAR(pcv));
+		entity e = ENTITY(CAR(pcv));//ifdebug(1)fprintf(stderr,"%s\n",entity_local_name(e));
 		if(
 			entity_storage(e) != storage_undefined
 			&& storage_ram_p(entity_storage(e))
-			&& ram_section(storage_ram(entity_storage(e)))==StaticArea
+			&& ram_section(storage_ram(entity_storage(e)))==_area
 		){
 			pips_debug(9,"Compute address of %s - offset: %d\n",entity_name(e), offset);
 
 			ram_offset(storage_ram(entity_storage(e))) = offset;
 
-			area ca = type_area(entity_type(StaticArea));
+			area ca = type_area(entity_type(_area));
 			area_layout(ca) = gen_nconc(area_layout(ca), CONS(ENTITY, e, NIL));
 
 			int size;SizeOfArray(e,&size);
 			offset += size;
 		}
 	}
-	set_common_to_size(StaticArea,offset);
-	pips_debug(9,"offset: %d\nEnd\n",offset);
-}
 
+	set_common_to_size( _area, offset );
+	pips_debug( 9, "offset: %d\t\tEnd %s\n", offset, entity_local_name(_area) );
+}
 
 void gfc2pips_handleEquiv(gfc_equiv *eq){
 	//StoreEquivChain(chain c){

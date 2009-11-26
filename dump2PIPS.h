@@ -184,8 +184,12 @@ newgen_list gfc2pips_arglist2arglist(gfc_actual_arglist *act);
 
 //memory related functions
 void gfc2pips_initAreas();
+void gfc2pips_computeAdresses();
 void gfc2pips_computeAdressesStatic();
-
+void gfc2pips_computeAdressesDynamic();
+void gfc2pips_computeAdressesHeap();
+void gfc2pips_computeAdressesStack();
+void gfc2pips_computeAdressesOfArea( entity _area );
 
 newgen_list *gfc2pips_list_of_all_modules;
 
