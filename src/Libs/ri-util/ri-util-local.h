@@ -296,6 +296,8 @@
 #define C_EQUAL_OPERATOR_NAME           "=="
 
 #define CONTINUE_FUNCTION_NAME          "CONTINUE"
+#define C_CONTINUE_FUNCTION_NAME        ";"
+#define C_STATEMENT_END_STRING          ";"
 #define RETURN_FUNCTION_NAME            "RETURN"
 #define STOP_FUNCTION_NAME              "STOP"
 #define PAUSE_FUNCTION_NAME             "PAUSE"
