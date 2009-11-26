@@ -14,8 +14,7 @@ void scalarization09(double A[SIZE], double B[SIZE][SIZE])
 //    PHI2+1<=TOP-LEVEL:SIZE}>
 
    // BEGIN BLOCK
-   int i;
-   int j;
+   int i, j;
 
 //  <A[PHI1]-IN-EXACT-{0<=PHI1, PHI1+1<=TOP-LEVEL:SIZE}>
 //  <B[PHI1][PHI2]-IN-EXACT-{0<=PHI1, PHI1+1<=TOP-LEVEL:SIZE, 0<=PHI2,
@@ -44,8 +43,7 @@ OUT regions
 void scalarization09(double A[SIZE], double B[SIZE][SIZE])
 {
    // BEGIN BLOCK
-   int i;
-   int j;
+   int i, j;
    for(i = 0; i <= SIZE-1; i += 1)
       for(j = 0; j <= SIZE-1; j += 1)
 
@@ -61,8 +59,8 @@ Code after scalarization
 void scalarization09(double A[SIZE], double B[SIZE][SIZE])
 {
    // BEGIN BLOCK
-   int i;
-   int j;
+   int i, j;
+   //PIPS generated variable
    double __scalar__0;
    for(i = 0; i <= SIZE-1; i += 1) {
       // BEGIN BLOCK

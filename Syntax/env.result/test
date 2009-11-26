@@ -1,4 +1,5 @@
 user warning, property ACTIVE_PHASES redefined
+user warning, property SEMANTICS_FIX_POINT_OPERATOR redefined
 echo
 
 echo First try: detect conflict between common and program 

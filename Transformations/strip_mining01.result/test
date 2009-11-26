@@ -19,6 +19,7 @@ int strip_mining01(int *in, int *val)
 {
    int x[512];
    int i;
+   //PIPS generated variable
    int i_1;
 
 l1:
@@ -38,6 +39,7 @@ int strip_mining01(int *in, int *val)
 {
    int x[512];
    int i;
+   //PIPS generated variable
    int i_1;
 
 //  P() {}

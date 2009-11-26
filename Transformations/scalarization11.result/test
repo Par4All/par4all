@@ -4,12 +4,8 @@ Initial code
 int main(int argc, char **argv)
 {
    // BEGIN BLOCK
-   int d;
-   int i;
-   int n = 100;
-   int x[n];
-   int y[n];
-   int t[n];
+   int d, i, n = 100;
+   int x[n], y[n], t[n];
 
    for(i = 0; i <= n-1-1; i += 1) {
       // BEGIN BLOCK
@@ -26,12 +22,8 @@ Code after scalarization
 int main(int argc, char **argv)
 {
    // BEGIN BLOCK
-   int d;
-   int i;
-   int n = 100;
-   int x[n];
-   int y[n];
-   int t[n];
+   int d, i, n = 100;
+   int x[n], y[n], t[n];
 
    for(i = 0; i <= n-1-1; i += 1) {
       // BEGIN BLOCK

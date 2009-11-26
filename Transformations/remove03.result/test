@@ -4,8 +4,7 @@ Initial code
 int volume(int a[256][256])
 {
    int v = 0;
-   int i;
-   int j;
+   int i, j;
 //  loop sum[v],
 volume:
    for(i = 0; i <= 255; i += 1) {
@@ -24,8 +23,8 @@ after removing reductions
 int volume(int a[256][256])
 {
    int v = 0;
-   int i;
-   int j;
+   int i, j;
+   //PIPS generated variable
    int RED[255+1];
 volume:
    for(i = 0; i <= 255; i += 1) {

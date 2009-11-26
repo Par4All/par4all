@@ -44,6 +44,7 @@ int main()
    int m = 0;
    int n = 0;
    int o = 2;
+   //PIPS generated variable
    int RED[9+1];
 
 l0:

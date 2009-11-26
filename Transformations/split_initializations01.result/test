@@ -26,8 +26,8 @@ int split_initializations01()
 {
    // BEGIN BLOCK
    int i;
-   int j;
    i = 1;
+   int j;
    i++;
    {
       // BEGIN BLOCK

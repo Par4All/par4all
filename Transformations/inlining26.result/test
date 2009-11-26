@@ -20,7 +20,9 @@ int gradient(void)
 }
 int gradient(void)
 {
+   //PIPS generated variable
    int _return0;
+   //PIPS generated variable
    int _return1;
    {
       int i;
