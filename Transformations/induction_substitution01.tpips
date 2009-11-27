@@ -1,0 +1,35 @@
+delete induction_substitution01
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create induction_substitution01 induction_substitution01.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+echo
+echo Initial code for "induction01"
+echo
+
+display PRINTED_FILE[induction01]
+
+
+# necessary because stupid tpips won't produce the same transformer when lauched
+# tpips my_script.tpips
+# and
+# tpips < my_script.tpips
+apply REFINE_TRANSFORMERS[induction01]
+
+# setenv INDUCTION_SUBSTITUTION_DEBUG_LEVEL 6
+apply INDUCTION_SUBSTITUTION[induction01]
+
+
+echo
+echo Code for "induction01" after induction substitution
+echo
+display PRINTED_FILE[induction01]
+
+
+close induction_substitution01
+delete induction_substitution01
