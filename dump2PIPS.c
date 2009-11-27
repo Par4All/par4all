@@ -4,6 +4,7 @@
  * - if the function is a translation from one RI to the other it will be:
  * 		gfc2pips_<type_of_the_source_entity>2<type_of_the_target_entity>(arguments)
  */
+
 #include "dump2PIPS.h"
 
 
@@ -58,7 +59,7 @@ int fcopy(char* old,char* new){
 }
 
 //an enum to know what kind of main entity we are dealing with
-typedef enum main_entity_type{MET_PROG,MET_SUB,MET_FUNC,MET_MOD,MET_BLOCK} main_entity_type;
+typedef enum gfc2pips_main_entity_type{MET_PROG,MET_SUB,MET_FUNC,MET_MOD,MET_BLOCK} gfc2pips_main_entity_type;
 entity gfc2pips_main_entity = entity_undefined;
 
 /*
@@ -101,15 +102,14 @@ void gfc2pips_namespace(gfc_namespace* ns){
 	 * according to the type we have to create different values as parameters for the creation of the PIPS entity by:
 	 * MakeCurrentFunction(type_undefined, TK_PROGRAM , CurrentPackage, NULL);
 	 */
-	main_entity_type bloc_token = -1;
+	gfc2pips_main_entity_type bloc_token = -1;
 	////type returned
 	type bloc_type = make_type(is_type_void, UU);
 	string full_name = concatenate(TOP_LEVEL_MODULE_NAME, MODULE_SEP_STRING, MAIN_PREFIX, ns->proc_name->name, NULL);
 	gfc2pips_main_entity = gen_find_tabulated(full_name, entity_domain);
 	if(gfc2pips_main_entity!=entity_undefined){
-		//we have defined this entity already
+		//we have defined this entity already. Nothing to do ?
 	}
-
 	if( root_sym->attr.is_main_program ){
 		pips_debug(3, "main program founded %s\n",ns->proc_name->name);
 		gfc2pips_main_entity = make_empty_program(str2upper((ns->proc_name->name)));
@@ -235,9 +235,21 @@ void gfc2pips_namespace(gfc_namespace* ns){
 	while(commons_p){
 		gfc_symtree *st = (gfc_symtree*)commons_p->car.e;
 		pips_debug(3, "common founded: /%s/\n",st->name);
-		entity com = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, st->name);
+		entity com = FindOrCreateEntity(
+			TOP_LEVEL_MODULE_NAME,
+			strdup(concatenate(COMMON_PREFIX,st->name, NULL))
+		);
 		//com = make_common_entity(com);
 		entity_type(com) = make_type(is_type_area, make_area(0, NIL));
+		/*entity_type(com) = make_type(
+			is_type_variable,
+			make_variable(
+				make_basic_overloaded(),//make_basic(is_basic_string, MakeValueUnknown()),
+				NIL,
+				NIL
+			)
+		);*/
+
 		entity_storage(com) = make_storage(
 			is_storage_ram,
 			make_ram(get_current_module_entity(),StaticArea, 0, NIL)
@@ -246,7 +258,7 @@ void gfc2pips_namespace(gfc_namespace* ns){
 		AddEntityToDeclarations(com, get_current_module_entity());
 		commons_p->car.e = com;
 		gfc_symbol *s = st->n.common->head;
-		int indice_common = stack_offset;
+		int offset_common = stack_offset;
 		while(s){
 			//faire une fonction récursive qui permet de déclarer à l'envers la liste des élements du common ?
 			pips_debug(4, "element in common founded: %s\n",s->name);
@@ -256,13 +268,14 @@ void gfc2pips_namespace(gfc_namespace* ns){
 				make_ram(
 					get_current_module_entity(),
 					com,
-					indice_common,
+					offset_common,
 				    NIL
 			   )
 			);
-			int size;SizeOfArray(in_common_entity,&size);
+			int size;
+			SizeOfArray(in_common_entity,&size);
 			//size = gfc2pips_symbol2sizeArray(s) * gfc2pips_symbol2size(s);
-			indice_common += size;
+			offset_common += size;
 			area_layout(type_area(entity_type(com))) = gen_nconc(area_layout(type_area(entity_type(com))), CONS(ENTITY, in_common_entity, NIL));
 			s = s->common_next;
 		}
@@ -303,7 +316,7 @@ void gfc2pips_namespace(gfc_namespace* ns){
 		//complete_list_of_entities = gen_once(CAR(variables_p).e,complete_list_of_entities);
 		POP(variables_p);
 	}*/
-	commons_p = commons;
+	commons_p = commons;// = NULL;/// = NULL est artificiel pour ne plus les dump
 	//complete_list_of_entities_p = gen_concatenate( commons_p, complete_list_of_entities_p );
 	complete_list_of_entities_p = gen_union( commons_p, complete_list_of_entities_p );
 	/*while(commons_p){
@@ -681,6 +694,7 @@ newgen_list gfc2pips_vars_(gfc_namespace *ns,newgen_list variables_p){
 			entity_type((entity)variables->car.e) = Type;
 			entity_initial((entity)variables->car.e) = Value;//make_value(is_value_code, make_code(NULL, strdup(""), make_sequence(NIL),NIL));
 			if(current_symtree->n.sym->attr.dummy){
+				pips_debug(9,"formal parameter \"%s\" put in FORMAL\n",current_symtree->n.sym->name);
 				//we have a formal parameter (argument of the function/subroutine)
 				entity_storage((entity)variables->car.e) = make_storage_formal(
 					make_formal(
@@ -688,7 +702,8 @@ newgen_list gfc2pips_vars_(gfc_namespace *ns,newgen_list variables_p){
 						i
 					)
 				);
-			}else if( current_symtree->n.sym->attr.flavor==FL_PARAMETER ){//fprintf(stderr,"ROM storage for %s\n",current_symtree->n.sym->name);
+			}else if( current_symtree->n.sym->attr.flavor==FL_PARAMETER ){
+				pips_debug(9,"Variable \"%s\" (PARAMETER) put in ROM\n",current_symtree->n.sym->name);
 				//we have a parameter, we rewrite some attributes of the entity
 				entity_type((entity)variables->car.e) = make_type(is_type_functional, make_functional(NIL, entity_type((entity)variables->car.e)));
 				entity_initial((entity)variables->car.e) = MakeValueSymbolic(gfc2pips_expr2expression(current_symtree->n.sym->value));
@@ -698,13 +713,13 @@ newgen_list gfc2pips_vars_(gfc_namespace *ns,newgen_list variables_p){
 				entity area = entity_undefined;
 				if(gfc2pips_test_save(NULL, current_symtree)){
 					area = FindOrCreateEntity(CurrentPackage,STATIC_AREA_LOCAL_NAME);
-					pips_debug(9,"Variable \"%s\" put in \"%s\"\n",entity_local_name((entity)variables->car.e),STATIC_AREA_LOCAL_NAME);
+					pips_debug(9,"Variable \"%s\" put in RAM \"%s\"\n",entity_local_name((entity)variables->car.e),STATIC_AREA_LOCAL_NAME);
 					//set_common_to_size(StaticArea,CurrentOffsetOfArea(StaticArea,(entity)variables->car.e));
 				}else{
 					area = current_symtree->n.sym->value ? DynamicArea:StackArea;
 					pips_debug(
 						9,
-						"Variable \"%s\" put in \"%s\"\n",
+						"Variable \"%s\" put in RAM \"%s\"\n",
 						entity_local_name((entity)variables->car.e),
 						current_symtree->n.sym->value ? DYNAMIC_AREA_LOCAL_NAME:STACK_AREA_LOCAL_NAME
 					);
@@ -908,6 +923,7 @@ entity gfc2pips_symbol2entity(gfc_symbol* s){
 		if(entity_initial(e)==value_undefined) entity_initial(e) = MakeValueUnknown();
 		if(entity_type(e)==type_undefined) entity_type(e) = gfc2pips_symbol2type(s);
 		//if(entity_storage(e)==storage_undefined) entity_storage(e) = MakeStorageRom();
+		return e;
 	}
 	if(module){
 		entity_initial(e) = make_value(
@@ -1181,11 +1197,17 @@ newgen_list gfc2pips_array_ref2indices(gfc_array_ref *ar){
 	newgen_list indices=NULL,indices_p=NULL;
 
 	if(!ar->start[0])return NULL;
+	//expression ex = gfc2pips_mkRangeExpression(ar->start[0],ar->end[0]);
+	//reference_entity(syntax_reference(expression_syntax(ex))) = NULL;
+	//indices_p = CONS( EXPRESSION, gfc2pips_expr2expression(ar->end[0]), indices_p );
 	indices_p = CONS( EXPRESSION, gfc2pips_expr2expression(ar->start[0]), NIL );
+	//indices_p = CONS( EXPRESSION, gfc2pips_mkRangeExpression(ar->start[0],ar->end[0]), NIL );
 	indices=indices_p;
 	for( i=1 ; ar->start[i] ;i++){
+		//indices_p = CONS( EXPRESSION, gfc2pips_expr2expression(ar->end[i]), indices_p );
 		CDR(indices_p) = CONS( EXPRESSION, gfc2pips_expr2expression(ar->start[i]), NIL );
 		indices_p = CDR(indices_p);
+		//indices_p = CONS( EXPRESSION, gfc2pips_mkRangeExpression(ar->start[i],ar->end[i]), indices_p );
 	}
 	return indices;
 	/*
@@ -1247,6 +1269,39 @@ newgen_list gfc2pips_array_ref2indices(gfc_array_ref *ar){
 */
 	return NULL;
 }
+bool gfc2pips_there_is_a_range(gfc_array_ref *ar){
+	int i;
+	if( !ar || !ar->start || !ar->start[0] ) return false;
+	for( i=0 ; ar->start[i] ;i++){
+		if(ar->end[i])return true;
+	}
+	return false;
+}
+expression gfc2pips_mkRangeExpression(entity ent, gfc_array_ref *ar){
+	expression ref = make_expression(
+		make_syntax(is_syntax_reference,
+			make_reference(ent, NULL)
+		),
+	    normalized_undefined
+	);
+
+	entity substr = entity_intrinsic(SUBSTRING_FUNCTION_NAME);
+	newgen_list lexpr = NULL;
+	int i;
+	for( i=0 ; ar->start[i] ;i++){
+		lexpr = CONS(EXPRESSION,
+			ar->end[i] ? gfc2pips_expr2expression(ar->end[i]) : MakeNullaryCall(CreateIntrinsic(UNBOUNDED_DIMENSION_NAME)),
+			CONS(EXPRESSION,
+				gfc2pips_expr2expression(ar->start[i]),
+				lexpr
+			)
+		);
+	}
+	lexpr = CONS(EXPRESSION, ref, gen_nreverse(lexpr) );
+	syntax s = make_syntax(is_syntax_call, make_call(substr, lexpr));
+	return make_expression( s, normalized_undefined );
+}
+
 
 //this is to know if we have to add a continue statement just after the loop statement for (exit/break)
 bool gfc2pips_last_statement_is_loop = false;
@@ -2373,8 +2428,36 @@ instruction gfc2pips_code2instruction_(gfc_code* c){
 	    	if(c->block->next->expr == NULL){
 	    		//check we have a DO
 	    	}
-			for (c = c->block->next; c && c->expr ; c = c->next){
-				if(c->expr){
+			for (c = c->block->next; c ; c = c->next){
+				if( c->op==EXEC_DO ){
+					fprintf(stderr,"we have a loop for a variable\n");
+
+					// add the range to list_of_arguments
+					//construction of the range expression
+					expression ex = gfc2pips_expr2expression(c->ext.iterator->var);
+
+					fprintf(stderr, "%d\n", syntax_tag(expression_syntax(ex)) );
+					//reference ref = make_reference();
+					//syntax synt = make_syntax(is_syntax_reference,ref);
+					//syntax MakeAtom(entity e, newgen_list indices, expression fc, expression lc, int HasParenthesis);
+					/*syntax synt = MakeAtom(
+						gfc2pips_expr2entity(c->ext.iterator->var),
+						CONS(EXPRESSION,ex,NULL),
+						gfc2pips_expr2expression(c->ext.iterator->start),
+						gfc2pips_expr2expression(c->ext.iterator->end),
+						1
+					);
+					//expression make_expression(<syntax>, normalized_undefined);*/
+					//ex = make_expression(synt, normalized_undefined);
+
+					if(list_of_arguments_p){
+						CDR(list_of_arguments_p) = CONS(EXPRESSION,ex,NULL);
+						list_of_arguments_p = CDR(list_of_arguments_p);
+					}else{
+						list_of_arguments = list_of_arguments_p = CONS(EXPRESSION,ex,NULL);
+					}
+
+				}else if(c->op==EXEC_TRANSFER){
 					expression ex = gfc2pips_expr2expression(c->expr);
 					if( ex!=entity_undefined && ex!=NULL ){
 						if(list_of_arguments_p){
@@ -2387,6 +2470,7 @@ instruction gfc2pips_code2instruction_(gfc_code* c){
 				}//else{fprintf(stderr,"boum2\n");}
 				//fprintf(stderr,"boum3\n");
 			}
+
 			list_of_arguments = gen_nreverse(list_of_arguments);
 			entity_initial(e) = make_value( is_value_intrinsic, e );
 			entity_type(e) = make_type(is_type_functional, make_functional(NIL, MakeOverloadedResult()) );
@@ -2458,6 +2542,7 @@ instruction gfc2pips_code2instruction_(gfc_code* c){
 					lci = gfc2pips_exprIO2("EOR=", d->ext.dt->end->value, lci );
 				}
 			}
+
 
 			//we have to have a peer number of elements in the list, so we need to insert an element between each and every elements of our arguments list
 			newgen_list pc,lr;
@@ -2582,13 +2667,14 @@ instruction gfc2pips_code2instruction_(gfc_code* c){
 */
 
 	    }break;
-/*
-	    case EXEC_TRANSFER:
+	    //this should be never dumped car only used in a WRITE block of gfc
+	    /*case EXEC_TRANSFER:
 	      fputs ("TRANSFER ", dumpfile);
 	      show_expr (c->expr);
-	      break;
+	      break;*/
 
-	    case EXEC_DT_END:
+
+/*	    case EXEC_DT_END:
 	      fputs ("DT_END", dumpfile);
 	      dt = c->ext.dt;
 
@@ -2682,6 +2768,7 @@ instruction gfc2pips_symbol2data_instruction(gfc_symbol *sym){
 		empty_comments
 	);
 	*/
+	pips_debug(3,"%s\n",sym->name);
 	entity e1 = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, DATA_LIST_FUNCTION_NAME);
 	entity_initial(e1) = MakeValueUnknown();
 
@@ -2701,30 +2788,47 @@ instruction gfc2pips_symbol2data_instruction(gfc_symbol *sym){
 	//list of variables used int the data statement
 	newgen_list init = CONS( EXPRESSION, make_call_expression( e1, args1 ), NULL );
 	//list of values
+	/*
+	 * data (z(i), i = min_off, max_off) /1+max_off-min_off*val/
+	 * gfc doesn't now the range between min_off and max_off it just state, one by one the value
+	 * how to know the range ? do we have to ?
+	 ** data z(offset+1) / value /
+	 * ? possible ?
+	 */
 	newgen_list values = NULL;
 	if(sym->value && sym->value->expr_type==EXPR_ARRAY){
 		gfc_constructor *constr = sym->value->value.constructor;
 		for (; constr; constr = constr->next){
-			values = CONS( EXPRESSION, gfc2pips_expr2expression(constr->expr), values );
-			/*if (constr->iterator == NULL){
-				show_expr (c->expr);
-			}else{
-				fputc ('(', dumpfile);
-				show_expr (c->expr);
-				fputc (' ', dumpfile);
-				show_expr (c->iterator->var);
-				fputc ('=', dumpfile);
-				show_expr (c->iterator->start);
-				fputc (',', dumpfile);
-				show_expr (c->iterator->end);
-				fputc (',', dumpfile);
-				show_expr (c->iterator->step);
+			pips_debug(
+				9,
+				"offset: %d\trepeat: %d\n",
+				mpz_get_si(constr->n.offset),
+				mpz_get_si(constr->repeat)
+			);
+			//if(constr->next)fprintf(stderr,"%d %d\n",constr->expr,constr->next->expr);//always different
 
-				fputc (')', dumpfile);
+
+			values = CONS( EXPRESSION, gfc2pips_expr2expression(constr->expr), values );
+			/*fprintf(stderr,"constr->iterator: %d\n",constr->iterator);
+			if (constr->iterator == NULL){
+				show_expr (constr->expr);
+			}else{
+				fputc ('(', stderr);
+				show_expr (constr->expr);
+				fputc (' ', stderr);
+				show_expr (constr->iterator->var);
+				fputc ('=', stderr);
+				show_expr (constr->iterator->start);
+				fputc (',', stderr);
+				show_expr (constr->iterator->end);
+				fputc (',', stderr);
+				show_expr (constr->iterator->step);
+
+				fputc (')', stderr);
 			}
 
-			if (c->next != NULL)
-			fputs (" , ", dumpfile);*/
+			//if (c->next != NULL)
+			//fputs (" , ", dumpfile);*/
 		}
 		values = gen_nreverse(values);
 	}else{
@@ -2878,8 +2982,15 @@ expression gfc2pips_expr2expression(gfc_expr *expr){
 			//use ri-util only functions
 		    //add array recognition (multi-dimension variable)
 		    //créer une liste de tous les indices et la balancer en deuxième arg  gen_nconc($1, CONS(EXPRESSION, $3, NIL))
-			newgen_list ref = NULL;
+			newgen_list ref_list = NULL;
 			syntax s = syntax_undefined;
+
+			entity ent_ref = FindOrCreateEntity(CurrentPackage, str2upper(strdup(expr->symtree->n.sym->name)));
+			entity_type(ent_ref) = gfc2pips_symbol2type(expr->symtree->n.sym);
+			if(entity_storage(ent_ref)==storage_undefined)
+				entity_storage(ent_ref) = MakeStorageRom();//fprintf(stderr,"expr2expression ROM %s\n",expr->symtree->n.sym->name);
+			entity_initial(ent_ref) = MakeValueUnknown();
+
 			if(expr->ref){
 				/*//assign statement
 				$$ = MakeAssignInst(
@@ -2900,19 +3011,25 @@ expression gfc2pips_expr2expression(gfc_expr *expr){
 				while(r){
 					//fprintf(stderr,"^^^^^^^^^^^^^^^^^^^^^\n");
 					if(r->type==REF_ARRAY){
-						ref = gfc2pips_array_ref2indices(&r->u.ar);
+						pips_debug(9,"ref array\n");
+						if( gfc2pips_there_is_a_range(&r->u.ar) ){
+							pips_debug(9,"We have a range\n");
+							/*
+							 * here we have something like x( a:b ) or y( c:d , e:f )
+							 * it is not implemented in PIPS at all, to emulate the substring syntax,
+							 * we create a list where each pair of expression represent end/start values
+							 */
+							return gfc2pips_mkRangeExpression(ent_ref, &r->u.ar);
+						}
+						ref_list = gfc2pips_array_ref2indices(&r->u.ar);
 						break;
 					/*}else if(r->type==REF_COMPONENT){
 						fprintf (dumpfile, " %% %s", p->u.c.component->name);
 					*/}else if(r->type==REF_SUBSTRING){
-						entity ent = FindOrCreateEntity(CurrentPackage,str2upper(strdup(expr->symtree->n.sym->name)));
-						entity_type(ent) = gfc2pips_symbol2type(expr->symtree->n.sym);
-						if(entity_storage(ent)==storage_undefined)
-							entity_storage(ent) = MakeStorageRom();fprintf(stderr,"expr2expression ROM %s\n",expr->symtree->n.sym->name);
-						entity_initial(ent) = MakeValueUnknown();
+						pips_debug(9,"ref substring\n");
 						expression ref = make_expression(
 							make_syntax(is_syntax_reference,
-								make_reference(ent, NULL)
+								make_reference(ent_ref, NULL)
 							),
 						    normalized_undefined
 						);
@@ -2935,16 +3052,10 @@ expression gfc2pips_expr2expression(gfc_expr *expr){
 					r=r->next;
 				}
 			}
-			entity ent_ref = FindOrCreateEntity(CurrentPackage, str2upper(strdup(expr->symtree->n.sym->name)));
-			entity_type(ent_ref) = gfc2pips_symbol2type(expr->symtree->n.sym);
-			if(entity_storage(ent_ref)==storage_undefined){
-				entity_storage(ent_ref) = MakeStorageRom();//fprintf(stderr,"expr2expression ROM %s\n",expr->symtree->n.sym->name);
-			}
-			entity_initial(ent_ref) = MakeValueUnknown();
 			s = make_syntax_reference(
 				make_reference(
 					ent_ref,
-					ref
+					ref_list
 				)
 			);
 
@@ -3194,7 +3305,7 @@ void gfc2pips_computeAdressesStack(){
 /**
  * @brief compute the addresses of the entities declared in the given entity
  */
-void gfc2pips_computeAdressesOfArea( entity _area ){//pb induit dans cette fonction, on se retrouve au dernier élément si on y refait appel
+int gfc2pips_computeAdressesOfArea( entity _area ){//pb induit dans cette fonction, on se retrouve au dernier élément si on y refait appel
 	//compute each and every addresses of the entities in this area. Doesn't handle equivalences.
 	if(
 		!_area
@@ -3208,7 +3319,7 @@ void gfc2pips_computeAdressesOfArea( entity _area ){//pb induit dans cette fonct
 	int offset = 0;
 	newgen_list _pcv=code_declarations(EntityCode(get_current_module_entity()));
 	newgen_list pcv = gen_copy_seq(_pcv);
-	pips_debug(9,"Start \t\t%s %d\n",entity_local_name(_area),gen_length(pcv));
+	pips_debug(9,"Start \t\t%s %d element(s) to check\n",entity_local_name(_area),gen_length(pcv));
 	for( pcv=gen_nreverse(pcv) ; pcv != NIL; pcv = CDR(pcv) ) {
 		entity e = ENTITY(CAR(pcv));//ifdebug(1)fprintf(stderr,"%s\n",entity_local_name(e));
 		if(
@@ -3218,18 +3329,26 @@ void gfc2pips_computeAdressesOfArea( entity _area ){//pb induit dans cette fonct
 		){
 			pips_debug(9,"Compute address of %s - offset: %d\n",entity_name(e), offset);
 
-			ram_offset(storage_ram(entity_storage(e))) = offset;
+			if(type_tag(entity_type(e))!=is_type_variable){
+				pips_user_warning("We don't know how to do that - skip %s\n",entity_local_name(e));
+				//size = gfc2pips_computeAdressesOfArea(e);
+			}else{
+				ram_offset(storage_ram(entity_storage(e))) = offset;
 
-			area ca = type_area(entity_type(_area));
-			area_layout(ca) = gen_nconc(area_layout(ca), CONS(ENTITY, e, NIL));
+				area ca = type_area(entity_type(_area));
+				area_layout(ca) = gen_nconc(area_layout(ca), CONS(ENTITY, e, NIL));
 
-			int size;SizeOfArray(e,&size);
-			offset += size;
+				int size;
+				//on triche ?
+				SizeOfArray(e,&size);
+				offset += size;
+			}
 		}
 	}
 
 	set_common_to_size( _area, offset );
 	pips_debug( 9, "offset: %d\t\tEnd %s\n", offset, entity_local_name(_area) );
+	return offset;
 }
 
 void gfc2pips_handleEquiv(gfc_equiv *eq){

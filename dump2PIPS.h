@@ -162,6 +162,11 @@ type gfc2pips_symbol2type(gfc_symbol *s);
 int gfc2pips_symbol2size(gfc_symbol *s);
 int gfc2pips_symbol2sizeArray(gfc_symbol *s);
 
+newgen_list gfc2pips_array_ref2indices(gfc_array_ref *ar);
+bool gfc2pips_there_is_a_range(gfc_array_ref *ar);
+expression gfc2pips_mkRangeExpression(entity ent, gfc_array_ref *ar);
+
+
 instruction gfc2pips_code2instruction__TOP(gfc_namespace *ns, gfc_code* c);
 instruction gfc2pips_code2instruction(gfc_code* c, bool force_sequence);
 instruction gfc2pips_code2instruction_(gfc_code* c);
@@ -189,7 +194,7 @@ void gfc2pips_computeAdressesStatic();
 void gfc2pips_computeAdressesDynamic();
 void gfc2pips_computeAdressesHeap();
 void gfc2pips_computeAdressesStack();
-void gfc2pips_computeAdressesOfArea( entity _area );
+int gfc2pips_computeAdressesOfArea( entity _area );
 
 newgen_list *gfc2pips_list_of_all_modules;
 
