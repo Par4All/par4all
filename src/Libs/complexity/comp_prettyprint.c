@@ -161,7 +161,7 @@ char *module_name;
     mod_stat = get_current_module_statement();
     set_current_module_entity(module_name_to_entity(module_name) );
     mod = get_current_module_entity();
-  
+
     if(is_user_view) {
 	user_stat =  (statement)
 	    db_get_memory_resource(DBR_PARSED_CODE, module_name, TRUE);
@@ -170,7 +170,7 @@ char *module_name;
 	nts = build_number_to_statement(nts, mod_stat);
     }
 
-  
+
     set_complexity_map( (statement_mapping)
 	db_get_memory_resource(DBR_COMPLEXITIES, module_name, TRUE));
 
@@ -208,9 +208,11 @@ entity module;
     char *s;
     text t = make_text(NIL);
 
-    if (nblanks < 1) 
+    if (nblanks < 1)
 	nblanks = 1;
-    asprintf(&s, "C    %*s%s (SUMMARY)\n", nblanks, "", r);
+    asprintf(&s, "%s    %*s%s (SUMMARY)\n",
+	     fortran_module_p(module)? "C" : "//",
+	     nblanks, "", r);
     ADD_SENTENCE_TO_TEXT(t, make_sentence(is_sentence_formatted,
 					  s));
 
