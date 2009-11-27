@@ -3,7 +3,7 @@
 
 int freia_dup_08(freia_data2d *i)
 {
-   int max1,  max2,  x,  y;                                             /*0004*/
+   int max1, max2, x, y;                                                /*0004*/
    // same measure performed twice
    freia_aipo_global_max(i, &max1);                                     /*0006*/
    freia_aipo_global_max_coord(i, &max2, &x, &y);                       /*0007*/
@@ -119,7 +119,7 @@ freia_status freia_dup_08_helper_0_0_0(freia_data2d * i0, int32_t * red0, int32_
 
 int freia_dup_08(freia_data2d *i)
 {
-   int max1,  max2,  x,  y;                                             /*0004*/
+   int max1, max2, x, y;                                                /*0004*/
    // same measure performed twice
    freia_dup_08_helper_0_0_0(i, &max1, &max2, &x, &y);                  /*0006*/
    return max1+max2+x+y;                                                /*0008*/

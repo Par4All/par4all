@@ -9,7 +9,7 @@ freia_status freia_scalar_05(freia_data2d *o, freia_data2d *i, uint32_t *k)
    
    
    freia_data2d *X = freia_common_create_data(16, 128, 128), *tB = freia_common_create_data(16, 128, 128), *tC = freia_common_create_data(16, 128, 128), *tC2 = freia_common_create_data(16, 128, 128), *tD = freia_common_create_data(16, 128, 128);       /*0010*/
-   int sA,  sB,  sC;                                                    /*0011*/
+   int sA, sB, sC;                                                      /*0011*/
    
    // look for order issues when reusing a temporary image
    freia_aipo_global_max(i, &sA);                                       /*0014*/
@@ -508,7 +508,7 @@ freia_status freia_scalar_05(freia_data2d *o, freia_data2d *i, uint32_t *k)
    
    
    freia_data2d *X = freia_common_create_data(16, 128, 128), *tC = freia_common_create_data(16, 128, 128), *tC2 = freia_common_create_data(16, 128, 128);         /*0010*/
-   int sA,  sB,  sC;                                                    /*0011*/
+   int sA, sB, sC;                                                      /*0011*/
    
    // look for order issues when reusing a temporary image
    freia_scalar_05_helper_0_0_0(X, i, &sA, k, &sB);                     /*0014*/

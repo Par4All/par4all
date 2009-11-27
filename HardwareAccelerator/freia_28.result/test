@@ -10,7 +10,7 @@ freia_status freia_28(freia_data2d *o, freia_data2d *i, uint32_t *k)
    
    
    freia_data2d *X0 = freia_common_create_data(16, 128, 128), *X1 = freia_common_create_data(16, 128, 128), *tB = freia_common_create_data(16, 128, 128), *tC = freia_common_create_data(16, 128, 128), *tC2 = freia_common_create_data(16, 128, 128), *tD = freia_common_create_data(16, 128, 128);     /*0011*/
-   int sA,  sB,  sC;                                                    /*0012*/
+   int sA, sB, sC;                                                      /*0012*/
    
    // complex dag for split
    freia_aipo_global_max(i, &sA);                                       /*0015*/
@@ -533,7 +533,7 @@ freia_status freia_28(freia_data2d *o, freia_data2d *i, uint32_t *k)
    
    
    freia_data2d *X0 = freia_common_create_data(16, 128, 128), *X1 = freia_common_create_data(16, 128, 128), *tC = freia_common_create_data(16, 128, 128), *tC2 = freia_common_create_data(16, 128, 128);       /*0011*/
-   int sA,  sB,  sC;                                                    /*0012*/
+   int sA, sB, sC;                                                      /*0012*/
    
    // complex dag for split
    freia_28_helper_0_0_0(X0, i, &sA, k, &sB);                           /*0015*/
