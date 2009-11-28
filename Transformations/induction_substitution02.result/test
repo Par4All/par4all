@@ -24,7 +24,7 @@ void induction02(double A[SIZE], double B[SIZE][SIZE])
       k = i;
       for(j = 0; j <= SIZE-1; j += 1) {
          k++;
-         A[-1*j+-1*i+-1] = B[j-(-1*j+-1*i+-1)][-1*j+-1*i+-1]+A[-1*j+-1*i+-1];
+         A[-j+(-i)+-1] = B[j-((-j)+(-i)+-1)][-j+(-i)+-1]+A[-j+(-i)+-1];
       }
    }
 }
