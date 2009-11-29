@@ -51,7 +51,7 @@ $(TARGET).h: $(DERIVED_HEADERS) $(DERIVED_CFILES)
 clean: local-clean
 
 local-clean:
-	$(RM) $(DERIVED_CFILES) $(DERIVED_HEADERS)
+	$(RM) $(DERIVED_CFILES) $(DERIVED_HEADERS) cyacc.[ch]
 
 # C parser
 
