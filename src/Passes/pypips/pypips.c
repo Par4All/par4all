@@ -148,7 +148,7 @@ char* info(char * about)
             string m = gen_array_item(modules, i);
             sinfo_size+=strlen(m)+1;
         }
-        sinfo=(char*)calloc(sinfo_size,sizeof(char));
+        sinfo=(char*)calloc(1+sinfo_size,sizeof(char));
         if(!sinfo) fprintf(stderr,"not enough meory to hold all module names\n");
         else {
             for(i=0; i<n; i++)
