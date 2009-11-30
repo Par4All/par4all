@@ -14,11 +14,6 @@ newgen_list gfc2pips_list_of_loops = NULL;
 static int gfc2pips_last_created_label = 95000;
 static int gfc2pips_last_created_label_step = 2;
 
-/*
- * Add initialization at the begining and at the end of the dumping
- * Put information in a table, in the "the_actual_gfc_parser"
- */
-
 
 
 char * str2upper(char s[]){
@@ -62,8 +57,8 @@ int fcopy(char* old,char* new){
 typedef enum gfc2pips_main_entity_type{MET_PROG,MET_SUB,MET_FUNC,MET_MOD,MET_BLOCK} gfc2pips_main_entity_type;
 entity gfc2pips_main_entity = entity_undefined;
 
-/*
- * Dump a namespace
+/**
+ * @brief Dump a namespace
  */
 void gfc2pips_namespace(gfc_namespace* ns){
 	gfc_symtree * current = NULL;
@@ -90,7 +85,7 @@ void gfc2pips_namespace(gfc_namespace* ns){
 
 	//gfc_get_code();
 	gfc2pips_shift_comments();
-	current = getSymtreeByName( ns->proc_name->name, ns->sym_root );
+	current = gfc2pips_getSymtreeByName( ns->proc_name->name, ns->sym_root );
 	message_assert("No current symtree to match the name of the namespace",current);
 	root_sym = current->n.sym;
 
@@ -105,28 +100,46 @@ void gfc2pips_namespace(gfc_namespace* ns){
 	gfc2pips_main_entity_type bloc_token = -1;
 	////type returned
 	type bloc_type = make_type(is_type_void, UU);
-	string full_name = concatenate(TOP_LEVEL_MODULE_NAME, MODULE_SEP_STRING, MAIN_PREFIX, ns->proc_name->name, NULL);
+	string full_name = concatenate(
+		TOP_LEVEL_MODULE_NAME,
+		MODULE_SEP_STRING,
+		root_sym->attr.is_main_program?MAIN_PREFIX:"",
+		ns->proc_name->name,
+		NULL
+	);
 	gfc2pips_main_entity = gen_find_tabulated(full_name, entity_domain);
 	if(gfc2pips_main_entity!=entity_undefined){
-		//we have defined this entity already. Nothing to do ?
+		//we have defined this entity already. Nothing to do ? we need at least to know the bloc_token
+		//force temporarily the type for the set_curren_module_entity(<entity>)
+		entity_initial(gfc2pips_main_entity) = make_value(
+			is_value_code,
+			make_code(
+				NIL, strdup(""), make_sequence(NIL),NIL, make_language_unknown()
+			)
+		);
+
+		//value v = entity_initial(gfc2pips_main_entity);
+		//fprintf(stderr,"value_tag: %d %d\n",is_value_code,value_tag(v));
+		//value_tag(v) = is_value_code;
+	    //value_code_p(v);
 	}
 	if( root_sym->attr.is_main_program ){
-		pips_debug(3, "main program founded %s\n",ns->proc_name->name);
+		pips_debug(3, "main program %s\n",ns->proc_name->name);
 		gfc2pips_main_entity = make_empty_program(str2upper((ns->proc_name->name)));
 		//message_assert("Main entity not created !\n",gfc2pips_main_entity!=entity_undefined);
-		bloc_token=MET_PROG;
+		bloc_token = MET_PROG;
 	}else if( root_sym->attr.subroutine ){
-		pips_debug(3, "subroutine founded %s\n",ns->proc_name->name);
+		pips_debug(3, "subroutine %s\n",ns->proc_name->name);
 		gfc2pips_main_entity = make_empty_subroutine(str2upper((ns->proc_name->name)));
 		bloc_token = MET_SUB;
 	}else if( root_sym->attr.function ){
-		pips_debug(3, "function founded %s\n",ns->proc_name->name);
+		pips_debug(3, "function %s\n",ns->proc_name->name);
 		gfc2pips_main_entity = make_empty_function(str2upper(ns->proc_name->name),gfc2pips_symbol2type(root_sym));
 		//gfc2pips_main_entity = FindOrCreateEntity(CurrentPackage,ns->proc_name->name);
 		bloc_type = gfc2pips_symbol2type(root_sym);
 		bloc_token = MET_FUNC;
 	}else if(root_sym->attr.flavor == FL_BLOCK_DATA){
-		pips_debug(3, "block data founded \n");
+		pips_debug(3, "block data \n");
 		gfc2pips_main_entity = make_empty_blockdata(str2upper((ns->proc_name->name)));
 		bloc_token = MET_BLOCK;
 	}else{
@@ -191,7 +204,7 @@ void gfc2pips_namespace(gfc_namespace* ns){
 	////type of entity we are creating : a function (except maybe for module ?
 	////a functional type is made of a list of parameters and the type returned
 	if(bloc_token != MET_BLOCK){
-		entity_type(gfc2pips_main_entity) = make_type(is_type_functional, make_functional(parameters, bloc_type));
+		entity_type( gfc2pips_main_entity ) = make_type(is_type_functional, make_functional(parameters, bloc_type));
 	}
 
 	/*struct _newgen_struct_entity_ {
@@ -224,7 +237,8 @@ void gfc2pips_namespace(gfc_namespace* ns){
 
 	//can it be removed ?
 	//common_size_map = hash_table_make(hash_pointer, 0);
-	set_current_module_entity(gfc2pips_main_entity);
+
+	set_current_module_entity( gfc2pips_main_entity );
 	gfc2pips_initAreas();//Even if it is initialized by the defaults functions of PIPS, it is not the way we want it to be
 
 
@@ -502,8 +516,8 @@ void gfc2pips_namespace(gfc_namespace* ns){
 
 
 
-/*
- * Retrieve the names of every argument of the function, if exists
+/**
+ * @brief Retrieve the list of names of every argument of the function, if any
  *///pb here in the creation of the parameters
 newgen_list gfc2pips_args(gfc_namespace* ns){
 	gfc_symtree * current = NULL;
@@ -514,13 +528,13 @@ newgen_list gfc2pips_args(gfc_namespace* ns){
 
 	if( ns && ns->proc_name ){
 
-		current = getSymtreeByName( ns->proc_name->name, ns->sym_root );
+		current = gfc2pips_getSymtreeByName( ns->proc_name->name, ns->sym_root );
 		if( current && current->n.sym ){
 			if (current->n.sym->formal){
 				formal = current->n.sym->formal;
 				if(formal){
 					e = gfc2pips_symbol2entity(
-						getSymtreeByName(
+						gfc2pips_getSymtreeByName(
 							str2upper(formal->sym->name),
 							ns->sym_root
 						)->n.sym
@@ -532,7 +546,7 @@ newgen_list gfc2pips_args(gfc_namespace* ns){
 					while(formal){
 						if (formal->sym != NULL){
 							e = gfc2pips_symbol2entity(
-								getSymtreeByName(
+								gfc2pips_getSymtreeByName(
 									str2upper(formal->sym->name),
 									ns->sym_root
 								)->n.sym
@@ -552,10 +566,10 @@ newgen_list gfc2pips_args(gfc_namespace* ns){
 	return args_list_p;
 }
 
-/*
- * Look for a specific symbol in a tree
+/**
+ * @brief Look for a specific symbol in a tree
  */
-gfc_symtree* getSymtreeByName (char* name, gfc_symtree *st){
+gfc_symtree* gfc2pips_getSymtreeByName (char* name, gfc_symtree *st){
   gfc_symtree *return_value = NULL;
   if(!name) return NULL;
 
@@ -577,18 +591,18 @@ gfc_symtree* getSymtreeByName (char* name, gfc_symtree *st){
 	  pips_debug(10, "symbol %s founded\n",name);
 	  return st;
   }
-  return_value = getSymtreeByName (name, st->left  );
+  return_value = gfc2pips_getSymtreeByName (name, st->left  );
 
   if( return_value != NULL) return return_value;
-  return_value = getSymtreeByName (name, st->right  );
+  return_value = gfc2pips_getSymtreeByName (name, st->right  );
   if(return_value != NULL) return return_value;
 
   //fprintf(stderr,"NULL\n");
   return NULL;
 }
 
-/*
- * Extract every and each variable from a namespace
+/**
+ * @brief Extract every and each variable from a namespace
  */
 newgen_list gfc2pips_vars(gfc_namespace *ns){
 	if(ns){
@@ -597,8 +611,8 @@ newgen_list gfc2pips_vars(gfc_namespace *ns){
 	return NULL;
 }
 
-/*
- * Convert the list of gfc symbol into a list of pips entities
+/**
+ * @brief Convert the list of gfc symbols into a list of pips entities with storage, type, everything
  */
 newgen_list gfc2pips_vars_(gfc_namespace *ns,newgen_list variables_p){
 	newgen_list variables = NULL;
@@ -750,6 +764,9 @@ newgen_list gfc2pips_vars_(gfc_namespace *ns,newgen_list variables_p){
 	return variables;
 }
 
+/**
+ * @brief build a list of externals entities
+ */
 newgen_list gfc2pips_get_extern_entities(gfc_namespace *ns){
 	newgen_list list_of_extern,list_of_extern_p;
 	list_of_extern_p = list_of_extern = getSymbolBy(ns,ns->sym_root,gfc2pips_test_extern);
@@ -762,14 +779,23 @@ newgen_list gfc2pips_get_extern_entities(gfc_namespace *ns){
 	}
 	return list_of_extern;
 }
+/**
+ * @brief return a list of elements needing a DATA statement
+ */
 newgen_list gfc2pips_get_data_vars(gfc_namespace *ns){
 	return getSymbolBy(ns,ns->sym_root,gfc2pips_test_data);
 }
+/**
+ * @brief return a list of SAVE elements
+ */
 newgen_list gfc2pips_get_save(gfc_namespace *ns){
 	return getSymbolBy(ns,ns->sym_root,gfc2pips_test_save);
 }
 
 
+/**
+ * @brief build a list - if any - of dimension elements from the gfc_symtree given
+ */
 newgen_list gfc2pips_get_list_of_dimensions(gfc_symtree *st){
 	if(st){
 		return gfc2pips_get_list_of_dimensions2(st->n.sym);
@@ -777,6 +803,9 @@ newgen_list gfc2pips_get_list_of_dimensions(gfc_symtree *st){
 		return NULL;
 	}
 }
+/**
+ * @brief build a list - if any - of dimension elements from the gfc_symbol given
+ */
 newgen_list gfc2pips_get_list_of_dimensions2(gfc_symbol *s){
 	newgen_list list_of_dimensions = NULL;
 	int i=0,j=0;
@@ -828,8 +857,8 @@ newgen_list gfc2pips_get_list_of_dimensions2(gfc_symbol *s){
 }
 
 
-/*
- * Look for a set of symbol filtered by a predicate function
+/**
+ * @brief Look for a set of symbols filtered by a predicate function
  */
 newgen_list getSymbolBy(gfc_namespace* ns, gfc_symtree *st, bool (*func)(gfc_namespace*, gfc_symtree *)){
   newgen_list args_list = NULL;
@@ -850,7 +879,10 @@ newgen_list getSymbolBy(gfc_namespace* ns, gfc_symtree *st, bool (*func)(gfc_nam
 /*
  * Predicate functions
  */
-//get variables who are not implicit or are needed to be declared for data statements
+
+/**
+ * @brief get variables who are not implicit or are needed to be declared for data statements hence variable that should be explicit in PIPS
+ */
 bool gfc2pips_test_variable(gfc_namespace* ns, gfc_symtree *st ){
 	if(!st || !st->n.sym) return false;
 	return ( st->n.sym->attr.flavor == FL_VARIABLE || st->n.sym->attr.flavor == FL_PARAMETER )
@@ -863,42 +895,74 @@ bool gfc2pips_test_variable(gfc_namespace* ns, gfc_symtree *st ){
 		&& !st->n.sym->attr.pointer
 		&& !st->n.sym->attr.dummy;
 }
+/*
+ * @brief test if it is a varaible
+ */
 bool gfc2pips_test_variable2(gfc_namespace* ns, gfc_symtree *st ){
 	if(!st || !st->n.sym) return false;
 	return st->n.sym->attr.flavor == EXPR_VARIABLE && !st->n.sym->attr.dummy;
 }
+/**
+ * @brief test if it is an external function
+ */
 bool gfc2pips_test_extern(gfc_namespace* ns, gfc_symtree *st ){
 	if(!st || !st->n.sym) return false;
 	return st->n.sym->attr.external || st->n.sym->attr.proc == PROC_EXTERNAL;
 }
+/**
+ * @brief test if it is a allocatable entity
+ */
 bool gfc2pips_test_allocatable(gfc_namespace *ns, gfc_symtree *st){
 	if(!st || !st->n.sym) return false;
 	return st->n.sym->attr.allocatable;
 }
+/**
+ * @brief test if it is a dummy parameter (formal parameter)
+ */
 bool gfc2pips_test_arg(gfc_namespace* __attribute__ ((__unused__)) ns, gfc_symtree *st ){
 	if(!st || !st->n.sym) return false;
 	return st->n.sym->attr.flavor == EXPR_VARIABLE && st->n.sym->attr.dummy;
 }
+/**
+ * @brief test if there is a value to stock
+ */
 bool gfc2pips_test_data(gfc_namespace* __attribute__ ((__unused__)) ns, gfc_symtree *st ){
 	if(!st || !st->n.sym) return false;
 	return st->n.sym->value && st->n.sym->attr.flavor != FL_PARAMETER;
 }
+/**
+ * @brief test if there is a SAVE to do
+ */
 bool gfc2pips_test_save(gfc_namespace* __attribute__ ((__unused__)) ns, gfc_symtree *st ){
 	if(!st || !st->n.sym) return false;
 	return st->n.sym->attr.save != SAVE_NONE;
 }
+/**
+ * @brief test function to know if it is a common, always true because the tree is completely separated therefore the function using it only create a list
+ */
 bool gfc2pips_get_commons(gfc_namespace* __attribute__ ((__unused__)) ns, gfc_symtree* __attribute__ ((__unused__)) st ){
 	return true;
 }
+/**
+ *
+ */
 bool gfc2pips_test_dimensions(gfc_namespace* __attribute__ ((__unused__)) ns, gfc_symtree* st ){
 	if(!st || !st->n.sym) return false;
 	return st->n.sym->attr.dimension;
 }
 
+/**
+ * @brief translate a gfc symbol to a PIPS entity, check if it is a function, program, subroutine or else
+ */
 entity gfc2pips_symbol2entity(gfc_symbol* s){
 	entity e = entity_undefined;
 	bool module = false;
 	//string CurrentPackage_backup = CurrentPackage;
+
+	string full_name = concatenate(CurrentPackage, MODULE_SEP_STRING, s->name, NULL);
+	bool non_exists = gen_find_tabulated(full_name, entity_domain)==entity_undefined;
+
+	if(!non_exists)return FindOrCreateEntity(CurrentPackage,str2upper(s->name));
 	if( s->attr.flavor==FL_PROGRAM || s->attr.is_main_program ){
 		pips_debug(9, "create main program %s\n",s->name);
 		//CurrentPackage = TOP_LEVEL_MODULE_NAME;
@@ -925,7 +989,7 @@ entity gfc2pips_symbol2entity(gfc_symbol* s){
 		//if(entity_storage(e)==storage_undefined) entity_storage(e) = MakeStorageRom();
 		return e;
 	}
-	if(module){
+	if(module && non_exists){
 		entity_initial(e) = make_value(
 			is_value_code,
 			make_code(NULL,strdup(""),make_sequence(NIL),NULL, make_language_fortran())
@@ -933,6 +997,9 @@ entity gfc2pips_symbol2entity(gfc_symbol* s){
 	}
 	return e;
 }
+/**
+ * @brief translate a gfc symbol to a top-level entity
+ */
 entity gfc2pips_symbol2entity2(gfc_symbol* s){
 	entity e = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,str2upper(s->name));
 	if(entity_initial(e)==value_undefined) entity_initial(e) = MakeValueUnknown();
@@ -940,6 +1007,9 @@ entity gfc2pips_symbol2entity2(gfc_symbol* s){
 	//if(entity_storage(e)==storage_undefined) entity_storage(e) = MakeStorageRom();
 	return e;
 }
+/**
+ * @brief a little bit more eleborated FindOrCreateEntity
+ */
 entity gfc2pips_char2entity(char* package, char* s){
 	entity e = FindOrCreateEntity(package, str2upper(strdup(s)));
 	if(entity_initial(e)==value_undefined) entity_initial(e) = MakeValueUnknown();
@@ -958,10 +1028,16 @@ entity gfc2pips_char2entity(char* package, char* s){
 /*
  * Functions about the translation of something from gfc into a pips "dimension" object
  */
+/**
+ * @brief create a <dimension> from the integer value given
+ */
 dimension gfc2pips_int2dimension(int n){
 	return make_dimension(MakeIntegerConstantExpression("1"),gfc2pips_int2expression(n));
 }
 
+/**
+ * @brief translate a int to an expression
+ */
 expression gfc2pips_int2expression(int n){
 	//return int_expr(n);
 	if(n<0){
@@ -970,46 +1046,76 @@ expression gfc2pips_int2expression(int n){
 		return entity_to_expression(gfc2pips_int_const2entity(n));
 	}
 }
+/**
+ * @brief translate a real to an expression
+ */
 expression gfc2pips_real2expression(double r){
 	return entity_to_expression(gfc2pips_real2entity(r));
 }
+/**
+ * @brief translate a bool to an expression
+ */
 expression gfc2pips_logical2expression(bool b){
 	//return int_expr(b!=false);
 	return entity_to_expression(gfc2pips_logical2entity(b));
 }
+/**
+ * @brief translate a string to an PIPS expression
+ */
 expression gfc2pips_string2expression(char* s){
 	return entity_to_expression(FindOrCreateEntity(CurrentPackage,s));
 }
 
 
-/*
- * If a number is used, such as 3, 3.14 in the program, it'll be translated into an entity
+/**
+ * @brief translate an integer to a PIPS constant, assume n is positive (or it will not be handled properly)
  */
 entity gfc2pips_int_const2entity(int n){
 	char str[30];
 	sprintf(str,"%d",n);
 	return MakeConstant(str, is_basic_int);
 }
+/**
+ * @brief dump an integer to a PIPS label entity
+ * @param n the value of the integer
+ */
 entity gfc2pips_int2label(int n){
 	//return make_loop_label(n,concatenate(TOP_LEVEL_MODULE_NAME,MODULE_SEP_STRING,LABEL_PREFIX,NULL));
 	char str[60];
 	sprintf(str,"%s%s%s%d",TOP_LEVEL_MODULE_NAME,MODULE_SEP_STRING,LABEL_PREFIX,n);//fprintf(stderr,"new label: %s %s %s %s %d\n",str,TOP_LEVEL_MODULE_NAME,MODULE_SEP_STRING,LABEL_PREFIX,n);
 	return make_label(str);
 }
-//on a un grave problème de traduction des valeurs réelles
-//code  => réel en valeur interne
-//16.53 => 16.530001
-//16.56 => 16.559999
+
+/**
+ * @brief dump reals to PIPS entities
+ * @param r the double to create
+ * @return the corresponding entity
+ *
+ * we have a big issue with reals:
+ * 16.53 => 16.530001
+ * 16.56 => 16.559999
+ */
 entity gfc2pips_real2entity(double r){
+	//create a more elaborate function to output a fortran format or somthing like it ?
 	char str[30];
 	sprintf(str,"%f",r);//fprintf(stderr,"copy of the entity name(real) %s\n",str);
 	return MakeConstant(str, is_basic_float);
 }
 
+/**
+ * @brief translate a boolean to a PIPS/fortran entity
+ */
 entity gfc2pips_logical2entity(bool b){
 	return MakeConstant(b?".TRUE.":".FALSE.",is_basic_logical);
 }
-//escape all ' in the string
+
+/**
+ * @brief translate a string from a table of integers in gfc to one of chars in PIPS, escape all ' in the string
+ * @param c the table of integers in gfc
+ * @param nb the size of the table
+ *
+ * The function only calculate the number of ' to escape and give the information to gfc2pips_gfc_char_t2string_
+ */
 char* gfc2pips_gfc_char_t2string(gfc_char_t *c, int nb){
 	if(nb){
 		gfc_char_t *p=c;
@@ -1022,6 +1128,36 @@ char* gfc2pips_gfc_char_t2string(gfc_char_t *c, int nb){
 		return NULL;
 	}
 }
+
+/**
+ * @brief translate a string from a table of integers in gfc to one of chars in PIPS, escape all ' in the string
+ * @param c the table of integers in gfc
+ * @param nb the size of the table
+ *
+ * Supidly add ' before ' and add ' at the beginning and the end of the string
+ */
+char* gfc2pips_gfc_char_t2string_(gfc_char_t *c, int nb){
+	char *s = malloc(sizeof(char)*(nb+1+2));
+	gfc_char_t *p=c;
+	int i=1;
+	s[0]='\'';
+	while(i<=nb){
+		if(*p=='\''){
+			s[i++]='\'';
+		}
+		s[i++]=*p;
+		p++;
+
+	}
+	s[i++]='\'';
+	s[i]='\0';
+	return s;
+}
+
+/**
+ * @brief translate the <nb> first elements of <c> from a wide integer representation to a char representation
+ * @param c the gfc integer table
+ */
 char* gfc2pips_gfc_char_t2string2(gfc_char_t *c){
 	gfc_char_t *p=c;
 	char *s = NULL;
@@ -1051,25 +1187,6 @@ char* gfc2pips_gfc_char_t2string2(gfc_char_t *c){
 	}else{
 		return NULL;
 	}
-}
-
-//very important question: do we have to put the ' before and after the string ? this function add them
-char* gfc2pips_gfc_char_t2string_(gfc_char_t *c, int nb){
-	char *s = malloc(sizeof(char)*(nb+1+2));
-	gfc_char_t *p=c;
-	int i=1;
-	s[0]='\'';
-	while(i<=nb){
-		if(*p=='\''){
-			s[i++]='\'';
-		}
-		s[i++]=*p;
-		p++;
-
-	}
-	s[i++]='\'';
-	s[i]='\0';
-	return s;
 }
 
 /*
@@ -1107,6 +1224,9 @@ AddVariableToCommon(<entity:common>,<entity:variable of the list>)
   is_basic_typedef
 };
  */
+/**
+ * @brief try to create the PIPS type that would be associated by the PIPS default parser
+ */
 type gfc2pips_symbol2type(gfc_symbol *s){
 	//beware the size of strings
 
@@ -1125,7 +1245,7 @@ type gfc2pips_symbol2type(gfc_symbol *s){
 		case BT_HOLLERITH:
 		case BT_VOID:
 		default:
-			pips_error("gfc2pips_symbol2type","An error occured in the type to type translation: impossible to translate the symbol.\n");
+			pips_error("gfc2pips_symbol2type","An error occurred in the type to type translation: impossible to translate the symbol.\n");
 			return type_undefined;
 			//return make_type_unknown();
 	}
@@ -1160,6 +1280,10 @@ type gfc2pips_symbol2type(gfc_symbol *s){
 	//return make_type_unknown();
 }
 
+/**
+ * @brief return the size of an elementary element:  REAL*16 A    CHARACTER*17 B
+ * @param s symbol of the entity
+ */
 int gfc2pips_symbol2size(gfc_symbol *s){
 	if(
 		s->ts.type==BT_CHARACTER
@@ -1173,6 +1297,10 @@ int gfc2pips_symbol2size(gfc_symbol *s){
 		return s->ts.kind;
 	}
 }
+/**
+ * @brief calculate the total size of the array whatever the bounds are:  A(-5,5)
+ * @param s symbol of the array
+ */
 int gfc2pips_symbol2sizeArray(gfc_symbol *s){
 	int retour = 1;
 	newgen_list list_of_dimensions = NULL;
@@ -1191,7 +1319,11 @@ int gfc2pips_symbol2sizeArray(gfc_symbol *s){
 	return retour;
 }
 
-//only for AR_ARRAY references
+/**
+ * @brief convert a list of indices from gfc to PIPS, assume there is no range (dump only the min range element)
+ * @param ar the struct with indices
+ * only for AR_ARRAY references
+ */
 newgen_list gfc2pips_array_ref2indices(gfc_array_ref *ar){
 	int i;
 	newgen_list indices=NULL,indices_p=NULL;
@@ -1269,6 +1401,11 @@ newgen_list gfc2pips_array_ref2indices(gfc_array_ref *ar){
 */
 	return NULL;
 }
+
+/**
+ * @brief Test if there is a range:  A( 1, 2, 3:5 )
+ * @param ar the gfc structure containing the information about range
+ */
 bool gfc2pips_there_is_a_range(gfc_array_ref *ar){
 	int i;
 	if( !ar || !ar->start || !ar->start[0] ) return false;
@@ -1277,6 +1414,12 @@ bool gfc2pips_there_is_a_range(gfc_array_ref *ar){
 	}
 	return false;
 }
+
+/**
+ * @brief Create an expression similar to the substring implementation, but with a couple of parameters(min-max) for each indice
+ * @param ent the entity refered by the indices
+ * @param ar the gfc structure containing the information
+ */
 expression gfc2pips_mkRangeExpression(entity ent, gfc_array_ref *ar){
 	expression ref = make_expression(
 		make_syntax(is_syntax_reference,

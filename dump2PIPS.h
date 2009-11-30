@@ -106,7 +106,7 @@ newgen_list gfc2pips_args(gfc_namespace* ns);
  * Simplified version of
  * static gfc_symtree * find_symbol (gfc_symtree *st, const char *name, const char *module, int generic);
  */
-gfc_symtree* getSymtreeByName (char* name, gfc_symtree *st);
+gfc_symtree* gfc2pips_getSymtreeByName (char* name, gfc_symtree *st);
 
 newgen_list gfc2pips_vars(gfc_namespace *ns);
 newgen_list gfc2pips_vars_(gfc_namespace *ns,newgen_list variables_p);
