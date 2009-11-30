@@ -12,8 +12,8 @@ Try to restructure the code for more precision:
 void calc(int n)
 {
    float h_A[n][n];
-   int i;
-   int j;
+
+   int i, j;
 
 //  <h_A[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI2+1<=n, PHI1<=PHI2}>
 
@@ -34,8 +34,8 @@ Ask for the parallelization of all the modules of the program with OpenMP output
 void calc(int n)
 {
    float h_A[n][n];
-   int i;
-   int j;
+
+   int i, j;
 
 
 #pragma omp parallel for private(j)
@@ -48,8 +48,8 @@ Bug 1: Regions should not prevent displaying OpenMP
 void calc(int n)
 {
    float h_A[n][n];
-   int i;
-   int j;
+
+   int i, j;
 
 
 
@@ -71,8 +71,8 @@ Bug 2: Where is the OpenMP output?
 void calc(int n)
 {
    float h_A[n][n];
-   int i;
-   int j;
+
+   int i, j;
 
 
 

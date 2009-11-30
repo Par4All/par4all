@@ -1,7 +1,6 @@
 void compute(complex image[64][64])
 {
-   int i;
-   int j;
+   int i, j;
 
    for(i = 0; i <= 63; i += 1)
       for(j = 0; j <= 63; j += 1) {
@@ -11,8 +10,8 @@ void compute(complex image[64][64])
 }
 int main()
 {
-   int i;
-   int j;
+
+   int i, j;
 
    compute(image);
 
@@ -34,8 +33,7 @@ void compute(complex image[64][64])
 //    PHI2<=63, 1<=PHI3, PHI3<=2}>
 
    // BEGIN BLOCK
-   int i;
-   int j;
+   int i, j;
 
 //  <image[PHI1][PHI2][PHI3]-W-EXACT-{0<=PHI1, PHI1<=63, 0<=PHI2,
 //    PHI2<=63, 1<=PHI3, PHI3<=2}>
@@ -69,8 +67,7 @@ void compute(complex image[64][64])
 void compute(complex image[64][64])
 {
    // BEGIN BLOCK
-   int i;
-   int j;
+   int i, j;
 
    for(i = 0; i <= 63; i += 1)
       for(j = 0; j <= 63; j += 1) {
@@ -106,8 +103,8 @@ int main()
 //  <TOP-LEVEL:stdout[PHI1]-W-MAY-{}>
 
    // BEGIN BLOCK
-   int i;
-   int j;
+
+   int i, j;
 
 //  <TOP-LEVEL:image[PHI1][PHI2][PHI3]-W-EXACT-{0<=PHI1, PHI1<=63,
 //    0<=PHI2, PHI2<=63, 1<=PHI3, PHI3<=2}>
@@ -162,8 +159,8 @@ int main()
 //  <TOP-LEVEL:stdout-IN-EXACT-{}>
 
    // BEGIN BLOCK
-   int i;
-   int j;
+
+   int i, j;
 
    compute(image);
 

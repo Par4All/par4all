@@ -19,10 +19,11 @@ void main()
 {
    int n = 10000;
    int loops = 10;
+
    float h_A[n*n];
    float h_C[n*n];
-   int i;
-   int j;
+
+   int i, j;
 
 //  P() {loops==10, n==10000}
 
@@ -49,10 +50,11 @@ void main()
 {
    int n = 10000;
    int loops = 10;
+
    float h_A[n*n];
    float h_C[n*n];
-   int i;
-   int j;
+
+   int i, j;
 
 //  <h_A[PHI1]-W-MAY-{loops==10, n==10000}>
 //  <h_C[PHI1]-W-MAY-{loops==10, n==10000}>
@@ -83,10 +85,11 @@ void main()
 {
    int n = 10000;
    int loops = 10;
+
    float h_A[n*n];
    float h_C[n*n];
-   int i;
-   int j;
+
+   int i, j;
 
 //  <h_A[PHI1]-W-MAY-{loops==10, n==10000}>
 //  <h_C[PHI1]-W-MAY-{loops==10, n==10000}>
@@ -115,10 +118,11 @@ void main()
 {
    int n = 10000;
    int loops = 10;
+
    float h_A[n*n];
    float h_C[n*n];
-   int i;
-   int j;
+
+   int i, j;
 
    for(i = 0; i <= n-1; i += 1)
       for(j = 0; j <= n-1; j += 1) {
@@ -132,10 +136,11 @@ void main()
 {
    int n = 10000;
    int loops = 10;
+
    float h_A[n*n];
    float h_C[n*n];
-   int i;
-   int j;
+
+   int i, j;
 
 
    for(i = 0; i <= n-1; i += 1)
