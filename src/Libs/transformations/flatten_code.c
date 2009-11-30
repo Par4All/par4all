@@ -103,6 +103,7 @@ static void rename_statement_declarations(statement s, hash_table renamings)
     list decls = statement_declarations(s); // Non-recursive
     instruction old = statement_instruction(s);
     list ndecls = NIL;
+    list tmp = NIL; /* holds the entity to remove from declarations */
 
     FOREACH(ENTITY, var, decls) {
       entity nvar = (entity)hash_get(renamings, var);
@@ -133,6 +134,7 @@ static void rename_statement_declarations(statement s, hash_table renamings)
 	    fprintf(stderr, "\n");
 	  }
 	}
+        tmp=CONS(ENTITY,var,tmp);
       }
       else {
 	/* Do nothing and the local declaration will be lost */
@@ -140,6 +142,11 @@ static void rename_statement_declarations(statement s, hash_table renamings)
 		   entity_name(var));
       }
     }
+
+    /* calling RemoveLocalEntityFromDeclarations will tidy the declarations and the declaratiuon_statements */
+    FOREACH(ENTITY,e,tmp) RemoveLocalEntityFromDeclarations(e,get_current_module_entity(),s);
+    gen_free_list(tmp);
+
 
     /* Insert the list of initialisation statements as a sequence at
        the beginning of s.
@@ -207,7 +214,7 @@ static bool redeclaration_enter_statement(statement s, redeclaration_context_t *
 	list dv = statement_declarations(ds);
 
 	if(!entity_is_argument_p(v, dv)) {
-	  statement_declarations(ds) = gen_nconc(dv, CONS(ENTITY, v, NIL));
+        AddLocalEntityToDeclarations(v,get_current_module_entity(),ds);
 	}
 	hash_put(rdcp->renamings, v, v);
       }
@@ -309,9 +316,7 @@ static bool redeclaration_enter_statement(statement s, redeclaration_context_t *
 	    }	      
 	  } while (!ok_p);
 
-	  statement_declarations(rdcp->declaration_statement) =
-	    gen_nconc(statement_declarations(rdcp->declaration_statement),
-		      CONS(ENTITY, nv, NIL));
+      AddLocalEntityToDeclarations(nv,get_current_module_entity(),rdcp->declaration_statement);
 	  hash_put(rdcp->renamings, v, nv);
 	  pips_debug(1, "Variable %s renamed as %s\n", entity_name(v), entity_name(nv));
 	}
@@ -387,7 +392,7 @@ void statement_flatten_declarations(statement s)
   if (statement_block_p(s)) {
     if( !ENDP(statement_declarations(s) ) ) {
       list declarations = instruction_to_declarations(statement_instruction(s)); // Recursive
-            hash_table renamings = hash_table_make(hash_pointer, 10);
+            hash_table renamings = hash_table_make(hash_pointer, HASH_DEFAULT_SIZE);
             bool renaming_p = FALSE;
 
             /* Can we find out what the local scope of statement s is? */
@@ -398,7 +403,7 @@ void statement_flatten_declarations(statement s)
                 string mn   = module_name(sen);
                 string cmn = entity_user_name(get_current_module_entity());
 
-                if(strcmp(mn, cmn)==0) {
+                if(same_string_p(mn, cmn)) {
                     compute_renamings(s, cs, mn, renamings);
                     renaming_p = TRUE;
                     break;
@@ -420,7 +425,6 @@ void statement_flatten_declarations(statement s)
                 //char *(*value_to_string)(void*),
 
                 pips_debug(1, "gen_context_multi_recurse\n");
-
                 gen_context_multi_recurse( statement_instruction(s), renamings,
                         reference_domain, gen_true, rename_reference,
                         loop_domain, gen_true, rename_loop_index,
@@ -581,10 +585,6 @@ static void split_initializations_in_statement(statement s)
 	    }
 	  }
 	}
-	/* Insert the list of initialisation statements as a sequence
-	   after statement s. */
-	sc = copy_statement(ls);
-	inits = gen_nconc(CONS(statement, sc, NIL), inits);
 
 	/* Chain the new list within the current statement list */
 	if(ENDP(pcs)) {
@@ -599,6 +599,8 @@ static void split_initializations_in_statement(statement s)
 	pcs = gen_last(inits);
 	CDR(gen_last(inits)) = CDR(cs);
 	cs = CDR(gen_last(inits));
+    gen_free_list(statement_declarations(ls));
+    statement_declarations(ls)=NIL;
       }
       else {
 	/* Move to the next statement */

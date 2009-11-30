@@ -67,7 +67,7 @@
 typedef struct {
     entity _inlined_module_;
     statement _inlined_module_statement_;
-    list _new_statements_;
+    statement _new_statements_;
     bool _has_static_declaration_;
     bool _has_inlinable_calls_;
     statement _laststmt_;
@@ -275,10 +275,9 @@ entity make_temporary_scalar_entity(entity efrom, expression from)
 			copy_basic(variable_basic(type_variable(entity_type(efrom))))
 			);
     /* set intial */
-	entity_initial(new) = expression_undefined_p(from)?value_undefined:make_value_expression(from);
+	entity_initial(new) = expression_undefined_p(from)?value_undefined:make_value_expression(copy_expression(from));
     /* add it to decl */
-	AddLocalEntityToDeclarations(new, get_current_module_entity(),
-			c_module_p(get_current_module_entity())?get_current_module_statement():statement_undefined);
+	AddEntityToCurrentModule(new);
 	return new;
 }
 
@@ -346,7 +345,7 @@ statement inline_expression_call(inlining_parameters p, expression modified_expr
      */
     statement expanded = copy_statement(inlined_module_statement(p));
     statement declaration_holder = expanded;
-    statement_declarations(expanded) = gen_full_copy_list( statement_declarations(expanded) ); // simple copy != deep copy
+    //statement_declarations(expanded) = gen_full_copy_list( statement_declarations(expanded) ); // simple copy != deep copy
 
     /* add external declartions for all extern referenced entities it
      * is needed because inlined module and current module may not
@@ -397,7 +396,9 @@ statement inline_expression_call(inlining_parameters p, expression modified_expr
             }
         }
         gen_sort_list(new_externs,(gen_cmp_func_t)compare_entities);
-        statement_declarations(expanded)=gen_nconc(statement_declarations(expanded),new_externs);
+        FOREACH(ENTITY,e,new_externs)
+            AddLocalEntityToDeclarations(e,inlined_module(p),expanded);
+        //statement_declarations(expanded)=gen_nconc(statement_declarations(expanded),new_externs);
         set_free(inlined_referenced_entities);
     }
 
@@ -456,8 +457,7 @@ statement inline_expression_call(inlining_parameters p, expression modified_expr
                 } while(entity_undefined_p(returned_entity(p)));
 
                 /* add it to current moduel declarations */
-                AddLocalEntityToDeclarations(returned_entity(p), get_current_module_entity(),
-                        c_module_p(get_current_module_entity())?get_current_module_statement():statement_undefined);
+                AddEntityToCurrentModule(returned_entity(p));
 
                 /* do the replacement */
                 gen_context_recurse(expanded, p, instruction_domain, gen_true, &inline_return_crawler);
@@ -529,8 +529,9 @@ statement inline_expression_call(inlining_parameters p, expression modified_expr
 
 
                 /* add the entity to our list */
-                statement_declarations(declaration_holder)=CONS(ENTITY,new,statement_declarations(declaration_holder));
+                //statement_declarations(declaration_holder)=CONS(ENTITY,new,statement_declarations(declaration_holder));
                 gen_context_recurse(expanded, new, statement_domain, gen_true, &solve_name_clashes);
+                AddLocalEntityToDeclarations(new,get_current_module_entity(),declaration_holder);
                 replace_entity(expanded,e,new);
             }
             /* substitute variables */
@@ -628,7 +629,7 @@ void inline_expression(expression expr, inlining_parameters  p)
                 statement s = inline_expression_call(p, expr, callee );
                 if( !statement_undefined_p(s) )
                 {
-                    new_statements(p)= CONS(STATEMENT, s, new_statements(p));;
+                    insert_statement(new_statements(p),s,true);
                 }
         }
     }
@@ -660,30 +661,29 @@ void inline_statement_crawler(statement stmt, inlining_parameters p)
     if( instruction_call_p(sti) && inline_has_inlinable_calls(inlined_module(p),sti) )
     {
         /* the gen_recurse can only handle expressions, so we turn this call into an expression */
-        sti = make_instruction_expression(call_to_expression(copy_call(instruction_call(sti))));
-    }
-    else {
-        sti = copy_instruction(sti);
+        update_statement_instruction(stmt,
+                sti=make_instruction_expression(call_to_expression(copy_call(instruction_call(sti)))));
     }
 
-    new_statements(p)=NIL;
-    gen_context_recurse(sti,p,expression_domain,gen_true,&inline_expression);
-    if( !ENDP(new_statements(p)) ) /* something happens on the way to heaven */
+    new_statements(p)=make_block_statement(NIL);
+    gen_context_recurse(sti,p,expression_domain,gen_true, inline_expression);
+
+    if( !ENDP(statement_block(new_statements(p)))  ) /* something happens on the way to heaven */
     {
         type t= functional_result(type_functional(entity_type(inlined_module(p))));
         if( ! type_void_p(t) )
         {
             pips_assert("inlining instruction modification is ok", instruction_consistent_p(sti));
-            new_statements(p)=CONS(STATEMENT,
-                    instruction_to_statement(sti),
-                    new_statements(p)
-                    );
+            insert_statement(new_statements(p),instruction_to_statement(copy_instruction(sti)),false);
         }
-        update_statement_instruction(stmt,make_instruction_sequence( make_sequence( gen_nreverse(new_statements(p)) ) ));
+        if(statement_block_p(stmt))
+        {
+            list iter=statement_block(stmt);
+            for(stmt=STATEMENT(CAR(iter));continue_statement_p(stmt);POP(iter))
+                stmt=STATEMENT(CAR(iter));
+        }
+        update_statement_instruction(stmt,statement_instruction(new_statements(p)));
         pips_assert("inlining statement generation is ok",statement_consistent_p(stmt));
-    }
-    else {
-        free_instruction(sti);
     }
 }
 
@@ -717,11 +717,12 @@ void inline_split_declarations(statement s, entity inlined_module)
             }
         }
         set_free(selected_entities);
-        if(!ENDP(prelude))
-            instruction_block(statement_instruction(s))=gen_nconc(gen_nreverse(prelude),statement_block(s));
+        FOREACH(STATEMENT,st,prelude)
+            insert_statement(s,st,true);
+        gen_free_list(prelude);
     }
-    else if(!ENDP(statement_declarations(s)))
-        pips_user_warning("only blocks should have declarations\n");
+    else if(!declaration_statement_p(s) && !ENDP(statement_declarations(s)))
+        pips_user_warning("only blocks and declaration statements should have declarations\n");
 }
 
 /* this should replace all call to `inlined' in `module'
@@ -742,7 +743,7 @@ inline_calls(inlining_parameters p ,char * module)
     /* first pass : convert some declaration with assignment to declarations + statements, if needed */
     gen_context_recurse(modified_module_statement, inlined_module(p), statement_domain, gen_true, inline_split_declarations);
     /* inline all calls to inlined_module */
-    gen_context_recurse(modified_module_statement, p, statement_domain, gen_true, &inline_statement_crawler);
+    gen_context_recurse(modified_module_statement, p, statement_domain, gen_true, inline_statement_crawler);
 
     DB_PUT_MEMORY_RESOURCE(DBR_CODE, module, modified_module_statement);
     DB_PUT_MEMORY_RESOURCE(DBR_CALLEES, module, compute_callees(modified_module_statement));

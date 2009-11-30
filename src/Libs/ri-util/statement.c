@@ -2111,7 +2111,16 @@ void insert_statement(statement s,
     {
       ls = instruction_block(i);
       if (before)
-	ls = CONS(STATEMENT,s1,ls);
+      {
+          if(!ENDP(ls) && declaration_statement_p(STATEMENT(CAR(ls))))
+          {
+              while( !ENDP(CDR(ls)) && declaration_statement_p(STATEMENT(CAR(CDR(ls))))) POP(ls);
+              CDR(ls)=CONS(STATEMENT,s1,CDR(ls));
+              ls=instruction_block(i);
+          }
+          else
+              ls = CONS(STATEMENT,s1,ls);
+    }
       else
 	ls = gen_nconc(ls,CONS(STATEMENT,s1,NIL));
       instruction_block(i) = ls;
@@ -2174,7 +2183,9 @@ statement add_declaration_statement(statement s, entity e)
     instruction_block(statement_instruction(s)) = nsl;
   }
   else
-    pips_internal_error("Declaration statements are only inserted in sequences\n");
+  {
+      pips_internal_error("can only add declarations to statement blocks\n");
+  }
 
   ifdebug(8) {
     pips_debug(8, "Statement after declaration insertion:\n");
@@ -2357,8 +2368,11 @@ bool all_statements_defined_p(statement s)
 static bool add_statement_declarations(statement s, list *statement_to_all_included_declarations)
 {
     /* naive version with O(n^2) complexity)*/
-  FOREACH(ENTITY,e,statement_declarations(s))
-      *statement_to_all_included_declarations=gen_once(e,*statement_to_all_included_declarations);
+    if(declaration_statement_p(s))
+    {
+        FOREACH(ENTITY,e,statement_declarations(s))
+            *statement_to_all_included_declarations=gen_once(e,*statement_to_all_included_declarations);
+    }
   return true;
 }
 
@@ -2877,47 +2891,47 @@ set get_referenced_entities(void* elem)
  */
 static list statement_clean_declarations_helper(list declarations, statement stmt)
 {
-  list new_declarations = NIL;
-  set referenced_entities = get_referenced_entities(stmt);
+    list new_declarations = NIL;
+    set referenced_entities = get_referenced_entities(stmt);
 
-  declarations=gen_nreverse(declarations);
+    declarations=gen_nreverse(declarations);
 
-  /* look for entity that are used in the statement */
-  FOREACH(ENTITY,e,declarations)
+    /* look for entity that are used in the statement */
+    FOREACH(ENTITY,e,declarations)
     {
-      bool add_entity_to_declaration_p = true;
-      /* area and parameters are always used */
-      if( ! formal_parameter_p(e) && ! entity_area_p(e) )
-	{
-	  /* entities whose declaration has a side effect are always used too */
-	  bool has_side_effects_p = false;
-	  value v = entity_initial(e);
-	  if( value_expression_p(v) )
-	    {
-	      list effects = expression_to_proper_effects(value_expression(v));
-	      FOREACH(EFFECT, eff, effects)
-		{
-		  if( action_write_p(effect_action(eff)) ) has_side_effects_p = true;
-		}
-	      gen_full_free_list(effects);
-	    }
+        bool add_entity_to_declaration_p = true;
+        /* area and parameters are always used */
+        if( formal_parameter_p(e) || entity_area_p(e) )
+            new_declarations=CONS(ENTITY,e,new_declarations);
+        else
+        {
+            /* entities whose declaration has a side effect are always used too */
+            bool has_side_effects_p = false;
+            value v = entity_initial(e);
+            if( value_expression_p(v) )
+            {
+                list effects = expression_to_proper_effects(value_expression(v));
+                FOREACH(EFFECT, eff, effects)
+                {
+                    if( action_write_p(effect_action(eff)) ) has_side_effects_p = true;
+                }
+                gen_full_free_list(effects);
+            }
 
-	  if( ! has_side_effects_p )
-	    {
-	      add_entity_to_declaration_p=set_belong_p(referenced_entities,e);
-	    }
-	}
-
-      /* if we found some usefulness , add it */
-      if(add_entity_to_declaration_p) {
-	new_declarations=CONS(ENTITY,e,new_declarations);
-      }
+            /* keep the declaration, and ensure the declaration_statement exist */
+            if( has_side_effects_p ) {
+                new_declarations=CONS(ENTITY,e,new_declarations);
+            }
+            /* do not keep the declaration, and remove it from any declaration_statement */
+            else {
+            }
+        }
     }
 
 
-  set_free(referenced_entities);
+    set_free(referenced_entities);
 
-  return new_declarations;
+    return new_declarations;
 }
 
 /**
@@ -2960,9 +2974,11 @@ static void entity_generate_missing_declarations(entity module, statement s)
  */
 void statement_clean_declarations(statement s)
 {
-  list l = statement_declarations(s);
-  statement_declarations(s)=statement_clean_declarations_helper(l,s);
-  gen_free_list(l);
+    if(statement_block_p(s)) {
+        list l = statement_declarations(s);
+        statement_declarations(s)=statement_clean_declarations_helper(l,s);
+        gen_free_list(l);
+    }
 }
 
 /**

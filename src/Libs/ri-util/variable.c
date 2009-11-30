@@ -94,6 +94,21 @@ AddEntityToDeclarations(entity e, entity module) {
 		code_declarations(EntityCode(module))=CONS(ENTITY, e, l);
 }
 
+void
+RemoveLocalEntityFromDeclarations(entity e, entity module, statement s)
+{
+    if(!ENDP(entity_declarations(module)))
+        gen_remove(&entity_declarations(module), e);
+    if(!ENDP(statement_declarations(s)))
+        gen_remove(&statement_declarations(s), e);
+    if(statement_block_p(s))
+    {
+        FOREACH(STATEMENT,stat,statement_block(s))
+            RemoveLocalEntityFromDeclarations(e,module,stat);
+    }
+
+}
+
 /**
  Add the variable entity e to the list of variables of the function
  module.
@@ -134,6 +149,10 @@ AddLocalEntityToDeclarations(entity e, entity module, statement s) {
   if (c_module_p(module)) {
     /* If undeclared in s, variable e is added in the
        statement_declarations field. */
+      if(!statement_block_p(s))
+          insert_statement(s,make_continue_statement(entity_empty_label()),true);
+      pips_assert("add declarations to statement block",statement_block_p(s));
+
     list l = statement_declarations(s);
     pips_assert("Calling AddLocalEntityToDeclarations from c_module with valid statement", !statement_undefined_p(s) );
 
