@@ -9,8 +9,7 @@ Cumulated effects for function "jacobi"
 //               <must be read   >: nb
 int jacobi(int nb, int **a, int **b)
 {
-   int indice_i;
-   int indice_j;
+   int indice_i, indice_j;                                              /*0003*/
 //               <may be read    >: a a[*] b b[*] b[*][*]
 //               <may be written >: a[*][*]
 //               <must be read   >: nb
@@ -45,16 +44,17 @@ Cumulated effects for function "main"
 //               <must be read   >: argc
 int main(int argc, char *argv[])
 {
-   int **a;
-   int **b;
-   int indice_i;
+   //int i;for(i=0;i<argc;i++) printf("_%s_\n",argv[i]);
+   int **a;                                                             /*0028*/
+   int **b;                                                             /*0029*/
+   int indice_i;                                                        /*0030*/
 //               <may be read    >: _MALLOC_EFFECTS:_MALLOC_ a a[*] b 
 //                                  b[*] b[*][*] nb
 //               <may be written >: _MALLOC_EFFECTS:_MALLOC_ a a[*] 
 //                                  a[*][*] b b[*] indice_i
 //               <must be read   >: argc
    if (argc>1) {                                                        /*0031*/
-      int nb = atol(argv[1]);
+      int nb = atol(argv[1]);                                           /*0032*/
 //               <must be read   >: _MALLOC_EFFECTS:_MALLOC_ nb
 //               <must be written>: _MALLOC_EFFECTS:_MALLOC_ b
       b = malloc(sizeof(int *)*(nb+1));                                 /*0033*/
@@ -130,8 +130,7 @@ Parallel code for function "jacobi"
 
 int jacobi(int nb, int **a, int **b)
 {
-   int indice_i;
-   int indice_j;
+   int indice_i, indice_j;                                              /*0003*/
 
 
 #pragma omp parallel for private(indice_j)
@@ -153,11 +152,12 @@ Parallel code for function "main"
 
 int main(int argc, char *argv[])
 {
-   int **a;
-   int **b;
-   int indice_i;
+   //int i;for(i=0;i<argc;i++) printf("_%s_\n",argv[i]);
+   int **a;                                                             /*0028*/
+   int **b;                                                             /*0029*/
+   int indice_i;                                                        /*0030*/
    if (argc>1) {                                                        /*0031*/
-      int nb = atol(argv[1]);
+      int nb = atol(argv[1]);                                           /*0032*/
       b = malloc(sizeof(int *)*(nb+1));                                 /*0033*/
       a = malloc(sizeof(int *)*(nb+1));                                 /*0034*/
 
