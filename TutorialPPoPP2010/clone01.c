@@ -5,7 +5,6 @@ int clone01(int n, int s)
     r = n-1;
   else if(s>0)
     r = n+1;
-
   return r;
 }
 
