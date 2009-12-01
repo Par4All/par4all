@@ -43,4 +43,5 @@ include $(ROOT)/makes/main.mk
 
 # local stuff
 here	:=	$(shell pwd)
-CPPFLAGS+='-DCONFIG_DIR="$(here)/$(ETC.d)"'
+CONFIG_DIR=$(here)/$(ETC.d)
+CPPFLAGS+='-DCONFIG_DIR="$(CONFIG_DIR)"'
