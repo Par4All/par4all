@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 from pyps import *
 ws=workspace(["test2.c"])
 conv=ws["convol"]
