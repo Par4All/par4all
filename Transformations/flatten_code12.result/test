@@ -13,25 +13,25 @@ void flatten_code12(void)
 {
 // (0,1)
    // BEGIN BLOCK
-   int i = (int) foo_0;
-// (0,2)
-
-   foo_0++;                                                             /*0017*/
+   int i = (int) foo_0;                                                 /*0015*/
 // (0,3)
 
-   for(i = i; i <= 6; i += 1) {
+   foo_0++;                                                             /*0017*/
 // (0,4)
-      // BEGIN BLOCK
-      static int foo = 0;
+
+   for(i = i; i <= 6; i += 1) {
 // (0,5)
+      // BEGIN BLOCK
+      static int foo = 0;                                               /*0020*/
+// (0,7)
 
       foo++;                                                            /*0022*/
-// (0,6)
+// (0,8)
 
       fprintf(stdout, "foo=%d\n", foo);                                 /*0024*/
       // END BLOCK
    }
-// (0,7)
+// (0,9)
    fprintf(stdout, "foo_0=%f\n", foo_0);                                /*0026*/
    // END BLOCK
 }
@@ -42,25 +42,26 @@ void flatten_code12(void)
 {
 // (0,1)
    // BEGIN BLOCK
-   int i = (int) foo_0;
+   int i = (int) foo_0;                                                 /*0015*/
+   //PIPS generated variable
    static int foo_1 = 0;
-// (0,2)
+// (0,4)
 
    foo_0++;                                                             /*0017*/
-// (0,3)
-
-   for(i = i; i <= 6; i += 1) {
-// (0,4)
-      // BEGIN BLOCK
 // (0,5)
 
-      foo_1++;                                                          /*0022*/
+   for(i = i; i <= 6; i += 1) {
 // (0,6)
+      // BEGIN BLOCK
+// (0,7)
+
+      foo_1++;                                                          /*0022*/
+// (0,8)
 
       fprintf(stdout, "foo=%d\n", foo_1);                               /*0024*/
       // END BLOCK
    }
-// (0,7)
+// (0,9)
    fprintf(stdout, "foo_0=%f\n", foo_0);                                /*0026*/
    // END BLOCK
 }

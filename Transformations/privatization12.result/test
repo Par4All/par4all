@@ -37,8 +37,10 @@ int main(int argc, char *argv[])
    int j = i++;
    int k = 0;
    {
+      //PIPS generated variable
       int i1;
       for(i1 = 0; i1 <= 9; i1 += 1) {
+         //PIPS generated variable
          int j1;
          for(j1 = 0; j1 <= 9; j1 += 1)
             k = k+i1*j1;
@@ -57,8 +59,10 @@ int main(int argc, char *argv[])
    int j = i++;
    int k = 0;
    {
+      //PIPS generated variable
       int i1;
       for(i1 = 0; i1 <= 9; i1 += 1) {
+         //PIPS generated variable
          int j1;
          for(j1 = 0; j1 <= 9; j1 += 1)
             k = k+i1*j1;

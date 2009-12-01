@@ -35,10 +35,15 @@ void flgr1d_arith_add_fgINT32(FLGR_Data1D *datdest, FLGR_Data1D *data1, FLGR_Dat
    fgINT32 result;
    int spp = datdest->spp;
    int length = datdest->length*spp;
+   //PIPS generated variable
    int _return0;
+   //PIPS generated variable
    int _return1;
+   //PIPS generated variable
    int _return2;
+   //PIPS generated variable
    int _return3;
+   //PIPS generated variable
    int _return4;
    for(j = 0; j <= length-1; j += 1) {
       _return3 = psrc1[j];

@@ -1,10 +1,11 @@
 void c_clean_declarations04(int x)
 {
+   /* Hide the formal parameter */
    int x;
    int y = 0;
-   extern  stderr();
 
    if (y) {
+      /* This third x is useless, but not its initialization */
       int x = y++;
       int z;
    }
@@ -15,12 +16,14 @@ void c_clean_declarations04(int x)
 }
 void c_clean_declarations04(int x)
 {
+   /* Hide the formal parameter */
    int x;
    int y = 0;
-   extern  stderr();
 
    if (y) {
+      /* This third x is useless, but not its initialization */
       int x = y++;
+
    }
    else {
       int z = y--;

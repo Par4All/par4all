@@ -34,15 +34,19 @@ int flatten_code04()
    // BEGIN BLOCK
    int i = 1;
    int j;
+   //PIPS generated variable
    int i_0 = 2;
+   //PIPS generated variable
    int i_1 = 3;
+   //PIPS generated variable
+   int i_2 = 3;
    i++;
    if (1) {
       // BEGIN BLOCK
       i_0++;
       j += i_0;
-      i_1++;
-      j += i_1;
+      i_2++;
+      j += i_2;
       // END BLOCK
    }
    i = j;

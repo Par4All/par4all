@@ -3,9 +3,18 @@ Initial code
 
 freia_error freia_cipo_dilate(freia_data2d *imout, freia_data2d *imin, int32_t connexity, uint32_t size)
 {
+   
+   
    int kernel_8c[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+   
+   
+   
    int kernel_6c[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1};
+   
+   
+   
    int kernel_4c[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0};
+
    int i;
    freia_error ret;
    if (freia_common_check_image_bpp_compat(imout, imin, (void *) 0)!=1) {
@@ -57,7 +66,6 @@ break_1:      ;
 freia_error freia_cipo_outer_gradient(freia_data2d *imout, freia_data2d *imin, int32_t connexity, uint32_t size)
 {
    freia_error ret;
-   extern int freia_aipo_sub(freia_data2d *, freia_data2d *, freia_data2d *);
 
    ret = freia_cipo_dilate(imout, imin, connexity, size);
    ret |= freia_aipo_sub(imout, imout, imin);
@@ -77,9 +85,18 @@ Because %ALL is modified by code synthesis, let's get ready
      freia_aipo_sub
 freia_error freia_cipo_dilate(freia_data2d *imout, freia_data2d *imin, int32_t connexity, uint32_t size)
 {
+   
+   
    int kernel_8c[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+   
+   
+   
    int kernel_6c[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1};
+   
+   
+   
    int kernel_4c[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0};
+
    int i;
    freia_error ret;
    if (freia_common_check_image_bpp_compat(imout, imin, (void *) 0)!=1) {
@@ -134,14 +151,24 @@ Code after inlining of "freia_cipo_dilate"
 freia_error freia_cipo_outer_gradient(freia_data2d *imout, freia_data2d *imin, int32_t connexity, uint32_t size)
 {
    freia_error ret;
-   extern int freia_aipo_sub(freia_data2d *f1, freia_data2d *f2, freia_data2d *f3);
+   //PIPS generated variable
    int _return0;
    {
+      
+      
       int kernel_8c[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+      
+      
+      
       int kernel_6c[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1};
+      
+      
+      
       int kernel_4c[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0};
+
       int i;
       freia_error ret;
+      //PIPS generated variable
       extern struct _IO_FILE *stderr;
       if (freia_common_check_image_bpp_compat(imout, imin, (void *) 0)!=1) {
 
@@ -203,20 +230,36 @@ int main()
    freia_data2d *imin;
    int32_t connexity = 8;
    uint32_t size = 4;
+   //PIPS generated variable
    int _return0;
+   //PIPS generated variable
    int _return1;
+   //PIPS generated variable
    int _return2;
    {
+      
+      
+      
+      //PIPS generated variable
       freia_error ret;
-      extern int freia_aipo_sub(freia_data2d *f1, freia_data2d *f2, freia_data2d *f3);
+      //ат^
       int _return0;
-      extern struct _IO_FILE *stderr;
       {
+         
+         
          int kernel_8c[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+         
+         
+         
          int kernel_6c[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1};
+         
+         
+         
          int kernel_4c[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0};
+
          int i;
          freia_error ret;
+         //PIPS generated variable
          extern struct _IO_FILE *stderr;
          if (freia_common_check_image_bpp_compat(imout, imin, (void *) 0)!=1) {
 
@@ -272,16 +315,29 @@ l99986:            ;
    }
    (void) _return1;
    {
+      
+      
+      
+      //PIPS generated variable
       freia_error ret;
-      extern int freia_aipo_sub(freia_data2d *f1, freia_data2d *f2, freia_data2d *f3);
+      //`о^
       int _return0;
-      extern struct _IO_FILE *stderr;
       {
+         
+         
          int kernel_8c[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+         
+         
+         
          int kernel_6c[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1};
+         
+         
+         
          int kernel_4c[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0};
+
          int i;
          freia_error ret;
+         //PIPS generated variable
          extern struct _IO_FILE *stderr;
          if (freia_common_check_image_bpp_compat(imout, imin, (void *) 0)!=1) {
 
@@ -346,126 +402,191 @@ int main()
    freia_data2d *imin;
    int32_t connexity = 8;
    uint32_t size = 4;
+   //PIPS generated variable
    int _return0;
+   //PIPS generated variable
    int _return1;
+   //PIPS generated variable
    int _return2;
+   //PIPS generated variable
    freia_error ret_0;
-   extern int freia_aipo_sub(freia_data2d *f1, freia_data2d *f2, freia_data2d *f3);
+   //PIPS generated variable
    int _return0_0;
-   extern struct _IO_FILE *stderr;
+   //PIPS generated variable
    int kernel_8c_0[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+   //PIPS generated variable
    int kernel_6c_0[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1};
+   //PIPS generated variable
    int kernel_4c_0[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0};
+   //PIPS generated variable
    int i_0;
+   //PIPS generated variable
    freia_error ret_1;
-   freia_error ret_2;
-   int _return0_1;
+   //PIPS generated variable
    int kernel_8c_1[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+   //PIPS generated variable
    int kernel_6c_1[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1};
+   //PIPS generated variable
    int kernel_4c_1[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0};
+   //PIPS generated variable
    int i_1;
+   //PIPS generated variable
+   freia_error ret_2;
+   //PIPS generated variable
    freia_error ret_3;
+   //PIPS generated variable
+   int _return0_1;
+   //PIPS generated variable
+   int kernel_8c_2[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+   //PIPS generated variable
+   int kernel_6c_2[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1};
+   //PIPS generated variable
+   int kernel_4c_2[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0};
+   //PIPS generated variable
+   int i_2;
+   //PIPS generated variable
+   freia_error ret_4;
+   //PIPS generated variable
+   int kernel_8c_3[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+   //PIPS generated variable
+   int kernel_6c_3[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1};
+   //PIPS generated variable
+   int kernel_4c_3[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0};
+   //PIPS generated variable
+   int i_3;
+   //PIPS generated variable
+   freia_error ret_5;
+
+
+
+   ////PIPS generated variable
+   //ат^
+
+
+
+
+
+
+
+
+   ////PIPS generated variable
+   extern struct _IO_FILE *stderr;
    if (freia_common_check_image_bpp_compat(imout, imin, (void *) 0)!=1) {
 
       fprintf(stderr, "bpp of images are not compatibles\n""ERROR: file %s, line %d, function %s: ", "./freia.src/cipo/src/freiaComplexOpMorpho.c", 90, "freia_cipo_dilate");
       freia_common_print_backtrace();
-      ret_1 = 1;
+      ret_2 = 1;
    }
    else if (freia_common_check_image_bpp_compat(imout, imin, (void *) 0)!=1) {
       
       
       fprintf(stderr, "bpp of images are not compatibles\n""ERROR: file %s, line %d, function %s: ", "./freia.src/cipo/src/freiaComplexOpMorpho.c", 95, "freia_cipo_dilate");
       freia_common_print_backtrace();
-      ret_1 = 1;
+      ret_2 = 1;
    }
    else if (size==0) {
       freia_aipo_copy(imout, imin);
-      ret_1 = 0;
+      ret_2 = 0;
    }
    else {
       if (connexity==4) goto l99989;
       if (connexity==6) goto l99988;
       if (connexity==8) goto l99987;
-      ret_1 = 2;
+      ret_2 = 2;
       goto l99986;
 l99987:      ;
-      freia_aipo_dilate_8c(imout, imin, kernel_8c_0);
-      for(i_0 = 1; i_0 <= size-1; i_0 += 1)
-         freia_aipo_dilate_8c(imout, imout, kernel_8c_0);
+      freia_aipo_dilate_8c(imout, imin, kernel_8c_1);
+      for(i_1 = 1; i_1 <= size-1; i_1 += 1)
+         freia_aipo_dilate_8c(imout, imout, kernel_8c_1);
       goto l99986;
 l99988:      ;
-      freia_aipo_dilate_6c(imout, imin, kernel_6c_0);
-      for(i_0 = 1; i_0 <= size-1; i_0 += 1)
-         freia_aipo_dilate_6c(imout, imout, kernel_6c_0);
-      ret_1 = 0;
+      freia_aipo_dilate_6c(imout, imin, kernel_6c_1);
+      for(i_1 = 1; i_1 <= size-1; i_1 += 1)
+         freia_aipo_dilate_6c(imout, imout, kernel_6c_1);
+      ret_2 = 0;
       goto l99986;
 l99989:      ;
-      freia_aipo_dilate_8c(imout, imin, kernel_4c_0);
-      for(i_0 = 1; i_0 <= size-1; i_0 += 1)
-         freia_aipo_dilate_8c(imout, imout, kernel_4c_0);
-      ret_1 = 0;
+      freia_aipo_dilate_8c(imout, imin, kernel_4c_1);
+      for(i_1 = 1; i_1 <= size-1; i_1 += 1)
+         freia_aipo_dilate_8c(imout, imout, kernel_4c_1);
+      ret_2 = 0;
 l99986:      ;
 
    }
    
    
-   _return0_0 = ret_1;
+   _return0_0 = ret_2;
    ret_0 = _return0_0;
    ret_0 |= freia_aipo_sub(imout, imout, imin);
    
    
    _return1 = ret_0;
    (void) _return1;
+
+
+
+   ////PIPS generated variable
+   //`о^
+
+
+
+
+
+
+
+
+   ////PIPS generated variable
+   extern struct _IO_FILE *stderr;
    if (freia_common_check_image_bpp_compat(imout, imin, (void *) 0)!=1) {
 
       fprintf(stderr, "bpp of images are not compatibles\n""ERROR: file %s, line %d, function %s: ", "./freia.src/cipo/src/freiaComplexOpMorpho.c", 90, "freia_cipo_dilate");
       freia_common_print_backtrace();
-      ret_3 = 1;
+      ret_5 = 1;
    }
    else if (freia_common_check_image_bpp_compat(imout, imin, (void *) 0)!=1) {
       
       
       fprintf(stderr, "bpp of images are not compatibles\n""ERROR: file %s, line %d, function %s: ", "./freia.src/cipo/src/freiaComplexOpMorpho.c", 95, "freia_cipo_dilate");
       freia_common_print_backtrace();
-      ret_3 = 1;
+      ret_5 = 1;
    }
    else if (size==0) {
       freia_aipo_copy(imout, imin);
-      ret_3 = 0;
+      ret_5 = 0;
    }
    else {
       if (connexity==4) goto l99985;
       if (connexity==6) goto l99984;
       if (connexity==8) goto l99983;
-      ret_3 = 2;
+      ret_5 = 2;
       goto l99982;
 l99983:      ;
-      freia_aipo_dilate_8c(imout, imin, kernel_8c_1);
-      for(i_1 = 1; i_1 <= size-1; i_1 += 1)
-         freia_aipo_dilate_8c(imout, imout, kernel_8c_1);
+      freia_aipo_dilate_8c(imout, imin, kernel_8c_3);
+      for(i_3 = 1; i_3 <= size-1; i_3 += 1)
+         freia_aipo_dilate_8c(imout, imout, kernel_8c_3);
       goto l99982;
 l99984:      ;
-      freia_aipo_dilate_6c(imout, imin, kernel_6c_1);
-      for(i_1 = 1; i_1 <= size-1; i_1 += 1)
-         freia_aipo_dilate_6c(imout, imout, kernel_6c_1);
-      ret_3 = 0;
+      freia_aipo_dilate_6c(imout, imin, kernel_6c_3);
+      for(i_3 = 1; i_3 <= size-1; i_3 += 1)
+         freia_aipo_dilate_6c(imout, imout, kernel_6c_3);
+      ret_5 = 0;
       goto l99982;
 l99985:      ;
-      freia_aipo_dilate_8c(imout, imin, kernel_4c_1);
-      for(i_1 = 1; i_1 <= size-1; i_1 += 1)
-         freia_aipo_dilate_8c(imout, imout, kernel_4c_1);
-      ret_3 = 0;
+      freia_aipo_dilate_8c(imout, imin, kernel_4c_3);
+      for(i_3 = 1; i_3 <= size-1; i_3 += 1)
+         freia_aipo_dilate_8c(imout, imout, kernel_4c_3);
+      ret_5 = 0;
 l99982:      ;
 
    }
    
    
-   _return0_1 = ret_3;
-   ret_2 = _return0_1;
-   ret_2 |= freia_aipo_sub(imout, imout, imin);
+   _return0_1 = ret_5;
+   ret_3 = _return0_1;
+   ret_3 |= freia_aipo_sub(imout, imout, imin);
    
    
-   _return2 = ret_2;
+   _return2 = ret_3;
    (void) _return2;
 }
 
@@ -480,25 +601,75 @@ int main()
    freia_data2d *imin;
    int32_t connexity = 8;
    uint32_t size = 4;
+   //PIPS generated variable
    int _return0;
+   //PIPS generated variable
    int _return1;
+   //PIPS generated variable
    int _return2;
+   //PIPS generated variable
    freia_error ret_0;
-   extern int freia_aipo_sub(freia_data2d *f1, freia_data2d *f2, freia_data2d *f3);
+   //PIPS generated variable
    int _return0_0;
-   extern struct _IO_FILE *stderr;
+   //PIPS generated variable
    int kernel_8c_0[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+   //PIPS generated variable
    int kernel_6c_0[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1};
+   //PIPS generated variable
    int kernel_4c_0[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0};
+   //PIPS generated variable
    int i_0;
+   //PIPS generated variable
    freia_error ret_1;
-   freia_error ret_2;
-   int _return0_1;
+   //PIPS generated variable
    int kernel_8c_1[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+   //PIPS generated variable
    int kernel_6c_1[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1};
+   //PIPS generated variable
    int kernel_4c_1[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0};
+   //PIPS generated variable
    int i_1;
+   //PIPS generated variable
+   freia_error ret_2;
+   //PIPS generated variable
    freia_error ret_3;
+   //PIPS generated variable
+   int _return0_1;
+   //PIPS generated variable
+   int kernel_8c_2[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+   //PIPS generated variable
+   int kernel_6c_2[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1};
+   //PIPS generated variable
+   int kernel_4c_2[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0};
+   //PIPS generated variable
+   int i_2;
+   //PIPS generated variable
+   freia_error ret_4;
+   //PIPS generated variable
+   int kernel_8c_3[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+   //PIPS generated variable
+   int kernel_6c_3[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1};
+   //PIPS generated variable
+   int kernel_4c_3[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0};
+   //PIPS generated variable
+   int i_3;
+   //PIPS generated variable
+   freia_error ret_5;
+
+
+
+   ////PIPS generated variable
+   //ат^
+
+
+
+
+
+
+
+
+   ////PIPS generated variable
+   extern struct _IO_FILE *stderr;
 
 //  P() {connexity==8, size==4}
 
@@ -515,7 +686,7 @@ int main()
 
 //  P() {connexity==8, size==4}
 
-      ret_1 = 1;
+      ret_2 = 1;
    }
    else if (freia_common_check_image_bpp_compat(imout, imin, (void *) 0)!=1) {
 
@@ -531,7 +702,7 @@ int main()
 
 //  P() {connexity==8, size==4}
 
-      ret_1 = 1;
+      ret_2 = 1;
    }
    else if (size==0) {
 
@@ -541,7 +712,7 @@ int main()
 
 //  P() {0==-1}
 
-      ret_1 = 0;
+      ret_2 = 0;
    }
    else {
 
@@ -559,180 +730,23 @@ int main()
 
 //  P() {0==-1}
 
-      ret_1 = 2;
+      ret_2 = 2;
       goto l99986;
 l99987:      ;
 
 //  P() {connexity==8, size==4}
 
-      freia_aipo_dilate_8c(imout, imin, kernel_8c_0);
+      freia_aipo_dilate_8c(imout, imin, kernel_8c_1);
 
 //  P() {connexity==8, size==4}
 
-      for(i_0 = 1; i_0 <= size-1; i_0 += 1)
-
-//  P(i_0) {connexity==8, size==4, 1<=i_0, i_0<=3}
-
-         freia_aipo_dilate_8c(imout, imout, kernel_8c_0);
-      goto l99986;
-l99988:      ;
-
-//  P() {0==-1}
-
-      freia_aipo_dilate_6c(imout, imin, kernel_6c_0);
-
-//  P() {0==-1}
-
-      for(i_0 = 1; i_0 <= size-1; i_0 += 1)
-
-//  P() {0==-1}
-
-         freia_aipo_dilate_6c(imout, imout, kernel_6c_0);
-
-//  P() {0==-1}
-
-      ret_1 = 0;
-      goto l99986;
-l99989:      ;
-
-//  P() {0==-1}
-
-      freia_aipo_dilate_8c(imout, imin, kernel_4c_0);
-
-//  P() {0==-1}
-
-      for(i_0 = 1; i_0 <= size-1; i_0 += 1)
-
-//  P() {0==-1}
-
-         freia_aipo_dilate_8c(imout, imout, kernel_4c_0);
-
-//  P() {0==-1}
-
-      ret_1 = 0;
-l99986:      ;
-
-//  P(i_0) {connexity==8, size==4, 4<=i_0}
-
-
-   }
-
-//  P(i_0,ret_1) {connexity==8, size==4}
-
-   
-   
-   _return0_0 = ret_1;
-
-//  P(_return0_0,i_0,ret_1) {_return0_0==ret_1, connexity==8, size==4}
-
-   ret_0 = _return0_0;
-
-//  P(_return0_0,i_0,ret_0,ret_1) {_return0_0==ret_0,
-//    _return0_0==ret_1, connexity==8, size==4}
-
-   ret_0 |= freia_aipo_sub(imout, imout, imin);
-
-//  P(_return0_0,i_0,ret_0,ret_1) {_return0_0==ret_1, connexity==8,
-//    size==4}
-
-   
-   
-   _return1 = ret_0;
-
-//  P(_return0_0,_return1,i_0,ret_0,ret_1) {_return0_0==ret_1,
-//    _return1==ret_0, connexity==8, size==4}
-
-   (void) _return1;
-
-//  P(_return0_0,_return1,i_0,ret_0,ret_1) {_return0_0==ret_1,
-//    _return1==ret_0, connexity==8, size==4}
-
-   if (freia_common_check_image_bpp_compat(imout, imin, (void *) 0)!=1) {
-
-//  P(_return0_0,_return1,i_0,ret_0,ret_1) {_return0_0==ret_1,
-//    _return1==ret_0, connexity==8, size==4}
-
-
-      fprintf(stderr, "bpp of images are not compatibles\n""ERROR: file %s, line %d, function %s: ", "./freia.src/cipo/src/freiaComplexOpMorpho.c", 90, "freia_cipo_dilate");
-
-//  P(_return0_0,_return1,i_0,ret_0,ret_1) {_return0_0==ret_1,
-//    _return1==ret_0, connexity==8, size==4}
-
-      freia_common_print_backtrace();
-
-//  P(_return0_0,_return1,i_0,ret_0,ret_1) {_return0_0==ret_1,
-//    _return1==ret_0, connexity==8, size==4}
-
-      ret_3 = 1;
-   }
-   else if (freia_common_check_image_bpp_compat(imout, imin, (void *) 0)!=1) {
-
-//  P(_return0_0,_return1,i_0,ret_0,ret_1) {_return0_0==ret_1,
-//    _return1==ret_0, connexity==8, size==4}
-
-      
-      
-      fprintf(stderr, "bpp of images are not compatibles\n""ERROR: file %s, line %d, function %s: ", "./freia.src/cipo/src/freiaComplexOpMorpho.c", 95, "freia_cipo_dilate");
-
-//  P(_return0_0,_return1,i_0,ret_0,ret_1) {_return0_0==ret_1,
-//    _return1==ret_0, connexity==8, size==4}
-
-      freia_common_print_backtrace();
-
-//  P(_return0_0,_return1,i_0,ret_0,ret_1) {_return0_0==ret_1,
-//    _return1==ret_0, connexity==8, size==4}
-
-      ret_3 = 1;
-   }
-   else if (size==0) {
-
-//  P() {0==-1}
-
-      freia_aipo_copy(imout, imin);
-
-//  P() {0==-1}
-
-      ret_3 = 0;
-   }
-   else {
-
-//  P(_return0_0,_return1,i_0,ret_0,ret_1) {_return0_0==ret_1,
-//    _return1==ret_0, connexity==8, size==4}
-
-      if (connexity==4) goto l99985;
-
-//  P(_return0_0,_return1,i_0,ret_0,ret_1) {_return0_0==ret_1,
-//    _return1==ret_0, connexity==8, size==4}
-
-      if (connexity==6) goto l99984;
-
-//  P(_return0_0,_return1,i_0,ret_0,ret_1) {_return0_0==ret_1,
-//    _return1==ret_0, connexity==8, size==4}
-
-      if (connexity==8) goto l99983;
-
-//  P() {0==-1}
-
-      ret_3 = 2;
-      goto l99982;
-l99983:      ;
-
-//  P(_return0_0,_return1,i_0,ret_0,ret_1) {_return0_0==ret_1,
-//    _return1==ret_0, connexity==8, size==4}
-
-      freia_aipo_dilate_8c(imout, imin, kernel_8c_1);
-
-//  P(_return0_0,_return1,i_0,ret_0,ret_1) {_return0_0==ret_1,
-//    _return1==ret_0, connexity==8, size==4}
-
       for(i_1 = 1; i_1 <= size-1; i_1 += 1)
 
-//  P(_return0_0,_return1,i_0,i_1,ret_0,ret_1) {_return0_0==ret_1,
-//    _return1==ret_0, connexity==8, size==4, 1<=i_1, i_1<=3}
+//  P(i_1) {connexity==8, size==4, 1<=i_1, i_1<=3}
 
          freia_aipo_dilate_8c(imout, imout, kernel_8c_1);
-      goto l99982;
-l99984:      ;
+      goto l99986;
+l99988:      ;
 
 //  P() {0==-1}
 
@@ -748,9 +762,9 @@ l99984:      ;
 
 //  P() {0==-1}
 
-      ret_3 = 0;
-      goto l99982;
-l99985:      ;
+      ret_2 = 0;
+      goto l99986;
+l99989:      ;
 
 //  P() {0==-1}
 
@@ -766,45 +780,217 @@ l99985:      ;
 
 //  P() {0==-1}
 
-      ret_3 = 0;
-l99982:      ;
+      ret_2 = 0;
+l99986:      ;
 
-//  P(_return0_0,_return1,i_0,i_1,ret_0,ret_1) {_return0_0==ret_1,
-//    _return1==ret_0, connexity==8, size==4, 4<=i_1}
+//  P(i_1) {connexity==8, size==4, 4<=i_1}
 
 
    }
 
-//  P(_return0_0,_return1,i_0,i_1,ret_0,ret_1,ret_3)
-//    {_return0_0==ret_1, _return1==ret_0, connexity==8, size==4}
+//  P(i_1,ret_2) {connexity==8, size==4}
 
    
    
-   _return0_1 = ret_3;
+   _return0_0 = ret_2;
 
-//  P(_return0_0,_return0_1,_return1,i_0,i_1,ret_0,ret_1,ret_3)
-//    {_return0_0==ret_1, _return0_1==ret_3, _return1==ret_0,
-//    connexity==8, size==4}
+//  P(_return0_0,i_1,ret_2) {_return0_0==ret_2, connexity==8, size==4}
 
-   ret_2 = _return0_1;
+   ret_0 = _return0_0;
 
-//  P(_return0_0,_return0_1,_return1,i_0,i_1,ret_0,ret_1,ret_2,ret_3)
-//    {_return0_0==ret_1, _return0_1==ret_2, _return0_1==ret_3,
+//  P(_return0_0,i_1,ret_0,ret_2) {_return0_0==ret_0,
+//    _return0_0==ret_2, connexity==8, size==4}
+
+   ret_0 |= freia_aipo_sub(imout, imout, imin);
+
+//  P(_return0_0,i_1,ret_0,ret_2) {_return0_0==ret_2, connexity==8,
+//    size==4}
+
+   
+   
+   _return1 = ret_0;
+
+//  P(_return0_0,_return1,i_1,ret_0,ret_2) {_return0_0==ret_2,
 //    _return1==ret_0, connexity==8, size==4}
 
-   ret_2 |= freia_aipo_sub(imout, imout, imin);
+   (void) _return1;
 
-//  P(_return0_0,_return0_1,_return1,i_0,i_1,ret_0,ret_1,ret_2,ret_3)
-//    {_return0_0==ret_1, _return0_1==ret_3, _return1==ret_0,
+
+
+   ////PIPS generated variable
+   //`о^
+
+
+
+
+
+
+
+
+   ////PIPS generated variable
+   extern struct _IO_FILE *stderr;
+
+//  P(_return0_0,_return1,i_1,ret_0,ret_2) {_return0_0==ret_2,
+//    _return1==ret_0, connexity==8, size==4}
+
+   if (freia_common_check_image_bpp_compat(imout, imin, (void *) 0)!=1) {
+
+//  P(_return0_0,_return1,i_1,ret_0,ret_2) {_return0_0==ret_2,
+//    _return1==ret_0, connexity==8, size==4}
+
+
+      fprintf(stderr, "bpp of images are not compatibles\n""ERROR: file %s, line %d, function %s: ", "./freia.src/cipo/src/freiaComplexOpMorpho.c", 90, "freia_cipo_dilate");
+
+//  P(_return0_0,_return1,i_1,ret_0,ret_2) {_return0_0==ret_2,
+//    _return1==ret_0, connexity==8, size==4}
+
+      freia_common_print_backtrace();
+
+//  P(_return0_0,_return1,i_1,ret_0,ret_2) {_return0_0==ret_2,
+//    _return1==ret_0, connexity==8, size==4}
+
+      ret_5 = 1;
+   }
+   else if (freia_common_check_image_bpp_compat(imout, imin, (void *) 0)!=1) {
+
+//  P(_return0_0,_return1,i_1,ret_0,ret_2) {_return0_0==ret_2,
+//    _return1==ret_0, connexity==8, size==4}
+
+      
+      
+      fprintf(stderr, "bpp of images are not compatibles\n""ERROR: file %s, line %d, function %s: ", "./freia.src/cipo/src/freiaComplexOpMorpho.c", 95, "freia_cipo_dilate");
+
+//  P(_return0_0,_return1,i_1,ret_0,ret_2) {_return0_0==ret_2,
+//    _return1==ret_0, connexity==8, size==4}
+
+      freia_common_print_backtrace();
+
+//  P(_return0_0,_return1,i_1,ret_0,ret_2) {_return0_0==ret_2,
+//    _return1==ret_0, connexity==8, size==4}
+
+      ret_5 = 1;
+   }
+   else if (size==0) {
+
+//  P() {0==-1}
+
+      freia_aipo_copy(imout, imin);
+
+//  P() {0==-1}
+
+      ret_5 = 0;
+   }
+   else {
+
+//  P(_return0_0,_return1,i_1,ret_0,ret_2) {_return0_0==ret_2,
+//    _return1==ret_0, connexity==8, size==4}
+
+      if (connexity==4) goto l99985;
+
+//  P(_return0_0,_return1,i_1,ret_0,ret_2) {_return0_0==ret_2,
+//    _return1==ret_0, connexity==8, size==4}
+
+      if (connexity==6) goto l99984;
+
+//  P(_return0_0,_return1,i_1,ret_0,ret_2) {_return0_0==ret_2,
+//    _return1==ret_0, connexity==8, size==4}
+
+      if (connexity==8) goto l99983;
+
+//  P() {0==-1}
+
+      ret_5 = 2;
+      goto l99982;
+l99983:      ;
+
+//  P(_return0_0,_return1,i_1,ret_0,ret_2) {_return0_0==ret_2,
+//    _return1==ret_0, connexity==8, size==4}
+
+      freia_aipo_dilate_8c(imout, imin, kernel_8c_3);
+
+//  P(_return0_0,_return1,i_1,ret_0,ret_2) {_return0_0==ret_2,
+//    _return1==ret_0, connexity==8, size==4}
+
+      for(i_3 = 1; i_3 <= size-1; i_3 += 1)
+
+//  P(_return0_0,_return1,i_1,i_3,ret_0,ret_2) {_return0_0==ret_2,
+//    _return1==ret_0, connexity==8, size==4, 1<=i_3, i_3<=3}
+
+         freia_aipo_dilate_8c(imout, imout, kernel_8c_3);
+      goto l99982;
+l99984:      ;
+
+//  P() {0==-1}
+
+      freia_aipo_dilate_6c(imout, imin, kernel_6c_3);
+
+//  P() {0==-1}
+
+      for(i_3 = 1; i_3 <= size-1; i_3 += 1)
+
+//  P() {0==-1}
+
+         freia_aipo_dilate_6c(imout, imout, kernel_6c_3);
+
+//  P() {0==-1}
+
+      ret_5 = 0;
+      goto l99982;
+l99985:      ;
+
+//  P() {0==-1}
+
+      freia_aipo_dilate_8c(imout, imin, kernel_4c_3);
+
+//  P() {0==-1}
+
+      for(i_3 = 1; i_3 <= size-1; i_3 += 1)
+
+//  P() {0==-1}
+
+         freia_aipo_dilate_8c(imout, imout, kernel_4c_3);
+
+//  P() {0==-1}
+
+      ret_5 = 0;
+l99982:      ;
+
+//  P(_return0_0,_return1,i_1,i_3,ret_0,ret_2) {_return0_0==ret_2,
+//    _return1==ret_0, connexity==8, size==4, 4<=i_3}
+
+
+   }
+
+//  P(_return0_0,_return1,i_1,i_3,ret_0,ret_2,ret_5)
+//    {_return0_0==ret_2, _return1==ret_0, connexity==8, size==4}
+
+   
+   
+   _return0_1 = ret_5;
+
+//  P(_return0_0,_return0_1,_return1,i_1,i_3,ret_0,ret_2,ret_5)
+//    {_return0_0==ret_2, _return0_1==ret_5, _return1==ret_0,
+//    connexity==8, size==4}
+
+   ret_3 = _return0_1;
+
+//  P(_return0_0,_return0_1,_return1,i_1,i_3,ret_0,ret_2,ret_3,ret_5)
+//    {_return0_0==ret_2, _return0_1==ret_3, _return0_1==ret_5,
+//    _return1==ret_0, connexity==8, size==4}
+
+   ret_3 |= freia_aipo_sub(imout, imout, imin);
+
+//  P(_return0_0,_return0_1,_return1,i_1,i_3,ret_0,ret_2,ret_3,ret_5)
+//    {_return0_0==ret_2, _return0_1==ret_5, _return1==ret_0,
 //    connexity==8, size==4}
 
    
    
-   _return2 = ret_2;
+   _return2 = ret_3;
 
-//  P(_return0_0,_return0_1,_return1,_return2,i_0,i_1,ret_0,ret_1,
-//    ret_2,ret_3) {_return0_0==ret_1, _return0_1==ret_3,
-//    _return1==ret_0, _return2==ret_2, connexity==8, size==4}
+//  P(_return0_0,_return0_1,_return1,_return2,i_1,i_3,ret_0,ret_2,
+//    ret_3,ret_5) {_return0_0==ret_2, _return0_1==ret_5,
+//    _return1==ret_0, _return2==ret_3, connexity==8, size==4}
 
    (void) _return2;
 }
@@ -817,126 +1003,191 @@ int main()
    freia_data2d *imin;
    int32_t connexity = 8;
    uint32_t size = 4;
+   //PIPS generated variable
    int _return0;
+   //PIPS generated variable
    int _return1;
+   //PIPS generated variable
    int _return2;
+   //PIPS generated variable
    freia_error ret_0;
-   extern int freia_aipo_sub(freia_data2d *f1, freia_data2d *f2, freia_data2d *f3);
+   //PIPS generated variable
    int _return0_0;
-   extern struct _IO_FILE *stderr;
+   //PIPS generated variable
    int kernel_8c_0[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+   //PIPS generated variable
    int kernel_6c_0[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1};
+   //PIPS generated variable
    int kernel_4c_0[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0};
+   //PIPS generated variable
    int i_0;
+   //PIPS generated variable
    freia_error ret_1;
-   freia_error ret_2;
-   int _return0_1;
+   //PIPS generated variable
    int kernel_8c_1[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+   //PIPS generated variable
    int kernel_6c_1[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1};
+   //PIPS generated variable
    int kernel_4c_1[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0};
+   //PIPS generated variable
    int i_1;
+   //PIPS generated variable
+   freia_error ret_2;
+   //PIPS generated variable
    freia_error ret_3;
+   //PIPS generated variable
+   int _return0_1;
+   //PIPS generated variable
+   int kernel_8c_2[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+   //PIPS generated variable
+   int kernel_6c_2[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1};
+   //PIPS generated variable
+   int kernel_4c_2[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0};
+   //PIPS generated variable
+   int i_2;
+   //PIPS generated variable
+   freia_error ret_4;
+   //PIPS generated variable
+   int kernel_8c_3[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+   //PIPS generated variable
+   int kernel_6c_3[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1};
+   //PIPS generated variable
+   int kernel_4c_3[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0};
+   //PIPS generated variable
+   int i_3;
+   //PIPS generated variable
+   freia_error ret_5;
+
+
+
+   ////PIPS generated variable
+   //ат^
+
+
+
+
+
+
+
+
+   ////PIPS generated variable
+   extern struct _IO_FILE *stderr;
    if (freia_common_check_image_bpp_compat(imout, imin, (void *) 0)!=1) {
 
       fprintf(stderr, "bpp of images are not compatibles\n""ERROR: file %s, line %d, function %s: ", "./freia.src/cipo/src/freiaComplexOpMorpho.c", 90, "freia_cipo_dilate");
       freia_common_print_backtrace();
-      ret_1 = 1;
+      ret_2 = 1;
    }
    else if (freia_common_check_image_bpp_compat(imout, imin, (void *) 0)!=1) {
       
       
       fprintf(stderr, "bpp of images are not compatibles\n""ERROR: file %s, line %d, function %s: ", "./freia.src/cipo/src/freiaComplexOpMorpho.c", 95, "freia_cipo_dilate");
       freia_common_print_backtrace();
-      ret_1 = 1;
+      ret_2 = 1;
    }
    else if (4==0) {
       freia_aipo_copy(imout, imin);
-      ret_1 = 0;
+      ret_2 = 0;
    }
    else {
       if (8==4) goto l99989;
       if (8==6) goto l99988;
       if (8==8) goto l99987;
-      ret_1 = 2;
+      ret_2 = 2;
       goto l99986;
 l99987:      ;
-      freia_aipo_dilate_8c(imout, imin, kernel_8c_0);
-      for(i_0 = 1; i_0 <= 3; i_0 += 1)
-         freia_aipo_dilate_8c(imout, imout, kernel_8c_0);
+      freia_aipo_dilate_8c(imout, imin, kernel_8c_1);
+      for(i_1 = 1; i_1 <= 3; i_1 += 1)
+         freia_aipo_dilate_8c(imout, imout, kernel_8c_1);
       goto l99986;
 l99988:      ;
-      freia_aipo_dilate_6c(imout, imin, kernel_6c_0);
-      for(i_0 = 1; i_0 <= size-1; i_0 += 1)
-         freia_aipo_dilate_6c(imout, imout, kernel_6c_0);
-      ret_1 = 0;
+      freia_aipo_dilate_6c(imout, imin, kernel_6c_1);
+      for(i_1 = 1; i_1 <= size-1; i_1 += 1)
+         freia_aipo_dilate_6c(imout, imout, kernel_6c_1);
+      ret_2 = 0;
       goto l99986;
 l99989:      ;
-      freia_aipo_dilate_8c(imout, imin, kernel_4c_0);
-      for(i_0 = 1; i_0 <= size-1; i_0 += 1)
-         freia_aipo_dilate_8c(imout, imout, kernel_4c_0);
-      ret_1 = 0;
+      freia_aipo_dilate_8c(imout, imin, kernel_4c_1);
+      for(i_1 = 1; i_1 <= size-1; i_1 += 1)
+         freia_aipo_dilate_8c(imout, imout, kernel_4c_1);
+      ret_2 = 0;
 l99986:      ;
 
    }
    
    
-   _return0_0 = ret_1;
+   _return0_0 = ret_2;
    ret_0 = _return0_0;
    ret_0 |= freia_aipo_sub(imout, imout, imin);
    
    
    _return1 = ret_0;
    (void) _return1;
+
+
+
+   ////PIPS generated variable
+   //`о^
+
+
+
+
+
+
+
+
+   ////PIPS generated variable
+   extern struct _IO_FILE *stderr;
    if (freia_common_check_image_bpp_compat(imout, imin, (void *) 0)!=1) {
 
       fprintf(stderr, "bpp of images are not compatibles\n""ERROR: file %s, line %d, function %s: ", "./freia.src/cipo/src/freiaComplexOpMorpho.c", 90, "freia_cipo_dilate");
       freia_common_print_backtrace();
-      ret_3 = 1;
+      ret_5 = 1;
    }
    else if (freia_common_check_image_bpp_compat(imout, imin, (void *) 0)!=1) {
       
       
       fprintf(stderr, "bpp of images are not compatibles\n""ERROR: file %s, line %d, function %s: ", "./freia.src/cipo/src/freiaComplexOpMorpho.c", 95, "freia_cipo_dilate");
       freia_common_print_backtrace();
-      ret_3 = 1;
+      ret_5 = 1;
    }
    else if (4==0) {
       freia_aipo_copy(imout, imin);
-      ret_3 = 0;
+      ret_5 = 0;
    }
    else {
       if (8==4) goto l99985;
       if (8==6) goto l99984;
       if (8==8) goto l99983;
-      ret_3 = 2;
+      ret_5 = 2;
       goto l99982;
 l99983:      ;
-      freia_aipo_dilate_8c(imout, imin, kernel_8c_1);
-      for(i_1 = 1; i_1 <= 3; i_1 += 1)
-         freia_aipo_dilate_8c(imout, imout, kernel_8c_1);
+      freia_aipo_dilate_8c(imout, imin, kernel_8c_3);
+      for(i_3 = 1; i_3 <= 3; i_3 += 1)
+         freia_aipo_dilate_8c(imout, imout, kernel_8c_3);
       goto l99982;
 l99984:      ;
-      freia_aipo_dilate_6c(imout, imin, kernel_6c_1);
-      for(i_1 = 1; i_1 <= size-1; i_1 += 1)
-         freia_aipo_dilate_6c(imout, imout, kernel_6c_1);
-      ret_3 = 0;
+      freia_aipo_dilate_6c(imout, imin, kernel_6c_3);
+      for(i_3 = 1; i_3 <= size-1; i_3 += 1)
+         freia_aipo_dilate_6c(imout, imout, kernel_6c_3);
+      ret_5 = 0;
       goto l99982;
 l99985:      ;
-      freia_aipo_dilate_8c(imout, imin, kernel_4c_1);
-      for(i_1 = 1; i_1 <= size-1; i_1 += 1)
-         freia_aipo_dilate_8c(imout, imout, kernel_4c_1);
-      ret_3 = 0;
+      freia_aipo_dilate_8c(imout, imin, kernel_4c_3);
+      for(i_3 = 1; i_3 <= size-1; i_3 += 1)
+         freia_aipo_dilate_8c(imout, imout, kernel_4c_3);
+      ret_5 = 0;
 l99982:      ;
 
    }
    
    
-   _return0_1 = ret_3;
-   ret_2 = _return0_1;
-   ret_2 |= freia_aipo_sub(imout, imout, imin);
+   _return0_1 = ret_5;
+   ret_3 = _return0_1;
+   ret_3 |= freia_aipo_sub(imout, imout, imin);
    
    
-   _return2 = ret_2;
+   _return2 = ret_3;
    (void) _return2;
 }
 
@@ -948,63 +1199,87 @@ int main()
    freia_data2d *imin;
    int32_t connexity = 8;
    uint32_t size = 4;
+   //PIPS generated variable
    int _return0;
+   //PIPS generated variable
    int _return1;
+   //PIPS generated variable
    int _return2;
+   //PIPS generated variable
    freia_error ret_0;
-   extern int freia_aipo_sub(freia_data2d *f1, freia_data2d *f2, freia_data2d *f3);
+   //PIPS generated variable
    int _return0_0;
-   extern struct _IO_FILE *stderr;
+   //PIPS generated variable
    int kernel_8c_0[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+   //PIPS generated variable
    int kernel_6c_0[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1};
+   //PIPS generated variable
    int kernel_4c_0[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0};
+   //PIPS generated variable
    int i_0;
+   //PIPS generated variable
    freia_error ret_1;
-   freia_error ret_2;
-   int _return0_1;
+   //PIPS generated variable
    int kernel_8c_1[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+   //PIPS generated variable
    int kernel_6c_1[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1};
+   //PIPS generated variable
    int kernel_4c_1[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0};
+   //PIPS generated variable
    int i_1;
+   //PIPS generated variable
+   freia_error ret_2;
+   //PIPS generated variable
    freia_error ret_3;
+   //PIPS generated variable
+   int _return0_1;
+   //PIPS generated variable
+   int kernel_8c_2[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+   //PIPS generated variable
+   int kernel_6c_2[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1};
+   //PIPS generated variable
+   int kernel_4c_2[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0};
+   //PIPS generated variable
+   int i_2;
+   //PIPS generated variable
+   freia_error ret_4;
+   //PIPS generated variable
+   int kernel_8c_3[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+   //PIPS generated variable
+   int kernel_6c_3[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1};
+   //PIPS generated variable
+   int kernel_4c_3[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0};
+   //PIPS generated variable
+   int i_3;
+   //PIPS generated variable
+   freia_error ret_5;
+
+
+
+   ////PIPS generated variable
+   //ат^
+
+
+
+
+
+
+
+
+   ////PIPS generated variable
+   extern struct _IO_FILE *stderr;
    if (freia_common_check_image_bpp_compat(imout, imin, (void *) 0)!=1) {
 
       fprintf(stderr, "bpp of images are not compatibles\n""ERROR: file %s, line %d, function %s: ", "./freia.src/cipo/src/freiaComplexOpMorpho.c", 90, "freia_cipo_dilate");
       freia_common_print_backtrace();
-      ret_1 = 1;
+      ret_2 = 1;
    }
    else if (freia_common_check_image_bpp_compat(imout, imin, (void *) 0)!=1) {
       
       
       fprintf(stderr, "bpp of images are not compatibles\n""ERROR: file %s, line %d, function %s: ", "./freia.src/cipo/src/freiaComplexOpMorpho.c", 95, "freia_cipo_dilate");
       freia_common_print_backtrace();
-      ret_1 = 1;
-   }
-   else {
-      freia_aipo_dilate_8c(imout, imin, kernel_8c_0);
-      for(i_0 = 1; i_0 <= 3; i_0 += 1)
-         freia_aipo_dilate_8c(imout, imout, kernel_8c_0);
-   }
-   
-   
-   _return0_0 = ret_1;
-   ret_0 = _return0_0;
-   ret_0 |= freia_aipo_sub(imout, imout, imin);
-   
-   
-   _return1 = ret_0;
-   if (freia_common_check_image_bpp_compat(imout, imin, (void *) 0)!=1) {
-
-      fprintf(stderr, "bpp of images are not compatibles\n""ERROR: file %s, line %d, function %s: ", "./freia.src/cipo/src/freiaComplexOpMorpho.c", 90, "freia_cipo_dilate");
-      freia_common_print_backtrace();
-      ret_3 = 1;
-   }
-   else if (freia_common_check_image_bpp_compat(imout, imin, (void *) 0)!=1) {
-      
-      
-      fprintf(stderr, "bpp of images are not compatibles\n""ERROR: file %s, line %d, function %s: ", "./freia.src/cipo/src/freiaComplexOpMorpho.c", 95, "freia_cipo_dilate");
-      freia_common_print_backtrace();
-      ret_3 = 1;
+      ret_2 = 1;
    }
    else {
       freia_aipo_dilate_8c(imout, imin, kernel_8c_1);
@@ -1013,12 +1288,53 @@ int main()
    }
    
    
-   _return0_1 = ret_3;
-   ret_2 = _return0_1;
-   ret_2 |= freia_aipo_sub(imout, imout, imin);
+   _return0_0 = ret_2;
+   ret_0 = _return0_0;
+   ret_0 |= freia_aipo_sub(imout, imout, imin);
    
    
-   _return2 = ret_2;
+   _return1 = ret_0;
+
+
+
+   ////PIPS generated variable
+   //`о^
+
+
+
+
+
+
+
+
+   ////PIPS generated variable
+   extern struct _IO_FILE *stderr;
+   if (freia_common_check_image_bpp_compat(imout, imin, (void *) 0)!=1) {
+
+      fprintf(stderr, "bpp of images are not compatibles\n""ERROR: file %s, line %d, function %s: ", "./freia.src/cipo/src/freiaComplexOpMorpho.c", 90, "freia_cipo_dilate");
+      freia_common_print_backtrace();
+      ret_5 = 1;
+   }
+   else if (freia_common_check_image_bpp_compat(imout, imin, (void *) 0)!=1) {
+      
+      
+      fprintf(stderr, "bpp of images are not compatibles\n""ERROR: file %s, line %d, function %s: ", "./freia.src/cipo/src/freiaComplexOpMorpho.c", 95, "freia_cipo_dilate");
+      freia_common_print_backtrace();
+      ret_5 = 1;
+   }
+   else {
+      freia_aipo_dilate_8c(imout, imin, kernel_8c_3);
+      for(i_3 = 1; i_3 <= 3; i_3 += 1)
+         freia_aipo_dilate_8c(imout, imout, kernel_8c_3);
+   }
+   
+   
+   _return0_1 = ret_5;
+   ret_3 = _return0_1;
+   ret_3 |= freia_aipo_sub(imout, imout, imin);
+   
+   
+   _return2 = ret_3;
    ;
 }
 
@@ -1030,65 +1346,87 @@ int main()
    freia_data2d *imin;
    int32_t connexity = 8;
    uint32_t size = 4;
+   //PIPS generated variable
    int _return0;
+   //PIPS generated variable
    int _return1;
+   //PIPS generated variable
    int _return2;
+   //PIPS generated variable
    freia_error ret_0;
-   extern int freia_aipo_sub(freia_data2d *f1, freia_data2d *f2, freia_data2d *f3);
+   //PIPS generated variable
    int _return0_0;
-   extern struct _IO_FILE *stderr;
+   //PIPS generated variable
    int kernel_8c_0[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+   //PIPS generated variable
    int kernel_6c_0[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1};
+   //PIPS generated variable
    int kernel_4c_0[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0};
+   //PIPS generated variable
    int i_0;
+   //PIPS generated variable
    freia_error ret_1;
-   freia_error ret_2;
-   int _return0_1;
+   //PIPS generated variable
    int kernel_8c_1[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+   //PIPS generated variable
    int kernel_6c_1[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1};
+   //PIPS generated variable
    int kernel_4c_1[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0};
+   //PIPS generated variable
    int i_1;
+   //PIPS generated variable
+   freia_error ret_2;
+   //PIPS generated variable
    freia_error ret_3;
+   //PIPS generated variable
+   int _return0_1;
+   //PIPS generated variable
+   int kernel_8c_2[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+   //PIPS generated variable
+   int kernel_6c_2[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1};
+   //PIPS generated variable
+   int kernel_4c_2[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0};
+   //PIPS generated variable
+   int i_2;
+   //PIPS generated variable
+   freia_error ret_4;
+   //PIPS generated variable
+   int kernel_8c_3[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+   //PIPS generated variable
+   int kernel_6c_3[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1};
+   //PIPS generated variable
+   int kernel_4c_3[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0};
+   //PIPS generated variable
+   int i_3;
+   //PIPS generated variable
+   freia_error ret_5;
+
+
+
+   ////PIPS generated variable
+   //ат^
+
+
+
+
+
+
+
+
+   ////PIPS generated variable
+   extern struct _IO_FILE *stderr;
    if (freia_common_check_image_bpp_compat(imout, imin, (void *) 0)!=1) {
 
       fprintf(stderr, "bpp of images are not compatibles\n""ERROR: file %s, line %d, function %s: ", "./freia.src/cipo/src/freiaComplexOpMorpho.c", 90, "freia_cipo_dilate");
       freia_common_print_backtrace();
-      ret_1 = 1;
+      ret_2 = 1;
    }
    else if (freia_common_check_image_bpp_compat(imout, imin, (void *) 0)!=1) {
       
       
       fprintf(stderr, "bpp of images are not compatibles\n""ERROR: file %s, line %d, function %s: ", "./freia.src/cipo/src/freiaComplexOpMorpho.c", 95, "freia_cipo_dilate");
       freia_common_print_backtrace();
-      ret_1 = 1;
-   }
-   else {
-      freia_aipo_dilate_8c(imout, imin, kernel_8c_0);
-      freia_aipo_dilate_8c(imout, imout, kernel_8c_0);
-      freia_aipo_dilate_8c(imout, imout, kernel_8c_0);
-      freia_aipo_dilate_8c(imout, imout, kernel_8c_0);
-      i_0 = 4;
-   }
-   
-   
-   _return0_0 = ret_1;
-   ret_0 = _return0_0;
-   ret_0 |= freia_aipo_sub(imout, imout, imin);
-   
-   
-   _return1 = ret_0;
-   if (freia_common_check_image_bpp_compat(imout, imin, (void *) 0)!=1) {
-
-      fprintf(stderr, "bpp of images are not compatibles\n""ERROR: file %s, line %d, function %s: ", "./freia.src/cipo/src/freiaComplexOpMorpho.c", 90, "freia_cipo_dilate");
-      freia_common_print_backtrace();
-      ret_3 = 1;
-   }
-   else if (freia_common_check_image_bpp_compat(imout, imin, (void *) 0)!=1) {
-      
-      
-      fprintf(stderr, "bpp of images are not compatibles\n""ERROR: file %s, line %d, function %s: ", "./freia.src/cipo/src/freiaComplexOpMorpho.c", 95, "freia_cipo_dilate");
-      freia_common_print_backtrace();
-      ret_3 = 1;
+      ret_2 = 1;
    }
    else {
       freia_aipo_dilate_8c(imout, imin, kernel_8c_1);
@@ -1099,12 +1437,55 @@ int main()
    }
    
    
-   _return0_1 = ret_3;
-   ret_2 = _return0_1;
-   ret_2 |= freia_aipo_sub(imout, imout, imin);
+   _return0_0 = ret_2;
+   ret_0 = _return0_0;
+   ret_0 |= freia_aipo_sub(imout, imout, imin);
    
    
-   _return2 = ret_2;
+   _return1 = ret_0;
+
+
+
+   ////PIPS generated variable
+   //`о^
+
+
+
+
+
+
+
+
+   ////PIPS generated variable
+   extern struct _IO_FILE *stderr;
+   if (freia_common_check_image_bpp_compat(imout, imin, (void *) 0)!=1) {
+
+      fprintf(stderr, "bpp of images are not compatibles\n""ERROR: file %s, line %d, function %s: ", "./freia.src/cipo/src/freiaComplexOpMorpho.c", 90, "freia_cipo_dilate");
+      freia_common_print_backtrace();
+      ret_5 = 1;
+   }
+   else if (freia_common_check_image_bpp_compat(imout, imin, (void *) 0)!=1) {
+      
+      
+      fprintf(stderr, "bpp of images are not compatibles\n""ERROR: file %s, line %d, function %s: ", "./freia.src/cipo/src/freiaComplexOpMorpho.c", 95, "freia_cipo_dilate");
+      freia_common_print_backtrace();
+      ret_5 = 1;
+   }
+   else {
+      freia_aipo_dilate_8c(imout, imin, kernel_8c_3);
+      freia_aipo_dilate_8c(imout, imout, kernel_8c_3);
+      freia_aipo_dilate_8c(imout, imout, kernel_8c_3);
+      freia_aipo_dilate_8c(imout, imout, kernel_8c_3);
+      i_3 = 4;
+   }
+   
+   
+   _return0_1 = ret_5;
+   ret_3 = _return0_1;
+   ret_3 |= freia_aipo_sub(imout, imout, imin);
+   
+   
+   _return2 = ret_3;
    ;
 }
 

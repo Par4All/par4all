@@ -4,8 +4,7 @@ Initial code
 void scalarization20(double B[SIZE][SIZE])
 {
    // BEGIN BLOCK
-   int i;
-   int j;
+   int i, j;
    for(i = 0; i <= SIZE-1; i += 1)
       for(j = 0; j <= SIZE-1; j += 1) {
          // BEGIN BLOCK
@@ -28,8 +27,7 @@ void scalarization20(double B[SIZE][SIZE])
 //  P() {TOP-LEVEL:SIZE==10}
 
    // BEGIN BLOCK
-   int i;
-   int j;
+   int i, j;
 
 //  P() {TOP-LEVEL:SIZE==10}
 
@@ -64,8 +62,7 @@ IN regions
 void scalarization20(double B[SIZE][SIZE])
 {
    // BEGIN BLOCK
-   int i;
-   int j;
+   int i, j;
    for(i = 0; i <= SIZE-1; i += 1)
       for(j = 0; j <= SIZE-1; j += 1) {
          // BEGIN BLOCK
@@ -96,8 +93,7 @@ void scalarization20(double B[SIZE][SIZE])
 //  <B[PHI1][PHI2]-OUT-EXACT-{PHI1==0, PHI2==0, TOP-LEVEL:SIZE==10}>
 
    // BEGIN BLOCK
-   int i;
-   int j;
+   int i, j;
 
 //  <B[PHI1][PHI2]-OUT-EXACT-{PHI1==0, PHI2==0, TOP-LEVEL:SIZE==10}>
 
@@ -108,7 +104,7 @@ void scalarization20(double B[SIZE][SIZE])
 
       for(j = 0; j <= SIZE-1; j += 1) {
 
-//  <B[PHI1][PHI2]-OUT-EXACT-{PHI1==i, PHI1==0, PHI2==j, PHI2==0,
+//  <B[PHI1][PHI2]-OUT-EXACT-{PHI1==i, PHI1==0, j==PHI2, PHI2==0,
 //    TOP-LEVEL:SIZE==10}>
 
          // BEGIN BLOCK
@@ -123,7 +119,7 @@ void scalarization20(double B[SIZE][SIZE])
 
          B[i][j] = B[i][j]+B[i][j];
 
-//  <B[PHI1][PHI2]-OUT-EXACT-{PHI1==i, PHI1==0, PHI2==j, PHI2==0,
+//  <B[PHI1][PHI2]-OUT-EXACT-{PHI1==i, PHI1==0, j==PHI2, PHI2==0,
 //    TOP-LEVEL:SIZE==10}>
 
          B[i][j] = B[i][j]*B[i][j];
@@ -137,8 +133,8 @@ Code after scalarization
 void scalarization20(double B[SIZE][SIZE])
 {
    // BEGIN BLOCK
-   int i;
-   int j;
+   int i, j;
+   //PIPS generated variable
    double __scalar__0;
    for(i = 0; i <= SIZE-1; i += 1)
       for(j = 0; j <= SIZE-1; j += 1) {

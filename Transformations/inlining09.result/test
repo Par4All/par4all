@@ -14,7 +14,9 @@ Code after inlining
 
 void bar(int **a)
 {
+   //PIPS generated variable
    int *P_0 = *a;
+
    *P_0 = 0;
 }
 

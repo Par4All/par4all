@@ -3,8 +3,7 @@ Initial code for "suppress_dead_code02"
 
 void suppress_dead_code02()
 {
-   int i;
-   int j;
+   int i, j;
    
    /* Not dead code because of control effect */
    while (i) {
@@ -16,8 +15,7 @@ Initial code for "suppress_dead_code02" with proper effects
 
 void suppress_dead_code02()
 {
-   int i;
-   int j;
+   int i, j;
 //               <must be read   >: i
    
    /* Not dead code because of control effect */
@@ -30,8 +28,7 @@ Initial code for "suppress_dead_code02" with cumulated effects
 
 void suppress_dead_code02()
 {
-   int i;
-   int j;
+   int i, j;
 //               <must be read   >: i
    
    /* Not dead code because of control effect */
@@ -44,8 +41,7 @@ Code for "suppress_dead_code02" after dead code elimination
 
 void suppress_dead_code02()
 {
-   int i;
-   int j;
+   int i, j;
    
    /* Not dead code because of control effect */
    while (i) 

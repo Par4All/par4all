@@ -12,8 +12,7 @@ int foo(int i)
 }
 int bar(int i_)
 {
-   int i__ = 0;
-   int i = 0;
+   int i__ = 0, i = 0;
    int j = 0;
    j += foo(i_);
    return j;
@@ -23,18 +22,19 @@ Code after inlining
 
 int bar(int i_)
 {
-   int i__ = 0;
-   int i = 0;
+   int i__ = 0, i = 0;
    int j = 0;
+   //PIPS generated variable
    int _return0;
    {
-      int i___ = i_;
       int i__ = 3;
+      //PIPS generated variable
+      int i = i_;
       {
          int i_ = i__;
-         i___ += i_;
+         i += i_;
       }
-      _return0 = i___;
+      _return0 = i;
    }
    j += _return0;
    return j;

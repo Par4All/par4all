@@ -27,6 +27,7 @@ int flatten_code01()
    // BEGIN BLOCK
    int i = 1;
    int j;
+   //PIPS generated variable
    int i_0 = 2;
    i++;
    i_0++;

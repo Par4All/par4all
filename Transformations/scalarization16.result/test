@@ -4,11 +4,11 @@ Code after scalarization
 int scalarization16(int n)
 {
    // BEGIN BLOCK
-   int x[n];
-   int y[n][n];
-   int i;
-   int j;
+   int x[n], y[n][n];
+   int i, j;
+   //PIPS generated variable
    int __scalar__0;
+   //PIPS generated variable
    int __scalar__1;
 
    for(i = 0; i <= n-1; i += 1) {

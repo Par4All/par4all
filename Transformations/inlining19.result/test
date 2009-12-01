@@ -3,8 +3,8 @@ Initial code
 
 void foo(void)
 {
-   int i;
-   int s = 0;
+   int i;                                                               /*0004*/
+   int s = 0;                                                           /*0005*/
    for (i = 0;i<3;i++)                                                  /*0006*/
       s += kernel[i];                                                   /*0007*/
 }
@@ -19,22 +19,30 @@ Code after inlining
 void inlining19(void)
 {
    {
-      int i;
-      int s = 0;
-      extern const  int kernel[3];
-      for (i = 0;i<3;i++)                                               /*0007*/
+      int i;                                                            /*0004*/
+      /*0004*/
+      int s = 0;                                                        /*0005*/
+      /*0005*/
+      //PIPS generated variable
+      extern const  int kernel[3];                                      /*0007*/
+      for (i = 0;i<3;i++)                                               /*0008*/
          /*0006*/
-         s += kernel[i];                                                /*0008*/
+         s += kernel[i];                                                /*0009*/
       /*0007*/
+      ;
    }
    {
-      int i;
-      int s = 0;
-      extern const  int kernel[3];
-      for (i = 0;i<3;i++)                                               /*0015*/
+      int i;                                                            /*0013*/
+      /*0004*/
+      int s = 0;                                                        /*0014*/
+      /*0005*/
+      //PIPS generated variable
+      extern const  int kernel[3];                                      /*0016*/
+      for (i = 0;i<3;i++)                                               /*0017*/
          /*0006*/
-         s += kernel[i];                                                /*0016*/
+         s += kernel[i];                                                /*0018*/
       /*0007*/
+      ;
    }
 }
 
@@ -42,24 +50,31 @@ Code after flattening
 
 void inlining19(void)
 {
-   {
-      int i;
-      int s = 0;
-      extern const  int kernel[3];
-      for (i = 0;i<3;i++)                                               /*0007*/
-         /*0006*/
-         s += kernel[i];                                                /*0008*/
-      /*0007*/
-   }
-   {
-      int i;
-      int s = 0;
-      extern const  int kernel[3];
-      for (i = 0;i<3;i++)                                               /*0015*/
-         /*0006*/
-         s += kernel[i];                                                /*0016*/
-      /*0007*/
-   }
+   //PIPS generated variable
+   int i_0;
+   //PIPS generated variable
+   int s_0 = 0;
+   //PIPS generated variable
+   int i_1;
+   //PIPS generated variable
+   int s_1 = 0;
+   /*0004*/
+   /*0005*/
+   //PIPS generated variable
+   extern const  int kernel[3];                                         /*0007*/
+   for (i_0 = 0;i_0<3;i_0++)                                            /*0008*/
+      /*0006*/
+      s_0 += kernel[i_0];                                               /*0009*/
+   /*0007*/
+   /*0004*/
+   /*0005*/
+   //PIPS generated variable
+   extern const  int kernel[3];                                         /*0016*/
+   for (i_1 = 0;i_1<3;i_1++)                                            /*0017*/
+      /*0006*/
+      s_1 += kernel[i_1];                                               /*0018*/
+   /*0007*/
+   ;
 }
 
 Unsplit resulting code

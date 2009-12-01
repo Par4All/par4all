@@ -35,14 +35,19 @@ int flatten_code02()
    // BEGIN BLOCK
    int i = 1;
    int j;
+   //PIPS generated variable
    int i_0 = 2;
+   //PIPS generated variable
    int k_0 = 2;
+   //PIPS generated variable
    int k_1 = 3;
+   //PIPS generated variable
+   int k_2 = 3;
    i++;
    i_0++;
    j = k_0;
    i_0++;
-   j = k_1;
+   j = k_2;
    i = j;
 
    printf("%d %d\n", i, j);

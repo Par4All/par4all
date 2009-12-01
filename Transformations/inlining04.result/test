@@ -16,17 +16,19 @@ Code after inlining
 
 int main(int argc, char **argv)
 {
+   //PIPS generated variable
    int _return0;
+   //PIPS generated variable
    int _return1;
    {
       int c = 1>2?1:2;
       printf("%d\n", c);
-      _return0 = c;
+      _return1 = c;
    }
    {
-      int c = 2>3?2:3;
+      int c = 1>2?1:2;
       printf("%d\n", c);
-      _return1 = c;
+      _return0 = c;
    }
    return _return0+_return1;
 }

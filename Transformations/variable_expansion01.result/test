@@ -3,8 +3,7 @@ Initial code
 
 int foo(int c[10])
 {
-   int i;
-   int k;
+   int i, k;
    for(i = 0; i <= 9; i += 1) {
       k = c[i];
       k = k+1;
@@ -15,8 +14,7 @@ int foo(int c[10])
 int main(int argc, char *argv[])
 {
    int c[10];
-   int i;
-   int k = 0;
+   int i, k = 0;
    for(i = 0; i <= 9; i += 1)
       c[i] = i;
    k = foo(c);
@@ -28,8 +26,7 @@ Code after variable_expansion
 
 int foo(int c[10])
 {
-   int i;
-   int k[9+1];
+   int i, k[9+1];
    for(i = 0; i <= 9; i += 1) {
       k[i] = c[i];
       k[i] = k[i]+1;

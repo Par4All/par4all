@@ -13,13 +13,15 @@ int main(void)
 }
 int main(void)
 {
-   int _return0;
+   //PIPS generated variable
+   int _return0;                                                        /*0004*/
    {
-      extern int kernel[3];
-      bla(kernel);                                                      /*0006*/
+      //PIPS generated variable
+      extern int kernel[3];                                             /*0007*/
+      bla(kernel);                                                      /*0008*/
       /*0004*/
-      _return0 = 0;                                                     /*0007*/
+      _return0 = 0;                                                     /*0009*/
    }
-   _return0;                                                            /*0011*/
-   return 0;                                                            /*0012*/
+   _return0;                                                            /*0013*/
+   return 0;                                                            /*0014*/
 }

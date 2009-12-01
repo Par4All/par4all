@@ -3,8 +3,7 @@ Initial code
 
 int main(int argc, char *argv[])
 {
-   int i;
-   int j = 1;
+   int i, j = 1;
 loop:
    for(i = 0; i <= 99; i += 1)
       j += 2*i;
@@ -15,10 +14,12 @@ Code after unrolling
 
 int main(int argc, char *argv[])
 {
-   int i;
-   int j = 1;
+   int i, j = 1;
+   //PIPS generated variable
    int LU_NUB0;
+   //PIPS generated variable
    int LU_IB0;
+   //PIPS generated variable
    int LU_IND0;
 loop:   LU_NUB0 = 100;
    LU_IB0 = 0;
@@ -41,10 +42,12 @@ Code after dead code elimination
 
 int main(int argc, char *argv[])
 {
-   int i;
-   int j = 1;
+   int i, j = 1;
+   //PIPS generated variable
    int LU_NUB0;
+   //PIPS generated variable
    int LU_IB0;
+   //PIPS generated variable
    int LU_IND0;
    LU_NUB0 = 100;
    LU_IB0 = 0;

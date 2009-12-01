@@ -5,12 +5,12 @@ void flatten_code10(void)
 {
 // (0,1)
    // BEGIN BLOCK
-   int i = 2;
+   int i = 2;                                                           /*0004*/
    {
-// (0,2)
-      // BEGIN BLOCK
-      extern int foo;
 // (0,3)
+      // BEGIN BLOCK
+      extern int foo;                                                   /*0007*/
+// (0,5)
 
       fprintf(stderr, "Hello world!\n");                                /*0009*/
       // END BLOCK
@@ -24,9 +24,9 @@ void flatten_code10(void)
 {
 // (0,1)
    // BEGIN BLOCK
-   int i = 2;
-   extern int foo;
-// (0,2)
+   int i = 2;                                                           /*0004*/
+   extern int foo;                                                      /*0007*/
+// (0,4)
 
    fprintf(stderr, "Hello world!\n");                                   /*0009*/
    // END BLOCK

@@ -3,13 +3,13 @@ Code for "suppress_dead_code03"
 
 int suppress_dead_code03(int i)
 {
-   int k;
-// (0,2)
+   int k;                                                               /*0012*/
+// (0,3)
 
    foo(1);                                                              /*0014*/
-// (0,3)
-   k = 3;                                                               /*0015*/
 // (0,4)
+   k = 3;                                                               /*0015*/
+// (0,5)
 
    return i;                                                            /*0017*/
 }
@@ -19,15 +19,15 @@ Code with cumulated effects for "suppress_dead_code03"
 //               <must be read   >: i
 int suppress_dead_code03(int i)
 {
-   int k;
-// (0,2)
+   int k;                                                               /*0012*/
+// (0,3)
 
    foo(1);                                                              /*0014*/
 //               <must be written>: k
-// (0,3)
+// (0,4)
    k = 3;                                                               /*0015*/
 //               <must be read   >: i
-// (0,4)
+// (0,5)
 
    return i;                                                            /*0017*/
 }
@@ -44,13 +44,13 @@ Code for "suppress_dead_code03" after dead code elimination
 
 int suppress_dead_code03(int i)
 {
-   int k;
-// (0,2)
+   int k;                                                               /*0012*/
+// (0,3)
 
    foo(1);                                                              /*0014*/
-// (0,3)
-   k = 3;                                                               /*0015*/
 // (0,4)
+   k = 3;                                                               /*0015*/
+// (0,5)
 
    return i;                                                            /*0017*/
 }

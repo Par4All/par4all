@@ -1,8 +1,8 @@
 void c_clean_declarations03(int x)
 {
+   /* Hide the formal parameter */
    int x;
    int y;
-   extern  stderr();
 
    if (x) {
       int z;
@@ -13,10 +13,12 @@ void c_clean_declarations03(int x)
 }
 void c_clean_declarations03(int x)
 {
+   /* Hide the formal parameter */
    int x;
-   extern  stderr();
+
 
    if (x) {
+
       float r = 1.2;
       x += (int) r;
    }

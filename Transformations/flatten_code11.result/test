@@ -11,12 +11,12 @@ Initial code
 void flatten_code11(void)
 {
    // BEGIN BLOCK
-   int i;
+   int i;                                                               /*0004*/
    
    /* Let's execute this loop four times! */
    for(i = 0; i <= 3; i += 1) {
       // BEGIN BLOCK
-      static int foo = 0;
+      static int foo = 0;                                               /*0008*/
       
       /* Let's update a static variable! */
       foo++;                                                            /*0011*/
@@ -38,7 +38,7 @@ void flatten_code11(void)
 //  P() {}
 
    // BEGIN BLOCK
-   int i;
+   int i;                                                               /*0004*/
 
 //  P() {}
 
@@ -49,7 +49,7 @@ void flatten_code11(void)
 //  P(foo,i) {0<=i, i<=3}
 
       // BEGIN BLOCK
-      static int foo = 0;
+      static int foo = 0;                                               /*0008*/
 
 //  P(foo,i) {0<=i, i<=3}
 
@@ -71,7 +71,8 @@ Code after code flattening
 void flatten_code11(void)
 {
    // BEGIN BLOCK
-   int i;
+   int i;                                                               /*0004*/
+   //PIPS generated variable
    static int foo_0 = 0;
    
    /* Let's execute this loop four times! */

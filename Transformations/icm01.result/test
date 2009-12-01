@@ -4,10 +4,10 @@ Initial code
 int icm01()
 {
    // BEGIN BLOCK
-   int i;
-   int j = 3;
-   int k;
-   int a[10];
+   int i;                                                               /*0004*/
+   int j = 3;                                                           /*0005*/
+   int k;                                                               /*0006*/
+   int a[10];                                                           /*0007*/
 
    for(i = 0; i <= 9; i += 1) {
       // BEGIN BLOCK
@@ -23,10 +23,11 @@ Code after Invariant Code Motion
 int icm01()
 {
    // BEGIN BLOCK
-   int i;
-   int j = 3;
-   int k;
-   int a[10];
+   int i;                                                               /*0004*/
+   int j = 3;                                                           /*0005*/
+   int k;                                                               /*0006*/
+   int a[10];                                                           /*0007*/
+   //PIPS generated variable
    int I_0;
    // BEGIN BLOCK
 
