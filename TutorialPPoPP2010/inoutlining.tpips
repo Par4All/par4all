@@ -1,0 +1,12 @@
+delete ws
+create ws inoutlining.c
+display PRINTED_FILE[%ALLFUNC]
+apply UNFOLDING[convol]
+apply FLAG_LOOPS[convol]
+display PRINTED_FILE[convol]
+setproperty OUTLINE_LABEL "l99996"
+setproperty OUTLINE_MODULE_NAME "convol_outlined"
+apply OUTLINE[convol]
+display PRINTED_FILE[convol]
+display PRINTED_FILE[convol_outlined]
+close ws
