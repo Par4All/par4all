@@ -56,8 +56,10 @@ shell cp clone01.database/clone01_1/clone01_1.pre.c clone01.database/clone01_1/c
 
 echo # applying dead code elimination...
 apply SUPPRESS_DEAD_CODE[clone01_0]
-quit
-apply SUPPRESS_DEAD_CODE[%ALL]
+apply SUPPRESS_DEAD_CODE[clone01_1]
+apply SUPPRESS_DEAD_CODE[clone01_2]
+#quit
+#apply SUPPRESS_DEAD_CODE[%ALL]
 display PRINTED_FILE[%ALLFUNC]
 
 quit
