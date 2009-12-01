@@ -59,6 +59,14 @@ echo # applying dead code elimination...
 apply SUPPRESS_DEAD_CODE[clone01_0]
 apply SUPPRESS_DEAD_CODE[clone01_1]
 apply SUPPRESS_DEAD_CODE[clone01_2]
+display PRINTED_FILE[%ALLFUNC]
+apply USE_DEF_ELIMINATION[clone01_0]
+apply USE_DEF_ELIMINATION[clone01_1]
+apply USE_DEF_ELIMINATION[clone01_2]
+apply SUPPRESS_DEAD_CODE[clone01_0]
+apply SUPPRESS_DEAD_CODE[clone01_1]
+apply SUPPRESS_DEAD_CODE[clone01_2]
+display PRINTED_FILE[%ALLFUNC]
 #quit
 #apply SUPPRESS_DEAD_CODE[%ALL]
 activate PRINT_CODE_PRECONDITIONS
