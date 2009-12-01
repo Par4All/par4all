@@ -1349,8 +1349,7 @@ gather_all_comments_of_a_statement_filter(statement s, string * all_comments)
 
    Do not forget to free the string returned later when no longer
    used. */
-string
-gather_all_comments_of_a_statement(statement s)
+string gather_all_comments_of_a_statement(statement s)
 {
     string comments = NULL;
     gen_context_recurse(s, &comments, statement_domain,
@@ -1359,9 +1358,8 @@ gather_all_comments_of_a_statement(statement s)
 }
 
 
-/* Find the first comment of a statement, if any: */
-string
-find_first_statement_comment(statement s)
+/* Find the first non-empty comment of a statement, if any: */
+string find_first_statement_comment(statement s)
 {
     instruction i = statement_instruction(s);
     if (instruction_sequence_p(i)) {
@@ -1376,6 +1374,36 @@ find_first_statement_comment(statement s)
     }
     else
 	/* Ok, plain statement: */
+	return statement_comments(s);
+}
+
+/* Find the first comment of a statement, if any.
+ *
+ * Unfortunately empty_comments may be used to decorate a statement
+ * although this makes the statement !gen_defined_p(). empty_comments
+ * is also used as a return value to signal that non statement
+ * legally carrying a comment has been found.
+ *
+ * The whole comment business should be cleaned up.
+ */
+string find_first_comment(statement s)
+{
+    instruction i = statement_instruction(s);
+    if (instruction_sequence_p(i)) {
+	MAP(STATEMENT, st, {
+	    string comment = find_first_statement_comment(st);
+	    /* let's hope the parser generates an empty string as
+	       comment rather than empty_comments which is defined as
+	       empty_string */
+	    if (comment!=empty_comments)
+		/* We've found it! */
+		return comment;
+	}, sequence_statements(instruction_sequence(statement_instruction(s))));
+	/* No comment found: */
+	return empty_comments;
+    }
+    else
+	/* comment carrying statement: */
 	return statement_comments(s);
 }
 
@@ -1481,12 +1509,16 @@ insert_comments_to_statement(statement s,
 	/* Nothing to add... */
 	return;
 
-    old  = find_first_statement_comment(s);
+    old  = find_first_comment(s);
     if (empty_comments_p(old))
 	/* There are no comments yet: */
 	put_a_comment_on_a_statement(s, strdup(the_comments));
     else {
 	put_a_comment_on_a_statement(s, strdup(concatenate(the_comments, old, NULL)));
+	/* Courageous: you have to be sure that the comment returned
+	   by find_first_comment() belongs to the statement which is
+	   going to be used by put_a_comment_on_a_statement() knowing
+	   that both can be different from s if s is a sequence. */
 	free(old);
     }
 }

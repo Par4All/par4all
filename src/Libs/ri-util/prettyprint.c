@@ -2328,6 +2328,8 @@ text_loop_default(
 	}
 
 	if (lp)
+	  /* local_var is a globale variable which is exploited
+	     later... */
 	  ADD_SENTENCE_TO_TEXT
 	    ( local_var,
 	      make_sentence(is_sentence_unformatted,
@@ -3378,7 +3380,7 @@ text text_statement_enclosed(entity module,
 	temp = make_text(NIL);
     }
 
-  /* Take care of comments
+  /* Take care of comments and of analysis results printed as comments
    *
    * Note about comments: they are duplicated here, but I'm pretty
    * sure that the free is NEVER performed as it should. FC.
