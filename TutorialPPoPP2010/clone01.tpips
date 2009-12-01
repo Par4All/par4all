@@ -36,7 +36,7 @@ echo
 
 activate PRINT_CODE_PRECONDITIONS
 display PRINTED_FILE[main]
-shell cat clone01.database/main/main.prec.c clone01.database/main/main.prec-1.c
+shell cp clone01.database/main/main.prec.c clone01.database/main/main.prec-1.c
 
 setproperty TRANSFORMATION_CLONE_ON_ARGUMENT 2
 apply CLONE_ON_ARGUMENT[clone01]
