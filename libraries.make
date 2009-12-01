@@ -50,7 +50,7 @@ ifdef WITH_DYNAMIC_LIBRARIES
 extern.libs	=
 else
 # maybe must create a link to libpolylib64.a
-extern.libs	= polylib
+extern.libs	= polylib64
 endif
 
 ################################################################### PIPS COMMON

@@ -2887,22 +2887,17 @@ set get_referenced_entities(void* elem)
  * @param declarations list of entity to purge
  * @param stmt statement where entities are used
  *
- * @return a list of used declarations
  */
-static list statement_clean_declarations_helper(list declarations, statement stmt)
+static void statement_clean_declarations_helper(list declarations, statement stmt)
 {
-    list new_declarations = NIL;
     set referenced_entities = get_referenced_entities(stmt);
-
-    declarations=gen_nreverse(declarations);
 
     /* look for entity that are used in the statement */
     FOREACH(ENTITY,e,declarations)
     {
         bool add_entity_to_declaration_p = true;
-        /* area and parameters are always used */
-        if( formal_parameter_p(e) || entity_area_p(e) )
-            new_declarations=CONS(ENTITY,e,new_declarations);
+        /* area and parameters are always used, so are referenced entities */
+        if( formal_parameter_p(e) || entity_area_p(e) || set_belong_p(referenced_entities,e));
         else
         {
             /* entities whose declaration has a side effect are always used too */
@@ -2918,20 +2913,14 @@ static list statement_clean_declarations_helper(list declarations, statement stm
                 gen_full_free_list(effects);
             }
 
-            /* keep the declaration, and ensure the declaration_statement exist */
-            if( has_side_effects_p ) {
-                new_declarations=CONS(ENTITY,e,new_declarations);
-            }
             /* do not keep the declaration, and remove it from any declaration_statement */
-            else {
+            if( !has_side_effects_p ) {
+                RemoveLocalEntityFromDeclarations(e,get_current_module_entity(),stmt);
             }
         }
     }
 
-
     set_free(referenced_entities);
-
-    return new_declarations;
 }
 
 /**
@@ -2975,9 +2964,7 @@ static void entity_generate_missing_declarations(entity module, statement s)
 void statement_clean_declarations(statement s)
 {
     if(statement_block_p(s)) {
-        list l = statement_declarations(s);
-        statement_declarations(s)=statement_clean_declarations_helper(l,s);
-        gen_free_list(l);
+        statement_clean_declarations_helper( statement_declarations(s),s);
     }
 }
 
@@ -2989,9 +2976,7 @@ void statement_clean_declarations(statement s)
  */
 void entity_clean_declarations(entity module,statement s)
 {
-  list l=entity_declarations(module);
-  entity_declarations(module)=statement_clean_declarations_helper(l,s);
-  gen_free_list(l);
+  statement_clean_declarations_helper(entity_declarations(module),s);
   if(fortran_module_p(module)) /* to keep backward compatibility with hpfc*/
     entity_generate_missing_declarations(module,s);
 }
