@@ -49,6 +49,7 @@ echo # applying partial evaluation...
 apply PARTIAL_EVAL[%ALLFUNC]
 echo # applying dead code elimination...
 apply SUPPRESS_DEAD_CODE[%ALL]
+activate PRINT_CODE
 display PRINTED_FILE[%ALLFUNC]
 
 quit
