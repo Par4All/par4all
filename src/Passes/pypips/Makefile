@@ -85,6 +85,7 @@ check:sample.py all pipscc.py pii.py
 	PYTHONPATH=$(PY.d) python -c "import pii"
 	PYTHONPATH=$(PY.d) PAGER=cat ./$<
 	PYTHONPATH=$(PY.d) PAGER=cat ./test.py
+	PYTHONPATH=$(PY.d) PAGER=cat ./test2.py
 	PYTHONPATH=$(PY.d) ./pipscc -c test.c
 	PYTHONPATH=$(PY.d) PAGER=cat ./pipscc test.o -o thetest
 	rm -f thetest test.o

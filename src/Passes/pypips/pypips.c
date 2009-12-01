@@ -182,7 +182,10 @@ void apply(char * phasename, char * target)
 
 void display(char *rname, char *mname)
 {
+    bool reset = db_get_current_module_name()==NULL;
+    if(reset) db_set_current_module_name(mname);
     string fname = build_view_file(rname);
+    if(reset) db_reset_current_module_name();
 
     if (!fname)
     {
