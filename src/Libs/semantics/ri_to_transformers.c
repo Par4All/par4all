@@ -246,10 +246,10 @@ transformer declarations_to_transformer(list dl, transformer pre)
       btf = transformer_combine(btf, stf);
       btf = transformer_normalize(btf, 4);
 
-      ifdebug(1) 
-	pips_assert("btf is a consistent transformer", 
+      ifdebug(1)
+	pips_assert("btf is a consistent transformer",
 		    transformer_consistency_p(btf));
-	pips_assert("post is a consistent transformer if pre is defined", 
+	pips_assert("post is a consistent transformer if pre is defined",
 		    transformer_undefined_p(pre)
 		    || transformer_consistency_p(post));
     }
@@ -260,8 +260,7 @@ transformer declarations_to_transformer(list dl, transformer pre)
   return btf;
 }
 
-static transformer 
-block_to_transformer(list b, transformer pre)
+static transformer block_to_transformer(list b, transformer pre)
 {
   statement s;
   transformer btf = transformer_undefined;
@@ -1808,6 +1807,7 @@ transformer statement_to_transformer(
   /* it would be nicer to control warning_on_redefinition */
   if (transformer_undefined_p(ot)
       || get_bool_property("SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT")) {
+    //list dl = declaration_statement_p(s) ? statement_declarations(s) : NIL;
     list dl = statement_block_p(s) ? statement_declarations(s) : NIL;
 
     /* FI: OK, we will have to switch to the new declaration

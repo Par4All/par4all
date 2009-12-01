@@ -213,29 +213,29 @@ discard_statement_and_save_label_and_comment(statement s)
 
       if(!entity_empty_label_p(flbl)) {
 
-	instruction block =  make_instruction_block(NIL); 
-	statement stmt = make_continue_statement(flbl);   
+	instruction block =  make_instruction_block(NIL);
+	statement stmt = make_continue_statement(flbl);
 	instruction_block(block)= gen_nconc(instruction_block(block),
-					    CONS(STATEMENT, stmt, NIL ));  
+					    CONS(STATEMENT, stmt, NIL ));
 	free_instruction(statement_instruction(s));
 	/* And put a new empty one: */
-	statement_instruction(s) = block;      
+	statement_instruction(s) = block;
 	/* Since the RI need to have no label on instruction block: */
 
 	fix_sequence_statement_attributes(s);
 
       }
-      
+
     }
-  else 
+  else
     {
       /* Discard the old instruction: */
       free_instruction(statement_instruction(s));
       /* And put a new empty one: */
       statement_instruction(s) = make_instruction_block(NIL);
-      
+
       /* Since the RI need to have no label on instruction block: */
-      fix_sequence_statement_attributes(s); 
+      fix_sequence_statement_attributes(s);
     }
    return false;
 }
@@ -819,7 +819,8 @@ dead_statement_rewrite(statement s)
 	      ORDERING_NUMBER(statement_ordering(s)),
 	      ORDERING_STATEMENT(statement_ordering(s)));
 
-   stdebug(2, "dead_statement_rewrite: The current statement", s);
+   stdebug(2, "dead_statement_rewrite: The current statement st at the beginning",
+	   s);
 
    switch(t) {
    case is_instruction_sequence:
@@ -878,6 +879,7 @@ dead_statement_rewrite(statement s)
 	      statement_number(s),
 	      ORDERING_NUMBER(statement_ordering(s)),
 	      ORDERING_STATEMENT(statement_ordering(s)));
+   stdebug(2, "dead_statement_rewrite: The current statement st at the end", s);
 }
 
 
