@@ -6,7 +6,7 @@ create clone01 clone01.c
 activate C_PARSER
 
 setproperty PRETTYPRINT_C_CODE TRUE
-setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 
 setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
 #setproperty PPRETTYPRINT_BLOCKS FALSE TRUE
@@ -43,13 +43,21 @@ apply CLONE_ON_ARGUMENT[clone01]
 
 echo # new callgraph
 display CALLGRAPH_FILE[%MAIN]
-echo # new codes.
+
+echo # new codes after cloning
+activate PRINT_CODE
 display PRINTED_FILE[%ALLFUNC]
+shell cp clone01.database/clone01_1/clone01_1.pre.c clone01.database/clone01_1/clone01_1.pre-clone.c
+
 echo # applying partial evaluation...
 apply PARTIAL_EVAL[%ALLFUNC]
+display PRINTED_FILE[%ALLFUNC]
+shell cp clone01.database/clone01_1/clone01_1.pre.c clone01.database/clone01_1/clone01_1.pre-partial-eval.c
+
 echo # applying dead code elimination...
+apply SUPPRESS_DEAD_CODE[clone01_0]
+quit
 apply SUPPRESS_DEAD_CODE[%ALL]
-activate PRINT_CODE
 display PRINTED_FILE[%ALLFUNC]
 
 quit
