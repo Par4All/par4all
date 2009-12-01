@@ -40,17 +40,17 @@ int main() //      program image_processing
   //     print *, new_image
   //      print *, new_image (image_size/2, image_size/2)
 
-  return 1; 
+  return 1;
 }
 
-void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], 
+void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj],
 	    int ksi, int ksj, float kernel[ksi][ksj])
 {
   //     The convolution kernel is not applied on the outer part
   //     of the image
 
   int i, j, ki, kj;
- 
+
   for(i = 0; i< isi; i++) {
     for(j = 0; j< isj; j++) {
       new_image[i][j] = image[i][j];
@@ -62,8 +62,8 @@ void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj],
       new_image[i][j] = 0.;
     l200: for(ki = 0; ki<ksi; ki++) {
       l100: for(kj = 0; kj<ksj; kj++) {
-	  new_image[i][j] = new_image[i][j] + 
-	    image[i+ki-ksi/2][j+kj-ksj/2]* 
+	  new_image[i][j] = new_image[i][j] +
+	    image[i+ki-ksi/2][j+kj-ksj/2]*
 	    kernel[ki][kj];
 	}
       }
