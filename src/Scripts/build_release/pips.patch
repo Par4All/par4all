@@ -3,7 +3,7 @@ set -e
 WDIR="$1"
 
 # pips include makefiles from newgen and linear ...
-cat linear-svn/libraries.make newgen-svn/libraries.make $WDIR/libraries.make | sed -e '/^include/ d' > pips.tmp
+cat linear-svn/libraries.make newgen-svn/libraries.make $WDIR/libraries.make | sed -e '/^include/ d' -e 's/polylib/polylib64/' > pips.tmp
 mv -f pips.tmp $WDIR/libraries.make
 cat newgen-svn/src/genC/standard_defines.mk $WDIR/src/Documentation/doxygen/Makefile | sed -e '/^include $(NEWGEN/ d' >pips.tmp
 mv -f pips.tmp $WDIR/src/Documentation/doxygen/Makefile
