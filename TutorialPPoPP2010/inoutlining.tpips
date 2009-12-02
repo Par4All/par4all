@@ -2,6 +2,8 @@ delete inoutlining
 create inoutlining inoutlining.c
 display PRINTED_FILE[%ALLFUNC]
 apply UNFOLDING[convol]
+display PRINTED_FILE[convol]
+shell cp inoutlining.database/convol/convol.pre.c inoutlining.database/convol/convol.pre-first.c
 apply FLAG_LOOPS[convol]
 display PRINTED_FILE[convol]
 setproperty OUTLINE_LABEL "l99996"
