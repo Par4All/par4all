@@ -32,7 +32,7 @@ setproperty PRETTYPRINT_DO_LABEL_AS_COMMENT TRUE
 setproperty PRETTYPRINT_UNSTRUCTURED TRUE
 setproperty PRETTYPRINT_FINAL_RETURN TRUE
 
-display PRINTED_FILE[%ALL]
+#display PRINTED_FILE[%ALL]
 apply UNSPLIT
 
 shell ubs_checking_instrument.pl < scalar02.database/instrument.out
