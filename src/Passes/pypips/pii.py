@@ -13,5 +13,5 @@ class Pii(pipscc):
 
 if __name__ == '__main__':
 
-    thecompiler = Pii()
+    thecompiler = Pii(sys.argv)
     thecompiler.run()

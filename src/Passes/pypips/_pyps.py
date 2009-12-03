@@ -89,8 +89,9 @@ class workspace:
 		for m in self.info("modules"):
 			self.modules[m]=module(self,m,self.sources[0])
 
-	def __init__(self,sources2,activates=[]):
+	def __init__(self,sources2,activates=[],verboseon=True):
 		"""init a workspace from a list of sources"""
+		if not verboseon:self.set_property(USER_LOG_P=False)
 		workspace=os.path.basename(os.tempnam("","PYPS"))
 		def helper(x,y):
 			return x+y if isinstance(y,list) else x +[y]
@@ -197,7 +198,7 @@ class workspace:
 
 	all=property(filter)
 
-	def quit(self):
+	def close(self):
 		"""force cleaning and deletion of the workspace"""
 		self.cleared=True
 		pypips.quit()

@@ -29,7 +29,9 @@ PYTHON_INCLUDE=`$(PYTHON_CONFIG) --cflags`
 PYPS_STDOUT=pypsout
 
 DYNLIB_TARGET=_$(PYTHON_MODULE).so
-PY_TARGET=pyps.py $(PYTHON_MODULE).py
+PY_TARGET=pyps.py $(PYTHON_MODULE).py pipscc.py pii.py
+
+BIN_TARGET=pipscc
 
 
 DYNLIB_OBJECTS=$(PYTHON_MODULE)_wrap.o $(PYTHON_MODULE).o
@@ -72,10 +74,11 @@ clean:
 	rm -rf build
 
 distclean:clean
-	rm -f $(PYTHON_MODULE).py _$(PYTHON_MODULE).so pyps.py pipscc.py *.i
+	rm -f $(PYTHON_MODULE).py _$(PYTHON_MODULE).so pyps.py *.i
 
-pipscc.py:pipscc
-	ln -s $< $@
+$(ARCH)/pipscc:pipscc.py
+	cp $< $@
+	chmod u+x $@
 
 
 check:sample.py all pipscc.py pii.py

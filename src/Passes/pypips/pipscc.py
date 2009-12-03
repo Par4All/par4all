@@ -15,7 +15,7 @@ class object_code:
 		self.cflags=cflags
 		CPP=os.getenv("CPP","cpp")
 		cmd=[CPP,"-U__GNUC__"]+cppflags+[sourcefile]
-		print "# running",cmd
+		#print "# running",cmd
 		sp=subprocess.Popen(cmd,stdout=subprocess.PIPE)
 		sp.wait()
 		self.code=sp.stdout.read()
@@ -33,30 +33,27 @@ class object_code:
 		cfile.write(self.code)
 		cfile.close()
 
-def ofile():
-	for opt in sys.argv[1:]:
-		if opt[0] == '-o':
-			index=sys.argv.index(opt)
-			return sys.argv[index+1]
+def ofile(argv):
+	for opt in argv[1:]:
+		if opt == '-o':
+			index=argv.index(opt)
+			return argv[index+1]
 	return ""
 
-def cppflags():
+def cppflags(argv):
 	flags=[]
-	for opt in sys.argv[1:]:
+	for opt in argv[1:]:
 		if opt[0:2] == "-D" or opt[0:2] == "-I" :
 			flags+=[opt]
-			sys.argv.remove(opt)
+			argv.remove(opt)
 	return flags
 
 class pipscc:
 	"""modular pips compiler front-end"""
-	def __init__(self):
-		"""create a pips compiler instance from sys.argv"""
-		self.is_ld=True
-		for opt in sys.argv[1:]:
-			if opt == "-c":
-				self.is_ld=False
-				break
+	def __init__(self,argv):
+		"""create a pips compiler instance from argv"""
+		self.argv=argv
+		self.is_ld=len(self.gather_c_files())==0
 
 	def run(self):
 		"""run the compilation"""
@@ -66,33 +63,43 @@ class pipscc:
 	def pipscpp(self):
 		"""simulate the behavior of the c preprocessor"""
 		# parse command line
-		CPPFLAGS=cppflags()
-		OUTFILE=ofile()
-		print "# CPPFLAGS: ", CPPFLAGS
+		CPPFLAGS=cppflags(self.argv)
+		OUTFILE=ofile(self.argv)
+		#print "# CPPFLAGS: ", CPPFLAGS
+		cpp_and_linking= len([f for f in self.argv[1:] if f == "-c"]) == 0
+
 		# look for input file
-		for opt in sys.argv[1:]:
-			if opt[0] != '-':
+		for opt in self.argv[1:]:
+			if opt[0] != '-' and opt[-2:] == '.c' :
 				if not OUTFILE:
-					OUTFILE=opt[0:-1]+"o"
+					OUTFILE=os.path.basename(opt)[0:-1]+"o"
 				# generate internal representation of preprocessed code
-				obj=object_code(opt,CPPFLAGS,sys.argv[1:])
+				args = self.argv[1:]
+				if cpp_and_linking : args.insert(0,"-c")
+				obj=object_code(opt,CPPFLAGS,args)
 				# serialize it
 				newobj=file(OUTFILE,"w")
 				pickle.dump(obj,newobj)
 				newobj.close()
-				print "# OBJ written: ", OUTFILE
+				#print "# OBJ written: ", OUTFILE
+		# check if we should link too
+		if cpp_and_linking:
+			for i in range(1,len(self.argv)):
+				if self.argv[i][-2:]=='.c':
+					self.argv[i]=self.argv[i][0:-2]+".o"
+			self.pipsld()
 		# that's all folks
 
 	def gather_object_files(self):
 		INPUT_FILES=[]
-		for opt in sys.argv[1:]:
+		for opt in self.argv[1:]:
 			if opt[0] != '-' and opt[-2:]==".o":
 				INPUT_FILES+=[opt]
 		return INPUT_FILES
 
 	def gather_c_files(self):
 		INPUT_FILES=[]
-		for opt in sys.argv[1:]:
+		for opt in self.argv[1:]:
 			if opt[0] != '-' and opt[-2:]==".c":
 				INPUT_FILES+=[opt]
 		return INPUT_FILES
@@ -114,7 +121,7 @@ class pipscc:
 	def get_wd(self):
 		"""selects a working directory for pipscc"""
 		WDIR=tempfile.mkdtemp("pipscc")
-		print "# intermediate files generated in", WDIR
+		#print "# intermediate files generated in", WDIR
 		return WDIR
 
 	def get_workspace(self,c_files):
@@ -124,14 +131,14 @@ class pipscc:
 		CC=os.getenv("CC","gcc")
 		for obj in o_files:
 			cmd=[CC]+obj.cflags+["-o",obj.oname]
-			print "# running", cmd
+			#print "# running", cmd
 			sp=subprocess.Popen(cmd)
 			sp.wait()
 		
-		cmd=reduce(lambda x,y:x+" "+y,sys.argv[1:],CC)
-		print "# running", cmd
-		res=os.system(cmd)
-		exitcode= (res >>8)& 0xFF
+		cmd=[CC]+self.argv[1:]
+		#print "# running", cmd
+		sp=subprocess.Popen(cmd)
+		exitcode=sp.wait()
 		if exitcode:
 			shutil.rmtree(wdir)
 
@@ -141,28 +148,33 @@ class pipscc:
 		
 		# gather pickled input files
 		INPUT_FILES=self.gather_object_files()
-		# load pickled input files
-		O_FILES=self.unpickle(WDIR,INPUT_FILES)
-		C_FILES=map(lambda o:o.cname,O_FILES)
-		print "# input files: ", reduce(lambda x,y:x+" "+y,C_FILES,"")
-		
-		# run pips with this informations
-		print "# running pips"
-		ws = self.get_workspace(C_FILES)
-		# add extra operations 
-		self.changes(ws)
-		# commit changes
-		ws.save(indir=WDIR)
-		# the end for pips
-		ws.quit()
-		
-		# now run the compiler
-		self.compile(WDIR,O_FILES)
+		if len(INPUT_FILES) == 0:
+			print >> sys.stderr, "pipscc: no input files"
+			sys.exit(1)
+		else:
+			# load pickled input files
+			O_FILES=self.unpickle(WDIR,INPUT_FILES)
+			C_FILES=map(lambda o:o.cname,O_FILES)
+			#print "# input files: ", C_FILES
+			
+			# run pips with this informations
+			#print "# running pips"
+			ws = self.get_workspace(C_FILES)
+			# add extra operations 
+			self.changes(ws)
+			# commit changes
+			ws.save(indir=WDIR)
+			# the end for pips
+			ws.close()
+			del ws
+			
+			# now run the compiler
+			self.compile(WDIR,O_FILES)
 
 #
 ##
 #
 
 if __name__ == "__main__":
-	thecompiler=pipscc()
+	thecompiler=pipscc(sys.argv)
 	thecompiler.run()

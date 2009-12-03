@@ -42,14 +42,13 @@
 
 #include "top-level.h"
 
+
 void create(char* workspace_name, char ** filenames)
 {
     /* init various composants */
     initialize_newgen();
     initialize_sc((char*(*)(Variable))entity_local_name);
-
-    // SG: should check this !
-    // pips_log_handler = tpips_user_log;
+    pips_log_handler = pips_error_user_log;
 
     gen_array_t filename_list = gen_array_make(0);
     static bool exception_callback_set = false;
@@ -182,10 +181,13 @@ void apply(char * phasename, char * target)
 
 void display(char *rname, char *mname)
 {
-    bool reset = db_get_current_module_name()==NULL;
-    if(reset) db_set_current_module_name(mname);
+    bool has_current_module_name = db_get_current_module_name()!=NULL;
+    if(has_current_module_name)
+        db_reset_current_module_name();
+
+    db_set_current_module_name(mname);
     string fname = build_view_file(rname);
-    if(reset) db_reset_current_module_name();
+    db_reset_current_module_name();
 
     if (!fname)
     {
