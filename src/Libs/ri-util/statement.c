@@ -2923,9 +2923,13 @@ set get_referenced_entities(void* elem)
 static void statement_clean_declarations_helper(list declarations, statement stmt)
 {
     set referenced_entities = get_referenced_entities(stmt);
+    list decl_cpy = gen_copy_seq(declarations);
 
-    /* look for entity that are used in the statement */
-    FOREACH(ENTITY,e,declarations)
+    /* look for entity that are used in the statement
+     * SG: we need to work on  a copy of the declarations because of
+     * the RemoveLocalEntityFromDeclarations
+     */
+    FOREACH(ENTITY,e,decl_cpy)
     {
         bool add_entity_to_declaration_p = true;
         /* area and parameters are always used, so are referenced entities */
@@ -2952,6 +2956,7 @@ static void statement_clean_declarations_helper(list declarations, statement stm
         }
     }
 
+    gen_free_list(decl_cpy);
     set_free(referenced_entities);
 }
 
