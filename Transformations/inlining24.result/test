@@ -240,9 +240,8 @@ int main()
       
       
       
-      //PIPS generated variable
       freia_error ret;
-      //ат^
+      //PIPS generated variable
       int _return0;
       {
          
@@ -318,9 +317,8 @@ l99986:            ;
       
       
       
-      //PIPS generated variable
       freia_error ret;
-      //`о^
+      //PIPS generated variable
       int _return0;
       {
          
@@ -456,20 +454,20 @@ int main()
    int i_3;
    //PIPS generated variable
    freia_error ret_5;
-
-
-
-   ////PIPS generated variable
-   //ат^
-
-
-
-
-
-
-
-
-   ////PIPS generated variable
+   
+   
+   
+   //PIPS generated variable
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   //PIPS generated variable
    extern struct _IO_FILE *stderr;
    if (freia_common_check_image_bpp_compat(imout, imin, (void *) 0)!=1) {
 
@@ -522,20 +520,20 @@ l99986:      ;
    
    _return1 = ret_0;
    (void) _return1;
-
-
-
-   ////PIPS generated variable
-   //`о^
-
-
-
-
-
-
-
-
-   ////PIPS generated variable
+   
+   
+   
+   //PIPS generated variable
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   //PIPS generated variable
    extern struct _IO_FILE *stderr;
    if (freia_common_check_image_bpp_compat(imout, imin, (void *) 0)!=1) {
 
@@ -655,20 +653,20 @@ int main()
    int i_3;
    //PIPS generated variable
    freia_error ret_5;
-
-
-
-   ////PIPS generated variable
-   //ат^
-
-
-
-
-
-
-
-
-   ////PIPS generated variable
+   
+   
+   
+   //PIPS generated variable
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   //PIPS generated variable
    extern struct _IO_FILE *stderr;
 
 //  P() {connexity==8, size==4}
@@ -814,20 +812,20 @@ l99986:      ;
 //    _return1==ret_0, connexity==8, size==4}
 
    (void) _return1;
-
-
-
-   ////PIPS generated variable
-   //`о^
-
-
-
-
-
-
-
-
-   ////PIPS generated variable
+   
+   
+   
+   //PIPS generated variable
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   //PIPS generated variable
    extern struct _IO_FILE *stderr;
 
 //  P(_return0_0,_return1,i_1,ret_0,ret_2) {_return0_0==ret_2,
@@ -1057,20 +1055,20 @@ int main()
    int i_3;
    //PIPS generated variable
    freia_error ret_5;
-
-
-
-   ////PIPS generated variable
-   //ат^
-
-
-
-
-
-
-
-
-   ////PIPS generated variable
+   
+   
+   
+   //PIPS generated variable
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   //PIPS generated variable
    extern struct _IO_FILE *stderr;
    if (freia_common_check_image_bpp_compat(imout, imin, (void *) 0)!=1) {
 
@@ -1123,20 +1121,20 @@ l99986:      ;
    
    _return1 = ret_0;
    (void) _return1;
-
-
-
-   ////PIPS generated variable
-   //`о^
-
-
-
-
-
-
-
-
-   ////PIPS generated variable
+   
+   
+   
+   //PIPS generated variable
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   //PIPS generated variable
    extern struct _IO_FILE *stderr;
    if (freia_common_check_image_bpp_compat(imout, imin, (void *) 0)!=1) {
 
@@ -1253,20 +1251,20 @@ int main()
    int i_3;
    //PIPS generated variable
    freia_error ret_5;
-
-
-
-   ////PIPS generated variable
-   //ат^
-
-
-
-
-
-
-
-
-   ////PIPS generated variable
+   
+   
+   
+   //PIPS generated variable
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   //PIPS generated variable
    extern struct _IO_FILE *stderr;
    if (freia_common_check_image_bpp_compat(imout, imin, (void *) 0)!=1) {
 
@@ -1294,20 +1292,20 @@ int main()
    
    
    _return1 = ret_0;
-
-
-
-   ////PIPS generated variable
-   //`о^
-
-
-
-
-
-
-
-
-   ////PIPS generated variable
+   
+   
+   
+   //PIPS generated variable
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   //PIPS generated variable
    extern struct _IO_FILE *stderr;
    if (freia_common_check_image_bpp_compat(imout, imin, (void *) 0)!=1) {
 
@@ -1400,20 +1398,20 @@ int main()
    int i_3;
    //PIPS generated variable
    freia_error ret_5;
-
-
-
-   ////PIPS generated variable
-   //ат^
-
-
-
-
-
-
-
-
-   ////PIPS generated variable
+   
+   
+   
+   //PIPS generated variable
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   //PIPS generated variable
    extern struct _IO_FILE *stderr;
    if (freia_common_check_image_bpp_compat(imout, imin, (void *) 0)!=1) {
 
@@ -1443,20 +1441,20 @@ int main()
    
    
    _return1 = ret_0;
-
-
-
-   ////PIPS generated variable
-   //`о^
-
-
-
-
-
-
-
-
-   ////PIPS generated variable
+   
+   
+   
+   //PIPS generated variable
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   //PIPS generated variable
    extern struct _IO_FILE *stderr;
    if (freia_common_check_image_bpp_compat(imout, imin, (void *) 0)!=1) {
 
