@@ -1,0 +1,16 @@
+delete mehdi01
+
+setproprety ABORT_ON_USER_ERROR TRUE
+
+create mehdi01 mehdi01.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+display PRINTED_FILE[func]
+
+
+close mehdi01
+
+quit
