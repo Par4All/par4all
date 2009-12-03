@@ -64,7 +64,7 @@ build_statement_for_clone(
 {
     statement stat, check_arg_value;
 
-    if (argn>0) 
+    if (argn>0)
     {
 	entity arg = find_ith_parameter(cloned, argn);
 
@@ -72,14 +72,16 @@ build_statement_for_clone(
 	 */
 	check_arg_value = test_to_statement
 	   (make_test(MakeBinaryCall(entity_intrinsic(NON_EQUAL_OPERATOR_NAME),
-	     entity_to_expression(arg), int_to_expression(val)), 
+	     entity_to_expression(arg), int_to_expression(val)),
 		       call_to_statement(make_call(entity_intrinsic
 						   (STOP_FUNCTION_NAME), NIL)),
 		       make_continue_statement(entity_undefined)));
 
-	statement_comments(check_arg_value) = strdup(concatenate(
-	    "!! PIPS: ", entity_local_name(arg),
-	    " is assumed a constant reaching value\n", NULL));	    
+	statement_comments(check_arg_value) =
+	  strdup(concatenate(fortran_module_p(get_current_module_entity())?
+			     "!! PIPS: " : "// PIPS: ",
+			     entity_user_name(arg),
+			     " is assumed a constant reaching value\n", NULL));
     }
     else
 	check_arg_value = make_continue_statement(entity_undefined);
@@ -91,7 +93,7 @@ build_statement_for_clone(
     return stat;
 }
 
-/* create an clone, and returns the corresponding entity, 
+/* create an clone, and returns the corresponding entity,
  * which looks like a not yet parsed routine.
  * it puts the initial_file for the routine, and updates its user_file.
  */
