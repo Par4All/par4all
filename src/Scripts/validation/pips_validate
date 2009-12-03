@@ -76,6 +76,10 @@ tpips=$(type -p tpips)
 pips=$(type -p pips)
 sysarch=$(uname -m)
 
+# get good version of python with proper PYTHONPATH
+export PYTHONPATH=${PIPS_PYTHONPATH:-$root/lib/$arch}
+python=$(type -p python)
+
 # by default, do not create a missing .result directory:
 auto_result_create=""
 
@@ -267,7 +271,7 @@ function validate_file()
   # full_name='/some/path/to/directory/file' without the extension
   # name='file'
   # upper='FILE'
-  local full_name=${file%.@([cfF]|tpips)}
+  local full_name=${file%.@([cfF]|tpips|py)}
   if [[ ! -d $full_name.result ]]
   then
     if [[ -n $auto_result_create ]]
@@ -322,6 +326,11 @@ function validate_file()
     verb 4 "$full_name.test"
     # ??? what about using default_test substitution?!
     $timeout $full_name.test 2> $out.err ; status=$?
+
+  elif [[ -r $full_name.py ]] ; then
+    verb 3 "$prefix.py method"
+    verb 4 "$python $full_name.py"
+    $timeout $python $full_name.py 2> $out.err ; status=$?
 
   elif [[ -r $full_name.tpips ]] ; then
     verb 3 "$prefix.tpips method"
@@ -456,13 +465,17 @@ do
   if [ -d $vdir/$obj ] ; then
     verb 1 "considering '$obj' directory"
     # this list may be empty: e.g. with the "pipspriv" repository
-    for file in $vdir/$obj/*.@([cfF]|tpips); do
+    for file in $vdir/$obj/*.@([cfF]|tpips|py); do
       verb 3 " - considering '${file//$vdir\//}' file"
-      base=${file%.@([cfF]|tpips)}
+      base=${file%.@([cfF]|tpips|py)}
       ext=${file/*./}
-      if [[ $ext != tpips && -f $base.tpips ]] ; then
+      if [[ $ext != tpips &&  $ext != py && -f $base.tpips ]] ; then
 	  # If there is a file and a .tpips associated, skip the
 	  # validation done for this file since it is done for the .tpips
+	  continue
+      elif [[ $ext != tpips &&  $ext != py && -f $base.py ]] ; then
+	  # If there is a file and a .py associated, skip the
+	  # validation done for this file since it is done for the .py
 	  continue
       fi
       validate_file $file || let errors++ failed=1

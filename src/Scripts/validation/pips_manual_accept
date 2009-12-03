@@ -22,6 +22,7 @@
 #
 
 # accept validation files differences...
+set -e
 
 svn=
 shopt -s nullglob
@@ -91,7 +92,7 @@ for arg ; do
   if [[ -d $arg ]] ; then
       handle_directory $arg
   elif [[ -f $arg ]] ; then
-      outfile=${arg%.@([Ffc]|tpips)}.result/out
+      outfile=${arg%.@([Ffc]|tpips|py)}.result/out
       if [[ -f $outfile ]] ; then
 	  handle_out_file $outfile
       else
