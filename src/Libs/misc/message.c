@@ -71,6 +71,20 @@ extern bool get_bool_property(string);
 #define INPUT_BUFFER_LENGTH 256 /*error caught by terminal at 257th character*/
 
 
+/** 
+ * similar to default_user_log
+ * but logs to stderr
+ * 
+ * @param fmt 
+ * @param args 
+ */
+void pips_error_user_log(const char *fmt, va_list args)
+{
+    if(!get_bool_property("USER_LOG_P")) return;
+    (void) vfprintf(stderr, fmt, args);
+    fflush(stderr);
+}
+
 /* USER_LOG is a function that should be called to log the current
  * PIPS request, as soon as it is relevant. loging will occure if property
  * USER_LOG_P is TRUE. USER_LOG should be called as:
