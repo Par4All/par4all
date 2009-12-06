@@ -21,7 +21,7 @@
 # along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-# $URL: file:///users/cri/coelho/SVN/svn/svn_branch.sh $
+# $URL$
 #
 # What is a branch?
 #
@@ -75,7 +75,7 @@
 command=${0/*\//}
 
 # keep revision number
-cmd_rev='$Rev: 535 $'
+cmd_rev='$Rev$'
 cmd_rev=${cmd_rev/*: /}
 cmd_rev=${cmd_rev/ \$/}
 
