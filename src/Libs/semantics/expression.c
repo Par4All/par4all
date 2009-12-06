@@ -2493,6 +2493,8 @@ transformer any_expression_to_transformer(
   return tf;
 }
 
+/* Always return a usable transformer. Use effects if no better
+   transformer can be found */
 transformer safe_any_expression_to_transformer(
 					       entity v, // value of the expression
 					       expression expr,
@@ -2638,7 +2640,7 @@ transformer condition_to_transformer(
   }
   else {
     entity tmpv = make_local_temporary_value_entity_with_basic(eb);
-    tf = any_expression_to_transformer(tmpv, cond, safe_pre, TRUE);
+    tf = safe_any_expression_to_transformer(tmpv, cond, safe_pre, TRUE);
     if(veracity) {
       /* tmpv != 0 */
       transformer tf_plus = transformer_add_sign_information(copy_transformer(tf), tmpv, 1);
