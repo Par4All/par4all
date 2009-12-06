@@ -3013,9 +3013,23 @@ void statement_clean_declarations(statement s)
  */
 void entity_clean_declarations(entity module,statement s)
 {
-  statement_clean_declarations_helper(entity_declarations(module),s);
-  if(fortran_module_p(module)) /* to keep backward compatibility with hpfc*/
-    entity_generate_missing_declarations(module,s);
+    entity curr = get_current_module_entity();
+    if( ! same_entity_p(curr,module)) {
+        reset_current_module_entity();
+        set_current_module_entity(module);
+    }
+    else
+        curr=entity_undefined;
+
+    statement_clean_declarations_helper(entity_declarations(module),s);
+    if(fortran_module_p(module)) /* to keep backward compatibility with hpfc*/
+        entity_generate_missing_declarations(module,s);
+
+    if(!entity_undefined_p(curr)){
+        reset_current_module_entity();
+        set_current_module_entity(curr);
+    }
+
 }
 
 /**  @} */
