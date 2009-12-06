@@ -1723,24 +1723,33 @@ the variable is unsigned, signed or not */
  @return the statement of the module
 */
 #define PIPS_PHASE_PRELUDE(module_name, debug_env_var)			\
-  /* Get the CODE resource of the module: */				\
-  (statement) db_get_memory_resource(DBR_CODE, module_name, TRUE);	\
-	      /* Define this module as the current one: */		\
-	      set_current_module_statement(module_statement);		\
-	      entity PIPS_PHASE_PRELUDE_mod = module_name_to_entity(module_name); \
-	      set_current_module_entity(PIPS_PHASE_PRELUDE_mod);	\
-	      								\
-	      /* The debug is now controled by this environment variable name: */ \
-	      debug_on(debug_env_var);					\
-	      pips_debug(1, "Entering...\n");				\
-	      pips_assert("Statement should be OK before...",		\
-			  statement_consistent_p(module_statement));
+  /* Get and return the CODE resource of the module and define this	\
+     module as the current one at the same time to avoid introducing	\
+     a new variable: */							\
+  set_current_module_statement((statement)				\
+			       db_get_memory_resource(DBR_CODE,		\
+						      module_name,	\
+						      TRUE));		\
+									\
+  /* Set the current module entity required to have many things		\
+     working in PIPS: */						\
+  set_current_module_entity(module_name_to_entity(module_name));	\
+  									\
+  /* The debug is now controled by this environment variable name: */	\
+  debug_on(debug_env_var);						\
+  pips_debug(1, "Entering...\n");					\
+  pips_assert("Statement should be OK at entry...",			\
+	      statement_consistent_p(get_current_module_statement()))
 
 
 /** End a transformation phase by putting back into PIPS the (possibly)
-    modified statement */
+    modified statement
+
+    @param new_module_statement point to the (potentially) new module
+    statement of the module
+ */
 #define PIPS_PHASE_POSTLUDE(new_module_statement)			\
-  pips_assert("Statement should be OK after...",			\
+  pips_assert("Statement should be OK at exit...",			\
 	      statement_consistent_p(new_module_statement));		\
   pips_debug(1, "done\n");						\
   /* Exit current debug context */					\
@@ -1759,7 +1768,7 @@ the variable is unsigned, signed or not */
   reset_current_module_entity();					\
   									\
   /* Assume it should have worked by returning TRUE... */		\
-  return TRUE;
+  return TRUE
 
 
 /** @} */
