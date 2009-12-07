@@ -790,6 +790,10 @@ entity FindEntityFromLocalNameAndPrefix(string name,string prefix)
 	global_name = (concatenate(get_current_module_name(),MODULE_SEP_STRING,
 					 ls,prefix,name,NULL));
       ent = gen_find_tabulated(global_name,entity_domain);
+      /* return values are not C variables... but they are entities. */
+      if(!entity_undefined_p(ent) && storage_return_p(entity_storage(ent))) {
+	ent = entity_undefined;
+      }
     } while(entity_undefined_p(ent) && (ls = pop_block_scope(ls))!=NULL);
   }
 

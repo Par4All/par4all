@@ -2386,17 +2386,22 @@ bool simplify_C_expression(expression e)
 	basic bt = basic_undefined;
 
 	if(type_variable_p(rt)) { /* FI: What if not? core dump? */
-	  bt = variable_basic(type_variable(ultimate_type(rt)));
+	  /* The variable type can hide a functional type via a
+	     typedef */
+	  type urt = ultimate_type(rt);
+	  if(type_variable_p(urt)) {
+	    bt = variable_basic(type_variable(urt));
 
-	  can_be_substituted_p =
-	    basic_int_p(bt)
-	    || basic_float_p(bt)
-	    || basic_overloaded_p(bt) /* Might be wrong, but necessary */
-	    || basic_complex_p(bt) /* Should not occur in old C code */
-	    || basic_logical_p(bt); /* Should not occur in old C code */
+	    can_be_substituted_p =
+	      basic_int_p(bt)
+	      || basic_float_p(bt)
+	      || basic_overloaded_p(bt) /* Might be wrong, but necessary */
+	      || basic_complex_p(bt) /* Should not occur in old C code */
+	      || basic_logical_p(bt); /* Should not occur in old C code */
 
-	  pips_debug(9, "Variable %s is an arithmetic variable: %s\n",
-		     entity_local_name(re), bool_to_string(can_be_substituted_p));
+	    pips_debug(9, "Variable %s is an arithmetic variable: %s\n",
+		       entity_local_name(re), bool_to_string(can_be_substituted_p));
+	  }
 	}
       }
       break; /* FI: The index expressions should be simplified too... */

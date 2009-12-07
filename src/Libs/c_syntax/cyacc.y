@@ -1544,10 +1544,15 @@ statement:
 			    entity v = reference_variable(r);
 			    type t = ultimate_type(entity_type(v));
 			    if(type_functional_p(t)) {
+			      /* pointers to functions, hence
+				 functions can be returned in C */
+			      /* FI: relationship with undeclared? */
+			      /*
 			      pips_user_warning("Ill. returned value: reference to function \"%s\""
                                                 " or variable \"%s\" not declared\n",
 						entity_user_name(v), entity_user_name(v));
 			      CParserError("Ill. return expression");
+			      */
 			    }
 			  }
                           $$ = make_statement(entity_empty_label(),
