@@ -2485,7 +2485,13 @@ direct_decl: /* (* ISO 6.7.5 *) */
 			     - Why comma_expression, it can be a list of expressions ?
                              - When the comma_expression is empty (corresponding to the first dimension),
 			       the array is of unknown size => can be determined by the intialization ? TO BE DONE*/
-			  UpdateArrayEntity($1,$3,$4);
+			  list el = $4;
+			  if(gen_length(el)<=1)
+			    UpdateArrayEntity($1,$3,el);
+			  else {
+			    expression d = MakeCommaExpression(el);
+			    UpdateArrayEntity($1,$3,CONS(EXPRESSION, d, NIL));
+			  }
 			}
 |   direct_decl TK_LBRACKET attributes error TK_RBRACKET
                         {
