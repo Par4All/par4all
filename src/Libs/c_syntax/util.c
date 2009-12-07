@@ -791,7 +791,9 @@ entity FindEntityFromLocalNameAndPrefix(string name,string prefix)
 					 ls,prefix,name,NULL));
       ent = gen_find_tabulated(global_name,entity_domain);
       /* return values are not C variables... but they are entities. */
-      if(!entity_undefined_p(ent) && storage_return_p(entity_storage(ent))) {
+      if(!entity_undefined_p(ent)
+	 && !storage_undefined_p(entity_storage(ent))
+	 && storage_return_p(entity_storage(ent))) {
 	ent = entity_undefined;
       }
     } while(entity_undefined_p(ent) && (ls = pop_block_scope(ls))!=NULL);
