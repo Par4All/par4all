@@ -7,5 +7,6 @@ activate MUST_REGIONS
 apply ARRAY_BOUND_CHECK_TOP_DOWN
 apply UNSPLIT
 
+close
 quit
 

@@ -1,7 +1,7 @@
 delete extending01b
 create extending01b extending01b.c
 
-setproperty PREPEND_COMMENT "PPoPP Bangalore"
+setproperty PREPEND_COMMENT " PPoPP Bangalore"
 
 apply PREPEND_COMMENT[%ALLFUNC]
 
