@@ -65,8 +65,11 @@ int main()
    int i;                                                               /*0004*/
    extern void foo(int);                                                /*0005*/
    void (*bar)();                                                       /*0006*/
-   foo(i);                                                              /*0007*/
-   (*bar)(i);                                                           /*0008*/
+   typedef void (*barbar)();                                            /*0007*/
+   extern int fputs();                                                  /*0008*/
+   //char line[256], *fgets() ;
+   foo(i);                                                              /*0010*/
+   (*bar)(i);                                                           /*0011*/
 }
 
 Call graph for "main"

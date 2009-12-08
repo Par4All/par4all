@@ -17,5 +17,10 @@ module main
 
 display PRINTED_FILE
 
+echo
+echo Call graph for "main"
+
+display CALLGRAPH_FILE[main]
+
 close
 delete io_intrinsics
