@@ -527,6 +527,7 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
   {TOASCII_OPERATOR_NAME,                  no_write_effects},
   {_TOLOWER_OPERATOR_NAME,                 no_write_effects},
   {_TOUPPER_OPERATOR_NAME,                 no_write_effects},
+  {CTYPE_B_LOC_OPERATOR_NAME,              no_write_effects},
 
   {"errno",                                no_write_effects},
 

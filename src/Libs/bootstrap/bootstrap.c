@@ -4126,6 +4126,8 @@ static IntrinsicDescriptor IntrinsicTypeDescriptorTable[] =
   {TOASCII_OPERATOR_NAME, 1, integer_to_integer_type, 0, 0},
   {_TOLOWER_OPERATOR_NAME, 1, integer_to_integer_type, 0, 0},
   {_TOUPPER_OPERATOR_NAME, 1, integer_to_integer_type, 0, 0},
+  /* Real type is void -> unsigned short int ** */
+  {CTYPE_B_LOC_OPERATOR_NAME, 0, integer_to_integer_type, 0, 0},
 
   /* #include <errno.h>*/
   /*  {"errno", 0, overloaded_to_integer_type, 0, 0}, */

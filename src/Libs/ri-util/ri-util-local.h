@@ -669,6 +669,8 @@
 #define TOASCII_OPERATOR_NAME           "toascii"
 #define _TOLOWER_OPERATOR_NAME          "_tolower"
 #define _TOUPPER_OPERATOR_NAME          "_toupper"
+/* Part of the binary standard */
+#define CTYPE_B_LOC_OPERATOR_NAME       "__ctype_b_loc"
 
  /* #include <math.h>*/
 
