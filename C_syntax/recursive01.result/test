@@ -1,0 +1,77 @@
+
+Symbol table for "recursive01"
+
+recursive01
+
+Declarations for module "recursive01" with type "int -> int"
+
+Variable list:
+
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
+	Declared entity "recursive01!:*STATIC*" with type "area" with size 0
+	Declared entity "recursive01:*DYNAMIC*" with type "area" with size 24
+	Declared entity "recursive01:*HEAP*" with type "area" with size 0
+	Declared entity "recursive01:*STACK*" with type "area" with size 0
+	Declared entity "recursive01:*STATIC*" with type "area" with size 0
+	Declared entity "recursive01:0`__FUNCTION__" with type "variable" "char"
+	Declared entity "recursive01:0`__func__" with type "variable" "char"
+	Declared entity "recursive01:i" with type "variable" "int"
+	Declared entity "recursive01:recursive01" with type "variable" "int"
+
+* empty extern declaration list *
+
+
+Layout for formal parameters:
+
+	Variable recursive01:i	offset = 1
+
+Layout for return variable:
+
+	Variable "recursive01:recursive01"	size = 4
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "recursive01!:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "recursive01:*DYNAMIC*" of size 24:
+	Variable "recursive01:0`__func__"	offset = 0	size = 12
+	Variable "recursive01:0`__FUNCTION__"	offset = 12	size = 12
+
+
+Layout for memory area "recursive01:*HEAP*" of size 0:
+	* empty area *
+
+
+Layout for memory area "recursive01:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "recursive01:*STATIC*" of size 0:
+	* empty area *
+
+End of declarations for module recursive01
+
+
+Parsed printed file
+
+int recursive01(int i)
+{
+   if (i>0) 
+      i = recursive01(i-1);
+   return i;
+}
+
+Printed file
+
+int recursive01(int i)
+{
+   if (i>0) 
+      i = recursive01(i-1);
+   return i;
+}

@@ -59,10 +59,12 @@ Variable list:
 
 	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 48
 	Declared entity "initialization04!:*STATIC*" with type "area" with size 0
-	Declared entity "initialization04:*DYNAMIC*" with type "area" with size 32
+	Declared entity "initialization04:*DYNAMIC*" with type "area" with size 66
 	Declared entity "initialization04:*HEAP*" with type "area" with size 0
 	Declared entity "initialization04:*STACK*" with type "area" with size 0
 	Declared entity "initialization04:*STATIC*" with type "area" with size 0
+	Declared entity "initialization04:0`__FUNCTION__" with type "variable" "char"
+	Declared entity "initialization04:0`__func__" with type "variable" "char"
 	Declared entity "initialization04:0`tab2" with type "variable" "si_t"
 	Declared entity "initialization04:0`tab3" with type "variable" "si_t"
 
@@ -79,9 +81,11 @@ Layout for memory area "initialization04!:*STATIC*" of size 0:
 	* empty area *
 
 
-Layout for memory area "initialization04:*DYNAMIC*" of size 32:
-	Variable "initialization04:0`tab2"	offset = 0	size = 16
-	Variable "initialization04:0`tab3"	offset = 16	size = 16
+Layout for memory area "initialization04:*DYNAMIC*" of size 66:
+	Variable "initialization04:0`tab2"	offset = 34	size = 16
+	Variable "initialization04:0`tab3"	offset = 50	size = 16
+	Variable "initialization04:0`__func__"	offset = 0	size = 17
+	Variable "initialization04:0`__FUNCTION__"	offset = 17	size = 17
 
 
 Layout for memory area "initialization04:*HEAP*" of size 0:
@@ -100,32 +104,40 @@ End of declarations for module initialization04
 
 Printed file for "initialization04!"
 
-struct s {
+
+
+
+/* Identify properly structure pointed to by expressions */
+typedef struct s {
    int foo;
-};
-typedef struct s a_t;
+} a_t;
+/* , *p_t*/
 typedef a_t *p_t;
+
 typedef p_t f_t();
-struct f {
-   f_t *init;
-   f_t *incr;
-   f_t *decr;
-};
-struct si {
+typedef struct si {
    int i;
    struct f functions;
-};
-typedef struct si si_t;
+} si_t;
+
 f_t ini;
 f_t inc;
 f_t dec;
+
+
+
 si_t tab[] = {{0, {ini, inc, dec}}, {1, {ini, inc, dec}}, {2, {ini, inc, dec}}};
+
 extern void initialization04();
 
 Printed file for "initialization04"
 
 void initialization04()
 {
+   /* The top-down approach used to compute the number of elements
+        fails here because two elements are seen here: tab2 is analyzed
+        as a two element array wile tab3 is analyzed as a one element
+        array */
    si_t tab2[] = {0, {ini, inc, dec}};
    si_t tab3[] = {{0, {ini, inc, dec}}};
 }
