@@ -256,11 +256,11 @@ void dump_functional(functional f, string_buffer result)
   if(ENDP(functional_parameters(f))) {
     string_buffer_append(result, concatenate("()",NULL));
   }
-  
+
   string_buffer_append(result, concatenate(" -> ",NULL));
 
   if(type_variable_p(tr))
-    string_buffer_append(result, 
+    string_buffer_append(result,
 			 concatenate(basic_to_string(variable_basic(type_variable(tr)))
 					    /*,NL*/,NULL));
   else if(type_void_p(tr))
