@@ -331,7 +331,7 @@ list words_basic(basic obj)
       }
     case is_basic_overloaded:
       {
-	/* should be a user error ? */
+	/* should be a user error? Or simply bootstrap.c is not accurate? */
 	pc = CHAIN_SWORD(pc,prettyprint_is_fortran?"OVERLOADED":"overloaded");
 	break;
       }
@@ -1949,36 +1949,38 @@ list generic_c_words_simplified_entity(type t, list name, bool is_safe, bool add
 	  pc = CHAIN_SWORD(name,"(");
 	}
 
-      for(cparam = lparams, pnum = 1; !ENDP(cparam); POP(cparam), pnum++) {
-	parameter p = PARAMETER(CAR(cparam));
-	type t1 = parameter_type(p);
-	string pn = dummy_unknown_p(parameter_dummy(p))?
-	  string_undefined
-	  : strdup(entity_local_name(dummy_identifier(parameter_dummy(p))));
+      if(!overloaded_parameters_p(lparams)) {
+	for(cparam = lparams, pnum = 1; !ENDP(cparam); POP(cparam), pnum++) {
+	  parameter p = PARAMETER(CAR(cparam));
+	  type t1 = parameter_type(p);
+	  string pn = dummy_unknown_p(parameter_dummy(p))?
+	    string_undefined
+	    : strdup(entity_local_name(dummy_identifier(parameter_dummy(p))));
 
-	if(add_dummy_parameter_name_p
-	   && string_undefined_p(pn)
-	   && !type_varargs_p(t1)
-	   && !type_void_p(t1)) {
-	  /* RK wants us to use another better function than itoa, but
-	     its name is not documented next to itoa() source code and
-	     here the string is going to be strduped, which makes
-	     itoa() a better choice. */
-	  pn = concatenate("f", itoa(pnum), NULL);
+	  if(add_dummy_parameter_name_p
+	     && string_undefined_p(pn)
+	     && !type_varargs_p(t1)
+	     && !type_void_p(t1)) {
+	    /* RK wants us to use another better function than itoa, but
+	       its name is not documented next to itoa() source code and
+	       here the string is going to be strduped, which makes
+	       itoa() a better choice. */
+	    pn = concatenate("f", itoa(pnum), NULL);
+	  }
+
+	  /*pips_debug(3,"Parameter type %s\n ",
+	    type_undefined_p(t1)? "type_undefined" :
+	    words_to_string(words_type(t1))); */
+	  if (!first)
+	    pc = gen_nconc(pc,CHAIN_SWORD(NIL, space_p? ", " : ","));
+	  /* c_words_entity(t1,NIL) should be replaced by c_words_entity(t1,name_of_corresponding_parameter) */
+	  pc = gen_nconc(pc,
+			 generic_c_words_simplified_entity(t1,
+							   string_undefined_p(pn)? NIL : CONS(STRING, strdup(pn), NIL),
+							   is_safe, FALSE, TRUE));
+	  pips_debug(9,"List of parameters \"%s\"\n ",list_to_string(pc));
+	  first = FALSE;
 	}
-
-	/*pips_debug(3,"Parameter type %s\n ",
-	type_undefined_p(t1)? "type_undefined" :
-	words_to_string(words_type(t1))); */
-	if (!first)
-	  pc = gen_nconc(pc,CHAIN_SWORD(NIL, space_p? ", " : ","));
-	/* c_words_entity(t1,NIL) should be replaced by c_words_entity(t1,name_of_corresponding_parameter) */
-	pc = gen_nconc(pc,
-		       generic_c_words_simplified_entity(t1,
-					      string_undefined_p(pn)? NIL : CONS(STRING, strdup(pn), NIL),
-					      is_safe, FALSE, TRUE));
-	pips_debug(9,"List of parameters \"%s\"\n ",list_to_string(pc));
-	first = FALSE;
       }
 
       pc = CHAIN_SWORD(pc,")");
