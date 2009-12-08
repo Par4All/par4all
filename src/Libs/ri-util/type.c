@@ -1929,11 +1929,16 @@ type expression_to_user_type(expression e)
 
 
 
+/* Returns true if t is a variable type with a basic overloaded. And
+   false elsewhere. */
 bool overloaded_type_p(type t)
 {
-    pips_assert("overloaded_type_p", type_variable_p(t));
+  //pips_assert("type t is of kind variable", type_variable_p(t));
 
-    return basic_overloaded_p(variable_basic(type_variable(t)));
+  if(!type_variable_p(t))
+    return FALSE;
+
+  return basic_overloaded_p(variable_basic(type_variable(t)));
 }
 
 /* bool is_inferior_basic(basic1, basic2)
@@ -3670,6 +3675,21 @@ type make_char_array_type(int n)
   type t = make_type_variable(var);
 
   return t;
+}
+bool overloaded_parameters_p(list lparams)
+{
+  bool overloaded_p = TRUE;
+
+  FOREACH(PARAMETER, p, lparams) {
+    type pt = parameter_type(p);
+
+    if(!overloaded_type_p(pt)) {
+      overloaded_p = FALSE;
+      break;
+    }
+  }
+
+  return overloaded_p;
 }
 /*
  *  that is all
