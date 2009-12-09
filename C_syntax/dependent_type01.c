@@ -1,3 +1,5 @@
+/* This code is C99. It is not parsed by the PIPS C parser. */
+
 #include <stdio.h>
 
 main()
@@ -8,6 +10,6 @@ main()
   m++;
   n++;
   double b[m][n];
-  printf("size of a = %d\n", sizeof(a));
-  printf("size of b = %d\n", sizeof(b));
+  printf("size of a = %d\n", (int) sizeof(a));
+  printf("size of b = %d\n", (int) sizeof(b));
 }

@@ -12,7 +12,7 @@ void generate07()
    } z_t;
    z_t z;
    morning_t u;
-   extern fii func(foo, z_t, morning_t, double *);
+   fii func(foo, z_t, morning_t, double *);
    
    // use an undeclared function without source code, which returns
    // implictly an inta typedef type

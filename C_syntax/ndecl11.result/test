@@ -8,6 +8,7 @@ Declarations for module "ndecl11" with type "char * -> void"
 Variable list:
 
 	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
+	Declared entity "TOP-LEVEL:foo" with type "functional" "() -> enum m "
 	Declared entity "ndecl11!:*STATIC*" with type "area" with size 0
 	Declared entity "ndecl11:*DYNAMIC*" with type "area" with size 24
 	Declared entity "ndecl11:*HEAP*" with type "area" with size 0
@@ -16,7 +17,6 @@ Variable list:
 	Declared entity "ndecl11:0`?m" with type "enum" 
 	Declared entity "ndecl11:0`__FUNCTION__" with type "variable" "char"
 	Declared entity "ndecl11:0`__func__" with type "variable" "char"
-	Declared entity "ndecl11:0`foo" with type "functional" "() -> enum m "
 	Declared entity "ndecl11:0`px" with type "variable" "enum m  *"
 	Declared entity "ndecl11:0`x" with type "variable" "enum m "
 	Declared entity "ndecl11:dir" with type "variable" "char *"

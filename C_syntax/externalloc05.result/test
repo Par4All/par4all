@@ -47,5 +47,5 @@ End of declarations for module foo
 
 void foo()
 {
-   extern int bar();
+   int bar();
 }

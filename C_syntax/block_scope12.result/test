@@ -69,10 +69,10 @@ Parser output
 
 static int block_scope12()
 {
-   extern int foo(int);
+   int foo(int);
    int x = 6;
    {
-      extern int foo(int);
+      int foo(int);
       int x = foo(x);
       printf("internal: %d\n", x);
    }
@@ -84,10 +84,10 @@ Parser output
 
 static int block_scope12()
 {
-   extern int foo(int);
+   int foo(int);
    int x = 6;
    {
-      extern int foo(int);
+      int foo(int);
       int x = foo(x);
       printf("internal: %d\n", x);
    }
@@ -99,10 +99,10 @@ Controlizer output
 
 static int block_scope12()
 {
-   extern int foo(int);
+   int foo(int);
    int x = 6;
    {
-      extern int foo(int);
+      int foo(int);
       int x = foo(x);
       printf("internal: %d\n", x);
    }

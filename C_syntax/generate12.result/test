@@ -3,8 +3,8 @@ Parsed printed file
 
 void generate12()
 {
-   int i,  j;
-   extern void func(void);
+   int i, j;
+   void func(void);
 
    func();
 }
@@ -13,8 +13,8 @@ Printed file
 
 void generate12()
 {
-   int i,  j;
-   extern void func(void);
+   int i, j;
+   void func(void);
 
    func();
 }
@@ -26,8 +26,8 @@ Printed file generate12 with intraprocedural preconditions
 
 void generate12()
 {
-   int i,  j;
-   extern void func(void);
+   int i, j;
+   void func(void);
 
 //  P() {}
 

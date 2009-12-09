@@ -5,13 +5,13 @@
 int filter();
 
 int  main()
-{ 
+{
   int i;
   int j;
-  
+
   j = filtre(i);
-}   
-  
+}
+
 int  filter(int x)
 {
   int y;

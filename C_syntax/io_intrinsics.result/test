@@ -117,3 +117,6 @@ int main(char *fmt1, ...)
    fprintf(stderr, "The END\n");
 }
 
+Call graph for "main"
+ main
+

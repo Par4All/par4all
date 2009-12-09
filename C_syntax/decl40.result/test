@@ -1,7 +1,7 @@
 int foo(void)
 {
    // external declaration stuttering...
-   extern int bla(void);                                                /*0005*/
-   extern int bla(void);                                                /*0006*/
+   int bla(void);                                                       /*0005*/
+   int bla(void);                                                       /*0006*/
    bla();                                                               /*0007*/
 }

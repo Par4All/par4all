@@ -1,7 +1,63 @@
 
+Symbol table
+
+ndecl05
+
+Declarations for module "ndecl05" with type "char * -> void"
+
+Variable list:
+
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
+	Declared entity "TOP-LEVEL:bar" with type "functional" "int -> void"
+	Declared entity "TOP-LEVEL:foo" with type "functional" "int -> void"
+	Declared entity "ndecl05!:*STATIC*" with type "area" with size 0
+	Declared entity "ndecl05:*DYNAMIC*" with type "area" with size 16
+	Declared entity "ndecl05:*HEAP*" with type "area" with size 0
+	Declared entity "ndecl05:*STACK*" with type "area" with size 0
+	Declared entity "ndecl05:*STATIC*" with type "area" with size 0
+	Declared entity "ndecl05:0`__FUNCTION__" with type "variable" "char"
+	Declared entity "ndecl05:0`__func__" with type "variable" "char"
+	Declared entity "ndecl05:dir" with type "variable" "char *"
+
+* empty extern declaration list *
+
+
+Layout for formal parameters:
+
+	Variable ndecl05:dir	offset = 1
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "ndecl05!:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "ndecl05:*DYNAMIC*" of size 16:
+	Variable "ndecl05:0`__func__"	offset = 0	size = 8
+	Variable "ndecl05:0`__FUNCTION__"	offset = 8	size = 8
+
+
+Layout for memory area "ndecl05:*HEAP*" of size 0:
+	* empty area *
+
+
+Layout for memory area "ndecl05:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "ndecl05:*STATIC*" of size 0:
+	* empty area *
+
+End of declarations for module ndecl05
+
+
 Parsed printed file
 
 void ndecl05(char *dir)
 {
-   void foo(int x),  bar(int y);
+   void foo(int x), bar(int y);
 }

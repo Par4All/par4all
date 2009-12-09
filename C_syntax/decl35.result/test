@@ -32,3 +32,45 @@ void decl35(int i)
 
 Effects for "main"
 
+main()
+{
+   // But it is not handled nicely here although the declaration statement is identical
+   void decl35(int);
+   int i = 1;
+//               <must be read   >: i
+
+   decl35(i);
+}
+
+Transformers for "decl35"
+
+
+//  T() {}
+
+void decl35(int i)
+{
+
+//  T(i) {i==i#init+1}
+
+   i++;
+}
+
+Preconditions for "decl35"
+
+
+//  P() {}
+
+void decl35(int i)
+{
+
+//  P() {}
+
+   i++;
+}
+
+PRINTED Regions for "decl35"
+
+void decl35(int i)
+{
+   i++;
+}

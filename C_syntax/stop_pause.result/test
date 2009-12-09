@@ -5,7 +5,7 @@ void STOP_PAUSE()
    int L3;
    int L4;
    float X;
-   extern float RAND();
+   float RAND();
    X = RAND();
    if (X>0.) {
       X = X+5.;

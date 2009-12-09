@@ -24,5 +24,24 @@ int main()
    j = filtre(i);
 }
 
-PARSED PRINTED FILE FOR MODULE filter (undefined variable "res")
+Symbol table for module "filter" (undefined variable "res")
 
+int filter(int x)
+{
+   int y;
+
+   y = x;
+
+   return res;
+}
+
+Parsed printed file for module "filter" (undefined variable "res")
+
+int filter(int x)
+{
+   int y;
+
+   y = x;
+
+   return res;
+}

@@ -63,10 +63,10 @@ Code for "main"
 int main()
 {
    int i;                                                               /*0004*/
-   extern void foo(int);                                                /*0005*/
+   void foo(int);                                                       /*0005*/
    void (*bar)();                                                       /*0006*/
    typedef void (*barbar)();                                            /*0007*/
-   extern int fputs();                                                  /*0008*/
+   int fputs();                                                         /*0008*/
    //char line[256], *fgets() ;
    foo(i);                                                              /*0010*/
    (*bar)(i);                                                           /*0011*/

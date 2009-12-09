@@ -6,7 +6,7 @@ void generate05()
    int i = 0;
    double x = 1.;
    foo y;
-   extern fii func(foo, double *);
+   fii func(foo, double *);
    
    // use an undeclared function without source code, which returns
    // implictly an inta typedef type

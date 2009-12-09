@@ -33,7 +33,13 @@ echo
 display PARSED_PRINTED_FILE[main]
 
 echo
-echo PARSED PRINTED FILE FOR MODULE filter (undefined variable "res")
+echo Symbol table for module "filter" (undefined variable "res")
+echo
+
+display PARSED_PRINTED_FILE[filter]
+
+echo
+echo Parsed printed file for module "filter" (undefined variable "res")
 echo
 
 display PARSED_PRINTED_FILE[filter]
