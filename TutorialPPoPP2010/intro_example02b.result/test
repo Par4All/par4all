@@ -2,9 +2,7 @@ Privatize module foo
 int foo(void)
 {
    int i;
-   double t;
-   double s;
-   double a[100];
+   double t, s, a[100];
 #pragma omp parallel for private(t)
    for(i = 0; i <= 49; i += 1) {
       t = a[i];

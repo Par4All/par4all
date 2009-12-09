@@ -1,9 +1,7 @@
 int foo(void)
 {
    int i;
-   double t;
-   double s = 0.;
-   double a[100];
+   double t, s = 0., a[100];
 #pragma omp parallel for private(t)
    for(i = 0; i <= 49; i += 1) {
       t = a[i];

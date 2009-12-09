@@ -1,8 +1,8 @@
 float extending01(int n, float a[n])
 {
+   // PPoPP 2010
    int i;
    float s = 0.;
-   //PPoPP 2010
    for(i = 0; i <= n-1; i += 1)
       s += a[i]*a[i];
    return s;
