@@ -428,8 +428,9 @@ integer_to_logical_type(int n)
   return t;
 }
 
-static type
-integer_to_integer_type(int n)
+/* Why do we make these functions static and keep them here instead of
+   populating ri-util/type.c? */
+static type integer_to_integer_type(int n)
 {
   type t = type_undefined;
   functional ft = functional_undefined;
@@ -442,8 +443,75 @@ integer_to_integer_type(int n)
   return t;
 }
 
-static type
-integer_to_real_type(int n)
+/* Can be used for C or Fortran functions. E.g. abort() */
+static type void_to_void_type(int n __attribute__ ((unused)))
+{
+  type t = type_undefined;
+  functional ft = functional_undefined;
+
+  ft = make_functional(NIL, make_type_void());
+  functional_parameters(ft) =
+    CONS(PARAMETER, make_parameter(make_type_void(),
+				   make_mode_value(), // not
+						      // significant
+						      // for void...
+				   make_dummy_unknown()), NIL);
+  t = make_type(is_type_functional, ft);
+
+  pips_assert("t is consistent", type_consistent_p(t));
+
+  return t;
+}
+
+/* C only because of pointer. e.g. atexit() */
+static type void_to_void_to_int_pointer_type(int n __attribute__ ((unused)))
+{
+  type t = type_undefined;
+  functional ft = functional_undefined;
+  type vtv = void_to_void_type(0);
+  type vtvp = type_to_pointer_type(vtv);
+
+  ft = make_functional(NIL, MakeIntegerResult());
+  functional_parameters(ft) =
+    CONS(PARAMETER, make_parameter(vtvp,
+				   make_mode_value(), // not
+						      // significant
+						      // for void...
+				   make_dummy_unknown()), NIL);
+  t = make_type(is_type_functional, ft);
+
+  pips_assert("t is consistent", type_consistent_p(t));
+
+  return t;
+}
+
+/* C only because of pointer. e.g. atof() */
+static type char_pointer_to_double_type(int n __attribute__ ((unused)))
+{
+  type t = type_undefined;
+  functional ft = functional_undefined;
+  type cp = MakeCharacterResult();
+  //type cp = type_to_pointer_type(c);
+  type d = MakeDoubleprecisionResult();
+
+  variable_qualifiers(type_variable(cp))
+    = CONS(QUALIFIER, make_qualifier_const(), NIL);
+
+  ft = make_functional(NIL, d);
+  functional_parameters(ft) =
+    CONS(PARAMETER, make_parameter(cp,
+				   make_mode_value(), // not
+						      // significant
+						      // for void...
+				   make_dummy_unknown()), NIL);
+  t = make_type(is_type_functional, ft);
+
+  pips_assert("t is consistent", type_consistent_p(t));
+
+  return t;
+}
+
+static type integer_to_real_type(int n)
 {
   type t = type_undefined;
   functional ft = functional_undefined;
@@ -4366,10 +4434,10 @@ static IntrinsicDescriptor IntrinsicTypeDescriptorTable[] =
 
   {POSIX_MEMALIGN_FUNCTION_NAME, 3, default_intrinsic_type, 0, 0},
 
-  {ABORT_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+  {ABORT_FUNCTION_NAME, 1, void_to_void_type, 0, 0},
   {ABS_FUNCTION_NAME, 1, integer_to_integer_type, 0, 0},
-  {ATEXIT_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
-  {ATOF_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+  {ATEXIT_FUNCTION_NAME, 1, void_to_void_to_int_pointer_type, 0, 0},
+  {ATOF_FUNCTION_NAME, 1, char_pointer_to_double_type, 0, 0},
   {ATOI_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
   {ATOL_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
   {BSEARCH_FUNCTION_NAME, 5, default_intrinsic_type, 0, 0},

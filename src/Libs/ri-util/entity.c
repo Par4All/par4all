@@ -1298,10 +1298,16 @@ string local_name_to_scope(string ln)
 
 bool typedef_entity_p(entity e)
 {
-  /* Its name must contain the TYPEDEF_PREFIX just after the MODULE_SEP_STRING */
+  /* Its name must contain the TYPEDEF_PREFIX just after the
+     MODULE_SEP_STRING and the scope information */
   string en = entity_name(e);
-  string ms = strchr(en, MODULE_SEP);
+  string ms = strchr(en, BLOCK_SEP_CHAR);
   bool is_typedef = FALSE;
+
+  /* If there is no scope information, use the module separator */
+  if(ms==NULL)
+    ms = strchr(en, MODULE_SEP);
+
 
   if(ms!=NULL)
     is_typedef = (*(ms+1)==TYPEDEF_PREFIX_CHAR);
@@ -1370,10 +1376,14 @@ entity MakeCompilationUnitEntity(string name)
 
 bool extern_entity_p(entity module, entity e)
 {
-  /* There are two cases for "extern" 
-     - The current module is a compilation unit and the entity is in the ram_shared list of 
-     the ram storage of the compilation unit.
-     - The current module is a normal function and the entity has a global scope.*/
+  /* There are two cases for "extern"
+
+     - The current module is a compilation unit and the entity is in
+       the ram_shared list of the ram storage of the compilation unit.
+
+     - The current module is a normal function and the entity has a
+       global scope.
+*/
   // Check if e belongs to module
   /* bool isbelong = TRUE;
   list ld = entity_declarations(m);
@@ -1401,6 +1411,20 @@ bool extern_entity_p(entity module, entity e)
     return ((compilation_unit_entity_p(module) && gen_in_list_p(e,code_externs(value_code(entity_initial(module)))))
 	  ||(!compilation_unit_entity_p(module) && (strstr(entity_name(e),TOP_LEVEL_MODULE_NAME) != NULL)));
 
+}
+
+bool explicit_extern_entity_p(entity module, entity e)
+{
+  /* There are two cases for "extern"
+
+     - The current module is a compilation unit and the entity is in
+       the ram_shared list of the ram storage of the compilation unit.
+
+     - The current module is a normal function and the entity has a
+       global scope: this is not an explicit extern declaration.
+  */
+    return compilation_unit_entity_p(module)
+	     && gen_in_list_p(e,code_externs(value_code(entity_initial(module))));
 }
 
 string storage_to_string(storage s)

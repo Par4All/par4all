@@ -1297,41 +1297,78 @@ void UpdateArrayEntity(entity e, list lq, list le)
     }
 }
 
+/* Rename function oe if necessary.
+ *
+ * The function name may be wrong because not enough information was
+ * available when it was created by FindOrCreateCurrentEntity().
+ *
+ * oe must be a function and not a pointer to a function
+ *
+ * oe should be added to the declarations of the current block
+ */
+
 entity RenameFunctionEntity(entity oe)
 {
   entity ne = oe;
-  string s = entity_name(oe);
+  string oen = entity_name(oe);
+  string oeln = entity_local_name(oe);
+  string sn = local_name_to_scope(oeln);
+  //type oet = entity_type(oe);
 
-  /* The function name may be wrong because not enough information was
-     available when it was created by FindOrCreateCurrentEntity(). */
-  if(strchr(s, MODULE_SEP)!=NULL) {
-    string mn = entity_module_name(ne);
-    string ln = entity_local_name(ne);
-    value voe = entity_initial(oe);
-    stack s = get_from_entity_type_stack_table(oe);
-    stack ns = stack_copy(s);
+  /* A C function or intrinsics name should include no scope
+     information. But a functional typedef should. */
+  if(!typedef_entity_p(oe) && !empty_string_p(sn)) {
+    if(strchr(oen, MODULE_SEP)!=NULL) {
+      //string mn = entity_module_name(ne);
+      string ln = entity_user_name(ne);
+      value voe = entity_initial(oe);
+      stack s = get_from_entity_type_stack_table(oe);
+      stack ns = stack_copy(s);
 
-    ne = find_or_create_entity(concatenate(mn, ln, NULL));
-    entity_type(ne) = copy_type(entity_type(oe));
-    entity_storage(ne) = copy_storage(entity_storage(oe));
-    /* FI I do not understand how formal parameters could be declared before */
-    if(value_undefined_p(voe) || value_unknown_p(voe))
-      entity_initial(ne) = make_value(is_value_code,
-				      make_code(NIL,strdup(""), make_sequence(NIL),NIL, make_language_c()));
-    else
-      entity_initial(ne) = copy_value(entity_initial(oe));
-    put_to_entity_type_stack_table(ne, ns);
-   pips_debug(1, "entity %s renamed %s\n", entity_name(oe), entity_name(ne));
+      /* In fact, we'd like to know if it is found before we create it... */
+      ne = global_name_to_entity(TOP_LEVEL_MODULE_NAME, ln);
+      if(entity_undefined_p(ne)) {
+	ne = find_or_create_entity(concatenate(TOP_LEVEL_MODULE_NAME, MODULE_SEP_STRING, ln, NULL));
+	entity_type(ne) = copy_type(entity_type(oe));
+	entity_storage(ne) = copy_storage(entity_storage(oe));
+	/* FI I do not understand how formal parameters could be declared before */
+	if(value_undefined_p(voe) || value_unknown_p(voe))
+	  entity_initial(ne) = make_value(is_value_code,
+					  make_code(NIL,strdup(""), make_sequence(NIL),NIL, make_language_c()));
+	else {
+	  list dl = list_undefined;
+	  entity_initial(ne) = copy_value(entity_initial(oe));
+
+	  dl = code_declarations(value_code(entity_initial(ne)));
+	  FOREACH(ENTITY, v, dl) {
+	    storage s = entity_storage(v);
+	    if(storage_formal_p(s)) {
+	      formal fs = storage_formal(s);
+	      formal_function(fs) = ne;
+	    }
+	  }
+	}
+	put_to_entity_type_stack_table(ne, ns);
+      }
+
+      pips_debug(1, "entity %s renamed %s\n", entity_name(oe), entity_name(ne));
+
+      /* We assume oe is not already part of a declaration list since
+	 its formal parameters have been taken care of */
+      free_entity(oe);
+    }
   }
   return ne;
 }
 
 /* The parser has found out that an entity is a function and partially
-   sets its type */
+   sets its type. The function may also be an intrinsics and be
+   already fully defined. */
 void UpdateFunctionEntity(entity oe, list la)
 {
   type t = entity_type(oe);
-  //string s = entity_name(oe);
+  //string oeln = entity_local_name(oe);
+  //string sn = local_name_to_scope(oeln);
   //entity ne = oe;
 
   pips_debug(3,"Update function entity %s\n",entity_name(oe));
@@ -1347,8 +1384,31 @@ void UpdateFunctionEntity(entity oe, list la)
       (void) fprintf(stderr, "\n");
   }
 
+  /* If oe is an intrinsics, nothing should be done if we are
+     compiling a function that redeclares intrinsics, because they are
+     usually badly or at least only partly redeclared.
+
+     However, il should be updated if it's declared in a compilation unit
+     as the header files may contain more up-to-date information than
+     bootstrap.
+
+     Note that a user function might have the same name as a C
+     intrinsic. Then we are in trouble.
+  */
+  if(intrinsic_entity_p(oe) && !compilation_unit_p(get_current_module_name()))
+    return;
+
+  /* Is oe's name compatible with a function name? Well oe might be a
+     pointer... */
+  // pips_assert("A function name does not include a scope", empty_string_p(sn));
+
   if (type_undefined_p(t))
     entity_type(oe) = make_type_functional(make_functional(gen_full_copy_list(la),type_undefined));
+  else if(type_functional_p(t)) {
+    /* FI: We used never to bump into this case... */
+    functional f = type_functional(t);
+    functional_parameters(f) = gen_full_copy_list(la);
+  }
   else {
     pips_internal_error("What should be done here?");
     CParserError("This entity must have undefined type\n");
@@ -1369,6 +1429,9 @@ void UpdateFunctionEntity(entity oe, list la)
 
    If t1 is a functional type, if the result type of t1 is undefined,
    it is replaced by t2.
+
+   If t1 is a void type, then either t2 also is a void type or an
+   error is raised.
 
    The function is recursive.
 
@@ -1423,7 +1486,13 @@ type UpdateType(type t1, type t2)
 							variable_dimensions(v),
 							variable_qualifiers(v)));
 	      }
-	    CParserError("This basic has which field undefined ?\n");
+	    else {
+	      /* t1 is already fully defined */
+	      if(type_equal_p(t1,t2))
+		return t2;
+	      else
+		CParserError("This basic has which field undefined ?\n");
+	    }
 	  }
 	break;
       }
@@ -1440,6 +1509,18 @@ type UpdateType(type t1, type t2)
 	    return make_type_functional(make_functional(functional_parameters(f),nt));
 	  }
 	return make_type_functional(make_functional(functional_parameters(f),UpdateType(functional_result(f),t2)));
+      }
+    case is_type_void:
+      {
+	if(type_void_p(t2)) {
+	  /* Redundant update */
+	  ;
+	}
+	else {
+	  /* Could be a pips internal error... */
+	  CParserError("void type to be updated by a non void type...\n");
+	}
+	return t1;
       }
     default:
       {
@@ -1906,6 +1987,11 @@ void UpdateEntity(entity e, stack ContextStack, stack FormalStack, stack Functio
 
   pips_debug(3,"Update entity begins for \"%s\" with context %p\n", entity_name(e), context);
 
+  /* If e is an intrinsics, nothing should be done, unless you are in
+     the compilation unit */
+  if(intrinsic_entity_p(e) && !compilation_unit_p(get_current_module_name()))
+    return;
+
   if (lq != NIL)
     {
       /* tc must have variable type, add lq to its qualifiers */
@@ -1922,17 +2008,20 @@ void UpdateEntity(entity e, stack ContextStack, stack FormalStack, stack Functio
   //pips_assert("context type tc is defined", !type_undefined_p(tc));
   t2 = UpdateType(t,tc);
 
-  while (stack_size(s) > 1)
-    {
-      t1 = stack_pop(s);
-      t2 = UpdateType(t1,t2);
+  if(t2!=t) {
+    if(!stack_undefined_p(s)) {
+      while (stack_size(s) > 1)
+	{
+	  t1 = stack_pop(s);
+	  t2 = UpdateType(t1,t2);
+	}
+      if(type_undefined_p(t2)) {
+	/* The default type is int, or a function returning an int */
+	t2 = make_scalar_integer_type(DEFAULT_INTEGER_TYPE_SIZE);
+      }
     }
-  if(type_undefined_p(t2)) {
-    /* The default type is int, or a function returning an int */
-    t2 = make_scalar_integer_type(DEFAULT_INTEGER_TYPE_SIZE);
+    entity_type(e) = t2;
   }
-  entity_type(e) = t2;
-
 
 
 

@@ -2518,14 +2518,26 @@ direct_decl: /* (* ISO 6.7.5 *) */
     rest_par_list TK_RPAREN
                         {
 			  entity e = GetFunction();
+			  entity ne = e;
 			  PopFunction();
 			  stack_pop(FormalStack);
 			  StackPop(OffsetStack);
 			  /* Intrinsic functions in C such as printf, fprintf, ... are considered
 			     as entities with functional type ???
 			     if (!intrinsic_entity_p(e))*/
-			  UpdateFunctionEntity(e,$4);
-			  $$ = e;
+			  /* e can be a function or a pointer to a
+			     function. The information is available
+			     somewhere in the stacks... */
+			  stack ts = get_from_entity_type_stack_table(e);
+			  if(!stack_undefined_p(ts)) {
+			    type et = (type) stack_head(ts);
+			    if(type_undefined_p(et))
+			      ne = RenameFunctionEntity(e);
+			    else if(!type_variable_p(et))
+			      ne = RenameFunctionEntity(e);
+			  }
+			  UpdateFunctionEntity(ne,$4);
+			  $$ = ne;
 			}
 ;
 

@@ -2414,6 +2414,7 @@ text c_text_related_entities(entity module, list del, int margin, int sn)
   entity e_last = ENTITY(CAR(gen_last(el))); // Let's also use the last declared entity.
   string name1 = entity_user_name(e1);
   type t1 = entity_type(e1);
+  type t_last = entity_type(e_last);
   //storage s1 = entity_storage(e1);
   storage s_last = entity_storage(e_last);
   //value val1 = entity_initial(e1);
@@ -2436,7 +2437,9 @@ text c_text_related_entities(entity module, list del, int margin, int sn)
      - function specifiers : inline */
 
   /* This part is for storage specifiers */
-  if (!entity_undefined_p(module) && extern_entity_p(module, e_last))
+  if (!entity_undefined_p(module)
+      && (explicit_extern_entity_p(module, e_last)
+	  || (extern_entity_p(module, e_last) && !type_functional_p(t_last))))
     pc = CHAIN_SWORD(pc,"extern ");
 
   if (strstr(entity_name(e_last),TYPEDEF_PREFIX) != NULL)

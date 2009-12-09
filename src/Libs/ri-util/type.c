@@ -189,60 +189,52 @@ MakeAnyScalarParameter(tag t, _int size)
 /* this function creates a default fortran operator result, i.e. a zero
  * dimension variable with an overloaded basic type.
  */
-type 
-MakeOverloadedResult()
+type MakeOverloadedResult()
 {
     return MakeAnyScalarResult(is_basic_overloaded, 0);
 }
 
-type 
-MakeIntegerResult()
+type MakeIntegerResult()
 {
     return MakeAnyScalarResult(is_basic_int, DEFAULT_INTEGER_TYPE_SIZE);
 }
 
-type 
-MakeRealResult()
+type MakeRealResult()
 {
     return MakeAnyScalarResult(is_basic_float, DEFAULT_REAL_TYPE_SIZE);
 }
 
-type 
-MakeDoubleprecisionResult()
+type MakeDoubleprecisionResult()
 {
     return MakeAnyScalarResult(is_basic_float, DEFAULT_DOUBLEPRECISION_TYPE_SIZE);
 }
 
-type 
-MakeLogicalResult()
+type MakeLogicalResult()
 {
     return MakeAnyScalarResult(is_basic_logical, DEFAULT_LOGICAL_TYPE_SIZE);
 }
 
-type 
-MakeComplexResult()
+type MakeComplexResult()
 {
     return MakeAnyScalarResult(is_basic_complex, DEFAULT_COMPLEX_TYPE_SIZE);
 }
 
-type 
-MakeDoublecomplexResult()
+type MakeDoublecomplexResult()
 {
-    return MakeAnyScalarResult(is_basic_complex, DEFAULT_DOUBLECOMPLEX_TYPE_SIZE);
+    return MakeAnyScalarResult(is_basic_complex,
+			       DEFAULT_DOUBLECOMPLEX_TYPE_SIZE);
 }
 
-type 
-MakeCharacterResult()
+type MakeCharacterResult()
 {
-  return MakeTypeArray(make_basic(is_basic_string, 
+  return MakeTypeArray(make_basic(is_basic_string,
 	 make_value(is_value_constant,
 		    make_constant(is_constant_int,
 				  UUINT(DEFAULT_CHARACTER_TYPE_SIZE)))),
 		       NIL);
 }
 
-type 
-MakeAnyScalarResult(tag t, _int size)
+type MakeAnyScalarResult(tag t, _int size)
 {
     return MakeTypeArray(make_basic(t, UUINT(size)), NIL);
 }
@@ -2375,32 +2367,29 @@ type basic_concrete_type(type t)
 		   basic_to_string(bt),
 		   (int) gen_length(lt));
 	
-	if(basic_typedef_p(bt)) 
+	if(basic_typedef_p(bt))
 	  {
 	    entity e = basic_typedef(bt);
 	    type st = entity_type(e);
-	    
 
 	    pips_debug(9, "typedef  : %s\n", type_to_string(st));
 	    nt = basic_concrete_type(st);
 	    if (type_variable_p(nt))
 	      {
-		variable_dimensions(type_variable(nt)) = 
-		  gen_nconc(gen_full_copy_list(lt), 
+		variable_dimensions(type_variable(nt)) =
+		  gen_nconc(gen_full_copy_list(lt),
 			    variable_dimensions(type_variable(nt)));
 	      }
-	    
 	  }
 	else if(basic_pointer_p(bt))
 	  {
 	    type npt = basic_concrete_type(basic_pointer(bt));
-	    
+
 	     pips_debug(9, "pointer \n");
 	     nt = make_type_variable
 	       (make_variable(make_basic_pointer(npt),
 			      gen_full_copy_list(lt),
 			      gen_full_copy_list(variable_qualifiers(vt))));
-	    
 	  }
 	else
 	  {
@@ -2409,27 +2398,28 @@ type basic_concrete_type(type t)
 	  }
       }
       break;
-    
+
     default:
       nt = copy_type(t);
     }
 
   pips_debug(9, "Ends with type \"%s\"\n", type_to_string(nt));
-  ifdebug(9) 
+  ifdebug(9)
     {
-    if(type_variable_p(nt)) 
+    if(type_variable_p(nt))
       {
 	variable nvt = type_variable(nt);
 	basic nbt = variable_basic(nvt);
 	list nlt = variable_dimensions(nvt);
-	pips_debug(9, "of basic \"%s\"and number of dimensions %d.\n", 
+	pips_debug(9, "of basic \"%s\"and number of dimensions %d.\n",
 		 basic_to_string(nbt),
 		 (int) gen_length(nlt));
       }
     }
-  
+
   pips_assert("nt is not a typedef",
-	      type_variable_p(nt)? !basic_typedef_p(variable_basic(type_variable(nt))) : TRUE);
+	      type_variable_p(nt)?
+	      !basic_typedef_p(variable_basic(type_variable(nt))) : TRUE);
 
   return nt;
 }
@@ -3487,6 +3477,13 @@ void print_types(list tl)
   fprintf(stderr, "\n");
 }
 
+/* For debugging */
+void print_type(type t)
+{
+  list wl = words_type(t);
+  dump_words(wl);
+}
+
 static list recursive_functional_type_supporting_types(list stl, set vt, functional f)
 {
   ifdebug(8) {
@@ -3690,6 +3687,15 @@ bool overloaded_parameters_p(list lparams)
   }
 
   return overloaded_p;
+}
+
+type type_to_pointer_type(type t)
+{
+  type pt = make_type_variable(make_variable(make_basic_pointer(t), NIL, NIL));
+
+  pips_assert("pt is consistent", type_consistent_p(pt));
+
+  return pt;
 }
 /*
  *  that is all

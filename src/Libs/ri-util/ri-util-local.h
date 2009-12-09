@@ -60,6 +60,7 @@
 #define FILE_SEP                         FILE_SEP_CHAR
 
 #define FILE_SEP_STRING                 "!"
+/* Scope separator */
 #define BLOCK_SEP_STRING                "`"
 #define BLOCK_SEP_CHAR                  '`'
 #define MEMBER_SEP_STRING               "^"
