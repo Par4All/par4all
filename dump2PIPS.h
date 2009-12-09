@@ -85,11 +85,31 @@ statement gfc_function_body;
 
 
 
-
+/**
+ * @brief put the given char table to upper case
+ */
 char * str2upper(char s[]);
+/**
+ * @brief put the n first elements of the given char table to upper case
+ */
 char * strn2upper(char s[], size_t n);
+/**
+ * @brief same as strcpy, but begin by the end of the string allowing you to give twice the same string
+ */
 char * strrcpy(char *dest, __const char *src);
-int fcopy(char* ,char* );
+/**
+ * @brief compare the strings in upper case mode
+ */
+int strcmp_ (__const char *__s1, __const char *__s2);
+/**
+ * @brief compare the strings in upper case mode
+ */
+int strncmp_ (__const char *__s1, __const char *__s2, size_t __n);
+/**
+ * @brief copy the content of the first file to the second one
+ */
+int fcopy(char* old, char* new );
+
 
 /*
  * Dump a namespace
@@ -100,6 +120,8 @@ void gfc2pips_namespace(gfc_namespace* ns);
  * Return a list of every and each arguments for PIPS from a  gfc function/subroutine
  */
 newgen_list gfc2pips_args(gfc_namespace* ns);
+
+void gfc2pips_generate_parameters_list(newgen_list parameters);
 
 /*
  * Find a symbol by it reference name
@@ -125,18 +147,26 @@ newgen_list getSymbolBy(gfc_namespace* ns, gfc_symtree *st, bool (*func)(gfc_nam
 /*
  * Predicate functions
  */
-bool gfc2pips_test_variable(gfc_namespace* ns, gfc_symtree *st);
-bool gfc2pips_test_variable2(gfc_namespace* ns, gfc_symtree *st );
-bool gfc2pips_test_extern(gfc_namespace* ns, gfc_symtree *st );
+bool gfc2pips_test_variable(gfc_namespace* __attribute__ ((__unused__)) ns, gfc_symtree *st);
+bool gfc2pips_test_variable2(gfc_namespace* __attribute__ ((__unused__)) ns, gfc_symtree *st );
+bool gfc2pips_test_extern(gfc_namespace* __attribute__ ((__unused__)) ns, gfc_symtree *st );
+bool gfc2pips_test_subroutine(gfc_namespace* __attribute__ ((__unused__)) ns, gfc_symtree *st );
 //bool gfc2pips_test_name(gfc_namespace* ns, gfc_symtree *st, int param);
 bool gfc2pips_test_data(gfc_namespace* __attribute__ ((__unused__)) ns, gfc_symtree *st );
 bool gfc2pips_test_save(gfc_namespace* __attribute__ ((__unused__)) ns, gfc_symtree *st );
 bool gfc2pips_get_commons(gfc_namespace* __attribute__ ((__unused__)) ns, gfc_symtree* __attribute__ ((__unused__)) st );
+bool gfc2pips_get_incommon(gfc_namespace* __attribute__ ((__unused__)) ns, gfc_symtree* __attribute__ ((__unused__)) st );
 bool gfc2pips_test_dimensions(gfc_namespace* __attribute__ ((__unused__)) ns, gfc_symtree* st );
 
+entity gfc2pips_check_entity_doesnt_exists(char *s);
+entity gfc2pips_check_entity_program_exists(char *s);
+entity gfc2pips_check_entity_module_exists(char *s);
+entity gfc2pips_check_entity_exists(char *s);
 entity gfc2pips_symbol2entity(gfc_symbol* sym);
 entity gfc2pips_symbol2entity2(gfc_symbol* sym);
 entity gfc2pips_char2entity(char*p, char* s);
+char* gfc2pips_get_safe_name(char* str);
+
 
 /*
  * Functions about the translation of something from gfc into a pips "dimension" object
@@ -146,7 +176,6 @@ dimension gfc2pips_int2dimension(int n);
 expression gfc2pips_int2expression(int n);//PIPS: expression int_to_expression(_int)
 expression gfc2pips_real2expression(double r);
 expression gfc2pips_logical2expression(bool b);
-expression gfc2pips_string2expression(char* s);
 
 entity gfc2pips_int_const2entity(int n);
 entity gfc2pips_int2label(int n);
@@ -170,7 +199,10 @@ expression gfc2pips_mkRangeExpression(entity ent, gfc_array_ref *ar);
 instruction gfc2pips_code2instruction__TOP(gfc_namespace *ns, gfc_code* c);
 instruction gfc2pips_code2instruction(gfc_code* c, bool force_sequence);
 instruction gfc2pips_code2instruction_(gfc_code* c);
+expression gfc2pips_buildCaseTest(gfc_expr *tested_variable, gfc_case *cp);
+newgen_list gfc2pips_dumpSELECT(gfc_code *c);
 instruction gfc2pips_symbol2data_instruction(gfc_symbol *sym);
+expression gfc2pips_make_zero_for_symbol(gfc_symbol* sym);
 entity gfc2pips_code2get_label(gfc_code *c);
 entity gfc2pips_code2get_label2(gfc_code *c);
 entity gfc2pips_code2get_label3(gfc_code *c);
@@ -184,16 +216,16 @@ entity gfc2pips_expr2entity(gfc_expr *expr);
 //translate an expression or a value of a IO statement
 newgen_list gfc2pips_exprIO(char* s, gfc_expr* e, newgen_list l);
 newgen_list gfc2pips_exprIO2(char* s, int e, newgen_list l);
+newgen_list gfc2pips_exprIO3(char* s, string e, newgen_list l);
 
 newgen_list gfc2pips_arglist2arglist(gfc_actual_arglist *act);
 
 //memory related functions
-void gfc2pips_initAreas();
-void gfc2pips_computeAdresses();
-void gfc2pips_computeAdressesStatic();
-void gfc2pips_computeAdressesDynamic();
-void gfc2pips_computeAdressesHeap();
-void gfc2pips_computeAdressesStack();
+void gfc2pips_initAreas(void);
+void gfc2pips_computeAdresses(void);
+void gfc2pips_computeAdressesStatic(void);
+void gfc2pips_computeAdressesDynamic(void);
+void gfc2pips_computeAdressesHeap(void);
 int gfc2pips_computeAdressesOfArea( entity _area );
 
 newgen_list *gfc2pips_list_of_all_modules;
@@ -203,7 +235,7 @@ void gfc2pips_push_comment(locus l, unsigned long nb, char s);
 bool gfc2pips_check_already_done(locus l);
 unsigned long gfc2pips_get_num_of_gfc_code(gfc_code *c);
 string gfc2pips_get_comment_of_code(gfc_code *c);
-gfc2pips_comments gfc2pips_pop_comment();
+gfc2pips_comments gfc2pips_pop_comment(void);
 //void gfc2pips_set_last_comments_done(gfc_code *c);
 void gfc2pips_set_last_comments_done(unsigned long nb);
 void gfc2pips_assign_num_to_last_comments(unsigned long nb);
@@ -211,15 +243,15 @@ void gfc2pips_assign_gfc_code_to_last_comments(gfc_code *c);
 void gfc2pips_replace_comments_num(unsigned long old, unsigned long new);
 void gfc2pips_assign_gfc_code_to_num_comments(gfc_code *c, unsigned long num);
 bool gfc2pips_comment_num_exists(unsigned long num);
-void gfc2pips_pop_not_done_comments();
+void gfc2pips_pop_not_done_comments(void);
 
-void gfc2pips_shift_comments();
+void gfc2pips_shift_comments(void);
 
 void gfc2pips_push_last_code(gfc_code *c);
 
-gfc_code* gfc2pips_get_last_loop();
+gfc_code* gfc2pips_get_last_loop(void);
 void gfc2pips_push_loop(gfc_code *c);
-void gfc2pips_pop_loop();
+void gfc2pips_pop_loop(void);
 
 newgen_list gen_union(newgen_list a, newgen_list b);
 newgen_list gen_intersection(newgen_list a, newgen_list b);
