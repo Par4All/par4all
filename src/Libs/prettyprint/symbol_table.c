@@ -329,7 +329,7 @@ string get_symbol_table(entity m, bool isfortran)
 	string_buffer_append(result, ") *\""NL);
       }
       else {
-	string_buffer_append(result, 
+	string_buffer_append(result,
 			     concatenate("\"", basic_to_string(b), "\""NL,NULL));
       }
     }
@@ -344,6 +344,7 @@ string get_symbol_table(entity m, bool isfortran)
     }
     else {
       /* FI: How do we want to print out structures, unions and enums? */
+      /* FI: How do we want to print out typedefs? */
       string_buffer_append(result, NL);
     }
   }
@@ -396,9 +397,69 @@ string get_symbol_table(entity m, bool isfortran)
     }
   }
 
+  /* Derived entities: struct, union and enum */
+  nth = 0;
+  FOREACH(ENTITY, de, decls) {
+    if(entity_struct_p(de) || entity_union_p(de) || entity_enum_p(de)) {
+	nth++;
+	if(nth==1) {
+	  string_buffer_append(result, concatenate(NL,"Derived entities:"
+						   ,NL,NL,NULL));
+	}
+	/* FI: it would be useful to dump more information aout
+	   fields and members */
+	string_buffer_append(result, concatenate("\tVariable ", entity_name(de),
+						 "\tkind = ",
+						 entity_struct_p(de)? "struct" :
+						 entity_union_p(de)? "union" : "enum",
+						 "\n", NULL));
+      }
+  }
+
+  /* Typedefs */
+  nth = 0;
+  FOREACH(ENTITY, te, decls) {
+    if(typedef_entity_p(te)) {
+      type t = entity_type(te);
+      nth++;
+      if(nth==1) {
+	string_buffer_append(result, concatenate(NL,"Typedef entities:"
+						 ,NL,NL,NULL));
+      }
+      string_buffer_append(result, concatenate("\tTypedef \"", entity_name(te),
+					       "\"\twith type \"",type_to_string(t),"\" ", NULL));
+
+      if(type_variable_p(t)) {
+	variable v = type_variable(t);
+	basic b = variable_basic(v);
+	if(basic_pointer_p(b) && type_functional_p(basic_pointer(b))) {
+	  functional f = type_functional(basic_pointer(b));
+	  string_buffer_append(result, "\"(");
+	  dump_functional(f,result);
+	  string_buffer_append(result, ") *\"" NL);
+	}
+	else {
+	  string_buffer_append(result,
+			       concatenate("\"", basic_to_string(b), "\""NL,NULL));
+	}
+      }
+      else if(type_functional_p(t)) {
+	string_buffer_append(result, "\"");
+	dump_functional(type_functional(t),result);
+	string_buffer_append(result, "\"" NL);
+      }
+      else if(type_void_p(t)) {
+	string_buffer_append(result, "\"void\"" NL);
+      }
+      else {
+	pips_internal_error("unexpected type for a typedef\n");
+      }
+    }
+  }
+
   /* Formal parameters */
   nth = 0;
-  MAP(ENTITY, v, {
+  FOREACH(ENTITY, v, decls) {
       storage vs = entity_storage(v);
 
       pips_assert("All storages are defined", !storage_undefined_p(vs));
@@ -418,7 +479,7 @@ string get_symbol_table(entity m, bool isfortran)
 	pips_assert("No more than one return variable", entity_undefined_p(rv));
 	rv = v;
       }
-    }, decls);
+  }
 
   /* Return variable */
   if(!entity_undefined_p(rv)) {
@@ -465,11 +526,11 @@ void actual_symbol_table_dump(string module_name, bool isfortran)
 						   module_name, NULL);
   string dir = db_get_current_workspace_directory();
   string filename = strdup(concatenate(dir, "/", symboltable, NULL));
-  
+
   //set_current_module_entity(module);
-  
+
   out = safe_fopen(filename, "w");
-  
+
   ppt = get_symbol_table(module, isfortran);
 
   fprintf(out, "%s\n%s", module_name,ppt);
