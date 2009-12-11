@@ -69,10 +69,10 @@ cons * lls;
     int n;				/* number of index */
     int m ;				/* number of constraints */
     Value *h;
-    int i;   
+    int i;
     statement s_lhyp;
     Pvecteur *pvg;
-    Pbase pb;  
+    Pbase pb;
     expression lower, upper;
     Pvecteur pv1, pv2;
     loop l;
@@ -87,9 +87,9 @@ cons * lls;
     ifdebug(8) {
       /*DNDEBUG*/
       (void) fprintf(stderr,"base_oldindex 0:\n");
-      base_fprint(stderr,base_oldindex,default_variable_to_string);    
+      base_fprint(stderr,base_oldindex,default_variable_to_string);
     }
-    
+
     /* create the  matrix A of coefficients of  index in (Psysteme)sci */
     n = base_dimension(base_oldindex);
     m = sci->nb_ineq;
@@ -99,7 +99,7 @@ cons * lls;
     ifdebug(8) {
       /*DNDEBUG*/
       (void) fprintf(stderr,"base_oldindex 1:\n");
-      base_fprint(stderr,base_oldindex,default_variable_to_string);    
+      base_fprint(stderr,base_oldindex,default_variable_to_string);
     }
     ifdebug(8) {
       /*DNDEBUG*/
@@ -127,9 +127,9 @@ cons * lls;
 	(void) fprintf(stderr,"\n");
     }
 
-    G = matrice_new(n,n); 
+    G = matrice_new(n,n);
     /* computation of the  scanning base G */
-    scanning_base_hyperplane(h, n, G);	  
+    scanning_base_hyperplane(h, n, G);
     ifdebug(8) {
 	(void) fprintf(stderr,"The scanning base G is:");
 	matrice_fprint(stderr, G, n, n);
@@ -144,14 +144,14 @@ cons * lls;
       (void) fprintf(stderr,"Matrice AG:\n");
       matrice_fprint(stderr,AG,m,n);
     }
-    /* create the new system of constraintes (Psysteme scn) with  
+    /* create the new system of constraintes (Psysteme scn) with
        AG and sci */
     scn = sc_dup(sci);
 
     ifdebug(8) {
       /*DNDEBUG*/
       (void) fprintf(stderr,"base_oldindex 2:\n");
-      base_fprint(stderr,base_oldindex,default_variable_to_string);    
+      base_fprint(stderr,base_oldindex,default_variable_to_string);
     }
     ifdebug(8) {
       /*DNDEBUG*/
@@ -191,7 +191,7 @@ cons * lls;
     }
 
     sc_newbase = sc_change_baseindex(sc_dup(sc_row_echelon), base_oldindex, base_newindex);
-    
+
     ifdebug(8) {
       /*DNDEBUG*/
       (void) fprintf(stderr,"sc_newbase:\n");
@@ -203,12 +203,12 @@ cons * lls;
     for (pb=base_newindex; pb!=NULL; pb=pb->succ) {
 	make_bound_expression(pb->var, base_newindex, sc_newbase, &lower, &upper);
     }
-  
+
     /* loop body generation */
     pvg = (Pvecteur *)malloc((unsigned)n*sizeof(Svecteur));
     scanning_base_to_vect(G,n,base_newindex,pvg);
     pv1 = sc_row_echelon->inegalites->succ->vecteur;
-    pv2 = vect_change_base(pv1,base_oldindex,pvg);    
+    pv2 = vect_change_base(pv1,base_oldindex,pvg);
 
     l = instruction_loop(statement_instruction(STATEMENT(CAR(lls))));
     lower = range_upper(loop_range(l));
