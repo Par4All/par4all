@@ -3,9 +3,7 @@ Initial code with converted loop
 
 main()
 {
-   int i;
-   int j;
-   int k;
+   int i, j, k;
    i = 0;
    while (i<k) {
       i++;

@@ -6,8 +6,7 @@ int main()
 {
    // BEGIN BLOCK
    int a[100];
-   int i;
-   int j;
+   int i, j;
    
    /* Test with incomplete for: */
    i = 2;
@@ -39,8 +38,7 @@ int main()
 {
    // BEGIN BLOCK
    int a[100];
-   int i;
-   int j;
+   int i, j;
    
    /* Test with incomplete for: */
    i = 2;

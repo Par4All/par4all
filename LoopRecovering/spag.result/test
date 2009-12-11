@@ -1,7 +1,7 @@
 int bazar(float c)
 {
-   int i;
-   double d = c*c;
+   int i;                                                               /*0003*/
+   double d = c*c;                                                      /*0004*/
    if (d>2) goto big;                                                   /*0005*/
    if (c<0) goto l99999;                                                /*0006*/
 big:   i = c;
@@ -16,8 +16,8 @@ exit:   return d;
 }
 int bazar(float c)
 {
-   int i;
-   double d = c*c;
+   int i;                                                               /*0003*/
+   double d = c*c;                                                      /*0004*/
    if (d>2) goto big;                                                   /*0005*/
    if (c<0) goto l99999;                                                /*0006*/
 big:   i = c;

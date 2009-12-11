@@ -1,9 +1,9 @@
 void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], int ksi, int ksj, float kernel[ksi][ksj])
 {
-   int i;
-   int j;
-   int ki;
-   int kj;
+   int i;                                                               /*0004*/
+   int j;                                                               /*0005*/
+   int ki;                                                              /*0006*/
+   int kj;                                                              /*0007*/
 
    for (i = 0;i<isi;i++)                                                /*0009*/
       for (j = 0;j<isj;j++)                                             /*0010*/
@@ -14,10 +14,10 @@ After for to do loop conversion
 
 void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], int ksi, int ksj, float kernel[ksi][ksj])
 {
-   int i;
-   int j;
-   int ki;
-   int kj;
+   int i;                                                               /*0004*/
+   int j;                                                               /*0005*/
+   int ki;                                                              /*0006*/
+   int kj;                                                              /*0007*/
 
    for(i = 0; i <= isi-1; i += 1)
       for(j = 0; j <= isj-1; j += 1)
@@ -28,10 +28,10 @@ Proper effects for "convol"
 
 void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], int ksi, int ksj, float kernel[ksi][ksj])
 {
-   int i;
-   int j;
-   int ki;
-   int kj;
+   int i;                                                               /*0004*/
+   int j;                                                               /*0005*/
+   int ki;                                                              /*0006*/
+   int kj;                                                              /*0007*/
 //               <must be read   >: isi
 //               <must be written>: i
 
@@ -51,10 +51,10 @@ Cumulated effects for "convol"
 //               <must be read   >: isi isj ksi ksj
 void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], int ksi, int ksj, float kernel[ksi][ksj])
 {
-   int i;
-   int j;
-   int ki;
-   int kj;
+   int i;                                                               /*0004*/
+   int j;                                                               /*0005*/
+   int ki;                                                              /*0006*/
+   int kj;                                                              /*0007*/
 //               <may be read    >: i image[*][*] isj j
 //               <may be written >: j new_image[*][*]
 //               <must be read   >: isi
@@ -79,10 +79,10 @@ Transformers for "convol"
 
 void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], int ksi, int ksj, float kernel[ksi][ksj])
 {
-   int i;
-   int j;
-   int ki;
-   int kj;
+   int i;                                                               /*0004*/
+   int j;                                                               /*0005*/
+   int ki;                                                              /*0006*/
+   int kj;                                                              /*0007*/
 
 //  T(i,j) {0<=i}
 
@@ -105,10 +105,10 @@ Preconditions for "convol"
 
 void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], int ksi, int ksj, float kernel[ksi][ksj])
 {
-   int i;
-   int j;
-   int ki;
-   int kj;
+   int i;                                                               /*0004*/
+   int j;                                                               /*0005*/
+   int ki;                                                              /*0006*/
+   int kj;                                                              /*0007*/
 
 //  P() {}
 
@@ -125,10 +125,10 @@ void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], 
 }
 void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], int ksi, int ksj, float kernel[ksi][ksj])
 {
-   int i;
-   int j;
-   int ki;
-   int kj;
+   int i;                                                               /*0004*/
+   int j;                                                               /*0005*/
+   int ki;                                                              /*0006*/
+   int kj;                                                              /*0007*/
 
 
 #pragma omp parallel for 

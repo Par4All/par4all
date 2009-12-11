@@ -6,8 +6,7 @@ int main()
 {
    // BEGIN BLOCK
    int a[100];
-   int i;
-   int j;
+   int i, j;
    
    /* Test we can deal with comments and label in while() { } generation. */
    for (i = 2;i<=50;i++)
@@ -46,8 +45,7 @@ int main()
 {
    // BEGIN BLOCK
    int a[100];
-   int i;
-   int j;
+   int i, j;
    
    /* Test we can deal with comments and label in while() { } generation. */
    for(i = 2; i <= 50; i += 1) {

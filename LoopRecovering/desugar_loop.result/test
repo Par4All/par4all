@@ -1,6 +1,6 @@
 int desugar_loop(int i)
 {
-   int j = 0;
+   int j = 0;                                                           /*0004*/
 
    while (j<i) {                                                        /*0006*/
       j = j+1;                                                          /*0007*/
@@ -30,7 +30,7 @@ break_3:   ;
 }
 int desugar_loop(int i)
 {
-   int j = 0;
+   int j = 0;                                                           /*0004*/
 
    while (j<i) {                                                        /*0006*/
       j = j+1;                                                          /*0007*/
@@ -65,7 +65,7 @@ break_3:   ;
 }
 int desugar_loop(int i)
 {
-   int j = 0;
+   int j = 0;                                                           /*0004*/
 
    while (j<i) {                                                        /*0006*/
       j = j+1;                                                          /*0007*/
@@ -100,7 +100,7 @@ break_3:   ;
 }
 int desugar_loop(int i)
 {
-   int j = 0;
+   int j = 0;                                                           /*0004*/
 
    while (j<i) {                                                        /*0006*/
       j = j+1;                                                          /*0007*/

@@ -1,6 +1,6 @@
 int desugar_loop(int i)
 {
-   int j = 0;
+   int j = 0;                                                           /*0004*/
 l99999:   ;
 
    if (!(j<i)) goto break_1;                                            /*0009*/
@@ -14,7 +14,7 @@ break_1:   ;
 }
 int desugar_loop(int i)
 {
-   int j = 0;
+   int j = 0;                                                           /*0004*/
 €Unstructured c_1_1 end: c_2_1
 ‚Unstructured Item c_1_1
 
@@ -33,7 +33,7 @@ break_1:   ;
 }
 int desugar_loop(int i)
 {
-   int j = 0;
+   int j = 0;                                                           /*0004*/
 €Unstructured c_1_1 end: c_2_1
 ‚Unstructured Item c_1_1
 
@@ -52,7 +52,7 @@ break_1:   ;
 }
 int desugar_loop(int i)
 {
-   int j = 0;
+   int j = 0;                                                           /*0004*/
 l99999:   ;
 
    if (!(j<i)) goto break_1;                                            /*0009*/

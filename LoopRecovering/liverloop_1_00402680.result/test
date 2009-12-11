@@ -1,9 +1,13 @@
 void sub_00402680()
 {
-   int var1;
-   int var2;
-   int var3;
-   int var4;
+
+   int var1;                                                            /*0054*/
+
+   int var2;                                                            /*0056*/
+
+   int var3;                                                            /*0058*/
+
+   int var4;                                                            /*0060*/
    
    
    
@@ -85,10 +89,14 @@ loc_4026E9:   endloop(1);
 }
 void sub_00402680()
 {
-   int var1;
-   int var2;
-   int var3;
-   int var4;
+
+   int var1;                                                            /*0054*/
+
+   int var2;                                                            /*0056*/
+
+   int var3;                                                            /*0058*/
+
+   int var4;                                                            /*0060*/
    
    
    
@@ -121,6 +129,7 @@ loc_402685:   var4 = *g_408330;                                                 
    
    
    
+   ;                                                                    /*0094*/
    parameters(1);                                                       /*0094*/
    
    

@@ -1,8 +1,7 @@
 int main()
 {
-   int a[100];
-   int i;
-   int j;
+   int a[100];                                                          /*0003*/
+   int i, j;                                                            /*0004*/
    
    // A do loop ! Should be parallel
    for (i = 2;i<100;i += 1)                                             /*0007*/
@@ -18,9 +17,8 @@ int main()
 }
 int main()
 {
-   int a[100];
-   int i;
-   int j;
+   int a[100];                                                          /*0003*/
+   int i, j;                                                            /*0004*/
    
    // A do loop ! Should be parallel
    for(i = 2; i <= 99; i += 1)
@@ -36,11 +34,11 @@ int main()
 }
 int main()
 {
-   int a[100];
-   int i;
-   int j;
+   int a[100];                                                          /*0003*/
+   int i, j;                                                            /*0004*/
    
    // A do loop ! Should be parallel
+   ;
    for(i = 2; i <= 99; i += 1)
       a[i] = 2;                                                         /*0008*/
    

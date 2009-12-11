@@ -1,8 +1,7 @@
 int main()
 {
-   int a[100];
-   int i;
-   int j;
+   int a[100];                                                          /*0003*/
+   int i, j;                                                            /*0004*/
    
    // A do loop ! Should be parallel.
    for (j = 10;j>0;j = -4+j)                                            /*0007*/
@@ -15,9 +14,8 @@ After for to do loop conversion
 
 int main()
 {
-   int a[100];
-   int i;
-   int j;
+   int a[100];                                                          /*0003*/
+   int i, j;                                                            /*0004*/
    
    // A do loop ! Should be parallel.
    for(j = 10; j >= 1; j += -4)
@@ -30,9 +28,8 @@ Proper effects for "main"
 
 int main()
 {
-   int a[100];
-   int i;
-   int j;
+   int a[100];                                                          /*0003*/
+   int i, j;                                                            /*0004*/
 //               <must be written>: j
    
    // A do loop ! Should be parallel.
@@ -48,9 +45,8 @@ Cumulated effects for "main"
 
 int main()
 {
-   int a[100];
-   int i;
-   int j;
+   int a[100];                                                          /*0003*/
+   int i, j;                                                            /*0004*/
 //               <may be read    >: j
 //               <may be written >: a[*]
 //               <must be written>: j
@@ -71,9 +67,8 @@ Transformers for "main"
 
 int main()
 {
-   int a[100];
-   int i;
-   int j;
+   int a[100];                                                          /*0003*/
+   int i, j;                                                            /*0004*/
 
 //  T(j) {j<=10}
 
@@ -98,9 +93,8 @@ Preconditions for "main"
 
 int main()
 {
-   int a[100];
-   int i;
-   int j;
+   int a[100];                                                          /*0003*/
+   int i, j;                                                            /*0004*/
 
 //  P() {}
 
@@ -119,11 +113,11 @@ int main()
 }
 int main()
 {
-   int a[100];
-   int i;
-   int j;
+   int a[100];                                                          /*0003*/
+   int i, j;                                                            /*0004*/
    
    // A do loop ! Should be parallel.
+   ;
 #pragma omp parallel for 
    for(j = 10; j >= 1; j += -4)
       a[j] = 2;                                                         /*0008*/
