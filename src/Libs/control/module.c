@@ -115,52 +115,58 @@ bool controlizer(string module_name)
     statement_consistent_p(module_stat);
   }
 
-  /* *module_stat can be re-used because control_graph reallocates
-     statements; do not show that to any student!
-     statement_instruction(module_stat) =
-     make_instruction(is_instruction_unstructured,
-     control_graph(module_stat));
-     Maintenant que je nettoie le code aussi avant le controlizer,
-     un programme sans instruction ne contient qu'un statement
-     RETURN, c'est a` dire un statement de CALL vers RETURN avec le
-     label 00000.  Comme la ligne ci-dessus recycle le label et le
-     commentaire, on se retrouve avec un unstructured avec le label
-     et le commentaire du RETURN qu'il contient... En plus il y avait
-     une re'cursion de l'unstructured vers module_stat. :-(
+  /* The statement of a compilation unit is a long list of continue
+     statements and it takes a long time to restructure although
+     nothing is done in the end. So, let's skip this useless
+     processing. */
+  if(!compilation_unit_p(module_name)) {
+    /* *module_stat can be re-used because control_graph reallocates
+       statements; do not show that to any student!
+       statement_instruction(module_stat) =
+       make_instruction(is_instruction_unstructured,
+       control_graph(module_stat));
+       Maintenant que je nettoie le code aussi avant le controlizer,
+       un programme sans instruction ne contient qu'un statement
+       RETURN, c'est a` dire un statement de CALL vers RETURN avec le
+       label 00000.  Comme la ligne ci-dessus recycle le label et le
+       commentaire, on se retrouve avec un unstructured avec le label
+       et le commentaire du RETURN qu'il contient... En plus il y avait
+       une re'cursion de l'unstructured vers module_stat. :-(
 
-     So now correct the label and the comment: */
+       So now correct the label and the comment: */
 
-  pips_assert("the module statement is consistent "
-	      "before the controlizer is called",
-	      statement_consistent_p(module_stat));
+    pips_assert("the module statement is consistent "
+		"before the controlizer is called",
+		statement_consistent_p(module_stat));
 
-  module_stat = make_statement(entity_empty_label(),
-			       STATEMENT_NUMBER_UNDEFINED,
-			       MAKE_ORDERING(0,1),
-			       empty_comments,
-			       make_instruction(is_instruction_unstructured,
-						control_graph(module_stat)),
-			       NIL /* gen_copy_seq(statement_declarations(parsed_mod_stat))*/,
-			       NULL,
-			       empty_extensions ());
+    module_stat = make_statement(entity_empty_label(),
+				 STATEMENT_NUMBER_UNDEFINED,
+				 MAKE_ORDERING(0,1),
+				 empty_comments,
+				 make_instruction(is_instruction_unstructured,
+						  control_graph(module_stat)),
+				 NIL /* gen_copy_seq(statement_declarations(parsed_mod_stat))*/,
+				 NULL,
+				 empty_extensions ());
 
-  pips_assert("the module statement is consistent "
-	      "after the controlizer call",
-	      statement_consistent_p(module_stat));
+    pips_assert("the module statement is consistent "
+		"after the controlizer call",
+		statement_consistent_p(module_stat));
 
-  /* By setting this property, we try to unspaghettify the control graph
-     of the module: */
-  if (get_bool_property("UNSPAGHETTIFY_IN_CONTROLIZER"))
-    unspaghettify_statement(module_stat);
+    /* By setting this property, we try to unspaghettify the control graph
+       of the module: */
+    if (get_bool_property("UNSPAGHETTIFY_IN_CONTROLIZER"))
+      unspaghettify_statement(module_stat);
 
 
-  /* With C code, some local declarations may have been lost by the
-     (current) restructurer */
-  if(c_module_p(m))
-    module_stat = update_unstructured_declarations(module_stat);
+    /* With C code, some local declarations may have been lost by the
+       (current) restructurer */
+    if(c_module_p(m))
+      module_stat = update_unstructured_declarations(module_stat);
 
-  /* Reorder the module, because we have a new statement structure. */
-  module_reorder(module_stat);
+    /* Reorder the module, because we have a new statement structure. */
+    module_reorder(module_stat);
+  }
 
   statement_consistent_p(module_stat);
 
