@@ -37,7 +37,6 @@ arch=${PIPS_ARCH:-$($PIPS_ROOT/makes/arch.sh)}
 function handle_out_file()
 {
     local outfile=$1
-    shift
     local ref=${outfile%\/out}/test
     [ -f $ref.$arch ] && ref=$ref.$arch
 
@@ -62,7 +61,9 @@ function handle_out_file()
     read answer
     if [[ $answer == [yY]* ]] ; then
 	mv $outfile $ref
-	[[ -d '.svn' ]] && svn=1
+	if [ -d .svn ]; then
+	    svn=1
+	fi
     else
 	echo "$outfile not accepted"
     fi
@@ -71,8 +72,7 @@ function handle_out_file()
 function handle_directory()
 {
     local dir=$1 outfile
-    shift
-    for outfile in $dir/*.result/out ; do
+   for outfile in $dir/*.result/out ; do
 	handle_out_file $outfile
     done
 }
