@@ -1,4 +1,4 @@
-
+delete accumulate
 setproperty ABORT_ON_USER_ERROR TRUE
 
 create accumulate accumulate.c include/SIMD.c
