@@ -58,7 +58,7 @@ void derive_new_basis(Pbase base_oldindex, Pbase * base_newindex, entity (*new_e
 
 /* void change_of_base_index(Pbase base_oldindex, Pbase *base_newindex)
  * change of variable index from  base_oldindex to
- * base_newindex 
+ * base_newindex
 */
 void change_of_base_index(base_oldindex, base_newindex)
 Pbase base_oldindex;
