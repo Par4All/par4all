@@ -1744,6 +1744,15 @@ decl_spec_list:
 			   /* Only block scope information is inherited */
 			   if(!string_block_scope_p(c_parser_context_scope(ycontext))
 			      && !string_struct_scope_p(c_parser_context_scope(ycontext))) {
+			     /* FI: too primitive; we need to push
+				and pop contexts more than to update
+				them.
+
+				Problem with "extern f(x), g(y);". f
+				anf g are definitvely top-level, but x
+				and y must be searched in the current
+				scope first.
+			     */
 			     pips_debug(8, "Reset modified scope \"%s\"\n",
 					c_parser_context_scope(ycontext));
 			     c_parser_context_scope(ycontext) = empty_scope();
@@ -1771,8 +1780,11 @@ my_decl_spec_list:                         /* ISO 6.7 */
 |   TK_EXTERN decl_spec_list_opt
                         {
 			  /* This can be a variable or a function, whose storage is ram or return  */
-			  /* What is the scope in cyacc.y of this scope modification? */
-			  pips_debug(8, "Scope of context %p forced to TOP_LEVEL_MODULE_NAME", ycontext);
+			  /* What is the scope in cyacc.y of this
+			     scope modification? Too much because the
+			     TOP_LEVEL scope is going to be used for
+			     argument types as well... */
+			  pips_debug(8, "Scope of context %p forced to TOP_LEVEL_MODULE_NAME\n", ycontext);
 			  c_parser_context_scope(ycontext) = strdup(concatenate(TOP_LEVEL_MODULE_NAME,
 									       MODULE_SEP_STRING,NULL));
 			  pips_assert("CONTINUE for declarations", continue_statements_p($2));
@@ -1902,8 +1914,19 @@ decl_spec_list_opt:
 decl_spec_list_opt_no_named:
     /* empty */
                         {
-			  //stack_push((char *) ycontext,ContextStack);
-			  PushContext(ycontext);
+			  // decl48.c: ycontext is not good because
+			  // the current scope information is lost.
+			  // I do not want to remove the Push to keep
+			  // the Push/Pop balance ok
+			  //PushContext(ycontext);
+			  if(stack_empty_p(ContextStack))
+			    PushContext(ycontext);
+			  else {
+			    c_parser_context y = GetContext();
+			    c_parser_context_scope(ycontext) =
+			      strdup(c_parser_context_scope(y));
+			    PushContext(ycontext);
+			  }
                           $$ = NIL;
 			} %prec TK_IDENT
 |   my_decl_spec_list      { }

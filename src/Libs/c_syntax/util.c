@@ -418,7 +418,7 @@ expression MemberDerivedIdentifierToExpression(type t,string m)
 	  entity de = basic_derived(b);
 	  string name = entity_user_name(de);
       string id = strdup(concatenate(name,MEMBER_SEP_STRING,m,NULL));
-	  expression exp = IdentifierToExpression(id); 
+	  expression exp = IdentifierToExpression(id);
       free(id);
       return exp;
 	}
@@ -985,7 +985,9 @@ entity FindOrCreateCurrentEntity(string name,
 
   if (is_typedef)
     {
-      /* Tell the lexer about the new type names : add to keyword_typedef_table */
+      /* Tell the lexer about the new type names : add to
+	 keyword_typedef_table. Because of scopes, different types
+	 can have the same name... */
       hash_put(keyword_typedef_table,strdup(name),(void *) TK_NAMED_TYPE);
       pips_debug(5,"Add typedef name %s to hash table\n",name);
       ent = CreateEntityFromLocalNameAndPrefix(name,TYPEDEF_PREFIX,is_external);
@@ -1972,11 +1974,12 @@ void RemoveDummyArguments(entity f, list refs)
   }
 }
 
+  /* Update the entity with final type, storage and initial value;
+     and also (sometimes?) declare it at the module level */
+
 void UpdateEntity(entity e, stack ContextStack, stack FormalStack, stack FunctionStack,
 		  stack OffsetStack, bool is_external, bool is_declaration)
 {
-  /* Update the entity with final type, storage, initial value */
-
   //stack s = (stack) entity_storage(e);
   stack s = get_from_entity_type_stack_table(e);
   type t = entity_type(e);
@@ -2023,7 +2026,7 @@ void UpdateEntity(entity e, stack ContextStack, stack FormalStack, stack Functio
     entity_type(e) = t2;
   }
 
-
+  pips_assert("the entity type is defined", !type_undefined_p(e));
 
   /************************* STORAGE PART *******************************************/
 
@@ -2035,6 +2038,9 @@ void UpdateEntity(entity e, stack ContextStack, stack FormalStack, stack Functio
     pips_debug(3,"Current storage context is %d\n",
 	       storage_tag(c_parser_context_storage(context)));
     entity_storage(e) = c_parser_context_storage(context);
+    if(typedef_entity_p(e)) {
+      AddToDeclarations(e,get_current_module_entity());
+    }
   }
   else if (!stack_undefined_p(FormalStack) && (FormalStack != NULL)
 	   && !stack_empty_p(FormalStack)) {
@@ -2378,7 +2384,10 @@ void AddToExterns(entity e, entity mod)
   }
 }
 
-/* FI: check the difference with AddEntityToDeclarations() */
+/* FI: check the difference with AddEntityToDeclarations()
+ *
+ * Here, the declared entity is added to the module declarations only.
+ */
 void AddToDeclarations(entity e, entity mod)
 {
   list dl = code_declarations(value_code(entity_initial(mod)));
