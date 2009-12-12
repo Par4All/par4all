@@ -599,6 +599,11 @@ bool entity_union_p(entity e)
   return union_p;
 }
 
+bool derived_entity_p(e)
+{
+  return entity_struct_p(e) || entity_union_p(e) || entity_enum_p(e);
+}
+
 bool local_entity_of_module_p(entity e, entity module)
 {
   bool
