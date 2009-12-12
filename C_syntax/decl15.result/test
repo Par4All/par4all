@@ -8,8 +8,6 @@ Declarations for module "decl15!" with type "() -> unknown"
 Variable list:
 
 	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
-	Declared entity "decl15!:#_PIPS_STRUCT_1" with type "struct" 
-	Declared entity "decl15!:'_PIPS_UNION_2" with type "union" 
 	Declared entity "decl15!:*DYNAMIC*" with type "area" with size 0
 	Declared entity "decl15!:*HEAP*" with type "area" with size 0
 	Declared entity "decl15!:*STACK*" with type "area" with size 0
@@ -17,6 +15,16 @@ Variable list:
 
 * empty extern declaration list *
 
+
+Derived entities:
+
+	Variable decl15!:#_PIPS_STRUCT_1	kind = struct
+	Variable decl15!:'_PIPS_UNION_2	kind = union
+
+Typedef entities:
+
+	Typedef "decl15!:$__mbstate_t"	with type "variable" "struct {int __count; union {wint_t __wch; char __wchb[4];} __value;}"
+	Typedef "decl15!:$wint_t"	with type "variable" "unsigned int"
 
 Layouts for memory areas:
 

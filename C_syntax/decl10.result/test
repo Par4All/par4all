@@ -8,16 +8,25 @@ Declarations for module "decl10!" with type "() -> unknown"
 Variable list:
 
 	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
-	Declared entity "decl10!:#_PIPS_STRUCT_1" with type "struct" 
-	Declared entity "decl10!:'_PIPS_UNION_2" with type "union" 
 	Declared entity "decl10!:*DYNAMIC*" with type "area" with size 0
 	Declared entity "decl10!:*HEAP*" with type "area" with size 0
 	Declared entity "decl10!:*STACK*" with type "area" with size 0
 	Declared entity "decl10!:*STATIC*" with type "area" with size 0
-	Declared entity "decl10!:?_PIPS_ENUM_3" with type "enum" 
 
 * empty extern declaration list *
 
+
+Derived entities:
+
+	Variable decl10!:#_PIPS_STRUCT_1	kind = struct
+	Variable decl10!:'_PIPS_UNION_2	kind = union
+	Variable decl10!:?_PIPS_ENUM_3	kind = enum
+
+Typedef entities:
+
+	Typedef "decl10!:$A"	with type "variable" "struct {int a;}"
+	Typedef "decl10!:$B"	with type "variable" "union {int a; double b;}"
+	Typedef "decl10!:$C"	with type "variable" "enum {x1, x2}"
 
 Layouts for memory areas:
 

@@ -12,18 +12,26 @@ Variable list:
 	Declared entity "main:*HEAP*" with type "area" with size 0
 	Declared entity "main:*STACK*" with type "area" with size 0
 	Declared entity "main:*STATIC*" with type "area" with size 0
-	Declared entity "main:0`#_PIPS_STRUCT_1" with type "struct" 
-	Declared entity "main:0`#_PIPS_STRUCT_2" with type "struct" 
 	Declared entity "main:0`__FUNCTION__" with type "variable" "char"
 	Declared entity "main:0`__func__" with type "variable" "char"
 	Declared entity "main:0`t" with type "variable" "TREE"
+	Declared entity "main:0`tree" with type "variable" "struct {int left; int right;}"
+	Declared entity "main:0`treeptr" with type "variable" "struct {int left; int right;} *"
 	Declared entity "main:main" with type "variable" "int"
-	Declared entity "main:tree" with type "variable" "struct {int left; int right;}"
-	Declared entity "main:treeptr" with type "variable" "struct {int left; int right;} *"
 	Declared entity "ndecl12!:*STATIC*" with type "area" with size 0
 
 * empty extern declaration list *
 
+
+Derived entities:
+
+	Variable main:0`#_PIPS_STRUCT_1	kind = struct
+	Variable main:0`#_PIPS_STRUCT_2	kind = struct
+
+Typedef entities:
+
+	Typedef "main:0`$TREE"	with type "variable" "struct {int left; int right;}"
+	Typedef "main:0`$TREEPTR"	with type "variable" "struct {int left; int right;} *"
 
 Layout for return variable:
 
@@ -36,8 +44,8 @@ Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
 
 
 Layout for memory area "main:*DYNAMIC*" of size 30:
-	Variable "main:tree"	offset = 10	size = 8
-	Variable "main:treeptr"	offset = 18	size = 4
+	Variable "main:0`tree"	offset = 10	size = 8
+	Variable "main:0`treeptr"	offset = 18	size = 4
 	Variable "main:0`t"	offset = 22	size = 8
 	Variable "main:0`__func__"	offset = 0	size = 5
 	Variable "main:0`__FUNCTION__"	offset = 5	size = 5

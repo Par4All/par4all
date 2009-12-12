@@ -21,6 +21,10 @@ Variable list:
 * empty extern declaration list *
 
 
+Typedef entities:
+
+	Typedef "decl02!:$STD_uint32"	with type "variable" "long"
+
 Layouts for memory areas:
 
 Layout for memory area "TOP-LEVEL:*STATIC*" of size 34:

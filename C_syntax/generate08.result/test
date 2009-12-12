@@ -18,8 +18,6 @@ Variable list:
 
 	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
 	Declared entity "TOP-LEVEL:generate08" with type "functional" "() -> void"
-	Declared entity "generate08!:#_PIPS_STRUCT_1" with type "struct" 
-	Declared entity "generate08!:#first" with type "struct" 
 	Declared entity "generate08!:*DYNAMIC*" with type "area" with size 0
 	Declared entity "generate08!:*HEAP*" with type "area" with size 0
 	Declared entity "generate08!:*STACK*" with type "area" with size 0
@@ -28,6 +26,15 @@ Variable list:
 External variable list:
 
 	Declared external entity "TOP-LEVEL:generate08"	with type "functional" "() -> void"
+
+Derived entities:
+
+	Variable generate08!:#_PIPS_STRUCT_1	kind = struct
+	Variable generate08!:#first	kind = struct
+
+Typedef entities:
+
+	Typedef "generate08!:$sem_t"	with type "variable" "struct {struct first c; char d;}"
 
 Layouts for memory areas:
 

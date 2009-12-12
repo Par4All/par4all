@@ -18,6 +18,11 @@ Variable list:
 * empty extern declaration list *
 
 
+Typedef entities:
+
+	Typedef "decl16!:$f"	with type "functional" "int -> int"
+	Typedef "decl16!:$g"	with type "functional" "int -> int"
+
 Layouts for memory areas:
 
 Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:

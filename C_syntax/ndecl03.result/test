@@ -23,6 +23,12 @@ Variable list:
 * empty extern declaration list *
 
 
+Typedef entities:
+
+	Typedef "ndecl03:0`$akm"	with type "variable" "int"
+	Typedef "ndecl03:0`$km"	with type "variable" "int"
+	Typedef "ndecl03:0`$pkm"	with type "variable" "int *"
+
 Layout for formal parameters:
 
 	Variable ndecl03:dir	offset = 1
@@ -63,7 +69,7 @@ Parsed printed file
 
 void ndecl03(char *dir)
 {
-   typedef int km,  *pkm,  akm[10];                                     /*0004*/
+   typedef int km, *pkm, akm[10];                                       /*0004*/
    km i;                                                                /*0005*/
    pkm pi;                                                              /*0006*/
    akm ai;                                                              /*0007*/

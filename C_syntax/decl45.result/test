@@ -23,6 +23,10 @@ Variable list:
 * empty extern declaration list *
 
 
+Typedef entities:
+
+	Typedef "main:0`$barbar"	with type "variable" "(() -> void) *"
+
 Layout for return variable:
 
 	Variable "main:main"	size = 4

@@ -13,9 +13,6 @@ Variable list:
 	Declared entity "TOP-LEVEL:ini" with type "variable" "f_t"
 	Declared entity "TOP-LEVEL:initialization04" with type "functional" "() -> void"
 	Declared entity "TOP-LEVEL:tab" with type "variable" "si_t"
-	Declared entity "initialization04!:#f" with type "struct" 
-	Declared entity "initialization04!:#s" with type "struct" 
-	Declared entity "initialization04!:#si" with type "struct" 
 	Declared entity "initialization04!:*DYNAMIC*" with type "area" with size 0
 	Declared entity "initialization04!:*HEAP*" with type "area" with size 0
 	Declared entity "initialization04!:*STACK*" with type "area" with size 0
@@ -24,6 +21,19 @@ Variable list:
 External variable list:
 
 	Declared external entity "TOP-LEVEL:initialization04"	with type "functional" "() -> void"
+
+Derived entities:
+
+	Variable initialization04!:#f	kind = struct
+	Variable initialization04!:#s	kind = struct
+	Variable initialization04!:#si	kind = struct
+
+Typedef entities:
+
+	Typedef "initialization04!:$a_t"	with type "variable" "struct s "
+	Typedef "initialization04!:$f_t"	with type "functional" "() -> p_t"
+	Typedef "initialization04!:$p_t"	with type "variable" "a_t *"
+	Typedef "initialization04!:$si_t"	with type "variable" "struct si "
 
 Layouts for memory areas:
 

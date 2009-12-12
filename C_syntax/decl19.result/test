@@ -18,6 +18,11 @@ External variable list:
 
 	Declared external entity "TOP-LEVEL:decl19"	with type "functional" "int -> int"
 
+Typedef entities:
+
+	Typedef "decl19!:$f"	with type "functional" "int -> int"
+	Typedef "decl19!:$g"	with type "variable" "(int -> int) *"
+
 Layouts for memory areas:
 
 Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:

@@ -9,7 +9,6 @@ Variable list:
 
 	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 4
 	Declared entity "TOP-LEVEL:x" with type "variable" "int"
-	Declared entity "typedef10!:$foo" with type "void" 
 	Declared entity "typedef10!:*DYNAMIC*" with type "area" with size 0
 	Declared entity "typedef10!:*HEAP*" with type "area" with size 0
 	Declared entity "typedef10!:*STACK*" with type "area" with size 0

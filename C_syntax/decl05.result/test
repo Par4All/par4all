@@ -10,9 +10,6 @@ Variable list:
 	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
 	Declared entity "TOP-LEVEL:ERR_mgr_ctor" with type "functional" "char * x char * -> void"
 	Declared entity "TOP-LEVEL:ERR_mgr_dtor" with type "functional" "() -> void"
-	Declared entity "decl05!:#_err_error" with type "struct" 
-	Declared entity "decl05!:#_err_manager" with type "struct" 
-	Declared entity "decl05!:#_err_pile" with type "struct" 
 	Declared entity "decl05!:*DYNAMIC*" with type "area" with size 0
 	Declared entity "decl05!:*HEAP*" with type "area" with size 0
 	Declared entity "decl05!:*STACK*" with type "area" with size 0
@@ -20,6 +17,12 @@ Variable list:
 
 * empty extern declaration list *
 
+
+Derived entities:
+
+	Variable decl05!:#_err_error	kind = struct
+	Variable decl05!:#_err_manager	kind = struct
+	Variable decl05!:#_err_pile	kind = struct
 
 Layouts for memory areas:
 

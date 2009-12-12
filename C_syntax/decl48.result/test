@@ -9,7 +9,6 @@ Variable list:
 
 	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
 	Declared entity "decl48!:*STATIC*" with type "area" with size 0
-	Declared entity "decl48!decl48!flat_color_z_triangle:0`1`#_PIPS_STRUCT_1" with type "struct" 
 	Declared entity "decl48!flat_color_z_triangle:*DYNAMIC*" with type "area" with size 48
 	Declared entity "decl48!flat_color_z_triangle:*HEAP*" with type "area" with size 0
 	Declared entity "decl48!flat_color_z_triangle:*STACK*" with type "area" with size 0
@@ -20,6 +19,10 @@ Variable list:
 
 * empty extern declaration list *
 
+
+Derived entities:
+
+	Variable decl48!flat_color_z_triangle:0`1`#_PIPS_STRUCT_1	kind = struct
 
 Layouts for memory areas:
 
