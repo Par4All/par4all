@@ -299,55 +299,62 @@ string get_symbol_table(entity m, bool isfortran)
   dump_functional(type_functional(entity_type(m)), result);
   string_buffer_append(result, "\"" NL);
 
-  /* List of implicitly and explicitly declared variables, functions
-     and areas */
+  /*
+   * List of implicitly and explicitly declared variables, functions
+   * and areas
+   *
+   */
   if(ENDP(decls))
     string_buffer_append(result, concatenate("\n* empty declaration list *",NL,NL,NULL));
   else
     string_buffer_append(result, concatenate("\nVariable list:",NL,NL,NULL));
 
-  for(ce=decls; !ENDP(ce); POP(ce)) {
-    entity e = ENTITY(CAR(ce));
-    type t = entity_type(e);
-    //storage s = entity_storage(e);
+  FOREACH(ENTITY, e, decls) {
+    if(!typedef_entity_p(e) && !derived_entity_p(e)) {
+      type t = entity_type(e);
 
-    pips_debug(8, "Processing entity \"%s\"\n", entity_name(e));
-    string_buffer_append(result, concatenate("\tDeclared entity \"",
-					     entity_name(e),"\" with type \"",
-					     type_to_string(t),"\" ",NULL));
+      pips_debug(8, "Processing entity \"%s\"\n", entity_name(e));
+      string_buffer_append(result, concatenate("\tDeclared entity \"",
+					       entity_name(e),"\" with type \"",
+					       type_to_string(t),"\" ",NULL));
 
-    /* FI: struct, union and enum are also declared (in theory...), but
-       their characteristics should be given differently. */
-    if(type_variable_p(t)
-       /* && (storage_ram_p(s) || storage_return_p(s) || storage_formal_p(s))*/) {
-      variable v = type_variable(t);
-      basic b = variable_basic(v);
-      if(basic_pointer_p(b) && type_functional_p(basic_pointer(b))) {
-	functional f = type_functional(basic_pointer(b));
-	string_buffer_append(result, "\"(");
-	dump_functional(f,result);
-	string_buffer_append(result, ") *\""NL);
+      /* FI: struct, union and enum are also declared (in theory...), but
+	 their characteristics should be given differently. */
+      if(type_variable_p(t)
+	 /* && (storage_ram_p(s) || storage_return_p(s) || storage_formal_p(s))*/) {
+	variable v = type_variable(t);
+	basic b = variable_basic(v);
+	if(basic_pointer_p(b) && type_functional_p(basic_pointer(b))) {
+	  functional f = type_functional(basic_pointer(b));
+	  string_buffer_append(result, "\"(");
+	  dump_functional(f,result);
+	  string_buffer_append(result, ") *\""NL);
+	}
+	else {
+	  string_buffer_append(result,
+			       concatenate("\"", basic_to_string(b), "\""NL,NULL));
+	}
+      }
+      else if(type_functional_p(t)) {
+	string_buffer_append(result, "\"");
+	dump_functional(type_functional(t),result);
+	string_buffer_append(result, "\""NL);
+      }
+      else if(type_area_p(t)) {
+	string_buffer_append(result,concatenate("with size ",
+						itoa(area_size(type_area(t))),NL, NULL));
       }
       else {
-	string_buffer_append(result,
-			     concatenate("\"", basic_to_string(b), "\""NL,NULL));
+	/* FI: How do we want to print out structures, unions and enums? */
+	/* FI: How do we want to print out typedefs? */
+	string_buffer_append(result, NL);
       }
     }
-    else if(type_functional_p(t)) {
-      string_buffer_append(result, "\"");
-      dump_functional(type_functional(t),result);
-      string_buffer_append(result, "\""NL);
-    }
-    else if(type_area_p(t)) {
-      string_buffer_append(result,concatenate("with size ",
-					      itoa(area_size(type_area(t))),NL, NULL));
-    }
-    else {
-      /* FI: How do we want to print out structures, unions and enums? */
-      /* FI: How do we want to print out typedefs? */
-      string_buffer_append(result, NL);
-    }
   }
+
+  /*
+   * Extern declarations
+   */
 
   if(!isfortran) {
     list edecls = gen_copy_seq(code_externs(value_code(entity_initial(m))));
@@ -397,7 +404,10 @@ string get_symbol_table(entity m, bool isfortran)
     }
   }
 
-  /* Derived entities: struct, union and enum */
+  /*
+   * Derived entities: struct, union and enum
+   */
+
   nth = 0;
   FOREACH(ENTITY, de, decls) {
     if(entity_struct_p(de) || entity_union_p(de) || entity_enum_p(de)) {
@@ -408,15 +418,18 @@ string get_symbol_table(entity m, bool isfortran)
 	}
 	/* FI: it would be useful to dump more information aout
 	   fields and members */
-	string_buffer_append(result, concatenate("\tVariable ", entity_name(de),
-						 "\tkind = ",
+	string_buffer_append(result, concatenate("\tVariable \"", entity_name(de),
+						 "\"\tkind = ",
 						 entity_struct_p(de)? "struct" :
 						 entity_union_p(de)? "union" : "enum",
 						 "\n", NULL));
       }
   }
 
-  /* Typedefs */
+  /*
+   * Typedefs
+   */
+
   nth = 0;
   FOREACH(ENTITY, te, decls) {
     if(typedef_entity_p(te)) {
