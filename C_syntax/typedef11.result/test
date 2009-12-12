@@ -1,0 +1,134 @@
+
+Symbol table file "typedef11!"
+
+typedef11!
+
+Declarations for module "typedef11!" with type "() -> unknown"
+
+Variable list:
+
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
+	Declared entity "TOP-LEVEL:typedef11" with type "functional" "km -> int"
+	Declared entity "typedef11!:*DYNAMIC*" with type "area" with size 0
+	Declared entity "typedef11!:*HEAP*" with type "area" with size 0
+	Declared entity "typedef11!:*STACK*" with type "area" with size 0
+	Declared entity "typedef11!:*STATIC*" with type "area" with size 0
+
+External variable list:
+
+	Declared external entity "TOP-LEVEL:typedef11"	with type "functional" "km -> int"
+
+Typedef entities:
+
+	Typedef "typedef11!:$km"	with type "variable" "int"
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "typedef11!:*DYNAMIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "typedef11!:*HEAP*" of size 0:
+	* empty area *
+
+
+Layout for memory area "typedef11!:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "typedef11!:*STATIC*" of size 0:
+	* empty area *
+
+End of declarations for module typedef11!
+
+
+Parsed printed file "typedef11!"
+
+
+
+
+/* typedef scope in preprocessor: here "cookie" is not a typedef */
+/* Case used to avoid quick fixes for typedef06.c */
+
+//#include <stdio.h>
+
+typedef int km;
+
+extern int typedef11(km x);
+
+Symbol table file "typedef11"
+
+typedef11
+
+Declarations for module "typedef11" with type "km -> int"
+
+Variable list:
+
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
+	Declared entity "typedef11!:*STATIC*" with type "area" with size 0
+	Declared entity "typedef11:*DYNAMIC*" with type "area" with size 24
+	Declared entity "typedef11:*HEAP*" with type "area" with size 0
+	Declared entity "typedef11:*STACK*" with type "area" with size 0
+	Declared entity "typedef11:*STATIC*" with type "area" with size 0
+	Declared entity "typedef11:0`__FUNCTION__" with type "variable" "char"
+	Declared entity "typedef11:0`__func__" with type "variable" "char"
+	Declared entity "typedef11:0`y" with type "variable" "km"
+	Declared entity "typedef11:typedef11" with type "variable" "int"
+	Declared entity "typedef11:x" with type "variable" "km"
+
+* empty extern declaration list *
+
+
+Typedef entities:
+
+	Typedef "typedef11:0`$km"	with type "variable" "float"
+
+Layout for formal parameters:
+
+	Variable typedef11:x	offset = 1
+
+Layout for return variable:
+
+	Variable "typedef11:typedef11"	size = 4
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "typedef11!:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "typedef11:*DYNAMIC*" of size 24:
+	Variable "typedef11:0`y"	offset = 20	size = 4
+	Variable "typedef11:0`__func__"	offset = 0	size = 10
+	Variable "typedef11:0`__FUNCTION__"	offset = 10	size = 10
+
+
+Layout for memory area "typedef11:*HEAP*" of size 0:
+	* empty area *
+
+
+Layout for memory area "typedef11:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "typedef11:*STATIC*" of size 0:
+	* empty area *
+
+End of declarations for module typedef11
+
+
+Parsed printed file "typedef11"
+
+int typedef11(km x)
+{
+   typedef float km;
+   km y;
+}
