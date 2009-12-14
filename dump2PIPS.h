@@ -111,6 +111,10 @@ int strncmp_ (__const char *__s1, __const char *__s2, size_t __n);
 int fcopy(char* old, char* new );
 
 
+void gfc2pips_truncate_useless_zeroes(char *s);
+
+
+
 /*
  * Dump a namespace
  */
@@ -161,6 +165,7 @@ bool gfc2pips_test_dimensions(gfc_namespace* __attribute__ ((__unused__)) ns, gf
 entity gfc2pips_check_entity_doesnt_exists(char *s);
 entity gfc2pips_check_entity_program_exists(char *s);
 entity gfc2pips_check_entity_module_exists(char *s);
+entity gfc2pips_check_entity_block_data_exists(char *s);
 entity gfc2pips_check_entity_exists(char *s);
 entity gfc2pips_symbol2entity(gfc_symbol* sym);
 entity gfc2pips_symbol2entity2(gfc_symbol* sym);
