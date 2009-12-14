@@ -118,7 +118,9 @@ bool controlizer(string module_name)
   /* The statement of a compilation unit is a long list of continue
      statements and it takes a long time to restructure although
      nothing is done in the end. So, let's skip this useless
-     processing. */
+     processing.
+    SG:it may be ok to skip it, but we still need to call module_reorder ...
+     */
   if(!compilation_unit_p(module_name)) {
     /* *module_stat can be re-used because control_graph reallocates
        statements; do not show that to any student!
@@ -164,9 +166,10 @@ bool controlizer(string module_name)
     if(c_module_p(m))
       module_stat = update_unstructured_declarations(module_stat);
 
-    /* Reorder the module, because we have a new statement structure. */
-    module_reorder(module_stat);
   }
+
+  /* Reorder the module, because we have a new statement structure. */
+  module_reorder(module_stat);
 
   statement_consistent_p(module_stat);
 
