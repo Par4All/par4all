@@ -870,7 +870,7 @@ entity CreateEntityFromLocalNameAndPrefix(string name, string prefix, bool is_ex
     pips_assert("scope is a block scope", string_block_scope_p(scope));
 
     if (static_module_p(get_current_module_entity()))
-      ent = find_or_create_entity((concatenate(compilation_unit_name,
+      ent = find_or_create_entity((concatenate(/*compilation_unit_name,*/
 						     get_current_module_name(),MODULE_SEP_STRING,
 						     scope,prefix,name,NULL)));
     else
@@ -2702,7 +2702,7 @@ string CreateMemberScope(string derived, bool is_external)
     pips_assert("scope is a block scope", string_block_scope_p(scope));
 
     if (static_module_p(get_current_module_entity()))
-      s = strdup(concatenate(compilation_unit_name,
+      s = strdup(concatenate(/*compilation_unit_name,*/
 			     get_current_module_name(), MODULE_SEP_STRING,
 			     scope, derived, MEMBER_SEP_STRING, NULL));
     else
