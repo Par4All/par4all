@@ -13,9 +13,7 @@ void for02(int n)
 {
    int j;
    float x[100];
-   float t;
-   float delta_t;
-   float t_max;
+   float t, delta_t, t_max;
 //               <must be read   >: delta_t t t_max
 //               <must be written>: t
 
@@ -33,9 +31,7 @@ void for02(int n)
 {
    int j;
    float x[100];
-   float t;
-   float delta_t;
-   float t_max;
+   float t, delta_t, t_max;
 
    for (t = 0.0;t<t_max;t += delta_t)
 #pragma omp parallel for 

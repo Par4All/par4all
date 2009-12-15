@@ -3,8 +3,8 @@ Controlizer output
 
 void malloc02()
 {
-   int *p[10];
-   int i;
+   int *p[10];                                                          /*0004*/
+   int i;                                                               /*0005*/
 
    for(i = 0; i <= 9; i += 1) {
       p[i] = malloc(sizeof(int));                                       /*0008*/
@@ -19,8 +19,8 @@ Preconditions
 
 void malloc02()
 {
-   int *p[10];
-   int i;
+   int *p[10];                                                          /*0004*/
+   int i;                                                               /*0005*/
 
 //  P() {}
 
@@ -41,8 +41,8 @@ Proper effects
 
 void malloc02()
 {
-   int *p[10];
-   int i;
+   int *p[10];                                                          /*0004*/
+   int i;                                                               /*0005*/
 //               <must be written>: i
 
    for(i = 0; i <= 9; i += 1) {
@@ -61,8 +61,8 @@ Cumulated effects
 //               <may be written >: _MALLOC_EFFECTS:_MALLOC_
 void malloc02()
 {
-   int *p[10];
-   int i;
+   int *p[10];                                                          /*0004*/
+   int i;                                                               /*0005*/
 //               <may be read    >: _MALLOC_EFFECTS:_MALLOC_ i
 //               <may be written >: _MALLOC_EFFECTS:_MALLOC_ p[*]
 //               <must be written>: i
@@ -82,8 +82,8 @@ Regions
 
 void malloc02()
 {
-   int *p[10];
-   int i;
+   int *p[10];                                                          /*0004*/
+   int i;                                                               /*0005*/
 
 //  <p[PHI1]-W-EXACT-{0<=PHI1, PHI1<=9}>
 
@@ -117,8 +117,8 @@ Parallelization
 
 void malloc02()
 {
-   int *p[10];
-   int i;
+   int *p[10];                                                          /*0004*/
+   int i;                                                               /*0005*/
 
 
    for(i = 0; i <= 9; i += 1)
@@ -132,8 +132,8 @@ Parallelization in Fortran (if one of the resources can be made obsolete)
 
 void malloc02()
 {
-   int *p[10];
-   int i;
+   int *p[10];                                                          /*0004*/
+   int i;                                                               /*0005*/
 
 
    for(i = 0; i <= 9; i += 1)

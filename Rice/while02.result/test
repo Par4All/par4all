@@ -12,8 +12,7 @@ Try to restructure the code for more precision:
 Check the proper effects
 void while02(int n)
 {
-   int i;
-   int j;
+   int i, j;
    float x[100];
    float y[100];
 //               <must be read   >: i n
@@ -39,8 +38,7 @@ Ask for some statistics about the job to be done:
 Ask for the parallelization of "while02"
 void while02(int n)
 {
-   int i;
-   int j;
+   int i, j;
    float x[100];
    float y[100];
 

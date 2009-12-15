@@ -12,8 +12,7 @@ Try to restructure the code for more precision:
 Check the proper effects, especially for variable fp and call to fgetc()
 void getimage(void)
 {
-   int i;
-   int j;
+   int i, j;
    unsigned char c;
    FILE *fp;
 //               <must be written>: fp
@@ -43,8 +42,7 @@ Ask for some statistics about the job to be done:
 Ask for the parallelization of all the modules of the program with OpenMP output:
 void getimage(void)
 {
-   int i;
-   int j;
+   int i, j;
    unsigned char c;
    FILE *fp;
    

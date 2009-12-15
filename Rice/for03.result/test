@@ -16,9 +16,7 @@ void for03(int n)
    int j;
    al_t e1;
    al_t e2;
-   float t;
-   float delta_t;
-   float t_max;
+   float t, delta_t, t_max;
 //               <must be written>: e1[2]
 
    e1.next = &e2;
@@ -41,9 +39,7 @@ void for03(int n)
    int j;
    al_t e1;
    al_t e2;
-   float t;
-   float delta_t;
-   float t_max;
+   float t, delta_t, t_max;
 
 //  <e1[PHI1]-W-EXACT-{PHI1==2}>
 
@@ -112,9 +108,7 @@ void for03(int n)
    int j;
    al_t e1;
    al_t e2;
-   float t;
-   float delta_t;
-   float t_max;
+   float t, delta_t, t_max;
 
    e1.next = &e2;
 

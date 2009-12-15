@@ -14,11 +14,18 @@ Ask for some statistics about the job to be done:
 Ask for the parallelization of all the modules of the program with OpenMP output:
 void empty_for()
 {
+   //  int n = 10000;
    int loops = 10;
+   
+   //int numBytes = n * n * sizeof(float);
+   /*
+     float* h_A = (float *) malloc(numBytes);
+     float* h_C = (float *) malloc(numBytes);
+     */
    float h_A[10000*10000];
    float h_C[10000*10000];
-   int i;
-   int j;
+
+   int i, j;
 
 
 #pragma omp parallel for private(j)

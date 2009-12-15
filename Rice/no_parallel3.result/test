@@ -1,9 +1,9 @@
 // OMP style
 int main()
 {
-   float a[10];
-   int m = 0;
-   int n = 0;
+   float a[10];                                                         /*0003*/
+   int m = 0;                                                           /*0004*/
+   int n = 0;                                                           /*0005*/
 
    while (n<100)                                                        /*0007*/
       for(m = 0; m <= 9; m += 1)

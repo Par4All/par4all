@@ -5,11 +5,8 @@ void invariant02(int ni, int nj)
 {
    int n = 10;
    float y[n];
-   int i;
-   int j;
-   float s;
-   float a;
-   float b;
+   int i, j;
+   float s, a, b;
 
    for(i = 0; i <= ni-1; i += 1) {
       s = a*b;
@@ -23,19 +20,15 @@ void invariant02(int ni, int nj)
 {
    int n = 10;
    float y[n];
-   int i;
-   int j;
-   float s;
-   float a;
-   float b;
-   float F_0;
+   int i, j;
+   float s, a, b;
 
 
-   F_0 = a*b;
-   for(i = 0; i <= ni-1; i += 1) {
-      s = F_0;
+   i = MAX(INT(ni), 0);
+   s = a*b;
+#pragma omp parallel for 
+   for(i = 0; i <= ni-1; i += 1)
       y[i] = s;
-   }
 }
 
 Warnings
