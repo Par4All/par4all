@@ -1,9 +1,6 @@
 
 parsed printed file
 
-
-
-
 typedef struct _IO_FILE _IO_FILE;
 
 typedef unsigned int size_t;

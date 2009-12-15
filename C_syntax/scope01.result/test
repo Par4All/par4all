@@ -1,9 +1,6 @@
 
 Printed file for scope01_b
 
-
-
-
 int i = 1;
 extern void foo();
 void foo()

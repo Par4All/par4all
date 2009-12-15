@@ -1,9 +1,6 @@
 
 Parsed printed file for "decl25!"
 
-
-
-
 /* The struct fields are prettyprinted as "extern" */
 struct s {
    int a;

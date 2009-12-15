@@ -1,9 +1,6 @@
 
 Parsed printed file for "decl22!"
 
-
-
-
 /* Double declaration of a global constant in a compilation unit is OK, even with -ansi and -pedantic */
 
 /* PIPS prettyprinter cannot debuild the source code properly */

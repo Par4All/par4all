@@ -52,9 +52,6 @@ End of declarations for module decl15!
 
 Parsed printed file for "decl15!"
 
-
-
-
 typedef unsigned int wint_t;
 /* Value so far.  */
 typedef struct {

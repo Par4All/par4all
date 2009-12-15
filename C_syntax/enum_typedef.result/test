@@ -2,9 +2,6 @@ Select some options to deal with the C Language:
 Parse as C:
 Prettyprint the source as C, of course
 Do not display original number lines as comment:
-
-
-
 /* Example that appear in an application from a company with:
 
 * To have M_PI: *

@@ -1,9 +1,6 @@
 
 Parsed printed file for "decl23!"
 
-
-
-
 // Reference to a function
 
 extern void decl23a();

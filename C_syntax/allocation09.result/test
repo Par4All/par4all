@@ -85,9 +85,6 @@ End of declarations for module allocation09
 
 Parsed printed file for "allocation09"
 
-
-
-
 // Check allocation for int
 
 extern int allocation09();

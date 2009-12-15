@@ -1,6 +1,6 @@
 void * safe_malloc(size_t n)
 {
-   int *ptr = malloc(n*sizeof(*ptr));
+   int *ptr = malloc(n*sizeof(*ptr));                                   /*0004*/
    if (!ptr)                                                            /*0005*/
       exit(1);                                                          /*0006*/
    else

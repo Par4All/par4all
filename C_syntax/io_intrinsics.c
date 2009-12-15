@@ -103,4 +103,3 @@ int main(char *fmt1, ...)
 
   fprintf(stderr, "The END\n");
 }
-

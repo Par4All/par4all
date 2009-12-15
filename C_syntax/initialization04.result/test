@@ -114,9 +114,6 @@ End of declarations for module initialization04
 
 Printed file for "initialization04!"
 
-
-
-
 /* Identify properly structure pointed to by expressions */
 typedef struct s {
    int foo;

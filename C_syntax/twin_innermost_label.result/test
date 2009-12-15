@@ -23,9 +23,6 @@ gwin:   goto gwin;
    // END BLOCK
 }
 // BEGIN BLOCK
-
-
-
 extern void miam(void);
 
 extern void comment(void);
@@ -53,9 +50,6 @@ gwin:   ;
    // END BLOCK
 }
 // BEGIN BLOCK
-
-
-
 extern void miam(void);
 
 extern void comment(void);

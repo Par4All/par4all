@@ -1,4 +1,4 @@
-setenv WSPC decl42
+setenv WSPC decl49
 setenv MAIN $WSPC.c
 delete $WSPC
 create $WSPC $MAIN

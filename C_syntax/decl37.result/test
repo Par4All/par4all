@@ -8,9 +8,6 @@ void decl37()
 
 PRINTED FILE for "decl37!"
 
-
-
-
 /* Check that the variable "b" is not considered wrongly declared twice.
  *
  * Problem shown in C_syntax/tpips.tpips within function parse_arguments.

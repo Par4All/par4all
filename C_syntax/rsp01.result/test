@@ -1,9 +1,6 @@
 
 PARSED PRINTED FILE FOR MODULE resp01!
 
-
-
-
 /* Derived from rsp05.c to debug the parser when a function is declared several time (here, filter) */
 /* #include <stdio.h> */
 

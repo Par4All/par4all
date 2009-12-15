@@ -1,9 +1,6 @@
 
 PARSED PRINTED FILE FOR MODULE comment02!
 
-
-
-
 /* Derived from rsp05.c to debug the parser when comments are used */
 /* #include <stdio.h> */
 

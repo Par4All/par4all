@@ -47,8 +47,5 @@ End of declarations for module typedef10!
 
 Parsed code for "typedef10"
 
-
-
-
 typedef void foo;
 int x;

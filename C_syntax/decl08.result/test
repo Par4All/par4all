@@ -43,8 +43,5 @@ End of declarations for module decl08!
 
 Parsed printed file
 
-
-
-
 /* This is ok -pedantic, -ansi */
 void decl08(int a, void (*f)(char a));

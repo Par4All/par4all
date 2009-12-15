@@ -109,9 +109,6 @@ End of declarations for module block_scope09
 
 Parser output
 
-
-
-
 int x = 1;
 int y = 2;
 

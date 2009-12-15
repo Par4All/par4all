@@ -71,9 +71,6 @@ End of declarations for module multideclsinfile!
 
   PRINT_SOURCE                   building   PARSED_PRINTED_FILE(multideclsinfile!)
 PARSED_PRINTED_FILE made for multideclsinfile!.
-
-
-
 /* Multiple declarations of global variables check in one file */
 
 /* but this is OK with C... */

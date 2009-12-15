@@ -44,9 +44,6 @@ End of declarations for module decl09!
 
 Parsed printed file
 
-
-
-
 /* This is fully ANSI compatible because the scopes are different for
    each a and for each f */
 
@@ -57,9 +54,6 @@ void decl09(int a, void (*f)(char a, void (*f)(char a, void (*f)(char a))));
 void decl09b(int, void (*)(char, void (*)(char, void (*)(char))));
 
 Printed file
-
-
-
 
 /* This is fully ANSI compatible because the scopes are different for
    each a and for each f */

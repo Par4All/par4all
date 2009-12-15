@@ -42,9 +42,6 @@ Unsplit goto
 /*
  * file for goto.c
  */
-
-
-
 extern  main();
 main()
 {

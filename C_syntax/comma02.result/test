@@ -3,39 +3,39 @@ Parsed printed file for "main"
 
 int main()
 {
-   int i,  j;
+   int i, j;                                                            /*0013*/
 
-   i = (j = 1, 2);
+   i = (j = 1, 2);                                                      /*0015*/
    i = 3, j = 4;
 
-   i = foo(-5, -6);
+   i = foo(-5, -6);                                                     /*0017*/
 }
 
 Code for "main"
 
 int main()
 {
-   int i,  j;
+   int i, j;                                                            /*0013*/
 
-   i = (j = 1, 2);
+   i = (j = 1, 2);                                                      /*0015*/
    i = 3, j = 4;
 
-   i = foo(-5, -6);
+   i = foo(-5, -6);                                                     /*0017*/
 }
 
 Proper effects for "main"
 
 int main()
 {
-   int i,  j;
+   int i, j;                                                            /*0013*/
 //               <must be written>: i j
 
-   i = (j = 1, 2);
+   i = (j = 1, 2);                                                      /*0015*/
 //               <must be written>: i j
    i = 3, j = 4;
 //               <must be written>: i
 
-   i = foo(-5, -6);
+   i = foo(-5, -6);                                                     /*0017*/
 }
 
 Transformers for "foo"
@@ -48,7 +48,7 @@ int foo(int i, int j)
 
 //  T(foo) {i+j==foo}
 
-   return i+j;
+   return i+j;                                                          /*0004*/
 }
 
 Transformers for "main"
@@ -58,12 +58,12 @@ Transformers for "main"
 
 int main()
 {
-   int i,  j;
+   int i, j;                                                            /*0013*/
 
 //  T(i,j) {i==2, j==1}
 
 
-   i = (j = 1, 2);
+   i = (j = 1, 2);                                                      /*0015*/
 
 //  T(i,j) {i==3, i#init==2, j==4, j#init==1}
 
@@ -72,7 +72,7 @@ int main()
 //  T(i) {i==-11, i#init==3, j==4}
 
 
-   i = foo(-5, -6);
+   i = foo(-5, -6);                                                     /*0017*/
 }
 
 Preconditions for "main"
@@ -82,12 +82,12 @@ Preconditions for "main"
 
 int main()
 {
-   int i,  j;
+   int i, j;                                                            /*0013*/
 
 //  P() {}
 
 
-   i = (j = 1, 2);
+   i = (j = 1, 2);                                                      /*0015*/
 
 //  P(i,j) {i==2, j==1}
 
@@ -96,7 +96,7 @@ int main()
 //  P(i,j) {i==3, j==4}
 
 
-   i = foo(-5, -6);
+   i = foo(-5, -6);                                                     /*0017*/
 }
 
 Preconditions for "foo"
@@ -109,5 +109,5 @@ int foo(int i, int j)
 
 //  P() {i==-5, j==-6}
 
-   return i+j;
+   return i+j;                                                          /*0004*/
 }

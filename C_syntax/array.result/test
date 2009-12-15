@@ -16,9 +16,6 @@ Unsplit array
 /*
  * file for array.c
  */
-
-
-
 extern  main();
 main()
 {

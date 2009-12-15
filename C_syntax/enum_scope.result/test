@@ -2,9 +2,6 @@ bar()
 {
    int a;
 }
-
-
-
 extern int main();
 enum hue {node, nide};
 extern int foo();

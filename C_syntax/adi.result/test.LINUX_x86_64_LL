@@ -4,9 +4,6 @@ Unsplit adi
 /*
  * file for adi.c
  */
-
-
-
 /*#include <math.h>*/
 
 extern double sqrt(double);

@@ -1,6 +1,3 @@
-
-
-
 extern void sc_to_matrices();
 extern int a[10];
 extern struct foo {

@@ -1,9 +1,6 @@
 
 Parser output
 
-
-
-
 static void foo(int x);
 
 extern void main();
@@ -18,9 +15,6 @@ void main()
 }
 
 Controlizer output
-
-
-
 
 static void foo(int x);
 

@@ -54,9 +54,6 @@ End of declarations for module decl02!
 
 Parsed printed file
 
-
-
-
 typedef long STD_uint32;
 
 static const char *cmd = "No cmd";
@@ -69,9 +66,6 @@ const  char MEM_checked_class[] = "allocateur avec suivi";
 int array[] = {1, 2, 3};
 
 Printed file
-
-
-
 
 typedef long STD_uint32;
 

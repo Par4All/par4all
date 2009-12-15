@@ -8,9 +8,6 @@ void decl36(int i)
 
 PRINTED FILE for "decl36!"
 
-
-
-
 /* Check that a function can be redeclared with the same arguments,
  * when a file is included more than once for instance.
  *

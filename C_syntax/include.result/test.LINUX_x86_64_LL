@@ -1,6 +1,3 @@
-
-
-
 /* Define ISO C stdio on top of C++ iostreams.
    Copyright (C) 1991,1994-2002,2003 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -1649,7 +1646,6 @@ extern void _IO_free_backup_area(_IO_FILE *);
 
 
 typedef _G_fpos_t fpos_t;
-
 /* The possibilities for the third argument to `setvbuf'.  */
 
 
@@ -2165,9 +2161,6 @@ extern int ftrylockfile(FILE *__stream);
 
 /* Relinquish the ownership granted for STREAM.  */
 extern void funlockfile(FILE *__stream);
-/* If we are compiling with optimizing read this file.  It contains
-   several optimizing inline functions and macros.  */
-
 extern int main();
 main()
 {

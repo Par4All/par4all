@@ -1,9 +1,6 @@
 
 Printed file for scope02_c
 
-
-
-
 static int i = 2;
 
 extern void foo();
@@ -13,9 +10,6 @@ void foo()
 }
 
 Printed file for scope02_a
-
-
-
 
 extern int i;
 
@@ -30,9 +24,6 @@ main()
 
 Printed file for scope02_b
 
-
-
-
 int i = 1;
 main()
 {
@@ -45,9 +36,6 @@ Unsplit the application
 /*
  * file for scope02_a.c
  */
-
-
-
 extern int i;
 
 void foo();
@@ -61,16 +49,10 @@ main()
 /*
  * file for scope02_b.c
  */
-
-
-
 int i = 1;
 /*
  * file for scope02_c.c
  */
-
-
-
 static int i = 2;
 
 extern void foo();

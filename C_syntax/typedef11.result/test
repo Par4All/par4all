@@ -48,9 +48,6 @@ End of declarations for module typedef11!
 
 Parsed printed file "typedef11!"
 
-
-
-
 /* typedef scope in preprocessor: here "cookie" is not a typedef */
 /* Case used to avoid quick fixes for typedef06.c */
 

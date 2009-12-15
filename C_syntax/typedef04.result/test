@@ -3,9 +3,6 @@ Checking that typedef types are properly prettyprinted
 
 Printed file for "typedef04"
 
-
-
-
 typedef double mydouble;
 struct s {
    int dim;

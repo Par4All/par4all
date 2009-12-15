@@ -89,9 +89,6 @@ End of declarations for module sizeofArray05!
 
 Parsed code
 
-
-
-
 //Size of array should be known and should not be dynamic
 int b = 20;
 extern void foo();

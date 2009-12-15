@@ -1,6 +1,3 @@
-
-
-
 static int i;
 extern int foo();
 int foo()

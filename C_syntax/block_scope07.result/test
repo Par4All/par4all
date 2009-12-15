@@ -59,9 +59,6 @@ End of declarations for module main
 
 Parser output
 
-
-
-
 extern int main();
 
 int main()

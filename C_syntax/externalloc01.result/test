@@ -42,9 +42,6 @@ Layout for memory area "externalloc01!:*STATIC*" of size 4:
 
 End of declarations for module externalloc01!
 
-
-
-
 //Checks Memory allocation offsets for one global external variable declared globally: offsets is not known and static and global variable of known size.
 extern int a;
 static int b;

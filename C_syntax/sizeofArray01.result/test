@@ -98,9 +98,6 @@ End of declarations for module sizeofArray01!
 
 Parsed code
 
-
-
-
 /* Checks the memory allocation offsets for local dynamic variables of dynamic size */
 
 extern int n;

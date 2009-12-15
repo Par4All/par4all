@@ -1,3 +1,6 @@
+
+Parsed printed file for "main"
+
 int main(char *fmt1, ...)
 {
    FILE *fp;
@@ -11,24 +14,8 @@ int main(char *fmt1, ...)
    long fp_pos_indic;
    va_list vl;
    
-   /* Some versions of <linux/posix_types.h> define these macros.  */
    
-   
-   
-   /* It's easier to assume 8-bit bytes than to get CHAR_BIT.  */
-   
-   
-   
-   
-   /* fd_set for select and pselect.  */
-   
-   
-   /* XPG4.2 requires this member name.  Otherwise avoid the name
-          from the global namespace.  */
-   
-   
-   
-   
+   // formatted IO functions
    fmt2 = "%s%d";
    max = 100;
    n = 200;
@@ -116,7 +103,3 @@ int main(char *fmt1, ...)
    
    fprintf(stderr, "The END\n");
 }
-
-Call graph for "main"
- main
-

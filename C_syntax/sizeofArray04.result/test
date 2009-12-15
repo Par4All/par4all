@@ -89,9 +89,6 @@ End of declarations for module sizeofArray04!
 
 Parsed code
 
-
-
-
 //Size of array should be known and should not be dynamic
 
 extern void foo();

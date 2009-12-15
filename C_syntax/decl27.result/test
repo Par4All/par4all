@@ -49,9 +49,6 @@ End of declarations for module decl27!
 
 Parsed printed file for "decl27!"
 
-
-
-
 /* Check PIPS size of different integers */
 long long i1;
 long i2;

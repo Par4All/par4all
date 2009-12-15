@@ -1,9 +1,6 @@
 
 Printed file for array_declarators!
 
-
-
-
 /* This code is extracted from C ISO standard*/
 extern int n;
 extern int m;
@@ -14,9 +11,6 @@ Unsplit array_declarators
 /*
  * file for array_declarators.c
  */
-
-
-
 /* This code is extracted from C ISO standard*/
 extern int n;
 extern int m;

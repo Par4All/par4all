@@ -1,6 +1,3 @@
-
-
-
 /* typedef scope in preprocessor: here "cookie" is not a typedef */
 /* Case used to avoid quick fixes for typedef06.c */
 

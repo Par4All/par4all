@@ -48,9 +48,6 @@ void main()
 
 Module static_function!
 
-
-
-
 static void foo(int x);
 
 extern void main();
