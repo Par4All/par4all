@@ -1,10 +1,6 @@
 Try to restructure the code for more precision:
 // (0,1)
-// (1,1)
 // BEGIN BLOCK
-
-
-
 extern int main(int argc, char *argv[]);                                /*0001*/
 // END BLOCK
 int main(int argc, char *argv[])

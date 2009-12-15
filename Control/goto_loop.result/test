@@ -1,25 +1,6 @@
 int main()
 {
    int i = 5;
-   
-   /* Some versions of <linux/posix_types.h> define these macros.  */
-   
-   
-   
-   /* It's easier to assume 8-bit bytes than to get CHAR_BIT.  */
-   
-   
-   
-   
-   /* fd_set for select and pselect.  */
-   
-   
-   /* XPG4.2 requires this member name.  Otherwise avoid the name
-          from the global namespace.  */
-   
-   
-   
-   
    printf("Begin\n");
    
    /* The a label */
@@ -27,6 +8,7 @@ a:   printf("a\n");
    /* The b label */
 b:   printf("b\n");
    /* Oh, go to a... */
+   ;
    goto a;
 }
 
@@ -38,25 +20,6 @@ int main()
 
 //  P() {i==5}
 
-   
-   /* Some versions of <linux/posix_types.h> define these macros.  */
-   
-   
-   
-   /* It's easier to assume 8-bit bytes than to get CHAR_BIT.  */
-   
-   
-   
-   
-   /* fd_set for select and pselect.  */
-   
-   
-   /* XPG4.2 requires this member name.  Otherwise avoid the name
-          from the global namespace.  */
-   
-   
-   
-   
    printf("Begin\n");
 
 //  P() {i==5}
@@ -69,7 +32,11 @@ a:   printf("a\n");
 
    /* The b label */
 b:   printf("b\n");
+
+//  P() {i==5}
+
    /* Oh, go to a... */
+   ;
    goto a;
 }
 
@@ -81,25 +48,6 @@ int main()
 
 //  P() {i==5}
 
-   
-   /* Some versions of <linux/posix_types.h> define these macros.  */
-   
-   
-   
-   /* It's easier to assume 8-bit bytes than to get CHAR_BIT.  */
-   
-   
-   
-   
-   /* fd_set for select and pselect.  */
-   
-   
-   /* XPG4.2 requires this member name.  Otherwise avoid the name
-          from the global namespace.  */
-   
-   
-   
-   
    printf("Begin\n");
 
 //  P() {i==5}
@@ -112,6 +60,10 @@ a:   printf("a\n");
 
    /* The b label */
 b:   printf("b\n");
+
+//  P() {i==5}
+
    /* Oh, go to a... */
+   ;
    goto a;
 }

@@ -7,14 +7,11 @@ void bar(int i)
 
    if (i) {
 
-      extern void foo(int i);
+      void foo(int i);
 
       foo(i);
    }
 }
-
-
-
 extern void foo(int i);
 void foo(int i)
 {
@@ -22,9 +19,6 @@ void foo(int i)
    i++;
    printf("This is the top-level version in bar.c\n");
 }
-
-
-
 static void foo(int i);
 
 extern void bar(int i);
@@ -42,9 +36,6 @@ int main()
    foo(3);
    bar(3);
 }
-
-
-
 
 
 
@@ -58,14 +49,11 @@ void bar(int i)
 
    if (i) {
 
-      extern void foo(int i);
+      void foo(int i);
 
       foo(i);
    }
 }
-
-
-
 extern void foo(int i);
 void foo(int i)
 {
@@ -73,9 +61,6 @@ void foo(int i)
    i++;
    printf("This is the top-level version in bar.c\n");
 }
-
-
-
 static void foo(int i);
 
 extern void bar(int i);
@@ -93,9 +78,6 @@ int main()
    foo(3);
    bar(3);
 }
-
-
-
 
 
 

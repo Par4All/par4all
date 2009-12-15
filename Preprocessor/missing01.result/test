@@ -2,9 +2,6 @@ int main(int argc, char *argv[])
 {
    return inC1(argc);                                                   /*0003*/
 }
-
-
-
 /* To test the stub generation of the missing int inC1(int) */
 extern int main(int argc, char *argv[]);                                /*0002*/
 # 2
