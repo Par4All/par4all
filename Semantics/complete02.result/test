@@ -4,10 +4,10 @@ Source code with proper effects
 void complete02()
 {
    // BEGIN BLOCK
-   int i;
+   int i;                                                               /*0004*/
    {
       // BEGIN BLOCK
-      int j = 0;
+      int j = 0;                                                        /*0008*/
 //               <must be read   >: i
 //               <must be written>: i
       for (i = 0;i<10;i++) {                                            /*0009*/
@@ -35,12 +35,12 @@ void complete02()
 //               <must be read   >: i j
 //               <must be written>: i j
    // BEGIN BLOCK
-   int i;
+   int i;                                                               /*0004*/
    {
 //               <must be read   >: i j
 //               <must be written>: i j
       // BEGIN BLOCK
-      int j = 0;
+      int j = 0;                                                        /*0008*/
 //               <must be read   >: i j
 //               <must be written>: i j
       for (i = 0;i<10;i++) {                                            /*0009*/
@@ -74,13 +74,13 @@ void complete02()
 //  T() {0==-1}
 
    // BEGIN BLOCK
-   int i;
+   int i;                                                               /*0004*/
    {
 
 //  T() {0==-1}
 
       // BEGIN BLOCK
-      int j = 0;
+      int j = 0;                                                        /*0008*/
 
 //  T(i,j) {i==0, j#init<=j}
 
@@ -120,13 +120,13 @@ void complete02()
 //  P() {}
 
    // BEGIN BLOCK
-   int i;
+   int i;                                                               /*0004*/
    {
 
-//  P() {}
+//  P() {j==0}
 
       // BEGIN BLOCK
-      int j = 0;
+      int j = 0;                                                        /*0008*/
 
 //  P() {j==0}
 

@@ -10,10 +10,10 @@ int while01()
   {
     int n = 10;
 
-  while(j<n) {
-    i++;
-    j += 2;
-  }
+    while(j<n) {
+      i++;
+      j += 2;
+    }
   }
 
   return i+j;

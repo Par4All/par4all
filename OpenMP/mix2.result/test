@@ -1,11 +1,11 @@
 // OMP style
 int main()
 {
-   float a[10];
-   float b[10][10][10][10][10];
-   int m = 0;
-   int n = 0;
-   int o = 2;
+   float a[10];                                                         /*0003*/
+   float b[10][10][10][10][10];                                         /*0004*/
+   int m = 0;                                                           /*0005*/
+   int n = 0;                                                           /*0006*/
+   int o = 2;                                                           /*0007*/
 
 
    for(m = 0; m <= 9; m += 1) {
@@ -29,11 +29,11 @@ int main()
 }
 int main()
 {
-   float a[10];
-   float b[10][10][10][10][10];
-   int m = 0;
-   int n = 0;
-   int o = 2;
+   float a[10];                                                         /*0003*/
+   float b[10][10][10][10][10];                                         /*0004*/
+   int m = 0;                                                           /*0005*/
+   int n = 0;                                                           /*0006*/
+   int o = 2;                                                           /*0007*/
 
    for(m = 0; m <= 9; m += 1) {
 //  call sum[n],

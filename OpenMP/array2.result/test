@@ -1,9 +1,9 @@
 // OMP style
 int main()
 {
-   int b[size];
-   int i;
-   int j;
+   int b[size];                                                         /*0003*/
+   int i;                                                               /*0004*/
+   int j;                                                               /*0005*/
    i = 0;                                                               /*0006*/
    j = 0;                                                               /*0007*/
 
@@ -28,9 +28,9 @@ int main()
 }
 int main()
 {
-   int b[size];
-   int i;
-   int j;
+   int b[size];                                                         /*0003*/
+   int i;                                                               /*0004*/
+   int j;                                                               /*0005*/
    i = 0;                                                               /*0006*/
    j = 0;                                                               /*0007*/
 

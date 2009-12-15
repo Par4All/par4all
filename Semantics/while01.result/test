@@ -10,20 +10,18 @@ int while01()
 //  T(while01) {while01==16}
 
    // BEGIN BLOCK
-   int i;
-   int j;
-   int n;
+   int i, j, n;
 
-//  T(i) {i==0}
+//  T(i) {0`1`n==10, i==0}
 
 
    i = 0;
 
-//  T(j) {i==0, j==1}
+//  T(j) {0`1`n==10, i==0, j==1}
 
    j = 1;
 
-//  T(0`n) {0`n==0, i==0, j==1}
+//  T(0`n) {0`1`n==10, 0`n==0, i==0, j==1}
 
    n = 0;
    {
@@ -55,7 +53,7 @@ int while01()
       // END BLOCK
    }
 
-//  T(while01) {0`n==0, i==5, j==11, while01==16}
+//  T(while01) {0`1`n==10, 0`n==0, i==5, j==11, while01==16}
 
 
    return i+j;
@@ -73,25 +71,23 @@ int while01()
 //  P() {}
 
    // BEGIN BLOCK
-   int i;
-   int j;
-   int n;
+   int i, j, n;
 
-//  P() {}
+//  P() {0`1`n==10}
 
 
    i = 0;
 
-//  P(i) {i==0}
+//  P(i) {0`1`n==10, i==0}
 
    j = 1;
 
-//  P(i,j) {i==0, j==1}
+//  P(i,j) {0`1`n==10, i==0, j==1}
 
    n = 0;
    {
 
-//  P(0`n,i,j) {0`n==0, i==0, j==1}
+//  P(0`n,i,j) {0`1`n==10, 0`n==0, i==0, j==1}
 
       // BEGIN BLOCK
       int n = 10;

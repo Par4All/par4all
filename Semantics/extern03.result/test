@@ -2,9 +2,6 @@
 Parsed code for "extern03!"
 
 // BEGIN BLOCK
-
-
-
 /* Check that successive external floating point dependent initializationa are properly taken
    into account. */
 

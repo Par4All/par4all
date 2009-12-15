@@ -4,9 +4,7 @@ OUT regions
 int scalarization08(int x[10], int y[10][10])
 {
    // BEGIN BLOCK
-   int i;
-   int j;
-   int k;
+   int i, j, k;
 
 //  <x[PHI1]-OUT-EXACT-{PHI1==1}>
 
@@ -30,14 +28,22 @@ Code after scalarization
 int scalarization08(int x[10], int y[10][10])
 {
    // BEGIN BLOCK
-   int i;
-   int j;
-   int k;
+   int i, j, k;
+   //PIPS generated variable
    int __scalar__0;
+
+//  <x[PHI1]-OUT-EXACT-{PHI1==1}>
+
    for(i = 0; i <= 9; i += 1) {
+
+//  <x[PHI1]-OUT-EXACT-{PHI1==i, PHI1==1}>
+
       // BEGIN BLOCK
       for(j = 0; j <= 9; j += 1)
          __scalar__0 = y[i][j];
+
+//  <x[PHI1]-OUT-EXACT-{PHI1==i, PHI1==1, j==10}>
+
       x[i] = __scalar__0;
       // END BLOCK
    }

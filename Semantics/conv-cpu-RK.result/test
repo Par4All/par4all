@@ -15,17 +15,17 @@ C  T() {}
 
 void conv_cpu(float *a, float *c, int n, float a00, float a10, float a20, float a01, float a11, float a21, float a02, float a12, float a22)
 {
-   int i;
-   int j;
+   int i, j;
 
 //  T(i,j) {0<=i}
 
-   for(i = 0; i <= n-1; i += 1)
+   for(i = 0; i <= n-1; i += 1) {
 
-//  T(j) {0<=i, i+1<=n, 0<=j}
+//  T(j) {0<=i, i+1<=n, j#init<=idx, 0<=j}
 
       for(j = 0; j <= n-1; j += 1) {
          int idx = i*n+j;
+
          _Bool right = i>0;
          _Bool left = i<n-1;
          _Bool top = j>0;
@@ -35,6 +35,7 @@ void conv_cpu(float *a, float *c, int n, float a00, float a10, float a20, float 
 
          c[idx] = (right&top?a00*a[idx-n-1]:0)+(right?a10*a[idx-1]:0)+(right&bottom?a20*a[idx+n-1]:0)+(top?a01*a[idx-n]:0)+a11*a[idx]+(bottom?a21*a[idx+n]:0)+(left&top?a02*a[idx-n+1]:0)+(left?a12*a[idx+1]:0)+(left&bottom?a22*a[idx+n+1]:0);
       }
+   }
 }
 Check preconditions for "conv_cpu"
 
@@ -42,17 +43,17 @@ Check preconditions for "conv_cpu"
 
 void conv_cpu(float *a, float *c, int n, float a00, float a10, float a20, float a01, float a11, float a21, float a02, float a12, float a22)
 {
-   int i;
-   int j;
+   int i, j;
 
-//  P() {n==10000}
+//  P() {10000i+j==idx, n==10000}
 
-   for(i = 0; i <= n-1; i += 1)
+   for(i = 0; i <= n-1; i += 1) {
 
-//  P(i,j) {n==10000, 0<=i, i<=9999}
+//  P(i,j) {n==10000, 0<=i, i<=9999, j<=idx, idx<=j+99990000}
 
       for(j = 0; j <= n-1; j += 1) {
          int idx = i*n+j;
+
          _Bool right = i>0;
          _Bool left = i<n-1;
          _Bool top = j>0;
@@ -63,5 +64,6 @@ void conv_cpu(float *a, float *c, int n, float a00, float a10, float a20, float 
 
          c[idx] = (right&top?a00*a[idx-n-1]:0)+(right?a10*a[idx-1]:0)+(right&bottom?a20*a[idx+n-1]:0)+(top?a01*a[idx-n]:0)+a11*a[idx]+(bottom?a21*a[idx+n]:0)+(left&top?a02*a[idx-n+1]:0)+(left?a12*a[idx+1]:0)+(left&bottom?a22*a[idx+n+1]:0);
       }
+   }
 }
 Privatize scalar variables on all the modules of the program:

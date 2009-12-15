@@ -6,6 +6,7 @@ C  T(FIR) {FIR==0}
 
 int FIR()
 {
+
    int ifr;
 
 //  T(ifr) {0<=ifr}
@@ -29,6 +30,7 @@ Preconditions for "FIR"
 
 int FIR()
 {
+
    int ifr;
 
 //  P() {}
@@ -52,6 +54,7 @@ Preconditions for "FIR" after partial evaluation
 
 int FIR()
 {
+
    int ifr;
 
 //  P() {}
@@ -72,6 +75,7 @@ Preconditions for "FIR" after dead code elimination
 
 int FIR()
 {
+
    int ifr;
    ifr = 0;
    return 0;

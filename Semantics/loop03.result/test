@@ -18,8 +18,8 @@ C  T() {}
 void getimage(char *filename)
 {
    extern complex imagein[64][64], imageout[256][256];
-   double z,  amp,  sum,  squares;
-   int i,  j,  conj,  nx,  ny;
+   double z, amp, sum, squares;
+   int i, j, conj, nx, ny;
    unsigned char c;
    FILE *fp;
 
@@ -34,25 +34,6 @@ void getimage(char *filename)
 
 //  T() {0<=i, i<=63, 0<=j, j<=63}
 
-         
-         /* Some versions of <linux/posix_types.h> define these macros.  */
-         
-         
-         
-         /* It's easier to assume 8-bit bytes than to get CHAR_BIT.  */
-         
-         
-         
-         
-         /* fd_set for select and pselect.  */
-         
-         
-         /* XPG4.2 requires this member name.  Otherwise avoid the name
-                from the global namespace.  */
-         
-         
-         
-         
          imagein_re[i][j] = 0.0;
 
 //  T() {0<=i, i<=63, 0<=j, j<=63}
@@ -96,8 +77,8 @@ Preconditions for "getimage" before privatization
 void getimage(char *filename)
 {
    extern complex imagein[64][64], imageout[256][256];
-   double z,  amp,  sum,  squares;
-   int i,  j,  conj,  nx,  ny;
+   double z, amp, sum, squares;
+   int i, j, conj, nx, ny;
    unsigned char c;
    FILE *fp;
 
@@ -112,25 +93,6 @@ void getimage(char *filename)
 
 //  P(i,j) {0<=i, i<=63, 0<=j, j<=63}
 
-         
-         /* Some versions of <linux/posix_types.h> define these macros.  */
-         
-         
-         
-         /* It's easier to assume 8-bit bytes than to get CHAR_BIT.  */
-         
-         
-         
-         
-         /* fd_set for select and pselect.  */
-         
-         
-         /* XPG4.2 requires this member name.  Otherwise avoid the name
-                from the global namespace.  */
-         
-         
-         
-         
          imagein_re[i][j] = 0.0;
 
 //  P(i,j) {0<=i, i<=63, 0<=j, j<=63}
@@ -181,8 +143,8 @@ void getimage(char *filename)
 
    // BEGIN BLOCK
    extern complex imagein[64][64], imageout[256][256];
-   double z,  amp,  sum,  squares;
-   int i,  j,  conj,  nx,  ny;
+   double z, amp, sum, squares;
+   int i, j, conj, nx, ny;
    unsigned char c;
    FILE *fp;
 
@@ -203,25 +165,6 @@ void getimage(char *filename)
 
 //  T() {0<=i, i<=63, 0<=j, j<=63}
 
-         
-         /* Some versions of <linux/posix_types.h> define these macros.  */
-         
-         
-         
-         /* It's easier to assume 8-bit bytes than to get CHAR_BIT.  */
-         
-         
-         
-         
-         /* fd_set for select and pselect.  */
-         
-         
-         /* XPG4.2 requires this member name.  Otherwise avoid the name
-                from the global namespace.  */
-         
-         
-         
-         
          imagein_re[i][j] = 0.0;
 
 //  T() {0<=i, i<=63, 0<=j, j<=63}
@@ -278,8 +221,8 @@ void getimage(char *filename)
 
    // BEGIN BLOCK
    extern complex imagein[64][64], imageout[256][256];
-   double z,  amp,  sum,  squares;
-   int i,  j,  conj,  nx,  ny;
+   double z, amp, sum, squares;
+   int i, j, conj, nx, ny;
    unsigned char c;
    FILE *fp;
 
@@ -300,25 +243,6 @@ void getimage(char *filename)
 
 //  P(i,j) {0<=i, i<=63, 0<=j, j<=63}
 
-         
-         /* Some versions of <linux/posix_types.h> define these macros.  */
-         
-         
-         
-         /* It's easier to assume 8-bit bytes than to get CHAR_BIT.  */
-         
-         
-         
-         
-         /* fd_set for select and pselect.  */
-         
-         
-         /* XPG4.2 requires this member name.  Otherwise avoid the name
-                from the global namespace.  */
-         
-         
-         
-         
          imagein_re[i][j] = 0.0;
 
 //  P(i,j) {0<=i, i<=63, 0<=j, j<=63}
@@ -367,8 +291,8 @@ Ask for the parallelization of all the modules of the program with OpenMP output
 void getimage(char *filename)
 {
    extern complex imagein[64][64], imageout[256][256];
-   double z,  amp,  sum,  squares;
-   int i,  j,  conj,  nx,  ny;
+   double z, amp, sum, squares;
+   int i, j, conj, nx, ny;
    unsigned char c;
    FILE *fp;
 
@@ -376,25 +300,6 @@ void getimage(char *filename)
    for(i = 0; i <= 63; i += 1)
 #pragma omp parallel for 
       for(j = 0; j <= 63; j += 1) {
-         
-         /* Some versions of <linux/posix_types.h> define these macros.  */
-         
-         
-         
-         /* It's easier to assume 8-bit bytes than to get CHAR_BIT.  */
-         
-         
-         
-         
-         /* fd_set for select and pselect.  */
-         
-         
-         /* XPG4.2 requires this member name.  Otherwise avoid the name
-                from the global namespace.  */
-         
-         
-         
-         
          imagein_re[i][j] = 0.0;
          imagein_im[i][j] = 0.0;
       }

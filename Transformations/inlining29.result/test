@@ -1,10 +1,6 @@
 
 Initial code
 
-
-
-
-
 typedef struct farray_t *farray;
 
 extern farray farray_new(unsigned int n);
@@ -49,17 +45,12 @@ void farray_set(farray a, unsigned int i, float f)
 {
    (a->data)[i] = f;
 }
-
-
-
-
 typedef struct farray_t *farray;
 
 farray farray_new(unsigned int n);
 void farray_delete(farray a);
 float farray_get(farray a, unsigned int i);
 void farray_set(farray a, unsigned int i, float f);
-
 extern int main(int argc, char *argv[]);
 int main(int argc, char *argv[])
 {
