@@ -1,0 +1,35 @@
+void mala_bar(int A[30], int I, int J)
+{
+   if (1) {
+      A[I] = I+1;
+      J += 1;
+   }
+}
+void mala_bar(int A[30], int I, int J)
+{
+   //PIPS generated variable
+   int I_0;
+   I_0 = 1;
+#pragma PIPS IF_TO_CONVERT
+   if (I_0) {
+      A[I] = I+1;
+      J += 1;
+   }
+   ;
+}
+void mala_bar(int A[30], int I, int J)
+{
+   //PIPS generated variable
+   int I_0;
+   //PIPS generated variable
+   int A0;
+   //PIPS generated variable
+   int J0;
+   I_0 = 1;
+   A0 = I+1;
+   A[I] = PHI(I_0, A0, A[I]);
+   J0 = J+1;
+   J = PHI(I_0, J0, J);
+   ;
+}
+

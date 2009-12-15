@@ -1,0 +1,49 @@
+void foo(int a, unsigned short b, char x, long j, long long i)
+{
+   if (a>0) {
+      i = 3;
+      if (b==3) 
+         x = 5;
+   }
+   else {
+      if (b<3) 
+         x = 6;
+      j = 3;
+   }
+}
+
+
+
+extern void foo(int a, unsigned short b, char x, long j, long long i);
+void foo(int a, unsigned short b, char x, long j, long long i)
+{
+   //PIPS generated variable
+   int I_0;
+   //PIPS generated variable
+   int I_1;
+   //PIPS generated variable
+   int I_2;
+   I_2 = a>0;
+#pragma PIPS IF_TO_CONVERT
+   if (I_2) {
+      i = 3;
+      I_0 = b==3;
+   }
+#pragma PIPS IF_TO_CONVERT
+   if (I_2&&I_0) 
+      x = 5;
+#pragma PIPS IF_TO_CONVERT
+   if (!I_2)
+      I_1 = b<3;
+#pragma PIPS IF_TO_CONVERT
+   if (!I_2&&I_1) 
+      x = 6;
+#pragma PIPS IF_TO_CONVERT
+   if (!I_2)
+      j = 3;
+}
+
+
+
+extern void foo(int a, unsigned short b, char x, long j, long long i);
+

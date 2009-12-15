@@ -1,0 +1,13 @@
+delete if_conversion02
+create if_conversion02 if_conversion02.c include/SIMD.c
+
+make PRINTED_FILE[%ALL]
+module foo
+display PRINTED_FILE
+apply IF_CONVERSION_INIT
+display PRINTED_FILE
+apply IF_CONVERSION
+display PRINTED_FILE
+
+close if_conversion02
+delete if_conversion02

@@ -1,0 +1,32 @@
+void foo()
+{
+   int i, tab[4][4];
+   for(i = 0; i <= 0; i += 1)
+      if (tab[i][i]>i) 
+         tab[i] = i;
+}
+void foo()
+{
+   int i, tab[4][4];
+   //PIPS generated variable
+   int I_0;
+   for(i = 0; i <= 0; i += 1) {
+      I_0 = tab[i][i]>i;
+#pragma PIPS IF_TO_CONVERT
+      if (I_0) 
+         tab[i] = i;
+      ;
+   }
+}
+void foo()
+{
+   int i, tab[4][4];
+   //PIPS generated variable
+   int I_0;
+   for(i = 0; i <= 0; i += 1) {
+      I_0 = tab[i][i]>i;
+      tab[i] = PHI(I_0, i, tab[i]);
+      ;
+   }
+}
+

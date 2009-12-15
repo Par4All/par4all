@@ -1,0 +1,13 @@
+delete if_conversion04
+create if_conversion04 if_conversion04.c include/SIMD.c
+
+make PRINTED_FILE[%ALL]
+module mala_bar
+display PRINTED_FILE
+apply IF_CONVERSION_INIT
+display PRINTED_FILE
+apply IF_CONVERSION
+display PRINTED_FILE
+
+close if_conversion04
+delete if_conversion04
