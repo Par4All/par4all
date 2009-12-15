@@ -159,8 +159,25 @@ extern stack OffsetStack; /**< to know the offset of the formal argument */
  // ContextStack
 static c_parser_context ycontext = c_parser_context_undefined;
 
+/* FI: these two variables are used in conjunction with comma
+   expressions. I do not remember why they are needed. They sometimes
+   stay set although they have become useless. The parser used not to
+   reset them systematically, which caused problemes with
+   io_intrinsics*.c */
 static string expression_comment = string_undefined;
 static int expression_line_number = STATEMENT_NUMBER_UNDEFINED;
+
+void reset_expression_comment()
+{
+  if(!string_undefined_p(expression_comment)) {
+    /* Too bad. This should not happen, but it happens with comma
+       expressions in header files */
+    free(expression_comment);
+    expression_comment = string_undefined;
+  }
+
+  expression_line_number = STATEMENT_NUMBER_UNDEFINED;
+}
 
 /* Functions used to manage the block scoping in conjunction with
    ContextStack and ycontext */
@@ -1382,16 +1399,25 @@ statement:
 			}
 |   comma_expression TK_SEMICOLON
 			{
-			  if (gen_length($1)==1)
+			  if (gen_length($1)==1) {
+			    /* This uses the current comment and
+			       current line number. */
 			    $$ = ExpressionToStatement(EXPRESSION(CAR($1)));
+			  }
 			  else
-			    $$ = call_to_statement(make_call(CreateIntrinsic(","),$1));
+			    /* FI: I do not know how
+			       expression_comment is supposed to
+			       worlk for real comma expressions */
+			    $$ = call_to_statement(make_call(CreateIntrinsic(COMMA_OPERATOR_NAME),$1));
 			  if(!string_undefined_p(expression_comment)) {
-			    statement_comments($$) = expression_comment;
-			    statement_number($$) = expression_line_number;
+			    if(!empty_comments_p(expression_comment)) {
+			      statement_comments($$) = expression_comment;
+			      statement_number($$) = expression_line_number;
+			    }
 			    expression_comment = string_undefined;
 			    expression_line_number = STATEMENT_NUMBER_UNDEFINED;
 			  }
+
 			}
 |   block               { }
 |   TK_IF paren_comma_expression statement                    %prec TK_IF
@@ -2867,7 +2893,7 @@ function_def:  /* (* ISO 6.9.1 *) */
     block
                         {
 			  /* Make value_code for current module here */
-			  list dl = statement_declarations($3);
+			  //list dl = statement_declarations($3);
 			  ModuleStatement = $3;
 			  pips_assert("Module statement is consistent",
 				      statement_consistent_p(ModuleStatement));

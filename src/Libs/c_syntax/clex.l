@@ -415,6 +415,9 @@ universal-character-name ({escape}(u{hexdigit}{4}|U{hexdigit}{8}))
                                       CParserError("Ill. formated # pragma\n");
                                    }
                                 }
+                                /* Current comments cannot be related to 
+                                   something happening after a pragma .*/
+                                discard_C_comment();
                         }
 
 \n                      {

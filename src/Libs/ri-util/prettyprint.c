@@ -2328,7 +2328,7 @@ text_loop_default(
 	}
 
 	if (lp)
-	  /* local_var is a globale variable which is exploited
+	  /* local_var is a global variable which is exploited
 	     later... */
 	  ADD_SENTENCE_TO_TEXT
 	    ( local_var,

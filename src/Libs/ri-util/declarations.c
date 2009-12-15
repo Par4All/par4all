@@ -382,8 +382,15 @@ list words_basic(basic obj)
       {
 	type t = basic_pointer(obj);
 	pips_debug(7,"Basic pointer\n");
-	pc = gen_nconc(pc,words_type(t));
-	pc = CHAIN_SWORD(pc," *");
+	if(type_undefined_p(t)) {
+	  /* This may occur in the parser when a variable is used
+	     before it is fully defined (see ptr in decl42.c) */
+	  pc = CHAIN_SWORD(pc,"type_undefined *");
+	}
+	else {
+	  pc = gen_nconc(pc,words_type(t));
+	  pc = CHAIN_SWORD(pc," *");
+	}
 	break;
       }
     case is_basic_derived:

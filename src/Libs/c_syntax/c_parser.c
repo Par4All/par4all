@@ -529,6 +529,7 @@ static bool actual_c_parser(string module_name,
     reset_current_C_line_number();
     reset_C_comment(compilation_unit_p(module_name));
     reset_current_dummy_parameter_number();
+    reset_expression_comment();
     /*  reset_keyword_typedef_table();*/
     pips_assert("ContextStack is empty", stack_empty_p(ContextStack));
     stack_free(&ContextStack);
