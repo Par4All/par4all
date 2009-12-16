@@ -263,6 +263,7 @@ void CParserError(char *msg)
   error_reset_current_C_line_number();
   /* get rid of all collected comments */
   reset_C_comment(TRUE);
+  reset_expression_comment();
 
   pips_user_warning("\nRecovery from C parser failure not (fully) implemented yet.\n"
 		    "C parser is likely to fail later if re-used.\n");

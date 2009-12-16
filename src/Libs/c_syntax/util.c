@@ -2026,7 +2026,12 @@ void UpdateEntity(entity e, stack ContextStack, stack FormalStack, stack Functio
     entity_type(e) = t2;
   }
 
-  pips_assert("the entity type is defined", !type_undefined_p(e));
+  if(type_undefined_p(entity_type(e))) {
+    /* The default type is int */
+    entity_type(e) =
+      make_type_variable(make_variable(make_basic_int(DEFAULT_INTEGER_TYPE_SIZE),NIL,NIL));
+  }
+  pips_assert("the entity type is defined", !type_undefined_p(entity_type(e)));
 
   /************************* STORAGE PART *******************************************/
 
