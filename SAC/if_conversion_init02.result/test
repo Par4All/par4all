@@ -8,9 +8,6 @@ void foo()
       for(i = 0; i <= 29; i += 1)
          j++;
 }
-
-
-
 extern void foo();
 void foo()
 {
@@ -27,8 +24,5 @@ void foo()
       for(i = 0; i <= 29; i += 1)
          j++;
 }
-
-
-
 extern void foo();
 

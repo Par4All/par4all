@@ -1,5 +1,5 @@
 delete if_conversion04
-create if_conversion04 if_conversion04.c include/SIMD.c
+create if_conversion04 if_conversion04.c
 
 make PRINTED_FILE[%ALL]
 module mala_bar

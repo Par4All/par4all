@@ -6,9 +6,6 @@ void foo()
    if (i) 
       i++;
 }
-
-
-
 extern void foo();
 void foo()
 {
@@ -18,8 +15,5 @@ void foo()
    if (i) 
       i++;
 }
-
-
-
 extern void foo();
 

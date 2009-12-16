@@ -1,5 +1,5 @@
 delete if_conversion01
-create if_conversion01 if_conversion01.c include/SIMD.c
+create if_conversion01 if_conversion01.c
 
 make PRINTED_FILE[%ALL]
 module foo

@@ -35,11 +35,11 @@ void foo()
    //PIPS generated variable
    int I_1;
    I_0 = i<0;
-   i = PHI(I_0, 0, i);
+   i = I_0?0:i;
    ;
    for(i = 0; i <= 0; i += 1) {
       I_1 = tab[i]>i;
-      tab[i] = PHI(I_1, i, tab[i]);
+      tab[i] = I_1?i:tab[i];
       ;
    }
 }

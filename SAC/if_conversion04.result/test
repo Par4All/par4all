@@ -27,9 +27,9 @@ void mala_bar(int A[30], int I, int J)
    int J0;
    I_0 = 1;
    A0 = I+1;
-   A[I] = PHI(I_0, A0, A[I]);
+   A[I] = I_0?A0:A[I];
    J0 = J+1;
-   J = PHI(I_0, J0, J);
+   J = I_0?J0:J;
    ;
 }
 

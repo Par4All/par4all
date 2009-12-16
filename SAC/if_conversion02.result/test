@@ -25,7 +25,7 @@ void foo()
    int I_0;
    for(i = 0; i <= 0; i += 1) {
       I_0 = tab[i][i]>i;
-      tab[i] = PHI(I_0, i, tab[i]);
+      tab[i] = I_0?i:tab[i];
       ;
    }
 }

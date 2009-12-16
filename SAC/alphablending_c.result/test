@@ -28,8 +28,11 @@ void alphablending(size_t n, float src1[n], float src2[n], float result[n], floa
 void alphablending(size_t n, float src1[n], float src2[n], float result[n], float alpha)
 {
    size_t i;
+   //PIPS generated variable
    float F_0;
+   //PIPS generated variable
    float F_1;
+   //PIPS generated variable
    float F_2;
    for(i = 0; i <= n-1; i += 1) {
       F_0 = alpha*src1[i];
@@ -41,11 +44,17 @@ void alphablending(size_t n, float src1[n], float src2[n], float result[n], floa
 void alphablending(size_t n, float src1[n], float src2[n], float result[n], float alpha)
 {
    size_t i;
+   //PIPS generated variable
    float F_0;
+   //PIPS generated variable
    float F_1;
+   //PIPS generated variable
    float F_2;
+   //PIPS generated variable
    size_t LU_NUB0;
+   //PIPS generated variable
    size_t LU_IB0;
+   //PIPS generated variable
    size_t LU_IND0;
    LU_NUB0 = n;
    LU_IB0 = MOD(LU_NUB0, 4);
@@ -95,11 +104,17 @@ void alphablending(size_t n, float src1[n], float src2[n], float result[n], floa
 void alphablending(size_t n, float src1[n], float src2[n], float result[n], float alpha)
 {
    size_t i;
+   //PIPS generated variable
    float F_0;
+   //PIPS generated variable
    float F_1;
+   //PIPS generated variable
    float F_2;
+   //PIPS generated variable
    size_t LU_NUB0;
+   //PIPS generated variable
    size_t LU_IB0;
+   //PIPS generated variable
    size_t LU_IND0;
    LU_NUB0 = n;
    LU_IB0 = MOD(LU_NUB0, 4);
@@ -149,26 +164,47 @@ void alphablending(size_t n, float src1[n], float src2[n], float result[n], floa
 void alphablending(size_t n, float src1[n], float src2[n], float result[n], float alpha)
 {
    size_t i;
+   //PIPS generated variable
    float F_0;
+   //PIPS generated variable
    float F_1;
+   //PIPS generated variable
    float F_2;
+   //PIPS generated variable
    size_t LU_NUB0;
+   //PIPS generated variable
    size_t LU_IB0;
+   //PIPS generated variable
    size_t LU_IND0;
+   //PIPS generated variable
    float F_20;
+   //PIPS generated variable
    float F_10;
+   //PIPS generated variable
    float F_00;
+   //PIPS generated variable
    float F_21;
+   //PIPS generated variable
    float F_11;
+   //PIPS generated variable
    float F_01;
+   //PIPS generated variable
    float F_22;
+   //PIPS generated variable
    float F_12;
+   //PIPS generated variable
    float F_02;
+   //PIPS generated variable
    float F_23;
+   //PIPS generated variable
    float F_13;
+   //PIPS generated variable
    float F_03;
+   //PIPS generated variable
    float F_24;
+   //PIPS generated variable
    float F_14;
+   //PIPS generated variable
    float F_04;
    LU_NUB0 = n;
    LU_IB0 = MOD(LU_NUB0, 4);
@@ -218,47 +254,89 @@ void alphablending(size_t n, float src1[n], float src2[n], float result[n], floa
 void alphablending(size_t n, float src1[n], float src2[n], float result[n], float alpha)
 {
    size_t i;
+   //PIPS generated variable
    float F_0;
+   //PIPS generated variable
    float F_1;
+   //PIPS generated variable
    float F_2;
+   //PIPS generated variable
    size_t LU_NUB0;
+   //PIPS generated variable
    size_t LU_IB0;
+   //PIPS generated variable
    size_t LU_IND0;
+   //PIPS generated variable
    float F_20;
+   //PIPS generated variable
    float F_10;
+   //PIPS generated variable
    float F_00;
+   //PIPS generated variable
    float F_21;
+   //PIPS generated variable
    float F_11;
+   //PIPS generated variable
    float F_01;
+   //PIPS generated variable
    float F_22;
+   //PIPS generated variable
    float F_12;
+   //PIPS generated variable
    float F_02;
+   //PIPS generated variable
    float F_23;
+   //PIPS generated variable
    float F_13;
+   //PIPS generated variable
    float F_03;
+   //PIPS generated variable
    float F_24;
+   //PIPS generated variable
    float F_14;
+   //PIPS generated variable
    float F_04;
+   //PIPS generated variable
    float v4sf_vec0[3+1];
+   //PIPS generated variable
    float v4sf_vec1[3+1];
+   //PIPS generated variable
    float v4sf_vec2[3+1];
+   //PIPS generated variable
    float v4sf_vec3[3+1];
+   //PIPS generated variable
    float v4sf_vec4[3+1];
+   //PIPS generated variable
    float v4sf_vec5[3+1];
+   //PIPS generated variable
    float v4sf_vec6[3+1];
+   //PIPS generated variable
    float v4sf_vec7[3+1];
+   //PIPS generated variable
    float v4sf_vec8[3+1];
+   //PIPS generated variable
    float v4sf_vec9[3+1];
+   //PIPS generated variable
    float v4sf_vec10[3+1];
+   //PIPS generated variable
    float v4sf_vec11[3+1];
+   //PIPS generated variable
    float v4sf_vec12[3+1];
+   //PIPS generated variable
    float v4sf_vec13[3+1];
+   //PIPS generated variable
    float v4sf_vec14[3+1];
+   //PIPS generated variable
    float v4sf_vec15[3+1];
+   //PIPS generated variable
    float v4sf_vec16[3+1];
+   //PIPS generated variable
    float v4sf_vec17[3+1];
+   //PIPS generated variable
    float v4sf_vec18[3+1];
+   //PIPS generated variable
    float v4sf_vec19[3+1];
+   //PIPS generated variable
    float v4sf_vec20[3+1];
    LU_NUB0 = n;
    LU_IB0 = MOD(LU_NUB0, 4);
@@ -288,48 +366,91 @@ void alphablending(size_t n, float src1[n], float src2[n], float result[n], floa
 void alphablending(size_t n, float src1[n], float src2[n], float result[n], float alpha)
 {
    size_t i;
+   //PIPS generated variable
    float F_0;
+   //PIPS generated variable
    float F_1;
+   //PIPS generated variable
    float F_2;
+   //PIPS generated variable
    size_t LU_NUB0;
+   //PIPS generated variable
    size_t LU_IB0;
+   //PIPS generated variable
    size_t LU_IND0;
+   //PIPS generated variable
    float F_20;
+   //PIPS generated variable
    float F_10;
+   //PIPS generated variable
    float F_00;
+   //PIPS generated variable
    float F_21;
+   //PIPS generated variable
    float F_11;
+   //PIPS generated variable
    float F_01;
+   //PIPS generated variable
    float F_22;
+   //PIPS generated variable
    float F_12;
+   //PIPS generated variable
    float F_02;
+   //PIPS generated variable
    float F_23;
+   //PIPS generated variable
    float F_13;
+   //PIPS generated variable
    float F_03;
+   //PIPS generated variable
    float F_24;
+   //PIPS generated variable
    float F_14;
+   //PIPS generated variable
    float F_04;
+   //PIPS generated variable
    float v4sf_vec0[3+1];
+   //PIPS generated variable
    float v4sf_vec1[3+1];
+   //PIPS generated variable
    float v4sf_vec2[3+1];
+   //PIPS generated variable
    float v4sf_vec3[3+1];
+   //PIPS generated variable
    float v4sf_vec4[3+1];
+   //PIPS generated variable
    float v4sf_vec5[3+1];
+   //PIPS generated variable
    float v4sf_vec6[3+1];
+   //PIPS generated variable
    float v4sf_vec7[3+1];
+   //PIPS generated variable
    float v4sf_vec8[3+1];
+   //PIPS generated variable
    float v4sf_vec9[3+1];
+   //PIPS generated variable
    float v4sf_vec10[3+1];
+   //PIPS generated variable
    float v4sf_vec11[3+1];
+   //PIPS generated variable
    float v4sf_vec12[3+1];
+   //PIPS generated variable
    float v4sf_vec13[3+1];
+   //PIPS generated variable
    float v4sf_vec14[3+1];
+   //PIPS generated variable
    float v4sf_vec15[3+1];
+   //PIPS generated variable
    float v4sf_vec16[3+1];
+   //PIPS generated variable
    float v4sf_vec17[3+1];
+   //PIPS generated variable
    float v4sf_vec18[3+1];
+   //PIPS generated variable
    float v4sf_vec19[3+1];
+   //PIPS generated variable
    float v4sf_vec20[3+1];
+   //PIPS generated variable
    float F_3;
    LU_NUB0 = n;
    LU_IB0 = MOD(LU_NUB0, 4);
@@ -362,32 +483,91 @@ void alphablending(size_t n, float src1[n], float src2[n], float result[n], floa
 void alphablending(size_t n, float src1[n], float src2[n], float result[n], float alpha)
 {
    size_t i;
+   //PIPS generated variable
+   ;
+   //PIPS generated variable
+   ;
+   //PIPS generated variable
+   ;
+   //PIPS generated variable
    size_t LU_NUB0;
+   //PIPS generated variable
    size_t LU_IB0;
+   //PIPS generated variable
    size_t LU_IND0;
+   //PIPS generated variable
    float F_20;
+   //PIPS generated variable
    float F_10;
+   //PIPS generated variable
    float F_00;
+   //PIPS generated variable
    float F_21;
+   //PIPS generated variable
    float F_11;
+   //PIPS generated variable
    float F_01;
+   //PIPS generated variable
    float F_22;
+   //PIPS generated variable
    float F_12;
+   //PIPS generated variable
    float F_02;
+   //PIPS generated variable
    float F_23;
+   //PIPS generated variable
    float F_13;
+   //PIPS generated variable
    float F_03;
+   //PIPS generated variable
    float F_24;
+   //PIPS generated variable
    float F_14;
+   //PIPS generated variable
    float F_04;
+   //PIPS generated variable
    float v4sf_vec0[3+1];
+   //PIPS generated variable
    float v4sf_vec1[3+1];
+   //PIPS generated variable
    float v4sf_vec2[3+1];
+   //PIPS generated variable
    float v4sf_vec3[3+1];
+   //PIPS generated variable
    float v4sf_vec4[3+1];
+   //PIPS generated variable
+   ;
+   //PIPS generated variable
    float v4sf_vec6[3+1];
+   //PIPS generated variable
+   ;
+   //PIPS generated variable
    float v4sf_vec8[3+1];
+   //PIPS generated variable
    float v4sf_vec9[3+1];
+   //PIPS generated variable
+   ;
+   //PIPS generated variable
+   ;
+   //PIPS generated variable
+   ;
+   //PIPS generated variable
+   ;
+   //PIPS generated variable
+   ;
+   //PIPS generated variable
+   ;
+   //PIPS generated variable
+   ;
+   //PIPS generated variable
+   ;
+   //PIPS generated variable
+   ;
+   //PIPS generated variable
+   ;
+   //PIPS generated variable
+   ;
+   //PIPS generated variable
    float F_3;
    LU_NUB0 = n;
    LU_IB0 = MOD(LU_NUB0, 4);
@@ -423,32 +603,91 @@ simdized code
 void alphablending(size_t n, float src1[n], float src2[n], float result[n], float alpha)
 {
    size_t i;
+   //PIPS generated variable
+   ;
+   //PIPS generated variable
+   ;
+   //PIPS generated variable
+   ;
+   //PIPS generated variable
    size_t LU_NUB0;
+   //PIPS generated variable
    size_t LU_IB0;
+   //PIPS generated variable
    size_t LU_IND0;
+   //PIPS generated variable
    float F_20;
+   //PIPS generated variable
    float F_10;
+   //PIPS generated variable
    float F_00;
+   //PIPS generated variable
    float F_21;
+   //PIPS generated variable
    float F_11;
+   //PIPS generated variable
    float F_01;
+   //PIPS generated variable
    float F_22;
+   //PIPS generated variable
    float F_12;
+   //PIPS generated variable
    float F_02;
+   //PIPS generated variable
    float F_23;
+   //PIPS generated variable
    float F_13;
+   //PIPS generated variable
    float F_03;
+   //PIPS generated variable
    float F_24;
+   //PIPS generated variable
    float F_14;
+   //PIPS generated variable
    float F_04;
+   //PIPS generated variable
    float v4sf_vec0[3+1];
+   //PIPS generated variable
    float v4sf_vec1[3+1];
+   //PIPS generated variable
    float v4sf_vec2[3+1];
+   //PIPS generated variable
    float v4sf_vec3[3+1];
+   //PIPS generated variable
    float v4sf_vec4[3+1];
+   //PIPS generated variable
+   ;
+   //PIPS generated variable
    float v4sf_vec6[3+1];
+   //PIPS generated variable
+   ;
+   //PIPS generated variable
    float v4sf_vec8[3+1];
+   //PIPS generated variable
    float v4sf_vec9[3+1];
+   //PIPS generated variable
+   ;
+   //PIPS generated variable
+   ;
+   //PIPS generated variable
+   ;
+   //PIPS generated variable
+   ;
+   //PIPS generated variable
+   ;
+   //PIPS generated variable
+   ;
+   //PIPS generated variable
+   ;
+   //PIPS generated variable
+   ;
+   //PIPS generated variable
+   ;
+   //PIPS generated variable
+   ;
+   //PIPS generated variable
+   ;
+   //PIPS generated variable
    float F_3;
    LU_NUB0 = n;
    LU_IB0 = MOD(LU_NUB0, 4);

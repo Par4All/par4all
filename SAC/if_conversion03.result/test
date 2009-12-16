@@ -37,10 +37,10 @@ void foo()
       I_0 = tab[i][i]>i;
       int j;
       j0 = i*2;
-      j = PHI(I_0, j0, j);
-      tab[i] = PHI(I_0, i, tab[i]);
+      j = I_0?j0:j;
+      tab[i] = I_0?i:tab[i];
       tab0 = tab[i]-j;
-      tab[i] = PHI(I_0, tab0, tab[i]);
+      tab[i] = I_0?tab0:tab[i];
       ;
    }
 }

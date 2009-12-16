@@ -37,6 +37,7 @@ float dotprod(float b[1000000], float c[1000000])
 {
    int i;
    float a = 0;
+   //PIPS generated variable
    float F_0;
    for(i = 0; i <= 999999; i += 1) {
       F_0 = b[i]*c[i];
@@ -48,9 +49,13 @@ float dotprod(float b[1000000], float c[1000000])
 {
    int i;
    float a = 0;
+   //PIPS generated variable
    float F_0;
+   //PIPS generated variable
    int LU_NUB0;
+   //PIPS generated variable
    int LU_IB0;
+   //PIPS generated variable
    int LU_IND0;
    LU_NUB0 = 1000000;
    LU_IB0 = 0;
@@ -80,10 +85,15 @@ float dotprod(float b[1000000], float c[1000000])
 {
    int i;
    float a = 0;
+   //PIPS generated variable
    float F_0;
+   //PIPS generated variable
    int LU_NUB0;
+   //PIPS generated variable
    int LU_IB0;
+   //PIPS generated variable
    int LU_IND0;
+   //PIPS generated variable
    float RED0[3+1];
    LU_NUB0 = 1000000;
    LU_IB0 = 0;
@@ -118,14 +128,23 @@ float dotprod(float b[1000000], float c[1000000])
 {
    int i;
    float a = 0;
+   //PIPS generated variable
    float F_0;
+   //PIPS generated variable
    int LU_NUB0;
+   //PIPS generated variable
    int LU_IB0;
+   //PIPS generated variable
    int LU_IND0;
+   //PIPS generated variable
    float RED0[3+1];
+   //PIPS generated variable
    float F_00;
+   //PIPS generated variable
    float F_01;
+   //PIPS generated variable
    float F_02;
+   //PIPS generated variable
    float F_03;
    LU_NUB0 = 1000000;
    LU_IB0 = 0;
@@ -160,22 +179,39 @@ float dotprod(float b[1000000], float c[1000000])
 {
    int i;
    float a = 0;
+   //PIPS generated variable
    float F_0;
+   //PIPS generated variable
    int LU_NUB0;
+   //PIPS generated variable
    int LU_IB0;
+   //PIPS generated variable
    int LU_IND0;
+   //PIPS generated variable
    float RED0[3+1];
+   //PIPS generated variable
    float F_00;
+   //PIPS generated variable
    float F_01;
+   //PIPS generated variable
    float F_02;
+   //PIPS generated variable
    float F_03;
+   //PIPS generated variable
    float v4sf_vec0[3+1];
+   //PIPS generated variable
    float v4sf_vec1[3+1];
+   //PIPS generated variable
    float v4sf_vec2[3+1];
+   //PIPS generated variable
    float v4sf_vec3[3+1];
+   //PIPS generated variable
    float v4sf_vec4[3+1];
+   //PIPS generated variable
    float v4sf_vec5[3+1];
+   //PIPS generated variable
    float v4sf_vec6[3+1];
+   //PIPS generated variable
    float v4sf_vec7[3+1];
    LU_NUB0 = 1000000;
    LU_IB0 = 0;
@@ -201,22 +237,39 @@ float dotprod(float b[1000000], float c[1000000])
 {
    int i;
    float a = 0;
+   //PIPS generated variable
    float F_0;
+   //PIPS generated variable
    int LU_NUB0;
+   //PIPS generated variable
    int LU_IB0;
+   //PIPS generated variable
    int LU_IND0;
+   //PIPS generated variable
    float RED0[3+1];
+   //PIPS generated variable
    float F_00;
+   //PIPS generated variable
    float F_01;
+   //PIPS generated variable
    float F_02;
+   //PIPS generated variable
    float F_03;
+   //PIPS generated variable
    float v4sf_vec0[3+1];
+   //PIPS generated variable
    float v4sf_vec1[3+1];
+   //PIPS generated variable
    float v4sf_vec2[3+1];
+   //PIPS generated variable
    float v4sf_vec3[3+1];
+   //PIPS generated variable
    float v4sf_vec4[3+1];
+   //PIPS generated variable
    float v4sf_vec5[3+1];
+   //PIPS generated variable
    float v4sf_vec6[3+1];
+   //PIPS generated variable
    float v4sf_vec7[3+1];
    LU_NUB0 = 1000000;
    LU_IB0 = 0;
@@ -242,18 +295,40 @@ float dotprod(float b[1000000], float c[1000000])
 {
    int i;
    float a = 0;
+   //PIPS generated variable
+   ;
+   //PIPS generated variable
    int LU_NUB0;
+   //PIPS generated variable
    int LU_IB0;
+   //PIPS generated variable
    int LU_IND0;
+   //PIPS generated variable
    float RED0[3+1];
+   //PIPS generated variable
    float F_00;
+   //PIPS generated variable
    float F_01;
+   //PIPS generated variable
    float F_02;
+   //PIPS generated variable
    float F_03;
+   //PIPS generated variable
    float v4sf_vec0[3+1];
+   //PIPS generated variable
    float v4sf_vec1[3+1];
+   //PIPS generated variable
    float v4sf_vec2[3+1];
+   //PIPS generated variable
    float v4sf_vec3[3+1];
+   //PIPS generated variable
+   ;
+   //PIPS generated variable
+   ;
+   //PIPS generated variable
+   ;
+   //PIPS generated variable
+   ;
    LU_NUB0 = 1000000;
    LU_IB0 = 0;
    LU_IND0 = 0;
@@ -281,18 +356,40 @@ float dotprod(float b[1000000], float c[1000000])
 {
    int i;
    float a = 0;
+   //PIPS generated variable
+   ;
+   //PIPS generated variable
    int LU_NUB0;
+   //PIPS generated variable
    int LU_IB0;
+   //PIPS generated variable
    int LU_IND0;
+   //PIPS generated variable
    float RED0[3+1];
+   //PIPS generated variable
    float F_00;
+   //PIPS generated variable
    float F_01;
+   //PIPS generated variable
    float F_02;
+   //PIPS generated variable
    float F_03;
+   //PIPS generated variable
    float v4sf_vec0[3+1];
+   //PIPS generated variable
    float v4sf_vec1[3+1];
+   //PIPS generated variable
    float v4sf_vec2[3+1];
+   //PIPS generated variable
    float v4sf_vec3[3+1];
+   //PIPS generated variable
+   ;
+   //PIPS generated variable
+   ;
+   //PIPS generated variable
+   ;
+   //PIPS generated variable
+   ;
    LU_NUB0 = 1000000;
    LU_IB0 = 0;
    LU_IND0 = 0;
