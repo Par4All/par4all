@@ -193,12 +193,16 @@ statement st;
 	return(make_control(st, NIL, NIL));
     }
     else {
+      /* FI: I do not understand the double cast from control to list
+	 in hash_get_default_empty_list() and then from list to
+	 control here... */
 	return((control)hash_get_default_empty_list(Label_control, label));
     }
 }
 
 /* GET_LABEL_CONTROL returns the control node corresponding to a
-   useful label NAME in the Label_control table. */
+   useful label NAME in the Label_control table. The name must be an
+   entity name, not a local or a user name. */
 
 static control get_label_control(name)
 string name;
@@ -207,7 +211,8 @@ string name;
 
     pips_assert("get_label_control", !empty_global_label_p(name)) ;
     c = (control)hash_get(Label_control, name);
-    pips_assert("get_label_control", c != (control) HASH_UNDEFINED_VALUE);
+    pips_assert("c is defined", c != (control) HASH_UNDEFINED_VALUE);
+    pips_assert("c is a control", check_control(c));
     return(c);
 }
 
@@ -1131,6 +1136,29 @@ static control compact_list(list ctls,
 			      CONS(STATEMENT, succ_st, NIL));
 	    }
 	  }
+	  if(!entity_empty_label_p(statement_label(control_statement(succ)))
+	     && !return_label_p(entity_name(statement_label(control_statement(succ))))) {
+	    /* We are going to free a node which may be accessible
+	       via a label... Let's hope no goto uses this label... */
+	    /* The quick fix would be not to fuse control with
+	       labelled statements, but labelled statements do not
+	       have to be the target of a goto statement. */
+	    entity l = statement_label(control_statement(succ));
+	    string ln = entity_name(l);
+	    control c = get_label_control(ln);
+	    if(!control_undefined_p(c))
+	      if(c==succ) {
+		/* This happens quite often in Syntax with no
+		   consequences; this leads to a core dump for
+		   C_syntax/block_scope13.c */
+		/* pips_user_warning("creation of a dangling pointer via "
+				  "hash table Label_control for label
+				  \"%s\"\n", ln); */
+	      }
+	      else
+		pips_internal_error("Inconsistent hash table Label_control: "
+				    "same labels points towards two different controls");
+	  }
 	  /* Skip the useless control: */
 	  control_statement(succ) = statement_undefined;
 	  remove_a_control_from_an_unstructured(succ);
@@ -1623,7 +1651,7 @@ statement st;
 	if (! hash_defined_p(Label_control, name)) {
 	    statement new_st = make_continue_statement(statement_label(st)) ;
 	    control c = make_control( new_st, NIL, NIL);
-
+	    pips_debug(8, "control %p allocated for label \"%s\"", c, name);
 	    hash_put(Label_control, name, (char *)c);
 	}
     }

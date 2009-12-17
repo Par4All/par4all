@@ -391,7 +391,9 @@ string entity_and_common_name(entity e)
 
 bool entity_empty_label_p(entity e)
 {
-  return empty_label_p(entity_local_name(e));
+  string lln = entity_local_name(e);
+  bool empty_p = empty_label_p(lln);
+  return empty_p;
 }
 
 bool entity_return_label_p(entity e)

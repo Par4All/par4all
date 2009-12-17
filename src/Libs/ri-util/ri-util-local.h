@@ -93,6 +93,7 @@
 /* For dmmmy parameters in functions declarations */
 #define DUMMY_PARAMETER_PREFIX         "DUMMY-PARAMETER-"
 
+/* Its value is "@", the label prefix followed by nothing */
 #define EMPTY_LABEL_NAME                LABEL_PREFIX
 #define LIST_DIRECTED_FORMAT_NAME       "LIST-DIRECTED"
 
