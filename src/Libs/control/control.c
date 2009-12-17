@@ -1129,6 +1129,7 @@ static control compact_list(list ctls,
 		statement_instruction(succ_st) = instruction_undefined;
 		free_statement(succ_st);
 		succ_st = statement_undefined;
+		control_statement(succ) = statement_undefined;
 	    }
 	    else {
 		instruction_block(i) =
@@ -1136,7 +1137,10 @@ static control compact_list(list ctls,
 			      CONS(STATEMENT, succ_st, NIL));
 	    }
 	  }
-	  if(!entity_empty_label_p(statement_label(control_statement(succ)))
+	  pips_assert("control succ and its statement are consistent",
+		      control_consistent_p(succ));
+	  if(!statement_undefined_p(control_statement(succ))
+	     && !entity_empty_label_p(statement_label(control_statement(succ)))
 	     && !return_label_p(entity_name(statement_label(control_statement(succ))))) {
 	    /* We are going to free a node which may be accessible
 	       via a label... Let's hope no goto uses this label... */
@@ -1146,7 +1150,7 @@ static control compact_list(list ctls,
 	    entity l = statement_label(control_statement(succ));
 	    string ln = entity_name(l);
 	    control c = get_label_control(ln);
-	    if(!control_undefined_p(c))
+	    if(!control_undefined_p(c)) {
 	      if(c==succ) {
 		/* This happens quite often in Syntax with no
 		   consequences; this leads to a core dump for
@@ -1158,6 +1162,7 @@ static control compact_list(list ctls,
 	      else
 		pips_internal_error("Inconsistent hash table Label_control: "
 				    "same labels points towards two different controls");
+	    }
 	  }
 	  /* Skip the useless control: */
 	  control_statement(succ) = statement_undefined;
