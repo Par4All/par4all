@@ -2,9 +2,7 @@ int main()
 {
    int *p;
    int *q;
-   int i;
-   int j;
-   int k;
+   int i, j, k;
 
    *p++;
    (*q)++;
