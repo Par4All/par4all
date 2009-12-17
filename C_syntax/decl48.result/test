@@ -22,7 +22,7 @@ Variable list:
 
 Derived entities:
 
-	Variable decl48!flat_color_z_triangle:0`1`#_PIPS_STRUCT_1	kind = struct
+	Variable "decl48!flat_color_z_triangle:0`1`#_PIPS_STRUCT_1"	kind = struct
 
 Layouts for memory areas:
 

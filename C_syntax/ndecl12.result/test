@@ -25,8 +25,8 @@ Variable list:
 
 Derived entities:
 
-	Variable main:0`#_PIPS_STRUCT_1	kind = struct
-	Variable main:0`#_PIPS_STRUCT_2	kind = struct
+	Variable "main:0`#_PIPS_STRUCT_1"	kind = struct
+	Variable "main:0`#_PIPS_STRUCT_2"	kind = struct
 
 Typedef entities:
 

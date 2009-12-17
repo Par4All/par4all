@@ -25,7 +25,7 @@ Variable list:
 
 Derived entities:
 
-	Variable ndecl11:0`?m	kind = enum
+	Variable "ndecl11:0`?m"	kind = enum
 
 Layout for formal parameters:
 

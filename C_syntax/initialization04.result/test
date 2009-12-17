@@ -24,9 +24,9 @@ External variable list:
 
 Derived entities:
 
-	Variable initialization04!:#f	kind = struct
-	Variable initialization04!:#s	kind = struct
-	Variable initialization04!:#si	kind = struct
+	Variable "initialization04!:#f"	kind = struct
+	Variable "initialization04!:#s"	kind = struct
+	Variable "initialization04!:#si"	kind = struct
 
 Typedef entities:
 

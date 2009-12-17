@@ -18,9 +18,9 @@ Variable list:
 
 Derived entities:
 
-	Variable decl10!:#_PIPS_STRUCT_1	kind = struct
-	Variable decl10!:'_PIPS_UNION_2	kind = union
-	Variable decl10!:?_PIPS_ENUM_3	kind = enum
+	Variable "decl10!:#_PIPS_STRUCT_1"	kind = struct
+	Variable "decl10!:'_PIPS_UNION_2"	kind = union
+	Variable "decl10!:?_PIPS_ENUM_3"	kind = enum
 
 Typedef entities:
 

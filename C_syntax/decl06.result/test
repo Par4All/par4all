@@ -19,7 +19,7 @@ Variable list:
 
 Derived entities:
 
-	Variable decl06!:#_err_manager	kind = struct
+	Variable "decl06!:#_err_manager"	kind = struct
 
 Layouts for memory areas:
 

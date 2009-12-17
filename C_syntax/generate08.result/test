@@ -29,8 +29,8 @@ External variable list:
 
 Derived entities:
 
-	Variable generate08!:#_PIPS_STRUCT_1	kind = struct
-	Variable generate08!:#first	kind = struct
+	Variable "generate08!:#_PIPS_STRUCT_1"	kind = struct
+	Variable "generate08!:#first"	kind = struct
 
 Typedef entities:
 

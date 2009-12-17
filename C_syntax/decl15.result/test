@@ -18,8 +18,8 @@ Variable list:
 
 Derived entities:
 
-	Variable decl15!:#_PIPS_STRUCT_1	kind = struct
-	Variable decl15!:'_PIPS_UNION_2	kind = union
+	Variable "decl15!:#_PIPS_STRUCT_1"	kind = struct
+	Variable "decl15!:'_PIPS_UNION_2"	kind = union
 
 Typedef entities:
 
