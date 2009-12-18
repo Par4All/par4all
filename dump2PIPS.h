@@ -208,6 +208,7 @@ expression gfc2pips_buildCaseTest(gfc_expr *tested_variable, gfc_case *cp);
 newgen_list gfc2pips_dumpSELECT(gfc_code *c);
 instruction gfc2pips_symbol2data_instruction(gfc_symbol *sym);
 expression gfc2pips_make_zero_for_symbol(gfc_symbol* sym);
+newgen_list gfc2pips_reduce_repeated_values(newgen_list l);
 entity gfc2pips_code2get_label(gfc_code *c);
 entity gfc2pips_code2get_label2(gfc_code *c);
 entity gfc2pips_code2get_label3(gfc_code *c);
@@ -232,6 +233,7 @@ void gfc2pips_computeAdressesStatic(void);
 void gfc2pips_computeAdressesDynamic(void);
 void gfc2pips_computeAdressesHeap(void);
 int gfc2pips_computeAdressesOfArea( entity _area );
+void gfc2pips_shiftAdressesOfArea( entity _area, int old_offset, int size, int max_offset, int shift );
 
 newgen_list *gfc2pips_list_of_all_modules;
 

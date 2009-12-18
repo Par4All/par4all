@@ -11,6 +11,10 @@
 
 newgen_list gfc2pips_list_of_declared_code = NULL;
 newgen_list gfc2pips_list_of_loops = NULL;
+
+newgen_list gfc2pips_format = NULL;//list of expression format
+newgen_list gfc2pips_format2 = NULL;//list of labels for above
+
 static int gfc2pips_last_created_label = 95000;
 static int gfc2pips_last_created_label_step = 2;
 
@@ -69,6 +73,9 @@ int fcopy(char* old,char* new){
 	return 0;
 }
 
+/**
+ * @brief epurate a string representing a REAL, could be a pre-prettyprinter processing
+ */
 void gfc2pips_truncate_useless_zeroes(char *s){
 	char *start = s;
 	bool has_dot = false;
@@ -76,7 +83,7 @@ void gfc2pips_truncate_useless_zeroes(char *s){
 	while(*s){
 		if(*s=='.'){
 			has_dot=true;
-			pips_debug(9,"found dot at %d\n",s-start);
+			pips_debug(9,"found [dot] at %d\n",s-start);
 			s++;
 			while(*s){
 				if(*s=='e'){
@@ -96,7 +103,7 @@ void gfc2pips_truncate_useless_zeroes(char *s){
 		}else{
 			s=start+strlen(start);
 		}
-		//comme back if we are in scientific output
+
 		while(s>start){
 			if(*s=='0'){
 				*s='\0';
@@ -106,16 +113,19 @@ void gfc2pips_truncate_useless_zeroes(char *s){
 			}
 			s--;
 		}
-		pips_debug(9,"%d zero(es) retrieved\n", nb);
+		pips_debug(9,"%d zero(s) retrieved\n", nb);
 		/*if(*s=='.'){
 			*s='\0';
 			s--;
 			pips_debug(9,"final dot retrieved\n");
 		}*/
-		if(end_sci && s!=end_sci-1){
-			strcpy(s+1,end_sci);
+		if(end_sci){
+			if(strcmp(end_sci,"e+00")==0){
+				*(s+1)='\0';
+			}else if(s!=end_sci-1){
+				strcpy(s+1,end_sci);
+			}
 		}
-		//if(*start=='\0') *start='0';
 	}
 }
 
@@ -142,6 +152,7 @@ void gfc2pips_namespace(gfc_namespace* ns){
 	  value _entity_initial_;			x
 	};*/
 	instruction icf = instruction_undefined;
+	gfc2pips_format = gfc2pips_format2 = NULL;
 
 
 	pips_debug(2, "Starting gfc 2 pips dumping\n");
@@ -249,6 +260,7 @@ void gfc2pips_namespace(gfc_namespace* ns){
 		parameters = gfc2pips_args(ns);//change it to put both name and namespace in order to catch the parameters of any subroutine ? or create a sub-function for gfc2pips_args
 		parameters_name = gen_copy_seq(parameters);//we need a copy of the list of the entities of the parameters
 		gfc2pips_generate_parameters_list(parameters);
+		//fprintf(stderr,"formal created ?? %d\n", storage_formal_p(entity_storage(ENTITY(CAR(parameters_name)))));
 
 	    //ScanFormalParameters(gfc2pips_main_entity, add_formal_return_code(parameters));
 	}
@@ -494,7 +506,7 @@ void gfc2pips_namespace(gfc_namespace* ns){
 		}
 		POP(list_of_subroutines_p);
 	}
-	pips_debug(2, "%d subroutine(s) encountered\n",gen_length(list_of_subroutines));
+	pips_debug(2, "%d subroutine(s) encountered\n", gen_length(list_of_subroutines) );
 
 
 	complete_list_of_entities = gen_union(
@@ -606,6 +618,22 @@ void gfc2pips_namespace(gfc_namespace* ns){
 	//we have a conflict in storage
 	//ComputeAddresses();
 	gfc2pips_computeAdresses();
+
+	//gfc2pips_computeEquiv(ns->equiv);
+/*show_equiv (gfc_equiv *eq)
+	{
+	  //quand une ou plusieurs variables sont équivalentes, l'adresse de la première en mémoire deviens celles de toutes. Les adresses de toutes les variables qui s'ensuivent sont décalées si la variable mise plus en avant est plus large que la précédente.
+	  show_indent ();
+	  fputs ("Equivalence: ", dumpfile);
+	  while (eq)
+	    {
+	      show_expr (eq->expr);
+	      eq = eq->eq;
+	      if (eq)
+		fputs (", ", dumpfile);
+	    }
+	}
+*/
 	//SaveChains();//Syntax !! handle equiv in some way, look into it, need to use SetChains(); at the beginning to initiate
 	//update_common_sizes();//Syntax !!//we have the job done 2 times if debug is at 9, one time if at 8
 	//print_common_layout(stderr,StaticArea,true);
@@ -732,7 +760,8 @@ newgen_list gfc2pips_args(gfc_namespace* ns){
 							CDR(args_list) = CONS( ENTITY, e, NULL );
 							args_list = CDR(args_list);
 						}else{
-							return args_list_p;//alternate returns are obsolete in F90 (and since we only want it)
+							return args_list_p;
+							//return args_list_p;//alternate returns are obsolete in F90 (and since we only want it)
 							uses_alternate_return(true);
 							e = generate_pseudo_formal_variable_for_formal_label(
 								CurrentPackage,
@@ -904,7 +933,12 @@ newgen_list gfc2pips_vars_(gfc_namespace *ns,newgen_list variables_p){
 						&& current_symtree->n.sym->as->type!=AS_EXPLICIT
 						&& !current_symtree->n.sym->value
 					){//some other criteria is needed
-						area = StackArea;
+						if(current_symtree->n.sym->attr.allocatable){
+							//we do know this entity is allocatable, it's place is in the heap. BUT in order to prettyprint the ALLOCATABLE statement, we need an other means to differenciate allocatables from the others.
+							area = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,"*ALLOCATABLE*");
+						}else{
+							area = StackArea;
+						}
 					}else{
 						area = DynamicArea;
 					}
@@ -912,7 +946,7 @@ newgen_list gfc2pips_vars_(gfc_namespace *ns,newgen_list variables_p){
 						9,
 						"Variable \"%s\" put in RAM \"%s\"\n",
 						entity_local_name((entity)variables->car.e),
-						area==DynamicArea ? DYNAMIC_AREA_LOCAL_NAME:STACK_AREA_LOCAL_NAME
+						area==DynamicArea ? DYNAMIC_AREA_LOCAL_NAME:(area==StackArea ?STACK_AREA_LOCAL_NAME:"*ALLOCATABLE*")
 					);
 				}
 				ram _r_ = make_ram(
@@ -1002,7 +1036,7 @@ newgen_list gfc2pips_get_list_of_dimensions2(gfc_symbol *s){
 					i = as->rank-1;
 					do{
 						//check lower ou upper n'est pas une variable dont la valeur est inconnue
-						list_of_dimensions = gen_int_cons(
+						list_of_dimensions = gen_cons(
 							make_dimension(
 									gfc2pips_expr2expression(as->lower[i]),
 									gfc2pips_expr2expression(as->upper[i])
@@ -1011,19 +1045,32 @@ newgen_list gfc2pips_get_list_of_dimensions2(gfc_symbol *s){
 						);
 					}while(--i >= j);
 				break;
-				case AS_DEFERRED:
+				case AS_DEFERRED://beware allocatable !!!
 					c = strdup("AS_DEFERRED");
 					i = as->rank-1;
-					do{
-						list_of_dimensions = gen_int_cons(
+					if(s->attr.allocatable){
+						do{
+							list_of_dimensions = gen_cons(
+								make_dimension(
+									MakeNullaryCall(CreateIntrinsic(UNBOUNDED_DIMENSION_NAME)),
+									MakeNullaryCall(CreateIntrinsic(UNBOUNDED_DIMENSION_NAME))
+								),
+								list_of_dimensions
+							);
+						}while(--i >= j);
+					}else{
+						do{
+							list_of_dimensions = gen_cons(
 								make_dimension(
 									MakeIntegerConstantExpression("1"),
 									MakeNullaryCall(CreateIntrinsic(UNBOUNDED_DIMENSION_NAME))
 								),
-							list_of_dimensions
-						);
-					}while(--i >= j);
+								list_of_dimensions
+							);
+						}while(--i >= j);
+					}
 				break;
+				//AS_ASSUMED_...  means information come from a dummy argument and the property is inherited from the call
 				case AS_ASSUMED_SIZE://means only the last set of dimensions is unknown
 					j=1;
 					c = strdup("AS_ASSUMED_SIZE");
@@ -1265,9 +1312,13 @@ entity gfc2pips_symbol2entity( gfc_symbol* s ){
 	}
 	//it is a module and we do not know it yet, so we put an empty content in it
 	if( module ){
-		entity_initial(e) = make_value_code(
-			make_code(NULL,strdup(""),make_sequence(NIL),NULL, make_language_fortran())
-		);
+		//message_assert("arg ! bad handling",entity_initial(e)==value_undefined);
+		//fprintf(stderr,"value ... ... ... %s\n",entity_initial(e)==value_undefined?"ok":"nok");
+		if(entity_initial(e)==value_undefined){
+			entity_initial(e) = make_value_code(
+				make_code(NULL,strdup(""),make_sequence(NIL),NULL, make_language_fortran())
+			);
+		}
 	}
 	free(name);
 	return e;
@@ -1873,6 +1924,7 @@ instruction gfc2pips_code2instruction__TOP(gfc_namespace *ns, gfc_code* c){
 		return make_instruction_block(CONS(STATEMENT, make_stmt_of_instr(make_instruction_block(NULL)), NIL));
 	}
 
+
 	//dump other
 	//we know we have at least one instruction, otherwise we would have returned an empty list of statements
 	do{
@@ -1955,6 +2007,35 @@ instruction gfc2pips_code2instruction__TOP(gfc_namespace *ns, gfc_code* c){
 			}
 		}
 	}
+
+	//FORMAT
+	//we have the informations only at the end, (<=>now)
+	newgen_list gfc2pips_format_p = gfc2pips_format;
+	newgen_list gfc2pips_format2_p = gfc2pips_format2;fprintf(stderr,"list of formats: 0x%e %d\n",gfc2pips_format,gen_length(gfc2pips_format));
+	newgen_list list_of_statements_format = NULL;
+	while(gfc2pips_format_p){
+		i = MakeZeroOrOneArgCallInst("FORMAT", (expression)gfc2pips_format_p->car.e);
+		statement s = make_statement(
+			gfc2pips_int2label((int)gfc2pips_format2_p->car.e),
+			STATEMENT_NUMBER_UNDEFINED,
+			STATEMENT_ORDERING_UNDEFINED,
+			//comments,
+			empty_comments,
+			i,
+			NULL,
+			NULL,
+			empty_extensions()
+		);
+		//unlike the classical method, we don't know if we have had a first statement (data inst)
+		list_of_statements_format = gen_nconc(
+				list_of_statements_format,
+			CONS(STATEMENT, s, NIL)
+		);
+		POP(gfc2pips_format_p);
+		POP(gfc2pips_format2_p);
+	}
+	list_of_statements = gen_nconc(list_of_statements_format,list_of_statements);
+
 	if(list_of_statements){
 		return make_instruction_block(list_of_statements);//make a sequence <=> make_instruction_sequence(make_sequence(list_of_statements));
 	}else{
@@ -2102,9 +2183,15 @@ instruction gfc2pips_code2instruction_(gfc_code* c){
 */
 		case EXEC_INIT_ASSIGN:
 		case EXEC_ASSIGN:{
-			pips_debug(5, "Translation of assign: %d %d\n", c->expr, c->expr2 );
+			pips_debug(5, "Translation of ASSIGN\n\t%d %d\n", c->expr, c->expr2 );
 			//if(c->expr->expr_type==EXPR_FUNCTION)
-			instruction i = make_assign_instruction(
+			/*call _call_ = make_call(
+				entity_intrinsic(ASSIGN_OPERATOR_NAME),
+				CONS(EXPRESSION, gfc2pips_expr2expression(c->expr), CONS(EXPRESSION, gfc2pips_expr2expression(c->expr2), NIL))
+			);
+			instruction i = make_instruction(is_instruction_call, _call_);
+			*/
+			instruction i = make_assign_instruction(//useless assert in make_assign_instruction ? check if it has an impact on the PIPS analyses !
 				gfc2pips_expr2expression(c->expr),//beware, cannot be a TOP-LEVEL entity IF it is an assignment to a function, some complications are to be expected
 				gfc2pips_expr2expression(c->expr2)
 			);
@@ -2121,7 +2208,7 @@ instruction gfc2pips_code2instruction_(gfc_code* c){
 
 */
 		case EXEC_POINTER_ASSIGN:{
-			pips_debug(5, "Translation of assign pointer\n");
+			pips_debug(5, "Translation of assign POINTER ASSIGN\n");
 			newgen_list list_of_arguments = CONS(EXPRESSION,gfc2pips_expr2expression(c->expr2),NIL);
 
 
@@ -2163,6 +2250,7 @@ instruction gfc2pips_code2instruction_(gfc_code* c){
 				//erreur
 				return instruction_undefined;
 			}
+			newgen_list list_of_arguments = gfc2pips_arglist2arglist(c->ext.actual);
 			/*str = symbol->name;
 			if(strncmp_("_gfortran_", str, strlen("_gfortran_") )==0){
 				str = str2upper(strdup("exit"));
@@ -2176,18 +2264,33 @@ instruction gfc2pips_code2instruction_(gfc_code* c){
 			if( entity_initial(called_function)==entity_undefined )
 				entity_initial(called_function) = make_value(is_value_intrinsic, called_function );
 
-			if(entity_type(called_function)==type_undefined)
-				entity_type(called_function) = make_type_functional( make_functional(NIL, MakeOverloadedResult()) );
+			if(entity_type(called_function)==type_undefined){
+				//fprintf(stderr,"type is already undefined %s\n",entity_name(called_function));
+				//invent list of parameters
+				newgen_list param_of_call = gen_copy_seq(list_of_arguments);
+				newgen_list param_of_call_p = param_of_call;
+				//need to translate list_of_arguments in sthg
+				while(param_of_call_p){
+					entity _new = gen_copy_tree((entity)param_of_call_p->car.e);
+					entity_name(_new) = "toto";
+					fprintf(stderr,"%s %s",entity_name((entity)param_of_call_p->car.e), entity_name(_new));
+					param_of_call_p->car.e = _new;
+					POP(param_of_call_p);
+				}
 
-			if(type_functional_p(entity_type(called_function)) && strcmp(symbol->name, symbol->ns->proc_name->name)!=0 ){
+				entity_type(called_function) = make_type_functional( make_functional(NULL, MakeOverloadedResult()) );
+			}else{
+				//fprintf(stderr,"type is already defined ? %s %d\n",entity_name(called_function), gen_length(functional_parameters(type_functional(entity_type(called_function)))));
+			}
+
+			/*if(type_functional_p(entity_type(called_function)) && strcmp(symbol->name, symbol->ns->proc_name->name)!=0 ){
 				//check list of parameters;
 				newgen_list check_sub_parameters = functional_parameters(type_functional(entity_type(called_function)));
 				if( check_sub_parameters==NULL ){
 					//on récupère les types des paramètres pour changer la liste des paramètres
 				}
-			}
+			}*/
 
-			newgen_list list_of_arguments = gfc2pips_arglist2arglist(c->ext.actual);
 			call call_ = make_call(called_function, list_of_arguments);
 
 /*
@@ -2381,7 +2484,7 @@ instruction gfc2pips_code2instruction_(gfc_code* c){
 			//block = ELSE { next }
 		}break;
 
-		//we HAVE TO create a list of instructions so we shouldn't put it here but in gfc2pips_code2instruction()
+		//we HAVE TO create a list of instructions so we shouldn't put it here but in gfc2pips_code2instruction() (done)
 /*		case EXEC_SELECT:{//it is a switch or several elseif
 			pips_debug(5, "Translation of SELECT into IF\n");
 			newgen_list list_of_instructions_p = NULL, list_of_instructions = NULL;
@@ -2412,8 +2515,9 @@ instruction gfc2pips_code2instruction_(gfc_code* c){
 
 			return make_instruction_block(list_of_instructions);
 		}break;
+*/
 
-/*	    case EXEC_WHERE:
+		/*case EXEC_WHERE:
 	      fputs ("WHERE ", dumpfile);
 
 	      d = c->block;
@@ -2571,38 +2675,30 @@ instruction gfc2pips_code2instruction_(gfc_code* c){
 	      if (c->symtree)
 		fprintf (dumpfile, " %s", c->symtree->n.sym->name);
 	      break;
-
+*/
 	    case EXEC_ALLOCATE:
-	      fputs ("ALLOCATE ", dumpfile);
-	      if (c->expr)
-		{
-		  fputs (" STAT=", dumpfile);
-		  show_expr (c->expr);
-		}
+	    case EXEC_DEALLOCATE:{
+	    	pips_debug(5, "Translation of %s\n",c->op==EXEC_ALLOCATE?"ALLOCATE":"DEALLOCATE");
+			newgen_list lci = NULL;
+	    	gfc_alloc *a;
+	    	entity e = FindOrCreateEntity(strdup(TOP_LEVEL_MODULE_NAME), str2upper(strdup(c->op==EXEC_ALLOCATE?"allocate":"deallocate")));
+			entity_initial(e) = make_value(is_value_intrinsic, e );
+			entity_type(e) = make_type_functional(make_functional(NIL, MakeOverloadedResult()));
+			//some problem inducted by the prettyprinter output become DEALLOCATE (variable, STAT=, I)
+			if(c->expr)
+				lci = gfc2pips_exprIO("STAT=", c->expr, NULL );
 
-	      for (a = c->ext.alloc_list; a; a = a->next)
-		{
-		  fputc (' ', dumpfile);
-		  show_expr (a->expr);
-		}
-
-	      break;
-
-	    case EXEC_DEALLOCATE:
-	      fputs ("DEALLOCATE ", dumpfile);
-	      if (c->expr)
-		{
-		  fputs (" STAT=", dumpfile);
-		  show_expr (c->expr);
-		}
-
-	      for (a = c->ext.alloc_list; a; a = a->next)
-		{
-		  fputc (' ', dumpfile);
-		  show_expr (a->expr);
-		}
-	      break;
-*/	    case EXEC_OPEN:{
+			for (a = c->ext.alloc_list; a; a = a->next){
+				lci = CONS(EXPRESSION, gfc2pips_expr2expression(a->expr), lci );//DATA_LIST_FUNCTION_NAME, IO_LIST_STRING_NAME, or sthg else ?
+				//show_expr (a->expr);
+			}
+			return make_instruction_call(
+				make_call(e,
+					gen_nconc(lci, NULL)
+				)
+			);
+	    }break;
+	    case EXEC_OPEN:{
 			pips_debug(5, "Translation of OPEN\n");
 			entity e = FindOrCreateEntity(strdup(TOP_LEVEL_MODULE_NAME), str2upper(strdup("open")));
 			entity_initial(e) = make_value(is_value_intrinsic, e );
@@ -2701,6 +2797,8 @@ instruction gfc2pips_code2instruction_(gfc_code* c){
 			else if(c->op==EXEC_ENDFILE) str = "endfile";
 			else if(c->op==EXEC_REWIND) str = "rewind";
 			else if(c->op==EXEC_FLUSH) str = "flush";
+			else pips_user_error("Your computer is mad\n");//no other possibility
+
 			pips_debug(5, "Translation of %s\n",str);
 			entity e = FindOrCreateEntity(strdup(TOP_LEVEL_MODULE_NAME), str2upper(strdup(str)));
 			entity_initial(e) = make_value(is_value_intrinsic, e );
@@ -2932,8 +3030,26 @@ instruction gfc2pips_code2instruction_(gfc_code* c){
 				){
 					if(d->ext.dt->format_label->format){
 						f = gfc2pips_int2expression(d->ext.dt->format_label->value);
-						//do we have to change the string ? we've got parentheses around the expression for the moment
-						f = gfc2pips_expr2expression(d->ext.dt->format_label->format);
+
+						//we have to push the current FORMAT in a list, we will dump it at the very, very TOP
+						//we need to change the expression, a FORMAT statement doesn't have quotes around it
+						expression fmt_expr = gfc2pips_expr2expression(d->ext.dt->format_label->format);
+						//delete too much quotes
+						char* str = entity_name(call_function(syntax_call(expression_syntax(fmt_expr))));
+						//fprintf(stderr,"new format: %s\n",str);
+						int curr_char_indice = 0,curr_char_indice_cible = 0, length_curr_format=strlen(str) ;
+						//str[0] = str[1];
+						for(;
+							curr_char_indice_cible<length_curr_format-1 ;
+							curr_char_indice++,curr_char_indice_cible++
+						){
+							if(str[curr_char_indice_cible]=='\'') curr_char_indice_cible++;
+							str[curr_char_indice] = str[curr_char_indice_cible];
+						}
+						str[curr_char_indice] = '\0';
+
+						gfc2pips_format = gen_cons(fmt_expr,gfc2pips_format);
+						gfc2pips_format2 = gen_cons(d->ext.dt->format_label->value,gfc2pips_format2);
 					}else{
 						//error or warning: we have bad code
 						pips_error("gfc2pips_code2instruction","No format for label\n");
@@ -3047,7 +3163,7 @@ instruction gfc2pips_code2instruction_(gfc_code* c){
 */
 
 	    }break;
-	    //this should be never dumped car only used in a WRITE block of gfc
+	    //this should be never dumped because only used in a WRITE block of gfc
 	    /*case EXEC_TRANSFER:
 	      fputs ("TRANSFER ", dumpfile);
 	      show_expr (c->expr);
@@ -3298,7 +3414,7 @@ instruction gfc2pips_symbol2data_instruction(gfc_symbol *sym){
 			}
 		}
 
-		if( prec && offset_end < ((double)total_size) / (double)size_of_unit ){
+		if( prec && offset_end+1 < ((double)total_size) / (double)size_of_unit ){
 			pips_debug(9,"We fill all the remaining space in the DATA %d\n",offset_end);
 			values = CONS( EXPRESSION,
 				MakeBinaryCall(
@@ -3324,6 +3440,7 @@ instruction gfc2pips_symbol2data_instruction(gfc_symbol *sym){
 
 	entity e2 = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, STATIC_INITIALIZATION_FUNCTION_NAME);
 	entity_initial(e2) = MakeValueUnknown();
+	values = gfc2pips_reduce_repeated_values(values);
 	newgen_list args2 = gen_nconc(init, values);
 	call call_ = make_call( e2, args2 );
 	return make_instruction_call( call_);
@@ -3342,6 +3459,83 @@ expression gfc2pips_make_zero_for_symbol(gfc_symbol* sym){
 	}else{
 		return gfc2pips_int2expression(0);
 	}
+}
+
+/**
+ * @brief look for repeated values in the list (list for DATA instructions) and transform them in a FORTRAN repeat syntax
+ *
+ * DATA x /1,1,1/ =>  DATA x /3*1/
+ *
+ * TODO: look into the consistency issue
+ */
+newgen_list gfc2pips_reduce_repeated_values(newgen_list l){
+	//return l;
+	expression curr=NULL, prec = NULL;
+	newgen_list local_list = l, last_pointer_on_list=NULL;
+	int nb_of_occurences=0;
+	pips_debug(9, "begin reduce of values\n");
+	//add recognition of /3*1, 4*1/ to make it a /7*1/
+	while(local_list){
+		curr = (expression)local_list->car.e;
+		if(expression_is_constant_p(curr)){
+			if( prec && expression_is_constant_p(prec) ){
+				if( reference_variable(syntax_reference(expression_syntax(curr))) == reference_variable(syntax_reference(expression_syntax(prec))) ){
+					pips_debug(10, "same as before\n");
+					nb_of_occurences++;
+				}else if(nb_of_occurences>1){
+					//reduce
+					pips_debug(9, "reduce1 %s %d\n",entity_name(reference_variable(syntax_reference(expression_syntax(prec)))),nb_of_occurences);
+					last_pointer_on_list->car.e = MakeBinaryCall(
+						CreateIntrinsic("*"),
+						gfc2pips_int2expression(nb_of_occurences),
+						prec
+					);
+					last_pointer_on_list->cdr = local_list;
+
+					nb_of_occurences=1;
+					last_pointer_on_list = local_list;
+				}else{
+					pips_debug(10, "skip to next\n");
+					nb_of_occurences=1;
+					last_pointer_on_list = local_list;
+				}
+			}else{
+				pips_debug(10, "no previous\n");
+				nb_of_occurences=1;
+				last_pointer_on_list = local_list;
+			}
+			prec = curr;
+		}else{//we will not be able to reduce
+			pips_debug(10, "not a constant\n");
+			if(nb_of_occurences>1){
+				//reduce
+				pips_debug(9, "reduce2 %s %d\n", entity_name(reference_variable(syntax_reference(expression_syntax(prec)))), nb_of_occurences );
+				last_pointer_on_list->car.e = MakeBinaryCall(
+					CreateIntrinsic("*"),
+					gfc2pips_int2expression(nb_of_occurences),
+					prec
+				);
+				last_pointer_on_list->cdr = local_list;
+			}
+			nb_of_occurences=0;//no dump, thus no increment
+			last_pointer_on_list = NULL;//no correct reference needed
+		}
+		POP(local_list);
+	}
+	//a last sequence of data ?
+	if(nb_of_occurences>1){
+		//reduce
+		pips_debug(9, "reduce3 %s %d\n",entity_name(reference_variable(syntax_reference(expression_syntax(prec)))),nb_of_occurences);
+		last_pointer_on_list->car.e = MakeBinaryCall(
+			CreateIntrinsic("*"),
+			gfc2pips_int2expression(nb_of_occurences),
+			prec
+		);
+		last_pointer_on_list->cdr = local_list;
+		last_pointer_on_list = local_list;
+	}
+	pips_debug(9, "reduce of values done\n");
+	return l;
 }
 
 
@@ -3537,7 +3731,15 @@ expression gfc2pips_expr2expression(gfc_expr *expr){
 					//fprintf(stderr,"^^^^^^^^^^^^^^^^^^^^^\n");
 					if(r->type==REF_ARRAY){
 						pips_debug(9,"ref array\n");
-						if( gfc2pips_there_is_a_range(&r->u.ar) ){
+						if(r->u.ar.type == AR_FULL){
+							//a=b  where a and b are full array, we are handling one of the expressions
+							return make_expression(
+								make_syntax_reference(
+									make_reference(ent_ref, NULL)
+								),
+								normalized_undefined
+							);
+						}else if( gfc2pips_there_is_a_range(&r->u.ar) ){
 							pips_debug(9,"We have a range\n");
 							/*
 							 * here we have something like x( a:b ) or y( c:d , e:f )
@@ -3816,6 +4018,7 @@ void gfc2pips_initAreas(void){
 /**
  * @brief compute addresses of the stack, heap, dynamic and static areas
  */
+//aller se balader dans "static segment_info * current_segment;" qui contient miriade d'informations sur la mémoire
 void gfc2pips_computeAdresses(void){
 	//check les déclarations, si UNBOUNDED_DIMENSION_NAME dans la liste des dimensions => direction *STACK*
 	gfc2pips_computeAdressesHeap();
@@ -3844,7 +4047,7 @@ void gfc2pips_computeAdressesHeap(void){
 /**
  * @brief compute the addresses of the entities declared in the given entity
  */
-int gfc2pips_computeAdressesOfArea( entity _area ){//pb induit dans cette fonction, on se retrouve au dernier élément si on y refait appel
+int gfc2pips_computeAdressesOfArea( entity _area ){
 	//compute each and every addresses of the entities in this area. Doesn't handle equivalences.
 	if(
 		!_area
@@ -3880,7 +4083,7 @@ int gfc2pips_computeAdressesOfArea( entity _area ){//pb induit dans cette foncti
 				ram_offset(storage_ram(entity_storage(e))) = offset;
 
 				area ca = type_area(entity_type(_area));
-				area_layout(ca) = gen_nconc(area_layout(ca), CONS(ENTITY, e, NIL));
+				area_layout(ca) = gen_nconc( area_layout(ca), CONS(ENTITY, e, NIL) );
 
 				int size;
 				SizeOfArray(e,&size);
@@ -3890,89 +4093,119 @@ int gfc2pips_computeAdressesOfArea( entity _area ){//pb induit dans cette foncti
 	}
 
 	set_common_to_size( _area, offset );
-	pips_debug( 9, "offset: %d\t\tEnd %s\n", offset, entity_local_name(_area) );
+	pips_debug( 9, "next offset: %d\t\tEnd %s\n", offset, entity_local_name(_area) );
 	return offset;
 }
 
-void gfc2pips_handleEquiv(gfc_equiv *eq){
-	//StoreEquivChain(chain c){
+void gfc2pips_computeEquiv(gfc_equiv *eq){
+	//ComputeEquivalences();//syntax/equivalence.c
+	//offset = calculate_offset(eq->expr);  enlever le static du fichier
 
-/*
-latom: atom
-		    {
-			$$ = make_chain(CONS(ATOM, MakeEquivAtom($1), (cons*) NULL));
-		    }
-		| latom TK_COMMA atom
-		    {
-			chain_atoms($1) = CONS(ATOM, MakeEquivAtom($3),
-					     chain_atoms($1));
-			$$ = $1;
-		    }
-		;
-<syntax>atom: entity_name
-	    {
-		$$ = MakeAtom($1, NIL, expression_undefined,
-				expression_undefined, FALSE);
-	    }
-	| entity_name indices
-	    {
-		$$ = MakeAtom($1, $2, expression_undefined,
-				expression_undefined, TRUE);
-	    }
-	| entity_name TK_LPAR opt_expression TK_COLON opt_expression TK_RPAR
-	    {
-		$$ = MakeAtom($1, NIL, $3, $5, TRUE);
-	    }
-	| entity_name indices TK_LPAR opt_expression TK_COLON opt_expression TK_RPAR
-	    {
-		$$ = MakeAtom($1, $2, $4, $6, TRUE);
-	    }
-	;
 
+/* how does PIPS know there is an equivalence to output ?
+lequivchain: equivchain | lequivchain TK_COMMA equivchain;
+
+equivchain: TK_LPAR latom TK_RPAR{ StoreEquivChain($2); };
+
+latom: atom {
+		$$ = make_chain(CONS(ATOM, MakeEquivAtom($1), (newgen_list) NULL));
+	} | latom TK_COMMA atom {
+		chain_atoms($1) = CONS(ATOM, MakeEquivAtom($3),chain_atoms($1));
+		$$ = $1;
+    };
 */
-    int maxoff;
 
-    maxoff = 0;
-    //pour chaque chaine ? ou chaque élément de la chaine ?
-    gfc_equiv * save = eq;
-    for( ; eq ; eq=eq->eq ){
-    	//ce n'est pas du tout ce qu'il faut
-    	printf("test of offset: %d\n", (int)expression_syntax_(gfc2pips_expr2expression(eq->expr) ) );
-    	/*
-struct _newgen_struct_atom_ {
-  intptr_t _type_;
-  entity _atom_equivar_;
-  intptr_t _atom_equioff_;
-};
-    	 */
-		//int o = atom_equioff(ATOM(CAR(pc)));
-    	int o = atom_equioff( (atom)expression_syntax_(gfc2pips_expr2expression(eq->expr) ));
+    for( ; eq ; eq=eq->next ){
+    	gfc_equiv * save = eq;
+    	gfc_equiv *eq_;
+    	pips_debug(9,"sequence of equivalences\n");
+    	entity storage_area = entity_undefined;
+    	entity not_moved_entity = entity_undefined;
+    	int offset=0;
+    	int size=-1;
+    	int not_moved_entity_size;
+    	for( eq_=eq ; eq_ ; eq_=eq_->eq ){
+			//check in same memory storage, not formal, not *STACK* ('cause size unknown)
+			//take minimum offset
+			//calculate the difference in offset to the next variable
+			//set the offset to the variable with the greatest offset
+			//add if necessary the difference of offset to all variable with an offset greater than the current one (and not equiv too ? or else need to proceed in order of offset ...)
+			// ?? gfc2pips_expr2int(eq->expr); ??
 
-		if (o > maxoff)	maxoff = o;
-	}
+			message_assert("expression to compute in equivalence\n",eq_->expr);
+			pips_debug(9,"equivalence of %s\n",eq_->expr->symtree->name);
 
-	pips_debug(9, "maxoff %d\n", maxoff);
+			//we have to absolutely know if it is an element in an array or a single variable
+			entity e = gfc2pips_check_entity_exists(eq->expr->symtree->name);//this doesn't give an accurate idea for the offset, just an idea about the storage
+			message_assert("entity has been founded\n",e!=entity_undefined);
+			if(size==-1)not_moved_entity = e;
 
-	eq = save;
-	if (maxoff > 0) {
-	    for( ; eq ; eq=eq->eq ){
-			atom a = expression_syntax_(gfc2pips_expr2expression(eq->expr));
+			message_assert("Storage is defined\n", entity_storage(e) != storage_undefined );
+			message_assert("Storage is not STACK\n", entity_storage(e) != StackArea );
+			message_assert("Storage is not HEAP\n", entity_storage(e) != HeapArea );
+			message_assert("Storage is RAM\n", storage_ram_p(entity_storage(e)) );
 
-			atom_equioff(a) = abs(atom_equioff(a)-maxoff);
+			if(!storage_area)
+				storage_area = ram_section(storage_ram(entity_storage(e)));
+			message_assert("Entities are in the same area\n", ram_section(storage_ram(entity_storage(e)))==storage_area );
+
+			storage_area = ram_section(storage_ram(entity_storage(e)));
+
+
+			//expression ex = gfc2pips_expr2expression(eq_->expr);
+			//fprintf(stderr,"toto %x\n",ex);
+
+			//int offset_of_expression = gfc2pips_offset_of_expression(eq_->expr);
+			//relative offset from the beginning of the variable (null if simple variable or first value of array)
+			int offset_of_expression = calculate_offset(eq_->expr);//gcc/fortran/trans-common.c
+			//int offset_of_expression = ram_offset(storage_ram(entity_storage(e)));
+			offset_of_expression += ram_offset(storage_ram(entity_storage(e)));
+
+			if(size!=-1){
+				//gfc2pips_shiftAdressesOfArea( storage_area, not_moved_entity, e, eq_->expr );
+			}else{
+				size=0;
+			}
 		}
-	}
-
-	/*
-	if (TempoEquivSet == equivalences_undefined) {
-	TempoEquivSet = make_equivalences(NIL);
-	}
-     */
-	//pips_assert("The TempoEquivSet is defined", !equivalences_undefined_p(TempoEquivSet) );
-
-	//equivalences_chains(TempoEquivSet) = CONS( CHAIN, c, equivalences_chains(TempoEquivSet) );
+    }
 }
 
 
+//we need 2 offsets, one is the end of the biggest element, another is the cumulated size of each moved element
+void gfc2pips_shiftAdressesOfArea( entity _area, int old_offset, int size, int max_offset, int shift ){
+	newgen_list _pcv = code_declarations(EntityCode(get_current_module_entity()));
+	newgen_list pcv = gen_copy_seq(_pcv);
+	for( pcv=gen_nreverse(pcv) ; pcv != NIL; pcv = CDR(pcv) ) {
+		entity e = ENTITY(CAR(pcv));
+		if(
+			entity_storage(e) != storage_undefined
+			&& storage_ram_p(entity_storage(e))
+			&& ram_section(storage_ram(entity_storage(e)))==_area
+		){
+/*
+ * put those two lines in one go (to process everything in one loop only)
+			when shift, if offset of variable after <c>, retrieve size of <c>
+			add to every variable after <a>+sizeof(<a>) the difference of offset
+
+			when shift, if offset of variable after <b>, retrieve size of <b>
+			add to every variable after <c(2)>+sizeof(<c>)-sizeof(<c(1)>) the difference of offset
+
+			=> when we move an array or a variable, use the full size of the array/variable
+				when an element, use the full size of the array minus the offset of the element
+*/
+			pips_debug(9,"%s\told_offset: %d\tsize: %d\tmax_offset: %d\tshift: %d\tram_offset: %d\n", entity_name(e), old_offset, size, max_offset, shift, ram_offset(storage_ram(entity_storage(e))) );
+			int personnal_shift = 0;
+			//if( ram_offset(storage_ram(entity_storage(e))) > old_offset+size ){
+				personnal_shift -= shift;
+			//}
+			if(ram_offset(storage_ram(entity_storage(e)))> old_offset){
+				personnal_shift -= size;
+			}
+			ram_offset(storage_ram(entity_storage(e))) +=personnal_shift;
+			pips_debug(9,"%s shifted of %d\n",entity_name(e),personnal_shift);
+		}
+	}
+}
 
 
 

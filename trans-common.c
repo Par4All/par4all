@@ -806,7 +806,7 @@ element_number (gfc_array_ref *ar)
    element number and multiply by the element size. For a substring we
    have to calculate the further reference.  */
 
-static HOST_WIDE_INT
+HOST_WIDE_INT
 calculate_offset (gfc_expr *e)
 {
   HOST_WIDE_INT n, element_size, offset;
