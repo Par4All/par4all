@@ -1,7 +1,7 @@
 delete split_initializations03
 
 setproperty ABORT_ON_USER_ERROR TRUE
-setproperty PRETTYPRINT_BLOCKS TRUE
+#setproperty PRETTYPRINT_BLOCKS TRUE
 
 create split_initializations03 split_initializations03.c
 

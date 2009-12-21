@@ -3,7 +3,6 @@ Initial code
 
 void split_initializations02(void)
 {
-   // BEGIN BLOCK
    int k[] = {1, 2, 3};
    {
       int k[] = {1, 2, 3};
@@ -11,14 +10,12 @@ void split_initializations02(void)
    if (1) {
       int k[] = {1, 2, 3};
    }
-   // END BLOCK
 }
 
 Code after split_initializations
 
 void split_initializations02(void)
 {
-   // BEGIN BLOCK
    int k[] = {1, 2, 3};
    {
       int k[] = {1, 2, 3};
@@ -26,5 +23,4 @@ void split_initializations02(void)
    if (1) {
       int k[] = {1, 2, 3};
    }
-   // END BLOCK
 }

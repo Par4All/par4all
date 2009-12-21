@@ -2,7 +2,6 @@ foo()
 {
    int i;
    int j;
-   extern int bar_b(int);
 
    i = foo_a(2);
    j = bar_b(3);
@@ -24,14 +23,17 @@ After UNSPLIT
 /*
  * file for bar.c
  */
-struct bar {
+typedef struct bar {
    int bar_first;
    int bar_second;
-};
-typedef struct bar t_bar;
+} t_bar;
+
 extern int bar_e(int k);
+
 extern int bar_d(int k);
+
 static int bar_c(int k);
+
 extern int bar_b(int k);
 int bar_e(int k)
 {
@@ -52,12 +54,13 @@ int bar_b(int k)
 /*
  * file for foo.c
  */
-struct foo {
+typedef struct foo {
    int foo_first;
    int foo_second;
-};
-typedef struct foo t_foo;
+} t_foo;
+
 static int foo_a(int k);
+
 extern  foo();
 static int foo_a(int k)
 {
@@ -67,7 +70,6 @@ foo()
 {
    int i;
    int j;
-   extern int bar_b(int);
 
    i = foo_a(2);
    j = bar_b(3);

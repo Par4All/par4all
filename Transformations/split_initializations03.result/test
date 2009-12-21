@@ -3,12 +3,12 @@ Initial code
 
 void split_initializations03(void)
 {
-   struct foo {
+   typedef struct foo {
       int a;
       int b;
       int c;
-   };
-   typedef struct foo three_ints;
+   } three_ints;
+
    three_ints a = {1, 2, 3};
 }
 
@@ -16,11 +16,11 @@ Code after split_initializations
 
 void split_initializations03(void)
 {
-   struct foo {
+   typedef struct foo {
       int a;
       int b;
       int c;
-   };
-   typedef struct foo three_ints;
+   } three_ints;
+
    three_ints a = {1, 2, 3};
 }
