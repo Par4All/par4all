@@ -13,7 +13,7 @@ void func1(int n, int m,float a[n][m], float b[n][m], float h)
   }
 }
 
-void main()
+int main()
 {
   float a[image_size][image_size],b[image_size][image_size],h;
   int i,j ;
