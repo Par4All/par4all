@@ -764,6 +764,25 @@ WARNING_ON_STAT_ERROR TRUE
 \end{PipsProp}
 
 
+\subsection{Option for C Code Generation}
+
+The syntactic constraints of C89 have been eased for declarations in
+C99, where it is possible to intersperse statement declarations within
+executable statements. This property is used to request C89 compatible
+code generation.
+
+\begin{PipsProp}{C89_CODE_GENERATION} 
+C89_CODE_GENERATION FALSE
+\end{PipsProp}
+
+So the default option is to generate C99 code.
+
+There is no guarantee that each code generation phase is going to
+comply with this property. It is up to each developper to decide if
+this global property is to be used or not in his/her local phase.
+
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% INPUT FILES
 
 \chapter{Input Files}
@@ -837,6 +856,8 @@ Section~\ref{subsection-preprocessing-and-splitting}) before submitting them to
 \index{Hollerith}
 \index{Missing file}
 
+\subsection{Fortran Case}
+
 The Fortran files specified as input to \Pips{} by the user are
 preprocessed in various ways.
 
@@ -907,8 +928,12 @@ PREPROCESSOR_MISSING_FILE_HANDLING "error"
 The output of this phase is a set of \verb|.f_initial| files in per-module
 subdirectories. They constitute the resource \verb|INITIAL_FILE|.
 
+\subsection{C Case}
 
-\section{Syntactic Preprocessing}
+The C preprocessor is applied before the splitting.
+
+
+\section{Fortran Syntactic Preprocessing}
 \label{subsection-syntactic-preprocessing}
 \index{Preprocessing}
 \index{Include}
@@ -1024,7 +1049,7 @@ c_initializer                     > MODULE.c_source_file
                                   > COMPILATION_UNIT.c_source_file
 \end{PipsMake}
 
-\section{Regeneration of user source files}
+\section{Regeneration of User Source Files}
 \label{sec:regen-user-source}
 
 
@@ -5549,6 +5574,8 @@ HPFC_EXTRACT_LATTICE TRUE
 
 \subsection{STEP: MPI code generation from OpenMP programs}
 \label{sec:step:-mpi-code}
+\index{MPI}
+\index{OpenMP}
 
 \marginpar{RK: IT SudParis : insert your documentation here}
 
@@ -5804,7 +5831,7 @@ safescale_distributor_init                  > MODULE.code
         < MODULE.code
 \end{PipsMake}
 
-\subsubsection{Statement externalization}
+\subsubsection{Statement Externalization}
 \index{Statement externalization}
 
 \begin{PipsPass}{safescale_distributor}
@@ -5824,7 +5851,7 @@ safescale_distributor                  > MODULE.code
         < MODULE.out_regions
 \end{PipsMake}
 
-\subsection{CoMap: code generation for accelerators with DMA}
+\subsection{CoMap: Code Generation for Accelerators with DMA}
 \label{sec:comap:-code}
 
 \subsubsection{Phrase Remove Dependences}
@@ -8042,8 +8069,8 @@ split_initializations > MODULE.code
         < MODULE.code
 \end{PipsMake}
 
-Note: this transformation is sensitive to the C declaration internal
-representation. A new version is needed for the new representation.
+This transformation uses the \verb/C89_CODE_GENERATION/ proprety to
+generate either C89 or C99 code.
 
 
 %-----------End of Declaration Transformations -------------------------
@@ -11554,7 +11581,7 @@ The output of the scheduling is of the following form:
 %         < MODULE.plc
 % \end{PipsMake}
 
-\section{Code Generation}
+\section{Code Generation for Affine Schedule}
 
 Function \texttt{reindexing} transforms the code using the schedule
 (\texttt{bdt}) and the mapping (\texttt{plc}) (see~\cite{Col93,Pla95a}). The

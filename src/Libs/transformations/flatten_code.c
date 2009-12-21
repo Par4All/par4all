@@ -522,12 +522,12 @@ bool flatten_code(string module_name)
 
   return (good_result_p);
 }
-
+
 /* gen_recurse callback on exiting statements. For a declaration to be split:
 
    - it must be a local declaration
 
-   - initial value must be a rhs expression
+   - the initial value, if any, must be a valid rhs expression
  */
 static void split_initializations_in_statement(statement s)
 {
@@ -557,7 +557,8 @@ static void split_initializations_in_statement(statement s)
     statement_instruction(s) = make_instruction_sequence(make_sequence(inits));
   }
   //else if(declaration_statement_p(s)) {
-  else if(statement_block_p(s)) {
+  else if(!get_bool_property("C89_CODE_GENERATION") && statement_block_p(s)) {
+    /* generate C99 code */
     list cs = list_undefined;
     list pcs = NIL;
     list nsl = statement_block(s); // new statement list
@@ -566,10 +567,7 @@ static void split_initializations_in_statement(statement s)
       if(declaration_statement_p(ls)) {
 	list inits = NIL;
 	list decls = statement_declarations(ls); // Non-recursive
-	//instruction old = statement_instruction(ls);
-	statement sc = statement_undefined; // statement copy
-	//statement ns = statement_undefined; // new statement
-	//statement as = statement_undefined; // ancestor statement
+	//statement sc = statement_undefined; // statement copy
 
 	FOREACH(ENTITY, var, decls) {
 	  string mn  = module_name(entity_name(var));
@@ -583,24 +581,34 @@ static void split_initializations_in_statement(statement s)
 	      inits = gen_nconc(inits, CONS(statement, is, NIL));
 	      entity_initial(var) = make_value_unknown();
 	    }
+	    else {
+	      free_expression(ie);
+	    }
 	  }
 	}
 
-	/* Chain the new list within the current statement list */
-	if(ENDP(pcs)) {
-	  nsl = inits;
+	if(!ENDP(inits)) {
+	  /* This is not very smart... You do not need pcs in C99
+	     since you are going to add the assignment statements
+	     just after the current declaration statement... */
+	  inits = CONS(STATEMENT, ls, inits);
+	  /* Chain the new list within the current statement list */
+	  if(ENDP(pcs)) {
+	    nsl = inits;
+	  }
+	  else {
+	    CDR(pcs) = inits;
+	  }
+	  /* Move to the next original element nsl */
+	  pcs = gen_last(inits);
+	  CDR(pcs) = CDR(cs);
+	  POP(cs);
 	}
 	else {
-	  CDR(pcs) = inits;
+	  /* Move to the next statement */
+	  pcs = cs;
+	  POP(cs);
 	}
-	/* Move to the next original element and complete nsl */
-	/* Not smart at all! Keep pointers instead of chasing
-	   pointers in lists... */
-	pcs = gen_last(inits);
-	CDR(gen_last(inits)) = CDR(cs);
-	cs = CDR(gen_last(inits));
-    gen_free_list(statement_declarations(ls));
-    statement_declarations(ls)=NIL;
       }
       else {
 	/* Move to the next statement */
@@ -609,6 +617,50 @@ static void split_initializations_in_statement(statement s)
       }
     }
     instruction_block(statement_instruction(s)) = nsl;
+  }
+  else if(statement_block_p(s)) {
+    /* generate C89 code */
+    list cs = list_undefined;
+    //list pcs = NIL;
+    //list nsl = statement_block(s); // new statement list
+    list inits = NIL; // list of initialization statements
+
+    for( cs = statement_block(s); !ENDP(cs); POP(cs)) {
+      statement ls = STATEMENT(CAR(cs));
+      if(declaration_statement_p(ls)) {
+	list decls = statement_declarations(ls); // Non-recursive
+	//statement sc = statement_undefined; // statement copy
+
+	FOREACH(ENTITY, var, decls) {
+	  string mn  = module_name(entity_name(var));
+	  string cmn = entity_user_name(get_current_module_entity());
+	  if ( strcmp(mn,cmn) == 0
+	       && !value_unknown_p(entity_initial(var))
+	       ) {
+	    expression ie = variable_initial_expression(var);
+	    if (expression_is_C_rhs_p(ie)) {
+	      statement is = make_assign_statement(entity_to_expression(var), ie);
+	      inits = gen_nconc(inits, CONS(statement, is, NIL));
+	      entity_initial(var) = make_value_unknown();
+	    }
+	    else {
+	      free_expression(ie);
+	    }
+	  }
+	}
+      }
+
+      if(!ENDP(inits)) {
+	list ncs = CDR(cs);
+	if(ENDP(ncs) || !declaration_statement_p(STATEMENT(CAR(ncs)))) {
+	  list pcs = gen_last(inits);
+	  CDR(cs) = inits;
+	  CDR(pcs) = ncs;
+	  break;
+	}
+      }
+    }
+    //instruction_block(statement_instruction(s)) = nsl;
   }
   else {
     /* Do nothing ? */
