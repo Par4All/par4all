@@ -22,7 +22,7 @@
 #
 
 # Accept entries in the PIPS validation
-
+# Should be merged in a unique tool with pips_manual_accept?
 
 failed=0
 success=0
@@ -32,6 +32,15 @@ function accept_one_file ()
 {
     dir=$1
     log=$2
+    # Accept also .test, .tpips,...
+    dir=${dir/.[Ffc]/.result}
+    dir=${dir/.test/.result}
+    dir=${dir/.tpips2/.result}
+    dir=${dir/.tpips/.result}
+    dir=${dir/.py/.result}
+
+    let list_lgt++
+
     if [ -d $dir ]; then
 	if [ -f $dir/out ]
 	then
@@ -60,8 +69,8 @@ echo "$@" >> /tmp/pips_force_accept.log
 
 if [[ "$1" == "-h" || "$1" == "--help" || $# == 0 ]]
 then
-    echo "usage: $0 [file | directory_list]"
-    echo "  directory_list: a list of .result directory where  you want the previous"
+    echo "usage: $0 [-f file | directory_list]"
+    echo "  directory_list: a list of .tpips/.test/... or .result directory where you want the previous"
     echo "                  validation output to be considered as the new reference"
     echo "                  for future validation tests"
     echo "  file          : a file with the validation SUMMARY format (check RESULT/SUMMARY"
@@ -71,30 +80,19 @@ then
    exit
 else
     # in this case we want to process a SUMMARY file
-    if [[ $# == 1 && -f $1 ]]; then
-	# generate a file with one .result directory per line
-	awk_file=/tmp/pips_force_accept_gen_list_awk
-	sed_file=/tmp/pips_force_accept_gen_list_sed
-	# firstly select change result in summary file
-	mawk '$1 ~ /^changed:.*/ {print $2}' $1 > $awk_file
-	# Select also the '> changed:' from a diff output:
-	mawk '/^(> )changed:.*/ {print $3}' $1 >> $awk_file
-	# secondly change extension to .result
-	sed 's/\.f$\|\.F$\|\.tpips2$\|\.tpips$\|\.c$/.result/' $awk_file > $sed_file
-
-	# Assume the validation in the current directory
-	while read line
-	do
-	    let list_lgt++
-	    accept_one_file $line /tmp/pips_force_accept.log
-	done < $sed_file
-    else
-	list_lgt=$#
-	for dir in $@
-	do
-	    accept_one_file $dir /tmp/pips_force_accept.log
-	done
+    if [[ $# == 2 && $1 == '-f' && -f $2 ]]; then
+	# Select the lines to validate from the validation mail or file in
+	# summary or diff output:
+	l=`sed -n -e 's/^changed: \(.*\)/\1/p' -e 's/^> changed: \(.*\)/\1/p' $2`
+	# Use this list as arguments fot the following:
+	set $l
     fi
+
+    # Accept on all files:
+    for dir in $@
+    do
+	accept_one_file $dir /tmp/pips_force_accept.log
+    done
 fi
 
 echo "
