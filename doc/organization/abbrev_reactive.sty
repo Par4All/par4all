@@ -1,0 +1,400 @@
+%% Noter que xspace ne rajoute pas d'espace avant « - »...
+\RequirePackage{xspace}
+\RequirePackage{comment}
+
+\begin{comment}
+  $Header: /home/keryell/TeX/bib/RCS/abbrev_reactive.sty,v 1.16 2007/06/19 07:25:00 keryell Exp keryell $
+  
+  Copyright (c) École Nationale Supérieure des Télécommunications de
+  Bretagne
+
+
+  $Log: abbrev_reactive.sty,v $
+  Revision 1.16  2007/06/19 07:25:00  keryell
+  RajoutÃ© trucs de cryptographie
+
+  Revision 1.15  2007/06/19 07:23:43  keryell
+  RajoutÃ© MP-SoC, SAFESCALE
+
+  Revision 1.14  2005/10/07 08:38:10  keryell
+  Mis à jour MR2 IAHP
+
+  Revision 1.13  2005/04/04 05:30:10  keryell
+  Rajouté IV pour CryptoPage
+
+  Revision 1.12  2004/08/01 13:53:54  keryell
+  Pour TSI
+
+  Revision 1.11  2004/08/01 13:52:19  keryell
+  FAQ, GABI, UBO,...
+
+  Revision 1.10  2004/03/24 08:33:20  keryell
+  Mises à jour pour CryptoPage TSI
+
+  Revision 1.9  2004/02/06 11:09:47  keryell
+  Rajouté des choses pour BibTeX++
+
+  Revision 1.8  2003/12/09 09:04:27  keryell
+  Fusion version BibTeX++
+
+  Revision 1.7  2003/12/04 00:12:18  keryell
+  Plein de choses
+
+  Revision 1.6  2002/02/28 21:45:23  keryell
+  Plein d'entrées en plus.
+  \ABBREVx
+
+  Revision 1.5  2001/07/03 12:24:16  keryell
+  Rajouté les index automatiques.
+
+  Revision 1.4  2001/07/03 08:37:04  keryell
+  Rajouté log en commentaire.
+
+\end{comment}
+
+%\def\RawCatcodeDef#1#2#3{%
+%  \expandafter\def\csname#1\endcsname{\bgroup\catcode`\~=12\catcode`\:=12\catcode`\_=12\catcode`\&=12\catcode`\%=12\csname#1@\endcsname}%
+%  \expandafter\def\csname#1@\endcsname#2{#3\egroup}%
+%}
+
+\def\DefProtectCharMacro#1{\expandafter\gdef\csname#1\endcsname{\bgroup\catcode`\~=12\catcode`\:=12\catcode`\_=12\catcode`\&=12\catcode`\%=12\csname
+    @#1@\endcsname}\expandafter\gdef\csname @#1@\endcsname}
+
+% Create an abreviation with text from the second argument:
+%\def\ABBREVx#1#2{\expandafter\gdef\csname
+%  A#1\endcsname{\index{#1@#2}#2\egroup\xspace}}
+\def\ABBREVx#1#2{\DefProtectCharMacro{A#1}{\index{#1@#2}#2\egroup\xspace}}
+% Create an abreviation in small caps with text from the second argument:
+\def\ABBREVsc#1#2{\ABBREVx{#1}{\textsc{#2}}}
+% Automatically put an abreviation in small caps:
+\def\ABBREV#1{\ABBREVsc{#1}{#1}}
+% Idem with linking:
+\def\ABBREVxl#1#2#3{\DefProtectCharMacro{A#1}{\index{#1@#2}\href{#3}{#2}\egroup\xspace}}
+\def\ABBREVscl#1#2#3{\ABBREVxl{#1}{\textsc{#2}}{#3}}
+\def\ABBREVl#1#2{\ABBREVscl{#1}{#1}{#2}}
+
+
+
+\ABBREVx{ABone}{\textsc{ab}one}
+\ABBREV{ack}
+\ABBREV{acl}
+\ABBREV{adsl}
+\ABBREV{adu}
+\ABBREV{adu}
+\ABBREV{aegis}
+\ABBREV{aes}
+\ABBREV{afdp}
+\ABBREV{afnor}
+\ABBREV{aiad}
+\ABBREV{aimd}
+\ABBREV{alien}
+\ABBREV{amanda}
+\ABBREV{anais}
+\ABBREV{anep}
+\ABBREV{anr}
+\ABBREVsc{antara}{Antara}
+\ABBREV{ants}
+\ABBREVsc{apache}{Apache}
+\ABBREV{apco}
+\ABBREVsc{pfa}{Par4All}
+\ABBREV{api}
+\ABBREVsc{archdraft}{ArchDraft}
+\ABBREV{arm}
+\ABBREV{arp}
+\ABBREV{ascii}
+\ABBREV{asip}
+\ABBREV{ast}
+\ABBREV{atm}
+\ABBREV{aux}
+\ABBREVx{auxextension}{\texttt{.aux}}
+\ABBREV{basic}
+\ABBREVx{bblextension}{\texttt{.bbl}}
+\ABBREV{bbn}
+\ABBREV{bib}
+\ABBREVx{bibextension}{\texttt{.bib}}
+\ABBREVx{bibtex}{\textsc{b}i{b}\TeX}
+\ABBREVx{bibtexpp}{\textsc{b}i{b}\TeX++}
+\ABBREV{bios}
+\ABBREVx{bistro}{\textsc{b}i\textsc{st}r\textsc{o}}
+\ABBREVx{blgextension}{\texttt{.blg}}
+\ABBREV{bochs}
+\ABBREV{bsd}
+\ABBREV{bst}
+\ABBREVx{bstextension}{\texttt{.bst}}
+\ABBREV{c}
+\ABBREVx{canes}{\textsc{cane}s}
+\ABBREV{cao}
+\ABBREV{cbc}
+\ABBREV{cd}
+\ABBREV{cdd}
+\ABBREV{cde}
+\ABBREVsc{cdrom}{cd-rom}
+\ABBREV{cerv}
+\ABBREVsc{cfengine}{Cfengine}
+\ABBREV{cfg}
+\ABBREV{cig}
+\ABBREV{cisc}
+\ABBREV{cisco}
+\ABBREV{clut}
+\ABBREV{cm}
+\ABBREV{cmm}
+\ABBREV{cnet}
+\ABBREV{cnrs}
+\ABBREV{codec}
+\ABBREV{comap}
+\ABBREV{corba}
+\ABBREV{cpl}
+\ABBREVsc{cplusplus}{c++}
+\ABBREV{cpu}
+\ABBREV{cray}
+\ABBREV{cre}
+\ABBREV{cri}
+\ABBREVsc{crldp}{cr-ldp}
+\ABBREVsc{cryptogrid}{CryptoGrid}
+\ABBREVsc{cryptopage}{CryptoPage}
+\ABBREVsc{cstar}{c*}
+\ABBREV{dag}
+\ABBREV{dan}
+\ABBREV{darpa}
+\ABBREVsc{darwin}{Darwin}
+\ABBREV{dce}
+\ABBREV{dct}
+\ABBREV{dea}
+\ABBREVxl{deainforennesI}{\textsc{dea} informatique de Rennes 1}{http://www.irisa.fr/master/}
+\ABBREVsc{debian}{Debian}
+\ABBREVx{decss}{\textsc{d}e\textsc{css}}
+\ABBREV{dga}
+\ABBREVsc{diffserv}{DiffServ}
+\ABBREVx{divx}{\textsc{d}iv\textsc{x}}
+\ABBREV{dma}
+\ABBREV{dns}
+\ABBREVsc{docbook}{DocBook}
+\ABBREV{dom}
+\ABBREV{dpa}
+\ABBREV{drm}
+\ABBREV{dsl}
+\ABBREV{dsp}
+\ABBREV{dtd}
+\ABBREV{dvd}
+\ABBREV{cvs}
+\ABBREV{dvecom}
+\ABBREV{ecb}
+\ABBREV{emacs}
+\ABBREV{ens}
+\ABBREV{ensmp}
+\ABBREV{enssat}
+\ABBREVl{enst}{http://www.enst.fr}
+\ABBREVxl{enstbr}{\textsc{enstb}r}{http://www.enst-bretagne.fr}
+\ABBREVxl{enstbretagne}{\textsc{enst} Bretagne}{http://www.enst-bretagne.fr}
+\ABBREVsc{ethernet}{Ethernet}
+\ABBREV{fai}
+\ABBREV{faq}
+\ABBREV{flex}
+\ABBREV{fm}
+\ABBREV{fortran}
+\ABBREV{fpga}
+\ABBREV{fsm}
+\ABBREVxl{francetelecomrd}{France Télécom \textsc{r\&d}}{http://www.rd.francetelecom.fr}
+\ABBREV{freia}
+\ABBREV{ft}
+\ABBREV{ftp}
+\ABBREVsc{ftrd}{ft r\&d}
+\ABBREV{gabi}
+\ABBREV{gdr}
+\ABBREV{get}
+\ABBREV{gflops}
+\ABBREVx{ghz}{\textsc{gh}z}
+\ABBREV{gips}
+\ABBREV{git}
+\ABBREV{gnu}
+\ABBREV{gop}
+\ABBREV{gpl}
+\ABBREVsc{gstreamer}{Gstreamer}
+\ABBREV{h}
+\ABBREVsc{hCCLXI}{h.261}
+\ABBREVsc{hCCLXIII}{h.263}
+\ABBREVsc{hCCCXXII}{h.323}
+\ABBREV{hmac}
+\ABBREV{hpc}
+\ABBREV{hpf}
+\ABBREV{html}
+\ABBREV{http}
+\ABBREVsc{hyperc}{HyperC}
+\ABBREVl{iahp}{https://info.enstb.org/enseignement/mri/modules/iahp}
+\ABBREV{idl}
+\ABBREV{ieee}
+\ABBREV{ietf}
+\ABBREV{imm}
+\ABBREVsc{internet}{Internet}
+\ABBREVsc{intserv}{IntServ}
+\ABBREV{ip}
+\ABBREVx{ipsec}{\textsc{ip}sec}
+\ABBREVl{isia}{http://www-isia.cma.fr/}
+\ABBREV{isis}
+\ABBREV{iv}
+\ABBREVsc{java}{Java}
+\ABBREV{jit}
+\ABBREV{jpeg}
+\ABBREV{jvm}
+\ABBREV{kaapi}
+\ABBREV{lan}
+\ABBREVx{latex}{\LaTeX}
+\ABBREVx{latexextension}{\texttt{.tex}}
+\ABBREV{liens}
+\ABBREV{lig}
+\ABBREVsc{linux}{Linux}
+\ABBREV{lisp}
+\ABBREV{lit}
+\ABBREV{lri}
+\ABBREV{mac}
+\ABBREV{madeo}
+\ABBREVsc{maspar}{MasPar}
+\ABBREVx{MBone}{\textsc{mb}one}
+\ABBREVsc{mcache}{mCache}
+\ABBREV{md}
+\ABBREV{mdp}
+\ABBREV{mdu}
+\ABBREVl{mecalog}{http://www.mecalog.fr}
+\ABBREV{mflops}
+\ABBREV{miad}
+\ABBREV{mimd}
+\ABBREV{mips}
+\ABBREVx{mirehd}{\textsc{mir}é\textsc{hd}}
+\ABBREV{mit}
+\ABBREVx{mlbibtex}{\textsc{mlb}i{b}\TeX}
+\ABBREV{mmu}
+\ABBREV{mmx}
+\ABBREVsc{mpIII}{mp3}
+\ABBREV{mpeg}
+\ABBREVsc{mpegIVip}{mpeg4ip}
+\ABBREV{mpi}
+\ABBREV{mpl}
+\ABBREV{mpls}
+\ABBREV{mpp}
+\ABBREVx{mpsoc}{\textsc{mp-s}o\textsc{c}}
+\ABBREV{mtp}
+\ABBREVsc{multic}{multiC}
+\ABBREVsc{muse}{Muse}
+\ABBREVsc{mzero}{m0}
+\ABBREV{nack}
+\ABBREV{netscript}
+\ABBREV{nfs}
+\ABBREV{nis}
+\ABBREVx{noc}{\textsc{n}o\textsc{c}}
+\ABBREV{nt}
+\ABBREV{numa}
+\ABBREVx{nvod}{\textsc{nv}o\textsc{d}}
+\ABBREVsc{odyssey}{Odyssey}
+\ABBREV{omg}
+\ABBREV{OpenDivX}
+\ABBREVx{openmp}{Open\textsc{mp}}
+\ABBREVxl{openoffice}{OpenOffice}{http://www.openoffice.org}
+\ABBREVsc{opensmartcard}{OpenSmartCard}
+\ABBREV{os}
+\ABBREVsc{palladium}{Palladium}
+\ABBREV{pascal}
+\ABBREV{pc}
+\ABBREVsc{pcfengine}{PCFengine}
+\ABBREV{pci}
+\ABBREV{pe}
+\ABBREV{perl}
+\ABBREV{pgp}
+\ABBREV{phrase}
+\ABBREV{pips}
+\ABBREV{plan}
+\ABBREVsc{polylib}{PolyLib}
+\ABBREV{pomp}
+\ABBREVsc{pompc}{pompC}
+\ABBREVsc{postscript}{PostScript}
+\ABBREVx{powerpc}{\textsc{p}ower\textsc{pc}}
+\ABBREV{ppp}
+\ABBREVsc{projectmayo}{ProjectMayo}
+\ABBREV{pvm}
+\ABBREV{python}
+\ABBREV{qos}
+\ABBREVsc{quicktime}{QuickTime}
+\ABBREV{raid}
+\ABBREV{ram}
+\ABBREV{ramp}
+\ABBREV{rap}
+\ABBREV{rbp}
+\ABBREV{rcs}
+\ABBREVsc{reactive}{RéActiVE}
+\ABBREVsc{redhat}{RedHat}
+\ABBREV{renater}
+\ABBREVsc{resel}{RésÉl}
+\ABBREV{rfc}
+\ABBREV{rire}
+\ABBREV{risc}
+\ABBREV{rom}
+\ABBREV{rmp}
+\ABBREV{rsim}
+\ABBREV{rsvp}
+\ABBREV{rtcp}
+\ABBREV{rtl}
+\ABBREV{rtp}
+\ABBREV{rtsp}
+\ABBREVx{sablecc}{Sable\textsc{cc}}
+\ABBREV{sac}
+\ABBREV{safescale}
+\ABBREV{samba}
+\ABBREV{sane}
+\ABBREV{sarl}
+\ABBREV{scsi}
+\ABBREV{sctp}
+\ABBREV{sdl}
+\ABBREV{sgbd}
+\ABBREV{sha}
+\ABBREV{sip}
+\ABBREV{sif}
+\ABBREV{simd}
+\ABBREVsc{smartpackets}{SmartPackets}
+\ABBREV{smb}
+\ABBREV{smt}
+\ABBREVx{soc}{\textsc{s}o\textsc{c}}
+\ABBREVsc{solaris}{Solaris}
+\ABBREV{sparc}
+\ABBREV{spe}
+\ABBREVx{spearde}{\textsc{spear}-\textsc{de}}
+\ABBREVx{spoc}{\textsc{sp}o\textsc{c}}
+\ABBREV{sqrt}
+\ABBREV{ssii}
+\ABBREVxl{staroffice}{StarOffice}{http://www.sun.com/software/star/staroffice}
+\ABBREVsc{sun}{Sun}
+\ABBREV{svn}
+\ABBREVsc{switchware}{SwitchWare}
+\ABBREVx{tb}{\textsc{Télécom} Bretagne}
+\ABBREV{tcg}
+\ABBREV{tcp}
+\ABBREV{tcpa}
+\ABBREV{tdf}
+\ABBREV{tear}
+\ABBREVx{terapix}{Ter@pix}
+\ABBREVx{tex}{\TeX}
+\ABBREV{tflops}
+\ABBREV{tfrc}
+\ABBREV{tlb}
+\ABBREV{tpm}
+\ABBREV{trt}
+\ABBREV{ubo}
+\ABBREV{ucsd}
+\ABBREV{udp}
+\ABBREV{unicode}
+\ABBREV{unix}
+\ABBREV{urgc}
+\ABBREV{url}
+\ABBREV{van}
+\ABBREVx{videolan}{\textsc{v}ideo\textsc{lan}}
+\ABBREV{vl}
+\ABBREV{vliw}
+\ABBREV{vlsi}
+\ABBREV{vme}
+\ABBREV{vne}
+\ABBREVx{vod}{\textsc{v}o\textsc{d}}
+\ABBREVsc{vovida}{Vovida}
+\ABBREVsc{westserver}{WestServer}
+\ABBREVx{windows}{Windows$^{\text{\textsc{tm}}}$}
+\ABBREVx{word}{Word$^{\text{\textsc{tm}}}$}
+\ABBREV{www}
+\ABBREV{xml}
+\ABBREV{xom}

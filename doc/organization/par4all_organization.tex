@@ -1,0 +1,229 @@
+\documentclass[a4paper]{article}
+
+\usepackage{url}
+\usepackage{abbrev_reactive}
+
+\sloppy
+
+\begin{document}
+
+\title{Par4All organization\\
+  draft
+}
+
+\author{Ronan Keryell, HPC Project}
+
+\maketitle
+
+\section{Introduction}
+\label{sec:introduction}
+
+\Apfa is ...
+
+This document describes the internal organization of \Apfa and how its
+construction relies on \Agit repositories, \Asvn repositories and other
+projects.
+
+
+\subsection{Collaborative repositories}
+\label{sec:coll-repos}
+
+There are few \Agit repositories used by the project.
+
+The main repository for the project is:
+\url{ssh://git.hpc-project.com/git/par4all.git}
+
+There are also ancillary \Agit repository to offer a \Agit interface to
+the \Asvn repositories for the \Apips components from \Acri:
+\begin{itemize}
+\item \url{ssh://git.hpc-project.com/git/svn_linear.git}
+\item \url{ssh://git.hpc-project.com/git/svn_newgen.git}
+\item \url{ssh://git.hpc-project.com/git/svn_nlpmake.git}
+\item \url{ssh://git.hpc-project.com/git/svn_pips.git}
+\item \url{ssh://git.hpc-project.com/git/svn_validation.git}
+\end{itemize}
+
+
+\subsection{Compilation}
+\label{sec:compilation}
+
+Once you have an image of the main \Agit repository content, \Apfa is
+compiled and configured by running th \verb|src/dev/p4a_setup|.
+
+
+\section{Packages}
+\label{sec:packages}
+
+\Apfa integrate different tools from different projects. Right now \Apfa
+is composed by \Apips and \Apolylib, with some extensions. Each project is
+included in \Apfa as a package and is placed in a directory inside the
+\texttt{package} top-level directory.
+
+
+\section{Directory organization}
+\label{sec:direct-organ}
+
+\begin{description}
+\item[\texttt{build}] contains the various productions of the compilation
+  of all the \Apfa packages: binaries, header files, documentation;
+\item[\texttt{packages}] contains the different components of \Apfa; of
+  all the \Apfa packages: binaries, header files, documentation;
+\item[\texttt{src}] contains source of tools used for the internal
+  organization of \Apfa itself, such as repository and product management,
+  publication process.
+\end{description}
+
+
+\section{Repositories and work-flow}
+\label{sec:repos-workfl}
+
+For history tracking and collaborative development, \Apfa rely on a main
+\Agit repository that is accessed by \Apfa developers, users, integrators
+and the product and quality team.
+
+Since \Apfa intimately extends some tools such as \Apips, their are some
+ancillary repositories to ease the impedance matching between \Apfa and
+those other project.
+
+Since \Apolylib is already a \Agit repository, it is simply fetched as a
+remote \Agit into the \Apfa at the right place.
+
+But this is far more complex with \Apips which is a project split in 5
+independent \Asvn repositories, so its organization needs more massage to
+be presented in a coherent way, with some \Asvn-\Agit gateways. We can
+take advantage of these gateways to offer more free developments with
+light branches stored into a common \Agit view of the \Apips{} \Asvn
+repositories that can be pushed back into the \Apips{} \Asvn .
+
+
+\subsection{PolyLib work-flow}
+\label{sec:polylib-workflow}
+
+The basic workflow for \Apolylib is to develop new features into the
+original \Apolylib{} \Agit, to fetch it into the \Apfa{} \Agit and select what
+feature we want to have into the \texttt{packages/polylib} of \Apfa.
+
+Since the \Apolylib is already in a \Agit, the \texttt{polylib} is simply
+a remote in the \Apfa{} \Agit.
+
+So to import the latest \Apolylib development into the \Apfa{} \Agit for
+inspection, choice for inclusion, you fetch \Apolylib with:
+\begin{verbatim}
+git fetch polylib
+\end{verbatim}
+
+You can then merge the feature you want with a \texttt{git merge -s
+  subtree} from \texttt{remotes/polylib/master}, or from any tree
+identifier. The \texttt{-s subtree} is necessary since in \Apfa the
+\Apolylib files are not at the top-level directory.
+
+
+\subsection{PIPS work-flow}
+\label{sec:pips-workflow}
+
+The work-flow related to \Apips is quite more complex since we must
+consolidate data from 5 different \Asvn repositories.
+
+The basic \Apips work-flow is to develop into the 5 original \Apips{}
+\Asvn repositories at MINES ParisTech/CRI and to import the selected
+developments into the \Apfa{} \Agit.
+
+For this, we use 5 \Agit repositories that are gateways with these \Asvn
+repositories. For technical reasons, it is better that this kind of subtle
+gateway exists in only one place and this is currently done on the laptop
+of Ronan \textsc{Keryell}. Then these 5 gateways are used as remotes into
+the \Apfa{} \Agit.
+
+But since we have then a \Agit interface of the original \Apips{} \Asvn
+repositories and \Agit is quite more powerful than \Asvn, some people may
+want to develop into \Apips with \Agit by using these gateways. For
+example they may want to develop with common branches easily and when they
+are right with them push them back into the \Apips{} \Asvn trunk. To have
+a public interface for them, these \Agit gateways are pushed to public
+\Agit repository programmers can play with. Regularly these public
+gateways are synchronized manually with the \Apips{} \Asvn. Nevertheless,
+\Asvn may not be credited with the right owner of the commit but with the
+one running the gateway, which is not fair. So the preferred way is to
+directly develop in the original \Apips \Asvn repository (eventually with
+her own \Agit-\Asvn gateway).
+
+The 5 public gateway \Agit repositories are also defined as 5 remotes into
+the \Apfa{} \Agit:
+\begin{description}
+\item[\texttt{remotes/CRI/linear}]
+\item[\texttt{remotes/CRI/newgen}]
+\item[\texttt{remotes/CRI/nlpmake}]
+\item[\texttt{remotes/CRI/pips}]
+\item[\texttt{remotes/CRI/validation}]
+\end{description}
+
+These remote repositories are merged into \Apfa in the following
+respective directories:
+\begin{description}
+\item[\texttt{packages/PIPS/linear}]
+\item[\texttt{packages/PIPS/newgen}]
+\item[\texttt{packages/PIPS/nlpmake}]
+\item[\texttt{packages/PIPS/pips}]
+\item[\texttt{packages/PIPS/validation}]
+\end{description}
+
+To import the latest \Apips development into the \Apfa{} \Agit for
+inspection, choice for inclusion, you fetch the repositories you want
+with:
+\begin{verbatim}
+git fetch CRI/linear
+git fetch CRI/newgen
+git fetch CRI/nlpmake
+git fetch CRI/pips
+git fetch CRI/validation
+\end{verbatim}
+
+You can then merge the feature you want with a \texttt{git merge -s
+  subtree} from \texttt{remotes/CRI/.../master}, or from any tree
+identifier. The \texttt{-s subtree} is necessary since in \Apfa the \Apips
+files are not at the top-level directory and you do not want them to
+appear at the top-level directory.
+
+
+\subsection{Setting the infrastructure up}
+\label{sec:setup}
+
+Some scripts used to setup the infrastructure are located in \texttt{src/dev}.
+\begin{itemize}
+\item \verb/p4a_apply_pips_patches/ is used to patch the original \Apips
+  files to fit the \Apfa architecture. It should be used only once, after
+  external \Agit import;
+\item \verb/p4a_create_CRI_git_svn/ is used once to create the \Apips
+  \Asvn-\Agit gateways. This script is here to show how it can be done but
+  also to keep track of the exact parameters used to create them in the
+  case we loose them and want to recreate them with exactly with the same
+  identifiers (that depends from the creation parameters);
+\item \verb/p4a_import_external_gits/ imports all the external \Agit
+  repositories into the \Apfa \Agit repository. It should be used only
+  once but are included as example for other projects or to help adding
+  other repositories later.
+\end{itemize}
+
+
+\section{Validation}
+\label{sec:validation}
+
+
+Validation of \Apfa is done inside the \texttt{validation} directory with
+\texttt{make}.
+
+
+\section{Making releases}
+\label{sec:releases}
+
+After validating, a release is done by making some branch at a given state
+a tag.
+
+
+\end{document}
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% ispell-local-dictionary: "american"
+%%% End: 
