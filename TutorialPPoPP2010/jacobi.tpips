@@ -1,4 +1,4 @@
-create $WKS $WKS.c ../../P4A_CUDA/p4a_stubs.c
+create $WKS jacobi.c p4a_stubs.c
 
 setproperty LOOP_NORMALIZE_ONE_INCREMENT TRUE
 setproperty LOOP_NORMALIZE_LOWER_BOUND 0
