@@ -218,10 +218,6 @@ C  P(J) {J==3}
 C  P(A,J) {A==9, J==3}
 
 
-      CONTINUE
-
-C  P(A,J) {A==9, J==3}
-
 1     PRINT *, 'Vrai 1'                                                 0028
 
 C  P(A,J) {A==9, J==3}
@@ -275,10 +271,6 @@ C  P() {}
 C  P() {}
 
 
-      CONTINUE
-
-C  P() {}
-
 1     PRINT *, 'Vrai 1'                                                 0028
 
 C  P() {}
@@ -298,48 +290,48 @@ C     END UNSTRUCTURED
 
 C  P() {0==-1}
 
-      CONTINUE
+      RETURN
       END
 
-C  P() {}
+C  P() {0==-1}
 
       SUBROUTINE TEST IF 2(B)
       INTEGER A, B, J
 
-C  P() {}
+C  P() {0==-1}
 
 
       J = 3                                                             0004
 
-C  P(J) {J==3}
+C  P() {0==-1}
 
 
       B = J                                                             0006
 
-C  P(B,J) {B==3, J==3}
+C  P() {0==-1}
 
 C     BEGIN UNSTRUCTURED
 
-C  P(B,J) {B==3, J==3}
+C  P() {0==-1}
 
 
 c      if(.true.) then
       IF (J.EQ.5) GOTO 31                                               0009
 
-C  P(B,J) {B==3, J==3}
+C  P() {0==-1}
 
       PRINT *, 'salut'                                                  0010
 
-C  P(B,J) {B==3, J==3}
+C  P() {0==-1}
 
 31    CONTINUE                                                          0011
 C     END UNSTRUCTURED
 
-C  P(B,J) {B==3, J==3}
+C  P() {0==-1}
 
       A = 9                                                             0011
 
-C  P(A,B,J) {A==9, B==3, J==3}
+C  P() {0==-1}
 
 
 c      endif
@@ -348,45 +340,45 @@ c      endif
       RETURN
       END
 
-C  P() {}
+C  P() {0==-1}
 
       SUBROUTINE TEST IF 2(B)
       INTEGER A, B, J
 
-C  P() {}
+C  P() {0==-1}
 
 
       J = 3                                                             0004
 
-C  P(J) {J==3}
+C  P() {0==-1}
 
 
       B = J                                                             0006
 
-C  P(B,J) {B==3, J==3}
+C  P() {0==-1}
 
 C     BEGIN UNSTRUCTURED
 
-C  P(B,J) {B==3, J==3}
+C  P() {0==-1}
 
 
 c      if(.true.) then
       IF (J.EQ.5) GOTO 31                                               0009
 
-C  P(B,J) {B==3, J==3}
+C  P() {0==-1}
 
       PRINT *, 'salut'                                                  0010
 
-C  P(B,J) {B==3, J==3}
+C  P() {0==-1}
 
 31    CONTINUE                                                          0011
 C     END UNSTRUCTURED
 
-C  P(B,J) {B==3, J==3}
+C  P() {0==-1}
 
       A = 9                                                             0011
 
-C  P(A,B,J) {A==9, B==3, J==3}
+C  P() {0==-1}
 
 
 c      endif
@@ -395,133 +387,81 @@ c      endif
       RETURN
       END
 
-C  P() {}
+C  P() {0==-1}
 
       SUBROUTINE TEST IF 2(B)
       INTEGER A, B, J
 
-C  P() {}
-
-
-      J = 3                                                             0004
-
-C  P(J) {J==3}
-
-
-      B = J                                                             0006
-
-C  P(B,J) {B==3, J==3}
-
-
-c      if(.true.) then
-      PRINT *, 'salut'                                                  0010
-
-C  P(B,J) {B==3, J==3}
-
-31    CONTINUE                                                          0011
-
-C  P(B,J) {B==3, J==3}
-
-      A = 9                                                             0011
-
-C  P(A,B,J) {A==9, B==3, J==3}
-
-
-c      endif
-
+C  P() {0==-1}
 
       RETURN
       END
 
-C  P() {}
+C  P() {0==-1}
 
       SUBROUTINE TEST IF 2(B)
       INTEGER A, B, J
 
-C  P() {}
+C  P() {0==-1}
 
-
-      J = 3                                                             0004
-
-C  P(J) {J==3}
-
-
-      B = J                                                             0006
-
-C  P(B,J) {B==3, J==3}
-
-
-c      if(.true.) then
-      PRINT *, 'salut'                                                  0010
-
-C  P(B,J) {B==3, J==3}
-
-31    CONTINUE                                                          0011
-
-C  P(B,J) {B==3, J==3}
-
-
-c      endif
-
-
-      CONTINUE                                                          0016
+      RETURN
       END
 
-C  P() {}
+C  P() {0==-1}
 
 
       SUBROUTINE TEST IF 3(B)
       INTEGER A, B, J
 
-C  P() {}
+C  P() {0==-1}
 
 
       J = 3                                                             0005
 
-C  P(J) {J==3}
+C  P() {0==-1}
 
 
       B = J                                                             0007
 
-C  P(B,J) {B==3, J==3}
+C  P() {0==-1}
 
       AVIRER = J                                                        0008
 
-C  P(B,J) {B==3, J==3}
+C  P() {0==-1}
 
 
       DO I = 3, 10                                                      0010
 
-C  P(B,I,J) {B==3, J==3, 3<=I, I<=10}
+C  P() {0==-1}
 
          PRINT *, 'une boucle !'                                        0011
       ENDDO
 
-C  P(B,I,J) {B==3, I==11, J==3}
+C  P() {0==-1}
 
 C     BEGIN UNSTRUCTURED
 
-C  P(B,I,J) {B==3, I==11, J==3}
+C  P() {0==-1}
 
 
 c      if(.true.) then
       IF (J.EQ.5) GOTO 31                                               0015
 
-C  P(B,I,J) {B==3, I==11, J==3}
+C  P() {0==-1}
 
       PRINT *, 'salut'                                                  0016
 
-C  P(B,I,J) {B==3, I==11, J==3}
+C  P() {0==-1}
 
 31    A = 9                                                             0017
 
-C  P(A,B,I,J) {A==9, B==3, I==11, J==3}
+C  P() {0==-1}
 
 
 c      endif
       AVIRERENCORE = B                                                  0020
 
-C  P(A,B,I,J) {A==9, B==3, I==11, J==3}
+C  P() {0==-1}
 
 
       IF (A.EQ.I) THEN                                                  0022
@@ -531,78 +471,78 @@ C  P() {0==-1}
          PRINT *, 'vrai'                                                0023
       ELSE
 
-C  P(A,B,I,J) {A==9, B==3, I==11, J==3}
+C  P() {0==-1}
 
          PRINT *, 'faux'                                                0025
       ENDIF
 
-C  P(A,B,I,J) {A==9, B==3, I==11, J==3}
+C  P() {0==-1}
 
 
 100   CONTINUE
 
-C  P(A,B,I,J) {A==9, B==3, I==11, J==3}
+C  P() {0==-1}
 
 200   CONTINUE                                                          0029
       GOTO 100
 C     END UNSTRUCTURED
       END
 
-C  P() {}
+C  P() {0==-1}
 
 
       SUBROUTINE TEST IF 3(B)
       INTEGER A, B, J
 
-C  P() {}
+C  P() {0==-1}
 
 
       J = 3                                                             0005
 
-C  P(J) {J==3}
+C  P() {0==-1}
 
 
       B = J                                                             0007
 
-C  P(B,J) {B==3, J==3}
+C  P() {0==-1}
 
       AVIRER = J                                                        0008
 
-C  P(B,J) {B==3, J==3}
+C  P() {0==-1}
 
 
       DO I = 3, 10                                                      0010
 
-C  P(B,I,J) {B==3, J==3, 3<=I, I<=10}
+C  P() {0==-1}
 
          PRINT *, 'une boucle !'                                        0011
       ENDDO
 
-C  P(B,I,J) {B==3, I==11, J==3}
+C  P() {0==-1}
 
 C     BEGIN UNSTRUCTURED
 
-C  P(B,I,J) {B==3, I==11, J==3}
+C  P() {0==-1}
 
 
 c      if(.true.) then
       IF (J.EQ.5) GOTO 31                                               0015
 
-C  P(B,I,J) {B==3, I==11, J==3}
+C  P() {0==-1}
 
       PRINT *, 'salut'                                                  0016
 
-C  P(B,I,J) {B==3, I==11, J==3}
+C  P() {0==-1}
 
 31    A = 9                                                             0017
 
-C  P(A,B,I,J) {A==9, B==3, I==11, J==3}
+C  P() {0==-1}
 
 
 c      endif
       AVIRERENCORE = B                                                  0020
 
-C  P(A,B,I,J) {A==9, B==3, I==11, J==3}
+C  P() {0==-1}
 
 
       IF (A.EQ.I) THEN                                                  0022
@@ -612,259 +552,130 @@ C  P() {0==-1}
          PRINT *, 'vrai'                                                0023
       ELSE
 
-C  P(A,B,I,J) {A==9, B==3, I==11, J==3}
+C  P() {0==-1}
 
          PRINT *, 'faux'                                                0025
       ENDIF
 
-C  P(A,B,I,J) {A==9, B==3, I==11, J==3}
+C  P() {0==-1}
 
 
 100   CONTINUE
 
-C  P(A,B,I,J) {A==9, B==3, I==11, J==3}
+C  P() {0==-1}
 
 200   CONTINUE                                                          0029
       GOTO 100
 C     END UNSTRUCTURED
       END
 
-C  P() {}
+C  P() {0==-1}
 
 
       SUBROUTINE TEST IF 3(B)
       INTEGER A, B, J
-
-C  P() {}
-
-
-      J = 3                                                             0005
-
-C  P(J) {J==3}
-
-
-      B = J                                                             0007
-
-C  P(B,J) {B==3, J==3}
-
-      AVIRER = J                                                        0008
-
-C  P(B,J) {B==3, J==3}
-
-
-      DO I = 3, 10                                                      0010
-
-C  P(B,I,J) {B==3, J==3, 3<=I, I<=10}
-
-         PRINT *, 'une boucle !'                                        0011
-      ENDDO
-
-C  P(B,I,J) {B==3, I==11, J==3}
-
-
-c      if(.true.) then
-      PRINT *, 'salut'                                                  0016
-
-C  P(B,I,J) {B==3, I==11, J==3}
-
-31    A = 9                                                             0017
-
-C  P(A,B,I,J) {A==9, B==3, I==11, J==3}
-
-
-c      endif
-      AVIRERENCORE = B                                                  0020
-
-C  P(A,B,I,J) {A==9, B==3, I==11, J==3}
-
-
-      PRINT *, 'faux'                                                   0025
-
-C  P(A,B,I,J) {A==9, B==3, I==11, J==3}
-
-C     BEGIN UNSTRUCTURED
-
-C  P(A,B,I,J) {A==9, B==3, I==11, J==3}
-
-
-100   CONTINUE
-
-C  P(A,B,I,J) {A==9, B==3, I==11, J==3}
-
-200   CONTINUE                                                          0029
-      GOTO 100
-C     END UNSTRUCTURED
 
 C  P() {0==-1}
 
       RETURN
       END
 
-C  P() {}
+C  P() {0==-1}
 
 
       SUBROUTINE TEST IF 3(B)
       INTEGER A, B, J
 
-C  P() {}
+C  P() {0==-1}
 
-
-      J = 3                                                             0005
-
-C  P(J) {J==3}
-
-
-      B = J                                                             0007
-
-C  P(B,J) {B==3, J==3}
-
-
-      DO I = 3, 10                                                      0010
-
-C  P(B,I,J) {B==3, J==3, 3<=I, I<=10}
-
-         PRINT *, 'une boucle !'                                        0011
-      ENDDO
-
-C  P(B,I,J) {B==3, I==11, J==3}
-
-
-c      if(.true.) then
-      PRINT *, 'salut'                                                  0016
-
-C  P(B,I,J) {B==3, I==11, J==3}
-
-31    CONTINUE                                                          0017
-
-C  P(B,I,J) {B==3, I==11, J==3}
-
-
-c      endif
-      CONTINUE                                                          0020
-
-C  P(B,I,J) {B==3, I==11, J==3}
-
-
-      PRINT *, 'faux'                                                   0025
-
-C  P(B,I,J) {B==3, I==11, J==3}
-
-      CONTINUE
+      RETURN
       END
 
-C  P() {}
+C  P() {0==-1}
 
 
       SUBROUTINE TEST IF 4(B)
       INTEGER A, B, J
       REAL X(10), Y(10)
 
-C  P() {}
+C  P() {0==-1}
 
 
       J = 5                                                             0006
 
-C  P(J) {J==5}
+C  P() {0==-1}
 
       B = J                                                             0007
 
-C  P(B,J) {B==5, J==5}
+C  P() {0==-1}
 
       X(1) = Y(2)                                                       0008
 
-C  P(B,J) {B==5, J==5}
+C  P() {0==-1}
 
       Y(2) = B                                                          0009
 
-C  P(B,J) {B==5, J==5}
+C  P() {0==-1}
 
 
       RETURN
       END
 
-C  P() {}
+C  P() {0==-1}
 
 
       SUBROUTINE TEST IF 4(B)
       INTEGER A, B, J
       REAL X(10), Y(10)
 
-C  P() {}
+C  P() {0==-1}
 
 
       J = 5                                                             0006
 
-C  P(J) {J==5}
+C  P() {0==-1}
 
       B = J                                                             0007
 
-C  P(B,J) {B==5, J==5}
+C  P() {0==-1}
 
       X(1) = Y(2)                                                       0008
 
-C  P(B,J) {B==5, J==5}
+C  P() {0==-1}
 
       Y(2) = B                                                          0009
 
-C  P(B,J) {B==5, J==5}
+C  P() {0==-1}
 
 
       RETURN
       END
 
-C  P() {}
+C  P() {0==-1}
 
 
       SUBROUTINE TEST IF 4(B)
       INTEGER A, B, J
       REAL X(10), Y(10)
 
-C  P() {}
-
-
-      J = 5                                                             0006
-
-C  P(J) {J==5}
-
-      B = J                                                             0007
-
-C  P(B,J) {B==5, J==5}
-
-      X(1) = Y(2)                                                       0008
-
-C  P(B,J) {B==5, J==5}
-
-      Y(2) = B                                                          0009
-
-C  P(B,J) {B==5, J==5}
-
+C  P() {0==-1}
 
       RETURN
       END
 
-C  P() {}
+C  P() {0==-1}
 
 
       SUBROUTINE TEST IF 4(B)
       INTEGER A, B, J
       REAL X(10), Y(10)
 
-C  P() {}
+C  P() {0==-1}
 
-
-      J = 5                                                             0006
-
-C  P(J) {J==5}
-
-      B = J                                                             0007
-
-C  P(B,J) {B==5, J==5}
-
-
-      CONTINUE                                                          0011
+      RETURN
       END
 
-C  P() {}
+C  P() {0==-1}
 
 
       SUBROUTINE TEST IF 5(B)
@@ -872,55 +683,55 @@ c test the propagation of control usefulness through the predecesors
       INTEGER A, B, J
       REAL X(10), Y(10)
 
-C  P() {}
+C  P() {0==-1}
 
 
       J = 5                                                             0007
 
-C  P(J) {J==5}
+C  P() {0==-1}
 
 100   B = J                                                             0009
 
-C  P(B,J) {B==5, J==5}
+C  P() {0==-1}
 
 C     BEGIN UNSTRUCTURED
 
-C  P(B,J) {B==5, J==5}
+C  P() {0==-1}
 
       IF (A.NE.0) GOTO 200                                              0010
 
-C  P(B,J) {A==0, B==5, J==5}
+C  P() {0==-1}
 
       PRINT *, 'Well...'                                                0011
 
-C  P(B,J) {B==5, J==5}
+C  P() {0==-1}
 
 200   CONTINUE                                                          0012
 C     END UNSTRUCTURED
 
-C  P(B,J) {B==5, J==5}
+C  P() {0==-1}
 
       TOBEDISCARDED = 1                                                 0012
 
-C  P(B,J) {B==5, J==5}
+C  P() {0==-1}
 
       YACCTOO = 2                                                       0013
 
-C  P(B,J) {B==5, J==5}
+C  P() {0==-1}
 
       X(1) = Y(2)                                                       0014
 
-C  P(B,J) {B==5, J==5}
+C  P() {0==-1}
 
       Y(2) = B                                                          0015
 
-C  P(B,J) {B==5, J==5}
+C  P() {0==-1}
 
 
       RETURN
       END
 
-C  P() {}
+C  P() {0==-1}
 
 
       SUBROUTINE TEST IF 5(B)
@@ -928,55 +739,55 @@ c test the propagation of control usefulness through the predecesors
       INTEGER A, B, J
       REAL X(10), Y(10)
 
-C  P() {}
+C  P() {0==-1}
 
 
       J = 5                                                             0007
 
-C  P(J) {J==5}
+C  P() {0==-1}
 
 100   B = J                                                             0009
 
-C  P(B,J) {B==5, J==5}
+C  P() {0==-1}
 
 C     BEGIN UNSTRUCTURED
 
-C  P(B,J) {B==5, J==5}
+C  P() {0==-1}
 
       IF (A.NE.0) GOTO 200                                              0010
 
-C  P(B,J) {A==0, B==5, J==5}
+C  P() {0==-1}
 
       PRINT *, 'Well...'                                                0011
 
-C  P(B,J) {B==5, J==5}
+C  P() {0==-1}
 
 200   CONTINUE                                                          0012
 C     END UNSTRUCTURED
 
-C  P(B,J) {B==5, J==5}
+C  P() {0==-1}
 
       TOBEDISCARDED = 1                                                 0012
 
-C  P(B,J) {B==5, J==5}
+C  P() {0==-1}
 
       YACCTOO = 2                                                       0013
 
-C  P(B,J) {B==5, J==5}
+C  P() {0==-1}
 
       X(1) = Y(2)                                                       0014
 
-C  P(B,J) {B==5, J==5}
+C  P() {0==-1}
 
       Y(2) = B                                                          0015
 
-C  P(B,J) {B==5, J==5}
+C  P() {0==-1}
 
 
       RETURN
       END
 
-C  P() {}
+C  P() {0==-1}
 
 
       SUBROUTINE TEST IF 5(B)
@@ -984,55 +795,12 @@ c test the propagation of control usefulness through the predecesors
       INTEGER A, B, J
       REAL X(10), Y(10)
 
-C  P() {}
-
-
-      J = 5                                                             0007
-
-C  P(J) {J==5}
-
-100   B = J                                                             0009
-
-C  P(B,J) {B==5, J==5}
-
-C     BEGIN UNSTRUCTURED
-
-C  P(B,J) {B==5, J==5}
-
-      IF (A.NE.0) GOTO 200                                              0010
-
-C  P(B,J) {A==0, B==5, J==5}
-
-      PRINT *, 'Well...'                                                0011
-
-C  P(B,J) {B==5, J==5}
-
-200   CONTINUE                                                          0012
-C     END UNSTRUCTURED
-
-C  P(B,J) {B==5, J==5}
-
-      TOBEDISCARDED = 1                                                 0012
-
-C  P(B,J) {B==5, J==5}
-
-      YACCTOO = 2                                                       0013
-
-C  P(B,J) {B==5, J==5}
-
-      X(1) = Y(2)                                                       0014
-
-C  P(B,J) {B==5, J==5}
-
-      Y(2) = B                                                          0015
-
-C  P(B,J) {B==5, J==5}
-
+C  P() {0==-1}
 
       RETURN
       END
 
-C  P() {}
+C  P() {0==-1}
 
 
       SUBROUTINE TEST IF 5(B)
@@ -1040,34 +808,7 @@ c test the propagation of control usefulness through the predecesors
       INTEGER A, B, J
       REAL X(10), Y(10)
 
-C  P() {}
+C  P() {0==-1}
 
-
-      J = 5                                                             0007
-
-C  P(J) {J==5}
-
-100   B = J                                                             0009
-
-C  P(B,J) {B==5, J==5}
-
-C     BEGIN UNSTRUCTURED
-
-C  P(B,J) {B==5, J==5}
-
-      IF (A.NE.0) GOTO 200                                              0010
-
-C  P(B,J) {A==0, B==5, J==5}
-
-      PRINT *, 'Well...'                                                0011
-
-C  P(B,J) {B==5, J==5}
-
-200   CONTINUE                                                          0012
-C     END UNSTRUCTURED
-
-C  P(B,J) {B==5, J==5}
-
-
-      CONTINUE                                                          0017
+      RETURN
       END

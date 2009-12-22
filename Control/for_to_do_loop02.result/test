@@ -1,1 +1,14 @@
 
+Initial code with converted loop
+
+main()
+{
+   int i, j, n, BlockEnd = 3;
+   for (i = 1;i<16;i <<= 2) {
+      j = i;
+      for(n = 0; n <= BlockEnd-1; n += 1) {
+         printf("%d", j);
+         j++;
+      }
+   }
+}

@@ -1,15 +1,14 @@
 void use_def_elim01(int *x)
 {
+   /* check aliases */
    int *y = x;
    y[0] = 123;
 }
 void use_def_elim01(int *x)
 {
-   int *y = x;
 }
 void use_def_elim01(int *x)
 {
-   int *y;
 }
 void use_def_elim01(int *x)
 {

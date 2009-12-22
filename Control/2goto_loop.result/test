@@ -4,11 +4,14 @@ int main()
 //:   BEGIN UNSTRUCTURED
 // (1,1)
    // BEGIN BLOCK
-   int i = 5;
 // (1,2)
 //:   BEGIN UNSTRUCTURED
 // (2,1)
+   // BEGIN BLOCK
+   int i = 5;                                                           /*0003*/
+// (2,3)
    printf("Begin\n");                                                   /*0004*/
+   // END BLOCK
 // (3,1)
    // BEGIN BLOCK
 // (3,2)
@@ -19,7 +22,7 @@ a:   printf("a\n");                                                       /*0008
    /* Oh, go to b... */
    ;                                                                    /*0010*/
 // (3,4)
-   ;
+
 // (3,5)
    /* The b label */
 b:   printf("b\n");
@@ -47,7 +50,6 @@ int main()
 
 // (1,1)
    // BEGIN BLOCK
-   int i = 5;
 
 //  P() {i==5}
 
@@ -57,7 +59,14 @@ int main()
 //  P() {i==5}
 
 // (2,1)
+   // BEGIN BLOCK
+   int i = 5;                                                           /*0003*/
+
+//  P() {i==5}
+
+// (2,3)
    printf("Begin\n");                                                   /*0004*/
+   // END BLOCK
 
 //  P() {i==5}
 
@@ -80,7 +89,7 @@ a:   printf("a\n");                                                       /*0008
 //  P() {i==5}
 
 // (3,4)
-   ;
+
 
 //  P() {i==5}
 
@@ -109,16 +118,16 @@ int main()
 
 // (0,1)
    // BEGIN BLOCK
-   int i = 5;
-
-//  P() {i==5}
-
-// (0,2)
-   printf("Begin\n");                                                   /*0004*/
+   int i = 5;                                                           /*0003*/
 
 //  P() {i==5}
 
 // (0,3)
+   printf("Begin\n");                                                   /*0004*/
+
+//  P() {i==5}
+
+// (0,4)
 //:   BEGIN UNSTRUCTURED
 
 //  P() {i==5}
