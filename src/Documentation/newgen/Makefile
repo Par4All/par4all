@@ -100,13 +100,13 @@ specs.h $(F.spec): $(F.newgen)
 	#
 	# building specs.h
 	#
-	export PATH=$$PATH:$(EXE.d):$(BIN.d) ; LD_LIBRARY_PATH=$(NEWGEN_ROOT)/lib/$(ARCH):$(NEWGEN_ROOT)/lib newgen -c $(F.newgen) | make_all_specs > specs.h
+	export PATH=$$PATH:$(EXE.d):$(BIN.d) ; LD_LIBRARY_PATH=$(NEWGEN_ROOT)/lib/$(ARCH):$(NEWGEN_ROOT)/lib:$$LD_LIBRARY_PATH newgen -c $(F.newgen) | make_all_specs > specs.h
 
 lisp_internal_representation: $(F.newgen)
 	#
 	# building $@
 	#
-	export PATH=$$PATH:$(EXE.d):$(BIN.d) ; LD_LIBRARY_PATH=$(NEWGEN_ROOT)/lib/$(ARCH):$(NEWGEN_ROOT)/lib newgen -lisp $(F.newgen)
+	export PATH=$$PATH:$(EXE.d):$(BIN.d) ; LD_LIBRARY_PATH=$(NEWGEN_ROOT)/lib/$(ARCH):$(NEWGEN_ROOT)/lib:$$LD_LIBRARY_PATH newgen -lisp $(F.newgen)
 	touch $@
 
 clean: local-clean
