@@ -3,6 +3,8 @@
  * - every and each function used to manipulate gfc or pips entities begin with gfc2pips_
  * - if the function is a translation from one RI to the other it will be:
  * 		gfc2pips_<type_of_the_source_entity>2<type_of_the_target_entity>(arguments)
+ *
+ * EXEC_RETURN plante
  */
 
 #include "dump2PIPS.h"
@@ -474,6 +476,24 @@ void gfc2pips_namespace(gfc_namespace* ns){
 
 
 	newgen_list list_of_extern_entities = gfc2pips_get_extern_entities(ns);
+
+	/* subroutines won't be declared */
+	/*
+	bool func = type_functional_p(te) && storage_rom_p(entity_storage(e)); //should be ok
+	//c'est une fonction et existe ou valeur de retour inconnue et n'est ni de type void ni une variable surchargée
+	bool external = (
+		func && (
+			value_code_p(v) || value_unknown_p(v)
+		) &&  !(
+			type_void_p(functional_result(type_functional(te)))
+			|| (
+				type_variable_p(functional_result(type_functional(te)))
+				&& basic_overloaded_p(variable_basic(type_variable(functional_result(type_functional(te)))))
+			)
+		)
+	);
+	*/
+
 	newgen_list list_of_extern_entities_p = list_of_extern_entities;
 	while(list_of_extern_entities_p){
 		//force storage
@@ -595,12 +615,11 @@ void gfc2pips_namespace(gfc_namespace* ns){
 
 	/*gfc_function_body = make_statement(
 		entity_empty_label(),
-		//ceci merde une fois les character implémentés
 		STATEMENT_NUMBER_UNDEFINED,//lien number
 		STATEMENT_ORDERING_UNDEFINED,
 		empty_comments,
 		icf,
-		NULL,//variables ? pour fortran2C ?
+		NULL,//variables ?
 		NULL,
 		empty_extensions()
 	);*/
@@ -610,31 +629,16 @@ void gfc2pips_namespace(gfc_namespace* ns){
 
 	//we automatically add a return statement
 	//we have got a problem with multiple return in the function
+	//and if the last statement is already a return ?
 	insure_return_as_last_statement(gfc2pips_main_entity,&gfc_function_body);
 
 	SetChains();
 	//using ComputeAddresses() point a problem: entities in *STATIC* are computed two times
 	//however we have to use it !
-	//we have a conflict in storage
-	//ComputeAddresses();
 	gfc2pips_computeAdresses();
 
 	//gfc2pips_computeEquiv(ns->equiv);
-/*show_equiv (gfc_equiv *eq)
-	{
-	  //quand une ou plusieurs variables sont équivalentes, l'adresse de la première en mémoire deviens celles de toutes. Les adresses de toutes les variables qui s'ensuivent sont décalées si la variable mise plus en avant est plus large que la précédente.
-	  show_indent ();
-	  fputs ("Equivalence: ", dumpfile);
-	  while (eq)
-	    {
-	      show_expr (eq->expr);
-	      eq = eq->eq;
-	      if (eq)
-		fputs (", ", dumpfile);
-	    }
-	}
-*/
-	//SaveChains();//Syntax !! handle equiv in some way, look into it, need to use SetChains(); at the beginning to initiate
+
 	//update_common_sizes();//Syntax !!//we have the job done 2 times if debug is at 9, one time if at 8
 	//print_common_layout(stderr,StaticArea,true);
 	pips_debug(2, "dumping done\n");
@@ -1451,7 +1455,8 @@ entity gfc2pips_real2entity(double r){
 	}else{
 		//we need a test to know if we output in scientific or normal mode
 		//sprintf(str,"%.32f",r);
-		sprintf(str,"%.6e",r);
+		//sprintf(str,"%.6e",r);
+		sprintf(str,"%.16e",r);
 		//fprintf(stderr,"copy of the entity name(real) %s\n",str);
 	}
 	gfc2pips_truncate_useless_zeroes(str);
@@ -1764,28 +1769,32 @@ bool gfc2pips_there_is_a_range(gfc_array_ref *ar){
  * @param ar the gfc structure containing the information
  */
 expression gfc2pips_mkRangeExpression(entity ent, gfc_array_ref *ar){
-	expression ref = make_expression(
-		make_syntax_reference(
-			make_reference(ent, NULL)
-		),
-	    normalized_undefined
-	);
-
-	entity substr = entity_intrinsic(SUBSTRING_FUNCTION_NAME);
 	newgen_list lexpr = NULL;
 	int i;
 	for( i=0 ; ar->start[i] ;i++){
-		lexpr = CONS(EXPRESSION,
-			ar->end[i] ? gfc2pips_expr2expression(ar->end[i]) : MakeNullaryCall(CreateIntrinsic(UNBOUNDED_DIMENSION_NAME)),
-			CONS(EXPRESSION,
+		if(ar->end[i]){
+			range r = make_range(
+				gfc2pips_expr2expression(ar->start[i]),
+				gfc2pips_expr2expression(ar->end[i]),
+				ar->stride[i] ? gfc2pips_expr2expression(ar->stride[i]) : MakeIntegerConstantExpression("1")
+			);
+			lexpr = CONS(EXPRESSION,
+				make_expression(make_syntax(is_syntax_range,r),normalized_undefined),
+				lexpr
+			);
+		}else{
+			lexpr = CONS(EXPRESSION,
 				gfc2pips_expr2expression(ar->start[i]),
 				lexpr
-			)
-		);
+			);
+		}
 	}
-	lexpr = CONS(EXPRESSION, ref, gen_nreverse(lexpr) );
-	syntax s = make_syntax_call( make_call(substr, lexpr));
-	return make_expression( s, normalized_undefined );
+	return make_expression(
+		make_syntax_reference(
+			make_reference(ent, gen_nreverse(lexpr))
+		),
+	    normalized_undefined
+	);
 }
 
 
@@ -1827,6 +1836,7 @@ instruction gfc2pips_code2instruction__TOP(gfc_namespace *ns, gfc_code* c){
 				//we should shift endlessly the comments number to the first "real" statement
 				//string comments  = gfc2pips_get_comment_of_code(c);//fprintf(stderr,"comment founded")
 
+				message_assert("error in data instruction",ins!=instruction_undefined);
 				newgen_list lst = CONS(STATEMENT, make_statement(
 					entity_empty_label(),
 					STATEMENT_NUMBER_UNDEFINED,
@@ -2248,6 +2258,7 @@ instruction gfc2pips_code2instruction_(gfc_code* c){
 				symbol = c->symtree->n.sym;
 			}else{
 				//erreur
+				pips_user_error("We do not have a symbol to call!!\n");
 				return instruction_undefined;
 			}
 			newgen_list list_of_arguments = gfc2pips_arglist2arglist(c->ext.actual);
@@ -2329,15 +2340,16 @@ instruction gfc2pips_code2instruction_(gfc_code* c){
 
 		case EXEC_RETURN:{//we shouldn't even dump that for main entities
 			pips_debug(5, "Translation of RETURN\n");
-			return instruction_undefined;
+			//return instruction_undefined;
 			expression e = expression_undefined;
-			if(c->expr){
-				//traitement de la variable de retour
-				e = gfc2pips_expr2expression(c->expr);
-			}else{
 
-			}
-			return MakeReturn(e);//Syntax !
+			return make_instruction_call(
+				make_call(
+					CreateIntrinsic(RETURN_FUNCTION_NAME),
+					c->expr?CONS(EXPRESSION, gfc2pips_expr2expression(c->expr), NULL):NULL
+				)
+			);
+			//return MakeReturn(e);//Syntax !
 		}
 
 		case EXEC_PAUSE:
@@ -2437,7 +2449,9 @@ instruction gfc2pips_code2instruction_(gfc_code* c){
 			statement s_else=statement_undefined;
 			//IF
 			if(d->next){
-				s_if = instruction_to_statement(gfc2pips_code2instruction(d->next,false));
+				instruction s_if_i = gfc2pips_code2instruction(d->next,false);
+				message_assert("s_if_i is defined\n",s_if_i!=instruction_undefined);
+				s_if = instruction_to_statement(s_if_i);
 				statement_label(s_if) = gfc2pips_code2get_label(d->next);
 				//ELSE + ?
 				if(d->block){
@@ -2445,12 +2459,17 @@ instruction gfc2pips_code2instruction_(gfc_code* c){
 					//ELSE IF
 					if(d->block->expr){
 						//fprintf(stderr,"d->block->expr %d\n",d->block->expr);
-						s_else = instruction_to_statement(gfc2pips_code2instruction_(d));
-						statement_label(s_else) = gfc2pips_code2get_label(d);
+						instruction ins = gfc2pips_code2instruction_(d);
+						if(ins!=instruction_undefined){
+							s_else = instruction_to_statement(ins);
+							statement_label(s_else) = gfc2pips_code2get_label(d);
+						}
 					//ELSE
 					}else{
 						//fprintf(stderr,"d->block %d\n",d->block);
-						s_else = instruction_to_statement(gfc2pips_code2instruction(d->block->next,false));//no condition therefore we are in the last ELSE statement
+						instruction s_else_i = gfc2pips_code2instruction(d->block->next,false);
+						message_assert("s_else_i is defined\n",s_else_i!=instruction_undefined);
+						s_else = instruction_to_statement(s_else_i);//no condition therefore we are in the last ELSE statement
 						statement_label(s_else) = gfc2pips_code2get_label(d->block->next);
 					}
 				}
@@ -2572,7 +2591,9 @@ instruction gfc2pips_code2instruction_(gfc_code* c){
 	    case EXEC_DO:{
 	    	pips_debug(5, "Translation of DO\n");
 	    	gfc2pips_push_loop(c);
-	    	statement s = instruction_to_statement(gfc2pips_code2instruction(c->block->next,true));
+	    	instruction do_i = gfc2pips_code2instruction(c->block->next,true);
+	    	message_assert("first instruction defined",do_i!=instruction_undefined);
+	    	statement s = instruction_to_statement(do_i);
 
 	    	//it would be perfect if we new there is a EXIT or a CYCLE in the loop, do not add if already one (then how to stock the label ?)
 	    	//add to s a continue statement at the end to make cycle/continue statements
@@ -2604,7 +2625,9 @@ instruction gfc2pips_code2instruction_(gfc_code* c){
 	    case EXEC_DO_WHILE:{
 	    	pips_debug(5, "Translation of DO WHILE\n");
 	    	gfc2pips_push_loop(c);
-	    	statement s = instruction_to_statement(gfc2pips_code2instruction(c->block->next,true));
+	    	instruction do_i = gfc2pips_code2instruction(c->block->next,true);
+	    	message_assert("first instruction defined",do_i!=instruction_undefined);
+	    	statement s = instruction_to_statement(do_i);
 
 	    	//add to s a continue statement at the end to make cycle/continue statements
 	    	newgen_list list_of_instructions = sequence_statements(instruction_sequence(statement_instruction(s)));
@@ -3029,27 +3052,30 @@ instruction gfc2pips_code2instruction_(gfc_code* c){
 					&& d->ext.dt->format_label->value != -1
 				){
 					if(d->ext.dt->format_label->format){
-						f = gfc2pips_int2expression(d->ext.dt->format_label->value);
+						//we check if we have already the label or not the label is associated to a FORMAT => we check if we already have this format
+						//this check is important 'cause we do not have to remove quotes twice !
+						if( gen_find_eq( d->ext.dt->format_label->value, gfc2pips_format2)==gen_chunk_undefined ){
+							//we do have a label somewhere with a format
+							f = gfc2pips_int2expression(d->ext.dt->format_label->value);
 
-						//we have to push the current FORMAT in a list, we will dump it at the very, very TOP
-						//we need to change the expression, a FORMAT statement doesn't have quotes around it
-						expression fmt_expr = gfc2pips_expr2expression(d->ext.dt->format_label->format);
-						//delete too much quotes
-						char* str = entity_name(call_function(syntax_call(expression_syntax(fmt_expr))));
-						//fprintf(stderr,"new format: %s\n",str);
-						int curr_char_indice = 0,curr_char_indice_cible = 0, length_curr_format=strlen(str) ;
-						//str[0] = str[1];
-						for(;
-							curr_char_indice_cible<length_curr_format-1 ;
-							curr_char_indice++,curr_char_indice_cible++
-						){
-							if(str[curr_char_indice_cible]=='\'') curr_char_indice_cible++;
-							str[curr_char_indice] = str[curr_char_indice_cible];
+							//we have to push the current FORMAT in a list, we will dump it at the very, very TOP
+							//we need to change the expression, a FORMAT statement doesn't have quotes around it
+							expression fmt_expr = gfc2pips_expr2expression(d->ext.dt->format_label->format);
+							//delete supplementary quotes
+							char* str = entity_name(call_function(syntax_call(expression_syntax(fmt_expr))));
+							int curr_char_indice = 0,curr_char_indice_cible = 0, length_curr_format=strlen(str) ;
+							for(;
+								curr_char_indice_cible<length_curr_format-1 ;
+								curr_char_indice++,curr_char_indice_cible++
+							){
+								if(str[curr_char_indice_cible]=='\'') curr_char_indice_cible++;
+								str[curr_char_indice] = str[curr_char_indice_cible];
+							}
+							str[curr_char_indice] = '\0';
+
+							gfc2pips_format = gen_cons(fmt_expr,gfc2pips_format);
+							gfc2pips_format2 = gen_cons(d->ext.dt->format_label->value,gfc2pips_format2);
 						}
-						str[curr_char_indice] = '\0';
-
-						gfc2pips_format = gen_cons(fmt_expr,gfc2pips_format);
-						gfc2pips_format2 = gen_cons(d->ext.dt->format_label->value,gfc2pips_format2);
 					}else{
 						//error or warning: we have bad code
 						pips_error("gfc2pips_code2instruction","No format for label\n");
@@ -3283,14 +3309,18 @@ newgen_list gfc2pips_dumpSELECT(gfc_code *c){
 
 		instruction s_if = gfc2pips_code2instruction(d->next,false);
 		//boucle//s_if = instruction_to_statement(gfc2pips_code2instruction(d->next,false));
-		instruction select_case = test_to_instruction(
-			make_test(
-				test_expr,
-				make_stmt_of_instr(s_if),
-				make_empty_block_statement()
-			)
-		);
-		list_of_statements = gen_nconc(list_of_statements, CONS(STATEMENT, make_stmt_of_instr(select_case), NULL));
+		if(s_if!=instruction_undefined){
+			instruction select_case = test_to_instruction(
+				make_test(
+					test_expr,
+					make_stmt_of_instr(s_if),
+					make_empty_block_statement()
+				)
+			);
+			list_of_statements = gen_nconc(list_of_statements, CONS(STATEMENT, make_stmt_of_instr(select_case), NULL));
+		}else{
+			pips_user_error("instruction in SELECT CASE is undefined\n");
+		}
 	}
 
 	return list_of_statements;
@@ -3300,8 +3330,8 @@ newgen_list gfc2pips_dumpSELECT(gfc_code *c){
  * @brief build a DATA statement, filling blanks with zeroes.
  *
  * TODO:
- * - add variables which tell when split the declaration in parts or not
- * - change this function into one returning a set of DATA statements for each sequence instead or filling with zeroes (it is what will be done in the memory anyway) ?
+ * - add variables which tell when split the declaration in parts or not ?
+ * - change this function into one returning a set of DATA statements for each sequence instead or filling with zeroes ? (add 0 is what will be done in the memory anyway)
  */
 instruction gfc2pips_symbol2data_instruction(gfc_symbol *sym){
 	pips_debug(3,"%s\n",sym->name);
@@ -3466,7 +3496,9 @@ expression gfc2pips_make_zero_for_symbol(gfc_symbol* sym){
  *
  * DATA x /1,1,1/ =>  DATA x /3*1/
  *
- * TODO: look into the consistency issue
+ * TODO:
+ * - look into the consistency issue
+ * - add recognition of /3*1, 4*1/ to make it a /7*1/
  */
 newgen_list gfc2pips_reduce_repeated_values(newgen_list l){
 	//return l;
@@ -3474,7 +3506,6 @@ newgen_list gfc2pips_reduce_repeated_values(newgen_list l){
 	newgen_list local_list = l, last_pointer_on_list=NULL;
 	int nb_of_occurences=0;
 	pips_debug(9, "begin reduce of values\n");
-	//add recognition of /3*1, 4*1/ to make it a /7*1/
 	while(local_list){
 		curr = (expression)local_list->car.e;
 		if(expression_is_constant_p(curr)){
@@ -3555,6 +3586,7 @@ entity gfc2pips_code2get_label(gfc_code *c){
 	if( c->here ) return gfc2pips_int2label(c->here->value);
 	return entity_empty_label() ;
 }
+
 entity gfc2pips_code2get_label2(gfc_code *c){
 	if(!c) return entity_empty_label() ;
 	pips_debug(9,
