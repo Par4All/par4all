@@ -1,0 +1,144 @@
+#! /bin/bash -vx
+#
+# Inspired from setup_pips.sh
+#
+
+P4A_ROOT=/home/keryell/projets/Wild_Systems/Par4All/b
+# Cf main.mk
+#INSTALL_DIR=$P4A_ROOT
+
+cd $P4A_ROOT
+
+PIPS_COMPONENTS="linear newgen pips"
+PIPS_DIR=$P4A_ROOT/packages/PIPS
+destination=$PIPS_DIR
+
+error()
+{
+  echo "$@" >&2
+  exit 1
+}
+
+warn()
+{
+  {
+    echo
+    echo "WARNING"
+    for msg in "$@" ; do
+      echo $msg ;
+    done
+    echo "Type return to continue"
+  } >&2
+  read
+}
+
+
+# Compile and install the polyLib:
+(
+    cd $P4A_ROOT/packages/polylib
+    ./autogen.sh
+    ./configure --prefix=$P4A_ROOT --libdir=$P4A_ROOT/$PIPS_ARCH
+)
+
+echo
+echo "### creating pipsrc.sh"
+cat <<EOF > $destination/pipsrc.sh
+# minimum rc file for sh-compatible shells
+
+# default architecture
+export PIPS_ARCH=$PIPS_ARCH
+# software roots
+export EXTERN_ROOT=/home/keryell/projets/Wild_Systems/PIPS/git-svn-work/extern
+export NEWGEN_ROOT=$P4A_ROOT
+export LINEAR_ROOT=$P4A_ROOT
+export PIPS_ROOT=$P4A_ROOT
+# Mainly to avoid the non working libraries.make:
+export WITH_DYNAMIC_LIBRARIES=1
+
+# fix path
+PATH=$P4A_ROOT/bin:$P4A_ROOT/utils:\$PATH
+EOF
+
+# Find the Fortran compiler:
+type gfortran && export PIPS_F77=gfortran
+type g77 && export PIPS_F77=g77
+
+
+if [ -n "$PIPS_F77" ]; then
+    echo >> $destination/pipsrc.sh
+    echo "# The Fortran compiler to use:" >> $destination/pipsrc.sh
+    echo "export PIPS_F77=$PIPS_F77" >> $destination/pipsrc.sh
+fi
+
+# Source the just generated environment to be able to compile PIPS later:
+source $destination/pipsrc.sh
+
+# Make PIPS makefile links:
+for i in $PIPS_COMPONENTS; do
+    ln -s ../nlpmake/makes $PIPS_DIR/$i/makes
+done
+
+
+echo
+echo "### checking needed softwares"
+for exe in svn wget tar gunzip make cproto flex bison gcc perl sed tr
+do
+  type $exe || error "no such executable, please install: $exe"
+done
+
+# check cproto version... 4.6 is still available on many distributions
+[[ $(cproto -V 2>&1) = 4.7* ]] || \
+  error "Pips compilation requires at least cproto 4.7c"
+
+# clean environment so as not to interfere with another installation
+PIPS_ARCH=`$PIPS_DIR/nlpmake/makes/arch.sh`
+export PIPS_ARCH
+
+unset NEWGEN_ROOT LINEAR_ROOT PIPS_ROOT
+
+echo
+echo "### testing special commands for config.mk"
+config=$PIPS_DIR/nlpmake/makes/config.mk
+# Save an old config file if we run again this script:
+[ -f $config ] && mv $config $config.old
+
+type javac && echo '_HAS_JDK_ = 1' >> $config
+type latex && echo '_HAS_LATEX_ = 1' >> $config
+type htlatex && echo '_HAS_HTLATEX_ = 1' >> $config
+type emacs && echo '_HAS_EMACS_ = 1' >> $config
+type pkg-config && has_pkgconfig=1
+
+if [ "$has_pkgconfig" ]
+then
+  echo '_HAS_PKGCONFIG_ = 1' >> $config
+  if pkg-config --exists gtk+-2.0
+  then
+    echo '_HAS_GTK2_ = 1' >> $config
+ else
+    echo 'PIPS_NO_GPIPS = 1' >> $config
+  fi
+else
+  echo 'PIPS_NO_GPIPS = 1' >> $config
+fi
+
+# whether to build the documentation depends on latex and htlatex
+target=compile
+type latex && target=build
+type htlatex && target=full-build
+
+
+echo
+echo "### generating csh environment"
+$PIPS_DIR/pips/src/Scripts/env/sh2csh.pl \
+    < $destination/pipsrc.sh \
+    > $destination/pipsrc.csh
+
+warn "cproto header generation results in many cpp warnings..."
+make -C $PIPS_DIR
+
+echo
+echo "### checking useful softwares"
+for exe in bash m4 wish latex htlatex javac emacs
+do
+  type $exe || echo "no such executable, consider installing: $exe"
+done
