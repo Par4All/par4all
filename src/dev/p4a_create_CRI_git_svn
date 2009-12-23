@@ -38,3 +38,15 @@ done
 
 # Wait for all the git-svn to finish:
 wait
+
+for i in $SVN_REPOSITORIES; do
+    (
+        cd $i
+        # Add the reference svn-git gateways for PIPS:
+        git remote add origin ssh://git.hpc-project.com/git/svn_$i.git
+        # Declare the master branch to be pushed on this remote git:
+        git config branch.master.remote origin
+        git config branch.master.merge refs/heads/master
+        git config push.default matching
+    )
+done

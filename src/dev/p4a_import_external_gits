@@ -12,6 +12,13 @@ GIT_SVN_PIPS_DIR=/home/keryell/projets/Wild_Systems/Par4All/CRI-git-svn
 # ):
 PIPS_SVN_REPOSITORIES="validation linear newgen nlpmake pips"
 
+if [[ -z $P4A_ROOT ]]; then
+    echo "You need to have \$P4A_ROOT defined to the Par4All top-level directory"
+    exit
+fi
+
+cd $P4A_ROOT
+
 COMMIT_MESSAGE_FILE=`mktemp`
 #echo $COMMIT_MESSAGE_FILE
 
