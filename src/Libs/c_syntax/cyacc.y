@@ -623,7 +623,7 @@ c_parser_context GetContextCopy()
 %type <entity> old_proto_decl direct_old_proto_decl
 
  /* For now, pass pragmas as strings and list of strings: */
-%type <string> pragma
+%type <liste> pragma
 %type <liste> pragmas
 
 %%
@@ -1412,26 +1412,32 @@ pragma:
 
 
 pragmas:
-{ /* No pragma... The common case, return the empty list */
+pragma { /* To  No pragma... The common case, return the empty list */
   pips_debug(1, "No longer pragma\n");
-  $$ = NIL;
+  $$ = CONS(STRING, $1, NIL);
 }
 | pragma pragmas {
   /* Concatenate the pragma to the list of pragmas */
-  $$ = CONS(STRING, $1, $2);
+  CDR($1) = $2;
+  $$ = $1;
 }
 ;
 
 
+/* To avoid shift-reduce conflict, enumerate statement with and without
+   pragma: */
 statement: pragmas statement_without_pragma
 {
-  //add_pragma_strings_to_statement($2, $1,
-  //				  FALSE /* Do not reallocate the strings*/);
+  add_pragma_strings_to_statement($2, $1,
+  				  FALSE /* Do not reallocate the strings*/);
   /* Reduce the CO2 impact of this code, even there is huge memory leaks
      everywhere around in this file: */
-  //gen_free_list($1);
+  gen_free_list($1);
   $$ = $2;
 }
+| statement_without_pragma {
+  $$ = $1;
+  }
 ;
 
 
