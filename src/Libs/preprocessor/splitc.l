@@ -277,7 +277,9 @@ universal-character-name ({escape}(u{hexdigit}{4}|U{hexdigit}{8}))
 			    gather_comment_state_machine = PUT_IN_NEXT_TOP_LEVEL_CONSTRUCT;
                         }
 
-^"#"[^\n]*              {
+^"#"("\\\n"|[^\n])*              {
+                /* Look for a # up to the end of line,
+                   dealing with any backslashed new lines: */
                                 /* csplit_line_number++; */
                                 pips_debug(5,"Pragma comment %s\n",yytext);
                                 /* Must be a line pragma left by the preprocessor:
@@ -287,7 +289,6 @@ universal-character-name ({escape}(u{hexdigit}{4}|U{hexdigit}{8}))
                                 */
                                 gdb_marker();
                                 if(strstr(yytext, "#pragma")==yytext) {
-                                   pips_user_warning("Pragma #pragma is ignored: \"%s\".\n", yytext);
                                    user_line_number--;
                                 }
                                 /* the preprocessor seems to provide line information in pragmas
@@ -343,8 +344,7 @@ universal-character-name ({escape}(u{hexdigit}{4}|U{hexdigit}{8}))
                         }
 
 "_Pragma" 	        {
-                                pips_debug(5,"Pragma not implemented %s\n",yytext);
-				return(TK_PRAGMA);
+                                return(TK_PRAGMA);
                         }
 
 \'([^\\]|{char_escape}|{oct_escape}|{hex_escape}|{universal-character-name})\'           {

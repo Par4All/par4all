@@ -52,6 +52,11 @@
 ** 2.0  George Necula 12/12/00: Many extensions
 *)*/
 
+%top{
+  /* To have strndup(), put this at the top of the generated file since : */
+#define _GNU_SOURCE
+ }
+
 %{
 #include <stdlib.h>
 #include <stdio.h>
@@ -351,6 +356,8 @@ void init_C_comment()
  /* To deal more cleanly with the comments:
     %x COMMENT
  */
+ /* To deal cleanly with complex pragma line escape, use a separate state: */
+%x the_end_of_pragma
 
 decdigit [0-9]
 octdigit [0-7]
@@ -385,25 +392,41 @@ universal-character-name ({escape}(u{hexdigit}{4}|U{hexdigit}{8}))
 
 %%
 
+<the_end_of_pragma>("\\\n"|[^\n])*"\n" {
+		 /* Parse some potentially escaped line up to a normal new
+			 line that is the end of a pragma: */
+		 /* Return the pragma value without the final \n: */
+		 c_lval.string = strndup(yytext, strlen(yytext) - 1);
+		 BEGIN(INITIAL);
+		 return(TK_PRAGMA);
+	       }
+
+
 ("/*"([^*]|("*"+[^/*]))*"*"+"/")|("//"("\\\n"|[^\n])*"\n"?)	{
                                 pips_debug(9,"Comment %s\n",yytext);
                                 C_line_number += character_occurences_in_string(yytext, '\n');
                                 update_C_comment(yytext);
                         }
-^"#"[^\n]*              {
+
+^"#"("\\\n"|[ \t])*"pragma"           {
+                /* Look for a # followed by any whitespace and any
+		   backslashed end-of line, followed by "pragma" up to the
+		   end of line, dealing with any backslashed new lines: */
+		 pips_debug(1, "#pragma found: \"%s\"\n", yytext);
+		 /* To deal with complex line escape, put the end of the
+		    analysis in another rule: */
+		 BEGIN(the_end_of_pragma);
+		 }
+
+^"#"[ \t]*{decdigit}+[^\n]*             {
                                 // \n is not part of the pragma
                                 // The line count is correct but empty lines
-                                // seem to be inserted at the beginning of 
+                                // seem to be inserted at the beginning of
                                 // the compilation unit files
-                                pips_debug(9,"Pragma comment %s\n",yytext);
-                                /* Is it a #line pragma? It has to be after preprocessing */
-                                if(strstr(yytext, "#pragma")==yytext) {
-                                   pips_user_warning("Pragma #pragma is ignored: \"%s\".\n", yytext);
-                                   C_line_number--;
-                                }
+                                pips_debug(9,"Pragma-like comment %s\n",yytext);
                                 /* the preprocessor seems to provide line information in pragmas
                                    which are not #line pragmas. */
-                                else if(/* strstr(yytext, "#line")==yytext && */ strlen(yytext)>=4) {
+                                if(/* strstr(yytext, "#line")==yytext && */ strlen(yytext)>=4) {
                                    int initial_C_line_number = -1;
                                    int items = sscanf(yytext+1, "%d", &initial_C_line_number);
                                    if(items==1) {
@@ -411,11 +434,11 @@ universal-character-name ({escape}(u{hexdigit}{4}|U{hexdigit}{8}))
                                       C_line_number = initial_C_line_number-1;
                                    }
                                    else {
-                                      pips_user_warning("No line number in # pragma: \"%s\".\n", yytext);
+                                      pips_user_warning("No line number after a #: \"%s\".\n", yytext);
                                       CParserError("Ill. formated # pragma\n");
                                    }
                                 }
-                                /* Current comments cannot be related to 
+                                /* Current comments cannot be related to
                                    something happening after a pragma .*/
                                 discard_C_comment();
                         }
@@ -438,8 +461,8 @@ universal-character-name ({escape}(u{hexdigit}{4}|U{hexdigit}{8}))
                         }
 
 "_Pragma" 	        {
-                                pips_debug(9,"Pragma soon implemented %s\n",yytext);
-				return(TK_PRAGMA);
+                                pips_debug(9,"_Pragma found in \"%s\"\n",yytext);
+				return(TK__Pragma);
                         }
 
 \'([^\\]|{char_escape}|{oct_escape}|{hex_escape}|{universal-character-name})\'           {

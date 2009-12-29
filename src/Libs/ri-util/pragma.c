@@ -2,7 +2,7 @@
 
   $Id$
 
-  Copyright 1989-2009 MINES ParisTech
+  Copyright 1989-2009 HPC Project
 
   This file is part of PIPS.
 
@@ -46,8 +46,8 @@
 
 //***********************************************************Local constant
 static const string C_PRAGMA_HEADER = "#pragma";
-static const string FORT_PRAGMA_HEADER = "!$";
-static const string FORT_OMP_CONTINUATION = "\n!$omp& ";
+static const string FORTRAN_PRAGMA_HEADER = "!$";
+static const string FORTRAN_OMP_CONTINUATION = "\n!$omp& ";
 
 
 /*****************************************************A CONSTRUCTOR LIKE PART
@@ -156,7 +156,7 @@ string close_extension (extension e) {
       if (pragma_entity_p(extension_pragma(e)))
 	result=directive_to_string(load_global_directives(pragma_entity(extension_pragma(e))),true);
       else
-	result = strdup(concatenate (FORT_PRAGMA_HEADER, "omp end parallel do",
+	result = strdup(concatenate (FORTRAN_PRAGMA_HEADER, "omp end parallel do",
 				     NULL));
     }
   return result;
@@ -225,7 +225,7 @@ pragma_to_string (pragma p) {
 		       size < (MAX_LINE_LENGTH - 7));
 	  line_sz += size;
 	  if (line_sz >= MAX_LINE_LENGTH - 8) {
-	    gen_insert_before (strdup (FORT_OMP_CONTINUATION), str, l_str);
+	    gen_insert_before (strdup (FORTRAN_OMP_CONTINUATION), str, l_str);
 	    line_sz = size;
 	  }
 	}
@@ -246,7 +246,7 @@ pragma_to_string (pragma p) {
   }
   if (s != string_undefined) {
     if (get_prettyprint_is_fortran() == TRUE) {
-      s = strdup(concatenate (FORT_PRAGMA_HEADER, s, NULL));
+      s = strdup(concatenate (FORTRAN_PRAGMA_HEADER, s, NULL));
     }
     else
       s = strdup(concatenate (C_PRAGMA_HEADER, " ", s, NULL));
@@ -312,18 +312,18 @@ extensions_to_string(extensions es, bool nl) {
 /********************************************************** PRAGMA MANAGEMENT
  */
 
-/** @brief  Add a pragma as a string to a statement.
+/** @brief  Add a string as a pragma to a statement.
  *  @return void
- *  @param  stat, the statement on which we want to add a pragma
- *  @param  s, the string pragma.
+ *  @param  st, the statement on which we want to add a pragma
+ *  @param  s, the pragma string.
  *  @param  copy_flag, to be set to true to duplicate the string
  */
 void
-add_pragma_str_to_statement(statement st, string s, bool copy_flg) {
+add_pragma_str_to_statement(statement st, string s, bool copy_flag) {
   extensions es = statement_extensions(st);
   /* Make a new pragma: */
   pragma p = pragma_undefined;
-  if (copy_flg == TRUE) p = make_pragma(is_pragma_string, strdup(s));
+  if (copy_flag == TRUE) p = make_pragma(is_pragma_string, strdup(s));
   else p = make_pragma_string(s);
   extension e = make_extension(p);
   /* Add the new pragma to the extension list: */
@@ -332,9 +332,25 @@ add_pragma_str_to_statement(statement st, string s, bool copy_flg) {
   extensions_extension(es) = el;
 }
 
+
+/** Add a list of strings as as many pragmas to a statement
+
+    @param  st, the statement on which we want to add a pragma
+
+    @param  l, a list of pragma string(s)
+
+    @param  copy_flag, to be set to true to duplicate the string
+ */
+void
+add_pragma_strings_to_statement(statement st, list l, bool copy_flag) {
+  FOREACH(STRING, p, l)
+    add_pragma_str_to_statement(st, p, copy_flag);
+}
+
+
 /** @brief  Add a pragma as a list of expression to a statement.
  *  @return void
- *  @param  stat, the statement on which we want to add a pragma
+ *  @param  st, the statement on which we want to add a pragma
  *  @param  l, the list of expression.
  */
 void
@@ -377,3 +393,5 @@ void add_pragma_entity_to_statement(statement st, entity en)
   el = gen_extension_cons(e, el);
   extensions_extension(es) = el;
 }
+
+

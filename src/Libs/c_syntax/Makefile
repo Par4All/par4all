@@ -25,7 +25,7 @@ TARGET	= c_syntax
 # many other parsers in PIPS:
 #YOPT	= --defines --locations --name-prefix=c_
 #LOPT	= --bison-bridge --bison-location --prefix=c_
-YOPT	= --defines --name-prefix=c_
+YOPT	= --defines --name-prefix=c_ --report=state
 LOPT	= --prefix=c_
 
 INC_CFILES =	c_parser.c \
@@ -46,7 +46,7 @@ PROJECT = pips
 include $(ROOT)/makes/main.mk
 
 # local stuff
-$(TARGET).h: $(DERIVED_HEADERS) $(DERIVED_CFILES) 
+$(TARGET).h: $(DERIVED_HEADERS) $(DERIVED_CFILES)
 
 clean: local-clean
 

@@ -523,7 +523,10 @@ c_parser_context GetContextCopy()
 %token TK_BLOCKATTRIBUTE
 %token TK_DECLSPEC
 %token TK_MSASM TK_MSATTR
-%token TK_PRAGMA
+ /* The string that follows a #pragma: */
+%token <string> TK_PRAGMA
+ /* The token _Pragma from C99: */
+%token TK__Pragma
 
 /* sm: cabs tree transformation specification keywords */
 %token TK_AT_TRANSFORM TK_AT_TRANSFORMEXPR TK_AT_SPECIFIER TK_AT_EXPR
@@ -558,6 +561,7 @@ c_parser_context GetContextCopy()
 %type <liste> attributes attributes_with_asm asmattr
 %type <qualifier> attribute
 %type <statement> statement
+%type <statement> statement_without_pragma
 %type <entity> constant
 %type <string> string_constant
 %type <expression> expression
@@ -617,6 +621,11 @@ c_parser_context GetContextCopy()
 %type <liste> decl_spec_list_opt_no_named
 %type <liste> decl_spec_list_opt
 %type <entity> old_proto_decl direct_old_proto_decl
+
+ /* For now, pass pragmas as strings and list of strings: */
+%type <string> pragma
+%type <liste> pragmas
+
 %%
 
 interpret: file TK_EOF
@@ -739,7 +748,7 @@ declaration         {/* discard_C_comment();*/ ;}
 			}
 |   TK_PRAGMA attr
                         {
-			  CParserError("PRAGMA not implemented\n");
+			  CParserError("PRAGMA not implemented at top level\n");
 			  $$ = NIL;
 			}
 /* Old-style function prototype. This should be somewhere else, like in
@@ -1153,6 +1162,8 @@ string_constant:
    back to a string for easy viewing. */
     string_list
                         {
+			  /* Hmmm... Looks like a memory leak on all the
+			     strings... */
 			  $$ = list_to_string($1);
 			}
 ;
@@ -1383,7 +1394,48 @@ label:
 			}
 ;
 
-statement:
+
+pragma:
+   TK__Pragma TK_LPAREN string_constant TK_RPAREN {
+     /* Well, indeed this has not been tested at the time of writing since
+	the _Pragma("...") is replaced by a #pragma ... in the C
+	preprocessor, at least in gcc 4.4. */
+     /* The pragma string has been strdup()ed in the lexer... */
+     pips_debug(1, "Found _Pragma(\"%s\")\n", $3);
+     $$ = $3;
+   }
+|  TK_PRAGMA {
+  pips_debug(1, "Found #pragma %s\n", c_lval.string);
+     $$ = c_lval.string;
+   }
+;
+
+
+pragmas:
+{ /* No pragma... The common case, return the empty list */
+  pips_debug(1, "No longer pragma\n");
+  $$ = NIL;
+}
+| pragma pragmas {
+  /* Concatenate the pragma to the list of pragmas */
+  $$ = CONS(STRING, $1, $2);
+}
+;
+
+
+statement: pragmas statement_without_pragma
+{
+  //add_pragma_strings_to_statement($2, $1,
+  //				  FALSE /* Do not reallocate the strings*/);
+  /* Reduce the CO2 impact of this code, even there is huge memory leaks
+     everywhere around in this file: */
+  //gen_free_list($1);
+  $$ = $2;
+}
+;
+
+
+statement_without_pragma:
     TK_SEMICOLON
 			{
 			  /* Null statement in C is represented as continue statement in Fortran*/
@@ -1407,7 +1459,7 @@ statement:
 			  else
 			    /* FI: I do not know how
 			       expression_comment is supposed to
-			       worlk for real comma expressions */
+			       work for real comma expressions */
 			    $$ = call_to_statement(make_call(CreateIntrinsic(COMMA_OPERATOR_NAME),$1));
 			  if(!string_undefined_p(expression_comment)) {
 			    if(!empty_comments_p(expression_comment)) {
