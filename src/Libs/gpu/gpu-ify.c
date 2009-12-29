@@ -215,4 +215,6 @@ bool gpu_ify(const char * module_name) {
 
   // Put back the new statement module
   PIPS_PHASE_POSTLUDE(module_statement);
+
+  return TRUE;
 }

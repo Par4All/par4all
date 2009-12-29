@@ -5225,8 +5225,24 @@ If the file is not found, the execution fails.
 SIMD_PATTERN_FILE "patterns.def"
 \end{PipsProp}
 
+\section{Task Parralelization}
+\label{subsection-task-parralelization}
 
+\subsection{Scalopes project}
+\label{subsubsection-scalopes-project}
 
+The goal of the following phase is to generate several task from one sequential
+programm. Each task is generated as an independant main programm. Then the task
+are linked and scheduled using the SCMP HAL.
+
+\begin{PipsMake}
+scalopify                    > MODULE.code
+		> MODULE.callees
+		> PROGRAM.entities
+		< PROGRAM.entities
+		< MODULE.code
+                < MODULE.cumulated_effects
+\end{PipsMake}
 
 \section{Code Distribution}
 \label{subsection-code-distribution}
