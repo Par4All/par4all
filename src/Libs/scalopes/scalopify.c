@@ -18,7 +18,9 @@
 #include "resources.h"
 #include "properties.h"
 
+/// the list to store the loop to outline
 list loops_to_outline;
+/// the flag to differentiate outer and inner loop
 bool flag;
 
 /// @brief build the list of loop to outline. Only first level loops are
@@ -35,13 +37,12 @@ static bool build_loop_list (loop l) {
     pips_debug (5, "nested loop will be outlined as part of one outer loop\n");
     flag = FALSE;
   }
-
   return flag;
 }
 
-/// @brief outline a loop
+/// @brief reset the flag to be able to differiate outer and inner loop
 /// @return void
-/// @param l, the loop to outline
+/// @param l, unused
 static void reset_flag (loop l) {
   pips_debug (9, "reset flags\n");
   flag = FALSE;
@@ -62,10 +63,11 @@ bool scalopify (const char * module_name) {
   gen_recurse (module_statement,
 	       loop_domain, build_loop_list, reset_flag);
 
-  /* apply outlining */
+  // revert the list and apply outlining
+  loops_to_outline = gen_nreverse (loops_to_outline);
   FOREACH (STATEMENT, s, loops_to_outline) {
     list local = CONS (STATEMENT, s, NIL);
-    (void) outliner ( build_new_top_level_module_name ("task"), local);
+    (void) outliner (build_new_top_level_module_name ("task"), local);
     gen_free_list(local);
   }
   gen_free_list(loops_to_outline);
