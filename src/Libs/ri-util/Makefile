@@ -25,6 +25,7 @@ LIB_CFILES =	contrainte_to_text.c \
 		eval.c \
 		size.c \
 		pragma.c \
+		extension.c \
 		util.c \
 		ordering.c \
 		prettyprint.c \
