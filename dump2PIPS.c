@@ -766,7 +766,7 @@ newgen_list gfc2pips_args(gfc_namespace* ns){
 						}else{
 							return args_list_p;
 							//return args_list_p;//alternate returns are obsolete in F90 (and since we only want it)
-							uses_alternate_return(true);
+							/*uses_alternate_return(true);
 							e = generate_pseudo_formal_variable_for_formal_label(
 								CurrentPackage,
 								get_current_number_of_alternate_returns()
@@ -774,7 +774,7 @@ newgen_list gfc2pips_args(gfc_namespace* ns){
 							if(entity_type(e)==type_undefined)
 								entity_type(e) = type_alt_return;
 							CDR(args_list) = CONS(ENTITY, e, NULL );
-							args_list = CDR(args_list);
+							args_list = CDR(args_list);*/
 						}
 						formal = formal->next;
 					}
@@ -2147,6 +2147,7 @@ instruction gfc2pips_code2instruction(gfc_code* c, bool force_sequence){
 						CONS(STATEMENT, s, NIL)
 					);
 				}
+				//TODO: if it is a loop and there is an EXIT statement
 				if(gfc2pips_get_last_loop()==c){
 					s = make_continue_statement(gfc2pips_int2label(curr_label_num-1));
 					list_of_statements = gen_nconc(
@@ -2536,58 +2537,88 @@ instruction gfc2pips_code2instruction_(gfc_code* c){
 		}break;
 */
 
-		/*case EXEC_WHERE:
-	      fputs ("WHERE ", dumpfile);
+		case EXEC_WHERE:{//do not pass the controlizer but is all right
+			pips_debug(5, "Translation of WHERE\n");
+			message_assert("block to dump\n",c->block);
+			gfc_code* d = c->block;
+			where w = make_where(
+				d->expr ? gfc2pips_expr2expression(d->expr) : expression_undefined,
+				instruction_to_statement(gfc2pips_code2instruction(d->next,true)),
+				where_undefined
+			);
+			where parcour = w;
+			for (d = d->block; d; d = d->block){
+				pips_debug(5, "Translation of ELSEWHERE\n");
+				where_elsewhere(parcour) = make_where(
+					d->expr ? gfc2pips_expr2expression(d->expr) : expression_undefined,
+					instruction_to_statement(gfc2pips_code2instruction(d->next,true)),
+					where_undefined
+				);
+				parcour = where_elsewhere(parcour);
+			}
+			return make_instruction(is_instruction_where, w);
+		}break;
 
-	      d = c->block;
-	      show_expr (d->expr);
-	      fputc ('\n', dumpfile);
 
-	      show_code (level + 1, d->next);
+		case EXEC_FORALL:{
+			pips_debug(5, "Translation of FORALL\n");
 
-	      for (d = d->block; d; d = d->block)
-		{
-		  code_indent (level, 0);
-		  fputs ("ELSE WHERE ", dumpfile);
-		  show_expr (d->expr);
-		  fputc ('\n', dumpfile);
-		  show_code (level + 1, d->next);
-		}
-
-	      code_indent (level, 0);
-	      fputs ("END WHERE", dumpfile);
-	      break;
-
-
-	    case EXEC_FORALL:
-	      fputs ("FORALL ", dumpfile);
-	      for (fa = c->ext.forall_iterator; fa; fa = fa->next)
-		{
-		  show_expr (fa->var);
-		  fputc (' ', dumpfile);
-		  show_expr (fa->start);
-		  fputc (':', dumpfile);
-		  show_expr (fa->end);
-		  fputc (':', dumpfile);
-		  show_expr (fa->stride);
-
-		  if (fa->next != NULL)
-		    fputc (',', dumpfile);
-		}
-
-	      if (c->expr != NULL)
-		{
-		  fputc (',', dumpfile);
-		  show_expr (c->expr);
-		}
-	      fputc ('\n', dumpfile);
-
-	      show_code (level + 1, c->block->next);
-
-	      code_indent (level, 0);
-	      fputs ("END FORALL", dumpfile);
-	      break;
+/*
+FORALL (X=1:100:3,y=2:20,z=3:4, c(z)>0)
+   a(x,y,z)=c(z)
+END FORALL
+  <=>
+DO X=1:100:3
+  DO Y=2:20
+    DO Z=3:4
+      IF(c(z)>0)
+        a(x,y,z)=c(z)
+      ENDIF
+    ENDDO
+  ENDDO
+ENDDO
 */
+			gfc_forall_iterator *fa;
+			pips_loop w, parcour, previous;
+			instruction forall_list_of_instructions = gfc2pips_code2instruction(c->block->next, true);
+			w = parcour = previous = NULL;
+			for (fa = c->ext.forall_iterator; fa; fa = fa->next){
+				parcour = make_loop(
+					gfc2pips_expr2entity(fa->var),//variable incremented
+					make_range(
+						gfc2pips_expr2expression(fa->start),
+						gfc2pips_expr2expression(fa->end),
+						gfc2pips_expr2expression(fa->stride)
+					),//lower, upper, increment
+					statement_undefined,
+					entity_empty_label(),
+					make_execution_sequential(),//sequential/parallel //beware gfc parameters to say it is a parallel or a sequential loop ?
+					NULL
+				);
+				if(w!=NULL){
+					loop_body( previous ) = instruction_to_statement( make_instruction_loop( parcour ) );
+				}else{
+					w = parcour;
+				}
+				previous = parcour;
+			}
+			if(previous!=NULL){
+				//add a IF also
+				loop_body(previous) = instruction_to_statement(
+					make_instruction_test(
+						make_test(
+							gfc2pips_expr2expression(c->expr),
+							instruction_to_statement(forall_list_of_instructions),
+							make_empty_block_statement()
+						)
+					)
+				);
+				return make_instruction_loop( w );
+			}else{
+				pips_user_error("No iterator for FORALL\n");
+			}
+		}break;
+
 	    case EXEC_DO:{
 	    	pips_debug(5, "Translation of DO\n");
 	    	gfc2pips_push_loop(c);
@@ -2610,7 +2641,7 @@ instruction gfc2pips_code2instruction_(gfc_code* c){
 	    		make_range(
     				gfc2pips_expr2expression(c->ext.iterator->start),
     				gfc2pips_expr2expression(c->ext.iterator->end),
-    				gfc2pips_expr2expression(c->ext.iterator->step)///ajouter des tests afin de pouvoir créer des do avec un incrément négatif
+    				gfc2pips_expr2expression(c->ext.iterator->step)
 	    		),//lower, upper, increment
 	    		s,
 	    		gfc2pips_code2get_label2(c),
@@ -2631,6 +2662,8 @@ instruction gfc2pips_code2instruction_(gfc_code* c){
 
 	    	//add to s a continue statement at the end to make cycle/continue statements
 	    	newgen_list list_of_instructions = sequence_statements(instruction_sequence(statement_instruction(s)));
+
+	    	//TODO: check if there is a CYCLE in the loop, check there isn't already a continue at the end of the list
 	    	list_of_instructions = gen_nreverse(list_of_instructions);
 	    	list_of_instructions = gen_cons(make_continue_statement(gfc2pips_int2label(gfc2pips_last_created_label)),list_of_instructions);
 	    	gfc2pips_last_created_label-=gfc2pips_last_created_label_step;
@@ -2693,12 +2726,13 @@ instruction gfc2pips_code2instruction_(gfc_code* c){
 				)
 			);
 			return i;
+			/*	      fputs ("EXIT", dumpfile);
+				      if (c->symtree)
+					fprintf (dumpfile, " %s", c->symtree->n.sym->name);
+				      break;
+			*/
 	    }break;
-/*	      fputs ("EXIT", dumpfile);
-	      if (c->symtree)
-		fprintf (dumpfile, " %s", c->symtree->n.sym->name);
-	      break;
-*/
+
 	    case EXEC_ALLOCATE:
 	    case EXEC_DEALLOCATE:{
 	    	pips_debug(5, "Translation of %s\n",c->op==EXEC_ALLOCATE?"ALLOCATE":"DEALLOCATE");
@@ -3052,17 +3086,36 @@ instruction gfc2pips_code2instruction_(gfc_code* c){
 					&& d->ext.dt->format_label->value != -1
 				){
 					if(d->ext.dt->format_label->format){
-						//we check if we have already the label or not the label is associated to a FORMAT => we check if we already have this format
-						//this check is important 'cause we do not have to remove quotes twice !
-						if( gen_find_eq( d->ext.dt->format_label->value, gfc2pips_format2)==gen_chunk_undefined ){
-							//we do have a label somewhere with a format
-							f = gfc2pips_int2expression(d->ext.dt->format_label->value);
+						//if is a reference to a FORMAT
+						if(d->ext.dt->format_label->value){
+							//we check if we have already the label or not the label is associated to a FORMAT => we check if we already have this format
+							//this check is important 'cause we do not have to remove quotes twice !
+							if( gen_find_eq( d->ext.dt->format_label->value, gfc2pips_format2)==gen_chunk_undefined ){
+								//we do have a label somewhere with a format
+								f = gfc2pips_int2expression(d->ext.dt->format_label->value);
 
-							//we have to push the current FORMAT in a list, we will dump it at the very, very TOP
-							//we need to change the expression, a FORMAT statement doesn't have quotes around it
-							expression fmt_expr = gfc2pips_expr2expression(d->ext.dt->format_label->format);
+								//we have to push the current FORMAT in a list, we will dump it at the very, very TOP
+								//we need to change the expression, a FORMAT statement doesn't have quotes around it
+								expression fmt_expr = gfc2pips_expr2expression(d->ext.dt->format_label->format);
+								//delete supplementary quotes
+								char* str = entity_name(call_function(syntax_call(expression_syntax(fmt_expr))));
+								int curr_char_indice = 0,curr_char_indice_cible = 0, length_curr_format=strlen(str) ;
+								for(;
+									curr_char_indice_cible<length_curr_format-1 ;
+									curr_char_indice++,curr_char_indice_cible++
+								){
+									if(str[curr_char_indice_cible]=='\'') curr_char_indice_cible++;
+									str[curr_char_indice] = str[curr_char_indice_cible];
+								}
+								str[curr_char_indice] = '\0';
+
+								gfc2pips_format = gen_cons(fmt_expr,gfc2pips_format);
+								gfc2pips_format2 = gen_cons(d->ext.dt->format_label->value,gfc2pips_format2);
+							}
+						}else{//the format is given as an argument !
+							expression f = gfc2pips_expr2expression(d->ext.dt->format_label->format);
 							//delete supplementary quotes
-							char* str = entity_name(call_function(syntax_call(expression_syntax(fmt_expr))));
+							char* str = entity_name(call_function(syntax_call(expression_syntax(f))));
 							int curr_char_indice = 0,curr_char_indice_cible = 0, length_curr_format=strlen(str) ;
 							for(;
 								curr_char_indice_cible<length_curr_format-1 ;
@@ -3072,9 +3125,6 @@ instruction gfc2pips_code2instruction_(gfc_code* c){
 								str[curr_char_indice] = str[curr_char_indice_cible];
 							}
 							str[curr_char_indice] = '\0';
-
-							gfc2pips_format = gen_cons(fmt_expr,gfc2pips_format);
-							gfc2pips_format2 = gen_cons(d->ext.dt->format_label->value,gfc2pips_format2);
 						}
 					}else{
 						//error or warning: we have bad code
@@ -3086,7 +3136,8 @@ instruction gfc2pips_code2instruction_(gfc_code* c){
 					d->ext.dt->io_unit
 					&& (
 						d->ext.dt->io_unit->expr_type!=EXPR_CONSTANT
-						//if the canal is 6, it is standard
+						//if the canal is 6, it is standard for write
+						//if the canal is 5, it is standard for read
 						|| (
 							d->ext.dt->io_unit->expr_type==EXPR_CONSTANT
 							&& (
