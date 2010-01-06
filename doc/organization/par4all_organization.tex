@@ -33,7 +33,7 @@ There are few \Agit repositories used by the project.
 The main repository for the project is:
 \url{ssh://git.hpc-project.com/git/par4all.git}
 
-There are also ancillary \Agit repository to offer a \Agit interface to
+There are also ancillary \Agit repositories to offer a \Agit interface to
 the \Asvn repositories for the \Apips components from \Acri:
 \begin{itemize}
 \item \url{ssh://git.hpc-project.com/git/svn_linear.git}
@@ -48,7 +48,7 @@ the \Asvn repositories for the \Apips components from \Acri:
 \label{sec:compilation}
 
 Once you have an image of the main \Agit repository content, \Apfa is
-compiled and configured by running th \verb|src/dev/p4a_setup|.
+compiled and configured by running \verb|src/dev/p4a_setup|.
 
 
 \section{Packages}
@@ -64,10 +64,43 @@ included in \Apfa as a package and is placed in a directory inside the
 \label{sec:direct-organ}
 
 \begin{description}
-\item[\texttt{build}] contains the various productions of the compilation
-  of all the \Apfa packages: binaries, header files, documentation;
+\item[\texttt{build}] is the directory created with the various productions
+  of the compilation of all the \Apfa packages: binaries, header files,
+  documentation;
+  \begin{description}
+  \item[\texttt{bin}] contains the executable programs from \Apfa;
+  \item[\texttt{doc}] is the generated documentation for the \Apfa
+    infrastructure;
+  \item[\texttt{etc}] contains some generated configuration files;
+  \item[\texttt{include}] contains the include files used for the
+    compilation of \Apfa;
+  \item[\texttt{lib}] owns the libraries used to run \Apfa;
+  \item[\texttt{share}] contains shared files for run-time and
+    configuration files
+
+    \marginpar{what is the difference of this pipsrc.sh and the one in
+      etc?}
+
+  \item[\texttt{utils}] gathers various utility programs used by \Apfa
+    infrastructure (validation...) and other internal tools;
+  \end{description}
+\item[\texttt{doc}] are the sources of the \Apfa infrastructure;
 \item[\texttt{packages}] contains the different components of \Apfa; of
   all the \Apfa packages: binaries, header files, documentation;
+  \begin{description}
+  \item[\texttt{PIPS}] contains the components of \Apips framework itself
+    with
+    \begin{description}
+    \item[\texttt{linear}] is the \Apips linear library of \Apips;
+    \item[\texttt{newgen}] is the object management infrastructure used by
+      \Apips;
+    \item[\texttt{nlpmake}] is the makefile common infrastructure used by
+      all the \Apips components
+    \item[\texttt{pips}] is the \Apips core;
+    \item[\texttt{validation}] is the validation of \Apips
+    \end{description}
+  \item[\texttt{polylib}] contains the \Apolylib library source
+  \end{description}
 \item[\texttt{src}] contains source of tools used for the internal
   organization of \Apfa itself, such as repository and product management,
   publication process.
@@ -77,7 +110,7 @@ included in \Apfa as a package and is placed in a directory inside the
 \section{Repositories and work-flow}
 \label{sec:repos-workfl}
 
-For history tracking and collaborative development, \Apfa rely on a main
+For history tracking and collaborative development, \Apfa relies on a main
 \Agit repository that is accessed by \Apfa developers, users, integrators
 and the product and quality team.
 
@@ -111,9 +144,14 @@ inspection, choice for inclusion, you fetch \Apolylib with:
 \begin{verbatim}
 git fetch polylib
 \end{verbatim}
+This command is also done by a \verb|p4a_fetch_all| that fetches also the
+\Apips parts.
 
-You can then merge the feature you want with a \texttt{git merge -s
-  subtree} from \texttt{remotes/polylib/master}, or from any tree
+You can then merge the feature you want with
+\begin{verbatim}
+git merge -s subtree remotes/polylib/master
+\end{verbatim}
+or from any tree
 identifier. The \texttt{-s subtree} is necessary since in \Apfa the
 \Apolylib files are not at the top-level directory.
 
@@ -132,7 +170,9 @@ For this, we use 5 \Agit repositories that are gateways with these \Asvn
 repositories. For technical reasons, it is better that this kind of subtle
 gateway exists in only one place and this is currently done on the laptop
 of Ronan \textsc{Keryell}. Then these 5 gateways are used as remotes into
-the \Apfa{} \Agit.
+the \Apfa{} \Agit. To synchronize these gateways to the latest version of
+the \Apips{} \Asvn repositories, use a \verb|pips_git| in the directory
+owning these \Agit-\Asvn repositories.
 
 But since we have then a \Agit interface of the original \Apips{} \Asvn
 repositories and \Agit is quite more powerful than \Asvn, some people may
@@ -177,22 +217,30 @@ git fetch CRI/nlpmake
 git fetch CRI/pips
 git fetch CRI/validation
 \end{verbatim}
+These commands are also done by a \verb|p4a_fetch_all| that fetches also the
+\Apolylib part.
 
 You can then merge the feature you want with a \texttt{git merge -s
-  subtree} from \texttt{remotes/CRI/.../master}, or from any tree
-identifier. The \texttt{-s subtree} is necessary since in \Apfa the \Apips
-files are not at the top-level directory and you do not want them to
-appear at the top-level directory.
+  subtree} from \texttt{remotes/CRI/.../master} as:
+\begin{verbatim}
+git merge -s subtree remotes/CRI/linear/master
+git merge -s subtree remotes/CRI/newgen/master
+git merge -s subtree remotes/CRI/nlpmake/master
+git merge -s subtree remotes/CRI/pips/master
+git merge -s subtree remotes/CRI/validation/master
+\end{verbatim}
+or from any tree identifier to do more precise version selection. The
+\texttt{-s subtree} is necessary since in \Apfa the \Apips files are not
+at the top-level directory and you do not want them to appear at the
+top-level directory.
 
 
 \subsection{Setting the infrastructure up}
 \label{sec:setup}
 
-Some scripts used to setup the infrastructure are located in \texttt{src/dev}.
+Some scripts used to setup the infrastructure are located in
+\texttt{src/dev}, that should be used in this order:
 \begin{itemize}
-\item \verb/p4a_apply_pips_patches/ is used to patch the original \Apips
-  files to fit the \Apfa architecture. It should be used only once, after
-  external \Agit import;
 \item \verb/p4a_create_CRI_git_svn/ is used once to create the \Apips
   \Asvn-\Agit gateways. This script is here to show how it can be done but
   also to keep track of the exact parameters used to create them in the
@@ -201,7 +249,13 @@ Some scripts used to setup the infrastructure are located in \texttt{src/dev}.
 \item \verb/p4a_import_external_gits/ imports all the external \Agit
   repositories into the \Apfa \Agit repository. It should be used only
   once but are included as example for other projects or to help adding
-  other repositories later.
+  other repositories later;
+\item \verb/p4a_apply_pips_patches/ is used to patch the original \Apips
+  files to fit the \Apfa architecture. It should be used only once, after
+  external \Agit import;
+\item \verb|src/dev/p4a_setup| is used to compile all the \Apfa
+  infrastructure and setting up many things. It should be used at least
+  for the first compilation.
 \end{itemize}
 
 

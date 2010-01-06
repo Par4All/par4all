@@ -13,6 +13,14 @@ p4a_create_CRI_git_svn : build a git svn copy of the PIPS svn.
 p4a_import_external_gits : add the external git repositories to Pa4All,
 such as PIPS, polylib...
 
+p4a_apply_pips_patches : used to patch the original PIPS files to fit the
+  Par4All architecture. It should be used only once, after external GIT
+  import
+
+p4a_fetch_all : fetch all the remote git repository. For sanity reason,
+the programmer is responsible to do the merge.
+
+
 
 Ronan Keryell.
 

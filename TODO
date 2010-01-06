@@ -1,0 +1,25 @@
+Why do I (RK) need
+diff --git a/packages/PIPS/pips/libraries.make b/packages/PIPS/pips/libraries.ma
+index 315ae13..f739fe8 100644
+--- a/packages/PIPS/pips/libraries.make
++++ b/packages/PIPS/pips/libraries.make
+@@ -25,7 +25,7 @@
+ 
+ # newgen.libs definition
+ ifdef WITH_DYNAMIC_LIBRARIES
+-newgen.libs=newgenlibs
++#newgen.libs=newgenlibs
+ else
+ include $(NEWGEN_ROOT)/libraries.make
+ endif
+@@ -34,7 +34,7 @@ endif
+ 
+ # linear.libs definition
+ ifdef WITH_DYNAMIC_LIBRARIES
+-linear.libs=linearlibs
++#linear.libs=linearlibs
+ else
+ include $(LINEAR_ROOT)/libraries.make
+ ?
+
+Update src/dev/patch_pips/pips.patch accordingly.
