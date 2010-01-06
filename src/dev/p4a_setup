@@ -3,7 +3,10 @@
 # Inspired from setup_pips.sh
 #
 
-P4A_ROOT=/home/keryell/projets/Wild_Systems/Par4All/b
+P4A_ROOT=/home/keryell/projets/Wild_Systems/Par4All/c
+
+P4A_ROOT_ETC=$P4A_ROOT/etc
+
 # Cf main.mk
 #INSTALL_DIR=$P4A_ROOT
 
@@ -11,7 +14,10 @@ cd $P4A_ROOT
 
 PIPS_COMPONENTS="linear newgen pips"
 PIPS_DIR=$P4A_ROOT/packages/PIPS
-destination=$PIPS_DIR
+# clean environment so as not to interfere with another installation
+PIPS_ARCH=`$PIPS_DIR/nlpmake/makes/arch.sh`
+export PIPS_ARCH
+
 
 error()
 {
@@ -32,26 +38,33 @@ warn()
   read
 }
 
-
+gni(){
 # Compile and install the polyLib:
 (
     cd $P4A_ROOT/packages/polylib
     ./autogen.sh
-    ./configure --prefix=$P4A_ROOT --libdir=$P4A_ROOT/$PIPS_ARCH
+    ./configure --prefix=$P4A_ROOT
+    #--libdir=$P4A_ROOT/$PIPS_ARCH
+    make
+    make install
 )
+}
 
 echo
 echo "### creating pipsrc.sh"
-cat <<EOF > $destination/pipsrc.sh
+mkdir -p  $P4A_ROOT_ETC
+cat <<EOF > $P4A_ROOT_ETC/pipsrc.sh
 # minimum rc file for sh-compatible shells
 
 # default architecture
 export PIPS_ARCH=$PIPS_ARCH
 # software roots
-export EXTERN_ROOT=/home/keryell/projets/Wild_Systems/PIPS/git-svn-work/extern
+export EXTERN_ROOT=$P4A_ROOT
 export NEWGEN_ROOT=$P4A_ROOT
 export LINEAR_ROOT=$P4A_ROOT
 export PIPS_ROOT=$P4A_ROOT
+# Hack to have access to makefiles...
+##export ROOT=$P4A_ROOT/packages/PIPS
 # Mainly to avoid the non working libraries.make:
 export WITH_DYNAMIC_LIBRARIES=1
 
@@ -65,19 +78,20 @@ type g77 && export PIPS_F77=g77
 
 
 if [ -n "$PIPS_F77" ]; then
-    echo >> $destination/pipsrc.sh
-    echo "# The Fortran compiler to use:" >> $destination/pipsrc.sh
-    echo "export PIPS_F77=$PIPS_F77" >> $destination/pipsrc.sh
+    echo >> $P4A_ROOT_ETC/pipsrc.sh
+    echo "# The Fortran compiler to use:" >> $P4A_ROOT_ETC/pipsrc.sh
+    echo "export PIPS_F77=$PIPS_F77" >> $P4A_ROOT_ETC/pipsrc.sh
 fi
 
 # Source the just generated environment to be able to compile PIPS later:
-source $destination/pipsrc.sh
+source $P4A_ROOT_ETC/pipsrc.sh
 
-# Make PIPS makefile links:
+# Make links PIPS makefile infrastructure:
 for i in $PIPS_COMPONENTS; do
     ln -s ../nlpmake/makes $PIPS_DIR/$i/makes
 done
-
+# Also add at top-level since of weird $(ROOT) stuff...
+ln -s packages/PIPS/nlpmake/makes
 
 echo
 echo "### checking needed softwares"
@@ -90,11 +104,7 @@ done
 [[ $(cproto -V 2>&1) = 4.7* ]] || \
   error "Pips compilation requires at least cproto 4.7c"
 
-# clean environment so as not to interfere with another installation
-PIPS_ARCH=`$PIPS_DIR/nlpmake/makes/arch.sh`
-export PIPS_ARCH
-
-unset NEWGEN_ROOT LINEAR_ROOT PIPS_ROOT
+#unset NEWGEN_ROOT LINEAR_ROOT PIPS_ROOT
 
 echo
 echo "### testing special commands for config.mk"
@@ -130,10 +140,12 @@ type htlatex && target=full-build
 echo
 echo "### generating csh environment"
 $PIPS_DIR/pips/src/Scripts/env/sh2csh.pl \
-    < $destination/pipsrc.sh \
-    > $destination/pipsrc.csh
+    < $P4A_ROOT_ETC/pipsrc.sh \
+    > $P4A_ROOT_ETC/pipsrc.csh
 
+env
 warn "cproto header generation results in many cpp warnings..."
+#make -C $PIPS_DIR clean
 make -C $PIPS_DIR
 
 echo
