@@ -1,7 +1,7 @@
 #! /bin/bash -vx
 
 # Apply some patches from Serge Guelton to simplify the PIPS architecture
-#  for Deian
+# for GNU/Linux/Debian (at least)
 
 if [[ -z $P4A_ROOT ]]; then
     echo "You need to have \$P4A_ROOT defined to the Par4All top-level directory"
@@ -9,7 +9,7 @@ if [[ -z $P4A_ROOT ]]; then
 fi
 
 PIPS_DIR=$P4A_ROOT/packages/PIPS
-BUILD_SCRIPT_DIR=$PIPS_DIR/pips/src/Scripts/build_release
+BUILD_SCRIPT_DIR=$P4A_ROOT/src/dev/patch_pips
 
 cd $BUILD_SCRIPT_DIR
 
