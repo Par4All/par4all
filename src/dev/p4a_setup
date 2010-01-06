@@ -4,8 +4,9 @@
 #
 
 P4A_ROOT=/home/keryell/projets/Wild_Systems/Par4All/c
+P4A_BUILD=$P4A_ROOT/build
 
-P4A_ROOT_ETC=$P4A_ROOT/etc
+P4A_ETC=$P4A_BUILD/etc
 
 # Cf main.mk
 #INSTALL_DIR=$P4A_ROOT
@@ -43,7 +44,7 @@ gni(){
 (
     cd $P4A_ROOT/packages/polylib
     ./autogen.sh
-    ./configure --prefix=$P4A_ROOT
+    ./configure --prefix=$P4A_BUILD
     #--libdir=$P4A_ROOT/$PIPS_ARCH
     make
     make install
@@ -52,24 +53,30 @@ gni(){
 
 echo
 echo "### creating pipsrc.sh"
-mkdir -p  $P4A_ROOT_ETC
-cat <<EOF > $P4A_ROOT_ETC/pipsrc.sh
+mkdir -p  $P4A_ETC
+cat <<EOF > $P4A_ETC/pipsrc.sh
 # minimum rc file for sh-compatible shells
 
 # default architecture
 export PIPS_ARCH=$PIPS_ARCH
 # software roots
-export EXTERN_ROOT=$P4A_ROOT
-export NEWGEN_ROOT=$P4A_ROOT
-export LINEAR_ROOT=$P4A_ROOT
-export PIPS_ROOT=$P4A_ROOT
+export EXTERN_ROOT=$P4A_BUILD
+export NEWGEN_ROOT=$P4A_BUILD
+export LINEAR_ROOT=$P4A_BUILD
+#export PIPS_ROOT=$P4A_BUILD
 # Hack to have access to makefiles...
 ##export ROOT=$P4A_ROOT/packages/PIPS
+
+# For pyps:
+export PYTHONPATH=$P4A_BUILD/lib
+
+export INSTALL_DIR=$P4A_BUILD
+
 # Mainly to avoid the non working libraries.make:
 export WITH_DYNAMIC_LIBRARIES=1
 
 # fix path
-PATH=$P4A_ROOT/bin:$P4A_ROOT/utils:\$PATH
+PATH=$P4A_BUILD/bin:$P4A_BUILD/utils:\$PATH
 EOF
 
 # Find the Fortran compiler:
@@ -78,20 +85,18 @@ type g77 && export PIPS_F77=g77
 
 
 if [ -n "$PIPS_F77" ]; then
-    echo >> $P4A_ROOT_ETC/pipsrc.sh
-    echo "# The Fortran compiler to use:" >> $P4A_ROOT_ETC/pipsrc.sh
-    echo "export PIPS_F77=$PIPS_F77" >> $P4A_ROOT_ETC/pipsrc.sh
+    echo >> $P4A_ETC/pipsrc.sh
+    echo "# The Fortran compiler to use:" >> $P4A_ETC/pipsrc.sh
+    echo "export PIPS_F77=$PIPS_F77" >> $P4A_ETC/pipsrc.sh
 fi
 
 # Source the just generated environment to be able to compile PIPS later:
-source $P4A_ROOT_ETC/pipsrc.sh
+source $P4A_ETC/pipsrc.sh
 
 # Make links PIPS makefile infrastructure:
 for i in $PIPS_COMPONENTS; do
     ln -s ../nlpmake/makes $PIPS_DIR/$i/makes
 done
-# Also add at top-level since of weird $(ROOT) stuff...
-ln -s packages/PIPS/nlpmake/makes
 
 echo
 echo "### checking needed softwares"
@@ -140,13 +145,15 @@ type htlatex && target=full-build
 echo
 echo "### generating csh environment"
 $PIPS_DIR/pips/src/Scripts/env/sh2csh.pl \
-    < $P4A_ROOT_ETC/pipsrc.sh \
-    > $P4A_ROOT_ETC/pipsrc.csh
+    < $P4A_ETC/pipsrc.sh \
+    > $P4A_ETC/pipsrc.csh
 
 env
 warn "cproto header generation results in many cpp warnings..."
-#make -C $PIPS_DIR clean
-make -C $PIPS_DIR
+make -C $PIPS_DIR clean
+make -C $PIPS_DIR install
+#make -C $PIPS_DIR/newgen clean
+#make -C $PIPS_DIR/newgen
 
 echo
 echo "### checking useful softwares"
@@ -154,3 +161,5 @@ for exe in bash m4 wish latex htlatex javac emacs
 do
   type $exe || echo "no such executable, consider installing: $exe"
 done
+
+echo To compile PIPS in a casual way, try a make into $PIPS_DIR or evan $PIPS_DIR/pips
