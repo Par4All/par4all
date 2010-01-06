@@ -1,0 +1,8 @@
+#! /bin/sh
+
+git fetch CRI/linear
+git fetch CRI/newgen
+git fetch CRI/nlpmake
+git fetch CRI/pips
+git fetch CRI/validation
+git fetch polylib
