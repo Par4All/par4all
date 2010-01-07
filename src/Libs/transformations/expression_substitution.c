@@ -2,7 +2,7 @@
 
   $Id: expression_substitution.c 14403 2009-06-29 08:48:32Z guelton $
 
-  Copyright 1989-2009 MINES ParisTech
+  Copyright 1989-2010 MINES ParisTech
 
   This file is part of PIPS.
 

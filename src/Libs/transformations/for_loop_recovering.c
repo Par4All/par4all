@@ -2,7 +2,7 @@
 
   $Id: for_loop_recovering.c 14303 2009-06-16 05:43:13Z guelton $
 
-  Copyright 1989-2009 MINES ParisTech
+  Copyright 1989-2010 MINES ParisTech
 
   This file is part of PIPS.
 

@@ -1,6 +1,6 @@
 ! $Id$
 !
-! Copyright 1989-2009 MINES ParisTech
+! Copyright 1989-2010 MINES ParisTech
 !
 ! This file is part of PIPS.
 !

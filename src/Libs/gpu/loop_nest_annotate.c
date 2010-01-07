@@ -2,7 +2,7 @@
 
   $Id:loop_nest_annotate.c 15433 2009-09-22 06:49:48Z creusillet $
 
-  Copyright 1989-2009 MINES ParisTech
+  Copyright 1989-2010 MINES ParisTech
 
   This file is part of PIPS.
 

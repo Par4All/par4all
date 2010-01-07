@@ -2,7 +2,7 @@
 
   $Id$
 
-  Copyright 1989-2009 HPC Project
+  Copyright 1989-2010 HPC Project
 
   This file is part of PIPS.
 

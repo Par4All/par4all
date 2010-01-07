@@ -2,7 +2,7 @@
 
   $Id: dowhile_to_while.c 14477 2009-07-07 06:21:50Z guelton $
 
-  Copyright 1989-2009 MINES ParisTech
+  Copyright 1989-2010 MINES ParisTech
 
   This file is part of PIPS.
 
