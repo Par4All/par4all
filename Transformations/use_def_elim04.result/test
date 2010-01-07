@@ -1,0 +1,20 @@
+
+Code for "EMPILE"
+
+
+       SUBROUTINE  EMPILE(X)
+       COMMON  /PILE/ H,T
+       INTEGER  H,T(10),X
+      H = H+1                                                           0005
+      T(H) = X                                                          0006
+      END
+
+Code for "EMPILE" after use-def elimination
+
+
+       SUBROUTINE  EMPILE(X)
+       COMMON  /PILE/ H,T
+       INTEGER  H,T(10),X
+      H = H+1                                                           0005
+      T(H) = X                                                          0006
+      END

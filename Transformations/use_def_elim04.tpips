@@ -1,0 +1,25 @@
+delete use_def_elim04
+
+setproperty ABORT_ON_USER_ERROR TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+create use_def_elim04 use_def_elim04.f
+
+echo
+echo Code for "EMPILE"
+echo
+
+display PRINTED_FILE[EMPILE]
+
+echo
+echo Code for "EMPILE" after use-def elimination
+echo
+
+apply USE_DEF_ELIMINATION[EMPILE]
+
+activate PRINT_CODE
+display PRINTED_FILE[EMPILE]
+
+close
+delete use_def_elim03
+quit
