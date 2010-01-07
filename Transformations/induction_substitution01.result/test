@@ -22,10 +22,10 @@ void induction01(double A[SIZE], double B[SIZE][SIZE])
    int k = -1;
    int l = 10;
    for(i = 0; i <= SIZE-1; i += 1) {
-      k = k+1;
-      l += 2;
+      k = i+(-1)+1;
+      l = -((-10)+(-2)*i)+2;
       for(j = 0; j <= SIZE-1; j += 1)
-         A[-i] = B[-12+-2*i][-i]+A[-i];
+         A[k] = B[l][k]+A[k];
    }
 }
 
