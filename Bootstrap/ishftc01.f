@@ -1,9 +1,9 @@
       program ishftc01
 
-      integer I
-      integer J
-      integer k
-      integer H
+      real I
+      real J
+      real k
+      real H
 
       I = 2
       J = 3

@@ -1,13 +1,13 @@
       program ibits01
 
-      integer I
-      integer J
-      integer k
-      integer H
+      INTEGER I
+      INTEGER J
+      INTEGER k
+      INTEGER H
 
-      I = 1
-      J = 3
-      K = 14
+      I = 1.0
+      J = 3.0
+      K = 14.0
       H = IBITS(K,I,J)
       PRINT *, 'H = ',H
 
