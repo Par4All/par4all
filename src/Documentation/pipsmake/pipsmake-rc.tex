@@ -8012,6 +8012,22 @@ scalarization  > MODULE.code
 \end{PipsMake}
 
 
+\subsection{Induction substitution}
+
+Induction substitution is the process of replacing scalar variables 
+by linear expression of loop indices. 
+
+
+\begin{PipsMake}
+alias induction_substitution 'Induction substitution'
+induction_substitution > MODULE.code
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.transformers
+        < MODULE.preconditions
+\end{PipsMake}
+
+
 \subsection{Flatten Code}
 
 \begin{PipsPass}{flatten_code}
