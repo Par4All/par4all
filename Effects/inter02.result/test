@@ -5,26 +5,7 @@ void foo(int *p)
 {
 //               <must be read   >: p
 //               <must be written>: p[0]
-   
-   /* Some versions of <linux/posix_types.h> define these macros.  */
-   
-   
-   
-   /* It's easier to assume 8-bit bytes than to get CHAR_BIT.  */
-   
-   
-   
-   
-   /* fd_set for select and pselect.  */
-   
-   
-   /* XPG4.2 requires this member name.  Otherwise avoid the name
-          from the global namespace.  */
-   
-   
-   
-   
-   *p = 4;                                                              /*0075*/
+   *p = 4;                                                              /*0004*/
    return;                                                              /*0005*/
 }
 
@@ -96,26 +77,7 @@ void foo(int *p)
 //  <p-R-EXACT-{}>
 //  <p[PHI1]-W-EXACT-{PHI1==0}>
 
-   
-   /* Some versions of <linux/posix_types.h> define these macros.  */
-   
-   
-   
-   /* It's easier to assume 8-bit bytes than to get CHAR_BIT.  */
-   
-   
-   
-   
-   /* fd_set for select and pselect.  */
-   
-   
-   /* XPG4.2 requires this member name.  Otherwise avoid the name
-          from the global namespace.  */
-   
-   
-   
-   
-   *p = 4;                                                              /*0075*/
+   *p = 4;                                                              /*0004*/
    return;                                                              /*0005*/
 }
 
@@ -296,25 +258,6 @@ void foo(int *p)
 
 //  <p[PHI1]-OUT-EXACT-{PHI1==0}>
 
-   
-   /* Some versions of <linux/posix_types.h> define these macros.  */
-   
-   
-   
-   /* It's easier to assume 8-bit bytes than to get CHAR_BIT.  */
-   
-   
-   
-   
-   /* fd_set for select and pselect.  */
-   
-   
-   /* XPG4.2 requires this member name.  Otherwise avoid the name
-          from the global namespace.  */
-   
-   
-   
-   
-   *p = 4;                                                              /*0075*/
+   *p = 4;                                                              /*0004*/
    return;                                                              /*0005*/
 }

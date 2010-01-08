@@ -1,6 +1,6 @@
 void compute()
 {
-   int i,  j;
+   int i, j;
 //               <must be written>: i
 
    for(i = 1; i <= 62; i += 1)
@@ -8,25 +8,6 @@ void compute()
       for(j = 1; j <= 62; j += 1) {
 //               <must be read   >: i j
 //               <must be written>: TOP-LEVEL:tab1[i][j]
-         
-         /* Some versions of <linux/posix_types.h> define these macros.  */
-         
-         
-         
-         /* It's easier to assume 8-bit bytes than to get CHAR_BIT.  */
-         
-         
-         
-         
-         /* fd_set for select and pselect.  */
-         
-         
-         /* XPG4.2 requires this member name.  Otherwise avoid the name
-                from the global namespace.  */
-         
-         
-         
-         
          tab1[i][j] = i*j;
 //               <must be read   >: i j
 //               <must be written>: TOP-LEVEL:tab2[i][j]
@@ -42,7 +23,7 @@ void compute()
 //                                  TOP-LEVEL:tab3[*][*]
 void compute()
 {
-   int i,  j;
+   int i, j;
 //               <may be read    >: TOP-LEVEL:tab3 i j
 //               <may be written >: TOP-LEVEL:tab1[*][*] 
 //                                  TOP-LEVEL:tab2[*][*] 
@@ -58,25 +39,6 @@ void compute()
       for(j = 1; j <= 62; j += 1) {
 //               <may be written >: TOP-LEVEL:tab1[*][*]
 //               <must be read   >: i j
-         
-         /* Some versions of <linux/posix_types.h> define these macros.  */
-         
-         
-         
-         /* It's easier to assume 8-bit bytes than to get CHAR_BIT.  */
-         
-         
-         
-         
-         /* fd_set for select and pselect.  */
-         
-         
-         /* XPG4.2 requires this member name.  Otherwise avoid the name
-                from the global namespace.  */
-         
-         
-         
-         
          tab1[i][j] = i*j;
 //               <may be written >: TOP-LEVEL:tab2[*][*]
 //               <must be read   >: i j
@@ -97,7 +59,7 @@ void compute()
 
 void compute()
 {
-   int i,  j;
+   int i, j;
 
 //  <TOP-LEVEL:tab1[PHI1][PHI2]-W-EXACT-{1<=PHI1, PHI1<=62, 1<=PHI2,
 //    PHI2<=62}>
@@ -123,25 +85,6 @@ void compute()
 //  <TOP-LEVEL:tab1[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==j, 1<=i,
 //    i<=62, 1<=j, j<=62}>
 
-         
-         /* Some versions of <linux/posix_types.h> define these macros.  */
-         
-         
-         
-         /* It's easier to assume 8-bit bytes than to get CHAR_BIT.  */
-         
-         
-         
-         
-         /* fd_set for select and pselect.  */
-         
-         
-         /* XPG4.2 requires this member name.  Otherwise avoid the name
-                from the global namespace.  */
-         
-         
-         
-         
          tab1[i][j] = i*j;
 
 //  <TOP-LEVEL:tab2[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==j, 1<=i,
