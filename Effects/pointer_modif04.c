@@ -1,8 +1,9 @@
+#include <malloc.h>
+
 typedef struct {int max; float *tab;} s_t;
 
 void init_s(s_t s, int max)
 {
-  extern char * malloc(int);
 
   s.tab = (float *) malloc(max * sizeof(float));
   s.max = max;
