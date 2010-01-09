@@ -11226,11 +11226,9 @@ print_whole_dependence_graph          > MODULE.dg_file
 
 \begin{PipsPass}{print_filtered_dependence_graph}
 Same as \PipsPassRef{print_whole_dependence_graph} but it's filtered by
-some variables.
+some variables. Variables to filter is a comma separated list set by 
+user via property ``EFFECTS_FILTER_ON_VARIABLE''.
 \end{PipsPass}
-
-\marginpar{RK: which one? FI: user\_request? Not found
-in validation suite.}
 
 \begin{PipsMake}
 print_filtered_dependence_graph          > MODULE.dg_file
