@@ -1,105 +1,104 @@
 
-parsed printed file
+Parsed printed file
 
 int control01(int *in, int *val)
 {
-   int c;
-   int v;
-   for (;;) {
-      if ((c = pnm_getc(in))==-1)
-         return -1;
-      if (c=='#') {
-         for (;;) {
-            if ((c = pnm_getc(in))==-1)
-               return -1;
-            if (c=='\n')
-               goto break_2;
+   int c;                                                               /*0004*/
+   int v;                                                               /*0005*/
+
+   for (;;) {                                                           /*0023*/
+      if ((c = pnm_getc(in))==-1)                                       /*0007*/
+         return -1;                                                     /*0008*/
+      if (c=='#') {                                                     /*0010*/
+
+         for (;;) {                                                     /*0018*/
+            if ((c = pnm_getc(in))==-1)                                 /*0012*/
+               return -1;                                               /*0013*/
+            if (c=='\n')                                                /*0015*/
+               goto break_2;                                            /*0016*/
          }
 break_2:         ;
       }
-      else if (c=='0'||c=='1') {
-         v = c-'0';
-         goto break_1;
+      else if (c=='0'||c=='1') {                                        /*0010*/
+         v = c-'0';                                                     /*0020*/
+         goto break_1;                                                  /*0021*/
       }
    }
 break_1:   ;
-   if (val)
-      *val = v;
-   return 0;
+   if (val)                                                             /*0024*/
+      *val = v;                                                         /*0025*/
+   return 0;                                                            /*0027*/
 }
 
-printed file
+Printed file
 
 int control01(int *in, int *val)
 {
-   int c;
-   int v;
-   extern int pnm_getc(int *);
-   ;
-l99997:   ;
-   if (!1) goto break_1;
-   if ((c = pnm_getc(in))==-1) 
-      return -1;
-   if (c=='#') goto l99999;
-   if (c=='0'||c=='1') goto l99998;
-l99995:   ;
-   ;
-   goto l99997;
+   int c;                                                               /*0004*/
+   int v;                                                               /*0005*/
 l99998:   ;
-   v = c-'0';
+   if (!1) goto break_1;                                                /*0023*/
+   if ((c = pnm_getc(in))==-1)                                          /*0007*/
+      return -1;                                                        /*0008*/
+   if (c=='#') goto l99999;                                             /*0010*/
+   if (c=='0'||c=='1') {                                                /*0019*/
+   }
+   else {
+      goto l99998;
+   }
+   v = c-'0';                                                           /*0020*/
    goto break_1;
 l99999:   ;
-   ;
-l99996:   ;
-   if (!1) goto break_2;
-   if ((c = pnm_getc(in))==-1) 
-      return -1;
-   if (c=='\n') goto break_2;
-   ;
-   goto l99996;
+   if (!1) goto break_2;                                                /*0018*/
+   if ((c = pnm_getc(in))==-1)                                          /*0012*/
+      return -1;                                                        /*0013*/
+   if (c=='\n') {                                                       /*0015*/
+   }
+   else {
+      goto l99999;
+   }
 break_2:   ;
-   goto l99995;
+   goto l99998;
 break_1:   ;
-   if (val) 
-      *val = v;
-   return 0;
+   if (val)                                                             /*0024*/
+      *val = v;                                                         /*0025*/
+   return 0;                                                            /*0027*/
 }
 
 printed file after RESTRUCTURE_CONTROL
 
 int control01(int *in, int *val)
 {
-   int c;
-   int v;
-   extern int pnm_getc(int *);
-   ;
-l99997:   ;
-   if (!1) goto break_1;
-   if ((c = pnm_getc(in))==-1) 
-      return -1;
-   if (c=='#') goto l99999;
-   if (c=='0'||c=='1') goto l99998;
-l99996:   ;
-   ;
-   goto l99997;
+   int c;                                                               /*0004*/
+   int v;                                                               /*0005*/
 l99998:   ;
-   v = c-'0';
+   if (!1) goto break_1;                                                /*0023*/
+   if ((c = pnm_getc(in))==-1)                                          /*0007*/
+      return -1;                                                        /*0008*/
+   if (c=='#') goto l99999;                                             /*0010*/
+   if (c=='0'||c=='1') {                                                /*0019*/
+   }
+   else {
+      goto l99998;
+   }
+   v = c-'0';                                                           /*0020*/
    goto break_1;
 l99999:   ;
-   ;
-l99995:   ;
-   if (!1) goto break_2;
-   if ((c = pnm_getc(in))==-1) 
-      return -1;
-   if (c=='\n') goto break_2;
-   ;
-   goto l99995;
+l99997:   ;
+   if (!1) goto break_2;                                                /*0018*/
+   if ((c = pnm_getc(in))==-1)                                          /*0012*/
+      return -1;                                                        /*0013*/
+   if (c=='\n') {                                                       /*0015*/
+   }
+   else {
+      goto l99997;
+   }
 break_2:   ;
-   goto l99996;
+   goto l99998;
 break_1:   ;
-   if (val) 
-      *val = v;
-   return 0;
+   if (val)                                                             /*0024*/
+      *val = v;                                                         /*0025*/
+   return 0;                                                            /*0027*/
 }
 Try more aggressive restructuring:
 
@@ -107,35 +106,34 @@ printed file after RESTRUCTURE_CONTROL
 
 int control01(int *in, int *val)
 {
-   int c;
-   int v;
-   extern int pnm_getc(int *);
-   ;
-l99997:   ;
-   if (!1) goto break_1;
-   if ((c = pnm_getc(in))==-1) 
-      return -1;
-   if (c=='#') goto l99999;
-   if (c=='0'||c=='1') goto l99998;
-l99996:   ;
-   ;
-   goto l99997;
+   int c;                                                               /*0004*/
+   int v;                                                               /*0005*/
 l99998:   ;
-   v = c-'0';
+   if (!1) goto break_1;                                                /*0023*/
+   if ((c = pnm_getc(in))==-1)                                          /*0007*/
+      return -1;                                                        /*0008*/
+   if (c=='#') goto l99999;                                             /*0010*/
+   if (c=='0'||c=='1') {                                                /*0019*/
+   }
+   else {
+      goto l99998;
+   }
+   v = c-'0';                                                           /*0020*/
    goto break_1;
 l99999:   ;
-   ;
-l99995:   ;
-   if (!1) goto break_2;
-   if ((c = pnm_getc(in))==-1) 
-      return -1;
-   if (c=='\n') goto break_2;
-   ;
-   goto l99995;
+l99997:   ;
+   if (!1) goto break_2;                                                /*0018*/
+   if ((c = pnm_getc(in))==-1)                                          /*0012*/
+      return -1;                                                        /*0013*/
+   if (c=='\n') {                                                       /*0015*/
+   }
+   else {
+      goto l99997;
+   }
 break_2:   ;
-   goto l99996;
+   goto l99998;
 break_1:   ;
-   if (val) 
-      *val = v;
-   return 0;
+   if (val)                                                             /*0024*/
+      *val = v;                                                         /*0025*/
+   return 0;                                                            /*0027*/
 }

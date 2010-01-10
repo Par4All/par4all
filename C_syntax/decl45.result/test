@@ -9,6 +9,7 @@ Variable list:
 
 	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
 	Declared entity "TOP-LEVEL:foo" with type "functional" "int -> void"
+	Declared entity "TOP-LEVEL:fputs" with type "functional" "overloaded x overloaded -> int"
 	Declared entity "decl45!:*STATIC*" with type "area" with size 0
 	Declared entity "main:*DYNAMIC*" with type "area" with size 18
 	Declared entity "main:*HEAP*" with type "area" with size 0

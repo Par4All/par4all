@@ -11,7 +11,7 @@ echo
 echo Parsed printed file
 echo
 
-#display PARSED_PRINTED_FILE[control01]
+display PARSED_PRINTED_FILE[control01]
 
 echo
 echo Printed file
