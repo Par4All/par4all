@@ -468,7 +468,7 @@ bool induction_substitution( char * module_name ) {
     set_current_module_statement( (statement) db_get_memory_resource( DBR_CODE, module_name, TRUE ) );
     module_stat = get_current_module_statement( );
 
-    set_cumulated_rw_effects( (statement_effects) db_get_memory_resource( DBR_REGIONS, module_name, TRUE ) );
+    set_cumulated_rw_effects( (statement_effects) db_get_memory_resource( DBR_CUMULATED_EFFECTS, module_name, TRUE ) );
     module_to_value_mappings( module );
 
     set_precondition_map( (statement_mapping) db_get_memory_resource( DBR_PRECONDITIONS, module_name, TRUE ) );
