@@ -1392,12 +1392,15 @@ void UpdateFunctionEntity(entity oe, list la)
 
      However, il should be updated if it's declared in a compilation unit
      as the header files may contain more up-to-date information than
-     bootstrap.
+     bootstrap. Or if its type has already been placed in the type
+     stack and been undefined in the entity.
 
      Note that a user function might have the same name as a C
      intrinsic. Then we are in trouble.
   */
-  if(intrinsic_entity_p(oe) && !compilation_unit_p(get_current_module_name()))
+  if(intrinsic_entity_p(oe)
+     && !compilation_unit_p(get_current_module_name())
+     && !type_undefined_p(entity_type(oe)))
     return;
 
   /* Is oe's name compatible with a function name? Well oe might be a
@@ -1491,6 +1494,8 @@ type UpdateType(type t1, type t2)
 	    else {
 	      /* t1 is already fully defined */
 	      if(type_equal_p(t1,t2))
+		return t2;
+	      else if(overloaded_type_p(t1))
 		return t2;
 	      else
 		CParserError("This basic has which field undefined ?\n");
@@ -1991,8 +1996,9 @@ void UpdateEntity(entity e, stack ContextStack, stack FormalStack, stack Functio
   pips_debug(3,"Update entity begins for \"%s\" with context %p\n", entity_name(e), context);
 
   /* If e is an intrinsics, nothing should be done, unless you are in
-     the compilation unit */
-  if(intrinsic_entity_p(e) && !compilation_unit_p(get_current_module_name()))
+     the compilation unit: but the intrinsic type has laready been
+     put aside in the type stack linked to the entity and destroyed */
+  if(FALSE && intrinsic_entity_p(e) && !compilation_unit_p(get_current_module_name()))
     return;
 
   if (lq != NIL)

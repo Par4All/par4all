@@ -3725,6 +3725,20 @@ integer_to_overloaded_type(int n)
   return t;
 }
 
+static type
+integer_to_void_type(int n)
+{
+  type t = type_undefined;
+  functional ft = functional_undefined;
+
+  ft = make_functional(NIL, make_type_void());
+  t = make_type(is_type_functional, ft);
+
+  functional_parameters(ft) =
+    make_parameter_list(n, MakeIntegerParameter);
+  return t;
+}
+
 static type __attribute__ ((unused))
 void_to_overloaded_type(int n)
 {
@@ -4443,7 +4457,7 @@ static IntrinsicDescriptor IntrinsicTypeDescriptorTable[] =
   {BSEARCH_FUNCTION_NAME, 5, default_intrinsic_type, 0, 0},
   {CALLOC_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
   {DIV_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
-  {EXIT_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+  {EXIT_FUNCTION_NAME, 1, integer_to_void_type, 0, 0},
   {FREE_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
 
   {GETENV_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},

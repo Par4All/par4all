@@ -1774,7 +1774,8 @@ init_declarator_list:                       /* ISO 6.7 */
 init_declarator:                             /* ISO 6.7 */
     declarator          {
                           /* The default initial value is often zero,
-                              but not so for formal parameters */
+                              but not so for formal parameters or
+                              functions */
                           if(value_undefined_p(entity_initial($1)))
 			    entity_initial($1) = make_value_unknown();
                         }

@@ -97,13 +97,14 @@ static void rename_loop_index(loop l, hash_table renamings)
    must be created or not. */
 static void rename_statement_declarations(statement s, hash_table renamings)
 {
-
-  if (statement_block_p(s)) {
+  if (continue_statement_p(s) /* declaration_statement_p(s) */) {
     list inits = NIL;
     list decls = statement_declarations(s); // Non-recursive
     instruction old = statement_instruction(s);
     list ndecls = NIL;
     list tmp = NIL; /* holds the entity to remove from declarations */
+
+    pips_debug(1, "Begin for statement %p\n", s);
 
     FOREACH(ENTITY, var, decls) {
       entity nvar = (entity)hash_get(renamings, var);
@@ -134,32 +135,62 @@ static void rename_statement_declarations(statement s, hash_table renamings)
 	    fprintf(stderr, "\n");
 	  }
 	}
-        tmp=CONS(ENTITY,var,tmp);
+	tmp=CONS(ENTITY,var,tmp);
       }
       else {
+	/* FI: The comment below used to be true before we used
+	   declaration statements... */
 	/* Do nothing and the local declaration will be lost */
 	pips_debug(1, "Declaration for external variable \"%s\" moved.\n",
 		   entity_name(var));
       }
     }
 
-    /* calling RemoveLocalEntityFromDeclarations will tidy the declarations and the declaratiuon_statements */
-    FOREACH(ENTITY,e,tmp) RemoveLocalEntityFromDeclarations(e,get_current_module_entity(),s);
+    /* calling RemoveLocalEntityFromDeclarations will tidy the
+       declarations and the declaration_statements */
+    FOREACH(ENTITY,e,tmp)
+      RemoveLocalEntityFromDeclarations(e,get_current_module_entity(),s);
     gen_free_list(tmp);
 
 
-    /* Insert the list of initialisation statements as a sequence at
-       the beginning of s.
-    */
-    inits = gen_nconc(inits, CONS(statement, instruction_to_statement(old), NIL));
-    ifdebug(1)
-      print_statements(inits);
-    statement_instruction(s) = make_instruction_sequence(make_sequence(inits));
+    if(!ENDP(inits)) {
+      /* Insert the list of initialisation statements as a sequence at
+	 the beginning of s.
+      */
+      inits = gen_nconc(inits,
+			CONS(statement, instruction_to_statement(old), NIL));
+      ifdebug(1)
+	print_statements(inits);
+      if(get_bool_property("C89_CODE_GENERATION")) {
+	/* The initializations must be inserted at the right place,
+	   which may prove impossible if some of the initializations
+	   cannot be moved but are used. Example:
+
+	   int a[] = {1, 2, 3};
+	   int i = a[1];
+	*/
+	pips_internal_error("C89 flattened code not generated yet\n");
+      }
+      else { /* C99*/
+	statement_instruction(s) =
+	  make_instruction_sequence(make_sequence(inits));
+	if(!statement_with_empty_comment_p(s)) {
+	  string c = statement_comments(s);
+	  statement fs = STATEMENT(CAR(inits));
+	  statement_comments(fs) = c;
+	  /* FI: should be a call to defined_empty_comments() or
+	     something like it. Currently, empty_comments is a macro
+	     and its value is string_undefined:-( */
+	  statement_comments(s) = strdup("");
+	}
+      }
+    }
 
     //gen_free_list(statement_declarations(s));
 
     statement_declarations(s) = ndecls;
-    pips_debug(1, "Local declarations replaced.\n");
+    pips_debug(1, "End. Local declarations %s.\n",
+	       ENDP(ndecls)? "removed" : "updated");
   }
 }
 
@@ -276,7 +307,7 @@ static bool redeclaration_enter_statement(statement s, redeclaration_context_t *
 	if(redeclare_p) {
 
 	  /* Build the new variable */
-	  string eun  = entity_user_name(v);	 
+	  string eun  = entity_user_name(v);
 	  string negn = strdup(concatenate(mn, MODULE_SEP_STRING, rdcp->scope, eun, NULL));
 	  entity nv   = entity_undefined;
 	  //list unused_nvs = NIL;
@@ -290,7 +321,7 @@ static bool redeclaration_enter_statement(statement s, redeclaration_context_t *
 
 	  statement ds = rdcp->declaration_statement;
 	  list dselist = statement_to_referenced_entities(ds);
-	  bool ok_p    = TRUE;	  
+	  bool ok_p    = TRUE;
 
 	  ifdebug(8) {
 	    pips_debug(8, "Entities found in declaration statement: ");
@@ -313,10 +344,14 @@ static bool redeclaration_enter_statement(statement s, redeclaration_context_t *
 	    if (!ok_p) {
 	      // WARNING: We must remember to free the newly declared nv when it's not used!
 	      //unused_nvs = CONS(ENTITY, nv, unused_nvs);
-	    }	      
+	    }
 	  } while (!ok_p);
 
-      AddLocalEntityToDeclarations(nv,get_current_module_entity(),rdcp->declaration_statement);
+	  /* FI: what happens to external entities whose declarations
+	     is moved, but the name unchanged? */
+	  AddLocalEntityToDeclarations(nv,
+				       get_current_module_entity(),
+				       rdcp->declaration_statement);
 	  hash_put(rdcp->renamings, v, nv);
 	  pips_debug(1, "Variable %s renamed as %s\n", entity_name(v), entity_name(nv));
 	}
