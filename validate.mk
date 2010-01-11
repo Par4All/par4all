@@ -5,6 +5,8 @@ TPIPS	= tpips
 PIPS	= pips
 
 # default output file
+# this can be modified to generate separate files
+# see "validate-out" and "validate-test" targets
 TEST	= test
 
 # source files
@@ -39,8 +41,14 @@ clean-validate:
 	$(RM) *~ *.o *.tmp *.result/out out err a.out
 	$(RM) -r *.database
 
-# regenerate "test" files: svn diff show the diffs!
 validate:
+	# Experimental parallel validation
+	# run "make validate-out" to generate usual "out" files.
+	# run "make validate-test" to generate "test" files.
+	# run "make unvalidate" to revert test files to their initial status.
+
+# regenerate files: svn diff show the diffs!
+validate-dir:
 	$(RM) $(F.valid)
 	$(MAKE) $(F.valid)
 
@@ -50,11 +58,15 @@ unvalidate:
 
 # generate "out" files
 validate-out:
-	$(MAKE) TEST=out validate
+	$(MAKE) TEST=out validate-dir
 
-# validate depending on prefix
+# generate "test" files
+validate-test:
+	$(MAKE) TEST=test validate-dir
+
+# validate depending on prefix?
 validate-%:
-	$(MAKE) F.result="$(wildcard $**.result)" validate
+	$(MAKE) F.result="$(wildcard $**.result)" validate-dir
 
 # generate missing "test" files
 test: $(F.valid)
