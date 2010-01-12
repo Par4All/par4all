@@ -3,7 +3,7 @@
 # Inspired from setup_pips.sh
 #
 
-P4A_ROOT=/home/keryell/projets/Wild_Systems/Par4All/c
+P4A_ROOT=/home/keryell/projets/Wild_Systems/Par4All/d
 P4A_BUILD=$P4A_ROOT/build
 
 P4A_ETC=$P4A_BUILD/etc
@@ -39,7 +39,6 @@ warn()
   read
 }
 
-gni(){
 # Compile and install the polyLib:
 (
     cd $P4A_ROOT/packages/polylib
@@ -49,7 +48,7 @@ gni(){
     make
     make install
 )
-}
+
 
 echo
 echo "### creating pipsrc.sh"

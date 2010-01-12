@@ -1,5 +1,5 @@
 \documentclass[a4paper]{article}
-
+\usepackage[latin9]{inputenc}
 \usepackage{url}
 \usepackage{abbrev_reactive}
 
@@ -18,11 +18,19 @@
 \section{Introduction}
 \label{sec:introduction}
 
-\Apfa is ...
+\Apfa is a platform that merges various open source developments
+to aim at achieving the migration of software to multicore and other
+parallel processors.
+
+It is mainly developed by \Ahpcp, MINES ParisTech/CRI, Institut
+Télécom/Télécom Bretagne and others.
 
 This document describes the internal organization of \Apfa and how its
 construction relies on \Agit repositories, \Asvn repositories and other
 projects.
+
+Since it relies on other tool projects, the documentation of these other
+projects should also be taken into account.
 
 
 \subsection{Collaborative repositories}
@@ -34,14 +42,22 @@ The main repository for the project is:
 \url{ssh://git.hpc-project.com/git/par4all.git}
 
 There are also ancillary \Agit repositories to offer a \Agit interface to
-the \Asvn repositories for the \Apips components from \Acri:
+the trunk of the \Asvn repositories for the \Apips components from \Acri:
 \begin{itemize}
-\item \url{ssh://git.hpc-project.com/git/svn_linear.git}
-\item \url{ssh://git.hpc-project.com/git/svn_newgen.git}
-\item \url{ssh://git.hpc-project.com/git/svn_nlpmake.git}
-\item \url{ssh://git.hpc-project.com/git/svn_pips.git}
-\item \url{ssh://git.hpc-project.com/git/svn_validation.git}
+\item \url{ssh://git.hpc-project.com/git/svn-linear.git}
+\item \url{ssh://git.hpc-project.com/git/svn-newgen.git}
+\item \url{ssh://git.hpc-project.com/git/svn-nlpmake.git} is a top-level
+  repository with \texttt{trunk}, \texttt{branch} and \texttt{tag} because
+  it started without this standard layout that was added later around
+  revision 750;
+\item \url{ssh://git.hpc-project.com/git/svn-pips.git}
+\item \url{ssh://git.hpc-project.com/git/svn-validation.git}
 \end{itemize}
+These ancillary gateways only include \texttt{trunk} history since at CRI
+branches are not public.
+
+To have access without authentication and only for reading/cloning, you
+can use the \texttt{git:} prefix instead of \texttt{ssh:}.
 
 
 \subsection{Compilation}
@@ -223,16 +239,21 @@ These commands are also done by a \verb|p4a_fetch_all| that fetches also the
 You can then merge the feature you want with a \texttt{git merge -s
   subtree} from \texttt{remotes/CRI/.../master} as:
 \begin{verbatim}
-git merge -s subtree remotes/CRI/linear/master
-git merge -s subtree remotes/CRI/newgen/master
-git merge -s subtree remotes/CRI/nlpmake/master
-git merge -s subtree remotes/CRI/pips/master
-git merge -s subtree remotes/CRI/validation/master
+git merge -strategy=subtree remotes/CRI/linear/master
+git merge -strategy=subtree remotes/CRI/newgen/master
+git merge -strategy=subtree remotes/CRI/nlpmake/master
+git merge -strategy=subtree remotes/CRI/pips/master
+git merge -strategy=subtree remotes/CRI/validation/master
 \end{verbatim}
 or from any tree identifier to do more precise version selection. The
 \texttt{-s subtree} is necessary since in \Apfa the \Apips files are not
 at the top-level directory and you do not want them to appear at the
 top-level directory.
+
+To pull everything at one for testing, this is done with the
+\verb|p4a_pull_all|. It may useful to create a branch with a \texttt{git
+  checkout -b} before to test it, so the branch can be deleted for an easy
+rollback.
 
 
 \subsection{Setting the infrastructure up}

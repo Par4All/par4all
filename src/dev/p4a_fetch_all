@@ -1,5 +1,7 @@
 #! /bin/sh
 
+# Script to fetch remote git repositories into Par4All git.
+
 git fetch CRI/linear
 git fetch CRI/newgen
 git fetch CRI/nlpmake
