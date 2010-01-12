@@ -1,0 +1,322 @@
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>mode d'emploi gfc2pips</title>
+<style>
+.bloc{
+	text-align:center;
+}
+ul{
+	list-style-type:decimal;
+}
+ul ul{
+	list-style-type:lower-alpha;
+}
+ul ul ul{
+	list-style-type:none;
+}
+ul li:before{
+	content:" - ";
+}
+.code {
+	background-color: #F1F5F9;
+        border: 1px solid gray;
+        padding: 1ex 1ex 1ex 2ex;
+}
+.shell{
+	font-style:italic;
+}
+.hid {
+	display:none;
+}
+</style>
+<script>
+function tocode(){
+	var all = document.getElementsByTagName('*');
+	for(var i=0;i<all.length;i++){
+		if(all[i].className=='code'){
+//			all[i].innerHTML = all[i].innerHTML.replace(/([^&][a-zA-Z0-9]*);/g,'$1');
+			all[i].innerHTML = all[i].innerHTML.replace(/</g,'&lt;');
+			all[i].innerHTML = all[i].innerHTML.replace(/>/g,'&gt;');
+			all[i].innerHTML = all[i].innerHTML.replace(/\r\n/g,'<br />');
+			all[i].innerHTML = all[i].innerHTML.replace(/\r|\n/g,'<br />');
+			all[i].innerHTML = all[i].innerHTML.replace(/\t/g,'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;');
+			all[i].innerHTML = all[i].innerHTML.replace(/\s/g,'&nbsp;');
+		}
+	}
+}
+</script>
+</head>
+<body onload="tocode();">
+<div>
+<div class="bloc">
+***************************************************************************<br />
+*******************  Étapes à suivre pour intégrer  ***********************<br />
+*******************   le parseur de gfc dans PIPS   ***********************<br />
+***************************************************************************</div>
+<p>
+	<ul>
+		<li>Télécharger gcc<br />
+		<li><p class="code">./configure --prefix="/home/raphael/Bureau/sortie_gcc" --disable-multilib --enable-languages=fortran --enable-checking=release</p> ajouter <span class="shell">--disable-nls</span> permettra d'avoir les messages d'erreurs en anglais ce qui aide pour le débug pour aller chercher le pourquoi du comment dans la documentation</li>
+				<li>Dans /gcc/fortran/Make-lang.in
+la liste des bibliothèques à ajouter se prend via la commande <span class="chell">find . -name "*.a"|grep /lib/|sed -e "s#^.#$(pwd)#"</span> dans le dossier de newgen et linear et <span class="shell">find . -name "*.a"|grep /src/Libs/|sed -e "s#^.#$(pwd)#"</span> dans pips.<br />
+Modifier: <p class="code" ># The compiler itself is called f951.
+f951$(exeext): $(F95_OBJS) \
+		$(BACKEND) $(LIBDEPS) attribs.o
+	$(CC) $(ALL_CFLAGS) $(LDFLAGS) -o $@ \
+		$(F95_OBJS) $(BACKEND) $(LIBS) \
+		/path/to/pips/prod/newgen/lib/LINUX_x86_64_LL/libgenC.a /path/to/pips/prod/pips/src/Libs/newgen/LINUX_x86_64_LL/libnewgen.a \
+		/path/to/pips/prod/linear/src/sg/LINUX_x86_64_LL/libsg.a attribs.o $(BACKENDLIBS)
+</p>
+				</li>
+
+			</li>
+			<li id="70">/fixincludes/Makefile.in et /gcc/Makefile.in  directive <b>.c.o</b> rajouter <span class="shell">-I/path/to/pips/prod/newgen/include/ -I/path/to/pips/prod/linear/include/ </span> <br />
+			</li>
+			<li>Modifier /Makefile.in et /Makefile.tpl pour ajouter <span class="shell">INC_PIPS = -I/path/to/pips/prod/newgen/include/ -I/path/to/pips/prod/linear/include/ -I/path/to/pips/prod/pips/src/include/</span> dans a première déclaration de CC dans la directive <b>POSTSTAGE1_HOST_EXPORTS</b><br />
+			</li>
+			<li>changement de nom de statistics en pips_statistics : <br />
+			pips/prod/pips/include/statistics.h &gt; pips_statistics.h<br />
+			pips/prod/pips/include/statistics-local.h &gt; pips_statistics-local.h<br />
+			dans <br />
+			pips/prod/pips/src/Libs/sac/codegen.c, pips/prod/pips/src/Libs/sac/reduction.c, pips/prod/pips/src/Libs/sac/tiling_sequence.c, pips/prod/pips/src/Libs/local.mk, pips/prod/pips/src/Libs/pips_statistics/Makefile, pips/prod/pips/makes/define_libraries.mk
+			<b>Il ne faut pas de fichier <i>statistics.h</i> dans PIPS</b>, car il entrerai aussi tôt en confit avec celui de gfc. Celui de gfc est généré automatiquement par un binaire. On possède les sources du binaire, mais en raison de nombreuses vérifications lors de la compilation de gfc changer le source du binaire impliquerai une erreur dans les vérifications et donc un arrêt du make.<br />
+			</li>
+			<li id="80">on a un pragma poison pour strdup => On a une moulinette à la racine du projet gcc qui enlève ces pragmas, cf. plus loin</li>
+			<li>Des conflits de noms existent sur : <b>free_graph</b>, <b>vect_dump</b>, <b>print_loops</b> et <b>expression_syntax</b>. On fait un hack massif sur gfc afin de renommer les variables/fonctions qui sont en conflit.<br />
+<b>hack.sh</b>: <p class="code">#!/bin/bash
+
+#This script escape most of the compiling problems in gfc such as:
+# - files with the same name in includes directory
+# - variables/functions with the same name
+# - poison pragma wich make the use of some keywords fail the compilation in GCC
+
+#Removal of the poison pragmas only if needed (one-line pragmas, change for multiple lines pragmas if there is a need to)
+echo -n "Hacking: poison pragma for strdup and malloc	"
+`find . -name "system.h"|xargs grep -l ".*#pragma GCC poison[^\n]*strdup.*$" |xargs sed -i -e "s/.*#pragma GCC poison[^\n]*strdup.*$//" &>/dev/null`
+echo -n "."
+`find . -name "system.h"|xargs grep -l ".*#pragma GCC poison[^\n]*malloc.*$" |xargs sed -i -e "s/.*#pragma GCC poison[^\n]*malloc.*$//" &>/dev/null`
+echo "ok"
+
+
+#Some names in gfc that are also defined in PIPS we change every one of them
+#free_graph and vect_dump are both used in PIPS and gfc and are not the same object
+./hack_name.sh free_graph
+./hack_name.sh vect_dump
+./hack_name.sh print_loops
+./hack_name.sh expression_syntax
+#./hack_name.sh hash_table
+
+
+</p>
+<b>hack_name.sh</b>: <p class="code">#!/bin/bash
+
+if [ $# -lt 1 ] ; then
+	echo "ERROR: need at least one parameter "
+else
+	echo -n "Hacking: $1	"
+fi
+
+
+#If we remove the previous hack and hack again, the make command will take eons because too many files depends of those we changed
+#remove previous hack if only partial one
+#we do not hack the files using both PIPS and gfc (dump2PIPS in our case, add any if necessary)
+
+`find . -name "*.c"|grep -v dump2PIPS|xargs grep -l "[^_]$1" |xargs sed -i -e "s/gfc_$1/$1/" &>/dev/null`
+echo -n "."
+`find . -name "*.h"|grep -v dump2PIPS|xargs grep -l "[^_]$1" |xargs sed -i -e "s/gfc_$1/$1/" &>/dev/null`
+echo -n "."
+
+#We hack what is not already hacked thus there will be minimal changes for the make command
+`find . -name "*.c"|grep -v dump2PIPS|xargs grep -l "[^_]$1" |xargs sed -i -e "s/$1/gfc_$1/" &>/dev/null`
+echo -n "."
+`find . -name "*.h"|grep -v dump2PIPS|xargs grep -l "[^_]$1" |xargs sed -i -e "s/$1/gfc_$1/" &>/dev/null`
+echo "ok"
+
+</p></li>
+			<li>Compiler la partie intégrée à pips avec les mêmes bibliothèques que ici
+<p class="code">/path/to/gcc/directory/host-x86_64-unknown-linux-gnu/prev-gcc/xgcc -B/path/to/gcc/directory/host-x86_64-unknown-linux-gnu/prev-gcc/ -B/home/raphael/Bureau/sortie_gcc/x86_64-unknown-linux-gnu/bin/ -I/path/to/pips/prod/newgen/include/ -I/path/to/pips/prod/linear/include/ -I/path/to/pips/prod/pips/include/   -g -O2 -DIN_GCC   -W -Wall -Wwrite-strings -Wstrict-prototypes -Wmissing-prototypes -Wcast-qual -Wold-style-definition -Wc++-compat -Wmissing-format-attribute -pedantic -Wno-long-long -Wno-variadic-macros -Wno-overlength-strings   -DHAVE_CONFIG_H  -o cc1 c-lang.o stub-objc.o attribs.o c-errors.o c-lex.o c-pragma.o c-decl.o c-typeck.o c-convert.o c-aux-info.o c-common.o c-opts.o c-format.o c-semantics.o c-ppoutput.o c-cppbuiltin.o c-objc-common.o c-dump.o c-pch.o c-parser.o i386-c.o c-gimplify.o tree-mudflap.o c-pretty-print.o c-omp.o cc1-checksum.o \
+	  main.o  libbackend.a ../libcpp/libcpp.a ../libdecnumber/libdecnumber.a ../libcpp/libcpp.a   ../libiberty/libiberty.a ../libdecnumber/libdecnumber.a   -lmpfr -lgmp</p>
+			modifier /pips/prod/pips/libraries.make <span class="hid">rajouter <span class="shell">backend cpp decnumber iberty mpfr gmpet</span> modifier statistics en pips_statistics	</span> à pips.libs et /pips/prod/pips/makes/main.mk transformer <p class="code">LINK	= $(LD) $(LDFLAGS) $(LDOPT) -o</p> en <p class="code">LINK	= $(LD) $(LDFLAGS) $(LDOPT) \
+	-L/path/to/gcc/directory/host-x86_64-unknown-linux-gnu/prev-gcc -L/path/to/gcc/directory/host-x86_64-unknown-linux-gnu/libcpp \
+	-L/path/to/gcc/directory/host-x86_64-unknown-linux-gnu/gcc -L/path/to/gcc/directory/host-x86_64-unknown-linux-gnu/libdecnumber \
+	-L/path/to/gcc/directory/host-x86_64-unknown-linux-gnu/libiberty -o
+</p>
+
+			</li>
+			<li>gcc utilise xgcc pour se compiler, il ne va chercher les définitions d'un objet que dans la liste de bibliothèques qui suit l'appel, on doit donc recopier un bout de la liste. Lorsqu'une bibli est demandée, et qu'elle est avant dans la liste, on recopie toute la liste à partir de ladite bibliothèque</li>
+			<li>Modifications dans les makefiles de pips de statistics en pips_statistics :<br />
+			modification dans makes/define_libraries.mk, src/Libs/(pips_)statistics/Makefile, src/Libs/local.mk</li>
+			<li>Ajout de <b>gfc_parser</b> dans src/Documentation/pipsmake-rc.tex en tant que double de <b>parser</b>.</li>
+			<li>f951 est en fait le parseur de gfortran (appelé pour chaque fichier via un fork), avec un autre nom, par conséquent nous sommes très intéressés par la liste des bibliothèques qu'il utilise lors qu'il est compilé. Nous utilisons ces mêmes bibliothèques pour compiler pips &amp; Cie. Ajouter dans makes/pips-bin.mk<p class="code">GFC_LIBS1 = fortran/arith.o fortran/array.o fortran/bbt.o fortran/check.o fortran/cpp.o fortran/data.o fortran/decl.o fortran/dump-parse-tree.o fortran/error.o fortran/expr.o fortran/interface.o fortran/intrinsic.o fortran/io.o fortran/iresolve.o fortran/match.o fortran/matchexp.o fortran/misc.o fortran/module.o fortran/openmp.o fortran/options.o fortran/parse.o fortran/primary.o fortran/resolve.o fortran/scanner.o fortran/simplify.o fortran/st.o fortran/symbol.o fortran/target-memory.o   fortran/convert.o fortran/dependency.o fortran/f95-lang.o fortran/trans.o fortran/trans-array.o fortran/trans-common.o fortran/trans-const.o fortran/trans-decl.o fortran/trans-expr.o fortran/trans-intrinsic.o fortran/trans-io.o fortran/trans-openmp.o fortran/trans-stmt.o fortran/trans-types.o attribs.o
+
+GFC_LIBS2 = $(addprefix /path/to/pips/prod/gcc/host-x86_64-unknown-linux-gnu/gcc/,$(GFC_LIBS1)) 
+GFC_LIBS3 = backend cpp decnumber iberty mpfr gmp
+GFC_LIBS = $(GFC_LIBS2) $(addprefix -l,$(GFC_LIBS3))
+
+</p>
+et modifier 
+<p class="code">$(ARCH)/pips:
+	$(MAKE) $(ARCH)
+	$(LINK) $@ $(main.dir)/$(PIPS_MAIN) -lpips $(addprefix -l,$(pips.libs))
+</p> et similaires(tpips, gpips, wpips, autre) en <p class="code">$(ARCH)/pips:
+	$(MAKE) $(ARCH)
+	$(LINK) $@ $(main.dir)/$(PIPS_MAIN) -lpips $(addprefix -l,$(pips.libs)) $(GFC_LIBS)
+</p>
+
+Rajouter autant de fois que necessaire toute la liste des bibliothèques pour la compilation de f951 (3x suffit, bonne (in?)digestion).<p class="code">$(CC) $(ALL_CFLAGS) $(LDFLAGS) -L/path/to/pips/prod/linear/lib/LINUX_x86_64_LL -L/path/to/pips/prod/newgen/lib/LINUX_x86_64_LL \
+		-L/path/to/pips/prod/extern/lib/LINUX_x86_64_LL -L/path/to/pips/prod/pips/lib/LINUX_x86_64_LL \
+		-o $@ \
+		$(F95_OBJS) $(BACKEND) $(LIBS) \
+		-lpips -ltop-level -lpipsmake -lwp65 -lhpfc -lhyperplane -lto_begin_with -linstrumentation -lpips_statistics \
+		-lexpressions -ltransformations -lhwac -lmovements -lbootstrap -lcallgraph -licfg -lchains -lcomplexity \
+		-lconversion -lprettyprint -latomizer -lsyntax -lpreprocessor -lpipsmake -lwp65 -lhpfc -lhyperplane -lto_begin_with -linstrumentation -lpips_statistics \
+		-lexpressions -ltransformations -lhwac -lmovements -lbootstrap -lcallgraph -licfg -lchains -lcomplexity \
+		-lconversion -lprettyprint -latomizer -lsyntax -lc_syntax -leffects-simple -leffects-convex -leffects-generic \
+		-lalias-classes -lcomp_sections -lsemantics -lcontrol -lcontinuation -lrice -lricedg -lpipsdbm -ltransformer \
+		-lpreprocessor -lpipsmake -lwp65 -lhpfc -lhyperplane -lto_begin_with -linstrumentation -lpips_statistics \
+		-lexpressions -ltransformations -lhwac -lmovements -lbootstrap -lcallgraph -licfg -lchains -lcomplexity \
+		-lconversion -lprettyprint -latomizer -lsyntax -lc_syntax -leffects-simple -leffects-convex -leffects-generic \
+		-lalias-classes -lcomp_sections -lsemantics -lcontrol -lcontinuation -lrice -lricedg -lpipsdbm -ltransformer \
+		-lpreprocessor -lri-util -lstep -lproperties -ltext-util -lmisc -lproperties -lreductions -lflint -lsac -lsafescale \
+		-lphrase -lnewgen -lgenC -lmatrice -lunion -lpolyedre -lsparse_sc -lsc -lcontrainte -lsg -lsommet -lray_dte -lpolynome \
+		-lmatrix -lvecteur -larithmetique -lpolylib -lm -lreadline -ltermcap -lri-util -lstep -lproperties -ltext-util -lmisc -lproperties -lreductions -lflint -lsac -lsafescale \
+		-lphrase -lnewgen -lgenC -lmatrice -lunion -lpolyedre -lsparse_sc -lsc -lcontrainte -lsg -lsommet -lray_dte -lpolynome \
+		-lmatrix -lvecteur -larithmetique -lpolylib -lm -lreadline -ltermcap -lri-util -lstep -lproperties -ltext-util -lmisc -lproperties -lreductions -lflint -lsac -lsafescale \
+		-lphrase -lnewgen -lgenC -lmatrice -lunion -lpolyedre -lsparse_sc -lsc -lcontrainte -lsg -lsommet -lray_dte -lpolynome \
+		-lmatrix -lvecteur -larithmetique -lpolylib -lm -lreadline -ltermcap -lc_syntax -leffects-simple -leffects-convex -leffects-generic \
+		-lalias-classes -lcomp_sections -lsemantics -lcontrol -lcontinuation -lrice -lricedg -lpipsdbm -ltransformer \
+		-lpreprocessor -lri-util -lstep -lproperties -ltext-util -lmisc -lproperties -lreductions -lflint -lsac -lsafescale \
+		-lphrase -lnewgen -lgenC -lmatrice -lunion -lpolyedre -lsparse_sc -lsc -lcontrainte -lsg -lsommet -lray_dte -lpolynome \
+		-lmatrix -lvecteur -larithmetique -lpolylib -lm -lreadline -ltermcap \
+		attribs.o $(BACKENDLIBS)</p>
+En pratique on fait : <p class="code">LIBS_PIPS1 = -lpips -ltop-level -lpipsmake -lwp65 -lhpfc -lhyperplane -lto_begin_with -linstrumentation -lpips_statistics \
+		-lexpressions -ltransformations -lhwac -lmovements -lbootstrap -lcallgraph -licfg -lchains -lcomplexity \
+		-lconversion -lprettyprint -latomizer -lsyntax -lc_syntax -leffects-simple -leffects-convex -leffects-generic \
+		-lalias-classes -lcomp_sections -lsemantics -lcontrol -lcontinuation -lrice -lricedg -lpipsdbm -ltransformer \
+		-lpreprocessor -lri-util -lstep -lproperties -ltext-util -lmisc -lproperties -lreductions -lflint -lsac -lsafescale \
+		-lphrase -lnewgen -lgenC -lmatrice -lunion -lpolyedre -lsparse_sc -lsc -lcontrainte -lsg -lsommet -lray_dte -lpolynome \
+		-lmatrix -lvecteur -larithmetique -lpolylib -lm -lreadline -ltermcap
+LIBS_PIPS = $(LIBS_PIPS1) $(LIBS_PIPS1) $(LIBS_PIPS1) 
+
+
+# The compiler itself is called f951.
+f951$(exeext): $(F95_OBJS) \
+		$(BACKEND) $(LIBDEPS) attribs.o
+	$(CC) $(ALL_CFLAGS) $(LDFLAGS) -L/path/to/pips/prod/linear/lib/LINUX_x86_64_LL -L/path/to/pips/prod/newgen/lib/LINUX_x86_64_LL \
+		-L/path/to/pips/prod/extern/lib/LINUX_x86_64_LL -L/path/to/pips/prod/pips/lib/LINUX_x86_64_LL \
+		-o $@ \
+		$(F95_OBJS) $(BACKEND) $(LIBS) $(LIBS_PIPS) attribs.o $(BACKENDLIBS)
+</p>
+
+</li>
+			<li>Virer les redéfinitions de getc dans fixincludes/system.h, libcpp/system.h et gcc/system.h afin de ne plus faire planter tout dans PIPS</li>
+			
+		<li>compiler gcc version fortran</li>
+		<li class="hid">Modification de ri-util/prettyprint.c dans <b>... words_substring_op(...)</b>
+<div class="code">    int length = gen_length(call_arguments(obj));
+    pips_assert("words_substring_op", length == 3 ||
+		(length>=4 && length%2==0)
+	);</div>
+et dans <b>... words_assign_substring_op(...)</b><div class="code">    int length = gen_length(call_arguments(obj));
+    pips_assert("words_substring_op", 
+		(length>=4 && length%2==0)
+	);
+</div> voire suppression totale du test</li>
+	<li>Create a new type of instruction: <p class="code">where = condition:expression x true:statement x elsewhere:where ;</p></li>
+	<li><b>ALLOCATABLE</b> should be in the branch but in case not: add in ri-util/declarations.c<p class="code">static text text_of_allocatables(list /* of entity that are allocatables */ lp)
+{
+  list /* of sentence */ ls = NIL;
+
+  /* generate the sentences
+   */
+  FOREACH(ENTITY, e, lp)
+      ls = CONS(SENTENCE, sentence_allocatable(e), ls );
+
+  return make_text(ls);
+}
+</p> <p class="code">static sentence sentence_allocatable(entity f)
+{
+  list pc = NIL;
+
+  //basic b = entity_basic(f);
+  //pc = CHAIN_SWORD(pc, basic_to_string(b));
+
+  pc = CHAIN_SWORD(pc, "ALLOCATABLE ");
+  pc = CHAIN_SWORD(pc, entity_local_name(f));
+  int size = gen_length(variable_dimensions(type_variable(entity_type(f))));
+  pc = CHAIN_SWORD(pc, "(");
+  while(size){
+    pc = CHAIN_SWORD(pc, ":");
+	size--;
+    if(size)pc = CHAIN_SWORD(pc, ",");
+  }
+  pc = CHAIN_SWORD(pc, ")");
+
+  return(make_sentence(is_sentence_unformatted,
+		       make_unformatted(NULL, 0, 0, pc)));
+}
+</p>
+
+and somes parts in <b>text_entity_declaration</b> to 
+<p class="code">    pf4 = NIL, pf8 = NIL,
+    pl = NIL,
++-  pc8 = NIL, pc16 = NIL, ps = NIL, lparam = NIL, lalloca = NIL;
+  list * ppi=NULL;
+  list * pph=NULL;
+</p>
+<p class="code">      bool allocatable = in_common
+    	&& same_string_p(entity_local_name(ram_section(storage_ram(entity_storage(e)))),"*ALLOCATABLE*");
+</p><p class="code">else if (!print_commons && (area_p || (var && in_common && pp_cinc)))
+	{
+	  pips_debug(5, "skipping entity %s\n", entity_name(e));
+	}
++     else if(allocatable)
++     {
++         ram_section(storage_ram(entity_storage(e))) = HeapArea;
++   	  lalloca = CONS(ENTITY, e, lalloca);
++     }
+      else if (param)
+	{
+	  /*        PARAMETER
+</p>
+<p class="code">  MERGE_TEXTS(r, text_of_parameters(lparam));
+  gen_free_list(lparam), lparam = NIL;
+
++ MERGE_TEXTS(r, text_of_allocatables(lalloca));
++ gen_free_list(lalloca), lalloca = NIL;
++
+  ADD_WORD_LIST_TO_TEXT(r, ph1);
+  attach_declaration_type_to_words(ph1, "INTEGER*1");
+  ADD_WORD_LIST_TO_TEXT(r, ph2);
+</p>
+</li>
+	</ul>
+</p>
+</div>
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<div>
+<div class="bloc">
+***************************************************************************<br />
+****************** How are created the config.h files ?  ******************<br />
+***************************************************************************</div>
+<p>create config.h<br />
+go to gcc/gcc/<br />
+We make the makefile, --prefix is completly optionnal because we will never ever install the compiled version of gcc<br />
+./configure --prefix="/home/raphael/Bureau/sortie_gcc" --disable-multilib --enable-languages=fortran<br />
+We make the config.h file and he will be created in the current directory (which is not the same directory as the one created by the general make).<br />
+When one launch the general make this file will not be used, modified or deleted, an other one with the exact same content and length will be created in the gcc/ directory.<br />
+make config.h<br />
+<br />
+Now we can use the config.h file</p>
+</div>
+<br />
+</body></html>
+
