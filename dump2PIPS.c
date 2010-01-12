@@ -1,10 +1,32 @@
-/*
+/**
  * The naming of functions is based on the following syntax :
  * - every and each function used to manipulate gfc or pips entities begin with gfc2pips_
  * - if the function is a translation from one RI to the other it will be:
  * 		gfc2pips_<type_of_the_source_entity>2<type_of_the_target_entity>(arguments)
+ * - if a function may need two versions for differents types in arguments, the less frequently used had a _ at the end, the other one doesn't
+ * 		newgen_list gfc2pips_vars(gfc_namespace *ns);
+ * 		newgen_list gfc2pips_vars_(gfc_namespace *ns, newgen_list variables_p);
+ * - functions with similar purpose have similar names, however you need to look at the comments/documentation to know what the difference is
+ * 		char* gfc2pips_gfc_char_t2string(gfc_char_t *c,int nb);
+ * 		char* gfc2pips_gfc_char_t2string2(gfc_char_t *c);
+ * 		char* gfc2pips_gfc_char_t2string_(gfc_char_t *c,int nb);
  *
- * EXEC_RETURN plante
+ */
+
+/**
+ * EXPR_STRUCTURE, EXPR_SUBSTRING, EXPR_NULL, EXPR_ARRAY are not dumped
+ *
+ * EXPR_STRUCTURE is for user defined structures:
+ *-  TYPE point
+ *-   REAL x,y
+ *-  END TYPE point
+ * not implemented in PIPS or partially for C structures
+ *
+ * EXPR_SUBSTRING is for a substring of a constant string, but never encountered even with specific test case
+ *
+ * EXPR_NULL The NULL pointer value (which also has a basic type), but POINTER is not implemented in PIPS
+ *
+ * EXPR_ARRAY array constructor but seem to be destroyed to the profit of RAW values
  */
 
 #include "dump2PIPS.h"
@@ -22,9 +44,18 @@ static int gfc2pips_last_created_label_step = 2;
 
 
 
+/**
+ * Here are few utility functions to handle splitted files and do comparisons with case insensitive
+ */
+/**
+ * @brief replace lower case char by upper case ones
+ */
 char * str2upper(char s[]){
 	return strn2upper(s,strlen(s));
 }
+/**
+ * @brief replace lower case char by upper case ones
+ */
 char * strn2upper(char s[], size_t n){
 	while(n){
 		s[n-1] = toupper(s[n-1]);
@@ -32,11 +63,17 @@ char * strn2upper(char s[], size_t n){
 	}
 	return s;
 }
+/**
+ * @brief copy a string from the last char (to allow copy on itself)
+ */
 char * strrcpy(char *dest, __const char *src){
 	int i = strlen(src);
 	while(i--) dest[i] = src[i];
 	return dest;
 }
+/**
+ * @brief insensitive case comparison
+ */
 int strcmp_ (__const char *__s1, __const char *__s2){
 	char *a = str2upper(strdup(__s1));
 	char *b = str2upper(strdup(__s2));
@@ -46,6 +83,9 @@ int strcmp_ (__const char *__s1, __const char *__s2){
 	return ret;
 }
 
+/**
+ * @brief insensitive case n-comparison
+ */
 int strncmp_ (__const char *__s1, __const char *__s2, size_t __n){
 	char *a = str2upper(strdup(__s1));
 	char *b = str2upper(strdup(__s2));
@@ -54,6 +94,10 @@ int strncmp_ (__const char *__s1, __const char *__s2, size_t __n){
 	free(b);
 	return ret;
 }
+
+/**
+ * @brief copy the file called *old to the file called *new
+ */
 int fcopy(char* old,char* new){
 	if(!old||!new) return 0;
 	FILE * o = fopen(old,"r");
@@ -76,7 +120,10 @@ int fcopy(char* old,char* new){
 }
 
 /**
- * @brief epurate a string representing a REAL, could be a pre-prettyprinter processing
+ * @brief expurgates a string representing a REAL, could be a pre-prettyprinter processing
+ *
+ * 1.0000000000e+00  becomes  1.
+ * 1234.5670000e+18  becomes  1234.567e+18
  */
 void gfc2pips_truncate_useless_zeroes(char *s){
 	char *start = s;
@@ -254,7 +301,6 @@ void gfc2pips_namespace(gfc_namespace* ns){
 	pips_debug(2, "main entity object initialized\n");
 
 
-	//
 	////list of parameters
 	pips_debug(2, "dump the list of parameters\n");
 	newgen_list parameters = NULL, parameters_name = NULL;
@@ -269,9 +315,6 @@ void gfc2pips_namespace(gfc_namespace* ns){
 	pips_debug(2, "List of parameters done\t %d parameters(s)\n", gen_length(parameters_name) );
 
 
-
-	////type of entity we are creating : a function (except maybe for module ?
-	////a functional type is made of a list of parameters and the type returned
 	if(bloc_token != MET_BLOCK){
 		entity_type( gfc2pips_main_entity ) = make_type_functional( make_functional(parameters, bloc_type));//entity_type( gfc2pips_main_entity)
 	}
@@ -287,12 +330,6 @@ void gfc2pips_namespace(gfc_namespace* ns){
 
 
 
-	//can it be removed ?
-	//init_ghost_variable_entities();
-
-	//can it be removed ?
-	//BeginingOfProcedure();
-
 	int stack_offset = 0;
 	entity_storage( gfc2pips_main_entity ) = MakeStorageRom();
 	/*struct _newgen_struct_entity_ {
@@ -304,9 +341,6 @@ void gfc2pips_namespace(gfc_namespace* ns){
 	  value _entity_initial_;			x
 	};*/
 
-
-	//can it be removed ?
-	//common_size_map = hash_table_make(hash_pointer, 0);
 
 	set_current_module_entity( gfc2pips_main_entity );
 	gfc2pips_initAreas();//Even if it is initialized by the defaults functions of PIPS, it is not the way we want it to be => still true ? if not remove the comment
@@ -426,7 +460,7 @@ void gfc2pips_namespace(gfc_namespace* ns){
 	//add variables who are not in a named common, their name is then the same as the common
 
 
-	//// declare DIMENSIONS => information transfered to each single entity
+	//// declare DIMENSIONS => no need to handle, information already transfered to each and every entity
 
 	//// declare variables
 	newgen_list variables_p,variables;
@@ -600,12 +634,9 @@ void gfc2pips_namespace(gfc_namespace* ns){
 	//get symbols with value, data and explicit-save
 	//sym->value is an expression to build the save
 	//create data $var /$val/
-	//save si explicit save, rien sinon
+	//save if explicit save, else nothing
 	instruction data_inst = instruction_undefined;
 
-	/*for (eq = ns->equiv; eq; eq = eq->next){
-		show_equiv (eq);
-	}*/
 
 	//// declare code
 	pips_debug(2, "dumping code ...\n");
@@ -629,7 +660,7 @@ void gfc2pips_namespace(gfc_namespace* ns){
 
 	//we automatically add a return statement
 	//we have got a problem with multiple return in the function
-	//and if the last statement is already a return ?
+	//and if the last statement is already a return ? badly handled
 	insure_return_as_last_statement(gfc2pips_main_entity,&gfc_function_body);
 
 	SetChains();
@@ -637,6 +668,7 @@ void gfc2pips_namespace(gfc_namespace* ns){
 	//however we have to use it !
 	gfc2pips_computeAdresses();
 
+	//compute equivalences
 	//gfc2pips_computeEquiv(ns->equiv);
 
 	//update_common_sizes();//Syntax !!//we have the job done 2 times if debug is at 9, one time if at 8
@@ -2604,15 +2636,19 @@ ENDDO
 			}
 			if(previous!=NULL){
 				//add a IF also
-				loop_body(previous) = instruction_to_statement(
-					make_instruction_test(
-						make_test(
-							gfc2pips_expr2expression(c->expr),
-							instruction_to_statement(forall_list_of_instructions),
-							make_empty_block_statement()
+				if(c->expr){
+					loop_body(previous) = instruction_to_statement(
+						make_instruction_test(
+							make_test(
+								gfc2pips_expr2expression(c->expr),
+								instruction_to_statement(forall_list_of_instructions),
+								make_empty_block_statement()
+							)
 						)
-					)
-				);
+					);
+				}else{
+					loop_body(previous) = instruction_to_statement(forall_list_of_instructions);
+				}
 				return make_instruction_loop( w );
 			}else{
 				pips_user_error("No iterator for FORALL\n");
@@ -3910,7 +3946,7 @@ expression gfc2pips_expr2expression(gfc_expr *expr){
 					//show_expr(expr->value.function.actual->expr);
 					return gfc2pips_expr2expression(expr->value.function.actual->expr);
 				}else{
-					pips_debug(6, "expression null !\n");
+					pips_user_error(6, "expression null !\n");
 				}
 			}else{
 				//functions whose name begin with __ should be used by gfc only therefore we put the old name back
@@ -3960,15 +3996,14 @@ expression gfc2pips_expr2expression(gfc_expr *expr){
 				);
 			}
 		break;
+		case EXPR_STRUCTURE:
+			pips_user_error("gfc2pips_expr2expression: dump of EXPR_STRUCTURE not yet implemented\n");
+		case EXPR_SUBSTRING:
+			pips_user_error("gfc2pips_expr2expression: dump of EXPR_SUBSTRING not yet implemented\n");
+		case EXPR_NULL:
+			pips_user_error("gfc2pips_expr2expression: dump of EXPR_NULL not yet implemented\n");
 		case EXPR_ARRAY:
-			pips_debug(5, "\n\narray\n\n");
-
-			//show_constructor (p->value.constructor);
-			//show_ref (p->ref);
-
-			//MakeDataStatement($2, $4);
-			//return CONS(EXPRESSION, $1, NIL);
-		//break;
+			pips_user_error("gfc2pips_expr2expression: dump of EXPR_ARRAY not yet implemented\n");
 		default:
 			pips_user_error("gfc2pips_expr2expression: dump not yet implemented, type of gfc_expr not recognized %d\n", (int)expr->expr_type);
 		break;
@@ -4181,22 +4216,26 @@ int gfc2pips_computeAdressesOfArea( entity _area ){
 }
 
 void gfc2pips_computeEquiv(gfc_equiv *eq){
+	//equivalences are not correctly implemented in PIPS: they work on entities instead of expressions
+	//there is no point in creating something wrong
+	/*
+	* example:
+	* EQUIVALENCE (a,c(1)),  (b,c(2))
+	*
+	* |-----a-----|
+	*          |-----b-----|
+	* |--c(1)--|--c(2)--|--c(3)--|
+	* |-------------c------------|-----d-----|
+	*
+	* It is impossible to represent with only entities !!!
+	*/
+
+
+
+
 	//ComputeEquivalences();//syntax/equivalence.c
 	//offset = calculate_offset(eq->expr);  enlever le static du fichier
 
-
-/* how does PIPS know there is an equivalence to output ?
-lequivchain: equivchain | lequivchain TK_COMMA equivchain;
-
-equivchain: TK_LPAR latom TK_RPAR{ StoreEquivChain($2); };
-
-latom: atom {
-		$$ = make_chain(CONS(ATOM, MakeEquivAtom($1), (newgen_list) NULL));
-	} | latom TK_COMMA atom {
-		chain_atoms($1) = CONS(ATOM, MakeEquivAtom($3),chain_atoms($1));
-		$$ = $1;
-    };
-*/
 
     for( ; eq ; eq=eq->next ){
     	gfc_equiv * save = eq;
