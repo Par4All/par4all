@@ -25,7 +25,7 @@
  * package   :	static_controlize
  * Author    :	Arnauld LESERVOT
  * Date      :	May 93
- * Modified  :	
+ * Modified  :
  * Documents :	"Implementation du Data Flow Graph dans Pips"
  * Comments  :
  */
@@ -52,8 +52,12 @@
 #include "polyedre.h"
 #include "matrix.h"
 
-/* Pips includes 	*/
+/* Pips includes	*/
 #include "ri.h"
+/* Types arc_label and vertex_label must be defined although they are
+   not used */
+typedef void * arc_label;
+typedef void * vertex_label;
 #include "graph.h"
 #include "paf_ri.h"
 #include "database.h"
@@ -66,7 +70,7 @@
 #include "resources.h"
 #include "paf-util.h"
 #include "static_controlize.h"
- 
+
 /* Global Variables	*/
 int			Gcount_nsp;
 int			Gcount_nub;
@@ -74,23 +78,22 @@ list			Gstructure_parameters;
 static list			Genclosing_loops;
 static list			Genclosing_tests;
 static list			Gscalar_written_forward;
-static hash_table 		Gforward_substitute_table;
+static hash_table		Gforward_substitute_table;
 statement_mapping	Gstatic_control_map;
 
 
 /*=================================================================*/
 /* static_control static_controlize_call( (call) c )		AL 05/93
- * It computes now just a static-control assignement if it is      
- * an ASSIGN statement.                                           
+ * It computes now just a static-control assignement if it is
+ * an ASSIGN statement.
  */
-static_control static_controlize_call( c )
-call c;
+static_control static_controlize_call(call c)
 {
-	static_control 	sc;
-	bool		b;
-	
-	debug( 3, "static_controlize_call", "begin CALL\n");
-	debug( 7, "static_controlize_call", 
+	static_control sc;
+	bool b;
+
+	pips_debug( 3, "begin CALL\n");
+	pips_debug( 7,
 		"call : %s\n", entity_local_name( call_function(c) ) );
 
 	b = splc_linear_access_to_arrays_p(call_arguments(c),
@@ -98,10 +101,10 @@ call c;
 
 	sc = make_static_control( b,
 			sc_list_of_entity_dup( Gstructure_parameters ),
-			sc_list_of_loop_dup( Genclosing_loops ),
+		_list_of_loop_dup( Genclosing_loops ),
 			sc_list_of_exp_dup( Genclosing_tests ));
-	debug( 3, "static_controlize_call", "end CALL\n");
-	return( sc );	
+	pips_debug( 3, "end CALL\n");
+	return sc;
 }
 
 
@@ -109,13 +112,12 @@ call c;
 /* static_control static_controlize_loop( (loop) l )
  * It computes the loop's static_control.
  */
-static_control static_controlize_loop(l)
-loop l;
+static_control static_controlize_loop(loop l)
 {
-  static_control 	sc;
+  static_control	sc;
 	expression	low, up;
 
-	debug(3, "static_controlize_loop", "begin LOOP\n");
+	pips_debug(3, "begin LOOP\n");
 
 	low = range_lower( loop_range( l ) );
 	up  = range_upper( loop_range( l ) );
@@ -129,7 +131,7 @@ loop l;
 	SET_STATEMENT_MAPPING(Gstatic_control_map, loop_body(l), sc);
 	gen_remove( &Genclosing_loops, l );
 
-	debug(3, "static_controlize_loop", "end LOOP\n");
+	pips_debug(3, "end LOOP\n");
 	return( sc );
 }
 
@@ -142,12 +144,12 @@ static_control static_controlize_statement(s)
 statement s;
 {
 bool		is_static = TRUE, static_test = FALSE;
-instruction 	inst = statement_instruction(s);
+instruction	inst = statement_instruction(s);
 static_control  sc, sc1, sc2;
 expression	exp, exp1, exp2;
 
-debug(3, "static_controlize_statement", "begin STATEMENT\n");
-debug(7, "static_controlize_statement", 
+pips_debug(3, "begin STATEMENT\n");
+pips_debug(7,
 	"statement_ordering = %d \n", statement_ordering( s ));
 
 switch(instruction_tag(inst))
@@ -174,11 +176,11 @@ switch(instruction_tag(inst))
 	expression_undefined) {
       test_condition( t ) = exp ;
       static_test = TRUE;
-    } 
+    }
     ADD_ELEMENT_TO_LIST( Genclosing_tests, EXPRESSION, test_condition(t) );
     sc1 = static_controlize_statement(test_true(t));
     SET_STATEMENT_MAPPING( Gstatic_control_map, test_true( t ), sc1);
-    gen_remove( &Genclosing_tests, (chunk*) test_condition( t ));
+    gen_remove( &Genclosing_tests, (void*) test_condition( t ));
 
     exp1 = MakeUnaryCall( ENTITY_NOT, copy_expression( test_condition(t) ));
     if ( (exp2 = sc_conditional(exp1, &Genclosing_loops)) ==
@@ -188,8 +190,8 @@ switch(instruction_tag(inst))
     ADD_ELEMENT_TO_LIST( Genclosing_tests, EXPRESSION, exp2 );
     sc2 = static_controlize_statement(test_false(t));
     SET_STATEMENT_MAPPING( Gstatic_control_map, test_false( t ), sc2);
-    gen_remove( &Genclosing_tests, (chunk*) exp2 );
-    is_static = (  static_control_yes( sc1 ) 
+    gen_remove( &Genclosing_tests, (void *) exp2 );
+    is_static = (  static_control_yes( sc1 )
 		&& static_control_yes( sc2 )
 		&& static_test );
     break;
@@ -203,18 +205,18 @@ switch(instruction_tag(inst))
     is_static = static_control_yes( sc1 );
     break;
     }
-  case is_instruction_call : 
+  case is_instruction_call :
     {
     call the_call = instruction_call( inst );
     forward_substitute_in_call( &the_call, Gforward_substitute_table );
-    /* If it is a redefinition of a SP, substitute it with a new one */ 
+    /* If it is a redefinition of a SP, substitute it with a new one */
     if (get_sp_of_call_p(the_call, Gforward_substitute_table,
 			 &Gscalar_written_forward)) {
 	/* We are in an assign call case */
-	forward_substitute_in_exp(&(EXPRESSION(CAR(call_arguments(the_call)))),
+	forward_substitute_in_exp(&(EXPRESSION_(CAR(call_arguments(the_call)))),
 				  Gforward_substitute_table);
 	is_static = TRUE; }
-    else 
+    else
 	is_static = static_control_yes(static_controlize_call( the_call ));
 
     break;
@@ -223,7 +225,7 @@ switch(instruction_tag(inst))
     {
     is_static = FALSE;
     break;
-    } 
+    }
   case is_instruction_unstructured :
     {
     unstructured local_un = instruction_unstructured( inst );
@@ -234,19 +236,19 @@ switch(instruction_tag(inst))
   default : pips_error("static_controlize_statement", "Bad instruction tag");
   }
 
-    sc = make_static_control(is_static, 
+    sc = make_static_control(is_static,
                                 sc_list_of_entity_dup(Gstructure_parameters),
                                 sc_list_of_loop_dup(Genclosing_loops),
 				sc_list_of_exp_dup(Genclosing_tests) );
 
-    debug(7, "static_controlize_statement", 
-"\n Returning static_control : \n bool   : %s \n params : %s \n loops  : %d \n tests  : %d \n ",
-		 ((is_static)?"TRUE":"FALSE"), 
+    pips_debug(7,
+" Returning static_control : \n bool   : %s \n params : %s \n loops  : %d \n tests  : %d \n ",
+		 ((is_static)?"TRUE":"FALSE"),
 		 print_structurals( Gstructure_parameters ),
 		 gen_length( Genclosing_loops ),
 		 gen_length( Genclosing_tests ) );
-    debug(3, "static_controlize_statement", "end STATEMENT\n");
-    return( sc );
+    pips_debug(3, "end STATEMENT\n");
+    return sc;
 }
 
 
@@ -261,7 +263,7 @@ unstructured u;
 	list 		blocs = NIL;
 	static_control 	sc, ret_sc = static_control_undefined;
 
-	debug(3, "static_controlize_unstructured", "begin UNSTRUCTURED\n");
+	pips_debug(3, "begin UNSTRUCTURED\n");
 	control_map_get_blocs(unstructured_control(u), &blocs ) ;
 	blocs = gen_nreverse( blocs ) ;
 
@@ -274,19 +276,19 @@ unstructured u;
 	      blocs);
 
 	gen_free_list(blocs);
-	ret_sc = make_static_control( is_static, 
+	ret_sc = make_static_control( is_static,
                                 sc_list_of_entity_dup(Gstructure_parameters),
                                 sc_list_of_loop_dup(Genclosing_loops),
 				sc_list_of_exp_dup(Genclosing_tests) );
 
-	debug(7, "static_controlize_unstructured",
+	pips_debug(7,
 "\n Returning static_control : \n bool   : %s \n params : %s \n loops  : %d \n tests  : %d \n ",
                  ((is_static)?"TRUE":"FALSE"),
                  print_structurals( Gstructure_parameters ),
                  gen_length( Genclosing_loops ),
 		 gen_length( Genclosing_tests ) );
 
-	debug(3, "static_controlize_unstructured", "end UNSTRUCTURED\n");
+	pips_debug(3, "end UNSTRUCTURED\n");
 	return( ret_sc );
 }
 
@@ -321,7 +323,7 @@ static IOIntrinsicDescriptor IOIntrinsicDescriptorTable[] = {
  *
  * Tests if the statement is a call to an IO function. In such a case, we
  * put the statement inside a comment.
- * 
+ *
  * AP, oct 9th 1995
  */
 
@@ -355,17 +357,24 @@ statement st;
 
 	  comment = (char*) malloc(64);
 	  sprintf(comment, "C  ");
+	  /* FI: I'm not sure about the fourth argument of
+	     words_call() */
 	  sprintf(comment, "%s %s", comment,
-		  words_to_string(words_call(ca, 0, TRUE)));
+		  words_to_string(words_call(ca, 0, TRUE, TRUE)));
 	  sprintf(comment, "%s\n", comment);
- 
+
+	  pips_assert("no buffer overflow", strlen(comment)<64);
+
 	  stat = make_statement(entity_empty_label(),
 				STATEMENT_NUMBER_UNDEFINED,
 				STATEMENT_ORDERING_UNDEFINED,
-				comment, 
-				make_instruction_block(NIL));
+				comment,
+				make_instruction_block(NIL),
+				NIL, // No local declarations
+				NULL, // null or empty string...
+				empty_extensions ());
 	  lstat = CONS(STATEMENT, stat, NIL);
- 
+
 	  statement_instruction(st) = make_instruction_block(lstat);
 	  /* Do not forget to move forbidden information associated with
 	     block: */
@@ -386,11 +395,10 @@ statement st;
 /* void static_controlize((char*) mod_name)			AL 05/93
  * Computes the static_control attached to module-name : mod_name.
  */
-boolean static_controlize(mod_name)
-char* mod_name;
+boolean static_controlize(string mod_name)
 {
-	statement 	mod_stat;
-	instruction 	mod_inst;
+	statement	mod_stat;
+	instruction	mod_inst;
 	entity		ent;
 	list		formal_integers;
 	static_control	sc;
@@ -398,15 +406,15 @@ char* mod_name;
 
 	debug_on("STATIC_CONTROLIZE_DEBUG_LEVEL");
 
-	if (get_debug_level() > 1) 
-        	user_log("\n\n *** STATIC CONTROLIZE CODE for %s\n", mod_name);
+	ifdebug(2)
+	  user_log("\n\n *** STATIC CONTROLIZE CODE for %s\n", mod_name);
 
 	Gcount_nlc = 0;
         Gcount_nsp = 0;
 	Gcount_nub = 0;
-	Gstructure_parameters 	= (list) NIL;
-	Genclosing_loops      	= (list) NIL;
-	Genclosing_tests      	= (list) NIL;
+	Gstructure_parameters	= (list) NIL;
+	Genclosing_loops	= (list) NIL;
+	Genclosing_tests	= (list) NIL;
 	Gscalar_written_forward = (list) NIL;
         Gforward_substitute_table = hash_table_make( hash_pointer, 0 );
         hash_warn_on_redefinition();
@@ -415,7 +423,7 @@ char* mod_name;
 	ent = local_name_to_top_level_entity(mod_name);
 	set_current_module_entity(ent);
 	formal_integers = sc_entity_to_formal_integer_parameters( ent );
-	debug(7, "static_controlize", "\n formal integers : %s \n",
+	pips_debug(7, "\n formal integers : %s \n",
 		print_structurals( formal_integers ));
 
 	mod_stat = (statement) db_get_memory_resource(DBR_CODE, mod_name, TRUE);
@@ -438,7 +446,7 @@ char* mod_name;
 				       &Gcount_nlc);
 
 	/* The code has been modified, so the orderings are recomputed. */
- 	module_reorder( mod_stat );  
+	module_reorder( mod_stat );
 	verify_structural_parameters(formal_integers,
 				     &Gscalar_written_forward);
 
@@ -459,7 +467,7 @@ char* mod_name;
 	DB_PUT_MEMORY_RESOURCE(DBR_STATIC_CONTROL, strdup(mod_name),
 			(char*) Gstatic_control_map);
 
-	if (get_debug_level() > 1) 
+	ifdebug(2)
 	        user_log("\n\n *** STATIC CONTROLIZE CODE done\n");
 
 	reset_current_module_entity();

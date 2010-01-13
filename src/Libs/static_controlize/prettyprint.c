@@ -25,8 +25,8 @@
  * package   :	static_controlize
  * Author    :	Arnauld LESERVOT
  * Date      :	May 93
- * Modified  :	
- * Documents :	"Implementation du Data Flow Graph dans Pips"
+ * Modified  :
+ * Documents :	"Implementation of Array Data Flow Graph in Pips"
  * Comments  :
  */
 
@@ -52,6 +52,10 @@
 
 /* Pips includes	*/
 #include "ri.h"
+/* Types arc_label and vertex_label must be defined although they are
+   not used */
+typedef void * arc_label;
+typedef void * vertex_label;
 #include "graph.h"
 #include "paf_ri.h"
 #include "database.h"
@@ -69,7 +73,7 @@
 #define CODE_WITH_STATIC_CONTROLIZE_EXT ".stco"
 
 /* Global variables */
-static statement_mapping 	Gsc_map;
+static statement_mapping	Gsc_map;
 
 /*=================================================================*/
 /* void print_code_static_control((char*) module_name)		AL 05/93
@@ -78,38 +82,38 @@ static statement_mapping 	Gsc_map;
 boolean print_code_static_control(module_name)
 string module_name;
 {
-    entity 	module;
-    statement 	module_stat;
-    text 	txt = make_text(NIL);
+    entity	module;
+    statement	module_stat;
+    text	txt = make_text(NIL);
     bool success;
 
     debug_on( "PRINT_STATIC_CONTROL_DEBUG_LEVEL" );
 
-    if (get_debug_level() > 1)
+    ifdebug(1)
            user_log("\n\n *** PRINTING STATIC CONTROL for %s\n",
 				 module_name);
 
     module = local_name_to_top_level_entity(module_name);
     module_stat = (statement)
 	db_get_memory_resource(DBR_CODE, module_name, TRUE);
-    Gsc_map = (statement_mapping) 
-	db_get_memory_resource( DBR_STATIC_CONTROL, module_name, TRUE); 
+    Gsc_map = (statement_mapping)
+	db_get_memory_resource( DBR_STATIC_CONTROL, module_name, TRUE);
     init_prettyprint(text_static_control);
 
 /*
-    filename = strdup(concatenate(db_get_current_workspace_directory(), 
+    filename = strdup(concatenate(db_get_current_workspace_directory(),
 				  "/", module_name, ".stco", NULL));
     fd = safe_fopen(filename, "w");
 */
 
-    MERGE_TEXTS(txt, text_module(module, module_stat)); 
+    MERGE_TEXTS(txt, text_module(module, module_stat));
 
 /*
     print_text(fd, txt);
     safe_fclose(fd, filename);
-    DB_PUT_FILE_RESOURCE(DBR_PRINTED_FILE, strdup(module_name), 
+    DB_PUT_FILE_RESOURCE(DBR_PRINTED_FILE, strdup(module_name),
 			 	filename);
-*/    
+*/
 
     success = make_text_resource(module_name,
 				 DBR_PRINTED_FILE,
@@ -119,7 +123,7 @@ string module_name;
     close_prettyprint();
 
     debug_off();
-    
+
     return(success);
 }
 
@@ -128,19 +132,18 @@ string module_name;
 /* text text_static_control((entity) module, (int) margin, (statement) stat)
  * Function hook used by package text-util to prettyprint a static_control.
  */
-text text_static_control(module, margin, stat)
-entity module;
-int margin;
-statement stat;
+text text_static_control(entity module __attribute__ ((unused)),
+			 int margin __attribute__ ((unused)),
+			 statement stat)
 {
     static_control sc = (static_control) GET_STATEMENT_MAPPING(Gsc_map, stat);
-    
+
     return( store_sc_text_line( sc ));
 }
 
 /*=================================================================*/
 /* text store_sc_text_line((static_control) sc)		AL 05/93
- * Stores a static_control prettyprinted. 
+ * Stores a static_control prettyprinted.
  */
 text store_sc_text_line( sc )
 static_control sc;
@@ -159,7 +162,7 @@ static_control sc;
     loops[0] 	= '\0';
     tests[0]	= '\0';
 
-        t = concatenate("C\t\t< is static >", 
+        t = concatenate("C\t\t< is static >",
 		(static_control_yes(sc)?" TRUE":" FALSE"), "\n", NULL);
         ADD_SENTENCE_TO_TEXT( sc_text,
 			 make_sentence(is_sentence_formatted, strdup(t)));
@@ -168,15 +171,15 @@ static_control sc;
 					 "\n", NULL);
 	ADD_SENTENCE_TO_TEXT( sc_text,
 			 make_sentence(is_sentence_formatted, strdup(t)));
-	t = concatenate("C\t\t<   loops   >", 
+	t = concatenate("C\t\t<   loops   >",
 		words_to_string(words_loop_list(static_control_loops(sc))),
 					  NULL);
-	ADD_SENTENCE_TO_TEXT( sc_text, 
+	ADD_SENTENCE_TO_TEXT( sc_text,
 			make_sentence(is_sentence_formatted, strdup(t)));
 	t = concatenate("C\t\t<   tests   >",
 		words_to_string(words_test_list(static_control_tests(sc))),
 					  NULL);
-	ADD_SENTENCE_TO_TEXT( sc_text, 
+	ADD_SENTENCE_TO_TEXT( sc_text,
 			make_sentence(is_sentence_formatted, strdup(t)));
 
     return ( sc_text );
@@ -195,9 +198,9 @@ list obj;
 	string before_string = strdup(" ");
         string blank_string = strdup("C                             ");
 
-        debug(7, "words_test_list", "doing \n");
+        pips_debug(7, "doing \n");
         MAPL( exp_ptr, {
-                cons*   	pc  = NIL;
+	    cons*	pc  = NIL;
                 expression	exp = EXPRESSION(CAR(exp_ptr));
 
                 pc = CHAIN_SWORD(pc, strdup( before_string ));
@@ -222,14 +225,13 @@ list obj;
 	string before_string = strdup(" ");
 	string blank_string = strdup("C                             ");
 
-        debug(7, "words_loop_list", "doing \n");
+	pips_debug(7, "doing \n");
 	MAPL( loop_ptr, {
 		cons*	pc	= NIL;
-		loop 	l 	= LOOP(CAR(loop_ptr));
-		entity 	ind 	= loop_index( l );
+		loop	l	= LOOP(CAR(loop_ptr));
+		entity	ind	= loop_index( l );
 		expression low  = range_lower(loop_range( l ));
 		expression up   = range_upper(loop_range( l ));
-	  
 		pc = CHAIN_SWORD(pc, strdup( before_string ));
 		pc = gen_nconc(pc, words_expression(low));
 		pc = CHAIN_SWORD(pc," <= ");
@@ -248,13 +250,15 @@ list obj;
 /*=================================================================*/
 /* cons *words_entity_list((list) obj)		AL 05/93
  * Returns a list of strings from a list of entities.
+ *
+ * FI: Should be moved in ri-util/entity.c or entities.c when it exists
  */
 cons *words_entity_list(obj)
 list obj;
 {
         list the_list = NIL;
 
-        debug(7, "words_entity_list", "doing \n");
+        pips_debug(7, "doing \n");
         the_list = CHAIN_SWORD(the_list, " ");
         MAPL( ent_ptr, {
                 string s = '\0';

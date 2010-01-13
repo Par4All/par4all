@@ -54,6 +54,10 @@
 
 /* Pips includes	*/
 #include "ri.h"
+/* Types arc_label and vertex_label must be defined although they are
+   not used */
+typedef void * arc_label;
+typedef void * vertex_label;
 #include "graph.h"
 #include "paf_ri.h"
 #include "database.h"
@@ -63,7 +67,7 @@
 #include "constants.h"
 #include "misc.h"
 #include "control.h"
-#include "text.h" 
+#include "text.h"
 #include "text-util.h"
 #include "paf-util.h"
 #include "static_controlize.h"
@@ -89,7 +93,7 @@ statement 		in_s, in_s2;
         list            l, l2, ret_l = NIL;
         static_control  sc, sc2;
 
-        debug(7, "stco_same_loops","begin\n");
+        pips_debug(7,"begin\n");
         sc = (static_control) GET_STATEMENT_MAPPING( in_map, in_s );
         sc2= (static_control) GET_STATEMENT_MAPPING( in_map, in_s2 );
         l = static_control_loops( sc );
@@ -104,7 +108,7 @@ statement 		in_s, in_s2;
                         if( in == in2 ) ADD_ELEMENT_TO_LIST(ret_l, LOOP, ll);
                 }
         }
-        debug(7, "stco_same_loops", "end \n");
+        pips_debug(7, "end \n");
 
         return( ret_l );
 }
@@ -127,14 +131,14 @@ stco_renumber_code(statement in_st,
 	int		count;
 	instruction	inst;
 
-        debug(7, "stco_renumber_code", "begin\n");
+        pips_debug(7, "begin\n");
 	count = in_ct;
 	inst = statement_instruction( in_st );
 
 	/* Renumber all the statement but the sequence: */
 	if (instruction_tag(inst) != is_instruction_block)
-	    statement_number(in_st) = count++;    
-	    
+	    statement_number(in_st) = count++;
+	
 	switch(instruction_tag(inst)) {
   		case is_instruction_block : {
 			MAPL( stmt_ptr, {
@@ -162,7 +166,7 @@ stco_renumber_code(statement in_st,
    		}
   		case is_instruction_loop : {
     			statement lb = loop_body( instruction_loop( inst ) );
-			/* 
+			/*
 			   statement_number( lb ) = count++;
 			*/
     			count = stco_renumber_code( lb, count );
@@ -196,11 +200,11 @@ stco_renumber_code(statement in_st,
         		gen_free_list(blocs);
     			break;
     		}
-  		default : pips_error("stco_renumber_code", 
+  		default : pips_error("stco_renumber_code",
 						"Bad instruction tag");
   	}
 
-        debug(7, "stco_renumber_code", "return count : %d\n", count);
+        pips_debug(7, "return count : %d\n", count);
         return( count );
 }
 
@@ -215,7 +219,7 @@ list *ell;
 {
 	expression ret_exp;
 
-        debug(9, "sc_opposite_exp_of_conjunction", "begin\n");
+        pips_debug(9, "begin\n");
         if ( (exp == expression_undefined) ||
                 (syntax_tag(expression_syntax( exp )) != is_syntax_call) ) {
 		ret_exp = expression_undefined;
@@ -245,7 +249,7 @@ list *ell;
 	}
 	else ret_exp = expression_undefined;
 
-	debug(9, "sc_opposite_exp_of_conjunction", "end\n");
+	pips_debug(9, "end\n");
 	return( ret_exp );
 }
 
@@ -263,7 +267,7 @@ list *ell;
 	call c;
 	list args;
 
-	debug(7, "splc_positive_relation_p", "exp : %s\n",
+	pips_debug(7, "exp : %s\n",
 			words_to_string( words_expression( exp ) ));
 	if (syntax_tag(s) != is_syntax_call) return( FALSE );
 	c = syntax_call( s );
@@ -279,20 +283,18 @@ list *ell;
  * is a logical combinaison of affine forms of structural parameters and
  * of loop counters.
  */
-list 	ndf_normalized_test(exp, ell)
-expression exp;
-list *ell;
+list ndf_normalized_test(expression exp, list *ell)
 {
 	list 		args, ret_list = NIL;
 	entity		fun;
 	expression 	arg1, arg2, exp2, exp3;
 
-	debug(7, "ndf_normalized_test", "doing\n");
+	pips_debug(7, "doing\n");
 	if ( (exp == expression_undefined) ||
 		(syntax_tag(expression_syntax( exp )) != is_syntax_call) ) {
 		return( list_undefined );
 	}
-	debug(7, "ndf_normalized_test", "input exp : %s\n",
+	pips_debug(7, "input exp : %s\n",
 			words_to_string(words_expression( exp )) );
 
 	fun = call_function(syntax_call(expression_syntax( exp )));
@@ -300,7 +302,7 @@ list *ell;
 	if (splc_positive_relation_p(exp, ell))  {
 		ADD_ELEMENT_TO_LIST( ret_list, EXPRESSION, exp );
 		return( ret_list );
-	}	
+	}
 	if (ENTITY_NOT_P( fun )) {
 		arg1 = EXPRESSION(CAR(args));
 		if (splc_positive_relation_p(arg1, ell)) {
@@ -319,9 +321,9 @@ list *ell;
 
 			MAPL( exp_ptr, {
 			   exp3 = EXPRESSION(CAR( exp_ptr ));
-			   if (exp2 == expression_undefined) 
+			   if (exp2 == expression_undefined)
 			     exp2 = sc_opposite_exp_of_conjunction(exp3, ell);
-			   else 
+			   else
 			     exp2 = MakeBinaryCall(ENTITY_AND,
 				     sc_opposite_exp_of_conjunction(exp3, ell),
 						   copy_expression( exp2 ) );
@@ -337,7 +339,7 @@ list *ell;
 	/*  Redon FND propagation : see document. */
 	if (ENTITY_OR_P( fun )) {
 	   expression exp3;
-	 
+	
 	   MAPL( exp_ptr, {
 	      exp3 = EXPRESSION(CAR( exp_ptr ));
 	      ADD_ELEMENT_TO_LIST( ret_list, EXPRESSION, exp3 );
@@ -348,7 +350,7 @@ list *ell;
 	      }, ndf_normalized_test(arg2, ell));
 	   return( ret_list );
 	}
-	 
+	
 	/*
 	%%%%%%%%%%%%%
 	*/
@@ -404,7 +406,7 @@ list *ell;
 			   exp5 = EXPRESSION(CAR( ep ));
 			   exp6 = MakeBinaryCall( ENTITY_AND,
 					exp4, exp5 );
-			   ADD_ELEMENT_TO_LIST(ret_list, EXPRESSION, exp6); 
+			   ADD_ELEMENT_TO_LIST(ret_list, EXPRESSION, exp6);
 			}, l2 );
 		}, l1 );
 		return( ret_list );
@@ -430,7 +432,7 @@ list *ell;
 	expression 	e, ne, arg1, arg2;
 
 	if (exp == expression_undefined) return( exp );
-	debug(7, "normalize_test_leaves", "exp : %s\n",
+	pips_debug(7, "exp : %s\n",
 			words_to_string(words_expression( exp )) );
 	if (syntax_tag( s ) != is_syntax_call) return( ret_exp );
 
@@ -440,9 +442,9 @@ list *ell;
 
 		/* We return expression_undefined if we can not normalize */
 		if (exp1 == expression_undefined) return(expression_undefined);
-		
+
 		ret_exp = MakeUnaryCall(ENTITY_NOT, exp1 );
-		debug(7, "normalize_test_leaves", "returning : %s\n",
+		pips_debug(7, "returning : %s\n",
 			words_to_string(words_expression( ret_exp )) );
 		return( ret_exp );
 	}
@@ -478,20 +480,20 @@ list *ell;
 			e = EXPRESSION(CAR( exp_ptr ));
 			ne = normalize_test_leaves(e, ell);
 			if (ne == expression_undefined) return(ne);
-			ADD_ELEMENT_TO_LIST(new_args, EXPRESSION, 
+			ADD_ELEMENT_TO_LIST(new_args, EXPRESSION,
 					copy_expression( ne ));
 			}, args);
 		call_arguments(syntax_call( s )) = new_args;
 		ret_exp = copy_expression( exp );
-		debug(7, "normalize_test_leaves", "returning : %s\n",
+		pips_debug(7, "returning : %s\n",
 			words_to_string(words_expression( ret_exp )) );
 		return( ret_exp );
 	}
 	else if (	ENTITY_RELATIONAL_OPERATOR_P( fun ) &&
-		(!splc_linear_expression_p(arg1, ell) || 
+		(!splc_linear_expression_p(arg1, ell) ||
 		 !splc_linear_expression_p(arg2, ell)) ) {
 
-		debug(7, "normalize_test_leaves", "returning : %s\n",
+		pips_debug(7, "returning : %s\n",
 					"expression_undefined" );
 		return( expression_undefined );
 	}
@@ -499,7 +501,7 @@ list *ell;
 	if (ENTITY_LESS_THAN_P( fun )) {
 		ret_exp = MakeBinaryCall( ENTITY_GE,
 				make_op_exp( MINUS_OPERATOR_NAME,
-					make_op_exp( 
+					make_op_exp(
 						MINUS_OPERATOR_NAME,
 						arg2, arg1 ),
 					make_integer_constant_expression(1) ),
@@ -514,7 +516,7 @@ list *ell;
 	else if (ENTITY_GREATER_THAN_P( fun )) {
                 ret_exp = MakeBinaryCall( ENTITY_GE,
 				make_op_exp( MINUS_OPERATOR_NAME,
-					make_op_exp( 
+					make_op_exp(
 						MINUS_OPERATOR_NAME,
 						arg1, arg2 ),
 					make_integer_constant_expression(1) ),
@@ -531,8 +533,8 @@ list *ell;
 			    MakeBinaryCall( ENTITY_GE,
 				make_op_exp( MINUS_OPERATOR_NAME,
 					arg1, arg2 ),
-				make_integer_constant_expression(0) ), 
-			    MakeBinaryCall( ENTITY_GE, 
+				make_integer_constant_expression(0) ),
+			    MakeBinaryCall( ENTITY_GE,
 				make_op_exp( MINUS_OPERATOR_NAME,
 					arg2, arg1 ),
 				make_integer_constant_expression(0) ) );
@@ -545,7 +547,7 @@ list *ell;
                                         arg1, arg2 ),
 				   make_integer_constant_expression(1) ),
                                 make_integer_constant_expression(0) ),
-                           MakeBinaryCall( ENTITY_GE, 
+                           MakeBinaryCall( ENTITY_GE,
                                 make_op_exp( MINUS_OPERATOR_NAME,
 				   make_op_exp( MINUS_OPERATOR_NAME,
                                         arg2, arg1 ),
@@ -554,7 +556,7 @@ list *ell;
 	}
 	else ret_exp = expression_undefined;
 
-	debug(7, "normalize_test_leaves", "returning : %s\n",
+	pips_debug(7, "returning : %s\n",
 		((ret_exp == expression_undefined)?"expression_undefined":\
 			words_to_string(words_expression( ret_exp ))) );
 	return( ret_exp );
@@ -566,15 +568,13 @@ list *ell;
  * exp is linear in structurals and loop-counters, it returns the same
  * expression with a normal disjunctive form.
  */
-expression sc_conditional(exp, ell)
-expression exp;
-list *ell;
+expression sc_conditional(expression exp, list *ell)
 {
 	expression 	e, ret_exp = expression_undefined;
 	syntax		s = expression_syntax( exp );
 	list		ndf_list;
 
-	debug(7, "sc_conditional", "exp : %s\n", 
+	pips_debug(7, "exp : %s\n",
 				words_to_string(words_expression(exp)));
 
 	if ( syntax_tag(s) != is_syntax_call ) return( ret_exp );
@@ -590,7 +590,7 @@ list *ell;
 		}, ndf_list );
 	}
 
-	debug(7, "sc_conditional", "returning : %s\n",
+	pips_debug(7, "returning : %s\n",
 		((ret_exp == expression_undefined)?"expression_undefined":
 		words_to_string(words_expression( ret_exp ))) );
 	return( ret_exp );
@@ -602,13 +602,12 @@ list *ell;
 /* list loops_to_indices((loop) l )				AL 04/93
  * Returns indices of the loop -list l.
  */
-list loops_to_indices( l )
-list l;
+list loops_to_indices(list l)
 {
 	list rl = NIL;
 	loop lo;
 
-	debug(7, "loops_to_indices", "doing\n");
+	pips_debug(7, "doing\n");
 	if (l == NIL) return(NIL);
 	MAPL( loop_ptr, {
 		lo = LOOP(CAR( loop_ptr ));
@@ -621,14 +620,12 @@ list l;
 /* bool splc_linear_expression_p((expression) exp) 		AL 04/93
  * Returns TRUE if exp is linear in structural parameters and loop counters.
  */
-bool splc_linear_expression_p(exp, ell)
-expression exp;
-list *ell;
+bool splc_linear_expression_p(expression exp, list *ell)
 {
   Pvecteur     vect;
   bool         ONLY_SPLC;
 
-  debug(7, "splc_linear_expression_p", "exp : %s\n",
+  pips_debug(7, "exp : %s\n",
 	words_to_string(words_expression(exp)));
 
   if(normalized_tag(NORMALIZE_EXPRESSION(exp)) == is_normalized_complex)
@@ -649,24 +646,22 @@ list *ell;
     }
   }
   unnormalize_expression(exp);
-  debug(7, "splc_linear_expression_p",
-	"  result : %s\n", (ONLY_SPLC?"TRUE":"FALSE") );
+  pips_debug(7,	"  result : %s\n", (ONLY_SPLC?"TRUE":"FALSE") );
   return(ONLY_SPLC);
 }
 
 
 /*=================================================================*/
-/* bool splc_linear_expression_list_p((list) l) 		AL 04/93
- * Returns TRUE if all expressions exp are structural parameters 
+/* bool splc_linear_expression_list_p((list) l)		AL 04/93
+ * Returns TRUE if all expressions exp are structural parameters
  * and loop counters linear functions.
  */
-bool splc_linear_expression_list_p(l, ell)
-list l, *ell;
+bool splc_linear_expression_list_p(list l, list * ell)
 {
 	bool		bo = TRUE;
-	expression 	exp;
+	expression	exp;
 
-	debug( 7, "splc_linear_expression_list_p", "doing \n");
+	pips_debug( 7, "doing \n");
 	MAPL( exp_ptr, {
 		exp = EXPRESSION(CAR( exp_ptr ));
 		bo = bo && splc_linear_expression_p(exp, ell);
@@ -679,32 +674,31 @@ list l, *ell;
  * Returns TRUE if all expressions exp are structural parameters and loop
  * counters linear functions.
  */
-bool splc_linear_access_to_arrays_p(l, ell)
-list l, *ell;
+bool splc_linear_access_to_arrays_p(list l, list * ell)
 {
-	bool 		bo, ret_bo = TRUE;
-	expression 	exp;
+	bool		bo, ret_bo = TRUE;
+	expression	exp;
 	syntax		s;
 	tag		t;
 
-	debug(7, "splc_linear_access_to_arrays_p", "doing\n");
+	pips_debug(7, "doing\n");
 	if (l == NIL) return(TRUE);
 	MAPL( exp_ptr, {
 	  exp = EXPRESSION(CAR( exp_ptr ));
 	  s   = expression_syntax( exp );
 	  t   = syntax_tag( s );
-	  if (t == is_syntax_call) 
+	  if (t == is_syntax_call)
 	    bo =
 	      splc_linear_access_to_arrays_p(call_arguments(syntax_call(s)),
-					     ell); 
-	  else if (t == is_syntax_reference) 
+					     ell);
+	  else if (t == is_syntax_reference)
 	    bo =
 	      splc_linear_expression_list_p(reference_indices(syntax_reference(s)),
-					    ell); 
+					    ell);
 		else bo = FALSE;
 		ret_bo = ret_bo && bo;
 	}, l );
-	
+
 	return( ret_bo );
 }
 
@@ -712,8 +706,7 @@ list l, *ell;
 /* char* print_structurals( (list) l )				AL 04/93
  * Prints structural parameters.
  */
-char* print_structurals( l )
-list l;
+string print_structurals(list l)
 {
 	return(strdup( words_to_string(words_entity_list( l )) ));
 }
@@ -722,12 +715,11 @@ list l;
 /* list sc_list_of_exp_dup( (list) l )				AL 04/93
  * Duplicates a list of expressions.
  */
-list sc_list_of_exp_dup( l )
-list l;
+list sc_list_of_exp_dup(list l)
 {
 	list ret_list = NIL;
 
-	debug(9, "sc_list_of_exp_dup", "begin\n");
+	pips_debug(9, "begin\n");
 	for(; !ENDP( l ); POP( l ) ) {
 		expression exp;
 
@@ -735,20 +727,19 @@ list l;
 		ADD_ELEMENT_TO_LIST( ret_list, EXPRESSION, copy_expression(exp) );
 	}
 
-	debug(9, "sc_list_of_exp_dup", "end\n");
+	pips_debug(9, "end\n");
 	return( ret_list );
 }
-	
+
 /*=================================================================*/
 /* list sc_list_of_entity_dup( (list) l )			AL 04/93
  * Duplicates a list of entities.
  */
-list sc_list_of_entity_dup( l )
-list l;
+list sc_list_of_entity_dup(list l)
 {
 	list rl = NIL;
 
-	debug( 7, "sc_list_of_entity_dup", "doing\n");
+	pips_debug( 7, "doing\n");
 	if ( l == NIL ) return( NIL );
 	MAPL( ent_ptr, {
 		entity ent = ENTITY(CAR( ent_ptr ));
@@ -756,17 +747,16 @@ list l;
 	}, l );
 	return( rl );
 }
- 
+
 /*=================================================================*/
 /* list sc_list_of_loop_dup( (list) l )				AL 04/93
  * Duplicates a list of loops.
  */
-list sc_list_of_loop_dup( l )
-list l;
+list sc_list_of_loop_dup(list l)
 {
 	list rl = NIL;
 
-	debug( 7, "sc_list_of_loop_dup", "doing\n");
+	pips_debug( 7, "doing\n");
 	if ( l == NIL ) return(NIL);
 	MAPL( loop_ptr, {
 		loop lo = LOOP(CAR( loop_ptr ));
@@ -774,37 +764,38 @@ list l;
 	}, l );
 	return( rl );
 }
-	
+
 /*=================================================================*/
 /* list sc_loop_dup( (list) l )					AL 04/93
  * Duplicates a loop.
  */
-loop sc_loop_dup( l )
-loop l;
+loop sc_loop_dup(loop l)
 {
 	loop new_loop;
 
-	debug( 7, "sc_loop_dup", "doing\n");
-	new_loop = make_loop(loop_index(l), range_dup(loop_range(l)), 
+	pips_debug( 7, "doing\n");
+	new_loop = make_loop(loop_index(l), range_dup(loop_range(l)),
 			loop_body(l), loop_label(l), loop_execution(l),
 			loop_locals(l));
 
 	return(new_loop);
-
 }
-	
+
 /*=================================================================*/
 /* list make_undefined_list( )					AL 04/93
  * Duplicates a list of 2 undefined statements.
+ *
+ * FI: this is no longer possible. List elements must be
+ * defined. Maybe empty/nop statements could be used instead?
  */
 list make_undefined_list()
 {
 	list the_list = NIL;
 
-	debug(7, "make_undefined_list", "doing\n");
+	pips_debug(7, "doing\n");
 	ADD_ELEMENT_TO_LIST( the_list, STATEMENT, statement_undefined);
 	ADD_ELEMENT_TO_LIST( the_list, STATEMENT, statement_undefined);
-	return( the_list );
+	return the_list;
 }
 
 
@@ -812,20 +803,18 @@ list make_undefined_list()
 /* int in_forward_defined( (entity) ent ) 			AL 30/08/93
  * Returns the number of entities ent in the list Gscalar_written_forward.
  */
-int in_forward_defined( ent, swfl)
-entity ent;
-list *swfl;
+int in_forward_defined(entity ent, list *swfl)
 {
     cons *pc;
     int  ret_int = 0;
 
-    debug(9, "in_forward_defined", "doing \n");
+    pips_debug(9, "doing \n");
     for (pc = *swfl; pc != NIL; pc = pc->cdr ) {
-        if ((chunk*) ent == CAR(pc).p)
+        if ((void *) ent == CAR(pc).p)
                 ret_int++;
     }
 
-    debug(9, "in_forward_defined", "returns : %d\n", ret_int);
+    pips_debug(9, "returns : %d\n", ret_int);
     return( ret_int );
 }
 
@@ -833,36 +822,35 @@ list *swfl;
 /* bool in_forward_defined_p( (entity) ent )			AL 04/93
  * Returns TRUE if ent is in global variable Gscalar_written_forward.
  */
-bool in_forward_defined_p( ent, swfl)
-entity ent;
-list *swfl;
+bool in_forward_defined_p(entity ent, list * swfl)
 {
-	chunk* ch;
+	entity ch;
 
-	debug( 7, "in_forward_defined_p", "doing \n");  
-	ch = gen_find_eq( ent, *swfl );
-	debug( 9, "in_forward_defined_p", "scalar written_forward = %s\n",
+	pips_debug(7, "doing \n");
+	ch = (entity) gen_find_eq(ent, *swfl );
+	pips_debug(9, "scalar written_forward = %s\n",
 			print_structurals(*swfl) );
-	return( ch != chunk_undefined );
+	return( ch != entity_undefined );
 }
-	
+
 /*=================================================================*/
 /* bool undefined_statement_list_p( (list) l )			AL 04/93
  * Returns TRUE if l is made of 2 undefined_statement.
+ *
+ * FI: to be modifed to deal with other kinds of "undefined" statements
  */
-bool undefined_statement_list_p( l ) 
-list l;
+bool undefined_statement_list_p(list l)
 {
-	bool 		local_bool;
-	statement 	first, second;
+	bool		local_bool;
+	statement	first, second;
 
-	debug(7, "undefined_statement_list_p","doing\n");
+	pips_debug(7,"doing\n");
 	if ( (l == NIL) || (gen_length(l) != 2) )
 		return( FALSE );
 
 	first = STATEMENT(CAR( l ));
 	second = STATEMENT(CAR(CDR( l )));
-	local_bool = ( first == statement_undefined ) 
+	local_bool = ( first == statement_undefined )
 		     && ( second == statement_undefined );
 	return( local_bool );
 }
@@ -874,11 +862,9 @@ list l;
  * An entity will be a structural parameter if it is a candidate and if it
  * is not written forward.
  */
-void verify_structural_parameters( the_list, swfl)
-list the_list;
-list *swfl;
+void verify_structural_parameters(list the_list, list *swfl)
 {
-	debug(7, "verify_structural_parameters","doing\n");
+	pips_debug(7,"doing\n");
 	MAPL( el_ptr,
 		{
 		entity ent = ENTITY(CAR( el_ptr ));
@@ -889,8 +875,8 @@ list *swfl;
 					     ent );
 		},
 	      the_list);
-	debug(7, "verify_structural_parameters","list of structurals : %s\n",
-			 print_structurals(Gstructure_parameters) );
+	pips_debug(7, "list of structurals : %s\n",
+		   print_structurals(Gstructure_parameters) );
 }
 
 /*=================================================================*/
@@ -919,7 +905,7 @@ entity f;
               if( type_variable_p(t)
 		  && (storage_formal_p(sto) || storage_ram_p(sto))
 		  && entity_integer_scalar_p(e))
-                  formals_or_ram_integer = CONS(ENTITY, e, 
+                  formals_or_ram_integer = CONS(ENTITY, e,
 						formals_or_ram_integer);},
          decl);
 
@@ -927,44 +913,40 @@ entity f;
 }
 
 /*=================================================================*/
-/* entity scalar_assign_call((call) c) 
+/* entity scalar_assign_call((call) c)
  * Detects if the call is an assignement
  * and if the value assigned is a scalar. If it is so, it
  * returns this scalar.
  */
-entity scalar_assign_call( c )
-call c;
+entity scalar_assign_call(call c)
 {
-   entity ent = entity_undefined;
+  entity ent = entity_undefined;
 
-   debug( 7, "scalar_assign_call", "doing \n");
-   if (ENTITY_ASSIGN_P(call_function(c)))
-        {
-        expression lhs;
+  pips_debug( 7, "doing \n");
+  if (ENTITY_ASSIGN_P(call_function(c)))
+    {
+      expression lhs;
 
-        lhs = EXPRESSION(CAR(call_arguments(c)));
-	ent = expression_int_scalar( lhs );
-	}
-   debug( 7, "scalar_assign_call", "returning : %s \n",
-	((ent == entity_undefined)?"entity_undefined":
-				entity_name(ent)) );
-   return( ent );
+      lhs = EXPRESSION(CAR(call_arguments(c)));
+      ent = expression_int_scalar( lhs );
+    }
+  pips_debug( 7, "returning : %s \n",
+	 ((ent == entity_undefined)?"entity_undefined":
+	  entity_name(ent)) );
+  return( ent );
 }
 
-	
 /*=================================================================*/
-/* scalar_written_in_call((call) the_call) 
+/* scalar_written_in_call((call) the_call)
  * Detects and puts a scalar written in an assignement call,
  * in the global list Gscalar_written_forward if Genclosing_loops
  * or Genclosing_tests are not empty.
  */
-void scalar_written_in_call( the_call, ell, etl, swfl)
-call the_call;
-list *ell, *etl, *swfl;
+void scalar_written_in_call(call the_call, list * ell, list * etl, list * swfl)
 {
    entity ent;
 
-   debug( 7, "scalar_written_in_call", "doing\n");
+   pips_debug(7, "doing\n");
    if (    ((ent = scalar_assign_call(the_call)) != entity_undefined)
         && ( (*ell != NIL) || (*etl != NIL) )
 	&& entity_integer_scalar_p( ent ) )
@@ -976,14 +958,13 @@ list *ell, *etl, *swfl;
 /* entity  expression_int_scalar((expression) exp)
  * Returns the scalar entity if this expression is a scalar.
  */
-entity expression_int_scalar( exp )
-expression exp;
+entity expression_int_scalar(expression exp)
 {
         syntax  s = expression_syntax( exp );
         tag     t = syntax_tag( s );
-        entity 	ent = entity_undefined;
+        entity	ent = entity_undefined;
 
-	debug( 7, "expression_int_scalar", "doing \n");
+	pips_debug(7, "doing \n");
         switch( t ) {
                 case is_syntax_reference: {
 			entity local;
@@ -993,8 +974,8 @@ expression exp;
                 }
                 default: break;
         }
-	debug( 7, "expression_int_scalar",
-		 "returning : %s\n", 
+	pips_debug(7,
+		 "returning : %s\n",
 		 ((ent == entity_undefined)?"entity_undefined":
 			entity_local_name( ent )) );
         return( ent );
@@ -1002,17 +983,16 @@ expression exp;
 
 /*=================================================================*/
 /* bool sp_linear_expression_p( (expression) exp)
- * Returns TRUE if the expression is a linear combinaison of 
+ * Returns TRUE if the expression is a linear combinaison of
  * structural parameters.
  */
-bool sp_linear_expression_p( exp )
-expression exp;
+bool sp_linear_expression_p(expression exp)
 {
    Pvecteur     vect;
    bool         ONLY_SP;
 
-   debug(7, "sp_linear_expression_p", "exp : %s\n",
-        	words_to_string(words_expression(exp)));
+   pips_debug(7, "exp : %s\n",
+	      words_to_string(words_expression(exp)));
 
    if(normalized_tag(NORMALIZE_EXPRESSION(exp)) == is_normalized_complex)
         ONLY_SP = FALSE;
@@ -1031,7 +1011,7 @@ expression exp;
         }
    }
    unnormalize_expression(exp);
-   debug(7, "sp_linear_expression_p",
+   pips_debug(7,
 		 "  result : %s\n", (ONLY_SP?"TRUE":"FALSE") );
    return(ONLY_SP);
 }
@@ -1041,14 +1021,12 @@ expression exp;
  * Returns TRUE if exp quasi affine form in structural parameters
  * and in surrounding loop-counters.
  */
-bool splc_feautrier_expression_p(exp, ell)
-expression exp;
-list *ell;
+bool splc_feautrier_expression_p(expression exp, list * ell)
 {
 	bool b = FALSE;
 	syntax s = expression_syntax( exp );
 
-	debug( 7, "splc_feautrier_expression_p", "exp : %s \n",
+	pips_debug(7, "exp : %s \n",
 		((exp == expression_undefined)?"expression_undefined":
 			words_to_string( words_expression( exp ) ) ));
 
@@ -1067,22 +1045,21 @@ list *ell;
 			       && expression_constant_p( exp2 );
 		}
 	}
-	debug(7, "splc_feautrier_expression_p", "returning : %s\n",
+	pips_debug(7, "returning : %s\n",
 			(b?"TRUE":"FALSE") );
-	return( b );	
+	return( b );
 }
 
 /*=================================================================*/
 /* bool sp_feautrier_expression_p( (expression) exp)
  * Returns TRUE if exp quasi affine form.
  */
-bool sp_feautrier_expression_p( exp )
-expression exp;
+bool sp_feautrier_expression_p(expression exp)
 {
 	bool b = FALSE;
 	syntax s = expression_syntax( exp );
 
-	debug( 7, "sp_feautrier_expression_p", "exp : %s \n",
+	pips_debug(7, "exp : %s \n",
 		((exp == expression_undefined)?"expression_undefined":
 			words_to_string( words_expression( exp ) ) ));
 
@@ -1098,34 +1075,33 @@ expression exp;
 			exp1 = EXPRESSION(CAR( args ));
 			exp2 = EXPRESSION(CAR( CDR(args) ));
 			b    = sp_feautrier_expression_p( exp1 )
-		    			&& expression_constant_p( exp2 );
+			  && expression_constant_p( exp2 );
 		}
 	}
-	debug(7, "sp_feautrier_expression_p", "returning : %s\n",
+	pips_debug(7, "returning : %s\n",
 			(b?"TRUE":"FALSE") );
-	return( b );	
+	return( b );
 }
 
 /*=================================================================*/
 /* entity  sp_feautrier_scalar_assign_call( (call) c )
- * Returns the left-hand-side entity if it is an assignement of 
+ * Returns the left-hand-side entity if it is an assignement of
  * a linear combinaison of structural parameters.
  */
-entity sp_feautrier_scalar_assign_call( c )
-call c;
+entity sp_feautrier_scalar_assign_call(call c)
 {
 	entity 		ent, ret_ent = entity_undefined;
 	expression 	rhs;
 
-	debug(7, "sp_feautrier_scalar_assign_call", "doing\n");
+	pips_debug(7, "doing\n");
 	if ((ent = scalar_assign_call(c)) != entity_undefined) {
 		rhs = EXPRESSION(CAR(CDR(call_arguments(c))));
 		if (sp_feautrier_expression_p( rhs )) ret_ent = ent;
 	}
-	debug( 7, "sp_feautrier_scalar_assign_call",
-		"returning : %s \n", 
+	pips_debug(7,
+		"returning : %s \n",
 		((ret_ent == entity_undefined)?"entity_undefined":
-		entity_name( ret_ent )) ); 
+		entity_name( ret_ent )) );
 	return( ret_ent );
 }
 		
@@ -1147,10 +1123,10 @@ list *swfl;
    entity 	lhs_ent, ent;
    bool		ret_bool = FALSE;
 
-   debug( 7, "get_sp_of_call", "begin\n");
-   debug(9, "get_sp_of_call", "input call : %s \n",
+   pips_debug(7, "begin\n");
+   pips_debug(9, "input call : %s \n",
 			words_to_string(words_regular_call( c )));
-   debug(9, "get_sp_of_call", "struct param. before : %s \n",
+   pips_debug(9, "struct param. before : %s \n",
 			print_structurals( Gstructure_parameters ));
 	
    if (ENTITY_READ_P( call_function(c) )) {
@@ -1166,8 +1142,8 @@ list *swfl;
           the_arg);
    }
 
-   if (    ((lhs_ent = sp_feautrier_scalar_assign_call(c)) != entity_undefined) 
-	&& (in_forward_defined(lhs_ent, swfl) <= 1) )	{	
+   if (    ((lhs_ent = sp_feautrier_scalar_assign_call(c)) != entity_undefined)
+	&& (in_forward_defined(lhs_ent, swfl) <= 1) )	{
 
 	expression nsp_exp;
 	entity     nsp_ent;
@@ -1184,11 +1160,11 @@ list *swfl;
 	}
    }
 
-   debug(9, "get_sp_of_call", "struct param. after  : %s \n",
+   pips_debug(9, "struct param. after  : %s \n",
 			print_structurals( Gstructure_parameters ));
-   debug(9, "get_sp_of_call", "call has to be modified : %s \n",
+   pips_debug(9, "call has to be modified : %s \n",
 		((ret_bool == TRUE)?"TRUE":"FALSE") );
-   debug( 7, "get_sp_of_call", "end\n");
+   pips_debug(7, "end\n");
    return( ret_bool );
 }
 
@@ -1198,13 +1174,11 @@ list *swfl;
  * computes MAX( exp1, exp2 ) if exp1 and exp2 are constant expressions.
  * If it is not the case, it returns MAX( exp1, exp2 )
  */
-expression make_max_exp( ent, exp1, exp2 )
-entity 		ent;
-expression 	exp1, exp2;
+expression make_max_exp(entity ent, expression exp1, expression exp2)
 {
 	expression rexp;
 
-	debug( 7, "make_max_exp", "doing MAX( %s, %s ) \n",
+	pips_debug(7, "doing MAX( %s, %s ) \n",
 		words_to_string(words_expression( exp1 )),
 		words_to_string(words_expression( exp2 )) );
 	if (expression_constant_p( exp1 ) && expression_constant_p( exp2 )) {
@@ -1244,9 +1218,8 @@ int *Gcount_nlc;
 	char 	*name, *num;
 	entity  dynamic_area;
 	ram	new_dynamic_ram;
-	
 
-	debug( 7, "make_nlc_entity", "doing\n");
+	pips_debug(7, "doing\n");
 	(*Gcount_nlc)++;
     num=i2a(*Gcount_nlc);
 
@@ -1259,8 +1232,8 @@ int *Gcount_nlc;
 
 	new_ent = make_entity(name,
                       make_type(is_type_variable,
-                                make_variable(make_basic(is_basic_int, 4),
-                                              NIL)),
+				make_variable(make_basic_int(4),
+					      NIL, NIL)),
                       make_storage(is_storage_ram, ram_undefined),
                       make_value(is_value_unknown, UU));
 
@@ -1280,16 +1253,20 @@ int *Gcount_nlc;
 /*=================================================================*/
 /* entity  make_nsp_entity()
  * Makes a new NSP (for New Structural Parameter) .
+ *
+ * FI: Should use a function located in ri-util library
+ *
+ * FI: Won't work for C as a declarataion statement is not generated.
  */
 entity make_nsp_entity()
 {
-	extern  int Gcount_nsp;
+  extern  int Gcount_nsp; // FI: oops...
 	entity  new_ent, mod_ent;
 	char    *name, *num;
 	entity  dynamic_area;
 	ram	new_dynamic_ram;
 
-	debug( 7, "make_nsp_entity", "doing\n");
+	pips_debug(7, "doing\n");
 	Gcount_nsp++;
     num=i2a(Gcount_nsp);
 
@@ -1301,11 +1278,11 @@ entity make_nsp_entity()
     free(num);
 
         new_ent = make_entity(name,
-                      make_type(is_type_variable,
-                                make_variable(make_basic(is_basic_int, 4),
-                                              NIL)),
-                      make_storage(is_storage_ram, ram_undefined),
-                      make_value(is_value_unknown, UU));
+			      make_type(is_type_variable,
+					make_variable(make_basic_int(4),
+						      NIL, NIL)),
+			      make_storage(is_storage_ram, ram_undefined),
+			      make_value_unknown());
 
         dynamic_area = FindOrCreateEntity( module_local_name(mod_ent),
                                   DYNAMIC_AREA_LOCAL_NAME);
@@ -1323,6 +1300,8 @@ entity make_nsp_entity()
 /*=================================================================*/
 /* entity  make_nub_entity()
  * Makes a new NUB (for New Upper Bound) .
+ *
+ * FI: same problems as with nsb
  */
 entity make_nub_entity()
 {
@@ -1333,7 +1312,7 @@ entity make_nub_entity()
 	ram	new_dynamic_ram;
 
 
-	debug( 7, "make_nub_entity", "doing\n");
+	pips_debug( 7, "doing\n");
 	Gcount_nub++;
     num=i2a(Gcount_nub);
 
@@ -1343,12 +1322,13 @@ entity make_nub_entity()
                           entity_local_name(mod_ent),
                           MODULE_SEP_STRING, NUB_PREFIX, num, (char *) NULL));
 
-        new_ent = make_entity(name,
-                      make_type(is_type_variable,
-                                make_variable(make_basic(is_basic_int, 4),
-                                              NIL)),
-                      make_storage(is_storage_ram, ram_undefined),
-                      make_value(is_value_unknown, UU));
+        new_ent =
+	  make_entity(name,
+		      make_type_variable(
+					 make_variable(make_basic_int(4),
+						       NIL, NIL)),
+		      make_storage(is_storage_ram, ram_undefined),
+		      make_value(is_value_unknown, UU));
 
         dynamic_area = FindOrCreateEntity( module_local_name(mod_ent),
                                   DYNAMIC_AREA_LOCAL_NAME);
@@ -1368,13 +1348,14 @@ entity make_nub_entity()
  * that is the entity of the module in which we are working currently.
  * If the entity "mod" is undefined, it returns the static entity already known;
  * Else, the static entity is updated to the entity "mod".
+ *
+ * FI: should be replaced by standard get_current_module_entity()
  */
-entity current_module(mod)
-entity mod;
+entity current_module(entity mod)
 {
     static entity current_mod;
 
-    debug( 7, "current_module", "doing\n");
+    pips_debug(7, "doing\n");
     if (mod != entity_undefined) {
 	pips_assert("current_module_entity", entity_module_p(mod));
 	current_mod = mod;
