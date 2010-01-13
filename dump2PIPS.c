@@ -39,7 +39,7 @@ newgen_list gfc2pips_list_of_loops = NULL;
 newgen_list gfc2pips_format = NULL;//list of expression format
 newgen_list gfc2pips_format2 = NULL;//list of labels for above
 
-static int gfc2pips_last_created_label = 95000;
+static int gfc2pips_last_created_label = 95000;//may need an other implementation
 static int gfc2pips_last_created_label_step = 2;
 
 
@@ -2596,6 +2596,8 @@ instruction gfc2pips_code2instruction_(gfc_code* c){
 			pips_debug(5, "Translation of FORALL\n");
 
 /*
+Dump implementation assuming the following equivalence is true (but it's not according to Ronan)
+
 FORALL (X=1:100:3,y=2:20,z=3:4, c(z)>0)
    a(x,y,z)=c(z)
 END FORALL
@@ -2610,46 +2612,33 @@ DO X=1:100:3
   ENDDO
 ENDDO
 */
+			// forall = index:entity* x ranges:range* x test:expression x body:statement ;
+			newgen_list list_of_indexes = NULL;
+			newgen_list list_of_ranges = NULL;
 			gfc_forall_iterator *fa;
-			pips_loop w, parcour, previous;
-			instruction forall_list_of_instructions = gfc2pips_code2instruction(c->block->next, true);
-			w = parcour = previous = NULL;
+
+			instruction forall_instructions = gfc2pips_code2instruction(c->block->next, true);
 			for (fa = c->ext.forall_iterator; fa; fa = fa->next){
-				parcour = make_loop(
-					gfc2pips_expr2entity(fa->var),//variable incremented
+				list_of_indexes = CONS(ENTITY, gfc2pips_expr2entity(fa->var), list_of_indexes );
+				list_of_ranges = CONS(RANGE,
 					make_range(
 						gfc2pips_expr2expression(fa->start),
 						gfc2pips_expr2expression(fa->end),
 						gfc2pips_expr2expression(fa->stride)
-					),//lower, upper, increment
-					statement_undefined,
-					entity_empty_label(),
-					make_execution_sequential(),//sequential/parallel //beware gfc parameters to say it is a parallel or a sequential loop ?
-					NULL
+					),
+					list_of_ranges
 				);
-				if(w!=NULL){
-					loop_body( previous ) = instruction_to_statement( make_instruction_loop( parcour ) );
-				}else{
-					w = parcour;
-				}
-				previous = parcour;
 			}
-			if(previous!=NULL){
+			if(list_of_indexes!=NULL){
 				//add a IF also
-				if(c->expr){
-					loop_body(previous) = instruction_to_statement(
-						make_instruction_test(
-							make_test(
-								gfc2pips_expr2expression(c->expr),
-								instruction_to_statement(forall_list_of_instructions),
-								make_empty_block_statement()
-							)
-						)
-					);
-				}else{
-					loop_body(previous) = instruction_to_statement(forall_list_of_instructions);
-				}
-				return make_instruction_loop( w );
+				return make_instruction_forall(
+					make_forall(
+						list_of_indexes,
+						list_of_ranges,
+						c->expr?gfc2pips_expr2expression(c->expr):expression_undefined,
+						instruction_to_statement(forall_instructions)
+					)
+				);
 			}else{
 				pips_user_error("No iterator for FORALL\n");
 			}
