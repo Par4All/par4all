@@ -76,16 +76,16 @@
  * instruction are known).
  */
 
-/* Ansi includes 	*/
+/* Ansi includes	*/
 #include <stdio.h>
 #include <string.h>
 #include <values.h>
 #include <stdlib.h>
 
-/* Newgen includes 	*/
+/* Newgen includes	*/
 #include "genC.h"
 
-/* C3 includes 		*/
+/* C3 includes		*/
 #include "boolean.h"
 #include "arithmetique.h"
 #include "vecteur.h"
@@ -98,27 +98,37 @@
 #include "matrice.h"
 #include "matrix.h"
 
-/* Pips includes 	*/
+/* Pips includes	*/
 #include "boolean.h"
 #include "linear.h"
 #include "ri.h"
 #include "constants.h"
 #include "ri-util.h"
 #include "misc.h"
+/* Types arc_label and vertex_label must be defined although they are
+   not used */
+/*
+typedef void * arc_label;
+typedef void * vertex_label;
+*/
+/* Local typedef, probably to be found in paf_ri */
+#include "paf_ri.h"
+typedef dfg_arc_label arc_label;
+typedef dfg_vertex_label vertex_label;
 #include "graph.h"
 #include "dg.h"
 #include "misc.h"
-#include "paf_ri.h"
+/*#include "paf_ri.h"*/
 #include "paf-util.h"
 
-/* Macro functions  	*/
+/* Macro functions	*/
 #define DOT "."
 #define PAF_STRING "paf"
 #define INS_NAME_LENGTH 4
 #define STMT_TO_STCT_SIZE 100  /* hash table max size */
 
 
-/* Global variables 	*/
+/* Global variables	*/
 /* The "dfg" global variable is the current DFG being computed. Its type is
  * defined in graph.h and paf_ri.h.
  */
@@ -172,9 +182,10 @@ static string crt_op_name;	/* Current operator name */
 static loop crt_loop;		/* Current loop instruction */
 
 /* Local typedef */
+/*
 typedef dfg_arc_label arc_label;
 typedef dfg_vertex_label vertex_label;
-
+*/
 
 /*============================================================================*/
 /* void adg_read_paf(char * s) :
@@ -264,18 +275,18 @@ string s;
  string param_full_name;
 
  param_full_name = strdup(concatenate(DFG_MODULE_NAME, MODULE_SEP_STRING,
-                                      s, (char *) NULL));
+				      s, (char *) NULL));
 
  new_ent = gen_find_tabulated(param_full_name, entity_domain);
 
  if(new_ent == entity_undefined)
+   /* Fi: UU is not a proper argument for make_basic_int() */
     new_ent = make_entity(param_full_name,
-                          make_type(is_type_variable,
-                                    make_variable(make_basic(is_basic_int,
-                                                             UU),
-                                                  NIL)),
-                          make_storage(is_storage_ram, ram_undefined),
-                          make_value(is_value_unknown, UU));
+			  make_type_variable(
+					     make_variable(make_basic_int(4 /* UU */),
+						  NIL, NIL)),
+			  make_storage(is_storage_ram, ram_undefined),
+			  make_value(is_value_unknown, UU));
 
  param_l = CONS(ENTITY, new_ent, param_l);
 }
@@ -351,7 +362,10 @@ char * s_ins;
  if(find_stmt_with_num(source_stmt) == statement_undefined)
     stmt_list = CONS(STATEMENT,
 		     make_statement(entity_undefined, 1, source_stmt,
-				    strdup(s_ins), instruction_undefined),
+				    strdup(s_ins), instruction_undefined,
+				NIL, // No local declarations
+				NULL, // null or empty string...
+				empty_extensions ()),
 		     stmt_list);
 
 /* Initialization of global variables */
@@ -454,7 +468,7 @@ int option;
     pred_l = CONS(EXPRESSION, negate_expression(crt_exp), pred_l);
     crt_exp = expression_undefined;
    }
- else 
+ else
  /* option == NEGATIVE */
    {
     /* "A < 0" becomes "A + 1 <= 0"*/
@@ -523,10 +537,9 @@ char * s_ref;
  if(ent_ref == entity_undefined)
     ent_ref = make_entity(ref_full_name,
 			  make_type(is_type_variable,
-				    make_variable(make_basic(is_basic_int,
-							     UU),
-						  NIL)),
-                          make_storage(is_storage_ram, ram_undefined),
+				    make_variable(make_basic_int(4 /* UU */),
+						  NIL, NIL)),
+			  make_storage(is_storage_ram, ram_undefined),
 			  make_value(is_value_unknown, UU));
 
  ref = make_reference(ent_ref, NIL);
@@ -661,8 +674,7 @@ void save_exp()
 /* void new_df_ref_ind(char *s_ind): the parser has read a new indice of
  * the current reference. We put it in the list of indices "ref_inds".
  */
-void new_df_ref_ind(s_ind)
-char * s_ind;
+void new_df_ref_ind(string s_ind __attribute__ ((unused)))
 {
  ref_inds = gen_nconc(ref_inds, CONS(EXPRESSION, crt_exp, NIL));
 
@@ -717,14 +729,21 @@ char * s_ins;
  if(find_stmt_with_num(sink_stmt) == statement_undefined)
     stmt_list = CONS(STATEMENT,
 		     make_statement(entity_undefined, 1, sink_stmt,
-				    strdup(s_ins), instruction_undefined),
+				    strdup(s_ins), instruction_undefined,
+				NIL, // No local declarations
+				NULL, // null or empty string...
+				empty_extensions ()),
 		     stmt_list);
 
  for(aux_l = crt_node_l; aux_l != NIL; aux_l = CDR(aux_l))
    {
     successor succ = first_succ_of_vertex(VERTEX(CAR(aux_l)));
+    /* FI: removed because of problems. paf_ri.h and/or paf_util.h  or something else
+       should be included and might cause conflict between newgen
+       data structures */
+    successor_vertex(succ) = vertex_undefined;
     successor_vertex(succ) = make_vertex(make_dfg_vertex_label(sink_stmt,
-    							       exec_dom,
+							       exec_dom,
 							       sccflags_undefined),
 					 NIL);
    }
@@ -779,18 +798,17 @@ char * s_ind;
  entity var_ind;
 
  index_full_name = strdup(concatenate(DFG_MODULE_NAME, MODULE_SEP_STRING,
-                                      s_ind, (char *) NULL));
+				      s_ind, (char *) NULL));
 
  var_ind = gen_find_tabulated(index_full_name, entity_domain);
 
  if(var_ind == entity_undefined)
     var_ind = make_entity(index_full_name,
-                          make_type(is_type_variable,
-                                    make_variable(make_basic(is_basic_int,
-                                                             UU),
-                                                  NIL)),
-                          make_storage(is_storage_ram, ram_undefined),
-                          make_value(is_value_unknown, UU));
+			  make_type(is_type_variable,
+				    make_variable(make_basic_int(4/*UU*/),
+						  NIL, NIL)),
+			  make_storage(is_storage_ram, ram_undefined),
+			  make_value(is_value_unknown, UU));
 
  loop_index(crt_loop) = var_ind;
 
@@ -896,7 +914,7 @@ string s;
  * We update "crt_el" with this loop (at the end): we want to construct an
  * ordered list from the most external list to the innermost loop, and the
  * parsing gets the loops in this order.
- * 
+ *
  */
 void new_eng_loop(s_loop)
 char * s_loop;
@@ -912,23 +930,23 @@ char * s_loop;
     string loop_full_name;
 
     loop_full_name = strdup(concatenate(DFG_MODULE_NAME,
-                                        MODULE_SEP_STRING,
-                                        s_loop, (char *) NULL));
+					MODULE_SEP_STRING,
+					s_loop, (char *) NULL));
 
     loop_ent = gen_find_tabulated(loop_full_name, entity_domain);
 
     if(loop_ent == entity_undefined)
        loop_ent = make_entity(loop_full_name,
-                              make_type(is_type_statement,UU),
-                              make_storage(is_storage_ram, ram_undefined),
-                              make_value(is_value_unknown, UU));
+			      make_type(is_type_statement,UU),
+			      make_storage(is_storage_ram, ram_undefined),
+			      make_value(is_value_unknown, UU));
 
     aux_loop =  make_loop(entity_undefined,
-                          make_range(expression_undefined,
-                                     expression_undefined,
-                                     expression_undefined),
-                          statement_undefined,
-                          loop_ent, execution_undefined, NIL);
+			  make_range(expression_undefined,
+				     expression_undefined,
+				     expression_undefined),
+			  statement_undefined,
+			  loop_ent, execution_undefined, NIL);
    }
  crt_el = gen_nconc(crt_el, CONS(LOOP, aux_loop, NIL));
 }
@@ -954,12 +972,14 @@ void finish_new_gd_ins()
     /* Make a copy to store in the hash table "STS" */
     new_el = NIL;
     MAPL(cl, {
-	loop l = EFFECT(CAR(cl));
+	/* loop l = EFFECT(CAR(cl)); */
+	loop l = LOOP(CAR(cl));
 	loop nl = loop_dup(l);
 	new_el = gen_nconc(new_el, CONS(LOOP, nl, NIL));
     }, crt_el);
 
-    hash_put(STS, (char *) crt_stmt,
-	     (char *) make_static_control(TRUE, param_l, new_el, NIL));
+    /* should be a long int for crt_stmt */
+    hash_put(STS, (void *) ((long)crt_stmt),
+	     (void *) make_static_control(TRUE, param_l, new_el, NIL));
 }
 

@@ -69,8 +69,10 @@
 #include "ri-util.h"
 #include "constants.h"
 #include "misc.h"
-#include "graph.h"
 #include "paf_ri.h"
+typedef dfg_arc_label arc_label;
+typedef dfg_vertex_label vertex_label;
+#include "graph.h"
 #include "paf-util.h"
 #include "static_controlize.h"
 
@@ -256,8 +258,7 @@ char * s_ins;
  * schedule has one dimension, the corresponding expression is found in
  * "crt_exp".
  */
-void bdt_new_shedule(s_func)
-char * s_func;
+void bdt_new_shedule(string s_func __attribute__ ((unused)))
 {
     extern int crt_ins;
     extern expression crt_exp;

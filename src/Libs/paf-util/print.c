@@ -37,13 +37,13 @@
  * structures of paf_ri.
  */
 
-/* Ansi includes 	*/
+/* Ansi includes	*/
 #include <stdio.h>
 
-/* Newgen includes 	*/
+/* Newgen includes	*/
 #include "genC.h"
 
-/* C3 includes 		*/
+/* C3 includes		*/
 #include "boolean.h"
 #include "arithmetique.h"
 #include "vecteur.h"
@@ -56,14 +56,16 @@
 #include "matrice.h"
 #include "matrix.h"
 
-/* Pips includes 	*/
+/* Pips includes	*/
 #include "linear.h"
 #include "ri.h"
 #include "ri-util.h"
 #include "constants.h"
 #include "misc.h"
-#include "graph.h"
 #include "paf_ri.h"
+typedef dfg_arc_label arc_label;
+typedef dfg_vertex_label vertex_label;
+#include "graph.h"
 #include "text.h"
 #include "text-util.h"
 #include "misc.h"
@@ -71,24 +73,27 @@
 
 extern int adg_number_to_ordering(int /*in_nb*/);
 
-/* Macro functions  	*/
+/* Macro functions	*/
 #define IS_INEG 0
 #define IS_EG 1
 #define IS_VEC 2
 
-/* Global variables 	*/
+/* Global variables	*/
 
-/* Internal variables 	*/
+/* Internal variables	*/
 static int quast_depth = 0;	/* Used in imprime_quast() for correct indentation */
 
 /* Local defines */
+/* Moved higher because of Newgen's static typing */
+/*
 typedef dfg_vertex_label vertex_label;
 typedef dfg_arc_label arc_label;
+*/
 
 /*============================================================================*/
 /* static void pu_contrainte_fprint(FILE *fp, Pcontrainte c, int is_what,
  *				     char *(*variable_name)()):
- * 
+ *
  * prints in the file "fp" the constraint "c", of type equality, inequality or
  * vector according to the value of the integer argument "is_what", using the
  * function "variable_name" for the name of the variables.
@@ -158,23 +163,23 @@ char * (*variable_name)();
 
 	v = v->succ;
   }
-  
+
   /* sign */
   if (value_pos_p(constante))
       fprintf(fp, "+ ");
   else if (value_neg_p(constante))
       value_oppose(constante), fprintf(fp, "- ");
- 
+
   /* value */
   if (value_notzero_p(constante))
       fprint_Value(fp, constante), fprintf(fp, " ");
- 
+
   /* trail */
   if (is_what == IS_INEG)
       fprintf (fp,"<= 0 ,");
-  else if(is_what == IS_EG) 
+  else if(is_what == IS_EG)
       fprintf (fp,"== 0 ,");
-  else /* IS_VEC */ 
+  else /* IS_VEC */
       fprintf (fp," ,");
 }
 
@@ -183,10 +188,9 @@ char * (*variable_name)();
  *			     char *(*variable_name)()):
  * Redefinition of inegalite_fprint(). See pu_contrainte_fprint() for details.
  */
-void pu_inegalite_fprint(fp,ineg,variable_name)
-FILE *fp;
-Pcontrainte ineg;
-char * (*variable_name)();
+void pu_inegalite_fprint(FILE *fp,
+			 Pcontrainte ineg,
+			 char * (*variable_name)(entity))
 {
     pu_contrainte_fprint(fp,ineg,IS_INEG,variable_name);
 }
@@ -195,10 +199,9 @@ char * (*variable_name)();
 /* void pu_egalite_fprint(FILE *fp, Pcontraint eg, char *(*variable_name)()):
  * Redefinition of egalite_fprint(). See pu_contrainte_fprint() for details.
  */
-void pu_egalite_fprint(fp,eg,variable_name)
-FILE *fp;
-Pcontrainte eg;
-char * (*variable_name)();
+void pu_egalite_fprint(FILE *fp,
+		       Pcontrainte eg,
+		       char * (*variable_name)(entity))
 {
     pu_contrainte_fprint(fp,eg,IS_EG,variable_name);
 }
@@ -207,10 +210,9 @@ char * (*variable_name)();
 /* void vecteur_fprint(FILE *fp, Pcontraint vec char *(*variable_name)()):
  * See pu_contrainte_fprint() for details.
  */
-void vecteur_fprint(fp,vec,variable_name)
-FILE *fp;
-Pcontrainte vec;
-char * (*variable_name)();
+void vecteur_fprint(FILE *fp,
+		    Pcontrainte vec,
+		    char * (*variable_name)(entity))
 {
  pu_contrainte_fprint(fp,vec,IS_VEC,variable_name);
 }
@@ -445,8 +447,8 @@ Variable v;
 
 
 /*============================================================================*/
-boolean pu_is_inferior_var(v1, v2)
-Variable v1, v2;
+boolean pu_is_inferior_var(Variable v1 __attribute__ ((unused)),
+			   Variable v2 __attribute__ ((unused)))
 {
  return(FALSE);
 }
@@ -459,9 +461,7 @@ Variable v1, v2;
  * There exist a function "vect_fprint" in C3 which takes a third argument.
  */
 /* arg, also in array_dfg. */
-void pu_vect_fprint(fp, v)
-FILE *fp;
-Pvecteur v;
+void pu_vect_fprint(FILE * fp, Pvecteur v)
 {
     short int debut = 1;
     Value constante = VALUE_ZERO;
@@ -573,7 +573,7 @@ quast qu;
       pred_aux = conditional_predicate(cond_aux);
       if (pred_aux != predicate_undefined)
       	  paux = (Psysteme)  predicate_system(pred_aux);
- 
+
       fprint_indent(fp, quast_depth);
       fprintf(fp, "IF ");
       fprint_psysteme(fp, paux);
@@ -596,7 +596,7 @@ quast qu;
 
     case is_quast_value_quast_leaf:
       qul = quast_value_quast_leaf( quv );
-      if (qul == quast_leaf_undefined) {fprintf(fp,"Empty Quast Leaf\n");break;} 
+      if (qul == quast_leaf_undefined) {fprintf(fp,"Empty Quast Leaf\n");break;}
       sol = quast_leaf_solution( qul );
       ll  = quast_leaf_leaf_label( qul );
       if (ll != leaf_label_undefined) {
@@ -605,7 +605,7 @@ quast qu;
 		statement_number(ordering_to_statement(leaf_label_statement(ll))));
 
         fprint_indent(fp, quast_depth);
-	fprintf(fp, "Depth : %d", leaf_label_depth(ll));	
+	fprintf(fp, "Depth : %d", leaf_label_depth(ll));
       }
       fprint_indent(fp, quast_depth);
       while (sol != NIL) {
