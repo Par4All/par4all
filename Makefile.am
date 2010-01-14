@@ -35,7 +35,7 @@ sources = $(CFILES) \
 	$(poly_arith)/arithmetique.h \
 	$(poly_arith)/arithmetic_errors.h
 
-EXTRA_DIST = doc source/oldpolytest.c
+EXTRA_DIST = doc source/oldpolytest.c INSTALL COPYING
 
 lib_LTLIBRARIES = @polylibs@
 libpolylib32_la_LDFLAGS = -rpath $(libdir) -version-info @versioninfo@
