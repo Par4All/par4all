@@ -110,8 +110,8 @@ LIBS_PIPS = $(LIBS_PIPS1) $(LIBS_PIPS1) $(LIBS_PIPS1) $(LIBS_PIPS1)
 # The compiler itself is called f951.
 f951$(exeext): $(F95_OBJS) \
 		$(BACKEND) $(LIBDEPS) attribs.o
-	$(CC) $(ALL_CFLAGS) $(LDFLAGS) -L$(LINEAR_ROOT)/lib/LINUX_x86_64_LL -L$(NEWGEN_ROOT)/lib/LINUX_x86_64_LL \
-		-L$(EXTERN_ROOT)/lib/LINUX_x86_64_LL -L$(PIPS_ROOT)/lib/LINUX_x86_64_LL \
+	$(CC) $(ALL_CFLAGS) $(LDFLAGS) -L/data/raphael/pips/prod/linear/lib/LINUX_x86_64_LL -L/data/raphael/pips/prod/newgen/lib/LINUX_x86_64_LL \
+		-L/data/raphael/pips/prod/extern/lib/LINUX_x86_64_LL -L/data/raphael/pips/prod/pips/lib/LINUX_x86_64_LL \
 		-o $@ \
 		$(F95_OBJS) $(BACKEND) $(LIBS) $(LIBS_PIPS) attribs.o $(BACKENDLIBS)
 
