@@ -52,7 +52,6 @@
 #include "syntax.h"
 #include "c_syntax.h"
 
-//#include "syn_yacc.h"
 //#include "/data/raphael/pips/prod/pips/src/Libs/syntax/syn_yacc.h"
 //#include "/data/raphael/pips/prod/pips/src/Libs/newgen/newgen.c"
 

@@ -300,6 +300,20 @@ void gfc2pips_namespace(gfc_namespace* ns){
 
 	pips_debug(2, "main entity object initialized\n");
 
+	/*we have taken the entities, we need to build to add user-defined elements
+	FL_DERIVED
+------------------------------------------------------------------------------
+      TYPE point
+       REAL x,y
+      END TYPE point
+------------------------------------------------------------------------------
+      symtree: point  Ambig 0
+      (UNKNOWN 0)(DERIVED UNKNOWN-INTENT UNKNOWN-ACCESS UNKNOWN-PROC UNKNOWN)
+      components: (x (REAL 4) ()) (y (REAL 4) ())
+      Procedure bindings:
+
+	*/
+	gfc2pips_getTypesDeclared(ns);
 
 	////list of parameters
 	pips_debug(2, "dump the list of parameters\n");
@@ -541,19 +555,6 @@ void gfc2pips_namespace(gfc_namespace* ns){
 
 	pips_debug(2, "nb of entities: %d\n",gen_length(complete_list_of_entities));
 
-	/*we have taken the entities, we now need to build to add user-defined elements
-	FL_DERIVED
-------------------------------------------------------------------------------
-      TYPE point
-       REAL x,y
-      END TYPE point
-------------------------------------------------------------------------------
-      symtree: point  Ambig 0
-      (UNKNOWN 0)(DERIVED UNKNOWN-INTENT UNKNOWN-ACCESS UNKNOWN-PROC UNKNOWN)
-      components: (x (REAL 4) ()) (y (REAL 4) ())
-      Procedure bindings:
-
-*/
 
 	newgen_list list_of_subroutines,list_of_subroutines_p;
 	list_of_subroutines_p = list_of_subroutines = getSymbolBy(ns,ns->sym_root, gfc2pips_test_subroutine);
@@ -1028,13 +1029,13 @@ newgen_list gfc2pips_vars_(gfc_namespace *ns,newgen_list variables_p){
 
 
 
-/*newgen_list gfc2pips_getTypesDeclared(gfc_namespace *ns){
+newgen_list gfc2pips_getTypesDeclared(gfc_namespace *ns){
 	if(ns){
 		return gfc2pips_getTypesDeclared_(ns,gen_nreverse(getSymbolBy(ns,ns->sym_root, gfc2pips_test_derived)));
 	}
 	return NULL;
 }
-newgen_list gfc2pips_getTypesDeclared_(gfc_namespace *ns,newgen_list variables_p){
+newgen_list gfc2pips_getTypesDeclared_(gfc_namespace *ns, newgen_list variables_p){
 	newgen_list variables = NULL;
 
 	while(variables_p){
@@ -1044,13 +1045,70 @@ newgen_list gfc2pips_getTypesDeclared_(gfc_namespace *ns,newgen_list variables_p
 
 		newgen_list list_of_components = NULL;
 
-		entity ent = MakeDerivedEntity(
-			current_symtree->n.sym->name,
-			list_of_components,
-			current_symtree->n.sym->attr.external,
-			is_type_struct
-		);
-		variable v = make_variable(make_basic_derived(ent),NIL,NIL);
+		newgen_list members = NULL;
+		gfc_component *c;
+		pips_debug(9,"start list of elements in the structure %s\n",current_symtree->name);
+		for( c=current_symtree->n.sym->components ; c ; c=c->next ){
+			/*decl_spec_list TK_SEMICOLON struct_decl_list
+						{
+			  //c_parser_context ycontext = stack_head(ContextStack);
+			  c_parser_context ycontext = GetContext();
+			  * Create the struct member entity with unique name, the name of the struct/union is added to the member name prefix *
+			  string istr = i2a(derived_counter++);
+			  string s = strdup(concatenate("PIPS_MEMBER_",istr,NULL));
+			  string derived = code_decls_text((code) stack_head(StructNameStack));
+			  entity ent = CreateEntityFromLocalNameAndPrefix(s,strdup(concatenate(derived,
+												   MEMBER_SEP_STRING,NULL)),
+									  is_external);
+			  pips_debug(5,"Current derived name: %s\n",derived);
+			  pips_debug(5,"Member name: %s\n",entity_name(ent));
+			  entity_storage(ent) = make_storage_rom();
+			  entity_type(ent) = c_parser_context_type(ycontext);
+			  free(s);
+
+			  * Temporally put the list of struct/union entities defined in $1 to initial value of ent. FI: where is it retrieved? in TakeDerivedEntities()? *
+			  entity_initial(ent) = (value) $1;
+
+			  $$ = CONS(ENTITY,ent,$3);
+
+			  //stack_pop(ContextStack);
+			  PopContext();
+			}*/
+
+			fprintf(stdout,"%s\n",c->name);
+			/*show_typespec (&c->ts);
+			if(c->attr.pointer) fputs(" POINTER", dumpfile);
+			if(c->attr.dimension) fputs(" DIMENSION", dumpfile);
+			fputc(' ', dumpfile);
+			show_array_spec(c->as);
+			if(c->attr.access) fprintf(dumpfile, " %s", gfc_code2string(access_types, c->attr.access) );
+			fputc (')', dumpfile);
+			if (c->next != NULL) fputc (' ', dumpfile);*/
+		}
+		entity ent;
+		if(current_symtree->n.sym->attr.external){
+		}else{
+			ent = find_or_create_entity(
+				concatenate(
+					CurrentPackage,
+					MODULE_SEP_STRING,
+					"",//scope,
+					STRUCT_PREFIX,
+					current_symtree->name,
+					NULL
+				)
+			);
+			/*ent = MakeDerivedEntity(
+				current_symtree->n.sym->name,
+				list_of_components,
+				current_symtree->n.sym->attr.external,
+				is_type_struct
+			);*/
+		}
+		//entity_type(ent) = make_type_struct( members );
+
+
+		/*variable v = make_variable(make_basic_derived(ent),NIL,NIL);
 		list le = TakeDerivedEntities(list_of_components);
 		variables = gen_cons( gen_nconc(le,CONS(ENTITY,ent,NIL)), variables );
 
@@ -1060,18 +1118,18 @@ newgen_list gfc2pips_getTypesDeclared_(gfc_namespace *ns,newgen_list variables_p
 				STRUCT_PREFIX,
 				s->attr.external
 			);
-			newgen_list members = NULL;//faire ça au tout début avant même de déclarer les variables, on commence par les types !
 			entity_type(ent) = make_type_struct( members );
 			return MakeTypeVariable(
 				make_basic_derived(ent),
 				NULL
-			);
+			);*/
 
 		POP(variables_p);
 	}
 
 	return variables;
-}*/
+}
+
 /**
  * @brief build a list of externals entities
  */
@@ -1685,6 +1743,7 @@ type gfc2pips_symbol2type(gfc_symbol *s){
 			return make_type_unknown();
 		break;
 		case BT_DERIVED:{
+
 		}
 		case BT_PROCEDURE:
 		case BT_HOLLERITH:
@@ -1734,6 +1793,11 @@ type gfc2pips_symbol2type(gfc_symbol *s){
 	pips_debug( 5, "WARNING: no type\n" );
 	return type_undefined;
 	//return make_type_unknown();
+}
+
+type gfc2pips_symbol2specialType(gfc_symbol *s){
+
+	return type_undefined;
 }
 
 /**

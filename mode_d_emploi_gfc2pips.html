@@ -68,6 +68,26 @@ f951$(exeext): $(F95_OBJS) \
 		/path/to/pips/prod/newgen/lib/LINUX_x86_64_LL/libgenC.a /path/to/pips/prod/pips/src/Libs/newgen/LINUX_x86_64_LL/libnewgen.a \
 		/path/to/pips/prod/linear/src/sg/LINUX_x86_64_LL/libsg.a attribs.o $(BACKENDLIBS)
 </p>
+into<p class="code">#There is a big issue for libraries loop dependencies
+LIBS_PIPS1 = -lpips -ltop-level -lpipsmake -lwp65 -lhpfc -lhyperplane -lto_begin_with -linstrumentation -lpips_statistics \
+		-lexpressions -ltransformations -lhwac -lmovements -lbootstrap -lcallgraph -licfg -lchains -lcomplexity \
+		-lconversion -lprettyprint -latomizer -lsyntax -lc_syntax -leffects-simple -leffects-convex -leffects-generic \
+		-lalias-classes -lcomp_sections -lsemantics -lcontrol -lcontinuation -lrice -lricedg -lpipsdbm -ltransformer \
+		-lpreprocessor -lri-util -lstep -lproperties -ltext-util -lmisc -lproperties -lreductions -lflint -lsac -lsafescale \
+		-lphrase -lgpu -lnewgen -lgenC -lmatrice -lunion -lpolyedre -lsparse_sc -lsc -lcontrainte -lsg -lsommet -lray_dte -lpolynome \
+		-lmatrix -lvecteur -larithmetique -lpolylib -lm -lreadline -ltermcap
+#Loop 4 times on its own declarations seems to be enough for depedencies
+LIBS_PIPS = $(LIBS_PIPS1) $(LIBS_PIPS1) $(LIBS_PIPS1) $(LIBS_PIPS1) 
+
+
+# The compiler itself is called f951.
+f951$(exeext): $(F95_OBJS) \
+		$(BACKEND) $(LIBDEPS) attribs.o
+	$(CC) $(ALL_CFLAGS) $(LDFLAGS) -L/path/to/pips/prod/linear/lib/LINUX_x86_64_LL -L/path/to/pips/prod/newgen/lib/LINUX_x86_64_LL \
+		-L/path/to/pips/prod/extern/lib/LINUX_x86_64_LL -L/path/to/pips/prod/pips/lib/LINUX_x86_64_LL \
+		-o $@ \
+		$(F95_OBJS) $(BACKEND) $(LIBS) $(LIBS_PIPS) attribs.o $(BACKENDLIBS)
+</p>$(PIPS_ROOT), $(NEWGEN_ROOT) etc. doesn't exist because we are in gfc.
 				</li>
 
 			</li>
