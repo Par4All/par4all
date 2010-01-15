@@ -50,8 +50,10 @@
 #include "ri-util.h"
 #include "pipsdbm.h"
 #include "syntax.h"
+#include "c_syntax.h"
 
-#include "/data/raphael/pips/prod/pips/src/Libs/syntax/syn_yacc.h"
+//#include "syn_yacc.h"
+//#include "/data/raphael/pips/prod/pips/src/Libs/syntax/syn_yacc.h"
 //#include "/data/raphael/pips/prod/pips/src/Libs/newgen/newgen.c"
 
 #undef loop
@@ -136,6 +138,8 @@ gfc_symtree* gfc2pips_getSymtreeByName (char* name, gfc_symtree *st);
 
 newgen_list gfc2pips_vars(gfc_namespace *ns);
 newgen_list gfc2pips_vars_(gfc_namespace *ns,newgen_list variables_p);
+newgen_list gfc2pips_getTypesDeclared(gfc_namespace *ns);
+newgen_list gfc2pips_getTypesDeclared_(gfc_namespace *ns,newgen_list variables_p);
 newgen_list gfc2pips_get_extern_entities(gfc_namespace *ns);
 newgen_list gfc2pips_get_data_vars(gfc_namespace *ns);
 newgen_list gfc2pips_get_save(gfc_namespace *ns);
@@ -153,6 +157,7 @@ newgen_list getSymbolBy(gfc_namespace* ns, gfc_symtree *st, bool (*func)(gfc_nam
  */
 bool gfc2pips_test_variable(gfc_namespace* __attribute__ ((__unused__)) ns, gfc_symtree *st);
 bool gfc2pips_test_variable2(gfc_namespace* __attribute__ ((__unused__)) ns, gfc_symtree *st );
+bool gfc2pips_test_derived(gfc_namespace __attribute__ ((__unused__)) *ns, gfc_symtree *st );
 bool gfc2pips_test_extern(gfc_namespace* __attribute__ ((__unused__)) ns, gfc_symtree *st );
 bool gfc2pips_test_subroutine(gfc_namespace* __attribute__ ((__unused__)) ns, gfc_symtree *st );
 //bool gfc2pips_test_name(gfc_namespace* ns, gfc_symtree *st, int param);

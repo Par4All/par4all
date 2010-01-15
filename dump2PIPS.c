@@ -20,7 +20,7 @@
  *-  TYPE point
  *-   REAL x,y
  *-  END TYPE point
- * not implemented in PIPS or partially for C structures
+ * not implemented in PIPS or partially: for C structures only
  *
  * EXPR_SUBSTRING is for a substring of a constant string, but never encountered even with specific test case
  *
@@ -541,6 +541,19 @@ void gfc2pips_namespace(gfc_namespace* ns){
 
 	pips_debug(2, "nb of entities: %d\n",gen_length(complete_list_of_entities));
 
+	/*we have taken the entities, we now need to build to add user-defined elements
+	FL_DERIVED
+------------------------------------------------------------------------------
+      TYPE point
+       REAL x,y
+      END TYPE point
+------------------------------------------------------------------------------
+      symtree: point  Ambig 0
+      (UNKNOWN 0)(DERIVED UNKNOWN-INTENT UNKNOWN-ACCESS UNKNOWN-PROC UNKNOWN)
+      components: (x (REAL 4) ()) (y (REAL 4) ())
+      Procedure bindings:
+
+*/
 
 	newgen_list list_of_subroutines,list_of_subroutines_p;
 	list_of_subroutines_p = list_of_subroutines = getSymbolBy(ns,ns->sym_root, gfc2pips_test_subroutine);
@@ -1013,6 +1026,52 @@ newgen_list gfc2pips_vars_(gfc_namespace *ns,newgen_list variables_p){
 	return variables;
 }
 
+
+
+/*newgen_list gfc2pips_getTypesDeclared(gfc_namespace *ns){
+	if(ns){
+		return gfc2pips_getTypesDeclared_(ns,gen_nreverse(getSymbolBy(ns,ns->sym_root, gfc2pips_test_derived)));
+	}
+	return NULL;
+}
+newgen_list gfc2pips_getTypesDeclared_(gfc_namespace *ns,newgen_list variables_p){
+	newgen_list variables = NULL;
+
+	while(variables_p){
+		type Type = type_undefined;
+		//create entities here
+		gfc_symtree *current_symtree = (gfc_symtree*)variables_p->car.e ;
+
+		newgen_list list_of_components = NULL;
+
+		entity ent = MakeDerivedEntity(
+			current_symtree->n.sym->name,
+			list_of_components,
+			current_symtree->n.sym->attr.external,
+			is_type_struct
+		);
+		variable v = make_variable(make_basic_derived(ent),NIL,NIL);
+		list le = TakeDerivedEntities(list_of_components);
+		variables = gen_cons( gen_nconc(le,CONS(ENTITY,ent,NIL)), variables );
+
+		//get the list of entities in the struct
+		entity ent = CreateEntityFromLocalNameAndPrefix(
+				s->ts.derived->name,
+				STRUCT_PREFIX,
+				s->attr.external
+			);
+			newgen_list members = NULL;//faire ça au tout début avant même de déclarer les variables, on commence par les types !
+			entity_type(ent) = make_type_struct( members );
+			return MakeTypeVariable(
+				make_basic_derived(ent),
+				NULL
+			);
+
+		POP(variables_p);
+	}
+
+	return variables;
+}*/
 /**
  * @brief build a list of externals entities
  */
@@ -1183,6 +1242,7 @@ bool gfc2pips_test_variable(gfc_namespace __attribute__ ((__unused__)) *ns, gfc_
 		&& !st->n.sym->attr.pointer
 		&& !st->n.sym->attr.dummy;
 }
+
 /*
  * @brief test if it is a variable
  */
@@ -1190,6 +1250,18 @@ bool gfc2pips_test_variable2(gfc_namespace __attribute__ ((__unused__)) *ns, gfc
 	if(!st || !st->n.sym) return false;
 	return st->n.sym->attr.flavor == EXPR_VARIABLE && !st->n.sym->attr.dummy;
 }
+
+/*
+ * @brief test if a variable is a user-defined structure
+ */
+bool gfc2pips_test_derived(gfc_namespace __attribute__ ((__unused__)) *ns, gfc_symtree *st ){
+	if(!st || !st->n.sym) return false;
+	return st->n.sym->attr.flavor == FL_DERIVED
+		//&& !st->n.sym->attr.external
+		&& !st->n.sym->attr.pointer
+		&& !st->n.sym->attr.dummy;
+}
+
 /**
  * @brief test if it is an external function
  */
@@ -1590,6 +1662,18 @@ type gfc2pips_symbol2type(gfc_symbol *s){
 	//beware the size of strings
 
 	enum basic_utype ut;
+	if(s->attr.pointer){
+		ut = is_basic_pointer;
+		//retake the following code in this block to create the correct information
+		return MakeTypeVariable(
+			make_basic(
+				ut,
+				(void*) ( (ut==is_basic_complex?2:1) * gfc2pips_symbol2size(s) )// * gfc2pips_symbol2sizeArray(s))
+			),
+			gfc2pips_get_list_of_dimensions2(s)
+		);
+
+	}
 	switch(s->ts.type){
 		case BT_INTEGER:	ut = is_basic_int;		break;
 		case BT_REAL:		ut = is_basic_float;	break;
@@ -1600,7 +1684,8 @@ type gfc2pips_symbol2type(gfc_symbol *s){
 			pips_debug( 5, "Type unknown\n" );
 			return make_type_unknown();
 		break;
-		case BT_DERIVED:
+		case BT_DERIVED:{
+		}
 		case BT_PROCEDURE:
 		case BT_HOLLERITH:
 		case BT_VOID:
@@ -2724,7 +2809,7 @@ ENDDO
 	    	}
 			instruction i = make_instruction_goto(
 				make_continue_statement(
-						label
+					label
 				)
 			);
 			return i;
@@ -2747,7 +2832,7 @@ ENDDO
 	    	}
 			instruction i = make_instruction_goto(
 				make_continue_statement(
-						label
+					label
 				)
 			);
 			return i;
