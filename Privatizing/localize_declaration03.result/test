@@ -1,17 +1,10 @@
 Try to restructure the code for more precision:
 void getimage(char *filename)
 {
-   double z;
-   double amp;
-   double sum;
-   double squares;
-   int i;
-   int j;
-   int conj;
-   int nx;
-   int ny;
-   unsigned char c;
-   FILE *fp;
+   double z, amp, sum, squares;                                         /*0025*/
+   int i, j, conj, nx, ny;                                              /*0026*/
+   unsigned char c;                                                     /*0027*/
+   FILE *fp;                                                            /*0028*/
    
    /* Erase the memory, in case the image is not big enough: */
    for (i = 0;i<64;i++)                                                 /*0031*/
@@ -22,76 +15,66 @@ void getimage(char *filename)
 }
 void getimage(char *filename)
 {
-   double z;
-   double amp;
-   double sum;
-   double squares;
-   int i;
-   int j;
-   int conj;
-   int nx;
-   int ny;
-   unsigned char c;
-   FILE *fp;
+   double z, amp, sum, squares;                                         /*0025*/
+   int i, j, conj, nx, ny;                                              /*0026*/
+   unsigned char c;                                                     /*0027*/
+   FILE *fp;                                                            /*0028*/
    
    /* Erase the memory, in case the image is not big enough: */
-   for(i = 0; i <= 63; i += 1)                                          /*0031*/
-      for(j = 0; j <= 63; j += 1) {                                     /*0032*/
+   for(i = 0; i <= 63; i += 1)
+      for(j = 0; j <= 63; j += 1) {
          imagein[i][j].re = 0.0;                                        /*0033*/
          imagein[i][j].im = 0.0;                                        /*0034*/
       }
 }
 void getimage(char *filename)
 {
-   double z;
-   double amp;
-   double sum;
-   double squares;
-   int i;
-   int j;
-   int conj;
-   int nx;
-   int ny;
-   unsigned char c;
-   FILE *fp;
-   int i0;
-   int j0;
+   double z, amp, sum, squares;                                         /*0025*/
+   int i, j, conj, nx, ny;                                              /*0026*/
+   unsigned char c;                                                     /*0027*/
+   FILE *fp;                                                            /*0028*/
    {
+      //PIPS generated variable
+      int i1, j1;
       
       /* Erase the memory, in case the image is not big enough: */
-      for(i0 = 0; i0 <= 63; i0 += 1)
-         for(j01 = 0; j01 <= 63; j01 += 1) {
-      int j01;
-            imagein[i0][j01].re = 0.0;                                  /*0033*/
-            imagein[i0][j01].im = 0.0;                                  /*0034*/
+      for(i1 = 0; i1 <= 63; i1 += 1) {
+         //PIPS generated variable
+         int j1;
+         for(j1 = 0; j1 <= 63; j1 += 1) {
+            imagein[i1][j1].re = 0.0;                                   /*0033*/
+            imagein[i1][j1].im = 0.0;                                   /*0034*/
          }
+      }
    }
 }
 void getimage(char *)
 {
-   int i0;
-   {
-      
-      /* Erase the memory, in case the image is not big enough: */
-      for(i0 = 0; i0 <= 63; i0 += 1)
-         for(j01 = 0; j01 <= 63; j01 += 1) {
-      int j01;
-            imagein[i0][j01].re = 0.0;                                  /*0033*/
-            imagein[i0][j01].im = 0.0;                                  /*0034*/
-         }
+   //PIPS generated variable
+   int i1, j1;
+   
+   /* Erase the memory, in case the image is not big enough: */
+   for(i1 = 0; i1 <= 63; i1 += 1) {
+      //PIPS generated variable
+      int j1;
+      for(j1 = 0; j1 <= 63; j1 += 1) {
+         imagein[i1][j1].re = 0.0;                                      /*0033*/
+         imagein[i1][j1].im = 0.0;                                      /*0034*/
+      }
    }
 }
 void getimage(char *)
 {
-   int i0;
-   {
-      
-      /* Erase the memory, in case the image is not big enough: */
-      for(i0 = 0; i0 <= 63; i0 += 1)
-         for(j01 = 0; j01 <= 63; j01 += 1) {
-      int j01;
-            imagein[i0][j01].re = 0.0;                                  /*0033*/
-            imagein[i0][j01].im = 0.0;                                  /*0034*/
-         }
+   //PIPS generated variable
+   int i1, j1;
+   
+   /* Erase the memory, in case the image is not big enough: */
+   for(i1 = 0; i1 <= 63; i1 += 1) {
+      //PIPS generated variable
+      int j1;
+      for(j1 = 0; j1 <= 63; j1 += 1) {
+         imagein[i1][j1].re = 0.0;                                      /*0033*/
+         imagein[i1][j1].im = 0.0;                                      /*0034*/
+      }
    }
 }

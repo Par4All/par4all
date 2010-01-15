@@ -1,10 +1,8 @@
 Try to restructure the code for more precision:
 int main(int argc, char *argv[])
 {
-   float b[N];
-   float c[N];
-   float a;
-   int i;
+   float b[N], c[N], a;                                                 /*0003*/
+   int i;                                                               /*0004*/
 
    a = 0;                                                               /*0006*/
 
@@ -26,10 +24,8 @@ compute:   do {                                                                 
 }
 int main(int argc, char *argv[])
 {
-   float b[N];
-   float c[N];
-   float a;
-   int i;
+   float b[N], c[N], a;                                                 /*0003*/
+   int i;                                                               /*0004*/
 
    a = 0;                                                               /*0006*/
 
@@ -51,14 +47,13 @@ compute:   do {                                                                 
 }
 int main(int argc, char *argv[])
 {
-   float b[N];
-   float c[N];
-   float a;
-   int i;
+   float b[N], c[N], a;                                                 /*0003*/
+   int i;                                                               /*0004*/
 
    a = 0;                                                               /*0006*/
 
 init:   do {                                                                 /*0014*/
+      //PIPS generated variable
       int i1;
       for(i1 = 0; i1 <= 999999; i1 += 1) {
          b[i1] = i1;                                                    /*0011*/
@@ -67,6 +62,7 @@ init:   do {                                                                 /*0
    }
    while (1);                                                           /*0014*/
 compute:   do {                                                                 /*0019*/
+      //PIPS generated variable
       int i1;
       for(i1 = 0; i1 <= 999999; i1 += 1)
          a = a+b[i1]*c[i1];                                             /*0018*/
@@ -78,13 +74,12 @@ compute:   do {                                                                 
 }
 int main(int, char *[])
 {
-   float b[N];
-   float c[N];
-   float a;
+   float b[N], c[N], a;                                                 /*0003*/
 
    a = 0;                                                               /*0006*/
 
 init:   do {                                                                 /*0014*/
+      //PIPS generated variable
       int i1;
       for(i1 = 0; i1 <= 999999; i1 += 1) {
          b[i1] = i1;                                                    /*0011*/
@@ -93,6 +88,7 @@ init:   do {                                                                 /*0
    }
    while (1);                                                           /*0014*/
 compute:   do {                                                                 /*0019*/
+      //PIPS generated variable
       int i1;
       for(i1 = 0; i1 <= 999999; i1 += 1)
          a = a+b[i1]*c[i1];                                             /*0018*/
@@ -104,13 +100,12 @@ compute:   do {                                                                 
 }
 int main(int, char *[])
 {
-   float b[N];
-   float c[N];
-   float a;
+   float b[N], c[N], a;                                                 /*0003*/
 
    a = 0;                                                               /*0006*/
 
 init:   do {                                                                 /*0014*/
+      //PIPS generated variable
       int i1;
       for(i1 = 0; i1 <= 999999; i1 += 1) {
          b[i1] = i1;                                                    /*0011*/
@@ -119,6 +114,7 @@ init:   do {                                                                 /*0
    }
    while (1);                                                           /*0014*/
 compute:   do {                                                                 /*0019*/
+      //PIPS generated variable
       int i1;
       for(i1 = 0; i1 <= 999999; i1 += 1)
          a = a+b[i1]*c[i1];                                             /*0018*/

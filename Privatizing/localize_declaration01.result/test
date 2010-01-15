@@ -1,10 +1,8 @@
 Try to restructure the code for more precision:
 int main(int argc, char *argv[])
 {
-   float b[N];
-   float c[N];
-   float a;
-   int i;
+   float b[N], c[N], a;                                                 /*0003*/
+   int i;                                                               /*0004*/
 
    a = 0;                                                               /*0006*/
 
@@ -22,10 +20,8 @@ compute:
 }
 int main(int argc, char *argv[])
 {
-   float b[N];
-   float c[N];
-   float a;
-   int i;
+   float b[N], c[N], a;                                                 /*0003*/
+   int i;                                                               /*0004*/
 
    a = 0;                                                               /*0006*/
 
@@ -43,13 +39,12 @@ compute:
 }
 int main(int argc, char *argv[])
 {
-   float b[N];
-   float c[N];
-   float a;
-   int i;
+   float b[N], c[N], a;                                                 /*0003*/
+   int i;                                                               /*0004*/
 
    a = 0;                                                               /*0006*/
    {
+      //PIPS generated variable
       int i1;
 
 init:      ;
@@ -59,6 +54,7 @@ init:      ;
       }
    }
    {
+      //PIPS generated variable
       int i1;
 compute:      ;
       for(i1 = 0; i1 <= 999999; i1 += 1)
@@ -70,12 +66,11 @@ compute:      ;
 }
 int main(int, char *[])
 {
-   float b[N];
-   float c[N];
-   float a;
+   float b[N], c[N], a;                                                 /*0003*/
 
    a = 0;                                                               /*0006*/
    {
+      //PIPS generated variable
       int i1;
 
 init:      ;
@@ -85,6 +80,7 @@ init:      ;
       }
    }
    {
+      //PIPS generated variable
       int i1;
 compute:      ;
       for(i1 = 0; i1 <= 999999; i1 += 1)
@@ -96,12 +92,11 @@ compute:      ;
 }
 int main(int, char *[])
 {
-   float b[N];
-   float c[N];
-   float a;
+   float b[N], c[N], a;                                                 /*0003*/
 
    a = 0;                                                               /*0006*/
    {
+      //PIPS generated variable
       int i1;
 
 init:      ;
@@ -111,6 +106,7 @@ init:      ;
       }
    }
    {
+      //PIPS generated variable
       int i1;
 compute:      ;
       for(i1 = 0; i1 <= 999999; i1 += 1)
