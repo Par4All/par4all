@@ -1087,6 +1087,15 @@ newgen_list gfc2pips_getTypesDeclared_(gfc_namespace *ns, newgen_list variables_
 		}
 		entity ent;
 		if(current_symtree->n.sym->attr.external){
+			ent = find_or_create_entity(
+				concatenate(
+					CurrentPackage,
+					MODULE_SEP_STRING,
+					STRUCT_PREFIX,
+					current_symtree->name,
+					NULL
+				)
+			);
 		}else{
 			ent = find_or_create_entity(
 				concatenate(
@@ -1104,8 +1113,9 @@ newgen_list gfc2pips_getTypesDeclared_(gfc_namespace *ns, newgen_list variables_
 				current_symtree->n.sym->attr.external,
 				is_type_struct
 			);*/
+			//entity_basic(ent) = make_basic_typedef(ent);
+			entity_type(ent) = make_type_struct( members );
 		}
-		//entity_type(ent) = make_type_struct( members );
 
 
 		/*variable v = make_variable(make_basic_derived(ent),NIL,NIL);
@@ -1298,7 +1308,8 @@ bool gfc2pips_test_variable(gfc_namespace __attribute__ ((__unused__)) *ns, gfc_
 		&& !st->n.sym->attr.external
 		//&& !st->n.sym->attr.in_common
 		&& !st->n.sym->attr.pointer
-		&& !st->n.sym->attr.dummy;
+		&& !st->n.sym->attr.dummy
+		&& !st->n.sym->ts.type == BT_DERIVED;
 }
 
 /*
@@ -1469,9 +1480,28 @@ entity gfc2pips_symbol2entity( gfc_symbol* s ){
 		module = true;
 	}else{
 		pips_debug(9, "create entity %s\n",name);
-		e = FindOrCreateEntity(CurrentPackage,str2upper((name)));
-		if(entity_initial(e)==value_undefined) entity_initial(e) = MakeValueUnknown();
-		if(entity_type(e)==type_undefined) entity_type(e) = gfc2pips_symbol2type(s);
+		if( s->ts.type == BT_DERIVED ){
+			pips_user_error("User-defined variables are not implemented yet\n");
+			//there is still a problem in the check of consistency of the domain names
+			e = FindOrCreateEntity(
+				CurrentPackage,
+				str2upper(strdup(concatenate(
+					strdup(s->ts.derived->name),
+					strdup(MEMBER_SEP_STRING),//make pips crash when verify the names
+					strdup(name),
+					NULL
+				)))
+			);
+			if(entity_initial(e)==value_undefined) entity_initial(e) = MakeValueUnknown();
+			if(entity_type(e)==type_undefined) entity_type(e) = MakeTypeVariable(
+				make_basic_derived(str2upper(strdup(s->ts.derived->name))),
+				gfc2pips_get_list_of_dimensions2(s)
+			);
+		}else{
+			e = FindOrCreateEntity(CurrentPackage,str2upper((name)));
+			if(entity_initial(e)==value_undefined) entity_initial(e) = MakeValueUnknown();
+			if(entity_type(e)==type_undefined) entity_type(e) = gfc2pips_symbol2type(s);
+		}
 		//if(entity_storage(e)==storage_undefined) entity_storage(e) = MakeStorageRom();
 		free(name);
 		return e;
@@ -1482,7 +1512,7 @@ entity gfc2pips_symbol2entity( gfc_symbol* s ){
 		//fprintf(stderr,"value ... ... ... %s\n",entity_initial(e)==value_undefined?"ok":"nok");
 		if(entity_initial(e)==value_undefined){
 			entity_initial(e) = make_value_code(
-				make_code(NULL,strdup(""),make_sequence(NIL),NULL, make_language_fortran())
+				make_code( NULL, strdup(""), make_sequence(NIL), NULL, make_language_fortran() )
 			);
 		}
 	}
@@ -1743,13 +1773,14 @@ type gfc2pips_symbol2type(gfc_symbol *s){
 			return make_type_unknown();
 		break;
 		case BT_DERIVED:{
-
+			pips_user_error("User-def types are not implemented yet\n");
+			return type_undefined;
 		}
 		case BT_PROCEDURE:
 		case BT_HOLLERITH:
 		case BT_VOID:
 		default:
-			pips_error("gfc2pips_symbol2type","An error occurred in the type to type translation: impossible to translate the symbol.\n");
+			pips_user_error("An error occurred in the type to type translation: impossible to translate the symbol.\n");
 			return type_undefined;
 			//return make_type_unknown();
 	}
@@ -3717,7 +3748,7 @@ expression gfc2pips_make_zero_for_symbol(gfc_symbol* sym){
 }
 
 /**
- * @brief look for repeated values in the list (list for DATA instructions) and transform them in a FORTRAN repeat syntax
+ * @brief look for repeated values (integers or real) in the list (list for DATA instructions) and transform them in a FORTRAN repeat syntax
  *
  * DATA x /1,1,1/ =>  DATA x /3*1/
  *
@@ -3733,7 +3764,16 @@ newgen_list gfc2pips_reduce_repeated_values(newgen_list l){
 	pips_debug(9, "begin reduce of values\n");
 	while(local_list){
 		curr = (expression)local_list->car.e;
-		if(expression_is_constant_p(curr)){
+		/*pips_debug( 9,
+			"is a call ? %s\n\tis a constant ? %s\n\tfunctional ? %s\n",
+			syntax_call_p(expression_syntax(curr))?"true":"false",
+			(
+				syntax_call_p(expression_syntax(curr))
+				&& entity_constant_p(call_function(syntax_call(expression_syntax(curr))))
+			) ? "true" : "false",
+			type_functional_p(entity_type(call_function(syntax_call(expression_syntax(curr))))) ? "true":"false"
+		);*/
+		if( expression_is_constant_p(curr) ){
 			if( prec && expression_is_constant_p(prec) ){
 				if( reference_variable(syntax_reference(expression_syntax(curr))) == reference_variable(syntax_reference(expression_syntax(prec))) ){
 					pips_debug(10, "same as before\n");
@@ -3765,16 +3805,27 @@ newgen_list gfc2pips_reduce_repeated_values(newgen_list l){
 			pips_debug(10, "not a constant\n");
 			if(nb_of_occurences>1){
 				//reduce
-				pips_debug(9, "reduce2 %s %d\n", entity_name(reference_variable(syntax_reference(expression_syntax(prec)))), nb_of_occurences );
-				last_pointer_on_list->car.e = MakeBinaryCall(
-					CreateIntrinsic("*"),
-					gfc2pips_int2expression(nb_of_occurences),
-					prec
+				pips_debug(
+					9,
+					"reduce2 %s %d %d\n",
+					entity_name(reference_variable(syntax_reference(expression_syntax(prec)))),
+					nb_of_occurences,
+					last_pointer_on_list
 				);
-				last_pointer_on_list->cdr = local_list;
+				if(last_pointer_on_list){
+					last_pointer_on_list->car.e = MakeBinaryCall(
+						CreateIntrinsic("*"),
+						gfc2pips_int2expression(nb_of_occurences),
+						prec
+					);
+					last_pointer_on_list->cdr = local_list;
+				}else{
+					//an error has been introduced somewhere, last_pointer_on_list is NULL and it should point to the first repeated value
+					pips_user_warning("We don't know what to do ! We do not have a current pointer (and we should).\n");
+				}
 			}
-			nb_of_occurences=0;//no dump, thus no increment
-			last_pointer_on_list = NULL;//no correct reference needed
+			nb_of_occurences = 0;//no dump, thus no increment
+			last_pointer_on_list = local_list->cdr;//no correct reference needed
 		}
 		POP(local_list);
 	}
