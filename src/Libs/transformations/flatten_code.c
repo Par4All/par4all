@@ -753,3 +753,102 @@ bool split_initializations(string module_name)
 
   return (good_result_p);
 }
+
+static entity
+update_operator_to_operator(entity op)
+{
+#define CHECK_OP(OP,op) if(ENTITY_##OP##_UPDATE_P(op)) return entity_intrinsic(OP##_OPERATOR_NAME)
+    if(ENTITY_PLUS_UPDATE_P(op)) return entity_intrinsic(PLUS_C_OPERATOR_NAME);
+    if(ENTITY_MINUS_UPDATE_P(op)) return entity_intrinsic(MINUS_C_OPERATOR_NAME);
+    CHECK_OP(BITWISE_AND,op);
+    CHECK_OP(BITWISE_OR,op);
+    CHECK_OP(BITWISE_XOR,op);
+    CHECK_OP(DIVIDE,op);
+    CHECK_OP(MULTIPLY,op);
+    CHECK_OP(MODULO,op);
+    CHECK_OP(LEFT_SHIFT,op);
+    CHECK_OP(RIGHT_SHIFT,op);
+    return entity_undefined;
+#undef CHECK_OP
+}
+
+void
+split_update_call(call c)
+{
+    entity op = call_function(c);
+    list args = call_arguments(c);
+    entity new_op = update_operator_to_operator(op);
+    if(!entity_undefined_p(new_op))
+    {
+        if(ENTITY_PLUS_C_P(new_op)||ENTITY_MINUS_C_P(new_op))
+        {
+            bool has_pointer =false;
+            FOREACH(EXPRESSION,exp,call_arguments(c))
+            {
+                basic b = basic_of_expression(exp);
+                if(basic_pointer_p(b)) { has_pointer=true;}
+                free_basic(b);
+            }
+            if(!has_pointer) {
+                if(ENTITY_PLUS_C_P(new_op))new_op=entity_intrinsic(PLUS_OPERATOR_NAME);
+                else new_op=entity_intrinsic(MINUS_OPERATOR_NAME);
+            }
+        }
+        ifdebug(1){
+            expression tmp = call_to_expression(c);
+            pips_debug(1,"changed expression \n");
+            print_expression(tmp);
+            syntax_call(expression_syntax(tmp))=call_undefined;
+            free_expression(tmp);
+        }
+
+        call_function(c)=entity_intrinsic(ASSIGN_OPERATOR_NAME);
+        expression lhs = binary_call_lhs(c);
+        expression rhs = binary_call_rhs(c);
+        CAR(CDR(args)).p=(gen_chunkp)MakeBinaryCall(
+                new_op,
+                copy_expression(lhs),
+                rhs);
+
+        ifdebug(1){
+            expression tmp = call_to_expression(c);
+            pips_debug(1,"into expression \n");
+            print_expression(tmp);
+            syntax_call(expression_syntax(tmp))=call_undefined;
+            free_expression(tmp);
+        }
+    }
+}
+static void
+split_update_operator_statement_walker(statement s)
+{
+    FOREACH(ENTITY,e,statement_declarations(s))
+    {
+        value v = entity_initial(e);
+              if( !value_undefined_p(v) && value_expression_p( v ) )
+                 gen_recurse(v,call_domain,gen_true, split_update_call);
+    }
+}
+
+bool split_update_operator(string module_name)
+{
+  set_current_module_entity(module_name_to_entity(module_name));
+  set_current_module_statement( (statement)	db_get_memory_resource(DBR_CODE, module_name, TRUE) );
+  debug_on("SPLIT_UPDATE_OPERATOR_DEBUG_LEVEL");
+  pips_debug(1, "begin\n");
+
+  gen_multi_recurse(get_current_module_statement(),
+          call_domain,gen_true,split_update_call,
+          statement_domain,gen_true,split_update_operator_statement_walker,
+          NULL);
+
+  pips_debug(1, "end\n");
+  debug_off();
+
+  /* Save modified code to database */
+  DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, get_current_module_statement());
+
+  reset_current_module_entity();
+  reset_current_module_statement();
+  return true;
+}

@@ -175,8 +175,8 @@ words_dimension(dimension obj)
 	  call c = syntax_call(expression_syntax(eup));
 	  entity f = call_function(c);
 	  if(ENTITY_MINUS_P(f)||ENTITY_MINUS_C_P(f)){
-	    expression e1 = EXPRESSION(CAR(call_arguments(c)));
-	    expression e2 = EXPRESSION(CAR(CDR(call_arguments(c))));
+	    expression e1 = binary_call_lhs(c);
+	    expression e2 = binary_call_rhs(c);
 	    int i;
 
 	    if (expression_integer_value(e2, &i) && i==1)
@@ -1236,8 +1236,8 @@ static sentence sentence_data_statement(statement is)
       pips_assert("Pseudo-intrinsic REPEAT-VALUE must have two arguments",
 		  gen_length(call_arguments(vc))==2);
 
-      rfe = EXPRESSION(CAR(call_arguments(vc)));
-      rve = EXPRESSION(CAR(CDR(call_arguments(vc))));
+      rfe = binary_call_lhs(vc);
+      rve = binary_call_rhs(vc);
 
       if(!(integer_constant_expression_p(rfe) && expression_to_int(rfe)==1)) {
 	/* print out the repeat factor if it is not one */

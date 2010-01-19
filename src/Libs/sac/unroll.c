@@ -159,10 +159,10 @@ static void compute_parallelism_factor(statement s, MinMaxVar* factor)
     int varwidth = effective_variables_width(statement_instruction(s));
 
     /* see if the statement can be SIMDized */
-    MAP(MATCH, m,
+    FOREACH(MATCH, m,match_statement(s))
     {
         /* and if so, to what extent it may benefit from unrolling */
-        MAP(OPCODE, o,
+        FOREACH(OPCODE, o,opcodeClass_opcodes(match_type(m)))
         {
             if (get_subwordSize_from_opcode(o, 0) >= varwidth) //opcode may be used
             {
@@ -171,10 +171,8 @@ static void compute_parallelism_factor(statement s, MinMaxVar* factor)
                 if (opcode_vectorSize(o) < factor->min)
                     factor->min = opcode_vectorSize(o);
             }
-        },
-            opcodeClass_opcodes(match_type(m)));
-    },
-        match_statement(s));
+        }
+    }
 }
 
 static bool full_simd_unroll_loop_filter(statement s)
@@ -198,17 +196,16 @@ static bool full_simd_unroll_loop_filter(statement s)
     /* look at each of the statements in the body */
     factor.min = INT_MAX;
     factor.max = 1;
-    gen_context_recurse(loop_body(l), &factor, statement_domain, gen_true, 
-            compute_parallelism_factor);
+    gen_context_recurse(loop_body(l), &factor, statement_domain, gen_true, compute_parallelism_factor);
+    factor.min = factor.min > factor.max ? factor.max : factor.min;
+
 
     /* Decide between min and max unroll factor, and unroll */
-    if (get_bool_property("SIMD_AUTO_UNROLL_MINIMIZE_UNROLL"))
-        simd_loop_unroll(s, factor.min);
-    else
-        simd_loop_unroll(s, factor.max);
+    int unroll_rate = get_bool_property("SIMD_AUTO_UNROLL_MINIMIZE_UNROLL") ? factor.min : factor.max;
+    simd_loop_unroll(s, unroll_rate);
 
     /* Do not recursively analyse the loop */
-    return FALSE;
+    return false;
 }
 
 void simd_unroll_as_needed(statement module_stmt)
@@ -221,10 +218,13 @@ void simd_unroll_as_needed(statement module_stmt)
     }
     else
     {
-        init_tree_patterns();
-        init_operator_id_mappings();
+        set_simd_treematch((matchTree)db_get_memory_resource(DBR_SIMD_TREEMATCH,"",TRUE));
+        set_simd_operator_mappings(db_get_memory_resource(DBR_SIMD_OPERATOR_MAPPINGS,"",TRUE));
+
         gen_recurse(module_stmt, statement_domain, 
                 full_simd_unroll_loop_filter, gen_null);
+        reset_simd_treematch();
+        reset_simd_operator_mappings();
     }
 }
 

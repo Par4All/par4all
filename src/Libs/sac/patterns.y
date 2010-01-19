@@ -48,11 +48,14 @@ int patterns_yyerror(char* s);
 int patterns_yywrap(void);
 int patterns_yylex();
 
+static size_t opcode_argc =0;
+
 /* fake helpers */
 #define TOKEN_NEWGEN_DOMAIN (-1)
 #define ARGUMENT_NEWGEN_DOMAIN (-1)
 #define gen_TOKEN_cons(t,l) gen_cons(t,l)
 #define gen_ARGUMENT_cons(a,l) gen_cons(a,l)
+
 
 %}
 
@@ -161,9 +164,10 @@ definition:
        ;
  
 operation:
-       IDENTIFIER_TOK '[' INTEGER_TOK ']' '{' opcodes_list '}' 
+       IDENTIFIER_TOK  '{' opcodes_list '}' 
                                         {
-                                           insert_opcodeClass($1, $3, $6);
+                                           insert_opcodeClass($1, opcode_argc, $3);
+											opcode_argc=0;
                                         }
 
 opcodes_list:
@@ -171,9 +175,11 @@ opcodes_list:
      |                                  { $$ = NIL; }
 
 opcode:
-       IDENTIFIER_TOK ':' INTEGER_TOK ',' types_list ',' INTEGER_TOK ';'      
+       IDENTIFIER_TOK ':'  types_list ',' INTEGER_TOK ';'      
                                         { 
-                                           $$ = make_opcode($1, $3, $5, $7);
+											if(opcode_argc<=0)opcode_argc=gen_length($3);
+											else pips_assert("all opcode of the same operation have the same lenght\n",opcode_argc == gen_length($3));
+                                           $$ = generate_opcode($1, $3, $5);
                                         }
 
 pattern:

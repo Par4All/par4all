@@ -149,7 +149,7 @@ static void generate_scalar_variables_from_list(list lRef)
 	string name =
 	  strdup(entity_local_name(reference_variable((reference)curRef)));
 
-	basic bas = get_basic_from_array_ref((reference)curRef);
+	basic bas = basic_of_reference((reference)curRef);
 
 	pips_assert("bas != basic_undefined", bas != basic_undefined);
 
@@ -157,7 +157,7 @@ static void generate_scalar_variables_from_list(list lRef)
 
 	entity new_ent = make_new_scalar_variable_with_prefix(name,
 							      get_current_module_entity(),
-							      copy_basic(bas));
+							      bas);
 
 	//printf("%s\n", entity_user_name(new_ent));
 

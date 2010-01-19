@@ -47,8 +47,6 @@ typedef dg_vertex_label vertex_label;
 #include "preprocessor.h"
 #include "sac.h"
 
-bool simd_supported_stat(statement stat);
-
 //Creates a new entity to replace the given one
 static entity make_replacement_entity(entity e)
 {
@@ -133,8 +131,8 @@ static void single_assign_statement(graph dg) {
                 }
                 else if (l != NIL)
                 {
-                    if(simd_supported_stat(vertex_to_statement(a_vertex)) &&
-                            simd_supported_stat(vertex_to_statement(successor_vertex(suc))))
+                    if(simd_supported_stat_p(vertex_to_statement(a_vertex)) &&
+                            simd_supported_stat_p(vertex_to_statement(successor_vertex(suc))))
                     {
                         if (l == HASH_UNDEFINED_VALUE)
                             l = NIL;
@@ -262,6 +260,8 @@ bool single_assignment(char * mod_name)
 
     // Restore the warning
     hash_warn_on_redefinition();
+
+    clean_up_sequences(mod_stmt);
 
     pips_assert("Statement is consistent after SINGLE_ASSIGNMENT",
             statement_consistent_p(mod_stmt));

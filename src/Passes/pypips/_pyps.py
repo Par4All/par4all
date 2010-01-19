@@ -4,6 +4,7 @@ import os
 import shutil
 from string import split, upper, join
 
+pypips.atinit()
 
 class loop:
 	"""a loop represent a doloop of  module"""
@@ -89,14 +90,14 @@ class workspace:
 		for m in self.info("modules"):
 			self.modules[m]=module(self,m,self.sources[0])
 
-	def __init__(self,sources2,activates=[],verboseon=True):
+	def __init__(self,sources2,name="",activates=[],verboseon=True):
 		"""init a workspace from a list of sources"""
 		if not verboseon:self.set_property(USER_LOG_P=False)
-		workspace=os.path.basename(os.tempnam("","PYPS"))
+		workspace_name=os.path.basename(os.tempnam("","PYPS")) if name == "" else name
 		def helper(x,y):
 			return x+y if isinstance(y,list) else x +[y]
 		self.sources=reduce(helper,sources2,[])
-		pypips.create(workspace, self.sources)
+		pypips.create(workspace_name, self.sources)
 		self.modules = {}
 		if os.path.splitext(self.sources[0])[1] == ".c":
 			self.module_ext=".c"

@@ -46,6 +46,8 @@
 #include "misc.h"
 
 #include "resources.h"
+#include "effects-simple.h"
+#include "effects-generic.h"
 #include "reductions_private.h"
 #include "reductions.h"
 #include "transformations.h"
@@ -66,11 +68,12 @@
 
 typedef struct  {
     list loop_indices ;
+    list loop_replacement ;
     list loop_dimensions ;
     entity expanded_variable ;
     list processed_variables ;
 } scalar_expansion_context;
-#define DEFAULT_SCALAR_EXPANSION_CONTEXT { NIL,NIL,entity_undefined,NIL }
+#define DEFAULT_SCALAR_EXPANSION_CONTEXT { NIL,NIL,NIL,entity_undefined,NIL }
 
 static bool perform_reference_expansion(reference r,scalar_expansion_context *ctxt)
 {
@@ -83,7 +86,7 @@ static bool perform_reference_expansion(reference r,scalar_expansion_context *ct
 
     pips_debug(9, "for variable %s\n", entity_local_name(v));
 
-    reference_indices(r) = gen_copy_seq(ctxt->loop_indices);
+    reference_indices(r) = gen_copy_seq(ctxt->loop_replacement);
 
     ifdebug(9) {
       pips_debug(9, "New reference:");
@@ -104,7 +107,7 @@ perform_reference_expansion_in_loop(instruction i,scalar_expansion_context *ctxt
         range r = loop_range(l);
         if(same_entity_p(loop_index(l),ctxt->expanded_variable) ) 
         {
-            expression new_ref = make_ref_expr(ctxt->expanded_variable,gen_copy_seq(ctxt->loop_indices));
+            expression new_ref = make_ref_expr(ctxt->expanded_variable,gen_copy_seq(ctxt->loop_replacement));
             /* we have to convert the do-loop into a for-loop */
             forloop new_loop = make_forloop(
                     expression_undefined,
@@ -134,37 +137,51 @@ bool prepare_expansion(loop l, scalar_expansion_context* ctxt)
 {
     entity i = loop_index(l);
     range r = loop_range(l);
-    expression lb = range_lower(r);
-    expression ub = range_upper(r);
-    expression inc = range_increment(r);
-    int ilb = 0;
-    int iub = 0;
-    int iinc = 0;
 
     /* Is this loop OK? */
-    if(expression_integer_value(lb, &ilb)
-            && expression_integer_value(ub, &iub)
-            && expression_integer_value(inc, &iinc)
-            && (iinc==1 /* || iiinc==-1 */ )) {
-        dimension d = make_dimension(copy_expression(lb), copy_expression(ub));
-        expression ie = entity_to_expression(i);
-
-        /* Update information about the nesting loops. */
-        ctxt->loop_dimensions = gen_append(ctxt->loop_dimensions, CONS(DIMENSION, d, NIL));
-        ctxt->loop_indices = gen_append(ctxt->loop_indices, CONS(EXPRESSION, ie, NIL));
-
-        ifdebug(9) {
-            pips_debug(9, "Going down, local variables: ");
-            print_entities(loop_locals(l));
-            pips_debug(9, "\n");
+    bool should_copy=!expression_constant_p(range_lower(r));
+    expression init;
+    if(should_copy)
+    {
+        entity I = make_new_scalar_variable(get_current_module_entity(), expression_basic(range_lower(r)));
+        statement parent = (statement)gen_get_ancestor(statement_domain,l);
+        AddLocalEntityToDeclarations(I,get_current_module_entity(),parent);
+        insert_statement(parent,
+                make_assign_statement(entity_to_expression(I),copy_expression(range_lower(r))),true);
+        init=entity_to_expression(I);
+        list peffects = proper_effects_of_expression(range_lower(r));
+        if(!effects_write_at_least_once_p(peffects))
+        {
+            /* add variable to locals */
+            for(loop ll=l;ll; (ll=(loop)gen_get_ancestor(loop_domain,ll)))
+                loop_locals(ll)=CONS(ENTITY,I,loop_locals(ll));
         }
-        return true;
+        gen_full_free_list(peffects);
+
+
     }
+    else
+        init=copy_expression(range_lower(r));
+    dimension d = make_dimension(make_expression_0(), make_op_exp("-",range_to_expression(r,range_to_nbiter),make_expression_1()));
+    expression ie = entity_to_expression(i);
+    expression ir = make_op_exp(
+                "-",
+                make_op_exp("/",entity_to_expression(i),copy_expression(range_increment(r))),
+                copy_expression(init)
+            );
 
-    /* If go down is FALSE here, we should reset loop_indices and
-       loop_dimensions and go down anyway.*/
+    /* Update information about the nesting loops. */
+    ctxt->loop_dimensions = gen_append(ctxt->loop_dimensions, CONS(DIMENSION, d, NIL));
+    ctxt->loop_indices = gen_append(ctxt->loop_indices, CONS(EXPRESSION, ie, NIL));
+    ctxt->loop_replacement = gen_append(ctxt->loop_replacement, CONS(EXPRESSION, ir, NIL));
 
-    return false;
+    ifdebug(9) {
+        pips_debug(9, "Going down, local variables: ");
+        print_entities(loop_locals(l));
+        pips_debug(9, "\n");
+    }
+    return true;
+
 }
 
 static void perform_expansion_and_unstack_index_and_dimension(loop l,scalar_expansion_context* ctxt)
@@ -174,6 +191,7 @@ static void perform_expansion_and_unstack_index_and_dimension(loop l,scalar_expa
     /* Select loops marked as relevant on the way down. */
     if(!ENDP(ctxt->loop_indices)) {
         expression eli = EXPRESSION(CAR(gen_last(ctxt->loop_indices)));
+        expression elr = EXPRESSION(CAR(gen_last(ctxt->loop_replacement)));
         if(same_entity_p(i,reference_variable(expression_reference(eli)))) {
             dimension d = DIMENSION(CAR(gen_last(ctxt->loop_dimensions)));
             list evl = NIL;
@@ -223,6 +241,7 @@ static void perform_expansion_and_unstack_index_and_dimension(loop l,scalar_expa
             ctxt->processed_variables = gen_append(ctxt->processed_variables, CONS(ENTITY, i, NIL));
 
             gen_remove(&ctxt->loop_indices, (void *) eli);
+            gen_remove(&ctxt->loop_replacement, (void *) elr);
             gen_remove(&ctxt->loop_dimensions, (void *) d);
             free_dimension(d);
         }
@@ -285,18 +304,24 @@ bool variable_expansion(char *module_name)
   return scalar_expansion(module_name);
 }
 
+typedef struct {
+    entity old;
+    entity new;
+    expression index;
+} er;
 /** 
  * if @a r entity is the same as  @a oni[0], repalce the entity by @a oni[1] and append the index @a oni[2]
  * 
  * @param r reference to check
  * @param oni [0] old entity to be replaced by [1] with [2] additionnal index
  */
-static void do_expand_reference(reference r, entity oni[3])
+static void do_expand_reference(reference r, er *e)
 {
-    if(same_entity_p(reference_variable(r),oni[0]))
+    if(same_entity_p(reference_variable(r),e->old))
     {
-        reference_variable(r)=oni[1];
-        reference_indices(r)=gen_append(reference_indices(r),CONS(EXPRESSION,entity_to_expression(oni[2]),NIL));
+        reference_variable(r)=e->new;
+        gen_full_free_list(reference_indices(r));
+        reference_indices(r)=CONS(EXPRESSION,copy_expression(e->index),NIL);
     }
 }
 
@@ -307,7 +332,7 @@ static void do_expand_reference(reference r, entity oni[3])
  * @param oni forwarded to do_expand_reference
  */
 static
-void do_expand_reference_in_declarations(statement s, entity oni[3])
+void do_expand_reference_in_declarations(statement s, entity oni[])
 {
     FOREACH(ENTITY,e,statement_declarations(s))
     {
@@ -343,7 +368,7 @@ bool reduction_variable_expansion(char *module_name) {
             /* convert the loop range to an expression */
             loop theloop = statement_loop(theloopstatement);
             expression loop_nbiters = range_to_expression(loop_range(theloop),range_to_nbiter);
-            dimension thedim = make_dimension(int_to_expression(0),make_op_exp(MINUS_OPERATOR_NAME,loop_nbiters,int_to_expression(1)));
+            dimension thedim = make_dimension(make_expression_0(),make_op_exp(MINUS_OPERATOR_NAME,loop_nbiters,make_expression_1()));
 
             /* used to keep track of reference <> expanded reference */
             hash_table new_entities = hash_table_make(hash_pointer,HASH_DEFAULT_SIZE);
@@ -357,26 +382,54 @@ bool reduction_variable_expansion(char *module_name) {
                 /* check if the reduction entity has already been processed before creating the new entity */
                 if(HASH_UNDEFINED_VALUE == (new_entity = hash_get(new_entities,reduction_entity)) )
                 {
+
                     /* the new entity is expanded from the reduction entity */
                     new_entity = make_new_array_variable_with_prefix(
                             "RED",
                             get_current_module_entity(),
                             entity_basic(reduction_entity),
-                            gen_append(gen_full_copy_list(variable_dimensions(type_variable(entity_type(reduction_entity)))),CONS(DIMENSION,copy_dimension(thedim),NIL))
+                            CONS(DIMENSION,copy_dimension(thedim),NIL)
                             );
                     AddEntityToCurrentModule(new_entity);
 
+
                     /* perform the expansion */
-                    entity oni [] = { reduction_entity, new_entity, loop_index(theloop) };
-                    gen_context_multi_recurse(theloop,oni,
+                    er _er_ = {
+                        reduction_entity,
+                        new_entity,
+                        make_op_exp("-",
+                                make_op_exp("/",entity_to_expression(loop_index(theloop)),copy_expression(range_increment(loop_range(theloop)))),
+                                copy_expression(range_lower(loop_range(theloop)))
+                               )
+
+                    };
+                    gen_context_multi_recurse(theloop,&_er_,
                             reference_domain,gen_true,do_expand_reference,
                             statement_domain,gen_true,do_expand_reference_in_declarations,
                             NULL);
+                    free_expression(_er_.index);
+
                     /* register the entity */
                     hash_put(new_entities,reduction_entity,new_entity);
                 }
 
-                /* create the loop that performs the reduction */
+                    /* create the assigment that put the good value at the beginning of the reduction,
+                     * the choice of the good value is not trivial, it should be the neutral element for the reduction operation
+                     * if we find a reference to our reduction before any control code, we have nothing to do ! */
+                instruction do_the_assignment = make_instruction_loop(
+                        make_loop(
+                            loop_index(theloop),
+                            copy_range(loop_range(theloop)),
+                            make_assign_statement(
+                                reference_to_expression(make_reference(new_entity,make_expression_list(make_expression_from_entity(loop_index(theloop))))),
+                                entity_to_expression(operator_neutral_element(reduction_operator_entity(reduction_op(red))))),
+                            entity_empty_label(),
+                            make_execution_sequential(),
+                            NIL)
+                        );
+                insert_statement( theloopstatement,instruction_to_statement(do_the_assignment),true);
+
+                /* create  two loops: one for the init, for the reduction */
                 instruction do_the_reduction = make_instruction_loop(
                         make_loop(
                             loop_index(theloop),
@@ -395,10 +448,11 @@ bool reduction_variable_expansion(char *module_name) {
                         );
                 /* append it */
                 trailing_statements=CONS(STATEMENT,instruction_to_statement(do_the_reduction),trailing_statements);
+
             }
             pips_assert("some entity were created",!hash_table_empty_p(new_entities));
             pips_assert("new statement were created",!ENDP(trailing_statements));
-            /* create trailing statement and appedn them */
+            /* create trailing statement and append them */
             statement all_trailining_statements = make_block_statement(trailing_statements);
             insert_statement(theloopstatement,all_trailining_statements,false);
 

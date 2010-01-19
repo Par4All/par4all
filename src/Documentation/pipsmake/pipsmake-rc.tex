@@ -4964,6 +4964,8 @@ alias simd_atomizer 'SIMD Atomizer'
 
 simd_atomizer                      > MODULE.code
         < PROGRAM.entities
+		< PROGRAM.simd_treematch
+		< PROGRAM.simd_operator_mappings
         < MODULE.code
 \end{PipsMake}
 
@@ -4995,6 +4997,8 @@ the optimal unroll factor, allowing to pack the most instructions together.
 alias simdizer_auto_unroll 'SIMD-Auto Unroll'
 
 simdizer_auto_unroll        > MODULE.code
+		< PROGRAM.simd_treematch
+		< PROGRAM.simd_operator_mappings
         < PROGRAM.entities
         < MODULE.code
 \end{PipsMake}
@@ -5039,21 +5043,20 @@ phase: \PipsPassRef{if_conversion_init}, \PipsPassRef{if_conversion} and
 \PipsPassRef{if_conversion_compact}.
 \end{PipsPass}
 
+Use \PipsPropRef{IF_CONVERSION_INIT_THRESHOLD} to control wether if conversion will occur or not:
+beyhond this number of call, no conversion is done.
+\begin{PipsProp}{IF_CONVERSION_INIT_THRESHOLD}
+IF_CONVERSION_INIT_THRESHOLD 40
+\end{PipsProp}
+
 \begin{PipsMake}
 alias if_conversion_init 'If-conversion init'
 
 if_conversion_init                  > MODULE.code
         < PROGRAM.entities
         < MODULE.code
-        < MODULE.proper_effects
-        < MODULE.dg
         < MODULE.summary_complexity
 \end{PipsMake}
-% +if_conversion_init > MODULE.code
-% +        > MODULE.calles
-% +        < PROGRAM.entities
-% +        < MODULE.code
-% +        < MODULE.complexities
 
 \begin{PipsPass}{if_conversion}
 This phase is the second phase of the if-conversion algorithm. The
@@ -5062,6 +5065,10 @@ following phase: \PipsPassRef{if_conversion_init}, \PipsPassRef{if_conversion} a
 \PipsPassRef{if_conversion_compact}.
 \end{PipsPass}
 
+\begin{PipsProp}{IF_CONVERSION_PHI}
+IF_CONVERSION_PHI "__C-conditional__"
+\end{PipsProp}
+
 \begin{PipsMake}
 alias if_conversion 'If-conversion'
 
@@ -5069,13 +5076,7 @@ if_conversion                  > MODULE.code
         < PROGRAM.entities
         < MODULE.code
         < MODULE.proper_effects
-        < MODULE.dg
 \end{PipsMake}
-% +if_conversion > MODULE.code
-% +        > MODULE.calles
-% +        < PROGRAM.entities
-% +        < MODULE.code
-% +        < MODULE.dg
 
 \begin{PipsPass}{if_conversion_compact}
 This phase is the third phase of the \emph{if-conversion} algorithm. The
@@ -5115,6 +5116,19 @@ single_assignment           > MODULE.code
         < MODULE.dg
 \end{PipsMake}%$
 
+\begin{PipsPass}{simd_treematcher}
+This function initialize a treematch used by \PipsPassRef{simdizer} for simd-oriented pattern matching
+\end{PipsPass}
+\begin{PipsMake}
+simd_treematcher > PROGRAM.simd_treematch
+\end{PipsMake}
+\begin{PipsPass}{simd_operator_mappings}
+This function initialize operator matchings used by \PipsPassRef{simdizer} for simd-oriented pattern matching
+\end{PipsPass}
+\begin{PipsMake}
+simd_operator_mappings > PROGRAM.simd_operator_mappings
+\end{PipsMake}
+
 \begin{PipsPass}{simdizer}
 Function \PipsPassRef{simdizer} is an attempt at generating SIMD code for SIMD
 multimedia instruction set such as MMX, SSE2, VIS,... This
@@ -5127,10 +5141,17 @@ alias simdizer 'Generate SIMD code'
 
 simdizer                    > MODULE.code
                             > MODULE.callees
+		< PROGRAM.simd_treematch
+		< PROGRAM.simd_operator_mappings
         < PROGRAM.entities
         < MODULE.code
         < MODULE.dg
 \end{PipsMake}
+
+When set to true, following property tells the simdizer to try to padd arrays when it seems to be profitable
+\begin{PipsProp}{SIMDIZER_ALLOW_PADDING}
+SIMDIZER_ALLOW_PADDING FALSE
+\end{PipsProp}
 
 
 \begin{PipsPass}{simd_loop_const_elim}
@@ -7380,6 +7401,7 @@ forward_substitute      > MODULE.code
         < PROGRAM.entities
         < MODULE.code
         < MODULE.proper_effects
+        < MODULE.dg
         < MODULE.cumulated_effects
 \end{PipsMake}
 
@@ -7541,6 +7563,12 @@ EOLE_OPTIONS ""
 \end{PipsProp}
 \begin{PipsProp}{EOLE_OPTIMIZATION_STRATEGY}
 EOLE_OPTIMIZATION_STRATEGY "P2SC"
+\end{PipsProp}
+
+Following property is used in sac to limit the subexpressions:
+iWhen set to true, only subexpressions without "+constant" terms are eligible.
+\begin{PipsProp}{COMMON_SUBEXPRESSION_ELIMINATION_SKIP_ADDED_CONSTANT}
+COMMON_SUBEXPRESSION_ELIMINATION_SKIP_ADDED_CONSTANT FALSE
 \end{PipsProp}
 
 %-----------End of Expression Transformations -------------------------
@@ -8070,6 +8098,16 @@ flatten_code > MODULE.code
         < MODULE.code
 \end{PipsMake}
 
+\subsection{Split Update Operator}
+
+\begin{PipsPass}{split_update_operator}
+Split C operators such as +=, *= >>= into their expanded form = ... +
+\end{PipsPass}
+\begin{PipsMake}
+split_update_operator > MODULE.code
+        < PROGRAM.entities
+        < MODULE.code
+\end{PipsMake}
 
 \subsection{Split Initializations (C code)}
 

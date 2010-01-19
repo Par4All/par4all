@@ -34,7 +34,7 @@ PY_TARGET=pyps.py $(PYTHON_MODULE).py pipscc.py pii.py
 BIN_TARGET=pipscc
 
 
-DYNLIB_OBJECTS=$(PYTHON_MODULE)_wrap.o $(PYTHON_MODULE).o
+DYNLIB_OBJECTS=the_$(PYTHON_MODULE)_wrap.o $(PYTHON_MODULE).o
 
 PROJECT = pips
 include $(ROOT)/makes/main.mk
@@ -53,12 +53,18 @@ pyps-install:setup.py
 $(PYTHON_MODULE).h:$(PYTHON_MODULE).c
 	$(PROTOIZE) $< > $@
 	echo "extern char *activate(char *phase);" >> $@
+	echo "extern int delete_workspace(char *phase);" >> $@
 
 $(PYTHON_MODULE).i:$(PYTHON_MODULE).i.in $(PYTHON_MODULE).h
 	sed -e 's/SWIG_MODULE_NAME/$(PYTHON_MODULE)/' $^ > $@
 
+
 $(PYTHON_MODULE)_wrap.c:$(PYTHON_MODULE).i
 	swig -python $<
+
+the_$(PYTHON_MODULE)_wrap.c:$(PYTHON_MODULE).h $(PYTHON_MODULE)_wrap.c
+	cat $^ > $@
+
 
 
 $(PYTHON_MODULE).py:$(PYTHON_MODULE).i

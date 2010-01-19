@@ -86,8 +86,6 @@ extern hash_table gRefToHREFifo;
 // HRE variable
 hash_table gRefToHREVar;
 
-basic get_basic_from_array_ref(reference ref);
-
 /*
 This function returns an constant expression whose value is the fifo
 number associated to reference ref.
@@ -372,13 +370,13 @@ static void generate_scalar_variables()
 
 	string name = strdup(entity_local_name(reference_variable((reference)curRef)));
 
-	basic bas = get_basic_from_array_ref((reference)curRef);
+	basic bas = basic_of_reference((reference)curRef);
 
 	pips_assert("bas != basic_undefined", bas != basic_undefined);
 
 	entity new_ent = make_new_scalar_variable_with_prefix(name,
 							      get_current_module_entity(),
-							      copy_basic(bas));
+							      bas);
 
 	hash_put(gRefToHREVar, curRef, new_ent);
 

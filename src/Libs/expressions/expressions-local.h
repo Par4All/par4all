@@ -21,6 +21,8 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+#ifndef EXPRESSION_H_
+#define EXPRESSION_H_
 /*
  * for partial_eval.c:
  *
@@ -37,3 +39,4 @@ struct eformat {
 };
 
 typedef struct eformat eformat_t;
+#endif

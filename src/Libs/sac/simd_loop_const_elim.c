@@ -55,6 +55,7 @@ static graph dependence_graph;
 
 
 #define same_stringn_p(a,b,c) (!strncmp((a),(b),(c)))
+#define SIZEOFSTRING(s) (sizeof((s))-1)
 
 
 bool simd_save_stat_p(statement stat)
@@ -63,9 +64,9 @@ bool simd_save_stat_p(statement stat)
     {
 
         string funcName = entity_local_name(call_function(statement_call(stat)));
-        return    same_stringn_p(funcName, SIMD_SAVE_NAME, SIMD_SAVE_SIZE)
-               || same_stringn_p(funcName, SIMD_GEN_SAVE_NAME, SIMD_GEN_SAVE_SIZE)
-               || same_stringn_p(funcName, SIMD_CONS_SAVE_NAME, SIMD_CONS_SAVE_SIZE);
+        return    same_stringn_p(funcName, SIMD_SAVE_NAME, SIZEOFSTRING(SIMD_SAVE_NAME))
+               || same_stringn_p(funcName, SIMD_GEN_SAVE_NAME, SIZEOFSTRING(SIMD_GEN_SAVE_NAME))
+               || same_stringn_p(funcName, SIMD_CONS_SAVE_NAME, SIZEOFSTRING(SIMD_CONS_SAVE_NAME));
     }
     else
     {
@@ -78,9 +79,9 @@ bool simd_load_stat_p(statement stat)
     {
 
         string funcName = entity_local_name(call_function(statement_call(stat)));
-        return    same_stringn_p(funcName, SIMD_LOAD_NAME, SIMD_LOAD_SIZE)
-               || same_stringn_p(funcName, SIMD_GEN_LOAD_NAME, SIMD_GEN_LOAD_SIZE)
-               || same_stringn_p(funcName, SIMD_CONS_LOAD_NAME, SIMD_CONS_LOAD_SIZE);
+        return    same_stringn_p(funcName, SIMD_LOAD_NAME, SIZEOFSTRING(SIMD_LOAD_NAME))
+               || same_stringn_p(funcName, SIMD_GEN_LOAD_NAME, SIZEOFSTRING(SIMD_GEN_LOAD_NAME))
+               || same_stringn_p(funcName, SIMD_CONS_LOAD_NAME,SIZEOFSTRING(SIMD_CONS_LOAD_NAME));
     }
     else
     {
@@ -101,7 +102,7 @@ bool simd_loadsave_stat_p(statement stat)
 bool simd_stat_p(statement stat)
 {
     return statement_call_p(stat)
-        && same_stringn_p( entity_local_name(call_function(statement_call(stat))) , SIMD_NAME, SIMD_SIZE);
+        && same_stringn_p( entity_local_name(call_function(statement_call(stat))) , SIMD_NAME, SIZEOFSTRING(SIMD_NAME));
 }
 
 /* This function checks if two list of expression are equals (modulo the & operator)
@@ -172,6 +173,7 @@ static bool index_argument_conflict(list args, list l_reg)
                                 same_entity_p(effect_entity(indEff), effect_entity(loopEff)))
                         {
                             gen_free_list(ef);
+                            pips_debug(1,"depend on loop index !\n");
                             return TRUE;
                         }
                     }
@@ -186,12 +188,13 @@ static bool index_argument_conflict(list args, list l_reg)
     return FALSE;
 }
 
+
+
 /* This function returns true if the arguments of the simd statement theStat do
  * not depend on the loop iteration
  */
 static bool constant_argument_list_p(list args, statement theStat, list forstats, list l_reg)
 {
-    bool bConstArg = TRUE;
     /* consider each vertex */
     FOREACH(VERTEX, a_vertex, graph_vertices(dependence_graph) )
     {
@@ -206,7 +209,7 @@ static bool constant_argument_list_p(list args, statement theStat, list forstats
             statement stat2 = vertex_to_statement(successor_vertex(suc));
 
             /* skip if the successor is not in the loop body */
-            if ((gen_find_eq(stat2, forstats) != gen_chunk_undefined) && (stat1 != stat2))
+            if (statement_in_statements_p(stat2, forstats)  && (stat1 != stat2))
             {
 
                 FOREACH(CONFLICT, c,dg_arc_label_conflicts(successor_arc_label(suc)) )
@@ -215,7 +218,9 @@ static bool constant_argument_list_p(list args, statement theStat, list forstats
                     // If stat2 is not a simd statement, then return FALSE
                     if(!simd_stat_p(stat2))
                     {
-                        bConstArg = FALSE;
+                        pips_debug(1,"conflicting with:\n");
+                        ifdebug(1) { print_statement(stat2); }
+                        return false;
                     }
                     // If stat2 is a loadsave statement and that there is a conflict
                     // between the arguments of
@@ -223,15 +228,29 @@ static bool constant_argument_list_p(list args, statement theStat, list forstats
                             && !list_eq_expression(args, CDR(call_arguments(statement_call(stat2))),true)
                            )
                     {
-                        bConstArg = FALSE;
+                        pips_debug(1,"conflicting with:\n");
+                        ifdebug(1) { print_statement(stat2); }
+                        return false;
                     }
-                    break;
+                    else
+                    {
+                        pips_debug(1,"conflict avoided with outer statement\n");
+                        ifdebug(1) { print_statement(stat2); }
+                    }
+                }
+            }
+            else
+            {
+                if( (stat1 != stat2))
+                {
+                    pips_debug(1,"conflict avoided with outer statement\n");
+                    ifdebug(1) { print_statement(stat2); }
                 }
             }
         }
     }
 
-    return bConstArg && !index_argument_conflict(args, l_reg);
+    return  !index_argument_conflict(args, l_reg);
 }
 
 /* This function searches for simd load or save statements that can be
@@ -244,6 +263,9 @@ static bool searchForConstArgs(statement body, hash_table constArgs, list l_reg)
     {
         FOREACH(STATEMENT, curStat, statement_block(body) )
         {
+            pips_debug(1,"examining statement:\n");
+            ifdebug(1) { print_statement(curStat); }
+
             // If if it is a simd load or save statement, ...
             if(simd_loadsave_stat_p(curStat))
             {
@@ -255,8 +277,12 @@ static bool searchForConstArgs(statement body, hash_table constArgs, list l_reg)
                  */
                 if(constant_argument_list_p(args, curStat, statement_block(body), l_reg))
                 {
+                    pips_debug(1,"no conflict ^^\n");
                     hash_put(constArgs, curStat, args);
                 }
+            }
+            else {
+                pips_debug(1,"not a save / load statement !\n");
             }
         }
         return TRUE;
@@ -388,13 +414,13 @@ bool simd_loop_const_elim(char * module_name)
 
     dependence_graph = (graph) db_get_memory_resource(DBR_DG, module_name, TRUE);
 
-    debug_on("SIMD_LOOP_CONST_ELIM_SCALAR_EXPANSION_DEBUG_LEVEL");
+    debug_on("SIMD_LOOP_CONST_ELIM_DEBUG_LEVEL");
 
     /* Go through all the statements */
     gen_recurse(module_stat, statement_domain,
             gen_true, simd_loop_const_elim_rwt);
 
-    pips_assert("Statement is consistent after SIMD_SCALAR_EXPANSION",
+    pips_assert("Statement is consistent after SIMD_LOOP_CONST_ELIM",
             statement_consistent_p(module_stat));
 
     module_reorder(module_stat);

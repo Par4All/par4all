@@ -36,6 +36,7 @@
 
 #include "resources.h"
 #include "pipsdbm.h"
+#include "control.h"
 
 #include "eole_private.h"
 
@@ -872,7 +873,7 @@ static bool inv_call_flt(call c)
 	   * cannot be shared and are not "named" as statements are. FC.
 	   */
 	  expression tmp = call_to_expression(c);
-	  basic b =  please_give_me_a_basic_for_an_expression(tmp);
+	  basic b =  basic_of_expression(tmp);
 	  if (basic_int_p(b)) doit = FALSE;
 	  syntax_call(expression_syntax(tmp)) = call_undefined;
 	  free_expression(tmp);
@@ -1389,6 +1390,7 @@ bool optimize_expressions(string module_name)
      */
           
     /* check consistency after optimizations */
+    clean_up_sequences(s);
     pips_assert("consistency checking after optimizations",
 		statement_consistent_p(s));
 

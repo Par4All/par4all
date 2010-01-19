@@ -63,6 +63,25 @@ static int nbAllocatedArguments = 0;
 
 static float gSimdCost;
 
+static entity _padding_entity_ = entity_undefined;
+
+void init_padding_entities() {
+    pips_assert("no previously defined table",entity_undefined_p(_padding_entity_));
+}
+void reset_padding_entities() {
+    _padding_entity_=entity_undefined;
+}
+
+entity get_padding_entity() {
+    if(entity_undefined_p(_padding_entity_))
+    {
+        _padding_entity_=make_scalar_entity(SAC_PADDING_ENTITY_NAME,get_current_module_name(),make_basic_overloaded());
+        AddEntityToCurrentModule(_padding_entity_);
+    }
+    return _padding_entity_;
+}
+
+
 /* expression is an simd vector
  * if it is a reference array
  * containing VECTOR_POSTFIX in its name
@@ -77,6 +96,57 @@ bool simd_vector_p(expression e)
         && type_variable_p(entity_type(reference_variable(syntax_reference(s))))
         && ! ENDP( variable_dimensions(type_variable(entity_type(reference_variable(syntax_reference(s))))))
     ;
+}
+
+/* a padding statement as all its expression set to 1, a constant, 
+ * event the fist one, that is the lhs of the assignement */
+
+static list padded_simd_statement_p(simdStatementInfo ssi)
+{
+    statementArgument * ssa = simdStatementInfo_arguments(ssi);
+    /* we have to check the assignment expression, if it is a constant, then it results from padding */
+    list padded_statements = NIL;
+    int vs = opcode_vectorSize(simdStatementInfo_opcode(ssi));
+    for(int i=vs*simdStatementInfo_nbArgs(ssi)-1;i>=0;i-=vs)
+    {
+        statementArgument ssa_to_check = ssa[i];
+        expression essa = statementArgument_expression(ssa_to_check);
+        padded_statements=CONS(BOOL,
+                expression_constant_p(essa) ||
+                (expression_reference_p(essa)&&same_string_p(entity_user_name(reference_variable(expression_reference(essa))),SAC_PADDING_ENTITY_NAME)),
+                padded_statements);
+    }
+    pips_assert("processed all arguments",gen_length(padded_statements)==(size_t)simdStatementInfo_nbArgs(ssi));
+    return padded_statements;
+}
+
+static bool all_padded_p(list padding)
+{
+    for(list iter=padding;!ENDP(iter);POP(iter))
+    {
+        bool b = BOOL(CAR(iter));
+        if(!b)
+            return false;
+    }
+    return true;
+}
+
+static void patch_all_padded_simd_statements(simdStatementInfo ssi)
+{
+    list paddings = padded_simd_statement_p(ssi);
+    if(all_padded_p(paddings))
+    {
+        statementArgument * ssa = simdStatementInfo_arguments(ssi);
+        int vs = opcode_vectorSize(simdStatementInfo_opcode(ssi));
+        for(int i=vs*simdStatementInfo_nbArgs(ssi)-1;i>=0;i-=vs)
+        {
+            statementArgument ssa_to_change = ssa[i];
+            free_syntax(expression_syntax(statementArgument_expression(ssa_to_change)));
+            expression_syntax(statementArgument_expression(ssa_to_change))=make_syntax_reference(make_reference(get_padding_entity(),NIL));
+        }
+
+    }
+    gen_free_list(paddings);
 }
 
 entity vectorElement_vector(vectorElement ve)
@@ -95,7 +165,7 @@ int vectorElement_vectorLength(vectorElement ve)
    This function return the basic corresponding to the argNum-th
    argument of opcode oc
    */
-int get_basic_from_opcode(opcode oc, int argNum)
+enum basic_utype get_basic_from_opcode(opcode oc, int argNum)
 {
     int type = INT(gen_nth(argNum, opcode_argType(oc)));
 
@@ -120,6 +190,7 @@ int get_basic_from_opcode(opcode oc, int argNum)
     return is_basic_int;
 }
 
+
 int get_subwordSize_from_opcode(opcode oc, int argNum)
 {
     int type = INT(gen_nth(argNum, opcode_argType(oc)));
@@ -143,6 +214,23 @@ int get_subwordSize_from_opcode(opcode oc, int argNum)
     }
 
     return 8;
+}
+
+/* auto-guess vector size */
+opcode generate_opcode(string name, list types, float cost)
+{
+    intptr_t elem_size=0,vector_size = get_int_property("SAC_SIMD_REGISTER_WIDTH");
+    opcode oc =  make_opcode(name,vector_size,types,cost);
+    int n = gen_length(types);
+    for(int i=0; i<n;i++)
+    {
+        int curr = get_subwordSize_from_opcode(oc,i);
+        if(curr > elem_size) elem_size=curr;
+    }
+    opcode_vectorSize(oc)/=elem_size;
+    if( opcode_vectorSize(oc) * elem_size !=get_int_property("SAC_SIMD_REGISTER_WIDTH"))
+        pips_user_warning("SAC_SIMD_REGISTER_WIDTH and description of %s leads to partially filled register\n");
+    return oc;
 }
 
 int get_subwordSize_from_vector(entity vec)
@@ -188,8 +276,6 @@ static opcode get_optimal_opcode(opcodeClass kind, int argc, list* args)
 
             FOREACH(EXPRESSION,arg,args[i])
             {
-                int bTag;
-                basic bas;
 
                 if (!expression_reference_p(arg))
                 {
@@ -197,23 +283,23 @@ static opcode get_optimal_opcode(opcodeClass kind, int argc, list* args)
                     continue;
                 }
 
-                bas = get_basic_from_array_ref(expression_reference(arg));
-                bTag = basic_tag(bas);
+                basic bas = basic_of_expression(arg);
 
-                if((bTag != get_basic_from_opcode(oc, count)) &&
-                        (bTag != is_basic_logical))
+                if(!basic_overloaded_p(bas) && get_basic_from_opcode(oc, count)!=basic_tag(bas))
                 {
                     bTagDiff = TRUE;
+                    free_basic(bas);
                     break;
                 }
 
-                switch(bTag)
+                switch(basic_tag(bas))
                 {
                     case is_basic_int: width = 8 * basic_int(bas); break;
                     case is_basic_float: width = 8 * basic_float(bas); break;
                     case is_basic_logical: width = 1; break;
-                    default: pips_user_error("basic %d not supported",bTag);
+                    default: pips_user_error("basic %d not supported",basic_tag(bas));
                 }
+                free_basic(bas);
 
                 if(width > get_subwordSize_from_opcode(oc, count))
                 {
@@ -315,7 +401,7 @@ bool analyse_reference(reference r, referenceInfo i)
                             // "If r is A(EXP + 3), e should contain 3"
                             case is_syntax_call:
                                 {
-                                    referenceInfo_lExp(i) = CONS(EXPRESSION, EXPRESSION(CAR(arg)), referenceInfo_lExp(i));
+                                    referenceInfo_lExp(i) = gen_cons(EXPRESSION(CAR(arg)), referenceInfo_lExp(i));//SG gen_cons by passes type check
 
                                     call cc = syntax_call(e);
 
@@ -335,7 +421,7 @@ bool analyse_reference(reference r, referenceInfo i)
                                 // "If r is A(EXP1 + EXP2), e should contain EXP2"
                             case is_syntax_reference:
                                 {
-                                    referenceInfo_lExp(i) = CONS(EXPRESSION, exp, referenceInfo_lExp(i));
+                                    referenceInfo_lExp(i) = gen_cons( exp, referenceInfo_lExp(i));
                                     referenceInfo_lOffset(i) = CONS(INT, 0, referenceInfo_lOffset(i));
                                     break;
                                 }
@@ -360,7 +446,7 @@ bool analyse_reference(reference r, referenceInfo i)
                         {
                             case is_syntax_call:
                                 {
-                                    referenceInfo_lExp(i) = CONS(EXPRESSION, EXPRESSION(CAR(arg)), referenceInfo_lExp(i));
+                                    referenceInfo_lExp(i) = gen_cons( EXPRESSION(CAR(arg)), referenceInfo_lExp(i));
 
                                     call cc = syntax_call(e);
 
@@ -378,7 +464,7 @@ bool analyse_reference(reference r, referenceInfo i)
 
                             case is_syntax_reference:
                                 {
-                                    referenceInfo_lExp(i) = CONS(EXPRESSION, exp, referenceInfo_lExp(i));
+                                    referenceInfo_lExp(i) = gen_cons( exp, referenceInfo_lExp(i));
                                     referenceInfo_lOffset(i) = CONS(INT, 0, referenceInfo_lOffset(i));
                                     break;
                                 }
@@ -391,7 +477,7 @@ bool analyse_reference(reference r, referenceInfo i)
                     // If nothing special has been detected
                     else
                     {
-                        referenceInfo_lExp(i) = CONS(EXPRESSION, exp, referenceInfo_lExp(i));
+                        referenceInfo_lExp(i) = gen_cons( exp, referenceInfo_lExp(i));
                         referenceInfo_lOffset(i) = CONS(INT, 0, referenceInfo_lOffset(i));
                     }
                     break;
@@ -399,7 +485,7 @@ bool analyse_reference(reference r, referenceInfo i)
 
                 // If nothing special has been detected
             case is_syntax_reference:
-                referenceInfo_lExp(i) = CONS(EXPRESSION, exp, referenceInfo_lExp(i));
+                referenceInfo_lExp(i) = gen_cons( exp, referenceInfo_lExp(i));
                 referenceInfo_lOffset(i) = CONS(INT, 0, referenceInfo_lOffset(i));
                 break;
 
@@ -599,7 +685,9 @@ static string get_simd_vector_type(list lExp)
             result = strdup(entity_name(
                         reference_variable(syntax_reference(expression_syntax(exp)))
                         ));
-            *strrchr(result,'_')='\0';
+            string c = strrchr(result,'_');
+            pips_assert("searching in a sec - encoded variable name",c);
+            *c='\0';
             /* switch to upper cases... */
             result=strupper(result,result);
 
@@ -621,7 +709,7 @@ static string get_vect_name_from_data(int argc, expression exp)
     basic bas;
     int itemSize;
 
-    bas = get_basic_from_array_ref(syntax_reference(expression_syntax(exp)));
+    bas = basic_of_expression(exp);
 
     prefix[0] = 'v';
     prefix[1] = '0'+argc;
@@ -647,6 +735,7 @@ static string get_vect_name_from_data(int argc, expression exp)
             return strdup("");
             break;
     }
+    free_basic(bas);
 
     switch(itemSize)
     {
@@ -701,23 +790,28 @@ statement make_exec_statement_from_opcode(opcode oc, list args)
     return make_exec_statement_from_name( opcode_name(oc) , args );
 }
 
-static statement make_loadsave_statement(int argc, list args, bool isLoad)
+
+static statement make_loadsave_statement(int argc, list args, bool isLoad, list padded)
 {
     enum {
         CONSEC_REFS,
+        MASKED_CONSEC_REFS,
         CONSTANT,
         OTHER
     } argsType;
-    const char funcNames[3][2][20] = {
-        { SIMD_SAVE_NAME"_",          SIMD_LOAD_NAME"_"          },
-        { SIMD_CONS_SAVE_NAME"_", SIMD_CONS_LOAD_NAME"_" },
-        { SIMD_GEN_SAVE_NAME"_",  SIMD_GEN_LOAD_NAME"_"  } };
+    const char funcNames[4][2][20] = {
+        { SIMD_SAVE_NAME"_",            SIMD_LOAD_NAME"_"},
+        { SIMD_MASKED_SAVE_NAME"_",     SIMD_MASKED_LOAD_NAME"_"},
+        { SIMD_CONS_SAVE_NAME"_",       SIMD_CONS_LOAD_NAME"_"},
+        { SIMD_GEN_SAVE_NAME"_",        SIMD_GEN_LOAD_NAME"_"}
+    };
     referenceInfo firstRef = make_empty_referenceInfo();
     referenceInfo cRef = make_empty_referenceInfo();
     int lastOffset = 0;
     char *functionName;
 
     string lsType = local_name(get_simd_vector_type(args));
+    bool all_padded= all_padded_p(padded);
 
     /* the function should not be called with an empty arguments list */
     assert((argc > 1) && (args != NIL));
@@ -747,8 +841,9 @@ static statement make_loadsave_statement(int argc, list args, bool isLoad)
 
     /* now verify the estimation on the first element is correct, and update
      * parameters needed later */
-    FOREACH( EXPRESSION, e, CDR(CDR(args)) )
+    for(list iter = CDR(CDR(args));!ENDP(iter);POP(iter))
     {
+        expression e = EXPRESSION(CAR(iter));
         if (argsType == OTHER)
             break;
         else if (argsType == CONSTANT)
@@ -769,6 +864,15 @@ static statement make_loadsave_statement(int argc, list args, bool isLoad)
             {
                 lastOffset = get_consec_offset(cRef);
             }
+            /* if all arguments are padded, we cas safely load an additionnal reference,
+             * it will not be used anyway */
+            else if(ENDP(CDR(iter)) && all_padded )
+            {
+                /* it is safe to load from anywhere (even a non existing data) but not to write anywhere
+                 * that's why we use a mask !
+                 */
+                if(!isLoad) argsType=MASKED_CONSEC_REFS;
+            }
             else
             {
                 argsType = OTHER;
@@ -783,16 +887,15 @@ static statement make_loadsave_statement(int argc, list args, bool isLoad)
     switch(argsType)
     {
         case CONSEC_REFS:
+        case MASKED_CONSEC_REFS:
             {
 
                 string realVectName = get_vect_name_from_data(argc, EXPRESSION(CAR(CDR(args))));
 
-                if(strcmp(strchr(realVectName, MODULE_SEP)?local_name(realVectName):realVectName, lsType))
+                if(false &&strcmp(strchr(realVectName, MODULE_SEP)?local_name(realVectName):realVectName, lsType))
                 {
                     /*string temp = local_name(lsType);*/
-
-                    lsType = strdup(concatenate(realVectName,
-                                "_TO_", /*temp*/lsType, (char *) NULL));
+                    asprintf(&lsType,"%s_TO_%s",realVectName,lsType);
                 }
                 if(get_bool_property("SIMD_FORTRAN_MEM_ORGANISATION"))
                 {
@@ -805,10 +908,7 @@ static statement make_loadsave_statement(int argc, list args, bool isLoad)
                 {
                     //expression addr = MakeUnaryCall(CreateIntrinsic("&"), reference_to_expression(referenceInfo_reference(firstRef)));
                     expression addr = reference_to_expression(referenceInfo_reference(firstRef));
-                    args = gen_make_list( expression_domain, 
-                            EXPRESSION(CAR(args)),
-                            addr,
-                            NULL);
+                    args = make_expression_list( EXPRESSION(CAR(args)), addr);
                 }
 
                 gSimdCost += - argc + 1;
@@ -838,21 +938,21 @@ static statement make_loadsave_statement(int argc, list args, bool isLoad)
 
 }
 
-static statement make_load_statement(int argc, list args)
+static statement make_load_statement(int argc, list args, list padded)
 {
-    return make_loadsave_statement(argc, args, TRUE);
+    return make_loadsave_statement(argc, args, TRUE, padded);
 }
 
-static statement make_save_statement(int argc, list args)
+static statement make_save_statement(int argc, list args, list padded)
 {
-    return make_loadsave_statement(argc, args, FALSE);
+    return make_loadsave_statement(argc, args, FALSE, padded);
 }
 
 
 /*
    This function creates a simd vector.
    */
-static entity make_new_simd_vector(int itemSize, int nbItems, int basicTag)
+static entity make_new_simd_vector(int itemSize, int nbItems, enum basic_utype basicTag)
 {
     //extern list integer_entities, real_entities, double_entities;
 
@@ -898,6 +998,7 @@ static entity make_new_simd_vector(int itemSize, int nbItems, int basicTag)
     pips_assert("buffer doesnot overflow",number<10000);
     sprintf(name, "%s%s%u",prefix,VECTOR_POSTFIX,number++);
     list lis=CONS(DIMENSION, make_dimension(int_to_expression(0),int_to_expression(nbItems-1)), NIL);  
+
     new_ent = make_new_array_variable_with_prefix(name, mod_ent , simdVector, lis);
 
 #if 0
@@ -1008,11 +1109,23 @@ static vectorElement copy_vector_element(vectorElement ve)
     return vec;
 }
 
+static string codegen_commenter(entity e)
+{
+    string s=NULL;
+    string b = basic_to_string(entity_basic(e));
+    asprintf(&s,"PIPS:SAC generated %s vector(s)", b);
+    free(b);
+    return s;
+}
+
 static statementInfo make_simd_statement_info(opcodeClass kind, opcode oc, list* args)
 {
     statementInfo si;
     simdStatementInfo ssi;
     size_t nbargs;
+
+    /* use a special commnter there */
+    push_generated_variable_commenter(codegen_commenter);
 
     /* find out the number of arguments needed */
     nbargs = opcodeClass_nbArgs(kind);
@@ -1030,7 +1143,7 @@ static statementInfo make_simd_statement_info(opcodeClass kind, opcode oc, list*
     pips_assert("nb parameters match nb dummy parameters",nbargs==gen_length(*args));
     FOREACH(EXPRESSION,exp,*args)
     {
-        int basicTag = get_basic_from_opcode(oc, j);
+        enum basic_utype basicTag = get_basic_from_opcode(oc, nbargs-1-j);
         simdStatementInfo_vectors(ssi)[j] = entity_undefined;
 #if 1
          HASH_MAP(key,val, {
@@ -1048,39 +1161,42 @@ static statementInfo make_simd_statement_info(opcodeClass kind, opcode oc, list*
                         basicTag);
             hash_put(reference_to_entity,expression_reference(exp),simdStatementInfo_vectors(ssi)[j]);
         }
-        --j;
+        j--;
     }
     hash_table_free(reference_to_entity);
 
     /* Fill the matrix of arguments */
     for(int j=0; j<opcode_vectorSize(oc); j++)
     {
-        argumentInfo ai;
-        expression e;
-        statementArgument ssa;
 
         list l = args[j];
 
         for(int i=nbargs-1; i>=0; i--)
         {
-            e = EXPRESSION(CAR(l));
+            expression e = EXPRESSION(CAR(l));
 
             //Store it in the argument's matrix
-            ssa = make_statementArgument(e, NIL);
+            statementArgument ssa = make_statementArgument(e, NIL);
             simdStatementInfo_arguments(ssi)[j + opcode_vectorSize(oc) * i] = ssa;
 
             l = CDR(l);
         }
+    }
 
-        //Build the dependance tree
+    // substitute reference padding to constant padding when possible
+    patch_all_padded_simd_statements(ssi);
+
+    //Build the dependance tree
+    for(int j=0; j<opcode_vectorSize(oc); j++)
+    {
         for(size_t i=0; i<nbargs-1; i++)
         {
             //we read this variable
-            ssa = simdStatementInfo_arguments(ssi)[j + opcode_vectorSize(oc) * i];
-            e = statementArgument_expression(ssa);
+            statementArgument ssa = simdStatementInfo_arguments(ssi)[j + opcode_vectorSize(oc) * i];
+            expression e = statementArgument_expression(ssa);
 
             //Get the id of the argumet
-            ai = get_argument_info(get_argument_id(e));
+            argumentInfo ai = get_argument_info(get_argument_id(e));
 
             //ssa depends on all the places where the expression was
             //used before
@@ -1095,10 +1211,10 @@ static statementInfo make_simd_statement_info(opcodeClass kind, opcode oc, list*
         }
 
         //Get the id of the last argument
-        ssa = simdStatementInfo_arguments(ssi)[j + opcode_vectorSize(oc) * (nbargs-1)];
-        e = statementArgument_expression(ssa);
+        statementArgument ssa = simdStatementInfo_arguments(ssi)[j + opcode_vectorSize(oc) * (nbargs-1)];
+        expression e = statementArgument_expression(ssa);
 
-        ai = get_argument_info(get_argument_id(e));
+        argumentInfo ai = get_argument_info(get_argument_id(e));
 
         //we write to this variable -->
         //Free the list of places available. Those places are
@@ -1109,6 +1225,7 @@ static statementInfo make_simd_statement_info(opcodeClass kind, opcode oc, list*
                     make_vector_element(ssi, nbargs-1, j),
                     NIL);
     }
+    pop_generated_variable_commenter();
 
     return si;
 }
@@ -1157,6 +1274,20 @@ list make_simd_statements(list kinds, cons* first, cons* last)
             args[index] = match_args(m);
         }
 
+        /* if index is a power of 2 less 1 , we may want to complete it with a fake statement 
+         * this would enlarge the matching at the cost of less efficiency
+         * indeed this is a kind of array padding !
+         */
+        bool padding_added=false;
+        if(get_bool_property("SIMDIZER_ALLOW_PADDING") && 
+                (padding_added=(index == 3 || index == 7 || index == 15 || index == 31)) )
+        {
+            args[index]=NIL;
+            for(int i=0;i<=index;i++)
+                args[index]=CONS(EXPRESSION,make_expression_0(),args[index]);
+            ++index;
+        }
+
         /* compute the opcode to use */
         oc = get_optimal_opcode(type, index, args);
 
@@ -1167,6 +1298,7 @@ list make_simd_statements(list kinds, cons* first, cons* last)
                     (index < MAX_PACK) && (i != CDR(last));
                     index++, i = CDR(i) )
             {
+                pips_debug(3,"make_simd_statements : non simd\n");
                 CDR(instr) = gen_statementInfo_cons(
                         make_nonsimd_statement_info(STATEMENT(CAR(i))),
                         NIL);
@@ -1175,6 +1307,37 @@ list make_simd_statements(list kinds, cons* first, cons* last)
         }
         else
         {
+            /* now that we know the optimal opcode, we can change the padding to the neutral element
+             */
+            if(padding_added)
+            {
+                statement sfirst = STATEMENT(CAR(first));
+                if(assignment_statement_p(sfirst))
+                {
+                    expression neutral_element= entity_to_expression(operator_neutral_element(
+                            call_function(expression_call(binary_call_rhs(statement_call(sfirst))))
+                            ));
+                    bool first=true;
+                    FOREACH(EXPRESSION,e,args[index-1])
+                    {
+                        free_syntax(expression_syntax(e));
+                        if(first)
+                        {
+                            /* we always use the same padding entity, it proves to be usefull later on */
+                            entity pe = get_padding_entity();
+                            expression_syntax(e)=make_syntax_reference(make_reference(pe,NIL));
+                            first=false;
+                        }
+                        else
+                        {
+                            expression_syntax(e)=copy_syntax(expression_syntax(neutral_element));
+                        }
+                    }
+                    free_expression(neutral_element);
+                }
+                else
+                    pips_user_warning("wrong padding may have been added\n");
+            }
             /* update the pointer to the next statement to be processed */
             for(index = 0; 
                     (index<opcode_vectorSize(oc)) && (i!=CDR(last)); 
@@ -1184,6 +1347,7 @@ list make_simd_statements(list kinds, cons* first, cons* last)
             }
 
             /* generate the statement information */
+            pips_debug(3,"make_simd_statements : simd\n");
             CDR(instr) = gen_statementInfo_cons( 
                     make_simd_statement_info(type, oc, args),
                     NIL);
@@ -1280,6 +1444,9 @@ static statement generate_load_statement(simdStatementInfo si, int line)
     list sourcesCopy = NIL;
     list sourcesShuffle = NIL;
 
+    /* is this statement padded ? if so, we are allowded to do more ... */
+    list padded = padded_simd_statement_p(si);
+
     //try to see if the arguments have not already been loaded
     FOREACH(VECTORELEMENT, ve,statementArgument_dependances(simdStatementInfo_arguments(si)[offset]))
     {
@@ -1371,7 +1538,7 @@ static statement generate_load_statement(simdStatementInfo si, int line)
         //Make a load statement
         return make_load_statement(
                 opcode_vectorSize(simdStatementInfo_opcode(si)), 
-                args);
+                args, padded);
     }
 }
 
@@ -1381,6 +1548,10 @@ static statement generate_save_statement(simdStatementInfo si)
     int i;
     int offset = opcode_vectorSize(simdStatementInfo_opcode(si)) * 
         (simdStatementInfo_nbArgs(si)-1);
+
+    /* is this statement padded ? if so, we are allowded to do more ... */
+    list padded = padded_simd_statement_p(si);
+
 
     for(i = opcode_vectorSize(simdStatementInfo_opcode(si))-1; 
             i >= 0; 
@@ -1396,8 +1567,7 @@ static statement generate_save_statement(simdStatementInfo si)
             entity_to_expression(simdStatementInfo_vectors(si)[simdStatementInfo_nbArgs(si)-1]),
             args);
 
-    return make_save_statement(opcode_vectorSize(simdStatementInfo_opcode(si)),
-            args);
+    return make_save_statement(opcode_vectorSize(simdStatementInfo_opcode(si)), args, padded);
 }
 
 list generate_simd_code(list/* <statementInfo> */ sil, float * simdCost)
@@ -1427,7 +1597,6 @@ list generate_simd_code(list/* <statementInfo> */ sil, float * simdCost)
             int i;
             simdStatementInfo ssi = statementInfo_simd(si);
 
-
             //First, the load statement(s)
             for(i = 0; i < simdStatementInfo_nbArgs(ssi)-1; i++)
             {
@@ -1451,6 +1620,6 @@ list generate_simd_code(list/* <statementInfo> */ sil, float * simdCost)
     sl = CDR(sl_begin);
     CDR(sl_begin) = NIL;
     gen_free_list(sl_begin);
-    pips_debug(3,"generate_simd_code 2\n");
+    pips_debug(3,"generate_simd_code 2 that costs %lf\n",gSimdCost);
     return sl;
 }

@@ -34,8 +34,8 @@
 extern entity hpfc_new_variable(entity, basic);
 
 /* if conversion */
-#define IF_TO_CONVERT "c IF_TO_CONVERT\n"
-#define IF_CONV_TO_COMPACT "c IF_CONV_TO_COMPACT\n"
+#define IF_TO_CONVERT "PIPS IF_TO_CONVERT"
+#define IF_CONV_TO_COMPACT "PIPS IF_CONV_TO_COMPACT"
 
 entity get_function_entity(string name);
 
@@ -55,20 +55,16 @@ void init_dep_graph(graph dg);
 /* simd_loop_const_elim.c */
 
 #define SIMD_LOAD_NAME "SIMD_LOAD"
-#define SIMD_LOAD_SIZE 9
 #define SIMD_SAVE_NAME "SIMD_SAVE"
-#define SIMD_SAVE_SIZE 9
+#define SIMD_MASKED_LOAD_NAME "SIMD_MASKED_LOAD"
+#define SIMD_MASKED_SAVE_NAME "SIMD_MASKED_SAVE"
 #define SIMD_GEN_LOAD_NAME "SIMD_LOAD_GENERIC"
-#define SIMD_GEN_LOAD_SIZE 17
 #define SIMD_GEN_SAVE_NAME "SIMD_SAVE_GENERIC"
-#define SIMD_GEN_SAVE_SIZE 17
 #define SIMD_CONS_LOAD_NAME "SIMD_LOAD_CONSTANT"
-#define SIMD_CONS_LOAD_SIZE 18
 #define SIMD_CONS_SAVE_NAME "SIMD_SAVE_CONSTANT"
-#define SIMD_CONS_SAVE_SIZE 18
+#define SAC_PADDING_ENTITY_NAME "PADDING_VALUE"
 
 #define SIMD_NAME "SIMD_"
-#define SIMD_SIZE 5
 
 list expression_to_proper_effects(expression e);
 

@@ -111,6 +111,13 @@ empty_comments_p(string s)
   pips_assert("comments cannot be NULL", s!=NULL);
   return (s == NULL || string_undefined_p(s) || strcmp(s,"")==0);
 }
+bool
+comments_equal_p(string c1, string c2)
+{
+    return 
+        ( empty_comments_p(c1) && empty_comments_p(c2)) ||
+        (!empty_comments_p(c1) && !empty_comments_p(c2) && same_string_p(c1,c2));
+}
 
 /** @defgroup statements_p Predicates on statements
 
@@ -2176,55 +2183,105 @@ void insert_statement(statement s,
     }
 }
 
+#define PIPS_DECLARATION_COMMENT "PIPS generated variable\n"
+static string
+default_generated_variable_commenter(__attribute__((unused))entity e)
+{
+    return strdup(PIPS_DECLARATION_COMMENT);
+}
+
+/* commenters are function used to add comments to pips-created variables
+ * they are handled as a limited size stack
+ * all commenters are supposed to return allocated data
+ */
+#define MAX_COMMENTERS 8 
+
+typedef string (*generated_variable_commenter)(entity);
+static generated_variable_commenter generated_variable_commenters[MAX_COMMENTERS] = {
+    [0]=default_generated_variable_commenter /* c99 inside :) */
+};
+static size_t nb_commenters=1;
+
+void push_generated_variable_commenter(string (*commenter)(entity))
+{
+    pips_assert("not exceeding stack commnters stack limited size\n",nb_commenters<MAX_COMMENTERS);
+    generated_variable_commenters[nb_commenters++]=commenter;
+}
+void pop_generated_variable_commenter()
+{
+    pips_assert("not removing default commenter",nb_commenters!=1);
+    --nb_commenters;
+}
+string generated_variable_comment(entity e)
+{
+    return generated_variable_commenters[nb_commenters-1](e);
+}
+
+
+
 /* Declarations are not only lists of entities, but also statement to
    carry the line number, comments,... For the time begin, a
    declaration statement is a continue statement. */
 statement add_declaration_statement(statement s, entity e)
 {
-  if(statement_block_p(s)) {
-    list sl = statement_block(s); //statement list
-    list cl = list_undefined; // current statement list
-    list pl = NIL; // previous statement list
-    list nsl = list_undefined; // new statement list
-    statement ds = make_declaration_statement(e,
-					      STATEMENT_NUMBER_UNDEFINED,
-					      strdup("PIPS generated variable\n"));
+    if(statement_block_p(s)) {
+        list sl = statement_block(s); //statement list
+        list cl = list_undefined; // current statement list
+        list pl = NIL; // previous statement list
+        list nsl = list_undefined; // new statement list
+        string comment = generated_variable_comment(e);
+        statement ds = make_declaration_statement(e,
+                STATEMENT_NUMBER_UNDEFINED,
+                comment);
 
-    /* Look for the last declaration: it is pointed to by pl */
-    for(cl=sl; !ENDP(cl); POP(cl)) {
-      statement cs = STATEMENT(CAR(cl));
-      if(declaration_statement_p(cs)) {
-	pl = cl;
-      }
-      else {
-	break;
-      }
+        /* Look for the last declaration: it is pointed to by pl */
+        for(cl=sl; !ENDP(cl); POP(cl)) {
+            statement cs = STATEMENT(CAR(cl));
+            if(declaration_statement_p(cs)) {
+                pl = cl;
+            }
+            else {
+                break;
+            }
+        }
+
+        /* Do we have previous declarations to skip? */
+        if(!ENDP(pl)) {
+            /* SG: if CAR(pl) has same comment and same type as ds, merge them */
+            statement spl = STATEMENT(CAR(pl));
+            if( comments_equal_p(statement_comments(spl),comment) &&
+                    basic_equal_p(entity_basic(e),entity_basic(ENTITY(CAR(statement_declarations(spl))))))
+            {
+                free_statement(ds);
+                statement_declarations(spl)=gen_nconc(statement_declarations(spl),CONS(ENTITY,e,NIL));
+                nsl=sl;
+            }
+            /* SG: otherwise, insert ds */
+            else
+            {
+                CDR(pl) = NIL; // Truncate sl
+                nsl = gen_nconc(sl, CONS(STATEMENT, ds, cl));
+            }
+        }
+        else { // pl == NIL
+            /* The new declaration is inserted before sl*/
+            pips_assert("The above loop was entered at most once", sl==cl);
+            nsl = CONS(STATEMENT, ds, cl);
+        }
+
+        instruction_block(statement_instruction(s)) = nsl;
+    }
+    else
+    {
+        pips_internal_error("can only add declarations to statement blocks\n");
     }
 
-    /* Do we have previous declarations to skip? */
-    if(!ENDP(pl)) {
-      CDR(pl) = NIL; // Truncate sl
-      nsl = gen_nconc(sl, CONS(STATEMENT, ds, cl));
-    }
-    else { // pl == NIL
-      /* The new declaration is inserted before sl*/
-      pips_assert("The above loop was entered at most once", sl==cl);
-      nsl = CONS(STATEMENT, ds, cl);
+    ifdebug(8) {
+        pips_debug(8, "Statement after declaration insertion:\n");
+        print_statement(s);
     }
 
-    instruction_block(statement_instruction(s)) = nsl;
-  }
-  else
-  {
-      pips_internal_error("can only add declarations to statement blocks\n");
-  }
-
-  ifdebug(8) {
-    pips_debug(8, "Statement after declaration insertion:\n");
-    print_statement(s);
-  }
-
-  return s;
+    return s;
 }
 
 /* Replace the instruction in statement s by instruction i.
@@ -2931,9 +2988,8 @@ static void statement_clean_declarations_helper(list declarations, statement stm
      */
     FOREACH(ENTITY,e,decl_cpy)
     {
-        bool add_entity_to_declaration_p = true;
         /* area and parameters are always used, so are referenced entities */
-        if( formal_parameter_p(e) || entity_area_p(e) || set_belong_p(referenced_entities,e));
+        if( formal_parameter_p(e) || entity_area_p(e) || set_belong_p(referenced_entities,e) /*|| storage_return_p(entity_storage(e))*/);
         else
         {
             /* entities whose declaration has a side effect are always used too */
@@ -3141,19 +3197,28 @@ struct fswp {
     string begin;
 };
 
+extension statement_with_pragma_p(statement s, string seed)
+{
+    list exs = extensions_extension(statement_extensions(s));
+    FOREACH(EXTENSION,ex,exs)
+    {
+        pragma pr = extension_pragma(ex);
+        if(pragma_string_p(pr) && strstr(pragma_string(pr),seed))
+        {
+            return ex;
+        }
+    }
+    return NULL;
+}
+
 static bool find_statements_with_pragma_walker(statement s, struct fswp *p)
 {
-  list exs = extensions_extension(statement_extensions(s));
-  FOREACH(EXTENSION,ex,exs)
+    if(statement_with_pragma_p(s,p->begin))
     {
-      pragma pr = extension_pragma(ex);
-      if(pragma_string_p(pr) && strstr(pragma_string(pr),p->begin))
-	{
-	  p->l=CONS(STATEMENT,s,p->l);
-	  gen_recurse_stop(NULL);
-	}
+        p->l=CONS(STATEMENT,s,p->l);
+        gen_recurse_stop(NULL);
     }
-  return true;
+    return true;
 }
 
 
@@ -3254,6 +3319,37 @@ statement normalize_statement(statement s)
 }
 /**  @} */
 
+struct sb {
+    statement s;
+    bool res;
+};
+
+static bool statement_in_statement_walker(statement st, struct sb* sb)
+{
+    ifdebug(7) {
+        pips_debug(7,"considering statement:\n");
+        print_statement(st);
+    }
+    if(sb->s==st)
+    {
+        sb->res=true; gen_recurse_stop(0);
+    }
+    return true;
+}
+
+bool statement_in_statement_p(statement s, statement st)
+{
+    struct sb sb = { s,false };
+    gen_context_recurse(st,&sb,statement_domain, statement_in_statement_walker,gen_null);
+    return sb.res;
+}
+
+bool statement_in_statements_p(statement s, list l)
+{
+    FOREACH(STATEMENT,st,l)
+        if(statement_in_statement_p(s,st)) return true;
+    return false;
+}
 
 /* That's all folks */
 

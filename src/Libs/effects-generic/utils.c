@@ -380,12 +380,6 @@ entity e;
 }
 
 
-/*************** I/O EFFECTS *****************/
-bool io_effect_entity_p(entity e)
-{
-    return io_entity_p(e) && 
-	same_string_p(entity_local_name(e), IO_EFFECTS_ARRAY_NAME);
-}
 
 /* Return true if a statement has an I/O effect in the effects
    list. */

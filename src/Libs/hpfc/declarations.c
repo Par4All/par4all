@@ -468,7 +468,7 @@ ComputeNewSizeOfIthDimension(
     int rate, param, pdim = 1, asize = 0;
     style st;
 
-    (void) SizeOfDimension(dim, &asize);
+    asize=dimension_size(dim);
 
     pips_debug(9, "dimension %d of array %s\n", i, entity_name(array));
     ifdebug(9)

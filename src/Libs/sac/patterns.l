@@ -90,12 +90,12 @@ int patterns_yyerror(char* s);
 "NON_EQUIV"		return NON_EQUIV_OPERATOR_TOK;
 "TRUE"			return TRUE_OPERATOR_TOK;
 "FALSE"			return FALSE_OPERATOR_TOK;
-">="                 	return GREATER_OR_EQUAL_OPERATOR_TOK;
+">="            return GREATER_OR_EQUAL_OPERATOR_TOK;
 ">"     		return GREATER_THAN_OPERATOR_TOK;
-"<="		        return LESS_OR_EQUAL_OPERATOR_TOK;
+"<="		    return LESS_OR_EQUAL_OPERATOR_TOK;
 "<"      		return LESS_THAN_OPERATOR_TOK;
 "=="			return EQUAL_OPERATOR_TOK;
-"PHI"		return PHI_TOK;
+"?"				return PHI_TOK;
 [0-9.-]+                  { patterns_yylval.iVal = atoi(patterns_yytext); return INTEGER_TOK; }
 [A-Za-z][0-9A-Za-z_]*   { patterns_yylval.strVal = strdup(patterns_yytext); return IDENTIFIER_TOK; }
 [ \t\n]                 ;

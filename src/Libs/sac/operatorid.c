@@ -40,6 +40,24 @@ typedef dg_vertex_label vertex_label;
 #include "sac-local.h"
 #include "sac.h"
 #include "patterns.tab.h"
+#include "pipsdbm.h"
+
+typedef struct {
+    int id;
+    hash_table sons; /* char -> operator_id_tree*/
+} operator_id_tree;
+
+static operator_id_tree * mappings = NULL;
+void set_simd_operator_mappings(void * m)
+{
+    pips_assert("not already set",mappings==NULL);
+    mappings=m;
+}
+void reset_simd_operator_mappings()
+{
+    pips_assert("already set",mappings);
+    mappings=NULL;
+}
 
 /*
  * we manipulate tokens from
@@ -93,17 +111,11 @@ static oper_id_mapping operators[] =
     { C_LESS_OR_EQUAL_OPERATOR_NAME,     LESS_OR_EQUAL_OPERATOR_TOK },
     { C_LESS_THAN_OPERATOR_NAME,         LESS_THAN_OPERATOR_TOK },
     { C_EQUAL_OPERATOR_NAME,             EQUAL_OPERATOR_TOK },
-    { SIMD_PHI_NAME,                   PHI_TOK },
+    { CONDITIONAL_OPERATOR_NAME,         PHI_TOK },
 
     { NULL,                              UNKNOWN_TOK }
 };
 
-typedef struct {
-    int id;
-    hash_table sons; /* char -> operator_id_tree*/
-} operator_id_tree;
-
-static operator_id_tree * mappings = NULL;
 
 static operator_id_tree* make_operator_id_tree()
 {
@@ -116,17 +128,18 @@ static operator_id_tree* make_operator_id_tree()
     return n;
 }
 
-static void free_operator_id_tree(operator_id_tree* t)
+void free_operator_id_tree(void* t)
 {
+    operator_id_tree * tree = (operator_id_tree*)t;
     operator_id_tree * next;
     HASH_MAP(key,l,
     {
-        next = (operator_id_tree *) hash_get(t->sons,key);
+        next = (operator_id_tree *) hash_get(tree->sons,key);
         free_operator_id_tree(next);
-        hash_del(t->sons,key);
-    }, t->sons )
-    hash_table_free(t->sons);
-    free(t);
+        hash_del(tree->sons,key);
+    }, tree->sons )
+    hash_table_free(tree->sons);
+    free(tree);
 }
 
 static void insert_mapping(oper_id_mapping* item)
@@ -156,23 +169,6 @@ static void insert_mapping(oper_id_mapping* item)
     t->id = item->id;
 }
 
-void init_operator_id_mappings()
-{
-    int i;
-
-    if (mappings != NULL)
-        return;
-
-    mappings = make_operator_id_tree();
-    for(i=0; operators[i].name != NULL; i++)
-        insert_mapping(&operators[i]);
-}
-void term_operator_id_mappings()
-{
-    free_operator_id_tree(mappings);
-    mappings=NULL;
-}
-
 int get_operator_id(entity e)
 {
     char * s;
@@ -191,4 +187,20 @@ int get_operator_id(entity e)
     }
 
     return t->id;
+}
+
+bool simd_operator_mappings(__attribute__((unused)) char * module_name)
+{
+    /* create a new operator id */
+    operator_id_tree *m= make_operator_id_tree();
+    set_simd_operator_mappings(m);
+
+    for(size_t i=0; operators[i].name != NULL; i++)
+        insert_mapping(&operators[i]);
+
+    /* put it in pipsdbm */
+    DB_PUT_MEMORY_RESOURCE(DBR_SIMD_OPERATOR_MAPPINGS,"",m);
+
+    reset_simd_operator_mappings();
+    return true;
 }

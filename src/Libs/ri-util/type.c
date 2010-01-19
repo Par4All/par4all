@@ -641,20 +641,6 @@ basic expression_basic(expression expr)
     return b;
 }
 
-/* returns an allocated basic.
- */
-basic please_give_me_a_basic_for_an_expression(expression e)
-{
-  basic r = expression_basic(e);
-  if(!basic_undefined_p(r)) {
-    if (basic_overloaded_p(r))
-      r = basic_of_expression(e); /* try something else... */
-    else
-      r = copy_basic(r);
-  }
-  return r;
-}
-
 dimension dimension_dup(dimension d)
 {
     return(make_dimension(copy_expression(dimension_lower(d)),
@@ -955,6 +941,21 @@ basic basic_of_any_expression(expression exp, bool apply_p)
 basic basic_of_expression(expression exp)
 {
   return basic_of_any_expression(exp, FALSE);
+}
+
+/** 
+ * retreives the basic of a reference in a newly allocated bsaic object
+ * 
+ * @param r reference we want the basic of
+ * 
+ * @return allocated basic of the reference
+ */
+basic basic_of_reference(reference r)
+{
+    static expression sexp = expression_undefined;
+    if(expression_undefined_p(sexp)) sexp=make_expression(make_syntax_reference(reference_undefined),normalized_undefined);
+    syntax_reference(expression_syntax(sexp)) = r;
+    return basic_of_expression(sexp);
 }
 
 

@@ -55,8 +55,6 @@ typedef dg_vertex_label vertex_label;
 
 #include "control.h"
 
-#define reduction_basic(x) (get_basic_from_array_ref(reduction_reference(x)))
-
 entity make_float_constant_entity(float c)
 {
     entity ce;
@@ -100,8 +98,7 @@ expression make_float_constant_expression(float c)
 
 static entity make_reduction_vector_entity(reduction r)
 {
-    extern list integer_entities, real_entities, double_entities;
-    basic base = get_basic_from_array_ref(reduction_reference(r));
+    basic base = basic_of_reference(reduction_reference(r));
     entity new_ent, mod_ent;
     static int counter = 0;
     static const char prefix[] = "RED" ;
@@ -114,7 +111,7 @@ static entity make_reduction_vector_entity(reduction r)
     new_ent = make_new_array_variable_with_prefix(buffer,mod_ent,base,lis);
     AddLocalEntityToDeclarations(new_ent,mod_ent,
             c_module_p(mod_ent)?get_current_module_statement():statement_undefined);
-
+#if 0
     /* The new entity is stored in the list of entities of the same type. */
     switch(basic_tag(base))
     {
@@ -134,32 +131,25 @@ static entity make_reduction_vector_entity(reduction r)
         default:
             break;
     }
+    //free_basic(base);
+#endif
 
     return new_ent;
 }
 
-static bool same_reduction_p(reduction r1, reduction r2)
-{
-    return ( (reference_equal_p(reduction_reference(r1),reduction_reference(r2))) &&
-            (reduction_operator_tag(reduction_op(r1)) == reduction_operator_tag(reduction_op(r2))) );
-}
-
 /* The first part of the function check that the reduction is allowed. If not,
-   the function returns NULL. If the reduction is allowed, the function updates the
+   the function returns undefined.
+   If the reduction is allowed, the function updates the
    reductionInfo list reds or add the reduction to the list.*/
 static reductionInfo add_reduction(list* reds, reduction r)
 {
-    list l;
-    list prev = NIL;
-    reductionInfo ri;
+    reductionInfo ri = reductionInfo_undefined;
 
     pips_debug(1, "reduction reference %s\n", entity_local_name(reference_variable(reduction_reference(r))));
 
     //See if the reduction has already been encountered
-    for(l = *reds; l != NIL; l = CDR(l))
+    FOREACH(REDUCTIONINFO,ri,*reds)
     {
-        ri = REDUCTIONINFO(CAR(l));
-
         if (same_reduction_p(r, reductionInfo_reduction(ri)))
         {
             //The reduction has already been encountered: update the coun
@@ -170,64 +160,47 @@ static reductionInfo add_reduction(list* reds, reduction r)
 
             return ri; 
         }
-
-        prev = l;
     }
 
     //First time we see this reduction: initialize a reductionInfo structure
     ri = make_reductionInfo(r, 1, make_reduction_vector_entity(r));
 
     //Add to the list of reductions encountered
-    if ( ENDP(prev) ) // same as (*reductions == NIL)
-        *reds = CONS(REDUCTIONINFO, ri, NIL);
-    else
-        CDR(prev) = CONS(REDUCTIONINFO, ri, NIL);
+    *reds=CONS(REDUCTIONINFO,ri,*reds);
 
     return ri;
 }
 
-static void rename_reduction_rewrite(expression e, reductionInfo ri)
-{
-    syntax s = expression_syntax(e);
-
-    if (!syntax_reference_p(s) ||
-            !reference_equal_p(syntax_reference(s), reduction_reference(reductionInfo_reduction(ri))))
-        return;
-
-    syntax_reference(s) = make_reference(reductionInfo_vector(ri),
-            CONS(EXPRESSION,
-                int_expr(reductionInfo_count(ri)-1),
-                NIL));
-    free_normalized(expression_normalized(e));
-    expression_normalized(e) = normalized_undefined;
-}
-
-static void rename_reduction_ref(statement s, reductionInfo ri)
-{
-    //recursively replace `reduction_reference(reductionInfo_reduction(ri))'
-    //with `reductionInfo_vector(ri)[reductionInfo_count(ri)-1]' in `s'
-
-    gen_context_recurse(s, ri, expression_domain, gen_true, rename_reduction_rewrite);
-}
-
-static bool gRedInStat;
-
-static void redInExpr(expression e, reduction red)
+static void rename_reduction_ref_walker(expression e, reductionInfo ri)
 {
     syntax s = expression_syntax(e);
 
     if (syntax_reference_p(s) &&
-            reference_equal_p(syntax_reference(s), reduction_reference(red)))
-        gRedInStat = TRUE;
+            reference_equal_p(syntax_reference(s), reduction_reference(reductionInfo_reduction(ri))))
+    {
+        free_reference(syntax_reference(s));
+        syntax_reference(s)= make_reference(reductionInfo_vector(ri),
+                make_expression_list(int_expr(reductionInfo_count(ri)-1)));
+    }
 }
 
-static bool redInStat(reduction red, statement stat)
+/* finds out expression with reduction */
+typedef struct {
+    reduction red;
+    bool has_reduction_p;
+} reduction_in_statement_param;
+
+static bool reduction_in_statement_walker(reference r, reduction_in_statement_param* p)
 {
-    gRedInStat = FALSE;
+    p->has_reduction_p|=reference_equal_p(r, reduction_reference(p->red));
+    return ! p->has_reduction_p;
+}
 
-    gen_context_recurse(stat, red, expression_domain, gen_true, redInExpr);
-
-    return gRedInStat;
+static bool reduction_in_statement_p(reduction red, statement stat)
+{
+    reduction_in_statement_param p ={ red, false };
+    gen_context_recurse(stat, &p, reference_domain, reduction_in_statement_walker, gen_null);
+    return p.has_reduction_p;
 }
 
 /* This function gets the possible reduction thanks to load_cumulated_reductions() function. 
@@ -238,26 +211,21 @@ static void rename_statement_reductions(statement s, list * reductions_info, lis
 {
     FOREACH(REDUCTION, r, reductions)
     {
-        bool bContinue = TRUE;
-
         pips_debug(3,"red bas\n");
         print_reference(reduction_reference(r));
         pips_debug(3,"\n");
 
-        bContinue = !redInStat(r, s);
-
-        if(bContinue)
-            continue;
-
-        basic bas = get_basic_from_array_ref(reduction_reference(r));
-
-        if(basic_undefined_p(bas))
-            continue;
-
-        reductionInfo l = add_reduction(reductions_info, r);
-
-        if(l != NULL)
-            rename_reduction_ref(s, l);
+        if(reduction_in_statement_p(r,s))
+        {
+            basic b = basic_of_reference(reduction_reference(r));
+            if(!basic_undefined_p(b))
+            {
+                free_basic(b);
+                reductionInfo ri = add_reduction(reductions_info, r);
+                if( ! reductionInfo_undefined_p(ri))
+                    gen_context_recurse(s,ri,expression_domain,gen_true,rename_reduction_ref_walker);
+            }
+        }
     }
 }
 
@@ -351,6 +319,7 @@ static statement generate_prelude(reductionInfo ri)
     expression initval;
     list prelude = NIL;
     int i;
+    basic bas = basic_of_reference(reduction_reference(reductionInfo_reduction(ri)));
 
     // According to the operator, get the correct initialization value
     switch(reduction_operator_tag(reduction_op(reductionInfo_reduction(ri))))
@@ -361,19 +330,19 @@ static statement generate_prelude(reductionInfo ri)
             break;
 
         case is_reduction_operator_min:
-            initval = make_maxval_expression(reduction_basic(reductionInfo_reduction(ri)));
+            initval = make_maxval_expression(bas);
             break;
 
         case is_reduction_operator_max:
-            initval = make_minval_expression(reduction_basic(reductionInfo_reduction(ri)));
+            initval = make_minval_expression(bas);
             break;
 
         case is_reduction_operator_sum:
-            initval = make_0val_expression(reduction_basic(reductionInfo_reduction(ri)));
+            initval = make_0val_expression(bas);
             break;
 
         case is_reduction_operator_prod:
-            initval = make_1val_expression(reduction_basic(reductionInfo_reduction(ri)));
+            initval = make_1val_expression(bas);
             break;
 
         case is_reduction_operator_and:

@@ -42,71 +42,53 @@ typedef dg_vertex_label vertex_label;
 #include "sac.h"
 
 
-static int g_varwidth;
 
-static bool variables_width_filter(reference r)
+static bool variables_width_filter(reference r,int *g_varwidth)
 {
-   basic b;
-   int width;
-   type t = entity_type(reference_variable(r));
-
-   if (!type_variable_p(t))
-      return TRUE;  /* keep searching recursively */
-
-   b = variable_basic(type_variable(t));
-
-   /* do NOT forget to multiply the size by 8, to get it in
-    * bits instead of bytes....
-    */
-   switch(basic_tag(b))
+   if (type_variable_p(entity_type(reference_variable(r))))
    {
-      case is_basic_int:
-	 width = 8*basic_int(b);
-	 break;
+       basic b = basic_of_reference(r);
 
-      case is_basic_float:
-	 width = 8*basic_float(b);
-	 break;
+       /* do NOT forget to multiply the size by 8, to get it in
+        * bits instead of bytes....
+        */
+       int width;
+       switch(basic_tag(b))
+       {
+           case is_basic_int:
+               width = basic_int(b);
+               break;
 
-      /*case is_basic_logical:
-	 width = 8*basic_logical(b);
-	 break;*/
+           case is_basic_float:
+               width = basic_float(b);
+               break;
 
-      case is_basic_pointer:
-      {
-	 basic bas = get_basic_from_array_ref(r);
-	 if(!basic_undefined_p(bas))
-	 {
-	    switch(basic_tag(bas))
-	    {
-	       case is_basic_int: width = 8*basic_int(bas); break;
-	       case is_basic_float: width = 8*basic_float(bas); break;
-           default: pips_internal_error("basic type %u not supported",basic_tag(bas));
-	    }
-	 }
-	 else
-	 {
-	    return TRUE;
-	 }
-	 break;
-      }
+               /*case is_basic_logical:
+                 width = 8*basic_logical(b);
+                 break;*/
 
-      default:
-	 return TRUE; /* don't know what to do with this... keep searching */
+           case is_basic_pointer:
+           default:
+               free(b);
+               return true; /* don't know what to do with this... keep searching */
+       }
+       free(b);
+       width*=8;
+
+       if (width > *g_varwidth)
+           *g_varwidth = width;
+
+       return false; /* do not search recursively */
    }
-   
-   if (width > g_varwidth)
-      g_varwidth = width;
-
-   return FALSE; /* do not search recursively */
+   else
+       return true; /* keep searching recursievly*/
 }
 
 int effective_variables_width(instruction i)
 {
-   g_varwidth = 0;
+   int g_varwidth = 0;
 
-   gen_recurse( i, reference_domain, 
-		variables_width_filter, gen_null);
+   gen_context_recurse( i, &g_varwidth,reference_domain, variables_width_filter, gen_null);
 
    return g_varwidth;
 }

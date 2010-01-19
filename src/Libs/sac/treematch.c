@@ -45,71 +45,20 @@ typedef dg_vertex_label vertex_label;
 
 
 static matchTree patterns_tree = NULL;
+void set_simd_treematch(matchTree t)
+{
+    pips_assert("tree match not already set",patterns_tree==NULL);
+    patterns_tree=t;
+}
+
+void reset_simd_treematch()
+{
+    pips_assert("tree match already set",patterns_tree!=NULL);
+    patterns_tree=NULL;
+}
 
 static list finalArgType = NIL;
 static list curArgType = NIL;
-
-static int gIndexCount = 0;
-
-static basic get_basic_from_pointer(basic inBas, int nbIndex)
-{
-    basic outBas = basic_undefined;
-    type t = basic_pointer(inBas);
-
-    if(!type_variable_p(t))
-        return outBas;
-
-    outBas = variable_basic(type_variable(t));
-
-    switch(basic_tag(outBas))
-    {
-        case is_basic_int:
-        case is_basic_float:
-        case is_basic_logical:
-            if(gIndexCount != nbIndex)
-                outBas = basic_undefined;
-            break;
-
-        case is_basic_pointer:
-            gIndexCount++;
-            outBas = get_basic_from_pointer(outBas, nbIndex);
-            break;
-        default:pips_internal_error("basic_tag %u not supported yet",basic_tag(outBas));
-    }
-
-    return outBas;
-}
-
-basic get_basic_from_array_ref(reference ref)
-{
-    basic bas = basic_undefined;
-    int nbIndex = gen_length(reference_indices(ref));
-
-    type t = entity_type(reference_variable(ref));
-
-    if(!type_variable_p(t))
-        return bas;
-
-    bas = variable_basic(type_variable(ultimate_type(t)));
-
-    gIndexCount = 0;
-
-    switch(basic_tag(bas))
-    {
-        case is_basic_int:
-        case is_basic_float:
-        case is_basic_logical:
-            break;
-
-        case is_basic_pointer:
-            gIndexCount++;
-            bas = get_basic_from_pointer(bas, nbIndex);
-            break;
-        default:pips_internal_error("basic_tag %u not supported yet",basic_tag(bas));
-    }
-
-    return bas;
-}
 
 void simd_reset_finalArgType()
 {
@@ -119,47 +68,22 @@ void simd_reset_finalArgType()
     gen_free_list(curArgType);
     curArgType = NIL;
 }
-
-static void simd_fill_curArgType_call(call ca)
+static list simd_fill_curArgType_call(call ca)
 {
+    list c=NIL;
     FOREACH(EXPRESSION, arg, call_arguments(ca))
-    {
-        syntax s = expression_syntax(arg);
-
-        switch(syntax_tag(s))
-        {
-            case is_syntax_call:
-                {
-                    call c = syntax_call(s);
-
-                    if (call_constant_p(c))
-                    {
-                        curArgType = CONS(BASIC, make_basic(is_basic_int, 0), curArgType);
-                    }
-                    else
-                        simd_fill_curArgType_call(c);
-                } break;
-
-            case is_syntax_reference:
-                {
-                    basic bas = get_basic_from_array_ref(syntax_reference(s));
-                    curArgType = CONS(BASIC, copy_basic(bas), curArgType);
-                } break;
-            default:pips_internal_error("syntax_tag %u not supported yet",syntax_tag(s));
-
-        }
-    }
+        c= CONS(BASIC,basic_of_expression(arg),c);
+    return c;
 }
 
 void simd_fill_finalArgType(statement stat)
 {
-    simd_fill_curArgType_call(statement_call(stat));
-    finalArgType = gen_copy_seq(curArgType);
+    finalArgType=simd_fill_curArgType_call(statement_call(stat));
 }
 
 void simd_fill_curArgType(statement stat)
 {
-    simd_fill_curArgType_call(statement_call(stat));
+    curArgType=simd_fill_curArgType_call(statement_call(stat));
 }
 
 bool simd_check_argType()
@@ -168,39 +92,20 @@ bool simd_check_argType()
 
     FOREACH(BASIC, finBas, finalArgType)
 	{
-		basic curBas = BASIC(CAR(pCurBas));
-
-		if((!(((basic_int_p(finBas)) &&  (basic_int(finBas) == 0)) ||
-						((basic_int_p(curBas)) &&  (basic_int(curBas) == 0)))) &&
-				!basic_equal_p(curBas, finBas))
-		{
-			return false;
-		}
-
-		else if(((basic_int_p(finBas)) &&  (basic_int(finBas) == 0)))
-		{
-			basic_tag(finBas) = basic_tag(curBas);
-
-			switch(basic_tag(curBas))
-			{
-				case is_basic_int: basic_int(finBas) = basic_int(curBas); break;
-				case is_basic_float: basic_float(finBas) = basic_float(curBas); break;
-				case is_basic_logical: basic_logical(finBas) = basic_logical(curBas); break;
-				default:pips_internal_error("basic_tag %u not supported yet",basic_tag(curBas));
-			}
-		}
-
-		pCurBas = CDR(pCurBas);
 		if(ENDP(pCurBas) )
 			return false;
-
+		basic curBas = BASIC(CAR(pCurBas));
+        if(!basic_equal_p(curBas, finBas))
+            return false;
+		pCurBas = CDR(pCurBas);
 	}
 
-    gen_free_list(curArgType);
+    gen_full_free_list(curArgType);
     curArgType = NIL;
 
     return true;
 }
+
 
 static matchTree make_tree()
 {
@@ -226,24 +131,21 @@ static matchTree select_tree_branch(matchTree t, int token)
  * (the head is in fact the last argument) */
 static matchTree match_call(call c, matchTree t, list *args)
 {
-    if (!top_level_entity_p(call_function(c)) || 
-            call_constant_p(c))
+    if (!top_level_entity_p(call_function(c)) || call_constant_p(c))
         return matchTree_undefined; /* no match */
 
     t = select_tree_branch(t, get_operator_id(call_function(c)));
-    if (t == matchTree_undefined)
+    if (matchTree_undefined_p(t))
         return matchTree_undefined; /* no match */
 
     FOREACH(EXPRESSION, arg, call_arguments(c))
     {
         syntax s = expression_syntax(arg);
-
         switch(syntax_tag(s))
         {
             case is_syntax_call:
                 {
                     call c = syntax_call(s);
-
                     if (call_constant_p(c))
                     {
                         t = select_tree_branch(t, CONSTANT_TOK);
@@ -256,7 +158,7 @@ static matchTree match_call(call c, matchTree t, list *args)
 
             case is_syntax_reference:
                 {
-                    basic bas = get_basic_from_array_ref(syntax_reference(s));
+                    basic bas = basic_of_reference(syntax_reference(s));
                     if(bas == basic_undefined)
                     {
                         return matchTree_undefined;
@@ -265,6 +167,7 @@ static matchTree match_call(call c, matchTree t, list *args)
                     {
                         t = select_tree_branch(t, REFERENCE_TOK);
                         *args = CONS(EXPRESSION, arg, *args);
+                        free_basic(bas);
                     }
                     break;
                 }
@@ -274,7 +177,7 @@ static matchTree match_call(call c, matchTree t, list *args)
                 return matchTree_undefined; /* unexpected token !! -> no match */
         }
 
-        if (t == matchTree_undefined)
+        if (matchTree_undefined_p(t) )
             return matchTree_undefined;
     }
         
@@ -288,10 +191,8 @@ static list merge_lists(list l, list format)
     list res = NIL;
 
     /* merge according to the format specifier list */
-    for( ; format != NIL; format = CDR(format))
+    FOREACH(PATTERNARG,param,format)
     {
-        patternArg param = PATTERNARG(CAR(format));
-
         if (patternArg_dynamic_p(param))
         {
             if (l != NIL)
@@ -320,30 +221,29 @@ static list merge_lists(list l, list format)
 /* return a list of matching statements */
 list match_statement(statement s)
 {
-    matchTree t;
-    list args = NULL;
     list matches = NIL;
-    list i;
 
-    if (!statement_call_p(s))
-        return NIL;
-
-    /* find the matching patterns */
-    t = match_call(statement_call(s), patterns_tree, &args);
-    if (t == matchTree_undefined)
+    if (statement_call_p(s))
     {
-        gen_free_list(args);
-        return NIL;
-    }
 
-    /* build the matches */
-    for(i = matchTree_patterns(t); i != NIL; i = CDR(i)) 
-    {
-        patternx p = PATTERNX(CAR(i));
-        match m = make_match(patternx_class(p), 
-                merge_lists(args, patternx_args(p)));
+        /* find the matching patterns */
+        list args = NIL;
+        matchTree t = match_call(statement_call(s), patterns_tree, &args);
+        if (matchTree_undefined_p(t))
+        {
+            gen_free_list(args);
+            return NIL;
+        }
 
-        matches = CONS(MATCH, m, matches);
+        /* build the matches */
+        FOREACH(PATTERNX, p ,matchTree_patterns(t))
+        {
+            match m = make_match(
+                    patternx_class(p),
+                    merge_lists(args, patternx_args(p))
+                    );
+            matches = CONS(MATCH, m, matches);
+        }
     }
 
     return matches;
@@ -392,17 +292,24 @@ void insert_pattern(char * s, list tokens, list args)
     matchTree_patterns(m) = CONS(PATTERNX, p, matchTree_patterns(m));
 }
 
-void patterns_yyparse();
+extern void patterns_yyparse();
+extern FILE * patterns_yyin;
 
-void init_tree_patterns()
+bool simd_treematcher(__attribute__((unused)) char * module_name)
 {
-    extern FILE * patterns_yyin;
+    /* create a new tree match */
+    matchTree treematch = make_tree();
+    set_simd_treematch(treematch);
 
-    if (patterns_tree == NULL) /* never initialized */
-    {
-        patterns_tree = make_tree();
-        patterns_yyin=fopen_config("patterns.def","SIMD_PATTERN_FILE",NULL);
-        patterns_yyparse();
-        fclose(patterns_yyin);
-    }
+    /* fill it */
+    patterns_yyin=fopen_config("patterns.def","SIMD_PATTERN_FILE",NULL);
+    patterns_yyparse();
+    fclose(patterns_yyin);
+
+    /* put it in pipsdbm */
+    DB_PUT_MEMORY_RESOURCE(DBR_SIMD_TREEMATCH,"",treematch);
+
+    /* clean up */
+    reset_simd_treematch();
+    return true;
 }

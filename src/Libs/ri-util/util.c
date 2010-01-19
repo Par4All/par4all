@@ -495,11 +495,6 @@ string string_remove_trailing_line_feeds(string s)
   return s;
 }
 
-/* print a list of strings */
-void dump_strings(list sl)
-{
-  dump_words(sl);
-}
 
 /* Get rid of linefeed/newline at the end of a string.
  *

@@ -601,7 +601,7 @@ bool entity_union_p(entity e)
   return union_p;
 }
 
-bool derived_entity_p(e)
+bool derived_entity_p(entity e)
 {
   return entity_struct_p(e) || entity_union_p(e) || entity_enum_p(e);
 }
@@ -1932,4 +1932,52 @@ bool entities_p(list el)
     }
   }
   return success_p;
+}
+
+entity operator_neutral_element(entity op)
+{
+    string en = entity_user_name(op);
+
+    const char * one_neutral []= {
+        MULTIPLY_OPERATOR_NAME,
+        MIN_OPERATOR_NAME,
+        AND_OPERATOR_NAME,
+        NULL
+    };
+    for(int i=0;one_neutral[i];i++)
+        if(same_string_p(one_neutral[i],en)) return find_entity_1();
+
+    const char * plus_inf_neutral[] = {
+        MIN_OPERATOR_NAME ,
+        BITWISE_AND_OPERATOR_NAME,
+        NULL
+    };
+    for(int i=0;plus_inf_neutral[i];i++)
+        if(same_string_p(plus_inf_neutral[i],en)) {
+            pips_user_warning("assuming reduction on integer\n");
+            return make_integer_constant_entity(UINT_MAX);
+        }
+
+    const char * minus_inf_neutral[] = {
+        MAX_OPERATOR_NAME,
+        NULL
+    };
+    for(int i=0;minus_inf_neutral[i];i++)
+        if(same_string_p(minus_inf_neutral[i],en)){
+            pips_user_warning("assuming reduction on integer\n");
+            return make_integer_constant_entity(INT_MIN);
+        }
+
+    const char * zero_neutral [] ={
+        PLUS_OPERATOR_NAME,
+        BITWISE_OR_OPERATOR_NAME,
+        PLUS_C_OPERATOR_NAME,
+        OR_OPERATOR_NAME,
+        NULL
+    };
+    for(int i=0;zero_neutral[i];i++)
+        if(same_string_p(zero_neutral[i],en)) return find_entity_0();
+
+    pips_internal_error("hunhadled case\n");
+    return entity_undefined;
 }

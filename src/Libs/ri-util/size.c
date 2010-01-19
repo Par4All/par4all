@@ -97,60 +97,62 @@ bool SizeOfArray(entity e, int * s)
   ok = NumberOfElements(variable_basic(a), variable_dimensions(a), &ne);
 
   if(!ok) {
-    /* Let's try to use the initial value */
-    value ev = entity_initial(e);
-    //basic eb = variable_basic(a);
+      /* Let's try to use the initial value */
+      value ev = entity_initial(e);
+      if(!value_undefined_p(ev))
+      {
 
-    if(value_expression_p(ev)) {
-      expression eve = value_expression(ev);
-      //type evet = expression_to_type(eve);
-      basic eveb = basic_of_expression(eve); /* FI: should eveb be freed? */
+          if(value_expression_p(ev)) {
+              expression eve = value_expression(ev);
+              //type evet = expression_to_type(eve);
+              basic eveb = basic_of_expression(eve); /* FI: should eveb be freed? */
 
-      /* Is it an array of characters initialized with a string expression? */
-      if(char_type_p(et) && !basic_undefined_p(eveb) && basic_string_p(eveb)) {
-	ne = string_type_size(eveb);
-	ok = TRUE;
+              /* Is it an array of characters initialized with a string expression? */
+              if(char_type_p(et) && !basic_undefined_p(eveb) && basic_string_p(eveb)) {
+                  ne = string_type_size(eveb);
+                  ok = TRUE;
+              }
+              else if(expression_call_p(eve)) {
+                  call evec = syntax_call(expression_syntax(eve));
+                  entity f = call_function(evec);
+                  list args = call_arguments(evec);
+
+                  /* Is it a call to the BRACE_INTRINSIC operator? */
+                  if(ENTITY_BRACE_INTRINSIC_P(f)) {
+                      /* This is too simple unfortunately */
+                      /* ne = gen_length(args); */
+                      int ni = number_of_initial_values(args);
+                      int nf = number_of_fields(et);
+                      ne = ni/nf;
+                      if(nf*ne!=ni) {
+                          /* Should be a call to CParserError()... */
+                          pips_user_error("Number of initialization values (%d) incompatible"
+                                  " with number of type fields (%d)\n", ni, nf);
+                      }
+                      ok = TRUE;
+                  }
+                  /* Check for other dimensions which must be all declared: the
+                     first dimension only can be implicit */
+                  /* Already taken care of by "ni" */
+                  /*
+                     if(ok && gen_length(variable_dimensions(a))>1) {
+                     bool sok = FALSE;
+                     int sne = -1;
+                     sok = NumberOfElements(variable_basic(a), CDR(variable_dimensions(a)), &sne);
+                     if(sok) {
+                     ne *= sne;
+                     }
+                     else {
+                     ok = FALSE;
+                     }
+                     }
+                     */
+              }
+          }
+          else if(value_constant_p(ev)) {
+              pips_internal_error("Not implemented yet\n");
+          }
       }
-      else if(expression_call_p(eve)) {
-	call evec = syntax_call(expression_syntax(eve));
-	entity f = call_function(evec);
-	list args = call_arguments(evec);
-
-	/* Is it a call to the BRACE_INTRINSIC operator? */
-	if(ENTITY_BRACE_INTRINSIC_P(f)) {
-	  /* This is too simple unfortunately */
-	  /* ne = gen_length(args); */
-	  int ni = number_of_initial_values(args);
-	  int nf = number_of_fields(et);
-	  ne = ni/nf;
-	  if(nf*ne!=ni) {
-	    /* Should be a call to CParserError()... */
-	    pips_user_error("Number of initialization values (%d) incompatible"
-			    " with number of type fields (%d)\n", ni, nf);
-	  }
-	  ok = TRUE;
-	}
-	/* Check for other dimensions which must be all declared: the
-	   first dimension only can be implicit */
-	/* Already taken care of by "ni" */
-	/*
-	if(ok && gen_length(variable_dimensions(a))>1) {
-	  bool sok = FALSE;
-	  int sne = -1;
-	  sok = NumberOfElements(variable_basic(a), CDR(variable_dimensions(a)), &sne);
-	  if(sok) {
-	    ne *= sne;
-	  }
-	  else {
-	    ok = FALSE;
-	  }
-	}
-	*/
-      }
-    }
-    else if(value_constant_p(ev)) {
-      pips_internal_error("Not implemented yet\n");
-    }
   }
 
   /* Check for 32 bit signed overflows */
@@ -243,10 +245,14 @@ int type_memory_size(type t)
     pips_internal_error("arg. with ill. tag %d\n", type_tag(t));
     break;
   case is_type_variable:
-    /* Seems to be the case for defined types; FI: why are they
-       allocated in RAM while they only exist at compile time ? */
-    s = SizeOfElements(variable_basic(type_variable(t)));
-    break;
+    {
+        /* Seems to be the case for defined types; FI: why are they
+           allocated in RAM while they only exist at compile time ? */
+        s = SizeOfElements(variable_basic(type_variable(t)));
+        FOREACH(DIMENSION,dim, variable_dimensions(type_variable(t)))
+            s*=dimension_size(dim);
+
+    } break;
   case is_type_struct:
     MAP(ENTITY, v, {s+=CSafeSizeOfArray(v);}, type_struct(t));
     break;
@@ -388,9 +394,11 @@ NumberOfElements(basic b, list ld, int * n)
   /* let's take care of the current level */
   if(ok) {
     for (pc = ld; pc != NULL && ok; pc = CDR(pc)) {
-      int s;
-      ok = SizeOfDimension(DIMENSION(CAR(pc)), &s);
-      ne *= s;
+        expression sod = SizeOfDimension(DIMENSION(CAR(pc)));
+        int s;
+        ok=expression_integer_value(sod,&s);
+        free_expression(sod);
+        ne *= s;
     }
   }
 
@@ -440,10 +448,12 @@ SizeOfIthDimension(entity e, int i)
 	abort();
     }
 
-    if(!(SizeOfDimension(DIMENSION(CAR(pc)), &s))) {
+    expression sod = SizeOfDimension(DIMENSION(CAR(pc)));
+    if(!(expression_integer_value(sod, &s))) {
 	fprintf(stderr, "[SizeOfIthDimension] Non constant %dth dimension\n", i);
 	abort();
     }
+    free_expression(sod);
 
     return s;
 }
@@ -455,26 +465,24 @@ SizeOfIthDimension(entity e, int i)
 int
 dimension_size(dimension d)
 {
-    int s = 0;
-
-    if(!SizeOfDimension(d, &s)) {
-	pips_error("dimension_size", "Probably varying size array\n");
-    }
-
-    return s;
+    expression sod= SizeOfDimension(d);
+    int i;
+    if(expression_integer_value(sod,&i))
+        free_expression(sod);
+    else
+        pips_internal_error("dimension is not constant, use SizeOfDimension instead");
+    return i;
 }
 
-bool
-SizeOfDimension(dimension d, int * s)
+expression
+SizeOfDimension(dimension d)
 {
-    int l = 0;
-    int u = 0;
-    bool ok = TRUE;
-	
-    ok = expression_integer_value(dimension_upper(d), &u) &&
-	   expression_integer_value(dimension_lower(d), &l);
-    *s = u - l + 1;
-    return ok;
+    return 
+        make_op_exp(PLUS_OPERATOR_NAME,
+                make_op_exp(MINUS_OPERATOR_NAME,copy_expression(dimension_upper(d)),copy_expression(dimension_lower(d))),
+                make_expression_1()
+                )
+                ;
 }
 
 

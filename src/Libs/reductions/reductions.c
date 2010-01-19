@@ -660,9 +660,15 @@ entity reduction_operator_entity(reduction_operator op)
         case is_reduction_operator_prod:
             opname=MULTIPLY_OPERATOR_NAME;break;
         default:
-            pips_internal_error("unhadled case\n");
+            pips_internal_error("unhandled case\n");
     }
     return entity_intrinsic(opname);
+}
+
+bool same_reduction_p(reduction r1, reduction r2)
+{
+    return ( (reference_equal_p(reduction_reference(r1),reduction_reference(r2))) &&
+            (reduction_operator_tag(reduction_op(r1)) == reduction_operator_tag(reduction_op(r2))) );
 }
 
 /* end of it!

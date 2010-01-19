@@ -48,25 +48,44 @@
 #include <string.h>
 
 #include "genC.h"
-
-#include "misc.h"
 #include "linear.h"
 #include "ri.h"
+
+#include "dg.h"
+
+typedef dg_arc_label arc_label;
+typedef dg_vertex_label vertex_label;
+
+
+#include "graph.h"
 #include "ri-util.h"
-#include "resources.h"
+#include "text-util.h"
+#include "database.h"
+#include "misc.h"
 #include "pipsdbm.h"
-#include "properties.h"
-#include "prettyprint.h"
+#include "resources.h"
+#include "transformer.h"
+#include "semantics.h"
+#include "control.h"
+#include "transformations.h"
 
 #include "effects-generic.h"
 #include "effects-simple.h"
+#include "properties.h"
+
+#include "expressions-local.h"
+#include "expressions.h"
+#include "callgraph.h"
+
+#include "ricedg.h"
+#include "sac.h"
 
 /* structure to hold a substitution to be performed forward.
  */
 typedef struct
 {
     statement source; /* the statement where the definition was found. */
-    entity var;       /* maybe could be a reference to allow arrays? */
+    reference ref;       /* maybe could be a reference to allow arrays? */
     expression val;   /* the result of the substitution. */
 }
     t_substitution, * p_substitution;
@@ -74,31 +93,30 @@ typedef struct
 /* newgen-looking make/free
  */
 static p_substitution 
-make_substitution(statement source, entity var, expression val)
+make_substitution(statement source, reference ref, expression val)
 {
     p_substitution subs;
-    basic bval = basic_of_expression(val), bvar = entity_basic(var);
+    basic bval = basic_of_expression(val),
+          bref = basic_of_reference(ref);
 
-    pips_assert("defined basics", 
-		!(basic_undefined_p(bval) || basic_undefined_p(bvar)));
+    pips_assert("defined basics", !(basic_undefined_p(bval) || basic_undefined_p(bref)));
 
     subs = (p_substitution) malloc(sizeof(t_substitution));
     pips_assert("malloc ok", subs);
     subs->source = source;
-    subs->var = var;
-    if (basic_equal_p(bval, bvar))
-	subs->val = copy_expression(val);
+    subs->ref = ref;
+    if (basic_equal_p(bval, bref))
+        subs->val = copy_expression(val);
     else
     {
-	entity conv = basic_to_generic_conversion(bvar);
-	if (entity_undefined_p(conv))
-	{
-	    pips_user_warning("no conversion function...");
-	    free(subs); 
-	    return NULL;
-	}
-	subs->val = make_call_expression
-	    (conv, CONS(EXPRESSION, copy_expression(val), NIL));
+        entity conv = basic_to_generic_conversion(bref);
+        if (entity_undefined_p(conv))
+        {
+            pips_user_warning("no conversion function...");
+            free(subs); 
+            return NULL;
+        }
+        subs->val = MakeUnaryCall(conv,copy_expression(val));
     }
     free_basic(bval);
     return subs;
@@ -117,20 +135,19 @@ free_substitution(p_substitution subs)
 
 static bool no_write_effects_on_var(entity var, list le)
 {
-  MAP(EFFECT, e, 
-      if (effect_write_p(e) && entity_conflict_p(effect_variable(e), var))
-        return FALSE,
-      le);
-  return TRUE;  
+    FOREACH(EFFECT, e, le)
+        if (effect_write_p(e) && entity_conflict_p(effect_variable(e), var))
+            return FALSE;
+                   return TRUE;  
 }
 
-static bool functionnal_on_effects(entity var, list /* of effect */ le)
+static bool functionnal_on_effects(reference ref, list /* of effect */ le)
 {
-  MAP(EFFECT, e, {
-      if ((effect_write_p(e) && effect_variable(e)!=var) ||
-	  (effect_read_p(e) && entity_conflict_p(effect_variable(e), var)))
-      return FALSE;},
-      le);
+    FOREACH(EFFECT, e, le) {
+        if ((effect_write_p(e) && effect_variable(e)!=reference_variable(ref)) ||
+                (effect_read_p(e) && entity_conflict_p(effect_variable(e), reference_variable(ref))))
+            return FALSE;
+    }
   return TRUE;  
 }
 
@@ -138,7 +155,7 @@ static bool functionnal_on_effects(entity var, list /* of effect */ le)
  * or if some variable conflicting with var is read... (?) 
  * proper_effects must be available.
  */
-static bool functionnal_on(entity var, statement s)
+static bool functionnal_on(reference ref, statement s)
 {
   effects efs = load_proper_rw_effects(s);
 
@@ -146,13 +163,13 @@ static bool functionnal_on(entity var, statement s)
     pips_assert("efs is consistent", effects_consistent_p(efs));
   }
 
-  return functionnal_on_effects(var, effects_effects(efs));
+  return functionnal_on_effects(ref, effects_effects(efs));
 }
 
 /* Whether it is a candidate of a substitution operation. that is: 
  * (1) it is a call
  * (2) it is an assignment call
- * (3) the assigned variable is a scalar
+ * (3) the assigned variable is a scalar (sg: no longer true !)
  * (4) there are no side effects in the expression
  * 
  * Note: a substitution candidate might be one after substitutions...
@@ -161,9 +178,10 @@ static bool functionnal_on(entity var, statement s)
  */
 static p_substitution substitution_candidate(statement s, bool only_scalar)
 {
+    only_scalar=true;
   list /* of expression */ args;
   call c;
-  entity fun, var;
+  entity fun;
   syntax svar;
   instruction i = statement_instruction(s);
   
@@ -174,22 +192,18 @@ static p_substitution substitution_candidate(statement s, bool only_scalar)
   
   if (!ENTITY_ASSIGN_P(fun)) return NULL; /* ASSIGN */
   
-  ifdebug(7) {
-    pips_debug(7, "considering assignment statement:\n");
-    print_statement(s);
-  }
   
   args = call_arguments(c);
   pips_assert("2 args to =", gen_length(args)==2);
   svar = expression_syntax(EXPRESSION(CAR(args)));
   pips_assert("assign to a reference", syntax_reference_p(svar));
-  var = reference_variable(syntax_reference(svar));
+  reference ref = syntax_reference(svar);
   
-  if (only_scalar && !entity_scalar_p(var)) return NULL; /* SCALAR */
+  //if (only_scalar && ENDP(reference_indices(ref))) return NULL; /* SCALAR */
   
-  if (!functionnal_on(var, s)) return NULL; /* NO SIDE EFFECTS */
+  if (!functionnal_on(ref, s)) return NULL; /* NO SIDE EFFECTS */
   
-  return make_substitution(s, var, EXPRESSION(CAR(CDR(args))));
+  return make_substitution(s, ref, EXPRESSION(CAR(CDR(args))));
 }
 
 /* x    = a(i) ; 
@@ -211,7 +225,7 @@ static bool cool_enough_for_a_last_substitution(statement s)
 /* s = r ;
  * s = s + w ; // read THEN write...
  */
-static bool other_cool_enough_for_a_last_substitution(statement s, entity v)
+static bool other_cool_enough_for_a_last_substitution(statement s, reference ref)
 {
   instruction i = statement_instruction(s);
   call c;
@@ -219,7 +233,6 @@ static bool other_cool_enough_for_a_last_substitution(statement s, entity v)
   syntax svar;
   entity var;
   list le;
-  bool cool;
 
   if (!instruction_call_p(i)) 
     return FALSE;
@@ -238,7 +251,7 @@ static bool other_cool_enough_for_a_last_substitution(statement s, entity v)
   if (!entity_scalar_p(var)) return FALSE;
   
   le = proper_effects_of_expression(EXPRESSION(CAR(CDR(args))));
-  cool = no_write_effects_on_var(v, le);
+  bool cool = no_write_effects_on_var(reference_variable(ref), le);
   gen_full_free_list(le);
 
   return cool;
@@ -249,23 +262,54 @@ static bool other_cool_enough_for_a_last_substitution(statement s, entity v)
 static bool expr_flt(expression e, p_substitution subs)
 {
     syntax s = expression_syntax(e);
-    reference r;
     if (!syntax_reference_p(s)) return TRUE;
-    r = syntax_reference(s);
-    if (reference_variable(r) == subs->var)
+
+    reference r = syntax_reference(s);
+    if (reference_equal_p(r,subs->ref)) 
     {
-	expression_syntax(e) = copy_syntax(expression_syntax(subs->val));
-	/* FI->FC: the syntax may be freed but not always the reference it
-contains because it can also be used in effects. The bug showed on
-transformations/Validation/fs01.f, fs02.f, fs04.f. I do not know why the
-effects are still used after the statement has been updated (?). The bug
-can be avoided by closing and opening the workspace which generates
-independent references in statements and in effects. Is there a link with
-the notion of cell = reference+preference? */
-	/* free_syntax(s); */
-	return FALSE;
+        ifdebug(2) {
+            pips_debug(2,"substituing ");
+            print_reference(subs->ref);
+            pips_debug(2," to ");
+            print_reference(r);
+            pips_debug(2,"\n");
+        }
+        expression_syntax(e) = copy_syntax(expression_syntax(subs->val));
+        /* FI->FC: the syntax may be freed but not always the reference it
+           contains because it can also be used in effects. The bug showed on
+           transformations/Validation/fs01.f, fs02.f, fs04.f. I do not know why the
+           effects are still used after the statement has been updated (?). The bug
+           can be avoided by closing and opening the workspace which generates
+           independent references in statements and in effects. Is there a link with
+           the notion of cell = reference+preference? */
+        /* free_syntax(s); */
+        return true;
+    }
+    else
+    {
+        ifdebug(2) {
+            pips_debug(2,"not substituing ");
+            print_reference(subs->ref);
+            pips_debug(2," to ");
+            print_reference(r);
+            pips_debug(2,"\n");
+        }
     }
     return TRUE;
+}
+
+static bool
+call_flt(call c, p_substitution subs)
+{
+    entity op = call_function(c);
+    if(same_entity_p(op, entity_intrinsic(ASSIGN_OPERATOR_NAME))||
+            !entity_undefined_p(update_operator_to_regular_operator(op)))
+    {
+        expression lhs = binary_call_lhs(c);
+        if(expression_reference_p(lhs) && reference_equal_p(expression_reference(lhs),subs->ref))
+            gen_recurse_stop(lhs);
+    }
+    return true;
 }
 
 static void
@@ -273,7 +317,10 @@ perform_substitution(
     p_substitution subs, /* substitution to perform */
     void * s /* where to do this */)
 {
-    gen_context_recurse(s, subs, expression_domain, expr_flt, gen_null);
+    gen_context_multi_recurse(s, subs,
+            expression_domain, expr_flt, gen_null,
+            call_domain,call_flt,gen_null,
+            NULL);
 }
 
 static void
@@ -290,9 +337,7 @@ perform_substitution_in_assign(p_substitution subs, statement s)
   args = call_arguments(instruction_call(i));
 
   perform_substitution(subs, EXPRESSION(CAR(CDR(args))));
-  MAP(EXPRESSION, e, perform_substitution(subs, e), 
-      reference_indices(syntax_reference
-	  (expression_syntax(EXPRESSION(CAR(args))))));
+  MAP(EXPRESSION, e, perform_substitution(subs, e), reference_indices(syntax_reference(expression_syntax(EXPRESSION(CAR(args))))));
 }
 
 /* whether there are some conflicts between W cumulated in s2
@@ -302,78 +347,144 @@ perform_substitution_in_assign(p_substitution subs, statement s)
  * proper and cumulated effects must be available.
  */
 static bool 
-some_conflicts_between(statement s1, statement s2, bool only_written)
+some_conflicts_between(hash_table successors, statement s1, statement s2, p_substitution sub )
 {
-  effects efs1, efs2;
-  efs1 = load_proper_rw_effects(s1);
-  efs2 = load_cumulated_rw_effects(s2);
-  
-  pips_debug(8, "looking for conflict %d/%d\n", 
-	     statement_number(s1), statement_number(s2));
-  
-  MAP(EFFECT, e2,
-  {
-    if (effect_write_p(e2))
+    /*
+       effects efs1, efs2;
+       efs1 = load_proper_rw_effects(s1);
+       efs2 = load_cumulated_rw_effects(s2);
+       */
+    pips_debug(2, "looking for conflict with statement\n");
+    ifdebug(2) { print_statement(s2); }
+    list s1_successors = hash_get(successors,s1);
+    FOREACH(SUCCESSOR,s,s1_successors)
     {
-      entity v2 = effect_variable(e2);
-      pips_debug(9, "written variable %s\n", entity_name(v2));
-      MAP(EFFECT, e1,
-	  if (entity_conflict_p(effect_variable(e1), v2) &&
-	      (!(only_written && effect_read_p(e1))))
-      {
-	pips_debug(8, "conflict with %s\n", entity_name(effect_variable(e1)));
-	return TRUE;
-      },
-	  effects_effects(efs1));
+        statement ss = vertex_to_statement(successor_vertex(s));
+        pips_debug(2, "checking:\n");
+        ifdebug(2) { print_statement(ss); }
+        if(statement_in_statement_p(ss,s2))
+        {
+            FOREACH(CONFLICT,c,dg_arc_label_conflicts(successor_arc_label(s)))
+            {
+                /* if there is a write-* conflict, we cannot do much */
+                if ( reference_equal_p(sub->ref ,effect_any_reference(conflict_source(c))) &&
+                            effect_write_p(conflict_sink(c)) /*&& effect_write_p(conflict_sink(c))*/ )
+                {
+                    /* this case is safe */
+                    if( ENDP(reference_indices(effect_any_reference(conflict_source(c)))) && 
+                            !ENDP(reference_indices(effect_any_reference(conflict_sink(c)))))
+                        continue;
+
+                    pips_debug(2, "conflict found on reference, with") ;
+                    ifdebug(2) { print_reference(effect_any_reference(conflict_sink(c)));}
+                    ifdebug(2) { print_reference(effect_any_reference(conflict_source(c)));}
+                    fprintf(stderr, "\n") ;
+                    return true;
+                }
+            }
+        }
     }
-  },
-      effects_effects(efs2));
-  
-  pips_debug(8, "no conflict\n");
-  return FALSE;
+
+    /*
+       FOREACH(EFFECT, e2,effects_effects(efs2))
+       {
+       if (effect_write_p(e2))
+       {
+       entity v2 = effect_variable(e2);
+       pips_debug(9, "written variable %s\n", entity_name(v2));
+       FOREACH(EFFECT, e1,effects_effects(efs1))
+       if (entity_conflict_p(effect_variable(e1), v2) &&
+       (!(only_written && effect_read_p(e1))))
+       {
+       pips_debug(8, "conflict with %s\n", entity_name(effect_variable(e1)));
+       return TRUE;
+       }
+       }
+       }
+       */
+    pips_debug(2, "no conflict\n");
+    return false;
+}
+
+struct s_p_s {
+    p_substitution subs;
+    hash_table successors;
+    bool stop;
+};
+
+static bool
+do_substitute(statement anext, struct s_p_s *param)
+{
+    if(!statement_block_p(anext))
+    {
+        ifdebug(1) {
+            pips_debug(1, "with statement:\n");
+            print_statement(anext);
+        }
+        if (some_conflicts_between(param->successors,param->subs->source, anext, param->subs))
+        {
+            /* for some special case the substitution is performed.
+             * in some cases effects should be updated?
+             */
+            if (cool_enough_for_a_last_substitution(anext) &&
+                    !some_conflicts_between(param->successors,param->subs->source, anext, param->subs))
+                perform_substitution(param->subs, anext);
+            else
+                if (other_cool_enough_for_a_last_substitution(anext, param->subs->ref))
+                    perform_substitution_in_assign(param->subs, anext);
+            param->stop=true;
+
+            /* now STOP propagation!
+            */
+            gen_recurse_stop(NULL);
+        }
+        else
+            perform_substitution(param->subs, anext);
+    }   
+    return true;
 }
 
 /* top-down forward substitution of scalars in SEQUENCE only.
  */
-static bool seq_flt(sequence s)
+static bool
+fs_filter(statement stat, graph dg)
 {
-  MAPL(ls, 
-  {
-    statement first = STATEMENT(CAR(ls));
-    p_substitution subs = substitution_candidate(first, TRUE);
-    if (subs)
+    if(statement_block_p(stat))
     {
-      /* scan following statements and substitute while no conflicts.
-       */
-      MAP(STATEMENT, anext,
-      {
-	if (some_conflicts_between(subs->source, anext, FALSE))
-	{
-	  /* for some special case the substitution is performed.
-	   * in some cases effects should be updated?
-	   */
-	  if (cool_enough_for_a_last_substitution(anext) &&
-	      !some_conflicts_between(subs->source, anext, TRUE))
-	    perform_substitution(subs, anext);
-	  else
-	    if (other_cool_enough_for_a_last_substitution(anext, subs->var))
-	      perform_substitution_in_assign(subs, anext);
+        ifdebug(1) {
+            pips_debug(1, "considering block statement:\n");
+            print_statement(stat);
+        }
+        hash_table successors = statements_to_successors(statement_block(stat),dg);
+        for(list ls = statement_block(stat);!ENDP(ls);POP(ls)) 
+        {
+            statement first = STATEMENT(CAR(ls));
+            if(assign_statement_p(first))
+            {
+                ifdebug(1) {
+                    pips_debug(1, "considering assignment statement:\n");
+                    print_statement(first);
+                }
+                p_substitution subs = substitution_candidate(first, TRUE);
+                if (subs)
+                {
+                    /* scan following statements and substitute while no conflicts.
+                    */
+                    struct s_p_s param = { subs, successors,false};
+                    FOREACH(STATEMENT,next,CDR(ls))
+                    {
+                        param.stop=false;
+                        gen_context_recurse(next,&param,statement_domain,do_substitute,gen_null);
+                        if(param.stop) break;
+                    }
 
-	  /* now STOP propagation!
-	   */
-	  break; 
-	}
-	else
-	  perform_substitution(subs, anext);
-      },   
-	  CDR(ls));
-      
-      free_substitution(subs);
+                    free_substitution(subs);
+                }
+            }
+        }
+        hash_table_free(successors);
     }
-  },
-       sequence_statements(s));
-  
-  return TRUE;
+    return true;
 }
 
 /* interface to pipsmake.
@@ -381,34 +492,30 @@ static bool seq_flt(sequence s)
  */
 bool forward_substitute(string module_name)
 {
-    statement stat;
-
     debug_on(DEBUG_NAME);
 
     /* set require resources.
      */
     set_current_module_entity(local_name_to_top_level_entity(module_name));
-    set_current_module_statement((statement)
-        db_get_memory_resource(DBR_CODE, module_name, TRUE));
-    set_proper_rw_effects((statement_effects)
-	db_get_memory_resource(DBR_PROPER_EFFECTS, module_name, TRUE));
-    set_cumulated_rw_effects((statement_effects)
-	db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
-
-    stat = get_current_module_statement();
+    set_current_module_statement((statement)db_get_memory_resource(DBR_CODE, module_name, TRUE));
+    set_proper_rw_effects((statement_effects)db_get_memory_resource(DBR_PROPER_EFFECTS, module_name, TRUE));
+    set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
+	set_ordering_to_statement(get_current_module_statement());
+    graph dg = (graph) db_get_memory_resource(DBR_DG, module_name, TRUE);
 
     /* do the job here:
      */
-    gen_recurse(stat, sequence_domain, seq_flt, gen_null);
+    gen_context_recurse(get_current_module_statement(), dg,statement_domain, fs_filter,gen_null);
 
     /* return result and clean.
      */
-    DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, stat);
+    DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, get_current_module_statement());
 
     reset_cumulated_rw_effects();
     reset_proper_rw_effects();
     reset_current_module_entity();
     reset_current_module_statement();
+    reset_ordering_to_statement();
 
     debug_off();
 

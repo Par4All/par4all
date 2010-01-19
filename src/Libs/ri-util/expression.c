@@ -698,7 +698,7 @@ bool signed_integer_constant_expression_p(expression e)
 	if(um == gen_find_tabulated(make_entity_fullname(TOP_LEVEL_MODULE_NAME,
 							 UNARY_MINUS_OPERATOR_NAME),
 				    entity_domain)) {
-	  expression e2 = EXPRESSION(CAR(call_arguments(c)));
+	  expression e2 = binary_call_lhs(c);
 
 	  return integer_constant_expression_p(e2);
 	}
@@ -1786,14 +1786,11 @@ expression make_op_exp(char *op_name, expression exp1, expression exp2)
   if( ! ENTITY_FOUR_OPERATION_P(op_ent) )
     user_error("make_op_exp", "operation must be : +, -, * or /");
 
-  if( expression_constant_p(exp1) && expression_constant_p(exp2) )
+  int val1, val2;
+  if( expression_integer_value(exp1,&val1) && expression_integer_value(exp2,&val2) )
     {
-      int val1, val2;
 
       debug(6, "make_op_exp", "Constant expressions\n");
-
-      val1 = expression_to_int(exp1);
-      val2 = expression_to_int(exp2);
 
       if (ENTITY_PLUS_P(op_ent))
 	result_exp = make_integer_constant_expression(val1 + val2);
@@ -1922,7 +1919,7 @@ int expression_to_int(expression exp)
       break;
     }
     case is_value_intrinsic: {
-      rv = 0 - expression_to_int(EXPRESSION(CAR(call_arguments(c))));
+      rv = 0 - expression_to_int(binary_call_lhs(c));
       break;
     }
     default:
@@ -1968,7 +1965,7 @@ bool expression_constant_p(expression exp)
 	case is_value_intrinsic:
 	    if(ENTITY_UNARY_MINUS_P(call_function(c)))
 		return expression_constant_p
-		    (EXPRESSION(CAR(call_arguments(c))));
+		    (binary_call_lhs(c));
 	default:
 	  ;
 	}
@@ -2422,8 +2419,8 @@ bool simplify_C_expression(expression e)
       }
       else if(gen_length(call_arguments(c))==2) {
 	/* Check "+C" and "-C" */
-	expression e1 = EXPRESSION(CAR(call_arguments(c)));
-	expression e2 = EXPRESSION(CAR(CDR(call_arguments(c))));
+	expression e1 = binary_call_lhs(c);
+	expression e2 = binary_call_rhs(c);
 	bool can_be_substituted_p1 = simplify_C_expression(e1);
 	bool can_be_substituted_p2 = simplify_C_expression(e2);
 	can_be_substituted_p = can_be_substituted_p1 && can_be_substituted_p2;
@@ -2877,4 +2874,12 @@ bool brace_expression_p(expression e)
             return TRUE;
     }
     return FALSE;
+}
+/* This function returns TRUE if Reference r is scalar 
+*/
+
+boolean reference_scalar_p(reference r)
+{
+    assert(!reference_undefined_p(r) && r!=NULL && reference_variable(r)!=NULL);
+    return (reference_indices(r) == NIL);
 }

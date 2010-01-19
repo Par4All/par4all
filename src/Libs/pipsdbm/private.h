@@ -45,3 +45,6 @@ typedef void * db_void;
 #include "newgen.h" /* needed for statement_mapping */
 #include "database.h" /* for obsolete functions... */
 #include "pipsdbm.h"
+
+/* SG: for free managment of a custom type */
+extern void free_operator_id_tree(void *);

@@ -21,8 +21,6 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
-/* If conversion 
-*/
 
 #include <stdio.h>
 #include <string.h>
@@ -62,77 +60,26 @@ typedef dg_vertex_label vertex_label;
 
 #include "sac-local.h"
 
-static graph dependence_graph;
 
-/*
-   This function returns TRUE if the statement comment contains searched_string
-   */
-static bool check_if_statement_contains_comment(statement s, string searched_string)
+/** 
+ * creates a phi-instruction using the entity given in property
+ * the generated instruction as the form
+ * @a lRef = PHI(@a cond,@a ref1, @a ref2)
+ * all parameters are copied
+ */
+static instruction
+make_phi_assign_instruction(reference lRef, expression cond,
+        expression ref1, expression ref2)
 {
-    bool res = FALSE;
-
-    if (!statement_with_empty_comment_p(s)) {
-        res = (strstr(statement_comments(s) , searched_string) != NULL);
-    }
-
-    return res;
-}
-
-/*
-   This function returns the left reference of call c
-   */
-static reference get_left_ref_from_assign(call c)
-{
-    expression expr = EXPRESSION(CAR(call_arguments(c)));
-
-    pips_assert("expr is a reference", syntax_reference_p(expression_syntax(expr)));
-
-    return syntax_reference(expression_syntax(expr));
-}
-
-/*
-   This function returns a phi statement: lRef = PHI(cond, rRef1, rRef2)
-   (if(cond) then lRef = rRef1 else lRef = rRef2)
-   */
-static statement make_phi_assign_stat(reference lRef, expression cond,
-        reference rRef1, reference rRef2)
-{
-    list args = gen_make_list(expression_domain, 
+    entity phiEntity = get_function_entity(get_string_property("IF_CONVERSION_PHI"));
+    expression phiExp = MakeTernaryCallExpr(
+            phiEntity,
             copy_expression(cond),
-            reference_to_expression(copy_reference(rRef1)),
-            reference_to_expression(copy_reference(rRef2)),
-            NULL);
+            copy_expression(ref1),
+            copy_expression(ref2)
+            );
 
-    expression phiExp = call_to_expression(make_call((entity)get_function_entity(SIMD_PHI_NAME),
-                args));
-
-    statement newS = make_assign_statement(reference_to_expression(copy_reference(lRef)), phiExp);
-
-    return newS;
-}
-
-/*
-   This function returns true if the right expression of an assign statement
-   has a write effect
-   */
-static bool expr_has_write_eff_p(expression expr)
-{
-    bool actionWrite = FALSE;
-
-    list ef = expression_to_proper_effects(expr);
-
-    FOREACH(EFFECT, f,ef)
-    {
-        if(action_write_p(effect_action(f)))
-        {
-            actionWrite = TRUE;
-        }
-
-    } 
-
-    gen_free_list(ef);
-
-    return actionWrite;
+    return make_assign_instruction(reference_to_expression(copy_reference(lRef)), phiExp);
 }
 
 /*
@@ -141,90 +88,90 @@ static bool expr_has_write_eff_p(expression expr)
 
    So, this function returns true if the statement stat is supported.
    */
-bool simd_supported_stat(statement stat)
+bool simd_supported_stat_p(statement stat)
 {
-    if(!instruction_call_p(statement_instruction(stat)))
-        return FALSE;
-
-    call c = instruction_call(statement_instruction(stat));
-
-    // Only the assign statements with no side effects are supported
-    if(!ENTITY_ASSIGN_P(call_function(c)))
-        return FALSE;
-
-    expression rExp = EXPRESSION(CAR(CDR(call_arguments(c))));
-
-    if(expr_has_write_eff_p(rExp))
-        return FALSE;
-
-    return TRUE;
+    if(instruction_call_p(statement_instruction(stat)))
+    {
+        call c = instruction_call(statement_instruction(stat));
+        split_update_call(c); // this will take car of splitting a+=2 into a = a+2
+        entity op = call_function(c);
+        // Only the assign statements with no side effects are supported
+        if(ENTITY_ASSIGN_P(op) )
+        {
+            expression rExp = EXPRESSION(CAR(CDR(call_arguments(c))));
+            list effects = expression_to_proper_effects(rExp);
+            bool has_write_effect_p = effects_write_at_least_once_p(effects);
+            free(effects);
+            return !has_write_effect_p;
+        }
+    }
+    return false;
 }
 
-static bool process_true_call_stat(expression cond, statement stat, list * outStat, list * postlude)
+/** 
+ * converts statement @a stat into a phi-statement if possible
+ * 
+ * @param cond condition of the potential new phi - statement
+ * @param stat statement to check
+ * 
+ * @return true if processing was ok (sg:unclean, event to me :))
+ */
+static bool
+process_true_call_stat(expression cond, statement stat)
 {
-    call c = copy_call(instruction_call(statement_instruction(stat)));
 
     // Only the assign statements with no side effects are supported
-    if(!simd_supported_stat(stat))
-        return FALSE;
-
-    // lRef is the left reference of the assign call
-    reference lRef = get_left_ref_from_assign(c);
-
-    entity e = reference_variable(lRef);
-
-    statement assign = NULL;
-
-    basic newBas = get_basic_from_array_ref(lRef);
-
-    if(basic_undefined_p(newBas))
-        return FALSE;
-
-    // If lRef is a scalar, ...
-    if(gen_length(reference_indices(lRef)) == 0)
+    if(simd_supported_stat_p(stat))
     {
-        // Create a new entity
-        entity newVar = make_new_scalar_variable_with_prefix(entity_local_name(e),
-                get_current_module_entity(),
-                newBas);
+        call c = copy_call(instruction_call(statement_instruction(stat)));
 
-        // Replace the left reference of the assign call by the new entity
-        syntax_reference(expression_syntax(EXPRESSION(CAR(call_arguments(c))))) = make_reference(newVar, NIL);
+        // lRef is the left reference of the assign call
+        expression lhs = binary_call_lhs(c);
+        reference lhs_ref = expression_reference(lhs);
+        lhs=copy_expression(lhs); /* to prevent side effect from further inplace modification */
+        entity e = reference_variable(lhs_ref);
 
-        // Make an assign statement to add to the postlude
-        assign = make_phi_assign_stat(
-                lRef,
-                cond,
-                make_reference(newVar, NIL),
-                lRef);
+        basic newBas = basic_of_reference(lhs_ref);
 
-        *outStat = CONS(STATEMENT, call_to_statement(c), *outStat);
-        *postlude = CONS(STATEMENT, assign, *postlude);
-    }
-    // If lRef is an array reference, ...
-    else
-    {
-        // Create a new entity
-        entity newVar = make_new_scalar_variable_with_prefix(entity_local_name(e),
-                get_current_module_entity(),
-                newBas);
+        if(!basic_undefined_p(newBas))
+        {
+            ifdebug(1) {
+                pips_debug(1,"converting statement\n");
+                print_statement(stat);
+            }
+            // Create a new entity if rhs is not a reference or a constant itself
+            expression rhs = binary_call_rhs(c);
+            expression ref = expression_undefined;
+            statement to_add = statement_undefined;
+            if(expression_reference_p(rhs)||expression_constant_p(rhs))
+                ref = rhs;
+            else {
+                entity newVar = make_new_scalar_variable_with_prefix(entity_local_name(e),
+                        get_current_module_entity(),
+                        newBas);
 
-        // Replace the left reference of the assign call by the new entity
-        syntax_reference(expression_syntax(EXPRESSION(CAR(call_arguments(c))))) = make_reference(newVar, NIL);
-
-        // Make an assign statement to add to the postlude
-        assign = make_phi_assign_stat(
-                lRef,
-                cond,
-                make_reference(newVar, NIL),
-                lRef);
-
-        *outStat = CONS(STATEMENT, call_to_statement(c), *outStat);
-        *postlude = CONS(STATEMENT, assign, *postlude);
+                syntax_reference(expression_syntax(binary_call_lhs(c))) = make_reference(newVar, NIL);
+                ref=reference_to_expression(make_reference(newVar,NIL));
+                to_add = call_to_statement(c);
+            }
+            // Make an assign statement to insert before the phi-statement
+            instruction assign = make_phi_assign_instruction(lhs_ref, cond, ref, lhs);
+            update_statement_instruction(stat,assign);
+            if(!statement_undefined_p(to_add))
+                insert_statement(stat,to_add,true);
+            ifdebug(1) {
+                pips_debug(1,"into statement\n");
+                print_statement(stat);
+            }
+            free_expression(lhs);
+            return true;
+        }
+        free_expression(lhs);
 
     }
-
-    return TRUE;
+    else if(declaration_statement_p(stat))
+        return true;// leave statement untouched
+    return false;
 }
 
 /*
@@ -245,10 +192,8 @@ static bool process_true_call_stat(expression cond, statement stat, list * outSt
    A(I) = PHI(COND, A0, A(I))
    J = J0
    */
-static bool process_true_stat(expression cond, statement stat, list * outStat, list * postlude)
+static void process_true_stat(statement parent, expression cond, statement stat)
 {
-    *outStat = NIL;
-    *postlude = NIL;
 
     // It must have been verified in the if_conversion_init phase
     pips_assert("stat is a call or a sequence statement", 
@@ -258,196 +203,35 @@ static bool process_true_stat(expression cond, statement stat, list * outStat, l
     // If stat is a call statement, ...
     if(instruction_call_p(statement_instruction(stat)))
     {
-        return process_true_call_stat(cond, stat, outStat, postlude);
+        if(process_true_call_stat(cond, stat))
+        {
+            statement_instruction(parent)=instruction_undefined;
+            update_statement_instruction(parent,statement_instruction(stat));
+            statement_instruction(stat)=instruction_undefined;
+            free_statement(stat);
+        }
+
     }
     // If stat is a sequence statement, ...
     else if(instruction_sequence_p(statement_instruction(stat)))
     {
-        sequence seq = copy_sequence(instruction_sequence(statement_instruction(stat)));
+        // first split initalizations
+        statement_split_initializations(stat);
 
-        list pCur = NIL;
-
-        list statDone = NIL;
-
-        list saveStat = NIL;
-
-        MAP(STATEMENT, cs,
+        // then do the processing
+        bool something_bad_p=false;
+        FOREACH(STATEMENT,st,statement_block(stat))
         {
-            // Only the assign statements with no side effects are supported
-            if(!simd_supported_stat(cs))
-                return FALSE;
-
-        }, sequence_statements(seq));
-
-        MAPL(cs,
+            something_bad_p|=!process_true_call_stat(cond, st);
+        }
+        if(!something_bad_p)
         {
-            pips_assert("cs is a call statement", 
-                    instruction_call_p(statement_instruction(STATEMENT(CAR(cs)))));
-
-            call c = instruction_call(statement_instruction(STATEMENT(CAR(cs))));
-
-            // Only the assign statements with no side effects are supported
-            if(!simd_supported_stat(STATEMENT(CAR(cs))))
-                return FALSE;
-
-            if(gen_find_eq(STATEMENT(CAR(cs)), statDone) != statement_undefined)
-            {
-                continue;
-            }
-
-            reference lRef = get_left_ref_from_assign(c);
-
-            entity e = reference_variable(lRef);
-
-            statement assign = NULL;
-
-            basic newBas = get_basic_from_array_ref(lRef);
-
-            if(basic_undefined_p(newBas))
-                return FALSE;
-
-            // If the written reference is a scalar, ...
-            if(gen_length(reference_indices(lRef)) == 0)
-            {
-
-                // Create a new entity
-                entity newVar = make_new_scalar_variable_with_prefix(entity_local_name(e),
-                        get_current_module_entity(),
-                        newBas);
-
-                // For each following statement, replace the old reference by
-                // the new one
-                MAP(STATEMENT, rStat,
-                {
-                    call rc = instruction_call(statement_instruction(rStat));
-
-                    reference lrRef = get_left_ref_from_assign(rc);
-
-                    if(reference_equal_p(lRef, lrRef))
-                    {
-                        statDone = CONS(STATEMENT, rStat, statDone);
-                    }
-
-                    replace_reference(rc,lRef,newVar);
-
-                }, CDR(cs));
-
-                syntax_reference(expression_syntax(EXPRESSION(CAR(call_arguments(c))))) = make_reference(newVar, NIL);
-
-                // Make the phi statement
-                assign = make_phi_assign_stat(
-                        lRef,
-                        cond,
-                        make_reference(newVar, NIL),
-                        lRef);
-
-            }
-            // If the written reference is not a scalar, ...
-            else
-            {
-                list lSaveInd = NIL;
-                list pSaveInd = NIL;
-
-                // For each reference index, 
-                MAP(EXPRESSION, ind,
-                {
-                    // Create a new index variable used to store the current index
-                    // value
-                    entity newInd = make_new_scalar_variable_with_prefix("IND",
-                            get_current_module_entity(),
-                            make_basic(is_basic_int, (void *)4));
-
-                    // Save the current index value
-                    statement indStat = make_assign_statement(entity_to_expression(newInd), copy_expression(ind));
-
-                    // Add a comment to inform the if_conversion_compact phase 
-                    // that this statement must be compacted if possible
-                    statement_comments(indStat) = strdup(IF_CONV_TO_COMPACT);
-
-                    // Insert the created statement before the current one
-                    sequence_statements(seq) = gen_insert_before(indStat,
-                            STATEMENT(CAR(cs)),
-                            sequence_statements(seq));
-
-                    // Store the new index in lSaveInd
-                    if(lSaveInd == NIL)
-                    {
-                        lSaveInd = pSaveInd = CONS(EXPRESSION, entity_to_expression(newInd), NIL);
-                    }
-                    else
-                    {
-                        CDR(pSaveInd) = CONS(EXPRESSION, entity_to_expression(newInd), NIL);
-                        pSaveInd = CDR(pSaveInd);
-                    }
-
-                }, reference_indices(lRef));
-
-                // Make a  new variable
-                entity saveVar = make_new_scalar_variable_with_prefix(entity_local_name(e),
-                        get_current_module_entity(),
-                        newBas);
-
-                // Make a statement to save the current value of the reference
-                statement saveStat = make_assign_statement(entity_to_expression(saveVar), reference_to_expression(lRef));
-
-                // Add a comment to inform the if_conversion_compact phase 
-                // that this statement must be compacted if possible
-                statement_comments(saveStat) = strdup(IF_CONV_TO_COMPACT);
-
-                // Insert the created statement before the current one
-                sequence_statements(seq) = gen_insert_before(saveStat,
-                        STATEMENT(CAR(cs)),
-                        sequence_statements(seq));
-
-                entity newVar = make_new_scalar_variable_with_prefix(entity_local_name(e),
-                        get_current_module_entity(),
-                        newBas);
-
-                syntax_reference(expression_syntax(EXPRESSION(CAR(call_arguments(c))))) = make_reference(newVar, NIL);
-
-                assign = make_phi_assign_stat(
-                        make_reference(e, lSaveInd),
-                        cond,
-                        make_reference(newVar, NIL),
-                        make_reference(saveVar, NIL));
-            }
-
-            if(*postlude == NIL)
-            {
-                *postlude = pCur = CONS(STATEMENT, assign, *postlude);
-            }
-            else
-            {
-                CDR(pCur) = CONS(STATEMENT, assign, NIL);
-                pCur = CDR(pCur);
-            }
-
-        }, sequence_statements(seq));
-
-        *outStat = sequence_statements(seq);
-
-        list old = *outStat;
-        *outStat = gen_concatenate(*outStat, saveStat);
-        gen_free_list(old);
+            statement_instruction(parent)=instruction_undefined;
+            update_statement_instruction(parent,statement_instruction(stat));
+            statement_instruction(stat)=instruction_undefined;
+            free_statement(stat);
+        }
     }
-
-    return TRUE;
-}
-
-static list do_conversion(list tOutStats, list tPostlude)
-{
-    list outStats = NIL;
-    list old = NIL;
-
-    old = outStats;
-    outStats = gen_concatenate(outStats, tOutStats);
-    gen_free_list(old);
-
-    old = outStats;
-    outStats = gen_concatenate(outStats, tPostlude);
-    gen_free_list(old);
-
-    return outStats;
 }
 
 /*
@@ -455,57 +239,18 @@ static list do_conversion(list tOutStats, list tPostlude)
    */
 static void if_conv_statement(statement cs)
 {
-    // If the statement is not a test statement, then nothing to do
-    if(!instruction_test_p(statement_instruction(cs)))
-        return;
-
-    test t = instruction_test(statement_instruction(cs));
-
-    pips_assert("statement is a test", instruction_test_p(statement_instruction(cs)));
-
-    bool success;
-
     // If the statement comment contains the string IF_TO_CONVERT,
     // then it means that this statement must be converted ...
-    success = check_if_statement_contains_comment(cs, IF_TO_CONVERT);
-
-    // ... so let's convert.
-    if(success)
+    extension ex;
+    if( (ex=statement_with_pragma_p(cs, IF_TO_CONVERT)) )
     {
-        list tOutStats = NIL;
-        list tPostlude = NIL;
+        // remove the pragma
+        gen_remove(&extensions_extension(statement_extensions(cs)),ex);
 
         // Process the "true statements" (test_false(t) is empty because if_conversion
         // phase is done after if_conversion_init phase).
-        success = process_true_stat(test_condition(t), test_true(t), &tOutStats, &tPostlude);
-
-        // If process_true_stat was a success, ...
-        if(success)
-        {
-            list newSeq;
-            instruction newInst;
-            instruction oldInst;
-
-            // Do the conversion and get the new statements sequence
-            newSeq = do_conversion(tOutStats, tPostlude);
-
-            // Replace the test instruction by the new sequence instruction
-            statement lastStat = cs;
-
-            newInst = make_instruction_block(newSeq);
-
-            oldInst = statement_instruction(lastStat);
-            statement_instruction(lastStat) = newInst;
-            free_instruction(oldInst);
-
-            statement_label(lastStat) = entity_empty_label();
-            statement_number(lastStat) = STATEMENT_NUMBER_UNDEFINED;
-            statement_ordering(lastStat) = STATEMENT_ORDERING_UNDEFINED;
-            statement_comments(lastStat) = empty_comments;
-        }
-
-        gen_free_list(tOutStats);
-        gen_free_list(tPostlude);
+        test t = instruction_test(statement_instruction(cs));
+        process_true_stat(cs,test_condition(t), test_true(t));
     }
 }
 
@@ -529,7 +274,7 @@ J = PHI(L1, J0, J)
 This phase MUST be used after if_conversion_init phase
 
 */
-boolean if_conversion(char * mod_name)
+bool if_conversion(char * mod_name)
 {
     // get the resources
     statement mod_stmt = (statement)
@@ -538,14 +283,10 @@ boolean if_conversion(char * mod_name)
     set_current_module_statement(mod_stmt);
     set_current_module_entity(module_name_to_entity(mod_name));
 
-    dependence_graph = 
-        (graph) db_get_memory_resource(DBR_DG, mod_name, TRUE);
-
     debug_on("IF_CONVERSION_DEBUG_LEVEL");
     // Now do the job
 
-    gen_recurse(mod_stmt, statement_domain,
-            gen_true, if_conv_statement);
+    gen_recurse(mod_stmt, statement_domain, gen_true, if_conv_statement);
 
     // Reorder the module, because new statements have been added 
     module_reorder(mod_stmt);
@@ -559,5 +300,5 @@ boolean if_conversion(char * mod_name)
 
     debug_off();
 
-    return TRUE;
+    return true;
 }

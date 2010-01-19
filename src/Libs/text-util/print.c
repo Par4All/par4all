@@ -260,6 +260,12 @@ void dump_words(list lw)
     print_words(stderr, lw);
 }
 
+/* print a list of strings */
+void dump_strings(list sl)
+{
+  dump_words(sl);
+}
+
 
 void print_words(fd, lw)
 FILE *fd;

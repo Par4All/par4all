@@ -195,6 +195,13 @@ bool malloc_effect_p(effect e)
   return heap_p;
 }
 
+/*************** I/O EFFECTS *****************/
+bool io_effect_entity_p(entity e)
+{
+    return io_entity_p(e) && 
+	same_string_p(entity_local_name(e), IO_EFFECTS_ARRAY_NAME);
+}
+
 bool io_effect_p(effect e)
 {
   return io_effect_entity_p(reference_variable(effect_any_reference(e)));

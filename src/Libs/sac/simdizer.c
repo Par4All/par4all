@@ -70,9 +70,6 @@ static hash_table matches = NULL;
  */
 void init_statement_matches_map(list l)
 {
-    init_operator_id_mappings();
-    init_tree_patterns();
-
     matches = hash_table_make(hash_pointer, 0);
     FOREACH(STATEMENT, s,l)
     {
@@ -89,7 +86,6 @@ void init_statement_matches_map(list l)
 void free_statement_matches_map()
 {
     hash_table_free(matches);
-    term_operator_id_mappings();
 }
 
 /*
@@ -151,7 +147,7 @@ void init_statement_successors_map(list l)
 {
     successors = hash_table_make(hash_pointer, 0);
 
-    MAP(VERTEX, a_vertex,
+    FOREACH(VERTEX, a_vertex,graph_vertices(dependence_graph))
     {
         list succ;
         statement s = vertex_to_statement(a_vertex);
@@ -162,8 +158,7 @@ void init_statement_successors_map(list l)
         succ = vertex_successors(a_vertex);
         if (succ != NIL)
             hash_put(successors, (void *)s, (void *)succ);
-    },
-        graph_vertices(dependence_graph));
+    }
 }
 
 /*
@@ -191,11 +186,11 @@ static bool successor_p(statement s1, statement s2, bool nonGroupStat)
 
     if (succ != HASH_UNDEFINED_VALUE)
     {
-        MAP(SUCCESSOR, s,
+        FOREACH(SUCCESSOR, s,succ)
         {
             if (vertex_to_statement(successor_vertex(s)) == s2)
             {
-                MAP(CONFLICT, c,
+                FOREACH(CONFLICT, c,dg_arc_label_conflicts(successor_arc_label(s)))
                 {
                     // If there is a write-read conflict between
                     // s1-s2, then s2 can't be simdized
@@ -221,10 +216,9 @@ static bool successor_p(statement s1, statement s2, bool nonGroupStat)
                         }
                     }
 
-                }, dg_arc_label_conflicts(successor_arc_label(s)));
+                }
             }
-        }, 
-            succ);
+        } 
     }
     return FALSE;
 }
@@ -275,6 +269,7 @@ static bool move_allowed_p(list group_first, list group_last, statement s)
     {
         if (successor_p(STATEMENT(CAR(i)), s, nonGroupStat))
         {
+            pips_debug(3,"move not allowed\n");
             return FALSE;
         }
 
@@ -283,6 +278,7 @@ static bool move_allowed_p(list group_first, list group_last, statement s)
             nonGroupStat = TRUE;
         }
     }
+    pips_debug(3,"move allowed\n");
 
     return TRUE;
 }
@@ -436,6 +432,10 @@ static list simdize_simple_statements_pass2(list seq, float * simdCost)
         cons * group_first, * group_last;
         statement si = STATEMENT(CAR(i));
         list group_matches;
+        ifdebug(3){
+            pips_debug(3,"trying to match statement\n");
+            print_statement(si);
+        }
 
         /* Initialize current group */
         group_first = i;
@@ -443,74 +443,114 @@ static list simdize_simple_statements_pass2(list seq, float * simdCost)
 
         /* if this is not a recognized statement (ie, no match), skip it */
         group_matches = get_statement_matching_types(si);
-        if (group_matches == NIL)
+        if (ENDP(group_matches) )
         {
-            sinfo = CDR(sinfo) = gen_statementInfo_cons( // CONS(STATEMENT_INFO,
-                  make_nonsimd_statement_info(STATEMENT(CAR(i))),
-                  NIL);
-                    continue;
+            pips_debug(3,"no match found\n");
+            sinfo = CDR(sinfo) =
+                gen_statementInfo_cons( make_nonsimd_statement_info(STATEMENT(CAR(i))),NIL);
+            continue;
+        }
+        else 
+        {
+            ifdebug(3) {
+                pips_debug(3,"matching opcode found:\n");
+                FOREACH(OPCODECLASS,oc,group_matches)
+                    pips_debug(3,"%s\n",opcodeClass_name(oc));
+            }
+        }
+
+        simd_fill_finalArgType(si);
+        ifdebug(3) {
+            pips_debug(3,"examining following statments:\n");
+            FOREACH(STATEMENT,st,CDR(group_last))
+                print_statement(st);
+        }
+
+        /* try to find all the compatible isomorphic statements after the
+         * current statement
+         */
+        for( j = CDR(group_last), p = NIL;
+                j != NIL;
+                p = j, j = CDR(j) )
+        {
+            statement sj = STATEMENT(CAR(j));
+            list m_sj;
+
+            /* if this is not a recognized statement (ie, no match), skip it */
+            m_sj = get_statement_matching_types(sj);
+            if (ENDP(m_sj) )
+            {
+                ifdebug(3){
+                    pips_debug(3,"following statement is not recognized\n");
+                    print_statement(sj);
+                }
+                continue;
+            }
+            /* if the matches for statement sj and for the group have a non-empty
+             * intersection, and the move is legal (ie, does not break dependency
+             * chain) then we can add the statement sj to the group.
+             */
+            gen_list_and(&m_sj, group_matches);
+            if(ENDP(m_sj)) {
+                ifdebug(3){
+                    pips_debug(3,"following statement share no group\n");
+                    print_statement(sj);
+                }
+                continue;
+            }
+
+            simd_fill_curArgType(sj);
+            if( !simd_check_argType()){
+                ifdebug(3){
+                    pips_debug(3,"following statement does not have good arg type\n");
+                    print_statement(sj);
+                }
+                continue;
+            }
+
+
+            if ( move_allowed_p(group_first, group_last, sj) )
+            {
+                if (j != CDR(group_last))
+                {
+                    /* do the move */
+                    CDR(p) = CDR(j);
+                    CDR(group_last) = CONS(STATEMENT, sj, CDR(group_last));
+
+                    /* keep searching from the next one */
+                    j = p;
+                    ifdebug(3){
+                        pips_debug(3,"following statement matches!\n");
+                        print_statement(sj);
                     }
-                    //printf("si\n");print_statement(si);
+                }
 
-                    simd_fill_finalArgType(si);
+                group_last = CDR(group_last);
+                gen_free_list(group_matches);
+                group_matches = m_sj;
+            }
+            else {
+                ifdebug(3){
+                    pips_debug(3,"following statement cannot be moved\n");
+                    print_statement(sj);
+                }
+            }
+        }
 
-                    /* try to find all the compatible isomorphic statements after the
-                     * current statement
-                     */
-                    for( j = CDR(group_last), p = NIL;
-                        j != NIL;
-                        p = j, j = CDR(j) )
-                    {
-                    statement sj = STATEMENT(CAR(j));
-                    list m_sj;
+        /* the previous group of isomorphic statements is complete. 
+         * we can now generate SIMD statement info.
+         * group is delimited by group_first and group_last (included)
+         */
+        CDR(sinfo) = make_simd_statements(group_matches, 
+                group_first, 
+                group_last);
+        while(CDR(sinfo) != NIL)
+            sinfo = CDR(sinfo);
 
-                    /* if this is not a recognized statement (ie, no match), skip it */
-                    m_sj = get_statement_matching_types(sj);
-                    if (m_sj == NIL)
-                        continue;
-                    //printf("sj\n");print_statement(sj);
-                    /* if the matches for statement sj and for the group have a non-empty
-                     * intersection, and the move is legal (ie, does not break dependency
-                     * chain) then we can add the statement sj to the group.
-                     */
-                    gen_list_and(&m_sj, group_matches);
+        /* skip what has already been matched */
+        i = group_last;
 
-                    simd_fill_curArgType(sj);
-
-                    if ( (m_sj!=NIL) &&
-                            simd_check_argType() &&
-                            move_allowed_p(group_first, group_last, sj) )
-                    {
-                        if (j != CDR(group_last))
-                        {
-                            /* do the move */
-                            CDR(p) = CDR(j);
-                            CDR(group_last) = CONS(STATEMENT, sj, CDR(group_last));
-
-                            /* keep searching from the next one */
-                            j = p;
-                        }
-
-                        group_last = CDR(group_last);
-                        gen_free_list(group_matches);
-                        group_matches = m_sj;
-                    }
-                    }
-
-                    /* the previous group of isomorphic statements is complete. 
-                     * we can now generate SIMD statement info.
-                     * group is delimited by group_first and group_last (included)
-                     */
-                    CDR(sinfo) = make_simd_statements(group_matches, 
-                            group_first, 
-                            group_last);
-                    while(CDR(sinfo) != NIL)
-                        sinfo = CDR(sinfo);
-
-                    /* skip what has already been matched */
-                    i = group_last;
-
-                    simd_reset_finalArgType();
+        simd_reset_finalArgType();
     }
 
     /* Now, based on the statement information gathered, 
@@ -602,6 +642,11 @@ static bool simd_simple_sequence_filter(statement s)
     return ! ( instruction_call_p( statement_instruction(s) ) ) ;
 }
 
+static string sac_commenter(__attribute__((unused)) entity e)
+{
+    return strdup("PIPS:SAC generated variable");
+}
+
 /*
  * main entry function
  * basically run `simdize_simple_statements' on all sequences
@@ -617,6 +662,10 @@ bool simdizer(char * mod_name)
 	set_ordering_to_statement(mod_stmt);
     dependence_graph = 
         (graph) db_get_memory_resource(DBR_DG, mod_name, TRUE);
+    set_simd_treematch((matchTree)db_get_memory_resource(DBR_SIMD_TREEMATCH,"",TRUE));
+    set_simd_operator_mappings(db_get_memory_resource(DBR_SIMD_OPERATOR_MAPPINGS,"",TRUE));
+    push_generated_variable_commenter(sac_commenter);
+    init_padding_entities();
 
     debug_on("SIMDIZER_DEBUG_LEVEL");
     /* Now do the job */
@@ -634,9 +683,13 @@ bool simdizer(char * mod_name)
     //DB_PUT_MEMORY_RESOURCE(DBR_DG, mod_name, dependence_graph);
 
     /* update/release resources */
+    reset_padding_entities();
+    reset_simd_operator_mappings();
+    reset_simd_treematch();
 	reset_ordering_to_statement();
     reset_current_module_statement();
     reset_current_module_entity();
+    pop_generated_variable_commenter();
 
     debug_off();
 

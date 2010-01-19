@@ -89,12 +89,12 @@ statement loop_strip_mine(statement loop_statement, int chunk_size, int chunk_nu
     if(chunk_size==-1) {
 	expression e_number = int_to_expression(chunk_number);
 
-	size = MakeBinaryCall(entity_intrinsic("-"), 
+	size = make_op_exp(MINUS_OPERATOR_NAME, 
 			      copy_expression(ub), copy_expression(lb));
-	size = MakeBinaryCall(entity_intrinsic("+"), size, e_number);
-	size = MakeBinaryCall(entity_intrinsic("/"), 
+	size = make_op_exp(PLUS_OPERATOR_NAME, size, e_number);
+	size = make_op_exp(DIVIDE_OPERATOR_NAME, 
 			      size, copy_expression(e_number));
-	sizem1 = MakeBinaryCall(entity_intrinsic("-"), 
+	sizem1 = make_op_exp(MINUS_OPERATOR_NAME, 
 				copy_expression(size), int_to_expression(1));
     }
     else {

@@ -175,53 +175,27 @@ statement s;
 statement atomize_this_expression(entity (*create)(entity, basic),
 				  expression e)
 {
-  basic bofe;
+    /* it does not make sense to atomize a range...
+    */
+    if (syntax_range_p(expression_syntax(e))) return NULL;
 
-  /* it does not make sense to atomize a range...
-   */
-  if (syntax_range_p(expression_syntax(e))) return NULL;
-  
-  bofe = please_give_me_a_basic_for_an_expression(e);
-  if(!basic_undefined_p(bofe)) {
-    if (!basic_overloaded_p(bofe))
-      {
-	entity newvar; 
-	expression rhs;
-	statement assign;
-	syntax ref;
+    basic bofe = basic_of_expression(e);
+    statement out = NULL;
+    if(!basic_undefined_p(bofe)) {
+        if (!basic_overloaded_p(bofe))
+        {
+            entity newvar = (*create)(get_current_module_entity(), bofe);
+            expression rhs = make_expression(expression_syntax(e), normalized_undefined);
+            normalize_all_expressions_of(rhs);
 
-	newvar = (*create)(get_current_module_entity(), bofe);
-	rhs = make_expression(expression_syntax(e), normalized_undefined);
-	normalize_all_expressions_of(rhs);
+            syntax ref = make_syntax_reference(make_reference(newvar, NIL));
 
-	ref = make_syntax(is_syntax_reference, make_reference(newvar, NIL));
-
-	assign = make_assign_statement(make_expression(copy_syntax(ref), 
-						       normalized_undefined), 
-				       rhs);
-	expression_syntax(e) = ref;
-
-	/*
-	// TEST
-	if (syntax_reference_p(ref))
-	{
-	  fprintf(stderr,"Ref: %s is reference!\n", entity_local_name(newvar));
-	}
-	else if (syntax_call_p(ref))
-	{
-	  fprintf(stderr,"Ref: %s is call '%s'!\n", entity_local_name(newvar),
-		  entity_local_name(call_function(syntax_call(ref))));
-	}
-	print_expression(e);
-	print_statement(assign);
-	*/
-
-	return assign;
-      }
-  
+            out = make_assign_statement(make_expression(copy_syntax(ref), normalized_undefined), rhs);
+            expression_syntax(e) = ref;
+        }
+    }
     free_basic(bofe);
-  }
-  return NULL;
+    return out;
 }
 
 static void compute_before_current_statement(expression *pe)
@@ -333,6 +307,34 @@ static void whileloop_rwt(whileloop w)
   /* return(TRUE);*/
 }
 
+void cleanup_subscript(expression e)
+{
+    if(syntax_subscript_p(expression_syntax(e)))
+    {
+        subscript s = syntax_subscript(expression_syntax(e));
+        if(expression_reference_p(subscript_array(s))) /* the subscript could be a reference ! */
+        {
+            syntax sa = expression_syntax(subscript_array(s));
+
+            /* update reference with additionnal indices */
+            reference r = syntax_reference(sa);
+            reference_indices(r)=gen_nconc(reference_indices(r),subscript_indices(s));
+            /* prepare to free subscript */
+            subscript_indices(s)=NIL;
+            expression_syntax(subscript_array(s))=syntax_undefined;
+            free_subscript(s);
+            /* transform subscript into reference */
+            syntax_tag(expression_syntax(e))=is_syntax_reference;
+            syntax_reference(expression_syntax(e))=r;
+        }
+    }
+}
+
+void cleanup_subscripts(gen_chunkp obj)
+{
+    gen_recurse(obj,expression_domain,gen_true,cleanup_subscript);
+}
+
 static void atomize_object(obj)
 gen_chunk *obj;
 {
@@ -348,6 +350,7 @@ gen_chunk *obj;
 	 range_domain, gen_true, range_rwt,        /* RANGE */
 	 whileloop_domain, gen_true, whileloop_rwt,/* WHILELOOP */
 	 NULL);
+    cleanup_subscripts(obj);
 }
 
 void atomize_as_required(

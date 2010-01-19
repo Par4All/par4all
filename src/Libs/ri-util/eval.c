@@ -148,7 +148,7 @@ value EvalSizeofexpression(sizeofexpression soe)
   }
 
   i = type_memory_size(t);
-  v = make_value(is_value_constant, make_constant(is_constant_int, (void *) i));
+  v = make_value_constant(make_constant_int(i));
 
   if(sizeofexpression_expression_p(soe))
     free_type(t);

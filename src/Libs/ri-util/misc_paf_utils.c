@@ -368,7 +368,7 @@ call c;
         {
         expression lhs;
 
-        lhs = EXPRESSION(CAR(call_arguments(c)));
+        lhs = binary_call_lhs(c);
 	ent = expression_int_scalar( lhs );
 	}
    debug( 7, "scalar_assign_call", "returning : %s \n",

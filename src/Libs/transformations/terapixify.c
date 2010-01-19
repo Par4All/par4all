@@ -737,56 +737,60 @@ bool normalize_microcode( char * module_name)
     size_t nb_re = 0;
     FOREACH(ENTITY,e,code_declarations(value_code(entity_initial(get_current_module_entity()))))
     {
-        if(formal_parameter_p(e))
+        if(!entity_area_p(e))
         {
-            variable v = type_variable(entity_type(e));
-            if( basic_pointer_p(variable_basic(v)) ) /* it's a pointer */
+            if(formal_parameter_p(e))
             {
-                string prefix = NULL;
-                bool parameter_written = find_write_effect_on_entity(get_current_module_statement(),e);
-                if( parameter_written ) /* it's an image */
+                variable v = type_variable(entity_type(e));
+                if( basic_pointer_p(variable_basic(v)) ) /* it's a pointer */
                 {
-                    printf("%s seems an image\n",entity_user_name(e));
-                    prefix = TERAPIX_IMAGE_PREFIX;
-                    terapix_argument_handler(e,TERAPIX_PTRARG_PREFIX,&nb_fifo,prefix,&nb_ptr);
-                }
-                else /* cannot tell if it's a kernel or an image*/
-                {
-                    int array_size=1;
-                    FOREACH(DIMENSION,d,variable_dimensions(v))
+                    string prefix = NULL;
+                    bool parameter_written = find_write_effect_on_entity(get_current_module_statement(),e);
+                    if( parameter_written ) /* it's an image */
                     {
-                        int d_size;
-                        if(SizeOfDimension(d,&d_size)) {
-                            array_size*=d_size;
-                        }
-                        else {
-                            array_size=-1;
-                            break;
-                        }
-                    }
-                    if( array_size > 0 && 56 >= array_size ) {
-                        printf("%s seems a mask\n",entity_user_name(e));
-                        prefix = TERAPIX_MASK_PREFIX;
-                    }
-                    else {
                         printf("%s seems an image\n",entity_user_name(e));
                         prefix = TERAPIX_IMAGE_PREFIX;
+                        terapix_argument_handler(e,TERAPIX_PTRARG_PREFIX,&nb_fifo,prefix,&nb_ptr);
                     }
-                    terapix_argument_handler(e,TERAPIX_PTRARG_PREFIX,&nb_fifo,prefix,&nb_ptr);
+                    else /* cannot tell if it's a kernel or an image*/
+                    {
+                        int array_size=1;
+                        FOREACH(DIMENSION,d,variable_dimensions(v))
+                        {
+                            int d_size;
+                            expression sod = SizeOfDimension(d);
+                            if(expression_integer_value(sod,&d_size)) {
+                                array_size*=d_size;
+                            }
+                            else {
+                                array_size=-1;
+                                break;
+                            }
+                        }
+                        if( array_size > 0 && 56 >= array_size ) {
+                            printf("%s seems a mask\n",entity_user_name(e));
+                            prefix = TERAPIX_MASK_PREFIX;
+                        }
+                        else {
+                            printf("%s seems an image\n",entity_user_name(e));
+                            prefix = TERAPIX_IMAGE_PREFIX;
+                        }
+                        terapix_argument_handler(e,TERAPIX_PTRARG_PREFIX,&nb_fifo,prefix,&nb_ptr);
+                    }
+                }
+                else if( entity_used_in_loop_bound_p(e) )
+                {
+                    printf("%s belongs to a loop bound\n",entity_user_name(e));
+                    //terapix_argument_handler(e,TERAPIX_LOOPARG_PREFIX,&nb_lu,NULL,NULL);
+                }
+                else {
+                    printf("parameter %s is not valid\n",entity_user_name(e));
+                    can_terapixify=false;
                 }
             }
-            else if( entity_used_in_loop_bound_p(e) )
-            {
-                printf("%s belongs to a loop bound\n",entity_user_name(e));
-                //terapix_argument_handler(e,TERAPIX_LOOPARG_PREFIX,&nb_lu,NULL,NULL);
-            }
             else {
-                printf("parameter %s is not valid\n",entity_user_name(e));
-                can_terapixify=false;
+                terapix_argument_handler(e,NULL,NULL,TERAPIX_REGISTER_PREFIX,&nb_re);
             }
-        }
-        else {
-            terapix_argument_handler(e,NULL,NULL,TERAPIX_REGISTER_PREFIX,&nb_re);
         }
     }
 
@@ -846,7 +850,7 @@ bool terapixify(__attribute__((unused)) char * module_name)
  * @return true
  */
 static
-bool expression_array_to_pointer(expression exp)
+bool expression_array_to_pointer(expression exp, bool in_init)
 {
     if(expression_reference_p(exp))
     {
@@ -906,10 +910,10 @@ bool expression_array_to_pointer(expression exp)
             if(!ENDP(dims)) POP(dims); // the first dimension is unused
             FOREACH(DIMENSION,dim,dims)
             {
-                expression dimension_size = MakeBinaryCall(
-                        CreateIntrinsic(PLUS_OPERATOR_NAME),
-                        MakeBinaryCall(
-                            CreateIntrinsic(MINUS_OPERATOR_NAME),
+                expression dimension_size = make_op_exp(
+                        PLUS_OPERATOR_NAME,
+                        make_op_exp(
+                            MINUS_OPERATOR_NAME,
                             copy_expression(dimension_upper(dim)),
                             copy_expression(dimension_lower(dim))
                             ),
@@ -917,19 +921,19 @@ bool expression_array_to_pointer(expression exp)
 
                 if( !ENDP(indices) ) { /* there may be more dimensions than indices */
                     expression index_expression = EXPRESSION(CAR(indices));
-                    address_computation = MakeBinaryCall(
-                            CreateIntrinsic(PLUS_OPERATOR_NAME),
+                    address_computation = make_op_exp(
+                            PLUS_OPERATOR_NAME,
                             index_expression,
-                            MakeBinaryCall(
-                                CreateIntrinsic(MULTIPLY_OPERATOR_NAME),
+                            make_op_exp(
+                                MULTIPLY_OPERATOR_NAME,
                                 dimension_size,address_computation
                                 )
                             );
                     POP(indices);
                 }
                 else {
-                    address_computation = MakeBinaryCall(
-                            CreateIntrinsic(MULTIPLY_OPERATOR_NAME),
+                    address_computation = make_op_exp(
+                            MULTIPLY_OPERATOR_NAME,
                             dimension_size,address_computation
                             );
                 }
@@ -938,38 +942,37 @@ bool expression_array_to_pointer(expression exp)
             /* there may be more indices than dimensions */
             FOREACH(EXPRESSION,e,indices)
             {
-                address_computation = MakeBinaryCall(
-                        CreateIntrinsic(PLUS_OPERATOR_NAME),
+                address_computation = make_op_exp(
+                        PLUS_OPERATOR_NAME,
                         address_computation,e
                         );
             }
 
             /* we now either add the DEREFERENCING_OPERATOR, or the [] */
             syntax new_syntax = syntax_undefined;
-            if(nb_indices == nb_dims || nb_dims == 0 ) {
-                if(get_bool_property("ARRAY_TO_POINTER_FLATTEN_ONLY")) {
-                    reference_indices(ref_without_indices)=make_expression_list(address_computation);
-                    new_syntax=make_syntax_reference(ref_without_indices);
-                }
-                else {
+            if(!in_init && get_bool_property("ARRAY_TO_POINTER_FLATTEN_ONLY")) {
+                reference_indices(ref_without_indices)=make_expression_list(address_computation);
+                new_syntax=make_syntax_reference(ref_without_indices);
+            }
+            else {
+                if(nb_indices == nb_dims || nb_dims == 0 ) {
 
                     new_syntax=make_syntax_call(
                             make_call(
                                 CreateIntrinsic(DEREFERENCING_OPERATOR_NAME),
                                 CONS(EXPRESSION,MakeBinaryCall(
-                                        CreateIntrinsic(PLUS_C_OPERATOR_NAME),
+                                        entity_intrinsic(PLUS_C_OPERATOR_NAME),
                                         base_ref,
                                         address_computation), NIL)
                                 )
                             );
                 }
-            }
-            else
-            {
-                new_syntax = make_syntax_call(
-                        make_call(CreateIntrinsic(PLUS_C_OPERATOR_NAME),
-                            make_expression_list(base_ref,address_computation))
-                        );
+                else {
+                    new_syntax = make_syntax_call(
+                            make_call(CreateIntrinsic(PLUS_C_OPERATOR_NAME),
+                                make_expression_list(base_ref,address_computation))
+                            );
+                }
             }
 
             /* free stuffs */
@@ -1021,10 +1024,10 @@ bool expression_array_to_pointer(expression exp)
  * @return true
  */
 static
-bool declaration_array_to_pointer(statement s)
+bool declaration_array_to_pointer(statement s,bool __attribute__((unused)) in_init)
 {
     FOREACH(ENTITY,e,statement_declarations(s))
-        gen_recurse(entity_initial(e),expression_domain,expression_array_to_pointer,gen_null);
+        gen_context_recurse(entity_initial(e),(void*)true,expression_domain,expression_array_to_pointer,gen_null);
     return true;
 }
 
@@ -1052,6 +1055,35 @@ void make_pointer_entity_from_reference_entity(entity e)
     make_pointer_from_variable(param);
 }
 
+static void
+reduce_array_declaration_dimension(statement s)
+{
+    FOREACH(ENTITY,e,statement_declarations(s))
+    {
+        type t = ultimate_type(entity_type(e));
+        if(type_variable_p(t))
+        {
+            variable v = type_variable(t);
+            if(!ENDP(variable_dimensions(v)))
+            {
+                expression new_dim = expression_undefined;
+                FOREACH(DIMENSION,d,variable_dimensions(v))
+                {
+                    new_dim = expression_undefined_p(new_dim)?
+                        SizeOfDimension(d):
+                        make_op_exp(MULTIPLY_OPERATOR_NAME,
+                                new_dim,
+                                SizeOfDimension(d)
+                                );
+                    print_expression(new_dim);
+                }
+                gen_full_free_list(variable_dimensions(v));
+                variable_dimensions(v)=CONS(DIMENSION,make_dimension(make_expression_0(),make_op_exp(MINUS_OPERATOR_NAME,new_dim,make_expression_1())),NIL);
+            }
+        }
+    }
+}
+
 bool array_to_pointer(char *module_name)
 {
     /* prelude */
@@ -1063,12 +1095,15 @@ bool array_to_pointer(char *module_name)
         pips_user_warning("this transformation will have no effect on a fortran module\n");
     else
     {
-        gen_multi_recurse(get_current_module_statement(),
+        gen_context_multi_recurse(get_current_module_statement(),(void*)false,
                 expression_domain,expression_array_to_pointer,gen_null,
                 statement_domain,declaration_array_to_pointer,gen_null,
                 NULL);
+        /* now fix array declarations : one dimension for every one ! */
+        gen_recurse(get_current_module_statement(),statement_domain,gen_true,reduce_array_declaration_dimension);
+
         /* if this property is set, we also change the signature of the module
-         * tricky : signature must be change in two places !
+         * tricky : signature must be changed in two places !
          */
         if( get_bool_property("ARRAY_TO_POINTER_CONVERT_PARAMETERS") )
         {
@@ -1086,6 +1121,7 @@ bool array_to_pointer(char *module_name)
                 make_pointer_from_variable(type_variable(t));
             }
         }
+
     }
 
     /* validate */

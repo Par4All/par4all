@@ -341,24 +341,6 @@ fprintf(stdout, "]\n");
   return(make_reference(ent, sl));
 }
 
-
-/* ========================================================================= */
-/*
- * basic basic_of_reference(reference r)
- * 
- * returns the basic of reference "r". It is its type.
- */
-basic basic_of_reference(r)
-reference r;
-{
-  type ty = entity_type(reference_variable(r));
-  if(! type_variable_p(ty))
-    pips_error("basic_of_reference", "Type is not Variable\n");
-
-  return(variable_basic(type_variable(ty)));
-}
-
-
 /* ========================================================================= */
 /*
  * list entities_to_expressions(list l_ent)

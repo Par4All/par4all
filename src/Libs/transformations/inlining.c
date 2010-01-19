@@ -78,7 +78,7 @@ typedef struct {
 #define IPARAM_INIT { \
     ._inlined_module_=entity_undefined,\
     ._inlined_module_statement_=statement_undefined,\
-    ._new_statements_=NIL,\
+    ._new_statements_=statement_undefined,\
     ._has_static_declaration_=false,\
     ._has_inlinable_calls_=false,\
     ._laststmt_=statement_undefined,\
@@ -1176,7 +1176,9 @@ statement outliner(string outline_module_name, list statements_to_outline)
             if(!top_level_entity_p(e))
                 tmp_list=CONS(ENTITY,e,tmp_list);
             else
-                statement_declarations(body)=gen_nconc(statement_declarations(body),CONS(ENTITY,e,NIL));
+            {
+                AddLocalEntityToDeclarations(e,new_fun,body);
+            }
         }
         gen_free_list(referenced_entities);
         referenced_entities=tmp_list;

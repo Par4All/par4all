@@ -42,21 +42,19 @@
 
 #include "top-level.h"
 
-
-void create(char* workspace_name, char ** filenames)
+void atinit()
 {
     /* init various composants */
     initialize_newgen();
     initialize_sc((char*(*)(Variable))entity_local_name);
     pips_log_handler = pips_error_user_log;
+    set_exception_callbacks(push_pips_context, pop_pips_context);
+}
 
+
+void create(char* workspace_name, char ** filenames)
+{
     gen_array_t filename_list = gen_array_make(0);
-    static bool exception_callback_set = false;
-    if(!exception_callback_set)
-    {
-        exception_callback_set = true;
-        set_exception_callbacks(push_pips_context, pop_pips_context);
-    }
     while(*filenames)
     {
         //printf("appending '%s'\n",*filenames);

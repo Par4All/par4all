@@ -60,6 +60,12 @@ replace_entity_declaration_walker(statement s, struct entity_pair* thecouple)
         replace_entity(decl_ent,thecouple->old,thecouple->new);
     }
 }
+static void
+replace_entity_reference_walker(reference r,struct entity_pair* thecouple)
+{
+  if(same_entity_p(thecouple->old,reference_variable(r)))
+    reference_variable(r)=thecouple->new;
+}
 
 static void replace_entity_loop_walker(loop l, struct entity_pair* thecouple)
 {
@@ -101,6 +107,7 @@ replace_entity(void* s, entity old, entity new) {
   }
   else {
       gen_context_multi_recurse(s, &thecouple,
+              reference_domain, gen_true, replace_entity_reference_walker,
               expression_domain, gen_true, replace_entity_expression_walker,
               statement_domain, gen_true, replace_entity_declaration_walker,
               loop_domain, gen_true, replace_entity_loop_walker,

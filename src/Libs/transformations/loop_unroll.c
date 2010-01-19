@@ -139,6 +139,7 @@ void do_loop_unroll(statement loop_statement, int rate, void (*statement_post_pr
     pips_assert("loop_unroll", rate > 0);
     /* "loop unrolling rate not strictly positive: %d\n", rate); */
 
+    if(rate>1)
     {
         loop il = instruction_loop(statement_instruction(loop_statement));
         range lr = loop_range(il);

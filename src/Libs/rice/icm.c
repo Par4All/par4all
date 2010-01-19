@@ -235,7 +235,7 @@ loop_level_in (loop l)
  * Update the depth and the indices list when exit a loop.
  */
 static void
-loop_level_out (loop l) 
+loop_level_out (__attribute__((unused))loop l) 
 {
     list new_indices = CDR(indices);
     free(indices);
@@ -663,9 +663,9 @@ expressions_invariant_p(list /* of expression */ le)
  */
 static bool
 vertex_partially_invariant_p(vertex v, 
-			     graph g, 
-			     int level,
-			     set /* of statement */ invariant)
+			     __attribute__((unused)) graph g, 
+			     __attribute__((unused)) int level,
+			     __attribute__((unused)) set /* of statement */ invariant)
 {
     statement st = vertex_to_statement(v);
 
@@ -925,7 +925,7 @@ DoInvariantsStatements(list /* of scc */ lsccs,
  */
 bool
 vertex_redundant_p(vertex v, 
-		   graph g, 
+		   __attribute__((unused)) graph g, 
 		   int level,
 		   set /* of statement */ region,
 		   set /* of statement */ partially_invariant,

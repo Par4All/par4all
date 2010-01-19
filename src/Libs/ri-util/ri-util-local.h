@@ -1780,6 +1780,10 @@ the variable is unsigned, signed or not */
 /* polymorhism thanks to newgen ! */
 #define INSTANCE_OF(type,value) ( (_int)((value)->u) == (_int)(type##_domain) )
 
+#define binary_call_lhs(c) (EXPRESSION(CAR(call_arguments((c)))))
+#define binary_call_rhs(c) (EXPRESSION(CAR(CDR(call_arguments((c))))))
+#define hash_contains_p(htp, key) (hash_get(htp, key) != HASH_UNDEFINED_VALUE)
+
 
 /* that is all for ri-util-local.h
  */

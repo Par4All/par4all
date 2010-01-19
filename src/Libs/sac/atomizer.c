@@ -119,6 +119,7 @@ statement simd_atomize_this_expression(entity (*create)(entity, basic),
             bofe=basic_of_expression(etemp);
         free_expression(etemp);
     }
+
     if(basic_undefined_p(bofe) )
         bofe = basic_of_expression(e);
 
@@ -149,6 +150,21 @@ statement simd_atomize_this_expression(entity (*create)(entity, basic),
     return NULL;
 }
 
+static
+int get_ultimate_basic_width(basic b)
+{
+    switch(basic_tag(b))
+    {
+        case is_basic_int: return basic_int(b);
+        case is_basic_float: return basic_float(b);
+        case is_basic_logical:return basic_logical(b);
+        case is_basic_pointer: return get_ultimate_basic_width(
+                                       variable_basic(type_variable(ultimate_type(basic_pointer(b)))));
+        default:pips_internal_error("basic_tag %u not supported yet",basic_tag(b));
+    }
+    return -1;
+}
+
 /* This function computes the maximum width of all the variables used in a call
  */
 static void get_type_max_width(call ca, int* maxWidth)
@@ -169,14 +185,9 @@ static void get_type_max_width(call ca, int* maxWidth)
 
             case is_syntax_reference:
                 {
-                    basic bas = get_basic_from_array_ref(syntax_reference(s));
-                    switch(basic_tag(bas))
-                    {
-                        case is_basic_int: *maxWidth=MAX(*maxWidth , basic_int(bas)); break;
-                        case is_basic_float: *maxWidth=MAX(*maxWidth , basic_float(bas)); break;
-                        case is_basic_logical:*maxWidth=MAX(*maxWidth , basic_logical(bas)); break;
-                        default:pips_internal_error("basic_tag %u not supported yet",basic_tag(bas));
-                    }
+                    basic bas = basic_of_reference(syntax_reference(s));
+                    *maxWidth=MAX(*maxWidth , get_ultimate_basic_width(bas));
+                    free_basic(bas);
                 } break;
             default:pips_internal_error("synatx_tag %u not supported yet",syntax_tag(s));
 
@@ -213,14 +224,7 @@ static void change_basic_if_needed(statement stat)
 			if(maxWidth > 0)
 			{
 				basic lExpBasic = expression_basic(lExp);
-
-				switch(basic_tag(lExpBasic))
-				{
-					case is_basic_int: maxWidth=MIN(maxWidth,(basic_int(lExpBasic))); break;
-					case is_basic_float:  maxWidth=MIN(maxWidth,(basic_float(lExpBasic))); break;
-					case is_basic_logical:  maxWidth=MIN(maxWidth,(basic_logical(lExpBasic))); break;
-					default:pips_internal_error("basic_tag %u not supported yet",basic_tag(lExpBasic));
-				}
+                maxWidth=MIN(maxWidth,get_ultimate_basic_width(lExpBasic));
 			}
 		}
 	}
@@ -347,12 +351,11 @@ boolean simd_atomizer(char * mod_name)
 
     set_current_module_statement(mod_stmt);
     set_current_module_entity(module_name_to_entity(mod_name));
+    set_simd_treematch((matchTree)db_get_memory_resource(DBR_SIMD_TREEMATCH,"",TRUE));
+    set_simd_operator_mappings(db_get_memory_resource(DBR_SIMD_OPERATOR_MAPPINGS,"",TRUE));
 
     debug_on("SIMD_ATOMIZER_DEBUG_LEVEL");
 
-    /* some init */
-    init_tree_patterns();
-    init_operator_id_mappings();
 
     /* Now do the job */
     gen_recurse(mod_stmt, statement_domain, gen_true, atomize_statements);
@@ -364,7 +367,8 @@ boolean simd_atomizer(char * mod_name)
     /* update/release resources */
     reset_current_module_statement();
     reset_current_module_entity();
-    term_operator_id_mappings();
+    reset_simd_operator_mappings();
+    reset_simd_treematch();
 
     debug_off();
 

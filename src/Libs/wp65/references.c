@@ -191,14 +191,6 @@ void reference_list_print(list l)
     (void) fprintf(stderr,"\n");
 }
 
-/* This function returns TRUE if Reference r is scalar 
-*/
-
-boolean reference_scalar_p(reference r)
-{
-    assert(!reference_undefined_p(r) && r!=NULL && reference_variable(r)!=NULL);
-    return (reference_indices(r) == NIL);
-}
 
 void reference_scalar_defined_p(reference r)
 {

@@ -104,7 +104,16 @@ RemoveLocalEntityFromDeclarations(entity e, entity module, statement s)
     if(statement_block_p(s))
     {
         FOREACH(STATEMENT,stat,statement_block(s))
+        {
+            bool decl_stat = declaration_statement_p(stat);
             RemoveLocalEntityFromDeclarations(e,module,stat);
+            /* this take care of removind useless declaration statements*/
+            if(ENDP(statement_declarations(stat)) && decl_stat)
+            {
+                gen_remove_once(&instruction_block(statement_instruction(s)),stat);
+                free_statement(stat);
+            }
+        }
     }
 
 }
@@ -232,6 +241,7 @@ entity make_stderr_variable()
 
   /* Its initial value is unknown */
   entity_initial(v) = make_value_unknown();
+  return v;
 }
 
 /* entity make_scalar_entity(name, module_name, base)
@@ -269,7 +279,7 @@ basic base;
 			  NIL));
 
   /* FI: I would have expected is_value_unknown, especially with a RAM storage! */
-  entity_initial(e) = make_value_constant(MakeConstantLitteral());
+  entity_initial(e) = make_value_unknown();
 
   return(e);
 }
@@ -995,7 +1005,7 @@ int add_any_variable_to_area(entity a, entity v, bool is_fortran_p)
     int s = 0;
     OldOffset = area_size(aa);
     if(!SizeOfArray(v, &s)) {
-      pips_internal_error("Varying size array \"%s\"\n", entity_name(v));
+        return DYNAMIC_RAM_OFFSET;
     }
 
     if(is_fortran_p)

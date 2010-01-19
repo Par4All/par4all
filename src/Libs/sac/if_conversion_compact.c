@@ -21,8 +21,6 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
-/* If conversion compact
-*/
 
 #include <stdio.h>
 #include <string.h>
@@ -53,198 +51,206 @@ typedef dg_vertex_label vertex_label;
 #include "effects-simple.h"
 #include "properties.h"
 #include "atomizer.h"
+#include "ricedg.h"
 
 #include "expressions.h"
 #include "callgraph.h"
 
 #include "sac-local.h"
 
-/*
-   This function return TRUE if the call is:
-
-   ... = PHI(....)
-   */
-static bool check_assign_phi_call(call c)
+/** 
+ * creates a hash_table containing statements from @a statements as keys and their respective succesors according to @a dg as values
+ * 
+ * @param statements input statements
+ * @param dg dependecy graph
+ * 
+ * @return allocated hash_table with (statement,successors pairs)
+ */
+hash_table statements_to_successors(list statements, graph dg)
 {
-    entity func = call_function(c);
-
-    if(ENTITY_ASSIGN_P(func))
+    hash_table successors = hash_table_make(hash_pointer, HASH_DEFAULT_SIZE);
+    FOREACH(VERTEX,v,graph_vertices(dg))
     {
-        expression rExp = EXPRESSION(CAR(CDR(call_arguments(c))));
-
-        if(expression_call_p(rExp))
+        statement s = vertex_to_statement(v);
+        if( !statement_undefined_p(gen_find_eq(s,statements)))
         {
-            call cc = syntax_call(expression_syntax(rExp));
+            list succ = vertex_successors(v);
+            hash_put(successors,s,succ);
+        }
+    }
+    return successors;
+}
 
-            if(!strcmp(SIMD_PHI_NAME,
-                        entity_local_name(call_function(cc))))
+/** 
+ * checks wether a statement is a phi function call of the form
+ * a=phi(cond, vt,vf)
+ * where phi is given by a property
+ * 
+ * @param s statement to check
+ * 
+ * @return result of the check
+ */
+static bool
+statement_phi_function_p(statement s)
+{
+    if(assign_statement_p(s))
+    {
+        expression rhs = binary_call_rhs(statement_call(s));
+        if(expression_call_p(rhs))
+        {
+            string phi_name = get_string_property("IF_CONVERSION_PHI");
+            entity phi = entity_intrinsic(phi_name);
+            return same_entity_p(phi,call_function(expression_call(rhs)));
+        }
+    }
+    return false;
+}
+
+
+/** 
+ * try to compact two phi-statements into a single one
+ * 
+ * @param s0 first statement to compact
+ * @param s1 second statement to compact
+ * 
+ * @return true if compaction succeeded, false otherwise
+ */
+static bool compact_phi_functions(statement s0,statement s1)
+{
+    /* all datas are handeled as pairs in an array of 2 elements
+     * we use i and !i to denote current index and its opposite
+     */
+    statement s [2] = { s0,s1 };
+
+    expression lhs[2];
+    for(size_t i=0;i<2;i++)
+        lhs[i]=binary_call_lhs(statement_call(s[i]));
+
+    /* let's compare assignment part */
+    if(same_expression_p(lhs[0],lhs[1]) && expression_reference_p(lhs[0]))
+    {
+
+        /* ok it may be good, now
+           let's compare both phi functions */
+        call phis[2];
+        reference ref[2];
+        expression cond[2], true_val[2], false_val[2];
+        for(size_t i=0;i<2;i++)
+        {
+            ref[i]=expression_reference(lhs[i]);
+            phis[i]=expression_call(binary_call_rhs(statement_call(s[i])));
+            cond[i]=EXPRESSION(CAR(call_arguments(phis[i])));
+            true_val[i]=EXPRESSION(CAR(CDR(call_arguments(phis[i]))));
+            false_val[i]=EXPRESSION(CAR(CDR(CDR(call_arguments(phis[i])))));
+        }
+
+        /* first constraint : ref[i] == false_val[i] */
+        if( expression_reference_p(false_val[0]) && expression_reference_p(false_val[1]))
+        {
+            if(reference_equal_p(ref[0],expression_reference(false_val[0])) &&
+                    reference_equal_p(ref[1],expression_reference(false_val[1])))
             {
-                return TRUE;
-            }
-        }
-    }
-
-    return FALSE;
-}
-
-/*
-   This function returns true if the two expression are complement
-   and that the first call of the expression cond2 is .NOT.
-   */
-static bool check_first_arg(expression cond1, expression cond2)
-{
-    // If cond2 is not an expression or if the call operator is not .NOT., ...
-    if(!expression_call_p(cond2) ||
-            strcmp(NOT_OPERATOR_NAME,
-                entity_local_name(call_function(syntax_call(expression_syntax(cond2))))))
-        return FALSE;
-
-    call c = syntax_call(expression_syntax(cond2));
-
-    // Check that the two condition are the same
-    if(same_expression_p(cond1, EXPRESSION(CAR(call_arguments(c)))))
-    {
-        return TRUE;
-    }
-
-    return FALSE;
-}
-
-static bool process_stat_to_compact(statement stat)
-{
-    string comments = NULL;
-    char*  next_line;
-
-    bool res = FALSE;
-
-    if (!statement_with_empty_comment_p(stat)) 
-    {
-        comments = strdup(statement_comments(stat));
-        next_line = strtok (comments, "\n");
-        if (next_line != NULL) {
-            do {
-                if(!strncmp(next_line, IF_CONV_TO_COMPACT, 20))
+                /* second constraint : cond[0] == !cond[1] */
+                bool ok = false;
+                size_t i;
+                for(i =0;i<2;i++)
                 {
-                    res = TRUE;
-                    free(statement_comments(stat));
-                    statement_comments(stat) = empty_comments;
-                    break;
+                    if(expression_call(cond[!i]) && ENTITY_NOT_P(call_function(expression_call(cond[!i]))))
+                    {
+                        if((ok=expression_equal_p(EXPRESSION(CAR(call_arguments(expression_call(cond[!i])))),
+                                        cond[i])))
+                            break;
+                    }
                 }
+                if(ok)
+                {
+                    /* yes, we have in s1 a = cond ? b:a; and in s2 a = !cond ? c: a;
+                     * it will become a = cond ? b :c ;*/
 
-                next_line = strtok(NULL, "\n");
+                    /* 1:replace false_val[i] by true_val[!i]*/
+                    free_expression(false_val[i]);
+                    CAR(CDR(CDR(call_arguments(phis[i])))).p=(gen_chunkp)true_val[!i];
+                    /* 2:unlink true_val[!i]*/
+                    CAR(CDR(call_arguments(phis[!i]))).p=gen_chunk_undefined;
+                    /* 3: replace s[!i] by a continue */
+                    update_statement_instruction(s[!i],make_continue_instruction());
+                    return true;
+                }
             }
-            while (next_line != NULL);
         }
-
-        if(comments)
-            free(comments);
     }
+    return false;
+}
 
-    return res;
+/** 
+ * checks if there is a write-read conflict between @a source and @a sink
+ * according to dg successors @a source_successors
+ */
+static bool
+statement_conflicts_p(statement sink,list source_successors)
+{
+    FOREACH(SUCCESSOR,s,source_successors)
+    {
+        statement ss = vertex_to_statement(successor_vertex(s));
+        if(ss==sink)
+        {
+            FOREACH(CONFLICT,c,dg_arc_label_conflicts(successor_arc_label(s)))
+            {
+                /* if there is a write-read conflict, we cannot do much */
+                if ( (effect_write_p(conflict_source(c)) && effect_read_p(conflict_sink(c))) ||
+                        (effect_read_p(conflict_source(c)) && effect_write_p(conflict_sink(c))) )
+                    return true;
+
+            }
+        }
+    }
+    return false;
 }
 
 /*
    This function does the job for each sequence.
    */
-static void if_conversion_compact_stats(statement stat)
+static void if_conversion_compact_stats(statement stat,graph dg)
 {
     // Only look at the sequence statements
-    if(!statement_block_p(stat))
-        return;
-
-    list seq = NIL;
-    list newseq = NIL;
-
-    seq = sequence_statements(instruction_sequence(statement_instruction(stat)));
-    newseq = da_process_list(seq, FALSE, process_stat_to_compact);
-
-    sequence_statements(instruction_sequence(statement_instruction(stat))) = newseq;
-    gen_free_list(seq);
-
-    list pStat = NIL;
-
-    //Go through the statements of the sequence
-    MAPL(lStat,
+    if(statement_block_p(stat))
     {
-        bool rep = FALSE;
-
-        statement cStat1 = STATEMENT(CAR(lStat));
-
-        // If it is a call to phi function,...
-        if(statement_call_p(cStat1) &&
-                check_assign_phi_call(statement_call(cStat1)))
+        hash_table successors = statements_to_successors(statement_block(stat),dg);
+        
+        for(list iter = statement_block(stat);!ENDP(iter);POP(iter))
         {
-
-            //Go through the remaining statements of the sequence
-            MAP(STATEMENT, cStat2,
+            statement st = STATEMENT(CAR(iter));
+            if(statement_phi_function_p(st))
             {
-                // If it is a call to phi function,...
-                if(statement_call_p(cStat2) && 
-                        check_assign_phi_call(statement_call(cStat2)))
-                {
-                    call c1 = statement_call(cStat1);
-                    list arg1 = call_arguments(c1);
-
-                    expression phiExp1 = EXPRESSION(CAR(CDR(call_arguments(c1))));
-                    list phiArg1 = call_arguments(syntax_call(expression_syntax(phiExp1)));
-
-                    expression lArg1 = EXPRESSION(CAR(arg1));
-                    expression cond1 = EXPRESSION(CAR(phiArg1));
-                    expression tVal1 = EXPRESSION(CAR(CDR(phiArg1)));
-
-                    call c2 = statement_call(cStat2);
-                    list arg2 = call_arguments(c2);
-
-                    expression phiExp2 = EXPRESSION(CAR(CDR(call_arguments(c2))));
-                    list phiArg2 = call_arguments(syntax_call(expression_syntax(phiExp2)));
-
-                    expression lArg2 = EXPRESSION(CAR(arg2));
-                    expression cond2 = EXPRESSION(CAR(phiArg2));
-                    expression tVal2 = EXPRESSION(CAR(CDR(phiArg2)));
-
-                    // If the phi condition are complement and 
-                    // that they share the same lValue
-                    if(check_first_arg(cond1, cond2) &&
-                            same_expression_p(lArg1, lArg2) )
-                    {
-                        // The argument list of the new phi call
-                        list args = gen_make_list(expression_domain, 
-                                copy_expression(cond1),
-                                copy_expression(tVal1),
-                                copy_expression(tVal2),
-                                NULL);
-
-                        // The new phi call
-                        expression phiExp = call_to_expression(
-                                make_call((entity)get_function_entity(SIMD_PHI_NAME), args));
-
-                        // The new assignment-phi call
-                        call newCall = make_call(entity_intrinsic(ASSIGN_OPERATOR_NAME),
-                                CONS(EXPRESSION, copy_expression(lArg1), CONS(EXPRESSION, phiExp, NIL)));
-
-                        // Free the old call of the statement
-                        free_call(c2);
-
-                        // Insert the new call
-                        instruction_call(statement_instruction(cStat2)) = newCall;
-
-                        pips_assert("cStat1 not the first stat in sequence", 
-                                pStat != NIL);
-
-                        // Delete the first statement
-                        CDR(pStat) = CDR(lStat);
-                        free_statement(cStat1);
-                        rep = TRUE;
-                        break;
-                    }
+                ifdebug(1) {
+                    pips_debug(1,"checking statement:\n");
+                    print_statement(st);
                 }
-            }, lStat);
+                /* iterate over the trailing statements to find a legal statement to compact
+                 * we stop when a conflict is found or when we achived our goal
+                 */
+                list succ = hash_get(successors,st);
+                FOREACH(STATEMENT,next,CDR(iter))
+                {
+
+                    if(statement_phi_function_p(next))
+                    {
+                        if(compact_phi_functions(st,next))
+                        {
+                            ifdebug(1) {
+                                pips_debug(1,"compacted into statement:\n");
+                                print_statement(st);
+                            }
+                            break;
+                        }
+                    }
+                    /* look for a write - read conflict between st and next */
+                    else if(statement_conflicts_p(next, succ)) break;
+                }
+            }
         }
-
-        if(!rep)
-            pStat = lStat;
-
-    }, statement_block(stat));
+        hash_table_free(successors);
+    }
 }
 
 /*
@@ -280,10 +286,9 @@ boolean if_conversion_compact(char * mod_name)
 
     set_current_module_statement(mod_stmt);
     set_current_module_entity(module_name_to_entity(mod_name));
+	set_ordering_to_statement(mod_stmt);
 
     graph dg = (graph) db_get_memory_resource(DBR_DG, mod_name, TRUE);
-
-    init_dep_graph(dg);
 
     set_proper_rw_effects((statement_effects) 
             db_get_memory_resource(DBR_PROPER_EFFECTS, mod_name, TRUE));
@@ -291,16 +296,14 @@ boolean if_conversion_compact(char * mod_name)
     debug_on("IF_CONVERSION_COMPACT_DEBUG_LEVEL");
     // Now do the job
 
-    gen_recurse(mod_stmt, statement_domain,
-            gen_true, if_conversion_compact_stats);
+    gen_context_recurse(mod_stmt, dg, statement_domain, gen_true, if_conversion_compact_stats);
 
     // Reorder the module, because new statements have been added 
     module_reorder(mod_stmt);
     DB_PUT_MEMORY_RESOURCE(DBR_CODE, mod_name, mod_stmt);
-    DB_PUT_MEMORY_RESOURCE(DBR_CALLEES, mod_name, 
-            compute_callees(mod_stmt));
 
     // update/release resources
+	reset_ordering_to_statement();
     reset_current_module_statement();
     reset_current_module_entity();
     reset_proper_rw_effects();
