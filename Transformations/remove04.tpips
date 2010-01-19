@@ -1,0 +1,48 @@
+delete remove04
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create remove04 remove04.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
+
+module volume
+
+echo
+echo Initial code
+echo
+
+activate PRINT_CODE_CUMULATED_REDUCTIONS
+display PRINTED_FILE
+
+echo
+echo after removing reductions
+echo
+
+setproperty LOOP_LABEL "volume"
+apply REDUCTION_VARIABLE_EXPANSION
+activate PRINT_CODE
+display PRINTED_FILE
+
+echo
+echo after array to pointer
+echo
+apply ARRAY_TO_POINTER
+display PRINTED_FILE
+
+echo
+echo Unsplit resulting code
+echo
+
+apply UNSPLIT
+shell gcc -c remove04.database/Src/remove04.c  -o remove04.database/Src/v.o
+shell rm -rf remove04.database/Src/v.o
+
+close
+delete remove04
+quit
+
+

@@ -22,7 +22,7 @@ int cse01()
    int j;
    int k;
    //PIPS generated variable
-   int I_0;
+   int I_0, I_1, I_2;
 
    I_0 = j+2;
    i = 2*I_0;

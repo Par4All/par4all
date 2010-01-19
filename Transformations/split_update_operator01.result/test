@@ -12,9 +12,6 @@ void foo()
    i &= 1;
    i ^= 1;
 }
-
-
-
 extern void foo();
 void foo()
 {
@@ -30,8 +27,5 @@ void foo()
    i = i&1;
    i = i^1;
 }
-
-
-
 extern void foo();
 

@@ -13,15 +13,17 @@ Privatize scalar variables on all the modules of the program:
 Ask for some statistics about the job to be done:
 Ask for the parallelization of all the modules of the program with OpenMP output:
 enum {N=9};
-typedef struct {float re; float im;} complex;
+typedef struct {
+   float re;
+   float im;
+} complex;
+
 complex imagein[N][N];
+
 extern int main(int argc, char *argv[]);
 int main(int argc, char *argv[])
 {
-   int i;
-   int j;
-   int k;
-
+   int i, j, k;
 
 
    return 0;

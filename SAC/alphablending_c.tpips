@@ -1,4 +1,4 @@
-
+delete alphablending_c
 setproperty ABORT_ON_USER_ERROR TRUE
 
 create alphablending_c alphablending.c include/SIMD.c
@@ -23,8 +23,9 @@ echo simdized code
 echo
 
 display PRINTED_FILE
+apply UNSPLIT
 
-shell ./compileC.sh alphablending_c alphablending test.c
+shell ./compileC.sh alphablending_c alphablending.c test.c
 shell gcc -O3 -I$. -march=native -c test.c
 shell rm test.c test.o
 

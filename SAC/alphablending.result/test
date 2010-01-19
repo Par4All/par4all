@@ -209,14 +209,15 @@ c SIMD_COMMENT_3
       INTEGER*4 SIZE
       PARAMETER (SIZE = 50000)
       INTEGER LU_IND0, LU_IB0, LU_NUB0, I
-      REAL*4 v4sf_vec20(0:3), v4sf_vec19(0:3), v4sf_vec18(0:3), 
-     &v4sf_vec17(0:3), v4sf_vec16(0:3), v4sf_vec15(0:3), v4sf_vec14(0
-     &:3), v4sf_vec13(0:3), v4sf_vec12(0:3), v4sf_vec11(0:3), 
-     &v4sf_vec10(0:3), v4sf_vec9(0:3), v4sf_vec8(0:3), v4sf_vec7(0:3)
-     &, v4sf_vec6(0:3), v4sf_vec5(0:3), v4sf_vec4(0:3), v4sf_vec3(0:3
-     &), v4sf_vec2(0:3), v4sf_vec1(0:3), v4sf_vec0(0:3), F_03, F_13, 
-     &F_23, F_02, F_12, F_22, F_01, F_11, F_21, F_00, F_10, F_20, F_2
-     &, F_1, F_0, RESULT(1:SIZE), SRC(1:SIZE), DEST(1:SIZE), ALPHA
+      REAL*4 v4sf_vec23(0:3), v4sf_vec22(0:3), v4sf_vec21(0:3), 
+     &v4sf_vec20(0:3), v4sf_vec19(0:3), v4sf_vec18(0:3), v4sf_vec17(0
+     &:3), v4sf_vec16(0:3), v4sf_vec15(0:3), v4sf_vec14(0:3), 
+     &v4sf_vec13(0:3), v4sf_vec12(0:3), v4sf_vec11(0:3), v4sf_vec10(0
+     &:3), v4sf_vec9(0:3), v4sf_vec8(0:3), v4sf_vec7(0:3), v4sf_vec6(
+     &0:3), v4sf_vec5(0:3), v4sf_vec4(0:3), v4sf_vec3(0:3), v4sf_vec2
+     &(0:3), v4sf_vec1(0:3), v4sf_vec0(0:3), F_03, F_13, F_23, F_02, 
+     &F_12, F_22, F_01, F_11, F_21, F_00, F_10, F_20, F_2, F_1, F_0, 
+     &RESULT(1:SIZE), SRC(1:SIZE), DEST(1:SIZE), ALPHA
 
 c      INCLUDE 'ALPHABLENDING_INC2.f'
 
@@ -249,14 +250,15 @@ c      INCLUDE 'ALPHABLENDING_INC2.f'
       INTEGER*4 SIZE
       PARAMETER (SIZE = 50000)
       INTEGER LU_IND0, LU_IB0, LU_NUB0, I
-      REAL*4 v4sf_vec20(0:3), v4sf_vec19(0:3), v4sf_vec18(0:3), 
-     &v4sf_vec17(0:3), v4sf_vec16(0:3), v4sf_vec15(0:3), v4sf_vec14(0
-     &:3), v4sf_vec13(0:3), v4sf_vec12(0:3), v4sf_vec11(0:3), 
-     &v4sf_vec10(0:3), v4sf_vec9(0:3), v4sf_vec8(0:3), v4sf_vec7(0:3)
-     &, v4sf_vec6(0:3), v4sf_vec5(0:3), v4sf_vec4(0:3), v4sf_vec3(0:3
-     &), v4sf_vec2(0:3), v4sf_vec1(0:3), v4sf_vec0(0:3), F_03, F_13, 
-     &F_23, F_02, F_12, F_22, F_01, F_11, F_21, F_00, F_10, F_20, F_2
-     &, F_1, F_0, RESULT(1:SIZE), SRC(1:SIZE), DEST(1:SIZE), ALPHA
+      REAL*4 v4sf_vec23(0:3), v4sf_vec22(0:3), v4sf_vec21(0:3), 
+     &v4sf_vec20(0:3), v4sf_vec19(0:3), v4sf_vec18(0:3), v4sf_vec17(0
+     &:3), v4sf_vec16(0:3), v4sf_vec15(0:3), v4sf_vec14(0:3), 
+     &v4sf_vec13(0:3), v4sf_vec12(0:3), v4sf_vec11(0:3), v4sf_vec10(0
+     &:3), v4sf_vec9(0:3), v4sf_vec8(0:3), v4sf_vec7(0:3), v4sf_vec6(
+     &0:3), v4sf_vec5(0:3), v4sf_vec4(0:3), v4sf_vec3(0:3), v4sf_vec2
+     &(0:3), v4sf_vec1(0:3), v4sf_vec0(0:3), F_03, F_13, F_23, F_02, 
+     &F_12, F_22, F_01, F_11, F_21, F_00, F_10, F_20, F_2, F_1, F_0, 
+     &RESULT(1:SIZE), SRC(1:SIZE), DEST(1:SIZE), ALPHA
 
 c      INCLUDE 'ALPHABLENDING_INC2.f'
 

@@ -1,11 +1,7 @@
 void output()
 {
-   double z;
-   double max;
-   double sum;
-   double squares;
-   int i;
-   int j;
+   double z, max, sum, squares;
+   int i, j;
    float imageout_re[256][256];
    max = 0.0;
    sum = 0.0;

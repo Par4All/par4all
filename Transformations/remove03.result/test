@@ -26,6 +26,8 @@ int volume(int a[256][256])
    int i, j;
    //PIPS generated variable
    int RED[255+1];
+   for(i = 0; i <= 255; i += 1)
+      RED[i] = 0;
 volume:
    for(i = 0; i <= 255; i += 1) {
       RED[i] = RED[i]+1;

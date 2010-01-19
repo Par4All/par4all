@@ -56,9 +56,7 @@ void carto(float towns[100][100], float result[100][100])
    int k;
    int l;
    //PIPS generated variable
-   int I_0;
-   //PIPS generated variable
-   int I_1;
+   int I_0, I_1;
 l0:
    for(i = 0; i <= 99; i += 1)
 l1:
@@ -91,9 +89,7 @@ void carto(float towns[100][100], float result[100][100])
    int k;
    int l;
    //PIPS generated variable
-   int I_0;
-   //PIPS generated variable
-   int I_1;
+   int I_0, I_1;
 l0:
    for(i = 0; i <= 99; i += 1)
 l1:
@@ -124,15 +120,7 @@ void carto(float towns[100][100], float result[100][100])
    int k;
    int l;
    //PIPS generated variable
-   int I_0;
-   //PIPS generated variable
-   int I_1;
-   //PIPS generated variable
-   int I_2;
-   //PIPS generated variable
-   int I_3;
-   //PIPS generated variable
-   int I_4;
+   int I_0, I_1, I_2, I_3, I_4;
 l0:
    for(i = 0; i <= 99; i += 1)
 l1:
@@ -172,21 +160,7 @@ void carto(float towns[100][100], float result[100][100])
    int k;
    int l;
    //PIPS generated variable
-   int I_0;
-   //PIPS generated variable
-   int I_1;
-   //PIPS generated variable
-   int I_2;
-   //PIPS generated variable
-   int I_3;
-   //PIPS generated variable
-   int I_4;
-   //PIPS generated variable
-   int I_5;
-   //PIPS generated variable
-   int I_6;
-   //PIPS generated variable
-   int I_7;
+   int I_0, I_1, I_2, I_3, I_4, I_5, I_6, I_7;
 l0:
    for(i = 0; i <= 99; i += 1)
 l1:
@@ -241,21 +215,7 @@ void carto(float towns[100][100], float result[100][100])
    int k;
    int l;
    //PIPS generated variable
-   int I_0;
-   //PIPS generated variable
-   int I_1;
-   //PIPS generated variable
-   int I_2;
-   //PIPS generated variable
-   int I_3;
-   //PIPS generated variable
-   int I_4;
-   //PIPS generated variable
-   int I_5;
-   //PIPS generated variable
-   int I_6;
-   //PIPS generated variable
-   int I_7;
+   int I_0, I_1, I_2, I_3, I_4, I_5, I_6, I_7;
 l0:
    for(i = 0; i <= 99; i += 1)
 l1:

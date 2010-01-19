@@ -14,7 +14,9 @@ echo
 echo Initial code
 echo
 
-display PRINTED_FILE[dotprod]
+module dotprod
+display PRINTED_FILE
+apply SPLIT_UPDATE_OPERATOR
 
 source include/benchmark.tpips.h
 
@@ -22,11 +24,21 @@ echo
 echo simdized code
 echo
 
-display PRINTED_FILE[dotprod]
+display PRINTED_FILE
 
-shell ./compileC.sh DOTPROD_C dotprod test.c
-shell gcc -O3 -I. -march=native -c test.c
-shell rm test.c test.o
+apply UNSPLIT
+
+shell cc kernels/DOTPROD/DOTPROD.c include/SIMD.c -o dotprod0
+shell sed -i -e '1 i #include "SIMD.h"' DOTPROD_C.database/Src/DOTPROD.c
+shell cc -Iinclude DOTPROD_C.database/Src/DOTPROD.c include/SIMD.c -o dotprod1
+shell sed -i -e '1 d' DOTPROD_C.database/Src/DOTPROD.c
+shell if test "`./dotprod0`" = "`./dotprod1`" ; then echo seq-ok ; else echo seq-ko ; fi
+
+shell ./compileC.sh DOTPROD_C DOTPROD.c dotprod-sse.c
+shell cc -O3 -I. -march=native dotprod-sse.c -o dotprod2
+shell if test "`./dotprod0`" = "`./dotprod2`" ; then echo sse-ok ; else echo sse-ko ; fi
+shell rm -f dotprod[012] dotprod-sse.c
 
 close
+delete DOTPROD_C
 quit

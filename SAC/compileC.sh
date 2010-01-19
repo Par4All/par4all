@@ -21,12 +21,15 @@ if test -n "$3"; then
 fi
 
 # ??? should not hard code file suffix
-TARGET=$PROJECT_NAME.database/$MODULE_NAME/$MODULE_NAME.pre.c
+TARGET=$PROJECT_NAME.database/Src/$MODULE_NAME
 
 {
     cat $RCDIR/include/sse.h
-    sed -r  -e 's/float v4sf_([^ ,]+)\[.*\]/__m128 \1/g' \
-            -e 's/v4sf_([^ ,]+)/\1/g' $TARGET
+	sed -r  -e 's/float (v4sf_[^[]+)/__m128 \1/g' \
+			-e 's/float (v4si_[^[]+)/__m128i \1/g' \
+            -e 's/v4s[if]_([^,[]+)\[[^]]*\]/\1/g' \
+            -e 's/v4s[if]_([^ ,[]+)/\1/g' \
+			$TARGET
 } > $OUTFILE
 
 cat 1>&2 << EOF

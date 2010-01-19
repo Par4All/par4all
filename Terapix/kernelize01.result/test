@@ -42,6 +42,8 @@ int foo(int seed[100])
    int b[100];
    int c[100];
    int i;
+   //PIPS generated variable
+   int i_1;
    /* init */
 #pragma omp parallel for 
    for(i = 0; i <= 99; i += 1) {
@@ -57,8 +59,8 @@ kernel:   run_kernel(a, b, c);
 }
 void run_kernel(int a[100], int b[100], int c[100])
 {
+   //PIPS generated variable
    int i;
-   extern void kernel(int a[100], int b[100], int c[100], int i);
    /* compute */
 kernel:
    for(i = 0; i <= 99; i += 10)
@@ -66,9 +68,12 @@ kernel:
 }
 void kernel(int a[100], int b[100], int c[100], int i)
 {
-   int i_1;
-   for(i_1 = i; i_1 <= MIN(i+9, 99); i_1 += 1)
-      c[i_1] = a[i_1]+b[i_1];
+   {
+      //PIPS generated variable
+      int i_1;
+      for(i_1 = i; i_1 <= MIN(i+9, 99); i_1 += 1)
+         c[i_1] = a[i_1]+b[i_1];
+   }
 }
 int foo(int seed[100])
 {
@@ -76,23 +81,24 @@ int foo(int seed[100])
    int b[100];
    int c[100];
    int i;
-   int (*P_0)[100];
-   int (*P_1)[100];
-   int (*P_2)[100];
+   //PIPS generated variable
+   int i_1;
+   //PIPS generated variable
+   int (*P_0)[100], (*P_1)[100], (*P_2)[100];
    /* init */
 #pragma omp parallel for 
    for(i = 0; i <= 99; i += 1) {
       a[i] = seed[i];
       b[i] = seed[99-i];
    }
-   memalloc(&P_2, sizeof(int[100])-1+1);
-   memalloc(&P_1, sizeof(int[100])-1+1);
-   memalloc(&P_0, sizeof(int[100])-1+1);
-   memload(a, *P_2, sizeof(int[100])-1+1);
-   memload(b, *P_1, sizeof(int[100])-1+1);
+   memalloc(&P_2, 400);
+   memalloc(&P_1, 400);
+   memalloc(&P_0, 400);
+   memload(a, *P_2, 400);
+   memload(b, *P_1, 400);
    /* compute */
 kernel:   run_kernel(*P_2, *P_1, *P_0);
-   memstore(c, *P_0, sizeof(int[100])-1+1);
+   memstore(c, *P_0, 400);
    memfree(*P_2);
    memfree(*P_1);
    memfree(*P_0);
@@ -110,23 +116,24 @@ int foo(int seed[100])
    int b[100];
    int c[100];
    int i;
-   int (*P_0)[100];
-   int (*P_1)[100];
-   int (*P_2)[100];
+   //PIPS generated variable
+   int i_1;
+   //PIPS generated variable
+   int (*P_0)[100], (*P_1)[100], (*P_2)[100];
    /* init */
 #pragma omp parallel for 
    for(i = 0; i <= 99; i += 1) {
       a[i] = seed[i];
       b[i] = seed[99-i];
    }
-   memalloc(&P_2, sizeof(int[100])-1+1);
-   memalloc(&P_1, sizeof(int[100])-1+1);
-   memalloc(&P_0, sizeof(int[100])-1+1);
-   memload(a, *P_2, sizeof(int[100])-1+1);
-   memload(b, *P_1, sizeof(int[100])-1+1);
+   memalloc(&P_2, 400);
+   memalloc(&P_1, 400);
+   memalloc(&P_0, 400);
+   memload(a, *P_2, 400);
+   memload(b, *P_1, 400);
    /* compute */
    run_kernel(*P_2, *P_1, *P_0);
-   memstore(c, *P_0, sizeof(int[100])-1+1);
+   memstore(c, *P_0, 400);
    memfree(*P_2);
    memfree(*P_1);
    memfree(*P_0);

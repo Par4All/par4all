@@ -1,0 +1,15 @@
+void foo_l()
+{
+   int a, b, c;
+   a = b>c?b:c;
+   a = !(b>c)?c:b;
+}
+extern void foo_l();
+void foo_l()
+{
+   int a, b, c;
+   a = b>c?b:c;
+   a = !(b>c)?c:b;
+}
+extern void foo_l();
+

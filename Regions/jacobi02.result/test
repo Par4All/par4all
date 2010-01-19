@@ -1,7 +1,6 @@
 void compute()
 {
-   int i;
-   int j;
+   int i, j;
    
    /* Use 2 array in flip-flop to have dataparallel forall semantics. I
         could use also a flip-flop dimension instead... */
@@ -18,10 +17,7 @@ kernel2:
 }
 void get_data(char filename[])
 {
-   int i;
-   int j;
-   int nx;
-   int ny;
+   int i, j, nx, ny;
    unsigned char c;
    FILE *fp;
    if ((fp = fopen(filename, "r"))==(void *) 0) {
@@ -67,8 +63,7 @@ void get_data(char filename[])
 }
 int main(int argc, char *argv[])
 {
-   int t;
-   int i;
+   int t, i;
 
    if (argc!=2) {
       
@@ -92,8 +87,7 @@ int main(int argc, char *argv[])
 }
 void write_data(char filename[])
 {
-   int i;
-   int j;
+   int i, j;
    unsigned char c;
    FILE *fp;
    if ((fp = fopen(filename, "w"))==(void *) 0) {
@@ -128,8 +122,7 @@ REGIONS for all modules
 
 void compute()
 {
-   int i;
-   int j;
+   int i, j;
 
 //  <TOP-LEVEL:save[PHI1][PHI2]-W-EXACT-{1<=PHI1, PHI1<=499, 1<=PHI2,
 //    PHI2<=499}>
@@ -195,10 +188,7 @@ kernel2:
 
 void get_data(char filename[])
 {
-   int i;
-   int j;
-   int nx;
-   int ny;
+   int i, j, nx, ny;
    unsigned char c;
    FILE *fp;
 
@@ -384,8 +374,7 @@ void get_data(char filename[])
 
 int main(int argc, char *argv[])
 {
-   int t;
-   int i;
+   int t, i;
 
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
@@ -479,8 +468,7 @@ int main(int argc, char *argv[])
 
 void write_data(char filename[])
 {
-   int i;
-   int j;
+   int i, j;
    unsigned char c;
    FILE *fp;
 
@@ -557,8 +545,7 @@ CODE for all modules after coarse_grain_parallelization
 void compute()
 {
    // BEGIN BLOCK
-   int i;
-   int j;
+   int i, j;
    
    /* Use 2 array in flip-flop to have dataparallel forall semantics. I
         could use also a flip-flop dimension instead... */
@@ -584,8 +571,7 @@ CODE for all modules after gpu_ify
 void compute()
 {
    // BEGIN BLOCK
-   int i;
-   int j;
+   int i, j;
    
    /* Use 2 array in flip-flop to have dataparallel forall semantics. I
         could use also a flip-flop dimension instead... */
@@ -596,10 +582,7 @@ kernel2:   p4a_kernel_launcher_1(save, space);
 void get_data(char filename[])
 {
    // BEGIN BLOCK
-   int i;
-   int j;
-   int nx;
-   int ny;
+   int i, j, nx, ny;
    unsigned char c;
    FILE *fp;
    if ((fp = fopen(filename, "r"))==(void *) 0) {
@@ -649,8 +632,7 @@ void get_data(char filename[])
 int main(int argc, char *argv[])
 {
    // BEGIN BLOCK
-   int t;
-   int i;
+   int t, i;
 
    if (argc!=2) {
       // BEGIN BLOCK
@@ -695,9 +677,9 @@ void p4a_kernel_2(float_t space[501][501], int i, int j)
 void p4a_kernel_launcher_0(float_t save[501][501], float_t space[501][501])
 {
    // BEGIN BLOCK
-   int i;
-   int j;
-   extern void p4a_kernel_wrapper_0(float_t save[501][501], float_t space[501][501], int i, int j);
+   // BEGIN BLOCK
+   //PIPS generated variable
+   int i, j;
    
    /* Use 2 array in flip-flop to have dataparallel forall semantics. I
            could use also a flip-flop dimension instead... */
@@ -710,9 +692,9 @@ kernel1:
 void p4a_kernel_launcher_1(float_t save[501][501], float_t space[501][501])
 {
    // BEGIN BLOCK
-   int i;
-   int j;
-   extern void p4a_kernel_wrapper_1(float_t save[501][501], float_t space[501][501], int i, int j);
+   // BEGIN BLOCK
+   //PIPS generated variable
+   int i, j;
 kernel2:
    for(i = 1; i <= 499; i += 1)
       for(j = 1; j <= 499; j += 1)
@@ -722,9 +704,9 @@ kernel2:
 void p4a_kernel_launcher_2(float_t space[501][501])
 {
    // BEGIN BLOCK
-   int i;
-   int j;
-   extern void p4a_kernel_wrapper_2(float_t space[501][501], int i, int j);
+   // BEGIN BLOCK
+   //PIPS generated variable
+   int i, j;
    
    /* Erase the memory, in case the image is not big enough: */
    for(i = 0; i <= 500; i += 1)
@@ -735,7 +717,6 @@ void p4a_kernel_launcher_2(float_t space[501][501])
 void p4a_kernel_wrapper_0(float_t save[501][501], float_t space[501][501], int i, int j)
 {
    // BEGIN BLOCK
-   extern void p4a_kernel_0(float_t save[501][501], float_t space[501][501], int i, int j);
    // BEGIN BLOCK
    // BEGIN BLOCK
    // To be replaced with a call to P4A_vp_0
@@ -749,7 +730,6 @@ void p4a_kernel_wrapper_0(float_t save[501][501], float_t space[501][501], int i
 void p4a_kernel_wrapper_1(float_t save[501][501], float_t space[501][501], int i, int j)
 {
    // BEGIN BLOCK
-   extern void p4a_kernel_1(float_t save[501][501], float_t space[501][501], int i, int j);
    // BEGIN BLOCK
    // BEGIN BLOCK
    // To be replaced with a call to P4A_vp_0
@@ -763,7 +743,6 @@ void p4a_kernel_wrapper_1(float_t save[501][501], float_t space[501][501], int i
 void p4a_kernel_wrapper_2(float_t space[501][501], int i, int j)
 {
    // BEGIN BLOCK
-   extern void p4a_kernel_2(float_t space[501][501], int i, int j);
    // BEGIN BLOCK
    // BEGIN BLOCK
    // To be replaced with a call to P4A_vp_0
@@ -776,8 +755,7 @@ void p4a_kernel_wrapper_2(float_t space[501][501], int i, int j)
 void write_data(char filename[])
 {
    // BEGIN BLOCK
-   int i;
-   int j;
+   int i, j;
    unsigned char c;
    FILE *fp;
    if ((fp = fopen(filename, "w"))==(void *) 0) {
@@ -830,8 +808,7 @@ void compute()
 //    PHI2<=499}>
 
    // BEGIN BLOCK
-   int i;
-   int j;
+   int i, j;
 
 //  <TOP-LEVEL:save[PHI1][PHI2]-W-EXACT-{1<=PHI1, PHI1<=499, 1<=PHI2,
 //    PHI2<=499}>
@@ -874,10 +851,7 @@ void get_data(char filename[])
 //    PHI2<=500}>
 
    // BEGIN BLOCK
-   int i;
-   int j;
-   int nx;
-   int ny;
+   int i, j, nx, ny;
    unsigned char c;
    FILE *fp;
 
@@ -1057,8 +1031,7 @@ Proper REGIONS for compute and get_data
 void compute()
 {
    // BEGIN BLOCK
-   int i;
-   int j;
+   int i, j;
 
 //  <TOP-LEVEL:save[PHI1][PHI2]-W-EXACT-{1<=PHI1, PHI1<=499, 1<=PHI2,
 //    PHI2<=499}>
@@ -1083,10 +1056,7 @@ kernel2:   p4a_kernel_launcher_1(save, space);
 void get_data(char filename[])
 {
    // BEGIN BLOCK
-   int i;
-   int j;
-   int nx;
-   int ny;
+   int i, j, nx, ny;
    unsigned char c;
    FILE *fp;
 
@@ -1247,8 +1217,7 @@ void compute()
 //    PHI1+PHI2<=999}>
 
    // BEGIN BLOCK
-   int i;
-   int j;
+   int i, j;
 
 //  <TOP-LEVEL:space[PHI1][PHI2]-IN-MAY-{0<=PHI1, PHI1<=500, 0<=PHI2,
 //    PHI2<=500, 1<=PHI1+PHI2, PHI2<=PHI1+499, PHI1<=PHI2+499,
@@ -1268,23 +1237,17 @@ kernel2:   p4a_kernel_launcher_1(save, space);
 }
 
 //  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{}>
-//  <__IO_EFFECTS:LUNS[PHI1]-OUT-MAY-{}>
 //  <filename[PHI1]-IN-MAY-{}>
 
 void get_data(char filename[])
 {
 
 //  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{}>
-//  <__IO_EFFECTS:LUNS[PHI1]-OUT-MAY-{}>
 //  <filename[PHI1]-IN-MAY-{}>
 //  <fp[PHI1]-IN-MAY-{}>
-//  <fp-OUT-EXACT-{}>
 
    // BEGIN BLOCK
-   int i;
-   int j;
-   int nx;
-   int ny;
+   int i, j, nx, ny;
    unsigned char c;
    FILE *fp;
 
@@ -1433,8 +1396,7 @@ void compute()
 //    PHI1+PHI2<=999}>
 
    // BEGIN BLOCK
-   int i;
-   int j;
+   int i, j;
 
 //  <TOP-LEVEL:save[PHI1][PHI2]-OUT-MAY-{1<=PHI1, PHI1<=499, 1<=PHI2,
 //    PHI2<=499, 1<=PHI1+PHI2, PHI2<=PHI1+499, PHI1<=PHI2+499,
@@ -1465,10 +1427,7 @@ void get_data(char filename[])
 //    PHI2<=500}>
 
    // BEGIN BLOCK
-   int i;
-   int j;
-   int nx;
-   int ny;
+   int i, j, nx, ny;
    unsigned char c;
    FILE *fp;
 
@@ -1603,8 +1562,7 @@ Privatized REGIONS for compute and get_data
 void compute()
 {
    // BEGIN BLOCK
-   int i;
-   int j;
+   int i, j;
    
    /* Use 2 array in flip-flop to have dataparallel forall semantics. I
         could use also a flip-flop dimension instead... */
@@ -1623,10 +1581,7 @@ void get_data(char filename[])
 //  <ny-PRIVATE-EXACT-{}>
 
    // BEGIN BLOCK
-   int i;
-   int j;
-   int nx;
-   int ny;
+   int i, j, nx, ny;
    unsigned char c;
    FILE *fp;
    if ((fp = fopen(filename, "r"))==(void *) 0) {

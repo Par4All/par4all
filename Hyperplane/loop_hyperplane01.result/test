@@ -4,7 +4,7 @@ Initial source code
 void loop_hyperplane01(int n, int ni, int nj)
 {
    float x[n][n];
-   int i,  j;
+   int i, j;
 
 l1:
    for(i = 0; i <= ni-1; i += 1)
@@ -18,11 +18,9 @@ Source code after loop hyperplane
 void loop_hyperplane01(int n, int ni, int nj)
 {
    float x[n][n];
-   int i,  j;
+   int i, j;
    //PIPS generated variable
-   int ip;
-   //PIPS generated variable
-   int jp;
+   int ip, jp;
 
 l1:
    for(ip = 0; ip <= -2+ni+nj; ip += 1)

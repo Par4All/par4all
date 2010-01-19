@@ -20,9 +20,7 @@ void loop_interchange01(int n, int ni, int nj)
    float x[n][n];
    int i, j;
    //PIPS generated variable
-   int ip;
-   //PIPS generated variable
-   int jp;
+   int ip, jp;
 
 l1:
    for(ip = 0; ip <= -1+nj; ip += 1)

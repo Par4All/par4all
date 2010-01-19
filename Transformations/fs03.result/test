@@ -39,7 +39,7 @@
 
       X = A(4)                                                          0016
       A(I-3) = A(4)+A(4)                                                0017
-      A(I-2) = X-X                                                      0018
+      A(I-2) = A(4)-A(4)                                                0018
 
       PRINT *, A(5)                                                     0020
 
@@ -59,9 +59,8 @@
          A(I) = A(I)*A(I)+A(I)*A(I)                                     0013
       ENDDO
 
-      X = A(4)                                                          0016
       A(I-3) = A(4)+A(4)                                                0017
-      A(I-2) = X-X                                                      0018
+      A(I-2) = A(4)-A(4)                                                0018
 
       PRINT *, A(5)                                                     0020
 
@@ -71,15 +70,14 @@
       INTEGER*4 N
       PARAMETER (N = 100)
       INTEGER I
-      REAL*4 A(1:N), X
+      REAL*4 A(1:N)
 
       DO I = 1, N                                                       0011
          A(I) = A(I)*A(I)+A(I)*A(I)                                     0013
       ENDDO
 
-      X = A(4)                                                          0016
       A(I-3) = A(4)+A(4)                                                0017
-      A(I-2) = X-X                                                      0018
+      A(I-2) = A(4)-A(4)                                                0018
 
       PRINT *, A(5)                                                     0020
 

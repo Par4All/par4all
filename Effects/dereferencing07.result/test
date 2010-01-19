@@ -5,26 +5,7 @@ void foo(int *col)
 {
 //               <must be read   >: col col[0]
 //               <must be written>: col
-   
-   /* Some versions of <linux/posix_types.h> define these macros.  */
-   
-   
-   
-   /* It's easier to assume 8-bit bytes than to get CHAR_BIT.  */
-   
-   
-   
-   
-   /* fd_set for select and pselect.  */
-   
-   
-   /* XPG4.2 requires this member name.  Otherwise avoid the name
-          from the global namespace.  */
-   
-   
-   
-   
-   *col++;                                                              /*0075*/
+   *col++;                                                              /*0004*/
 
    return;                                                              /*0006*/
 }
@@ -33,7 +14,7 @@ Proper effects for "main"
 
 int main()
 {
-   int x,  tab1[10],  tab2[10],  *p;                                    /*0016*/
+   int x, tab1[10], tab2[10], *p;                                       /*0016*/
 //               <must be read   >: x
 //               <must be written>: x
    x++;                                                                 /*0017*/
@@ -50,7 +31,7 @@ Proper regions for "main"
 
 int main()
 {
-   int x,  tab1[10],  tab2[10],  *p;                                    /*0016*/
+   int x, tab1[10], tab2[10], *p;                                       /*0016*/
 
 //  <x-R-EXACT-{}>
 //  <x-W-EXACT-{}>

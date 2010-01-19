@@ -8,10 +8,10 @@ PHI (LOGICAL L, int X1, int X2)
 }
 
 void
-SIMD_PHID(int R[4], LOGICAL L[4], int X1[4], int X2[4])
+SIMD_PHIW(int R[4], LOGICAL L[4], int X1[4], int X2[4])
 {
     int i;
-    for (i=0;i<4;i++)
+    for (i=0;i<2;i++)
         R[i]=L[i]?X1[i]:X2[i];
 }
 
@@ -33,9 +33,15 @@ SIMD_LOAD_V4SF (float VEC[4], float BASE[4])
 }
 
 void
+SIMD_LOAD_GENERIC_V2SF (float VEC[2], float X0, float X1)
+{
+    VEC[0] = X0;
+    VEC[1] = X1;
+}
+
+void
 SIMD_LOAD_GENERIC_V4SF (float VEC[4], float X0, float X1, float X2, float X3)
 {
-
     VEC[0] = X0;
     VEC[1] = X1;
     VEC[2] = X2;
@@ -54,12 +60,29 @@ SIMD_LOAD_CONSTANT_V4SF (float VEC[4], float X0, float X1, float X2, float X3)
 
 void
 SIMD_SAVE_V4SF (float VEC[4], float BASE[4])
-{  BASE[0] = VEC[0];
+{  
+    BASE[0] = VEC[0];
     BASE[1] = VEC[1];
     BASE[2] = VEC[2];
     BASE[3] = VEC[3];
 }
 
+void
+SIMD_MASKED_SAVE_V4SF(float VEC[4], float BASE[3])
+{  
+    BASE[0] = VEC[0];
+    BASE[1] = VEC[1];
+    BASE[2] = VEC[2];
+}
+
+
+void
+SIMD_SAVE_GENERIC_V2SF (float VEC[2], float X1[1], float X2[1])
+{
+
+    X1 [0]= VEC[0];
+    X2 [0]= VEC[1];
+}
 void
 SIMD_SAVE_GENERIC_V4SF (float VEC[4], float X1[1], float X2[1],
         float X3[1], float X4[1])
@@ -72,7 +95,7 @@ SIMD_SAVE_GENERIC_V4SF (float VEC[4], float X1[1], float X2[1],
 }
 
 void
-SIMD_CMPGTPS (LOGICAL DEST[4], float SRC1[4], float SRC2[4])
+SIMD_GTPS (LOGICAL DEST[4], float SRC1[4], float SRC2[4])
 {
     DEST[0] = SRC1[0] > SRC2[0];
     DEST[1] = SRC1[1] > SRC2[1];
@@ -164,6 +187,27 @@ SIMD_MAXPS (float DEST[4], float SRC1[4], float SRC2[4])
 }
 
 void
+SIMD_LOAD_V2SI_TO_V2SF(int VEC[2], float TO[2])
+{
+    TO[0]=VEC[0];
+    TO[1]=VEC[1];
+}
+void
+SIMD_SAVE_V2SI_TO_V2SF(int TO[2], float VEC[2])
+{
+    TO[0]=VEC[0];
+    TO[1]=VEC[1];
+}
+
+
+void
+SIMD_LOAD_CONSTANT_V2SF (float VEC[2], float HIGH, float LOW)
+{
+
+    VEC[0] = LOW;
+    VEC[1] = HIGH;
+}
+void
 SIMD_LOAD_CONSTANT_V2SI (int VEC[2], int HIGH, int LOW)
 {
 
@@ -237,28 +281,28 @@ SIMD_SAVE_GENERIC_V4SI (int VEC[4], int X1[1], int X2[1], int X3[1], int X4[1])
 }
 
 void
-SIMD_ADDD (int DEST[2], int SRC1[2], int SRC2[2])
+SIMD_ADDW (short DEST[8], int SRC1[2], int SRC2[2])
 {
     DEST[0] = SRC1[0] + SRC2[0];
     DEST[1] = SRC1[1] + SRC2[1];
 }
 
 void
-SIMD_SUBD (int DEST[2], int SRC1[2], int SRC2[2])
+SIMD_SUBW (short DEST[2], short SRC1[2], short SRC2[2])
 {
     DEST[0] = SRC1[0] - SRC2[0];
     DEST[1] = SRC1[1] - SRC2[1];
 }
 
 void
-SIMD_MULD (int DEST[2], int SRC1[2], int SRC2[2])
+SIMD_MULW (short DEST[2], short SRC1[2], short SRC2[2])
 {
     DEST[0] = SRC1[0] * SRC2[0];
     DEST[1] = SRC1[1] * SRC2[1];
 }
 
 void
-SIMD_DIVD (int DEST[2], int SRC1[2], int SRC2[2])
+SIMD_DIVW (short DEST[2], short SRC1[2], short SRC2[2])
 {
     DEST[0] = SRC1[0] / SRC2[0];
     DEST[1] = SRC1[1] / SRC2[1];
@@ -319,16 +363,14 @@ SIMD_SAVE_GENERIC_V4HI (short VEC[4], short X1[1],
 }
 
 void
-SIMD_CMPGTW (LOGICAL DEST[4], short SRC1[4], short SRC2[4])
+SIMD_GTW (LOGICAL DEST[4], short SRC1[4], short SRC2[4])
 {
     DEST[0] = SRC1[0] > SRC2[0];
     DEST[1] = SRC1[1] > SRC2[1];
-    DEST[2] = SRC1[2] > SRC2[2];
-    DEST[3] = SRC1[3] > SRC2[3];
 }
 
 void
-SIMD_PHIW (short DEST[4], LOGICAL COND[4], short SRC1[4], short SRC2[4])
+SIMD_PHID (int DEST[4], LOGICAL COND[4], int SRC1[4], int SRC2[4])
 {
 
     if (COND[0])
@@ -366,7 +408,7 @@ SIMD_PHIW (short DEST[4], LOGICAL COND[4], short SRC1[4], short SRC2[4])
 }
 
 void
-SIMD_ADDW (short DEST[4], short SRC1[4], short SRC2[4])
+SIMD_ADDD (int DEST[4], int SRC1[4], int SRC2[4])
 {
     DEST[0] = SRC1[0] + SRC2[0];
     DEST[1] = SRC1[1] + SRC2[1];
@@ -375,7 +417,7 @@ SIMD_ADDW (short DEST[4], short SRC1[4], short SRC2[4])
 }
 
 void
-SIMD_SUBW (short DEST[4], short SRC1[4], short SRC2[4])
+SIMD_SUBD (int DEST[4], int SRC1[4], int SRC2[4])
 {
     DEST[0] = SRC1[0] - SRC2[0];
     DEST[1] = SRC1[1] - SRC2[1];
@@ -384,7 +426,7 @@ SIMD_SUBW (short DEST[4], short SRC1[4], short SRC2[4])
 }
 
 void
-SIMD_MULW (short DEST[4], short SRC1[4], short SRC2[4])
+SIMD_MULD (int DEST[4], int SRC1[4], int SRC2[4])
 {
     DEST[0] = SRC1[0] * SRC2[0];
     DEST[1] = SRC1[1] * SRC2[1];
@@ -392,7 +434,7 @@ SIMD_MULW (short DEST[4], short SRC1[4], short SRC2[4])
     DEST[3] = SRC1[3] * SRC2[3];
 }
 void
-SIMD_DIVW (short DEST[4], short SRC1[4], short SRC2[4])
+SIMD_DIVD (int DEST[4], int SRC1[4], int SRC2[4])
 {
     DEST[0] = SRC1[0] / SRC2[0];
     DEST[1] = SRC1[1] / SRC2[1];
@@ -593,6 +635,8 @@ SIMD_SETD (int DEST[2], int SRC[2])
 {
     DEST[0] = SRC[0];
     DEST[1] = SRC[1];
+    DEST[2] = SRC[2];
+    DEST[3] = SRC[3];
 }
 
 void
@@ -600,8 +644,6 @@ SIMD_SETW (short DEST[4], short SRC[4])
 {
     DEST[0] = SRC[0];
     DEST[1] = SRC[1];
-    DEST[2] = SRC[2];
-    DEST[3] = SRC[3];
 }
 
 void

@@ -1,10 +1,29 @@
-void Matrix_Mult(int a1[4], int a2[4], int a3[4])
+#define N 4
+void Matrix_Mult(float a[N][N], float b[N][N], float c[N][N])
 {
-    int i = 0;
-    int j = 0;
-    int k = 0;
-    for(i = 0; i < 2; i++) 
-        for( j = 0; j < 2; j++)
-            for( k = 0; k < 2; k++) 
-                 a3[i*2+j] = a3[i*2+j] +  a1[i*2+k] * a2[k*2+j];
+   int i, j, k;
+loop0:
+   for(i = 0; i <N; i ++)
+loop1:
+      for(j = 0; j <N; j ++) {
+         c[i][j] = 0;
+loop2:
+         for(k = 0; k <N; k ++)
+            c[i][j] = c[i][j]+a[i][k]*b[k][j];
+      }
+}
+int main()
+{
+    float a[N][N], b[N][N], c[N][N];
+    int i,j;
+    for(i=0;i<N;i++)
+        for(j=0;j<N;j++)
+            a[i][j]=b[i][j]=i;
+
+    Matrix_Mult(a,b,c);
+
+    for(i=0;i<N;i++)
+        for(j=0;j<N;j++)
+            printf("%f-",c[i][j]);
+    return 0;
 }

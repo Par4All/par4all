@@ -11,8 +11,8 @@ Code after array conversion
 
 int duck(int riri[10], int fifi[2][3], int size, int loulou[1][size][6])
 {
-   int *zaza = (int *) fifi+(3-1-0+1)*1;
-   return *((int *) riri+2) = *(zaza+1)+*((int *) loulou+3+(6-1-0+1)*(1+(size-1-0+1)*0));
+   int *zaza = (int *) fifi+3;
+   return *((int *) riri+2) = *(zaza+1)+*((int *) loulou+9);
 }
 
 Code after partial eval

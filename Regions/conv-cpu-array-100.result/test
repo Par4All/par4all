@@ -12,9 +12,8 @@ Try to restructure the code for more precision:
 Privatize scalar variables on all the modules of the program:
 void conv_cpu(float a[100*100], float c[100*100], float a00, float a10, float a20, float a01, float a11, float a21, float a02, float a12, float a22)
 {
-   int i;
-   int j;
-   for(i = 0; i <= 99; i += 1)
+   int i, j;
+   for(i = 0; i <= 99; i += 1) {
       for(j = 0; j <= 99; j += 1) {
          int idx = i*100+j;
 
@@ -37,4 +36,5 @@ void conv_cpu(float a[100*100], float c[100*100], float a00, float a10, float a2
          else if (j==100-1&&0<i&&i<100-1)
             c[idx] = a00*a[idx-100-1]+a10*a[idx-1]+a20*a[idx+100-1]+a01*a[idx-100]+a11*a[idx]+a21*a[idx+100];
       }
+   }
 }

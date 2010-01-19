@@ -20,11 +20,7 @@ void mala_bar(int A[30], int I, int J)
 void mala_bar(int A[30], int I, int J)
 {
    //PIPS generated variable
-   int I_0;
-   //PIPS generated variable
-   int A0;
-   //PIPS generated variable
-   int J0;
+   int I_0, A0, J0;
    I_0 = 1;
    A0 = I+1;
    A[I] = I_0?A0:A[I];

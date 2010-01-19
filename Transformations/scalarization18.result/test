@@ -110,9 +110,7 @@ void scalarization18(double A[SIZE], double B[SIZE][SIZE])
    // BEGIN BLOCK
    int i, j;
    //PIPS generated variable
-   double __scalar__0;
-   //PIPS generated variable
-   double __scalar__1;
+   double __scalar__0, __scalar__1;
 
    for(i = 0; i <= SIZE-1; i += 1) {
       // BEGIN BLOCK

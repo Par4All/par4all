@@ -1,0 +1,15 @@
+delete simdizer01
+create simdizer01 simdizer01.c include/SIMD.c
+
+make PRINTED_FILE[%ALL]
+
+module foo_l
+display PRINTED_FILE 
+
+setproperty SAC_SIMD_REGISTER_WIDTH 128
+apply SIMDIZER
+
+display PRINTED_FILE
+
+close
+delete simdizer01

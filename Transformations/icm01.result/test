@@ -29,10 +29,7 @@ int icm01()
    int a[10];                                                           /*0007*/
    //PIPS generated variable
    int I_0;
-   // BEGIN BLOCK
 
-
-   // BEGIN BLOCK
    I_0 = j*j+1;
    for(i = 0; i <= 9; i += 1) {
       // BEGIN BLOCK
@@ -40,7 +37,5 @@ int icm01()
       a[i] = k;                                                         /*0011*/
       // END BLOCK
    }
-   // END BLOCK
-   // END BLOCK
    // END BLOCK
 }

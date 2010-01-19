@@ -1,0 +1,10 @@
+delete if_conversion_compact03
+create if_conversion_compact03 if_conversion_compact03.c
+
+make PRINTED_FILE[%ALL]
+display PRINTED_FILE[%ALL]
+apply IF_CONVERSION_COMPACT[%ALL]
+display PRINTED_FILE[%ALL]
+
+close if_conversion_compact03
+delete if_conversion_compact03

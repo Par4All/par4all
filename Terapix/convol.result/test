@@ -3,8 +3,10 @@ Inital code
 
 void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], float kernel[3][3])
 {
-   int i;
-   int j;
+   //     The convolution kernel is not applied on the outer part
+   //     of the image
+   
+   int i, j;
 
    for(i = 0; i <= isi-1; i += 1)
       for(j = 0; j <= isj-1; j += 1)
@@ -16,8 +18,7 @@ void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], 
 }
 void run_kernel(int i, int j, int isi, int isj, float new_image[isi][isj], float image[isi][isj], float kernel[3][3])
 {
-   int ki;
-   int kj;
+   int ki, kj;
    new_image[i][j] = 0.;
    for(ki = 0; ki <= 2; ki += 1)
       for(kj = 0; kj <= 2; kj += 1)
@@ -31,8 +32,10 @@ After Inlining
 
 void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], float kernel[3][3])
 {
-   int i;
-   int j;
+   //     The convolution kernel is not applied on the outer part
+   //     of the image
+   
+   int i, j;
 
    for(i = 0; i <= isi-1; i += 1)
       for(j = 0; j <= isj-1; j += 1)
@@ -40,15 +43,16 @@ void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], 
 
    for(i = 1; i <= isi-2; i += 1)
       for(j = 1; j <= isj-2; j += 1) {
-         int ki;
-         int kj;
-         new_image[i][j] = 0.;
-         for(ki = 0; ki <= 2; ki += 1)
-            for(kj = 0; kj <= 2; kj += 1)
-               
-               
-               new_image[i][j] = new_image[i][j]+image[i+ki-3/2][j+kj-3/2]*kernel[ki][kj];
-         new_image[i][j] = new_image[i][j]/(3*3);
+         {
+            int ki, kj;
+            new_image[i][j] = 0.;
+            for(ki = 0; ki <= 2; ki += 1)
+               for(kj = 0; kj <= 2; kj += 1)
+                  
+                  
+                  new_image[i][j] = new_image[i][j]+image[i+ki-3/2][j+kj-3/2]*kernel[ki][kj];
+            new_image[i][j] = new_image[i][j]/(3*3);
+         }
       }
 }
 
@@ -56,8 +60,12 @@ after Kernelize
 
 void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], float kernel[3][3])
 {
-   int i;
-   int j;
+   //     The convolution kernel is not applied on the outer part
+   //     of the image
+   
+   int i, j;
+   //PIPS generated variable
+   int i_1;
 
 #pragma omp parallel for private(j)
 l99997:
@@ -71,9 +79,8 @@ l99993:   work(isi, isj, image, kernel, new_image);
 }
 void work(int isi, int isj, float image[isi][isj], float kernel[3][3], float new_image[isi][isj])
 {
-   int i;
-   int j;
-   extern void microcode(int i, int isi, int isj, float image[isi][isj], float kernel[3][3], float new_image[isi][isj]);
+   //PIPS generated variable
+   int i, j;
 
 l99993:
    for(i = 1; i <= isi-2; i += 128)
@@ -81,45 +88,51 @@ l99993:
 }
 void microcode(int i, int isi, int isj, float image[isi][isj], float kernel[3][3], float new_image[isi][isj])
 {
+   //PIPS generated variable
    int j;
    {
+      //PIPS generated variable
       int i_1;
       for(i_1 = i; i_1 <= MIN(i+127, isi-2); i_1 += 1)
 l99994:
          for(j = 1; j <= isj-2; j += 1) {
-            int ki;
-            int kj;
-            new_image[i_1][j] = 0.;
+            {
+               int ki, kj;
+               new_image[i_1][j] = 0.;
 l99995:
-            for(ki = 0; ki <= 2; ki += 1)
+               for(ki = 0; ki <= 2; ki += 1)
 l99996:
-               for(kj = 0; kj <= 2; kj += 1)
-                  
-                  
-                  new_image[i_1][j] = new_image[i_1][j]+image[i_1+ki-3/2][j+kj-3/2]*kernel[ki][kj];
-            new_image[i_1][j] = new_image[i_1][j]/(3*3);
+                  for(kj = 0; kj <= 2; kj += 1)
+                     
+                     
+                     new_image[i_1][j] = new_image[i_1][j]+image[i_1+ki-3/2][j+kj-3/2]*kernel[ki][kj];
+               new_image[i_1][j] = new_image[i_1][j]/(3*3);
+            }
          }
    }
 }
 void microcode(int i, int isi, int isj, float image[isi][isj], float kernel[3][3], float new_image[isi][isj])
 {
+   //PIPS generated variable
    int j;
    {
+      //PIPS generated variable
       int i_1;
       for(i_1 = i; i_1 <= MIN(i+127, isi-2); i_1 += 1)
 l99994:
          for(j = 1; j <= isj-2; j += 1) {
-            int ki;
-            int kj;
-            new_image[i_1][j] = 0.;
+            {
+               int ki, kj;
+               new_image[i_1][j] = 0.;
 l99995:
-            for(ki = 0; ki <= 2; ki += 1)
+               for(ki = 0; ki <= 2; ki += 1)
 l99996:
-               for(kj = 0; kj <= 2; kj += 1)
-                  
-                  
-                  new_image[i_1][j] = new_image[i_1][j]+image[i_1+ki-1][j+kj-1]*kernel[ki][kj];
-            new_image[i_1][j] = new_image[i_1][j]/9;
+                  for(kj = 0; kj <= 2; kj += 1)
+                     
+                     
+                     new_image[i_1][j] = new_image[i_1][j]+image[i_1+ki-1][j+kj-1]*kernel[ki][kj];
+               new_image[i_1][j] = new_image[i_1][j]/9;
+            }
          }
    }
    ;
@@ -129,24 +142,28 @@ Microcode after scalarization
 
 void microcode(int i, int isi, int isj, float image[isi][isj], float kernel[3][3], float new_image[isi][isj])
 {
+   //PIPS generated variable
    int j;
+   //PIPS generated variable
    float __scalar__0;
    {
+      //PIPS generated variable
       int i_1;
       for(i_1 = i; i_1 <= MIN(i+127, isi-2); i_1 += 1)
 l99994:
          for(j = 1; j <= isj-2; j += 1) {
-            int ki;
-            int kj;
-            __scalar__0 = 0.;
+            {
+               int ki, kj;
+               __scalar__0 = 0.;
 l99995:
-            for(ki = 0; ki <= 2; ki += 1)
+               for(ki = 0; ki <= 2; ki += 1)
 l99996:
-               for(kj = 0; kj <= 2; kj += 1)
-                  
-                  
-                  __scalar__0 = __scalar__0+image[i_1+ki-1][j+kj-1]*kernel[ki][kj];
-            __scalar__0 = __scalar__0/9;
+                  for(kj = 0; kj <= 2; kj += 1)
+                     
+                     
+                     __scalar__0 = __scalar__0+image[i_1+ki-1][j+kj-1]*kernel[ki][kj];
+               __scalar__0 = __scalar__0/9;
+            }
             new_image[i_1][j] = __scalar__0;
          }
    }
@@ -157,24 +174,28 @@ Microcode After array conversion
 
 void microcode(int i, int isi, int isj, float *image, float *kernel, float *new_image)
 {
+   //PIPS generated variable
    int j;
+   //PIPS generated variable
    float __scalar__0;
    {
+      //PIPS generated variable
       int i_1;
       for(i_1 = i; i_1 <= MIN(i+127, isi-2); i_1 += 1)
 l99994:
          for(j = 1; j <= isj-2; j += 1) {
-            int ki;
-            int kj;
-            __scalar__0 = 0.;
+            {
+               int ki, kj;
+               __scalar__0 = 0.;
 l99995:
-            for(ki = 0; ki <= 2; ki += 1)
+               for(ki = 0; ki <= 2; ki += 1)
 l99996:
-               for(kj = 0; kj <= 2; kj += 1)
-                  
-                  
-                  __scalar__0 = __scalar__0+image[j+kj-1+isj*(i_1+ki-1)]*kernel[kj+3*ki];
-            __scalar__0 = __scalar__0/9;
+                  for(kj = 0; kj <= 2; kj += 1)
+                     
+                     
+                     __scalar__0 = __scalar__0+image[j+kj-1+isj*(i_1+ki-1)]*kernel[3*ki+kj];
+               __scalar__0 = __scalar__0/9;
+            }
             new_image[j+isj*i_1] = __scalar__0;
          }
    }
@@ -185,11 +206,13 @@ Microcode after flattening
 
 void microcode(int i, int isi, int isj, float *image, float *kernel, float *new_image)
 {
+   //PIPS generated variable
    int j;
+   //PIPS generated variable
    float __scalar__0;
-   int i_1_0;
-   int ki_0;
-   int kj_0;
+   //PIPS generated variable
+   int i_1_0, ki_2, kj_2;
+   //PIPS generated variable
    for(i_1_0 = i; i_1_0 <= MIN(i+127, isi-2); i_1_0 += 1)
 l99994:
       for(j = 1; j <= isj-2; j += 1) {
@@ -203,7 +226,7 @@ l99994:
          
          
          __scalar__0 = __scalar__0+image[j+isj*(i_1_0-1)+1]*kernel[2];
-         kj_0 = 3;
+         kj_2 = 3;
          
          
          __scalar__0 = __scalar__0+image[j+isj*i_1_0-1]*kernel[3];
@@ -213,7 +236,7 @@ l99994:
          
          
          __scalar__0 = __scalar__0+image[j+isj*i_1_0+1]*kernel[5];
-         kj_0 = 3;
+         kj_2 = 3;
          
          
          __scalar__0 = __scalar__0+image[j+isj*(i_1_0+1)-1]*kernel[6];
@@ -223,8 +246,8 @@ l99994:
          
          
          __scalar__0 = __scalar__0+image[j+isj*(i_1_0+1)+1]*kernel[8];
-         kj_0 = 3;
-         ki_0 = 3;
+         kj_2 = 3;
+         ki_2 = 3;
          __scalar__0 = __scalar__0/9;
          new_image[j+isj*i_1_0] = __scalar__0;
       }
@@ -235,21 +258,26 @@ Microcode after CSE
 
 void microcode(int i, int isi, int isj, float *image, float *kernel, float *new_image)
 {
+   //PIPS generated variable
    int j;
+   //PIPS generated variable
    float __scalar__0;
-   int i_1_0;
-   int ki_0;
-   int kj_0;
-   int I_5;
+   //PIPS generated variable
+   int i_1_0, ki_2, kj_2, I_5;
+   //PIPS generated variable
    int I_9;
+   //PIPS generated variable
    int I_14;
+   //PIPS generated variable
    for(i_1_0 = i; i_1_0 <= MIN(i+127, isi-2); i_1_0 += 1)
 l99994:
       for(j = 1; j <= isj-2; j += 1) {
+         I_5 = j+isj*(i_1_0-1);
+         I_9 = j+isj*i_1_0;
+         I_14 = j+isj*(i_1_0+1);
          __scalar__0 = 0.;
          
          
-         I_5 = j+isj*(i_1_0-1);
          __scalar__0 = __scalar__0+image[I_5-1]*kernel[0];
          
          
@@ -257,10 +285,9 @@ l99994:
          
          
          __scalar__0 = __scalar__0+image[I_5+1]*kernel[2];
-         kj_0 = 3;
+         kj_2 = 3;
          
          
-         I_9 = j+isj*i_1_0;
          __scalar__0 = __scalar__0+image[I_9-1]*kernel[3];
          
          
@@ -268,10 +295,9 @@ l99994:
          
          
          __scalar__0 = __scalar__0+image[I_9+1]*kernel[5];
-         kj_0 = 3;
+         kj_2 = 3;
          
          
-         I_14 = j+isj*(i_1_0+1);
          __scalar__0 = __scalar__0+image[I_14-1]*kernel[6];
          
          
@@ -279,10 +305,10 @@ l99994:
          
          
          __scalar__0 = __scalar__0+image[I_14+1]*kernel[8];
-         kj_0 = 3;
-         ki_0 = 3;
+         kj_2 = 3;
+         ki_2 = 3;
          __scalar__0 = __scalar__0/9;
-         new_image[j+isj*i_1_0] = __scalar__0;
+         new_image[I_9] = __scalar__0;
       }
    ;
 }
@@ -291,23 +317,27 @@ Microcode after ICM
 
 void microcode(int i, int isi, int isj, float *image, float *kernel, float *new_image)
 {
+   //PIPS generated variable
    int j;
+   //PIPS generated variable
    float __scalar__0;
-   int i_1_0;
-   int ki_0;
-   int kj_0;
-   int I_5;
+   //PIPS generated variable
+   int i_1_0, ki_2, kj_2, I_5;
+   //PIPS generated variable
    int I_9;
-   int I_14;
-   int I_17;
+   //PIPS generated variable
+   int I_14, I_17;
+   //PIPS generated variable
    I_17 = isj-2;
    for(i_1_0 = i; i_1_0 <= MIN(i+127, isi-2); i_1_0 += 1)
 l99994:
       for(j = 1; j <= I_17; j += 1) {
+         I_5 = j+isj*(i_1_0-1);
+         I_9 = j+isj*i_1_0;
+         I_14 = j+isj*(i_1_0+1);
          __scalar__0 = 0.;
          
          
-         I_5 = j+isj*(i_1_0-1);
          __scalar__0 = __scalar__0+image[I_5-1]*kernel[0];
          
          
@@ -315,10 +345,9 @@ l99994:
          
          
          __scalar__0 = __scalar__0+image[I_5+1]*kernel[2];
-         kj_0 = 3;
+         kj_2 = 3;
          
          
-         I_9 = j+isj*i_1_0;
          __scalar__0 = __scalar__0+image[I_9-1]*kernel[3];
          
          
@@ -326,10 +355,9 @@ l99994:
          
          
          __scalar__0 = __scalar__0+image[I_9+1]*kernel[5];
-         kj_0 = 3;
+         kj_2 = 3;
          
          
-         I_14 = j+isj*(i_1_0+1);
          __scalar__0 = __scalar__0+image[I_14-1]*kernel[6];
          
          
@@ -337,10 +365,10 @@ l99994:
          
          
          __scalar__0 = __scalar__0+image[I_14+1]*kernel[8];
-         kj_0 = 3;
-         ki_0 = 3;
+         kj_2 = 3;
+         ki_2 = 3;
          __scalar__0 = __scalar__0/9;
-         new_image[j+isj*i_1_0] = __scalar__0;
+         new_image[I_9] = __scalar__0;
       }
    ;
 }
@@ -349,84 +377,74 @@ Microcode After atomization
 
 void microcode(int i, int isi, int isj, float *image, float *kernel, float *new_image)
 {
+   //PIPS generated variable
    int j;
+   //PIPS generated variable
    float __scalar__0;
-   int i_1_0;
-   int ki_0;
-   int kj_0;
-   int I_5;
+   //PIPS generated variable
+   int i_1_0, ki_2, kj_2, I_5;
+   //PIPS generated variable
    int I_9;
-   int I_14;
-   int I_17;
-   int I_18;
-   int I_19;
-   float F_9;
-   float F_10;
-   float F_11;
-   int I_20;
-   float F_12;
-   float F_13;
-   float F_14;
-   int I_21;
-   int I_22;
-   float F_15;
-   float F_16;
-   float F_17;
+   //PIPS generated variable
+   int I_14, I_17, I_18, I_19, I_20, I_21, I_22;
+   //PIPS generated variable
+   float F_37, F_38, F_39, F_40, F_41, F_42, F_43, F_44, F_45;
+   //PIPS generated variable
    I_17 = isj-2;
    for(i_1_0 = i; i_1_0 <= MIN(i+127, isi-2); i_1_0 += 1)
 l99994:
       for(j = 1; j <= I_17; j += 1) {
-         __scalar__0 = 0.;
          I_18 = i_1_0-1;
          I_19 = isj*I_18;
-         
-         
          I_5 = j+I_19;
-         F_9 = image[I_5-1]*kernel[0];
-         __scalar__0 = __scalar__0+F_9;
-         F_10 = image[I_5]*kernel[1];
-         
-         
-         __scalar__0 = __scalar__0+F_10;
-         F_11 = image[I_5+1]*kernel[2];
-         
-         
-         __scalar__0 = __scalar__0+F_11;
-         kj_0 = 3;
          I_20 = isj*i_1_0;
-         
-         
          I_9 = j+I_20;
-         F_12 = image[I_9-1]*kernel[3];
-         __scalar__0 = __scalar__0+F_12;
-         F_13 = image[I_9]*kernel[4];
-         
-         
-         __scalar__0 = __scalar__0+F_13;
-         F_14 = image[I_9+1]*kernel[5];
-         
-         
-         __scalar__0 = __scalar__0+F_14;
-         kj_0 = 3;
          I_21 = i_1_0+1;
          I_22 = isj*I_21;
-         
-         
          I_14 = j+I_22;
-         F_15 = image[I_14-1]*kernel[6];
-         __scalar__0 = __scalar__0+F_15;
-         F_16 = image[I_14]*kernel[7];
+         __scalar__0 = 0.;
+         F_37 = image[I_5-1]*kernel[0];
          
          
-         __scalar__0 = __scalar__0+F_16;
-         F_17 = image[I_14+1]*kernel[8];
+         __scalar__0 = __scalar__0+F_37;
+         F_38 = image[I_5]*kernel[1];
          
          
-         __scalar__0 = __scalar__0+F_17;
-         kj_0 = 3;
-         ki_0 = 3;
+         __scalar__0 = __scalar__0+F_38;
+         F_39 = image[I_5+1]*kernel[2];
+         
+         
+         __scalar__0 = __scalar__0+F_39;
+         kj_2 = 3;
+         F_40 = image[I_9-1]*kernel[3];
+         
+         
+         __scalar__0 = __scalar__0+F_40;
+         F_41 = image[I_9]*kernel[4];
+         
+         
+         __scalar__0 = __scalar__0+F_41;
+         F_42 = image[I_9+1]*kernel[5];
+         
+         
+         __scalar__0 = __scalar__0+F_42;
+         kj_2 = 3;
+         F_43 = image[I_14-1]*kernel[6];
+         
+         
+         __scalar__0 = __scalar__0+F_43;
+         F_44 = image[I_14]*kernel[7];
+         
+         
+         __scalar__0 = __scalar__0+F_44;
+         F_45 = image[I_14+1]*kernel[8];
+         
+         
+         __scalar__0 = __scalar__0+F_45;
+         kj_2 = 3;
+         ki_2 = 3;
          __scalar__0 = __scalar__0/9;
-         new_image[j+isj*i_1_0] = __scalar__0;
+         new_image[I_9] = __scalar__0;
       }
    ;
 }

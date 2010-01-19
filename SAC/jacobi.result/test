@@ -1,0 +1,626 @@
+void compute()
+{
+   int i, j;
+   
+   /* Use 2 array in flip-flop to have dataparallel forall semantics. I
+        could use also a flip-flop dimension instead... */
+kernel1:
+   for(i = 1; i <= 62; i += 1)
+      for(j = 1; j <= 62; j += 1)
+
+         save[i][j] = 0.25*(space[i-1][j]+space[i+1][j]+space[i][j-1]+space[i][j+1]);
+   for(i = 1; i <= 62; i += 1)
+      for(j = 1; j <= 62; j += 1)
+
+         space[i][j] = 0.25*(save[i-1][j]+save[i+1][j]+save[i][j-1]+save[i][j+1]);
+}
+void compute()
+{
+   int i, j;
+   
+   /* Use 2 array in flip-flop to have dataparallel forall semantics. I
+        could use also a flip-flop dimension instead... */
+kernel1:
+   for(i = 1; i <= 62; i += 1)
+      for(j = 1; j <= 62; j += 1)
+
+         save[i][j] = 0.25*(space[i-1][j]+space[i+1][j]+space[i][j-1]+space[i][j+1]);
+   for(i = 1; i <= 62; i += 1)
+      for(j = 1; j <= 62; j += 1)
+
+         space[i][j] = 0.25*(save[i-1][j]+save[i+1][j]+save[i][j-1]+save[i][j+1]);
+}
+void compute()
+{
+   int i, j;
+   
+   /* Use 2 array in flip-flop to have dataparallel forall semantics. I
+        could use also a flip-flop dimension instead... */
+kernel1:
+   for(i = 1; i <= 62; i += 1)
+      for(j = 1; j <= 62; j += 1)
+
+         save[i][j] = 0.25*(space[i-1][j]+space[i+1][j]+space[i][j-1]+space[i][j+1]);
+   for(i = 1; i <= 62; i += 1)
+      for(j = 1; j <= 62; j += 1)
+
+         space[i][j] = 0.25*(save[i-1][j]+save[i+1][j]+save[i][j-1]+save[i][j+1]);
+}
+void compute()
+{
+   int i, j;
+   //PIPS generated variable
+   float F_0, F_1, F_2, F_3, F_4, F_5;
+   
+   /* Use 2 array in flip-flop to have dataparallel forall semantics. I
+        could use also a flip-flop dimension instead... */
+kernel1:
+   for(i = 1; i <= 62; i += 1)
+      for(j = 1; j <= 62; j += 1) {
+         F_0 = space[i-1][j]+space[i+1][j];
+         F_1 = F_0+space[i][j-1];
+         F_2 = F_1+space[i][j+1];
+
+         save[i][j] = 0.25*F_2;
+      }
+   for(i = 1; i <= 62; i += 1)
+      for(j = 1; j <= 62; j += 1) {
+         F_3 = save[i-1][j]+save[i+1][j];
+         F_4 = F_3+save[i][j-1];
+         F_5 = F_4+save[i][j+1];
+
+         space[i][j] = 0.25*F_5;
+      }
+}
+void compute()
+{
+   int i, j;
+   //PIPS generated variable
+   float F_0, F_1, F_2, F_3, F_4, F_5;
+   //PIPS generated variable
+   int LU_NUB0, LU_IB0, LU_IND0, LU_NUB1, LU_IB1, LU_IND1;
+   
+   /* Use 2 array in flip-flop to have dataparallel forall semantics. I
+        could use also a flip-flop dimension instead... */
+kernel1:
+   for(i = 1; i <= 62; i += 1) {
+      LU_NUB0 = 62;
+      LU_IB0 = 2;
+      for(LU_IND0 = 0; LU_IND0 <= 1; LU_IND0 += 1) {
+         F_0 = space[i-1][LU_IND0+1]+space[i+1][LU_IND0+1];
+         F_1 = F_0+space[i][LU_IND0];
+         F_2 = F_1+space[i][LU_IND0+2];
+
+         save[i][LU_IND0+1] = 0.25*F_2;
+      }
+      for(LU_IND0 = 2; LU_IND0 <= 61; LU_IND0 += 4) {
+         //c SIMD_COMMENT_0
+         F_0 = space[i-1][LU_IND0+1]+space[i+1][LU_IND0+1];
+         //c SIMD_COMMENT_1
+         F_1 = F_0+space[i][LU_IND0];
+         //c SIMD_COMMENT_2
+         F_2 = F_1+space[i][LU_IND0+2];
+         //c SIMD_COMMENT_3
+
+         save[i][LU_IND0+1] = 0.25*F_2;
+         //c SIMD_COMMENT_0
+         F_0 = space[i-1][LU_IND0+2]+space[i+1][LU_IND0+2];
+         //c SIMD_COMMENT_1
+         F_1 = F_0+space[i][LU_IND0+1];
+         //c SIMD_COMMENT_2
+         F_2 = F_1+space[i][LU_IND0+3];
+         //c SIMD_COMMENT_3
+
+         save[i][LU_IND0+2] = 0.25*F_2;
+         //c SIMD_COMMENT_0
+         F_0 = space[i-1][LU_IND0+3]+space[i+1][LU_IND0+3];
+         //c SIMD_COMMENT_1
+         F_1 = F_0+space[i][LU_IND0+2];
+         //c SIMD_COMMENT_2
+         F_2 = F_1+space[i][LU_IND0+4];
+         //c SIMD_COMMENT_3
+
+         save[i][LU_IND0+3] = 0.25*F_2;
+         //c SIMD_COMMENT_0
+         F_0 = space[i-1][LU_IND0+4]+space[i+1][LU_IND0+4];
+         //c SIMD_COMMENT_1
+         F_1 = F_0+space[i][LU_IND0+3];
+         //c SIMD_COMMENT_2
+         F_2 = F_1+space[i][LU_IND0+5];
+         //c SIMD_COMMENT_3
+
+         save[i][LU_IND0+4] = 0.25*F_2;
+      }
+      j = 63;
+   }
+   for(i = 1; i <= 62; i += 1) {
+      LU_NUB1 = 62;
+      LU_IB1 = 2;
+      for(LU_IND1 = 0; LU_IND1 <= 1; LU_IND1 += 1) {
+         F_3 = save[i-1][LU_IND1+1]+save[i+1][LU_IND1+1];
+         F_4 = F_3+save[i][LU_IND1];
+         F_5 = F_4+save[i][LU_IND1+2];
+
+         space[i][LU_IND1+1] = 0.25*F_5;
+      }
+      for(LU_IND1 = 2; LU_IND1 <= 61; LU_IND1 += 4) {
+         //c SIMD_COMMENT_0
+         F_3 = save[i-1][LU_IND1+1]+save[i+1][LU_IND1+1];
+         //c SIMD_COMMENT_1
+         F_4 = F_3+save[i][LU_IND1];
+         //c SIMD_COMMENT_2
+         F_5 = F_4+save[i][LU_IND1+2];
+         //c SIMD_COMMENT_3
+
+         space[i][LU_IND1+1] = 0.25*F_5;
+         //c SIMD_COMMENT_0
+         F_3 = save[i-1][LU_IND1+2]+save[i+1][LU_IND1+2];
+         //c SIMD_COMMENT_1
+         F_4 = F_3+save[i][LU_IND1+1];
+         //c SIMD_COMMENT_2
+         F_5 = F_4+save[i][LU_IND1+3];
+         //c SIMD_COMMENT_3
+
+         space[i][LU_IND1+2] = 0.25*F_5;
+         //c SIMD_COMMENT_0
+         F_3 = save[i-1][LU_IND1+3]+save[i+1][LU_IND1+3];
+         //c SIMD_COMMENT_1
+         F_4 = F_3+save[i][LU_IND1+2];
+         //c SIMD_COMMENT_2
+         F_5 = F_4+save[i][LU_IND1+4];
+         //c SIMD_COMMENT_3
+
+         space[i][LU_IND1+3] = 0.25*F_5;
+         //c SIMD_COMMENT_0
+         F_3 = save[i-1][LU_IND1+4]+save[i+1][LU_IND1+4];
+         //c SIMD_COMMENT_1
+         F_4 = F_3+save[i][LU_IND1+3];
+         //c SIMD_COMMENT_2
+         F_5 = F_4+save[i][LU_IND1+5];
+         //c SIMD_COMMENT_3
+
+         space[i][LU_IND1+4] = 0.25*F_5;
+      }
+      j = 63;
+   }
+   ;
+}
+void compute()
+{
+   int i, j;
+   //PIPS generated variable
+   float F_0, F_1, F_2, F_3, F_4, F_5;
+   //PIPS generated variable
+   int LU_NUB0, LU_IB0, LU_IND0, LU_NUB1, LU_IB1, LU_IND1;
+   
+   /* Use 2 array in flip-flop to have dataparallel forall semantics. I
+        could use also a flip-flop dimension instead... */
+kernel1:
+   for(i = 1; i <= 62; i += 1) {
+      LU_NUB0 = 62;
+      LU_IB0 = 2;
+      for(LU_IND0 = 0; LU_IND0 <= 1; LU_IND0 += 1) {
+         F_0 = space[i-1][LU_IND0+1]+space[i+1][LU_IND0+1];
+         F_1 = F_0+space[i][LU_IND0];
+         F_2 = F_1+space[i][LU_IND0+2];
+
+         save[i][LU_IND0+1] = 0.25*F_2;
+      }
+      for(LU_IND0 = 2; LU_IND0 <= 61; LU_IND0 += 4) {
+         //c SIMD_COMMENT_0
+         F_0 = space[i-1][LU_IND0+1]+space[i+1][LU_IND0+1];
+         //c SIMD_COMMENT_1
+         F_1 = F_0+space[i][LU_IND0];
+         //c SIMD_COMMENT_2
+         F_2 = F_1+space[i][LU_IND0+2];
+         //c SIMD_COMMENT_3
+
+         save[i][LU_IND0+1] = 0.25*F_2;
+         //c SIMD_COMMENT_0
+         F_0 = space[i-1][LU_IND0+2]+space[i+1][LU_IND0+2];
+         //c SIMD_COMMENT_1
+         F_1 = F_0+space[i][LU_IND0+1];
+         //c SIMD_COMMENT_2
+         F_2 = F_1+space[i][LU_IND0+3];
+         //c SIMD_COMMENT_3
+
+         save[i][LU_IND0+2] = 0.25*F_2;
+         //c SIMD_COMMENT_0
+         F_0 = space[i-1][LU_IND0+3]+space[i+1][LU_IND0+3];
+         //c SIMD_COMMENT_1
+         F_1 = F_0+space[i][LU_IND0+2];
+         //c SIMD_COMMENT_2
+         F_2 = F_1+space[i][LU_IND0+4];
+         //c SIMD_COMMENT_3
+
+         save[i][LU_IND0+3] = 0.25*F_2;
+         //c SIMD_COMMENT_0
+         F_0 = space[i-1][LU_IND0+4]+space[i+1][LU_IND0+4];
+         //c SIMD_COMMENT_1
+         F_1 = F_0+space[i][LU_IND0+3];
+         //c SIMD_COMMENT_2
+         F_2 = F_1+space[i][LU_IND0+5];
+         //c SIMD_COMMENT_3
+
+         save[i][LU_IND0+4] = 0.25*F_2;
+      }
+      j = 63;
+   }
+   for(i = 1; i <= 62; i += 1) {
+      LU_NUB1 = 62;
+      LU_IB1 = 2;
+      for(LU_IND1 = 0; LU_IND1 <= 1; LU_IND1 += 1) {
+         F_3 = save[i-1][LU_IND1+1]+save[i+1][LU_IND1+1];
+         F_4 = F_3+save[i][LU_IND1];
+         F_5 = F_4+save[i][LU_IND1+2];
+
+         space[i][LU_IND1+1] = 0.25*F_5;
+      }
+      for(LU_IND1 = 2; LU_IND1 <= 61; LU_IND1 += 4) {
+         //c SIMD_COMMENT_0
+         F_3 = save[i-1][LU_IND1+1]+save[i+1][LU_IND1+1];
+         //c SIMD_COMMENT_1
+         F_4 = F_3+save[i][LU_IND1];
+         //c SIMD_COMMENT_2
+         F_5 = F_4+save[i][LU_IND1+2];
+         //c SIMD_COMMENT_3
+
+         space[i][LU_IND1+1] = 0.25*F_5;
+         //c SIMD_COMMENT_0
+         F_3 = save[i-1][LU_IND1+2]+save[i+1][LU_IND1+2];
+         //c SIMD_COMMENT_1
+         F_4 = F_3+save[i][LU_IND1+1];
+         //c SIMD_COMMENT_2
+         F_5 = F_4+save[i][LU_IND1+3];
+         //c SIMD_COMMENT_3
+
+         space[i][LU_IND1+2] = 0.25*F_5;
+         //c SIMD_COMMENT_0
+         F_3 = save[i-1][LU_IND1+3]+save[i+1][LU_IND1+3];
+         //c SIMD_COMMENT_1
+         F_4 = F_3+save[i][LU_IND1+2];
+         //c SIMD_COMMENT_2
+         F_5 = F_4+save[i][LU_IND1+4];
+         //c SIMD_COMMENT_3
+
+         space[i][LU_IND1+3] = 0.25*F_5;
+         //c SIMD_COMMENT_0
+         F_3 = save[i-1][LU_IND1+4]+save[i+1][LU_IND1+4];
+         //c SIMD_COMMENT_1
+         F_4 = F_3+save[i][LU_IND1+3];
+         //c SIMD_COMMENT_2
+         F_5 = F_4+save[i][LU_IND1+5];
+         //c SIMD_COMMENT_3
+
+         space[i][LU_IND1+4] = 0.25*F_5;
+      }
+      j = 63;
+   }
+   ;
+}
+void compute()
+{
+   int i, j;
+   //PIPS generated variable
+   float F_0, F_1, F_2, F_3, F_4, F_5;
+   //PIPS generated variable
+   int LU_NUB0, LU_IB0, LU_IND0, LU_NUB1, LU_IB1, LU_IND1;
+   //PIPS generated variable
+   float F_50, F_40, F_30, F_51, F_41, F_31, F_52, F_42, F_32, F_53, F_43, F_33, F_54, F_44, F_34, F_20, F_10, F_00, F_21, F_11, F_01, F_22, F_12, F_02, F_23, F_13, F_03, F_24, F_14, F_04;
+   
+   /* Use 2 array in flip-flop to have dataparallel forall semantics. I
+        could use also a flip-flop dimension instead... */
+kernel1:
+   for(i = 1; i <= 62; i += 1) {
+      LU_NUB0 = 62;
+      LU_IB0 = 2;
+      for(LU_IND0 = 0; LU_IND0 <= 1; LU_IND0 += 1) {
+         F_04 = space[i-1][LU_IND0+1]+space[i+1][LU_IND0+1];
+         F_14 = F_04+space[i][LU_IND0];
+         F_24 = F_14+space[i][LU_IND0+2];
+
+         save[i][LU_IND0+1] = 0.25*F_24;
+      }
+      for(LU_IND0 = 2; LU_IND0 <= 61; LU_IND0 += 4) {
+         //c SIMD_COMMENT_0
+         F_03 = space[i-1][LU_IND0+1]+space[i+1][LU_IND0+1];
+         //c SIMD_COMMENT_1
+         F_13 = F_03+space[i][LU_IND0];
+         //c SIMD_COMMENT_2
+         F_23 = F_13+space[i][LU_IND0+2];
+         //c SIMD_COMMENT_3
+
+         save[i][LU_IND0+1] = 0.25*F_23;
+         //c SIMD_COMMENT_0
+         F_02 = space[i-1][LU_IND0+2]+space[i+1][LU_IND0+2];
+         //c SIMD_COMMENT_1
+         F_12 = F_02+space[i][LU_IND0+1];
+         //c SIMD_COMMENT_2
+         F_22 = F_12+space[i][LU_IND0+3];
+         //c SIMD_COMMENT_3
+
+         save[i][LU_IND0+2] = 0.25*F_22;
+         //c SIMD_COMMENT_0
+         F_01 = space[i-1][LU_IND0+3]+space[i+1][LU_IND0+3];
+         //c SIMD_COMMENT_1
+         F_11 = F_01+space[i][LU_IND0+2];
+         //c SIMD_COMMENT_2
+         F_21 = F_11+space[i][LU_IND0+4];
+         //c SIMD_COMMENT_3
+
+         save[i][LU_IND0+3] = 0.25*F_21;
+         //c SIMD_COMMENT_0
+         F_00 = space[i-1][LU_IND0+4]+space[i+1][LU_IND0+4];
+         //c SIMD_COMMENT_1
+         F_10 = F_00+space[i][LU_IND0+3];
+         //c SIMD_COMMENT_2
+         F_20 = F_10+space[i][LU_IND0+5];
+         //c SIMD_COMMENT_3
+
+         save[i][LU_IND0+4] = 0.25*F_20;
+      }
+      j = 63;
+   }
+   for(i = 1; i <= 62; i += 1) {
+      LU_NUB1 = 62;
+      LU_IB1 = 2;
+      for(LU_IND1 = 0; LU_IND1 <= 1; LU_IND1 += 1) {
+         F_34 = save[i-1][LU_IND1+1]+save[i+1][LU_IND1+1];
+         F_44 = F_34+save[i][LU_IND1];
+         F_54 = F_44+save[i][LU_IND1+2];
+
+         space[i][LU_IND1+1] = 0.25*F_54;
+      }
+      for(LU_IND1 = 2; LU_IND1 <= 61; LU_IND1 += 4) {
+         //c SIMD_COMMENT_0
+         F_33 = save[i-1][LU_IND1+1]+save[i+1][LU_IND1+1];
+         //c SIMD_COMMENT_1
+         F_43 = F_33+save[i][LU_IND1];
+         //c SIMD_COMMENT_2
+         F_53 = F_43+save[i][LU_IND1+2];
+         //c SIMD_COMMENT_3
+
+         space[i][LU_IND1+1] = 0.25*F_53;
+         //c SIMD_COMMENT_0
+         F_32 = save[i-1][LU_IND1+2]+save[i+1][LU_IND1+2];
+         //c SIMD_COMMENT_1
+         F_42 = F_32+save[i][LU_IND1+1];
+         //c SIMD_COMMENT_2
+         F_52 = F_42+save[i][LU_IND1+3];
+         //c SIMD_COMMENT_3
+
+         space[i][LU_IND1+2] = 0.25*F_52;
+         //c SIMD_COMMENT_0
+         F_31 = save[i-1][LU_IND1+3]+save[i+1][LU_IND1+3];
+         //c SIMD_COMMENT_1
+         F_41 = F_31+save[i][LU_IND1+2];
+         //c SIMD_COMMENT_2
+         F_51 = F_41+save[i][LU_IND1+4];
+         //c SIMD_COMMENT_3
+
+         space[i][LU_IND1+3] = 0.25*F_51;
+         //c SIMD_COMMENT_0
+         F_30 = save[i-1][LU_IND1+4]+save[i+1][LU_IND1+4];
+         //c SIMD_COMMENT_1
+         F_40 = F_30+save[i][LU_IND1+3];
+         //c SIMD_COMMENT_2
+         F_50 = F_40+save[i][LU_IND1+5];
+         //c SIMD_COMMENT_3
+
+         space[i][LU_IND1+4] = 0.25*F_50;
+      }
+      j = 63;
+   }
+   ;
+}
+void compute()
+{
+   int i, j;
+   //PIPS generated variable
+   float F_0, F_1, F_2, F_3, F_4, F_5;
+   //PIPS generated variable
+   int LU_NUB0, LU_IB0, LU_IND0, LU_NUB1, LU_IB1, LU_IND1;
+   //PIPS generated variable
+   float F_50, F_40, F_30, F_51, F_41, F_31, F_52, F_42, F_32, F_53, F_43, F_33, F_54, F_44, F_34, F_20, F_10, F_00, F_21, F_11, F_01, F_22, F_12, F_02, F_23, F_13, F_03, F_24, F_14, F_04;
+   //PIPS:SAC generated float vector(s)
+   float v4sf_vec0[3+1], v4sf_vec1[3+1], v4sf_vec2[3+1], v4sf_vec3[3+1], v4sf_vec4[3+1], v4sf_vec5[3+1], v4sf_vec6[3+1], v4sf_vec7[3+1], v4sf_vec8[3+1], v4sf_vec9[3+1], v4sf_vec10[3+1], v4sf_vec11[3+1], v4sf_vec12[3+1], v4sf_vec13[3+1], v4sf_vec14[3+1], v4sf_vec15[3+1], v4sf_vec16[3+1], v4sf_vec17[3+1], v4sf_vec18[3+1], v4sf_vec19[3+1], v4sf_vec20[3+1], v4sf_vec21[3+1], v4sf_vec22[3+1], v4sf_vec23[3+1], v4sf_vec24[3+1], v4sf_vec25[3+1], v4sf_vec26[3+1], v4sf_vec27[3+1], v4sf_vec28[3+1], v4sf_vec29[3+1], v4sf_vec30[3+1], v4sf_vec31[3+1], v4sf_vec32[3+1], v4sf_vec33[3+1], v4sf_vec34[3+1], v4sf_vec35[3+1], v4sf_vec36[3+1], v4sf_vec37[3+1], v4sf_vec38[3+1], v4sf_vec39[3+1], v4sf_vec40[3+1], v4sf_vec41[3+1], v4sf_vec42[3+1], v4sf_vec43[3+1], v4sf_vec44[3+1], v4sf_vec45[3+1], v4sf_vec46[3+1], v4sf_vec47[3+1];
+   
+   /* Use 2 array in flip-flop to have dataparallel forall semantics. I
+        could use also a flip-flop dimension instead... */
+kernel1:
+   for(i = 1; i <= 62; i += 1) {
+      LU_NUB0 = 62;
+      LU_IB0 = 2;
+      for(LU_IND0 = 0; LU_IND0 <= 1; LU_IND0 += 1) {
+         F_04 = space[i-1][LU_IND0+1]+space[i+1][LU_IND0+1];
+         F_14 = F_04+space[i][LU_IND0];
+         F_24 = F_14+space[i][LU_IND0+2];
+
+         save[i][LU_IND0+1] = 0.25*F_24;
+      }
+      for(LU_IND0 = 2; LU_IND0 <= 61; LU_IND0 += 4) {
+         SIMD_LOAD_V4SF(v4sf_vec2, &space[i+1][LU_IND0+1]);
+         SIMD_LOAD_V4SF(v4sf_vec1, &space[i-1][LU_IND0+1]);
+         SIMD_ADDPS(v4sf_vec0, v4sf_vec1, v4sf_vec2);
+         SIMD_SAVE_GENERIC_V4SF(v4sf_vec0, &F_03, &F_02, &F_01, &F_00);
+         SIMD_LOAD_V4SF(v4sf_vec5, &space[i][LU_IND0]);
+         SIMD_ADDPS(v4sf_vec3, v4sf_vec0, v4sf_vec5);
+         SIMD_SAVE_GENERIC_V4SF(v4sf_vec3, &F_13, &F_12, &F_11, &F_10);
+         SIMD_LOAD_V4SF(v4sf_vec8, &space[i][LU_IND0+2]);
+         SIMD_ADDPS(v4sf_vec6, v4sf_vec3, v4sf_vec8);
+         SIMD_SAVE_GENERIC_V4SF(v4sf_vec6, &F_23, &F_22, &F_21, &F_20);
+         SIMD_LOAD_CONSTANT_V4SF(v4sf_vec10, 0.25, 0.25, 0.25, 0.25);
+         SIMD_MULPS(v4sf_vec9, v4sf_vec10, v4sf_vec6);
+         SIMD_SAVE_V4SF(v4sf_vec9, &save[i][LU_IND0+1]);
+      }
+      j = 63;
+   }
+   for(i = 1; i <= 62; i += 1) {
+      LU_NUB1 = 62;
+      LU_IB1 = 2;
+      for(LU_IND1 = 0; LU_IND1 <= 1; LU_IND1 += 1) {
+         F_34 = save[i-1][LU_IND1+1]+save[i+1][LU_IND1+1];
+         F_44 = F_34+save[i][LU_IND1];
+         F_54 = F_44+save[i][LU_IND1+2];
+
+         space[i][LU_IND1+1] = 0.25*F_54;
+      }
+      for(LU_IND1 = 2; LU_IND1 <= 61; LU_IND1 += 4) {
+         SIMD_LOAD_V4SF(v4sf_vec26, &save[i+1][LU_IND1+1]);
+         SIMD_LOAD_V4SF(v4sf_vec25, &save[i-1][LU_IND1+1]);
+         SIMD_ADDPS(v4sf_vec24, v4sf_vec25, v4sf_vec26);
+         SIMD_SAVE_GENERIC_V4SF(v4sf_vec24, &F_33, &F_32, &F_31, &F_30);
+         SIMD_LOAD_V4SF(v4sf_vec29, &save[i][LU_IND1]);
+         SIMD_ADDPS(v4sf_vec27, v4sf_vec24, v4sf_vec29);
+         SIMD_SAVE_GENERIC_V4SF(v4sf_vec27, &F_43, &F_42, &F_41, &F_40);
+         SIMD_LOAD_V4SF(v4sf_vec32, &save[i][LU_IND1+2]);
+         SIMD_ADDPS(v4sf_vec30, v4sf_vec27, v4sf_vec32);
+         SIMD_SAVE_GENERIC_V4SF(v4sf_vec30, &F_53, &F_52, &F_51, &F_50);
+         SIMD_LOAD_CONSTANT_V4SF(v4sf_vec34, 0.25, 0.25, 0.25, 0.25);
+         SIMD_MULPS(v4sf_vec33, v4sf_vec34, v4sf_vec30);
+         SIMD_SAVE_V4SF(v4sf_vec33, &space[i][LU_IND1+1]);
+      }
+      j = 63;
+   }
+   ;
+}
+void compute()
+{
+   int i, j;
+   //PIPS generated variable
+   float F_0, F_1, F_2, F_3, F_4, F_5;
+   //PIPS generated variable
+   int LU_NUB0, LU_IB0, LU_IND0, LU_NUB1, LU_IB1, LU_IND1;
+   //PIPS generated variable
+   float F_50, F_40, F_30, F_51, F_41, F_31, F_52, F_42, F_32, F_53, F_43, F_33, F_54, F_44, F_34, F_20, F_10, F_00, F_21, F_11, F_01, F_22, F_12, F_02, F_23, F_13, F_03, F_24, F_14, F_04;
+   //PIPS:SAC generated float vector(s)
+   float v4sf_vec0[3+1], v4sf_vec1[3+1], v4sf_vec2[3+1], v4sf_vec3[3+1], v4sf_vec4[3+1], v4sf_vec5[3+1], v4sf_vec6[3+1], v4sf_vec7[3+1], v4sf_vec8[3+1], v4sf_vec9[3+1], v4sf_vec10[3+1], v4sf_vec11[3+1], v4sf_vec12[3+1], v4sf_vec13[3+1], v4sf_vec14[3+1], v4sf_vec15[3+1], v4sf_vec16[3+1], v4sf_vec17[3+1], v4sf_vec18[3+1], v4sf_vec19[3+1], v4sf_vec20[3+1], v4sf_vec21[3+1], v4sf_vec22[3+1], v4sf_vec23[3+1], v4sf_vec24[3+1], v4sf_vec25[3+1], v4sf_vec26[3+1], v4sf_vec27[3+1], v4sf_vec28[3+1], v4sf_vec29[3+1], v4sf_vec30[3+1], v4sf_vec31[3+1], v4sf_vec32[3+1], v4sf_vec33[3+1], v4sf_vec34[3+1], v4sf_vec35[3+1], v4sf_vec36[3+1], v4sf_vec37[3+1], v4sf_vec38[3+1], v4sf_vec39[3+1], v4sf_vec40[3+1], v4sf_vec41[3+1], v4sf_vec42[3+1], v4sf_vec43[3+1], v4sf_vec44[3+1], v4sf_vec45[3+1], v4sf_vec46[3+1], v4sf_vec47[3+1];
+   
+   /* Use 2 array in flip-flop to have dataparallel forall semantics. I
+        could use also a flip-flop dimension instead... */
+kernel1:
+   for(i = 1; i <= 62; i += 1) {
+      LU_NUB0 = 62;
+      LU_IB0 = 2;
+      for(LU_IND0 = 0; LU_IND0 <= 1; LU_IND0 += 1) {
+         F_04 = space[i-1][LU_IND0+1]+space[i+1][LU_IND0+1];
+         F_14 = F_04+space[i][LU_IND0];
+         F_24 = F_14+space[i][LU_IND0+2];
+
+         save[i][LU_IND0+1] = 0.25*F_24;
+      }
+      SIMD_LOAD_CONSTANT_V4SF(v4sf_vec10, 0.25, 0.25, 0.25, 0.25);
+      for(LU_IND0 = 2; LU_IND0 <= 61; LU_IND0 += 4) {
+         SIMD_LOAD_V4SF(v4sf_vec2, &space[i+1][LU_IND0+1]);
+         SIMD_LOAD_V4SF(v4sf_vec1, &space[i-1][LU_IND0+1]);
+         SIMD_ADDPS(v4sf_vec0, v4sf_vec1, v4sf_vec2);
+         SIMD_LOAD_V4SF(v4sf_vec5, &space[i][LU_IND0]);
+         SIMD_ADDPS(v4sf_vec3, v4sf_vec0, v4sf_vec5);
+         SIMD_LOAD_V4SF(v4sf_vec8, &space[i][LU_IND0+2]);
+         SIMD_ADDPS(v4sf_vec6, v4sf_vec3, v4sf_vec8);
+         SIMD_MULPS(v4sf_vec9, v4sf_vec10, v4sf_vec6);
+         SIMD_SAVE_V4SF(v4sf_vec9, &save[i][LU_IND0+1]);
+      }
+      SIMD_SAVE_GENERIC_V4SF(v4sf_vec0, &F_03, &F_02, &F_01, &F_00);
+      SIMD_SAVE_GENERIC_V4SF(v4sf_vec3, &F_13, &F_12, &F_11, &F_10);
+      SIMD_SAVE_GENERIC_V4SF(v4sf_vec6, &F_23, &F_22, &F_21, &F_20);
+      j = 63;
+   }
+   for(i = 1; i <= 62; i += 1) {
+      LU_NUB1 = 62;
+      LU_IB1 = 2;
+      for(LU_IND1 = 0; LU_IND1 <= 1; LU_IND1 += 1) {
+         F_34 = save[i-1][LU_IND1+1]+save[i+1][LU_IND1+1];
+         F_44 = F_34+save[i][LU_IND1];
+         F_54 = F_44+save[i][LU_IND1+2];
+
+         space[i][LU_IND1+1] = 0.25*F_54;
+      }
+      SIMD_LOAD_CONSTANT_V4SF(v4sf_vec34, 0.25, 0.25, 0.25, 0.25);
+      for(LU_IND1 = 2; LU_IND1 <= 61; LU_IND1 += 4) {
+         SIMD_LOAD_V4SF(v4sf_vec26, &save[i+1][LU_IND1+1]);
+         SIMD_LOAD_V4SF(v4sf_vec25, &save[i-1][LU_IND1+1]);
+         SIMD_ADDPS(v4sf_vec24, v4sf_vec25, v4sf_vec26);
+         SIMD_LOAD_V4SF(v4sf_vec29, &save[i][LU_IND1]);
+         SIMD_ADDPS(v4sf_vec27, v4sf_vec24, v4sf_vec29);
+         SIMD_LOAD_V4SF(v4sf_vec32, &save[i][LU_IND1+2]);
+         SIMD_ADDPS(v4sf_vec30, v4sf_vec27, v4sf_vec32);
+         SIMD_MULPS(v4sf_vec33, v4sf_vec34, v4sf_vec30);
+         SIMD_SAVE_V4SF(v4sf_vec33, &space[i][LU_IND1+1]);
+      }
+      SIMD_SAVE_GENERIC_V4SF(v4sf_vec24, &F_33, &F_32, &F_31, &F_30);
+      SIMD_SAVE_GENERIC_V4SF(v4sf_vec27, &F_43, &F_42, &F_41, &F_40);
+      SIMD_SAVE_GENERIC_V4SF(v4sf_vec30, &F_53, &F_52, &F_51, &F_50);
+      j = 63;
+   }
+   ;
+}
+void compute()
+{
+   int i, j;
+   //PIPS generated variable
+   int LU_NUB0, LU_IB0, LU_IND0, LU_NUB1, LU_IB1, LU_IND1;
+   //PIPS generated variable
+   float F_50, F_40, F_30, F_51, F_41, F_31, F_52, F_42, F_32, F_53, F_43, F_33, F_54, F_44, F_34, F_20, F_10, F_00, F_21, F_11, F_01, F_22, F_12, F_02, F_23, F_13, F_03, F_24, F_14, F_04;
+   //PIPS:SAC generated float vector(s)
+   float v4sf_vec0[3+1], v4sf_vec1[3+1], v4sf_vec2[3+1], v4sf_vec3[3+1], v4sf_vec5[3+1], v4sf_vec6[3+1], v4sf_vec8[3+1], v4sf_vec9[3+1], v4sf_vec10[3+1], v4sf_vec24[3+1], v4sf_vec25[3+1], v4sf_vec26[3+1], v4sf_vec27[3+1], v4sf_vec29[3+1], v4sf_vec30[3+1], v4sf_vec32[3+1], v4sf_vec33[3+1], v4sf_vec34[3+1];
+   
+   /* Use 2 array in flip-flop to have dataparallel forall semantics. I
+        could use also a flip-flop dimension instead... */
+kernel1:
+   for(i = 1; i <= 62; i += 1) {
+      LU_NUB0 = 62;
+      LU_IB0 = 2;
+      for(LU_IND0 = 0; LU_IND0 <= 1; LU_IND0 += 1) {
+         F_04 = space[i-1][LU_IND0+1]+space[i+1][LU_IND0+1];
+         F_14 = F_04+space[i][LU_IND0];
+         F_24 = F_14+space[i][LU_IND0+2];
+
+         save[i][LU_IND0+1] = 0.25*F_24;
+      }
+      SIMD_LOAD_CONSTANT_V4SF(v4sf_vec10, 0.25, 0.25, 0.25, 0.25);
+      for(LU_IND0 = 2; LU_IND0 <= 61; LU_IND0 += 4) {
+         SIMD_LOAD_V4SF(v4sf_vec2, &space[i+1][LU_IND0+1]);
+         SIMD_LOAD_V4SF(v4sf_vec1, &space[i-1][LU_IND0+1]);
+         SIMD_ADDPS(v4sf_vec0, v4sf_vec1, v4sf_vec2);
+         SIMD_LOAD_V4SF(v4sf_vec5, &space[i][LU_IND0]);
+         SIMD_ADDPS(v4sf_vec3, v4sf_vec0, v4sf_vec5);
+         SIMD_LOAD_V4SF(v4sf_vec8, &space[i][LU_IND0+2]);
+         SIMD_ADDPS(v4sf_vec6, v4sf_vec3, v4sf_vec8);
+         SIMD_MULPS(v4sf_vec9, v4sf_vec10, v4sf_vec6);
+         SIMD_SAVE_V4SF(v4sf_vec9, &save[i][LU_IND0+1]);
+      }
+      SIMD_SAVE_GENERIC_V4SF(v4sf_vec0, &F_03, &F_02, &F_01, &F_00);
+      SIMD_SAVE_GENERIC_V4SF(v4sf_vec3, &F_13, &F_12, &F_11, &F_10);
+      SIMD_SAVE_GENERIC_V4SF(v4sf_vec6, &F_23, &F_22, &F_21, &F_20);
+      j = 63;
+   }
+   for(i = 1; i <= 62; i += 1) {
+      LU_NUB1 = 62;
+      LU_IB1 = 2;
+      for(LU_IND1 = 0; LU_IND1 <= 1; LU_IND1 += 1) {
+         F_34 = save[i-1][LU_IND1+1]+save[i+1][LU_IND1+1];
+         F_44 = F_34+save[i][LU_IND1];
+         F_54 = F_44+save[i][LU_IND1+2];
+
+         space[i][LU_IND1+1] = 0.25*F_54;
+      }
+      SIMD_LOAD_CONSTANT_V4SF(v4sf_vec34, 0.25, 0.25, 0.25, 0.25);
+      for(LU_IND1 = 2; LU_IND1 <= 61; LU_IND1 += 4) {
+         SIMD_LOAD_V4SF(v4sf_vec26, &save[i+1][LU_IND1+1]);
+         SIMD_LOAD_V4SF(v4sf_vec25, &save[i-1][LU_IND1+1]);
+         SIMD_ADDPS(v4sf_vec24, v4sf_vec25, v4sf_vec26);
+         SIMD_LOAD_V4SF(v4sf_vec29, &save[i][LU_IND1]);
+         SIMD_ADDPS(v4sf_vec27, v4sf_vec24, v4sf_vec29);
+         SIMD_LOAD_V4SF(v4sf_vec32, &save[i][LU_IND1+2]);
+         SIMD_ADDPS(v4sf_vec30, v4sf_vec27, v4sf_vec32);
+         SIMD_MULPS(v4sf_vec33, v4sf_vec34, v4sf_vec30);
+         SIMD_SAVE_V4SF(v4sf_vec33, &space[i][LU_IND1+1]);
+      }
+      SIMD_SAVE_GENERIC_V4SF(v4sf_vec24, &F_33, &F_32, &F_31, &F_30);
+      SIMD_SAVE_GENERIC_V4SF(v4sf_vec27, &F_43, &F_42, &F_41, &F_40);
+      SIMD_SAVE_GENERIC_V4SF(v4sf_vec30, &F_53, &F_52, &F_51, &F_50);
+      j = 63;
+   }
+   ;
+}

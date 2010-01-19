@@ -1,8 +1,8 @@
 split.database/.fsplit_main_list
-split.database/BLA/BLA.f_initial
+split.database/BLA/BLA.initial.f
 split.database/BLA/INITIAL_FILE
 split.database/BLA/USER_FILE
-split.database/FOO/FOO.f_initial
+split.database/FOO/FOO.initial.f
 split.database/FOO/INITIAL_FILE
 split.database/FOO/USER_FILE
 split.database/Logfile
@@ -13,6 +13,6 @@ split.database/Metadata/database.SYMBOLS
 split.database/Metadata/pipsmake
 split.database/Metadata/properties
 split.database/SPLIT/INITIAL_FILE
-split.database/SPLIT/SPLIT.f_initial
+split.database/SPLIT/SPLIT.initial.f
 split.database/SPLIT/USER_FILE
 split.database/Warnings

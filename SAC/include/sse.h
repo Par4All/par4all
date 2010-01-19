@@ -1,5 +1,6 @@
 #include <xmmintrin.h>
 
+/* float */
 #define SIMD_LOAD_V4SF(vec,arr) vec=_mm_loadu_ps(arr)
 #define SIMD_MULPS(vec1,vec2,vec3) vec1=_mm_mul_ps(vec2,vec3)
 #define SIMD_ADDPS(vec1,vec2,vec3) vec1=_mm_add_ps(vec2,vec3)
@@ -13,3 +14,8 @@ do { \
     *v2=tmp[2];\
     *v3=tmp[3];\
 } while (0)
+#define SIMD_LOAD_GENERIC_V4SF(vec,v0,v1,v2,v3)\
+do { \
+    float v[4] = { v0,v1,v2,v3 };\
+    SIMD_LOAD_V4SF(vec,&v[0]); \
+} while(0)

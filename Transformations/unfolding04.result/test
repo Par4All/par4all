@@ -31,89 +31,73 @@ void flgr2d_arith_add_fgINT32(FLGR_Data2D *datdest, FLGR_Data2D *data1, FLGR_Dat
    /*0006*/
    /*0083*/
    //PIPS generated variable
-   FLGR_Data1D *P_0 = *pdest;                                           /*0016*/
+   FLGR_Data1D *P_0 = *pdest, *P_1 = *p1, *P_2 = *p2;                   /*0016*/
    /*0012*/
    /*0008*/
    //PIPS generated variable
-   FLGR_Data1D *P_1 = *p1;                                              /*0019*/
+   int _return0, _return1, _return2;                                    /*0019*/
    /*0014*/
-   /*0010*/
    //PIPS generated variable
-   FLGR_Data1D *P_2 = *p2;                                              /*0022*/
-   /*0016*/
-   /*0012*/
-   //PIPS generated variable
-   int _return0;                                                        /*0025*/
-   /*0018*/
-   //PIPS generated variable
-   int _return1;                                                        /*0027*/
-   /*0020*/
-   //PIPS generated variable
-   int _return2;                                                        /*0029*/
-   /*0022*/
-   //PIPS generated variable
-   int _return3;                                                        /*0031*/
-   //PIPS generated variable
-   int _return4;                                                        /*0033*/
-   i = 0;                                                               /*0034*/
-   /*0023*/
-   /*0013*/
+   int _return3, _return4;                                              /*0021*/
+   i = 0;                                                               /*0022*/
+   /*0015*/
+   /*0009*/
    /*0084*/
-   while (i<data1->size_y) {                                            /*0037*/
+   while (i<data1->size_y) {                                            /*0025*/
       {
-         int j;                                                         /*0039*/
+         int j;                                                         /*0027*/
+         /*0019*/
+         /*0012*/
+         /*0060*/
+         fgINT32 *psrc1 = (fgINT32 *) P_1->array;                       /*0030*/
+         /*0021*/
+         /*0013*/
+         /*0061*/
+         fgINT32 *psrc2 = (fgINT32 *) P_2->array;                       /*0033*/
+         /*0023*/
+         /*0014*/
+         /*0062*/
+         fgINT32 *pdest = (fgINT32 *) P_0->array;                       /*0036*/
+         /*0025*/
+         /*0015*/
+         /*0063*/
+         fgINT32 v1;                                                    /*0039*/
          /*0027*/
          /*0016*/
-         /*0060*/
-         fgINT32 *psrc1 = (fgINT32 *) P_1->array;                       /*0042*/
+         /*0064*/
+         fgINT32 v2;                                                    /*0042*/
          /*0029*/
          /*0017*/
-         /*0061*/
-         fgINT32 *psrc2 = (fgINT32 *) P_2->array;                       /*0045*/
+         /*0065*/
+         fgINT32 result;                                                /*0045*/
          /*0031*/
          /*0018*/
-         /*0062*/
-         fgINT32 *pdest = (fgINT32 *) P_0->array;                       /*0048*/
+         /*0066*/
+         int spp = P_0->spp;                                            /*0048*/
          /*0033*/
          /*0019*/
-         /*0063*/
-         fgINT32 v1;                                                    /*0051*/
+         /*0067*/
+         int length = P_0->length*spp;                                  /*0051*/
          /*0035*/
          /*0020*/
-         /*0064*/
-         fgINT32 v2;                                                    /*0054*/
-         /*0037*/
-         /*0021*/
-         /*0065*/
-         fgINT32 result;                                                /*0057*/
-         /*0039*/
-         /*0022*/
-         /*0066*/
-         int spp = P_0->spp;                                            /*0060*/
-         /*0041*/
-         /*0023*/
-         /*0067*/
-         int length = P_0->length*spp;                                  /*0063*/
-         /*0043*/
-         /*0024*/
          /*0068*/
          for(j = 0; j <= length-1; j += 1) {
-            _return3 = psrc1[j];                                        /*0067*/
-            _return0 = _return3;                                        /*0070*/
-            v1 = _return0;                                              /*0071*/
-            /*0049*/
+            _return3 = psrc1[j];                                        /*0055*/
+            _return0 = _return3;                                        /*0058*/
+            v1 = _return0;                                              /*0059*/
+            /*0041*/
             /*0070*/
-            _return4 = psrc2[j];                                        /*0074*/
-            _return1 = _return4;                                        /*0077*/
-            v2 = _return1;                                              /*0078*/
-            /*0055*/
+            _return4 = psrc2[j];                                        /*0062*/
+            _return1 = _return4;                                        /*0065*/
+            v2 = _return1;                                              /*0066*/
+            /*0047*/
             /*0071*/
-            _return2 = v1+v2;                                           /*0080*/
-            /*0058*/
-            result = _return2;                                          /*0081*/
-            /*0061*/
+            _return2 = v1+v2;                                           /*0068*/
+            /*0050*/
+            result = _return2;                                          /*0069*/
+            /*0053*/
             /*0072*/
-            pdest[j] = result;                                          /*0084*/
+            pdest[j] = result;                                          /*0072*/
             /*0034*/
             /*0039*/
             ;
@@ -123,5 +107,5 @@ void flgr2d_arith_add_fgINT32(FLGR_Data2D *datdest, FLGR_Data2D *data1, FLGR_Dat
       }
       i++, pdest++, p1++, p2++;
    }
-   return;                                                              /*0094*/
+   return;                                                              /*0082*/
 }

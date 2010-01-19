@@ -65,6 +65,9 @@ Parallelization in Fortran (if one of the resources can be made obsolete)
       SUBROUTINE parallel03
       INTEGER i
       REAL*8 x(0:10-1), y(0:10-1)
+      CHARACTER*11 __func__
+      CHARACTER*11 __FUNCTION__
+
       y(0) = 0.
 
 !$OMP PARALLEL DO 

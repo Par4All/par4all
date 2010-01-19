@@ -6,7 +6,7 @@ create threshold threshold.c include/SIMD.c
 
 activate C_PARSER
 setproperty PRETTYPRINT_C_CODE TRUE
-setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
 setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
 setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
 
@@ -22,28 +22,30 @@ activate PRECONDITIONS_INTER_FULL
 activate TRANSFORMERS_INTER_FULL
 
 setproperty RICEDG_STATISTICS_ALL_ARRAYS TRUE
-activate RICE_SEMANTICS_DEPENDENCE_GRAPH
+activate RICE_REGIONS_DEPENDENCE_GRAPH
+activate REGION_CHAINS
 
 setproperty SIMD_FORTRAN_MEM_ORGANISATION=FALSE
-setproperty SAC_SIMD_REGISTER_WIDTH = 64
+setproperty SAC_SIMD_REGISTER_WIDTH = 128
 setproperty SIMD_AUTO_UNROLL_SIMPLE_CALCULATION FALSE
 setproperty SIMD_AUTO_UNROLL_MINIMIZE_UNROLL TRUE
 
 apply IF_CONVERSION_INIT
-display PRINTED_FILE
-
 apply IF_CONVERSION
-display PRINTED_FILE
-
 apply IF_CONVERSION_COMPACT
-#apply USE_DEF_ELIMINATION
 display PRINTED_FILE
 
 apply PARTIAL_EVAL
 apply SIMD_ATOMIZER
 display PRINTED_FILE
 
+apply PRIVATIZE_MODULE
+apply VARIABLE_EXPANSION
+display PRINTED_FILE
+
 apply SIMDIZER_AUTO_UNROLL
+apply PARTIAL_EVAL
+apply SIMD_ATOMIZER
 apply PARTIAL_EVAL
 apply SUPPRESS_DEAD_CODE
 display PRINTED_FILE
@@ -51,15 +53,16 @@ display PRINTED_FILE
 apply CUMULATED_REDUCTIONS
 apply SIMD_REMOVE_REDUCTIONS
 display PRINTED_FILE
+apply VARIABLE_EXPANSION
+display PRINTED_FILE
 
 #apply DEATOMIZER
 #apply PARTIAL_EVAL
 #apply USE_DEF_ELIMINATION
 #display PRINTED_FILE
 
-apply SINGLE_ASSIGNMENT
-apply FORWARD_SUBSTITUTE
-apply PARTIAL_EVAL
+#apply FORWARD_SUBSTITUTE
+#apply PARTIAL_EVAL
 
 display PRINTED_FILE
 
@@ -87,12 +90,18 @@ echo simdized code
 echo
 
 display PRINTED_FILE
-#apply USE_DEF_ELIMINATION
-#display PRINTED_FILE
+apply UNSPLIT
 
-shell ./compileC.sh threshold threshold test.c
-shell gcc -O3 -I. -march=native -c test.c
-shell rm test.c test.o
+shell cc threshold.c include/SIMD.c -o threshold0
+shell sed -i -e '1 i #include "SIMD.h"' threshold.database/Src/threshold.c
+shell cc -Iinclude threshold.database/Src/threshold.c include/SIMD.c -o threshold1
+shell sed -i -e '1 d' threshold.database/Src/threshold.c
+shell if test "`./threshold0`" = "`./threshold1`" ; then echo seq-ok ; else echo seq-ko ; fi
+
+shell ./compileC.sh threshold threshold.c threshold-sse.c
+shell cc -O3 -I. -march=native threshold-sse.c -o threshold2
+shell if test "`./threshold0`" = "`./threshold2`" ; then echo sse-ok ; else echo sse-ko ; fi
+shell rm -f threshold[012] threshold-sse.c
 
 close
 delete threshold

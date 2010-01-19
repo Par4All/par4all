@@ -7,9 +7,7 @@ int scalarization15(int n)
    int x[100], y[100][100], t[100];
    int i, j;
    //PIPS generated variable
-   int __scalar__0;
-   //PIPS generated variable
-   int __scalar__1;
+   int __scalar__0, __scalar__1;
 
    for(i = 0; i <= 99; i += 1) {
       // BEGIN BLOCK

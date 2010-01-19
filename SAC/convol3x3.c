@@ -11,7 +11,7 @@ int main() //      program image_processing
 {
     float image[image_size][image_size];
     float new_image[image_size][image_size];
-    float kernel[kernel_size][kernel_size+1];
+    float kernel[kernel_size][kernel_size];
 
     int i, j, n;
 
@@ -62,7 +62,7 @@ l400: for(i =  kernel_size/2; i<isi - kernel_size/2; i++) {
 l300: for(j =  kernel_size/2; j<isj - kernel_size/2; j++) {
           new_image[i][j] = 0.;
 l200: for(ki = 0; ki<kernel_size; ki++) {
-l100: for(kj = 0; kj<kernel_size+1; kj++) {
+l100: for(kj = 0; kj<kernel_size; kj++) {
           new_image[i][j] = new_image[i][j] + 
               image[i+ki-kernel_size/2][j+kj-kernel_size/2]* 
               kernel[ki][kj];

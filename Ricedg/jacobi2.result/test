@@ -1,7 +1,6 @@
 int jacobi2(int nb, pint *a, pint *b)
 {
-   int indice_i;
-   int indice_j;
+   int indice_i, indice_j;                                              /*0003*/
    indice_i = 0;                                                        /*0004*/
    indice_j = 0;                                                        /*0005*/
 
