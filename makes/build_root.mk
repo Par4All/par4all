@@ -87,6 +87,17 @@ CTAGS:
 		xargs -0 ctags --append -o $(CTAGS) ; \
 	mv $(CTAGS) CTAGS
 
+cscope.out:cscope-clean
+	cd / && \
+		find $(CURDIR) -name '*-local.h' -type f -prune -o -name include -type d -prune -o -name '*.[ch]' -print >  $(CURDIR)/cscope.files && \
+		cd - && \
+		cscope -b && \
+		rm -f $(CURDIR)/cscope.files
+
+cscope-clean:
+	$(RM) cscope.out
+
+
 # force tags target
 tags: tags-clean
 	$(MAKE) TAGS CTAGS
