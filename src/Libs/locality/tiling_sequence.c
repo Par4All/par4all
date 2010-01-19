@@ -30,7 +30,7 @@
 #include "misc.h"
 #include "ri-util.h"
 #include "pipsdbm.h"
-#include "bouchebaba-local.h"
+#include "locality-local.h"
 
 #define DEFAULT_INT_PREFIX 	"I_"
 #define DEFAULT_FLOAT_PREFIX 	"F_"

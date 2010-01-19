@@ -19,7 +19,7 @@
 # along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-TARGET	= bouchebaba
+TARGET	= locality
 
 LIB_CFILES = \
 	stats.c \
