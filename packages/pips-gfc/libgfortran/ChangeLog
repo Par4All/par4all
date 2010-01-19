@@ -1,3 +1,35 @@
+2009-10-15  Release Manager
+
+	* GCC 4.4.2 released.
+
+2009-09-19  Jerry DeLisle  <jvdelisle@gcc.gnu.org>
+
+	Backport from mainline:
+	PR libgfortran/41328
+	* io/transfer.c (read_sf): Adjust fbuf position and do proper fbuf reads
+	to traverse CR, CR-LF, and LF style line ends.Set at_eof flag on short
+	read if any characters were successfully read so that EOF condition with
+	no EOR marker succeeds.
+
+2009-08-24  Steven G. Kargl  <kargl@gcc.gnu.org>
+
+	PR fortran/41157
+	* dtime.c (dtime_sub): Fix computing time increment.
+	* time_1.h: Add <sys/types.h> header.  Use RUSAGE_SELF macro instead
+	of a hardcoded 0.
+
+2009-08-20  Thomas Koenig  <tkoenig@gcc.gnu.org>
+
+	PR libfortran/40962
+	* iso_c_binding.c (c_f_pointer_u0):  Multiply stride by
+	previous stride.
+
+2009-08-04  Jerry DeLisle  <jvdelisle@gcc.gnu.org>
+
+	PR libfortran/40853
+	* io/list_read.c (nml_get_obj_data): Do not set nl
+	pointer to first_nl if nl->next is NULL.
+
 2009-07-22  Release Manager
 
 	* GCC 4.4.1 released.

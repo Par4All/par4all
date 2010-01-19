@@ -8,21 +8,24 @@ see ONEWS.
 http://gcc.gnu.org/gcc-4.4/index.html
                            GCC 4.4 Release Series
 
-   July 22, 2009
+   October 15, 2009
 
    The [1]GNU project and the GCC developers are pleased to announce the
-   release of GCC 4.4.1.
+   release of GCC 4.4.2.
 
    This release is a bug-fix release, containing fixes for regressions in
-   GCC 4.4.0 relative to previous releases of GCC.
+   GCC 4.4.1 relative to previous releases of GCC.
 
 Release History
 
+   GCC 4.4.2
+          October 15, 2009 ([2]changes)
+
    GCC 4.4.1
-          July 22, 2009 ([2]changes)
+          July 22, 2009 ([3]changes)
 
    GCC 4.4.0
-          April 21, 2009 ([3]changes)
+          April 21, 2009 ([4]changes)
 
 References and Acknowledgements
 
@@ -30,65 +33,66 @@ References and Acknowledgements
    supports several other languages aside from C, it now stands for the
    GNU Compiler Collection.
 
-   A list of [4]successful builds is updated as new information becomes
+   A list of [5]successful builds is updated as new information becomes
    available.
 
    The GCC developers would like to thank the numerous people that have
    contributed new features, improvements, bug fixes, and other changes as
-   well as test results to GCC. This [5]amazing group of volunteers is
+   well as test results to GCC. This [6]amazing group of volunteers is
    what makes GCC successful.
 
-   For additional information about GCC please refer to the [6]GCC project
-   web site or contact the [7]GCC development mailing list.
+   For additional information about GCC please refer to the [7]GCC project
+   web site or contact the [8]GCC development mailing list.
 
-   To obtain GCC please use [8]our mirror sites or [9]our SVN server.
+   To obtain GCC please use [9]our mirror sites or [10]our SVN server.
 
-   Please send FSF & GNU inquiries & questions to [10]gnu@gnu.org. There
-   are also [11]other ways to contact the FSF.
+   Please send FSF & GNU inquiries & questions to [11]gnu@gnu.org. There
+   are also [12]other ways to contact the FSF.
 
-   These pages are maintained by [12]the GCC team.
+   These pages are maintained by [13]the GCC team.
 
 
     For questions related to the use of GCC, please consult these web
-    pages and the [13]GCC manuals. If that fails, the
-    [14]gcc-help@gcc.gnu.org mailing list might help.
+    pages and the [14]GCC manuals. If that fails, the
+    [15]gcc-help@gcc.gnu.org mailing list might help.
     Please send comments on these web pages and the development of GCC to
-    our developer mailing list at [15]gcc@gnu.org or [16]gcc@gcc.gnu.org.
-    All of our lists have [17]public archives.
+    our developer mailing list at [16]gcc@gnu.org or [17]gcc@gcc.gnu.org.
+    All of our lists have [18]public archives.
 
    Copyright (C) Free Software Foundation, Inc., 51 Franklin St, Fifth
    Floor, Boston, MA 02110, USA.
 
    Verbatim copying and distribution of this entire article is permitted
    in any medium, provided this notice is preserved.
-   Last modified 2009-07-22 [18]Valid XHTML 1.0
+   Last modified 2009-10-15 [19]Valid XHTML 1.0
 
 References
 
    1. http://www.gnu.org/
    2. http://gcc.gnu.org/gcc-4.4/changes.html
    3. http://gcc.gnu.org/gcc-4.4/changes.html
-   4. http://gcc.gnu.org/gcc-4.4/buildstat.html
-   5. http://gcc.gnu.org/onlinedocs/gcc/Contributors.html
-   6. http://gcc.gnu.org/index.html
-   7. mailto:gcc@gcc.gnu.org
-   8. http://gcc.gnu.org/mirrors.html
-   9. http://gcc.gnu.org/svn.html
-  10. mailto:gnu@gnu.org
-  11. http://www.gnu.org/home.html#ContactInfo
-  12. http://gcc.gnu.org/about.html
-  13. http://gcc.gnu.org/onlinedocs/
-  14. mailto:gcc-help@gcc.gnu.org
-  15. mailto:gcc@gnu.org
-  16. mailto:gcc@gcc.gnu.org
-  17. http://gcc.gnu.org/lists.html
-  18. http://validator.w3.org/check/referer
+   4. http://gcc.gnu.org/gcc-4.4/changes.html
+   5. http://gcc.gnu.org/gcc-4.4/buildstat.html
+   6. http://gcc.gnu.org/onlinedocs/gcc/Contributors.html
+   7. http://gcc.gnu.org/index.html
+   8. mailto:gcc@gcc.gnu.org
+   9. http://gcc.gnu.org/mirrors.html
+  10. http://gcc.gnu.org/svn.html
+  11. mailto:gnu@gnu.org
+  12. http://www.gnu.org/home.html#ContactInfo
+  13. http://gcc.gnu.org/about.html
+  14. http://gcc.gnu.org/onlinedocs/
+  15. mailto:gcc-help@gcc.gnu.org
+  16. mailto:gcc@gnu.org
+  17. mailto:gcc@gcc.gnu.org
+  18. http://gcc.gnu.org/lists.html
+  19. http://validator.w3.org/check/referer
 ======================================================================
 http://gcc.gnu.org/gcc-4.4/changes.html
                            GCC 4.4 Release Series
                       Changes, New Features, and Fixes
 
-   The latest release in the 4.4 release series is [1]GCC 4.4.1.
+   The latest release in the 4.4 release series is [1]GCC 4.4.2.
 
 Caveats
 
@@ -630,29 +634,36 @@ GCC 4.4.1
    not be complete (that is, it is possible that some PRs that have been
    fixed are not listed here).
 
-   Please send FSF & GNU inquiries & questions to [14]gnu@gnu.org. There
-   are also [15]other ways to contact the FSF.
+GCC 4.4.2
 
-   These pages are maintained by [16]the GCC team.
+   This is the [14]list of problem reports (PRs) from GCC's bug tracking
+   system that are known to be fixed in the 4.4.2 release. This list might
+   not be complete (that is, it is possible that some PRs that have been
+   fixed are not listed here).
+
+   Please send FSF & GNU inquiries & questions to [15]gnu@gnu.org. There
+   are also [16]other ways to contact the FSF.
+
+   These pages are maintained by [17]the GCC team.
 
 
     For questions related to the use of GCC, please consult these web
-    pages and the [17]GCC manuals. If that fails, the
-    [18]gcc-help@gcc.gnu.org mailing list might help.
+    pages and the [18]GCC manuals. If that fails, the
+    [19]gcc-help@gcc.gnu.org mailing list might help.
     Please send comments on these web pages and the development of GCC to
-    our developer mailing list at [19]gcc@gnu.org or [20]gcc@gcc.gnu.org.
-    All of our lists have [21]public archives.
+    our developer mailing list at [20]gcc@gnu.org or [21]gcc@gcc.gnu.org.
+    All of our lists have [22]public archives.
 
    Copyright (C) Free Software Foundation, Inc., 51 Franklin St, Fifth
    Floor, Boston, MA 02110, USA.
 
    Verbatim copying and distribution of this entire article is permitted
    in any medium, provided this notice is preserved.
-   Last modified 2009-07-22 [22]Valid XHTML 1.0
+   Last modified 2009-10-15 [23]Valid XHTML 1.0
 
 References
 
-   1. http://gcc.gnu.org/gcc-4.4/changes.html#4.4.1
+   1. http://gcc.gnu.org/gcc-4.4/changes.html#4.4.2
    2. http://gcc.gnu.org/gcc-4.3/changes.html#obsoleted
    3. http://gcc.gnu.org/gcc-4.4/porting_to.html
    4. http://gcc.gnu.org/wiki/Graphite
@@ -665,15 +676,16 @@ References
   11. http://gcc.gnu.org/onlinedocs/gfortran/Code-Gen-Options.html#index-g_t_0040code_007bfcheck-array-temporaries_007d-221
   12. http://gcc.gnu.org/onlinedocs/gfortran/Fortran-Dialect-Options.html#index-g_t_0040code_007bbackslash_007d-34
   13. http://gcc.gnu.org/bugzilla/buglist.cgi?bug_status=RESOLVED&resolution=FIXED&target_milestone=4.4.1
-  14. mailto:gnu@gnu.org
-  15. http://www.gnu.org/home.html#ContactInfo
-  16. http://gcc.gnu.org/about.html
-  17. http://gcc.gnu.org/onlinedocs/
-  18. mailto:gcc-help@gcc.gnu.org
-  19. mailto:gcc@gnu.org
-  20. mailto:gcc@gcc.gnu.org
-  21. http://gcc.gnu.org/lists.html
-  22. http://validator.w3.org/check/referer
+  14. http://gcc.gnu.org/bugzilla/buglist.cgi?bug_status=RESOLVED&resolution=FIXED&target_milestone=4.4.2
+  15. mailto:gnu@gnu.org
+  16. http://www.gnu.org/home.html#ContactInfo
+  17. http://gcc.gnu.org/about.html
+  18. http://gcc.gnu.org/onlinedocs/
+  19. mailto:gcc-help@gcc.gnu.org
+  20. mailto:gcc@gnu.org
+  21. mailto:gcc@gcc.gnu.org
+  22. http://gcc.gnu.org/lists.html
+  23. http://validator.w3.org/check/referer
 ======================================================================
 http://gcc.gnu.org/gcc-4.3/index.html
                            GCC 4.3 Release Series
@@ -681,24 +693,27 @@ http://gcc.gnu.org/gcc-4.3/index.html
    January 24, 2009
 
    The [1]GNU project and the GCC developers are pleased to announce the
-   release of GCC 4.3.3.
+   release of GCC 4.3.4.
 
    This release is a bug-fix release, containing fixes for regressions in
-   GCC 4.3.2 relative to previous releases of GCC.
+   GCC 4.3.3 relative to previous releases of GCC.
 
 Release History
 
+   GCC 4.3.4
+          August 4, 2009 ([2]changes)
+
    GCC 4.3.3
-          January 24, 2009 ([2]changes)
+          January 24, 2009 ([3]changes)
 
    GCC 4.3.2
-          August 27, 2008 ([3]changes)
+          August 27, 2008 ([4]changes)
 
    GCC 4.3.1
-          June 6, 2008 ([4]changes)
+          June 6, 2008 ([5]changes)
 
    GCC 4.3.0
-          March 5, 2008 ([5]changes)
+          March 5, 2008 ([6]changes)
 
 References and Acknowledgements
 
@@ -706,38 +721,38 @@ References and Acknowledgements
    supports several other languages aside from C, it now stands for the
    GNU Compiler Collection.
 
-   A list of [6]successful builds is updated as new information becomes
+   A list of [7]successful builds is updated as new information becomes
    available.
 
    The GCC developers would like to thank the numerous people that have
    contributed new features, improvements, bug fixes, and other changes as
-   well as test results to GCC. This [7]amazing group of volunteers is
+   well as test results to GCC. This [8]amazing group of volunteers is
    what makes GCC successful.
 
-   For additional information about GCC please refer to the [8]GCC project
-   web site or contact the [9]GCC development mailing list.
+   For additional information about GCC please refer to the [9]GCC project
+   web site or contact the [10]GCC development mailing list.
 
-   To obtain GCC please use [10]our mirror sites or [11]our SVN server.
+   To obtain GCC please use [11]our mirror sites or [12]our SVN server.
 
-   Please send FSF & GNU inquiries & questions to [12]gnu@gnu.org. There
-   are also [13]other ways to contact the FSF.
+   Please send FSF & GNU inquiries & questions to [13]gnu@gnu.org. There
+   are also [14]other ways to contact the FSF.
 
-   These pages are maintained by [14]the GCC team.
+   These pages are maintained by [15]the GCC team.
 
 
     For questions related to the use of GCC, please consult these web
-    pages and the [15]GCC manuals. If that fails, the
-    [16]gcc-help@gcc.gnu.org mailing list might help.
+    pages and the [16]GCC manuals. If that fails, the
+    [17]gcc-help@gcc.gnu.org mailing list might help.
     Please send comments on these web pages and the development of GCC to
-    our developer mailing list at [17]gcc@gnu.org or [18]gcc@gcc.gnu.org.
-    All of our lists have [19]public archives.
+    our developer mailing list at [18]gcc@gnu.org or [19]gcc@gcc.gnu.org.
+    All of our lists have [20]public archives.
 
    Copyright (C) Free Software Foundation, Inc., 51 Franklin St, Fifth
    Floor, Boston, MA 02110, USA.
 
    Verbatim copying and distribution of this entire article is permitted
    in any medium, provided this notice is preserved.
-   Last modified 2009-01-24 [20]Valid XHTML 1.0
+   Last modified 2009-10-15 [21]Valid XHTML 1.0
 
 References
 
@@ -746,27 +761,28 @@ References
    3. http://gcc.gnu.org/gcc-4.3/changes.html
    4. http://gcc.gnu.org/gcc-4.3/changes.html
    5. http://gcc.gnu.org/gcc-4.3/changes.html
-   6. http://gcc.gnu.org/gcc-4.3/buildstat.html
-   7. http://gcc.gnu.org/onlinedocs/gcc/Contributors.html
-   8. http://gcc.gnu.org/index.html
-   9. mailto:gcc@gcc.gnu.org
-  10. http://gcc.gnu.org/mirrors.html
-  11. http://gcc.gnu.org/svn.html
-  12. mailto:gnu@gnu.org
-  13. http://www.gnu.org/home.html#ContactInfo
-  14. http://gcc.gnu.org/about.html
-  15. http://gcc.gnu.org/onlinedocs/
-  16. mailto:gcc-help@gcc.gnu.org
-  17. mailto:gcc@gnu.org
-  18. mailto:gcc@gcc.gnu.org
-  19. http://gcc.gnu.org/lists.html
-  20. http://validator.w3.org/check/referer
+   6. http://gcc.gnu.org/gcc-4.3/changes.html
+   7. http://gcc.gnu.org/gcc-4.3/buildstat.html
+   8. http://gcc.gnu.org/onlinedocs/gcc/Contributors.html
+   9. http://gcc.gnu.org/index.html
+  10. mailto:gcc@gcc.gnu.org
+  11. http://gcc.gnu.org/mirrors.html
+  12. http://gcc.gnu.org/svn.html
+  13. mailto:gnu@gnu.org
+  14. http://www.gnu.org/home.html#ContactInfo
+  15. http://gcc.gnu.org/about.html
+  16. http://gcc.gnu.org/onlinedocs/
+  17. mailto:gcc-help@gcc.gnu.org
+  18. mailto:gcc@gnu.org
+  19. mailto:gcc@gcc.gnu.org
+  20. http://gcc.gnu.org/lists.html
+  21. http://validator.w3.org/check/referer
 ======================================================================
 http://gcc.gnu.org/gcc-4.3/changes.html
                            GCC 4.3 Release Series
                       Changes, New Features, and Fixes
 
-   The latest release in the 4.3 release series is [1]GCC 4.3.3.
+   The latest release in the 4.3 release series is [1]GCC 4.3.4.
 
 Caveats
 
@@ -1502,29 +1518,36 @@ GCC 4.3.3
    not be complete (that is, it is possible that some PRs that have been
    fixed are not listed here).
 
-   Please send FSF & GNU inquiries & questions to [28]gnu@gnu.org. There
-   are also [29]other ways to contact the FSF.
+GCC 4.3.4
 
-   These pages are maintained by [30]the GCC team.
+   This is the [28]list of problem reports (PRs) from GCC's bug tracking
+   system that are known to be fixed in the 4.3.4 release. This list might
+   not be complete (that is, it is possible that some PRs that have been
+   fixed are not listed here).
+
+   Please send FSF & GNU inquiries & questions to [29]gnu@gnu.org. There
+   are also [30]other ways to contact the FSF.
+
+   These pages are maintained by [31]the GCC team.
 
 
     For questions related to the use of GCC, please consult these web
-    pages and the [31]GCC manuals. If that fails, the
-    [32]gcc-help@gcc.gnu.org mailing list might help.
+    pages and the [32]GCC manuals. If that fails, the
+    [33]gcc-help@gcc.gnu.org mailing list might help.
     Please send comments on these web pages and the development of GCC to
-    our developer mailing list at [33]gcc@gnu.org or [34]gcc@gcc.gnu.org.
-    All of our lists have [35]public archives.
+    our developer mailing list at [34]gcc@gnu.org or [35]gcc@gcc.gnu.org.
+    All of our lists have [36]public archives.
 
    Copyright (C) Free Software Foundation, Inc., 51 Franklin St, Fifth
    Floor, Boston, MA 02110, USA.
 
    Verbatim copying and distribution of this entire article is permitted
    in any medium, provided this notice is preserved.
-   Last modified 2009-04-19 [36]Valid XHTML 1.0
+   Last modified 2009-08-13 [37]Valid XHTML 1.0
 
 References
 
-   1. http://gcc.gnu.org/gcc-4.3/changes.html#4.3.3
+   1. http://gcc.gnu.org/gcc-4.3/changes.html#4.3.4
    2. http://gmplib.org/
    3. http://www.mpfr.org/
    4. http://gcc.gnu.org/install/prerequisites.html
@@ -1551,15 +1574,16 @@ References
   25. http://gcc.gnu.org/bugzilla/buglist.cgi?bug_status=RESOLVED&resolution=FIXED&target_milestone=4.3.1
   26. http://gcc.gnu.org/bugzilla/buglist.cgi?bug_status=RESOLVED&resolution=FIXED&target_milestone=4.3.2
   27. http://gcc.gnu.org/bugzilla/buglist.cgi?bug_status=RESOLVED&resolution=FIXED&target_milestone=4.3.3
-  28. mailto:gnu@gnu.org
-  29. http://www.gnu.org/home.html#ContactInfo
-  30. http://gcc.gnu.org/about.html
-  31. http://gcc.gnu.org/onlinedocs/
-  32. mailto:gcc-help@gcc.gnu.org
-  33. mailto:gcc@gnu.org
-  34. mailto:gcc@gcc.gnu.org
-  35. http://gcc.gnu.org/lists.html
-  36. http://validator.w3.org/check/referer
+  28. http://gcc.gnu.org/bugzilla/buglist.cgi?bug_status=RESOLVED&resolution=FIXED&target_milestone=4.3.4
+  29. mailto:gnu@gnu.org
+  30. http://www.gnu.org/home.html#ContactInfo
+  31. http://gcc.gnu.org/about.html
+  32. http://gcc.gnu.org/onlinedocs/
+  33. mailto:gcc-help@gcc.gnu.org
+  34. mailto:gcc@gnu.org
+  35. mailto:gcc@gcc.gnu.org
+  36. http://gcc.gnu.org/lists.html
+  37. http://validator.w3.org/check/referer
 ======================================================================
 http://gcc.gnu.org/gcc-4.2/index.html
                            GCC 4.2 Release Series

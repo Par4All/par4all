@@ -1,5 +1,5 @@
 This is doc/gccinstall.info, produced by makeinfo version 4.13 from
-/d/gcc-4.4.1/gcc-4.4.1/gcc/doc/install.texi.
+/d/gcc-4.4.2/gcc-4.4.2/gcc/doc/install.texi.
 
 Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 Free
@@ -2327,8 +2327,6 @@ tools can also be obtained from:
 
    * http://www.nongnu.org/avr/
 
-   * http://home.overta.ru/users/denisc/
-
    * http://www.amelek.gda.pl/avr/
 
    We _strongly_ recommend using binutils 2.13 or newer.
@@ -4173,64 +4171,64 @@ Ref: arm-x-elf98967
 Ref: arm-x-coff99187
 Ref: arm-x-aout99389
 Ref: avr99511
-Ref: bfin100195
-Ref: cris100437
-Ref: crx101253
-Ref: dos101916
-Ref: x-x-freebsd102239
-Ref: h8300-hms104622
-Ref: hppa-hp-hpux104974
-Ref: hppa-hp-hpux10107345
-Ref: hppa-hp-hpux11107978
-Ref: x-x-linux-gnu113637
-Ref: ix86-x-linux113830
-Ref: ix86-x-solaris210114143
-Ref: ia64-x-linux114529
-Ref: ia64-x-hpux115299
-Ref: x-ibm-aix115854
-Ref: iq2000-x-elf121837
-Ref: m32c-x-elf121977
-Ref: m32r-x-elf122079
-Ref: m6811-elf122181
-Ref: m6812-elf122331
-Ref: m68k-x-x122481
-Ref: m68k-x-uclinux123486
-Ref: mips-x-x123849
-Ref: mips-sgi-irix5126526
-Ref: mips-sgi-irix6127474
-Ref: powerpc-x-x130281
-Ref: powerpc-x-darwin130486
-Ref: powerpc-x-elf131033
-Ref: powerpc-x-linux-gnu131118
-Ref: powerpc-x-netbsd131213
-Ref: powerpc-x-eabisim131301
-Ref: powerpc-x-eabi131427
-Ref: powerpcle-x-elf131503
-Ref: powerpcle-x-eabisim131595
-Ref: powerpcle-x-eabi131728
-Ref: s390-x-linux131811
-Ref: s390x-x-linux131883
-Ref: s390x-ibm-tpf131970
-Ref: x-x-solaris2132101
-Ref: sparc-sun-solaris2135978
-Ref: sparc-sun-solaris27138699
-Ref: sparc-x-linux141163
-Ref: sparc64-x-solaris2141388
-Ref: sparcv9-x-solaris2142033
-Ref: x-x-vxworks142118
-Ref: x86-64-x-x143640
-Ref: xtensa-x-elf143968
-Ref: xtensa-x-linux144639
-Ref: windows144980
-Ref: x-x-cygwin146935
-Ref: x-x-interix147205
-Ref: x-x-mingw32147571
-Ref: os2147797
-Ref: older147988
-Ref: elf150105
-Node: Old150363
-Node: Configurations153500
-Node: GNU Free Documentation License157482
-Node: Concept Index179898
+Ref: bfin100153
+Ref: cris100395
+Ref: crx101211
+Ref: dos101874
+Ref: x-x-freebsd102197
+Ref: h8300-hms104580
+Ref: hppa-hp-hpux104932
+Ref: hppa-hp-hpux10107303
+Ref: hppa-hp-hpux11107936
+Ref: x-x-linux-gnu113595
+Ref: ix86-x-linux113788
+Ref: ix86-x-solaris210114101
+Ref: ia64-x-linux114487
+Ref: ia64-x-hpux115257
+Ref: x-ibm-aix115812
+Ref: iq2000-x-elf121795
+Ref: m32c-x-elf121935
+Ref: m32r-x-elf122037
+Ref: m6811-elf122139
+Ref: m6812-elf122289
+Ref: m68k-x-x122439
+Ref: m68k-x-uclinux123444
+Ref: mips-x-x123807
+Ref: mips-sgi-irix5126484
+Ref: mips-sgi-irix6127432
+Ref: powerpc-x-x130239
+Ref: powerpc-x-darwin130444
+Ref: powerpc-x-elf130991
+Ref: powerpc-x-linux-gnu131076
+Ref: powerpc-x-netbsd131171
+Ref: powerpc-x-eabisim131259
+Ref: powerpc-x-eabi131385
+Ref: powerpcle-x-elf131461
+Ref: powerpcle-x-eabisim131553
+Ref: powerpcle-x-eabi131686
+Ref: s390-x-linux131769
+Ref: s390x-x-linux131841
+Ref: s390x-ibm-tpf131928
+Ref: x-x-solaris2132059
+Ref: sparc-sun-solaris2135936
+Ref: sparc-sun-solaris27138657
+Ref: sparc-x-linux141121
+Ref: sparc64-x-solaris2141346
+Ref: sparcv9-x-solaris2141991
+Ref: x-x-vxworks142076
+Ref: x86-64-x-x143598
+Ref: xtensa-x-elf143926
+Ref: xtensa-x-linux144597
+Ref: windows144938
+Ref: x-x-cygwin146893
+Ref: x-x-interix147163
+Ref: x-x-mingw32147529
+Ref: os2147755
+Ref: older147946
+Ref: elf150063
+Node: Old150321
+Node: Configurations153458
+Node: GNU Free Documentation License157440
+Node: Concept Index179856
 
 End Tag Table

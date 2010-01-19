@@ -256,16 +256,7 @@
 	(sign_extend:DI (match_dup 1)))]
   "")
 
-;; Don't say we have addsi3 if optimizing.  This generates better code.  We
-;; have the anonymous addsi3 pattern below in case combine wants to make it.
-(define_expand "addsi3"
-  [(set (match_operand:SI 0 "register_operand" "")
-	(plus:SI (match_operand:SI 1 "reg_or_0_operand" "")
-		 (match_operand:SI 2 "add_operand" "")))]
-  "! optimize"
-  "")
-
-(define_insn "*addsi_internal"
+(define_insn "addsi3"
   [(set (match_operand:SI 0 "register_operand" "=r,r,r,r")
 	(plus:SI (match_operand:SI 1 "reg_or_0_operand" "%rJ,rJ,rJ,rJ")
 		 (match_operand:SI 2 "add_operand" "rI,O,K,L")))]
@@ -619,14 +610,7 @@
   ""
   "subqv $31,%1,%0")
 
-(define_expand "subsi3"
-  [(set (match_operand:SI 0 "register_operand" "")
-	(minus:SI (match_operand:SI 1 "reg_or_0_operand" "")
-		  (match_operand:SI 2 "reg_or_8bit_operand" "")))]
-  "! optimize"
-  "")
-
-(define_insn "*subsi_internal"
+(define_insn "subsi3"
   [(set (match_operand:SI 0 "register_operand" "=r")
 	(minus:SI (match_operand:SI 1 "reg_or_0_operand" "rJ")
 		  (match_operand:SI 2 "reg_or_8bit_operand" "rI")))]
@@ -3716,19 +3700,7 @@
 	(match_operator:DF 1 "alpha_fp_comparison_operator"
 			   [(match_operand:DF 2 "reg_or_0_operand" "fG")
 			    (match_operand:DF 3 "reg_or_0_operand" "fG")]))]
-  "TARGET_FP && alpha_fptm < ALPHA_FPTM_SU"
-  "cmp%-%C1%/ %R2,%R3,%0"
-  [(set_attr "type" "fadd")
-   (set_attr "trap" "yes")
-   (set_attr "trap_suffix" "su")])
-
-(define_insn "*cmpdf_ieee_ext1"
-  [(set (match_operand:DF 0 "register_operand" "=&f")
-	(match_operator:DF 1 "alpha_fp_comparison_operator"
-			   [(float_extend:DF
-			     (match_operand:SF 2 "reg_or_0_operand" "fG"))
-			    (match_operand:DF 3 "reg_or_0_operand" "fG")]))]
-  "TARGET_FP && alpha_fptm >= ALPHA_FPTM_SU"
+  "TARGET_FP"
   "cmp%-%C1%/ %R2,%R3,%0"
   [(set_attr "type" "fadd")
    (set_attr "trap" "yes")
@@ -3746,18 +3718,6 @@
    (set_attr "trap" "yes")
    (set_attr "trap_suffix" "su")])
 
-(define_insn "*cmpdf_ieee_ext2"
-  [(set (match_operand:DF 0 "register_operand" "=&f")
-	(match_operator:DF 1 "alpha_fp_comparison_operator"
-			   [(match_operand:DF 2 "reg_or_0_operand" "fG")
-			    (float_extend:DF
-			     (match_operand:SF 3 "reg_or_0_operand" "fG"))]))]
-  "TARGET_FP && alpha_fptm >= ALPHA_FPTM_SU"
-  "cmp%-%C1%/ %R2,%R3,%0"
-  [(set_attr "type" "fadd")
-   (set_attr "trap" "yes")
-   (set_attr "trap_suffix" "su")])
-
 (define_insn "*cmpdf_ext2"
   [(set (match_operand:DF 0 "register_operand" "=f")
 	(match_operator:DF 1 "alpha_fp_comparison_operator"
@@ -3765,19 +3725,6 @@
 			    (float_extend:DF
 			     (match_operand:SF 3 "reg_or_0_operand" "fG"))]))]
   "TARGET_FP && alpha_fptm < ALPHA_FPTM_SU"
-  "cmp%-%C1%/ %R2,%R3,%0"
-  [(set_attr "type" "fadd")
-   (set_attr "trap" "yes")
-   (set_attr "trap_suffix" "su")])
-
-(define_insn "*cmpdf_ieee_ext3"
-  [(set (match_operand:DF 0 "register_operand" "=&f")
-	(match_operator:DF 1 "alpha_fp_comparison_operator"
-			   [(float_extend:DF
-			     (match_operand:SF 2 "reg_or_0_operand" "fG"))
-			    (float_extend:DF
-			     (match_operand:SF 3 "reg_or_0_operand" "fG"))]))]
-  "TARGET_FP && alpha_fptm >= ALPHA_FPTM_SU"
   "cmp%-%C1%/ %R2,%R3,%0"
   [(set_attr "type" "fadd")
    (set_attr "trap" "yes")
@@ -3832,7 +3779,7 @@
 			  (match_operand:DF 2 "const0_operand" "G,G")])
 	 (float_extend:DF (match_operand:SF 1 "reg_or_0_operand" "fG,0"))
 	 (match_operand:DF 5 "reg_or_0_operand" "0,fG")))]
-  "TARGET_FP"
+  "TARGET_FP && alpha_fptm < ALPHA_FPTM_SU"
   "@
    fcmov%C3 %R4,%R1,%0
    fcmov%D3 %R4,%R5,%0"
@@ -3847,7 +3794,7 @@
 			  (match_operand:DF 2 "const0_operand" "G,G")])
 	 (match_operand:DF 1 "reg_or_0_operand" "fG,0")
 	 (match_operand:DF 5 "reg_or_0_operand" "0,fG")))]
-  "TARGET_FP"
+  "TARGET_FP && alpha_fptm < ALPHA_FPTM_SU"
   "@
    fcmov%C3 %R4,%R1,%0
    fcmov%D3 %R4,%R5,%0"
@@ -3862,7 +3809,7 @@
 			  (match_operand:DF 2 "const0_operand" "G,G")])
 	 (match_operand:SF 1 "reg_or_0_operand" "fG,0")
 	 (match_operand:SF 5 "reg_or_0_operand" "0,fG")))]
-  "TARGET_FP"
+  "TARGET_FP && alpha_fptm < ALPHA_FPTM_SU"
   "@
    fcmov%C3 %R4,%R1,%0
    fcmov%D3 %R4,%R5,%0"
@@ -3877,7 +3824,7 @@
 			  (match_operand:DF 2 "const0_operand" "G,G")])
 	 (float_extend:DF (match_operand:SF 1 "reg_or_0_operand" "fG,0"))
 	 (match_operand:DF 5 "reg_or_0_operand" "0,fG")))]
-  "TARGET_FP"
+  "TARGET_FP && alpha_fptm < ALPHA_FPTM_SU"
   "@
    fcmov%C3 %R4,%R1,%0
    fcmov%D3 %R4,%R5,%0"
@@ -3916,7 +3863,7 @@
    (set (match_operand:SF 0 "register_operand" "")
 	(if_then_else:SF (eq (match_dup 3) (match_dup 4))
 			 (match_dup 1) (match_dup 2)))]
-  "TARGET_FP"
+  "TARGET_FP && alpha_fptm < ALPHA_FPTM_SU"
 {
   operands[3] = gen_reg_rtx (DFmode);
   operands[4] = CONST0_RTX (DFmode);
@@ -3929,7 +3876,7 @@
    (set (match_operand:SF 0 "register_operand" "")
 	(if_then_else:SF (ne (match_dup 3) (match_dup 4))
 		      (match_dup 1) (match_dup 2)))]
-  "TARGET_FP"
+  "TARGET_FP && alpha_fptm < ALPHA_FPTM_SU"
 {
   operands[3] = gen_reg_rtx (DFmode);
   operands[4] = CONST0_RTX (DFmode);
@@ -6052,7 +5999,7 @@
 	(mem:DI (and:DI (match_operand:DI 0 "address_operand" "")
 			(const_int -8))))
    (set (match_operand:DI 2 "register_operand" "")
-	(plus:DI (match_dup 0) (const_int 1)))
+	(plus:DI (match_dup 5) (const_int 1)))
    (set (match_dup 3)
 	(and:DI (not:DI (ashift:DI
 			  (const_int 65535)
@@ -6067,7 +6014,7 @@
    (set (mem:DI (and:DI (match_dup 0) (const_int -8)))
 	(match_dup 4))]
   "WORDS_BIG_ENDIAN"
-  "")
+  "operands[5] = force_reg (DImode, operands[0]);")
 
 ;; Here are the define_expand's for QI and HI moves that use the above
 ;; patterns.  We have the normal sets, plus the ones that need scratch

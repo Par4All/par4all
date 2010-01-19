@@ -1,3 +1,65 @@
+2009-10-15  Release Manager
+
+	* GCC 4.4.2 released.
+
+2009-10-05  Tobias Burnus  <burnus@net-b.de>
+
+	PR fortran/41479
+	(init_intent_out_dt): Call gfc_init_default_dt
+	for all derived types with initializers.
+
+2009-10-01  Tobias Burnus  <burnus@net-b.de>
+
+	PR fortran/41515
+	* decl.c (do_parm): Call add_init_expr_to_sym.
+
+2009-09-11  Steven G. Kargl  <kargl@gcc.gnu.org>
+
+	Backported from mainline:
+	2009-05-08  Janus Weil  <janus@gcc.gnu.org>
+
+	PR fortran/39876
+	* intrinsic.c (gfc_is_intrinsic): Do not add the EXTERNAL attribute if
+	the symbol is a module procedure.
+
+
+2009-09-05  Paul Thomas  <pault@gcc.gnu.org>
+
+	PR fortran/41258
+	* primary.c (gfc_match_varspec): Do not look for typebound
+	procedures unless the derived type has a f2k_derived namespace.
+
+2008-08-25  Paul Thomas  <pault@gcc.gnu.org>
+
+	PR fortran/41062
+	* trans-decl.c (gfc_trans_use_stmts):  Keep going through use
+	list if symbol is not use associated.
+
+2009-08-16  Paul Thomas  <pault@gcc.gnu.org>
+
+	PR fortran/40847
+	* iresolve.c (gfc_resolve_transfer): Correct error in 'mold'
+	character length for case where length expresson is NULL.
+
+2009-07-29  Tobias Burnus  <burnus@net-b.de>
+
+	PR fortran/40851
+	* resolve.c (resolve_symbol): Do not initialize pointer derived-types.
+	* trans-decl.c (init_intent_out_dt): Ditto.
+	(generate_local_decl): No need to set attr.referenced for DT pointers.
+
+2009-07-28  Jakub Jelinek  <jakub@redhat.com>
+
+	PR fortran/40878
+	* openmp.c (gfc_match_omp_clauses): Use gfc_error_now instead of
+	gfc_error to diagnose invalid COLLAPSE arguments.
+
+2009-07-23  Steven G. Kargl  <kargl@gcc.gnu.org>
+
+	PR fortran/40727
+	* fortran/check.c (gfc_check_cmplx, gfc_check_dcmplx): Add check that
+	the optional second argument isn't of COMPLEX type.
+
 2009-07-22  Release Manager
 
 	* GCC 4.4.1 released.
