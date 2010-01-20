@@ -50,7 +50,7 @@ typedef dg_vertex_label vertex_label;
 #include "effects-convex.h"
 #include "effects-simple.h"
 #include "preprocessor.h"
-#include "statistics.h"
+#include "locality.h"
 #include "callgraph.h"
 
 #include "control.h"

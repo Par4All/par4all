@@ -53,7 +53,7 @@
 #include "transformations.h"
 #include "control.h"
 // { should not be there
-#include "statistics.h"
+#include "locality.h"
 // }
 
 /* bool scalar_expansion(char *module_name) 

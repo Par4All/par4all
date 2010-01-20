@@ -48,7 +48,7 @@ typedef dg_vertex_label vertex_label;
 #include "patterns.tab.h"
 
 #include "properties.h"
-#include "statistics.h"
+#include "locality.h"
 
 #include "misc.h"
 #include <ctype.h>
