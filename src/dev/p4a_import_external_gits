@@ -66,6 +66,9 @@ import_PIPS_git_svn() {
     import_git CRI/$1 $GIT_SVN_PIPS_DIR/$1 packages/PIPS/$1
 }
 
+### To import a branch from PIPS :
+# import_git CRI/pips-gfc ../CRI-git-svn/roosz-pips-gfc packages/pips-gfc/gcc/fortran
+# exit
 
 # Add the PIPS git svn repositories to Par4All:
 for i in $PIPS_SVN_REPOSITORIES; do

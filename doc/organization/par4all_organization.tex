@@ -276,15 +276,15 @@ rollback.
 
 This part is into the \texttt{package/pips-gfc} directory. It contains
 plain \Agcc core and Fortran 4.4.1 distribution, pointed by the branch
-\texttt{gcc/4.4.1}
+\texttt{gcc-4.4.1}
 
 The development of \Apipsgfc should be done in the branch
-\texttt{pips/gfc/dev/4.4.1} and this branch should be merged with the
-branch \texttt{gcc/4.4.1} into a branch \texttt{pips/gfc/4.4.1} with a
-more global name \texttt{pips/gfc/master} tracking which version is to be
+\texttt{pips-gfc-4.4.1} and this branch should be merged with the
+branch \texttt{gcc-4.4.1} into a branch \texttt{pips-gfc+gcc-4.4.1} with a
+more global name \texttt{pips-gfc+gcc} tracking which version is to be
 merged into the global \texttt{master} branch.
 
-So in \texttt{pips/gfc/dev/...} there should be only files different from
+So in \texttt{pips-gfc-4.4.1} there should be only files different from
 the \Agcc distribution. In this way, if we want to have more subtle
 construction methods, later, it will be clearer how to get the real
 content.
@@ -292,25 +292,25 @@ content.
 There is the same variation in branches for version 4.4.2.
 
 So to develop and test the \Apipsgfc extension, you get into for example
-\texttt{pips/gfc/dev/4.4.1} with
+\texttt{pips-gfc-4.4.1} with
 \begin{verbatim}
-git checkout pips/gfc/dev/4.4.1
+git checkout pips-gfc-4.4.1
 \end{verbatim}
 and develop your code in this branch.
 
-To test, you commit and change to the \texttt{pips/gfc/4.4.1} branch with
+To test, you commit and change to the \texttt{pips-gfc+gcc-4.4.1} branch with
 \begin{verbatim}
-git checkout pips/gfc/4.4.1
+git checkout pips-gfc+gcc-4.4.1
 \end{verbatim}
 where you merge with a
 \begin{verbatim}
-git merge pips/gfc/dev/4.4.1
+git merge pips-gfc-4.4.1
 \end{verbatim}
 and compile. If you are happy, you commit or you revert and then go back
-into branch \texttt{pips/gfc/dev/4.4.1}.
+into branch \texttt{pips-gfc-4.4.1}.
 
-If you want to avoid spoiling the branches \texttt{pips/gfc/dev/4.4.1} and
-\texttt{pips/gfc/4.4.1}, you can create sub-branches of them, commit in
+If you want to avoid spoiling the branches \texttt{pips-gfc-4.4.1} and
+\texttt{pips-gfc+gcc-4.4.1}, you can create sub-branches of them, commit in
 them and merge this work in the former one back (with the \verb|--slashed|
 if you want to be modest about your gory hesitations \smiley{} and delete
 these branches).
@@ -359,16 +359,21 @@ Validation of \Apfa is done inside the \texttt{validation} directory with
 \section{Branches}
 \label{sec:branches}
 
+Since there are restrictions on the use of \texttt{/} in branch names, we
+prefer to use \texttt{-} to add hierarchy.
+
 To ease the developments and the organization, there are some already
 defined branches:
 \begin{description}
 \item[\texttt{master}] is the branch for the main latest developments in
   \Apfa;
-\item[\texttt{pips/gfc}] point the original developments of Raphaël in
-  \Agcc;
-\item[\texttt{gcc/4.4.1}] is the original \Agcc 4.4.1 core \& Fortran in
+\item[\texttt{pips-gfc+gcc}] point to a working \Apipsgfc implementation
+  of the Fortran 95 extension for \Apips in \texttt{package/pips-gfc};
+\item[\texttt{pips-gfc-4.4.1}] point the original developments of Raphaël
+  in \Agcc in \texttt{package/pips-gfc};
+\item[\texttt{gcc-4.4.1}] is the original \Agcc 4.4.1 core \& Fortran in
   \texttt{package/pips-gfc}
-\item[\texttt{gcc/4.4.2}] is the original \Agcc 4.4.2 core \& Fortran in
+\item[\texttt{gcc-4.4.2}] is the original \Agcc 4.4.2 core \& Fortran in
   \texttt{package/pips-gfc}
 \end{description}
 
