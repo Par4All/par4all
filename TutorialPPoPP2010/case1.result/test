@@ -64,7 +64,7 @@ void func1(int n, int m, float a[n][m], float b[n][m], float h)
 
 Proper effetcs for "main"
 
-void main()
+int main()
 {
    float a[10][10], b[10][10], h;
    int i, j;
@@ -100,7 +100,7 @@ Cumulated effetcs for "main"
 //                                  __IO_EFFECTS:LUNS[*]
 //               <may be written >: TOP-LEVEL:stderr[*] 
 //                                  __IO_EFFECTS:LUNS[*]
-void main()
+int main()
 {
    float a[10][10], b[10][10], h;
    int i, j;
@@ -161,7 +161,7 @@ void func1(int n, int m, float a[n][m], float b[n][m], float h)
       }
 }
 //  T() {}
-void main()
+int main()
 {
    float a[10][10], b[10][10], h;
    int i, j;
@@ -186,7 +186,7 @@ void main()
 Preconditions for "main"
 
 //  P() {}
-void main()
+int main()
 {
    float a[10][10], b[10][10], h;
    int i, j;
@@ -290,7 +290,7 @@ void func1(int n, int m, float a[n][m], float b[n][m], float h)
 //  <TOP-LEVEL:stderr[PHI1]-IN-MAY-{*SEMANTICS*:o#0==11}>
 //  <TOP-LEVEL:stderr-IN-EXACT-{}>
 
-void main()
+int main()
 {
    float a[10][10], b[10][10], h;
    int i, j;
@@ -356,7 +356,7 @@ void func1(int n, int m, float a[n][m], float b[n][m], float h)
          a[i][j] = b[i][j]*x;
       }
 }
-void main()
+int main()
 {
    float a[10][10], b[10][10], h;
    int i, j;
@@ -409,7 +409,7 @@ void func1(int n, int m, float a[n][m], float b[n][m], float h)
       }
 }
 //                                                                 3075 (SUMMARY)
-void main()
+int main()
 {
    float a[10][10], b[10][10], h;
    int i, j;
@@ -431,7 +431,7 @@ void main()
          fprintf(stderr, "a[%d] = %f \n", i, a[i][j]);
 }
 //  P() {}
-void main()
+int main()
 {
    float a[10][10], b[10][10], h;
    int i, j;

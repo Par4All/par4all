@@ -1,10 +1,10 @@
 
 Initial source code
 
-void loop_tiling01(int ni, int nj)
+void loop_tiling01(int n, int ni, int nj)
 {
    float x[n][n];
-   int i,  j;
+   int i, j;
 
 l1:
    for(i = 0; i <= ni-1; i += 1)
@@ -15,14 +15,12 @@ l2:
 
 Source code after loop tiling
 
-void loop_tiling01(int ni, int nj)
+void loop_tiling01(int n, int ni, int nj)
 {
    float x[n][n];
-   int i,  j;
+   int i, j;
    //PIPS generated variable
-   int i_t;
-   //PIPS generated variable
-   int j_t;
+   int i_t, j_t;
 
 l1:
    for(i_t = 0; i_t <= (-1+ni)/10; i_t += 1)

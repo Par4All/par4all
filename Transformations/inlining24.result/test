@@ -399,7 +399,23 @@ int main()
    //PIPS generated variable
    int _return0, _return1, _return2;
    //PIPS generated variable
-   freia_error ret_0, _return0_0, kernel_8c_0[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1}, kernel_6c_0[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1}, kernel_4c_0[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0}, i_0, ret_1, kernel_8c_1[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1}, kernel_6c_1[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1}, kernel_4c_1[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0}, i_1, ret_2, ret_3, _return0_1, kernel_8c_2[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1}, kernel_6c_2[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1}, kernel_4c_2[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0}, i_2, ret_4, kernel_8c_3[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1}, kernel_6c_3[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1}, kernel_4c_3[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0}, i_3, ret_5;
+   freia_error ret_0;
+   //PIPS generated variable
+   int _return0_0, kernel_8c_0[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1}, kernel_6c_0[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1}, kernel_4c_0[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0}, i_0;
+   //PIPS generated variable
+   freia_error ret_1;
+   //PIPS generated variable
+   int kernel_8c_1[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1}, kernel_6c_1[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1}, kernel_4c_1[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0}, i_1;
+   //PIPS generated variable
+   freia_error ret_2, ret_3;
+   //PIPS generated variable
+   int _return0_1, kernel_8c_2[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1}, kernel_6c_2[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1}, kernel_4c_2[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0}, i_2;
+   //PIPS generated variable
+   freia_error ret_4;
+   //PIPS generated variable
+   int kernel_8c_3[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1}, kernel_6c_3[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1}, kernel_4c_3[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0}, i_3;
+   //PIPS generated variable
+   freia_error ret_5;
    {
       {
          
@@ -554,7 +570,23 @@ int main()
    //PIPS generated variable
    int _return0, _return1, _return2;
    //PIPS generated variable
-   freia_error ret_0, _return0_0, kernel_8c_0[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1}, kernel_6c_0[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1}, kernel_4c_0[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0}, i_0, ret_1, kernel_8c_1[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1}, kernel_6c_1[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1}, kernel_4c_1[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0}, i_1, ret_2, ret_3, _return0_1, kernel_8c_2[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1}, kernel_6c_2[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1}, kernel_4c_2[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0}, i_2, ret_4, kernel_8c_3[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1}, kernel_6c_3[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1}, kernel_4c_3[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0}, i_3, ret_5;
+   freia_error ret_0;
+   //PIPS generated variable
+   int _return0_0, kernel_8c_0[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1}, kernel_6c_0[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1}, kernel_4c_0[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0}, i_0;
+   //PIPS generated variable
+   freia_error ret_1;
+   //PIPS generated variable
+   int kernel_8c_1[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1}, kernel_6c_1[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1}, kernel_4c_1[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0}, i_1;
+   //PIPS generated variable
+   freia_error ret_2, ret_3;
+   //PIPS generated variable
+   int _return0_1, kernel_8c_2[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1}, kernel_6c_2[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1}, kernel_4c_2[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0}, i_2;
+   //PIPS generated variable
+   freia_error ret_4;
+   //PIPS generated variable
+   int kernel_8c_3[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1}, kernel_6c_3[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1}, kernel_4c_3[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0}, i_3;
+   //PIPS generated variable
+   freia_error ret_5;
    {
       {
 
@@ -912,7 +944,23 @@ int main()
    //PIPS generated variable
    int _return0, _return1, _return2;
    //PIPS generated variable
-   freia_error ret_0, _return0_0, kernel_8c_0[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1}, kernel_6c_0[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1}, kernel_4c_0[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0}, i_0, ret_1, kernel_8c_1[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1}, kernel_6c_1[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1}, kernel_4c_1[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0}, i_1, ret_2, ret_3, _return0_1, kernel_8c_2[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1}, kernel_6c_2[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1}, kernel_4c_2[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0}, i_2, ret_4, kernel_8c_3[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1}, kernel_6c_3[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1}, kernel_4c_3[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0}, i_3, ret_5;
+   freia_error ret_0;
+   //PIPS generated variable
+   int _return0_0, kernel_8c_0[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1}, kernel_6c_0[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1}, kernel_4c_0[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0}, i_0;
+   //PIPS generated variable
+   freia_error ret_1;
+   //PIPS generated variable
+   int kernel_8c_1[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1}, kernel_6c_1[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1}, kernel_4c_1[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0}, i_1;
+   //PIPS generated variable
+   freia_error ret_2, ret_3;
+   //PIPS generated variable
+   int _return0_1, kernel_8c_2[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1}, kernel_6c_2[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1}, kernel_4c_2[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0}, i_2;
+   //PIPS generated variable
+   freia_error ret_4;
+   //PIPS generated variable
+   int kernel_8c_3[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1}, kernel_6c_3[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1}, kernel_4c_3[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0}, i_3;
+   //PIPS generated variable
+   freia_error ret_5;
    {
       {
          
@@ -1064,7 +1112,23 @@ int main()
    //PIPS generated variable
    int _return0, _return1, _return2;
    //PIPS generated variable
-   freia_error ret_0, _return0_0, kernel_8c_0[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1}, kernel_6c_0[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1}, kernel_4c_0[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0}, i_0, ret_1, kernel_8c_1[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1}, kernel_6c_1[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1}, kernel_4c_1[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0}, i_1, ret_2, ret_3, _return0_1, kernel_8c_2[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1}, kernel_6c_2[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1}, kernel_4c_2[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0}, i_2, ret_4, kernel_8c_3[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1}, kernel_6c_3[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1}, kernel_4c_3[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0}, i_3, ret_5;
+   freia_error ret_0;
+   //PIPS generated variable
+   int _return0_0, kernel_8c_0[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1}, kernel_6c_0[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1}, kernel_4c_0[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0}, i_0;
+   //PIPS generated variable
+   freia_error ret_1;
+   //PIPS generated variable
+   int kernel_8c_1[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1}, kernel_6c_1[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1}, kernel_4c_1[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0}, i_1;
+   //PIPS generated variable
+   freia_error ret_2, ret_3;
+   //PIPS generated variable
+   int _return0_1, kernel_8c_2[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1}, kernel_6c_2[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1}, kernel_4c_2[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0}, i_2;
+   //PIPS generated variable
+   freia_error ret_4;
+   //PIPS generated variable
+   int kernel_8c_3[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1}, kernel_6c_3[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1}, kernel_4c_3[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0}, i_3;
+   //PIPS generated variable
+   freia_error ret_5;
    {
       {
          
@@ -1167,7 +1231,39 @@ int main()
    //PIPS generated variable
    int _return0, _return1, _return2;
    //PIPS generated variable
-   freia_error ret_0, _return0_0, kernel_8c_0[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1}, kernel_6c_0[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1}, kernel_4c_0[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0}, i_0, ret_1, kernel_8c_1[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1}, kernel_6c_1[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1}, kernel_4c_1[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0}, i_1, ret_2, ret_3, _return0_1, kernel_8c_2[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1}, kernel_6c_2[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1}, kernel_4c_2[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0}, i_2, ret_4, kernel_8c_3[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1}, kernel_6c_3[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1}, kernel_4c_3[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0}, i_3, ret_5, ret_6, _return0_2, kernel_8c_4[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1}, kernel_6c_4[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1}, kernel_4c_4[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0}, i_4, ret_7, kernel_8c_5[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1}, kernel_6c_5[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1}, kernel_4c_5[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0}, i_5, ret_8, ret_9, _return0_3, kernel_8c_6[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1}, kernel_6c_6[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1}, kernel_4c_6[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0}, i_6, ret_10, kernel_8c_7[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1}, kernel_6c_7[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1}, kernel_4c_7[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0}, i_7, ret_11;
+   freia_error ret_0;
+   //PIPS generated variable
+   int _return0_0, kernel_8c_0[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1}, kernel_6c_0[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1}, kernel_4c_0[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0}, i_0;
+   //PIPS generated variable
+   freia_error ret_1;
+   //PIPS generated variable
+   int kernel_8c_1[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1}, kernel_6c_1[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1}, kernel_4c_1[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0}, i_1;
+   //PIPS generated variable
+   freia_error ret_2, ret_3;
+   //PIPS generated variable
+   int _return0_1, kernel_8c_2[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1}, kernel_6c_2[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1}, kernel_4c_2[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0}, i_2;
+   //PIPS generated variable
+   freia_error ret_4;
+   //PIPS generated variable
+   int kernel_8c_3[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1}, kernel_6c_3[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1}, kernel_4c_3[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0}, i_3;
+   //PIPS generated variable
+   freia_error ret_5, ret_6;
+   //PIPS generated variable
+   int _return0_2, kernel_8c_4[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1}, kernel_6c_4[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1}, kernel_4c_4[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0}, i_4;
+   //PIPS generated variable
+   freia_error ret_7;
+   //PIPS generated variable
+   int kernel_8c_5[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1}, kernel_6c_5[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1}, kernel_4c_5[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0}, i_5;
+   //PIPS generated variable
+   freia_error ret_8, ret_9;
+   //PIPS generated variable
+   int _return0_3, kernel_8c_6[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1}, kernel_6c_6[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1}, kernel_4c_6[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0}, i_6;
+   //PIPS generated variable
+   freia_error ret_10;
+   //PIPS generated variable
+   int kernel_8c_7[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1}, kernel_6c_7[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1}, kernel_4c_7[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0}, i_7;
+   //PIPS generated variable
+   freia_error ret_11;
    {
       {
          

@@ -5,21 +5,20 @@ Prettyprint the source as C, of course
 Select the most precise analysis:
 int main(int argc, char *argv[])
 {
-   int i;
-   int j;
+   int i, j;
 
-init_kernel:   for (i = 0;i<64;i++)                                                 /*0006*/
-      for (j = 0;j<64;j++)                                              /*0007*/
-         imagein_re[i][j] = 2*i;                                        /*0008*/
+init_kernel:   for (i = 0;i<64;i++)
+      for (j = 0;j<64;j++)
+         imagein_re[i][j] = 2*i;
 
-   for (i = 0;i<64;i++) {                                               /*0011*/
-      printf("Line %d:\n");                                             /*0012*/
-      for (j = 0;j<64;j++)                                              /*0013*/
-         printf("%d ", imagein_re[i][j]);                               /*0014*/
-      puts("\n");                                                       /*0016*/
+   for (i = 0;i<64;i++) {
+      printf("Line %d:\n");
+      for (j = 0;j<64;j++)
+         printf("%d ", imagein_re[i][j]);
+      puts("\n");
    }
 
-   return 0;                                                            /*0019*/
+   return 0;
 }
 
 //  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
@@ -31,36 +30,35 @@ init_kernel:   for (i = 0;i<64;i++)                                             
 
 int main(int argc, char *argv[])
 {
-   int i;
-   int j;
+   int i, j;
 
 init_kernel:
-   for(i = 0; i <= 63; i += 1)                                          /*0006*/
+   for(i = 0; i <= 63; i += 1)
 
 //  <TOP-LEVEL:imagein_re[PHI1][PHI2]-W-EXACT-{PHI1==i, 0<=PHI2,
 //    PHI2<=63, 0<=i, i<=63}>
 
-      for(j = 0; j <= 63; j += 1)                                       /*0007*/
+      for(j = 0; j <= 63; j += 1)
 
 //  <TOP-LEVEL:imagein_re[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==j, 0<=i,
 //    i<=63, 0<=j, j<=63}>
 
-         imagein_re[i][j] = 2*i;                                        /*0008*/
+         imagein_re[i][j] = 2*i;
 
-   for(i = 0; i <= 63; i += 1) {                                        /*0011*/
-      printf("Line %d:\n");                                             /*0012*/
-      for(j = 0; j <= 63; j += 1)                                       /*0013*/
+   for(i = 0; i <= 63; i += 1) {
+      printf("Line %d:\n");
+      for(j = 0; j <= 63; j += 1)
 
 //  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
 //  <TOP-LEVEL:imagein_re[PHI1][PHI2]-R-EXACT-{PHI1==i, PHI2==j, 0<=i,
 //    i<=63, 0<=j, j<=63}>
 
-         printf("%d ", imagein_re[i][j]);                               /*0014*/
-      puts("\n");                                                       /*0016*/
+         printf("%d ", imagein_re[i][j]);
+      puts("\n");
    }
 
-   return 0;                                                            /*0019*/
+   return 0;
 }
 
 //  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
@@ -72,36 +70,35 @@ init_kernel:
 
 int main(int argc, char *argv[])
 {
-   int i;
-   int j;
+   int i, j;
 
 init_kernel:
-   for(i = 0; i <= 63; i += 1)                                          /*0006*/
+   for(i = 0; i <= 63; i += 1)
 
 //  <TOP-LEVEL:imagein_re[PHI1][PHI2]-W-EXACT-{PHI1==i, 0<=PHI2,
 //    PHI2<=63, 0<=i, i<=63}>
 
-      for(j = 0; j <= 63; j += 1)                                       /*0007*/
+      for(j = 0; j <= 63; j += 1)
 
 //  <TOP-LEVEL:imagein_re[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==j, 0<=i,
 //    i<=63, 0<=j, j<=63}>
 
-         imagein_re[i][j] = 2*i;                                        /*0008*/
+         imagein_re[i][j] = 2*i;
 
-   for(i = 0; i <= 63; i += 1) {                                        /*0011*/
-      printf("Line %d:\n");                                             /*0012*/
-      for(j = 0; j <= 63; j += 1)                                       /*0013*/
+   for(i = 0; i <= 63; i += 1) {
+      printf("Line %d:\n");
+      for(j = 0; j <= 63; j += 1)
 
 //  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
 //  <TOP-LEVEL:imagein_re[PHI1][PHI2]-R-EXACT-{PHI1==i, PHI2==j, 0<=i,
 //    i<=63, 0<=j, j<=63}>
 
-         printf("%d ", imagein_re[i][j]);                               /*0014*/
-      puts("\n");                                                       /*0016*/
+         printf("%d ", imagein_re[i][j]);
+      puts("\n");
    }
 
-   return 0;                                                            /*0019*/
+   return 0;
 }
 The first loop nest must be parallel:
 
@@ -114,38 +111,37 @@ The first loop nest must be parallel:
 
 int main(int argc, char *argv[])
 {
-   int i;
-   int j;
+   int i, j;
 
 #pragma omp parallel for private(j)
 init_kernel:
-   for(i = 0; i <= 63; i += 1)                                          /*0006*/
+   for(i = 0; i <= 63; i += 1)
 
 //  <TOP-LEVEL:imagein_re[PHI1][PHI2]-W-EXACT-{PHI1==i, 0<=PHI2,
 //    PHI2<=63, 0<=i, i<=63}>
 
 #pragma omp parallel for 
-      for(j = 0; j <= 63; j += 1)                                       /*0007*/
+      for(j = 0; j <= 63; j += 1)
 
 //  <TOP-LEVEL:imagein_re[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==j, 0<=i,
 //    i<=63, 0<=j, j<=63}>
 
-         imagein_re[i][j] = 2*i;                                        /*0008*/
+         imagein_re[i][j] = 2*i;
 
-   for(i = 0; i <= 63; i += 1) {                                        /*0011*/
-      printf("Line %d:\n");                                             /*0012*/
-      for(j = 0; j <= 63; j += 1)                                       /*0013*/
+   for(i = 0; i <= 63; i += 1) {
+      printf("Line %d:\n");
+      for(j = 0; j <= 63; j += 1)
 
 //  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
 //  <TOP-LEVEL:imagein_re[PHI1][PHI2]-R-EXACT-{PHI1==i, PHI2==j, 0<=i,
 //    i<=63, 0<=j, j<=63}>
 
-         printf("%d ", imagein_re[i][j]);                               /*0014*/
-      puts("\n");                                                       /*0016*/
+         printf("%d ", imagein_re[i][j]);
+      puts("\n");
    }
 
-   return 0;                                                            /*0019*/
+   return 0;
 }
 
 //  <imagein_re[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1<=63, 0<=PHI2,
@@ -153,22 +149,25 @@ init_kernel:
 
 void init_kernel(float imagein_re[64][64])
 {
-   int i;
-   int j;
+   //PIPS generated variable
+   int i, j;
 
 init_kernel:
-   for(i = 0; i <= 63; i += 1)                                          /*0007*/
+   for(i = 0; i <= 63; i += 1)
 
 //  <imagein_re[PHI1][PHI2]-W-EXACT-{PHI1==i, 0<=PHI2, PHI2<=63, 0<=i,
 //    i<=63}>
 
-      for(j = 0; j <= 63; j += 1)                                       /*0008*/
+      for(j = 0; j <= 63; j += 1)
 
 //  <imagein_re[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==j, 0<=i, i<=63,
 //    0<=j, j<=63}>
 
-         imagein_re[i][j] = 2*i;                                        /*0009*/
+         imagein_re[i][j] = 2*i;
 }
+//
+//     This module was automatically generated by PIPS
+//
 void init_kernel(float imagein_re[64][64]);
 
 //  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
@@ -180,26 +179,26 @@ void init_kernel(float imagein_re[64][64]);
 
 int main(int argc, char *argv[])
 {
-   int i;
-   int j;
+   int i, j;
 
-init_kernel:   init_kernel(imagein_re);                                             /*0006*/
+init_kernel:   init_kernel(imagein_re);
 
-   for(i = 0; i <= 63; i += 1) {                                        /*0011*/
-      printf("Line %d:\n");                                             /*0012*/
-      for(j = 0; j <= 63; j += 1)                                       /*0013*/
+   for(i = 0; i <= 63; i += 1) {
+      printf("Line %d:\n");
+      for(j = 0; j <= 63; j += 1)
 
 //  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
 //  <TOP-LEVEL:imagein_re[PHI1][PHI2]-R-EXACT-{PHI1==i, PHI2==j, 0<=i,
 //    i<=63, 0<=j, j<=63}>
 
-         printf("%d ", imagein_re[i][j]);                               /*0014*/
-      puts("\n");                                                       /*0016*/
+         printf("%d ", imagein_re[i][j]);
+      puts("\n");
    }
 
-   return 0;                                                            /*0019*/
+   return 0;
 }
+
 float imagein_re[64][64];
 float imagein_im[64][64];
 extern int main(int argc, char *argv[]);
@@ -210,24 +209,27 @@ The loop nest of init_kernel should be parallel:
 
 void init_kernel(float imagein_re[64][64])
 {
-   int i;
-   int j;
+   //PIPS generated variable
+   int i, j;
 
 #pragma omp parallel for private(j)
 init_kernel:
-   for(i = 0; i <= 63; i += 1)                                          /*0007*/
+   for(i = 0; i <= 63; i += 1)
 
 //  <imagein_re[PHI1][PHI2]-W-EXACT-{PHI1==i, 0<=PHI2, PHI2<=63, 0<=i,
 //    i<=63}>
 
 #pragma omp parallel for 
-      for(j = 0; j <= 63; j += 1)                                       /*0008*/
+      for(j = 0; j <= 63; j += 1)
 
 //  <imagein_re[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==j, 0<=i, i<=63,
 //    0<=j, j<=63}>
 
-         imagein_re[i][j] = 2*i;                                        /*0009*/
+         imagein_re[i][j] = 2*i;
 }
+//
+//     This module was automatically generated by PIPS
+//
 void init_kernel(float imagein_re[64][64]);
 
 //  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
@@ -239,53 +241,53 @@ void init_kernel(float imagein_re[64][64]);
 
 int main(int argc, char *argv[])
 {
-   int i;
-   int j;
+   int i, j;
 
-init_kernel:   init_kernel(imagein_re);                                             /*0006*/
+init_kernel:   init_kernel(imagein_re);
 
-   for(i = 0; i <= 63; i += 1) {                                        /*0011*/
-      printf("Line %d:\n");                                             /*0012*/
-      for(j = 0; j <= 63; j += 1)                                       /*0013*/
+   for(i = 0; i <= 63; i += 1) {
+      printf("Line %d:\n");
+      for(j = 0; j <= 63; j += 1)
 
 //  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
 //  <TOP-LEVEL:imagein_re[PHI1][PHI2]-R-EXACT-{PHI1==i, PHI2==j, 0<=i,
 //    i<=63, 0<=j, j<=63}>
 
-         printf("%d ", imagein_re[i][j]);                               /*0014*/
-      puts("\n");                                                       /*0016*/
+         printf("%d ", imagein_re[i][j]);
+      puts("\n");
    }
 
-   return 0;                                                            /*0019*/
+   return 0;
 }
+
 float imagein_re[64][64];
 float imagein_im[64][64];
 extern int main(int argc, char *argv[]);
 void init_kernel(float imagein_re[64][64])
 {
-   int i;
-   int j;
+   //PIPS generated variable
+   int i, j;
 
 init_kernel:
-   forall(i = 0; i <= 63; i += 1)                                       /*0007*/
-      forall(j = 0; j <= 63; j += 1)                                    /*0008*/
+   forall(i = 0; i <= 63; i += 1)
+      forall(j = 0; j <= 63; j += 1)
+         imagein_re[i][j] = 2*i;
       PRIVATE j
-         imagein_re[i][j] = 2*i;                                        /*0009*/
 }
 int main(int argc, char *argv[])
 {
-   int i;
-   int j;
+   int i, j;
 
-init_kernel:   init_kernel(imagein_re);                                             /*0006*/
+init_kernel:   init_kernel(imagein_re);
 
-   for(i = 0; i <= 63; i += 1) {                                        /*0011*/
-      printf("Line %d:\n");                                             /*0012*/
-      for(j = 0; j <= 63; j += 1)                                       /*0013*/
-         printf("%d ", imagein_re[i][j]);                               /*0014*/
-      puts("\n");                                                       /*0016*/
+
+   for(i = 0; i <= 63; i += 1) {
+      printf("Line %d:\n");
+      for(j = 0; j <= 63; j += 1)
+         printf("%d ", imagein_re[i][j]);
+      puts("\n");
    }
 
-   return 0;                                                            /*0019*/
+   return 0;
 }

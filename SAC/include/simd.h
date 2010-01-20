@@ -4,6 +4,8 @@
 #define simd_mul(to,from1,from2) (to).v = (from1).v*(from2).v
 #define simd_add(to,from1,from2) (to).v = (from1).v+(from2).v
 #define simd_sub(to,from1,from2) (to).v = (from1).v-(from2).v
+#define simd_gt(to,from1,from2) (to).v = (from1).v < (from2).v
+#define simd_phi(to,from1,from2,from3) (to).v = (from1).v ? (from2.v) : (from3).v
 
 #define simd_load(to,from) memcpy(&(to.i),&(from),sizeof(to))
 #define simd_save(from,to) memcpy(&(to),&(from.i),sizeof(to))
@@ -32,6 +34,10 @@ typedef union{
         float v __attribute__ ((vector_size (sizeof(float)*4)));
         float i[4];
 } v4sf;
+typedef union{
+        int v __attribute__ ((vector_size (sizeof(int)*4)));
+        int i[4];
+} v4si;
 
 #define SIMD(l) SIMD_l
 
@@ -45,6 +51,11 @@ void SIMD(LOAD_V4HI)( v4hi vec, float* base)
     simd_load(vec,base);
 }
 
+void SIMD(LOAD_V4SI)( v4si vec, int* base)
+{
+    simd_load(vec,base);
+}
+
 void SIMD(LOAD_GENERIC_V4SF)(v4sf vec, float x1, float x2, float x3, float x4)
 {
     simd_load_generic(vec,x1,x2,x3,x4);
@@ -53,6 +64,16 @@ void SIMD(LOAD_GENERIC_V4SF)(v4sf vec, float x1, float x2, float x3, float x4)
 void SIMD(LOAD_GENERIC_V4HI)(v4hi vec, float x1, float x2, float x3, float x4)
 {
     simd_load_generic(vec,x1,x2,x3,x4);
+}
+
+void SIMD(LOAD_GENERIC_V4SI)(v4si vec, int x1, int x2, int x3, int x4)
+{
+    simd_load_generic(vec,x1,x2,x3,x4);
+}
+
+void SIMD(SAVE_V4SI)(v4si vec, int *dest)
+{
+    simd_save(vec,dest);
 }
 
 #define simd_load_constant_v4hi simd_load_generic
@@ -69,3 +90,4 @@ void SIMD(LOAD_GENERIC_V4HI)(v4hi vec, float x1, float x2, float x3, float x4)
 
 #define simd_subw  simd_sub
 #define simd_subps simd_sub
+
