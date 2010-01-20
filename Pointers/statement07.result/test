@@ -1,0 +1,29 @@
+int main()
+{
+   // BEGIN BLOCK
+   int *x, *a, i;
+//               <must be written>: i
+   i = 1;
+//               <must be written>: a
+   a = &i;
+//               <must be read   >: a
+//               <must be written>: x
+   x = a;
+
+   return 0;
+   // END BLOCK
+}
+POINTS TO
+int main()
+{
+   // BEGIN BLOCK
+   int *x, *a, i;
+   i = 1;
+   a = &i;
+//  points to = {(a,i,E)}
+   x = a;
+//  points to = {(x,i,E)(a,i,E)}
+
+   return 0;
+   // END BLOCK
+}
