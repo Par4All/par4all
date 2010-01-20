@@ -316,8 +316,19 @@ if you want to be modest about your gory hesitations \smiley{} and delete
 these branches).
 
 
-\subsection{Setting the infrastructure up}
+\subsection{Setting and running the infrastructure up}
 \label{sec:setup}
+
+For an everyday work there are these scripts:
+\begin{itemize}
+\item to pull everything at one for testing, this is done with the
+  \verb|p4a_pull_all|. It may useful to create a branch with a \texttt{git
+    checkout -b} before to test it, so the branch can be deleted for an
+  easy rollback;
+\item \verb|p4a_setup| is used to compile all the \Apfa infrastructure and
+  setting up many things. It should be used at least for the first
+  compilation.
+\end{itemize}
 
 Some scripts used to setup the infrastructure are located in
 \texttt{src/dev}, that should be used in this order:
@@ -334,9 +345,6 @@ Some scripts used to setup the infrastructure are located in
 \item \verb/p4a_apply_pips_patches/ is used to patch the original \Apips
   files to fit the \Apfa architecture. It should be used only once, after
   external \Agit import;
-\item \verb|src/dev/p4a_setup| is used to compile all the \Apfa
-  infrastructure and setting up many things. It should be used at least
-  for the first compilation.
 \end{itemize}
 
 

@@ -1,0 +1,10 @@
+#! /bin/sh
+
+# Script to pull remote git repositories into Par4All git.
+
+git pull --strategy=subtree CRI/linear master
+git pull --strategy=subtree CRI/newgen master
+git pull --strategy=subtree CRI/nlpmake master
+git pull --strategy=subtree CRI/pips master
+git pull --strategy=subtree CRI/validation master
+git pull --strategy=subtree polylib master
