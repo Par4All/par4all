@@ -39,6 +39,7 @@
 #include "genC.h"
 #include "properties.h"
 #include "misc.h"
+#include "top-level.h"
 #include "constants.h"
 
 #define TTRUE	10

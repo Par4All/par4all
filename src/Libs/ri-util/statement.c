@@ -2204,7 +2204,7 @@ static size_t nb_commenters=1;
 
 void push_generated_variable_commenter(string (*commenter)(entity))
 {
-    pips_assert("not exceeding stack commnters stack limited size\n",nb_commenters<MAX_COMMENTERS);
+    pips_assert("not exceeding stack commenters stack limited size\n",nb_commenters<MAX_COMMENTERS);
     generated_variable_commenters[nb_commenters++]=commenter;
 }
 void pop_generated_variable_commenter()
@@ -2214,7 +2214,11 @@ void pop_generated_variable_commenter()
 }
 string generated_variable_comment(entity e)
 {
-    return generated_variable_commenters[nb_commenters-1](e);
+    string tmp = generated_variable_commenters[nb_commenters-1](e);
+    string out;
+    asprintf(&out,"%s%s",c_module_p(get_current_module_entity())?"//":"C ",tmp);
+    free(tmp);
+    return out;
 }
 
 
@@ -2249,8 +2253,10 @@ statement add_declaration_statement(statement s, entity e)
         if(!ENDP(pl)) {
             /* SG: if CAR(pl) has same comment and same type as ds, merge them */
             statement spl = STATEMENT(CAR(pl));
+            string b1=basic_to_string(entity_basic(e)),
+                   b2=basic_to_string(entity_basic(ENTITY(CAR(statement_declarations(spl)))));
             if( comments_equal_p(statement_comments(spl),comment) &&
-                    basic_equal_p(entity_basic(e),entity_basic(ENTITY(CAR(statement_declarations(spl))))))
+                    same_string_p(b1,b2))
             {
                 free_statement(ds);
                 statement_declarations(spl)=gen_nconc(statement_declarations(spl),CONS(ENTITY,e,NIL));
@@ -2262,6 +2268,7 @@ statement add_declaration_statement(statement s, entity e)
                 CDR(pl) = NIL; // Truncate sl
                 nsl = gen_nconc(sl, CONS(STATEMENT, ds, cl));
             }
+            free(b1);free(b2);
         }
         else { // pl == NIL
             /* The new declaration is inserted before sl*/

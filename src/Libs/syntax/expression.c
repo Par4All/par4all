@@ -56,7 +56,7 @@ expression x;
     tp = (entity_type(e) != type_undefined) ? entity_type(e) : ImplicitType(e);
     entity_type(e) = make_type(is_type_functional, make_functional(NIL, tp));
     if(storage_undefined_p(entity_storage(e))) {
-	entity_storage(e) = MakeStorageRom();
+	entity_storage(e) = make_storage_rom();
     }
     else {
 	if(storage_ram_p(entity_storage(e))) {
@@ -223,7 +223,7 @@ int HasParenthesis;
 		    entity_type(e) = ImplicitType(e);
 		}
 		if (value_undefined_p(entity_initial(e))) {
-		    entity_initial(e) = MakeValueUnknown();
+		    entity_initial(e) = make_value_unknown();
 		}
 	    }
 	    else {

@@ -640,7 +640,7 @@ effect make_anywhere_effect(tag act)
       area a = make_area(0,NIL); /* Size and layout are unknown */
       type t = make_type_area(a);
       anywhere_ent = make_entity(strdup(ALL_MEMORY_ENTITY_NAME),
-				 t, MakeStorageRom(), MakeValueUnknown());
+				 t, make_storage_rom(), make_value_unknown());
     }
   
   anywhere_eff = (*reference_to_effect_func)

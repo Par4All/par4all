@@ -144,7 +144,7 @@ int un, sn;
 }
 
 
-void control_node_reorder(control c, set visited_control) {
+void control_node_reorder(__attribute__((unused)) control c,__attribute__((unused))  set visited_control) {
 }
 
 /* Reorder an unstructured

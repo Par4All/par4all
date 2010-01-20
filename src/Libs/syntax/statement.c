@@ -272,9 +272,9 @@ string s;
     if (entity_type(l) == type_undefined) {
 	debug(5, "MakeLabel", "%s\n", name);
 	entity_type(l) = MakeTypeStatement();
-	entity_storage(l) = MakeStorageRom();
+	entity_storage(l) = make_storage_rom();
 	entity_initial(l) = make_value(is_value_constant,
-				       MakeConstantLitteral());
+				       make_constant_litteral());
     }
     else {
 	debug(5, "MakeLabel", "%s already exists\n", name);
@@ -1783,9 +1783,10 @@ cons *lio;
 	else if (strcmp(entity_local_name(e1), "END=") == 0) {
 	  io_end = make_check_io_statement(IO_EOF_ARRAY_NAME, unit, e2);
 	}
-	else
+	else {
 	  //free_expression(unit);
 	  ;
+    }
       }
     }
   }

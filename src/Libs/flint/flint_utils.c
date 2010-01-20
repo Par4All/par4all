@@ -93,7 +93,7 @@ bool            size_of_dimension(d, the_int)
  */
 
 bool
-control_type_in_expression(int a_basic,
+control_type_in_expression(enum basic_utype a_basic,
 			   int __attribute__ ((unused)) a_dim,
 			   expression exp)
 {

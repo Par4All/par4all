@@ -123,8 +123,8 @@ void init_c_areas()
   //HeapArea = FindOrCreateEntity(compilation_unit_name, HEAP_AREA_LOCAL_NAME);
   HeapArea = FindOrCreateEntity(get_current_module_name(), HEAP_AREA_LOCAL_NAME);
   entity_type(HeapArea) = make_type(is_type_area, make_area(0, NIL));
-  entity_storage(HeapArea) = MakeStorageRom();
-  entity_initial(HeapArea) = MakeValueUnknown();
+  entity_storage(HeapArea) = make_storage_rom();
+  entity_initial(HeapArea) = make_value_unknown();
   AddEntityToDeclarations(HeapArea, get_current_module_entity());
 
   /* Create a hidden pointer in the heap area to modelize malloc and
@@ -158,8 +158,8 @@ void init_c_areas()
   // Dynamic variables whose size are not known are stored in Stack area
   StackArea = FindOrCreateEntity(get_current_module_name(), STACK_AREA_LOCAL_NAME);
   entity_type(StackArea) = make_type(is_type_area, make_area(0, NIL));
-  entity_storage(StackArea) = MakeStorageRom();
-  entity_initial(StackArea) = MakeValueUnknown();
+  entity_storage(StackArea) = make_storage_rom();
+  entity_initial(StackArea) = make_value_unknown();
   AddEntityToDeclarations(StackArea, get_current_module_entity());
 
   entity msae = FindOrCreateEntity(compilation_unit_name,  STATIC_AREA_LOCAL_NAME);
@@ -2146,7 +2146,7 @@ void UpdateEntity(entity e, stack ContextStack, stack FormalStack, stack Functio
       CParserError("Name conflict between a "
 		   "function and an intrinsic\n");
     }
-    entity_storage(e) = MakeStorageRom();
+    entity_storage(e) = make_storage_rom();
   }
   else
     pips_assert("not implemented yet", FALSE);

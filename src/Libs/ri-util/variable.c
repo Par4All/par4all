@@ -714,7 +714,7 @@ char *module_name;
 					     NIL)));
 
   entity_initial(e) = make_value(is_value_constant,
-				 MakeConstantLitteral());
+				 make_constant_litteral());
 
   debug(8,"make_scalar_integer_entity", "end\n");
 
@@ -965,7 +965,7 @@ entity make_integer_constant_entity(_int c) {
 				make_variable(make_basic(is_basic_int, (void*)sizeof(int)),
 					      NIL,NIL)));
     type ct = make_type(is_type_functional, cf);
-    ce = make_entity(strdup(cn), ct, MakeStorageRom(),
+    ce = make_entity(strdup(cn), ct, make_storage_rom(),
 		     make_value(is_value_constant,
 				make_constant(is_constant_int, (void*)c)));
   }

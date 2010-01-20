@@ -328,7 +328,7 @@ Character constants are typed as int.
     }
 
     entity_type(e) = make_type(is_type_functional, fe);
-    entity_storage(e) = MakeStorageRom();
+    entity_storage(e) = make_storage_rom();
     entity_initial(e) = make_value(is_value_constant, ce);
   }
   return(e);

@@ -122,7 +122,7 @@ find_operator(entity module, string oper, string str )
 				       make_functional(NIL,
 						       make_type(is_type_void,
 								 UU))),
-			     MakeStorageRom(),
+			     make_storage_rom(),
 			     make_value(is_value_unknown,NIL));
     return(operator);
 }

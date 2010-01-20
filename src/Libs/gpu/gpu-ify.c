@@ -20,6 +20,7 @@
 #include "transformations.h"
 #include "resources.h"
 #include "properties.h"
+#include "bootstrap.h"
 
 /** Store the loop nests found that meet the spec to be executed on a
     GPU. Use a list and not a set or hash_map to have always the same
@@ -27,6 +28,7 @@
 list loop_nests_to_outline;
 
 
+#if 0
 /* Get the intrinsic function to get iteration coordinate
 
    @param coordinate is the coordinate number (0, 1...)
@@ -43,6 +45,7 @@ static entity get_coordinate_intrinsic(int coordinate) {
   free(coord_name);
   return  coord_intrinsic;
 }
+#endif
 
 
 static bool
@@ -158,7 +161,7 @@ user error in rmake: recursion on resource SUMMARY_EFFECTS of p4a_kernel_wrapper
       asprintf(&intrinsic_name,
 	       get_string_property("GPU_COORDINATE_INTRINSICS_FORMAT"),
 	       i);
-      asprintf(&comment, "// To be replaced with a call to %s", intrinsic_name);
+      asprintf(&comment, "%s To be replaced with a call to %s",c_module_p(get_current_module_entity())?"//":"C", intrinsic_name);
       free(intrinsic_name);
       put_a_comment_on_a_statement(assign, comment);
 
@@ -181,7 +184,7 @@ user error in rmake: recursion on resource SUMMARY_EFFECTS of p4a_kernel_wrapper
 }
 
 
-bool gpu_ify(const char * module_name) {
+bool gpu_ify(const string module_name) {
   // Use this module name and this environment variable to set
   statement module_statement = PIPS_PHASE_PRELUDE(module_name,
 						  "GPU_IFY_DEBUG_LEVEL");

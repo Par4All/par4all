@@ -125,7 +125,7 @@ static void set_parser_recursive_call()
 
 bool InParserError = FALSE;
 
-bool ParserError(char * f, char * m)
+bool ParserError(const char * f, char * m)
 {
     entity mod = get_current_module_entity();
 

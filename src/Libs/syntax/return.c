@@ -130,7 +130,7 @@ static entity GetFullyDefinedReturnCodeVariable()
 			    add_variable_to_area(a, rc),
 			    NIL));
 
-    entity_initial(rc) = MakeValueUnknown();
+    entity_initial(rc) = make_value_unknown();
   }
 
   pips_assert("rc is defined", !entity_undefined_p(rc));

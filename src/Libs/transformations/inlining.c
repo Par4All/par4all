@@ -1213,6 +1213,11 @@ statement outliner(string outline_module_name, list statements_to_outline)
             /* this adds the effective parameter */
             effective_parameters=CONS(EXPRESSION,entity_to_expression(e),effective_parameters);
         }
+        /* this is a constant variable */
+        else if(entity_constant_p(e)) {
+            AddLocalEntityToDeclarations(e,new_fun,body);
+        }
+
     }
     formal_parameters=gen_nreverse(formal_parameters);
     effective_parameters=gen_nreverse(effective_parameters);
@@ -1279,7 +1284,7 @@ statement outliner(string outline_module_name, list statements_to_outline)
     /* we can now begin the outlining */
     bool saved = get_bool_property(STAT_ORDER);
     set_bool_property(STAT_ORDER,false);
-    text t = text_named_module(new_fun, get_current_module_entity(), body);
+    text t = text_named_module(new_fun, new_fun /*get_current_module_entity()*/, body);
     add_new_module_from_text(outline_module_name, t, fortran_module_p(get_current_module_entity()));
     set_bool_property(STAT_ORDER,saved);
 	/* horrible hack to prevent declaration duplication 
@@ -1287,6 +1292,13 @@ statement outliner(string outline_module_name, list statements_to_outline)
 	 */
 	gen_free_list(code_declarations(EntityCode(new_fun)));
 	code_declarations(EntityCode(new_fun))=NIL;
+    FOREACH(PARAMETER,p,formal_parameters) {
+        entity e = dummy_identifier(parameter_dummy(p));
+        if(entity_variable_p(e)) {
+            free_type(entity_type(e));
+            entity_type(e)=type_undefined;
+        }
+    }
 
 
     /* and return the replacement statement */

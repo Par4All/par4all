@@ -694,7 +694,7 @@ list lis;
 			  (add_variable_to_area(a, e)):(0),
 			  NIL));
   entity_initial(e) = make_value(is_value_constant,
-				 MakeConstantLitteral());
+				 make_constant_litteral());
   return(e);
 }
 

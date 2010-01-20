@@ -440,7 +440,7 @@ static void davinci_print_control_nodes(list l, string msg)
   list sl = gen_copy_seq(l);
 
   free(dn);
-  gen_sort_list(sl, control_cons_compare);
+  gen_sort_list(sl, (gen_cmp_func_t)control_cons_compare);
   
   fprintf(f, "[\n");
   fprintf(f, "l(\"%s\",n(\"\",[a(\"_GO\",\"text\"),a(\"OBJECT\",\"%s\\nSerial number for module %s: %d\\nEntry node: double border\\nExit node: red\\nCycles: bold italic\\nTrue arc: green\\nFalse arc: red\")],\n\t[])),\n",
@@ -493,7 +493,7 @@ static void davinci_print_non_deterministic_unstructured
   
   sl = gen_copy_seq(l);
 
-  gen_sort_list(sl, control_cons_compare);
+  gen_sort_list(sl,(gen_cmp_func_t) control_cons_compare);
   
   fprintf(f, "[\n");
   fprintf(f, "l(\"%s\",n(\"\",[a(\"_GO\",\"text\"),a(\"OBJECT\",\"%s\\nSerial number for module %s: %d\\nEntry node: double border\\nExit node: red\\nCycles: bold italic\\nTrue arc: green\\nFalse arc: red\")],\n\t[])),\n",

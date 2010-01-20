@@ -202,10 +202,11 @@ string get_current_C_comment()
       /* Remove the trailing new-line if any since the RI is already
 	 line-oriented at the comment level: This is already done above. */
       char * last_newline = strrchr(cc, '\n');
-      if (last_newline != NULL && last_newline[1] == '\0')
+      if (last_newline != NULL && last_newline[1] == '\0') {
 	/* It is a trailing new-line: just get rid of it: */
 	//last_newline[0] = '\0';
 	;
+}
     }
   }
   /* pips_debug(3, "get_current_C_comment comment \"%s\"\n",

@@ -111,7 +111,7 @@ static entity make_empty_module(string full_name,
     (strdup(full_name),
      make_type(is_type_functional,
 	       make_functional(NIL, r)),
-     MakeStorageRom(),
+     make_storage_rom(),
      make_value(is_value_code,
 		make_code(NIL, strdup(""), make_sequence(NIL),NIL,
 			  make_language_unknown())));
@@ -119,26 +119,26 @@ static entity make_empty_module(string full_name,
   name = module_local_name(e);
   DynamicArea = FindOrCreateEntity(name, DYNAMIC_AREA_LOCAL_NAME);
   entity_type(DynamicArea) = make_type_area(make_area(0, NIL));
-  entity_storage(DynamicArea) = MakeStorageRom();
-  entity_initial(DynamicArea) = MakeValueUnknown();
+  entity_storage(DynamicArea) = make_storage_rom();
+  entity_initial(DynamicArea) = make_value_unknown();
   AddEntityToDeclarations(DynamicArea, e);
 
   StaticArea = FindOrCreateEntity(name, STATIC_AREA_LOCAL_NAME);
   entity_type(StaticArea) = make_type_area(make_area(0, NIL));
-  entity_storage(StaticArea) = MakeStorageRom();
-  entity_initial(StaticArea) = MakeValueUnknown();
+  entity_storage(StaticArea) = make_storage_rom();
+  entity_initial(StaticArea) = make_value_unknown();
   AddEntityToDeclarations(StaticArea, e);
 
   StackArea = FindOrCreateEntity(name, STACK_AREA_LOCAL_NAME);
   entity_type(StackArea) = make_type_area(make_area(0, NIL));
-  entity_storage(StackArea) = MakeStorageRom();
-  entity_initial(StackArea) = MakeValueUnknown();
+  entity_storage(StackArea) = make_storage_rom();
+  entity_initial(StackArea) = make_value_unknown();
   AddEntityToDeclarations(StackArea, e);
 
   HeapArea = FindOrCreateEntity(name, HEAP_AREA_LOCAL_NAME);
   entity_type(HeapArea) = make_type_area(make_area(0, NIL));
-  entity_storage(HeapArea) = MakeStorageRom();
-  entity_initial(HeapArea) = MakeValueUnknown();
+  entity_storage(HeapArea) = make_storage_rom();
+  entity_initial(HeapArea) = make_value_unknown();
   AddEntityToDeclarations(HeapArea, e);
 
   return(e);
@@ -189,9 +189,9 @@ entity make_label(string strg)
   entity l = find_or_create_entity(strg);
   if( type_undefined_p(entity_type(l)) ) {
     entity_type(l) = (type) MakeTypeStatement();
-    entity_storage(l) = (storage) MakeStorageRom();
+    entity_storage(l) = (storage) make_storage_rom();
     entity_initial(l) = make_value(is_value_constant,
-				   MakeConstantLitteral());
+				   make_constant_litteral());
   }
   return l;
 }
@@ -1002,22 +1002,8 @@ string name;
 }
 */
 
-constant MakeConstantLitteral(void)
-{
-  return(make_constant(is_constant_litteral, NIL));
-}
-
-storage MakeStorageRom(void)
-{
-  return((make_storage(is_storage_rom, UU)));
-}
 
 /* END_EOLE */
-
-value MakeValueUnknown(void)
-{
-  return(make_value(is_value_unknown, NIL));
-}
 
 /* returns a range expression containing e's i-th bounds */
 expression entity_ith_bounds(entity e, int i)

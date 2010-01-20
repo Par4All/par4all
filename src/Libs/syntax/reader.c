@@ -271,7 +271,7 @@ static int iLine = 0, lLine = 0;
 
 void append_data_current_stmt_buffer_to_declarations(void)
 {
-    int i=0, j=0, column=6;
+    size_t i=0, j=0, column=6;
     char * tmp = (char*) malloc(lStmt+200), * ndecls, * odecls;
     code c = EntityCode(get_current_module_entity());
 
@@ -555,6 +555,7 @@ PipsGetc(FILE * fp)
     int eof = FALSE;
     int c;
 
+    /* SG: UNDEF negative and iStmt of type size_t ...*/
     if (iStmt == UNDEF || iStmt >= lStmt) {
 	/*
 	 * le statement est vide. On lit et traite le suivant.

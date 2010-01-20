@@ -262,7 +262,7 @@ print_sentence(FILE * fd,
 
 	/* statement line number starts at different column depending on */
 	/* the used language : C or fortran                              */
-	unsigned int column_start = 0;
+	size_t column_start = 0;
 	if (prettyprint_is_fortran) {
 	  /* fortran case */
 	  column_start = MAX_END_COLUMN;
@@ -275,7 +275,7 @@ print_sentence(FILE * fd,
 	/* Output the statement line number on the right end of the
            line: */
 	if (n > 0 && get_bool_property("PRETTYPRINT_STATEMENT_NUMBER")) {
-	    for (i = col; i <= column_start; i++)
+	    for (size_t i = col; i <= column_start; i++)
 		putc_sentence(' ', fd);
 	    fprintf_sentence(fd,  prettyprint_is_fortran? "%04d" : "/*%04d*/", n);
 	}
@@ -369,7 +369,7 @@ static void debug_word(string w)
 void
 debug_words(list /* of string */ l)
 {
-    gen_map(debug_word, l);
+    gen_map((gen_iter_func_t)debug_word, l);
 }
 
 static void
@@ -408,6 +408,6 @@ void debug_sentence(sentence s)
 void debug_text(text t)
 {
     fprintf(stderr, "# text\n");
-    gen_map(debug_sentence, text_sentences(t));
+    gen_map((gen_iter_func_t)debug_sentence, text_sentences(t));
     fprintf(stderr,"# end text\n");
 }

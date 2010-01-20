@@ -623,7 +623,7 @@ c_parser_context GetContextCopy()
 %type <entity> old_proto_decl direct_old_proto_decl
 
  /* For now, pass pragmas as strings and list of strings: */
-%type <liste> pragma
+%type <string> pragma
 %type <liste> pragmas
 
 %%
@@ -1418,8 +1418,7 @@ pragma { /* To  No pragma... The common case, return the empty list */
 }
 | pragma pragmas {
   /* Concatenate the pragma to the list of pragmas */
-  CDR($1) = $2;
-  $$ = $1;
+  $$ = CONS(STRING,$1,$2);
 }
 ;
 
@@ -2200,7 +2199,7 @@ type_spec:   /* ISO 6.7.2 */
 			  entity ent = MakeDerivedEntity(s,$4,is_external,is_type_union);
 			  variable v = make_variable(make_basic_derived(ent),NIL,NIL);
 			  /* Take from $4 the struct/union entities */
-			  list le = TakeDerivedEntities($4);
+			  (void)TakeDerivedEntities($4);
 			  //$$ = gen_nconc(le,CONS(ENTITY,ent,NIL));
 			  //$$ = CONS(ENTITY,ent,le);
 			  $$ = CONS(ENTITY,ent,NIL);

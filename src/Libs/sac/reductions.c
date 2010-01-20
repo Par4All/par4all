@@ -74,7 +74,7 @@ entity make_float_constant_entity(float c)
                         make_variable(make_basic(is_basic_float, (void*)sizeof(float)),
                             NIL,NIL)));
         type ct = make_type(is_type_functional, cf);
-        ce = make_entity(strdup(cn), ct, MakeStorageRom(),
+        ce = make_entity(strdup(cn), ct, make_storage_rom(),
                 make_value(is_value_constant, 
                     make_constant(is_constant_litteral, NULL)));
     }

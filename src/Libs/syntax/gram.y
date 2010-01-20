@@ -1257,7 +1257,7 @@ lg_fortran_type:
 	    }
 	| TK_STAR TK_LPAR TK_STAR TK_RPAR /* CHARACTER *(*) */
 	    {
-		    $$ = MakeValueUnknown();
+		    $$ = make_value_unknown();
 	    }
 	| TK_STAR TK_LPAR expression TK_RPAR
 	    {

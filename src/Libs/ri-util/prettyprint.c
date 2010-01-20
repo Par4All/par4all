@@ -190,7 +190,6 @@ void close_prettyprint()
     text_statement_hook = empty_text;
 }
 
-
 /* Can this statement be printed on one line, without enclosing braces? */
 bool one_liner_p(statement s)
 {
@@ -3256,15 +3255,15 @@ text text_statement_enclosed(entity module,
     comments = strdup("");
   }
   else if(declaration_statement_p(stmt)) {
-    /* LF interspersed within C struct or union or initialization
-       declarations may damage the user comment. However, there is no
-       way no know if the LF are valid because thay are located
-       between two statements or invalid because they are located
-       within one statement. The information is lost by the lexer and
-       the parser. */
-    //comments = string_strip_final_linefeeds(strdup(i_comments));
-    //comments = string_fuse_final_linefeeds(strdup(i_comments));
-    comments = strdup(i_comments);
+      /* LF interspersed within C struct or union or initialization
+         declarations may damage the user comment. However, there is no
+         way no know if the LF are valid because thay are located
+         between two statements or invalid because they are located
+         within one statement. The information is lost by the lexer and
+         the parser. */
+      //comments = string_strip_final_linefeeds(strdup(i_comments));
+      //comments = string_fuse_final_linefeeds(strdup(i_comments));
+      comments = strdup(i_comments);
   }
   else {
     comments = strdup(i_comments);

@@ -4795,9 +4795,9 @@ bootstrap(string workspace)
                                         LABEL_PREFIX,
                                         NULL)),
                      MakeTypeStatement(),
-                     MakeStorageRom(),
+                     make_storage_rom(),
                      make_value(is_value_constant,
-                                MakeConstantLitteral()));
+                                make_constant_litteral()));
 
   /* FI: I suppress the owner filed to make the database moveable */
   /* FC: the content must be consistent with pipsdbm/methods.h */

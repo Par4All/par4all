@@ -293,6 +293,8 @@ static string c_basic_string(basic b)
                 allocated=true;
                 break;
             }
+        default:
+            pips_internal_error("unhandled case\n");
     }
     return allocated ? result : strdup(result);
 }
@@ -358,7 +360,7 @@ static string c_dim_string(list ldim)
 static string c_qualifier_string(list l)
 {
     string result="";
-    MAP(QUALIFIER,q,
+    FOREACH(QUALIFIER,q,l)
     {
         switch (qualifier_tag(q)) {
             case is_qualifier_register:
@@ -373,8 +375,11 @@ static string c_qualifier_string(list l)
             case is_qualifier_volatile:
                 result = concatenate(result,"volatile ",NULL);
                 break;
+            case is_qualifier_auto:
+                result = concatenate(result,"auto ",NULL);
+                break;
         }
-    },l);
+    }
     return strdup(result);
 }
 

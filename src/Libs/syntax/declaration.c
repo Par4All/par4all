@@ -95,29 +95,29 @@ InitAreas()
 {
     DynamicArea = FindOrCreateEntity(CurrentPackage, DYNAMIC_AREA_LOCAL_NAME);
     entity_type(DynamicArea) = make_type(is_type_area, make_area(0, NIL));
-    entity_storage(DynamicArea) = MakeStorageRom();
-    entity_initial(DynamicArea) = MakeValueUnknown();
+    entity_storage(DynamicArea) = make_storage_rom();
+    entity_initial(DynamicArea) = make_value_unknown();
     AddEntityToDeclarations(DynamicArea, get_current_module_entity());
     set_common_to_size(DynamicArea, 0);
 
     StaticArea = FindOrCreateEntity(CurrentPackage, STATIC_AREA_LOCAL_NAME);
     entity_type(StaticArea) = make_type(is_type_area, make_area(0, NIL));
-    entity_storage(StaticArea) = MakeStorageRom();
-    entity_initial(StaticArea) = MakeValueUnknown();
+    entity_storage(StaticArea) = make_storage_rom();
+    entity_initial(StaticArea) = make_value_unknown();
     AddEntityToDeclarations(StaticArea, get_current_module_entity());
     set_common_to_size(StaticArea, 0);
 
     HeapArea = FindOrCreateEntity(CurrentPackage, HEAP_AREA_LOCAL_NAME);
     entity_type(HeapArea) = make_type(is_type_area, make_area(0, NIL));
-    entity_storage(HeapArea) = MakeStorageRom();
-    entity_initial(HeapArea) = MakeValueUnknown();
+    entity_storage(HeapArea) = make_storage_rom();
+    entity_initial(HeapArea) = make_value_unknown();
     AddEntityToDeclarations(HeapArea, get_current_module_entity());
     set_common_to_size(HeapArea, 0);
 
     StackArea = FindOrCreateEntity(CurrentPackage, STACK_AREA_LOCAL_NAME);
     entity_type(StackArea) = make_type(is_type_area, make_area(0, NIL));
-    entity_storage(StackArea) = MakeStorageRom();
-    entity_initial(StackArea) = MakeValueUnknown();
+    entity_storage(StackArea) = make_storage_rom();
+    entity_initial(StackArea) = make_value_unknown();
     AddEntityToDeclarations(StackArea, get_current_module_entity());
     set_common_to_size(StackArea, 0);
 }
@@ -846,7 +846,7 @@ DeclareVariable(
 
   if (v == value_undefined) {
     if (entity_initial(e) == value_undefined) {
-      entity_initial(e) = MakeValueUnknown();
+      entity_initial(e) = make_value_unknown();
     }
   }
   else {
@@ -981,7 +981,7 @@ common_to_defined_size_p(entity a)
     return defined;
 }
 
-int
+size_t
 common_to_size(entity a)
 {
     size_t size;
@@ -1221,37 +1221,37 @@ update_common_sizes()
 
     sort_list_of_entities(commons);
 
-    MAP(ENTITY, c, {
-	int s = common_to_size(c);
-	type tc = entity_type(c);
-	area ac = type_area(tc);
+    FOREACH(ENTITY, c, commons)
+    {
+        intptr_t s = common_to_size(c);
+        type tc = entity_type(c);
+        area ac = type_area(tc);
 
-	pips_assert("update_common_sizes", s != (size_t) HASH_UNDEFINED_VALUE);
+        pips_assert("update_common_sizes", s != (intptr_t) HASH_UNDEFINED_VALUE);
 
-	if(area_size(ac) == 0) {
-	    area_size(ac) = s;
-	    debug(1, "update_common_sizes",
-		  "set size %zd for common %s\n", s, entity_name(c));
-	}
-	else if (area_size(ac) != s) {
-	    /* I'm afraid this warning might be printed because area_size is given
-	     * a wrong value by CurrentOffsetOfArea().
-	     */
-	    user_warning("update_common_sizes",
-			 "inconsistent size (%d and %d) for common /%s/ in %s\n"
-			 "Best results are obtained if all instances of a "
-			 "COMMON are declared the same way.\n",
-			 area_size(ac), s, module_local_name(c), 
-			 CurrentPackage);
-	    if(area_size(ac) < s)
-		area_size(ac) = s;
-	}
-	else {
-	    debug(1, "update_common_sizes",
-		       "reset size %d for common %s\n", s, entity_name(c));
-	}
-    },
-	     commons);
+        if(area_size(ac) == 0) {
+            area_size(ac) = s;
+            debug(1, "update_common_sizes",
+                    "set size %zd for common %s\n", s, entity_name(c));
+        }
+        else if (area_size(ac) != s) {
+            /* I'm afraid this warning might be printed because area_size is given
+             * a wrong value by CurrentOffsetOfArea().
+             */
+            user_warning("update_common_sizes",
+                    "inconsistent size (%d and %d) for common /%s/ in %s\n"
+                    "Best results are obtained if all instances of a "
+                    "COMMON are declared the same way.\n",
+                    area_size(ac), s, module_local_name(c), 
+                    CurrentPackage);
+            if(area_size(ac) < s)
+                area_size(ac) = s;
+        }
+        else {
+            debug(1, "update_common_sizes",
+                    "reset size %d for common %s\n", s, entity_name(c));
+        }
+    }
     /* Postpone the resetting because DynamicArea is updated till the EndOfProcedure() */
     /* reset_common_size_map(); */
 
@@ -1381,18 +1381,18 @@ implicit_type_p(entity e)
 
     b = variable_basic(type_variable(t));
 
-    if(basic_tag(b) != tag_implicit[i])
+    if((tag)basic_tag(b) != tag_implicit[i])
 	return FALSE;
 
     switch(basic_tag(b)) {
-	case is_basic_int: return basic_int(b)==int_implicit[i];
-	case is_basic_float: return basic_float(b)==int_implicit[i];
-	case is_basic_logical: return basic_logical(b)==int_implicit[i];
-	case is_basic_complex: return basic_complex(b)==int_implicit[i];
+	case is_basic_int: return (size_t)basic_int(b)==int_implicit[i];
+	case is_basic_float: return (size_t)basic_float(b)==int_implicit[i];
+	case is_basic_logical: return (size_t)basic_logical(b)==int_implicit[i];
+	case is_basic_complex: return (size_t)basic_complex(b)==int_implicit[i];
 	case is_basic_overloaded:
 	    pips_internal_error("unexpected overloaded basic tag\n");
 	case is_basic_string: 
-	    return constant_int(value_constant(basic_string(b)))==
+	    return (size_t)constant_int(value_constant(basic_string(b)))==
 		int_implicit[i];
 	default:
 	    pips_internal_error("illegal basic tag\n");

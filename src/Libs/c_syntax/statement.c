@@ -285,9 +285,9 @@ entity MakeCLabel(string s)
     {
       pips_debug(7,"Label %s\n", s);
       entity_type(l) = MakeTypeStatement();
-      entity_storage(l) = MakeStorageRom();
+      entity_storage(l) = make_storage_rom();
       entity_initial(l) = make_value(is_value_constant,
-				     MakeConstantLitteral());
+				     make_constant_litteral());
     }
   else
     pips_debug(7, "Label %s already exists\n", s);

@@ -196,7 +196,7 @@ entity create_new_common_variable(string name, entity module, entity common, var
 					      name,NULL));
   type var_type = make_type(is_type_variable, var);
   storage var_storage = storage_undefined;
-  value var_value = MakeValueUnknown();
+  value var_value = make_value_unknown();
   entity e = make_entity(var_global_name,var_type,var_storage,var_value);
   list old_layout = area_layout(type_area(entity_type(common)));
   old_size = area_size(type_area(entity_type(common)));

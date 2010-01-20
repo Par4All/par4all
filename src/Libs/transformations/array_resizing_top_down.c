@@ -217,7 +217,7 @@ entity make_new_integer_scalar_common_variable(string name, entity mod, entity c
   type var_type = make_type(is_type_variable, make_variable(make_basic_int(8), NIL,NIL));
   storage var_storage = make_storage(is_storage_ram,
 				     (make_ram(mod,com,0,NIL)));
-  value var_value = MakeValueUnknown();
+  value var_value = make_value_unknown();
   entity e = make_entity(var_global_name,var_type,var_storage,var_value);
   //area_layout(type_area(entity_type(com))) = CONS(ENTITY,e,NIL);
   return e;

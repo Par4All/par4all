@@ -66,7 +66,7 @@ syntax s;
   switch (syntax_tag(s)) {
   case is_syntax_reference:
   case is_syntax_range:
-    v = MakeValueUnknown();
+    v = make_value_unknown();
     break;
   case is_syntax_call:
     v = EvalCall((syntax_call(s)));
@@ -76,7 +76,7 @@ syntax s;
   case is_syntax_subscript:
   case is_syntax_application:
   case is_syntax_va_arg:
-    v = MakeValueUnknown();
+    v = make_value_unknown();
     break;
   default:
     ParserError("EvalExpression", "cas default\n");
@@ -114,7 +114,7 @@ call c;
 		vout = EvalIntrinsic(f, call_arguments(c));
 		break;
 	    case is_value_code:
-		vout = MakeValueUnknown();
+		vout = make_value_unknown();
 		break;
 	    default:
 		ParserError("EvalCall", "case default\n");
@@ -157,7 +157,7 @@ cons *la;
     else if ((token = IsBinaryOperator(e)) > 0)
 	    v = EvalBinaryOp(token, la);
     else
-	    v = MakeValueUnknown();
+	    v = make_value_unknown();
 
     return(v);
 }
@@ -184,7 +184,7 @@ cons *la;
 	}
 	else {
 		gen_free(v);
-		vout = MakeValueUnknown();
+		vout = make_value_unknown();
 	}
 
 	return(vout);
@@ -236,13 +236,13 @@ cons *la;
 		constant_int(value_constant(v)) = ipow(argl,argr);
 	else {
 	    gen_free(v);
-	    v = MakeValueUnknown();
+	    v = make_value_unknown();
 	}
 	break;
       default:
 	debug(9, "EvalBinaryOp", "pas encore d'evaluation\n");
 	gen_free(v);
-	v = MakeValueUnknown();
+	v = make_value_unknown();
     }
 
     return(v);

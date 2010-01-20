@@ -263,7 +263,7 @@ int ls;
 	entity_type(esv) = MakeTypeVariable((basic) gen_copy_tree(bv), NIL);
     }
 
-    entity_initial(esv) = MakeValueUnknown();
+    entity_initial(esv) = make_value_unknown();
 
     a = global_name_to_entity(module_local_name(memory_module), 
 			      DYNAMIC_AREA_LOCAL_NAME);

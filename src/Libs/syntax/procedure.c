@@ -1361,7 +1361,7 @@ void MakeCurrentFunction(type t,
     entity_type(cf) = make_type(is_type_functional, make_functional(NIL, t));
 
     /* a function has a rom storage */
-    entity_storage(cf) = MakeStorageRom();
+    entity_storage(cf) = make_storage_rom();
 
     /* a function has an initial value 'code' that contains an empty block */
     icf = MakeEmptyInstructionBlock();
@@ -1747,7 +1747,7 @@ instruction MakeEntry(
 
     /* This depends on what has been done in LocalToGlobal and SafeLocalToGlobal */
     if(storage_undefined_p(entity_storage(fe))) {
-	entity_storage(fe) = MakeStorageRom();
+	entity_storage(fe) = make_storage_rom();
     }
     else {
 	pips_assert("storage must be rom", storage_rom_p(entity_storage(fe)));
@@ -2385,10 +2385,10 @@ entity MakeExternalFunction(
     /* a function has a rom storage, except for formal functions */
 
     if (entity_storage(e) == storage_undefined)
-	entity_storage(fe) = MakeStorageRom();
+	entity_storage(fe) = make_storage_rom();
     else
 	if (! storage_formal_p(entity_storage(e)))
-	    entity_storage(fe) = MakeStorageRom();
+	    entity_storage(fe) = make_storage_rom();
 	else {
 	    pips_user_warning("unsupported formal function %s\n",
 			 entity_name(fe));
@@ -2401,7 +2401,7 @@ entity MakeExternalFunction(
      * be temporarily undefined which is avoided (theoretically forbidden)
      * in PIPS.  */
     if(entity_initial(fe) == value_undefined)
-	entity_initial(fe) = MakeValueUnknown();
+	entity_initial(fe) = make_value_unknown();
 
     /* fe is added to CurrentFunction's entities */
     AddEntityToDeclarations(fe, get_current_module_entity());
@@ -2461,7 +2461,7 @@ void MakeFormalParameter(
   if(formal_label_replacement_p(fp)){
     entity_type(fp) = make_type(is_type_variable,
 				make_variable(make_basic(is_basic_string,
-							 MakeValueUnknown()),
+							 make_value_unknown()),
 					      NIL,NIL));
   }
   else if(SubstituteAlternateReturnsP() && ReturnCodeVariableP(fp)) {
@@ -2474,7 +2474,7 @@ void MakeFormalParameter(
   entity_storage(fp) =
     make_storage(is_storage_formal, make_formal(m, nfp));
 
-  entity_initial(fp) = MakeValueUnknown();
+  entity_initial(fp) = make_value_unknown();
 }
 
 

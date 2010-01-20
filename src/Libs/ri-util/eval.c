@@ -67,21 +67,23 @@ EvalSyntax(syntax s)
   switch (syntax_tag(s)) {
   case is_syntax_reference:
   case is_syntax_range:
-    v = make_value(is_value_unknown, NIL);
+    v = make_value_unknown();
     break;
   case is_syntax_call:
     v = EvalCall((syntax_call(s)));
     break;
   case is_syntax_cast:
-    v = make_value(is_value_unknown, NIL);
+    v = make_value_unknown();
     break;
   case is_syntax_sizeofexpression:
-    v = EvalSizeofexpression((syntax_sizeofexpression(s)));
+    v = make_value_unknown();
+    /* SG: sizeof is architecture dependant, it is better not to evaluate it 
+    v = EvalSizeofexpression((syntax_sizeofexpression(s)));*/
     break;
   case is_syntax_subscript:
   case is_syntax_application:
   case is_syntax_va_arg:
-    v = MakeValueUnknown();
+    v = make_value_unknown();
     break;
   default:
     fprintf(stderr, "[EvalExpression] Unexpected default case %d\n",
@@ -115,6 +117,7 @@ EvalCall(call c)
 	vout = EvalConstant((value_constant(vin)));
 	break;
       case is_value_symbolic:
+    /* SG: it may be better not to evaluate symbolic and keep their symbolic name */
 	vout = EvalConstant((symbolic_constant(value_symbolic(vin))));
 	break;
       case is_value_unknown:
@@ -122,7 +125,7 @@ EvalCall(call c)
 	vout = EvalIntrinsic(f, call_arguments(c));
 	break;
       case is_value_code:
-	vout = make_value(is_value_unknown, NIL);
+	vout = make_value_unknown();
 	break;
       default:
 	fprintf(stderr, "[EvalCall] case default\n");

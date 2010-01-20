@@ -75,7 +75,7 @@ call            flint_call(c)
 
     check_the_call(c);
 
-    gen_mapl(flint_cons_actual_argument, la);
+    gen_mapl((gen_iter_func_t)flint_cons_actual_argument, la);
 
     return (c);
 }
@@ -108,7 +108,7 @@ reference       flint_reference(r)
 
     (void) check_the_reference(r);
 
-    gen_mapl(flint_cons_expression, pc);
+    gen_mapl((gen_iter_func_t)flint_cons_expression, pc);
 
     return (r);
 }
@@ -223,7 +223,7 @@ instruction i;
     switch (instruction_tag(i)) {
     case is_instruction_block:
 	pc = instruction_block(i);
-	gen_mapl(flint_cons_statement, pc);
+	gen_mapl((gen_iter_func_t)flint_cons_statement, pc);
 	break;
     case is_instruction_test:
 	t = instruction_test(i);

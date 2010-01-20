@@ -28,7 +28,7 @@ extern void user_log(); /* in misc/messages.c */
 
 /* mallinfo portability os restricted to SUN C library */
 void
-print_malloc_info(FILE * __attribute__ ((unused)) fd)
+print_malloc_info(__attribute__((unused)) FILE * fd)
 {
 /*
     static struct mallinfo m;
@@ -40,7 +40,7 @@ print_malloc_info(FILE * __attribute__ ((unused)) fd)
 	    */
 }
 
-void print_full_malloc_info(FILE * __attribute__ ((unused)) fd)
+void print_full_malloc_info(__attribute__((unused)) FILE * fd)
 {
 /*
     static struct mallinfo m;
