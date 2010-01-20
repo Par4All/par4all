@@ -2,6 +2,15 @@
 \usepackage[latin9]{inputenc}
 \usepackage{url}
 \usepackage{abbrev_reactive}
+\let\OldRightarrow=\Rightarrow
+\RequirePackage{marvosym}
+\let\MarvosymRightarrow=\Rightarrow
+\let\Rightarrow=\OldRightarrow
+\RequirePackage{wasysym}
+\let\Lightning\UnTrucIndefini% Car conflit entre ifsym et marvosym
+\let\Sun\UnTrucIndefini%
+\RequirePackage[weather]{ifsym}
+
 
 \sloppy
 
@@ -33,7 +42,7 @@ Since it relies on other tool projects, the documentation of these other
 projects should also be taken into account.
 
 
-\subsection{Collaborative repositories}
+\section{Collaborative repositories}
 \label{sec:coll-repos}
 
 There are few \Agit repositories used by the project.
@@ -64,7 +73,7 @@ These ancillary gateways only include the \texttt{trunk} history since at
 CRI branches are not public.
 
 
-\subsection{Compilation}
+\section{Compilation}
 \label{sec:compilation}
 
 Once you have an image of the main \Agit repository content, \Apfa is
@@ -75,9 +84,9 @@ compiled and configured by running \verb|src/dev/p4a_setup|.
 \label{sec:packages}
 
 \Apfa integrate different tools from different projects. Right now \Apfa
-is composed by \Apips and \Apolylib, with some extensions. Each project is
-included in \Apfa as a package and is placed in a directory inside the
-\texttt{package} top-level directory.
+is composed by \Apips, \Apipsgfc, \Apolylib, with some extensions. Each
+project is included in \Apfa as a package and is placed in a directory
+inside the \texttt{package} top-level directory.
 
 
 \section{Directory organization}
@@ -119,7 +128,7 @@ included in \Apfa as a package and is placed in a directory inside the
     \item[\texttt{pips}] is the \Apips core;
     \item[\texttt{validation}] is the validation of \Apips
     \end{description}
-  \item[\texttt{gfc-pips}] contains a \Agcc 4.4 source patched to be
+  \item[\texttt{pips-gfc}] contains a \Agcc 4.4 source patched to be
     compiled and linked with \Apips to add a Fortran 95+ parser to \Apips;
   \item[\texttt{polylib}] contains the \Apolylib library source
   \end{description}
@@ -262,6 +271,51 @@ To pull everything at one for testing, this is done with the
 rollback.
 
 
+\subsection{PIPS-GFC extension workflow}
+\label{sec:pips-gfc-workflow}
+
+This part is into the \texttt{package/pips-gfc} directory. It contains
+plain \Agcc core and Fortran 4.4.1 distribution, pointed by the branch
+\texttt{gcc/4.4.1}
+
+The development of \Apipsgfc should be done in the branch
+\texttt{pips/gfc/dev/4.4.1} and this branch should be merged with the
+branch \texttt{gcc/4.4.1} into a branch \texttt{pips/gfc/4.4.1} with a
+more global name \texttt{pips/gfc/master} tracking which version is to be
+merged into the global \texttt{master} branch.
+
+So in \texttt{pips/gfc/dev/...} there should be only files different from
+the \Agcc distribution. In this way, if we want to have more subtle
+construction methods, later, it will be clearer how to get the real
+content.
+
+There is the same variation in branches for version 4.4.2.
+
+So to develop and test the \Apipsgfc extension, you get into for example
+\texttt{pips/gfc/dev/4.4.1} with
+\begin{verbatim}
+git checkout pips/gfc/dev/4.4.1
+\end{verbatim}
+and develop your code in this branch.
+
+To test, you commit and change to the \texttt{pips/gfc/4.4.1} branch with
+\begin{verbatim}
+git checkout pips/gfc/4.4.1
+\end{verbatim}
+where you merge with a
+\begin{verbatim}
+git merge pips/gfc/dev/4.4.1
+\end{verbatim}
+and compile. If you are happy, you commit or you revert and then go back
+into branch \texttt{pips/gfc/dev/4.4.1}.
+
+If you want to avoid spoiling the branches \texttt{pips/gfc/dev/4.4.1} and
+\texttt{pips/gfc/4.4.1}, you can create sub-branches of them, commit in
+them and merge this work in the former one back (with the \verb|--slashed|
+if you want to be modest about your gory hesitations \smiley{} and delete
+these branches).
+
+
 \subsection{Setting the infrastructure up}
 \label{sec:setup}
 
@@ -292,6 +346,23 @@ Some scripts used to setup the infrastructure are located in
 
 Validation of \Apfa is done inside the \texttt{validation} directory with
 \texttt{make}.
+
+
+\section{Branches}
+\label{sec:branches}
+
+To ease the developments and the organization, there are some already
+defined branches:
+\begin{description}
+\item[\texttt{master}] is the branch for the main latest developments in
+  \Apfa;
+\item[\texttt{pips/gfc}] point the original developments of Raphaël in
+  \Agcc;
+\item[\texttt{gcc/4.4.1}] is the original \Agcc 4.4.1 core \& Fortran in
+  \texttt{package/pips-gfc}
+\item[\texttt{gcc/4.4.2}] is the original \Agcc 4.4.2 core \& Fortran in
+  \texttt{package/pips-gfc}
+\end{description}
 
 
 \section{Making releases}
