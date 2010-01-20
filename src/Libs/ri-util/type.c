@@ -411,21 +411,8 @@ bool variable_equal_p(variable v1, variable v2)
   }
   return TRUE;
 }
-
-bool basic_equal_p(basic b1, basic b2)
+bool basic_equal_strict_p(basic b1, basic b2)
 {
-  if( basic_typedef_p(b1) )
-    {
-      type t1 = ultimate_type( entity_type(basic_typedef(b1)) );
-      b1 = variable_basic(type_variable(t1));
-    }
-
-  if( basic_typedef_p(b2) )
-    {
-      type t2 = ultimate_type( entity_type(basic_typedef(b2)) );
-      b2 = variable_basic(type_variable(t2));
-    }
-
   if(b1 == b2)
     return TRUE;
   else if (b1 == basic_undefined && b2 != basic_undefined)
@@ -478,6 +465,23 @@ bool basic_equal_p(basic b1, basic b2)
   default: pips_error("basic_equal_p", "unexpected tag %d\n", basic_tag(b1));
   }
   return FALSE; /* just to avoid a warning */
+}
+
+bool basic_equal_p(basic b1, basic b2)
+{
+  if( basic_typedef_p(b1) )
+    {
+      type t1 = ultimate_type( entity_type(basic_typedef(b1)) );
+      b1 = variable_basic(type_variable(t1));
+    }
+
+  if( basic_typedef_p(b2) )
+    {
+      type t2 = ultimate_type( entity_type(basic_typedef(b2)) );
+      b2 = variable_basic(type_variable(t2));
+    }
+  return basic_equal_strict_p(b1,b2);
+
 }
 
 bool functional_equal_p(functional f1, functional f2)

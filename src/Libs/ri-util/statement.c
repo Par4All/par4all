@@ -2253,10 +2253,8 @@ statement add_declaration_statement(statement s, entity e)
         if(!ENDP(pl)) {
             /* SG: if CAR(pl) has same comment and same type as ds, merge them */
             statement spl = STATEMENT(CAR(pl));
-            string b1=basic_to_string(entity_basic(e)),
-                   b2=basic_to_string(entity_basic(ENTITY(CAR(statement_declarations(spl)))));
             if( comments_equal_p(statement_comments(spl),comment) &&
-                    same_string_p(b1,b2))
+                    basic_equal_strict_p(entity_basic(e),entity_basic(ENTITY(CAR(statement_declarations(spl))))))
             {
                 free_statement(ds);
                 statement_declarations(spl)=gen_nconc(statement_declarations(spl),CONS(ENTITY,e,NIL));
@@ -2268,7 +2266,6 @@ statement add_declaration_statement(statement s, entity e)
                 CDR(pl) = NIL; // Truncate sl
                 nsl = gen_nconc(sl, CONS(STATEMENT, ds, cl));
             }
-            free(b1);free(b2);
         }
         else { // pl == NIL
             /* The new declaration is inserted before sl*/
