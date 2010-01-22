@@ -53,10 +53,10 @@ dnl defines with_libname=(yes|no) and msg_libname
 AC_DEFUN([AX_CHECK_PKG],
     [
 dnl        AC_REQUIRE([PKG_CHECK_MODULES])dnl
-        AC_REQUIRE([AX_HAS])dnl
-        AC_REQUIRE([AX_TR_UP])dnl
-        AC_REQUIRE([AX_MSG])dnl
-        AC_REQUIRE([AX_WITH])dnl
+dnl        AC_REQUIRE([AX_HAS])dnl
+dnl        AC_REQUIRE([AX_TR_UP])dnl
+dnl        AC_REQUIRE([AX_MSG])dnl
+dnl        AC_REQUIRE([AX_WITH])dnl
 
         PKG_CHECK_MODULES(AX_TR_UP([$1]),[$1],
             [AX_WITH([$1])=yes],
