@@ -2,9 +2,28 @@
 
 # Script to fetch remote git repositories into Par4All git.
 
+PIPS_MODULES=linear newgen nlpmake pips validation
+
 git fetch CRI/linear
 git fetch CRI/newgen
 git fetch CRI/nlpmake
 git fetch CRI/pips
 git fetch CRI/validation
 git fetch polylib
+
+exit
+
+merge_into_master() {
+    from=$1
+    to=$2
+    git checkout $to
+    git merge $from
+    git checkout master
+    git merge $to
+}
+
+for i in $PIPS_MODULE; do
+    echo merge_into_master CRI/$i $i
+done
+
+merge_into_master polylib polylib

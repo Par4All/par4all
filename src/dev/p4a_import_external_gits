@@ -93,6 +93,7 @@ git checkout master
 
 # There was a SVN reorganization of the CRI nlpmake repository to
 # introduce branches, so put things in the correct order:
+git checkout nlpmake
 git mv packages/PIPS/nlpmake/trunk/makes packages/PIPS/nlpmake/makes
 git rm -r packages/PIPS/nlpmake/{branches,tags}
 git commit --message="There was a SVN reorganization of the CRI nlpmake repository
@@ -101,7 +102,7 @@ so put the makes directory at the top-level back"
 # Since git do not track directories and trunk is now empty, use a simple
 # directory deletion:
 rm -rf packages/PIPS/nlpmake/{branches,tags,trunk}
-
+git checkout master
 
 echo 'Do not forget to use "merge -s subtree" when getting new CRI stuff later'
 echo "For example you can get the last upstream version with:"
