@@ -1,17 +1,22 @@
-# Temporary version.
-# To compile try something like
-#  make _HAS_HTLATEX_=1 ROOT=~/projets/Wild_Systems/PIPS/git-svn-work/pips full-compile
-# rsync -a par4all_organization.pdf par4all_organization.htdoc ridee.enstb.org:/var/www/par4all/doc/organization
-use_pdflatex = 1
 INSTALL_DOC = par4all_organization.pdf
 INSTALL_HTM = par4all_organization.htdoc
+
 # Hide the PDF into the HTML documentation directory
 DOC.subd = $(INSTALL_HTM)
 
+use_pdflatex = 1
+# Force HTML generation:
+_HAS_HTLATEX_ = 1
+
 # common stuff
-ROOT    = ../../..
+ROOT    = $(P4A_ROOT)/packages/PIPS/pips
 PROJECT	= pips
 include $(ROOT)/makes/main.mk
+
+default: full-compile
+
+publish:
+	rsync -a par4all_organization.pdf par4all_organization.htdoc ridee.enstb.org:/var/www/par4all/doc/organization
 
 # local stuff
 clean: local-clean

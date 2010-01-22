@@ -17,10 +17,12 @@
 \begin{document}
 
 \title{Par4All organization\\
-  draft
-}
+  \textsc{draft} }
 
-\author{Ronan \textsc{Keryell}, Grégoire \textsc{Péan}, HPC Project}
+\author{Ronan \textsc{Keryell}, Grégoire \textsc{Péan}, Claire
+  \textsc{Seguin}, Mickaël \textsc{Thievent}\\
+  ---\\
+  HPC Project}
 
 \maketitle
 
@@ -99,6 +101,8 @@ inside the \texttt{package} top-level directory.
 \item[\texttt{build}] is the directory created with the various productions
   of the compilation of all the \Apfa packages: binaries, header files,
   documentation;
+  \marginpar{Right now it is still mainly in \texttt{package/PIPS} since
+    I'm waiting for the new \Apips compilation infrastructure. RK}
   \begin{description}
   \item[\texttt{bin}] contains the executable programs from \Apfa;
   \item[\texttt{doc}] is the generated documentation for the \Apfa
@@ -110,8 +114,8 @@ inside the \texttt{package} top-level directory.
   \item[\texttt{share}] contains shared files for run-time and
     configuration files
 
-    \marginpar{what is the difference of this pipsrc.sh and the one in
-      etc?}
+    \marginpar{what is the difference of this \texttt{pipsrc.sh} and the one in
+      \texttt{etc}? \texttt{RK->FC}}
 
   \item[\texttt{utils}] gathers various utility programs used by \Apfa
     infrastructure (validation...) and other internal tools;
@@ -356,7 +360,8 @@ Some scripts used to setup the infrastructure are located in
 
 
 Validation of \Apfa is done inside the \texttt{validation} directory with
-\texttt{make}.
+\texttt{make validate}.\marginpar{ Right now it is still in the
+  \texttt{package/PIPS/validation} directory. RK}
 
 
 \section{Branches}
