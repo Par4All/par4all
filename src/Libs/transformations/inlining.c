@@ -1102,14 +1102,16 @@ list private_variables(statement stat)
     return l;
 }
 
-/** 
+/**
  * outline the statements in statements_to_outline into a module named outline_module_name
  * the outlined statements are replaced by a call to the newly generated module
  * statements_to_outline is modified in place to represent that call
- * 
+ *
  * @param outline_module_name name of the new module
- * @param statements_to_outline statements to outline into outline_module_name
- * 
+
+ * @param statements_to_outline is a list of consecutive statements to
+ * outline into outline_module_name
+ *
  * @return pointer to the newly generated statement (already inserted in statements_to_outline)
  */
 statement outliner(string outline_module_name, list statements_to_outline)
@@ -1118,7 +1120,7 @@ statement outliner(string outline_module_name, list statements_to_outline)
     entity new_fun = make_empty_subroutine(outline_module_name);
     statement body = instruction_to_statement(make_instruction_sequence(make_sequence(statements_to_outline)));
 
-    /* retreive referenced and declared entities */
+    /* Retrieve referenced and declared entities */
     list referenced_entities = NIL,
          declared_entities = NIL;
     set sreferenced_entities = set_make(set_pointer);
@@ -1130,8 +1132,8 @@ statement outliner(string outline_module_name, list statements_to_outline)
         set_free(tmp);
         list sd = statement_to_declarations(s);
         declared_entities =gen_nconc(declared_entities, sd);
-        /* we want to declare private variable as locals, but it may 
-           not be valid*/
+        /* We want to declare private variables as locals, but it may not
+           be valid */
         list private_ents = private_variables(s);
         gen_sort_list(private_ents,(gen_cmp_func_t)compare_entities);
         FOREACH(ENTITY,e,private_ents)

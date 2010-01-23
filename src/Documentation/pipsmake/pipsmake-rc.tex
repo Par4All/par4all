@@ -5972,32 +5972,81 @@ gpu_ify                    > MODULE.code
         < MODULE.cumulated_effects
 \end{PipsMake}
 
+For example from
+\begin{lstlisting}
+   for(i = 1; i <= 499; i += 1)
+      for(j = 1; j <= 499; j += 1)
+         save[i][j] = 0.25*(space[i-1][j]+space[i+1][j]+space[i][j-1]+space[i][j+1]);
+\end{lstlisting}
+it generates something like
+\begin{lstlisting}
+   p4a_kernel_launcher_0(save, space);
+
+   [...]
+   void p4a_kernel_launcher_0(float_t save[501][501], float_t space[501][501])
+   {
+     int i;
+     int j;
+   for(i = 1; i <= 499; i += 1)
+      for(j = 1; j <= 499; j += 1)
+
+         p4a_kernel_wrapper_0(save, space, i, j);
+   }
+
+   void p4a_kernel_wrapper_0(float_t save[501][501], float_t space[501][501], int i, int j)
+   {
+     i = P4A_pv_0(i);
+     j = P4A_pv_1(j);
+     p4a_kernel_0(save, space, i, j);
+   }
+   void p4a_kernel_0(float_t save[501][501], float_t space[501][501], int
+                     i, int j) {
+     save[i][j] = 0.25*(space[i-1][j]+space[i+1][j]+space[i][j-1]+space[i][j+1]);
+   }
+\end{lstlisting}
+
+
 The launcher, wrapper and kernel prefix names to be used during the generation:
-\begin{PipsProp}{GPU_LAUNCHER_PREFIX} 
+\begin{PipsProp}{GPU_LAUNCHER_PREFIX}
 GPU_LAUNCHER_PREFIX "p4a_kernel_launcher"
 \end{PipsProp}
-\begin{PipsProp}{GPU_WRAPPER_PREFIX} 
+\begin{PipsProp}{GPU_WRAPPER_PREFIX}
 GPU_WRAPPER_PREFIX "p4a_kernel_wrapper"
 \end{PipsProp}
-\begin{PipsProp}{GPU_KERNEL_PREFIX} 
+\begin{PipsProp}{GPU_KERNEL_PREFIX}
 GPU_KERNEL_PREFIX "p4a_kernel"
 \end{PipsProp}
+For Fortran output you may need to have these prefix name in uppercase.
 
-According to
-\begin{PipsProp}{GPU_USE_WRAPPER} 
+Indeed, each level of outlining can be enabled or disabled according
+According to the following properties:
+\begin{PipsProp}{GPU_USE_LAUNCHER}
+GPU_USE_LAUNCHER TRUE
+\end{PipsProp}
+
+\begin{PipsProp}{GPU_USE_WRAPPER}
 GPU_USE_WRAPPER TRUE
 \end{PipsProp}
-the phase generate a wrapper function to get the iteration coordinate from
+
+\begin{PipsProp}{GPU_USE_KERNEL}
+GPU_USE_KERNEL TRUE
+\end{PipsProp}
+
+
+The phase generates a wrapper function to get the iteration coordinate from
 intrinsics functions instead of the initial loop indices. Using this kind
 of wrapper is the normal behaviour but for simulation of an accelerator
 code, not using a wrapper is useful.
 
-The intrinsics function to get an i-th coordinate in the iteration space
-is defined by this GNU \emph{à la} \texttt{printf} format:
-\begin{PipsProp}{GPU_COORDINATE_INTRINSICS_FORMAT} 
+The intrinsics function names to get an $i^{th}$ coordinate in the
+iteration space are defined by this GNU \emph{à la} \texttt{printf}
+format:
+\begin{PipsProp}{GPU_COORDINATE_INTRINSICS_FORMAT}
 GPU_COORDINATE_INTRINSICS_FORMAT "P4A_vp_%d"
 \end{PipsProp}
-where \verb|%d| is used to get the dimension number.
+where \verb|%d| is used to get the dimension number. Here \texttt{vp}
+stands for \emph{virtual processor} dimension and is a reminiscence from
+PompC and HyperC...
 
 Please, do not use this feature for buffer-overflow attack...
 
@@ -6007,7 +6056,7 @@ Annotates loop nests with comments and guards for further generation of CUDA cal
 \end{PipsPass}
 
 \begin{PipsMake}
-gpu_loop_nest_annotate	        > MODULE.code	
+gpu_loop_nest_annotate	        > MODULE.code
         < PROGRAM.entities
         < MODULE.code
 
