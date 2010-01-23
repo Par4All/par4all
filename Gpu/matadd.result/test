@@ -1,0 +1,321 @@
+      PROGRAM MATADD
+      INTEGER M
+      INTEGER N
+      PARAMETER (M = 402, N = 160)
+      INTEGER I, J
+      REAL A(M, N), B(M, N), C(M, N)
+
+      DO I = 0, 401
+         DO J = 0, 159
+            B(I+1,J+1) = I+1
+            C(I+1,J+1) = J+1
+         ENDDO
+      ENDDO
+
+      DO I = 0, 401
+         DO J = 0, 159
+            A(I+1,J+1) = B(I+1,J+1)+C(I+1,J+1)
+         ENDDO
+      ENDDO
+
+      END
+
+
+	SUBROUTINE P4A_ACCEL_FREE(DEST)
+	INTEGER DEST
+! Do nothing since it is not representable in Fortran 77...
+      END
+
+
+	SUBROUTINE P4A_ACCEL_MALLOC(DEST, N)
+	INTEGER N
+	INTEGER DEST
+! Do nothing since it is not representable in Fortran 77...
+      END
+
+
+	FUNCTION P4A_COPY_FROM_ACCEL(HOST_ADDRESS, ACCEL_ADDRESS, N)
+	INTEGER N
+	CHARACTER HOST_ADDRESS(N)
+	CHARACTER ACCEL_ADDRESS(N)
+	INTEGER I
+	INTEGER P4A_COPY_FROM_ACCEL
+
+      DO I = 1, N
+         HOST_ADDRESS(I) = ACCEL_ADDRESS(I)
+      ENDDO
+      P4A_COPY_FROM_ACCEL = HOST_ADDRESS
+      END
+! Equivalent stubs of Par4All runtime to keep the PIPS analyzes happy
+
+	FUNCTION P4A_COPY_TO_ACCEL(HOST_ADDRESS, ACCEL_ADDRESS, N)
+	INTEGER N
+	CHARACTER HOST_ADDRESS(N)
+	CHARACTER ACCEL_ADDRESS(N)
+	INTEGER I
+	INTEGER P4A_COPY_TO_ACCEL
+
+      DO I = 1, N
+         ACCEL_ADDRESS(I) = HOST_ADDRESS(I)
+      ENDDO
+      P4A_COPY_TO_ACCEL = ACCEL_ADDRESS
+      END
+/* C pretty print for module MATADD. */
+#define m 402
+
+#define n 160
+
+int
+main (int argc, char *argv[])
+{
+  int i;
+  int j;
+  float a[160][402];
+  float b[160][402];
+  float c[160][402];
+
+  for (i = 0; i <= 401; i++)
+    {
+      for (j = 0; j <= 159; j++)
+	{
+	  b[(j + 1) - 1][(i + 1) - 1] = (i + 1);
+	  c[(j + 1) - 1][(i + 1) - 1] = (j + 1);
+	}
+    }
+  for (i = 0; i <= 401; i++)
+    {
+      for (j = 0; j <= 159; j++)
+	{
+	  a[(j + 1) - 1][(i + 1) - 1] =
+	    (b[(j + 1) - 1][(i + 1) - 1] + c[(j + 1) - 1][(i + 1) - 1]);
+	}
+    }
+  return 0;
+}
+/* C pretty print for module P4A_ACCEL_FREE. */
+void
+p4a_accel_free (int dest)
+{
+
+  return;
+}
+/* C pretty print for module P4A_ACCEL_MALLOC. */
+void
+p4a_accel_malloc (int dest, int n)
+{
+
+  return;
+}
+/* C pretty print for module P4A_COPY_FROM_ACCEL. */
+int
+p4a_copy_from_accel (char host_address[N - 0], char accel_address[N - 0],
+		     int n)
+{
+  int result;
+  int i;
+
+  for (i = 1; i <= n; i++)
+    {
+      host_address[i - 1] = accel_address[i - 1];
+    }
+  result = host_address;
+  return result;
+}
+/* C pretty print for module P4A_COPY_TO_ACCEL. */
+int
+p4a_copy_to_accel (char host_address[N - 0], char accel_address[N - 0], int n)
+{
+  int result;
+  int i;
+
+  for (i = 1; i <= n; i++)
+    {
+      accel_address[i - 1] = host_address[i - 1];
+    }
+  result = accel_address;
+  return result;
+}
+      PROGRAM MATADD
+      INTEGER M
+      INTEGER N
+      PARAMETER (M = 402, N = 160)
+      INTEGER I, J
+      REAL A(M, N), B(M, N), C(M, N)
+
+
+!$OMP PARALLEL DO PRIVATE(J)
+      DO I = 0, 401
+
+!$OMP    PARALLEL DO 
+         DO J = 0, 159
+            B(I+1,J+1) = I+1
+            C(I+1,J+1) = J+1
+         ENDDO
+      ENDDO
+
+
+!$OMP PARALLEL DO PRIVATE(J)
+      DO I = 0, 401
+
+!$OMP    PARALLEL DO 
+         DO J = 0, 159
+            A(I+1,J+1) = B(I+1,J+1)+C(I+1,J+1)
+         ENDDO
+      ENDDO
+
+      END
+      PROGRAM MATADD
+      INTEGER M
+      INTEGER N
+      PARAMETER (M = 402, N = 160)
+      INTEGER I, J
+      REAL A(M, N), B(M, N), C(M, N)
+
+      CALL P4A_KERNEL_LAUNCHER_0(B, C)
+
+      CALL P4A_KERNEL_LAUNCHER_1(A, B, C)
+
+      END
+/* C pretty print for module MATADD. */
+#define m 402
+
+#define n 160
+
+int
+main (int argc, char *argv[])
+{
+  int i;
+  int j;
+  float a[160][402];
+  float b[160][402];
+  float c[160][402];
+
+  p4a_kernel_launcher_0 (b, c);
+  p4a_kernel_launcher_1 (a, b, c);
+  return 0;
+}
+/* C pretty print for module P4A_ACCEL_FREE. */
+void
+p4a_accel_free (int dest)
+{
+
+  return;
+}
+/* C pretty print for module P4A_ACCEL_MALLOC. */
+void
+p4a_accel_malloc (int dest, int n)
+{
+
+  return;
+}
+/* C pretty print for module P4A_COPY_FROM_ACCEL. */
+int
+p4a_copy_from_accel (char host_address[N - 0], char accel_address[N - 0],
+		     int n)
+{
+  int result;
+  int i;
+
+  for (i = 1; i <= n; i++)
+    {
+      host_address[i - 1] = accel_address[i - 1];
+    }
+  result = host_address;
+  return result;
+}
+/* C pretty print for module P4A_COPY_TO_ACCEL. */
+int
+p4a_copy_to_accel (char host_address[N - 0], char accel_address[N - 0], int n)
+{
+  int result;
+  int i;
+
+  for (i = 1; i <= n; i++)
+    {
+      accel_address[i - 1] = host_address[i - 1];
+    }
+  result = accel_address;
+  return result;
+}
+/* C pretty print for module P4A_KERNEL_0. */
+void
+p4a_kernel_0 (int i, int j, float b[N - 0][M - 0], float c[N - 0][M - 0])
+{
+  int m;
+  int n;
+
+  b[(j + 1) - 1][(i + 1) - 1] = (i + 1);
+  c[(j + 1) - 1][(i + 1) - 1] = (j + 1);
+  return;
+}
+/* C pretty print for module P4A_KERNEL_1. */
+void
+p4a_kernel_1 (float a[N - 0][M - 0], float b[N - 0][M - 0],
+	      float c[N - 0][M - 0], int i, int j)
+{
+  int m;
+  int n;
+
+  a[(j + 1) - 1][(i + 1) - 1] =
+    (b[(j + 1) - 1][(i + 1) - 1] + c[(j + 1) - 1][(i + 1) - 1]);
+  return;
+}
+/* C pretty print for module P4A_KERNEL_LAUNCHER_0. */
+void
+p4a_kernel_launcher_0 (float b[N - 0][M - 0], float c[N - 0][M - 0])
+{
+  int j;
+  int i;
+  int m;
+  int n;
+
+  for (i = 0; i <= 401; i++)
+    {
+      for (j = 0; j <= 159; j++)
+	{
+	  p4a_kernel_wrapper_0 (b, c, i, j);
+	}
+    }
+  return;
+}
+/* C pretty print for module P4A_KERNEL_LAUNCHER_1. */
+void
+p4a_kernel_launcher_1 (float a[N - 0][M - 0], float b[N - 0][M - 0],
+		       float c[N - 0][M - 0])
+{
+  int j;
+  int i;
+  int m;
+  int n;
+
+  for (i = 0; i <= 401; i++)
+    {
+      for (j = 0; j <= 159; j++)
+	{
+	  p4a_kernel_wrapper_1 (a, b, c, i, j);
+	}
+    }
+  return;
+}
+/* C pretty print for module P4A_KERNEL_WRAPPER_0. */
+void
+p4a_kernel_wrapper_0 (float b[N - 0][M - 0], float c[N - 0][M - 0], int i,
+		      int j)
+{
+  int m;
+  int n;
+
+  p4a_kernel_0 (i, j, b, c);
+  return;
+}
+/* C pretty print for module P4A_KERNEL_WRAPPER_1. */
+void
+p4a_kernel_wrapper_1 (float a[N - 0][M - 0], float b[N - 0][M - 0],
+		      float c[N - 0][M - 0], int i, int j)
+{
+  int m;
+  int n;
+
+  p4a_kernel_1 (a, b, c, i, j);
+  return;
+}
