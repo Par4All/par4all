@@ -1,0 +1,332 @@
+main file
+main()
+{
+   
+   /* initialize constants */
+   
+   t = 0.499975;
+   t1 = 0.50025;
+   t2 = 2.0;
+   
+   /* set values of module weights */
+   
+   n1 = 0*100000;
+   n2 = 12*100000;
+   n3 = 14*100000;
+   n4 = 345*100000;
+   n6 = 210*100000;
+   n7 = 32*100000;
+   n8 = 899*100000;
+   n9 = 616*100000;
+   n10 = 0*100000;
+   n11 = 93*100000;
+   
+   /* MODULE 1:  simple identifiers */
+   
+   x1 = 1.0;
+   x2 = x3 = x4 = -1.0;
+
+   for(i = 1; i <= n1; i += 1) {
+      x1 = (x1+x2+x3-x4)*t;
+      x2 = (x1+x2-x3-x4)*t;
+      x3 = (x1-x2+x3+x4)*t;
+      x4 = (-x1+x2+x3+x4)*t;
+   }
+   
+   
+   
+   
+   
+   /* MODULE 2:  array elements */
+   
+   e1[0] = 1.0;
+   e1[1] = e1[2] = e1[3] = -1.0;
+
+   for(i = 1; i <= n2; i += 1) {
+      e1[0] = (e1[0]+e1[1]+e1[2]-e1[3])*t;
+      e1[1] = (e1[0]+e1[1]-e1[2]+e1[3])*t;
+      e1[2] = (e1[0]-e1[1]+e1[2]+e1[3])*t;
+      e1[3] = (-e1[0]+e1[1]+e1[2]+e1[3])*t;
+   }
+   
+   
+   
+   
+   /* MODULE 3:  array as parameter */
+   
+   for(i = 1; i <= n3; i += 1)
+      pa(e1);
+   
+   
+   
+   
+   /* MODULE 4:  conditional jumps */
+   
+   j = 1;
+   for(i = 1; i <= n4; i += 1) {
+      if (j==1)
+         j = 2;
+      else
+         j = 3;
+
+      if (j>2)
+         j = 0;
+      else
+         j = 1;
+
+      if (j<1)
+         j = 1;
+      else
+         j = 0;
+   }
+   
+   
+   
+   
+   /* MODULE 5:  omitted */
+   
+   /* MODULE 6:  integer arithmetic */
+   
+   j = 1;
+   k = 2;
+   l = 3;
+
+   for(i = 1; i <= n6; i += 1) {
+      j = j*(k-j)*(l-k);
+      k = l*k-(l-j)*k;
+      l = (l-k)*(k+j);
+
+      e1[l-2] = j+k+l;
+      /* C arrays are zero based */
+      e1[k-2] = j*k*l;
+   }
+   
+   
+   
+   
+   /* MODULE 7:  trig. functions */
+   
+   x = y = 0.5;
+
+   for(i = 1; i <= n7; i += 1) {
+      x = t*atan(t2*sin(x)*cos(x)/(cos(x+y)+cos(x-y)-1.0));
+      y = t*atan(t2*sin(y)*cos(y)/(cos(x+y)+cos(x-y)-1.0));
+   }
+   
+   
+   
+   
+   /* MODULE 8:  procedure calls */
+   
+   x = y = z = 1.0;
+
+   for(i = 1; i <= n8; i += 1)
+      p3(x, y, &z);
+   
+   
+   
+   
+   /* MODULE9:  array references */
+   
+   j = 1;
+   k = 2;
+   l = 3;
+
+   e1[0] = 1.0;
+   e1[1] = 2.0;
+   e1[2] = 3.0;
+
+   for(i = 1; i <= n9; i += 1)
+      p0();
+   
+   
+   
+   
+   /* MODULE10:  integer arithmetic */
+   
+   j = 2;
+   k = 3;
+
+   for(i = 1; i <= n10; i += 1) {
+      j = j+k;
+      k = j+k;
+      j = k-j;
+      k = k-j-j;
+   }
+   
+   
+   
+   
+   /* MODULE11:  standard functions */
+   
+   x = 0.75;
+   for(i = 1; i <= n11; i += 1)
+      x = sqrt(exp(log(x)/t1));
+}
+aftter privatization
+main()
+{
+   
+   /* initialize constants */
+   
+   t = 0.499975;
+   t1 = 0.50025;
+   t2 = 2.0;
+   
+   /* set values of module weights */
+   
+   n1 = 0*100000;
+   n2 = 12*100000;
+   n3 = 14*100000;
+   n4 = 345*100000;
+   n6 = 210*100000;
+   n7 = 32*100000;
+   n8 = 899*100000;
+   n9 = 616*100000;
+   n10 = 0*100000;
+   n11 = 93*100000;
+   
+   /* MODULE 1:  simple identifiers */
+   
+   x1 = 1.0;
+   x2 = x3 = x4 = -1.0;
+
+#pragma omp parallel for 
+   for(i = 1; i <= n1; i += 1) {
+      x1 = (x1+x2+x3-x4)*t;
+      x2 = (x1+x2-x3-x4)*t;
+      x3 = (x1-x2+x3+x4)*t;
+      x4 = (-x1+x2+x3+x4)*t;
+   }
+   
+   
+   
+   
+   
+   /* MODULE 2:  array elements */
+   
+   e1[0] = 1.0;
+   e1[1] = e1[2] = e1[3] = -1.0;
+
+   for(i = 1; i <= n2; i += 1) {
+      e1[0] = (e1[0]+e1[1]+e1[2]-e1[3])*t;
+      e1[1] = (e1[0]+e1[1]-e1[2]+e1[3])*t;
+      e1[2] = (e1[0]-e1[1]+e1[2]+e1[3])*t;
+      e1[3] = (-e1[0]+e1[1]+e1[2]+e1[3])*t;
+   }
+   
+   
+   
+   
+   /* MODULE 3:  array as parameter */
+   
+   for(i = 1; i <= n3; i += 1)
+      pa(e1);
+   
+   
+   
+   
+   /* MODULE 4:  conditional jumps */
+   
+   j = 1;
+   for(i = 1; i <= n4; i += 1) {
+      if (j==1)
+         j = 2;
+      else
+         j = 3;
+
+      if (j>2)
+         j = 0;
+      else
+         j = 1;
+
+      if (j<1)
+         j = 1;
+      else
+         j = 0;
+   }
+   
+   
+   
+   
+   /* MODULE 5:  omitted */
+   
+   /* MODULE 6:  integer arithmetic */
+   
+   j = 1;
+   k = 2;
+   l = 3;
+
+   for(i = 1; i <= n6; i += 1) {
+      j = j*(k-j)*(l-k);
+      k = l*k-(l-j)*k;
+      l = (l-k)*(k+j);
+
+      e1[l-2] = j+k+l;
+      /* C arrays are zero based */
+      e1[k-2] = j*k*l;
+   }
+   
+   
+   
+   
+   /* MODULE 7:  trig. functions */
+   
+   x = y = 0.5;
+
+   for(i = 1; i <= n7; i += 1) {
+      x = t*atan(t2*sin(x)*cos(x)/(cos(x+y)+cos(x-y)-1.0));
+      y = t*atan(t2*sin(y)*cos(y)/(cos(x+y)+cos(x-y)-1.0));
+   }
+   
+   
+   
+   
+   /* MODULE 8:  procedure calls */
+   
+   x = y = z = 1.0;
+
+   for(i = 1; i <= n8; i += 1)
+      p3(x, y, &z);
+   
+   
+   
+   
+   /* MODULE9:  array references */
+   
+   j = 1;
+   k = 2;
+   l = 3;
+
+   e1[0] = 1.0;
+   e1[1] = 2.0;
+   e1[2] = 3.0;
+
+   for(i = 1; i <= n9; i += 1)
+      p0();
+   
+   
+   
+   
+   /* MODULE10:  integer arithmetic */
+   
+   j = 2;
+   k = 3;
+
+#pragma omp parallel for 
+   for(i = 1; i <= n10; i += 1) {
+      j = j+k;
+      k = j+k;
+      j = k-j;
+      k = k-j-j;
+   }
+   
+   
+   
+   
+   /* MODULE11:  standard functions */
+   
+   x = 0.75;
+   for(i = 1; i <= n11; i += 1)
+      x = sqrt(exp(log(x)/t1));
+}

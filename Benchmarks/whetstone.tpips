@@ -1,0 +1,14 @@
+delete whetstone
+create whetstone whetstone.c
+module main
+
+echo main file
+display PRINTED_FILE
+
+echo aftter privatization
+
+apply COARSE_GRAIN_PARALLELIZATION
+display PRINTED_FILE
+close
+delete whetstone
+quit

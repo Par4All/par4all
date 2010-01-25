@@ -1,0 +1,8 @@
+delete linpack
+create linpack linpack.c
+
+display PRINTED_FILE[%ALLFUNC]
+
+close
+delete linpack
+quit

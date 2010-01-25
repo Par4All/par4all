@@ -11,7 +11,7 @@
 
 !$OMP    PARALLEL DO 
          DO J = 1, N                                                    0009
-            CALL P4A_KERNEL_0(I, J, B, C)
+            CALL P4A_KERNEL_0(N, M, J, I, C, B)
          ENDDO
       ENDDO
 
@@ -21,19 +21,19 @@
 
 !$OMP    PARALLEL DO 
          DO J = 1, N                                                    0016
-            CALL P4A_KERNEL_1(A, B, C, I, J)                            0017
+            CALL P4A_KERNEL_1(N, M, J, I, C, B, A)                      0017
          ENDDO
       ENDDO
 
       END
-      SUBROUTINE P4A_KERNEL_0(I, J, B, C)
-      INTEGER I, J
-      REAL*4 B(1:M, 1:N), C(1:M, 1:N)
+      SUBROUTINE P4A_KERNEL_0(N, M, J, I, C, B)
+      INTEGER N, M, J, I
+      REAL*4 C(1:M, 1:N), B(1:M, 1:N)
       B(I,J) = I                                                        0004
       C(I,J) = J                                                        0005
       END
-      SUBROUTINE P4A_KERNEL_1(A, B, C, I, J)
-      INTEGER I, J
-      REAL*4 A(1:M, 1:N), B(1:M, 1:N), C(1:M, 1:N)
+      SUBROUTINE P4A_KERNEL_1(N, M, J, I, C, B, A)
+      INTEGER N, M, J, I
+      REAL*4 C(1:M, 1:N), B(1:M, 1:N), A(1:M, 1:N)
       A(I,J) = B(I,J)+C(I,J)                                            0004
       END
