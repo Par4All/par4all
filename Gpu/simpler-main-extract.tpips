@@ -3,7 +3,7 @@ delete $WKS
 
 setproperty ABORT_ON_USER_ERROR TRUE
 
-create $WKS simpler-main-extract.c $P4A_DIR/p4a_stubs.c
+create $WKS simpler-main-extract.c p4a_stubs.c
 
 echo Select some options to deal with the C Language:
 echo Parse as C:
