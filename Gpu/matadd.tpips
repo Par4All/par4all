@@ -10,6 +10,7 @@ create $WKS $WKS.f p4a_stubs.f
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
 
+setproperty EVAL_SYMBOLIC_CONSTANT FALSE
 setproperty GPU_LAUNCHER_PREFIX "P4A_KERNEL_LAUNCHER"
 setproperty GPU_WRAPPER_PREFIX "P4A_KERNEL_WRAPPER"
 setproperty GPU_KERNEL_PREFIX "P4A_KERNEL"
@@ -30,6 +31,7 @@ setproperty LOOP_NORMALIZE_LOWER_BOUND 0
 setproperty LOOP_NORMALIZE_SKIP_INDEX_SIDE_EFFECT TRUE
 # If we do this here, the side effect at the end of a loop on the index
 # break parallelization. It would require to apply USE_DEF_ELIM...
+display PRINTED_FILE[%ALLFUNC]
 apply LOOP_NORMALIZE[MATADD]
 
 apply PRIVATIZE_MODULE[MATADD]

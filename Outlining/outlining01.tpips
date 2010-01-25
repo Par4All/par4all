@@ -1,6 +1,7 @@
 delete outlining01
 
 setproperty ABORT_ON_USER_ERROR TRUE
+setenv PIPS_CPP = "cpp"
 
 create outlining01 outlining01.c
 
@@ -20,6 +21,8 @@ echo
 
 apply OUTLINE[main]
 outlined
+n
+n
 n
 n
 n
