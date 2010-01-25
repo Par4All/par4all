@@ -1,0 +1,10 @@
+delete union0
+create union0 union0.c
+
+display PRINTED_FILE[%ALL]
+
+close
+
+delete union0
+
+quit
