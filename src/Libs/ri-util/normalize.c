@@ -32,6 +32,7 @@
 #include "misc.h"
 
 #include "ri-util.h"
+#include "properties.h"
 
 #include "operator.h"
 
@@ -101,7 +102,10 @@ normalized NormalizeCall(call c)
 	n = NormalizeConstant((value_constant(v)));
 	break;
       case is_value_symbolic:
-	n = NormalizeConstant((symbolic_constant(value_symbolic(v))));
+    if(get_bool_property("EVAL_SYMBOLIC_CONSTANT"))
+        n = NormalizeConstant((symbolic_constant(value_symbolic(v))));
+    else
+        n= make_normalized_complex();
 	break;
       case is_value_unknown:
       case is_value_code:

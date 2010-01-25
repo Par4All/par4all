@@ -1162,7 +1162,7 @@ statement outliner(string outline_module_name, list statements_to_outline)
     list tmp_list=NIL;
     FOREACH(ENTITY,e,referenced_entities)
     {
-        if( (!entity_function_p(e) ) && (!entity_field_p(e)) &&
+        if( (!entity_constant_p(e) ) && (!entity_field_p(e)) &&
                 !( entity_formal_p(e) && (!same_string_p(entity_module_name(e),get_current_module_name()))) )
             tmp_list=CONS(ENTITY,e,tmp_list);
     }
@@ -1197,21 +1197,27 @@ statement outliner(string outline_module_name, list statements_to_outline)
     FOREACH(ENTITY,e,referenced_entities)
     {
         type t = entity_type(e);
-        if( type_variable_p(t) ) {
+        bool is_parameter_p = false;
+        if( type_variable_p(t) || 
+                /* for parameter case */ (is_parameter_p=(entity_symbolic_p(e) && storage_rom_p(entity_storage(e)) && type_functional_p(t))) )
+        {
             /* this create the dummy parameter */
             type new_type = copy_type(t);
             entity dummy_entity = FindOrCreateEntity(
                     outline_module_name,
                     entity_user_name(e)
                     );
-            entity_type(dummy_entity)=new_type;
+            entity_type(dummy_entity)=is_parameter_p?
+                make_type_variable(make_variable(make_basic_int(DEFAULT_INTEGER_TYPE_SIZE),NIL,NIL)):
+                new_type;
             entity_storage(dummy_entity)=make_storage_formal(make_formal(dummy_entity,++i));
 
 
             formal_parameters=CONS(PARAMETER,make_parameter(
-                        copy_type(new_type),
-                        make_mode_value(), /* to be changed */
+                        is_parameter_p?make_type_variable(make_variable(make_basic_int(DEFAULT_INTEGER_TYPE_SIZE),NIL,NIL)):copy_type(new_type),
+                        fortran_module_p(get_current_module_entity())?make_mode_reference():make_mode_value(), 
                         make_dummy_identifier(dummy_entity)),formal_parameters);
+
             /* this adds the effective parameter */
             effective_parameters=CONS(EXPRESSION,entity_to_expression(e),effective_parameters);
         }

@@ -50,6 +50,7 @@ range: a range is not evaluated.
 #include "misc.h"
 
 #include "ri-util.h"
+#include "properties.h"
 
 #include "operator.h"
 
@@ -118,7 +119,10 @@ EvalCall(call c)
 	break;
       case is_value_symbolic:
     /* SG: it may be better not to evaluate symbolic and keep their symbolic name */
-	vout = EvalConstant((symbolic_constant(value_symbolic(vin))));
+    if(get_bool_property("EVAL_SYMBOLIC_CONSTANT"))
+	    vout = EvalConstant((symbolic_constant(value_symbolic(vin))));
+    else
+        vout = make_value_unknown();
 	break;
       case is_value_unknown:
 	/* it might be an intrinsic function */

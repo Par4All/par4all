@@ -304,7 +304,7 @@ static string c_dim_string(list ldim)
     string result = "";
     if (ldim != NIL )
     {
-        MAP(DIMENSION, dim,
+        FOREACH(DIMENSION, dim,ldim)
         {
             expression elow = dimension_lower(dim);
             expression eup = dimension_upper(dim);
@@ -317,7 +317,7 @@ static string c_dim_string(list ldim)
                we only need to print (upper dimension + 1)
                but in order to handle Fortran code, we check all other possibilities
                and print (upper - lower + 1). Problem : the order of dimensions is reversed !!!! */
-
+#if 0
             if (expression_integer_value(elow, &low))
             {
                 if (low == 0)
@@ -344,14 +344,15 @@ static string c_dim_string(list ldim)
                 }
             }
             else
+#endif
             {
-                slow = words_to_string(words_expression(elow));
-                sup = words_to_string(words_expression(eup));
+                slow = c_expression(elow,false);
+                sup = c_expression(eup,false);
                 result = strdup(concatenate(OPENBRACKET,sup,"-",slow,"+ 1",CLOSEBRACKET,result,NULL));
                 free(slow);
                 free(sup);
             }
-        }, ldim);
+        }
     }
     /* otherwise the list is empty, no dimension to declare */
     return result;
@@ -437,10 +438,14 @@ static string this_entity_cdeclaration(entity var)
                         {
                             string sval = i2a(constant_int(c));
                             string svar = c_entity_local_name(var);
-                            result = strdup(concatenate(SHARPDEF, SPACE, svar,
-                                        SPACE, sval, NL, NULL));
+                            bool old = get_prettyprint_is_fortran();
+                            reset_prettyprint_is_fortran();
+                            string sbasic = basic_to_string(entity_basic(var));
+                            if(old) set_prettyprint_is_fortran();
+                            asprintf(&result,"static const %s %s = %s;\n",sbasic,svar,sval);
                             free(sval);
                             free(svar);
+                            free(sbasic);
                             return result;
                         }
                         /*What about real, double, string, ... ?*/
@@ -487,12 +492,12 @@ static string this_entity_cdeclaration(entity var)
                 }
                 if (basic_bit_p(variable_basic(v)))
                 {
-		  /* It is an expression... */
-		  _int i = (_int) basic_bit(variable_basic(v));
-		  pips_debug(2,"Basic bit %td",i);
-		  result = strdup(concatenate(result,":",i2a(i),NULL));
-		  user_error("this_entity_cdeclaration",
-			     "Bitfield to be finished...");
+                    /* It is an expression... */
+                    _int i = (_int) basic_bit(variable_basic(v));
+                    pips_debug(2,"Basic bit %td",i);
+                    result = strdup(concatenate(result,":",i2a(i),NULL));
+                    user_error("this_entity_cdeclaration",
+                            "Bitfield to be finished...");
                 }
                 free(st);
                 //free(sd);
@@ -506,11 +511,11 @@ static string this_entity_cdeclaration(entity var)
                 result = strdup(concatenate("struct ",tmp, "{", NL,NULL));
                 free(tmp);
                 MAP(ENTITY,ent,
-                {
-                    string s = this_entity_cdeclaration(ent);	
-                    result = strdup(concatenate(result, s, SEMICOLON, NULL));
-                    free(s);
-                },l);
+                        {
+                        string s = this_entity_cdeclaration(ent);	
+                        result = strdup(concatenate(result, s, SEMICOLON, NULL));
+                        free(s);
+                        },l);
                 result = strdup(concatenate(result,"}", NULL));
                 break;
             }
@@ -522,11 +527,11 @@ static string this_entity_cdeclaration(entity var)
                 result = strdup(concatenate("union ",tmp, "{", NL,NULL));
                 free(tmp);
                 MAP(ENTITY,ent,
-                {
-                    string s = this_entity_cdeclaration(ent);	
-                    result = strdup(concatenate(result, s, SEMICOLON, NULL));
-                    free(s);
-                },l);
+                        {
+                        string s = this_entity_cdeclaration(ent);	
+                        result = strdup(concatenate(result, s, SEMICOLON, NULL));
+                        free(s);
+                        },l);
                 result = strdup(concatenate(result,"}", NULL));
                 break;
             }
@@ -539,12 +544,12 @@ static string this_entity_cdeclaration(entity var)
                 result = strdup(concatenate("enum ", tmp, " {",NULL));
                 free(tmp);
                 MAP(ENTITY,ent,
-                {
-                    tmp = c_entity_local_name(ent);
-                    result = strdup(concatenate(result,first?"":",",tmp,NULL));
-                    free(tmp);
-                    first = FALSE;
-                },l);
+                        {
+                        tmp = c_entity_local_name(ent);
+                        result = strdup(concatenate(result,first?"":",",tmp,NULL));
+                        free(tmp);
+                        first = FALSE;
+                        },l);
                 result = strdup(concatenate(result,"}", NULL));
                 break;
             }
@@ -570,6 +575,11 @@ static bool variable_p(entity e)
         (storage_ram_p(s) || storage_return_p(s));
 }
 
+static bool parameter_or_variable_p(entity e)
+{
+    return parameter_p(e) || variable_p(e);
+}
+
 static bool argument_p(entity e)
 {
     /* Formal variables */
@@ -591,7 +601,7 @@ static string c_declarations(
     pips_assert("it is a code", value_code_p(entity_initial(module)));
 
     c = value_code(entity_initial(module));
-    MAP(ENTITY, var,
+    FOREACH(ENTITY, var,code_declarations(c))
     {
         string tmp = NULL;
         tmp = c_entity_local_name(var);
@@ -607,7 +617,7 @@ static string c_declarations(
             free(old);
             first = FALSE;
         }
-    },code_declarations(c));
+    }
     return result;
 }
 
@@ -1341,13 +1351,13 @@ static string c_code_string(entity module, statement stat)
         print_entities(statement_declarations(stat));
     }
 
-    before_head = c_declarations(module, parameter_p, NL, TRUE);
+    //before_head = c_declarations(module, parameter_p, NL, TRUE);
     head        = c_head(module);
     /* What about declarations associated to statements */
-    decls       = c_declarations(module, variable_p, SEMICOLON, TRUE);
+    decls       = c_declarations(module, parameter_or_variable_p, SEMICOLON, TRUE);
     body        = c_statement(stat, false);
 
-    result = concatenate(before_head, head, OPENBRACE, NL,
+    result = concatenate(/*before_head,*/ head, OPENBRACE, NL,
             decls, NL, body, CLOSEBRACE, NL, NULL);
 
     free(before_head);
