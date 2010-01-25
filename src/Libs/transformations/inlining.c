@@ -1045,21 +1045,19 @@ set get_private_entities(void *s)
 }
 
 static
-int compare_entities_with_dep(const entity *e1, const entity *e2)
+void sort_entities_with_dep(list *l)
 {
-    set s1 = set_make(set_pointer);
-    entity_get_referenced_entities(*e1,s1);
-    if( set_belong_p(s1,*e2) ) {
-        set_free(s1);
-        return +1;
+    gen_sort_list(*l,(gen_cmp_func_t)compare_entities);
+    list l_parameters=NIL,l_others=NIL;
+    FOREACH(ENTITY,e,*l)
+    {
+        if(entity_symbolic_p(e))
+            l_parameters=CONS(ENTITY,e,l_parameters);
+        else
+            l_others=CONS(ENTITY,e,l_others);
     }
-    set s2 = set_make(set_pointer);
-    entity_get_referenced_entities(*e2,s2);
-    if( set_belong_p(s2,*e1) ) {
-        set_free(s2);
-        return -1;
-    }
-    return compare_entities(e1,e2);
+    gen_free_list(*l);
+    *l=gen_nconc(l_parameters,l_others);
 }
 
 struct cpv {
@@ -1186,7 +1184,9 @@ statement outliner(string outline_module_name, list statements_to_outline)
         referenced_entities=tmp_list;
     }
 
-    gen_sort_list(referenced_entities,(gen_cmp_func_t)compare_entities_with_dep);
+    /* sort list, and put parameters first */
+    sort_entities_with_dep(&referenced_entities);
+
 
 
     intptr_t i=0;
