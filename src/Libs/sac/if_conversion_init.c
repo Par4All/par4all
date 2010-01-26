@@ -1,6 +1,6 @@
 /*
 
-  $Id$
+  $Id: if_conversion_init.c 16011 2010-01-19 14:35:21Z guelton $
 
   Copyright 1989-2010 MINES ParisTech
 
@@ -221,6 +221,17 @@ void if_conv_init_statement(statement stat)
     if(statement_test_p(stat))
     {
 
+      gen_chunk * ancestor = gen_get_recurse_current_ancestor();
+      if (INSTANCE_OF(control, ancestor)) {
+	// Hmmm, we are inside a control node
+	control c = (control) ancestor;
+	if (gen_length(control_successors(c)) == 2) {
+	  // A control node with 2 successors is an unstructured test:
+	  pips_user_warning("not converting a non structured test yet...\n");
+	  return;
+	}
+      }
+
         complexity stat_comp = load_statement_complexity(stat);
         if(stat_comp != (complexity) HASH_UNDEFINED_VALUE)
         {
@@ -335,20 +346,36 @@ boolean if_conversion_init(char * mod_name)
     set_current_module_entity(module_name_to_entity(mod_name));
     statement root = (statement) db_get_memory_resource(DBR_CODE, mod_name, TRUE);
     statement fake = make_empty_block_statement();
-        
+
     set_current_module_statement(fake);// to prevent a complex bug with gen_recurse and AddEntityToCurrentModule
     set_complexity_map( (statement_mapping) db_get_memory_resource(DBR_COMPLEXITIES, mod_name, TRUE));
 
     debug_on("IF_CONVERSION_INIT_DEBUG_LEVEL");
 
+    ifdebug(1) {
+      pips_debug(1, "Code before if_conversion_init:\n");
+      print_statement(root);
+    }
+
     // Now do the job
     gen_recurse(root, statement_domain, gen_true, if_conv_init_statement);
+
+    ifdebug(1) {
+      pips_debug(1, "Code after if_conv_init_statement:\n");
+      print_statement(root);
+    }
+
     // and share decl
     FOREACH(STATEMENT,s,statement_block(fake))
         insert_statement(root,copy_statement(s),true);
     free_statement(fake);
 
-    // Reorder the module, because new statements have been added 
+    ifdebug(1) {
+      pips_debug(1, "Code after copying from fake statement:\n");
+      print_statement(root);
+    }
+
+    // Reorder the module, because new statements have been added
     module_reorder(root);
     DB_PUT_MEMORY_RESOURCE(DBR_CODE, mod_name, root);
 
