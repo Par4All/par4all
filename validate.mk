@@ -38,7 +38,7 @@ OK	= exit 0
 clean: clean-validate
 
 clean-validate:
-	$(RM) *~ *.o *.tmp *.result/out out err a.out
+	$(RM) *~ *.o *.s *.tmp *.result/out out err a.out
 	$(RM) -r *.database
 
 validate:
