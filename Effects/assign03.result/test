@@ -3,7 +3,7 @@ Parsed printed file for "assign03"
 
 void assign03()
 {
-   extern char *malloc(int);
+   char *malloc(int);
    double *p = (double *) malloc(10*sizeof(double));
    int j = 2;
 
@@ -14,7 +14,7 @@ Proper effetcs for "assign03"
 
 void assign03()
 {
-   extern char *malloc(int);
+   char *malloc(int);
    double *p = (double *) malloc(10*sizeof(double));
    int j = 2;
 //               <must be read   >: j p
@@ -27,7 +27,7 @@ Cumulated effetcs for "assign03"
 
 void assign03()
 {
-   extern char *malloc(int);
+   char *malloc(int);
    double *p = (double *) malloc(10*sizeof(double));
    int j = 2;
 //               <may be written >: p[*]

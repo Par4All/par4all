@@ -21,7 +21,7 @@ Proper effetcs for "make_s"
 s_t make_s(int i, float x)
 {
    s_t *p;
-   extern char *malloc(int);
+   char *malloc(int);
 //               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
 //               <must be written>: _MALLOC_EFFECTS:_MALLOC_ p
 
@@ -45,7 +45,7 @@ Cumulated effetcs for "make_s"
 s_t make_s(int i, float x)
 {
    s_t *p;
-   extern char *malloc(int);
+   char *malloc(int);
 //               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
 //               <must be written>: _MALLOC_EFFECTS:_MALLOC_ p
 

@@ -69,11 +69,11 @@ void fpointer01(char c, void *_stream, void (*my_fputc)(const char c, void *_str
 {
    if (c=='\n'||c=='\r')
       /* on change de ligne */
-
+      
       *col = 0;
    else {
       /* indentation ok ? */
-
+      
       while (*col<indent) {
          my_fputc(' ', _stream);
          (*nbout)++;
@@ -84,7 +84,7 @@ void fpointer01(char c, void *_stream, void (*my_fputc)(const char c, void *_str
    }
    
    /* dans tous les cas il faut afficher le caractere passe */
-
+   
    my_fputc(c, _stream);
    (*nbout)++;
 }
@@ -98,12 +98,12 @@ void fpointer01(char c, void *_stream, void (*my_fputc)(const char c, void *_str
 //               <must be read   >: col
 //               <must be written>: col[0]
       /* on change de ligne */
-
+      
       *col = 0;
    else {
 //               <must be read   >: col col[0] indent
       /* indentation ok ? */
-
+      
       while (*col<indent) {
          my_fputc(' ', _stream);
 //               <must be read   >: nbout nbout[0]
@@ -120,7 +120,7 @@ void fpointer01(char c, void *_stream, void (*my_fputc)(const char c, void *_str
    }
    
    /* dans tous les cas il faut afficher le caractere passe */
-
+   
    my_fputc(c, _stream);
 //               <must be read   >: nbout nbout[0]
 //               <must be written>: nbout[0]
@@ -142,13 +142,13 @@ void fpointer01(char c, void *_stream, void (*my_fputc)(const char c, void *_str
 //               <must be read   >: col
 //               <must be written>: col[0]
       /* on change de ligne */
-
+      
       *col = 0;
    else {
 //               <must be read   >: col col[0] indent nbout nbout[0]
 //               <must be written>: col[0] nbout[0]
       /* indentation ok ? */
-
+      
       while (*col<indent) {
          my_fputc(' ', _stream);
 //               <must be read   >: nbout nbout[0]
@@ -165,7 +165,7 @@ void fpointer01(char c, void *_stream, void (*my_fputc)(const char c, void *_str
    }
    
    /* dans tous les cas il faut afficher le caractere passe */
-
+   
    my_fputc(c, _stream);
 //               <must be read   >: nbout nbout[0]
 //               <must be written>: nbout[0]

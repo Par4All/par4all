@@ -1,6 +1,6 @@
 byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
 {
-   int height,  width,  gris;
+   int height, width, gris;
    byte **m;
    FILE *file;
    char *buffer;
@@ -69,7 +69,7 @@ Proper effects for "LoadPGM_bmatrix"
 
 byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
 {
-   int height,  width,  gris;
+   int height, width, gris;
    byte **m;
    FILE *file;
    char *buffer;
@@ -147,7 +147,7 @@ Cumulated effects for "LoadPGM_bmatrix"
 //                                  _MALLOC_EFFECTS:_MALLOC_
 byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
 {
-   int height,  width,  gris;
+   int height, width, gris;
    byte **m;
    FILE *file;
    char *buffer;

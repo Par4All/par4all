@@ -3,7 +3,7 @@ Parsed code for "call10"
 
 void call10(int i, int x[10], int j, int y[10])
 {
-   int k,  l;
+   int k, l;
 
    for (k = 0;k<i;k++)
       x[i] = 0;
@@ -15,7 +15,7 @@ Code for "call10"
 
 void call10(int i, int x[10], int j, int y[10])
 {
-   int k,  l;
+   int k, l;
 
    for(k = 0; k <= i-1; k += 1)
       x[i] = 0;
@@ -27,7 +27,7 @@ Proper effects for "call10"
 
 void call10(int i, int x[10], int j, int y[10])
 {
-   int k,  l;
+   int k, l;
 //               <must be read   >: i
 //               <must be written>: k
 
@@ -49,7 +49,7 @@ Cumulated effects for "call10"
 //               <must be read   >: i j
 void call10(int i, int x[10], int j, int y[10])
 {
-   int k,  l;
+   int k, l;
 //               <may be written >: x[*]
 //               <must be read   >: i
 //               <must be written>: k
@@ -100,7 +100,7 @@ Regions for "call10"
 
 void call10(int i, int x[10], int j, int y[10])
 {
-   int k,  l;
+   int k, l;
 
 //  <x[PHI1]-W-EXACT-{PHI1==i, 1<=i}>
 

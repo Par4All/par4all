@@ -3,8 +3,7 @@ Parsed code for "call14"
 
 void call14(int n, int m, int *x)
 {
-   int i;
-   int j;
+   int i, j;
 
    for (i = 0;i<n*m;i++)
       x[i] = i;
@@ -14,8 +13,7 @@ Code for "call14"
 
 void call14(int n, int m, int *x)
 {
-   int i;
-   int j;
+   int i, j;
 
    for(i = 0; i <= n*m-1; i += 1)
       x[i] = i;
@@ -25,33 +23,32 @@ Proper effects for "call14"
 
 void call14(int n, int m, int *x)
 {
-   int i;
-   int j;
+   int i, j;
 //               <must be read   >: m n
 //               <must be written>: i
 
    for(i = 0; i <= n*m-1; i += 1)
-//               <must be read   >: i m n
+//               <must be read   >: i m n x
 //               <must be written>: x[i]
       x[i] = i;
 }
 
 Cumulated effects for "call14"
 
+//               <may be read    >: x
 //               <may be written >: x[*]
 //               <must be read   >: m n
 void call14(int n, int m, int *x)
 {
-   int i;
-   int j;
-//               <may be read    >: i
+   int i, j;
+//               <may be read    >: i x
 //               <may be written >: x[*]
 //               <must be read   >: m n
 //               <must be written>: i
 
    for(i = 0; i <= n*m-1; i += 1)
 //               <may be written >: x[*]
-//               <must be read   >: i m n
+//               <must be read   >: i m n x
       x[i] = i;
 }
 
@@ -62,9 +59,8 @@ main()
    int d1 = 4;
    int d2 = 4;
    int y[d1][d2];
-   int i;
-   int j;
-//               <may be written >: y[*][*]
+   int i, j;
+//               <may be written >: y[*]
 //               <must be read   >: d1 d2
 
    call14(d1, d2, (int *) y);
@@ -94,8 +90,7 @@ main()
    int d1 = 4;
    int d2 = 4;
    int y[d1][d2];
-   int i;
-   int j;
+   int i, j;
 //               <may be written >: y[*]
 //               <must be read   >: d1 d2
 
