@@ -1264,7 +1264,7 @@ statement outliner(string outline_module_name, list statements_to_outline)
                                 NIL
                                 )
                             );
-                    parameter_type(p)=t;
+                    parameter_type(p)=copy_type(t);
                     syntax s = expression_syntax(x);
                     expression X = make_expression(s,normalized_undefined);
                     expression_syntax(x)=make_syntax_call(make_call(CreateIntrinsic(ADDRESS_OF_OPERATOR_NAME),CONS(EXPRESSION,X,NIL)));
