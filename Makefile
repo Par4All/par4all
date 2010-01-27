@@ -82,6 +82,8 @@ validate-%: %
 
 .PHONY: parallel-validate-test
 
+parallel-clean: $(TARGET:%=parallel-clean-%)
+
 parallel-validate-test: $(TARGET:%=parallel-validate-test-%)
 	# TODO generate summary
 	# TODO archive summary
@@ -89,11 +91,20 @@ parallel-validate-test: $(TARGET:%=parallel-validate-test-%)
 parallel-clean-%:
 	$(MAKE) -C $* clean unvalidate
 
+# unsafe directories...
+# maybe it would be easier to list safe directories:-(
+parallel-validate-test-Control: SAFE=-j1
+parallel-validate-test-DemoStd: SAFE=-j1
+parallel-validate-test-Syntax: SAFE=-j1
+parallel-validate-test-Semantics: SAFE=-j1
+parallel-validate-test-Prettyprint: SAFE=-j1
+
+SAFE	=
 parallel-validate-test-%: parallel-clean-%
 	# -j1 do not run subdirectory validations in parallel as
 	# some directory cannot stand it at the time
 	# ISSUE: failed/changed are not detected?
-	$(MAKE) -j1 -C $* validate-test
+	$(MAKE) $(SAFE) FAILED=../failed -C $* validate-test
 
 ## REMOVE ???
 # special handling of private

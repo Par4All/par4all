@@ -30,9 +30,12 @@ F.test	= $(wildcard *.test)
 # validation output
 F.valid	= $(F.result:%=%/$(TEST))
 
+SUBDIR	= $(notdir $(PWD))
 here	:= $(shell pwd)
 FLT	= sed -e 's,$(here),$$VDIR,g'
-OK	= exit 0
+#OK	= exit 0
+FAILED	= failed
+OK	= [ $$? -eq 0 ] || echo $(SUBDIR)/$* >> $(FAILED) ; exit 0
 
 # default target is to clean
 clean: clean-validate
