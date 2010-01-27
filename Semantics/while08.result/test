@@ -1,0 +1,86 @@
+
+Transformers for "while08"
+
+
+C  T(while08) {9<=while08}
+
+int while08()
+{
+   int i, n;
+
+//  T(i) {i==0}
+
+
+   i = 0;
+
+//  T(n) {n==10}
+
+   n = 10;
+
+//  T(i,n) {i+n==i#init+n#init-1, i#init+1<=i+n, 1<=n}
+
+
+   while (--n>0) {
+
+//  T() {}
+
+      printf("loop: i=%d, n=%d, i+n=%d\n", i, n, i+n);
+
+//  T(i) {i==i#init+1}
+
+      i++;
+   }
+
+//  T() {}
+
+
+   printf("exit: i=%d, n=%d, i+n=%d\n", i, n, i+n);
+
+//  T(while08) {i==while08}
+
+
+   return i;
+}
+
+Preconditions for "while08"
+
+
+//  P() {}
+
+int while08()
+{
+   int i, n;
+
+//  P() {}
+
+
+   i = 0;
+
+//  P(i) {i==0}
+
+   n = 10;
+
+//  P(i,n) {i==0, n==10}
+
+
+   while (--n>0) {
+
+//  P(i,n) {8<=i+n, i+n<=9, 8i+7n<=63}
+
+      printf("loop: i=%d, n=%d, i+n=%d\n", i, n, i+n);
+
+//  P(i,n) {8<=i+n, i+n<=9, 8i+7n<=63}
+
+      i++;
+   }
+
+//  P(i,n) {i==8, n==0}
+
+
+   printf("exit: i=%d, n=%d, i+n=%d\n", i, n, i+n);
+
+//  P(i,n) {i==8, n==0}
+
+
+   return i;
+}
