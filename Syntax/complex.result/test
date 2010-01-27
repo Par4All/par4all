@@ -1,0 +1,7 @@
+      PROGRAM COMPLEX
+C     bug: complex constant are not recognized by PIPS's parser
+C          they have to be replaced by a call to intrinsic CMPLX
+      COMPLEX CMPLX2
+c     cmplx2 = (0.1,0.)
+      CMPLX2 = CMPLX(0.1, 0.)                                           0006
+      END
