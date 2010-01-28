@@ -1,6 +1,6 @@
 /*
 
-  $Id: if_conversion_init.c 16011 2010-01-19 14:35:21Z guelton $
+  $Id$
 
   Copyright 1989-2010 MINES ParisTech
 
@@ -221,16 +221,16 @@ void if_conv_init_statement(statement stat)
     if(statement_test_p(stat))
     {
 
-      gen_chunk * ancestor = gen_get_recurse_current_ancestor();
-      if (INSTANCE_OF(control, ancestor)) {
-	// Hmmm, we are inside a control node
-	control c = (control) ancestor;
-	if (gen_length(control_successors(c)) == 2) {
-	  // A control node with 2 successors is an unstructured test:
-	  pips_user_warning("not converting a non structured test yet...\n");
-	  return;
-	}
-      }
+        gen_chunk * ancestor = gen_get_recurse_current_ancestor();
+        if (ancestor && INSTANCE_OF(control, ancestor)) {
+            // Hmmm, we are inside a control node
+            control c = (control) ancestor;
+            if (gen_length(control_successors(c)) == 2) {
+                // A control node with 2 successors is an unstructured test:
+                pips_user_warning("not converting a non structured test yet...\n");
+                return;
+            }
+        }
 
         complexity stat_comp = load_statement_complexity(stat);
         if(stat_comp != (complexity) HASH_UNDEFINED_VALUE)
@@ -264,12 +264,12 @@ void if_conv_init_statement(statement stat)
                         MakeUnaryCall(
                                 entity_intrinsic(NOT_OPERATOR_NAME),
                                 copy_expression(test_condition(t))
-                    );
+                                );
                     list block = 
                         make_statement_list(
-                            do_transform_if_statements(test_true(t),test_condition(t)),
-                            do_transform_if_statements(test_false(t),not_test_condition)
-                            );
+                                do_transform_if_statements(test_true(t),test_condition(t)),
+                                do_transform_if_statements(test_false(t),not_test_condition)
+                                );
                     if(!statement_undefined_p(atom))
                         block=CONS(STATEMENT,atom,block);
                     update_statement_instruction(stat,make_instruction_block(block));
@@ -279,8 +279,8 @@ void if_conv_init_statement(statement stat)
                     }
                 }
             }
-        else
-            pips_user_warning("not converting a test, complexity too ... complex \n");
+            else
+                pips_user_warning("not converting a test, complexity too ... complex \n");
 
         }
         else

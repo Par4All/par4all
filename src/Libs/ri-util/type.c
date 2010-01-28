@@ -462,6 +462,8 @@ bool basic_equal_strict_p(basic b1, basic b2)
     */
     /* could be a star or an expression; a value_equal_p() is needed! */
     return TRUE;
+  case is_basic_typedef:
+        return basic_typedef_p(b2) && same_entity_p(basic_typedef_p(b1),basic_typedef_p(b2));
   default: pips_error("basic_equal_p", "unexpected tag %d\n", basic_tag(b1));
   }
   return FALSE; /* just to avoid a warning */
