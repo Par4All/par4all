@@ -4,7 +4,7 @@ void carried_dependence_in_conditional( int a[N], int n ) {
 
   // The backward output dependence should be marked as carried
   for(j = 1; j <= 99; j += 1) {
-    if( j<N) {
+    if( j<n) {
       k = 0;
     }
   }
