@@ -318,11 +318,16 @@ SIMD_LOAD_CONSTANT_V4HI (short VEC[4], int HIGH, int LOW)
 }
 
 void
-SIMD_LOAD_V4HI (short VEC[4], short BASE[4])
-{  VEC[0] = BASE[0];
+SIMD_LOAD_V8HI (short VEC[8], short BASE[8])
+{  
+    VEC[0] = BASE[0];
     VEC[1] = BASE[1];
     VEC[2] = BASE[2];
     VEC[3] = BASE[3];
+    VEC[4] = BASE[4];
+    VEC[5] = BASE[5];
+    VEC[6] = BASE[6];
+    VEC[7] = BASE[7];
 }
 
 void
@@ -344,11 +349,16 @@ SIMD_LOAD_GENERIC_V4HI (short VEC[4], short X1, short X2, short X3, short X4)
 }
 
 void
-SIMD_SAVE_V4HI (short VEC[4], short BASE[4])
-{  BASE[0] = VEC[0];
+SIMD_SAVE_V8HI (short VEC[8], short BASE[8])
+{  
+    BASE[0] = VEC[0];
     BASE[1] = VEC[1];
     BASE[2] = VEC[2];
     BASE[3] = VEC[3];
+    BASE[4] = VEC[4];
+    BASE[5] = VEC[5];
+    BASE[6] = VEC[6];
+    BASE[7] = VEC[7];
 }
 
 void
