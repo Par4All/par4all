@@ -335,15 +335,21 @@ bool nop_statement_p(statement s)
    have side effects. See C_syntax/block01.c.
 
    FI: same issue with CONTINUE.
+
+   If there is an extension on it (such as a pragma) return false since
+   this statement may be useful/
  */
 bool empty_statement_or_labelless_continue_p(statement st)
 {
   instruction i;
 
-  if (!entity_empty_label_p(statement_label(st)))
+  if (!entity_empty_label_p(statement_label(st))
+      || !empty_extensions_p(statement_extensions(st)))
     return FALSE;
+
   if (continue_statement_p(st))
     return ENDP(statement_declarations(st));
+
   i = statement_instruction(st);
   if (instruction_block_p(i) && ENDP(statement_declarations(st))) {
     MAP(STATEMENT, s,
@@ -771,6 +777,17 @@ statement make_continue_statement(entity l)
     return make_call_statement(CONTINUE_FUNCTION_NAME, NIL, l,
 			       empty_comments);
 }
+
+
+/* Make a simple continue statement to be used as a NOP or ";" in C
+
+   @return the statement
+*/
+statement make_plain_continue_statement()
+{
+    return make_continue_statement(entity_empty_label());
+}
+
 
 /* To preserve declaration lines and comments, declaration statements
    are used. */

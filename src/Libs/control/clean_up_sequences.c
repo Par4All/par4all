@@ -312,7 +312,7 @@ void clean_up_sequences_rewrite(statement s)
       if (the_comments != NULL /* || !ENDP(statement_declarations(s))*/) {
 	/* We have a pending comment we were not able to
 	   attach. Create a continue statement to attach it: */
-	statement st = make_continue_statement(entity_empty_label());
+	statement st = make_plain_continue_statement();
 	deal_with_pending_comment(st, &the_comments);
 	useful_sts = gen_nconc(useful_sts,
 			       CONS(STATEMENT, st, NIL));
@@ -347,6 +347,8 @@ void clean_up_sequences_rewrite(statement s)
 	statement_instruction(st) = instruction_undefined;
 	statement_declarations(s) = statement_declarations(st);
 	statement_declarations(st) = NIL;
+	statement_extensions(s) = statement_extensions(st);
+	statement_extensions(st) = extensions_undefined;
 	/* Do not forget to adjust the GOTOs pointing on st: */
 	adjust_goto_from_to(st, s);
 	/* Discard the old statement: */

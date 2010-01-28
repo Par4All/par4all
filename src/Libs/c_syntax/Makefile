@@ -25,7 +25,7 @@ TARGET	= c_syntax
 # many other parsers in PIPS:
 #YOPT	= --defines --locations --name-prefix=c_
 #LOPT	= --bison-bridge --bison-location --prefix=c_
-YOPT	= --defines --name-prefix=c_ --report=state
+YOPT	= --defines --name-prefix=c_ --report=state --debug --verbose
 LOPT	= --prefix=c_
 
 INC_CFILES =	c_parser.c \

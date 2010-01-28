@@ -588,7 +588,7 @@ c_parser_context GetContextCopy()
 %type <void> function_def
 %type <void> function_def_start
 %type <type> type_name
-%type <statement> block
+%type <statement> block statements_inside_block
 %type <liste> local_labels local_label_names
 %type <liste> old_parameter_list_ne
 %type <liste> old_pardef_list
@@ -791,7 +791,9 @@ declaration         {/* discard_C_comment();*/ ;}
 			  //retrieve all comments
 			  //discard_C_comment();
 			}
-/* Old style function prototype, but without any arguments */
+/* Old style function prototype, but without any arguments
+
+ Not used because of conflicts...
 |   TK_IDENT TK_LPAREN TK_RPAREN TK_SEMICOLON
                         {
 			  entity e = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,$1);
@@ -813,6 +815,7 @@ declaration         {/* discard_C_comment();*/ ;}
 			  //retrieve all comments
 			  //discard_C_comment();
 			}
+*/
 /* transformer for a toplevel construct */
 |   TK_AT_TRANSFORM TK_LBRACE global TK_RBRACE TK_IDENT /*to*/ TK_LBRACE globals TK_RBRACE
                         {
@@ -1337,16 +1340,40 @@ bracket_comma_expression:
 ;
 
 /*** statements ***/
-block: /* ISO 6.8.2 */
+
+statements_inside_block:
     TK_LBRACE
-                        { EnterScope(); discard_C_comment();}
-    local_labels block_attrs declaration_list statement_list TK_RBRACE
+                        { EnterScope(); discard_C_comment(); }
+    local_labels block_attrs declaration_list statement_list
                         {
 			  $$ = MakeBlock($5,$6);
 			  ExitScope();
 			}
+
+block: /* ISO 6.8.2 */
+    statements_inside_block TK_RBRACE
+                        {
+			  $$ = $1
+			}
+|   statements_inside_block pragmas TK_RBRACE
+                        {
+			  /* Since pragmas cannot be attached to nothing,
+			     add a CONTINUE to attach them: */
+			  statement nop = make_plain_continue_statement();
+			  add_pragma_strings_to_statement(nop, $2, FALSE /* Do not reallocate the strings*/);
+			  /* Free the pragma list structure: */
+			  gen_free_list($2);
+			  /* Since we can also attach a comment, try to
+			     save one if any: */
+			  add_comment_and_line_number(nop,
+						      get_current_C_comment(),
+						      get_current_C_line_number());
+			  /* Add the pragmaifyed nop at the end of the block: */
+			  append_a_statement($1, nop);
+			  $$ = $1;
+			}
 |   error location TK_RBRACE
-                        { CParserError("Parse error: error location TK_RBRACE \n"); }
+{ abort();CParserError("Parse error: error location TK_RBRACE \n"); }
 ;
 
 block_attrs:
@@ -1412,7 +1439,7 @@ pragma:
 
 
 pragmas:
-pragma { /* To  No pragma... The common case, return the empty list */
+pragma { /* No pragma... The common case, return the empty list */
   pips_debug(1, "No longer pragma\n");
   $$ = CONS(STRING, $1, NIL);
 }
@@ -2760,10 +2787,12 @@ direct_old_proto_decl:
 			  (void) UpdateFunctionEntity(e, paras);
 			  $$ = e;
 			}
+/* Never used because of conflict
 |   direct_decl TK_LPAREN TK_RPAREN
                         {
                           (void) UpdateFunctionEntity($1,NIL);
 			}
+*/
 ;
 
 old_parameter_list_ne:
@@ -3031,10 +3060,12 @@ function_def_start:  /* (* ISO 6.9.1 *) */
 			  StackPop(OffsetStack);
 			}
 /* (* No return type and no parameters *) */
+/* Never used because of conflict
+
 |   TK_IDENT TK_LPAREN TK_RPAREN
                         {
 			  entity e = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,$1);
-			  /* Functional type is unknown or int (by default) or void ?*/
+			  /* Functional type is unknown or int (by default) or void ?* /
 			  functional f = make_functional(NIL,make_type_unknown());
 			  entity_type(e) = make_type_functional(f);
 			  pips_debug(2,"Create current module %s with no return type and no parameters\n",$1);
@@ -3042,7 +3073,7 @@ function_def_start:  /* (* ISO 6.9.1 *) */
 			  clear_C_comment();
 			  pips_assert("Current module entity is consistent\n",entity_consistent_p(e));
 			}
-;
+*/;
 
 /*** GCC attributes ***/
 attributes:
@@ -3174,7 +3205,10 @@ attr:
 ;
 
 attr_list_ne:
-|   attr
+/* Never used because of conflict
+|
+*/
+    attr
                         { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }
 |   attr TK_COMMA attr_list_ne
                         { CParserError("PRAGMAS and ATTRIBUTES not implemented\n"); }
@@ -3246,4 +3280,3 @@ asmcloberlst_ne:
 ;
 
 %%
-

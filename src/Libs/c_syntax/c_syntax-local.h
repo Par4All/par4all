@@ -40,6 +40,7 @@ extern void push_current_C_comment(void);
 extern void update_C_comment(string a_comment);
 extern void discard_C_comment(void);
 extern void reset_C_comment(bool);
+extern void reset_expression_comment(void);
 extern void clear_C_comment();
 extern void init_C_comment();
 
