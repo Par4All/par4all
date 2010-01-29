@@ -6182,6 +6182,21 @@ Partial distribution distributes the statements of a loop nest except
 PARTIAL_DISTRIBUTION FALSE
 \end{PipsProp}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Loop expansion
+\subsection{Loop Expansion}
+\begin{PipsPass}
+Extends the range of a loop given by \PipsPropRef{LOOP_LABEL} to fit a size given by \PipsPropRef{LOOP_EXPANSION_SIZE}
+The new loop is guarded to prevent illegal iterations, further transformations can elaborate on this.
+\end{PipsPass}
+\begin{PipsMake}
+loop_expansion 	> MODULE.code
+    < PROGRAM.entities
+    < MODULE.code
+\end{PipsMake}
+\begin{PipsProp}{LOOP_EXPANSION_SIZE}
+LOOP_EXPANSION_SIZE 0
+\end{PipsProp}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Index Set Splitting
 
 \subsection{Index Set Splitting}

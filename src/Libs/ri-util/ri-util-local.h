@@ -1159,10 +1159,11 @@
 #define ENTITY_VA_COPY_P(e)  ENTITY_NAME_P(e, BUILTIN_VA_COPY)
 
 
-#define ENTITY_FOUR_OPERATION_P(e) ( ENTITY_PLUS_P(e) || \
+#define ENTITY_FIVE_OPERATION_P(e) ( ENTITY_PLUS_P(e) || \
                                      ENTITY_MINUS_P(e) || \
                                      ENTITY_UNARY_MINUS_P(e) || \
                                      ENTITY_MULTIPLY_P(e) || \
+                                     ENTITY_MODULO_P(e) ||\
                                      ENTITY_DIVIDE_P(e) )
 
 #define IO_CALL_P(call) io_intrinsic_p(call_function(call))

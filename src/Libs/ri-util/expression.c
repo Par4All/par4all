@@ -1783,8 +1783,8 @@ expression make_op_exp(char *op_name, expression exp1, expression exp2)
 	op_name,
 	words_to_string(words_expression(exp2)));
 
-  if( ! ENTITY_FOUR_OPERATION_P(op_ent) )
-    user_error("make_op_exp", "operation must be : +, -, * or /");
+  if( ! ENTITY_FIVE_OPERATION_P(op_ent) )
+    user_error("make_op_exp", "operation must be : +, -, *, MOD, or /");
 
   int val1, val2;
   if( expression_integer_value(exp1,&val1) && expression_integer_value(exp2,&val2) )
@@ -1798,6 +1798,8 @@ expression make_op_exp(char *op_name, expression exp1, expression exp2)
 	result_exp = make_integer_constant_expression(val1 - val2);
       else if(ENTITY_MULTIPLY_P(op_ent))
 	result_exp = make_integer_constant_expression(val1 * val2);
+      else if(ENTITY_MODULO_P(op_ent))
+          result_exp = make_integer_constant_expression(val1 % val2);
       else /* ENTITY_DIVIDE_P(op_ent) */
 	/* we compute here as FORTRAN would do */
 	result_exp = make_integer_constant_expression((int) (val1 / val2));
