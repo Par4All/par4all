@@ -271,8 +271,10 @@ void prettyprint_dependence_graph( FILE * fd,
  */
 
 /* Context structure used by gen recurse */
-static struct prettyprint_dot_context {
+struct prettyprint_dot_context {
   int previous_ordering;
+  bool ordered;
+  bool print_statement;
   FILE *fd;
   statement current;
 };
@@ -302,40 +304,50 @@ while ( *str ) { \
   } \
 }
 
-/** \fn static void prettyprint_dot_label( FILE *fd, statement s )
+/** \fn static void prettyprint_dot_label( FILE *fd, statement s, bool print_statement )
  *  \brief Print the label for a statement. It will only output the first line
  *  after having removed comments.
  *  \param fd is the file descriptor
  *  \param s is the statement
+ *  \param print_statement, if set to false then only print the ordering
  */
-static void prettyprint_dot_label( FILE *fd, statement s ) {
+static void prettyprint_dot_label( FILE *fd, statement s, bool print_statement ) {
 
-  // saving comments
-  string i_comments = statement_comments(s);
-
-  // remove thems
-  statement_comments(s) = string_undefined;
-
-  // Get the text without comments
-  list sentences =
-      text_sentences(text_statement_enclosed(entity_undefined,0,s,false,true ) );
-
-  // Restoring comments
-  statement_comments(s) = i_comments;
-
-  // Print the first sentence
-  sentence sent = SENTENCE(CAR( sentences ) );
-  if ( sentence_formatted_p(sent) ) {
-    string str = sentence_formatted(sent);
-    dot_print_label_string( fd, str );
+  if( ! print_statement ) {
+    // Print only ordering
+    long int o = statement_ordering(s);
+    fprintf( fd, "(%d,%d)", ORDERING_NUMBER(o), ORDERING_STATEMENT(o));
   } else {
-    unformatted u = sentence_unformatted(sent);
-    cons *lw = unformatted_words(u);
-    while ( lw ) {
-      string str = STRING(CAR(lw));
-      dot_print_label_string( fd, str )
-      lw = CDR(lw);
+    // Print the code
 
+    // saving comments
+    string i_comments = statement_comments(s);
+
+    // remove thems
+    statement_comments(s) = string_undefined;
+
+    // Get the text without comments
+    list
+        sentences =
+            text_sentences(text_statement_enclosed(entity_undefined,0,s,false,true ) );
+
+    // Restoring comments
+    statement_comments(s) = i_comments;
+
+    // Print the first sentence
+    sentence sent = SENTENCE(CAR( sentences ) );
+    if ( sentence_formatted_p(sent) ) {
+      string str = sentence_formatted(sent);
+      dot_print_label_string( fd, str );
+    } else {
+      unformatted u = sentence_unformatted(sent);
+      cons *lw = unformatted_words(u);
+      while ( lw ) {
+        string str = STRING(CAR(lw));
+        dot_print_label_string( fd, str )
+        lw = CDR(lw);
+
+      }
     }
   }
 }
@@ -355,17 +367,19 @@ static bool prettyprint_dot_nodes( statement s, dot_ctx ctx ) {
 
   // We ignore the current statement (infinite recursion) and blocks
   if(ctx->current != s && ! statement_block_p( s ) ) {
-    // When we have produced a previous statement,
-    // we chain it with current one with a very high weight
     int ordering = statement_ordering(s);
-    if ( ctx->previous_ordering > 0 ) {
-      fprintf( ctx->fd,
-               "    \"%d\" -> \"%d\";\n",
-               ctx->previous_ordering,
-               ordering
-               ); // We really want ordering to be respected :-)
+
+    if ( ctx->ordered ) {
+      // When we have produced a previous statement,
+      // we chain it with current one with a very high weight
+      if ( ctx->previous_ordering > 0 ) {
+        fprintf( ctx->fd,
+                 "    \"%d\" -> \"%d\";\n",
+                 ctx->previous_ordering,
+                 ordering ); // We really want ordering to be respected :-)
+      }
+      ctx->previous_ordering = ordering;
     }
-    ctx->previous_ordering = ordering;
 
     // Create the node
     fprintf( ctx->fd, "    %d  [label=\"", ordering);
@@ -375,9 +389,10 @@ static bool prettyprint_dot_nodes( statement s, dot_ctx ctx ) {
     switch ( instruction_tag(i) ) {
       case is_instruction_test:
         // It's a test, we print the test itself first
-        prettyprint_dot_label( ctx->fd, s );
+        prettyprint_dot_label( ctx->fd, s, ctx->print_statement );
         fprintf( ctx->fd, "\"];\n" );
-        // FIXME "else" won't appear in output... but I've no solution :-(
+        // FIXME "else" won't appear in output...
+        // but I've no "simple" solution for the moment :-(
 
         // Recurse on test bodies (true & false)
         dot_nodes_recurse( ctx, s );
@@ -389,7 +404,7 @@ static bool prettyprint_dot_nodes( statement s, dot_ctx ctx ) {
       case is_instruction_whileloop:
       case is_instruction_forloop:
         // We have a loop, first print the header
-        prettyprint_dot_label( ctx->fd, s );
+        prettyprint_dot_label( ctx->fd, s, ctx->print_statement );
         fprintf( ctx->fd, "\"];\n" );
         // Recurse on loop body now
         dot_nodes_recurse( ctx, s )
@@ -402,13 +417,15 @@ static bool prettyprint_dot_nodes( statement s, dot_ctx ctx ) {
       case is_instruction_expression:
       default:
         // Standard output, print the statement
-        prettyprint_dot_label( ctx->fd, s );
+        prettyprint_dot_label( ctx->fd, s, ctx->print_statement );
         fprintf( ctx->fd, "\"];\n\n" );
         break;
     }
   }
   return gen_recurse;
 }
+
+
 
 /** \fn void prettyprint_dot_dependence_graph( FILE * fd,
  *                                             statement mod_stat,
@@ -422,8 +439,6 @@ static bool prettyprint_dot_nodes( statement s, dot_ctx ctx ) {
 void prettyprint_dot_dependence_graph( FILE * fd,
                                        statement mod_stat,
                                        graph mod_graph ) {
-  cons *pv1, *ps, *pc;
-  Ptsg gs;
   debug_on( "RICEDG_DEBUG_LEVEL" );
 
   ifdebug(8) {
@@ -431,18 +446,85 @@ void prettyprint_dot_dependence_graph( FILE * fd,
      * hash table is the proper one */
     print_ordering_to_statement( );
   }
-
+  // Begin graph
   fprintf( fd, "digraph {\n" );
 
-  if ( !get_bool_property( "PRINT_DOTDG_SIMPLE" ) ) {
-    // Will output the whole code and not only ordering
-    fprintf( fd, "\n"
-      "  {\n/* Print nodes for statements, and order them */\n\n"
-      "    node [shape=box,fontsize=18,style=bold];\n"
-      "    edge  [weight=100,color=white];\n\n" );
+
+  bool centered = get_bool_property( "PRINT_DOTDG_CENTERED" );
+  string title = get_string_property( "PRINT_DOTDG_TITLE" );
+  string title_position = get_string_property( "PRINT_DOTDG_TITLE_POSITION" );
+  string background = get_string_property( "PRINT_DOTDG_BACKGROUND" );
+  string nodeshape= get_string_property( "PRINT_DOTDG_NODE_SHAPE" );
+  string nodeshapecolor = get_string_property( "PRINT_DOTDG_NODE_SHAPE_COLOR" );
+  string nodefillcolor = get_string_property( "PRINT_DOTDG_NODE_FILL_COLOR" );
+  string nodefontcolor = get_string_property( "PRINT_DOTDG_NODE_FONT_COLOR" );
+  string nodefontsize = get_string_property( "PRINT_DOTDG_NODE_FONT_SIZE" );
+  string nodefontface = get_string_property( "PRINT_DOTDG_NODE_FONT_FACE" );
+
+
+  /* graph style */
+  fprintf( fd,
+           "\n"
+           "  /* graph style */\n");
+  // Print title if not empty
+  if( !same_string_p( title, "" ) ) {
+    fprintf( fd, "  label=\"%s\";\n", title);
+  }
+  // Print title location if not empty
+  if( !same_string_p( title_position, "" ) ) {
+    fprintf( fd, "  labelloc=\"%s\";\n", title_position);
+  }
+  // Print background color if not empty
+  if( !same_string_p( background, "" ) ) {
+    fprintf( fd, "  bgcolor=\"%s\";\n", background);
+  }
+  if( centered ) {
+    fprintf( fd, "  center=\"true\";\n");
+  }
+  fprintf( fd, "\n\n");
+
+
+
+  /* Nodes style */
+  fprintf( fd,
+           "\n"
+             "  /* Nodes style */\n"
+             "  node [shape=\"%s\",color=\"%s\",fillcolor=\"%s\","
+             "fontcolor=\"%s\",fontsize=\"%s\",fontname=\"%s\"];\n\n",
+           nodeshape,
+           nodeshapecolor,
+           nodefillcolor,
+           nodefontcolor,
+           nodefontsize,
+           nodefontface );
+
+
+
+
+  // Should we print the statement or only its ordering ?
+  bool print_statement = get_bool_property( "PRINT_DOTDG_STATEMENT" );
+  // Should node be ordered top down according to the statement ordering ?
+  bool ordered = get_bool_property( "PRINT_DOTDG_TOP_DOWN_ORDERED" );
+
+  if( ordered || print_statement ) {
+  fprintf( fd,
+             "\n"
+               "  {\n/* Print nodes for statements %s order them */\n\n",
+             ordered ? "and" : "but don't" );
+
+    if ( ordered ) {
+      fprintf( fd,
+               "/* ordering edges must be invisible, so set background color */\n"
+                 "    edge  [weight=100,color=%s];\n\n",
+               background );
+    }
+
+    // Generate nodes
     struct prettyprint_dot_context ctx;
     ctx.fd = fd;
     ctx.current = NULL;
+    ctx.ordered = ordered;
+    ctx.print_statement = print_statement;
     ctx.previous_ordering = 0;
 
     gen_context_recurse( mod_stat,
@@ -450,9 +532,24 @@ void prettyprint_dot_dependence_graph( FILE * fd,
         statement_domain,
         prettyprint_dot_nodes,
         gen_true );
-    fprintf( fd, "  }\n\n");
+    fprintf( fd, "  }\n\n" );
   }
-  fprintf( fd, "/* Print arcs between statements */\n\n");
+
+
+  fprintf( fd, "/* Print arcs between statements */\n\n" );
+
+
+
+
+  string flowdep_color = get_string_property( "PRINT_DOTDG_FLOW_DEP_COLOR" );
+  string flowdep_style = get_string_property( "PRINT_DOTDG_FLOW_DEP_STYLE" );
+  string antidep_color = get_string_property( "PRINT_DOTDG_ANTI_DEP_COLOR" );
+  string antidep_style = get_string_property( "PRINT_DOTDG_ANTI_DEP_STYLE" );
+  string outputdep_color = get_string_property( "PRINT_DOTDG_OUTPUT_DEP_COLOR" );
+  string outputdep_style = get_string_property( "PRINT_DOTDG_OUTPUT_DEP_STYLE" );
+  string inputdep_color = get_string_property( "PRINT_DOTDG_INPUT_DEP_COLOR" );
+  string inputdep_style = get_string_property( "PRINT_DOTDG_INPUT_DEP_STYLE" );
+
 
   // Loop over the graph and print all dependences
   FOREACH( vertex, v1 , graph_vertices( mod_graph ) ) {
@@ -468,21 +565,25 @@ void prettyprint_dot_dependence_graph( FILE * fd,
         action sink_act = effect_action( conflict_sink( c ) );
         reference sink_ref = effect_any_reference( conflict_sink( c ) );
         reference source_ref = effect_any_reference( conflict_source( c ) );
-        string color = "black";
+        string color = inputdep_color;
+        string style = inputdep_style;
 
-        // FIXME, allows to change color with properties
         if( action_read_p( source_act ) && action_write_p( sink_act ) ) {
-          color = "green";
+          color = antidep_color;
+          style = antidep_style;
         } else if( action_write_p( source_act ) && action_write_p( sink_act ) ) {
-          color = "blue";
+          color = outputdep_color;
+          style = outputdep_style;
         } else if( action_write_p( source_act ) && action_read_p( sink_act ) ) {
-          color = "red";
+          color = flowdep_color;
+          style = flowdep_style;
         }
         fprintf( fd,
-                 "%d -> %d [color=%s,label=\"",
+                 "%d -> %d [color=%s,style=%s,label=\"",
                  (int) statement_ordering(s1),
                  (int) statement_ordering(s2),
-                 color );
+                 color,
+                 style );
         fprintf( fd,
                  "%c <",
                  action_read_p( source_act ) ? 'R'
@@ -509,7 +610,7 @@ void prettyprint_dot_dependence_graph( FILE * fd,
           fprintf( fd, ") " );
 
           if ( get_bool_property( "PRINT_DEPENDENCE_GRAPH_WITH_DEPENDENCE_CONES" ) ) {
-            gs = (Ptsg) cone_generating_system( conflict_cone( c ) );
+            Ptsg gs = (Ptsg) cone_generating_system( conflict_cone( c ) );
             if ( !SG_UNDEFINED_P( gs ) ) {
               if ( sg_nbre_sommets( gs ) == 1 && sg_nbre_rayons( gs ) == 0
                   && sg_nbre_droites( gs ) == 0 ) {

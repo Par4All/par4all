@@ -11420,6 +11420,102 @@ print_dot_dependence_graph          > MODULE.dotdg_file
         < MODULE.dg
 \end{PipsMake}
 
+\subsection{Properties for Dot ouptput} 
+
+Here are the properties available to tune the Dot output, read dot
+documentation for available colors, style, shape, etc.
+
+\begin{PipsProp}{PRINT_DOTDG_STATEMENT}  
+PRINT_DOTDG_STATEMENT TRUE
+\end{PipsProp} 
+
+Print statement code and not only ordering inside nodes.
+
+\begin{PipsProp}{PRINT_DOTDG_TOP_DOWN_ORDERED}  
+  PRINT_DOTDG_TOP_DOWN_ORDERED TRUE
+\end{PipsProp} 
+
+Add a constraint on top-down ordering for node instead of free dot placement.
+
+\begin{PipsProp}{PRINT_DOTDG_CENTERED}  
+PRINT_DOTDG_CENTERED FALSE
+\end{PipsProp} 
+
+Should dot produce a centered graph ?
+
+\begin{PipsProp}{PRINT_DOTDG_TITLE}  
+PRINT_DOTDG_TITLE ""
+\end{PipsProp} 
+\begin{PipsProp}{PRINT_DOTDG_TITLE_POSITION}  
+PRINT_DOTDG_TITLE_POSITION "b"
+\end{PipsProp} 
+
+Title and title position (t for top and b for bottom) for the graph.
+
+
+\begin{PipsProp}{PRINT_DOTDG_BACKGROUND}  
+PRINT_DOTDG_BACKGROUND "white"
+\end{PipsProp} 
+
+Main Background.
+
+\begin{PipsProp}{PRINT_DOTDG_NODE_SHAPE}  
+PRINT_DOTDG_NODE_SHAPE "box"
+\end{PipsProp} 
+
+Shape for statement nodes.
+
+\begin{PipsProp}{PRINT_DOTDG_NODE_SHAPE_COLOR}  
+PRINT_DOTDG_NODE_SHAPE_COLOR "black"
+\end{PipsProp} 
+
+\begin{PipsProp}{PRINT_DOTDG_NODE_FILL_COLOR}  
+PRINT_DOTDG_NODE_FILL_COLOR "white"
+\end{PipsProp} 
+
+\begin{PipsProp}{PRINT_DOTDG_NODE_FONT_COLOR}  
+PRINT_DOTDG_NODE_FONT_COLOR "black"
+\end{PipsProp} 
+\begin{PipsProp}{PRINT_DOTDG_NODE_FONT_SIZE}  
+PRINT_DOTDG_NODE_FONT_SIZE "18"
+\end{PipsProp} 
+\begin{PipsProp}{PRINT_DOTDG_NODE_FONT_FACE}  
+PRINT_DOTDG_NODE_FONT_FACE "Times-Roman"
+\end{PipsProp} 
+
+Color for the shape, background, and font of each node.
+
+\begin{PipsProp}{PRINT_DOTDG_FLOW_DEP_COLOR}  
+PRINT_DOTDG_FLOW_DEP_COLOR "red"
+\end{PipsProp} 
+\begin{PipsProp}{PRINT_DOTDG_ANTI_DEP_COLOR}  
+PRINT_DOTDG_ANTI_DEP_COLOR "green"
+\end{PipsProp} 
+\begin{PipsProp}{PRINT_DOTDG_OUTPUT_DEP_COLOR}  
+PRINT_DOTDG_OUTPUT_DEP_COLOR "blue"
+\end{PipsProp} 
+\begin{PipsProp}{PRINT_DOTDG_INPUT_DEP_COLOR}  
+PRINT_DOTDG_INPUT_DEP_COLOR "black"
+\end{PipsProp} 
+
+Color for each type of dependence
+
+\begin{PipsProp}{PRINT_DOTDG_FLOW_DEP_STYLE}  
+PRINT_DOTDG_FLOW_DEP_STYLE "solid"
+\end{PipsProp} 
+\begin{PipsProp}{PRINT_DOTDG_ANTI_DEP_STYLE}  
+PRINT_DOTDG_ANTI_DEP_STYLE "solid"
+\end{PipsProp} 
+\begin{PipsProp}{PRINT_DOTDG_OUTPUT_DEP_STYLE}  
+PRINT_DOTDG_OUTPUT_DEP_STYLE "solid"
+\end{PipsProp} 
+\begin{PipsProp}{PRINT_DOTDG_INPUT_DEP_STYLE}  
+PRINT_DOTDG_INPUT_DEP_STYLE "dashed"
+\end{PipsProp} 
+
+Style for each type of dependence
+
+
 
 \section{Prettyprinters for C}
 
