@@ -87,178 +87,458 @@ static string dependence_graph_banner[8] = {
     };
 
 /* Print all edges and arcs */
-void 
-prettyprint_dependence_graph(FILE * fd,
-			     statement mod_stat,
-			     graph mod_graph)
-{
-    cons *pv1, *ps, *pc;
-    Ptsg gs;
-    int banner_number = 0;
-    bool sru_format_p = get_bool_property("PRINT_DEPENDENCE_GRAPH_USING_SRU_FORMAT");
-    persistant_statement_to_int s_to_l = persistant_statement_to_int_undefined;
-    int dl = -1;
-    debug_on("RICEDG_DEBUG_LEVEL");
+void prettyprint_dependence_graph( FILE * fd,
+                                   statement mod_stat,
+                                   graph mod_graph ) {
+  cons *pv1, *ps, *pc;
+  Ptsg gs;
+  int banner_number = 0;
+  bool sru_format_p =
+      get_bool_property( "PRINT_DEPENDENCE_GRAPH_USING_SRU_FORMAT" );
+  persistant_statement_to_int s_to_l = persistant_statement_to_int_undefined;
+  int dl = -1;
+  debug_on("RICEDG_DEBUG_LEVEL");
 
-    ifdebug(8) {
-      /* There is no guarantee that the ordering_to_statement() hash table is the proper one */
-      print_ordering_to_statement();
+  ifdebug(8) {
+    /* There is no guarantee that the ordering_to_statement()
+     * hash table is the proper one */
+    print_ordering_to_statement( );
+  }
+
+  if ( sru_format_p && !statement_undefined_p(mod_stat) ) {
+    /* compute line numbers for statements */
+    s_to_l = statement_to_line_number( mod_stat );
+    dl = module_to_declaration_length( get_current_module_entity( ) );
+  } else {
+    banner_number
+        = get_bool_property( "PRINT_DEPENDENCE_GRAPH_WITHOUT_PRIVATIZED_DEPS" )
+          + 2 * get_bool_property( "PRINT_DEPENDENCE_GRAPH_WITHOUT_NOLOOPCARRIED_DEPS" )
+          + 4 * get_bool_property( "PRINT_DEPENDENCE_GRAPH_WITH_DEPENDENCE_CONES" );
+    fprintf( fd, "%s\n", dependence_graph_banner[banner_number] );
+  }
+
+  for ( pv1 = graph_vertices(mod_graph); !ENDP(pv1); pv1 = CDR(pv1) ) {
+    vertex v1 = VERTEX(CAR(pv1));
+    statement s1 = vertex_to_statement( v1 );
+
+    for ( ps = vertex_successors(v1); !ENDP(ps); ps = CDR(ps) ) {
+      successor su = SUCCESSOR(CAR(ps));
+      vertex v2 = successor_vertex(su);
+      statement s2 = vertex_to_statement( v2 );
+      dg_arc_label dal = (dg_arc_label) successor_arc_label(su);
+
+      if ( !sru_format_p || statement_undefined_p(mod_stat) ) {
+        /* Modification at revision 12484 because statement
+         numbers were not initialized by C parser, with no
+         validation of ricedg available at that time*/
+        /* factorize line numbers */
+        //fprintf(fd, "\t%s -->",
+        // external_statement_identification(s1)
+        // Revision 10893: %02d and statement_number (Pham Dat)
+        fprintf( fd, "\t%02td -->", statement_number(s1) );
+        //fprintf(fd, " %s with conflicts\n",
+        // external_statement_identification(s2)
+        fprintf( fd, " %02td with conflicts\n", statement_number(s2) );
+      }
+
+      for ( pc = dg_arc_label_conflicts(dal); !ENDP(pc); pc = CDR(pc) ) {
+        conflict c = CONFLICT(CAR(pc));
+
+        /* if (!entity_scalar_p(reference_variable
+         (effect_any_reference(conflict_source(c))))) {
+         */
+        if ( sru_format_p && !statement_undefined_p(mod_stat) ) {
+          int l1 = dl + apply_persistant_statement_to_int( s_to_l, s1 );
+          int l2 = dl + apply_persistant_statement_to_int( s_to_l, s2 );
+
+          fprintf( fd, "%d %d ", l1, l2 );
+          /*
+           fprintf(fd, "%d %d ",
+           statement_number(s1), statement_number(s2));
+           */
+          fprintf( fd,
+                   "%c %c ",
+                   action_read_p(effect_action(conflict_source(c))) ? 'R' : 'W',
+                   action_read_p(effect_action(conflict_sink(c))) ? 'R' : 'W' );
+          fprintf( fd, "<" );
+          print_words( fd,
+                       effect_words_reference(
+                           effect_any_reference(conflict_source(c)) ) );
+          fprintf( fd, "> - <" );
+          print_words( fd,
+                       effect_words_reference(
+                           effect_any_reference(conflict_sink(c)) ) );
+          fprintf( fd, ">" );
+
+          /* Additional information for EDF prettyprint.
+           Instruction calls are given with  statement numbers
+           */
+          if ( get_bool_property( "PRETTYPRINT_WITH_COMMON_NAMES" ) ) {
+            if ( instruction_call_p(statement_instruction(s1)) )
+              fprintf( fd,
+                       " %td-%s",
+                       statement_number(s1),
+                       entity_local_name(
+                           call_function(
+                               instruction_call(statement_instruction(s1))) ) );
+            else
+              fprintf( fd, " %td", statement_number(s1) );
+            if ( instruction_call_p(statement_instruction(s2)) )
+              fprintf( fd,
+                       " %td-%s",
+                       statement_number(s2),
+                       entity_local_name(
+                           call_function(
+                               instruction_call(statement_instruction(s2))) ) );
+            else
+              fprintf( fd, " %td", statement_number(s2) );
+          }
+
+        } else {
+          fprintf( fd, "\t\tfrom " );
+          print_words( fd, words_effect( conflict_source(c) ) );
+
+          fprintf( fd, " to " );
+          print_words( fd, words_effect( conflict_sink(c) ) );
+        }
+
+        if ( conflict_cone(c) != cone_undefined ) {
+          if ( sru_format_p && !statement_undefined_p(mod_stat) ) {
+            fprintf( fd, " levels(" );
+            MAPL(pl, {
+                  fprintf(fd, pl==cone_levels(conflict_cone(c))? "%td" : ",%td",
+                      INT(CAR(pl)));
+                }, cone_levels(conflict_cone(c)));
+            fprintf( fd, ") " );
+          } else {
+            fprintf( fd, " at levels " );
+            MAPL(pl, {
+                  fprintf(fd, " %td", INT(CAR(pl)));
+                }, cone_levels(conflict_cone(c)));
+            fprintf( fd, "\n" );
+          }
+
+          if( get_bool_property( "PRINT_DEPENDENCE_GRAPH_WITH_DEPENDENCE_CONES" ) ) {
+            gs = (Ptsg) cone_generating_system(conflict_cone(c));
+            if( !SG_UNDEFINED_P( gs ) ) {
+              if( sru_format_p && !statement_undefined_p(mod_stat) ) {
+                if( sg_nbre_sommets( gs ) == 1 && sg_nbre_rayons( gs ) == 0
+                    && sg_nbre_droites( gs ) == 0 ) {
+                  /* uniform dependence */
+                  fprintf( fd, "uniform" );
+                  fprint_lsom_as_dense( fd, sg_sommets( gs ), gs->base );
+                } else {
+                  sg_fprint_as_ddv( fd, gs );
+                }
+              } else {
+                /* sg_fprint(fd,gs,entity_local_name); */
+                /* FI: almost print_dependence_cone:-( */
+                sg_fprint_as_dense( fd, gs, gs->base );
+                ifdebug(2) {
+                  Psysteme sc1 = sc_new( );
+                  sc1 = sg_to_sc_chernikova( gs );
+                  (void) fprintf( fd,
+                                  "syst. lin. correspondant au syst. gen.:\n" );
+                  sc_fprint( fd, sc1, (get_variable_name_t) entity_local_name );
+                }
+              }
+            }
+          }
+        } else {
+          if ( sru_format_p && !statement_undefined_p(mod_stat) )
+            fprintf( fd, " levels()" );
+        }
+        fprintf( fd, "\n" );
+      }
     }
+  }
 
-    if(sru_format_p && !statement_undefined_p(mod_stat)) {
-	/* compute line numbers for statements */
-	s_to_l = statement_to_line_number(mod_stat);
-	dl = module_to_declaration_length(get_current_module_entity());
-     }
-    else {
-	banner_number =
-	    get_bool_property("PRINT_DEPENDENCE_GRAPH_WITHOUT_PRIVATIZED_DEPS") +
-	    2*get_bool_property
-	    ("PRINT_DEPENDENCE_GRAPH_WITHOUT_NOLOOPCARRIED_DEPS") +
-	    4*get_bool_property
-	    ("PRINT_DEPENDENCE_GRAPH_WITH_DEPENDENCE_CONES");
-	fprintf(fd, "%s\n", dependence_graph_banner[banner_number]);
-    }
+  if ( sru_format_p && !statement_undefined_p(mod_stat) ) {
+    free_persistant_statement_to_int( s_to_l );
+  } else {
+    fprintf( fd,
+             "\n****************** End of Dependence Graph ******************\n" );
+  }
 
-    for (pv1 = graph_vertices(mod_graph); !ENDP(pv1); pv1 = CDR(pv1)) {
-	vertex v1 = VERTEX(CAR(pv1));
-	statement s1 = vertex_to_statement(v1);
-
-	for (ps = vertex_successors(v1); !ENDP(ps); ps = CDR(ps)) {
-	    successor su = SUCCESSOR(CAR(ps));
-	    vertex v2 = successor_vertex(su);
-	    statement s2 = vertex_to_statement(v2);
-	    dg_arc_label dal = (dg_arc_label) successor_arc_label(su);
-
-	    if(!sru_format_p || statement_undefined_p(mod_stat)) {
-	      /* Modification at revision 12484 because statement
-		 numbers were not initialized by C parser, with no
-		 validation of ricedg available at that time*/
-		/* factorize line numbers */
-		//fprintf(fd, "\t%s -->", 
-			// external_statement_identification(s1)
-	        // Revision 10893: %02d and statement_number (Pham Dat)
-		fprintf(fd, "\t%02td -->", 
-			statement_number(s1));
-		//fprintf(fd, " %s with conflicts\n", 
-			// external_statement_identification(s2)
-		fprintf(fd, " %02td with conflicts\n", 
-			statement_number(s2));
-	    }
-
-	    for (pc = dg_arc_label_conflicts(dal); !ENDP(pc); pc = CDR(pc)) {
-		conflict c = CONFLICT(CAR(pc));
-		     
-		/* if (!entity_scalar_p(reference_variable
-		   (effect_any_reference(conflict_source(c))))) {
-		   */
-		if(sru_format_p && !statement_undefined_p(mod_stat)) {
-		    int l1 = dl + apply_persistant_statement_to_int(s_to_l, s1);
-		    int l2 = dl + apply_persistant_statement_to_int(s_to_l, s2);
-
-		    fprintf(fd, "%d %d ", l1, l2);
-		    /*
-		    fprintf(fd, "%d %d ", 
-		    statement_number(s1), statement_number(s2));
-		    */
-		    fprintf(fd, "%c %c ", 
-			    action_read_p(effect_action(conflict_source(c)))? 'R' : 'W',
-			    action_read_p(effect_action(conflict_sink(c)))? 'R' : 'W');
-		    fprintf(fd, "<");
-		    print_words(fd, effect_words_reference(effect_any_reference(conflict_source(c))));
-		    fprintf(fd, "> - <");
-		    print_words(fd, effect_words_reference(effect_any_reference(conflict_sink(c))));
-		    fprintf(fd, ">");
-		    
-		    /* Additional information for EDF prettyprint. 
-		       Instruction calls are given with  statement numbers
-		       */
-		    if (get_bool_property("PRETTYPRINT_WITH_COMMON_NAMES")) {
-			if (instruction_call_p(statement_instruction(s1)))
-			    fprintf(fd, " %td-%s",statement_number(s1),
-				    entity_local_name(call_function(instruction_call(statement_instruction(s1)))));
-			else  fprintf(fd, " %td",statement_number(s1));
-			if (instruction_call_p(statement_instruction(s2)))
-			    fprintf(fd, " %td-%s",statement_number(s2),
-				    entity_local_name(call_function(instruction_call(statement_instruction(s2)))));
-			else  fprintf(fd, " %td",statement_number(s2));
-		    }
-		    
-		}
-		else {
-		    fprintf(fd, "\t\tfrom ");
-		    print_words(fd, words_effect(conflict_source(c)));
-
-		    fprintf(fd, " to ");
-		    print_words(fd, words_effect(conflict_sink(c)));
-		}
-
-		if(conflict_cone(c) != cone_undefined) {
-		    if(sru_format_p && !statement_undefined_p(mod_stat)) {
-			fprintf(fd, " levels(");
-			MAPL(pl, {
-			    fprintf(fd, pl==cone_levels(conflict_cone(c))? "%td" : ",%td",
-				    INT(CAR(pl)));
-			}, cone_levels(conflict_cone(c)));
-			fprintf(fd, ") ");
-		    }
-		    else {
-			fprintf(fd, " at levels ");
-			MAPL(pl, {
-			    fprintf(fd, " %td", INT(CAR(pl)));
-			}, cone_levels(conflict_cone(c)));
-			fprintf(fd, "\n");
-		    }
-
-		    if(get_bool_property
-		       ("PRINT_DEPENDENCE_GRAPH_WITH_DEPENDENCE_CONES")) {
-			gs = (Ptsg)cone_generating_system(conflict_cone(c));
-			if (!SG_UNDEFINED_P(gs)) {
-			    if(sru_format_p && !statement_undefined_p(mod_stat)) {
-				if(sg_nbre_sommets(gs)==1 && sg_nbre_rayons(gs)==0
-				   && sg_nbre_droites(gs)==0) {
-				    /* uniform dependence */
-				    fprintf(fd, "uniform");
-				    fprint_lsom_as_dense(fd, sg_sommets(gs), gs->base);
-				}
-				else {
-				    sg_fprint_as_ddv(fd, gs);
-				}
-			    }
-			    else {
-				/* sg_fprint(fd,gs,entity_local_name); */
-				/* FI: almost print_dependence_cone:-( */
-				sg_fprint_as_dense(fd, gs, gs->base);
-				ifdebug(2) {
-				    Psysteme sc1 = sc_new();
-				    sc1 = sg_to_sc_chernikova(gs);
-				    (void) fprintf(fd,"syst. lin. correspondant au syst. gen.:\n");
-				    sc_fprint(fd, sc1, (get_variable_name_t) entity_local_name);
-				}
-			    }
-			} 
-		    }
-		}
-		else {
-		    if(sru_format_p && !statement_undefined_p(mod_stat)) 
-			fprintf(fd, " levels()");
-		}
-		fprintf(fd, "\n");
-	    }
-	}
-    } 
-
-    if(sru_format_p && !statement_undefined_p(mod_stat)) {
-	free_persistant_statement_to_int(s_to_l);
-    }
-    else {
-	fprintf(fd, "\n****************** End of Dependence Graph ******************\n");
-    }
-
-    debug_off();
+  debug_off();
 }
 
-
+
+
+/****************************************************************
+ * FOLLOWING FUNCTIONS ARE INTENDED TO PRODUCE DEPENDENCE GRAPH
+ * IN GRAPHIZ DOT FORMAT
+ */
+
+/* Context structure used by gen recurse */
+static struct prettyprint_dot_context {
+  int previous_ordering;
+  FILE *fd;
+  statement current;
+};
+typedef struct prettyprint_dot_context *dot_ctx;
+
+/** \def dot_nodes_recurse( ctx, s )
+  Recurse on statement s with context ctx
+  Intended to be called while already on a gen_recurse recursion
+ */
+#define dot_nodes_recurse( ctx, s )   { \
+  ctx->current = s; \
+  gen_context_recurse( s, \
+    ctx, \
+    statement_domain, \
+    prettyprint_dot_nodes, \
+    gen_true ); \
+}
+
+/** \def dot_print_label_string( fd, str )
+  print the string str in file descriptor fd, removing all \n
+ */
+#define dot_print_label_string( fd, str ) \
+while ( *str ) { \
+  char c = *str++; \
+  if ( c != '\n' ) { \
+    (void) putc( c, fd); \
+  } \
+}
+
+/** \fn static void prettyprint_dot_label( FILE *fd, statement s )
+ *  \brief Print the label for a statement. It will only output the first line
+ *  after having removed comments.
+ *  \param fd is the file descriptor
+ *  \param s is the statement
+ */
+static void prettyprint_dot_label( FILE *fd, statement s ) {
+
+  // saving comments
+  string i_comments = statement_comments(s);
+
+  // remove thems
+  statement_comments(s) = string_undefined;
+
+  // Get the text without comments
+  list sentences =
+      text_sentences(text_statement_enclosed(entity_undefined,0,s,false,true ) );
+
+  // Restoring comments
+  statement_comments(s) = i_comments;
+
+  // Print the first sentence
+  sentence sent = SENTENCE(CAR( sentences ) );
+  if ( sentence_formatted_p(sent) ) {
+    string str = sentence_formatted(sent);
+    dot_print_label_string( fd, str );
+  } else {
+    unformatted u = sentence_unformatted(sent);
+    cons *lw = unformatted_words(u);
+    while ( lw ) {
+      string str = STRING(CAR(lw));
+      dot_print_label_string( fd, str )
+      lw = CDR(lw);
+
+    }
+  }
+}
+
+/** \fn static bool prettyprint_dot_nodes( statement s, dot_ctx ctx )
+ *  \brief Print nodes for statements, the recursion is quite complicated.
+ *  for instance when we see a loop, we print the header, and we call a
+ *  self-gen_recursion on the body to create separate node for each statement
+ *  inside the loop.
+ *  Called by gen_recurse_context
+ *  \param s is the current statement
+ *  \param ctx is the gen_recurse context
+ *  \return true for blocks and simple statement, false for loop, test, ...
+ */
+static bool prettyprint_dot_nodes( statement s, dot_ctx ctx ) {
+  bool gen_recurse = true;
+
+  // We ignore the current statement (infinite recursion) and blocks
+  if(ctx->current != s && ! statement_block_p( s ) ) {
+    // When we have produced a previous statement,
+    // we chain it with current one with a very high weight
+    int ordering = statement_ordering(s);
+    if ( ctx->previous_ordering > 0 ) {
+      fprintf( ctx->fd,
+               "    \"%d\" -> \"%d\";\n",
+               ctx->previous_ordering,
+               ordering
+               ); // We really want ordering to be respected :-)
+    }
+    ctx->previous_ordering = ordering;
+
+    // Create the node
+    fprintf( ctx->fd, "    %d  [label=\"", ordering);
+
+    // Specials cases
+    instruction i = statement_instruction(s);
+    switch ( instruction_tag(i) ) {
+      case is_instruction_test:
+        // It's a test, we print the test itself first
+        prettyprint_dot_label( ctx->fd, s );
+        fprintf( ctx->fd, "\"];\n" );
+        // FIXME "else" won't appear in output... but I've no solution :-(
+
+        // Recurse on test bodies (true & false)
+        dot_nodes_recurse( ctx, s );
+        gen_recurse = false; // No more further recursion
+        break;
+      case is_instruction_sequence:
+        break;
+      case is_instruction_loop:
+      case is_instruction_whileloop:
+      case is_instruction_forloop:
+        // We have a loop, first print the header
+        prettyprint_dot_label( ctx->fd, s );
+        fprintf( ctx->fd, "\"];\n" );
+        // Recurse on loop body now
+        dot_nodes_recurse( ctx, s )
+        ;
+        gen_recurse = false; // No more further recursion
+        break;
+      case is_instruction_goto:
+      case is_instruction_unstructured:// FIXME ???
+      case is_instruction_call:
+      case is_instruction_expression:
+      default:
+        // Standard output, print the statement
+        prettyprint_dot_label( ctx->fd, s );
+        fprintf( ctx->fd, "\"];\n\n" );
+        break;
+    }
+  }
+  return gen_recurse;
+}
+
+/** \fn void prettyprint_dot_dependence_graph( FILE * fd,
+ *                                             statement mod_stat,
+ *                                             graph mod_graph )
+ *  \brief Output dependence graph in a file in graphviz dot format
+ *  \param fd is the file descriptor where to output
+ *  \param mod_stat is the module statement (not necessary module, it can be
+ *  a block statement for instance
+ *  \param graph is the dependence graph to print
+ */
+void prettyprint_dot_dependence_graph( FILE * fd,
+                                       statement mod_stat,
+                                       graph mod_graph ) {
+  cons *pv1, *ps, *pc;
+  Ptsg gs;
+  debug_on( "RICEDG_DEBUG_LEVEL" );
+
+  ifdebug(8) {
+    /* There is no guarantee that the ordering_to_statement()
+     * hash table is the proper one */
+    print_ordering_to_statement( );
+  }
+
+  fprintf( fd, "digraph {\n" );
+
+  if ( !get_bool_property( "PRINT_DOTDG_SIMPLE" ) ) {
+    // Will output the whole code and not only ordering
+    fprintf( fd, "\n"
+      "  {\n/* Print nodes for statements, and order them */\n\n"
+      "    node [shape=box,fontsize=18,style=bold];\n"
+      "    edge  [weight=100,color=white];\n\n" );
+    struct prettyprint_dot_context ctx;
+    ctx.fd = fd;
+    ctx.current = NULL;
+    ctx.previous_ordering = 0;
+
+    gen_context_recurse( mod_stat,
+        &ctx,
+        statement_domain,
+        prettyprint_dot_nodes,
+        gen_true );
+    fprintf( fd, "  }\n\n");
+  }
+  fprintf( fd, "/* Print arcs between statements */\n\n");
+
+  // Loop over the graph and print all dependences
+  FOREACH( vertex, v1 , graph_vertices( mod_graph ) ) {
+    statement s1 = vertex_to_statement( v1 );
+    FOREACH( successor, su, vertex_successors(v1) )
+    {
+      vertex v2 = successor_vertex( su );
+      statement s2 = vertex_to_statement( v2 );
+      dg_arc_label dal = (dg_arc_label) successor_arc_label( su );
+      FOREACH( conflict, c, dg_arc_label_conflicts( dal ) )
+      {
+        action source_act = effect_action( conflict_source( c ) );
+        action sink_act = effect_action( conflict_sink( c ) );
+        reference sink_ref = effect_any_reference( conflict_sink( c ) );
+        reference source_ref = effect_any_reference( conflict_source( c ) );
+        string color = "black";
+
+        // FIXME, allows to change color with properties
+        if( action_read_p( source_act ) && action_write_p( sink_act ) ) {
+          color = "green";
+        } else if( action_write_p( source_act ) && action_write_p( sink_act ) ) {
+          color = "blue";
+        } else if( action_write_p( source_act ) && action_read_p( sink_act ) ) {
+          color = "red";
+        }
+        fprintf( fd,
+                 "%d -> %d [color=%s,label=\"",
+                 (int) statement_ordering(s1),
+                 (int) statement_ordering(s2),
+                 color );
+        fprintf( fd,
+                 "%c <",
+                 action_read_p( source_act ) ? 'R'
+                                             : 'W' );
+        print_words( fd,
+                     effect_words_reference( source_ref ) );
+        fprintf( fd, ">\\n" );
+        fprintf( fd,
+                 "%c <",
+                 action_read_p( sink_act ) ? 'R'
+                                           : 'W' );
+        print_words( fd,
+                     effect_words_reference( sink_ref ) );
+        fprintf( fd, ">\\n" );
+
+
+        // Print the levels and the cone
+        if ( conflict_cone( c ) != cone_undefined ) {
+          fprintf( fd, " levels(" );
+          MAPL(pl, {
+                fprintf(fd, pl==cone_levels(conflict_cone(c))? "%td" : ",%td",
+                    INT(CAR(pl)));
+              }, cone_levels(conflict_cone(c)));
+          fprintf( fd, ") " );
+
+          if ( get_bool_property( "PRINT_DEPENDENCE_GRAPH_WITH_DEPENDENCE_CONES" ) ) {
+            gs = (Ptsg) cone_generating_system( conflict_cone( c ) );
+            if ( !SG_UNDEFINED_P( gs ) ) {
+              if ( sg_nbre_sommets( gs ) == 1 && sg_nbre_rayons( gs ) == 0
+                  && sg_nbre_droites( gs ) == 0 ) {
+                /* uniform dependence */
+                fprintf( fd, "uniform" );
+                fprint_lsom_as_dense( fd, sg_sommets( gs ), gs->base );
+              } else {
+                sg_fprint_as_ddv( fd, gs );
+              }
+            }
+          }
+        } else {
+          fprintf( fd, " levels()" );
+        }
+        fprintf( fd, "\"];\n" );
+      }
+    }
+  }
+
+  fprintf( fd, "\n}\n" );
+  debug_off( );
+}
+
+/*
+ * END OF OUTPUT IN GRAPHIZ DOT FORMAT
+ ****************************************************************/
+
+
+
 /* Do not print vertices and arcs ignored by the parallelization algorithms.
  * At least, hopefully...
  */

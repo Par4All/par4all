@@ -11283,6 +11283,8 @@ alias   print_effective_dependence_graph    'Default'
 alias   print_loop_carried_dependence_graph 'Loop Carried Only'
 alias   print_whole_dependence_graph        'All arcs'
 alias   print_chains_graph                  'Chains'
+alias   print_dot_chains_graph              'Chains (for dot)'
+alias   print_dot_dependence_graph          'Dependence graph (for dot)'
 alias   print_filtered_dependence_graph     'Filtered Arcs'
 alias   print_filtered_dependence_daVinci_graph   'Filtered Arcs Output to uDrawGraph'
 alias   impact_check                        'Check alias impact'
@@ -11388,6 +11390,34 @@ print_chains_graph      > MODULE.dg_file
         < PROGRAM.entities
         < MODULE.code
         < MODULE.chains
+\end{PipsMake}
+
+
+\subsection{Chains Graph Graphviz Dot View}
+
+\begin{PipsPass}{print_dot_chains_graph}
+Display the chains graph in graphviz dot format.
+\end{PipsPass}
+
+\begin{PipsMake}
+print_dot_chains_graph  > MODULE.dotdg_file
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.chains
+\end{PipsMake}
+
+
+\subsection{Dependence Graph Graphviz Dot View}
+
+\begin{PipsPass}{print_dot_dependence_graph}
+Display the dependence graph in graphviz dot format.
+\end{PipsPass}
+
+\begin{PipsMake}
+print_dot_dependence_graph          > MODULE.dotdg_file
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.dg
 \end{PipsMake}
 
 
