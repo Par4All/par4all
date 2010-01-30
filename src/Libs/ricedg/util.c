@@ -508,14 +508,13 @@ void prettyprint_dot_dependence_graph( FILE * fd,
 
   if( ordered || print_statement ) {
   fprintf( fd,
-             "\n"
-               "  {\n/* Print nodes for statements %s order them */\n\n",
+               "\n  {\n    /* Print nodes for statements %s order them */\n\n",
              ordered ? "and" : "but don't" );
 
     if ( ordered ) {
       fprintf( fd,
-               "/* ordering edges must be invisible, so set background color */\n"
-                 "    edge  [weight=100,color=%s];\n\n",
+               "    /* ordering edges must be invisible, so set background color */\n"
+               "    edge  [weight=100,color=%s];\n\n",
                background );
     }
 
@@ -536,8 +535,8 @@ void prettyprint_dot_dependence_graph( FILE * fd,
   }
 
 
-  fprintf( fd, "/* Print arcs between statements */\n\n" );
-
+  fprintf( fd, "  /* Print arcs between statements */\n\n" );
+  fprintf( fd, "  /* Dependence arcs won't constrain node positions */\nedge [constraint=false];\n\n" );
 
 
 
