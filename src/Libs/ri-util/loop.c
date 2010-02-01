@@ -1,4 +1,4 @@
-/* Some generic methods about loops.
+/* Some generic methods about loops and list of loops.
 
    There are many things elsewher that should be factored out into here
    (static controlize...).
@@ -658,4 +658,12 @@ void print_parallelization_statistics(
       fprintf(stderr, "%s %s parallelization statistics", module, msg);
       print_number_of_loop_statistics(stderr, "", s);
     }
+}
+
+/* Duplicate a loop list. */
+list copy_loops(list ll)
+{
+  list nll = gen_full_copy_list(ll);
+
+  return nll;
 }

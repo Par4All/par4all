@@ -24,9 +24,16 @@ export NO_INCLUDES
 
 # old stuff:
 # paf-util pip prgm_mapping scheduling static_controlize reindexing array_dfg
+# paf-util and static_controlize habe been rehabilitated for PoCC
 
 # there is no rationnal order to compile the libraries:-(
 # see local TODO
+
+# FI->FC: OK, cycles have been introduced, but then when do you
+# declare the library list for linking? I did not find the information
+# in Section 10.3 of the developper guide and it is not in the
+# tutorial either. See Section 10.3.2, file $PIPS_ROOT/libraries.make
+
 FWD_DIRS	= \
 	misc newgen properties text-util pipsdbm \
 	top-level ri-util conversion movements \
@@ -37,4 +44,5 @@ FWD_DIRS	= \
 	callgraph icfg ricedg \
 	chains rice hyperplane transformations hwac expressions \
 	locality instrumentation hpfc atomizer safescale sac phrase wp65 \
-	preprocessor pipsmake step to_begin_with gpu pipslibs scalopes
+	preprocessor pipsmake step to_begin_with gpu pipslibs scalopes \
+	static_controlize paf-util

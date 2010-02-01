@@ -56,7 +56,7 @@ list base_to_list(Pbase b)
 }
 
 /* Pbase list_to_base(list l): returns the Pbase that contains the variables
- * of list "l", of entities, in the same order. 
+ * of list "l", of entities, in the same order.
  */
 Pbase list_to_base(l)
 list l;
@@ -276,7 +276,7 @@ entity mod;
 #define ADD_ELEMENT_TO_LIST( _list, _type, _element) \
     (_list = gen_nconc( _list, CONS( _type, _element, NIL)))
 
-  
+
 /*==================================================================*/
 
 /* void fprint_list_of_exp(FILE *fp, list exp_l): prints in the file "fp"
@@ -302,7 +302,7 @@ list exp_l;
 /* bool undefined_statement_list_p( (list) l )			AL 04/93
  * Returns TRUE if l is made of 2 undefined or continue statement.
  */
-bool undefined_statement_list_p( l ) 
+bool undefined_statement_list_p( l )
 list l;
 {
 	bool 		local_bool;
@@ -314,7 +314,7 @@ list l;
 
 	first = STATEMENT(CAR( l ));
 	second = STATEMENT(CAR(CDR( l )));
-	local_bool = ( first == statement_undefined ) 
+	local_bool = ( first == statement_undefined )
 		     && ( second == statement_undefined );
 
 	/* Newgen does not support list of undefined objects */
@@ -347,13 +347,13 @@ expression exp;
                 default: break;
         }
 	debug( 7, "expression_int_scalar",
-		 "returning : %s\n", 
+		 "returning : %s\n",
 		 ((ent == entity_undefined)?"entity_undefined":
 			entity_local_name( ent )) );
         return( ent );
 }
 
-/* entity scalar_assign_call((call) c) 
+/* entity scalar_assign_call((call) c)
  * Detects if the call is an assignement
  * and if the value assigned is a scalar. If it is so, it
  * returns this scalar.
@@ -377,7 +377,7 @@ call c;
    return( ent );
 }
 
-/* scalar_written_in_call((call) the_call) 
+/* scalar_written_in_call((call) the_call)
  * Detects and puts a scalar written in an assignement call,
  * in the global list Gscalar_written_forward if Genclosing_loops
  * or Genclosing_tests are not empty.

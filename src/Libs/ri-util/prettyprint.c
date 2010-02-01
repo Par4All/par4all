@@ -512,9 +512,12 @@ text generate_alternate_return_targets()
 
 
 /* words_regular_call used for user subroutine and user function and
-   intrinsics called like user function such as MOD(). */
+   intrinsics called like user function such as MOD().
 
-static list
+   used also by library static_controlize
+ */
+
+list
 words_regular_call(call obj, bool is_a_subroutine)
 {
   list pc = NIL;
