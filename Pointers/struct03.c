@@ -1,5 +1,5 @@
 #include<stdio.h>
-int struct003()
+int struct03()
 {
   struct {
     int **q;

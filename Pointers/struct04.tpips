@@ -1,5 +1,5 @@
-delete struct004
-create struct004 struct004.c
+delete struct04
+create struct04 struct04.c
 setproperty ABORT_ON_USER_ERROR TRUE
 setproperty PRETTYPRINT_BLOCKS TRUE
 setproperty PRETTYPRINT_C_CODE TRUE
@@ -15,21 +15,21 @@ activate C_PARSER
 
 
 activate PRINT_CODE_PROPER_EFFECTS
-display PRINTED_FILE[struct004]
+display PRINTED_FILE[struct04]
 
-echo
-echo Cumulated effects for "struct004"
-echo
 
-activate PRINT_CODE_CUMULATED_EFFECTS
-display PRINTED_FILE[struct004]
+
+
+
+
+
 
 
 echo POINTS TO
 activate PRINT_CODE_POINTS_TO_LIST
-display PRINTED_FILE[struct004]
+display PRINTED_FILE[struct04]
 
 close
-delete struct004
+delete struct04
 quit
 

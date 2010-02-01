@@ -1,0 +1,59 @@
+int struct04()
+{
+   // BEGIN BLOCK
+   struct {
+      int **q;
+      int **p;
+   } m, n;
+
+   int i = 0, j = 1, k = 2;
+   int *r, *s;
+//               <must be written>: r
+   r = &k;
+//               <must be written>: s
+   s = &j;
+//               <must be written>: m[1]
+   m.q = &r;
+//               <must be written>: m[2]
+   m.p = &s;
+//               <must be read   >: m[2]
+//               <must be written>: m[1]
+   m.q = m.p;
+//               <must be read   >: m[2]
+//               <must be written>: m[2][0]
+   *m.p = &k;
+//               <must be read   >: m
+//               <must be written>: n
+   n = m;
+   return 0;
+   // END BLOCK
+}
+POINTS TO
+int struct04()
+{
+   // BEGIN BLOCK
+   struct {
+      int **q;
+      int **p;
+   } m, n;
+
+   int i = 0, j = 1, k = 2;
+   int *r, *s;
+   r = &k;
+//  points to = {(r,k,E)}
+   s = &j;
+//  points to = {(s,j,E)(r,k,E)}
+   m.q = &r;
+//  points to = {(m[1],r,E)(s,j,E)(r,k,E)}
+   m.p = &s;
+//  points to = {(m[2],s,E)(m[1],r,E)(s,j,E)(r,k,E)}
+   m.q = m.p;
+//  points to = {(m[2],s,E)(m[1],s,E)(s,j,E)(r,k,E)}
+   *m.p = &k;
+//  points to = {(m[2],s,E)(m[1],s,E)(r,k,E)(s,k,E)}
+   n = m;
+//  points to = {(n[2],s,E)(n[1],s,E)(m[2],s,E)(m[1],s,E)(r,k,E)(s,k,
+//   E)}
+   return 0;
+   // END BLOCK
+}
