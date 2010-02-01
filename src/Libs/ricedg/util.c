@@ -299,6 +299,9 @@ typedef struct prettyprint_dot_context *dot_ctx;
 #define dot_print_label_string( fd, str ) \
 while ( *str ) { \
   char c = *str++; \
+  if ( c == '"' ) { /* some char must be escaped */ \
+    (void) putc( '\\', fd); \
+  } \
   if ( c != '\n' ) { \
     (void) putc( c, fd); \
   } \
