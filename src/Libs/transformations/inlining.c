@@ -1348,7 +1348,7 @@ outline(char* module_name)
     /* prelude */
     set_current_module_entity(module_name_to_entity( module_name ));
     set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, module_name, TRUE) );
- 	set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_PROPER_EFFECTS, module_name, TRUE));
+ 	set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
 
     /* retrieve name of the outiled module */
     string outline_module_name = get_string_property_or_ask("OUTLINE_MODULE_NAME","outline module name ?\n");

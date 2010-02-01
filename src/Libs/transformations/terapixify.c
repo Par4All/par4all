@@ -375,7 +375,7 @@ bool do_kernelize(statement s, entity loop_label)
       cumulated_effects(module_local_name(cme));
       set_current_module_entity(cme);
       set_current_module_statement(cms);
-      set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_PROPER_EFFECTS, get_current_module_name(), TRUE));
+      set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS, get_current_module_name(), TRUE));
       /* outline the work and kernel parts*/
       outliner(kernel_name,make_statement_list(loop_body(l)));
       (void)outliner(host_call_name,make_statement_list(s));

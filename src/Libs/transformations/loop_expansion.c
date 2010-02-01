@@ -7,8 +7,43 @@
 #include "database.h"
 #include "pipsdbm.h"
 #include "properties.h"
+#include "control.h"
 #include "resources.h"
 #include "transformations.h"
+#include "effects-generic.h"
+
+/** 
+ * create a guard @a guard around statement @a s if needed
+ * it is needed when a not-private variable (that is not in @a privates)
+ * is written by the statement
+ * @param s statement to guard
+ * @param guard guard to apply
+ * @param privates set of enclosing loop locals
+ */
+static
+void guard_expanded_statement_if_needed(statement s,expression guard, set privates)
+{
+    list effects = load_cumulated_rw_effects_list(s);
+    bool must_guard= false;
+    FOREACH(EFFECT,eff,effects)
+    {
+        if((must_guard=(effect_write_p(eff) && !set_belong_p(privates,effect_entity(eff)))))
+            break;
+        /* an io effect implies a guard too */
+        if((must_guard=io_effect_p(eff)))
+            break;
+    }
+    if(must_guard) {
+        instruction ins = make_instruction_test(
+                make_test(
+                    copy_expression(guard),
+                    copy_statement(s),/* update_instruction force us to copy */
+                    make_empty_statement()
+                    )
+                );
+        update_statement_instruction(s,ins);
+    }
+}
 
 static
 void do_loop_expansion(statement st, int size)
@@ -50,21 +85,27 @@ void do_loop_expansion(statement st, int size)
                 );
         statement_comments(conditionnal_assignement)=strdup("// PIPS test to adjust loop size to required loop expansion parameter");
 
-        /* update fileds */
-        loop_body(l)=instruction_to_statement(
-                make_instruction_test(
-                    make_test(
-                        MakeBinaryCall(
-                            entity_intrinsic(LESS_OR_EQUAL_OPERATOR_NAME),
-                            entity_to_expression(loop_index(l)),
-                            range_upper(r)
-                            ),
-                        loop_body(l),
-                        make_empty_statement()
-                        )
-                    )
+        /* set the guard on all statement that need it */
+        set privates = set_make(set_pointer);
+        privates=set_assign_list(privates,loop_locals(l));
+        expression guard = MakeBinaryCall(
+                entity_intrinsic(LESS_OR_EQUAL_OPERATOR_NAME),
+                entity_to_expression(loop_index(l)),
+                range_upper(r)
                 );
+        if(statement_block_p(loop_body(l)))
+        {
+            FOREACH(STATEMENT,s,statement_block(loop_body(l)))
+                guard_expanded_statement_if_needed(s,guard,privates);
+        }
+        else
+            guard_expanded_statement_if_needed(loop_body(l),guard,privates);
+        set_free(privates);
+        free_expression(guard);
+
+        /* update loop fields */
         range_upper(r)=entity_to_expression(new_range_upper);
+        /* insert new loop bound assignment */
         insert_statement(st,conditionnal_assignement,true);
     }
     else
@@ -77,6 +118,8 @@ bool loop_expansion(const string module_name)
 {
     set_current_module_entity(module_name_to_entity(module_name));
     set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, module_name, TRUE));
+    set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS, get_current_module_name(), TRUE));
+
     debug_on("LOOP_EXPANSION_DEBUG_LEVEL");
 
 
@@ -116,6 +159,7 @@ bool loop_expansion(const string module_name)
     debug_off();
     reset_current_module_entity();
     reset_current_module_statement();
+    reset_cumulated_rw_effects();
     return true;;
 
 }
