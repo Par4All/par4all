@@ -1,0 +1,79 @@
+int struct02()
+{
+   // BEGIN BLOCK
+   struct {
+      int *q;
+      int *p;
+   } m, n;
+
+   int i = 0, j = 1, k = 2;
+   int *r;
+//               <must be written>: r
+   r = &k;
+//               <must be written>: m[1]
+   m.q = &i;
+//               <must be written>: m[2]
+   m.p = &j;
+//               <must be read   >: m
+//               <must be written>: n
+   n = m;
+//               <must be read   >: n[2]
+//               <must be written>: r
+   r = n.p;
+   return 0;
+   // END BLOCK
+}
+
+Cumulated effects for "struct02"
+
+int struct02()
+{
+//               <must be read   >: m n[2]
+//               <must be written>: m[1] m[2] n r
+   // BEGIN BLOCK
+   struct {
+      int *q;
+      int *p;
+   } m, n;
+
+   int i = 0, j = 1, k = 2;
+   int *r;
+//               <must be written>: r
+   r = &k;
+//               <must be written>: m[1]
+   m.q = &i;
+//               <must be written>: m[2]
+   m.p = &j;
+//               <must be read   >: m
+//               <must be written>: n
+   n = m;
+//               <must be read   >: n[2]
+//               <must be written>: r
+   r = n.p;
+   return 0;
+   // END BLOCK
+}
+POINTS TO
+int struct02()
+{
+   // BEGIN BLOCK
+   struct {
+      int *q;
+      int *p;
+   } m, n;
+
+   int i = 0, j = 1, k = 2;
+   int *r;
+   r = &k;
+//  points to = {(r,k,E)}
+   m.q = &i;
+//  points to = {(m[1],i,E)(r,k,E)}
+   m.p = &j;
+//  points to = {(m[2],j,E)(m[1],i,E)(r,k,E)}
+   n = m;
+//  points to = {(n[2],j,E)(n[1],i,E)(m[2],j,E)(m[1],i,E)(r,k,E)}
+   r = n.p;
+//  points to = {(n[2],j,E)(n[1],i,E)(m[2],j,E)(m[1],i,E)(r,j,E)}
+   return 0;
+   // END BLOCK
+}

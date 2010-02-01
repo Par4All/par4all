@@ -1,0 +1,31 @@
+int main()
+{
+   // BEGIN BLOCK
+   struct one {
+      int *first;
+   } x;
+   int y[10];
+//               <must be written>: x[1]
+
+   x.first = &y[5];
+   
+   
+   return 0;
+   // END BLOCK
+}
+POINTS TO
+int main()
+{
+   // BEGIN BLOCK
+   struct one {
+      int *first;
+   } x;
+   int y[10];
+
+   x.first = &y[5];
+//  points to = {(x[1],y[5],E)}
+   
+   
+   return 0;
+   // END BLOCK
+}

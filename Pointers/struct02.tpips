@@ -1,0 +1,35 @@
+delete struct02
+create struct02 struct02.c
+setproperty ABORT_ON_USER_ERROR TRUE
+setproperty PRETTYPRINT_BLOCKS TRUE
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   FALSE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   FALSE
+##TODO: explain
+setproperty ARRAY_PRIV_FALSE_DEP_ONLY FALSE
+
+
+setenv PIPS_CPP="cpp -C"
+activate C_PARSER
+
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[struct02]
+
+echo
+echo Cumulated effects for "struct02"
+echo
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[struct02]
+
+
+echo POINTS TO
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[struct02]
+
+close
+delete struct02
+quit
+
