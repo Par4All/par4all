@@ -15,13 +15,11 @@ Code after outlining
 void foo(int bar[256][256])
 {
    int i, j;
+   //PIPS generated variable
+   void kernel(int bar[256][256], int j, int i);
    for(i = 0; i <= 255; i += 1)
-      for(j = 0; j <= 255; j += 1) {
-         //PIPS generated variable
-         void kernel(int bar[256][256], int j, int i);
-
+      for(j = 0; j <= 255; j += 1)
 kernel:         kernel(bar, j, i);
-      }
 }
 void kernel(int bar[256][256], int j, int i)
 {
