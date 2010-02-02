@@ -1,0 +1,64 @@
+setenv WKS simple_loop
+delete $WKS
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create $WKS $WKS.c p4a_stubs.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
+
+activate MUST_REGIONS
+activate TRANSFORMERS_INTER_FULL
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate PRECONDITIONS_INTER_FULL
+
+# Loop normalize for the C language and GPU friendly
+setproperty LOOP_NORMALIZE_1_INCREMENT TRUE
+setproperty LOOP_NORMALIZE_LOWER_BOUND 0
+# It is legal in the following by construction:
+setproperty LOOP_NORMALIZE_SKIP_INDEX_SIDE_EFFECT TRUE
+# If we do this here, the side effect at the end of a loop on the index
+# break paramemstorellelization. It would require to apply USE_DEF_ELIM...
+apply LOOP_NORMALIZE[%ALLFUNC]
+
+apply PRIVATIZE_MODULE[%ALLFUNC]
+
+activate PRINT_CODE
+
+apply COARSE_GRAIN_PARALLELIZATION[main]
+
+display PRINTED_FILE[main]
+
+apply GPU_IFY[main]
+
+display PRINTED_FILE[%ALLFUNC]
+
+apply KERNEL_LOAD_STORE[p4a_kernel_launcher_0]
+display PRINTED_FILE[%ALLFUNC]
+
+apply GPU_LOOP_NEST_ANNOTATE[p4a_kernel_launcher_0]
+
+apply UNSPLIT
+
+
+#echo simple_loop.c:
+#shell cat $WKS.database/Src/simple_loop.c
+
+echo p4a_kernel_0.c:
+shell cat $WKS.database/Src/p4a_kernel_0.c
+
+echo There should be a declaration of p4a_kernel_0 in p4a_kernel_wrapper_0.c:
+shell cat $WKS.database/Src/p4a_kernel_wrapper_0.c
+
+echo There should be a declaration of p4a_kernel_wrapper_0 in p4a_kernel_launcher_0.c:
+shell cat $WKS.database/Src/p4a_kernel_launcher_0.c
+
+#echo p4a_stubs.c:
+#shell cat $WKS.database/Src/p4a_stubs.c
+
+close
+#delete $WKS
+quit
