@@ -285,6 +285,7 @@ string safe_entity_name(entity e)
   return sn;
 }
 
+
 /* entity_local_name modified so that it does not core when used in
  * vect_fprint, since someone thought that it was pertinent to remove the
  * special care of constants there. So I added something here, to deal
@@ -301,6 +302,7 @@ entity_local_name(const entity e)
   return e==NULL ? null_name : local_name(entity_name(e));
 }
 
+
 /* Used instead of the macro to pass as formal argument */
 string entity_global_name(entity e)
 {
@@ -308,6 +310,69 @@ string entity_global_name(entity e)
   pips_assert("entity is defined", !entity_undefined_p(e));
   return entity_name(e);
 }
+
+/* Since entity_local_name may contain PIPS special characters such as
+   prefixes (label, common, struct, union, typedef, ...), this
+   entity_user_name function is created to return the initial
+   entity/variable name, as viewed by the user in his code.
+
+   In addition, all possible seperators (file, module, block, member)
+   are taken into account.
+
+   Function strstr locates the occurence of the last special character
+   which can appear just before the initial name, so the order of test
+   is important.
+
+   01/08/2003 Nga Nguyen -
+
+   @return pointer to the the user name (not newly allocated!)
+*/
+string entity_user_name(entity e)
+{
+  string gn = entity_name(e);
+  string un = global_name_to_user_name(gn);
+  return un;
+}
+
+
+/* allocates a new string */
+string entity_name_without_scope(entity e)
+{
+  string en = entity_name(e);
+  string mn = entity_module_name(e);
+  string ns = strrchr(en, BLOCK_SEP_CHAR);
+  string enws = string_undefined;
+
+  if(ns==NULL)
+    enws = strdup(en);
+  else
+    enws = strdup(concatenate(mn, MODULE_SEP_STRING, ns+1, NULL));
+
+  pips_debug(9, "entity name = \"%s\", without scope: \"%s\"\n",
+	     en, enws);
+
+  return enws;
+}
+
+
+/* allocates a new string */
+string local_name_to_scope(string ln)
+{
+  string ns = strrchr(ln, BLOCK_SEP_CHAR);
+  string s = string_undefined;
+  extern string empty_scope(void);
+
+  if(ns==NULL)
+    s = empty_scope();
+  else
+    s = strndup(ln, ns-ln+1);
+
+  pips_debug(8, "local name = \"%s\",  scope: \"%s\"\n",
+	     ln, s);
+
+  return s;
+}
+
 
 /* Returns the module local user name
  * SG: should return a const pointer
@@ -1227,66 +1292,6 @@ list /* of entity */ string_to_entity_list(string module, string names)
       if (next_comma) *next_comma = ',';
     }
   return le;
-}
-
-/* 01/08/2003 Nga Nguyen -
-
-   Since entity_local_name may contain PIPS special characters such as
-   prefixes (label, common, struct, union, typedef, ...), this
-   entity_user_name function is created to return the initial
-   entity/variable name, as viewed by the user in his code.
-
-   In addition, all possible seperators (file, module, block, member)
-   are taken into account.
-
-   Function strstr locates the occurence of the last special character
-   which can appear just before the initial name, so the order of test
-   is important.
-
-   @return pointer to the the user name (not newly allocated!)
-*/
-string entity_user_name(entity e)
-{
-  string gn = entity_name(e);
-  string un = global_name_to_user_name(gn);
-  return un;
-}
-
-/* allocates a new string */
-string entity_name_without_scope(entity e)
-{
-  string en = entity_name(e);
-  string mn = entity_module_name(e);
-  string ns = strrchr(en, BLOCK_SEP_CHAR);
-  string enws = string_undefined;
-
-  if(ns==NULL)
-    enws = strdup(en);
-  else
-    enws = strdup(concatenate(mn, MODULE_SEP_STRING, ns+1, NULL));
-
-  pips_debug(9, "entity name = \"%s\", without scope: \"%s\"\n",
-	     en, enws);
-
-  return enws;
-}
-
-/* allocates a new string */
-string local_name_to_scope(string ln)
-{
-  string ns = strrchr(ln, BLOCK_SEP_CHAR);
-  string s = string_undefined;
-  extern string empty_scope(void);
-
-  if(ns==NULL)
-    s = empty_scope();
-  else
-    s = strndup(ln, ns-ln+1);
-
-  pips_debug(8, "local name = \"%s\",  scope: \"%s\"\n",
-	     ln, s);
-
-  return s;
 }
 
 bool typedef_entity_p(entity e)
