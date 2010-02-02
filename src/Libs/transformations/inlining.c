@@ -1276,7 +1276,7 @@ statement outliner(string outline_module_name, list statements_to_outline)
                                 NIL
                                 )
                             );
-                    parameter_type(p)=copy_type(t);
+                    parameter_type(p)=copy_type(entity_type(e));
                     syntax s = expression_syntax(x);
                     expression X = make_expression(s,normalized_undefined);
                     expression_syntax(x)=make_syntax_call(make_call(CreateIntrinsic(ADDRESS_OF_OPERATOR_NAME),CONS(EXPRESSION,X,NIL)));
@@ -1343,8 +1343,7 @@ statement outliner(string outline_module_name, list statements_to_outline)
         gen_free_list(statement_declarations(old_statement));
         statement_declarations(old_statement)=NIL;
     }
-    /* the new module will be in the same compilation unit as its creator */
-    //AddEntityToModuleCompilationUnit(new_fun,get_current_module_entity());
+    AddEntityToCurrentModule(new_fun);
     return new_stmt;
 }
 
