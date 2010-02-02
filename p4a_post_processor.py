@@ -62,7 +62,8 @@ def patch_to_use_p4a_methods(file_name, dir_name):
                      "\\1// Index has been replaced by \\2\n\\1\\3 = \\2", content)
 
     # Insert a
-    #include <p4a_accel.h>
+    # #include <p4a_accel.h>
+    # #include <math.h>
     content = re.sub("^",
                      "#include <p4a_accel.h>\n#include <math.h>\n", content)
 
@@ -101,8 +102,10 @@ def patch_to_use_p4a_methods(file_name, dir_name):
     content = re.sub("(?s)(/\\*\n \\* file for [^\n]+\n \\*/\n).*extern void funlockfile\\(FILE \\*__stream\\);",
                      "\\1#include <stdio.h>\n", content)
 
+    # Remove #include <math.h> stuff since it has already be included
+    # above and CUDA does not cope with multiple inclusions:
     content = re.sub("(?s)\ntypedef union {\n.*extern int matherr\\(struct exception \\*__exc\\);",
-                     "#include <math.h>\n", content)
+                     "", content)
 
     content = re.sub("typedef unsigned int size_t;\n",
                      "", content)
