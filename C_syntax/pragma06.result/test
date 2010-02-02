@@ -1,0 +1,67 @@
+
+Symbol table for pragma06
+
+pragma06
+
+Declarations for module "pragma06" with type "() -> void"
+
+Variable list:
+
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
+	Declared entity "pragma06!:*STATIC*" with type "area" with size 0
+	Declared entity "pragma06:*DYNAMIC*" with type "area" with size 18
+	Declared entity "pragma06:*HEAP*" with type "area" with size 0
+	Declared entity "pragma06:*STACK*" with type "area" with size 0
+	Declared entity "pragma06:*STATIC*" with type "area" with size 0
+	Declared entity "pragma06:0`__FUNCTION__" with type "variable" "char"
+	Declared entity "pragma06:0`__func__" with type "variable" "char"
+
+* empty extern declaration list *
+
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "pragma06!:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "pragma06:*DYNAMIC*" of size 18:
+	Variable "pragma06:0`__func__"	offset = 0	size = 9
+	Variable "pragma06:0`__FUNCTION__"	offset = 9	size = 9
+
+
+Layout for memory area "pragma06:*HEAP*" of size 0:
+	* empty area *
+
+
+Layout for memory area "pragma06:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "pragma06:*STATIC*" of size 0:
+	* empty area *
+
+End of declarations for module pragma06
+
+
+Parsed printed file
+
+void pragma06()
+{
+   // BEGIN BLOCK
+#pragma  gnih
+
+   // END BLOCK
+}
+
+Printed file
+
+void pragma06()
+{
+#pragma  gnih
+
+}
