@@ -53,13 +53,12 @@ def patch_to_use_p4a_methods(file_name, dir_name):
     f.close()
 
     ## Change
-    ##    // To be replaced with a call to P4A_vp_1
-    ##    j = j;
+    ##    // To be assigned to a call to P4A_vp_1: j
     ## into
     ##     // Index has been replaced by P4A_vp_1
     ##    j = P4A_vp_1;
-    content = re.sub("( *)// To be replaced with a call to (P4A_vp_[0-9]+)\n[^=]+= ([^;]+)",
-                     "\\1// Index has been replaced by \\2\n\\1\\3 = \\2", content)
+    content = re.sub("( *)// To be assigned to a call to (P4A_vp_[0-9]+): ([^\n]+)",
+                     "\\1// Index has been replaced by \\2:\n\\1\\3 = \\2;", content)
 
     # Insert a
     # #include <p4a_accel.h>
@@ -70,6 +69,11 @@ def patch_to_use_p4a_methods(file_name, dir_name):
     # Compatibility
     content = re.sub("// Prepend here P4A_init_accel\n",
                      "P4A_init_accel;\n", content)
+
+    # Now the outliner output all the declarations in one line, so put
+    # only one function per line for further replacement:
+    content = re.sub(", (p4a_kernel[^0-9]+[0-9]+\\()",
+                     ";\n   void \\1", content)
 
     # Add accelerator attributes on accelerated parts:
     content = re.sub("(void p4a_kernel_wrapper_[0-9]+[^\n]+)",
@@ -87,15 +91,16 @@ def patch_to_use_p4a_methods(file_name, dir_name):
     ##         p4a_kernel_wrapper_2(space, i, j);
     ##
     ## with
-    ## P4A_CALL_ACCEL_KERNEL_2D(p4a_kernel_wrapper_2, 500, 500, i, j);
+    ## P4A_call_accel_kernel_2D(p4a_kernel_wrapper_2, 500, 500, i, j);
 
-    content = re.sub("(?s)// Loop nest P4A begin,(\\d+)D\\(([^)]+)\\).*// Loop nest P4A end\n[^\n]+\n +(p4a_kernel_wrapper_\\d+)\\(([^)]*)\\);\n",
+    content = re.sub("(?s)// Loop nest P4A begin,(\\d+)D\\(([^)]+)\\).*// Loop nest P4A end\n.*?(p4a_kernel_wrapper_\\d+)\\(([^)]*)\\);\n",
                      "P4A_call_accel_kernel_\\1d(\\3,\\2,\\4);\n", content)
 
     # Add missing declarations of the p4a_kernel_launcher (outliner or
     # prettyprinter bug?)
-    content = re.sub("\n[^\n]+(p4a_kernel_launcher_\\d+)\\(",
-                     insert_kernel_launcher_declaration, content)
+    # It seems to be corrected now
+    ### content = re.sub("\n[^\n]+(p4a_kernel_launcher_\\d+)\\(",
+    ###                 insert_kernel_launcher_declaration, content)
 
 
     # Clean-up headers and inject standard header injection:
