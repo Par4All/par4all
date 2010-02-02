@@ -55,11 +55,11 @@
 #include "c_syntax.h"
 
 
-/** 
+/**
  * @name inlining
  * @{ */
 
-/** 
+/**
  * structure containing all the parameters needed by inlining.
  * It avoids using globals
  * newgen like macros are defined
@@ -118,8 +118,8 @@ void inline_return_crawler(instruction ins,inlining_parameters p)
     if( return_instruction_p( ins ) )
     {
         // create the goto
-        list l= (ins == tail_ins(p)) ? 
-            NIL : 
+        list l= (ins == tail_ins(p)) ?
+            NIL :
             make_statement_list( instruction_to_statement( make_instruction_goto( copy_statement(laststmt(p)) ) ) ) ;
         // create the assign and push it if needed
         call ic = instruction_call(ins);
@@ -220,8 +220,9 @@ bool inline_has_static_declaration(entity module,list iter)
     return false;
 }
 
-/* return true if an entity declared in the statement `s' from `p->inlined_module'
- */ 
+/* return true if an entity declared in the statement `s' from
+   `p->inlined_module'
+ */
 static
 void statement_with_static_declarations_p(statement s,inlining_parameters p )
 {
@@ -452,7 +453,7 @@ statement inline_expression_call(inlining_parameters p, expression modified_expr
                         {
                             returned_entity(p)=entity_undefined;
                             break;
-                        } 
+                        }
                     }
                 } while(entity_undefined_p(returned_entity(p)));
 
@@ -703,10 +704,10 @@ void inline_split_declarations(statement s, entity inlined_module)
             {
                 /* the first condition is a bit tricky :
                  * check int a = foo(); int b=bar();
-                 * once we decide to inline foo(), we must split b=bar() because foo may 
-                 * touch a global variable used in bar()
+		 * once we decide to inline foo(), we must split b=bar()
+                 * because foo may touch a global variable used in bar()
                  */
-                if( !ENDP(prelude) || 
+                if( !ENDP(prelude) ||
                     inline_has_inlinable_calls(inlined_module,value_expression(v)) )
                 {
                     set_add_element(selected_entities,selected_entities,e);
@@ -751,12 +752,12 @@ inline_calls(inlining_parameters p ,char * module)
     reset_current_module_statement();
 }
 
-/** 
+/**
  * this should inline all calls to module `module_name'
  * in calling modules, if possible ...
- * 
+ *
  * @param module_name name of the module to inline
- * 
+ *
  * @return true if we did something
  */
 static
@@ -809,11 +810,11 @@ bool do_inlining(inlining_parameters p,char *module_name)
     return TRUE;
 }
 
-/** 
+/**
  * perform inlining using effects
- * 
+ *
  * @param module_name name of the module to inline
- * 
+ *
  * @return
  */
 bool inlining(char *module_name)
@@ -868,13 +869,14 @@ run_inlining(string caller_name, string module_name, inlining_parameters p)
     if(use_effects(p)) reset_cumulated_rw_effects();
 }
 
-/** 
+
+/**
  * this should inline all call in module `module_name'
  * it does not works recursievly, so multiple pass may be needed
  * returns true if at least one function has been inlined
- * 
+ *
  * @param module_name name of the module to unfold
- * 
+ *
  * @return true if we did something
  */
 static
@@ -954,12 +956,13 @@ bool do_unfolding(inlining_parameters p, char* module_name)
     return true;
 }
 
-/** 
+
+/**
  * perform unfolding using effect
- * 
+ *
  * @param module_name name of the module to unfold
- * 
- * @return 
+ *
+ * @return
  */
 bool unfolding(char* module_name)
 {
@@ -968,11 +971,12 @@ bool unfolding(char* module_name)
 	return do_unfolding(&p,module_name);
 }
 
-/** 
+
+/**
  * perform unfolding without using effects
- * 
+ *
  * @param module_name name of the module to unfold
- * 
+ *
  * @return true upon success
  */
 bool unfolding_simple(char* module_name)
@@ -984,7 +988,7 @@ bool unfolding_simple(char* module_name)
 /**  @} */
 
 
-/** 
+/**
  * @name outlining
  * @{ */
 
@@ -1065,7 +1069,8 @@ struct cpv {
     bool rm;
 };
 
-static 
+
+static
 void check_private_variables_call_walker(call c,struct cpv * p)
 {
     set s = get_referenced_entities(c);
@@ -1198,7 +1203,7 @@ statement outliner(string outline_module_name, list statements_to_outline)
     {
         type t = entity_type(e);
         bool is_parameter_p = false;
-        if( type_variable_p(t) || 
+        if( type_variable_p(t) ||
                 /* for parameter case */ (is_parameter_p=(entity_symbolic_p(e) && storage_rom_p(entity_storage(e)) && type_functional_p(t))) )
         {
             /* this create the dummy parameter */
@@ -1215,7 +1220,7 @@ statement outliner(string outline_module_name, list statements_to_outline)
 
             formal_parameters=CONS(PARAMETER,make_parameter(
                         is_parameter_p?make_type_variable(make_variable(make_basic_int(DEFAULT_INTEGER_TYPE_SIZE),NIL,NIL)):copy_type(new_type),
-                        fortran_module_p(get_current_module_entity())?make_mode_reference():make_mode_value(), 
+                        fortran_module_p(get_current_module_entity())?make_mode_reference():make_mode_value(),
                         make_dummy_identifier(dummy_entity)),formal_parameters);
 
             /* this adds the effective parameter */
@@ -1233,8 +1238,8 @@ statement outliner(string outline_module_name, list statements_to_outline)
 
     /* we need to patch parameters , effective parameters and body in C
      * because of by copy function call
-	 * it's not needed if 
-	 * - the parameter is only read 
+	 * it's not needed if
+	 * - the parameter is only read
 	 * - it's an array / pointer
      */
     if(c_module_p(get_current_module_entity()))
@@ -1251,7 +1256,7 @@ statement outliner(string outline_module_name, list statements_to_outline)
                 FOREACH(STATEMENT,stmt,statements_to_outline)
                     entity_written|=find_write_effect_on_entity(stmt,ex);
 
-                if( (!basic_pointer_p(variable_basic(v))) && 
+                if( (!basic_pointer_p(variable_basic(v))) &&
                         ENDP(variable_dimensions(v)) &&
                         entity_written
                   )
@@ -1295,7 +1300,7 @@ statement outliner(string outline_module_name, list statements_to_outline)
     text t = text_named_module(new_fun, new_fun /*get_current_module_entity()*/, body);
     add_new_module_from_text(outline_module_name, t, fortran_module_p(get_current_module_entity()));
     set_bool_property(STAT_ORDER,saved);
-	/* horrible hack to prevent declaration duplication 
+	/* horrible hack to prevent declaration duplication
 	 * signed : Serge Guelton
 	 */
 	gen_free_list(code_declarations(EntityCode(new_fun)));
@@ -1330,6 +1335,10 @@ statement outliner(string outline_module_name, list statements_to_outline)
         gen_free_list(statement_declarations(old_statement));
         statement_declarations(old_statement)=NIL;
     }
+    /* Do not forgot to declare the function we want to call: */
+    AddLocalEntityToDeclarations(new_fun,
+	    			 get_current_module_entity(),
+				 new_stmt);
     return new_stmt;
 }
 
