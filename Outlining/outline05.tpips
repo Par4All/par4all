@@ -35,7 +35,6 @@ apply CLEAN_DECLARATIONS[%ALLFUNC]
 display PRINTED_FILE[init_kernel]
 apply COARSE_GRAIN_PARALLELIZATION[init_kernel]
 display PRINTED_FILE[%ALL]
-display PARALLELPRINTED_FILE[%ALLFUNC]
 
 close
 quit

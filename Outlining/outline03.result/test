@@ -118,10 +118,20 @@ void init_kernel(float imagein_re[64][64], float imagein_im[64][64]);
 int main(int argc, char *argv[])
 {
    int i, j;
+   {
+      //PIPS generated variable
+      void init_kernel(float imagein_re[64][64], float imagein_im[64][64]);
 
-init_kernel:   init_kernel(imagein_re, imagein_im);
 
-compute_kernel:   compute_kernel(imagein_re, imagein_im);
+init_kernel:      init_kernel(imagein_re, imagein_im);
+   }
+   {
+      //PIPS generated variable
+      void compute_kernel(float imagein_re[64][64], float imagein_im[64][64]);
+
+
+compute_kernel:      compute_kernel(imagein_re, imagein_im);
+   }
 
    for(i = 0; i <= 63; i += 1) {
       printf("Line %d:\n");
@@ -174,10 +184,20 @@ void init_kernel(float imagein_re[64][64], float imagein_im[64][64]);
 int main(int argc, char *argv[])
 {
    int i, j;
+   {
+      //PIPS generated variable
+      void init_kernel(float imagein_re[64][64], float imagein_im[64][64]);
 
-init_kernel:   init_kernel(imagein_re, imagein_im);
 
-compute_kernel:   compute_kernel(imagein_re, imagein_im);
+init_kernel:      init_kernel(imagein_re, imagein_im);
+   }
+   {
+      //PIPS generated variable
+      void compute_kernel(float imagein_re[64][64], float imagein_im[64][64]);
+
+
+compute_kernel:      compute_kernel(imagein_re, imagein_im);
+   }
 
    for(i = 0; i <= 63; i += 1) {
       printf("Line %d:\n");
