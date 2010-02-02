@@ -139,9 +139,13 @@ to put files in. It defaults to "P4A" in the current directory>""")
     group.add_option("-v",  "--verbose",
                      action = "store_true", dest = "verbose", default = False,
                      help = "Run in verbose mode")
+
     group.add_option("-q",  "--quiet",
                      action = "store_false", dest = "verbose",
                      help = "Run in quiet mode [default]")
+
+    parser.add_option_group(group)
+
     (options, args) = parser.parse_args()
 
     verbose = options.verbose
