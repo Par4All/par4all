@@ -370,8 +370,8 @@ add_new_module_from_text(string module_name,
       cun = compilation_unit_of_module(module_name);
 
       if(string_undefined_p(cun)) {
-	cun = strdup(concatenate(module_name, FILE_SEP_STRING, NULL));
-	cu = MakeCompilationUnitEntity(cun);
+          cun = strdup(concatenate(module_name, FILE_SEP_STRING, NULL));
+          cu = MakeCompilationUnitEntity(cun);
       }
     }
 

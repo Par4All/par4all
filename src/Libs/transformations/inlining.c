@@ -54,6 +54,7 @@
 #include "syntax.h"
 #include "c_syntax.h"
 
+extern string compilation_unit_of_module(string);
 
 /**
  * @name inlining
@@ -358,7 +359,6 @@ statement inline_expression_call(inlining_parameters p, expression modified_expr
      * of declarations has to be taken into account).
      */
     {
-        extern string compilation_unit_of_module(string);
         string cu_name = compilation_unit_of_module(get_current_module_name());
         string mln = module_local_name(inlined_module(p));
         set inlined_referenced_entities = get_referenced_entities(inlined_module_statement(p));
@@ -1122,6 +1122,10 @@ statement outliner(string outline_module_name, list statements_to_outline)
     pips_assert("there are some statements to outline",!ENDP(statements_to_outline));
     entity new_fun = make_empty_subroutine(outline_module_name);
     statement body = instruction_to_statement(make_instruction_sequence(make_sequence(statements_to_outline)));
+    /* this sets the compilation unit */
+    //extern void db_put_or_update_memory_resource(string, string,void *, bool);
+    //string cun = strdup(db_get_memory_resource(DBR_USER_FILE,get_current_module_name(),TRUE));
+    //db_put_or_update_memory_resource(DBR_USER_FILE,module_local_name(new_fun),cun ,TRUE);
 
     /* Retrieve referenced and declared entities */
     list referenced_entities = NIL,
@@ -1165,7 +1169,10 @@ statement outliner(string outline_module_name, list statements_to_outline)
     list tmp_list=NIL;
     FOREACH(ENTITY,e,referenced_entities)
     {
-        if( (!entity_constant_p(e) ) && (!entity_field_p(e)) &&
+        /* function should be add to compilation unit */
+        if(entity_function_p(e))
+            ;//AddEntityToModuleCompilationUnit(e,get_current_module_entity());
+        else if( (!entity_constant_p(e) ) && (!entity_field_p(e)) &&
                 !( entity_formal_p(e) && (!same_string_p(entity_module_name(e),get_current_module_name()))) )
             tmp_list=CONS(ENTITY,e,tmp_list);
     }
@@ -1305,6 +1312,7 @@ statement outliner(string outline_module_name, list statements_to_outline)
 	 */
 	gen_free_list(code_declarations(EntityCode(new_fun)));
 	code_declarations(EntityCode(new_fun))=NIL;
+
     FOREACH(PARAMETER,p,formal_parameters) {
         entity e = dummy_identifier(parameter_dummy(p));
         if(entity_variable_p(e)) {
@@ -1335,10 +1343,8 @@ statement outliner(string outline_module_name, list statements_to_outline)
         gen_free_list(statement_declarations(old_statement));
         statement_declarations(old_statement)=NIL;
     }
-    /* Do not forgot to declare the function we want to call: */
-    AddLocalEntityToDeclarations(new_fun,
-	    			 get_current_module_entity(),
-				 new_stmt);
+    /* the new module will be in the same compilation unit as its creator */
+    //AddEntityToModuleCompilationUnit(new_fun,get_current_module_entity());
     return new_stmt;
 }
 
