@@ -26,7 +26,7 @@
 /** Store the loop nests found that meet the spec to be executed on a
     GPU. Use a list and not a set or hash_map to have always the same
     order */
-list loop_nests_to_outline;
+static list loop_nests_to_outline;
 
 
 #if 0
@@ -142,7 +142,8 @@ gpu_ify_statement(statement s, int depth) {
      coordinates from hardware intrinsics? */
   if (get_bool_property("GPU_USE_WRAPPER")) {
     /* Add index initialization from GPU coordinates, in the reverse order
-       since we use insert_a_statement() */
+       since we use insert_comments_to_statement() to avoid furthering the
+       first statement from its original comment: */
     for(int i = depth - 1; i >= 0; i--) {
       entity index = perfectly_nested_loop_index_at_depth(s, i);
       // Get the iteration coordinate intrinsic, for example P4A_vp_1:
@@ -160,19 +161,28 @@ user error in rmake: recursion on resource SUMMARY_EFFECTS of p4a_kernel_wrapper
      entity_to_expression(index)));
      So keep simple right now
       */
-      statement assign = make_assign_statement(entity_to_expression(index),
-					       entity_to_expression(index));
+
       /* Add a comment to know what to do later: */
       string comment;
       string intrinsic_name;
       asprintf(&intrinsic_name,
 	       get_string_property("GPU_COORDINATE_INTRINSICS_FORMAT"),
 	       i);
-      asprintf(&comment, "%s To be replaced with a call to %s",c_module_p(get_current_module_entity())?"//":"C", intrinsic_name);
-      free(intrinsic_name);
-      put_a_comment_on_a_statement(assign, comment);
+      /* Add a comment in the form of
 
-      insert_a_statement(inner, assign);
+	 To be replaced with a call to P4A_vp_1: j
+
+	 that may replaced by a post-processor later by
+
+	 j = P4A_vp_1();
+	 or whatever according to the target accelerator
+      */
+      asprintf(&comment, "%s To be assigned to a call to %s: %s\n",
+	       c_module_p(get_current_module_entity()) ? "//" : "C",
+	       intrinsic_name,
+	       entity_user_name(index));
+      free(intrinsic_name);
+      insert_comments_to_statement(inner, comment);
     }
 
     /* Then outline the innermost code again (the kernel wrapper) that owns
