@@ -11,5 +11,5 @@ etc/patterns.def
 etc/complexity_cost_tables
 etc/complexity_cost_tables/*
 etc/complexity_cost_tables/*/*
-etc/properties.rc
+etc/properties*.rc
 etc/pipsmake.rc
