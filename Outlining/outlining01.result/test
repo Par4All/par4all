@@ -12,7 +12,7 @@ int main(int argc, char *argv[])
       return 2;
    {
       int i;
-      for (i = 0;i<n-1;i++)
+      for(i = 0; i <= n-1-1; i += 1)
          str[i] = 'a'+(char) i;
       str[n-1] = 0;
    }
@@ -31,16 +31,18 @@ int main(int argc, char *argv[])
    n = atoi(argv[1]);
    if (!(str = malloc(n*sizeof(char)))) 
       return 2;
-   outlined(n, str);
+   outlined(str, n);
    printf("%s\n", str);
    return 0;
 }
-void outlined(int n, char *str)
+void outlined(char *str, int n)
 {
-   int i;
-   for (i = 0;i<n-1;i++)
-      str[i] = 'a'+(char) i;
-   str[n-1] = 0;
+   {
+      int i;
+      for(i = 0; i <= n-1-1; i += 1)
+         str[i] = 'a'+(char) i;
+      str[n-1] = 0;
+   }
 }
 
 Unsplit resulting code

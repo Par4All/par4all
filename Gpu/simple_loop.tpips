@@ -43,21 +43,8 @@ apply GPU_LOOP_NEST_ANNOTATE[p4a_kernel_launcher_0]
 
 apply UNSPLIT
 
-
-#echo simple_loop.c:
-#shell cat $WKS.database/Src/simple_loop.c
-
-echo p4a_kernel_0.c:
-shell cat $WKS.database/Src/p4a_kernel_0.c
-
-echo There should be a declaration of p4a_kernel_0 in p4a_kernel_wrapper_0.c:
-shell cat $WKS.database/Src/p4a_kernel_wrapper_0.c
-
-echo There should be a declaration of p4a_kernel_wrapper_0 in p4a_kernel_launcher_0.c:
-shell cat $WKS.database/Src/p4a_kernel_launcher_0.c
-
-#echo p4a_stubs.c:
-#shell cat $WKS.database/Src/p4a_stubs.c
+echo All generated modules should be there
+shell cat $WKS.database/Src/$WKS.c
 
 close
 #delete $WKS

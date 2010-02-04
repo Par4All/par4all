@@ -50,9 +50,9 @@ void convol(int n, int a[n][n], int b[n][n], int kernel[3][3])
    int i, j;
 l99995:
    for(i = 0; i <= n-1; i += 1)
-l99996:      convol_outlined(i, n, a, b, kernel);
+l99996:      convol_outlined(n, kernel, b, a, i);
 }
-void convol_outlined(int i, int n, int a[n][n], int b[n][n], int kernel[3][3])
+void convol_outlined(int n, int kernel[3][3], int b[n][n], int a[n][n], int i)
 {
    //PIPS generated variable
    int j;

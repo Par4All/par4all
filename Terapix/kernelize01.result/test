@@ -51,22 +51,22 @@ int foo(int seed[100])
       b[i] = seed[99-i];
    }
    /* compute */
-kernel:   run_kernel(a, b, c);
+kernel:   run_kernel(c, b, a);
    /* print result */
    for(i = 0; i <= 99; i += 1)
       printf("%d ", c[i]);
    printf("\n");
 }
-void run_kernel(int a[100], int b[100], int c[100])
+void run_kernel(int c[100], int b[100], int a[100])
 {
    //PIPS generated variable
    int i;
    /* compute */
 kernel:
    for(i = 0; i <= 99; i += 10)
-      kernel(a, b, c, i);
+      kernel(i, c, b, a);
 }
-void kernel(int a[100], int b[100], int c[100], int i)
+void kernel(int i, int c[100], int b[100], int a[100])
 {
    {
       //PIPS generated variable
@@ -94,11 +94,11 @@ int foo(int seed[100])
    memalloc(&P_2, sizeof(int[100])-1+1);
    memalloc(&P_1, sizeof(int[100])-1+1);
    memalloc(&P_0, sizeof(int[100])-1+1);
-   memload(a, *P_2, sizeof(int[100])-1+1);
    memload(b, *P_1, sizeof(int[100])-1+1);
+   memload(a, *P_0, sizeof(int[100])-1+1);
    /* compute */
 kernel:   run_kernel(*P_2, *P_1, *P_0);
-   memstore(c, *P_0, sizeof(int[100])-1+1);
+   memstore(c, *P_2, sizeof(int[100])-1+1);
    memfree(*P_2);
    memfree(*P_1);
    memfree(*P_0);
@@ -129,11 +129,11 @@ int foo(int seed[100])
    memalloc(&P_2, sizeof(int[100])-1+1);
    memalloc(&P_1, sizeof(int[100])-1+1);
    memalloc(&P_0, sizeof(int[100])-1+1);
-   memload(a, *P_2, sizeof(int[100])-1+1);
    memload(b, *P_1, sizeof(int[100])-1+1);
+   memload(a, *P_0, sizeof(int[100])-1+1);
    /* compute */
    run_kernel(*P_2, *P_1, *P_0);
-   memstore(c, *P_0, sizeof(int[100])-1+1);
+   memstore(c, *P_2, sizeof(int[100])-1+1);
    memfree(*P_2);
    memfree(*P_1);
    memfree(*P_0);

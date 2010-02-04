@@ -100,14 +100,14 @@ echo
 
 apply UNSPLIT
 
-shell echo Generating P4A code:
-shell echo
-shell cd $WKS.database; $P4A_DIR/p4a_post_processor.py Src/*.c
 
 close
 #delete $WKS
 quit
 
+shell echo Generating P4A code:
+shell echo
+shell cd $WKS.database; $P4A_DIR/p4a_post_processor.py Src/*.c
 
 
 shell echo
