@@ -35,9 +35,7 @@ int flatten_code03()
    int i = 1;
    int j;
    //PIPS generated variable
-   int i_0 = 2;
-   //PIPS generated variable
-   int i_1 = 3;
+   int i_0 = 2, i_1 = 3;
    i++;
    i_0++;
    j = 1;
