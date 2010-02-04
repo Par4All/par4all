@@ -303,6 +303,7 @@ recompile_module(char* module)
 
     /* build and register textual representation */
     text t = text_module(get_current_module_entity(), modified_module_statement);
+    //add_new_module_from_text(module,t,fortran_module_p(modified_module),compilation_unit_of_module(module));
     string dirname = db_get_current_workspace_directory();
     string res = fortran_module_p(modified_module)? DBR_INITIAL_FILE : DBR_C_SOURCE_FILE;
     string filename = db_get_file_resource(res,module,TRUE);
@@ -347,7 +348,7 @@ recompile_module(char* module)
             if(!db_resource_required_or_available_p(DBR_PRINTED_FILE,m))
                 print_code(m);
         }
-        unsplit(cu);
+        //unsplit(cu);
     }
 
     bool parsing_ok =(fortran_module_p(modified_module)) ? parser(module) : c_parser(module);

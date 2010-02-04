@@ -1122,10 +1122,6 @@ statement outliner(string outline_module_name, list statements_to_outline)
     pips_assert("there are some statements to outline",!ENDP(statements_to_outline));
     entity new_fun = make_empty_subroutine(outline_module_name);
     statement body = instruction_to_statement(make_instruction_sequence(make_sequence(statements_to_outline)));
-    /* this sets the compilation unit */
-    //extern void db_put_or_update_memory_resource(string, string,void *, bool);
-    //string cun = strdup(db_get_memory_resource(DBR_USER_FILE,get_current_module_name(),TRUE));
-    //db_put_or_update_memory_resource(DBR_USER_FILE,module_local_name(new_fun),cun ,TRUE);
 
     /* Retrieve referenced and declared entities */
     list referenced_entities = NIL,
@@ -1305,7 +1301,7 @@ statement outliner(string outline_module_name, list statements_to_outline)
     bool saved = get_bool_property(STAT_ORDER);
     set_bool_property(STAT_ORDER,false);
     text t = text_named_module(new_fun, new_fun /*get_current_module_entity()*/, body);
-    add_new_module_from_text(outline_module_name, t, fortran_module_p(get_current_module_entity()));
+    add_new_module_from_text(outline_module_name, t, fortran_module_p(get_current_module_entity()), compilation_unit_of_module(get_current_module_name()) );
     set_bool_property(STAT_ORDER,saved);
 	/* horrible hack to prevent declaration duplication
 	 * signed : Serge Guelton
@@ -1343,7 +1339,6 @@ statement outliner(string outline_module_name, list statements_to_outline)
         gen_free_list(statement_declarations(old_statement));
         statement_declarations(old_statement)=NIL;
     }
-    AddEntityToCurrentModule(new_fun);
     return new_stmt;
 }
 

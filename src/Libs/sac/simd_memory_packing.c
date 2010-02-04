@@ -181,7 +181,7 @@ bool simd_memory_packing(char *mod_name)
         }
         add_new_module_from_text( mod_name,
                 text_module(get_current_module_entity(),get_current_module_statement()),
-                fortran_module_p(get_current_module_entity())
+                fortran_module_p(get_current_module_entity()),compilation_unit_of_module(get_current_module_name())
         );
         /* update/release resources */
         hash_table_free(array_to_vector);

@@ -342,8 +342,8 @@ static text compilation_unit_text(entity cu, entity module)
 bool
 add_new_module_from_text(string module_name,
 			 text code_text,
-			 bool is_fortran/*,
-					    text heading*/) {
+			 bool is_fortran,
+					    string compilation_unit_name) {
     boolean success_p = TRUE;
     entity m = local_name_to_top_level_entity(module_name);
     string file_name, dir_name, src_name, full_name, init_name, finit_name;
@@ -364,7 +364,7 @@ add_new_module_from_text(string module_name,
     }
 
     // Build the coresponding compilation unit for C code
-    if(!is_fortran) {
+    if(string_undefined_p(compilation_unit_name) ) {
       // Function defined in pipsmake
       extern string compilation_unit_of_module(string);
       cun = compilation_unit_of_module(module_name);
@@ -374,45 +374,51 @@ add_new_module_from_text(string module_name,
           cu = MakeCompilationUnitEntity(cun);
       }
     }
+    else
+        cun=strdup(compilation_unit_name);
 
     /* pips' current directory is just above the workspace
      */
-    file_name = strdup(concatenate(module_name, is_fortran? FORTRAN_FILE_SUFFIX : PP_C_ED, NULL));
-    //file_name = strlower(file_name, file_name);
+    {
+        string cu_real = strdup(cun);
+        cu_real[strlen(cu_real)-1]=0;
+        asprintf(&file_name,"%s%s",cu_real,is_fortran?FORTRAN_FILE_SUFFIX:PP_C_ED);
+        free(cu_real);
+    }
     dir_name = db_get_current_workspace_directory();
-    src_name = strdup(concatenate(WORKSPACE_TMP_SPACE, "/", file_name, NULL));
-    full_name = strdup(concatenate(dir_name, "/", src_name, NULL));
+    asprintf(&src_name,WORKSPACE_TMP_SPACE "/%s",file_name);
+    asprintf(&full_name,"%s/%s",dir_name,src_name);
     init_name =
-      db_build_file_resource_name(res, module_name, is_fortran? FORTRAN_INITIAL_FILE_SUFFIX : C_FILE_SUFFIX);
-    finit_name = strdup(concatenate(dir_name, "/", init_name, NULL));
+      db_build_file_resource_name(res, entity_local_name(m), is_fortran? FORTRAN_INITIAL_FILE_SUFFIX : C_FILE_SUFFIX);
+    asprintf(&finit_name,"%s/%s" ,dir_name,init_name);
 
     /* Put the code text in the temporary source file */
     db_make_subdirectory(WORKSPACE_TMP_SPACE);
-    f = safe_fopen(full_name, "w");
+    f = safe_fopen(finit_name, "w");
     print_text(f, code_text);
-    safe_fclose(f, full_name);
+    safe_fclose(f, finit_name);
     /* A PIPS database may be partly incoherent after a core dump but
        still usable (Cathare 2, FI). So delete a previously finit_name
        file. */
-    if(file_exists_p(finit_name))
-      safe_unlink(finit_name);
+    if(file_exists_p(full_name))
+      safe_unlink(full_name);
     /* The initial file is linked to the newly generated temporary file: */
-    safe_link(finit_name, full_name);
+    safe_link(full_name, finit_name);
 
     /* Add the new generated file as a file resource with its local
      * name...  should only put a new user file, I guess?
      */
-    user_log("Registering synthesized file %s\n", file_name);
-    DB_PUT_FILE_RESOURCE(res, module_name, init_name);
+    user_log("Registering synthesized file %s\n", file_name );
+    DB_PUT_FILE_RESOURCE(res, module_name, strdup(init_name));
     /* The user file dwells in the WORKSPACE_TMP_SPACE */
-    DB_PUT_FILE_RESOURCE(DBR_USER_FILE, module_name, src_name);
+    DB_PUT_FILE_RESOURCE(DBR_USER_FILE, module_name, strdup(string_undefined_p(compilation_unit_name)?src_name:full_name));
 
-    if(!is_fortran) { // C is assumed
+    if(!is_fortran && string_undefined_p(compilation_unit_name) ) { // C is assumed
       /* Add the compilation unit files */
       pips_assert("The compilation unit name is defined", !string_undefined_p(cun));
       user_log("Registering synthesized compilation unit %s\n", file_name);
 
-      init_name = db_build_file_resource_name(res, cun, C_FILE_SUFFIX);
+      init_name = db_build_file_resource_name(res, cun, is_fortran? FORTRAN_INITIAL_FILE_SUFFIX : C_FILE_SUFFIX);
       finit_name = strdup(concatenate(dir_name, "/", init_name, NULL));
 
       /* Builds the compilation unit stub: it can be empty or include
@@ -456,7 +462,7 @@ add_new_module(string module_name,
   text code_text = text_module(module, stat);
   return add_new_module_from_text(module_name,
 				  code_text,
-				  is_fortran);
+				  is_fortran,string_undefined);
 
 }
 
@@ -482,7 +488,7 @@ missing_file_initializer(string module_name, bool is_fortran) {
   stub = stub_text(m, is_fortran);
   return add_new_module_from_text(module_name,
 				  stub,
-				  is_fortran);
+				  is_fortran,string_undefined);
 }
 
 

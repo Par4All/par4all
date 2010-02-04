@@ -1051,19 +1051,33 @@ gen_array_t db_get_module_list_initial_order(void)
   ls = gen_filter_tabulated(gen_true, db_symbol_domain);
   a = gen_array_make(0);
   dbr = get_pips_database();
-  
-  MAP(DB_SYMBOL, symbol, 
-  {
-    string name = db_symbol_name(symbol);
 
-    /* if it is a module, append... */
-    if (!string_undefined_p(name) &&
-	!same_string_p(name, "") && 
-	/* I should check that some actual resources is stored? */
-	bound_db_resources_p(dbr, symbol))
-      gen_array_dupappend(a, name);
-  },
-      ls);
+  
+  FOREACH(DB_SYMBOL, symbol, ls)
+  {
+      string name = db_symbol_name(symbol);
+      /* if it is a module, append... */
+      if (!string_undefined_p(name) &&
+              !same_string_p(name, "") && 
+              /* I should check that some actual resources is stored? */
+              bound_db_resources_p(dbr, symbol) &&
+              compilation_unit_p(name)
+      )
+          gen_array_dupappend(a, name);
+  }
+  FOREACH(DB_SYMBOL, symbol, ls)
+  {
+      string name = db_symbol_name(symbol);
+      /* if it is a module, append... */
+      if (!string_undefined_p(name) &&
+              !same_string_p(name, "") && 
+              /* I should check that some actual resources is stored? */
+              bound_db_resources_p(dbr, symbol) &&
+              !compilation_unit_p(name)
+      )
+          gen_array_dupappend(a, name);
+  }
+
 
   gen_free_list(ls);
   return a;  
