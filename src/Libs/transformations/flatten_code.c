@@ -492,6 +492,29 @@ static bool unroll_loops_in_statement(statement s) {
   return TRUE;
 }
 
+static void statement_purge_declarations_walker(sequence seq)
+{
+    statement block = (statement)gen_get_ancestor(statement_domain,seq);
+    list decls = gen_copy_seq(statement_declarations(block));
+    FOREACH(ENTITY,e,decls)
+    {
+        bool decl_stat_found = false;
+        FOREACH(STATEMENT,s,sequence_statements(seq))
+        {
+            if(( decl_stat_found = ( declaration_statement_p(s) && !gen_chunk_undefined_p(gen_find_eq(e,statement_declarations(s))) ) ) )
+                break;
+        }
+        if(!decl_stat_found)
+            gen_remove_once(&statement_declarations(block),e);
+    }
+    gen_free_list(decls);
+}
+
+static void statement_purge_declarations(statement s)
+{
+    gen_recurse(s,sequence_domain,gen_true,statement_purge_declarations_walker);
+}
+
 
 /* Pipsmake 'flatten_code' phase.
 
@@ -532,6 +555,7 @@ bool flatten_code(string module_name)
 
   /* Step 1 and 2: flatten declarations and clean up sequences */
   statement_flatten_declarations(module_stat);
+  statement_purge_declarations(module_stat);
     // call sequence flattening as some declarations may have been
     // moved up
   clean_up_sequences(module_stat);
