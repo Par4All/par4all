@@ -174,6 +174,7 @@ static void rename_statement_declarations(statement s, hash_table renamings)
       else { /* C99*/
 	statement_instruction(s) =
 	  make_instruction_sequence(make_sequence(inits));
+    statement_number(s)=STATEMENT_NUMBER_UNDEFINED;
 	if(!statement_with_empty_comment_p(s)) {
 	  string c = statement_comments(s);
 	  statement fs = STATEMENT(CAR(inits));
