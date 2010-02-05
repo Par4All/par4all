@@ -52,6 +52,15 @@ def patch_to_use_p4a_methods(file_name, dir_name):
     content = f.read()
     f.close()
 
+
+    # Remove a boggy output from the outliner:
+    content = re.sub("//PIPS generated variable\nstruct {\n   float re;\n   float im;\n};", "", content)
+
+#    content = re.sub("(\nvoid p4a_kernel_launcher_(\\d+\\([^\n]\\);\n))",
+#                     "\\1P4A_accel_kernel_wrapper void p4a_kernel_wrapper_\\2", content)
+    content = re.sub("(\nvoid p4a_kernel_launcher_(\\d+\\([^\n]*\\);\n))",
+                     "\\1void p4a_kernel_wrapper_\\2", content)
+
     ## Change
     ##    // To be assigned to a call to P4A_vp_1: j
     ## into
@@ -112,9 +121,14 @@ def patch_to_use_p4a_methods(file_name, dir_name):
     content = re.sub("(?s)\ntypedef union {\n.*extern int matherr\\(struct exception \\*__exc\\);",
                      "", content)
 
+    # Remove a weird parasitic type definition:
     content = re.sub("typedef unsigned int size_t;\n",
                      "", content)
 
+    content = re.sub("(?s)typedef int wchar_t;\n.*?\nextern int getloadavg\\(double __loadavg\\[\\], int __nelem\\);\n",
+                     "#include <stdlib.h>\n", content)
+
+    
     if verbose:
         print content,
 
