@@ -160,6 +160,7 @@ int get_ultimate_basic_width(basic b)
         case is_basic_logical:return basic_logical(b);
         case is_basic_pointer: return get_ultimate_basic_width(
                                        variable_basic(type_variable(ultimate_type(basic_pointer(b)))));
+        case is_basic_complex: return 2*basic_complex(b);//SG is suppose this is ok ...*/
         default:pips_internal_error("basic_tag %u not supported yet",basic_tag(b));
     }
     return -1;
