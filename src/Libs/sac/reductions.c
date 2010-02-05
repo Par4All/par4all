@@ -95,6 +95,10 @@ expression make_float_constant_expression(float c)
             normalized_undefined);
     return (ex_cons);
 }
+expression make_complex_constant_expression(float re, float im)
+{
+    return MakeComplexConstantExpression(make_float_constant_expression(re),make_float_constant_expression(im));
+}
 
 static entity make_reduction_vector_entity(reduction r)
 {
@@ -287,8 +291,11 @@ static expression make_0val_expression(basic b)
         case is_basic_int:
             return make_integer_constant_expression(0);
 
+        case is_basic_complex:
+            return make_complex_constant_expression(0,0);
+
         default:
-            return expression_undefined;
+            pips_internal_error("function not implemented for this basic \n");
     }
 }
 
@@ -356,6 +363,7 @@ static statement generate_prelude(reductionInfo ri)
 
     // For each reductionInfo_vector reference, make an initialization
     // assign statement and add it to the prelude
+    // do nothing if no init val exist
     for(i=0; i<reductionInfo_count(ri); i++)
     {
         instruction is;
