@@ -39,7 +39,8 @@ AC_DEFUN([AX_CHECK_FUNCS],
             ],
             [
                 AX_WITH([$1])=no
-                AX_MSG([$1])="function $ac_func not found ${AX_MSG([$1])}"
+                AX_MSG([$1])="function $ac_func not found
+${AX_MSG([$1])}"
                 m4_ifval([$3],[$3])dnl
             ]
         )
@@ -59,7 +60,9 @@ dnl        AC_REQUIRE([AX_MSG])dnl
 dnl        AC_REQUIRE([AX_WITH])dnl
 
         PKG_CHECK_MODULES(AX_TR_UP([$1]),[$1],
-            [AX_WITH([$1])=yes],
+            [
+				AX_WITH([$1])=yes
+			],
             [
                 m4_ifval([$2],
                     [
@@ -83,7 +86,8 @@ dnl        AC_REQUIRE([AX_WITH])dnl
                             ],
                             [
                                 AX_WITH([$1])=no
-                                AX_MSG([$1])="library $1 not found ${AX_MSG([$1])}"
+                                AX_MSG([$1])="library $1 not found
+${AX_MSG([$1])}"
                             ]
                         )
                     ],
@@ -149,6 +153,8 @@ AC_DEFUN([AX_CHECK_HEADERS],
                 AS_IF([test x${AX_WITH([std headers])} = xno ],
                     [
                         AX_WITH([std headers])=no
+						AX_MSG([std headers])="${AX_MSG([std headers])}
+$ac_header not found"
                         m4_ifval([$3],[$3])dnl
                     ],
                     [
@@ -159,7 +165,8 @@ AC_DEFUN([AX_CHECK_HEADERS],
             ],
             [
                 AX_WITH([std headers])=no
-                AX_MSG([std headers])="${AX_MSG([std headers])} $ac_header not found"
+                AX_MSG([std headers])="${AX_MSG([std headers])}
+$ac_header not found"
                 m4_ifval([$3],[$3])
             ]
         )
@@ -181,7 +188,8 @@ AC_DEFUN([AX_DEPENDS],
                 m4_append([_MSG_],${AX_MSG([_DEP_])} )
             ]
         )
-        AS_IF(_TEST_,[AX_WITH([$1])=yes],[AX_MSG([$1])="_MSG_"])
+		AX_MSG([$1])="_MSG_"
+        AS_IF(_TEST_,[AX_WITH([$1])=yes],[AX_WITH([$1])=no])
         m4_popdef([_MSG_])
         m4_popdef([_TEST_])
     ]
