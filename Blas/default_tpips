@@ -1,0 +1,10 @@
+delete $WSPACE
+create $WSPACE $FILE include/simd.f scabs1.f
+
+module `echo $WSPACE | tr '[:lower:]' '[:upper:]'`
+
+source include/sac.tpips
+
+close
+delete $WSPACE
+quit
