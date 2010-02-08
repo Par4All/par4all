@@ -198,7 +198,8 @@ static void process_true_stat(statement parent, expression cond, statement stat)
     // It must have been verified in the if_conversion_init phase
     pips_assert("stat is a call or a sequence statement", 
             (instruction_call_p(statement_instruction(stat)) ||
-             instruction_sequence_p(statement_instruction(stat))));
+             instruction_sequence_p(statement_instruction(stat)) ||
+             statement_loop_p(stat)));
 
     // If stat is a call statement, ...
     if(instruction_call_p(statement_instruction(stat)))
@@ -212,6 +213,10 @@ static void process_true_stat(statement parent, expression cond, statement stat)
         }
 
     }
+    // recurse for for loops
+    else if( statement_loop_p(stat))
+        process_true_stat(stat,cond,loop_body(statement_loop(stat)));
+
     // If stat is a sequence statement, ...
     else if(instruction_sequence_p(statement_instruction(stat)))
     {

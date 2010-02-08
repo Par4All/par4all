@@ -360,7 +360,7 @@ cons *n1, *n2;
 
 /* Management of loop counters */
 
-#define ILCMAX 10000
+#define ILCMAX 100000
 
 static int ilc = ILCMAX;
 

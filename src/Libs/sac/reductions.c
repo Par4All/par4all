@@ -313,6 +313,9 @@ static expression make_1val_expression(basic b)
         case is_basic_int:
             return make_integer_constant_expression(1);
 
+        case is_basic_complex:
+            return make_complex_constant_expression(0,1);
+
         default:
             return expression_undefined;
     }
