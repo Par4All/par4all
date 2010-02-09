@@ -2007,7 +2007,7 @@ list generic_c_words_simplified_entity(type t, list name, bool is_safe, bool add
     }
 
   /* Add type qualifiers if there are */
-  if (type_variable_p(t) && variable_qualifiers(type_variable(t)) != NIL)
+  if (is_first && type_variable_p(t) && variable_qualifiers(type_variable(t)) != NIL)
     pc = words_qualifier(variable_qualifiers(type_variable(t)));
 
   if (basic_type_p(t)) {
