@@ -631,8 +631,8 @@ static void split_initializations_in_statement(statement s)
 
 	FOREACH(ENTITY, var, decls) {
 	  string mn  = module_name(entity_name(var));
-	  string cmn = entity_user_name(get_current_module_entity());
-	  if ( strcmp(mn,cmn) == 0
+	  string cmn =get_current_module_name();
+	  if ( same_string_p(mn,cmn) 
 	       && !value_unknown_p(entity_initial(var))
 	       ) {
 	    expression ie = variable_initial_expression(var);
@@ -737,13 +737,9 @@ static void split_initializations_in_statement(statement s)
 */
 void statement_split_initializations(statement s)
 {
-  if (statement_block_p(s)) {
     gen_recurse(s, statement_domain, gen_true, split_initializations_in_statement);
     /* Is it still useful? */
     clean_up_sequences(s);
-  }
-  else
-    pips_internal_error("Input assumptions not met: not a block statement.\n");
 }
 
 /* Pipsmake 'split_initializations' phase

@@ -151,6 +151,7 @@ entity build_a_clone_for(
       comment_prefix,"\n", NULL));
     text_sentences(t) = 
 	CONS(SENTENCE, make_sentence(is_sentence_formatted, comments), text_sentences(t));
+    extern string compilation_unit_of_module(string);
     add_new_module_from_text(new_name,t,fortran_module_p(cloned),compilation_unit_of_module(get_current_module_name()));
 
     /* should fix the declarations ...*/

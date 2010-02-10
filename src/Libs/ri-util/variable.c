@@ -99,19 +99,22 @@ RemoveLocalEntityFromDeclarations(entity e, entity module, statement s)
 {
     if(!ENDP(entity_declarations(module)))
         gen_remove(&entity_declarations(module), e);
-    if(!ENDP(statement_declarations(s)))
-        gen_remove(&statement_declarations(s), e);
-    if(statement_block_p(s))
+    if(!statement_undefined_p(s))
     {
-        FOREACH(STATEMENT,stat,statement_block(s))
+        if(!ENDP(statement_declarations(s)))
+            gen_remove(&statement_declarations(s), e);
+        if(statement_block_p(s))
         {
-            bool decl_stat = declaration_statement_p(stat);
-            RemoveLocalEntityFromDeclarations(e,module,stat);
-            /* this take care of removind useless declaration statements*/
-            if(ENDP(statement_declarations(stat)) && decl_stat)
+            FOREACH(STATEMENT,stat,statement_block(s))
             {
-                gen_remove_once(&instruction_block(statement_instruction(s)),stat);
-                free_statement(stat);
+                bool decl_stat = declaration_statement_p(stat);
+                RemoveLocalEntityFromDeclarations(e,module,stat);
+                /* this take care of removind useless declaration statements*/
+                if(ENDP(statement_declarations(stat)) && decl_stat)
+                {
+                    gen_remove_once(&instruction_block(statement_instruction(s)),stat);
+                    free_statement(stat);
+                }
             }
         }
     }

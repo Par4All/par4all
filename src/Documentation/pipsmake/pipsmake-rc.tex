@@ -7669,6 +7669,7 @@ call sites of the inlined function are inlined.
 \begin{PipsMake}
 
 inlining      > CALLERS.parsed_code
+		! MODULE.split_Initializations
         < PROGRAM.entities
         < CALLERS.code
         < CALLERS.printed_file
@@ -7682,6 +7683,7 @@ Same as inlining but always simulate the by-copy argument passing
 \end{PipsPass}
 \begin{PipsMake}
 inlining_simple      > CALLERS.parsed_code
+		! MODULE.split_Initializations
         < PROGRAM.entities
         < CALLERS.code
         < CALLERS.printed_file
@@ -7714,6 +7716,7 @@ unfolding the content of the module.
 \begin{PipsMake}
 
 unfolding      > MODULE.parsed_code
+		! CALLERS.split_Initializations
         < PROGRAM.entities
         < MODULE.code
         < MODULE.printed_file

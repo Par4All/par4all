@@ -31,6 +31,7 @@
  * @author Serge Guelton <serge.guelton@enst-bretagne.fr>
  * @date 2009-01-07
  */
+#define _GNU_SOURCE
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -101,29 +102,25 @@ typedef struct {
 /* replace return instruction by a goto
  */
 static
-void inline_return_remover(instruction ins,inlining_parameters p)
+void inline_return_remover(statement s,inlining_parameters p)
 {
-    if( return_instruction_p( ins ) )
-    {
-        free_call(instruction_call(ins));
-        instruction_tag(ins)=is_instruction_goto;
-        instruction_goto(ins)=copy_statement(laststmt(p));
-    }
+    if( return_statement_p( s ) )
+        update_statement_instruction(s,make_instruction_goto(copy_statement(laststmt(p))));
 }
 
 /* replace return instruction by an assignment and a goto
  */
 static
-void inline_return_crawler(instruction ins,inlining_parameters p)
+void inline_return_crawler(statement s,inlining_parameters p)
 {
-    if( return_instruction_p( ins ) )
+    if( return_statement_p( s ) )
     {
         // create the goto
-        list l= (ins == tail_ins(p)) ?
+        list l= (statement_instruction(s) == tail_ins(p)) ?
             NIL :
             make_statement_list( instruction_to_statement( make_instruction_goto( copy_statement(laststmt(p)) ) ) ) ;
         // create the assign and push it if needed
-        call ic = instruction_call(ins);
+        call ic = statement_call(s);
         if( !ENDP(call_arguments(ic)) )
         {
             pips_assert("return is called with one argument",ENDP(CDR(call_arguments(ic))));
@@ -132,10 +129,7 @@ void inline_return_crawler(instruction ins,inlining_parameters p)
                     copy_expression(EXPRESSION(CAR(call_arguments(ic)))));
             l = CONS( STATEMENT, assign , l );
         }
-
-        free_call( instruction_call(ins));
-        instruction_tag(ins) = is_instruction_sequence;
-        instruction_sequence(ins)=make_sequence( l );
+        update_statement_instruction(s,make_instruction_sequence(make_sequence(l)));
     }
 }
 
@@ -195,7 +189,8 @@ solve_name_clashes(statement s, entity new)
             entity solve_clash = copy_entity(decl_ent);
             string ename = strdup(entity_name(solve_clash));
             do {
-                string tmp =strdup( concatenate( ename, "_" , NULL ) );
+                string tmp;
+                asprintf(&tmp,"%s_",ename);
                 free(ename);
                 ename=tmp;
                 entity_name(solve_clash)=ename;
@@ -210,12 +205,11 @@ solve_name_clashes(statement s, entity new)
 /* return true if an entity declared in `iter' is static to `module'
  */
 static
-bool inline_has_static_declaration(entity module,list iter)
+bool inline_has_static_declaration(list iter)
 {
     FOREACH(ENTITY, e ,iter)
     {
-        storage s = entity_storage(e);
-        if ( same_string_p(module_local_name(module),entity_module_name(e)) && storage_ram_p(s) && ENTITY_NAME_P( ram_section(storage_ram(s)), STATIC_AREA_LOCAL_NAME) )
+        if ( variable_static_p(e))
             return true;
     }
     return false;
@@ -227,44 +221,8 @@ bool inline_has_static_declaration(entity module,list iter)
 static
 void statement_with_static_declarations_p(statement s,inlining_parameters p )
 {
-    has_static_declaration(p)|=inline_has_static_declaration(inlined_module(p),statement_declarations(s) );
+    has_static_declaration(p)|=inline_has_static_declaration(statement_declarations(s) );
 }
-
-#if 0
-/* create an array simlar to `efrom' initialized with expression `from'
- */
-entity make_temporary_array_entity(entity efrom, expression from)
-{
-	basic pointers =copy_basic(variable_basic(type_variable(entity_type(efrom))));
-	list dims = gen_copy_seq(variable_dimensions(type_variable(entity_type(efrom))));
-    /* remove a dimension */
-	if(ENDP(CDR(dims))) {
-        gen_free_list(dims);
-        dims=NIL;
-    }
-	else {
-
-		list iter = dims;
-		while(!ENDP(CDR(CDR(iter)))) POP(iter);
-        gen_free_list(CDR(iter));
-		CDR(iter)=NIL;
-	}
-    /* replace the removed dimension by a pointer */
-	pointers = make_basic_pointer(make_type_variable(make_variable(pointers,dims,NIL)));
-    /* create the variable as a pointer */
-	entity new = make_new_scalar_variable(
-			get_current_module_entity(),
-			pointers
-			);
-    /* set its initial */
-	entity_initial(new) = expression_undefined_p(from)?make_value_unknown():
-		make_value_expression(make_expression(make_syntax_cast(make_cast(make_type_variable(make_variable(pointers,NIL,NIL)),from)),normalized_undefined));
-    /* add it to decl */
-	AddLocalEntityToDeclarations(new, get_current_module_entity(),
-			c_module_p(get_current_module_entity())?get_current_module_statement():statement_undefined);
-	return new;
-}
-#endif
 
 /* create a scalar similar to `efrom' initialized with expression `from'
  */
@@ -277,7 +235,11 @@ entity make_temporary_scalar_entity(entity efrom, expression from)
 			copy_basic(variable_basic(type_variable(entity_type(efrom))))
 			);
     /* set intial */
-	entity_initial(new) = expression_undefined_p(from)?value_undefined:make_value_expression(copy_expression(from));
+    if(!expression_undefined_p(from))
+    {
+        free_value(entity_initial(new));
+        entity_initial(new) = make_value_expression(copy_expression(from));
+    }
     /* add it to decl */
 	AddEntityToCurrentModule(new);
 	return new;
@@ -312,6 +274,7 @@ bool has_entity_with_same_name(entity e, list l) {
     return false;
 }
 
+
 /* this should inline the call callee
  * calling module inlined_module
  */
@@ -333,7 +296,7 @@ statement inline_expression_call(inlining_parameters p, expression modified_expr
         if( c_module_p(inlined_module(p)) )
             gen_context_recurse(inlined_module_statement(p),p, statement_domain, gen_true, statement_with_static_declarations_p);
         else
-            has_static_declaration(p)= inline_has_static_declaration( inlined_module(p), code_declarations(inlined_code) );
+            has_static_declaration(p)= inline_has_static_declaration( code_declarations(inlined_code) );
 
         if( has_static_declaration(p))
         {
@@ -346,7 +309,7 @@ statement inline_expression_call(inlining_parameters p, expression modified_expr
      * no need to change all entities in the new statements, because we build a new text ressource latter
      */
     statement expanded = copy_statement(inlined_module_statement(p));
-    statement declaration_holder = expanded;
+    statement declaration_holder = make_empty_block_statement();
     //statement_declarations(expanded) = gen_full_copy_list( statement_declarations(expanded) ); // simple copy != deep copy
 
     /* add external declartions for all extern referenced entities it
@@ -360,9 +323,9 @@ statement inline_expression_call(inlining_parameters p, expression modified_expr
      */
     {
         string cu_name = compilation_unit_of_module(get_current_module_name());
-        string mln = module_local_name(inlined_module(p));
+        //string mln = module_local_name(inlined_module(p));
         set inlined_referenced_entities = get_referenced_entities(inlined_module_statement(p));
-        list new_externs = NIL;
+        //list new_externs = NIL;
         SET_FOREACH(entity,ref_ent,inlined_referenced_entities)
         {
             if( entity_field_p(ref_ent) ) /* special hook for struct member : consider their structure instead of the field */
@@ -374,32 +337,29 @@ statement inline_expression_call(inlining_parameters p, expression modified_expr
                     !entity_formal_p(ref_ent) ) /* formal parameters are not considered */
             {
                 string emn = entity_module_name(ref_ent);
-                if(! same_string_p(emn,mln) && /* this checks if the entity is local to current module */
-                        !same_string_p(emn,cu_name) && /* this checks if the entity is static to current compilation unit */
-                        !has_entity_with_same_name(ref_ent,statement_declarations(expanded)) ) /* this checks if the entity is already declared in expanded */
+                if(extern_entity_p(get_current_module_entity(),ref_ent) &&
+                        !has_entity_with_same_name(ref_ent,entity_declarations(module_name_to_entity(cu_name)) ) )
                 {
-                    entity add = ref_ent;
-                    if(entity_variable_p(ref_ent) &&
-                            !top_level_entity_p(ref_ent)) /* make it global instead of static to the compilation unit ...*/
-                    {
-                        pips_user_warning("replacing static variable \"%s\" by a global one, this may lead to incorrect code\n", entity_user_name(ref_ent));
-                        add = make_global_entity_from_local(ref_ent);
-                        replace_entity(expanded,ref_ent,add);
-                        replace_entity(inlined_module_statement(p),ref_ent,add);
-                    }
-                    if( entity_variable_p(add) ) {
-                        new_externs=CONS(ENTITY,add,new_externs);
-                    }
-                    else {
-                        AddEntityToModuleCompilationUnit(add,get_current_module_entity());
-                    }
+                    AddEntityToModuleCompilationUnit(ref_ent,get_current_module_entity());
+                    gen_append(code_externs(entity_code(module_name_to_entity(cu_name))),CONS(ENTITY,ref_ent,NIL));
+                }
+                else if(variable_static_p(ref_ent) &&
+                        !has_entity_with_same_name(ref_ent,entity_declarations(module_name_to_entity(cu_name)) ) )
+                {
+                    pips_user_warning("replacing static variable \"%s\" by a global one, this may lead to incorrect code\n", entity_user_name(ref_ent));
+                    entity add = make_global_entity_from_local(ref_ent);
+                    replace_entity(expanded,ref_ent,add);
+                    replace_entity(inlined_module_statement(p),ref_ent,add);
+                    AddEntityToModuleCompilationUnit(add,get_current_module_entity());
+                    gen_append(code_externs(entity_code(module_name_to_entity(cu_name))),CONS(ENTITY,add,NIL));
+                }
+                else if(!variable_entity_p(ref_ent) && !same_string_p(emn,cu_name) &&
+                        !has_entity_with_same_name(ref_ent,entity_declarations(module_name_to_entity(cu_name)) ))
+                {
+                    AddEntityToModuleCompilationUnit(ref_ent,get_current_module_entity());
                 }
             }
         }
-        gen_sort_list(new_externs,(gen_cmp_func_t)compare_entities);
-        FOREACH(ENTITY,e,new_externs)
-            AddLocalEntityToDeclarations(e,inlined_module(p),expanded);
-        //statement_declarations(expanded)=gen_nconc(statement_declarations(expanded),new_externs);
         set_free(inlined_referenced_entities);
     }
 
@@ -411,12 +371,14 @@ statement inline_expression_call(inlining_parameters p, expression modified_expr
         expanded = instruction_to_statement( i );
     }
 
+
     /* avoid duplicated label due to copy_statement */
     gen_context_recurse(expanded,modified_module_name,statement_domain,gen_true,inlining_regenerate_labels);
 
     /* add label at the end of the statement */
     laststmt(p)=make_continue_statement(make_new_label( modified_module_name ) );
     gen_nconc( sequence_statements(instruction_sequence(statement_instruction(expanded))), CONS( STATEMENT, laststmt(p), NIL) );
+
 
     /* fix `return' calls
      * in case a goto is immediatly followed by its targeted label
@@ -428,13 +390,12 @@ statement inline_expression_call(inlining_parameters p, expression modified_expr
             pips_user_warning("expanded sequence_statements seems empty to me\n");
         else
         {
-            //while( CDR(CDR(tail)) != NIL ) POP(tail);
             tail_ins(p)= statement_instruction(STATEMENT(CAR(gen_last(tail))));
 
             type treturn = ultimate_type(functional_result(type_functional(entity_type(inlined_module(p)))));
             if( type_void_p(treturn) ) /* only replace return statement by gotos */
             {
-                gen_context_recurse(expanded, p,instruction_domain, gen_true, &inline_return_remover);
+                gen_context_recurse(expanded, p,statement_domain, gen_true, &inline_return_remover);
             }
             else /* replace by affectation + goto */
             {
@@ -461,7 +422,7 @@ statement inline_expression_call(inlining_parameters p, expression modified_expr
                 AddEntityToCurrentModule(returned_entity(p));
 
                 /* do the replacement */
-                gen_context_recurse(expanded, p, instruction_domain, gen_true, &inline_return_crawler);
+                gen_context_recurse(expanded, p, statement_domain, gen_true, &inline_return_crawler);
 
                 /* change the caller from an expression call to a call to a constant */
                 if( entity_constant_p(returned_entity(p)) )
@@ -574,7 +535,6 @@ reget:
                         else
                             new = make_temporary_scalar_entity(e,from);
                         break;
-#if 0
                     case is_syntax_subscript:
                         /* need a temporary variable */
                         {
@@ -582,11 +542,11 @@ reget:
                                 new = make_temporary_scalar_entity(e,from);
                             else
                             {
-                                new = make_temporary_array_entity(e,from);
+                                new = make_temporary_pointer_to_array_entity(e,MakeUnaryCall(entity_intrinsic(ADDRESS_OF_OPERATOR_NAME),from));
+                                add_dereferencment=true;
                             }
 
                         } break;
-#endif
 
                     case is_syntax_cast:
                         pips_user_warning("ignoring cast\n");
@@ -609,11 +569,14 @@ reget:
         gen_free_list(formal_parameters);
     }
 
+    /* add declaration at the beginning of the statement */
+    insert_statement(declaration_holder,expanded,false);
+
     /* final cleanings
      */
     gen_recurse(expanded,statement_domain,gen_true,fix_statement_attributes_if_sequence);
     unnormalize_expression(expanded);
-    return expanded;
+    return declaration_holder;
 }
 
 
