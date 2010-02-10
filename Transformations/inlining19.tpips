@@ -23,7 +23,7 @@ echo Code after inlining
 echo
 
 apply INLINING[foo]
-display PRINTED_FILE[inlining19]
+display PRINTED_FILE[%ALL]
 
 
 echo

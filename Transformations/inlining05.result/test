@@ -15,13 +15,17 @@ int main(int argc, char **argv)
 
 Code after inlining
 
+static int pmax(int a, int b);
+
+extern int main(int argc, char **argv);
 int main(int argc, char **argv)
 {
    int c;
    //PIPS generated variable
    int _return0;
    {
-      int argc_ = 2>argc?2:argc;
+      int argc_;
+      argc_ = 2>argc?2:argc;
       _return0 = argc_;
    }
    c = _return0;

@@ -12,6 +12,9 @@ void bar(int **a)
 
 Code after inlining
 
+extern void foo(int *a);
+
+extern void bar(int **a);
 void bar(int **a)
 {
    //PIPS generated variable

@@ -1,4 +1,3 @@
-#include <stdio.h>
 struct a { int b; };
 void foo(struct a *_)
 {

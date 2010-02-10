@@ -8,6 +8,9 @@ void inlining20(int j)
    foo(2);                                                              /*0004*/
    foo(j);                                                              /*0005*/
 }
+extern void foo(int i);                                                 /*0001*/
+
+extern void inlining20(int j);                                          /*0003*/
 void inlining20(int j)
 {
    {
@@ -15,7 +18,6 @@ void inlining20(int j)
       int i = 2;                                                        /*0005*/
       i = i+1;                                                          /*0006*/
       /*0004*/
-      /*0005*/
       ;
    }
    {
@@ -23,7 +25,6 @@ void inlining20(int j)
       int i = j;                                                        /*0012*/
       i = i+1;                                                          /*0013*/
       /*0004*/
-      /*0005*/
       ;
    }
 }
@@ -34,11 +35,9 @@ void inlining20(int j)
    //PIPS generated variable
    i_0 = i_0+1;                                                         /*0006*/
    /*0004*/
-   /*0005*/
    //PIPS generated variable
    i_1 = j;
    i_1 = i_1+1;                                                         /*0013*/
    /*0004*/
-   /*0005*/
    ;
 }

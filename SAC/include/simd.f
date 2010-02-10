@@ -15,13 +15,18 @@
       subroutine simd_load_v4sf(vec, base)
       real*4 vec(4)
       real*4 base(4)
-      real*4 index
-      real*4 offset
       
       vec(1) = base(1)
       vec(2) = base(2)
       vec(3) = base(3)
       vec(4) = base(4)
+      end
+      subroutine simd_load_v2df(vec, base)
+      real*8 vec(2)
+      real*8 base(2)
+      
+      vec(1) = base(1)
+      vec(2) = base(2)
       end
       
       subroutine simd_load_generic_v4sf(vec, x1, x2, x3, x4)
@@ -36,6 +41,14 @@
       vec(3) = x3
       vec(4) = x4
       end
+      subroutine simd_load_generic_v2df(vec, x1, x2)
+      real*8 vec(2)
+      real*8 x1
+      real*8 x2
+
+      vec(1) = x1
+      vec(2) = x2
+      end
 
       subroutine simd_load_constant_v4sf(vec, x1, x2, x3, x4)
       real*4 vec(4)
@@ -49,17 +62,30 @@
       vec(3) = x3
       vec(4) = x4
       end
+      subroutine simd_load_constant_v2df(vec, x1, x2 )
+      real*8 vec(2)
+      real*8 x1
+      real*8 x2
+
+      vec(1) = x1
+      vec(2) = x2
+      end
 
       subroutine simd_save_v4sf(vec, base)
       real*4 vec(4)
       real*4 base(4)
-      real*4 index
-      real*4 offset
       
       base(1) = vec(1)
       base(2) = vec(2)
       base(3) = vec(3)
       base(4) = vec(4)
+      end
+      subroutine simd_save_v2df(vec, base)
+      real*8 vec(2)
+      real*8 base(2)
+      
+      base(1) = vec(1)
+      base(2) = vec(2)
       end
       
       subroutine simd_save_generic_v4sf(vec, x1, x2, x3, x4)
@@ -73,6 +99,14 @@
       x2 = vec(2)
       x3 = vec(3)
       x4 = vec(4)
+      end
+      subroutine simd_save_generic_v2df(vec, x1, x2)
+      real*8 vec(2)
+      real*8 x1
+      real*8 x2
+
+      x1 = vec(1)
+      x2 = vec(2)
       end
 
       subroutine simd_cmpgtps(dest, src1, src2)
@@ -127,6 +161,14 @@
       dest(3) = src1(3) + src2(3)
       dest(4) = src1(4) + src2(4)
       end
+      subroutine simd_addpd(dest, src1, src2)
+      real*8 dest(2)
+      real*8 src1(2)
+      real*8 src2(2)
+
+      dest(1) = src1(1) + src2(1)
+      dest(2) = src1(2) + src2(2)
+      end
 
       subroutine simd_subps(dest, src1, src2)
       real*4 dest(4)
@@ -137,6 +179,14 @@
       dest(2) = src1(2) - src2(2)
       dest(3) = src1(3) - src2(3)
       dest(4) = src1(4) - src2(4)
+      end
+      subroutine simd_subpd(dest, src1, src2)
+      real*8 dest(2)
+      real*8 src1(2)
+      real*8 src2(2)
+
+      dest(1) = src1(1) - src2(1)
+      dest(2) = src1(2) - src2(2)
       end
 
       subroutine simd_mulps(dest, src1, src2)
@@ -149,6 +199,14 @@
       dest(3) = src1(3) * src2(3)
       dest(4) = src1(4) * src2(4)
       end
+      subroutine simd_mulpd(dest, src1, src2)
+      real*8 dest(2)
+      real*8 src1(2)
+      real*8 src2(2)
+
+      dest(1) = src1(1) * src2(1)
+      dest(2) = src1(2) * src2(2)
+      end
 
       subroutine simd_divps(dest, src1, src2)
       real*4 dest(4)
@@ -159,6 +217,15 @@
       dest(2) = src1(2) / src2(2)
       dest(3) = src1(3) / src2(3)
       dest(4) = src1(4) / src2(4)
+      end
+
+      subroutine simd_divpd(dest, src1, src2)
+      real*8 dest(2)
+      real*8 src1(2)
+      real*8 src2(2)
+
+      dest(1) = src1(1) / src2(1)
+      dest(2) = src1(2) / src2(2)
       end
 
       subroutine simd_maxps(dest, src1, src2)

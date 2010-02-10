@@ -1,7 +1,5 @@
 /*  Same as inlining16.c and 17, but switch used again for connexity */
-
 #include <stdio.h>
-
 #define FREIA_OK 0
 #define FREIA_SIZE_ERROR 1
 #define FREIA_INVALID_PARAM 2

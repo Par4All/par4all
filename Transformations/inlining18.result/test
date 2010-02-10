@@ -1,26 +1,29 @@
 char * foo(void)
 {
-   const char *foo_fun = __FUNCTION__;
+   const char *foo_fun = __FUNCTION__;                                  /*0004*/
    return (char *) foo_fun;                                             /*0005*/
 }
 int main(void)
 {
-   const char *fun;
-   const char *fun2;
-   const char *fun3;
+   const char *fun, *fun2, *fun3;                                       /*0004*/
    fun = foo();                                                         /*0005*/
    fun2 = __FUNCTION__;                                                 /*0006*/
    fun3 = __func__;                                                     /*0007*/
    return 0;                                                            /*0008*/
 }
+extern char *foo(void);                                                 /*0001*/
+
+extern int main(void);                                                  /*0003*/
 int main(void)
 {
-   const char *fun;
-   const char *fun2;
-   const char *fun3;
-   char *_return0;
+   const char *fun, *fun2, *fun3;                                       /*0003*/
+   /*0004*/
+   //PIPS generated variable
+   char *_return0;                                                      /*0005*/
    {
-      const char *foo_fun = __FUNCTION__;
+      const char *foo_fun;                                              /*0007*/
+      /*0004*/
+      foo_fun = __FUNCTION__;                                           /*0008*/
       _return0 = (char *) foo_fun;                                      /*0009*/
    }
    fun = _return0;                                                      /*0013*/

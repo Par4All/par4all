@@ -20,7 +20,7 @@ echo Code after inlining
 echo
 
 apply INLINING[inlining02!pmax]
-display PRINTED_FILE[main]
+display PRINTED_FILE[inlining02!,main]
 
 echo
 echo Unsplit resulting code

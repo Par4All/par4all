@@ -20,7 +20,7 @@ display PRINTED_FILE[bla]
 display PRINTED_FILE[main]
 
 setproperty INLINING_CALLERS "main"
-apply INLINING[bla]
+apply INLINING[inlining25!,bla]
 
 make PRINTED_FILE[main]
 display PRINTED_FILE[main]

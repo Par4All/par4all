@@ -168,8 +168,6 @@ freia_error freia_cipo_outer_gradient(freia_data2d *imout, freia_data2d *imin, i
 
       int i;
       freia_error ret;
-      //PIPS generated variable
-      extern struct _IO_FILE *stderr;
       if (freia_common_check_image_bpp_compat(imout, imin, (void *) 0)!=1) {
 
          fprintf(stderr, "ERROR: file %s, line %d, function %s: ""bpp of images are not compatibles\n", "./freia.src/cipo/src/freiaComplexOpMorpho.c", 90, "freia_cipo_dilate");
@@ -254,8 +252,6 @@ int main()
 
          int i;
          freia_error ret;
-         //PIPS generated variable
-         extern struct _IO_FILE *stderr;
          if (freia_common_check_image_bpp_compat(imout, imin, (void *) 0)!=1) {
 
             fprintf(stderr, "bpp of images are not compatibles\n""ERROR: file %s, line %d, function %s: ", "./freia.src/cipo/src/freiaComplexOpMorpho.c", 90, "freia_cipo_dilate");
@@ -331,8 +327,6 @@ l99986:            ;
 
          int i;
          freia_error ret;
-         //PIPS generated variable
-         extern struct _IO_FILE *stderr;
          if (freia_common_check_image_bpp_compat(imout, imin, (void *) 0)!=1) {
 
             fprintf(stderr, "bpp of images are not compatibles\n""ERROR: file %s, line %d, function %s: ", "./freia.src/cipo/src/freiaComplexOpMorpho.c", 90, "freia_cipo_dilate");
@@ -429,7 +423,6 @@ int main()
    
    
    
-   //PIPS generated variable
    if (freia_common_check_image_bpp_compat(imout, imin, (void *) 0)!=1) {
 
       fprintf(stderr, "bpp of images are not compatibles\n""ERROR: file %s, line %d, function %s: ", "./freia.src/cipo/src/freiaComplexOpMorpho.c", 90, "freia_cipo_dilate");
@@ -494,7 +487,6 @@ l99986:      ;
    
    
    
-   //PIPS generated variable
    if (freia_common_check_image_bpp_compat(imout, imin, (void *) 0)!=1) {
 
       fprintf(stderr, "bpp of images are not compatibles\n""ERROR: file %s, line %d, function %s: ", "./freia.src/cipo/src/freiaComplexOpMorpho.c", 90, "freia_cipo_dilate");
@@ -595,7 +587,6 @@ int main()
    
    
    
-   //PIPS generated variable
    if (freia_common_check_image_bpp_compat(imout, imin, (void *) 0)!=1) {
 
 //  P() {connexity==8, size==4}
@@ -754,7 +745,6 @@ l99986:      ;
    
    
    
-   //PIPS generated variable
    if (freia_common_check_image_bpp_compat(imout, imin, (void *) 0)!=1) {
 
 //  P(_return0_0,_return1,i_1,ret_0,ret_2) {_return0_0==ret_2,
@@ -958,7 +948,6 @@ int main()
    
    
    
-   //PIPS generated variable
    if (freia_common_check_image_bpp_compat(imout, imin, (void *) 0)!=1) {
 
       fprintf(stderr, "bpp of images are not compatibles\n""ERROR: file %s, line %d, function %s: ", "./freia.src/cipo/src/freiaComplexOpMorpho.c", 90, "freia_cipo_dilate");
@@ -1023,7 +1012,6 @@ l99986:      ;
    
    
    
-   //PIPS generated variable
    if (freia_common_check_image_bpp_compat(imout, imin, (void *) 0)!=1) {
 
       fprintf(stderr, "bpp of images are not compatibles\n""ERROR: file %s, line %d, function %s: ", "./freia.src/cipo/src/freiaComplexOpMorpho.c", 90, "freia_cipo_dilate");
@@ -1118,7 +1106,6 @@ int main()
    
    
    
-   //PIPS generated variable
    if (freia_common_check_image_bpp_compat(imout, imin, (void *) 0)!=1) {
 
       fprintf(stderr, "bpp of images are not compatibles\n""ERROR: file %s, line %d, function %s: ", "./freia.src/cipo/src/freiaComplexOpMorpho.c", 90, "freia_cipo_dilate");
@@ -1158,7 +1145,6 @@ int main()
    
    
    
-   //PIPS generated variable
    if (freia_common_check_image_bpp_compat(imout, imin, (void *) 0)!=1) {
 
       fprintf(stderr, "bpp of images are not compatibles\n""ERROR: file %s, line %d, function %s: ", "./freia.src/cipo/src/freiaComplexOpMorpho.c", 90, "freia_cipo_dilate");
@@ -1229,7 +1215,6 @@ int main()
    
    
    
-   //PIPS generated variable
    if (freia_common_check_image_bpp_compat(imout, imin, (void *) 0)!=1) {
 
       fprintf(stderr, "bpp of images are not compatibles\n""ERROR: file %s, line %d, function %s: ", "./freia.src/cipo/src/freiaComplexOpMorpho.c", 90, "freia_cipo_dilate");
@@ -1271,7 +1256,6 @@ int main()
    
    
    
-   //PIPS generated variable
    if (freia_common_check_image_bpp_compat(imout, imin, (void *) 0)!=1) {
 
       fprintf(stderr, "bpp of images are not compatibles\n""ERROR: file %s, line %d, function %s: ", "./freia.src/cipo/src/freiaComplexOpMorpho.c", 90, "freia_cipo_dilate");

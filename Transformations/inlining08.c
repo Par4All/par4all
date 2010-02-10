@@ -1,4 +1,3 @@
-#include<stdio.h>
 int bar(int a, int b)
 {
     int n;

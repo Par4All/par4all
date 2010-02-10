@@ -5,6 +5,7 @@ setenv PIPS_CPP_FLAGS=" -D__u64='unsigned long long' -D__s64='long long' -D__sig
 create fulguro-convol-3x3 fulguro_convol_3x3.c
 
 setproperty ABORT_ON_USER_ERROR TRUE
+setproperty C89_CODE_GENERATION TRUE
 
 setproperty PRETTYPRINT_C_CODE TRUE
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
@@ -15,24 +16,23 @@ activate C_PARSER
 
 display PRINTED_FILE[main]
 display PRINTED_FILE[flgr2d_convolution]
-apply INLINING[flgr2d_convolution_fgUINT16]
+apply INLINING_SIMPLE[flgr2d_convolution_fgUINT16]
 display PRINTED_FILE[flgr2d_convolution]
 
-#apply UNFOLDING[flgr_get_array_fgUINT16]
-#apply INLINING[flgr_set_data_array_vector_fgUINT16]
-#apply INLINING[flgr_get_array_fgUINT16]
-#apply INLINING[flgr_set_array_fgUINT16]
-#apply INLINING_SIMPLE[flgr2d_get_neighborhood_fgUINT16]
-#apply INLINING[flgr2d_get_data_array_fgUINT16]
-#apply INLINING_SIMPLE[flgr_get_data_array_vector_fgUINT16]
-#display PRINTED_FILE[flgr2d_raster_slide_window_fgUINT16]
-#display PRINTED_FILE[flgr2d_get_nhb_convolution_fgUINT16]
+apply UNFOLDING[flgr_get_array_fgUINT16]
+display PRINTED_FILE[flgr_get_array_fgUINT16]
+apply INLINING[flgr_set_data_array_vector_fgUINT16]
+apply INLINING[flgr_get_array_fgUINT16]
+apply INLINING[flgr_set_array_fgUINT16]
+apply INLINING_SIMPLE[flgr2d_get_neighborhood_fgUINT16]
+display PRINTED_FILE[flgr2d_native_dilate_4_connexity_fgUINT16]
+apply INLINING[flgr2d_get_data_array_fgUINT16]
+apply INLINING_SIMPLE[flgr_get_data_array_vector_fgUINT16]
+display PRINTED_FILE[flgr2d_raster_slide_window_fgUINT16]
+display PRINTED_FILE[flgr2d_get_nhb_convolution_fgUINT16]
 
-#apply INLINING_SIMPLE[flgr2d_raster_slide_window_fgUINT16]
-#display PRINTED_FILE[flgr2d_convolution]
-#apply PARTIAL_EVAL[flgr2d_raster_slide_window_fgUINT16]
-#display PRINTED_FILE[flgr2d_raster_slide_window_fgUINT16]
-
+apply INLINING_SIMPLE[flgr2d_raster_slide_window_fgUINT16]
+display PRINTED_FILE[flgr2d_convolution]
 
 quit
 

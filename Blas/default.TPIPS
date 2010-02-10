@@ -1,9 +1,11 @@
-setenv WS = strsm
+setenv WS = ddot
 delete $WS
-create $WS $WS.f include/simd.f
+#create $WS $WS.f include/simd.f
+create $WS $WS.f
 
 module `echo $WS | tr '[:lower:]' '[:upper:]'`
 display PRINTED_FILE
-source include/sac.tpips
+#source include/sac.tpips
+source include/gpu.tpips
 
 close

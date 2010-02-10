@@ -102,10 +102,8 @@ void flgr2d_arith_add_fgINT32(FLGR_Data2D *datdest, FLGR_Data2D *data1, FLGR_Dat
             /*0039*/
             ;
          }
-         /*0075*/
-         ;
       }
       i++, pdest++, p1++, p2++;
    }
-   return;                                                              /*0082*/
+   return;                                                              /*0080*/
 }

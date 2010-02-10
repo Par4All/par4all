@@ -20,6 +20,9 @@ int bar(int i_)
 
 Code after inlining
 
+extern int foo(int i);
+extern int bar(int i_);
+extern int main();
 int bar(int i_)
 {
    int i__ = 0, i = 0;
@@ -27,14 +30,18 @@ int bar(int i_)
    //PIPS generated variable
    int _return0;
    {
-      int i__ = 3;
       //PIPS generated variable
       int i = i_;
       {
-         int i_ = i__;
-         i += i_;
+         int i__;
+         i__ = 3;
+         {
+            int i_;
+            i_ = i__;
+            i += i_;
+         }
+         _return0 = i;
       }
-      _return0 = i;
    }
    j += _return0;
    return j;

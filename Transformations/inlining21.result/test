@@ -17,19 +17,21 @@ int main(void)
 
 after inlining
 
+extern int foo(void);                                                   /*0001*/
+extern int main(void);                                                  /*0002*/
+//PIPS generated variable
+const  int kernel[3] = {1, 1, 1};
+//PIPS generated variable
+void bla(int *f1);
 int main(void)
 {
    //PIPS generated variable
    int _return0;                                                        /*0004*/
-   {
-      //PIPS generated variable
-      extern const  int kernel[3];                                      /*0007*/
-      bla(kernel);                                                      /*0008*/
-      /*0004*/
-      _return0 = 0;                                                     /*0009*/
-   }
-   _return0;                                                            /*0013*/
-   return 0;                                                            /*0014*/
+   bla(kernel);                                                         /*0005*/
+   /*0004*/
+   _return0 = 0;                                                        /*0006*/
+   _return0;                                                            /*0009*/
+   return 0;                                                            /*0010*/
 }
 
 Unsplit resulting code

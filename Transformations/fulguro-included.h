@@ -1774,7 +1774,7 @@ void flgr2d_apply_raster_scan_method_fgUINT16(FLGR_Data2D *nhb) {
 }
 
 void flgr2d_raster_slide_window_fgUINT16(FLGR_Data2D *imgdest, FLGR_Data2D *imgsrc, FLGR_Data2D *nhb, int nhb_sym,
-					  FLGR_ComputeNhb2D computeNhb) {
+					  const FLGR_ComputeNhb2D computeNhb) {
   FLGR_MACRO_RASTER_SLIDE_WINDOW_2D(fgUINT16,flgr2d_get_neighborhood);
 }
 void flgr2d_convolution_fgUINT16(FLGR_Data2D *datdest, FLGR_Data2D *datsrc, FLGR_Data2D *nhb) {

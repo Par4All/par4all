@@ -13,6 +13,9 @@ void bar(int c[30][20][10])
 
 Code after inlining
 
+extern void foo(int a[30][20][10], int b[20][10], int c[10], int d);
+
+extern void bar(int c[30][20][10]);
 void bar(int c[30][20][10])
 {
    //PIPS generated variable
