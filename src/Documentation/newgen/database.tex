@@ -19,88 +19,102 @@
 %% You should have received a copy of the GNU General Public License
 %% along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 %%
-
-%% newgen domain for pips detabase management.
-
+ 
+%% newgen domain for pips database management.
+ 
 \documentclass[a4paper]{article}
-
+ 
 \usepackage[latin1]{inputenc}
 \usepackage{newgen_domain}
 \usepackage[backref,pagebackref]{hyperref}
-
+ 
 \title{Pips Database Manager}
-
+ 
 \begin{document}
 
 \maketitle
-
-\section{Old database structures}
-
+ 
+\section{Old Database Structures}
+ 
 \domain{Database = name:string x directory:string x resources:resource*}
-{ Le domaine {\tt database} est utilisé par pips-db pour décrire
-l'état d'un programme utilisateur. Ce domaine contient son nom ({\tt
-name}), le répertoire dans lequel il a été créé, et les
-informations qui ont été calculées pour les différents modules ({\tt
-resources}). En fait, le nom de la base et le nom de la directory
-utilisée sont directement lié, en pratique. Le nom de la directory est
-le nom de la base suffisé par \textsc{database}.
-
-Un élément de type {\tt resource} est ajouté à la liste {\tt resources}
-pour chaque objet calculé pour ce programme par les phases d'analyse ou
-de transformation de Pips. 
-
-La bibliothèque qui exploite cette structure de données est
-\texttt{pipsdbm}.  Elle devrait être nommée \texttt{database-util} si une
-règle de nommage était observée.
-
+{ The domain {\tt database} is used by pips-dbm
+  to describe the state of a program user. This domain contains its
+  name ({\tt name}), the directory in which it was created, and the
+  information which was calculated for the different modules ({\tt
+    resources}). In reality, the name of the database and the name of the
+  directory used are in practice directly linked. The name of the
+  directory is the name of the base with the string \textsc{.database}
+  attached as a suffix.
+ 
+An element of type {\tt resource} is added to the list {\tt resources}
+of each objet calculed for this program by the phases, analyses or
+transformations of Pips.
+ 
+The library which makes use of this data structure is
+\texttt{pipsdbm}. It should be named \texttt{database-util} if a
+consistent file naming rule were used across PIPS development.
+ 
 }
-
+ 
 \domain{Resource = name:string x owner\_name:string x status x time:int x file\_time:int}
-{ Le domaine {\tt resource} est utilisé par pips-db pour décrire l'une
-des informations suceptibles d'être calculées par Pips pour un module
-ou un programme. Pour chaque information, il faut connaître son nom
-({\tt name}), savoir qui elle décore ({\tt owner\_name}), savoir si elle
-est présente en mémoire ou rangée dans un fichier ({\tt status}),
-connaitre sa date de création logique ({\tt time}), et eventuellement
-la date (Unix) de création du fichier correspondant ({\tt file\_time}).
+{ The domain {\tt resource} is used by
+  pips-dbm to describe any piece of information which might be
+  calculated by PIPS for a module or a program. For each bit of
+  information, the following fields must be known: its resource kind
+  name, ({\tt name}), the function to whom this resource is related to
+  ({\tt owner\_name}), whether it is present in memory or stored in
+  file ({\tt status}), its logical creation date ({\tt time}), and,
+  portentially, the creation date (Unix) of the corresponding file
+  ({\tt file\_time}).
+ 
+The kind {\tt name} of the resource is in fact a type and could have been
+defined as an enumerated type. It is out of concern for the simple and
+generic nature of pipsdbm that we have chosen to define it as a
+character string. It is this {\tt name} which permits a pipsdbm to
+select the proper C function for reading, writing or freeing a resource.
 
-Le {\tt name} de la ressource est en fait un type et aurait pu être
-défini comme un type énuméré. C'est par souci de simplicité et
-généricité de pipsdbm que nous avons choisi de le définir comme par
-une chaine de caractères. C'est ce {\tt name} qui permet notamment à
-pipsdbm de choisir la fonction pour lire, écrire ou libérer une
-ressource.
-
-A un moment donné, chaque ressource est identifiée demanière unique
-par son nom, \texttt{name}, et le nom de son {\em owner}, \texttt{owner\_name}.
-
-Nous avons longement discute de l'utilité d'avoir un owner\_type pour
-preciser ce que décore la ressource: un programme (cas des entités),
-un module (cas de toutes les autres ressources), une boucle, une
-instruction, etc. Nous y avons renoncé car à l'heure actuelle, nous
-n'avons que des ressources attachables à des programmes ou à des
-modules, et que cette information peut être déduite du {\tt name} de
-la ressource. En fait, nous n'avons qu'une ressource attachable à un
-programme, ce sont les entités (et les \texttt{user\_file}, mais ils sont
-largement maltraités pour le moment).}
-
+At any given moment, each resource is identified in a unique manner by
+its resource kind name, \texttt{name}, and the name of its so-called
+{\em owner}, \texttt{owner\_name}.
+ 
+We discussed for some time the utility of having an owner\_type to
+specify what the resource refers to: a program (e.g. entities, the
+symbol table), a module (most other resources), a
+loop, an instruction, etc. We decided against it since to this date,
+we only have those resources which may be attached to programs or
+modules, and this information may be deduced from the kind {\tt name} of
+the resource. In fact, we only have a few resources which may be
+attached to a program; these are the entities (et les
+\texttt{user\_file}, but they are largely poorly treated for the
+moment). We also have summary information related to the whole
+program, e.g. the program precondition.}
+ 
 \domain{Status = memory:string + file:string}
-{ Le domaine {\tt status} est utilisé par pips-db pour savoir si la
-ressource concernée peut résider en mémoire, auxquel cas elle peut se
-trouver soit en mémoire, si elle a été réclamée par un processus,
-soit sur disque, ou bien si elle est constituée d'un fichier, qui n'est
-a priori jamais chargée en mémoire. Dans
-ce dernier cas, le sous-domaine {\tt file} donne le nom de ce fichier.
-Le nom du fichier doit être relatif au workspace, s'il se trouve dans
-le workspace, et doit être absolu, s'il se trouve hors du workspace, de
-sorte qu'on puisse faire des \texttt{mv} et des \texttt{cp -pr} sur le workspace.
-Si la ressource est en mémoire, le sous-domaine {\tt memory} contient
-un pointeur vers cette ressource.
+{ The domain {\tt
+    status} is used by pips-dbm to know if the resource concerned may
+  either reside in memory, in which case it my be found either in
+  memory, if it is needed for a processus, or on disc, if it is
+  composed of a file which is normally never loaded in memory in the
+  latter case, the sub-domain {\tt file} gives the file
+  name.  The file name must be relative to the workspace, if it is
+  found in this workspace, and must be absolute, if it is found
+  outside of the workspace, in order to allow the operations
+  \texttt{mv} and \texttt{cp -pr} in the workspace.  If the
+  resource is in memory, the sub-domaine {\tt memory} contains a
+  pointer towards this resource.
+ 
+How do resources in a file and file resources differ? It cannot be seen
+from this description! The list of the latter group is explicitely managed
+somewherelsee in pipsdbm. File resources cannot be loaded into
+memory. They are accessed through other files named after the resource
+kind. For instance, the file PRINTED\_FILE contains the name of the
+file containing the print-out of a function.
 
-How resources in a file a and file resources differ? It cannot be seen
-from this description! The list of the laters is explicitely managed
-somewhere in pipsdbm! 
-}
-
+The pool of resources called database is often called the PIPS
+workspace in PIPS litterature. It has been called a database initially
+because a database can be memory resident.  The storage of a database,
+i.e. a workspace, on disk is called a PIPS database or workspace. The
+file structure of a workspace is described elsewhere (Fabien?). See
+for instance the workspace slide in the PPOPP 2010 PIPS tutorial.  }
+ 
 \end{document}
-
