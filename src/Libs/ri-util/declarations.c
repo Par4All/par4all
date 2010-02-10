@@ -1909,14 +1909,15 @@ list words_dimensions(list dims)
  */
 list generic_c_words_entity(type t, list name, bool is_safe, bool add_dummy_parameter_name_p)
 {
-  return generic_c_words_simplified_entity(t, name, is_safe, add_dummy_parameter_name_p, TRUE);
+  return generic_c_words_simplified_entity(t, name, is_safe, add_dummy_parameter_name_p, TRUE, false);
 }
 
 /* Same as above, but the boolean is_first is used to skip a type
  * specifier which is useful when several variables or types are
  * defined in a unique statement such as "int i, *pi, ai[10],...;"
+ * in_type_declaration is set to true when a variable is declared at the same time as its type
  */
-list generic_c_words_simplified_entity(type t, list name, bool is_safe, bool add_dummy_parameter_name_p, bool is_first)
+list generic_c_words_simplified_entity(type t, list name, bool is_safe, bool add_dummy_parameter_name_p, bool is_first, bool in_type_declaration)
 {
   list pc = NIL;
   bool space_p = get_bool_property("PRETTYPRINT_LISTS_WITH_SPACES");
@@ -1984,14 +1985,14 @@ list generic_c_words_simplified_entity(type t, list name, bool is_safe, bool add
 	  pc = gen_nconc(pc,
 			 generic_c_words_simplified_entity(t1,
 							   string_undefined_p(pn)? NIL : CONS(STRING, strdup(pn), NIL),
-							   is_safe, FALSE, TRUE));
+							   is_safe, FALSE, TRUE,in_type_declaration));
 	  pips_debug(9,"List of parameters \"%s\"\n ",list_to_string(pc));
 	  first = FALSE;
 	}
       }
 
       pc = CHAIN_SWORD(pc,")");
-      return generic_c_words_simplified_entity(t2,pc,is_safe, FALSE, is_first);
+      return generic_c_words_simplified_entity(t2,pc,is_safe, FALSE, is_first, in_type_declaration);
     }
 
   if (pointer_type_p(t))
@@ -2003,11 +2004,11 @@ list generic_c_words_simplified_entity(type t, list name, bool is_safe, bool add
       if (variable_qualifiers(type_variable(t)) != NIL)
 	pc = gen_nconc(pc,words_qualifier(variable_qualifiers(type_variable(t))));
       pc = gen_nconc(pc,name);
-      return generic_c_words_simplified_entity(t1,pc,is_safe, FALSE, is_first);
+      return generic_c_words_simplified_entity(t1,pc,is_safe, FALSE, is_first,in_type_declaration);
     }
 
   /* Add type qualifiers if there are */
-  if (is_first && type_variable_p(t) && variable_qualifiers(type_variable(t)) != NIL)
+  if (( is_first || in_type_declaration ) && type_variable_p(t) && variable_qualifiers(type_variable(t)) != NIL)
     pc = words_qualifier(variable_qualifiers(type_variable(t)));
 
   if (basic_type_p(t)) {
@@ -2060,7 +2061,7 @@ list generic_c_words_simplified_entity(type t, list name, bool is_safe, bool add
       pips_debug(8, "Before concatenation, pc=\"\%s\"\n", list_to_string(pc));
       if(pc!=NIL)
 	pc = CHAIN_SWORD(pc, " ");
-      return gen_nconc(pc,generic_c_words_simplified_entity(t1,gen_nconc(tmp,words_dimensions(dims)),is_safe, FALSE, is_first));
+      return gen_nconc(pc,generic_c_words_simplified_entity(t1,gen_nconc(tmp,words_dimensions(dims)),is_safe, FALSE, is_first, in_type_declaration));
     }
 
   if (derived_type_p(t))
@@ -2207,9 +2208,9 @@ list generic_c_words_simplified_entity(type t, list name, bool is_safe, bool add
   return NIL;
 }
 
-list c_words_simplified_entity(type t, list name, bool is_first)
+list c_words_simplified_entity(type t, list name, bool is_first, bool in_type_declaration)
 {
-  list pc = generic_c_words_simplified_entity(t, name, FALSE, FALSE, is_first);
+  list pc = generic_c_words_simplified_entity(t, name, FALSE, FALSE, is_first,in_type_declaration);
 
   ifdebug(8) {
     string s = list_to_string(pc);
@@ -2325,14 +2326,14 @@ static list words_union(string name1, list pc)
   return pc;
 }
 
-static list words_variable_or_function(entity module, entity e, bool is_first, list pc)
+static list words_variable_or_function(entity module, entity e, bool is_first, list pc,bool in_type_declaration)
 {
   string name = entity_user_name(e);
   type t = entity_type(e);
   //storage s = entity_storage(e);
   value val = entity_initial(e);
 
-  pc = gen_nconc(pc,c_words_simplified_entity(t,CHAIN_SWORD(NIL,name), is_first));
+  pc = gen_nconc(pc,c_words_simplified_entity(t,CHAIN_SWORD(NIL,name), is_first,in_type_declaration));
   /* This part is for declarator initialization if there is.  If
      the entity is declared extern wrt current module, do not add
      this initialization*/
@@ -2467,6 +2468,7 @@ text c_text_related_entities(entity module, list del, int margin, int sn)
      Variable (scalar, array), pointer, function, variables of type struct/union/enum and typedef
      are treated by function c_words_entity */
 
+  bool in_type_declaration = true;
   switch (type_tag(t1)) {
   case is_type_struct:
     {
@@ -2503,7 +2505,8 @@ text c_text_related_entities(entity module, list del, int margin, int sn)
   case is_type_void:
   case is_type_unknown:
     {
-      pc = words_variable_or_function(module, e1, TRUE, pc);
+        in_type_declaration=false;
+      pc = words_variable_or_function(module, e1, TRUE, pc,in_type_declaration);
       ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_unformatted,
 					    make_unformatted(NULL,sn,margin,pc)));
       skip_first_comma_p = FALSE;
@@ -2519,6 +2522,7 @@ text c_text_related_entities(entity module, list del, int margin, int sn)
   /* the word list pc must have been inserted in text r*/
   pc = NIL;
 
+
   /* Add the declared variables or more declared variables. */
   list oel = CDR(el); // other entities after e1
   //print_entities(oel);
@@ -2529,7 +2533,7 @@ text c_text_related_entities(entity module, list del, int margin, int sn)
     }
     else
       pc = gen_nconc(pc,CHAIN_SWORD(NIL,space_p? ", " : ","));
-    pc = words_variable_or_function(module, e, FALSE, pc);
+    pc = words_variable_or_function(module, e, FALSE, pc,in_type_declaration);
   }
   pc = CHAIN_SWORD(pc,";");
 
