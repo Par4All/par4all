@@ -436,6 +436,26 @@
       base(8) = vec(8)
       end
 
+      subroutine simd_save_generic_v8hi(vec, x1, x2, x3, x4,x5,x6,x7,x8)
+      integer*2 vec(8)
+      integer*2 x1
+      integer*2 x2
+      integer*2 x3
+      integer*2 x4
+      integer*2 x5
+      integer*2 x6
+      integer*2 x7
+      integer*2 x8
+
+      x1 = vec(1)
+      x2 = vec(2)
+      x3 = vec(3)
+      x4 = vec(4)
+      x5 = vec(5)
+      x6 = vec(6)
+      x7 = vec(7)
+      x8 = vec(8)
+      end
       subroutine simd_save_generic_v4hi(vec, x1, x2, x3, x4)
       integer*2 vec(4)
       integer*2 x1
