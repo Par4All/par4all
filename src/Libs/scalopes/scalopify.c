@@ -9,10 +9,10 @@
 #include "ri.h"
 #include "ri-util.h"
 #include "misc.h"
-//#include "effects-generic.h"
-//#include "effects-simple.h"
-//#include "control.h"
-//#include "callgraph.h"
+#include "effects-generic.h"
+#include "effects-simple.h"
+#include "control.h"
+#include "callgraph.h"
 #include "pipsdbm.h"
 #include "transformations.h"
 #include "resources.h"
@@ -20,36 +20,20 @@
 
 /// the list to store the loop to outline
 list loops_to_outline;
-/// the flag to differentiate outer and inner loop
-bool flag;
 
 /// @brief build the list of loop to outline. Only first level loops are
 /// targeted.
 /// @return TRUE if the loop is a first level loop.
 /// @param l, the loop to test.
 static bool build_loop_list (loop l) {
-  if (flag == FALSE) {
-    pips_debug (5, "outer loop to be outlined\n");
-    flag = TRUE;
-    statement stmt = (statement) gen_get_ancestor(statement_domain, l);
-    loops_to_outline = CONS (STATEMENT, stmt, loops_to_outline);
-  } else {
-    pips_debug (5, "nested loop will be outlined as part of one outer loop\n");
-    flag = FALSE;
-  }
-  return flag;
+  pips_debug (5, "outer loop to be outlined\n");
+  statement stmt = (statement) gen_get_ancestor(statement_domain, l);
+  loops_to_outline = CONS (STATEMENT, stmt, loops_to_outline);
+  pips_debug (5, "statement %p added\n", (void*) stmt);
+  return FALSE;
 }
 
-/// @brief reset the flag to be able to differiate outer and inner loop
-/// @return void
-/// @param l, unused
-static void reset_flag (loop l) {
-  pips_debug (9, "reset flags\n");
-  flag = FALSE;
-  return;
-}
-
-bool scalopify (const char * module_name) {
+bool scalopify (const string module_name) {
   // Use this module name and this environment variable to set
   statement module_statement = PIPS_PHASE_PRELUDE(module_name,
 						  "SCALOPIFY_DEBUG_LEVEL");
@@ -61,11 +45,14 @@ bool scalopify (const char * module_name) {
   // build the list of loops to outline
   loops_to_outline = NIL;
   gen_recurse (module_statement,
-	       loop_domain, build_loop_list, reset_flag);
+	       loop_domain, build_loop_list, gen_identity);
+  pips_debug (5, "%d loops to outline found\n", gen_length (loops_to_outline));
 
   // revert the list and apply outlining
   loops_to_outline = gen_nreverse (loops_to_outline);
+
   FOREACH (STATEMENT, s, loops_to_outline) {
+    pips_debug (5, "outlining statement %p\n", (void*) s);
     list local = CONS (STATEMENT, s, NIL);
     (void) outliner (build_new_top_level_module_name ("task"), local);
     gen_free_list(local);
