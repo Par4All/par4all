@@ -22,7 +22,7 @@ AC_DEFUN([AX_WITH],[with_[]AS_TR_SH([$1])])
 dnl test for feature result
 dnl usage : AX_HAS(progname-or-libname)
 dnl expands in a test that checks if this prog or library was found ?
-AC_DEFUN([AX_HAS],[AC_REQUIRE([AX_WITH]) test "x${AX_WITH([$1])}" = xyes ])
+AC_DEFUN([AX_HAS],[test "x${AX_WITH([$1])}" = xyes ])
 
 
 dnl check for a function
@@ -30,8 +30,6 @@ dnl usage AX_CHECK_FUNC(funcname,[action-if-found],[action-if-not-found])
 dnl defines with_funcname=(yes|no) and msg_funcname
 AC_DEFUN([AX_CHECK_FUNCS],
     [
-        AC_REQUIRE([AX_MSG])dnl
-        AC_REQUIRE([AX_WITH])dnl
         AC_CHECK_FUNCS([$1],
             [
                 AX_WITH([$1])=yes
@@ -53,12 +51,6 @@ dnl defines LIBNAME_CFLAGS and LIBNAME_LIBS for further use in makefiles
 dnl defines with_libname=(yes|no) and msg_libname
 AC_DEFUN([AX_CHECK_PKG],
     [
-dnl        AC_REQUIRE([PKG_CHECK_MODULES])dnl
-dnl        AC_REQUIRE([AX_HAS])dnl
-dnl        AC_REQUIRE([AX_TR_UP])dnl
-dnl        AC_REQUIRE([AX_MSG])dnl
-dnl        AC_REQUIRE([AX_WITH])dnl
-
         PKG_CHECK_MODULES(AX_TR_UP([$1]),[$1],
             [
 				AX_WITH([$1])=yes
@@ -108,9 +100,6 @@ dnl defines PROGNAME for further use in the makefiles
 dnl defines with_progname=(yes|no) and msg_progname
 AC_DEFUN([AX_CHECK_PROG],
     [
-        AC_REQUIRE([AX_TR_UP])dnl
-        AC_REQUIRE([AX_MSG])dnl
-        AC_REQUIRE([AX_WITH])dnl
         AC_MSG_CHECKING([user given AX_TR_UP([$1])])
         AS_IF(
             [test "x${AX_TR_UP([$1])}" = x],
@@ -146,8 +135,6 @@ dnl usage : AX_CHECK_HEADERS(header ...,[action-if-found],[action-if-not-found])
 dnl defines with_std_headers=(yes|no) and msg_system_headers
 AC_DEFUN([AX_CHECK_HEADERS],
     [
-        AC_REQUIRE([AX_MSG])dnl
-        AC_REQUIRE([AX_WITH])dnl
         AC_CHECK_HEADERS([$1],
             [
                 AS_IF([test x${AX_WITH([std headers])} = xno ],
@@ -178,8 +165,6 @@ dnl usage : AX_DEPENDS(dependency-var-name, dependencies ...)
 dnl defines with_dependency-var-name and msg_dependency-var-name
 AC_DEFUN([AX_DEPENDS],
     [
-        AC_REQUIRE([AX_MSG])dnl
-        AC_REQUIRE([AX_WITH])dnl
         pushdef([_TEST_],[true ])
         pushdef([_MSG_],[])
         m4_foreach_w([_DEP_],[$2],
