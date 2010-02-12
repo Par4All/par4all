@@ -197,5 +197,8 @@ AC_DEFUN([AX_DEPENDS],
 
 dnl exit with relevant exit status and a small message
 dnl dnl usage: AX_EXIT(dependency-var-name)
-AC_DEFUN([AX_EXIT],[AS_IF([AX_HAS([$1])],[AS_MESSAGE([Configure suceeded])],[AS_EXIT([Configure failed])])])
+AC_DEFUN([AX_EXIT],[AS_IF([AX_HAS([$1])],[AS_MESSAGE([Configure suceeded])],[
+AS_MESSAGE([Configure failed])
+AS_EXIT([1])
+])])
 
