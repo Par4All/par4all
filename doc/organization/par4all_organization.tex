@@ -44,6 +44,16 @@ projects.
 Since it relies on other tool projects, the documentation of these other
 projects should also be taken into account.
 
+Before using PIPS, once it is installed, you should do, according to your
+shell, a
+\begin{verbatim}
+source build/etc/par4all-rc.sh
+\end{verbatim}
+or a
+\begin{verbatim}
+source build/etc/par4all-rc.csh
+\end{verbatim}
+
 
 \section{Collaborative repositories}
 \label{sec:coll-repos}
@@ -96,13 +106,6 @@ According to the evolving private collaborations, other repositories can
 be created and used on demand.
 
 
-\section{Compilation}
-\label{sec:compilation}
-
-Once you have an image of the main \Agit repository content, \Apfa is
-compiled and configured by running \verb|src/dev/p4a_setup|.
-
-
 \section{Packages}
 \label{sec:packages}
 
@@ -139,6 +142,7 @@ inside the \texttt{package} top-level directory.
     infrastructure (validation...) and other internal tools;
   \end{description}
 \item[\texttt{doc}] are the sources of the \Apfa infrastructure;
+\item[\texttt{examples}] comes with some examples to exercise \Apfa;
 \item[\texttt{packages}] contains the different components of \Apfa; of
   all the \Apfa packages: binaries, header files, documentation;
   \begin{description}
@@ -344,6 +348,11 @@ these branches).
 \subsection{Setting and running the infrastructure up}
 \label{sec:setup}
 
+The installation has been tested on Ubuntu/Linux 9.10 and you need to have
+at least these packages installed:
+MICKAEL !
+
+
 For an everyday work there are these scripts:
 \begin{itemize}
 \item to pull everything at one for testing, this is done with the
@@ -371,6 +380,45 @@ Some scripts used to setup the infrastructure are located in
   files to fit the \Apfa architecture. It should be used only once, after
   external \Agit import;
 \end{itemize}
+
+
+\section{Examples and demos}
+\label{sec:examples-demos}
+
+The \texttt{examples} directory comes with examples to show some aspects
+of \Apfa. Of course there are far more examples in the validation of \Apfa
+(\S~\ref{sec:validation}) but it is often less pedagogical.
+
+\section{Compilation}
+\label{sec:compilation}
+
+Once you have an image of the main \Agit repository content, \Apfa is
+compiled and configured by running \verb|src/dev/p4a_setup|.
+
+To be sure you do not break the compilation process, you should compile
+your work before committing it on the central repositories. By a nice side
+effect, it allows you to test your code. \smiley
+
+More seriously, it is not obvious that it may compile on your account but
+not for other people. For example because you forgot to commit some files.
+
+A nice feature of \Agit over \Asvn is that since you split the commit from
+the publication, you can test your own committed state before it hurts the
+team.
+
+For example, you can create a light\footnote{Because the objects are
+  shared with symbolic links and not copied since we did not use the
+  \texttt{file://} syntax.} clone with a
+\begin{verbatim}
+git clone par4all par4all-compile
+\end{verbatim}
+and after you have tested and committed your modifications inside the
+\texttt{par4all} working copy, you do the same into the
+\texttt{par4all-compile} working copy after a \texttt{git pull}.
+If some files are lacking from the commit, it will be detected.
+
+Afterwards you can do a \texttt{git push} into the central \Apfa
+repository with less risks.
 
 
 \section{Validation}
