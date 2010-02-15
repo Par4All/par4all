@@ -7328,6 +7328,28 @@ atomizer                      > MODULE.code
 \label{subsubsection:limited-atomizer}
 \index{atomizer}
 
+\begin{PipsPass}{simplify_subscripts}
+This pass performs subscripts atomization so that they can be converted in reference
+for more accruate analysis.
+\end{PipsPass}
+\begin{PipsMake}
+simplify_subscripts > MODULE.code
+        < PROGRAM.entities
+        < MODULE.code
+\end{PipsMake}
+\begin{PipsPass}{simplify_complex}
+This pass performs a conversion from complex to real.
+\PipsPropRef{SIMPLIFY_COMPLEX_USE_ARRAY_OF_STRUCTS} controls the new layout
+\end{PipsPass}
+\begin{PipsMake}
+simplify_complex > MODULE.code
+        < PROGRAM.entities
+        < MODULE.code
+\end{PipsMake}
+\begin{PipsProp}{SIMPLIFY_COMPLEX_USE_ARRAY_OF_STRUCTS}
+SIMPLIFY_COMPLEX_USE_ARRAY_OF_STRUCTS TRUE
+\end{PipsProp}
+
 \begin{PipsPass}{new_atomizer}
 Here is a new version of the atomizer using a small atomizer from
 the HPF compiler (see Section~\ref{subsubsection-hpf-compiler}).
