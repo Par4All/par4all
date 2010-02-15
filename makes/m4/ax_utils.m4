@@ -16,8 +16,8 @@ dnl usage AX_TR_UP(name)
 dnl expands in a reworked name
 AC_DEFUN([AX_TR_UP],[m4_translit([AS_TR_SH([$1])],[a-z],[A-Z])])
 
-AC_DEFUN([AX_MSG],[msg_[]AS_TR_SH([$1])])
-AC_DEFUN([AX_WITH],[with_[]AS_TR_SH([$1])])
+AC_DEFUN([AX_MSG],[ax_msg_[]AS_TR_SH([$1])])
+AC_DEFUN([AX_WITH],[ax_with_[]AS_TR_SH([$1])])
 
 dnl test for feature result
 dnl usage : AX_HAS(progname-or-libname)
