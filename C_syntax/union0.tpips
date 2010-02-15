@@ -3,6 +3,9 @@ create union0 union0.c
 
 display PRINTED_FILE[%ALL]
 
+apply UNSPLIT
+shell cc -c union0.database/Src/union0.c
+
 close
 
 delete union0

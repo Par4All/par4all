@@ -1,0 +1,12 @@
+/* Make sure s is not redeclared in a sizeof and s_prime is
+   redeclared */
+struct s {
+   int l;
+};
+
+extern void struct15();
+void struct15()
+{
+   int i = sizeof(struct s );
+   int j = sizeof(struct s_prime {int i; int j;} );
+}

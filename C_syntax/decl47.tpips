@@ -21,6 +21,9 @@ echo
 
 display PRINTED_FILE[decl47b]
 
+apply UNSPLIT
+shell cc -c decl47.database/Src/decl47.c
+
 close
 delete $WSPC
 quit

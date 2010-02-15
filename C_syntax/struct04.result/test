@@ -1,0 +1,4 @@
+union {
+   struct s {int l;} d;
+   int i;
+} u;

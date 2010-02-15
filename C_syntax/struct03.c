@@ -1,5 +1,6 @@
-/* Data structures for mutex handling.  The structure of the attribute
-   type is not exposed on purpose.  */
+/* Make sure that the struct __pthread_mutex_s is fully expansed in
+   the declaration of the union because it has not been declared
+   earlier */
 
 #define __WORDSIZE 64
 #define __SIZEOF_PTHREAD_MUTEX_T 123

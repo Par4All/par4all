@@ -23,13 +23,15 @@ echo Parsed printed file
 echo
 
 display PARSED_PRINTED_FILE[decl10!]
-quit
-echo
-echo Printed file
-echo
 
-display PRINTED_FILE[decl10!]
+#echo
+#echo Printed file
+#echo
+#
+#display PRINTED_FILE[decl10!]
 
+apply UNSPLIT
+shell cc -c decl10.database/Src/decl10.c
 
 close
 delete decl10

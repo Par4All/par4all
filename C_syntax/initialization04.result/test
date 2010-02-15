@@ -124,7 +124,7 @@ typedef a_t *p_t;
 typedef p_t f_t();
 typedef struct si {
    int i;
-   struct f functions;
+   struct f {f_t *init; f_t *incr; f_t *decr;} functions;
 } si_t;
 
 f_t ini;

@@ -17,6 +17,16 @@ echo Symbol table for "decl05!"
 echo
 
 display SYMBOL_TABLE_FILE[decl05!]
+
+echo
+echo Source code for "decl05!"
+echo
+
+display PARSED_PRINTED_FILE[decl05!]
+
+apply UNSPLIT
+shell cc -c decl05.database/Src/decl05.c
+
 close
 delete decl05
 quit

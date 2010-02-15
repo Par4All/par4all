@@ -31,11 +31,14 @@ echo
 display PARSED_PRINTED_FILE[decl13!]
 
 echo
-echo Parsed rinted file for "decl13"
+echo Parsed printed file for "decl13"
 echo
 
 display PARSED_PRINTED_FILE[decl13]
 
+# The input source code is not legal
+#apply UNSPLIT
+#shell cc -c decl13.database/Src/decl13.c
 
 close
 delete decl13

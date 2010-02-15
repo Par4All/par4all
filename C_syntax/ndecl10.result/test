@@ -14,7 +14,6 @@ Variable list:
 	Declared entity "ndecl10:*HEAP*" with type "area" with size 0
 	Declared entity "ndecl10:*STACK*" with type "area" with size 0
 	Declared entity "ndecl10:*STATIC*" with type "area" with size 0
-	Declared entity "ndecl10:0`'m" with type "union" 
 	Declared entity "ndecl10:0`__FUNCTION__" with type "variable" "char"
 	Declared entity "ndecl10:0`__func__" with type "variable" "char"
 	Declared entity "ndecl10:0`px" with type "variable" "union m  *"
@@ -23,6 +22,10 @@ Variable list:
 
 * empty extern declaration list *
 
+
+Derived entities:
+
+	Variable "ndecl10:0`'m"	kind = union
 
 Layout for formal parameters:
 

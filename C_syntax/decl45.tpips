@@ -26,6 +26,10 @@ echo Call graph for "main"
 echo
 
 display CALLGRAPH_FILE[main]
+
+apply UNSPLIT
+shell cc -c decl45.database/Src/decl45.c
+
 close
 delete $WSPC
 quit

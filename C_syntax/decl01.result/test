@@ -13,7 +13,6 @@ Variable list:
 	Declared entity "decl01:*HEAP*" with type "area" with size 0
 	Declared entity "decl01:*STACK*" with type "area" with size 0
 	Declared entity "decl01:*STATIC*" with type "area" with size 0
-	Declared entity "decl01:0`#c" with type "struct" 
 	Declared entity "decl01:0`__FUNCTION__" with type "variable" "char"
 	Declared entity "decl01:0`__func__" with type "variable" "char"
 	Declared entity "decl01:0`x" with type "variable" "struct c "
@@ -22,6 +21,10 @@ Variable list:
 
 * empty extern declaration list *
 
+
+Derived entities:
+
+	Variable "decl01:0`#c"	kind = struct
 
 Layout for formal parameters:
 

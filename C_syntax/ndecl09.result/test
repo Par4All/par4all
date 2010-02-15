@@ -14,7 +14,6 @@ Variable list:
 	Declared entity "ndecl09:*HEAP*" with type "area" with size 0
 	Declared entity "ndecl09:*STACK*" with type "area" with size 0
 	Declared entity "ndecl09:*STATIC*" with type "area" with size 0
-	Declared entity "ndecl09:0`#m" with type "struct" 
 	Declared entity "ndecl09:0`__FUNCTION__" with type "variable" "char"
 	Declared entity "ndecl09:0`__func__" with type "variable" "char"
 	Declared entity "ndecl09:0`bar" with type "variable" "(() -> struct m ) *"
@@ -24,6 +23,10 @@ Variable list:
 
 * empty extern declaration list *
 
+
+Derived entities:
+
+	Variable "ndecl09:0`#m"	kind = struct
 
 Layout for formal parameters:
 

@@ -23,6 +23,10 @@ echo Parsed printed file
 echo
 
 display PARSED_PRINTED_FILE[decl07]
+
+apply UNSPLIT
+shell cc -c decl07.database/Src/decl07.c
+
 close
 delete decl07
 quit
