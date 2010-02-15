@@ -373,10 +373,12 @@ transformer any_assign_operation_to_transformer(entity tmp,
 	  ifdebug(9) dump_transformer(tf);
 
 	  if(entity_is_argument_p(v, transformer_arguments(tf))) {
-	    /* Is it standard compliant? The assigned variable is modified by the rhs. */
+	    /* Is it standard compliant? The assigned variable is
+	       modified by the rhs. */
 	    transformer teq = simple_equality_to_transformer(v, tmp, TRUE);
 	    extern string words_to_string(list);
-	    string s = words_to_string(words_syntax(expression_syntax(rhs)));
+	    string s =
+	      words_to_string(words_syntax(expression_syntax(rhs),NIL));
 
 	    pips_user_warning("Variable %s in lhs is uselessly updated by the rhs '%s'\n",
 			      entity_local_name(v), s);

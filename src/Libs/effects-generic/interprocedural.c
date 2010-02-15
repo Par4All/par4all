@@ -101,12 +101,12 @@ list c_actual_argument_to_may_summary_effects(expression real_arg, tag act)
   type real_arg_t = expression_to_type(real_arg);
   int real_arg_t_d = effect_type_depth(real_arg_t);
   transformer context = effects_private_current_context_head();
-	    
 
-  pips_debug(6,"actual argument %s, with type %s, and type depth %d\n", 
-	     words_to_string(words_expression(real_arg)),
+
+  pips_debug(6,"actual argument %s, with type %s, and type depth %d\n",
+	     words_to_string(words_expression(real_arg,NIL)),
 	     type_to_string(real_arg_t), real_arg_t_d);
-  
+
   if (real_arg_t_d == 0)
     {
       pips_debug(6, "actual argument is a constant expression -> NIL\n");
@@ -114,13 +114,13 @@ list c_actual_argument_to_may_summary_effects(expression real_arg, tag act)
   else
     {
       syntax s = expression_syntax(real_arg);
-      
+
       switch(syntax_tag(s))
 	{
 	case is_syntax_call:
 	  /*
 	    just a special case for :
-	    - the assignment 
+	    - the assignment
 	    - and the ADDRESS_OF operator to avoid
             losing to musch information because we don't know how to 
             represent &p access path in the general case.
@@ -364,7 +364,7 @@ list generic_c_effects_backward_translation(entity callee,
       type te;
 
       pips_debug(5, "current real arg : %s\n",
-		 words_to_string(words_expression(real_arg)));
+		 words_to_string(words_expression(real_arg,NIL)));
 
       if (!param_varargs_p)
 	{

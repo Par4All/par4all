@@ -1333,22 +1333,22 @@ static void claire_loop(stack st, string_buffer result)
   string_buffer_append(result, "exLoopNest = LOOPNEST(deep = ");
   string_buffer_append(result, concatenate(i2a(stack_size(st)),",",NULL));
 
-  STACK_MAP_X(s, statement, 
-  {   
+  STACK_MAP_X(s, statement,
+  {
     loop l = instruction_loop(statement_instruction(s));
-    expression el =range_lower(loop_range(l));  
+    expression el =range_lower(loop_range(l));
     expression eu =range_upper(loop_range(l));
     expression new_eu= expression_plusplus(eu);
 
   string_buffer_append(buffer_lower,
 		       concatenate(comma_needed? ",": "",
 				   "vartype!(",
-				   words_to_string(words_expression(el)),
+				   words_to_string(words_expression(el,NIL)),
 				   ")",NULL));
   string_buffer_append(buffer_upper,
 		       concatenate(comma_needed? ",": "",
 				   "vartype!(",
-				   words_to_string(words_expression(new_eu)),
+				   words_to_string(words_expression(new_eu,NIL)),
 				   ")",NULL));
   string_buffer_append(buffer_names,
 		       concatenate(comma_needed? ",": "",

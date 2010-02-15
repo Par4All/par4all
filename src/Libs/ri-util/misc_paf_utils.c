@@ -93,8 +93,8 @@ expression 	exp1, exp2;
 	expression rexp;
 
 	debug( 7, "make_max_exp", "doing MAX( %s, %s ) \n",
-		words_to_string(words_expression( exp1 )),
-		words_to_string(words_expression( exp2 )) );
+	       words_to_string(words_expression(exp1, NIL)),
+	       words_to_string(words_expression(exp2, NIL)) );
 	if (expression_constant_p( exp1 ) && expression_constant_p( exp2 )) {
 		int val1 = expression_to_int( exp1 );
 		int val2 = expression_to_int( exp2 );
@@ -293,7 +293,7 @@ list exp_l;
  for(aux_l = exp_l; aux_l != NIL; aux_l = CDR(aux_l))
    {
     exp = EXPRESSION(CAR(aux_l));
-    fprintf(fp,"%s", words_to_string(words_expression(exp)));
+    fprintf(fp,"%s", words_to_string(words_expression(exp, NIL)));
     if(CDR(aux_l) != NIL)
        fprintf(fp,",");
    }

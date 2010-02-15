@@ -50,7 +50,7 @@
 void wp65_debug_print_text(entity m, statement s)
 {
     debug_on("PRETTYPRINT_DEBUG_LEVEL");
-    print_text(stderr, text_statement(m, 0, s));
+    print_text(stderr, text_statement(m, 0, s, NIL));
     debug_off();
 }
 
@@ -362,7 +362,7 @@ int number_of_lower_bounds,number_of_upper_bounds;
     lbody = make_block_statement(CONS(STATEMENT,stat1,lex3));
     ifdebug(8) {
 	mod = local_name_to_top_level_entity(entity_local_name(module));
-	t = text_statement(mod, 2,lbody);
+	t = text_statement(mod, 2, lbody, NIL);
 	print_text(stderr,t);
     }
     debug(8,"make_movements_loop_body_wp65","end\n");

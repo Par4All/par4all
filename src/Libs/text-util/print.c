@@ -202,8 +202,8 @@ void print_text(fd, t)
 FILE *fd;
 text t;
 {
-    MAPL(cs, 
-	 print_sentence(fd, SENTENCE(CAR(cs))), 
+    MAPL(cs,
+	 print_sentence(fd, SENTENCE(CAR(cs))),
 	 text_sentences(t));
 }
 

@@ -508,37 +508,37 @@ static list common_regions_backward_translation(entity func, list func_regions)
         reference has at leat one index.       
  @param real_arg is an expression. It's the real argument corresponding to
         the formal parameter which memory effects are represented by l_sum_eff.
- @param context is the transformer translating the callee's neame space into 
-        the caller's name space.	 
+ @param context is the transformer translating the callee's neame space into
+        the caller's name space.
  @return a list of effects which are the translation of l_sum_eff in the
          caller's name space.
  */
-list c_convex_effects_on_formal_parameter_backward_translation(list l_sum_eff, 
-						  expression real_arg, 
+list c_convex_effects_on_formal_parameter_backward_translation(list l_sum_eff,
+						  expression real_arg,
 						  transformer context)
 {
   list l_eff = NIL; /* the result */
   syntax real_s = expression_syntax(real_arg);
   type real_arg_t = expression_to_type(real_arg);
-  
-  
+
+
   ifdebug(5)
     {
-      pips_debug(8, "begin for real arg %s, of type %s and effects :\n", 
-		 words_to_string(words_expression(real_arg)),
+      pips_debug(8, "begin for real arg %s, of type %s and effects :\n",
+		 words_to_string(words_expression(real_arg, NIL)),
 		 type_to_string(real_arg_t));
-      (*effects_prettyprint_func)(l_sum_eff);		 
+      (*effects_prettyprint_func)(l_sum_eff);
     }
-  
+
   switch (syntax_tag(real_s))
     {
     case is_syntax_reference:
-      {  
+      {
 	reference real_ref = syntax_reference(real_s);
 	entity real_ent = reference_variable(real_ref);
 	list real_ind = reference_indices(real_ref);
-	
-	/* if it's a pointer or a partially indexed array 
+
+	/* if it's a pointer or a partially indexed array
 	 * We should do more testing here to check if types
 	 * are compatible... (see effect_array_substitution ?)
 	 */

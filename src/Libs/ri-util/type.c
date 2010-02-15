@@ -463,7 +463,9 @@ bool basic_equal_strict_p(basic b1, basic b2)
     /* could be a star or an expression; a value_equal_p() is needed! */
     return TRUE;
   case is_basic_typedef:
-        return basic_typedef_p(b2) && same_entity_p(basic_typedef_p(b1),basic_typedef_p(b2));
+    /* FI->BC (?): suffixes _p should be removed */
+    return basic_typedef_p(b2)
+      && same_entity_p(basic_typedef_p(b1),basic_typedef_p(b2));
   default: pips_error("basic_equal_p", "unexpected tag %d\n", basic_tag(b1));
   }
   return FALSE; /* just to avoid a warning */
@@ -743,7 +745,7 @@ string safe_type_to_string(type t)
  string basic_to_string(basic b)
 {
   /* Nga Nguyen, 19/09/2003: To not rewrite the same thing, I use the words_basic() function*/
-  return list_to_string(words_basic(b));
+  return list_to_string(words_basic(b, NIL));
 }
 
 
@@ -1499,7 +1501,7 @@ type intrinsic_call_to_type(call c)
 
   pips_debug(7, "Intrinsic call to intrinsic \"%s\" with a priori result type \"%s\"\n",
 	     module_local_name(f),
-	     words_to_string(words_type(rt)));
+	     words_to_string(words_type(rt, NIL)));
 
   if(basic_overloaded_p(rb))
     {
@@ -1628,7 +1630,7 @@ type intrinsic_call_to_type(call c)
 
   pips_debug(7, "Intrinsic call to intrinsic \"%s\" with a posteriori result type \"%s\"\n",
 	     module_local_name(f),
-	     words_to_string(words_type(t)));
+	     words_to_string(words_type(t, NIL)));
 
   return t;
 }
@@ -1698,7 +1700,7 @@ type reference_to_type(reference ref)
 	  
 	  ifdebug(7) {
 	    pips_debug(7, "new iteration : current type : %s\n",
-		       words_to_string(words_type(ct)));
+		       words_to_string(words_type(ct, NIL)));
 	    pips_debug(7, "current list of indices: \n");
 	    print_expressions(l_inds);
 	  }
@@ -1881,7 +1883,7 @@ type expression_to_type(expression exp)
       /* Never go there... */
     }
 
-  pips_debug(6, "returns with %s\n", words_to_string(words_type(t)));
+  pips_debug(6, "returns with %s\n", words_to_string(words_type(t, NIL)));
 
   return t;
 }
@@ -3257,14 +3259,14 @@ bool check_C_function_type(entity f, list args)
 
 	pips_user_warning("Type updated for function \"%s\"\n", entity_user_name(f));
 	ifdebug(8) {
-	  text txt = c_text_entity(get_current_module_entity(), f, 0);
+	  text txt = c_text_entity(get_current_module_entity(), f, 0, NIL);
 	  print_text(stderr, txt);
 	}
       }
       else {
 	/* Must be a typedef or a pointer to a function. No need to refine the type*/
 	ifdebug(8) {
-	  text txt = c_text_entity(get_current_module_entity(), f, 0);
+	  text txt = c_text_entity(get_current_module_entity(), f, 0, NIL);
 	  pips_debug(8, "Type not updated for function \"%s\"\n", entity_user_name(f));
 	  print_text(stderr, txt);
 	}
@@ -3487,7 +3489,7 @@ void print_types(list tl)
 /* For debugging */
 void print_type(type t)
 {
-  list wl = words_type(t);
+  list wl = words_type(t, NIL);
   dump_words(wl);
 }
 

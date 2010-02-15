@@ -90,20 +90,20 @@ static boolean reference_in_statement_p(statement l, entity v)
 static void eval_var(reference ref)
 {
     cons * ind1;
-    expression expr1 = expression_undefined; 
+    expression expr1 = expression_undefined;
     expression expr2 = expression_undefined;
     cons *expr=NIL;
     Value coeff = VALUE_ZERO;
     boolean debut=TRUE;
     ind1 = reference_indices(ref);
-    
+
     if (ind1) {
-	for (debut =TRUE; ind1 != NULL; ind1 = CDR(ind1)) 
+	for (debut =TRUE; ind1 != NULL; ind1 = CDR(ind1))
 	{ normalized norm1;
 	  expr1 = EXPRESSION(CAR(ind1));
 	  norm1 = (normalized) NORMALIZE_EXPRESSION(expr1);
 	  if (normalized_linear_p(norm1)) {
-	      Pvecteur pv1 = (Pvecteur) normalized_linear(norm1); 
+	      Pvecteur pv1 = (Pvecteur) normalized_linear(norm1);
 	      fprintf(stderr,"\n expression->vecteur:");
 		  vect_fprint(stderr,pv1,entity_local_name);
 	      if (value_notzero_p(coeff = vect_coeff(var_to_evaluate,pv1)))
@@ -115,28 +115,28 @@ static void eval_var(reference ref)
 		  vect_fprint(stderr,pv1,entity_local_name);
 		  expr2 = make_vecteur_expression(pv1);
 	      }
-	      else expr2 = expr1;  
-	      print_words(stderr,words_expression(expr2));
+	      else expr2 = expr1;
+	      print_words(stderr,words_expression(expr2, NIL));
 	  }
-	    
-	  if (debut) { 
+
+	  if (debut) {
 	      expr = CONS(EXPRESSION,expr2,NIL);
-	      print_words(stderr,words_expression(expr2));
+	      print_words(stderr,words_expression(expr2, NIL));
 	      debut = FALSE;
 	  }
-	  else expr = gen_nconc(expr,CONS(EXPRESSION,expr2,NIL));  
-	
+	  else expr = gen_nconc(expr,CONS(EXPRESSION,expr2,NIL));
+
       }
 	reference_indices(ref) = expr;
-    } 
-    
+    }
+
 }
 
 
 void eval_variable_in_statement(entity module,statement s,Variable v,int min)
 {
     var_to_evaluate = v;
-    var_minmax = min; 
+    var_minmax = min;
     ifdebug(8) {
 	(void) fprintf(stderr, "Loop body :\n");
 	wp65_debug_print_text(module, s);
@@ -870,7 +870,7 @@ Pbase local_basis;
     int i;
     debug(8,"reference_conversion_expression", "begin expression:");
     ifdebug(8) {
-	print_words(stderr, words_expression(e));
+      print_words(stderr, words_expression(e, NIL));
 	(void) fputc('\n', stderr);
     }
 
@@ -922,7 +922,7 @@ Pbase local_basis;
 
     debug(8,"reference_conversion_expression", "end expression:\n");
     ifdebug(8) {
-	print_words(stderr, words_expression(e));
+      print_words(stderr, words_expression(e, NIL));
 	(void) fputc('\n', stderr);
     }
 }
@@ -1034,7 +1034,7 @@ Pbase *new_index_base;
 	(void) fprintf(stderr, "Associated reference list:");
 	for(crefs=lr; !ENDP(crefs); POP(crefs)) {
 	    reference r1 = REFERENCE(CAR(crefs));
-	    print_words(stderr, words_reference(r1));
+	    print_words(stderr, words_reference(r1, NIL));
 	    if(ENDP(CDR(crefs)))
 		(void) putc('\n', stderr);
 	    else
@@ -1220,7 +1220,7 @@ int last_parallel_level)
 	(void) fprintf(stderr, "Associated reference list:");
 	for(crefs=lrefs; !ENDP(crefs); POP(crefs)) {
 	    reference r1 = REFERENCE(CAR(crefs));
-	    print_words(stderr, words_reference(r1));
+	    print_words(stderr, words_reference(r1, NIL));
 	    if(ENDP(CDR(crefs)))
 		(void) putc('\n', stderr);
 	    else
@@ -1370,7 +1370,7 @@ int first_parallel_level,last_parallel_level;
 	(void) fprintf(stderr, "Associated reference list:");
 	for(crefs=lrefs; !ENDP(crefs); POP(crefs)) {
 	    reference r1 = REFERENCE(CAR(crefs));
-	    print_words(stderr, words_reference(r1));
+	    print_words(stderr, words_reference(r1, NIL));
 	    if(ENDP(CDR(crefs)))
 		(void) putc('\n', stderr);
 	    else

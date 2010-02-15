@@ -235,7 +235,7 @@ dataflow df;
 
  fprintf(fp,
 	 " ---Def-Use---> ins_%d:\n  Reference: %s\n  Transformation: [",
-	 stmt, words_to_string(words_reference(ref)));
+	 stmt, words_to_string(words_reference(ref, NIL)));
 
  fprint_list_of_exp(fp, trans_l);
  fprintf(fp,"]\n");
@@ -292,7 +292,7 @@ list exp_l;
  for(aux_l = exp_l; aux_l != NIL; aux_l = CDR(aux_l))
    {
     exp = EXPRESSION(CAR(aux_l));
-    fprintf(fp,"%s", words_to_string(words_expression(exp)));
+    fprintf(fp,"%s", words_to_string(words_expression(exp,NIL)));
     if(CDR(aux_l) != NIL)
        fprintf(fp,",");
    }
@@ -423,7 +423,7 @@ bdt obj;
     fprintf(fp, "\t dims: ");
     for(; dim_l != NIL; dim_l = CDR(dim_l)) {
       expression exp = EXPRESSION(CAR(dim_l));
-      fprintf(fp,"%s", words_to_string(words_expression(exp)));
+      fprintf(fp,"%s", words_to_string(words_expression(exp,NIL)));
       if(CDR(dim_l) != NIL)
         fprintf(fp," , ");
     }
@@ -609,7 +609,7 @@ quast qu;
       }
       fprint_indent(fp, quast_depth);
       while (sol != NIL) {
-        fprintf(fp, "%s, ", words_to_string(words_expression(EXPRESSION(CAR(sol)))));
+	fprintf(fp, "%s, ", words_to_string(words_expression(EXPRESSION(CAR(sol)),NIL)));
         sol = CDR(sol);
       }
     break;

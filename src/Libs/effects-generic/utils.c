@@ -895,10 +895,10 @@ static list type_fields(type t)
       pips_internal_error("type_fields improperly called\n");
     }
   return l_res;
-	
+
 }
 
-/** 
+/**
  NOT YET IMPLEMENTED FOR VARARGS AND FUNCTIONAL TYPES.
 
  @param eff is an effect
@@ -908,8 +908,8 @@ static bool r_effect_pointer_type_p(effect eff, list l_ind, type ct)
 {
   bool p = false, finished = false;
 
-  pips_debug(7, "begin with type %s\n and number of indices : %d\n", 
-	     words_to_string(words_type(ct)),
+  pips_debug(7, "begin with type %s\n and number of indices : %d\n",
+	     words_to_string(words_type(ct,NIL)),
 	     (int) gen_length(l_ind));
   while (!finished)
     {
@@ -920,9 +920,9 @@ static bool r_effect_pointer_type_p(effect eff, list l_ind, type ct)
 	    variable v = type_variable(ct);
 	    basic b = variable_basic(v);
 	    list l_dim = variable_dimensions(v);
-	    
-	    pips_debug(8, "variable case, of dimension %d\n", 
-		       (int) gen_length(variable_dimensions(v))); 
+
+	    pips_debug(8, "variable case, of dimension %d\n",
+		       (int) gen_length(variable_dimensions(v)));
 
 	    while (!ENDP(l_dim) && !ENDP(l_ind))
 	      {
@@ -957,12 +957,12 @@ static bool r_effect_pointer_type_p(effect eff, list l_ind, type ct)
 		    finished = true;
 		  }
 		 
-	      }	
+	      }
 	    else /* ENDP(l_ind) but !ENDP(l_dim) */
 	      {
 		finished = true;
 	      }
-	    
+
 	    break;
 	  }
 	case is_type_struct:
@@ -972,19 +972,19 @@ static bool r_effect_pointer_type_p(effect eff, list l_ind, type ct)
 	    list l_ent = type_fields(ct);
 	    expression rank_exp = EXPRESSION(CAR(l_ind));
 	    int rank;
-	    
-	    pips_debug(7, "field case, with rank expression : %s \n",
-		       words_to_string(words_expression(rank_exp)));
 
-	    /* If the field rank is known, we only look at the 
+	    pips_debug(7, "field case, with rank expression : %s \n",
+		       words_to_string(words_expression(rank_exp,NIL)));
+
+	    /* If the field rank is known, we only look at the
 	       corresponding type.
-	       If not, we have to recursively look at each field 
-	    */ 
+	       If not, we have to recursively look at each field
+	    */
 	    if (expression_integer_value(rank_exp, &rank))
 	      {
-		/* the current type becomes the type of the 
+		/* the current type becomes the type of the
 		 *p_rank-th field
-		 */		
+		 */
 		ct = entity_type(ENTITY(gen_nth(rank - 1, l_ent)));
 		p = r_effect_pointer_type_p(eff, CDR(l_ind), ct);
 		finished = true;
@@ -1031,7 +1031,7 @@ bool effect_pointer_type_p(effect eff)
   type t = basic_concrete_type(entity_type(ent));
 
   pips_debug(8, "begin with effect reference %s\n",
-	     words_to_string(words_reference(ref)));
+	     words_to_string(words_reference(ref,NIL)));
 
   p = r_effect_pointer_type_p(eff, l_ind, t);
 
@@ -1051,22 +1051,22 @@ type simple_effect_reference_type(reference ref)
 
   type t = type_undefined; /* result */
   bool finished = false;
-      
-  pips_debug(8, "beginning with reference : %s\n", words_to_string(words_reference(ref)));
-  
+
+  pips_debug(8, "beginning with reference : %s\n", words_to_string(words_reference(ref,NIL)));
+
   ct = bct;
   while (! finished)
     {
-      basic cb = variable_basic(type_variable(ct)); /* current basic */     
+      basic cb = variable_basic(type_variable(ct)); /* current basic */
       list cd = variable_dimensions(type_variable(ct)); /* current type dimensions */
-      
+
       while(!ENDP(cd) && !ENDP(l_inds))
 	{
 	  pips_debug(8, "poping one array dimension \n");
 	  POP(cd);
 	  POP(l_inds);
 	}
-      
+
       if(ENDP(l_inds))
 	{
 	  pips_debug(8, "end of reference indices, generating type\n");
@@ -1126,12 +1126,12 @@ type simple_effect_reference_type(reference ref)
 	      pips_internal_error("typedef not expected here \n");
 	    } /* switch (basic_tag(cb)) */
 	}
-      
+
     } /* while (!finished) */
 
 
   free_type(bct);
-  pips_debug(6, "returns with %s\n", words_to_string(words_type(t)));
+  pips_debug(6, "returns with %s\n", words_to_string(words_type(t,NIL)));
   return t;
 
 }

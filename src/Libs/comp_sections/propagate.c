@@ -238,7 +238,8 @@ list comp_regions_of_instruction(instruction i, transformer t_inst, transformer 
 	      {
 	        pips_debug(3, "test : %s\n",
 		         words_to_string(words_expression
-				         (test_condition(instruction_test(i)))));
+					 (test_condition(instruction_test(i)),
+					  NIL)));
 	      }
         lreg = comp_regions_of_test(instruction_test(i), context, plpropreg);
 	      break;
@@ -656,7 +657,7 @@ list comp_regions_of_syntax(syntax s, transformer context)
     ifdebug(3)
     {
 	    pips_debug(3, "Regions of expression  %s :\n",
-		    words_to_string(words_syntax(s)));
+		       words_to_string(words_syntax(s, NIL)));
 	    print_regions(le);
     }
 
@@ -669,7 +670,7 @@ list comp_regions_of_syntax(syntax s, transformer context)
  * input    : a list of expressions and the current context.
  * output   : the correpsonding list of regions.
  * modifies : nothing.
- * comment  :	
+ * comment  :
  */
 list comp_regions_of_expressions(list exprs, transformer context)
 {

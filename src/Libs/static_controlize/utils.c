@@ -268,7 +268,7 @@ list *ell;
 	list args;
 
 	pips_debug(7, "exp : %s\n",
-			words_to_string( words_expression( exp ) ));
+		   words_to_string( words_expression( exp, NIL ) ));
 	if (syntax_tag(s) != is_syntax_call) return( FALSE );
 	c = syntax_call( s );
 	if (!ENTITY_GREATER_OR_EQUAL_P(call_function( c ))) return( FALSE );
@@ -295,7 +295,7 @@ list ndf_normalized_test(expression exp, list *ell)
 		return( list_undefined );
 	}
 	pips_debug(7, "input exp : %s\n",
-			words_to_string(words_expression( exp )) );
+		   words_to_string(words_expression( exp, NIL )) );
 
 	fun = call_function(syntax_call(expression_syntax( exp )));
 	args = call_arguments(syntax_call(expression_syntax( exp )));
@@ -433,7 +433,7 @@ list *ell;
 
 	if (exp == expression_undefined) return( exp );
 	pips_debug(7, "exp : %s\n",
-			words_to_string(words_expression( exp )) );
+		   words_to_string(words_expression( exp, NIL )) );
 	if (syntax_tag( s ) != is_syntax_call) return( ret_exp );
 
 	if (ENTITY_NOT_P( fun )) {
@@ -445,7 +445,7 @@ list *ell;
 
 		ret_exp = MakeUnaryCall(ENTITY_NOT, exp1 );
 		pips_debug(7, "returning : %s\n",
-			words_to_string(words_expression( ret_exp )) );
+			   words_to_string(words_expression( ret_exp, NIL )) );
 		return( ret_exp );
 	}
 
@@ -486,7 +486,7 @@ list *ell;
 		call_arguments(syntax_call( s )) = new_args;
 		ret_exp = copy_expression( exp );
 		pips_debug(7, "returning : %s\n",
-			words_to_string(words_expression( ret_exp )) );
+			   words_to_string(words_expression( ret_exp, NIL )) );
 		return( ret_exp );
 	}
 	else if (	ENTITY_RELATIONAL_OPERATOR_P( fun ) &&
@@ -558,7 +558,7 @@ list *ell;
 
 	pips_debug(7, "returning : %s\n",
 		((ret_exp == expression_undefined)?"expression_undefined":\
-			words_to_string(words_expression( ret_exp ))) );
+		 words_to_string(words_expression( ret_exp, NIL ))) );
 	return( ret_exp );
 }
 			
@@ -575,7 +575,7 @@ expression sc_conditional(expression exp, list *ell)
 	list		ndf_list;
 
 	pips_debug(7, "exp : %s\n",
-				words_to_string(words_expression(exp)));
+		   words_to_string(words_expression(exp, NIL)));
 
 	if ( syntax_tag(s) != is_syntax_call ) return( ret_exp );
 	e = normalize_test_leaves(exp, ell);
@@ -592,7 +592,7 @@ expression sc_conditional(expression exp, list *ell)
 
 	pips_debug(7, "returning : %s\n",
 		((ret_exp == expression_undefined)?"expression_undefined":
-		words_to_string(words_expression( ret_exp ))) );
+		 words_to_string(words_expression( ret_exp, NIL ))) );
 	return( ret_exp );
 }			
 				
@@ -626,7 +626,7 @@ bool splc_linear_expression_p(expression exp, list *ell)
   bool         ONLY_SPLC;
 
   pips_debug(7, "exp : %s\n",
-	words_to_string(words_expression(exp)));
+	     words_to_string(words_expression(exp, NIL)));
 
   if(normalized_tag(NORMALIZE_EXPRESSION(exp)) == is_normalized_complex)
     ONLY_SPLC = FALSE;
@@ -908,7 +908,7 @@ bool sp_linear_expression_p(expression exp)
    bool         ONLY_SP;
 
    pips_debug(7, "exp : %s\n",
-	      words_to_string(words_expression(exp)));
+	      words_to_string(words_expression(exp, NIL)));
 
    if(normalized_tag(NORMALIZE_EXPRESSION(exp)) == is_normalized_complex)
         ONLY_SP = FALSE;
@@ -944,7 +944,7 @@ bool splc_feautrier_expression_p(expression exp, list * ell)
 
 	pips_debug(7, "exp : %s \n",
 		((exp == expression_undefined)?"expression_undefined":
-			words_to_string( words_expression( exp ) ) ));
+		 words_to_string( words_expression( exp, NIL ) ) ));
 
 	if (splc_linear_expression_p(exp, ell)) return( TRUE );
 	if ( syntax_tag( s ) == is_syntax_call ) {
@@ -977,7 +977,7 @@ bool sp_feautrier_expression_p(expression exp)
 
 	pips_debug(7, "exp : %s \n",
 		((exp == expression_undefined)?"expression_undefined":
-			words_to_string( words_expression( exp ) ) ));
+		 words_to_string( words_expression( exp, NIL ) ) ));
 
 	if (sp_linear_expression_p( exp )) return( TRUE );
 	if ( syntax_tag( s ) == is_syntax_call ) {
@@ -1042,7 +1042,7 @@ list *swfl;
    pips_debug(7, "begin\n");
    /*FI: not too sure about the FALSE parameter... */
    pips_debug(9, "input call : %s \n",
-	      words_to_string(words_regular_call( c, FALSE )));
+	      words_to_string(words_regular_call( c, FALSE, NIL )));
    pips_debug(9, "struct param. before : %s \n",
 			print_structurals( Gstructure_parameters ));
 

@@ -408,11 +408,11 @@ void do_loop_unroll(statement loop_statement, int rate, void (*statement_post_pr
                     make_stmt_of_instr(inst),
                     NIL ));
         
-            /* Generate a statement to reinitialize old index 
+            /* Generate a statement to reinitialize old index
              * IND = LB + MAX(NUB,0)*INC
              */
             expr = MakeBinaryCall(entity_intrinsic(MULTIPLY_OPERATOR_NAME),
-                    MakeBinaryCall(entity_intrinsic(MAX0_OPERATOR_NAME), 
+                    MakeBinaryCall(entity_intrinsic(MAX0_OPERATOR_NAME),
                         make_ref_expr(nub, NIL),
                         int_expr(0) ),
                     copy_expression(inc) );
@@ -423,7 +423,7 @@ void do_loop_unroll(statement loop_statement, int rate, void (*statement_post_pr
         stmt = make_assign_statement(expr,
                 rhs_expr );
         ifdebug(9) {
-            print_text(stderr,text_statement(entity_undefined,0,stmt));
+	  print_text(stderr,text_statement(entity_undefined,0,stmt,NIL));
             pips_assert("loop_unroll", statement_consistent_p(stmt));
         }
         instruction_block(block)= gen_nconc(instruction_block(block),
@@ -441,7 +441,7 @@ block: */
         fix_sequence_statement_attributes(loop_statement);
 
         ifdebug(9) {
-            print_text(stderr,text_statement(entity_undefined,0,loop_statement));
+	  print_text(stderr,text_statement(entity_undefined,0,loop_statement,NIL));
             pips_assert("loop_unroll", statement_consistent_p(loop_statement));
         }
         /* ?? Bad condition */
@@ -590,7 +590,7 @@ void full_loop_unroll(statement loop_statement)
     if(!entity_empty_label_p(flbl)) {
       stmt = make_continue_statement(flbl);
       ifdebug(9) {
-	print_text(stderr,text_statement(entity_undefined,0,stmt));
+	print_text(stderr,text_statement(entity_undefined,0,stmt,NIL));
 	pips_assert("full_loop_unroll", statement_consistent_p(stmt));
       }
       instruction_block(block)= gen_nconc(instruction_block(block),
@@ -602,7 +602,7 @@ void full_loop_unroll(statement loop_statement)
     expr = make_ref_expr(ind, NIL);
     stmt = make_assign_statement(expr, rhs_expr);
     ifdebug(9) {
-	print_text(stderr,text_statement(entity_undefined,0,stmt));
+      print_text(stderr,text_statement(entity_undefined,0,stmt,NIL));
 	pips_assert("full_loop_unroll", statement_consistent_p(stmt));
     }
     instruction_block(block)= gen_nconc(instruction_block(block),
@@ -614,13 +614,14 @@ void full_loop_unroll(statement loop_statement)
      * with its actual parameter; if the free is executed, Pvecteur normalized_linear
      * is destroyed (18 January 1993) */
     free_instruction(statement_instruction(loop_statement));
-    statement_instruction(loop_statement) = block;    
+    statement_instruction(loop_statement) = block;
     /* Do not forget to move forbidden information associated with
        block: */
     fix_sequence_statement_attributes(loop_statement);
-    
+
     ifdebug(9) {
-	print_text(stderr,text_statement(entity_undefined,0,loop_statement));
+      /* FI: how about a simpler print_statement()? */
+      print_text(stderr,text_statement(entity_undefined,0,loop_statement,NIL));
 	pips_assert("full_loop_unroll", statement_consistent_p(loop_statement));
     }
     /* ?? Bad condition */

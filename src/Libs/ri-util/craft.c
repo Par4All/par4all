@@ -150,22 +150,22 @@ text text_loop_craft(module, label, margin, obj, n, lr, lidx)
 	sprintf(comment, "%s, ", comment);
     }
     sprintf(comment, "%s) ON %s\n", comment,
-	    words_to_string(words_expression(lhs_exp)));
-    ADD_SENTENCE_TO_TEXT(result_text, make_sentence(is_sentence_formatted, 
+	    words_to_string(words_expression(lhs_exp, NIL)));
+    ADD_SENTENCE_TO_TEXT(result_text, make_sentence(is_sentence_formatted,
 						    comment));
 
     for(lli = lidx, llr = lr, c = 0; !ENDP(lli); POP(lli), POP(llr), c++) {
       pc = CHAIN_SWORD(NIL, "DO " );
       pc = CHAIN_SWORD(pc, entity_local_name(ENTITY(CAR(lli))));
       pc = CHAIN_SWORD(pc, " = ");
-      pc = gen_nconc(pc, words_loop_range(RANGE(CAR(llr))));
+      pc = gen_nconc(pc, words_loop_range(RANGE(CAR(llr)), NIL));
       u = make_unformatted(strdup(label), n,
-			   margin+c*INDENTATION, pc); 
+			   margin+c*INDENTATION, pc);
       ADD_SENTENCE_TO_TEXT(result_text,
 			   make_sentence(is_sentence_unformatted, u));
     }
     MERGE_TEXTS(result_text, text_statement(module, margin+c*INDENTATION,
-					    loop_body(obj)));
+					    loop_body(obj), NIL));
 
     for(c = gen_length(lidx)-1; c > -1; c--) {
       ADD_SENTENCE_TO_TEXT(result_text,

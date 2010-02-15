@@ -77,8 +77,7 @@ expression exp;
 Pvecteur vect;
 bool ONLY_NLCs;
 
-debug(7, "nlc_linear_expression_p", "exp : %s\n",
-      words_to_string(words_expression(exp)));
+pips_debug(7, "exp : %s\n", words_to_string(words_expression(exp, NIL)));
 
 if(normalized_tag(NORMALIZE_EXPRESSION(exp)) == is_normalized_complex)
   ONLY_NLCs = FALSE;

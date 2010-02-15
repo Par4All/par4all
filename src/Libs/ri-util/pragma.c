@@ -165,7 +165,7 @@ pragma_to_string (pragma p) {
 	line_sz +=1;
       }
       flg = TRUE;
-      l_str = words_expression(e);
+      l_str = words_expression(e, NIL);
       l_str = gen_nreverse (l_str);
       if (get_prettyprint_is_fortran() == TRUE) {
 	// In fortran line size can not be more than 72

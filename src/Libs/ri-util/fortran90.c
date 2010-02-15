@@ -370,7 +370,7 @@ int n ;
            prettyprinter warning */
 	statement_ordering(new_s) = statement_ordering(loop_body(obj));
 	statement_comments(new_s) = statement_comments(loop_body(obj));
-	t = text_statement(module, margin, new_s);
+	t = text_statement(module, margin, new_s, NIL);
 	/* FI: Although new_s has been converted to text, it cannot
 	   always be freed. I do not know which part of new_s is
 	   reused in the result of text_statement() or somewhere
@@ -382,7 +382,7 @@ int n ;
 	/* No legal vector form has been found */
 	free_expression(new_lhs);
 	free_expression(new_rhs);
-	t = text_loop_default(module, label, margin, obj, n);
+	t = text_loop_default(module, label, margin, obj, n, NIL);
     }
 
     pips_assert("Loop obj still is consistent", loop_consistent_p(obj));

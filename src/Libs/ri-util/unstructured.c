@@ -69,13 +69,13 @@ text_unstructured(entity module,
 	    statement st = control_statement(n) ;
 
 	    /*
-	      fprintf(stderr, "\n%*sNode %p (%s)\n--\n", margin, "", 
+	      fprintf(stderr, "\n%*sNode %p (%s)\n--\n", margin, "",
 	      (unsigned int) n, control_to_label_name(n, labels)) ;
 	      */
-	    fprintf(stderr, "\n%*sNode %p (%s)\n--\n", margin, "", 
+	    fprintf(stderr, "\n%*sNode %p (%s)\n--\n", margin, "",
 		    n, statement_identification(st));
 	    ifdebug(9)
-		print_text(stderr, text_statement(module,margin,st));
+	      print_text(stderr, text_statement(module,margin,st,NIL));
 	    fprintf(stderr, "--\n%*sPreds:", margin, "");
 	    MAPL(ps,{
 		int so = statement_ordering(control_statement(CONTROL(CAR(ps))));
@@ -515,7 +515,7 @@ text_trail(entity module, int margin, list trail, hash_table labels)
 		sentence s = make_sentence(is_sentence_unformatted,
 					   make_unformatted(NULL, 0, margin, pc)) ;
 		unformatted_label(sentence_unformatted(s)) = l ;
-		ADD_SENTENCE_TO_TEXT(r, s);    
+		ADD_SENTENCE_TO_TEXT(r, s);
 		debug(3, "text_trail", "Label %s generated for stmt %s\n",
 		      l, statement_identification(control_statement(c)));
 	    }
@@ -527,7 +527,7 @@ text_trail(entity module, int margin, list trail, hash_table labels)
 
 	switch(nsucc) {
 	case 0:
-	    MERGE_TEXTS(r, text_statement(module, margin, st));
+	  MERGE_TEXTS(r, text_statement(module, margin, st, NIL));
 	    break;
 	case 1: {
 	    control succ = CONTROL(CAR(control_successors(c)));
@@ -545,7 +545,7 @@ text_trail(entity module, int margin, list trail, hash_table labels)
 			  !check_io_statement_p(control_statement(succ)));
 	    }
 
-	    MERGE_TEXTS(r, text_statement(module, margin, st));
+	    MERGE_TEXTS(r, text_statement(module, margin, st, NIL));
 
 	    /* If the statement "really" has a continuation (e.g. not a STOP
 	     * or a RETURN)
@@ -585,13 +585,13 @@ text_trail(entity module, int margin, list trail, hash_table labels)
 
 	    MERGE_TEXTS(r, init_text_statement(module, margin, st)) ;
 	    if (! string_undefined_p(comments)) {
-		ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted, 
+		ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted,
 						      strdup(comments)));
 	    }
 
 	    pc = CHAIN_SWORD(NIL, prettyprint_is_fortran?"IF (":"if (");
 	    t = instruction_test(i);
-	    pc = gen_nconc(pc, words_expression(test_condition(t)));
+	    pc = gen_nconc(pc, words_expression(test_condition(t), NIL));
 
 	    /* Is there a textual successor? */
 	    if(!ENDP(CDR(cc))) {

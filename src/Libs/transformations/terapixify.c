@@ -552,7 +552,7 @@ bool can_terapixify_expression_p(expression e, bool *can_terapixify)
 
     if(!basic_int_p(b) && ! basic_overloaded_p(b))
     {
-        list ewords = words_expression(e);
+      list ewords = words_expression(e,NIL);
         string estring = words_to_string(ewords);
         string bstring = basic_to_string(b);
         printf("found invalid expression %s of basic %s\n",estring, bstring);

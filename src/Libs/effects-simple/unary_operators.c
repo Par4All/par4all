@@ -63,16 +63,16 @@
  subscripted array). This has to be done at a higher level. (BC)
 
  */
-effect reference_to_simple_effect(reference ref, tag act, 
+effect reference_to_simple_effect(reference ref, tag act,
 				  bool use_preference_p)
 {
   entity ent = reference_variable(ref);
   effect eff = effect_undefined;
   action ac = make_action(act, UU);
 
-  pips_debug(8, "Begins for reference: \"%s\"\n", 
-	     words_to_string(words_reference(ref)));
-  
+  pips_debug(8, "Begins for reference: \"%s\"\n",
+	     words_to_string(words_reference(ref,NIL)));
+
   if (same_string_p(entity_name(ent), ALL_MEMORY_ENTITY_NAME))
     {
       /* anywhere effect */
@@ -82,12 +82,12 @@ effect reference_to_simple_effect(reference ref, tag act,
 			make_descriptor_none());
     }
   else
-    {    
-      
+    {
+
       list ind = reference_indices(ref);
       type t = entity_type(reference_variable(ref));
       type ut = basic_concrete_type(t);
-      
+
       
       if(type_variable_p(ut)) 
 	{

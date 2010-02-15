@@ -494,7 +494,7 @@ statement MakeCaseStatement(expression e)
            xxx is unique from LoopStack */
   int i = basic_int((basic) stack_head(LoopStack));
   string lab ;
-  string estr = words_to_string(words_expression(e));
+  string estr = words_to_string(words_expression(e, NIL));
   asprintf(&lab,"switch_%d_case_%s",i,estr);
   free(estr);
   statement s = MakeLabeledStatement(lab,

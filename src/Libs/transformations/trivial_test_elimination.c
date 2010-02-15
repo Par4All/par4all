@@ -21,9 +21,9 @@
   along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
-#include <stdio.h> 
-#include <stdlib.h> 
-#include <string.h> 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include "genC.h"
 #include "linear.h"
@@ -94,21 +94,22 @@ MakeInvertExpression(expression e)
       expression e2 = expression_undefined;
       if (!ENDP(args)) {
 	e1 =  EXPRESSION(CAR(args));
-	if (!ENDP(CDR(args)))  
+	if (!ENDP(CDR(args)))
 	  e2 = EXPRESSION(CAR(CDR(args)));
       }
- 
+
       if (relational_expression_p(e)) {
 	normalized n1 = NORMALIZE_EXPRESSION(e1);
 	normalized n2 = NORMALIZE_EXPRESSION(e2);
-	pips_debug(8, "The expression %s is a relational expression\n", words_to_string(words_syntax(expression_syntax(e))));
-	  
+	pips_debug(8, "The expression %s is a relational expression\n",
+		   words_to_string(words_syntax(expression_syntax(e), NIL)));
+
 	if (normalized_linear_p(n1) && normalized_linear_p(n2)) {
 
 	  if (ENTITY_NON_EQUAL_P(op)) {
 	    nc = eq_expression(e1, e2);
-	  }		    
-          else if (ENTITY_EQUAL_P(op)) {
+	  }
+	  else if (ENTITY_EQUAL_P(op)) {
 	    nc = ne_expression(e1, e2);
 	  }
 	  else if (ENTITY_GREATER_OR_EQUAL_P(op)) {
@@ -126,7 +127,8 @@ MakeInvertExpression(expression e)
 	}
       }
       else if (logical_operator_expression_p(e)) {
-	pips_debug(8, "The expression %s is a logical expression\n", words_to_string(words_syntax(expression_syntax(e))));
+	pips_debug(8, "The expression %s is a logical expression\n",
+		   words_to_string(words_syntax(expression_syntax(e), NIL)));
 
 	if (ENTITY_NOT_P(op)) {
 	  tmpc = copy_expression(e1);
@@ -134,12 +136,12 @@ MakeInvertExpression(expression e)
 	else if (ENTITY_AND_P(op)) {
 	  expression tmpc1 = MakeInvertExpression(e1);
 	  expression tmpc2 = MakeInvertExpression(e2);
-          tmpc = or_expression(tmpc1, tmpc2);
+	  tmpc = or_expression(tmpc1, tmpc2);
 	}
 	else if (ENTITY_OR_P(op)) {
 	  expression tmpc1 = MakeInvertExpression(e1);
 	  expression tmpc2 = MakeInvertExpression(e2);
-          tmpc = and_expression(tmpc1, tmpc2);
+	  tmpc = and_expression(tmpc1, tmpc2);
 	}
 	else if (ENTITY_EQUIV_P(op)) {
 	  // expression tmpc1 = MakeInvertExpression(e1);

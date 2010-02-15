@@ -1319,8 +1319,8 @@ static void instrument_call_rwt(call c)
 		}
 	      /* As we can not modify ALL.code, we cannot use a function like :
 		 insert_statement(stmt,new_s,TRUE).
-		 Instead, we have to stock the assignment as weel as the ordering 
-		 of the call site in a special file, named TD_instrument.out, and 
+		 Instead, we have to stock the assignment as weel as the ordering
+		 of the call site in a special file, named TD_instrument.out, and
 		 then use a script to insert the assignment before the call site.*/
 	      ifdebug(2)
 		{
@@ -1330,12 +1330,12 @@ static void instrument_call_rwt(call c)
 		}
 	      fprintf(instrument_file, "%s\t%s\t%s\t(%d,%d)\n",PREFIX2,file_name_caller,
 		      module_local_name(current_caller),ORDERING_NUMBER(order),ORDERING_STATEMENT(order));
-	      print_text(instrument_file, text_statement(entity_undefined,0,new_s));
+	      print_text(instrument_file, text_statement(entity_undefined,0,new_s,NIL));
 	      fprintf(instrument_file,"%s\n",PREFIX3);
 	      number_of_array_size_assignments++;
 	    }
 	}
-      else 
+      else
 	/* Abnormal case*/
 	pips_user_warning("Actual argument is an undefined expression\n");
     }
@@ -1546,7 +1546,7 @@ static void top_down_adn_callers_arrays(list l_arrays,list l_callers)
 		  fprintf(instrument_file, "%s\t%s\t%s\t(%d,%d)\n",PREFIX2,file_name_caller,caller_name,0,1);
 		  fprintf(instrument_file, new_decl);
 		  fprintf(instrument_file, "%s\n",PREFIX3);
-		  
+
 		  /* insert "I_PIPS_SUB_ARRAY = actual_array_size" before each call site*/
 		  instrument_caller_array();
 		  current_variable_caller = entity_undefined;
@@ -1560,23 +1560,23 @@ static void top_down_adn_callers_arrays(list l_arrays,list l_callers)
 	}
       fprintf(instrument_file,"%s\t%s\t%s\t%s\t%d\t%s\t%s\n",PREFIX1,file_name,
 	      callee_name,entity_local_name(current_dummy_array),length,
-	      words_to_string(words_expression(dimension_upper(last_dim))),
-	      words_to_string(words_expression(new_value)));
+	      words_to_string(words_expression(dimension_upper(last_dim),NIL)),
+	      words_to_string(words_expression(new_value,NIL)));
       dimension_upper(last_dim) = new_value;
       l_arrays = CDR(l_arrays);
     }
   free(file_name), file_name = NULL;
 }
 
-/* The rule in pipsmake permits a top-down analysis  
-     
+/* The rule in pipsmake permits a top-down analysis
+
 array_resizing_top_down         > MODULE.new_declarations
                                 > PROGRAM.entities
         < PROGRAM.entities
         < CALLERS.code
 	< CALLERS.new_declarations
 
-Algorithm : For each module that is called by the main program 
+Algorithm : For each module that is called by the main program
 - Take the declaration list. 
 - Take list of unnormalized array declarations   
   - For each unnormalized array that is formal variable. 

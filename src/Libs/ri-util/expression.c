@@ -1091,12 +1091,12 @@ void print_syntax_expressions(list le)
 
 void print_syntax(syntax s)
 {
-    print_words(stderr,words_syntax(s));
+  print_words(stderr,words_syntax(s, NIL));
 }
 
 void print_reference(reference r)
 {
-    print_words(stderr,words_reference(r));
+  print_words(stderr,words_reference(r, NIL));
 }
 
 void print_reference_list(list lr)
@@ -1778,10 +1778,10 @@ expression make_op_exp(char *op_name, expression exp1, expression exp2)
 					    UNARY_MINUS_OPERATOR_NAME),
 		       entity_domain);
 
-  debug(5, "make_op_exp", "begin OP EXP : %s  %s  %s\n",
-	words_to_string(words_expression(exp1)),
+  pips_debug(5, "begin OP EXP : %s  %s  %s\n",
+	words_to_string(words_expression(exp1, NIL)),
 	op_name,
-	words_to_string(words_expression(exp2)));
+	words_to_string(words_expression(exp2, NIL)));
 
   if( ! ENTITY_FIVE_OPERATION_P(op_ent) )
     user_error("make_op_exp", "operation must be : +, -, *, MOD, or /");
@@ -1856,8 +1856,8 @@ expression make_op_exp(char *op_name, expression exp1, expression exp2)
   if(result_exp == expression_undefined)
     result_exp = MakeBinaryCall(op_ent, exp1, exp2);
 
-  debug(5, "make_op_exp", "end   OP EXP : %s\n",
-	words_to_string(words_expression(result_exp)));
+  pips_debug(5, "end   OP EXP : %s\n",
+	words_to_string(words_expression(result_exp, NIL)));
 
   return (result_exp);
 }

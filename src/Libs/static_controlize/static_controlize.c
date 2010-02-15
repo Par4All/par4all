@@ -361,7 +361,7 @@ statement st;
 	  /* FI: I'm not sure about the fourth argument of
 	     words_call() */
 	  sprintf(comment, "%s %s", comment,
-		  words_to_string(words_call(ca, 0, TRUE, TRUE)));
+		  words_to_string(words_call(ca, 0, TRUE, TRUE, NIL)));
 	  sprintf(comment, "%s\n", comment);
 
 	  pips_assert("no buffer overflow", strlen(comment)<64);

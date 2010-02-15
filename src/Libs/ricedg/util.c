@@ -332,7 +332,7 @@ static void prettyprint_dot_label( FILE *fd, statement s, bool print_statement )
     // Get the text without comments
     list
         sentences =
-            text_sentences(text_statement_enclosed(entity_undefined,0,s,false,true ) );
+      text_sentences(text_statement_enclosed(entity_undefined,0,s,false,true,NIL ) );
 
     // Restoring comments
     statement_comments(s) = i_comments;

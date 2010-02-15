@@ -403,10 +403,10 @@ static expression interprocedural_abc_arrays(call c, entity actual_array,
 		user_log("%s\t%s\t%s\t%s\t%s\t%s\t%s\n",PREFIX,
 			 entity_module_name(actual_array),
 			 entity_local_name(actual_array),
-			 words_to_string(words_expression(actual_array_size)),
+			 words_to_string(words_expression(actual_array_size,NIL)),
 			 entity_module_name(dummy_array),
 			 entity_local_name(dummy_array),
-			 words_to_string(words_expression(dummy_array_size)));
+			 words_to_string(words_expression(dummy_array_size,NIL)));
 	    }
 	  else
 	    {
@@ -420,12 +420,12 @@ static expression interprocedural_abc_arrays(call c, entity actual_array,
 								 int_to_expression(i_dummy));
 		  retour = expression_less_than_in_context(int_to_expression(i_actual),dummy_array_size,prec);
 		}
-	      else 
+	      else
 		retour = expression_less_than_in_context(int_to_expression(1),dummy_array_size,prec);
 	    }
 	}
-      else 
-	pips_user_warning("Cannot translate the size of dummy array %s into module %s's frame\n", 
+      else
+	pips_user_warning("Cannot translate the size of dummy array %s into module %s's frame\n",
 			  entity_local_name(dummy_array),entity_local_name(current_callee));
         /* This case is rare, because size of dummy array = constants or formal parameters or commons*/
     }
@@ -504,13 +504,13 @@ static array_test interprocedural_abc_call(call c, statement s)
 		},
 		    l_decls);
 	      }
-	    else 
+	    else
 	      /* Actual argument is an assumed-size array => what to do ?*/
 	      pips_user_warning("Actual argument %s is an assumed-size array\n",
 				entity_local_name(actual_array));
 	  }
 	i++;
-      },  
+      },
 	  l_args);
     }
   return retour;
@@ -525,33 +525,33 @@ static array_test interprocedural_abc_expression(expression e, statement s)
 }
 
 static statement make_interprocedural_abc_tests(array_test at)
-{  
-  list la = at.arr,le = at.exp; 
+{
+  list la = at.arr,le = at.exp;
   statement retour = statement_undefined;
   while (!ENDP(la))
-    { 
+    {
       entity a = ENTITY(CAR(la));
-      expression e = EXPRESSION(CAR(le));     
-      string stop_message = strdup(concatenate("\"Bound violation: array ", 
+      expression e = EXPRESSION(CAR(le));
+      string stop_message = strdup(concatenate("\"Bound violation: array ",
 					  entity_name(a),"\"", NULL));
       string print_message = strdup(concatenate("\'BV array ",entity_name(a)," with ",
-						words_to_string(words_syntax(expression_syntax(e))),
+						words_to_string(words_syntax(expression_syntax(e),NIL)),
 						"\'",print_variables(e), NULL));
       statement smt = statement_undefined;
       if (true_expression_p(e))
 	{
-	  /* There is a bound violation, we can return a stop statement immediately, 
+	  /* There is a bound violation, we can return a stop statement immediately,
 	     but for debugging purpose, it is better to display all bound violations */
 	  number_of_bound_violations++;
-	  if (get_bool_property("PROGRAM_VERIFICATION_WITH_PRINT_MESSAGE"))   
-	    smt = make_print_statement(print_message);	  
+	  if (get_bool_property("PROGRAM_VERIFICATION_WITH_PRINT_MESSAGE"))
+	    smt = make_print_statement(print_message);
 	  else
-	    smt = make_stop_statement(stop_message);	
+	    smt = make_stop_statement(stop_message);
 	}
       else
 	{
 	  number_of_added_tests++;
-	  if (get_bool_property("PROGRAM_VERIFICATION_WITH_PRINT_MESSAGE"))   
+	  if (get_bool_property("PROGRAM_VERIFICATION_WITH_PRINT_MESSAGE"))
 	    smt = test_to_statement(make_test(e, make_print_statement(print_message),
 					      make_block_statement(NIL)));
 	  else
@@ -560,9 +560,9 @@ static statement make_interprocedural_abc_tests(array_test at)
 	}
       if (statement_undefined_p(retour))
 	retour = copy_statement(smt);
-      else 
+      else
 	// always structured case
-	insert_statement(retour,copy_statement(smt),FALSE);   
+	insert_statement(retour,copy_statement(smt),FALSE);
       la = CDR(la);
       le = CDR(le);
     }

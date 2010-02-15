@@ -161,8 +161,9 @@ static void loop_annotate(loop l)
 				     CONS(EXPRESSION, c_number_iter_exp, NIL));
 	}
       
+      /* FI: how about an expression_to_string() */
       pips_debug(2, "guard expression : %s\n",
-		 words_to_string(words_expression(guard_exp)));
+		 words_to_string(words_expression(guard_exp, NIL)));
 
       guard_s = test_to_statement(make_test(guard_exp,
 					    loop_body(l),
@@ -188,7 +189,7 @@ static void loop_annotate(loop l)
       FOREACH(EXPRESSION, upper_exp, l_number_iter_exp)
 	{
         string buf,
-               buf1=words_to_string(words_expression(upper_exp));
+	  buf1=words_to_string(words_expression(upper_exp, NIL));
         asprintf(&buf,"%s%s",outer_s,buf1);
         free(outer_s);free(buf1);
         outer_s=buf;

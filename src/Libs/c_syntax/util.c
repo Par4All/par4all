@@ -1214,7 +1214,7 @@ void UpdatePointerEntity(entity e, type pt, list lq)
 {
   type t = entity_type(e);
   pips_debug(3,"Update pointer entity %s with type pt=\"%s\"\n",
-	     entity_name(e), list_to_string(c_words_entity(pt, NIL)));
+	     entity_name(e), list_to_string(c_words_entity(pt, NIL, NIL)));
   if (type_undefined_p(t))
     {
       pips_debug(3,"Undefined entity type\n");
@@ -1256,7 +1256,8 @@ void UpdatePointerEntity(entity e, type pt, list lq)
 	  /* Make e a function returns a pointer */
 	  functional f = type_functional(t);
 	  pips_debug(3,"Function returns a pointer \n");
-	  entity_type(e) = make_type_functional(make_functional(functional_parameters(f),pt));
+	  entity_type(e) =
+	    make_type_functional(make_functional(functional_parameters(f),pt));
 	  break;
 	}
       default:
@@ -1266,7 +1267,8 @@ void UpdatePointerEntity(entity e, type pt, list lq)
       }
     }
   pips_debug(3,"Ends with type \"%s\" for entity %s\n",
-	     list_to_string(c_words_entity(entity_type(e), NIL)), entity_name(e));
+	     list_to_string(c_words_entity(entity_type(e), NIL, NIL)),
+	     entity_name(e));
 }
 
 void UpdateArrayEntity(entity e, list lq, list le)

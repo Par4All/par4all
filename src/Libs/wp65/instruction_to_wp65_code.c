@@ -358,10 +358,10 @@ translate_IO_ref(call c, hash_table v_to_esv, boolean loop_or_call_print)
 	    arg = EXPRESSION(CAR(CDR(pio)));
 	    
 	    if (((strcmp(entity_local_name(call_function(c1)),"FMT=")==0) &&
-		 (strcmp(words_to_string(words_expression(arg)),"*")==0)) 
+		 (strcmp(words_to_string(words_expression(arg,NIL)),"*")==0))
 		||((strcmp(entity_local_name(call_function(c1)),"UNIT=")==0) 
 		   &&
-		   (strcmp(words_to_string(words_expression(arg)),"*")==0)))
+		   (strcmp(words_to_string(words_expression(arg,NIL)),"*")==0)))
 		pio = CDR(CDR(pio));
 	    else
 		if (strcmp(entity_local_name(call_function(c1)),

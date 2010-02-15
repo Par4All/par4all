@@ -141,7 +141,7 @@ text_region(effect reg)
     /* REFERENCE
      */
     r = effect_any_reference(reg);
-    ls = foresys? words_reference(r): effect_words_reference(r);
+    ls = foresys? words_reference(r, NIL): effect_words_reference(r);
 
     MAP(STRING, s, append(s), ls);
     gen_free_string_list(ls); ls = NIL;

@@ -235,7 +235,7 @@ string compilation_unit_of_module(string module_name)
   return compilation_unit_name;
 }
 
-/* Translate and expand a list of virtual resources into a potentially 
+/* Translate and expand a list of virtual resources into a potentially
  * much longer list of real resources
  *
  * this is intrinsically a bad idea: if a new module is created as
@@ -255,7 +255,7 @@ static list build_real_resources(string oname, list lvr)
 	string vrn = virtual_resource_name(vr);
 	tag vrt = owner_tag(virtual_resource_owner(vr));
 
-	switch (vrt) 
+	switch (vrt)
 	{
 	    /* FI: should be is_owner_workspace, but changing Newgen decl... */
 	case is_owner_program:
@@ -272,14 +272,14 @@ static list build_real_resources(string oname, list lvr)
 	    int number_of_main = 0;
 	    gen_array_t a = db_get_module_list();
 
-	    GEN_ARRAY_MAP(on, 
+	    GEN_ARRAY_MAP(on,
 	    {
 		if (entity_main_module_p
 		    (local_name_to_top_level_entity(on)) == TRUE)
 		{
 		    if (number_of_main)
 			pips_internal_error("More than one main\n");
-		    
+
 		    number_of_main++;
 		    pips_debug(8, "Main is %s\n", (string) on);
 		    add_res(vrn, on);
@@ -301,13 +301,13 @@ static list build_real_resources(string oname, list lvr)
 				"Some source code probably is missing!\n",
 				 oname);
 	    }
-	    
-	    called_modules = (callees) 
+
+	    called_modules = (callees)
 		db_get_memory_resource(DBR_CALLEES, oname, TRUE);
 	    lcallees = gen_copy_string_list(callees_callees(called_modules));
-	    
+
 	    pips_debug(8, "Callees of %s are:\n", oname);
-	    MAP(STRING, on, 
+	    MAP(STRING, on,
 	    {
 		pips_debug(8, "\t%s\n", on);
 		add_res(vrn, on);
@@ -331,7 +331,7 @@ static list build_real_resources(string oname, list lvr)
 			    oname);
 	    }
 
-	    caller_modules = (callees) 
+	    caller_modules = (callees)
 		db_get_memory_resource(DBR_CALLERS, oname, TRUE);
 	    lcallers = gen_copy_string_list(callees_callees(caller_modules));
 
@@ -380,9 +380,16 @@ static list build_real_resources(string oname, list lvr)
 	    if(string_undefined_p(compilation_unit_name)) {
 	      /* Source code for module oname is not available */
 	      if(compilation_unit_p(oname)) {
-		pips_internal_error("Synthetic compilation units cannot be missing"
+		/* The user can make typos in tpips scripts about
+		   compilation unit names */
+		/* pips_internal_error("Synthetic compilation units cannot be missing"
 				    " because they are synthesized"
-				    " with the corresponding file\n", oname);
+				    " with the corresponding file\n",
+				    oname);
+		*/
+		pips_user_error("No source code for compilation unit \"%s\"\n."
+				"Compilation units cannot be synthesized.\n",
+				oname);
 	      }
 	      pips_user_warning("No source code for module %s.\n", oname);
 	      compilation_unit_name = strdup(concatenate(oname, FILE_SEP_STRING, NULL));

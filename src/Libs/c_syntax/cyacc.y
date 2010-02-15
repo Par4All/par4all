@@ -455,6 +455,39 @@ c_parser_context GetContextCopy()
   return cc;
 }
 
+/* When struct and union declarations are nested, the rules cannot
+   return information about the internal declarations because they
+   must return type information. Hence internal declarations must be
+   recorded and re-used when the final continue/declaration statement
+   is generated. In order not to confuse the prettyprinter, they must
+   appear first in the declaration list, that is in the innermost to
+   outermost order. */
+
+static list internal_derived_entity_declarations = NIL;
+
+static void RecordDerivedEntityDeclaration(entity de)
+{
+  internal_derived_entity_declarations
+    = gen_nconc(internal_derived_entity_declarations,
+		CONS(ENTITY, de, NIL));
+}
+
+static list GetDerivedEntityDeclarations()
+{
+  list l = internal_derived_entity_declarations;
+  /* The list spine is going to be reused by the caller. No need to
+     free. */
+  internal_derived_entity_declarations = NIL;
+  return l;
+}
+
+static list ResetDerivedEntityDeclarations()
+{
+  if(!ENDP(internal_derived_entity_declarations)) {
+    gen_free_list(internal_derived_entity_declarations);
+    internal_derived_entity_declarations = NIL;
+  }
+}
 %}
 
 /* Bison declarations */
@@ -1734,15 +1767,21 @@ declaration:                               /* ISO 6.7.*/
 				      continue_statements_p(sl1));
 			  pips_assert("el2 is an entity list", entities_p(el2));
 			  if(ENDP(sl1)) {
+			    list el0 = GetDerivedEntityDeclarations();
 			    string sc = get_current_C_comment();
 			    int sn = get_current_C_line_number();
 			    s =
 			      make_continue_statement(entity_empty_label());
+			    FOREACH(ENTITY, e, el0) {
+			      if(!gen_in_list_p(e, el2))
+				el2 = CONS(ENTITY, e, el2);
+			    }
 			    statement_declarations(s) = el2;
 			    s = add_comment_and_line_number(s, sc, sn);
 			    $$ = CONS(STATEMENT,s, NIL);
 			    el12 = el2;
 			    el1 = NIL;
+
 			    ifdebug(8) {
 			      pips_debug(8, "New continue statement for entities: ");
 			      print_entities(el2);
@@ -1750,9 +1789,14 @@ declaration:                               /* ISO 6.7.*/
 			    }
 			  }
 			  else if(gen_length(sl1)==1){
+			    list el0 = GetDerivedEntityDeclarations();
+			    list el012 = NIL;
 			    s = STATEMENT(CAR(sl1));
 			    el1 = statement_declarations(s);
 			    ifdebug(8) {
+			      pips_debug(8, "Recorded derived entities: ");
+			      print_entities(el0);
+			      fprintf(stderr, "\n");
 			      pips_debug(8, "Previous continue statement for entities: ");
 			      print_entities(el1);
 			      fprintf(stderr, "\n");
@@ -1761,7 +1805,19 @@ declaration:                               /* ISO 6.7.*/
 			      fprintf(stderr, "\n");
 			    }
 			    el12 = gen_nconc(statement_declarations(s), el2);
-			    statement_declarations(s) = el12;
+			    // This could introduce duplicate declarations
+			    //el012 = gen_nconc(el0, el12);
+			    //el012 = el12;
+			    el0 = gen_nreverse(el0);
+			    el012 = el12;
+			    FOREACH(ENTITY, e, el0) {
+			      if(!gen_in_list_p(e, el012))
+				el012 = CONS(ENTITY, e, el012);
+			    }
+			    pips_assert("no duplicate declaration",
+					gen_once_p(el012));
+			    gen_free_list(el0);
+			    statement_declarations(s) = el012;
 			  }
 			  else {
 			    pips_internal_error("Unexpected case");
@@ -1781,6 +1837,7 @@ declaration:                               /* ISO 6.7.*/
                         {
 			  //stack_pop(ContextStack);
 			  PopContext();
+			  ResetDerivedEntityDeclarations();
 			  $$ = $1;
 			}
 ;
@@ -1924,8 +1981,8 @@ my_decl_spec_list:                         /* ISO 6.7 */
                                         /* ISO 6.7.2 */
 |   type_spec decl_spec_list_opt_no_named
                         {
-			  list el = $1;
-			  list sl = $2;
+			  list el = $1; // entity list
+			  list sl = $2; // statement list
 			  list rl = list_undefined;
 			  pips_assert("el contains an entity list", entities_p(el));
 			  //pips_assert("CONTINUE for declarations", continue_statements_p(el));
@@ -2151,13 +2208,17 @@ type_spec:   /* ISO 6.7.2 */
                         {
 			  /* Create the struct entity */
 			  entity ent = MakeDerivedEntity($2,$5,is_external,is_type_struct);
+			  /* Record the declaration of the struct
+			     entity */
+			  RecordDerivedEntityDeclaration(ent);
 			  /* Specify the type of the variable that follows this declaration specifier*/
 			  variable v = make_variable(make_basic_derived(ent),NIL,NIL);
 			  /* Take from $5 the struct/union entities */
 			  list le = TakeDerivedEntities($5);
-			  $$ = gen_nconc(le,CONS(ENTITY,ent,NIL));
+			  list rl = gen_nconc(le,CONS(ENTITY,ent,NIL));
 			  c_parser_context_type(ycontext) = make_type_variable(v);
 			  stack_pop(StructNameStack);
+			  $$ = rl;
 			}
 |   TK_STRUCT TK_LBRACE
                         {
@@ -2224,6 +2285,7 @@ type_spec:   /* ISO 6.7.2 */
 			  /* Create the union entity with unique name */
 			  string s = code_decls_text((code) stack_head(StructNameStack));
 			  entity ent = MakeDerivedEntity(s,$4,is_external,is_type_union);
+			  RecordDerivedEntityDeclaration(ent);
 			  variable v = make_variable(make_basic_derived(ent),NIL,NIL);
 			  /* Take from $4 the struct/union entities */
 			  (void)TakeDerivedEntities($4);
@@ -2261,6 +2323,7 @@ type_spec:   /* ISO 6.7.2 */
                         {
                           /* Create the enum entity */
 			  entity ent = MakeDerivedEntity($2,$4,is_external,is_type_enum);
+			  RecordDerivedEntityDeclaration(ent);
 			  variable v = make_variable(make_basic_derived(ent),NIL,NIL);
 
 			  InitializeEnumMemberValues($4);

@@ -1003,37 +1003,37 @@ fortran_summary_to_proper_effects(entity func,
         reference has at leat one index.       
  @param real_arg is an expression. It's the real argument corresponding to
         the formal parameter which memory effects are represented by l_sum_eff.
- @param context is the transformer translating the callee's neame space into 
-        the caller's name space.	 
+ @param context is the transformer translating the callee's neame space into
+        the caller's name space.
  @return a list of effects which are the translation of l_sum_eff in the
          caller's name space.
  */
-list c_simple_effects_on_formal_parameter_backward_translation(list l_sum_eff, 
-						  expression real_arg, 
+list c_simple_effects_on_formal_parameter_backward_translation(list l_sum_eff,
+						  expression real_arg,
 						  transformer context)
 {
   list l_eff = NIL; /* the result */
   syntax real_s = expression_syntax(real_arg);
   type real_arg_t = expression_to_type(real_arg);
-  
-  
+
+
   ifdebug(5)
     {
-      pips_debug(8, "begin for real arg %s, of type %s and effects :\n", 
-		 words_to_string(words_expression(real_arg)),
+      pips_debug(8, "begin for real arg %s, of type %s and effects :\n",
+		 words_to_string(words_expression(real_arg,NIL)),
 		 type_to_string(real_arg_t));
-      (*effects_prettyprint_func)(l_sum_eff);		 
+      (*effects_prettyprint_func)(l_sum_eff);
     }
-  
+
   switch (syntax_tag(real_s))
     {
     case is_syntax_reference:
-      {  
+      {
 	reference real_ref = syntax_reference(real_s);
 	entity real_ent = reference_variable(real_ref);
 	list real_ind = reference_indices(real_ref);
-	
-	/* if it's a pointer or a partially indexed array 
+
+	/* if it's a pointer or a partially indexed array
 	 * We should do more testing here to check if types
 	 * are compatible... (see effect_array_substitution ?)
 	 */
@@ -1330,11 +1330,11 @@ list c_simple_effects_on_formal_parameter_backward_translation(list l_sum_eff,
  * FI: it might be better to return a list of effects including the
  * read implied by the evaluation of real_arg
  * BC : no because there can be several effects for one real arg. This would
- * induce redundant, hence harmful, computations. 
- * 
- 
+ * induce redundant, hence harmful, computations.
+ *
+
  */
-list c_summary_effect_to_proper_effects(effect eff, expression real_arg) 
+list c_summary_effect_to_proper_effects(effect eff, expression real_arg)
 {
   list l_eff = NIL; /* the result */
 
@@ -1344,9 +1344,9 @@ list c_summary_effect_to_proper_effects(effect eff, expression real_arg)
 
   ifdebug(8)
     {
-      pips_debug(8, "begin for real arg %s, and effect :\n", 
-		 words_to_string(words_expression(real_arg)));
-      print_effect(eff);		 
+      pips_debug(8, "begin for real arg %s, and effect :\n",
+		 words_to_string(words_expression(real_arg,NIL)));
+      print_effect(eff);
     }
 
   /* Whatever the real_arg may be if there is an effect on the sole value of the
@@ -1359,7 +1359,7 @@ list c_summary_effect_to_proper_effects(effect eff, expression real_arg)
     }
   else
     {
-      
+
       syntax real_s = expression_syntax(real_arg);
       type real_arg_t = expression_to_type(real_arg);
  

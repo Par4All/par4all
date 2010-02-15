@@ -1482,7 +1482,7 @@ transformer any_scalar_assign_to_transformer(entity v,
       if(entity_is_argument_p(v, transformer_arguments(tf))) {
 	/* Is it standard compliant? The assigned variable is modified by the rhs. */
 	transformer teq = simple_equality_to_transformer(v, tmp, TRUE);
-	string s = words_to_string(words_syntax(expression_syntax(rhs)));
+	string s = words_to_string(words_syntax(expression_syntax(rhs),NIL));
 
 	pips_user_warning("Variable %s in lhs is uselessly updated by the rhs '%s'\n",
 			  entity_local_name(v), s);

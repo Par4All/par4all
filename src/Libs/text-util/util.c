@@ -230,22 +230,22 @@ close_current_line(
     string buffer,
     text txt,
     string continuation)
-{  
+{
   if (strlen(buffer)!=0) /* do not append an empty line to text */ {
-    int lbuffer=0; 
+    int lbuffer=0;
     char stmp = continuation[0];
     char stmp1 = continuation[1];
-    boolean comment = stmp == 'c'|| stmp == 'C'	
+    boolean comment = stmp == 'c'|| stmp == 'C'
       || stmp == '!'|| stmp == '*'
       || (stmp == '/' && stmp1 == '*') || (stmp == '/' && stmp1 == '/');
 
-    if ((lbuffer=strlen(buffer))+2>MAX_LINE_LENGTH) { 
+    if ((lbuffer=strlen(buffer))+2>MAX_LINE_LENGTH) {
       if (comment) {
 	int coupure = MAX_LINE_LENGTH-2;
 	char tmp2[2*MAX_LINE_LENGTH];
 	strcpy(tmp2,buffer+coupure);
 	buffer[coupure]='\0';
-		
+
 	add_to_current_line(buffer,"  ",continuation,txt);
 	add_to_current_line(buffer,tmp2,continuation,txt);
 	close_current_line(buffer,txt,continuation);

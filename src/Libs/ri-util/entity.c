@@ -32,6 +32,7 @@
 #include "linear.h"
 
 #include "genC.h"
+#include "newgen_set.h"
 #include "misc.h"
 #include "ri.h"
 
@@ -39,9 +40,17 @@
 
 void print_entities(list l)
 {
-  MAP(ENTITY, e, {
+  FOREACH(ENTITY, e, l) {
     fprintf(stderr, "%s ", entity_name(e));
-  }, l);
+  }
+}
+
+void print_entity_set(set s)
+{
+  /* For some reason, here entity is not capitalized. */
+  SET_FOREACH(entity, e, s) {
+    fprintf(stderr, "%s ", entity_name(e));
+  }
 }
 
 bool unbounded_expression_p(expression e)
@@ -653,7 +662,9 @@ bool entity_enum_member_p(entity e)
 bool entity_struct_p(entity e)
 {
   string ln = entity_local_name(e);
-  bool struct_p = (*ln==STRUCT_PREFIX_CHAR)
+  string ns = strrchr(ln, BLOCK_SEP_CHAR);
+  bool struct_p = (ns==NULL && *ln==STRUCT_PREFIX_CHAR)
+    || (ns!=NULL && *(ns+1)==STRUCT_PREFIX_CHAR)
     || (strstr(entity_name(e),DUMMY_STRUCT_PREFIX)!=NULL);
   return struct_p;
 }
@@ -661,7 +672,9 @@ bool entity_struct_p(entity e)
 bool entity_union_p(entity e)
 {
   string ln = entity_local_name(e);
-  bool union_p = (*ln==UNION_PREFIX_CHAR)
+  string ns = strrchr(ln, BLOCK_SEP_CHAR);
+  bool union_p = (ns==NULL && *ln==UNION_PREFIX_CHAR)
+    || (ns!=NULL && *(ns+1)==UNION_PREFIX_CHAR)
     || (strstr(entity_name(e),DUMMY_UNION_PREFIX)!=NULL);
   return union_p;
 }

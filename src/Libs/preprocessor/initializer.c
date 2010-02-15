@@ -186,7 +186,10 @@ static text stub_text(entity module, bool is_fortran)
 
     ifdebug(8) {
       if(!is_fortran) {
-	text txt = c_text_entity(entity_undefined, module, 0);
+	/* FI: The result should be good because pdl wil be set to
+	   NIL and the types used for the parameter will simply be
+	   declared but not defined */
+	text txt = c_text_entity_simple(entity_undefined, module, 0);
 	print_text(stderr, txt);
       }
     }
@@ -222,9 +225,11 @@ static text stub_text(entity module, bool is_fortran)
 						     CONS(STRING, strdup("{}"), NIL)));
 	string name = entity_user_name(module);
 	type t = entity_type(module);
-	list pc = generic_c_words_entity(t, CHAIN_SWORD(NIL,name), FALSE, TRUE);
+	/* FI: I do not know what to use to initialize pdl usefully */
+	list pdl = NIL; // each type supporting entity is declared independently
+	list pc = generic_c_words_entity(t, CHAIN_SWORD(NIL,name), FALSE, TRUE, pdl);
 
-	// st = c_text_entity(entity_undefined, module, 0);
+	// st = c_text_entity_simple(entity_undefined, module, 0);
 	st = make_text(NIL);
 	ADD_SENTENCE_TO_TEXT(st, make_sentence(is_sentence_unformatted,
 					       make_unformatted(NULL, 0, 0, pc)));
@@ -257,6 +262,8 @@ static text compilation_unit_text(entity cu, entity module)
     // The text output of the compilation unit:
     text cut = make_text(NIL);
     //entity e = entity_undefined;
+    list pdl = NIL; // Let's hope it works; else pdl should contain
+		    // each type to declare except for the module
 
     pips_assert("We must be in a C prettyprinter environment", !get_prettyprint_is_fortran());
 
@@ -269,7 +276,6 @@ static text compilation_unit_text(entity cu, entity module)
     warning = make_sentence(is_sentence_formatted, strdup(C_FILE_WARNING));
     ADD_SENTENCE_TO_TEXT(cut, warning);
 
-    md = c_text_entity(cu, module, 0);
     sel = functional_type_supporting_entities(sel, type_functional(t));
 
     ifdebug(8) {
@@ -298,7 +304,7 @@ static text compilation_unit_text(entity cu, entity module)
 
     pips_assert("Each entity appears only once", gen_once_p(nsel));
 
-    MAP(ENTITY, se, {
+    FOREACH(ENTITY, se, nsel) {
       string n = entity_user_name(se);
 
       /* Do not declare dummy structures, unions and enumerations,
@@ -307,7 +313,7 @@ static text compilation_unit_text(entity cu, entity module)
       if((strstr(n,DUMMY_ENUM_PREFIX)==NULL) &&
 	 (strstr(n,DUMMY_STRUCT_PREFIX)==NULL) &&
 	 (strstr(n,DUMMY_UNION_PREFIX)==NULL)) {
-	text se_text = c_text_entity(module, se, 0);
+	text se_text = c_text_entity(module, se, 0, pdl);
 
 	ifdebug(8) {
 	  pips_debug(8, "Add declaration of entity \"\%s\"\n", entity_name(se));
@@ -317,8 +323,9 @@ static text compilation_unit_text(entity cu, entity module)
 	MERGE_TEXTS(cut, se_text);
       }
       //free(n);
-    }, nsel);
+    }
 
+    md = c_text_entity(cu, module, 0, pdl);
     MERGE_TEXTS(cut, md);
 
     gen_free_list(nsel);
@@ -332,7 +339,7 @@ static text compilation_unit_text(entity cu, entity module)
 
    The idea is to prettyprint the module to some file resources and to
    parse it later in order to have a full-fledge module with all the PIPS
-   structured up-to-date.
+   data structures up-to-date.
 
    Useful for code generation, out-lining, stub generation...
 
@@ -453,7 +460,7 @@ add_new_module_from_text(string module_name,
    There is still some redundancy with module_name, module and stat
 */
 bool
-add_new_module(string module_name, 
+add_new_module(string module_name,
 	       entity module,
 	       statement stat,
 	       bool is_fortran/*,
@@ -469,8 +476,8 @@ add_new_module(string module_name,
 
 /* Generate a source file for a module, if none available.
  */
-static bool 
-missing_file_initializer(string module_name, bool is_fortran) {
+static bool missing_file_initializer(string module_name, bool is_fortran)
+{
   entity m = local_name_to_top_level_entity(module_name);
   text stub = text_undefined;
 

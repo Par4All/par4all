@@ -1325,18 +1325,18 @@ static list generic_io_effects(entity e, list args, bool system_p)
 	lep = effects_of_C_ioelem(arg, p->IoElementName[lenght-2]);
       else
 	lep = effects_of_C_ioelem(arg, p->IoElementName[i]);
-      
+
       i=i+1;
-      
+
       if (p->MayOrMust == is_approximation_may)
 	effects_to_may_effects(lep);
-      
+
       le = gen_nconc(le, lep);
-      
-      ifdebug(8) 
+
+      ifdebug(8)
 	{
 	  pips_debug(8, "effects for argument %s :\n",
-		     words_to_string(words_expression(arg)));	
+		     words_to_string(words_expression(arg,NIL)));
 	  (*effects_prettyprint_func)(lep);
 	}
     }
@@ -1349,10 +1349,10 @@ static list generic_io_effects(entity e, list args, bool system_p)
      the array, because it updates the file-pointer so
      it reads it and then writes it ...*/
 
-  if(!system_p) 
+  if(!system_p)
     {
       /* FILE * file descriptors are used */
-      if(ENTITY_PRINTF_P(e) || ENTITY_PUTCHAR_P(e) || 
+      if(ENTITY_PRINTF_P(e) || ENTITY_PUTCHAR_P(e) ||
 	 ENTITY_PUTS_P(e)|| ENTITY_VPRINTF_P(e))
 	// The output is written into stdout
       unit = int_to_expression(STDOUT_FILENO);
@@ -1555,13 +1555,13 @@ static list effects_of_any_ioelem(expression exp, tag act, bool is_fortran)
   //syntax s = expression_syntax(exp);
 
   pips_debug(5, "begin with expression %s, act=%s\n",
-	     words_to_string(words_expression(exp)),
-	     (act == is_action_write) ? "w" : 
+	     words_to_string(words_expression(exp,NIL)),
+	     (act == is_action_write) ? "w" :
 	     ((act == 'x') ? "read-write" : "r"));
 
   if (act == 'w' || act == 'x' || act == is_action_write) {
     pips_debug(6, "is_action_write or read-write\n");
-    
+
     if(is_fortran)
       le = generic_proper_effects_of_any_lhs(exp);
     else { /* C language */
@@ -1677,7 +1677,7 @@ static list effects_of_C_ioelem(expression arg, tag act)
   entity private_io_entity;
 
   pips_debug(5, "begin with expression %s and tag %c\n",
-	     words_to_string(words_expression(arg)), act);
+	     words_to_string(words_expression(arg,NIL)), act);
 
   le = gen_nconc(le, generic_proper_effects_of_expression(arg));
 
@@ -1685,9 +1685,9 @@ static list effects_of_C_ioelem(expression arg, tag act)
     {
     case 'f':
       unit = copy_expression(arg);
-    case 's':      
+    case 's':
       pips_debug(5, "stream or integer file descriptor case \n");
-      
+
             /* We simulate actions on files by read/write actions
 	       to a special static integer array.
 	       GO:
@@ -1758,12 +1758,12 @@ effects_of_iolist(list exprs, tag act)
     expression exp = EXPRESSION(CAR(exprs));
 
     pips_debug(5, "begin with exp = %s\n",
-	       words_to_string(words_expression(exp)));
+	       words_to_string(words_expression(exp,NIL)));
 
     if (expression_implied_do_p(exp))
         lep = effects_of_implied_do(exp, act);
     else
-    {        
+    {
        if (act == is_action_write)
         {
             syntax s = expression_syntax(exp);

@@ -22,9 +22,9 @@
 
 */
 
-#include <stdio.h> 
-#include <stdlib.h> 
-#include <string.h> 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include "genC.h"
 #include "linear.h"
@@ -386,14 +386,14 @@ use_def_deal_if_useful(statement s)
    if (get_debug_level() >= 5) {
       fprintf(stderr, "use_def_deal_if_useful: statement %p (%#zx)\n",
               s, statement_ordering(s));
-      print_text(stderr, text_statement(get_current_module_entity(), 0, s));
+      print_text(stderr, text_statement(get_current_module_entity(), 0, s, NIL));
    }
 
    if (statement_ordering(s) == STATEMENT_ORDERING_UNDEFINED) {
       pips_user_warning("exited since it found a statement without ordering: statement %p (%#x)\n", s, statement_ordering(s));
       return;
    }
-   
+
    /* The possible reasons to have useful code: */
    /* - the statement does an I/O: */
    this_statement_has_an_io_effect = statement_io_effect_p(s);

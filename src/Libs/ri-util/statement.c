@@ -978,7 +978,7 @@ void print_statement(statement s)
   bool previous_is_fortran_p = get_prettyprint_is_fortran();
   /* Prettyprint in the correct language: */
   set_prettyprint_is_fortran_p(!get_bool_property("PRETTYPRINT_C_CODE"));
-  text txt = text_statement(entity_undefined, 0, s);
+  text txt = text_statement(entity_undefined, 0, s, NIL);
   print_text(stderr, txt);
   free_text(txt);
   /* Put back the previous prettyprint language: */
@@ -1017,7 +1017,7 @@ text statement_to_text(statement s)
   debug_on("PRETTYPRINT_DEBUG_LEVEL");
   set_alternate_return_set();
   reset_label_counter();
-  t = text_statement(entity_undefined, 0, s);
+  t = text_statement(entity_undefined, 0, s, NIL);
   reset_alternate_return_set();
   debug_off();
 

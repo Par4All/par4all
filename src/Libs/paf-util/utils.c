@@ -841,7 +841,7 @@ list exp_l;
     else
       {
        printf("\nNon linear expression :");
-       printf(" %s\n", words_to_string(words_expression(exp)));
+       printf(" %s\n", words_to_string(words_expression(exp,NIL)));
       }
    }
 
@@ -941,7 +941,7 @@ Psysteme make_expression_equalities(list le)
     else
       {
        printf("\nNon linear expression :");
-       printf(" %s\n", words_to_string(words_expression(exp)));
+       printf(" %s\n", words_to_string(words_expression(exp,NIL)));
       }
    }
  sc_creer_base(new_sc);
@@ -2016,9 +2016,9 @@ expression rational_op_exp(string op_name, expression exp1, expression exp2)
 		       entity_domain);
 
   pips_debug(5, "begin OP EXP : %s  %s  %s\n",
-	     words_to_string(words_expression(exp1)),
+	     words_to_string(words_expression(exp1,NIL)),
 	     op_name,
-	     words_to_string(words_expression(exp2)));
+	     words_to_string(words_expression(exp2,NIL)));
 
   if( ! ENTITY_FOUR_OPERATION_P(op_ent) )
     user_error("rational_op_exp", "operation must be : +, -, * or /");
@@ -2089,7 +2089,7 @@ expression rational_op_exp(string op_name, expression exp1, expression exp2)
     result_exp = MakeBinaryCall(op_ent, exp1, exp2);
 
   pips_debug(5, "end   OP EXP : %s\n",
-	     words_to_string(words_expression(result_exp)));
+	     words_to_string(words_expression(result_exp,NIL)));
 
   return (result_exp);
 }

@@ -254,7 +254,7 @@ entity module;
 statement stat;
 hash_table hash_statement_to_complexity;
 {
-    text t = text_statement(module, 0, stat);
+  text t = text_statement(module, 0, stat, NIL);
     complexity comp;
 
     comp = ((complexity) hash_get(hash_statement_to_complexity,(char *)stat));

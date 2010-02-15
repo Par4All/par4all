@@ -328,7 +328,7 @@ static string c_dim_string(list ldim)
                         /* to be refined here to make more beautiful expression */
                         result = strdup(concatenate(OPENBRACKET,
                                     words_to_string(words_expression(MakeBinaryCall(CreateIntrinsic("+"),
-                                                eup,int_to_expression(1)))),
+										    eup,int_to_expression(1)), NIL)),
                                     CLOSEBRACKET,result,NULL));
                 }
                 else
@@ -337,7 +337,7 @@ static string c_dim_string(list ldim)
                         result = strdup(concatenate(OPENBRACKET,i2a(up-low+1),CLOSEBRACKET,result,NULL));
                     else
                     {
-                        sup = words_to_string(words_expression(eup));
+		      sup = words_to_string(words_expression(eup, NIL));
                         result = strdup(concatenate(OPENBRACKET,sup,"-",i2a(low-1),CLOSEBRACKET,result,NULL));
                         free(sup);
                     }
@@ -395,7 +395,7 @@ static string c_brace_expression_string(expression exp)
         if (brace_expression_p(e))
             result = strdup(concatenate(result,first?"":",",c_brace_expression_string(e),NULL));
         else
-            result = strdup(concatenate(result,first?"":",",words_to_string(words_expression(e)),NULL));
+	  result = strdup(concatenate(result,first?"":",",words_to_string(words_expression(e, NIL)),NULL));
         first = FALSE;
     },args);
     result = strdup(concatenate(result,"}",NULL));
@@ -487,7 +487,7 @@ static string this_entity_cdeclaration(entity var)
                         if (brace_expression_p(exp))
                             result = strdup(concatenate(result,"=",c_brace_expression_string(exp),NULL));
                         else
-                            result = strdup(concatenate(result,"=",words_to_string(words_expression(exp)),NULL));
+			  result = strdup(concatenate(result,"=",words_to_string(words_expression(exp, NIL)),NULL));
                     }
                 }
                 if (basic_bit_p(variable_basic(v)))

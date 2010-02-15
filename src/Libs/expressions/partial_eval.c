@@ -1368,7 +1368,7 @@ void partial_eval_statement(statement stmt)
 					     stmt_prec(stmt),
 					     stmt_to_fx(stmt,fx_map));
       if(get_debug_level()>=9) {
-	print_text(stderr, text_statement(entity_undefined, 0, stmt));
+	print_text(stderr, text_statement(entity_undefined, 0, stmt, NIL));
 	pips_assert("stmt is consistent", statement_consistent_p(stmt));
       }
     } break;
@@ -1394,7 +1394,7 @@ void partial_eval_statement(statement stmt)
       rm_live_loop_index(loop_index(l));
 
       if(get_debug_level()>=9) {
-	print_text(stderr, text_statement(entity_undefined, 0, stmt));
+	print_text(stderr, text_statement(entity_undefined, 0, stmt, NIL));
 	pips_assert("stmt is consistent", statement_consistent_p(stmt));
       }
     } break;
@@ -1417,7 +1417,7 @@ void partial_eval_statement(statement stmt)
       //rm_live_loop_index(loop_index(l));
 
       if(get_debug_level()>=9) {
-	print_text(stderr, text_statement(entity_undefined, 0, stmt));
+	print_text(stderr, text_statement(entity_undefined, 0, stmt, NIL));
 	pips_assert(__func__, statement_consistent_p(stmt));
       }
     } break;
@@ -1437,7 +1437,7 @@ void partial_eval_statement(statement stmt)
       */
 
       if(get_debug_level()>=9) {
-	print_text(stderr, text_statement(entity_undefined, 0, stmt));
+	print_text(stderr, text_statement(entity_undefined, 0, stmt, NIL));
 	pips_assert("stmt is consistent", statement_consistent_p(stmt));
       }
     } break;
