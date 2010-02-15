@@ -197,7 +197,7 @@ static statement rm_block_block_statement(statement stat)
 }
 
 
- 
+
 /*============================================================================*/
 /* void atomizer(char *module_name): computes the translation of Fortran
  * instructions into Three Adresses Code instructions.
@@ -672,7 +672,7 @@ Block *cb;
     case is_value_symbolic: break;
     case is_value_constant: break;
     case is_value_unknown:
-	    pips_error("atomizer_of_call", "unknown function %s\n", n); 
+	    pips_error("atomizer_of_call", "unknown function %s\n", n);
 	    break;
     default: pips_error("atomizer_of_call", "unknown tag %d\n", t);
     }

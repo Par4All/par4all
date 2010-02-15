@@ -2398,10 +2398,24 @@ static list words_enum(string name1, list l, bool space_p, list pc, list pdl)
     constant emc = symbolic_constant(value_symbolic(emv));
     int n = constant_int(emc);
 
+    // SG has decided not to evaluate expressions containins a sizeof
+    // operator because the result is architecture dependent and
+    // because the PIPS user has not specified which architecture
+    // should be used.
+    //
+    // Serge has no idea how many things he has broken in PIPS!!!
+    // constant integer expressions are used in many declarations and
+    // expected by PIPS components. Unexpected results are going to
+    // occur as the blind interpretation of an unknown constant
+    // returns 0!
+    //
+    //if(!constant_int_p(emc))
+    //  pips_internal_error("constant expression not evaluated by parser\n");
+
     if (!first)
       pc = CHAIN_SWORD(pc, space_p? ", " : ",");
     pc = CHAIN_SWORD(pc, entity_user_name(em));
-    if(n!=cv) {
+    if(n!=cv || !constant_int_p(emc)) {
       pc = CHAIN_SWORD(pc, "=");
       pc = gen_nconc(pc, words_expression(eme, pdl));
       cv = n;

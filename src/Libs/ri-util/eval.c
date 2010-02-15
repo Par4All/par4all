@@ -54,17 +54,15 @@ range: a range is not evaluated.
 
 #include "operator.h"
 
-value 
-EvalExpression(expression e)
+value EvalExpression(expression e)
 {
     return EvalSyntax(expression_syntax(e));
 }
 
-value 
-EvalSyntax(syntax s)
+value EvalSyntax(syntax s)
 {
   value v;
-  
+
   switch (syntax_tag(s)) {
   case is_syntax_reference:
   case is_syntax_range:

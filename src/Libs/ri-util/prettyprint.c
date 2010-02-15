@@ -65,7 +65,7 @@ char lib_ri_util_prettyprint_c_rcsid[] = "$Id$";
   *     Thay are now??? FC?
   *
   * - variable pdl added in most signature to handle derived type
-  *   declaration in C; it the parser declaration list; if a derived
+  *   declarations in C; it is the parser declaration list; if a derived
   *   type must be prettyprinted, it must be prettyprinted with all
   *   information if in pdl, and else it must be prettyprinted with no
   *   information. For instance, "struct m {int l; int m}" is the
@@ -75,6 +75,31 @@ char lib_ri_util_prettyprint_c_rcsid[] = "$Id$";
   *   used to desambiguate between the two cases. The problem occurs
   *   in both declarations.c and prettyprint.c because types can
   *   appear in expressions thanks to the sizeof and cast operators.
+  *
+  * Data structures used:
+  *
+  * text: to produce output with multiple lines (a.k.a. "sentence")
+  * and proper indenting; this is a Newgen managed data structure
+  *
+  * words: a list of strings to produce output without any specific
+  * formatting, but text's sentences can be built with words.
+  *
+  * Call graph structure (a slice of it, for C prettyprint):
+  *
+  * text_module
+  *   text_named_module
+  *     text_statement
+  *       text_statement_enclosed: to manage braces
+  *         text_instruction: to print a command
+  *         c_text_related_entities: to print the declarations
+  *                                  all variables declared share some type
+  *           c_text_entities:  to declare a list of variables
+  *             c_text_entity: to declare a variable; may call
+  *                            recursively c_text_related_entities to
+  *                            print out, for instance, a set of membres
+  *               words_variable_or_function(): words level
+  *                 c_words_simplified_entity()
+  *                   generic_c_words_simplified_entity()
   */
 
 // To have asprintf:
@@ -3773,8 +3798,7 @@ text text_named_module(
   return(r);
 }
 
-text
-text_module(
+text text_module(
     entity module,
     statement stat)
 {

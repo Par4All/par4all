@@ -48,7 +48,7 @@ instruction inst;
 list l;
 {
 bool not_found = TRUE;
- 
+
 while((not_found) && (l != NIL))
   {
   instruction current_inst = INSTRUCTION(CAR(l));
@@ -56,7 +56,7 @@ while((not_found) && (l != NIL))
     not_found = FALSE;
   else
     l = CDR(l);
-  }   
+  }
 return (! not_found);
 }
 
@@ -92,7 +92,7 @@ else
 
     if( ! term_cst(vect) )
       if( ! (ENTITY_NLC_P(var)) )
-        ONLY_NLCs = FALSE;
+	ONLY_NLCs = FALSE;
     }
   }
 
