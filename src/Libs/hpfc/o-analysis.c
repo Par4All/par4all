@@ -808,6 +808,10 @@ generate_optimized_code_for_loop_nest(
 					     MakeBasic(is_basic_int));
 	     oldidxvl = make_new_scalar_variable(node_module, 
 					     MakeBasic(is_basic_int));
+         AddEntityToCurrentModule(newindex);
+         AddEntityToCurrentModule(newlobnd);
+         AddEntityToCurrentModule(newupbnd);
+         AddEntityToCurrentModule(oldidxvl);
 
 	     bc = statement_compute_bounds
 		 (newlobnd, newupbnd, oldidxvl, lb, ub, an, p);

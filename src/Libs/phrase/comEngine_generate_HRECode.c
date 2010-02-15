@@ -377,6 +377,7 @@ static void generate_scalar_variables()
 	entity new_ent = make_new_scalar_variable_with_prefix(name,
 							      get_current_module_entity(),
 							      bas);
+    AddEntityToCurrentModule(new_ent);
 
 	hash_put(gRefToHREVar, curRef, new_ent);
 

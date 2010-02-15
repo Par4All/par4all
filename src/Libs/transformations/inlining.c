@@ -240,8 +240,6 @@ entity make_temporary_scalar_entity(entity efrom, expression from)
         free_value(entity_initial(new));
         entity_initial(new) = make_value_expression(copy_expression(from));
     }
-    /* add it to decl */
-	AddEntityToCurrentModule(new);
 	return new;
 }
 
@@ -418,7 +416,6 @@ statement inline_expression_call(inlining_parameters p, expression modified_expr
                     }
                 } while(entity_undefined_p(returned_entity(p)));
 
-                /* add it to current moduel declarations */
                 AddEntityToCurrentModule(returned_entity(p));
 
                 /* do the replacement */
@@ -516,12 +513,15 @@ reget:
                             else /* need a temporary variable */
                             {
                                 if( ENDP(variable_dimensions(type_variable(entity_type(e)))) )
+                                {
                                     new = make_temporary_scalar_entity(e,from);
+                                }
                                 else
                                 {
                                     new = make_temporary_pointer_to_array_entity(e,MakeUnaryCall(entity_intrinsic(ADDRESS_OF_OPERATOR_NAME),from));
                                     add_dereferencment=true;
                                 }
+                                AddLocalEntityToDeclarations(new,get_current_module_entity(),declaration_holder);
 
                             }
                         } break;
@@ -533,7 +533,10 @@ reget:
                         if( expression_constant_p(from) )
                             new = call_function(expression_call(from));
                         else
+                        {
                             new = make_temporary_scalar_entity(e,from);
+                            AddLocalEntityToDeclarations(new,get_current_module_entity(),declaration_holder);
+                        }
                         break;
                     case is_syntax_subscript:
                         /* need a temporary variable */
@@ -545,6 +548,7 @@ reget:
                                 new = make_temporary_pointer_to_array_entity(e,MakeUnaryCall(entity_intrinsic(ADDRESS_OF_OPERATOR_NAME),from));
                                 add_dereferencment=true;
                             }
+                            AddLocalEntityToDeclarations(new,get_current_module_entity(),declaration_holder);
 
                         } break;
 
@@ -559,9 +563,9 @@ reget:
                 /* check wether the substitution will cause naming clashes
                  * then perform the substitution
                  */
-                gen_context_recurse(expanded, new, statement_domain, gen_true, &solve_name_clashes);
-                if(add_dereferencment) replace_entity_by_expression(expanded,e,MakeUnaryCall(entity_intrinsic(DEREFERENCING_OPERATOR_NAME),entity_to_expression(new)));
-                else replace_entity(expanded,e,new);
+                    gen_context_recurse(expanded , new, statement_domain, gen_true, &solve_name_clashes);
+                    if(add_dereferencment) replace_entity_by_expression(expanded ,e,MakeUnaryCall(entity_intrinsic(DEREFERENCING_OPERATOR_NAME),entity_to_expression(new)));
+                    else replace_entity(expanded ,e,new);
 
             }
 
@@ -637,7 +641,7 @@ void inline_statement_crawler(statement stmt, inlining_parameters p)
         type t= functional_result(type_functional(entity_type(inlined_module(p))));
         if( ! type_void_p(t) )
         {
-            pips_assert("inlining instruction modification is ok", instruction_consistent_p(sti));
+            //pips_assert("inlining instruction modification is ok", instruction_consistent_p(sti));
             insert_statement(new_statements(p),instruction_to_statement(copy_instruction(sti)),false);
         }
         if(statement_block_p(stmt))
@@ -647,7 +651,7 @@ void inline_statement_crawler(statement stmt, inlining_parameters p)
                 stmt=STATEMENT(CAR(iter));
         }
         update_statement_instruction(stmt,statement_instruction(new_statements(p)));
-        pips_assert("inlining statement generation is ok",statement_consistent_p(stmt));
+        //pips_assert("inlining statement generation is ok",statement_consistent_p(stmt));
     }
 }
 

@@ -149,6 +149,7 @@ process_true_call_stat(expression cond, statement stat)
                 entity newVar = make_new_scalar_variable_with_prefix(entity_local_name(e),
                         get_current_module_entity(),
                         newBas);
+                AddEntityToCurrentModule(newVar);
 
                 syntax_reference(expression_syntax(binary_call_lhs(c))) = make_reference(newVar, NIL);
                 ref=reference_to_expression(make_reference(newVar,NIL));

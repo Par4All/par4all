@@ -138,6 +138,7 @@ entity comEngine_make_new_scalar_variable(string prefix,
 					       get_current_module_statement(),
 					       bas);
     }
+  AddEntityToCurrentModule(retEnt);
 
   return retEnt;
 }

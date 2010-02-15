@@ -345,6 +345,7 @@ static list create_new_ent_list(int minOff, int maxOff,
 	make_new_scalar_variable_with_prefix(entity_local_name(keyEnt),
 					     get_current_module_entity(),
 					     entity_basic(keyEnt));
+      AddEntityToCurrentModule(newEnt);
 
       lNewEnt = gen_nconc(lNewEnt, CONS(ENTITY, newEnt, NIL));
     }

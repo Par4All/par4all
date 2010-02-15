@@ -631,7 +631,9 @@ static bool hpfc_decision(reference r, expression e)
 
 entity hpfc_new_variable(entity module, basic b)
 {
-    return make_new_scalar_variable(module, copy_basic(b));
+    entity new_ent =  make_new_scalar_variable(module, copy_basic(b));
+    AddEntityToCurrentModule(new_ent);
+    return new_ent;
 }
 
 

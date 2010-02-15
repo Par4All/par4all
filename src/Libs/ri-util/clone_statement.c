@@ -169,6 +169,7 @@ do_clone_entity(entity e, clone_context cc, hash_table ht)
         new_entity = make_new_scalar_variable(
                 clone_context_new_module(cc),
                 entity_basic(e));
+        AddEntityToCurrentModule(new_entity);
         AddLocalEntityToDeclarations(new_entity,clone_context_new_module(cc),clone_context_new_module_statement(cc));
         hash_put(ht,entity_name(e),new_entity);
     }

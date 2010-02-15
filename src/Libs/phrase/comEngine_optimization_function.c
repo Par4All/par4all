@@ -291,6 +291,7 @@ static void regenerate_toggles(statement stat, statement newStat,
     entity newTog =
       comEngine_make_new_scalar_variable(strdup("toggle"),
 					 make_basic(is_basic_int, (void *)4));
+      AddEntityToCurrentModule(newTog);
 
     comEngine_replace_reference_in_stat(tempStat,
 					make_reference(oldTog, NIL),

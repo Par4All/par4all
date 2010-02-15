@@ -784,6 +784,7 @@ syntax *sp;
     entity temp = make_new_scalar_variable(node_module,
 					   MakeBasic(is_basic_int));
     statement stat;
+    AddEntityToCurrentModule(temp);
 
     (*sp)=make_syntax(is_syntax_reference, make_reference(temp, NIL));
 

@@ -758,6 +758,7 @@ Variable var;
 		    (v_prefix,
 		     get_current_module_entity(),
 		     MakeBasic (is_basic_int));
+        AddEntityToCurrentModule((entity)v);
 	    free(v_prefix);
 	    comp = make_single_var_complexity(1.0, v); 
 	}

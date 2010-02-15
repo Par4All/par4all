@@ -213,10 +213,7 @@ entity make_temporary_pointer_to_array_entity(entity efrom,
 					pointer);
   /* Set its initial */
   entity_initial(new) = expression_undefined_p(from)?make_value_unknown():
-    make_value_expression(make_expression(make_syntax_cast(make_cast(make_type_variable(make_variable(pointer,NIL,NIL)),from)),normalized_undefined));
-  /* Add it to decl */
-  AddLocalEntityToDeclarations(new, get_current_module_entity(),
-			       c_module_p(get_current_module_entity())?get_current_module_statement():statement_undefined);
+    make_value_expression(make_expression(make_syntax_cast(make_cast(make_type_variable(make_variable(pointer,NIL,NIL)),copy_expression(from))),normalized_undefined));
   return new;
 }
 

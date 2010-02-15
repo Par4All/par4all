@@ -232,18 +232,6 @@ static bool supported_ref_p(reference ref, entity index, hash_table htOffset)
   return success;
 }
 
-/*
-This function moves the entity declaration from the module declaration
-list to the module statement declaration list
- */
-static void procCode_move_declarations(entity ent, entity new_fun,
-				       statement stat)
-{
-  gen_remove(&code_declarations(value_code(entity_initial(new_fun))), ent);
-
-  statement_declarations(stat) = gen_nconc(statement_declarations(stat),
-					   CONS(ENTITY, ent, NIL));
-}
 
 /*
 This function creates a new entity and stores its declaration
@@ -258,9 +246,7 @@ entity make_new_C_scalar_variable_with_prefix(string prefix,
     make_new_scalar_variable_with_prefix(prefix,
 					 module,
 					 b);
-
-  procCode_move_declarations(retEnt, module, stat);
-
+  AddLocalEntityToDeclarations(retEnt,module,stat);
   return retEnt;
 }
 

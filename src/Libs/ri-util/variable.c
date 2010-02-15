@@ -418,8 +418,6 @@ entity make_new_scalar_variable_with_prefix(string prefix,
   pips_debug(9, "var %s, tag %d\n", variable_name, basic_tag(b));
 
   e = make_scalar_entity(variable_name, module_name, b);
-  // Add a global variable:
-  AddEntityToCurrentModule(e);
   free(variable_name);
 
   return e;
