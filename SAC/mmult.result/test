@@ -421,5 +421,3 @@ loop1:      ;
    SIMD_SAVE_GENERIC_V4SF(v4sf_vec10, &F_80, &F_90, &F_100, &F_110);
    SIMD_SAVE_GENERIC_V4SF(v4sf_vec15, &F_120, &F_130, &F_140, &F_150);
 }
-seq-ko
-sse-ko

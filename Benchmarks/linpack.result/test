@@ -153,7 +153,7 @@ static REAL ddot_ur(int n, REAL *dx, int incx, REAL *dy, int incy)
 static void dgefa(REAL *a, int lda, int n, int *ipvt, int *info, int roll)
 {
    REAL t;
-   int idamax(int, REAL *, int), j, k, kp1, l, nm1;
+   int j, k, kp1, l, nm1;
    
    /* gaussian elimination with partial pivoting */
    
@@ -580,4 +580,38 @@ l99999:   ;
    printf("Too small.\n");
    goto loop_end_1;
 break_1:   ;
+}
+static REAL ddot_r(int n, REAL *dx, int incx, REAL *dy, int incy)
+{
+   REAL dtemp;
+   int i, ix, iy;
+
+   dtemp = 0.0e0;
+
+   if (n<=0) 
+      return 0.0e0;
+
+   if (incx!=1||incy!=1) {
+      
+      /* code for unequal increments or equal increments != 1 */
+      
+      ix = 0;
+      iy = 0;
+      if (incx<0) 
+         ix = (-n+1)*incx;
+      if (incy<0) 
+         iy = (-n+1)*incy;
+      for(i = 0; i <= n-1; i += 1) {
+         dtemp = dtemp+dx[ix]*dy[iy];
+         ix = ix+incx;
+         iy = iy+incy;
+      }
+      return dtemp;
+   }
+   
+   /* code for both increments equal to 1 */
+   
+   for(i = 0; i <= n-1; i += 1)
+      dtemp = dtemp+dx[i]*dy[i];
+   return dtemp;
 }

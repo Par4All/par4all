@@ -1,4 +1,7 @@
+#ifndef N
 #define N 4
+#endif
+
 void Matrix_Mult(float a[N][N], float b[N][N], float c[N][N])
 {
    int i, j, k;

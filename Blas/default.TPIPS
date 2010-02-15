@@ -1,11 +1,12 @@
-setenv WS = ddot
+setenv WS = cher
 delete $WS
-#create $WS $WS.f include/simd.f
-create $WS $WS.f
+#create $WS $WS.f include/simd.f include/scabs1.f include/xerbla.f
+create $WS $WS.f include/simd.f include/scabs1.f include/xerbla.f
 
 module `echo $WS | tr '[:lower:]' '[:upper:]'`
+apply SIMPLIFY_COMPLEX
 display PRINTED_FILE
 #source include/sac.tpips
-source include/gpu.tpips
+#source include/gpu.tpips
 
 close

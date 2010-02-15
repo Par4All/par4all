@@ -25,9 +25,11 @@ extern  main();
 void bar()
 {
    struct a A = {0};
-   //PIPS generated variable
-   struct a *P_0 = &A;
-   P_0->b = 1;
+   {
+      //PIPS generated variable
+      struct a *P_0 = &A;
+      P_0->b = 1;
+   }
    printf("%d\n", A.b);
 }
 

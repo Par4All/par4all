@@ -68,7 +68,7 @@ int flatten_code13(void)
       /*0015*/
       // (0,6)
       /*0004*/
-      // (0,3)
+      // (statement ordering unavailable)
       // BEGIN BLOCK
       // (statement ordering unavailable)
       _return0 = bla();                                                 /*0024*/
@@ -100,7 +100,7 @@ int flatten_code13(void)
       int bla(void);                                                    /*0049*/
 // (0,12)
       /*0004*/
-      // (0,3)
+      // (statement ordering unavailable)
       // BEGIN BLOCK
       // (statement ordering unavailable)
       _return1 = bla();                                                 /*0053*/
@@ -148,7 +148,7 @@ int flatten_code13(void)
    /*0015*/
    // (0,6)
    /*0004*/
-   // (0,3)
+   // (statement ordering unavailable)
    // BEGIN BLOCK
    // (statement ordering unavailable)
    _return0 = bla();                                                    /*0024*/
@@ -172,7 +172,7 @@ int flatten_code13(void)
    // (0,1)
    // BEGIN BLOCK
    /*0004*/
-   // (0,3)
+   // (statement ordering unavailable)
    // BEGIN BLOCK
    // (statement ordering unavailable)
    _return1 = bla();                                                    /*0053*/
@@ -222,7 +222,7 @@ int flatten_code13(void)
    /*0015*/
    // (0,6)
    /*0004*/
-   // (0,3)
+   // (statement ordering unavailable)
    // BEGIN BLOCK
    // (statement ordering unavailable)
    _return0 = bla();                                                    /*0059*/
@@ -250,7 +250,7 @@ int flatten_code13(void)
    // (0,1)
    // BEGIN BLOCK
    /*0004*/
-   // (0,3)
+   // (statement ordering unavailable)
    // BEGIN BLOCK
    // (statement ordering unavailable)
    _return1 = bla();                                                    /*0083*/

@@ -1,7 +1,12 @@
 delete linpack
 create linpack linpack.c
 
-display PRINTED_FILE[%ALLFUNC]
+display PRINTED_FILE(%ALLFUNC)
+
+apply PRIVATIZE_MODULE(linpack!ddot_r)
+apply INTERNALIZE_PARALLEL_CODE(linpack!ddot_r)
+apply OMPIFY_CODE(linpack!ddot_r)
+display PRINTED_FILE(linpack!ddot_r)
 
 close
 delete linpack

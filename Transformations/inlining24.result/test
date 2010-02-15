@@ -229,7 +229,7 @@ int main()
    int32_t connexity = 8;
    uint32_t size = 4;
    //PIPS generated variable
-   int _return0, _return1, _return2;
+   int _return1, _return2;
    {
       
       
@@ -391,7 +391,7 @@ int main()
    int32_t connexity = 8;
    uint32_t size = 4;
    //PIPS generated variable
-   int _return0, _return1, _return2;
+   int _return1, _return2;
    //PIPS generated variable
    freia_error ret_0;
    //PIPS generated variable
@@ -552,7 +552,7 @@ int main()
    int32_t connexity = 8;
    uint32_t size = 4;
    //PIPS generated variable
-   int _return0, _return1, _return2;
+   int _return1, _return2;
    //PIPS generated variable
    freia_error ret_0;
    //PIPS generated variable
@@ -916,7 +916,7 @@ int main()
    int32_t connexity = 8;
    uint32_t size = 4;
    //PIPS generated variable
-   int _return0, _return1, _return2;
+   int _return1, _return2;
    //PIPS generated variable
    freia_error ret_0;
    //PIPS generated variable
@@ -1074,7 +1074,7 @@ int main()
    int32_t connexity = 8;
    uint32_t size = 4;
    //PIPS generated variable
-   int _return0, _return1, _return2;
+   int _return1, _return2;
    //PIPS generated variable
    freia_error ret_0;
    //PIPS generated variable
@@ -1183,7 +1183,7 @@ int main()
    int32_t connexity = 8;
    uint32_t size = 4;
    //PIPS generated variable
-   int _return0, _return1, _return2;
+   int _return1, _return2;
    //PIPS generated variable
    freia_error ret_0;
    //PIPS generated variable
