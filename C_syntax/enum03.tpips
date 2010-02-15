@@ -8,6 +8,9 @@ activate C_PARSER
 
 display PARSED_PRINTED_FILE[enum03!]
 
+apply UNSPLIT
+shell cc -c enum03.database/Src/enum03.c
+
 activate PRINT_CODE_PRECONDITIONS
 
 echo
@@ -15,11 +18,12 @@ echo Preconditions derived from enum
 echo
 
 display PRINTED_FILE[enum03!]
+
 echo
 display PRINTED_FILE[main]
 
 close
 
-delete enum03
+#delete enum03
 
 quit
