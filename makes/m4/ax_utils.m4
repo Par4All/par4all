@@ -169,8 +169,8 @@ AC_DEFUN([AX_DEPENDS],
         pushdef([_MSG_],[])
         m4_foreach_w([_DEP_],[$2],
             [
-                m4_append([_TEST_],&& AX_HAS(AX_TR_UP(_DEP_)))
-                m4_append([_MSG_],${AX_MSG(AX_TR_UP([_DEP_]))} )
+                m4_append([_TEST_],&& AX_HAS(AS_TR_SH(_DEP_)))
+                m4_append([_MSG_],${AX_MSG(AS_TR_SH([_DEP_]))} )
             ]
         )
 		AX_MSG([$1])="_MSG_"
