@@ -1233,6 +1233,64 @@ bool check_common_inclusion(entity common)
   return ok;
 }
 
+/* This function creates a common for a given name in a given module.
+   This is an entity with the following fields :
+   Example:  SUBROUTINE SUB1
+             COMMON /FOO/ W1,V1
+
+   name = top_level:~name (TOP-LEVEL:~FOO)
+   type = area
+          with size = 8 [2*8], layout = NIL [SUB1:W,SUB1:V]
+   storage = ram
+          with function = module (TOP-LEVEL:SUB1) (first occurence ? SUB2,SUB3,..)
+               section = TOP-LEVEL:~FOO  (recursive ???)
+               offset = undefined
+               shared = NIL
+  initial = unknown
+
+  The area size and area layout must be updated each time when
+  a common variable is added to this common */
+
+entity make_new_common(string name, entity mod)
+{
+  string common_global_name = strdup(concatenate(TOP_LEVEL_MODULE_NAME,MODULE_SEP_STRING
+             COMMON_PREFIX,name,NULL));
+  type common_type = make_type(is_type_area, make_area(8, NIL));
+  entity StaticArea = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME, STATIC_AREA_LOCAL_NAME);
+  storage common_storage = make_storage(is_storage_ram,
+          (make_ram(mod,StaticArea, 0, NIL)));
+  value common_value = make_value_code(make_code(NIL,string_undefined,make_sequence(NIL),NIL, make_language_unknown()));
+  return  make_entity(common_global_name,common_type,common_storage,common_value);
+}
+
+/* This function creates a common variable in a given common in a given module.
+   This is an entity with the following fields :
+   name = module_name:name (SUB1:W1)
+   type = variable
+          with basic = int, dimension = NIL
+   storage = ram
+          with function = module (TOP-LEVEL:SUB1)
+               section = common (TOP-LEVEL:~FOO)
+               offset = 0
+               shared =
+  initial = unknown
+
+  The common must be updated with new area size and area layout */
+
+entity make_new_integer_scalar_common_variable(string name, entity mod, entity com)
+{
+  string var_global_name = strdup(concatenate(module_local_name(mod),MODULE_SEP_STRING,
+                name,NULL));
+  type var_type = make_type(is_type_variable, make_variable(make_basic_int(8), NIL,NIL));
+  storage var_storage = make_storage(is_storage_ram,
+             (make_ram(mod,com,0,NIL)));
+  value var_value = make_value_unknown();
+  entity e = make_entity(var_global_name,var_type,var_storage,var_value);
+  //area_layout(type_area(entity_type(com))) = CONS(ENTITY,e,NIL);
+  return e;
+}
+
+
 #define declaration_formal_p(E) storage_formal_p(entity_storage(E))
 #define entity_to_offset(E) formal_offset(storage_formal(entity_storage(E)))
 
