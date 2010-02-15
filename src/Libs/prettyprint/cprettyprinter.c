@@ -293,6 +293,9 @@ static string c_basic_string(basic b)
                 allocated=true;
                 break;
             }
+        case is_basic_complex:
+            result = "_Complex" SPACE; /* c99 style */
+            break;
         default:
             pips_internal_error("unhandled case\n");
     }
