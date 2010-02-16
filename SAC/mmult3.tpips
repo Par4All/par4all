@@ -1,5 +1,6 @@
-delete MMULT
-create MMULT mmult.c include/SIMD.c
+delete MMULT3
+setenv PIPS_CPP_FLAGS="-DN=3"
+create MMULT3 mmult.c include/SIMD.c
 
 echo
 echo Initial code
@@ -12,6 +13,7 @@ display PRINTED_FILE
 #setproperty SIMD_EXTRAVAGANT_ATOMIZER TRUE
 setproperty SAC_SIMD_REGISTER_WIDTH 128
 setproperty SIMD_FORTRAN_MEM_ORGANISATION=FALSE
+setproperty SIMDIZER_ALLOW_PADDING TRUE
 
 activate MUST_REGIONS
 activate PRECONDITIONS_INTER_FULL
@@ -58,14 +60,14 @@ display PRINTED_FILE
 
 apply UNSPLIT
 
-shell cc mmult.c include/SIMD.c -o mmult0
-shell sed -i -e '1 i #include "SIMD.h"' MMULT.database/Src/mmult.c
-shell cc -Iinclude MMULT.database/Src/mmult.c include/SIMD.c -o mmult1
-shell sed -i -e '1 d' MMULT.database/Src/mmult.c
+shell cc $PIPS_CPP_FLAGS mmult.c include/SIMD.c -o mmult0
+shell sed -i -e '1 i #include "SIMD.h"' -e 's/overloaded/float/g' MMULT3.database/Src/mmult.c
+shell cc -Iinclude MMULT3.database/Src/mmult.c include/SIMD.c -o mmult1
+shell sed -i -e '1 d' MMULT3.database/Src/mmult.c
 shell if test "`./mmult0`" = "`./mmult1`" ; then echo seq-ok ; else echo seq-ko ; fi
 
-shell ./compileC.sh MMULT mmult.c mmult-sse.c
-shell cc -O3 -I. -march=native mmult-sse.c -o mmult2
+shell ./compileC.sh MMULT3 mmult.c mmult-sse.c
+shell cc $PIPS_CPP_FLAGS -O3 -I. -march=native mmult-sse.c -o mmult2
 shell if test "`./mmult0`" = "`./mmult2`" ; then echo sse-ok ; else echo sse-ko ; fi
 shell rm -f mmult[012] mmult-sse.c
 

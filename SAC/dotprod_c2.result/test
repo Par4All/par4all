@@ -1,0 +1,216 @@
+
+Initial code
+
+void dotprod(int *a, int *b, int *c)
+{
+   int i;
+   for(i = 0; i <= 999999; i += 1)
+      inner_loop(i, a, b, c);
+   
+   
+   return;
+}
+
+After Inlining
+
+void dotprod(int *a, int *b, int *c)
+{
+   int i;
+   for(i = 0; i <= 999999; i += 1)
+      a[i] = b[i]+c[i];
+   
+   
+   return;
+}
+void dotprod(int *a, int *b, int *c)
+{
+   int i;
+   for(i = 0; i <= 999999; i += 1)
+      a[i] = b[i]+c[i];
+   
+   
+   return;
+}
+void dotprod(int *a, int *b, int *c)
+{
+   int i;
+   for(i = 0; i <= 999999; i += 1)
+      a[i] = b[i]+c[i];
+   
+   
+   return;
+}
+void dotprod(int *a, int *b, int *c)
+{
+   int i;
+   for(i = 0; i <= 999999; i += 1)
+      a[i] = b[i]+c[i];
+   
+   
+   return;
+}
+void dotprod(int *a, int *b, int *c)
+{
+   int i;
+   for(i = 0; i <= 999999; i += 1)
+      a[i] = b[i]+c[i];
+   
+   
+   return;
+}
+void dotprod(int *a, int *b, int *c)
+{
+   int i;
+   //PIPS generated variable
+   int LU_NUB0, LU_IB0, LU_IND0;
+   LU_NUB0 = 1000000;
+   LU_IB0 = 0;
+   LU_IND0 = 0;
+   for(LU_IND0 = 0; LU_IND0 <= 999999; LU_IND0 += 4) {
+      //c SIMD_COMMENT_0
+      a[LU_IND0] = b[LU_IND0]+c[LU_IND0];
+      //c SIMD_COMMENT_0
+      a[LU_IND0+1] = b[LU_IND0+1]+c[LU_IND0+1];
+      //c SIMD_COMMENT_0
+      a[LU_IND0+2] = b[LU_IND0+2]+c[LU_IND0+2];
+      //c SIMD_COMMENT_0
+      a[LU_IND0+3] = b[LU_IND0+3]+c[LU_IND0+3];
+   }
+   i = 1000000;
+   
+   
+   return;
+}
+void dotprod(int *a, int *b, int *c)
+{
+   int i;
+   //PIPS generated variable
+   int LU_NUB0, LU_IB0, LU_IND0;
+   LU_NUB0 = 1000000;
+   LU_IB0 = 0;
+   LU_IND0 = 0;
+   for(LU_IND0 = 0; LU_IND0 <= 999999; LU_IND0 += 4) {
+      //c SIMD_COMMENT_0
+      a[LU_IND0] = b[LU_IND0]+c[LU_IND0];
+      //c SIMD_COMMENT_0
+      a[LU_IND0+1] = b[LU_IND0+1]+c[LU_IND0+1];
+      //c SIMD_COMMENT_0
+      a[LU_IND0+2] = b[LU_IND0+2]+c[LU_IND0+2];
+      //c SIMD_COMMENT_0
+      a[LU_IND0+3] = b[LU_IND0+3]+c[LU_IND0+3];
+   }
+   i = 1000000;
+   
+   
+   return;
+}
+void dotprod(int *a, int *b, int *c)
+{
+   int i;
+   //PIPS generated variable
+   int LU_NUB0, LU_IB0, LU_IND0;
+   LU_NUB0 = 1000000;
+   LU_IB0 = 0;
+   LU_IND0 = 0;
+   for(LU_IND0 = 0; LU_IND0 <= 999999; LU_IND0 += 4) {
+      //c SIMD_COMMENT_0
+      a[LU_IND0] = b[LU_IND0]+c[LU_IND0];
+      //c SIMD_COMMENT_0
+      a[LU_IND0+1] = b[LU_IND0+1]+c[LU_IND0+1];
+      //c SIMD_COMMENT_0
+      a[LU_IND0+2] = b[LU_IND0+2]+c[LU_IND0+2];
+      //c SIMD_COMMENT_0
+      a[LU_IND0+3] = b[LU_IND0+3]+c[LU_IND0+3];
+   }
+   i = 1000000;
+   
+   
+   return;
+}
+void dotprod(int *a, int *b, int *c)
+{
+   int i;
+   //PIPS generated variable
+   int LU_NUB0, LU_IB0, LU_IND0;
+   //PIPS:SAC generated int vector(s)
+   int v4si_vec0[3+1], v4si_vec1[3+1], v4si_vec2[3+1], v4si_vec3[3+1], v4si_vec4[3+1], v4si_vec5[3+1];
+   LU_NUB0 = 1000000;
+   LU_IB0 = 0;
+   LU_IND0 = 0;
+   for(LU_IND0 = 0; LU_IND0 <= 999999; LU_IND0 += 4) {
+      SIMD_LOAD_V4SI(v4si_vec2, &c[LU_IND0]);
+      SIMD_LOAD_V4SI(v4si_vec1, &b[LU_IND0]);
+      SIMD_ADDD(v4si_vec0, v4si_vec1, v4si_vec2);
+      SIMD_SAVE_V4SI(v4si_vec0, &a[LU_IND0]);
+   }
+   i = 1000000;
+   
+   
+   return;
+}
+void dotprod(int *a, int *b, int *c)
+{
+   int i;
+   //PIPS generated variable
+   int LU_NUB0, LU_IB0, LU_IND0;
+   //PIPS:SAC generated int vector(s)
+   int v4si_vec0[3+1], v4si_vec1[3+1], v4si_vec2[3+1], v4si_vec3[3+1], v4si_vec4[3+1], v4si_vec5[3+1];
+   LU_NUB0 = 1000000;
+   LU_IB0 = 0;
+   LU_IND0 = 0;
+   for(LU_IND0 = 0; LU_IND0 <= 999999; LU_IND0 += 4) {
+      SIMD_LOAD_V4SI(v4si_vec2, &c[LU_IND0]);
+      SIMD_LOAD_V4SI(v4si_vec1, &b[LU_IND0]);
+      SIMD_ADDD(v4si_vec0, v4si_vec1, v4si_vec2);
+      SIMD_SAVE_V4SI(v4si_vec0, &a[LU_IND0]);
+   }
+   i = 1000000;
+   
+   
+   return;
+}
+void dotprod(int *a, int *b, int *c)
+{
+   int i;
+   //PIPS generated variable
+   int LU_NUB0, LU_IB0, LU_IND0;
+   //PIPS:SAC generated int vector(s)
+   int v4si_vec0[3+1], v4si_vec1[3+1], v4si_vec2[3+1];
+   LU_NUB0 = 1000000;
+   LU_IB0 = 0;
+   LU_IND0 = 0;
+   for(LU_IND0 = 0; LU_IND0 <= 999999; LU_IND0 += 4) {
+      SIMD_LOAD_V4SI(v4si_vec2, &c[LU_IND0]);
+      SIMD_LOAD_V4SI(v4si_vec1, &b[LU_IND0]);
+      SIMD_ADDD(v4si_vec0, v4si_vec1, v4si_vec2);
+      SIMD_SAVE_V4SI(v4si_vec0, &a[LU_IND0]);
+   }
+   i = 1000000;
+   
+   
+   return;
+}
+
+simdized code
+
+void dotprod(int *a, int *b, int *c)
+{
+   int i;
+   //PIPS generated variable
+   int LU_NUB0, LU_IB0, LU_IND0;
+   //PIPS:SAC generated int vector(s)
+   int v4si_vec0[3+1], v4si_vec1[3+1], v4si_vec2[3+1];
+   LU_NUB0 = 1000000;
+   LU_IB0 = 0;
+   LU_IND0 = 0;
+   for(LU_IND0 = 0; LU_IND0 <= 999999; LU_IND0 += 4) {
+      SIMD_LOAD_V4SI(v4si_vec2, &c[LU_IND0]);
+      SIMD_LOAD_V4SI(v4si_vec1, &b[LU_IND0]);
+      SIMD_ADDD(v4si_vec0, v4si_vec1, v4si_vec2);
+      SIMD_SAVE_V4SI(v4si_vec0, &a[LU_IND0]);
+   }
+   i = 1000000;
+   
+   
+   return;
+}

@@ -27,15 +27,9 @@ void filtre(float x[100], float y[100], float h[4])
    //PIPS generated variable
    float F_0;
    //PIPS generated variable
-   int LU_NUB0;
+   int LU_NUB0, LU_IB0, LU_IND0;
    //PIPS generated variable
-   int LU_IB0;
-   //PIPS generated variable
-   int LU_IND0;
-   //PIPS generated variable
-   float RED0[0+1];
-   //PIPS generated variable
-   float RED1[3+1];
+   float RED0[0+1], RED1[3+1];
    for(i = 4-1; i <= 99; i += 1) {
 loop:      LU_NUB0 = 4;
       LU_IB0 = 0;
@@ -79,15 +73,9 @@ void filtre(float x[100], float y[100], float h[4])
    //PIPS generated variable
    float F_0;
    //PIPS generated variable
-   int LU_NUB0;
+   int LU_NUB0, LU_IB0, LU_IND0;
    //PIPS generated variable
-   int LU_IB0;
-   //PIPS generated variable
-   int LU_IND0;
-   //PIPS generated variable
-   float RED0[0+1];
-   //PIPS generated variable
-   float RED1[3+1];
+   float RED0[0+1], RED1[3+1];
    for(i = 4-1; i <= 99; i += 1) {
 loop:      LU_NUB0 = 4;
       LU_IB0 = 0;
@@ -131,25 +119,9 @@ void filtre(float x[100], float y[100], float h[4])
    //PIPS generated variable
    float F_0;
    //PIPS generated variable
-   int LU_NUB0;
+   int LU_NUB0, LU_IB0, LU_IND0;
    //PIPS generated variable
-   int LU_IB0;
-   //PIPS generated variable
-   int LU_IND0;
-   //PIPS generated variable
-   float RED0[0+1];
-   //PIPS generated variable
-   float RED1[3+1];
-   //PIPS generated variable
-   float F_00;
-   //PIPS generated variable
-   float F_01;
-   //PIPS generated variable
-   float F_02;
-   //PIPS generated variable
-   float F_03;
-   //PIPS generated variable
-   float F_04;
+   float RED0[0+1], RED1[3+1], F_00, F_01, F_02, F_03, F_04;
    for(i = 3; i <= 99; i += 1) {
       LU_NUB0 = 4;
       LU_IB0 = 0;
@@ -188,25 +160,9 @@ void filtre(float x[100], float y[100], float h[4])
    //PIPS generated variable
    float F_0;
    //PIPS generated variable
-   int LU_NUB0;
+   int LU_NUB0, LU_IB0, LU_IND0;
    //PIPS generated variable
-   int LU_IB0;
-   //PIPS generated variable
-   int LU_IND0;
-   //PIPS generated variable
-   float RED0[0+1];
-   //PIPS generated variable
-   float RED1[3+1];
-   //PIPS generated variable
-   float F_00;
-   //PIPS generated variable
-   float F_01;
-   //PIPS generated variable
-   float F_02;
-   //PIPS generated variable
-   float F_03;
-   //PIPS generated variable
-   float F_04;
+   float RED0[0+1], RED1[3+1], F_00, F_01, F_02, F_03, F_04;
    for(i = 3; i <= 99; i += 1) {
       LU_NUB0 = 4;
       LU_IB0 = 0;
@@ -245,41 +201,11 @@ void filtre(float x[100], float y[100], float h[4])
    //PIPS generated variable
    float F_0;
    //PIPS generated variable
-   int LU_NUB0;
+   int LU_NUB0, LU_IB0, LU_IND0;
    //PIPS generated variable
-   int LU_IB0;
-   //PIPS generated variable
-   int LU_IND0;
-   //PIPS generated variable
-   float RED0[0+1];
-   //PIPS generated variable
-   float RED1[3+1];
-   //PIPS generated variable
-   float F_00;
-   //PIPS generated variable
-   float F_01;
-   //PIPS generated variable
-   float F_02;
-   //PIPS generated variable
-   float F_03;
-   //PIPS generated variable
-   float F_04;
-   //PIPS generated variable
-   float v4sf_vec0[3+1];
-   //PIPS generated variable
-   float v4sf_vec1[3+1];
-   //PIPS generated variable
-   float v4sf_vec2[3+1];
-   //PIPS generated variable
-   float v4sf_vec3[3+1];
-   //PIPS generated variable
-   float v4sf_vec4[3+1];
-   //PIPS generated variable
-   float v4sf_vec5[3+1];
-   //PIPS generated variable
-   float v4sf_vec6[3+1];
-   //PIPS generated variable
-   float v4sf_vec7[3+1];
+   float RED0[0+1], RED1[3+1], F_00, F_01, F_02, F_03, F_04;
+   //PIPS:SAC generated float vector(s)
+   float v4sf_vec0[3+1], v4sf_vec1[3+1], v4sf_vec2[3+1], v4sf_vec3[3+1], v4sf_vec4[3+1], v4sf_vec5[3+1], v4sf_vec6[3+1], v4sf_vec7[3+1], v4sf_vec8[3+1], v4sf_vec9[3+1];
    for(i = 3; i <= 99; i += 1) {
       LU_NUB0 = 4;
       LU_IB0 = 0;
@@ -309,41 +235,11 @@ void filtre(float x[100], float y[100], float h[4])
    //PIPS generated variable
    float F_0;
    //PIPS generated variable
-   int LU_NUB0;
+   int LU_NUB0, LU_IB0, LU_IND0;
    //PIPS generated variable
-   int LU_IB0;
-   //PIPS generated variable
-   int LU_IND0;
-   //PIPS generated variable
-   float RED0[0+1];
-   //PIPS generated variable
-   float RED1[3+1];
-   //PIPS generated variable
-   float F_00;
-   //PIPS generated variable
-   float F_01;
-   //PIPS generated variable
-   float F_02;
-   //PIPS generated variable
-   float F_03;
-   //PIPS generated variable
-   float F_04;
-   //PIPS generated variable
-   float v4sf_vec0[3+1];
-   //PIPS generated variable
-   float v4sf_vec1[3+1];
-   //PIPS generated variable
-   float v4sf_vec2[3+1];
-   //PIPS generated variable
-   float v4sf_vec3[3+1];
-   //PIPS generated variable
-   float v4sf_vec4[3+1];
-   //PIPS generated variable
-   float v4sf_vec5[3+1];
-   //PIPS generated variable
-   float v4sf_vec6[3+1];
-   //PIPS generated variable
-   float v4sf_vec7[3+1];
+   float RED0[0+1], RED1[3+1], F_00, F_01, F_02, F_03, F_04;
+   //PIPS:SAC generated float vector(s)
+   float v4sf_vec0[3+1], v4sf_vec1[3+1], v4sf_vec2[3+1], v4sf_vec3[3+1], v4sf_vec4[3+1], v4sf_vec5[3+1], v4sf_vec6[3+1], v4sf_vec7[3+1], v4sf_vec8[3+1], v4sf_vec9[3+1];
    for(i = 3; i <= 99; i += 1) {
       LU_NUB0 = 4;
       LU_IB0 = 0;
@@ -371,43 +267,11 @@ void filtre(float x[100], float y[100], float h[4])
 {
    int i, k;
    //PIPS generated variable
-   ;
+   int LU_NUB0, LU_IB0, LU_IND0;
    //PIPS generated variable
-   int LU_NUB0;
-   //PIPS generated variable
-   int LU_IB0;
-   //PIPS generated variable
-   int LU_IND0;
-   //PIPS generated variable
-   float RED0[0+1];
-   //PIPS generated variable
-   float RED1[3+1];
-   //PIPS generated variable
-   float F_00;
-   //PIPS generated variable
-   float F_01;
-   //PIPS generated variable
-   float F_02;
-   //PIPS generated variable
-   float F_03;
-   //PIPS generated variable
-   ;
-   //PIPS generated variable
-   float v4sf_vec0[3+1];
-   //PIPS generated variable
-   float v4sf_vec1[3+1];
-   //PIPS generated variable
-   float v4sf_vec2[3+1];
-   //PIPS generated variable
-   float v4sf_vec3[3+1];
-   //PIPS generated variable
-   ;
-   //PIPS generated variable
-   ;
-   //PIPS generated variable
-   ;
-   //PIPS generated variable
-   ;
+   float RED0[0+1], RED1[3+1], F_00, F_01, F_02, F_03;
+   //PIPS:SAC generated float vector(s)
+   float v4sf_vec0[3+1], v4sf_vec1[3+1], v4sf_vec2[3+1], v4sf_vec3[3+1];
    for(i = 3; i <= 99; i += 1) {
       LU_NUB0 = 4;
       LU_IB0 = 0;
@@ -438,43 +302,11 @@ void filtre(float x[100], float y[100], float h[4])
 {
    int i, k;
    //PIPS generated variable
-   ;
+   int LU_NUB0, LU_IB0, LU_IND0;
    //PIPS generated variable
-   int LU_NUB0;
-   //PIPS generated variable
-   int LU_IB0;
-   //PIPS generated variable
-   int LU_IND0;
-   //PIPS generated variable
-   float RED0[0+1];
-   //PIPS generated variable
-   float RED1[3+1];
-   //PIPS generated variable
-   float F_00;
-   //PIPS generated variable
-   float F_01;
-   //PIPS generated variable
-   float F_02;
-   //PIPS generated variable
-   float F_03;
-   //PIPS generated variable
-   ;
-   //PIPS generated variable
-   float v4sf_vec0[3+1];
-   //PIPS generated variable
-   float v4sf_vec1[3+1];
-   //PIPS generated variable
-   float v4sf_vec2[3+1];
-   //PIPS generated variable
-   float v4sf_vec3[3+1];
-   //PIPS generated variable
-   ;
-   //PIPS generated variable
-   ;
-   //PIPS generated variable
-   ;
-   //PIPS generated variable
-   ;
+   float RED0[0+1], RED1[3+1], F_00, F_01, F_02, F_03;
+   //PIPS:SAC generated float vector(s)
+   float v4sf_vec0[3+1], v4sf_vec1[3+1], v4sf_vec2[3+1], v4sf_vec3[3+1];
    for(i = 3; i <= 99; i += 1) {
       LU_NUB0 = 4;
       LU_IB0 = 0;
@@ -486,8 +318,8 @@ void filtre(float x[100], float y[100], float h[4])
       RED1[2] = 0.000000;
       RED1[3] = 0.000000;
       LU_IND0 = 0;
-      SIMD_LOAD_V4SF(v4sf_vec2, &h[0]);
-      SIMD_LOAD_GENERIC_V4SF(v4sf_vec1, x[i-0], x[i-0-1], x[i-0-2], x[i-0-3]);
+      SIMD_LOAD_V4SF(v4sf_vec2, &h[LU_IND0]);
+      SIMD_LOAD_GENERIC_V4SF(v4sf_vec1, x[i-LU_IND0], x[i-LU_IND0-1], x[i-LU_IND0-2], x[i-LU_IND0-3]);
       SIMD_MULPS(v4sf_vec0, v4sf_vec1, v4sf_vec2);
       SIMD_LOAD_V4SF(v4sf_vec3, &RED1[0]);
       SIMD_ADDPS(v4sf_vec3, v4sf_vec3, v4sf_vec0);
@@ -498,3 +330,4 @@ void filtre(float x[100], float y[100], float h[4])
    SIMD_SAVE_GENERIC_V4SF(v4sf_vec0, &F_03, &F_02, &F_01, &F_00);
    ;
 }
+seq-ok
