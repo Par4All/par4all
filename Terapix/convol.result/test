@@ -84,9 +84,9 @@ void work(int isi, int isj, float image[isi][isj], float kernel[3][3], float new
 
 l99993:
    for(i = 1; i <= isi-2; i += 128)
-      microcode(i, isi, isj, image, kernel, new_image);
+      microcode(isi, isj, i, image, kernel, new_image);
 }
-void microcode(int i, int isi, int isj, float image[isi][isj], float kernel[3][3], float new_image[isi][isj])
+void microcode(int isi, int isj, int i, float image[isi][isj], float kernel[3][3], float new_image[isi][isj])
 {
    //PIPS generated variable
    int j;
@@ -111,7 +111,7 @@ l99996:
          }
    }
 }
-void microcode(int i, int isi, int isj, float image[isi][isj], float kernel[3][3], float new_image[isi][isj])
+void microcode(int isi, int isj, int i, float image[isi][isj], float kernel[3][3], float new_image[isi][isj])
 {
    //PIPS generated variable
    int j;
@@ -140,7 +140,7 @@ l99996:
 
 Microcode after scalarization
 
-void microcode(int i, int isi, int isj, float image[isi][isj], float kernel[3][3], float new_image[isi][isj])
+void microcode(int isi, int isj, int i, float image[isi][isj], float kernel[3][3], float new_image[isi][isj])
 {
    //PIPS generated variable
    int j;
@@ -172,7 +172,7 @@ l99996:
 
 Microcode After array conversion
 
-void microcode(int i, int isi, int isj, float *image, float *kernel, float *new_image)
+void microcode(int isi, int isj, int i, float *image, float *kernel, float *new_image)
 {
    //PIPS generated variable
    int j;
@@ -204,7 +204,7 @@ l99996:
 
 Microcode after flattening
 
-void microcode(int i, int isi, int isj, float *image, float *kernel, float *new_image)
+void microcode(int isi, int isj, int i, float *image, float *kernel, float *new_image)
 {
    //PIPS generated variable
    int j;
@@ -256,7 +256,7 @@ l99994:
 
 Microcode after CSE
 
-void microcode(int i, int isi, int isj, float *image, float *kernel, float *new_image)
+void microcode(int isi, int isj, int i, float *image, float *kernel, float *new_image)
 {
    //PIPS generated variable
    int j;
@@ -272,12 +272,10 @@ void microcode(int i, int isi, int isj, float *image, float *kernel, float *new_
    for(i_1_0 = i; i_1_0 <= MIN(i+127, isi-2); i_1_0 += 1)
 l99994:
       for(j = 1; j <= isj-2; j += 1) {
-         I_5 = j+isj*(i_1_0-1);
-         I_9 = j+isj*i_1_0;
-         I_14 = j+isj*(i_1_0+1);
          __scalar__0 = 0.;
          
          
+         I_5 = j+isj*(i_1_0-1);
          __scalar__0 = __scalar__0+image[I_5-1]*kernel[0];
          
          
@@ -288,6 +286,7 @@ l99994:
          kj_2 = 3;
          
          
+         I_9 = j+isj*i_1_0;
          __scalar__0 = __scalar__0+image[I_9-1]*kernel[3];
          
          
@@ -298,6 +297,7 @@ l99994:
          kj_2 = 3;
          
          
+         I_14 = j+isj*(i_1_0+1);
          __scalar__0 = __scalar__0+image[I_14-1]*kernel[6];
          
          
@@ -315,7 +315,7 @@ l99994:
 
 Microcode after ICM
 
-void microcode(int i, int isi, int isj, float *image, float *kernel, float *new_image)
+void microcode(int isi, int isj, int i, float *image, float *kernel, float *new_image)
 {
    //PIPS generated variable
    int j;
@@ -332,12 +332,10 @@ void microcode(int i, int isi, int isj, float *image, float *kernel, float *new_
    for(i_1_0 = i; i_1_0 <= MIN(i+127, isi-2); i_1_0 += 1)
 l99994:
       for(j = 1; j <= I_17; j += 1) {
-         I_5 = j+isj*(i_1_0-1);
-         I_9 = j+isj*i_1_0;
-         I_14 = j+isj*(i_1_0+1);
          __scalar__0 = 0.;
          
          
+         I_5 = j+isj*(i_1_0-1);
          __scalar__0 = __scalar__0+image[I_5-1]*kernel[0];
          
          
@@ -348,6 +346,7 @@ l99994:
          kj_2 = 3;
          
          
+         I_9 = j+isj*i_1_0;
          __scalar__0 = __scalar__0+image[I_9-1]*kernel[3];
          
          
@@ -358,6 +357,7 @@ l99994:
          kj_2 = 3;
          
          
+         I_14 = j+isj*(i_1_0+1);
          __scalar__0 = __scalar__0+image[I_14-1]*kernel[6];
          
          
@@ -375,7 +375,7 @@ l99994:
 
 Microcode After atomization
 
-void microcode(int i, int isi, int isj, float *image, float *kernel, float *new_image)
+void microcode(int isi, int isj, int i, float *image, float *kernel, float *new_image)
 {
    //PIPS generated variable
    int j;
@@ -386,26 +386,29 @@ void microcode(int i, int isi, int isj, float *image, float *kernel, float *new_
    //PIPS generated variable
    int I_9;
    //PIPS generated variable
-   int I_14, I_17, I_18, I_19, I_20, I_21, I_22;
+   int I_14, I_17, I_18, I_19;
    //PIPS generated variable
-   float F_37, F_38, F_39, F_40, F_41, F_42, F_43, F_44, F_45;
+   float F_37, F_38, F_39;
+   //PIPS generated variable
+   int I_20;
+   //PIPS generated variable
+   float F_40, F_41, F_42;
+   //PIPS generated variable
+   int I_21, I_22;
+   //PIPS generated variable
+   float F_43, F_44, F_45;
    //PIPS generated variable
    I_17 = isj-2;
    for(i_1_0 = i; i_1_0 <= MIN(i+127, isi-2); i_1_0 += 1)
 l99994:
       for(j = 1; j <= I_17; j += 1) {
+         __scalar__0 = 0.;
          I_18 = i_1_0-1;
          I_19 = isj*I_18;
+         
+         
          I_5 = j+I_19;
-         I_20 = isj*i_1_0;
-         I_9 = j+I_20;
-         I_21 = i_1_0+1;
-         I_22 = isj*I_21;
-         I_14 = j+I_22;
-         __scalar__0 = 0.;
          F_37 = image[I_5-1]*kernel[0];
-         
-         
          __scalar__0 = __scalar__0+F_37;
          F_38 = image[I_5]*kernel[1];
          
@@ -416,9 +419,11 @@ l99994:
          
          __scalar__0 = __scalar__0+F_39;
          kj_2 = 3;
+         I_20 = isj*i_1_0;
+         
+         
+         I_9 = j+I_20;
          F_40 = image[I_9-1]*kernel[3];
-         
-         
          __scalar__0 = __scalar__0+F_40;
          F_41 = image[I_9]*kernel[4];
          
@@ -429,9 +434,12 @@ l99994:
          
          __scalar__0 = __scalar__0+F_42;
          kj_2 = 3;
+         I_21 = i_1_0+1;
+         I_22 = isj*I_21;
+         
+         
+         I_14 = j+I_22;
          F_43 = image[I_14-1]*kernel[6];
-         
-         
          __scalar__0 = __scalar__0+F_43;
          F_44 = image[I_14]*kernel[7];
          

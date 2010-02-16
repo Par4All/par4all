@@ -14,14 +14,14 @@ int main(int *argc, char **argv)
    int i, j;
    int a[100];
 
-   task_0(&j, &i, a);
+   task_0(a, &i, &j);
 
    return 0;
 }
 
 
 extern int main(int *argc, char **argv);
-void task_0(int *j, int *i, int a[100])
+void task_0(int a[100], int *i, int *j)
 {
 
    for(i = 0; i <= 99; i += 1)

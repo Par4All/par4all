@@ -14,20 +14,20 @@ int main(int *argc, char **argv)
    int i;
    int a[100];
 
-   task_0(&i, a);
-   task_1(&i, a);
+   task_0(a, &i);
+   task_1(a, &i);
    return 0;
 }
 
 
 extern int main(int *argc, char **argv);
-void task_0(int *i, int a[100])
+void task_0(int a[100], int *i)
 {
 
    for(i = 0; i <= 99; i += 1)
       a[*i] *= 2;
 }
-void task_1(int *i, int a[100])
+void task_1(int a[100], int *i)
 {
    for(i = 0; i <= 99; i += 1)
       a[*i] += 1;

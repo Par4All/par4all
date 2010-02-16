@@ -24,7 +24,7 @@ compute_kernel:   j = i+2;
    return 0;
 }
 All the kernel parameters should be passed correctly
-void compute_kernel(int *j, int i)
+void compute_kernel(int i, int *j)
 {
 compute_kernel:   *j = i+2;
 }
@@ -38,14 +38,14 @@ int main(int argc, char *argv[])
    int i, j;
 
 init_kernel:   init_kernel(&i);
-compute_kernel:   compute_kernel(&j, i);
+compute_kernel:   compute_kernel(i, &j);
 
    printf("Value is %d\n", j);
 
    return 0;
 }
 extern int main(int argc, char *argv[]);
-void compute_kernel(int *j, int i)
+void compute_kernel(int i, int *j)
 {
 compute_kernel:   *j = i+2;
 }
@@ -59,7 +59,7 @@ int main(int argc, char *argv[])
    int i, j;
 
 init_kernel:   init_kernel(&i);
-compute_kernel:   compute_kernel(&j, i);
+compute_kernel:   compute_kernel(i, &j);
 
    printf("Value is %d\n", j);
 

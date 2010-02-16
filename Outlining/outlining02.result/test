@@ -30,12 +30,12 @@ int main(int argc, char *argv[])
    char *str = 0;
    if (argc==1) 
       return 1;
-l0:   outlined(argv, str);
+l0:   outlined(str, argv);
    if (str) 
       printf("%s\n", str);
    return 0;
 }
-void outlined(char *argv[], char *str)
+void outlined(char *str, char *argv[])
 {
    //PIPS generated variable
    int j, n;

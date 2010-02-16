@@ -36,27 +36,27 @@ int main()
 {
    int i;
 
-   p4a_kernel_launcher_0(N, c, b, a);
+   p4a_kernel_launcher_0(N, a, b, c);
 
    return 0;
 }
-void p4a_kernel_0(int N, int i, double c[N], double b[N], double a[N])
+void p4a_kernel_0(int N, double a[N], double b[N], double c[N], int i)
 {
    a[i] = b[i]+c[i];
 }
-void p4a_kernel_launcher_0(int N, double c[N], double b[N], double a[N])
+void p4a_kernel_launcher_0(int N, double a[N], double b[N], double c[N])
 {
    //PIPS generated variable
    int i;
 
    for(i = 0; i <= 9999; i += 1)
       // To be assigned to a call to P4A_vp_0: i
-      p4a_kernel_wrapper_0(N, i, c, b, a);
+      p4a_kernel_wrapper_0(N, a, b, c, i);
 }
-void p4a_kernel_wrapper_0(int N, int i, double c[N], double b[N], double a[N])
+void p4a_kernel_wrapper_0(int N, double a[N], double b[N], double c[N], int i)
 {
    // To be assigned to a call to P4A_vp_0: i
-   p4a_kernel_0(N, i, c, b, a);
+   p4a_kernel_0(N, a, b, c, i);
 }
 void P4A_accel_free(void *dest)
 {
@@ -90,34 +90,34 @@ int main()
    P4A_accel_malloc(&P_2, sizeof(double[N])-1+1);
    P4A_accel_malloc(&P_1, sizeof(double[N])-1+1);
    P4A_accel_malloc(&P_0, sizeof(double[N])-1+1);
-   P4A_copy_to_accel(c, *P_2, sizeof(double[N])-1+1);
    P4A_copy_to_accel(b, *P_1, sizeof(double[N])-1+1);
+   P4A_copy_to_accel(c, *P_0, sizeof(double[N])-1+1);
 
    p4a_kernel_launcher_0(N, *P_2, *P_1, *P_0);
-   P4A_copy_from_accel(a, *P_0, sizeof(double[N])-1+1);
+   P4A_copy_from_accel(a, *P_2, sizeof(double[N])-1+1);
    P4A_accel_free(*P_2);
    P4A_accel_free(*P_1);
    P4A_accel_free(*P_0);
 
    return 0;
 }
-void p4a_kernel_0(int N, int i, double c[N], double b[N], double a[N])
+void p4a_kernel_0(int N, double a[N], double b[N], double c[N], int i)
 {
    a[i] = b[i]+c[i];
 }
-void p4a_kernel_launcher_0(int N, double c[N], double b[N], double a[N])
+void p4a_kernel_launcher_0(int N, double a[N], double b[N], double c[N])
 {
    //PIPS generated variable
    int i;
 
    for(i = 0; i <= 9999; i += 1)
       // To be assigned to a call to P4A_vp_0: i
-      p4a_kernel_wrapper_0(N, i, c, b, a);
+      p4a_kernel_wrapper_0(N, a, b, c, i);
 }
-void p4a_kernel_wrapper_0(int N, int i, double c[N], double b[N], double a[N])
+void p4a_kernel_wrapper_0(int N, double a[N], double b[N], double c[N], int i)
 {
    // To be assigned to a call to P4A_vp_0: i
-   p4a_kernel_0(N, i, c, b, a);
+   p4a_kernel_0(N, a, b, c, i);
 }
 All generated modules should be there
 /*
@@ -128,7 +128,7 @@ enum {N=10000};
 double a[N], b[N], c[N];
 
 extern int main();
-void p4a_kernel_launcher_0(int N, double c[N], double b[N], double a[N])
+void p4a_kernel_launcher_0(int N, double a[N], double b[N], double c[N])
 {
    //PIPS generated variable
    int i;
@@ -137,14 +137,14 @@ void p4a_kernel_launcher_0(int N, double c[N], double b[N], double a[N])
       // Loop nest P4A end
       if (i<=9999)
          // To be assigned to a call to P4A_vp_0: i
-         p4a_kernel_wrapper_0(N, i, c, b, a);
+         p4a_kernel_wrapper_0(N, a, b, c, i);
 }
-void p4a_kernel_wrapper_0(int N, int i, double c[N], double b[N], double a[N])
+void p4a_kernel_wrapper_0(int N, double a[N], double b[N], double c[N], int i)
 {
    // To be assigned to a call to P4A_vp_0: i
-   p4a_kernel_0(N, i, c, b, a);
+   p4a_kernel_0(N, a, b, c, i);
 }
-void p4a_kernel_0(int N, int i, double c[N], double b[N], double a[N])
+void p4a_kernel_0(int N, double a[N], double b[N], double c[N], int i)
 {
    a[i] = b[i]+c[i];
 }
@@ -156,11 +156,11 @@ int main()
    P4A_accel_malloc(&P_2, sizeof(double[N])-1+1);
    P4A_accel_malloc(&P_1, sizeof(double[N])-1+1);
    P4A_accel_malloc(&P_0, sizeof(double[N])-1+1);
-   P4A_copy_to_accel(c, *P_2, sizeof(double[N])-1+1);
    P4A_copy_to_accel(b, *P_1, sizeof(double[N])-1+1);
+   P4A_copy_to_accel(c, *P_0, sizeof(double[N])-1+1);
 
    p4a_kernel_launcher_0(N, *P_2, *P_1, *P_0);
-   P4A_copy_from_accel(a, *P_0, sizeof(double[N])-1+1);
+   P4A_copy_from_accel(a, *P_2, sizeof(double[N])-1+1);
    P4A_accel_free(*P_2);
    P4A_accel_free(*P_1);
    P4A_accel_free(*P_0);

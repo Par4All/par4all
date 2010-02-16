@@ -25,18 +25,18 @@ int main(int *argc, char **argv)
    int i, j, k, l;
    int a[100];
 
-   task_0(&k, &j, &i, a);
+   task_0(a, &i, &j, &k);
 
-   task_1(&l, &k, &j, &i, a);
+   task_1(a, &i, &j, &k, &l);
 
-   task_2(&j, &i, a);
+   task_2(a, &i, &j);
 
    return 0;
 }
 
 
 extern int main(int *argc, char **argv);
-void task_0(int *k, int *j, int *i, int a[100])
+void task_0(int a[100], int *i, int *j, int *k)
 {
 
    for(i = 0; i <= 99; i += 1)
@@ -44,7 +44,7 @@ void task_0(int *k, int *j, int *i, int a[100])
          for(k = 0; k <= 99; k += 1)
             a[*j] += 1;
 }
-void task_1(int *l, int *k, int *j, int *i, int a[100])
+void task_1(int a[100], int *i, int *j, int *k, int *l)
 {
 
    for(i = 0; i <= 99; i += 1)
@@ -53,7 +53,7 @@ void task_1(int *l, int *k, int *j, int *i, int a[100])
             for(l = 0; l <= 99; l += 1)
                a[*j] += 1;
 }
-void task_2(int *j, int *i, int a[100])
+void task_2(int a[100], int *i, int *j)
 {
 
    for(i = 0; i <= 99; i += 1)

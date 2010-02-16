@@ -21,6 +21,10 @@ setproperty KERNELIZE_HOST_CALL_NAME "launch_kernel1"
 apply KERNELIZE[compute]
 
 display PRINTED_FILE[%ALLFUNC]
+setproperty KERNEL_LOAD_STORE_LOAD_FUNCTION "memload"
+setproperty KERNEL_LOAD_STORE_STORE_FUNCTION "memstore"
+setproperty KERNEL_LOAD_STORE_ALLOCATE_FUNCTION "memalloc"
+setproperty KERNEL_LOAD_STORE_DEALLOCATE_FUNCTION "memfree"
 apply KERNEL_LOAD_STORE[compute]
 display PRINTED_FILE[compute]
 

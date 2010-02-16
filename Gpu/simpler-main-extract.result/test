@@ -218,19 +218,19 @@ estimation:   ;
    
    
    for(c = 0; c <= 63; c += 1) {
-      p4a_kernel_launcher_1(c, finger_mat);
-      p4a_kernel_launcher_2(ovsf_code_ref, inv_qpsk_user1, c, finger_mat);
+      p4a_kernel_launcher_1(finger_mat, c);
+      p4a_kernel_launcher_2(finger_mat, c, inv_qpsk_user1, ovsf_code_ref);
    }
 
    p4a_kernel_launcher_3(finger_mat);
-   p4a_kernel_launcher_4(symbole_flow_user1, finger_mat, coeff2);
+   p4a_kernel_launcher_4(coeff2, finger_mat, symbole_flow_user1);
    
    //display the channel coefficients
    p4a_kernel_launcher_5();
    
    //calculating max power received
    max = 0;
-   p4a_kernel_launcher_6(&max, coeff2);
+   p4a_kernel_launcher_6(coeff2, &max);
 
 //max=max*100/(SF*NB_SYMBOL*80);
 
@@ -249,7 +249,7 @@ l99996:   ;
    goto l99996;
 l99997:   ;
    coeff[j]++;
-   p4a_kernel_launcher_7(symbole_flow_user1, ovsf_code_ref, j, inv_qpsk_user1);
+   p4a_kernel_launcher_7(inv_qpsk_user1, j, ovsf_code_ref, symbole_flow_user1);
 
    retro_loop_count++;
    goto estimation;
@@ -261,25 +261,25 @@ l99999:   ;
 void p4a_kernel_0()
 {
 }
-void p4a_kernel_1(int i, int c, int finger_mat[64][16])
+void p4a_kernel_1(int finger_mat[64][16], int c, int i)
 {
    finger_mat[c][i] = 0;
 }
-void p4a_kernel_2(int ovsf_code_ref[16], int j, int inv_qpsk_user1[16*64+16], int c, int finger_mat[64][16])
+void p4a_kernel_2(int finger_mat[64][16], int c, int inv_qpsk_user1[16*64+16], int j, int ovsf_code_ref[16])
 {
    //PIPS generated variable
    int d;
    for(d = 0; d <= 15; d += 1)
       finger_mat[c][j] += inv_qpsk_user1[c*16+d+j]*ovsf_code_ref[d];
 }
-void p4a_kernel_3(int j, int c, int finger_mat[64][16])
+void p4a_kernel_3(int finger_mat[64][16], int c, int j)
 {
    if (finger_mat[c][j]>=0) 
       printf("%3d\t", finger_mat[c][j]);
    if (finger_mat[c][j]<0) 
       printf("%3d\t", finger_mat[c][j]);
 }
-void p4a_kernel_4(int symbole_flow_user1[64], int j, int finger_mat[64][16], int coeff2[16])
+void p4a_kernel_4(int coeff2[16], int finger_mat[64][16], int j, int symbole_flow_user1[64])
 {
    //PIPS generated variable
    int c;
@@ -295,12 +295,12 @@ void p4a_kernel_5(int j)
    if (j<16-1)
       ;
 }
-void p4a_kernel_6(int *max, int j, int coeff2[16])
+void p4a_kernel_6(int coeff2[16], int j, int *max)
 {
    if (coeff2[j]>*max) 
       *max = coeff2[j];
 }
-void p4a_kernel_7(int symbole_flow_user1[64], int ovsf_code_ref[16], int j, int inv_qpsk_user1[16*64+16], int d, int c)
+void p4a_kernel_7(int c, int d, int inv_qpsk_user1[16*64+16], int j, int ovsf_code_ref[16], int symbole_flow_user1[64])
 {
    if (symbole_flow_user1[c]==1)
       inv_qpsk_user1[c*16+d+j] -= ovsf_code_ref[d];
@@ -315,21 +315,21 @@ void p4a_kernel_launcher_0()
       // To be assigned to a call to P4A_vp_0: d
       p4a_kernel_wrapper_0();
 }
-void p4a_kernel_launcher_1(int c, int finger_mat[64][16])
+void p4a_kernel_launcher_1(int finger_mat[64][16], int c)
 {
    //PIPS generated variable
    int i;
    for(i = 0; i <= 15; i += 1)
       // To be assigned to a call to P4A_vp_0: i
-      p4a_kernel_wrapper_1(i, c, finger_mat);
+      p4a_kernel_wrapper_1(finger_mat, c, i);
 }
-void p4a_kernel_launcher_2(int ovsf_code_ref[16], int inv_qpsk_user1[16*64+16], int c, int finger_mat[64][16])
+void p4a_kernel_launcher_2(int finger_mat[64][16], int c, int inv_qpsk_user1[16*64+16], int ovsf_code_ref[16])
 {
    //PIPS generated variable
    int d, j;
    for(j = 0; j <= 15; j += 1)
       // To be assigned to a call to P4A_vp_0: j
-      p4a_kernel_wrapper_2(ovsf_code_ref, j, inv_qpsk_user1, c, finger_mat);
+      p4a_kernel_wrapper_2(finger_mat, c, inv_qpsk_user1, j, ovsf_code_ref);
 }
 void p4a_kernel_launcher_3(int finger_mat[64][16])
 {
@@ -340,15 +340,15 @@ void p4a_kernel_launcher_3(int finger_mat[64][16])
       for(j = 0; j <= 15; j += 1)
          // To be assigned to a call to P4A_vp_0: c
          // To be assigned to a call to P4A_vp_1: j
-         p4a_kernel_wrapper_3(j, c, finger_mat);
+         p4a_kernel_wrapper_3(finger_mat, c, j);
 }
-void p4a_kernel_launcher_4(int symbole_flow_user1[64], int finger_mat[64][16], int coeff2[16])
+void p4a_kernel_launcher_4(int coeff2[16], int finger_mat[64][16], int symbole_flow_user1[64])
 {
    //PIPS generated variable
    int c, j;
    for(j = 0; j <= 15; j += 1)
       // To be assigned to a call to P4A_vp_0: j
-      p4a_kernel_wrapper_4(symbole_flow_user1, j, finger_mat, coeff2);
+      p4a_kernel_wrapper_4(coeff2, finger_mat, j, symbole_flow_user1);
 }
 void p4a_kernel_launcher_5()
 {
@@ -360,15 +360,15 @@ void p4a_kernel_launcher_5()
       // To be assigned to a call to P4A_vp_0: j
       p4a_kernel_wrapper_5(j);
 }
-void p4a_kernel_launcher_6(int *max, int coeff2[16])
+void p4a_kernel_launcher_6(int coeff2[16], int *max)
 {
    //PIPS generated variable
    int j;
    for(j = 0; j <= 15; j += 1)
       // To be assigned to a call to P4A_vp_0: j
-      p4a_kernel_wrapper_6(&*max, j, coeff2);
+      p4a_kernel_wrapper_6(coeff2, j, &*max);
 }
-void p4a_kernel_launcher_7(int symbole_flow_user1[64], int ovsf_code_ref[16], int j, int inv_qpsk_user1[16*64+16])
+void p4a_kernel_launcher_7(int inv_qpsk_user1[16*64+16], int j, int ovsf_code_ref[16], int symbole_flow_user1[64])
 {
    //PIPS generated variable
    int c, d;
@@ -376,49 +376,49 @@ void p4a_kernel_launcher_7(int symbole_flow_user1[64], int ovsf_code_ref[16], in
       for(d = 0; d <= 15; d += 1)
          // To be assigned to a call to P4A_vp_0: c
          // To be assigned to a call to P4A_vp_1: d
-         p4a_kernel_wrapper_7(symbole_flow_user1, ovsf_code_ref, j, inv_qpsk_user1, d, c);
+         p4a_kernel_wrapper_7(c, d, inv_qpsk_user1, j, ovsf_code_ref, symbole_flow_user1);
 }
 void p4a_kernel_wrapper_0()
 {
    // To be assigned to a call to P4A_vp_0: d
    p4a_kernel_0();
 }
-void p4a_kernel_wrapper_1(int i, int c, int finger_mat[64][16])
+void p4a_kernel_wrapper_1(int finger_mat[64][16], int c, int i)
 {
    // To be assigned to a call to P4A_vp_0: i
-   p4a_kernel_1(i, c, finger_mat);
+   p4a_kernel_1(finger_mat, c, i);
 }
-void p4a_kernel_wrapper_2(int ovsf_code_ref[16], int j, int inv_qpsk_user1[16*64+16], int c, int finger_mat[64][16])
+void p4a_kernel_wrapper_2(int finger_mat[64][16], int c, int inv_qpsk_user1[16*64+16], int j, int ovsf_code_ref[16])
 {
    // To be assigned to a call to P4A_vp_0: j
-   p4a_kernel_2(ovsf_code_ref, j, inv_qpsk_user1, c, finger_mat);
+   p4a_kernel_2(finger_mat, c, inv_qpsk_user1, j, ovsf_code_ref);
 }
-void p4a_kernel_wrapper_3(int j, int c, int finger_mat[64][16])
+void p4a_kernel_wrapper_3(int finger_mat[64][16], int c, int j)
 {
    // To be assigned to a call to P4A_vp_0: c
    // To be assigned to a call to P4A_vp_1: j
-   p4a_kernel_3(j, c, finger_mat);
+   p4a_kernel_3(finger_mat, c, j);
 }
-void p4a_kernel_wrapper_4(int symbole_flow_user1[64], int j, int finger_mat[64][16], int coeff2[16])
+void p4a_kernel_wrapper_4(int coeff2[16], int finger_mat[64][16], int j, int symbole_flow_user1[64])
 {
    // To be assigned to a call to P4A_vp_0: j
-   p4a_kernel_4(symbole_flow_user1, j, finger_mat, coeff2);
+   p4a_kernel_4(coeff2, finger_mat, j, symbole_flow_user1);
 }
 void p4a_kernel_wrapper_5(int j)
 {
    // To be assigned to a call to P4A_vp_0: j
    p4a_kernel_5(j);
 }
-void p4a_kernel_wrapper_6(int *max, int j, int coeff2[16])
+void p4a_kernel_wrapper_6(int coeff2[16], int j, int *max)
 {
    // To be assigned to a call to P4A_vp_0: j
-   p4a_kernel_6(&*max, j, coeff2);
+   p4a_kernel_6(coeff2, j, &*max);
 }
-void p4a_kernel_wrapper_7(int symbole_flow_user1[64], int ovsf_code_ref[16], int j, int inv_qpsk_user1[16*64+16], int d, int c)
+void p4a_kernel_wrapper_7(int c, int d, int inv_qpsk_user1[16*64+16], int j, int ovsf_code_ref[16], int symbole_flow_user1[64])
 {
    // To be assigned to a call to P4A_vp_0: c
    // To be assigned to a call to P4A_vp_1: d
-   p4a_kernel_7(symbole_flow_user1, ovsf_code_ref, j, inv_qpsk_user1, d, c);
+   p4a_kernel_7(c, d, inv_qpsk_user1, j, ovsf_code_ref, symbole_flow_user1);
 }
 void P4A_accel_free(void *dest)
 {
@@ -468,7 +468,7 @@ int main()
    int count_loop = 0;
    int max = 0;
    //PIPS generated variable
-   int (*P_0)[64][16], (*P_1)[64][16], (*P_2)[16*64+16], (*P_3)[16], (*P_4)[64][16], (*P_5)[2000+1], (*P_6)[16], (*P_7)[64][16], (*P_8)[64];
+   int (*P_0)[64][16], (*P_1)[16], (*P_2)[16*64+16], (*P_3)[64][16], (*P_4)[64][16], (*P_5)[2000+1], (*P_6)[64], (*P_7)[64][16], (*P_8)[16];
 l99998:   ;
 
 /********************************************************************************/
@@ -501,17 +501,17 @@ estimation:   ;
    
    for(c = 0; c <= 63; c += 1) {
       P4A_accel_malloc(&P_0, sizeof(int[64][16])-1+1);
-      p4a_kernel_launcher_1(c, *P_0);
+      p4a_kernel_launcher_1(*P_0, c);
       P4A_copy_from_accel(finger_mat, *P_0, sizeof(int[64][16])-1+1);
       P4A_accel_free(*P_0);
-      P4A_accel_malloc(&P_3, sizeof(int[16])-1+1);
+      P4A_accel_malloc(&P_3, sizeof(int[64][16])-1+1);
       P4A_accel_malloc(&P_2, sizeof(int[16*64+16])-1+1);
-      P4A_accel_malloc(&P_1, sizeof(int[64][16])-1+1);
-      P4A_copy_to_accel(ovsf_code_ref, *P_3, sizeof(int[16])-1+1);
+      P4A_accel_malloc(&P_1, sizeof(int[16])-1+1);
+      P4A_copy_to_accel(finger_mat, *P_3, sizeof(int[64][16])-1+1);
       P4A_copy_to_accel(inv_qpsk_user1, *P_2, sizeof(int[16*64+16])-1+1);
-      P4A_copy_to_accel(finger_mat, *P_1, sizeof(int[64][16])-1+1);
-      p4a_kernel_launcher_2(*P_3, *P_2, c, *P_1);
-      P4A_copy_from_accel(finger_mat, *P_1, sizeof(int[64][16])-1+1);
+      P4A_copy_to_accel(ovsf_code_ref, *P_1, sizeof(int[16])-1+1);
+      p4a_kernel_launcher_2(*P_3, c, *P_2, *P_1);
+      P4A_copy_from_accel(finger_mat, *P_3, sizeof(int[64][16])-1+1);
       P4A_accel_free(*P_3);
       P4A_accel_free(*P_2);
       P4A_accel_free(*P_1);
@@ -525,14 +525,14 @@ estimation:   ;
    P4A_copy_from_accel(LUNS, *P_5, sizeof(int[2000+1])-1+1);
    P4A_accel_free(*P_5);
    P4A_accel_free(*P_4);
-   P4A_accel_malloc(&P_8, sizeof(int[64])-1+1);
+   P4A_accel_malloc(&P_8, sizeof(int[16])-1+1);
    P4A_accel_malloc(&P_7, sizeof(int[64][16])-1+1);
-   P4A_accel_malloc(&P_6, sizeof(int[16])-1+1);
-   P4A_copy_to_accel(symbole_flow_user1, *P_8, sizeof(int[64])-1+1);
+   P4A_accel_malloc(&P_6, sizeof(int[64])-1+1);
+   P4A_copy_to_accel(coeff2, *P_8, sizeof(int[16])-1+1);
    P4A_copy_to_accel(finger_mat, *P_7, sizeof(int[64][16])-1+1);
-   P4A_copy_to_accel(coeff2, *P_6, sizeof(int[16])-1+1);
+   P4A_copy_to_accel(symbole_flow_user1, *P_6, sizeof(int[64])-1+1);
    p4a_kernel_launcher_4(*P_8, *P_7, *P_6);
-   P4A_copy_from_accel(coeff2, *P_6, sizeof(int[16])-1+1);
+   P4A_copy_from_accel(coeff2, *P_8, sizeof(int[16])-1+1);
    P4A_accel_free(*P_8);
    P4A_accel_free(*P_7);
    P4A_accel_free(*P_6);
@@ -542,7 +542,7 @@ estimation:   ;
    
    //calculating max power received
    max = 0;
-   p4a_kernel_launcher_6(&max, coeff2);
+   p4a_kernel_launcher_6(coeff2, &max);
 
 //max=max*100/(SF*NB_SYMBOL*80);
 
@@ -561,7 +561,7 @@ l99996:   ;
    goto l99996;
 l99997:   ;
    coeff[j]++;
-   p4a_kernel_launcher_7(symbole_flow_user1, ovsf_code_ref, j, inv_qpsk_user1);
+   p4a_kernel_launcher_7(inv_qpsk_user1, j, ovsf_code_ref, symbole_flow_user1);
 
    retro_loop_count++;
    goto estimation;
@@ -573,25 +573,25 @@ l99999:   ;
 void p4a_kernel_0()
 {
 }
-void p4a_kernel_1(int i, int c, int finger_mat[64][16])
+void p4a_kernel_1(int finger_mat[64][16], int c, int i)
 {
    finger_mat[c][i] = 0;
 }
-void p4a_kernel_2(int ovsf_code_ref[16], int j, int inv_qpsk_user1[16*64+16], int c, int finger_mat[64][16])
+void p4a_kernel_2(int finger_mat[64][16], int c, int inv_qpsk_user1[16*64+16], int j, int ovsf_code_ref[16])
 {
    //PIPS generated variable
    int d;
    for(d = 0; d <= 15; d += 1)
       finger_mat[c][j] += inv_qpsk_user1[c*16+d+j]*ovsf_code_ref[d];
 }
-void p4a_kernel_3(int j, int c, int finger_mat[64][16])
+void p4a_kernel_3(int finger_mat[64][16], int c, int j)
 {
    if (finger_mat[c][j]>=0) 
       printf("%3d\t", finger_mat[c][j]);
    if (finger_mat[c][j]<0) 
       printf("%3d\t", finger_mat[c][j]);
 }
-void p4a_kernel_4(int symbole_flow_user1[64], int j, int finger_mat[64][16], int coeff2[16])
+void p4a_kernel_4(int coeff2[16], int finger_mat[64][16], int j, int symbole_flow_user1[64])
 {
    //PIPS generated variable
    int c;
@@ -607,12 +607,12 @@ void p4a_kernel_5(int j)
    if (j<16-1)
       ;
 }
-void p4a_kernel_6(int *max, int j, int coeff2[16])
+void p4a_kernel_6(int coeff2[16], int j, int *max)
 {
    if (coeff2[j]>*max) 
       *max = coeff2[j];
 }
-void p4a_kernel_7(int symbole_flow_user1[64], int ovsf_code_ref[16], int j, int inv_qpsk_user1[16*64+16], int d, int c)
+void p4a_kernel_7(int c, int d, int inv_qpsk_user1[16*64+16], int j, int ovsf_code_ref[16], int symbole_flow_user1[64])
 {
    if (symbole_flow_user1[c]==1)
       inv_qpsk_user1[c*16+d+j] -= ovsf_code_ref[d];
@@ -627,21 +627,21 @@ void p4a_kernel_launcher_0()
       // To be assigned to a call to P4A_vp_0: d
       p4a_kernel_wrapper_0();
 }
-void p4a_kernel_launcher_1(int c, int finger_mat[64][16])
+void p4a_kernel_launcher_1(int finger_mat[64][16], int c)
 {
    //PIPS generated variable
    int i;
    for(i = 0; i <= 15; i += 1)
       // To be assigned to a call to P4A_vp_0: i
-      p4a_kernel_wrapper_1(i, c, finger_mat);
+      p4a_kernel_wrapper_1(finger_mat, c, i);
 }
-void p4a_kernel_launcher_2(int ovsf_code_ref[16], int inv_qpsk_user1[16*64+16], int c, int finger_mat[64][16])
+void p4a_kernel_launcher_2(int finger_mat[64][16], int c, int inv_qpsk_user1[16*64+16], int ovsf_code_ref[16])
 {
    //PIPS generated variable
    int d, j;
    for(j = 0; j <= 15; j += 1)
       // To be assigned to a call to P4A_vp_0: j
-      p4a_kernel_wrapper_2(ovsf_code_ref, j, inv_qpsk_user1, c, finger_mat);
+      p4a_kernel_wrapper_2(finger_mat, c, inv_qpsk_user1, j, ovsf_code_ref);
 }
 void p4a_kernel_launcher_3(int finger_mat[64][16])
 {
@@ -652,15 +652,15 @@ void p4a_kernel_launcher_3(int finger_mat[64][16])
       for(j = 0; j <= 15; j += 1)
          // To be assigned to a call to P4A_vp_0: c
          // To be assigned to a call to P4A_vp_1: j
-         p4a_kernel_wrapper_3(j, c, finger_mat);
+         p4a_kernel_wrapper_3(finger_mat, c, j);
 }
-void p4a_kernel_launcher_4(int symbole_flow_user1[64], int finger_mat[64][16], int coeff2[16])
+void p4a_kernel_launcher_4(int coeff2[16], int finger_mat[64][16], int symbole_flow_user1[64])
 {
    //PIPS generated variable
    int c, j;
    for(j = 0; j <= 15; j += 1)
       // To be assigned to a call to P4A_vp_0: j
-      p4a_kernel_wrapper_4(symbole_flow_user1, j, finger_mat, coeff2);
+      p4a_kernel_wrapper_4(coeff2, finger_mat, j, symbole_flow_user1);
 }
 void p4a_kernel_launcher_5()
 {
@@ -672,15 +672,15 @@ void p4a_kernel_launcher_5()
       // To be assigned to a call to P4A_vp_0: j
       p4a_kernel_wrapper_5(j);
 }
-void p4a_kernel_launcher_6(int *max, int coeff2[16])
+void p4a_kernel_launcher_6(int coeff2[16], int *max)
 {
    //PIPS generated variable
    int j;
    for(j = 0; j <= 15; j += 1)
       // To be assigned to a call to P4A_vp_0: j
-      p4a_kernel_wrapper_6(&*max, j, coeff2);
+      p4a_kernel_wrapper_6(coeff2, j, &*max);
 }
-void p4a_kernel_launcher_7(int symbole_flow_user1[64], int ovsf_code_ref[16], int j, int inv_qpsk_user1[16*64+16])
+void p4a_kernel_launcher_7(int inv_qpsk_user1[16*64+16], int j, int ovsf_code_ref[16], int symbole_flow_user1[64])
 {
    //PIPS generated variable
    int c, d;
@@ -688,49 +688,49 @@ void p4a_kernel_launcher_7(int symbole_flow_user1[64], int ovsf_code_ref[16], in
       for(d = 0; d <= 15; d += 1)
          // To be assigned to a call to P4A_vp_0: c
          // To be assigned to a call to P4A_vp_1: d
-         p4a_kernel_wrapper_7(symbole_flow_user1, ovsf_code_ref, j, inv_qpsk_user1, d, c);
+         p4a_kernel_wrapper_7(c, d, inv_qpsk_user1, j, ovsf_code_ref, symbole_flow_user1);
 }
 void p4a_kernel_wrapper_0()
 {
    // To be assigned to a call to P4A_vp_0: d
    p4a_kernel_0();
 }
-void p4a_kernel_wrapper_1(int i, int c, int finger_mat[64][16])
+void p4a_kernel_wrapper_1(int finger_mat[64][16], int c, int i)
 {
    // To be assigned to a call to P4A_vp_0: i
-   p4a_kernel_1(i, c, finger_mat);
+   p4a_kernel_1(finger_mat, c, i);
 }
-void p4a_kernel_wrapper_2(int ovsf_code_ref[16], int j, int inv_qpsk_user1[16*64+16], int c, int finger_mat[64][16])
+void p4a_kernel_wrapper_2(int finger_mat[64][16], int c, int inv_qpsk_user1[16*64+16], int j, int ovsf_code_ref[16])
 {
    // To be assigned to a call to P4A_vp_0: j
-   p4a_kernel_2(ovsf_code_ref, j, inv_qpsk_user1, c, finger_mat);
+   p4a_kernel_2(finger_mat, c, inv_qpsk_user1, j, ovsf_code_ref);
 }
-void p4a_kernel_wrapper_3(int j, int c, int finger_mat[64][16])
+void p4a_kernel_wrapper_3(int finger_mat[64][16], int c, int j)
 {
    // To be assigned to a call to P4A_vp_0: c
    // To be assigned to a call to P4A_vp_1: j
-   p4a_kernel_3(j, c, finger_mat);
+   p4a_kernel_3(finger_mat, c, j);
 }
-void p4a_kernel_wrapper_4(int symbole_flow_user1[64], int j, int finger_mat[64][16], int coeff2[16])
+void p4a_kernel_wrapper_4(int coeff2[16], int finger_mat[64][16], int j, int symbole_flow_user1[64])
 {
    // To be assigned to a call to P4A_vp_0: j
-   p4a_kernel_4(symbole_flow_user1, j, finger_mat, coeff2);
+   p4a_kernel_4(coeff2, finger_mat, j, symbole_flow_user1);
 }
 void p4a_kernel_wrapper_5(int j)
 {
    // To be assigned to a call to P4A_vp_0: j
    p4a_kernel_5(j);
 }
-void p4a_kernel_wrapper_6(int *max, int j, int coeff2[16])
+void p4a_kernel_wrapper_6(int coeff2[16], int j, int *max)
 {
    // To be assigned to a call to P4A_vp_0: j
-   p4a_kernel_6(&*max, j, coeff2);
+   p4a_kernel_6(coeff2, j, &*max);
 }
-void p4a_kernel_wrapper_7(int symbole_flow_user1[64], int ovsf_code_ref[16], int j, int inv_qpsk_user1[16*64+16], int d, int c)
+void p4a_kernel_wrapper_7(int c, int d, int inv_qpsk_user1[16*64+16], int j, int ovsf_code_ref[16], int symbole_flow_user1[64])
 {
    // To be assigned to a call to P4A_vp_0: c
    // To be assigned to a call to P4A_vp_1: d
-   p4a_kernel_7(symbole_flow_user1, ovsf_code_ref, j, inv_qpsk_user1, d, c);
+   p4a_kernel_7(c, d, inv_qpsk_user1, j, ovsf_code_ref, symbole_flow_user1);
 }
 
 Unsplit resulting code
