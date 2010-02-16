@@ -3706,6 +3706,36 @@ type type_to_pointer_type(type t)
 
   return pt;
 }
+
+/* returns t if t is not a pointer type, and the pointed type if t is
+   a pointer type. Type definitions are replaced. */
+type type_to_pointed_type(type t)
+{
+  type ut = ultimate_type(t);
+  type pt = ut;
+  type upt = type_undefined;
+
+  if(pointer_type_p(ut))
+    pt = basic_pointer(variable_basic(type_variable(ut)));
+
+  upt = ultimate_type(pt);
+
+  return upt;
+}
+
+/* returns t if t is not a pointer type, and the first indirectly
+   pointed type that is not a pointer if t is
+   a pointer type. Type definitions are replaced. */
+type type_to_final_pointed_type(type t)
+{
+  type ut = ultimate_type(t);
+  type pt = ut;
+
+  while(pointer_type_p(ut)) {
+    ut = type_to_pointed_type(ut);
+  }
+  return ut;
+}
 /*
  *  that is all
  */

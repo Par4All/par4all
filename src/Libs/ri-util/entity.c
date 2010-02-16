@@ -644,7 +644,14 @@ int entity_field_rank(entity f)
 
 bool entity_enum_p(entity e)
 {
-  return type_enum_p(entity_type(e));
+  /* Base the predicate on the entity name as for struct and union.*/
+  //return type_enum_p(entity_type(e));
+  string ln = entity_local_name(e);
+  string ns = strrchr(ln, BLOCK_SEP_CHAR);
+  bool struct_p = (ns==NULL && *ln==ENUM_PREFIX_CHAR)
+    || (ns!=NULL && *(ns+1)==ENUM_PREFIX_CHAR)
+    || (strstr(entity_name(e),DUMMY_STRUCT_PREFIX)!=NULL);
+  return struct_p;
 }
 
 bool entity_enum_member_p(entity e)

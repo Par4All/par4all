@@ -2481,15 +2481,29 @@ static list words_variable_or_function(entity module, entity e, bool is_first, l
   return pc;
 }
 
-/* Fix the declaration list produced by the parser to accomodate the
-   prettyprinter: get rid of all derived entities but the last one.
+/* Fix the declaration list produced by the parser, which includes
+   declared program variables but also derived types used in the
+   declaration or the initialization, to accomodate the
+   prettyprinter, which must decide which derived types appearing in
+   the declaration must be defined, and which one must be referenced:
 
-   All entities in deal are useful to regenerate the corresponding
+    - first option: get rid of all derived entities; pro: safe; cons:
+      all declarations become one liners
+
+    - second option: get rid of all derived entities but the last
+      one, assuming they appear in the right order. Sometimes, you may
+      even have to get rid of all derived entities.
+
+   All entities in del are useful to regenerate the corresponding
    declaration, but the key entities are the type used for the
    variables, and the variables. Nested types should not appear in the
    return list.
 
-   No new list is allocated, just a pointer tothe first relevant chunk
+   FI: I wonder what the parser generates for something like
+
+   int foo[sizeof(struct {int a; int b;})] = {...};
+
+   No new list is allocated, just a pointer to the first relevant chunk
    of del.
 */
 static list filtered_declaration_list(list del)
@@ -2511,7 +2525,8 @@ static list filtered_declaration_list(list del)
 
      struct {struct ..};
 
-     with no variable declaration.
+     with no variable declaration. Or a declaration in the rhs via a
+     sizeof or a cast... See below, after the intermediate list.
 
   */
   if(gen_length(del)>=2) {
@@ -2532,6 +2547,50 @@ static list filtered_declaration_list(list del)
 	  break;
 	}
       }
+    }
+  }
+
+
+  ifdebug(8) {
+    pips_debug(8, "Intermediate declaration list: ");
+    print_entities(el);
+    fprintf(stderr, "\n");
+  }
+
+  /* Now we still have to deal with "void * p = ... derived type
+     definition..."  Maybe, we simply want to make sure that e1
+     belongs to type supporting entities of t2... but this is not
+     strong enough because it includes types of formal arguments which
+     are not relevant
+  */
+  if(gen_length(el)>=2) {
+    entity e1 = ENTITY(CAR(el));
+
+    if(derived_entity_p(e1)) {
+      bool match_p = FALSE;
+      type t1 = entity_type(e1);
+      entity e2 = ENTITY(CAR(CDR(el)));
+      type t2 = entity_type(e2);
+      type nt2 = type_undefined;
+
+      /* If t2 is a pointer, get to the final pointed type. */
+      nt2 = type_to_final_pointed_type(t2);
+
+      /* If nt2 is a functional type, what is the final pointed type
+	 returned? */
+      if(type_functional_p(nt2)) {
+	functional f2 = type_functional(nt2);
+	type rt2 = functional_result(f2);
+	nt2 = type_to_final_pointed_type(rt2);
+      }
+
+      if(type_variable_p(nt2)) {
+	basic b2 = variable_basic(type_variable(nt2));
+	if(basic_derived_p(b2) && basic_derived(b2)==e1)
+	  match_p = TRUE;
+      }
+      if(!match_p)
+	POP(el);
     }
   }
 

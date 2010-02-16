@@ -63,13 +63,16 @@
 /* Scope separator */
 #define BLOCK_SEP_STRING                "`"
 #define BLOCK_SEP_CHAR                  '`'
+
 #define MEMBER_SEP_STRING               "^"
 #define MEMBER_SEP_CHAR                 '^'
+
 #define STRUCT_PREFIX                   "#" // Conflict with value naming in transformer
 #define STRUCT_PREFIX_CHAR              '#'
 #define UNION_PREFIX                    "'" /* Conflict with C character constants */
 #define UNION_PREFIX_CHAR               '\''
 #define ENUM_PREFIX                     "?"
+#define ENUM_PREFIX_CHAR                '?'
 #define TYPEDEF_PREFIX                  "$"
 #define TYPEDEF_PREFIX_CHAR             '$'
 
@@ -1443,9 +1446,9 @@ entity get_ith_##lname##_prime(int i)\
 #define DEFAULT_LONG_INTEGER_TYPE_SIZE (6)
 #define DEFAULT_LONG_LONG_INTEGER_TYPE_SIZE (8)
 
-#define DEFAULT_POINTER_TYPE_SIZE (4) // could be 4 or 8
-#define DEFAULT_UNSIGNED_TYPE_SIZE (1)
-#define DEFAULT_SIGNED_TYPE_SIZE (2)
+#define DEFAULT_POINTER_TYPE_SIZE (4) // could be 4 or 8 or sizeof(pointer)
+#define DEFAULT_UNSIGNED_TYPE_SIZE (1) // type_size/10==1
+#define DEFAULT_SIGNED_TYPE_SIZE (2) // type_size/10=2
 
 /* The standard C integer types are represented as follow
 char                   = 1

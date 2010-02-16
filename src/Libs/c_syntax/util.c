@@ -2234,10 +2234,11 @@ void UpdateEntity(entity e, stack ContextStack, stack FormalStack, stack Functio
 void UpdateEntities(list le, stack ContextStack, stack FormalStack, stack FunctionStack,
 		    stack OffsetStack, bool is_external, bool is_declaration)
 {
-  MAP(ENTITY, e,
-  {
-    UpdateEntity(e,ContextStack,FormalStack,FunctionStack,OffsetStack,is_external,is_declaration);
-  },le);
+  FOREACH(ENTITY, e, le) {
+    if(!derived_entity_p(e))
+      UpdateEntity(e,ContextStack,FormalStack,FunctionStack,OffsetStack,
+		   is_external,is_declaration);
+  }
 }
 
 entity CleanUpEntity(entity e)
