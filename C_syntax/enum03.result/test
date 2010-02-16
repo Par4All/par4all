@@ -9,7 +9,7 @@ Preconditions derived from enum
 
 enum {a=sizeof(int), b};
 
-extern int main();
+extern  main();
 
 
 //  P() {}
@@ -25,11 +25,11 @@ main()
 
    ia = a;
 
-//  P(ia) {ia==4}
+//  P(ia) {}
 
    ib = b;
 
-//  P(ia,ib) {ia==4, ib==5}
+//  P(ia,ib) {ib==1}
 
 
    t = ia+ib;

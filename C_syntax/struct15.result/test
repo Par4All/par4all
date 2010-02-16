@@ -9,4 +9,5 @@ void struct15()
 {
    int i = sizeof(struct s );
    int j = sizeof(struct s_prime {int i; int j;} );
+   struct s_prime u;
 }
