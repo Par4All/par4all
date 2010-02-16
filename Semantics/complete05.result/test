@@ -76,13 +76,22 @@ void complete05()
 //  T() {}
 
    // BEGIN BLOCK
+
+//  T() {}
+
    int i;                                                               /*0004*/
+
+//  T() {}
+
    int n;                                                               /*0005*/
    {
 
 //  T(i) {i==0, n<=0}
 
       // BEGIN BLOCK
+
+//  T() {j==0}
+
       int j = 0;                                                        /*0009*/
 
 //  T(i,j) {i==0, j#init<=j, 1<=n}
@@ -123,13 +132,22 @@ void complete05()
 //  P() {}
 
    // BEGIN BLOCK
+
+//  P() {}
+
    int i;                                                               /*0004*/
+
+//  P() {}
+
    int n;                                                               /*0005*/
    {
 
-//  P() {j==0}
+//  P() {}
 
       // BEGIN BLOCK
+
+//  P() {}
+
       int j = 0;                                                        /*0009*/
 
 //  P() {j==0}

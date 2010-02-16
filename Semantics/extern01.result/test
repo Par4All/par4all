@@ -26,6 +26,9 @@ main()
 //  T() {TOP-LEVEL:delta==1}
 
    // BEGIN BLOCK
+
+//  T() {TOP-LEVEL:delta==1, i==0}
+
    int i = 0;
 
 //  T(i) {TOP-LEVEL:delta==1, i==1, i#init==0}
@@ -46,6 +49,9 @@ main()
 //  P() {TOP-LEVEL:delta==1}
 
    // BEGIN BLOCK
+
+//  P() {TOP-LEVEL:delta==1}
+
    int i = 0;
 
 //  P() {TOP-LEVEL:delta==1, i==0}

@@ -19,10 +19,25 @@ main()
 
 main()
 {
+
+//  P() {}
+
    enum fleurs {rose=0x0001, marguerite=0, jasmin};
+
+//  P() {}
+
    enum legumes {carotte=rose+50, haricot};
+
+//  P() {}
+
    enum fleurs ma1, ma2, ma3;
+
+//  P() {}
+
    enum legumes mon1, mon2;
+
+//  P() {}
+
    int i;
 
 //  P() {}

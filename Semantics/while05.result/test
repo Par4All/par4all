@@ -6,7 +6,10 @@ C  T(while05) {while05==9}
 
 int while05()
 {
-   int i,  n;
+
+//  T() {}
+
+   int i, n;
 
 //  T(i) {i==0}
 
@@ -49,7 +52,10 @@ Preconditions for "while05"
 
 int while05()
 {
-   int i,  n;
+
+//  P() {}
+
+   int i, n;
 
 //  P() {}
 

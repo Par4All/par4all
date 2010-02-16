@@ -1,7 +1,7 @@
 int main()
 {
    // BEGIN BLOCK
-   int i,  j,  k;                                                       /*0004*/
+   int i, j, k;                                                         /*0004*/
    int a[500];                                                          /*0005*/
 //               <must be written>: i
 
@@ -38,7 +38,7 @@ int main()
 //               <must be read   >: i j k
 //               <must be written>: i j k
    // BEGIN BLOCK
-   int i,  j,  k;                                                       /*0004*/
+   int i, j, k;                                                         /*0004*/
    int a[500];                                                          /*0005*/
 //               <must be written>: i
 
@@ -83,7 +83,13 @@ int main()
 //  T(main) {main==2}
 
    // BEGIN BLOCK
-   int i,  j,  k;                                                       /*0004*/
+
+//  T() {}
+
+   int i, j, k;                                                         /*0004*/
+
+//  T() {}
+
    int a[500];                                                          /*0005*/
 
 //  T(i) {i==0}
@@ -139,7 +145,13 @@ int main()
 //  P() {}
 
    // BEGIN BLOCK
-   int i,  j,  k;                                                       /*0004*/
+
+//  P() {}
+
+   int i, j, k;                                                         /*0004*/
+
+//  P() {}
+
    int a[500];                                                          /*0005*/
 
 //  P() {}

@@ -59,6 +59,9 @@ Transformers for "update01"
 
 void update01()
 {
+
+//  T() {i==1}
+
    int i = 1;
 
 //  T(i) {i==i#init+3}
@@ -87,6 +90,9 @@ Preconditions for "update01"
 
 void update01()
 {
+
+//  P() {}
+
    int i = 1;
 
 //  P() {i==1}

@@ -4,7 +4,7 @@ Parsed printed file for "update04"
 void update04()
 {
    int i = 1;
-   int j,  k;
+   int j, k;
    
    //i = 2;
    j = ++i;
@@ -17,7 +17,7 @@ Proper effects for "update04"
 void update04()
 {
    int i = 1;
-   int j,  k;
+   int j, k;
 //               <must be read   >: i
 //               <must be written>: i j
    
@@ -35,7 +35,7 @@ Cumulated effects for "update04"
 void update04()
 {
    int i = 1;
-   int j,  k;
+   int j, k;
 //               <must be read   >: i
 //               <must be written>: i j
    
@@ -55,8 +55,14 @@ Transformers for "update04"
 
 void update04()
 {
+
+//  T() {i==1}
+
    int i = 1;
-   int j,  k;
+
+//  T() {i==1}
+
+   int j, k;
 
 //  T(i,j) {i==2, i#init==1, j==2}
 
@@ -80,8 +86,14 @@ Preconditions for "update04"
 
 void update04()
 {
+
+//  P() {}
+
    int i = 1;
-   int j,  k;
+
+//  P() {i==1}
+
+   int j, k;
 
 //  P() {i==1}
 

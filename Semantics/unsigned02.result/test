@@ -20,9 +20,21 @@ Transformers for "main"
 
 main()
 {
+
+//  T() {i==2}
+
    unsigned int i = 2;
+
+//  T() {j==4}
+
    int j = 4;
+
+//  T() {k==6}
+
    int k = 6;
+
+//  T() {}
+
    int l;
 
 //  T(i) {i==i#init+1}
@@ -84,9 +96,21 @@ Preconditions for "main"
 
 main()
 {
+
+//  P() {}
+
    unsigned int i = 2;
+
+//  P() {i==2}
+
    int j = 4;
+
+//  P() {i==2, j==4}
+
    int k = 6;
+
+//  P() {i==2, j==4, k==6}
+
    int l;
 
 //  P() {i==2, j==4, k==6}
@@ -122,9 +146,21 @@ Transformers for "main" after transformer refining
 
 main()
 {
+
+//  T() {i==2}
+
    unsigned int i = 2;
+
+//  T() {i==2, j==4}
+
    int j = 4;
+
+//  T() {i==2, j==4, k==6}
+
    int k = 6;
+
+//  T() {i==2, j==4, k==6}
+
    int l;
 
 //  T(i) {i==3, i#init==2, j==4, k==6}
@@ -160,9 +196,21 @@ Preconditions for "main" after transformer refining
 
 main()
 {
+
+//  P() {}
+
    unsigned int i = 2;
+
+//  P() {i==2}
+
    int j = 4;
+
+//  P() {i==2, j==4}
+
    int k = 6;
+
+//  P() {i==2, j==4, k==6}
+
    int l;
 
 //  P() {i==2, j==4, k==6}

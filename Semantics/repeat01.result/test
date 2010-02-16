@@ -6,7 +6,10 @@ C  T(repeat01) {16<=repeat01}
 
 int repeat01()
 {
-   int i,  j;
+
+//  T() {}
+
+   int i, j;
 
 //  T(i) {i==0}
 
@@ -17,6 +20,9 @@ int repeat01()
 
    j = 1;
    {
+
+//  T() {n==10}
+
       int n = 10;
 
 //  T(i,j) {2i+j#init==2i#init+j}
@@ -46,17 +52,23 @@ Preconditions for "repeat01"
 
 int repeat01()
 {
-   int i,  j;
 
-//  P() {n==10}
+//  P() {}
+
+   int i, j;
+
+//  P() {}
 
 
    i = 0;
 
-//  P(i) {i==0, n==10}
+//  P(i) {i==0}
 
    j = 1;
    {
+
+//  P(i,j) {i==0, j==1}
+
       int n = 10;
 
 //  P(i,j) {i==0, j==1, n==10}

@@ -44,9 +44,21 @@ Source code with transformers
 
 void assign03()
 {
+
+//  T() {}
+
    int i;                                                               /*0004*/
+
+//  T() {}
+
    int j;                                                               /*0005*/
+
+//  T() {}
+
    int k;                                                               /*0006*/
+
+//  T() {}
+
    int n;                                                               /*0007*/
 
 //  T(j) {j==2}

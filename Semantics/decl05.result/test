@@ -37,7 +37,13 @@ Transformers for "decl05"
 
 void decl05()
 {
+
+//  T() {i==1}
+
    int i = 1;
+
+//  T() {i==j-1}
+
    int j = i+1;
 
 //  T() {}
@@ -53,7 +59,13 @@ Preconditions for "decl05"
 
 void decl05()
 {
+
+//  P() {}
+
    int i = 1;
+
+//  P() {i==1}
+
    int j = i+1;
 
 //  P() {i==1, j==2}

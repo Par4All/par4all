@@ -31,6 +31,9 @@ void static02()
 //  T(i) {i==i#init+1}
 
    // BEGIN BLOCK
+
+//  T() {}
+
    static int i = 0.;
 
 //  T(i) {i==i#init+1}

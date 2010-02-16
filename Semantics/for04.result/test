@@ -13,7 +13,7 @@ int for04()
       x[i] = 0;
    
    //printf("%d, %d\n", i, j);
-
+   
    return 0;
 }
 
@@ -24,8 +24,17 @@ Check transformers on strip-mined loop
 
 int for04()
 {
+
+//  T() {}
+
    int x[512];
+
+//  T() {}
+
    int i;
+
+//  T() {}
+
    int j;
 
 //  T(i) {0<=i, i<=499}
@@ -43,6 +52,6 @@ int for04()
 
    
    //printf("%d, %d\n", i, j);
-
+   
    return 0;
 }

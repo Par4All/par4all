@@ -10,6 +10,9 @@ int foo(int s)
 //  T(foo) {s+1<=foo, foo<=s+5}
 
    // BEGIN BLOCK
+
+//  T() {s==t-2}
+
    int t = s+2;
 
 //  T(t) {t#init<=t+1, t<=t#init+3}
@@ -44,7 +47,13 @@ int bar()
 //  T(bar) {}
 
    // BEGIN BLOCK
+
+//  T() {x==3}
+
    int x = 3;
+
+//  T() {x==y+3}
+
    int y = x-3;
 
 //  T(x,y) {x<=4, x#init<=4, y#init<=y}
@@ -88,7 +97,13 @@ int bar()
 //  P() {}
 
    // BEGIN BLOCK
+
+//  P() {}
+
    int x = 3;
+
+//  P() {x==3}
+
    int y = x-3;
 
 //  P() {x==3, y==0}
@@ -132,6 +147,9 @@ int foo(int s)
 //  P() {}
 
    // BEGIN BLOCK
+
+//  P() {}
+
    int t = s+2;
 
 //  P() {s==t-2}
@@ -160,16 +178,18 @@ After inlining/unfolding of "bar"
 int bar()
 {
    // BEGIN BLOCK
+   // BEGIN BLOCK
    int x = 3;
    int y = x-3;
-   int _return0;
-   int _return1;
+   //PIPS generated variable
+   int _return0, _return1;
 
    while (x<=4) {
       // BEGIN BLOCK
       // BEGIN BLOCK
       y++;
       {
+         // BEGIN BLOCK
          // BEGIN BLOCK
          int t = x+2;
 
@@ -180,16 +200,21 @@ int bar()
          // BEGIN BLOCK
          
          
+         // BEGIN BLOCK
          _return0 = t;
          // END BLOCK
          // END BLOCK
+         ;
+         // END BLOCK
       }
+      // END BLOCK
       x = _return0;
       // END BLOCK
    }
    {
       // BEGIN BLOCK
-      int t = y+2;
+      // BEGIN BLOCK
+      int t = x+2;
 
       if (t>6)
          t -= 3;
@@ -198,10 +223,14 @@ int bar()
       // BEGIN BLOCK
       
       
+      // BEGIN BLOCK
       _return1 = t;
       // END BLOCK
       // END BLOCK
+      ;
+      // END BLOCK
    }
+   // END BLOCK
    y = _return1;
    // END BLOCK
    
@@ -214,16 +243,18 @@ After unspahettify of "bar"
 int bar()
 {
    // BEGIN BLOCK
+   // BEGIN BLOCK
    int x = 3;
    int y = x-3;
-   int _return0;
-   int _return1;
+   //PIPS generated variable
+   int _return0, _return1;
 
    while (x<=4) {
       // BEGIN BLOCK
       // BEGIN BLOCK
       y++;
       {
+         // BEGIN BLOCK
          // BEGIN BLOCK
          int t = x+2;
 
@@ -234,16 +265,21 @@ int bar()
          // BEGIN BLOCK
          
          
+         // BEGIN BLOCK
          _return0 = t;
          // END BLOCK
          // END BLOCK
+         ;
+         // END BLOCK
       }
+      // END BLOCK
       x = _return0;
       // END BLOCK
    }
    {
       // BEGIN BLOCK
-      int t = y+2;
+      // BEGIN BLOCK
+      int t = x+2;
 
       if (t>6)
          t -= 3;
@@ -252,10 +288,14 @@ int bar()
       // BEGIN BLOCK
       
       
+      // BEGIN BLOCK
       _return1 = t;
       // END BLOCK
       // END BLOCK
+      ;
+      // END BLOCK
    }
+   // END BLOCK
    y = _return1;
    // END BLOCK
    
@@ -274,10 +314,20 @@ int bar()
 //  P() {}
 
    // BEGIN BLOCK
+   // BEGIN BLOCK
+
+//  P() {}
+
    int x = 3;
+
+//  P() {x==3}
+
    int y = x-3;
-   int _return0;
-   int _return1;
+   //PIPS generated variable
+
+//  P() {x==3, y==0}
+
+   int _return0, _return1;
 
 //  P() {x==3, y==0}
 
@@ -297,6 +347,10 @@ int bar()
 //  P(_return0,x,y) {x==y+2, 3<=x, x<=4}
 
          // BEGIN BLOCK
+         // BEGIN BLOCK
+
+//  P(_return0,x,y) {x==y+2, 3<=x, x<=4}
+
          int t = x+2;
 
 //  P() {0==-1}
@@ -318,13 +372,20 @@ int bar()
          // BEGIN BLOCK
          
          
+         // BEGIN BLOCK
          _return0 = t;
+
+//  P() {0==-1}
+
          // END BLOCK
+         // END BLOCK
+         ;
          // END BLOCK
       }
 
 //  P() {0==-1}
 
+      // END BLOCK
       x = _return0;
       // END BLOCK
    }
@@ -334,7 +395,12 @@ int bar()
 //    y+3<=_return0, _return0<=5y+3, 1<=y, y<=2}
 
       // BEGIN BLOCK
-      int t = y+2;
+      // BEGIN BLOCK
+
+//  P(_return0,x,y) {_return0==x, 5<=_return0, _return0<=9,
+//    y+3<=_return0, _return0<=5y+3, 1<=y, y<=2}
+
+      int t = x+2;
 
 //  P() {0==-1}
 
@@ -355,13 +421,20 @@ int bar()
       // BEGIN BLOCK
       
       
+      // BEGIN BLOCK
       _return1 = t;
+
+//  P() {0==-1}
+
       // END BLOCK
+      // END BLOCK
+      ;
       // END BLOCK
    }
 
 //  P() {0==-1}
 
+   // END BLOCK
    y = _return1;
 
 //  P() {0==-1}
@@ -383,10 +456,20 @@ int bar()
 //  P() {}
 
    // BEGIN BLOCK
+   // BEGIN BLOCK
+
+//  P() {}
+
    int x = 3;
+
+//  P() {x==3}
+
    int y = x-3;
-   int _return0;
-   int _return1;
+   //PIPS generated variable
+
+//  P() {x==3, y==0}
+
+   int _return0, _return1;
 
 //  P() {x==3, y==0}
 
@@ -406,14 +489,29 @@ int bar()
 //  P(y) {x==3, 1<=y}
 
          // BEGIN BLOCK
+         // BEGIN BLOCK
+
+//  P(y) {x==3, 1<=y}
+
          int t = x+2;
+
+//  P() {0==-1}
+
          
          // BEGIN BLOCK
          
          
+         // BEGIN BLOCK
          // END BLOCK
+         // END BLOCK
+         ;
          // END BLOCK
       }
+
+//  P() {0==-1}
+
+      // END BLOCK
+      ;
       // END BLOCK
    }
    {
@@ -421,15 +519,29 @@ int bar()
 //  P() {0==-1}
 
       // BEGIN BLOCK
-      int t = y+2;
+      // BEGIN BLOCK
+
+//  P() {0==-1}
+
+      int t = x+2;
+
+//  P() {0==-1}
+
       
       // BEGIN BLOCK
       
       
+      // BEGIN BLOCK
       // END BLOCK
+      // END BLOCK
+      ;
       // END BLOCK
    }
    // END BLOCK
+   // END BLOCK
    
+
+//  P() {0==-1}
+
    // END BLOCK
 }

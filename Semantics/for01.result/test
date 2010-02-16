@@ -3,7 +3,7 @@ Source code with proper effects
 
 int main()
 {
-   int i,  j,  k;                                                       /*0004*/
+   int i, j, k;                                                         /*0004*/
    int a[500];                                                          /*0005*/
 //               <must be written>: i
 
@@ -34,7 +34,7 @@ Source code with cumulated effects
 
 int main()
 {
-   int i,  j,  k;                                                       /*0004*/
+   int i, j, k;                                                         /*0004*/
    int a[500];                                                          /*0005*/
 //               <must be written>: i
 
@@ -93,7 +93,13 @@ Source code with transformers
 
 int main()
 {
-   int i,  j,  k;                                                       /*0004*/
+
+//  T() {}
+
+   int i, j, k;                                                         /*0004*/
+
+//  T() {}
+
    int a[500];                                                          /*0005*/
 
 //  T(i) {i==0}
@@ -139,7 +145,13 @@ Source code with preconditions
 
 int main()
 {
-   int i,  j,  k;                                                       /*0004*/
+
+//  P() {}
+
+   int i, j, k;                                                         /*0004*/
+
+//  P() {}
+
    int a[500];                                                          /*0005*/
 
 //  P() {}

@@ -34,6 +34,9 @@ Source code with transformers for "call11"
 
 double call11(void)
 {
+
+//  T() {}
+
    double x = 3.;                                                       /*0004*/
 
 //  T(TOP-LEVEL:j) {TOP-LEVEL:j==j#init+1}
@@ -53,6 +56,9 @@ Source code with transformers for "main"
 
 main()
 {
+
+//  T() {ai==3}
+
    int ai = 3;                                                          /*0015*/
 
 //  T(TOP-LEVEL:j) {TOP-LEVEL:j==j#init+1}
@@ -73,6 +79,9 @@ Source code with preconditions for "call11"
 
 double call11(void)
 {
+
+//  P() {TOP-LEVEL:j==0}
+
    double x = 3.;                                                       /*0004*/
 
 //  P() {TOP-LEVEL:j==0}
@@ -92,6 +101,9 @@ Source code with preconditions for "main"
 
 main()
 {
+
+//  P() {TOP-LEVEL:j==0}
+
    int ai = 3;                                                          /*0015*/
 
 //  P() {TOP-LEVEL:j==0, ai==3}

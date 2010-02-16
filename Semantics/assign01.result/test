@@ -34,7 +34,13 @@ Source code with transformers
 
 void assign01()
 {
+
+//  T() {}
+
    int i;                                                               /*0004*/
+
+//  T() {}
+
    int j;                                                               /*0005*/
 
 //  T(i,j) {i==6, j==1}

@@ -6,6 +6,9 @@ C  T(while08) {9<=while08}
 
 int while08()
 {
+
+//  T() {}
+
    int i, n;
 
 //  T(i) {i==0}
@@ -49,6 +52,9 @@ Preconditions for "while08"
 
 int while08()
 {
+
+//  P() {}
+
    int i, n;
 
 //  P() {}

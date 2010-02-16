@@ -10,7 +10,10 @@ void beatrice01()
 //  T() {}
 
    // BEGIN BLOCK
-   int i,  j;
+
+//  T() {}
+
+   int i, j;
 
 //  T(i,j) {0<=i}
 
@@ -62,7 +65,10 @@ void beatrice01()
 //  P() {}
 
    // BEGIN BLOCK
-   int i,  j;
+
+//  P() {}
+
+   int i, j;
 
 //  P() {}
 

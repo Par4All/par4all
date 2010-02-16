@@ -64,9 +64,21 @@ Source code with transformers
 
 void assign02()
 {
+
+//  T() {i==1}
+
    int i = 1;                                                           /*0004*/
+
+//  T() {}
+
    int j;                                                               /*0005*/
+
+//  T() {}
+
    int k;                                                               /*0006*/
+
+//  T() {}
+
    int n;                                                               /*0007*/
 
 //  T(n) {n==n#init+1}
@@ -103,9 +115,21 @@ Source code with preconditions
 
 void assign02()
 {
+
+//  P() {}
+
    int i = 1;                                                           /*0004*/
+
+//  P() {i==1}
+
    int j;                                                               /*0005*/
+
+//  P() {i==1}
+
    int k;                                                               /*0006*/
+
+//  P() {i==1}
+
    int n;                                                               /*0007*/
 
 //  P() {i==1}

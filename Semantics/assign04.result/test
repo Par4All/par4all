@@ -48,6 +48,9 @@ Source code with transformers
 
 void assign04()
 {
+
+//  T() {}
+
    int i;                                                               /*0004*/
 
 //  T(i) {i==3}

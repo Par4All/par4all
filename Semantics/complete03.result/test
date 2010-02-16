@@ -74,12 +74,18 @@ void complete03()
 //  T() {}
 
    // BEGIN BLOCK
+
+//  T() {}
+
    int i;                                                               /*0004*/
    {
 
 //  T(i) {i==0}
 
       // BEGIN BLOCK
+
+//  T() {j==0}
+
       int j = 0;                                                        /*0008*/
 
 //  T() {0==-1}
@@ -120,12 +126,18 @@ void complete03()
 //  P() {}
 
    // BEGIN BLOCK
+
+//  P() {}
+
    int i;                                                               /*0004*/
    {
 
-//  P() {j==0}
+//  P() {}
 
       // BEGIN BLOCK
+
+//  P() {}
+
       int j = 0;                                                        /*0008*/
 
 //  P() {j==0}

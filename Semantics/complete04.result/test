@@ -62,13 +62,22 @@ void complete04()
 //  T() {}
 
    // BEGIN BLOCK
+
+//  T() {}
+
    int i;                                                               /*0004*/
+
+//  T() {}
+
    int n;                                                               /*0005*/
    {
 
 //  T(i) {0<=i, n<=i}
 
       // BEGIN BLOCK
+
+//  T() {j==0}
+
       int j = 0;                                                        /*0009*/
 
 //  T(i,j) {i+j#init==j, 0<=i, i+j#init+1<=j+n, i+1<=n, j#init<=j}
@@ -99,13 +108,22 @@ void complete04()
 //  P() {}
 
    // BEGIN BLOCK
+
+//  P() {}
+
    int i;                                                               /*0004*/
+
+//  P() {}
+
    int n;                                                               /*0005*/
    {
 
-//  P() {j==0}
+//  P() {}
 
       // BEGIN BLOCK
+
+//  P() {}
+
       int j = 0;                                                        /*0009*/
 
 //  P() {j==0}

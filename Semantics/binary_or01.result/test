@@ -57,6 +57,9 @@ Source code with transformers for "binary_or01"
 
 binary_or01()
 {
+
+//  T() {ret==1}
+
    int ret = 1;                                                         /*0014*/
 
 //  T(ret) {}
@@ -77,6 +80,9 @@ Source code with preconditions for "binary_or01"
 
 binary_or01()
 {
+
+//  P() {}
+
    int ret = 1;                                                         /*0014*/
 
 //  P() {ret==1}

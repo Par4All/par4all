@@ -76,7 +76,13 @@ Transformers for "update02"
 
 void update02()
 {
+
+//  T() {i==1}
+
    int i = 1;
+
+//  T() {}
+
    int j;
 
 //  T(i,j) {i==i#init+2, i==j}
@@ -113,7 +119,13 @@ Preconditions for "update02"
 
 void update02()
 {
+
+//  P() {}
+
    int i = 1;
+
+//  P() {i==1}
+
    int j;
 
 //  P() {i==1}

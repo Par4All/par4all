@@ -6,7 +6,10 @@ C  T(if06) {0<=if06+1, if06<=1}
 
 int if06()
 {
-   int i,  n;
+
+//  T() {}
+
+   int i, n;
 
 //  T(i) {i==0}
 

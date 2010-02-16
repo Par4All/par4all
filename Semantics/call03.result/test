@@ -59,7 +59,13 @@ Source code with transformers for "main"
 
 main()
 {
+
+//  T() {ai==3}
+
    int ai = 3;                                                          /*0014*/
+
+//  T() {}
+
    float ax = 4.;                                                       /*0015*/
 
 //  T(TOP-LEVEL:j) {TOP-LEVEL:j==j#init+1}
@@ -101,7 +107,13 @@ Source code with preconditions for "main"
 
 main()
 {
+
+//  P() {TOP-LEVEL:j==0}
+
    int ai = 3;                                                          /*0014*/
+
+//  P() {TOP-LEVEL:j==0, ai==3}
+
    float ax = 4.;                                                       /*0015*/
 
 //  P() {TOP-LEVEL:j==0, ai==3}
