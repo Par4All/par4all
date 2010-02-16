@@ -681,7 +681,7 @@ transformer statement_to_postcondition(
 	list non_initial_values =
 	    arguments_difference(transformer_arguments(pre),
 				 get_module_global_arguments());
-	list dl = statement_block_p(s) ? statement_declarations(s) : NIL;
+	list dl = declaration_statement_p(s) ? statement_declarations(s) : NIL;
 
 	/* FI: OK, to be fixed when the declaration representation is
 	   frozen. */
@@ -705,18 +705,24 @@ transformer statement_to_postcondition(
 	    precondition_add_reference_information(pre, s);
 	}
 
+	/* Add information from declarations when possible */
 	if(!ENDP(dl)) {
-	  list vl = variables_to_values(dl);
 	  transformer dt = declarations_to_transformer(dl, pre);
 	  transformer dpre = transformer_apply(dt, pre);
 
 	  post = instruction_to_postcondition(dpre, i, tf);
-	  if(!ENDP(vl))
-	    post = safe_transformer_projection(post, vl);
 	  free_transformer(dpre);
 	}
 	else {
 	  post = instruction_to_postcondition(pre, i, tf);
+	}
+
+	/* Remove information when leaving a block */
+	if(statement_block_p(s) && !ENDP(statement_declarations(s))) {
+	  list vl = variables_to_values(statement_declarations(s));
+
+	  if(!ENDP(vl))
+	    post = safe_transformer_projection(post, vl);
 	}
 
 	/* add equivalence equalities */
@@ -759,8 +765,8 @@ transformer statement_to_postcondition(
 	    pips_internal_error("Non-consistent precondition after update\n");
 	}
 
-	/* Do not keep too many initial variables in the preconditions: not so smart? 
-	 * 
+	/* Do not keep too many initial variables in the preconditions: not so smart?
+	 *
 	 * See character01.c, but other counter examples above about
 	 * non_initial_values.
 	 */

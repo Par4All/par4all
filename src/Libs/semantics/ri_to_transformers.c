@@ -1808,7 +1808,7 @@ transformer statement_to_transformer(
   if (transformer_undefined_p(ot)
       || get_bool_property("SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT")) {
     //list dl = declaration_statement_p(s) ? statement_declarations(s) : NIL;
-    list dl = statement_block_p(s) ? statement_declarations(s) : NIL;
+    list dl = declaration_statement_p(s) ? statement_declarations(s) : NIL;
 
     /* FI: OK, we will have to switch to the new declaration
        representation some day, but the old representation is still
@@ -1848,8 +1848,11 @@ transformer statement_to_transformer(
       transformer_add_reference_information(nt, s);
       /* nt = transformer_normalize(nt, 0); */
     }
-    if(!ENDP(dl)) {
-      /* Get rid of the non static variables declared in this statement. */
+
+    /* When we leave a block the local stack allocated variables
+       disappear */
+    if(statement_block_p(s) && !ENDP(dl=statement_declarations(s))) {
+      /* Get rid of the non static variables declared in this block statement. */
       list vl = dynamic_variables_to_values(dl);
       if(!ENDP(vl))
 	nt = safe_transformer_projection(nt, vl);

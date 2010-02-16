@@ -3514,6 +3514,7 @@ text text_statement_enclosed(entity module,
       else {
 	text ct = C_comment_to_text(nmargin, comments);
 	MERGE_TEXTS(r, ct);
+	MERGE_TEXTS(r, init_text_statement(module, nmargin, stmt));
       }
     }
     else if(!prettyprint_is_fortran && !braces_p && !braces_added &&ENDP(dl)) {
@@ -3523,6 +3524,9 @@ text text_statement_enclosed(entity module,
       sentence s = MAKE_ONE_WORD_SENTENCE(nmargin,
 					  strdup(C_CONTINUE_FUNCTION_NAME));
       ADD_SENTENCE_TO_TEXT(r, s);
+    }
+    else if(!ENDP(dl)) {
+      MERGE_TEXTS(r, init_text_statement(module, nmargin, stmt));
     }
     free_text(temp);
   }
