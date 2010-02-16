@@ -38,6 +38,9 @@ void flatten_code11(void)
 //  P() {}
 
    // BEGIN BLOCK
+
+//  P() {}
+
    int i;                                                               /*0004*/
 
 //  P() {}
@@ -49,6 +52,9 @@ void flatten_code11(void)
 //  P(foo,i) {0<=i, i<=3}
 
       // BEGIN BLOCK
+
+//  P(foo,i) {0<=i, i<=3}
+
       static int foo = 0;                                               /*0008*/
 
 //  P(foo,i) {0<=i, i<=3}

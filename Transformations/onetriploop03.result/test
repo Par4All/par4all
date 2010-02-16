@@ -33,7 +33,13 @@ void foo(char *f, int a)
 
 void onetriploop03(int n)
 {
+
+//  P() {}
+
    int i;
+
+//  P() {}
+
    int m;
 
 //  P() {}

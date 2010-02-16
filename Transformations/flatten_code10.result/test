@@ -5,10 +5,12 @@ void flatten_code10(void)
 {
 // (0,1)
    // BEGIN BLOCK
+// (0,2)
    int i = 2;                                                           /*0004*/
    {
 // (0,3)
       // BEGIN BLOCK
+// (0,4)
       extern int foo;                                                   /*0007*/
 // (0,5)
 
@@ -24,6 +26,7 @@ void flatten_code10(void)
 {
 // (0,1)
    // BEGIN BLOCK
+// (0,2)
    int i = 2;                                                           /*0004*/
 // (0,3)
 

@@ -547,29 +547,71 @@ Preconditions after inlining and before partial eval
 
 int main()
 {
+
+//  P() {}
+
    freia_data2d *imout;
+
+//  P() {}
+
    freia_data2d *imin;
+
+//  P() {}
+
    int32_t connexity = 8;
+
+//  P() {connexity==8}
+
    uint32_t size = 4;
    //PIPS generated variable
+
+//  P() {connexity==8, size==4}
+
    int _return1, _return2;
    //PIPS generated variable
+
+//  P() {connexity==8, size==4}
+
    freia_error ret_0;
    //PIPS generated variable
+
+//  P() {connexity==8, size==4}
+
    int _return0_0, kernel_8c_0[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1}, kernel_6c_0[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1}, kernel_4c_0[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0}, i_0;
    //PIPS generated variable
+
+//  P() {connexity==8, size==4}
+
    freia_error ret_1;
    //PIPS generated variable
+
+//  P() {connexity==8, size==4}
+
    int kernel_8c_1[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1}, kernel_6c_1[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1}, kernel_4c_1[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0}, i_1;
    //PIPS generated variable
+
+//  P() {connexity==8, size==4}
+
    freia_error ret_2, ret_3;
    //PIPS generated variable
+
+//  P() {connexity==8, size==4}
+
    int _return0_1, kernel_8c_2[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1}, kernel_6c_2[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1}, kernel_4c_2[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0}, i_2;
    //PIPS generated variable
+
+//  P() {connexity==8, size==4}
+
    freia_error ret_4;
    //PIPS generated variable
+
+//  P() {connexity==8, size==4}
+
    int kernel_8c_3[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1}, kernel_6c_3[9] = {0, 1, 1, 1, 1, 1, 0, 1, 1}, kernel_4c_3[9] = {0, 1, 0, 1, 1, 1, 0, 1, 0}, i_3;
    //PIPS generated variable
+
+//  P() {connexity==8, size==4}
+
    freia_error ret_5;
 
 //  P() {connexity==8, size==4}
