@@ -1,6 +1,6 @@
 main()
 {
-   int i,  j;
+   int i, j;
    int a[5];
    i = 1;
    while (i<5) {
@@ -10,7 +10,7 @@ main()
 }
 main()
 {
-   int i,  j;
+   int i, j;
    int a[5];
 //               <must be written>: i
    i = 1;
@@ -29,7 +29,13 @@ main()
 
 main()
 {
-   int i,  j;
+
+//  T() {}
+
+   int i, j;
+
+//  T() {}
+
    int a[5];
 
 //  T(i) {i==1}
@@ -54,7 +60,13 @@ main()
 
 main()
 {
-   int i,  j;
+
+//  P() {}
+
+   int i, j;
+
+//  P() {}
+
    int a[5];
 
 //  P() {}
@@ -76,7 +88,7 @@ main()
 }
 main()
 {
-   int i,  j;
+   int i, j;
    int a[5];
    i = 1;
 

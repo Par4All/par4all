@@ -4,7 +4,7 @@ main()
    enum legumes {carotte=rose+50, haricot};
    enum fleurs ma1, ma2, ma3;
    enum legumes mon1, mon2;
-   int i,  a1,  a2,  a3,  on1,  on2,  j;
+   int i, a1, a2, a3, on1, on2, j;
 
    ma1 = rose;
    ma2 = marguerite;
@@ -27,11 +27,26 @@ main()
 
 main()
 {
+
+//  P() {}
+
    enum fleurs {rose=0x0001, marguerite=0, jasmin};
+
+//  P() {}
+
    enum legumes {carotte=rose+50, haricot};
+
+//  P() {}
+
    enum fleurs ma1, ma2, ma3;
+
+//  P() {}
+
    enum legumes mon1, mon2;
-   int i,  a1,  a2,  a3,  on1,  on2,  j;
+
+//  P() {}
+
+   int i, a1, a2, a3, on1, on2, j;
 
 //  P() {}
 

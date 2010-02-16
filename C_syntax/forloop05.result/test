@@ -121,6 +121,9 @@ Printed file with transformers for "foo"
 int foo(int i)
 {
    /* Default type is int */
+
+//  T() {}
+
    static int l;
 
 //  T(l) {i==l}
@@ -139,6 +142,9 @@ Printed file with transformers for "main"
 
 int main()
 {
+
+//  T() {BlockEnd==3}
+
    int i, j, n, BlockEnd = 3;
 
 //  T(i) {BlockEnd==3, i==1}
@@ -158,6 +164,9 @@ int main()
 //  T(foo:0`l,j,n) {BlockEnd==3, i+n==j, i==j#init, i<=15, i<=j}
 
          for(n = 0; n <= BlockEnd-1; n += 1) {
+
+//  T() {BlockEnd==3, i<=15, 0<=n, n<=2}
+
             int k, l;
 
 //  T(foo:0`l,k) {BlockEnd==3, foo:0`l==k, foo:0`l==n, 0<=foo:0`l,
@@ -195,6 +204,9 @@ Printed file preconditions for "main"
 
 int main()
 {
+
+//  P() {}
+
    int i, j, n, BlockEnd = 3;
 
 //  P() {BlockEnd==3}
@@ -214,6 +226,9 @@ int main()
 //  P(foo:0`l,i,j,n) {BlockEnd==3, i==j, i<=15}
 
          for(n = 0; n <= BlockEnd-1; n += 1) {
+
+//  P(foo:0`l,i,j,n) {BlockEnd==3, i+n==j, i<=15, i<=j, 0<=n, n<=2}
+
             int k, l;
 
 //  P(foo:0`l,i,j,n) {BlockEnd==3, i+n==j, i<=15, i<=j, 0<=n, n<=2}
@@ -251,6 +266,9 @@ Printed file with preconditions for "for"
 int foo(int i)
 {
    /* Default type is int */
+
+//  P() {0<=i, i<=2}
+
    static int l;
 
 //  P() {0<=i, i<=2}

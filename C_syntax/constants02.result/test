@@ -42,10 +42,25 @@ Preconditions
 
 main()
 {
+
+//  P() {i==-1}
+
    unsigned int i = 4294967295U;
+
+//  P() {i==-1}
+
    unsigned int j;
+
+//  P() {i==-1}
+
    int k;
+
+//  P() {i==-1}
+
    int t;
+
+//  P() {i==-1}
+
    int u;
 
 //  P() {i==-1}

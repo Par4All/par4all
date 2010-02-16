@@ -7,7 +7,13 @@ Preconditions derived from enum
 
 //  P() {}
 
+
+//  P() {}
+
 enum {a, b, c=b+3};
+
+
+//  P() {}
 
 extern int main();
 
@@ -16,9 +22,21 @@ extern int main();
 
 main()
 {
+
+//  P() {}
+
    int ia;
+
+//  P() {}
+
    int ib;
+
+//  P() {}
+
    int ic;
+
+//  P() {}
+
    int t;
 
 //  P() {}

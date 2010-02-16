@@ -18,7 +18,13 @@ Printed file with precoditions for "main"
 
 main()
 {
-   int i01,  i02,  i03,  i04,  i05,  i06,  i07,  i08,  i09,  i10,  i11,  i12;
+
+//  P() {}
+
+   int i01, i02, i03, i04, i05, i06, i07, i08, i09, i10, i11, i12;
+
+//  P() {}
+
    int t;
 
 //  P() {}

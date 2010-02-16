@@ -58,6 +58,9 @@ Transformers for "main"
 
 int main()
 {
+
+//  T() {}
+
    int i, j;                                                            /*0013*/
 
 //  T(i,j) {i==2, j==1}
@@ -82,6 +85,9 @@ Preconditions for "main"
 
 int main()
 {
+
+//  P() {}
+
    int i, j;                                                            /*0013*/
 
 //  P() {}

@@ -30,7 +30,13 @@ Printed file generate01 with intraprocedural preconditions
 
 void generate01()
 {
+
+//  P() {}
+
    int i = 0;
+
+//  P() {i==0}
+
    double x = 1.;
 
 //  P() {i==0}

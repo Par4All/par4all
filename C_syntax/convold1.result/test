@@ -19,7 +19,7 @@ PARSED PRINTED FILE for convold1
 
 int convold1(int X[13][13], int coeff[6], int i, int j)
 {
-   int m,  res;
+   int m, res;
    
    /* for  (m = 0; m<= 5; m++) */
    
@@ -34,7 +34,7 @@ PRINTED FILE for convold1
 
 int convold1(int X[13][13], int coeff[6], int i, int j)
 {
-   int m,  res;
+   int m, res;
    
    /* for  (m = 0; m<= 5; m++) */
    
@@ -49,7 +49,7 @@ Effects for convold1
 
 int convold1(int X[13][13], int coeff[6], int i, int j)
 {
-   int m,  res;
+   int m, res;
 //               <must be written>: res
    
    /* for  (m = 0; m<= 5; m++) */
@@ -72,7 +72,10 @@ Transformers for convold1
 
 int convold1(int X[13][13], int coeff[6], int i, int j)
 {
-   int m,  res;
+
+//  T() {}
+
+   int m, res;
 
 //  T(res) {res==0}
 
@@ -102,7 +105,10 @@ Preconditions for convold1
 
 int convold1(int X[13][13], int coeff[6], int i, int j)
 {
-   int m,  res;
+
+//  P() {}
+
+   int m, res;
 
 //  P() {}
 
@@ -133,7 +139,7 @@ PRINTED Regions for convold1
 
 int convold1(int X[13][13], int coeff[6], int i, int j)
 {
-   int m,  res;
+   int m, res;
    
    /* for  (m = 0; m<= 5; m++) */
    

@@ -18,7 +18,13 @@ Transformers for "initialization05"
 
 int initialization05()
 {
+
+//  T() {}
+
    int a = a;
+
+//  T() {}
+
    int i;
 
 //  T(i) {a==i-1}
@@ -42,7 +48,13 @@ Preconditions for "initialization05"
 
 int initialization05()
 {
+
+//  P() {}
+
    int a = a;
+
+//  P() {}
+
    int i;
 
 //  P() {}
