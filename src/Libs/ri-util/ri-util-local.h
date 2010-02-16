@@ -1446,7 +1446,7 @@ entity get_ith_##lname##_prime(int i)\
 #define DEFAULT_LONG_INTEGER_TYPE_SIZE (6)
 #define DEFAULT_LONG_LONG_INTEGER_TYPE_SIZE (8)
 
-#define DEFAULT_POINTER_TYPE_SIZE (4) // could be 4 or 8 or sizeof(pointer)
+#define DEFAULT_POINTER_TYPE_SIZE (sizeof(void *)) // could be 4 or 8 or sizeof(pointer)
 #define DEFAULT_UNSIGNED_TYPE_SIZE (1) // type_size/10==1
 #define DEFAULT_SIGNED_TYPE_SIZE (2) // type_size/10=2
 
@@ -1478,7 +1478,8 @@ the variable is unsigned, signed or not */
 #define DEFAULT_DOUBLECOMPLEX_TYPE_SIZE (16)
 #define DEFAULT_LOGICAL_TYPE_SIZE (4)
 
-#define DEFAULT_POINTER_TYPE_SIZE (4)
+/* Already defined */
+//#define DEFAULT_POINTER_TYPE_SIZE (4)
 
 /* Implicit variables to handle IO effetcs */
 

@@ -2558,7 +2558,7 @@ static list filtered_declaration_list(list del)
   }
 
   /* Now we still have to deal with "void * p = ... derived type
-     definition..."  Maybe, we simply want to make sure that e1
+     definition(s)..."  Maybe, we simply want to make sure that e1
      belongs to type supporting entities of t2... but this is not
      strong enough because it includes types of formal arguments which
      are not relevant
@@ -2568,7 +2568,7 @@ static list filtered_declaration_list(list del)
 
     if(derived_entity_p(e1)) {
       bool match_p = FALSE;
-      type t1 = entity_type(e1);
+      //type t1 = entity_type(e1);
       entity e2 = ENTITY(CAR(CDR(el)));
       type t2 = entity_type(e2);
       type nt2 = type_undefined;
