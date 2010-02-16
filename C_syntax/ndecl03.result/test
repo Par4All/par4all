@@ -9,7 +9,7 @@ Variable list:
 
 	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
 	Declared entity "ndecl03!:*STATIC*" with type "area" with size 0
-	Declared entity "ndecl03:*DYNAMIC*" with type "area" with size 64
+	Declared entity "ndecl03:*DYNAMIC*" with type "area" with size 68
 	Declared entity "ndecl03:*HEAP*" with type "area" with size 0
 	Declared entity "ndecl03:*STACK*" with type "area" with size 0
 	Declared entity "ndecl03:*STATIC*" with type "area" with size 0
@@ -43,10 +43,10 @@ Layout for memory area "ndecl03!:*STATIC*" of size 0:
 	* empty area *
 
 
-Layout for memory area "ndecl03:*DYNAMIC*" of size 64:
+Layout for memory area "ndecl03:*DYNAMIC*" of size 68:
 	Variable "ndecl03:0`i"	offset = 16	size = 4
-	Variable "ndecl03:0`pi"	offset = 20	size = 4
-	Variable "ndecl03:0`ai"	offset = 24	size = 40
+	Variable "ndecl03:0`pi"	offset = 20	size = 8
+	Variable "ndecl03:0`ai"	offset = 28	size = 40
 	Variable "ndecl03:0`__func__"	offset = 0	size = 8
 	Variable "ndecl03:0`__FUNCTION__"	offset = 8	size = 8
 

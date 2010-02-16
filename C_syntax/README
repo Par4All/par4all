@@ -23,6 +23,7 @@ struct18	    NOK like struct04, but within a function instead of a compilation u
 struct19	    OK	same as struct04, but with two struct nested
 struct20	    OK  simple list recursive data structure
 struct21	    NOK bug in PIPS parser
+struct22	    OK	make sure simple cases are handled in a simple usual way
 
 enum06		    OK	reference to an enum in a declaration
 enum07		    OK  same as above + definition of an enum within a declaration

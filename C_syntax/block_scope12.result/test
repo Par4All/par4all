@@ -33,11 +33,11 @@ Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
 	External Variable "TOP-LEVEL:_IO_2_1_stdin_"	offset = UNKNOWN,	size = unknown
 	External Variable "TOP-LEVEL:_IO_2_1_stdout_"	offset = UNKNOWN,	size = unknown
 	External Variable "TOP-LEVEL:_IO_2_1_stderr_"	offset = UNKNOWN,	size = unknown
-	External Variable "TOP-LEVEL:stdin"	offset = UNKNOWN,	size = 4
-	External Variable "TOP-LEVEL:stdout"	offset = UNKNOWN,	size = 4
-	External Variable "TOP-LEVEL:stderr"	offset = UNKNOWN,	size = 4
+	External Variable "TOP-LEVEL:stdin"	offset = UNKNOWN,	size = 8
+	External Variable "TOP-LEVEL:stdout"	offset = UNKNOWN,	size = 8
+	External Variable "TOP-LEVEL:stderr"	offset = UNKNOWN,	size = 8
 	External Variable "TOP-LEVEL:sys_nerr"	offset = UNKNOWN,	size = 4
-	External Variable "TOP-LEVEL:sys_errlist"	offset = UNKNOWN,	size = 4
+	External Variable "TOP-LEVEL:sys_errlist"	offset = UNKNOWN,	size = 8
 
 
 Layout for memory area "block_scope12!:*STATIC*" of size 0:

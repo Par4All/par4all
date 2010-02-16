@@ -27,7 +27,7 @@ Layout for formal parameters:
 
 Layout for return variable:
 
-	Variable "return01:return01"	size = 4
+	Variable "return01:return01"	size = 8
 
 Layouts for memory areas:
 
