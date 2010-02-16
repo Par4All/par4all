@@ -419,7 +419,7 @@ bool reduction_variable_expansion(char *module_name) {
                 instruction do_the_assignment = make_instruction_loop(
                         make_loop(
                             loop_index(theloop),
-                            copy_range(loop_range(theloop)),
+                            make_range(copy_expression(dimension_lower(thedim)),copy_expression(dimension_upper(thedim)),make_expression_1()),
                             make_assign_statement(
                                 reference_to_expression(make_reference(new_entity,make_expression_list(make_expression_from_entity(loop_index(theloop))))),
                                 entity_to_expression(operator_neutral_element(reduction_operator_entity(reduction_op(red))))),
@@ -439,7 +439,14 @@ bool reduction_variable_expansion(char *module_name) {
                                 MakeBinaryCall(
                                     reduction_operator_entity(reduction_op(red)),
                                     reference_to_expression(copy_reference(reduction_reference(red))),
-                                    reference_to_expression(make_reference(new_entity,CONS(EXPRESSION,entity_to_expression(loop_index(theloop)),NIL)))
+                                    reference_to_expression(make_reference(new_entity,
+                                            CONS(EXPRESSION,
+                                                make_op_exp("-",
+                                                    make_op_exp("/",entity_to_expression(loop_index(theloop)),copy_expression(range_increment(loop_range(theloop)))),
+                                                    copy_expression(range_lower(loop_range(theloop)))
+                                                    )
+
+                                                ,NIL)))
                                     )
                                 ),
                             entity_empty_label(),
