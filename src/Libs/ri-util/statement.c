@@ -2965,8 +2965,13 @@ static void statement_clean_declarations_statement_walker(statement s, set re)
  */
 set get_referenced_entities(void* elem)
 {
-  /* gather entities from s*/
   set referenced_entities = set_make(set_pointer);
+
+  /* if s is an entity it self, add it */
+  if(INSTANCE_OF(entity,(gen_chunkp)elem))
+      set_add_element(referenced_entities,referenced_entities,elem);
+
+  /* gather entities from s*/
   gen_context_multi_recurse(elem,referenced_entities,
 			    loop_domain,gen_true,statement_clean_declarations_loop_walker,
 			    reference_domain,gen_true,statement_clean_declarations_reference_walker,

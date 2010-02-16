@@ -1018,17 +1018,26 @@ set get_private_entities(void *s)
 static
 void sort_entities_with_dep(list *l)
 {
-    gen_sort_list(*l,(gen_cmp_func_t)compare_entities);
-    list l_parameters=NIL,l_others=NIL;
+    set params = set_make(set_pointer);
     FOREACH(ENTITY,e,*l)
     {
-        if(entity_symbolic_p(e))
-            l_parameters=CONS(ENTITY,e,l_parameters);
-        else
-            l_others=CONS(ENTITY,e,l_others);
+        set e_ref = get_referenced_entities(e);
+        set_del_element(e_ref,e_ref,e);
+        set_union(params,params,e_ref);
+        set_free(e_ref);
     }
+
+    set base = set_make(set_pointer);
+    set_assign_list(base,*l);
+    set_difference(base,base,params);
+
+    list l_params = set_to_sorted_list(params,(gen_cmp_func_t)compare_entities);
+    list l_base = set_to_sorted_list(base,(gen_cmp_func_t)compare_entities);
+
+    set_free(base);set_free(params);
     gen_free_list(*l);
-    *l=gen_nconc(l_parameters,l_others);
+
+    *l=gen_nconc(l_params,l_base);
 }
 
 struct cpv {
