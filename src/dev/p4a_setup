@@ -23,7 +23,7 @@ PIPS_ARCH=`$PIPS_DIR/nlpmake/makes/arch.sh`
 export PIPS_ARCH
 
 # The config files to source later:
-P4A_RC=$P4A_ETC/par4all-rc.sh
+P4A_RC_SH=$P4A_ETC/par4all-rc.sh
 P4A_RC_CSH=$P4A_ETC/par4all-rc.csh
 
 
