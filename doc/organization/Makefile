@@ -13,10 +13,10 @@ ROOT    = $(P4A_ROOT)/packages/PIPS/pips
 PROJECT	= pips
 include $(ROOT)/makes/main.mk
 
-default: full-compile
+default: full-compile phase7
 
 publish:
-	rsync -a par4all_organization.pdf par4all_organization.htdoc ridee.enstb.org:/var/www/par4all/doc/organization
+	rsync -av par4all_organization.pdf par4all_organization.htdoc ridee.enstb.org:/var/www/par4all/doc/organization
 
 # local stuff
 clean: local-clean
