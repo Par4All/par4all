@@ -13,35 +13,69 @@
 #include "effects-generic.h"
 
 /** 
+ * create a guard @a guard around statement @a s
+ * 
+ * @param s statement to guard
+ * @param guard guard to apply
+ */
+static void guard_expanded_statement(statement s, expression guard)
+{
+    instruction ins = make_instruction_test(
+            make_test(
+                copy_expression(guard),
+                copy_statement(s),/* update_instruction force us to copy */
+                make_empty_statement()
+                )
+            );
+    update_statement_instruction(s,ins);
+}
+
+/** 
  * create a guard @a guard around statement @a s if needed
  * it is needed when a not-private variable (that is not in @a privates)
  * is written by the statement
  * @param s statement to guard
  * @param guard guard to apply
- * @param privates set of enclosing loop locals
+ * @param parent_loop set of enclosing loop locals
  */
 static
-void guard_expanded_statement_if_needed(statement s,expression guard, set privates)
+void guard_expanded_statement_if_needed(statement s,expression guard, loop parent_loop)
 {
-    list effects = load_cumulated_rw_effects_list(s);
-    bool must_guard= false;
-    FOREACH(EFFECT,eff,effects)
+    if(statement_block_p(s))
     {
-        if((must_guard=(effect_write_p(eff) && !set_belong_p(privates,effect_entity(eff)))))
-            break;
-        /* an io effect implies a guard too */
-        if((must_guard=io_effect_p(eff)))
-            break;
+        FOREACH(STATEMENT,st,statement_block(s))
+            guard_expanded_statement_if_needed(st,guard,parent_loop);
     }
-    if(must_guard) {
-        instruction ins = make_instruction_test(
-                make_test(
-                    copy_expression(guard),
-                    copy_statement(s),/* update_instruction force us to copy */
-                    make_empty_statement()
-                    )
-                );
-        update_statement_instruction(s,ins);
+    else if(statement_loop_p(s))
+    {
+        loop l =statement_loop(s);
+        set s0 = get_referenced_entities(loop_range(l));
+        if(set_belong_p(s0,loop_index(parent_loop)))
+            guard_expanded_statement(s,guard);
+        else
+            guard_expanded_statement_if_needed(loop_body(l),guard,parent_loop);
+        set_free(s0);
+    }
+    else {
+        list effects = load_cumulated_rw_effects_list(s);
+        list decls = statement_to_declarations(s);
+        set sdecls = set_make(set_pointer);set_assign_list(sdecls,decls); gen_free_list(decls);
+        list privates = loop_locals(parent_loop);
+        set sprivates = set_make(set_pointer); set_assign_list(sprivates,privates);
+
+        bool must_guard= false;
+        FOREACH(EFFECT,eff,effects)
+        {
+            if((must_guard=(effect_write_p(eff) && 
+                            !set_belong_p(sprivates,effect_entity(eff)) &&
+                            !set_belong_p(sdecls,effect_entity(eff)) )))
+                break;
+            /* an io effect implies a guard too */
+            if((must_guard=io_effect_p(eff)))
+                break;
+        }
+        set_free(sdecls);set_free(sprivates);
+        if(must_guard) guard_expanded_statement(s,guard);
     }
 }
 
@@ -58,55 +92,80 @@ void do_loop_expansion(statement st, int size)
         expression remainder = make_op_exp(MODULO_OPERATOR_NAME, nb_iter, int_to_expression(size));
         /* this checks wether the remainder is 0 or not, that is do we need to expand the loop or not ? */
         expression not_expand_p = MakeBinaryCall(entity_intrinsic(EQUAL_OPERATOR_NAME),remainder,int_to_expression(0));
+        value not_expand_v = EvalExpression(not_expand_p);
         /* this will hold the new value of range_upper */
-        entity new_range_upper = make_new_scalar_variable(get_current_module_entity(),basic_of_expression(range_upper(r)));
-        AddEntityToCurrentModule(new_range_upper);
+        entity new_range_upper = entity_undefined;
+        expression new_range_upper_value = 
+                    make_op_exp(PLUS_OPERATOR_NAME,
+                        copy_expression(range_upper(r)),
+                        make_op_exp(MINUS_OPERATOR_NAME,
+                            int_to_expression(size),
+                            copy_expression(remainder)));
 
         /* this makes the conditionnal assignment */
-        statement assign_expand = make_assign_statement(
-                entity_to_expression(new_range_upper),
-                make_op_exp(PLUS_OPERATOR_NAME,
-                    copy_expression(range_upper(r)),
-                    make_op_exp(MINUS_OPERATOR_NAME,
-                        int_to_expression(size),
-                        copy_expression(remainder)))
-                );
-        statement assign_not_expand = make_assign_statement(
-                entity_to_expression(new_range_upper),
-                copy_expression(range_upper(r)));
+        statement conditionnal_assignement = statement_undefined;
 
-        statement conditionnal_assignement = instruction_to_statement(
-                make_instruction_test(
-                    make_test(
-                        not_expand_p,
-                        assign_not_expand,
-                        assign_expand)
-                    )
-                );
-        statement_comments(conditionnal_assignement)=strdup("// PIPS test to adjust loop size to required loop expansion parameter");
+
+        if(value_constant_p(not_expand_v))
+        {
+            constant c = value_constant(not_expand_v);
+            bool remainder_is_zero_p = false;
+            switch( constant_tag(c))
+            {
+                case is_constant_int:
+                    if(constant_int(c)==0) remainder_is_zero_p=true;
+                    break;
+                case is_constant_logical:
+                    if(constant_logical(c)) remainder_is_zero_p=true;
+                    break;
+                default:
+                    pips_internal_error("unexpected case\n");
+            }
+        }
+        else {
+            new_range_upper=make_new_scalar_variable(get_current_module_entity(),basic_of_expression(range_upper(r)));
+            AddEntityToCurrentModule(new_range_upper);
+
+            statement assign_expand = make_assign_statement(
+                    entity_to_expression(new_range_upper),
+                    new_range_upper_value
+                    );
+            statement assign_not_expand = make_assign_statement(
+                    entity_to_expression(new_range_upper),
+                    copy_expression(range_upper(r)));
+
+            conditionnal_assignement = instruction_to_statement(
+                    make_instruction_test(
+                        make_test(
+                            not_expand_p,
+                            assign_not_expand,
+                            assign_expand)
+                        )
+                    );
+            statement_comments(conditionnal_assignement)=strdup("// PIPS test to adjust loop size to required loop expansion parameter");
+        }
 
         /* set the guard on all statement that need it */
-        set privates = set_make(set_pointer);
-        privates=set_assign_list(privates,loop_locals(l));
         expression guard = MakeBinaryCall(
                 entity_intrinsic(LESS_OR_EQUAL_OPERATOR_NAME),
                 entity_to_expression(loop_index(l)),
                 range_upper(r)
                 );
-        if(statement_block_p(loop_body(l)))
-        {
-            FOREACH(STATEMENT,s,statement_block(loop_body(l)))
-                guard_expanded_statement_if_needed(s,guard,privates);
-        }
-        else
-            guard_expanded_statement_if_needed(loop_body(l),guard,privates);
-        set_free(privates);
+
+        guard_expanded_statement_if_needed(loop_body(l),guard,l);
         free_expression(guard);
 
-        /* update loop fields */
-        range_upper(r)=entity_to_expression(new_range_upper);
-        /* insert new loop bound assignment */
-        insert_statement(st,conditionnal_assignement,true);
+        /* update loop fields either by a constant, or by a new entity with appropriate init*/
+        if(statement_undefined_p(conditionnal_assignement))/* this neams everything is known statically */
+        {
+            range_upper(r)=new_range_upper_value;
+        }
+        else
+        {
+            range_upper(r)=entity_to_expression(new_range_upper);
+            /* insert new loop bound assignment */
+            insert_statement(st,conditionnal_assignement,true);
+        }
     }
     else
         pips_user_warning("cannot expand a loop with non constant increment\n");
