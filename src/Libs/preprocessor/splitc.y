@@ -68,6 +68,13 @@
 
 #define C_ERROR_VERBOSE 1 /* much clearer error messages with bison */
 
+/* Increase the parser stack to have SPEC2006/445.gobmk/owl_defendpat.c
+   going through without a:
+
+   user warning in splitc_error: C memory exhausted near "0" at preprocessed line 13459 (user line 8732)
+*/
+#define YYMAXDEPTH 1000000
+
 extern int splitc_lex(void);
 extern void splitc_error(char *);
 extern int get_csplit_current_beginning(void);
