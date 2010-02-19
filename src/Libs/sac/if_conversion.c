@@ -219,17 +219,22 @@ static void process_true_stat(statement parent, expression cond, statement stat)
         process_true_stat(stat,cond,loop_body(statement_loop(stat)));
 
     // If stat is a sequence statement, ...
-    else if(instruction_sequence_p(statement_instruction(stat)))
+    else if(statement_block_p(stat))
     {
         // first split initalizations
         statement_split_initializations(stat);
 
         // then do the processing
         bool something_bad_p=false;
-        FOREACH(STATEMENT,st,statement_block(stat))
+        if(statement_block_p(stat))
         {
-            something_bad_p|=!process_true_call_stat(cond, st);
+            FOREACH(STATEMENT,st,statement_block(stat))
+            {
+                something_bad_p|=!process_true_call_stat(cond, st);
+            }
         }
+        else
+            something_bad_p|=!process_true_call_stat(cond, stat);
         if(!something_bad_p)
         {
             statement_instruction(parent)=instruction_undefined;

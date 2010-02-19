@@ -32,7 +32,7 @@ static void guard_expanded_statement(statement s, expression guard)
 
 /** 
  * create a guard @a guard around statement @a s if needed
- * it is needed when a not-private variable (that is not in @a privates)
+ * it is needed when a not-private variable (that is not in @a parent_loop locals)
  * is written by the statement
  * @param s statement to guard
  * @param guard guard to apply
@@ -41,11 +41,13 @@ static void guard_expanded_statement(statement s, expression guard)
 static
 void guard_expanded_statement_if_needed(statement s,expression guard, loop parent_loop)
 {
+    /* map guard on each block */
     if(statement_block_p(s))
     {
         FOREACH(STATEMENT,st,statement_block(s))
             guard_expanded_statement_if_needed(st,guard,parent_loop);
     }
+    /* map on loop body if range independant from loop_index(parent_loop) */
     else if(statement_loop_p(s))
     {
         loop l =statement_loop(s);
@@ -80,7 +82,7 @@ void guard_expanded_statement_if_needed(statement s,expression guard, loop paren
 }
 
 static
-void do_loop_expansion(statement st, int size)
+void do_loop_expansion(statement st, int size,int offset)
 {
     loop l =statement_loop(st);
     range r = loop_range(l);
@@ -99,8 +101,9 @@ void do_loop_expansion(statement st, int size)
                     make_op_exp(PLUS_OPERATOR_NAME,
                         copy_expression(range_upper(r)),
                         make_op_exp(MINUS_OPERATOR_NAME,
-                            int_to_expression(size),
+                            int_to_expression(size-offset),
                             copy_expression(remainder)));
+        expression new_range_lower_value = make_op_exp("-",range_lower(r),int_to_expression(offset));
 
         /* this makes the conditionnal assignment */
         statement conditionnal_assignement = statement_undefined;
@@ -146,11 +149,21 @@ void do_loop_expansion(statement st, int size)
         }
 
         /* set the guard on all statement that need it */
-        expression guard = MakeBinaryCall(
-                entity_intrinsic(LESS_OR_EQUAL_OPERATOR_NAME),
-                entity_to_expression(loop_index(l)),
-                range_upper(r)
-                );
+        expression guard = 
+            MakeBinaryCall(
+                    entity_intrinsic(AND_OPERATOR_NAME),
+                    MakeBinaryCall(
+                        entity_intrinsic(GREATER_OR_EQUAL_OPERATOR_NAME),
+                        entity_to_expression(loop_index(l)),
+                        range_lower(r)
+                        )
+                    ,
+                    MakeBinaryCall(
+                        entity_intrinsic(LESS_OR_EQUAL_OPERATOR_NAME),
+                        entity_to_expression(loop_index(l)),
+                        range_upper(r)
+                        )
+                    );
 
         guard_expanded_statement_if_needed(loop_body(l),guard,l);
         free_expression(guard);
@@ -159,10 +172,12 @@ void do_loop_expansion(statement st, int size)
         if(statement_undefined_p(conditionnal_assignement))/* this neams everything is known statically */
         {
             range_upper(r)=new_range_upper_value;
+            range_lower(r)=new_range_lower_value;
         }
         else
         {
             range_upper(r)=entity_to_expression(new_range_upper);
+            range_lower(r)=new_range_lower_value;
             /* insert new loop bound assignment */
             insert_statement(st,conditionnal_assignement,true);
         }
@@ -199,7 +214,7 @@ bool loop_expansion(const string module_name)
                 if( rate > 0)
                 {
                     /* ok for the ui part, let's do something !*/
-                    do_loop_expansion(loop_statement,rate);
+                    do_loop_expansion(loop_statement,rate,get_int_property("LOOP_EXPANSION_OFFSET"));
                     /* commit changes */
                     module_reorder(get_current_module_statement()); ///< we may have had statements
                     DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, get_current_module_statement());

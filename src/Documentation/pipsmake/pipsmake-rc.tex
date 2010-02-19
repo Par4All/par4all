@@ -6186,7 +6186,8 @@ PARTIAL_DISTRIBUTION FALSE
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Loop expansion
 \subsection{Loop Expansion}
 \begin{PipsPass}
-Extends the range of a loop given by \PipsPropRef{LOOP_LABEL} to fit a size given by \PipsPropRef{LOOP_EXPANSION_SIZE}
+Extends the range of a loop given by \PipsPropRef{LOOP_LABEL} to fit a size given by \PipsPropRef{LOOP_EXPANSION_SIZE}.
+An offset can be set by \PipsPropRef{LOOP_EXPANSION_OFFSET} to accuratly change the lower bound too.
 The new loop is guarded to prevent illegal iterations, further transformations can elaborate on this.
 \end{PipsPass}
 \begin{PipsMake}
@@ -6197,6 +6198,9 @@ loop_expansion 	> MODULE.code
 \end{PipsMake}
 \begin{PipsProp}{LOOP_EXPANSION_SIZE}
 LOOP_EXPANSION_SIZE 0
+\end{PipsProp}
+\begin{PipsProp}{LOOP_EXPANSION_OFFSET}
+LOOP_EXPANSION_OFFSET 0
 \end{PipsProp}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Index Set Splitting
@@ -8836,8 +8840,7 @@ performed earlier.
 \index{Reduction Parallelization}
 
 \begin{PipsPass}{scalar_expansion}
-Loop private scalar variables are expanded when all enclosing loops have
-numerical bounds and increment one.
+Loop private scalar variables are expanded
 \end{PipsPass}
 
 \begin{PipsMake}

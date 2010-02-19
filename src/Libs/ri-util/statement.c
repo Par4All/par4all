@@ -2364,6 +2364,10 @@ statement update_statement_instruction(statement s,instruction i)
     {
       free_instruction(statement_instruction(s));
       statement_instruction(s) = i;
+      /* SG: if the old statement add declarations, they are removed
+       * maybe we should regenerate the new one if any to keep global coherency ?*/
+      gen_free_list(statement_declarations(s));
+      statement_declarations(s)=NIL;
     }
   return s;
 }
