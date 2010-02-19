@@ -1,12 +1,23 @@
 delete linpack
-create linpack linpack.c
+create linpack linpack.c include/clock.c
+
+setproperty UNSPAGHETTIFY_WHILE_RECOVER TRUE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER FALSE
+apply RESTRUCTURE_CONTROL
+apply RECOVER_FOR_LOOP
+apply FOR_LOOP_TO_DO_LOOP
 
 display PRINTED_FILE(%ALLFUNC)
 
-apply PRIVATIZE_MODULE(linpack!ddot_r)
-apply INTERNALIZE_PARALLEL_CODE(linpack!ddot_r)
-apply OMPIFY_CODE(linpack!ddot_r)
-display PRINTED_FILE(linpack!ddot_r)
+apply PRIVATIZE_MODULE(%ALLFUNC)
+apply INTERNALIZE_PARALLEL_CODE(%ALLFUNC)
+apply OMPIFY_CODE(%ALLFUNC)
+
+display PRINTED_FILE(%ALLFUNC)
+
+apply UNSPLIT
+
+shell cc linpack.database/Src/linpack.c -lm -o /dev/null
 
 close
 delete linpack

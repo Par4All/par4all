@@ -1,19 +1,10 @@
 delete convol2
 create convol2 convol.c include/load.c
-setproperty ABORT_ON_USER_ERROR TRUE
-
-setproperty PRETTYPRINT_C_CODE TRUE
-setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
-
-setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
-
-activate C_PARSER
-module convol
 
 echo
 echo Inital code
 echo
-
+module convol
 apply PARTIAL_EVAL
 display PRINTED_FILE
 display PRINTED_FILE[run_kernel]
@@ -21,7 +12,6 @@ display PRINTED_FILE[run_kernel]
 echo
 echo After Inlining
 echo
-
 apply UNFOLDING
 display PRINTED_FILE
 
@@ -32,16 +22,18 @@ apply SCALARIZATION
 display PRINTED_FILE
 
 echo
-echo After privatization + loop expansion + tiling
+echo After privatization + loop expansion
 echo
-
 apply FLAG_LOOPS
-display PRINTED_FILE
 apply PRIVATIZE_MODULE
 setproperty LOOP_LABEL "l99993"
 setproperty LOOP_EXPANSION_SIZE 126
 apply LOOP_EXPANSION
 display PRINTED_FILE
+
+echo
+echo After tiling
+echo
 setproperty LOOP_LABEL ""
 apply LOOP_TILING
 l99993
@@ -52,7 +44,6 @@ display PRINTED_FILE
 echo
 echo After loop normalization
 echo
-
 apply FLAG_LOOPS
 setproperty LOOP_NORMALIZE_ONE_INCREMENT TRUE
 setproperty LOOP_NORMALIZE_SKIP_INDEX_SIDE_EFFECT TRUE
@@ -61,14 +52,25 @@ apply PARTIAL_EVAL
 display PRINTED_FILE
 
 echo
+echo loop expansion again
+echo
+setproperty LOOP_LABEL "l99991"
+setproperty LOOP_EXPANSION_SIZE 128
+setproperty LOOP_EXPANSION_OFFSET 1
+apply PRIVATIZE_MODULE
+apply LOOP_EXPANSION
+display PRINTED_FILE
+
+apply IF_CONVERSION_INIT
+apply IF_CONVERSION
+display PRINTED_FILE
+
+echo
 echo After Double Outlining and load - store generation
 echo
-
 setproperty OUTLINE_LABEL "l99991"
 setproperty OUTLINE_MODULE_NAME "microcode_launcher"
 apply OUTLINE
-display PRINTED_FILE
-
 
 module microcode_launcher
 display PRINTED_FILE

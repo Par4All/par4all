@@ -43,6 +43,12 @@ display PRINTED_FILE
 apply FLATTEN_CODE
 display PRINTED_FILE
 
+
+# missing loop_fusion
+# missing saturated arith detection
+# missing loop coalescing
+# sould add loop_interchange somewhere
+
 # apply CLEAN_DECLARATIONS[]
 # display PRINTED_FILE[]
 

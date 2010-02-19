@@ -19,6 +19,6 @@ pop(int op)
       I_0 = op-1+128-MOD(-i+op, 128);
 l99999:
    for(i = i; i <= I_0; i += 1)
-      if (i<=op-1) 
+      if (i>=i&&i<=op-1) 
          printf("%d", i);
 }
