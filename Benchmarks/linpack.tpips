@@ -8,9 +8,21 @@ apply RECOVER_FOR_LOOP
 apply FOR_LOOP_TO_DO_LOOP
 
 display PRINTED_FILE(%ALLFUNC)
-
+shell cp linpack.database/linpack!dgefa/linpack!dgefa.pre.c \
+ linpack.database/linpack!dgefa/v1.c
+#quit
 apply PRIVATIZE_MODULE(%ALLFUNC)
+
+display PRINTED_FILE(%ALLFUNC)
+shell cp linpack.database/linpack!dgefa/linpack!dgefa.pre.c \
+ linpack.database/linpack!dgefa/v2.c
+
 apply INTERNALIZE_PARALLEL_CODE(%ALLFUNC)
+
+display PRINTED_FILE(%ALLFUNC)
+shell cp linpack.database/linpack!dgefa/linpack!dgefa.pre.c \
+ linpack.database/linpack!dgefa/v3.c
+
 apply OMPIFY_CODE(%ALLFUNC)
 
 display PRINTED_FILE(%ALLFUNC)
@@ -20,5 +32,5 @@ apply UNSPLIT
 shell cc linpack.database/Src/linpack.c -lm -o /dev/null
 
 close
-delete linpack
+#delete linpack
 quit
