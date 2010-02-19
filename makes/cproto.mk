@@ -20,5 +20,6 @@ $(TARGET).h:$(TARGET)-local.h $(SOURCES)
 $(TARGET)-local.h:
 	touch $@
 
-CLEANFILES=$(TARGET).h
+clean-local:
+	rm -f $(TARGET).h
 EXTRA_DIST=$(TARGET)-local.h

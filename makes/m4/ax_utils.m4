@@ -22,7 +22,7 @@ AC_DEFUN([AX_WITH],[ax_with_[]AS_TR_SH([$1])])
 dnl test for feature result
 dnl usage : AX_HAS(progname-or-libname)
 dnl expands in a test that checks if this prog or library was found ?
-AC_DEFUN([AX_HAS],[test "x${AX_WITH([$1])}" = xyes ])
+AC_DEFUN([AX_HAS],[test "x${AX_WITH([$1])}" != no ])
 
 
 dnl check for a function
@@ -180,10 +180,58 @@ AC_DEFUN([AX_DEPENDS],
     ]
 )
 
-dnl exit with relevant exit status and a small message
-dnl dnl usage: AX_EXIT(dependency-var-name)
-AC_DEFUN([AX_EXIT],[AS_IF([AX_HAS([$1])],[AS_MESSAGE([Configure suceeded])],[
-AS_MESSAGE([Configure failed])
-AS_EXIT([1])
-])])
+dnl exit with relevant exit status and an extended configuration message
+dnl usage: AX_EXIT(required-dependency-var-name,optional-dependency-var-names)
+AC_DEFUN([AX_EXIT],[
+	# configure summary
+	eval my_bindir="`eval echo $[]{bindir}`"
+	eval my_libdir="`eval echo $[]{libdir}`"
+	eval my_docdir="`eval echo $[]{docdir}`"
+
+	cat << EOF
+
+$PACKAGE_NAME Configuration: 
+ 
+  Version:     $VERSION$VERSIONINFO 
+ 
+
+  Executables: $my_bindir
+  Libraries:   $my_libdir
+  Docs:        $my_docdir
+
+  Minimal deps ok ? $[]AX_WITH([$1])
+$[]AX_MSG([$1])
+m4_foreach_w([_i_],[$2],[dnl
+  Build _i_ ? $[]AX_WITH(_i_)
+   $[]AX_MSG(_i_)])
+EOF
+
+	pushdef([_TEST_],[AX_HAS($1)])
+	m4_foreach_w([_i_],[$2],[m4_append([_TEST_],&& AX_HAS(_i_) )])
+	AS_IF(_TEST_,[AS_MESSAGE([Configure succeded])],[
+		AS_MESSAGE([Configure failed])
+		AS_EXIT([1])
+	])
+	m4_popdef([_TEST_])
+])
+
+dnl configure an optionnal feature
+dnl usage AX_ARG_ENABLE(feature-name,help-message,default=[yes|no],configuration-action)
+dnl sets the conditionnal WITH_FEATURE-NAME
+dnl and the disable message for AX_HAS(FEATURE-NAME)
+AC_DEFUN([AX_ARG_ENABLE],[
+		AC_ARG_ENABLE([$1],
+			[AS_HELP_STRING([--enable-$1],[$2 (defaut is $3)])],
+			[AS_IF([test x"$enableval" = "xyes"],[$4],[])],
+			[
+				m4_if([$3],[yes],[$4],
+					[
+						AX_WITH([$1])=disabled
+						AX_MSG([$1])=""
+					])
+			]
+		)
+		AM_CONDITIONAL(WITH_[]AX_TR_UP([$1]),[AX_HAS([$1])])
+	]
+)
 
