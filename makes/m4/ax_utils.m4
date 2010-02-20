@@ -20,9 +20,14 @@ AC_DEFUN([AX_MSG],[ax_msg_[]AS_TR_SH([$1])])
 AC_DEFUN([AX_WITH],[ax_with_[]AS_TR_SH([$1])])
 
 dnl test for feature result
+dnl usage : AX_HAS_OR_DISABLED(progname-or-libname)
+dnl expands in a test that checks if this prog or library was found or disabled
+AC_DEFUN([AX_HAS_OR_DISABLED],[test "x${AX_WITH([$1])}" != xno ])
+
+dnl test for feature result
 dnl usage : AX_HAS(progname-or-libname)
 dnl expands in a test that checks if this prog or library was found ?
-AC_DEFUN([AX_HAS],[test "x${AX_WITH([$1])}" != no ])
+AC_DEFUN([AX_HAS],[test "x${AX_WITH([$1])}" = xyes ])
 
 
 dnl check for a function
@@ -207,7 +212,7 @@ m4_foreach_w([_i_],[$2],[dnl
 EOF
 
 	pushdef([_TEST_],[AX_HAS($1)])
-	m4_foreach_w([_i_],[$2],[m4_append([_TEST_],&& AX_HAS(_i_) )])
+	m4_foreach_w([_i_],[$2],[m4_append([_TEST_],&& AX_HAS_OR_DISABLED(_i_) )])
 	AS_IF(_TEST_,[AS_MESSAGE([Configure succeded])],[
 		AS_MESSAGE([Configure failed])
 		AS_EXIT([1])
@@ -217,8 +222,9 @@ EOF
 
 dnl configure an optionnal feature
 dnl usage AX_ARG_ENABLE(feature-name,help-message,default=[yes|no],configuration-action)
+dnl sets the shell_variable ax_enable_feature-name to FEATURE-NAME if test succeeded
 dnl sets the conditionnal WITH_FEATURE-NAME
-dnl and the disable message for AX_HAS(FEATURE-NAME)
+dnl and set the disable message for AX_HAS(FEATURE-NAME)
 AC_DEFUN([AX_ARG_ENABLE],[
 		AC_ARG_ENABLE([$1],
 			[AS_HELP_STRING([--enable-$1],[$2 (defaut is $3)])],
@@ -231,6 +237,7 @@ AC_DEFUN([AX_ARG_ENABLE],[
 					])
 			]
 		)
+		AS_IF([AX_HAS([$1])],[ax_enable_[]AS_TR_SH($1)=AS_TR_SH($1)])
 		AM_CONDITIONAL(WITH_[]AX_TR_UP([$1]),[AX_HAS([$1])])
 	]
 )
