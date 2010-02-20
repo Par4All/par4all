@@ -2,7 +2,9 @@ void decl41(int size)
 {
 // (statement ordering unavailable)
    // BEGIN BLOCK
+// (statement ordering unavailable)
    int i;                                                               /*0004*/
+// (statement ordering unavailable)
    int x;                                                               /*0005*/
 // (statement ordering unavailable)
    for (i = 1;(i<size);i++)                                             /*0006*/
@@ -47,7 +49,9 @@ void decl41(int size)
 // (1,2)
 // (2,1)
    // BEGIN BLOCK
+// (2,2)
    int i;                                                               /*0004*/
+// (2,3)
    int x;                                                               /*0005*/
 // (2,4)
    for(i = 1; i <= (size-1); i += 1)

@@ -19,7 +19,13 @@ Preconditions
 
 void malloc02()
 {
+
+//  P() {}
+
    int *p[10];                                                          /*0004*/
+
+//  P() {}
+
    int i;                                                               /*0005*/
 
 //  P() {}

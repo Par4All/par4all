@@ -4,6 +4,7 @@ Source code with transformers
 C  T(clone02) {n<=clone02+1, clone02<=n+1}
 int clone02(int n, int s)
 {
+//  T() {n==r}
    int r = n;
 //  T(r) {n==r#init, r<=n+1, n<=r+1}
    if (s<0)
@@ -21,6 +22,7 @@ Source code with preconditions
 //  P() {}
 int main()
 {
+//  P() {}
    int i = 1;
 //  P() {i==1}
    i = clone02(i, -1);
@@ -223,6 +225,7 @@ int main()
 //  P() {}
 int main()
 {
+//  P() {}
    int i = 1;
 //  P() {i==1}
    i = clone02_0(i, -1);

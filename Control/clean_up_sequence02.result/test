@@ -1,6 +1,7 @@
 Try to restructure the code for more precision:
 // (0,1)
 // BEGIN BLOCK
+// (0,2)
 extern int main(int argc, char *argv[]);                                /*0001*/
 // END BLOCK
 int main(int argc, char *argv[])
@@ -14,6 +15,7 @@ int main(int argc, char *argv[])
       {
 // (1,3)
          // BEGIN BLOCK
+// (1,4)
          int i;                                                         /*0005*/
 // (1,5)
          i = 3;                                                         /*0006*/
@@ -22,6 +24,7 @@ int main(int argc, char *argv[])
       {
 // (1,6)
          // BEGIN BLOCK
+// (1,7)
          int i;                                                         /*0009*/
 // (1,8)
          i = 4;                                                         /*0010*/

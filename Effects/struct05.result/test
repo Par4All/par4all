@@ -74,10 +74,16 @@ Transformers for "main"
 
 int struct05()
 {
+
+//  T() {}
+
    struct two {
       int first;
       int second;
    } x[10];
+
+//  T() {i==0}
+
    int i = 0;
 
 //  T(i) {i#init==0, 0<=i}
@@ -106,10 +112,16 @@ Preconditions for "main"
 
 int struct05()
 {
+
+//  P() {}
+
    struct two {
       int first;
       int second;
    } x[10];
+
+//  P() {}
+
    int i = 0;
 
 //  P() {i==0}

@@ -5,9 +5,13 @@ void decl38(int size)
 {
 // (statement ordering unavailable)
    // BEGIN BLOCK
+// (statement ordering unavailable)
    int i;                                                               /*0004*/
+// (statement ordering unavailable)
    int j;                                                               /*0005*/
+// (statement ordering unavailable)
    int k;                                                               /*0006*/
+// (statement ordering unavailable)
    float x;                                                             /*0007*/
 // (statement ordering unavailable)
 
@@ -61,9 +65,13 @@ void decl38(int size)
 // (1,2)
 // (2,1)
    // BEGIN BLOCK
+// (2,2)
    int i;                                                               /*0004*/
+// (2,3)
    int j;                                                               /*0005*/
+// (2,4)
    int k;                                                               /*0006*/
+// (2,5)
    float x;                                                             /*0007*/
 // (2,6)
 

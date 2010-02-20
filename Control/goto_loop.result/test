@@ -16,6 +16,9 @@ b:   printf("b\n");
 
 int main()
 {
+
+//  P() {i==5}
+
    int i = 5;
 
 //  P() {i==5}
@@ -44,6 +47,9 @@ b:   printf("b\n");
 
 int main()
 {
+
+//  P() {i==5}
+
    int i = 5;
 
 //  P() {i==5}

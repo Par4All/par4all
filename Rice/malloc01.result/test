@@ -18,8 +18,14 @@ Preconditions
 
 void malloc01()
 {
+
+//  P() {}
+
    int *p = malloc(10*sizeof(int));
    //int p[10];
+
+//  P() {}
+
    int i;
 
 //  P() {}
