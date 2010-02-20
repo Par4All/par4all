@@ -117,6 +117,7 @@ int csplit_is_function = 0; /* to know if this is the declaration of a function 
 			      a static variable and a static function */
 /* Shared with the lexical analyzer */
 string csplit_current_function_name = string_undefined;
+string csplit_current_function_name2 = string_undefined;
 string csplit_definite_function_name = string_undefined;
 string csplit_definite_function_signature = string_undefined;
 
@@ -2064,6 +2065,13 @@ function_def_start:  /* (* ISO 6.9.1 *) */
     decl_spec_list declarator
                         {
 			  pips_debug(5, "decl_spec_list declarator->function_def_start\n");
+			  /* let's use a pretty limited stack... */
+			  if(string_undefined_p(csplit_current_function_name)) {
+			    csplit_current_function_name =
+			      csplit_current_function_name2;
+			    csplit_current_function_name2 = string_undefined;
+			  }
+
 			  pips_assert("A temptative function name is available",
 				      !string_undefined_p(csplit_current_function_name));
 			  pips_assert("No definite function name is available",
