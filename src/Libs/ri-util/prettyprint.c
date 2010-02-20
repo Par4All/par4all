@@ -2397,8 +2397,13 @@ text_loop_default(
 	if (lp)
 	  /* local_var is a global variable which is exploited
 	     later... */
+	  /* FI: I do not understand why the local declarations were
+	     not added right away. I hope my change (simplification)
+	     does not break something else that is not tested by our
+	     non-regression suite. */
 	  ADD_SENTENCE_TO_TEXT
-	    ( local_var,
+	    //	    ( local_var,
+	    ( r,
 	      make_sentence(is_sentence_unformatted,
 			    make_unformatted(NULL, 0, margin+INDENTATION, lp)));
     }
