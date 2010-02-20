@@ -1,0 +1,61 @@
+
+Parsed printed file for "decl01"
+
+void decl01()
+{
+   int i = 2;                                                           /*0004*/
+   int j = i;                                                           /*0005*/
+   int a[sizeof(i)];                                                    /*0006*/
+
+   i = 2;                                                               /*0008*/
+   j = i;                                                               /*0009*/
+   j = sizeof(i);                                                       /*0010*/
+}
+
+Proper effects for "decl01"
+
+void decl01()
+{
+// (0,2)
+   int i = 2;                                                           /*0004*/
+// (0,3)
+//               <must be read   >: i
+   int j = i;                                                           /*0005*/
+// (0,4)
+   int a[sizeof(i)];                                                    /*0006*/
+//               <must be written>: i
+// (0,5)
+
+   i = 2;                                                               /*0008*/
+//               <must be read   >: i
+//               <must be written>: j
+// (0,6)
+   j = i;                                                               /*0009*/
+//               <must be written>: j
+// (0,7)
+//               <must be read   >: i
+   j = sizeof(i);                                                       /*0010*/
+}
+
+Cumulated effects for "decl01"
+
+void decl01()
+{
+// (0,2)
+   int i = 2;                                                           /*0004*/
+// (0,3)
+   int j = i;                                                           /*0005*/
+// (0,4)
+   int a[sizeof(i)];                                                    /*0006*/
+//               <must be written>: i
+// (0,5)
+
+   i = 2;                                                               /*0008*/
+//               <must be read   >: i
+//               <must be written>: j
+// (0,6)
+   j = i;                                                               /*0009*/
+//               <must be written>: j
+// (0,7)
+   j = sizeof(i);                                                       /*0010*/
+}
