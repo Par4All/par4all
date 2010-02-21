@@ -367,7 +367,7 @@ list words_basic(basic obj, list pdl)
 	    pc = gen_nconc(pc, words_value(basic_string(obj)));
 	  }
 	else
-	  pc = CHAIN_SWORD(pc,"char");
+	  pc = CHAIN_SWORD(pc,"char *"); // FI: should it be char[]?
 	break;
       }
     case is_basic_bit:
@@ -2057,7 +2057,8 @@ list generic_c_words_simplified_entity(type t, list name, bool is_safe, bool add
 	pc = gen_nconc(pc,words_type(t, pdl));
       }
       if (string_type_p(t)) {
-	pc = CHAIN_SWORD(pc," *");
+	// pc = CHAIN_SWORD(pc," *");
+	;
       }
       /* FI: left out of the previous declaration internal representation */
       if(strlen(sname)!=0 && is_first)

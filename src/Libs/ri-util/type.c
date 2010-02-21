@@ -1541,6 +1541,10 @@ type intrinsic_call_to_type(call c)
 			      type_consistent_p(t));
 		  free_type(ct);
 		}
+	      else if(basic_string_p(cb))
+		{
+		  t = make_type_variable(make_variable(make_basic_int(DEFAULT_CHARACTER_TYPE_SIZE), NIL, NIL));
+		}
 	      else
 		{
 		  pips_assert("Dereferencing of a non-pointer expression : it must be an array\n", !ENDP(cd));
