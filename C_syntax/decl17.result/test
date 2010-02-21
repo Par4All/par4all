@@ -56,8 +56,8 @@ Variable list:
 	Declared entity "decl17:*HEAP*" with type "area" with size 0
 	Declared entity "decl17:*STACK*" with type "area" with size 0
 	Declared entity "decl17:*STATIC*" with type "area" with size 0
-	Declared entity "decl17:0`__FUNCTION__" with type "variable" "char"
-	Declared entity "decl17:0`__func__" with type "variable" "char"
+	Declared entity "decl17:0`__FUNCTION__" with type "variable" "char *"
+	Declared entity "decl17:0`__func__" with type "variable" "char *"
 	Declared entity "decl17:iarg" with type "variable" "int"
 
 * empty extern declaration list *

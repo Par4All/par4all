@@ -13,8 +13,8 @@ Variable list:
 	Declared entity "pragma05:*HEAP*" with type "area" with size 0
 	Declared entity "pragma05:*STACK*" with type "area" with size 0
 	Declared entity "pragma05:*STATIC*" with type "area" with size 0
-	Declared entity "pragma05:0`__FUNCTION__" with type "variable" "char"
-	Declared entity "pragma05:0`__func__" with type "variable" "char"
+	Declared entity "pragma05:0`__FUNCTION__" with type "variable" "char *"
+	Declared entity "pragma05:0`__func__" with type "variable" "char *"
 
 * empty extern declaration list *
 

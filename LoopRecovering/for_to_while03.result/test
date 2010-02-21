@@ -48,7 +48,7 @@ enum {M=64};
 
 extern  main(int argc, char *argv[]);
 // END BLOCK
-void compute(int M, int *m, int *l, int *a)
+void compute(int M, int *a, int *l, int *m)
 {
    // BEGIN BLOCK
 compute:   do {
@@ -75,7 +75,7 @@ main(int argc, char *argv[])
    l = 0;
    while (l<M) {
       // BEGIN BLOCK
-compute:      compute(M, &m, &l, &a);
+compute:      compute(M, &a, &l, &m);
       l++;
       // END BLOCK
    }

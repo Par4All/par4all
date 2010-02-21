@@ -9,8 +9,8 @@ Variable list:
 	Declared entity "fcompat:*HEAP*" with type "area" with size 0
 	Declared entity "fcompat:*STACK*" with type "area" with size 0
 	Declared entity "fcompat:*STATIC*" with type "area" with size 0
-	Declared entity "fcompat:0`__FUNCTION__" with type "variable" "char"
-	Declared entity "fcompat:0`__func__" with type "variable" "char"
+	Declared entity "fcompat:0`__FUNCTION__" with type "variable" "char *"
+	Declared entity "fcompat:0`__func__" with type "variable" "char *"
 	Declared entity "fcompat:0`a" with type "variable" "int"
 	Declared entity "fcompat:0`c" with type "variable" "int"
 	Declared entity "fcompat:0`p" with type "variable" "int[n+1] *"

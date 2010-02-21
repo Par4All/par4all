@@ -73,8 +73,8 @@ Variable list:
 	Declared entity "initialization04:*HEAP*" with type "area" with size 0
 	Declared entity "initialization04:*STACK*" with type "area" with size 0
 	Declared entity "initialization04:*STATIC*" with type "area" with size 0
-	Declared entity "initialization04:0`__FUNCTION__" with type "variable" "char"
-	Declared entity "initialization04:0`__func__" with type "variable" "char"
+	Declared entity "initialization04:0`__FUNCTION__" with type "variable" "char *"
+	Declared entity "initialization04:0`__func__" with type "variable" "char *"
 	Declared entity "initialization04:0`tab2" with type "variable" "si_t"
 	Declared entity "initialization04:0`tab3" with type "variable" "si_t"
 

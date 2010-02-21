@@ -71,8 +71,8 @@ Variable list:
 	Declared entity "typedef11:*HEAP*" with type "area" with size 0
 	Declared entity "typedef11:*STACK*" with type "area" with size 0
 	Declared entity "typedef11:*STATIC*" with type "area" with size 0
-	Declared entity "typedef11:0`__FUNCTION__" with type "variable" "char"
-	Declared entity "typedef11:0`__func__" with type "variable" "char"
+	Declared entity "typedef11:0`__FUNCTION__" with type "variable" "char *"
+	Declared entity "typedef11:0`__func__" with type "variable" "char *"
 	Declared entity "typedef11:0`y" with type "variable" "km"
 	Declared entity "typedef11:typedef11" with type "variable" "int"
 	Declared entity "typedef11:x" with type "variable" "km"

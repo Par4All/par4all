@@ -13,8 +13,8 @@ Variable list:
 	Declared entity "ndecl03:*HEAP*" with type "area" with size 0
 	Declared entity "ndecl03:*STACK*" with type "area" with size 0
 	Declared entity "ndecl03:*STATIC*" with type "area" with size 0
-	Declared entity "ndecl03:0`__FUNCTION__" with type "variable" "char"
-	Declared entity "ndecl03:0`__func__" with type "variable" "char"
+	Declared entity "ndecl03:0`__FUNCTION__" with type "variable" "char *"
+	Declared entity "ndecl03:0`__func__" with type "variable" "char *"
 	Declared entity "ndecl03:0`ai" with type "variable" "akm"
 	Declared entity "ndecl03:0`i" with type "variable" "km"
 	Declared entity "ndecl03:0`pi" with type "variable" "pkm"

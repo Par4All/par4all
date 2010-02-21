@@ -17,8 +17,8 @@ Variable list:
 	Declared entity "block_scope12!block_scope12:0`1`x" with type "variable" "int"
 	Declared entity "block_scope12!block_scope12:0`x" with type "variable" "int"
 	Declared entity "block_scope12!block_scope12:block_scope12!block_scope12" with type "variable" "int"
-	Declared entity "block_scope12:0`__FUNCTION__" with type "variable" "char"
-	Declared entity "block_scope12:0`__func__" with type "variable" "char"
+	Declared entity "block_scope12:0`__FUNCTION__" with type "variable" "char *"
+	Declared entity "block_scope12:0`__func__" with type "variable" "char *"
 
 * empty extern declaration list *
 

@@ -79,9 +79,21 @@ Transformers for "convol"
 
 void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], int ksi, int ksj, float kernel[ksi][ksj])
 {
+
+//  T() {}
+
    int i;                                                               /*0004*/
+
+//  T() {}
+
    int j;                                                               /*0005*/
+
+//  T() {}
+
    int ki;                                                              /*0006*/
+
+//  T() {}
+
    int kj;                                                              /*0007*/
 
 //  T(i,j) {0<=i}
@@ -105,9 +117,21 @@ Preconditions for "convol"
 
 void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], int ksi, int ksj, float kernel[ksi][ksj])
 {
+
+//  P() {}
+
    int i;                                                               /*0004*/
+
+//  P() {}
+
    int j;                                                               /*0005*/
+
+//  P() {}
+
    int ki;                                                              /*0006*/
+
+//  P() {}
+
    int kj;                                                              /*0007*/
 
 //  P() {}

@@ -13,8 +13,8 @@ Variable list:
 	Declared entity "decl07:*HEAP*" with type "area" with size 0
 	Declared entity "decl07:*STACK*" with type "area" with size 0
 	Declared entity "decl07:*STATIC*" with type "area" with size 0
-	Declared entity "decl07:0`__FUNCTION__" with type "variable" "char"
-	Declared entity "decl07:0`__func__" with type "variable" "char"
+	Declared entity "decl07:0`__FUNCTION__" with type "variable" "char *"
+	Declared entity "decl07:0`__func__" with type "variable" "char *"
 	Declared entity "decl07:0`a" with type "variable" "int"
 	Declared entity "decl07:0`f" with type "variable" "(char -> void) *"
 

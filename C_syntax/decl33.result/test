@@ -51,8 +51,8 @@ Variable list:
 	Declared entity "decl33:*HEAP*" with type "area" with size 0
 	Declared entity "decl33:*STACK*" with type "area" with size 0
 	Declared entity "decl33:*STATIC*" with type "area" with size 0
-	Declared entity "decl33:0`__FUNCTION__" with type "variable" "char"
-	Declared entity "decl33:0`__func__" with type "variable" "char"
+	Declared entity "decl33:0`__FUNCTION__" with type "variable" "char *"
+	Declared entity "decl33:0`__func__" with type "variable" "char *"
 	Declared entity "decl33:decl33" with type "variable" "int"
 	Declared entity "decl33:i" with type "variable" "int"
 	Declared entity "decl33:j" with type "variable" "int"

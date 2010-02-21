@@ -11,8 +11,8 @@ Variable list:
 	Declared entity "foo:*HEAP*" with type "area" with size 0
 	Declared entity "foo:*STACK*" with type "area" with size 0
 	Declared entity "foo:*STATIC*" with type "area" with size 0
-	Declared entity "foo:0`__FUNCTION__" with type "variable" "char"
-	Declared entity "foo:0`__func__" with type "variable" "char"
+	Declared entity "foo:0`__FUNCTION__" with type "variable" "char *"
+	Declared entity "foo:0`__func__" with type "variable" "char *"
 
 * empty extern declaration list *
 

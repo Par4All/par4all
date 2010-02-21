@@ -12,6 +12,18 @@ setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 
 #setenv PRETTYPRINT_DEBUG_LEVEL 7
 
+activate C_SYMBOL_TABLE
+
+echo
+echo Symbol table for "main"
+echo
+
+display SYMBOL_TABLE_FILE[main]
+
+echo
+echo Printed file for "main"
+echo
+
 display PRINTED_FILE[main]
 
 #apply UNSPLIT[%PROGRAM]

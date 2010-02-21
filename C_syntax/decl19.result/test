@@ -61,8 +61,8 @@ Variable list:
 	Declared entity "decl19:*HEAP*" with type "area" with size 0
 	Declared entity "decl19:*STACK*" with type "area" with size 0
 	Declared entity "decl19:*STATIC*" with type "area" with size 0
-	Declared entity "decl19:0`__FUNCTION__" with type "variable" "char"
-	Declared entity "decl19:0`__func__" with type "variable" "char"
+	Declared entity "decl19:0`__FUNCTION__" with type "variable" "char *"
+	Declared entity "decl19:0`__func__" with type "variable" "char *"
 	Declared entity "decl19:0`x" with type "variable" "g"
 	Declared entity "decl19:cookie" with type "variable" "int"
 	Declared entity "decl19:decl19" with type "variable" "int"
