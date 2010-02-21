@@ -5,7 +5,6 @@ pop(int op)
 #pragma omp DO private(i,j)
 l99999:
    for(i = i; i <= op-1; i += 1) {
-      private(i,j)
       j = i*2;
       printf("%d", j);
    }
@@ -24,7 +23,6 @@ pop(int op)
 #pragma omp DO private(i,j)
 l99999:
    for(i = i; i <= I_0; i += 1) {
-      private(i,j)
       j = i*2;
       if (i>=i&&i<=op-1) 
          printf("%d", j);

@@ -6,11 +6,9 @@ C     Check that j is privatized
 
 !$OMP DO PRIVATE(I,J,K)
       DO I = 1, 10                                                      0006
-         PRIVATE(I,J,K)
 
 !$OMP    DO PRIVATE(J,K)
          DO K = 1, 10                                                   0007
-            PRIVATE(J,K)
             J = 0                                                       0008
             J = J+1                                                     0009
             A(I,K) = J                                                  0010

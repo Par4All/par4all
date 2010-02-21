@@ -9,7 +9,6 @@ C     with a proper initialization of J
 
 !$OMP DO PRIVATE(I)
       DO I = 1, 10                                                      0009
-         PRIVATE(I)
          J = J+1                                                        0010
          A(I) = J                                                       0011
       ENDDO
@@ -17,7 +16,6 @@ C     with a proper initialization of J
 
 !$OMP DO PRIVATE(I,J)
       DO I = 1, 10                                                      0014
-         PRIVATE(I,J)
          J = 1                                                          0015
          A(I) = J                                                       0016
       ENDDO
