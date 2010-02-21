@@ -2401,11 +2401,13 @@ text_loop_default(
 	     not added right away. I hope my change (simplification)
 	     does not break something else that is not tested by our
 	     non-regression suite. */
-	  ADD_SENTENCE_TO_TEXT
-	    //	    ( local_var,
-	    ( r,
-	      make_sentence(is_sentence_unformatted,
-			    make_unformatted(NULL, 0, margin+INDENTATION, lp)));
+	  if (!pp_omp_style_p()) {
+	    ADD_SENTENCE_TO_TEXT
+	      //	    ( local_var,
+	      ( r,
+		make_sentence(is_sentence_unformatted,
+			      make_unformatted(NULL, 0, margin+INDENTATION, lp)));
+	  }
     }
 
     /* loop BODY
