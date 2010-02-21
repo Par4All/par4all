@@ -13,8 +13,8 @@ Variable list:
 	Declared entity "fpointer01:*HEAP*" with type "area" with size 0
 	Declared entity "fpointer01:*STACK*" with type "area" with size 0
 	Declared entity "fpointer01:*STATIC*" with type "area" with size 0
-	Declared entity "fpointer01:0`__FUNCTION__" with type "variable" "char"
-	Declared entity "fpointer01:0`__func__" with type "variable" "char"
+	Declared entity "fpointer01:0`__FUNCTION__" with type "variable" "char *"
+	Declared entity "fpointer01:0`__func__" with type "variable" "char *"
 	Declared entity "fpointer01:_stream" with type "variable" "void *"
 	Declared entity "fpointer01:c" with type "variable" "char"
 	Declared entity "fpointer01:col" with type "variable" "int *"

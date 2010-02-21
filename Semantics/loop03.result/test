@@ -197,16 +197,16 @@ void getimage(char *filename)
 
 
    for(i = 0; i <= 63; i += 1)
+      PRIVATE i,j
 
 //  T(j) {0<=i, i<=63, 0<=j}
 
       for(j = 0; j <= 63; j += 1) {
+         PRIVATE j
 
 //  T() {0<=i, i<=63, 0<=j, j<=63}
 
          // BEGIN BLOCK
-      PRIVATE i,j
-         PRIVATE j
 
 //  T() {0<=i, i<=63, 0<=j, j<=63}
 
@@ -222,16 +222,16 @@ void getimage(char *filename)
 
 
    for(i = 0; i <= 255; i += 1)
+      PRIVATE i,j
 
 //  T(j) {j#init==64, 0<=i, i<=255, 0<=j}
 
       for(j = 0; j <= 255; j += 1) {
+         PRIVATE j
 
 //  T() {0<=i, i<=255, 0<=j, j<=255}
 
          // BEGIN BLOCK
-      PRIVATE i,j
-         PRIVATE j
 
 //  T() {0<=i, i<=255, 0<=j, j<=255}
 
@@ -290,16 +290,16 @@ void getimage(char *filename)
 
 
    for(i = 0; i <= 63; i += 1)
+      PRIVATE i,j
 
 //  P(i,j) {0<=i, i<=63}
 
       for(j = 0; j <= 63; j += 1) {
+         PRIVATE j
 
 //  P(i,j) {0<=i, i<=63, 0<=j, j<=63}
 
          // BEGIN BLOCK
-      PRIVATE i,j
-         PRIVATE j
 
 //  P(i,j) {0<=i, i<=63, 0<=j, j<=63}
 
@@ -315,16 +315,16 @@ void getimage(char *filename)
 
 
    for(i = 0; i <= 255; i += 1)
+      PRIVATE i,j
 
 //  P(i,j) {192i==j-64, 0<=i, i<=255}
 
       for(j = 0; j <= 255; j += 1) {
+         PRIVATE j
 
 //  P(i,j) {i==0, 0<=j, j<=255}
 
          // BEGIN BLOCK
-      PRIVATE i,j
-         PRIVATE j
 
 //  P(i,j) {i==0, 0<=j, j<=255}
 
