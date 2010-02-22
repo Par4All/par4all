@@ -3,7 +3,7 @@
  * The initial label must be preserved, but not the other ones
  */
 
-void loop_tiling03(int ni, int nj, int nk)
+void loop_tiling03(int n, int ni, int nj, int nk)
 {
   float x[n][n][n];
   int i, j, k;
