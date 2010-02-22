@@ -14,7 +14,5 @@ void pas_vous()
 #pragma omp DO private(j)
       for(j = 12; j <= i-1; j += 1)
          printf("%d", j);
-      private(i,j)
-         private(j)
 }
 extern void pas_vous();

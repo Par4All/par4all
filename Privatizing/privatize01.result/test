@@ -11,6 +11,5 @@ void papy_boom()
 #pragma omp DO private(i)
    for(i = 0; i <= 9; i += 1)
       printf("%i", i);
-      private(i)
 }
 extern void papy_boom();

@@ -11,6 +11,5 @@ void j_aime_les_moulinettes_a_fromage()
 #pragma omp DO private(i)
    for(i = 0; i <= 11; i += 1)
       j++;
-      private(i)
 }
 extern void j_aime_les_moulinettes_a_fromage();
