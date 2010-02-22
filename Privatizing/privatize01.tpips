@@ -1,5 +1,8 @@
+# To debug defaut_tpips
+
+setenv WSPACE=privatize01
+setenv FILE=privatize01.c
 delete $WSPACE
-setproperty ABORT_ON_USER_ERROR=TRUE
 create $WSPACE $FILE
 setproperty PRETTYPRINT_ALL_PRIVATE_VARIABLES TRUE
 
@@ -13,6 +16,6 @@ apply UNSPLIT
 shell gcc -fopenmp -c $WSPACE.database/Src/$FILE
 
 close
- delete $WSPACE
+# delete $WSPACE
 
 quit
