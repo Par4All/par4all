@@ -631,11 +631,17 @@ L\"(\\\"|[^\"\\]|\\[^\"])*\"	{
 					 pips_debug(5, "Temptative function name found: \"%s\"\n",
 						    csplit_current_function_name);
                                        }
-                                       else {
-					 pips_debug(5, "Identifier \"%s\" ignored because of identifier \"%s\"\n",
+                                       else if(string_undefined_p(csplit_current_function_name2)) {
+				         pips_debug(5, "Identifier \"%s\" ignored because of two previous identifiers \"%s\"\n",
+						     yytext, csplit_current_function_name);
+				         csplit_current_function_name2 = strdup(yytext);
+				       }
+				       else {
+				         free(csplit_current_function_name2);
+					 pips_debug(5, "Identifier \"%s\" not ignored in spite of two previous identifiers \"%s\"\n",
 						    yytext, csplit_current_function_name);
 					 csplit_current_function_name2 = strdup(yytext);
-					 }
+				       }
 
 				       yylval.string = strdup(yytext);
 				       return(TK_IDENT);

@@ -476,14 +476,14 @@ typedef struct { list le, lr; } deux_listes;
 static void make_uniq_reference_list(reference r, deux_listes * l)
 {
   entity e = reference_variable(r);
-  if (! (storage_rom_p(entity_storage(e)) && 
+  if (! (storage_rom_p(entity_storage(e)) &&
 	 !(value_undefined_p(entity_initial(e))) &&
 	 value_symbolic_p(entity_initial(e)) &&
 	 type_functional_p(entity_type(e)))) {
-    
+
     /* Add reference r only once */
     if (l->le ==NIL || !gen_in_list_p(e, l->le)) {
-      l->le = CONS(ENTITY,e,  l->le); 
+      l->le = CONS(ENTITY,e,  l->le);
       l->lr = CONS(REFERENCE,r,l->lr);
     }
   }
@@ -492,32 +492,32 @@ static void make_uniq_reference_list(reference r, deux_listes * l)
 /* FI: this function has not yet been extended for C types!!! */
 list extract_references_from_declarations(list decls)
 {
-  list arrays = NIL; 
+  list arrays = NIL;
   deux_listes lref = { NIL, NIL };
-  
-  MAPL(le,{ 
+
+  MAPL(le,{
     entity e= ENTITY(CAR(le));
     type t = entity_type(e);
-    
+
     if (type_variable_p(t) && !ENDP(variable_dimensions(type_variable(t))))
       arrays = CONS(VARIABLE,type_variable(t), arrays);
   }, decls );
-  
+
   MAPL(array,
   { variable v = VARIABLE(CAR(array));
-  list ldim = variable_dimensions(v);  
+  list ldim = variable_dimensions(v);
   while (!ENDP(ldim))
     {
-      dimension d = DIMENSION(CAR(ldim)); 
+      dimension d = DIMENSION(CAR(ldim));
       gen_context_recurse(d, &lref, reference_domain, make_uniq_reference_list, gen_null);
       ldim=CDR(ldim);
-      
-    }	   
+
+    }
   }, arrays);
   gen_free_list(lref.le);
-  
+
   return(lref.lr);
-}   
+}
 
 list summary_effects_from_declaration(string module_name __attribute__ ((unused)))
 {
