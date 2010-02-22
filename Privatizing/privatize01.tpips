@@ -14,6 +14,7 @@ display PRINTED_FILE[%ALL]
 
 apply UNSPLIT
 shell gcc -fopenmp -c $WSPACE.database/Src/$FILE
+shell rm *.o
 
 close
 # delete $WSPACE
