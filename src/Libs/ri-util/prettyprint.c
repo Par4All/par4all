@@ -2244,7 +2244,10 @@ text_directive(
 	if (l)
 	{
 	    add_to_current_line(buffer, dir, cont, t);
-	    if (is_omp) add_to_current_line(buffer, "DO ", cont, t);
+	    if (is_omp)
+	      add_to_current_line(buffer,
+				  prettyprint_is_fortran? "DO ":"for ",
+				  cont, t);
 	}
     }
 

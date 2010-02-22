@@ -115,60 +115,49 @@ int the_tag;
 
 /* functions on types */
 
-type 
-MakeTypeArray(b, ld)
-basic b;
-cons * ld;
+type MakeTypeArray(basic b, cons * ld)
 {
     return(make_type(is_type_variable, make_variable(b, ld,NIL)));
 }
 
-parameter 
-MakeOverloadedParameter()
+parameter MakeOverloadedParameter()
 {
     return MakeAnyScalarParameter(is_basic_overloaded, 0);
 }
 
-parameter 
-MakeIntegerParameter()
+parameter MakeIntegerParameter()
 {
   return MakeAnyScalarParameter(is_basic_int, DEFAULT_REAL_TYPE_SIZE);
 }
 
-parameter 
-MakeRealParameter()
+parameter MakeRealParameter()
 {
   return MakeAnyScalarParameter(is_basic_float, DEFAULT_REAL_TYPE_SIZE);
 }
 
-parameter 
-MakeDoubleprecisionParameter()
+parameter MakeDoubleprecisionParameter()
 {
   return MakeAnyScalarParameter(is_basic_float, DEFAULT_DOUBLEPRECISION_TYPE_SIZE);
 }
 
-parameter 
-MakeLogicalParameter()
+parameter MakeLogicalParameter()
 {
   return MakeAnyScalarParameter(is_basic_logical, DEFAULT_LOGICAL_TYPE_SIZE);
 }
 
-parameter 
-MakeComplexParameter()
+parameter MakeComplexParameter()
 {
   return MakeAnyScalarParameter(is_basic_complex, DEFAULT_COMPLEX_TYPE_SIZE);
 }
 
-parameter 
-MakeDoublecomplexParameter()
+parameter MakeDoublecomplexParameter()
 {
   return MakeAnyScalarParameter(is_basic_complex, DEFAULT_DOUBLECOMPLEX_TYPE_SIZE);
 }
 
-parameter 
-MakeCharacterParameter()
+parameter MakeCharacterParameter()
 {
-  return make_parameter(MakeTypeArray(make_basic(is_basic_string, 
+  return make_parameter(MakeTypeArray(make_basic(is_basic_string,
 	 make_value(is_value_constant,
 		    make_constant(is_constant_int,
 				  UUINT(DEFAULT_CHARACTER_TYPE_SIZE)))),
@@ -178,8 +167,7 @@ MakeCharacterParameter()
 }
 
 /* For Fortran */
-parameter 
-MakeAnyScalarParameter(tag t, _int size)
+parameter MakeAnyScalarParameter(tag t, _int size)
 {
   return make_parameter(MakeTypeArray(make_basic(t, UUINT(size)), NIL),
 			make_mode_reference(),
