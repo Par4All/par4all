@@ -1,5 +1,5 @@
 $(TARGET).h:$(srcdir)/$(TARGET)-local.h $(SOURCES)
-	cat $(srcdir)/$(TARGET)-local.h > $(TARGET).h
+	cat `( test -f $(TARGET)-local.h && echo $(TARGET)-local.h ) || echo $(srcdir)/$(TARGET)-local.h ` > $(TARGET).h
 	{ \
 		SOURCES=`for s in $(TARGET)-local.h $(SOURCES) ; do case $$s in *.[ch]) ( test -f $$s && echo $$s ) || echo $(srcdir)/$$s ;; esac ; done`; \
 		guard=`echo $(TARGET)_header_included | tr - _`;\
@@ -10,12 +10,15 @@ $(TARGET).h:$(srcdir)/$(TARGET)-local.h $(SOURCES)
       	echo ""; \
       	echo "#ifndef $${guard}";\
       	echo "#define $${guard}";\
-      	cat $(TARGET)-local.h ;\
+      	cat `( test -f $(TARGET)-local.h && echo $(TARGET)-local.h ) || echo $(srcdir)/$(TARGET)-local.h ` ;\
 		$(CPROTO) -evcf2 -E "$(CPP) $(INCLUDES) $(DEFAULT_INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) -DCPROTO_IS_PROTOTYPING" $$SOURCES ;\
       	echo "#endif /* $${guard} */"; \
 	} > $(TARGET).h-tmp
 	rm $(TARGET).h
 	mv $(TARGET).h-tmp $(TARGET).h
+
+$(TARGET)-local.h:
+	touch $@
 
 clean-local:
 	rm -f $(TARGET).h
