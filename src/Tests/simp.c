@@ -32,7 +32,7 @@
  */
 
 #include <stdio.h>
-#include <malloc.h>
+#include <stdlib.h>
 
 #include "boolean.h"
 #include "assert.h"
@@ -44,7 +44,7 @@
 static void
 test_system(Psysteme sc)
 {
-    CATCH(overflow_error) 
+    CATCH(overflow_error)
 	fprintf(stdout, "*** Arithmetic error occured in simplex\n");
     TRY
 	if (sc_simplexe_feasibility_ofl_ctrl(sc,FWD_OFL_CTRL))
@@ -53,12 +53,11 @@ test_system(Psysteme sc)
 	    printf("Systeme insoluble\n");
 }
 
-static void 
-test_file(FILE * f, char * name)
+static void test_file(FILE * f, char * name)
 {
-    Psysteme sc=sc_new(); 
+    Psysteme sc=sc_new();
     printf("systeme initial \n");
-    if(sc_fscan(f,&sc)) 
+    if(sc_fscan(f,&sc))
     {
 	printf("syntaxe correcte dans %s\n",name);
 	sc_fprint(stdout, sc, *variable_default_name);

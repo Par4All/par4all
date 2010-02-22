@@ -22,7 +22,7 @@
 
 */
 
-/* Package sc 
+/* Package sc
  */
 
 #include <string.h>
@@ -33,7 +33,6 @@
 #include "vecteur.h"
 #include "contrainte.h"
 #include "sc.h"
-#include "malloc.h"
 
 /* Transform each equality in two inequalities
  */

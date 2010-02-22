@@ -15,7 +15,6 @@
 #include "vecteur.h"
 #include "contrainte.h"
 #include "sc.h"
-#include "malloc.h"
 #include "union.h"
 
 
