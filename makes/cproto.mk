@@ -1,4 +1,4 @@
-$(TARGET).h:$(TARGET)-local.h $(SOURCES)
+$(TARGET).h:$(srcdir)/$(TARGET)-local.h $(SOURCES)
 	cat $(srcdir)/$(TARGET)-local.h > $(TARGET).h
 	{ \
 		SOURCES=`for s in $(TARGET)-local.h $(SOURCES) ; do case $$s in *.[ch]) ( test -f $$s && echo $$s ) || echo $(srcdir)/$$s ;; esac ; done`; \
@@ -16,9 +16,6 @@ $(TARGET).h:$(TARGET)-local.h $(SOURCES)
 	} > $(TARGET).h-tmp
 	rm $(TARGET).h
 	mv $(TARGET).h-tmp $(TARGET).h
-
-$(TARGET)-local.h:
-	touch $@
 
 clean-local:
 	rm -f $(TARGET).h
