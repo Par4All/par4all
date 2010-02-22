@@ -1,7 +1,7 @@
 $(TARGET).h:$(TARGET)-local.h $(SOURCES)
 	cat $< > $(TARGET).h
 	{ \
-		SOURCES=`for s in $^ ; do case $$s in *.[ch]) echo $$s ;; esac ; done`; \
+		SOURCES=`for s in $(TARGET)-local.h $(SOURCES) ; do case $$s in *.[ch]) echo $$s ;; esac ; done`; \
 		guard=`echo $(TARGET)_header_included | tr - _`;\
       	echo "/* Warning! Do not modify this file that is automatically generated! */"; \
       	echo "/* Modify src/Libs/$(TARGET)/$(TARGET)-local.h instead, to add your own modifications. */"; \
@@ -10,7 +10,7 @@ $(TARGET).h:$(TARGET)-local.h $(SOURCES)
       	echo ""; \
       	echo "#ifndef $${guard}";\
       	echo "#define $${guard}";\
-      	cat $< ;\
+      	cat $(TARGET)-local.h ;\
 		$(CPROTO) -evcf2 -E "$(CPP) $(INCLUDES) $(DEFAULT_INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) -DCPROTO_IS_PROTOTYPING" $$SOURCES ;\
       	echo "#endif /* $${guard} */"; \
 	} > $(TARGET).h-tmp
