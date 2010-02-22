@@ -9,9 +9,9 @@ extern void pas_vous();
 void pas_vous()
 {
    int i, j, k;
-#pragma omp DO private(i,j)
+#pragma omp for private(i,j)
    for(i = 0; i <= k-1; i += 1)
-#pragma omp DO private(j)
+#pragma omp for private(j)
       for(j = 12; j <= i-1; j += 1)
          printf("%d", j);
 }

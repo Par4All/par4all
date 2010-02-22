@@ -16,10 +16,10 @@ void c_est_pourtant_magnifique()
 {
    int y, m, c, a;
    int u[2];
-#pragma omp DO private(a,c,m,y)
+#pragma omp for private(a,c,m,y)
    for(y = 2; y <= 46; y += 8) {
       m = y;
-#pragma omp DO private(c)
+#pragma omp for private(c)
       for(c = m; c <= y*2; c += 1) {
          a = m*4;
          u[0] = 2;

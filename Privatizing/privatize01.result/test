@@ -8,7 +8,7 @@ extern void papy_boom();
 void papy_boom()
 {
    int i = 0;
-#pragma omp DO private(i)
+#pragma omp for private(i)
    for(i = 0; i <= 9; i += 1)
       printf("%i", i);
 }

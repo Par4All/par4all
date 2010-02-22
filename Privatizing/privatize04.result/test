@@ -15,11 +15,11 @@ extern void c_est_dommage();
 void c_est_dommage()
 {
    int i, j, k, l;
-#pragma omp DO private(i,j,k)
+#pragma omp for private(i,j,k)
    for(i = 0; i <= 1; i += 1) {
       j = 12;
       k = 22;
-#pragma omp DO private(j,k)
+#pragma omp for private(j,k)
       for(j = 4; j >= 1; j += -5) {
          k = 23;
          l = k*2+j;

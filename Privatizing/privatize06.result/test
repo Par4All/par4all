@@ -20,7 +20,7 @@ int erminable(char isme)
    while (luke) 
       ;
 
-#pragma omp DO private(ce,luke,the)
+#pragma omp for private(ce,luke,the)
    for(the = 2; the <= 1; the += 1) {
       ce = luke;
       luke = ce;
