@@ -1,5 +1,5 @@
 $(TARGET).h:$(TARGET)-local.h $(SOURCES)
-	cat $< > $(TARGET).h
+	cat $(srcdir)/$(TARGET)-local.h > $(TARGET).h
 	{ \
 		SOURCES=`for s in $(TARGET)-local.h $(SOURCES) ; do case $$s in *.[ch]) echo $$s ;; esac ; done`; \
 		guard=`echo $(TARGET)_header_included | tr - _`;\
