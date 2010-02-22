@@ -70,7 +70,7 @@ int flag;
 activate (i1,i2)
 int i1,i2 ;
 */
-activate (int i1, int i2)
+int activate (int i1, int i2)
 {
 int upper, lower;
 ATOM *ap,*a_m_serial(),*a_next();
