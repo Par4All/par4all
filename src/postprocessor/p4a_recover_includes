@@ -5,32 +5,122 @@
 """
 Recover #include into PIPS C output
 
+The idea is to pass each standard C99 .h through PIPS and analyse the output and to store the association of a given C construction in the output to a give .h.
+
+In this way, by parsing a PIPS output, we can statistically recover the
+original #include <...h>
+
 Ronan.Keryell@hpc-project.com
 """
 
 #import string, re, sys, os, types, optparse
 
-import re, optparse, pickle
+import re, optparse, pickle, os, shutil
+import ply.lex as lex
 
 #from pyps import *
 
 # The #include files we want to analyse:
+# I use on the GNU libc'Appendix B Summary of Library Facilities' a
+# grep '\.h' l | sed 's/.*`/    "/; s/'"'"'.*/",/' | sort -u
 header_file_names = [
+    "aio.h",
+    "argp.h",
+    "argz.h",
+    "arpa/inet.h",
+    "assert.h",
+    "complex.h",
+    "crypt.h",
+    "ctype.h",
     "dirent.h",
+    "envz.h",
+    "err.h",
+    "errno.h",
+    "error.h",
+    "execinfo.h",
     "fcntl.h",
+    "fenv.h",
+    "float.h",
+    "fmtmsg.h",
+    "fnmatch.h",
+    "fstab.h",
+    "ftw.h",
+    "gconv.h",
+    "getopt.h",
+    "glob.h",
     "grp.h",
+    "iconv.h",
+    "inttypes.h",
+    "langinfo.h",
+    "libgen.h",
+    "libintl.h",
     "limits.h",
+    "locale.h",
+    "malloc.h",
+    "math.h",
+    "mcheck.h",
+    "mntent.h",
+    "netdb.h",
+    "net/if.h",
+    "netinet/in.h",
+    "nl_types.h",
+    "obstack.h",
+    "printf.h",
+    "pthread.h",
+    "pty.h",
     "pwd.h",
+    "regex.h",
+    "rpc/des_crypt.h",
+    "sched.h",
+    "search.h",
+    "semaphore.h",
+    "setjmp.h",
+    "sgtty.h",
     "signal.h",
+    "stdarg.h",
+    "stddef.h",
+    "stdio_ext.h",
     "stdio.h",
     "stdlib.h",
+    "string.h",
+    "sysctl.h",
+    "sys/file.h",
+    "sys/ioctl.h",
+    "syslog.h",
+    "sys/mman.h",
+    "sys/mount.h",
+    "sys/param.h",
+    "sys/resource.h",
+    "sys/socket.h",
     "sys/stat.h",
+    "sys/sysinfo.h",
+    "sys/time.h",
     "sys/times.h",
-    "termios.h"
+    "sys/timex.h",
+    "sys/types.h",
+    "sys/uio.h",
+    "sys/un.h",
+    "sys/utsname.h",
+    "sys/vlimit.h",
+    "sys/wait.h",
+    "termios.h",
+    "time.h",
+    "ucontext.h",
+    "ulimit.h",
+    "unistd.h",
+    "unistdh.h",
+    "utmp.h",
+    "utmpx.h",
+    "varargs.h",
+    "vtimes.h",
+    "wchar.h",
+    "wcjar.h",
+    "wctype.h",
+    "wordexp.h",
     ]
-header_file_names = [
-    "stdio.h"
-   ]
+
+Gheader_file_names = [ "stdlib.h" ]
+
 
 # The file name used for #include parsing:
 tmp_header_file_name = "header.c"
@@ -45,10 +135,16 @@ declaration_to_header = {}
 
 def save_header_information():
     "Save the descriptions of the parsed structures in a file for later use"
+    # Replace all the sets by frozensets so that we can use them as keys later
+    for k, v in declaration_to_header.items():
+        declaration_to_header[k] = frozenset(v)
+    #print (declaration_to_header)
+
+    # Create the file used to store the serialized version of
+    # declaration_to_header:
     p = open(header_information_file_name, mode = 'bw')
     pickle.dump(declaration_to_header, p)
     p.close()
-    #print (declaration_to_header)
 
 
 def load_header_information():
@@ -77,63 +173,192 @@ def add_to_map_of_sets(d, key, value):
     s.add(value)
 
 
-# Match stuff from the begin of a line up to the first ';' found at an end
-# of line:
-declarations_re = re.compile('^.*?;$', re.MULTILINE|re.DOTALL)
+class SimpleC99Lexer:
+    """The PLY-lexer to parse C declarations with comments.
+    The difficulty it to track nested { }"""
+
+    # Declare the tokens:
+    tokens = (
+        'LBRACE',
+        'RBRACE',
+        'SEMICOLON_NL',
+        'comment',
+        'string',
+        'char'
+        )
+
+
+    # Match the '{':
+    def t_LBRACE(self, t):
+        r'\{'
+        if verbose:
+            print ("Found '{' at level", t.lexer.level)
+        # Increase the nesting counter:
+        t.lexer.level += 1
+        return t
+
+
+    # Match the '}':
+    def t_RBRACE(self, t):
+        r'\}'
+        t.lexer.level -= 1
+        if verbose:
+            print ("Found '}' back to level", t.lexer.level)
+        return t
+
+    # Match the potential end of a declaration:
+    t_SEMICOLON_NL = r';\n'
+
+    # C99 comments:
+    def t_comment(self, t):
+        # Taken from pips/src/Libs/c_syntax/clex.l
+        r'(/\*([^*]|(\*+[^/*]))*\*+/)|(//(\\\n|[^\n])*\n?)'
+        return t
+
+    # C99 string:
+    t_string = r'"(\\"|[^"\\]|\\[^"])*"'
+
+    # C99 character literal:
+    t_char = r'\'([^\\\n]|(\\.))*?\''
+
+    # For other characters, we store them as the current declaration:
+    def t_error(self, t):
+        if verbose:
+            print("Found character '%s'" % t.value[0])
+        # Keep the caracter as input
+        t.lexer.content += t.value[0]
+        # Remove is from the input:
+        t.lexer.skip(1)
+
+    # Build the lexer:
+    def build(self, **kwargs):
+        self.lexer = lex.lex(module=self, **kwargs)
+        # To store the string of a declaration encountered:
+        self.lexer.content = ""
+        # Start without a nest { }:
+        self.lexer.level = 0
 
 
 def parse_declarations(header_name, file_name):
     "Keep track of all the declarations generated by this header file digested by PIPS"
     f = open(file_name)
-    # First skip the PIPS-generated header that is 7 line long:
-    for i in range(7):
+    # First skip the PIPS-generated header that is 3 line long:
+    for i in range(3):
         f.readline()
     # slurp all the file in a string:
     content = f.read()
     f.close()
 
-    for m in declarations_re.finditer(content):
+    # Build the lexer:
+    l = SimpleC99Lexer()
+    l.build()
+    # Give the lexer some input:
+    l.lexer.input(content)
+
+    # Tokenize:
+    for tok in l.lexer:
+        l.lexer.content += tok.value
         if verbose:
-            print()
-            print(">>>>>>>>>>>>>")
-            print(m.group(0))
-        # Note that this declaration is to be found in this header_name.
-        add_to_map_of_sets(declaration_to_header, m.group(0) + '\n', header_name)
+            print(tok)
+        if tok.type == 'SEMICOLON_NL' and l.lexer.level == 0:
+            # A semicolon ending a line at {}-nesting level 0
+            # is a complete declaration:
+            if verbose:
+                print (tok.value, "Found declaration:\n", l.lexer.content)
+            # Note that this declaration is to be found in this header_name:
+            add_to_map_of_sets(declaration_to_header,
+                               l.lexer.content,
+                               header_name)
+            # Reset the content variable:
+            l.lexer.content = ""
 
 
 def init_headers():
     "Read classical header files to construct index tables"
 
+    # A directory to store PIPS-processed include files:
+    try:
+        os.mkdir('headers')
+    except:
+        pass
+
+    errors = open('failing_headers', mode = 'w')
+
     for n in header_file_names:
         # Create a .c file that includes this header file:
         f = open(tmp_header_file_name, mode = 'w')
-        #print('#include <' + n + '>', file = f)
         print('#include <' + n + '>', file = f)
-        #print >> f, 'void main() {}'
         f.close()
+
+        # Create a proxy include file to add a marking comment that is
+        # used to recognize more precizely the included file because
+        # of the massive cross inclusions of C99 .h...
+        pn = os.path.join('include', n)
+        # Crate the directory for it:
+        try:
+            os.mkdir(os.path.dirname(pn))
+        except:
+            # Just in case it already exists...
+            pass
+        # And then the file:
+        proxy = open(pn, mode = 'w')
+        print('/* This file includes ' + n + ' for PIPS */',
+              file = proxy)
+        print('#include "' + os.path.join('/usr/include', n ) + '"',
+              file = proxy)
+        proxy.close()
+
         #w = workspace(tmp_header_file_name);
         #print w
         #parse_declarations(n, 'a.database/header!/header!.pre.c')
-        parse_declarations(n, 'pips_c2openmp16086.database/Src/header.c')
+        os.system("tpips header.tpips; mkdir -p headers include")
+        try:
+            parse_declarations(n, 'header.database/Src/header.c')
+            # Keep a copy of the header digested by PIPS if manual
+            # inspection is needed:
+            shutil.copy('header.database/Src/header.c',
+                        os.path.join('headers', n))
+        except IOError:
+            # Notice the .h that can not get through PIPS:
+            print('The parsing by PIPS seems to have failed on', n,
+                  file = errors)
 
+def sort_key(declaration):
+    return len(declaration)
 
-def recover_header(file_name):
+def recover_header(file_name, output_file_name):
     """Replace CPP-inlined stuff from previous #include <something.h> by
     the #include <something.h> itself"""
 
     # To store the set of found headers:
     found_headers = set()
-
+    # Since an output can be generated by different #include because of
+    # some .h including some other one, keep track of all the sets of .h
+    # that could be responsible of an entry:
+    found_headers_sets = set()
     f = open(file_name)
     # slurp all the file in a string:
     content = f.read()
     f.close()
     #print(declaration_to_header)
-    for d, h in declaration_to_header.items():
+
+    # Build a list of list of declarations to find sorted by decreasing
+    # size to be sure that the longer matches will be done first:
+    declarations = list(declaration_to_header.keys())
+    declarations = sorted(declarations)
+    print(declarations)
+    for i in declarations:
+        print(i)
+    #declarations = sorted(declarations, sort_key, True)
+    #declarations = sorted(declarations, (lambda x: len(x)), True)
+
+    for d in declarations:
+        h = declaration_to_header[d]
         #print(h, d)
         if content.find(d) != -1:
             # Add the header name to the found names
             found_headers |= h
+            found_headers_sets.add(h)
             if verbose:
                 print(h)
                 print(d)
@@ -151,8 +376,14 @@ def recover_header(file_name):
             #print(content)
             #exit(0)
     print('Found headers:', found_headers)
+    print('All the sets of headers found:', found_headers_sets)
+
     #print(content)
-    f = open("apres.c", mode = 'w')
+    if not output_file_name:
+        # If no output file is provided, override the input file:
+        output_file_name = file_name
+
+    f = open(output_file_name, mode = 'w')
     print(content, file = f)
     f.close()
 
@@ -165,7 +396,12 @@ def main():
 
     parser.add_option("-i",  "--init",
                      action = "store_true", dest = "init", default = False,
-                     help = "Initialize #include tables")
+                     help = "Initialize the #include tables from PIPS exersizing")
+
+    parser.add_option("-o",  "--output", dest="output_file_name",
+                      help = """Name of the file used to output the recovered
+                      includes instead of overriding the input file""",
+                      metavar="FILE")
 
     group = optparse.OptionGroup(parser, "Debug options")
 
@@ -189,8 +425,7 @@ def main():
     else:
         load_header_information()
         for file_name in args:
-            #init_headers()
-            recover_header(file_name)
+            recover_header(file_name, options.output_file_name)
 
 
 # If this programm is independent it is executed:
