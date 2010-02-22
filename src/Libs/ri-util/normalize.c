@@ -121,7 +121,7 @@ normalized NormalizeCall(call c)
 normalized NormalizeConstant(constant c)
 {
     return((constant_int_p(c)) ?
-	   make_normalized(is_normalized_linear, 
+	   make_normalized(is_normalized_linear,
 			   vect_new(TCST, constant_int(c))) :
 	   make_normalized(is_normalized_complex, UU));
 }
@@ -136,7 +136,14 @@ normalized NormalizeReference(reference r)
 	      entity_domain_number(e)==entity_domain);
 
   if (!type_variable_p(t)) {
-    pips_error("NormalizeReference", "should be a variable !");
+    if(type_functional_p(t))
+      pips_user_warning("Reference to function \"%s\" cannot be normalized.\n"
+			"Is it an undeclared variable?\n",
+			entity_user_name(e));
+    else
+      pips_user_warning("Reference to entity \"%s\" cannot be normalized because of its type tag %d\n",
+			entity_name(e), type_tag(t));
+    pips_user_error("Referenced entity should be a variable!\n");
   }
   else {
     Variable v = (Variable) e;
