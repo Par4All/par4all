@@ -1,7 +1,7 @@
 $(TARGET).h:$(TARGET)-local.h $(SOURCES)
 	cat $(srcdir)/$(TARGET)-local.h > $(TARGET).h
 	{ \
-		SOURCES=`for s in $(TARGET)-local.h $(SOURCES) ; do case $$s in *.[ch]) echo $$s ;; esac ; done`; \
+		SOURCES=`for s in $(TARGET)-local.h $(SOURCES) ; do case $$s in *.[ch]) ( test -f $$s && echo $$s ) || echo $(srcdir)/$$s ;; esac ; done`; \
 		guard=`echo $(TARGET)_header_included | tr - _`;\
       	echo "/* Warning! Do not modify this file that is automatically generated! */"; \
       	echo "/* Modify src/Libs/$(TARGET)/$(TARGET)-local.h instead, to add your own modifications. */"; \
