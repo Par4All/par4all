@@ -172,98 +172,67 @@ static bool incrementation_expression_to_increment(expression incr,
                     expression inc_v =  EXPRESSION(CAR(CDR(call_arguments(incr_c))));
                     bool entity_plus_update_p = ENTITY_PLUS_UPDATE_P(op);
                     bool entity_minus_update_p = ENTITY_MINUS_UPDATE_P(op);
-                    if ( (entity_plus_update_p||entity_minus_update_p)
-                            && extended_integer_constant_expression_p(inc_v)) {
-                        int v = expression_to_int(inc_v);
-                        if (v != 0) {
-                            int sign = entity_plus_update_p ? 1 : -1 ;
-                            * pincrement = int_to_expression(sign * v);
+                    if ( (entity_plus_update_p||entity_minus_update_p) ) {
+                        if(extended_integer_constant_expression_p(inc_v)) {
+                            int v = expression_to_int(inc_v);
+                            if (v != 0) {
+                                int sign = entity_plus_update_p ? 1 : -1 ;
+                                * pincrement = int_to_expression(sign * v);
+                                success = TRUE;
+                                if (v > 0 ) {
+                                    * is_increasing_p = entity_plus_update_p;
+                                    pips_debug(5, "Found += with positive increment!\n");
+                                }
+                                else {
+                                    * is_increasing_p = entity_minus_update_p;
+                                    pips_debug(5, "Found += with negative increment!\n");
+                                }
+                            }
+                        }
+                        /* SG: we checked the no-write-effect-on-increment earlier, we can go on safely,
+                         * but we will not know if the increment is positive or not, assume yes ?
+                         */
+                        else {
+                            * pincrement = copy_expression(inc_v);
+                            *is_increasing_p = entity_plus_update_p;
                             success = TRUE;
-                            if (v > 0 ) {
-                                * is_increasing_p = entity_plus_update_p;
-                                pips_debug(5, "Found += with positive increment!\n");
-                            }
-                            else {
-                                * is_increasing_p = entity_minus_update_p;
-                                pips_debug(5, "Found += with negative increment!\n");
-                            }
                         }
                     }
                     else {
                         /* Look for "i = i + v" (only for v positive here...)
                            or "i = v + i": */
                         expression inc_v = expression_verbose_reduction_p_and_return_increment(incr, add_expression_p);
-                        if (inc_v != expression_undefined
-                                && extended_integer_constant_expression_p(inc_v)) {
-                            int v = expression_to_int(inc_v);
-                            if (v != 0) {
-                                * pincrement = inc_v;
+                        if (inc_v != expression_undefined ) {
+                            if(extended_integer_constant_expression_p(inc_v)) {
+                                int v = expression_to_int(inc_v);
+                                if (v != 0) {
+                                    * pincrement = inc_v;
+                                    success = TRUE;
+                                    if (v > 0 ) {
+                                        * is_increasing_p = TRUE;
+                                        pips_debug(5, "Found \"i = i + v\" or \"i = v + i\" with positive increment!\n");
+                                    }
+                                    else {
+                                        * is_increasing_p = FALSE;
+                                        pips_debug(5, "Found \"i = i + v\" or \"i = v + i\" with negative increment!\n");
+                                    }
+                                }
+                            }
+                            /* SG: we checked the no-write-effect-on-increment earlier, we can go on safely,
+                             * but we will not know if the increment is positive or not, assume yes ?
+                             */
+                            else {
+                                * pincrement = copy_expression(inc_v);
+                                * is_increasing_p = TRUE;
                                 success = TRUE;
-                                if (v > 0 ) {
-                                    * is_increasing_p = TRUE;
-                                    pips_debug(5, "Found \"i = i + v\" or \"i = v + i\" with positive increment!\n");
-                                }
-                                else {
-                                    * is_increasing_p = FALSE;
-                                    pips_debug(5, "Found \"i = i + v\" or \"i = v + i\" with negative increment!\n");
-                                }
                             }
                         }
                     }
-                }
+                    }
             }
         }
     }
     return success;
-}
-
-static
-expression guess_loop_increment_walker(expression e, entity loop_index)
-{
-    if(expression_call_p(e))
-    {
-        call c =expression_call(e);
-        list args = call_arguments(c);
-        entity op = call_function(c);
-        if( ENTITY_PRE_INCREMENT_P(op)||ENTITY_POST_INCREMENT_P(op)||
-                ENTITY_PRE_DECREMENT_P(op)||ENTITY_POST_DECREMENT_P(op)||
-                ENTITY_PLUS_UPDATE_P(op)||ENTITY_MINUS_UPDATE_P(op)||
-                ENTITY_ASSIGN_P(op) /* this one needs further processing */ )
-        {
-            expression lhs = EXPRESSION(CAR(args));
-            if(expression_reference_p(lhs) &&
-                    same_entity_p(loop_index,reference_variable(expression_reference(lhs))))
-            {
-                if(!ENTITY_ASSIGN_P(op)) {
-                    return e;
-                }
-                else {
-                    expression rhs = EXPRESSION(CAR(CDR(args)));
-                    if(expression_call_p(rhs))
-                    {
-                        call rhs_c = expression_call(rhs);
-                        entity rhs_op = call_function(rhs_c);
-                        list rhs_args = call_arguments(rhs_c);
-                        if( ENTITY_PLUS_P(rhs_op) || ENTITY_PLUS_C_P(rhs_op) || 
-                                    ENTITY_MINUS_P(rhs_op) || ENTITY_MINUS_C_P(rhs_op) )
-                        {
-                            expression rhs_rhs = EXPRESSION(CAR(rhs_args));
-                            expression rhs_lhs = EXPRESSION(CAR(CDR(rhs_args)));
-                            if( (expression_reference_p(rhs_rhs)&& same_entity_p(loop_index,reference_variable(expression_reference(rhs_rhs)))
-                                    && extended_integer_constant_expression_p(rhs_lhs)) ||
-                                (expression_reference_p(rhs_lhs)&& same_entity_p(loop_index,reference_variable(expression_reference(rhs_lhs)))
-                                    && extended_integer_constant_expression_p(rhs_rhs))
-                              )
-                            {
-                                return e;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-    return expression_undefined;
 }
 
 /** 
@@ -339,6 +308,66 @@ static bool guess_write_effect_on_entity(void* exp, entity loop_index)
 }
 
 /** 
+ * guess the increment of a loop
+ * the condition is: the increment must be a reference that is constant in the loop body
+ * 
+ * @param e candidate expression
+ * @param loop_index entity guessed as index
+ * @param body loop body
+ * 
+ * @return selected increment expression
+ */
+static
+expression guess_loop_increment_walker(expression e, entity loop_index, statement body)
+{
+    if(expression_call_p(e))
+    {
+        call c =expression_call(e);
+        list args = call_arguments(c);
+        entity op = call_function(c);
+        if( ENTITY_PRE_INCREMENT_P(op)||ENTITY_POST_INCREMENT_P(op)||
+                ENTITY_PRE_DECREMENT_P(op)||ENTITY_POST_DECREMENT_P(op)||
+                ENTITY_PLUS_UPDATE_P(op)||ENTITY_MINUS_UPDATE_P(op)||
+                ENTITY_ASSIGN_P(op) /* this one needs further processing */ )
+        {
+            expression lhs = EXPRESSION(CAR(args));
+            if(expression_reference_p(lhs) &&
+                    same_entity_p(loop_index,reference_variable(expression_reference(lhs))))
+            {
+                if(!ENTITY_ASSIGN_P(op)) {
+                    return e;
+                }
+                else {
+                    expression rhs = EXPRESSION(CAR(CDR(args)));
+                    if(expression_call_p(rhs))
+                    {
+                        call rhs_c = expression_call(rhs);
+                        entity rhs_op = call_function(rhs_c);
+                        list rhs_args = call_arguments(rhs_c);
+                        if( ENTITY_PLUS_P(rhs_op) || ENTITY_PLUS_C_P(rhs_op) || 
+                                    ENTITY_MINUS_P(rhs_op) || ENTITY_MINUS_C_P(rhs_op) )
+                        {
+                            expression rhs_rhs = EXPRESSION(CAR(rhs_args));
+                            expression rhs_lhs = EXPRESSION(CAR(CDR(rhs_args)));
+                            if( (expression_reference_p(rhs_rhs)&& same_entity_p(loop_index,reference_variable(expression_reference(rhs_rhs)))
+                                    && (!guess_write_effect_on_entity(body,reference_variable(expression_reference(rhs_lhs))))) ||
+                                (expression_reference_p(rhs_lhs)&& same_entity_p(loop_index,reference_variable(expression_reference(rhs_lhs)))
+                                    && (!guess_write_effect_on_entity(body,reference_variable(expression_reference(rhs_rhs)))))
+                              )
+                            {
+                                return e;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return expression_undefined;
+}
+
+
+/** 
  * iterate over @param incr, a comma separated expression and checks for an (in|de)crement
  * of @param loop_index
  * if @param loop_index is written twice in @param incr , the result is expression_undefined
@@ -347,7 +376,7 @@ static bool guess_write_effect_on_entity(void* exp, entity loop_index)
  */
 static
 expression 
-guess_loop_increment(expression incr, entity loop_index)
+guess_loop_increment(expression incr, entity loop_index, statement body)
 {
     if(expression_call_p(incr))
     {
@@ -359,15 +388,15 @@ guess_loop_increment(expression incr, entity loop_index)
             expression rhs = EXPRESSION(CAR(args));
             expression lhs = EXPRESSION(CAR(CDR(args)));
 
-            expression lhs_guessed = guess_loop_increment(lhs,loop_index);
+            expression lhs_guessed = guess_loop_increment(lhs,loop_index,body);
             if( !expression_undefined_p(lhs_guessed) && !guess_write_effect_on_entity(rhs,loop_index))
                 return lhs_guessed;
 
-            expression rhs_guessed = guess_loop_increment(rhs,loop_index);
+            expression rhs_guessed = guess_loop_increment(rhs,loop_index,body);
             if( !expression_undefined_p(rhs_guessed) && !guess_write_effect_on_entity(lhs,loop_index))
                 return rhs_guessed;
         }
-        return guess_loop_increment_walker(incr,loop_index);
+        return guess_loop_increment_walker(incr,loop_index,body);
     }
     return expression_undefined;
 }
@@ -484,7 +513,7 @@ sequence for_to_do_loop_conversion(forloop theloop, statement parent)
                 set_free(upper_bound_entities);
                 if(!upper_bound_entity_written){
                     /* we got a candidate loop index and final bound, let's check the increment */
-                    expression increment_expression = guess_loop_increment(incr,loop_index);
+                    expression increment_expression = guess_loop_increment(incr,loop_index,body);
                     expression increment;
                     if( !expression_undefined_p(increment_expression) &&
                             incrementation_expression_to_increment(increment_expression,loop_index,&is_increasing_p,&increment))

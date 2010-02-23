@@ -925,7 +925,7 @@ static bool cse_call_flt(call c, __attribute__((unused))list* inserted)
   if(ENTITY_ASSIGN_P(call_function(c)))
   {
       expression lhs = binary_call_lhs(c);
-      if(expression_scalar_p(lhs))
+      if(get_bool_property("COMMON_SUBEXPRESSION_ELIMINATION_SKIP_LHS") || expression_scalar_p(lhs))
           gen_recurse_stop(lhs);
   }
   /* Go down! */
@@ -1745,7 +1745,8 @@ static bool cse_atom_call_flt(call c,list *skip_list)
   if (ENTITY_ASSIGN_P(called))
   {
       expression lhs = binary_call_lhs(c);
-      if(!syntax_subscript_p(expression_syntax(lhs)))
+      if(get_bool_property("COMMON_SUBEXPRESSION_ELIMINATION_SKIP_LHS")) gen_recurse_stop(lhs);
+      else if(!syntax_subscript_p(expression_syntax(lhs)))
       {
           *skip_list=CONS(EXPRESSION,lhs,*skip_list);
           expression var_defined =

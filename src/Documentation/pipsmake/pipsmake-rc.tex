@@ -7457,6 +7457,12 @@ evaluations.
 EVAL_SYMBOLIC_CONSTANT TRUE
 \end{PipsProp}
 
+One can also set \PipsPropRef{PARTIAL_EVAL_ALWAYS_SIMPLIFY}
+to TRUE in order to force distribution, even when it does not seem profitable
+\begin{PipsProp}{PARTIAL_EVAL_ALWAYS_SIMPLIFY}
+PARTIAL_EVAL_ALWAYS_SIMPLIFY FALSE
+\end{PipsProp}
+
 This function was implemented initially by Bruno \textsc{Baron}.
 
 
@@ -7667,9 +7673,10 @@ EOLE_OPTIMIZATION_STRATEGY "P2SC"
 \end{PipsProp}
 
 Following property is used in sac to limit the subexpressions:
-iWhen set to true, only subexpressions without "+constant" terms are eligible.
+When set to true, only subexpressions without "+constant" terms are eligible.
 \begin{PipsProp}{COMMON_SUBEXPRESSION_ELIMINATION_SKIP_ADDED_CONSTANT}
 COMMON_SUBEXPRESSION_ELIMINATION_SKIP_ADDED_CONSTANT FALSE
+COMMON_SUBEXPRESSION_ELIMINATION_SKIP_LHS TRUE
 \end{PipsProp}
 
 %-----------End of Expression Transformations -------------------------

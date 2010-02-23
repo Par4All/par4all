@@ -1073,7 +1073,7 @@ eformat_t partial_eval_binary_operator_old(entity func,
   if (strcmp(entity_local_name(func), DIVIDE_OPERATOR_NAME) == 0) {
     token = PERFORM_DIVISION;
   }
-  if (strcmp(entity_local_name(func), "MOD") == 0) {
+  if (strcmp(entity_local_name(func), MODULO_OPERATOR_NAME) == 0) {
     token = PERFORM_MODULO;
   }
 
@@ -1264,10 +1264,10 @@ void regenerate_expression(eformat_t *efp, expression *ep)
   if(eformat_equivalent_p(*efp,eformat_undefined)) {
     /* nothing to do because expressions are the same */
   }
-  else if(!efp->simpler) {
+  else if(!get_bool_property("PARTIAL_EVAL_ALWAYS_SIMPLIFY") && !efp->simpler) {
     /* simply free efp->expr */
-    /* ?? ******commented out for debug******* */
-    /*free_expression(efp->expr);*/
+    /* ******commented out for debug******* */
+    free_expression(efp->expr);
     efp->expr= expression_undefined; /* useless */
   }
   else {
