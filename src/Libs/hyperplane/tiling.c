@@ -49,7 +49,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <malloc.h>
+#include <stdlib.h>
 #include <strings.h>
 
 #include "genC.h"

@@ -35,8 +35,8 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <malloc.h>
-#include <values.h>
+#include <stdlib.h>
+#include <limits.h>
 #include "genC.h"
 #include "misc.h"
 #include "linear.h"

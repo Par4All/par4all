@@ -37,7 +37,7 @@
 #include <sys/types.h>
 #include <sys/ipc.h>
 #include <sys/shm.h>
-#include <malloc.h>
+#include <stdlib.h>
 /* Some silly AIX stuff: */
 #if defined(_AIX)
 #define _NO_PROTO

@@ -26,9 +26,9 @@ INC_CFILES = \
 	treematch.c atomizer.c vectransform.c reductions.c \
 	singleass.c deatomizer.c if_conversion.c simd_memory_packing.c
 
-DERIVED_CFILES = patterns.tab.c patterns.lex.c
+DERIVED_CFILES = patterns.c lexer.c
 
-DERIVED_HEADERS = patterns.tab.h
+DERIVED_HEADERS = patterns.h
 
 LIB_CFILES = $(INC_CFILES) $(DERIVED_CFILES)
 
@@ -51,8 +51,12 @@ local-clean:
 
 $(TARGET).h: $(DERIVED_HEADERS) $(DERIVED_CFILES) 
 
-patterns.lex.c: patterns.l patterns.tab.h
-	flex -Cf -opatterns.lex.c -Ppatterns_yy patterns.l
+lexer.c: lexer.l patterns.h
+	sed -e 's/yy/patterns_yy/g' lexer.l > tmp.l
+	flex -Cf -olexer.c -Ppatterns_yy tmp.l
+	rm tmp.l
 
-patterns.tab.c patterns.tab.h: patterns.y
-	bison -o patterns.tab.c -d -p patterns_yy patterns.y
+patterns.c patterns.h: patterns.y
+	sed -e 's/yy/patterns_yy/g' patterns.y > tmp.y
+	bison -o patterns.c -d -p patterns_yy tmp.y
+	rm tmp.y

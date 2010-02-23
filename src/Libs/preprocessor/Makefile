@@ -29,7 +29,7 @@ INC_CFILES = \
 	module.c
 
 DERIVED_HEADERS = splitc.h
-DERIVED_CFILES = splitcyaccer.c splitclexer.c
+DERIVED_CFILES = splitc.c lexer.c
 
 LIB_CFILES =	$(DERIVED_CFILES) $(INC_CFILES)
 
@@ -55,13 +55,13 @@ local-clean:
 
 YY2SC	= sed '/^FILE \*yyin/s/=[^,;]*//g;s/YY/SPLITC_/g;s/yy/splitc_/g'
 
-splitcyaccer.c: splitc.y
+splitc.c: splitc.y
 	$(PARSE) `pwd`/splitc.y
-	$(YY2SC) y.tab.c > splitcyaccer.c
+	$(YY2SC) y.tab.c > splitc.c
 	$(YY2SC) y.tab.h > splitc.h
 	$(RM) y.tab.c y.tab.h
 
-splitc.h: splitcyaccer.c
+splitc.h: splitc.c
 
-splitclexer.c: splitc.l splitc.h
-	$(SCAN) `pwd`/splitc.l | $(YY2SC) > $@
+lexer.c: lexer.l splitc.h
+	$(SCAN) `pwd`/lexer.l | $(YY2SC) > $@

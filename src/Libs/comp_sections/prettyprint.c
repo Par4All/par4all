@@ -23,7 +23,7 @@
 */
 /* print complementary sections */
 #include <stdlib.h>
-#include <malloc.h>
+#include <stdlib.h>
 
 #include "all.h"
 #include "text-util.h"

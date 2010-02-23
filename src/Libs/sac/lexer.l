@@ -47,9 +47,9 @@ typedef dg_vertex_label vertex_label;
 
 #include "sac-local.h"
 #include "sac.h"
-#include "patterns.tab.h"
+#include "patterns.h"
 
-int patterns_yyerror(char* s);
+int yyerror(char* s);
 %}
 %%
 "REFERENCE"               return REFERENCE_TOK;
@@ -96,9 +96,9 @@ int patterns_yyerror(char* s);
 "<"      		return LESS_THAN_OPERATOR_TOK;
 "=="			return EQUAL_OPERATOR_TOK;
 "?"				return PHI_TOK;
-[0-9.-]+                  { patterns_yylval.iVal = atoi(patterns_yytext); return INTEGER_TOK; }
-[A-Za-z][0-9A-Za-z_]*   { patterns_yylval.strVal = strdup(patterns_yytext); return IDENTIFIER_TOK; }
+[0-9.-]+                  { yylval.iVal = atoi(yytext); return INTEGER_TOK; }
+[A-Za-z][0-9A-Za-z_]*   { yylval.strVal = strdup(yytext); return IDENTIFIER_TOK; }
 [ \t\n]                 ;
 "#".*                   ;
-.                       return *patterns_yytext;
+.                       return *yytext;
 %%

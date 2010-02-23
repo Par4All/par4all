@@ -22,12 +22,8 @@
 
 */
 
-#ifndef _STDARG_H
 #include <stdarg.h>
-#endif
-#ifndef _STDLIB_H
 #include <stdlib.h>
-#endif
 #include <setjmp.h>
 
 /* To generate a string from a macro: */

@@ -44,9 +44,9 @@ typedef dg_vertex_label vertex_label;
 #include "sac-local.h"
 #include "sac.h"
 
-int patterns_yyerror(char* s);
-int patterns_yywrap(void);
-int patterns_yylex();
+int yyerror(char* s);
+int yywrap(void);
+int yylex();
 
 static size_t opcode_argc =0;
 
@@ -269,12 +269,12 @@ mappings:
 
 %%
 
-int patterns_yywrap(void)
+int yywrap(void)
 {
    return 1;
 }
 
-int patterns_yyerror(char* s)
+int yyerror(char* s)
 {
    pips_internal_error("patterns parser: %s\n", s);
    return 0;

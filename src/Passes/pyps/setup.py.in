@@ -1,0 +1,49 @@
+#!/usr/bin/env python
+
+from distutils.core import setup, Extension
+
+def parsecppflags(cppflags):
+	flags=cppflags.split(' ')
+	defines=[]
+	includes=[]
+	for f in flags:
+		tmp = f[0:2]
+		if tmp == '-I':
+			includes+=[f[2:]]
+		elif tmp == '-D':
+			define = f[2:].split("=",1)
+			thedef=define[0]
+			thevalue = define[1] if len(define) > 1 else None
+			defines+=[(thedef,thevalue)]
+	return (defines,includes)
+
+def parseldflags(ldflags):
+	flags=ldflags.split(' ')
+	dirs=[]
+	libs=[]
+	for f in flags:
+		tmp = f[0:2]
+		if tmp == '-L':
+			dirs+=[f[2:]]
+		elif tmp == '-l':
+			libs+=[f[2:]]
+	return (libs,dirs)
+
+(defines,includes)=parsecppflags("@CPPFLAGS@")
+(libs,dirs)=parseldflags("@LDFLAGS@")
+
+setup(name='pyps',
+		version='0.1',
+		description='PIPS python interface and extension',
+		author='Serge Guelton',
+		author_email='serge.guelton@telecom-bretagne.eu',
+		url='http://pips.enstb.org',
+		ext_modules=[Extension('_pypips', ['pypips.c','pypips.i'],
+			include_dirs=includes,
+			define_macros=defines,
+			library_dirs=dirs,
+			libraries=libs
+			)],
+		py_modules=['pypips','pyps']
+		)
+

@@ -52,11 +52,6 @@
 ** 2.0  George Necula 12/12/00: Many extensions
 *)*/
 
-%top{
-  /* To have strndup(), put this at the top of the generated file since : */
-#define _GNU_SOURCE
- }
-
 %{
 #include <stdlib.h>
 #include <stdio.h>
@@ -70,7 +65,7 @@
 #include "misc.h"
 
 #include "c_syntax.h"
-#include "cyacc.tab.h"
+#include "cyacc.h"
 
 #define FIRST_C_LINE_NUMBER (1)
 #define UNDEFINED_C_LINE_NUMBER (-1)

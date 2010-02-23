@@ -70,7 +70,7 @@
 #include "top-level.h"
 #include "pipsmake.h"
 
-#include "malloc.h"
+#include "stdlib.h"
 
 extern void add_rule(rule);
 extern int yyerror(char *);

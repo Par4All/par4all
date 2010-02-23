@@ -23,7 +23,7 @@
 */
 #include <stdio.h>
 #include <string.h>
-#include <values.h>
+#include <limits.h>
 
 #include "linear.h"
 

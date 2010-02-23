@@ -27,13 +27,13 @@
   */
 
 #include <stdio.h>
+#include <limits.h>
 
 #include "genC.h"
 #include "linear.h"
 #include "ri.h"
 #include "ri-util.h"
 #include "constants.h"
-#include <values.h>
 #include "boolean.h"
 #include "arithmetique.h"
 #include "vecteur.h"

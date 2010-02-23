@@ -278,27 +278,6 @@ dataflow df;
 
 
 /*============================================================================*/
-/* void fprint_list_of_exp(FILE *fp, list exp_l): prints in the file "fp"
- * the list of expression "exp_l". We separate the expressions with a colon
- * (","). We do not end the print with a line feed.
- */
-void fprint_list_of_exp(fp, exp_l)
-FILE *fp;
-list exp_l;
-{
- list aux_l;
- expression exp;
-
- for(aux_l = exp_l; aux_l != NIL; aux_l = CDR(aux_l))
-   {
-    exp = EXPRESSION(CAR(aux_l));
-    fprintf(fp,"%s", words_to_string(words_expression(exp,NIL)));
-    if(CDR(aux_l) != NIL)
-       fprintf(fp,",");
-   }
-}
-
-/*============================================================================*/
 /* void fprint_pred(FILE *fp, predicate pred): prints in the file "fp" the
  * predicate "pred".
  */
@@ -512,17 +491,6 @@ void pu_vect_fprint(FILE * fp, Pvecteur v)
 }
 
 
-/*============================================================================*/
-/* void fprint_entity_list(FILE *fp,list l): prints a list of entities on
- * file fp.
- */
-void fprint_entity_list(fp,l)
-FILE *fp;
-list l;
-{
-  for( ; l != NIL; l = CDR(l))
-    fprintf(fp, "%s, ", entity_local_name(ENTITY(CAR(l))));
-}
 
 
 #define INDENT_FACTOR 2

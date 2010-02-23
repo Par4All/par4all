@@ -39,7 +39,7 @@ typedef dg_vertex_label vertex_label;
 
 #include "sac-local.h"
 #include "sac.h"
-#include "patterns.tab.h"
+#include "patterns.h"
 #include "pipsdbm.h"
 
 typedef struct {

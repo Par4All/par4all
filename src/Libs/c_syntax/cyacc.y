@@ -70,8 +70,8 @@
 
 #include "c_syntax.h"
 
-#include "cyacc.tab.h"
-#include "clexer.h"
+#include "cyacc.h"
+extern int c_lineno;
 
 #define C_ERROR_VERBOSE 1 /* much clearer error messages with bison */
 
@@ -1393,7 +1393,7 @@ statements_inside_block:
 block: /* ISO 6.8.2 */
     statements_inside_block TK_RBRACE
                         {
-			  $$ = $1
+			  $$ = $1;
 			}
 |   statements_inside_block pragmas TK_RBRACE
                         {

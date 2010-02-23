@@ -19,7 +19,6 @@ regroupement de la majorité des includes
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits.h>
-#include <values.h>
 #include <ctype.h>
 #include <string.h>
 

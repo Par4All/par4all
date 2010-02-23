@@ -31,8 +31,6 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-//#include <malloc.h>
-/* #include <values.h>   */ 
 #include <limits.h>
 #include <string.h>
 

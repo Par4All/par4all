@@ -27,7 +27,7 @@
   */
 
 #include <stdio.h>
-#include <malloc.h> 
+#include <stdlib.h> 
 
 #include "boolean.h"
 #include "vecteur.h"

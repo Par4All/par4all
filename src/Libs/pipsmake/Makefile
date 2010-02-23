@@ -29,7 +29,7 @@ INC_CFILES =	pipsmake.c \
 		stubs.c
 
 DERIVED_HEADERS = pipsmake_yacc.h
-DERIVED_CFILES = pipsmake_yacc.c pipsmake_lex.c
+DERIVED_CFILES = readmakefile.c lexer.c
 
 LIB_CFILES =	$(DERIVED_CFILES)  $(INC_CFILES)
 INC_TARGET = $(TARGET).h
@@ -52,13 +52,13 @@ $(TARGET).h: $(DERIVED_CFILES)
 
 YY2PM	= sed -e '/^FILE \*yyin/s/=[^,;]*//g;s/YY/PIPSMAKE_/g;s/yy/pipsmake_/g'
 
-pipsmake_lex.c: readmakefile.l
-	$(SCAN) readmakefile.l | $(YY2PM) > $@
+lexer.c: lexer.l
+	$(SCAN) lexer.l | $(YY2PM) > $@
 
-pipsmake_yacc.c: readmakefile.y
+readmakefile.c: readmakefile.y
 	$(PARSE) readmakefile.y
-	$(YY2PM) y.tab.c > pipsmake_yacc.c
-	$(YY2PM) y.tab.h > pipsmake_yacc.h
+	$(YY2PM) y.tab.c > readmakefile.c
+	$(YY2PM) y.tab.h > readmakefile.h
 	$(RM) y.tab.[hc] y.output
 
-pipsmake_yacc.h: pipsmake_yacc.c
+readmakefile.h: readmakefile.c

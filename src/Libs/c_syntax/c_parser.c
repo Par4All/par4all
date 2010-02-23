@@ -34,7 +34,7 @@
 #include "transformations.h"
 
 #include "c_syntax.h"
-#include "cyacc.tab.h"
+#include "cyacc.h"
 
 #include "c_parser_private.h"
 

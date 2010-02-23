@@ -33,7 +33,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <malloc.h>
+#include <stdlib.h>
 #include <setjmp.h>
 #include <string.h>
 #include <errno.h>

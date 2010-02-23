@@ -22,7 +22,7 @@
 
 */
 /* #include <sys/stdtypes.h>*/
-/* #include "malloc.h" */
+/* #include "stdlib.h" */
 
 #include "genC.h"
 

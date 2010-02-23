@@ -32,7 +32,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <malloc.h>
+#include <stdlib.h>
 
 /* Newgen includes 	*/
 #include "genC.h"

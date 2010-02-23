@@ -22,7 +22,7 @@
 
 */
 #include "stdio.h"
-#include "malloc.h"
+#include "stdlib.h"
 
 extern void user_log(); /* in misc/messages.c */
 

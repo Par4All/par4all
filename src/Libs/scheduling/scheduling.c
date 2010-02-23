@@ -28,7 +28,7 @@ char vcid_scheduling_scheduling[] = "$Id$";
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <malloc.h>
+#include <stdlib.h>
 #include <setjmp.h>
 
 #include "genC.h"

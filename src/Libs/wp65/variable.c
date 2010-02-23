@@ -38,7 +38,6 @@
 #include <stdlib.h>
 #include <math.h>
 
-/* #include <values.h> */
 #include <limits.h>
 #include <string.h>
 

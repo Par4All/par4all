@@ -45,7 +45,7 @@ typedef dg_vertex_label vertex_label;
 #include "graph.h"
 
 #include "sac.h"
-#include "patterns.tab.h"
+#include "patterns.h"
 
 #include "properties.h"
 #include "locality.h"

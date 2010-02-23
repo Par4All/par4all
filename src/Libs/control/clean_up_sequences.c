@@ -37,7 +37,7 @@ char vcid_clean_up_sequences[] = "%A% ($Date: 2004/02/16 15:24:55 $, ) version $
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <malloc.h>
+#include <stdlib.h>
 
 #include "linear.h"
 

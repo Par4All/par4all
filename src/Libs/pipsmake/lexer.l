@@ -29,7 +29,7 @@
 #include <string.h>
 #include "genC.h"
 #include "makefile.h"
-#include "pipsmake_yacc.h"
+#include "readmakefile.h"
 %}
 
 %%

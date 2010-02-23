@@ -1267,7 +1267,7 @@ void regenerate_expression(eformat_t *efp, expression *ep)
   else if(!get_bool_property("PARTIAL_EVAL_ALWAYS_SIMPLIFY") && !efp->simpler) {
     /* simply free efp->expr */
     /* ******commented out for debug******* */
-    free_expression(efp->expr);
+    //free_expression(efp->expr);
     efp->expr= expression_undefined; /* useless */
   }
   else {

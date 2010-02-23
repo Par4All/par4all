@@ -97,6 +97,7 @@ typedef dfg_vertex_label vertex_label;
 				    (strcmp(s,MINUS_OPERATOR_NAME) == 0) || \
 				    (strcmp(s,MULTIPLY_OPERATOR_NAME) == 0) || \
 				    (strcmp(s,DIVIDE_OPERATOR_NAME) == 0) )
+#define ENTITY_FOUR_OPERATION_P(s) (ENTITY_PLUS_P(s) || ENTITY_MINUS_P(s) || ENTITY_MULTIPLY_P(s) || ENTITY_DIVIDE_P(s))
 
 /* Global variables	*/
 
@@ -1716,25 +1717,6 @@ boolean single_var_vecteur_p(Pvecteur pv)
  return(vect_size(pv) == 1);
 }
 
-/*============================================================================*/
-/* Pbase list_to_base(list l): returns the Pbase that contains the variables
- * of list "l", of entities, in the same order.
- *
- * FI: should be moved to the interface between ri and
- * linear. Probably useful in many places.
- */
-Pbase list_to_base(list l)
-{
- Pbase new_b = NULL;
- list el_l;
-
- for(el_l = l ; el_l != NIL; el_l = CDR(el_l))
-   vect_add_elem((Pvecteur *) &new_b, (char *) ENTITY(CAR(el_l)), VALUE_ONE);
-
- new_b = base_reversal(new_b);
- return(new_b);
-}
-
 
 /*============================================================================*/
 /* list vecteur_to_list(Pvecteur v): translates a Pvecteur into a list of
@@ -1756,20 +1738,6 @@ list vecteur_to_list(Pvecteur v)
 }
 
 
-/*============================================================================*/
-/* list base_to_list(Pbase v): translates a Pbase into a list of entities, in
- * the same order.
- */
-/* FI: to be moved like functions above */
-list base_to_list(Pbase b)
-{
- list l = NIL;
-
- for( ; b != NULL; b = b->succ)
-   l = gen_nconc(l, CONS(ENTITY, (entity) b->var, NIL));
-
- return(l);
-}
 
 
 /*============================================================================*/

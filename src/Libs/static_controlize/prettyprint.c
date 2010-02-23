@@ -34,7 +34,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <values.h>
+#include <limits.h>
 
 /* Newgen includes	*/
 #include "genC.h"

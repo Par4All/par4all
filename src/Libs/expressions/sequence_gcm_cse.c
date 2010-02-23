@@ -1426,24 +1426,6 @@ list_diff(list l1, list l2)
   return diff;
 }
 
-static bool simple_reference_p(expression e)
-{
-  syntax s = expression_syntax(e);
-  return syntax_reference_p(s) && !reference_indices(syntax_reference(s));
-}
-
-static bool is_expression_constant_p(expression e)
-{
-  syntax s = expression_syntax(e);
-  if(syntax_call_p(s))
-  {
-    call c = syntax_call(s);
-    entity en = call_function(c);
-    return entity_constant_p(en);
-  }
-  return FALSE;
-}
-
 static bool call_unary_minus_p(expression e)
 {
   syntax s = expression_syntax(e);
@@ -1629,8 +1611,8 @@ static void atom_cse_expression(expression e,list * skip_list)
      *   - constant (ex: 2.6 , 5)
      *   - Unary minus (ex: -a , -5)
      */
-    if (!simple_reference_p(e) &&
-            !is_expression_constant_p(e) &&
+    if (!expression_scalar_p(e) &&
+            !expression_constant_p(e) &&
             !call_unary_minus_p(e))
     {
         expression exp = NULL;
