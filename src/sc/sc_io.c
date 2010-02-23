@@ -295,8 +295,8 @@ int sc_nb;
 char *directory_name;
 {
   FILE * f;
-  int d,n;
-  char *fn,*tmp,*filename;
+  char fn[256],*filename;
+  int d;
   
   filename = "_sc.out";
   if (directory_name==NULL) {directory_name = "SC_OUT_DEFAULT";}  
@@ -305,8 +305,8 @@ char *directory_name;
     mkdir(directory_name,S_IRWXU);
     d = chdir(directory_name);
   }   
-  tmp = fcvt((double) sc_nb,0,&d,&n);
-  fn = strcat(tmp,filename);
+
+  snprintf(fn,sizeof(fn),".0f%f%s",(double)sc_nb,filename);
    
   if ((f = fopen(fn,"w")) != NULL) {
     if(!SC_UNDEFINED_P(sc)) {
