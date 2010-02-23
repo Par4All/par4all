@@ -4454,6 +4454,8 @@ static IntrinsicDescriptor IntrinsicTypeDescriptorTable[] =
   {ATOF_FUNCTION_NAME, 1, char_pointer_to_double_type, 0, 0},
   {ATOI_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
   {ATOL_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+  {ATOLL_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+  {ATOQ_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
   {BSEARCH_FUNCTION_NAME, 5, default_intrinsic_type, 0, 0},
   {CALLOC_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
   {DIV_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},

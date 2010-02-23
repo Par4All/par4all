@@ -463,6 +463,8 @@
 #define ATOF_FUNCTION_NAME              "atof"
 #define ATOI_FUNCTION_NAME              "atoi"
 #define ATOL_FUNCTION_NAME              "atol"
+#define ATOLL_FUNCTION_NAME             "atoll"
+#define ATOQ_FUNCTION_NAME              "atoq"
 #define BSEARCH_FUNCTION_NAME           "bsearch"
 #define CALLOC_FUNCTION_NAME            "calloc"
 #define DIV_FUNCTION_NAME               "div"

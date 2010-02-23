@@ -769,6 +769,8 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
   {ATOF_FUNCTION_NAME,                             no_write_effects},
   {ATOI_FUNCTION_NAME,                             no_write_effects},
   {ATOL_FUNCTION_NAME,                             no_write_effects},
+  {ATOLL_FUNCTION_NAME,                             no_write_effects},
+  {ATOQ_FUNCTION_NAME,                             no_write_effects},
   {BSEARCH_FUNCTION_NAME,                          no_write_effects},
   {CALLOC_FUNCTION_NAME,                           no_write_effects},
   {DIV_FUNCTION_NAME,                              no_write_effects},
