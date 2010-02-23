@@ -563,7 +563,10 @@ static bool pips_split_file(string name, string tempfile)
   free(dir);
   safe_fclose(out, tempfile);
   clean_file(tempfile);
-  if (err) fprintf(stderr, "split error: %s\n", err);
+  if (err) {
+    fprintf(stderr, "split error while extracting %s from %s: %s\n",
+	    tempfile, name, err);
+  }
   return err? TRUE: FALSE;
 }
 
