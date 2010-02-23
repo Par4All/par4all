@@ -4525,7 +4525,6 @@ static IntrinsicDescriptor IntrinsicTypeDescriptorTable[] =
   {ISATTY_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
   {MEMALIGN_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
   {TTYNAME_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
-  {ATOLL_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
   {LLABS_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
   {LLDIV_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
   {LLTOSTR_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},

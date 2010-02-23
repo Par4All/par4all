@@ -531,7 +531,6 @@
 #define ISATTY_FUNCTION_NAME            "isatty"
 #define MEMALIGN_FUNCTION_NAME          "memalign"
 #define TTYNAME_FUNCTION_NAME           "ttyname"
-#define ATOLL_FUNCTION_NAME             "atoll"
 #define LLABS_FUNCTION_NAME             "llabs"
 #define LLDIV_FUNCTION_NAME             "lldiv"
 #define LLTOSTR_FUNCTION_NAME           "lltostr"
