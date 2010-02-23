@@ -28,7 +28,7 @@ INC_CFILES =	pipsmake.c \
 		unsplit.c \
 		stubs.c
 
-DERIVED_HEADERS = pipsmake_yacc.h
+DERIVED_HEADERS = readmakefile.h
 DERIVED_CFILES = readmakefile.c lexer.c
 
 LIB_CFILES =	$(DERIVED_CFILES)  $(INC_CFILES)
