@@ -2920,7 +2920,7 @@ union domain *dp;
 }
 
 static void
-initialize_DirectDomainsTable()
+initialize_DirectDomainsTable(void)
 {
     int i,j;
 
@@ -3182,7 +3182,11 @@ void gen_recurse_stop(void * obj)
      Beware that the function is reentrant.
 */
 static void
-gen_internal_context_multi_recurse(void * o, void * context, va_list pvar)
+gen_internal_context_multi_recurse
+  (void * o,       // starting point
+   void * context, // context passed to decision and rewrite functions
+   bool gointabs,  // whether to recurse within tabulated domains
+   va_list pvar)   // domain, decision (down) and rewrite (up) functions
 {
   gen_chunk * obj = (gen_chunk*) o;
   int i, domain;
@@ -3191,6 +3195,8 @@ gen_internal_context_multi_recurse(void * o, void * context, va_list pvar)
   GenDecisionTableType new_decision_table, new_domain_table, *p_table;
   struct multi_recurse *saved_mrc, new_mrc;
   struct driver dr;
+
+  message_assert("tabulated domain recursion is not implemented", !gointabs);
 
   check_read_spec_performed();
 
@@ -3283,7 +3289,7 @@ void gen_context_multi_recurse(void * o, void * context, ...)
 {
     va_list pvar;
     va_start(pvar, context);
-    gen_internal_context_multi_recurse(o, context, pvar);
+    gen_internal_context_multi_recurse(o, context, false, pvar);
     va_end(pvar);
 }
 
@@ -3309,7 +3315,7 @@ void gen_multi_recurse(void * o, ...)
 {
     va_list pvar;
     va_start(pvar, o);
-    gen_internal_context_multi_recurse(o, NULL, pvar);
+    gen_internal_context_multi_recurse(o, NULL, false, pvar);
     va_end(pvar);
 }
 
