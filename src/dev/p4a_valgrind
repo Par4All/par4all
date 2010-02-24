@@ -1,0 +1,6 @@
+#! /bin/sh
+
+# Launch valgrind with some paranoid options
+# Could be also in ~/.valgrindrc or in VALGRIND_OPTS
+
+valgrind --tool=memcheck --malloc-fill=a5 --free-fill=e1 --freelist-vol=1000000000 --track-origins=yes --leak-resolution=high --num-callers=50 --leak-check=full $@

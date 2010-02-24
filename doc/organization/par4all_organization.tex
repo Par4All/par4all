@@ -353,7 +353,13 @@ at least these packages installed:
 MICKAEL !
 
 
-For an everyday work there are these scripts:
+There are scripts to ease the developer and user life.
+
+
+\subsubsection{Scripts for an everyday work}
+\label{sec:an-everyday-work}
+
+
 \begin{itemize}
 \item to pull everything at one for testing, this is done with the
   \verb|p4a_pull_all|. It may useful to create a branch with a \texttt{git
@@ -363,6 +369,11 @@ For an everyday work there are these scripts:
   setting up many things. It should be used at least for the first
   compilation.
 \end{itemize}
+
+
+\subsubsection{Scripts used to setup the infrastructure}
+\label{sec:scripts-used-setup}
+
 
 Some scripts used to setup the infrastructure are located in
 \texttt{src/dev}, that should be used in this order:
@@ -379,6 +390,16 @@ Some scripts used to setup the infrastructure are located in
 \item \verb/p4a_apply_pips_patches/ is used to patch the original \Apips
   files to fit the \Apfa architecture. It should be used only once, after
   external \Agit import;
+\end{itemize}
+
+
+\subsubsection{Scripts for debugging}
+\label{sec:scripts-debugging}
+
+\begin{itemize}
+\item \verb|p4a_valgrind| launch a command with Valgrind with a memory
+  checker in paranoid mode, mainly with the options described in the
+  \Apips development guide.
 \end{itemize}
 
 
