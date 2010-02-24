@@ -474,9 +474,10 @@ static transformer main_summary_precondition(entity callee)
  * called receive an identity summary precondition, i.e. no information.
  *
  * If an interprocedural analysis is required, the preconditions of all
- * call sites are translated and the unioned.
+ * call sites are translated and then unioned.
  *
- * */
+ *
+ */
 
 static transformer ordinary_summary_precondition(string module_name,
 						 entity callee)
@@ -508,7 +509,7 @@ static transformer ordinary_summary_precondition(string module_name,
       t = update_precondition_with_call_site_preconditions(t, caller, callee);
     }
 
-    if (ENDP(callees_callees(callers)) && 
+    if (ENDP(callees_callees(callers)) &&
 	some_main_entity_p()) {
       /* no callers => empty precondition if a main is being analyzed
 	 FC. 08/01/1999.
