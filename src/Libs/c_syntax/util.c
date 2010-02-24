@@ -2034,10 +2034,24 @@ void UpdateEntity(entity e, stack ContextStack, stack FormalStack, stack Functio
     entity_type(e) = t2;
   }
 
+  /* FI: it might be a good idea to use the type "unknown" or a
+     future type "default" to improve the prettyprinting by not
+     adding implicit "int" declarations. */
   if(type_undefined_p(entity_type(e))) {
     /* The default type is int */
     entity_type(e) =
       make_type_variable(make_variable(make_basic_int(DEFAULT_INTEGER_TYPE_SIZE),NIL,NIL));
+  }
+  /* FI: This elseif  branch is apparently useless because the
+     probleme must be dealt with later in the parser */
+  else if(type_functional_p(entity_type(e))) {
+    functional f = type_functional(entity_type(e));
+    type rt = functional_result(f);
+    if(type_undefined_p(rt)) {
+      /* The default return type is int */
+      functional_result(f) =
+	make_type_variable(make_variable(make_basic_int(DEFAULT_INTEGER_TYPE_SIZE),NIL,NIL));
+    }
   }
   pips_assert("the entity type is defined", !type_undefined_p(entity_type(e)));
 

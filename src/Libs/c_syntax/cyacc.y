@@ -3097,10 +3097,15 @@ function_def_start:  /* (* ISO 6.9.1 *) */
     rest_par_list TK_RPAREN
                         {
 			  /* Functional type is unknown or int (by default) or void ?*/
-			  functional f = make_functional($4,make_type_unknown());
+			  //functional f = make_functional($4,make_type_unknown());
+			  functional f = make_functional($4,MakeIntegerResult());
 			  entity e = GetFunction();
 			  entity_type(e) = make_type_functional(f);
 			  pips_assert("Current module entity is consistent\n",entity_consistent_p(e));
+			  // Too late for full UpdateEntity() but at
+			  //least the return value and the formal
+			  //parameters should be properly defined
+			  //UpdateEntity(e,ContextStack,FormalStack,FunctionStack,OffsetStack,is_external, FALSE);
 			  PopFunction();
 			  stack_pop(FormalStack);
 			  StackPop(OffsetStack);

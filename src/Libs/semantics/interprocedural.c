@@ -1307,7 +1307,7 @@ static bool process_call(call c)
 				call_site_prec);
       transformer_free(current_summary_precondition);
       current_summary_precondition = new_current_summary_precondition;
-	
+
     }
   }
   else {
@@ -1317,7 +1317,7 @@ static bool process_call(call c)
      */
     current_summary_precondition = call_site_prec;
   }
-	
+
   ifdebug(PROCESS_CALL_DEBUG_LEVEL) {
     pips_debug(PROCESS_CALL_DEBUG_LEVEL,
 	  "new current summary precondition for module %s in current frame, %p:\n",
@@ -1333,14 +1333,14 @@ static bool process_call(call c)
    * have to be translated in callee's frame when used.
    */
   /*
-    translate_global_values(current_callee, 
+    translate_global_values(current_callee,
     current_summary_precondition);
   */
 
   return TRUE;
 }
 
-transformer update_precondition_with_call_site_preconditions(transformer t, 
+transformer update_precondition_with_call_site_preconditions(transformer t,
 							     entity caller,
 							     entity callee)
 {
@@ -1363,7 +1363,7 @@ transformer update_precondition_with_call_site_preconditions(transformer t,
   current_summary_precondition = t;
   current_caller = caller;
   current_callee = callee;
-	    
+
   set_cumulated_rw_effects((statement_effects)
 			   db_get_memory_resource
 			   (DBR_CUMULATED_EFFECTS,
