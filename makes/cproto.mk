@@ -1,7 +1,7 @@
 $(TARGET).h:$(srcdir)/$(TARGET)-local.h $(SOURCES)
 	cat `( test -f $(TARGET)-local.h && echo $(TARGET)-local.h ) || echo $(srcdir)/$(TARGET)-local.h ` > $(TARGET).h
 	{ \
-		SOURCES=`for s in $(TARGET)-local.h $(SOURCES) ; do case $$s in *.[ch]) ( test -f $$s && echo $$s ) || echo $(srcdir)/$$s ;; esac ; done`; \
+		SOURCES=`for s in $(TARGET)-local.h $(SOURCES) ; do ( test -f $$s && echo $$s ) || echo $(srcdir)/$$s ; done`; \
 		guard=`echo $(TARGET)_header_included | tr - _`;\
       	echo "/* Warning! Do not modify this file that is automatically generated! */"; \
       	echo "/* Modify src/Libs/$(TARGET)/$(TARGET)-local.h instead, to add your own modifications. */"; \
@@ -13,7 +13,7 @@ $(TARGET).h:$(srcdir)/$(TARGET)-local.h $(SOURCES)
       	cat `( test -f $(TARGET)-local.h && echo $(TARGET)-local.h ) || echo $(srcdir)/$(TARGET)-local.h ` ;\
 		$(CPROTO) -evcf2 -E "$(CPP) $(INCLUDES) $(DEFAULT_INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) -DCPROTO_IS_PROTOTYPING" $$SOURCES ;\
       	echo "#endif /* $${guard} */"; \
-	} > $(TARGET).h-tmp
+	} | sed -e '/ yy/ d' > $(TARGET).h-tmp
 	rm $(TARGET).h
 	mv $(TARGET).h-tmp $(TARGET).h
 
