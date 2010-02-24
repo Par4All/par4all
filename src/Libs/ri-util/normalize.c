@@ -121,9 +121,8 @@ normalized NormalizeCall(call c)
 normalized NormalizeConstant(constant c)
 {
     return((constant_int_p(c)) ?
-	   make_normalized(is_normalized_linear,
-			   vect_new(TCST, constant_int(c))) :
-	   make_normalized(is_normalized_complex, UU));
+	   make_normalized_linear(vect_new(TCST, constant_int(c))) :
+	   make_normalized_complex());
 }
 
 normalized NormalizeReference(reference r)

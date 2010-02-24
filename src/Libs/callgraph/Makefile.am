@@ -1,5 +1,5 @@
 TARGET	= callgraph
-lib_LTLIBRARIES=libcallgraph.la
+noinst_LTLIBRARIES=libcallgraph.la
 libcallgraph_la_SOURCES=callgraph.c print.c graph.c
 BUILT_SOURCES=$(TARGET).h
 nodist_include_HEADERS=$(TARGET).h

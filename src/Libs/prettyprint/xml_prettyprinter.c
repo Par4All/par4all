@@ -231,8 +231,8 @@ static string xml_expression(expression e)
   return result;
 }
 
-gen_array_t array_names;
-gen_array_t array_dims;
+static gen_array_t array_names;
+static gen_array_t array_dims;
 
 #define ITEM_NOT_IN_ARRAY -1
 

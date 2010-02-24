@@ -72,8 +72,6 @@ typedef void * vertex_label;
 #include "static_controlize.h"
 
 /* Global Variables	*/
-int			Gcount_nsp;
-int			Gcount_nub;
 list			Gstructure_parameters;
 static list			Genclosing_loops;
 static list			Genclosing_tests;
