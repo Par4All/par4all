@@ -1,6 +1,6 @@
 SUBDIRS = include Test
 
-CPPFLAGS = -I$(srcdir)/include -Iinclude @CPPFLAGS@
+EXTRA_CPPFLAGS = -I$(srcdir)/include -Iinclude @CPPFLAGS@
 
 ACLOCAL_AMFLAGS = -I m4
 
@@ -40,19 +40,19 @@ EXTRA_DIST = doc source/oldpolytest.c INSTALL COPYING
 lib_LTLIBRARIES = @polylibs@
 libpolylib32_la_LDFLAGS = -rpath $(libdir) -version-info @versioninfo@
 libpolylib32_la_SOURCES = $(sources)
-libpolylib32_la_CPPFLAGS = -DPOLYLIB_BITS=32
+libpolylib32_la_CPPFLAGS = -DPOLYLIB_BITS=32 $(EXTRA_CPPFLAGS)
 libpolylib32_la_LIBADD = @LTLIBOBJS@
 libpolylib64_la_LDFLAGS = -rpath $(libdir) -version-info @versioninfo@
 libpolylib64_la_SOURCES = $(sources)
-libpolylib64_la_CPPFLAGS = -DPOLYLIB_BITS=64
+libpolylib64_la_CPPFLAGS = -DPOLYLIB_BITS=64 $(EXTRA_CPPFLAGS)
 libpolylib64_la_LIBADD = @LTLIBOBJS@
 libpolylib128_la_LDFLAGS = -rpath $(libdir) -version-info @versioninfo@
 libpolylib128_la_SOURCES = $(sources)
-libpolylib128_la_CPPFLAGS = -DPOLYLIB_BITS=128
+libpolylib128_la_CPPFLAGS = -DPOLYLIB_BITS=128  $(EXTRA_CPPFLAGS)
 libpolylib128_la_LIBADD = @LTLIBOBJS@
 libpolylibgmp_la_LDFLAGS = -rpath $(libdir) -version-info @versioninfo@
 libpolylibgmp_la_SOURCES = $(sources)
-libpolylibgmp_la_CPPFLAGS = -DGNUMP
+libpolylibgmp_la_CPPFLAGS = -DGNUMP  $(EXTRA_CPPFLAGS)
 libpolylibgmp_la_LIBADD = @LTLIBOBJS@
 
 testlib_CPPFLAGS = $(libpolylib@BITS@_la_CPPFLAGS)
@@ -71,12 +71,10 @@ ehrhart_upper_bound_CPPFLAGS = $(libpolylib@BITS@_la_CPPFLAGS)
 EXTRA_LTLIBRARIES = libpolylib32.la libpolylib64.la libpolylib128.la \
 		    libpolylibgmp.la
 
-multi_noinst_programs = $(foreach B,$(ALL_BITS), \
-	Zpolytest$(B)$(EXEEXT) \
-	polytest$(B)$(EXEEXT) \
-	verif_ehrhart$(B)$(EXEEXT) \
-	testCompressParms$(B)$(EXEEXT) \
-)
+# not using foreach GNU make extension
+no_inst_programs_32=Zpolytest32$(EXEEXT) polytest32$(EXEEXT) verif_ehrhart32$(EXEEXT) testCompressParms32$(EXEEXT)
+no_inst_programs_64=Zpolytest64$(EXEEXT) polytest64$(EXEEXT) verif_ehrhart64$(EXEEXT) testCompressParms64$(EXEEXT)
+no_inst_programs_gmp=Zpolytestgmp$(EXEEXT) polytestgmp$(EXEEXT) verif_ehrhartgmp$(EXEEXT) testCompressParmsgmp$(EXEEXT)
 
 noinst_PROGRAMS = \
 	testlib \
@@ -84,12 +82,9 @@ noinst_PROGRAMS = \
 	count \
 	@multi_noinst_programs@
 
-multi_bin_programs = $(foreach B,$(ALL_BITS), \
-	ehrhart_ranking$(B)$(EXEEXT) \
-	ehrhart_union$(B)$(EXEEXT) \
-	pp$(B)$(EXEEXT) \
-	testehrhart$(B)$(EXEEXT) \
-)
+multi_bin_programs_32=ehrhart_ranking32$(EXEEXT) ehrhart_union32$(EXEEXT) pp32$(EXEEXT) testehrhart32$(EXEEXT)
+multi_bin_programs_64=ehrhart_ranking64$(EXEEXT) ehrhart_union64$(EXEEXT) pp64$(EXEEXT) testehrhart64$(EXEEXT)
+multi_bin_programs_gmp=ehrhart_rankinggmp$(EXEEXT) ehrhart_uniongmp$(EXEEXT) ppgmp$(EXEEXT) testehrhartgmp$(EXEEXT)
 
 bin_PROGRAMS = \
 	c2p \
@@ -102,31 +97,10 @@ bin_PROGRAMS = \
 	ehrhart_lower_bound \
 	@multi_bin_programs@
 
-EXTRA_PROGRAMS = \
-	Zpolytest32 \
-	Zpolytest64 \
-	Zpolytestgmp \
-	ehrhart_ranking32 \
-	ehrhart_ranking64 \
-	ehrhart_rankinggmp \
-	ehrhart_union32 \
-	ehrhart_union64 \
-	ehrhart_uniongmp \
-	polytest32 \
-	polytest64 \
-	polytestgmp \
-	pp32 \
-	pp64 \
-	ppgmp \
-	testehrhart32 \
-	testehrhart64 \
-	testehrhartgmp \
-	testCompressParms32 \
-	testCompressParms64 \
-	testCompressParmsgmp \
-	verif_ehrhart32 \
-	verif_ehrhart64 \
-	verif_ehrhartgmp
+EXTRA_PROGRAMS = $(no_inst_programs_32) $(no_inst_programs_64) $(no_inst_programs_gmp) \
+				 $(multi_bin_programs_32) $(multi_bin_programs_64) $(multi_bin_programs_gmp)
+
+
 
 LDADD = @polylib@
 c2p_SOURCES = $(poly_src)/c2p.c
@@ -239,7 +213,11 @@ document:
 
 dist-hook: document
 	rm -rf `find $(distdir)/doc -name CVS`
-	cp -r doc/codeDoc $(distdir)/doc
+
+clean-local:
+	rm -rf doc
+distclean-local:
+	rm -f polylib*.pc polylib*-uninstalled.pc polylib*-uninstalled.sh polylib*.pc.in
 
 install-data-local:
 	@test -z "$(pkgconfig_libdir)" || $(mkdir_p) "$(DESTDIR)$(pkgconfig_libdir)"

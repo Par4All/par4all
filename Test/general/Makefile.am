@@ -44,3 +44,4 @@ tests:
 	else \
 	        echo "Test polytest works correctly"; \
         fi
+CLEANFILES=xyz

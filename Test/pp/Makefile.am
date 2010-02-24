@@ -42,3 +42,4 @@ tests:
 	else \
 	        echo "Test pp works correctly"; \
         fi
+CLEANFILES=xyz
