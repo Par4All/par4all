@@ -11,4 +11,4 @@ URL: http://pips4u.org
 # Libs: bibliothèques nécessaire pour linker dynamiquement une appli externe
 # Libs.private: bibliothèques à rajouter en cas de link statique
 Libs: -L${libdir} -llinearlibs @LIBS@
-Cflags: -I${includedir}
+Cflags: -I${includedir} @CPPFLAGS@

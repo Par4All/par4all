@@ -52,7 +52,7 @@ AX_CHECK_FUNCS([alarm gettimeofday memset mkdir strchr strdup])
 # Check for cproto
 AX_CHECK_PROG([cproto])
 
-# set cppflags
+# set linear cppflags
 CPPFLAGS="-DLINEAR_VALUE_IS_LONGLONG -DLINEAR_VALUE_PROTECT_MULTIPLY -DLINEAR_VALUE_ASSUME_SOFTWARE_IDIV"
 
 AC_CONFIG_FILES([Makefile
