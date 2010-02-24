@@ -43,7 +43,7 @@ void call08(int r, int m, int *x)
 
 Proper effects for "main"
 
-main()
+int main()
 {
    int d1 = 4;
    int d2 = 4;
@@ -60,7 +60,7 @@ main()
 
 Cumulated effects for "main"
 
-main()
+int main()
 {
    int d1 = 4;
    int d2 = 4;

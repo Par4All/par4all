@@ -1,4 +1,4 @@
-main()
+int main()
 {
    unsigned int i = 2;
    int j = 4;
@@ -18,7 +18,7 @@ Transformers for "main"
 
 //  T() {}
 
-main()
+int main()
 {
 
 //  T() {i==2}
@@ -94,7 +94,7 @@ Preconditions for "main"
 
 //  P() {}
 
-main()
+int main()
 {
 
 //  P() {}
@@ -144,7 +144,7 @@ Transformers for "main" after transformer refining
 
 //  T() {}
 
-main()
+int main()
 {
 
 //  T() {i==2}
@@ -194,7 +194,7 @@ Preconditions for "main" after transformer refining
 
 //  P() {}
 
-main()
+int main()
 {
 
 //  P() {}

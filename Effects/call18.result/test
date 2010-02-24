@@ -13,7 +13,7 @@ void call18(int i, ...)
 
 Proper effects for "main"
 
-main()
+int main()
 {
    int i = 1;
    int j = 2;
@@ -25,7 +25,7 @@ main()
 
 Cumulated effects for "main"
 
-main()
+int main()
 {
    int i = 1;
    int j = 2;

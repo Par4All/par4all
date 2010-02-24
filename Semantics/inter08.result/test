@@ -53,7 +53,7 @@ Preconditions for "main"
 
 //  P() {}
 
-main()
+int main()
 {
 
 //  P() {}

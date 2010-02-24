@@ -190,7 +190,7 @@ ATOM * a_m_serial(int serial)
 
 Parsed printed file for "activate"
 
-activate(int i1, int i2)
+int activate(int i1, int i2)
 {
    int upper, lower;
    ATOM *ap, *a_m_serial(int), *a_next(int);
@@ -221,19 +221,19 @@ activate(int i1, int i2)
 
 Proper effects for "activate"
 
-activate(int i1, int i2)
+int activate(int i1, int i2)
 {
    int upper, lower;
    ATOM *ap, *a_m_serial(int), *a_next(int flag);
    int i, numatm, a_number();
-//               <must be read   >: DUMMY-PARAMETER-38150278:i2
+//               <must be read   >: i2
 
    if (i2==0) {
 //               <may be read    >: TOP-LEVEL:*MEMORY*
 //               <may be written >: TOP-LEVEL:atomNUMBER 
 //                                  TOP-LEVEL:atomUPDATE 
 //                                  a_m_serial:0`lastmatched
-//               <must be read   >: DUMMY-PARAMETER-38150278:i1
+//               <must be read   >: i1
 //               <must be written>: a_m_serial:0`ap ap
       ap = a_m_serial(i1);
 //               <must be read   >: ap
@@ -243,20 +243,19 @@ activate(int i1, int i2)
          ap->active = 1;
       return 0;
    }
-//               <must be read   >: DUMMY-PARAMETER-38150278:i2
+//               <must be read   >: i2
 //               <must be written>: upper
 
    upper = i2;
-//               <must be read   >: DUMMY-PARAMETER-38150278:i1
+//               <must be read   >: i1
 //               <must be written>: lower
    lower = i1;
-//               <must be read   >: DUMMY-PARAMETER-38150278:i1 
-//                                  DUMMY-PARAMETER-38150278:i2
+//               <must be read   >: i1 i2
    if (i2<i1) {
-//               <must be read   >: DUMMY-PARAMETER-38150278:i2
+//               <must be read   >: i2
 //               <must be written>: lower
       lower = i2;
-//               <must be read   >: DUMMY-PARAMETER-38150278:i1
+//               <must be read   >: i1
 //               <must be written>: upper
       upper = i1;
    }
@@ -296,7 +295,7 @@ Cumulated effects for "activate"
 //                                  a_m_serial:0`ap 
 //                                  a_m_serial:0`lastmatched 
 //                                  a_next:0`ap
-activate(int i1, int i2)
+int activate(int i1, int i2)
 {
    int upper, lower;
    ATOM *ap, *a_m_serial(int), *a_next(int flag);
@@ -313,7 +312,7 @@ activate(int i1, int i2)
 //               <may be written >: TOP-LEVEL:atomNUMBER 
 //                                  TOP-LEVEL:atomUPDATE 
 //                                  a_m_serial:0`lastmatched
-//               <must be read   >: DUMMY-PARAMETER-38150278:i1
+//               <must be read   >: i1
 //               <must be written>: a_m_serial:0`ap ap
       ap = a_m_serial(i1);
 //               <may be written >: ap[0][2]
@@ -324,21 +323,20 @@ activate(int i1, int i2)
          ap->active = 1;
       return 0;
    }
-//               <must be read   >: DUMMY-PARAMETER-38150278:i2
+//               <must be read   >: i2
 //               <must be written>: upper
 
    upper = i2;
-//               <must be read   >: DUMMY-PARAMETER-38150278:i1
+//               <must be read   >: i1
 //               <must be written>: lower
    lower = i1;
 //               <may be written >: lower upper
-//               <must be read   >: DUMMY-PARAMETER-38150278:i1 
-//                                  DUMMY-PARAMETER-38150278:i2
+//               <must be read   >: i1 i2
    if (i2<i1) {
-//               <must be read   >: DUMMY-PARAMETER-38150278:i2
+//               <must be read   >: i2
 //               <must be written>: lower
       lower = i2;
-//               <must be read   >: DUMMY-PARAMETER-38150278:i1
+//               <must be read   >: i1
 //               <must be written>: upper
       upper = i1;
    }

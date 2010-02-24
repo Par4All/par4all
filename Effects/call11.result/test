@@ -63,7 +63,7 @@ void call11(int n, int m, int x[n][m])
 
 Cumulated effects for "main"
 
-main()
+int main()
 {
    int d1 = 10;
    int d2 = 10;
@@ -114,7 +114,7 @@ void call11(int n, int m, int x[n][m])
 
 Regions for "main"
 
-main()
+int main()
 {
    int d1 = 10;
    int d2 = 10;

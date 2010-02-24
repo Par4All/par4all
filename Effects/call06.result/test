@@ -54,7 +54,7 @@ void call06(int r, int m, int *x)
 
 Proper effects for "main"
 
-main()
+int main()
 {
    int d1 = 4;
    int d2 = 4;
@@ -71,7 +71,7 @@ main()
 
 Cumulated effects for "main"
 
-main()
+int main()
 {
    int d1 = 4;
    int d2 = 4;
@@ -121,7 +121,7 @@ void call06(int r, int m, int *x)
 
 Regions for "main"
 
-main()
+int main()
 {
    int d1 = 4;
    int d2 = 4;

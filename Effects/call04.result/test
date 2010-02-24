@@ -63,7 +63,7 @@ void call04(int n, int m, int x[n][m])
 
 Proper effects for "main"
 
-main()
+int main()
 {
    int d1 = 10;
    int d2 = 10;
@@ -76,7 +76,7 @@ main()
 
 Cumulated effects for "main"
 
-main()
+int main()
 {
    int d1 = 10;
    int d2 = 10;
@@ -133,7 +133,7 @@ void call04(int n, int m, int x[n][m])
 
 Regions for "main"
 
-main()
+int main()
 {
    int d1 = 10;
    int d2 = 10;

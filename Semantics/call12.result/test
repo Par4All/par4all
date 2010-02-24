@@ -48,7 +48,7 @@ Source code with transformers for "main"
 
 //  T(TOP-LEVEL:j) {TOP-LEVEL:j==j#init+2}
 
-main()
+int main()
 {
 
 //  T() {ai==3}
@@ -95,7 +95,7 @@ Source code with preconditions for "main"
 
 //  P() {TOP-LEVEL:j==0}
 
-main()
+int main()
 {
 
 //  P() {TOP-LEVEL:j==0}

@@ -61,7 +61,7 @@ void call03()
 
 Proper effects for "main"
 
-main()
+int main()
 {
 //               <must be read   >: TOP-LEVEL:pi TOP-LEVEL:q
 //               <must be written>: TOP-LEVEL:pi TOP-LEVEL:pi[0] 
@@ -117,7 +117,7 @@ Regions for "main"
 //    PHI3==4}>
 //  <TOP-LEVEL:q[PHI1][PHI2]-W-EXACT-{PHI1==0, PHI2==1}>
 
-main()
+int main()
 {
 
 //  <TOP-LEVEL:pi-R-EXACT-{}>

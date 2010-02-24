@@ -70,7 +70,7 @@ void call10(int i, int x[10], int j, int y[10])
 
 Proper effects for "main"
 
-main()
+int main()
 {
    tf_t s;
    tf_t *sp = &s;
@@ -82,7 +82,7 @@ main()
 
 Cumulated effects for "main"
 
-main()
+int main()
 {
    tf_t s;
    tf_t *sp = &s;
@@ -122,7 +122,7 @@ void call10(int i, int x[10], int j, int y[10])
 
 Regions for "main"
 
-main()
+int main()
 {
    tf_t s;
    tf_t *sp = &s;

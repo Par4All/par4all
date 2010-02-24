@@ -56,8 +56,6 @@ C     Communicating data to other nodes
 !$OMP end parallel do
       END
 ###################### pi/src/STEP.f ######################
-
-
 * Copyright 2007, 2008 Alain Muller, Frederique Silber-Chaussumier
 *
 *This file is part of STEP.

@@ -21,7 +21,7 @@ extern void foo(struct a *_);
 
 extern void bar();
 
-extern  main();
+extern int main();
 void bar()
 {
    struct a A = {0};

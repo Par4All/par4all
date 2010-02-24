@@ -36,7 +36,7 @@ Source code with transformers for "main"
 
 //  T() {}
 
-main()
+int main()
 {
 
 //  T() {}
@@ -67,7 +67,7 @@ Source code with preconditions for "main"
 
 //  P() {}
 
-main()
+int main()
 {
 
 //  P() {}

@@ -374,6 +374,10 @@ C    PHI2<=127}>
 C     BEGIN BLOCK
 
       DO T8 = 0, N                                                      0023
+         PRIVATE BL(0:N, 0:127),ENERGIE(0:N, 0:199, 0:127),F3,
+     &   FREQUENCE(0:N, 0:255, 0:511),H1,H2,HYDRO(0:N, 0:511),I,INTC(
+     &   0:N, 0:127),OUTPUT(0:N, 0:127),T1,T5,T7,T8,V3,V5,V6,V7,V8,
+     &   VOIES(0:N, 0:199, 0:127),VSTAB(0:N, 0:127)
 
 C  <BL(PHI1,PHI2)-PRIVATE-EXACT-{64T8<=PHI1, PHI1<=N, PHI1<=63+64T8,
 C    0<=PHI2, PHI2<=127, 0<=T8}>
@@ -407,11 +411,11 @@ C  <VSTAB(PHI1,PHI2)-PRIVATE-EXACT-{8T8<=PHI1, PHI1<=N, PHI1<=7+8T8,
 C    0<=PHI2, PHI2<=127, T8<=N, 0<=T8}>
 
 C        BEGIN BLOCK
-         PRIVATE BL(0:N, 0:127),ENERGIE(0:N, 0:199, 0:127),F3,
-     &   FREQUENCE(0:N, 0:255, 0:511),H1,H2,HYDRO(0:N, 0:511),I,INTC(
-     &   0:N, 0:127),OUTPUT(0:N, 0:127),T1,T5,T7,T8,V3,V5,V6,V7,V8,
-     &   VOIES(0:N, 0:199, 0:127),VSTAB(0:N, 0:127)
          DO T7 = 8*T8, 8*T8+7                                           0024
+            PRIVATE BL(0:N, 0:127),ENERGIE(0:N, 0:199, 0:127),F3,
+     &      FREQUENCE(0:N, 0:255, 0:511),H1,H2,HYDRO(0:N, 0:511),INTC
+     &      (0:N, 0:127),T1,T5,T7,V3,V5,V6,V7,VOIES(0:N, 0:199, 0:127
+     &      ),VSTAB(0:N, 0:127)
 
 C  <BL(PHI1,PHI2)-PRIVATE-EXACT-{8T7<=PHI1, PHI1<=N, PHI1<=7+8T7,
 C    0<=PHI2, PHI2<=127, T8<=N, 8T8<=T7, T7<=7+8T8, 0<=T8}>
@@ -445,11 +449,10 @@ C  <VSTAB(PHI1,PHI2)-COPYOUT-EXACT-{T7==PHI1, 0<=PHI1, PHI1<=N,
 C    0<=PHI2, PHI2<=127, T8<=N, 8T8<=T7, T7<=7+8T8, 0<=T8}>
 
 C           BEGIN BLOCK
-            PRIVATE BL(0:N, 0:127),ENERGIE(0:N, 0:199, 0:127),F3,
-     &      FREQUENCE(0:N, 0:255, 0:511),H1,H2,HYDRO(0:N, 0:511),INTC
-     &      (0:N, 0:127),T1,T5,T7,V3,V5,V6,V7,VOIES(0:N, 0:199, 0:127
-     &      ),VSTAB(0:N, 0:127)
             DO T5 = 8*T7, 8*T7+7                                        0025
+               PRIVATE BL(0:N, 0:127),ENERGIE(0:N, 0:199, 0:127),F3,
+     &         FREQUENCE(0:N, 0:255, 0:511),H1,H2,HYDRO(0:N, 0:511),
+     &         T1,T5,V3,V5,VOIES(0:N, 0:199, 0:127)
 
 C  <BL(PHI1,PHI2)-PRIVATE-EXACT-{PHI1==T5, PHI1<=N, 0<=PHI2,
 C    PHI2<=127, T8<=N, 8T7<=T5, T5<=7+8T7, 8T8<=T7, T7<=7+8T8, 0<=T8}>
@@ -477,9 +480,6 @@ C  <BL(PHI1,PHI2)-COPYOUT-EXACT-{T5==PHI1, 0<=PHI1, PHI1<=N, 0<=PHI2,
 C    PHI2<=127, T8<=N, 8T7<=T5, T5<=7+8T7, 8T8<=T7, T7<=7+8T8, 0<=T8}>
 
 C              BEGIN BLOCK
-               PRIVATE BL(0:N, 0:127),ENERGIE(0:N, 0:199, 0:127),F3,
-     &         FREQUENCE(0:N, 0:255, 0:511),H1,H2,HYDRO(0:N, 0:511),
-     &         T1,T5,V3,V5,VOIES(0:N, 0:199, 0:127)
                DO T1 = 512*T5, 512*T5+511                               0026
                   PRIVATE H1,HYDRO(0:N, 0:511),T1
 
@@ -500,6 +500,8 @@ C    8T8<=T7, T7<=7+8T8, 0<=T8}>
                   CALL FFTR(FREQUENCE, T5, H2, HYDRO, N)                0030
                ENDDO
                DO V3 = 0, 127                                           0033
+                  PRIVATE ENERGIE(0:N, 0:199, 0:127),F3,V3,VOIES(0:N
+     &            , 0:199, 0:127)
 
 C  <ENERGIE(PHI1,PHI2,PHI3)-PRIVATE-EXACT-{PHI1==T5, PHI3==V3,
 C    PHI1<=N, 0<=PHI2, PHI2<=199, 0<=PHI3, PHI3<=127, H2==512,
@@ -517,6 +519,8 @@ C    512T5==T1-512, T8<=N, 8T7<=T5, T5<=7+8T7, 8T8<=T7, T7<=7+8T8,
 C    0<=T8}>
 
                   DO F3 = 0, 199                                        0034
+                     PRIVATE ENERGIE(0:N, 0:199, 0:127),F3,VOIES(0:N
+     &               , 0:199, 0:127)
 
 C  <ENERGIE(PHI1,PHI2,PHI3)-PRIVATE-EXACT-{PHI1==T5, PHI2==F3,
 C    PHI3==V3, PHI1<=N, 0<=PHI2, PHI2<=199, 0<=PHI3, PHI3<=127,
@@ -534,10 +538,6 @@ C    H2==512, T1==512T5+512, T8<=N, 8T7<=T5, T5<=7+8T7, 8T8<=T7,
 C    T7<=7+8T8, 0<=T8}>
 
 C                    BEGIN BLOCK
-                  PRIVATE ENERGIE(0:N, 0:199, 0:127),F3,V3,VOIES(0:N
-     &            , 0:199, 0:127)
-                     PRIVATE ENERGIE(0:N, 0:199, 0:127),F3,VOIES(0:N
-     &               , 0:199, 0:127)
                      CALL FV(VOIES, T5, F3, V3, FREQUENCE, N)           0035
                      CALL MOD2(ENERGIE(T5,F3,V3), VOIES(T5,F3,V3))      0037
 C                    END BLOCK

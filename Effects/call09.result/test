@@ -34,7 +34,7 @@ void call09(int i, int j)
 
 Cumulated effects for "main"
 
-main()
+int main()
 {
    tf_t s;
    tf_t *sp = &s;
@@ -52,7 +52,7 @@ void call09(int i, int j)
 
 Regions for "main"
 
-main()
+int main()
 {
    tf_t s;
    tf_t *sp = &s;

@@ -54,7 +54,7 @@ void call05(int r, int m, int *x)
 
 Proper effects for "main"
 
-main()
+int main()
 {
    int d1 = 4;
    int d2 = 4;
@@ -88,7 +88,7 @@ Cumulated effects for "main"
 
 //               <may be read    >: __IO_EFFECTS:LUNS[1]
 //               <may be written >: __IO_EFFECTS:LUNS[1]
-main()
+int main()
 {
    int d1 = 4;
    int d2 = 4;
@@ -153,7 +153,7 @@ Regions for "main"
 //  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
 
-main()
+int main()
 {
    int d1 = 4;
    int d2 = 4;

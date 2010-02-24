@@ -82,7 +82,7 @@ void call02(int i, int j, int y[10], int *q[10], tf_t *p)
 
 Cumulated effects for "main"
 
-main()
+int main()
 {
    int a;
    int b;
@@ -100,7 +100,7 @@ main()
 
 Regions for "main"
 
-main()
+int main()
 {
    int a;
    int b;

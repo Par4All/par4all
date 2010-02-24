@@ -2,7 +2,7 @@
 Cumulated effects for "main"
 
 //               <must be read   >: TOP-LEVEL:delta TOP-LEVEL:delta2
-main()
+int main()
 {
 //               <must be read   >: TOP-LEVEL:delta TOP-LEVEL:delta2 i
 //               <must be written>: i
@@ -23,7 +23,7 @@ Transformers for "main"
 
 //  T() {TOP-LEVEL:delta==1, TOP-LEVEL:delta2==3}
 
-main()
+int main()
 {
 
 //  T() {TOP-LEVEL:delta==1, TOP-LEVEL:delta2==3}
@@ -50,7 +50,7 @@ Preconditions for "main"
 
 //  P() {TOP-LEVEL:delta==1, TOP-LEVEL:delta2==3}
 
-main()
+int main()
 {
 
 //  P() {TOP-LEVEL:delta==1, TOP-LEVEL:delta2==3}
