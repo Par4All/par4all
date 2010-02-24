@@ -68,6 +68,7 @@
 #include "splitc.h"
 
 extern string csplit_current_function_name;
+extern string csplit_current_function_name2;
 extern string csplit_definite_function_name;
 extern string csplit_definite_function_signature;
 extern bool csplit_is_static_p;
@@ -624,15 +625,23 @@ L\"(\\\"|[^\"\\]|\\[^\"])*\"	{
 				else
 				   {
  				       pips_debug(5,"TK_IDENT: %s\n",yytext);
-                                       /* Might not work if a function returns a struct declared locally in the function declaration, or a pointer to such a structrue */
+                                       /* Might not work if a function returns a struct declared locally in the function declaration, or a pointer to such a structure */
                                        if(string_undefined_p(csplit_current_function_name)) {
 					 csplit_current_function_name = strdup(yytext);
 					 pips_debug(5, "Temptative function name found: \"%s\"\n",
 						    csplit_current_function_name);
                                        }
-                                       else
-					 pips_debug(5, "Identifier ignored: \"%s\"\n",
-						    yytext);
+                                       else if(string_undefined_p(csplit_current_function_name2)) {
+				         pips_debug(5, "Identifier \"%s\" ignored because of two previous identifiers \"%s\"\n",
+						     yytext, csplit_current_function_name);
+				         csplit_current_function_name2 = strdup(yytext);
+				       }
+				       else {
+				         free(csplit_current_function_name2);
+					 pips_debug(5, "Identifier \"%s\" not ignored in spite of two previous identifiers \"%s\"\n",
+						    yytext, csplit_current_function_name);
+					 csplit_current_function_name2 = strdup(yytext);
+				       }
 
 				       yylval.string = strdup(yytext);
 				       return(TK_IDENT);
