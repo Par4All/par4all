@@ -15,7 +15,7 @@ extern int decl33();
 
 Parsed printed file for "main"
 
-main()
+int main()
 {
    int k = decl33(2, 3);
 }
@@ -33,7 +33,7 @@ extern int decl33(int i, int j);
 extern int decl33(int i, int j);
 extern int decl33(int i, int j);
 
-extern  main();
+extern int main();
 
 extern int decl33(int i, int j);
 

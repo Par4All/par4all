@@ -3,7 +3,7 @@ Symbol table for "main"
 
 main
 
-Declarations for module "main" with type "() -> unknown"
+Declarations for module "main" with type "() -> int"
 
 Variable list:
 

@@ -1,7 +1,7 @@
 
 Parsed printed file for main
 
-main()
+int main()
 {
    int i = 1;
 
@@ -22,7 +22,7 @@ break_1:   ;
 
 Printed file for main
 
-main()
+int main()
 {
    int i = 1;
    if (i==1) goto switch_1_case_1;
@@ -40,7 +40,7 @@ Try more aggressive restructuring:
 
 printed file after RESTRUCTURE_CONTROL
 
-main()
+int main()
 {
    int i = 1;
    if (i==1) {

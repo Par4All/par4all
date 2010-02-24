@@ -1,7 +1,7 @@
 
 PARSED PRINTED FILE
 
-main()
+int main()
 {
    int i = 0;
    /* if with gotos */
@@ -20,7 +20,7 @@ lab2:   i = i-1;
 
 PRINTED FILE (after controlization)
 
-main()
+int main()
 {
    int i = 0;
 /* if with gotos */
@@ -42,8 +42,8 @@ Unsplit goto
 /*
  * file for goto.c
  */
-extern  main();
-main()
+extern int main();
+int main()
 {
    int i = 0;
 /* if with gotos */

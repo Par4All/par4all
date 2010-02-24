@@ -1,7 +1,7 @@
 
 Printed file for main
 
-main()
+int main()
 {
    char c1;
    unsigned char c2;
@@ -24,7 +24,7 @@ Preconditions for main
 
 //  P() {}
 
-main()
+int main()
 {
 
 //  P() {}

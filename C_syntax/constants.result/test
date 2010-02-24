@@ -1,7 +1,7 @@
 
 Parser output
 
-main()
+int main()
 {
    int i, j, k, l;
    i = 015;
@@ -15,7 +15,7 @@ main()
 
 Controlizer output
 
-main()
+int main()
 {
    int i, j, k, l;
    i = 015;
@@ -32,7 +32,7 @@ Preconditions
 
 //  P() {}
 
-main()
+int main()
 {
 
 //  P() {}

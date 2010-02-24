@@ -1,4 +1,4 @@
-main()
+int main()
 {
    int i = 1;
 }
@@ -10,8 +10,8 @@ Unsplit define
  */
 
 
-extern  main();
-main()
+extern int main();
+int main()
 {
    int i = 1;
 }

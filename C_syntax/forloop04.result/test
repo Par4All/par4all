@@ -1,11 +1,11 @@
-main()
+int main()
 {
    int i, j;
    int a[5];
    for(i = 1; i <= 4; i += 1)
       a[i] = i;
 }
-main()
+int main()
 {
    int i, j;
    int a[5];
@@ -18,7 +18,7 @@ main()
 
 //  T() {}
 
-main()
+int main()
 {
 
 //  T() {}
@@ -40,7 +40,7 @@ main()
 
 //  P() {}
 
-main()
+int main()
 {
 
 //  P() {}
@@ -59,7 +59,7 @@ main()
 
       a[i] = i;
 }
-main()
+int main()
 {
    int i, j;
    int a[5];

@@ -1,7 +1,7 @@
 
 Parser output
 
-main()
+int main()
 {
    unsigned int i = 4294967295U;
    unsigned int j;
@@ -19,7 +19,7 @@ main()
 
 Controlizer output
 
-main()
+int main()
 {
    unsigned int i = 4294967295U;
    unsigned int j;
@@ -40,7 +40,7 @@ Preconditions
 
 //  P() {i==-1}
 
-main()
+int main()
 {
 
 //  P() {i==-1}

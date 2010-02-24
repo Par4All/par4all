@@ -16,7 +16,7 @@ Printed file with precoditions for "main"
 
 //  P() {}
 
-main()
+int main()
 {
 
 //  P() {}

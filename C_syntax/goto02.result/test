@@ -1,7 +1,7 @@
 
 PARSED PRINTED FILE
 
-main()
+int main()
 {
    int a[5];
    int i;
@@ -13,7 +13,7 @@ found:   printf("found\n");
 
 PRINTED FILE (after controlization)
 
-main()
+int main()
 {
    int a[5];
    int i;

@@ -3,7 +3,7 @@ Symbol table for "main"
 
 main
 
-Declarations for module "main" with type "() -> unknown"
+Declarations for module "main" with type "() -> int"
 
 Variable list:
 
@@ -53,7 +53,7 @@ End of declarations for module main
 
 Printed file for "main"
 
-main()
+int main()
 {
    void abort(void);
    int atexit(void (*)(void));

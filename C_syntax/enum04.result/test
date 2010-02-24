@@ -20,7 +20,7 @@ extern int main();
 
 //  P() {}
 
-main()
+int main()
 {
 
 //  P() {}

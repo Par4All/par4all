@@ -15,12 +15,12 @@ enum {a=sizeof(int), b};
 
 //  P() {}
 
-extern  main();
+extern int main();
 
 
 //  P() {}
 
-main()
+int main()
 {
 
 //  P() {}

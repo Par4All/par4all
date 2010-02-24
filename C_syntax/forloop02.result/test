@@ -1,7 +1,7 @@
 
 PARSED PRINTED FILE for main
 
-main()
+int main()
 {
    int i, j;
    int a[5];
@@ -11,7 +11,7 @@ main()
 
 PRINTED FILE for main
 
-main()
+int main()
 {
    int i, j;
    int a[5];
@@ -24,7 +24,7 @@ main()
 
 PRINTED FILE with effects for main
 
-main()
+int main()
 {
    int i, j;
    int a[5];
@@ -46,7 +46,7 @@ PRINTED FILE with transformers for main
 
 //  T() {}
 
-main()
+int main()
 {
 
 //  T() {}

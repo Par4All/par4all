@@ -3,7 +3,7 @@ Symbol table for "main"
 
 main
 
-Declarations for module "main" with type "() -> unknown"
+Declarations for module "main" with type "() -> int"
 
 Variable list:
 
@@ -52,7 +52,7 @@ End of declarations for module main
 
 Code for "main"
 
-main()
+int main()
 {
    allocatable_2d a;                                                    /*0018*/
 }
