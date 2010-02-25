@@ -249,12 +249,12 @@ extern void gen_recurse_stop GEN_PROTO((void *));
 extern void gen_multi_recurse GEN_PROTO((void *, ...));
 extern void gen_context_multi_recurse GEN_PROTO((void *, void *,...));
 extern void gen_full_recurse GEN_PROTO((void *, void *, ...));
-
-#define gen_recurse(s,d,f,r) \
-        gen_multi_recurse(s,d,f,r,NULL)
-
-#define gen_context_recurse(s,c,d,f,r) \
-        gen_context_multi_recurse(s,c,d,f,r,NULL)
+extern void gen_recurse(void * start, int domain_number,
+                bool (*flt)(void *),
+                void (*rwt)(void *)); 
+extern void gen_context_recurse(void * start, void * context, int domain_number,
+                bool (*flt)(void *, void * context),
+                void (*rwt)(void *, void * context)); 
 
 extern gen_chunk * gen_get_recurse_previous_visited_object(void);
 extern gen_chunk * gen_get_recurse_current_ancestor(void);

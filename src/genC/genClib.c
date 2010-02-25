@@ -3353,10 +3353,6 @@ void gen_multi_recurse(void * o, ...)
     va_end(pvar);
 }
 
-#ifdef gen_recurse
-#undef gen_recurse
-#endif
-
 /** Visit all the objects from a given types found in an object.
 
     @param obj the object to start visiting
@@ -3375,15 +3371,11 @@ void gen_multi_recurse(void * o, ...)
 void gen_recurse(
     void * obj, /**< starting point */
     int domain,
-    bool (*filter)(gen_chunk * encountered_object),
-    void (*rewrite)(gen_chunk * encountered_object))
+    bool (*filter)(void * encountered),
+    void (*rewrite)(void * encountered_object))
 {
     gen_multi_recurse(obj, domain, filter, rewrite, NULL);
 }
-
-#ifdef gen_context_recurse
-#undef gen_context_recurse
-#endif
 
 /** Visit all the objects from a given types found in an object with a context.
 
@@ -3411,8 +3403,8 @@ void gen_context_recurse(
     void * obj, /**< starting point */
     void * context,
     int domain,
-    bool (*filter)(gen_chunk * encountered_object, void * context),
-    void (*rewrite)(gen_chunk * encountered_object, void * context))
+    bool (*filter)(void * encountered_object, void * context),
+    void (*rewrite)(void * encountered_object, void * context))
 {
     gen_context_multi_recurse(obj, context, domain, filter, rewrite, NULL);
 }
