@@ -55,7 +55,7 @@
 #include "expressions.h"
 
 #include "eole_private.h"
-#define expression_scalar_p(e) (expression_reference_p((e)) && entity_scalar_p(reference_variable(expression_reference((e)))))
+#define expression_scalar_p(e) (expression_reference_p((e)) && reference_scalar_p(expression_reference((e))))
 
 /******************************************************************* FLATTEN */
 
@@ -1138,7 +1138,7 @@ static bool expr_cse_flt(expression e,__attribute__((unused))list *skip_list)
         case is_syntax_call:
             return !IO_CALL_P(syntax_call(s));
         case is_syntax_reference:
-            return entity_scalar_p(reference_variable(syntax_reference(s)));
+            //return entity_scalar_p(reference_variable(syntax_reference(s)));
         case is_syntax_subscript:
             return true;
         default:
