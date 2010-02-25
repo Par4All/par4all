@@ -22,7 +22,9 @@ $(TARGET).h:$(srcdir)/$(TARGET)-local.h $(SOURCES)
       	echo "#ifndef $${guard}";\
       	echo "#define $${guard}";\
       	cat `( test -f $(TARGET)-local.h && echo $(TARGET)-local.h ) || echo $(srcdir)/$(TARGET)-local.h ` ;\
-		$(CPROTO) -evcf2 -O /dev/null -E "$(CPP) $(INCLUDES) $(DEFAULT_INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) -DCPROTO_IS_PROTOTYPING" $$SOURCES ;\
+		for s in $$SOURCES ; do \
+			$(CPROTO) -evcf2 -O /dev/null -E "$(CPP) $(INCLUDES) $(DEFAULT_INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) -DCPROTO_IS_PROTOTYPING" $$s ;\
+		done ; \
       	echo "#endif /* $${guard} */"; \
 	} | sed -e '/ yy/ d' > $(TARGET).h-tmp
 	if cmp -s $(TARGET).h $(TARGET).h-tmp ; then \
