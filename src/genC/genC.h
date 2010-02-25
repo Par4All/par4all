@@ -248,6 +248,7 @@ extern void gen_core GEN_PROTO((void *)) ;
 extern void gen_recurse_stop GEN_PROTO((void *));
 extern void gen_multi_recurse GEN_PROTO((void *, ...));
 extern void gen_context_multi_recurse GEN_PROTO((void *, void *,...));
+extern void gen_full_recurse GEN_PROTO((void *, void *, ...));
 
 #define gen_recurse(s,d,f,r) \
         gen_multi_recurse(s,d,f,r,NULL)
