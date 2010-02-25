@@ -61,9 +61,9 @@ warn()
 
 
 echo
-echo "### creating `basename $P4A_RC`"
+echo "### creating `basename $P4A_RC_SH`"
 mkdir -p  $P4A_ETC
-cat <<EOF > $P4A_RC
+cat <<EOF > $P4A_RC_SH
 # minimum rc file for sh-compatible shells
 
 # default architecture
@@ -93,6 +93,11 @@ unset WITH_DYNAMIC_LIBRARIES
 # fix path
 #PATH=$P4A_BUILD/bin:$P4A_BUILD/utils:\$PATH
 PATH=$PIPS_DIR/pips/bin:$PIPS_DIR/pips/utils:$PIPS_DIR/newgen/bin:$PIPS_DIR/newgen/bin/$PIPS_ARCH:$P4A_BUILD/bin:$P4A_BUILD/bin/$PIPS_ARCH:\$PATH
+
+# Some hack to have p4a_recover_includes working. DIrectory to move
+# somewhere else later...
+export PIPS_CPP_FLAGS=" -I$P4A_ROOT/src/postprocessor/include "
+export PYTHONPATH=/usr/share/pyshared
 EOF
 
 # Find the Fortran compiler:
@@ -101,13 +106,13 @@ type g77 && export PIPS_F77=g77
 
 
 if [ -n "$PIPS_F77" ]; then
-    echo >> $P4A_RC
-    echo "# The Fortran compiler to use:" >> $P4A_RC
-    echo "export PIPS_F77=$PIPS_F77" >> $P4A_RC
+    echo >> $P4A_RC_SH
+    echo "# The Fortran compiler to use:" >> $P4A_RC_SH
+    echo "export PIPS_F77=$PIPS_F77" >> $P4A_RC_SH
 fi
 
 # Source the just generated environment to be able to compile PIPS later:
-source $P4A_RC
+source $P4A_RC_SH
 
 # Make links PIPS makefile infrastructure:
 for i in $PIPS_COMPONENTS; do
@@ -161,7 +166,7 @@ type htlatex && target=full-build
 echo
 echo "### generating csh environment"
 $PIPS_DIR/pips/src/Scripts/env/sh2csh.pl \
-    < $P4A_RC \
+    < $P4A_RC_SH \
     > $P4A_ETC/par4all-rc.csh
 
 #env
