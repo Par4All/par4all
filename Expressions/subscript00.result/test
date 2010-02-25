@@ -1,4 +1,4 @@
-foo()
+int foo()
 {
    struct a b;
    (b.c)[0] = 1;
@@ -7,8 +7,8 @@ struct a {
    int c[10];
 };
 
-extern  foo();
-foo()
+extern int foo();
+int foo()
 {
    struct a b;
    //PIPS generated variable
@@ -20,4 +20,4 @@ struct a {
    int c[10];
 };
 
-extern  foo();
+extern int foo();
