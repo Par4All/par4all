@@ -1,1 +1,2 @@
-SUBDIRS=drivers
+SUBDIRS=drivers @PIPS_EXTRA_SCRIPTS@
+DIST_SUBDIRS=drivers hpfc

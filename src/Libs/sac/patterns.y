@@ -44,7 +44,6 @@ typedef dg_vertex_label vertex_label;
 #include "sac-local.h"
 #include "sac.h"
 
-int yyerror(char* s);
 int yywrap(void);
 int yylex();
 
@@ -274,8 +273,7 @@ int yywrap(void)
    return 1;
 }
 
-int yyerror(char* s)
+void yyerror(char* s)
 {
    pips_internal_error("patterns parser: %s\n", s);
-   return 0;
 }

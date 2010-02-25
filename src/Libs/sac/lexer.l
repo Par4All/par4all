@@ -49,7 +49,6 @@ typedef dg_vertex_label vertex_label;
 #include "sac.h"
 #include "patterns.h"
 
-int yyerror(char* s);
 %}
 %%
 "REFERENCE"               return REFERENCE_TOK;

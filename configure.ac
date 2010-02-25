@@ -31,7 +31,6 @@ AX_CHECK_PKG([linearlibs], [norm_syst],[sc.h])
 
 
 # Checks for header files.
-AC_PATH_X
 AC_FUNC_ALLOCA
 AC_HEADER_DIRENT
 AC_HEADER_STDC
@@ -91,8 +90,23 @@ AX_ARG_ENABLE([pyps],
 			 AX_DEPENDS([pyps],[swig python_devel])
 			]
 )
+
+# hpfc
+AX_ARG_ENABLE([hpfc],
+			  [enable high performance fortran compiler],
+			  [no],
+			  [
+			   AX_CHECK_PKG([readline],[readline],[readline/readline.h])
+			   AX_CHECK_PKG([termcap],[tgetent],[term.h])
+			   AX_DEPENDS([hpfc],[readline termcap])
+			  ]
+)
+
 # set the optionnal passes dirs there
 AC_SUBST([PIPS_EXTRA_PASSES],["$ax_enable_gpips $ax_enable_tpips $ax_enable_pyps"])
+
+# set the optionnal scripts dirs there
+AC_SUBST([PIPS_EXTRA_SCRIPTS],["$ax_enable_hpfc"])
 
 AC_CONFIG_FILES([Makefile
                  src/Documentation/Makefile
@@ -160,6 +174,7 @@ AC_CONFIG_FILES([Makefile
                  src/Runtimes/Makefile
                  src/Scripts/Makefile
                  src/Scripts/drivers/Makefile
+                 src/Scripts/hpfc/Makefile
 ])
                  #src/Libs/pip/Makefile
                  #src/Libs/prgm_mapping/Makefile
@@ -197,4 +212,4 @@ AC_OUTPUT
 
 AX_DEPENDS([minimum],[newgen perl cproto make_all_specs newgenlibs linearlibs std_headers dup2_getcwd_gethostname_gettimeofday_memset_mkdir_putenv_regcomp_setenv_strcasecmp_strchr_strcspn_strdup_strerror_strndup_strrchr_strspn_strstr_strtol_strtoul_strtoull])
 
-AX_EXIT([minimum],[tpips pyps gpips])
+AX_EXIT([minimum],[tpips pyps gpips hpfc])

@@ -17,7 +17,7 @@ include $(srcdir)/../pipslibs_includes.mk
 install-data-hook:complexity_cost_tables.tar.gz
 	rm -rf complexity_cost_tables && \
 		tar xzf `( test -f complexity_cost_tables.tar.gz && echo complexity_cost_tables.tar.gz ) || echo $(srcdir)/complexity_cost_tables.tar.gz ` && \
-		cp -r complexity_cost_tables $(DESTDIR)$(datadir)/ && rm -rf complexity_cost_tables
+		cp -r complexity_cost_tables $(DESTDIR)$(sysconfdir)/ && rm -rf complexity_cost_tables
 
 uninstall-hook:
-	rm -rf $(DESTDIR)$(datadir)/complexity_cost_tables
+	rm -rf $(DESTDIR)$(sysconfdir)/complexity_cost_tables

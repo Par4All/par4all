@@ -11,6 +11,6 @@ libsac_la_SOURCES=\
 
 AM_YFLAGS=-d -p patterns_yy
 AM_LFLAGS=-p patterns_yy
-dist_data_DATA=patterns.def
+dist_sysconf_DATA=patterns.def
 
 include $(srcdir)/../pipslibs_includes.mk

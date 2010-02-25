@@ -1,7 +1,7 @@
 TARGET	= syntax
 nodist_include_HEADERS=$(TARGET).h
 dist_noinst_HEADERS=warning.h
-dist_data_DATA=f77keywords f77symboles
+dist_sysconf_DATA=f77keywords f77symboles
 dist_noinst_DATA=gram.y
 
 BUILT_SOURCES=$(TARGET).h keywtbl.h syn_yacc.y

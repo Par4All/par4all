@@ -1,5 +1,5 @@
 dist_noinst_SCRIPTS=make-pips-menu make-builder-map generate_all_menu_documentation pipspassdep.pl
-data_DATA=pipsmake.rc properties.rc pipsdep.rc wpips.rc properties-2009-10-31.rc 
+sysconf_DATA=pipsmake.rc properties.rc pipsdep.rc wpips.rc properties-2009-10-31.rc 
 dist_noinst_DATA=pipsmake.sed pipsmake-rc.tex properties-2009-10-31.rc.model resources.sed
 BUILT_SOURCES=resources.h printable_resources.h phases.h builder_map.h wpips_transform_menu_layout.h wpips_view_menu_layout.h
 
@@ -45,4 +45,4 @@ builder_map.h: pipsmake.rc $(srcdir)/make-builder-map
 epips_transform_menu_layout.el wpips_transform_menu_layout.h epips_view_menu_layout.el wpips_view_menu_layout.h:  pipsmake-rc.tex generate_all_menu_documentation
 	$(srcdir)/generate_all_menu_documentation -layout < $(srcdir)/pipsmake-rc.tex
 
-CLEANFILES=$(dist_noinst_DATA) $(nodist_include_HEADERS) $(data_DATA) $(BUILT_SOURCES) pipsprop.sed epips_transform_menu_layout.el epips_view_menu_layout.el
+CLEANFILES=$(dist_noinst_DATA) $(nodist_include_HEADERS) $(sysconf_DATA) $(BUILT_SOURCES) pipsprop.sed epips_transform_menu_layout.el epips_view_menu_layout.el

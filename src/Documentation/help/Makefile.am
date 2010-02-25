@@ -1,1 +1,1 @@
-dist_data_DATA=pips_help.txt
+dist_sysconf_DATA=pips_help.txt

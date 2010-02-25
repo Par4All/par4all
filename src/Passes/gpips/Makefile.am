@@ -39,5 +39,5 @@ AM_CPPFLAGS=\
 TARGET	= gpips
 nodist_noinst_HEADERS=$(TARGET).h
 dist_noinst_HEADERS=gpips_view_menu_layout.h gtk_sizes.h gpips-labels.h
-dist_data_DATA=pips.icon
+dist_sysconf_DATA=pips.icon
 include $(top_srcdir)/makes/cproto.mk

@@ -6,7 +6,7 @@ pkgpyexec_LTLIBRARIES = _pypips.la
 _pypips_la_SOURCES = pypips_aux.c 
 nodist__pypips_la_SOURCES =pypips_wrap.c
 _pypips_la_LDFLAGS = -module $(PYTHON_LDFLAGS)
-_pypips_la_LIBADD = ../../Libs/libpipslibs.la $(PYTHON_EXTRALIBS)
+_pypips_la_LIBADD = ../../Libs/libpipslibs.la $(PYTHON_EXTRALIBS) $(LINEAR_LIBS) $(NEWGEN_LIBS)
 _pypips_la_CPPFLAGS = \
 	$(PYTHON_CPPFLAGS)\
 	$(LINEARLIBS_CFLAGS)\
