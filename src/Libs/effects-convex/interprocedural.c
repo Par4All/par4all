@@ -721,6 +721,17 @@ list c_convex_effects_on_formal_parameter_backward_translation(list l_sum_eff,
 			  region_remove_psi_variables(n_eff);
 			  region_remove_rho_variables(n_eff);
 			  
+			  /* finally we must add the additional PHI variables to the indices of the effect reference */
+			  reference n_eff_ref = effect_any_reference(n_eff);
+			  for(i = nb_phi_n_eff +1; i<nb_phi_n_eff + nb_phi_eff; i++)
+			    {
+			      reference_indices(n_eff_ref) = gen_nconc(reference_indices(n_eff_ref), 
+								       CONS(EXPRESSION,
+									    make_phi_expression(i),
+									    NIL));
+			    }
+			  pips_debug_effect(8, "n_eff after adding phi: \n", n_eff);
+
 			} /*  if (nb_phi_n_eff !=0) */
 		      else
 			{
