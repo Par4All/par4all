@@ -1,6 +1,7 @@
 # coding=iso-8859-15
 import pypips
 import os
+import tempfile
 import shutil
 from string import split, upper, join
 
@@ -92,19 +93,14 @@ class workspace:
 
 	def __init__(self,sources2,name="",activates=[],verboseon=True):
 		"""init a workspace from a list of sources"""
-		if not verboseon:self.set_property(USER_LOG_P=False)
-		workspace_name=os.path.basename(os.tempnam("","PYPS")) if name == "" else name
+		if name == "":
+			name=os.path.basename(tempfile.mkdtemp("","PYPS"))
 		def helper(x,y):
 			return x+y if isinstance(y,list) else x +[y]
 		self.sources=reduce(helper,sources2,[])
-		pypips.create(workspace_name, self.sources)
+		pypips.create(name, self.sources)
+		if not verboseon:self.set_property(USER_LOG_P=False)
 		self.modules = {}
-		if os.path.splitext(self.sources[0])[1] == ".c":
-			self.module_ext=".c"
-			pypips.activate("C_PARSER");
-			self.set_property(FOR_TO_DO_LOOP_IN_CONTROLIZER=True,PRETTYPRINT_C_CODE=True,PRETTYPRINT_STATEMENT_NUMBER=False)
-		else:
-			self.module_ext=".f"
 		map(lambda x:pypips.activate(x),activates)
 		self.__build_module_list()
 		self.name=self.info("workspace")[0]
