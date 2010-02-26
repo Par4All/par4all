@@ -31,6 +31,7 @@ SIMD_LOAD_V4SF (float VEC[4], float BASE[4])
     VEC[2] = BASE[2];
     VEC[3] = BASE[3];
 }
+
 void
 SIMD_LOAD_V2DF (double VEC[2], double BASE[2])
 {
@@ -39,7 +40,7 @@ SIMD_LOAD_V2DF (double VEC[2], double BASE[2])
 }
 
 void
-SIMD_LOAD_GENERIC_V2SF (float VEC[2], float X0, float X1)
+SIMD_LOAD_GENERIC_V2DF (double VEC[2], double X0, double X1)
 {
     VEC[0] = X0;
     VEC[1] = X1;
@@ -63,6 +64,15 @@ SIMD_LOAD_CONSTANT_V4SF (float VEC[4], float X0, float X1, float X2, float X3)
     VEC[2] = X2;
     VEC[3] = X3;
 }
+void
+SIMD_LOAD_CONSTANT_V4SI (int VEC[4], int X0, int X1, int X2, int X3)
+{
+
+    VEC[0] = X0;
+    VEC[1] = X1;
+    VEC[2] = X2;
+    VEC[3] = X3;
+}
 
 void
 SIMD_SAVE_V4SF (float VEC[4], float BASE[4])
@@ -71,6 +81,12 @@ SIMD_SAVE_V4SF (float VEC[4], float BASE[4])
     BASE[1] = VEC[1];
     BASE[2] = VEC[2];
     BASE[3] = VEC[3];
+}
+void
+SIMD_SAVE_V2DF (double VEC[2], double BASE[2])
+{  
+    BASE[0] = VEC[0];
+    BASE[1] = VEC[1];
 }
 
 void
@@ -83,7 +99,7 @@ SIMD_MASKED_SAVE_V4SF(float VEC[4], float BASE[3])
 
 
 void
-SIMD_SAVE_GENERIC_V2SF (float VEC[2], float X1[1], float X2[1])
+SIMD_SAVE_GENERIC_V2DF (double VEC[2], double X1[1], double X2[1])
 {
 
     X1 [0]= VEC[0];
@@ -178,6 +194,12 @@ SIMD_MULPS (float DEST[4], float SRC1[4], float SRC2[4])
     DEST[1] = SRC1[1] * SRC2[1];
     DEST[2] = SRC1[2] * SRC2[2];
     DEST[3] = SRC1[3] * SRC2[3];
+}
+void
+SIMD_MULPD (double DEST[2], double SRC1[2], double SRC2[2])
+{
+    DEST[0] = SRC1[0] * SRC2[0];
+    DEST[1] = SRC1[1] * SRC2[1];
 }
 
 void
