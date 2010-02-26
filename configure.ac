@@ -175,6 +175,9 @@ AC_CONFIG_FILES([Makefile
                  src/Scripts/Makefile
                  src/Scripts/drivers/Makefile
                  src/Scripts/hpfc/Makefile
+                 src/Scripts/simple_tools/Makefile
+                 src/Scripts/simple_tools/pips_c2openmp
+                 src/Scripts/simple_tools/pips_f2openmp
 ])
                  #src/Libs/pip/Makefile
                  #src/Libs/prgm_mapping/Makefile
@@ -196,7 +199,6 @@ AC_CONFIG_FILES([Makefile
 #                 src/Scripts/jpips/Makefile
 #                 src/Scripts/make/Makefile
 #                 src/Scripts/misc/Makefile
-#                 src/Scripts/simple_tools/Makefile
 #                 src/Scripts/stats/Makefile
 #                 src/Scripts/step/Makefile
 #                 src/Scripts/stf/Makefile

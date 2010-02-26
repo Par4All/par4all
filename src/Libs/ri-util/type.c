@@ -800,13 +800,13 @@ basic some_basic_of_any_expression(expression exp, bool apply_p, bool ultimate_p
 
 	      for (l_dim = variable_dimensions(type_variable(exp_type)); !ENDP(l_dim); POP(l_dim))
 		{
-		  b = make_basic(is_basic_pointer, make_type(is_type_variable, make_variable(b, NIL, NIL)));
+		  b = make_basic_pointer(make_type_variable(make_variable(b, NIL, NIL)));
 		}
 	    }
 	  else if(type_functional_p(exp_type))
 	    {
 	      /* A reference to a function returns a pointer to a function of the very same time */
-	      b = make_basic(is_basic_pointer, copy_type(exp_type));
+	      b = make_basic_pointer(copy_type(exp_type));
 	    }
 	  else
 	    {
@@ -822,9 +822,11 @@ basic some_basic_of_any_expression(expression exp, bool apply_p, bool ultimate_p
 	  {
 	    if(basic_pointer_p(b))
 	      {
-		basic bt = copy_basic(variable_basic(type_variable(basic_pointer(b))));
-		free_basic(b);
-		b=bt;
+              type t = basic_pointer(b);
+              basic bt = copy_basic(variable_basic(type_variable(
+                              ultimate_p?ultimate_type(t):t)));
+		      free_basic(b);
+		      b=bt;
 	      }
 	    else
 	      {

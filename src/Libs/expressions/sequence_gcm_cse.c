@@ -1475,17 +1475,6 @@ static void atom_cse_expression(expression e,list * skip_list)
                 case is_syntax_call:
                     {
                         call c = syntax_call(s);
-                        if(
-                                get_bool_property("COMMON_SUBEXPRESSION_ELIMINATION_SKIP_ADDED_CONSTANT") &&
-                                (
-                                 same_entity_p(call_function(c),entity_intrinsic(PLUS_OPERATOR_NAME)) ||
-                                 same_entity_p(call_function(c),entity_intrinsic(PLUS_C_OPERATOR_NAME)) 
-                                )
-                          )
-                        {
-                            FOREACH(EXPRESSION,arg,call_arguments(c))
-                                if(expression_constant_p(arg)) return ;
-                        }
                         if (quality==MAX_SIMILARITY)
                         {
                             /* identicals, just make a reference to the scalar.

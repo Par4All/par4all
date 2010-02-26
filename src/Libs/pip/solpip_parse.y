@@ -249,11 +249,10 @@ coefficient1      : MOINS_OP ENTIER
 
 %% 
 
-int yyerror(char* s)
+void yyerror(char* s)
 {
     fputs(s,stderr);
-    putc('\n',stderr);
-    return 0;
+	putc('\n',stderr);
 }
 
     
