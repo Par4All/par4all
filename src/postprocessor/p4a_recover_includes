@@ -15,7 +15,7 @@ Ronan.Keryell@hpc-project.com
 
 #import string, re, sys, os, types, optparse
 
-import re, optparse, pickle, os, shutil
+import re, optparse, pickle, os, shutil, subprocess
 import ply.lex as lex
 
 #from pyps import *
@@ -119,8 +119,10 @@ header_file_names = [
     "wordexp.h",
     ]
 
-Gheader_file_names = [ "stdlib.h" ]
+#header_file_names = [ "stdio.h" ]
 
+# End-of-file mark:
+END_OF_INCLUDE_TO_FIND_MARKER = r'int p4a_recover_includes_end_of_parse;\n'
 
 # The file name used for #include parsing:
 tmp_header_file_name = "header.c"
@@ -182,6 +184,7 @@ class SimpleC99Lexer:
         'LBRACE',
         'RBRACE',
         'SEMICOLON_NL',
+        'std_include',
         'comment',
         'string',
         'char'
@@ -209,17 +212,21 @@ class SimpleC99Lexer:
     # Match the potential end of a declaration:
     t_SEMICOLON_NL = r';\n'
 
-    # C99 comments:
-    def t_comment(self, t):
-        # Taken from pips/src/Libs/c_syntax/clex.l
-        r'(/\*([^*]|(\*+[^/*]))*\*+/)|(//(\\\n|[^\n])*\n?)'
-        return t
+    # C99 comments, taken from pips/src/Libs/c_syntax/clex.l:
+    t_comment = r'(/\*([^*]|(\*+[^/*]))*\*+/)|(//(\\\n|[^\n])*\n?)'
+
 
     # C99 string:
     t_string = r'"(\\"|[^"\\]|\\[^"])*"'
 
     # C99 character literal:
     t_char = r'\'([^\\\n]|(\\.))*?\''
+
+    # A preprocessor postion information about an included standard
+    # include of the form '# 1 "/usr/include/features.h" 1 3 4':
+    #t_std_include = r'# 1 "/usr/include/[^"]+"[^\n]+\n'
+    #t_std_include = r'\# .*1 [^\n]+\n'
+    t_std_include = r'\#[ ][1][ ]"/usr/include/[^"]+"[^\n]+\n'
 
     # For other characters, we store them as the current declaration:
     def t_error(self, t):
@@ -229,6 +236,9 @@ class SimpleC99Lexer:
         t.lexer.content += t.value[0]
         # Remove is from the input:
         t.lexer.skip(1)
+
+    # A string containing ignored characters (spaces and tabs)
+    t_ignore  = ''
 
     # Build the lexer:
     def build(self, **kwargs):
@@ -249,6 +259,8 @@ def parse_declarations(header_name, file_name):
     content = f.read()
     f.close()
 
+    # Hum, the following is rather an invariant and should be moved out of
+    # the loop...
     # Build the lexer:
     l = SimpleC99Lexer()
     l.build()
@@ -271,6 +283,8 @@ def parse_declarations(header_name, file_name):
                                header_name)
             # Reset the content variable:
             l.lexer.content = ""
+    # For later use of the lexer, if any, throw away useless characters:
+    l.lexer.content = ""
 
 
 def init_headers():
@@ -288,30 +302,35 @@ def init_headers():
         # Create a .c file that includes this header file:
         f = open(tmp_header_file_name, mode = 'w')
         print('#include <' + n + '>', file = f)
+        #print('int p4a_#include <' + n + '>', file = f)
         f.close()
 
-        # Create a proxy include file to add a marking comment that is
-        # used to recognize more precizely the included file because
-        # of the massive cross inclusions of C99 .h...
-        pn = os.path.join('include', n)
-        # Crate the directory for it:
-        try:
-            os.mkdir(os.path.dirname(pn))
-        except:
-            # Just in case it already exists...
-            pass
-        # And then the file:
-        proxy = open(pn, mode = 'w')
-        print('/* This file includes ' + n + ' for PIPS */',
-              file = proxy)
-        print('#include "' + os.path.join('/usr/include', n ) + '"',
-              file = proxy)
-        proxy.close()
+        if False:
+            #  No longer used
+
+            # Create a proxy include file to add a marking comment that is
+            # used to recognize more precizely the included file because
+            # of the massive cross inclusions of C99 .h...
+            pn = os.path.join('include', n)
+            # Crate the directory for it:
+            try:
+                os.mkdir(os.path.dirname(pn))
+            except:
+                # Just in case it already exists...
+                pass
+            # And then the file:
+            proxy = open(pn, mode = 'w')
+            print('/* This file includes ' + n + ' for PIPS */',
+                  file = proxy)
+            print('#include "' + os.path.join('/usr/include', n ) + '"',
+                  file = proxy)
+            proxy.close()
 
         #w = workspace(tmp_header_file_name);
         #print w
         #parse_declarations(n, 'a.database/header!/header!.pre.c')
-        os.system("tpips header.tpips; mkdir -p headers include")
+        #os.system("tpips header.tpips; mkdir -p headers include")
+        os.system("tpips header.tpips")
         try:
             parse_declarations(n, 'header.database/Src/header.c')
             # Keep a copy of the header digested by PIPS if manual
@@ -323,8 +342,14 @@ def init_headers():
             print('The parsing by PIPS seems to have failed on', n,
                   file = errors)
 
+
 def sort_key(declaration):
+    "Not clear to Ronan Keryell how this sort_key concept works yet"
     return len(declaration)
+
+
+#match_a_line = re.compile(r'^(.*)$', re.MULTILINE)
+
 
 def recover_header(file_name, output_file_name):
     """Replace CPP-inlined stuff from previous #include <something.h> by
@@ -346,9 +371,9 @@ def recover_header(file_name, output_file_name):
     # size to be sure that the longer matches will be done first:
     declarations = list(declaration_to_header.keys())
     declarations = sorted(declarations)
-    print(declarations)
-    for i in declarations:
-        print(i)
+    #print(declarations)
+    #for i in declarations:
+    #    print(i)
     #declarations = sorted(declarations, sort_key, True)
     #declarations = sorted(declarations, (lambda x: len(x)), True)
 
@@ -369,8 +394,7 @@ def recover_header(file_name, output_file_name):
             # efficiency, but we stress debugability here...
             hgc = re.escape(d);
             (content, n_substitutions) = re.subn(hgc, '', content)
-            #if verbose and n_substitutions > 0:
-            if n_substitutions > 0:
+            if verbose and n_substitutions > 0:
                 print('Found', n_substitutions, 'substitutions for:')
                 #print(hgc)
             #print(content)
@@ -383,24 +407,100 @@ def recover_header(file_name, output_file_name):
         # If no output file is provided, override the input file:
         output_file_name = file_name
 
+    # Write the result:
     f = open(output_file_name, mode = 'w')
+    # Output the unchanged 3-line header of the changed file:
+    for i in range(3):
+        # Get in line the first line of the content and get the remaining
+        # in content:
+        (line, content) = re.split(r'\n', content, 1)
+        # Output the line to the destination file:
+        print(line, file = f)
+
+    # Then write the recoverd includes:
+    for h in found_headers:
+        print('#include <', h, '>', sep = '', file = f)
+
+    # Finished with the remaining of the file:
     print(content, file = f)
     f.close()
+
+
+def postpreprocess(output_string):
+    "Add a comment on all the begin of standard include files"
+    # Build the lexer:
+    l = SimpleC99Lexer()
+    l.build()
+    # Give the lexer some input:
+    l.lexer.input(output_string)
+
+    # Tokenize:
+    for tok in l.lexer:
+        if verbose:
+            print(tok)
+        if tok.type == 'std_include':
+            # Do not forget any pending other characters:
+            print(l.lexer.content, end = '')
+            l.lexer.content = ""
+            # Add a comment marking the begin of standard inclusion. Strip
+            # the trailing \n of the include sentence.
+            print('/* Par4All including', tok.value[:-1], '*/')
+
+        # Display with any pending other characters before:
+        l.lexer.content += tok.value
+        print(l.lexer.content, end = '')
+
+        l.lexer.content = ""
+
+    # Do not forget other pending characters if any:
+    print(l.lexer.content, end = '')
+    # For later use of the lexer, if any, throw away useless characters:
+    l.lexer.content = ""
+
+
+def preprocess(option, opt_str, value, parser):
+    """Call the preprocessor on the given argument and postprocess a little bit the output to add comments to better track standard file inclusion.
+
+    This is an optparse-callback to be able to get trailing arguments"""
+
+    #print (option, opt_str, value, parser, parser.rargs)
+
+    # Pick the default values from
+    # pips/src/Libs/preprocessor/preprocessor-local.h:
+    cpp_args = " -C  -D__PIPS__ -D__HPFC__ -U__GNUC__ "
+    # Add other options from the PIPS_CPP_FLAGS environment variable if defined:
+    if 'PIPS_CPP_FLAGS' in os.environ:
+        cpp_args += os.environ['PIPS_CPP_FLAGS'] + " "
+    # Addded the trailing arguments of this program as files to
+    # preprocess, if any:
+    cpp_args += " ".join(parser.rargs)
+    # Mark all the arguments as having been consumed:
+    del parser.rargs[:]
+    # Rely on the shell to easily use the CPP parameters:
+    output_string = subprocess.check_output("cpp" + cpp_args, shell=True)
+    if verbose:
+        print('The output before', output_string)
+    # Well, add a postprocess phase in the... preprocessor phase :-)
+    # Transform the byte array into string before
+    postpreprocess(output_string.decode())
 
 
 def main():
     global verbose
 
-    parser = optparse.OptionParser(usage = "usage: %prog [options] <files>",
+    parser = optparse.OptionParser(usage = "usage: %prog [options] [<files>]",
                                    version = "$Id")
 
     parser.add_option("-i",  "--init",
                      action = "store_true", dest = "init", default = False,
-                     help = "Initialize the #include tables from PIPS exersizing")
+                     help = "Initialize from PIPS exersizing the #include tables that will be used in the postprocessor")
+
+    parser.add_option("-E",  "--preprocessor",
+                     action = "callback", callback = preprocess,
+                      help = "Use this program as a preprocessor. It follows the PIPS_CPP_FLAGS environment variable but not PIPS_CPP since often the later is used to call this program. It must be the last option of this program before all the other options and parameters to be passed to CPP. This option override the -i/--init and -o/--output options. The arguments passed to the CPP are the PIPS default options, the content of the PIPS_CPP_FLAGS environment variable and the trailing arguments of this programm.")
 
     parser.add_option("-o",  "--output", dest="output_file_name",
-                      help = """Name of the file used to output the recovered
-                      includes instead of overriding the input file""",
+                      help = "When used in default postprocessor mode, it sets the name of the file used to output the recovered includes instead of overriding the input file",
                       metavar="FILE")
 
     group = optparse.OptionGroup(parser, "Debug options")

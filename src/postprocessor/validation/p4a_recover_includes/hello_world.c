@@ -1,12 +1,14 @@
 /* Pour pouvoir utiliser proprement
    la fonction de sortie : */
 #include <stdio.h>
-/* Définit entre autres les codes de retour : */
+/* DÃ©finit entre autres les codes de retour : */
 #include <stdlib.h>
 
 int main(int argc, char *argv[]) {
-  /* Affiche sur la « sortie-standard » */
+  /* Affiche sur la Â« sortie-standard Â» */
   puts("Hello, world!");
-  // Renvoie une marque de réussite :
+  // Renvoie une marque de rÃ©ussite :
   return EXIT_SUCCESS;
 }
+
+

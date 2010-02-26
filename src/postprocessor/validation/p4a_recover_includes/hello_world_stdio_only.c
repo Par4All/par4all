@@ -1,8 +1,8 @@
 #include <stdio.h>
 
 int main(int argc, char *argv[]) {
-  /* Affiche sur la « sortie-standard » */
+  /* Affiche sur la Â« sortie-standard Â» */
   puts("Hello, world!");
-  // Renvoie une marque de réussite :
+  // Renvoie une marque de rÃ©ussite :
   return 0;
 }
