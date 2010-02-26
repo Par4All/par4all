@@ -1,6 +1,4 @@
-#! /bin/bash
-#
-# $Id$
+# $Id: Makefile 15925 2010-01-07 15:03:43Z coelho $
 #
 # Copyright 1989-2010 MINES ParisTech
 #
@@ -21,32 +19,6 @@
 # along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-
-# Use $INSTALL_DIR if set or $PIPS_ROOT:
-SHR_d=${INSTALL_DIR:-$PIPS_ROOT}/share
-
-function display_usage_and_exit () {
-    cat <<EOF
-$0 [-h|--help] file.f ...
-  Create a workspace from C source files and parallelize
-  them with OpenMP syntax.
-
-'$Id$'
-EOF
-    exit
-}
-
-source ${SHR_d}/simple_tools.bash
-
-{
-    create_workspace $*
-    select_c_language
-    select_most_precise_analysis
-    privatize_scalar_variables
-    #openmp_parallelization_rice
-    #internalize_parallel_code
-    openmp_parallelization_coarse_grain
-    regenerate_source
-} | tpips
-
-echo "The parallelized code is in $workspace.database/Src"
+# pips shell simple tools
+dist_bin_SCRIPTS =	pips_c2openmp pips_f2openmp
+dist_data_DATA = simple_tools.bash

@@ -22,14 +22,15 @@
 #
 
 
-# Use $INSTALL_DIR if set or $PIPS_ROOT, if SimpleTool_dir is not set for
-# testing:
-${SimpleTool_dir:=${INSTALL_DIR:-$PIPS_ROOT}/share}
+# Use $INSTALL_DIR if set or $PIPS_ROOT:
+prefix="@prefix@"
+datarootdir="@datarootdir@"
+SHR_d="@datadir@"
 
 function display_usage_and_exit () {
     cat <<EOF
 $0 [-h|--help] file.f ...
-  Create a workspace from Fortran source files and parallelize
+  Create a workspace from C source files and parallelize
   them with OpenMP syntax.
 
 '$Id$'
@@ -37,10 +38,11 @@ EOF
     exit
 }
 
-source ${SimpleTool_dir}/simple_tools.bash
+source ${SHR_d}/simple_tools.bash
 
 {
     create_workspace $*
+    select_c_language
     select_most_precise_analysis
     privatize_scalar_variables
     #openmp_parallelization_rice
@@ -49,4 +51,4 @@ source ${SimpleTool_dir}/simple_tools.bash
     regenerate_source
 } | tpips
 
-display_end
+echo "The parallelized code is in $workspace.database/Src"
