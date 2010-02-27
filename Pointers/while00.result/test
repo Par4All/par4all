@@ -36,7 +36,7 @@ int main()
 //  points to = {(b,c,E)}
 
    while (c>0) {
-//  points to = {(a,d,M)({,c,M)(a,c,M)(b,d,M)}
+//  points to = {(a,d,M)(b,c,M)(a,c,M)(b,d,M)}
       // BEGIN BLOCK
 
       a = b;
