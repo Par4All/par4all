@@ -27,7 +27,7 @@ INSTALL_EXE =	$(SCRIPTS)
 INSTALL_SHR = simple_tools.bash
 
 %:%.in
-	sed -e 's/@datadir@/$${INSTALL_DIR:-$$PIPS_ROOT}/share}/g' $< > $@
+	sed -e 's,@datadir@,$${INSTALL_DIR:-$$PIPS_ROOT}/share,g' $< > $@
 
 # common stuff
 ROOT    = ../../..
