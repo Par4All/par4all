@@ -1,0 +1,64 @@
+int main()
+{
+   // BEGIN BLOCK
+   struct p_s {
+      struct q_s *q;
+   } *p;
+   struct q_s {
+      int r;
+   } **z, *x, b, u;
+   int a;
+//               <must be written>: a
+   a = 1;
+//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
+//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ p
+   p = (struct p_s *) malloc(sizeof(struct p_s ));
+//               <must be written>: x
+   x = &b;
+//               <must be read   >: p x
+//               <must be written>: p[0][1]
+   p->q = x;
+//               <must be read   >: p
+//               <must be written>: z
+   z = &p->q;
+//               <must be read   >: z
+//               <must be written>: z[0]
+   // q = p;
+   *z = &u;
+//               <must be read   >: a p p[0][1]
+//               <must be written>: p[0][1][0][1]
+   p->q->r = a;
+   return 0;
+   // END BLOCK
+}
+POINTS TO
+int main()
+{
+   // BEGIN BLOCK
+   struct p_s {
+      struct q_s *q;
+   } *p;
+   struct q_s {
+      int r;
+   } **z, *x, b, u;
+   int a;
+   a = 1;
+   p = (struct p_s *) malloc(sizeof(struct p_s ));
+//  points to = {(p,*ANYWHERE*:*HEAP*,M)}
+   x = &b;
+//  points to = {(p,*ANYWHERE*:*HEAP*,M)(x,b,E)}
+   p->q = x;
+//  points to = {(p,*ANYWHERE*:*HEAP*,M)(x,b,E)(p[0][1],b,E)}
+   z = &p->q;
+//  points to = {(p,*ANYWHERE*:*HEAP*,M)(x,b,E)(z,p[0][1],E)(p[0][1],
+//   b,E)}
+   // q = p;
+   *z = &u;
+//  points to = {(p[0][1],u,E)(x,b,E)(z,p[0][1],E)(p,
+//   *ANYWHERE*:*HEAP*,M)}
+   p->q->r = a;
+//  points to = {(p,*ANYWHERE*:*HEAP*,M)(x,b,E)(p[0][1],u,E)(z,
+//   p[0][1],E)}
+   return 0;
+   // END BLOCK
+}
