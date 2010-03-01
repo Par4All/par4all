@@ -11,6 +11,6 @@ long long test_intr (char** argv) {
 }
 
 int main (int argc, char** argv) {
-  long long size = test_intr (argv);
-  return (int) size;
+  long long size[test_intr (argv)];
+  return (int) size[0];
 }
