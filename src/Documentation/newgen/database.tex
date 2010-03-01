@@ -37,12 +37,15 @@
 \section{Old Database Structures}
  
 \domain{Database = name:string x directory:string x resources:resource*}
-{ The domain {\tt database} is used by pips-dbm
-  to describe the state of a program user. This domain contains its
-  name ({\tt name}), the directory in which it was created, and the
-  information which was calculated for the different modules ({\tt
-    resources}). In reality, the name of the database and the name of the
-  directory used are in practice directly linked. The name of the
+{ The domain {\tt database} is managed by the pipsdbm and preprocessor libraries
+  to describe the current state of a PIPS execution. This Newgen domain contains its
+  name ({\tt name}), the directory in which it was created which is
+  also know as {\em workspace}, and the
+  information which has been computed for the different modules, {\tt
+    resources}. Each
+  piece of information is called a {\tt
+    resource}. In reality, the name of the database and the name of the
+  directory used are directly linked. The name of the
   directory is the name of the base with the string \textsc{.database}
   attached as a suffix.
  
@@ -58,13 +61,13 @@ consistent file naming rule were used across PIPS development.
  
 \domain{Resource = name:string x owner\_name:string x status x time:int x file\_time:int}
 { The domain {\tt resource} is used by
-  pips-dbm to describe any piece of information which might be
+  pipsdbm to describe any piece of information which might be
   calculated by PIPS for a module or a program. For each bit of
   information, the following fields must be known: its resource kind
   name, ({\tt name}), the function to whom this resource is related to
   ({\tt owner\_name}), whether it is present in memory or stored in
   file ({\tt status}), its logical creation date ({\tt time}), and,
-  portentially, the creation date (Unix) of the corresponding file
+  potentially, the creation date (Unix) of the corresponding file
   ({\tt file\_time}).
  
 The kind {\tt name} of the resource is in fact a type and could have been
@@ -80,21 +83,21 @@ its resource kind name, \texttt{name}, and the name of its so-called
 We discussed for some time the utility of having an owner\_type to
 specify what the resource refers to: a program (e.g. entities, the
 symbol table), a module (most other resources), a
-loop, an instruction, etc. We decided against it since to this date,
+loop, an instruction, etc. We decided against it since up to this date,
 we only have those resources which may be attached to programs or
 modules, and this information may be deduced from the kind {\tt name} of
 the resource. In fact, we only have a few resources which may be
-attached to a program; these are the entities (et les
+attached to a program; these are the entities (and the
 \texttt{user\_file}, but they are largely poorly treated for the
-moment). We also have summary information related to the whole
+time being). We also have summary information related to the whole
 program, e.g. the program precondition.}
  
 \domain{Status = memory:string + file:string}
 { The domain {\tt
-    status} is used by pips-dbm to know if the resource concerned may
-  either reside in memory, in which case it my be found either in
+    status} is used by pipsdbm to know if the resource concerned may
+  either reside in memory, in which case it may be found in
   memory, if it is needed for a processus, or on disc, if it is
-  composed of a file which is normally never loaded in memory in the
+  composed of a file which is normally never loaded in memory. In the
   latter case, the sub-domain {\tt file} gives the file
   name.  The file name must be relative to the workspace, if it is
   found in this workspace, and must be absolute, if it is found
@@ -104,7 +107,7 @@ program, e.g. the program precondition.}
   pointer towards this resource.
  
 How do resources in a file and file resources differ? It cannot be seen
-from this description! The list of the latter group is explicitely managed
+from this description. The list of the latter group is explicitely managed
 somewherelsee in pipsdbm. File resources cannot be loaded into
 memory. They are accessed through other files named after the resource
 kind. For instance, the file PRINTED\_FILE contains the name of the
