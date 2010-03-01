@@ -4988,10 +4988,11 @@ if \PipsPropRef{SIMD_OVERRIDE_CONSTANT_TYPE_INFERENCE} is set to \texttt{TRUE}, 
 SIMD_OVERRIDE_CONSTANT_TYPE_INFERENCE FALSE
 \end{PipsProp}
 
+
 \begin{PipsPass}{simdizer_auto_unroll}
-Function \PipsPassRef{simdizer_auto_unroll} tries to unroll the code for
-making the simdizing process more efficient. It thus tries to compute
+Tries to unroll the code for making the simdizing process more efficient. It thus tries to compute
 the optimal unroll factor, allowing to pack the most instructions together.
+Sensible to \PipsPropRef{SIMDIZER_AUTO_UNROLL_MINIMIZE_UNROLL} and \PipsPropRef{SIMDIZER_AUTO_UNROLL_SIMPLE_CALCULATION}.
 \end{PipsPass}
 
 \begin{PipsMake}
@@ -5206,8 +5207,8 @@ is computed by using the minimum of the optimal factor for each
 statement. If the property is set to FALSE, then the maximum unroll
 factor is used instead.
 
-\begin{PipsProp}{SIMD_AUTO_UNROLL_MINIMIZE_UNROLL} 
-SIMD_AUTO_UNROLL_MINIMIZE_UNROLL TRUE
+\begin{PipsProp}{SIMDIZER_AUTO_UNROLL_MINIMIZE_UNROLL} 
+SIMDIZER_AUTO_UNROLL_MINIMIZE_UNROLL TRUE
 \end{PipsProp}
 
 This property controls how the ``optimal'' unroll factor is
@@ -5217,8 +5218,8 @@ to the size of the registers to find out the best unroll factor.
 If the property is set to FALSE, a more complex algorithm is used,
 which takes into account the actual SIMD instructions.
 
-\begin{PipsProp}{SIMD_AUTO_UNROLL_SIMPLE_CALCULATION} 
-SIMD_AUTO_UNROLL_SIMPLE_CALCULATION TRUE
+\begin{PipsProp}{SIMDIZER_AUTO_UNROLL_SIMPLE_CALCULATION} 
+SIMDIZER_AUTO_UNROLL_SIMPLE_CALCULATION TRUE
 \end{PipsProp}
 
 \paragraph{Memory Organisation}

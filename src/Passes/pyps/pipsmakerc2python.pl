@@ -46,7 +46,6 @@ foreach(@lines) {
 }
 close INPUT;
 
-
 # read texfile into a string
 open INPUT ,$texfile or die "cannot open $texfile:$!";
 @lines=<INPUT>; 
