@@ -1054,9 +1054,9 @@ transformer fortran_user_call_to_transformer(entity f,
   t_callee = load_summary_transformer(f);
 
   ifdebug(8) {
-    Psysteme s = 
+    Psysteme s =
       (Psysteme) predicate_system(transformer_relation(t_callee));
-    pips_debug(8, "Transformer for callee %s:\n", 
+    pips_debug(8, "Transformer for callee %s:\n",
 	       entity_local_name(f));
     dump_transformer(t_callee);
     sc_fprint(stderr, s, (char * (*)(Variable)) dump_value_name);
