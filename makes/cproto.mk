@@ -11,8 +11,8 @@ $(TARGET).h:$(srcdir)/$(TARGET)-local.h $(SOURCES)
 	if ! test -f $(TARGET).h ; then \
 		cp $(srcdir)/$(TARGET)-local.h $(TARGET).h ;\
 	fi
+	SOURCES=`for s in $(TARGET)-local.h $(SOURCES) ; do ( test -f $$s && echo $$s ) || echo $(srcdir)/$$s ; done`; \
 	{ \
-		SOURCES=`for s in $(TARGET)-local.h $(SOURCES) ; do ( test -f $$s && echo $$s ) || echo $(srcdir)/$$s ; done`; \
 		guard=`echo $(TARGET)_header_included | tr - _`;\
       	echo "/* Warning! Do not modify this file that is automatically generated! */"; \
       	echo "/* Modify src/Libs/$(TARGET)/$(TARGET)-local.h instead, to add your own modifications. */"; \
@@ -26,10 +26,11 @@ $(TARGET).h:$(srcdir)/$(TARGET)-local.h $(SOURCES)
 			$(CPROTO) -evcf2 -O /dev/null -E "$(CPP) $(INCLUDES) $(DEFAULT_INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) -DCPROTO_IS_PROTOTYPING" $$s ;\
 		done ; \
       	echo "#endif /* $${guard} */"; \
-	} | sed -e '/ yy/ d' > $(TARGET).h-tmp
+	} | sed -e '/ yy/ d' > $(TARGET).h-tmp ; \
 	if cmp -s $(TARGET).h $(TARGET).h-tmp ; then \
-		echo "file is unchanged" ; \
+		echo "file is unchanged, updating timestamp only" ; \
 		rm $(TARGET).h-tmp ;\
+		for s in $$SOURCES ; do test $$s -ot $(TARGET).h || touch -r $$s $(TARGET).h ; done ;\
 	 else \
 	 	echo "udpating file"; \
 		rm $(TARGET).h ; \
