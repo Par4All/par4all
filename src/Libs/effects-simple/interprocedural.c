@@ -1075,7 +1075,18 @@ list c_simple_effects_on_formal_parameter_backward_translation(list l_sum_eff,
       } /* case is_syntax_reference */ 
     case is_syntax_subscript:
       {
-	pips_internal_error("Subscript not supported yet\n");
+	bool read_p = false;
+	bool write_p = false;
+	pips_user_warning("Subscript not supported yet : returning anywhere effect\n");
+	FOREACH(EFFECT, eff, l_sum_eff)
+	      {
+		if (effect_read_p(eff)) read_p = true;
+		if (effect_write_p(eff)) write_p = true;
+	      }
+	if (read_p) 
+	  l_eff = CONS(EFFECT, make_anywhere_effect(is_action_read), NIL);
+	if (write_p)
+	  l_eff = CONS(EFFECT, make_anywhere_effect(is_action_write), l_eff);
 	break;
       }
     case is_syntax_call:
