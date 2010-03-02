@@ -4,15 +4,15 @@ Initial code
 int icm01()
 {
    // BEGIN BLOCK
-   int i;                                                               /*0004*/
-   int j = 3;                                                           /*0005*/
-   int k;                                                               /*0006*/
-   int a[10];                                                           /*0007*/
+   int i;                                                               /*0006*/
+   int j = 3;                                                           /*0007*/
+   int k;                                                               /*0008*/
+   int a[10];                                                           /*0009*/
 
    for(i = 0; i <= 9; i += 1) {
       // BEGIN BLOCK
-      k = j*j+1;                                                        /*0010*/
-      a[i] = k;                                                         /*0011*/
+      k = j*j+1;                                                        /*0012*/
+      a[i] = k;                                                         /*0013*/
       // END BLOCK
    }
    // END BLOCK
@@ -23,18 +23,18 @@ Code after Invariant Code Motion
 int icm01()
 {
    // BEGIN BLOCK
-   int i;                                                               /*0004*/
-   int j = 3;                                                           /*0005*/
-   int k;                                                               /*0006*/
-   int a[10];                                                           /*0007*/
+   int i;                                                               /*0006*/
+   int j = 3;                                                           /*0007*/
+   int k;                                                               /*0008*/
+   int a[10];                                                           /*0009*/
    //PIPS generated variable
    int I_0;
 
    I_0 = j*j+1;
    for(i = 0; i <= 9; i += 1) {
       // BEGIN BLOCK
-      k = I_0;                                                          /*0010*/
-      a[i] = k;                                                         /*0011*/
+      k = I_0;                                                          /*0012*/
+      a[i] = k;                                                         /*0013*/
       // END BLOCK
    }
    // END BLOCK

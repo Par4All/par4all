@@ -4,14 +4,14 @@
          foo
 int bla(void)
 {
-   int f = foo();                                                       /*0004*/
-   int bla_int = f+2;                                                   /*0005*/
-   return bla_int;                                                      /*0006*/
+   int f = foo();                                                       /*0009*/
+   int bla_int = f+2;                                                   /*0010*/
+   return bla_int;                                                      /*0011*/
 }
 int foo(void)
 {
-   int foo_int = 1;                                                     /*0004*/
-   return foo_int;                                                      /*0005*/
+   int foo_int = 1;                                                     /*0003*/
+   return foo_int;                                                      /*0004*/
 }
 int main(void)
 {
@@ -30,7 +30,7 @@ int main(void)
    int _return0;                                                        /*0006*/
    {
       int foo_int;                                                      /*0008*/
-      /*0004*/
+      /*0003*/
       foo_int = 1;                                                      /*0009*/
       _return0 = foo_int;                                               /*0010*/
    }
@@ -43,14 +43,14 @@ int main(void)
 int bla(void)
 {
    int f;                                                               /*0003*/
-   /*0004*/
+   /*0009*/
    int bla_int;                                                         /*0004*/
-   /*0005*/
+   /*0010*/
    //PIPS generated variable
    int _return0;                                                        /*0006*/
    {
       int foo_int;                                                      /*0008*/
-      /*0004*/
+      /*0003*/
       foo_int = 1;                                                      /*0009*/
       _return0 = foo_int;                                               /*0010*/
    }
@@ -79,7 +79,7 @@ int main(void)
    {
       int foo_int;                                                      /*0012*/
       /*0008*/
-      /*0004*/
+      /*0003*/
       foo_int = 1;                                                      /*0014*/
       /*0009*/
       _return0 = foo_int;                                               /*0015*/
@@ -88,16 +88,16 @@ int main(void)
    {
       int f;                                                            /*0019*/
       /*0003*/
-      /*0004*/
+      /*0009*/
       int bla_int;                                                      /*0021*/
       /*0004*/
-      /*0005*/
+      /*0010*/
       //PIPS generated variable
       int _return0;                                                     /*0024*/
       {
          int foo_int;                                                   /*0026*/
          /*0008*/
-         /*0004*/
+         /*0003*/
          foo_int = 1;                                                   /*0028*/
          /*0009*/
          _return0 = foo_int;                                            /*0029*/

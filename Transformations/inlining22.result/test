@@ -3,8 +3,8 @@
          bla
 int foo(void)
 {
-   bla(kernel);                                                         /*0004*/
-   return 0;                                                            /*0005*/
+   bla(kernel);                                                         /*0005*/
+   return 0;                                                            /*0006*/
 }
 int main(void)
 {
@@ -22,7 +22,7 @@ int main(void)
    //PIPS generated variable
    int _return0;                                                        /*0004*/
    bla(kernel);                                                         /*0005*/
-   /*0004*/
+   /*0005*/
    _return0 = 0;                                                        /*0006*/
    _return0;                                                            /*0009*/
    return 0;                                                            /*0010*/

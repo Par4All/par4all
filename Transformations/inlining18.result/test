@@ -1,15 +1,15 @@
 char * foo(void)
 {
-   const char *foo_fun = __FUNCTION__;                                  /*0004*/
-   return (char *) foo_fun;                                             /*0005*/
+   const char *foo_fun = __FUNCTION__;                                  /*0003*/
+   return (char *) foo_fun;                                             /*0004*/
 }
 int main(void)
 {
-   const char *fun, *fun2, *fun3;                                       /*0004*/
-   fun = foo();                                                         /*0005*/
-   fun2 = __FUNCTION__;                                                 /*0006*/
-   fun3 = __func__;                                                     /*0007*/
-   return 0;                                                            /*0008*/
+   const char *fun, *fun2, *fun3;                                       /*0009*/
+   fun = foo();                                                         /*0010*/
+   fun2 = __FUNCTION__;                                                 /*0011*/
+   fun3 = __func__;                                                     /*0012*/
+   return 0;                                                            /*0013*/
 }
 extern char *foo(void);                                                 /*0001*/
 
@@ -17,19 +17,19 @@ extern int main(void);                                                  /*0003*/
 int main(void)
 {
    const char *fun, *fun2, *fun3;                                       /*0003*/
-   /*0004*/
+   /*0009*/
    //PIPS generated variable
    char *_return0;                                                      /*0005*/
    {
       const char *foo_fun;                                              /*0007*/
-      /*0004*/
+      /*0003*/
       foo_fun = __FUNCTION__;                                           /*0008*/
       _return0 = (char *) foo_fun;                                      /*0009*/
    }
    fun = _return0;                                                      /*0013*/
    fun2 = __FUNCTION__;                                                 /*0014*/
-   /*0006*/
+   /*0011*/
    fun3 = __func__;                                                     /*0015*/
-   /*0007*/
+   /*0012*/
    return 0;                                                            /*0016*/
 }
